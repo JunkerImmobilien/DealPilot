@@ -604,9 +604,28 @@
         var _wPasst = !!(_wA && _wA.wgfz_objekt != null && _wObjN != null && Math.abs(Number(_wA.wgfz_objekt) - _wObjN) < 0.005);
         var _wWert, _wText;
         var _wKopf = st('a', 'Ausschuss') + esc(String(wq.ausschuss || '').split(',')[0]) + (wq.seite ? ' · ' + esc(wq.seite) : '') + _wQ;
-        if (!wEigen) {
+        /* v3293 · Marcel 11.11.2026: „Wir haben oft ‚WGFZ fehlt'. Können wir das ändern?"
+           Ohne eingetragene WGFZ zeigt die Zeile die abgeleitete (r.wgfz_abgeleitet, dieselbe
+           Rechnung wie der Bericht: Haus aus BGF und Gebäudeart, MFH aus Wohnfläche : 0,8),
+           immer als „abgeleitet" mit dem Eingabeknopf. Hat der Bericht damit umgerechnet,
+           steht sein Faktor da. „fehlt" bleibt nur, wo nichts abzuleiten ist (ETW, keine Fläche). */
+        var _wAbl = r.wgfz_abgeleitet && r.wgfz_abgeleitet.verfuegbar ? r.wgfz_abgeleitet : null;
+        if (!wEigen && _wAbl) {
+          var _wAblPasst = !!(_wA && _wA.wgfz_objekt != null && Math.abs(Number(_wA.wgfz_objekt) - Number(_wAbl.wgfz)) < 0.005);
+          if (_wA && _wA.verfuegbar && _wAblPasst && _wA.faktor != null) {
+            _wWert = '× ' + _de(_wA.faktor) + ' WGFZ ' + _de(_wA.wgfz_zone, 2) + ' → ' + _de(_wAbl.wgfz, 2) + ' (abgeleitet)';
+            _wText = ' — im Marktbericht vom ' + _berDatum(_wB) + ' angewandt' + (_wA.naeherung ? ' (Umrechnung abgeleitet aus der DealPilot-Formel)' : '')
+              + ': Koeffizient Objekt ' + _de(_wA.uk_objekt) + ' / Zone ' + _de(_wA.uk_zone)
+              + (_wA.bodenwert_eur_qm != null ? ', angepasster Bodenwert ' + _de(_wA.bodenwert_eur_qm, 2) + ' €/m²' : '') + '. ';
+          } else {
+            _wWert = 'WGFZ ' + _de(_wAbl.wgfz, 2) + ' · abgeleitet';
+            _wText = ' — ';
+          }
+          _wText += esc(_wAbl.hinweis || _wAbl.kennung || '') + ' Eigene Angabe möglich:';
+        } else if (!wEigen) {
           _wWert = 'WGFZ fehlt — eintragen';
-          _wText = ' Der Ausschuss führt eine Umrechnung nach der WGFZ. Trag die WGFZ des Objekts ein (oberirdische Geschossfläche / Grundstück) — sonst bleibt der Bodenwert insoweit unangepasst.';
+          _wText = ' Der Ausschuss führt eine Umrechnung nach der WGFZ. Trag die WGFZ des Objekts ein (oberirdische Geschossfläche / Grundstück) — sonst bleibt der Bodenwert insoweit unangepasst.'
+            + (r.wgfz_abgeleitet && r.wgfz_abgeleitet.hinweis ? ' ' + esc(r.wgfz_abgeleitet.hinweis) : '');
         } else if (_wA && _wA.verfuegbar && _wPasst && _wA.faktor != null) {
           _wWert = '× ' + _de(_wA.faktor) + ' WGFZ ' + _de(_wA.wgfz_zone, 2) + ' → ' + _de(_wA.wgfz_objekt, 2);
           _wText = ' — im Marktbericht vom ' + _berDatum(_wB) + ' angewandt' + (_wA.naeherung ? ' (abgeleitet aus der DealPilot-Formel)' : '')

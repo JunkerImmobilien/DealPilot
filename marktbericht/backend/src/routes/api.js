@@ -1832,6 +1832,16 @@ router.post('/wertparameter/zinssatz', async (req, res) => {
             seite: s.seite || null, jahrgang: s.jahrgang || s.berichtsjahr || null };
         } catch (e) { return null; }
       })(),
+      /* v3293 · Marcel 11.11.2026: „Wir haben oft ‚WGFZ fehlt'." Ohne eingetragene WGFZ
+         zeigt der Reiter die abgeleitete (dieselbe Rechnung wie der Bericht, Stufe N). */
+      wgfz_abgeleitet: await (async () => {
+        try {
+          if (Number(m.wgfz_objekt) > 0) return null;
+          const WG = await import('../lib/umrechnung_wgfz.js');
+          return WG.wgfzAbleitung({ objektart: m.property_subtype || m.property_type, plot_area: m.plot_area,
+            bgf: m.bgf, living_area: m.living_area, nhk_typ: m.nhk_typ, ags: String(agsFein) });
+        } catch (e) { return null; }
+      })(),
       baupreisindex: baupreisindexHeute(),
       objektart: m.property_type, ags: String(agsFein)
     });

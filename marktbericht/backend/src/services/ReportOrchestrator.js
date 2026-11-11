@@ -21,7 +21,7 @@ import { restnutzungsdauerEinheitlich as rndEinheitlich } from '../lib/rnd-einhe
 import { flaechenaufteilung, manuelleAufteilung } from '../lib/umrechnung_nrw.js';
 import { groessenanpassung as ukAusRegister, naeherung as ukNaeherung,
          sperreSchliesstNaeherungAus } from '../lib/umrechnung_flaeche.js';   /* v2280, v2288 */
-import { wgfzAnpassung, wgfzNaeherung } from '../lib/umrechnung_wgfz.js';   /* v2361, v2377 */
+import { wgfzAnpassung, wgfzNaeherung, wgfzAbleitung } from '../lib/umrechnung_wgfz.js';   /* v2361, v2377, v3293 */
 import { zustaendig as niZoneZustaendig, holeZonen as niZonenHolen, waehleZone as niZoneWaehlen } from '../connectors/boris/ni-zone.js';   /* v2284 */
 /* v1073-WGAA-4 · Vorschlag fuer den Gartenland-Wertansatz aus dem
  * zustaendigen Grundstuecksmarktbericht. */
@@ -1080,6 +1080,31 @@ export const ReportOrchestrator = {
        * grundstuecke), wird der BRW damit angepasst. Amtlich vor Naeherung: wo
        * die WGFZ-Umrechnung greift, rechnet die DealPilot-Formel NICHT zusaetzlich
        * ueber die Flaeche - sonst stuende der Groesseneffekt doppelt im Wert. */
+      /* v3293 · Marcel 11.11.2026: „Wir haben oft ‚WGFZ fehlt'. Können wir das ändern?"
+       * Fehlt die eingetragene WGFZ, wird sie abgeleitet (umrechnung_wgfz.js wgfzAbleitung:
+       * Haus aus BGF und Gebaeudeart, MFH aus Wohnflaeche : 0,8) - Stufe N, nie amtlich, im
+       * Bericht immer „WGFZ abgeleitet aus …, eigene Angabe genauer". Die eingetragene
+       * WGFZ schlaegt die Ableitung immer. Kein zusaetzlicher Belastbarkeitsabzug - wie bei
+       * den uebrigen Stufe-N-Werten des Bodenwerts (UK-Flaeche, WGFZ-Formel). */
+      let _wgfzAbl = null;
+      try {
+        if (!(ref.wgfz_objekt > 0)) _wgfzAbl = wgfzAbleitung({ objektart: ref.property_subtype || ref.property_type,
+          plot_area: ref.plot_area, bgf: ref.bgf, living_area: ref.living_area, nhk_typ: ref.nhk_typ, ags: ref.ags });
+      } catch (e) { _wgfzAbl = null; }
+      const _wgfzObj = ref.wgfz_objekt > 0 ? ref.wgfz_objekt : (_wgfzAbl && _wgfzAbl.verfuegbar ? _wgfzAbl.wgfz : null);
+      /* haengt die Herkunft an das Ergebnis: abgeleitet -> Stufe N, Kennzeichnung vorn im Hinweis */
+      const _wgfzHerkunft = (w) => {
+        if (!w) return w;
+        if (_wgfzAbl && _wgfzAbl.verfuegbar && w.wgfz_objekt != null && Math.abs(Number(w.wgfz_objekt) - _wgfzAbl.wgfz) < 1e-9) {
+          w.wgfz_herkunft = 'abgeleitet'; w.wgfz_ableitung = _wgfzAbl;
+          if (w.verfuegbar) { w.stufe = 'N'; w.wgfz_abgeleitet = true; }
+          w.hinweis = _wgfzAbl.hinweis + (w.hinweis ? ' ' + w.hinweis : '');
+        } else if (w.grund === 'wgfz_objekt_fehlt' && _wgfzAbl && !_wgfzAbl.verfuegbar && _wgfzAbl.hinweis) {
+          w.wgfz_ableitung = _wgfzAbl;
+          w.hinweis = (w.hinweis ? w.hinweis + ' ' : '') + _wgfzAbl.hinweis;
+        } else if (ref.wgfz_objekt > 0) w.wgfz_herkunft = 'eigene_angabe';
+        return w;
+      };
       let _wgfz = null;
       try {
         const _pw = (landValue && landValue.properties_raw) || {};
@@ -1088,8 +1113,11 @@ export const ReportOrchestrator = {
         _wgfz = wgfzAnpassung({
           ags: ref.ags || null, objektart: ref.property_subtype || ref.property_type,
           brw_eur_qm: (landValue && landValue.available) ? landValue.value_sqm : null,
-          wgfz_zone: _gz > 0 ? _gz : null, wgfz_objekt: ref.wgfz_objekt,
+          wgfz_zone: _gz > 0 ? _gz : null, wgfz_objekt: _wgfzObj,
         });
+        /* die Kennzeichnung nur, wo die WGFZ des Objekts eine Rolle spielt (Zone mit GFZ, Satz vorhanden) */
+        if (_gz > 0 && ['kein_satz', 'sperre', 'wgfz_zone_fehlt'].indexOf(_wgfz.grund) < 0) _wgfzHerkunft(_wgfz);
+        if (_wgfzAbl) step('wgfz-ableitung: ' + (_wgfzAbl.verfuegbar ? _wgfzAbl.wgfz + ' (' + _wgfzAbl.weg + ')' : _wgfzAbl.grund));
         step('uk-wgfz: ' + (_wgfz.verfuegbar ? 'Faktor ' + _wgfz.faktor + ' (' + _wgfz.uk_objekt + '/' + _wgfz.uk_zone + ')' : _wgfz.grund));
       } catch (e) { _wgfz = null; }
       /* v2541 · MFH: WGFZ VOR FLAECHE (Marcel 20.10.2026). Bielefeld schreibt zur
@@ -1155,8 +1183,9 @@ export const ReportOrchestrator = {
           const _wn = wgfzNaeherung({
             objektart: ref.property_subtype || ref.property_type,
             brw_eur_qm: (landValue && landValue.available) ? landValue.value_sqm : null,
-            wgfz_zone: _gz2 > 0 ? _gz2 : null, wgfz_objekt: ref.wgfz_objekt,
+            wgfz_zone: _gz2 > 0 ? _gz2 : null, wgfz_objekt: _wgfzObj,   /* v3293 */
           });
+          if (_gz2 > 0 && (_wn.verfuegbar || _wn.grund === 'wgfz_objekt_fehlt' || /^ausserhalb/.test(String(_wn.grund || '')))) _wgfzHerkunft(_wn);
           step('uk-wgfz-dealpilot-formel: ' + (_wn.verfuegbar ? 'Faktor ' + _wn.faktor : _wn.grund));
           if (_wn.verfuegbar) {
             /* Der Weg zum Ausschuss bleibt sichtbar (Sperre mit Fundstelle). */
@@ -1250,7 +1279,9 @@ export const ReportOrchestrator = {
           ? 'WGFZ ' + String(_wgfz.wgfz_objekt).replace('.', ',') + ' statt ' + String(_wgfz.wgfz_zone).replace('.', ',')
             + (_wgfz.naeherung   /* v2377 */
               ? ': × ' + String(_wgfz.faktor).replace('.', ',') + ' (abgeleitet aus der DealPilot-Formel)'
-              : ': × ' + String(_wgfz.uk_objekt).replace('.', ',') + ' / ' + String(_wgfz.uk_zone).replace('.', ',')) : null,
+                + (_wgfz.wgfz_abgeleitet ? '; WGFZ des Objekts abgeleitet (DealPilot-Ableitung, Stufe N), eigene Angabe genauer' : '')
+              : ': × ' + String(_wgfz.uk_objekt).replace('.', ',') + ' / ' + String(_wgfz.uk_zone).replace('.', ',')
+                + (_wgfz.wgfz_abgeleitet ? ' (WGFZ des Objekts abgeleitet, DealPilot-Ableitung, Stufe N, eigene Angabe genauer)' : '')) : null,
         beitrag_abzug_eur: ref.beitrag_abzug_eur || null,
         anpassung_pct: ref.brw_anpassung_pct || null,
         anpassung_grund: ref.brw_anpassung_grund || null,

@@ -17,13 +17,18 @@
    - lineare Interpolation ueber Bodenrichtwert und WGFZ, KEINE
      Extrapolation („nicht sachgerecht", Bielefeld S. 31);
    - Koeffizienten wie im amtlichen Beispiel auf zwei Stellen gerundet;
-   - die WGFZ des Objekts ist eine Angabe des Nutzers (oberirdische
-     Geschossflaeche nach § 16 Abs. 4 / Grundstuecksflaeche). Eine
-     Naeherung aus Wohn- oder Bruttogrundflaeche gibt es bewusst NICHT —
-     Keller, Dachgeschoss (75 %) und Treppenhaus schwanken zu stark.
+   - die WGFZ des Objekts ist zuerst eine Angabe des Nutzers (oberirdische
+     Geschossflaeche nach § 16 Abs. 4 / Grundstuecksflaeche).
+     Hier stand bis zum 11.11.2026: „Eine Naeherung aus Wohn- oder
+     Bruttogrundflaeche gibt es bewusst NICHT — Keller, Dachgeschoss (75 %)
+     und Treppenhaus schwanken zu stark." AUFGEHOBEN durch Marcel am
+     11.11.2026 („Wir haben oft ‚WGFZ fehlt'. Können wir das ändern?"):
+     fehlt die Angabe, leitet wgfzAbleitung() sie ab (v3293, Stufe N,
+     nie amtlich, eigene Angabe genauer) - siehe unten.
    ════════════════════════════════════════════════════════════════════ */
 import { finde } from './ausschuss_register.js';
 import { artSchluessel } from './umrechnung_flaeche.js';
+import { bgf as nhkBgf } from './nhk2010.js';   /* v3293 · BGF aus Wohnflaeche (SW-RL-Faktor) */
 import { readFileSync } from 'node:fs';   /* v2375 */
 
 export const KENNZAHL = 'umrechnungskoeffizient_wgfz';
@@ -251,6 +256,118 @@ export function wgfzNaeherung({ objektart, brw_eur_qm, wgfz_zone, wgfz_objekt })
   };
 }
 
+/* ══ v3293 · DIE WGFZ DES OBJEKTS ABLEITEN (Stufe N) ═════════════════════════
+   Marcel 11.11.2026: „Wir haben oft ‚WGFZ fehlt'. Können wir das ändern?"
+   Massstab ist § 16 Abs. 4 ImmoWertV (Wortlaut gesetze-im-internet.de,
+   immowertv_2022/__16.html): Flaechen ALLER oberirdischen Geschosse nach den
+   Aussenmassen, ausgebaute oder ausbaufaehige Dachgeschosse zu 75 Prozent,
+   Kellergeschosse (Deckenoberkante im Mittel <= 1,40 m ueber Gelaende) und nicht
+   ausbaufaehige Dachgeschosse nicht, Staffelgeschosse voll.
+   Rangfolge:
+     a) eingetragene WGFZ (eigene Angabe) - hier nicht, das macht der Aufrufer;
+     b) Haus mit Gebaeudeart NHK 2010 (Hausform.Geschosse Dach) und BGF:
+        die BGF zaehlt jede Ebene voll (ImmoWertA IV.(I).4: auch das nicht
+        ausgebaute Dachgeschoss), die Ebenen sind gleich gross angenommen
+        (wie im Beispiel ImmoWertA IV.(I).5: „BGF: 4 Ebenen x 36,3 m²").
+          Grundflaeche = BGF / Ebenen
+          Geschossflaeche = Grundflaeche x (Vollgeschosse + 0,75 bei Steildach)
+        Fehlt die BGF, kommt sie aus der Wohnflaeche ueber den Faktor der
+        SW-RL-Anlage 1 (nhk2010.bgf, dieselbe Naeherung wie im Sachwert).
+        Ein nicht ausgebautes Dachgeschoss (x.y2) gilt als ausbaufaehig; ist es
+        das nicht, entfaellt es - die Spanne nennt dann den kleineren Wert.
+     c) Mehrfamilienhaus, Wohn- und Geschaeftshaus, Gewerbe: Wohn-/Nutzflaeche
+        geteilt durch einen Divisor - die Naeherungsformel der Ausschuesse:
+          Bremen (Umrechnungstabelle 100012, Stichtage 31.12.2020/01.01.2022):
+            „Gesamtwohnfläche dividiert durch 0,8 … dividiert durch die
+             Grundstücksgröße = ca. WGFZ" (Beispiel 800 : 0,8 : 1.600 = 0,63)
+          Muenster (Grundstücksmarktbericht 2025, Abschn. WGFZ, S. 31):
+            „durch Rückrechnung mit einem Divisor von 0,75 aus der Wohn- /
+             Nutzungsfläche" (Beispiel 1.200 : 1.000 : 0,75 = 1,6)
+        Im eigenen Bezirk gilt der eigene Divisor (Muenster 0,75, Bremen 0,8),
+        sonst 0,8 mit der Spanne bis 0,75.
+   Eigentumswohnung: nur mit Angaben zum GANZEN Gebaeude - die gibt es im
+   Formular nicht (Wohnflaeche und MEA sind die der Wohnung), also weiter
+   „fehlt". Bremen rechnet die ETW ueber den MEA (Wohnflaeche : 0,8 : (MEA x
+   Grundstueck)); das setzt voraus, dass der MEA dem Wohnflaechenanteil folgt
+   - bewusst NICHT uebernommen (Marcel 11.11.: ETW nur mit Gesamtgebaeude).
+   Ergebnis IMMER: nicht amtlich, „DealPilot-Ableitung, Stufe N", eigene
+   Angabe genauer. Keine Extrapolation: was ausserhalb der Tabelle liegt,
+   faengt wgfzAnpassung ab wie bei einer eingetragenen WGFZ. */
+const DG_ANTEIL = 0.75;
+const DIVISOR_STANDARD = 0.8;
+const DIVISOR_QUELLEN = {
+  bremen: { divisor: 0.8, ausschuss: 'Gutachterausschusses für Grundstückswerte in Bremen',
+    fundstelle: 'Umrechnungstabelle 100012 (WGFZ), Stichtage 31.12.2020 und 01.01.2022, „Überschlägige Ermittlung der WGFZ (Näherung)"',
+    url: 'https://immobilienmarkt.niedersachsen.de/boris-umdatei/umretabs/2022/1000012wgfz2022.pdf' },
+  muenster: { divisor: 0.75, ausschuss: 'Gutachterausschusses für Grundstückswerte in der Stadt Münster',
+    fundstelle: 'Grundstücksmarktbericht 2025, Abschnitt „Wertrelevante Geschossflächenzahl (WGFZ)", S. 31',
+    url: 'https://epflicht.ulb.uni-muenster.de/download/pdf/1041650' },
+};
+/* AGS-Anfang -> eigener Divisor des Ausschusses (Stadt Muenster 05515000, Stadtgemeinde Bremen 04011000) */
+const DIVISOR_JE_AGS = [['05515', 'muenster'], ['04011', 'bremen']];
+
+export function wgfzAbleitung({ objektart, plot_area, bgf, living_area, nhk_typ, ags } = {}) {
+  const nein = (grund, hinweis) => ({ verfuegbar: false, grund, hinweis: hinweis || null });
+  const r2x = (x) => Math.round(x * 100) / 100;
+  /* deutsche Zahlen im Kundentext: Flaechen mit Tausenderpunkt, WGFZ immer zwei Stellen */
+  const qm = (x) => Number(x).toLocaleString('de-DE', { maximumFractionDigits: 2 });
+  const zf = (x) => Number(x).toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const art = artSchluessel(objektart);
+  const g = Number(plot_area), b = Number(bgf), w = Number(living_area);
+  if (art === 'etw') return nein('etw_ohne_gesamtgebaeude', 'Bei einer Eigentumswohnung lässt sich die WGFZ nur aus den Flächen '
+    + 'des ganzen Gebäudes ableiten; erfasst sind Wohnfläche und Miteigentumsanteil der Wohnung. Trag die WGFZ ein.');
+  if (!(g > 0)) return nein('grundstueck_fehlt', 'Für eine Ableitung der WGFZ fehlt die Grundstücksfläche.');
+  const kennung = (aus) => 'WGFZ abgeleitet aus ' + aus + ' (DealPilot-Ableitung, Stufe N), eigene Angabe genauer';
+  const ergebnis = (wgfz, weg, aus, rechnung, extra) => {
+    const wr = r2x(wgfz);
+    if (!(wr >= 0.05 && wr <= 8)) return nein('unplausibel', 'Die abgeleitete WGFZ (' + zf(wr) + ') ist nicht plausibel - bitte die WGFZ eintragen.');
+    return { verfuegbar: true, amtlich: false, stufe: 'N', wgfz: wr, weg, kennung: kennung(aus),
+      hinweis: kennung(aus) + ': ' + rechnung + '. Nicht amtlich; die eingetragene WGFZ des Objekts (§ 16 Abs. 4 ImmoWertV) ersetzt sie.',
+      ...(extra || {}) };
+  };
+  const haus = ['efh', 'zfh', 'dhh', 'rh'].indexOf(art) >= 0 || /^haus$/i.test(String(objektart || ''));
+  const mh = String(nhk_typ || '').trim().match(/^([123])\.([0-3])([1-3])$/);
+  if (haus || (mh && art !== 'mfh')) {
+    if (!mh) return nein('gebaeudeart_fehlt', 'Für eine Ableitung der WGFZ beim Haus fehlt die Gebäudeart nach NHK 2010 '
+      + '(Hausform, Geschosse, Dach im Reiter Objekt) - oder trag die WGFZ ein.');
+    const gs = Number(mh[2]), dach = Number(mh[3]);
+    const keller = gs === 0 || gs === 1 ? 1 : 0, voll = gs === 1 || gs === 3 ? 2 : 1, steil = dach === 1 || dach === 2 ? 1 : 0;
+    const ebenen = keller + voll + steil;
+    let bq = b > 0 ? b : null, aus = 'der Bruttogrundfläche', weg = 'bgf', bgfText = '';
+    if (!bq) {
+      const n = nhkBgf({ wohnflaeche_qm: w, nhk_typ: mh[0] });
+      if (!(n && n.wert > 0 && n.faktor)) return nein('flaechen_fehlen', 'Für eine Ableitung der WGFZ fehlen Bruttogrundfläche und Wohnfläche.');
+      bq = n.wert; aus = 'der Wohnfläche über die Bruttogrundfläche'; weg = 'bgf_aus_wohnflaeche';
+      bgfText = qm(w) + ' m² Wohnfläche × ' + de(n.faktor) + ' (BGF/Wohnfläche Typ ' + mh[0] + ', SW-RL Anl. 1) = ';
+    }
+    const grund = bq / ebenen, gf = grund * (voll + steil * DG_ANTEIL);
+    const ohneDg = dach === 2 ? r2x(grund * voll / g) : null;
+    return ergebnis(gf / g, weg, aus,
+      bgfText + qm(Math.round(bq * 100) / 100) + ' m² BGF : ' + ebenen + ' Ebenen (Typ ' + mh[0] + ') × ('
+        + voll + ' Vollgeschoss' + (voll > 1 ? 'e' : '') + (steil ? ' + 0,75 Dachgeschoss' : '') + ') = '
+        + qm(Math.round(gf * 10) / 10) + ' m² Geschossfläche : ' + qm(g) + ' m² Grundstück = ' + zf(r2x(gf / g))
+        + (keller ? '; Keller nicht angerechnet' : '')
+        + (ohneDg != null ? '; das nicht ausgebaute Dachgeschoss ist als ausbaufähig angesetzt, sonst WGFZ ' + zf(ohneDg) : ''),
+      { geschossflaeche_qm: Math.round(gf * 10) / 10, spanne: ohneDg != null ? [ohneDg, r2x(gf / g)] : null });
+  }
+  if (art === 'mfh' || art === 'gewerbe' || /gemischt|gesch|wgh/i.test(String(objektart || ''))) {
+    if (!(w > 0)) return nein('wohnflaeche_fehlt', 'Für eine Ableitung der WGFZ beim Mehrfamilienhaus fehlt die Wohn-/Nutzfläche des Gebäudes'
+      + (b > 0 ? ' (aus der Bruttogrundfläche allein geht es nicht: Keller und Dachgeschoss sind nicht erfasst)' : '') + '.');
+    const a = String(ags || '').replace(/\D/g, '');
+    const eigen = (DIVISOR_JE_AGS.find(([p]) => a.startsWith(p)) || [])[1];
+    const q = DIVISOR_QUELLEN[eigen || 'bremen'];
+    const d = eigen ? q.divisor : DIVISOR_STANDARD;
+    const gf = w / d, wgfz = gf / g;
+    const alt = eigen ? null : r2x(w / DIVISOR_QUELLEN.muenster.divisor / g);
+    return ergebnis(wgfz, 'wohnflaeche', 'der Wohnfläche',
+      qm(w) + ' m² Wohn-/Nutzfläche : ' + de(d) + ' = ' + qm(Math.round(gf * 10) / 10) + ' m² Geschossfläche : ' + qm(g)
+        + ' m² Grundstück = ' + zf(r2x(wgfz)) + '; Divisor ' + de(d) + ' nach der Näherungsformel des ' + q.ausschuss
+        + ' (' + q.fundstelle + ')' + (eigen ? ', hier der zuständige Ausschuss' : ', Münster rechnet mit 0,75 (WGFZ dann ' + zf(alt) + ')'),
+      { geschossflaeche_qm: Math.round(gf * 10) / 10, divisor: d, quelle_url: q.url, spanne: alt != null ? [r2x(wgfz), alt] : null });
+  }
+  return nein('objektart', 'Für diese Objektart gibt es keine belegte Ableitung der WGFZ - trag sie ein.');
+}
+
 /* Pruefung gegen das amtliche Anwendungsbeispiel. */
 export function pruefeBeispiel(s) {
   const b = s && s.anwendungsbeispiel;
@@ -264,4 +381,4 @@ export function pruefeBeispiel(s) {
   return { ok: Math.abs(r.bodenwert_eur_qm - Number(b.ergebnis_eur_qm)) <= Math.max(tol, 1), ist: r.bodenwert_eur_qm, soll: b.ergebnis_eur_qm };
 }
 
-export default { KENNZAHL, koeffizientFuer, satzFuer, wgfzAnpassung, wgfzNaeherung, pruefeBeispiel };
+export default { KENNZAHL, koeffizientFuer, satzFuer, wgfzAnpassung, wgfzNaeherung, wgfzAbleitung, pruefeBeispiel };
