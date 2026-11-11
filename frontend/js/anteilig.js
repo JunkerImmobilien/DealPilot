@@ -239,7 +239,24 @@
     return { ok: true, level: null, msg: null };
   }
 
+  /* v3314 · N157 · STEUERJAHR DES HEUTIGEN VOLLEN JAHRES (Marcel 11.11.2026, „ja umsetzen").
+     Beim Ankauf (kein Datum, Kaufjahr = laufendes oder kuenftiges Jahr) gilt das KAUFJAHR,
+     im Bestand (Kaufjahr vor dem laufenden) das LAUFENDE Jahr - mit dessen Steuerzeitraum
+     (zvE) und dem Saldo der uebrigen Objekte in diesem Jahr. Die EINE Stelle fuer diese
+     Regel: calc.js (Cashflow nach Steuern heute -> Score, Karten, Cockpit, PDF) liest nur hier.
+     heuteJahr kommt als Parameter (Pruefer setzen die Uhr fest). */
+  function steuerjahrHeute(heuteJahr) {
+    var now = (typeof heuteJahr === 'number' && heuteJahr > 1900) ? heuteJahr : new Date().getFullYear();
+    var by = getBaseYear();
+    if (by && by >= now) {
+      return { jahr: by, art: 'kaufjahr', kaufjahr: by, text: 'Steuerwirkung ' + by + ', Kaufjahr' };
+    }
+    return { jahr: now, art: 'laufend', kaufjahr: by || null,
+             text: 'Steuerwirkung ' + now + ', laufendes Jahr' };
+  }
+
   window.DealPilotAnteilig = {
+    steuerjahrHeute: steuerjahrHeute,   /* v3314 · N157 */
     // V268-01
     getRelevantDate: getRelevantDate,
     getBaseYear:     getBaseYear,

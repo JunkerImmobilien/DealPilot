@@ -2387,7 +2387,27 @@ function _calcImmediate(){
       if (isFinite(_zwk) && _zwk > 0) zve_immo -= _zwk;
     }
   } catch (_eZ) {}
-  var steuer   = _mtxYear(zve_immo, _calYearBase, zins_j);
+  /* v3314 · N157 · das Steuerjahr des heutigen vollen Jahres: Ankauf -> Kaufjahr, Bestand ->
+     laufendes Jahr (Regel an EINER Stelle: DealPilotAnteilig.steuerjahrHeute). Bis v3313 stand
+     hier immer _calYearBase (Kaufjahr) - Westerfeldstr. (Kauf 01.01.2025) rechnete 2026 noch mit
+     dem zvE des Zeitraums 2023-2025 und dem Saldo 2025. Nur das Steuerjahr wechselt (Tarif,
+     zvE des Jahres, Saldo der uebrigen Objekte); das Ergebnis des Objekts bleibt das volle Jahr. */
+  var _stJahrInfo = (function () {
+    try { if (window.DealPilotAnteilig && DealPilotAnteilig.steuerjahrHeute) return DealPilotAnteilig.steuerjahrHeute(new Date().getFullYear()); } catch (_e) {}
+    var _n = new Date().getFullYear();
+    return (_calYearBase >= _n) ? { jahr: _calYearBase, art: 'kaufjahr', text: 'Steuerwirkung ' + _calYearBase + ', Kaufjahr' }
+                                : { jahr: _n, art: 'laufend', text: 'Steuerwirkung ' + _n + ', laufendes Jahr' };
+  })();
+  var steuer   = _mtxYear(zve_immo, _stJahrInfo.jahr, zins_j);
+  /* v3314 · N157 (2) · Sind Steuerzeitraeume und Snapshots der uebrigen Objekte (noch) nicht da,
+     ist diese Steuer VORLAEUFIG - storage.js wartet dann mit dem Speichern bzw. ueberschreibt
+     _kpis_cf_ns nicht. Gesellschaften (KSt) haengen an keinem der beiden. */
+  var _stVorlaeufig = false;
+  try {
+    if (_mandRate == null && window.DpSteuerGrundlagen && typeof DpSteuerGrundlagen.status === 'function') {
+      _stVorlaeufig = DpSteuerGrundlagen.status() !== 'bereit';
+    }
+  } catch (_eV) {}
 
   /* v1379-PROG · DER EFFEKTIVE SATZ, den dieses Objekt tatsaechlich traegt.
      Er weicht vom eingegebenen Grenzsteuersatz ab, sobald das Ergebnis den
@@ -2395,7 +2415,7 @@ function _calcImmediate(){
      dem Nutzer, warum seine Ersparnis kleiner ist als sein Grenzsteuersatz -
      ohne sie sieht es nach einem Rechenfehler aus. */
   _progEff = (_progAktiv && Math.abs(zve_immo) > 0.5) ? (steuer / zve_immo) : null;
-  try { _progHinweisZeichnen(zve_immo, steuer, grenz, _progEff, _zveBasis + _bestandSaldo_w, _bestandSaldo_w, _bestandAnz_w); } catch (_e) {}
+  try { _progHinweisZeichnen(zve_immo, steuer, grenz, _progEff, (_zveJahr(_stJahrInfo.jahr) || _zveBasis) + _bestandSaldo_w, _bestandSaldo_w, _bestandAnz_w); } catch (_e) {}   /* v3314: zvE des Steuerjahres, nicht das Feld */
 
   // Öffentliche Werte: alle nach Tilgung (Banker) und nach BSV-Sparrate
   var cf_op = cf_operativ - tilg_j - bspar_y;          // CF v.St. NACH Tilgung & BSV
@@ -3351,6 +3371,15 @@ function _calcImmediate(){
        d_total: compute() reicht K.d_total als `darlehen` weiter (Barkauf, v2141) - das
        Feld gab es in State.kpis nie. */
     mstg:mstg*100,d_total:d_total};
+  /* v3314 · N157 · Steuerjahr und Ladezustand der Steuer gehoeren zur Zahl (storage.js, PDF) */
+  State.kpis.steuerjahr = _stJahrInfo.jahr;
+  State.kpis.steuerjahr_art = _stJahrInfo.art;
+  State.kpis.steuerjahr_text = _stJahrInfo.text;
+  State.kpis.steuer_vorlaeufig = _stVorlaeufig;
+  try {
+    var _sjT = _stJahrInfo.text + (_stVorlaeufig ? ' · vorläufig (Steuerdaten werden geladen)' : '');
+    ['cf-nst-now', 'ph-st-now', 'ph-cfns-now'].forEach(function (_id) { var _e = document.getElementById(_id); if (_e) _e.title = _sjT; });
+  } catch (_eSj) {}
   /* v1898 · `bwk_nul_st` wird hier MITGEFUEHRT, damit storage.js es am Objekt
      stempeln kann (`_kpis_bwk_nul_st_y`). Das Cockpit rechnet seine
      Projektion aus den gespeicherten Kennzahlen und kann `_calcImmediate()`
@@ -4436,6 +4465,15 @@ function renderCFCalc(mode){
   //   (cf_vst und data.cf_ns sind Volljahr; K.steuer wäre Y1-anteilig -> Widerspruch).
   var _v352_st = cf_vst - data.cf_ns;            // >0 = Belastung, <0 = Erstattung
   st('cr-st', (_v352_st < 0 ? '+' : '–') + fE(Math.abs(_v352_st)));
+  /* v3314 · N157 · Steuerjahr an der Zahl - nur fuer heute; Ende Zinsbindung/Anschluss sind eigene Jahre */
+  try {
+    var _crSj = document.getElementById('cr-st-jahr');
+    if (_crSj) {
+      var _kS = (window.State && State.kpis) || {};
+      _crSj.textContent = (mode === 'heute' && _kS.steuerjahr_text)
+        ? '(' + _kS.steuerjahr_text + (_kS.steuer_vorlaeufig ? ', vorläufig' : '') + ')' : '';
+    }
+  } catch (_eCrSj) {}
   // V118: cr-cfns mit Farbklasse — rot bei Verlust, gold bei Überschuss
   var _crCfnsEl = document.getElementById('cr-cfns');
   if (_crCfnsEl) {
@@ -5195,6 +5233,15 @@ function updateAllValues() {
 // Expose globally
 window.updateAllValues = updateAllValues;
 window.calcNow = calcNow;
+/* v3314 · N157 · Steuerzeitraeume und Snapshots sind da (oder endgueltig gescheitert):
+   die Steuer neu rechnen, damit keine vorlaeufige Zahl stehen bleibt. Das Ereignis kommt nur
+   beim Wechsel des Gesamtstands (wk-aggregator.js) - keine Schleife mit dem Snapshot-POST. */
+window.addEventListener('dp:steuer-grundlagen', function (e) {
+  try {
+    if (e && e.detail && e.detail.status !== 'bereit') console.warn('[v3314] Steuer vorlaeufig: ' + (e.detail.grund || ''));
+    if (window.State && State.kpis && State.kpis.steuer_vorlaeufig) calcNow();
+  } catch (_e) {}
+});
 window.calc = calc;
 
 /* ═══════════════════════════════════════════════════════════════
@@ -5457,7 +5504,8 @@ window._dpKpisNachziehen = function () {
     if (!o || typeof State === 'undefined' || !State.kpis) return;
     if (String(State.kpis._fuer || '') !== String(window._currentObjKey || '')) return;
     o._kpis_bmy   = State.kpis.bmy;
-    o._kpis_cf_ns = State.kpis.cf_ns;
+    /* v3314 · N157: eine vorlaeufige Steuer (Grundlagen nicht geladen) ersetzt keine fertige */
+    if (!State.kpis.steuer_vorlaeufig || o._kpis_cf_ns == null || o._steuer_vorlaeufig) o._kpis_cf_ns = State.kpis.cf_ns;
     o._kpis_cf_vs = State.kpis.cf_op;
     o._kpis_dscr  = State.kpis.dscr;
     o._kpis_dscr_art = 'netto';   /* v3031 */

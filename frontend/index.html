@@ -3581,7 +3581,7 @@ label.dp-required.qc-required::after {
       <div class="kv kv-step"><span><b>= CF nach Zinsen (vor Tilgung)</b></span><span class="kv-v c-green" id="cr-cfop">—</span></div>
       <div class="kv"><span data-cr-tilg-label>– Tilgung / Jahr</span><span class="kv-v" id="cr-tilg">—</span></div>
       <div class="kv kv-step"><span><b>= CF vor Steuern (nach Tilgung)</b></span><span class="kv-v c-gold" id="cr-cfvst">—</span></div>
-      <div class="kv"><span>± Steuern / Jahr <span class="cf-hint">(– bei Belastung, + bei Erstattung)</span></span><span class="kv-v" id="cr-st">—</span></div>
+      <div class="kv"><span>± Steuern / Jahr <span class="cf-hint">(– bei Belastung, + bei Erstattung)</span> <span class="cf-hint" id="cr-st-jahr"></span></span><span class="kv-v" id="cr-st">—</span></div>
       <div class="kv kv-result"><span><b>= CF nach Steuern / Jahr <span class="cf-hint">(nach Tilgung)</span></b></span><span class="kv-v c-gold" id="cr-cfns">—</span></div>
       <div class="kv kv-result"><span><b>= CF nach Steuern / Monat</b></span><span class="kv-v c-gold" id="cr-cfm">—</span></div>
       <hr class="dvd">
@@ -3893,7 +3893,7 @@ label.dp-required.qc-required::after {
 <script src="js/pdf-anlage-bmf.js?v=v3018c"></script>
 <script src="js/pdf-blocksatz.js?v=v2830a"></script><!-- v2830 · Blocksatz fuer alle PDFs -->
 <script src="js/pdf-wert-zielbild.js?v=v3030"></script><!-- v2830 · Segment Wert & Zielbild in allen PDFs -->
-<script src="js/pdf-investment-bank.js?v=v3222"></script>
+<script src="js/pdf-investment-bank.js?v=v3314"></script>
 <script src="js/bmf-modal.js?v=v3280"></script>
 <script src="js/bmf-modal-v292.js?v=v3185b"></script>
 <script src="js/bmf-bodenabschlag.js?v=v3196"></script>
@@ -3915,19 +3915,19 @@ label.dp-required.qc-required::after {
 <script src="js/erbbau-ui.js?v=v3003a"></script>
   <script src="js/afa-ui.js?v=v3006"></script>
   <script src="js/zve-manager.js?v=v2180"></script>
-  <script src="js/tax-periods.js?v=v2949"></script>
+  <script src="js/tax-periods.js?v=v3314"></script>
   <script src="js/tax-periods-sync.js?v=1"></script>
   <script src="js/zve-smart.js?v=1"></script>
-  <script src="js/wk-aggregator.js?v=v2891"></script>
+  <script src="js/wk-aggregator.js?v=v3314"></script>
   <!-- V276.2-no-sidebar-widget: wk-dashboard entfernt - Inhalt jetzt im Steuermodul -->
   <script src="js/all-objects-views.js?v=v2422"></script>
   <script src="js/tour-sidebar.js?v=v1696"></script>
-  <script src="js/anteilig.js?v=5"></script>
+  <script src="js/anteilig.js?v=v3314"></script>
   <script src="js/wirtschaftlicher-uebergang.js?v=3"></script>
   <script src="js/anteilig-recalc.js?v=353"></script>
   <script src="js/finanzierung-validation.js?v=1"></script>
 <script src="js/data/foerderregister.js?v=v3072"></script>
-  <script src="js/calc.js?v=v3282"></script>
+  <script src="js/calc.js?v=v3314"></script>
   <script src="js/zahlenfelder.js?v=v3023"></script>
 <script src="js/d1-type-handler.js?v=161"></script>
 <script src="js/icons.js?v=166"></script>
@@ -3987,7 +3987,7 @@ label.dp-required.qc-required::after {
 <script src="js/marktdaten-modal.js?v=v2247c"></script>
 <script src="js/ui.js?v=v3257"></script>
 <script src="js/sidebar-collapse.js?v=20260611174630"></script>
-<script src="js/storage.js?v=v3313"></script>
+<script src="js/storage.js?v=v3314"></script>
 <script src="js/nachrechnen.js?v=v3031"></script><!-- v3031: Kennzahlen/Scores gespeicherter Objekte neu rechnen (nur auf Aufruf) -->
 <!-- v845-newsearch-removed: sb-search.js entfernt (Kollision mit sidebar-search.js) -->
 <script src="js/inventar-sync.js?v=v3006c"></script><!-- V291-inv-sync-applied -->
@@ -4594,7 +4594,7 @@ document.addEventListener('DOMContentLoaded', function(){
     <link rel="stylesheet" href="css/einheitlich.css?v=v3253"><!-- v3239 · Marcel 09.11.2026: Felder, Karten, Schrift in allen Reitern und Fenstern wie im Reiter Objekt; Handy-Felder nie unter 16 px (iOS-Zoom). Letztes Stylesheet. -->
     <script src="js/marktbericht-profi.js?v=v3242"></script><!-- v3176 · Marktbericht Profi (HTML/A4) -->
     <script src="js/dp-dokument.js?v=v3223"></script><!-- v3179 · einheitliches Dokument-Design -->
-    <script src="js/dp-dokumente.js?v=v3268"></script><!-- v3179 · Dokumente im einheitlichen Design (Demo) -->
+    <script src="js/dp-dokumente.js?v=v3314"></script><!-- v3179 · Dokumente im einheitlichen Design (Demo) -->
     <script src="js/pdf-wahl.js?v=v3235"></script><!-- v1636 · Rueckfrage vor dem Export -->
     <script src="js/hub-anmelden.js?v=v3190a"></script><!-- v3190 · Makler-Hub: Verbinden-Ebene (/hub/anmelden) -->
     <script src="js/dok-weiche.js?v=v3226"></script><!-- v3181 · einheitliche Dokumente an allen Knoepfen, klassisch in den Einstellungen -->

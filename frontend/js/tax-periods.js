@@ -32,6 +32,21 @@
     return s;
   }
 
+  /* v3314 · N157 · Ladezustand fuer DpSteuerGrundlagen (wk-aggregator.js):
+     offen | laedt | geladen | fehler, Ereignis dp:steuerzeitraeume nach jedem Laden. */
+  STATE.status = 'offen';
+  STATE.fehler = null;
+  function _melden(st, fehler) {
+    STATE.status = (st === 'fehler' && STATE.loaded) ? 'geladen' : st;   /* alter Stand bleibt gueltig */
+    STATE.fehler = fehler || null;
+    try { window.dispatchEvent(new CustomEvent('dp:steuerzeitraeume', { detail: { status: STATE.status, fehler: STATE.fehler } })); } catch (e) {}
+  }
+  function status() {
+    /* nach create/update/remove ist loaded=false, bis neu geladen ist */
+    if (STATE.status === 'geladen' && !STATE.loaded) return 'offen';
+    return STATE.status;
+  }
+
   async function loadAll(force) {
     if (!force && STATE.loaded) return STATE.periods;
     if (STATE.loading) return STATE.loading;
@@ -40,17 +55,22 @@
       STATE.periods = [];
       return [];
     }
+    STATE.status = 'laedt';   /* v3314 · N157 */
     STATE.loading = (async () => {
       try {
         const res = await fetch('/api/v1/tax-periods', { headers: authHeaders() });
         if (!res.ok) {
-          console.warn('[V259-03] load HTTP', res.status);
+          /* v3314 · N157: sichtbar - ohne Zeitraeume rechnet die Steuer mit dem Feld-zvE */
+          console.error('[v3314] Steuerzeitraeume NICHT geladen: HTTP ' + res.status
+            + (res.status === 429 ? ' (Anfragebremse)' : '') + ' - Steuer bleibt vorlaeufig, gespeicherte Steuerzahl wird nicht ueberschrieben');
           STATE.periods = [];
+          _melden('fehler', 'HTTP ' + res.status);
           return [];
         }
         const data = await res.json();
         STATE.periods = data.periods || [];
         STATE.loaded = true;
+        _melden('geladen');
         console.log('[V259-03] Tax-Periods geladen:', STATE.periods.length);
         /* v2892: der Zeitraum-Zwischenspeicher in tax.js (_zveCache, 5 s)
            hielt nach einer Aenderung die ALTEN Zeitraum-Objekte - gemessen:
@@ -61,7 +81,8 @@
         try { if (window.DpSteuerAngaben && DpSteuerAngaben.zeigen) setTimeout(DpSteuerAngaben.zeigen, 0); } catch (e) {}
         return STATE.periods;
       } catch(e) {
-        console.warn('[V259-03] loadAll:', e.message);
+        console.error('[v3314] Steuerzeitraeume NICHT geladen:', e.message);
+        _melden('fehler', e.message);
         return [];
       } finally {
         STATE.loading = null;
@@ -470,6 +491,7 @@
     openModal, closeModal, renderInline, refreshList, submitNew, /* v841-render-inline */
     forceCreate, cancelConflict, editPeriod, removePeriod,
     setVeranlagung, getAllSync,   /* v2892 */
+    status, fehler: function () { return STATE.fehler; },   /* v3314 · N157 */
     _meta: 'V259-03'
   };
 

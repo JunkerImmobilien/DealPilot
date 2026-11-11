@@ -7,6 +7,14 @@
 
   let _cache = null;
   let _cacheTime = 0;
+  /* v3314 · N157 · Ladezustand der Snapshots: offen | laedt | geladen | fehler */
+  let _status = 'offen';
+  let _fehler = null;
+  function _melden(st, fehler) {
+    _status = (st === 'fehler' && _cache) ? 'geladen' : st;   /* alter Cache bleibt gueltig */
+    _fehler = fehler || null;
+    try { window.dispatchEvent(new CustomEvent('dp:steuer-snapshots', { detail: { status: _status, fehler: _fehler } })); } catch (e) {}
+  }
   const CACHE_TTL = 30000; // 30 Sekunden
 
   function getApi() {
@@ -29,6 +37,7 @@
         console.log('[V258-05] Kein Token — keine WK-Aggregation');
         return null;
       }
+      if (!_cache) _status = 'laedt';   /* v3314 */
       const res = await fetch('/api/v1/tax-snapshots', {
         headers: {
           'Authorization': 'Bearer ' + token,
@@ -36,7 +45,10 @@
         }
       });
       if (!res.ok) {
-        console.warn('[V258-05] wk-aggregate HTTP', res.status);
+        /* v3314 · N157: sichtbar - ohne Snapshots fehlt der Saldo der uebrigen Objekte */
+        console.error('[v3314] Steuer-Snapshots der uebrigen Objekte NICHT geladen: HTTP ' + res.status
+          + (res.status === 429 ? ' (Anfragebremse)' : '') + ' - Steuer bleibt vorlaeufig, gespeicherte Steuerzahl wird nicht ueberschrieben');
+        _melden('fehler', 'HTTP ' + res.status);
         return null;
       }
       _cache = await res.json();
@@ -60,9 +72,11 @@
       }
       _cacheTime = Date.now();
       console.log('[V258-05] WK-Aggregation geladen:', _cache.count, 'Objekte');
+      if (_status !== 'geladen') _melden('geladen');   /* v3314: nur der Uebergang meldet (v730-Schleife) */
       return _cache;
     } catch(e) {
-      console.warn('[V258-05] loadAll fehlgeschlagen:', e.message);
+      console.error('[v3314] Steuer-Snapshots NICHT geladen:', e.message);
+      _melden('fehler', e.message);
       return null;
     }
   }
@@ -121,6 +135,7 @@
   function clearCache() {
     _cache = null;
     _cacheTime = 0;
+    _status = 'offen';   /* v3314 */
   }
 
   window.DealPilotWKAggregator = {
@@ -130,8 +145,96 @@
     getAllObjectsWithWK: getAllObjectsWithWK,
     saveSnapshot: saveSnapshot,
     clearCache: clearCache,
+    status: function () { return _status; },          /* v3314 · N157 */
+    fehler: function () { return _fehler; },
     _meta: 'V258-05'
   };
+
+  /* ═══ v3314 · N157 · SIND DIE GRUNDLAGEN DER STEUER GELADEN? ══════════════
+   *
+   * Gemessen 11.11.2026 (Westerfeldstr., Staging): ein Speicherlauf rechnete, bevor
+   * /tax-periods und /tax-snapshots geantwortet hatten - Rueckfall Feld-zvE ohne Saldo,
+   * gespeichert wurde 10.185,16 statt 6.007,91 EUR Cashflow nach Steuern. Nichts sagte,
+   * dass die Zahl auf halben Grundlagen stand.
+   *
+   * status():  'bereit' (beides da oder nicht angemeldet) | 'laedt' | 'fehler'
+   * warten():  Promise auf das Ende des Ladens (Ereignisse, kein Polling); startet ein
+   *            noch nicht begonnenes Laden selbst. Eine Frist von 20 s verhindert das
+   *            Endloswarten - danach gilt 'fehler', und storage.js ueberschreibt nichts.
+   * Ereignis dp:steuer-grundlagen bei jedem Wechsel des Gesamtstands (calc.js rechnet neu).
+   * Leser: calc.js (State.kpis.steuer_vorlaeufig), storage.js (saveObj wartet, collectData). */
+  (function () {
+    function _angemeldet() {
+      try {
+        if (!window.Auth || typeof Auth.isLoggedIn !== 'function' || !Auth.isLoggedIn()) return false;
+        if (typeof Auth.isApiMode === 'function' && !Auth.isApiMode()) return false;
+        return !!getToken();
+      } catch (e) { return false; }
+    }
+    function _teile() {
+      var TP = window.DealPilotTaxPeriods;
+      return { zeitraeume: (TP && typeof TP.status === 'function') ? TP.status() : 'geladen', snapshots: _status };
+    }
+    var _fristAbgelaufen = false;
+    function status() {
+      if (!_angemeldet()) return 'bereit';
+      var t = _teile();
+      if (t.zeitraeume === 'geladen' && t.snapshots === 'geladen') return 'bereit';
+      if (_fristAbgelaufen) return 'fehler';
+      if (t.zeitraeume === 'offen' || t.zeitraeume === 'laedt' || t.snapshots === 'offen' || t.snapshots === 'laedt') return 'laedt';
+      return 'fehler';
+    }
+    function grund() {
+      var t = _teile(), TP = window.DealPilotTaxPeriods, g = [];
+      if (t.zeitraeume !== 'geladen') g.push('Steuerzeitraeume ' + t.zeitraeume + ((TP && TP.fehler && TP.fehler()) ? ' (' + TP.fehler() + ')' : ''));
+      if (t.snapshots !== 'geladen') g.push('Snapshots ' + t.snapshots + (_fehler ? ' (' + _fehler + ')' : ''));
+      if (_fristAbgelaufen) g.push('Frist abgelaufen');
+      return g.join(', ') || 'geladen';
+    }
+    var _letzter = null;
+    function _pruefen() {
+      var s = status();
+      if (s === 'laedt' || s === _letzter) return;
+      _letzter = s;
+      try { window.dispatchEvent(new CustomEvent('dp:steuer-grundlagen', { detail: { status: s, grund: grund() } })); } catch (e) {}
+    }
+    window.addEventListener('dp:steuerzeitraeume', _pruefen);
+    window.addEventListener('dp:steuer-snapshots', _pruefen);
+    function warten() {
+      var s = status();
+      if (s !== 'laedt') return Promise.resolve(s);
+      try {
+        var TP = window.DealPilotTaxPeriods, t = _teile();
+        if (TP && t.zeitraeume === 'offen' && typeof TP.loadAll === 'function') TP.loadAll();
+        if (t.snapshots === 'offen') loadAll(false);
+      } catch (e) {}
+      return new Promise(function (resolve) {
+        var fertig = false, frist = null;
+        function ende() {
+          if (fertig || status() === 'laedt') return;
+          fertig = true;
+          if (frist) clearTimeout(frist);
+          window.removeEventListener('dp:steuerzeitraeume', ende);
+          window.removeEventListener('dp:steuer-snapshots', ende);
+          resolve(status());
+        }
+        window.addEventListener('dp:steuerzeitraeume', ende);
+        window.addEventListener('dp:steuer-snapshots', ende);
+        frist = setTimeout(function () {
+          if (fertig) return;
+          _fristAbgelaufen = true;
+          console.error('[v3314] Steuergrundlagen nach 20 s nicht geladen (' + grund() + ') - Speichern ohne neue Steuerzahl');
+          _pruefen();
+          ende();
+        }, 20000);
+      });
+    }
+    /* Kommen die Grundlagen spaeter doch noch, gilt die Frist nicht mehr */
+    window.addEventListener('dp:steuer-grundlagen', function (e) {
+      if (e && e.detail && e.detail.status === 'bereit') _fristAbgelaufen = false;
+    });
+    window.DpSteuerGrundlagen = { status: status, warten: warten, grund: grund, _meta: 'v3314' };
+  })();
 
   // Beim Login/App-Start initial laden
   if (document.readyState === 'loading') {

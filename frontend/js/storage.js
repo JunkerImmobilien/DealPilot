@@ -505,14 +505,30 @@ function collectData() {
         eines FREMDEN Objekts weg. */
      '_kpis_bwk_nul_y','_kpis_bwk_nul_st_y',
      /* v3161 */ '_kpis_rs_bindung','_kpis_anschl_rate','_kpis_bindung_ende','_kpis_bsv_luecke',
-     /* v3198 */ '_kpis_afa_geb_basis','_kpis_afa_satz','_kpis_afa_methode']
+     /* v3198 */ '_kpis_afa_geb_basis','_kpis_afa_satz','_kpis_afa_methode',
+     /* v3314 */ '_kpis_steuerjahr','_steuer_vorlaeufig']
       .forEach(function (f) {
         if (window._currentObjData && window._currentObjData[f] != null) d[f] = window._currentObjData[f];
       });
   }
   if (_kpiPasst) {
     d._kpis_bmy = State.kpis.bmy;
-    d._kpis_cf_ns = State.kpis.cf_ns;
+    /* v3314 · N157 (2) · SPEICHERN OHNE STEUERGRUNDLAGEN SCHREIBT KEINE ZU GUTE ZAHL.
+       Gemessen 11.11.2026: ohne Steuerzeitraeume und Snapshots der uebrigen Objekte wurde
+       Westerfeldstr. mit 10.185,16 statt 6.007,91 (bzw. 7.727) gespeichert. saveObj wartet
+       zuerst auf die Grundlagen; kommt es trotzdem zum Speichern (Laden gescheitert), bleibt
+       der vorhandene Wert stehen. Ohne vorhandenen Wert wird die Zahl als vorlaeufig markiert. */
+    var _stVorl = !!State.kpis.steuer_vorlaeufig;
+    var _altO = window._currentObjData || {};
+    if (_stVorl && _altO._kpis_cf_ns != null && !_altO._steuer_vorlaeufig) {
+      d._kpis_cf_ns = _altO._kpis_cf_ns;
+      if (_altO._kpis_steuerjahr != null) d._kpis_steuerjahr = _altO._kpis_steuerjahr;
+      try { console.warn('[storage v3314] Steuergrundlagen nicht geladen - _kpis_cf_ns bleibt ' + _altO._kpis_cf_ns + ' (vorlaeufig gerechnet: ' + State.kpis.cf_ns + ')'); } catch (e) {}
+    } else {
+      d._kpis_cf_ns = State.kpis.cf_ns;
+      if (_stVorl) d._steuer_vorlaeufig = { seit: new Date().toISOString(), grund: (window.DpSteuerGrundlagen && DpSteuerGrundlagen.grund) ? DpSteuerGrundlagen.grund() : 'nicht geladen' };
+      if (State.kpis.steuerjahr) d._kpis_steuerjahr = State.kpis.steuerjahr;   /* v3314: Jahr der Steuer in _kpis_cf_ns */
+    }
     d._kpis_cf_vs = State.kpis.cf_op;  /* v487-cfvs: CF vor Steuer (Jahr) fuers Cockpit */
     d._kpis_dscr = State.kpis.dscr;
     d._kpis_dscr_art = 'netto';         /* v3031: DSCR ist netto (Reinertrag / Kapitaldienst) */
@@ -897,7 +913,7 @@ function loadData(d) {
           || String(State.kpis._fuer || '') === String(window._currentObjKey || ''));
     if (_o351 && _passt351) {
       _o351._kpis_bmy  = State.kpis.bmy;
-      _o351._kpis_cf_ns = State.kpis.cf_ns;
+      if (!State.kpis.steuer_vorlaeufig || _o351._kpis_cf_ns == null || _o351._steuer_vorlaeufig) _o351._kpis_cf_ns = State.kpis.cf_ns;   /* v3314 · N157 */
       _o351._kpis_cf_vs = State.kpis.cf_op;  /* v487-cfvs */
       _o351._kpis_dscr = State.kpis.dscr;
       _o351._kpis_dscr_art = 'netto';   /* v3031 */
@@ -1033,6 +1049,34 @@ async function saveObj(opts) {
      Alle Auto-Save-/Sofort-Anlage-/Wrapper-saveObj werden stillgelegt -> genau eine Anlage, kein Doppel. */
   if (window._qcTakeover && !(opts && opts._qcFinal)) { return; }
   var silent = !!opts.silent || !!window._autoSaveActive;
+  /* v3314 · N157 (2a) · ERST DIE STEUERGRUNDLAGEN, DANN SPEICHERN.
+     Laden Steuerzeitraeume oder Snapshots der uebrigen Objekte noch, wartet der Speicherlauf
+     auf das Ereignis dp:steuer-grundlagen (wk-aggregator.js), rechnet neu und speichert dann -
+     einmal, auch wenn in der Wartezeit mehrere Speicherwuensche kommen. Scheitert das Laden,
+     speichert er trotzdem; collectData() laesst dann _kpis_cf_ns stehen (2b). */
+  try {
+    if (!opts._steuerGewartet && window.DpSteuerGrundlagen && typeof DpSteuerGrundlagen.status === 'function') {
+      var _sgStatus = DpSteuerGrundlagen.status();
+      if (_sgStatus === 'laedt') {
+        if (window._dpSteuerSpeichernWartet) return window._dpSteuerSpeichernWartet;
+        try { console.info('[storage v3314] Speichern wartet auf Steuerzeitraeume/Snapshots (' + (DpSteuerGrundlagen.grund ? DpSteuerGrundlagen.grund() : '') + ')'); } catch (e) {}
+        var _optsW = {}; Object.keys(opts).forEach(function (k) { _optsW[k] = opts[k]; });
+        _optsW.silent = silent; _optsW._steuerGewartet = true;
+        window._dpSteuerSpeichernWartet = DpSteuerGrundlagen.warten().then(function (st) {
+          window._dpSteuerSpeichernWartet = null;
+          if (String(window._currentObjKey || '') !== String(_ctxKey || '')) {
+            try { console.warn('[storage v3314] Objekt waehrend des Wartens gewechselt - Speichern entfaellt'); } catch (e) {}
+            return;
+          }
+          try { if (typeof calcNow === 'function') calcNow(); } catch (e) {}
+          return saveObj(_optsW);
+        });
+        return window._dpSteuerSpeichernWartet;
+      }
+      /* Grundlagen inzwischen da, die letzte Rechnung aber noch vorlaeufig: erst neu rechnen */
+      if (_sgStatus === 'bereit' && typeof State !== 'undefined' && State.kpis && State.kpis.steuer_vorlaeufig && typeof calcNow === 'function') calcNow();
+    }
+  } catch (_eSg) { try { console.warn('[storage v3314] Steuer-Warten:', _eSg.message); } catch (e) {} }
   /* v828-inflight-guard: Doppel-Anlage verhindern. Wenn bereits ein POST fuer ein NEUES
      Objekt laeuft (_currentObjKey noch null), keinen zweiten POST starten. */
   if (_newObjSaveInflight && !_currentObjKey) {

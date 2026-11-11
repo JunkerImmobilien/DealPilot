@@ -1165,7 +1165,7 @@
        V352): K.steuer ist das anteilige erste Jahr, die Cashflows sind Volljahre -
        gemessen stand „+ 771 €" zwischen zwei gleichen Cashflows von 8.119 €. */
     var _stH = (da(K.cf_op) === null || da(K.cf_ns) === null) ? null : K.cf_ns - K.cf_op;
-    zeile('Steuern (Belastung -, Erstattung +)', _stH === null ? '-' : (_stH > 0.5 ? '+ ' : (_stH < -0.5 ? '- ' : '')) + eur(Math.abs(_stH)), { einzug: true });
+    zeile('Steuern (Belastung -, Erstattung +)' + (K.steuerjahr ? ' ' + K.steuerjahr + (K.steuerjahr_art === 'laufend' ? ', laufendes Jahr' : ', Kaufjahr') : ''), _stH === null   /* v3314 · N157 */ ? '-' : (_stH > 0.5 ? '+ ' : (_stH < -0.5 ? '- ' : '')) + eur(Math.abs(_stH)), { einzug: true });
     zeile('Cashflow nach Steuern / Jahr', eur(K.cf_ns), { summe: true });
     zeile('Cashflow nach Steuern / Monat', da(K.cf_ns) === null ? '-' : eur(K.cf_ns / 12, 2), { fett: true });
     y += 2;

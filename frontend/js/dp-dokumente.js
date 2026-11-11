@@ -291,7 +291,7 @@
         { w: ['Tilgung', B.eur(K.tilg_j), B.eur(K.tilg_ezb), B.eur(K.tilg_an)] },
         bsv ? { w: ['Bausparrate', B.eur(K.bspar_j || 0), B.eur(K.bspar_ezb || 0), B.eur(K.bspar_an || 0)] } : null,
         { w: ['Cashflow vor Steuern', B.eurS(K.cf_op), B.eurS(K.cf_op_ezb), B.eurS(K.cf_op_an)], art: 'summe' },
-        { w: ['Steuern (Belastung −, Erstattung +)', stD(K.cf_op, K.cf_ns), stD(K.cf_op_ezb, K.cf_ns_ezb), stD(K.cf_op_an, K.cf_ns_an)] },
+        { w: ['Steuern (Belastung −, Erstattung +)' + (K.steuerjahr ? ' · ' + K.steuerjahr_text.replace('Steuerwirkung ', 'heute: ') : ''), stD(K.cf_op, K.cf_ns)   /* v3314 · N157 */, stD(K.cf_op_ezb, K.cf_ns_ezb), stD(K.cf_op_an, K.cf_ns_an)] },
         { w: ['Cashflow nach Steuern', B.eurS(K.cf_ns), B.eurS(K.cf_ns_ezb), B.eurS(K.cf_ns_an)], art: 'summe' },
         { w: ['Cashflow nach Steuern / Monat', B.eurS((K.cf_ns || 0) / 12, 2), B.eurS((K.cf_ns_ezb || 0) / 12, 2), B.eurS((K.cf_ns_an || 0) / 12, 2)], art: 'ende' }
       ]) + '<p class="det">Ende Zinsbindung: mit fortgeschriebener Miete und dem dann erreichten Tilgungsstand. Anschluss: mit dem angenommenen Anschlusszins.</p></div>';
