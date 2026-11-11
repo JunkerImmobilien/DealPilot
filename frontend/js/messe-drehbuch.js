@@ -5714,6 +5714,15 @@
     }
   };
   function r26Heute() { var d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+  /* v3288b · Rohertragsfaktor × Miete: nur die Spalten mit Betrag (Bestand steht seit v3287 als „—“), die erste mit Namen */
+  function r26Rf(rf, kopf, iB, iZ) {
+    if (!rf) return '';
+    var mit = []; for (var i = iB; i <= iZ; i++) if (/€/.test(rf[i] || '')) mit.push(i);
+    if (!mit.length) return '';
+    var nm = function (i) { return String(kopf[i] || '').split(' ')[0]; };
+    if (mit.length === 1) return ' — und als Gegenprobe Rohertragsfaktor × Miete: <b>' + rf[mit[0]] + '</b> (' + nm(mit[0]) + ')';
+    return ' — und als Gegenprobe Rohertragsfaktor × Miete: <b>' + rf[mit[0]] + '</b>' + (mit[0] !== iB ? ' (' + nm(mit[0]) + ')' : '') + ' bis <b>' + rf[mit[mit.length - 1]] + '</b>';
+  }
   function r26Mfh(sel) { return q('#mfh-modal ' + sel); }
   function r26We(sel) { return q('#mfh-we-ov ' + sel); }
   function r26Zelle(i, k) { return r26Mfh('[data-i="' + i + '"][data-k="' + k + '"]'); }
@@ -6085,7 +6094,7 @@
         var zr = function (re) { return function () { var t = tab(); var r = t && [].filter.call(t.querySelectorAll('tbody tr'), function (x) { return re.test(r6Text(x.cells[0])); })[0]; return r || null; }; };
         if (ew && iB > 0) { await zeige(zr(/^Ertragswert/), 6); await b2oZeile(s, 'Ertragswert je Stufe', 'Bestand <b>' + ew[iB] + '</b>, mit Mieterhöhung <b>' + ew[iM] + '</b>, im Zielbild <b>' + ew[iZ] + '</b> — Potenzialwert, keine Verkehrswertermittlung.', 1000); }
         if (mpi && iB > 0) { await zeige(function () { var a = zr(/^Marktpreisindikation/)(), b = zr(/^Rohertragsfaktor/)(); return a && b ? b2oHuelle(a, b) : a; }, 6);
-          await b2oZeile(s, 'Daneben der Markt', 'Marktpreisindikation aus Angeboten: Bestand <b>' + mpi[iB] + '</b>, Zielbild <b>' + mpi[iZ] + '</b>' + (rf ? ' — und als Gegenprobe Rohertragsfaktor × Miete: <b>' + rf[iB] + '</b> bis <b>' + rf[iZ] + '</b>' : '') + '.', 1500);
+          await b2oZeile(s, 'Daneben der Markt', 'Marktpreisindikation aus Angeboten: Bestand <b>' + mpi[iB] + '</b>, Zielbild <b>' + mpi[iZ] + '</b>' + r26Rf(rf, kopf, iB, iZ) + '.', 1500);
           await b2oZeile(s, 'Zwei Blickwinkel', 'Der Ertragswert rechnet aus der Miete. Die Marktpreisindikation sagt, was vergleichbare Häuser am Ort im Angebot kosten — abzüglich des üblichen Abschlags.', 1500); }
         /* v2481g · GEMESSEN: die Aufteilung steht als ZEILEN in derselben Tafel, nicht als eigene Tabelle - gezeigt werden diese Zeilen samt Begründung */
         var auf = function () {
@@ -6095,6 +6104,9 @@
         };
         var au = auf();
         if (au) {
+          /* v3288b · die Hülle liegt position:fixed und lässt sich nicht holen - erst die erste Zeile ins Bild (Prüflauf: Kegel 0 %) */
+          var auErst = [].filter.call(r11Panel().querySelectorAll('[data-dp-pot-wirt] tr'), function (r) { return r.offsetWidth && /Aufteilung/i.test(r6Text(r.cells[0] || r)); })[0];
+          if (auErst) { holen(auErst); await warte(400); }
           await zeige(auf, 6);
           var at = [].map.call(r11Panel().querySelectorAll('[data-dp-pot-wirt] tr'), function (r) { return /Aufteilung/i.test(r6Text(r.cells[0] || r)) ? r6Text(r) : ''; }).join(' '), neg = /kein Potenzial/i.test(at);
           await b2oZeile(s, 'Nach der Aufteilung', neg ? 'Jede Wohnung als Eigentumswohnung, die Summe gegen das Haus — hier <b>kein Potenzial</b>, und DealPilot sagt warum.' : 'Jede Wohnung als Eigentumswohnung, die Summe nach Aufteilungskosten gegen den Wert des Hauses.');
