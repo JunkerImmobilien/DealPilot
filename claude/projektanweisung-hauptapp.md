@@ -44611,3 +44611,15 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
   - Speicherung auf Prod am 09.11. um 15:14 UTC klären.
   - VOLL-A/B tragen Staging-Scores (DS 25/23). Auf Prod erst B öffnen oder neu laden (Tilgung-Falle, siehe Kopf von `tools/demo-vollausstattung.mjs`).
   - Die nächste Prod-Objektnummer ist 2026-1159.
+
+### Nachtrag: Demo-Konto Staging auf Lage-Fokus, Storybook (11.11.2026, nur Staging)
+- **Was:**
+  - Marcel: „ja mach das alles so fertig“. In `user_settings.browser_vorgaben` des Staging-Demo-Kontos nur die Score-Gewichtung wie auf Prod gesetzt: `lage`, 20/22/14/14/30, `dp_dealscore_eigen` entfernt.
+  - UPDATE mit md5-Vorbedingung. Sicherung `/root/backups/demo-settings-staging-20261111-1000-vor-lage.json.gz`. Übrige Einstellungen md5-gleich.
+  - Die gespeicherten Scores sind nicht umgerechnet. 17 der 19 gemeinsamen Objekte weichen von Prod ab, bis sie in der App gespeichert werden.
+- **Zurückgenommen:** „Westerfeld `mietausfall` 3942 = Betrag im Prozentfeld“ (Eintrag oben) war falsch.
+  - `#mietausfall` ist ein Euro-Feld. Seit v3238 trägt es Jahresnettokaltmiete × Leerstand: 39.420 € × 10 % = 3.942 €.
+  - Nicht geändert.
+- **Storybook:** `node tools/messe-storybook.mjs` (18 Objekte, 24 Seiten).
+  - Die Geschichte Gohliser Str. 42 sagt „Gut“, gespeichert ist 68 Solide (Prod 77). Das ist der alte Staging-Stand; nach dem Speichern mit Lage-Fokus erneut prüfen.
+- **Nachweis:** Blob danach `lage` / 20/22/14/14/30 / ohne eigen. Objekte seit dem Abdruck 08:59 unverändert. Prod nicht angefasst.

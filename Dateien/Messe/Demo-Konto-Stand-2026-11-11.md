@@ -99,7 +99,34 @@ Die Abzüge sind COPY-Textformat, je Zeile ein `row_to_json`.
 
 ## 7 · Offen (Marcel)
 
-1. Gewichtung der Demo: Lage-Fokus (Prod, Messe-Stand) oder die Staging-Regler „Vorsichtig“?
-2. Danach entscheiden, ob der Staging-Stand nach Prod soll. Damit fielen die Prod-Neuabrufe vom 29.10. und 04.11. weg. Die Staging-Eingaben ändern die Geschichte bei Parkstr. 9, Bismarckstr. 27 und Westerfeldstr. 140. Bei Westerfeld ist `mietausfall` 3942 vermutlich ein Betrag in einem Prozentfeld, das gehört vorher angesehen.
+1. ~~Gewichtung der Demo~~ – entschieden 11.11.: Lage-Fokus, auf Staging zurückgesetzt (Abschnitt 8).
+2. Danach entscheiden, ob der Staging-Stand nach Prod soll. Damit fielen die Prod-Neuabrufe vom 29.10. und 04.11. weg. Die Staging-Eingaben ändern die Geschichte bei Parkstr. 9, Bismarckstr. 27 und Westerfeldstr. 140.
 3. Lindenallee 14: Prod führt 2026-1123, Staging nur Kopien. Welche ist die Demo?
 4. Wer hat am 09.11. um 15:14 UTC auf Prod Westerfeld und Hölderlin gespeichert?
+
+
+## 8 · Nachtrag 11.11. vormittags (Marcel: „ja mach das alles so fertig“), nur Staging
+
+**Gewichtung auf Staging zurück auf Lage-Fokus.** Geändert wurde nur die Score-Gewichtung in `user_settings.browser_vorgaben`:
+- `dp_dealscore2_preset` balanced → `lage`
+- `dp_dealscore_weights` → 20/22/14/14/30
+- `dp_dealscore_eigen` entfernt, wie auf Prod
+
+Der Rest des Blobs ist unverändert (`dp_std_set`, `dp_score_ansicht`, `dp_investment_profile`). Die übrigen Einstellungen sind md5-gleich wie vorher.
+Das UPDATE lief mit md5-Vorbedingung (3fd6ad7b… → 48bc41ce…). Vorher gesichert: `/root/backups/demo-settings-staging-20261111-1000-vor-lage.json.gz` (11 Zeilen).
+
+**Die gespeicherten Scores sind NICHT umgerechnet.** Sie bleiben so lange verschieden, bis das Objekt in der App gespeichert wird.
+Von Prod weichen jetzt 17 der 19 gemeinsamen Objekte ab, Werte wie in Tabelle 2 und dazu 2026-004 (DS 56/27, Investor 56/36) und 2026-1002 (85/71, 74/65).
+Gleich sind nur 1082 und 1088, die beide keinen Score haben, sowie VOLL-A/B.
+Die Abweichung kommt nicht allein von der Gewichtung: Auch der DSCR ist auf beiden Seiten seit dem 28.10. neu gerechnet, zum Beispiel Bäckerstr. 0,99 → 0,80.
+
+**Westerfeldstr. 140, `mietausfall` 3942: richtig, nicht geändert.** Meine Vermutung „Betrag im Prozentfeld“ (Bericht von heute früh) war falsch und ist hiermit zurückgenommen.
+`#mietausfall` ist ein Euro-Feld („Kalkulat. Mietausfall / Jahr“, Präfix €, index.html). Seit v3238 trägt es den berechneten Betrag Jahresnettokaltmiete × Leerstand (calc.js, Block „MIETAUSFALL = LEERSTAND“).
+Rechnung: 39.420 € × 10 % = 3.942 €. Die Bewirtschaftung auf Staging liegt genau um diese 3.942 € über Prod (23.334 gegen 19.392).
+Prod führt 0, weil der Leerstand dort 0 ist. Auch das ist in sich stimmig. Offen ist nur die Frage, welcher Leerstand die Demo trägt.
+
+**Storybook** neu erzeugt mit `node tools/messe-storybook.mjs`: Es liest Staging nur per SELECT, das PDF druckt ein lokales Headless-Chrome, Kosten fallen keine an. Ergebnis 18 Objekte, 24 Seiten.
+Gegen das Storybook von heute früh haben sich nur Ravensberger (63 → 71 Gut) und Hölderlin (57 → 68 Solide) geändert, beides aus den Speicherungen von heute.
+**Eine Geschichte passt nicht:** Gohliser Str. 42 sagt Score „Gut“, gespeichert ist 68 Solide (Prod 77 Gut). Das kommt vom Staging-Stand mit der alten Gewichtung. Nach einmal Speichern mit Lage-Fokus erneut prüfen, den Text nicht ändern.
+
+**Nicht angefasst:** Lindenallee 14 und die 17 Objekte mit Prod-eigenen Ständen. Prod ist unverändert.
