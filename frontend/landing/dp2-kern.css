@@ -113,3 +113,6 @@
 /* landing-kern-2a · mit „Deal-Check" und „Geschichten" brachen bei 1424 px Menüpunkte und der
    Startknopf zweizeilig um (gemessen) - Punkte einzeilig halten */
 .nav ul > li > a, .nav .b-cta, .nav .b-log{white-space:nowrap}
+/* landing-kern-2b · das Untermenü des LETZTEN Punkts (Sicherheit) ragte bei 1100 px 29 px über den
+   Rand (verborgen, aber es erzeugte eine waagerechte Scrollleiste) - am rechten Rand des Punkts ausrichten */
+@media (min-width:1081px){.nav ul > li:last-child > .sub{left:auto;right:-6px}}
