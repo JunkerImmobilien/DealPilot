@@ -861,8 +861,16 @@
             + '<div><span>Zielbild</span><b class="c-ziel">' + eurN(werte.zielbild) + '</b></div></div>'
             + '<p class="mfh-we-hint">' + (_ewArt === 'etw'
                 ? 'Zins ' + (z && z.pct != null ? String(z.pct).replace('.', ',') + ' % (Wohnungseigentum, Stufe ' + esc(z.stufe || '?') + (z.ausschuss ? ', ' + esc(String(z.ausschuss).replace(/^Der\s+/, '')) : '') + ')' : '—') + ' · Bodenwertanteil nach ' + esc(we.anteil_herkunft || 'Fläche')
-                : 'Anteil am Ertragswert des Hauses nach dem Anteil am Rohertrag')
+                : (r && r.anteil_regel ? 'Anteil am Ertragswert des Hauses: ' + esc(r.anteil_regel) : 'Anteil am Ertragswert des Hauses nach dem Anteil am Rohertrag'))
               + ' · ' + esc(P.KENNZEICHNUNG) + '</p>'
+            /* v3283 · die Mindermiete der Wohnung als boG (ImmoWertA 31 c), je Stufe mit Laufzeit und Zins */
+            + (function () {
+                var mm = we && we[_ewArt === 'etw' ? 'mietabweichung_etw' : 'mietabweichung'];
+                if (!mm) return '';
+                var t = [['bestand', 'Bestand'], ['mieterhoehung', 'Mieterhöhung']].filter(function (s) { return mm[s[0]] && mm[s[0]].satz; })
+                  .map(function (s) { return '<b>' + s[1] + ':</b> ' + esc(mm[s[0]].satz); });
+                return t.length ? '<p class="mfh-we-hint mfh-we-mietbog">' + t.join('<br>') + '</p>' : '';
+              })()
           : '<p class="mfh-we-hint">' + (P.ergebnisVeraltet() ? 'Die Angaben haben sich geändert. ' : '') + 'Der Ertragswert kommt aus demselben Rechenkern wie der Marktbericht Stufe 3 (kein Kontingent).</p>')
         + '<button type="button" class="btn btn-outline btn-sm" id="mfh-we-ew-los">Ertragswerte rechnen</button>';
       /* v3265 · das führende Verfahren steht jetzt in einem eigenen Feld darüber (#mfh-we-vw, vwZeichnen) -

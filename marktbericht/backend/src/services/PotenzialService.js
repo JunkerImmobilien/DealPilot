@@ -31,6 +31,7 @@ import { MarketAnalysisService } from './MarketAnalysisService.js';   /* v2541 *
 import { marktmiete as amtlicheMiete, klasseAusPunkten, KLASSE_TEXT } from '../lib/mietmodell_nrw.js';   /* v2988 */
 import { MIETBAND } from './CrossCheckService.js';   /* v2988 */
 import { erhoehungspfad558, ausschluss558, kappungFuer } from '../lib/kappung.js';
+import { barwertAbweichung } from '../lib/immowertv.js';   /* v3283 · Mietabweichung je Wohnung mit dem ETW-Zins */
 import { vergleichsfaktor as regVergleichsfaktor } from '../lib/gutachterausschuss.js';   /* v3200 · Aufteilerwert */
 import { regVfEingabe, regVfErgebnis } from '../lib/vergleichsfaktor_eingabe.js';         /* v3200 */
 import { vergleichsfaktor as amtlicherVf } from '../lib/vergleichsfaktoren_nrw.js';      /* v3200 */
@@ -365,7 +366,114 @@ function eineStufe(basis, ref, basisKern, miete, plus, kosten, bogMiete) {
   }
   const z = kernZusammenfassung(k);
   if (z) { z.mod_punkte = rndInfo.mod_punkte; z.mod_punkte_plus = rndInfo.plus; z.miete_wohnen_jahr = ein.miete_markt_jahr; z.sanierungsstau = stau; }
+  /* v3283 · die Eingabe der Stufe fuer den Anteil je Wohnung (nicht in der Antwort: nicht aufzaehlbar) */
+  if (z) Object.defineProperty(z, '_ein', { value: ein, enumerable: false });
   return z;
+}
+
+/* ══ v3283 · MINDERMIETE JE WOHNUNG ALS boG (ImmoWertA 31 c, Marcel 11.11.2026 „nimm das, was richtig ist") ══
+   Gemessen Modul 26, Wohnung 1 (68 m², Ist 6,00 €/m², Band 6,16–9,24, Anker 7,70): als Eigentumswohnung
+   Bestand 107.000 € > Mieterhoehung 106.000 €, Anteil am Haus 114.437 > 108.005 €. Das Haus rechnete richtig
+   (Bestand 580.000 < Mieterhoehung 630.000, die Mindermiete je Wohnung als boG, v2993/v3150) - aber JE
+   WOHNUNG fehlte sie im Bestand: die Eigentumswohnung rechnete mit 7,70 €/m² ohne Abzug, die Stufe
+   Mieterhoehung mit Abzug. Und der Anteil am Haus verteilte den GANZEN Hauswert nach dem Anteil am
+   Rohertrag - Bodenwert und den boG aller Wohnungen eingeschlossen; eine Wohnung, deren Miete in der
+   Stufe weniger stieg als die der anderen, verlor Wert (die leere Wohnung 5: 114.426 -> 106.606 €).
+   ImmoWertA 31 (Rohertrag) a) und c): vorlaeufiger Ertragswert mit der marktueblichen Miete, die Abweichung
+   als besonderes objektspezifisches Grundstuecksmerkmal (§ 8 Abs. 3), Mieterhoehungsmoeglichkeiten
+   beruecksichtigt (31 b: §§ 558 ff. BGB). Jetzt je Wohnung und Stufe:
+     Bestand        die Mietabweichung dieser Wohnung aus dem Bestand (CrossCheckService mietabweichungBog:
+                    Pfad nach § 558 bis zur marktueblichen Miete, oder belegte Laufzeit)
+     Mieterhoehung  der Pfad dieser Wohnung bis zur Zielmiete der Stufe (stufe558); ohne eigenen Pfad
+                    die Abweichung des Bestands
+     Zielbild       keine (die Stufe unterstellt die Zielmiete, wie das Haus)
+   Zins: als Eigentumswohnung der Liegenschaftszins fuer Wohnungseigentum (der Zins DIESES Verfahrens),
+   im Anteil am Haus der des Hauses. Anteil am Haus = Ertragswert der Wohnung im Modell des Hauses
+   (gleicher Zins, gleiche Bewirtschaftungskosten, Bodenwert nach Anteil) + ihr boG; was das Haus darueber
+   hinaus traegt (Stellplaetze, Sanierungsstau, Rundung), nach dem Anteil am Rohertrag. */
+const MM_POS = { underrent: 'besonderes objektspezifisches Grundstücksmerkmal: Mindermiete (ImmoWertA 31 c)',
+                 overrent: 'besonderes objektspezifisches Grundstücksmerkmal: Mehrmiete (ImmoWertA 31 c)' };
+/** Die Bestandszeile der Mietabweichung einer Wohnung - nur, wenn das Haus sie wirklich ansetzt. */
+function bestandMietZeile(basis, nr, nW) {
+  const mb = basis.miet_bog || null;
+  const post = (Array.isArray(basis.ein.bog_posten) ? basis.ein.bog_posten : []).find((x) => /Mietabweichung/.test(String(x.pos || '')));
+  if (!post || !mb || !Array.isArray(mb.zeilen)) return null;
+  const zs = mb.zeilen.filter((x) => x && x.nutzung !== 'gewerbe');
+  if (nr != null) { const f = zs.find((x) => x.nr != null && String(x.nr) === String(nr)); if (f) return f; }
+  return nW === 1 && zs.length === 1 ? zs[0] : null;
+}
+const ymDe = (ym) => (ym ? ym.slice(5, 7) + '/' + ym.slice(0, 4) : null);
+/** boG einer Wohnung in Stufe s mit dem Zins lzsPct (null = keiner).
+ *  ctx: { basis, S558, kapp, st, lzsHaus, rndHaus, nW } */
+function mietBogWohnung(ctx, z, w, s, lzsPct, rnd) {
+  if (!z || !(z.ist > 0) || z.herkunft === 'leer_marktueblich' || s === 'zielbild' || !(Number(lzsPct) > 0)) return null;
+  const gleich = Number(lzsPct) === Number(ctx.lzsHaus) && Number(rnd) === Number(ctx.rndHaus);
+  const opt = { stichtag: ctx.st, letzte: w.letzte || null, letzteBetragMonat: zahl(w.letzte_betrag) || null, mvArt: w.mv_art || null, vorsichtig36: true };
+  const aus = (pf, art, quelle, ziel) => (pf ? { wert: Math.round(pf.barwert_eur), art, jahre: pf.jahre, bis: pf.monate != null ? ymAb(ctx.st, pf.monate) : null,
+    zins_pct: Number(lzsPct), quelle, ziel_monat: ziel != null ? Math.round(ziel / 12 * 100) / 100 : null,
+    erste_anhebung: pf.erste_anhebung || (pf.schritte && pf.schritte.length ? ymAb(ctx.st, pf.schritte[0].ab_monat) : null), vorsichtig36: !!pf.vorsichtig36 } : null);
+  if (s === 'mieterhoehung' && ctx.S558) {
+    const zr = ctx.S558.zeilen.find((x) => x.schritte && x.nr != null && String(x.nr) === String(w.nr));
+    if (zr) {
+      const T = zr.ziel_monat * 12;
+      const pf = gleich ? { barwert_eur: zr.mindermiete_barwert_eur, jahre: zr.jahre_bis_ziel, monate: null, erste_anhebung: zr.erste_anhebung, vorsichtig36: zr.vorsichtig36 }
+        : erhoehungspfad558(z.ist, T, lzsPct, ctx.kapp.pct, rnd, opt);
+      const r = aus(pf, 'underrent', 'Mieterhöhung nach § 558 BGB bis zur Zielmiete der Stufe', T);
+      if (r && gleich && zr.schritte.length) r.bis = zr.schritte[zr.schritte.length - 1].ab;
+      return r;
+    }
+  }
+  /* Bestand (und Mieterhoehung ohne eigenen Pfad): die Abweichung, die das Haus fuer diese Wohnung ansetzt */
+  const bz = bestandMietZeile(ctx.basis, w.nr, ctx.nW);
+  if (!bz || !bz.angesetzt) return null;
+  const d = Number(bz.differenz_jahr) || 0;
+  if (bz.abgelaufen || !d) return null;
+  if (bz.pfad558) {
+    const ansatz = z.ist - d;
+    const pf = gleich ? { barwert_eur: bz.barwert_eur, jahre: bz.jahre, monate: null, erste_anhebung: bz.pfad558.erste_anhebung, vorsichtig36: bz.pfad558.vorsichtig36 }
+      : erhoehungspfad558(z.ist, ansatz, lzsPct, ctx.kapp.pct, rnd, opt);
+    const r = aus(pf, 'underrent', 'Mieterhöhung nach § 558 BGB bis zur marktüblichen Miete', ansatz);
+    if (r && gleich && Array.isArray(bz.pfad558.schritte) && bz.pfad558.schritte.length) r.bis = ymAb(ctx.st, bz.pfad558.schritte[bz.pfad558.schritte.length - 1].ab_monat);
+    return r;
+  }
+  const n = Number(bz.jahre);
+  if (!(n > 0)) return null;
+  const wert = gleich ? Number(bz.barwert_eur) : barwertAbweichung(d, lzsPct, n);
+  if (wert == null) return null;
+  return { wert: Math.round(wert), art: bz.art, jahre: n, bis: ymAb(ctx.st, Math.round(n * 12)), zins_pct: Number(lzsPct),
+    quelle: bz.jahre_quelle === 'befristung' ? 'Befristung' : (bz.jahre_quelle === 'kuendigungsverzicht' ? 'Kündigungsverzicht' : 'eingetragene Dauer der Abweichung'), ziel_monat: null };
+}
+/** Der Satz zum boG einer Wohnung (Rechenweg). */
+function mietBogSatz(b) {
+  if (!b) return null;
+  const eu = (x) => (x < 0 ? '−' : '+') + Math.abs(Math.round(x)).toLocaleString('de-DE') + ' €';
+  return (MM_POS[b.art] || MM_POS.underrent).replace(/^b/, 'B') + ' ' + eu(b.wert) + ': Barwert der Differenz zur angesetzten Miete'
+    + (b.ziel_monat ? ' (' + b.ziel_monat.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €/Monat)' : '')
+    + ' über ' + String(b.jahre).replace('.', ',') + ' J.' + (b.bis ? ' bis ' + ymDe(b.bis) : '') + ' (' + b.quelle
+    + (b.vorsichtig36 ? ', erste Anhebung als vorsichtige Annahme nach 36 Monaten' : (b.erste_anhebung ? ', erste Anhebung ' + ymDe(b.erste_anhebung) : ''))
+    + '), abgezinst mit dem Liegenschaftszins ' + String(b.zins_pct).replace('.', ',') + ' %.';
+}
+/** Ertragswert einer Wohnung im Modell des Hauses (Stufeneingabe einS, ohne boG) - fuer den Anteil am Haus. */
+function wohnungImHaus(einS, bwHaus, w, mw, anteil) {
+  if (!einS || !(mw > 0) || !(Number(w.wfl) > 0)) return null;
+  const ein = Object.assign({}, einS, { wohnflaeche_qm: Number(w.wfl), anzahl_we: 1, miete_markt_jahr: Math.round(mw), miete_ist_jahr: null,
+    gewerbe_jahr: null, gewerbe_flaechen: null, gewerbe_ohne_nutzung_qm: null, gewerbe_ohne_nutzung_nr: null,
+    stellplatz_anz: 0, stellplatz_miete_monat: null, garagen_anz: 0, aussen_anz: 0, zusatz_jahr: null, sonstige_jahr: null,
+    miete_aufteilung: null, bog_posten: null, bog_eur: null, bog_grund: null, vorlaeufig_vor_bog: false,
+    leerstand_pct: null, instandhaltung_ruecklage_jahr: null });
+  if (String(einS.bwk_modus) === 'manuell' && Number(einS.bwk_gesamt_jahr) > 0) {
+    const bez = Number(einS.bwk_bezugsgroesse_jahr) > 0 ? Number(einS.bwk_bezugsgroesse_jahr) : Number(einS.miete_markt_jahr);
+    if (!(bez > 0)) return null;
+    ein.bwk_gesamt_jahr = Math.round(Number(einS.bwk_gesamt_jahr) * mw / bez);
+    ein.bwk_bezugsgroesse_jahr = Math.round(mw);
+  }
+  if (!bwHaus || !bwHaus.vollstaendig || bwHaus.wert == null) return null;
+  const bwE = Object.assign({}, bwHaus, { wert: bwHaus.wert * anteil });
+  if (bwHaus.wert_rentierlich != null) bwE.wert_rentierlich = bwHaus.wert_rentierlich * anteil;
+  if (bwHaus.bodenwert_gesamt != null) bwE.bodenwert_gesamt = bwHaus.bodenwert_gesamt * anteil;
+  let k = null;
+  try { k = ErtragswertService.ertragswert(ein, bwE); } catch (e) { return null; }
+  return k && k.vollstaendig ? Number(k.wert_ungerundet != null ? k.wert_ungerundet : k.wert) : null;
 }
 
 /* ══ v3150 · N114 · DIE STUFE „MIETERHÖHUNG" ALS WERT ZUM STICHTAG (Marcel 03.11.2026) ══════════
@@ -1105,6 +1213,35 @@ export const PotenzialService = {
         r.anteil_herkunft = meaSum > 0 && Number(w.mea_pct) > 0 ? 'Miteigentumsanteil' : 'Fläche';
         return r;
       });
+      /* v3283 · Mindermiete je Wohnung als boG (ImmoWertA 31 c) und der Anteil am Haus aus dem Ertragswert
+         der Wohnung im Modell des Hauses - statt den ganzen Hauswert nach dem Rohertrag zu verteilen. */
+      const mmCtx = { basis, S558, kapp: S558 ? { pct: S558.kappung_pct } : (basis.kappung || kappungFuer(ref.ags, ref.kappung_pct, basis.stichtag ? new Date(basis.stichtag + 'T00:00:00Z') : new Date())),
+        st: basis.stichtag ? new Date(basis.stichtag + 'T00:00:00Z') : new Date(), lzsHaus: kB && kB.lzs ? Number(kB.lzs.pct) : Number(basis.ein.lzs_pct),
+        rndHaus: kB && kB.nutzungsdauer ? Number(kB.nutzungsdauer.rnd) : null, nW: wl.filter((w) => w && w.art !== 'gewerbe').length };
+      out.anteil_regel = 'Ertragswert der Wohnung im Modell des Hauses (Liegenschaftszins und Bewirtschaftungskosten des Hauses, Bodenwert nach Anteil) '
+        + 'plus ihre Mietabweichung als besonderes objektspezifisches Grundstücksmerkmal (ImmoWertA 31 c); der Rest des Hauswerts nach dem Anteil am Rohertrag.';
+      if (bbW) stufenAlle.forEach((s) => {
+        const einS = s === 'bestand' ? basis.ein : (out.haus[s] && out.haus[s]._ein);
+        const H = out.haus[s] && out.haus[s].wert;
+        if (!einS || H == null) return;
+        const rnd = out.haus[s].rnd;
+        const zeilen = out.wohnungen.map((r, i) => {
+          if (r.art === 'gewerbe') return null;
+          const w = wl[i], mw = mieteW(w, i, s);
+          const b = mietBogWohnung(mmCtx, bbW.zeilen[i], w, s, mmCtx.lzsHaus, rnd);
+          return { roh: wohnungImHaus(einS, basis.bodenwert, w, mw, r.anteil), bog: b, mw };
+        });
+        if (zeilen.some((x) => x && x.mw > 0 && x.roh == null)) return;   /* ohne Kern je Wohnung: wie bisher nach dem Rohertrag */
+        const gew = out.wohnungen.reduce((a, r, i) => a + (r.art === 'gewerbe' ? (r.anteil_am_haus[s] || 0) : 0), 0);
+        const sW = zeilen.reduce((a, x) => a + (x ? x.mw : 0), 0);
+        const rest = H - gew - zeilen.reduce((a, x) => a + (x ? (x.roh || 0) + (x.bog ? x.bog.wert : 0) : 0), 0);
+        out.wohnungen.forEach((r, i) => {
+          const x = zeilen[i];
+          if (!x) return;
+          r.anteil_am_haus[s] = Math.round((x.roh || 0) + (x.bog ? x.bog.wert : 0) + (sW > 0 ? rest * x.mw / sW : 0));
+          if (x.bog) { r.mietabweichung = r.mietabweichung || {}; r.mietabweichung[s] = Object.assign({}, x.bog, { satz: mietBogSatz(x.bog) }); }
+        });
+      });
 
       const auf = auftrag.aufteilung || {};
       if (auf.aktiv) {
@@ -1137,10 +1274,16 @@ export const PotenzialService = {
             const mw = mieteW(w, i, s);
             if (r.art === 'gewerbe') { summe += r.anteil_am_haus[s] || 0; r.als_etw = r.als_etw || {}; r.als_etw[s] = null; return; }
             const e = etwEingabe(basis, ref, w, mw, lzs, bwk, rnd, r.anteil);
-            /* v3150 · Stufe Mieterhoehung: die Mindermiete der Wohnung bis zur Zielmiete auch als Eigentumswohnung */
-            if (s === 'mieterhoehung' && S558 && bbW) {
-              const zr = S558.zeilen.find((x) => x.schritte && x.nr != null && String(x.nr) === String(w.nr));
-              if (zr && zr.mindermiete_barwert_eur) e.ein.bog_posten = [{ pos: 'besonderes objektspezifisches Merkmal: Mindermiete bis zur Wirksamkeit der Mieterhöhung', wert: zr.mindermiete_barwert_eur }];
+            /* v3150 · Stufe Mieterhoehung: die Mindermiete der Wohnung bis zur Zielmiete auch als Eigentumswohnung
+               v3283 · auch im BESTAND (ImmoWertA 31 c), abgezinst mit dem Zins fuer Wohnungseigentum - bis hier
+               rechnete die Eigentumswohnung im Bestand mit der marktueblichen Miete ohne Abzug */
+            if (bbW) {
+              const b = mietBogWohnung(mmCtx, bbW.zeilen[i], w, s, Number(lzs.wert), rnd);
+              if (b && b.wert) {
+                e.ein.bog_posten = [{ pos: MM_POS[b.art] || MM_POS.underrent, wert: b.wert }];
+                r.mietabweichung_etw = r.mietabweichung_etw || {};
+                r.mietabweichung_etw[s] = Object.assign({}, b, { satz: mietBogSatz(b) });
+              }
             }
             const k = mw > 0 ? ErtragswertService.ertragswert(e.ein, e.bw) : null;
             const wert = k && k.vollstaendig ? k.wert : null;

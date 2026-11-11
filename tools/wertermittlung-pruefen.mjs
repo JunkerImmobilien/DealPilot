@@ -1535,6 +1535,78 @@ fallB('B63', () => {
       && /^Ertragswert als Eigentumswohnung \(ersatzweise/.test(B({ ertragswert: 3 })), B({ angebote: 2, ertragswert: 1 }));
 });
 
+/* ══ v3283 · B64 MINDERMIETE JE WOHNUNG ALS boG (ImmoWertA 31 c) ═══════════════════════════════
+   Nachgestellt Modul 26 (Mitschnitt DPM_REIHE_DATEN.zielbild26, MFH Bielefeld, 6 WE, 378 m², LZS 2,5 %,
+   RND 18, Bodenwert 386.662 €, ETW-Zins 2,9 %). Wohnung 1: 68 m², Ist 408 € = 6,00 €/m² unter dem Band
+   6,16–9,24 (Anker 7,70), Vergleichsmiete 7,80, letzte Erhöhung 04/2019. Bis v3282 als Eigentumswohnung
+   Bestand 107.000 > Mieterhöhung 106.000 €, Anteil am Haus 114.437 > 108.005 €: der Bestand je Wohnung
+   rechnete die marktübliche Miete ohne die Mindermiete, der Anteil verteilte den ganzen Hauswert nach dem
+   Rohertrag. Muss gelten: Mieterhöhung ≥ Bestand, Bestand < Wert mit voller marktüblicher Miete. */
+async function b64Lauf(mod) {
+  if (!PSM || !CCS || !WPS || !WPS.WertParameterService) return null;
+  const W = [
+    { nr: '1', wfl: 68, miete_jahr: { bestand: 4896, mieterhoehung: 5630, zielbild: 7752 }, vgl_jahr: 6365, vgl_herkunft: 'eigene Angabe', soll558_jahr: 5630, letzte: '2019-04-01', mv_art: 'unbefristet' },
+    { nr: '2', wfl: 58, miete_jahr: { bestand: 4320, mieterhoehung: 4968, zielbild: 4968 }, vgl_jahr: 5867, vgl_herkunft: 'Mietspiegel', soll558_jahr: 4968 },
+    { nr: '3', wfl: 68, miete_jahr: { bestand: 5220, mieterhoehung: 6003, zielbild: 6003 }, vgl_jahr: 6879, vgl_herkunft: 'Mietspiegel', soll558_jahr: 6003 },
+    { nr: '4', wfl: 58, miete_jahr: { bestand: 4104, mieterhoehung: 4720, zielbild: 4720 }, vgl_jahr: 5867, vgl_herkunft: 'Mietspiegel', soll558_jahr: 4720 },
+    { nr: '5', wfl: 68, miete_jahr: { bestand: 0, mieterhoehung: 0, zielbild: 0 }, soll558_jahr: 0 },
+    { nr: '6', wfl: 58, miete_jahr: { bestand: 4380, mieterhoehung: 5037, zielbild: 5037 }, vgl_jahr: 5867, vgl_herkunft: 'Mietspiegel', soll558_jahr: 5037 },
+  ].map((w) => Object.assign({ art: 'wohnen', mea_pct: null, leer: false, vgl_marktmiete: false, letzte: null, letzte_betrag: null, mv_art: null }, w));
+  if (mod) mod(W);
+  const markt = 7.7, band = { unten_qm: 6.16, oben_qm: 9.24, anker_qm: 7.7, band_pct: 20, anker_stufe: 'satz_mittel', anker_etikett: 'Ø Miete des Liegenschaftszinssatzes' };
+  const st = new Date('2026-11-10T00:00:00Z'), kapp = { pct: 15, text: 'Kappungsgrenze 15 % in 3 Jahren' };
+  const q = (w) => w.miete_jahr.bestand / 12 / w.wfl;
+  const posten = W.filter((w) => w.miete_jahr.bestand > 0 && (q(w) < band.unten_qm || q(w) > band.oben_qm)).map((w) => ({ nr: w.nr, nutzung: 'wohnen', ist_jahr: w.miete_jahr.bestand,
+    differenz_jahr: w.miete_jahr.bestand - markt * w.wfl * 12, letzte_erhoehung: w.letzte, mv_art: w.mv_art, befristet_bis: w.befristet_bis || null }));
+  const mb = CCS.mietabweichungBog(posten, 2.5, 18, st, { kappung: kapp });
+  const roh = W.reduce((a, w) => a + (q(w) > 0 && q(w) >= band.unten_qm && q(w) <= band.oben_qm ? w.miete_jahr.bestand : markt * w.wfl * 12), 0);
+  const ein = { objektart: 'mfh', baujahr: 1960, baustatus: null, wohnflaeche_qm: 378, anzahl_we: 6, stichtag_jahr: 2026, miete_markt_jahr: Math.round(roh),
+    gewerbe_jahr: null, stellplatz_anz: 0, zusatz_jahr: null, sonstige_jahr: null, rnd_jahre: 18, gnd_jahre: 80, lzs_pct: 2.5, lzs_stufe: 'A', lzs_quelle: 'Prüffall', bwk_modus: 'normiert',
+    bog_posten: mb.angesetzt_eur ? [{ pos: 'besonderes objektspezifisches Merkmal: Mietabweichung Wohnungen', wert: mb.angesetzt_eur }] : [] };
+  const wb = { ref: { ags: '05711000', units: 6, living_area: 378, property_type: 'mfh' }, cross_check: { ertragswert: {} }, valuation: null,
+    ertragswert_eingabe: { ein, bodenwert: { vollstaendig: true, wert: 386662 }, wohnflaeche_wohnen: 378, miete_qm: 6.87, miete_band: band, markt_qm: markt,
+      miet_bog: mb, stichtag: '2026-11-10', kappung: kapp } };
+  const auftrag = { varianten: [{ key: 'mieterhoehung', miete_wohnen_jahr: 26358, mod_punkte_plus: 0, kosten: 0 }, { key: 'zielbild', miete_wohnen_jahr: 28480, mod_punkte_plus: 0.7, kosten: 20000 }],
+    wohnungen: W, aufteilung: { aktiv: true, kosten_eur: 10800 } };
+  const S = WPS.WertParameterService, alt = { lz: S.liegenschaftszins, ho: S.hole };
+  S.liegenschaftszins = async () => ({ wert: 2.9, stufe: 'A', quelle: 'Prüffall ETW-Zins', ausschuss: 'Gutachterausschuss (Prüffall)' });
+  S.hole = async () => null;
+  try { return await PSM.PotenzialService.rechne(wb, auftrag); } finally { S.liegenschaftszins = alt.lz; S.hole = alt.ho; }
+}
+let B64 = null, B64o = null, B64g = '';
+try {
+  B64 = await b64Lauf();
+  /* Gegentest Mehrmiete: Wohnung 3 zahlt 10,00 €/m² (über dem Band) - ohne Laufzeit kein Ansatz (E2), befristet bis 12/2029 ein Mehrertrag */
+  B64o = [await b64Lauf((W) => { W[2].miete_jahr.bestand = 8160; }), await b64Lauf((W) => { W[2].miete_jahr.bestand = 8160; W[2].befristet_bis = '2029-12-31'; })];
+} catch (e) { B64g = e.message.slice(0, 120); }
+fallB('B64', () => {
+  if (!B64 || !B64.wohnungen) return pruefe('B', 'B64', 'Potenzial-Lauf Modul 26 nachgestellt', false, B64g || 'kein Ergebnis');
+  const w1 = B64.wohnungen[0], w4 = B64.wohnungen[3], w5 = B64.wohnungen[4], e1 = w1.als_etw || {}, a1 = w1.anteil_am_haus || {};
+  wert('B', 'B64', 'Haus Bestand wie Mitschnitt (580.000 €)', B64.haus.bestand.wert, 580000, 0);
+  wert('B', 'B64', 'Haus Mieterhöhung wie Mitschnitt (630.000 €)', B64.haus.mieterhoehung.wert, 630000, 0);
+  pruefe('B', 'B64', 'Wohnung 1 (6,00 €/m² unter dem Band 6,16–9,24) als Eigentumswohnung: Mieterhöhung ≥ Bestand', e1.mieterhoehung >= e1.bestand && e1.bestand > 0,
+    e1.bestand + ' / ' + e1.mieterhoehung + ' (bis v3282: 107.000 / 106.000)');
+  pruefe('B', 'B64', 'Wohnung 1, Anteil am Haus: Mieterhöhung ≥ Bestand', a1.mieterhoehung >= a1.bestand, a1.bestand + ' / ' + a1.mieterhoehung + ' (bis v3282: 114.437 / 108.005)');
+  const m1 = w1.mietabweichung_etw && w1.mietabweichung_etw.bestand;
+  pruefe('B', 'B64', 'Wohnung 1 Bestand: boG Mindermiete negativ, Bestand unter dem Wert mit voller marktüblicher Miete (Zielbild gleicher Miete, ohne boG)',
+    !!m1 && m1.wert < 0 && e1.bestand < e1.zielbild, m1 ? m1.wert + ' €, ' + e1.bestand + ' < ' + e1.zielbild : 'kein boG');
+  pruefe('B', 'B64', 'Rechenweg-Satz: „Mindermiete (ImmoWertA 31 c)“, Laufzeit bis 02/2030, ETW-Zins 2,9 %', !!m1 && /Mindermiete \(ImmoWertA 31 c\) −/.test(m1.satz) && /bis 02\/2030/.test(m1.satz) && /2,9 %/.test(m1.satz), m1 && m1.satz);
+  pruefe('B', 'B64', 'Wohnung 4 (5,90 €/m², ohne Historie): Mieterhöhung ≥ Bestand, als ETW und als Anteil', w4.als_etw.mieterhoehung >= w4.als_etw.bestand && w4.anteil_am_haus.mieterhoehung >= w4.anteil_am_haus.bestand,
+    w4.als_etw.bestand + '/' + w4.als_etw.mieterhoehung + ' · ' + w4.anteil_am_haus.bestand + '/' + w4.anteil_am_haus.mieterhoehung);
+  pruefe('B', 'B64', 'leere Wohnung 5 (gleiche Miete in allen Stufen): Anteil am Haus bleibt (±1 %; bis v3282 114.426 → 106.606)',
+    Math.abs(w5.anteil_am_haus.mieterhoehung / w5.anteil_am_haus.bestand - 1) < 0.01, w5.anteil_am_haus.bestand + ' / ' + w5.anteil_am_haus.mieterhoehung);
+  ['bestand', 'mieterhoehung', 'zielbild'].forEach((s) => wert('B', 'B64', 'Summe der Anteile = Hauswert ' + s, B64.wohnungen.reduce((a, w) => a + w.anteil_am_haus[s], 0), B64.haus[s].wert, 6));
+  const ma = w1.mietabweichung && w1.mietabweichung.bestand;
+  wert('B', 'B64', 'Anteil am Haus: boG der Wohnung 1 = Bestandszeile des Hauses (Zins 2,5 %)', ma ? ma.wert : null, -2219, 0);
+  if (!B64o || !B64o[0] || !B64o[1]) return pruefe('B', 'B64', 'Gegentest Mehrmiete gelaufen', false, B64g || 'kein Ergebnis');
+  const o0 = B64o[0].wohnungen[2], o1 = B64o[1].wohnungen[2];
+  pruefe('B', 'B64', 'Mehrmiete (10,00 €/m²) ohne Laufzeit: kein boG je Wohnung (E2), Bestand = Mieterhöhung', !(o0.mietabweichung_etw && o0.mietabweichung_etw.bestand) && o0.als_etw.bestand === o0.als_etw.mieterhoehung,
+    JSON.stringify(o0.als_etw));
+  const ob = o1.mietabweichung_etw && o1.mietabweichung_etw.bestand;
+  pruefe('B', 'B64', 'Mehrmiete befristet bis 12/2029: Mehrertrag als boG (+), in Bestand und Mieterhöhung gleich', !!ob && ob.art === 'overrent' && ob.wert > 0
+    && o1.als_etw.bestand === o1.als_etw.mieterhoehung && o1.als_etw.bestand > o0.als_etw.bestand, ob ? ob.satz + ' · ' + JSON.stringify(o1.als_etw) : 'kein boG');
+});
+
 /* ══ EBENE C ═════════════════════════════════════════════════════════ */
 const auszug = (cc) => {
   const e = (cc && cc.ertragswert) || {}, s = (cc && cc.sachwert) || {};
