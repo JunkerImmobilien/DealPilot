@@ -678,13 +678,38 @@ if (!window._pdfGold) {
   }
 
   // ── Whitelabel-Branding ─────────────────────────────────────
-  var _brandState = { logo: undefined, current_logo: '' }; // logo undefined = unverändert, '' = entfernt
+  var _brandState = { logo: undefined, current_logo: '', logoDark: undefined, current_logo_dark: '', vari: null }; // logo undefined = unverändert, '' = entfernt
   function _currentLogo() { return _brandState.logo !== undefined ? _brandState.logo : (_brandState.current_logo || ''); }
+  /* v3299 · zweites, optionales Logo fuer dunklen Grund (Vorrang dort) */
+  function _currentLogoDark() { return _brandState.logoDark !== undefined ? _brandState.logoDark : (_brandState.current_logo_dark || ''); }
+  /* v3299 · Logo-Kontrast: Varianten je Grund (logo-kontrast.js), einmal je
+     Logo-Paar gerechnet und gemerkt. */
+  function _variantenFuer() {
+    var l = _currentLogo(), d = _currentLogoDark();
+    if (!l) return Promise.resolve(null);
+    var key = l.length + ':' + l.slice(-40) + '|' + d.length + ':' + d.slice(-40);
+    if (_brandState.vari && _brandState.vari.key === key) return Promise.resolve(_brandState.vari.v);
+    if (!window.DealPilotLogoKontrast) return Promise.resolve(null);
+    return window.DealPilotLogoKontrast.varianten(l, d || null).then(function (v) {
+      _brandState.vari = { key: key, v: v }; return v;
+    }, function () { return null; });
+  }
   async function loadBranding() {
     var w = $('rp-work'); if (!w) return; w.innerHTML = '<p class="rp-ph">Lade Branding…</p>';
     try {
       var r = await api('/branding'); var b = r.branding || {};
-      _brandState = { logo: undefined, current_logo: b.brand_logo_b64 || '' };
+      _brandState = { logo: undefined, current_logo: b.brand_logo_b64 || '',
+                      logoDark: undefined, current_logo_dark: b.brand_logo_dark_b64 || '', vari: null };
+      /* v3299 · Branding vor v3299 gespeichert: Varianten einmal nachrechnen und
+         ablegen - sonst fehlen sie in Mails (oeffentliche Logo-Route) und beim
+         Kunden muss jeder Browser selbst rechnen. Aendert am Logo nichts. */
+      if (b.brand_logo_b64 && !(b.brand_logo_auf_hell && b.brand_logo_auf_dunkel)) {
+        _variantenFuer().then(function (v) {
+          if (!v) return;
+          api('/branding-logo-varianten', { method: 'PUT', body: { auf_dunkel: v.auf_dunkel, auf_hell: v.auf_hell, messung: v.messung } })
+            .catch(function () {});
+        });
+      }
       var accent = b.brand_accent || '#C9A84C';
       var obsidian = b.brand_obsidian || '#0b0b0a';
       var inp = 'width:100%;padding:9px 11px;border:1px solid #e6e0d4;border-radius:8px;font:400 13px Inter;outline:none';
@@ -715,11 +740,18 @@ if (!window._pdfGold) {
              weg. Jetzt: echte Vorschau des gespeicherten Logos. */
           '<div style="margin-top:14px"><div class="rp-fl">Logo (PNG/SVG, max ~300 KB)</div>' +
             '<div id="rp-b-logo-prev" style="display:flex;align-items:center;gap:12px;margin-bottom:9px">' +
-              '<div id="rp-b-logo-box" style="width:132px;height:44px;border:1px dashed #ddd6c8;border-radius:8px;background:#151515;display:flex;align-items:center;justify-content:center;flex:none;overflow:hidden"></div>' +
+              /* v3299 · Vorschau auf dunklem UND hellem Grund, je mit Kontrast-Ampel */
+              '<div id="rp-b-logo-box" style="width:150px;height:52px;border:1px dashed #ddd6c8;border-radius:8px;background:#0A0A0C;display:flex;align-items:center;justify-content:center;flex:none;overflow:hidden"></div>' +
+              '<div id="rp-b-logo-box-hell" style="width:150px;height:52px;border:1px dashed #ddd6c8;border-radius:8px;background:#ffffff;display:flex;align-items:center;justify-content:center;flex:none;overflow:hidden"></div>' +
               '<div id="rp-b-logo-txt" style="font:400 11.5px Inter;color:#8a8473;line-height:1.5"></div>' +
             '</div>' +
+            '<div id="rp-b-logo-ampel" style="font:400 11.5px/1.55 Inter;color:#6b6558;margin-bottom:9px"></div>' +
             '<input type="file" id="rp-b-logo" accept="image/*" style="font:400 12px Inter">' +
-            '<button class="rp-act remove" id="rp-b-logo-x" type="button" style="margin-left:8px">entfernen</button></div>' +
+            '<button class="rp-act remove" id="rp-b-logo-x" type="button" style="margin-left:8px">entfernen</button>' +
+            '<div class="rp-fl" style="margin-top:12px">Logo für dunklen Grund (optional, hat dort Vorrang)</div>' +
+            '<div style="font:400 11.5px Inter;color:#8a8473;margin-bottom:6px">Für Menüleiste, Mail-Kopf und dunkle PDF-Deckblätter. Ohne eigenes Bild wird das Logo dort automatisch hell eingefärbt oder auf eine Platte gesetzt, wenn der Kontrast unter 3 : 1 liegt.</div>' +
+            '<input type="file" id="rp-b-logo-dark" accept="image/*" style="font:400 12px Inter">' +
+            '<button class="rp-act remove" id="rp-b-logo-dark-x" type="button" style="margin-left:8px">entfernen</button></div>' +
         '</div>' +
         /* W1b-contact-ui: Kontaktdaten fuer den PDF-Footer der Mandanten.
            Ohne die faellt config.js auf JUNKER_DEFAULTS zurueck. */
@@ -776,6 +808,9 @@ if (!window._pdfGold) {
       });
       $('rp-b-logo').addEventListener('change', function (e) { _brandLogoPick(e, upd); });
       $('rp-b-logo-x').addEventListener('click', function () { _brandState.logo = ''; var f = $('rp-b-logo'); if (f) f.value = ''; upd(); });
+      /* v3299 · zweites Logo fuer dunklen Grund */
+      $('rp-b-logo-dark').addEventListener('change', function (e) { _brandLogoPick(e, upd, 'logoDark'); });
+      $('rp-b-logo-dark-x').addEventListener('click', function () { _brandState.logoDark = ''; var f = $('rp-b-logo-dark'); if (f) f.value = ''; upd(); });
       ['rp-b-company','rp-b-address','rp-b-plz','rp-b-city','rp-b-phone','rp-b-email','rp-b-website','rp-b-tagline']
         .forEach(function (id) { var el = $(id); if (el) el.addEventListener('input', _footPreview); });
       _footPreview();
@@ -798,24 +833,47 @@ if (!window._pdfGold) {
   /* W22-logoprev */
   function _logoPrev() {
     var box = $('rp-b-logo-box'), txt = $('rp-b-logo-txt'); if (!box) return;
+    var boxH = $('rp-b-logo-box-hell'), amp = $('rp-b-logo-ampel');
     var l = _currentLogo();
     if (l) {
-      box.innerHTML = '<img src="' + esc(l) + '" alt="" style="max-width:120px;max-height:36px">';
+      box.innerHTML = '<img src="' + esc(_currentLogoDark() || l) + '" alt="" style="max-width:136px;max-height:40px">';
+      if (boxH) boxH.innerHTML = '<img src="' + esc(l) + '" alt="" style="max-width:136px;max-height:40px">';
       box.style.borderStyle = 'solid';
+      /* v3299 · Vorschau mit den Varianten, die Mandanten wirklich sehen, und Ampel */
+      if (amp) amp.textContent = 'Kontrast wird gemessen …';
+      _variantenFuer().then(function (v) {
+        if (!v || l !== _currentLogo()) { if (amp && !v) amp.textContent = ''; return; }
+        box.innerHTML = '<img src="' + esc(v.auf_dunkel) + '" alt="" style="max-width:136px;max-height:40px">';
+        if (boxH) boxH.innerHTML = '<img src="' + esc(v.auf_hell) + '" alt="" style="max-width:136px;max-height:40px">';
+        if (!amp) return;
+        var ART = { 'unveraendert': 'unverändert', 'weiss': 'weiß eingefärbt', 'dunkel': 'dunkel eingefärbt',
+                    'platte-hell': 'auf heller Platte', 'platte-dunkel': 'auf dunkler Platte', 'eigenes Logo': 'eigenes Logo für dunklen Grund' };
+        var zeile = function (titel, e) {
+          if (!e) return '';
+          var ok = e.k_nachher == null || e.k_nachher >= 3;
+          var k = function (x) { return x == null ? 'eigene Fläche' : String(x).replace('.', ',') + ' : 1'; };
+          return '<span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:' + (ok ? '#3FA56C' : '#B8625C') +
+            ';margin-right:6px;vertical-align:0"></span><b style="color:#3a352c">' + titel + ':</b> ' +
+            (e.k == null ? 'eigene Fläche, unverändert' : 'Kontrast ' + k(e.k) + (e.art !== 'unveraendert' ? ' → ' + esc(ART[e.art] || e.art) + ', jetzt ' + k(e.k_nachher) : ' – reicht')) + '<br>';
+        };
+        amp.innerHTML = zeile('Dunkler Grund', v.messung.dunkel) + zeile('Heller Grund', v.messung.hell);
+      });
       if (txt) txt.innerHTML = (_brandState.logo !== undefined
         ? '<b style="color:#3FA56C">Neu gew\u00e4hlt</b> \u2014 noch nicht gespeichert.'
         : 'Gespeichert. Neue Datei w\u00e4hlen ersetzt es.');
     } else {
       box.innerHTML = '<span style="font:400 10px Inter;color:#6f6a60">kein Logo</span>';
+      if (boxH) boxH.innerHTML = '';
+      if (amp) amp.textContent = '';
       box.style.borderStyle = 'dashed';
       if (txt) txt.textContent = 'Ohne Logo erscheint dein Marken-/Kanzleiname als Schriftzug.';
     }
   }
-  function _brandLogoPick(e, cb) {
+  function _brandLogoPick(e, cb, feld) {
     var f = e.target.files && e.target.files[0]; if (!f) return;
     if (f.size > 300 * 1024) { toast('Logo zu groß (max ~300 KB)'); e.target.value = ''; return; }
     var rd = new FileReader();
-    rd.onload = function () { _brandState.logo = rd.result; if (cb) cb(); };
+    rd.onload = function () { _brandState[feld || 'logo'] = rd.result; if (cb) cb(); };
     rd.readAsDataURL(f);
   }
   function _brandPreview() {
@@ -825,6 +883,8 @@ if (!window._pdfGold) {
     var accent = ($('rp-b-accent') || {}).value || '#C9A84C';
     var obsidian = ($('rp-b-obsidian') || {}).value || '#0b0b0a';
     var logo = _currentLogo();
+    /* v3299 · im Mail-Kopf (dunkel) steht die Variante fuer dunklen Grund */
+    try { if (_brandState.vari && _brandState.vari.v && _brandState.vari.v.auf_dunkel) logo = _brandState.vari.v.auf_dunkel; else if (_currentLogoDark()) logo = _currentLogoDark(); } catch (e) {}
     var brandName = wl ? name : 'DealPilot';
     var head = (wl && logo) ? '<img src="' + esc(logo) + '" style="max-height:40px">' : '<div style="font:700 20px Georgia,serif;color:#fff">' + esc(brandName) + '</div>';
     host.innerHTML =
@@ -832,7 +892,7 @@ if (!window._pdfGold) {
         '<div style="background:' + esc(wl ? obsidian : '#0b0b0a') + ';padding:16px 18px">' + head + '</div>' +
         '<div style="height:4px;background:' + esc(accent) + '"></div>' +
         '<div style="padding:18px;background:#fff">' +
-          '<div style="font-size:13px;color:#3a352c"><b>' + esc(brandName) + '</b> lädt dich zu DealPilot ein.</div>' +
+          '<div style="font-size:13px;color:#3a352c">' + (wl ? '<b>' + esc(brandName) + '</b> lädt dich ein.' : '<b>' + esc(brandName) + '</b> lädt dich zu DealPilot ein.') + '</div>' +   /* v3299 */
           '<div style="margin-top:12px"><span style="background:' + esc(accent) + ';color:#241c05;font-weight:700;padding:9px 16px;border-radius:8px;font-size:13px;display:inline-block">Einladung annehmen</span></div>' +
         '</div></div>';
   }
@@ -885,6 +945,16 @@ if (!window._pdfGold) {
       brand_obsidian: ($('rp-b-obsidian') || {}).value || ''
     };
     if (_brandState.logo !== undefined) body.brand_logo_b64 = _brandState.logo;
+    if (_brandState.logoDark !== undefined) body.brand_logo_dark_b64 = _brandState.logoDark;   /* v3299 */
+    /* v3299 · Logo-Kontrast: Varianten je Grund mitschicken (PNG, auch fuer SVG-Logos) */
+    try {
+      if (_currentLogo()) {
+        var _v = await _variantenFuer();
+        if (_v) body.brand_logo_varianten = { auf_dunkel: _v.auf_dunkel, auf_hell: _v.auf_hell, messung: _v.messung };
+      } else if (_brandState.logo === '') {
+        body.brand_logo_varianten = null;
+      }
+    } catch (e) {}
     try {
       await api('/branding', { method: 'PUT', body: body });
       /* W1b-contact-ui: Kontaktdaten ueber die eigene Route (laesst Logo-/Accent-Logik unangetastet) */
@@ -898,6 +968,7 @@ if (!window._pdfGold) {
       toast('✓ Branding gespeichert');
       try { if (_previewOn()) _applyPreview(); } catch (e) {}   /*W7-livepreview*/
       if (_brandState.logo !== undefined) { _brandState.current_logo = _brandState.logo; _brandState.logo = undefined; }
+      if (_brandState.logoDark !== undefined) { _brandState.current_logo_dark = _brandState.logoDark; _brandState.logoDark = undefined; }   /* v3299 */
     } catch (e) { toast(e && e.status === 413 ? 'Logo zu groß (max ~300 KB)' : 'Speichern fehlgeschlagen'); }
   }
 
@@ -1054,7 +1125,8 @@ if (!window._pdfGold) {
       var b = r && r.branding; if (!b || !b.brand_accent) return;
       window.DealPilotWhitelabel.apply({
         accent: b.brand_accent, accentHi: b.brand_accent_hi, accentLo: b.brand_accent_lo,
-        obsidian: b.brand_obsidian, name: b.brand_name, logo: b.brand_logo_b64
+        obsidian: b.brand_obsidian, name: b.brand_name, logo: b.brand_logo_b64,
+        logoDunkel: b.brand_logo_auf_dunkel || '', logoHell: b.brand_logo_auf_hell || ''   /* v3299 */
       });
     }).catch(function () { /* kein Partner / kein Branding -> normal weiter */ });
   })(0);

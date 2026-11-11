@@ -190,11 +190,19 @@ router.post('/clients', async (req, res, next) => {
     // Reseller-Branding für die Mail laden
     let brand = {};
     try {
+      /* v3299 · brand_mail_accent fehlte im SELECT (Befund 2g) - die eigene
+         Mail-Farbe griff nie. Dazu Kontakt (Reply-To), Website (Fuss) und die
+         Varianten-Spalte, damit die Mail eine gehostete Logo-Adresse bekommt. */
       const r = await query(
-        `SELECT name, brand_name, brand_logo_b64, brand_accent, whitelabel_enabled FROM resellers WHERE id=$1`,
+        `SELECT id, name, brand_name, brand_logo_b64, brand_accent, brand_mail_accent, whitelabel_enabled,
+                brand_email, brand_website, brand_company,
+                (brand_logo_auf_dunkel IS NOT NULL) AS hat_variante,
+                extract(epoch from updated_at)::bigint AS stand
+           FROM resellers WHERE id=$1`,
         [req.reseller.id]
       );
       brand = r.rows[0] || {};
+      brand.basis = inviteBase(req);
     } catch (e) {}
 
     const link = inviteBase(req) + '/?rp_invite=' + encodeURIComponent(invite.token);
@@ -292,7 +300,8 @@ router.get('/branding', async (req, res, next) => {
       /* W1a-contact */
       `SELECT brand_name, whitelabel_enabled, brand_logo_b64, brand_accent, brand_accent_hi, brand_accent_lo, brand_obsidian,
               brand_company, brand_address, brand_plz, brand_city, brand_phone, brand_email, brand_website, brand_tagline,
-              brand_mail_accent, brand_pdf_light, brand_display /*W8 W12 W20-display*/
+              brand_mail_accent, brand_pdf_light, brand_display /*W8 W12 W20-display*/,
+              brand_logo_dark_b64, brand_logo_auf_dunkel, brand_logo_auf_hell, brand_logo_messung /*v3299*/
          FROM resellers WHERE id=$1`, [req.reseller.id]);
     res.json({ branding: r.rows[0] || {} });
   } catch (e) { next(e); }
@@ -314,6 +323,18 @@ router.put('/branding', async (req, res, next) => {
       if (!/^data:image\//.test(logo)) return res.status(400).json({ error: 'logo_invalid', message: 'Ungültiges Bildformat.' });
     } else { logo = undefined; }                                    // nicht geändert
 
+    /* v3299 · zweites Logo "fuer dunklen Grund" - dieselben Regeln wie oben */
+    let logoDark = b.brand_logo_dark_b64;
+    if (logoDark === '' || logoDark === null) { logoDark = ''; }
+    else if (typeof logoDark === 'string') {
+      if (logoDark.length > 400000) return res.status(413).json({ error: 'logo_too_large', message: 'Logo zu groß (max ~300 KB).' });
+      if (!/^data:image\//.test(logoDark)) return res.status(400).json({ error: 'logo_invalid', message: 'Ungültiges Bildformat.' });
+    } else { logoDark = undefined; }
+    /* v3299 · Varianten je Grund (PNG, im Browser gerechnet). null = mit dem Logo entfernen. */
+    let vari;
+    try { vari = _varianten(b.brand_logo_varianten); }
+    catch (e) { return res.status(e.status || 400).json({ error: 'varianten_invalid', message: e.message }); }
+
     await query(
       `UPDATE resellers SET
          brand_name = $2,
@@ -327,8 +348,52 @@ router.put('/branding', async (req, res, next) => {
          updated_at = now()
        WHERE id = $1`,
       [req.reseller.id, name, wl, accent, accentHi, accentLo, (logo === undefined ? null : logo), obsidian]);
+    /* v3299 */
+    if (logoDark !== undefined) {
+      await query(`UPDATE resellers SET brand_logo_dark_b64 = $2, updated_at = now() WHERE id = $1`,
+        [req.reseller.id, logoDark === '' ? null : logoDark]);
+    }
+    /* Neues oder entferntes Logo ohne frische Varianten: die alten passen nicht mehr -> leeren
+       (die Kundenseite rechnet dann selbst, das Portal traegt sie beim naechsten Oeffnen nach). */
+    if (vari !== undefined || logo !== undefined || logoDark !== undefined) {
+      await _variantenSchreiben(req.reseller.id, (logo === '' || vari === undefined) ? null : vari);
+    }
     res.json({ ok: true });
   } catch (e) { next(e); }
 });
+
+/* v3299 · Varianten nachtragen, ohne das Logo anzufassen - das Portal ruft
+   das einmal fuer Branding auf, das vor v3299 gespeichert wurde. */
+router.put('/branding-logo-varianten', async (req, res, next) => {
+  try {
+    let vari;
+    try { vari = _varianten(req.body); }
+    catch (e) { return res.status(e.status || 400).json({ error: 'varianten_invalid', message: e.message }); }
+    if (!vari) return res.status(400).json({ error: 'varianten_invalid' });
+    await _variantenSchreiben(req.reseller.id, vari);
+    res.json({ ok: true });
+  } catch (e) { next(e); }
+});
+
+/* v3299 · undefined = nicht mitgeschickt, null = entfernen, sonst gepruefte Werte. */
+function _varianten(v) {
+  if (v === undefined) return undefined;
+  if (v === null) return null;
+  if (typeof v !== 'object' || Array.isArray(v)) throw Object.assign(new Error('Varianten fehlen.'), { status: 400 });
+  const png = (x) => {
+    if (typeof x !== 'string' || !/^data:image\/png;base64,/.test(x)) throw Object.assign(new Error('Variante ist kein PNG.'), { status: 400 });
+    if (x.length > 600000) throw Object.assign(new Error('Variante zu groß.'), { status: 413 });
+    return x;
+  };
+  const m = (v.messung && typeof v.messung === 'object' && !Array.isArray(v.messung)) ? JSON.stringify(v.messung) : null;
+  if (m && m.length > 4000) throw Object.assign(new Error('Messung zu groß.'), { status: 413 });
+  return { auf_dunkel: png(v.auf_dunkel), auf_hell: png(v.auf_hell), messung: m };
+}
+async function _variantenSchreiben(id, v) {
+  await query(
+    `UPDATE resellers SET brand_logo_auf_dunkel = $2, brand_logo_auf_hell = $3, brand_logo_messung = $4::jsonb, updated_at = now()
+      WHERE id = $1`,
+    [id, v ? v.auf_dunkel : null, v ? v.auf_hell : null, v ? v.messung : null]);
+}
 
 module.exports = router;

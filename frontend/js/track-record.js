@@ -93,7 +93,7 @@ function renderCoverPage(doc, objects, W, H, C, V) {
   doc.rect(0, H * 0.55 - 2, W, 2, 'F');
 
   // V24: DealPilot-Logo statt JUNKER-Hardcoding
-  var _coverLogo = (typeof _getBrandingLogo === 'function') ? _getBrandingLogo() : null;
+  var _coverLogo = (typeof _getBrandingLogo === 'function') ? _getBrandingLogo(true) : null;   /* v3299 · Deckblatt C.CH = dunkel */
   if (_coverLogo) {
     var _sz = (typeof _getLogoSize === 'function') ? _getLogoSize(_coverLogo, 50, 22) : { w: 40, h: 16 };
     try { doc.addImage(_coverLogo, 'PNG', M, 12, _sz.w, _sz.h); } catch(e) {}

@@ -20,6 +20,10 @@
 (function () {
   var _acc = null, _hi = null, _lo = null, _obs = null;
   var _label = '', _logo = '';   /* W11-wordmark */
+  /* v3299 · Logo-Kontrast: je Grund eine fertige Variante (logo-kontrast.js).
+     Fehlen sie (Branding vor v3299 gespeichert), rechnet apply() sie einmal
+     selbst nach und fegt danach erneut. */
+  var _logoDunkel = '', _logoHell = '', _varRechnet = false;
   var _active = false;
   var _seen = new WeakSet();      // bereits gefegte Stylesheets/Regeln
   /* W22-reapply: Der Sweeper schrieb #C9A84C IN den Regeln um. Beim zweiten Aufruf
@@ -359,12 +363,69 @@
       if (el.querySelector('img')) return;              // schon ein Logo drin
       el.setAttribute('data-wlw', '1');
       if (_logo) {
-        el.innerHTML = '<img src="' + String(_logo).replace(/"/g, '&quot;') +
-                       '" alt="" style="max-height:1.5em;max-width:150px;vertical-align:middle">';
+        /* v3299 · Groesse: in der Layout-Schiene (.dpl-wm) stand das Logo mit
+           1,5em bei 84 x 21 px in einem 247 x 100 px grossen Markenfeld
+           (gemessen Kessler, Staging). Dort traegt es jetzt die Klasse der
+           Schiene (.dpl-logo: hoechstens 46 x 176 px, Seitenverhaeltnis
+           bleibt) - sonst wie bisher 1,5em. Die Variante waehlt der Grund. */
+        var gross = el.classList && el.classList.contains('dpl-wm');
+        el.innerHTML = '<img data-wl-logo="1" src="' + String(_logoFuer(el)).replace(/"/g, '&quot;') + '" alt=""' +
+          (gross ? ' class="dpl-logo" style="display:block"'
+                 : ' style="max-height:1.5em;max-width:150px;vertical-align:middle"') + '>';
       } else {
         el.textContent = _label;
       }
     });
+    /* v3299 · schon gesetzte Logos auf die passende Variante nachziehen
+       (die Varianten koennen spaeter kommen als das erste Fegen). */
+    try {
+      Array.prototype.forEach.call((root || document).querySelectorAll('img[data-wl-logo="1"]'), function (img) {
+        var soll = _logoFuer(img.parentElement || img);
+        if (soll && img.getAttribute('src') !== soll) img.setAttribute('src', soll);
+      });
+    } catch (e) {}
+  }
+
+  /* v3299 · Welche Logo-Variante gehoert auf den Grund dieses Elements?
+     Gemessen wird der erste Vorfahr mit deckender Hintergrundfarbe. */
+  function _logoFuer(el) {
+    if (!_logoDunkel && !_logoHell) return _logo;
+    var dunkel = true;
+    try {
+      var K = window.DealPilotLogoKontrast;
+      if (K && el) dunkel = K.istDunkel(K.grundVon(el));
+    } catch (e) {}
+    return (dunkel ? _logoDunkel : _logoHell) || _logo;
+  }
+  function _istUnser(src) { return !!src && (src === _logo || src === _logoDunkel || src === _logoHell); }
+
+  /* v3299 · DealPilot-Reste in der Kundensicht eines Partners (Befund 2j):
+     Kopf der Markteinschaetzungs-Karte (.dplogo, avm-section.js - die Datei
+     selbst steht auf "Nicht anfassen", deshalb hier), Zeile "DealPilot -
+     Boarding/Quickboarding" im Boarding Pass (object-actions.js und
+     quickcheck-app.html) und der Browser-Tab. Ersetzt wird nur der
+     Textknoten mit dem Wort DealPilot; das Original wird fuer reset() gemerkt. */
+  var TXT_SEL = '.dplogo,.dp-pf-lead .s';
+  var _touchedText = [];
+  function sweepTexte(root) {
+    if (!_label) return;
+    var nodes;
+    try { nodes = (root || document).querySelectorAll(TXT_SEL); } catch (e) { return; }
+    Array.prototype.forEach.call(nodes, function (el) {
+      Array.prototype.forEach.call(el.childNodes, function (n) {
+        if (n.nodeType !== 3 || !/DealPilot/.test(n.nodeValue || '')) return;
+        _touchedText.push({ n: n, orig: n.nodeValue });
+        n.nodeValue = n.nodeValue.replace(/DealPilot/g, _label);
+      });
+    });
+    try {
+      var t = document.title || '';
+      if (/deal\s*pilot/i.test(t)) {
+        if (!_touchedText.some(function (x) { return x.titel; })) _touchedText.push({ titel: true, orig: t });
+        /* "Dealpilot - Junker Immobilien" ist der Tab der Haupt-App - dort nur der Partnername. */
+        document.title = /junker/i.test(t) ? _label : t.replace(/deal\s*pilot/ig, _label);
+      }
+    } catch (e) {}
   }
 
   /* ── 5) Bild-Logos ────────────────────────────────────────────
@@ -391,16 +452,17 @@
     try { imgs = (root || document).querySelectorAll(LOGO_SEL); } catch (e) { return; }
     Array.prototype.forEach.call(imgs, function (img) {
       var cur = img.getAttribute('src') || '';
-      if (cur === _logo) return;                     // schon unseres -> Loop-Schutz
-      if (cur.indexOf('data:') === 0) return;        // fremdes Inline-Bild nicht anfassen
+      var soll = _logoFuer(img);                     /* v3299 · Variante je Grund */
+      if (cur === soll) return;                      // schon unseres -> Loop-Schutz
+      if (cur.indexOf('data:') === 0 && !_istUnser(cur)) return;   // fremdes Inline-Bild nicht anfassen
       /* W23-logonarrow: zweites Netz — nur echte DealPilot-Assets. Selbst wenn ein
          Selektor irgendwann wieder zu weit wird, kann kein Fremdlogo mehr kippen. */
       if (!/dealpilot[-_]logo/i.test(cur) && !img.classList.contains('app-logo-simple-sidebar')) return;
       if (!img.getAttribute('data-wl-orig')) img.setAttribute('data-wl-orig', cur);
-      img.setAttribute('src', _logo);
+      img.setAttribute('src', soll);
       /* applyTheme() liest data-logo-dark und schreibt es nach src zurueck —
          mitziehen, sonst kaempfen wir gegen den Theme-Boot. */
-      if (img.hasAttribute('data-logo-dark')) img.setAttribute('data-logo-dark', _logo);
+      if (img.hasAttribute('data-logo-dark')) img.setAttribute('data-logo-dark', soll);
       if (_label) img.setAttribute('alt', _label);
     });
   }
@@ -413,6 +475,7 @@
     try { sweepSvg(); } catch (e) {}
     try { sweepWordmark(); } catch (e) {}   /* W11-wordmark */
     try { sweepLogoImgs(); } catch (e) {}   /* W15-logoimg */
+    try { sweepTexte(); } catch (e) {}      /* v3299 */
   }
   function sweepThrottled() {
     if (_timer) return;
@@ -427,6 +490,9 @@
     _touched.forEach(function (t) { try { t.st.setProperty(t.prop, t.orig, t.prio); } catch (e) {} });
     _touchedAttr.forEach(function (t) { try { t.el.setAttribute(t.attr, t.orig); } catch (e) {} });
     _touched = []; _touchedAttr = []; _seen = new WeakSet();
+    /* v3299 · ersetzte Texte und Tab-Titel zurueck */
+    _touchedText.forEach(function (t) { try { if (t.titel) document.title = t.orig; else t.n.nodeValue = t.orig; } catch (e) {} });
+    _touchedText = [];
     try {
       var r = document.documentElement.style;
       ['--gold','--gold-hi','--gold-lo','--gold-l','--gold-2','--gold-3','--gold-bg','--gold-d','--gold-soft','--obsidian',
@@ -500,8 +566,12 @@
     /* W11-wordmark: Name/Logo auch ohne Akzent uebernehmen — ein Reseller kann
        seine Marke setzen, ohne die Farbe zu aendern. */
     if (b.name) _label = b.name;
-    if (b.logo) _logo = b.logo;
-    if (!_ok(b.accent)) { if (_label || _logo) { _active = true; sweepWordmark(); sweepLogoImgs(); _watch(); return true; } return false; }
+    if (b.logo && b.logo !== _logo) { _logo = b.logo; _logoDunkel = ''; _logoHell = ''; }
+    /* v3299 · Logo-Kontrast: fertige Varianten aus dem Branding, sonst einmal nachrechnen. */
+    if (b.logoDunkel) _logoDunkel = b.logoDunkel;
+    if (b.logoHell) _logoHell = b.logoHell;
+    _variantenNachrechnen();
+    if (!_ok(b.accent)) { if (_label || _logo) { _active = true; sweepWordmark(); sweepLogoImgs(); sweepTexte(); _watch(); return true; } return false; }
     _acc = b.accent;
     _hi  = _ok(b.accentHi) ? b.accentHi : _lighten(_acc, 22);
     _lo  = _ok(b.accentLo) ? b.accentLo : _darken(_acc, 16);
@@ -545,6 +615,20 @@
     _watch();
     return true;
   }
+  function _variantenNachrechnen() {
+    if (!_logo || (_logoDunkel && _logoHell) || _varRechnet) return;
+    var K = window.DealPilotLogoKontrast;
+    if (!K || !K.varianten) return;
+    _varRechnet = true;
+    var fuer = _logo;
+    K.varianten(fuer).then(function (v) {
+      _varRechnet = false;
+      if (fuer !== _logo) return;                    // inzwischen anderes Logo
+      if (!_logoDunkel) _logoDunkel = v.auf_dunkel;
+      if (!_logoHell) _logoHell = v.auf_hell;
+      try { sweepWordmark(); sweepLogoImgs(); } catch (e) {}
+    }, function () { _varRechnet = false; });
+  }
   var _watching = false;
   function _watch() {
     if (_watching) return; _watching = true;
@@ -565,6 +649,8 @@
     reset: reset,   /*W22-reapply*/
     sweepWordmark: sweepWordmark,
     sweepLogoImgs: sweepLogoImgs,
-    accent: function () { return _acc; }
+    accent: function () { return _acc; },
+    label: function () { return _label; },              /* v3299 */
+    logoFuer: function (dunkel) { return (dunkel ? _logoDunkel : _logoHell) || _logo; }   /* v3299 */
   };
 })();

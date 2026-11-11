@@ -84,7 +84,15 @@ function getStatus() {
  */
 async function sendMail(opts) {
   const t = _getTransporter();
-  const from = process.env.BETA_MAIL_FROM || (opts.from || 'noreply@example.com');
+  let from = process.env.BETA_MAIL_FROM || (opts.from || 'noreply@example.com');
+  /* v3299 · Anzeigename je Mail (Partner-Branding). BETA_MAIL_FROM gewann bisher
+     IMMER - der Partnername aus resellerInviteMail kam nie an. Die Adresse
+     bleibt technisch die eigene (SPF/DKIM), nur der Name wechselt. */
+  if (opts.fromName) {
+    const m = /<([^>]+)>/.exec(from);
+    const addr = m ? m[1] : String(from).replace(/"/g, '').trim();
+    from = '"' + String(opts.fromName).replace(/["<>\r\n]/g, '').slice(0, 80) + '" <' + addr + '>';
+  }
   const to   = opts.to || process.env.BETA_MAIL_TO || 'info@dealpilot.immo';
 
   if (!t) {

@@ -904,6 +904,8 @@
           && typeof window.DealPilotConfig.branding.get === 'function')
           ? (window.DealPilotConfig.branding.get() || {}) : {};
         if (b.logo_b64) eigenes = String(b.logo_b64);
+        /* v3299 · Logo-Kontrast: auf der dunklen Schiene die Variante fuer dunklen Grund */
+        if ((S.ton || 'dunkel') === 'dunkel' && b.logo_b64_dunkel) eigenes = String(b.logo_b64_dunkel);
       } catch (e) {}
       marke.innerHTML = eigenes
         ? '<img class="dpl-logo" alt="">'

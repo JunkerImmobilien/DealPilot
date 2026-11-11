@@ -72,8 +72,12 @@ function _brand(o) {
     acc:  a || '#C9A84C',
     hi:   a ? _b_mix(a, 0.22)  : '#E8CC7A',
     lo:   a ? _b_mix(a, -0.16) : '#b8932f',
-    wordmark: o.name ? _esc(o.name)
+    /* v3299 · Befund 2h: die Bestaetigungs-Mail hatte kein Logo. Jetzt die
+       gehostete Adresse (Variante fuer den dunklen Kopf), sonst der Name. */
+    wordmark: o.logoUrl ? '<img src="' + _esc(o.logoUrl) + '" alt="' + _esc(o.name || '') + '" height="34" style="max-height:34px;max-width:220px;height:auto;display:block;border:0">'
+            : o.name ? _esc(o.name)
             : 'Deal<span style="color:' + (a ? _b_mix(a, 0.22) : '#E8CC7A') + ';">Pilot</span>',
+    marke: o.name ? _esc(o.name) : null,
     tag:  _esc(o.brandTag || 'DEALPILOT'),
     foot: o.footerNote || null,
     sup:  o.supportEmail || 'support@dealpilot.immo'
@@ -210,14 +214,18 @@ function renderVerifyMail(firstName, verifyUrl, brand) {
 '    </tr>\n' +
 '    <tr>\n' +
 '      <td style="background:#070707;border-radius:0 0 16px 16px;padding:24px 26px;" class="px">\n' +
-'        <div style="font-family:\'Space Grotesk\',Arial,sans-serif;font-size:15px;font-weight:700;color:#ffffff;">Guten Flug \u2014 dein DealPilot-Team</div>\n' +
+'        <div style="font-family:\'Space Grotesk\',Arial,sans-serif;font-size:15px;font-weight:700;color:#ffffff;">Guten Flug \u2014 dein ' + (B.marke || 'DealPilot') + '-Team</div>\n' +
 '        <div style="font-family:Arial,Helvetica,sans-serif;font-size:12px;line-height:1.6;color:#9a8f6a;margin-top:12px;">\n' +
 '          Fragen? Antworte einfach auf diese Mail oder schreib an\n' +
 '          <a href="mailto:' + B.sup + '" style="color:' + B.acc + ';">' + B.sup + '</a>.\n' +
 '        </div>\n' +
 '        <div style="font-family:Arial,Helvetica,sans-serif;font-size:11px;line-height:1.6;color:#6a6453;margin-top:14px;border-top:1px solid #1f1c14;padding-top:14px;">\n' +
-'          Junker Immobilien \u00b7 DealPilot<br>\n' +
-'          Du erhältst diese Mail, weil du dich gerade bei DealPilot registriert hast. Der Link ist 24 Stunden gültig.\n' +
+(B.marke
+  /* v3299 · bei einem Partner: seine Marke im Fuss, DealPilot nur dezent als Plattform */
+  ? '          ' + (B.foot || B.marke) + '<br>Plattform: DealPilot<br>\n' +
+    '          Du erhältst diese Mail, weil du dich gerade bei ' + B.marke + ' registriert hast. Der Link ist 24 Stunden gültig.\n'
+  : '          Junker Immobilien \u00b7 DealPilot<br>\n' +
+    '          Du erhältst diese Mail, weil du dich gerade bei DealPilot registriert hast. Der Link ist 24 Stunden gültig.\n') +
 '        </div>\n' +
 '      </td>\n' +
 '    </tr>\n' +

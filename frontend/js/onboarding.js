@@ -1277,13 +1277,26 @@ window.DealPilotOnboarding = (function () {
   }
   function _zurueck() { if (_schritt > 0) { _schritt--; _zeichne(); } }
 
+  /* v3299 · Befund 2j: der Kunde eines Partners las beim ersten Start
+     "Wie soll DealPilot aussehen?". Mit aktivem Partner-Branding neutral;
+     ohne Partner bleibt der Titel, wie er ist. */
+  function _titelFuerMarke(t) {
+    try {
+      var W = window.DealPilotWhitelabel;
+      if (!(W && W.isActive && W.isActive() && W.label && W.label())) return t;
+      if (t === 'Wie soll DealPilot aussehen?') return 'Wie soll deine App aussehen?';
+      if (t === 'Wie soll DealPilot bewerten?') return 'Wonach soll bewertet werden?';
+      return String(t).replace(/DealPilot/g, W.label());
+    } catch (e) { return t; }
+  }
+
   function _zeichne() {
     var s = SCHRITTE[_schritt];
     /* v2096: im Schritt „Aussehen" den Schleier wegnehmen und den Kasten
        zur Seite legen, damit die App dahinter WAHRHEITSGEMAESS zu sehen
        ist. Die Begruendung mit den gemessenen Zahlen steht am CSS. */
     try { if (_ov) _ov.classList.toggle('dpo-ov-schau', _schritt === 0); } catch (e) {}
-    el('dpo-titel').textContent = s.titel;
+    el('dpo-titel').textContent = _titelFuerMarke(s.titel);
     el('dpo-inhalt').innerHTML = s.bau();
     el('dpo-schritte').innerHTML = SCHRITTE.map(function (x, i) {
       return '<span class="dpo-pkt' + (i === _schritt ? ' an' : (i < _schritt ? ' fertig' : '')) + '">'

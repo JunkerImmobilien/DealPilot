@@ -158,6 +158,8 @@ router.post('/register-with-verify', registerLimiter, async (req, res) => {
       catch (e) { /* Branding ist Kuer, nie mail-blockierend */ }
       await mailerService.sendMail({
         to: user.email,
+        fromName: _brand ? _brand.name : undefined,                 /* v3299 · Absendername des Partners */
+        replyTo: (_brand && _brand.supportEmail) || undefined,      /* v3299 */
         subject: verifyMailTemplate.subject(),
         text: verifyMailTemplate.renderVerifyText(firstName, verifyUrl, _brand),
         html: verifyMailTemplate.renderVerifyMail(firstName, verifyUrl, _brand)
@@ -271,6 +273,8 @@ router.post('/resend-verify', resendLimiter, async (req, res) => {
     try { _brand = await resellerBrandLookup.brandForEmail(user.email); } catch (e) {}
     await mailerService.sendMail({
       to: user.email,
+      fromName: _brand ? _brand.name : undefined,                   /* v3299 */
+      replyTo: (_brand && _brand.supportEmail) || undefined,        /* v3299 */
       subject: verifyMailTemplate.subject(),
       text: verifyMailTemplate.renderVerifyText(firstName, verifyUrl, _brand),
       html: verifyMailTemplate.renderVerifyMail(firstName, verifyUrl, _brand)

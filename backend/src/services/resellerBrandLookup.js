@@ -15,6 +15,7 @@
  * brand_accent. Ohne Reseller / ohne Whitelabel -> null -> alles bleibt DealPilot.
  */
 const { query } = require('../db/pool');
+const { logoUrl } = require('../routes/partnerLogo');   /* v3299 */
 
 function _row2brand(r) {
   if (!r || !r.whitelabel_enabled || !r.brand_name) return null;
@@ -33,6 +34,11 @@ function _row2brand(r) {
     brandTag: String(r.brand_name).toUpperCase().slice(0, 28),
     accent: /^#[0-9a-fA-F]{6}$/.test(acc || '') ? acc : null,
     logo: r.brand_logo_b64 || null,
+    /* v3299 · gehostete Adresse (Variante fuer dunklen Grund) - der Kopf der
+       Bestaetigungs-Mail ist #070707. SVG ohne Variante liefert die Route nicht. */
+    logoUrl: (r.brand_logo_b64 && r.id && (r.hat_variante || !/^data:image.svg/.test(r.brand_logo_b64)))
+      ? logoUrl(process.env.APP_URL || process.env.FRONTEND_BASE_URL || 'https://app.dealpilot.immo', r.id, 'dunkel', r.stand)
+      : null,
     footerNote: footer,
     supportEmail: r.brand_email || null,
     /* W21-website: die Text-Variante der Verify-Mail braucht eine Adresse fuer
@@ -42,7 +48,9 @@ function _row2brand(r) {
 }
 
 const SEL = `rs.whitelabel_enabled, rs.brand_name, rs.brand_company, rs.brand_logo_b64,
-             rs.brand_accent, rs.brand_mail_accent, rs.brand_city, rs.brand_website, rs.brand_email`;
+             rs.brand_accent, rs.brand_mail_accent, rs.brand_city, rs.brand_website, rs.brand_email,
+             rs.id, (rs.brand_logo_auf_dunkel IS NOT NULL) AS hat_variante,
+             extract(epoch from rs.updated_at)::bigint AS stand`;   /* v3299 */
 
 /** Vor der Registrierung: gibt es eine offene Einladung fuer diese Adresse? */
 async function brandForEmail(email) {

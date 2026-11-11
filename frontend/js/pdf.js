@@ -146,9 +146,29 @@ function _formatBrandingFooter(b, sep) {
   return b.company || '';   /* v1632 · kein Ersatzabsender */
 }
 // Logo: Custom-Logo aus Settings hat Vorrang, sonst geladenes DealPilot-Logo
-function _getBrandingLogo() {
+/* v3299 · Logo-Kontrast: dunkel=true fuer Obsidian-Flaechen (Deckblatt und
+   Kopfbalken der klassischen PDFs, Track-Record-Deckblatt). Der Partner
+   liefert dafuer eine eigene Variante (logo_b64_dunkel, mandant-branding.js);
+   logo_b64 ist die Variante fuer hellen Grund. Ohne Partner: wie bisher. */
+function _getBrandingLogo(dunkel) {
   var b = _getBranding();
+  if (dunkel && b.logo_b64_dunkel) return b.logo_b64_dunkel;
   return b.logo_b64 || _ASSETS.logoDealpilot || null;
+}
+/* v3299 · PNG-Masse direkt aus dem IHDR-Kopf lesen. Ein frisch gesetztes
+   Data-URL-Bild ist beim ersten Export noch nicht dekodiert (img.complete
+   false) - dann fiel die Groesse auf das Seitenverhaeltnis 2,5 zurueck und
+   jedes andere Logo wurde verzerrt. */
+function _pngMasse(b64) {
+  try {
+    var m = /^data:image\/png;base64,/.exec(b64 || '');
+    if (!m) return null;
+    var k = atob(b64.slice(m[0].length, m[0].length + 44));
+    if (k.slice(12, 16) !== 'IHDR') return null;
+    var z = function (i) { return ((k.charCodeAt(i) << 24) >>> 0) + (k.charCodeAt(i + 1) << 16) + (k.charCodeAt(i + 2) << 8) + k.charCodeAt(i + 3); };
+    var w = z(16), h = z(20);
+    return (w > 0 && h > 0) ? { w: w, h: h } : null;
+  } catch (e) { return null; }
 }
 // Proportionale Maße berechnen - Logo nicht verzerren
 function _getLogoSize(imgB64, maxWidth, maxHeight) {
@@ -164,6 +184,8 @@ function _getLogoSize(imgB64, maxWidth, maxHeight) {
       return _fitProportional(_logoSizeCache[imgB64], maxWidth, maxHeight);
     }
   } catch (e) {}
+  var _pm = _pngMasse(imgB64);   /* v3299 */
+  if (_pm) { _logoSizeCache[imgB64] = _pm; return _fitProportional(_pm, maxWidth, maxHeight); }
   // Fallback: typische DealPilot-Aspect-Ratio
   var aspect = 2.5;
   var byW = { w: maxWidth, h: maxWidth / aspect };
@@ -817,7 +839,7 @@ function pageTpl(doc, num, subtitle, W, M) {
 
   // Sidebar-Logo im Header (Banner-Format auf dunklem BG)
   // Branding-Logo (Custom oder DealPilot), proportional skaliert
-  var _brandImg = _getBrandingLogo();
+  var _brandImg = _getBrandingLogo(!window._dpPdfLight);   /* v3299 · Kopfbalken C.CH = dunkel */
   if (_brandImg) {
     var _ls = _getLogoSize(_brandImg, 50, 17);
     try { doc.addImage(_brandImg, 'PNG', M, 3, _ls.w, _ls.h); } catch(e) {}
@@ -1374,7 +1396,7 @@ async function _exportPDFInner() {
   doc.rect(0, 252, W, 0.8, 'F');
 
   // Logo direkt auf dem Deckblatt-Hintergrund (charcoal) - keine weiße Box
-  var _coverLogo = _getBrandingLogo();
+  var _coverLogo = _getBrandingLogo(!window._dpPdfLight);   /* v3299 · Deckblatt C.CH = dunkel */
   if (_coverLogo) {
     var _csz = _getLogoSize(_coverLogo, 76, 36);
     try { doc.addImage(_coverLogo, 'PNG', W / 2 - _csz.w / 2, 14, _csz.w, _csz.h); } catch(e) {}

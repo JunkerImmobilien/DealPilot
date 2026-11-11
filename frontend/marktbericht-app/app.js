@@ -3247,6 +3247,37 @@ function makeCoverFadePNG() {
   return c.toDataURL('image/png');
 }
 
+/* v3299 · Deckblatt-Artwork in der Partnerfarbe. Das Bild bringt Pin und
+   Leuchten in GOLD mit (jsPDF erreicht der Sweeper nicht, Befund 2d/4).
+   Je Pixel bleibt die Helligkeit, der Farbanteil wandert zum Akzent: Grau
+   bleibt Grau, Gold wird Partnerfarbe. Ergebnis je Akzent gemerkt. */
+async function _mbFaerbeCover(dataUrl, rgb) {
+  try {
+    const key = rgb.join(',');
+    window._mbCoverFarbe = window._mbCoverFarbe || {};
+    if (window._mbCoverFarbe[key]) return window._mbCoverFarbe[key];
+    const img = await new Promise((ok, nein) => { const i = new Image(); i.onload = () => ok(i); i.onerror = nein; i.src = dataUrl; });
+    const c = document.createElement('canvas'); c.width = img.naturalWidth; c.height = img.naturalHeight;
+    const x = c.getContext('2d'); x.drawImage(img, 0, 0);
+    const id = x.getImageData(0, 0, c.width, c.height), d = id.data;
+    const am = Math.max(rgb[0], rgb[1], rgb[2]) || 1;
+    for (let i = 0; i < d.length; i += 4) {
+      const r = d[i], g = d[i + 1], b = d[i + 2];
+      const mx = Math.max(r, g, b), mn = Math.min(r, g, b);
+      if (mx === 0) continue;
+      const sat = (mx - mn) / mx, grau = 0.299 * r + 0.587 * g + 0.114 * b;
+      for (let k = 0; k < 3; k++) {
+        const ziel = rgb[k] / am * mx;
+        d[i + k] = Math.max(0, Math.min(255, Math.round(grau + (ziel - grau) * sat)));
+      }
+    }
+    x.putImageData(id, 0, 0);
+    const out = c.toDataURL('image/jpeg', 0.9);
+    window._mbCoverFarbe[key] = out;
+    return out;
+  } catch (e) { return null; }
+}
+
 async function loadImageDataUrl(url) {
   try {
     const r = await fetch(url);
@@ -3282,7 +3313,9 @@ async function exportPdf(out) {
   // v-Cover-Art: Marcels Mockup-Artwork als Cover-Hintergrund (statt Live-Karte).
   // Spart den static-map-Call; Live-Karte bleibt Fallback, falls Asset fehlt.
   if (window._bgCoverArt === undefined) window._bgCoverArt = await loadImageDataUrl('assets/bg-cover-art.jpg?v=49k');
-  const bgCoverArt = window._bgCoverArt;
+  /* v3299 · Partner aktiv (mb-whitelabel.js setzt window._mbMarke): Artwork in Partnerfarbe */
+  const _mk = (window._mbMarke && window._mbMarke.name) ? window._mbMarke : null;
+  const bgCoverArt = (_mk && window._bgCoverArt) ? ((await _mbFaerbeCover(window._bgCoverArt, GOLD)) || null) : window._bgCoverArt;
   // Deckblatt-Karte je nach Theme: dunkel = gold-auf-schwarz, hell = positron. Pin zeichnen wir selbst.
   const coverMapStyle = theme === 'dark' ? 'dark-matter-yellow-roads' : 'positron';
   let objImg = out._covMap || null;
@@ -3812,11 +3845,36 @@ async function exportPdf(out) {
   // Radar-Pin nur bei Live-Karte zeichnen (Artwork bringt den leuchtenden Pin mit)
   if (!covArtUsed) radarPin(165, 132, C.pin);
   // Marke 25pt (Mockup): "Deal" weiss/ink + "Pilot" gold — Baseline 32.4
+  /* v3299 · Befund 2d: bei aktivem Partner-Branding stand hier fest
+     "DealPilot". Jetzt das Partnerlogo (Variante fuer dunklen Grund, PNG
+     aus logo-kontrast.js, hoechstens 62 x 15 mm, Seitenverhaeltnis bleibt)
+     oder der Partnername als Schriftzug. */
+  let _markeGesetzt = false;
+  if (_mk && theme === 'dark') {
+    const _lg = _mk.logoDunkel || '';
+    if (_lg) {
+      try {
+        const _im = await new Promise((ok, nein) => { const i = new Image(); i.onload = () => ok(i); i.onerror = nein; i.src = _lg; });
+        const f = Math.min(62 / _im.naturalWidth, 15 / _im.naturalHeight);
+        const lw = _im.naturalWidth * f, lh = _im.naturalHeight * f;
+        doc.addImage(_lg, 'PNG', LX, 34.4 - lh, lw, lh);
+        _markeGesetzt = true;
+      } catch (e) { _markeGesetzt = false; }
+    }
+    if (!_markeGesetzt) {
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(_mk.name.length > 22 ? 17 : 22);
+      doc.setTextColor(255, 255, 255);
+      doc.text(String(_mk.name), LX, 32.4, { maxWidth: W * 0.6 });
+      _markeGesetzt = true;
+    }
+  }
+  if (!_markeGesetzt) {
   doc.setFont('helvetica', 'bold'); doc.setFontSize(25);
   doc.setTextColor(...(theme === 'dark' ? [255, 255, 255] : INK));
   doc.text('Deal', LX, 32.4);
   doc.setTextColor(...GOLD);
   doc.text('Pilot', LX + doc.getTextWidth('Deal'), 32.4);
+  }
   doc.setTextColor(...C.sub); doc.setFont('helvetica', 'normal'); doc.setFontSize(11);
   doc.text('MARKTBERICHT', LX, 43.6, { charSpace: 1.9 });
   // Gold-Dash (Mockup: y57.4, 15.8 x 1.2)
@@ -3896,7 +3954,15 @@ async function exportPdf(out) {
     doc.setTextColor(...C.foot); doc.text(window._mbMarkenName || 'DealPilot', fx, 284.3);
   }
   doc.setTextColor(...C.footAccent); doc.setFont('helvetica', 'bold');
-  doc.text(String(location.hostname || 'dealpilot.immo'), W - LX, 284.3, { align: 'right' });
+  /* v3299 · Befund 2d: hier stand die Adresse, unter der die App laeuft
+     (auf Staging app.staging.dealpilot.immo). Bei einem Partner: seine
+     Website, falls hinterlegt, sonst nichts. Ohne Partner: dealpilot.immo,
+     nie die Staging-Adresse. */
+  {
+    const _fuss = _mk ? String(_mk.website || '').replace(/^https?:\/\//i, '').replace(/\/+$/, '')
+                      : (/staging/i.test(location.hostname || '') ? 'dealpilot.immo' : String(location.hostname || 'dealpilot.immo'));
+    if (_fuss) doc.text(_fuss, W - LX, 284.3, { align: 'right' });
+  }
   doc.setFont('helvetica', 'normal');
   // Inhaltsverzeichnis-Seite reservieren (wird am Ende gefuellt, wenn alle Sektionen bekannt sind).
   doc.addPage();

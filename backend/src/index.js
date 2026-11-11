@@ -381,6 +381,7 @@ app.use('/api/v1/beta-signup', betaSignupRoutes);
 app.use('/api/v1/track', rateLimit({ windowMs: 60000, max: 120 }), require('./routes/track')); // v973
 /* v1523: oeffentliche Kennzahlen fuer die Landing - ohne Token, nur Summen. */
 app.use('/api/v1/public/stats', rateLimit({ windowMs: 60000, max: 60 }), require('./routes/publicStats'));
+app.use('/api/v1/public/partner-logo', rateLimit({ windowMs: 60000, max: 240 }), require('./routes/partnerLogo'));  // v3299 · Partner-Logos fuer Mails (gehostet statt data:)
 app.use('/api/v1/deal-action', dealActionRoutes);
 app.use('/api/v1/feedback', feedbackRoutes);
 app.use('/api/v1/dateien', require('./routes/dateien'));  // v3162 · Unterlagen-Ablage (Ordner, Grenzen je Plan, verschluesselt)

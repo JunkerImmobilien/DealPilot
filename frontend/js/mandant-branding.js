@@ -59,7 +59,9 @@
         /* W11-passname: Name+Logo mitgeben -> der Sweeper ersetzt ALLE zehn
            Wortmarken-Varianten (.fb-bb-logo, .mf-logo, .dpmb-logo, .dpx-logo,
            .rp-logo, .dp-mtb-brand ...), die replaceWordmark() nie erwischt hat. */
-        name: _b.brand_name || '', logo: _b.brand_logo_b64 || ''
+        name: _b.brand_name || '', logo: _b.brand_logo_b64 || '',
+        /* v3299 · Logo-Kontrast: fertige Varianten je Grund */
+        logoDunkel: _b.brand_logo_auf_dunkel || '', logoHell: _b.brand_logo_auf_hell || ''
       })) return;   // Override hat die Tokens schon gesetzt
     } catch (e) {}
     var r = document.documentElement.style;
@@ -88,7 +90,13 @@
              Firmenname ueber der Junker-Adresse im PDF-Footer. */
           if (_b.brand_name) { b.company = _b.brand_name; b.product_name = _b.brand_name; }
           if (_b.brand_company) b.company = _b.brand_company;   // Rechtsname schlaegt Markenname
-          if (_b.brand_logo_b64) b.logo_b64 = _b.brand_logo_b64;
+          /* v3299 · PDFs: logo_b64 ist die Variante fuer HELLEN Grund (PDF-Bogen,
+             Logo-Plakette) und immer ein PNG - jsPDF druckt kein SVG
+             (addImage 'PNG' in try/catch, das Logo fehlte dann still).
+             logo_b64_dunkel ist die Variante fuer Obsidian (Deckblatt und
+             Kopfbalken des klassischen Investment-PDFs, Layout-Schiene). */
+          if (_b.brand_logo_b64) b.logo_b64 = _b.brand_logo_auf_hell || _b.brand_logo_b64;
+          if (_b.brand_logo_b64) b.logo_b64_dunkel = _b.brand_logo_auf_dunkel || _b.brand_logo_b64;
           if (_b.brand_tagline) b.tagline = _b.brand_tagline;
           if (_b.brand_address) b.address = _b.brand_address;
           if (_b.brand_plz)     b.plz     = _b.brand_plz;
@@ -273,7 +281,8 @@
         try {
           window.DealPilotWhitelabel.apply({
             accent: c.brand_accent, accentHi: c.brand_accent_hi, accentLo: c.brand_accent_lo,
-            obsidian: c.brand_obsidian, name: c.brand_name, logo: c.brand_logo_b64
+            obsidian: c.brand_obsidian, name: c.brand_name, logo: c.brand_logo_b64,
+            logoDunkel: c.brand_logo_auf_dunkel || '', logoHell: c.brand_logo_auf_hell || ''   /* v3299 */
           });
         } catch (e) {}
       };
@@ -306,6 +315,19 @@
     } catch (e) { return; }
     _bootDone = true;   /* W37: erst NACH erfolgreichem Fetch sperren */
     if (!_b) return;
+    /* v3299 · Branding vor v3299 gespeichert: die Varianten fehlen. Einmal im
+       Browser nachrechnen (logo-kontrast.js), damit PDFs und Leiste sie
+       trotzdem haben - gespeichert werden sie erst, wenn der Partner sein
+       Portal oeffnet (reseller-portal.js). */
+    try {
+      if (_b.brand_logo_b64 && !(_b.brand_logo_auf_hell && _b.brand_logo_auf_dunkel) && window.DealPilotLogoKontrast) {
+        var _vb = _b;
+        await window.DealPilotLogoKontrast.varianten(_vb.brand_logo_b64, _vb.brand_logo_dark_b64 || null).then(function (v) {
+          if (!_vb.brand_logo_auf_hell) _vb.brand_logo_auf_hell = v.auf_hell;
+          if (!_vb.brand_logo_auf_dunkel) _vb.brand_logo_auf_dunkel = v.auf_dunkel;
+        }, function () {});
+      }
+    } catch (e) {}
     /* W39-pdf-gold: _pdfAccentPoll gibt nach ~20s auf. Wer laenger am
        Login-Bildschirm steht — also jeder — bekam den Akzent NIE in die
        PDF-Palette, und das Bank-PDF blieb DealPilot-gold. Hier ist _b

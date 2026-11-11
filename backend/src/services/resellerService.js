@@ -190,7 +190,8 @@ async function assignSeat(resellerId, clientId) {
   );
   if (!r.rowCount) { const e = new Error('Kein freier Seat im Pool'); e.status = 409; throw e; }
 
-  // Mandant bekommt durch den Seat mindestens Starter
+  /* v3299 · Hier stand "mindestens Starter" - vergeben wird seit jeher Investor
+     (10 Jahre, manuell), gemessen in der Partner-Demo 11.11.2026. */
   try { if (c.rows[0].user_id) await planService.setUserPlanManual(c.rows[0].user_id, 'investor', 'monthly', 3650); } catch (e) { /* Plan best-effort */ }
   return r.rows[0];
 }

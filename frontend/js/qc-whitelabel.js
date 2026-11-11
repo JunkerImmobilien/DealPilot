@@ -30,7 +30,9 @@
         if (!b) return;                     // kein Mandant / kein Whitelabel -> nichts tun
         window.DealPilotWhitelabel.apply({
           accent: b.brand_accent, accentHi: b.brand_accent_hi, accentLo: b.brand_accent_lo,
-          obsidian: b.brand_obsidian, name: b.brand_name, logo: b.brand_logo_b64
+          obsidian: b.brand_obsidian, name: b.brand_name, logo: b.brand_logo_b64,
+          /* v3299 · Logo-Kontrast: Variante je Grund (fehlt sie, rechnet die Override-Ebene nach) */
+          logoDunkel: b.brand_logo_auf_dunkel || '', logoHell: b.brand_logo_auf_hell || ''
         });
       })
       .catch(function () { /* Branding ist Kuer, nie QC-blockierend */ });
