@@ -21,19 +21,21 @@ async function createForUser(userId, opts) {
   const hash = _hash(plain);
   const prefix = _prefix(plain);
   const name = String(opts.name || 'DealPilot API').slice(0, 80);
+  /* v3289 · Bereich beim Anlegen (Makler-Hub: 'flow' / 'crud flow'). Ohne Angabe der Spaltenvorgabe 'crud'. */
+  const scopes = opts.scopes ? String(opts.scopes).toLowerCase().replace(/[^a-z ]/g, '').trim().slice(0, 60) || null : null;
   let r;
   if (opts.expiresInDays) {
     r = await query(
-      "INSERT INTO api_keys (user_id, name, key_prefix, key_hash, expires_at) " +
-      "VALUES ($1,$2,$3,$4, NOW() + ($5 || ' days')::interval) " +
+      "INSERT INTO api_keys (user_id, name, key_prefix, key_hash, expires_at, scopes) " +
+      "VALUES ($1,$2,$3,$4, NOW() + ($5 || ' days')::interval, COALESCE($6, 'crud')) " +
       "RETURNING id, name, key_prefix, scopes, created_at, expires_at",
-      [userId, name, prefix, hash, String(opts.expiresInDays)]
+      [userId, name, prefix, hash, String(opts.expiresInDays), scopes]
     );
   } else {
     r = await query(
-      "INSERT INTO api_keys (user_id, name, key_prefix, key_hash) VALUES ($1,$2,$3,$4) " +
+      "INSERT INTO api_keys (user_id, name, key_prefix, key_hash, scopes) VALUES ($1,$2,$3,$4, COALESCE($5, 'crud')) " +
       "RETURNING id, name, key_prefix, scopes, created_at, expires_at",
-      [userId, name, prefix, hash]
+      [userId, name, prefix, hash, scopes]
     );
   }
   return Object.assign({ plain: plain }, r.rows[0]);

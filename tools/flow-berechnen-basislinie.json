@@ -1,0 +1,26 @@
+{
+ "stand": "2026-11-11",
+ "abweichende_objekte": 8,
+ "objekte": [
+  "demo-konto:2026-1006",
+  "demo-konto:2026-1008",
+  "demo-konto:2026-1036",
+  "demo-konto:2026-1124",
+  "demo-konto:2026-1126",
+  "demo-konto:2026-1127",
+  "demo-konto:2026-1157",
+  "objekt:demo-object.json"
+ ],
+ "hinweis": "Deckel: darf sinken, nie steigen (tools/flow-berechnen-pruefen.mjs)",
+ "ursachen": {
+  "objekt:demo-object.json": "Score-Stempel aelter als der Score-Kern (Datei vom 15.10.2026, danach v3069/v3070/v3075 am DealScore). Alle Kennzahlen gleich; keine Vorlage trifft die gestempelte 77 mit dem heutigen Kern.",
+  "demo-konto:2026-1036": "Bewusst: am Objekt ist keine Bewirtschaftung eingetragen (Detail-Modus, alle Posten leer). Der Browser rechnet mit 0, der Server rechnet ohne Hausgeld keinen Score (Quick-Check-Regel, nichts wird geschaetzt). Mit BWK = 0 traefe der Server die 90 genau.",
+  "demo-konto:2026-1006": "Bewusst: wie 2026-1036 - keine Bewirtschaftung eingetragen, Browser rechnet mit 0, Server ohne Score. Mit BWK = 0 traefe der Server die 73 genau.",
+  "demo-konto:2026-1124": "Stempel vor v3238 (09.11.2026): der Browser zaehlte den Euro-Mietausfall (464 EUR) zusaetzlich zum Leerstand. Heute zaehlt calc.js nur den Leerstand - der Server rechnet wie die heutige App. Neu gespeichert verschwindet die Abweichung.",
+  "demo-konto:2026-1126": "Stempel vor v3238: Mietausfall (439 EUR) doppelt zum Leerstand, wie 2026-1124.",
+  "demo-konto:2026-1127": "Stempel vor v3238: Mietausfall (464 EUR) doppelt zum Leerstand, wie 2026-1124.",
+  "demo-konto:2026-1157": "Nicht abgebildet: Tilgungsaussetzung mit Bausparvertrag am Darlehen I (d1_type tilgungsaussetzung, bspar_rate) - die Bausparrate fehlt im Kapitaldienst (Cashflow -11.657 statt -3.857 EUR/Jahr). Offen im Backlog FLOW INVESTOR.",
+  "demo-konto:2026-1008": "Nicht abgebildet: Ueberfuehrung (verkehrswert_ueberf, ueberf_restschuld) - der Browser rechnet LTV und Kapitaldienst auf dem Ueberfuehrungsstand. Offen im Backlog FLOW INVESTOR."
+ },
+ "profil": "Vorsichtig (conservative), abgeleitet aus den Stempeln"
+}

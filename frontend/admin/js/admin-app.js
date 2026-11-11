@@ -865,6 +865,21 @@
               </div>
             </div>
 
+            <div class="action-section" id="zusatz-flow">
+              <h4>Zusatz: DealPilot Flow (Makler-Hub)</h4>
+              <p style="font-size:0.85em;color:var(--text-muted);margin:0 0 8px 0;">Linien der Firma im Makler-Hub. Investor/Privat: der Hub bekommt einen API-Schlüssel mit Bereich „flow“ (nur Flow-Routen, auch in der Testphase). Makler kommt sonst über den Plan (makler_hub). Nach einer neuen Linie im Hub einmal neu verbinden.</p>
+              <div id="zusatz-flow-stand" style="font-size:0.85em;margin:0 0 8px 0;">lädt …</div>
+              <div class="action-row">
+                <label style="font-size:0.85em;"><input type="checkbox" id="zusatz-flow-makler"> Makler</label>
+                <label style="font-size:0.85em;"><input type="checkbox" id="zusatz-flow-privat"> Privat</label>
+                <label style="font-size:0.85em;"><input type="checkbox" id="zusatz-flow-investor"> Investor</label>
+              </div>
+              <div class="action-row" style="margin-top:6px;">
+                <button class="btn btn-primary btn-sm" data-action="zusatz-flow-an">Freischalten / speichern</button>
+                <button class="btn btn-sm" data-action="zusatz-flow-aus">Abschalten</button>
+              </div>
+            </div>
+
             <div class="action-section" id="zusatz-ep">
               <h4>Zusatz: Backlog-User (Bordbuch)</h4>
               <p style="font-size:0.85em;color:var(--text-muted);margin:0 0 8px 0;">Sieht in der App den Mechaniker neben dem Piloten (Alt+B): Fehler, Wünsche und Ideen mit Screenshot, Markierung und Diktat ins Backlog. Dazu System › Umsetzungswünsche mit der gemeinsamen Liste.</p>
@@ -924,6 +939,8 @@
       $$('[data-action="zusatz-rk-aus"]')[0].addEventListener('click', () => handleZusatzRk(id, false));
       $$('[data-action="zusatz-ep-an"]')[0].addEventListener('click', () => handleZusatzEp(id, true));
       $$('[data-action="zusatz-ep-aus"]')[0].addEventListener('click', () => handleZusatzEp(id, false));
+      $$('[data-action="zusatz-flow-an"]')[0].addEventListener('click', () => handleZusatzFlow(id, true));   /* v3289 */
+      $$('[data-action="zusatz-flow-aus"]')[0].addEventListener('click', () => handleZusatzFlow(id, false));
       ladeZusatzRk(id);
 
     } catch (err) {
@@ -997,6 +1014,7 @@
       const ep = r.entwicklungspartner, epEl = $('#zusatz-ep-stand');
       if (epEl) epEl.innerHTML = (ep && ep.aktiv ? '<span class="pill pill-active">Freigeschaltet</span>' : '<span class="pill pill-plan">Nicht freigeschaltet</span>')
         + (ep && ep.updated_at ? ' <span style="color:var(--text-muted)">geändert ' + fmtDate(ep.updated_at) + (ep.geaendert_von ? ' von ' + escapeHtml(ep.geaendert_von) : '') + '</span>' : '');
+      flowZeigen(r.flow, r.flow_linien);   /* v3289 */
       const kg = (v) => (v == null ? 'ohne Grenze' : v);
       if (z) {
         if (z.kontingent_rnd != null) $('#zusatz-rk-rnd').value = z.kontingent_rnd;
@@ -1011,6 +1029,34 @@
           + (z.geaendert_von ? ' von ' + escapeHtml(z.geaendert_von) : '') + '</span>' : '');
     } catch (err) {
       el.textContent = 'Stand nicht lesbar: ' + (err.message || 'unbekannt');
+    }
+  }
+
+  /* v3289 · Zusatz DealPilot Flow: Linien je Konto, daneben die wirksamen (Plan + Zusatz) */
+  const FLOW_NAMEN = { makler: 'Makler', privat: 'Privat', investor: 'Investor' };
+  function flowZeigen(z, h) {
+    const el = $('#zusatz-flow-stand');
+    if (!el) return;
+    const zl = (z && Array.isArray(z.linien)) ? z.linien : [];
+    ['makler', 'privat', 'investor'].forEach((l) => { const c = $('#zusatz-flow-' + l); if (c) c.checked = zl.indexOf(l) >= 0; });
+    const nennen = (l) => (l && l.length ? l.map((x) => FLOW_NAMEN[x] || x).join(', ') : '–');
+    el.innerHTML = (z && z.aktiv ? '<span class="pill pill-active">Zusatz aktiv</span>' : '<span class="pill pill-plan">Zusatz nicht aktiv</span>')
+      + '<br>Wirksam: <b>' + escapeHtml(nennen(h && h.linien)) + '</b>'
+      + ' · aus dem Plan' + (h && h.plan_id ? ' (' + escapeHtml(h.plan_id) + ')' : '') + ': ' + escapeHtml(nennen(h && h.plan))
+      + ' · aus dem Zusatz: ' + escapeHtml(nennen(h && h.zusatz))
+      + (h && h.testphase ? ' · <span style="color:var(--text-muted)">Testphase</span>' : '')
+      + (z && z.updated_at ? '<br><span style="color:var(--text-muted)">geändert ' + fmtDate(z.updated_at)
+        + (z.geaendert_von ? ' von ' + escapeHtml(z.geaendert_von) : '') + '</span>' : '');
+  }
+  async function handleZusatzFlow(id, aktiv) {
+    const linien = ['makler', 'privat', 'investor'].filter((l) => { const c = $('#zusatz-flow-' + l); return c && c.checked; });
+    if (aktiv && !linien.length) { toast('Bitte mindestens eine Linie wählen', 'error'); return; }
+    try {
+      await API.setZusatzFlow(id, { aktiv: aktiv, linien: linien });
+      toast(aktiv ? '✓ Flow-Linien gespeichert' : '✓ Flow-Zusatz abgeschaltet', 'success');
+      ladeZusatzRk(id);
+    } catch (err) {
+      toast('Fehler: ' + (err.message || 'unbekannt'), 'error');
     }
   }
 

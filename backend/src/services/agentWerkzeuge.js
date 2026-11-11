@@ -57,7 +57,8 @@ const bewertungsText = require('./bewertungsText'); /* v1927: die KI-Einordnung 
 const avmHistorie = require('./avmHistoryService');  /* v1937: Marktpreisindikation */
 const ertragswertFreigabe = require('./ertragswertFreigabe');   /* v2431 */
 const config = require('../config');
-const objektWissen = require('./objektWissen');      /* v3025: Unterlagen, Potenzial im Jahr, To-dos */
+const objektWissen = require('./objektWissen');
+const objektRechnung = require('./objektRechnung');   /* v3289: EINE Abbildung Objekt -> Rechenkerne (Bot + Flow) */      /* v3025: Unterlagen, Potenzial im Jahr, To-dos */
 
 /* ═══ LESEN ═══════════════════════════════════════════════════════════ */
 
@@ -271,16 +272,8 @@ const SOLL_IST = [
 /* v3003a · EINE Wertangabe: Marktwert/Verkehrswert (svwert) mit Herkunft (svw_herkunft). Dieselbe Regel
    wie frontend/js/wertangabe.js aufloesen(): bankval ist keine eigene Quelle mehr, sondern gilt nur,
    solange das Objekt noch nicht im Formular uebertragen ist (bankval_migriert). */
-function wertangabe(d) {
-  d = d || {};
-  const n = (v) => { const x = Number(String(v == null ? '' : v).replace(/\./g, '').replace(',', '.')); return Number.isFinite(x) && x > 0 ? x : null; };
-  const sv = n(d.svwert), bv = n(d.bankval), h = String(d.svw_herkunft || '');
-  if (String(d.bankval_migriert || '') === '1' || !bv) return { wert: sv, herkunft: sv ? (h || null) : null };
-  if (!sv) return { wert: bv, herkunft: 'bank' };
-  if (Math.abs(sv - bv) < 1) return { wert: sv, herkunft: h || 'bank' };
-  if (h === 'gutachten' || h === 'bank') return { wert: sv, herkunft: h, anders: bv };
-  return { wert: bv, herkunft: 'bank', anders: sv };
-}
+/* v3289 · wertangabe() steht jetzt in objektRechnung.js - eine Stelle fuer Bot und Flow */
+const wertangabe = objektRechnung.wertangabe;
 
 function _zahlSI(v) {
   if (v === null || v === undefined || v === '') return null;
@@ -2112,13 +2105,20 @@ async function objekt_schnellblick(ctx, args) {
   const eur = (x) => Math.round(x).toLocaleString('de-DE') + ' EUR';
   const pct = (x) => x.toFixed(2).replace('.', ',') + ' %';
 
-  const kp = z(d.kp), nkm = z(d.nkm), ze = z(d.ze) || 0, wfl = z(d.wfl);
   const erg = await vorgaben.ergaenzung(ctx.userId, d);
 
+  /* ── v3289 · DIE RECHNUNG STEHT IN objektRechnung.js ────────────────────
+     Flow Investor (POST /objects/:id/berechnen) rechnet dasselbe Objekt fuer
+     den Makler-Hub. Damit Hub und Bot nicht zwei Abbildungen fuehren, liegt
+     die Abbildung Objekt -> Kerneingabe jetzt dort; hier bleiben die Texte.
+     Die Messungen und Begruendungen in den Kommentaren unten gelten weiter -
+     sie beschreiben, was objektRechnung.rechnen() tut. */
+  const sGespeichert = dialog.scoreLesen(d);
+  const R = objektRechnung.rechnen(d, { erg: erg, gespeichert: sGespeichert });
+  const kp = R.kp, nkm = R.nkm, ze = R.ze, wfl = R.wfl;
+
   /* ── Was fehlt, um ueberhaupt etwas zu sagen? ───────────────────────── */
-  const pflicht = [];
-  if (!kp) pflicht.push('Kaufpreis');
-  if (!nkm) pflicht.push('Nettokaltmiete pro Monat');
+  const pflicht = R.pflicht;
   if (pflicht.length) {
     return {
       gefunden: true, id: id, adresse: _adrVon(o),
@@ -2163,7 +2163,7 @@ async function objekt_schnellblick(ctx, args) {
    * KEIN RUECKFALL AUF EIGENE FORMELN: fehlt die Spiegelung, sagt der
    * Schnellblick das und rechnet nicht. Eine zweite Meinung ueber denselben
    * Deal ist schlimmer als eine fehlende Auskunft. */
-  if (!rechenkerne.vorhanden()) {
+  if (R.kernFehlt) {
     return {
       gefunden: true, id: id, adresse: _adrVon(o),
       geht_noch_nicht: ['Rechenkern'],
@@ -2178,7 +2178,7 @@ async function objekt_schnellblick(ctx, args) {
      Kaufpreisfaktor braucht der Kern sie nicht (sie haengen am Kaufpreis).
      Der Kapitaldienst wird im Finanzierungszweig mit der dann bekannten
      Gesamtinvestition noch einmal gerufen. */
-  const K0 = rechenkerne.kpis({ kp: kp, nkm: nkm, ze: ze });
+  const K0 = R.K0;   /* v3289 · rechenkerne.kpis({ kp, nkm, ze }) in objektRechnung.rechnen() */
   const mieteJahr = K0.nkm_j;
   const bmr = K0.bmy;
   const faktor = K0.fak;
@@ -2215,29 +2215,17 @@ async function objekt_schnellblick(ctx, args) {
   }
 
   /* ── Kaufnebenkosten, soweit belegbar ───────────────────────────────── */
-  const satzVon = (id2) => {
-    /* v1899: `dez` statt `z` — ein Prozentsatz fuehrt kein
-       Tausendertrennzeichen (siehe Block oben). */
-    if (erg.vorhanden[id2] != null) return { wert: dez(erg.vorhanden[id2]), quelle: 'am Objekt' };
-    if (erg.vom_nutzer[id2] != null) return { wert: Number(erg.vom_nutzer[id2]), quelle: 'deine Vorgabe' };
-    if (erg.vorschlag[id2]) return { wert: Number(erg.vorschlag[id2].wert), quelle: erg.vorschlag[id2].herkunft };
-    return null;
-  };
+  /* v1899: Saetze mit `dez` statt `z` — ein Prozentsatz fuehrt kein Tausendertrennzeichen.
+     v3006c · Grunderwerbsteuer auf den Kaufpreis ohne ausgewiesenes Inventar (§ 2 GrEStG),
+     dieselbe Bemessung wie die App (DealKpis.grestBasis). Die anderen Posten auf den Gesamtpreis.
+     v3289 · gerechnet in objektRechnung.rechnen() (R.knk), hier nur beschriftet. */
   const knkTeile = [];
-  let knkSumme = 0, knkVollstaendig = true, knkGrest = 0;
-  /* v3006c · Grunderwerbsteuer auf den Kaufpreis ohne ausgewiesenes Inventar (§ 2 GrEStG),
-     dieselbe Bemessung wie die App (DealKpis.grestBasis). Die anderen Posten auf den Gesamtpreis. */
-  const _invGr = Math.max(0, z(d.inv_kueche) || 0, z(d.moebl) || 0);
-  const _grBasis = rechenkerne.grestBasis(kp, _invGr);
-  [['gest_p', 'Grunderwerbsteuer'], ['notar_p', 'Notar'], ['gba_p', 'Grundbuch'],
-   ['makler_p', 'Maklercourtage']].forEach(([fid, name]) => {
-    const s = satzVon(fid);
-    if (!s || s.wert == null) { knkVollstaendig = false; knkTeile.push(name + ': unbekannt'); return; }
-    const betrag = (fid === 'gest_p' ? _grBasis : kp) * s.wert / 100;
-    if (fid === 'gest_p') knkGrest = betrag;
-    knkSumme += betrag;
-    knkTeile.push(name + ' ' + pct(s.wert) + ' = ' + eur(betrag) + '  (' + s.quelle
-      + (fid === 'gest_p' && _grBasis < kp ? ', auf ' + eur(_grBasis) + ' ohne Inventar' : '') + ')');
+  const knkSumme = R.knk.summe, knkVollstaendig = R.knk.vollstaendig;
+  const _grBasis = R.knk.grBasis;
+  R.knk.posten.forEach((p) => {
+    if (p.fehlt) { knkTeile.push(p.name + ': unbekannt'); return; }
+    knkTeile.push(p.name + ' ' + pct(p.satz) + ' = ' + eur(p.betrag) + '  (' + p.quelle
+      + (p.fid === 'gest_p' && _grBasis < kp ? ', auf ' + eur(_grBasis) + ' ohne Inventar' : '') + ')');
   });
 
   const kaufnebenkosten = {
@@ -2250,8 +2238,8 @@ async function objekt_schnellblick(ctx, args) {
 
   /* ── Finanzierung, wenn Vorgaben vorliegen ──────────────────────────── */
   let finanzierung = null;
-  const zins = satzVon('d1z'), tilg = satzVon('d1t');
-  const ekQuote = erg.vom_nutzer.ek_quote != null ? Number(erg.vom_nutzer.ek_quote) : null;
+  const zins = R.zins, tilg = R.tilg;   /* v3289 · satzVon() in objektRechnung.rechnen() */
+  const ekQuote = R.ekQuote;
   /* ── v1824b · AUCH OHNE VOLLSTAENDIGE KAUFNEBENKOSTEN ────────────────
    *
    * Hier stand `knkVollstaendig` als Bedingung. GEMESSEN an Marcels
@@ -2289,38 +2277,18 @@ async function objekt_schnellblick(ctx, args) {
    *   > Eine Bewirtschaftungszahl, die nicht da ist, wird nicht
    *   > geschaetzt. Der Quick-Check der App zeigt ohne Hausgeld keinen
    *   > Score, und hier gilt dasselbe. */
-  const bwkModus = d._bwk_mode || 'detail';
-  let bwkUl = 0, bwkNul = 0, bwkHerkunft = null;
-  if (bwkModus === 'percent') {
-    if ((d._bwk_pct_mode || 'nkm') === 'kp') {
-      const q = dez(d.bwk_kp_pct);
-      if (q != null && q > 0) {
-        bwkUl = kp * q / 100 * 0.5;
-        bwkNul = kp * q / 100 * 0.5;
-        bwkHerkunft = pct(q) + ' vom Kaufpreis (am Objekt, 50/50 geteilt)';
-      }
-    } else {
-      const qu = dez(d.bwk_ul_pct), qn = dez(d.bwk_nul_pct);
-      if ((qu != null && qu > 0) || (qn != null && qn > 0)) {
-        bwkUl = nkm * 12 * (qu || 0) / 100;
-        bwkNul = nkm * 12 * (qn || 0) / 100;
-        bwkHerkunft = 'Quoten der Jahreskaltmiete (am Objekt): '
-          + pct(qu || 0) + ' umlagefaehig, ' + pct(qn || 0) + ' nicht umlagefaehig';
-      }
-    }
-  } else {
-    const ulT = ['hg_ul', 'grundsteuer', 'ul_sonst', 'kp1', 'kp2', 'kp3', 'kp4'];
-    const nulT = ['hg_nul', 'eigen_r', 'mietausfall', 'nul_sonst'];
-    const sum = (ids) => ids.reduce((a, k2) => a + (z(d[k2]) || 0), 0);
-    const hatEtwas = ulT.concat(nulT).some((k2) => z(d[k2]) != null && z(d[k2]) !== 0);
-    if (hatEtwas) {
-      bwkUl = sum(ulT);
-      bwkNul = sum(nulT);
-      bwkHerkunft = 'aus den Einzelposten am Objekt (Hausgeld, Grundsteuer, '
-        + 'Ruecklage, Mietausfallwagnis)';
-    }
-  }
-  const bwkDa = bwkHerkunft != null;
+  /* v3289 · gerechnet in objektRechnung.rechnen() (R.bwk), hier nur beschriftet */
+  const bwkUl = R.bwk.ul, bwkNul = R.bwk.nul;
+  const bwkHerkunft = R.bwk.art === 'kp'
+    ? pct(R.bwk.quote_kp) + ' vom Kaufpreis (am Objekt, 50/50 geteilt)'
+    : R.bwk.art === 'nkm'
+      ? 'Quoten der Jahreskaltmiete (am Objekt): '
+        + pct(R.bwk.quote_ul) + ' umlagefaehig, ' + pct(R.bwk.quote_nul) + ' nicht umlagefaehig'
+      : R.bwk.art === 'detail'
+        ? 'aus den Einzelposten am Objekt (Hausgeld, Grundsteuer, '
+          + 'Ruecklage, Mietausfallwagnis)'
+        : null;
+  const bwkDa = R.bwk.da;
 
   /* ── Finanzierung und Kennzahlen: EIN Lauf des Kerns ──────────────────
    *
@@ -2334,11 +2302,10 @@ async function objekt_schnellblick(ctx, args) {
    *
    * Also ein Lauf mit allem, was belegt ist, und die Beschriftung sagt,
    * was drinsteckt. */
-  let K = null, darlehen = null, ek = null;
-  /* Steht hier und nicht erst beim Score: ob das Objekt in DealPilot schon
-     gerechnet wurde, entscheidet AUCH ueber die Finanzierung (Block
-     darunter). */
-  const sGespeichert = dialog.scoreLesen(d);
+  /* v3289 · gerechnet in objektRechnung.rechnen(): K, Darlehen, Eigenkapital.
+     `sGespeichert` steht seitdem ganz oben - ob das Objekt in DealPilot schon
+     gerechnet wurde, entscheidet AUCH ueber die Finanzierung (Block darunter). */
+  const K = R.K, darlehen = R.darlehen, ek = R.ek;
 
   /* ══ v2143 · DAS ZIEL DER LAGEKLASSE, SERVERSEITIG GEHOLT ══════════
      Die Klasse steht am Objekt (`d.lageklasse`), ihre Zielrendite im
@@ -2366,17 +2333,10 @@ async function objekt_schnellblick(ctx, args) {
         [ctx.userId, 'lage_profil']
       );
       const _prof = (_lp.rowCount && _lp.rows[0].wert) || null;
-      const _k = _prof && _prof.klassen ? _prof.klassen[_klasse] : null;
-      const _z = _k ? _k.ziel_bmr : null;
-      if (_z != null && _z !== '') {
-        const _n = Number(String(_z).replace(',', '.'));
-        if (isFinite(_n) && _n > 0) zielBmrLage = _n;
-      }
+      zielBmrLage = objektRechnung.zielBmrAusProfil(_prof, d.lageklasse);   /* v3289: eine Lesart fuer Bot und Flow */
     }
   } catch (e) { zielBmrLage = null; }
   if (zins && tilg) {
-    const gi = kp + knkSumme;
-    ek = ekQuote != null ? gi * ekQuote / 100 : (z(d.ek) || 0);
     /* ── v1925 · WANN EIN DARLEHEN ABGELEITET WERDEN DARF ──────────────
      *
      * Das Darlehen am Objekt schlaegt jede Ableitung — es ist die
@@ -2397,44 +2357,16 @@ async function objekt_schnellblick(ctx, args) {
      *   > Finanzierung dort. Was dort fehlt, fehlt absichtlich.
      *
      * Also: abgeleitet wird nur, wenn das Objekt noch KEINEN gerechneten
-     * Score hat. Sonst gilt, was eingetragen ist — auch die Null. */
-    const d1Objekt = z(d.d1);
-    const darlehenGesetzt = d1Objekt != null && d1Objekt > 0;
-    const darlehenAbgeleitet = !darlehenGesetzt && sGespeichert.dealscore == null;
-    darlehen = darlehenGesetzt ? d1Objekt
-      : (darlehenAbgeleitet ? Math.max(0, gi - ek) : 0);
-
-    /* AfA und Grenzsteuersatz nur, wenn sie am Objekt stehen — sonst 0,
-       dann ist der Cashflow vor Steuer gleich dem nach Steuer. */
-    const gebAnt = dez(d.geb_ant), afaSatz = dez(d.afa_satz);
-    /* v3006b · Gebaeude-AHK aus dem Kern der App (DealKpis.gebaeudeAhk): Nebenkosten anteilig,
-       Inventar (moebl / inv_kueche) vor der Aufteilung abgezogen. Bis v3006a (kp + NK) x geb_ant. */
-    const _invB = Math.max(0, z(d.inv_kueche) || 0, z(d.moebl) || 0);
-    const afa = (gebAnt != null && gebAnt > 0)
-      ? rechenkerne.gebaeudeAhk({ kp: kp, nk: knkSumme, nkNurImmo: knkGrest, gebAntPct: gebAnt, inventar: _invB }).gebAhk
-        * ((afaSatz != null ? afaSatz : 2) / 100) : 0;
-    /* v3006 · LTV-Basis wie die App (calc.js v2996, deal-kpis v3006): der Wert mit
-       seiner Herkunft, die Bankbewertung getrennt. Ohne gespeicherte Herkunft gilt
-       „eigene" - so liest calc.js ein Objekt ohne Auswahl (ohne Marktbericht-Vermerk). */
-    /* v3003a · Wert und Herkunft aus der einen Wertangabe (wertangabe), bankval geht dort auf */
-    const _wa = wertangabe(d);
-    const svw = _wa.wert || 0;
-    const svwHerkunft = svw > 0 ? (_wa.herkunft || 'eigene') : null;
-
-    K = rechenkerne.kpis({
-      kp: kp, nk: knkSumme, san: z(d.san) || 0, moebl: z(d.moebl) || 0,
-      nkm: nkm, ze: ze, uf: 0,
-      bwk_ul: bwkUl, bwk_nul: bwkNul,
-      leerstand_pct: dez(d.leerstand) || 0,   /* v3030: wie calc.js */
-      d1: darlehen, d1z: zins.wert, d1t: tilg.wert, ek: ek,
-      afa: afa, grenz: dez(d.grenz) || 0,
-      /* v3213 · W-16: der Haken ek_inkl_nk ist in der App entfernt (GI-Bezug war lockerer,
-         nicht strenger) - der Bot rechnet wie calc.js: Gutachten/Bank -> Kaufpreis */
-      ekInklNkLtv: false,
-      svw: svw,
-      svw_herkunft: svwHerkunft,
-      bankval: 0   /* v3003a · steckt in svw mit Herkunft bank */
-    });
+     * Score hat. Sonst gilt, was eingetragen ist — auch die Null.
+     *
+     * AfA und Grenzsteuersatz nur, wenn sie am Objekt stehen (v3006b: Gebaeude-AHK
+     * aus DealKpis.gebaeudeAhk), LTV-Basis aus der einen Wertangabe (v3003a/v3006),
+     * ekInklNkLtv false wie calc.js (v3213 · W-16).
+     *
+     * v3289 · Gerechnet wird das alles in objektRechnung.rechnen(); hier stehen
+     * nur noch die Beschriftungen. */
+    const darlehenGesetzt = R.darlehenGesetzt;
+    const darlehenAbgeleitet = R.darlehenAbgeleitet;
 
     finanzierung = {
       eigenkapital: eur(ek) + (ekQuote != null ? '  (' + pct(ekQuote) + ' deiner Vorgabe)' : ''),
@@ -2450,7 +2382,9 @@ async function objekt_schnellblick(ctx, args) {
       zins: pct(zins.wert) + '  (' + zins.quelle + ')',
       tilgung: pct(tilg.wert) + '  (' + tilg.quelle + ')',
       kapitaldienst_jahr: eur(K.rate_j)
-        + '  = ' + eur(darlehen) + ' x ' + pct(zins.wert + tilg.wert),
+        + '  = ' + eur(darlehen) + ' x ' + pct(zins.wert + tilg.wert)
+        /* v3289 · Darlehen II am Objekt (calc.js _d2_enabled) rechnet mit - die Zeile sagt es */
+        + (R.d2 > 0 ? '  plus Darlehen II ' + eur(R.d2) + ' (am Objekt hinterlegt)' : ''),
       bewirtschaftung_jahr: bwkDa
         ? eur(bwkUl + bwkNul) + ' gesamt, davon ' + eur(bwkNul)
           + ' nicht umlagefaehig  (' + bwkHerkunft + ')'
@@ -2522,21 +2456,19 @@ async function objekt_schnellblick(ctx, args) {
    *
    * ── WAS FEHLEN DARF UND WAS NICHT ────────────────────────────────── */
   let bewertung = null;
-  const scoreFehlt = [];
-  if (!zins || !tilg) scoreFehlt.push('Zinssatz und Tilgung');
-  if (!bwkDa) scoreFehlt.push('Hausgeld bzw. Bewirtschaftungskosten');
+  const scoreFehlt = R.scoreFehlt;   /* v3289 · objektRechnung.rechnen() */
 
   /* v3006b · Dieselbe Herkunftsregel wie Kachel und Score (calc.js wp / wp_kpi): eine
      Marktpreisindikation aus Angebotspreisen traegt keinen Wertpuffer. Bis v3006a rechnete der
      Schnellblick sie als „Verkehrswert minus Kaufpreis“. Ohne Wertangabe bleibt die
-     5-%-Annahme des Quick-Checks. */
-  const _wa2 = wertangabe(d);
-  const svwIndikation = (_wa2.wert || 0) > 0 && _wa2.herkunft === 'indikation';
-  const svw2 = svwIndikation ? 0 : (_wa2.wert || 0);   /* v3003a */
-  /* Der Wertpuffer ist `Verkehrswert minus Kaufpreis` (calc.js:2036).
+     5-%-Annahme des Quick-Checks.
+     Der Wertpuffer ist `Verkehrswert minus Kaufpreis` (calc.js:2036).
      Ohne Verkehrswert nimmt der Quick-Check 5 % vom Kaufpreis an — das
-     ist eine ANNAHME und steht als solche im Ergebnis. */
-  const wp = svw2 > 0 ? svw2 - kp : (svwIndikation ? 0 : kp * 0.05);
+     ist eine ANNAHME und steht als solche im Ergebnis.
+     v3289 · gerechnet in objektRechnung.rechnen(). */
+  const svwIndikation = R.svwIndikation;
+  const svw2 = R.svw2;
+  const wp = R.wp;
 
   /* ── 1 · WELCHER SCORE GILT — genau einer ─────────────────────────────
    * Liegt ein in DealPilot gerechneter vor, gilt DIESER, und es wird kein
@@ -2551,18 +2483,15 @@ async function objekt_schnellblick(ctx, args) {
     score = sGespeichert.dealscore;
     herkunft = 'in DealPilot gerechnet und am Objekt gespeichert';
   } else if (!scoreFehlt.length) {
-    const mstg = dez(d.mietstg) != null ? dez(d.mietstg) : 1.5;
-    /* v2141 - AUCH IM BOT. `darlehen` steht hier schon als Variable
+    /* v2141 - AUCH IM BOT. `darlehen` geht als Parameter an den Kern
        (oben aus `d1` gelesen oder abgeleitet). Ohne sie bekaeme der Bot
        einen anderen Score als die App, und zwar lautlos: beide rufen
        denselben Kern, nur mit verschiedenen Eingaben. Genau auf diesem
        Weg blieb am 07.10.2026 eine ungespiegelte Score-Aenderung
-       stundenlang unentdeckt. */
-    const S = rechenkerne.score({
-      kp: kp, cf_m: K.cf_m, nmy: K.nmy, ltv: K.ltv, dscr: K.dscr,
-      wp_kpi: wp, mstg: mstg,
-      darlehen: (darlehen != null && isFinite(darlehen)) ? darlehen : null
-    });
+       stundenlang unentdeckt.
+       v3289 · DealScore.computeFromKpis() laeuft in objektRechnung.rechnen()
+       (mietstg, sonst 1,5 %; ohne Gewichte = die des Kerns, wie bisher). */
+    const S = R.S;
     score = S.score;
     /* v2141 - DIE HERKUNFT NANNTE DIE FALSCHE URSACHE.
 
@@ -2594,8 +2523,7 @@ async function objekt_schnellblick(ctx, args) {
     }));
     /* v1936: dieselben Punkte, aber nach Schluessel — `qc-heuristik.js`
        traegt sie in die fuenf Kategorien ein und rechnet sie NICHT nach. */
-    teilnotenRoh = {};
-    S.breakdown.forEach((b) => { teilnotenRoh[b.key] = b.score; });
+    teilnotenRoh = R.teilnotenRoh;   /* v3289 · objektRechnung.rechnen() */
   }
 
   if (score == null) {
@@ -2608,19 +2536,14 @@ async function objekt_schnellblick(ctx, args) {
     };
   } else {
     /* ── 2 · DIE KENNZAHLEN UND DIE HEURISTIK — immer, wenn sie gehen ── */
-    const bwkQuote = (K && K.nkm_j > 0) ? (K.bwk / K.nkm_j * 100) : null;
+    const bwkQuote = R.bwkQuote;   /* v3289 · objektRechnung.rechnen() */
     /* ── v1938 · EINE LISTE FUER ALLE ANZEIGEN ───────────────────────────
      * Welche Groesse an diesem Objekt gar nicht anwendbar ist, steht
      * EINMAL da — und sowohl die Ampel als auch die fuenf Kategorien lesen
      * sie. Gemessen an der Sachsenstr. 18: solange die beiden ihre eigene
      * Fallunterscheidung fuehrten, sagte die Ampel „entfaellt" und die
      * Kategorie zwei Zeilen darunter „LTV 0 %". */
-    const nichtAnwendbar = {
-      dscr: (darlehen > 0) ? null : 'ohne Kapitaldienst gibt es keinen Deckungsgrad',
-      ltv: (darlehen > 0) ? null : 'am Objekt ist kein Darlehen hinterlegt',
-      bwk: bwkDa ? null : 'am Objekt ist keine Bewirtschaftung hinterlegt',
-      ekr: (ek > 0) ? null : 'ohne eingesetztes Eigenkapital nicht berechenbar'
-    };
+    /* v3289 · die Liste steht in objektRechnung.rechnen() (R.nichtAnwendbar) */
     /* ── v1939 · DIE MARKTPREISINDIKATION GEHOERT IN DIE HEURISTIK ───────
      *
      * Marcel am 07.10.2026: „Wenn es einen Preis gibt dann sollte man
@@ -2636,15 +2559,14 @@ async function objekt_schnellblick(ctx, args) {
     const marktBasis = (mpiFrueh && mpiFrueh.vergleich) ? mpiFrueh.vergleich._basis : null;
     const marktGrund = (mpiFrueh && mpiFrueh.vergleich) ? mpiFrueh.vergleich._abschlag_grund : null;
 
-    const H = K ? rechenkerne.heuristik({
-      score: score, kp: kp, nkm: nkm + ze,
-      bmr: K.bmy, nmr: K.nmy, cfMon: K.cf_m, dscr: K.dscr, ltv: K.ltv,
-      ekr: K.ekr, bewirtPctNkm: bwkQuote || 0,
-      marktwert: marktBasis, marktwert_grund: marktGrund,
-      /* v2239: Zielrendite der Lageklasse - ohne sie fiel die Kaufempfehlung
-         still auf 6 % und das Lage-Urteil weg (die Ampel bekam sie schon). */
-      zielBmr: zielBmrLage, lageklasse: d.lageklasse || null
-    }, undefined, nichtAnwendbar) : null;
+    /* v2239: Zielrendite der Lageklasse - ohne sie fiel die Kaufempfehlung
+       still auf 6 % und das Lage-Urteil weg (die Ampel bekam sie schon).
+       v3289 · Heuristik, Stufensatz, Ampel und Kategorien in objektRechnung.bewerten() -
+       dieselben Aufrufe wie bisher hier, dieselbe Vorgabe-Schwelle {} (v2243). */
+    const B = objektRechnung.bewerten(R, score, {
+      teilnoten: teilnotenRoh, marktBasis: marktBasis, marktGrund: marktGrund, zielBmr: zielBmrLage
+    });
+    const H = B.H;
 
     bewertung = {
       dealpilot_score: score,
@@ -2713,27 +2635,17 @@ async function objekt_schnellblick(ctx, args) {
        *
        * Alle fuenf kommen jetzt aus `qc-heuristik.js`, also aus derselben
        * Datei, die der Browser laedt. */
-      stufensatz: H ? rechenkerne.heuristikTeil('stufensatz',
-        rechenkerne.stufe(score).farbe) : undefined,
+      stufensatz: B.stufensatz,
       /* v2143: die Lageklasse steht am Objekt (`lageklasse`), ihr Ziel
          im Lage-Profil des Nutzers - das liegt serverseitig unter
          `/user-settings/lage_profil`. Hier wird NUR durchgereicht, was
          schon gelesen ist; der Kern rechnet damit die Ampel, nicht den
          Score. Fehlt eines von beiden, bleibt die feste Skala. */
-      kennzahlen_ampel: K ? rechenkerne.heuristikTeil('kennzahlenAmpel',
-        { bmr: K.bmy, nmr: K.nmy, ekr: K.ekr, cfMon: K.cf_m,
-          dscr: K.dscr, ltv: K.ltv, bewirtPctNkm: bwkQuote || 0,
-          zielBmr: zielBmrLage, lageklasse: d.lageklasse || null }, nichtAnwendbar,
-          /* v2243: Vorgabe-Schwellen 1,2 / 90 / 0 wie in der App ohne eigene
-             Einstellung - sonst sagte der Bot bei DSCR 1,3 "gelb", die App "gruen".
-             Die persoenlichen Werte liegen nur im Browser. */
-          {}) : undefined,
-      kategorien: K ? rechenkerne.heuristikTeil('kategorien',
-        { bmr: K.bmy, nmr: K.nmy, ekr: K.ekr, cfMon: K.cf_m,
-          dscr: K.dscr, ltv: K.ltv, bewirtPctNkm: bwkQuote || 0,
-          /* v3075: der Rechenweg der Kategorie Potenzial nennt den Wertpuffer, mit dem der Score rechnet */
-          kp: kp, wp: wp },
-        teilnotenRoh, nichtAnwendbar) : undefined,
+      /* v2243: Vorgabe-Schwellen 1,2 / 90 / 0 wie in der App ohne eigene
+         Einstellung - sonst sagte der Bot bei DSCR 1,3 "gelb", die App "gruen".
+         v3075: der Rechenweg der Kategorie Potenzial nennt den Wertpuffer. */
+      kennzahlen_ampel: B.ampel,
+      kategorien: B.kategorien,
       empfehlung: H && H.empfehlung ? H.empfehlung.verdict : null,
       empfehlung_text: H && H.empfehlung ? H.empfehlung.text : null,
       einschaetzung: H ? H.einschaetzung : undefined,
@@ -4659,4 +4571,5 @@ function fuerModell() {
 
 function finde(name) { return WERKZEUGE.find((w) => w.name === name) || null; }
 
-module.exports = { WERKZEUGE, fuerModell, finde };
+module.exports = { WERKZEUGE, fuerModell, finde,
+  _marktpreisIndikation };   /* v3289 · Flow Investor (flowBerechnung.js) liest dieselbe Indikation wie der Bot */

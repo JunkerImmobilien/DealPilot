@@ -1937,7 +1937,10 @@ router.get('/users/:id/zusaetze', requireAdmin, async (req, res) => {
     res.json({
       rechenkerne: await _zusatzService.holen(req.params.id, _zusatzService.RECHENKERNE),
       entwicklungspartner: await _zusatzService.holen(req.params.id, _zusatzService.PARTNER),
-      monat: await _zusatzService.monatsZaehlung(req.params.id)
+      monat: await _zusatzService.monatsZaehlung(req.params.id),
+      /* v3289 · DealPilot Flow: Zusatz je Konto + wirksame Linien (Plan-Merkmal und Zusatz) */
+      flow: await _zusatzService.holen(req.params.id, _zusatzService.FLOW).catch(() => null),
+      flow_linien: await _zusatzService.flowLinienHerkunft(req.params.id).catch(() => null)
     });
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
@@ -1952,6 +1955,24 @@ router.post('/users/:id/zusaetze/rechenkerne', requireAdmin, requireRole('owner'
       z.aktiv ? 'user.zusatz_rechenkerne_an' : 'user.zusatz_rechenkerne_aus', 'user', req.params.id,
       { kontingent_rnd: z.kontingent_rnd, kontingent_vw: z.kontingent_vw }, req.ip, req.headers['user-agent']);
     res.json({ success: true, rechenkerne: z });
+  } catch (e) { res.status(400).json({ error: e.message }); }
+});
+
+/* v3289 · Zusatz „DealPilot Flow“ (Makler-Hub): Linien makler / privat / investor je Konto.
+   Marcel 11.11.2026: Flow Investor wird ein eigenes Produkt, der Preis ist offen - bis dahin schaltet
+   der Admin einzelne Konten frei (auch Testkonten). Der Hub bekommt die Linien bei der naechsten
+   Anmeldung (GET /hub/konto liefert paket.flow_linien); der Schluessel-Bereich wird beim Verbinden
+   vergeben - nach einer NEUEN Linie verbindet der Hub einmal neu. */
+router.post('/users/:id/zusaetze/flow', requireAdmin, requireRole('owner', 'support'), async (req, res) => {
+  const db = req.app.get('db');
+  try {
+    const b = req.body || {};
+    const z = await _zusatzService.setzen(req.params.id, _zusatzService.FLOW,
+      { aktiv: b.aktiv !== false, linien: b.linien, notiz: b.notiz }, req.adminUser.email);
+    await audit(db, req.adminUser.id, req.adminUser.email,
+      z.aktiv ? 'user.zusatz_flow_an' : 'user.zusatz_flow_aus', 'user', req.params.id,
+      { linien: z.linien }, req.ip, req.headers['user-agent']);
+    res.json({ success: true, flow: z, flow_linien: await _zusatzService.flowLinienHerkunft(req.params.id) });
   } catch (e) { res.status(400).json({ error: e.message }); }
 });
 

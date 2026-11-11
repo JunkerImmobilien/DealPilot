@@ -29,6 +29,9 @@ const subscriptionService = require('../services/subscriptionService');
 
    Die TESTPHASE dagegen braucht eine eigene Pruefung — siehe unten. */
 const API_FEATURE = 'api_access';
+/* v3289 · DealPilot Flow: Schluessel mit Bereich `flow` (middleware/flow.js) */
+const flowZugang = require('./flow');
+const zusatzService = require('../services/zusatzService');
 const _apiKeyRate = new Map();
 function _rateOk(keyId) {
   const now = Date.now();
@@ -86,8 +89,16 @@ async function _authViaApiKey(req, res, next, plain) {
         });
       }
     }
+    /* v3289 · DealPilot Flow. Ein Schluessel mit Bereich `flow` bekommt der Makler-Hub fuer eine
+       Firma mit Linie Investor oder Privat (maklerHubService.apiKeyScope). Er haengt NICHT an
+       api_access und nicht an der Testphase - die Freischaltung der Linie ist die Freigabe
+       (Marcel 11.11.2026) -, darf dafuer nur die Flow-Routen (flow.js FLOW_ROUTEN).
+       Deshalb wird die Sperre unten erst GEMERKT und nur ohne `flow` sofort ausgesprochen. */
+    const _flowArt = flowZugang.scopeArt(rec.scopes);
+    let _planSperre = null, _plan = null;
     try {
       const plan = await subscriptionService.getEffectivePlan(user.id);
+      _plan = plan;
       /* v2072a: dasselbe Merkmal, das routes/apiKeys.js per
          requireFeature('api_access') prueft. Dort geht es um das ANLEGEN
          eines Schluessels, hier um sein BENUTZEN — beide muessen am
@@ -96,11 +107,11 @@ async function _authViaApiKey(req, res, next, plain) {
          Die Meldung nennt den gemessenen Plan MIT, damit ein 403 nicht
          wieder als falscher Schluessel gelesen wird. */
       if (!plan || !plan.plan_features || !plan.plan_features[API_FEATURE]) {
-        return res.status(403).json({
+        _planSperre = {
           error: `Feature '${API_FEATURE}' is not available on your plan`,
           plan_id: (plan && plan.plan_id) || null,
           upgrade_required: true
-        });
+        };
       }
       /* v2072: waehrend der Testphase bleibt die Schnittstelle zu — aus
          demselben Grund, aus dem getEffectivePlan dort export_csv,
@@ -108,17 +119,41 @@ async function _authViaApiKey(req, res, next, plain) {
          Das Merkmal oben allein reicht nicht: die Testphase liefert die
          FEATURES des gewaehrten Plans, api_access ist darin true.
          Marcels Entscheidung vom 10.10.2026 ("ja b"). */
-      if (plan.trial === true) {
-        return res.status(403).json({
+      else if (plan.trial === true) {
+        _planSperre = {
           error: 'API-Zugang ist in der Testphase nicht enthalten',
           plan_id: plan.plan_id, trial: true,
           trial_ends_at: plan.trial_ends_at || null,
           upgrade_required: true
-        });
+        };
       }
     } catch (e) { /* im Zweifel durchlassen statt Owner aussperren */ }
+    if (_planSperre && !_flowArt.flow) return res.status(403).json(_planSperre);
     req.user = { id: user.id, email: user.email, name: user.name, role: user.role };
     req.apiKey = { id: rec.id, scopes: rec.scopes };
+
+    /* v3289 · Der Flow-Weg: nur-flow-Schluessel immer, crud+flow nur dort, wo crud nicht greift. */
+    if (_flowArt.flow && (_flowArt.nurFlow || _planSperre)) {
+      let _linien = [];
+      try { _linien = await zusatzService.flowLinien(user.id, _plan || undefined); } catch (e) { _linien = []; }
+      const _frei = _linien.indexOf('investor') >= 0 || _linien.indexOf('privat') >= 0;
+      if (!_frei) {
+        return res.status(403).json(_planSperre || {
+          error: 'DealPilot Flow ist für dieses Konto nicht (mehr) freigeschaltet.',
+          code: 'FLOW_NICHT_FREIGESCHALTET', linien: _linien, upgrade_required: true
+        });
+      }
+      if (!flowZugang.istFlowRoute(req.method, req.originalUrl || req.url)) {
+        return res.status(403).json({
+          error: 'Dieser Schlüssel (Bereich flow) darf nur die Routen von DealPilot Flow.',
+          code: 'FLOW_SCOPE', methode: req.method
+        });
+      }
+      req.apiKey.nurFlow = true;
+      req.flowLinien = _linien;
+      apiKeyService.touchLastUsed(rec.id).catch(function () {});
+      return next();
+    }
 
     /* ── v1796 · DER SCOPE WIRD JETZT AUCH GELESEN ────────────────────────
      *

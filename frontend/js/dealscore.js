@@ -60,31 +60,53 @@ var DealScore = (function() {
     return 'balanced';
   }
 
-  function _getWeights() {
-    var preset = _getActivePreset();
+  /* v3289 · DIE GEWICHTE AUS DEN VORGABEN - ALS REINE FUNKTION (Flow Investor).
+     Der Server rechnet fuer den Makler-Hub mit dem Bewertungsprofil des Kontos
+     (user_settings browser_vorgaben: dp_dealscore2_preset, dp_dealscore_eigen,
+     dp_dealscore_weights). Ein Kern liest nie Einstellungen - deshalb liegt die
+     Aufloesung HIER als Funktion der drei Werte, und _getWeights() ruft sie mit
+     dem localStorage des Browsers. Dieselbe Regel, eine Stelle.
+       v = { preset, eigen ('1' | true), weights (JSON-Text oder Objekt) } */
+  function gewichteAus(v) {
+    v = v || {};
+    var preset = (v.preset && (PRESET_WEIGHTS[v.preset] || v.preset === 'custom')) ? v.preset : 'balanced';
     /* v2191 · Eigene Regler galten nur bei Vorlage „custom“ - und auf „custom“
        schaltet nur der Investor Deal Score (dealscore2.js saveConfig). Wer nur
        die fünf DealScore-Regler verschob, speicherte sie, und sie wirkten nie.
        Jetzt: hat setWeights() eigene Regler gesetzt (Merker), gelten sie, bis
        wieder eine Vorlage gewählt wird (dealscore2.js setActivePreset löscht ihn).
        Ohne localStorage (Backend-Spiegel) bleibt alles wie vorher. */
-    var eigen = false;
-    try { eigen = localStorage.getItem('dp_dealscore_eigen') === '1'; } catch (e) {}
+    var eigen = (v.eigen === true || v.eigen === '1');
     // V108: Wenn ein Preset aktiv ist (nicht "custom"), nutze die Preset-Gewichtungen
     if (!eigen && preset !== 'custom' && PRESET_WEIGHTS[preset]) {
       return PRESET_WEIGHTS[preset];
     }
     // Sonst: gespeicherte User-Gewichte (oder Default)
     try {
-      var saved = localStorage.getItem('dp_dealscore_weights');
+      var saved = v.weights;
       if (saved) {
-        var w = JSON.parse(saved);
+        var w = (typeof saved === 'string') ? JSON.parse(saved) : saved;
         // Validate sum ~100
         var sum = w.cashflow + w.rendite + w.ltv + w.risiko + w.potenzial;
         if (Math.abs(sum - 100) < 1) return w;
       }
     } catch (e) {}
     return DEFAULT_WEIGHTS;
+  }
+
+  function _getWeights() {
+    var eigen = false, saved = null;
+    try { eigen = localStorage.getItem('dp_dealscore_eigen') === '1'; } catch (e) {}
+    try { saved = localStorage.getItem('dp_dealscore_weights'); } catch (e) {}
+    return gewichteAus({ preset: _getActivePreset(), eigen: eigen, weights: saved });
+  }
+
+  /* v3289 · Gewichte, die der Aufrufer hereinreicht (K.gewichte), gelten nur mit
+     allen fuenf Schluesseln und Summe ~100 - sonst die des Browsers. */
+  function _gewichteOk(w) {
+    if (!w || typeof w !== 'object') return false;
+    var sum = w.cashflow + w.rendite + w.ltv + w.risiko + w.potenzial;
+    return isFinite(sum) && Math.abs(sum - 100) < 1;
   }
 
   function _saveWeights(w) {
@@ -253,7 +275,7 @@ var DealScore = (function() {
     if (!K.kp) {
       return { score: 0, color: 'gray', label: 'Keine Daten', interpretation: 'Bitte Werte eingeben.', breakdown: [] };
     }
-    var weights = _getWeights();
+    var weights = _gewichteOk(K.gewichte) ? K.gewichte : _getWeights();   /* v3289 */
     var cf_m = K.cf_m || 0;
     var nmr = K.nmy || 0;
     var ltv = K.ltv || 0;
@@ -418,6 +440,7 @@ var DealScore = (function() {
     computeFromKpis: computeFromKpis,
     setWeights: setWeights,
     getWeights: _getWeights,
+    gewichteAus: gewichteAus,   /* v3289 · Flow Investor: Gewichte aus den Vorgaben, ohne localStorage */
     getDefaults: function() { return Object.assign({}, DEFAULT_WEIGHTS); },
     snapshot: snapshot
   };

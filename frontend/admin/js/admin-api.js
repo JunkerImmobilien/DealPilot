@@ -154,6 +154,7 @@ return {
     // v2977: Zusatz Schnittstelle Rechenkerne
     getZusaetze: (id) => call('GET', `/users/${id}/zusaetze`),
     setZusatzPartner: (id, aktiv) => call('POST', `/users/${id}/zusaetze/entwicklungspartner`, { aktiv: aktiv }),
+    setZusatzFlow: (id, werte) => call('POST', `/users/${id}/zusaetze/flow`, werte),   // v3289 · DealPilot Flow
     setZusatzRechenkerne: (id, werte) =>
       call('POST', `/users/${id}/zusaetze/rechenkerne`, werte),
     deleteUser: (id, confirm_email, reason) =>

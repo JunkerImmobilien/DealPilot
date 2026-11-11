@@ -1,0 +1,22 @@
+-- 098_flow_linien.sql  ·  v3289
+--
+-- DEALPILOT FLOW: LINIEN JE KONTO (Makler, Privat, Investor)
+-- Auftrag: Dateien/Makler-Hub/Flow-Investor-Schnittstelle.md, Punkt 7.
+--
+-- Marcel 11.11.2026: Flow Investor wird ein eigenes Produkt, Preis und Plan stehen noch nicht fest
+-- („evtl. im Partnerplan, evtl. später separat kaufbar“). Die Preisentscheidung soll später OHNE Code fallen.
+-- Deshalb zwei Wege, die beide nur Daten sind:
+--
+--   1. Merkmal am Plan:  plans.features.flow_linien = ["investor", ...]
+--      Diese Migration setzt es BEI KEINEM PLAN - auch nicht beim Partner. Wenn Marcel entschieden hat,
+--      genügt eine Zeile (eigene Migration), z. B.:
+--        UPDATE plans SET features = features || '{"flow_linien": ["investor"]}'::jsonb WHERE id = 'partner';
+--      `makler_hub: true` (Migration 097) bleibt gültig und bedeutet ["makler"].
+--
+--   2. Zusatz je Konto:  user_zusaetze (zusatz = 'flow', linien = ["investor","privat"])
+--      Admin › Nutzer › „Zusatz: DealPilot Flow“. Das ist die bewusste Freischaltung einzelner Konten,
+--      auch von Testkonten - ohne Migration. Ein späteres Stripe-Paket setzt dieselbe Zeile.
+--
+-- Wirksam ist die Vereinigung aus beiden (services/zusatzService.js flowLinien()).
+
+ALTER TABLE user_zusaetze ADD COLUMN IF NOT EXISTS linien JSONB;

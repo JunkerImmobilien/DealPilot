@@ -13,6 +13,7 @@ const crypto = require('crypto');
 const { query } = require('../db/pool');
 const subscriptionService = require('./subscriptionService');
 const apiKeyService = require('./apiKeyService');
+const zusatzService = require('./zusatzService');   /* v3289 · Flow-Linien */
 
 let credits = null;
 try { credits = require('./aiCreditsService'); } catch (e) { credits = null; }
@@ -73,11 +74,17 @@ async function konto(userId) {
   const plan = await subscriptionService.getEffectivePlan(userId);
   const f = plan.plan_features || {};
   const hub = f.makler_hub === true;
+  /* v3289 · DealPilot Flow (Flow-Investor-Schnittstelle.md, Punkt 7): die Linien der Firma aus
+     Plan-Merkmal und Zusatz je Konto. Der Hub uebernimmt sie als meta.linien. makler_hub bleibt
+     und bedeutet ["makler"]. */
+  let flowLinien = hub ? ['makler'] : [];
+  try { flowLinien = await zusatzService.flowLinien(userId, plan); } catch (e) { /* Liste bleibt beim Plan */ }
   const paket = {
     plan_id: plan.plan_id,
     /* Partnertypen folgen (Marcel 05.11.2026): heute ist jeder Partner ein Makler-Partner */
     partner_typ: hub ? 'makler' : null,
     makler_hub: hub,
+    flow_linien: flowLinien,   /* v3289 */
     plaetze: Math.max(1, Number(plan.max_users) || 1),
     status: plan.status || 'active',
     bis: plan.current_period_end ? new Date(plan.current_period_end).toISOString().slice(0, 10) : (plan.trial_ends_at ? new Date(plan.trial_ends_at).toISOString().slice(0, 10) : null),
@@ -136,15 +143,36 @@ async function tokenTauschen(body, ip) {
 
   const hubToken = 'dph_' + zufall(32);
   let apiKey = null, apiKeyId = null;
-  if (k.paket.makler_hub) {
-    const neu = await apiKeyService.createForUser(c.user_id, { name: API_KEY_NAME });
+  /* v3289 · Den Schluessel bekommt jede Firma mit einer Flow-Linie, nicht nur makler_hub.
+     Der Bereich (scope) folgt den Linien:
+       nur makler                 'crud'       - wie bisher (Vertrag Anmeldung-Schnittstelle.md: Rechte crud),
+                                                 haengt weiter an api_access und ist in der Testphase zu
+       investor/privat, kein makler  'flow'    - darf NUR die Flow-Routen (middleware/flow.js), geht auch in
+                                                 der Testphase, solange die Linie freigeschaltet ist
+       makler + investor/privat   'crud flow'  - wie crud; wo crud nicht greift (Testphase), bleiben die Flow-Routen
+     Ohne Freischaltung einer Linie bleibt alles wie heute (Marcel 11.11.2026). */
+  const linien = k.paket.flow_linien || [];
+  const scope = apiKeyScope(linien);
+  if (scope) {
+    const neu = await apiKeyService.createForUser(c.user_id, { name: API_KEY_NAME, scopes: scope });
     apiKey = neu.plain; apiKeyId = neu.id;
   }
   await query('INSERT INTO hub_verbindungen (user_id, client_id, token_hash, api_key_id) VALUES ($1,$2,$3,$4)', [c.user_id, c.client_id, sha256(hubToken), apiKeyId]);
-  await protokoll(c.user_id, 'token', ip, { makler_hub: k.paket.makler_hub });
+  await protokoll(c.user_id, 'token', ip, { makler_hub: k.paket.makler_hub, flow_linien: linien, scope: scope });
   const antwort = Object.assign({}, k, { hub_token: hubToken });
   if (apiKey) antwort.api_key = apiKey;
   return { antwort: antwort };
+}
+
+/** v3289 · Bereich des Hub-Schluessels aus den Linien (siehe tokenTauschen). null = kein Schluessel. */
+function apiKeyScope(linien) {
+  const l = Array.isArray(linien) ? linien : [];
+  const makler = l.indexOf('makler') >= 0;
+  const flow = l.indexOf('investor') >= 0 || l.indexOf('privat') >= 0;
+  if (makler && flow) return 'crud flow';
+  if (makler) return 'crud';
+  if (flow) return 'flow';
+  return null;
 }
 
 /* ── 4./5. Bearer hub_token ────────────────────────────────────────── */
@@ -198,4 +226,5 @@ function ereignis(userId, art) {
 /* abgelaufene Codes aufräumen (beim Ausstellen gelegentlich) */
 async function aufraeumen() { try { await query("DELETE FROM hub_codes WHERE expires_at < NOW() - interval '1 day'"); } catch (e) {} }
 
-module.exports = { bereit, clientPruefen, clientAuth, konto, codeAusstellen, tokenTauschen, verbindungZumToken, trennen, trennenFuerNutzer, verbunden, ereignis, aufraeumen, API_KEY_NAME };
+module.exports = { bereit, clientPruefen, clientAuth, konto, codeAusstellen, tokenTauschen, verbindungZumToken, trennen, trennenFuerNutzer, verbunden, ereignis, aufraeumen, API_KEY_NAME,
+  apiKeyScope };   /* v3289 */

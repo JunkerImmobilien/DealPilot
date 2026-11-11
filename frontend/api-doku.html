@@ -48,7 +48,7 @@ nav.inhalt a{color:var(--text);font-size:14px}
 <main>
 <nav class="inhalt">
   <a href="#zugang">Zugang</a><a href="#rnd">Restnutzungsdauer</a><a href="#vw">Verkehrswert</a>
-  <a href="#kontingent">Kontingent</a><a href="#fehler">Fehlercodes</a><a href="#grundsaetze">Grundsätze</a>
+  <a href="#kontingent">Kontingent</a><a href="#flow">DealPilot Flow</a><a href="#fehler">Fehlercodes</a><a href="#grundsaetze">Grundsätze</a>
 </nav>
 
 <h2 id="zugang">Zugang</h2>
@@ -132,6 +132,52 @@ nav.inhalt a{color:var(--text);font-size:14px}
 <pre><code>{ "freigeschaltet": true,
   "monat": { "rnd": { "n": 12, "n_ok": 12 }, "verkehrswert": { "n": 3, "n_ok": 2 } },
   "kontingent": { "rnd": null, "verkehrswert": 50 } }</code></pre>
+
+<!-- v3289 · DealPilot Flow (Makler-Hub), Flow-Investor-Schnittstelle Punkt 1 und 7.
+     Quelle der Wahrheit: backend/src/routes/objects.js, services/flowBerechnung.js, middleware/flow.js. -->
+<h2 id="flow">DealPilot Flow · Objekte rechnen</h2>
+<p>Für den Makler-Hub (DealPilot Flow). Basis-Adresse hier <code>https://app.dealpilot.immo/api/v1</code>. Der Hub bekommt beim Verbinden einen eigenen Schlüssel: für die Linien <strong>Investor</strong> und <strong>Privat</strong> mit dem Bereich <code>flow</code>. Er gilt auch in der Testphase, solange die Linie für das Konto freigeschaltet ist, und darf nur die Wege von DealPilot Flow: Objekte anlegen, lesen und ändern (nicht löschen), rechnen, Felder nachschlagen, Unterlagen hochladen und lesen.</p>
+
+<h3><span class="m">POST</span> /objects/:id/berechnen</h3>
+<p>Kennzahlen und Quick-Check eines gespeicherten Objekts, gerechnet auf dem Server mit denselben Rechenkernen wie die App und mit dem Investmentprofil des Kontos: Score-Gewichte des Bewertungsprofils, Ampel-Schwellen (Mindest-DSCR, Maximal-LTV, Mindest-Cashflow), Zielrendite der Lageklasse und fehlende Finanzierungssätze, soweit im Profil gesetzt. Kostenlos. Braucht die Linie Investor.</p>
+<p>Das Ergebnis wird am Objekt unter <code>data._flow_berechnung</code> abgelegt; die Version des Objekts steigt dabei um eins. Optionaler Inhalt: <code>expectedVersion</code> (409, wenn das Objekt inzwischen geändert wurde) und <code>speichern: false</code> (nur rechnen).</p>
+<pre><code>curl -X POST https://app.dealpilot.immo/api/v1/objects/&lt;id&gt;/berechnen \
+  -H "x-api-key: dpk_live_…" -H "Content-Type: application/json" \
+  -d '{ "expectedVersion": 12 }'</code></pre>
+<h3>Antwort (gekürzt)</h3>
+<pre><code>{ "objekt_id": "…",
+  "kennzahlen": { "kaufpreis": 180000, "nebenkosten": 15205, "gesamtinvest": 195205,
+                  "nkm_jahr": 11280, "bruttorendite": 6.2667, "nettorendite": 4.9592, "faktor": 15.9574,
+                  "cashflow_vor_steuer_monat": 56.71, "dscr": 1.0756, "ltv": 90.9091, "ek_bedarf": 0,
+                  "darlehen": 200000, "kapitaldienst_jahr": 9000, "bewirtschaftung_jahr": 3326.46, … },
+  "quickcheck": { "ampel": "gruen", "score": 76, "stufe": "Gut", "empfehlung": "KAUFEN",
+                  "empfehlung_text": "Die Kennzahlen passen — …", "gruende": [ "…" ],
+                  "noetige_preissenkung_pct": 0, "zielpreis": 180000, "grenze": null,
+                  "teilnoten": [ … ], "kennzahlen_ampel": [ … ], "score_app": 77 },
+  "annahmen": [ "Tilgung 1,5 % (Investmentprofil)", … ],
+  "profil": { "name": "Ausgewogen", "geaendert": "2026-11-10T09:12:00.000Z",
+              "gewichte": { "cashflow": 30, "rendite": 25, "ltv": 15, "risiko": 15, "potenzial": 15 },
+              "schwellen": { "dscrGruen": 1.2, "ltvGruen": 90, "cfMin": 0 }, "ziel_bmr_lage": null },
+  "marktpreisindikation": null,
+  "berechnet_at": "2026-11-11T09:30:00.000Z", "gespeichert": true, "version": 13 }</code></pre>
+<div class="kasten"><strong>Was die Zahlen tragen:</strong> Prozente als Zahl (<code>6.2667</code> = 6,27 %), Beträge in Euro. <code>dscr</code> und <code>ltv</code> sind <code>null</code>, wenn kein Darlehen am Objekt steht (Barkauf). Ohne Bewirtschaftung (Hausgeld) gibt es keinen Score - es wird nichts geschätzt, <code>quickcheck.fehlt</code> sagt, was fehlt. Jede Annahme steht unter <code>annahmen</code>. <code>score_app</code> ist der Score, den die App zuletzt am Objekt gespeichert hat; er gilt hier nicht, weil sich Preis oder Miete seitdem geändert haben können. Eine vorhandene Marktpreisindikation wird gelesen, nie abgerufen.</div>
+
+<h3><span class="m get">GET</span> /objects/felder</h3>
+<p>Das Feldverzeichnis der Objekte: interne Feld-Ids für <code>data</code> in <code>POST</code>/<code>PUT /objects</code>, mit Beschriftung, Art und bei Auswahlfeldern den erlaubten Werten. <code>?suche=zins</code> filtert nach Id oder Beschriftung.</p>
+<pre><code>{ "anzahl": 3,
+  "felder": [ { "id": "d1z", "label": "Zinssatz nominal", "kind": "text" }, … ],
+  "hinweis": "Interne Feld-Ids für data{} …" }</code></pre>
+
+<h3>Fehler bei DealPilot Flow</h3>
+<div class="tw"><table>
+<tr><th>Status</th><th><code>code</code></th><th>Bedeutung</th></tr>
+<tr><td>403</td><td><code>FLOW_LINIE_FEHLT</code></td><td>die Linie (hier Investor) ist für das Konto nicht freigeschaltet</td></tr>
+<tr><td>403</td><td><code>FLOW_SCOPE</code></td><td>der Schlüssel mit Bereich <code>flow</code> darf diesen Weg nicht</td></tr>
+<tr><td>403</td><td><code>FLOW_NICHT_FREIGESCHALTET</code></td><td>keine Linie Investor oder Privat mehr freigeschaltet, Schlüssel ruht</td></tr>
+<tr><td>404</td><td>–</td><td>Objekt nicht gefunden (oder gehört einem anderen Konto)</td></tr>
+<tr><td>409</td><td>–</td><td>Versionskonflikt: das Objekt wurde geändert, neu lesen und neu rechnen</td></tr>
+<tr><td>422</td><td><code>FLOW_ANGABEN_FEHLEN</code></td><td>ohne Kaufpreis und Nettokaltmiete lässt sich nichts rechnen</td></tr>
+</table></div>
 
 <h2 id="fehler">Fehlercodes</h2>
 <div class="tw"><table>

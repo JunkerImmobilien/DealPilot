@@ -263,6 +263,13 @@ function score(kennzahlen) {
   return _oder_wirf().DealScore.computeFromKpis(kennzahlen || {});
 }
 
+/** v3289 · DealScore.gewichteAus() der App - die fuenf Score-Gewichte aus den
+ *  Vorgaben eines Kontos ({ preset, eigen, weights } wie in browser_vorgaben).
+ *  Das Ergebnis geht als `gewichte` an score(); der Kern liest nie Einstellungen. */
+function scoreGewichte(vorgaben) {
+  return _oder_wirf().DealScore.gewichteAus(vorgaben || {});
+}
+
 /** ScoreTier.stufe() der App — { wort, versal, farbe } zu einem Score.
  *  Die Kette aus CLAUDE.md: 85 / 70 / 50 / 35. */
 function stufe(wert) {
@@ -319,6 +326,7 @@ function herkunft() {
 
 module.exports = {
   kpis, dscr, score, stufe, heuristik,
+  scoreGewichte,               /* v3289 · Flow Investor */
   gebaeudeAhk,                 /* v3006b */
   grestBasis,                  /* v3006c */
   weitereDarlehen, weitereDarlehenListe, weitereDarlehenRate,   /* v3215 · W-17 */

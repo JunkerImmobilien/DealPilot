@@ -15,14 +15,52 @@ const subscriptionService = require('./subscriptionService');
 
 const RECHENKERNE = 'rechenkerne_api';
 const PARTNER = 'entwicklungspartner';   /* v3097 · Umsetzungswünsche (routes/wuensche.js) */
-const BEKANNT = [RECHENKERNE, PARTNER];
+/* v3289 · DealPilot Flow (Makler-Hub): Linien je Konto. Marcel 11.11.2026: Flow Investor wird ein
+   eigenes Produkt, Preis offen - freigeschaltet wird per Plan-Merkmal `flow_linien` ODER hier je Konto. */
+const FLOW = 'flow';
+const FLOW_LINIEN = ['makler', 'privat', 'investor'];
+const BEKANNT = [RECHENKERNE, PARTNER, FLOW];
 const KERN_SPALTE = { rnd: 'kontingent_rnd', verkehrswert: 'kontingent_vw' };
 
 async function holen(userId, zusatz) {
-  const r = await query(
-    'SELECT user_id, zusatz, aktiv, kontingent_rnd, kontingent_vw, notiz, geaendert_von, created_at, updated_at '
-    + 'FROM user_zusaetze WHERE user_id=$1 AND zusatz=$2', [userId, zusatz]);
+  /* v3289: SELECT * - die Spalte `linien` (Migration 098) gibt es nur am Zusatz 'flow' */
+  const r = await query('SELECT * FROM user_zusaetze WHERE user_id=$1 AND zusatz=$2', [userId, zusatz]);
   return r.rows[0] || null;
+}
+
+/* v3289 · Nur die bekannten Linien, jede einmal, in fester Reihenfolge. */
+function linienSaeubern(roh) {
+  let l = roh;
+  if (typeof l === 'string') { try { l = JSON.parse(l); } catch (e) { l = l.split(','); } }
+  if (!Array.isArray(l)) return [];
+  const s = new Set(l.map((x) => String(x || '').trim().toLowerCase()));
+  return FLOW_LINIEN.filter((x) => s.has(x));
+}
+
+/** v3289 · Welche Flow-Linien hat dieses Konto? Vereinigung aus
+ *    Plan-Merkmal `makler_hub: true`  -> makler   (Migration 097, bleibt gültig)
+ *    Plan-Merkmal `flow_linien`       -> die Liste (Migration 098 setzt es bei keinem Plan)
+ *    Zusatz 'flow' (aktiv)            -> seine `linien` (Admin-Schalter je Konto)
+ *  Eine Stelle: maklerHubService, middleware/flow.js und der Admin fragen nur hier.
+ *  `plan` darf mitkommen, wenn der Aufrufer ihn schon hat (spart eine Abfrage). */
+async function flowLinien(userId, plan) {
+  const det = await flowLinienHerkunft(userId, plan);
+  return det.linien;
+}
+async function flowLinienHerkunft(userId, plan) {
+  if (!userId) return { linien: [], plan: [], zusatz: [] };
+  const p = plan || await subscriptionService.getEffectivePlan(userId);
+  const f = (p && p.plan_features) || {};
+  const ausPlan = linienSaeubern(f.flow_linien);
+  if (f.makler_hub === true && ausPlan.indexOf('makler') < 0) ausPlan.push('makler');
+  let ausZusatz = [];
+  try {
+    const z = await holen(userId, FLOW);
+    if (z && z.aktiv) ausZusatz = linienSaeubern(z.linien);
+  } catch (e) { ausZusatz = []; }   /* ohne Migration 098: nur der Plan */
+  const alle = new Set(ausPlan.concat(ausZusatz));
+  return { linien: FLOW_LINIEN.filter((x) => alle.has(x)), plan: linienSaeubern(ausPlan), zusatz: ausZusatz,
+    plan_id: (p && p.plan_id) || null, testphase: !!(p && p.trial) };
 }
 
 /* Aufrufe im laufenden Kalendermonat (Europe/Berlin), je Kern. */
@@ -89,6 +127,21 @@ async function setzen(userId, zusatz, werte, von) {
     if (!isFinite(n) || n < 0) throw new Error('Kontingent muss eine ganze Zahl ab 0 sein');
     return n;
   };
+  /* v3289 · Der Zusatz 'flow' traegt seine Linien (Migration 098). Alle anderen schreiben die Spalte
+     nicht an - so laeuft setzen() fuer sie auch ohne die Migration wie bisher. */
+  if (zusatz === FLOW) {
+    const linien = linienSaeubern(werte.linien);
+    if (werte.aktiv !== false && !linien.length) throw new Error('Mindestens eine Linie wählen (makler, privat, investor).');
+    const rf = await query(
+      'INSERT INTO user_zusaetze (user_id, zusatz, aktiv, linien, notiz, geaendert_von) '
+      + 'VALUES ($1,$2,$3,$4::jsonb,$5,$6) '
+      + 'ON CONFLICT (user_id, zusatz) DO UPDATE SET aktiv=EXCLUDED.aktiv, linien=EXCLUDED.linien, '
+      + 'notiz=EXCLUDED.notiz, geaendert_von=EXCLUDED.geaendert_von, updated_at=NOW() '
+      + 'RETURNING *',
+      [userId, zusatz, werte.aktiv !== false, JSON.stringify(linien),
+       werte.notiz ? String(werte.notiz).slice(0, 500) : null, von || null]);
+    return rf.rows[0];
+  }
   const r = await query(
     'INSERT INTO user_zusaetze (user_id, zusatz, aktiv, kontingent_rnd, kontingent_vw, notiz, geaendert_von) '
     + 'VALUES ($1,$2,$3,$4,$5,$6,$7) '
@@ -100,4 +153,5 @@ async function setzen(userId, zusatz, werte, von) {
   return r.rows[0];
 }
 
-module.exports = { RECHENKERNE, PARTNER, BEKANNT, holen, monatsZaehlung, darfRechnen, aufrufZaehlen, setzen };
+module.exports = { RECHENKERNE, PARTNER, FLOW, FLOW_LINIEN, BEKANNT, holen, monatsZaehlung, darfRechnen, aufrufZaehlen, setzen,
+  flowLinien, flowLinienHerkunft, linienSaeubern };   /* v3289 */
