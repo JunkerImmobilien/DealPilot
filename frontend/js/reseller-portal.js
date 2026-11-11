@@ -267,7 +267,8 @@ if (!window._pdfGold) {
         '<div class="rp-price"><div class="per"></div><div class="tot"></div></div></div>' +
         '<div class="rp-buyfoot"><div class="rp-staffel">' + staffelText()
           + '<br>Der Stückpreis gilt für alle Seats.'
-          + '<br>Die ersten <b>3 Mandanten-Plätze</b> sind im Partner-Paket enthalten \u2014 hier kaufen Sie die darüber hinaus.</div>' +
+          /* v3303 · Marcel 11.11.2026: keine Plaetze mehr im Partner-Paket enthalten */
+          + '<br>Im Partner-Paket ist kein Mandanten-Platz enthalten \u2014 jeden Platz buchen Sie hier dazu.</div>' +
         '<button class="rp-checkout" id="rp-checkout">Zur Kasse (Stripe)</button></div></div>';
     box.querySelectorAll('.rp-seg button').forEach(function (b) { b.addEventListener('click', function () { _st.iv = b.getAttribute('data-iv'); box.querySelectorAll('.rp-seg button').forEach(function (x) { x.classList.remove('on'); }); b.classList.add('on'); calcPrice(); }); });
     $('rp-minus').addEventListener('click', function () { _st.qty = Math.max(1, _st.qty - 1); $('rp-qty').value = _st.qty; calcPrice(); });

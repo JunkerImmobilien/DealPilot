@@ -9,7 +9,8 @@
  *   pool  = status='pool'        (frei, verteilbar)
  *   assig = status='zugewiesen'  (client_id gesetzt)
  * Die Pool-Größe wird aus der Stripe-Subscription-Menge synchronisiert
- * (syncPoolQuantity) — beim Checkout-Return und bei jedem Pool-Abruf.
+ * (syncPoolQuantity) — beim Checkout-Return, bei jedem Pool-Abruf und seit
+ * v3303 im Stripe-Webhook (services/partnerSeatsWebhook.js).
  */
 
 const { query } = require('../db/pool');
@@ -66,7 +67,10 @@ async function getPool(resellerId) {
     zugewiesen: parseInt(row.zugewiesen, 10) || 0,
     frei:       parseInt(row.frei, 10)       || 0,
     /* v1537: davon im Grundpreis enthalten - nur zur Anzeige, nie zum
-       Rechnen. Wer Plaetze zaehlt, nimmt 'gekauft'. */
+       Rechnen. Wer Plaetze zaehlt, nimmt 'gekauft'.
+       v3303: seit Marcels Entscheidung vom 11.11.2026 ist INKLUSIV_MANDANTEN
+       = 0, also immer inklusiv 0 und bezahlt = gekauft. Die Felder bleiben,
+       damit kein Leser an einem fehlenden Feld scheitert. */
     inklusiv:   Math.min(INKLUSIV_MANDANTEN, gekauft),
     bezahlt:    Math.max(0, gekauft - INKLUSIV_MANDANTEN)
   };
@@ -91,8 +95,19 @@ async function getPool(resellerId) {
    uebergeben wird weiterhin die GEKAUFTE Menge aus Stripe. Wer null Seats
    kauft, hat drei; wer fuenf kauft, hat acht. Beim Herunterstufen werden
    nur freie Pool-Zeilen geloescht, es bleiben also immer mindestens drei.
+
+   ═══ v3303 · Marcel 11.11.2026 (Preis, freigegeben) ═════════════════════
+   Der Partner-Plan kostet weiter 99 EUR/Monat bzw. 1.089 EUR/Jahr, enthaelt
+   aber KEINE Kundenplaetze mehr. Jeder Platz wird dazugekauft (Staffel
+   unveraendert 19/15/12 EUR, Stripe-Preise unveraendert). Deshalb hier 0:
+   wer null Seats kauft, hat null, wer fuenf kauft, hat fuenf.
+   Altbestand: auf Prod 0 Reseller und 0 Client-Lizenzen (gemessen). Wo es
+   doch Plaetze aus dem alten Aufschlag gibt (Staging-Demo), loescht der
+   naechste Abgleich nur FREIE Pool-Zeilen - zugewiesene bleiben immer.
+   Die Konstante bleibt stehen (statt zu verschwinden), damit die Stelle,
+   an der ein kuenftiger Inklusiv-Anteil wirken MUSS, auffindbar bleibt.
    ════════════════════════════════════════════════════════════════════════ */
-const INKLUSIV_MANDANTEN = 3;
+const INKLUSIV_MANDANTEN = 0;
 
 async function syncPoolQuantity(resellerId, gekaufteSeats, opts = {}) {
   const targetQty = Math.max(0, parseInt(gekaufteSeats, 10) || 0) + INKLUSIV_MANDANTEN;

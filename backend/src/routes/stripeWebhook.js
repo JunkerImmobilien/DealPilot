@@ -74,6 +74,21 @@ router.post('/', express.raw({ type: 'application/json' }), async (req, res) => 
 });
 
 async function handleEvent(event) {
+  /* v3303: Mandanten-Plaetze (metadata.kind = 'partner_seats') gleicht der
+     Webhook jetzt selbst ab - bisher nur Checkout-Ruecksprung und
+     pool?refresh. Steht VOR allen Zweigen, weil ein Seat-Abo sonst in den
+     Plan-Zweig liefe (resolvePlanFromPriceId findet den Seat-Preis nicht und
+     bricht still ab). Fehler werden NICHT verschluckt: Stripe soll erneut
+     zustellen, sonst hat der Partner bezahlt und keinen Platz. */
+  if (/^(checkout\.session\.completed|customer\.subscription\.(created|updated|deleted))$/.test(event.type)) {
+    const { handlePartnerSeatsEvent } = require('../services/partnerSeatsWebhook');
+    const r = await handlePartnerSeatsEvent(event);
+    if (r.handled) {
+      console.log('[stripe-webhook] partner_seats ' + event.type + ': ' + r.aktion
+        + (r.menge != null ? ' menge=' + r.menge : '') + (r.grund ? ' (' + r.grund + ')' : ''));
+      return;
+    }
+  }
   switch (event.type) {
     case 'checkout.session.completed': {
       // Customer completed checkout - subscription should now exist
