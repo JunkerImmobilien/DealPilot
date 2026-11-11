@@ -757,7 +757,15 @@ Kennzahl `umrechnungskoeffizient_flaeche` im Register (`uk-flaeche-*.json`), Ker
 - **WGFZ-Umrechnung (§ 16 Abs. 4, § 40 ImmoWertV, seit v2361)** — Kennzahl `umrechnungskoeffizient_wgfz`,
   Kern `lib/umrechnung_wgfz.js`: BW = BRW × UK(WGFZ Objekt) / UK(WGFZ Zone), linear interpoliert, nie
   extrapoliert. Greift nur, wenn die Zone eine GFZ führt (BORIS-NRW-Feld `Geschossflächenzahl`) und der
-  Nutzer die WGFZ des Objekts einträgt (`wgfz_objekt`, keine Näherung). **Amtlich vor Näherung:** wo sie
+  Nutzer die WGFZ des Objekts einträgt (`wgfz_objekt`) — **oder sie abgeleitet wird (seit v3293):**
+  Hier stand bis 11.11.2026 „keine Näherung". Aufgehoben durch Marcel 11.11.2026 („Wir haben oft
+  ‚WGFZ fehlt'. Können wir das ändern?"): ohne Eintrag leitet `wgfzAbleitung()` sie ab — Haus mit
+  NHK-Gebäudeart aus BGF (BGF / Ebenen × (Vollgeschosse + 0,75 DG), Keller nicht, § 16 Abs. 4),
+  ohne BGF über den SW-RL-Faktor aus der Wohnfläche; MFH/WGH aus Wohnfläche : 0,8 (GAA Bremen,
+  Umrechnungstabelle 100012; im eigenen Bezirk Münster 0,75, GMB 2025 S. 31). ETW ohne Angaben
+  zum ganzen Gebäude bleibt „fehlt". Immer „WGFZ abgeleitet aus … (DealPilot-Ableitung, Stufe N),
+  eigene Angabe genauer", nie amtlich; die eigene Angabe schlägt sie. Prüfer `uk-wgfz-pruefen.mjs`
+  (Abschnitt ABLEITUNG). **Amtlich vor Näherung:** wo sie
   greift, rechnet die DealPilot-Formel nicht zusätzlich über die Fläche. Sätze: Bielefeld + 8 NRW (`uk-wgfz-nw-2026.json`, Formen `wgfz_tabelle`, `wgfz_wurzel`, `wgfz_polynom`, `wgfz_exp`, `wgfz_matrix`).
 - **Eine Sperre trägt KEINE rechenbare `formel`** — `mb.param_modell` kennt kein
   Sperr-Feld; eine Sperre mit Tabelle kam dort als WERT an (v2287b). Vorgemerkte
