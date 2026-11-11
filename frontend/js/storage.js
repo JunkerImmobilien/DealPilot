@@ -784,7 +784,9 @@ function loadData(d) {
   /* v1312: Erbbaurecht-Schalter zurueckholen. sync() klappt den Koerper
      auf und rechnet den Abschlag neu - ohne change-Ereignis passiert das
      sonst nicht, und der Block bliebe trotz gesetzter Checkbox zu. */
-  if (d._erbpacht !== undefined) {
+  /* v3284: auch OHNE Schluessel setzen - sonst erbt ein per API/Import angelegtes
+     Objekt den Schalter des vorher geladenen (N148, gemessen: LTV 82,85 statt 73,08). */
+  {
     var erbCbL = document.getElementById('erbpacht');
     if (erbCbL) erbCbL.checked = !!d._erbpacht;
   }
@@ -820,6 +822,10 @@ function loadData(d) {
   window._aiText = d._ai || '';
   // V63.57: D1-Typ-Sichtbarkeit nach Load syncen — sonst bleibt Bauspar-Card
   // versteckt obwohl Tilgungsaussetzung aktiv ist
+  /* v3284: der gemerkte Tilgungssatz gehoert zum VORIGEN Objekt. Ohne das setzte
+     onD1TypeChange beim Wechsel von Tilgungsaussetzung zu Annuitaet d1t auf dessen
+     Wert und das Auto-Speichern schrieb ihn fest (N148: d1t 2 -> 0, Score 23 -> 54). */
+  try { var _d1tL = document.getElementById('d1t'); if (_d1tL) delete _d1tL.dataset.savedValue; } catch(_) {}
   if (typeof window.onD1TypeChange === 'function') {
     try { window.onD1TypeChange(); } catch(_) {}
   }
