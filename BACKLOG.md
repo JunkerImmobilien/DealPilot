@@ -36,6 +36,14 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
+### N151 · Partner-Branding für das Partnergespräch 12.11. (Partner-Demo, 11.11.2026) — **v3299/v3299a (`616d4aea`, `60d783d5`) auf Staging nachgemessen; Prod offen (Marcel)**
+Befund und Vorher/Nachher: `Dateien/Partner-Demo/Befund.md` (Abschnitt „Stand nach v3299a“), Bilder je Marke unter `<Marke>/nachher/`.
+- **Logo-Kontrast (L1/L4/L10):** `js/logo-kontrast.js` vermisst beim Speichern im Portal, legt je Grund ein PNG ab (Migration 101). Gemessen: Kessler dunkler Grund 1,03 → 14,81 : 1 (weiß eingefärbt), Nordwind heller Grund 1,02 → 18,4 : 1 (dunkel eingefärbt), Lumen eigene Fläche unverändert. Schienen-Logo 84×21 → 216×54 px. Zweites Feld „Logo für dunklen Grund“ mit Vorrang, Ampel im Portal.
+- **Mails (L7):** gehostete Logo-Route `/api/v1/public/partner-logo/:id/:art.png`, Einladung „<Partner> lädt dich ein“, `brand_mail_accent`, Absendername des Partners, Reply-To Partnerkontakt; Bestätigungs-Mail mit Logo und Partnerfuß.
+- **Marktbericht-PDF klassisch (L3):** Partnerlogo, Artwork in Partnerfarbe, Fuß = Website des Partners.
+- **DealPilot-Reste (L5):** Tab-Titel, „· Boarding/Quickboarding“, Markteinschätzungs-Karte, Erststart-Titel.
+- **Offen:** Prod-Rollout (Migration 101 → Backend-Rebuild; danach öffnet jeder Partner einmal sein Portal oder die Varianten werden im Browser nachgerechnet). Nicht gebaut (Marcels Entscheidung): inklusive Plätze ohne Kauf, Webhook `partner_seats`, Objektübergabe Partner→Kunde, Subdomain/Login-Branding. Weiter offen: Text im Erststart-Assistenten nennt DealPilot noch im Fließtext, Willkommens-Mail ohne Logo, Bordeaux-Akzent auf Obsidian-KPI-Zahlen mit wenig Kontrast, Partner-Portal selbst hart Gold (L9).
+
 ### N150 · „WGFZ fehlt“ — WGFZ des Objekts ableiten (Marcel 11.11.2026) — **v3293 (`21ec8499`) auf Staging, mb-backend neu gebaut 11.11.2026; Prod offen**
 Marcel: *„Wir haben oft ‚WGFZ fehlt‘. Können wir das ändern?“* `wgfzAbleitung()` (umrechnung_wgfz.js): Haus mit NHK-Gebäudeart aus BGF (bzw. Wohnfläche × SW-RL-Faktor), MFH/WGH aus Wohnfläche : 0,8 (GAA Bremen; Münster 0,75 im eigenen Bezirk); ETW ohne Gesamtgebäude bleibt „fehlt“; immer Stufe N, „eigene Angabe genauer“. Reiter zeigt „WGFZ x,xx · abgeleitet“. Gemessen (82 Staging-Berichte): Reiter-„fehlt“ 6 → 1; Berichte mit Umrechnung +1 (MFH Detmold, Bodenwert 476.000 → rd. 371.600 €). Prüfer `uk-wgfz-pruefen` ABLEITUNG 12/12, `wertermittlung-pruefen` grün (Ebene C unverändert).
 - **Staging nachgemessen (Container, POST /potenzial und /wertparameter/zinssatz):** Bismarckstr. 27 Detmold Bodenwert 476.000 → 371.566 €, Ertragswert 900.000 → 865.000 €; Reiter-Antwort wgfz_abgeleitet: Detmold 1,00 (Wohnfläche), ZFH Löhner Str. 0,34 (BGF), EFH 2026-1132 0,26 (BGF), ETW 2026-001 fehlt.
