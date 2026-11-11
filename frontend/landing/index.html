@@ -1,4 +1,4 @@
-<!DOCTYPE html><!-- DealPilot Landing · landing-kern-1 (11.11.2026: Startseite gekürzt, Preis-Details auf preise.html) -->
+<!DOCTYPE html><!-- DealPilot Landing · landing-kern-2 (11.11.2026: Deal-Check, Geschichten und F&E auf Unterseiten) -->
 <html lang="de"><head>
 <meta charset="utf-8">
 <meta name="google-site-verification" content="sjsXb3XudmYE75JCus789-lKn_IIX5jOySZx50Iy4i0">
@@ -37,7 +37,10 @@
 <script>/* landing-makler-hub-2 · der Makler-Hub steht unter „Für Partner" (loesungen.html); die QR-Codes der Messe-Tafeln zeigen auf /#makler-hub */
 if (location.hash === '#makler-hub') location.replace('loesungen.html#makler-hub');
 /* landing-kern-1 · Partner, Schnittstellen, Kontingent und Matrix stehen auf preise.html - alte Sprungziele weiterleiten */
-if (/^#(partner-plan|module|nachkauf|feature-matrix)$/.test(location.hash)) location.replace('preise.html' + location.hash);</script>
+if (/^#(partner-plan|module|nachkauf|feature-matrix)$/.test(location.hash)) location.replace('preise.html' + location.hash);
+/* landing-kern-2 · die Geschichten stehen auf geschichten.html, F&E auf forschung.html */
+if (location.hash === '#stories') location.replace('geschichten.html');
+if (location.hash === '#forschung') location.replace('forschung.html');</script>
 <link rel="stylesheet" href="dp2.css?v=v2971b">
 <link rel="stylesheet" href="dp2-hero.css?v=landing-zahlen-1">
 <link rel="stylesheet" href="dp2-teile.css?v=v2973">
@@ -46,7 +49,7 @@ if (/^#(partner-plan|module|nachkauf|feature-matrix)$/.test(location.hash)) loca
 <!-- landing-videothek-1 · DealPilot live, F&E, Kanzlei-Zeile -->
 <link rel="stylesheet" href="dp2-live.css?v=landing-makler-hub-3">
 <link rel="stylesheet" href="dp2-module.css?v=landing-module-2">
-<link rel="stylesheet" href="dp2-kern.css?v=landing-kern-1a">
+<link rel="stylesheet" href="dp2-kern.css?v=landing-kern-2">
 </head><body>
 
 <svg style="display:none" aria-hidden="true">
@@ -101,7 +104,8 @@ if (/^#(partner-plan|module|nachkauf|feature-matrix)$/.test(location.hash)) loca
         <li><a href="api.html"><svg class="ico si"><use href="#i-code"/></svg><span><b>API</b><span>REST-Schnittstelle, voller CRUD — im Pro-Plan</span></span></a></li>
         <li><a href="forschung.html"><svg class="ico si"><use href="#i-ziel"/></svg><span><b>Forschung &amp; Entwicklung</b><span>Bescheinigtes Vorhaben: das ganze Portfolio im Blick</span></span></a></li>
       </ul></li>
-    <li><a href="#daten">Datenbasis</a></li>
+    <li><a href="#dealcheck">Deal-Check</a></li>
+    <li><a href="geschichten.html">Geschichten</a></li>
     <li><a href="videothek.html">Videothek</a></li>
     <li><a href="#pricing">Preise<i class="kar"></i></a>
       <ul class="sub">
@@ -321,6 +325,42 @@ if (/^#(partner-plan|module|nachkauf|feature-matrix)$/.test(location.hash)) loca
 </div></div></div>
 <!-- landing-kern-1 · Vertrauensband hinter die Tarife gerückt, damit die Preise auch auf dem Handy in den ersten zwei Bildschirmhöhen stehen -->
 
+<!-- ══ DEAL-CHECK ════════════════════════════════════════════════════
+     landing-kern-2 · Marcel 11.11.2026: öffentlicher Mini-Deal-Check ohne Anmeldung.
+     Rechnet mit den ECHTEN Kernen der App (DealKpis, Dscr, DealScore, ScoreTier) -
+     dp2-dealcheck.js bildet nur die Eingaben ab. Keine Übergabe in die App: dafür gibt
+     es dort noch keinen Weg (geprüft 11.11.2026), der Knopf führt in die Registrierung. -->
+<section class="sec sec-cream dealcheck" id="dealcheck"><div class="wrap">
+  <div class="head ctr rv"><div class="eye ctr">Deal-Check · ohne Anmeldung</div>
+    <h2>Rechnet sich das Objekt? <span class="ac">Prüf es jetzt.</span></h2>
+    <p>Kaufpreis und Kaltmiete eintragen – DealPilot rechnet mit denselben Kernen wie in der App.</p></div>
+  <div class="dc-g rv">
+    <form class="dc-ein" onsubmit="return false" autocomplete="off">
+      <label><span>Kaufpreis</span><input id="dcKp" inputmode="decimal" value="200.000"><i>€</i></label>
+      <label><span>Nettokaltmiete im Monat</span><input id="dcNkm" inputmode="decimal" value="1.100"><i>€</i></label>
+      <label><span>Eigenkapital</span><input id="dcEk" inputmode="decimal" placeholder="20.000"><i>€</i><small>leer = 10 % des Kaufpreises</small></label>
+      <label><span>Zins</span><input id="dcZins" inputmode="decimal" value="4,0"><i>%</i><small id="dcZinsHinweis">Sollzins, 10 Jahre</small></label>
+      <label><span>Nebenkosten</span><input id="dcNk" inputmode="decimal" value="10"><i>%</i><small>Grunderwerbsteuer, Notar, Makler</small></label>
+    </form>
+    <div class="dc-erg leer" id="dcErg" aria-live="polite">
+      <div class="dc-kopf">
+        <div class="dc-ring" id="dcRing"><b id="dcScore">–</b><small>/ 100</small></div>
+        <div><div class="dc-stufe" id="dcStufe">–</div><div class="dc-vorab">Vorab-Einstufung · Deal Score</div></div>
+      </div>
+      <div class="dc-kpi">
+        <div><span>Bruttomietrendite</span><b id="dcBmy">–</b></div>
+        <div><span>Nettomietrendite</span><b id="dcNmy">–</b></div>
+        <div id="dcCfK"><span>Cashflow / Monat vor Steuern</span><b id="dcCf">–</b></div>
+        <div><span>DSCR</span><b id="dcDscr">–</b></div>
+      </div>
+      <p class="dc-annahme" id="dcAnnahme"></p>
+      <a class="btn-p" href="https://app.dealpilot.immo/?register=1">Ganz rechnen — 4 Wochen Pro kostenlos</a>
+      <p class="cta-haken dc-haken"><span>Keine Zahlungsdaten</span><span>Lage, Steuer, Wert und Bankunterlage in der App</span></p>
+      <p class="dc-hinweis">Indikative Vorab-Rechnung, keine Finanzierungs- oder Steuerberatung.</p>
+    </div>
+  </div>
+</div></section>
+
 <!-- ══ DEALPILOT LIVE ════════════════════════════════════════════════
      landing-videothek-1 · Marcel am 16.10.2026: "relativ weit oben, nicht
      direkt am Header, vielleicht danach erst, wie es erklaert ist, und dann
@@ -456,23 +496,7 @@ if (/^#(partner-plan|module|nachkauf|feature-matrix)$/.test(location.hash)) loca
   <p class="btn-reihe"><a class="btn-dark" href="methodik.html">Woher unsere Zahlen kommen — Datenbasis und Prüfung →</a></p>
 </div></section>
 
-<!-- ══ STORIES ═══════════════════════════════════════════════════════ -->
-<section class="sec sec-dark mit-bild" id="stories">
-  <img class="sec-bild" src="assets/bild/stories.jpg" alt="" loading="lazy">
-  <div class="wrap">
-  <div class="head rv"><div class="eye">Aus dem Investor-Alltag</div>
-    <h2>Geschichten, die <span class="ac">jeder Investor kennt.</span></h2></div>
-  <div class="stx-vp rv"><div class="stx-track" id="stxTrack"></div></div>
-  <div class="stx-nav">
-    <div class="stx-dots" id="stxDots"></div>
-    <div class="stx-arr">
-      <button class="stx-a" id="stxPrev" aria-label="Zurück">‹</button>
-      <!-- landing-stories-1 · Play/Pause (Marcel 29.10.2026) -->
-      <button class="stx-a" id="stxPlay" aria-label="Anhalten" aria-pressed="true">❚❚</button>
-      <button class="stx-a" id="stxNext" aria-label="Weiter">›</button>
-    </div>
-  </div>
-</div></section>
+<!-- landing-kern-2 · Die Geschichten stehen auf geschichten.html (Marcel 11.11.2026, Runde 2); /#stories leitet dorthin -->
 
 <!-- ══ FORSCHUNG & ENTWICKLUNG ══════════════════════════════════════
      landing-videothek-1 · Marcel am 16.10.2026: "unter F und E ... die
@@ -481,28 +505,13 @@ if (/^#(partner-plan|module|nachkauf|feature-matrix)$/.test(location.hash)) loca
      Siegel (Fassung 5, Kernabsatz) und dem bescheinigten Vorhaben.
      Bewusst NICHT hier: Verfahren, Messwerte, Schwellen, Aktenzeichen,
      Stunden, Namen. Langfassung: forschung.html ═══════════════════════ -->
-<section class="sec sec-dark fe2" id="forschung"><div class="wrap">
-  <div class="fe2-grid">
-    <a class="fe2-siegel rv" href="forschung.html" aria-label="Zur Seite Forschung und Entwicklung">
-      <img src="assets/bsfz-siegel-2026.svg" alt="FuE-Siegel 2026 der Bescheinigungsstelle Forschungszulage" width="300" height="300" loading="lazy"></a>
-    <div class="rv">
-      <div class="eye">Forschung &amp; Entwicklung · FuE-Siegel 2026</div>
-      <h2 style="font-size:clamp(26px,3.6vw,42px);margin:14px 0 18px">Ein Objekt rechnen kann jeder. <span class="ac" style="color:var(--gdh)">Einen ganzen Bestand aufstellen kaum jemand.</span></h2>
-      <p class="fe2-zitat">„Optimier mir mal meinen Bestand.“</p>
-      <p class="fe2-text">Mit diesem Satz fing es an — als Gedankenspiel mit einem Steuerberater: Ein Mandant mit über
-        100 Objekten sitzt vor dir und sagt genau das. Wo setzt du an? Die Zahlen liegen auf dem Tisch. Was fehlt, ist
-        der Zusammenhang. <b>Aus genau dieser Lücke ist unser Forschungsvorhaben entstanden.</b></p>
-      <div class="fe2-drei">
-        <div><b>Was wir erforschen</b><span>Ob sich ein ganzer Immobilienbestand gemeinsam optimieren lässt — passend zum Investor, statt Objekt für Objekt.</span></div>
-        <div><b>Warum das neu ist</b><span>Im Portfolio hängt alles an allem: Fristen, Grenzen, Freibeträge. Jede Entscheidung bei einem Objekt verändert die Rechnung für alle anderen.</span></div>
-        <div><b>Was du davon hast</b><span>Heute jedes Objekt mit Flugdaten. Morgen dein ganzer Bestand auf Kurs — aufbereitet für das Gespräch in der Kanzlei.</span></div>
-      </div>
-      <a class="btn-l" href="forschung.html">Die ganze Geschichte und das Vorhaben
-        <svg class="ico" style="width:14px;height:14px"><use href="#i-pfeil"/></svg></a>
-      <p class="fe2-fuss">Von der Bescheinigungsstelle Forschungszulage als Forschung und Entwicklung bescheinigt · Laufzeit 2026 bis 2028 · Analyse-Werkzeug, keine Steuerberatung.</p>
-    </div>
-  </div>
-</div></section>
+<!-- landing-kern-2 · F&E nur noch als Band, die ganze Geschichte auf forschung.html -->
+<section class="sec sec-dark" id="forschung" style="padding:40px 0"><div class="wrap"><div class="fe-band rv">
+  <a href="forschung.html" aria-label="Forschung und Entwicklung"><img src="assets/bsfz-siegel-2026.svg" alt="FuE-Siegel 2026 der Bescheinigungsstelle Forschungszulage" width="84" height="84" loading="lazy"></a>
+  <div><h3>Forschung &amp; Entwicklung · FuE-Siegel 2026</h3>
+    <p>Von der Bescheinigungsstelle Forschungszulage als Forschung und Entwicklung bescheinigt: ein ganzer Immobilienbestand, gemeinsam optimiert – passend zum Investor.</p></div>
+  <a class="btn-l" href="forschung.html">Das Vorhaben <svg class="ico" style="width:14px;height:14px"><use href="#i-pfeil"/></svg></a>
+</div></div></section>
 
 <!-- ══ PARTNER & DATENQUELLEN ════════════════════════════════════════ -->
 <section class="sec sec-paper" id="partner"><div class="wrap">
@@ -581,6 +590,14 @@ if (/^#(partner-plan|module|nachkauf|feature-matrix)$/.test(location.hash)) loca
 <!-- dp2-ablauf.js abgeloest durch demo-wechsel.js (v1588) -->
 <script src="dp2.js?v=landing-kern-1"></script>
 <script src="dp2-kern.js?v=landing-kern-1"></script>
+<!-- landing-kern-2 · Deal-Check: die ECHTEN Kerne aus der App, gleiche Buster wie frontend/index.html
+     (tools/buster-ebenen-pruefen.mjs liest die Zeilen unten). Die App-Domain folgt umgebung.js:
+     staging.dealpilot.immo -> app.staging.dealpilot.immo, sonst app.dealpilot.immo. -->
+<script>(function () {
+  var h = location.hostname, app = /(^|\.)staging\.dealpilot\.immo$/.test(h) ? 'https://app.staging.dealpilot.immo/' : 'https://app.dealpilot.immo/';
+  ['js/dscr-engine.js?v=v3031b', 'js/deal-kpis.js?v=v3215', 'js/score-tiers.js?v=v3254', 'js/dealscore.js?v=v3289', 'dp2-dealcheck.js?v=landing-kern-2']
+    .forEach(function (s) { var e = document.createElement('script'); e.src = (s.indexOf('js/') === 0 ? app : '') + s; e.async = false; document.body.appendChild(e); });
+})();</script>
 <script src="dp2-live.js?v=landing-videothek-9"></script><!-- landing-videothek-1 -->
 <!-- v1588: Zwei Funktionen, die der alten Landing schon gehoerten und
      hier gefehlt haben. Beide betreffen Geld, deshalb standen sie ganz
