@@ -44623,3 +44623,9 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Storybook:** `node tools/messe-storybook.mjs` (18 Objekte, 24 Seiten).
   - Die Geschichte Gohliser Str. 42 sagt „Gut“, gespeichert ist 68 Solide (Prod 77). Das ist der alte Staging-Stand; nach dem Speichern mit Lage-Fokus erneut prüfen.
 - **Nachweis:** Blob danach `lage` / 20/22/14/14/30 / ohne eigen. Objekte seit dem Abdruck 08:59 unverändert. Prod nicht angefasst.
+
+### v3295–v3298a · Flow Investor Punkte 2, 6, 5, 4 (11.11.2026, Staging)
+- **Was:** Offerte serverseitig (`offertePayload`, `flowOfferte`, `POST /objects/:id/offerte`); Kosten-Freigabe (`kostenFreigabe`, `routes/kosten.js`, `kosten_token` in `runReport`, Telegram-Weg); Co-Pilot über die API (`flowAgent`, `routes/agent.js`, `agentLauf` Option `schreibenVormerken`); ImmoMetrica-Stände/Ereignisse (`immometricaFlow`, `GET /immometrica/ereignisse`, Job per `FLOW_IMMOMETRICA_JOB` aus). Migrationen 099, 100. Doku `api-doku.html#flow`.
+- **Commit:** `5bcc5de6`, `9904f8df`, `d27eb1a3`, `c5b1256b`, `8c1d5899` (Doku), v3298a `c85d10f9`
+- **Nachweis:** Prüfer grün: `offerte-payload` (6), `kosten-freigabe` (33), `flow-agent` (12), `immometrica-flow` (24), `flow-zugang` (Z3 je Route), `prompt-lecks`, `flow-berechnen`, `score-ketten`, `saat`, `wertermittlung`, `jahreswerte`, `kappungsgrenzen`, `frontend-konstanten`. Staging: Sicherung beider DBs (`*-20261111-1043-v3298`, 72/46 MB, Kopf geprüft), Migrationen 099/100 angewandt, Job-Meldung „AUS“. Echter Lauf mit Wegwerf-Konto 20/20 grün (Offerte 1 KI-Abruf, Kosten 402/403 ohne Abruf, Agent 1 Lauf mit Vorschlag → Bestätigung), danach gelöscht. ImmoMetrica-Messung 1 Abruf: 600/Monat, 158 genutzt.
+- **Rest:** Prod (Migrationen 099/100 → Backend-Rebuild). Freigabe des ImmoMetrica-Jobs durch Marcel. Echter kostenpflichtiger Bericht mit Token bei der Abnahme.
