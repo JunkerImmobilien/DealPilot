@@ -36,6 +36,16 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
+### N152 · Landing „Kern“: Startseite kürzen, Preise oben, Datenbasis gemessen, SEO (Marcel 11.11.2026) — **landing-kern-1/1a (`a9593297`, `11de45e5`) auf Staging nachgemessen 11.11.2026; Prod offen (Marcel soll die Optik erst sehen)**
+- **Startseite** 11.952 → 8.851 px (1440 px): kompakte Tarifkarten direkt nach Hero (Preise ab 944 px, Karten enden 1.660 px; Handy 390: Preise ab 1.448, erste Karte 1.692 px), Zusagen am Knopf (keine Zahlungsdaten · 4 Wochen Pro · danach automatisch Free, belegt: config.js `trial_days` 28, `plan_trials`), neuer Abschnitt **#daten**.
+- **Gewandert:** Partner & Whitelabel, Mandantenstaffel, Rechenkerne-Module, Kontingent, Cockpit-Matrix → `preise.html` (alte Sprungziele `/#partner-plan|module|nachkauf|feature-matrix` leiten weiter); Live-Marktzinsen → `methodik.html`.
+- **methodik.html** heißt jetzt „Datenbasis und Prüfung“: Grundsätze, Umfang, Abruftakte, Prüfung, Grenzen, Rechtsrahmen — kein Rechenweg mehr (15-Kapitel-Fassung in git vor `a9593297`); PDF `assets/dealpilot-methodik.pdf` entlinkt und per robots gesperrt, Datei liegt noch.
+- **Datenumfang gemessen** (`tools/datenumfang-messen.mjs`, Staging nur lesend): 1.099.779 amtliche Datenpunkte (Zensus 894.880, Regionaldatenbank 108.137, Bautätigkeit 56.128, AK OGA 28.827, Register 6.187, GAA-Kennzahlen 2.557, Indizes 299, Bundesbank 2.764), 36 amtliche Dienste/Tabellen (10 BORIS-Dienste, 24 Statistik-Tabellen/Reihen, Bundesbank, AK OGA), 118 Ausschuss-Portale.
+- **Fuß** aller Landing-Seiten: „DealPilot ist eine Marke von Junker Solution“, © Junker Solution; Sachverständigenbüro bleibt als eigene Spalte verlinkt. **6085** → 6.187 statisch.
+- **SEO:** title mit Suchbegriff, canonical, og/twitter mit `assets/og-dealpilot.jpg` (1200×630), JSON-LD SoftwareApplication (4 Angebote aus config.js), FAQPage (27 Fragen, `tools/faq-schema.mjs`), Sitemap + preise.html.
+- **Hero-Video** lädt erst nach dem Laden und nur ab 900 px (`dp2-kern.js`); Handy lädt nur das Poster.
+- **Offen:** Prod-Rollout nach Marcels Blick; Schnellcheck (Vorschlag, nicht gebaut); Löschen der Methodik-PDF; Kundenstimmen (keine erfunden); `leistungsumfang.html` Z. 303 „Wir bei Junker Immobilien prüfen …“ (Betreiber-Formulierung?).
+
 ### N151 · Partner-Branding für das Partnergespräch 12.11. (Partner-Demo, 11.11.2026) — **v3299/v3299a (`616d4aea`, `60d783d5`) auf Staging nachgemessen; Prod offen (Marcel)**
 Befund und Vorher/Nachher: `Dateien/Partner-Demo/Befund.md` (Abschnitt „Stand nach v3299a“), Bilder je Marke unter `<Marke>/nachher/`.
 - **Logo-Kontrast (L1/L4/L10):** `js/logo-kontrast.js` vermisst beim Speichern im Portal, legt je Grund ein PNG ab (Migration 101). Gemessen: Kessler dunkler Grund 1,03 → 14,81 : 1 (weiß eingefärbt), Nordwind heller Grund 1,02 → 18,4 : 1 (dunkel eingefärbt), Lumen eigene Fläche unverändert. Schienen-Logo 84×21 → 216×54 px. Zweites Feld „Logo für dunklen Grund“ mit Vorrang, Ampel im Portal.
