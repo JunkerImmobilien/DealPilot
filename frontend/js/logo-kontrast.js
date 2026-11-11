@@ -109,7 +109,7 @@
   function entscheidung(m, gruende) {
     var hell = lum(gruende[0]) > 0.5;
     var k = Math.min.apply(null, gruende.map(function (g) { return kontrast(m.mittel, g); }));
-    if (m.eigeneFlaeche) return { art: 'unveraendert', k: rund(k), k_nachher: rund(k), grund: 'eigene Flaeche' };
+    if (m.eigeneFlaeche) return { art: 'unveraendert', k: null, k_nachher: null, k_mittel: rund(k), grund: 'eigene Flaeche' };   /* der Mittelwert misst hier die Flaeche, nicht das Zeichen */
     if (k >= MINDEST) return { art: 'unveraendert', k: rund(k), k_nachher: rund(k), grund: 'Kontrast reicht' };
     if (m.streuung < 45) {
       var tinte = hell ? TINTE_DUNKEL : [255, 255, 255];

@@ -368,7 +368,7 @@
            (gemessen Kessler, Staging). Dort traegt es jetzt die Klasse der
            Schiene (.dpl-logo: hoechstens 46 x 176 px, Seitenverhaeltnis
            bleibt) - sonst wie bisher 1,5em. Die Variante waehlt der Grund. */
-        var gross = el.classList && el.classList.contains('dpl-wm');
+        var gross = el.classList && (el.classList.contains('dpl-wm') || el.classList.contains('dpl-marke'));   /* gemessen: der Sweeper trifft .dpl-marke selbst */
         el.innerHTML = '<img data-wl-logo="1" src="' + String(_logoFuer(el)).replace(/"/g, '&quot;') + '" alt=""' +
           (gross ? ' class="dpl-logo" style="display:block"'
                  : ' style="max-height:1.5em;max-width:150px;vertical-align:middle"') + '>';
