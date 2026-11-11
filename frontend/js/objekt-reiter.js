@@ -43,7 +43,11 @@
     var _mp = modPunkte();
     return { plz: _v('plz'), ort: _v('ort'), str: _v('str'), hnr: _v('hnr'), objart: _v('objart'),
              baujahr: _v('baujahr'), einheiten: _v('einheiten'), nutzungsart: _v('nutzungsart'), wfl: _v('wfl'),
-             mod_punkte: _mp ? _mp.total : null, modernis: _v('modernis') };
+             mod_punkte: _mp ? _mp.total : null, modernis: _v('modernis'),
+             /* v3294: Grundstueck, BGF, Gebaeudeart und eigene WGFZ gehen mit - ohne sie konnte
+                der Endpunkt die WGFZ nie ableiten (v3293), der Reiter meldete „fehlt die Grundstuecksflaeche“. */
+             gsfl: _v('gsfl'), bgf: _v('bgf'), wgfz_objekt: _v('wgfz_objekt'),
+             nhk_haus: _v('nhk_haus'), nhk_geschosse: _v('nhk_geschosse'), nhk_dach: _v('nhk_dach') };
   }
 
   /* ═══ Automatik-Leiste ═══════════════════════════════════════════════ */
