@@ -512,7 +512,7 @@
     }
     r.qm = og; r.gekappt = true;
     r.text = 'Zielmiete auf die Mietpreisbremse begrenzt: eingetragen ' + eur2(ein).replace(/\s*€$/, '') + ' → ' + eur2(og) + '/m²'
-      + ' (Vergleichsmiete ' + eur2(vgl) + ' + 10 %, § 556d BGB; höher nur mit höherer Vormiete § 556e oder nach umfassender Modernisierung § 556f — dann die Ausnahme eintragen)';
+      + ' (Vergleichsmiete ' + eur2(vgl) + '/m² + 10 %, § 556d BGB; höher nur mit höherer Vormiete § 556e oder nach umfassender Modernisierung § 556f — dann die Ausnahme eintragen)';
     return r;
   }
 
