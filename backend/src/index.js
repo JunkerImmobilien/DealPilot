@@ -479,11 +479,12 @@ async function start() {
   // lifecycle_config.enabled=false (sendet/loescht nichts). Scharf nur ueber Admin 'Kundenbindung'.
   try {
     const lifecycleService = require('./services/lifecycleService');
-    const _runLc = function () {
-      lifecycleService.scan({}).then(function (r) {
+    /* v3311: jeder Takt unter seiner Sperre (utils/taktSperre.js) - mit zwei Instanzen laeuft er nur einmal */
+    const _runLc = require('./utils/taktSperre').takt('lifecycle', function () {
+      return lifecycleService.scan({}).then(function (r) {
         console.log('[lifecycle] scan: enabled=' + r.enabled + ' dryRun=' + r.dryRun + ' actions=' + r.count);
       }).catch(function (e) { console.error('[lifecycle] scan failed:', e && e.message); });
-    };
+    });
     setTimeout(_runLc, 60000);                  // einmal ~1min nach Boot
     setInterval(_runLc, 24 * 60 * 60 * 1000);   // danach taeglich
   } catch (e) { console.error('[lifecycle] init failed:', e && e.message); }
@@ -492,7 +493,7 @@ async function start() {
   try {
     const retentionService = require('./services/retentionService');
     const _RET_INTERVAL_MS = 24 * 60 * 60 * 1000; // taeglich
-    const _runRetention = async () => {
+    const _runRetention = require('./utils/taktSperre').takt('retention', async () => {   /* v3311 */
       try {
         const r = await retentionService.runOnce({ dryRun: false });
         console.log('[retention] Lauf fertig:',
@@ -502,7 +503,7 @@ async function start() {
       } catch (e) {
         console.error('[retention] Lauf-Fehler:', e.message);
       }
-    };
+    });
     setTimeout(_runRetention, 60 * 1000);          // erster Lauf 60s nach Start
     setInterval(_runRetention, _RET_INTERVAL_MS);  // danach taeglich
     console.log('✓ Retention-Scheduler aktiv (taeglich)');
@@ -512,13 +513,13 @@ async function start() {
        'mieterhoehung'). Die Termine rechnet das Frontend beim Speichern (_soll_einheiten). */
     try {
       const mhErinnerung = require('./services/mieterhoehungErinnerung');
-      const _runMh = async () => {
+      const _runMh = require('./utils/taktSperre').takt('mieterhoehung', async () => {   /* v3311 */
         try {
           const r = await mhErinnerung.runOnce({ dryRun: false });
           console.log('[mieterhoehung] Lauf fertig: Nutzer', r.nutzer, '| Termine', r.termine,
             '| gesendet', r.gesendet, 'in', r.mails, 'Mails | schon erinnert', r.uebersprungen, '| Fehler', r.fehler);
         } catch (e) { console.error('[mieterhoehung] Lauf-Fehler:', e.message); }
-      };
+      });
       setTimeout(_runMh, 2 * 60 * 1000);           // erster Lauf 2 min nach Start
       setInterval(_runMh, _RET_INTERVAL_MS);       // danach taeglich
     } catch (e) { console.error('[mieterhoehung] init failed:', e && e.message); }
@@ -541,7 +542,7 @@ async function start() {
        weder den Anbieter noch den Nutzer.
        ══════════════════════════════════════════════════════════════════ */
     const _SEC_LOESCH_MS = 24 * 60 * 60 * 1000;
-    const _secAufraeumen = async () => {
+    const _secAufraeumen = require('./utils/taktSperre').takt('sicherheitLoeschen', async () => {   /* v3311 */
       try {
         const db = require('./db/pool');
         const r1 = await db.query(
@@ -572,7 +573,7 @@ async function start() {
       } catch (e) {
         console.error('[sec-retention] Lauf-Fehler:', e.message);
       }
-    };
+    });
     setTimeout(_secAufraeumen, 90 * 1000);
     setInterval(_secAufraeumen, _SEC_LOESCH_MS);
     console.log('✓ Sicherheits-Loeschlauf aktiv (90 Tage / 3 Jahre)');
@@ -594,13 +595,13 @@ async function start() {
      aus, bleiben die alten Werte stehen und es steht im Log. */
   try {
     const plansSync = require('./db/plans-preise-sync');
-    setTimeout(function () {
-      plansSync.sync({}).then(function (r) {
+    setTimeout(require('./utils/taktSperre').takt('plansSync', function () {   /* v3311 */
+      return plansSync.sync({}).then(function (r) {
         if (!r.ok) console.warn('[plans-sync] uebersprungen:', r.reason);
       }).catch(function (e) {
         console.error('[plans-sync] fehlgeschlagen:', e && e.message);
       });
-    }, 15000);
+    }), 15000);
   } catch (e) {
     console.error('✗ plans-sync konnte nicht starten:', e.message);
   }

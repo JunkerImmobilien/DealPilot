@@ -21,6 +21,7 @@
 //   docker exec dealpilot-mb-backend npm run makro
 
 import { pool, q } from '../lib/db.js';
+import { takt as _taktSperre } from '../lib/taktSperre.js';   /* v3311: Sperre gegen Doppellauf */
 import { DestatisConnector } from '../connectors/stubConnectors.js';
 import { destatisEnabled } from '../lib/config.js';
 
@@ -393,8 +394,9 @@ async function durchgangGemeinden() {
 }
 export function starteMakroTakt() {
   if (String(process.env.MAKRO_IMPORT || '1') !== '1') { console.log('[makro] Takt aus (MAKRO_IMPORT=0)'); return; }
-  setTimeout(durchgang, 3 * 60 * 1000);
-  setInterval(durchgang, TAKT_MS);
+  const _dg = _taktSperre('makro', durchgang);   /* v3311 */
+  setTimeout(_dg, 3 * 60 * 1000);
+  setInterval(_dg, TAKT_MS);
   console.log('[makro] Takt an: alle 12 h pruefen, alle ' + ALTER_TAGE + ' Tage holen');
 }
 

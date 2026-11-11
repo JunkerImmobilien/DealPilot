@@ -20,6 +20,7 @@
 //
 // Aus: JAHRESWERTE_TAKT=0. Von Hand: POST /api/v1/marktbericht/jahreswerte/abruf.
 import { q } from '../lib/db.js';
+import { takt as _taktSperre } from '../lib/taktSperre.js';   /* v3311: Sperre gegen Doppellauf */
 import { REIHEN, holeSeite, holeGenesis, pruefe } from '../lib/destatis_reihen.js';
 import { BPI_TABELLE, uebernimmAbruf as bpiUebernehmen } from '../lib/baupreisindex.js';
 import { VPI_OKTOBER_IMMOWERTV, uebernimmVpiOktober } from '../lib/nrw_modell.js';
@@ -192,8 +193,9 @@ async function durchgang() {
 export function starteJahreswerteTakt() {
   ladeAktive().then((g) => console.log('[jahreswerte] geladen: ' + JSON.stringify(g))).catch(() => {});
   if (String(process.env.JAHRESWERTE_TAKT || '1') !== '1') { console.log('[jahreswerte] Takt aus (JAHRESWERTE_TAKT=0)'); return; }
-  setTimeout(durchgang, 5 * 60 * 1000);
-  setInterval(durchgang, TAKT_MS);
+  const _dg = _taktSperre('jahreswerte', durchgang);   /* v3311 */
+  setTimeout(_dg, 5 * 60 * 1000);
+  setInterval(_dg, TAKT_MS);
   console.log('[jahreswerte] Takt an: taeglich pruefen, Reihen alle ' + ABRUF_ALTER_TAGE + ' Tage, Angebotsabschlag ab 15.01.');
 }
 

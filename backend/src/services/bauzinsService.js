@@ -487,7 +487,11 @@ function clearCache() { _cache = null; }
 /* Takt: einmal kurz nach dem Start, wenn der letzte Abruf aelter als
    ein Tag ist; danach taeglich um 18:00 Serverzeit. */
 function starteTakt() {
-  async function _wennAlt() {
+  /* v3311: beide Laeufe unter derselben Sperre (utils/taktSperre.js) */
+  const _ts = require('../utils/taktSperre');
+  const _wennAlt = _ts.takt('bauzins', _wennAltRoh);
+  const _taeglich = _ts.takt('bauzins', _taeglichRoh);
+  async function _wennAltRoh() {
     try {
       var db = _db();
       var r = await db.query('SELECT max(abgerufen_at) AS a FROM markt_zins_tag');
@@ -499,7 +503,7 @@ function starteTakt() {
     } catch (e) { console.warn('[bauzins] Startpruefung: ' + e.message); }
     try { await aktualisieren(); } catch (e) { console.warn('[bauzins] Startabruf fehlgeschlagen: ' + e.message); }
   }
-  async function _taeglich() {
+  async function _taeglichRoh() {
     try { await aktualisieren(); } catch (e) { console.warn('[bauzins] Tagesabruf fehlgeschlagen: ' + e.message); }
   }
   setTimeout(_wennAlt, 20 * 1000);

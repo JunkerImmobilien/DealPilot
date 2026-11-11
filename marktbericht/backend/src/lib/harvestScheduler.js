@@ -16,6 +16,7 @@
 
 import { HarvestService } from '../services/HarvestService.js';
 import { q } from './db.js';
+import { takt as _taktSperre } from './taktSperre.js';   /* v3311: Sperre gegen Doppellauf */
 
 const AN = () => String(process.env.HARVEST_SCHEDULER || '1') === '1';
 const TAKT_MS = 6 * 60 * 60 * 1000;          // alle 6 Stunden nachsehen
@@ -96,7 +97,8 @@ export function starteHarvestScheduler() {
   if (!AN()) { console.log('[harvest] Taktgeber aus (HARVEST_SCHEDULER=0)'); return; }
   laufLaden();
   // Erster Durchgang mit Verzoegerung: der Start soll nicht davon abhaengen.
-  setTimeout(durchgang, 90 * 1000);
-  setInterval(durchgang, TAKT_MS);
+  const _dg = _taktSperre('harvest', durchgang);   /* v3311 */
+  setTimeout(_dg, 90 * 1000);
+  setInterval(_dg, TAKT_MS);
   console.log('[harvest] Taktgeber an, alle 6 Stunden');
 }

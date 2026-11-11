@@ -15,6 +15,7 @@
 // Von Hand im Container:  docker exec dealpilot-mb-backend node src/services/BaustatistikService.js
 
 import { pool, q } from '../lib/db.js';
+import { takt as _taktSperre } from '../lib/taktSperre.js';   /* v3311: Sperre gegen Doppellauf */
 import { DestatisConnector as D } from '../connectors/stubConnectors.js';
 import { destatisEnabled } from '../lib/config.js';
 import { entpackeZip } from '../lib/destatis_reihen.js';
@@ -305,8 +306,9 @@ async function durchgang() {
 }
 export function starteBaustatistikTakt() {
   if (String(process.env.BAUSTATISTIK_IMPORT || '1') !== '1') { console.log('[baustatistik] Takt aus'); return; }
-  setTimeout(durchgang, 20 * 60 * 1000);   /* nach dem Makro-Import (3 min), damit sich die Abrufe nicht stauen */
-  setInterval(durchgang, TAKT_MS);
+  const _dg = _taktSperre('baustatistik', durchgang);   /* v3311 */
+  setTimeout(_dg, 20 * 60 * 1000);   /* nach dem Makro-Import (3 min), damit sich die Abrufe nicht stauen */
+  setInterval(_dg, TAKT_MS);
 }
 
 if (process.argv[1] && process.argv[1].endsWith('BaustatistikService.js')) {

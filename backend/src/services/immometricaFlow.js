@@ -183,12 +183,12 @@ function eingeschaltet() { return String(process.env.FLOW_IMMOMETRICA_JOB || '')
 function starten() {
   if (!eingeschaltet()) { console.log('[immometrica-flow] Job AUS (FLOW_IMMOMETRICA_JOB != an)'); return false; }
   const stunden = Math.max(1, Number(process.env.FLOW_IMMOMETRICA_STUNDEN) || 6);
-  const runde = async () => {
+  const runde = require('../utils/taktSperre').takt('immometricaFlow', async () => {   /* v3311 */
     try {
       const r = await query("SELECT DISTINCT z.user_id FROM user_zusaetze z JOIN user_provider_credentials c ON c.user_id = z.user_id AND c.provider = 'immometrica' WHERE z.zusatz='flow' AND z.aktiv AND z.linien ? 'investor'");
       for (const u of r.rows) { try { const b = await lauf(u.user_id); console.log('[immometrica-flow] ' + u.user_id + ' ' + JSON.stringify(b)); } catch (e) { console.warn('[immometrica-flow] ' + u.user_id + ': ' + e.message); } }
     } catch (e) { console.warn('[immometrica-flow] Runde: ' + e.message); }
-  };
+  });
   setInterval(runde, stunden * 3600 * 1000);
   console.log('[immometrica-flow] Job AN, alle ' + stunden + ' h');
   return true;
