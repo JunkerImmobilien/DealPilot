@@ -207,9 +207,9 @@
       "id": "grenzsteuer_vorgabe",
       "name": "Grenzsteuersatz-Vorgabe (Profil-Default)",
       "gruppe": "steuer",
-      "stand": "42 %",
-      "erwartet": "42",
-      "quelle": "Produktvorgabe ohne Herleitung: Altwert aus V1.0 (Initial 13.05.2026, Feld grenz value=40.45), in V226 (B4.2) als 'Marcel-spezifisch' bezeichnet, in v1257 als Profil-Default uebernommen. v3269 Marcel 09.11.2026: 'ist immer individuell, nimm 42' -> 42 % (Einkommensteuer-Satz ab Tarifzone 4, ohne Soli/KiSt)",
+      "stand": "40,45 %",
+      "erwartet": "40.45",
+      "quelle": "Produktvorgabe ohne Herleitung: Altwert aus V1.0 (Initial 13.05.2026, Feld grenz value=40.45), in V226 (B4.2) als 'Marcel-spezifisch' bezeichnet, in v1257 als Profil-Default uebernommen. NICHT '42 % x 1,055' - das waeren 44,31 % (v3268 korrigiert). v3269 kurz 42 %, v3280 Marcel 11.11.2026: zurueck auf 40,45 %",
       "turnus": "bei Tarifwechsel durchsehen",
       "faellig_am": "2027-01-15",
       "verfahren": "durchsicht",
@@ -218,7 +218,7 @@
         { "datei": "frontend/js/bmf-modal.js", "bezeichner": "var grenz", "muster": "var grenz = ([\\d.]+);", "nimm": "alle", "faktor": 100 },
         { "datei": "backend/src/services/bmfPipelineService.js", "bezeichner": "GRENZSTEUER_DEFAULT", "muster": "GRENZSTEUER_DEFAULT = ([\\d.]+);", "faktor": 100 }
       ],
-      "hinweis": "v3268: Zur Entscheidung (Marcel): 40,45 % behalten (Altwert) oder ableiten - z. B. 42 % + Soli 5,5 % = 44,31 %, oder 42 % ohne Soli (Soli-Freigrenze greift bei den meisten Anlegern). Bei aktivem Haken 'Grenzsteuersatz automatisch aus zvE' wirkt die Vorgabe ohnehin nicht."
+      "hinweis": "Entschieden 11.11.2026 (Marcel, v3280): 40,45 %. Bei aktivem Haken Grenzsteuersatz automatisch aus zvE wirkt die Vorgabe ohnehin nicht."
     },
     {
       "id": "anlage_v",

@@ -1115,7 +1115,7 @@ window.DealPilotConfig = (function() {
       min_cashflow_vor_st:    0,      // €/Monat
       max_ltv:                90,     // %
       // Steuern
-      grenzsteuersatz:        42,     /* % — v3269 Marcel 09.11.2026: „ist immer individuell, nimm 42“ (vorher 40,45) */
+      grenzsteuersatz:        40.45,  /* % — war 42, nie wirksam */
       // Bundesland (für Grunderwerbsteuer-Default)
       bundesland:             'NW',   // ISO-Kürzel
       // Nebenkosten-Pauschalen

@@ -202,7 +202,7 @@ function setDefaults() {
   sv('anschl_bj', 15);
   // zaer wird automatisch aus anschl_z - d1z berechnet
   sv('geb_ant',  80);
-  sv('grenz',    _dpProfilWert('grenzsteuersatz', 42));
+  sv('grenz',    _dpProfilWert('grenzsteuersatz', 40.45));
   /* ══ v1740d · DAS zvE AUS DEM STEUERZEITRAUM VORBELEGEN ══
      Marcel am 01.10.2026: „was macht es, wenn wir ein zvE unter Mandanten
      anlegen?"
@@ -211,7 +211,7 @@ function setDefaults() {
 
        Steuerzeitraum 2026   zvE 68.000, DB-gebunden, exact
        gespeichertes Objekt  zvE 90.000 -> Grenzsatz 42,00, Feld gesperrt
-       NEUES Objekt          zvE LEER   -> Grenzsatz 42 aus dem Profil (v3269; vorher 40,45)
+       NEUES Objekt          zvE LEER   -> Grenzsatz 40,45 aus dem Profil
 
      Das System kannte die Zahl also und fragte trotzdem danach. Wer sie
      nicht jedes Mal von Hand nachträgt, rechnet jedes neue Objekt gegen

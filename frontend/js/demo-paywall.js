@@ -39,7 +39,7 @@ var DemoMode = (function() {
     nul_sonst: '0',
     // Steuer
     zve: '50000',
-    grenz: '42',
+    grenz: '40.45',
     afa_satz: '2.0',
     geb_ant: '80',
     // Finanzierung

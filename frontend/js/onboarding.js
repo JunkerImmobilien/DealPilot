@@ -557,13 +557,13 @@ window.DealPilotOnboarding = (function () {
       + 'Steuerwirkung deiner Immobilie — Abschreibung, Werbungskosten, '
       + 'Cashflow nach Steuern.</p>'
       + '<div class="dpo-raster dpo-raster-2">'
-      +   _num('dpo_grenz', 'Grenzsteuersatz', profil('grenzsteuersatz', 42), '%',
+      +   _num('dpo_grenz', 'Grenzsteuersatz', profil('grenzsteuersatz', 40.45), '%',
           'Nicht dein Durchschnittssatz, sondern der Satz auf den nächsten Euro. '
         + 'Er ist immer höher als der Durchschnitt und ist die richtige Größe, '
         + 'wenn man wissen will, was eine zusätzliche Einnahme oder eine '
-        + 'Abschreibung wirklich bringt. Vorbelegt mit 42 % — der Satz, der für Alleinstehende ab knapp '
-        + '70.000 € zu versteuerndem Einkommen gilt (ohne Soli und Kirchensteuer). '
-        + 'Er ist immer individuell — trag deinen eigenen ein.')
+        + 'Abschreibung wirklich bringt. Vorbelegt mit 40,45 % — das ist der '
+        + 'Satz eines Alleinstehenden mit rund 66.000 € zu versteuerndem '
+        + 'Einkommen (Einkommensteuer; Soli fällt dort noch nicht an).')
       + '</div>'
       /* ══ v1750 · WAS DER RECHNER TUT, UND WO DIE ZAHL STEHT ══════════
          Marcel: „Bei der Steuer, was macht der genau? … Man sollte nur genau
