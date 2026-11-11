@@ -67,8 +67,8 @@ if (!window._pdfGold) {
       '.rp-ov{position:fixed;inset:0;z-index:99999;background:rgba(8,7,5,.62);display:flex;align-items:center;justify-content:center;padding:22px;backdrop-filter:blur(2px)}',
       '.rp-modal{width:100%;max-width:1080px;max-height:92vh;background:#fff;border-radius:16px;overflow:hidden;border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 40%, transparent);box-shadow:0 40px 100px rgba(0,0,0,.6);display:flex;flex-direction:column}',
       '.rp-bar{background:#0b0b0a;display:flex;align-items:center;padding:14px 22px}',
-      '.rp-logo{font:700 18px "Space Grotesk";color:#fff}.rp-logo b{color:var(--wl-c9a84c, #C9A84C)}',
-      '.rp-ctx{margin-left:auto;font:600 11px "JetBrains Mono";letter-spacing:.22em;color:var(--wl-c9a84c, #C9A84C);text-transform:uppercase}',
+      '.rp-logo{font:700 18px "Space Grotesk";color:#fff}.rp-logo b{color:var(--rp-akzent-dunkel, var(--wl-c9a84c, #C9A84C))}',
+      '.rp-ctx{margin-left:auto;font:600 11px "JetBrains Mono";letter-spacing:.22em;color:var(--rp-akzent-dunkel, var(--wl-c9a84c, #C9A84C));text-transform:uppercase}',
       '.rp-x{margin-left:20px;width:30px;height:30px;border-radius:50%;border:1px solid rgba(255,255,255,.15);color:#fff;font-size:15px;cursor:pointer;background:none}',
       '.rp-hero{background:linear-gradient(105deg,var(--wl-e8cc7a, #E8CC7A),var(--wl-c9a84c, #C9A84C) 52%,var(--wl-b8932f, #b8932f));padding:20px 28px}',
       '.rp-hero h1{font:600 28px "Cormorant Garamond",serif;color:var(--rp-tinte, #241c05);line-height:1.05}',
@@ -80,7 +80,7 @@ if (!window._pdfGold) {
       '.rp-nav .t{font:600 13px "Space Grotesk";color:rgba(255,255,255,.82)}',
       '.rp-nav .s{font-size:10.5px;color:rgba(255,255,255,.38);margin-top:1px}',
       '.rp-nav:hover{background:rgba(255,255,255,.04)}',
-      '.rp-nav.on{background:#161511;box-shadow:inset 2px 0 0 var(--wl-c9a84c, #C9A84C)}.rp-nav.on svg{stroke:var(--wl-c9a84c, #C9A84C)}.rp-nav.on .t{color:var(--wl-c9a84c, #C9A84C)}',
+      '.rp-nav.on{background:#161511;box-shadow:inset 2px 0 0 var(--rp-akzent-dunkel, var(--wl-c9a84c, #C9A84C))}.rp-nav.on svg{stroke:var(--rp-akzent-dunkel, var(--wl-c9a84c, #C9A84C))}.rp-nav.on .t{color:var(--rp-akzent-dunkel, var(--wl-c9a84c, #C9A84C))}',
       '.rp-work{flex:1;background:#fff;padding:24px 30px;overflow-y:auto}',
       '.rp-intro{font-size:13px;color:#6f685d;font-style:italic;margin-bottom:22px}',
       '.rp-label{font:600 10.5px "JetBrains Mono";letter-spacing:.16em;text-transform:uppercase;color:var(--wl-9a7f3a, #9a7f3a);margin:0 0 14px}',
@@ -175,6 +175,13 @@ if (!window._pdfGold) {
       var dunkel = (Math.max(la, ld) + 0.05) / (Math.min(la, ld) + 0.05) >= 4.5;
       if (dunkel) { r.removeProperty('--rp-tinte'); r.removeProperty('--rp-tinte-2'); }
       else { r.setProperty('--rp-tinte', '#ffffff'); r.setProperty('--rp-tinte-2', 'rgba(255,255,255,.86)'); }
+      /* Akzent als Schrift auf der schwarzen Leiste/Seitenleiste: bei dunklem
+         Partnerakzent (Bordeaux auf #161511 ~1,6 : 1) der fuer dunklen Grund
+         aufgehellte Ton --gold-2 (whitelabel-override, tonAufDunkel). Nur mit
+         Whitelabel - ohne bleibt es das Gold von heute. */
+      var wl = (cs.getPropertyValue('--wl-c9a84c') || '').trim();
+      var g2 = (cs.getPropertyValue('--gold-2') || '').trim();
+      if (wl && g2) r.setProperty('--rp-akzent-dunkel', g2); else r.removeProperty('--rp-akzent-dunkel');
     } catch (e) {}
   }
   window._rpTinte = _rpTinte;
@@ -433,7 +440,7 @@ if (!window._pdfGold) {
       '.rp-os-ov{position:fixed;inset:0;z-index:100000;background:rgba(8,7,5,.7);display:flex;align-items:center;justify-content:center;padding:22px;backdrop-filter:blur(2px)}',
       '.rp-os{width:100%;max-width:760px;max-height:92vh;background:#fff;border-radius:16px;overflow:hidden;border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 40%, transparent);box-shadow:0 40px 100px rgba(0,0,0,.6);display:flex;flex-direction:column}',
       '.rp-os-bar{background:#0b0b0a;display:flex;align-items:center;padding:14px 22px}',
-      '.rp-os-bar .l{font:700 17px "Space Grotesk";color:#fff}.rp-os-bar .l b{color:var(--wl-c9a84c, #C9A84C)}',
+      '.rp-os-bar .l{font:700 17px "Space Grotesk";color:#fff}.rp-os-bar .l b{color:var(--rp-akzent-dunkel, var(--wl-c9a84c, #C9A84C))}',
       '.rp-os-bar .x{margin-left:auto;width:30px;height:30px;border-radius:50%;border:1px solid rgba(255,255,255,.15);color:#fff;font-size:15px;cursor:pointer;background:none}',
       '.rp-os-hero{background:linear-gradient(105deg,var(--wl-e8cc7a, #E8CC7A),var(--wl-c9a84c, #C9A84C) 52%,var(--wl-b8932f, #b8932f));padding:18px 26px}',
       '.rp-os-hero h1{font:600 24px "Cormorant Garamond",serif;color:var(--rp-tinte, #241c05);line-height:1.05}.rp-os-hero p{font-size:12px;color:var(--rp-tinte-2, #3a2e08);margin-top:2px}',
