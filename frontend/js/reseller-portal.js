@@ -43,7 +43,7 @@ if (!window._pdfGold) {
     try {
       var t = document.createElement('div');
       t.textContent = m;
-      t.style.cssText = 'position:fixed;left:50%;bottom:26px;transform:translateX(-50%);z-index:100001;background:#0b0b0a;color:#fff;border:1px solid #C9A84C;border-radius:10px;padding:12px 20px;font:600 13.5px Inter;box-shadow:0 12px 40px rgba(0,0,0,.5);max-width:80vw;text-align:center;pointer-events:none';
+      t.style.cssText = 'position:fixed;left:50%;bottom:26px;transform:translateX(-50%);z-index:100001;background:#0b0b0a;color:#fff;border:1px solid var(--wl-c9a84c, #C9A84C);border-radius:10px;padding:12px 20px;font:600 13.5px Inter;box-shadow:0 12px 40px rgba(0,0,0,.5);max-width:80vw;text-align:center;pointer-events:none';
       document.body.appendChild(t);
       setTimeout(function () { t.style.transition = 'opacity .4s'; t.style.opacity = '0'; setTimeout(function () { t.remove(); }, 400); }, 2600);
     } catch (e) {}
@@ -65,14 +65,14 @@ if (!window._pdfGold) {
     var st = document.createElement('style'); st.id = 'rp-css';
     st.textContent = [
       '.rp-ov{position:fixed;inset:0;z-index:99999;background:rgba(8,7,5,.62);display:flex;align-items:center;justify-content:center;padding:22px;backdrop-filter:blur(2px)}',
-      '.rp-modal{width:100%;max-width:1080px;max-height:92vh;background:#fff;border-radius:16px;overflow:hidden;border:1px solid rgba(201,168,76,.4);box-shadow:0 40px 100px rgba(0,0,0,.6);display:flex;flex-direction:column}',
+      '.rp-modal{width:100%;max-width:1080px;max-height:92vh;background:#fff;border-radius:16px;overflow:hidden;border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 40%, transparent);box-shadow:0 40px 100px rgba(0,0,0,.6);display:flex;flex-direction:column}',
       '.rp-bar{background:#0b0b0a;display:flex;align-items:center;padding:14px 22px}',
-      '.rp-logo{font:700 18px "Space Grotesk";color:#fff}.rp-logo b{color:#C9A84C}',
-      '.rp-ctx{margin-left:auto;font:600 11px "JetBrains Mono";letter-spacing:.22em;color:#C9A84C;text-transform:uppercase}',
+      '.rp-logo{font:700 18px "Space Grotesk";color:#fff}.rp-logo b{color:var(--wl-c9a84c, #C9A84C)}',
+      '.rp-ctx{margin-left:auto;font:600 11px "JetBrains Mono";letter-spacing:.22em;color:var(--wl-c9a84c, #C9A84C);text-transform:uppercase}',
       '.rp-x{margin-left:20px;width:30px;height:30px;border-radius:50%;border:1px solid rgba(255,255,255,.15);color:#fff;font-size:15px;cursor:pointer;background:none}',
-      '.rp-hero{background:linear-gradient(105deg,#E8CC7A,#C9A84C 52%,#b8932f);padding:20px 28px}',
-      '.rp-hero h1{font:600 28px "Cormorant Garamond",serif;color:#241c05;line-height:1.05}',
-      '.rp-hero p{font-size:12.5px;color:#3a2e08;margin-top:2px}',
+      '.rp-hero{background:linear-gradient(105deg,var(--wl-e8cc7a, #E8CC7A),var(--wl-c9a84c, #C9A84C) 52%,var(--wl-b8932f, #b8932f));padding:20px 28px}',
+      '.rp-hero h1{font:600 28px "Cormorant Garamond",serif;color:var(--rp-tinte, #241c05);line-height:1.05}',
+      '.rp-hero p{font-size:12.5px;color:var(--rp-tinte-2, #3a2e08);margin-top:2px}',
       '.rp-body{display:flex;flex:1;min-height:0}',
       '.rp-side{width:238px;flex-shrink:0;background:#0d0d0c;padding:13px 11px;display:flex;flex-direction:column}',
       '.rp-nav{display:flex;align-items:center;gap:11px;padding:11px 12px;border-radius:9px;margin-bottom:3px;cursor:pointer;background:none;border:none;text-align:left;width:100%}',
@@ -80,37 +80,37 @@ if (!window._pdfGold) {
       '.rp-nav .t{font:600 13px "Space Grotesk";color:rgba(255,255,255,.82)}',
       '.rp-nav .s{font-size:10.5px;color:rgba(255,255,255,.38);margin-top:1px}',
       '.rp-nav:hover{background:rgba(255,255,255,.04)}',
-      '.rp-nav.on{background:#161511;box-shadow:inset 2px 0 0 #C9A84C}.rp-nav.on svg{stroke:#C9A84C}.rp-nav.on .t{color:#C9A84C}',
+      '.rp-nav.on{background:#161511;box-shadow:inset 2px 0 0 var(--wl-c9a84c, #C9A84C)}.rp-nav.on svg{stroke:var(--wl-c9a84c, #C9A84C)}.rp-nav.on .t{color:var(--wl-c9a84c, #C9A84C)}',
       '.rp-work{flex:1;background:#fff;padding:24px 30px;overflow-y:auto}',
       '.rp-intro{font-size:13px;color:#6f685d;font-style:italic;margin-bottom:22px}',
-      '.rp-label{font:600 10.5px "JetBrains Mono";letter-spacing:.16em;text-transform:uppercase;color:#9a7f3a;margin:0 0 14px}',
+      '.rp-label{font:600 10.5px "JetBrains Mono";letter-spacing:.16em;text-transform:uppercase;color:var(--wl-9a7f3a, #9a7f3a);margin:0 0 14px}',
       '.rp-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:16px}',
       '.rp-stat{border:1px solid #e6e0d4;border-radius:13px;padding:16px 18px;background:#FDFCFA}',
       '.rp-stat .l{font:600 9.5px "JetBrains Mono";letter-spacing:.12em;text-transform:uppercase;color:#9a9284}',
-      '.rp-stat .v{font:600 30px "Space Grotesk";margin-top:6px}.rp-stat.zug .v{color:#3FA56C}.rp-stat.frei .v{color:#b8932f}',
+      '.rp-stat .v{font:600 30px "Space Grotesk";margin-top:6px}.rp-stat.zug .v{color:#3FA56C}.rp-stat.frei .v{color:var(--wl-b8932f, #b8932f)}',
       '.rp-poolbar{height:9px;border-radius:5px;background:#efe9dc;overflow:hidden;display:flex;border:1px solid #e6e0d4}',
-      '.rp-poolbar i{display:block;height:100%}.rp-poolbar .z{background:#3FA56C}.rp-poolbar .f{background:linear-gradient(105deg,#E8CC7A,#C9A84C,#b8932f)}',
-      '.rp-buy{margin-top:20px;background:linear-gradient(105deg,#E8CC7A,#C9A84C 52%,#b8932f);color:#241c05;font:700 13.5px Inter;padding:12px 20px;border-radius:10px;border:none;cursor:pointer}',
+      '.rp-poolbar i{display:block;height:100%}.rp-poolbar .z{background:#3FA56C}.rp-poolbar .f{background:linear-gradient(105deg,var(--wl-e8cc7a, #E8CC7A),var(--wl-c9a84c, #C9A84C),var(--wl-b8932f, #b8932f))}',
+      '.rp-buy{margin-top:20px;background:linear-gradient(105deg,var(--wl-e8cc7a, #E8CC7A),var(--wl-c9a84c, #C9A84C) 52%,var(--wl-b8932f, #b8932f));color:var(--rp-tinte, #241c05);font:700 13.5px Inter;padding:12px 20px;border-radius:10px;border:none;cursor:pointer}',
       '.rp-panel{border:1px solid #e6e0d4;border-radius:14px;padding:20px 22px;margin-top:18px}',
       '.rp-row{display:flex;align-items:flex-end;gap:24px;flex-wrap:wrap}',
       '.rp-fl{font:600 9.5px "JetBrains Mono";letter-spacing:.1em;text-transform:uppercase;color:#9a9284;margin-bottom:8px}',
       '.rp-seg{display:inline-flex;background:#f1ece0;border-radius:9px;padding:3px;border:1px solid #e6e0d4}',
-      '.rp-seg button{padding:8px 14px;font:600 12.5px Inter;border-radius:7px;color:#6f685d;border:none;background:none;cursor:pointer}.rp-seg button.on{background:#C9A84C;color:#241c05}',
+      '.rp-seg button{padding:8px 14px;font:600 12.5px Inter;border-radius:7px;color:#6f685d;border:none;background:none;cursor:pointer}.rp-seg button.on{background:var(--wl-c9a84c, #C9A84C);color:var(--rp-tinte, #241c05)}',
       '.rp-step{display:flex;border:1px solid #e6e0d4;border-radius:9px;overflow:hidden}',
-      '.rp-step button{width:38px;height:42px;font-size:19px;color:#b8932f;background:#f7f2e8;border:none;cursor:pointer}',
+      '.rp-step button{width:38px;height:42px;font-size:19px;color:var(--wl-b8932f, #b8932f);background:#f7f2e8;border:none;cursor:pointer}',
       '.rp-step input{width:54px;height:42px;text-align:center;border:none;font:600 16px "JetBrains Mono";outline:none;color:#1c1a17}',
-      '.rp-price{margin-left:auto;text-align:right}.rp-price .per{font-size:12px;color:#6f685d}.rp-price .per b{color:#b8932f;font-family:"JetBrains Mono"}',
+      '.rp-price{margin-left:auto;text-align:right}.rp-price .per{font-size:12px;color:#6f685d}.rp-price .per b{color:var(--wl-b8932f, #b8932f);font-family:"JetBrains Mono"}',
       '.rp-price .tot{font:600 24px "Space Grotesk";margin-top:2px}.rp-price .tot small{font-size:13px;color:#6f685d;font-weight:400}',
       '.rp-buyfoot{display:flex;align-items:center;gap:14px;margin-top:18px;padding-top:16px;border-top:1px solid #e6e0d4}',
       '.rp-staffel{font-size:11.5px;color:#6f685d;line-height:1.6}.rp-staffel b{color:#1c1a17}',
-      '.rp-checkout{margin-left:auto;background:linear-gradient(105deg,#E8CC7A,#C9A84C,#b8932f);color:#241c05;font:700 13px Inter;padding:11px 20px;border-radius:9px;border:none;cursor:pointer}',
+      '.rp-checkout{margin-left:auto;background:linear-gradient(105deg,var(--wl-e8cc7a, #E8CC7A),var(--wl-c9a84c, #C9A84C),var(--wl-b8932f, #b8932f));color:var(--rp-tinte, #241c05);font:700 13px Inter;padding:11px 20px;border-radius:9px;border:none;cursor:pointer}',
       '.rp-mrow{display:flex;align-items:center;gap:15px;padding:14px 4px;border-bottom:1px solid #e6e0d4}.rp-mrow:last-child{border-bottom:none}',
-      '.rp-av{width:38px;height:38px;border-radius:10px;background:#f6ecd0;color:#b8932f;display:flex;align-items:center;justify-content:center;font:600 14px "Space Grotesk";flex-shrink:0}',
+      '.rp-av{width:38px;height:38px;border-radius:10px;background:var(--wl-f6ecd0, #f6ecd0);color:var(--wl-b8932f, #b8932f);display:flex;align-items:center;justify-content:center;font:600 14px "Space Grotesk";flex-shrink:0}',
       '.rp-nm{font:600 14px "Space Grotesk"}.rp-mt{font-size:12px;color:#6f685d;margin-top:2px}',
       '.rp-mr{margin-left:auto;display:flex;align-items:center;gap:14px}',
       '.rp-seat{font:600 10px "JetBrains Mono";padding:5px 11px;border-radius:20px;white-space:nowrap}.rp-seat.on{background:#e2f0e6;color:#3FA56C}.rp-seat.off{background:#f0ece2;color:#6f685d}',
-      '.rp-act{font:600 12.5px Inter;padding:8px 14px;border-radius:8px;border:1px solid #e6e0d4;background:#fff;cursor:pointer;white-space:nowrap}.rp-act.assign{color:#b8932f}.rp-act.remove{color:#B86250;border-color:#e6cbc5}',
-      '.rp-add{border:1px solid #e6e0d4;color:#b8932f;font:600 12.5px Inter;padding:8px 14px;border-radius:8px;background:#fff;cursor:pointer;float:right}',
+      '.rp-act{font:600 12.5px Inter;padding:8px 14px;border-radius:8px;border:1px solid #e6e0d4;background:#fff;cursor:pointer;white-space:nowrap}.rp-act.assign{color:var(--wl-b8932f, #b8932f)}.rp-act.remove{color:#B86250;border-color:#e6cbc5}',
+      '.rp-add{border:1px solid #e6e0d4;color:var(--wl-b8932f, #b8932f);font:600 12.5px Inter;padding:8px 14px;border-radius:8px;background:#fff;cursor:pointer;float:right}',
       '.rp-share{border:1px solid #e6e0d4;border-radius:12px;padding:16px 18px;margin-bottom:11px;display:flex;align-items:center;gap:15px;background:#FDFCFA}',
       '.rp-bg{font:600 9.5px "JetBrains Mono";letter-spacing:.06em;background:#fbeed8;color:#c8791f;padding:4px 9px;border-radius:6px;margin-left:auto}',
       '.rp-ph{color:#9a9284;font-size:13px;padding:30px 0;text-align:center;font-style:italic}',
@@ -139,7 +139,7 @@ if (!window._pdfGold) {
       '  .rp-side{width:100%!important;flex:0 0 auto!important;flex-direction:row!important;overflow-x:auto!important;overflow-y:hidden!important;padding:8px 10px!important;gap:6px!important;-webkit-overflow-scrolling:touch}',
       '  .rp-nav{width:auto!important;flex:0 0 auto!important;min-width:44px!important;min-height:44px!important;white-space:nowrap!important;margin-bottom:0!important;padding:9px 12px!important}',
       '  .rp-nav .s{display:none!important}',
-      '  .rp-nav.on{box-shadow:inset 0 -2px 0 #C9A84C!important}',
+      '  .rp-nav.on{box-shadow:inset 0 -2px 0 var(--wl-c9a84c, #C9A84C)!important}',
       '  .rp-work{flex:1 1 auto!important;min-height:0!important;padding:18px 16px!important}',
       '  .rp-foot{padding:10px 16px!important}',
       '}'
@@ -156,9 +156,33 @@ if (!window._pdfGold) {
   };
 
   // ── Modal öffnen ───────────────────────────────────────────
+  /* v3301 · Text auf Akzentflaechen (Hero, Kauf-Knopf, Segment): der Partner
+     sieht das Portal jetzt in SEINER Farbe. Dunkler Text (#241c05) war fuer
+     Gold gebaut - auf Bordeaux waere er unlesbar. Je nach Akzent hell oder
+     dunkel, gemessen nach WCAG (>= 4,5 : 1 fuer dunkel, sonst weiss). */
+  function _rpTinte() {
+    try {
+      var cs = getComputedStyle(document.documentElement);
+      var a = (cs.getPropertyValue('--wl-c9a84c') || cs.getPropertyValue('--gold') || '').trim();
+      var r = document.documentElement.style;
+      if (!/^#[0-9a-f]{6}$/i.test(a)) { r.removeProperty('--rp-tinte'); r.removeProperty('--rp-tinte-2'); return; }
+      var lum = function (h) {
+        var c = [1, 3, 5].map(function (i) { var x = parseInt(h.substr(i, 2), 16) / 255;
+          return x <= 0.03928 ? x / 12.92 : Math.pow((x + 0.055) / 1.055, 2.4); });
+        return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
+      };
+      var la = lum(a), ld = lum('#241c05');
+      var dunkel = (Math.max(la, ld) + 0.05) / (Math.min(la, ld) + 0.05) >= 4.5;
+      if (dunkel) { r.removeProperty('--rp-tinte'); r.removeProperty('--rp-tinte-2'); }
+      else { r.setProperty('--rp-tinte', '#ffffff'); r.setProperty('--rp-tinte-2', 'rgba(255,255,255,.86)'); }
+    } catch (e) {}
+  }
+  window._rpTinte = _rpTinte;
+
   function openResellerPortal() {
     if (_st.open) return;
     injectCss();
+    _rpTinte();
     var ov = document.createElement('div'); ov.className = 'rp-ov'; ov.id = 'rp-overlay';
     ov.innerHTML =
       '<div class="rp-modal" role="dialog" aria-modal="true">' +
@@ -402,22 +426,23 @@ if (!window._pdfGold) {
   function _num(v, d) { v = _n(v); return v == null ? '–' : v.toLocaleString('de-DE', { maximumFractionDigits: d == null ? 2 : d }); }
 
   function _osCss() {
+    _rpTinte();   /* v3301 */
     if ($('rp-os-css')) return;
     var s = document.createElement('style'); s.id = 'rp-os-css';
     s.textContent = [
       '.rp-os-ov{position:fixed;inset:0;z-index:100000;background:rgba(8,7,5,.7);display:flex;align-items:center;justify-content:center;padding:22px;backdrop-filter:blur(2px)}',
-      '.rp-os{width:100%;max-width:760px;max-height:92vh;background:#fff;border-radius:16px;overflow:hidden;border:1px solid rgba(201,168,76,.4);box-shadow:0 40px 100px rgba(0,0,0,.6);display:flex;flex-direction:column}',
+      '.rp-os{width:100%;max-width:760px;max-height:92vh;background:#fff;border-radius:16px;overflow:hidden;border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 40%, transparent);box-shadow:0 40px 100px rgba(0,0,0,.6);display:flex;flex-direction:column}',
       '.rp-os-bar{background:#0b0b0a;display:flex;align-items:center;padding:14px 22px}',
-      '.rp-os-bar .l{font:700 17px "Space Grotesk";color:#fff}.rp-os-bar .l b{color:#C9A84C}',
+      '.rp-os-bar .l{font:700 17px "Space Grotesk";color:#fff}.rp-os-bar .l b{color:var(--wl-c9a84c, #C9A84C)}',
       '.rp-os-bar .x{margin-left:auto;width:30px;height:30px;border-radius:50%;border:1px solid rgba(255,255,255,.15);color:#fff;font-size:15px;cursor:pointer;background:none}',
-      '.rp-os-hero{background:linear-gradient(105deg,#E8CC7A,#C9A84C 52%,#b8932f);padding:18px 26px}',
-      '.rp-os-hero h1{font:600 24px "Cormorant Garamond",serif;color:#241c05;line-height:1.05}.rp-os-hero p{font-size:12px;color:#3a2e08;margin-top:2px}',
+      '.rp-os-hero{background:linear-gradient(105deg,var(--wl-e8cc7a, #E8CC7A),var(--wl-c9a84c, #C9A84C) 52%,var(--wl-b8932f, #b8932f));padding:18px 26px}',
+      '.rp-os-hero h1{font:600 24px "Cormorant Garamond",serif;color:var(--rp-tinte, #241c05);line-height:1.05}.rp-os-hero p{font-size:12px;color:var(--rp-tinte-2, #3a2e08);margin-top:2px}',
       '.rp-os-body{padding:22px 26px;overflow-y:auto}',
       '.rp-os-kpi{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px;margin-bottom:20px}',
       '.rp-os-k{border:1px solid #e6e0d4;border-radius:11px;padding:11px 13px;background:#fdfbf6}',
-      '.rp-os-k .t{font:600 9px "JetBrains Mono";letter-spacing:.12em;text-transform:uppercase;color:#9a7f3a}',
+      '.rp-os-k .t{font:600 9px "JetBrains Mono";letter-spacing:.12em;text-transform:uppercase;color:var(--wl-9a7f3a, #9a7f3a)}',
       '.rp-os-k .v{font:700 18px "Space Grotesk";color:#1c1a17;margin-top:3px}',
-      '.rp-os-sec{font:600 10px "JetBrains Mono";letter-spacing:.15em;text-transform:uppercase;color:#9a7f3a;margin:18px 0 10px}',
+      '.rp-os-sec{font:600 10px "JetBrains Mono";letter-spacing:.15em;text-transform:uppercase;color:var(--wl-9a7f3a, #9a7f3a);margin:18px 0 10px}',
       '.rp-os-dl{display:grid;grid-template-columns:1fr 1fr;gap:8px 24px}',
       '.rp-os-dl .r{display:flex;justify-content:space-between;border-bottom:1px solid #f0ebdf;padding:6px 0;font-size:13px}',
       '.rp-os-dl .r .k{color:#6f685d}.rp-os-dl .r .v{font-weight:600;color:#1c1a17}',
@@ -718,7 +743,7 @@ if (!window._pdfGold) {
         '<p class="rp-intro">Dein Whitelabel — Logo, Akzentfarbe und Kontaktdaten erben deine Mandanten: in der App, in den Einladungs-Mails und im Fuß jedes PDFs.</p>' +
         '<div class="rp-panel">' +
           '<label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:13.5px">' +
-            '<input type="checkbox" id="rp-b-wl"' + (b.whitelabel_enabled ? ' checked' : '') + ' style="width:18px;height:18px;accent-color:#C9A84C">' +
+            '<input type="checkbox" id="rp-b-wl"' + (b.whitelabel_enabled ? ' checked' : '') + ' style="width:18px;height:18px;accent-color:var(--wl-c9a84c, #C9A84C)">' +
             '<span>Whitelabel aktiv — eigenes Branding statt DealPilot</span></label>' +
           '<div style="display:flex;gap:12px;margin-top:16px">' +
             '<div style="flex:1"><div class="rp-fl">Marken-/Kanzleiname</div><input id="rp-b-name" value="' + esc(b.brand_name || '') + '" style="' + inp + '"></div>' +
@@ -902,7 +927,7 @@ if (!window._pdfGold) {
         '<div style="height:4px;background:' + esc(accent) + '"></div>' +
         '<div style="padding:18px;background:#fff">' +
           '<div style="font-size:13px;color:#3a352c">' + (wl ? '<b>' + esc(brandName) + '</b> lädt dich ein.' : '<b>' + esc(brandName) + '</b> lädt dich zu DealPilot ein.') + '</div>' +   /* v3299 */
-          '<div style="margin-top:12px"><span style="background:' + esc(accent) + ';color:#241c05;font-weight:700;padding:9px 16px;border-radius:8px;font-size:13px;display:inline-block">Einladung annehmen</span></div>' +
+          '<div style="margin-top:12px"><span style="background:' + esc(accent) + ';color:var(--rp-tinte, #241c05);font-weight:700;padding:9px 16px;border-radius:8px;font-size:13px;display:inline-block">Einladung annehmen</span></div>' +
         '</div></div>';
   }
   function _v(id) { var el = $(id); return el && el.value ? String(el.value).trim() : ''; }
@@ -954,6 +979,7 @@ if (!window._pdfGold) {
         name: _v('rp-b-name') || '',
         logo: _currentLogo() || ''
       });
+      _rpTinte();   /* v3301 · Hero-Text folgt der Vorschaufarbe */
     } catch (e) {}
   }
   async function saveBranding() {
@@ -1027,9 +1053,9 @@ if (!window._pdfGold) {
       if (!info || !info.valid) return;
       var b = document.createElement('div');
       b.id = 'rp-invite-banner';
-      b.style.cssText = 'position:fixed;left:0;right:0;bottom:0;z-index:99998;background:#0b0b0a;color:#fff;border-top:2px solid #C9A84C;padding:14px 22px;display:flex;align-items:center;gap:12px;font-family:Inter,sans-serif;font-size:13.5px;flex-wrap:wrap';
-      b.innerHTML = '<span style="flex:1;min-width:220px"><b style="color:#E8CC7A">' + esc(info.brand_name) + '</b> hat dich zu DealPilot eingeladen. Leg ein Konto mit <b>' + esc(info.email) + '</b> an, um loszulegen.</span>' +
-        '<button id="rp-inv-reg" style="background:linear-gradient(105deg,#E8CC7A,#C9A84C,#b8932f);color:#241c05;border:none;border-radius:8px;padding:9px 16px;font-weight:700;cursor:pointer;font-family:inherit">Konto anlegen</button>' +
+      b.style.cssText = 'position:fixed;left:0;right:0;bottom:0;z-index:99998;background:#0b0b0a;color:#fff;border-top:2px solid var(--wl-c9a84c, #C9A84C);padding:14px 22px;display:flex;align-items:center;gap:12px;font-family:Inter,sans-serif;font-size:13.5px;flex-wrap:wrap';
+      b.innerHTML = '<span style="flex:1;min-width:220px"><b style="color:var(--wl-e8cc7a, #E8CC7A)">' + esc(info.brand_name) + '</b> hat dich zu DealPilot eingeladen. Leg ein Konto mit <b>' + esc(info.email) + '</b> an, um loszulegen.</span>' +
+        '<button id="rp-inv-reg" style="background:linear-gradient(105deg,var(--wl-e8cc7a, #E8CC7A),var(--wl-c9a84c, #C9A84C),var(--wl-b8932f, #b8932f));color:var(--rp-tinte, #241c05);border:none;border-radius:8px;padding:9px 16px;font-weight:700;cursor:pointer;font-family:inherit">Konto anlegen</button>' +
         '<button id="rp-inv-login" style="background:none;border:1px solid rgba(255,255,255,.2);color:#fff;border-radius:8px;padding:9px 14px;cursor:pointer;font-family:inherit">Schon ein Konto</button>' +
         '<button id="rp-inv-x" style="background:none;border:none;color:rgba(255,255,255,.5);cursor:pointer;font-size:18px;font-family:inherit">✕</button>';
       document.body.appendChild(b);
