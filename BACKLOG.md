@@ -36,6 +36,11 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
+### N154 · Partner-Paket ohne inklusive Kundenplätze + Seat-Abgleich im Webhook (Marcel 11.11.2026, Preis freigegeben) — **ERLEDIGT 11.11.2026 auf Staging, v3303 (`9db0623f`); Prod offen (mit dem Staging-Stand, wartet auf N152)**
+- `INKLUSIV_MANDANTEN` 3 → 0, `getPool` inklusiv 0 / bezahlt = gekauft. Preisseite, FAQ (+ JSON-LD), Portal-Kaufpanel ohne „3 Plätze inklusive“.
+- Stripe-Webhook gleicht `partner_seats` selbst ab (Checkout, Abo angelegt/geändert/gekündigt), idempotent, nur freie Plätze werden abgebaut. Prüfer `tools/partner-seats-webhook-pruefen.mjs` 18/18.
+- Staging gemessen: frischer Partner 0, Kessler & Roth 3/3/0 unverändert. Demo-Partner mit Abo (voraussichtlich Marcel Junker 13 → 10, Nordwind 4 → 1) verlieren beim nächsten Portal-Aufruf die freien Inklusiv-Plätze.
+
 ### N153 · Partner sieht seine Marke selbst (Marcel 11.11.2026: „Er stellt sich das ein für seine Firma und sieht das selber auch. Das muss auf beiden Seiten so sein.“) — **v3301/v3301a/v3301b (`9ba776de`, `cf2be764`, `ab7c31da`) auf Staging nachgemessen 11.11.2026; Prod offen**
 - **Ursache:** `GET /reseller-invite/my-branding` lieferte nur an `reseller_clients` (Kommentar „nicht für den Owner“). Alle Leser hängen daran: `mandant-branding.js` (App, PDFs, Tab-Titel, Boarding-Zeile), `qc-whitelabel.js`, `mb-whitelabel.js`, der PDF-Dienst.
 - **Änderung:** zweiter Weg im Backend für Owner und Mitglieder (`reseller_members`), **nie für Admins** (info@ führt auf Staging den Test-Reseller „Schmidt & Partner“), gleiche Rangfolge wie `getResellerForUser`; Antwort trägt `rolle: 'mandant' | 'partner'`. Beim Partner gilt nur die MARKE — `brand_display` (seine Vorgabe für Mandanten) wird bei ihm nicht angewandt, seine Darstellung „für mich“ bleibt. Portal: Haken „Ansicht meiner Mandanten“ beim Partner durch Hinweis ersetzt; 31 Stilzeilen in `reseller-portal.js` auf `var(--wl-*)` (gold-audit 46 → 4, Basislinie 408 → 366), Text auf Akzentflächen hell/dunkel nach Kontrast (`_rpTinte`), Akzent als Schrift auf Schwarz über `--gold-2`.
