@@ -157,6 +157,7 @@ pruef('Z6 ohne Schluessel: neuer mit Bereich flow, einmal im Klartext', r6.berei
 LAGE.verbKey = null;
 r6 = await hub.bereichNachziehen({ id: 9, user_id: 'u1', api_key_id: null }, [], null);
 pruef('Z6 ohne Linie: nichts', r6.bereich === null && !r6.api_key && LAGE.verbKey === null, r6);
+pruef('Z3 POST /objects/:id/offerte ist Flow-Route', flow.istFlowRoute('POST', '/api/v1/objects/' + ID + '/offerte'));
 pruef('Z3 GET/PUT /flow/profil ist Flow-Route', flow.istFlowRoute('GET', '/api/v1/flow/profil') && flow.istFlowRoute('PUT', '/api/v1/flow/profil'));
 
 console.log('flow-zugang-pruefen: ' + (n - fehler) + ' von ' + n + ' gruen');

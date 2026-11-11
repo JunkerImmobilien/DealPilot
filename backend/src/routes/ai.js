@@ -2186,3 +2186,6 @@ module.exports.copilotKontingent = {
 
 /* v3025 · fuer tools/agent-pruefung/pruef-objektwissen.js: derselbe Weg wie die Route */
 module.exports.copilotObjektwissen = _copilotObjektwissen;
+
+/* v3295 · Flow Investor Punkt 2 (services/flowOfferte.js): derselbe Marktbericht-Verlauf wie /analyze */
+module.exports.mbHistoryFor = _mbHistoryFor;

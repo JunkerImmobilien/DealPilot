@@ -37,6 +37,7 @@ const FLOW_ROUTEN = [
   ['PUT',  new RegExp('^/api/v1/objects/' + UUID + '/?$')],
   ['GET',  new RegExp('^/api/v1/objects/' + UUID + '/wissen/?$')],
   ['POST', new RegExp('^/api/v1/objects/' + UUID + '/berechnen/?$')],
+  ['POST', new RegExp('^/api/v1/objects/' + UUID + '/offerte/?$')],   /* v3295 · Punkt 2 */
   ['GET',  new RegExp('^/api/v1/dateien/?$')],
   ['GET',  new RegExp('^/api/v1/dateien/speicher/?$')],
   ['GET',  new RegExp('^/api/v1/dateien/' + UUID + '/?$')],

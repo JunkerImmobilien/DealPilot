@@ -111,6 +111,28 @@ router.post('/:id/berechnen', validate({ params: idParamSchema, body: berechnenS
     } catch (err) { next(err); }
   });
 
+/* v3295 · Flow Investor, Punkt 2: Offerte nur mit der Objekt-Id (services/flowOfferte.js). Der Server baut den
+   Auftrag selbst und ruft dieselbe Analyse wie /ai/analyze (Deckelung auf den Kaufpreis, Bestandsmodus).
+   Gespeichert als ai_analysis, nichts wird versendet. Body: { expectedVersion, speichern:false, vorschau:true }. */
+const offerteSchema = z.object({
+  expectedVersion: z.number().int().positive().optional(),
+  speichern: z.boolean().optional(),
+  vorschau: z.boolean().optional()
+});
+router.post('/:id/offerte', validate({ params: idParamSchema, body: offerteSchema }), requireFlowLinie('investor'),
+  async (req, res, next) => {
+    try {
+      const b = req.body || {};
+      const erg = await require('../services/flowOfferte').offerte(req.user.id, req.params.id,
+        { expectedVersion: b.expectedVersion, speichern: b.speichern, vorschau: b.vorschau === true });
+      res.set('Cache-Control', 'no-store');
+      res.json(erg);
+    } catch (err) {
+      if (!err.statusCode && err.status) return res.status(502).json({ error: 'OpenAI-Fehler: ' + err.message });
+      next(err);
+    }
+  });
+
 router.get('/:id/wissen', validate({ params: idParamSchema }), async (req, res, next) => {
   try {
     const obj = await objectService.getById(req.user.id, req.params.id);
