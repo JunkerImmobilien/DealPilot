@@ -42,6 +42,8 @@ const FLOW_ROUTEN = [
   ['GET',  new RegExp('^/api/v1/dateien/speicher/?$')],
   ['GET',  new RegExp('^/api/v1/dateien/' + UUID + '/?$')],
   ['POST', new RegExp('^/api/v1/dateien/?$')],
+  /* v3297 · Punkt 5: Co-Pilot */
+  ['POST', new RegExp('^/api/v1/agent/(frage|bestaetigen|verwerfen)/?$')],
   /* v3296 · Punkt 6: Freigabe und Marktbericht mit kosten_token */
   ['POST', new RegExp('^/api/v1/kosten/(anfrage|freigeben|ablehnen)/?$')],
   ['GET',  new RegExp('^/api/v1/marktbericht/stufenpreis/?$')],

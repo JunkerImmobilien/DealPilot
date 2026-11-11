@@ -366,6 +366,14 @@ async function laufen(frage, ctx, opts) {
           hinweis: 'Dieser Abruf kostet Guthaben und wurde NICHT ausgefuehrt. '
                  + 'Nenne dem Nutzer den Preis (marktbericht_preis) und frage, '
                  + 'ob er ihn abrufen soll.' };
+      } else if (w.stufe === 'schreiben' && typeof o.schreibenVormerken === 'function') {
+        /* v3297 · Flow Investor Punkt 5 (POST /agent/frage): schreibende Werkzeuge laufen ueber die
+           Schnittstelle NICHT sofort - sie werden als Vorschlag vorgemerkt und erst mit
+           POST /agent/bestaetigen { token } ausgefuehrt. Telegram uebergibt die Funktion nicht und
+           bleibt wie bisher. */
+        let args = {};
+        try { args = a.args ? JSON.parse(a.args) : {}; } catch (e) { args = {}; }
+        ergebnis = await o.schreibenVormerken(a.name, args);
       } else {
         try {
           const args = a.args ? JSON.parse(a.args) : {};
