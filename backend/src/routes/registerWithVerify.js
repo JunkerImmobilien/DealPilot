@@ -132,6 +132,14 @@ router.post('/register-with-verify', registerLimiter, async (req, res) => {
     );
     const user = r.rows[0];
 
+    /* v3316 · Testphase auch auf DIESEM Weg (Marcel 11.11.2026: Landing verspricht an jedem Knopf
+       „4 Wochen voller Pro-Umfang“). Die App registriert ueber diese Route mit eigenem INSERT -
+       userService.createUser (der „einzige Trichter“) wird hier NICHT durchlaufen, deshalb bekam
+       seit v2136 kein neuer Nutzer seine 28 Tage (gemessen Prod: 0 von 9 Registrierungen der letzten
+       60 Tage mit plan_trials). gewaehreTestphase wirft nie und vergibt nie doppelt. */
+    try { await userService.gewaehreTestphase(user.id, user.email); }
+    catch (e) { console.error('[register-verify] Testphase fehlgeschlagen:', e.message); }
+
     // Verify-Token generieren
     const token = await emailVerifyService.createVerifyToken(user.id);
     const verifyUrl = `${process.env.APP_URL || baseUrl}/api/v1/auth/verify-email?token=${token}`;
