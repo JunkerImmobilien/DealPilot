@@ -3892,6 +3892,7 @@ function _calcImmediate(){
             ? _mtxYear(totals.ergebnis, r.cal, (totals.values && Number(totals.values.schuldzinsen)) || 0)
             : totals.taxDelta;
           r.cfns_y = r.cfop_y - r.tax_y;
+          if (typeof totals.ergebnis === 'number' && isFinite(totals.ergebnis)) r.zve_steuer = totals.ergebnis;   /* v3314a: steuerliches Ergebnis des Jahres (mit Einmalkosten) */
         }
         _taxKumNew += (r.tax_y || 0);
         // V119: Komponenten konsistent zu cfns_y akkumulieren
@@ -3928,7 +3929,7 @@ function _calcImmediate(){
         if (_hR && isFinite(_hR.cfop_y) && isFinite(_hR.cfns_y)) {
           State.kpis.heute = { jahr: _hR.cal, idx: _hIdx, nkm: _hR.nkm_y, bwk: _hR.bwk_y, bwk_cf: _hR.bwk_cf_y,
             zins: _hR.zy, tilg: _hR.ty, bspar: _hR.bspar_y || 0, su: _hR.su_y || 0, cf_op: _hR.cfop_y,
-            steuer: _hR.tax_y, cf_ns: _hR.cfns_y, afa: _hR.afa_y, zve: _hR.zve_y };
+            steuer: _hR.tax_y, cf_ns: _hR.cfns_y, afa: _hR.afa_y, zve: (typeof _hR.zve_steuer === 'number') ? _hR.zve_steuer : _hR.zve_y };
           State.kpis.cf_op = _hR.cfop_y;
           State.kpis.cf_ns = _hR.cfns_y;
           State.kpis.cf_m  = _hR.cfop_y / 12;
@@ -5095,8 +5096,8 @@ function renderPhaseTable() {
   }
 
   // Heute column
-  setF('ph-wm-now', K.nkm_j);
-  setF('ph-bwk-now', -K.bwk_cf);
+  setF('ph-wm-now', K.heute ? nowVals.wm : K.nkm_j);   /* v3314a */
+  setF('ph-bwk-now', -(K.heute ? nowVals.bwk : K.bwk_cf));
   setF('ph-zins-now', -nowVals.zins);
   setF('ph-tilg-now', -_tilgOrBsparNow);
   setF('ph-cfvst-now', nowVals.cfvst);
