@@ -187,6 +187,42 @@ nav.inhalt a{color:var(--text);font-size:14px}
 <div class="kasten"><strong>Freigaben:</strong> je Stufe <code>auto</code>, <code>frage</code> oder <code>nie</code>, Voreinstellung <code>frage</code>. <code>auto</code> geht nur mit <code>monatsgrenze_eur</code> über 0 (sonst 400) und wird mit Zeitpunkt und Weg vermerkt. <code>min_dscr</code> und <code>min_cashflow_monat</code> sind dieselben Werte wie die Mindest-Schwellen der App. <code>POST /objects/:id/berechnen</code> rechnet mit den Zielen: <code>min_bruttorendite</code> als Zielrendite (wenn die Lageklasse keine hat), <code>max_kaufpreis</code> und <code>max_faktor</code> als Obergrenzen des Zielpreises (<code>zielpreis_grund</code> nennt die greifende), dazu <code>quickcheck.ziele</code> mit Soll, Ist und erfüllt.</div>
 <p><strong>Schlüssel-Bereich:</strong> <code>GET /hub/konto</code> zieht den Bereich des Hub-Schlüssels selbst nach, wenn sich die Linien ändern (<code>paket.api_key_bereich</code>). Hatte die Verbindung noch keinen Schlüssel, kommt er einmal als <code>api_key</code> in dieser Antwort.</p>
 
+<!-- v3295-v3298 · Punkte 2, 6, 5, 4 -->
+<h3><span class="m">POST</span> /objects/:id/offerte · Offerte nur mit der Objekt-Id</h3>
+<p>DealPilot baut den Auftrag selbst (Objekt, Kennzahlen, Investmentprofil, Unterlagen, Marktberichte des Objekts) und ruft dieselbe Analyse wie die App. Die Offerte liegt höchstens beim Kaufpreis; ist das Objekt im Bestand (festgeschriebener Ankauf), gibt es keinen Kaufpreisvorschlag. Gespeichert als KI-Analyse am Objekt. <strong>Es wird nichts versendet</strong> – die Mail ist ein Entwurf. Zählt wie eine KI-Analyse der App (Monatsgrenze des Plans). Mit <code>vorschau: true</code> nur der Auftrag, ohne KI und ohne Kosten.</p>
+<pre><code>curl -X POST https://app.dealpilot.immo/api/v1/objects/&lt;id&gt;/offerte -H "x-api-key: dpk_live_…" \
+  -H "Content-Type: application/json" -d '{ "expectedVersion": 14 }'
+
+{ "kaufpreis_offerte": { "empfohlen": "165.000 €", "begruendung": "…", "argumente": [ … ] },
+  "offerte_mail": { "betreff": "…", "text": "…" }, "verhandlungsempfehlung": "…", "empfehlung": "VERHANDELN",
+  "bestand_modus": false, "grundlage": { "kennzahlen": { … }, "mpi": null, "marktbericht": { "anzahl": 2 } },
+  "versendet": false, "gespeichert": true, "version": 15 }</code></pre>
+
+<h3><span class="m">POST</span> /kosten/anfrage · Freigabe kostenpflichtiger Stufen</h3>
+<p>Vor jedem Marktbericht, der eine Bewertung aus dem Kontingent verbraucht (<code>mpi</code>, <code>mpi_plus</code>, <code>wev</code>). Die Freigabe folgt <code>freigaben</code> aus dem Profil: <code>auto</code> ohne Rückfrage bis zur Monatsgrenze, <code>frage</code> immer, <code>nie</code> gesperrt (403). Ist die Tiefe für das Objekt schon bezahlt, kostet es nichts. Leeres Kontingent: 402 ohne Token.</p>
+<pre><code>POST /kosten/anfrage   { "art": "mpi", "objekt_id": "…" }
+{ "preis": 0.9, "kontingent_rest": 4, "freigabe_noetig": true, "status": "wartet", "token": "dpkt_…", "gueltig_bis": "…" }
+
+POST /kosten/freigeben { "token": "dpkt_…" }      → { "ok": true, "status": "frei" }   (Knopf im Hub)
+POST /marktbericht/reports/from-dealpilot { "object": {…}, "external_ref": "&lt;objekt_id&gt;", "wert_stufe": 1, "kosten_token": "dpkt_…" }</code></pre>
+<div class="kasten">Ohne gültigen <code>kosten_token</code> antwortet der Bericht für einen Flow-Schlüssel mit <strong>402</strong> <code>kosten_freigabe_fehlt</code> (Gründe in <code>code</code>: <code>KOSTEN_TOKEN_FEHLT</code>, <code>KOSTEN_FREIGABE_FEHLT</code>, <code>KOSTEN_TOKEN_PASST_NICHT</code>, <code>KOSTEN_TOKEN_VERBRAUCHT</code>, <code>KOSTEN_TOKEN_ABGELAUFEN</code>). Der Token gilt für genau eine Stufe und ein Objekt, 24 Stunden, einmal. Scheitert der Bericht, wird er wieder frei. Der Telegram-Bot geht denselben Weg: sein „Ja“ ist die Freigabe.</div>
+
+<h3><span class="m">POST</span> /agent/frage · Co-Pilot mit allen Objekten</h3>
+<p>Derselbe Co-Pilot wie im Telegram-Bot, mit allen Werkzeugen. Änderungen (Felder ändern, Objekt anlegen, Vorgaben setzen) werden <strong>nicht sofort ausgeführt</strong>, sondern als Vorschlag mit Token zurückgegeben; ausgeführt wird erst mit <code>POST /agent/bestaetigen</code>. Kostenpflichtige Abrufe nur mit <code>darf_kosten: true</code> und einem freigegebenen <code>kosten_token</code> (er legt Stufe und Objekt fest). Tageslimit wie der Co-Pilot der App.</p>
+<pre><code>POST /agent/frage { "text": "Setz den Kaufpreis der Lindenallee auf 199.000", "objekt_id": "…" }
+{ "antwort": "Ich würde den Kaufpreis auf 199.000 € setzen – bitte bestätigen.",
+  "schritte": [ { "werkzeug": "felder_aendern", "stufe": "schreiben", "kurz": "felder_aendern: kp=199000" } ],
+  "bestaetigen": [ { "token": "dpav_…", "werkzeug": "felder_aendern", "kurz": "felder_aendern: kp=199000", "gueltig_std": 24 } ],
+  "kosten_vorschlag": { "art": "mpi", "stufe": 1, "preis": 0.9, "objekt_id": "…" }, "tageslimit": { "benutzt": 3, "limit": 20 } }
+
+POST /agent/bestaetigen { "token": "dpav_…" }   → { "ok": true, "werkzeug": "felder_aendern", "ergebnis": { … } }
+POST /agent/verwerfen   { "token": "dpav_…" }</code></pre>
+
+<h3><span class="m get">GET</span> /immometrica/ereignisse?seit= · Preissenkungen und neue Treffer</h3>
+<p>DealPilot merkt sich je Suche und Treffer Preis, Fläche, Titel, Link und Online-Status und meldet <code>neu</code>, <code>preis_gesenkt</code> (ab <code>alarme.preissenkung_pct</code>), <code>unter_zielpreis</code> (mit <code>alarme.unter_zielpreis</code>; Zielpreis aus der letzten Berechnung des verknüpften Objekts oder <code>ziele.max_kaufpreis</code>), <code>offline</code> und <code>wieder_online</code> – per Webhook an den Hub (signiert wie <code>verbindung.getrennt</code>) und hier zum Nachholen. <code>seit</code> = ISO-Zeit oder letzte Ereignis-Id. Keine Kontaktdaten. <em>Der regelmäßige Abruf ist noch nicht eingeschaltet.</em></p>
+<pre><code>{ "ereignisse": [ { "id": 17, "art": "preis_gesenkt", "suche_id": "…", "offer_id": "…", "objekt_id": null,
+    "titel": "…", "link": "https://…", "preis_alt": 200000, "preis_neu": 189000, "senkung_pct": 5.5, "zielpreis": null, "at": "…" } ] }</code></pre>
+
 <h3>Fehler bei DealPilot Flow</h3>
 <div class="tw"><table>
 <tr><th>Status</th><th><code>code</code></th><th>Bedeutung</th></tr>
