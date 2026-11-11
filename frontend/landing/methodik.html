@@ -1,13 +1,17 @@
-<!DOCTYPE html><!-- DealPilot · Wie wir rechnen (Methodik und Regelwerk) · landing-methodik-1 -->
+<!DOCTYPE html><!-- DealPilot · Datenbasis und Prüfung · landing-kern-1 (vorher: Wie wir rechnen, landing-methodik-3) -->
 <html lang="de"><head>
 <meta charset="utf-8">
 <meta name="google-site-verification" content="sjsXb3XudmYE75JCus789-lKn_IIX5jOySZx50Iy4i0">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Wie wir rechnen · Methodik und Regelwerk · DealPilot</title>
-<meta name="description" content="Wie DealPilot rechnet: Wertermittlung nach ImmoWertV, Restnutzungsdauer, indikativer Beleihungswert und Investitionsrechnung – mit Rechtsgrundlage, Datenherkunft und offen benannten Grenzen.">
+<title>Datenbasis und Prüfung · Woher die Zahlen kommen · DealPilot</title>
+<meta name="description" content="Über 1 Million amtliche Datenpunkte: Gutachterausschüsse, Bodenrichtwerte, Zensus 2022, Statistische Ämter und Bundesbank – laufend abgeglichen, mit Herkunft je Wert und geprüft vor jeder Auslieferung.">
+<link rel="canonical" href="https://dealpilot.immo/methodik.html">
+<meta property="og:title" content="Datenbasis und Prüfung · DealPilot"><meta property="og:image" content="https://dealpilot.immo/assets/og-dealpilot.jpg">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="stylesheet" href="/fonts/dp-fonts.css">
 <link rel="stylesheet" href="dp2.css?v=v2971b">
 <link rel="stylesheet" href="dp2-teile.css?v=v2973">
+<link rel="stylesheet" href="dp2-kern.css?v=landing-kern-1">
 <style>
 /* Methodik-Seite: Bausteine wie sicherheit.html (Kopf .sk, Abschnitte .kz,
    Tabellen .tab-d, Hinweis), dazu Inhaltsverzeichnis und Fliesstext.
@@ -147,7 +151,7 @@ section[id]{scroll-margin-top:70px}
       <ul class="sub">
         <li><a href="index.html#features"><svg class="ico si"><use href="#i-blitz"/></svg><span><b>Die 19 Module</b><span>Von Boarding über Deal Score bis Bankexport</span></span></a></li>
         <li><a href="leistungsumfang.html"><svg class="ico si"><use href="#i-buch"/></svg><span><b>Leistungsumfang</b><span>Alle 22 Kapitel ausführlich — was jedes Modul kann</span></span></a></li>
-        <li><a href="index.html#feature-matrix"><svg class="ico si"><use href="#i-ziel"/></svg><span><b>Cockpit-Matrix</b><span>Jede Funktion, jeder Tarif — im Vergleich</span></span></a></li>
+        <li><a href="preise.html#feature-matrix"><svg class="ico si"><use href="#i-ziel"/></svg><span><b>Cockpit-Matrix</b><span>Jede Funktion, jeder Tarif — im Vergleich</span></span></a></li>
         <li><a href="api.html"><svg class="ico si"><use href="#i-code"/></svg><span><b>API</b><span>REST-Schnittstelle, voller CRUD — im Pro-Plan</span></span></a></li>
         <li><a href="forschung.html"><svg class="ico si"><use href="#i-ziel"/></svg><span><b>Forschung &amp; Entwicklung</b><span>Bescheinigtes Vorhaben: das ganze Portfolio im Blick</span></span></a></li>
       </ul></li>
@@ -155,15 +159,16 @@ section[id]{scroll-margin-top:70px}
     <li><a href="videothek.html">Videothek</a></li>
     <li><a href="index.html#pricing">Preise<i class="kar"></i></a>
       <ul class="sub">
-        <li><a href="index.html#pricing"><svg class="ico si"><use href="#i-bank"/></svg><span><b>Einzelplatz</b><span>Vier Pakete von kostenlos bis Pro</span></span></a></li>
-        <li><a href="index.html#partner-plan"><svg class="ico si"><use href="#i-ebenen"/></svg><span><b>Partner &amp; Whitelabel</b><span>Deine Mandanten unter deiner Marke</span></span></a></li>
-        <li><a href="index.html#feature-matrix"><svg class="ico si"><use href="#i-ziel"/></svg><span><b>Alles im Vergleich</b><span>Die vollständige Matrix</span></span></a></li>
+        <li><a href="preise.html"><svg class="ico si"><use href="#i-bank"/></svg><span><b>Alle Preise</b><span>Vier Pakete von kostenlos bis Pro, im Detail</span></span></a></li>
+        <li><a href="preise.html#partner-plan"><svg class="ico si"><use href="#i-ebenen"/></svg><span><b>Partner &amp; Whitelabel</b><span>Deine Mandanten unter deiner Marke</span></span></a></li>
+        <li><a href="preise.html#feature-matrix"><svg class="ico si"><use href="#i-ziel"/></svg><span><b>Alles im Vergleich</b><span>Die vollständige Matrix</span></span></a></li>
+        <li><a href="preise.html#nachkauf"><svg class="ico si"><use href="#i-blitz"/></svg><span><b>Kontingent nachlegen</b><span>Bewertungen einzeln oder im Paket</span></span></a></li>
       </ul></li>
     <li><a href="loesungen.html">Für Partner<i class="kar"></i></a>
       <ul class="sub"><!-- landing-loesungen-1 -->
         <li><a href="loesungen.html"><svg class="ico si"><use href="#i-ziel"/></svg><span><b>Individuelle Lösungen</b><span>Prozesse, Automatisierung, Homepage &amp; iFrame</span></span></a></li>
-        <li><a href="index.html#partner-plan"><svg class="ico si"><use href="#i-ebenen"/></svg><span><b>Partner &amp; Whitelabel</b><span>DealPilot unter deiner Marke</span></span></a></li>
-        <li><a href="index.html#module"><svg class="ico si"><use href="#i-code"/></svg><span><b>Module &amp; Schnittstellen</b><span>Rechenkerne als Schnittstelle, auf Anfrage</span></span></a></li>
+        <li><a href="preise.html#partner-plan"><svg class="ico si"><use href="#i-ebenen"/></svg><span><b>Partner &amp; Whitelabel</b><span>DealPilot unter deiner Marke</span></span></a></li>
+        <li><a href="preise.html#module"><svg class="ico si"><use href="#i-code"/></svg><span><b>Module &amp; Schnittstellen</b><span>Rechenkerne als Schnittstelle, auf Anfrage</span></span></a></li>
         <li><a href="loesungen.html#makler-hub"><svg class="ico si"><use href="#i-haus"/></svg><span><b>Makler-Hub</b><span>Der Maklerprozess bis zum Notar · für Makler</span></span></a></li>
         <li><a href="index.html#partner"><svg class="ico si"><use href="#i-pokal"/></svg><span><b>Unsere Partner</b><span>Wer mit uns zusammenarbeitet</span></span></a></li>
       </ul></li>
@@ -171,7 +176,7 @@ section[id]{scroll-margin-top:70px}
       <ul class="sub">
         <li><a href="sicherheit.html"><svg class="ico si"><use href="#i-schild"/></svg><span><b>Daten &amp; Server</b><span>Hetzner, DSGVO, was gespeichert wird</span></span></a></li>
         <li><a href="fragen.html"><svg class="ico si"><use href="#i-frage"/></svg><span><b>Häufige Fragen</b><span>Die Antworten, die wir sonst am Telefon geben</span></span></a></li>
-        <li><a href="methodik.html"><svg class="ico si"><use href="#i-buch"/></svg><span><b>Wie wir rechnen</b><span>Methodik und Regelwerk der Wertermittlung</span></span></a></li><!-- landing-methodik-1 -->
+        <li><a href="methodik.html"><svg class="ico si"><use href="#i-buch"/></svg><span><b>Datenbasis &amp; Prüfung</b><span>Amtliche Daten, Herkunft je Wert, Prüfung</span></span></a></li><!-- landing-methodik-1 -->
       </ul></li>
   </ul>
   <a class="b-log" href="https://app.dealpilot.immo/">Anmelden</a>
@@ -179,296 +184,112 @@ section[id]{scroll-margin-top:70px}
 </div></nav>
 
 <main>
+<!-- landing-kern-1 · Marcel 11.11.2026: „Die Methodik finde ich gut, aber ich will nicht zeigen, WIE wir rechnen."
+     Bis hierher stand auf dieser Seite das ganze Regelwerk in fünfzehn Kapiteln (Verfahren, Stufen-Tabelle,
+     Rechenwege, Score) samt PDF-Download. Jetzt: Umfang, Herkunft, Amtlichkeit, Prüfung, Grenzen - kein
+     Rechenweg, keine Formel, kein Verfahrensdetail. Die Langfassung liegt in git (vor landing-kern-1) und
+     intern als Methodik-Dokument; assets/dealpilot-methodik.pdf ist nicht mehr verlinkt. -->
 <div class="sk"><div class="raster"></div><div class="w">
-  <div class="kick">Methodik und Regelwerk</div>
-  <h1>Wie wir <em>rechnen.</em></h1>
-  <p>Wertermittlung nach der Immobilienwertermittlungsverordnung, Investitionsrechnung, Steuer und Bewertung, Unterlagen und Datenschutz: welche Grundsätze gelten, welche Rechtsgrundlagen und Daten DealPilot nutzt – und wo die Grenzen liegen.</p>
+  <div class="kick">Datenbasis und Prüfung</div>
+  <h1>Woher unsere <em>Zahlen kommen.</em></h1>
+  <p>DealPilot rechnet mit den Daten der Behörden – und sagt bei jeder Zahl, woher sie stammt. Hier steht, welche
+    Daten das sind, wie wir sie aktuell halten, wie wir prüfen und wo die Grenzen liegen.</p>
   <div class="knopf">
-    <a class="btn-p" href="assets/dealpilot-methodik.pdf?v=v3094" download>Als PDF herunterladen</a>
-    <span class="meta">Stand 02.11.2026 · PDF, A4</span>
+    <a class="btn-p" href="https://app.dealpilot.immo/?register=1">Vier Wochen als Pro — kostenlos</a>
+    <span class="meta">Keine Zahlungsdaten · danach automatisch Free</span>
   </div>
-  <div class="brot"><a href="/">DEALPILOT</a> › <a href="sicherheit.html">SICHERHEIT</a> › WIE WIR RECHNEN</div>
+  <div class="brot"><a href="/">DEALPILOT</a> › <a href="sicherheit.html">SICHERHEIT</a> › DATENBASIS UND PRÜFUNG</div>
 </div></div>
 
-<section id="inhalt"><div class="w-schmal">
-  <div class="kz"><div class="kick">Inhalt</div><h2>Fünfzehn Kapitel</h2></div>
-  <ol class="toc"><li><a href="#k1"><span class="n">01</span><span>Grundsätze und Rechtsrahmen</span></a></li><li><a href="#k2"><span class="n">02</span><span>Verfahren, Verfahrenswahl und Stichtag</span></a></li><li><a href="#k3"><span class="n">03</span><span>Bodenwert (§§ 40 bis 45 ImmoWertV)</span></a></li><li><a href="#k4"><span class="n">04</span><span>Vergleichswertverfahren (§§ 20, 24 bis 26 ImmoWertV)</span></a></li><li><a href="#k5"><span class="n">05</span><span>Ertragswertverfahren (§§ 27 bis 34 ImmoWertV)</span></a></li><li><a href="#k6"><span class="n">06</span><span>Sachwertverfahren (§§ 35 bis 39 ImmoWertV)</span></a></li><li><a href="#k7"><span class="n">07</span><span>Restnutzungsdauer</span></a></li><li><a href="#k8"><span class="n">08</span><span>Besondere objektspezifische Grundstücksmerkmale (§ 8 Abs. 3 ImmoWertV)</span></a></li><li><a href="#k9"><span class="n">09</span><span>Wertangabe, LTV und Beleihungswert</span></a></li><li><a href="#k10"><span class="n">10</span><span>Investitionsrechnung, Steuer und Bewertung</span></a></li><li><a href="#k11"><span class="n">11</span><span>Datenquellen und Register</span></a></li><li><a href="#k12"><span class="n">12</span><span>Unterlagen, KI und Datenschutz</span></a></li><li><a href="#k13"><span class="n">13</span><span>Prüfung</span></a></li><li><a href="#k14"><span class="n">14</span><span>Grenzen</span></a></li><li><a href="#k15"><span class="n">15</span><span>Rechtsgrundlagen</span></a></li></ol>
-  <div class="hinweis"><b>Kurz gesagt:</b> DealPilot ermittelt indikative Werte nach der Systematik der
-    ImmoWertV. Das Ergebnis ist kein Verkehrswertgutachten nach § 194 BauGB und keine
-    Beleihungswertermittlung nach der BelWertV – aber jede Zahl lässt sich auf ihre Rechtsgrundlage
-    und ihre Quelle zurückführen.</div>
+<section id="grundsaetze"><div class="w-schmal">
+<div class="kz"><div class="kick">Grundsätze</div><h2>Fünf Zusagen, die für jede Zahl gelten</h2></div>
+<div class="m-text">
+<ol class="m-liste"><li><b>Amtlich vor geschätzt.</b> Wo ein Gutachterausschuss oder ein statistisches Amt einen Wert veröffentlicht, rechnet DealPilot mit diesem Wert – nicht mit einer eigenen Annahme.</li><li><b>Jede Zahl trägt ihre Herkunft.</b> Im Bericht steht zu jedem Wert, von welchem Ausschuss er stammt, aus welchem Jahrgang, mit Fundstelle und Lizenz.</li><li><b>Kein Treffer heißt kein erfundener Wert.</b> Fehlt eine amtliche Zahl, nennt der Bericht den zuständigen Ausschuss und den Weg zur Quelle – bei kostenpflichtigen Berichten mit diesem Hinweis.</li><li><b>Was nicht amtlich ist, heißt auch nicht so.</b> Marktdaten aus Angeboten, eigene Angaben und eigene Ableitungen sind im Bericht als solche gekennzeichnet.</li><li><b>Die KI rechnet nicht.</b> Sie liest Unterlagen und formuliert; jede Zahl in einem erläuternden Text wird gegen die vorab gerechneten Werte geprüft.</li></ol>
+<div class="hinweis"><b>Kurz gesagt:</b> DealPilot liefert indikative Werte nach der Systematik der
+  Immobilienwertermittlungsverordnung. Das Ergebnis ist kein Verkehrswertgutachten und keine
+  Beleihungswertermittlung – aber jede Zahl lässt sich auf ihre Quelle zurückführen.</div>
+</div>
 </div></section>
 
-<section class="m-sec" id="k1"><div class="w-schmal">
-<div class="kz"><div class="kick">Kapitel 1</div><h2>Grundsätze und Rechtsrahmen</h2></div>
+<section class="sec-creme" id="umfang"><div class="w-schmal">
+<div class="kz"><div class="kick">Umfang</div><h2><span data-umfang="amtlich_rund">über 1 Million</span> amtliche Datenpunkte</h2></div>
 <div class="m-text">
-<p>DealPilot prüft Immobilien als Kapitalanlage – mit einer vollständigen Investitionsrechnung und einer Wertindikation nach der Systematik der Immobilienwertermittlungsverordnung (ImmoWertV 2021) und ihrer Anwendungshinweise (ImmoWertA). Das Ergebnis ist <b>kein Gutachten</b> nach § 194 BauGB und keine Beleihungswertermittlung einer Bank. Jede Zahl lässt sich aber auf ihre Rechtsgrundlage und ihre Quelle zurückführen.</p>
-<p>Der Verkehrswert ist nach § 194 BauGB der Preis, der zum Stichtag im gewöhnlichen Geschäftsverkehr zu erzielen wäre – ohne Rücksicht auf ungewöhnliche oder persönliche Verhältnisse. Die Daten, die man dafür braucht – Bodenrichtwerte, Liegenschaftszinssätze, Sachwertfaktoren, Vergleichsfaktoren, Umrechnungskoeffizienten –, ermitteln die Gutachterausschüsse (§ 193 Abs. 5 BauGB, §§ 12 bis 23 ImmoWertV). DealPilot verwendet diese Daten so, wie der Ausschuss sie ableitet.</p>
-<p>Sechs Grundsätze gelten in jedem Verfahren:</p>
-<ol class="m-liste"><li><b>Modellkonformität (§ 10 Abs. 1 ImmoWertV).</b> Wer die Daten eines Gutachterausschusses anwendet, muss dieselben Modelle und Modellansätze verwenden, mit denen sie ermittelt wurden. Gesamtnutzungsdauer, Bewirtschaftungskosten, Mietansatz und Regionalfaktor folgen deshalb dem Modell des Ausschusses, dessen Zinssatz oder Faktor verwendet wird – jeder Parameter trägt seinen Modellvermerk.</li><li><b>Amtlich vor geschätzt.</b> Wo ein Gutachterausschuss einen Wert veröffentlicht, rechnet DealPilot mit diesem Wert und nicht mit einer eigenen Annahme.</li><li><b>Kein Verfahren rechnet halb.</b> Fehlt eine Angabe, die ein Verfahren zwingend braucht – etwa der Bodenwert, die Brutto-Grundfläche oder ein Merkmal, nach dem der Ausschuss seinen Faktor anpasst –, wird das Verfahren nicht angesetzt. Der Bericht nennt, was fehlt, und wo man es einträgt.</li><li><b>Kein Treffer heißt kein Wert.</b> Ein Sachwertfaktor, Vergleichsfaktor oder Umrechnungskoeffizient wird nie aus einem Nachbarkreis oder als Landesmittel übertragen. Wo kein amtlicher Wert vorliegt, nennt der Bericht den zuständigen Gutachterausschuss und den Weg zur Quelle – bei kostenpflichtigen Berichten mit diesem Hinweis. <b>Einzige Ausnahme ist der Liegenschaftszinssatz</b> (Abschnitt 5.5): Damit der Ertragswert rechnet, gibt es dort immer einen Wert, und jede Ebene unterhalb des örtlichen amtlichen Werts wird ausgewiesen.</li><li><b>Jede Zahl trägt ihre Herkunft:</b> Stufe, Modellvermerk, Ausschuss, Jahrgang, Stichtag und Fundstelle.</li><li><b>Feste Rechenwege, nicht die KI.</b> Gerechnet wird mit festen, geprüften Rechenwegen. Die KI erklärt, fasst zusammen und liest Unterlagen – jede Zahl, die sie nennt, wird gegen die Rechnung geprüft.</li></ol>
-<h3 id="k1-1">1.1 Die Stufen der Herkunft</h3>
-<p>Jeder Wert trägt eine <b>Stufe</b>. Sie sagt, woher die Zahl kommt und wie belastbar sie ist. DealPilot greift immer auf die höchste verfügbare Stufe zurück – in dieser Reihenfolge:</p>
-<div class="tab-wrap"><table class="tab-d tab-m"><thead><tr><th>Stufe</th><th>Bedeutung</th><th>Wann</th><th>Grundlage</th></tr></thead><tbody>
-<tr><td data-l="Stufe"><span><b>E</b></span></td><td data-l="Bedeutung"><span>eigene Angabe des Nutzers</span></td><td data-l="Wann"><span>wenn du einen Wert selbst einträgst – er geht allem vor und ist im Bericht so benannt</span></td><td data-l="Grundlage"><span>in deiner Verantwortung</span></td></tr>
-<tr><td data-l="Stufe"><span><b>A</b></span></td><td data-l="Bedeutung"><span>amtlicher Wert des zuständigen Gutachterausschusses, für Ort und Objektart; „A, angepasst“, wenn er mit den Koeffizienten oder der Funktion desselben Ausschusses an das Objekt angepasst ist</span></td><td data-l="Wann"><span>wenn der örtliche Ausschuss einen passenden Wert veröffentlicht</span></td><td data-l="Grundlage"><span>§ 193 Abs. 5 BauGB, § 21 ImmoWertV; vorrangig zu verwenden (ImmoWertA 9.(3).1 a)</span></td></tr>
-<tr><td data-l="Stufe"><span><b>B</b></span></td><td data-l="Bedeutung"><span>amtlicher Wert mit eingeschränkter Belastbarkeit – etwa ohne veröffentlichte Streuung, vom Ausschuss als statistisch unsicher bezeichnet oder aus einer Tabelle bzw. einem amtlichen Rechner abgelesen</span></td><td data-l="Wann"><span>wenn es für Ort und Objektart nur einen solchen Wert gibt</span></td><td data-l="Grundlage"><span>ImmoWertA 9.(3).1 a und b</span></td></tr>
-<tr><td data-l="Stufe"><span><b>C</b></span></td><td data-l="Bedeutung"><span>amtlicher Wert mit geringer Datenbasis oder überregional abgeleitet, z. B. vom Oberen Gutachterausschuss</span></td><td data-l="Wann"><span>wenn der örtliche Ausschuss keinen eigenen Wert führt</span></td><td data-l="Grundlage"><span>ImmoWertA 9.(3).1 b und c; die Quelle ist anzugeben (9.(3).3)</span></td></tr>
-<tr><td data-l="Stufe"><span><b>N</b></span></td><td data-l="Bedeutung"><span>DealPilot-Ableitung aus amtlichen Werten – nie amtlich, immer gekennzeichnet</span></td><td data-l="Wann"><span>nur beim Liegenschaftszins und bei der Grundstücksgröße, nur wo kein amtlicher Wert vorliegt und die Ableitung nachweislich genauer ist als der gesetzliche Auffangwert</span></td><td data-l="Grundlage"><span>Schätzung nach § 9 Abs. 3 ImmoWertV; die Grundlagen werden dokumentiert</span></td></tr>
-<tr><td data-l="Stufe"><span><b>D</b></span></td><td data-l="Bedeutung"><span>gesetzlicher Auffangwert nach § 256 Bewertungsgesetz</span></td><td data-l="Wann"><span>nur beim Liegenschaftszins, wenn nichts anderes vorliegt – damit der Ertragswert überhaupt rechnet</span></td><td data-l="Grundlage"><span>steuerlicher Typisierungswert, nicht aus dem Markt abgeleitet</span></td></tr>
+<p>DealPilot hält die amtlichen Daten in eigenen Datenbanken und gleicht sie regelmäßig mit den Quellen ab. Gezählt wird nur, was von einer Behörde stammt.</p>
+<div class="reg-karten"><div class="rk gross"><b data-umfang="amtlich_gesamt">1.099.779</b><span>amtliche Datenpunkte in unseren Datenbanken</span></div><div class="rk"><b data-umfang="schnittstellen">36</b><span>amtliche Dienste und Tabellen angebunden</span></div><div class="rk"><b data-k="ausschuesse">201</b><span>Gutachterausschüsse mit Wert</span></div><div class="rk"><b data-k="werte_gesamt">6.187</b><span>Kennzahlen der Gutachterausschüsse</span></div><div class="rk"><b data-umfang="portale">118</b><span>Portale der Ausschüsse im Blick</span></div><div class="rk"><b data-umfang="zensus">894.880</b><span>Werte aus dem Zensus 2022</span></div><div class="rk"><b data-umfang="regional">108.137</b><span>Werte der Regionaldatenbank</span></div><div class="rk"><b data-umfang="bau">56.128</b><span>Werte zu Bautätigkeit und Bauland</span></div><div class="rk"><b data-umfang="akoga">28.827</b><span>Werte der Oberen Gutachterausschüsse</span></div></div>
+<p class="rk-stand">Stand des Registers: <span data-k="stand">11.11.2026</span> · gezählt mit tools/datenumfang-messen.mjs</p>
+<div class="tab-wrap"><table class="tab-d tab-m"><thead><tr><th>Quelle</th><th>Was</th><th>Wie oft</th></tr></thead><tbody>
+<tr><td data-l="Quelle"><span><b>Bodenrichtwertsysteme der Länder und des Bundes</b></span></td><td data-l="Was"><span>Bodenrichtwert und Zone, für alle 16 Länder</span></td><td data-l="Wie oft"><span>live bei jedem Bericht</span></td></tr>
+<tr><td data-l="Quelle"><span><b>Gutachterausschüsse</b></span></td><td data-l="Was"><span>Liegenschaftszinssätze, Sachwertfaktoren, Vergleichsfaktoren, Immobilienrichtwerte, Umrechnungskoeffizienten – mit Ausschuss, Jahrgang, Fundstelle, Lizenz</span></td><td data-l="Wie oft"><span>Portale von Januar bis Juni wöchentlich, sonst monatlich auf neue Berichte geprüft</span></td></tr>
+<tr><td data-l="Quelle"><span><b>Statistische Ämter des Bundes und der Länder</b></span></td><td data-l="Was"><span>Regionaldatenbank: Bevölkerung, Einkommen, Arbeitsmarkt, Wanderung; Bautätigkeit und Baulandpreise</span></td><td data-l="Wie oft"><span>monatlich abgeglichen</span></td></tr>
+<tr><td data-l="Quelle"><span><b>Zensus 2022</b></span></td><td data-l="Was"><span>Wohnungen, Gebäude, Leerstand, Mieten bis auf die Gemeinde</span></td><td data-l="Wie oft"><span>Stichtag 15.05.2022, Korrekturen der Ämter werden nachgezogen</span></td></tr>
+<tr><td data-l="Quelle"><span><b>Statistisches Bundesamt</b></span></td><td data-l="Was"><span>Verbraucherpreise, Nettokaltmieten, Baupreisindex</span></td><td data-l="Wie oft"><span>wöchentlich geprüft</span></td></tr>
+<tr><td data-l="Quelle"><span><b>Deutsche Bundesbank</b></span></td><td data-l="Was"><span>Zinsstruktur und Zinsstatistik für die indikativen Bauzinsen</span></td><td data-l="Wie oft"><span>täglich</span></td></tr>
+<tr><td data-l="Quelle"><span><b>Obere Gutachterausschüsse</b></span></td><td data-l="Was"><span>bundesweite Preis- und Mietspannen zur Einordnung</span></td><td data-l="Wie oft"><span>je Veröffentlichung</span></td></tr>
+<tr><td data-l="Quelle"><span><b>Gesetze und Verordnungen</b></span></td><td data-l="Was"><span>Steuersätze, Abschreibung, Grunderwerbsteuer, Kappungsgrenzen und Mietpreisbremse, Notar- und Grundbuchkosten</span></td><td data-l="Wie oft"><span>mit Fälligkeitsdatum je Wert überwacht</span></td></tr>
 </tbody></table></div>
-<p>§ 9 Abs. 3 ImmoWertV erlaubt die sachverständige Schätzung, wenn keine geeigneten Daten zur Verfügung stehen; ihre Grundlagen sind zu dokumentieren. Wo ein Wert unter Stufe A liegt, sagt der Bericht deshalb dazu, wie es genauer geht: den örtlichen Wert selbst eintragen oder beim zuständigen Ausschuss anfordern. Für Sachwertfaktoren und Vergleichsfaktoren gibt es keine Ableitung – fehlt der amtliche Wert, rechnet dieses Verfahren nicht.</p>
+<p><b>Sperre mit Weg.</b> Gibt ein Ausschuss seine Daten nur gegen Gebühr, mit Genehmigung oder auf Anfrage ab, steht im Register keine Zahl, sondern der Ausschuss, der Grund und der Bestellweg.</p>
+<p><b>Namensnennung.</b> Daten unter der Datenlizenz Deutschland – Namensnennung 2.0 verlangen die Nennung des Bereitstellers. Der Bericht nennt die Vermerke der tatsächlich verwendeten Daten – und nur diese.</p>
 </div>
-<p class="nach-oben"><a href="#inhalt">↑ Inhalt</a></p>
 </div></section>
 
-<section class="m-sec sec-creme" id="k2"><div class="w-schmal">
-<div class="kz"><div class="kick">Kapitel 2</div><h2>Verfahren, Verfahrenswahl und Stichtag</h2></div>
-<div class="m-text">
-<h3 id="k2-1">2.1 Die drei Verfahren und ihr Ablauf</h3>
-<p>DealPilot rechnet die drei normierten Verfahren der ImmoWertV und ermittelt den Bodenwert gesondert. Nach § 6 Abs. 1 ImmoWertV sind sie nach der Art des Objekts, den Gepflogenheiten des Geschäftsverkehrs und der Eignung der verfügbaren Daten zu wählen; die Wahl ist zu begründen.</p>
-<p>Jedes Verfahren läuft in drei Stufen (§ 6 Abs. 2 und 3 ImmoWertV):</p>
-<ol class="m-liste"><li><b>vorläufiger Verfahrenswert</b> aus den Modellansätzen,</li><li><b>marktangepasster vorläufiger Verfahrenswert</b> – die allgemeinen Wertverhältnisse (§ 7). Im Vergleichs- und Ertragswertverfahren stecken sie bereits im Vergleichsfaktor bzw. Liegenschaftszinssatz, im Sachwertverfahren kommen sie erst über den Sachwertfaktor hinein,</li><li><b>Verfahrenswert</b> – danach die besonderen objektspezifischen Grundstücksmerkmale (§ 8 Abs. 3, Kapitel 8).</li></ol>
-<p>Den Verkehrswert bildet § 6 Abs. 4 aus den Verfahrenswerten unter Würdigung ihrer Aussagefähigkeit. DealPilot mittelt mehrere Verfahrenswerte deshalb nicht, sondern weist ein <b>führendes Verfahren</b> aus und stellt die anderen zur Plausibilisierung daneben.</p>
-<h3 id="k2-2">2.2 Welches Verfahren führt</h3>
-<div class="tab-wrap"><table class="tab-d tab-m"><thead><tr><th>Objektart</th><th>führend</th><th>daneben</th></tr></thead><tbody>
-<tr><td data-l="Objektart"><span>Mehrfamilienhaus, Wohn- und Geschäftshaus, Gewerbe</span></td><td data-l="führend"><span>Ertragswert – die Erträge sind für die Preisbildung ausschlaggebend (ImmoWertA 6.(1).3)</span></td><td data-l="daneben"><span>Vergleichswert, wo ein Immobilienrichtwert vorliegt; Sachwert nur zur Plausibilität</span></td></tr>
-<tr><td data-l="Objektart"><span>Ein- und Zweifamilienhaus, Doppel- und Reihenhaus mit amtlichem Sachwertfaktor</span></td><td data-l="führend"><span>Sachwert (ImmoWertA 6.(1).4)</span></td><td data-l="daneben"><span>Vergleichswert, wo vorhanden; Ertragswert</span></td></tr>
-<tr><td data-l="Objektart"><span>Ein- und Zweifamilienhaus ohne Sachwertfaktor, aber mit amtlichem Vergleichsfaktor oder Immobilienrichtwert</span></td><td data-l="führend"><span>Vergleichswert – ein Sachwert ohne Marktanpassung ist kein Marktwert (§ 21 Abs. 3, § 39)</span></td><td data-l="daneben"><span>Ertragswert</span></td></tr>
-<tr><td data-l="Objektart"><span>Eigentumswohnung mit amtlichem Vergleichsfaktor oder Immobilienrichtwert</span></td><td data-l="führend"><span>Vergleichswert (ImmoWertA 6.(1).2)</span></td><td data-l="daneben"><span>Ertragswert</span></td></tr>
-<tr><td data-l="Objektart"><span>Eigentumswohnung ohne amtliche Vergleichsdaten</span></td><td data-l="führend"><span>kein führendes Verfahren</span></td><td data-l="daneben"><span>Ertragswert und Marktpreisindikation nebeneinander – Angebotspreise sind keine Vergleichspreise (§ 25)</span></td></tr>
-<tr><td data-l="Objektart"><span>Wohnungseigentum in einem Objekt mit höchstens zwei Wohnungen</span></td><td data-l="führend"><span>Sachwert – wirtschaftlich ein Zweifamilienhaus</span></td><td data-l="daneben"><span>Ertragswert</span></td></tr>
-</tbody></table></div>
-<p>Die Zuordnung je Objektart folgt der Gutachterpraxis und den Marktberichten der Ausschüsse. Kann das führende Verfahren nicht gerechnet werden, nennt der Bericht das Verfahren, das führen würde, und die fehlende Angabe – er weicht nicht still auf ein anderes Verfahren aus.</p>
-<h3 id="k2-3">2.3 Wertermittlungsstichtag</h3>
-<p>Der Wertermittlungsstichtag ist der Zeitpunkt, auf den sich die Wertermittlung bezieht; er bestimmt die allgemeinen Wertverhältnisse (§ 2 Abs. 4 ImmoWertV). Du kannst ihn am Objekt eintragen, etwa den Tag des Kaufvertrags; sonst ist es der Tag der Berichtserstellung. Bericht und PDF nennen ihn mit seiner Herkunft.</p>
-<p>An diesem einen Datum hängen der Baupreisindex, das Alter und die Restnutzungsdauer, die Fortschreibung der Bewirtschaftungskosten, die Fortschreibung der Bestandsmiete, die Laufzeiten bei abweichender Miete und der Jahrgang der Registerdaten: Es gilt der Jahrgang eines Ausschusses, der am Stichtag galt.</p>
-</div>
-<p class="nach-oben"><a href="#inhalt">↑ Inhalt</a></p>
+<!-- landing-kern-1 · Live-Marktzinsen von der Startseite hierher (dp2-inhalt.js füllt #condG) -->
+<section class="sec sec-cream" id="zinsen"><div class="wrap">
+  <div class="head rv"><div class="eye">Live-Daten</div>
+    <h2>Live-Marktzinsen <span class="ac">wie im Cockpit.</span></h2>
+    <p>Dieselben indikativen Bauzinsen wie im Finanzierungs-Tab der App — Rendite der Bundesanleihe
+      plus der Marktaufschlag, den Banken laut Bundesbank-Zinsstatistik tatsächlich nehmen, gerechnet für 80 % Beleihung.</p></div>
+  <div class="cond rv">
+    <div class="cond-stub"><span class="k">PRE-FLIGHT</span><b>Konditionen</b>
+      <span class="s">BELEIHUNG 80 %</span></div>
+    <div class="cond-r">
+      <div class="cond-band">◆ Indikative Konditionen nach Zinsbindung</div>
+      <div class="cond-g" id="condG">
+        <div class="cond-c"><div class="zb">5 JAHRE</div><span class="bd">INDIKATIV</span>
+          <div class="zs">4,06 %</div><div class="er">Bundesanleihe 3,23 % + Marktaufschlag 0,83 (Stand 08/2026)</div></div>
+        <div class="cond-c"><div class="zb">10 JAHRE</div><span class="bd">INDIKATIV</span>
+          <div class="zs">4,34 %</div><div class="er">Bundesanleihe 3,51 % + Marktaufschlag 0,83 (Stand 08/2026)</div></div>
+        <div class="cond-c"><div class="zb">15 JAHRE</div><span class="bd">INDIKATIV</span>
+          <div class="zs">4,53 %</div><div class="er">Bundesanleihe 3,70 % + Marktaufschlag 0,83 (Stand 08/2026)</div></div>
+        <div class="cond-c"><div class="zb">20 JAHRE</div><span class="bd">INDIKATIV</span>
+          <div class="zs">4,63 %</div><div class="er">Bundesanleihe 3,80 % + Marktaufschlag 0,83 (Stand 08/2026)</div></div>
+      </div>
+      <div class="cond-foot"><span class="live">● Stand · Deutsche Bundesbank</span> · Stand Okt 2026 ·
+        indikative Schätzung, kein Bankangebot · keine Finanzierungsberatung (§ 34c GewO)</div>
+    </div>
+  </div>
 </div></section>
 
-<section class="m-sec" id="k3"><div class="w-schmal">
-<div class="kz"><div class="kick">Kapitel 3</div><h2>Bodenwert (§§ 40 bis 45 ImmoWertV)</h2></div>
-<div class="m-text">
-<p>Der Bodenwert ist Grundlage aller drei Verfahren. Er ist ohne die baulichen Anlagen und vorrangig im Vergleichswertverfahren zu ermitteln; neben oder anstelle von Vergleichspreisen kann ein objektspezifisch angepasster Bodenrichtwert verwendet werden (§ 40 Abs. 1 und 2).</p>
-<ol class="m-liste"><li><b>Bodenrichtwert.</b> DealPilot ruft den Bodenrichtwert der Zone aus den amtlichen Bodenrichtwertsystemen der Länder (BORIS) ab, einschließlich der Merkmale des Bodenrichtwertgrundstücks (§§ 13 bis 16).</li><li><b>Anpassung an die Grundstücksgröße</b> (§ 40 Abs. 2, § 19). In dieser Rangfolge: der amtliche Umrechnungskoeffizient des zuständigen Ausschusses – nur in seinem Geltungsbereich, nie über die Tabelle hinaus –; wo keiner vorliegt, die gekennzeichnete DealPilot-Ableitung aus den amtlichen Tabellen (Stufe N), nur für Ein- und Zweifamilien-, Doppel- und Reihenhäuser in niedrig bebauten Zonen und nie dort, wo der Ausschuss anders umrechnet; schließlich deine eigene Angabe. Ohne jeden Koeffizienten wird die volle Fläche angesetzt und das Ergebnis als „nicht an die Grundstücksgröße angepasst“ gekennzeichnet.</li><li><b>Anpassung an die Geschossflächenzahl (WGFZ).</b> Nur mit den Umrechnungskoeffizienten des Ausschusses, nur wenn die Zone eine Geschossflächenzahl führt und die des Objekts eingetragen ist – eine Ableitung gibt es hier nicht.</li><li><b>Übergroße Grundstücke (§ 41).</b> Geht die Fläche erheblich über das marktübliche Maß hinaus, wird die Mehrfläche getrennt bewertet, wo das Modell des Ausschusses es vorsieht.</li><li><b>Nur der rentierliche Bodenwert wird verzinst.</b> Eine nicht selbständig nutzbare Teilfläche geht in den Bodenwert ein, aber nicht in die Bodenwertverzinsung des Ertragswerts.</li><li><b>Eigentumswohnung.</b> Der Bodenwertanteil ergibt sich über den Miteigentumsanteil. Ohne Miteigentumsanteil wird kein Bodenwert angesetzt – und weil Ertrags- und Sachwert ihn voraussetzen, werden sie dann nicht ausgewiesen; der Bericht fordert den Anteil an.</li></ol>
-</div>
-<p class="nach-oben"><a href="#inhalt">↑ Inhalt</a></p>
-</div></section>
-
-<section class="m-sec sec-creme" id="k4"><div class="w-schmal">
-<div class="kz"><div class="kick">Kapitel 4</div><h2>Vergleichswertverfahren (§§ 20, 24 bis 26 ImmoWertV)</h2></div>
-<div class="m-text">
-<h3 id="k4-1">4.1 Vergleichsfaktoren der Gutachterausschüsse</h3>
-<p>Ein Vergleichswert entsteht aus Vergleichspreisen – das sind nach § 25 Kaufpreise vergleichbarer Grundstücke – oder aus einem <b>objektspezifisch angepassten Vergleichsfaktor</b> (§ 24 Abs. 1, § 26). Einzelkaufpreise stehen DealPilot nicht zur Verfügung; der Weg ist deshalb ausschließlich der Vergleichsfaktor des Gutachterausschusses (§ 20). Er wird auf seine Eignung geprüft und nur mit den Umrechnungskoeffizienten und dem Modell desselben Ausschusses angepasst (§ 26 Abs. 1, ImmoWertA 26.1).</p>
-<ul class="m-liste"><li><b>Kein Übertrag.</b> Ein Vergleichsfaktor gilt nur im Gebiet seines Ausschusses und nur für seine Objektart.</li><li><b>Anwendungsbereich.</b> Liegt das Objekt außerhalb des Geltungsbereichs (Baujahr, Wohnfläche, Bodenrichtwert, Teilmarkt), gibt es keinen Wert, sondern den Grund.</li><li><b>Jede Anpassung oder kein Wert.</b> Jede Anpassung, die der Ausschuss vorsieht, wird vorgenommen – oder das Objekt liegt in diesem Merkmal in der Norm. Sonst nennt der Bericht je Merkmal, was fehlt oder außerhalb der Tabelle liegt.</li><li><b>Stand.</b> Der Rechenweg nennt den Stand des Ausschusses. Fortgeschrieben auf den Stichtag wird nur mit einem amtlichen Index (§ 9 Abs. 1).</li><li><b>Verwendungszweck.</b> Faktoren, die ein Ausschuss ausdrücklich nur für die steuerliche Bewertung veröffentlicht, tragen kein Verfahren.</li></ul>
-<h3 id="k4-2">4.2 Immobilienrichtwerte</h3>
-<p>Immobilienrichtwerte sind Vergleichsfaktoren, wenn sie als Grundlage der Ermittlung von Vergleichswerten dienen (ImmoWertA 20). Gutachterausschüsse veröffentlichen sie je Richtwertzone und Teilmarkt, bezogen auf ein Normobjekt, zusammen mit ihren Umrechnungskoeffizienten. DealPilot rechnet sie nur mit der Tabelle desselben Ausschusses, Teilmarkts und Jahrgangs, nie über die Tabelle hinaus. Fehlt ein Merkmal, das der Ausschuss umrechnet, gibt es keinen Wert, sondern die Liste dessen, was fehlt. Das Register führt Immobilienrichtwerte für jedes Land, in dem ein Ausschuss sie frei veröffentlicht.</p>
-<h3 id="k4-3">4.3 Marktpreisindikation – und warum sie kein Vergleichswert ist</h3>
-<p>Wo kein amtlicher Vergleichsfaktor vorliegt, zeigt DealPilot eine <b>Marktpreisindikation</b> aus aktuellen Angebotsdaten, angepasst an das Objekt und um den üblichen Abstand zwischen Angebots- und Kaufpreis bereinigt. Den Abschlag bestimmt DealPilot in dieser Rangfolge:</p>
-<ol class="m-liste"><li>deine eigene Angabe im Investmentprofil,</li><li>örtlich gemessen: der durchschnittliche Kaufpreis aus den Kauffällen des zuständigen Gutachterausschusses für dieses Segment gegen den Median der aktuellen Angebote,</li><li>örtlich aus der Stichprobe, aus der der Ausschuss seinen Liegenschaftszinssatz abgeleitet hat – nur, wenn sie zum Objekt passt,</li><li>erst wenn nichts davon vorliegt: der aktuelle Marktdurchschnitt des Abstands zwischen Angebots- und Kaufpreis für Eigentumswohnungen bundesweit, mit Stand im Bericht.</li></ol>
-<p>Der Bericht nennt an der Zahl, welche Stufe gilt. Für Häuser liegt kein vergleichbar aktueller Marktdurchschnitt vor; Stufe 4 ist dort eine Näherung. Der Marktdurchschnitt wird jährlich nachgezogen.</p>
-<p>Die Marktpreisindikation heißt ausdrücklich nicht „Vergleichswert“: Vergleichspreise sind nach § 25 Kaufpreise, und Kaufpreisniveaus ohne Normobjekt sind als Vergleichspreise ungeeignet (ImmoWertA 25.3). Sie trägt kein führendes Verfahren und ist nie Grundlage für Beleihung oder LTV.</p>
-</div>
-<p class="nach-oben"><a href="#inhalt">↑ Inhalt</a></p>
-</div></section>
-
-<section class="m-sec" id="k5"><div class="w-schmal">
-<div class="kz"><div class="kick">Kapitel 5</div><h2>Ertragswertverfahren (§§ 27 bis 34 ImmoWertV)</h2></div>
-<div class="m-text">
-<h3 id="k5-1">5.1 Das Verfahren</h3>
-<p>Der Ertragswert wird auf der Grundlage marktüblich erzielbarer Erträge ermittelt (§ 27). DealPilot rechnet das <b>allgemeine Ertragswertverfahren</b> nach § 28 – Reinertrag abzüglich der Verzinsung des Bodenwerts, kapitalisiert über die Restnutzungsdauer, zuzüglich Bodenwert – und das vereinfachte Verfahren nach § 29 als Gegenrechnung. Ohne Bodenwert gibt es keinen Ertragswert. Neben dem Wert steht, wie empfindlich er auf den Liegenschaftszinssatz reagiert.</p>
-<h3 id="k5-2">5.2 Welche Miete</h3>
-<p>§ 31 Abs. 2 verlangt die marktüblich erzielbaren Erträge; die tatsächlichen Erträge gelten, wenn sie marktüblich sind. Den Maßstab der marktüblichen Miete bestimmt DealPilot in dieser Rangfolge:</p>
-<ol class="m-liste"><li>die Miete, die das Modell des verwendeten Liegenschaftszinssatzes verlangt (Mietpreisübersicht oder Modellmiete des Ausschusses, § 10),</li><li>die Miete der Kauffälle, aus denen der Ausschuss seinen Zinssatz abgeleitet hat,</li><li>die amtliche Mietpreisübersicht des Ausschusses,</li><li>die Bestandsmiete aus dem Zensus 2022, auf den Stichtag fortgeschrieben,</li><li>erst zuletzt die Angebotsmiete, gekennzeichnet – Inserate liegen erfahrungsgemäß über den vereinbarten Mieten, und kein bekanntes Zinsmodell eines Ausschusses setzt sie an.</li></ol>
-<p>Geprüft wird <b>je Mietverhältnis</b>, nicht als Hausdurchschnitt. Liegt die Ist-Miete im Rahmen des Marktüblichen, ist sie der Ansatz (ImmoWertA 31.2 a). Leere Einheiten gehen mit der marktüblichen Miete ein (ImmoWertA 31.4).</p>
-<h3 id="k5-3">5.3 Mindermiete und Mehrertrag</h3>
-<p>Liegt eine Miete deutlich unter oder über dem Marktüblichen, rechnet der Ertragswert mit der marktüblichen Miete, und die Abweichung wird als besonderes objektspezifisches Merkmal angesetzt (ImmoWertA 31.2 c, § 8 Abs. 3) – über die Restlaufzeit, die der Mietvertrag oder bei Wohnraum der gesetzliche Erhöhungspfad nach §§ 558, 558b BGB vorgibt. Ein Mehrertrag zählt nur mit belegter Vertragslaufzeit; sonst zeigt der Bericht Szenarien.</p>
-<h3 id="k5-4">5.4 Bewirtschaftungskosten</h3>
-<p>Verwaltung, Instandhaltung, Mietausfallwagnis und nicht umlagefähige Betriebskosten (§ 32) setzt DealPilot nach den Modellansätzen der Anlage 3 ImmoWertV an, <b>fortgeschrieben auf den Stichtag</b> (Anlage 3 Teil III). Führt das Modell des verwendeten Zinssatzes eigene Bewirtschaftungskosten – etwa das gemeinsame Modell der Gutachterausschüsse eines Landes –, gelten dessen Ansätze (§ 10). Die Verwaltung zählt je bewerteter Einheit – bei einer Eigentumswohnung ist das eine Einheit, nicht das ganze Haus. Eigene Sätze gehen vor und heißen im Rechenweg „eigene Angabe“; rechnet der Ertragswert mit einem amtlichen Zinssatz, weist der Bericht darauf hin, dass die Rechnung insoweit nicht mehr modellkonform ist.</p>
-<h3 id="k5-5">5.5 Liegenschaftszinssatz (§ 21 Abs. 2, § 33)</h3>
-<p>Liegenschaftszinssätze sind die Zinssätze, mit denen Verkehrswerte je nach Grundstücksart im Durchschnitt marktüblich verzinst werden (§ 21 Abs. 2). Beim Liegenschaftszinssatz gibt es bei DealPilot <b>immer einen Wert</b>, damit der Ertragswert rechnet – jede Ebene unter Stufe A wird ausgewiesen, mit dem Weg zu einem genaueren Wert.</p>
-<ul class="m-liste"><li><b>Stufe A bis C – das Register.</b> Der Satz des Ausschusses wird objektgenau gewählt: nach Objektart, Lage, Restnutzungsdauer und Baujahr, so wie der Ausschuss seine Sätze gliedert, im Jahrgang, der am Stichtag galt. Mit dem Satz übernimmt die Rechnung seine Modellansätze.</li><li><b>Objektspezifische Anpassung (§ 33).</b> Angepasst wird nur mit den Koeffizienten oder der Funktion desselben Ausschusses – nie mit einer eigenen Gewichtung von DealPilot. Der Rechenweg zeigt beides: den Satz des Ausschusses und den angepassten Satz.</li><li><b>Stufe N.</b> Liegt für die Gemeinde kein Registersatz vor, rechnet vor dem Auffangwert eine gekennzeichnete DealPilot-Ableitung aus den amtlichen Zinssätzen – nur für Wohnnutzung und nur in den Ländern, in denen sie gemessen genauer ist als der gesetzliche Auffangwert. Ist der amtliche Satz nur deshalb nicht verwendbar, weil er kostenpflichtig oder genehmigungspflichtig ist, nennt der Bericht zusätzlich den Bestellweg.</li><li><b>Stufe D – § 256 BewG.</b> Danach gilt der gesetzliche Auffangwert der Grundsteuerbewertung: 2,5 % für Ein- und Zweifamilienhäuser, 3,0 % für Wohnungseigentum, 4,0 % bzw. 4,5 % für Mietwohngrundstücke bis bzw. über sechs Wohnungen, bei hohem Bodenrichtwert nach § 256 Abs. 2 und 3 abgesenkt. Er ist für die Grundsteuer bestimmt und nicht aus dem Markt abgeleitet; der Bericht sagt das.</li></ul>
-</div>
-<p class="nach-oben"><a href="#inhalt">↑ Inhalt</a></p>
-</div></section>
-
-<section class="m-sec sec-creme" id="k6"><div class="w-schmal">
-<div class="kz"><div class="kick">Kapitel 6</div><h2>Sachwertverfahren (§§ 35 bis 39 ImmoWertV)</h2></div>
-<div class="m-text">
-<p>Ein Sachwert gilt bei DealPilot <b>nur mit amtlichem Sachwertfaktor</b> als Marktwert: Die allgemeinen Wertverhältnisse kommen im Sachwertverfahren erst über den Sachwertfaktor hinein (§ 7 Abs. 1, ImmoWertA 7.(1)).</p>
-<ol class="m-liste"><li><b>Herstellungskosten</b> nach den Normalherstellungskosten 2010 (Anlage 4 ImmoWertV) – Gebäudeart und Standardstufe aus dem Objekt, je Quadratmeter Brutto-Grundfläche.</li><li><b>Baupreisindex</b> des Statistischen Bundesamts zum Stichtag (§ 36 Abs. 2) – der Wert, der am Stichtag bereits veröffentlicht war. Der Rechenweg nennt Index und Monat.</li><li><b>Regionalfaktor</b> des örtlichen Ausschusses (§ 36 Abs. 3), wo sein Modell einen führt.</li><li><b>Außenanlagen und sonstige Anlagen</b> (§ 37) nur, wenn sie eingetragen sind.</li><li><b>Alterswertminderung</b> im Verhältnis von Restnutzungsdauer zu Gesamtnutzungsdauer (§ 38) – mit derselben Restnutzungsdauer wie im Ertragswert.</li><li><b>Bodenwert</b> wie im Ertragswert. Ohne Bodenwert gibt es keinen Sachwert (§ 35 Abs. 2).</li><li><b>Marktanpassung mit dem Sachwertfaktor</b> (§ 21 Abs. 3, § 39) im Modell des Ausschusses, mit seinen Korrekturen. Jede Korrektur wird angewandt, oder das Objekt liegt in der Norm – sonst wird kein Faktor angesetzt, und der Bericht nennt den Grund je Merkmal.</li><li><b>Besondere objektspezifische Merkmale</b> erst danach (Kapitel 8).</li></ol>
-<p><b>Gesamtnutzungsdauer aus dem Modell.</b> Führt der Ausschuss eine eigene Gesamtnutzungsdauer, gilt sie, und die Restnutzungsdauer wird in ihrem Rahmen neu abgeleitet (ImmoWertA 4.(2)). Ohne Angabe gilt Anlage 1 ImmoWertV.</p>
-<p><b>Ohne Sachwertfaktor</b> steht der Wert als „vorläufiger Sachwert (nur Plausibilität)“ im Bericht: keine Marktanpassung, kein Marktwert, keine Rolle in der Verfahrenswahl.</p>
-</div>
-<p class="nach-oben"><a href="#inhalt">↑ Inhalt</a></p>
-</div></section>
-
-<section class="m-sec" id="k7"><div class="w-schmal">
-<div class="kz"><div class="kick">Kapitel 7</div><h2>Restnutzungsdauer</h2></div>
-<div class="m-text">
-<h3 id="k7-1">7.1 Das Modell der ImmoWertV</h3>
-<p>Die Restnutzungsdauer ist die Zahl der Jahre, in denen ein Gebäude bei ordnungsgemäßer Bewirtschaftung voraussichtlich noch wirtschaftlich genutzt werden kann; Modernisierungen können sie verlängern, unterlassene Instandhaltung verkürzen (§ 4 Abs. 3 ImmoWertV). Weil die Gutachterausschüsse ihre Daten mit Anlage 1 (Gesamtnutzungsdauer) und Anlage 2 (Modernisierung) ableiten (§ 12 Abs. 5), rechnet DealPilot <b>eine</b> Restnutzungsdauer nach diesem Modell für alle Verfahren.</p>
-<ul class="m-liste"><li><b>Modernisierungspunkte</b> nach Anlage 2 Tabelle 1 – Dach, Fenster und Außentüren, Leitungen, Heizung, Außenwanddämmung, Bäder, Innenausbau, Grundriss.</li><li><b>Ohne Angaben zur Modernisierung</b> gilt das Gebäude als nicht modernisiert, mit dem Hinweis, dass eingetragene Modernisierungen die Restnutzungsdauer erhöhen können.</li><li><b>Alter über der Gesamtnutzungsdauer</b> wird wie das Alter in Höhe der Gesamtnutzungsdauer angesetzt (ImmoWertA zu Anlage 2) – ein älteres Gebäude bekommt nie mehr Restnutzungsdauer als ein jüngeres.</li></ul>
-<h3 id="k7-2">7.2 Restnutzungsdauer-Gutachten für die Abschreibung</h3>
-<p>Ist die tatsächliche Nutzungsdauer kürzer als die gesetzliche, kann nach § 7 Abs. 4 Satz 2 EStG entsprechend höher abgeschrieben werden; die kürzere Nutzungsdauer ist nachzuweisen.</p>
-<div class="tab-wrap"><table class="tab-d tab-m"><thead><tr><th>Fundstelle</th><th>Aussage</th></tr></thead><tbody>
-<tr><td data-l="Fundstelle"><span>BFH, Urteil vom 28.07.2021, IX R 25/19</span></td><td data-l="Aussage"><span>Jede geeignete sachverständige Methode kann genügen, auch eine modellhafte.</span></td></tr>
-<tr><td data-l="Fundstelle"><span>BFH, Urteil vom 23.01.2024, IX R 14/23</span></td><td data-l="Aussage"><span>Die Restnutzungsdauer nach der ImmoWertV ist eine anerkannte Schätzungsmethode; der bloße Verweis auf das Modell reicht aber nicht – das Gutachten muss sich zum einzelnen Objekt verhalten.</span></td></tr>
-<tr><td data-l="Fundstelle"><span>BMF-Schreiben vom 22.02.2023</span></td><td data-l="Aussage"><span>am 01.12.2025 aufgehoben; die Verwaltung wendet seither das Urteil IX R 14/23 an.</span></td></tr>
-</tbody></table></div>
-<p>Der Gutachten-Assistent von DealPilot nimmt den Erwerb als Stichtag, führt die Modernisierungspunkte je Element mit Jahr und Beleg, rechnet das Modell der Anlage 2 und prüft den Zustand zusätzlich <b>je Bauteilgruppe</b>, gewichtet nach den Anteilen der Normalherstellungskosten 2010. Weichen Modell und technische Prüfung erheblich voneinander ab, wird das ausgewiesen und ist sachverständig zu würdigen.</p>
-</div>
-<p class="nach-oben"><a href="#inhalt">↑ Inhalt</a></p>
-</div></section>
-
-<section class="m-sec sec-creme" id="k8"><div class="w-schmal">
-<div class="kz"><div class="kick">Kapitel 8</div><h2>Besondere objektspezifische Grundstücksmerkmale (§ 8 Abs. 3 ImmoWertV)</h2></div>
-<div class="m-text">
-<p>Besondere objektspezifische Grundstücksmerkmale sind wertbeeinflussende Merkmale, die erheblich vom Üblichen abweichen – etwa besondere Ertragsverhältnisse, Baumängel und Bauschäden, nicht mehr wirtschaftlich nutzbare Gebäude, Bodenverunreinigungen oder grundstücksbezogene Rechte und Belastungen (§ 8 Abs. 3 Satz 2).</p>
-<ul class="m-liste"><li><b>Reihenfolge.</b> Sie werden erst bei den Verfahrenswerten berücksichtigt, also nach der Marktanpassung (§ 8 Abs. 3 Satz 3, § 6 Abs. 2).</li><li><b>Identisch in allen Verfahren.</b> Ein eingetragener Betrag wirkt in jedem gerechneten Verfahren (§ 8 Abs. 3 Satz 4).</li><li><b>Keine Doppelberücksichtigung</b> (ImmoWertA 9.(1).6). Was schon in einem Modellansatz steckt, wird nicht noch einmal abgezogen; der Bericht weist auf einen möglichen Doppelabzug hin.</li><li><b>Nur mit Begründung.</b> Ein eingetragenes Merkmal ohne Begründung ist im Bericht als solches gekennzeichnet.</li></ul>
-</div>
-<p class="nach-oben"><a href="#inhalt">↑ Inhalt</a></p>
-</div></section>
-
-<section class="m-sec" id="k9"><div class="w-schmal">
-<div class="kz"><div class="kick">Kapitel 9</div><h2>Wertangabe, LTV und Beleihungswert</h2></div>
-<div class="m-text">
-<h3 id="k9-1">9.1 Die Herkunft der Wertangabe</h3>
-<p>Ein Verkehrswert nach § 194 BauGB entsteht nur durch eine Wertermittlung, in der Regel ein Gutachten. Das Objekt führt deshalb <b>eine</b> Wertangabe mit ihrer Herkunft, und die Herkunft entscheidet, wofür der Wert taugt:</p>
-<div class="tab-wrap"><table class="tab-d tab-m"><thead><tr><th>Herkunft</th><th>Beschriftung</th><th>Grundlage für den LTV</th></tr></thead><tbody>
-<tr><td data-l="Herkunft"><span>Verkehrswertgutachten</span></td><td data-l="Beschriftung"><span>Verkehrswert (§ 194 BauGB, Gutachten)</span></td><td data-l="Grundlage für den LTV"><span>ja</span></td></tr>
-<tr><td data-l="Herkunft"><span>Bankbewertung</span></td><td data-l="Beschriftung"><span>Marktwert laut Bankbewertung</span></td><td data-l="Grundlage für den LTV"><span>ja</span></td></tr>
-<tr><td data-l="Herkunft"><span>DealPilot-Marktbericht</span></td><td data-l="Beschriftung"><span>Wert aus dem Marktbericht (indikativ)</span></td><td data-l="Grundlage für den LTV"><span>nein</span></td></tr>
-<tr><td data-l="Herkunft"><span>Marktpreisindikation</span></td><td data-l="Beschriftung"><span>Marktpreisindikation aus Angebotspreisen</span></td><td data-l="Grundlage für den LTV"><span>nein</span></td></tr>
-<tr><td data-l="Herkunft"><span>eigene Schätzung</span></td><td data-l="Beschriftung"><span>Marktwert (eigene Schätzung)</span></td><td data-l="Grundlage für den LTV"><span>nein</span></td></tr>
-</tbody></table></div>
-<p>Der Beleihungsauslauf (LTV) rechnet mit dem Gutachten- oder Bankwert, sonst mit dem Kaufpreis.</p>
-<h3 id="k9-2">9.2 Indikativer Beleihungswert-Check</h3>
-<p>Banken beleihen auf den Beleihungswert – den Wert, der während der gesamten Dauer der Beleihung voraussichtlich erzielt werden kann (§ 3 BelWertV). DealPilot bildet ihn als <b>Näherung</b> nach, getrennt vom Verkehrswert und nie als Gutachten bezeichnet: Der Ertragswert ist maßgeblich und darf nicht überschritten werden (§ 4 Abs. 1), Mieten werden auf das nachhaltig Erzielbare begrenzt, die Bewirtschaftungskosten folgen den Mindestsätzen der BelWertV (§ 11), der Kapitalisierungszinssatz den Vorgaben des § 12, der Sachwert dient als Kontrollwert (§ 16). Der Beleihungswert darf den Marktwert nicht übersteigen (§ 16 Abs. 2 PfandBG); ausgewiesen wird außerdem die Beleihungsgrenze von 60 % (§ 14 PfandBG).</p>
-</div>
-<p class="nach-oben"><a href="#inhalt">↑ Inhalt</a></p>
-</div></section>
-
-<section class="m-sec sec-creme" id="k10"><div class="w-schmal">
-<div class="kz"><div class="kick">Kapitel 10</div><h2>Investitionsrechnung, Steuer und Bewertung</h2></div>
-<div class="m-text">
-<p>Die Investitionsrechnung ist keine Wertermittlung. Sie folgt dort, wo es eine gibt, der gesetzlichen Grundlage. Alle Teile der Anwendung – Objekt, Schnellprüfung, Steuer, Kaufpreisaufteilung, Auswertungen und Assistent – rechnen mit <b>denselben</b> Rechenkernen.</p>
-<!-- landing-methodik-5 / v3094 (N93): Kapitel 10 um Kaufnebenkosten, DSCR-Staffel, Scores, Mietpotenzial, Zielkaufpreis und Quick-Check ergänzt -->
-<h3 id="k10-1">10.1 Steuer, Kaufnebenkosten und Mietrecht</h3>
-<div class="tab-wrap"><table class="tab-d tab-m"><thead><tr><th>Thema</th><th>Wie DealPilot vorgeht</th><th>Rechtsgrundlage</th></tr></thead><tbody>
-<tr><td data-l="Thema"><span>Grunderwerbsteuer</span></td><td data-l="Wie DealPilot vorgeht"><span>Satz des Bundeslandes auf den Kaufpreis ohne gesondert und angemessen ausgewiesenes Inventar</span></td><td data-l="Rechtsgrundlage"><span>§§ 1, 2 GrEStG; Landesgesetze zum Steuersatz</span></td></tr>
-<tr><td data-l="Thema"><span>Notar und Grundbuch</span></td><td data-l="Wie DealPilot vorgeht"><span>nach der gesetzlichen Gebührentabelle für Kaufpreis und Darlehen: Notar 2,0 Gebühren auf den Kaufpreis für die Beurkundung, je 0,5 für Vollzug und Betreuung, 1,0 auf das Darlehen für die Grundschuld, Auslagen pauschal 60 €, zuzüglich Umsatzsteuer; Grundbuchamt 0,5 für die Vormerkung und 1,0 für die Eigentumsumschreibung auf den Kaufpreis, 1,0 auf das Darlehen. Ohne Darlehen entfällt die Grundschuld. Der Anteil am Kaufpreis sinkt deshalb mit dem Preis. Abschaltbar in den Einstellungen; ein eigener Eintrag gilt vor</span></td><td data-l="Rechtsgrundlage"><span>§ 34 GNotKG mit Tabelle B (Anlage 2); KV 21100, 22110, 22200, 21200, 14110, 14150, 14121 GNotKG</span></td></tr>
-<tr><td data-l="Thema"><span>Grundschuldkosten</span></td><td data-l="Wie DealPilot vorgeht"><span>als Finanzierungskosten Werbungskosten, nicht Anschaffungskosten</span></td><td data-l="Rechtsgrundlage"><span>§ 9 Abs. 1 EStG</span></td></tr>
-<tr><td data-l="Thema"><span>Kaufpreisaufteilung</span></td><td data-l="Wie DealPilot vorgeht"><span>Grund und Boden zu Gebäude nach der Arbeitshilfe des Bundesministeriums der Finanzen</span></td><td data-l="Rechtsgrundlage"><span>Arbeitshilfe BMF</span></td></tr>
-<tr><td data-l="Thema"><span>Lineare Abschreibung</span></td><td data-l="Wie DealPilot vorgeht"><span>nach dem Jahr der Fertigstellung: 3 % ab 2023, 2 % von 1925 bis 2022, 2,5 % vor 1925</span></td><td data-l="Rechtsgrundlage"><span>§ 7 Abs. 4 Satz 1 EStG</span></td></tr>
-<tr><td data-l="Thema"><span>Kürzere Nutzungsdauer</span></td><td data-l="Wie DealPilot vorgeht"><span>höherer Satz mit nachgewiesener Restnutzungsdauer (Abschnitt 7.2)</span></td><td data-l="Rechtsgrundlage"><span>§ 7 Abs. 4 Satz 2 EStG</span></td></tr>
-<tr><td data-l="Thema"><span>Degressive Abschreibung</span></td><td data-l="Wie DealPilot vorgeht"><span>5 % vom Restbuchwert für Wohngebäude, wenn Vertrag bzw. Baubeginn im gesetzlichen Zeitraum liegen</span></td><td data-l="Rechtsgrundlage"><span>§ 7 Abs. 5a EStG</span></td></tr>
-<tr><td data-l="Thema"><span>Sonderabschreibung Mietwohnungsneubau</span></td><td data-l="Wie DealPilot vorgeht"><span>zusätzlich zur regulären Abschreibung, mit Kostengrenze; Voraussetzungen bestätigst du</span></td><td data-l="Rechtsgrundlage"><span>§ 7b EStG</span></td></tr>
-<tr><td data-l="Thema"><span>Anschaffungsnahe Herstellungskosten</span></td><td data-l="Wie DealPilot vorgeht"><span>Instandsetzung und Modernisierung in den ersten drei Jahren über 15 % der Gebäude-Anschaffungskosten (ohne Umsatzsteuer) werden mit dem Gebäude abgeschrieben</span></td><td data-l="Rechtsgrundlage"><span>§ 6 Abs. 1 Nr. 1a EStG</span></td></tr>
-<tr><td data-l="Thema"><span>Standardhebung</span></td><td data-l="Wie DealPilot vorgeht"><span>Hinweis, sobald Arbeiten an mindestens drei der vier zentralen Bereiche Fenster, Elektro, Sanitär und Heizung angekreuzt sind: wird der Standard dabei deutlich gehoben, sind die Kosten Herstellungskosten und laufen über die Abschreibung – auch unterhalb der 15-%-Grenze. Bei zwei Bereichen weist DealPilot vorab darauf hin. Die Einordnung stimmst du mit deiner Steuerberatung ab</span></td><td data-l="Rechtsgrundlage"><span>BMF-Schreiben vom 26.01.2026</span></td></tr>
-<tr><td data-l="Thema"><span>Steuerwirkung</span></td><td data-l="Wie DealPilot vorgeht"><span>Einkünfte aus Vermietung und Verpachtung; Steuer nach dem Einkommensteuertarif, mit Splitting, Solidaritätszuschlag und Kirchensteuer – privat oder über eine Kapitalgesellschaft</span></td><td data-l="Rechtsgrundlage"><span>§§ 9, 21, 32a EStG</span></td></tr>
-<tr><td data-l="Thema"><span>Mieterhöhung</span></td><td data-l="Wie DealPilot vorgeht"><span>bis zur ortsüblichen Vergleichsmiete, mit Wartefrist und Kappungsgrenze der Gemeinde: 15 % in drei Jahren, wo die Landesverordnung die Gemeinde nennt und noch gilt, sonst die gesetzlichen 20 %; die Verordnung wird mit Link genannt (Abschnitt 10.4)</span></td><td data-l="Rechtsgrundlage"><span>§§ 558, 558b BGB; Kappungsgrenzen-Verordnungen der Länder</span></td></tr>
-<tr><td data-l="Thema"><span>Mietpreisbremse</span></td><td data-l="Wie DealPilot vorgeht"><span>bei Neuvermietung höchstens ortsübliche Vergleichsmiete + 10 %, wo die Landesverordnung die Gemeinde nennt und noch gilt; eine Zielmiete darüber wird markiert (Ausnahmen höhere Vormiete und umfassende Modernisierung)</span></td><td data-l="Rechtsgrundlage"><span>§§ 556d bis 556f BGB; Mietpreisbremsen-Verordnungen der Länder</span></td></tr>
-<tr><td data-l="Thema"><span>Modernisierungsumlage</span></td><td data-l="Wie DealPilot vorgeht"><span>nur für Modernisierung, nicht für Erhaltung, mit gesetzlicher Obergrenze je m²</span></td><td data-l="Rechtsgrundlage"><span>§ 559 BGB</span></td></tr>
-<tr><td data-l="Thema"><span>Staffel- und Indexmiete</span></td><td data-l="Wie DealPilot vorgeht"><span>keine Erhöhung nach § 558; bei Staffelmiete auch keine Umlage nach § 559, bei Indexmiete nur in den gesetzlichen Ausnahmen</span></td><td data-l="Rechtsgrundlage"><span>§§ 557a, 557b BGB</span></td></tr>
-</tbody></table></div>
-<p><b>Kennzahlen.</b> Gesamtinvestition, Brutto- und Nettomietrendite, Kaufpreisfaktor, Cashflow vor und nach Steuern, Eigenkapitalrendite, Kapitaldienstfähigkeit (DSCR) und Beleihungsauslauf (LTV) sind offen definiert und stehen mit ihren Bestandteilen im Objekt. Die Gesamtinvestition ist Kaufpreis plus Kaufnebenkosten plus Sanierung.</p>
-
-<h3 id="k10-2">10.2 Kapitaldienstfähigkeit (DSCR) und die harte Grenze im Score</h3>
-<p>Der <b>DSCR</b> sagt, wie oft die Miete den Kapitaldienst deckt: Nettokaltmiete und Zuschläge abzüglich der nicht umlagefähigen Bewirtschaftungskosten, geteilt durch Zins und Tilgung im Jahr (bei Tilgungsaussetzung einschließlich der Bausparrate). Maßgeblich ist dieser Nettowert, wie in der Bankpraxis; der Bruttowert ohne Kostenabzug steht zum Vergleich daneben. Die Ampel steht bei 1,2 auf grün und unter 1,0 auf rot – deine persönliche Mindest-Schwelle aus den Einstellungen ersetzt diese Vorgabe.</p>
-<p>Eine Mindest-DSCR steht in keiner Norm; in der Bankpraxis üblich sind 1,1 bis 1,35. Damit eine starke Rendite einen Deal nicht schönrechnet, dessen Miete den Kapitaldienst nicht trägt, begrenzt DealPilot den Score nach dieser Staffel:</p>
-<div class="tab-wrap"><table class="tab-d tab-m"><thead><tr><th>DSCR</th><th>Score höchstens</th><th>Stufe höchstens</th></tr></thead><tbody>
-<tr><td data-l="DSCR"><span>ab 1,2 oder Barkauf</span></td><td data-l="Score höchstens"><span>keine Grenze</span></td><td data-l="Stufe höchstens"><span>–</span></td></tr>
-<tr><td data-l="DSCR"><span>1,0 bis unter 1,2</span></td><td data-l="Score höchstens"><span>84</span></td><td data-l="Stufe höchstens"><span>Gut</span></td></tr>
-<tr><td data-l="DSCR"><span>0,8 bis unter 1,0</span></td><td data-l="Score höchstens"><span>69</span></td><td data-l="Stufe höchstens"><span>Solide</span></td></tr>
-<tr><td data-l="DSCR"><span>unter 0,8</span></td><td data-l="Score höchstens"><span>49</span></td><td data-l="Stufe höchstens"><span>Schwach</span></td></tr>
-<tr><td data-l="DSCR"><span>unter 0,8 und Darlehen über dem Marktwert</span></td><td data-l="Score höchstens"><span>34</span></td><td data-l="Stufe höchstens"><span>Kritisch</span></td></tr>
-</tbody></table></div>
-<p>Die letzte Zeile greift nur, wo ein Marktwert bekannt ist. Eine zweite Grenze gilt für Zustand und Sanierung: sanierungsbedürftig oder Sanierungskosten ab 25 % des Kaufpreises höchstens 69, renovierungsbedürftig oder ab 10 % höchstens 84. Es gilt die niedrigere Grenze, und das Ergebnis nennt, welche greift und welcher Score ohne sie herausgekommen wäre.</p>
-
-<h3 id="k10-3">10.3 Deal Score – ein Score oder zwei</h3>
-<p>Die Scores sind DealPilot-eigene Bewertungen. Sie haben keine Rechtsgrundlage, sind keine Wertaussage und erscheinen erst, wenn genug Angaben vorliegen. Die Stufen sind überall dieselben: ab 85 <b>Sehr gut</b>, ab 70 <b>Gut</b>, ab 50 <b>Solide</b>, ab 35 <b>Schwach</b>, darunter <b>Kritisch</b>.</p>
-<p><b>DealPilot Score</b> – die Ersteinschätzung im Quick-Check und im Objekt, aus fünf Teilnoten. Vorgabe-Gewichtung: Cashflow nach Kapitaldienst 30 %, Nettomietrendite 25 %, Beleihungsauslauf 15 %, Risiko (DSCR) 15 %, Potenzial 15 %. Das Potenzial misst den Wertpuffer (Marktwert über dem Kaufpreis) und die Mietsteigerung; im Quick-Check ist das die <b>rechtlich zulässige</b> Steigerung der Bestandsmiete in drei Jahren (Abschnitt 10.4), in der Teilnote Potenzial bis zu 10 Punkte. Beim Barkauf entfallen Beleihung und Risiko aus der Rechnung, statt schlecht bewertet zu werden.</p>
-<p><b>Investor Deal Score</b> – die ausführliche Bewertung mit fünf Kategorien und ihren Kennzahlen, Vorgabe-Gewichtung Rendite 35 %, Finanzierung 25 %, Risiko 20 %, Lage 10 %, Potenzial 10 %. Fehlt eine Kennzahl, fällt sie aus der Gewichtung, statt geschätzt zu werden. Wahlweise (Einstellungen) zeigt DealPilot ihn als <b>zwei Scores</b>:</p>
-<ul class="m-liste"><li><b>Investment-Score</b> – das Objekt: Objektrendite (Brutto- und Nettomietrendite), Risiko und Zustand, Lage und Markt, Potenzial und Preis.</li><li><b>Finanzierungs-Score</b> – die Finanzierung: Kapitaldienst und Beleihung, Cashflow und Eigenkapitalrendite.</li><li><b>Gesamtscore</b> – das gewichtete Mittel beider Teile, also der Investor Deal Score selbst, wie ihn auch Seitenleiste, Objektkarte und PDF zeigen.</li></ul>
-<p>Die zwei Scores teilen die Kennzahlen nur auf; jede behält ihr Gewicht aus dem gewählten Bewertungsprofil. Die DSCR-Staffel aus Abschnitt 10.2 begrenzt den Finanzierungs-Score und den Gesamtscore. Die <b>Empfehlung</b> hängt an zwei Schwellen: „Kaufen“ nur bei Investment-Score ab 70 und Finanzierungs-Score ab 50 – und nur, wenn die Miete den Kapitaldienst trägt (DSCR ab 1,0); beim Barkauf gilt die Finanzierung als erfüllt. Erfüllt nur das Objekt die Schwelle, heißt es „Objekt passt, Finanzierung umbauen“, erfüllt nur die Finanzierung sie, „Verhandeln“, erfüllt keiner sie, „Verhandeln, Finanzierung umbauen“. Unter 50 im Investment-Score lautet die Empfehlung „Nicht kaufen“.</p>
-
-<h3 id="k10-4">10.4 Mietpotenzial – nur die Miete, die rechtlich zulässig ist</h3>
-<p>Angebotsmiete und zulässige Bestandsmiete sind zwei verschiedene Zahlen und werden nie gleichgesetzt. Als Mietpotenzial einer vermieteten Wohnung rechnet DealPilot nur, was das Mietrecht erlaubt:</p>
-<ul class="m-liste"><li><b>Mieterhöhung im Bestand</b> bis zur ortsüblichen Vergleichsmiete, aber höchstens um die Kappungsgrenze in drei Jahren – es gilt der niedrigere Wert. Liegt die Miete schon an der Vergleichsmiete, gibt es keine Erhöhung. Ist keine Vergleichsmiete bekannt, rechnet nur die Kappungsgrenze, mit dem ausdrücklichen Hinweis, dass die echte Grenze darunter liegen kann.</li><li><b>Termine</b>: wann die Erhöhung frühestens verlangt werden kann und wann sie wirksam wird – verlangt frühestens zwölf Monate nach der letzten Erhöhung, wirksam zu Beginn des dritten Kalendermonats nach Zugang.</li><li><b>Staffel- und Indexmiete</b> schließen die Erhöhung nach § 558 aus; dann zählt der Vertrag.</li><li><b>Neuvermietung</b> ist eine eigene Zeile: die Marktmiete, wo die Mietpreisbremse gilt, begrenzt auf Vergleichsmiete + 10 %.</li></ul>
-<p>Kappungsgrenze und Mietpreisbremse kommen aus den <b>Landesverordnungen</b>. Zugeordnet wird über den amtlichen Gemeindeschlüssel aus der Adresse; wo er fehlt, über den Ortsnamen – das steht dann dabei, und ein Name, der auf mehrere Gemeinden passt, wird zur Prüfung markiert. Eine ausgelaufene Verordnung zählt nicht mehr. Als Vergleichsmiete gilt deine eigene Angabe; fehlt sie, die eingetragene Marktmiete oder der Mietspiegelwert – als Annahme, die du vor einer Mieterhöhung prüfst. Im Objekt zeigt die <b>Mietleiter</b> je Wohnung, was heute gilt, welche Erhöhung wann möglich ist, was bei Neuvermietung gilt und wo deine Zielmiete liegt.</p>
-
-<h3 id="k10-5">10.5 Zielkaufpreis</h3>
-<p>Der Zielkaufpreis ist ein Verhandlungsrahmen, kein Wert. Er ist der niedrigste von drei Preisen:</p>
-<ul class="m-liste"><li>der Preis, bei dem die Bruttomietrendite deine <b>Zielrendite</b> erreicht – gerechnet auf Kaufpreis plus Sanierung,</li><li>der Preis, bei dem der <b>Cashflow null</b> wird – mit deinem Darlehen und deiner Rate gerechnet, bei gleicher Finanzierungsquote,</li><li>der <b>Marktwert</b> nach Abzug des Angebotsabschlags (Abschnitt 4.3), wenn er abgerufen ist.</li></ul>
-<p>Liegt der Kaufpreis schon darunter, ist kein Nachlass nötig. Die Bewertung nennt, welche der drei Grenzen greift – bremst die Finanzierung den Preis, verschieben ihn mehr Eigenkapital oder ein günstigerer Zins. Beispiel für die Rendite-Grenze: Nettokaltmiete 10.800 € im Jahr und Zielrendite 8 % ergeben 135.000 €. Gerechnet wird mit der angesetzten Miete von heute; was nach drei Jahren rechtlich zulässig wäre, zeigt das Mietpotenzial getrennt (Abschnitt 10.4). Die Zielrendite kommt aus deiner Lageklasse; ohne Lageklasse rechnet DealPilot mit 6 %.</p>
-
-<h3 id="k10-6">10.6 Quick-Check – wie die Ersteinschätzung bewertet</h3>
-<p>Der Quick-Check ordnet ein Angebot in einer Minute ein. Er rechnet mit denselben Kernen wie das Objekt und zeigt sein Ergebnis in <b>einer Karte</b>: Score und Urteil, drei Prüfsteine, den Zielkaufpreis und die angesetzte Miete.</p>
-<div class="tab-wrap"><table class="tab-d tab-m"><thead><tr><th>Angabe</th><th>Woher sie kommt</th></tr></thead><tbody>
-<tr><td data-l="Angabe"><span>Kaufpreis, Miete, Hausgeld, Eigenkapital, Zins, Tilgung</span></td><td data-l="Woher sie kommt"><span>deine Eingabe; Zins und Tilgung vorbelegt aus deinen Standardwerten</span></td></tr>
-<tr><td data-l="Angabe"><span>Kaufnebenkosten</span></td><td data-l="Woher sie kommt"><span>Grunderwerbsteuer nach dem Bundesland der Postleitzahl, Notar und Grundbuch nach Gebührenordnung (Abschnitt 10.1) für Kaufpreis und gewählte Beleihung, Makler und Sonstige aus deinen Einstellungen</span></td></tr>
-<tr><td data-l="Angabe"><span>Anteil nicht umlagefähig</span></td><td data-l="Woher sie kommt"><span>aus den Ansätzen der ImmoWertV, Anlage 3: bei der Wohnung Verwaltung je Wohnung plus Rücklage der Gemeinschaft (Instandhaltung je m² ohne die eigene Rücklage), beim Haus Verwaltung je Wohnung plus Instandhaltung je m² – im Verhältnis zum Hausgeld, begrenzt auf 5 bis 80 %. Deine eigene Angabe gilt vor</span></td></tr>
-<tr><td data-l="Angabe"><span>Marktwert und Marktmiete</span></td><td data-l="Woher sie kommt"><span>die DealPilot-Marktbewertung mit Spanne (Abschnitt 4.3), wenn du sie abrufst</span></td></tr>
-<tr><td data-l="Angabe"><span>Kappungsgrenze und Mietpreisbremse</span></td><td data-l="Woher sie kommt"><span>Landesverordnungen, zugeordnet über den Gemeindeschlüssel der Postleitzahl, sonst über den Ortsnamen</span></td></tr>
-<tr><td data-l="Angabe"><span>Lageklasse und Zielrendite</span></td><td data-l="Woher sie kommt"><span>deine Wahl; vorbelegt A 3,5 %, B 5,0 %, C 7,0 % brutto, änderbar in den Einstellungen. Ohne eigene Vorgabe steht der Quick-Check auf B</span></td></tr>
-</tbody></table></div>
-<p><b>Die drei Prüfsteine.</b> Erstens der Preis gegen die Marktspanne der DealPilot-Marktbewertung: innerhalb der Spanne gilt er als „im Rahmen“ ohne Vor- oder Nachteil, darüber als Warnung. Zweitens die Bruttomietrendite gegen das Ziel deiner Lageklasse. Drittens die Finanzierung: Cashflow nach Kapitaldienst und DSCR gegen deine Schwellen.</p>
-<p><b>Das Urteil</b> folgt dem Score: ab 70 Kauf (liegt der Preis über dem Marktwert, Verhandeln), ab 50 Verhandeln oder genauer Prüfen, ab 35 nur mit Nachbesserung, darunter Absage. Die Lageklasse ist deine Grenze: Verfehlt die Rendite ihr Ziel, heißt das Urteil „Nicht kaufen“, auch wenn der Score gut ist. Erfüllt das Objekt Lage-Ziel und Marktpreis und scheitert nur an der Finanzierung, heißt es „Objekt passt – Finanzierung prüfen“, mit dem Eigenkapital, das den Cashflow auf null bringt. <b>Der Score selbst ändert sich mit der Lageklasse nicht</b> – sie wirkt auf Ziel, Urteil und Zielkaufpreis, damit der Score vergleichbar bleibt.</p>
-<p><b>Die Miete.</b> Ohne eigene Miete setzt der Quick-Check die Marktmiete der Bewertung an und sagt das, ohne Leerstand zu unterstellen. Liegt deine Ist-Miete darunter, zeigt eine Karte das Mietpotenzial: Ist-Miete, in drei Jahren zulässig (Kappungsgrenze, höchstens die Marktmiete) und bei Neuvermietung. Die Marktmiete steht dabei als <b>Annahme</b> für die ortsübliche Vergleichsmiete; eine amtliche Vergleichsmiete gibt es nur im Marktbericht Stufe 3 und nur dort, wo der Gutachterausschuss eine Mietübersicht führt. Fehlt die Marktmiete, gibt es keinen Abgleich und keine Potenzialkarte – der Quick-Check sagt dann, ob die Bewertung noch fehlt oder keine Vergleichsmieten fand.</p>
-</div>
-<p class="nach-oben"><a href="#inhalt">↑ Inhalt</a></p>
-</div></section>
-
-<section class="m-sec" id="k11"><div class="w-schmal">
-<div class="kz"><div class="kick">Kapitel 11</div><h2>Datenquellen und Register</h2></div>
-<div class="m-text">
-<p>DealPilot führt ein eigenes Register der wertermittlungsrelevanten Daten aller 16 Länder: Liegenschaftszinssätze, Sachwertfaktoren, Vergleichsfaktoren, Immobilienrichtwerte und Umrechnungskoeffizienten. <b>Jeder Satz trägt Ausschuss, Link, Jahrgang, Stichtag, Seite und Lizenz</b> – und das Modell, in dem der Ausschuss ihn abgeleitet hat.</p>
-<div class="reg-karten"><div class="rk gross"><b data-k="werte_gesamt">6.186</b><span>rechenbare amtliche Werte</span></div><div class="rk"><b data-k="ausschuesse">201</b><span>Gutachterausschüsse mit Wert</span></div><div class="rk"><b data-k="laender_erfasst">16</b><span>von 16 Ländern im Register</span></div><div class="rk"><b data-k="lzs">2.505</b><span>Liegenschaftszinssätze</span></div><div class="rk"><b data-k="swf">845</b><span>Sachwertfaktoren</span></div><div class="rk"><b data-k="vgf">1.389</b><span>Vergleichsfaktoren</span></div><div class="rk"><b data-k="irw_tabellen">135</b><span>Immobilienrichtwert-Tabellen</span></div><div class="rk"><b data-k="uk_flaeche">162</b><span>Umrechnungskoeffizienten Grundstücksgröße</span></div><div class="rk"><b data-k="uk_wgfz">115</b><span>Umrechnungskoeffizienten Geschossflächenzahl</span></div></div><p class="rk-stand">Stand des Registers: <span data-k="stand">28.10.2026</span> · jeder Wert mit Ausschuss, Jahrgang, Stichtag, Fundstelle und Lizenz · daneben Sperren mit Weg, wo ein Ausschuss nur gegen Gebühr oder Genehmigung abgibt</p>
-<p><b>Sperre mit Weg.</b> Gibt ein Ausschuss seine Daten nur gegen Gebühr, mit Genehmigung, nur für nichtkommerzielle Zwecke oder nur auf Anfrage ab, steht im Register keine Zahl, sondern der Ausschuss, der Grund und der Bestellweg. Wo DealPilot keine Zahl nennt, nennt es den Weg zur echten.</p>
-<p><b>Namensnennung.</b> Daten unter der Datenlizenz Deutschland – Namensnennung 2.0 verlangen die Nennung des Bereitstellers. Der Bericht nennt die Vermerke der <b>tatsächlich verwendeten</b> Sätze als Quellennachweis – und nur diese.</p>
-<p><b>Weitere amtliche Quellen:</b> die Bodenrichtwertsysteme der Länder (BORIS), das Statistische Bundesamt (Baupreisindex, Verbraucherpreisindex), der Zensus 2022, die Landesverordnungen zur Kappungsgrenze und die Geodienste der Länder. Dazu kommen aktuelle Marktdaten aus Angeboten – sie werden als solche bezeichnet und nie als amtlich.</p>
-</div>
-<p class="nach-oben"><a href="#inhalt">↑ Inhalt</a></p>
-</div></section>
-
-<section class="m-sec sec-creme" id="k12"><div class="w-schmal">
-<div class="kz"><div class="kick">Kapitel 12</div><h2>Unterlagen, KI und Datenschutz</h2></div>
-<div class="m-text">
-<p>DealPilot liest Exposés, Mietaufstellungen, Mietverträge, Grundbuchauszüge, Teilungserklärungen, Protokolle der Eigentümerversammlung und Energieausweise ein – auch gescannte. Daraus werden Felder vorgeschlagen, Risiken mit Fundstelle benannt und eine Investitionsthese formuliert. Übernommen wird erst nach deiner Bestätigung; eigene Angaben werden nie still überschrieben.</p>
-<p><b>Personenbezogene Daten werden geschwärzt, bevor ein Text an die KI geht:</b> Namen von Privatpersonen, Geburtsdaten, Anschriften, Telefonnummern, E-Mail-Adressen, Kontoverbindungen und Steuer-Identifikationsnummern werden durch Platzhalter ersetzt. Bei gescannten Seiten ersetzt bereits das Lesen diese Angaben, danach schwärzt der Server ein zweites Mal. Persönliche Unterlagen von Mietern – etwa Bescheide oder Einkommensnachweise – werden erkannt und gar nicht ausgelesen. Die Anschrift des Objekts bleibt erhalten, weil die Wertermittlung sie braucht.</p>
-<p>Die KI rechnet nicht. Sie erklärt, wertet Unterlagen aus und formuliert; jede Zahl in einem erläuternden Text wird gegen die vorab gerechneten Werte geprüft.</p>
-</div>
-<p class="nach-oben"><a href="#inhalt">↑ Inhalt</a></p>
-</div></section>
-
-<section class="m-sec" id="k13"><div class="w-schmal">
-<div class="kz"><div class="kick">Kapitel 13</div><h2>Prüfung</h2></div>
+<section id="pruefung"><div class="w-schmal">
+<div class="kz"><div class="kick">Prüfung</div><h2>Erst geprüft, dann live</h2></div>
 <div class="m-text">
 <p>Vor jeder Auslieferung laufen Prüfungen gegen die <b>echten Rechenkerne</b> – nicht gegen eine Nachbildung:</p>
-<ul class="m-liste"><li><b>Wertermittlung</b> gegen die amtlichen Anwendungsbeispiele (Ertragswert-, Vergleichswert- und Sachwertrichtlinie, ImmoWertA, Marktberichte der Ausschüsse), gegen fachlich festgelegte Testfälle und gegen eingefrorene Musterobjekte.</li><li><b>Umrechnungskoeffizienten und Immobilienrichtwerte</b> je Satz gegen das Anwendungsbeispiel des Ausschusses.</li><li><b>Restnutzungsdauer</b> gegen unterschriebene Gutachten und über zwei unabhängige Rechenkerne.</li><li><b>Register</b> auf Pflichtangaben je Satz – Quelle, Stichtag, Seite, Lizenz, Modell. Die Zahl der Lücken darf nur sinken.</li><li><b>KI-Texte</b> Zahl für Zahl gegen die Rechnung.</li></ul>
+<ul class="m-liste"><li><b>Wertermittlung</b> gegen die amtlichen Anwendungsbeispiele der Richtlinien und Ausschüsse und gegen eingefrorene Musterobjekte.</li><li><b>Restnutzungsdauer</b> gegen unterschriebene Gutachten.</li><li><b>Register</b> auf Pflichtangaben je Satz – Quelle, Stichtag, Seite, Lizenz. Die Zahl der Lücken darf nur sinken.</li><li><b>Steuer- und Jahreswerte</b> mit Fälligkeitsdatum je Wert – was fällig wird, fällt auf, bevor es veraltet.</li><li><b>KI-Texte</b> Zahl für Zahl gegen die Rechnung.</li></ul>
 <p>Eine Änderung geht erst live, wenn diese Prüfungen bestehen. Was sich nicht automatisch prüfen lässt, wird nicht als geprüft ausgegeben.</p>
 </div>
-<p class="nach-oben"><a href="#inhalt">↑ Inhalt</a></p>
 </div></section>
 
-<section class="m-sec sec-creme" id="k14"><div class="w-schmal">
-<div class="kz"><div class="kick">Kapitel 14</div><h2>Grenzen</h2></div>
+<section class="sec-creme" id="datenschutz"><div class="w-schmal">
+<div class="kz"><div class="kick">Unterlagen und Datenschutz</div><h2>Deine Unterlagen bleiben deine</h2></div>
 <div class="m-text">
-<p>DealPilot ersetzt <b>kein Verkehrswertgutachten</b> nach § 194 BauGB, keine Beleihungswertermittlung nach der BelWertV und kein unterschriebenes Restnutzungsdauer-Gutachten. Alle Werte sind indikativ; jede Zahl unter Stufe A ist gekennzeichnet. DealPilot besichtigt nicht – Zustand, Mängel und Modernisierungen beruhen auf deinen Angaben und Unterlagen.</p>
-<ul class="m-liste"><li><b>Keine Einzelkaufpreise.</b> Ein Vergleichswert entsteht nur aus Vergleichsfaktoren und Immobilienrichtwerten der Ausschüsse.</li><li><b>Nicht jedes Land veröffentlicht frei.</b> Wo Ausschüsse ihre Daten kostenpflichtig oder genehmigungspflichtig abgeben, ist ein Verfahren nicht oder nur gekennzeichnet rechenbar.</li><li><b>Merkmale, die DealPilot nicht erhebt.</b> Passt ein Ausschuss nach Merkmalen an, die nicht erfasst sind, wird sein Faktor nicht angesetzt, und der Bericht nennt die fehlenden Merkmale.</li><li><b>Eigene Festlegungen.</b> Wo die Verordnung keine Zahl nennt und DealPilot eine setzen muss, ist das im Bericht als DealPilot-Festlegung gekennzeichnet.</li><li><b>Stufe N</b> ist eine dokumentierte Schätzung, kein amtlicher Wert.</li><li><b>Steuer</b> ist eine Planungsrechnung und keine Steuerberatung; die Voraussetzungen besonderer Abschreibungen bestätigst du selbst.</li></ul>
+<p>DealPilot liest Exposés, Mietaufstellungen, Grundbuchauszüge, Teilungserklärungen und Energieausweise ein – auch gescannte. Übernommen wird erst nach deiner Bestätigung; eigene Angaben werden nie still überschrieben.</p>
+<p><b>Personenbezogene Daten werden geschwärzt, bevor ein Text an die KI geht</b> – Namen von Privatpersonen, Anschriften, Kontoverbindungen, Steuer-Identifikationsnummern. Persönliche Unterlagen von Mietern werden erkannt und gar nicht ausgelesen. Mehr unter <a href="sicherheit.html">Sicherheit &amp; Server</a>.</p>
 </div>
-<p class="nach-oben"><a href="#inhalt">↑ Inhalt</a></p>
 </div></section>
 
-<section class="m-sec" id="k15"><div class="w-schmal">
-<div class="kz"><div class="kick">Kapitel 15</div><h2>Rechtsgrundlagen</h2></div>
+<section id="grenzen"><div class="w-schmal">
+<div class="kz"><div class="kick">Grenzen</div><h2>Was DealPilot nicht ist</h2></div>
 <div class="m-text">
-<ul class="m-liste"><li>Immobilienwertermittlungsverordnung (ImmoWertV 2021), insbesondere §§ 2, 4, 6 bis 10, 12, 19 bis 21, 24 bis 41 und Anlagen 1 bis 4, mit den Muster-Anwendungshinweisen (ImmoWertA)</li><li>Baugesetzbuch (BauGB), §§ 192 bis 199</li><li>Bewertungsgesetz (BewG), § 256 und Anlage 39</li><li>Beleihungswertermittlungsverordnung (BelWertV) und Pfandbriefgesetz (PfandBG), §§ 14, 16</li><li>Einkommensteuergesetz (EStG), insbesondere §§ 6, 7, 7b, 9, 21, 32a</li><li>Bürgerliches Gesetzbuch (BGB), §§ 557a bis 559</li><li>Grunderwerbsteuergesetz (GrEStG)</li><li>Arbeitshilfe des Bundesministeriums der Finanzen zur Aufteilung eines Gesamtkaufpreises</li><li>Ertragswertrichtlinie, Vergleichswertrichtlinie und Sachwertrichtlinie als Quelle der amtlichen Rechenbeispiele</li><li>BFH, Urteile vom 28.07.2021 (IX R 25/19) und 23.01.2024 (IX R 14/23)</li><li>Datenschutz-Grundverordnung (DSGVO)</li></ul>
+<p>DealPilot ersetzt <b>kein Verkehrswertgutachten</b> nach § 194 BauGB, keine Beleihungswertermittlung einer Bank und kein unterschriebenes Restnutzungsdauer-Gutachten. Alle Werte sind indikativ. DealPilot besichtigt nicht – Zustand, Mängel und Modernisierungen beruhen auf deinen Angaben und Unterlagen.</p>
+<ul class="m-liste"><li><b>Nicht jedes Land veröffentlicht frei.</b> Wo Ausschüsse ihre Daten nur gegen Gebühr oder Genehmigung abgeben, ist ein Verfahren nicht oder nur gekennzeichnet rechenbar.</li><li><b>Steuer</b> ist eine Planungsrechnung und keine Steuerberatung.</li><li><b>Finanzierung</b> ist eine indikative Schätzung, kein Bankangebot und keine Finanzierungsberatung.</li></ul>
 </div>
-<p class="nach-oben"><a href="#inhalt">↑ Inhalt</a></p>
 </div></section>
 
+<section class="sec-creme" id="recht"><div class="w-schmal">
+<div class="kz"><div class="kick">Rechtsrahmen</div><h2>Worauf sich DealPilot stützt</h2></div>
+<div class="m-text">
+<ul class="m-liste"><li>Immobilienwertermittlungsverordnung (ImmoWertV 2021) mit den Muster-Anwendungshinweisen (ImmoWertA)</li><li>Baugesetzbuch (BauGB), §§ 192 bis 199</li><li>Bewertungsgesetz (BewG)</li><li>Beleihungswertermittlungsverordnung (BelWertV)</li><li>Einkommensteuergesetz (EStG) und Grunderwerbsteuergesetz (GrEStG)</li><li>Bürgerliches Gesetzbuch (BGB), Mietrecht</li><li>Arbeitshilfe des Bundesministeriums der Finanzen zur Aufteilung eines Gesamtkaufpreises</li><li>Datenschutz-Grundverordnung (DSGVO)</li></ul>
+</div>
+</div></section>
 </main>
 
 <footer class="footer"><div class="wrap">
@@ -476,26 +297,27 @@ section[id]{scroll-margin-top:70px}
     <div>
       <div class="mark mark-gross" style="color:#fff"><span class="wort">Deal<b>Pilot</b></span></div>
       <p class="footer-tag">Immobilien-Investmentanalyse für strukturierte Entscheidungen.
-        Entwickelt von Junker Immobilien · Sachverständigenbüro &amp; Projektentwicklung.</p>
+        DealPilot ist eine Marke von Junker Solution.<!-- landing-kern-1 · Betreiber Junker Solution (Einzelunternehmen), das Sachverständigenbüro ist eine eigene Marke und nur verlinkt --></p>
     </div>
     <div><h4>Produkt</h4>
       <a href="index.html#workflow">So funktioniert's</a><a href="index.html#features">Funktionen</a>
-      <a href="leistungsumfang.html">Leistungsumfang</a><a href="index.html#pricing">Preise</a>
+      <a href="leistungsumfang.html">Leistungsumfang</a><a href="preise.html">Preise</a>
       <a href="api.html">API</a><a href="videothek.html">Videothek</a></div>
     <div><h4>Vertrauen</h4>
       <a href="sicherheit.html">Sicherheit &amp; Server</a><a href="fragen.html">Häufige Fragen</a>
-      <a href="index.html#partner">Partner &amp; Datenquellen</a><a href="index.html#feature-matrix">Cockpit-Matrix</a></div>
+      <a href="index.html#partner">Partner &amp; Datenquellen</a><a href="preise.html#feature-matrix">Cockpit-Matrix</a></div>
     <div><h4>Kontakt</h4>
       <a href="mailto:support@dealpilot.immo">support@dealpilot.immo</a>
       <a href="mailto:info@dealpilot.immo">info@dealpilot.immo</a>
       <a href="/impressum.html">Impressum</a><a href="/datenschutz.html">Datenschutz</a></div>
   </div>
   <div class="footer-bottom">
-    <div>© 2026 Junker Immobilien</div>
+    <div>© 2026 Junker Solution · DealPilot</div>
     <div>Keine Steuer- oder Finanzberatung. Analyse-Werkzeug für eigene Kalkulationen.</div>
   </div>
 </div></footer>
 
+<script src="dp2-inhalt.js?v=landing-stories-1"></script>
 <script src="dp2.js?v=landing-zahlen-2"></script>
   <script src="assets/umgebung.js?v=v1644"></script><!-- v1644 · Landing zeigt auf DIE App, in der sie steht -->
 <script>/* landing-methodik-3 · Registerkarten tagesaktuell aus register-stand.js nachziehen */

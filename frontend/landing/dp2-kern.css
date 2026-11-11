@@ -1,0 +1,60 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   dp2-kern.css · landing-kern-1 (11.11.2026)
+   Startseite gekürzt: Zusagen am Knopf, kompakte Tarifkarten, Datenbasis.
+   Nur Tokens aus dp2.css - kein Gold-Literal (Whitelabel-Pflicht).
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* ── Zusagen direkt am Handlungsaufruf ─────────────────────────────── */
+.cta-haken{display:flex;flex-wrap:wrap;gap:6px 16px;margin:14px 0 0;padding:0;
+  font:600 12.5px/1.4 var(--mono);letter-spacing:.02em;color:rgba(236,230,214,.82)}
+.cta-haken span{display:inline-flex;align-items:center;gap:7px;white-space:nowrap}
+.cta-haken span::before{content:'✓';color:var(--grnh);font-weight:700}
+.cta-haken.ctr{justify-content:center}
+.board-band .cta-haken{color:var(--inks);margin-top:12px;font-size:12px}
+.board-band .cta-haken span::before{color:var(--ink)}
+.board-band .inner > div:last-child{display:flex;flex-direction:column;align-items:flex-start}
+.hero .cta-haken{margin-top:16px}
+@media (max-width:560px){.cta-haken{font-size:11.5px;gap:5px 12px}.cta-haken span{white-space:normal}}
+
+/* ── Kompakte Tarifkarten auf der Startseite ───────────────────────── */
+.tarif-kompakt{padding-top:64px;padding-bottom:58px}
+.tarif-kompakt .head{margin-bottom:22px}
+.tarif-kompakt .pseg{margin-bottom:22px}
+.tarif-kompakt .tk-feat{gap:7px;margin-bottom:16px}
+.tarif-kompakt .tk-rip{display:none}
+.tarif-mehr{margin-top:26px;text-align:center}
+.tarif-links{display:flex;flex-wrap:wrap;justify-content:center;gap:8px 22px;margin:16px 0 0;
+  font:700 11px/1.3 var(--mono);letter-spacing:.12em;text-transform:uppercase}
+.tarif-links a{color:var(--gdh);border-bottom:1px solid color-mix(in srgb,var(--gdh) 35%,transparent);padding-bottom:3px}
+.tarif-links a:hover{border-bottom-color:var(--gdh)}
+
+/* ── Preisseite ────────────────────────────────────────────────────── */
+.preis-h1{font-size:clamp(30px,4.4vw,52px);line-height:1.05;margin:14px 0 12px;color:#fff}
+#pricing .cta-haken.ctr{margin:0 0 14px}
+
+/* ── Datenbasis ────────────────────────────────────────────────────── */
+.daten .dt-zahlen{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border:1px solid var(--cream-line);
+  background:#fff;margin:6px 0 26px}
+.dt-zahlen > div{padding:22px 22px 20px;border-right:1px solid var(--cream-line);border-top:3px solid var(--gd);
+  display:flex;flex-direction:column;gap:6px;min-width:0}
+.dt-zahlen > div:last-child{border-right:0}
+.dt-zahlen b{font:700 clamp(28px,3.2vw,40px)/1 var(--disp);color:var(--ink);letter-spacing:-.02em}
+.dt-zahlen span{font-size:13.5px;line-height:1.4;color:var(--inkm)}
+.dt-zahlen i{font-style:normal;font-weight:700;color:var(--ink)}
+.dt-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.dt-k{background:#fff;border:1px solid var(--cream-line);padding:18px 18px 16px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.dt-k h4{font-size:17px;color:var(--ink)}
+.dt-k p{margin:0;font-size:13.5px;line-height:1.5;color:var(--inkm);flex:1}
+.dt-takt{align-self:flex-start;font:700 9.5px/1.3 var(--mono);letter-spacing:.12em;text-transform:uppercase;
+  color:var(--gdi);border:1px solid color-mix(in srgb,var(--gdi) 30%,transparent);padding:4px 8px}
+.dt-takt.live{color:var(--grn);border-color:rgba(63,165,108,.4)}
+.dt-takt.live::before{content:'● '}
+.dt-n{font:600 12px/1.4 var(--mono);color:var(--inkm);border-top:1px solid var(--cream-line);padding-top:9px}
+.dt-n b{color:var(--ink);font-weight:700}
+.dt-fuss{max-width:820px;margin:22px auto 0;text-align:center;font-size:13.5px;line-height:1.6;color:var(--mut)}
+@media (max-width:1020px){.dt-grid{grid-template-columns:repeat(2,1fr)}
+  .daten .dt-zahlen{grid-template-columns:repeat(2,1fr)}
+  .dt-zahlen > div:nth-child(2){border-right:0}
+  .dt-zahlen > div:nth-child(-n+2){border-bottom:1px solid var(--cream-line)}}
+@media (max-width:560px){.dt-grid{grid-template-columns:1fr}
+  .dt-zahlen > div{padding:16px 14px}.dt-zahlen span{font-size:12.5px}}

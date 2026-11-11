@@ -18,4 +18,8 @@ Disallow: /entwurf-
 Disallow: /demo-
 Disallow: /quickcheck-app.html
 
+# landing-kern-1 · die Langfassung der Methodik ist nicht mehr verlinkt (Marcel 11.11.2026:
+# nicht zeigen, WIE gerechnet wird) - Datei liegt noch, bis Marcel ueber das Loeschen entscheidet.
+Disallow: /assets/dealpilot-methodik.pdf
+
 Sitemap: https://dealpilot.immo/sitemap.xml
