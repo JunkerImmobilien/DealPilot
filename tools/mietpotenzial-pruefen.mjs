@@ -512,6 +512,16 @@ const EINH = [{ nr: '1', wfl: '60', ist: '480', status: 'vermietet' }, { nr: '2'
   wahr('K14 Herkunft „abzüglich 22 % (DealPilot-Ansatz nach Marktlage, nicht amtlich)“', /abzüglich 22 % \(DealPilot-Ansatz nach Marktlage, nicht amtlich\)/.test(m.vgl.herkunft) && /Gutachten belegen/.test(m.vgl.herkunft));
   zv = P.mietrechtDaten(m, 0).zeilen.find((z) => z.k === 'Vergleichsmiete');
   wahr('K14 Mietrecht-Zeile warnt bei Schätzung', zv && zv.warn && zv.quelle_art === 'angebot_abschlag');
+  /* v3286 · Begründung des Abschlags und Rechenweg der Höchstmiete (Marcel 11.11.2026: „DealPilot-Ansatz ohne Begründung") */
+  wahr('K14b Vergleichsmiete begründet: Marktmiete 10,00 − 22 % = 7,80, weil Mietpreisbremse gilt, § 558 Abs. 2, Herkunft nur einmal',
+    zv && /gerechnet: Marktmiete 10,00 €\/m² \(aktueller Marktdurchschnitt der Angebotsmieten/.test(zv.u) && /− 22 % = 7,80 €\/m²/.test(zv.u)
+      && /Abschlag 22 %, weil Mietpreisbremse gilt \(Marktlage angespannt\)/.test(zv.u) && /§ 558 Abs\. 2 BGB/.test(zv.u)
+      && zv.u.split('DealPilot-Ansatz nach Marktlage').length === 2 && !/BBSR|Scout|Immowelt|PriceHubble|Sprengnetter|Wohngeld/i.test(zv.u), zv && zv.u);
+  let rw = P.mietrechtDaten(m, 0).zeilen.find((z) => z.k === 'Rechenweg');
+  wahr('K14c Rechenweg (Aachen 15 %): 450 × 1,15 = 518 · 7,80 × 60 = 468 → höchstens 468, Neuvermietung 7,80 × 1,10 = 8,58',
+    rw && rw.v === 'höchstens 468 €/Monat' && /Kappungsgrenze: 450 € × 1,15 = 518 €/.test(rw.u) && /Vergleichsmiete: 7,80 € \/m² × 60 m² = 468 €|Vergleichsmiete: 7,80 €\/m² × 60 m² = 468 €/.test(rw.u)
+      && /Neuvermietung: 7,80 €\/m² × 1,10 = 8,58 €\/m²/.test(rw.u), rw && (rw.v + ' | ' + rw.u));
+  gleich('K14c Rechenweg = Kern (teil558)', P.soll558(m.wohnungen[0]), 468);
   P = await lauf({ plz: '32609', ds2_marktmiete: '10' }, null, '05758016');   /* weder Bremse noch 15 % -> mittel */
   m = P.modell({ einheiten: EIN1 });
   gleich('K15 mittel (Gemeinde ermittelt: 20 % Gesetz, keine Bremse): 10,00 − 10 % = 9,00', [m.vgl.qm, m.vgl.angebot.stufe, m.kappung.herkunft], [9, 'mittel', 'gesetz']);
@@ -794,5 +804,5 @@ const EINH = [{ nr: '1', wfl: '60', ist: '480', status: 'vermietet' }, { nr: '2'
   wahr('N10 Vorbehalt mit ausgelieferten Werten (Staging): kein Nutzungshinweis', !z2.nutzung && z2.werte_hinweis === K.MS_REG.werte);
 }
 
-console.log('mietpotenzial-pruefen (v3075, v3244, v3246, v3250, v3255, v3266): ' + (n - fehler) + ' von ' + n + ' ok');
+console.log('mietpotenzial-pruefen (v3075, v3244, v3246, v3250, v3255, v3266, v3286): ' + (n - fehler) + ' von ' + n + ' ok');
 process.exit(fehler ? 1 : 0);

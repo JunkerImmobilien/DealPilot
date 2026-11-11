@@ -2466,10 +2466,12 @@
         var ueb = q('#me-soll-uebernehmen'); if (ueb) ueb.click();
         await warte(900);
         await r6Ende(zb);
-        var opp = r6Id('me_opp'), drueber = opp && /^\+/.test(opp.trim());
-        if (drueber) await b2oZeile(s, 'Oder im Detail', 'Ziel ist die Vergleichsmiete <b>' + wert('me_soll') + ' €/m²</b>. Deine Miete liegt schon <b>' + opp.trim() + '</b> darüber — nach § 558 ist hier keine Erhöhung drin. Die Treppe gilt für Verträge mit Staffel oder Index.');
+        /* v3286 · #me_opp zeigt das Potenzial jetzt positiv („Potenzial +X %“ bzw. „über Mietspiegel +X %“);
+           Richtung und Abstand stehen in data-richtung / data-abstand - nicht mehr am Vorzeichen raten */
+        var oppEl = q('#me_opp'), oppR = oppEl && oppEl.getAttribute('data-richtung'), opp = oppEl && oppEl.getAttribute('data-abstand'), drueber = oppR === 'ueber';
+        if (drueber) await b2oZeile(s, 'Oder im Detail', 'Ziel ist die Vergleichsmiete <b>' + wert('me_soll') + ' €/m²</b>. Deine Miete liegt schon <b>' + opp + '</b> darüber — nach § 558 ist hier keine Erhöhung drin. Die Treppe gilt für Verträge mit Staffel oder Index.');
         else {
-          await b2oZeile(s, 'Oder im Detail', '<b>' + wert('me_anz') + ' Erhöhungen</b> alle ' + wert('me_int') + ' Jahre, zusammen ' + r6Pz(wert('me_pct')) + ' % — Ziel: Vergleichsmiete ' + wert('me_soll') + ' €/m²' + (opp && opp !== '—' ? '. Deine Kaltmiete liegt <b>' + opp.replace(/^[-−]\s*/, '') + '</b> darunter' : '') + '.');
+          await b2oZeile(s, 'Oder im Detail', '<b>' + wert('me_anz') + ' Erhöhungen</b> alle ' + wert('me_int') + ' Jahre, zusammen ' + r6Pz(wert('me_pct')) + ' % — Ziel: Vergleichsmiete ' + wert('me_soll') + ' €/m²' + (oppR === 'unter' && opp ? '. Potenzial bis dorthin: <b>' + opp + '</b>' : '') + '.');
           /* v3281 · die Treppe in der Tabelle: die Jahre mit Erhöhung (me-row-hike) und ihr €/m² */
           var stufen = [].map.call(document.querySelectorAll('#me_table_wrap tr.me-row-hike'), function (tr) { var td = tr.querySelectorAll('td'); return { j: (/Jahr\s*\d+/.exec(r6Text(td[0])) || [''])[0], qm: r6Text(td[2]) }; });
           var tab = function () { return q('#me_table_wrap table'); };

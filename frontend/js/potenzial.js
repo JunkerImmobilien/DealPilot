@@ -496,8 +496,27 @@
     var vMs = vEig ? null : (s.ms || vgO.ms || null);
     var vHw = vEig ? [] : (s.vgl_hinweise || vgO.hinweise || []);
     var vSchaetz = !vEig && /^(angebot_abschlag|dealpilot_naeherung)$/.test(s.vgl_quelle_art || vgO.quelle_art || '');   /* v3266 */
+    /* v3286 · Marcel 11.11.2026: „da steht DealPilot-Ansatz ohne Begründung". Bei der Schätzung aus
+       Angebotsmieten und bei der DealPilot-Näherung steht jetzt die Rechnung mit den Zahlen des Objekts
+       dabei (Marktmiete − Abschlag und WARUM dieser Abschlag; Zensus-Rechnung der Näherung). Nur, wenn die
+       Zahl der Zeile wirklich aus dieser Rechnung kommt. Keine Datenquelle namentlich (CLAUDE.md
+       Anbieter-Neutralität). Die Herkunft selbst stand doppelt (herkunft + hinweise[0]) - entdoppelt. */
+    var vBegr = '';
+    var vQa = vEig ? 'eigen' : (s.vgl_quelle_art || vgO.quelle_art || '');
+    var vAng = vgO.angebot, vAb = vgO.abschlag;
+    if (vQa === 'angebot_abschlag' && vAng && Math.abs(zahl(vAng.qm) - vglQm) < 0.005) {
+      var STUFE_W = { angespannt: 'angespannt', mittel: 'mittel', entspannt: 'entspannt' };
+      vBegr = vAng.pct != null
+        ? 'gerechnet: Marktmiete ' + eur2(vAng.markt_qm) + '/m² (aktueller Marktdurchschnitt der Angebotsmieten, Feld Marktmiete im Tab Miete) − ' + dez(vAng.pct, vAng.pct % 1 ? 1 : 0) + ' % = ' + eur2(vAng.qm) + '/m²'
+          + ' · Abschlag ' + dez(vAng.pct, vAng.pct % 1 ? 1 : 0) + ' %' + (vAb && vAb.grund ? ', weil ' + vAb.grund + (STUFE_W[vAb.stufe] ? ' (Marktlage ' + STUFE_W[vAb.stufe] + ')' : '') : '')
+          + ': Angebotsmieten liegen über der ortsüblichen Vergleichsmiete, denn in diese gehen auch die Bestandsmieten der letzten sechs Jahre ein (§ 558 Abs. 2 BGB)'
+        : 'gerechnet mit der Marktmiete ' + eur2(vAng.markt_qm) + '/m² ohne Abschlag (Marktlage nicht bekannt) — die ortsübliche Vergleichsmiete liegt meist darunter';
+    } else if (vQa === 'dealpilot_naeherung' && vgO.naeherung && vgO.naeherung.rechnung && Math.abs(zahl(vgO.naeherung.qm) - vglQm) < 0.005) {
+      vBegr = 'gerechnet: ' + vgO.naeherung.rechnung;
+    }
+    var vHwU = vHw.filter(function (h) { return h && h !== vglHer; });
     if (vglQm > 0) z.push({ k: 'Vergleichsmiete', v: eur2(vglQm) + '/m²' + (vMs ? ' · ' + vMs.wahl_text : ''),
-      u: vglHer + (vHw.length ? ' · ' + vHw.join(' · ') : ''),
+      u: vglHer + (vBegr ? ' · ' + vBegr : '') + (vHwU.length ? ' · ' + vHwU.join(' · ') : ''),
       warn: vSchaetz || !!(vMs && (vMs.veraltet || vMs.art !== 'qualifiziert' || vMs.genutzt === 'oben')), lang: vHw.join(' · '),
       ms: vMs, quelle_art: vEig ? 'eigen' : (s.vgl_quelle_art || vgO.quelle_art || null) });
     else z.push({ k: 'Vergleichsmiete', v: 'fehlt', u: 'Mietspiegel der Stadt eintragen (Tab Investition, Karte Mieterhöhung und Zielbild) oder eine belegte Vergleichsmiete', warn: true });
@@ -537,6 +556,27 @@
         + (br.gilt === true && naeh ? ' Die Obergrenze ist auf der DealPilot-Näherung der ortsüblichen Vergleichsmiete gerechnet: sie leitet die Vergleichsmiete aus der amtlichen Zensus-Bestandsmiete ab und ist an den freien Mietspiegeln kalibriert (mittlere Abweichung rund 7,5 %). Maßgeblich bleibt die Vergleichsmiete laut Mietspiegel — liegt sie niedriger, ist auch die zulässige Miete niedriger; vor der Neuvermietung mit dem Mietspiegel prüfen.' : '')
         + (br.gilt === true && markt && !naeh ? ' Die Obergrenze ist auf einer Schätzung aus Angebotsmieten gerechnet, nicht auf der ortsüblichen Vergleichsmiete (Mietspiegel) — die kann niedriger liegen.' : '')
         + (br.gilt === true ? ' Ausnahmen: höhere Vormiete (§ 556e BGB), erste Vermietung nach umfassender Modernisierung oder Neubau (§ 556f BGB).' : '') });
+    /* v3286 · 3b · RECHENWEG der Höchstmiete mit den Zahlen des Objekts (Marcel 11.11.2026: „woher der
+       Wert kommt und wie die Maximalmiete berechnet wird"). Gerechnet wird hier nichts Neues: die Regel
+       ist die des Kerns (sollFuer: höchstens Kappung auf die Basis, höchstens Vergleichsmiete × Fläche,
+       nie unter Ist) - die Zeile erscheint nur, wenn ihr Ergebnis mit teil558() des Kerns übereinstimmt.
+       Eigene Soll-Angaben, Staffel/Index und Wohnungen ohne Fläche bekommen keinen Rechenweg. */
+    if (w && !s.vertrag) {
+      var istR = zahl(w.ist), wflR = zahl(w.wfl), kpR = kapp && Number(kapp.pct);
+      if (istR > 0 && wflR > 0 && vglQm > 0 && kpR > 0) {
+        var basisR = zahl(s.kapp_basis) || istR, kappeR = basisR * (1 + kpR / 100), zielR = vglQm * wflR;
+        var m558R = Math.max(istR, Math.min(zielR, kappeR));
+        if (Math.abs(m558R - K.teil558(s, istR)) < 1) {
+          var rw = 'Kappungsgrenze: ' + eur(basisR) + (s.kapp_angerechnet ? ' (Miete vor der letzten Erhöhung)' : '') + ' × ' + dez(1 + kpR / 100, 2) + ' = ' + eur(kappeR)
+            + ' · Vergleichsmiete: ' + eur2(vglQm) + '/m² × ' + dez(wflR, wflR % 1 ? 2 : 0) + ' m² = ' + eur(zielR)
+            + ' · es gilt der kleinere Wert, nie unter der Ist-Miete von ' + eur(istR)
+            + (s.umlage559 && s.umlage559.monat > 0 ? ' · dazu Modernisierungsumlage § 559: ' + eur(s.umlage559.monat) + '/Monat' : '')
+            + (obergrenze ? ' · Neuvermietung: ' + eur2(vglQm) + '/m² × 1,10 = ' + eur2(obergrenze) + '/m² (Mietpreisbremse)'
+              : br.gilt === false ? ' · Neuvermietung: frei, keine Mietpreisbremse' : '');
+          z.push({ k: 'Rechenweg', v: m558R > istR + 0.01 ? 'höchstens ' + eur(m558R) + '/Monat' : 'keine Erhöhung', u: rw });
+        }
+      }
+    }
     /* 4 · Zielmiete gegen die Bremse */
     var zq = zahl(w && w.ziel_qm);
     if (obergrenze && zq > obergrenze + 0.004) z.push({ k: 'Zielmiete', v: eur2(zq) + '/m² liegt über der Bremse', bad: true,
@@ -562,11 +602,15 @@
     var s = document.createElement('style'); s.id = 'dp-mr-stil';
     s.textContent = [
       '.dp-mr{display:flex;flex-direction:column;gap:0;border:1px solid #E6E0D3;border-radius:10px;overflow:hidden;background:#fff}',
-      '.dp-mr-z{display:grid;grid-template-columns:150px minmax(0,auto) 1fr;gap:4px 14px;align-items:baseline;padding:9px 14px;border-top:1px solid #EFEBE3;font-size:13px}',
+      /* v3286 · Marcel 11.11.2026: „das ganze Feld rückt sehr weit nach unten“. Bis v3285 drei Spalten 150px | auto (nowrap) | 1fr:
+         in der schmalen rechten Spalte des Tabs Miete (~390 px) blieb für die Erläuterung (.dp-mr-u) ein Rest von wenigen Pixeln,
+         der lange Herkunftstext brach Wort für Wort um und zog jede Zeile weit nach unten. Jetzt: Beschriftung | Wert, die
+         Erläuterung darunter in der Wertspalte (wie .dp-mr-eng). */
+      '.dp-mr-z{display:grid;grid-template-columns:132px minmax(0,1fr);gap:2px 14px;align-items:baseline;padding:9px 14px;border-top:1px solid #EFEBE3;font-size:13px}',
       '.dp-mr-z:first-child{border-top:none}',
       '.dp-mr-k{font-family:"JetBrains Mono",monospace;font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:#7A7370}',
-      '.dp-mr-v{font-family:"Space Grotesk",sans-serif;font-weight:600;color:#2A2727;white-space:nowrap}',
-      '.dp-mr-u{color:#6B6356;font-size:12px;line-height:1.45}',
+      '.dp-mr-v{font-family:"Space Grotesk",sans-serif;font-weight:600;color:#2A2727;min-width:0;overflow-wrap:break-word}',
+      '.dp-mr-u{grid-column:2;color:#6B6356;font-size:12px;line-height:1.45;min-width:0;overflow-wrap:break-word}',
       '.dp-mr-warn .dp-mr-k::after{content:" ⚠";color:var(--wl-b8932f, #b8932f)}',
       '.dp-mr-bad{background:color-mix(in srgb,#B8625C 7%,#fff)}',
       '.dp-mr-bad .dp-mr-v{color:#B8625C}',
@@ -581,7 +625,7 @@
       '.dp-mr-w1 .dp-mr-w-v{margin-left:auto;color:#2A2727;font-weight:600}',
       '.dp-mr-w2{font-size:11.5px;color:#7A7370;line-height:1.45;margin-top:2px}',
       '.dp-mr-w.dp-mr-bad .dp-mr-w2 b{color:#B8625C}',
-      '@media(max-width:700px){.dp-mr-z{grid-template-columns:1fr}.dp-mr-v{white-space:normal}}'
+      '@media(max-width:700px){.dp-mr-z{grid-template-columns:1fr}.dp-mr-u{grid-column:1}}'
     ].join('');
     document.head.appendChild(s);
   }
@@ -923,8 +967,10 @@
       naeherung: nz, hinweise: (nz.hinweise || []).slice() };
     v = zahl(wert('ds2_marktmiete'));
     if (v > 0) {
-      var s = K.vglAusAngebot(v, mieteAbschlag());
+      var abS = mieteAbschlag();
+      var s = K.vglAusAngebot(v, abS);
       return { qm: s.qm, herkunft: s.text, marktmiete: true, art: 'marktmiete', quelle_art: 'angebot_abschlag', angebot: s,
+        abschlag: abS,   /* v3286 · Stufe und Grund des Abschlags für die Begründung in der Mietrecht-Karte */
         warnung: s.warnung, hinweise: s.warnung ? [s.warnung] : [] };
     }
     return { qm: 0, herkunft: null, hinweise: [] };

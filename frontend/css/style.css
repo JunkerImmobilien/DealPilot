@@ -60,6 +60,17 @@ select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%
 .ass-row:last-child{border-bottom:none}
 .ass-label{font-size:12.5px;color:var(--muted)}
 .ass-inp{display:flex;align-items:center;gap:7px}
+/* v3286 · Marcel 11.11.2026 (Miete › Prognose-Annahmen): „die Felder stehen nicht bündig untereinander“.
+   Ursache: .ass-row war flex mit space-between, .ass-inp klebte rechts — der linke Rand des Feldes hing
+   damit an der Breite von Einheit + Plakette + Hinweis JE ZEILE („%“ + „Annahme“, nur „Jahre“, nur „%“,
+   dazu #r-leer-j mit nowrap). Jetzt ein festes Raster: Beschriftung | Eingabespalte fester Breite,
+   das Feld steht links in seiner Spalte; ein Rechenhinweis (.cf-hint) bricht unter das Feld um. */
+.ass-row{display:grid;grid-template-columns:minmax(0,1fr) 13rem;column-gap:12px}
+.ass-row>.ass-inp{justify-content:flex-start;flex-wrap:wrap;row-gap:4px;min-width:0}
+.ass-row>.ass-inp>.cf-hint{flex:1 0 100%;margin-left:0 !important;white-space:normal !important}
+.ass-row>.ass-inp>.cf-hint:empty{display:none}
+.ass-row>.ass-l{min-width:0;hyphens:auto;overflow-wrap:break-word}
+@media (max-width:480px){.ass-row{grid-template-columns:minmax(0,1fr) 11.5rem;column-gap:8px}}
 .ass-inp input,.ass-inp select{width:75px;height:32px;font-size:12px;text-align:right;padding-right:5px;border-width:1px}
 .ass-inp select{width:90px}
 .unit{font-size:11px;color:var(--muted)}

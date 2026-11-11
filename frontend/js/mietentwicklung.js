@@ -559,11 +559,38 @@ window.MietEntwicklung = (function() {
     if (snap.soll <= 0 || snap.ist_qm <= 0) {
       el.textContent = '—';
       el.className = 'cf';
+      el.removeAttribute('data-richtung'); el.removeAttribute('data-abstand');   /* v3286 */
       return;
     }
-    var p = snap.opp_pct * 100;
-    el.textContent = (p >= 0 ? '+' : '') + p.toFixed(1).replace('.', ',') + ' %';
-    el.className = 'cf ' + (p < -5 ? 'pos' : (p > 5 ? 'neg' : ''));
+    /* v3286 · Marcel 11.11.2026: „negativ heisst hier Potenzial vorhanden — das passt nicht zum
+       Erklaertext." Bis v3285 stand hier opp_pct = Ist/Soll − 1, also z. B. „−15,0 %" fuer Luft
+       nach oben, gruen gefaerbt, und der Satz darunter sagte „negativ = unter Markt". Jetzt steht
+       das Potenzial POSITIV da, und zwar als Erhoehung bis zur Soll-Miete (Soll/Ist − 1, dieselbe
+       Zahl wie _sollProzent() unter „Angestrebte Entwicklung"). Gruen = Potenzial, Rot = Ist liegt
+       ueber dem Mietspiegel. Statusfarben fest (#3FA56C / #B8625C), nie als Token. Die Richtung
+       steht zusaetzlich in data-richtung (unter|ueber|gleich), damit Leser (messe-drehbuch.js)
+       nicht am Vorzeichen raten muessen. snapshot().opp_pct bleibt unveraendert. */
+    var ist = snap.ist_qm, soll = snap.soll, diff = soll - ist;
+    var pz = function (x) { return x.toFixed(1).replace('.', ',') + ' %'; };
+    var qmT = function (x) { return x.toFixed(2).replace('.', ',') + ' €/m²'; };
+    var richtung, abstand, html;
+    if (diff > 0.005) {
+      richtung = 'unter'; abstand = '+' + pz((soll / ist - 1) * 100);
+      html = '<span style="color:#3FA56C">Potenzial ' + abstand + '</span>'
+        + '<small style="margin-left:8px;font-size:12px;font-weight:500;color:#3FA56C">+' + qmT(diff) + ' bis zum Soll</small>';
+    } else if (diff < -0.005) {
+      richtung = 'ueber'; abstand = '+' + pz((ist / soll - 1) * 100);
+      html = '<span style="color:#B8625C">über Mietspiegel ' + abstand + '</span>'
+        + '<small style="margin-left:8px;font-size:12px;font-weight:500;color:#B8625C">kein Potenzial nach § 558</small>';
+    } else {
+      richtung = 'gleich'; abstand = '0,0 %';
+      html = '<span>an der Soll-Miete — kein Potenzial</span>';
+    }
+    el.innerHTML = html;
+    el.className = 'cf';
+    el.setAttribute('data-richtung', richtung);
+    el.setAttribute('data-abstand', abstand);
+    el.title = 'Ist ' + qmT(ist) + ' (nur Kaltmiete) · Soll ' + qmT(soll);
   }
 
   // Re-render Tabelle bei jeder calc()-Aktualisierung
