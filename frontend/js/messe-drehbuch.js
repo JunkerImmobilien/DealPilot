@@ -2377,7 +2377,11 @@
         reiter('s2'); await warte(700);
         await zeige(r6Gruppe('nkm'), 10);
         var zb = r6Beginn(s, 'Die Ist-Miete', 'Was der Mieter heute kalt zahlt — eingetippt.');
-        await tippeH('nkm', '900', 90);
+        /* v3281 · N147 (Marcel 10.11.2026): 900 € lagen mit 9,00 €/m² über der Vergleichsmiete
+           (7,80 €/m²) - nach § 558 war nichts drin, die Erhöhungstreppe blieb leer. 600 € = 6,00 €/m²:
+           die erste Erhöhung endet an der Kappungsgrenze (+20 % = 720 €), erst die zweite an der
+           Vergleichsmiete - so ist die Treppe zu sehen. */
+        await tippeH('nkm', '600', 90);
         try { DealPilotInvestmentProfile.nachziehen('nkm'); } catch (e) {}
         await tippeH('ze', '40', 90);
         await tippeH('umlagef', '230', 90);
@@ -2385,8 +2389,10 @@
         await r6Ende(zb);
         await zeigeGruppe(feldVon('nkm'), function () { return q('#wm_m') && q('#wm_m').closest('.f'); }, 8);
         await b2oZeile(s, 'Die Ist-Miete', 'Kaltmiete <b>' + eur(zahl('nkm')) + '</b>, Stellplatz ' + eur(zahl('ze')) + ', Nebenkosten-Vorauszahlung ' + eur(zahl('umlagef')) + ' — Warmmiete <b>' + r6Id('wm_m') + '</b>.');
-        await zeige(function () { return q('#miete_qm') && q('#miete_qm').closest('.f'); }, 10);
-        await b2oZeile(s, 'Pro Quadratmeter', 'Bezogen auf die Wohnfläche aus dem Reiter Objekt: <b>' + r6Id('miete_qm') + '</b> — der Stellplatz zählt mit.');
+        /* v3281 · der Stellplatz als eigener Betrag. NICHT #miete_qm zeigen: calc.js (Z. 4164) zählt dort
+           den Stellplatz noch mit (gemessen 11.11.2026: 600 + 40 € auf 100 m² = 6,40 €/m²) - gemeldet. */
+        await zeige(r6Gruppe('ze'), 10);
+        await b2oZeile(s, 'Der Stellplatz', 'Eigener Betrag: <b>' + eur(zahl('ze')) + '</b> im Monat. Er gehört nicht zur Wohnfläche — beim Vergleich mit Mietspiegel und Marktmiete zählt nur die Kaltmiete der Wohnung.');
       },
       async function (s) {   /* 3 · Pilot-Mietpreis-Analyse (v2481h: der Zensus-Kasten ist seit v2500 raus) */
         var m = q('.main-col'); if (m) m.scrollTop = 0;
@@ -2404,7 +2410,9 @@
         await tippeH('ds2_marktmiete', String(qm).replace('.', ','), 110);
         await warte(1000);
         await r6Ende(zb);
-        await b2oZeile(s, 'Die Marktmiete', 'Marktmiete <b>' + wert('ds2_marktmiete') + ' €/m²</b> gegen deine ' + r6Id('miete_qm') + ' — der Abstand fließt in den Investor Deal Score.');
+        /* v3281 · Kaltmiete je m² aus dem Kern der Mietentwicklung (ohne Stellplatz, v3279) - #miete_qm zählt ihn noch mit */
+        var istQm = (function () { try { var x = MietEntwicklung.snapshot().ist_qm; return x > 0 ? x.toFixed(2).replace('.', ',') + ' €/m²' : ''; } catch (e) { return ''; } })();
+        await b2oZeile(s, 'Die Marktmiete', 'Marktmiete <b>' + wert('ds2_marktmiete') + ' €/m²</b>' + (istQm ? ' gegen deine <b>' + istQm + '</b> Kaltmiete, ohne Stellplatz' : '') + ' — der Abstand fließt in den Investor Deal Score.');
       },
       async function (s) {   /* 5 · v3272: Leerstand statt Mietausfall-Posten (seit v3233 ein Posten: Kaltmiete × Leerstand %) */
         await zeige(r6Gruppe('leerstand'), 10);
@@ -2430,6 +2438,14 @@
         await zeige(mr, 8);
         var t = r6Inner(mr()).replace(/\s+/g, ' '), kg = /KAPPUNGSGRENZE\s+([\d,]+ % in \d+ Jahren)/i.exec(t), vm = /VERGLEICHSMIETE\s+([\d,]+ €\/m²)/i.exec(t), mb = /MIETPREISBREMSE\s+(gilt hier nicht|gilt[^|.]*?)(?=\s+[A-ZÄÖÜ]|\s*$)/.exec(t);
         await b2oZeile(s, 'Mietrecht an dieser Adresse', '§ 558 BGB: Kappungsgrenze <b>' + (kg ? kg[1] : '–') + '</b>, Vergleichsmiete <b>' + (vm ? vm[1] : '–') + '</b> aus der Mietspiegel-Zeile, oberer Spannenwert' + (mb ? '. Mietpreisbremse: ' + mb[1] : '') + '.');
+        /* v3281 · N147: die nächste Erhöhung nach § 558 - Betrag, Grenze und die zwei Termine (verlangbar ab · wirksam ab), alles aus der Karte gelesen */
+        var ne = function () { return [].filter.call(document.querySelectorAll('#dp-mietrecht-karte .dp-mr-z'), function (z) { return /Nächste Erhöhung/i.test(r6Text(z.querySelector('.dp-mr-k'))); })[0] || null; };
+        if (ne()) {
+          await zeige(ne, 8);
+          var nv = r6Text(ne().querySelector('.dp-mr-v')), nu = r6Text(ne().querySelector('.dp-mr-u'));
+          var ter = /verlangbar ab ([^·]+?) · wirksam ab ([^·]+?)(?:s*·|$)/.exec(nu), gr = /Grenze § 558: ([^·]+?)(?:s*·|$)/.exec(nu);
+          await b2oZeile(s, 'Die nächste Erhöhung', 'Nach § 558: <b>' + nv + '</b>' + (gr ? ' — begrenzt durch die <b>' + gr[1].trim() + '</b>' : '') + '.' + (ter ? ' Verlangbar ab <b>' + ter[1].trim() + '</b>, wirksam ab <b>' + ter[2].trim() + '</b>.' : ''));
+        }
       },
       async function (s) {   /* 7 · Mietentwicklung: Prognose */
         await zeige(function () { return q('#me-block-prog') && q('#me-block-prog').closest('.card'); }, 8);
@@ -2442,12 +2458,27 @@
         var zb = r6Beginn(s, 'Oder im Detail', 'Einzelne Erhöhungen bis zur Vergleichsmiete der Mietspiegel-Zeile — höchstens bis zur Kappungsgrenze.');
         /* v3272 · der Zielwert ist die Vergleichsmiete aus der Mietspiegel-Zeile (§ 558), nicht ein Angebotsniveau */
         var vgm = (/VERGLEICHSMIETE\s+([\d,]+) €\/m²/i.exec(r6Inner(q('#dp-mietrecht-karte')).replace(/\s+/g, ' ')) || [])[1] || '8,50';
+        /* v3281 · zwei Schritte im Abstand der Kappungsgrenze (3 Jahre); der Prozentsatz kommt aus der Soll-Miete (übernehmen) */
+        await tippeH('me_anz', '2', 110);
+        await tippeH('me_int', '3', 110);
         await tippeH('me_soll', vgm, 110);
-        await warte(1200);
+        await warte(900);
+        var ueb = q('#me-soll-uebernehmen'); if (ueb) ueb.click();
+        await warte(900);
         await r6Ende(zb);
         var opp = r6Id('me_opp'), drueber = opp && /^\+/.test(opp.trim());
         if (drueber) await b2oZeile(s, 'Oder im Detail', 'Ziel ist die Vergleichsmiete <b>' + wert('me_soll') + ' €/m²</b>. Deine Miete liegt schon <b>' + opp.trim() + '</b> darüber — nach § 558 ist hier keine Erhöhung drin. Die Treppe gilt für Verträge mit Staffel oder Index.');
-        else await b2oZeile(s, 'Oder im Detail', '<b>' + wert('me_anz') + ' Erhöhungen</b> alle ' + wert('me_int') + ' Jahre, zusammen ' + r6Pz(wert('me_pct')) + ' % — Ziel: Vergleichsmiete ' + wert('me_soll') + ' €/m²' + (opp && opp !== '—' ? ', Abstand deiner Miete: ' + opp : '') + '.');
+        else {
+          await b2oZeile(s, 'Oder im Detail', '<b>' + wert('me_anz') + ' Erhöhungen</b> alle ' + wert('me_int') + ' Jahre, zusammen ' + r6Pz(wert('me_pct')) + ' % — Ziel: Vergleichsmiete ' + wert('me_soll') + ' €/m²' + (opp && opp !== '—' ? '. Deine Kaltmiete liegt <b>' + opp.replace(/^[-−]s*/, '') + '</b> darunter' : '') + '.');
+          /* v3281 · die Treppe in der Tabelle: die Jahre mit Erhöhung (me-row-hike) und ihr €/m² */
+          var stufen = [].map.call(document.querySelectorAll('#me_table_wrap tr.me-row-hike'), function (tr) { var td = tr.querySelectorAll('td'); return { j: r6Text(td[0]).replace(/s*⬆/, ''), qm: r6Text(td[2]) }; });
+          var tab = function () { return q('#me_table_wrap table'); };
+          if (stufen.length && tab()) {
+            await zeige(tab, 8);
+            var kgD = (/KAPPUNGSGRENZEs+([d,]+ %)/i.exec(r6Inner(q('#dp-mietrecht-karte')).replace(/s+/g, ' ')) || [])[1];
+            await b2oZeile(s, 'Die Treppe', stufen.map(function (x) { return x.j + ': <b>' + x.qm + '</b>'; }).join(', ') + ' — jeder Schritt bleibt unter der Kappungsgrenze' + (kgD ? ' von ' + kgD : '') + ', der letzte endet an der Vergleichsmiete.');
+          }
+        }
         var p = q('#me-mode-prog'); if (p) p.click();
         await warte(700);
       },
