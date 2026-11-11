@@ -44569,3 +44569,9 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Commit:** `cc14d70b` (push + git pull von Hand; deploy-staging bricht an fremden offenen Änderungen ab)
 - **Nachweis:** Server-Dateien 34.439.275 / 46.486.637 Byte = lokal, alte 26 in `alt-vor-v3276/`; im Browser 861,2 s stumm und mit Ton, Kapitel 261 → 263,8 s, 560 → 562,3 s.
 - **Rest:** Prod (zusammen mit v3285: 42 MP4s).
+
+### v3292/v3292a · Vom Hub angelegte Vorgaben verdrängen die des Browsers nicht (11.11.2026, Staging)
+- **Was:** Ursache `vorgaben-sync.js` „Server gewinnt“ (`setzen(server)` entfernt fehlende Schlüssel). `flowProfil.blobNeu` setzt `flow_angelegt`, `vorgaben-sync.js` führt damit zusammen und schreibt vollständig hoch (Buster v3292); v3292a Frontend-Konstanten.
+- **Commit:** `5f334fd4`, `cc585d17`
+- **Nachweis:** `flow-berechnen-pruefen` E4/E5 23/23 (echte vorgaben-sync.js im vm), RC 0; Prüfer der Ausrollstrecke von Hand (saat, wertermittlung, kappungsgrenzen, jahreswerte, frontend-konstanten grün); Staging: Sicherung beider DBs angesehen, `git pull` auf `cc585d17`, Backend neu gebaut (healthy); echter Lauf mit Wegwerf-Konto 12/12 grün (403 ohne Linie, Profil GET/PUT, 400 auto ohne Grenze, Marke, Zusammenführen, alter Tab, `/berechnen` = Browser-Stempel Score 71/71 und KPIs, Version +1, 409), Konto danach gelöscht.
+- **Rest:** Prod (mit v3289/v3290; Migration 098 → Backend-Rebuild). Abnahme im Browser: Konto mit vom Hub angelegtem Profil einmal öffnen – Vorlage bleibt, Ziele sichtbar im Blob.
