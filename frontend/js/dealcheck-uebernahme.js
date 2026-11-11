@@ -216,7 +216,14 @@
         + ', Zins ' + dez(zins, 2) + ' %, Tilgung 1,5 %, Nebenkosten pauschal ' + dez(nkPct, 0) + ' %, '
         + 'nicht umlagefähige Kosten 16 % der Kaltmiete und 1 % Leerstand. Adresse, Objektart, Wohnfläche und Hausgeld fehlen noch.');
 
-      if (typeof window.calc === 'function') window.calc();
+      /* v3313a · calc() ist entprellt (300 ms): nach den Eingabe-Ereignissen oben lief
+         er nur verzögert, und saveObj stempelte Kennzahlen 0 (gemessen 11.11.2026:
+         _kpis_bmy = 0, _kpis_cf_vs = 0). calcNow() rechnet sofort, danach kurz warten,
+         falls ein Hüllen-calc (financing.js, indicative-zins.js) nachzieht. */
+      if (typeof window.calcNow === 'function') window.calcNow();
+      else if (typeof window.calc === 'function') window.calc();
+      await pausiere(600);
+      if (typeof window.calcNow === 'function') window.calcNow();
       if (typeof window.saveObj === 'function') {
         var ps = window.saveObj({ _qcFinal: true });
         if (ps && typeof ps.then === 'function') await ps;
