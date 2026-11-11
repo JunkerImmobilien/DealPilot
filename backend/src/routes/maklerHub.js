@@ -65,6 +65,13 @@ router.get('/konto', async (req, res) => {
     if (!v) return res.status(401).json({ error: 'verbindung_getrennt' });
     const k = await hub.konto(v.user_id);
     if (!k) return res.status(401).json({ error: 'verbindung_getrennt' });
+    /* v3290 · Bereich des Schluessels zu den Linien nachziehen (ohne Neuverbinden). Ein neuer Schluessel
+       kommt nur, wenn die Verbindung noch keinen aktiven hat - dann einmal als api_key in dieser Antwort. */
+    try {
+      const b = await hub.bereichNachziehen(v, (k.paket && k.paket.flow_linien) || [], req.ip);
+      k.paket.api_key_bereich = b.bereich;
+      if (b.api_key) k.api_key = b.api_key;
+    } catch (e) { /* Konto-Auskunft geht trotzdem */ }
     res.json(k);
   } catch (e) { res.status(500).json({ error: 'server_error' }); }
 });

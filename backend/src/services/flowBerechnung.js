@@ -29,15 +29,12 @@ const objektRechnung = require('./objektRechnung');
 const rechenkerne = require('./rechenkerne');
 const vorgaben = require('./botVorgabenService');
 const dialog = require('./telegramDialogService');
+const flowProfil = require('./flowProfil');   /* v3290 */
 
 let _werkzeuge = null;
 function werkzeuge() { return _werkzeuge || (_werkzeuge = require('./agentWerkzeuge')); }
 
-/* Namen der Bewertungsprofile, wie dealscore2.js sie zeigt (v2548). */
-const PROFIL_NAME = {
-  balanced: 'Ausgewogen', conservative: 'Vorsichtig', optimistic: 'Renditeorientiert',
-  lage: 'Lage-Fokus', cashflow: 'Cashflow-Fokus', sicherheit: 'Sicherheit', custom: 'Eigene Gewichte'
-};
+const PROFIL_NAME = flowProfil.PROFIL_NAME;   /* v3290: steht in flowProfil.js */
 
 /* Fehlende Saetze aus dem Investmentprofil — nur, was der Nutzer dort GESETZT hat. Die Vorgaben der
    App (config.js investmentProfileDefaults) werden hier nicht eingesetzt: ein Standardwert, den
@@ -62,44 +59,9 @@ function _r(x, stellen) {
   return Math.round(Number(x) * f) / f;
 }
 
-/** Das Profil des Kontos, so wie der Browser es hochlaedt (vorgaben-sync.js, v3024). */
-async function profilLesen(userId) {
-  const r = await query(
-    'SELECT schluessel, wert, updated_at FROM user_settings WHERE user_id = $1 AND schluessel = ANY($2)',
-    [userId, ['browser_vorgaben', 'lage_profil']]);
-  const e = {};
-  r.rows.forEach((x) => { e[x.schluessel] = x; });
-  return profilAus(e.browser_vorgaben ? _json(e.browser_vorgaben.wert) : null,
-    e.lage_profil ? _json(e.lage_profil.wert) : null,
-    [e.browser_vorgaben, e.lage_profil].filter(Boolean).map((x) => x.updated_at));
-}
-
-/** Rein (ohne DB) - auch fuer tools/flow-berechnen-pruefen.mjs. */
-function profilAus(browserVorgaben, lageProfil, staende) {
-  const keys = (browserVorgaben && browserVorgaben.keys) || {};
-  const ip = _json(keys.dp_investment_profile) || {};
-  const ds = {
-    preset: keys.dp_dealscore2_preset || null,
-    eigen: keys.dp_dealscore_eigen || null,
-    weights: keys.dp_dealscore_weights || null
-  };
-  const t = (staende || []).map((x) => new Date(x).getTime()).filter((x) => Number.isFinite(x));
-  const presetGilt = ds.preset && PROFIL_NAME[ds.preset] ? ds.preset : 'balanced';
-  const name = (ds.eigen === '1' || ds.eigen === true) ? 'Eigene Gewichte' : PROFIL_NAME[presetGilt];
-  /* Ampel-Schwellen wie schwellen.js get(): nur die drei Werte, den Rest leitet der Kern ab
-     (qc-heuristik.js _schwellenOk). Fehlt einer, gilt seine Vorgabe 1,2 / 90 / 0. */
-  const schwellen = {};
-  const md = _zahl(ip.min_dscr), ml = _zahl(ip.max_ltv), mc = _zahl(ip.min_cashflow_vor_st);
-  if (md != null && md > 0) schwellen.dscrGruen = md;
-  if (ml != null && ml > 0) schwellen.ltvGruen = ml;
-  if (mc != null) schwellen.cfMin = mc;
-  return {
-    vorhanden: !!browserVorgaben,
-    name: name, preset: presetGilt,
-    geaendert: t.length ? new Date(Math.max.apply(null, t)).toISOString() : null,
-    investment: ip, lage: lageProfil || null, ds: ds, schwellen: schwellen
-  };
-}
+/* v3290 · Profil lesen steht in flowProfil.js (Punkt 3) - eine Stelle fuer Flow, Bot und GET/PUT /flow/profil */
+const profilLesen = flowProfil.lesen;
+const profilAus = flowProfil.profilAus;
 
 /** Die Ergaenzung des Bots (Objekt > Bot-Vorgaben > Richtwert) plus das Investmentprofil fuer Luecken. */
 function ergMitProfil(erg, profil, d) {
@@ -142,7 +104,11 @@ function ergebnisBauen(d, erg, profil, opt) {
   if (R.pflicht.length) return { ok: false, status: 422, fehlt: R.pflicht, R: R };
   if (R.kernFehlt) return { ok: false, status: 503, fehlt: ['Rechenkern'], R: R };
 
-  const zielBmr = objektRechnung.zielBmrAusProfil(profil.lage, d.lageklasse);
+  /* v3290 · Zielrendite: die der Lageklasse, sonst das Ziel min_bruttorendite aus dem Profil (Punkt 3).
+     Als Parameter an den Kern - er misst damit die Ampel der Bruttomietrendite und den Zielkaufpreis. */
+  const ZI = profil.ziele || {};
+  const zielBmrLage = objektRechnung.zielBmrAusProfil(profil.lage, d.lageklasse);
+  const zielBmr = zielBmrLage != null ? zielBmrLage : (ZI.min_bruttorendite > 0 ? ZI.min_bruttorendite : null);
   const score = R.S ? R.S.score : null;
   const B = score != null
     ? objektRechnung.bewerten(R, score, { teilnoten: R.teilnotenRoh, zielBmr: zielBmr, schwellen: profil.schwellen,
@@ -150,7 +116,26 @@ function ergebnisBauen(d, erg, profil, opt) {
     : null;
   const K = R.K, K0 = R.K0, mitDarlehen = R.darlehenGesamt > 0;
   const E = B && B.H ? B.H.empfehlung : null;
-  const ziel = E && Number.isFinite(E.ziel_kp) ? E.ziel_kp : null;
+  const zielKern = E && Number.isFinite(E.ziel_kp) ? E.ziel_kp : null;
+  /* v3290 · Die Obergrenzen aus den Zielen: max_kaufpreis und max_faktor (Kaufpreis = Faktor x Jahresmiete).
+     Es gilt die niedrigste Grenze; welche greift, steht in zielpreis_grund. */
+  const nkmJ = (R.K || R.K0).nkm_j;
+  const grenzen = [];
+  if (zielKern != null) grenzen.push([zielKern, zielBmr != null ? 'Zielrendite ' + zielBmr + ' %, Cashflow 0 bzw. Marktwert (Quick-Check)' : 'Quick-Check (Rendite 6 %, Cashflow 0 bzw. Marktwert)']);
+  if (ZI.max_kaufpreis > 0) grenzen.push([ZI.max_kaufpreis, 'Ziel max_kaufpreis']);
+  if (ZI.max_faktor > 0 && nkmJ > 0) grenzen.push([ZI.max_faktor * nkmJ, 'Ziel max_faktor ' + ZI.max_faktor + ' x Jahresmiete']);
+  let ziel = null, zielGrund = null;
+  grenzen.forEach(([w, g]) => { if (ziel == null || w < ziel) { ziel = w; zielGrund = g; } });
+  if (ziel != null && ziel >= R.kp) { ziel = R.kp; zielGrund = 'Kaufpreis erfuellt alle Grenzen'; }
+  /* v3290 · Ziele je Kennzahl: erreicht oder nicht (nur gesetzte Ziele) */
+  const zielListe = [];
+  const zl = (name, soll, ist, art) => { if (soll == null || ist == null || !Number.isFinite(ist)) return;
+    zielListe.push({ ziel: name, soll: soll, ist: _r(ist, 4), erfuellt: art === 'min' ? ist >= soll : ist <= soll }); };
+  zl('min_bruttorendite', ZI.min_bruttorendite, (R.K || R.K0).bmy, 'min');
+  if (R.K) zl('min_cashflow_monat', ZI.min_cashflow_monat, R.K.cf_m, 'min');
+  if (R.K && R.darlehenGesamt > 0) zl('min_dscr', ZI.min_dscr, R.K.dscr, 'min');
+  zl('max_faktor', ZI.max_faktor, (R.K || R.K0).fak, 'max');
+  zl('max_kaufpreis', ZI.max_kaufpreis, R.kp, 'max');
 
   const annahmen = [];
   if (R.zins && R.zins.quelle !== 'am Objekt') annahmen.push('Zinssatz ' + R.zins.wert + ' % (' + R.zins.quelle + ')');
@@ -195,6 +180,9 @@ function ergebnisBauen(d, erg, profil, opt) {
     gruende: B && B.H ? (B.H.einschaetzung || []).slice() : [],
     noetige_preissenkung_pct: (ziel != null && R.kp > 0 && ziel < R.kp) ? _r((1 - ziel / R.kp) * 100, 1) : (ziel != null ? 0 : null),
     zielpreis: ziel != null ? Math.round(ziel) : null,
+    zielpreis_grund: zielGrund,                 /* v3290 */
+    ziele: zielListe,                           /* v3290 · nur gesetzte Ziele */
+    ziele_erfuellt: zielListe.length ? zielListe.every((x) => x.erfuellt) : null,
     grenze: (R.S && R.S.deckel && R.S.score_ohne_deckel > R.S.score) ? R.S.deckel : null,   /* nur, wenn sie greift */
     teilnoten: R.S ? R.S.breakdown.map((b) => ({ key: b.key, was: b.label, punkte: b.score == null ? null : _r(b.score, 1),
       gewicht: b.weight, grundlage: b.input })) : null,
@@ -210,7 +198,8 @@ function ergebnisBauen(d, erg, profil, opt) {
       quickcheck: quickcheck,
       annahmen: annahmen,
       profil: { name: profil.name, geaendert: profil.geaendert, vorhanden: profil.vorhanden,
-        gewichte: gewichte, schwellen: profil.schwellen, ziel_bmr_lage: zielBmr, lageklasse: d.lageklasse || null },
+        gewichte: gewichte, schwellen: profil.schwellen, ziel_bmr_lage: zielBmrLage, ziel_bmr: zielBmr,
+        ziele: ZI, lageklasse: d.lageklasse || null },
       marktpreisindikation: opt.markt ? { marktwert_bereinigt: _r(opt.markt.basis, 0), grund: opt.markt.grund || null } : null
     }
   };

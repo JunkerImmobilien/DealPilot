@@ -255,8 +255,67 @@ if (!arg.einzeln && abweichend.length > 8) console.log('    … ' + (abweichend.
 console.log('  E3 Felder, die calc.js liest und die Abbildung nicht (Objekte mit Wert): '
   + (Object.keys(ungelesenZaehl).length ? Object.entries(ungelesenZaehl).sort((a, b) => b[1] - a[1]).map(([k, n]) => k + ' ' + n).join(', ') : 'keine'));
 
+/* ── E4 · Profil und Ziele (v3290, Punkt 3) ─────────────────────────────
+ * flowProfil.pruefen(): Voreinstellung frage, auto nur mit Monatsgrenze, Ziele in die richtige
+ * Ablage (min_dscr/min_cashflow_monat = Investmentprofil), unbekannte Felder abgewiesen.
+ * flowBewahren(): ein aelterer Browser-Blob loescht den juengeren Flow-Block nicht.
+ * ergebnisBauen() mit Zielen: min_bruttorendite geht als zielBmr an den Kern (Ampel am Ziel),
+ * max_kaufpreis und max_faktor deckeln den Zielpreis, die Ziel-Liste stimmt. */
+const flowProfil = require_(path.join(ROOT, 'backend/src/services/flowProfil.js'));
+let e4Fehler = 0, e4n = 0;
+const e4 = (name, ok, ist) => { e4n++; if (!ok) { e4Fehler++; console.log('  \x1b[31mE4 ROT\x1b[0m ' + name + (ist !== undefined ? '  (ist: ' + JSON.stringify(ist).slice(0, 300) + ')' : '')); } };
+{
+  const leer = flowProfil.profilAus(null, null, []);
+  e4('Voreinstellung frage', ['mpi', 'mpi_plus', 'wev'].every((s) => leer.freigaben[s] === 'frage') && leer.freigaben.monatsgrenze_eur === 0, leer.freigaben);
+  let p = flowProfil.pruefen({ freigaben: { mpi: 'auto' } }, {}, {}, 't');
+  e4('auto ohne Monatsgrenze abgewiesen', p.fehler.length === 1 && /Monatsgrenze/.test(p.fehler[0]), p.fehler);
+  p = flowProfil.pruefen({ freigaben: { mpi: 'auto', monatsgrenze_eur: 50 } }, {}, {}, 'api:k1');
+  e4('auto mit Monatsgrenze gespeichert und vermerkt', !p.fehler.length && p.ip.flow.freigaben.mpi === 'auto' && p.ip.flow.freigaben.auto_gesetzt.von === 'api:k1', p);
+  const teile = flowProfil.flowTeile(p.ip);
+  e4('nicht gesetzte Stufen bleiben frage', teile.freigaben.mpi_plus === 'frage' && teile.freigaben.wev === 'frage', teile.freigaben);
+  e4('auto ohne Grenze im Bestand gilt als frage', flowProfil.flowTeile({ flow: { freigaben: { wev: 'auto' } } }).freigaben.wev === 'frage');
+  p = flowProfil.pruefen({ ziele: { min_dscr: 1.3, min_cashflow_monat: 50, max_faktor: 22, min_bruttorendite: '5,5', max_kaufpreis: 250000 } }, { min_dscr: 1.2, tilgung_default: 2 }, {}, 't');
+  e4('Ziele in der richtigen Ablage', !p.fehler.length && p.ip.min_dscr === 1.3 && p.ip.min_cashflow_vor_st === 50 && p.ip.tilgung_default === 2
+    && p.ip.flow.ziele.max_faktor === 22 && p.ip.flow.ziele.min_bruttorendite === 5.5 && p.ip.flow.ziele.min_dscr === undefined, p.ip);
+  p = flowProfil.pruefen({ ziele: { unsinn: 1 }, investment: { ai_risk: 'x' }, extra: {} }, {}, {}, 't');
+  e4('Unbekanntes abgewiesen', p.fehler.length === 3, p.fehler);
+  p = flowProfil.pruefen({ ziele: { max_faktor: null } }, { flow: { ziele: { max_faktor: 20 } } }, {}, 't');
+  e4('null loescht ein Ziel', p.ip.flow.ziele.max_faktor === undefined, p.ip);
+  p = flowProfil.pruefen({ lage: { klassen: { B: { ziel_bmr: 6.5 } } } }, {}, { klassen: { A: { ziel_bmr: 4 } }, x: 1 }, 't');
+  e4('Lage-Ziel gemischt, Rest bleibt', !p.fehler.length && p.lage.klassen.A.ziel_bmr === 4 && p.lage.klassen.B.ziel_bmr === 6.5 && p.lage.x === 1, p.lage);
+  const alt = { keys: { dp_investment_profile: JSON.stringify({ min_dscr: 1.2, flow: { geaendert: '2026-11-11T10:00:00Z', ziele: { max_faktor: 20 } } }) } };
+  const neuOhne = { keys: { dp_investment_profile: JSON.stringify({ min_dscr: 1.4 }), dp_dealscore2_preset: 'lage' } };
+  const bew = flowProfil.flowBewahren(neuOhne, alt);
+  const bip = JSON.parse(bew.keys.dp_investment_profile);
+  e4('Browser ohne Flow-Block: gespeicherter bleibt, Rest vom Browser', bip.flow && bip.flow.ziele.max_faktor === 20 && bip.min_dscr === 1.4 && bew.keys.dp_dealscore2_preset === 'lage', bip);
+  const neuAlt = { keys: { dp_investment_profile: JSON.stringify({ flow: { geaendert: '2026-11-10T10:00:00Z', ziele: { max_faktor: 30 } } }) } };
+  e4('aelterer Flow-Block verliert', JSON.parse(flowProfil.flowBewahren(neuAlt, alt).keys.dp_investment_profile).flow.ziele.max_faktor === 20);
+  const neuJung = { keys: { dp_investment_profile: JSON.stringify({ flow: { geaendert: '2026-11-12T10:00:00Z', ziele: { max_faktor: 30 } } }) } };
+  e4('juengerer Flow-Block gewinnt', JSON.parse(flowProfil.flowBewahren(neuJung, alt).keys.dp_investment_profile).flow.ziele.max_faktor === 30);
+
+  /* ergebnisBauen mit Zielen am Rundgang-Objekt */
+  const dO = F.faelle['objekt:demo-object.json'].d;
+  const ipZ = { flow: { ziele: { min_bruttorendite: 7, max_kaufpreis: 150000, max_faktor: 12 } }, min_dscr: 1.3 };
+  const prZ = flow.profilAus({ keys: { dp_investment_profile: JSON.stringify(ipZ) } }, null, []);
+  const ohneLage = Object.assign({}, dO, { lageklasse: '' });
+  const bZ = flow.ergebnisBauen(ohneLage, flow.ergMitProfil(ergaenzungOhneDb(ohneLage), prZ, ohneLage), prZ, {});
+  const bmrZeile = (bZ.ergebnis.quickcheck.kennzahlen_ampel || []).find((x) => x.id === 'bmr') || {};
+  e4('min_bruttorendite als zielBmr an den Kern (Ampel am Ziel)', bZ.ergebnis.profil.ziel_bmr === 7 && bmrZeile.am_ziel === true, { ziel_bmr: bZ.ergebnis.profil.ziel_bmr, bmr: bmrZeile });
+  const nkmJ = bZ.R.K.nkm_j;
+  const zp = bZ.ergebnis.quickcheck.zielpreis;
+  e4('Zielpreis = niedrigste Grenze (Faktor 12 x ' + nkmJ + ')', zp === Math.round(Math.min(150000, 12 * nkmJ)) && /max_faktor/.test(bZ.ergebnis.quickcheck.zielpreis_grund),
+    { zp, grund: bZ.ergebnis.quickcheck.zielpreis_grund });
+  e4('noetige Preissenkung zum Zielpreis', Math.abs(bZ.ergebnis.quickcheck.noetige_preissenkung_pct - Math.round((1 - zp / dO.kp.replace(/\./g, '')) * 1000) / 10) < 0.11, bZ.ergebnis.quickcheck.noetige_preissenkung_pct);
+  const zl = bZ.ergebnis.quickcheck.ziele;
+  e4('Ziel-Liste: 4 gesetzte Ziele, keins erfuellt', zl.length === 4 && zl.every((x) => !x.erfuellt) && bZ.ergebnis.quickcheck.ziele_erfuellt === false, zl);
+  const bOhne = flow.ergebnisBauen(ohneLage, flow.ergMitProfil(ergaenzungOhneDb(ohneLage), flow.profilAus(null, null, []), ohneLage), flow.profilAus(null, null, []), {});
+  e4('ohne Ziele: keine Liste, Zielpreis aus dem Kern', bOhne.ergebnis.quickcheck.ziele.length === 0 && bOhne.ergebnis.quickcheck.ziele_erfuellt === null
+    && /Quick-Check|Kaufpreis erfuellt/.test(bOhne.ergebnis.quickcheck.zielpreis_grund || '') && bOhne.ergebnis.quickcheck.zielpreis === Math.round(bOhne.R.kp <= (bOhne.ergebnis.quickcheck.zielpreis) ? bOhne.R.kp : bOhne.ergebnis.quickcheck.zielpreis), bOhne.ergebnis.quickcheck.zielpreis_grund);
+}
+console.log('  E4 Profil und Ziele: ' + (e4n - e4Fehler) + ' von ' + e4n + ' gruen');
+
 /* ── Basislinie ────────────────────────────────────────────────────────── */
-let rc = e1Fehler ? 1 : 0;
+let rc = (e1Fehler || e4Fehler) ? 1 : 0;
 if (arg['basislinie-schreiben']) {
   const altB = fs.existsSync(BASIS) ? JSON.parse(fs.readFileSync(BASIS, 'utf8')) : {};
   const urs = {};

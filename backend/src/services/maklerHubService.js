@@ -175,6 +175,34 @@ function apiKeyScope(linien) {
   return null;
 }
 
+/** v3290 · Den Bereich des Hub-Schluessels nachziehen, wenn sich die Linien geaendert haben - ohne
+ *  Neuverbinden (Auftrag 11.11.2026). Aufgerufen von GET /hub/konto (taeglich und bei jeder Anmeldung).
+ *    Schluessel da, Bereich anders  -> UPDATE api_keys.scopes (z. B. crud -> crud flow)
+ *    kein aktiver Schluessel, aber eine Linie -> neuer Schluessel; der Klartext geht EINMAL in dieser
+ *                                     Antwort an den Hub (wie beim Token-Tausch), gespeichert nur als Hash
+ *    keine Linie mehr               -> nichts; auth.js laesst einen flow-Schluessel ohne Linie nicht durch
+ *  Rueckgabe { bereich, api_key? }. */
+async function bereichNachziehen(verbindung, linien, ip) {
+  const soll = apiKeyScope(linien);
+  if (!soll || !verbindung) return { bereich: null };
+  if (verbindung.api_key_id) {
+    const r = await query('SELECT scopes FROM api_keys WHERE id=$1 AND user_id=$2 AND revoked_at IS NULL AND (expires_at IS NULL OR expires_at > NOW())',
+      [verbindung.api_key_id, verbindung.user_id]);
+    if (r.rowCount) {
+      const ist = String(r.rows[0].scopes || '');
+      if (ist !== soll) {
+        await query('UPDATE api_keys SET scopes=$1 WHERE id=$2 AND user_id=$3', [soll, verbindung.api_key_id, verbindung.user_id]);
+        await protokoll(verbindung.user_id, 'bereich', ip, { alt: ist, neu: soll, flow_linien: linien });
+      }
+      return { bereich: soll };
+    }
+  }
+  const neu = await apiKeyService.createForUser(verbindung.user_id, { name: API_KEY_NAME, scopes: soll });
+  await query('UPDATE hub_verbindungen SET api_key_id=$1 WHERE id=$2', [neu.id, verbindung.id]);
+  await protokoll(verbindung.user_id, 'bereich', ip, { neu: soll, flow_linien: linien, schluessel_neu: true });
+  return { bereich: soll, api_key: neu.plain };
+}
+
 /* ── 4./5. Bearer hub_token ────────────────────────────────────────── */
 async function verbindungZumToken(authHeader) {
   const m = /^Bearer\s+(dph_[A-Za-z0-9_-]+)$/.exec(String(authHeader || ''));
@@ -227,4 +255,4 @@ function ereignis(userId, art) {
 async function aufraeumen() { try { await query("DELETE FROM hub_codes WHERE expires_at < NOW() - interval '1 day'"); } catch (e) {} }
 
 module.exports = { bereit, clientPruefen, clientAuth, konto, codeAusstellen, tokenTauschen, verbindungZumToken, trennen, trennenFuerNutzer, verbunden, ereignis, aufraeumen, API_KEY_NAME,
-  apiKeyScope };   /* v3289 */
+  apiKeyScope, bereichNachziehen };   /* v3289, v3290 */

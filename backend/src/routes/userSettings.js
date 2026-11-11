@@ -93,8 +93,16 @@ router.put('/:schluessel', authenticate, async (req, res, next) => {
     const k = String(req.params.schluessel || '');
     if (ERLAUBT.indexOf(k) < 0) return res.status(400).json({ error: 'unbekannter_schluessel' });
 
-    const wert = req.body && typeof req.body.wert === 'object' ? req.body.wert : null;
+    let wert = req.body && typeof req.body.wert === 'object' ? req.body.wert : null;
     if (!wert) return res.status(400).json({ error: 'wert_fehlt' });
+    /* v3290 · Flow-Profil (Ziele, Alarme, Freigaben) steht im Investmentprofil. Der Browser schreibt den
+       ganzen Blob - ein aelterer Tab darf einen juengeren Flow-Block nicht loeschen (flowProfil.flowBewahren). */
+    if (k === 'browser_vorgaben') {
+      try {
+        const alt = await query('SELECT wert FROM user_settings WHERE user_id = $1 AND schluessel = $2', [req.user.id, k]);
+        if (alt.rowCount) wert = require('../services/flowProfil').flowBewahren(wert, alt.rows[0].wert);
+      } catch (e) { /* im Zweifel schreibt der Browser wie bisher */ }
+    }
 
     /* Eine Obergrenze, damit hier keine Dokumente landen. Der Datenraum
        speichert Links, keine Inhalte - das steht so auch im Reiter. */

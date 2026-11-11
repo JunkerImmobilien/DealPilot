@@ -40,7 +40,10 @@ const FLOW_ROUTEN = [
   ['GET',  new RegExp('^/api/v1/dateien/?$')],
   ['GET',  new RegExp('^/api/v1/dateien/speicher/?$')],
   ['GET',  new RegExp('^/api/v1/dateien/' + UUID + '/?$')],
-  ['POST', new RegExp('^/api/v1/dateien/?$')]
+  ['POST', new RegExp('^/api/v1/dateien/?$')],
+  /* v3290 · Punkt 3: Richtwerte und Ziele */
+  ['GET',  new RegExp('^/api/v1/flow/profil/?$')],
+  ['PUT',  new RegExp('^/api/v1/flow/profil/?$')]
 ];
 
 const LINIE_NAME = { makler: 'Makler', privat: 'Privat', investor: 'Investor' };

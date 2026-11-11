@@ -58,7 +58,8 @@ const avmHistorie = require('./avmHistoryService');  /* v1937: Marktpreisindikat
 const ertragswertFreigabe = require('./ertragswertFreigabe');   /* v2431 */
 const config = require('../config');
 const objektWissen = require('./objektWissen');
-const objektRechnung = require('./objektRechnung');   /* v3289: EINE Abbildung Objekt -> Rechenkerne (Bot + Flow) */      /* v3025: Unterlagen, Potenzial im Jahr, To-dos */
+const objektRechnung = require('./objektRechnung');
+const flowProfil = require('./flowProfil');           /* v3290: Bewertungsprofil des Kontos fuer den Score */   /* v3289: EINE Abbildung Objekt -> Rechenkerne (Bot + Flow) */      /* v3025: Unterlagen, Potenzial im Jahr, To-dos */
 
 /* ═══ LESEN ═══════════════════════════════════════════════════════════ */
 
@@ -2114,7 +2115,13 @@ async function objekt_schnellblick(ctx, args) {
      Die Messungen und Begruendungen in den Kommentaren unten gelten weiter -
      sie beschreiben, was objektRechnung.rechnen() tut. */
   const sGespeichert = dialog.scoreLesen(d);
-  const R = objektRechnung.rechnen(d, { erg: erg, gespeichert: sGespeichert });
+  /* v3290 · Der Score rechnet mit dem Bewertungsprofil des Kontos (browser_vorgaben: Vorlage, eigene
+     Gewichte) - dieselbe Gewichtung wie die App und POST /objects/:id/berechnen. Bis hier nahm der Bot
+     die Gewichte des Kerns (Ausgewogen), auch wenn das Konto z. B. Vorsichtig rechnet. Ohne Profil
+     bleibt es bei Ausgewogen, wie im Browser ohne Einstellung. */
+  let _gewichte = null;
+  try { _gewichte = rechenkerne.scoreGewichte((await flowProfil.lesen(ctx.userId)).ds); } catch (e) { _gewichte = null; }
+  const R = objektRechnung.rechnen(d, { erg: erg, gespeichert: sGespeichert, gewichte: _gewichte || undefined });
   const kp = R.kp, nkm = R.nkm, ze = R.ze, wfl = R.wfl;
 
   /* ── Was fehlt, um ueberhaupt etwas zu sagen? ───────────────────────── */

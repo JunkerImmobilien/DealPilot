@@ -168,6 +168,25 @@ nav.inhalt a{color:var(--text);font-size:14px}
   "felder": [ { "id": "d1z", "label": "Zinssatz nominal", "kind": "text" }, … ],
   "hinweis": "Interne Feld-Ids für data{} …" }</code></pre>
 
+<!-- v3290 · Punkt 3 -->
+<h3><span class="m get">GET</span> / <span class="m">PUT</span> /flow/profil · Richtwerte und Ziele</h3>
+<p>Investmentprofil, Lageprofil, Ziele, Alarme und Freigaben des Kontos. Gespeichert wird im Investmentprofil und Lageprofil, das auch die App und der Telegram-Bot lesen: eine Änderung hier gilt dort sofort. Linie Investor nötig. <code>PUT</code> ändert nur die mitgeschickten Werte; <code>null</code> löscht einen Wert (zurück auf die Vorgabe).</p>
+<pre><code>curl -X PUT https://app.dealpilot.immo/api/v1/flow/profil   -H "x-api-key: dpk_live_…" -H "Content-Type: application/json"   -d '{ "ziele":     { "min_bruttorendite": 6.0, "min_cashflow_monat": 0, "min_dscr": 1.2, "max_faktor": 18, "max_kaufpreis": null },
+        "alarme":    { "preissenkung_pct": 5, "unter_zielpreis": true },
+        "freigaben": { "mpi": "auto", "mpi_plus": "frage", "wev": "nie", "monatsgrenze_eur": 60 },
+        "lage":      { "klassen": { "B": { "ziel_bmr": 6.5 } } },
+        "investment":{ "tilgung_default": 2, "ek_quote_default": 15 } }'</code></pre>
+<pre><code>{ "ok": true,
+  "investment": { "zins_override": null, "tilgung_default": 2, "ek_quote_default": 15, "min_dscr": 1.2, … },
+  "lage": { "klassen": { "A": { "ziel_bmr": null }, "B": { "ziel_bmr": 6.5 }, "C": { "ziel_bmr": null } } },
+  "ziele": { "min_bruttorendite": 6, "min_cashflow_monat": 0, "min_dscr": 1.2, "max_faktor": 18, "max_kaufpreis": null },
+  "alarme": { "preissenkung_pct": 5, "unter_zielpreis": true },
+  "freigaben": { "monatsgrenze_eur": 60, "mpi": "auto", "mpi_plus": "frage", "wev": "nie",
+                 "auto_gesetzt": { "stufen": ["mpi"], "am": "…", "von": "api:…" } },
+  "bewertungsprofil": { "name": "Ausgewogen", "gewichte": { … } } }</code></pre>
+<div class="kasten"><strong>Freigaben:</strong> je Stufe <code>auto</code>, <code>frage</code> oder <code>nie</code>, Voreinstellung <code>frage</code>. <code>auto</code> geht nur mit <code>monatsgrenze_eur</code> über 0 (sonst 400) und wird mit Zeitpunkt und Weg vermerkt. <code>min_dscr</code> und <code>min_cashflow_monat</code> sind dieselben Werte wie die Mindest-Schwellen der App. <code>POST /objects/:id/berechnen</code> rechnet mit den Zielen: <code>min_bruttorendite</code> als Zielrendite (wenn die Lageklasse keine hat), <code>max_kaufpreis</code> und <code>max_faktor</code> als Obergrenzen des Zielpreises (<code>zielpreis_grund</code> nennt die greifende), dazu <code>quickcheck.ziele</code> mit Soll, Ist und erfüllt.</div>
+<p><strong>Schlüssel-Bereich:</strong> <code>GET /hub/konto</code> zieht den Bereich des Hub-Schlüssels selbst nach, wenn sich die Linien ändern (<code>paket.api_key_bereich</code>). Hatte die Verbindung noch keinen Schlüssel, kommt er einmal als <code>api_key</code> in dieser Antwort.</p>
+
 <h3>Fehler bei DealPilot Flow</h3>
 <div class="tw"><table>
 <tr><th>Status</th><th><code>code</code></th><th>Bedeutung</th></tr>
@@ -176,6 +195,7 @@ nav.inhalt a{color:var(--text);font-size:14px}
 <tr><td>403</td><td><code>FLOW_NICHT_FREIGESCHALTET</code></td><td>keine Linie Investor oder Privat mehr freigeschaltet, Schlüssel ruht</td></tr>
 <tr><td>404</td><td>–</td><td>Objekt nicht gefunden (oder gehört einem anderen Konto)</td></tr>
 <tr><td>409</td><td>–</td><td>Versionskonflikt: das Objekt wurde geändert, neu lesen und neu rechnen</td></tr>
+<tr><td>400</td><td><code>FLOW_PROFIL_UNGUELTIG</code></td><td>Profil nicht gespeichert, Gründe in <code>fehler</code> (z. B. <code>auto</code> ohne Monatsgrenze)</td></tr>
 <tr><td>422</td><td><code>FLOW_ANGABEN_FEHLEN</code></td><td>ohne Kaufpreis und Nettokaltmiete lässt sich nichts rechnen</td></tr>
 </table></div>
 

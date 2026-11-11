@@ -16,6 +16,8 @@
  *       Linie 403 · crud flow ausserhalb der Testphase voller Zugriff ·
  *       crud flow in der Testphase nur Flow-Routen.
  *   Z5  requireFlowLinie('investor'): ohne Linie 403 FLOW_LINIE_FEHLT.
+ *   Z6  maklerHubService.bereichNachziehen (GET /hub/konto, v3290): Bereich folgt den Linien ohne
+ *       Neuverbinden - aendern, gleich lassen, neuer Schluessel nur ohne aktiven, ohne Linie nichts.
  *
  * Aufruf: node tools/flow-zugang-pruefen.mjs     RC 0 = alles gruen
  * ══════════════════════════════════════════════════════════════════════ */
@@ -27,13 +29,16 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const require_ = createRequire(import.meta.url);
 
 /* Gegenwart je Fall: Plan, Zusatz-Zeile, Nutzer */
-const LAGE = { plan: null, zusatz: null };
+const LAGE = { plan: null, zusatz: null, key: null, scopeUpdates: 0, verbKey: null };
 const DB = {
   query: async (sql, p) => {
     const s = String(sql);
     if (/FROM user_zusaetze/.test(s)) return LAGE.zusatz ? { rowCount: 1, rows: [LAGE.zusatz] } : { rowCount: 0, rows: [] };
     if (/FROM users WHERE id/.test(s)) return { rowCount: 1, rows: [{ id: 'u1', email: 'probe@example.invalid', name: 'Probe', role: 'user', is_active: true, email_verified_at: new Date(), created_at: new Date() }] };
     if (/UPDATE api_keys SET last_used_at/.test(s)) return { rowCount: 1, rows: [] };
+    if (s.indexOf('SELECT scopes FROM api_keys WHERE id=') >= 0) return LAGE.key ? { rowCount: 1, rows: [{ scopes: LAGE.key.scopes }] } : { rowCount: 0, rows: [] };
+    if (s.indexOf('UPDATE api_keys SET scopes=') >= 0) { LAGE.key.scopes = p[0]; LAGE.scopeUpdates++; return { rowCount: 1, rows: [] }; }
+    if (s.indexOf('UPDATE hub_verbindungen SET api_key_id=') >= 0) { LAGE.verbKey = p[0]; return { rowCount: 1, rows: [] }; }
     return { rowCount: 0, rows: [] };
   }
 };
@@ -135,6 +140,24 @@ r5 = await linie({ aktiv: true, linien: ['investor'] }, plan({}));
 pruef('Z5 mit Linie investor -> weiter', r5.weiter, r5);
 r5 = await linie(null, plan({ flow_linien: ['investor'] }));
 pruef('Z5 Plan-Merkmal flow_linien -> weiter', r5.weiter, r5);
+
+/* Z6 · Bereich nachziehen */
+apiKeys.createForUser = async (uid, o) => ({ id: 'k-neu', plain: 'dpk_live_neu', scopes: o && o.scopes });
+const verb = { id: 7, user_id: 'u1', api_key_id: 'k1' };
+LAGE.key = { scopes: 'crud' }; LAGE.scopeUpdates = 0;
+let r6 = await hub.bereichNachziehen(verb, ['makler', 'investor'], null);
+pruef('Z6 crud -> crud flow, kein neuer Schluessel', r6.bereich === 'crud flow' && !r6.api_key && LAGE.key.scopes === 'crud flow' && LAGE.scopeUpdates === 1, { r6, key: LAGE.key });
+r6 = await hub.bereichNachziehen(verb, ['makler', 'investor'], null);
+pruef('Z6 gleicher Bereich: kein Update', r6.bereich === 'crud flow' && LAGE.scopeUpdates === 1, LAGE.scopeUpdates);
+r6 = await hub.bereichNachziehen(verb, ['investor'], null);
+pruef('Z6 makler entfaellt: crud flow -> flow', LAGE.key.scopes === 'flow' && LAGE.scopeUpdates === 2, LAGE.key);
+LAGE.key = null; LAGE.verbKey = null;
+r6 = await hub.bereichNachziehen({ id: 8, user_id: 'u1', api_key_id: null }, ['privat'], null);
+pruef('Z6 ohne Schluessel: neuer mit Bereich flow, einmal im Klartext', r6.bereich === 'flow' && r6.api_key === 'dpk_live_neu' && LAGE.verbKey === 'k-neu', r6);
+LAGE.verbKey = null;
+r6 = await hub.bereichNachziehen({ id: 9, user_id: 'u1', api_key_id: null }, [], null);
+pruef('Z6 ohne Linie: nichts', r6.bereich === null && !r6.api_key && LAGE.verbKey === null, r6);
+pruef('Z3 GET/PUT /flow/profil ist Flow-Route', flow.istFlowRoute('GET', '/api/v1/flow/profil') && flow.istFlowRoute('PUT', '/api/v1/flow/profil'));
 
 console.log('flow-zugang-pruefen: ' + (n - fehler) + ' von ' + n + ' gruen');
 console.log(fehler ? '\x1b[31mRC=1\x1b[0m' : '\x1b[32mRC=0\x1b[0m');

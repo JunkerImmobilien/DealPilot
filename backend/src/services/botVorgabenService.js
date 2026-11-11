@@ -154,7 +154,14 @@ async function ergaenzung(userId, daten) {
   const hat = (id) => d[id] != null && String(d[id]).trim() !== '';
 
   Object.keys(ERLAUBT).forEach((id) => {
-    if (id === 'ek_quote') return;          /* kein Objektfeld, nur Vorgabe */
+    /* ek_quote ist kein Objektfeld, nur Vorgabe. v3290: hier stand nur `return` - die Vorgabe kam
+       dadurch NIE an (objekt_schnellblick las erg.vom_nutzer.ek_quote und fand nichts, gerechnet wurde
+       mit dem Eigenkapital am Objekt, meist 0). Jetzt gilt sie - aber nur, wenn am Objekt kein
+       Eigenkapital steht: das eingetragene schlaegt die Vorgabe. */
+    if (id === 'ek_quote') {
+      if (!hat('ek') && vorgaben.ek_quote != null) vomNutzer.ek_quote = vorgaben.ek_quote;
+      return;
+    }
     if (hat(id)) { vorhanden[id] = d[id]; return; }
     if (vorgaben[id] != null) { vomNutzer[id] = vorgaben[id]; return; }
     fehlt.push(id);
