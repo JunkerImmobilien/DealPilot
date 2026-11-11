@@ -21,14 +21,14 @@
    ═══════════════════════════════════════════════════════════════════════ */
 (function () {
   'use strict';
-  var QUELLE = 'assets/videothek/videos.json?v=landing-videothek-8';   /* landing-videothek-8: 20 Videos neu (N145, v3285); landing-videothek-7: Ue3, Modul 28 */
+  var QUELLE = 'assets/videothek/videos.json?v=landing-videothek-9';   /* landing-videothek-9: Modul 26 neu (v3291); landing-videothek-8: 20 Videos neu (N145, v3285); landing-videothek-7: Ue3, Modul 28 */
   /* landing-videothek-4 · Jedes Video gibt es mit und ohne Sprecher (Marcel 19.10.2026:
      „die Videos muss es vertont und unvertont geben"). videos.json traegt je Eintrag
      `datei_ton`; die Wahl merkt sich der Browser, Standard: mit Sprecher. */
   var TON = true;
   try { TON = localStorage.getItem('dp_vt_ton') !== '0'; } catch (e) {}
-  function datei(v) { return ((TON && v && v.datei_ton) ? v.datei_ton : v.datei) + '?v=v3285'; }   /* v3285 · Videothek auf die Aufnahmen vom 09.–11.11.2026 (N145): neu laden statt aus dem Cache; v2967 · neue Stimme */
-  function bildUrl(v, D) { return D.basis_bilder + v.poster + '?v=v3285'; }   /* v3285 · 20 Vorschaubilder aus den neuen Aufnahmen; v2968 · Modul 14/18 */
+  function datei(v) { return ((TON && v && v.datei_ton) ? v.datei_ton : v.datei) + '?v=v3291'; }   /* v3291 · Modul 26 neu; v3285 · Videothek auf die Aufnahmen vom 09.–11.11.2026 (N145): neu laden statt aus dem Cache; v2967 · neue Stimme */
+  function bildUrl(v, D) { return D.basis_bilder + v.poster + '?v=v3291'; }   /* v3291 · Modul 26; v3285 · 20 Vorschaubilder aus den neuen Aufnahmen; v2968 · Modul 14/18 */
   function tonText() { return TON ? 'Mit Sprecher ✓' : 'Ohne Sprecher'; }
   var ruhig = matchMedia('(prefers-reduced-motion: reduce)').matches;
   var PLAY = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15l13-7.5z"/></svg>';

@@ -1,4 +1,4 @@
-/* messe-schleife-daten.mjs · erzeugt 2026-11-11T07:14:43.019Z — NICHT von Hand ändern.
+/* messe-schleife-daten.mjs · erzeugt 2026-11-11T08:38:29.366Z — NICHT von Hand ändern.
    Neu erzeugen: node tools/messe-schleife-daten.mjs */
 window.DPS_VIDEOTHEK = {
  "stand": "2026-11-11",
@@ -1569,87 +1569,71 @@ window.DPS_VIDEOTHEK = {
    "titel": "Mieterhöhung und Zielbild",
    "unterzeile": "Ein Mehrfamilienhaus, Wohnung für Wohnung — Ist, Soll und Zielbild bis zum Wertpotenzial.",
    "datei": "dealpilot-modul-26-mieterhoehung-und-zielbild.mp4",
-   "dauer": 945,
+   "dauer": 861,
    "kapitel": [
     {
      "t": 0,
      "titel": "Einstieg"
     },
     {
-     "t": 27,
-     "titel": "Einheiten erfassen"
+     "t": 13,
+     "titel": "Das Beispiel"
     },
     {
-     "t": 41,
-     "titel": "Das Haus"
+     "t": 42,
+     "titel": "Schritt 1 · Das Haus"
     },
     {
-     "t": 54,
-     "titel": "In Wohnungseigentum aufgeteilt"
+     "t": 80,
+     "titel": "Schritt 2 · Die Wohnungen"
     },
     {
-     "t": 69,
-     "titel": "Jahr des Zielbilds"
+     "t": 131,
+     "titel": "Wohnung 1 · Der Mietvertrag"
     },
     {
-     "t": 93,
-     "titel": "Die Wohnungen"
+     "t": 157,
+     "titel": "Wohnung 1 · Soll-Miete"
     },
     {
-     "t": 128,
-     "titel": "Mietvertrag und Kappung"
+     "t": 219,
+     "titel": "Wohnung 1 · Zielbild"
     },
     {
-     "t": 190,
-     "titel": "Die Soll-Miete"
+     "t": 261,
+     "titel": "Ertragswert dieser Wohnung"
     },
     {
-     "t": 210,
-     "titel": "Das Zielbild"
+     "t": 302,
+     "titel": "Wohnung 2"
     },
     {
-     "t": 252,
-     "titel": "Ertragswert je Wohnung"
-    },
-    {
-     "t": 293,
-     "titel": "Wohnung zwei"
-    },
-    {
-     "t": 337,
+     "t": 347,
      "titel": "Die übrigen Wohnungen"
     },
     {
-     "t": 414,
-     "titel": "Übernehmen"
+     "t": 395,
+     "titel": "Schritt 4 · Ergebnis und Übernehmen"
     },
     {
-     "t": 450,
-     "titel": "Mietentwicklung aus Wohnungen"
+     "t": 463,
+     "titel": "Tab Miete · Mietentwicklung"
     },
     {
-     "t": 547,
-     "titel": "Pilot-Analyse: Ankauf, Bestand, Zielbild"
+     "t": 560,
+     "titel": "Pilot-Analyse"
     },
     {
-     "t": 618,
-     "titel": "Marktpreisindikation als Gegenprobe"
+     "t": 704,
+     "titel": "Tab Bewertung"
     },
     {
-     "t": 654,
-     "titel": "Lohnt sich eine Aufteilung?"
+     "t": 765,
+     "titel": "Das Bank-PDF"
     },
     {
-     "t": 682,
-     "titel": "Marktpreise am Ort"
-    },
-    {
-     "t": 787,
-     "titel": "Die Wertüberleitung"
-    },
-    {
-     "t": 848,
-     "titel": "Die Seite im Bank-PDF"
+     "t": 832,
+     "titel": "Ist, Soll, Zielbild"
     }
    ]
   },
