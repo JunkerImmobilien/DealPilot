@@ -71,7 +71,7 @@ async function stand(userId) {
   let plan = 'free';
   try { const eff = await require('./subscriptionService').getEffectivePlan(userId); if (eff && eff.plan_id) plan = String(eff.plan_id); } catch (e) {}
   const grenze = GRENZE_JE_PLAN[plan] != null ? GRENZE_JE_PLAN[plan] : GRENZE_JE_PLAN.free;
-  const r = await query('SELECT COALESCE(SUM(groesse), 0)::bigint AS belegt, COUNT(*)::int AS anzahl FROM dateien WHERE user_id = $1 AND deleted_at IS NULL', [userId]);
+  const r = await query("SELECT COALESCE(SUM(groesse), 0)::bigint AS belegt, COUNT(*)::int AS anzahl FROM dateien WHERE user_id = $1 AND deleted_at IS NULL AND quelle IS DISTINCT FROM 'objektfoto'", [userId]);  /* v3310: Objektfotos zählen nicht */
   const belegt = Number(r.rows[0].belegt) || 0;
   return { plan, grenze_bytes: grenze, belegt_bytes: belegt, frei_bytes: Math.max(0, grenze - belegt), anzahl: r.rows[0].anzahl, max_datei_bytes: MAX_DATEI, bereit: bereit() };
 }
@@ -112,7 +112,7 @@ async function ablegen(userId, opts) {
 
 async function liste(userId, objectId) {
   const args = [userId];
-  let w = 'user_id = $1 AND deleted_at IS NULL';
+  let w = "user_id = $1 AND deleted_at IS NULL AND quelle IS DISTINCT FROM 'objektfoto'";   /* v3310: Objektfotos nicht in der Liste */
   if (objectId === null) w += ' AND object_id IS NULL';
   else if (objectId) { args.push(objectId); w += ' AND object_id = $2'; }
   const r = await query('SELECT id, object_id, ordner, name, mime, groesse, sha256, quelle, meta, created_at, updated_at FROM dateien WHERE ' + w + ' ORDER BY ordner, name', args);
@@ -136,12 +136,12 @@ async function aendern(userId, id, opts) {
     args.push(opts.objectId || null); sets.push('object_id = $' + args.length);
   }
   if (!sets.length) return null;
-  const r = await query('UPDATE dateien SET ' + sets.join(', ') + ', updated_at = NOW() WHERE id = $1 AND user_id = $2 AND deleted_at IS NULL RETURNING id, object_id, ordner, name, mime, groesse, quelle, updated_at', args);
+  const r = await query('UPDATE dateien SET ' + sets.join(', ') + ", updated_at = NOW() WHERE id = $1 AND user_id = $2 AND deleted_at IS NULL AND quelle IS DISTINCT FROM 'objektfoto' RETURNING id, object_id, ordner, name, mime, groesse, quelle, updated_at", args);
   return r.rows[0] || null;
 }
 
 async function loeschen(userId, id) {
-  const r = await query('UPDATE dateien SET deleted_at = NOW() WHERE id = $1 AND user_id = $2 AND deleted_at IS NULL RETURNING ablage_schluessel', [id, userId]);
+  const r = await query("UPDATE dateien SET deleted_at = NOW() WHERE id = $1 AND user_id = $2 AND deleted_at IS NULL AND quelle IS DISTINCT FROM 'objektfoto' RETURNING ablage_schluessel"  /* v3310: Objektfotos nur über das Objekt */, [id, userId]);
   if (!r.rowCount) return false;
   await _entfernen(userId, r.rows[0].ablage_schluessel);
   return true;
@@ -152,4 +152,4 @@ async function kontoLeeren(userId) {
   try { await fs.promises.rm(path.join(BASIS, String(userId)), { recursive: true, force: true }); return true; } catch (e) { return false; }
 }
 
-module.exports = { ablegen, liste, holen, aendern, loeschen, stand, kontoLeeren, bereit, ordnerSauber, nameSauber, GRENZE_JE_PLAN, MAX_DATEI, _lesen, _schreiben };
+module.exports = { ablegen, liste, holen, aendern, loeschen, stand, kontoLeeren, bereit, ordnerSauber, nameSauber, GRENZE_JE_PLAN, MAX_DATEI, _lesen, _schreiben, _entfernen };

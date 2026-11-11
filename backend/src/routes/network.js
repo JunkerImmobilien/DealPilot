@@ -30,7 +30,9 @@ async function resolveObject(userId, ref) {
         LIMIT 1`,
       [userId, String(ref)]
     );
-    return r.rows[0] || null;
+    const o = r.rows[0] || null;
+    if (o) o.photos = await require('../services/objektFotos').zumLesen(userId, o.photos);   /* v3310: Verweise -> Bilder */
+    return o;
   } catch (e) { console.warn('[network] resolveObject:', e.message); return null; }
 }
 

@@ -568,6 +568,11 @@ async function bauen(userId, opt) {
       ORDER BY seq_no NULLS LAST, created_at`,
     [userId]
   );
+  /* v3310: Fotos liegen in der Ablage - nur wenn sie mitsollen, die Verweise aufloesen */
+  if (mitFotos) {
+    const of = require('./objektFotos');
+    for (const o of r.rows) o.photos = await of.zumLesen(userId, o.photos);
+  }
 
   const k = konstanten().daten || {};
 
@@ -787,7 +792,7 @@ async function bauen(userId, opt) {
 
   /* v3162 · abgelegte Unterlagen je Objekt (nur Liste mit Download-Adresse, kein Inhalt) */
   try {
-    const dz = await query('SELECT id, object_id, ordner, name, mime, groesse, quelle, created_at FROM dateien WHERE user_id = $1 AND deleted_at IS NULL ORDER BY ordner, name', [userId]);
+    const dz = await query("SELECT id, object_id, ordner, name, mime, groesse, quelle, created_at FROM dateien WHERE user_id = $1 AND deleted_at IS NULL AND quelle IS DISTINCT FROM 'objektfoto' ORDER BY ordner, name", [userId]);  /* v3310: Fotos stehen unter fotos */
     const je = {}; dz.rows.forEach((d) => { if (d.object_id) (je[d.object_id] = je[d.object_id] || []).push(Object.assign({}, d, { download: '/api/v1/dateien/' + d.id })); });
     objekte.forEach((o) => { if (je[o.id]) o.dateien = je[o.id]; });
   } catch (e) { /* Tabelle fehlt (Migration 096 noch nicht gelaufen) */ }

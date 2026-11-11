@@ -121,6 +121,12 @@ async function _einfuegen(userId, demo) {
      s.seq_no, JSON.stringify(data), aiAnalysis, JSON.stringify(photos)]
   );
 
+  /* v3310: auch hier die Fotos in die Ablage, die Zeile bekommt nur Verweise */
+  try {
+    const of = require('./objektFotos');
+    const neu = await of.zumSpeichern(userId, result.rows[0].id, photos, data);
+    if (JSON.stringify(neu) !== JSON.stringify(photos)) await query('UPDATE objects SET photos = $1::jsonb WHERE id = $2', [JSON.stringify(neu), result.rows[0].id]);
+  } catch (e) { console.warn('[demoObjectService] Fotos auslagern:', e.message); }
   console.log('[demoObjectService] Demo-Objekt angelegt fuer User', userId, '→', result.rows[0]);
   return result.rows[0];
 }

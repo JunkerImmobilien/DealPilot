@@ -135,7 +135,7 @@ router.post('/:id/offerte', validate({ params: idParamSchema, body: offerteSchem
 
 router.get('/:id/wissen', validate({ params: idParamSchema }), async (req, res, next) => {
   try {
-    const obj = await objectService.getById(req.user.id, req.params.id);
+    const obj = await objectService.getById(req.user.id, req.params.id, { fotos: false });   /* v3310: Fotos braucht hier niemand */
     if (!obj) return res.status(404).json({ error: 'Object not found' });
     let d = obj.data;
     if (typeof d === 'string') { try { d = JSON.parse(d); } catch (e) { d = {}; } }

@@ -1,6 +1,7 @@
 'use strict';
 const { query } = require('../db/pool');
 const { HttpError } = require('../middleware/errors');
+const objektFotos = require('./objektFotos');   /* v3310: Fotos in der Ablage, in der Zeile nur Verweise */
 
 /**
  * Extract summary fields from data for indexing
@@ -79,6 +80,7 @@ async function listForUser(userId, { limit = 100, offset = 0 } = {}) {
               WHEN jsonb_typeof(photos::jsonb) = 'array'
                    AND jsonb_array_length(photos::jsonb) > 0
                    AND length(photos::jsonb->>0) <= 500000
+                   AND left(photos::jsonb->>0, 7) <> 'dpfoto:'   -- v3310: ein Verweis ist kein Bild
               THEN photos::jsonb->>0
               ELSE NULL
             END AS thumbnail
@@ -91,7 +93,8 @@ async function listForUser(userId, { limit = 100, offset = 0 } = {}) {
   return r.rows;
 }
 
-async function getById(userId, objectId) {
+/* v3310: opts.fotos === false liefert die Verweise roh (ohne Laufwerk lesen) - fuer Leser, die keine Fotos brauchen */
+async function getById(userId, objectId, opts) {
   const r = await query(
     `SELECT id, user_id, name, kuerzel, ort, kaufpreis, bmy, cf_ns, dscr,
             data, ai_analysis, photos, version, created_at, updated_at
@@ -99,7 +102,9 @@ async function getById(userId, objectId) {
      WHERE id = $1 AND user_id = $2`,
     [objectId, userId]
   );
-  return r.rows[0] || null;
+  const row = r.rows[0] || null;
+  if (row && !(opts && opts.fotos === false)) row.photos = await objektFotos.zumLesen(row.user_id, row.photos);
+  return row;
 }
 
 // qb-seqfix: kollisionssichere, fortlaufende Objekt-Nummer (selbstheilend: MAX+1 aus Tabelle)
@@ -162,6 +167,13 @@ async function create(userId, { data, aiAnalysis, photos }) {
       throw e;
     }
   }
+  /* v3310: erst jetzt gibt es die Objekt-ID - Fotos in die Ablage, die Zeile bekommt die Verweise */
+  try {
+    const neu = await objektFotos.zumSpeichern(userId, r.rows[0].id, photos, data);
+    if (JSON.stringify(neu) !== JSON.stringify(photos || [])) {
+      await query('UPDATE objects SET photos = $1 WHERE id = $2 AND user_id = $3', [JSON.stringify(neu), r.rows[0].id, userId]);
+    }
+  } catch (e) { console.warn('[objekt-fotos] beim Anlegen:', e.message); }
   return r.rows[0];
 }
 
@@ -179,6 +191,8 @@ async function update(userId, objectId, { data, aiAnalysis, photos, expectedVers
   }
 
   const summary = extractSummary(data);
+  /* v3310: data-URLs -> Verweise auf die Ablage (gleiches Foto = dieselbe Datei) */
+  photos = await objektFotos.zumSpeichern(userId, objectId, photos, data);
   // V63.25: seq_no MUSS auch im UPDATE gesetzt werden — sonst wird die ID-Änderung
   // im Frontend zwar in data._obj_seq gespeichert, aber die seq_no-Spalte (die der
   // Listen-Endpoint zurückgibt) bleibt auf der alten Nummer → Sidebar zeigt alte ID
@@ -220,10 +234,12 @@ async function update(userId, objectId, { data, aiAnalysis, photos, expectedVers
     r = await _upd(null, data);
     if (r.rows[0]) r.rows[0].seq_kollision = summary.seq_no;
   }
+  await objektFotos.aufraeumen(userId, objectId);   /* v3310: nicht mehr genannte Fotos weg (Nachfrist 5 min) */
   return r.rows[0];
 }
 
 async function deleteObject(userId, objectId) {
+  await objektFotos.objektLeeren(userId, objectId);   /* v3310: vor dem DELETE, die FK setzt object_id sonst NULL */
   const r = await query(
     'DELETE FROM objects WHERE id = $1 AND user_id = $2 RETURNING id',
     [objectId, userId]
