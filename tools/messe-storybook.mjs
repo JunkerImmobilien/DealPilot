@@ -51,7 +51,7 @@ const STORYS = [
     zeigen: ['Reiter Bewertung: Stufe 3 erzeugen', 'Rechenweg Ertragswert: Rohertrag, Bewirtschaftung, Liegenschaftszins', 'Sachwert: NHK 2010, Baupreisindex, Alterswertminderung', 'Quellennachweis: welcher Gutachterausschuss, welches Jahr'],
     satz: 'Jede Zahl mit Herkunft: welcher Ausschuss, welches Jahr, welche Seite. Keine Schätzung ohne Quelle.' },
   { seq: '2026-1053', titel: 'Steuer, AfA und Zeiträume', thema: 'Steuer · AfA · zvE je Jahr',
-    geschichte: 'Acht Wohnungen in Bielefeld. Hier zeigt sich, was die Steuer aus einem Objekt macht: der Cashflow nach Steuern liegt über dem vor Steuern – die Abschreibung arbeitet für dich.',
+    geschichte: 'Acht Wohnungen in Bielefeld. Hier zeigt sich, was die Steuer aus einem Objekt macht: rund 10.000 € Überschuss im Jahr, und trotzdem kaum Steuer darauf – die Abschreibung gleicht sie aus, der Cashflow nach Steuern liegt gleichauf mit dem vor Steuern.',
     zeigen: ['Reiter Steuer: zvE, Splitting, Kirchensteuer', 'Steuerverlauf: wann der Wendepunkt kommt', 'AfA: Gebäudeanteil und Restnutzungsdauer'],
     satz: 'Du siehst Jahr für Jahr, was das Objekt dich nach Steuern kostet oder bringt – nicht erst mit dem Bescheid.' },
   { seq: '2026-1036', titel: 'Die Cashflow-Maschine', thema: 'Rendite · Cashflow',

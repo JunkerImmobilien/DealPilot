@@ -130,3 +130,58 @@ Gegen das Storybook von heute früh haben sich nur Ravensberger (63 → 71 Gut) 
 **Eine Geschichte passt nicht:** Gohliser Str. 42 sagt Score „Gut“, gespeichert ist 68 Solide (Prod 77 Gut). Das kommt vom Staging-Stand mit der alten Gewichtung. Nach einmal Speichern mit Lage-Fokus erneut prüfen, den Text nicht ändern.
 
 **Nicht angefasst:** Lindenallee 14 und die 17 Objekte mit Prod-eigenen Ständen. Prod ist unverändert.
+
+## 9 · Nachtrag 11.11. mittags: Staging-Objekte einmal in der App gespeichert (nur Staging)
+
+**Weg:** die echte App im Headless-Chromium des Containers `dealpilot-pdf` (kein Chrome des Nutzers), angemeldet mit einem 90-Minuten-Token des Demo-Kontos (`signKurz`). Ein frisches Fenster je Objekt, `loadSaved(id)`, Rechnung abwarten, dann einmal `saveObj({silent:true})`. Skript: scratchpad `neuspeichern.js`.
+Schreibschutz im Request-Filter: Jeder nicht-lesende `/api/v1`-Aufruf wurde abgewiesen, außer genau einem `PUT /objects/<id>` nach dem ausdrücklichen Speichern. Den ließ der Filter nur durch, wenn der Feld-Diff (gespeicherter Stand gegen PUT-Body) keine Eingabe änderte.
+Als Eingabe zählen alle Schlüssel ohne `_` sowie `_deal_lost`, `_deal_won`, `_ankauf` und `_name`. Fotos und KI-Text mussten gleich sein.
+Gesperrt waren außerdem `/ai`, `/immometrica`, `/avm`, `/credits`, die Marktbericht-Wege (`potenzial`, `wertparameter`, `ausstattung`, `verlauf-text`, Karten/Geocode) und fremde Hosts. Das Auto-Speichern beim Laden wurde bei jedem Objekt abgewiesen (1 PUT je Objekt).
+Der Detailgrad-Merker des Kopflos-Browsers wurde je Objekt auf dessen `dp_stufe` gesetzt. Sonst schrieb das Laden `dp_stufe` 1 → 3 (Hölderlin, im Trockenlauf gesehen).
+Vorher lief ein Trockenlauf über alle 21 Objekte, in dem jeder PUT abgewiesen wurde.
+Gewichtung im Kopflos-Browser nach dem Laden: `dp_dealscore2_preset = lage`, 20/22/14/14/30, kein `dp_dealscore_eigen`.
+
+**Sicherung vorher:** `/root/backups/demo-objekte-staging-20261111-1023-vor-neuspeichern.json.gz` (12 MB, 56 Zeilen `row_to_json`, Kopf angesehen).
+
+**Gespeichert (12):** 2026-001, 1002 (bleibt verloren), 1006, 1007, 1008, 1036, 1041, 1053, 1082, 1088, 1157 VOLL-A, 1158 VOLL-B.
+Nachher gegen die Sicherung: Genau diese 12 von 56 Zeilen sind geändert (Version +1). Verloren/gewonnen, Fotos und KI-Text sind unverändert.
+An Eingabe-Schlüsseln kamen nur leere neue Felder dazu (`ms_*`, `paket_*`, `eig_*` usw., fehlend → ""). Dazu bei 1082 `mietausfall` "" → 216. Das ist der berechnete Euro-Betrag seit v3238 (Leerstand 2 % × NKM), kein Eingabefeld mehr.
+
+**Übersprungen (9), weil das Laden eine Eingabe ändert:**
+- `grenz` 47,00 → 41,35: 1040, 1042, 1051, 1052, 1054, 1055, 1056, 999.
+- 004 Bäckerstr.: `grenz` 36,85 → 41,35 und `leerstand` 0,0 → 1,14. Den Leerstand setzt die Umrechnung v3238, die den alten Mietausfall von 110 €/Jahr in Prozent übernimmt.
+
+Ursache bei `grenz`: Der Haken `grenz_auto` ist an. Seit v3188 (05.11.) nimmt die App das zvE des Steuerzeitraums 2026 (68.000 €) statt des Feldes `zve` (90.000 €).
+Die Steuerzeiträume sind auf Prod identisch (`tax_periods`, drei Zeilen). Ein Speichern auf Prod schriebe also dieselben 41,35.
+**Entscheidung offen:** Soll `grenz` bei `grenz_auto = true` als Rechenfeld gelten? Dann lassen sich die 9 in rund 5 Minuten nachspeichern (`RECHEN_EXTRA=mietausfall,grenz`). Bäckerstr. bleibt wegen `leerstand` dann trotzdem eine eigene Frage.
+Die Scores, die das Speichern geschrieben hätte (aus dem abgewiesenen PUT, DS/Investor): 1040 64/65, 1042 66/67, 1051 20/40, 1052 76/77, 1054 28/62, 1055 60/58, 1056 75/77, 999 47/55, 004 48/49.
+
+**Scores Staging gegen Prod (Prod nur gelesen), DS / Investor:**
+
+| Nr. | Objekt | Prod | Staging jetzt | | Grund |
+|---|---|---:|---:|---|---|
+| 2026-001 | Hermannstraße 9 | 77/74 | 77/74 | gleich | (AfA-Eingaben anders, wirken nicht auf den Score) |
+| 2026-1006 | Löhner Str. 278 | 67/65 | 67/65 | gleich | |
+| 2026-1007 | Am Markt 9 (VV) | 66/81 | 66/81 | gleich | |
+| 2026-1008 | Hölderlinstr. 1 | 80/64 | 80/64 | gleich | |
+| 2026-1036 | Wilhelm-Busch-Str. | 82/69 | 82/69 | gleich | |
+| 2026-1053 | Ravensberger Weg 38 | 73/69 | 73/69 | gleich | (grenz 41,35 statt 47, CF n. St. 10.398 statt 10.773) |
+| 2026-1082 / 1088 | Sachsenstr. / Hermannstr. alt | – | – | gleich | ohne Score |
+| 2026-1002 | Am Markt 9 privat (verloren) | 85/74 | 81/81 | ungleich | Staging-Eingabe `wertermittlungsstichtag` 2024-08-01 |
+| 2026-1041 | Westerfeldstr. 140 | 75/73 | 69/68 | ungleich | 19 Staging-Eingaben (EK, Leerstand 10 %, Sanierung, Darlehen II KfW …) |
+| 2026-1157 / 1158 | VOLL-A / VOLL-B | 25/47 · 23/49 | 33/49 · 31/49 | ungleich | Prod trägt noch die Staging-Rechnung mit Vorsichtig-Gewichten. Auf Prod nicht gespeichert |
+| 2026-1040, 1042, 1051, 1052, 1055, 999 | | wie Prod | alt | ungleich | nicht gespeichert (grenz). Der abgewiesene PUT hätte genau die Prod-Werte geschrieben |
+| 2026-1054 | Bismarckstr. 27 | 46/59 | 23/44 | ungleich | nicht gespeichert. Eingaben anders (Wert 725.000, Makrolage, Wertsteigerung); PUT 28/62 |
+| 2026-1056 | Parkstr. 9 | 93/70 | 87/75 | ungleich | nicht gespeichert. Eingaben anders (Wert 453.000, Mikrolage, Nachfrage); PUT 75/77 |
+| 2026-004 | Bäckerstr. 7 | 56/56 | 27/36 | ungleich | nicht gespeichert. Eingabe `wertermittlungsstichtag` 2026-06-09; PUT 48/49 |
+
+Damit ist bestätigt: Mit Lage-Fokus rechnet Staging dieselben Scores wie Prod, wo die Eingaben gleich sind (12 von 12 Objekten mit Score: 6 gespeichert, 6 im abgewiesenen PUT).
+
+**Storybook** neu (`node tools/messe-storybook.mjs`, 18 Objekte, 24 Seiten). Die Geschichten wurden gegen die gespeicherten Zahlen geprüft:
+- **Gohliser Str. 42** („Score Gut“): passt weiterhin nicht, gespeichert 68 Solide. **Fehler in den Daten, nicht im Text.** Das Objekt ist nicht gespeichert (grenz), der abgewiesene PUT hätte 77 Gut geschrieben (= Prod). DSCR 1,23 und beide Cashflows positiv passen.
+- **Ravensberger Weg 38** („Cashflow nach Steuern liegt über dem vor Steuern“): **passte nicht.** v. St. 10.400 €, n. St. 10.398 € auf Staging seit dem Speichern von heute 08:29 UTC, also nicht erst seit diesem Lauf. Auf Prod gilt noch 10.773 €, gerechnet mit grenz 47.
+  Das ist der Text: Mit dem heutigen Code (grenz 41,35 aus dem Steuerzeitraum) liegen beide gleichauf. Korrigiert in `tools/messe-storybook.mjs`: „rund 10.000 € Überschuss im Jahr, und trotzdem kaum Steuer darauf – die Abschreibung gleicht sie aus, der Cashflow nach Steuern liegt gleichauf mit dem vor Steuern.“
+- Alle anderen passen: Lindenhof 35 Schwach mit DSCR 0,68, Rinteln (BMY 7,30 %, DSCR 1,66, CF 20.040 €), Ibbenbüren n. St. 6.892 über v. St. 1.804, Bäckerstr. LTV 100 % mit DSCR 0,80, Hiddenhausen KP 350.000 und 1002 verloren / 1007 gewonnen.
+  Westerfeld heißt im Text „solide“ und steht bei 68 Solide.
+
+**Nicht entschieden, nur gemeldet:** Lindenallee 14 (Prod 2026-1123 gegen die Staging-Kopien 1124/1126/1127/1143–1147, das Storybook nimmt 1124). Leerstand Westerfeld (Staging 10 %, Prod 0). Der Spiegel nach Prod. Und neu `grenz` bei `grenz_auto` als Rechenfeld (siehe oben).
