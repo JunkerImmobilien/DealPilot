@@ -1542,7 +1542,7 @@ fallB('B63', () => {
    Bestand 107.000 > Mieterhöhung 106.000 €, Anteil am Haus 114.437 > 108.005 €: der Bestand je Wohnung
    rechnete die marktübliche Miete ohne die Mindermiete, der Anteil verteilte den ganzen Hauswert nach dem
    Rohertrag. Muss gelten: Mieterhöhung ≥ Bestand, Bestand < Wert mit voller marktüblicher Miete. */
-async function b64Lauf(mod) {
+async function b64Lauf(mod, opt = {}) {
   if (!PSM || !CCS || !WPS || !WPS.WertParameterService) return null;
   const W = [
     { nr: '1', wfl: 68, miete_jahr: { bestand: 4896, mieterhoehung: 5630, zielbild: 7752 }, vgl_jahr: 6365, vgl_herkunft: 'eigene Angabe', soll558_jahr: 5630, letzte: '2019-04-01', mv_art: 'unbefristet' },
@@ -1553,15 +1553,16 @@ async function b64Lauf(mod) {
     { nr: '6', wfl: 58, miete_jahr: { bestand: 4380, mieterhoehung: 5037, zielbild: 5037 }, vgl_jahr: 5867, vgl_herkunft: 'Mietspiegel', soll558_jahr: 5037 },
   ].map((w) => Object.assign({ art: 'wohnen', mea_pct: null, leer: false, vgl_marktmiete: false, letzte: null, letzte_betrag: null, mv_art: null }, w));
   if (mod) mod(W);
-  const markt = 7.7, band = { unten_qm: 6.16, oben_qm: 9.24, anker_qm: 7.7, band_pct: 20, anker_stufe: 'satz_mittel', anker_etikett: 'Ø Miete des Liegenschaftszinssatzes' };
+  const markt = opt.markt || 7.7, lzsH = opt.lzs || 2.5;
+  const band = { unten_qm: Math.round(markt * 0.8 * 100) / 100, oben_qm: Math.round(markt * 1.2 * 100) / 100, anker_qm: markt, band_pct: 20, anker_stufe: 'satz_mittel', anker_etikett: 'Ø Miete des Liegenschaftszinssatzes' };
   const st = new Date('2026-11-10T00:00:00Z'), kapp = { pct: 15, text: 'Kappungsgrenze 15 % in 3 Jahren' };
   const q = (w) => w.miete_jahr.bestand / 12 / w.wfl;
   const posten = W.filter((w) => w.miete_jahr.bestand > 0 && (q(w) < band.unten_qm || q(w) > band.oben_qm)).map((w) => ({ nr: w.nr, nutzung: 'wohnen', ist_jahr: w.miete_jahr.bestand,
     differenz_jahr: w.miete_jahr.bestand - markt * w.wfl * 12, letzte_erhoehung: w.letzte, mv_art: w.mv_art, befristet_bis: w.befristet_bis || null }));
-  const mb = CCS.mietabweichungBog(posten, 2.5, 18, st, { kappung: kapp });
+  const mb = CCS.mietabweichungBog(posten, lzsH, 18, st, { kappung: kapp });
   const roh = W.reduce((a, w) => a + (q(w) > 0 && q(w) >= band.unten_qm && q(w) <= band.oben_qm ? w.miete_jahr.bestand : markt * w.wfl * 12), 0);
   const ein = { objektart: 'mfh', baujahr: 1960, baustatus: null, wohnflaeche_qm: 378, anzahl_we: 6, stichtag_jahr: 2026, miete_markt_jahr: Math.round(roh),
-    gewerbe_jahr: null, stellplatz_anz: 0, zusatz_jahr: null, sonstige_jahr: null, rnd_jahre: 18, gnd_jahre: 80, lzs_pct: 2.5, lzs_stufe: 'A', lzs_quelle: 'Prüffall', bwk_modus: 'normiert',
+    gewerbe_jahr: null, stellplatz_anz: 0, zusatz_jahr: null, sonstige_jahr: null, rnd_jahre: 18, gnd_jahre: 80, lzs_pct: lzsH, lzs_stufe: 'A', lzs_quelle: 'Prüffall', bwk_modus: 'normiert',
     bog_posten: mb.angesetzt_eur ? [{ pos: 'besonderes objektspezifisches Merkmal: Mietabweichung Wohnungen', wert: mb.angesetzt_eur }] : [] };
   const wb = { ref: { ags: '05711000', units: 6, living_area: 378, property_type: 'mfh' }, cross_check: { ertragswert: {} }, valuation: null,
     ertragswert_eingabe: { ein, bodenwert: { vollstaendig: true, wert: 386662 }, wohnflaeche_wohnen: 378, miete_qm: 6.87, miete_band: band, markt_qm: markt,
@@ -1595,7 +1596,7 @@ fallB('B64', () => {
     w4.als_etw.bestand + '/' + w4.als_etw.mieterhoehung + ' · ' + w4.anteil_am_haus.bestand + '/' + w4.anteil_am_haus.mieterhoehung);
   pruefe('B', 'B64', 'leere Wohnung 5 (gleiche Miete in allen Stufen): Anteil am Haus bleibt (±1 %; bis v3282 114.426 → 106.606)',
     Math.abs(w5.anteil_am_haus.mieterhoehung / w5.anteil_am_haus.bestand - 1) < 0.01, w5.anteil_am_haus.bestand + ' / ' + w5.anteil_am_haus.mieterhoehung);
-  ['bestand', 'mieterhoehung', 'zielbild'].forEach((s) => wert('B', 'B64', 'Summe der Anteile = Hauswert ' + s, B64.wohnungen.reduce((a, w) => a + w.anteil_am_haus[s], 0), B64.haus[s].wert, 6));
+  ['bestand', 'mieterhoehung', 'zielbild'].forEach((s) => wert('B', 'B64', 'Summe der Anteile = Hauswert (ungerundet) ' + s, B64.wohnungen.reduce((a, w) => a + w.anteil_am_haus[s], 0), B64.haus[s].wert_ungerundet, 6));
   const ma = w1.mietabweichung && w1.mietabweichung.bestand;
   wert('B', 'B64', 'Anteil am Haus: boG der Wohnung 1 = Bestandszeile des Hauses (Zins 2,5 %)', ma ? ma.wert : null, -2219, 0);
   if (!B64o || !B64o[0] || !B64o[1]) return pruefe('B', 'B64', 'Gegentest Mehrmiete gelaufen', false, B64g || 'kein Ergebnis');
@@ -1605,6 +1606,27 @@ fallB('B64', () => {
   const ob = o1.mietabweichung_etw && o1.mietabweichung_etw.bestand;
   pruefe('B', 'B64', 'Mehrmiete befristet bis 12/2029: Mehrertrag als boG (+), in Bestand und Mieterhöhung gleich', !!ob && ob.art === 'overrent' && ob.wert > 0
     && o1.als_etw.bestand === o1.als_etw.mieterhoehung && o1.als_etw.bestand > o0.als_etw.bestand, ob ? ob.satz + ' · ' + JSON.stringify(o1.als_etw) : 'kein boG');
+});
+
+/* ══ v3287 · B65 ZIELBILD NIE UNTER DER MIETERHÖHUNG ═══════════════════════════════════════════
+   Modul 26 live auf Staging 11.11.2026 mit dem Satz 2024 (LZS 2,6 %, Ø Miete 7,30, Band 5,84–8,76; Stichtag
+   = Kaufdatum 01.01.2025): Haus Zielbild 600.000 < Mieterhöhung 625.000 €. Wohnung 1 Zielmiete 9,50 €/m² über
+   dem Band -> Anker 7,30, die Mieterhöhung rechnet die Vergleichsmiete 7,80. Muss gelten: Zielbild ≥ Mieterhöhung
+   ≥ Bestand, je Haus und je Wohnung (ImmoWertA 31 b: die zulässigen Erhöhungen sind marktüblich erzielbar). */
+let B65 = null, B65g = '';
+try { B65 = await b64Lauf(null, { markt: 7.3, lzs: 2.6 }); } catch (e) { B65g = e.message.slice(0, 120); }
+fallB('B65', () => {
+  if (!B65 || !B65.wohnungen) return pruefe('B', 'B65', 'Potenzial-Lauf Modul 26 (Satz 2024) nachgestellt', false, B65g || 'kein Ergebnis');
+  const H = B65.haus, w1 = B65.wohnungen[0];
+  pruefe('B', 'B65', 'Haus: Zielbild ≥ Mieterhöhung ≥ Bestand', H.zielbild.wert >= H.mieterhoehung.wert && H.mieterhoehung.wert >= H.bestand.wert,
+    H.bestand.wert + ' / ' + H.mieterhoehung.wert + ' / ' + H.zielbild.wert + ' (live 11.11. vor v3287: 545.000 / 625.000 / 600.000)');
+  pruefe('B', 'B65', 'Wohnung 1: Zielbild-Miete nie unter der Zielmiete der Mieterhöhung (Vergleichsmiete 7,80 statt Anker 7,30)', w1.miete_jahr.zielbild >= w1.miete_jahr.mieterhoehung,
+    JSON.stringify(w1.miete_jahr));
+  const fehl = [];
+  B65.wohnungen.forEach((w) => ['als_etw', 'anteil_am_haus'].forEach((k) => { const v = w[k] || {};
+    if (!(v.zielbild >= v.mieterhoehung && v.mieterhoehung >= v.bestand)) fehl.push(w.nr + ' ' + k + ' ' + JSON.stringify(v)); }));
+  pruefe('B', 'B65', 'alle Wohnungen, als ETW und als Anteil: Zielbild ≥ Mieterhöhung ≥ Bestand', !fehl.length,
+    fehl.length ? fehl.join(' | ') : 'Wohnung 1 ETW ' + JSON.stringify(w1.als_etw) + ' · Anteil ' + JSON.stringify(w1.anteil_am_haus));
 });
 
 /* ══ EBENE C ═════════════════════════════════════════════════════════ */

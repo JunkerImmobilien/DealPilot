@@ -1079,7 +1079,18 @@ export const PotenzialService = {
     let S558 = null;
     try { S558 = varianten.some((v) => v && v.key === 'mieterhoehung') ? stufe558(basis, ref, bb, wlB, kB) : null; }
     catch (e) { console.log('[potenzial] stufe558: ' + e.message); S558 = null; }
-    const mieteStufe = (z, i, s) => (s === 'mieterhoehung' && S558 ? (S558.mieten[i] != null ? S558.mieten[i] : z.basis) : stufenMiete(z, wlB[i], s, ovS(s)));   /* v3150 */
+    /* v3287 · ZIELBILD NIE UNTER DER MIETERHOEHUNG (Marcel 11.11.2026 „nimm das, was richtig ist"). Gemessen
+       Modul 26 live: Haus Zielbild 600.000 < Mieterhoehung 625.000 €. Die Zielmiete der Wohnung 1 (9,50 €/m²)
+       lag ueber dem Band, die Bandregel (v2936, aus E1) setzte dann den Anker 7,30 an - die Stufe Mieterhoehung
+       aber die rechtlich erreichbare Vergleichsmiete 7,80 (im Band). ImmoWertA 31 b: bei bestehenden
+       Mietverhaeltnissen sind die zulaessigen Erhoehungen (§§ 558 ff. BGB) marktueblich erzielbar - das Zielbild
+       baut auf ihnen auf. Je Wohnung: Zielbild = max(Bandregel des Zielbilds, Zielmiete der Stufe Mieterhoehung).
+       E1 bleibt: ausserhalb des Bandes nie die Bandkante, und die Vergleichsmiete der Mieterhoehung liegt selbst im Band. */
+    const mieteStufe = (z, i, s) => {
+      if (s === 'mieterhoehung' && S558) return S558.mieten[i] != null ? S558.mieten[i] : z.basis;   /* v3150 */
+      const m = stufenMiete(z, wlB[i], s, ovS(s));
+      return (s === 'zielbild' && S558 && S558.mieten[i] != null && S558.mieten[i] > m) ? S558.mieten[i] : m;
+    };
     const anhebungN = (s) => (bb ? bb.zeilen.filter((z, i) => z && mieteStufe(z, i, s) > z.basis + 0.5).length : 0);
     bestand.anhebung_jahr = 0;
     for (const v of varianten) {
@@ -1193,7 +1204,7 @@ export const PotenzialService = {
       const bbW = bb && wlB === wl ? bb : null;
       const mieteW = (w, i, s) => {
         const z = bbW ? bbW.zeilen[i] : null;
-        return z ? (s === 'mieterhoehung' && S558 ? mieteStufe(z, i, s) : stufenMiete(z, w, s, ovS(s))) : (zahl(w.miete_jahr && w.miete_jahr[s]) || 0);   /* v3150 */
+        return z ? ((s === 'mieterhoehung' || s === 'zielbild') && S558 ? mieteStufe(z, i, s) : stufenMiete(z, w, s, ovS(s))) : (zahl(w.miete_jahr && w.miete_jahr[s]) || 0);   /* v3150, v3287 */
       };
       const summeMiete = {};
       stufenAlle.forEach((s) => { summeMiete[s] = wl.reduce((a, w, i) => a + mieteW(w, i, s), 0); });
@@ -1222,7 +1233,8 @@ export const PotenzialService = {
         + 'plus ihre Mietabweichung als besonderes objektspezifisches Grundstücksmerkmal (ImmoWertA 31 c); der Rest des Hauswerts nach dem Anteil am Rohertrag.';
       if (bbW) stufenAlle.forEach((s) => {
         const einS = s === 'bestand' ? basis.ein : (out.haus[s] && out.haus[s]._ein);
-        const H = out.haus[s] && out.haus[s].wert;
+        /* v3287 · ungerundet: die Rundung des Hauswerts auf Tausend (bis ±500 €) wanderte sonst je Stufe verschieden in die Anteile */
+        const H = out.haus[s] && (out.haus[s].wert_ungerundet != null ? out.haus[s].wert_ungerundet : out.haus[s].wert);
         if (!einS || H == null) return;
         const rnd = out.haus[s].rnd;
         const zeilen = out.wohnungen.map((r, i) => {
