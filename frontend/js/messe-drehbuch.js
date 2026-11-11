@@ -2443,7 +2443,7 @@
         if (ne()) {
           await zeige(ne, 8);
           var nv = r6Text(ne().querySelector('.dp-mr-v')), nu = r6Text(ne().querySelector('.dp-mr-u'));
-          var ter = /verlangbar ab ([^·]+?) · wirksam ab ([^·]+?)(?:s*·|$)/.exec(nu), gr = /Grenze § 558: ([^·]+?)(?:s*·|$)/.exec(nu);
+          var ter = /verlangbar ab ([^·]+?) · wirksam ab ([^·]+?)(?:\s*·|$)/.exec(nu), gr = /Grenze § 558: ([^·]+?)(?:\s*·|$)/.exec(nu);
           await b2oZeile(s, 'Die nächste Erhöhung', 'Nach § 558: <b>' + nv + '</b>' + (gr ? ' — begrenzt durch die <b>' + gr[1].trim() + '</b>' : '') + '.' + (ter ? ' Verlangbar ab <b>' + ter[1].trim() + '</b>, wirksam ab <b>' + ter[2].trim() + '</b>.' : ''));
         }
       },
@@ -2469,13 +2469,13 @@
         var opp = r6Id('me_opp'), drueber = opp && /^\+/.test(opp.trim());
         if (drueber) await b2oZeile(s, 'Oder im Detail', 'Ziel ist die Vergleichsmiete <b>' + wert('me_soll') + ' €/m²</b>. Deine Miete liegt schon <b>' + opp.trim() + '</b> darüber — nach § 558 ist hier keine Erhöhung drin. Die Treppe gilt für Verträge mit Staffel oder Index.');
         else {
-          await b2oZeile(s, 'Oder im Detail', '<b>' + wert('me_anz') + ' Erhöhungen</b> alle ' + wert('me_int') + ' Jahre, zusammen ' + r6Pz(wert('me_pct')) + ' % — Ziel: Vergleichsmiete ' + wert('me_soll') + ' €/m²' + (opp && opp !== '—' ? '. Deine Kaltmiete liegt <b>' + opp.replace(/^[-−]s*/, '') + '</b> darunter' : '') + '.');
+          await b2oZeile(s, 'Oder im Detail', '<b>' + wert('me_anz') + ' Erhöhungen</b> alle ' + wert('me_int') + ' Jahre, zusammen ' + r6Pz(wert('me_pct')) + ' % — Ziel: Vergleichsmiete ' + wert('me_soll') + ' €/m²' + (opp && opp !== '—' ? '. Deine Kaltmiete liegt <b>' + opp.replace(/^[-−]\s*/, '') + '</b> darunter' : '') + '.');
           /* v3281 · die Treppe in der Tabelle: die Jahre mit Erhöhung (me-row-hike) und ihr €/m² */
-          var stufen = [].map.call(document.querySelectorAll('#me_table_wrap tr.me-row-hike'), function (tr) { var td = tr.querySelectorAll('td'); return { j: r6Text(td[0]).replace(/[^wäöüÄÖÜ ]/g, '').trim(), qm: r6Text(td[2]) }; });
+          var stufen = [].map.call(document.querySelectorAll('#me_table_wrap tr.me-row-hike'), function (tr) { var td = tr.querySelectorAll('td'); return { j: (/Jahr\s*\d+/.exec(r6Text(td[0])) || [''])[0], qm: r6Text(td[2]) }; });
           var tab = function () { return q('#me_table_wrap table'); };
           if (stufen.length && tab()) {
             await zeige(tab, 8);
-            var kgD = (/Kappungsgrenzes*([d,]+s*%)/i.exec(r6Text(q('#dp-mietrecht-karte'))) || [])[1];   /* textContent: innerText lieferte im Lauf nichts */
+            var kgD = (/Kappungsgrenze\s*([\d,]+\s*%)/i.exec(r6Text(q('#dp-mietrecht-karte'))) || [])[1];   /* textContent: innerText lieferte im Lauf nichts */
             await b2oZeile(s, 'Die Treppe', stufen.map(function (x) { return x.j + ': <b>' + x.qm + '</b>'; }).join(', ') + ' — jeder Schritt bleibt unter der Kappungsgrenze' + (kgD ? ' von ' + kgD : '') + ', der letzte endet an der Vergleichsmiete.');
           }
         }
