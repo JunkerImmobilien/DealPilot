@@ -229,6 +229,108 @@
   }
 
 
+  /* ══ v3312 · ZIELMIETE GEGEN DIE MIETPREISBREMSE — UMGETRAGEN, NICHT NUR ROT ═════════════
+     Marcel 11.11.2026 (Westerfeldstr., Zielmiete 9,50 bei Obergrenze 8,43 × 1,1 = 9,27): „Vielleicht können wir
+     dann einfach das Maximum übernehmen … dann wird das einfach an den Stellen umgetragen.“
+     Die Regel steht im Kern (zielmieteBremse). Zwei Ebenen:
+     1 · RECHNUNG: modell() rechnet immer mit der zulässigen Zielmiete - Balken, Summen, Zielbild-Ertragswert,
+         Cashflow und PDF sind damit konsistent, auch bevor das Feld umgetragen ist.
+     2 · FELD: zielBremseUmtragen() schreibt die Obergrenze ins Feld (Einzelobjekt zb_ziel_qm, MFH je Wohnung
+         ziel_qm) und merkt die Eingabe (zb_ziel_bremse „ein|auf“ bzw. e.ziel_bremse {ein, auf}). Beim Eingeben
+         auf change (nie bei jedem Tastendruck, nie im fokussierten Feld); für den Altbestand beim ersten Zeichnen
+         nach dem Laden. Gespeichert wird wie jede Änderung mit dem nächsten Speichern/Tab-Wechsel - kein
+         eigener Speicherlauf. Idempotent: steht die Obergrenze im Feld und der Merker stimmt, passiert nichts;
+         ein zweites Laden ändert also nichts mehr.
+     Warum mit Merker: die Obergrenze hängt an der Vergleichsmiete, und die kommt teils später (Gemeinde,
+     Mietspiegel-Zelle je Wohnungsgröße). Fiel sie beim ersten Zeichnen zu niedrig aus, rechnet das nächste
+     Zeichnen vom gemerkten Eintrag aus neu (min(Eintrag, Obergrenze)) statt von der schon gekappten Zahl.
+     Gilt die Bremse nicht oder ist eine Ausnahme (§ 556e/§ 556f) eingetragen, kommt der Eintrag zurück.
+     „bitte prüfen“ (gilt null) und fehlende Vergleichsmiete: nichts wird angefasst. */
+  var BREMSE_AUSNAHME_FELD = [['', 'keine'], ['556e', 'höhere Vormiete (§ 556e)'], ['556f', 'umfassend modernisiert (§ 556f)']];
+  function bremseStash(v) {
+    if (!v) return null;
+    if (typeof v === 'string') { var t = v.split('|'); v = { ein: Number(t[0]), auf: Number(t[1]) }; }
+    var ein = Number(v.ein), auf = Number(v.auf);
+    return ein > 0 && auf > 0 ? { ein: ein, auf: auf } : null;
+  }
+  /** die eingetragene Zielmiete: steht im Feld noch die umgetragene Obergrenze, gilt der gemerkte Eintrag */
+  function zielEingetragen(feld, stash) {
+    var f = zahl(feld), s = bremseStash(stash);
+    return (s && f > 0 && Math.abs(f - s.auf) < 0.005) ? s.ein : f;
+  }
+  function zielBremseFuer(feld, stash, ausnahme, vgl, art) {
+    var br = art === 'gewerbe' ? null : mietpreisbremse(agsJetzt());   /* die Bremse gilt nur für Wohnraum */
+    return K.zielmieteBremse({ ziel_qm: zielEingetragen(feld, stash), vgl_qm: vgl, bremse: br, ausnahme: ausnahme });
+  }
+  function qmFeld(x) { return (Math.round(x * 100) / 100).toFixed(2).replace('.', ','); }
+  /** was am Feld zu tun ist: null (nichts) · { feld: 'x,xx' | null (Feld bleibt), stash: {ein, auf} | null (Merker weg) } */
+  function bremseUmtragenNeu(feld, stash, zb) {
+    if (!zb) return null;
+    var s = bremseStash(stash), f = zahl(feld);
+    if (zb.gekappt) {
+      var auf = zb.obergrenze_qm, ein = zb.eingetragen_qm;
+      if (Math.abs(f - auf) < 0.005 && s && Math.abs(s.ein - ein) < 0.005 && Math.abs(s.auf - auf) < 0.005) return null;
+      return { feld: Math.abs(f - auf) < 0.005 ? null : qmFeld(auf), stash: { ein: ein, auf: auf } };
+    }
+    if (!s) return null;
+    var endgueltig = zb.bremse_gilt === false || !!zb.ausnahme || !!(zb.obergrenze_qm && zb.eingetragen_qm <= zb.obergrenze_qm + 0.004);
+    if (!endgueltig) return null;   /* bitte prüfen / Vergleichsmiete fehlt: nichts anfassen */
+    if (Math.abs(f - s.auf) >= 0.005) return { feld: null, stash: null };   /* Feld inzwischen selbst geändert: nur der Merker fällt */
+    return { feld: qmFeld(s.ein), stash: null };   /* Eintrag zurück (Bremse gilt nicht, Ausnahme, Obergrenze gestiegen) */
+  }
+  var _ubLauf = false, _ubGemeldet = {};
+  function zielBremseUmtragen(m, o) {
+    o = o || {};
+    if (_ubLauf || !m || !Array.isArray(m.wohnungen)) return [];
+    _ubLauf = true;
+    var meld = [];
+    try {
+      if (m.art === 'mfh') {
+        var D = window._dpMfh;
+        if (!D || !Array.isArray(D.einheiten)) return meld;
+        m.wohnungen.forEach(function (w) {
+          var e = D.einheiten[w.i]; if (!e) return;
+          var n = bremseUmtragenNeu(e.ziel_qm, e.ziel_bremse, w.ziel_bremse); if (!n) return;
+          if (n.feld != null) e.ziel_qm = n.feld;
+          if (n.stash) e.ziel_bremse = n.stash; else delete e.ziel_bremse;
+          if (n.stash) meld.push({ nr: w.nr, ein: n.stash.ein, auf: n.stash.auf });
+        });
+      } else {
+        var f = el('zb_ziel_qm'), h = el('zb_ziel_bremse');
+        if (!f || !h || (!o.jetzt && document.activeElement === f)) return meld;
+        var n = bremseUmtragenNeu(f.value, h.value, m.wohnungen[0] && m.wohnungen[0].ziel_bremse); if (!n) return meld;
+        h.value = n.stash ? n.stash.ein + '|' + n.stash.auf : '';
+        if (n.feld != null) { f.value = n.feld; try { f.dispatchEvent(new Event('input', { bubbles: true })); } catch (x) {} }   /* input: als geändert markieren */
+        if (n.stash) meld.push({ nr: '', ein: n.stash.ein, auf: n.stash.auf });
+      }
+    } finally { _ubLauf = false; }
+    var neu = meld.filter(function (x) { var k = (window._currentObjKey || '') + '|' + x.nr + '|' + x.ein + '|' + x.auf; if (_ubGemeldet[k]) return false; _ubGemeldet[k] = 1; return true; });
+    if (neu.length && typeof window.toast === 'function') {
+      try { window.toast('Zielmiete auf die Mietpreisbremse begrenzt: ' + neu.map(function (x) { return (x.nr ? 'Wohnung ' + x.nr + ' ' : '') + qmFeld(x.ein) + ' → ' + qmFeld(x.auf) + ' €/m²'; }).join(' · ')); } catch (x) {}
+    }
+    return meld;
+  }
+  /** v3312 · im MFH-Fenster (Arbeitsstand): die Wohnung e auf die Bremse umtragen; gibt den neuen Feldwert zurück oder null */
+  function zielBremseKappen(e, m, i) {
+    var w = m && m.wohnungen ? m.wohnungen.filter(function (x) { return x.i === i; })[0] : null;
+    var n = e && w ? bremseUmtragenNeu(e.ziel_qm, e.ziel_bremse, w.ziel_bremse) : null; if (!n) return null;
+    if (n.feld != null) e.ziel_qm = n.feld;
+    if (n.stash) e.ziel_bremse = n.stash; else delete e.ziel_bremse;
+    return e.ziel_qm;
+  }
+  /* Einzelobjekt: Auswahl der Ausnahme und Merker der Begrenzung im Formular (Felder in storage.js FIELDS) */
+  function bremseFelderAnlegen() {
+    var z = el('zb_ziel_qm'); if (!z) return;
+    if (!el('zb_ziel_bremse')) { var h = document.createElement('input'); h.type = 'hidden'; h.id = 'zb_ziel_bremse'; (z.parentNode || z).appendChild(h); }
+    if (!el('zb_bremse_ausnahme')) {
+      var wann = el('zb_ziel_wann'), feld = wann && wann.closest ? wann.closest('.f') : null;
+      var d = document.createElement('div'); d.className = 'f';
+      d.innerHTML = '<label title="Nur wo die Mietpreisbremse gilt: Liegt die Zielmiete über Vergleichsmiete + 10 %, begrenzt DealPilot sie auf diese Obergrenze. Ausnahmen: die Vormiete lag höher (§ 556e BGB, dann höchstens bis zur Vormiete) oder es ist die erste Vermietung nach umfassender Modernisierung (§ 556f BGB).">Ausnahme Mietpreisbremse</label>'
+        + '<div class="iw"><select id="zb_bremse_ausnahme">' + BREMSE_AUSNAHME_FELD.map(function (o) { return '<option value="' + o[0] + '">' + esc(o[1]) + '</option>'; }).join('') + '</select></div>';
+      if (feld && feld.parentNode) feld.parentNode.insertBefore(d, feld.nextSibling);
+    }
+  }
+
   /* ══ v3067 · DIE MIETLEITER — EINE FÜR ETW UND MFH-WOHNUNG ═════════════
      Marcel 02.11.2026: „was geht und wann zum Übernehmen" — erst im MFH-Fenster
      (v3066), jetzt auch für ETW/EFH/ZFH. Der Bau steht HIER, damit beide dieselbe
@@ -270,9 +372,12 @@
       u: zv.herkunft + (zv.gedeckelt ? ' · gedeckelt durch die Mietpreisbremse' : zv.ungeprueft ? ' · Mietpreisbremse bitte prüfen' : ''),
       k: f.zielSetzen && Math.abs(zahl(f.ziel_qm) - zv.qm) > 0.004 ? { lbl: 'übernehmen', fn: function () { f.zielSetzen(zv.qm); } } : null });
     else if (zv && zv.fehlt) z.push({ c: 'ziel', t: 'Vorschlag nach Sanierung', v: 'noch keine Marktmiete', u: VORSCHLAG_FEHLT });
-    var zq = zahl(f.ziel_qm), bad = !!(og && br && br.gilt === true && zq > og + 0.004);
+    /* v3312 · Zielmiete aus dem Modell: über der Bremse ist sie dort schon auf die Obergrenze begrenzt (w.ziel_bremse) */
+    var zb = w.ziel_bremse || {}, zq = zahl(w.ziel_qm), bad = !!(og && br && br.gilt === true && zq > og + 0.004 && !zb.ausnahme);
     z.push({ c: 'ziel', t: 'Zielbild', v: zq > 0 ? eur2(zq) + '/m²' + (wfl ? ' · ' + eur(zq * wfl) + '/Monat' : '') : 'noch keine Zielmiete', bad: bad,
+      tag: zb.gekappt ? 'auf die Mietpreisbremse begrenzt' : zb.ueber ? 'Ausnahme § ' + zb.ausnahme + ' BGB' : '', warn: !!zb.gekappt,
       u: bad ? 'über der Mietpreisbremse — nur mit höherer Vormiete (§ 556e) oder nach umfassender Modernisierung (§ 556f)'
+        : zb.text ? zb.text + (f.ziel_wann ? ' · ' + String(f.ziel_wann) : '')
         : (f.ziel_wann ? String(f.ziel_wann) : 'Zielmiete und Maßnahmen darunter eintragen') });
     z._kapp = d.kapp && d.kapp.text;
     /* v3071 · Marcel 02.11.2026: „ein Balkendiagramm IST / nach Mieterhöhung (wenn möglich,
@@ -296,7 +401,7 @@
   function leiterHtml(z) {
     leiterStil();
     return balkenHtml(z._balken) + '<div class="dp-ml">' + z.map(function (r, j) {
-      return '<div class="dp-ml-z dp-ml-' + r.c + (r.bad ? ' dp-ml-bad' : '') + '"><span class="dp-ml-p"></span>'
+      return '<div class="dp-ml-z dp-ml-' + r.c + (r.bad ? ' dp-ml-bad' : r.warn ? ' dp-ml-warn' : '') + '"><span class="dp-ml-p"></span>'
         + '<div class="dp-ml-txt"><span class="dp-ml-t">' + esc(r.t) + (r.tag ? ' <i>' + esc(r.tag) + '</i>' : '') + '</span>'
         + '<b class="dp-ml-v">' + esc(r.v) + '</b>' + (r.u ? '<span class="dp-ml-u">' + esc(r.u) + '</span>' : '') + '</div>'
         + (r.k ? '<button type="button" class="dp-ml-k" data-ml="' + j + '">' + esc(r.k.lbl) + ' ›</button>' : '') + '</div>';
@@ -323,6 +428,7 @@
       '.dp-ml-v{font:600 14px/1.35 "Space Grotesk",sans-serif;color:#2A2727}',
       '.dp-ml-u{font-size:11.5px;color:#7A7370;line-height:1.4}',
       '.dp-ml-bad .dp-ml-v{color:#B8625C}.dp-ml-bad .dp-ml-p{background:#B8625C}',
+      '.dp-ml-warn .dp-ml-u{color:var(--wl-b8932f, #b8932f)}',   /* v3312 · begrenzte Zielmiete */
       '.dp-ml-k{border:1px solid var(--wl-c9a84c, #C9A84C);background:#fff;color:#2A2727;border-radius:7px;padding:5px 9px;font:500 12px Inter,sans-serif;cursor:pointer;white-space:nowrap}',
       '.dp-ml-k:hover{background:color-mix(in srgb,var(--wl-c9a84c, #C9A84C) 12%,#fff)}',
       '.dp-ml-fuss{font-size:11.5px;color:#8A8272;margin:6px 0 0;line-height:1.45}',
@@ -578,8 +684,10 @@
       }
     }
     /* 4 · Zielmiete gegen die Bremse */
-    var zq = zahl(w && w.ziel_qm);
-    if (obergrenze && zq > obergrenze + 0.004) z.push({ k: 'Zielmiete', v: eur2(zq) + '/m² liegt über der Bremse', bad: true,
+    var zq = zahl(w && w.ziel_qm), zbM = (w && w.ziel_bremse) || {};
+    if (zbM.gekappt) z.push({ k: 'Zielmiete', v: 'auf ' + eur2(zq) + '/m² begrenzt', warn: true, gekappt: true, ein: zbM.eingetragen_qm, u: zbM.text });   /* v3312 */
+    else if (zbM.ueber) z.push({ k: 'Zielmiete', v: eur2(zq) + '/m² über der Bremse (Ausnahme)', warn: true, ueber: true, u: zbM.text });
+    else if (obergrenze && zq > obergrenze + 0.004) z.push({ k: 'Zielmiete', v: eur2(zq) + '/m² liegt über der Bremse', bad: true,
       u: 'zulässig nur mit höherer Vormiete (§ 556e) oder nach umfassender Modernisierung (§ 556f) — sonst höchstens ' + eur2(obergrenze) + '/m²' });
     /* v3158 · was hier gilt, am Objekt merken (Schnittstelle) - auch ohne Potenzial-Rechnung; nur fuer das Objekt selbst (i == null) */
     try { if (!i && window.dpMarktdatenMerken) window.dpMarktdatenMerken({ kappung: kapp ? Object.assign({ ags: agsJetzt() }, kapp) : null, mietpreisbremse: br ? Object.assign({ ags: agsJetzt(), obergrenze_qm: obergrenze || null }, br) : null, vergleichsmiete_genutzt: vglQm ? { qm: vglQm, herkunft: vglHer || null } : null }); } catch (e) {}   /* v3245: eigener Schluessel - unter 'vergleichsmiete' las objektVgl() die Marktmiete als amtlich zurueck */
@@ -632,6 +740,7 @@
 
   /* Karte im Tab Miete, direkt unter dem Mietvertrag (#mv-objekt-karte). */
   function mietrechtKarte() {
+    try { zielBremseUmtragen(modell()); } catch (e) { console.warn('[v3312 bremse]', e); }
     var anker = el('mv-objekt-karte'); if (!anker || !anker.parentNode) return;
     mietrechtStil();
     var k = el('dp-mietrecht-karte');
@@ -652,11 +761,13 @@
         var naechst = d.zeilen.filter(function (r) { return r.k === 'Nächste Erhöhung'; })[0];
         var ziel = d.zeilen.filter(function (r) { return r.k === 'Zielmiete'; })[0];
         var istQm = w.ist > 0 && w.wfl > 0 ? eur2(w.ist / w.wfl) + '/m²' : (w.status === 'leer' ? 'leer' : '—');
-        return '<div class="dp-mr-w' + (ziel ? ' dp-mr-bad' : '') + '">'
+        return '<div class="dp-mr-w' + (ziel && ziel.bad ? ' dp-mr-bad' : '') + '">'
           + '<div class="dp-mr-w1"><b>' + esc(w.nr) + (w.lage ? ' · ' + esc(w.lage) : '') + '</b><span>' + istQm + '</span>'
           + '<span class="dp-mr-w-v">' + esc(naechst ? naechst.v : '—') + '</span></div>'
           + '<div class="dp-mr-w2">' + esc(naechst && naechst.u ? naechst.u : '')
-          + (w.ziel_qm ? '<br>Zielmiete ' + eur2(w.ziel_qm) + '/m²' + (ziel ? ' — <b>über der Mietpreisbremse</b> (höchstens ' + eur2(d.obergrenze) + '/m², außer § 556e/§ 556f)' : '') : '') + '</div></div>';
+          + (w.ziel_qm ? '<br>Zielmiete ' + eur2(w.ziel_qm) + '/m²' + (ziel && ziel.bad ? ' — <b>über der Mietpreisbremse</b> (höchstens ' + eur2(d.obergrenze) + '/m², außer § 556e/§ 556f)'
+              : ziel && ziel.gekappt ? ' — <b>auf die Mietpreisbremse begrenzt</b> (eingetragen ' + eur2(ziel.ein) + '/m²; höher nur mit Ausnahme § 556e/§ 556f)'   /* v3312 */
+              : ziel && ziel.ueber ? ' — über der Bremse, Ausnahme eingetragen' : '') : '') + '</div></div>';
       }).join('');
       k.innerHTML = kopf + mietrechtHtml({ kappung: m.kappung, vgl: m.vgl, wohnungen: [] }, 0)
         + (W.length ? '<div class="dp-mr-liste">' + zeilen + '</div><p class="hint" style="margin:6px 0 0">Ändern je Wohnung im Fenster „Einheiten erfassen“ › Details.</p>' : '');
@@ -1051,7 +1162,10 @@
             vgl_hinweise: mwW.hinweise.concat(msW.werte && msW.werte.hinweise ? msW.werte.hinweise : []), vgl_ms: mwW });
         }
         var s = sollFuer(hausL.length ? Object.assign({}, e, { massnahmen: ml }) : e, ctxW);
-        var zielQm = zahl(e.ziel_qm);
+        /* v3312 · die eingetragene Zielmiete gegen die Mietpreisbremse (Kern zielmieteBremse) - gerechnet wird
+           IMMER mit der zulässigen, auch bevor das Feld umgetragen ist (zielBremseUmtragen) */
+        var zb = zielBremseFuer(e.ziel_qm, e.ziel_bremse, e.bremse_ausnahme, s.vgl_qm || vg.qm, e.art);
+        var zielQm = zb.qm || 0;
         var zielM = zielQm > 0 && wfl > 0 ? zielQm * wfl : 0;
         var kAlle = ml.reduce(function (a, m) { return a + zahl(m.k); }, 0);
         var kBew = ml.filter(function (m) { return m.bewohnt; }).reduce(function (a, m) { return a + zahl(m.k); }, 0);
@@ -1059,7 +1173,7 @@
         if (s.miete != null && s.miete > ist) out.hat_soll = true;
         if (zielM > 0 || ml.length) out.hat_ziel = true;
         return { i: i, nr: e.nr || String(i + 1), lage: e.lage || '', art: e.art || 'wohnen', wfl: wfl, zimmer: zahl(e.zimmer) || null,
-          status: e.status || 'vermietet', ist: ist, soll: s, ziel: zielM || null, ziel_qm: zielQm || null, ziel_wann: e.ziel_wann || '',
+          status: e.status || 'vermietet', ist: ist, soll: s, ziel: zielM || null, ziel_qm: zielQm || null, ziel_wann: e.ziel_wann || '', ziel_bremse: zb,   /* v3312 */
           massnahmen: mlEigen, kosten: kAlle, kosten_bewohnt: kBew, mea: zahl(e.mea_anteil) || null,
           kosten_haus: ml.filter(function (m) { return m.haus; }).reduce(function (a, m) { return a + m.k; }, 0),   /* v2966 */
           plus_soll: Math.min(20, punkteGewinn(ml, e, geb, true)), plus_ziel: Math.min(20, punkteGewinn(ml, e, geb, false)),
@@ -1081,11 +1195,12 @@
         mv_art: wert('mv_art'), mv_beginn: wert('mv_beginn'),   /* v3026 · bis hier sah die Objektebene ihre Vertragsart nicht */
         massnahmen: objektMassnahmen() };
       var sO = sollFuer(eO, ctx);
-      var zQ = zahl(wert('zb_ziel_qm'));
+      var zbO = zielBremseFuer(wert('zb_ziel_qm'), wert('zb_ziel_bremse'), wert('zb_bremse_ausnahme'), sO.vgl_qm || vg.qm, 'wohnen');   /* v3312 */
+      var zQ = zbO.qm || 0;
       var mlO = eO.massnahmen;
       out.wfl = wflO;
       out.wohnungen = [{ i: 0, nr: '', lage: '', art: 'wohnen', wfl: wflO, status: eO.status, ist: istO, soll: sO,
-        ziel: zQ > 0 && wflO > 0 ? zQ * wflO : null, ziel_qm: zQ || null, ziel_wann: wert('zb_ziel_wann'),
+        ziel: zQ > 0 && wflO > 0 ? zQ * wflO : null, ziel_qm: zQ || null, ziel_wann: wert('zb_ziel_wann'), ziel_bremse: zbO,   /* v3312 */
         massnahmen: mlO, kosten: mlO.reduce(function (a, m) { return a + zahl(m.k); }, 0),
         kosten_bewohnt: mlO.filter(function (m) { return m.bewohnt; }).reduce(function (a, m) { return a + zahl(m.k); }, 0),
         plus_soll: Math.min(20, punkteGewinn(mlO, null, null, true)), plus_ziel: Math.min(20, punkteGewinn(mlO, null, null, false)),
@@ -1497,10 +1612,10 @@
     if (!window.confirm(frage)) return false;
     var D = window._dpMfh;
     if (D && Array.isArray(D.einheiten)) {
-      D.einheiten.forEach(function (e) { if (!e) return; e.massnahmen = []; e.massnahme = ''; e.kosten = ''; e.soll = ''; e.ziel_qm = ''; e.ziel_wann = ''; });
+      D.einheiten.forEach(function (e) { if (!e) return; e.massnahmen = []; e.massnahme = ''; e.kosten = ''; e.soll = ''; e.ziel_qm = ''; e.ziel_wann = ''; delete e.ziel_bremse; });
       D.haus_massnahmen = [];
     }
-    ['zb_massnahmen', 'zb_soll_qm', 'zb_soll_ab', 'zb_ziel_qm', 'zb_ziel_wann', 'zb_markt_qm', 'zb_fertig_jahr'].forEach(function (id) {
+    ['zb_massnahmen', 'zb_soll_qm', 'zb_soll_ab', 'zb_ziel_qm', 'zb_ziel_wann', 'zb_markt_qm', 'zb_fertig_jahr', 'zb_ziel_bremse'].forEach(function (id) {   /* v3312: Merker der Begrenzung */
       var f = el(id); if (!f) return; f.value = '';
       try { f.dispatchEvent(new Event('input', { bubbles: true })); f.dispatchEvent(new Event('change', { bubbles: true })); } catch (e) {}
     });
@@ -2836,10 +2951,16 @@
       var e = el(id); if (!e || e._dpZb) return; e._dpZb = true;
       e.addEventListener('change', function () { try { objektKarte(); } catch (x) {} try { msHinweis(); } catch (x) {} });
     });
-    ['zb_soll_qm', 'zb_ziel_qm', 'zb_soll_ab', 'zb_vgl_qm', 'zb_ziel_wann', 'zb_fertig_jahr', 'zb_markt_qm', 'san', 'kaufdat', 'nkm', 'wfl', 'ds2_marktmiete', 'me_soll', 'mv_letzte_erhoehung', 'mv_letzte_erhoehung_betrag', 'mv_art', 'mv_beginn'].forEach(function (id) {   /* v3026: mv_art, mv_beginn */
+    bremseFelderAnlegen();   /* v3312 */
+    ['zb_soll_qm', 'zb_ziel_qm', 'zb_soll_ab', 'zb_vgl_qm', 'zb_ziel_wann', 'zb_bremse_ausnahme', 'zb_fertig_jahr', 'zb_markt_qm', 'san', 'kaufdat', 'nkm', 'wfl', 'ds2_marktmiete', 'me_soll', 'mv_letzte_erhoehung', 'mv_letzte_erhoehung_betrag', 'mv_art', 'mv_beginn'].forEach(function (id) {   /* v3026: mv_art, mv_beginn */
       var e = el(id); if (!e || e._dpZb) return; e._dpZb = true;
       e.addEventListener('input', function () { objektSumme(); });
       e.addEventListener('change', function () { objektSumme(); });
+    });
+    /* v3312 · nach der Eingabe (change, nicht bei jedem Tastendruck) die Zielmiete auf die Bremse umtragen */
+    ['zb_ziel_qm', 'zb_bremse_ausnahme', 'zb_vgl_qm'].forEach(function (id) {
+      var e = el(id); if (!e || e._dpZbB) return; e._dpZbB = true;
+      e.addEventListener('change', function () { try { zielBremseUmtragen(modell(), { jetzt: true }); objektSumme(); } catch (x) {} });
     });
   }
   function start() {
@@ -2996,6 +3117,7 @@
     indexmieteFuer: indexmieteFuer, indexmieteHtml: indexmieteHtml, indexmieteDaten: indexmieteDaten,   /* v3026 */
     mhTermine: mhTermine, wirksamNachZugang: wirksamNachZugang, TERMIN_REGEL: TERMIN_REGEL, mmjj: mmjj,   /* v3028 */
     zielBmrAn: zielBmrAn, zielBmrPruefen: zielBmrPruefen,   /* v3213 · W-6 */
+    zielBremseUmtragen: zielBremseUmtragen, zielBremseKappen: zielBremseKappen, BREMSE_AUSNAHME_FELD: BREMSE_AUSNAHME_FELD, _bremseUmtragenNeu: bremseUmtragenNeu,   /* v3312 */
     _hash: hash, _auftrag: auftrag
   };
 })();

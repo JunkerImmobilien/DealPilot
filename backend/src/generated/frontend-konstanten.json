@@ -1,10 +1,10 @@
 {
- "erzeugt_am": "2026-11-11T14:25:23.620Z",
+ "erzeugt_am": "2026-11-11T14:39:01.619Z",
  "quellen": {
   "voice-import": "e66c4689fd6498d0",
   "objektart-felder": "f7d9212555982a97",
-  "storage": "018f7872141fc856",
-  "index-html": "02c2e791a9f91940",
+  "storage": "3d87a5e74624f206",
+  "index-html": "b23e4cc2bcbccce1",
   "grest": "81f3fb0a4de3a6cf"
  },
  "daten": {
@@ -586,6 +586,8 @@
    "zb_fertig_jahr",
    "zb_markt_qm",
    "san_ausgefuehrt",
+   "zb_ziel_bremse",
+   "zb_bremse_ausnahme",
    "ms_art",
    "ms_unten",
    "ms_mittel",

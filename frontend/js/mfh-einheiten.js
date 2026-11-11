@@ -659,6 +659,8 @@
           '<div class="mfh-we-raster">' +
             f('ziel_qm', 'Zielmiete (€/m²)', 'z. B. 9,20', 'decimal') +
             f('ziel_wann', 'Wann', 'z. B. bei Mieterwechsel') +
+            /* v3312 · über der Mietpreisbremse wird die Zielmiete auf Vergleichsmiete + 10 % begrenzt - außer mit Ausnahme */
+            s('bremse_ausnahme', 'Ausnahme Mietpreisbremse', (P && P.BREMSE_AUSNAHME_FELD) || [['', 'keine']]) +
           '</div><div class="mfh-we-ergebnis" id="mfh-we-ziel"></div>') +
         /* v3265 · Marcel 09.11.2026: aufgeteilt → je Wohnung das Vergleichswertverfahren, der Ertragswert
            nur noch stützend. Oben (#mfh-we-vw) das führende Verfahren, darunter unverändert der Ertragswert
@@ -895,7 +897,14 @@
     ov.querySelectorAll("[data-wk]").forEach(function (inp) {
       var k = inp.getAttribute("data-wk");
       inp.addEventListener("input", function () { e[k] = inp.value; aktualisieren(); });
-      inp.addEventListener("change", function () { e[k] = inp.value; aktualisieren(); });
+      inp.addEventListener("change", function () {
+        e[k] = inp.value;
+        /* v3312 · nach der Eingabe die Zielmiete auf die Mietpreisbremse umtragen (Hinweis in der Leiter) */
+        if ((k === 'ziel_qm' || k === 'bremse_ausnahme' || k === 'vgl_qm') && P && P.zielBremseKappen) {
+          try { var neu = P.zielBremseKappen(e, P.modell(opts()), i), zf = ov.querySelector('[data-wk="ziel_qm"]'); if (neu != null && zf) zf.value = neu; } catch (x) {}
+        }
+        aktualisieren();
+      });
     });
     /* v2023 - Haken schreiben true/false, nicht .value ("on"). */
     ov.querySelectorAll("[data-wkb]").forEach(function (box) {

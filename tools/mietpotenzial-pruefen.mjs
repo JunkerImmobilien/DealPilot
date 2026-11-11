@@ -804,5 +804,108 @@ const EINH = [{ nr: '1', wfl: '60', ist: '480', status: 'vermietet' }, { nr: '2'
   wahr('N10 Vorbehalt mit ausgelieferten Werten (Staging): kein Nutzungshinweis', !z2.nutzung && z2.werte_hinweis === K.MS_REG.werte);
 }
 
-console.log('mietpotenzial-pruefen (v3075, v3244, v3246, v3250, v3255, v3266, v3286): ' + (n - fehler) + ' von ' + n + ' ok');
+/* ── O · v3312 · eingetragene Zielmiete über der Mietpreisbremse: auf die Obergrenze umgetragen ──
+   Marcel 11.11.2026 (Westerfeldstr., 9,50 bei 8,43 × 1,1 = 9,27): „einfach das Maximum übernehmen … an den Stellen
+   umgetragen“. Kern zielmieteBremse(); potenzial.js rechnet im Modell immer mit der zulässigen Zielmiete und trägt
+   sie ins Feld um (Einzelobjekt zb_ziel_qm + Merker zb_ziel_bremse, MFH je Wohnung ziel_qm + ziel_bremse). */
+{
+  const BR = { gilt: true };
+  let r = K.zielmieteBremse({ ziel_qm: 9.5, vgl_qm: 8.43, bremse: BR });
+  gleich('O1 über der Obergrenze: auf 9,27 begrenzt', [r.qm, r.eingetragen_qm, r.obergrenze_qm, r.gekappt, r.ueber], [9.27, 9.5, 9.27, true, false]);
+  wahr('O1 Hinweis „eingetragen 9,50 → 9,27 €/m²“ mit § 556e/§ 556f', /^Zielmiete auf die Mietpreisbremse begrenzt: eingetragen 9,50 → 9,27 €\/m²/.test(r.text) && /§ 556e/.test(r.text) && /§ 556f/.test(r.text));
+  r = K.zielmieteBremse({ ziel_qm: 9.27, vgl_qm: 8.43, bremse: BR });
+  gleich('O2 gleich der Obergrenze: unverändert', [r.qm, r.gekappt, r.text], [9.27, false, '']);
+  r = K.zielmieteBremse({ ziel_qm: 9, vgl_qm: 8.43, bremse: BR });
+  gleich('O3 unter der Obergrenze: unverändert', [r.qm, r.gekappt], [9, false]);
+  r = K.zielmieteBremse({ ziel_qm: 9.5, vgl_qm: 8.43, bremse: { gilt: false } });
+  gleich('O4 Bremse gilt nicht: unverändert, keine Obergrenze', [r.qm, r.gekappt, r.obergrenze_qm], [9.5, false, null]);
+  r = K.zielmieteBremse({ ziel_qm: 9.5, vgl_qm: 8.43, bremse: { gilt: null } });
+  gleich('O5 Bremse „bitte prüfen“: unverändert', [r.qm, r.gekappt, r.obergrenze_qm], [9.5, false, null]);
+  r = K.zielmieteBremse({ ziel_qm: 9.5, vgl_qm: 0, bremse: BR });
+  gleich('O6 ohne Vergleichsmiete: unverändert', [r.qm, r.gekappt, r.obergrenze_qm], [9.5, false, null]);
+  r = K.zielmieteBremse({ ziel_qm: 9.5, vgl_qm: 8.43, bremse: BR, ausnahme: '556f' });
+  gleich('O7 Ausnahme § 556f: Eintrag gilt, als „über“ markiert', [r.qm, r.gekappt, r.ueber, r.ausnahme], [9.5, false, true, '556f']);
+  r = K.zielmieteBremse({ ziel_qm: 9.5, vgl_qm: 8.43, bremse: BR, ausnahme: '556e' });
+  wahr('O7 Ausnahme § 556e: höchstens bis zur Vormiete', r.qm === 9.5 && /Vormiete/.test(r.text));
+  gleich('O7 unbekannte Ausnahme zählt nicht', K.zielmieteBremse({ ziel_qm: 9.5, vgl_qm: 8.43, bremse: BR, ausnahme: 'x' }).qm, 9.27);
+  gleich('O8 dieselbe Obergrenze wie neuvermietung() (Vorschlag nach Sanierung)', K.neuvermietung({ markt_qm: 9.5, wfl: 1, vgl_qm: 8.43, bremse: BR }).obergrenze_qm, 9.27);
+}
+async function bremseLauf(feld, mfh) {
+  const c = fenster();
+  const E = {};
+  for (const [k, v] of Object.entries(feld)) E[k] = { id: k, value: v, addEventListener() {}, dispatchEvent() {}, closest() { return null; } };
+  c.document.getElementById = (id) => E[id] || null;
+  c.document.activeElement = null;
+  c._dpPotenzial = { ags: '05334002', plz: '52062' };   /* Aachen: Mietpreisbremse gilt (Liste) */
+  if (mfh) { c._dpMfh = { einheiten: mfh, gebaeude: {} }; c.DpMfhEinheiten = { artMitEinheiten: () => true, maxPunkte: () => 2 }; }
+  lade(c, JS('mietpotenzial-kern.js')); lade(c, JS('potenzial.js'));
+  await c.DpPotenzial.kappungLaden();
+  return { P: c.DpPotenzial, E, c };
+}
+{
+  /* Einzelobjekt: 70 m², Ist 500 €, belegte Vergleichsmiete 8,43 -> Obergrenze 9,27, Zielmiete 9,50 */
+  const { P, E, c } = await bremseLauf({ plz: '52062', wfl: '70', nkm: '500', zb_vgl_qm: '8,43', zb_ziel_qm: '9,50', zb_ziel_bremse: '', zb_bremse_ausnahme: '' });
+  let m = P.modell(), w = m.wohnungen[0];
+  gleich('O9 Modell rechnet mit 9,27 (vor dem Umtragen): ziel_qm, ziel/Monat, Zielbild-Stufe', [w.ziel_qm, Math.round(w.ziel * 100) / 100, Math.round(m.stufen.zielbild.miete_m * 100) / 100, w.ziel_bremse.gekappt], [9.27, 648.9, 648.9, true]);
+  const z = P.leiterZeilen(m, 0, { ziel_qm: E.zb_ziel_qm.value });
+  const zr = z.filter((x) => x.t === 'Zielbild')[0], zbk = z._balken.filter((x) => x.c === 'ziel')[0];
+  wahr('O10 Leiter: Zielbild 9,27 €/m², Hinweis „begrenzt“, nicht rot; Balken 648,90 €', /^9,27 €\/m²/.test(zr.v) && zr.tag === 'auf die Mietpreisbremse begrenzt' && !zr.bad && /eingetragen 9,50 → 9,27/.test(zr.u) && Math.round(zbk.v * 100) === 64890 && !zbk.bad);
+  const mr = P.mietrechtDaten(m, 0).zeilen.filter((x) => x.k === 'Zielmiete')[0];
+  wahr('O11 Mietrecht-Zeile: „auf 9,27 €/m² begrenzt“ statt rot', mr && mr.gekappt && !mr.bad && /auf 9,27 €\/m² begrenzt/.test(mr.v));
+  let meld = P.zielBremseUmtragen(m);
+  gleich('O12 Umtragen: Feld 9,27, Merker 9.5|9.27', [E.zb_ziel_qm.value, E.zb_ziel_bremse.value, meld.length], ['9,27', '9.5|9.27', 1]);
+  meld = P.zielBremseUmtragen(P.modell());
+  gleich('O12 zweites Zeichnen ändert nichts (kein Speichern bei jedem Laden)', [E.zb_ziel_qm.value, E.zb_ziel_bremse.value, meld.length], ['9,27', '9.5|9.27', 0]);
+  w = P.modell().wohnungen[0];
+  gleich('O13 nach dem Umtragen: 9,27, Eintrag 9,50 bleibt im Hinweis', [w.ziel_qm, w.ziel_bremse.eingetragen_qm, w.ziel_bremse.gekappt], [9.27, 9.5, true]);
+  E.zb_bremse_ausnahme.value = '556f';
+  P.zielBremseUmtragen(P.modell(), { jetzt: true });
+  w = P.modell().wohnungen[0];
+  gleich('O14 Ausnahme § 556f eingetragen: Eintrag 9,50 zurück, Merker weg', [E.zb_ziel_qm.value, E.zb_ziel_bremse.value, w.ziel_qm, w.ziel_bremse.ueber], ['9,50', '', 9.5, true]);
+  E.zb_bremse_ausnahme.value = '';
+  E.zb_ziel_qm.value = '9,00';
+  P.zielBremseUmtragen(P.modell());
+  gleich('O15 unter der Obergrenze: nichts umgetragen', [E.zb_ziel_qm.value, E.zb_ziel_bremse.value, P.modell().wohnungen[0].ziel_qm], ['9,00', '', 9]);
+  /* fokussiertes Feld wird nicht angefasst (Tippen), erst auf change */
+  E.zb_ziel_qm.value = '12';
+  c.document.activeElement = E.zb_ziel_qm;
+  P.zielBremseUmtragen(P.modell());
+  gleich('O16 Eingabe 12 während des Tippens: Modell 9,27, das fokussierte Feld bleibt', [P.modell().wohnungen[0].ziel_qm, E.zb_ziel_qm.value], [9.27, '12']);
+  P.zielBremseUmtragen(P.modell(), { jetzt: true });
+  gleich('O16 auf change umgetragen: 9,27, Merker 12|9.27', [E.zb_ziel_qm.value, E.zb_ziel_bremse.value], ['9,27', '12|9.27']);
+}
+{
+  const U = (feld, stash, zb) => JSON.stringify(P0._bremseUmtragenNeu(feld, stash, zb));
+  const { P: P0 } = await bremseLauf({ plz: '52062' });
+  gleich('O17 Bremse gilt nicht: Eintrag zurück', U('9,27', '9.5|9.27', { bremse_gilt: false, eingetragen_qm: 9.5, gekappt: false }), JSON.stringify({ feld: '9,50', stash: null }));
+  gleich('O17 „bitte prüfen“: nichts anfassen', U('9,27', '9.5|9.27', { bremse_gilt: null, eingetragen_qm: 9.5, obergrenze_qm: null, gekappt: false }), 'null');
+  gleich('O17 Obergrenze gestiegen (Mietspiegel-Zelle kam später): vom Eintrag aus neu', U('9,00', '9.5|9', { bremse_gilt: true, eingetragen_qm: 9.5, obergrenze_qm: 9.27, gekappt: true }), JSON.stringify({ feld: '9,27', stash: { ein: 9.5, auf: 9.27 } }));
+  gleich('O17 Feld selbst geändert (8,80 unter der Grenze): nur der Merker fällt', U('8,80', '9.5|9.27', { bremse_gilt: true, eingetragen_qm: 8.8, obergrenze_qm: 9.27, gekappt: false }), JSON.stringify({ feld: null, stash: null }));
+}
+{
+  /* MFH: Wohnung 1 und 2 mit 9,50, Wohnung 3 mit Ausnahme § 556e, Gewerbe (keine Bremse) */
+  const EIN = [
+    { nr: '1', wfl: '60', ist: '420', status: 'vermietet', ziel_qm: '9,50' },
+    { nr: '2', wfl: '70', ist: '', status: 'leer', ziel_qm: '9,50' },
+    { nr: '3', wfl: '50', ist: '350', status: 'vermietet', ziel_qm: '9,50', bremse_ausnahme: '556e' },
+    { nr: 'G', art: 'gewerbe', wfl: '80', ist: '900', ziel_qm: '15' }
+  ];
+  const { P } = await bremseLauf({ plz: '52062', zb_vgl_qm: '8,43' }, EIN);
+  let m = P.modell();
+  gleich('O18 MFH-Modell: 9,27 / 9,27 / 9,50 (Ausnahme) / Gewerbe 15', m.wohnungen.map((w) => w.ziel_qm), [9.27, 9.27, 9.5, 15]);
+  gleich('O18 Zielbild-Summe mit den zulässigen Mieten', Math.round(m.stufen.zielbild.miete_m * 100) / 100, Math.round((9.27 * 60 + 9.27 * 70 + 9.5 * 50 + 15 * 80) * 100) / 100);
+  const meld = P.zielBremseUmtragen(m);
+  gleich('O19 MFH umgetragen: Felder und Merker je Wohnung, Ausnahme und Gewerbe unverändert',
+    [EIN.map((e) => e.ziel_qm), EIN.map((e) => e.ziel_bremse || null), meld.map((x) => x.nr)],
+    [['9,27', '9,27', '9,50', '15'], [{ ein: 9.5, auf: 9.27 }, { ein: 9.5, auf: 9.27 }, null, null], ['1', '2']]);
+  gleich('O19 zweites Zeichnen ändert nichts', P.zielBremseUmtragen(P.modell()).length, 0);
+  /* Fenster „Einheiten erfassen“ (Arbeitsstand): Eingabe 10,00 -> 9,27, Merker 10 */
+  const A = EIN.map((e) => Object.assign({}, e)); A[0].ziel_qm = '10,00';
+  const neuF = P.zielBremseKappen(A[0], P.modell({ einheiten: A }), 0);
+  gleich('O20 MFH-Fenster: Eingabe 10,00 auf 9,27 umgetragen', [neuF, A[0].ziel_bremse], ['9,27', { ein: 10, auf: 9.27 }]);
+  const mr = P.mietrechtDaten(m, 0).zeilen.filter((x) => x.k === 'Zielmiete')[0];
+  wahr('O21 Mietrecht je Wohnung: begrenzt mit Eintrag 9,50', mr && mr.gekappt && mr.ein === 9.5);
+}
+
+console.log('mietpotenzial-pruefen (v3075, v3244, v3246, v3250, v3255, v3266, v3286, v3312): ' + (n - fehler) + ' von ' + n + ' ok');
 process.exit(fehler ? 1 : 0);

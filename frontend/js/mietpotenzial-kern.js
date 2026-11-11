@@ -480,6 +480,42 @@
     };
   }
 
+  /**
+   * v3312 · EINGETRAGENE ZIELMIETE GEGEN DIE MIETPREISBREMSE (Marcel 11.11.2026: „Vielleicht können wir
+   * dann einfach das Maximum übernehmen … dann wird das einfach an den Stellen umgetragen.")
+   * Gilt die Bremse (gilt === true) und ist die Vergleichsmiete bekannt, ist die Zielmiete bei
+   * Neuvermietung höchstens Vergleichsmiete × 1,10 (§ 556d Abs. 1 BGB) - dieselbe Obergrenze wie
+   * neuvermietung(). Darüber nur mit einer eingetragenen Ausnahme: höhere Vormiete (§ 556e) oder erste
+   * Vermietung nach umfassender Modernisierung (§ 556f). Bremse gilt nicht / bitte prüfen / ohne
+   * Vergleichsmiete: die Eingabe bleibt unverändert.
+   * p: { ziel_qm (eingetragen), vgl_qm, bremse: mietpreisbremseAus(), ausnahme: '' | '556e' | '556f' }
+   * Ergebnis: { qm (gilt), eingetragen_qm, obergrenze_qm, gekappt, ueber (über der Grenze mit Ausnahme),
+   *   ausnahme, bremse_gilt, text }
+   */
+  var BREMSE_AUSNAHME = {
+    '556e': 'höhere Vormiete (§ 556e BGB)',
+    '556f': 'erste Vermietung nach umfassender Modernisierung (§ 556f BGB)'
+  };
+  function zielmieteBremse(p) {
+    p = p || {};
+    var ein = zahl(p.ziel_qm), vgl = zahl(p.vgl_qm), br = p.bremse || null;
+    var aus = BREMSE_AUSNAHME[p.ausnahme] ? p.ausnahme : null;
+    var og = (br && br.gilt === true && vgl > 0) ? Math.round(vgl * 1.1 * 100) / 100 : null;
+    var r = { qm: ein > 0 ? ein : null, eingetragen_qm: ein > 0 ? ein : null, obergrenze_qm: og, gekappt: false, ueber: false,
+      ausnahme: aus, bremse_gilt: br ? br.gilt : null, text: '' };
+    if (!(ein > 0) || !og || ein <= og + 0.004) return r;
+    if (aus) {
+      r.ueber = true;
+      r.text = 'über der Mietpreisbremse (sonst höchstens ' + eur2(og) + '/m²) — Ausnahme eingetragen: ' + BREMSE_AUSNAHME[aus]
+        + (aus === '556e' ? ', höchstens bis zur Vormiete' : '');
+      return r;
+    }
+    r.qm = og; r.gekappt = true;
+    r.text = 'Zielmiete auf die Mietpreisbremse begrenzt: eingetragen ' + eur2(ein).replace(/\s*€$/, '') + ' → ' + eur2(og) + '/m²'
+      + ' (Vergleichsmiete ' + eur2(vgl) + ' + 10 %, § 556d BGB; höher nur mit höherer Vormiete § 556e oder nach umfassender Modernisierung § 556f — dann die Ausnahme eintragen)';
+    return r;
+  }
+
   /* ══ v3246 · MIETSPIEGEL UND SCHÄTZUNG DER VERGLEICHSMIETE (Marcel 09.11.2026, § 558 BGB) ══════════
      Rangfolge der Vergleichsmiete (potenzial.js objektVgl): eigene belegte Vergleichsmiete -> Mietspiegel
      (Eingabe am Objekt, später dieselben Felder aus dem Register) -> amtliche Mietpreisübersicht ->
@@ -690,7 +726,8 @@
     wirksamNachZugang: wirksamNachZugang, mhTermine: mhTermine, umlage559: umlage559, vertragGrenzen: vertragGrenzen,
     sollFuer: sollFuer, zulaessig: zulaessig, neuvermietung: neuvermietung,
     teil558: teil558, teilVertrag: teilVertrag,   /* v3244 */
-    zielmieteVorschlag: zielmieteVorschlag   /* v3130 · N115 */
+    zielmieteVorschlag: zielmieteVorschlag,   /* v3130 · N115 */
+    BREMSE_AUSNAHME: BREMSE_AUSNAHME, zielmieteBremse: zielmieteBremse   /* v3312 */
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = g.DpMietpotenzial;
 })(typeof window !== 'undefined' ? window : globalThis);
