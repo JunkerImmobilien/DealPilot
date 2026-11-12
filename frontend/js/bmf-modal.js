@@ -672,6 +672,16 @@ function runBmf(){
       var pct = parseDe(($('bmf_mea') || {}).value || _v('mea'));
       return pct > 0 ? 10000 : 1000;
     })(),
+    /* v3345 · Garagen und Wohneinheiten gingen nie an die Arbeitshilfe (KPA G13, G42) - die Vorlage
+       rechnete ein Mehrfamilienhaus ohne Verwaltungs-/Instandhaltungskosten je Einheit und ohne Garagen.
+       Gemessen 12.11.2026 an einem MFH mit 6 WE und 6 Garagen: 60,27 % statt 57,61 % Gebaeudeanteil.
+       Wohneinheiten nur bei MFH / gemischt genutzt (bei WE und EFH fuellt die Vorlage selbst). */
+    garagen: (parseInt(_v('garagen'), 10) > 0) ? parseInt(_v('garagen'), 10) : '',
+    wohneinheiten: (function(){
+      var art = ($('bmf_art') || {}).value || '';
+      var n = parseInt(_v('einheiten'), 10);
+      return (/Mietwohngrundst|gemischt genutzt/.test(art) && !/^Teileigentum/.test(art) && n > 0) ? n : '';
+    })(),
     miete_bekannt: ($('bmf_miete') && parseDe($('bmf_miete').value) > 0) ? 'Ja' : 'Nein',
     miete_monatlich: parseDe(($('bmf_miete') || {}).value),
     /* v974-bmf-wiring: LZ korrekt (war sachwertfaktor), SWF aus gaa_swf, Modernisierung + Vergleichsfaktor mitschicken */
@@ -996,6 +1006,13 @@ function downloadXlsx(){
       /* V292.6.3-nkm-leerstand-fallback: Bei Leerstand Vergleichsmiete nutzen */
       /* V292.6.4-backend-keys: Backend braucht miete_monatlich + miete_bekannt
        * miete_bekannt: 'Ja' wenn Miete > 0, sonst 'Nein' */
+      /* v3345 · dieselben zwei Felder wie runBmf - die XLSX muss rechnen wie die Anzeige */
+      garagen: (parseInt((document.getElementById('garagen') || {}).value, 10) > 0) ? parseInt(document.getElementById('garagen').value, 10) : '',
+      wohneinheiten: (function(){
+        var art = _v292_5_pane2('bmf_art') || '';
+        var n = parseInt((document.getElementById('einheiten') || {}).value, 10);
+        return (/Mietwohngrundst|gemischt genutzt/.test(art) && !/^Teileigentum/.test(art) && n > 0) ? n : '';
+      })(),
       miete_monatlich: (function(){
         /* V292.6.5: liest Pane 2 bmf_miete (Single Source of Truth) */
         var bmfMiete = _v292_5_parseDe(_v292_5_pane2('bmf_miete'));
