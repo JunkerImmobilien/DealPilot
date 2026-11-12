@@ -1605,3 +1605,8 @@ body.dp-theme-dark #dashboard-main .dp-pp-chip:hover{
   #dashboard-main .cp-sz-m{margin-left:0}
   #dashboard-main select.dp-pp-sel{max-width:none;flex-basis:100%}
 }
+/* v3321c · Kartenmodus (tabellen-karten.js, td als flex): der Schritt je Stufe steht hinter dem Wert, nicht als dritte Spalte */
+@media(max-width:600px){
+  #dashboard-main table.dptk.zb-vgl tbody td small{display:inline;margin:0 0 0 6px;order:3}
+  #dashboard-main table.dptk.zb-vgl tbody td{flex-wrap:wrap;justify-content:space-between}
+}
