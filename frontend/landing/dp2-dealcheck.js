@@ -270,7 +270,7 @@
         var satz = mieteSatz(vg, kp, mb, wfl);
         if (satz) { var p = document.createElement('p'); p.className = 'dk-miete-satz'; p.innerHTML = satz; g.appendChild(p); }
         var mo = d.miete && d.miete.monat && /^\d{4}-\d{2}$/.test(d.miete.monat) ? d.miete.monat.slice(5) + '/' + d.miete.monat.slice(0, 4) : null;
-        setze('dkLageQ', 'Amtliche Daten: Regionaldatenbank, Zensus 2022' + (mo ? ' (Miete fortgeschrieben auf ' + mo + ')' : '') + (d.mietspiegel && d.mietspiegel.art && d.mietspiegel.art !== 'unklar' ? ', ' + (d.mietspiegel.art === 'qualifiziert' ? 'qualifizierter' : d.mietspiegel.art === 'einfach' ? 'einfacher' : '') + ' Mietspiegel der Gemeinde vorhanden' : '') + (d.kappung || d.mietpreisbremse ? ', Landesverordnungen nach § 558 Abs. 3 und § 556d BGB' : '') + (d.einwohner && d.einwohner.ebene === 'kreis' ? '; Einwohner auf Kreisebene' : '') + '.');
+        setze('dkLageQ', 'Amtliche Daten: Regionaldatenbank, Zensus 2022' + (mo ? ' (Miete fortgeschrieben auf ' + mo + ')' : '') + (d.mietspiegel && d.mietspiegel.art && d.mietspiegel.art !== 'unklar' ? ', ' + (d.mietspiegel.art === 'qualifiziert' ? 'qualifizierter' : d.mietspiegel.art === 'einfach' ? 'einfacher' : '') + ' Mietspiegel der Gemeinde vorhanden' : '') + (d.kappung || d.mietpreisbremse ? ', Landesverordnungen nach § 558 Abs. 3 und § 556d BGB' : '') + (d.einwohner && d.einwohner.ebene === 'kreis' ? '. Einwohner auf Kreisebene' : '') + '.');
       })
       .catch(function () { if (n === lauf) { g.innerHTML = ''; setze('dkLageQ', 'Lage & Markt gerade nicht abrufbar.'); } });
   }
