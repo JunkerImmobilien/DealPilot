@@ -19,6 +19,8 @@ const BASIS = process.env.APP_URL;
 const ok = (b, t) => console.log((b ? 'OK ' : 'ROT ') + t);
 const info = (t) => console.log('INFO ' + t);
 const PNG = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==';
+/* zweites, anderes Bild (andere Pruefsumme) - gleiche Bilder legt objektFotos nur einmal ab */
+const PNG2 = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8DwHwAFBQIAX8jx0gAAAABJRU5ErkJggg==';
 async function fehlerVon(fn) { try { await fn(); return null; } catch (e) { return { code: e.message, status: e.status }; } }
 
 const ids = { users: [], resellers: [] };
@@ -61,7 +63,7 @@ const zeile = async (id) => (await query('SELECT * FROM objekt_uebergaben WHERE 
 
     const daten = { str: 'Pruefweg', hnr: '1', plz: '32052', ort: 'Herford', _obj_seq: '2026-901', _dealpilot_score: 72,
       _kpis_cf_ns: 1800, _kpis_bmy: 5.4, _kpis_dscr: 1.25, svwert: 250000, svw_herkunft: 'bank', _deal_won: true, halter: 'm-1', kp: 230000, _thumb: PNG };
-    const o1 = await objectService.create(p1.id, { data: JSON.parse(JSON.stringify(daten)), aiAnalysis: 'Analyse-Text', photos: [PNG, PNG.replace('AAAAA', 'AAAAB')] });
+    const o1 = await objectService.create(p1.id, { data: JSON.parse(JSON.stringify(daten)), aiAnalysis: 'Analyse-Text', photos: [PNG, PNG2] });
     const o2 = await objectService.create(p2.id, { data: { str: 'Fremdweg', hnr: '2' }, photos: [] });
     const o1Vorher = (await query('SELECT version, data::text AS d, photos::text AS p, user_id FROM objects WHERE id = $1', [o1.id])).rows[0];
 
@@ -125,9 +127,11 @@ const zeile = async (id) => (await query('SELECT * FROM objekt_uebergaben WHERE 
     const kf = Array.isArray(kop.photos) ? kop.photos : [];
     ok(kf.length === 2, 'beide Fotos kopiert (' + kf.length + ')');
     if (ablage.bereit()) {
-      const verw = kf.filter((p) => typeof p === 'string' && p.indexOf('dpfoto:') === 0).map((p) => p.slice(7));
+      const verw = Array.from(new Set(kf.filter((p) => typeof p === 'string' && p.indexOf('dpfoto:') === 0).map((p) => p.slice(7))));
       const ds = verw.length ? (await query('SELECT user_id FROM dateien WHERE id = ANY($1::uuid[])', [verw])).rows : [];
-      ok(verw.length >= 1 && ds.length === verw.length && ds.every((d) => d.user_id === k1.id), 'Fotos der Kopie in der Ablage des KUNDEN (' + verw.length + ' Verweise)');
+      ok(verw.length === 2 && ds.length === verw.length && ds.every((d) => d.user_id === k1.id), 'Fotos der Kopie in der Ablage des KUNDEN (' + verw.length + ' Dateien, ' + ds.length + ' Zeilen)');
+      const origVerw = JSON.parse(orig.p).filter((p) => typeof p === 'string' && p.indexOf('dpfoto:') === 0);
+      ok(origVerw.length === 2 && origVerw.every((p) => verw.indexOf(p.slice(7)) < 0), 'eigene Dateien, keine Verweise auf die Fotos des Partners');
     }
 
     e = await fehlerVon(() => U.uebernehmen(a.token, k1));

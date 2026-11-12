@@ -101,7 +101,7 @@ function zusammenfassung(data, opts) {
     cashflow_monat: cfJahr !== null ? cfJahr / 12 : null,
     rendite_brutto: zahl(d._kpis_bmy),
     dscr: zahl(d._kpis_dscr),
-    marktwert: sv !== null && sv > 0 ? { wert: sv, herkunft: HERKUNFT[d.svw_herkunft] || 'Wertangabe' } : null,
+    marktwert: sv !== null && sv > 0 ? { wert: sv, herkunft: HERKUNFT[d.svw_herkunft] || null } : null,
     hat_foto: !!(opts && opts.hatFoto)
   };
 }
@@ -183,7 +183,7 @@ function mailBauen(p) {
     ? '<img src="' + esc(p.bildUrl) + '" alt="' + esc(z.adresse) + '" width="504" style="display:block;width:100%;max-width:504px;height:auto;border-radius:10px 10px 0 0;border:0">'
     : '';
   const marktwert = z.marktwert
-    ? '<p style="font-size:13px;color:#3a352c;margin:12px 0 0">Wertangabe: <b>' + _eur(z.marktwert.wert) + '</b> (' + esc(z.marktwert.herkunft) + ')</p>'
+    ? '<p style="font-size:13px;color:#3a352c;margin:12px 0 0">Wertangabe: <b>' + _eur(z.marktwert.wert) + '</b>' + (z.marktwert.herkunft ? ' (' + esc(z.marktwert.herkunft) + ')' : '') + '</p>'
     : '';
   const satz = String(p.nachricht || '').trim();
   const satzHtml = satz
@@ -219,7 +219,7 @@ function mailBauen(p) {
   if (cf) t.push('Cashflow nach Steuern: ' + _eur(z.cashflow_monat) + ' je Monat (' + _eur(z.cashflow_jahr) + ' im Jahr)');
   if (z.rendite_brutto !== null && z.rendite_brutto !== undefined) t.push('Bruttomietrendite: ' + _pct(z.rendite_brutto));
   if (z.dscr !== null && z.dscr !== undefined) t.push('DSCR: ' + _dscr(z.dscr));
-  if (z.marktwert) t.push('Wertangabe: ' + _eur(z.marktwert.wert) + ' (' + z.marktwert.herkunft + ')');
+  if (z.marktwert) t.push('Wertangabe: ' + _eur(z.marktwert.wert) + (z.marktwert.herkunft ? ' (' + z.marktwert.herkunft + ')' : ''));
   t.push('', 'Objekt öffnen:', p.link, '', 'Der Link ist ' + (ablauf ? 'bis ' + ablauf : GUELTIG_TAGE + ' Tage') + ' gültig und lässt sich einmal übernehmen.');
 
   return {

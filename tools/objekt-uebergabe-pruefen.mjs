@@ -98,6 +98,7 @@ ok(z.cashflow_jahr === 2400 && z.cashflow_monat === 200, 'Cashflow: Jahr gespeic
 ok(z.rendite_brutto === 5.43 && z.dscr === 1.27, 'Rendite und DSCR unveraendert aus _kpis_bmy/_kpis_dscr');
 ok(z.marktwert && z.marktwert.wert === 310000 && z.marktwert.herkunft === 'Bankbewertung', 'Wertangabe aus svwert mit Herkunft');
 ok(U.zusammenfassung({ svwert: '' }).marktwert === null && U.zusammenfassung({ svwert: 0 }).marktwert === null, 'ohne Wertangabe keine Zeile');
+ok(U.zusammenfassung({ svwert: 5 }).marktwert.herkunft === null && !/\(\)|\(Wertangabe\)/.test(U.mailBauen({ zusammenfassung: U.zusammenfassung({ svwert: 5 }), link: 'x', reseller: {} }).html), 'Wertangabe ohne Herkunft ohne Klammer');
 ok(U.zusammenfassung({ _kpis_cf_ns: null }).cashflow_monat === null, 'null bleibt null (Number(null) ist 0 - Falle)');
 
 /* ── A3 · MAIL ─────────────────────────────────────────────────────────── */
