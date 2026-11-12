@@ -44694,3 +44694,8 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Commit:** `85a9d7cc`, `5828b422`, `d59d841f` (+ Studio-Titel). Kam mit Rollout 1.0.106 eines anderen Strangs auf Prod; dort wirkungslos (Objekte A/B gibt es nur auf Staging).
 - **Nachweis:** zwei Prüfläufe (normal und Studio), 419 s Lauf; Objekte A `46b268c1` und B `3888ccb6` vorher/nachher per md5 gleich, Lauf-Objekt gelöscht, keine KI/BMF/Marktbericht-Abrufe aus dem Lauf. Werte und Szenendauern in `wissen/2026-11-12.md`.
 - **Rest:** Aufnahme (ffmpeg) wartet auf Marcels Freigabe. Offen zur Entscheidung: Score genau an der Schwelle (70 · Gut), keine Mieterhöhung (Soll = Ist), Beleihungsspielraum 0 €, Geokodierung legt die erfundene Anschrift auf eine echte Adresse. Kaufpreisaufteilungs-PDF nicht gezeigt (der Knopf lädt herunter).
+
+### Rollout 1.0.107 · 12.11.2026 (`7aab71c`, v3333c, v3336/a, Spot-Drehbuch)
+- **Was:** Lagekarte statt leerem Bildplatz in allen drei PDF-Wegen (OSM-Kacheln über eigenes Backend, Ablage 30 Tage, ≤ 60/min an OSM, Namensnennung im Bild; v3336/a), Je-Objekt-Karten 601–1279 px (v3333c), Spot-Drehbuch `spot-quittengarten` (nur Staging-Objekte), Mieterliste schlägt KI-Fantasieliste aus dem Exposé (`object-actions.js`, kam schon mit 1.0.106).
+- **Nachweis:** Sicherungen `/root/backups/*-20261112-0919.sql.gz` (6,9 / 31 MB, Kopf gelesen), keine Migration, Gold-Audit 366, Backend ohne Fehler, `js/lagekarte.js` 200, Kachel-Route ohne Anmeldung 401 (gewollt).
+- **Rest:** Geoapify-Rückfall im einheitlichen Deckblatt druckt keine Namensnennung (Marcel entscheidet: streichen?). Nebenbefund: klassisches Investment-PDF zeigt „DealPilot Free“-Wasserzeichen trotz Plan investor (Testkonto Staging) — offen.
