@@ -194,6 +194,14 @@
     if (wort) { var c = document.createElement('em'); c.textContent = wort; d.appendChild(c); }
     return d;
   }
+  /* Die Landing-Domain leitet nur einzelne /api-Pfade weiter (Caddy: market-rates, public/stats, track) —
+     der Schnellcheck geht deshalb an den App-Host, wie erstflug-popup.js und promo-erstflug.js:
+     dealpilot.immo -> app.dealpilot.immo, staging.dealpilot.immo -> app.staging.dealpilot.immo (CORS erlaubt). */
+  function appApi() {
+    var h = location.hostname.replace(/^www\./i, '');
+    if (h.indexOf('localhost') >= 0 || h.indexOf('127.0.0.1') === 0) return '/api/v1';
+    return location.protocol + '//' + (h.indexOf('app.') === 0 ? h : 'app.' + h) + '/api/v1';
+  }
   function lage(plz) {
     var feld = $('dkLage'), g = $('dkLageG'), n = lauf;
     if (!/^\d{5}$/.test(plz)) { feld.hidden = true; return; }
@@ -202,7 +210,7 @@
     setze('dkLageQ', '');
     g.innerHTML = '';
     for (var i = 0; i < 4; i++) { var l = document.createElement('div'); l.className = 'dk-lk laedt'; g.appendChild(l); }
-    fetch('/api/v1/market-stats/schnellcheck?plz=' + plz)
+    fetch(appApi() + '/market-stats/schnellcheck?plz=' + plz)
       .then(function (r) { return r.ok ? r.json() : (r.status === 429 ? { _bremse: true } : null); })
       .then(function (d) {
         if (n !== lauf) return;
