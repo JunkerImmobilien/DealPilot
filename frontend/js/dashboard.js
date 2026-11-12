@@ -2247,7 +2247,7 @@
       var _mx = axes();
       _mx.y.title = { display:true, text:'Miete · Cashflow (€/Jahr)', color:axisCol, font:{size:10}, padding:{ top:0, bottom:6 } };   /* v3325a: 360 px - Titel berührte die Zahlen */
       _mx.y2 = { position:'right', grid:{ drawOnChartArea:false }, ticks:{ color:axisCol, callback:function(v){ return yfmt(v); } },
-                 title:{ display:true, text:'Restschuld · Eigenkapital (€)', color:axisCol, font:{size:10}, padding:{ top:6, bottom:0 } } };
+                 title:{ display:true, text:'Restschuld · Eigenkapital (€)', color:axisCol, font:{size:10}, padding:{ top:0, bottom:6 } } };   /* v3325b: rechte Achse - top schob den Titel an die Zahlen (gemessen 360 px) */
       mk('dpc-proj-mix',{type:'bar',data:{labels:labels,datasets:[
         {type:'bar',label:'Miete',data:PR.map(function(r){return Math.round(r.miete);}),backgroundColor:_wlrgba(.28),borderRadius:2,yAxisID:'y',order:4},
         {type:'line',label:'Cashflow vor Steuer',data:PR.map(function(r){return Math.round(r.cfVor);}),borderColor:'#7A7370',backgroundColor:'#7A7370',pointRadius:0,borderWidth:2,tension:.3,yAxisID:'y',order:1},
