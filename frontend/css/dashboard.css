@@ -665,7 +665,7 @@
 .dp-wk-modal-t{font-family:'Space Grotesk',sans-serif;font-size:17px;font-weight:700;color:#F2ECDC;margin-bottom:6px}
 .dp-wk-modal-s{font-size:12.5px;color:rgba(232,226,212,.6);margin-bottom:18px}
 .dp-wk-modal-btns{display:flex;flex-direction:column;gap:9px}
-.dp-wk-modal-btns button{padding:13px 16px;border-radius:10px;border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 30%, transparent);background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 8%, transparent);color:var(--wl-e8c964, #E8C964);font-size:13.5px;font-weight:600;cursor:pointer;text-align:left}
+.dp-wk-modal-btns button{padding:13px 16px;border-radius:10px;border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 30%, transparent);background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 8%, transparent);color:var(--wl-e8cc7a, #E8CC7A);font-size:13.5px;font-weight:600;cursor:pointer;text-align:left}
 .dp-wk-modal-btns button:hover{background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 18%, transparent);border-color:var(--wl-c9a84c, #C9A84C)}
 .dp-wk-modal-x{margin-top:14px;width:100%;padding:9px;border-radius:9px;border:1px solid rgba(232,226,212,.15);background:transparent;color:rgba(232,226,212,.55);font-size:12px;cursor:pointer}
 .dp-wk-modal-x:hover{color:#F2ECDC;border-color:rgba(232,226,212,.3)}
@@ -1636,4 +1636,58 @@ body.dp-theme-dark #dashboard-main .dp-pp-chip:hover{
   #dashboard-main .sk-tab:not(.dptk){font-size:11.5px}
   #dashboard-main .sk-tab:not(.dptk) th{letter-spacing:.02em;font-size:9px;hyphens:auto;-webkit-hyphens:auto;overflow-wrap:anywhere}
   #dashboard-main .vb-on,#dashboard-main .vb-on small{white-space:normal;overflow:visible;text-overflow:clip;overflow-wrap:anywhere}
+}
+
+/* ════ v3331 · Portfolio-Cockpit im Stil der übrigen App ════
+   Marcel 12.11.2026: „die einzelnen Abschnittsköpfe mit dem Gold — das müssen wir nicht mehr
+   so machen … Passe das zum gesamten anderen App-Design an … Icons, Eingabefelder, Texte,
+   Schriftfarben." Maßstab ist der Reiter Objekt, wie ihn einheitlich.css (v3239) festhält,
+   gemessen mit getComputedStyle bei 1280 px:
+     Abschnittskopf  h2.sec-title  Space Grotesk 24/700, #2A2727, -0,3 px, goldener Strich links (3 px)
+     Unterzeile      .sec-desc     Inter 12/400, #625C59
+     Karte           .card         #FFF, 1 px Gold 22 %, Radius 2 px, kein Schatten, 20 px
+     Kartenkopf      .ct.ct-pro    JetBrains Mono 10/700, Versalien, Sperrung 1,2 px, #6B645A
+     Kartensymbol    .ct-ico       22 px, Radius 6, Rand Gold 40 %, Symbol Gold
+     Feld            .f select     Inter 13/400, #2A2727, #FFF, 1 px #E6E1D6, Radius 2 px, 38 px
+     Knopf           .oe-btn       Inter 13/500, #2A2727, #FFF, 1 px Gold 30 %, Radius 8 px
+     Hauptknopf      .oab-act      #0A0A0A, Schrift #E8CC7A, Radius 8 px
+   Gold bleibt Akzent (Strich, Linie, Symbol, aktiver Knopf), nie Fläche oder Kopfschrift. */
+#dashboard-main #dp-stage.stage.fc .sl{background:transparent;border:0;border-radius:0;box-shadow:none;padding:0 0 0 14px;margin:30px 0 14px;position:relative;overflow:visible}
+#dashboard-main #dp-stage.stage.fc .sl::after{display:none}
+#dashboard-main #dp-stage.stage.fc .sl::before{content:"";position:absolute;left:0;top:4px;width:3px;height:20px;border-radius:2px;background:linear-gradient(180deg,var(--wl-e8cc7a, #E8CC7A),var(--wl-9a7f33, #9a7f33));box-shadow:0 0 8px color-mix(in srgb,var(--wl-c9a84c, #C9A84C) 40%,transparent)}
+#dashboard-main #dp-stage.stage.fc .sl.sl-head::before{top:5px;height:24px}
+#dashboard-main #dp-stage.stage.fc .sl h2{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:20px;letter-spacing:-.3px;color:#2A2727}
+#dashboard-main #dp-stage.stage.fc .sl.sl-head h2{font-size:24px}
+#dashboard-main #dp-stage.stage.fc .sl .e{background:none;color:#625C59;padding:0;border-radius:0;font:600 11px 'JetBrains Mono',monospace;letter-spacing:1px}
+#dashboard-main #dp-stage.stage.fc .sl .tag{border:0;border-radius:0;padding:0;font:400 12px Inter,system-ui,sans-serif;color:#625C59;letter-spacing:0}
+#dashboard-main #dp-stage.stage.fc .sl .cp-objsel-lab{color:#625C59;font:500 11px Inter,system-ui,sans-serif;letter-spacing:0;text-transform:none}
+#dashboard-main #dp-stage.stage.fc .sl .cp-objsel select{background:#fff;color:#2A2727;border:1px solid var(--dpl-linie, #E6E1D6);border-radius:2px;height:38px;padding:0 11px;font:400 13px Inter,system-ui,sans-serif;max-width:240px}
+#dashboard-main #dp-stage.stage.fc .sl .cp-objsel select:focus{outline:none;border-color:var(--wl-c9a84c, #C9A84C);box-shadow:0 0 0 2px color-mix(in srgb,var(--wl-c9a84c, #C9A84C) 16%,transparent)}
+#dashboard-main #dp-stage.stage.fc .cp-sek .cp-chev{background:#fff;border:1px solid color-mix(in srgb,var(--wl-c9a84c, #C9A84C) 30%,transparent);border-radius:8px}
+#dashboard-main #dp-stage.stage.fc .cp-sek .cp-chev::before{border-color:#625C59}
+/* Jahre-Umschalter im Kopf und Ansicht Einfach | Genau: Knopf wie .oe-btn, aktiv wie der Hauptknopf */
+#dashboard-main #dp-stage.stage.fc .sl .yrs button{background:#fff;color:#2A2727;border:1px solid color-mix(in srgb,var(--wl-c9a84c, #C9A84C) 30%,transparent);border-radius:8px;font:500 12px Inter,system-ui,sans-serif}
+#dashboard-main #dp-stage.stage.fc .sl .yrs button.active{background:#0A0A0A;color:var(--wl-e8cc7a, #E8CC7A);border-color:#0A0A0A}
+#dashboard-main #dp-stage .cp-ans-sw{background:transparent;padding:0;gap:6px;border-radius:0}
+#dashboard-main #dp-stage .cp-ans-sw button{background:#fff;color:#2A2727;border:1px solid color-mix(in srgb,var(--wl-c9a84c, #C9A84C) 30%,transparent);border-radius:8px;font:500 13px Inter,system-ui,sans-serif}
+#dashboard-main #dp-stage .cp-ans-sw button.on{background:#0A0A0A;color:var(--wl-e8cc7a, #E8CC7A);border-color:#0A0A0A}
+/* Karten und Kartenköpfe wie .card / .ct.ct-pro */
+#dashboard-main #dp-stage .cpk,#dashboard-main #dp-stage .chart{background:#fff;border:1px solid color-mix(in srgb,var(--wl-c9a84c, #C9A84C) 22%,transparent);border-radius:2px;box-shadow:none}
+#dashboard-main #dp-stage .cpk-h,#dashboard-main #dp-stage .chart .ct{font:700 10px/1.3 'JetBrains Mono',monospace;letter-spacing:1.2px;text-transform:uppercase;color:#6B645A}
+#dashboard-main #dp-stage .chart .cs{font:400 11px Inter,system-ui,sans-serif;color:#625C59;margin-top:2px}
+#dashboard-main #dp-stage .chart .badge{color:#625C59}
+#dashboard-main #dp-stage .chart .ico{width:22px;height:22px;flex:0 0 22px;border-radius:6px;background:linear-gradient(135deg,#fdf9ef,var(--wl-f5ecd0, #f5ecd0));border:1px solid color-mix(in srgb,var(--wl-c9a84c, #C9A84C) 40%,transparent)}
+#dashboard-main #dp-stage .chart .ico svg,#dashboard-main #dp-stage .cpk-ico svg{width:14px;height:14px;stroke:var(--wl-c9a84c, #C9A84C);stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+/* Felder wie .f select / Knopf wie .oe-btn */
+#dashboard-main #dp-stage select.dp-pp-sel,#dashboard-main #dp-stage select.dp-mappe-sel{background:#fff;color:#2A2727;border:1px solid var(--dpl-linie, #E6E1D6);border-radius:2px;height:38px;padding:0 11px;font:400 13px Inter,system-ui,sans-serif}
+#dashboard-main #dp-stage select.dp-pp-sel:focus,#dashboard-main #dp-stage select.dp-mappe-sel:focus{outline:none;border-color:var(--wl-c9a84c, #C9A84C);box-shadow:0 0 0 2px color-mix(in srgb,var(--wl-c9a84c, #C9A84C) 16%,transparent)}
+@media(max-width:768px){
+  #dashboard-main #dp-stage.stage.fc .sl h2{font-size:18px}
+  #dashboard-main #dp-stage.stage.fc .sl.sl-head h2{font-size:21px}
+  #dashboard-main #dp-stage.stage.fc .sl::before{top:3px;height:18px}
+  #dashboard-main #dp-stage.stage.fc .sl .cp-objsel select{height:44px}
+  #dashboard-main #dp-stage select.dp-pp-sel,#dashboard-main #dp-stage select.dp-mappe-sel{height:44px}
+}
+@media(max-width:600px){
+  #dashboard-main .sk-tab:not(.dptk) td.r{white-space:nowrap}
 }
