@@ -8715,7 +8715,7 @@
      Die BMF-Aufteilung ist abgespielt (DPM_QG_DATEN.bmf), die Pilot-Analysen sind die gespeicherten.
      Kein Abruf, der Kontingent kostet. Jede Zahl im Text liest das Drehbuch aus der Oberfläche. */
   var QG_A = '46b268c1-4871-4a5e-b9ef-bda5e03e38fc', QG_B = '3888ccb6-cb2d-4b60-b56a-45874930f295';
-  var QG_PFAD = 'messe-dateien/am-quittengarten-12/', QG_BUSTER = 'v3330';
+  var QG_PFAD = 'messe-dateien/am-quittengarten-12/', QG_BUSTER = 'v3330b';   /* v3330b: Exposé mit 740.000 € (Marcel 12.11.) */
   var QG_DATEIEN = ['01-expose-am-quittengarten-12.pdf', '02-mieterliste-am-quittengarten-12.pdf', '03-energieausweis-am-quittengarten-12.pdf'];
   var _qg = { geladen: false };
   window.DPM_QG = window.DPM_QG || {};
@@ -9131,6 +9131,11 @@
         reiter('s2'); await warte(600);
         await zeige(nkmFeld, 10);
         await b2oZeile(s, 'Ist · heute', 'Heute <b>' + (eur(zahl('nkm')) || '–') + '</b> im Monat.');
+        DPM_QG.zeiten.push({ szene: 'A11', ms: Date.now() - t1 });
+      },
+      /* ── A12 · Plan gegen Ist (Pilot-Analyse, Tafel) ── v3330b: Marcel 12.11. statt Beleihungsspielraum (0 € gemessen) */
+      async function (s) {
+        var t1 = Date.now();
         reiter('s5'); await warte(1200);
         await warteAuf(function () { return q('#ai-content .dp-pa-tab'); }, 8000);
         await r11PaTab(/Ankauf · Bestand/);
@@ -9140,22 +9145,11 @@
         var ah = function () { var x = r11Panel(); return x && (x.querySelector('.abw-tafel-host') || x.querySelector('.abw-tafel')); };
         var sx = ah() && scroller(ah()); if (sx && ah()) { sx.scrollTop += rect(ah()).top - 120; await warte(500); }
         var t = r6Inner(r11Panel()), vg = /Von (\d+) vergleichbaren Kennzahlen stehen (\d+) besser und (\d+) schlechter/.exec(t);
-        DPM_QG.a11 = vg ? vg.slice(1) : null;
+        DPM_QG.a12 = vg ? { von: vg[1], besser: vg[2], schlechter: vg[3] } : null;
         await zeige(function () { var x = rhIm(r11Panel(), /Von \d+ vergleichbaren Kennzahlen/); return (x && (x.closest('p,div') || x)) || ah(); }, 8);
-        await b2oZeile(s, 'Plan gegen Ist', vg ? 'Von <b>' + vg[1] + ' Kennzahlen</b> stehen heute <b>' + vg[2] + ' besser</b> und <b>' + vg[3] + ' schlechter</b> als beim Kauf.' : 'Kennzahl für Kennzahl: Plan gegen heute.');
-        DPM_QG.zeiten.push({ szene: 'A11', ms: Date.now() - t1 });
-      },
-      /* ── A12 · Anschluss & Exit: Beleihungsspielraum ── */
-      async function (s) {
-        var t1 = Date.now();
-        await r11PaTab(/Exit/);
-        await warte(600);
-        var bz = function () { var p = r11Panel(); var e = p && rhIm(p, /^Beleihungsspielraum bei 80/); return e && (e.closest('tr') || e.parentElement); };
-        var b0 = bz(); if (b0) { try { b0.scrollIntoView({ block: 'center' }); } catch (x) {} await warte(500); }
-        await zeige(function () { return bz() || r11Panel(); }, 8);
-        var t = qgPanelText(), w = /Beleihungsspielraum bei 80 % des Marktpreises\s*([^\n]+)/.exec(t), mp = /Marktpreis[^\n]*?\(Marktbericht vom ([\d.]+)\)\s*([\d.]+ €)/.exec(t);
-        DPM_QG.a12 = { spielraum: w ? w[1].trim() : null, marktpreis: mp ? mp[2] : null };
-        await b2oZeile(s, 'Beleihungsspielraum', 'Bei 80 % des Marktpreises: <b>' + (w ? w[1].trim() : '–') + '</b> — rechnerisch; die Bank setzt ihren eigenen Wert an.');
+        await b2oZeile(s, 'Plan gegen Ist', vg ? '<b>' + vg[2] + ' Kennzahlen besser als geplant</b> — ' + vg[3] + ' schlechter, von ' + vg[1] + ' vergleichbaren.' : 'Kennzahl für Kennzahl: Plan vom Kauftag gegen heute.');
+        var bw = function () { var x = q('#ai-content .abw-bewegt'); return x && x.offsetWidth ? x : null; };
+        if (bw()) { await zeige(bw, 8); await b2oZeile(s, 'Was sich bewegt hat', 'Jede Kennzahl mit ihrem Wert beim Kauf und heute.'); }
         DPM_QG.zeiten.push({ szene: 'A12', ms: Date.now() - t1 });
       }
     ]
