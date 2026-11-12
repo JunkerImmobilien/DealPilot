@@ -2454,6 +2454,14 @@
       d.kennzahlen.push(['Aufteilungspotenzial'].concat(d.spalten.map(function (k) {
         var s = AT && AT[k] ? AT[k] : r.aufteilung.je_stufe[k]; return !s ? '—' : (s.potenzial < 0 ? 'kein Potenzial' : '+' + eur(s.potenzial)); })));
       d.aufteilung_hinweis = r.aufteilung.negativ_hinweis || null;
+      /* v3332 · der Hinweis vergleicht die Summe der ERTRAGSWERTE mit dem Haus. Führt je Wohnung der
+         Vergleichswert (Aufteilerwert mit Potenzial), las er sich als „Aufteilung lohnt nicht" neben
+         +245.200 € (Westerfeldstr. 146, 12.11.2026) - er bleibt als Gegenprobe, so benannt. */
+      if (d.aufteilung_hinweis && AT && AT.bestand && AT.bestand.zaehl && AT.bestand.zaehl.ertragswert < (AT.bestand.zaehl.amtlich + AT.bestand.zaehl.angebote + AT.bestand.zaehl.ertragswert)
+          && Number(AT.bestand.potenzial) >= 0) {
+        d.aufteilung_hinweis = 'Gegenprobe Ertragswert (stützend): ' + d.aufteilung_hinweis.replace('die Summe der Einzelwohnungen', 'die Summe der Ertragswerte der Einzelwohnungen')
+          + ' Führend ist je Wohnung der ' + (AT.bestand.bezeichnung || 'Vergleichswert') + '; danach ergibt die Aufteilung ein Potenzial von +' + eur(AT.bestand.potenzial) + '.';
+      }
       /* v3322 · je Wohnung der führende Wert (Vergleichswert je Einheit), Verfahren und stützender Ertragswert */
       var _akP = AT ? aufteilungKurz(r, m) : null;
       if (_akP && _akP.je_wohnung.length) {

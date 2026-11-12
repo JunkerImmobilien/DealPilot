@@ -439,6 +439,16 @@
           ? tab(B, ['WE', 'm²', 'Ist €/M', 'Mieterhöhung'], PD.wohnungen.map(function (w) { return [w.we, B.zahl(w.wfl, 0), w.ist, w.soll]; }), 'dicht')
           : tab(B, ['WE', 'm²', 'Ist €/M', 'Mieterhöhung', 'Ziel €/M', 'Maßnahmen'], PD.wohnungen.map(function (w) { return [w.we, B.zahl(w.wfl, 0), w.ist, w.soll, w.ziel, w.massnahmen]; }), 'dicht');
       }
+      /* v3332 · aufgeteilt: Wert je Wohnung (Vergleichswert führend, Ertragswert stützend). Stand im jsPDF-Weg
+         (pdf.js v3322) und im Bank-PDF, fehlte aber im Investment-PDF dieser Fassung - gemessen 12.11.2026 an
+         Westerfeldstr. 146 (2026-1161): Aufteilerwert in der Stufen-Tabelle, die Wohnungen selbst nirgends. */
+      if (PD.wert_je_wohnung && PD.wert_je_wohnung.length) {
+        var WS = PD.wert_je_wohnung_summe;
+        h += '<h3>Wert je Wohnung · nach Aufteilung</h3>'
+          + tab(B, ['WE', 'm²', 'Wert führend', 'Verfahren · Herkunft', 'Ertragswert stützend'], PD.wert_je_wohnung.map(function (w) {
+            return [w.we, B.zahl(w.wfl, 0), w.wert, w.verfahren, w.stuetzend]; })
+            .concat(WS ? [{ w: ['Summe nach Aufteilung', '', WS.summe + (WS.vollstaendig ? '' : '*'), WS.bezeichnung + ' · führend', ''], art: 'summe' }] : []), 'dicht');
+      }
       if (PD.bruecke && PZ && typeof PZ.ueberleitungZeilen === 'function') {
         var UZ = PZ.ueberleitungZeilen(PD.bruecke) || [], um = Math.max.apply(null, UZ.filter(function (z) { return z.schritt; }).map(function (z) { return Math.abs(z.w); }).concat([1]));
         var farbe = { bestand: '#2A2727', kosten: 'var(--rot)', soll: 'color-mix(in srgb,var(--gold) 55%,#fff)', ziel: 'var(--gold-d)' };
@@ -456,7 +466,8 @@
       if (PD.kennzahlen && PD.kennzahlen.length) {
         h += '<div class="block"><h3>Kennzahlen je Stufe</h3>' + tab(B, ['Kennzahl'].concat(PD.spalten.map(function (k) { return PD.titel[k]; })),
           PD.kennzahlen.map(function (z) { return { w: z.map(String), art: /^Ertragswert|^nach Aufteilung/.test(z[0]) ? 'summe' : '' }; }).concat([{ w: ['Kaufpreis'].concat(PD.spalten.map(function (k, i) { return i ? '' : B.eur(K.kp); })) }]))
-          + '<p class="det">' + B.esc(klar((PD.aufteilung_hinweis ? 'Aufteilung: ' + PD.aufteilung_hinweis + ' ' : '') + (PD.fuss || ''))) + '</p></div>';
+          /* v3332 · PD.fuss traegt den Aufteilungshinweis schon (potenzial.js pdfDaten) - er stand zweimal da */
+          + '<p class="det">' + B.esc(klar(PD.fuss || '')) + '</p></div>';
       }
     } else if (WZ && WZ.stufen && WZ.stufen.length) {
       h += '<h3>Ertragswert je Stufe</h3>' + tab(B, ['Stufe', 'Ertragswert', 'Maßnahmen', 'Marktpreisindikation'], WZ.stufen.map(function (s) { return [s.titel, B.eur(s.wert), s.kosten ? B.eur(s.kosten) : '–', s.mpi != null ? B.eur(s.mpi) : '–']; }));
