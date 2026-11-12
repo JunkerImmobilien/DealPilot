@@ -39,6 +39,15 @@
   function stufen(pp) {
     var S = pp && pp.stufen; if (!S || !S.bestand) return null;
     var b = S.bestand, out = { bestand: b, mh: S.mieterhoehung || null, zb: S.zielbild || null };
+    /* Ertragswert und Restnutzungsdauer je Stufe: ohne Lauf in dieser Sitzung aus dem gespeicherten Stand – dieselbe
+       Quelle wie die Tafel Ankauf · Bestand · Soll · Zielbild (potenzial.js stufenWerte(): Lauf oder Abruf mit Datum) */
+    var sw = null; try { sw = window.DpPotenzial && window.DpPotenzial.stufenWerte ? window.DpPotenzial.stufenWerte() : null; } catch (e) { sw = null; }
+    if (sw && !sw.gesperrt && sw.S) [['bestand', 'bestand'], ['mh', 'mieterhoehung'], ['zb', 'zielbild']].forEach(function (p) {
+      var s = out[p[0]], w = sw.S[p[1]]; if (!s || !w) return;
+      if (!zahl(s.ertragswert) && zahl(w.ertragswert)) { s.ertragswert = w.ertragswert; s._ewQuelle = sw; }
+      if (!zahl(s.rnd) && zahl(w.rnd)) s.rnd = w.rnd;
+    });
+    out._sw = sw;
     ['mh', 'zb'].forEach(function (k) {
       var s = out[k]; if (!s) return;
       s._mehr = zahl(s.kaltmiete_monat) && zahl(b.kaltmiete_monat) ? s.kaltmiete_monat - b.kaltmiete_monat : null;
@@ -138,6 +147,8 @@
         + stufeKarte('Nach Mieterhöhung', 'var(--wl-b8932f,#b8932f)', S.mh, S.bestand, J.mieterhoehung, 'mh')
         + stufeKarte('Zielbild', 'var(--wl-c9a84c,#C9A84C)', S.zb, S.bestand, J.zielbild, 'zb') + '</div>';
       if (pp.ertragswert_gesperrt && pp.ertragswert_hinweis) h += '<p class="dp-pa-fuss">' + esc(pp.ertragswert_hinweis) + '</p>';
+      else if (S._sw && S._sw.quelle === 'abruf' && S._sw.datum && [S.bestand, S.mh, S.zb].some(function (x) { return x && x._ewQuelle; }))
+        h += '<p class="dp-pa-fuss">Ertragswerte aus dem gespeicherten Abruf vom ' + esc(S._sw.datum) + (S._sw.veraltet ? ' – seitdem hat sich am Objekt etwas geändert; im Reiter Ankauf · Bestand · Soll · Zielbild neu rechnen' : '') + '.</p>';
     }
     /* Die Hebel einzeln: Mieterhöhung, Mieterwechsel, Modernisierung, Aufteilung, Indexmiete */
     var hebel = [];
