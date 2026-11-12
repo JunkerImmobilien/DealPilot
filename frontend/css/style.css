@@ -41674,7 +41674,7 @@ body.dp-dg-2 :is(#s0, #s1, #s2, #s3, #s4, #s3-tax, #s5, #s6, #s8) [data-dp-dg="3
 @media (max-width: 640px) {
   /* (1) Reiter Finanzierung, Werkzeuge: „Tilgungsplan ansehen & bearbeiten" und „Daten aus
          Bank-PDF importieren" ragten 35/19 px aus der Gruppe (nowrap). */
-  html body .fz-werkzeuge > .btn { white-space: normal; max-width: 100%; height: auto; text-align: left; }
+  html body .fz-werkzeuge > button { white-space: normal !important; max-width: 100%; height: auto; text-align: left; flex-shrink: 1; min-width: 0; }
   /* (2) Reiter Objekt, Fotomenue (⋯): oeffnete nach unten und wurde von der Karte
          (overflow:hidden) nach 11 px abgeschnitten - die Kachel steht unten in der Karte.
          Am Handy oeffnet es nach oben. */
