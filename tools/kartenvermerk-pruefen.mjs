@@ -35,6 +35,7 @@ const STELLEN = {
     return [
       [/var OSM_VERMERK = '(\\u00a9|©) OpenStreetMap-Mitwirkende'/.test(c), 'Profi: Vermerk-Konstante'],
       [/function mitOsmVermerk\([\s\S]{0,700}fillText\(OSM_VERMERK/.test(c), 'Profi: mitOsmVermerk malt den Vermerk ins Bild'],
+      [/var y0 = h - 24 - 22;/.test(c), 'Profi: Vermerk UEBER dem Zuschreibungsstreifen des Kartenbilds (unterste 20 px, gemessen 12.11.), der bleibt unverdeckt'],
       [/karte\(lat, lon, 16, 1200, 620\)[^\n]*mitZonen[^\n]*mitOsmVermerk\(k, 1200, 620\)/.test(c), 'Profi: Nahkarte (Lage) mit Vermerk, NACH den Bodenrichtwertzonen gemalt'],
       [/karte\(lat, lon, 12, 1200, 620\)\.then\(function \(k\) \{ return mitOsmVermerk\(k, 1200, 620\)/.test(c), 'Profi: Regionalkarte (Lage) mit Vermerk'],
       [/titelbild && istKarte \? '<span class="osm">' \+ esc\(OSM_VERMERK\)/.test(c), 'Profi: Titelkarte (Deckblatt) mit Vermerk ueber dem Bild (object-fit:cover schneidet einen gemalten ab)'],

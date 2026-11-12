@@ -27,7 +27,7 @@
    ═══════════════════════════════════════════════════════════════════════ */
 (function () {
   'use strict';
-  var VERSION = 'v3338';
+  var VERSION = 'v3338a';
 
   /* ── kleine Helfer ─────────────────────────────────────────────────── */
   function esc(s) {
@@ -390,8 +390,11 @@
         g.drawImage(im, 0, 0, w, h);
         g.font = '15px Inter, Arial, sans-serif';
         var tw = g.measureText(OSM_VERMERK).width;
-        g.fillStyle = 'rgba(255,255,255,.85)'; g.fillRect(w - tw - 16, h - 24, tw + 16, 24);
-        g.fillStyle = '#333'; g.fillText(OSM_VERMERK, w - tw - 8, h - 7);
+        /* ueber dem Zuschreibungsstreifen, den der Kartendienst selbst unten rechts ins Bild setzt
+           (gemessen 12.11.: rund 20 px hoch) - der bleibt unverdeckt */
+        var y0 = h - 24 - 22;
+        g.fillStyle = 'rgba(255,255,255,.85)'; g.fillRect(w - tw - 16, y0, tw + 16, 24);
+        g.fillStyle = '#333'; g.fillText(OSM_VERMERK, w - tw - 8, y0 + 17);
         return c.toDataURL('image/jpeg', 0.9);
       } catch (e) { return basis; }
     });
