@@ -41667,3 +41667,35 @@ body.dp-dg-2 :is(#s0, #s1, #s2, #s3, #s4, #s3-tax, #s5, #s6, #s8) [data-dp-dg="3
   html body #s-vermoegen .vm-wa { display: flex; flex-wrap: wrap; margin: 6px 0 0; max-width: 100%; }
   html body #s-vermoegen .vm-wa select { max-width: 100%; min-width: 0; }
 }
+
+/* ===== v3341 · Handy-Durchgang, zweites Paket (Marcel 12.11.2026: „ALLE Tabs, ALLE Reiter,
+   Aktionen und Menüs"). Gemessen mit allen <details> offen, allen Pilot-Analyse-Unterreitern,
+   Cockpit Einfach/Genau und den Dialogen bei 360/390 px. Desktop unberuehrt (nur unter 640 px). ===== */
+@media (max-width: 640px) {
+  /* (1) Reiter Finanzierung, Werkzeuge: „Tilgungsplan ansehen & bearbeiten" und „Daten aus
+         Bank-PDF importieren" ragten 35/19 px aus der Gruppe (nowrap). */
+  html body .fz-werkzeuge > .btn { white-space: normal; max-width: 100%; height: auto; text-align: left; }
+  /* (2) Reiter Objekt, Fotomenue (⋯): oeffnete nach unten und wurde von der Karte
+         (overflow:hidden) nach 11 px abgeschnitten - die Kachel steht unten in der Karte.
+         Am Handy oeffnet es nach oben. */
+  html body .img-cell .img-pop { top: auto !important; bottom: calc(100% + 4px) !important; }
+  /* (3) Pilot-Analyse: „VERHANDLUNGSEMPFEHLUNG" (ein Wort) ragte 23 px aus der Zeile,
+         die Ampelworte im Lagevergleich 26 px. */
+  html body #s5 .dp-pa-sec .dp-pa-lbl { min-width: 0; overflow-wrap: anywhere; }
+  html body #s5 .dp-pa-ggs-kopf { flex-wrap: wrap; column-gap: 8px; }
+  /* (4) Portfolio-Cockpit „Genau": Steuerkopf „Einkommensteuer · § 32a · …" lief 39 px hinaus
+         (nowrap); in „Bewertung je Objekt" lief die Abweichung (+57,8 %) ueber den Kartenrand. */
+  html body .sk-kopf .sk-art { white-space: normal; min-width: 0; }
+  html body table.dptk td { flex-wrap: wrap; column-gap: 6px; }
+  /* (5) Fortschrittsfenster „PDF wird erstellt" (#pdf-overlay): 370 px breit in einem
+         360-px-Schirm (Innenabstand 44 px je Seite). */
+  html body .pdf-modal { max-width: calc(100vw - 24px); box-sizing: border-box; padding: 26px 20px; }
+  /* (6) Einstellungen › Deal Score: Beschriftung 172 px plus Regler 185 px in 265 px -
+         der Regler ragte 104 px hinaus. Am Handy Beschriftung ueber dem Regler. */
+  html body #settings-modal .ds-setting-row { grid-template-columns: minmax(0, 1fr); row-gap: 4px; }
+  html body #settings-modal .ds-setting-input { min-width: 0; }
+  /* (7) Einstellungen › Plan, Kontingente: zwei Spalten mit Inhaltsbreite (1fr = minmax(auto,1fr)),
+         eine Zelle lief 89 px hinaus. Eine Spalte. */
+  html body .ai-credits-row { grid-template-columns: minmax(0, 1fr) !important; }
+  html body .ai-credits-cell { min-width: 0; overflow-wrap: anywhere; }
+}
