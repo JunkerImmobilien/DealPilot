@@ -359,7 +359,9 @@
       P.push('Bodenwertabschlag. Auf den so ermittelten Bodenwert wurde ein Abschlag von ' + pct(W.ab, 0) + ' angesetzt' +
         (grund ? ', begründet mit ' + grund : '') + '. Der Bodenrichtwert gilt für ein Grundstück mit den ' +
         'Merkmalen des Richtwertgrundstücks; weicht das bewertete Grundstück davon ab, ist der Wert anzupassen ' +
-        '(§ 196 Abs. 1 Satz 3 BauGB in Verbindung mit § 15 ImmoWertV).');
+        /* v3344 · Marcel 12.11.2026: § 15 ImmoWertV regelt die Bodenrichtwertzonen; die Anpassung
+           an abweichende Grundstuecksmerkmale steht in § 40 Abs. 2 ImmoWertV (bis v3343 hier § 15). */
+        '(§ 196 Abs. 1 Satz 3 BauGB in Verbindung mit § 40 Abs. 2 ImmoWertV).');
     }
     P.push('Bindungswirkung. Die Arbeitshilfe ist ein Schätzhilfsmittel und bindet weder die Beteiligten noch ' +
       'die Gerichte (BFH, Urteil vom 21.07.2020, IX R 26/19). Eine vertragliche Aufteilung ist der Besteuerung ' +
