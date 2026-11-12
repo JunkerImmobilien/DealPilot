@@ -438,7 +438,7 @@
     W.verfahren.splice(pos, 0, { schluessel: 'aufteiler', name: 'Vergleichswert je Einheit (Summe)',
       zusatz: (T.bezeichnung || 'Vergleichswert') + ' · ' + n + ' Wohnungen einzeln' + (a.kosten > 0 ? ', abzüglich Aufteilungskosten ' + eur(a.kosten) : '') + (T.vollstaendig ? '' : ' · unvollständig'),
       unten: null, mitte: T.wert, oben: null, fuehrend: true, abw_zur_mpi_pct: rund1(abw(T.wert, mw)) });
-    W.aufteilung = { wert: T.wert, summe: T.summe, bezeichnung: T.bezeichnung || null, n: n };
+    W.aufteilung = { wert: T.wert, summe: T.summe, bezeichnung: T.bezeichnung || null, n: n, kosten: a.kosten > 0 ? a.kosten : 0 };   /* v3334a · kosten fehlte: Potenzialanalyse schrieb „nach 0 € Aufteilungskosten“ (Westerfeldstr. 146, richtig 10.800 €) */
     W.klartext = 'In Wohnungseigentum aufgeteilt: führend ist der Vergleichswert je Einheit – ' + n + ' Wohnungen einzeln bewertet, zusammen ' + eur(T.wert)
       + (T.vollstaendig ? '' : ' (unvollständig)') + '. Der Ertragswert des Hauses als Ganzes stützt. '
       + String(W.klartext || '').replace(/^Führend ist der [^:]*: an ihm misst sich der Preis, die übrigen Werte sind die Gegenprobe\.\s*/, '');

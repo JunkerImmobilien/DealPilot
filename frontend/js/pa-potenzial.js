@@ -161,7 +161,7 @@
         + (zahl(S.zb._zuw) ? 'Wertzuwachs nach Kosten ' + sEur(S.zb._zuw) + '.' : '')]);
     if (d.auf) {
       if (d.auf.gesperrt) hebel.push(['Aufteilung in Eigentumswohnungen', 'nicht gerechnet', String(d.auf.gesperrt)]);
-      else if (zahl(d.auf.wert)) hebel.push(['Aufteilung in Eigentumswohnungen', eur(d.auf.wert), (d.auf.n ? d.auf.n + ' Wohnungen einzeln, ' : '') + (d.auf.bezeichnung || 'Vergleichswert') + ' führend, nach ' + eur(d.auf.kosten || 0) + ' Aufteilungskosten.']);
+      else if (zahl(d.auf.wert)) hebel.push(['Aufteilung in Eigentumswohnungen', eur(d.auf.wert), (d.auf.n ? d.auf.n + ' Wohnungen einzeln, ' : '') + (d.auf.bezeichnung || 'Vergleichswert') + ' führend' + (zahl(d.auf.kosten) && d.auf.kosten > 0 ? ', nach ' + eur(d.auf.kosten) + ' Aufteilungskosten' : '') + '.']);   /* v3334a · ohne bekannte Kosten keine „0 €“ */
     }
     if (d.im && d.im.zeile) hebel.push(['Indexmiete', 'Indexvertrag', String(d.im.zeile)]);
     if (hebel.length) h += karte(kopf('Deine Hebel') + '<div class="dp-pap-hebel">' + hebel.map(function (x) {
