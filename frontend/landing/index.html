@@ -331,7 +331,7 @@ if (location.hash === '#forschung') location.replace('forschung.html');</script>
      dp2-dealcheck.js bildet nur die Eingaben ab.
      landing-kern-3 · der Knopf trägt die fünf Zahlen als Fragment (#dc=1&kp=…) in die App;
      dort nimmt js/dealcheck-uebernahme.js sie an und legt nach der Anmeldung auf Nachfrage
-     ein Objekt an. Vorbelegung 150.000 € / 880 € (Begründung in dp2-dealcheck.js). -->
+     ein Objekt an. Vorbelegung 150.000 € / 950 € (Begründung in dp2-dealcheck.js, landing-dealcheck-4). -->
 <!-- landing-dealcheck-2 · Marcel 12.11.2026: „cooler animieren … mit Wendekarte eingeben, man sieht nur so einen Score mit
      Progress-Bar … einfacher, kleiner". Vorderseite: Kaufpreis, Kaltmiete, Zinsbindung (indikativer Zins je Bindung,
      /api/v1/market-rates/bauzins), optional PLZ. Rückseite: Score zählt hoch, Stufe, Cashflow, zwei Kennzahlen,
@@ -345,7 +345,7 @@ if (location.hash === '#forschung') location.replace('forschung.html');</script>
     <form class="dk-seite dk-vorn" id="dkVorn" onsubmit="return false" autocomplete="off" aria-label="Deal-Check Eingaben">
       <div class="dk-kopf"><span class="dk-marke">Deal-Check</span><span class="dk-nr">Boarding · Vorab</span></div>
       <label class="dk-f"><span>Kaufpreis</span><input id="dcKp" inputmode="decimal" value="150.000" aria-label="Kaufpreis in Euro"><i>€</i></label>
-      <label class="dk-f"><span>Kaltmiete im Monat</span><input id="dcNkm" inputmode="decimal" value="880" aria-label="Nettokaltmiete im Monat in Euro"><i>€</i></label>
+      <label class="dk-f"><span>Kaltmiete im Monat</span><input id="dcNkm" inputmode="decimal" value="950" aria-label="Nettokaltmiete im Monat in Euro"><i>€</i></label>
       <fieldset class="dk-bind"><legend>Zinsbindung</legend>
         <div class="dk-chips" id="dkChips" role="radiogroup" aria-label="Zinsbindung">
           <button type="button" role="radio" aria-checked="false" data-b="5"><b>5 J</b><small>–</small></button>
@@ -614,7 +614,7 @@ if (location.hash === '#forschung') location.replace('forschung.html');</script>
      staging.dealpilot.immo -> app.staging.dealpilot.immo, sonst app.dealpilot.immo. -->
 <script>(function () {
   var h = location.hostname, app = /(^|\.)staging\.dealpilot\.immo$/.test(h) ? 'https://app.staging.dealpilot.immo/' : 'https://app.dealpilot.immo/';
-  ['js/dscr-engine.js?v=v3031b', 'js/deal-kpis.js?v=v3215', 'js/score-tiers.js?v=v3254', 'js/dealscore.js?v=v3289', 'dp2-dealcheck.js?v=landing-dealcheck-3']
+  ['js/dscr-engine.js?v=v3031b', 'js/deal-kpis.js?v=v3215', 'js/score-tiers.js?v=v3254', 'js/dealscore.js?v=v3289', 'dp2-dealcheck.js?v=landing-dealcheck-4']
     .forEach(function (s) { var e = document.createElement('script'); e.src = (s.indexOf('js/') === 0 ? app : '') + s; e.async = false; document.body.appendChild(e); });
 })();</script>
 <script src="dp2-live.js?v=landing-videothek-9"></script><!-- landing-videothek-1 -->

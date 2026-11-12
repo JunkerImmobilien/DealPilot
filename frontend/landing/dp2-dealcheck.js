@@ -43,6 +43,11 @@
          standard 4,16 %: CF +23 €, DSCR 1,03, 62 · Solide
          voll     4,61 %: CF −33 €, DSCR 0,96, 53 · Solide
        Die Übergabe in die App trägt denselben Zins (&zins=…).
+       landing-dealcheck-4 · Marcel 12.11.2026 „ja auf 950 ändern": Vorbelegung Kaltmiete
+       880 → 950 €, damit das Beispiel mit dem Vollfinanzierungszins nicht ins Minus kippt.
+       Nachgerechnet mit den echten Kernen in Node (dieselben Zahlen wie oben reproduziert):
+         950 € · standard 4,16 %: CF +81 €, DSCR 1,11, 67 · Solide
+         950 € · voll     4,61 %: CF +25 €, DSCR 1,03, 62 · Solide  (Bruttorendite 7,6 %)
        Kommt kein Zins an, wird KEINER erfunden: dann erscheint ein Feld zum Selbsteintragen.
      · LAGE & MARKT aus /api/v1/market-stats/schnellcheck (v3324, nur eigene amtliche
        Tabellen, 0 € je Abruf — Begründung im Kopf von backend/src/routes/marketStats.js).
