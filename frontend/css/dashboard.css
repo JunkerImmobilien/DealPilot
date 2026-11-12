@@ -1760,3 +1760,7 @@ html body #dashboard-main #dp-stage #dp-dash-objsel option{background:#fff !impo
 }
 /* v3333b · Vermögensbilanz-Objektliste auch am Schreibtisch zweizeilig statt „Ravensberger W…“ (23 px abgeschnitten, gemessen 1024/1280/1440) */
 #dashboard-main #dp-stage .vb-on,#dashboard-main #dp-stage .vb-on small{white-space:normal;overflow:visible;text-overflow:clip;overflow-wrap:anywhere}
+/* v3333c · Kartenkopf (Objektname) über die volle Kartenbreite - die Namensspalte trug noch max-width 150 px und den Rahmen der klebenden Spalte */
+@media(min-width:601px) and (max-width:1279px){
+  #dashboard-main #dp-stage table.zb-ot-tab tbody th,#dashboard-main #dp-stage table.zb-ot-tab tfoot th{max-width:none;min-width:0;width:auto;box-shadow:none;border-right:0 !important;border-top:0 !important;border-left:0 !important}
+}
