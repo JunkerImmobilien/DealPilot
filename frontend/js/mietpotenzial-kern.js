@@ -462,10 +462,29 @@
    *   gedeckelt, obergrenze_qm, bremse_gilt, ungeprueft, text, bestand }
    * Der Vorschlag wird NIE selbst übernommen - das tut der Nutzer je Wohnung.
    */
+  /* v3343 · p.maximum (optional): Ergebnis zielMaximum() des mb-Backends (lib/mietanker.js, Route /mietspiegel
+     ziel_maximum) - das rechtlich vertretbare Maximum der Wohnung bei Neuvermietung (Oberwert × 1,10 mit
+     Mietpreisbremse, × 1,20 ohne). Dann gilt: Vorschlag = min(Marktmiete, Maximum); ohne Marktmiete das Maximum.
+     Die Grenze rechnet NUR das Backend, hier wird nur das Kleinere genommen. */
   function zielmieteVorschlag(p) {
     p = p || {};
-    var wfl = zahl(p.wfl), bq = zahl(p.basis_qm);
+    var wfl = zahl(p.wfl), bq = zahl(p.basis_qm), mx = p.maximum && zahl(p.maximum.neu_max_qm) > 0 ? p.maximum : null;
     if (p.art === 'gewerbe' || !(wfl > 0)) return null;
+    if (mx) {
+      var mq = zahl(mx.neu_max_qm), q2 = bq > 0 ? Math.min(bq, mq) : mq;
+      q2 = Math.round(q2 * 100) / 100;
+      return {
+        qm: q2, monat: Math.round(q2 * wfl * 100) / 100, basis_qm: bq > 0 ? bq : null, maximum_qm: mq,
+        gedeckelt: bq > mq + 0.004, obergrenze_qm: mq, bremse_gilt: mx.bremse_gilt, ungeprueft: mx.bremse_gilt == null,
+        markt_begrenzt: bq > 0 && bq < mq - 0.004, ohne_markt: !(bq > 0),
+        spanne: { konservativ_qm: zahl(mx.konservativ_qm), bestand_max_qm: zahl(mx.bestand_max_qm), maximum_qm: mq, ca: !!mx.ca,
+          bedingung: mx.bedingung || null, texte: mx.texte || [], hinweis: mx.hinweis || null },
+        text: (mx.texte && mx.texte[1]) || '',
+        bestand: p.vermietet
+          ? 'Mieter wohnt: bis zur Neuvermietung gilt die zulässige Miete (' + ((mx.texte && mx.texte[0]) || 'Kappungsgrenze, § 558 BGB') + ')'
+          : 'Leer: die Zielmiete gilt ab der Neuvermietung.'
+      };
+    }
     if (!(bq > 0)) return { fehlt: 'marktmiete' };
     var nv = neuvermietung({ markt_qm: bq, wfl: wfl, vgl_qm: p.vgl_qm, bremse: p.bremse });
     var qm = Math.round(nv.qm * 100) / 100;

@@ -31,6 +31,7 @@ import { MarketAnalysisService } from './MarketAnalysisService.js';   /* v2541 *
 import { marktmiete as amtlicheMiete, klasseAusPunkten, KLASSE_TEXT } from '../lib/mietmodell_nrw.js';   /* v2988 */
 import { MIETBAND } from './CrossCheckService.js';   /* v2988 */
 import { erhoehungspfad558, ausschluss558, kappungFuer } from '../lib/kappung.js';
+import { vergleichsmieteWohnung, bandWohnung, zielMaximum, mietsteigerungRate, fortschreibung } from '../lib/mietanker.js';   /* v3343 */
 import { barwertAbweichung } from '../lib/immowertv.js';   /* v3283 · Mietabweichung je Wohnung mit dem ETW-Zins */
 import { vergleichsfaktor as regVergleichsfaktor } from '../lib/gutachterausschuss.js';   /* v3200 · Aufteilerwert */
 import { regVfEingabe, regVfErgebnis } from '../lib/vergleichsfaktor_eingabe.js';         /* v3200 */
@@ -168,19 +169,26 @@ function bestandsBasis(basis, wl) {
     if (!w || w.art === 'gewerbe' || !(Number(w.wfl) > 0)) return null;
     const wfl = Number(w.wfl);
     const ist = zahl(w.miete_jahr && w.miete_jahr.bestand) || 0;
+    /* v3343 · je Wohnung ihre eigene Vergleichsmiete und ihr Band - dieselbe Rechnung wie CrossCheckService
+       (lib/mietanker.js), nur wenn der Anker des Bestands aus ihr kommt (basis.vgl_kontext) */
+    const vW = basis.vgl_kontext ? vergleichsmieteWohnung(basis.vgl_kontext, wfl) : null;
+    const bW = vW ? bandWohnung(vW) : null;
+    const bandW = bW ? Object.assign({}, band || {}, { anker_qm: bW.anker_qm, unten_qm: bW.unten_qm, oben_qm: bW.oben_qm, spanne: bW.spanne }) : band;
+    const marktW = bW ? bW.anker_qm : markt;
     let qm, herkunft, istQm = null;
     if (ist > 0) {
       istQm = r2(ist / 12 / wfl);
-      const r = mieteNachBand(istQm, band, markt);
+      const r = mieteNachBand(istQm, bandW, marktW);
       qm = r.qm != null ? r.qm : istQm;
       herkunft = herkunftNachBand(r);   /* v2600 · ausserhalb: Anker (ueber_band/unter_band) */
     } else {
-      qm = markt; herkunft = 'leer_marktueblich';
+      qm = marktW; herkunft = 'leer_marktueblich';
     }
     if (!(qm > 0)) return null;
     return { wfl, ist, ist_qm: istQm, qm, herkunft, roh: herkunft === 'ist_im_band' ? ist : qm * wfl * 12,   /* v2541 · im Band die Vertragsmiete */
-             kappe: band && band.oben_qm > 0 ? band.oben_qm * wfl * 12 : Infinity,
-             band, markt };   /* v2936 · fuer die Bandregel der Stufenmiete */
+             kappe: bandW && bandW.oben_qm > 0 ? bandW.oben_qm * wfl * 12 : Infinity,
+             band: bandW, markt: marktW,   /* v2936 · fuer die Bandregel der Stufenmiete */
+             vgl: vW || null, ziel_max: vW ? zielMaximum(vW, basis.bremse, w.bremse_ausnahme) : null };   /* v3343 */
   });
   const summeRoh = zeilen.reduce((a, z) => a + (z ? z.roh : 0), 0);
   if (!(summeRoh > 0) || !(rB > 0)) return null;
@@ -211,9 +219,33 @@ function bestandsBasis(basis, wl) {
  *  (mieteNachModernisierung). Dann gilt die Bandregel gegen DIESES Band - auch fuer die
  *  Ist-Miete einer Wohnung ohne eigene Stufenmiete (der Mieter zahlt sie weiter, nach der
  *  Modernisierung ist sie womoeglich marktueblich) und fuer leere Wohnungen. */
+/* v3343 · ZIELBILD: RECHTMAESSIG ERZIELBAR (ImmoWertA zu § 31: bei Neuvermietung die „rechtmaessig erzielbare"
+   Miete). Das Band des Zielbilds reicht bis zum rechtlichen Maximum der Wohnung (lib/mietanker.js zielMaximum:
+   Oberwert x 1,10 mit Mietpreisbremse, x 1,20 ohne), mindestens bis zur oberen Bandkante des Bestands. Eine
+   Zielmiete darueber zaehlt nur bis zum Maximum - es ist selbst rechtmaessig erzielbar (kein Bandkanten-Ersatz,
+   sondern die gesetzliche Obergrenze). Ohne Vergleichsmiete der Wohnung: wie bisher. */
+function bandZielbild(band, z) {
+  const zm = z && z.ziel_max;
+  if (!band || !zm || !(zm.neu_max_qm > 0)) return null;
+  return Object.assign({}, band, { oben_qm: Math.max(Number(band.oben_qm) || 0, zm.neu_max_qm), recht_max_qm: zm.neu_max_qm });
+}
+function zielRoh(z, mJahr, bandZ) {
+  const q = r2(mJahr / 12 / z.wfl);
+  if (q < bandZ.unten_qm) return null;
+  return q > bandZ.oben_qm ? bandZ.oben_qm * z.wfl * 12 : mJahr;
+}
 function stufenMiete(z, w, s, ov) {
   if (!z) return null;
   if (s === 'bestand') return z.basis;
+  if (s === 'zielbild' && z.ziel_max && z.wfl > 0) {
+    const bandZ = bandZielbild(ov && ov.band ? ov.band : z.band, z);
+    const m0 = zahl(w.miete_jahr && w.miete_jahr[s]);
+    if (bandZ && m0 != null && m0 > 0) {
+      const leer = z.herkunft === 'leer_marktueblich';
+      const roh = zielRoh(z, m0, bandZ);
+      if (roh != null) return z.basis + Math.max(0, roh - (leer ? z.basis : z.roh));
+    }
+  }
   if (ov && ov.band && ov.markt > 0 && z.wfl > 0) {
     const m0 = zahl(w.miete_jahr && w.miete_jahr[s]);
     const leer = z.herkunft === 'leer_marktueblich';
@@ -1067,6 +1099,56 @@ function aufteilerRechnen(wohnungen, jeStufe, haus, kostenEur, stufen) {
   return T;
 }
 
+/* v3343 · Zielbild je Wohnung: welche Miete gilt und warum (Rechenweg, Kundentext nur Punkt und Komma) */
+function zielHerleitung(bb, wlB, mieteZ) {
+  const de = (x) => (x == null ? '-' : (Math.round(x * 100) / 100).toFixed(2).replace('.', ','));
+  return bb.zeilen.map((z, i) => {
+    if (!z) return null;
+    const w = wlB[i] || {}, zm = z.ziel_max, v = z.vgl;
+    const m = mieteZ(z, i);
+    return { nr: w.nr || String(i + 1), wfl: z.wfl, angesetzt_qm: z.wfl > 0 && m != null ? Math.round(m / 12 / z.wfl * 100) / 100 : null,
+      eingabe_qm: zahl(w.miete_jahr && w.miete_jahr.zielbild) > 0 && z.wfl > 0 ? Math.round(zahl(w.miete_jahr.zielbild) / 12 / z.wfl * 100) / 100 : null,
+      vergleichsmiete: v ? { quelle: v.quelle, unten: v.unten, mittel: v.mittel, oben: v.oben, ca: !!v.ca, einordnung: v.einordnung ? v.einordnung.wahl : null } : null,
+      maximum: zm ? { bestand_qm: zm.bestand_max_qm, neu_qm: zm.neu_max_qm, konservativ_qm: zm.konservativ_qm, faktor: zm.faktor, bremse_gilt: zm.bremse_gilt, bedingung: zm.bedingung } : null,
+      satz: zm ? ('Vergleichsmiete ' + (v.ca ? 'ca. ' : '') + de(v.mittel) + ' €/m², Spanne ' + de(v.unten) + ' bis ' + de(v.oben) + ' €/m². Rechtlich erzielbar bei Neuvermietung bis ' + de(zm.neu_max_qm)
+        + ' €/m² (' + (zm.faktor > 1.15 ? '120 % ohne Mietpreisbremse' : '110 % mit Mietpreisbremse') + '). Im Zielbild zählt die Zielmiete bis zu diesem Maximum.') : null };
+  }).filter(Boolean);
+}
+function zielbildPrognose(basis, ref, kB, zb, auftrag) {
+  const st = basis.stichtag ? new Date(basis.stichtag + 'T00:00:00Z') : new Date();
+  const jetzt = st.getUTCFullYear();
+  const zj = Math.round(zahl(auftrag.zielbild_jahr) || 0);
+  if (!(zj > jetzt) || zj > jetzt + 30) return zj && zj <= jetzt ? null : (zj ? null : { verfuegbar: false, grund: 'Zielbild-Jahr nicht eingetragen (Feld „Zielbild fertig (Jahr)“), ohne Jahr keine Prognose.' });
+  const rate = mietsteigerungRate(auftrag.mietsteigerung_pct);
+  if (!rate) return null;
+  const n = zj - jetzt;
+  const f = fortschreibung(rate.pct, n);
+  const ein0 = zb._ein || basis.ein;
+  const ein = Object.assign({}, ein0);
+  const mNeu = Math.round(Number(zb.miete_wohnen_jahr) * f);
+  bwkNachziehen(ein, mNeu);
+  ein.miete_markt_jahr = mNeu;
+  const rndZ = zahl(zb.rnd);
+  /* Ohne Massnahme altert das Gebaeude bis zum Zieljahr (RND - n). Mit Massnahme bleibt die RND des Zielbilds:
+     sie ist nach Anlage 2 ab der Modernisierung gerechnet, und das Zieljahr ist ihr Fertigstellungsjahr. */
+  const altert = !(zahl(zb.mod_punkte_plus) > 0);
+  const rndP = rndZ != null ? (altert ? Math.max(10, Math.round((rndZ - n) * 10) / 10) : rndZ) : null;
+  if (rndP != null) { ein.rnd_jahre = rndP; ein.mod_punkte = null; }
+  const k = ErtragswertService.ertragswert(ein, basis.bodenwert);
+  const z = kernZusammenfassung(k);
+  if (!z || z.wert == null) return null;
+  /* zum Vergleich: dieselbe Miete mit der RND des Zielbilds (nur die Mietentwicklung, ohne Alterung) */
+  let wertGleicheRnd = null;
+  if (altert && rndZ != null && rndP !== rndZ) { const e2 = Object.assign({}, ein, { rnd_jahre: rndZ }); const k2 = kernZusammenfassung(ErtragswertService.ertragswert(e2, basis.bodenwert)); wertGleicheRnd = k2 ? k2.wert : null; }
+  const de = (x) => String(Math.round(x * 1000) / 10).replace('.', ',');
+  return { verfuegbar: true, jahr: zj, jahre: n, rate_pct: rate.pct, rate_quelle: rate.quelle, rate_text: rate.text, faktor: Math.round(f * 10000) / 10000,
+    wert: z.wert, wert_ungerundet: z.wert_ungerundet, rohertrag: z.rohertrag, rnd: z.rnd, miete_wohnen_jahr: mNeu, wert_ohne_alterung: wertGleicheRnd,
+    satz: 'Prognose zum Jahr ' + zj + ': Wohnmiete des Zielbilds fortgeschrieben mit ' + rate.text + ', Faktor ' + String(Math.round(f * 1000) / 1000).replace('.', ',')
+      + '. Vergleichsmiete, Spanne und die Grenzen der Neuvermietung wandern mit demselben Faktor. Liegenschaftszins und Bodenwert wie heute, Bewirtschaftungskosten mit gleicher Quote, Restnutzungsdauer '
+      + (rndP != null ? String(rndP).replace('.', ',') + ' Jahre' + (altert ? ' (das Gebäude ist ' + n + ' Jahre älter)' : ' (ab Fertigstellung der Maßnahmen im Zieljahr)') : 'wie im Zielbild')
+      + '. Eine Prognose, kein Verkehrswert. Mietanstieg ' + de(f - 1) + ' % bis ' + zj + '.' };
+}
+
 export const PotenzialService = {
   KENNZEICHNUNG,
 
@@ -1185,6 +1267,23 @@ export const PotenzialService = {
         z.miete_nach_modernisierung = MNM[v.key] ? MNM[v.key].info : null;   /* v2988 */
         out.haus[v.key] = z;
       }
+    }
+    /* v3343 · Herleitung der Zielbild-Miete je Wohnung (Vergleichsmiete, Spanne, rechtliches Maximum) */
+    if (out.haus.zielbild && bb) {
+      out.haus.zielbild.miete_herleitung = zielHerleitung(bb, wlB, (z, i) => mieteStufe(z, i, 'zielbild'));
+    }
+    /* ── v3343 · PROGNOSE ZUM ZIELBILD-JAHR (Marcel 12.11.2026 abends) ─────────────────────────────
+       Getrennt vom heutigen Ertragswert (Stichtag heute, modellkonform): die Wohnmiete des Zielbilds wird mit
+       der Rate (lib/mietanker.js mietsteigerungRate) auf das Zieljahr fortgeschrieben - Vergleichsmiete, Spanne
+       und die Grenzen 110 %/120 % wandern mit demselben Faktor, das rechtliche Maximum also auch.
+       Entscheidungen: Liegenschaftszins und Bodenwert bleiben (keine Prognose von Marktzinsen); die
+       Bewirtschaftungskosten bleiben als QUOTE am Rohertrag stehen (bwkNachziehen) - sie steigen damit mit der
+       Miete, fuer Instandhaltung und Verwaltung (VPI-Fortschreibung, II. BV § 26 Abs. 4/§ 28 Abs. 5a) liegt
+       die Rate in derselben Groessenordnung; die Restnutzungsdauer nimmt bis zum Zieljahr um die Jahre ab
+       (das Gebaeude altert), nie unter 10 Jahre. Nie Verkehrswert. */
+    if (out.haus.zielbild && out.haus.zielbild.wert != null) {
+      try { const pg = zielbildPrognose(basis, ref, kB, out.haus.zielbild, auftrag); if (pg) out.haus.zielbild_prognose = pg; }
+      catch (e) { console.log('[potenzial] prognose: ' + e.message); }
     }
     /* ── v2541 · Marktpreisindikation je Stufe (zwei Wege, s. o.) ─────────── */
     {
@@ -1500,3 +1599,4 @@ export { stufeNeuvermietung as _stufeNeuvermietung };   /* v3152 · Pruefer B62 
 export { etwAusAbruf as _etwAusAbruf, etwNiveauAusAbruf as _etwNiveauAusAbruf, aufteilerBezeichnung as _aufteilerBezeichnung, aufteilerRechnen as _aufteilerRechnen };   /* v3322 · B66 */   /* v3265 · Pruefer B63 */
 /* v2988 · fuer Knotenprobe und Pruefer: Miete nach Modernisierung, Stufenmiete, Bestandsbasis */
 export { mieteNachModernisierung as _mieteNachModernisierung, stufenMiete as _stufenMiete, bestandsBasis as _bestandsBasis };
+export { zielbildPrognose as _zielbildPrognose, bandZielbild as _bandZielbild };   /* v3343 · Pruefer B70 */

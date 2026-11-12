@@ -482,6 +482,8 @@ export const DealPilotObjectMapper = {
          Vorgabe der Nachschlagetabelle) — nur die Aussagekraft sagt jetzt
          ehrlich, dass er fehlt. */
       condition: pick(d, ['ds2_zustand', 'zustand']) || null,
+      /* v3343 · Mikrolage fuer die Einordnung in die Mietspiegel-Spanne (lib/mietanker.js einordnung) */
+      mikrolage: pick(d, ['mikrolage']) || null,
       /* v1444: ValuationService liest ref.quality - hier kam die Ausstattung nur als
          `ausstattung` an, der Qualitaetsfaktor griff auf dem Objektweg nie. */
       quality: qualityAus(d),   /* v1851: aus `ausst` ODER aus der Standardstufe */

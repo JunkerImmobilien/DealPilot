@@ -1722,6 +1722,51 @@ for (const [name, fall] of Object.entries(C.faelle || {})) {
   } catch (err) { pruefe('C', name, 'Lauf', false, 'Ausnahme: ' + err.message); }
 }
 
+/* ══ v3343 · B70 · PROGNOSE ZUM ZIELBILD-JAHR (lib/mietanker.js, PotenzialService zielbildPrognose) ══
+   Uhr fest auf 21.10.2026 -> Zieljahr 2030 = 4 Jahre. Mit eigener Mietsteigerung 2 %: Wohnmiete × 1,02^4.
+   Formularvorgabe 3,0 %: Index der Nettokaltmieten (2020-2025). Ohne Massnahme altert die RND um 4 Jahre. */
+fallB('B70', () => {
+  if (!PSM || typeof PSM._zielbildPrognose !== 'function') return pruefe('B', 'B70', 'PotenzialService._zielbildPrognose geladen', false, psGrund || 'fehlt');
+  const r = ccFall('demo'), basis = r && r._ertragswertEingabe;
+  if (!basis) return pruefe('B', 'B70', 'Ertragswert-Eingabe demo', false, 'fehlt');
+  const kB = ertragswert(Object.assign({}, basis.ein), basis.bodenwert);
+  const zb = PSM._eineStufe(basis, {}, kB, Math.round(basis.ein.miete_markt_jahr * 1.1), 0, 0);
+  const st = basis.stichtag ? Number(String(basis.stichtag).slice(0, 4)) : 2026;
+  const pg = PSM._zielbildPrognose(basis, {}, kB, zb, { zielbild_jahr: st + 4, mietsteigerung_pct: 2 });
+  wert('B', 'B70', 'Miete Zieljahr = Zielbild × 1,02^4', pg ? pg.miete_wohnen_jahr : null, Math.round(zb.miete_wohnen_jahr * Math.pow(1.02, 4)), 1);
+  pruefe('B', 'B70', 'Rate eigen 2 %, Faktor 1,0824', !!pg && pg.rate_quelle === 'eigen' && Math.abs(pg.faktor - 1.0824) < 0.0001, pg && pg.rate_text);
+  wert('B', 'B70', 'RND altert um 4 Jahre (ohne Maßnahme)', pg ? pg.rnd : null, Math.max(10, Math.round((zb.rnd - 4) * 10) / 10), 0.05);
+  pruefe('B', 'B70', 'Prognose ohne Alterung > Zielbild heute (nur Mietentwicklung)', !!pg && pg.wert_ohne_alterung > zb.wert, pg && pg.wert_ohne_alterung + ' > ' + zb.wert);
+  pruefe('B', 'B70', 'Satz nennt Prognose, Rate und „kein Verkehrswert", ohne Semikolon', !!pg && /Prognose zum Jahr/.test(pg.satz) && /kein Verkehrswert/.test(pg.satz) && !/;/.test(pg.satz), pg && pg.satz.slice(0, 120));
+  const pI = PSM._zielbildPrognose(basis, {}, kB, zb, { zielbild_jahr: st + 4, mietsteigerung_pct: 3.0 });
+  pruefe('B', 'B70', 'Formularvorgabe 3,0 % → Index der Nettokaltmieten 1,81 %', !!pI && pI.rate_quelle === 'nkm_index' && Math.abs(pI.rate_pct - 1.81) < 0.001, pI && pI.rate_text);
+  const pO = PSM._zielbildPrognose(basis, {}, kB, zb, {});
+  pruefe('B', 'B70', 'ohne Zielbild-Jahr keine Prognose, mit Grund', !!pO && pO.verfuegbar === false && /Zielbild-Jahr/.test(pO.grund));
+  const zbM = Object.assign({}, zb, { mod_punkte_plus: 4 });
+  Object.defineProperty(zbM, '_ein', { value: zb._ein, enumerable: false });
+  const pM = PSM._zielbildPrognose(basis, {}, kB, zbM, { zielbild_jahr: st + 4, mietsteigerung_pct: 2 });
+  wert('B', 'B70', 'mit Maßnahme bleibt die RND des Zielbilds', pM ? pM.rnd : null, zb.rnd, 0.05);
+});
+
+/* ══ v3343 · C2 · ANKER = VERGLEICHSMIETE DER WOHNUNG — ALT → NEU (Entscheidung offen, bis Marcel neu einfriert) ══
+   Die eingefrorenen Argumente der Ebene C tragen keinen vergleichsmiete_kontext (der kommt im Orchestrator aus
+   Dateien und mb.zensus_werte). Hier wird er offline gebaut (Mietspiegel-Werte, Naeherung mit
+   tools/mietanker-zensus.json) und der Ertragswert neben den eingefrorenen gestellt. */
+try {
+  const MA = await lade('lib/mietanker.js'), MW = await lade('lib/mietspiegel/werte.js'), MN = await lade('lib/mietspiegel/naeherung.js'), MK = await lade('lib/kappung.js');
+  const ZZ = JSON.parse(fs.readFileSync(path.join(WURZEL, 'tools/mietanker-zensus.json'), 'utf8'));
+  for (const [name, fall] of Object.entries(C.faelle || {})) {
+    const a = mitSatz(klon(fall.argumente)), ref = a[0], ags = String(ref.ags || '');
+    let w = MW.werteFuer(ags); if (w && w.freigabe === 'gesperrt') w = null;
+    a[4].vergleichsmiete_kontext = { ags, werte: w, naeherung_param: w ? null : MN.naeherungParameter(), zensus_zeilen: w ? null : (ZZ.gemeinden[ags] || null), baujahr: ref.build_year,
+      signale: MA.signaleAus({ standardstufe: ref.standardstufe, mikrolage: ref.mikrolage, mod_punkte: ref.mod_punkte, baujahr: ref.build_year, zustand: ref.condition }, 2026),
+      bremse: MK.mietpreisbremseFuer(ags, new Date('2026-11-12')) };
+    const neu = auszug(compute(...a)), alt = fall.soll.ertragswert;
+    if (alt == null && neu.ertragswert == null) continue;
+    if (alt !== neu.ertragswert) offen('C', 'C2-' + name, 'Ertragswert ' + alt + ' → ' + neu.ertragswert + ' (Anker Vergleichsmiete der Wohnung, v3343; Rohertrag ' + fall.soll.rohertrag + ' → ' + neu.rohertrag + ')');
+  }
+} catch (e) { hinweise.push('C2 nicht gelaufen: ' + e.message); }
+
 /* ══ AUSGABE ═════════════════════════════════════════════════════════ */
 if (ALLE) detail.forEach((z) => console.log(z));
 const titel = { A: 'amtliche Anwendungsbeispiele', B: 'Prompt-Testfälle 1–11', C: 'Demo-Objekte (eingefroren ' + (C.stand || '–') + ')' };

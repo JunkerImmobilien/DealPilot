@@ -528,7 +528,8 @@
     var band = ew.miete_band || cc.miete_band || null, ms = ew.miete_stufe || null;
     var wfl = zahl(fv('wfl')), nkm = zahl(fv('nkm')), ist = (wfl && nkm) ? nkm / wfl : null;
     var anker = ms ? zahl(ms.qm) : (band ? zahl(band.anker_qm) : null);
-    var quelle = (ms && ms.code === 'amtlich') ? 'des Gutachterausschusses' : (ms && ms.code === 'zensus') ? 'laut Zensus' : 'im Bericht';
+    var quelle = (ms && ms.code === 'amtlich') ? 'des Gutachterausschusses' : (ms && ms.code === 'zensus') ? 'laut Zensus'
+      : (ms && ms.code === 'mietspiegel') ? 'laut Mietspiegel' : (ms && ms.code === 'naeherung') ? 'laut DealPilot-Näherung' : 'im Bericht';   /* v3343 · Anker Vergleichsmiete der Wohnung */
     if (ist != null && anker) {
       var oben = band ? zahl(band.oben_qm) : null, unten = band ? zahl(band.unten_qm) : null;
       if (unten != null && ist < unten) H.push({ satz: 'Deine Ist-Miete (' + qm(ist) + ') liegt ' + pct(ist, anker) + ' % unter der marktüblichen Miete ' + quelle + ' (' + qm(anker) + ') — Mieterhöhung prüfen.',

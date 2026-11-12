@@ -1,0 +1,985 @@
+{
+ "_zweck": "v3343 · Zensus-2022-Zeilen (mb.zensus_werte, ebene gemeinde, nettokaltmiete_qm) der Demo-Gemeinden, gelesen 12.11.2026 von Staging, fuer die Pruefer ohne Datenbank",
+ "stand": "2026-11-12",
+ "lizenz": "© Statistische Ämter des Bundes und der Länder, Zensus 2022, dl-de/by-2-0",
+ "gemeinden": {
+  "05711000": [
+   {
+    "dimension": "gesamt",
+    "auspraegung": "INSGESAMT",
+    "auspraegung_text": null,
+    "wert": 7.12,
+    "gebiet_name": "Bielefeld, Stadt"
+   },
+   {
+    "dimension": "baujahr",
+    "auspraegung": "BAU0000B1918",
+    "auspraegung_text": "Vor 1919",
+    "wert": 7.05,
+    "gebiet_name": "Bielefeld, Stadt"
+   },
+   {
+    "dimension": "baujahr",
+    "auspraegung": "BAU1919B1949",
+    "auspraegung_text": "1919 - 1949",
+    "wert": 6.82,
+    "gebiet_name": "Bielefeld, Stadt"
+   },
+   {
+    "dimension": "baujahr",
+    "auspraegung": "BAU1950B1959",
+    "auspraegung_text": "1950 - 1959",
+    "wert": 7.28,
+    "gebiet_name": "Bielefeld, Stadt"
+   },
+   {
+    "dimension": "baujahr",
+    "auspraegung": "BAU1960B1969",
+    "auspraegung_text": "1960 - 1969",
+    "wert": 6.93,
+    "gebiet_name": "Bielefeld, Stadt"
+   },
+   {
+    "dimension": "baujahr",
+    "auspraegung": "BAU1970B1979",
+    "auspraegung_text": "1970 - 1979",
+    "wert": 6.62,
+    "gebiet_name": "Bielefeld, Stadt"
+   },
+   {
+    "dimension": "baujahr",
+    "auspraegung": "BAU1980B1989",
+    "auspraegung_text": "1980 - 1989",
+    "wert": 6.67,
+    "gebiet_name": "Bielefeld, Stadt"
+   },
+   {
+    "dimension": "baujahr",
+    "auspraegung": "BAU1990B1999",
+    "auspraegung_text": "1990 - 1999",
+    "wert": 7.48,
+    "gebiet_name": "Bielefeld, Stadt"
+   },
+   {
+    "dimension": "baujahr",
+    "auspraegung": "BAU2000B2009",
+    "auspraegung_text": "2000 - 2009",
+    "wert": 7.17,
+    "gebiet_name": "Bielefeld, Stadt"
+   },
+   {
+    "dimension": "baujahr",
+    "auspraegung": "BAU2010B2015",
+    "auspraegung_text": "2010 - 2015",
+    "wert": 8.18,
+    "gebiet_name": "Bielefeld, Stadt"
+   },
+   {
+    "dimension": "baujahr",
+    "auspraegung": "BAU2016BXXXX",
+    "auspraegung_text": "2016 und später",
+    "wert": 9.35,
+    "gebiet_name": "Bielefeld, Stadt"
+   },
+   {
+    "dimension": "baujahr",
+    "auspraegung": "INSGESAMT",
+    "auspraegung_text": "Insgesamt",
+    "wert": 7.12,
+    "gebiet_name": "Bielefeld, Stadt"
+   },
+   {
+    "dimension": "flaeche",
+    "auspraegung": "INSGESAMT",
+    "auspraegung_text": "Insgesamt",
+    "wert": 7.12,
+    "gebiet_name": "Bielefeld, Stadt"
+   },
+   {
+    "dimension": "flaeche",
+    "auspraegung": "WFL000B039",
+    "auspraegung_text": "Unter 40 m²",
+    "wert": 9.28,
+    "gebiet_name": "Bielefeld, Stadt"
+   },
+   {
+    "dimension": "flaeche",
+    "auspraegung": "WFL040B059",
+    "auspraegung_text": "40 - 59 m²",
+    "wert": 7.34,
+    "gebiet_name": "Bielefeld, Stadt"
+   },
+   {
+    "dimension": "flaeche",
+    "auspraegung": "WFL060B079",
+    "auspraegung_text": "60 - 79 m²",
+    "wert": 6.81,
+    "gebiet_name": "Bielefeld, Stadt"
+   },
+   {
+    "dimension": "flaeche",
+    "auspraegung": "WFL080B099",
+    "auspraegung_text": "80 - 99 m²",
+    "wert": 6.64,
+    "gebiet_name": "Bielefeld, Stadt"
+   },
+   {
+    "dimension": "flaeche",
+    "auspraegung": "WFL100B119",
+    "auspraegung_text": "100 - 119 m²",
+    "wert": 6.73,
+    "gebiet_name": "Bielefeld, Stadt"
+   },
+   {
+    "dimension": "flaeche",
+    "auspraegung": "WFL120B139",
+    "auspraegung_text": "120 - 139 m²",
+    "wert": 6.79,
+    "gebiet_name": "Bielefeld, Stadt"
+   },
+   {
+    "dimension": "flaeche",
+    "auspraegung": "WFL140B159",
+    "auspraegung_text": "140 - 159 m²",
+    "wert": 6.73,
+    "gebiet_name": "Bielefeld, Stadt"
+   },
+   {
+    "dimension": "flaeche",
+    "auspraegung": "WFL160B179",
+    "auspraegung_text": "160 - 179 m²",
+    "wert": 6.49,
+    "gebiet_name": "Bielefeld, Stadt"
+   },
+   {
+    "dimension": "flaeche",
+    "auspraegung": "WFL180B199",
+    "auspraegung_text": "180 - 199 m²",
+    "wert": 6.47,
+    "gebiet_name": "Bielefeld, Stadt"
+   },
+   {
+    "dimension": "flaeche",
+    "auspraegung": "WFL200BXXX",
+    "auspraegung_text": "200 m² und mehr",
+    "wert": 5.67,
+    "gebiet_name": "Bielefeld, Stadt"
+   }
+  ],
+  "05758004": [
+   {
+    "dimension": "gesamt",
+    "auspraegung": "INSGESAMT",
+    "auspraegung_text": null,
+    "wert": 5.67,
+    "gebiet_name": "Bünde, Stadt"
+   },
+   {
+    "dimension": "baujahr",
+    "auspraegung": "BAU0000B1918",
+    "auspraegung_text": "Vor 1919",
+    "wert": 5.12,
+    "gebiet_name": "Bünde, Stadt"
+   },
+   {
+    "dimension": "baujahr",
+    "auspraegung": "BAU1919B1949",
+    "auspraegung_text": "1919 - 1949",
+    "wert": 5.24,
+    "gebiet_name": "Bünde, Stadt"
+   },
+   {
+    "dimension": "baujahr",
+    "auspraegung": "BAU1950B1959",
+    "auspraegung_text": "1950 - 1959",
+    "wert": 5.56,
+    "gebiet_name": "Bünde, Stadt"
+   },
+   {
+    "dimension": "baujahr",
+    "auspraegung": "BAU1960B1969",
+    "auspraegung_text": "1960 - 1969",
+    "wert": 5.43,
+    "gebiet_name": "Bünde, Stadt"
+   },
+   {
+    "dimension": "baujahr",
+    "auspraegung": "BAU1970B1979",
+    "auspraegung_text": "1970 - 1979",
+    "wert": 5.54,
+    "gebiet_name": "Bünde, Stadt"
+   },
+   {
+    "dimension": "baujahr",
+    "auspraegung": "BAU1980B1989",
+    "auspraegung_text": "1980 - 1989",
+    "wert": 5.76,
+    "gebiet_name": "Bünde, Stadt"
+   },
+   {
+    "dimension": "baujahr",
+    "auspraegung": "BAU1990B1999",
+    "auspraegung_text": "1990 - 1999",
+    "wert": 5.6,
+    "gebiet_name": "Bünde, Stadt"
+   },
+   {
+    "dimension": "baujahr",
+    "auspraegung": "BAU2000B2009",
+    "auspraegung_text": "2000 - 2009",
+    "wert": 6.38,
+    "gebiet_name": "Bünde, Stadt"
+   },
+   {
+    "dimension": "baujahr",
+    "auspraegung": "BAU2010B2015",
+    "auspraegung_text": "2010 - 2015",
+    "wert": 6.6,
+    "gebiet_name": "Bünde, Stadt"
+   },
+   {
+    "dimension": "baujahr",
+    "auspraegung": "BAU2016BXXXX",
+    "auspraegung_text": "2016 und später",
+    "wert": 8.11,
+    "gebiet_name": "Bünde, Stadt"
+   },
+   {
+    "dimension": "baujahr",
+    "auspraegung": "INSGESAMT",
+    "auspraegung_text": "Insgesamt",
+    "wert": 5.67,
+    "gebiet_name": "Bünde, Stadt"
+   },
+   {
+    "dimension": "flaeche",
+    "auspraegung": "INSGESAMT",
+    "auspraegung_text": "Insgesamt",
+    "wert": 5.67,
+    "gebiet_name": "Bünde, Stadt"
+   },
+   {
+    "dimension": "flaeche",
+    "auspraegung": "WFL000B039",
+    "auspraegung_text": "Unter 40 m²",
+    "wert": 6.91,
+    "gebiet_name": "Bünde, Stadt"
+   },
+   {
+    "dimension": "flaeche",
+    "auspraegung": "WFL040B059",
+    "auspraegung_text": "40 - 59 m²",
+    "wert": 6.03,
+    "gebiet_name": "Bünde, Stadt"
+   },
+   {
+    "dimension": "flaeche",
+    "auspraegung": "WFL060B079",
+    "auspraegung_text": "60 - 79 m²",
+    "wert": 5.75,
+    "gebiet_name": "Bünde, Stadt"
+   },
+   {
+    "dimension": "flaeche",
+    "auspraegung": "WFL080B099",
+    "auspraegung_text": "80 - 99 m²",
+    "wert": 5.58,
+    "gebiet_name": "Bünde, Stadt"
+   },
+   {
+    "dimension": "flaeche",
+    "auspraegung": "WFL100B119",
+    "auspraegung_text": "100 - 119 m²",
+    "wert": 5.27,
+    "gebiet_name": "Bünde, Stadt"
+   },
+   {
+    "dimension": "flaeche",
+    "auspraegung": "WFL120B139",
+    "auspraegung_text": "120 - 139 m²",
+    "wert": 5.23,
+    "gebiet_name": "Bünde, Stadt"
+   },
+   {
+    "dimension": "flaeche",
+    "auspraegung": "WFL140B159",
+    "auspraegung_text": "140 - 159 m²",
+    "wert": 4.86,
+    "gebiet_name": "Bünde, Stadt"
+   },
+   {
+    "dimension": "flaeche",
+    "auspraegung": "WFL160B179",
+    "auspraegung_text": "160 - 179 m²",
+    "wert": 4.52,
+    "gebiet_name": "Bünde, Stadt"
+   },
+   {
+    "dimension": "flaeche",
+    "auspraegung": "WFL180B199",
+    "auspraegung_text": "180 - 199 m²",
+    "wert": 4.31,
+    "gebiet_name": "Bünde, Stadt"
+   },
+   {
+    "dimension": "flaeche",
+    "auspraegung": "WFL200BXXX",
+    "auspraegung_text": "200 m² und mehr",
+    "wert": 3.69,
+    "gebiet_name": "Bünde, Stadt"
+   }
+  ],
+  "05758012": [
+   {
+    "dimension": "gesamt",
+    "auspraegung": "INSGESAMT",
+    "auspraegung_text": null,
+    "wert": 5.78,
+    "gebiet_name": "Herford, Hansestadt"
+   },
+   {
+    "dimension": "baujahr",
+    "auspraegung": "BAU0000B1918",
+    "auspraegung_text": "Vor 1919",
+    "wert": 5.55,
+    "gebiet_name": "Herford, Hansestadt"
+   },
+   {
+    "dimension": "baujahr",
+    "auspraegung": "BAU1919B1949",
+    "auspraegung_text": "1919 - 1949",
+    "wert": 5.8,
+    "gebiet_name": "Herford, Hansestadt"
+   },
+   {
+    "dimension": "baujahr",
+    "auspraegung": "BAU1950B1959",
+    "auspraegung_text": "1950 - 1959",
+    "wert": 6.05,
+    "gebiet_name": "Herford, Hansestadt"
+   },
+   {
+    "dimension": "baujahr",
+    "auspraegung": "BAU1960B1969",
+    "auspraegung_text": "1960 - 1969",
+    "wert": 5.66,
+    "gebiet_name": "Herford, Hansestadt"
+   },
+   {
+    "dimension": "baujahr",
+    "auspraegung": "BAU1970B1979",
+    "auspraegung_text": "1970 - 1979",
+    "wert": 5.37,
+    "gebiet_name": "Herford, Hansestadt"
+   },
+   {
+    "dimension": "baujahr",
+    "auspraegung": "BAU1980B1989",
+    "auspraegung_text": "1980 - 1989",
+    "wert": 5.59,
+    "gebiet_name": "Herford, Hansestadt"
+   },
+   {
+    "dimension": "baujahr",
+    "auspraegung": "BAU1990B1999",
+    "auspraegung_text": "1990 - 1999",
+    "wert": 5.84,
+    "gebiet_name": "Herford, Hansestadt"
+   },
+   {
+    "dimension": "baujahr",
+    "auspraegung": "BAU2000B2009",
+    "auspraegung_text": "2000 - 2009",
+    "wert": 6.12,
+    "gebiet_name": "Herford, Hansestadt"
+   },
+   {
+    "dimension": "baujahr",
+    "auspraegung": "BAU2010B2015",
+    "auspraegung_text": "2010 - 2015",
+    "wert": 7.31,
+    "gebiet_name": "Herford, Hansestadt"
+   },
+   {
+    "dimension": "baujahr",
+    "auspraegung": "BAU2016BXXXX",
+    "auspraegung_text": "2016 und später",
+    "wert": 8.27,
+    "gebiet_name": "Herford, Hansestadt"
+   },
+   {
+    "dimension": "baujahr",
+    "auspraegung": "INSGESAMT",
+    "auspraegung_text": "Insgesamt",
+    "wert": 5.78,
+    "gebiet_name": "Herford, Hansestadt"
+   },
+   {
+    "dimension": "flaeche",
+    "auspraegung": "INSGESAMT",
+    "auspraegung_text": "Insgesamt",
+    "wert": 5.78,
+    "gebiet_name": "Herford, Hansestadt"
+   },
+   {
+    "dimension": "flaeche",
+    "auspraegung": "WFL000B039",
+    "auspraegung_text": "Unter 40 m²",
+    "wert": 7.38,
+    "gebiet_name": "Herford, Hansestadt"
+   },
+   {
+    "dimension": "flaeche",
+    "auspraegung": "WFL040B059",
+    "auspraegung_text": "40 - 59 m²",
+    "wert": 6.05,
+    "gebiet_name": "Herford, Hansestadt"
+   },
+   {
+    "dimension": "flaeche",
+    "auspraegung": "WFL060B079",
+    "auspraegung_text": "60 - 79 m²",
+    "wert": 5.6,
+    "gebiet_name": "Herford, Hansestadt"
+   },
+   {
+    "dimension": "flaeche",
+    "auspraegung": "WFL080B099",
+    "auspraegung_text": "80 - 99 m²",
+    "wert": 5.59,
+    "gebiet_name": "Herford, Hansestadt"
+   },
+   {
+    "dimension": "flaeche",
+    "auspraegung": "WFL100B119",
+    "auspraegung_text": "100 - 119 m²",
+    "wert": 5.56,
+    "gebiet_name": "Herford, Hansestadt"
+   },
+   {
+    "dimension": "flaeche",
+    "auspraegung": "WFL120B139",
+    "auspraegung_text": "120 - 139 m²",
+    "wert": 5.56,
+    "gebiet_name": "Herford, Hansestadt"
+   },
+   {
+    "dimension": "flaeche",
+    "auspraegung": "WFL140B159",
+    "auspraegung_text": "140 - 159 m²",
+    "wert": 5.68,
+    "gebiet_name": "Herford, Hansestadt"
+   },
+   {
+    "dimension": "flaeche",
+    "auspraegung": "WFL160B179",
+    "auspraegung_text": "160 - 179 m²",
+    "wert": 5.1,
+    "gebiet_name": "Herford, Hansestadt"
+   },
+   {
+    "dimension": "flaeche",
+    "auspraegung": "WFL180B199",
+    "auspraegung_text": "180 - 199 m²",
+    "wert": 5.14,
+    "gebiet_name": "Herford, Hansestadt"
+   },
+   {
+    "dimension": "flaeche",
+    "auspraegung": "WFL200BXXX",
+    "auspraegung_text": "200 m² und mehr",
+    "wert": 4.66,
+    "gebiet_name": "Herford, Hansestadt"
+   }
+  ],
+  "05758016": [
+   {
+    "dimension": "gesamt",
+    "auspraegung": "INSGESAMT",
+    "auspraegung_text": null,
+    "wert": 5.31,
+    "gebiet_name": "Hiddenhausen"
+   },
+   {
+    "dimension": "baujahr",
+    "auspraegung": "BAU0000B1918",
+    "auspraegung_text": "Vor 1919",
+    "wert": 5.07,
+    "gebiet_name": "Hiddenhausen"
+   },
+   {
+    "dimension": "baujahr",
+    "auspraegung": "BAU1919B1949",
+    "auspraegung_text": "1919 - 1949",
+    "wert": 4.9,
+    "gebiet_name": "Hiddenhausen"
+   },
+   {
+    "dimension": "baujahr",
+    "auspraegung": "BAU1950B1959",
+    "auspraegung_text": "1950 - 1959",
+    "wert": 5,
+    "gebiet_name": "Hiddenhausen"
+   },
+   {
+    "dimension": "baujahr",
+    "auspraegung": "BAU1960B1969",
+    "auspraegung_text": "1960 - 1969",
+    "wert": 5.27,
+    "gebiet_name": "Hiddenhausen"
+   },
+   {
+    "dimension": "baujahr",
+    "auspraegung": "BAU1970B1979",
+    "auspraegung_text": "1970 - 1979",
+    "wert": 5.1,
+    "gebiet_name": "Hiddenhausen"
+   },
+   {
+    "dimension": "baujahr",
+    "auspraegung": "BAU1980B1989",
+    "auspraegung_text": "1980 - 1989",
+    "wert": 5.54,
+    "gebiet_name": "Hiddenhausen"
+   },
+   {
+    "dimension": "baujahr",
+    "auspraegung": "BAU1990B1999",
+    "auspraegung_text": "1990 - 1999",
+    "wert": 5.36,
+    "gebiet_name": "Hiddenhausen"
+   },
+   {
+    "dimension": "baujahr",
+    "auspraegung": "BAU2000B2009",
+    "auspraegung_text": "2000 - 2009",
+    "wert": 5.76,
+    "gebiet_name": "Hiddenhausen"
+   },
+   {
+    "dimension": "baujahr",
+    "auspraegung": "BAU2010B2015",
+    "auspraegung_text": "2010 - 2015",
+    "wert": 6.14,
+    "gebiet_name": "Hiddenhausen"
+   },
+   {
+    "dimension": "baujahr",
+    "auspraegung": "BAU2016BXXXX",
+    "auspraegung_text": "2016 und später",
+    "wert": 7.23,
+    "gebiet_name": "Hiddenhausen"
+   },
+   {
+    "dimension": "baujahr",
+    "auspraegung": "INSGESAMT",
+    "auspraegung_text": "Insgesamt",
+    "wert": 5.31,
+    "gebiet_name": "Hiddenhausen"
+   },
+   {
+    "dimension": "flaeche",
+    "auspraegung": "INSGESAMT",
+    "auspraegung_text": "Insgesamt",
+    "wert": 5.31,
+    "gebiet_name": "Hiddenhausen"
+   },
+   {
+    "dimension": "flaeche",
+    "auspraegung": "WFL000B039",
+    "auspraegung_text": "Unter 40 m²",
+    "wert": 7.36,
+    "gebiet_name": "Hiddenhausen"
+   },
+   {
+    "dimension": "flaeche",
+    "auspraegung": "WFL040B059",
+    "auspraegung_text": "40 - 59 m²",
+    "wert": 5.79,
+    "gebiet_name": "Hiddenhausen"
+   },
+   {
+    "dimension": "flaeche",
+    "auspraegung": "WFL060B079",
+    "auspraegung_text": "60 - 79 m²",
+    "wert": 5.2,
+    "gebiet_name": "Hiddenhausen"
+   },
+   {
+    "dimension": "flaeche",
+    "auspraegung": "WFL080B099",
+    "auspraegung_text": "80 - 99 m²",
+    "wert": 5.19,
+    "gebiet_name": "Hiddenhausen"
+   },
+   {
+    "dimension": "flaeche",
+    "auspraegung": "WFL100B119",
+    "auspraegung_text": "100 - 119 m²",
+    "wert": 5.3,
+    "gebiet_name": "Hiddenhausen"
+   },
+   {
+    "dimension": "flaeche",
+    "auspraegung": "WFL120B139",
+    "auspraegung_text": "120 - 139 m²",
+    "wert": 5.05,
+    "gebiet_name": "Hiddenhausen"
+   },
+   {
+    "dimension": "flaeche",
+    "auspraegung": "WFL140B159",
+    "auspraegung_text": "140 - 159 m²",
+    "wert": 4.67,
+    "gebiet_name": "Hiddenhausen"
+   },
+   {
+    "dimension": "flaeche",
+    "auspraegung": "WFL160B179",
+    "auspraegung_text": "160 - 179 m²",
+    "wert": 4.31,
+    "gebiet_name": "Hiddenhausen"
+   },
+   {
+    "dimension": "flaeche",
+    "auspraegung": "WFL180B199",
+    "auspraegung_text": "180 - 199 m²",
+    "wert": 4.62,
+    "gebiet_name": "Hiddenhausen"
+   },
+   {
+    "dimension": "flaeche",
+    "auspraegung": "WFL200BXXX",
+    "auspraegung_text": "200 m² und mehr",
+    "wert": 4.45,
+    "gebiet_name": "Hiddenhausen"
+   }
+  ],
+  "05766020": [
+   {
+    "dimension": "gesamt",
+    "auspraegung": "INSGESAMT",
+    "auspraegung_text": null,
+    "wert": 6.09,
+    "gebiet_name": "Detmold, Stadt"
+   },
+   {
+    "dimension": "baujahr",
+    "auspraegung": "BAU0000B1918",
+    "auspraegung_text": "Vor 1919",
+    "wert": 6.24,
+    "gebiet_name": "Detmold, Stadt"
+   },
+   {
+    "dimension": "baujahr",
+    "auspraegung": "BAU1919B1949",
+    "auspraegung_text": "1919 - 1949",
+    "wert": 5.81,
+    "gebiet_name": "Detmold, Stadt"
+   },
+   {
+    "dimension": "baujahr",
+    "auspraegung": "BAU1950B1959",
+    "auspraegung_text": "1950 - 1959",
+    "wert": 5.92,
+    "gebiet_name": "Detmold, Stadt"
+   },
+   {
+    "dimension": "baujahr",
+    "auspraegung": "BAU1960B1969",
+    "auspraegung_text": "1960 - 1969",
+    "wert": 5.87,
+    "gebiet_name": "Detmold, Stadt"
+   },
+   {
+    "dimension": "baujahr",
+    "auspraegung": "BAU1970B1979",
+    "auspraegung_text": "1970 - 1979",
+    "wert": 5.75,
+    "gebiet_name": "Detmold, Stadt"
+   },
+   {
+    "dimension": "baujahr",
+    "auspraegung": "BAU1980B1989",
+    "auspraegung_text": "1980 - 1989",
+    "wert": 5.97,
+    "gebiet_name": "Detmold, Stadt"
+   },
+   {
+    "dimension": "baujahr",
+    "auspraegung": "BAU1990B1999",
+    "auspraegung_text": "1990 - 1999",
+    "wert": 5.98,
+    "gebiet_name": "Detmold, Stadt"
+   },
+   {
+    "dimension": "baujahr",
+    "auspraegung": "BAU2000B2009",
+    "auspraegung_text": "2000 - 2009",
+    "wert": 6.84,
+    "gebiet_name": "Detmold, Stadt"
+   },
+   {
+    "dimension": "baujahr",
+    "auspraegung": "BAU2010B2015",
+    "auspraegung_text": "2010 - 2015",
+    "wert": 7.23,
+    "gebiet_name": "Detmold, Stadt"
+   },
+   {
+    "dimension": "baujahr",
+    "auspraegung": "BAU2016BXXXX",
+    "auspraegung_text": "2016 und später",
+    "wert": 9.04,
+    "gebiet_name": "Detmold, Stadt"
+   },
+   {
+    "dimension": "baujahr",
+    "auspraegung": "INSGESAMT",
+    "auspraegung_text": "Insgesamt",
+    "wert": 6.09,
+    "gebiet_name": "Detmold, Stadt"
+   },
+   {
+    "dimension": "flaeche",
+    "auspraegung": "INSGESAMT",
+    "auspraegung_text": "Insgesamt",
+    "wert": 6.09,
+    "gebiet_name": "Detmold, Stadt"
+   },
+   {
+    "dimension": "flaeche",
+    "auspraegung": "WFL000B039",
+    "auspraegung_text": "Unter 40 m²",
+    "wert": 8.1,
+    "gebiet_name": "Detmold, Stadt"
+   },
+   {
+    "dimension": "flaeche",
+    "auspraegung": "WFL040B059",
+    "auspraegung_text": "40 - 59 m²",
+    "wert": 6.22,
+    "gebiet_name": "Detmold, Stadt"
+   },
+   {
+    "dimension": "flaeche",
+    "auspraegung": "WFL060B079",
+    "auspraegung_text": "60 - 79 m²",
+    "wert": 5.91,
+    "gebiet_name": "Detmold, Stadt"
+   },
+   {
+    "dimension": "flaeche",
+    "auspraegung": "WFL080B099",
+    "auspraegung_text": "80 - 99 m²",
+    "wert": 5.89,
+    "gebiet_name": "Detmold, Stadt"
+   },
+   {
+    "dimension": "flaeche",
+    "auspraegung": "WFL100B119",
+    "auspraegung_text": "100 - 119 m²",
+    "wert": 5.72,
+    "gebiet_name": "Detmold, Stadt"
+   },
+   {
+    "dimension": "flaeche",
+    "auspraegung": "WFL120B139",
+    "auspraegung_text": "120 - 139 m²",
+    "wert": 5.68,
+    "gebiet_name": "Detmold, Stadt"
+   },
+   {
+    "dimension": "flaeche",
+    "auspraegung": "WFL140B159",
+    "auspraegung_text": "140 - 159 m²",
+    "wert": 5.2,
+    "gebiet_name": "Detmold, Stadt"
+   },
+   {
+    "dimension": "flaeche",
+    "auspraegung": "WFL160B179",
+    "auspraegung_text": "160 - 179 m²",
+    "wert": 5.26,
+    "gebiet_name": "Detmold, Stadt"
+   },
+   {
+    "dimension": "flaeche",
+    "auspraegung": "WFL180B199",
+    "auspraegung_text": "180 - 199 m²",
+    "wert": 5.04,
+    "gebiet_name": "Detmold, Stadt"
+   },
+   {
+    "dimension": "flaeche",
+    "auspraegung": "WFL200BXXX",
+    "auspraegung_text": "200 m² und mehr",
+    "wert": 4.74,
+    "gebiet_name": "Detmold, Stadt"
+   }
+  ],
+  "05770016": [
+   {
+    "dimension": "gesamt",
+    "auspraegung": "INSGESAMT",
+    "auspraegung_text": null,
+    "wert": 5.22,
+    "gebiet_name": "Hüllhorst"
+   },
+   {
+    "dimension": "baujahr",
+    "auspraegung": "BAU0000B1918",
+    "auspraegung_text": "Vor 1919",
+    "wert": 4.89,
+    "gebiet_name": "Hüllhorst"
+   },
+   {
+    "dimension": "baujahr",
+    "auspraegung": "BAU1919B1949",
+    "auspraegung_text": "1919 - 1949",
+    "wert": 4.8,
+    "gebiet_name": "Hüllhorst"
+   },
+   {
+    "dimension": "baujahr",
+    "auspraegung": "BAU1950B1959",
+    "auspraegung_text": "1950 - 1959",
+    "wert": 5.08,
+    "gebiet_name": "Hüllhorst"
+   },
+   {
+    "dimension": "baujahr",
+    "auspraegung": "BAU1960B1969",
+    "auspraegung_text": "1960 - 1969",
+    "wert": 5,
+    "gebiet_name": "Hüllhorst"
+   },
+   {
+    "dimension": "baujahr",
+    "auspraegung": "BAU1970B1979",
+    "auspraegung_text": "1970 - 1979",
+    "wert": 5.02,
+    "gebiet_name": "Hüllhorst"
+   },
+   {
+    "dimension": "baujahr",
+    "auspraegung": "BAU1980B1989",
+    "auspraegung_text": "1980 - 1989",
+    "wert": 4.94,
+    "gebiet_name": "Hüllhorst"
+   },
+   {
+    "dimension": "baujahr",
+    "auspraegung": "BAU1990B1999",
+    "auspraegung_text": "1990 - 1999",
+    "wert": 5.47,
+    "gebiet_name": "Hüllhorst"
+   },
+   {
+    "dimension": "baujahr",
+    "auspraegung": "BAU2000B2009",
+    "auspraegung_text": "2000 - 2009",
+    "wert": 5.45,
+    "gebiet_name": "Hüllhorst"
+   },
+   {
+    "dimension": "baujahr",
+    "auspraegung": "BAU2010B2015",
+    "auspraegung_text": "2010 - 2015",
+    "wert": 6.68,
+    "gebiet_name": "Hüllhorst"
+   },
+   {
+    "dimension": "baujahr",
+    "auspraegung": "BAU2016BXXXX",
+    "auspraegung_text": "2016 und später",
+    "wert": 7.21,
+    "gebiet_name": "Hüllhorst"
+   },
+   {
+    "dimension": "baujahr",
+    "auspraegung": "INSGESAMT",
+    "auspraegung_text": "Insgesamt",
+    "wert": 5.22,
+    "gebiet_name": "Hüllhorst"
+   },
+   {
+    "dimension": "flaeche",
+    "auspraegung": "INSGESAMT",
+    "auspraegung_text": "Insgesamt",
+    "wert": 5.22,
+    "gebiet_name": "Hüllhorst"
+   },
+   {
+    "dimension": "flaeche",
+    "auspraegung": "WFL000B039",
+    "auspraegung_text": "Unter 40 m²",
+    "wert": 7.53,
+    "gebiet_name": "Hüllhorst"
+   },
+   {
+    "dimension": "flaeche",
+    "auspraegung": "WFL040B059",
+    "auspraegung_text": "40 - 59 m²",
+    "wert": 5.99,
+    "gebiet_name": "Hüllhorst"
+   },
+   {
+    "dimension": "flaeche",
+    "auspraegung": "WFL060B079",
+    "auspraegung_text": "60 - 79 m²",
+    "wert": 5.48,
+    "gebiet_name": "Hüllhorst"
+   },
+   {
+    "dimension": "flaeche",
+    "auspraegung": "WFL080B099",
+    "auspraegung_text": "80 - 99 m²",
+    "wert": 5.1,
+    "gebiet_name": "Hüllhorst"
+   },
+   {
+    "dimension": "flaeche",
+    "auspraegung": "WFL100B119",
+    "auspraegung_text": "100 - 119 m²",
+    "wert": 5.15,
+    "gebiet_name": "Hüllhorst"
+   },
+   {
+    "dimension": "flaeche",
+    "auspraegung": "WFL120B139",
+    "auspraegung_text": "120 - 139 m²",
+    "wert": 4.68,
+    "gebiet_name": "Hüllhorst"
+   },
+   {
+    "dimension": "flaeche",
+    "auspraegung": "WFL140B159",
+    "auspraegung_text": "140 - 159 m²",
+    "wert": 4.31,
+    "gebiet_name": "Hüllhorst"
+   },
+   {
+    "dimension": "flaeche",
+    "auspraegung": "WFL160B179",
+    "auspraegung_text": "160 - 179 m²",
+    "wert": 4.04,
+    "gebiet_name": "Hüllhorst"
+   },
+   {
+    "dimension": "flaeche",
+    "auspraegung": "WFL180B199",
+    "auspraegung_text": "180 - 199 m²",
+    "wert": 4.6,
+    "gebiet_name": "Hüllhorst"
+   },
+   {
+    "dimension": "flaeche",
+    "auspraegung": "WFL200BXXX",
+    "auspraegung_text": "200 m² und mehr",
+    "wert": 3.61,
+    "gebiet_name": "Hüllhorst"
+   }
+  ]
+ }
+}

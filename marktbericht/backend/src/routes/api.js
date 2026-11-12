@@ -18,6 +18,9 @@ import { indexreihen } from '../lib/indexreihen.js';                            
 import { mietspiegelFuer } from '../lib/mietspiegel/verzeichnis.js';              /* v3250 */
 import { mietspiegelMitWerten } from '../lib/mietspiegel/werte.js';               /* v3255 */
 import { mietspiegelMitNaeherung } from '../lib/mietspiegel/naeherung.js';       /* v3266 */
+import { vergleichsmieteWohnung, zielMaximum, signaleAus, mietsteigerungRate, fortschreibung, spanneFortschreiben, kappungsPfad } from '../lib/mietanker.js';   /* v3343 */
+import { werteFuer as msWerteFuer } from '../lib/mietspiegel/werte.js';   /* v3343 */
+import { naeherungParameter as msNaeherungParameter } from '../lib/mietspiegel/naeherung.js';   /* v3343 */
 import { kappungFuer, mietpreisbremseFuer } from '../lib/kappung.js';           /* landing-dealcheck-5 */
 import { zensusMieteAmStichtag, nkmIndexAm, NKM_INDEX } from '../lib/zensus_miete.js';   /* v3028 */
 import { GeoMapImportService } from '../services/GeoMapImportService.js';
@@ -1067,6 +1070,43 @@ router.get('/mietspiegel', async (req, res) => {
     await mietspiegelMitNaeherung(satz, req.query, (ags) => q(
       "SELECT dimension, auspraegung, auspraegung_text, wert, gebiet_name FROM mb.zensus_werte WHERE ebene = 'gemeinde' AND kennzahl = 'nettokaltmiete_qm' AND ags = $1",
       [ags]));
+    /* v3343 · Vergleichsmiete der Wohnung, Einordnung in die Spanne und Zielbild-Maximum (lib/mietanker.js) -
+       dieselbe Rechnung wie im Wertkern. Merkmale: standardstufe, mikrolage, mod_punkte, zustand; ausnahme 556e|556f;
+       zieljahr + mietstg fuer die Fortschreibung. Werte mit Rechtevorbehalt nur, wo die Route sie selbst ausliefert. */
+    if (req.query.wfl && (satz.werte || satz.naeherung)) {
+      try {
+        const ags = String(satz.ags || '').replace(/\D/g, '');
+        let w = satz.werte && satz.werte.mittel > 0 ? msWerteFuer(ags) : null;
+        const jahr = new Date().getUTCFullYear();
+        const zeilen = (!w && satz.naeherung && satz.naeherung.qm > 0) ? await q(
+          "SELECT dimension, auspraegung, auspraegung_text, wert, gebiet_name FROM mb.zensus_werte WHERE ebene = 'gemeinde' AND kennzahl = 'nettokaltmiete_qm' AND ags = $1", [ags]) : null;
+        const merk = {};
+        String(req.query.merkmale || '').split(',').map((x) => x.trim()).filter(Boolean).forEach((x) => { const i = x.indexOf(':'); if (i > 0) merk[x.slice(0, i).trim()] = x.slice(i + 1).trim(); else merk[x] = true; });
+        const k = { werte: w, naeherung_param: w ? null : msNaeherungParameter(), zensus_zeilen: zeilen, baujahr: req.query.baujahr,
+          lage: req.query.lage || null, ausstattung: req.query.ausstattung || null, merkmale: merk,
+          signale: signaleAus({ standardstufe: req.query.standardstufe, mikrolage: req.query.mikrolage, mod_punkte: req.query.mod_punkte,
+            baujahr: req.query.baujahr, zustand: req.query.zustand }, jahr) };
+        const v = vergleichsmieteWohnung(k, req.query.wfl);
+        if (v) {
+          const br = mietpreisbremseFuer(ags);
+          satz.vergleich_wohnung = { quelle: v.quelle, unten: v.unten, mittel: v.mittel, oben: v.oben, ca: v.ca, qm: v.qm,
+            einordnung: v.einordnung, etikett: v.etikett, herkunft: v.herkunft };
+          satz.ziel_maximum = zielMaximum(v, br, req.query.ausnahme || '');
+          const zj = Number(req.query.zieljahr);
+          if (zj > jahr && zj <= jahr + 30) {
+            const rate = mietsteigerungRate(req.query.mietstg);
+            if (rate) {
+              const f = fortschreibung(rate.pct, zj - jahr);
+              const vF = spanneFortschreiben(v, f);
+              satz.ziel_prognose = { jahr: zj, rate, faktor: Math.round(f * 10000) / 10000, vergleich: { unten: vF.unten, mittel: vF.mittel, oben: vF.oben, ca: v.ca },
+                ziel_maximum: zielMaximum(vF, br, req.query.ausnahme || ''),
+                pfad: Number(req.query.ist_qm) > 0 ? kappungsPfad({ ist_qm: Number(req.query.ist_qm), vgl_qm: v.oben, rate_pct: rate.pct,
+                  kappung_pct: Number(req.query.kappung_pct) || 20, monate: (zj - jahr) * 12, erste_ab_monat: Number(req.query.erste_ab_monat) || 0 }) : null };
+            }
+          }
+        }
+      } catch (e) { satz.vergleich_fehler = e.message; }
+    }
     res.json(satz);
   } catch (e) { res.status(500).json({ error: e.message }); }
 });

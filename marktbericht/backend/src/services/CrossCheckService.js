@@ -48,6 +48,7 @@ import { schaetzung as rndSchaetzung } from '../lib/rnd-einheitlich.js';
 import { STUFE_ANGEBOT, NAME_ANGEBOT, abschlagKurz, wegVergleichsfaktor } from '../lib/verfahrenswahl.js';
 import { ladeKontakte, schluesselVon } from '../lib/sperren_anfragen.js';
 import { LC as LAND_KURZ } from '../lib/register_deckung.js';
+import { vergleichsmieteWohnung, bandWohnung } from '../lib/mietanker.js';   /* v3343 · Vergleichsmiete der Wohnung */
 let _kontakte = null;
 /** Belegtes Funktionspostfach des Ausschusses (ausschuss_kontakte.json), sonst null - nie geraten. */
 function kontaktMail(ags, stelle) {
@@ -1262,7 +1263,30 @@ export const CrossCheckService = {
       catch (e) { return null; }
     })();
     const _r2a = (x) => Math.round(x * 100) / 100;
-    const _anker = _amtFuehrt
+    /* ══ v3343 · ANKER = VERGLEICHSMIETE DER WOHNUNG (Marcel 12.11.2026) ══════════════════════
+       ImmoWertA 5.(3).2 zu § 31 Abs. 2: Grundlage der marktueblich erzielbaren Ertraege ist „insbesondere
+       die ortsuebliche Vergleichsmiete aus geeigneten Mietspiegeln"; das AGVGA-NRW-Modell prueft die Miete
+       bei der Zinsableitung am Mietspiegel (GMB Paderborn 2024 S. 38 f.) - der Anker ist modellkonform.
+       Gemessen 12.11.2026 Am Quittengarten 12 (Buende): Ist 7,03-8,36 €/m² gegen die Ø Miete des
+       Zinssatzes 5,50 (Kreisstichprobe aller Baujahre und Groessen) - alle acht Wohnungen „ueber dem Band",
+       Bestand und Zielbild gleich. Neue Rangfolge (lib/mietanker.js, je Wohnung nach ihrer Flaeche):
+         1  Mietspiegel-Werte der Gemeinde (frei), eingeordnet nach den Merkmalen; Band = Spanne, mind. ± 20 %
+         2  amtliche Miete des Gutachterausschusses (vom Zinsmodell verlangt, sonst ortsuebliche Uebersicht)
+         3  DealPilot-Naeherung der Vergleichsmiete (Zensus x Kalibrierfaktor, MAPE 7,5 % gegen 59 freie
+            Mietspiegel) - genauer als die Ø Miete der Zinsstichprobe, die weder Baujahr noch Groesse kennt
+         4  Ø Miete des Liegenschaftszinssatzes, 5 Zensus, 6 Angebotsmiete - wie bisher als Rueckfall
+       Stufe D (§ 256 BewG) bleibt bei der alten Rangfolge (Anlage 39 BewG, Modellkonformitaet, v2996). */
+    const _vglK = p.vergleichsmiete_kontext || null;
+    const _ehWfl = (function () {
+      const l = Array.isArray(ref.einheiten_miete) ? ref.einheiten_miete.filter((e) => _num(e && e.wfl)) : [];
+      if (l.length) return l.reduce((a, e) => a + Number(e.wfl), 0) / l.length;
+      const u = Number(ref.units) || 0, wf = _num(ref.living_area);
+      return wf ? (u > 1 ? wf / u : wf) : null;
+    })();
+    const _vglHaus = (_vglK && p.lzs_stufe !== 'D') ? vergleichsmieteWohnung(_vglK, _ehWfl) : null;
+    const _vglAnker = (v) => ({ qm: _r2a(v.qm), stufe: v.quelle === 'mietspiegel' ? 'mietspiegel' : 'naeherung', etikett: v.etikett,
+      quelle: v.herkunft + (v.einordnung ? ' · ' + v.einordnung.text : ''), vgl: v, je_wohnung: true });
+    const _anker0 = _amtFuehrt
       ? { qm: _r2a(_num(_amtM.miete_qm)), stufe: 'amtlich',
           /* v2670 · Marcel 21.10.: jenseits der Groessentabelle gilt die Randklasse - im Etikett gekennzeichnet */
           etikett: 'amtliche Miete des Gutachterausschusses' + (_amtM.ausserhalb_tabelle && _amtM.groessenklasse_kurz ? ' (' + _amtM.groessenklasse_kurz + ')' : ''),
@@ -1291,6 +1315,11 @@ export const CrossCheckService = {
             ? { qm: _r2a(rentSqm), stufe: 'angebot', etikett: 'Angebotsmiete (aktueller Marktdurchschnitt)',
                 quelle: 'aktueller Marktdurchschnitt der Angebotsmieten' }
             : null);
+    /* v3343 · Einsortieren: Mietspiegel vor allem, Naeherung vor Ø-Satzmiete/Zensus/Angebot */
+    const _anker = !_vglHaus ? _anker0
+      : (_vglHaus.quelle === 'mietspiegel' ? _vglAnker(_vglHaus)
+        : ((_anker0 && _anker0.stufe === 'amtlich') ? _anker0 : _vglAnker(_vglHaus)));
+    if (_anker && _anker !== _anker0 && _anker0) _anker.ersetzt = { stufe: _anker0.stufe, etikett: _anker0.etikett, qm: _anker0.qm };
     if (_anker && _amtVerlangt && !_amtFuehrt && _amtM.ausserhalb_hinweis) _anker.amtlich_nicht_fuehrend = _amtM.ausserhalb_hinweis;
     const _refQm = _anker ? _anker.qm : null;
     /* ══ v2367 · DIE IST-MIETE, WENN SIE MARKTUEBLICH IST (§ 31 Abs. 2 ImmoWertV) ══
@@ -1354,14 +1383,19 @@ export const CrossCheckService = {
     void _bandQ;
     /* v2600 · E1 · Band = Anker ± 20 % (MIETBAND). Die drei Vergleichswerte stehen daneben,
        damit Bericht und Pilot-Tafel sagen koennen, woran gemessen ist. */
+    const _bandVgl = _anker && _anker.je_wohnung ? bandWohnung(_anker.vgl) : null;   /* v3343 · Spanne, mind. ± 20 % */
     const _band = _anker ? {
       anker_qm: _anker.qm, anker_stufe: _anker.stufe, anker_etikett: _anker.etikett, anker_quelle: _anker.quelle,
-      unten_qm: Math.round(_anker.qm * (1 - MIETBAND.pct / 100) * 100) / 100,
-      oben_qm: Math.round(_anker.qm * BAND_OBEN * 100) / 100, faktor_oben: BAND_OBEN, band_pct: MIETBAND.pct,
+      unten_qm: _bandVgl ? _bandVgl.unten_qm : Math.round(_anker.qm * (1 - MIETBAND.pct / 100) * 100) / 100,
+      oben_qm: _bandVgl ? _bandVgl.oben_qm : Math.round(_anker.qm * BAND_OBEN * 100) / 100, faktor_oben: BAND_OBEN, band_pct: MIETBAND.pct,
+      spanne: _bandVgl ? _bandVgl.spanne : null, einordnung: _bandVgl ? (_anker.vgl.einordnung || null) : null,
+      je_wohnung: !!_bandVgl, ersetzt: _anker.ersetzt || null,
       amtlich_qm: _amtQmBand, angebot_qm: _angQmBand != null ? Math.round(_angQmBand * 100) / 100 : null,
       satz_qm: _satzMiete ? _r2a(_satzMiete.qm) : null,
       amtlich_nicht_fuehrend: _anker.amtlich_nicht_fuehrend || null,
-      regel: _anker.etikett + ' ± ' + MIETBAND.pct + ' % (' + MIETBAND.art + ')',
+      regel: _bandVgl
+        ? _anker.etikett + ', Band ' + (_anker.vgl.quelle === 'mietspiegel' ? 'Spanne des Mietspiegels' : 'Spanne ca.') + ', mindestens ± ' + MIETBAND.pct + ' % (' + MIETBAND.art + ')'
+        : _anker.etikett + ' ± ' + MIETBAND.pct + ' % (' + MIETBAND.art + ')',
     } : null;
     const _mnb = mieteNachBand(_istQm, _band, _refQm);   /* v2488 · eine Regel, auch je Wohnung */
     const _istLage = _mnb.lage;
@@ -1408,21 +1442,28 @@ export const CrossCheckService = {
                      letzte_erhoehung: e.mv_letzte_erhoehung || null, letzte_erhoehung_betrag: Number(e.mv_letzte_erhoehung_betrag) > 0 ? Number(e.mv_letzte_erhoehung_betrag) : null,
                      kuendigungsverzicht_bis: e.mv_kuendigungsverzicht_bis || null,
                      abw_jahre: Number(e.mv_abw_jahre) > 0 ? Number(e.mv_abw_jahre) : null };
+        /* v3343 · je Wohnung ihre EIGENE Vergleichsmiete (Mietspiegel-Zelle nach Wohnungsgroesse) und ihr Band */
+        const vW = _band && _band.je_wohnung ? vergleichsmieteWohnung(_vglK, Number(e.wfl)) : null;
+        const bW = vW ? bandWohnung(vW) : null;
+        const bandE = bW ? Object.assign({}, _band, { anker_qm: bW.anker_qm, unten_qm: bW.unten_qm, oben_qm: bW.oben_qm, spanne: bW.spanne }) : _band;
+        const refE = bW ? bW.anker_qm : _refQm;
         if (e.leer || !(Number(e.ist_monat) > 0)) {
-          return { nr: e.nr, wfl: fl, ist_qm: null, qm: r2(_refQm), herkunft: 'leer_marktueblich', jahr: Math.round(_refQm * fl * 12),
+          return { nr: e.nr, wfl: fl, ist_qm: null, qm: r2(refE), herkunft: 'leer_marktueblich', jahr: Math.round(refE * fl * 12),
+                   band: bW ? { anker_qm: bW.anker_qm, unten_qm: bW.unten_qm, oben_qm: bW.oben_qm } : null,
                    leer_abzug: e.leer_abzug === true || e.leer_abzug === 'true' || e.leer_abzug === 1,
                    leer_monate: Number(e.leer_monate) > 0 ? Number(e.leer_monate) : null,
                    herrichtung_eur: Number(e.herrichtung_eur) > 0 ? Number(e.herrichtung_eur) : null };
         }
         const iq = r2(Number(e.ist_monat) / Number(e.wfl));
-        const r = mieteNachBand(iq, _band, _refQm);
+        const r = mieteNachBand(iq, bandE, refE);
         /* v2541 · im Band die VERTRAGSMIETE selbst (× Flaechenfaktor), nicht die auf Cent
            gerundeten €/m² hochgerechnet - Westerfeld: 799 € / 97,5 m² = 8,1949 -> 8,19 ergab
            9.582 statt 9.588 €/Jahr je Wohnung (Pruefbericht 20.10.2026). Ausserhalb: Anker × Flaeche. */
         const istJ = Math.round(Number(e.ist_monat) * 12 * f);
         const jahr = r.fuehrt ? istJ : Math.round(r.qm * fl * 12);
         return Object.assign({ nr: e.nr, wfl: fl, ist_qm: iq, qm: r2(r.qm), jahr, ist_jahr: istJ,
-                 differenz_jahr: istJ - jahr, herkunft: herkunftNachBand(r) }, vt);
+                 differenz_jahr: istJ - jahr, herkunft: herkunftNachBand(r),
+                 band: bW ? { anker_qm: bW.anker_qm, unten_qm: bW.unten_qm, oben_qm: bW.oben_qm } : null }, vt);
       });
       const v = zeilen.filter((z) => z.herkunft !== 'leer_marktueblich'), l = zeilen.filter((z) => z.herkunft === 'leer_marktueblich');
       const wflV = r2(v.reduce((a, z) => a + z.wfl, 0)), jV = v.reduce((a, z) => a + z.jahr, 0);
@@ -1473,10 +1514,13 @@ export const CrossCheckService = {
     if (_je) {
       /* v2540 · je Wohnung: welche Wohnung an welche Kante, in einem Satz */
       out.notes.push('Die Ist-Mieten sind je Wohnung gegen das Band der Marktüblichkeit ('
-        + _dqJ(_band.unten_qm) + ' bis ' + _dqJ(_band.oben_qm) + ' €/m², ' + _band.anker_etikett + ' ' + _dqJ(_band.anker_qm) + ' €/m² ± ' + _band.band_pct
-        + ' %) geprüft (ImmoWertA 31.2: je Mietverhältnis). '
+        + (_band.je_wohnung
+          ? 'je Wohnung um ihre eigene Vergleichsmiete nach Wohnungsgröße, ' + _band.anker_etikett + ', Spanne mindestens ± ' + _band.band_pct + ' %; mittlere Wohnung '
+            + _dqJ(_band.unten_qm) + ' bis ' + _dqJ(_band.oben_qm) + ' €/m² um ' + _dqJ(_band.anker_qm) + ' €/m²'
+          : _dqJ(_band.unten_qm) + ' bis ' + _dqJ(_band.oben_qm) + ' €/m², ' + _band.anker_etikett + ' ' + _dqJ(_band.anker_qm) + ' €/m² ± ' + _band.band_pct + ' %')
+        + ') geprüft (ImmoWertA 31.2: je Mietverhältnis). '
         + (_je.angepasst.length
-          ? ((_je.angepasst.length > 2 && _je.angepasst.every((z) => z.herkunft === _je.angepasst[0].herkunft))
+          ? ((_je.angepasst.length > 2 && _je.angepasst.every((z) => z.herkunft === _je.angepasst[0].herkunft && z.qm === _je.angepasst[0].qm))
               ? _je.angepasst.length + ' Wohnungen ' + (_je.angepasst[0].herkunft === 'ueber_band' ? 'über' : 'unter') + ' dem Band ('
                 + _je.angepasst.map((z) => _dqJ(z.ist_qm)).join(', ') + ' €/m²), angesetzt ' + _dqJ(_je.angepasst[0].qm) + ' €/m²'
               : _je.angepasst.map((z) => z.nr + ' ' + _dqJ(z.ist_qm) + ' €/m² ' + (z.herkunft === 'ueber_band' ? 'über' : 'unter')
@@ -1973,6 +2017,8 @@ export const CrossCheckService = {
                    miete_qm: mieteQm, miete_quelle: mieteQuelle || null, gnd_quelle: _gndEwQuelle,
                    /* v2488 · Band und Vergleichsmiete fuer die Bestandsbasis je Wohnung */
                    miete_band: _band || null, markt_qm: _refQm > 0 ? _refQm : null,
+                   /* v3343 · Kontext der Vergleichsmiete je Wohnung (nur, wenn der Anker aus ihm kommt) und die Bremse fuer das Zielbild */
+                   vgl_kontext: (_band && _band.je_wohnung) ? _vglK : null, bremse: _vglK ? _vglK.bremse : null,
                    /* v2520 · der Bestand trennt vermietete und leere Flaeche */
                    miete_aufteilung: _aufteilung,
                    /* v3150 · die Mietabweichung je Wohnung (Bestand) - die Stufe Mieterhoehung ersetzt nur die Zeilen der Wohnungen, die sie neu rechnet */

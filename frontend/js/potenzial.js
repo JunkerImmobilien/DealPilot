@@ -495,25 +495,30 @@
     var w = m && m.wohnungen && m.wohnungen[idx];
     if (!w || !K || !K.zielmieteVorschlag) return null;
     var b = marktSaniert(m), d = mietrechtDaten(m, idx);
-    var r = K.zielmieteVorschlag({ wfl: w.wfl, basis_qm: b ? b.qm : 0, art: w.art, vermietet: w.ist > 0 && w.status !== 'leer', bremse: d.bremse, vgl_qm: d.vgl_qm });
+    var zm = w.art !== 'gewerbe' ? zielMaxFuer(w.wfl) : null;   /* v3343 · rechtliches Maximum der Wohnung */
+    var r = K.zielmieteVorschlag({ wfl: w.wfl, basis_qm: b ? b.qm : 0, art: w.art, vermietet: w.ist > 0 && w.status !== 'leer', bremse: d.bremse, vgl_qm: d.vgl_qm,
+      maximum: zm && zm.ziel ? Object.assign({}, zm.ziel, { ca: zm.vergleich && zm.vergleich.ca }) : null });
     if (!r || r.qm == null) return r;
-    r.herkunft = b.herkunft; r.basis_art = b.art;
+    r.herkunft = b ? b.herkunft : 'rechtliches Maximum der Wohnung (ohne Marktbewertung)'; r.basis_art = b ? b.art : 'maximum';
+    if (zm && zm.vergleich) r.vergleich = zm.vergleich;
+    if (zm && zm.prognose) r.prognose = zm.prognose;
     /* die Marktmiete gilt für die mittlere Wohnungsgröße - weicht diese Wohnung deutlich ab, sagt es der Vorschlag */
-    if (b.wfl_schnitt > 0 && Math.abs(w.wfl / b.wfl_schnitt - 1) > 0.35) r.groesse = 'Wohnung deutlich ' + (w.wfl > b.wfl_schnitt ? 'größer' : 'kleiner') + ' als der Durchschnitt — Marktmiete je m² weicht dann meist ab';
+    if (b && b.wfl_schnitt > 0 && Math.abs(w.wfl / b.wfl_schnitt - 1) > 0.35) r.groesse = 'Wohnung deutlich ' + (w.wfl > b.wfl_schnitt ? 'größer' : 'kleiner') + ' als der Durchschnitt — Marktmiete je m² weicht dann meist ab';
     return r;
   }
   /** v3130 · alle Wohnungen des Arbeitsstands: { markt, zeilen:[{ i, nr, lage, wfl, ist, ziel_qm, v }] } */
   function zielVorschlaege(opts) {
     var m = modell(opts);
     return { markt: marktSaniert(m), bremse: mietpreisbremse(agsJetzt()), zeilen: m.wohnungen.map(function (w, j) {
-      return { i: w.i, nr: w.nr, lage: w.lage, art: w.art, wfl: w.wfl, ist: w.ist, status: w.status, ziel_qm: w.ziel_qm, v: vorschlagFuer(m, j) };
+      return { i: w.i, nr: w.nr, lage: w.lage, art: w.art, wfl: w.wfl, ist: w.ist, status: w.status, ziel_qm: w.ziel_auto ? null : w.ziel_qm, ziel_auto: !!w.ziel_auto, v: vorschlagFuer(m, j) };
     }) };
   }
   function zielVorschlagHtml(res) {
     zvStil();
     if (!res || !res.zeilen || !res.zeilen.length) return '';
     var kopf = '<div class="dp-zv-kopf"><b>Zielmiete nach Sanierung · Vorschlag</b><span>nur ein Vorschlag — übernommen wird nur, was du anklickst</span></div>';
-    if (!res.markt) return '<div class="dp-zv">' + kopf + '<p class="dp-zv-fehlt">' + esc(VORSCHLAG_FEHLT) + '</p></div>';
+    var mitMax = res.zeilen.some(function (z) { return z.v && z.v.spanne; });   /* v3343 · Maximum geht auch ohne Marktbewertung */
+    if (!res.markt && !mitMax) return '<div class="dp-zv">' + kopf + '<p class="dp-zv-fehlt">' + esc(VORSCHLAG_FEHLT) + '</p></div>';
     var offen = 0;
     var zeilen = res.zeilen.map(function (z) {
       var name = (z.nr ? 'Nr. ' + z.nr : '#' + (z.i + 1)) + (z.lage ? ' · ' + z.lage : '');
@@ -524,13 +529,15 @@
         var gleich = z.ziel_qm != null && Math.abs(z.ziel_qm - v.qm) < 0.005;
         if (!gleich) offen++;
         rechts = gleich ? '<span class="dp-zv-ok">übernommen</span>'
-          : '<button type="button" class="dp-ml-k" data-zv="' + z.i + '" data-zv-qm="' + v.qm + '">übernehmen ›</button>';
+          : (z.ziel_auto ? '<span class="dp-zv-ok" title="ohne eigene Eingabe rechnet das Zielbild mit diesem Maximum">im Zielbild angesetzt</span> ' : '')
+            + '<button type="button" class="dp-ml-k" data-zv="' + z.i + '" data-zv-qm="' + v.qm + '">übernehmen ›</button>';
       }
       var mitte = v && v.qm != null
         ? '<b>' + esc(qmDe(v.qm)) + ' €/m²</b> · ' + esc(eur(v.monat)) + '/Monat'
           + (v.gedeckelt ? ' <i class="dp-zv-deckel" title="' + esc(v.text) + '">Mietpreisbremse</i>' : v.ungeprueft ? ' <i class="dp-zv-pruef" title="' + esc(v.text) + '">Bremse prüfen</i>' : '')
           + '<small>' + (z.ist > 0 && z.wfl > 0 ? 'heute ' + esc(qmDe(z.ist / z.wfl)) + ' €/m²' : 'leer') + (z.ziel_qm ? ' · eingetragen ' + esc(qmDe(z.ziel_qm)) + ' €/m²' : '')
           + (v.groesse ? ' · ' + esc(v.groesse) : '') + '</small>'
+          + zvSpanneHtml(v)
         : '';
       return '<div class="dp-zv-z"><span class="dp-zv-n">' + esc(name) + '<small>' + (z.wfl ? Math.round(z.wfl) + ' m²' : '') + '</small></span>'
         + '<span class="dp-zv-v">' + mitte + '</span><span class="dp-zv-k">' + rechts + '</span></div>';
@@ -544,6 +551,19 @@
           : br.gilt === false ? 'Keine Mietpreisbremse an dieser Adresse.' : 'Mietpreisbremse bitte prüfen — wo sie gilt, höchstens Vergleichsmiete + 10 % (§ 556d BGB).')
         + ' Laufende Mietverträge: bis zur Neuvermietung gilt die zulässige Miete (Kappungsgrenze, § 558 BGB); mehr nur über die Modernisierungsumlage (§ 559 BGB). Die Zielmiete geht nur in Zielbild, Pilot-Analyse und PDF, nicht in die Mietentwicklung.</p></div>';
   }
+  /* v3343 · die Spanne je Wohnung: konservativ, Maximum, darüber. Kundentext nur mit Punkt und Komma. */
+  function zvSpanneHtml(v) {
+    var sp = v && v.spanne; if (!sp) return '';
+    var ca = sp.ca ? 'ca. ' : '';
+    var t = 'Konservativ ' + ca + qmDe(sp.konservativ_qm) + ' €/m² (Vergleichsmiete, Mittelwert). Maximum bei Neuvermietung ' + ca + qmDe(sp.maximum_qm) + ' €/m²'
+      + (v.bremse_gilt === false ? ' (120 % ohne Mietpreisbremse). Darüber Bußgeldrisiko nach § 5 WiStG nur bei Ausnutzung eines geringen Angebots.' : ' (110 % mit Mietpreisbremse). Darüber nur mit Ausnahme nach § 556e oder § 556f BGB.')
+      + ' Bestandsmieter bis ' + ca + qmDe(sp.bestand_max_qm) + ' €/m² in Schritten der Kappungsgrenze.'
+      + (v.markt_begrenzt ? ' Angesetzt ist die niedrigere Marktmiete.' : '') + (v.ohne_markt ? ' Ohne Marktbewertung, am Markt prüfen.' : '')
+      + (sp.bedingung ? ' Der Oberwert ' + sp.bedingung.replace(/^gilt, /, 'gilt, ') + '.' : '')
+      + (v.prognose && v.prognose.ziel_maximum ? ' Im Jahr ' + v.prognose.jahr + ' ' + ca + qmDe(v.prognose.ziel_maximum.neu_max_qm) + ' €/m² (fortgeschrieben mit ' + String(v.prognose.rate.pct).replace('.', ',') + ' % je Jahr).' : '')
+      + ' ' + (sp.hinweis || 'Orientierung, keine Rechtsberatung.');
+    return '<small class="dp-zv-sp">' + esc(t) + '</small>';
+  }
   function zvStil() {
     leiterStil();
     if (el('dp-zv-stil')) return;
@@ -555,6 +575,7 @@
       '.dp-zv-kopf span{font-size:11.5px;color:#8A8272}',
       '.dp-zv-her,.dp-zv-fuss,.dp-zv-fehlt{font-size:11.5px;color:#7A7370;line-height:1.45;margin:6px 0}',
       '.dp-zv-fehlt{color:#2A2727}',
+      '.dp-zv-sp{display:block;margin-top:3px;font-size:11px;line-height:1.4;color:#7A7370}',
       '.dp-zv-z{display:grid;grid-template-columns:minmax(90px,1.1fr) 2.4fr auto;gap:6px 12px;align-items:center;padding:7px 0;border-top:1px solid #F1ECE1}',
       '.dp-zv-n{font-size:12.5px;color:#2A2727;min-width:0}.dp-zv-n small{display:block;color:#8A8272;font-size:11px}',
       '.dp-zv-v{font-size:12.5px;color:#2A2727;min-width:0}.dp-zv-v b{font:600 13.5px "Space Grotesk",sans-serif}',
@@ -985,7 +1006,26 @@
      /marktbericht/mietspiegel?ags=&baujahr=&wfl= geholt. Lage: DealPilot kennt die Wohnlage des Mietspiegels nicht
      (die Lageklasse A/B/C ist eine andere) - die Route rechnet dann mit dem Standard des Dokuments und sagt es im Hinweis.
      Eingabe am Objekt (ms_unten/ms_mittel/ms_oben) und die eigene Vergleichsmiete gehen weiter vor. */
-  var _msWerte = {};   /* 'ags|baujahr|wfl' -> Promise (läuft) | werte (Antwort .werte) | null */
+  var _msWerte = {};   /* 'ags|baujahr|wfl|merkmale' -> Promise (läuft) | werte (Antwort .werte) | null */
+  /* v3343 · Vergleichsmiete der Wohnung, Einordnung und Zielbild-Maximum (Rechnung NUR im mb-Backend, lib/mietanker.js).
+     Die Merkmale der Einordnung (Standardstufe, Mikrolage, Modernisierungspunkte, Zustand) und das Zielbild-Jahr reisen
+     als Parameter mit; die Antwort liegt je Schlüssel in _msVz. */
+  var _msVz = {};
+  function msMerkmalQuery() {
+    var q = [['standardstufe', wert('standardstufe')], ['mikrolage', wert('mikrolage')], ['mod_punkte', wert('mod_punkte')],
+      ['zustand', wert('ds2_zustand')], ['zieljahr', wert('zb_fertig_jahr')], ['mietstg', wert('mietstg')]]
+      .filter(function (x) { return x[1] != null && String(x[1]).trim() !== ''; })
+      .map(function (x) { return '&' + x[0] + '=' + encodeURIComponent(String(x[1]).trim().replace(',', '.')); });
+    return q.join('');
+  }
+  /** v3343 · { vergleich, ziel, prognose } für eine Wohnungsgröße oder null (lädt einmal nach) */
+  function zielMaxFuer(wflW) {
+    var g = agsJetzt(), bj = parseInt(wert('baujahr'), 10), fl = Math.round(zahl(wflW) * 100) / 100;
+    if (!g || !(bj > 1000) || !(fl > 0)) return null;
+    msWerteFuer(fl);
+    var c = _msVz[g + '|' + bj + '|' + fl + '|' + msMerkmalQuery()];
+    return c || null;
+  }
   function msWerteNachladen() {
     try { if (artMitEinheiten() && window._dpMfh && Array.isArray(window._dpMfh.einheiten) && window._dpMfh.einheiten.length) objektKarte(); else objektSumme(); } catch (e) {}
     try { msHinweis(); } catch (e) {}
@@ -996,12 +1036,13 @@
     var bj = parseInt(wert('baujahr'), 10), fl = Math.round(zahl(wflW) * 100) / 100;
     if (!(bj > 1000)) return { unten: null, mittel: null, oben: null, hinweise: ['Baujahr fehlt — der Mietspiegel ordnet nach Baualter'] };
     if (!(fl > 0)) return { unten: null, mittel: null, oben: null, hinweise: ['Wohnfläche fehlt — der Mietspiegel ordnet nach Wohnungsgröße'] };
-    var k = g + '|' + bj + '|' + fl;
+    var k = g + '|' + bj + '|' + fl + '|' + msMerkmalQuery();
     if (k in _msWerte) { var c = _msWerte[k]; return c && typeof c.then !== 'function' ? c : null; }
     if (!window.Auth || typeof Auth.apiCall !== 'function') return null;
-    _msWerte[k] = Auth.apiCall('/marktbericht/mietspiegel?ags=' + encodeURIComponent(g) + '&baujahr=' + bj + '&wfl=' + fl, { method: 'GET' }).then(function (a) {
+    _msWerte[k] = Auth.apiCall('/marktbericht/mietspiegel?ags=' + encodeURIComponent(g) + '&baujahr=' + bj + '&wfl=' + fl + msMerkmalQuery(), { method: 'GET' }).then(function (a) {
       _msWerte[k] = a && a.werte ? a.werte : null;
       _msNz[k] = a && a.naeherung ? a.naeherung : null;   /* v3266 */
+      _msVz[k] = a && a.vergleich_wohnung ? { vergleich: a.vergleich_wohnung, ziel: a.ziel_maximum || null, prognose: a.ziel_prognose || null } : null;   /* v3343 */
       if (agsJetzt() === g) msWerteNachladen();
     }).catch(function () { _msWerte[k] = null; });
     return null;
@@ -1045,10 +1086,16 @@
     var fl = Math.round(zahl(msObjektWfl()) * 100) / 100, bj = parseInt(wert('baujahr'), 10);
     if (!(bj > 1000) || !(fl > 0)) return null;
     msWerteFuer(fl);   /* holt einmal je Gemeinde × Baujahr × Fläche */
-    var c = _msNz[agsJetzt() + '|' + bj + '|' + fl];
+    var c = _msNz[agsJetzt() + '|' + bj + '|' + fl + '|' + msMerkmalQuery()];   /* v3343 · derselbe Schlüssel wie msWerteFuer */
     return c && c.qm > 0 ? c : null;
   }
-  function msWahl() { var w = wert('ms_wahl'); return K.MS_WAHL[w] ? w : 'oben'; }
+  /* v3343 · ohne eigene Wahl gilt die Einordnung nach den Merkmalen (lib/mietanker.js einordnung, BGH VIII ZR 82/18):
+     Oberwert nur, wenn Ausstattung, Lage und Zustand ihn tragen, sonst Mittelwert. Bis v3342 stand hier „oben". */
+  function msWahl() {
+    var w = wert('ms_wahl'); if (K.MS_WAHL[w]) return w;
+    var z = zielMaxFuer(msObjektWfl()), e = z && z.vergleich && z.vergleich.einordnung;
+    return e && K.MS_WAHL[e.wahl] ? e.wahl : 'mittel';
+  }
   /* v3246 · Stufe des Abschlags Angebotsmiete -> Vergleichsmiete. Zahlen: config.js mieteAngebotAbschlag (EINE Stelle). */
   function mieteAbschlag() {
     var C = window.DealPilotConfig, cfg = C && C.mieteAngebotAbschlag;
@@ -1209,6 +1256,19 @@
       if (sO.miete != null && sO.miete > istO) out.hat_soll = true;
       if (zQ > 0 || mlO.length) out.hat_ziel = true;
     }
+    /* v3343 · ZIELBILD = DAS MAXIMUM (Marcel 12.11.2026: „im Zielbild interessiert uns das Maximum, was geht").
+       Ohne eigene Zielmiete setzt das Zielbild je Wohnung den Vorschlag an: das rechtlich vertretbare Maximum
+       bei Neuvermietung (Backend lib/mietanker.js), begrenzt auf die Marktmiete, wo sie bekannt ist; nie unter
+       der heutigen Miete. Die eigene Eingabe schlägt ihn weiterhin (oben, zielBremseFuer). */
+    if (!opts.ohneVorschlag) out.wohnungen.forEach(function (w, j) {
+      if (!w || w.art === 'gewerbe' || w.ziel_qm > 0 || !(w.wfl > 0)) return;
+      var v = null; try { v = vorschlagFuer(out, j); } catch (e) { v = null; }
+      if (!v || !(v.qm > 0) || !v.spanne) return;
+      var zM = Math.max(w.ist || 0, v.qm * w.wfl);
+      w.ziel = zM; w.ziel_qm = Math.round(zM / w.wfl * 100) / 100; w.ziel_auto = true; w.ziel_vorschlag = v;
+      if (!w.ziel_wann) w.ziel_wann = 'bei Mieterwechsel';
+      out.hat_ziel = true;
+    });
     /* Summen je Stufe. Mieterhöhung: Mieter bleiben (Leerstand bleibt leer).
        Zielbild: Zielmiete, sonst Soll, sonst Ist. */
     var W = out.wohnungen, fl = out.wfl || 0;
@@ -1362,6 +1422,7 @@
         var _e = w.e || {};   /* v3200 · Merkmale der Wohnung für den Vergleichswert (Aufteilerwert) */
         return Object.assign({ nr: w.nr, art: w.art, wfl: w.wfl, mea_pct: w.mea || null,
           lage: _e.lage || null, zimmer: zahl(_e.zimmer) || null, kueche: _e.aus_kueche || null, leer: _e.status === 'leer',
+          bremse_ausnahme: _e.bremse_ausnahme || null,   /* v3343 · § 556e/§ 556f für das Zielbild-Maximum */
           miete_jahr: { bestand: Math.round(w.ist * 12), mieterhoehung: Math.round(mhMiete(w) * 12),
                         zielbild: Math.round((w.ziel != null ? w.ziel : sm) * 12) } }, d558(w), nv(w));   /* v3152 */
       });
@@ -1371,6 +1432,12 @@
     /* v3152 · N117 · Marcel 03.11.2026: „wir haben ein Feld Leerstand in Prozent, das könnte man nehmen" */
     var _lq = zahl(wert('leerstand'));
     if (_lq >= 0 && String(wert('leerstand') || '').trim() !== '') body.leerstand_pct = Math.round(_lq * 100) / 100;
+    /* v3343 · Prognose zum Zielbild-Jahr: Jahr aus „Zielbild fertig (Jahr)", Rate aus der Mietsteigerung der Projektion
+       (calc.js projectAll - dieselbe Zahl, kein zweiter Wert); die Formularvorgabe zählt im Wertkern nicht als eigene Angabe */
+    var _zj = parseInt(String(wert('zb_fertig_jahr') || '').trim(), 10);
+    if (_zj >= 1990 && _zj <= 2100) body.zielbild_jahr = _zj;
+    var _ms0 = String(wert('mietstg') || '').trim();
+    if (_ms0 !== '' && isFinite(zahl(_ms0))) body.mietsteigerung_pct = zahl(_ms0);
     return body;
   }
   var _lauf = null;
@@ -2531,6 +2598,10 @@
         { t: 'Ertragswert Bestand', w: B, art: 'bestand' },
         Sw != null ? { t: 'Ertragswert Mieterhöhung', w: Sw, art: 'soll' } : null,
         Zw != null ? { t: 'Ertragswert Zielbild', w: Zw, art: 'ziel' } : null,
+        /* v3343 · Prognose zum Zielbild-Jahr, getrennt vom heutigen Wert (nie Verkehrswert) */
+        (Zw != null && H.zielbild_prognose && H.zielbild_prognose.verfuegbar && H.zielbild_prognose.wert != null)
+          ? { t: 'Prognose ' + H.zielbild_prognose.jahr, w: H.zielbild_prognose.wert, art: 'ziel',
+              unter: 'fortgeschrieben mit ' + String(H.zielbild_prognose.rate_pct).replace('.', ',') + ' % je Jahr' + (H.zielbild_prognose.rate_quelle === 'eigen' ? ' (eigene Annahme)' : ' (Index der Nettokaltmieten ' + (H.zielbild_prognose.rate_text.match(/\d{4} bis \d{4}/) || [''])[0] + ')') + ', kein Verkehrswert' } : null,
         { t: 'Potenzial netto', w: netto, art: 'netto', unter: kosten > 0 ? 'nach ' + eur(kosten) + ' Maßnahmenkosten' : 'ohne Maßnahmenkosten' }
       ].filter(Boolean) };
   }

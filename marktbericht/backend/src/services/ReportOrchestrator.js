@@ -54,6 +54,7 @@ import { objektartNormal, gewerbeArt, zinsObjektart, istGrundstueck } from '../l
 import { zensusMieteAmStichtag, nkmIndexAm, NKM_INDEX } from '../lib/zensus_miete.js';   /* v2993, v3043: Fortschreibung im Zensus-Block */
 import { protokolliereMessung as protokolliereAbschlag } from './JahreswerteService.js';   /* v3021 */
 import { stichtagVon, stichtagJahr, stichtagIso } from '../lib/stichtag.js';
+import { vergleichsmieteKontext } from '../lib/mietanker_kontext.js';   /* v3343 · Vergleichsmiete der Wohnung */
 import { regVfEingabe, regVfErgebnis } from '../lib/vergleichsfaktor_eingabe.js';   /* v3200 */   /* v3010 · Wertermittlungsstichtag */
 
 /* v3043 · Fortschreibungsfaktor der Zensus-Miete zum Stichtag an den Zensus-Block haengen */
@@ -1701,6 +1702,13 @@ export const ReportOrchestrator = {
       }
     }
 
+    /* v3343 · VERGLEICHSMIETE DER WOHNUNG als Anker der Marktueblichkeit (lib/mietanker.js): Mietspiegel-
+       Werte der Gemeinde, sonst die DealPilot-Naeherung aus den Zensus-Zeilen der Gemeinde. Nur Dateien und
+       eigene Tabelle (mb.zensus_werte), kein kostenpflichtiger Abruf. */
+    if (_wertParams) {
+      try { _wertParams.vergleichsmiete_kontext = await vergleichsmieteKontext(ref); }
+      catch (e) { step('vergleichsmiete: fehler ' + e.message); }
+    }
     let crossCheck = CrossCheckService.compute(ref, landValue, rent, valuation, _wertParams);
     /* v2988 · Sanierungskosten: welche Regel gilt - im Bericht offen, nicht still */
     try {
