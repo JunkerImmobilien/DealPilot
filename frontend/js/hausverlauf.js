@@ -139,7 +139,7 @@
       '.dp-hv-lage{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin:0 0 12px}',
       '.dp-hv-k{border:1px solid #E6DCC2;border-radius:12px;background:#fff;padding:11px 13px;display:grid;gap:3px;align-content:start;min-width:0}',
       '.dp-hv-k small{font:600 10px "JetBrains Mono",monospace;letter-spacing:.08em;text-transform:uppercase;color:#6B645A}',
-      '.dp-hv-k p{margin:0;font:400 12.5px/1.55 Inter,sans-serif;color:#2A2727;text-align:justify;hyphens:auto}',
+      '.dp-pa-wrap .dp-hv-k p{margin:0;font:400 12.5px/1.55 Inter,sans-serif;color:#2A2727;text-align:left !important;hyphens:auto}',
       '.dp-hv-filter{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 10px}',
       '.dp-pa-wrap .dp-hv-filter button{border:1px solid #E6DCC2 !important;background:#fff !important;border-radius:999px !important;padding:3px 10px !important;font:500 11.5px Inter,sans-serif !important;cursor:pointer;color:#2A2727 !important;box-shadow:none !important;min-height:0 !important}',
       '.dp-pa-wrap .dp-hv-filter button[aria-pressed="false"]{opacity:.45}',

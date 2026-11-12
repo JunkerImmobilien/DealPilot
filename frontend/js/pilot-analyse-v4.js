@@ -249,6 +249,9 @@
       /* v3323 · Marcel 12.11.2026: Texte „bis zum Ende ausgeschrieben … in Blocksatz“ - Blocksatz mit Silbentrennung (html lang=de), volle Breite */
       '.dp-pa-wrap[data-dp-pa-v4] .dp-pa-content p,.dp-pa-wrap[data-dp-pa-v4] .dp-pa-content li,.dp-pa-wrap[data-dp-pa-v4] .dp-pa-content dd,.dp-pa-wrap[data-dp-pa-v4] .dp-pa-kv{text-align:justify;-webkit-hyphens:auto;hyphens:auto;overflow-wrap:break-word}',
       '.dp-pa-wrap[data-dp-pa-v4] .dp-pa-content .dp-pa-p{max-width:none !important}',
+      /* schmale Karten (Strategie, Fit, Wegweiser, Szenarien, Mini-Grafiken) linksbündig - Blocksatz reißt dort Löcher */
+      '.dp-pa-wrap[data-dp-pa-v4] .dp-pa4-strat *,.dp-pa-wrap[data-dp-pa-v4] .dp-pa4-wk *,.dp-pa-wrap[data-dp-pa-v4] .dp-pa4-szk p,.dp-pa-wrap[data-dp-pa-v4] .dp-pa4-mini p,.dp-pa-wrap[data-dp-pa-v4] .dp-pa4-liste li{text-align:left !important}',
+      '@media (max-width:480px){.dp-pa-wrap[data-dp-pa-v4] .dp-pa-content p,.dp-pa-wrap[data-dp-pa-v4] .dp-pa-content li{text-align:left !important}}',
       /* v3323 · Wert & Verlauf: im Einfach ohne die Tafel der Absolutwerte (der Verlauf selbst steht jetzt in beiden) */
       '.dp-pa-wrap[data-dp-pa-modus="einfach"] .dpv-card:has(.dpv-tbl){display:none !important}',
       '.dp-pa4-bt{display:block;font:600 10.5px "JetBrains Mono",monospace;letter-spacing:.08em;text-transform:uppercase;color:#A49D92;margin:0 0 4px}',
