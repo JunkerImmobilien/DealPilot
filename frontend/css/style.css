@@ -41629,20 +41629,27 @@ body.dp-dg-2 :is(#s0, #s1, #s2, #s3, #s4, #s3-tax, #s5, #s6, #s8) [data-dp-dg="3
          Die Stand-Zeilen der Konditionen (#d1_grp_kond_stand) und der Pilot-Analyse
          (.dp-pa-stand) kuerzen mit … ABSICHTLICH - ein Tipp klappt sie auf
          (pilot-analyse-v4.js .auf). Deshalb hier unveraendert. */
-  #d1z-marktzins-knopf .btn-outline { min-height: 34px; white-space: normal; padding: 6px 10px; }
+  /* v3340a: zwei IDs plus html body - finanzierung-raster.css (#s3 #d1t_field …, 2,3,0) setzt
+     min-height:0 und padding 2px 8px mit !important. */
+  html body #s3 #d1t_field .dp-mz-knopf-zeile > .btn.dp-mz-uebernehmen {
+    min-height: 32px !important; padding: 5px 8px !important; white-space: normal; text-overflow: clip; text-align: left; }
   /* (6) Reiter Bewertung, Stress-Matrix: die Achse unten nahm ihre Spaltenbreite vom Inhalt
          (35/57/58/50/44 px gegen 5 x 43 px der Zellen) - „Wachstum" lief 29 px (bei 360 px:
          59 px) aus der Karte. Jetzt dieselben fuenf Spalten wie die Zellen. */
   .bc-matrix-row, .bc-matrix-axis-x { grid-template-columns: repeat(5, minmax(0, 1fr)) !important; }
   .bc-matrix-axis-x-cell { min-width: 0; font-size: 9.5px; letter-spacing: 0; overflow-wrap: anywhere;
     hyphens: auto; -webkit-hyphens: auto; line-height: 1.2; }
+  /* v3340a: das Wort steht in .bc-delta, und v2571 (Z. ~39246) haelt es mit nowrap !important
+     in einer Zeile - bei 37 px Spalte liefen „Vollvermietet"/„Aufwertung" ineinander. */
+  html body .bc-matrix-axis-x .bc-matrix-axis-x-cell .bc-delta { white-space: normal !important;
+    overflow-wrap: anywhere; hyphens: auto; -webkit-hyphens: auto; line-height: 1.15; }
   /* (7) Reiter Deal-Aktion, Bordkarten der Partner: Logo 92 px plus Abriss 58 px liessen dem
          Namen 70 px - er lief 26 px (360 px: 56 px) unter den Abriss, der Knopf 6 px. */
   html body #s8 .dab-bp-logo { width: 56px; height: 56px; border-radius: 10px; }
   html body #s8 .dab-bp-stub { width: 40px; }
   html body #s8 .dab-bp-top > div:not(.dab-bp-logo) { min-width: 0; flex: 1 1 auto; overflow-wrap: anywhere; }
   html body #s8 .dab-bp-cta { white-space: normal; text-align: center; }
-  html body #s8 .dab-req li { flex-wrap: wrap; }
+  html body #s8 .dab-req li .dab-req-fix { flex: 0 0 auto; }
   /* (8) Einstellungen, Liste: die Seitenleiste nahm 834 px in einem 778-px-Schirm und
          scrollte nicht - „Rechtliches" und alles darunter war unerreichbar. Ursache: die
          v2201-Liste (flex:1 1 auto, min-height:0; 1,2,2) verlor gegen
@@ -41653,8 +41660,8 @@ body.dp-dg-2 :is(#s0, #s1, #s2, #s3, #s4, #s3-tax, #s5, #s6, #s8) [data-dp-dg="3
          (1fr = minmax(auto,1fr)) - die Karten wurden bei 359 px abgeschnitten, die Spalte
          „€ / Monat" war weg. Die Tabellen wischen in ihrem .vm-scroll. Der Wertansatz-
          Waehler im Titel lief 128 px hinaus. */
-  #s-vermoegen .vm-zwei { grid-template-columns: minmax(0, 1fr) !important; }
-  #s-vermoegen .vm-zwei > div { min-width: 0; }
-  #s-vermoegen .vm-wa { display: flex; flex-wrap: wrap; margin: 6px 0 0; max-width: 100%; }
-  #s-vermoegen .vm-wa select { max-width: 100%; min-width: 0; }
+  html body #s-vermoegen .vm-zwei { grid-template-columns: minmax(0, 1fr) !important; }
+  html body #s-vermoegen .vm-zwei > div { min-width: 0; }
+  html body #s-vermoegen .vm-wa { display: flex; flex-wrap: wrap; margin: 6px 0 0; max-width: 100%; }
+  html body #s-vermoegen .vm-wa select { max-width: 100%; min-width: 0; }
 }
