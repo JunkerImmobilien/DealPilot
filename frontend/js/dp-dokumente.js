@@ -47,7 +47,13 @@
       var adr = adresse || (o && o.name) || '';
       if (!adr) return info;
       return api('/marktbericht/geocode?address=' + encodeURIComponent(adr)).then(function (g) {
-        return D().karte(g && g.lat, g && g.lon, 16, 1400, 700).then(function (k) { info.karte = k; return info; });
+        /* v3336 · zuerst die OSM-Lagekarte mit Punkt und Namensnennung (lagekarte.js, Kacheln aus der eigenen
+           Ablage, 0 EUR); nur wenn sie ausfaellt, die bisherige Kartenkachel des Marktberichts. Deckblatt 210 x 118 mm. */
+        var osm = window.DpLagekarte ? DpLagekarte.bild(g && g.lat, g && g.lon, { breite: 760, hoehe: 427 }) : Promise.resolve(null);
+        return osm.then(function (lk) {
+          if (lk) { info.karte = lk.src; return info; }
+          return D().karte(g && g.lat, g && g.lon, 16, 1400, 700).then(function (k) { info.karte = k; return info; });
+        });
       }).catch(function () { return info; });
     }).catch(function () { return { fotos: [], seq: '', kuerzel: '', karte: null }; });
   }

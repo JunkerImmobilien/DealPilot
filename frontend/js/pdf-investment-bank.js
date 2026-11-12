@@ -922,6 +922,12 @@
     if (fotos.length && !KURZ) {   /* v2900a · Kurzfassung ohne Titelbild, sonst rutschen die Kennzahlen auf S. 2 */
       var _r0 = fotos[0].w / fotos[0].h, _fr = _r0 < 2.5 ? Math.min(2.5, _r0 / 0.65) : 2.5, _fh = Math.min(KURZ ? 46 : 74, CW / _fr), _fw = _fh * _fr;
       bild(fotos[0], L + (CW - _fw) / 2, y, _fw, _fh, true); y += _fh + 6;
+    } else if (!KURZ && window.DpLagekarte) {
+      /* v3336 · ohne Foto die Lagekarte (OpenStreetMap, Punkt, Namensnennung im Bild; lagekarte.js) im Rahmen
+         eines breiten Titelfotos (2,5 : 1) - dieselbe Hoehe wie mit Foto, die Seite laeuft nicht weiter. */
+      var _lk = null, _lh = Math.min(74, CW / 2.5);
+      try { _lk = await window.DpLagekarte.fuerAdresse(adr || '', { breite: 760, hoehe: Math.round(760 * _lh / CW) }); } catch (e) { _lk = null; }
+      if (_lk) { bild(_lk, L, y, CW, _lh, false); y += _lh + 6; }
     }
 
     abschnitt('Objekt');

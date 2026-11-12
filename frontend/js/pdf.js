@@ -1457,7 +1457,17 @@ async function _exportPDFInner() {
     drawPhotoFit(doc, _tf, M + (CW - _tw) / 2, cy + (containerH - _th) / 2, _tw, _th, null);
     if (window._dpPdfLight) { doc.setDrawColor.apply(doc, C.BORDER); doc.setLineWidth(0.25); doc.rect(M + (CW - _tw) / 2, cy + (containerH - _th) / 2, _tw, _th); }
     cy += containerH + 3;
-  } else { cy += 2; }
+  } else {
+    /* v3336 · ohne Foto die Lagekarte (OpenStreetMap, Punkt, Namensnennung im Bild; lagekarte.js) im selben
+       Rahmen wie das Titelfoto - ohne Anschrift/Koordinaten bleibt es beim bisherigen Leerraum. */
+    var _lkH = g('thesis') ? 58 : 100, _lk = null;
+    try { if (window.DpLagekarte) _lk = await window.DpLagekarte.fuerAdresse(undefined, { breite: 728, hoehe: Math.round(728 * _lkH / CW) }); } catch (e) { _lk = null; }
+    if (_lk) {
+      drawPhotoFit(doc, _lk, M, cy, CW, _lkH, null);
+      doc.setDrawColor.apply(doc, window._dpPdfLight ? C.BORDER : C.GOLD); doc.setLineWidth(0.25); doc.rect(M, cy, CW, _lkH);
+      cy += _lkH + 3;
+    } else { cy += 2; }
+  }
 
   // Investitionsthese
   var thesis = g('thesis');

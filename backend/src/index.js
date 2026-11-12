@@ -405,6 +405,7 @@ app.use('/api/v1/wuensche', rateLimit({ windowMs: 60000, max: 60 }), require('./
 app.use('/api/v1/api-keys', require('./routes/apiKeys'));  // mand v807-api-keys
 app.use('/api/v1/hub', require('./routes/maklerHub'));
 app.use('/api/v1/flow', require('./routes/flow'));
+app.use('/api/v1/lagekarte', rateLimit({ windowMs: 60000, max: 240 }), require('./routes/lagekarte'));  // v3336 · OSM-Kacheln fuer die PDF-Lagekarte (Ablage, Ratenbremse)
 app.use('/api/v1/kosten', require('./routes/kosten'));
 app.use('/api/v1/agent', require('./routes/agent'));  // v3297 · DealPilot Flow Punkt 5: Co-Pilot ueber die API  // v3296 · DealPilot Flow Punkt 6: Freigabe kostenpflichtiger Stufen  // v3290 · DealPilot Flow: GET/PUT /flow/profil (Flow-Investor-Schnittstelle Punkt 3)  // v3190 · Makler-Hub-Anmeldung (Dateien/Makler-Hub/Anmeldung-Schnittstelle.md)
 /* v2071 · Die Rechenkerne als Schnittstelle: Restnutzungsdauer (im Image)
