@@ -471,9 +471,11 @@ if (!window._pdfGold) {
         var hinweis = u.mail_status === 'testadresse' ? 'Testadresse, keine Mail' : (u.mail_status === 'fehler' ? 'Mail nicht zugestellt' : '');
         var mt = [esc(u.anzeige_name ? u.anzeige_name + ' · ' + u.email : u.email), zeit, hinweis].filter(Boolean).join(' · ');
         var weg = (u.status === 'gesendet' || u.status === 'geoeffnet') ? '<button class="rp-act remove" data-uw="' + esc(u.id) + '">widerrufen</button>' : '';
+        /* v3317b · mitgeschickter Platz */
+        var platz = u.platz_reserviert ? '<span class="rp-bg" style="background:#e2f0e6;color:#3FA56C" title="Ein Platz ist für diese Übergabe reserviert. Widerruf oder Ablauf gibt ihn frei.">1 PLATZ RESERVIERT</span>' : '';
         return '<div class="rp-share"><div><div class="rp-nm">' + esc(u.adresse || 'Objekt') + (u.score != null ? ' <span style="font:500 12px Inter;color:#6f685d">· Score ' + esc(u.score) + '</span>' : '') + '</div>' +
-          '<div class="rp-mt">' + mt + '</div></div>' +
-          '<div style="margin-left:auto;display:flex;gap:8px;align-items:center"><span class="rp-bg" style="' + s[1] + '">' + s[0] + '</span>' + weg + '</div></div>';
+          '<div class="rp-mt">' + mt + (u.platz_reserviert ? ' · 1 Platz reserviert für ' + esc(u.email) : '') + '</div></div>' +
+          '<div style="margin-left:auto;display:flex;gap:8px;align-items:center">' + platz + '<span class="rp-bg" style="' + s[1] + '">' + s[0] + '</span>' + weg + '</div></div>';
       }).join('');
       w.innerHTML = '<p class="rp-intro">Ein durchgerechnetes Objekt per E-Mail an einen Kunden übergeben. Die Mail kommt in deiner Marke; der Kunde bekommt eine Kopie des Objekts in sein Konto. Ein neuer Kunde legt dabei ein Konto an und erhält einen freien Platz.</p>' +
         '<p class="rp-label">Objekt übergeben</p>' +
@@ -486,26 +488,37 @@ if (!window._pdfGold) {
           '</div>' +
           '<div class="rp-fl" style="margin-top:14px">Persönlicher Satz (optional)</div><textarea id="rp-ub-satz" maxlength="600" rows="2" style="' + inp + ';resize:vertical" placeholder="z. B. Wie besprochen - schau dir die Zahlen in Ruhe an."></textarea>' +
           '<div id="rp-ub-vp" class="rp-staffel" style="margin-top:10px;min-height:18px"></div>' +
+          /* v3317b · Kundenplatz mitschicken (nur neue Adresse mit freiem Platz) */
+          '<label id="rp-ub-platz-wrap" style="display:none;align-items:center;gap:8px;margin-top:8px;font:500 13px Inter;color:#1c1a17;cursor:pointer">' +
+            '<input type="checkbox" id="rp-ub-platz" style="width:16px;height:16px;accent-color:var(--wl-c9a84c, #C9A84C)"> Kundenplatz mitschicken <span style="color:#6f685d;font-weight:400">- wird beim Senden reserviert, der Zugang ist sofort freigeschaltet</span></label>' +
           '<div class="rp-buyfoot"><span class="rp-staffel">Der Link ist 30 Tage gültig und lässt sich einmal übernehmen. Du siehst unten, ob er geöffnet und übernommen wurde.</span>' +
-            '<button class="rp-checkout" id="rp-ub-send">An Kunden übergeben</button></div>' +
+            '<button class="rp-checkout" id="rp-ub-send">An Kunden übergeben</button>' +
+            '<button class="rp-checkout" id="rp-ub-kauf2" style="display:none">Erst einen Platz kaufen →</button></div>' +
         '</div>') : '<p class="rp-ph">Noch keine eigenen Objekte. Leg zuerst ein Objekt an und rechne es durch.</p>') +
-        '<p class="rp-label" style="margin-top:24px">Bisherige Übergaben</p>' + (liste || '<p class="rp-ph">Noch keine Übergaben.</p>');
+        '<p class="rp-label" style="margin-top:24px">Bisherige Übergaben' + (r.pool ? ' <span style="text-transform:none;letter-spacing:0;font:500 11.5px Inter;color:#6f685d;margin-left:8px">Plätze: ' + (r.pool.frei || 0) + ' frei · ' + (r.pool.reserviert || 0) + ' reserviert</span>' : '') + '</p>' + (liste || '<p class="rp-ph">Noch keine Übergaben.</p>');
       w.querySelectorAll('[data-uw]').forEach(function (b) { b.addEventListener('click', function () { uebWiderrufen(b.getAttribute('data-uw')); }); });
       var em = $('rp-ub-email'); if (em) em.addEventListener('input', function () { clearTimeout(_uebVp); _uebVp = setTimeout(uebVorpruefung, 450); });
       var sb = $('rp-ub-send'); if (sb) sb.addEventListener('click', uebSenden);
+      /* v3317b · kein Platz: Verweis auf den vorhandenen Platz-Kauf (Übersicht › Seats kaufen) */
+      var k2 = $('rp-ub-kauf2'); if (k2) k2.addEventListener('click', function () { go('ueber'); setTimeout(function () { try { toggleBuy(); } catch (e) {} }, 400); });
     } catch (e) { w.innerHTML = '<p class="rp-ph">Übergaben konnten nicht geladen werden.</p>'; }
   }
+  var _uebPlatzFuer = null;   /* v3317b · für welche Adresse das Häkchen vorbelegt wurde */
   async function uebVorpruefung() {
-    var em = ($('rp-ub-email') || {}).value || '', box = $('rp-ub-vp'), sb = $('rp-ub-send'); if (!box) return null;
-    var frei = function (an) { if (sb) { sb.disabled = !an; sb.style.opacity = an ? '1' : '.45'; sb.style.cursor = an ? 'pointer' : 'not-allowed'; } };
-    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em.trim())) { box.innerHTML = ''; frei(true); return null; }
+    var em = ($('rp-ub-email') || {}).value || '', box = $('rp-ub-vp'), sb = $('rp-ub-send'), k2 = $('rp-ub-kauf2'), pw = $('rp-ub-platz-wrap'), pc = $('rp-ub-platz'); if (!box) return null;
+    /* v3317b · statt gesperrtem Knopf: ohne freien Platz steht dort der Weg zum Platz-Kauf */
+    var knopf = function (senden) { if (sb) sb.style.display = senden ? '' : 'none'; if (k2) k2.style.display = senden ? 'none' : ''; };
+    var haken = function (zeigen) {
+      if (!pw) return; pw.style.display = zeigen ? 'flex' : 'none';
+      if (zeigen && pc && _uebPlatzFuer !== em.trim().toLowerCase()) { pc.checked = true; _uebPlatzFuer = em.trim().toLowerCase(); }
+    };
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em.trim())) { box.innerHTML = ''; knopf(true); haken(false); return null; }
     try {
       var v = await api('/uebergaben/vorpruefung?email=' + encodeURIComponent(em.trim()));
-      if (v.bestehender_mandant) box.innerHTML = '<span style="color:#3FA56C">●</span> Bereits dein Mandant - die Kopie landet direkt in seinem Konto.';
-      else if (v.frei > 0) box.innerHTML = '<span style="color:#3FA56C">●</span> Neuer Kunde: legt ein Konto an und bekommt einen deiner ' + v.frei + ' freien Plätze.';
-      else box.innerHTML = '<span style="color:#B86250">●</span> <b>Kein freier Platz.</b> Diese Adresse ist noch kein Mandant - kauf zuerst einen Platz. <button class="rp-act assign" id="rp-ub-kauf" style="margin-left:6px">Zu den Seats</button>';
-      frei(v.kann_senden);
-      var k = $('rp-ub-kauf'); if (k) k.addEventListener('click', function () { go('ueber'); setTimeout(function () { try { toggleBuy(); } catch (e) {} }, 400); });
+      if (v.bestehender_mandant) box.innerHTML = '<span style="color:#3FA56C">●</span> Bereits dein Mandant - die Kopie landet direkt in seinem Konto, ein Platz wird nicht gebraucht.';
+      else if (v.frei > 0) box.innerHTML = '<span style="color:#3FA56C">●</span> Neuer Kunde: legt ein Konto an. Frei: ' + v.frei + (v.frei === 1 ? ' Platz' : ' Plätze') + (v.reserviert ? ', reserviert: ' + v.reserviert : '') + '.';
+      else box.innerHTML = '<span style="color:#B86250">●</span> <b>Kein freier Platz.</b> Diese Adresse ist noch kein Mandant - kauf zuerst einen Platz' + (v.reserviert ? ' (' + v.reserviert + ' reserviert für offene Übergaben)' : '') + '.';
+      knopf(v.kann_senden); haken(!!v.platz_moeglich);
       return v;
     } catch (e) { box.innerHTML = ''; return null; }
   }
@@ -517,7 +530,9 @@ if (!window._pdfGold) {
     if (v && !v.kann_senden) { toast(UEB_FEHLER.kein_freier_platz); return; }
     var sb = $('rp-ub-send'); if (sb) { sb.disabled = true; sb.textContent = 'Sende…'; }
     try {
-      var r = await api('/uebergaben', { method: 'POST', body: { objectId: oid, email: em, anzeigeName: nm, nachricht: satz } });
+      var pw = $('rp-ub-platz-wrap'), pc = $('rp-ub-platz');
+      var mitPlatz = !!(v && v.platz_moeglich && pw && pw.style.display !== 'none' && pc && pc.checked);   /* v3317b */
+      var r = await api('/uebergaben', { method: 'POST', body: { objectId: oid, email: em, anzeigeName: nm, nachricht: satz, platzMitschicken: mitPlatz } });
       var st = r && r.mail && r.mail.status;
       toast(st === 'gesendet' ? '✓ Objekt an ' + em + ' übergeben' : (st === 'testadresse' ? 'Übergabe angelegt (Testadresse - keine Mail)' : 'Übergabe angelegt - Mail nicht versendet'));
       _st.uebObj = oid;
@@ -1273,7 +1288,8 @@ if (!window._pdfGold) {
     var knopf = 'background:linear-gradient(105deg,var(--wl-e8cc7a, #E8CC7A),var(--wl-c9a84c, #C9A84C),var(--wl-b8932f, #b8932f));color:var(--rp-tinte, #241c05);border:none;border-radius:8px;padding:9px 16px;font-weight:700;cursor:pointer;font-family:inherit';
     var zweit = 'background:none;border:1px solid rgba(255,255,255,.2);color:#fff;border-radius:8px;padding:9px 14px;cursor:pointer;font-family:inherit';
     var text = '<b style="color:var(--wl-e8cc7a, #E8CC7A)">' + esc(info.brand_name) + '</b> übergibt dir das Objekt <b>' + esc(o.adresse || '') + '</b>' +
-      (o.score != null ? ' (Score ' + esc(o.score) + (o.stufe ? ' · ' + esc(o.stufe) : '') + ')' : '') + '. ';
+      (o.score != null ? ' (Score ' + esc(o.score) + (o.stufe ? ' · ' + esc(o.stufe) : '') + ')' : '') + '. ' +
+      (info.platz_reserviert ? 'Dein Zugang ist schon freigeschaltet. ' : '');   /* v3317b · Platz mitgeschickt */
     b.innerHTML = loggedIn
       ? '<span style="flex:1;min-width:220px">' + text + 'Eine Kopie in dein Konto' + (ich ? ' <b>' + esc(ich) + '</b>' : '') + ' übernehmen?</span>' +
         '<button id="rp-ueb-ja" style="' + knopf + '">Objekt übernehmen</button><button id="rp-ueb-x" style="' + zweit + '">Später</button>'

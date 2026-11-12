@@ -125,6 +125,20 @@ ok(mb.html.includes('12.12.2026'), 'Ablaufdatum in der Mail');
 const ohne = U.mailBauen({ zusammenfassung: U.zusammenfassung({ str: 'Weg', hnr: '1' }), link: 'https://x.test/?rp_uebergabe=T', reseller: marke });
 ok(!ohne.html.includes('<img src="https://x.test') && ohne.html.includes('–'), 'ohne Foto kein Bild, fehlende Kennzahl als Strich');
 
+/* ── A3b · PLATZ MITSCHICKEN (v3317b) ─────────────────────────────────── */
+console.log('A3b · PLATZ - mitgeschickter Kundenplatz');
+{
+  const mit = U.mailBauen({ zusammenfassung: z, link: 'https://x.test/?rp_uebergabe=T', reseller: marke, platz: true });
+  const ohneP = U.mailBauen({ zusammenfassung: z, link: 'https://x.test/?rp_uebergabe=T', reseller: marke });
+  ok(mit.html.includes('Dein Zugang ist schon freigeschaltet') && mit.text.includes('Dein Zugang ist schon freigeschaltet'), 'Mail mit Platz: "Dein Zugang ist schon freigeschaltet" (HTML und Text)');
+  ok(!ohneP.html.includes('freigeschaltet') && !ohneP.text.includes('freigeschaltet'), 'Mail ohne Platz: kein Satz dazu');
+  const rs = readFileSync(join(SRC, 'services', 'resellerService.js'), 'utf8');
+  ok((rs.match(/\$\{FREI_SQL\}/g) || []).length >= 4, 'FREI_SQL in Zaehlen (frei + reserviert), Abbauen und Zuweisen (' + (rs.match(/\$\{FREI_SQL\}/g) || []).length + ' Stellen)');
+  ok(/reserviert_fuer = NULL/.test(rs) && /lizenzId/.test(rs), 'Zuweisung nimmt den reservierten Platz (opts.lizenzId) und loest die Reservierung');
+  const rt = readFileSync(join(SRC, 'routes', 'resellerPortal.js'), 'utf8');
+  ok(/platzMitschicken: b\.platzMitschicken === true/.test(rt), 'Route reicht das Haekchen nur bei echtem true durch');
+}
+
 /* ── A4 · KOPIE ────────────────────────────────────────────────────────── */
 console.log('A4 · KOPIE - was mitgeht');
 const k = U.datenFuerKopie(daten, { uebergabe_id: 'u1', von: 'Kessler & Roth Finanzierung' });

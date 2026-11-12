@@ -144,7 +144,9 @@ async function vorpruefung(resellerId, email) {
   const pool = await reseller.getPool(resellerId);
   const frei = parseInt(pool.frei, 10) || 0;
   const bestehend = m.rowCount > 0;
-  return { bestehender_mandant: bestehend, frei: frei, braucht_platz: !bestehend, kann_senden: bestehend || frei > 0 };
+  /* v3317b · platz_moeglich: das Haekchen "Kundenplatz mitschicken" kann gesetzt werden (neue Adresse + freier Platz) */
+  return { bestehender_mandant: bestehend, frei: frei, reserviert: parseInt(pool.reserviert, 10) || 0, braucht_platz: !bestehend,
+           kann_senden: bestehend || frei > 0, platz_moeglich: !bestehend && frei > 0 };
 }
 
 // ── Mail ───────────────────────────────────────────────────────────────────
@@ -203,6 +205,9 @@ function mailBauen(p) {
         scoreZeile + kennzahlen + marktwert +
       '</div>' +
     '</div>' +
+    /* v3317b · Platz mitgeschickt */
+    (p.platz ? '<p style="font-size:14px;line-height:1.6;color:#1c1a17;margin:18px 0 0;padding:12px 14px;background:#e2f0e6;border-radius:8px">' +
+      '<b>Dein Zugang ist schon freigeschaltet.</b> ' + esc(m.brandName) + ' hat dir einen Platz reserviert - du legst nur noch dein Konto an.</p>' : '') +
     '<p style="text-align:center;margin:24px 0">' + partnerMail.knopf(m, 'Objekt öffnen', p.link) + '</p>' +
     '<p style="font-size:12px;color:#8a8473;line-height:1.6">Oder kopiere diesen Link:<br>' + esc(p.link) + '</p>' +
     '<p style="font-size:12px;color:#8a8473;border-top:1px solid #eee;padding-top:14px;margin-top:18px;line-height:1.6">' +
@@ -220,6 +225,7 @@ function mailBauen(p) {
   if (z.rendite_brutto !== null && z.rendite_brutto !== undefined) t.push('Bruttomietrendite: ' + _pct(z.rendite_brutto));
   if (z.dscr !== null && z.dscr !== undefined) t.push('DSCR: ' + _dscr(z.dscr));
   if (z.marktwert) t.push('Wertangabe: ' + _eur(z.marktwert.wert) + (z.marktwert.herkunft ? ' (' + z.marktwert.herkunft + ')' : ''));
+  if (p.platz) t.push('', 'Dein Zugang ist schon freigeschaltet: ' + m.brandName + ' hat dir einen Platz reserviert - du legst nur noch dein Konto an.');
   t.push('', 'Objekt öffnen:', p.link, '', 'Der Link ist ' + (ablauf ? 'bis ' + ablauf : GUELTIG_TAGE + ' Tage') + ' gültig und lässt sich einmal übernehmen.');
 
   return {
@@ -278,9 +284,27 @@ async function anlegen(o) {
       JSON.stringify(z), GUELTIG_TAGE]);
   const row = ins.rows[0];
 
+  /* v3317b · Kundenplatz mitschicken: beim SENDEN einen freien Platz fuer genau diese Uebergabe
+     reservieren (atomar - zwei gleichzeitige Uebergaben greifen nie denselben Platz). Kein Platz
+     mehr frei -> die Uebergabe wird nicht angelegt, 409. Fuer Bestandsmandanten nie. */
+  row.lizenz_id = null;
+  if (o.platzMitschicken && !vp.bestehender_mandant) {
+    const res = await query(
+      `UPDATE licenses SET reserviert_fuer = $2
+        WHERE id = (SELECT id FROM licenses WHERE reseller_id = $1 AND kind = 'client' AND status = 'pool' AND ${reseller.FREI_SQL}
+                     ORDER BY created_at ASC FOR UPDATE SKIP LOCKED LIMIT 1)
+        RETURNING id`, [o.resellerId, row.id]);
+    if (!res.rowCount) {
+      await query('DELETE FROM objekt_uebergaben WHERE id = $1', [row.id]);
+      throw fehler('kein_freier_platz', 409);
+    }
+    row.lizenz_id = res.rows[0].id;
+    await query('UPDATE objekt_uebergaben SET lizenz_id = $2 WHERE id = $1', [row.id, row.lizenz_id]);
+  }
+
   const brand = await _markeLaden(o.resellerId, o.basis);
   const mail = mailBauen({ zusammenfassung: z, nachricht: nachricht, anzeigeName: anzeigeName, link: _link(o.basis, token),
-                           bildUrl: _bildUrl(o.basis, bildSchluessel), ablauf: row.expires_at, reseller: brand });
+                           bildUrl: _bildUrl(o.basis, bildSchluessel), ablauf: row.expires_at, reseller: brand, platz: !!row.lizenz_id });
   let mailStatus;
   if (istTestadresse(email)) {
     mailStatus = 'testadresse';
@@ -303,7 +327,10 @@ async function anlegen(o) {
 async function liste(resellerId) {
   const r = await query(
     `SELECT u.id, u.object_id, u.email, u.anzeige_name, u.mail_status, u.created_at, u.expires_at,
-            u.geoeffnet_at, u.uebernommen_at, u.widerrufen_at, u.seat_assigned,
+            u.geoeffnet_at, u.uebernommen_at, u.widerrufen_at, u.seat_assigned, u.lizenz_id,
+            /* v3317b · Platz gerade fuer diese Uebergabe reserviert (aktiv) */
+            (u.status IN ('gesendet','geoeffnet') AND u.expires_at > now() AND EXISTS (
+               SELECT 1 FROM licenses l WHERE l.id = u.lizenz_id AND l.reserviert_fuer = u.id AND l.status = 'pool')) AS platz_reserviert,
             CASE WHEN u.status IN ('gesendet','geoeffnet') AND u.expires_at <= now() THEN 'abgelaufen' ELSE u.status END AS status,
             u.zusammenfassung->>'adresse' AS adresse, (u.zusammenfassung->>'score')::int AS score,
             o.seq_no
@@ -317,6 +344,8 @@ async function widerrufen(resellerId, id) {
   const r = await query(
     `UPDATE objekt_uebergaben SET status = 'widerrufen', widerrufen_at = now()
       WHERE id = $1 AND reseller_id = $2 AND status IN ('gesendet','geoeffnet') RETURNING id`, [id, resellerId]);
+  /* v3317b · ein reservierter Platz ist sofort wieder frei */
+  if (r.rowCount) await query('UPDATE licenses SET reserviert_fuer = NULL WHERE reserviert_fuer = $1', [id]);
   return r.rowCount > 0;
 }
 
@@ -346,7 +375,8 @@ async function info(token) {
     status: (abgelaufen && z.status !== 'uebernommen') ? 'abgelaufen' : z.status,
     valid: !abgelaufen && (z.status === 'gesendet' || z.status === 'geoeffnet'),
     expires_at: z.expires_at,
-    objekt: { adresse: zf.adresse, score: zf.score, stufe: zf.stufe ? zf.stufe.wort : null }
+    objekt: { adresse: zf.adresse, score: zf.score, stufe: zf.stufe ? zf.stufe.wort : null },
+    platz_reserviert: !!z.lizenz_id   /* v3317b */
   };
 }
 
@@ -389,8 +419,11 @@ async function uebernehmen(token, user) {
     let seatAssigned = null;
     if (neuerMandant) {
       seatAssigned = false;
-      try { await reseller.assignSeat(z.reseller_id, client.id); seatAssigned = true; } catch (e) { /* kein Platz mehr frei - Partner weist spaeter zu */ }
+      /* v3317b · mitgeschickter Platz: genau DIESER geht an den Kunden */
+      try { await reseller.assignSeat(z.reseller_id, client.id, { lizenzId: z.lizenz_id || null }); seatAssigned = true; } catch (e) { /* kein Platz mehr frei - Partner weist spaeter zu */ }
     }
+    /* v3317b · Bestandsmandant braucht den reservierten Platz nicht -> zurueck in den Pool */
+    if (z.lizenz_id) await query('UPDATE licenses SET reserviert_fuer = NULL WHERE id = $1 AND reserviert_fuer = $2', [z.lizenz_id, z.id]);
 
     const daten = datenFuerKopie(orig.data, { uebergabe_id: z.id, von: z.brand_name, am: new Date().toISOString(), seq_partner: (orig.data && orig.data._obj_seq) || null });
     let fotos = orig.photos;

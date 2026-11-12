@@ -26,9 +26,12 @@ async function query(sql, p = []) {
     const r = db.resellers.get(p[0]); return { rows: r ? [r] : [], rowCount: r ? 1 : 0 };
   }
   if (/COUNT\(\*\) FILTER/.test(s)) {
+    /* v3317b · reservierte Plaetze (Objekt-Uebergabe) zaehlen nur, wenn das SQL die Bedingung fuehrt */
     const l = db.licenses.filter(x => x.reseller_id === p[0] && x.kind === 'client');
+    const kenntRes = /reserviert_fuer/.test(s);
+    const istFrei = (x) => x.status === 'pool' && !(kenntRes && x.reserviert);
     return { rows: [{ gekauft: l.length, zugewiesen: l.filter(x => x.status === 'zugewiesen').length,
-                      frei: l.filter(x => x.status === 'pool').length }] };
+                      frei: l.filter(istFrei).length, reserviert: l.filter(x => x.status === 'pool' && !istFrei(x)).length }] };
   }
   if (/^INSERT INTO licenses/.test(s)) {
     for (let i = 0; i < p[4]; i++) db.licenses.push({ id: ++db.seq, reseller_id: p[0], kind: 'client',
@@ -36,7 +39,8 @@ async function query(sql, p = []) {
     return { rows: [], rowCount: p[4] };
   }
   if (/^DELETE FROM licenses/.test(s)) {
-    const frei = db.licenses.filter(x => x.reseller_id === p[0] && x.kind === 'client' && x.status === 'pool')
+    const kenntRes = /reserviert_fuer/.test(s);   /* v3317b · ohne die Bedingung baute der Abgleich reservierte Plaetze ab */
+    const frei = db.licenses.filter(x => x.reseller_id === p[0] && x.kind === 'client' && x.status === 'pool' && !(kenntRes && x.reserviert))
       .sort((a, b) => a.created_at - b.created_at).slice(0, p[1]).map(x => x.id);
     db.licenses = db.licenses.filter(x => !frei.includes(x.id));
     return { rows: [], rowCount: frei.length };
@@ -125,6 +129,15 @@ await query('INSERT INTO licenses', ['r2', 'monatlich', null, null, 3]);
 db.licenses.filter(x => x.reseller_id === 'r2').forEach(x => { x.status = 'zugewiesen'; });
 await reseller.syncPoolQuantity('r2', 0);
 p = await pool('r2'); ok(p.gekauft === 3 && p.zugewiesen === 3, 'Altbestand 3 vergebene, Abgleich 0: alle 3 bleiben');
+
+// 9b · v3317b: ein fuer eine Objekt-Uebergabe reservierter Platz zaehlt als belegt und wird nicht abgebaut
+db.resellers.set('r3', { id: 'r3', stripe_subscription_id: null });
+await reseller.syncPoolQuantity('r3', 3);
+db.licenses.filter(x => x.reseller_id === 'r3')[0].reserviert = true;
+p = await pool('r3'); ok(p.gekauft === 3 && p.frei === 2 && p.reserviert === 1, 'reservierter Platz: 3 gekauft, 2 frei, 1 reserviert');
+await reseller.syncPoolQuantity('r3', 0);
+p = await pool('r3'); ok(p.gekauft === 1 && p.reserviert === 1 && p.frei === 0, 'Abgleich auf 0: der reservierte Platz bleibt, die freien gehen');
+ok(/reserviert_fuer/.test(reseller.FREI_SQL || ''), 'FREI_SQL fuehrt die Reservierung (eine Stelle fuer Zaehlen, Abbauen, Zuweisen)');
 
 // 10 · fremde Ereignisse laufen in den normalen Zweig
 r = await handlePartnerSeatsEvent(ev('checkout.session.completed', { mode: 'subscription', metadata: { userId: 'x' } }), deps);

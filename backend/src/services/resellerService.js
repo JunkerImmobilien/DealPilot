@@ -51,12 +51,21 @@ async function ensureReseller(userId, { name, role } = {}) {
 }
 
 // ── Lizenz-Pool ─────────────────────────────────────────────────
+/* v3317b · Ein Pool-Platz kann fuer eine Objekt-Uebergabe RESERVIERT sein (Migration 104,
+   licenses.reserviert_fuer). Frei ist er nur ohne AKTIVE Reservierung - aktiv heisst: die
+   Uebergabe ist gesendet/geoeffnet und nicht abgelaufen. Ablauf braucht so keinen Takt.
+   Diese Bedingung gilt fuer Zaehlen, Abbauen (syncPoolQuantity) und Zuweisen - an EINER Stelle. */
+const FREI_SQL = `(licenses.reserviert_fuer IS NULL OR NOT EXISTS (
+    SELECT 1 FROM objekt_uebergaben ru WHERE ru.id = licenses.reserviert_fuer
+       AND ru.status IN ('gesendet','geoeffnet') AND ru.expires_at > now()))`;
+
 async function getPool(resellerId) {
   const r = await query(
     `SELECT
         COUNT(*) FILTER (WHERE kind='client')                          AS gekauft,
         COUNT(*) FILTER (WHERE kind='client' AND status='zugewiesen')  AS zugewiesen,
-        COUNT(*) FILTER (WHERE kind='client' AND status='pool')        AS frei
+        COUNT(*) FILTER (WHERE kind='client' AND status='pool' AND ${FREI_SQL})      AS frei,
+        COUNT(*) FILTER (WHERE kind='client' AND status='pool' AND NOT ${FREI_SQL})  AS reserviert
        FROM licenses WHERE reseller_id = $1`,
     [resellerId]
   );
@@ -66,6 +75,7 @@ async function getPool(resellerId) {
     gekauft:    gekauft,
     zugewiesen: parseInt(row.zugewiesen, 10) || 0,
     frei:       parseInt(row.frei, 10)       || 0,
+    reserviert: parseInt(row.reserviert, 10) || 0,   /* v3317b · fuer eine Uebergabe reserviert, zaehlt als belegt */
     /* v1537: davon im Grundpreis enthalten - nur zur Anzeige, nie zum
        Rechnen. Wer Plaetze zaehlt, nimmt 'gekauft'.
        v3303: seit Marcels Entscheidung vom 11.11.2026 ist INKLUSIV_MANDANTEN
@@ -128,8 +138,8 @@ async function syncPoolQuantity(resellerId, gekaufteSeats, opts = {}) {
     await query(
       `DELETE FROM licenses WHERE id IN (
          SELECT id FROM licenses
-          WHERE reseller_id = $1 AND kind='client' AND status='pool'
-          ORDER BY created_at ASC LIMIT $2)`,
+          WHERE reseller_id = $1 AND kind='client' AND status='pool' AND ${FREI_SQL}
+          ORDER BY created_at ASC LIMIT $2)`,   /* v3317b · reservierte Plaetze werden nie abgebaut */
       [resellerId, toRemove]
     );
   }
@@ -173,7 +183,9 @@ async function listClients(resellerId) {
 
 // ── Seat zuweisen / entziehen ───────────────────────────────────
 /* W1a-investor: Seat = Investor-Tier (59-EUR-Referenz aus dem Konzept), nicht Starter */
-async function assignSeat(resellerId, clientId) {
+/* v3317b · opts.lizenzId: genau DIESEN (fuer eine Uebergabe reservierten) Platz nehmen, sonst einen freien. */
+async function assignSeat(resellerId, clientId, opts) {
+  const lizenzId = (opts && opts.lizenzId) || null;
   // Client muss zum Reseller gehören
   const c = await query(
     `SELECT id, user_id FROM reseller_clients WHERE id = $1 AND reseller_id = $2`,
@@ -194,14 +206,15 @@ async function assignSeat(resellerId, clientId) {
 
   // Einen freien Pool-Seat atomar greifen
   const r = await query(
-    `UPDATE licenses SET client_id = $2, status = 'zugewiesen', assigned_at = now()
+    `UPDATE licenses SET client_id = $2, status = 'zugewiesen', assigned_at = now(), reserviert_fuer = NULL
       WHERE id = (
         SELECT id FROM licenses
          WHERE reseller_id = $1 AND kind='client' AND status='pool'
-         ORDER BY created_at ASC
+           AND (id = $3::uuid OR ${FREI_SQL})
+         ORDER BY (id = $3::uuid) DESC NULLS LAST, created_at ASC
          FOR UPDATE SKIP LOCKED LIMIT 1)
      RETURNING *`,
-    [resellerId, clientId]
+    [resellerId, clientId, lizenzId]
   );
   if (!r.rowCount) { const e = new Error('Kein freier Seat im Pool'); e.status = 409; throw e; }
 
@@ -481,6 +494,7 @@ async function deleteClient(resellerId, clientId) {
 }
 
 module.exports = {
+  FREI_SQL,   /* v3317b */
   getResellerForUser,
   ensureReseller,
   getPool,

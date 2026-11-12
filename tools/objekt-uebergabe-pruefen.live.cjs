@@ -195,6 +195,68 @@ const zeile = async (id) => (await query('SELECT * FROM objekt_uebergaben WHERE 
     ok(l2.length === 0, 'fremder Partner sieht keine');
     ok(l1.every((x) => !('token_hash' in x)), 'Liste ohne Token-Hash');
 
+    /* ── v3317b · Kundenplatz mitschicken (Reservierung beim Senden) ── */
+    const k5 = await nutzer('platz5', 'Pruefer Platz Fuenf'), k6 = await nutzer('platz6', 'Pruefer Platz Sechs');
+    const k7 = await nutzer('platz7', 'Pruefer Platz Sieben'), k8 = await nutzer('platz8', 'Pruefer Platz Acht');
+    await platz(r1.id); await platz(r1.id);   /* zwei neue freie Plaetze */
+    let pool = await reseller.getPool(r1.id);
+    ok(pool.frei === 2 && pool.reserviert === 0, 'Ausgang: 2 frei, 0 reserviert');
+    vp = await U.vorpruefung(r1.id, k5.email);
+    ok(vp.platz_moeglich === true && vp.frei === 2, 'Vorpruefung neue Adresse: Haekchen moeglich');
+    ok((await U.vorpruefung(r1.id, k1.email)).platz_moeglich === false, 'Bestandsmandant: kein Haekchen');
+    const p5 = await U.anlegen({ resellerId: r1.id, userId: p1.id, objectId: o1.id, email: k5.email, platzMitschicken: true, basis: BASIS });
+    let z5 = await zeile(p5.uebergabe.id);
+    const l5 = z5.lizenz_id && (await query('SELECT status::text, reserviert_fuer FROM licenses WHERE id = $1', [z5.lizenz_id])).rows[0];
+    ok(l5 && l5.status === 'pool' && l5.reserviert_fuer === z5.id, 'beim SENDEN reserviert: Platz traegt die Uebergabe');
+    pool = await reseller.getPool(r1.id);
+    ok(pool.frei === 1 && pool.reserviert === 1 && pool.gekauft === 3, 'Pool: 1 frei, 1 reserviert (zaehlt als belegt)');
+    ok((await U.liste(r1.id)).find((x) => x.id === z5.id).platz_reserviert === true, 'Portal-Liste: platz_reserviert');
+    ok((await U.info(p5.token)).platz_reserviert === true, 'Landeseite: platz_reserviert (Band "Zugang schon freigeschaltet")');
+    const keinPlatzBeiBestand = await U.anlegen({ resellerId: r1.id, userId: p1.id, objectId: o1.id, email: k1.email, platzMitschicken: true, basis: BASIS });
+    ok(!(await zeile(keinPlatzBeiBestand.uebergabe.id)).lizenz_id && (await reseller.getPool(r1.id)).reserviert === 1, 'Bestandsmandant mit Haekchen: nichts reserviert');
+    await U.widerrufen(r1.id, keinPlatzBeiBestand.uebergabe.id);
+
+    /* Doppelreservierung: 1 freier Platz, zwei gleichzeitige Sendungen mit Haekchen */
+    const zwei = await Promise.allSettled([
+      U.anlegen({ resellerId: r1.id, userId: p1.id, objectId: o1.id, email: k6.email, platzMitschicken: true, basis: BASIS }),
+      U.anlegen({ resellerId: r1.id, userId: p1.id, objectId: o1.id, email: k7.email, platzMitschicken: true, basis: BASIS })]);
+    const gew = zwei.filter((x) => x.status === 'fulfilled');
+    ok(gew.length === 1 && zwei.some((x) => x.status === 'rejected' && x.reason.status === 409), 'zwei gleichzeitige Reservierungen auf 1 Platz: genau eine gewinnt, die andere 409');
+    const verwaist = (await query('SELECT COUNT(*)::int AS n FROM objekt_uebergaben WHERE email = ANY($1) AND lizenz_id IS NULL', [[k6.email, k7.email]])).rows[0].n;
+    ok(verwaist === 0, 'die abgewiesene Uebergabe ist nicht angelegt (keine Zeile ohne Platz)');
+    pool = await reseller.getPool(r1.id);
+    ok(pool.frei === 0 && pool.reserviert === 2, 'Pool: 0 frei, 2 reserviert');
+    e = await fehlerVon(() => U.anlegen({ resellerId: r1.id, userId: p1.id, objectId: o1.id, email: k8.email, platzMitschicken: true, basis: BASIS }));
+    ok(e && e.code === 'kein_freier_platz', 'kein Platz frei: Senden mit Haekchen 409');
+
+    /* Abgleich mit Stripe (Webhook) darf reservierte Plaetze nicht abbauen */
+    await reseller.syncPoolQuantity(r1.id, 0);
+    pool = await reseller.getPool(r1.id);
+    ok(pool.reserviert === 2 && pool.frei === 0, 'syncPoolQuantity(0): beide reservierten Plaetze bleiben (' + pool.gekauft + ' gekauft)');
+
+    /* Widerruf gibt frei */
+    const w6 = gew[0].value;
+    await U.widerrufen(r1.id, w6.uebergabe.id);
+    pool = await reseller.getPool(r1.id);
+    ok(pool.frei === 1 && pool.reserviert === 1, 'Widerruf: Platz sofort wieder frei');
+    ok((await query('SELECT COUNT(*)::int AS n FROM licenses WHERE reserviert_fuer = $1', [w6.uebergabe.id])).rows[0].n === 0, 'Widerruf raeumt reserviert_fuer');
+
+    /* Ablauf gibt frei (ohne Takt) */
+    await query(`UPDATE objekt_uebergaben SET expires_at = now() - interval '1 minute' WHERE id = $1`, [z5.id]);
+    pool = await reseller.getPool(r1.id);
+    ok(pool.frei === 2 && pool.reserviert === 0, 'Ablauf: reservierter Platz zaehlt wieder als frei');
+
+    /* Uebernahme nutzt GENAU den reservierten Platz */
+    const p8 = await U.anlegen({ resellerId: r1.id, userId: p1.id, objectId: o1.id, email: k8.email, platzMitschicken: true, basis: BASIS });
+    const z8 = await zeile(p8.uebergabe.id);
+    const u8 = await U.uebernehmen(p8.token, k8);
+    const l8 = (await query('SELECT status::text, client_id, reserviert_fuer FROM licenses WHERE id = $1', [z8.lizenz_id])).rows[0];
+    ok(u8.seat_assigned === true && l8.status === 'zugewiesen' && l8.client_id === u8.client_id && !l8.reserviert_fuer, 'Uebernahme: genau der reservierte Platz geht an den Kunden');
+    pool = await reseller.getPool(r1.id);
+    ok(pool.frei === 1 && pool.reserviert === 0, 'danach: der andere Platz bleibt frei');
+    const pl8 = (await query('SELECT plan_id FROM subscriptions WHERE user_id = $1', [k8.id])).rows[0];
+    ok(pl8 && pl8.plan_id === 'investor', 'Kunde mit mitgeschicktem Platz: Investor');
+
     /* ── Mail ── */
     const brand = (await query('SELECT id, name, brand_name, brand_accent, whitelabel_enabled, brand_email FROM resellers WHERE id = $1', [r1.id])).rows[0];
     brand.basis = BASIS;

@@ -233,7 +233,8 @@ router.post('/uebergaben', async (req, res, next) => {
     const b = req.body || {};
     const r = await uebergabe.anlegen({
       resellerId: req.reseller.id, userId: req.user.id, objectId: b.objectId, email: b.email,
-      anzeigeName: b.anzeigeName, nachricht: b.nachricht, basis: inviteBase(req)
+      anzeigeName: b.anzeigeName, nachricht: b.nachricht, basis: inviteBase(req),
+      platzMitschicken: b.platzMitschicken === true   /* v3317b */
     });
     /* Das Token geht NICHT an den Browser zurueck - es steht nur in der Mail. */
     res.json({ ok: true, uebergabe: r.uebergabe, mail: r.mail });
