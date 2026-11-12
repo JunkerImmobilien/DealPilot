@@ -4072,6 +4072,17 @@ button[onclick="QcApp.openQc6Settings()"] { display:none !important; }
    Ohne PLZ: 6,5 % Grunderwerbsteuer wie die Vorbelegung im Objekt. */
 /* v3088 · Zahl aus dem Feld ohne QcEngine (die ist hier noch nicht geladen): Punkt = Tausender */
 function QcEngineNum(s) { s = String(s || '').replace(/\s|€/g, ''); if (/,/.test(s)) s = s.replace(/\./g, '').replace(',', '.'); else if (/^\d{1,3}(\.\d{3})+$/.test(s)) s = s.replace(/\./g, ''); var n = parseFloat(s); return isFinite(n) ? n : 0; }
+/* v3339 · Leerstand in % der Jahresmiete: dieselbe Vorgabe wie ein neues Objekt (main.js setDefaults:
+   _dpProfilWert('leerstand_pct', 0)) - aus den Einstellungen des Hauptfensters, ohne sie 0. */
+window._qcLeerstandPct = function () {
+  try {
+    var P = window.parent && window.parent !== window ? window.parent : window;
+    var IP = (P && P.DealPilotInvestmentProfile) || window.DealPilotInvestmentProfile;
+    var v = IP && typeof IP.get === 'function' ? IP.get('leerstand_pct') : null;
+    var x = (v === undefined || v === null || v === '') ? NaN : parseFloat(v);
+    return (isFinite(x) && x > 0) ? x : 0;
+  } catch (e) { return 0; }
+};
 window._qcKnkPct = function () {
   var P = null; try { P = window.parent && window.parent !== window ? window.parent : window; } catch (e) { P = window; }
   var grest = 6.5, notar = 1.0;
@@ -4934,12 +4945,13 @@ const QcApp = (function() {
       ['– Eigenkapital', eur(k.ekValue), ''],
       ['= Darlehen', eur(k.darlehen) + ' @ ' + pct(zins) + ' / ' + pct(tilg) + ' Tilg.', 'stark'],
       ['Nettokaltmiete (Mon)', eur(nkm), ''],
+    ].concat(k.leerPct > 0 ? [['– Leerstand ' + pct(k.leerPct) + ' (Vorgabe aus den Einstellungen, wie im Objekt)', eur(k.leerY) + ' / Jahr', '']] : []).concat([   /* v3339 */
       ['Bruttomietrendite', pct(k.bmr), ''],
       ['Nettomietrendite', pct(k.nmr), ''],
       ['Cashflow / Monat', eur(k.cfMon), (k.cfMon < 0 ? 'rot' : 'gruen')],
       ['DSCR', k.dscr == null ? '—' : String(k.dscr).replace('.', ','), (k.dscr != null && k.dscr < 1 ? 'rot' : '')],
       ['LTV (Darlehen ÷ Kaufpreis)', pct(k.ltvPct), '']
-    ]);
+    ]));   /* v3339: Klammer der Leerstand-Zeile */
     host.innerHTML = z.map(function (r) {
       return '<div class="qcb-row' + (r[2] === 'stark' ? ' qcb-row-stark' : '') + '">' +
              '<span class="qcb-l">' + r[0] + '</span>' +
@@ -8373,7 +8385,14 @@ html.qc-embedded, html.qc-embedded body{ min-height:0 !important; height:auto !i
     var san=Math.max(0,n(i.san));
     var gesamt=kp*(1+knk)+san, ek=n(i.ek), darlehen=Math.max(0,gesamt-ek);
     var mp = window._qcMietpotenzial ? window._qcMietpotenzial(i, avm) : null;
-    var k = window.DealKpis.compute({ kp:kp, nk:kp*knk, san:san, nkm:nkm, ze:0,
+    /* v3339 · LEERSTAND WIE IM OBJEKT. Seit v3030 (Marcel 28.10.2026: „zwei Prozent nehmen wir einfach mal an,
+       dass leer steht, und dann wird's abgezogen") zieht das Objekt den Leerstand aus den Einstellungen
+       (leerstand_pct, main.js setDefaults) von Cashflow, DSCR und Nettomietrendite ab - der Quick-Check
+       rechnete weiter voll vermietet. Gemessen Am Quittengarten 12: Quick-Check DSCR 1,16 / NMR 5,2 % /
+       Score 72, das daraus gespeicherte Objekt (und sein Bank-PDF) 1,21 / 5,37 % / 73. Dieselbe Vorgabe
+       wie ein neues Objekt, derselbe Kern (DealKpis.compute leerstand_pct). */
+    var leerPct = window._qcLeerstandPct ? window._qcLeerstandPct() : 0;
+    var k = window.DealKpis.compute({ kp:kp, nk:kp*knk, san:san, nkm:nkm, ze:0, leerstand_pct:leerPct,
       bwk_ul:hgY*(1-split), bwk_nul:hgY*split, d1:darlehen, d1z:(n(i.zins)||3.8), d1t:(n(i.tilg)||1.5),
       ek:ek, svw:0, afa:0, grenz:0,
       /* qc-v2546a: LTV wieder gegen den KAUFPREIS (deal-kpis.js: ekInklNkLtv false
@@ -8408,6 +8427,7 @@ html.qc-embedded, html.qc-embedded body{ min-height:0 !important; height:auto !i
             wpDiff:(mw>0)?Math.round(mw-kp):null, ltvBasis:'kaufpreis',
             /* qc-v2546a: ohne diese drei blieb die Euro-Aufteilung unter dem Hausgeld leer (bewirt-derived las k.hgY) */
             hgY:Math.round(hgY), nulY:Math.round(hgY*split), ulY:Math.round(hgY*(1-split)),
+            leerPct:leerPct, leerY:Math.round(k.nkm_j*leerPct/100),   /* v3339 */
             ltvKpPct:Math.round(darlehen/kp*1000)/10 } };
   };
 })();

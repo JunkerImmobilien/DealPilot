@@ -15,6 +15,32 @@
 (function() {
 
   var PDFJS_URL = '/vendor/cdn/pdf.js/3.11.174/pdf.min.js';
+  /* v3339 · EIN GERENDERTER AUSSCHNITT IST NUR DANN EIN FOTO, WENN FAST KEIN TEXT DARIN STEHT.
+     Gemessen 12.11.2026 (Am Quittengarten 12): ein Exposé ohne eingebettete Fotos (Symbolbild als
+     Vektor) lieferte über den Notfall-Pfad seine Seiten 1 und 3 (75 und 145 Wörter) als „Fotos".
+     Seite 1 trug die Kachel „790.000 € Kaufpreis" - sie wurde Titelbild des Objekts und damit des
+     Bank-PDFs und stand dort weiter, als der Kaufpreis längst 740.000 € war. Eine Textseite ist eine
+     Unterlage, kein Objektfoto: ihre Zahlen frieren den Stand des Exposés ein.
+     Regel jetzt für alles, was aus der GERENDERTEN Seite geschnitten wird (Heuristik, ihr Ganzseiten-
+     Rückfall, Notfall-Pfad): höchstens so viele Wörter der Textschicht liegen im Ausschnitt. Eine
+     Bildseite mit Bildunterschriften bleibt darunter. Eingebettete Fotos (Pfad 1) sind nicht betroffen.
+     Ohne Foto zeigen die PDFs die Lagekarte (v3336). */
+  var BILD_MAX_WOERTER = 30;
+  /* Mittelpunkt jedes Textstücks in Pixeln des gerenderten Canvas, mit seiner Wortzahl */
+  function _textPunkte(content, vp) {
+    var pts = [];
+    (content && content.items || []).forEach(function (it) {
+      var n = (it.str || '').split(/\s+/).filter(Boolean).length;
+      if (!n || !it.transform) return;
+      var q = vp.convertToViewportPoint(it.transform[4], it.transform[5]);
+      pts.push({ x: q[0] + (it.width || 0) * vp.scale / 2, y: q[1] - (it.height || 0) * vp.scale / 2, n: n });
+    });
+    return pts;
+  }
+  function _woerterIn(pts, x, y, w, h) {
+    if (!pts) return 0;
+    return pts.reduce(function (s, q) { return s + ((q.x >= x && q.x <= x + w && q.y >= y && q.y <= y + h) ? q.n : 0); }, 0);
+  }
   var PDFJS_WORKER = '/vendor/cdn/pdf.js/3.11.174/pdf.worker.min.js';
   var _pdfjsLoaded = false;
   var _onDoneCallback = null;
@@ -316,7 +342,7 @@
         var wordCount = content.items.reduce(function(sum, it) {
           return sum + (it.str || '').split(/\s+/).filter(Boolean).length;
         }, 0);
-        if (wordCount > 250) continue;     // sehr textlastig → skippen
+        if (wordCount > BILD_MAX_WOERTER) continue;     // v3339: Textseite ist kein Foto (war 250)
 
         var vp = page.getViewport({ scale: 1.5 });
         var canvas = document.createElement('canvas');
@@ -499,12 +525,13 @@
 
       try {
         if (_isMostlyBlank(canvas)) continue;
-        var subImages = _splitPageIntoPhotos(canvas);
+        var subImages = _splitPageIntoPhotos(canvas, _textPunkte(content, vp));   /* v3339 */
         for (var s = 0; s < subImages.length && images.length < 6; s++) {
           images.push(subImages[s]);
         }
       } catch(e) {
         try {
+          if (wordCount > BILD_MAX_WOERTER) continue;   /* v3339 */
           var dataUrl = canvas.toDataURL('image/jpeg', 0.85);
           images.push(dataUrl);
         } catch(e2) {}
@@ -526,7 +553,10 @@
    * Min-Größe: 150×150 px (sonst zu klein, vermutlich Artefakt)
    * Min-Verhältnis: 0.4-3.0 (nicht zu schmal, nicht zu lang)
    */
-  function _splitPageIntoPhotos(canvas) {
+  function _splitPageIntoPhotos(canvas, pts) {
+    /* v3339 · pts = Textpunkte der Seite (_textPunkte): Ganzseite und Zuschnitt nur ohne Fliesstext */
+    var _ganz = function () { return _woerterIn(pts, 0, 0, canvas.width, canvas.height) > BILD_MAX_WOERTER ? [] : [canvas.toDataURL('image/jpeg', 0.85)]; };
+    var _schnitt = function (x, y, w, h) { return _woerterIn(pts, x, y, w, h) > BILD_MAX_WOERTER ? null : _cropCanvasToDataURL(canvas, x, y, w, h); };
     var W = canvas.width, H = canvas.height;
     var ctx = canvas.getContext('2d');
     var imgData;
@@ -534,7 +564,7 @@
       imgData = ctx.getImageData(0, 0, W, H);
     } catch(e) {
       // CORS o.ä. — Fallback ganze Seite
-      return [canvas.toDataURL('image/jpeg', 0.85)];
+      return _ganz();   /* v3339 */
     }
     var px = imgData.data;
 
@@ -562,7 +592,7 @@
 
     if (stripes.length <= 1) {
       // Keine sinnvolle horizontale Trennung — ganze Seite als ein Bild
-      return [canvas.toDataURL('image/jpeg', 0.85)];
+      return _ganz();   /* v3339 */
     }
 
     // Pro Streifen: prüfe ob horizontaler Split möglich (vertikale weiße Spalten)
@@ -588,7 +618,7 @@
 
       if (subStripes.length <= 1) {
         // Keine vertikale Trennung — ganzer horizontaler Streifen
-        var img = _cropCanvasToDataURL(canvas, 0, stripe.start, W, sH);
+        var img = _schnitt(0, stripe.start, W, sH);   /* v3339 */
         if (img) output.push(img);
       } else {
         // Mehrere Sub-Bilder
@@ -600,7 +630,7 @@
           // Verhältnis-Filter (extreme Linien sind keine Fotos)
           var ratio = sw / sH;
           if (ratio < 0.3 || ratio > 4.0) return;
-          var img2 = _cropCanvasToDataURL(canvas, sub.start, stripe.start, sw, sH);
+          var img2 = _schnitt(sub.start, stripe.start, sw, sH);   /* v3339 */
           if (img2) output.push(img2);
         });
       }
@@ -608,7 +638,7 @@
 
     // Wenn Splitting nichts brauchbares geliefert hat → Fallback ganze Seite
     if (output.length === 0) {
-      return [canvas.toDataURL('image/jpeg', 0.85)];
+      return _ganz();   /* v3339 */
     }
     return output;
   }

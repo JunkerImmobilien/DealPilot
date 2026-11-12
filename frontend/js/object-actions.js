@@ -55,7 +55,12 @@
   var _qcPendingMerged = {};      /* v418: Bucket B+C -> beim qc-save ins Objekt */
   var OBJ2QC = { str:'qc_str', hnr:'qc_hnr', plz:'qc_plz', ort:'qc_ort', wfl:'qc_wfl', baujahr:'qc_bj', zimmer:'qc_zimmer', objart:'qc_objektart', kp:'qc_kp', nkm:'qc_nkm', hg_ul:'qc_hg', ek:'qc_ek', ds2_energie:'qc_energieklasse', stellpl_aussen:'qc_stellplatz', lageklasse:'qc_lageklasse' /* v2159 */,
     /* v506-obj2qc: Finanzierung + Mieten-Einzelposten (Sprachaufzeichnung) */
-    d1z:'qc_zins', d1t:'qc_tilg', ze_stp:'qc_nkm_stp', ze_kueche:'qc_nkm_kueche', ze_sonst:'qc_nkm_sonst' };  /* v418: Bucket A */
+    d1z:'qc_zins', d1t:'qc_tilg', ze_stp:'qc_nkm_stp', ze_kueche:'qc_nkm_kueche', ze_sonst:'qc_nkm_sonst',
+    /* v3339 · Stellplaetze/Garagen der Mieterliste (_merged.ze, v3029-import) gingen nur ans spaetere Objekt,
+       der Quick-Check rechnete ohne sie: Am Quittengarten 12 zeigte dort 4.240 statt 4.480 EUR/Monat,
+       DSCR 1,16 statt 1,21. Als Mieten-Einzelposten kommen sie in die Summe qc_nkm (mieteAddUp) und
+       beim Speichern als ze zurueck ins Objekt (quick-check.js qcZusatz). */
+    ze:'qc_nkm_sonst' };  /* v418: Bucket A */
 
   function $(id) { return document.getElementById(id); }
   function val(id) { var e = $(id); return e ? (e.value || '').trim() : ''; }
