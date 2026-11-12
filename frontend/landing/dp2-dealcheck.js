@@ -224,7 +224,7 @@
         if (d.miete) {
           var art = d.mietspiegel && d.mietspiegel.art;
           var ms = art === 'qualifiziert' ? 'qualif. Mietspiegel' : art === 'einfach' ? 'einf. Mietspiegel' : art ? 'Mietspiegel' : 'Bestandsmiete';
-          k.push(kachel('Miete Ø', dez(d.miete.qm, 2) + ' €/m²', ms, null));
+          k.push(kachel('Miete Ø je m²', dez(d.miete.qm, 2) + ' €', ms, null));
         }
         if (!k.length) { setze('dkLageQ', 'Für diese PLZ liegen uns noch keine amtlichen Lagedaten vor – in der App gibt es den vollen Marktbericht.'); return; }
         k.forEach(function (x, i) { x.style.animationDelay = (i * 90) + 'ms'; g.appendChild(x); });
