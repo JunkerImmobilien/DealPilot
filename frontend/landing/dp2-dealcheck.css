@@ -129,6 +129,7 @@
   .dk-stufe{font-size:21px}
   .dk-kpi{grid-template-columns:1fr 1fr}.dk-kpi .dk-cf{grid-column:1/-1}
   .dk-lage-g{grid-template-columns:1fr 1fr}
+  .dk-skala-w span:nth-child(2){display:none}
 }
 @media (prefers-reduced-motion:reduce){
   .dk-karte{transition:none}.dk-karte.wink{animation:none}
