@@ -3342,14 +3342,18 @@ async function exportPdf(out) {
   if (window._bgDarkAsset === undefined) window._bgDarkAsset = await loadImageDataUrl('assets/bg-cover-dark.jpg?v=49k');
   const bgLightAsset = window._bgLightAsset, bgDarkAsset = window._bgDarkAsset;
   // Heller Seitenhintergrund (Off-White + feines Karten-Wasserzeichen) fuer alle Inhaltsseiten.
+  /* v3338 · Steht die echte Karte (static-map, OpenStreetMap-Daten) als Wasserzeichen auf der Seite,
+     traegt die Fusszeile DIESER Seite die Namensnennung (ODbL). Das Mockup-Artwork braucht sie nicht. */
+  let osmAufSeite = false;
   function contentBg() {
+    osmAufSeite = false;
     doc.setFillColor(250, 250, 249); doc.rect(0, 0, W, H, 'F');
     if (bgLightAsset) { // Marcels Mockup-Hintergrund (bereits dezent) 1:1
       try { doc.addImage(bgLightAsset, 'JPEG', 0, 0, W, H, 'bgl'); return; } catch (e) { /* fallback */ }
     }
     if (lightImg && doc.GState) {
       doc.setGState(new doc.GState({ opacity: 0.30 }));
-      try { doc.addImage(lightImg, 'PNG', 0, 0, W, H, 'lightwm'); } catch (e) { /* optional */ }
+      try { doc.addImage(lightImg, 'PNG', 0, 0, W, H, 'lightwm'); osmAufSeite = true; } catch (e) { /* optional */ }
       doc.setGState(new doc.GState({ opacity: 1 }));
     }
   }
@@ -3388,6 +3392,10 @@ async function exportPdf(out) {
     doc.setTextColor(...GOLD); doc.setFont('helvetica', 'bold');
     doc.text('Seite ' + pageNo, W - M, H - 8, { align: 'right' });
     doc.setFont('helvetica', 'normal');
+    if (osmAufSeite) { // v3338 · Kartengrundlage, feste Farbe (jsPDF kennt kein var())
+      doc.setFontSize(6); doc.setTextColor(150, 150, 160);
+      doc.text('© OpenStreetMap-Mitwirkende', W - M, H - 4.5, { align: 'right' });
+    }
     if (_fsPrev != null) doc.setFontSize(_fsPrev); // v957-fontleak: Groesse zurueckgeben
   }
   let page = 1;
@@ -6010,12 +6018,13 @@ async function exportPdf(out) {
       : { bg: [255, 255, 255], head: INK, accent: [168, 162, 150], sub: [120, 120, 130], num: GOLD,
           title: TXT, page: [120, 120, 130], div: [224, 222, 216], sky: [186, 182, 174] };
     doc.setFillColor(...T.bg); doc.rect(0, 0, W, H, 'F');
+    osmAufSeite = false; // v3338 · nur wenn unten die Karte als Hintergrund steht
     // Hintergrund: Marcels dunkles Mockup-Asset 1:1; Fallback Cover-Karte transparent
     if (dark && bgDarkAsset) {
       try { doc.addImage(bgDarkAsset, 'JPEG', 0, 0, W, H, 'bgd'); } catch (e) {}
     } else if (dark && objImg && doc.GState) {
       doc.setGState(new doc.GState({ opacity: 0.14 }));
-      try { doc.addImage(objImg, 'PNG', 0, 0, W, H); } catch (e) { /* optional */ }
+      try { doc.addImage(objImg, 'PNG', 0, 0, W, H); osmAufSeite = true; } catch (e) { /* optional */ }
       doc.setGState(new doc.GState({ opacity: 1 }));
     }
     /* v962-nopin: Glow-Orb und Radar-Pin oben rechts sind raus — das Briefpapier

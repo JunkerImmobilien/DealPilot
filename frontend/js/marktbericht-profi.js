@@ -27,7 +27,7 @@
    ═══════════════════════════════════════════════════════════════════════ */
 (function () {
   'use strict';
-  var VERSION = 'v3219a';
+  var VERSION = 'v3338';
 
   /* ── kleine Helfer ─────────────────────────────────────────────────── */
   function esc(s) {
@@ -376,6 +376,26 @@
   var BRW_LAYER = 'brw_wohnbauflaeche,brw_gemischte_bauweise,brw_gewerbliche_bauweise,brw_sonderbauflaeche';
   var BRW_VERMERK = 'Bodenrichtwertzonen \u00a9 Gutachteraussch\u00fcsse f\u00fcr Grundst\u00fcckswerte, dl-de/by-2-0 (bodenrichtwerte-boris.de)';
   var ZONEN_KACHEL = 512;
+  /* v3338 · Namensnennung der Kartengrundlage (ODbL, Pflicht). Die Kacheln von /marktbericht/static-map
+     beruhen auf OpenStreetMap-Daten; der Vermerk wird unten rechts ins Bild gemalt, damit er an jeder
+     Stelle mitreist, an der die Karte steht. Den Kartendienst selbst nennen wir nicht (Anbieter-Neutralitaet). */
+  var OSM_VERMERK = '© OpenStreetMap-Mitwirkende';
+  function mitOsmVermerk(basis, w, h) {
+    if (!basis) return Promise.resolve(basis);
+    return bildLaden(basis).then(function (im) {
+      if (!im) return basis;
+      try {
+        var c = document.createElement('canvas'); c.width = w; c.height = h;
+        var g = c.getContext('2d');
+        g.drawImage(im, 0, 0, w, h);
+        g.font = '15px Inter, Arial, sans-serif';
+        var tw = g.measureText(OSM_VERMERK).width;
+        g.fillStyle = 'rgba(255,255,255,.85)'; g.fillRect(w - tw - 16, h - 24, tw + 16, 24);
+        g.fillStyle = '#333'; g.fillText(OSM_VERMERK, w - tw - 8, h - 7);
+        return c.toDataURL('image/jpeg', 0.9);
+      } catch (e) { return basis; }
+    });
+  }
   function zonenBbox(lat, lon, zoom, w, h) {
     var R = 6378137, x = R * lon * Math.PI / 180, y = R * Math.log(Math.tan(Math.PI / 4 + lat * Math.PI / 360));
     var res = 2 * Math.PI * R / (ZONEN_KACHEL * Math.pow(2, zoom));
@@ -540,8 +560,8 @@
         var lat = p.ref && p.ref.lat, lon = p.ref && p.ref.lon;
         var b = marke();
         return Promise.all([
-          karte(lat, lon, 16, 1200, 620).then(function (k) { return mitZonen(k, lat, lon, 16, 1200, 620); }),
-          karte(lat, lon, 12, 1200, 620),
+          karte(lat, lon, 16, 1200, 620).then(function (k) { return mitZonen(k, lat, lon, 16, 1200, 620); }).then(function (k) { return mitOsmVermerk(k, 1200, 620); }),
+          karte(lat, lon, 12, 1200, 620).then(function (k) { return mitOsmVermerk(k, 1200, 620); }),
           ((obj && obj.photos) || []).length ? Promise.resolve(null) : karte(lat, lon, 15, 1000, 800),
           zonenListe(lat, lon, 16, 1200, 620).catch(function () { return null; }),
           window.DealPilotPdfLogo ? DealPilotPdfLogo.fuerMarke(b).catch(function () { return null; }) : Promise.resolve(null)
@@ -579,6 +599,7 @@
     '.deck .bild{height:100mm;display:grid;grid-template-columns:76mm 1fr;background:#050505}',
     '.deck .bild .links{position:relative;background:#050505 radial-gradient(ellipse at 20% 0%,color-mix(in srgb,var(--gold) 28%,transparent),transparent 62%);color:#fff;padding:14mm 9mm 10mm 17mm;display:flex;flex-direction:column;justify-content:space-between}',
     '.deck .bild .rechts{position:relative;overflow:hidden;background:#1b1b1d}.deck .bild .rechts img{display:block;width:100%;height:100%;object-fit:cover;object-position:center}',
+    '.deck .bild .rechts .osm{position:absolute;right:0;bottom:0;background:rgba(255,255,255,.85);color:#333;font:5.6pt/1 Inter,Arial,sans-serif;padding:.9mm 1.6mm}',
     '.deck .bild .logo{position:static;align-self:flex-start;background:#fff;border-radius:1.6mm;padding:3mm 4mm;display:inline-flex;align-items:center;justify-content:center;max-width:52mm}',
     '.deck .bild .logo img{display:block;max-height:14mm;max-width:44mm;width:auto;height:auto;object-fit:contain}',
     '.deck .bild .lk{font:6.8pt/1.5 "JetBrains Mono",monospace;letter-spacing:.16em;text-transform:uppercase;color:var(--wl-e8cc7a, #E8CC7A)}.deck .bild .lk b{display:block;font:600 11pt/1.3 "Space Grotesk",Inter,sans-serif;letter-spacing:0;text-transform:none;color:#fff;margin-top:1.5mm}',
@@ -719,7 +740,8 @@
       + '<div class="bild"><div class="links">'
       + (d.logo && d.logo.b64 ? '<div class="logo"><img src="' + d.logo.b64 + '" alt=""></div>' : '<div class="logo" style="font:600 12pt Space Grotesk,sans-serif;color:#111">' + esc(b.company || '') + '</div>')
       + '<div class="lk">Marktbericht Profi<b>' + esc(r.gemeinde || r.city || '') + '</b></div></div>'
-      + '<div class="rechts">' + (titelbild ? '<img src="' + titelbild + '" alt="' + (istKarte ? 'Karte' : 'Objektfoto') + '">' : '') + '</div></div>'
+      + '<div class="rechts">' + (titelbild ? '<img src="' + titelbild + '" alt="' + (istKarte ? 'Karte' : 'Objektfoto') + '">' : '')
+      + (titelbild && istKarte ? '<span class="osm">' + esc(OSM_VERMERK) + '</span>' : '') + '</div></div>'
       + '<div class="inhalt"><div class="eyebrow">Marktbericht Profi · Wertermittlung mit Herleitung</div>'
       + '<h1>' + esc(r.address || '') + '</h1><div class="adr">' + esc(art) + (istZahl(r.living_area) ? ' · ' + zahl(r.living_area, 0) + ' m² Wohnfläche' : '')
       + (istZahl(r.build_year) ? ' · Baujahr ' + jahr(r.build_year) : '') + (istZahl(r.plot_area) ? ' · Grundstück ' + zahl(r.plot_area, 0) + ' m²' : '') + '</div>'
@@ -913,6 +935,7 @@
     (c.quellen_nachweis || []).forEach(function (x) { q.push((x.kennzahlen ? x.kennzahlen.join(', ') + ': ' : '') + (x.vermerk || '') + (x.url ? ' (' + x.url + ')' : '')); });
     if (sw.sachwertfaktor && sw.sachwertfaktor.quelle) q.push('Sachwertfaktor: ' + sw.sachwertfaktor.quelle);
     if (d.brwZonen) q.push('Bodenrichtwertzonen in Karte und Tabelle: Gutachterausschüsse für Grundstückswerte, BORIS-D, dl-de/by-2-0 (bodenrichtwerte-boris.de)');
+    if (d.karteNah || d.karteFern || (!d.fotos[0] && d.karteTitel)) q.push('Kartengrundlage: © OpenStreetMap-Mitwirkende (Open Database License, openstreetmap.org/copyright)');
     if (irw.quellennachweis) q.push('Immobilienrichtwert: ' + irw.quellennachweis);
     var mq = p.makro_kennzahlen && p.makro_kennzahlen.quellennachweis;
     if (mq) q.push('Regionaldaten: ' + (typeof mq === 'object' ? [mq.vermerk, mq.lizenz].filter(Boolean).join(' · ') : mq));

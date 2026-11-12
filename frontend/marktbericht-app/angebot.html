@@ -25,6 +25,7 @@
     box-shadow:0 30px 70px -34px #000;min-height:300px;background:#0a0a0c;}
   .hero img{width:100%;height:340px;object-fit:cover;display:block;filter:saturate(1.02) contrast(1.02);}
   .hero .ov{position:absolute;inset:0;background:linear-gradient(180deg,rgba(5,5,5,.15) 0%,rgba(5,5,5,.55) 55%,rgba(5,5,5,.96) 100%);}
+  .hero .osm{position:absolute;top:0;right:0;z-index:2;font-size:10px;line-height:1;color:#333;background:rgba(255,255,255,.85);padding:3px 6px;border-bottom-left-radius:6px;}
   .hero .hc{position:absolute;left:0;right:0;bottom:0;padding:22px 24px;}
   .hero .badge{display:inline-flex;align-items:center;gap:7px;font-family:'Space Grotesk';font-weight:600;font-size:11px;
     letter-spacing:.06em;padding:4px 11px;border-radius:999px;border:1px solid;text-transform:uppercase;}
@@ -177,6 +178,7 @@ function render(out, key) {
   $('#root').innerHTML =
     '<div class="hero">'
       + '<img id="heroImg" alt="Standort" />'
+      + '<span class="osm" id="heroOsm" hidden>© OpenStreetMap-Mitwirkende</span>'
       + '<div class="ov"></div>'
       + '<div class="hc">'
         + (ds.rating ? '<span class="badge" style="color:' + rCol + ';border-color:' + rCol + '55;background:' + rCol + '1f;">★ ' + ds.rating + '</span>' : '')
@@ -229,7 +231,9 @@ function render(out, key) {
   const img = $('#heroImg');
   if (lat != null && lon != null) {
     const mapUrl = API + '/static-map?lat=' + lat + '&lon=' + lon + '&style=dark-matter-yellow-roads&width=920&height=340&zoom=16';
-    img.onerror = () => { img.onerror = null; img.src = mapUrl; };
+    /* v3338 · faellt die Strassenansicht auf die Karte zurueck, steht die Namensnennung der
+       Kartengrundlage (ODbL) im Bild */
+    img.onerror = () => { const o = $('#heroOsm'); img.onerror = () => { img.onerror = null; if (o) o.hidden = true; }; img.src = mapUrl; if (o) o.hidden = false; };
     img.src = API + '/streetview?lat=' + lat + '&lon=' + lon + '&width=640&height=340';
   } else {
     img.style.display = 'none';
