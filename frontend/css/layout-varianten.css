@@ -3574,6 +3574,14 @@ html[data-dp-layout] body header.hdr #hdr-badges{
   display:flex !important; align-items:stretch !important;
   gap:0 !important; width:100% !important;
 }
+/* v3335 · Im Kopf baut calc.js keinen Score mehr (Marcel 12.11.2026: nie).
+   Der LEERE Behaelter stand mit der Regel oben (1,2,3) trotzdem als
+   12-px-Streifen ueber der Reiterleiste (gemessen 800 px, Aktenmappe) -
+   die Leer-Regel in style.css (header.hdr #hdr-badges:not(:has(*)), 1,1,1)
+   verlor. Gleiche Kette plus :not(:has(*)): leer heisst weg. */
+html[data-dp-layout] body header.hdr #hdr-badges:not(:has(*)){
+  display:none !important;
+}
 html[data-dp-layout] body header.hdr #hdr-badges .scores{
   display:flex !important; align-items:stretch !important;
   gap:0 !important; width:100% !important; flex:1 1 auto !important;
