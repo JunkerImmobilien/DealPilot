@@ -1508,7 +1508,7 @@
       + w('Miete im Monat', _fE(s.mieteM), 'Rendite ' + _fPr(s.brutto, 2) + ' brutto')
       + w('Cashflow im Monat', sg(s.cfVsM), 'nach Steuer ' + sg(s.cfNsM), s.cfVsM >= 0 ? 'pos' : 'neg')
       + w('Kapitaldienst gedeckt', s.dscr != null ? s.dscr.toFixed(2).replace('.', ',') + '-fach' : '–', 'DSCR · Miete ÷ Zins und Tilgung')
-      + '</div>' + _seitZeileHtml(false),
+      + '</div>' + _seitZeileHtml(),
       n + ' Objekte. Nach Bewirtschaftung, Zins und Tilgung bleiben ' + sg(s.cfVsM) + ' im Monat' + (s.cfNsM > s.cfVsM ? ', nach Steuer sogar mehr' : '') + '.', 'ke2-voll');
 
     /* 2 · Gesamtbewertung */
@@ -2612,8 +2612,20 @@
     /* Die Kurve reicht ein Stück über das Ausgangs-zvE hinaus, damit der
        Startpunkt nicht am rechten Rand klebt. */
     var maxX = Math.max(t.zve * 1.25, (letzter ? letzter.basisNach : 0) * 1.25, 30000);
-    var stuetzen = _kurvenStuetzen(maxX, jahr);
+    /* v3321 · Marcel 12.11.2026: „Progressionskurve … aussagekräftig?" Gemessen: die Punkte
+       lagen alle zwischen 67k und 95k € auf einer Achse von 0 bis 113k - acht Punkte auf
+       einem Viertel der Breite, übereinander. Die Achse zeigt jetzt den Bereich, in dem
+       sich deine Objekte bewegen (mit Rand), die Punkte tragen die Nummer der Tabelle. */
+    var _xs = [t.zve].concat(t.schritte.map(function (s) { return s.basisNach; }));
+    var _lo = Math.min.apply(null, _xs), _hi = Math.max.apply(null, _xs);
+    var _pad = Math.max((_hi - _lo) * 0.45, 12000);
+    var minX = Math.max(0, Math.floor((_lo - _pad) / 5000) * 5000);
+    maxX = Math.ceil((_hi + _pad * 0.6) / 5000) * 5000;
+    var stuetzen = _kurvenStuetzen(maxX, jahr).filter(function (x) { return x >= minX; });
+    if (stuetzen[0] !== minX) stuetzen.unshift(minX);
     var kurve = stuetzen.map(function (x) { return { x: x, y: _grenzsatz(x) }; });
+    var _ys = kurve.map(function (p) { return p.y; });
+    var minY = Math.max(0, Math.floor((Math.min.apply(null, _ys) - 6) / 5) * 5);
 
     /* Je Objekt ein Punkt — dort, wo es dich hingeschoben hat. Dazu der
        Ausgangspunkt, damit die Strecke sichtbar wird. */
@@ -2632,7 +2644,7 @@
         { label: 'Weg deiner Objekte', data: punkte, parsing: false,
           showLine: true, borderColor: isDark() ? 'rgba(232,226,212,.45)' : 'rgba(42,39,39,.35)',
           borderWidth: 1.4, borderDash: [4, 3],
-          pointRadius: 6, pointHoverRadius: 8,
+          pointRadius: 10, pointHoverRadius: 12,   /* v3321: Platz fuer die Nummer */
           pointBackgroundColor: punkte.map(function (p, i) {
             if (i === 0) return isDark() ? '#E8E2D4' : '#2A2727';
             return (p._erg < 0) ? GRUEN : ROT;
@@ -2640,6 +2652,13 @@
           pointBorderColor: isDark() ? '#0a0805' : '#fff', pointBorderWidth: 2,
           order: 1 }
       ]},
+      plugins: [{ id: 'skNummern', afterDatasetsDraw: function (ch) {
+        var meta = ch.getDatasetMeta(1); if (!meta || meta.hidden) return;
+        var ctx = ch.ctx; ctx.save();
+        ctx.font = '700 10px "JetBrains Mono", ui-monospace, monospace'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        meta.data.forEach(function (pt, i) { ctx.fillStyle = i === 0 ? (isDark() ? '#0a0805' : '#fff') : '#fff'; ctx.fillText(i === 0 ? 'A' : String(i), pt.x, pt.y + 0.5); });
+        ctx.restore();
+      } }],
       options: {
         responsive: true, maintainAspectRatio: false, devicePixelRatio: 2,
         interaction: { mode: 'nearest', intersect: true },
@@ -2662,12 +2681,12 @@
           } }
         },
         scales: {
-          x: { type: 'linear', min: 0, max: maxX,
+          x: { type: 'linear', min: minX, max: maxX,
                grid: { color: gridCol, drawBorder: false },
                ticks: { color: axisCol, maxTicksLimit: 7,
                         callback: function (v) { return Math.round(v / 1000) + 'k €'; } },
                title: { display: true, text: 'zu versteuerndes Einkommen', color: axisCol } },
-          y: { min: 0, suggestedMax: 48,
+          y: { min: minY, suggestedMax: 50,
                grid: { color: gridCol, drawBorder: false },
                ticks: { color: SER[0], callback: function (v) { return Math.round(v) + ' %'; } },
                title: { display: true, text: 'Grenzsteuersatz', color: SER[0] } }
@@ -2718,7 +2737,8 @@
       '.sk-k-gut .sk-k-v{color:#3FA56C}',
       '.sk-k-schlecht .sk-k-v{color:#B8625C}',
       '.sk-box{height:260px;margin-bottom:14px}',
-      '.sk-box-h{min-height:200px}',   /* v3321: Hoehe je nach Zahl der Objekte (inline) */
+      '.sk-box-h{min-height:200px}',
+      '.sk-nr{display:inline-block;min-width:17px;height:17px;line-height:17px;border-radius:50%;background:#2A2727;color:#fff;font:700 9.5px ui-monospace,monospace;text-align:center;margin-right:7px;vertical-align:1px}',   /* v3321: Hoehe je nach Zahl der Objekte (inline) */
       '.sk-ueber{font-size:12.5px;line-height:1.5;color:var(--c-mut,#6b6660);margin:0 2px 10px}',
       '.sk-ueber b{color:var(--c-ink,#1b1815)}',
       '.sk-ohne{font-size:11.5px;line-height:1.45;color:var(--c-mut,#6b6660);margin:-6px 0 12px;padding:7px 10px;border-radius:7px;background:rgba(184,98,92,.07);border-left:3px solid #B8625C}',
@@ -2832,7 +2852,7 @@
           +     ' title="Der Tarif des § 32a EStG als Kurve — und wo deine Objekte dich darauf hinschieben.">Progressionskurve</button>'
           +   '<span class="sk-u-hint">'
           +     (_ketteAnsicht === 'kurve'
-                  ? 'Die Kurve ist der Steuertarif selbst. Jeder Punkt ist ein Objekt — er sitzt dort, wo dein Einkommen nach diesem Objekt liegt.'
+                  ? 'Die Linie ist der Steuertarif. A ist dein Einkommen ohne Objekte, jede Nummer ein Objekt aus der Tabelle – dort, wo dein Einkommen danach liegt.'
                   : 'Je Objekt die Steuer, die es spart (grün) oder kostet (rot) – in der Reihenfolge des Kaufs, unten die Summe.')
           +   '</span>'
           + '</div>'
@@ -2866,7 +2886,7 @@
       t.schritte.forEach(function (s) {
         var gefallen = istEst && (s.satzNach < s.satzVor - 0.005);
         html += '<tr>'
-          + '<td class="sk-name" title="' + _esc(s.name) + '">' + _esc(s.name) + '</td>'
+          + '<td class="sk-name" title="' + _esc(s.name) + '">' + (istEst ? '<span class="sk-nr">' + (t.schritte.indexOf(s) + 1) + '</span>' : '') + _esc(s.name) + '</td>'
           + '<td class="sk-dat">' + (s.datum ? _datDe(s.datum) : '—') + '</td>'
           + '<td class="r ' + (s.erg < 0 ? 'sk-rot' : 'sk-gruen') + '">' + eur(s.erg) + '</td>'
           + (istEst ? '<td class="r sk-grau">' + eur(s.basisVor) + '</td>'
@@ -2926,7 +2946,7 @@
          vollem Objektnamen, Betrag am Balken und die Summe als eigener Balken. Der Grenzsatz
          steht in der Tabelle darunter und in der Progressionskurve. Zahlen unverändert aus
          steuerKette() (s.wirkung, t.summe). */
-      var labels = t.schritte.map(function (s) { var n = String(s.name || ''); return n.length > 32 ? n.substring(0, 30) + '…' : n; }).concat(['Summe aller Objekte']);
+      var labels = t.schritte.map(function (s, i) { var n = String(s.name || ''); return (i + 1) + '  ' + (n.length > 32 ? n.substring(0, 30) + '…' : n); }).concat(['Summe aller Objekte']);
       var wirkReihe = t.schritte.map(function (s) { return Math.round(s.wirkung); }).concat([Math.round(t.summe)]);
       var nS = t.schritte.length;
       var GOLD = SER[0];
