@@ -2245,9 +2245,9 @@
        die Tabelle (projectAll), zwei Achsen: Fluesse links, Bestaende rechts. */
     if ($('dpc-proj-mix') && _projAnsicht === 'chart') {
       var _mx = axes();
-      _mx.y.title = { display:true, text:'Miete · Cashflow (€/Jahr)', color:axisCol, font:{size:10} };
+      _mx.y.title = { display:true, text:'Miete · Cashflow (€/Jahr)', color:axisCol, font:{size:10}, padding:{ top:0, bottom:6 } };   /* v3325a: 360 px - Titel berührte die Zahlen */
       _mx.y2 = { position:'right', grid:{ drawOnChartArea:false }, ticks:{ color:axisCol, callback:function(v){ return yfmt(v); } },
-                 title:{ display:true, text:'Restschuld · Eigenkapital (€)', color:axisCol, font:{size:10} } };
+                 title:{ display:true, text:'Restschuld · Eigenkapital (€)', color:axisCol, font:{size:10}, padding:{ top:6, bottom:0 } } };
       mk('dpc-proj-mix',{type:'bar',data:{labels:labels,datasets:[
         {type:'bar',label:'Miete',data:PR.map(function(r){return Math.round(r.miete);}),backgroundColor:_wlrgba(.28),borderRadius:2,yAxisID:'y',order:4},
         {type:'line',label:'Cashflow vor Steuer',data:PR.map(function(r){return Math.round(r.cfVor);}),borderColor:'#7A7370',backgroundColor:'#7A7370',pointRadius:0,borderWidth:2,tension:.3,yAxisID:'y',order:1},
@@ -3039,7 +3039,7 @@
           scales: {
             x: { min: minX, max: maxX, grid: { color: function (c) { return c.tick && c.tick.value === 0 ? (isDark() ? 'rgba(232,226,212,.5)' : 'rgba(42,39,39,.45)') : gridCol; }, drawBorder: false },
                  ticks: { color: axisCol, maxTicksLimit: schmal ? 4 : 7, callback: function (v) { return (v < 0 ? '−' : v > 0 ? '+' : '') + Math.round(Math.abs(v) / 1000) + 'k €'; } },
-                 title: { display: true, text: schmal ? 'gespart (+) / mehr gezahlt (−) ' + _kettenJahr() : 'Steuer gespart (+) bzw. mehr gezahlt (−) im Jahr ' + _kettenJahr(), color: axisCol } },
+                 title: { display: true, text: schmal ? (cv.parentNode.clientWidth < 340 ? 'gespart (+) / mehr (−) ' : 'gespart (+) / mehr gezahlt (−) ') + _kettenJahr() :   /* v3325a: 360 px - 8 px über den Rand */ 'Steuer gespart (+) bzw. mehr gezahlt (−) im Jahr ' + _kettenJahr(), color: axisCol } },
             y: { grid: { display: false }, ticks: { color: function (c) { return c.index === nS ? (isDark() ? '#E8E2D4' : '#2A2727') : axisCol; },
                  font: function (c) { return c.index === nS ? { weight: '700' } : {}; }, autoSkip: false } }
           }
