@@ -192,5 +192,20 @@
     return h;
   }
 
-  window.DpPaPotenzial = { VERSION: 'v3323', html: html, kurz: kurz, daten: daten };
+  /* Der Ertragswert je Stufe kommt oft erst NACH dem Zeichnen (potenzial.js rechnen() → Ereignis dp:potenzial).
+     Gemessen 12.11.2026: beim ersten Öffnen fehlte die Stufe „Nach Mieterhöhung“ samt Ertragswert. Dann neu zeichnen –
+     und ebenso beim Öffnen des Reiters. */
+  function neuZeichnen() {
+    Array.prototype.forEach.call(document.querySelectorAll('.dp-pa-wrap[data-dp-pa-v4] #dp-pa-pot'), function (p) {
+      try { var w = p.closest('.dp-pa-wrap'); var h = html(window._dpPaLetzte || {}, !!(w && w.classList.contains('dp-pa-bestand'))); if (h) p.innerHTML = h; } catch (e) {}
+    });
+    try { if (window.DpPilotV4 && window.DpPilotV4.wegNeu) window.DpPilotV4.wegNeu(); } catch (e) {}
+  }
+  ['dp:potenzial', 'dp:potenzial-markt'].forEach(function (ev) { window.addEventListener(ev, function () { setTimeout(neuZeichnen, 0); }); });
+  document.addEventListener('click', function (ev) {
+    var t = ev.target && ev.target.closest ? ev.target.closest('.dp-pa-wrap[data-dp-pa-v4] .dp-pa-rail .dp-pa-tab') : null;
+    if (t && (t.getAttribute('onclick') || '').indexOf("'pot'") >= 0) setTimeout(neuZeichnen, 0);
+  });
+
+  window.DpPaPotenzial = { VERSION: 'v3323', html: html, kurz: kurz, daten: daten, neuZeichnen: neuZeichnen };
 })();

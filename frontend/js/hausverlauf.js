@@ -177,7 +177,9 @@
       + '<p class="dp-pa-p">Hier steht, was in der Eigentümergemeinschaft passiert ist – Versammlungen, Beschlüsse, Sonderumlagen, Instandhaltung und Verwalterwechsel, nach Jahren geordnet. '
       + 'Die Grundlage sind die WEG-Unterlagen dieses Objekts: Protokolle der Eigentümerversammlung, Wirtschaftspläne und Hausgeldabrechnungen.</p>'
       + '<p class="dp-pa-p">Noch ist keine WEG-Unterlage eingelesen. Lade ein Protokoll hoch – nichts wird ohne deine Bestätigung ins Objekt übernommen.</p>' + knoepfe() + '</div>';
-    if (!L.hatWeg || !L.liste.length) return leer;
+    /* ohne WEG-Unterlagen nur bei Wohnungseigentum (dort gibt es eine Gemeinschaft) - ein ganzes Haus ohne WEG bekommt keinen leeren Reiter */
+    var etw = false; try { etw = /ETW/i.test(String((el('objart') || {}).value || '')); } catch (e) {}
+    if (!L.hatWeg || !L.liste.length) return etw ? leer : '';
     var w = (L.d && L.d.auswertung && L.d.auswertung.weg) || {};
     /* oben: der Stand heute in drei Karten (Verwaltung, Rücklage, Hausgeld) + Fazit */
     var lage = [['Verwaltung', w.verwaltung], ['Erhaltungsrücklage', w.ruecklage], ['Hausgeld', w.hausgeld]].filter(function (x) { return x[1] && String(x[1]).trim(); });
