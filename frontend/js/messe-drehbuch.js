@@ -8718,7 +8718,7 @@
      80 % → Gut), A3b Bewertung/Prüfsteine/Zielkaufpreis im Quick-Check, A5b Investor Deal Score (24 von 24 Kennzahlen),
      A8 Variante „Optimiert“ (Boden −20 %). Objekt A trägt seither 690.000 €, das Hausfoto, geb_ant 80,72 und eine neue Pilot-Analyse. */
   var QG_A = '46b268c1-4871-4a5e-b9ef-bda5e03e38fc', QG_B = '3888ccb6-cb2d-4b60-b56a-45874930f295';
-  var QG_PFAD = 'messe-dateien/am-quittengarten-12/', QG_BUSTER = 'v3330g';   /* v3330g: Begründung Optimiert; v3330f: Kegel Wahl-Tafel, Titelbild; v3330e: Mitschnitt neu (Auslese, BMF 690.000 €); v3330d: Exposé mit 690.000 € und Hausfoto (Marcel 12.11.: Score bei 100 % Solide) */
+  var QG_PFAD = 'messe-dateien/am-quittengarten-12/', QG_BUSTER = 'v3330h';   /* v3330h: Begründungszeile berichtigt; v3330g: Begründung Optimiert; v3330f: Kegel Wahl-Tafel, Titelbild; v3330e: Mitschnitt neu (Auslese, BMF 690.000 €); v3330d: Exposé mit 690.000 € und Hausfoto (Marcel 12.11.: Score bei 100 % Solide) */
   var QG_DATEIEN = ['01-expose-am-quittengarten-12.pdf', '02-mieterliste-am-quittengarten-12.pdf', '03-energieausweis-am-quittengarten-12.pdf'];
   var _qg = { geladen: false };
   window.DPM_QG = window.DPM_QG || {};
@@ -9112,19 +9112,19 @@
         var tt = r6Inner(r6BmfPane()), ga = /GEBÄUDEANTEIL\s*([\d,]+ %)/i.exec(tt), af = /AFA JE JAHR\s*([\d.]+ €)/i.exec(tt), gw = /(?:^|\n)\s*GEWÄHLT\s*\n\s*([^\n]+)/.exec(tt);   /* ohne i: „Was gewählt ist, …“ steht darüber */
         DPM_QG.a8 = { gebaeude: ga && ga[1], afa: af && af[1], wahl: gw && gw[1] };
         await b2oZeile(s, (gw ? gw[1].trim() : 'Amtlich'), 'Gebäudeanteil <b>' + (ga ? ga[1] : '–') + '</b>, AfA <b>' + (af ? af[1] : '–') + '</b> im Jahr.');
-        /* v3330g · Marcel 12.11.: die Abweichung braucht eine Begründung - getippt, sie geht in den Vertragstext.
+        /* v3330g · Marcel 12.11.: die Abweichung braucht eine Begründung - getippt; gemessen: sie steht im Text für den Steuerberater (bmf-boden-zusatz-text), nicht im Kaufvertragstext.
            Nur im Fenster (bmf-boden-grund wird nicht gespeichert, Objekt A ist ohnehin nur gelesen). */
         var gf = function () { var e = q('#bmf-boden-grund'); return e && e.offsetWidth ? e : null; };
         if (gf()) {
           r6BmfOben(gf()); await warte(500);
           await zeige(function () { var e = gf(); return e && (e.closest('label') || e); }, 8);
-          s.zeile('Die Begründung', 'Die Abweichung wird begründet — der Satz geht <b>in den Vertragstext</b>.');
+          s.zeile('Die Begründung', 'Die Abweichung wird begründet — der Satz steht im <b>Text für den Steuerberater</b>.');
           var GR = 'Bodenwert nach Lage und Grundstückszuschnitt unter dem Richtwert, Gebäudeanteil nach Sachwertverfahren.';
           var ge = gf(); ge.value = '';
           for (var gi = 1; gi <= GR.length; gi++) { ge.value = GR.slice(0, gi); if (gi % 4 === 0 || gi === GR.length) ge.dispatchEvent(new Event('input', { bubbles: true })); await warte(45); }
           ge.dispatchEvent(new Event('change', { bubbles: true }));
           _qg.grund = true;
-          await warte(Math.max(1500, lies('Die Begründung', 'Die Abweichung wird begründet — der Satz geht in den Vertragstext.') - GR.length * 45));
+          await warte(Math.max(1500, lies('Die Begründung', 'Die Abweichung wird begründet — der Satz steht im Text für den Steuerberater.') - GR.length * 45));
         }
         var kl = function () { var e = q('#bmf-boden-klausel-text'); if (!e || !e.offsetWidth) return null; var x = e; for (var j = 0; j < 3 && x && !/kopieren/i.test(x.textContent); j++) x = x.parentElement; return x || e; };
         var ausg = function () { var p = r6BmfPane(); var e = p && (rhIm(p, /^Text für den/) || rhIm(p, /^AUSGABE$/i)); return e && (e.closest('div[style*="grid"]') || e.parentElement); };
