@@ -378,7 +378,10 @@
     einleitung('Die Arbeitshilfe teilt die Anschaffungskosten einschließlich Nebenkosten auf; die Nebenkosten folgen demselben Verhältnis wie der Kaufpreis. Angesetzt sind alle Anschaffungsnebenkosten des Erwerbs: Grunderwerbsteuer, Notar, Grundbuch, Makler und Vermittlung ebenso wie Fahrten zur Besichtigung und zum Notartermin, ein Wertgutachten zur Kaufentscheidung sowie Rechtsberatung des Erwerbs (BFH VIII R 195/77; BFH IX R 20/08). Kosten, die erst die Abschreibung ermitteln, stehen gesondert und sind sofort abziehbar.');
 
     /* ── Herleitung der amtlichen Aufteilung ─────────────────────── */
-    platz(80, 'Kaufpreisaufteilung', 'Herleitung nach der amtlichen Arbeitshilfe');
+    /* v3346 · Marcel 12.11.2026: Aufbau 1:1 wie die KPA Rinteln (4 Seiten) - die Herleitung steht
+       IMMER auf eigener Seite. Bis v3345 wechselte sie nur bei Platzmangel; mit wenigen Nebenkosten
+       rutschte sie auf Seite 1 und das Dokument hatte 3 Seiten mit anderem Seitenbild. */
+    neueSeite('Kaufpreisaufteilung', 'Herleitung nach der amtlichen Arbeitshilfe');
     abschnitt('Herleitung der amtlichen Arbeitshilfe');
     einleitung('Gerechnet hat die Arbeitshilfe des Bundesfinanzministeriums selbst; die Werte stammen aus ihrem Berechnungsblatt. Bei einem Mietwohngrundstück führt sie über das Ertragswertverfahren, sonst über den Sachwert.');
     zeile('Bodenwert (Fläche × Bodenrichtwert)', eur(bodenwert));
@@ -479,6 +482,9 @@
       doc.setFont('helvetica', 'italic'); doc.setFontSize(9); doc.setTextColor(26, 26, 26);
       String(zusatzTxt).split('\n').forEach(function (absatz) {
         if (!absatz.trim()) { y += 2.2; return; }
+        /* v3346 · ein nummerierter Absatz wird nicht ueber den Seitenwechsel gerissen */
+        var _zl = doc.splitTextToSize(sauber(absatz), CW).length;
+        if (_zl * 4.8 < H - 70 && y + _zl * 4.8 > H - 22) { doc.addPage(); kopf(_titel, _unter); }
         doc.splitTextToSize(sauber(absatz), CW).forEach(function (z) {
           if (y > H - 22) { doc.addPage(); kopf(_titel, _unter); }
           doc.text(z, L, y); y += 4.8;
