@@ -330,7 +330,73 @@ window.DealPilotOnboarding = (function () {
       + 'Den vollen Umfang mit Wertermittlung, Einheiten erfassen, Unterlagen einlesen, PDF-Berichten '
       + 'und Portfolio-Cockpit nutzt du am großen Bildschirm am bequemsten.</div>';
   }
+  /* v3340 · Marcel 12.11.2026: „am Anfang ein Hinweis, dass empfohlen wird, das Programm im
+     Browser oder auf dem Tablet zu nutzen — wegen der Vollumfänglichkeit." Der Hinweis in
+     Schritt 1 (oben) erreicht nur, wer die Einrichtung noch vor sich hat. Alle anderen sehen
+     auf dem Handy (bis 640 px - ein Tablet hochkant ist 768 px und braucht ihn nicht) EINMAL
+     eine Karte am unteren Rand. Der Merker gilt je Browser: wer die Karte (oder Schritt 1 auf
+     dem Handy) gesehen hat, bekommt sie nicht wieder. */
+  var HANDY_KEY = 'dp_handy_hinweis_v1';
+  function _klein() {
+    try { return window.matchMedia('(max-width: 640px)').matches; } catch (e) { return false; }
+  }
+  function _handyKarte() {
+    if (!_klein() || _ls(HANDY_KEY) || el('dp-handy-hinweis')) return;
+    if (el('dp-onboarding') || el('auth-modal') || el('dp-register-modal')) return;
+    try { if (window.Auth && Auth.isLoggedIn && !Auth.isLoggedIn()) return; } catch (e) { return; }
+    if (!el('dp-handy-hinweis-css')) {
+      var s = document.createElement('style');
+      s.id = 'dp-handy-hinweis-css';
+      s.textContent = [
+        '#dp-handy-hinweis{position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:99990;',
+        '  background:#0E0D0B;color:#F4EFE3;border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 55%, transparent);border-radius:14px;',
+        '  box-shadow:0 18px 40px rgba(0,0,0,.45);padding:14px 14px 12px;font:13px/1.5 Inter,system-ui,sans-serif;overflow:hidden;',
+        '  animation:dpHhEin .35s ease-out both}',
+        '#dp-handy-hinweis::before{content:"";position:absolute;left:0;right:0;top:0;height:3px;',
+        '  background:linear-gradient(110deg, var(--wl-e8cc7a, #E8CC7A), var(--wl-c9a84c, #C9A84C) 55%, var(--wl-b8932f, #b8932f))}',
+        '#dp-handy-hinweis .hh-kopf{display:flex;align-items:center;gap:10px;margin:0 34px 6px 0}',
+        '#dp-handy-hinweis .hh-ic{flex:0 0 32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;',
+        '  background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 16%, transparent);color:var(--wl-e8cc7a, #E8CC7A)}',
+        '#dp-handy-hinweis .hh-t{font:700 15px/1.25 "Space Grotesk",Inter,sans-serif;color:#FDFCFA}',
+        '#dp-handy-hinweis .hh-x{position:absolute;top:8px;right:8px;width:36px;height:36px;border:0;border-radius:9px;background:transparent;',
+        '  color:#CFC7B6;font-size:22px;line-height:1;cursor:pointer}',
+        '#dp-handy-hinweis p{margin:0 0 10px;color:#D9D2C3}',
+        '#dp-handy-hinweis .hh-ok{display:block;width:100%;min-height:42px;border:0;border-radius:10px;cursor:pointer;',
+        '  font:700 14px/1 "Space Grotesk",Inter,sans-serif;color:#050505;',
+        '  background:linear-gradient(110deg, var(--wl-e8cc7a, #E8CC7A), var(--wl-c9a84c, #C9A84C) 55%, var(--wl-b8932f, #b8932f))}',
+        '@keyframes dpHhEin{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}',
+        '@media (min-width:641px){#dp-handy-hinweis{display:none}}'
+      ].join('\n');
+      document.head.appendChild(s);
+    }
+    var k = document.createElement('div');
+    k.id = 'dp-handy-hinweis';
+    k.setAttribute('role', 'dialog');
+    k.setAttribute('aria-label', 'Hinweis zur Nutzung am Handy');
+    k.innerHTML = '<button type="button" class="hh-x" aria-label="Hinweis schließen">×</button>'
+      + '<div class="hh-kopf"><span class="hh-ic" aria-hidden="true">'
+      + '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'
+      + '<rect x="2" y="4" width="14" height="10" rx="1.5"/><path d="M6 18h6"/><rect x="17" y="8" width="5" height="12" rx="1.2"/></svg></span>'
+      + '<span class="hh-t">Am Rechner oder Tablet am besten</span></div>'
+      + '<p>Für den vollen Funktionsumfang empfehlen wir DealPilot im Browser am Rechner oder auf dem Tablet. '
+      + 'Auf dem Handy funktioniert alles Wichtige – Quick-Check, Objekte, Kennzahlen und Co-Pilot.</p>'
+      + '<button type="button" class="hh-ok">Verstanden</button>';
+    function zu() { _lsSet(HANDY_KEY, String(Date.now())); if (k.parentNode) k.parentNode.removeChild(k); }
+    k.querySelector('.hh-x').addEventListener('click', zu);
+    k.querySelector('.hh-ok').addEventListener('click', zu);
+    document.body.appendChild(k);
+  }
+  function _handyKarteSpaeter() {
+    if (!_klein() || _ls(HANDY_KEY)) return;
+    (function warten(seit) {
+      seit = seit || Date.now();
+      if (!document.querySelector('#sb-list, #sidebar') && (Date.now() - seit) < 6000) { setTimeout(function () { warten(seit); }, 200); return; }
+      setTimeout(function () { if (!_faellig()) _handyKarte(); }, 1200);
+    })();
+  }
+
   function s1() {
+    if (_klein()) _lsSet(HANDY_KEY, 'einrichtung-' + Date.now());   /* v3340: Schritt 1 nennt es schon */
     return _handyHinweis()
       + '<p class="dpo-vor">Womit möchtest du arbeiten? Du kannst das jederzeit '
       + 'unter <b>Darstellung</b> ändern — auch mitten im Betrieb.'
@@ -1626,7 +1692,7 @@ window.DealPilotOnboarding = (function () {
   }
 
   function _vielleichtZeigen() {
-    if (!_faellig()) return;
+    if (!_faellig()) { _handyKarteSpaeter(); return; }
     /* Dieselbe Bedingung wie beim Rundgang: warten, bis die Oberflaeche
        wirklich steht - nicht eine Zahl von Millisekunden raten. */
     (function warten(seit) {
@@ -1664,7 +1730,7 @@ window.DealPilotOnboarding = (function () {
      Merker `dp_auth_flow` gehoert zum Anmeldeweg und ist hier vorbei. */
   function pruefen() {
     try { sessionStorage.removeItem('dp_auth_flow'); } catch (e) {}
-    if (!_faellig()) return false;
+    if (!_faellig()) { _handyKarteSpaeter(); return false; }
     setTimeout(_vielleichtZeigen, 300);
     return true;
   }

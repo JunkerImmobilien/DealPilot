@@ -41607,3 +41607,54 @@ body.dp-dg-2 :is(#s0, #s1, #s2, #s3, #s4, #s3-tax, #s5, #s6, #s8) [data-dp-dg="3
 #s4 .dp-bwk-info .dp-infobox-title { font-size: 11.5px; }
 #s4 .dp-bwk-info .dp-infobox-title::after { content: " ·"; color: var(--muted, #5F5E5A); font-weight: 400; }
 #s4 .dp-bwk-info .dp-infobox-body { display: inline; }
+
+/* ===== v3340 · Handy-Durchgang in der Messkabine (Marcel 12.11.2026: „den DealPilot auf dem
+   Handy und Tablet nochmal ganz genau durchgehen … alles passend rendern und anpassen").
+   Gemessen bei 360/390 px (Aktenmappe und Heute), 768/834 px und den fuenf iPad-Safari-Profilen.
+   Tablets waren sauber; alle Befunde unten sind Handy-Befunde, deshalb alles unter 640 px. ===== */
+@media (max-width: 640px) {
+  /* (1) Reiter Objekt, Objektdaten: Beschriftungen waren auf 20 px Hoehe und eine Zeile
+         festgenagelt (objektdaten-raster.css v3225a) - „Zustand des Gebäudes" lief unter die
+         DS2-Marke, das „?" daneben war abgeschnitten (206 statt 146 px). Jetzt bricht sie um. */
+  .od-raster > .f > label { white-space: normal; height: auto; min-height: 20px; line-height: 1.25;
+    overflow: visible; flex-wrap: wrap; row-gap: 2px; align-items: flex-end; }
+  /* (2) Reiter Objekt, Pilot-Lage-Bewertung: die Marke „Aus dem Marktbericht" ragte 22 px aus
+         der Titelspalte (Kopf bleibt einzeilig, Marcel 09.11.2026 v3247). */
+  #ki-lage-box .ki-lage-title > span { min-width: 0; overflow-wrap: anywhere; }
+  #ki-lage-box .ki-lage-title .ki-lage-tag { white-space: normal; max-width: 100%; }
+  /* (3) Reiter Objekt, Bodenrichtwert: „Bodenrichtwert-Portal Nordrhein-Westfalen" ragte 27 px
+         ueber die Karte hinaus. */
+  #brw-portal-btn { white-space: normal; max-width: 100%; text-align: left; height: auto; min-height: 36px; }
+  /* (4) Reiter Finanzierung: „Marktzins übernehmen" war 22 px hoch und abgeschnitten (136/132).
+         Die Stand-Zeilen der Konditionen (#d1_grp_kond_stand) und der Pilot-Analyse
+         (.dp-pa-stand) kuerzen mit … ABSICHTLICH - ein Tipp klappt sie auf
+         (pilot-analyse-v4.js .auf). Deshalb hier unveraendert. */
+  #d1z-marktzins-knopf .btn-outline { min-height: 34px; white-space: normal; padding: 6px 10px; }
+  /* (6) Reiter Bewertung, Stress-Matrix: die Achse unten nahm ihre Spaltenbreite vom Inhalt
+         (35/57/58/50/44 px gegen 5 x 43 px der Zellen) - „Wachstum" lief 29 px (bei 360 px:
+         59 px) aus der Karte. Jetzt dieselben fuenf Spalten wie die Zellen. */
+  .bc-matrix-row, .bc-matrix-axis-x { grid-template-columns: repeat(5, minmax(0, 1fr)) !important; }
+  .bc-matrix-axis-x-cell { min-width: 0; font-size: 9.5px; letter-spacing: 0; overflow-wrap: anywhere;
+    hyphens: auto; -webkit-hyphens: auto; line-height: 1.2; }
+  /* (7) Reiter Deal-Aktion, Bordkarten der Partner: Logo 92 px plus Abriss 58 px liessen dem
+         Namen 70 px - er lief 26 px (360 px: 56 px) unter den Abriss, der Knopf 6 px. */
+  html body #s8 .dab-bp-logo { width: 56px; height: 56px; border-radius: 10px; }
+  html body #s8 .dab-bp-stub { width: 40px; }
+  html body #s8 .dab-bp-top > div:not(.dab-bp-logo) { min-width: 0; flex: 1 1 auto; overflow-wrap: anywhere; }
+  html body #s8 .dab-bp-cta { white-space: normal; text-align: center; }
+  html body #s8 .dab-req li { flex-wrap: wrap; }
+  /* (8) Einstellungen, Liste: die Seitenleiste nahm 834 px in einem 778-px-Schirm und
+         scrollte nicht - „Rechtliches" und alles darunter war unerreichbar. Ursache: die
+         v2201-Liste (flex:1 1 auto, min-height:0; 1,2,2) verlor gegen
+         „#settings-modal .settings-modal.set-modal-v2 .modal-side" (flex:0 0 auto; 1,3,0). */
+  html body #settings-modal[data-mob="liste"] .settings-modal.set-modal-v2 .modal-side {
+    flex: 1 1 auto !important; min-height: 0 !important; overflow-y: auto !important; }
+  /* (9) Vermoegen & Haushalt: die Spalten nahmen 520 px Mindestbreite der Tabellen mit
+         (1fr = minmax(auto,1fr)) - die Karten wurden bei 359 px abgeschnitten, die Spalte
+         „€ / Monat" war weg. Die Tabellen wischen in ihrem .vm-scroll. Der Wertansatz-
+         Waehler im Titel lief 128 px hinaus. */
+  #s-vermoegen .vm-zwei { grid-template-columns: minmax(0, 1fr) !important; }
+  #s-vermoegen .vm-zwei > div { min-width: 0; }
+  #s-vermoegen .vm-wa { display: flex; flex-wrap: wrap; margin: 6px 0 0; max-width: 100%; }
+  #s-vermoegen .vm-wa select { max-width: 100%; min-width: 0; }
+}
