@@ -117,6 +117,12 @@
     var kp = kaufpreis(), fu = String(h.fuehrend || '');
     var mfh = /mfh|mehrfam|wgh|wohn.*gesch|gewerbe/i.test(String(h.property_type || '')) || (fu === 'ertragswert' && h.sw_faktor_grund === 'objektart_nicht_abgeleitet');
     var ro = rohertrag(h);
+    /* v3334 · aufgeteilt (Haken unter den Einheiten): führend ist der Vergleichswert je Einheit (Summe),
+       der Ertragswert des Hauses stützt - dieselbe Weiche wie „Wert je Verfahren" (wert-zielbild.js
+       mitAufteilung, v3322). Gemessen 12.11.2026 an Westerfeldstr. 146: Reiter Bewertung „Vergleichswert je
+       Einheit 985.200 € führend", hier daneben „Ertragswert führend". Nichts neu gerechnet. */
+    var AUF = aufteilung();
+    if (AUF) fu = 'aufteilung';
 
     function zeile(name, sub, a, m, b, fuehrend, ohneAbw) {
       var d = ohneAbw ? null : abw(m, mw);
@@ -132,8 +138,10 @@
       + '<th>Wert</th><th>untere</th><th>Mitte / Wert</th><th>obere</th><th>zur Marktpreis&shy;indikation</th></tr></thead><tbody>';
     t += zeile('Marktpreisindikation', mitAb ? 'nach ' + pct(ab) + ' % Abschlag auf Angebotspreise' : 'aus Angebotspreisen vergleichbarer Objekte', lo, mw, hi, fu === 'vergleichswert' && vw == null);
     if (mitAb) t += zeile('ohne Abschlag', 'Angebotsniveau, wie es im Markt ausgeschrieben ist', rohLo, roh, rohHi, false);
+    if (AUF) t += zeile('Vergleichswert je Einheit (Summe)', esc(AUF.bezeichnung || 'Vergleichswert') + ' · ' + AUF.n + ' Wohnungen einzeln'
+      + (AUF.kosten > 0 ? ', abzüglich Aufteilungskosten ' + eur(AUF.kosten) : '') + (AUF.vollstaendig ? '' : ' · unvollständig'), null, AUF.wert, null, true);
     if (ew != null) t += zeile(/vorläufig/.test(h.ertragswert_bezeichnung || '') ? 'Ertragswert (vorläufig)' : 'Ertragswert',
-      (ewV != null ? 'Spanne aus dem Liegenschaftszins' : '') , ewV, ew, ewB, fu === 'ertragswert');
+      (ewV != null ? 'Spanne aus dem Liegenschaftszins' : '') + (AUF ? (ewV != null ? ' · ' : '') + 'Haus als Ganzes, stützend' : ''), ewV, ew, ewB, fu === 'ertragswert');
     /* v2979 · Marcel 27.10.2026 (Parkstr. 9, MFH Bj 1905: Sachwert 519.125 € neben Ertragswert 425.000 € und
        Kaufpreis 395.000 €), Variante B: ohne Sachwertfaktor ist der Sachwert eine Herstellungskostenrechnung,
        keine Marktaussage. Er bleibt stehen, aber als Plausibilitaet, mit Begruendung und ohne Prozentabstand -
@@ -225,7 +233,9 @@
 
     /* ── Warum sie auseinanderliegen ── */
     var w = [];
-    if (fu && VERF[fu]) w.push('Für dieses Objekt ist der <b>' + VERF[fu] + '</b> das führende Verfahren' + (h.fuehrend_grund ? ': ' + esc(String(h.fuehrend_grund).replace(/\.$/, '')) : '') + '. An ihm misst sich der Preis, die anderen Werte sind die Gegenprobe.');
+    if (AUF) w.push('In Wohnungseigentum aufgeteilt: führend ist der <b>Vergleichswert je Einheit</b> – ' + AUF.n + ' Wohnungen einzeln bewertet, zusammen ' + eur(AUF.wert)
+      + '. Der Ertragswert des Hauses als Ganzes stützt.');
+    else if (fu && VERF[fu]) w.push('Für dieses Objekt ist der <b>' + VERF[fu] + '</b> das führende Verfahren' + (h.fuehrend_grund ? ': ' + esc(String(h.fuehrend_grund).replace(/\.$/, '')) : '') + '. An ihm misst sich der Preis, die anderen Werte sind die Gegenprobe.');
     if (ew != null) {
       var d = abw(ew, mw), drin = lo != null && hi != null && ew >= lo && ew <= hi;
       var fak = ro ? ' Die Marktpreisindikation entspricht dem ' + pct(mw / ro) + '-Fachen des Jahresrohertrags, der Ertragswert dem ' + pct(ew / ro) + '-Fachen.' : '';
@@ -287,8 +297,25 @@
     document.head.appendChild(s);
   }
 
+  /* v3334 · Aufteilerwert aus dem Lauf der Sitzung (DpPotenzial.aufteilungKurz), nur mit Haken „aufgeteilt" */
+  function aufteilung() {
+    try {
+      var M = global._dpMfh, PZ = global.DpPotenzial;
+      if (!M || !M.aufgeteilt || !PZ || typeof PZ.aufteilungKurz !== 'function') return null;
+      var a = PZ.aufteilungKurz(PZ.ergebnis(), PZ.modell()), T = a && a.aufteiler && a.aufteiler.bestand;
+      if (!T || T.wert == null) return null;
+      return { wert: T.wert, bezeichnung: T.bezeichnung, vollstaendig: !!T.vollstaendig, kosten: a.kosten || 0,
+        n: (a.je_wohnung || []).filter(function (w) { return w.art !== 'gewerbe'; }).length };
+    } catch (e) { return null; }
+  }
+  var _letzteHist = null;
+  /* der Potenzial-Lauf kommt oft nach dem Verlauf - dann die Tafel neu */
+  global.addEventListener('dp:potenzial', function () { if (_letzteHist) { try { fuellen(_letzteHist); } catch (e) {} } });
+  global.addEventListener('dp:object-ready', function () { _letzteHist = null; });
+
   /** hist: Verlauf des Objekts (objects/history). Füllt Reiter und Knopf. */
   function fuellen(hist) {
+    _letzteHist = hist;
     var body = document.getElementById('dp-pa-wert-body'), knopf = document.getElementById('dp-pa-tab-wert');
     if (!body) return;
     var letzt = null;
