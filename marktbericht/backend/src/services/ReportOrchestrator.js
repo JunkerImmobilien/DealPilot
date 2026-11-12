@@ -2130,7 +2130,8 @@ export const ReportOrchestrator = {
       external_ref: ext,
       ai_mode: report.mode,
       ai_error: report.error || null,
-      cost: { geomap_eur: geomapCostEur, geomap_balance_eur: balanceAfter },
+      /* v3318 · openai_posten: Modell + usage je KI-Aufruf, das Haupt-Backend rechnet die Euro */
+      cost: { geomap_eur: geomapCostEur, geomap_balance_eur: balanceAfter, openai_posten: (report && report.ki_posten) || [] },
       took_ms: Date.now() - t0,
       trace,
       data: payload,

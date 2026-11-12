@@ -370,6 +370,25 @@
           <tbody id="mbcost-recent"><tr><td colspan="6">Lädt…</td></tr></tbody>
         </table>
       </div>
+      <!-- v3318 · KI-Verbrauch je Konto, Funktion und Monat (ki_verbrauch) -->
+      <div class="card">
+        <h3>KI-Verbrauch (OpenAI) <span id="kiv-monat-wahl" style="font-weight:400;font-size:0.8em"></span></h3>
+        <div id="kiv-kopf" style="font-size:0.85em;color:var(--text-muted);margin-bottom:8px">Lädt…</div>
+        <table class="data-table">
+          <thead><tr><th>Konto</th><th>Plan</th><th>Aufrufe</th><th>Vorgänge</th><th>€ gesamt</th><th>€ im Deckel</th><th>Deckel</th><th>Anteil</th><th>Websuchen</th></tr></thead>
+          <tbody id="kiv-konten"><tr><td colspan="9">Lädt…</td></tr></tbody>
+        </table>
+        <h3 style="margin-top:16px">Je Funktion</h3>
+        <table class="data-table">
+          <thead><tr><th>Weg</th><th>Funktion</th><th>Modell</th><th>Aufrufe</th><th>Token ein / davon Cache / aus</th><th>Websuchen</th><th>€</th></tr></thead>
+          <tbody id="kiv-funktionen"><tr><td colspan="7">Lädt…</td></tr></tbody>
+        </table>
+        <h3 style="margin-top:16px">Je Monat</h3>
+        <table class="data-table">
+          <thead><tr><th>Monat</th><th>Aufrufe</th><th>Konten</th><th>€ gesamt</th><th>€ Server-Schlüssel</th></tr></thead>
+          <tbody id="kiv-monate"><tr><td colspan="5">Lädt…</td></tr></tbody>
+        </table>
+      </div>
     </section>
     <section id="view-landing" class="view" style="display:none;">
       <div class="view-header"><h2>Landing-Analytics <span id="lp-days"><button data-d="7">7 T</button><button data-d="30" class="on">30 T</button><button data-d="90">90 T</button></span></h2></div>
@@ -504,11 +523,11 @@
 
 <div id="toast-container" class="toast-container"></div>
 
-<script src="js/admin-api.js?v=v3289"></script>
+<script src="js/admin-api.js?v=v3318"></script>
 <script src="js/admin-auth.js?v=197"></script>
 <script src="js/admin-charts.js?v=197"></script>
 <script src="js/bc-editor.js?v=780d"></script>
-    <script src="js/admin-app.js?v=v3289"></script>
+    <script src="js/admin-app.js?v=v3318"></script>
     <script src="js/admin-audit-tools.js?v=802"></script> <!-- v802-audit-tools-js -->
     <script src="js/admin-stats.js?v=800"></script> <!-- v800-stats-js -->
     <script src="js/dp-rich-editor.js?v=802"></script> <!-- v802-rich-editor-js -->

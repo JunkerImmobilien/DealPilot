@@ -23,6 +23,7 @@ const { authenticate, requireVerified } = require('../middleware/auth');   /* v2
 const aiCreditsService = require('../services/aiCreditsService');
 const creditAlert = require('../services/creditAlert'); // v554
 const _kosten = require('../services/kostenFreigabe');   /* v3296 · Flow Punkt 6 */
+const kiVerbrauch = require('../services/kiVerbrauch');   /* v3318 */
 
 const router = express.Router();
 
@@ -239,7 +240,11 @@ router.post('/beleihungswert', authenticate, async function (req, res) {
    sichtbar bleibt, aber nichts mehr abgezogen. */
 router.post('/verlauf-text', authenticate, async function (req, res) {
   try {
+    /* v3318 · der Verlaufstext zaehlt in den Monatsdeckel (im Plan, kein Kontingent) */
+    try { await kiVerbrauch.vorAufruf({ userId: req.user.id, endpunkt: 'marktbericht/verlauf-text' }); }
+    catch (e) { if (kiVerbrauch.antwortBeiSperre(res, e)) return; }
     const out = await forward('POST', '/verlauf-text', { query: qstrUser(req), body: req.body || {} });
+    try { kiVerbrauch.erfasseFremdPosten(out.data && out.data.ki_posten, { userId: req.user.id, endpunkt: 'marktbericht/verlauf-text', funktion: 'marktbericht-verlauf-text' }); if (out.data) delete out.data.ki_posten; } catch (e) {}
     if (out.status >= 400) return res.status(out.status).json(out.data);
     const gotText = !!(out.data && out.data.text);
     if (gotText) { try { await aiCreditsService.logExtract(req.user.id, 'marktbericht:verlauf-text'); } catch (e) {} }
@@ -416,6 +421,10 @@ async function runReport(req, res) {
     var _hasValue = !!(_val && (_val.estimated || _val.estimated === 0) && _val.estimated > 0);
     var _c = _d.cost || {};
     var _bal = (typeof _c.geomap_balance_eur === 'number') ? _c.geomap_balance_eur : null;
+    /* v3318 · KI-Kosten des Berichts: der mb-Dienst meldet Modell + usage, gerechnet wird hier
+       (services/kiVerbrauch.js). Bis v3317 blieb openai_eur in jeder Zeile leer. */
+    var _kiEur = kiVerbrauch.erfasseFremdPosten(_c.openai_posten, { userId: req.user.id, endpunkt: 'marktbericht/' + (fast ? 'fast' : 'full'), funktion: 'marktbericht' });
+    try { if (_d.cost) delete _d.cost.openai_posten; } catch (e) {}
 
     if (!_hasValue) {
       if (req._kostenFreigabeId) await _kosten.zurueck(req._kostenFreigabeId);   /* v3296: keine Daten, nichts abgebucht */
@@ -423,10 +432,10 @@ async function runReport(req, res) {
       try {
         const db = req.app.get('db');
         if (db) await db.query(
-          'INSERT INTO marktbericht_cost_log (user_id, kind, liters, geomap_eur, geomap_balance_eur, address, ok) VALUES ($1,$2,$3,$4,$5,$6,false)',
+          'INSERT INTO marktbericht_cost_log (user_id, kind, liters, geomap_eur, geomap_balance_eur, address, ok, openai_eur) VALUES ($1,$2,$3,$4,$5,$6,false,$7)',
           [req.user.id, (fast ? 'qc' : 'voll'), 0,
            (typeof _c.geomap_eur === 'number' ? _c.geomap_eur : null), _bal,
-           ((obj && ((obj.plz || '') + ' ' + (obj.ort || ''))) || body.address || '').trim() || null]
+           ((obj && ((obj.plz || '') + ' ' + (obj.ort || ''))) || body.address || '').trim() || null, _kiEur]
         );
       } catch (e) { console.warn('[marktbericht] cost-log no-data failed:', e.message); }
       return res.status(200).json(Object.assign({}, out.data, { no_data: true, _kerosin: { charged: 0, mode: (fast ? 'fast' : 'full') } }));
@@ -455,10 +464,10 @@ async function runReport(req, res) {
       const db = req.app.get('db');
       if (db) {
         await db.query(
-          'INSERT INTO marktbericht_cost_log (user_id, kind, liters, geomap_eur, geomap_balance_eur, address, ok) VALUES ($1,$2,$3,$4,$5,$6,true)',
+          'INSERT INTO marktbericht_cost_log (user_id, kind, liters, geomap_eur, geomap_balance_eur, address, ok, openai_eur) VALUES ($1,$2,$3,$4,$5,$6,true,$7)',
           [req.user.id, (fast ? 'qc' : 'voll'), stufe,
            (typeof _c.geomap_eur === 'number' ? _c.geomap_eur : null), _bal,
-           ((obj && ((obj.plz || '') + ' ' + (obj.ort || ''))) || body.address || '').trim() || null]
+           ((obj && ((obj.plz || '') + ' ' + (obj.ort || ''))) || body.address || '').trim() || null, _kiEur]
         );
         // Schwellen-Mail bei niedrigem GeoMap-Guthaben (best effort)
         if (_bal != null) { try { await creditAlert.checkAndAlert(db, _bal); } catch (e) {} }
@@ -771,12 +780,13 @@ router.post('/reports/generate-stream', authenticate, requireVerified, async fun
     const _hasValue = !!(_val && _val.estimated > 0);
     const _c = (doneResult && doneResult.cost) || {};
     const _bal = (typeof _c.geomap_balance_eur === 'number') ? _c.geomap_balance_eur : null;
+    const _kiEur = kiVerbrauch.erfasseFremdPosten(_c.openai_posten, { userId: req.user.id, endpunkt: 'marktbericht/' + (fast ? 'fast' : 'full') + '-stream', funktion: 'marktbericht' });   /* v3318 */
     const _addr = ((obj && ((obj.plz || '') + ' ' + (obj.ort || ''))) || body.address || '').trim() || null;
     const db = req.app.get('db');
     if (!_hasValue) {
       if (db) await db.query(
-        'INSERT INTO marktbericht_cost_log (user_id, kind, liters, geomap_eur, geomap_balance_eur, address, ok) VALUES ($1,$2,$3,$4,$5,$6,false)',
-        [req.user.id, (fast ? 'qc' : 'voll'), 0, (typeof _c.geomap_eur === 'number' ? _c.geomap_eur : null), _bal, _addr]
+        'INSERT INTO marktbericht_cost_log (user_id, kind, liters, geomap_eur, geomap_balance_eur, address, ok, openai_eur) VALUES ($1,$2,$3,$4,$5,$6,false,$7)',
+        [req.user.id, (fast ? 'qc' : 'voll'), 0, (typeof _c.geomap_eur === 'number' ? _c.geomap_eur : null), _bal, _addr, _kiEur]
       );
     } else {
       /* v1125-stufenpreis: bei 0 nicht buchen — consume() macht daraus sonst
@@ -787,8 +797,8 @@ router.post('/reports/generate-stream', authenticate, requireVerified, async fun
       }
       if (db) {
         await db.query(
-          'INSERT INTO marktbericht_cost_log (user_id, kind, liters, geomap_eur, geomap_balance_eur, address, ok) VALUES ($1,$2,$3,$4,$5,$6,true)',
-          [req.user.id, (fast ? 'qc' : 'voll'), stufe, (typeof _c.geomap_eur === 'number' ? _c.geomap_eur : null), _bal, _addr]
+          'INSERT INTO marktbericht_cost_log (user_id, kind, liters, geomap_eur, geomap_balance_eur, address, ok, openai_eur) VALUES ($1,$2,$3,$4,$5,$6,true,$7)',
+          [req.user.id, (fast ? 'qc' : 'voll'), stufe, (typeof _c.geomap_eur === 'number' ? _c.geomap_eur : null), _bal, _addr, _kiEur]
         );
         if (_bal != null) { try { await creditAlert.checkAndAlert(db, _bal); } catch (e) {} }
       }

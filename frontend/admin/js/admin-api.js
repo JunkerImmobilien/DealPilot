@@ -63,6 +63,7 @@ return {
     /* v3274 · admin-apikeys.js (API & Pro-Test) ruft API.call - fehlte im Rueckgabeobjekt, Meldung "API fehlt" (Marcel 10.11.2026) */
     call,
     credits, marktberichtCosts,
+    kiVerbrauch: (monat) => call('GET', '/ki-verbrauch' + (monat ? '?monat=' + encodeURIComponent(monat) : '')),   /* v3318 */
     fetchAttachmentUrl,
     feedbackPeriod: (period) => call('GET', '/feedback?period=' + encodeURIComponent(period || 'all')),
     feedbackQuery: (q) => { q = q || {}; var p = []; if (q.period) p.push('period=' + encodeURIComponent(q.period)); if (q.from) p.push('from=' + encodeURIComponent(q.from)); if (q.to) p.push('to=' + encodeURIComponent(q.to)); return call('GET', '/feedback' + (p.length ? '?' + p.join('&') : '')); },

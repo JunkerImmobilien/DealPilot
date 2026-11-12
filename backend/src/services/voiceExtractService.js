@@ -89,29 +89,14 @@ const MAX_OPTIONS = 40;        /* Optionen je Select */
 /* USD je 1 Mio Token. `einAudio` gilt nur fuer Audio-Eingabe, `einCached`
    fuer wiederverwendete Prompt-Praefixe.
    Recherchiert am 08.09.2026, jeder Wert aus zwei unabhaengigen Quellen. */
-const PREISE_FEST = {
-  /* v1329: gpt-5.6-luna ist das neue Arbeitspferd - 0,20 / 1,20 statt
-     0,75 / 4,50 je Mio Token, also 3,75-fach guenstiger, dazu 1 Mio
-     Kontext. Ohne diesen Eintrag zaehlt das Kerosin-Konto falsch: es
-     faellt auf null zurueck und der Abruf sieht gratis aus. */
-  'gpt-5.6-luna':            { ein: 0.20, einCached: 0.02, aus: 1.20 },
-  'gpt-5.6-terra':           { ein: 2.00, einCached: 0.20, aus: 12.00 },
-  'gpt-5.4-mini':           { ein: 0.75, einCached: 0.075, aus: 4.50 },
-  'gpt-4o-mini':            { ein: 0.15, aus: 0.60 },
-  'gpt-4o-transcribe':      { ein: 2.50, einAudio: 6.00, aus: 10.00 },
-  'gpt-4o-mini-transcribe': { ein: 1.25, einAudio: 3.00, aus: 5.00 }
-  /* gpt-5.5 fehlt weiter — es laeuft hier nicht (die ENV setzt
-     gpt-5.4-mini), und einen Preis einzutragen, den niemand braucht und
-     den ich nicht geprueft habe, waere die schlechtere Haelfte von beidem.
-     Nachtragen ohne Codeaenderung per OPENAI_PREISE. */
-};
-const USD_EUR = Number(process.env.OPENAI_USD_EUR || 0.92);
-
-function preisFuer(modell) {
-  let extra = {};
-  try { extra = JSON.parse(process.env.OPENAI_PREISE || '{}'); } catch (e) { extra = {}; }
-  return extra[modell] || PREISE_FEST[modell] || null;
-}
+/* v3318 · DIE PREISE STEHEN JETZT AN EINER STELLE: services/kiVerbrauch.js (PREISE_FEST,
+   preisFuer, Kurs aus config.ki.usdEur = OPENAI_USD_EUR). Hier stand bis v3317 die Tabelle selbst;
+   eine zweite Kopie wuerde beim naechsten Preiswechsel auseinanderlaufen. Jeder Posten, den dieser
+   Dienst einsammelt, wird ausserdem als Zeile in ki_verbrauch geschrieben (Monatsdeckel). */
+const config = require('../config');
+const kiVerbrauch = require('./kiVerbrauch');
+const preisFuer = kiVerbrauch.preisFuer;
+function _eigen(apiKey) { return !!(apiKey && apiKey !== config.openai.apiKey); }
 
 function neuerSammler() {
   return { posten: [], usdGesamt: 0, ohnePreis: [] };
@@ -120,52 +105,32 @@ function neuerSammler() {
 /* Nimmt die `usage` einer OpenAI-Antwort entgegen. Fail-soft in jeder
    Richtung: fehlt sie, fehlt der Posten — die Auswertung laeuft weiter.
    Eine Kostenmessung darf nie der Grund sein, dass ein Diktat scheitert. */
-function usageErfassen(sammler, schritt, modell, data) {
+function usageErfassen(sammler, schritt, modell, data, apiKey) {
+  /* v3318 · erst die Zeile in ki_verbrauch (auch ohne Sammler), dann der Posten fuer die Anzeige */
+  let pz = null;
+  try { pz = kiVerbrauch.erfassen({ funktion: 'sprache:' + schritt, modell: modell, data: data, eigenerSchluessel: _eigen(apiKey) }); } catch (e) { pz = null; }
   try {
     if (!sammler) return;
     const u = (data && data.usage) || null;
-    if (!u) { sammler.posten.push({ schritt, modell, hinweis: 'ohne usage-Angabe' }); return; }
-
-    /* /v1/responses zaehlt input_tokens/output_tokens; die Transkription
-       kann stattdessen eine Dauer melden (usage.type === 'duration'). */
-    const ein = Number(u.input_tokens != null ? u.input_tokens : (u.prompt_tokens || 0)) || 0;
-    const aus = Number(u.output_tokens != null ? u.output_tokens : (u.completion_tokens || 0)) || 0;
-    const det = u.input_token_details || u.input_tokens_details || {};
-    const einAudio = Number(det.audio_tokens || 0) || 0;
-    /* v1259f · Zwischengespeicherte Prompt-Teile kosten nur einen Bruchteil.
-       Das ist hier KEIN Randfall: von rund 6.200 Eingabe-Token der Auswertung
-       sind ueber 6.000 der immer gleiche Feldkatalog, und der steht im Prompt
-       VOR dem Transkript. Genau diese Reihenfolge macht ihn zwischenspeicher-
-       faehig. Ohne diese Zeilen rechnete die Anzeige den Katalog jedes Mal
-       zum vollen Preis und meldete damit zu viel. */
-    const einCached = Number(det.cached_tokens || 0) || 0;
-    const einText = Math.max(0, ein - einAudio - einCached);
-    const sekunden = (u.type === 'duration') ? (Number(u.seconds) || 0) : 0;
-
-    const p = preisFuer(modell);
-    const posten = { schritt, modell, ein, aus, einAudio, einCached, sekunden, bepreist: false, usd: 0 };
-    if (p) {
-      const satzAudio  = (p.einAudio  != null) ? p.einAudio  : p.ein;
-      /* Kein Cache-Preis hinterlegt: zum vollen Satz rechnen. Lieber zu hoch
-         als eine Ersparnis behaupten, die vielleicht nicht gilt. */
-      const satzCached = (p.einCached != null) ? p.einCached : p.ein;
-      posten.usd = (einText * p.ein + einAudio * satzAudio + einCached * satzCached + aus * p.aus) / 1e6;
-      posten.bepreist = true;
-      sammler.usdGesamt += posten.usd;
-    } else if (sammler.ohnePreis.indexOf(modell) < 0) {
-      sammler.ohnePreis.push(modell);
-    }
+    if (!u || !pz) { sammler.posten.push({ schritt, modell, hinweis: 'ohne usage-Angabe' }); return; }
+    /* Die Rechnung (Text-, Audio-, Cache-Token, Dauer) ist dieselbe wie in kiVerbrauch.postenAus -
+       sie stand bis v3317 hier und ist dorthin umgezogen. Ein Modell ohne Preis zaehlt hier weiter
+       NICHT mit (Anzeige ohne_preis); im Deckel steht es zum teuersten Satz. */
+    const posten = { schritt, modell, ein: pz.ein, aus: pz.aus, einAudio: pz.ein_audio, einCached: pz.ein_cached,
+      sekunden: pz.audio_sek, bepreist: pz.bepreist, usd: pz.bepreist ? pz.usd : 0 };
+    if (pz.bepreist) sammler.usdGesamt += pz.usd;
+    else if (sammler.ohnePreis.indexOf(modell) < 0) sammler.ohnePreis.push(modell);
     sammler.posten.push(posten);
   } catch (e) { /* eine Kostenmessung bricht nie eine Auswertung ab */ }
 }
 
 function kostenAbschluss(sammler) {
   if (!sammler) return null;
-  const eur = sammler.usdGesamt * USD_EUR;
+  const eur = sammler.usdGesamt * kiVerbrauch.kurs();
   return {
     eur_cent: Math.round(eur * 10000) / 100,   /* zwei Nachkommastellen im Cent */
     usd: Math.round(sammler.usdGesamt * 1e6) / 1e6,
-    kurs: USD_EUR,
+    kurs: kiVerbrauch.kurs(),
     vollstaendig: sammler.ohnePreis.length === 0,
     ohne_preis: sammler.ohnePreis,
     posten: sammler.posten
@@ -224,6 +189,7 @@ async function transcribe(buf, mime, apiKey, sammler) {
   fd.append('model', TRANSCRIBE_MODEL);
   fd.append('language', 'de');
   fd.append('file', new Blob([buf], { type: mime || 'audio/webm' }), 'aufnahme.' + extFromMime(mime));
+  await kiVerbrauch.vorAufruf({ eigenerSchluessel: _eigen(apiKey) });   /* v3318 */
   let r;
   try {
     r = await fetch('https://api.openai.com/v1/audio/transcriptions', {
@@ -241,7 +207,7 @@ async function transcribe(buf, mime, apiKey, sammler) {
     throw httpErr(502, 'Transkription fehlgeschlagen (HTTP ' + r.status + '): ' + t.slice(0, 300));
   }
   const data = await r.json().catch(() => ({}));
-  usageErfassen(sammler, 'Transkription', TRANSCRIBE_MODEL, data);  /* v1259 */
+  usageErfassen(sammler, 'Transkription', TRANSCRIBE_MODEL, data, apiKey);  /* v1259 */
   return String(data.text || '').trim();
 }
 
@@ -431,6 +397,7 @@ async function extractFields(transcript, catalog, apiKey, sammler, zusatz) {
      Katalog), laeuft der alte Weg weiter - der funktioniert, er ist
      nur weniger zuverlaessig. */
   const _fmt = formatAusKatalog(catalog);
+  await kiVerbrauch.vorAufruf({ eigenerSchluessel: _eigen(apiKey) });   /* v3318 */
   let r;
   try {
     r = await fetch('https://api.openai.com/v1/responses', {
@@ -454,7 +421,7 @@ async function extractFields(transcript, catalog, apiKey, sammler, zusatz) {
     throw httpErr(502, 'Extraktion fehlgeschlagen (HTTP ' + r.status + '): ' + t.slice(0, 300));
   }
   const data = await r.json().catch(() => ({}));
-  usageErfassen(sammler, 'Auswertung', EXTRACT_MODEL, data);  /* v1259 */
+  usageErfassen(sammler, 'Auswertung', EXTRACT_MODEL, data, apiKey);  /* v1259 */
   let text = '';
   (data.output || []).forEach(item => {
     (item.content || []).forEach(c => {
@@ -600,6 +567,8 @@ async function quickMatch(transcript, catalog, apiKey) {
   if (!apiKey) { const e = new Error('Kein OpenAI-API-Key.'); e.code = 'NO_API_KEY'; throw e; }
   const cat = sanitizeCatalog(catalog);
   if (!cat.length || !transcript || transcript.length < 3) return { ids: [] };
+  /* v3318 · fail-soft wie der ganze Quickmatch: Kontingent leer -> keine Live-Hilfe */
+  try { await kiVerbrauch.vorAufruf({ eigenerSchluessel: _eigen(apiKey) }); } catch (e) { return { ids: [] }; }
   let r;
   try {
     r = await fetch('https://api.openai.com/v1/responses', {
@@ -627,7 +596,7 @@ async function quickMatch(transcript, catalog, apiKey) {
      Aufnahme" nur die Haelfte. Eigener Sammler, weil dieser Aufruf ueber
      eine eigene Route laeuft — das Frontend addiert beide Seiten. */
   const sammler = neuerSammler();
-  usageErfassen(sammler, 'Live-Hilfe', QUICKMATCH_MODEL, data);
+  usageErfassen(sammler, 'Live-Hilfe', QUICKMATCH_MODEL, data, apiKey);
   let text = '';
   (data.output || []).forEach(item => {
     (item.content || []).forEach(c => {
@@ -697,6 +666,7 @@ async function verifyFields(transcript, prev, catalog, apiKey, sammler) {
   const seed = {};
   Object.keys((prev && prev.fields) || {}).forEach(function (k) { seed[k] = prev.fields[k]; });
   if (prev && Array.isArray(prev.unsicher)) seed._unsicher = prev.unsicher.slice();
+  await kiVerbrauch.vorAufruf({ eigenerSchluessel: _eigen(apiKey) });   /* v3318 */
   let r;
   try {
     r = await fetch('https://api.openai.com/v1/responses', {
@@ -716,7 +686,7 @@ async function verifyFields(transcript, prev, catalog, apiKey, sammler) {
   } catch (e) { return prev; }
   if (!r || !r.ok) return prev;
   const data = await r.json().catch(function () { return {}; });
-  usageErfassen(sammler, 'Gegenpruefung', VERIFY_MODEL, data);  /* v1259 */
+  usageErfassen(sammler, 'Gegenpruefung', VERIFY_MODEL, data, apiKey);  /* v1259 */
   let text = '';
   (data.output || []).forEach(function (item) {
     (item.content || []).forEach(function (c) {

@@ -1325,6 +1325,13 @@ router.get('/credits', requireAdmin, async (req, res) => {
       openaiSpent = Number(r.rows[0].openai);
       geomapSpent = Number(r.rows[0].geomap);
     } catch (e) { /* Tabelle evtl. noch nicht da */ }
+    /* v3318 · OpenAI jetzt aus ki_verbrauch (jeder Aufruf, alle Wege) statt aus openai_eur des
+       Marktbericht-Logs, das bis v3317 nie beschrieben wurde. Eigene Nutzerschluessel zaehlen nicht. */
+    let openaiMonat = null;
+    try {
+      const k = await db.query("SELECT COALESCE(SUM(eur),0) AS alle, COALESCE(SUM(eur) FILTER (WHERE ts >= date_trunc('month', now() AT TIME ZONE 'Europe/Berlin') AT TIME ZONE 'Europe/Berlin'),0) AS monat FROM ki_verbrauch WHERE NOT eigener_schluessel");
+      openaiSpent = Number(k.rows[0].alle); openaiMonat = Number(k.rows[0].monat);
+    } catch (e) { /* Migration 103 noch nicht da */ }
     res.json({
       geomap: {
         balance_eur: geomapBalance,
@@ -1334,11 +1341,54 @@ router.get('/credits', requireAdmin, async (req, res) => {
       openai: {
         balance_eur: null,        // kein Live-API
         spent_tracked_eur: openaiSpent,
+        spent_month_eur: openaiMonat,   /* v3318 */
         note: 'OpenAI bietet kein Live-Guthaben-API; nur getrackter Verbrauch.'
       }
     });
   } catch (err) {
     console.error('[admin/credits] error:', err);
+    res.status(500).json({ error: 'server_error', message: err.message });
+  }
+});
+
+/* ══ v3318 · KI-VERBRAUCH JE KONTO, FUNKTION UND MONAT (ki_verbrauch) ═════════════
+   ?monat=JJJJ-MM (Standard: laufender Berliner Monat). Echte Euro - nur fuer den Admin;
+   der Kunde sieht in den Einstellungen nur den Anteil am Deckel. */
+router.get('/ki-verbrauch', requireAdmin, async (req, res) => {
+  const db = req.app.get('db');
+  try {
+    const kiVerbrauch = require('../services/kiVerbrauch');
+    const m = /^\d{4}-\d{2}$/.test(String(req.query.monat || '')) ? String(req.query.monat) : null;
+    const von = m ? "($1::date AT TIME ZONE 'Europe/Berlin')" : "(date_trunc('month', now() AT TIME ZONE 'Europe/Berlin') AT TIME ZONE 'Europe/Berlin')";
+    const bis = m ? "((($1::date + interval '1 month')::date) AT TIME ZONE 'Europe/Berlin')" : "now() + interval '1 day'";
+    const p = m ? [m + '-01'] : [];
+    const w = ' WHERE v.ts >= ' + von + ' AND v.ts < ' + bis + ' ';
+    const konten = await db.query(
+      'SELECT v.user_id, u.email, u.role, u.is_test_user, COUNT(*) AS aufrufe, COUNT(DISTINCT v.vorgang) AS vorgaenge,' +
+      ' COALESCE(SUM(v.eur),0) AS eur, COALESCE(SUM(v.eur) FILTER (WHERE v.im_deckel AND NOT v.eigener_schluessel),0) AS eur_deckel,' +
+      ' COALESCE(SUM(v.websuchen),0) AS websuchen, COUNT(*) FILTER (WHERE v.abgeschnitten) AS abgeschnitten,' +
+      ' COUNT(*) FILTER (WHERE NOT v.bepreist) AS ohne_preis' +
+      ' FROM ki_verbrauch v LEFT JOIN users u ON u.id = v.user_id' + w +
+      ' GROUP BY v.user_id, u.email, u.role, u.is_test_user ORDER BY eur DESC LIMIT 200', p);
+    const funktionen = await db.query(
+      "SELECT COALESCE(v.endpunkt, '(ohne Weg)') AS endpunkt," +
+      ' v.funktion, v.modell, COUNT(*) AS aufrufe, COALESCE(SUM(v.eur),0) AS eur,' +
+      ' COALESCE(SUM(v.ein),0) AS ein, COALESCE(SUM(v.ein_cached),0) AS ein_cached, COALESCE(SUM(v.aus),0) AS aus, COALESCE(SUM(v.websuchen),0) AS websuchen' +
+      ' FROM ki_verbrauch v' + w + ' GROUP BY 1, 2, 3 ORDER BY eur DESC LIMIT 200', p);
+    const monate = await db.query(
+      "SELECT to_char(date_trunc('month', ts AT TIME ZONE 'Europe/Berlin'), 'YYYY-MM') AS monat, COUNT(*) AS aufrufe, COUNT(DISTINCT user_id) AS konten," +
+      " COALESCE(SUM(eur),0) AS eur, COALESCE(SUM(eur) FILTER (WHERE NOT eigener_schluessel),0) AS eur_server FROM ki_verbrauch GROUP BY 1 ORDER BY 1 DESC LIMIT 24");
+    /* Deckel je Konto dazu (Plan, Art) - dieselbe Rechnung wie die Sperre */
+    const zeilen = [];
+    for (const r of konten.rows) {
+      let st = null;
+      if (r.user_id && !m) { try { st = await kiVerbrauch.stand(r.user_id, { ohneOffen: true }); } catch (e) { st = null; } }
+      zeilen.push(Object.assign({}, r, st ? { plan: st.plan, art: st.art, deckel_eur: st.deckel_eur, anteil_pct: st.anteil_pct, gesperrt: st.gesperrt } : {}));
+    }
+    res.json({ monat: m, konten: zeilen, funktionen: funktionen.rows, monate: monate.rows,
+      deckel: require('../config').ki.deckelEur, monatsgrenzen: require('../config').ki.monatsgrenzen, kurs: kiVerbrauch.kurs() });
+  } catch (err) {
+    console.error('[admin/ki-verbrauch] error:', err);
     res.status(500).json({ error: 'server_error', message: err.message });
   }
 });

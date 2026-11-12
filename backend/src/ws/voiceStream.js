@@ -16,6 +16,7 @@
 
 const { WebSocketServer, WebSocket } = require('ws');
 const config = require('../config');
+const kiVerbrauch = require('../services/kiVerbrauch');   /* v3318 */
 let jwtUtil = null;
 try { jwtUtil = require('../utils/jwt'); } catch (e) { jwtUtil = null; }
 
@@ -47,20 +48,28 @@ function attach(server) {
       console.warn('[voiceStream] Upgrade ohne/ungueltigen Token -> 401');
       socket.write('HTTP/1.1 401 Unauthorized\r\n\r\n'); socket.destroy(); return;
     }
-    try { jwtUtil.verify(token); }
+    try { const _p = jwtUtil.verify(token); req._kiUid = (_p && _p.userId) || null; }   /* v3318 */
     catch (e) {
       console.warn('[voiceStream] Token-Verify fehlgeschlagen -> 401:', e && e.message);
       socket.write('HTTP/1.1 401 Unauthorized\r\n\r\n'); socket.destroy(); return;
     }
-    wss.handleUpgrade(req, socket, head, function (client) { wss.emit('connection', client, req); });
+    /* v3318 · Monatsdeckel vor dem Verbindungsaufbau */
+    kiVerbrauch.vorAufruf({ userId: req._kiUid, endpunkt: 'ws/voice-stream', funktion: 'realtime' }).then(function () {
+      wss.handleUpgrade(req, socket, head, function (client) { wss.emit('connection', client, req); });
+    }, function () {
+      socket.write('HTTP/1.1 429 Too Many Requests\r\n\r\n'); socket.destroy();
+    });
   });
 
-  wss.on('connection', function (client) {
+  wss.on('connection', function (client, req) {
+    const _kiUid = (req && req._kiUid) || null;   /* v3318 */
     let closed = false, msgCount = 0, commitTimer = null, lastCommitBytes = 0, audioFrames = 0, audioBytes = 0;  /* v531-commit */
     console.log('[voiceStream] Client verbunden -> verbinde OpenAI (' + LIVE_MODEL + ') ' + REALTIME_URL);
 
     function closeBoth() {
       if (closed) return; closed = true;
+      /* v3318 · Realtime-Transkription nach Minuten: PCM16 mono 24 kHz = 48.000 Byte je Sekunde */
+      try { kiVerbrauch.erfassen({ funktion: 'realtime', modell: LIVE_MODEL, data: null, audioSekunden: audioBytes / 48000, userId: _kiUid, endpunkt: 'ws/voice-stream' }); } catch (e) {}
       try { if (commitTimer) { clearInterval(commitTimer); commitTimer = null; } } catch (e) {}  /* v531-commit */
       try { up.close(); } catch (e) {}
       try { client.close(); } catch (e) {}

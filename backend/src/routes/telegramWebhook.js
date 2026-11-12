@@ -457,6 +457,7 @@ async function agentAntwort(token, chatId, userId, text, z, bezugObjektId) {
     await senden(token, chatId,
       e.code === 'NO_API_KEY'
         ? 'Mir fehlt gerade der Zugang zur KI.'
+        : e.code === 'KI_KONTINGENT' ? e.message   /* v3318 */
         : 'Da ist mir etwas dazwischengekommen: ' + (e.message || e));
     return;
   }
@@ -1377,6 +1378,8 @@ router.post('/:pfad', async (req, res) => {
     }
 
     /* ── Verknuepft ──────────────────────────────────────────────────── */
+    /* v3318 · ab hier zahlt dieser Nutzer: KI-Aufrufe des Updates laufen auf sein Konto (ki_verbrauch, Deckel) */
+    require('../services/kiVerbrauch').setzeKontext({ userId: l.rows[0].user_id, endpunkt: 'telegram' });
     await query(`UPDATE telegram_links SET letzte_nutzung = now()
                   WHERE chat_id = $1::bigint AND bot_user_id = $2`,
       [String(chatId), bot.user_id]);

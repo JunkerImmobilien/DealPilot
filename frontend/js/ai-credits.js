@@ -410,12 +410,29 @@
         '.akc-z b{font-weight:600;color:var(--ch,#2A2727);white-space:nowrap}' +
         '.akc-bar{height:5px;border-radius:3px;background:var(--surface2,#efe9da);overflow:hidden;margin:-2px 0 2px}' +
         '.akc-bar i{display:block;height:100%;background:var(--wl-c9a84c, #C9A84C);border-radius:3px}' +
+        '.ai-credits-row.akc-ki-row{grid-template-columns:1fr}.akc-ki .akc-name{min-height:0}' +   /* v3318 */
         '@media (max-width:640px){.akc-name{min-height:0}}';
       document.head.appendChild(_st);
+    }
+    /* v3318 · KI-Monatsverbrauch (Co-Pilot, Analysen, Recherchen, Dokumente, Sprache) als Anteil am
+       Monatsdeckel des Plans - bewusst ohne Euro-Betrag. Der Deckel selbst steht im Backend
+       (config.js ki.deckelEur); ki_monat kommt aus /ai/credits. Ohne Feld (alter Server): nichts. */
+    var km = s.ki_monat;
+    var kiZeile = '';
+    if (km && !km.ausgenommen && km.anteil_pct != null) {
+      var kp = Math.max(0, Math.min(100, Number(km.anteil_pct) || 0));
+      var kFarbe = kp >= 100 ? 'var(--red,#B8625C)' : (kp >= 80 ? 'var(--wl-b8932f, #b8932f)' : 'var(--wl-c9a84c, #C9A84C)');
+      kiZeile = '<div class="ai-credits-cell akc akc-ki">' +
+        '<div class="akc-name">KI-Nutzung diesen Monat</div>' +
+        '<div class="akc-z"><span>' + (kp >= 100 ? 'aufgebraucht' : 'genutzt') + '</span><b>' + kp.toLocaleString('de-DE', { maximumFractionDigits: 0 }) + ' %</b></div>' +
+        '<div class="akc-bar"><i style="width:' + kp.toFixed(0) + '%;background:' + kFarbe + '"></i></div>' +
+        '<div class="akc-z"><span>' + (kp >= 100 ? 'Wieder verfügbar ab' : 'Neu ab') + '</span><b>' + _datum(km.zurueck_am) + '</b></div>' +
+      '</div>';
     }
     host.innerHTML = '' +
       '<div class="ai-credits-box">' +
         '<div class="ai-credits-row">' + zellen + '</div>' +
+        (kiZeile ? '<div class="ai-credits-row akc-ki-row">' + kiZeile + '</div>' : '') +
         '<div class="hint">' + hinweis + '</div>' +
         '<div class="ai-credits-meta">' +
           '<span>Zurücksetzung am ' + _datum(resetDate) + ' (1. des Monats)</span>' +

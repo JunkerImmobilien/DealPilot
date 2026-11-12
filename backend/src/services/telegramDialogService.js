@@ -419,7 +419,7 @@ async function antwort(opts) {
   if (opts.kontextArt) nutzlast.kontextArt = opts.kontextArt;
   if (opts.felder) nutzlast.felder = opts.felder;
 
-  const r = await openaiService.copilotChat(nutzlast, {});
+  const r = await openaiService.copilotChat(nutzlast, { kiFunktion: 'telegram-dialog' });   /* v3318 */
   return r;
 }
 

@@ -68,6 +68,45 @@ const config = {
     defaultModel: process.env.OPENAI_DEFAULT_MODEL || 'gpt-5.6-luna'
   },
 
+  /* ══ v3318 · KI-DECKEL - DIE EINE STELLE FUER ALLE GRENZEN ═════════════════
+     Marcel 12.11.2026: „passende grenzen, dass man max 3-4 euro hat pro monat".
+     Gelesen nur von services/kiVerbrauch.js. Begruendung der Werte:
+     wissen/2026-11-12.md (Abschnitt v3318) und tools/ki-deckel-pruefen.mjs.
+       deckelEur        Monatsdeckel in Euro je Konto (Berliner Kalendermonat). null = ohne Deckel.
+                        testphase = laufende Pro-Testphase, test = is_test_user, admin = role admin.
+                        Mandanten eines Partners haben je Platz ein eigenes Konto und damit
+                        je Platz ihren eigenen Deckel.
+       monatsgrenzen    Vorgaenge je Monat fuer die frueher ungedeckelten Funktionen.
+       reserveEur       je laufendem, schon geprueftem Vorgang vorgemerkt (parallele Anfragen
+                        koennen den Deckel sonst gemeinsam ueberspringen).
+       analyseJeStunde  Ratenbegrenzer fuer POST /ai/analyze.
+     Uebersteuern ohne Codeaenderung: KI_DECKEL_EUR='{"pro":4}', KI_MONATSGRENZEN='{"pro":{"analyse":60}}',
+     OPENAI_USD_EUR=0.92, OPENAI_PREISE='{"modell":{"ein":..,"aus":..}}' (USD je Mio Token). */
+  ki: (function () {
+    function _json(s) { try { return s ? JSON.parse(s) : {}; } catch (e) { return {}; } }
+    const deckel = Object.assign({
+      free: 0.75, starter: 2.00, investor: 3.00, pro: 3.50, partner: 3.50,
+      business: 3.50, enterprise: 3.50, testphase: 2.50, test: 10.00, admin: null
+    }, _json(process.env.KI_DECKEL_EUR));
+    const grenzenBasis = {
+      free:     { analyse: 3,  recherche: 15,  dokument: 30 },
+      starter:  { analyse: 15, recherche: 40,  dokument: 80 },
+      investor: { analyse: 30, recherche: 80,  dokument: 150 },
+      pro:      { analyse: 50, recherche: 120, dokument: 250 },
+      testphase:{ analyse: 15, recherche: 40,  dokument: 80 }
+    };
+    ['partner', 'business', 'enterprise'].forEach(function (p) { grenzenBasis[p] = Object.assign({}, grenzenBasis.pro); });
+    const ueber = _json(process.env.KI_MONATSGRENZEN);
+    Object.keys(ueber).forEach(function (p) { grenzenBasis[p] = Object.assign({}, grenzenBasis[p] || {}, ueber[p]); });
+    return {
+      usdEur: Number(process.env.OPENAI_USD_EUR || 0.92),
+      deckelEur: deckel,
+      monatsgrenzen: grenzenBasis,
+      reserveEur: Number(process.env.KI_RESERVE_EUR || 0.15),
+      analyseJeStunde: parseInt(process.env.KI_ANALYSE_JE_STUNDE || '12', 10)
+    };
+  })(),
+
   // Frontend URL for redirects (Stripe success/cancel, email links)
   frontend: {
     baseUrl: process.env.FRONTEND_BASE_URL || 'http://localhost:8080'

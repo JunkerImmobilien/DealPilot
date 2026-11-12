@@ -611,6 +611,47 @@
       const bk = document.getElementById('mbcost-bykind');
       if (bk) bk.innerHTML = '<tr><td colspan="5">Fehler beim Laden</td></tr>';
     }
+    await loadKiVerbrauch();   /* v3318 */
+  }
+
+  /* v3318 · KI-Verbrauch aus ki_verbrauch: echte Euro je Konto, Funktion, Monat. */
+  async function loadKiVerbrauch(monat) {
+    function eur(v) { return (v == null) ? '–' : Number(v).toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 4 }) + ' €'; }
+    function zahl(v) { return Number(v || 0).toLocaleString('de-DE'); }
+    const kopf = document.getElementById('kiv-kopf');
+    try {
+      const d = await API.kiVerbrauch(monat);
+      const wahl = document.getElementById('kiv-monat-wahl');
+      if (wahl) {
+        wahl.innerHTML = '<select id="kiv-sel"><option value="">laufender Monat</option>' +
+          (d.monate || []).map(function (m) { return '<option value="' + escapeHtml(m.monat) + '"' + (d.monat === m.monat ? ' selected' : '') + '>' + escapeHtml(m.monat) + '</option>'; }).join('') + '</select>';
+        const sel = document.getElementById('kiv-sel');
+        if (sel) sel.onchange = function () { loadKiVerbrauch(sel.value || undefined); };
+      }
+      const dk = d.deckel || {};
+      if (kopf) kopf.textContent = 'Monatsdeckel je Konto: ' + Object.keys(dk).map(function (k) { return k + ' ' + (dk[k] == null ? 'ohne' : eur(dk[k])); }).join(' · ') +
+        ' · Kurs ' + d.kurs + ' €/$ · Marktbericht und Support-Einstufung zählen nicht in den Deckel.';
+      const kt = document.getElementById('kiv-konten');
+      if (kt) kt.innerHTML = (d.konten && d.konten.length) ? d.konten.map(function (r) {
+        var wer = r.email ? escapeHtml(r.email) : (r.user_id ? escapeHtml(r.user_id) : '<em>ohne Konto</em>');
+        if (r.role === 'admin') wer += ' <small>(Admin)</small>'; else if (r.is_test_user) wer += ' <small>(Test)</small>';
+        var anteil = r.anteil_pct == null ? '–' : (r.anteil_pct + ' %' + (r.gesperrt ? ' ⛔' : ''));
+        return '<tr><td>' + wer + '</td><td>' + escapeHtml((r.art && r.art !== 'kunde' ? r.art + ' / ' : '') + (r.plan || '–')) + '</td><td>' + zahl(r.aufrufe) + '</td><td>' + zahl(r.vorgaenge) +
+          '</td><td>' + eur(r.eur) + '</td><td>' + eur(r.eur_deckel) + '</td><td>' + (r.deckel_eur === undefined ? '–' : (r.deckel_eur == null ? 'ohne' : eur(r.deckel_eur))) +
+          '</td><td>' + anteil + '</td><td>' + zahl(r.websuchen) + '</td></tr>';
+      }).join('') : '<tr><td colspan="9" style="color:var(--text-muted)">Keine KI-Aufrufe in diesem Monat</td></tr>';
+      const ft = document.getElementById('kiv-funktionen');
+      if (ft) ft.innerHTML = (d.funktionen && d.funktionen.length) ? d.funktionen.map(function (r) {
+        return '<tr><td>' + escapeHtml(r.endpunkt) + '</td><td>' + escapeHtml(r.funktion || '–') + '</td><td>' + escapeHtml(r.modell || '–') + '</td><td>' + zahl(r.aufrufe) +
+          '</td><td>' + zahl(r.ein) + ' / ' + zahl(r.ein_cached) + ' / ' + zahl(r.aus) + '</td><td>' + zahl(r.websuchen) + '</td><td>' + eur(r.eur) + '</td></tr>';
+      }).join('') : '<tr><td colspan="7" style="color:var(--text-muted)">–</td></tr>';
+      const mt = document.getElementById('kiv-monate');
+      if (mt) mt.innerHTML = (d.monate && d.monate.length) ? d.monate.map(function (r) {
+        return '<tr><td>' + escapeHtml(r.monat) + '</td><td>' + zahl(r.aufrufe) + '</td><td>' + zahl(r.konten) + '</td><td>' + eur(r.eur) + '</td><td>' + eur(r.eur_server) + '</td></tr>';
+      }).join('') : '<tr><td colspan="5" style="color:var(--text-muted)">–</td></tr>';
+    } catch (e) {
+      if (kopf) kopf.textContent = 'KI-Verbrauch nicht ladbar: ' + (e && e.message || 'Fehler');
+    }
   }
 
   // ── Dashboard ───────────────────────────────────────────

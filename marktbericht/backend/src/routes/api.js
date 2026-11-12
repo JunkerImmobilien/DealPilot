@@ -960,7 +960,7 @@ router.post('/verlauf-text', async (req, res) => {
   try {
     const out = await generateVerlaufText(req.body || {});
     if (out.error && !out.text) return res.status(502).json({ error: out.error });
-    res.json({ text: out.text || '' });
+    res.json({ text: out.text || '', ki_posten: out.ki_posten || [] });   /* v3318 */
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 

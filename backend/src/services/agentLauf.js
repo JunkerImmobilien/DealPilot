@@ -77,6 +77,7 @@ const projektwissen = require('./projektwissen');
 const wissen = projektwissen.wissen;
 
 const OPENAI_URL = 'https://api.openai.com/v1/responses';
+const kiVerbrauch = require('./kiVerbrauch');   /* v3318 */
 const RUNDEN_MAX = 6;
 
 /* ── v1813c · EINE FRIST AUF DEN RUNDEN IST KEINE FRIST AUF DEM GANZEN ──
@@ -231,6 +232,9 @@ const SYSTEM =
 + 'Nebenbemerkungen. Keine Ueberschriften, keine Tabellen.';
 
 async function _ruf(body, apiKey) {
+  /* v3318 · Monatsdeckel vor dem Aufruf, Zeile in ki_verbrauch danach (services/kiVerbrauch.js) */
+  const _eigen = !!(apiKey && apiKey !== config.openai.apiKey);
+  await kiVerbrauch.vorAufruf({ eigenerSchluessel: _eigen, funktion: 'agent' });
   const ctrl = new AbortController();
   const t = setTimeout(() => ctrl.abort(), FRIST_MS);
   try {
@@ -246,7 +250,9 @@ async function _ruf(body, apiKey) {
       e.status = r.status;
       throw e;
     }
-    return await r.json();
+    const data = await r.json();
+    kiVerbrauch.erfassen({ funktion: 'agent', modell: body.model, data: data, eigenerSchluessel: _eigen });
+    return data;
   } finally { clearTimeout(t); }
 }
 

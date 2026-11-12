@@ -63,6 +63,9 @@ app.use('/api/v1/webhooks/stripe', stripeWebhookRoutes);
 // ── Body parsing ────────────────────────────────────
 // Big limit because photos are stored as base64 inside data
 app.use(express.json({ limit: '50mb' }));
+/* v3318 · je Anfrage ein KI-Vorgang (Nutzer, Weg) fuer ki_verbrauch und den Monatsdeckel.
+   Direkt NACH dem Koerper-Parser: dessen Strom-Ereignisse verlieren den AsyncLocalStorage sonst. */
+app.use(require('./services/kiVerbrauch').middleware);
 
 // ── Rate limiting (skip health checks) ──────────────
 /* ══════════════════════════════════════════════════════════════════════

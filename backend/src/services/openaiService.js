@@ -22,6 +22,22 @@ const dokumentSchemas = require('./dokumentSchemas');   /* v1678 */
 const ocr = require('./ocr');   /* v3089 · Dokumentbilder nur als geschwaerzter Text hinaus */
 
 const OPENAI_URL = 'https://api.openai.com/v1/responses';
+const kiVerbrauch = require('./kiVerbrauch');   /* v3318 · Erfassen + Monatsdeckel */
+
+/* v3318 · LUECKE 5 DES KOSTENBERICHTS: callOpenAI las opts.maxTokens nicht - die Ausgabegrenze war
+   immer 16.000 (4o-mini) bzw. 32.000. Jetzt gilt der Wert des Aufrufers, aber mit Luft: die Zahlen
+   der Aufrufer (900 ... 6.000) stammen aus einer Zeit, in der sie nie gegriffen haben, und eine
+   Kappe soll den Ausreisser fangen, nicht die normale Antwort abschneiden. Deshalb das 1,5-Fache,
+   mindestens 2.000, bei Denkmodellen 4.000 mehr fuer die Denk-Token. Ohne Angabe bleibt das
+   Modellmaximum (die Deal-Analyse braucht es, v2986). Abgeschnittene Antworten stehen in
+   ki_verbrauch.abgeschnitten - nachmessbar statt vermutet. */
+function _ausgabeGrenze(model, maxTokens) {
+  const obergrenze = /4o-mini/i.test(String(model || '')) ? 16000 : 32000;
+  const m = Number(maxTokens);
+  if (!Number.isFinite(m) || m <= 0) return obergrenze;
+  const denk = /^(gpt-5|o[1-9])/i.test(String(model || '')) ? 4000 : 0;
+  return Math.min(obergrenze, Math.max(2000, Math.ceil(m * 1.5)) + denk);
+}
 
 /**
  * V25: Investment-Report-Prompt nach Marcels Vorgabe.
@@ -1811,11 +1827,14 @@ function buildPrompt(payload, opts) {
       + 'Das Objekt ist bereits GEKAUFT und im Bestand (siehe ANKAUF-STAND). Es gibt keine Kaufentscheidung mehr.\n'
       + '- "empfehlung" und "fazit_kurz": "Halten" | "Optimieren" | "Verkauf prüfen" (nie Kaufen/Prüfen/Nicht kaufen).\n'
       + '  Bindung an den Score: 70+ Halten, 50-69 Optimieren, unter 50 Verkauf prüfen; abweichen nur mit benanntem Grund.\n'
-      + '- "empfehlung_begruendung": warum halten/optimieren/verkaufen, mit Zahlen von heute und der Bewegung seit dem Ankauf.\n'
+      + '- "empfehlung_begruendung": die Einordnung - wie das Objekt heute dasteht (v3323: ohne Empfehlung), mit Zahlen von heute und der Bewegung seit dem Ankauf.\n'
       + '- "verhandlungsempfehlung": statt einer Kaufverhandlung die BESTANDSSTRATEGIE, 8-12 Saetze: Mietanpassung,\n'
       + '  Anschlussfinanzierung, Instandhaltung/Modernisierung, Steuer, Exit - die wirksamsten Hebel zuerst.\n'
       + '- "kaufpreis_offerte": null. "offerte_mail": null. Keinen Kaufpreis und keinen Zielpreis nennen.\n'
       + '- Gesamtbewertung, Staerken, Risiken und Szenarien beschreiben das Objekt als Bestand, nicht als Angebot.\n'
+      /* v3323 · Marcel 12.11.2026: „eine Empfehlung … sollten wir da nicht aussprechen. Das machen wir nur im Ankauf" */
+      + '- KEINE Handlungsempfehlung in gesamtbewertung, empfehlung_begruendung und investmentbewertung: beschreibe, wie das Objekt heute dasteht und was sich seit dem Ankauf bewegt hat,\n'
+      + '  ohne "sollte gehalten/verkauft werden", ohne "wir empfehlen". Die Hebel stehen nur in der Bestandsstrategie (verhandlungsempfehlung). Das Feld "empfehlung" bleibt fuer die interne Einordnung.\n'
       /* v2985 · zwei Reiter im Bestand: Anschlussfinanzierung und Exit-Strategien, als Fragen und Antworten */
       + '- "anschlussfinanzierung" und "exit_strategien": je 4-6 Eintraege {"frage", "antwort"}. Jede Antwort 3-5 Saetze\n'
       + '  MIT Zahlen aus dem Block „BESTAND: ANSCHLUSSFINANZIERUNG UND EXIT" (Restschuld, Raten je Anschlusszins, Cashflow, DSCR,\n'
@@ -1988,7 +2007,7 @@ async function callOpenAI(prompt, opts) {
     /* v2986 · Hüllhorst 27.10.2026: mit den Bestandsfeldern (Anschlussfinanzierung, Exit-Strategien)
        riss die Antwort bei 16.000 ab (31.011 Zeichen, JSON-Parse fehlgeschlagen), der zweite Anlauf
        kam nach dem Zeitlimit des Browsers. gpt-4.1 erlaubt 32.768 Ausgabe-Tokens, gpt-4o-mini 16.384. */
-    max_output_tokens: /4o-mini/i.test(String(model || '')) ? 16000 : 32000,
+    max_output_tokens: _ausgabeGrenze(model, opts.maxTokens),
     /* v1264: Web-Suche abschaltbar. Additiv — wer die Option nicht setzt,
        bekommt sie weiter, also ändert sich für alle bestehenden Aufrufer
        nichts. Gebraucht wird das für Nachbearbeitungs-Aufrufe, die einen
@@ -2015,6 +2034,8 @@ async function callOpenAI(prompt, opts) {
     // 'seed' bewusst nicht setzen — siehe oben
   }
 
+  /* v3318 · Monatsdeckel VOR dem Aufruf (wirft KI_KONTINGENT, 429). Eigener Schluessel = frei. */
+  await kiVerbrauch.vorAufruf({ eigenerSchluessel: keySource === 'user', funktion: opts.kiFunktion });
   const resp = await fetch(OPENAI_URL, {
     method: 'POST',
     headers: {
@@ -2043,6 +2064,8 @@ async function callOpenAI(prompt, opts) {
     throw err;
   }
   const data = await resp.json();
+  /* v3318 · eine Zeile je Aufruf in ki_verbrauch (fail-soft, bricht nie den Aufruf) */
+  kiVerbrauch.erfassen({ funktion: opts.kiFunktion || 'callOpenAI', modell: model, data: data, eigenerSchluessel: keySource === 'user' });
 
   // Antwort-Text extrahieren (Responses-API: output[].content[].text)
   let text = '';
@@ -3359,7 +3382,7 @@ async function extractExpose(text, opts) {
     text
   ].join('\n');
 
-  const r = await callOpenAI(prompt, Object.assign({ maxTokens: 1500 }, opts || {}));
+  const r = await callOpenAI(prompt, Object.assign({ maxTokens: 1500, noWebSearch: true /* v3318 */ }, opts || {}));
   const parsed = extractJson(r.text);
   if (!parsed) {
     return { success: false, error: 'KI-Antwort konnte nicht ausgewertet werden.', raw_text: r.text };
@@ -3438,7 +3461,7 @@ async function extractPaket(text, opts) {
     '─── EXPOSE-TEXT ───',
     text
   ].join('\n');
-  const r = await callOpenAI(prompt, Object.assign({ maxTokens: 16000 }, opts || {}));
+  const r = await callOpenAI(prompt, Object.assign({ maxTokens: 16000, noWebSearch: true /* v3318 */ }, opts || {}));
   const parsed = extractJson(r.text);
   if (!parsed || !Array.isArray(parsed.objekte)) return { success: false, error: 'KI-Antwort konnte nicht ausgewertet werden.' };
   const z = (v) => { if (v == null || v === '') return null; if (typeof v === 'number') return isFinite(v) ? v : null;
@@ -3567,7 +3590,7 @@ async function extractMarketData(text, opts) {
     text
   ].join('\n');
 
-  const r = await callOpenAI(prompt, Object.assign({ maxTokens: 1800 }, opts || {}));
+  const r = await callOpenAI(prompt, Object.assign({ maxTokens: 1800, noWebSearch: true /* v3318 */ }, opts || {}));
   const parsed = extractJson(r.text);
   if (!parsed) {
     return { success: false, error: 'KI-Antwort konnte nicht ausgewertet werden.', raw_text: r.text };
@@ -4066,7 +4089,12 @@ async function copilotChat(payload, opts) {
   const res = await callOpenAI(prompt, {
     userApiKey: opts.userApiKey,
     model: model,
-    aiOptions: { temperature: 0.4 }
+    aiOptions: { temperature: 0.4 },
+    /* v3318 · Luecke 4: ohne allowWeb verbietet der Prompt die Suche ohnehin - das Werkzeug hing
+       trotzdem an (jede Suche 2,5 ct). Ausgabe gekappt: eine Chat-Antwort ist 300-900 Token. */
+    noWebSearch: !allowWeb,
+    maxTokens: 2500,
+    kiFunktion: opts.kiFunktion || 'copilot'
   });
   return { reply: _urlsSaeubern(res.text), model: res.model, allowWeb: allowWeb };
 }
@@ -4116,6 +4144,7 @@ async function _callOpenAIVision(contentParts, opts) {
   /* v3163 · Belege werden mit temperature 0 gelesen - gemessen: bei der Standardeinstellung (1) ergab dieselbe
      Hotelrechnung je Lauf andere Betraege. Fuer Buchhaltung zaehlt Wiederholbarkeit, nicht Abwechslung. */
   if (opts.temperature != null && !/^(o\d|gpt-5)/.test(String(model))) body.temperature = opts.temperature;
+  await kiVerbrauch.vorAufruf({ eigenerSchluessel: keySource === 'user', funktion: opts.kiFunktion });   /* v3318 */
   const resp = await fetch(OPENAI_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + apiKey },
@@ -4129,6 +4158,7 @@ async function _callOpenAIVision(contentParts, opts) {
     throw err;
   }
   const data = await resp.json();
+  kiVerbrauch.erfassen({ funktion: opts.kiFunktion || 'vision', modell: model, data: data, eigenerSchluessel: keySource === 'user' });   /* v3318 */
   let text = '';
   if (data.output_text) {
     text = data.output_text;
@@ -4404,11 +4434,11 @@ async function extractDokument(text, typ, opts) {
   /* v3016 · Listen-Arten (WEG, Teilung, Mieterliste) brauchen mehr Platz: 1.400 Token
      schnitten eine Mieterliste mit 12 Einheiten mitten im JSON ab. */
   const _lang = { weg_protokoll: 1, teilungserklaerung: 1, mietaufstellung: 1, grundbuch: 1, energieausweis: 1, mietvertrag: 1 };
-  let r = await callOpenAI(prompt, Object.assign({ maxTokens: _lang[typ] ? 3500 : 1400 }, opts || {}));
+  let r = await callOpenAI(prompt, Object.assign({ maxTokens: _lang[typ] ? 3500 : 1400, noWebSearch: true /* v3318 */ }, opts || {}));
   let parsed = extractJson(r.text);
   /* v3016g · gemessen 28.10.: die Mieterliste kam EINMAL als nicht lesbares JSON, beim zweiten
      Lauf sauber. Ein zweiter Versuch, bevor der Import auf den Exposé-Weg zurückfällt. */
-  if (!parsed) { r = await callOpenAI(prompt, Object.assign({ maxTokens: 4000 }, opts || {})); parsed = extractJson(r.text); }
+  if (!parsed) { r = await callOpenAI(prompt, Object.assign({ maxTokens: 4000, noWebSearch: true /* v3318 */ }, opts || {})); parsed = extractJson(r.text); }
   if (!parsed) {
     return { success: false, error: 'KI-Antwort konnte nicht ausgewertet werden.', raw_text: r.text };
   }
@@ -4487,7 +4517,7 @@ async function extractRndg(text, opts) {
     text
   ].join('\n');
 
-  const r = await callOpenAI(prompt, Object.assign({ maxTokens: 900 }, opts || {}));
+  const r = await callOpenAI(prompt, Object.assign({ maxTokens: 900, noWebSearch: true /* v3318 */ }, opts || {}));
   const parsed = extractJson(r.text);
   if (!parsed) {
     return { success: false, error: 'KI-Antwort konnte nicht ausgewertet werden.', raw_text: r.text };
@@ -4654,7 +4684,7 @@ async function dokumenteAuswerten(dokumente, objekt, opts) {
     'gleiche Sachverhalte zusammenfassen; ist ein neueres Dokument da, gilt es (z. B. neuere Ruecklage, neuer Beschluss) und der Verlauf wird genannt.',
     'In "aenderungen" stehen nur die Punkte, die durch die NEUEN Unterlagen hinzukommen oder sich aendern.'
   ].join('\n') : prompt;
-  const r = await callOpenAI(promptGesamt, { userApiKey: o.userApiKey, maxTokens: 6000 });
+  const r = await callOpenAI(promptGesamt, { userApiKey: o.userApiKey, maxTokens: 6000, noWebSearch: true /* v3318 */ });
   const parsed = extractJson(r.text);
   if (!parsed) return { success: false, error: 'KI-Antwort konnte nicht ausgewertet werden.' };
   return { success: true, model: r.model, auswertung: parsed };

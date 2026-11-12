@@ -14,7 +14,31 @@
 const express = require('express');
 const config = require('../config');
 const rateLimit = require('express-rate-limit');
-const { authenticate } = require('../middleware/auth');
+const { authenticate: _authRoh } = require('../middleware/auth');
+const kiVerbrauch = require('../services/kiVerbrauch');   /* v3318 */
+/* ══ v3318 · DER MONATSDECKEL SITZT VOR JEDER KI-ROUTE ═════════════════════
+   Jede Route dieser Datei nennt `authenticate` - hier wird daraus die Kette
+   [Anmeldung, KI-Pruefung]. Die Pruefung laeuft NACH der Anmeldung (req.user steht)
+   und VOR dem Handler: wer sein Kontingent aufgebraucht hat, bekommt eine freundliche
+   429 mit code KI_KONTINGENT statt eines OpenAI-Fehlers. Ausgenommen: GET, eigener
+   OpenAI-Schluessel und die Wege, die fail-soft bleiben muessen (Live-Hilfe, Live-
+   Transkription) - die pruefen intern selbst und liefern dann still nichts. */
+const _KI_FREI = ['/credits/demo-purchase', '/voice-quickmatch', '/transcribe-chunk'];
+async function _kiPruefung(req, res, next) {
+  try {
+    if (req.method !== 'POST' || _KI_FREI.indexOf(req.path) >= 0) return next();
+    const b = req.body || {};
+    if (typeof b.userApiKey === 'string' && b.userApiKey.startsWith('sk-')) return next();
+    /* ohne Vorgang (Middleware in index.js fehlt): hier einen anlegen, sonst fehlt der Nutzer in der Zeile */
+    if (!kiVerbrauch.vorgangAktuell()) kiVerbrauch.setzeKontext({ req: req });
+    await kiVerbrauch.vorAufruf({});
+    return next();
+  } catch (e) {
+    if (kiVerbrauch.antwortBeiSperre(res, e)) return;
+    return next();   /* Pruefung gestoert -> Aufruf laeuft (fail-open, s. kiVerbrauch.js) */
+  }
+}
+const authenticate = [_authRoh, _kiPruefung];
 const { requireUnderLimit } = require('../middleware/planLimits');
 const usageService = require('../services/usageService');
 const openaiService = require('../services/openaiService');
@@ -165,6 +189,8 @@ const dialogLimiter = rateLimit({
 router.get('/credits', authenticate, async (req, res, next) => {
   try {
     const status = await aiCreditsService.getStatus(req.user.id);
+    /* v3318 · KI-Monatsverbrauch als Anteil am Deckel (kein Euro-Betrag fuer Kunden) */
+    status.ki_monat = await kiVerbrauch.monatAnzeige(req.user.id);
     res.json(status);
   } catch (e) { next(e); }
 });
@@ -235,7 +261,16 @@ router.get('/status', (req, res) => {
  * Priorität: Server-Key (.env) > User-Key (Body) > 503-Fehler.
  * User-Keys werden NICHT geloggt.
  */
-router.post('/analyze', authenticate, plzValidator.middleware, /* V229: PLZ-Halluzinationsschutz */ /* V186: kein requireUnderLimit, AI-Credits ist Wahrheit */ async (req, res, next) => {
+/* v3318 · Luecke 6: /analyze hatte keinen Ratenbegrenzer (teuerster Einzelaufruf, ~14 ct). */
+const analyzeLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: (config.ki && config.ki.analyseJeStunde) || 12,
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: function (req) { return req.user && req.user.id ? 'a:' + req.user.id : req.ip; },
+  message: { error: 'Sehr viele Deal-Analysen in einer Stunde. Bitte einen Moment warten.' }
+});
+router.post('/analyze', authenticate, analyzeLimiter, plzValidator.middleware, /* V229: PLZ-Halluzinationsschutz */ /* V186: kein requireUnderLimit, AI-Credits ist Wahrheit */ async (req, res, next) => {
   try {
     const payload = req.body || {};
     const userApiKey = typeof payload.userApiKey === 'string' && payload.userApiKey.startsWith('sk-')
@@ -1147,7 +1182,7 @@ router.post('/extract-voice', authenticate, dialogLimiter, async (req, res, next
       apiKey: config.openai.apiKey,
       userApiKey: userApiKey
     });
-    if (_sp) _spracheBuchen(_sp);
+    if (_sp) await _spracheBuchen(_sp);
 
     /* v1259: Protokollieren, nicht abbuchen — diese KI-Hilfe ist im Plan
        enthalten (v1183). Der Aufruf stand hier ZWEIMAL hintereinander: einmal
@@ -1327,12 +1362,14 @@ router.post('/copilot-frage', authenticate, dialogLimiter, async (req, res, next
     ].join('\n');
 
     const modell = process.env.OPENAI_COPILOT_MODEL || process.env.OPENAI_VOICE_EXTRACT_MODEL || 'gpt-5.4-mini';
+    await kiVerbrauch.vorAufruf({});   /* v3318 · meist schon von _kiPruefung erledigt (je Vorgang einmal) */
     const r = await fetch('https://api.openai.com/v1/responses', {
       method: 'POST',
       headers: { 'Authorization': 'Bearer ' + config.openai.apiKey, 'Content-Type': 'application/json' },
       body: JSON.stringify({ store: false, model: modell, input: [{ role: 'user', content: prompt }], max_output_tokens: 700 })
     });
     const data = await r.json().catch(() => null);
+    kiVerbrauch.erfassen({ funktion: 'copilot-frage', modell: modell, data: data });   /* v3318 (vorAufruf: _kiPruefung) */
     if (!r.ok) {
       const msg = (data && data.error && data.error.message) || ('Fehler ' + r.status);
       return res.status(502).json({ error: msg });
@@ -1918,8 +1955,9 @@ router.post('/enrich-market-fields', authenticate, extractLimiter, async (req, r
 const COPILOT_PLAN_LIMITS = { free: 10, starter: 20, investor: 50, pro: 100, partner: 100 };
 /* STILLGELEGT v1183 — die Ableitung ueber das Monatslimit in Litern. */
 const _COPILOT_BY_MONTHLY = { 2: 10, 10: 50, 40: 150, 100: 300 };
-const _cpDaily = new Map(); // key: userId:YYYY-MM-DD -> count
-function _cpKey(uid) { return uid + ':' + new Date().toISOString().slice(0, 10); }
+/* v3318 · DER TAGESZAEHLER STEHT IN DER DATENBANK (ki_tageszaehler, Migration 103).
+   Hier stand eine Map im Arbeitsspeicher (_cpDaily) - jeder Deploy und jeder Neustart setzte
+   das Limit auf 0 zurueck. Zaehler je Berliner Kalendertag: kiVerbrauch.tagStand/tagErhoehen. */
 /* v1183: das Tageslimit haengt jetzt direkt am PLAN. Vorher wurde es aus
    `monthly_limit` (Liter) zurueckgerechnet — ein Umweg, der mit dem Tank
    gestorben ist und stillschweigend jeden auf `free` gesetzt haette.
@@ -1940,7 +1978,6 @@ async function _copilotLimit(uid) {
    (30-40 Antworten) mehr als das ganze Starter-Limit.
    Derselbe Zaehler wie der Co-Pilot (_cpDaily), kein zweiter. Eigener Schluessel = frei. */
 const SPRACHE_BLOCK_S = 120;
-const _spDaily = new Map(); // key: userId:YYYY-MM-DD -> gesprochene Sekunden
 function _spracheSekunden(body) {
   const b64 = String((body && body.audio) || '');
   const bytes = b64.length * 0.75;
@@ -1953,15 +1990,14 @@ function _spracheSekunden(body) {
 }
 async function _spracheRechnen(uid, sek) {
   const limit = await _copilotLimit(uid);
-  const key = _cpKey(uid);
-  const vor = _spDaily.get(key) || 0, nach = vor + sek;
+  const st = await kiVerbrauch.tagStand(uid);
+  const vor = st.sprache_s, nach = vor + sek;
   const neu = Math.ceil(nach / SPRACHE_BLOCK_S) - Math.ceil(vor / SPRACHE_BLOCK_S);
-  const used = _cpDaily.get(key) || 0;
-  return { ok: !(neu > 0 && used + neu > limit), limit: limit, key: key, nach: nach, neu: neu, used: used };
+  const used = st.copilot;
+  return { ok: !(neu > 0 && used + neu > limit), limit: limit, uid: uid, sek: sek, neu: neu, used: used };
 }
-function _spracheBuchen(r) {
-  _spDaily.set(r.key, r.nach);
-  if (r.neu > 0) _cpDaily.set(r.key, (_cpDaily.get(r.key) || 0) + r.neu);
+async function _spracheBuchen(r) {
+  try { await kiVerbrauch.tagErhoehen(r.uid, Math.max(0, r.neu), r.sek); } catch (e) { console.warn('[ai] Tageszaehler Sprache:', e.message); }
 }
 /* ══ v3025 · DAS OBJEKTWISSEN FUER CO-PILOT UND COCKPIT-PILOT ═══════════════
    Marcel 28.10.2026: dasselbe Wissen wie der Telegram-Bot - Unterlagen-Auswertung,
@@ -2050,8 +2086,7 @@ router.post('/copilot', authenticate, async (req, res, next) => {
   try {
     const uid = req.user && req.user.id;
     const limit = await _copilotLimit(uid);
-    const key = _cpKey(uid);
-    const used = _cpDaily.get(key) || 0;
+    const used = (await kiVerbrauch.tagStand(uid)).copilot;   /* v3318 · persistent */
     if (used >= limit) {
       return res.status(429).json({ error: 'copilot_rate_limited', message: 'Co-Pilot-Tageslimit erreicht (' + limit + '/Tag). Morgen wieder verfuegbar.' });
     }
@@ -2069,11 +2104,7 @@ router.post('/copilot', authenticate, async (req, res, next) => {
 
     await _copilotObjektwissen(uid, payload);   /* v3025 */
     const result = await openaiService.copilotChat(payload, { userApiKey });
-    _cpDaily.set(key, used + 1);
-    if (_cpDaily.size > 5000) {
-      const today = new Date().toISOString().slice(0, 10);
-      for (const k of Array.from(_cpDaily.keys())) { if (k.slice(-10) !== today) _cpDaily.delete(k); }
-    }
+    try { await kiVerbrauch.tagErhoehen(uid, 1, 0); } catch (e) { console.warn('[ai] Tageszaehler Co-Pilot:', e.message); }
     res.json(result);
   } catch (err) {
     if (err.code === 'NO_API_KEY') return res.status(503).json({ error: err.message, needs_user_key: true });
@@ -2176,11 +2207,9 @@ module.exports = router;
 module.exports.copilotKontingent = {
   async verbrauchen(uid) {
     const limit = await _copilotLimit(uid);
-    const key = _cpKey(uid);
-    const used = _cpDaily.get(key) || 0;
-    if (used >= limit) return { ok: false, limit: limit, benutzt: used };
-    _cpDaily.set(key, used + 1);
-    return { ok: true, limit: limit, benutzt: used + 1 };
+    /* v3318 · fragen und zaehlen in EINEM Schritt, in der Datenbank */
+    const r = await kiVerbrauch.tagVerbrauchen(uid, limit);
+    return { ok: r.ok, limit: limit, benutzt: r.benutzt };
   }
 };
 

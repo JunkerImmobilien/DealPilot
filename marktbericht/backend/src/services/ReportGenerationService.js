@@ -6,6 +6,13 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { cfg, aiEnabled } from '../lib/config.js';
 import { httpJson } from '../lib/http.js';
+import { AsyncLocalStorage } from 'async_hooks';
+/* v3318 · KI-VERBRAUCH AN DAS HAUPT-BACKEND MELDEN. Jeder rawCompletion-Aufruf legt Modell und
+   usage in den laufenden Sammler; generate() und generateVerlaufText() geben ihn als ki_posten
+   zurueck. Das Haupt-Backend (routes/marktbericht.js) rechnet daraus mit SEINER Preisliste
+   (services/kiVerbrauch.js) die Euro, schreibt ki_verbrauch und marktbericht_cost_log.openai_eur.
+   Hier steht bewusst KEIN Preis - eine zweite Preisliste liefe auseinander. */
+const _kiSammler = new AsyncLocalStorage();
 import { textFakten, faktenAnweisung, pruefeUndRepariere } from '../lib/ki_text_pruefung.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -153,13 +160,14 @@ _Hinweis: Stub-Modus (kein KI-Text). Für narrativen Bericht REPORT_AI_MODE=open
 export const ReportGenerationService = {
   async generate(payload, opts = {}) {
     if (aiEnabled()) {
+      const _posten = [];
       try {
-        const r = await callOpenAI(payload, opts);
-        return { mode: 'openai', report_md: r.text, ki_text_pruefung: r.ki_text_pruefung };
+        const r = await _kiSammler.run(_posten, () => callOpenAI(payload, opts));
+        return { mode: 'openai', report_md: r.text, ki_text_pruefung: r.ki_text_pruefung, ki_posten: _posten };
       } catch (e) {
         // Fallback auf Stub bei API-Fehler, Bericht crasht nicht
         return { mode: 'stub_fallback', report_md: stubReport(payload),
-                 error: `OpenAI-Fehler: ${e.message}` };
+                 error: `OpenAI-Fehler: ${e.message}`, ki_posten: _posten };   /* v3318: bezahlt ist bezahlt */
       }
     }
     return { mode: 'stub', report_md: stubReport(payload) };
@@ -512,6 +520,7 @@ async function rawCompletion(messages, { maxTok, effort, isNewModel } = {}) {
     timeoutMs: parseInt(process.env.OPENAI_TIMEOUT_MS || '120000', 10),
     retries: 0,
   });
+  try { const _s = _kiSammler.getStore(); if (_s) _s.push({ modell: cfg.ai.model, usage: data?.usage || null, finish: data?.choices?.[0]?.finish_reason || null }); } catch (e) {}   /* v3318 */
   const choice = data?.choices?.[0];
   return { content: choice?.message?.content || '', finish: choice?.finish_reason || '?', usage: data?.usage || null };
 }
@@ -687,9 +696,12 @@ export async function generateVerlaufText(payload) {
   const isNewModel = /^(gpt-5|o\d|gpt-4\.1)/.test(cfg.ai.model || '');
   const isReasoning = /^(gpt-5|o\d)/.test(cfg.ai.model || '');
   const effort = (process.env.OPENAI_REASONING_EFFORT || 'low').trim().toLowerCase();
+  const _posten = [];
   try {
-    let r = await rawCompletion(messages, { maxTok: parseInt(process.env.OPENAI_MAX_TOKENS_PER_GROUP || '2000', 10), effort: isReasoning ? effort : null, isNewModel });
-    if (!r.content) r = await rawCompletion(messages, { maxTok: 3000, effort: null, isNewModel });
-    return { text: (r.content || '').trim() };
-  } catch (e) { return { text: '', error: e.message }; }
+    return await _kiSammler.run(_posten, async () => {
+      let r = await rawCompletion(messages, { maxTok: parseInt(process.env.OPENAI_MAX_TOKENS_PER_GROUP || '2000', 10), effort: isReasoning ? effort : null, isNewModel });
+      if (!r.content) r = await rawCompletion(messages, { maxTok: 3000, effort: null, isNewModel });
+      return { text: (r.content || '').trim(), ki_posten: _posten };   /* v3318 */
+    });
+  } catch (e) { return { text: '', error: e.message, ki_posten: _posten }; }
 }

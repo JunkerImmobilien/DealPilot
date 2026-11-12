@@ -398,7 +398,8 @@
     }).catch(function (err) {
       if (thinking && thinking.parentNode) thinking.parentNode.removeChild(thinking);
       var m = (err && err.data && (err.data.message || err.data.error)) || (err && err.message) || 'Fehler';
-      if (err && err.status === 429) m = 'Co-Pilot-Tageslimit erreicht. Morgen wieder verfügbar.';
+      /* v3318 · 429 hat jetzt zwei Gruende: Tageslimit oder aufgebrauchtes KI-Monatskontingent */
+      if (err && err.status === 429) m = (err.data && err.data.code === 'KI_KONTINGENT' && err.data.message) || 'Co-Pilot-Tageslimit erreicht. Morgen wieder verfügbar.';
       if (err && err.status === 503) m = 'KI ist gerade nicht verfügbar (kein Server-Key).';
       addMsg('assistant', '\u26a0 ' + m);
     }).then(function () {
