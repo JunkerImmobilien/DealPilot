@@ -156,6 +156,10 @@
             '<span class="auth-btn-arrow">→</span>' +
           '</button>' +
 
+          /* v3342 · Marcel 12.11.2026: „wenn man auf Konto erstellen ist, kommt man nicht mehr auf das normale Anmelden" -
+             der Weg zurück stand nur im kleinen × oben rechts, auf dem Handy oft außerhalb des Bildes. */
+          '<p style="text-align:center;font-size:13px;color:rgba(250,246,232,.75);margin:14px 0 0">Schon ein Konto? ' +
+            '<button type="button" id="dp-reg-zum-login" style="background:none;border:0;padding:6px 4px;min-height:36px;color:var(--wl-c9a84c, #C9A84C);font:inherit;font-weight:700;text-decoration:underline;cursor:pointer">Anmelden</button></p>' +
           '<p style="text-align:center;font-size:11px;color:#888;margin:16px 0 0;line-height:1.5">' +
             'Mit der Anmeldung stimmst du unserer Datenschutzerklärung zu.<br>' +
             'Keine Werbung. Keine Weitergabe. DSGVO-konform.' +
@@ -164,6 +168,22 @@
       '</div>';
 
     document.body.appendChild(modal);
+    /* v3342 · Handy: Karte höher als der Bildschirm wurde oben abgeschnitten (align-items:center in einem
+       overflow:auto-Flex-Behälter - der Überstand oben ist nicht erreichbar). margin:auto zentriert, solange Platz
+       ist, und klebt sonst oben; die Seite scrollt. Nur dieses Fenster, Regel hier statt in style.css. */
+    if (!document.getElementById('dp-reg-stil-v3341')) {
+      var st = document.createElement('style'); st.id = 'dp-reg-stil-v3341';
+      st.textContent = '@media (max-width:768px),(max-height:820px){#dp-register-modal.auth-overlay-v39{align-items:flex-start!important;padding-top:12px!important;padding-bottom:12px!important}'
+        + '#dp-register-modal>.auth-card-v39{margin:auto 0!important;flex:0 0 auto}}'
+        + '@media (max-width:480px){#dp-register-modal.auth-overlay-v39{padding-left:10px!important;padding-right:10px!important}#dp-register-modal #dp-register-close{width:40px!important;height:40px!important;top:8px!important;right:8px!important}}';
+      document.head.appendChild(st);
+    }
+    var zumLogin = document.getElementById('dp-reg-zum-login');
+    if (zumLogin) zumLogin.addEventListener('click', function () {
+      try { sessionStorage.removeItem('dp_auth_flow'); } catch (e) {}
+      modal.remove();
+      if (typeof showAuthModal === 'function') setTimeout(function () { showAuthModal('login'); }, 50);
+    });
     // V173: Punkt-Visibility updaten (Register-Modal ist jetzt sichtbar)
     try { _applyInviteBranding(modal); } catch (e) {}
     setTimeout(_updateEasterEggVisibility, 50);
@@ -428,7 +448,16 @@
     }
 
     // ?register=1 → Register-Modal direkt öffnen (Landingpage-Link)
-    if (params.get('register') === '1') {
+    /* v3342 · Marcel 12.11.2026: „ganz kurz wird DealPilot eingeblendet, dann kommt das Anmeldefenster … und wenn ich
+       Objekt anlegen klicke, legt er das in welchem Account auch immer an". Ursache: ?register=1 öffnete das Fenster
+       Konto erstellen AUCH bei bestehender Anmeldung in diesem Browser - die App stand schon, das Fenster kam darüber,
+       und das Übernahme-Band (dealcheck-uebernahme.js) bot das Anlegen im angemeldeten Konto an. Jetzt: wer angemeldet
+       ist, bleibt in der App (kein Registrierfenster); das Band nennt das Konto. */
+    var _angemeldet = false;
+    try { _angemeldet = !!(window.Auth && Auth.getSession && Auth.getSession()) && !!localStorage.getItem('ji_token'); } catch (e) {}
+    if (params.get('register') === '1' && _angemeldet) {
+      try { history.replaceState({}, '', window.location.pathname); } catch (e) {}
+    } else if (params.get('register') === '1') {
       try { sessionStorage.setItem('dp_auth_flow', '1'); } catch (e) {}
       var clean2 = window.location.pathname;
       history.replaceState({}, '', clean2);

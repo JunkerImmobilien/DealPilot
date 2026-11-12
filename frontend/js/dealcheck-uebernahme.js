@@ -104,20 +104,39 @@
     return b;
   }
 
-  function anbieten() {
+  /* v3342 · Marcel 12.11.2026: „Dealcheck übernehmen … das geht ja noch gar nicht, weil wir noch nicht angemeldet
+     sind … legt das an, in welchem Account auch immer". Bis v3340 genügte ein ji_token im Speicher - auch ein
+     abgelaufener oder der eines anderen Kontos in diesem Browser. Jetzt: das Band kommt erst, wenn der Server die
+     Anmeldung bestätigt (/auth/me), kein Anmelde- oder Registrierfenster offen ist, und es NENNT das Konto. Bis dahin
+     bleibt die Übergabe gemerkt (7 Tage) - zwischengespeichert, später übernommen. */
+  function fensterOffen() {
+    var f = document.querySelectorAll('#dp-register-modal, .auth-overlay-v39, #authOverlay, #auth-overlay');
+    for (var i = 0; i < f.length; i++) { var r = f[i].getBoundingClientRect(); if (r.width > 0 && r.height > 0 && getComputedStyle(f[i]).display !== 'none') return true; }
+    return false;
+  }
+  var konto = null;
+  async function anbieten() {
     if (gezeigt) return;
     var w = lesen();
     if (!w) return;
     var tok = null; try { tok = localStorage.getItem('ji_token'); } catch (e) {}
     if (!tok) return;   /* nicht angemeldet: der Register-Weg läuft, nach dem Neuladen kommt das Band */
+    if (fensterOffen()) { setTimeout(anbieten, 2500); return; }
+    try {
+      var me = window.Auth && Auth.apiCall ? await Auth.apiCall('/auth/me') : null;
+      konto = me && me.user ? (me.user.email || me.user.name || null) : null;
+    } catch (e) { konto = null; }
+    if (!konto) return;   /* Server kennt die Anmeldung nicht: nichts anbieten, Übergabe bleibt gemerkt */
+    if (gezeigt || fensterOffen()) { if (!gezeigt) setTimeout(anbieten, 2500); return; }
     gezeigt = true;
     band('<div style="font:600 11px JetBrains Mono,monospace;letter-spacing:.08em;color:var(--wl-b8932f, #b8932f);text-transform:uppercase">Deal-Check von der Startseite</div>'
       + '<div style="font:600 16px Space Grotesk,Inter,sans-serif;margin:4px 0 6px">Deal-Check übernehmen?</div>'
       + '<div>Kaufpreis ' + eur(w.kp) + ' · Kaltmiete ' + eur(w.nkm) + ' im Monat · Eigenkapital ' + eur(ekVon(w))
       + ' · Zins ' + dez(zinsVon(w), 2) + ' % · Nebenkosten ' + dez(nkVon(w), 0) + ' %</div>'
-      + '<div style="color:#6b655c;font-size:12.5px;margin-top:6px">DealPilot legt daraus ein neues Objekt als Entwurf an. '
+      + '<div style="color:#6b655c;font-size:12.5px;margin-top:6px">Angemeldet als <b>' + String(konto).replace(/[<>&"]/g, '') + '</b> – das Objekt kommt in dieses Konto. DealPilot legt daraus ein neues Objekt als Entwurf an. '
       + 'Adresse, Wohnfläche und Hausgeld trägst du danach selbst ein — erst dann rechnen Lage, Steuer und Wert mit.</div>',
       [{ text: 'Als Objekt anlegen', haupt: true, tun: function () { anlegen(w); } },
+       { text: 'Später', tun: function () { bandWeg(); } },
        { text: 'Nein, danke', tun: function () { loeschen(); bandWeg(); } }]);
   }
 
