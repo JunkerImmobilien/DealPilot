@@ -1691,3 +1691,15 @@ body.dp-theme-dark #dashboard-main .dp-pp-chip:hover{
 @media(max-width:600px){
   #dashboard-main .sk-tab:not(.dptk) td.r{white-space:nowrap}
 }
+/* v3331 · weitere Goldflächen, gemessen (Hintergrund mit Gold, ≥ 30×14 px, Deckkraft ≥ 0,3):
+   Kopf der Projektion (.ph, Goldband), Umschalter Tabelle | Chart (.pj-sw .on, Runway), Objektwahl
+   im Kopf 01 (style.css:32936 setzt sie mit ID und !important dunkel). Die Score-Karten bleiben:
+   sie sind dieselbe Ansicht wie im Reiter Bewertung (dpsh-score-hero.js). */
+#dashboard-main #dp-stage.stage.fc .ph,#dashboard-main #dp-stage.stage.fc .hpre,#dashboard-main #dp-stage.stage.fc .shq{background:#fff;border-bottom:1px solid var(--dpl-linie, #E6E1D6)}
+#dashboard-main #dp-stage.stage.fc .ph .t{font:700 10px/1.3 'JetBrains Mono',monospace;letter-spacing:1.2px;text-transform:uppercase;color:#6B645A}
+#dashboard-main #dp-stage.stage.fc .ph .tag{color:#625C59;border-color:var(--dpl-linie, #E6E1D6)}
+#dashboard-main #dp-stage .pj-sw{border:0;padding:0;gap:6px;border-radius:0}
+#dashboard-main #dp-stage .pj-sw button{background:#fff;color:#2A2727;border:1px solid color-mix(in srgb,var(--wl-c9a84c, #C9A84C) 30%,transparent);border-radius:8px;font:500 12px Inter,system-ui,sans-serif}
+#dashboard-main #dp-stage .pj-sw button.on{background:#0A0A0A;color:var(--wl-e8cc7a, #E8CC7A);border-color:#0A0A0A}
+html body #dashboard-main #dp-stage #dp-dash-objsel{background:#fff !important;color:#2A2727 !important;border:1px solid var(--dpl-linie, #E6E1D6) !important;border-radius:2px !important;font:400 13px Inter,system-ui,sans-serif !important}
+html body #dashboard-main #dp-stage #dp-dash-objsel option{background:#fff !important;color:#2A2727 !important}
