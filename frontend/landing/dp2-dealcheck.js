@@ -222,7 +222,8 @@
         if (d.bevoelkerung) k.push(kachel('Einwohner', (d.bevoelkerung.wert > 0 ? '+' : d.bevoelkerung.wert < 0 ? '−' : '±') + dez(Math.abs(d.bevoelkerung.wert), 1) + ' %/J', d.bevoelkerung.wort, d.bevoelkerung.ton));
         if (d.leerstand) k.push(kachel('Leerstand', dez(d.leerstand.wert, 1) + ' %', d.leerstand.wort + ' · Zensus', d.leerstand.ton));
         if (d.miete) {
-          var ms = d.mietspiegel && d.mietspiegel.art ? 'Mietspiegel: ' + d.mietspiegel.art : 'Bestandsmiete';
+          var art = d.mietspiegel && d.mietspiegel.art;
+          var ms = art === 'qualifiziert' ? 'qualif. Mietspiegel' : art === 'einfach' ? 'einf. Mietspiegel' : art ? 'Mietspiegel' : 'Bestandsmiete';
           k.push(kachel('Miete Ø', dez(d.miete.qm, 2) + ' €/m²', ms, null));
         }
         if (!k.length) { setze('dkLageQ', 'Für diese PLZ liegen uns noch keine amtlichen Lagedaten vor – in der App gibt es den vollen Marktbericht.'); return; }
@@ -250,13 +251,17 @@
     seite(true);
     zeigen(r);
     lage(String(F.plz.value || '').replace(/\D/g, '').slice(0, 5));
-    setTimeout(function () { var z = $('dkZur'); if (z && hinten.getAttribute('aria-hidden') === 'false') z.focus({ preventScroll: true }); }, ruhig ? 0 : 500);
+    /* Fokus nur bei Tastaturbedienung mitnehmen — nach einem Klick stand sonst ein Rahmen um „Eingaben ändern" */
+    if (perTaste) setTimeout(function () { var z = $('dkZur'); if (z && hinten.getAttribute('aria-hidden') === 'false') z.focus({ preventScroll: true }); }, ruhig ? 0 : 500);
   }
+  var perTaste = false;
+  document.addEventListener('keydown', function () { perTaste = true; }, true);
+  document.addEventListener('pointerdown', function () { perTaste = false; }, true);
   vorn.addEventListener('submit', function (e) { e.preventDefault(); pruefen(); });
   $('dkZur').addEventListener('click', function () {
     lauf++;
     seite(false);
-    setTimeout(function () { F.kp.focus({ preventScroll: true }); }, ruhig ? 0 : 500);
+    if (perTaste) setTimeout(function () { F.kp.focus({ preventScroll: true }); }, ruhig ? 0 : 500);
   });
   F.plz.addEventListener('input', function () { F.plz.value = String(F.plz.value).replace(/\D/g, '').slice(0, 5); });
   seite(false);

@@ -10,7 +10,9 @@
    ═══════════════════════════════════════════════════════════════════════ */
 .dk.sec{padding:72px 0}
 .dk-g{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,420px);gap:56px;align-items:center;max-width:1040px}
-.dk-text h2{margin:14px 0 12px}
+.dk [hidden]{display:none!important}
+.dk-text h2{font-size:clamp(28px,3.6vw,44px);line-height:1.08;margin:14px 0 14px}
+.dk-text h2 .ac{color:var(--gdd);display:block}
 .dk-text p{margin:0 0 18px;color:var(--inkm);max-width:440px}
 .dk-pkt{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
 .dk-pkt li{font:500 14px/1.4 var(--body);color:var(--ink);display:flex;gap:10px;align-items:center}
@@ -56,7 +58,7 @@
 .dk-chips button.an small{color:var(--gdh)}
 .dk-chips button:focus-visible,.dk-zur:focus-visible,.dk-los:focus-visible{outline:2px solid var(--gdh);outline-offset:2px}
 .dk-stand{font:500 11px/1.35 var(--body);color:rgba(236,230,214,.45)}
-.dk-los{border:0;cursor:pointer;width:100%;text-align:center;font-family:var(--body);border-radius:9px;margin-top:2px}
+.dk-los{margin-top:auto;border:0;cursor:pointer;width:100%;text-align:center;font-family:var(--body);border-radius:9px}
 .dk-los span{display:inline-block;transition:transform .5s}
 .dk-los:hover span{transform:rotate(180deg)}
 
@@ -79,7 +81,7 @@
 .dk-skala{position:relative;height:8px;border-radius:8px;background:rgba(255,255,255,.08);overflow:hidden}
 .dk-skala i{position:absolute;left:0;top:0;bottom:0;width:0;border-radius:8px;background:var(--runway)}
 .dk-skala s{position:absolute;top:0;bottom:0;width:1px;background:rgba(5,5,5,.7)}
-.dk-skala-w{display:flex;justify-content:space-between;margin-top:6px;font:600 9px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:rgba(236,230,214,.4)}
+.dk-skala-w{position:relative;height:9px;margin-top:6px;font:600 9px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:rgba(236,230,214,.4)}
 
 .dk-kpi{display:grid;grid-template-columns:1.3fr 1fr 1fr;gap:1px;background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.09);border-radius:10px;overflow:hidden}
 .dk-kpi > div{background:var(--ob);padding:10px 12px;display:flex;flex-direction:column;gap:5px;min-width:0}
@@ -97,13 +99,16 @@
   opacity:0;transform:translateY(6px);animation:dkRein .45s ease forwards}
 .dk-lk span{font:600 8.5px/1.2 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:rgba(236,230,214,.5)}
 .dk-lk b{font:700 15px/1 var(--disp);color:#fff;white-space:nowrap}
-.dk-lk em{font:500 10.5px/1.2 var(--body);font-style:normal;color:rgba(236,230,214,.62)}
+.dk-lk em{font:500 10.5px/1.2 var(--body);font-style:normal;color:rgba(236,230,214,.62);overflow-wrap:anywhere;hyphens:auto}
 .dk-lk[data-ton="gut"] em{color:var(--grnh,#5BD98E)}
 .dk-lk[data-ton="schwach"] em{color:#E08A7E}
 .dk-lk.laedt{animation:none;opacity:1;transform:none;min-height:54px;background:linear-gradient(90deg,rgba(255,255,255,.03),rgba(255,255,255,.08),rgba(255,255,255,.03));background-size:200% 100%;animation:dkSchimmer 1.2s linear infinite}
 .dk-lage small{font:500 10px/1.35 var(--body);color:rgba(236,230,214,.4)}
 .dk-weiter{text-align:center;border-radius:9px}
 .dk-annahme{margin:0;font:500 10.5px/1.45 var(--body);color:rgba(236,230,214,.42)}
+/* Wörter unter der Skala an ihren Stufen: Kritisch links, Solide bei 50–70, Sehr gut rechts */
+.dk-skala-w span{position:absolute;top:0;white-space:nowrap}
+.dk-skala-w span:nth-child(1){left:0}.dk-skala-w span:nth-child(2){left:60%;transform:translateX(-50%)}.dk-skala-w span:nth-child(3){right:0}
 @keyframes dkRein{to{opacity:1;transform:none}}
 @keyframes dkSchimmer{to{background-position:-200% 0}}
 
