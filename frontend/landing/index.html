@@ -50,7 +50,7 @@ if (location.hash === '#forschung') location.replace('forschung.html');</script>
 <link rel="stylesheet" href="dp2-live.css?v=landing-makler-hub-3">
 <link rel="stylesheet" href="dp2-module.css?v=landing-module-2">
 <link rel="stylesheet" href="dp2-kern.css?v=landing-kern-2c">
-<link rel="stylesheet" href="dp2-dealcheck.css?v=landing-dealcheck-5">
+<link rel="stylesheet" href="dp2-dealcheck.css?v=landing-dealcheck-6">
 </head><body>
 
 <svg style="display:none" aria-hidden="true">
@@ -357,6 +357,8 @@ if (location.hash === '#forschung') location.replace('forschung.html');</script>
         <small class="dk-stand" id="dkStand">Zins wird geladen …</small>
       </fieldset>
       <label class="dk-f dk-plz"><span>PLZ <em>optional · Lage &amp; Markt</em></span><input id="dcPlz" inputmode="numeric" maxlength="5" placeholder="z. B. 32049" aria-label="Postleitzahl, optional"></label>
+      <div class="dk-zwei" id="dkObj"><label class="dk-f"><span>Baujahr <em>optional</em></span><input id="dcBj" inputmode="numeric" maxlength="4" placeholder="z. B. 1975" aria-label="Baujahr, optional"></label>
+        <label class="dk-f"><span>Wohnfläche <em>optional</em></span><input id="dcWfl" inputmode="decimal" maxlength="5" placeholder="z. B. 70" aria-label="Wohnfläche in Quadratmetern, optional"><i>m²</i></label></div>
       <button type="submit" class="btn-p dk-los" id="dkDreh">Deal prüfen <span aria-hidden="true">↻</span></button>
     </form>
     <div class="dk-seite dk-hinten" id="dcErg" aria-live="polite" aria-hidden="true">
@@ -614,7 +616,7 @@ if (location.hash === '#forschung') location.replace('forschung.html');</script>
      staging.dealpilot.immo -> app.staging.dealpilot.immo, sonst app.dealpilot.immo. -->
 <script>(function () {
   var h = location.hostname, app = /(^|\.)staging\.dealpilot\.immo$/.test(h) ? 'https://app.staging.dealpilot.immo/' : 'https://app.dealpilot.immo/';
-  ['js/dscr-engine.js?v=v3031b', 'js/deal-kpis.js?v=v3215', 'js/score-tiers.js?v=v3254', 'js/dealscore.js?v=v3289', 'dp2-dealcheck.js?v=landing-dealcheck-5']
+  ['js/dscr-engine.js?v=v3031b', 'js/deal-kpis.js?v=v3215', 'js/score-tiers.js?v=v3254', 'js/dealscore.js?v=v3289', 'dp2-dealcheck.js?v=landing-dealcheck-6']
     .forEach(function (s) { var e = document.createElement('script'); e.src = (s.indexOf('js/') === 0 ? app : '') + s; e.async = false; document.body.appendChild(e); });
 })();</script>
 <script src="dp2-live.js?v=landing-videothek-9"></script><!-- landing-videothek-1 -->

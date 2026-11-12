@@ -62,7 +62,7 @@
   var RING_U = 2 * Math.PI * 52;
   var $ = function (id) { return document.getElementById(id); };
   var karte = $('dkKarte'), vorn = $('dkVorn'), hinten = $('dcErg');
-  var F = { kp: $('dcKp'), nkm: $('dcNkm'), zins: $('dcZins'), plz: $('dcPlz') };
+  var F = { kp: $('dcKp'), nkm: $('dcNkm'), zins: $('dcZins'), plz: $('dcPlz'), bj: $('dcBj'), wfl: $('dcWfl') };
   var ruhig = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var zinsen = null;            /* { '5': 4.11, … } vom Endpunkt, sonst null */
   var standText = '';
@@ -225,7 +225,10 @@
     setze('dkLageQ', '');
     g.innerHTML = '';
     for (var i = 0; i < 6; i++) { var l = document.createElement('div'); l.className = 'dk-lk laedt'; g.appendChild(l); }
-    fetch(appApi() + '/market-stats/schnellcheck?plz=' + plz)
+    /* landing-dealcheck-6 · Baujahr/Wohnfläche optional für die Vergleichsmiete */
+    var bj = parseInt(String(F.bj.value || '').replace(/\D/g, ''), 10), wfl = zahl(F.wfl);
+    bj = bj >= 1800 && bj <= 2030 ? bj : null; wfl = wfl >= 15 && wfl <= 400 ? wfl : null;
+    fetch(appApi() + '/market-stats/schnellcheck?plz=' + plz + (bj ? '&baujahr=' + bj : '') + (wfl ? '&wfl=' + Math.round(wfl) : ''))
       .then(function (r) { return r.ok ? r.json() : (r.status === 429 ? { _bremse: true } : null); })
       .then(function (d) {
         if (n !== lauf) return;
@@ -249,18 +252,46 @@
              Das steht jetzt an der Kachel; bis hierhin stand dort die Art des Mietspiegels, als wäre es dessen Wert. */
           k.push(kachel('Bestandsmiete Ø', dez(d.miete.qm, 2) + ' €/m²', 'alle laufenden Verträge', null));
         }
-        if (d.kappung && d.kappung.pct) k.push(kachel('Kappungsgrenze', d.kappung.pct + ' % in 3 J.',
-          d.kappung.verordnung ? 'Landesverordnung' : 'gesetzlich', null));
-        if (d.mietpreisbremse && d.mietpreisbremse.gilt != null) {
-          var bis = d.mietpreisbremse.bis && /^\d{4}-\d{2}/.test(d.mietpreisbremse.bis) ? 'bis ' + d.mietpreisbremse.bis.slice(5, 7) + '/' + d.mietpreisbremse.bis.slice(0, 4) : 'Neuvermietung';
-          k.push(kachel('Mietpreisbremse', d.mietpreisbremse.gilt ? 'gilt' : 'keine', d.mietpreisbremse.gilt ? bis : 'nicht in der Verordnung', null));
+        /* landing-dealcheck-6 · Vergleichsmiete (Marcel 12.11.2026 „haben wir auch die Vergleichsmieten?"): Mietspiegel-Mittelwert
+           der Gemeinde, wo wir die Werte führen dürfen, sonst DealPilot-Näherung (nie „Mietspiegel" genannt). */
+        var vg = d.vergleichsmiete;
+        if (vg && vg.qm > 0) k.push(kachel('Vergleichsmiete', dez(vg.qm, 2) + ' €/m²',
+          (vg.quelle === 'mietspiegel' ? 'Mietspiegel' + (vg.unten && vg.oben ? ' ' + dez(vg.unten, 2) + '–' + dez(vg.oben, 2) : '') : 'Näherung ±' + dez(vg.abweichung_pct || 7.5, 1).replace(',0', '') + ' %')
+          + (vg.objekt && vg.objekt.norm ? ' · Bj. ' + vg.objekt.baujahr + ', ' + vg.objekt.wfl + ' m²' : ''), null));
+        /* Kappungsgrenze und Mietpreisbremse in EINER Kachel (landing-dealcheck-5 hatte zwei) */
+        var mb = d.mietpreisbremse, kp = d.kappung;
+        if ((kp && kp.pct) || (mb && mb.gilt != null)) {
+          var bis = mb && mb.bis && /^\d{4}-\d{2}/.test(mb.bis) ? ' bis ' + mb.bis.slice(5, 7) + '/' + mb.bis.slice(0, 4) : '';
+          k.push(kachel('Mietrecht', kp && kp.pct ? 'Kappung ' + kp.pct + ' %' : '–',
+            mb && mb.gilt === true ? 'Mietpreisbremse' + bis : mb && mb.gilt === false ? 'keine Mietpreisbremse' : 'Bremse: bitte prüfen', null));
         }
         if (!k.length) { setze('dkLageQ', 'Für diese PLZ liegen uns noch keine amtlichen Lagedaten vor – in der App gibt es den vollen Marktbericht.'); return; }
         k.forEach(function (x, i) { x.style.animationDelay = (i * 90) + 'ms'; g.appendChild(x); });
+        var satz = mieteSatz(vg, kp, mb, wfl);
+        if (satz) { var p = document.createElement('p'); p.className = 'dk-miete-satz'; p.innerHTML = satz; g.appendChild(p); }
         var mo = d.miete && d.miete.monat && /^\d{4}-\d{2}$/.test(d.miete.monat) ? d.miete.monat.slice(5) + '/' + d.miete.monat.slice(0, 4) : null;
         setze('dkLageQ', 'Amtliche Daten: Regionaldatenbank, Zensus 2022' + (mo ? ' (Miete fortgeschrieben auf ' + mo + ')' : '') + (d.mietspiegel && d.mietspiegel.art && d.mietspiegel.art !== 'unklar' ? ', ' + (d.mietspiegel.art === 'qualifiziert' ? 'qualifizierter' : d.mietspiegel.art === 'einfach' ? 'einfacher' : '') + ' Mietspiegel der Gemeinde vorhanden' : '') + (d.kappung || d.mietpreisbremse ? ', Landesverordnungen nach § 558 Abs. 3 und § 556d BGB' : '') + (d.einwohner && d.einwohner.ebene === 'kreis' ? '; Einwohner auf Kreisebene' : '') + '.');
       })
       .catch(function () { if (n === lauf) { g.innerHTML = ''; setze('dkLageQ', 'Lage & Markt gerade nicht abrufbar.'); } });
+  }
+
+  /* landing-dealcheck-6 · Ein Satz zur eigenen Miete gegen die Vergleichsmiete — nur mit Wohnfläche.
+     § 558 BGB: Erhöhung bis zur Vergleichsmiete, höchstens um die Kappungsgrenze in drei Jahren.
+     § 556d BGB: bei Neuvermietung mit Mietpreisbremse höchstens 10 % über der Vergleichsmiete. */
+  function mieteSatz(vg, kp, mb, wfl) {
+    var nkm = zahl(F.nkm);
+    if (!vg || !(vg.qm > 0) || !wfl || !(nkm > 0)) return null;
+    var ist = nkm / wfl, abw = (ist / vg.qm - 1) * 100, kpct = kp && kp.pct ? kp.pct : 20;
+    var t = 'Deine Miete: <b>' + dez(ist, 2) + ' €/m²</b>';
+    if (abw < -3) {
+      var ziel = Math.min(vg.qm, ist * (1 + kpct / 100)), plus = (ziel - ist) * wfl;
+      t += ', ' + dez(Math.abs(abw), 0) + ' % unter der Vergleichsmiete. Nach § 558 BGB in 3 Jahren bis <b>' + dez(ziel, 2) + ' €/m²</b> möglich (+' + dez(Math.round(plus), 0) + ' € im Monat, Kappung ' + kpct + ' %).';
+    } else if (abw > 3) {
+      t += ', ' + dez(abw, 0) + ' % über der Vergleichsmiete – eine Erhöhung nach § 558 BGB ist derzeit nicht drin.';
+    } else t += ' – entspricht etwa der Vergleichsmiete.';
+    if (mb && mb.gilt === true) t += ' Bei Neuvermietung gilt die Mietpreisbremse: höchstens <b>' + dez(vg.qm * 1.1, 2) + ' €/m²</b>.';
+    if (vg.quelle !== 'mietspiegel') t += ' <small>(Vergleichsmiete als Näherung – für ein Erhöhungsverlangen mit Mietspiegel, Vergleichswohnungen oder Gutachten belegen.)</small>';
+    return t;
   }
 
   /* ── Drehen ─────────────────────────────────────────────────────────── */
@@ -293,6 +324,7 @@
     if (perTaste) setTimeout(function () { F.kp.focus({ preventScroll: true }); }, ruhig ? 0 : 500);
   });
   F.plz.addEventListener('input', function () { F.plz.value = String(F.plz.value).replace(/\D/g, '').slice(0, 5); });
+  F.bj.addEventListener('input', function () { F.bj.value = String(F.bj.value).replace(/\D/g, '').slice(0, 4); });
   seite(false);
 
   /* Einmal kurz anwackeln, wenn die Karte ins Bild kommt — zeigt, dass sie sich dreht */

@@ -51,18 +51,33 @@ function kachelAusFeld(f) {
   return { wert: Number(f.wert), einheit: f.einheit || null, wort: f.wort || null, ton: f.ton || null,
     stand: f.stand == null ? null : (typeof f.stand === 'object' ? (f.stand.bevoelkerung || null) : f.stand), ebene: f.ebene || null };
 }
+function vglAus(ms, bj, wfl) {
+  if (!ms) return null;
+  const objekt = { baujahr: bj || 1975, wfl: wfl || 70, norm: !bj || !wfl };
+  const w = ms.werte;
+  if (w && Number(w.mittel) > 0) return { qm: Number(w.mittel), unten: Number(w.unten) || null, oben: Number(w.oben) || null,
+    quelle: 'mietspiegel', art: ms.art || w.art || null, gemeinde: w.gemeinde || ms.gemeinde || null, stand: w.stand || ms.stand || null, zelle: w.zelle || null, objekt };
+  const n = ms.naeherung;
+  if (n && Number(n.qm) > 0) return { qm: Number(n.qm), unten: null, oben: null, quelle: 'naeherung', abweichung_pct: n.mape_pct || null, objekt };
+  return null;
+}
 router.get('/schnellcheck', schnellLimit, async (req, res) => {
   const plz = String(req.query.plz || '').trim();
   if (!/^\d{5}$/.test(plz)) return res.status(400).json({ error: 'plz_fehlt' });
   const ort = String(req.query.ort || '').replace(/[^A-Za-zÄÖÜäöüß .\-]/g, '').trim().slice(0, 60);
-  const key = plz + '|' + ort.toLowerCase();
+  /* landing-dealcheck-6 · Vergleichsmiete: Baujahr und Wohnflaeche des Objekts (optional). Ohne Angabe die Normwohnung
+     Baujahr 1975 / 70 m^2 (an ihr ist die DealPilot-Naeherung gemessen, 85 % innerhalb +-10 %) - die Antwort sagt, welche. */
+  const bjIn = parseInt(String(req.query.baujahr || ''), 10), wflIn = parseFloat(String(req.query.wfl || '').replace(',', '.'));
+  const bj = bjIn >= 1800 && bjIn <= 2030 ? bjIn : null, wfl = wflIn >= 15 && wflIn <= 400 ? Math.round(wflIn) : null;
+  const msQ = '&baujahr=' + (bj || 1975) + '&wfl=' + (wfl || 70);
+  const key = plz + '|' + ort.toLowerCase() + '|' + (bj || '') + '|' + (wfl || '');
   const alt = schnellSpeicher.get(key);
   if (alt && Date.now() - alt.t < SCHNELL_TTL) return res.set('Cache-Control', 'public, max-age=3600').json(alt.d);
   const q = '?plz=' + plz + (ort ? '&ort=' + encodeURIComponent(ort) : '');
   const [lage, miete] = await Promise.all([mbJson('/lage/gemessen' + q, 8000), mbJson('/zensus/fortgeschrieben' + q, 6000)]);
   const gem = lage && lage.gebiet && lage.gebiet.gemeinde_ags;
   /* landing-dealcheck-5: Einwohnerzahl, Kappungsgrenze, Mietpreisbremse (mb /schnell/ort, nur eigene Daten) */
-  const [ms, ort2] = gem ? await Promise.all([mbJson('/mietspiegel?ags=' + encodeURIComponent(gem), 4000),
+  const [ms, ort2] = gem ? await Promise.all([mbJson('/mietspiegel?ags=' + encodeURIComponent(gem) + msQ, 4000),
     mbJson('/schnell/ort?ags=' + encodeURIComponent(gem), 4000)]) : [null, null];
   const fe = (lage && lage.felder) || {};
   const d = {
@@ -71,6 +86,7 @@ router.get('/schnellcheck', schnellLimit, async (req, res) => {
     bevoelkerung: kachelAusFeld(fe.ds2_bevoelkerung),
     leerstand: kachelAusFeld(fe.ds2_mietausfall),
     miete: miete && miete.available && miete.qm > 0 ? { qm: miete.qm, ebene: miete.ebene || null, monat: miete.fortgeschrieben_auf || null } : null,
+    vergleichsmiete: vglAus(ms, bj, wfl),
     einwohner: ort2 && ort2.einwohner ? ort2.einwohner : null,
     kappung: ort2 && ort2.kappung ? { pct: ort2.kappung.pct, verordnung: ort2.kappung.herkunft === 'verordnung', pruefen: ort2.kappung.pruefen, text: ort2.kappung.text } : null,
     mietpreisbremse: ort2 && ort2.mietpreisbremse ? { gilt: ort2.mietpreisbremse.gilt, bis: ort2.mietpreisbremse.bis, pruefen: ort2.mietpreisbremse.pruefen, text: ort2.mietpreisbremse.text } : null,
