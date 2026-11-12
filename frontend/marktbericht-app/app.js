@@ -3400,6 +3400,24 @@ async function exportPdf(out) {
   }
   let page = 1;
   function newPage() { footer(page); doc.addPage(); page++; y = M; contentBg(); }
+  /* v3338b · Bricht eine Tabelle (autoTable) selbst auf eine neue Seite um, lief das an newPage()
+   * vorbei: die verlassene Seite bekam keine Fusszeile (also auch keinen Kartenvermerk, obwohl die
+   * Hintergrundkarte darauf stand), die neue Seite keinen Hintergrund, und ab dort zaehlte "Seite N"
+   * eine zu wenig (gemessen am Bericht 586: PDF-Seite 7 ohne Fuss, Seite 8 weiss mit "Seite 6").
+   * Jetzt holt jede Tabelle beim Umbruch genau das nach, was newPage() tut. */
+  const _autoTable = doc.autoTable.bind(doc);
+  doc.autoTable = function (opt) {
+    const o = Object.assign({}, opt), vorher = o.willDrawPage;
+    o.willDrawPage = function (data) {
+      if (data && data.pageNumber > 1) {
+        const neu = doc.getCurrentPageInfo().pageNumber;
+        doc.setPage(neu - 1); footer(page); doc.setPage(neu);
+        page++; contentBg();
+      }
+      if (typeof vorher === 'function') vorher(data);
+    };
+    return _autoTable(o);
+  };
   function need(h) { if (y + h > H - 16) newPage(); }
   let secNo = 0;
   const tocEntries = [];

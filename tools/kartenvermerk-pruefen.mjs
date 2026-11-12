@@ -50,6 +50,7 @@ const STELLEN = {
       [/addImage\(lightImg, 'PNG', 0, 0, W, H, 'lightwm'\); osmAufSeite = true;/.test(c), 'MB-PDF: helle Hintergrundkarte setzt den Merker'],
       [/if \(osmAufSeite\) \{[\s\S]{0,200}doc\.text\('(\\u00A9|©) OpenStreetMap-Mitwirkende', W - M, H - 4\.5/.test(c), 'MB-PDF: Fusszeile druckt den Vermerk auf Seiten mit Karte'],
       [/addImage\(objImg, 'PNG', 0, 0, W, H\); osmAufSeite = true;/.test(c), 'MB-PDF: Inhaltsverzeichnis mit Titelkarte als Hintergrund traegt den Vermerk'],
+      [/doc\.autoTable = function \(opt\) \{[\s\S]{0,300}willDrawPage = function \(data\) \{\s*if \(data && data\.pageNumber > 1\) \{[\s\S]{0,120}footer\(page\);[\s\S]{0,60}page\+\+; contentBg\(\);/.test(c), 'MB-PDF: Tabellenumbruch (autoTable) holt Fusszeile, Hintergrund und Seitenzaehler nach (v3338b)'],
       [/if \(!covArtUsed\) \{\s*doc\.setFontSize\(6\.5\)[^\n]*\n\s*doc\.text\('\\u00A9 OpenStreetMap-Mitwirkende'/.test(c), 'MB-PDF: Deckblatt mit Live-Karte (auch object_image) traegt den Vermerk'],
       [/attribution: '© OpenStreetMap-Mitwirkende'/.test(c), 'MB-Web: Leaflet-Karte mit Namensnennung'],
     ];
