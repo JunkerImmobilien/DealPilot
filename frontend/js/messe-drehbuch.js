@@ -8715,7 +8715,7 @@
      Die BMF-Aufteilung ist abgespielt (DPM_QG_DATEN.bmf), die Pilot-Analysen sind die gespeicherten.
      Kein Abruf, der Kontingent kostet. Jede Zahl im Text liest das Drehbuch aus der Oberfläche. */
   var QG_A = '46b268c1-4871-4a5e-b9ef-bda5e03e38fc', QG_B = '3888ccb6-cb2d-4b60-b56a-45874930f295';
-  var QG_PFAD = 'messe-dateien/am-quittengarten-12/', QG_BUSTER = 'v3330b';   /* v3330b: Exposé mit 740.000 € (Marcel 12.11.) */
+  var QG_PFAD = 'messe-dateien/am-quittengarten-12/', QG_BUSTER = 'v3330c';   /* v3330b: Exposé mit 740.000 € (Marcel 12.11.) */
   var QG_DATEIEN = ['01-expose-am-quittengarten-12.pdf', '02-mieterliste-am-quittengarten-12.pdf', '03-energieausweis-am-quittengarten-12.pdf'];
   var _qg = { geladen: false };
   window.DPM_QG = window.DPM_QG || {};
