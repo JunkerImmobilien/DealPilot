@@ -135,7 +135,7 @@
       zinsen = null;
       $('dkChips').hidden = true;
       $('dkZinsEigen').hidden = false;
-      setze('dkStand', 'Der Tageszins ist gerade nicht abrufbar – trag deinen Zins selbst ein.');
+      setze('dkStand', 'Der Tageszins ist gerade nicht abrufbar. Trag deinen Zins selbst ein.');
     });
 
   /* ── Rechnen (nur Kerne der App) ────────────────────────────────────── */
@@ -233,7 +233,7 @@
       .then(function (d) {
         if (n !== lauf) return;
         g.innerHTML = '';
-        if (!d || d._bremse) { setze('dkLageQ', d && d._bremse ? 'Gerade zu viele Abrufe – in ein paar Minuten noch einmal.' : 'Lage & Markt gerade nicht abrufbar.'); return; }
+        if (!d || d._bremse) { setze('dkLageQ', d && d._bremse ? 'Gerade zu viele Abrufe. Bitte in ein paar Minuten noch einmal.' : 'Lage & Markt gerade nicht abrufbar.'); return; }
         if (d.gebiet) setze('dkLageTitel', 'Lage & Markt · ' + String(d.gebiet).split(',')[0]);
         var k = [];
         if (d.makrolage) k.push(kachel('Makrolage', d.makrolage.wert + ' / 100', d.makrolage.wort, d.makrolage.ton));
@@ -256,7 +256,7 @@
            der Gemeinde, wo wir die Werte führen dürfen, sonst DealPilot-Näherung (nie „Mietspiegel" genannt). */
         var vg = d.vergleichsmiete;
         if (vg && vg.qm > 0) k.push(kachel('Vergleichsmiete', dez(vg.qm, 2) + ' €/m²',
-          (vg.quelle === 'mietspiegel' ? 'Mietspiegel' + (vg.unten && vg.oben ? ' ' + dez(vg.unten, 2) + '–' + dez(vg.oben, 2) : '') : 'Näherung ±' + dez(vg.abweichung_pct || 7.5, 1).replace(',0', '') + ' %')
+          (vg.quelle === 'mietspiegel' ? 'Mietspiegel' + (vg.unten && vg.oben ? ' ' + dez(vg.unten, 2) + ' bis ' + dez(vg.oben, 2) : '') : 'Näherung ±' + dez(vg.abweichung_pct || 7.5, 1).replace(',0', '') + ' %')
           + (vg.objekt && vg.objekt.norm ? ' · Bj. ' + vg.objekt.baujahr + ', ' + vg.objekt.wfl + ' m²' : ''), null));
         /* Kappungsgrenze und Mietpreisbremse in EINER Kachel (landing-dealcheck-5 hatte zwei) */
         var mb = d.mietpreisbremse, kp = d.kappung;
@@ -265,7 +265,7 @@
           k.push(kachel('Mietrecht', kp && kp.pct ? 'Kappung ' + kp.pct + ' %' : '–',
             mb && mb.gilt === true ? 'Mietpreisbremse' + bis : mb && mb.gilt === false ? 'keine Mietpreisbremse' : 'Bremse: bitte prüfen', null));
         }
-        if (!k.length) { setze('dkLageQ', 'Für diese PLZ liegen uns noch keine amtlichen Lagedaten vor – in der App gibt es den vollen Marktbericht.'); return; }
+        if (!k.length) { setze('dkLageQ', 'Für diese PLZ liegen uns noch keine amtlichen Lagedaten vor. In der App gibt es den vollen Marktbericht.'); return; }
         k.forEach(function (x, i) { x.style.animationDelay = (i * 90) + 'ms'; g.appendChild(x); });
         var satz = mieteSatz(vg, kp, mb, wfl);
         if (satz) { var p = document.createElement('p'); p.className = 'dk-miete-satz'; p.innerHTML = satz; g.appendChild(p); }
@@ -275,38 +275,48 @@
       .catch(function () { if (n === lauf) { g.innerHTML = ''; setze('dkLageQ', 'Lage & Markt gerade nicht abrufbar.'); } });
   }
 
-  /* landing-dealcheck-7 · HÖCHSTMIETE (Marcel 12.11.2026: „den obersten Wert der Miete angeben mit den zulässigen
-     Abweichungen"). Je m² nettokalt, nur aus Gesetz und Vergleichsmiete:
-       Bestand   § 558 BGB  bis zur ortsüblichen Vergleichsmiete DIESER Wohnung - am oberen Rand der Mietspiegel-
-                            Spanne, wenn Ausstattung und Lage es tragen; je 3 Jahre höchstens die Kappungsgrenze.
-       Neu, Bremse § 556d   höchstens 10 % über der Vergleichsmiete (Ausnahmen § 556e/§ 556f: Vormiete, Neubau,
-                            umfassende Modernisierung).
-       Neu, ohne Bremse     keine Obergrenze im Mietrecht; Grenze ist § 5 WiStG (mehr als 20 % über der
-                            ortsüblichen Miete bei geringem Angebot = Ordnungswidrigkeit).
-     Ohne Spanne (DealPilot-Näherung) steht der obere Rand als typischer Wert: Median Oberwert/Mittelwert über
-     3.051 Tabellenfelder aus 70 freien Mietspiegeln = 1,186 (gemessen 12.11.2026) - dann „ca." und benannt. */
+  /* landing-dealcheck-8 · HÖCHSTMIETE, rechtlich gegengeprüft (Recherche 12.11.2026, Marcel: „keine Falschaussage"):
+       Maßstab ist die Vergleichsmiete DER WOHNUNG (Einzelvergleichsmiete) - der Oberwert der Spanne nur, wenn
+       Ausstattung, Lage, Zustand ihn tragen (BGH VIII ZR 82/18, VIII ZR 346/10). Deshalb zwei Zahlen: Mittel und Rand.
+       Bestand  § 558: bis zur Vergleichsmiete; Kappung 20/15 % innerhalb von 3 Jahren insgesamt; 15 Monate Sperrfrist.
+       Bremse § 556d: höchstens 110 % der Vergleichsmiete der Wohnung; Ausnahmen § 556e/f; Verordnungen längstens bis 31.12.2029.
+       Ohne Bremse: keine mietrechtliche Obergrenze; über 120 % der üblichen Miete droht Mietpreisüberhöhung (§ 5 WiStG,
+       nur bei Ausnutzung eines knappen Angebots), Mietwucher (§ 291 StGB) erst bei auffälligem Missverhältnis.
+       „Mietwucher" nie für § 5 WiStG. Alles als Orientierung, keine Rechtsberatung.
+     Ohne Spanne (DealPilot-Näherung): oberer Rand typisch × 1,186 = Median Oberwert/Mittelwert über 3.051 Felder aus
+     70 freien Mietspiegeln (gemessen 12.11.2026), mit „ca.". */
   var OBEN_TYPISCH = 1.186;
+  /* landing-dealcheck-8b · Marcel 12.11.2026: „bitte ohne ; oder – nur mit Punkt und Komma … Mietwucher anders
+     ausdrücken". Kurze Sätze, kein Gedankenstrich, kein Semikolon, das Wort Mietwucher fällt weg. */
   function mieteSatz(vg, kp, mb, wfl) {
     if (!vg || !(vg.qm > 0)) return null;
     var nkm = zahl(F.nkm), mitW = wfl && nkm > 0, kpct = kp && kp.pct ? kp.pct : 20;
     var spanne = vg.quelle === 'mietspiegel' && vg.oben > 0, oben = spanne ? vg.oben : vg.qm * OBEN_TYPISCH, ca = spanne ? '' : 'ca. ';
-    var mon = function (qm) { return mitW ? ' <small>(' + dez(Math.round(qm * wfl), 0) + ' €/Monat)</small>' : ''; };
-    var t = '<b>Höchstmiete je m² nettokalt</b><br>';
-    t += 'Bestand: bis <b>' + ca + dez(oben, 2) + ' €</b>' + mon(oben) + ' – oberer Rand ' + (spanne ? 'des Mietspiegels' : 'der Vergleichsmiete') + ', wenn Ausstattung und Lage es tragen; je Erhöhung höchstens ' + kpct + ' % in 3 Jahren (§ 558 BGB).<br>';
-    if (mb && mb.gilt === true) t += 'Neuvermietung: bis <b>' + ca + dez(oben * 1.1, 2) + ' €</b>' + mon(oben * 1.1) + ' – Mietpreisbremse, 10 % über der Vergleichsmiete (§ 556d BGB, Ausnahmen § 556e/f).';
-    else if (mb && mb.gilt === false) t += 'Neuvermietung: keine Mietpreisbremse; Grenze ist der Mietwucher ab 20 % über der Vergleichsmiete (§ 5 WiStG) – bis <b>' + ca + dez(oben * 1.2, 2) + ' €</b>' + mon(oben * 1.2) + '.';
-    else t += 'Neuvermietung: ob die Mietpreisbremse gilt, bitte prüfen.';
+    var eu = function (qm, mitCa) { return '<b>' + (mitCa ? ca : '') + dez(qm, 2) + ' €</b>' + (mitW ? ' (' + dez(Math.round(qm * wfl), 0) + ' € im Monat)' : ''); };
+    var t = '<b>Was an Miete möglich ist, je m² nettokalt</b><br>';
+    t += '<b>Bestand:</b> bis zur Vergleichsmiete der Wohnung. Im Mittel sind das ' + eu(vg.qm) + ', am oberen Rand ' + eu(oben, true)
+      + ', wenn Ausstattung, Lage und Zustand das tragen. Erhöht werden darf um höchstens ' + kpct + ' % in 3 Jahren, frühestens 15 Monate nach der letzten Erhöhung (§ 558 BGB).<br>';
+    if (mb && mb.gilt === true) t += '<b>Neuvermietung:</b> hier gilt die Mietpreisbremse. Nach § 556d BGB sind höchstens 110 % der Vergleichsmiete erlaubt, also ' + eu(vg.qm * 1.1)
+      + ', am oberen Rand ' + eu(oben * 1.1, true) + '. Ausnahmen gibt es bei höherer Vormiete, Modernisierung in den letzten 3 Jahren und Erstbezug nach dem 01.10.2014.';
+    else if (mb && mb.gilt === false) t += '<b>Neuvermietung:</b> hier gilt keine Mietpreisbremse, die Miete ist frei vereinbar. Unbedenklich sind bis zu 120 % der Vergleichsmiete, also ' + eu(vg.qm * 1.2)
+      + '. Wer darüber geht und dabei ein knappes Wohnungsangebot ausnutzt, riskiert ein Bußgeld wegen überhöhter Miete (§ 5 WiStG).';
+    else t += '<b>Neuvermietung:</b> ob die Mietpreisbremse gilt, bitte prüfen.';
     if (mitW) {
       var ist = nkm / wfl, abw = (ist / vg.qm - 1) * 100;
-      t += '<br>Deine Miete: <b>' + dez(ist, 2) + ' €/m²</b>';
+      t += '<br><b>Deine Miete:</b> ' + dez(ist, 2) + ' € je m²';
       if (abw < -3) {
         var ziel = Math.min(oben, ist * (1 + kpct / 100));
-        t += ', ' + dez(Math.abs(abw), 0) + ' % unter der Vergleichsmiete (Mittel ' + dez(vg.qm, 2) + ' €) – in 3 Jahren bis <b>' + dez(ziel, 2) + ' €/m²</b> (+' + dez(Math.round((ziel - ist) * wfl), 0) + ' €/Monat).';
-      } else if (abw > 3) t += ', ' + dez(abw, 0) + ' % über dem Mittel der Vergleichsmiete (' + dez(vg.qm, 2) + ' €).';
-      else t += ' – etwa das Mittel der Vergleichsmiete.';
+        t += ', das sind ' + dez(Math.abs(abw), 0) + ' % unter dem Mittel. In 3 Jahren sind bis zu <b>' + dez(ziel, 2) + ' €</b> möglich, also ' + dez(Math.round((ziel - ist) * wfl), 0) + ' € mehr im Monat.';
+      } else if (abw > 3) {
+        t += ', das sind ' + dez(abw, 0) + ' % über dem Mittel. '
+          + (ist > oben ? 'Sie liegt auch über dem oberen Rand. Sie darf so bleiben, eine weitere Erhöhung nach § 558 BGB ist aber voraussichtlich ausgeschöpft.'
+                        : 'Sie liegt noch in der Spanne. Eine weitere Erhöhung geht nur, wenn Ausstattung und Lage eine Einordnung weiter oben tragen.')
+          + ' Modernisierung, Index- oder Staffelmiete sind davon getrennt zu prüfen.';
+      } else t += ', das entspricht etwa dem Mittel.';
     }
-    if (!spanne) t += ' <small>Vergleichsmiete als DealPilot-Näherung (±' + dez(vg.abweichung_pct || 7.5, 1) + ' %) – für ein Erhöhungsverlangen mit Mietspiegel, Vergleichswohnungen oder Gutachten belegen.</small>';
-    return t;
+    t += ' <small>Orientierung, keine Rechtsberatung.';
+    if (!spanne) t += ' Die Vergleichsmiete ist eine DealPilot-Näherung (±' + dez(vg.abweichung_pct || 7.5, 1) + ' %). Für eine Mieterhöhung braucht es den Mietspiegel, drei Vergleichswohnungen oder ein Gutachten.';
+    return t + '</small>';
   }
 
   /* ── Drehen ─────────────────────────────────────────────────────────── */
