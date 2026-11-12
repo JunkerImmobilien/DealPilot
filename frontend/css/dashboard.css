@@ -1741,3 +1741,20 @@ html body #dashboard-main #dp-stage #dp-dash-objsel option{background:#fff !impo
   #dashboard-main #dp-stage table.zb-ot-tab td small{flex-basis:100%;text-align:right}
   #dashboard-main #dp-stage table.zb-ot-tab td[data-dptk-spalte=""]{justify-content:flex-end}
 }
+/* v3333a · Komplettmessung 1024 / 1280 px (Messkabine, alle Zustände) nach v3333:
+   - Einfach: Werte „7,93 Mio €“ in den Kacheln mit … abgeschnitten (bis 47 px) → Schrift folgt der
+     Kachelbreite (Container-Einheit), höchstens 21 px wie bisher; Beschriftung/Unterzeile brechen um.
+   - Vermögensbilanz: Objektnamen mit … → zweizeilig (am Handy schon seit v3325a).
+   - „Wert heute je Objekt“ bei 601–1200 px: tabellen-karten.js setzt table-layout:fixed, die Köpfe
+     „Marktpreisindikation“/„Vergleichswert (…)“ liefen 22–30 px übereinander → Köpfe brechen um,
+     Spaltenbreite nach Inhalt.
+   - Handy: „ohne Score“ (neue Objekte ohne Score) ragte 5 px aus der Spalte „Seit dem Kauf“. */
+#dashboard-main #dp-stage .ke2-w{container-type:inline-size}
+#dashboard-main #dp-stage .ke2-v{font-size:min(21px,15cqi);overflow:visible;text-overflow:clip}
+#dashboard-main #dp-stage .ke2-l,#dashboard-main #dp-stage .ke2-s{overflow-wrap:anywhere;hyphens:auto;-webkit-hyphens:auto}
+#dashboard-main #dp-stage .vb-ln{white-space:normal;overflow:visible;text-overflow:clip;overflow-wrap:anywhere}
+#dashboard-main #dp-stage .sa-d{white-space:normal;overflow-wrap:anywhere}
+@media(min-width:601px) and (max-width:1200px){
+  #dashboard-main #dp-stage table.dptk:not(.zb-ot-tab){table-layout:auto !important}
+  #dashboard-main #dp-stage table.dptk:not(.zb-ot-tab) thead th{white-space:normal !important;hyphens:auto;-webkit-hyphens:auto}
+}
