@@ -1703,3 +1703,8 @@ body.dp-theme-dark #dashboard-main .dp-pp-chip:hover{
 #dashboard-main #dp-stage .pj-sw button.on{background:#0A0A0A;color:var(--wl-e8cc7a, #E8CC7A);border-color:#0A0A0A}
 html body #dashboard-main #dp-stage #dp-dash-objsel{background:#fff !important;color:#2A2727 !important;border:1px solid var(--dpl-linie, #E6E1D6) !important;border-radius:2px !important;font:400 13px Inter,system-ui,sans-serif !important}
 html body #dashboard-main #dp-stage #dp-dash-objsel option{background:#fff !important;color:#2A2727 !important}
+/* v3331b · Kopf- und Feldbeschriftungen in Dunkelgold (#7D682F, gemessen 27 Stellen) wie .ct-pro
+   in Grau #6B645A; Verweise „Zielbild anlegen ›“ in Schriftfarbe. Werte in Dunkelgold
+   (.sk-k-v, .vb-kv) bleiben - die App führt sie genauso (.kv-v.c-gold). */
+#dashboard-main #dp-stage :is(.gb-t,.gb-tab-t,.cp-sz-t,.cp-sz-m,.cpk-det > summary,.cp-ans-t > b){color:#6B645A}
+#dashboard-main #dp-stage :is(.zb-btn,.zb-neu-btn){color:#2A2727}
