@@ -8713,9 +8713,12 @@
      - beide NUR GELESEN: jeder Schreibweg an Objekt und Steuer wird beantwortet, nicht geschrieben
      (qgGesperrt, über r27Gesperrt in rhSpion), auch nach dem Lauf, solange A oder B geladen ist.
      Die BMF-Aufteilung ist abgespielt (DPM_QG_DATEN.bmf), die Pilot-Analysen sind die gespeicherten.
-     Kein Abruf, der Kontingent kostet. Jede Zahl im Text liest das Drehbuch aus der Oberfläche. */
+     Kein Abruf, der Kontingent kostet. Jede Zahl im Text liest das Drehbuch aus der Oberfläche.
+     v3330d/e (Marcel 12.11. nachmittags): Exposé mit 690.000 € und eingebettetem Hausfoto (Quick-Check 100 % → Solide,
+     80 % → Gut), A3b Bewertung/Prüfsteine/Zielkaufpreis im Quick-Check, A5b Investor Deal Score (24 von 24 Kennzahlen),
+     A8 Variante „Optimiert“ (Boden −20 %). Objekt A trägt seither 690.000 €, das Hausfoto, geb_ant 80,72 und eine neue Pilot-Analyse. */
   var QG_A = '46b268c1-4871-4a5e-b9ef-bda5e03e38fc', QG_B = '3888ccb6-cb2d-4b60-b56a-45874930f295';
-  var QG_PFAD = 'messe-dateien/am-quittengarten-12/', QG_BUSTER = 'v3330d';   /* v3330d: Exposé mit 690.000 € und Hausfoto (Marcel 12.11.: Score bei 100 % Solide) */
+  var QG_PFAD = 'messe-dateien/am-quittengarten-12/', QG_BUSTER = 'v3330e';   /* v3330e: Mitschnitt neu (Auslese, BMF 690.000 €); v3330d: Exposé mit 690.000 € und Hausfoto (Marcel 12.11.: Score bei 100 % Solide) */
   var QG_DATEIEN = ['01-expose-am-quittengarten-12.pdf', '02-mieterliste-am-quittengarten-12.pdf', '03-energieausweis-am-quittengarten-12.pdf'];
   var _qg = { geladen: false };
   window.DPM_QG = window.DPM_QG || {};
@@ -8908,6 +8911,40 @@
         await b2oZeile(s, 'Beleihung 80 %', 'Score <b>' + (s1.n || '–') + ' · ' + (s1.stufe || '–') + '</b>' + (dscr ? ', DSCR ' + dscr[1] : '') + '.');
         DPM_QG.zeiten.push({ szene: 'A3', ms: Date.now() - t1 });
       },
+      /* ── A3b · das Ergebnis im Quick-Check: Bewertung, Prüfsteine, Zielkaufpreis (v3330d) ──
+         Marcel 12.11.2026: „das Ergebnis im Quick-Check zeigen — mit Zielbild und Bewertung“. Die Karte
+         „Bewertung“ (#ai-card .qcb, quickcheck-app.html Z. ~6040) trägt Urteil, drei Prüfsteine und den
+         Zielkaufpreis; ein Feld „Zielbild“ gibt es im Quick-Check nicht - das Zielbild je Wohnung folgt in A4.
+         Alles wird aus der Karte gelesen, nichts steht fest im Text. */
+      async function (s) {
+        var t1 = Date.now();
+        var boxen = function () { var d = qcDoc(); return d ? [].slice.call(d.querySelectorAll('#ai-card .qcb > .qcb-box')) : []; };
+        var ur = function () { return qcSel('#ai-card .qcb-urteil'); };
+        var pr = function () { return boxen().filter(function (x) { return x.querySelector('.qcb-pz'); })[0] || null; };
+        var zk = function () { return boxen().filter(function (x) { return x.querySelector('.qcb-zk'); })[0] || null; };
+        await warteAuf(ur, 6000);
+        if (ur()) {
+          await qcHole(ur()); await zeige(ur, 6);
+          var h4 = ur().querySelector('h4'), lb = ur().querySelector('.qcb-l');
+          DPM_QG.a3b = { urteil: h4 ? r6Text(h4) : null, stufe: lb ? r6Text(lb) : null };
+          await b2oZeile(s, 'Die Bewertung', (lb ? r6Text(lb).replace(/\s+/g, ' ') + ': ' : '') + '<b>' + (h4 ? r6Text(h4) : '–') + '</b>.');
+        }
+        if (pr()) {
+          await qcHole(pr()); await zeige(pr, 6);
+          var ti = [].map.call(pr().querySelectorAll('.qcb-pz b'), function (b) { return r6Text(b); });
+          DPM_QG.a3b.pruefsteine = ti;
+          await b2oZeile(s, 'Drei Prüfsteine', ti.length ? '<b>' + ti.join(' · ') + '</b>.' : 'Preis, Rendite und Finanzierung — je mit Ampel.');
+        }
+        if (zk()) {
+          await qcHole(zk()); await zeige(zk, 6);
+          var g = zk().querySelector('.qcb-zk.greift') || zk().querySelector('.qcb-zk');
+          var v = g && g.querySelector('.v'), u = g && g.querySelector('.u'), l = g && g.querySelector('.qcb-l');
+          var ut = u ? r6Text(u).split(' — ')[0].split(' · ')[0] : '';
+          DPM_QG.a3b.zielkaufpreis = { grenze: l ? r6Text(l) : null, wert: v ? r6Text(v) : null, text: ut };
+          await b2oZeile(s, 'Zielkaufpreis', 'Was der Preis sein müsste: <b>' + (v ? r6Text(v) : '–') + '</b>' + (ut ? ' — ' + ut : '') + '.');
+        }
+        DPM_QG.zeiten.push({ szene: 'A3b', ms: Date.now() - t1 });
+      },
       /* ── A4 · als Objekt speichern, Einheiten mit Ist und Zielbild ── */
       async function (s) {
         var t1 = Date.now();
@@ -8970,6 +9007,29 @@
         await b2oZeile(s, 'Heute und Zielbild', r ? 'Kaltmiete heute <b>' + r[1] + '</b> im Jahr — im Zielbild <b>' + r[3] + '</b>.' : 'Ist und Zielbild nebeneinander, Wohnung für Wohnung gerechnet.');
         DPM_QG.zeiten.push({ szene: 'A5', ms: Date.now() - t1 });
       },
+      /* ── A5b · Investor Deal Score, alle Kennzahlen belegt (v3330d, Marcel 12.11.) ──
+         Objekt A trägt seit 12.11. nachmittags Zustand, Mietausfall, Marktmiete, Marktfaktor, Wertsteigerung,
+         Entwicklung und die neun Gewerke-Stufen - DealScore2.getKpiCompleteness 24 von 24. */
+      async function (s) {
+        var t1 = Date.now();
+        reiter('s6'); await warte(1200);
+        var kopf = function () { var e = rhIm('#s6', /Investor Deal Score/i); return e && (e.closest('.dpz-kopf') || e.parentElement); };
+        await warteAuf(kopf, 6000);
+        var m = q('.main-col'); if (m) m.scrollTop = 0;
+        var c = null; try { c = DealScore2.getKpiCompleteness(window._buildDeal2FromState()); } catch (e) {}
+        var t = r6Inner(kopf()).replace(/\s+/g, ' '), g = /(Sehr gut|Gut|Solide|Schwach|Kritisch)\s*(\d+)\s*\/\s*100/i.exec(t);
+        DPM_QG.a5b = { kopf: t.slice(0, 160), kpi: c ? { belegt: c.filled, von: c.total } : null };
+        await zeige(kopf, 8);
+        await b2oZeile(s, 'Investor Deal Score', (g ? '<b>' + g[2] + ' · ' + g[1] + '</b>' : 'Der Investor Deal Score') + (c ? ' — ' + (c.filled === c.total ? 'alle ' + c.total : c.filled + ' von ' + c.total) + ' Kennzahlen belegt' : '') + '.');
+        var sc = function (re) { return function () { var e = rhIm('#s6', re); return e && e.closest('.dpz-score'); }; };
+        var iv = sc(/^Investment-Score$/), fi = sc(/^Finanzierungs-Score$/);
+        if (iv() && fi()) {
+          var zi = /^\s*(\d+)/.exec(r6Inner(iv())), zf = /^\s*(\d+)/.exec(r6Inner(fi()));
+          await zeigeGruppe(iv, fi, 8);
+          await b2oZeile(s, 'Immobilie und Finanzierung', 'Investment <b>' + (zi ? zi[1] : '–') + '</b>, Finanzierung <b>' + (zf ? zf[1] : '–') + '</b> — jede Kennzahl mit ihrem Beitrag.');
+        }
+        DPM_QG.zeiten.push({ szene: 'A5b', ms: Date.now() - t1 });
+      },
       /* ── A6 · Finanzierung, indikativer Zins ── */
       async function (s) {
         var t1 = Date.now();
@@ -9019,7 +9079,21 @@
         await warteAuf(function () { return r6BmfPane(); }, 6000);
         kegelHoch(true);
         await warte(1200);
-        for (var i = 0; i < 4 && r6BmfPane() && r6BmfPane().id !== 'p-boden'; i++) await r6BmfWeiter();
+        /* v3330d · Marcel 12.11.: die optimierte Aufteilung (Boden −20 %) - in Schritt 4 gewählt, nur angezeigt
+           (das Objekt trägt den Gebäudeanteil der Variante seit 12.11. selbst, geb_ant 80,72) */
+        for (var i = 0; i < 4 && r6BmfPane() && r6BmfPane().id !== 'p-hebel' && r6BmfPane().id !== 'p-boden'; i++) await r6BmfWeiter();
+        await warte(800);
+        var ko = function () { return r6BmfKarte('optimiert'); };
+        if (ko()) {
+          var b0 = ko(); r6BmfOben(b0); await warte(500);
+          await zeige(ko, 8);
+          var V = null; try { V = window._v292State.response.phase5_varianten.optimiert; } catch (e) {}
+          await b2oZeile(s, 'Optimiert', 'Boden mit 20 % Abschlag' + (V ? ': Boden <b>' + String(V.boden_pct).replace('.', ',') + ' %</b>, Gebäude <b>' + String(V.gebaeude_pct).replace('.', ',') + ' %</b>' : '') + '.');
+          var k1 = ko(); if (k1) k1.click();
+          DPM_QG.a8v = { gewaehlt: window._v292State && _v292State.selectedVariant, boden_pct: V && V.boden_pct };
+          await warte(900);
+        }
+        for (var i2 = 0; i2 < 3 && r6BmfPane() && r6BmfPane().id !== 'p-boden'; i2++) await r6BmfWeiter();
         await warte(800);
         var kart = function () { var p = r6BmfPane(); var e = p && rhIm(p, /^Gebäudeanteil$/i); return e && (e.closest('div[style*="grid"]') || e.parentElement && e.parentElement.parentElement) || p; };
         var p0 = r6BmfPane(); if (p0) { var sc = p0.closest('.bmfmo-body'); if (sc) sc.scrollTop = 0; }
