@@ -1711,3 +1711,33 @@ html body #dashboard-main #dp-stage #dp-dash-objsel option{background:#fff !impo
 /* v3331c · Umschalter Wirkung je Objekt | Progressionskurve wie die übrigen Umschalter */
 #dashboard-main #dp-stage .sk-u-btn{background:#fff;color:#2A2727;border:1px solid color-mix(in srgb,var(--wl-c9a84c, #C9A84C) 30%,transparent);border-radius:8px;font-family:Inter,system-ui,sans-serif;font-weight:500}
 #dashboard-main #dp-stage .sk-u-btn.sk-u-an{background:#0A0A0A;color:var(--wl-e8cc7a, #E8CC7A);border-color:#0A0A0A}
+
+/* ════ v3333 · Tabelle „Je Objekt · Bestand → Soll → Zielbild“ ohne Querscrollen ════
+   Marcel 12.11.2026: „ja zieh die Tabelle nach“ (Inhalt bleibt, er findet sie „überragend gut“).
+   Gemessen in der Messkabine: die Tabelle hatte min-width 1080 px und schob bei 1280 px 320 px quer
+   (1273 auf 953), bei 1440 px 160; bei 1024 px setzte tabellen-karten.js (601–1200) table-layout:fixed,
+   13 Spalten à 54 px, die Zahlen liefen über die Zellen (722 auf 697).
+   Kleinste mögliche Breite ohne Zahlumbruch (min-content, 11 px, Köpfe 9 px): 945 px — der Kasten ist
+   Fensterbreite − 327 px. Darum: ab 1280 px Tabelle in voller Breite, darunter (601–1279 px) dieselben
+   Zellen als Karten, zwei je Reihe; unter 601 px bleibt der Kartenmodus von tabellen-karten.js.
+   Die Beschriftungen der Karten kommen aus tabellen-karten.js (v3333: Kopf als Raster gelesen). */
+@media(min-width:601px){
+  #dashboard-main #dp-stage table.zb-ot-tab{min-width:0 !important;width:100% !important;table-layout:auto !important;font-size:11px}
+  #dashboard-main #dp-stage table.zb-ot-tab th,#dashboard-main #dp-stage table.zb-ot-tab td{font-size:11px;padding:6px 5px !important;white-space:normal;overflow-wrap:normal !important}
+  #dashboard-main #dp-stage table.zb-ot-tab thead th{font-size:9px;letter-spacing:.02em}
+  #dashboard-main #dp-stage table.zb-ot-tab tbody th,#dashboard-main #dp-stage table.zb-ot-tab tfoot th{font-size:12px}
+  #dashboard-main #dp-stage table.zb-ot-tab tr.zb-ot-g > th:first-child,#dashboard-main #dp-stage table.zb-ot-tab tbody th,#dashboard-main #dp-stage table.zb-ot-tab tfoot th{min-width:96px;max-width:150px}
+  #dashboard-main #dp-stage table.zb-ot-tab td.zb-ot-akt .zb-neu-btn{white-space:normal}
+}
+@media(min-width:601px) and (max-width:1279px){
+  #dashboard-main #dp-stage table.zb-ot-tab{display:block}
+  #dashboard-main #dp-stage table.zb-ot-tab thead{display:none}
+  #dashboard-main #dp-stage table.zb-ot-tab tbody{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  #dashboard-main #dp-stage table.zb-ot-tab tfoot{display:block;margin-top:10px}
+  #dashboard-main #dp-stage table.zb-ot-tab tr{display:block;padding:8px 10px;border:1px solid color-mix(in srgb,var(--wl-c9a84c, #C9A84C) 22%,transparent);border-radius:2px;background:#fff}
+  #dashboard-main #dp-stage table.zb-ot-tab th,#dashboard-main #dp-stage table.zb-ot-tab td{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;column-gap:10px;padding:3px 0 !important;border:0 !important;position:static;min-width:0;max-width:none;background:none;text-align:right}
+  #dashboard-main #dp-stage table.zb-ot-tab tbody th,#dashboard-main #dp-stage table.zb-ot-tab tfoot th{display:block;text-align:left;padding-bottom:6px !important;margin-bottom:4px;border-bottom:1px solid var(--dpl-linie, #E6E1D6) !important}
+  #dashboard-main #dp-stage table.zb-ot-tab td::before{content:attr(data-dptk-spalte);flex:0 1 auto;max-width:58%;text-align:left;color:#6B645A;font:600 10px/1.45 'JetBrains Mono',monospace;white-space:normal;letter-spacing:0;text-transform:none}
+  #dashboard-main #dp-stage table.zb-ot-tab td small{flex-basis:100%;text-align:right}
+  #dashboard-main #dp-stage table.zb-ot-tab td[data-dptk-spalte=""]{justify-content:flex-end}
+}

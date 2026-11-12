@@ -164,17 +164,54 @@
   /* ── Die Beschriftung an die Zellen hängen ───────────────────────────
      Gelesen wird die LETZTE Kopfzeile: bei mehrzeiligen Köpfen steht
      dort die Spalte, nicht die Gruppe. */
+  /* v3333 · Mehrzeilige Köpfe als RASTER lesen (rowspan/colspan). Bis hier
+     zählte nur die letzte Kopfzeile - im Portfolio-Cockpit („Je Objekt ·
+     Bestand → Soll → Zielbild": Objekt, Maßnahmen, Marktpreisindikation …
+     stehen mit rowspan=2 nur in der ERSTEN Zeile) hatte die letzte Zeile 8
+     Namen für 13 Zellen: das Objekt hieß „Bestand", die Kaltmiete „Soll" …
+     Jetzt: je Spalte die Kette Gruppe · Spalte („Kaltmiete p. a. · Bestand"),
+     bei einzeiligen Köpfen wie bisher. Kindknoten werden mit Leerzeichen
+     verbunden („Soll<small>Mieterhöhung</small>" → „Soll Mieterhöhung"). */
+  function kopfText(th) {
+    return [].slice.call(th.childNodes).map(function (k) { return k.textContent || ''; }).join(' ')
+      .replace(/­/g, '').replace(/\s+/g, ' ').trim()
+      .replace(/[▲▼↑↓⇅⇄]/g, '').trim();
+  }
+  function kopfNamen(t) {
+    var zeilen = [].slice.call(t.querySelectorAll('thead tr'));
+    var raster = [];
+    zeilen.forEach(function (tr, r) {
+      raster[r] = raster[r] || [];
+      var c = 0;
+      [].slice.call(tr.children).forEach(function (th) {
+        while (raster[r][c]) c++;
+        var txt = kopfText(th), rs = th.rowSpan || 1, cs = th.colSpan || 1;
+        for (var i = 0; i < rs; i++) {
+          raster[r + i] = raster[r + i] || [];
+          for (var j = 0; j < cs; j++) raster[r + i][c + j] = { t: txt };
+        }
+        c += cs;
+      });
+    });
+    var letzte = raster[zeilen.length - 1] || [];
+    var namen = [];
+    for (var ci = 0; ci < letzte.length; ci++) {
+      var teile = [];
+      for (var r = 0; r < zeilen.length; r++) {
+        var x = raster[r] && raster[r][ci];
+        if (x && x.t && teile.indexOf(x.t) < 0) teile.push(x.t);
+      }
+      namen.push(teile.join(' · '));
+    }
+    return namen;
+  }
   function beschriften(t) {
     var kopfZeilen = t.querySelectorAll('thead tr');
     if (!kopfZeilen.length) return 0;
-    var kopf = kopfZeilen[kopfZeilen.length - 1];
-    var namen = [].slice.call(kopf.children).map(function (th) {
-      return (th.textContent || '').replace(/\s+/g, ' ').trim()
-             .replace(/[▲▼↑↓⇅⇄]/g, '').trim();
-    });
+    var namen = kopfNamen(t);
     if (namen.length < MIN_SPALTEN) return 0;
     var n = 0;
-    [].slice.call(t.querySelectorAll('tbody tr')).forEach(function (tr) {
+    [].slice.call(t.querySelectorAll('tbody tr, tfoot tr')).forEach(function (tr) {
       [].slice.call(tr.children).forEach(function (td, i) {
         /* colspan-Zellen (Zwischensummen, "keine Daten") bekommen keine
            Beschriftung - sie gehören zu keiner Spalte. */
@@ -249,9 +286,7 @@
     var tb = t.querySelector('tbody');
     if (!tb || !tb.querySelector('tr')) return false;
     if (tb.querySelector('input, select, textarea')) return false;
-    var kopfZeilen = t.querySelectorAll('thead tr');
-    var spalten = kopfZeilen.length
-      ? kopfZeilen[kopfZeilen.length - 1].children.length : 0;
+    var spalten = kopfNamen(t).length;   /* v3333: Raster statt letzter Kopfzeile */
     if (spalten < MIN_SPALTEN) return false;
     if (!beschriften(t)) return false;
     t.classList.add('dptk');
