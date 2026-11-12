@@ -214,6 +214,36 @@ router.post('/clients', async (req, res, next) => {
   } catch (e) { if (e.status) return res.status(e.status).json({ error: e.message }); next(e); }
 });
 
+// ── v3317 · Objekt an Kunden uebergeben (Partnerseite, services/objektUebergabe.js) ──
+const uebergabe = require('../services/objektUebergabe');
+router.get('/uebergaben', async (req, res, next) => {
+  try { res.json({ uebergaben: await uebergabe.liste(req.reseller.id), pool: await reseller.getPool(req.reseller.id) }); }
+  catch (e) { next(e); }
+});
+/* Vor dem Senden: bestehender Mandant? freier Platz? - der Dialog sagt es, bevor etwas rausgeht */
+router.get('/uebergaben/vorpruefung', async (req, res, next) => {
+  try {
+    const email = String((req.query && req.query.email) || '').trim();
+    if (!email) return res.status(400).json({ error: 'email_required' });
+    res.json(await uebergabe.vorpruefung(req.reseller.id, email));
+  } catch (e) { next(e); }
+});
+router.post('/uebergaben', async (req, res, next) => {
+  try {
+    const b = req.body || {};
+    const r = await uebergabe.anlegen({
+      resellerId: req.reseller.id, userId: req.user.id, objectId: b.objectId, email: b.email,
+      anzeigeName: b.anzeigeName, nachricht: b.nachricht, basis: inviteBase(req)
+    });
+    /* Das Token geht NICHT an den Browser zurueck - es steht nur in der Mail. */
+    res.json({ ok: true, uebergabe: r.uebergabe, mail: r.mail });
+  } catch (e) { if (e.status) return res.status(e.status).json({ error: e.message }); next(e); }
+});
+router.post('/uebergaben/:id/widerrufen', async (req, res, next) => {
+  try { res.json({ ok: await uebergabe.widerrufen(req.reseller.id, req.params.id) }); }
+  catch (e) { next(e); }
+});
+
 router.post('/invites/:id/revoke', async (req, res, next) => {
   try { res.json({ ok: await reseller.revokeInvite(req.reseller.id, req.params.id) }); }
   catch (e) { next(e); }

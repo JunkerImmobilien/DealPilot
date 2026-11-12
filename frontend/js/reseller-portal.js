@@ -151,6 +151,7 @@ if (!window._pdfGold) {
     ueber: ['Übersicht & Lizenz-Pool', 'Seats kaufen und an deine Mandanten verteilen.'],
     mand: ['Mandanten', 'Kunden verwalten und Seats zuweisen.'],
     frei: ['Freigaben', 'Eingereichte Objekte prüfen und bestätigen.'],
+    ueberg: ['Objekte übergeben', 'Durchgerechnete Objekte per E-Mail an Kunden übergeben.'],   /* v3317 */
     brand: ['Branding', 'Whitelabel — Farben, Logo, Subdomain.'],
     abr: ['Abrechnung', 'Dein Partner-Abo und die Seat-Abrechnung.']
   };
@@ -200,6 +201,7 @@ if (!window._pdfGold) {
             nav('ueber', 'Übersicht', 'Lizenz-Pool, Seats', '<rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>') +
             nav('mand', 'Mandanten', 'Kunden, Seat-Zuweisung', '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>') +
             nav('frei', 'Freigaben', 'Objekte prüfen', '<path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/>') +
+            nav('ueberg', 'Übergeben', 'Objekt an Kunden', '<path d="M4 12h13M12 6l6 6-6 6"/><path d="M20 4v16"/>') +   /* v3317 */
             nav('brand', 'Branding', 'Whitelabel, Logo', '<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.9 4.9l2 2M17 17l2 2M2 12h3M19 12h3"/>') +
             nav('abr', 'Abrechnung', 'Abo & Rechnungen', '<rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/>') +
           '</div>' +
@@ -235,6 +237,7 @@ if (!window._pdfGold) {
     if (s === 'ueber') loadOverview();
     else if (s === 'mand') loadMandanten();
     else if (s === 'frei') loadFreigaben();
+    else if (s === 'ueberg') loadUebergaben();   /* v3317 */
     else if (s === 'brand') loadBranding();
     else if (s === 'abr') $('rp-work').innerHTML = '<p class="rp-intro">Dein Partner-Abo und die Seat-Abrechnung.</p><p class="rp-label">Abo &amp; Rechnungen</p><p class="rp-ph">Partner-Basis · Seat-Pool · Stripe-Rechnungen — kommt im Abrechnungs-Paket.</p>';
   }
@@ -424,6 +427,110 @@ if (!window._pdfGold) {
   async function reviewShare(id, decision) {
     try { await api('/shares/' + id + '/review', { method: 'POST', body: { decision: decision } }); loadFreigaben(); toast(decision === 'bestaetigt' ? '✓ Bestätigt' : 'Zurückgegeben'); }
     catch (e) { toast('Fehlgeschlagen'); }
+  }
+
+  // ── v3317 · Objekte an Kunden übergeben (services/objektUebergabe.js) ──
+  /* Marcel 12.11.2026: Partner rechnet ein Objekt durch und übergibt es per E-Mail.
+     Der Kunde bekommt eine Mail in Partnermarke und eine KOPIE in sein Konto.
+     Vor dem Senden fragt das Portal den Server, ob die Adresse schon Mandant ist
+     und ob ein Platz frei ist - ein neuer Kunde braucht einen. */
+  var UEB_STATUS = {
+    gesendet:    ['GESENDET', 'background:#f0ece2;color:#6f685d'],
+    geoeffnet:   ['GEÖFFNET', 'background:#fbeed8;color:#c8791f'],
+    uebernommen: ['ÜBERNOMMEN', 'background:#e2f0e6;color:#3FA56C'],
+    widerrufen:  ['WIDERRUFEN', 'background:#fbeeec;color:#B86250'],
+    abgelaufen:  ['ABGELAUFEN', 'background:#f0ece2;color:#9a9284']
+  };
+  var UEB_FEHLER = {
+    kein_freier_platz: 'Kein freier Platz: Diese Adresse ist noch kein Mandant. Kauf zuerst einen Platz (Übersicht › Seats kaufen).',
+    objekt_nicht_gefunden: 'Das Objekt gehört nicht zu deinem Konto.',
+    email_ungueltig: 'Bitte eine gültige E-Mail-Adresse eingeben.',
+    eigene_adresse: 'Das ist deine eigene Adresse.',
+    tagesgrenze: 'Für heute sind genug Übergaben verschickt - bitte morgen weiter.',
+    kein_partner: 'Nur Partner dürfen Objekte übergeben.'
+  };
+  function _uebDatum(s) { try { return new Date(s).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' }); } catch (e) { return ''; } }
+  var _uebVp = null;
+  async function loadUebergaben() {
+    var w = $('rp-work'); if (!w) return; w.innerHTML = '<p class="rp-ph">Lade Übergaben…</p>';
+    try {
+      var r = await api('/uebergaben');
+      var or = await Auth.apiCall('/objects?limit=200');
+      var objs = (or && (or.items || or.objects)) || [];
+      var akt = window._currentObjKey || '';
+      var wahl = _st.uebObj || (objs.some(function (o) { return o.id === akt; }) ? akt : (objs[0] ? objs[0].id : ''));
+      var opts = objs.map(function (o) {
+        var t = [o.seq_no, o.name || o.ort].filter(Boolean).join(' · ') + (o.dealpilot_score != null ? ' · Score ' + o.dealpilot_score : '') + (o.id === akt ? ' (gerade geöffnet)' : '');
+        return '<option value="' + esc(o.id) + '"' + (o.id === wahl ? ' selected' : '') + '>' + esc(t) + '</option>';
+      }).join('');
+      var inp = 'width:100%;padding:9px 11px;border:1px solid #e6e0d4;border-radius:8px;font:400 13px Inter;outline:none;box-sizing:border-box';
+      var liste = (r.uebergaben || []).map(function (u) {
+        var s = UEB_STATUS[u.status] || [String(u.status || '').toUpperCase(), ''];
+        var zeit = u.status === 'uebernommen' ? 'übernommen ' + _uebDatum(u.uebernommen_at)
+          : (u.status === 'geoeffnet' ? 'geöffnet ' + _uebDatum(u.geoeffnet_at) : 'gesendet ' + _uebDatum(u.created_at));
+        var hinweis = u.mail_status === 'testadresse' ? 'Testadresse, keine Mail' : (u.mail_status === 'fehler' ? 'Mail nicht zugestellt' : '');
+        var mt = [esc(u.anzeige_name ? u.anzeige_name + ' · ' + u.email : u.email), zeit, hinweis].filter(Boolean).join(' · ');
+        var weg = (u.status === 'gesendet' || u.status === 'geoeffnet') ? '<button class="rp-act remove" data-uw="' + esc(u.id) + '">widerrufen</button>' : '';
+        return '<div class="rp-share"><div><div class="rp-nm">' + esc(u.adresse || 'Objekt') + (u.score != null ? ' <span style="font:500 12px Inter;color:#6f685d">· Score ' + esc(u.score) + '</span>' : '') + '</div>' +
+          '<div class="rp-mt">' + mt + '</div></div>' +
+          '<div style="margin-left:auto;display:flex;gap:8px;align-items:center"><span class="rp-bg" style="' + s[1] + '">' + s[0] + '</span>' + weg + '</div></div>';
+      }).join('');
+      w.innerHTML = '<p class="rp-intro">Ein durchgerechnetes Objekt per E-Mail an einen Kunden übergeben. Die Mail kommt in deiner Marke; der Kunde bekommt eine Kopie des Objekts in sein Konto. Ein neuer Kunde legt dabei ein Konto an und erhält einen freien Platz.</p>' +
+        '<p class="rp-label">Objekt übergeben</p>' +
+        (objs.length ? (
+        '<div class="rp-panel" style="margin-top:0">' +
+          '<div class="rp-fl">Objekt</div><select id="rp-ub-obj" style="' + inp + ';margin-bottom:14px">' + opts + '</select>' +
+          '<div class="rp-row" style="align-items:flex-start">' +
+            '<div style="flex:1;min-width:200px"><div class="rp-fl">E-Mail des Kunden</div><input id="rp-ub-email" type="email" autocomplete="off" style="' + inp + '"></div>' +
+            '<div style="flex:1;min-width:200px"><div class="rp-fl">Name (optional, für die Anrede)</div><input id="rp-ub-name" style="' + inp + '"></div>' +
+          '</div>' +
+          '<div class="rp-fl" style="margin-top:14px">Persönlicher Satz (optional)</div><textarea id="rp-ub-satz" maxlength="600" rows="2" style="' + inp + ';resize:vertical" placeholder="z. B. Wie besprochen - schau dir die Zahlen in Ruhe an."></textarea>' +
+          '<div id="rp-ub-vp" class="rp-staffel" style="margin-top:10px;min-height:18px"></div>' +
+          '<div class="rp-buyfoot"><span class="rp-staffel">Der Link ist 30 Tage gültig und lässt sich einmal übernehmen. Du siehst unten, ob er geöffnet und übernommen wurde.</span>' +
+            '<button class="rp-checkout" id="rp-ub-send">An Kunden übergeben</button></div>' +
+        '</div>') : '<p class="rp-ph">Noch keine eigenen Objekte. Leg zuerst ein Objekt an und rechne es durch.</p>') +
+        '<p class="rp-label" style="margin-top:24px">Bisherige Übergaben</p>' + (liste || '<p class="rp-ph">Noch keine Übergaben.</p>');
+      w.querySelectorAll('[data-uw]').forEach(function (b) { b.addEventListener('click', function () { uebWiderrufen(b.getAttribute('data-uw')); }); });
+      var em = $('rp-ub-email'); if (em) em.addEventListener('input', function () { clearTimeout(_uebVp); _uebVp = setTimeout(uebVorpruefung, 450); });
+      var sb = $('rp-ub-send'); if (sb) sb.addEventListener('click', uebSenden);
+    } catch (e) { w.innerHTML = '<p class="rp-ph">Übergaben konnten nicht geladen werden.</p>'; }
+  }
+  async function uebVorpruefung() {
+    var em = ($('rp-ub-email') || {}).value || '', box = $('rp-ub-vp'), sb = $('rp-ub-send'); if (!box) return null;
+    var frei = function (an) { if (sb) { sb.disabled = !an; sb.style.opacity = an ? '1' : '.45'; sb.style.cursor = an ? 'pointer' : 'not-allowed'; } };
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em.trim())) { box.innerHTML = ''; frei(true); return null; }
+    try {
+      var v = await api('/uebergaben/vorpruefung?email=' + encodeURIComponent(em.trim()));
+      if (v.bestehender_mandant) box.innerHTML = '<span style="color:#3FA56C">●</span> Bereits dein Mandant - die Kopie landet direkt in seinem Konto.';
+      else if (v.frei > 0) box.innerHTML = '<span style="color:#3FA56C">●</span> Neuer Kunde: legt ein Konto an und bekommt einen deiner ' + v.frei + ' freien Plätze.';
+      else box.innerHTML = '<span style="color:#B86250">●</span> <b>Kein freier Platz.</b> Diese Adresse ist noch kein Mandant - kauf zuerst einen Platz. <button class="rp-act assign" id="rp-ub-kauf" style="margin-left:6px">Zu den Seats</button>';
+      frei(v.kann_senden);
+      var k = $('rp-ub-kauf'); if (k) k.addEventListener('click', function () { go('ueber'); setTimeout(function () { try { toggleBuy(); } catch (e) {} }, 400); });
+      return v;
+    } catch (e) { box.innerHTML = ''; return null; }
+  }
+  async function uebSenden() {
+    var oid = ($('rp-ub-obj') || {}).value, em = (($('rp-ub-email') || {}).value || '').trim();
+    var nm = (($('rp-ub-name') || {}).value || '').trim(), satz = (($('rp-ub-satz') || {}).value || '').trim();
+    if (!oid || !em) { toast('Objekt und E-Mail nötig'); return; }
+    var v = await uebVorpruefung();
+    if (v && !v.kann_senden) { toast(UEB_FEHLER.kein_freier_platz); return; }
+    var sb = $('rp-ub-send'); if (sb) { sb.disabled = true; sb.textContent = 'Sende…'; }
+    try {
+      var r = await api('/uebergaben', { method: 'POST', body: { objectId: oid, email: em, anzeigeName: nm, nachricht: satz } });
+      var st = r && r.mail && r.mail.status;
+      toast(st === 'gesendet' ? '✓ Objekt an ' + em + ' übergeben' : (st === 'testadresse' ? 'Übergabe angelegt (Testadresse - keine Mail)' : 'Übergabe angelegt - Mail nicht versendet'));
+      _st.uebObj = oid;
+      loadUebergaben();
+    } catch (e) {
+      toast(UEB_FEHLER[e && e.message] || ('Übergabe fehlgeschlagen' + (e && e.message ? ': ' + e.message : '')));
+      if (sb) { sb.disabled = false; sb.textContent = 'An Kunden übergeben'; }
+    }
+  }
+  async function uebWiderrufen(id) {
+    if (!window.confirm('Diese Übergabe widerrufen? Der Link in der Mail funktioniert dann nicht mehr.')) return;
+    try { await api('/uebergaben/' + id + '/widerrufen', { method: 'POST', body: {} }); toast('Übergabe widerrufen'); loadUebergaben(); }
+    catch (e) { toast('Widerruf fehlgeschlagen'); }
   }
 
   // ── Cross-Account: freigegebenes Objekt read-only anzeigen ──
@@ -1120,11 +1227,117 @@ if (!window._pdfGold) {
     }, 1500);
   }
 
+  // ── v3317 · Objekt-Übergabe annehmen (läuft für ALLE, wie die Einladung) ──
+  /* Link aus der Mail: /?rp_uebergabe=<token>. Angemeldet -> Band mit "Objekt übernehmen"
+     (ausdrücklich, damit nicht ein falsches Konto das Objekt bekommt). Nicht angemeldet
+     -> Band mit Konto anlegen / anmelden; nach der Anmeldung wird übernommen. Danach
+     wird die Kopie geöffnet. */
+  var UEB_ANNAHME_FEHLER = {
+    schon_uebernommen: 'Dieses Objekt wurde schon übernommen.',
+    uebernommen: 'Dieses Objekt wurde schon übernommen.',
+    abgelaufen: 'Der Link ist abgelaufen - bitte deinen Ansprechpartner um eine neue Übergabe.',
+    widerrufen: 'Diese Übergabe wurde zurückgezogen.',
+    partnerkonto: 'Mit einem Partner-Konto lässt sich keine Übergabe annehmen - bitte mit dem Kundenkonto anmelden.',
+    mandant_anderer_partner: 'Dein Konto wird schon von einem anderen Partner betreut.',
+    objekt_geloescht: 'Das Objekt gibt es nicht mehr.',
+    uebergabe_nicht_gefunden: 'Diese Übergabe gibt es nicht.'
+  };
+  function _uebTokenWeg() {
+    try { localStorage.removeItem('rp_uebergabe_token'); } catch (e) {}
+    try { var q2 = new URLSearchParams(location.search); q2.delete('rp_uebergabe'); history.replaceState({}, '', location.pathname + (q2.toString() ? '?' + q2.toString() : '')); } catch (e) {}
+  }
+  async function handleUebergabe() {
+    var token = null;
+    try {
+      token = new URLSearchParams(location.search).get('rp_uebergabe');
+      if (token) { try { localStorage.setItem('rp_uebergabe_token', token); } catch (e) {} }
+      else { try { token = localStorage.getItem('rp_uebergabe_token'); } catch (e) {} }
+    } catch (e) {}
+    if (!token) return;
+    var info = null;
+    try {
+      var resp = await fetch('/api/v1/objekt-uebergabe/info?token=' + encodeURIComponent(token));
+      if (resp.ok) info = await resp.json(); else if (resp.status === 404) { _uebTokenWeg(); toast(UEB_ANNAHME_FEHLER.uebergabe_nicht_gefunden); return; }
+    } catch (e) {}
+    if (!info) return;
+    if (!info.valid) { _uebTokenWeg(); toast(UEB_ANNAHME_FEHLER[info.status] || 'Diese Übergabe ist nicht mehr gültig.'); return; }
+    var loggedIn = false; try { loggedIn = !!localStorage.getItem('ji_token'); } catch (e) {}
+    uebBand(token, info, loggedIn);
+  }
+  function uebBand(token, info, loggedIn) {
+    var alt = $('rp-ueb-band'); if (alt) alt.remove();
+    var ich = ''; try { var _s = Auth.getSession && Auth.getSession(); ich = (_s && _s.email) || ''; } catch (e) {}
+    var o = info.objekt || {};
+    var b = document.createElement('div'); b.id = 'rp-ueb-band';
+    b.style.cssText = 'position:fixed;left:0;right:0;bottom:0;z-index:99998;background:#0b0b0a;color:#fff;border-top:2px solid var(--wl-c9a84c, #C9A84C);padding:14px 22px;display:flex;align-items:center;gap:12px;font-family:Inter,sans-serif;font-size:13.5px;flex-wrap:wrap';
+    var knopf = 'background:linear-gradient(105deg,var(--wl-e8cc7a, #E8CC7A),var(--wl-c9a84c, #C9A84C),var(--wl-b8932f, #b8932f));color:var(--rp-tinte, #241c05);border:none;border-radius:8px;padding:9px 16px;font-weight:700;cursor:pointer;font-family:inherit';
+    var zweit = 'background:none;border:1px solid rgba(255,255,255,.2);color:#fff;border-radius:8px;padding:9px 14px;cursor:pointer;font-family:inherit';
+    var text = '<b style="color:var(--wl-e8cc7a, #E8CC7A)">' + esc(info.brand_name) + '</b> übergibt dir das Objekt <b>' + esc(o.adresse || '') + '</b>' +
+      (o.score != null ? ' (Score ' + esc(o.score) + (o.stufe ? ' · ' + esc(o.stufe) : '') + ')' : '') + '. ';
+    b.innerHTML = loggedIn
+      ? '<span style="flex:1;min-width:220px">' + text + 'Eine Kopie in dein Konto' + (ich ? ' <b>' + esc(ich) + '</b>' : '') + ' übernehmen?</span>' +
+        '<button id="rp-ueb-ja" style="' + knopf + '">Objekt übernehmen</button><button id="rp-ueb-x" style="' + zweit + '">Später</button>'
+      : '<span style="flex:1;min-width:220px">' + text + 'Leg ein Konto an' + (info.email ? ' (mit <b>' + esc(info.email) + '</b>)' : '') + ' oder melde dich an - danach liegt eine Kopie in deinem Konto.</span>' +
+        '<button id="rp-ueb-reg" style="' + knopf + '">Konto anlegen</button><button id="rp-ueb-login" style="' + zweit + '">Schon ein Konto</button><button id="rp-ueb-x" style="background:none;border:none;color:rgba(255,255,255,.5);cursor:pointer;font-size:18px;font-family:inherit">✕</button>';
+    document.body.appendChild(b);
+    $('rp-ueb-x').addEventListener('click', function () { b.remove(); });
+    if (loggedIn) { $('rp-ueb-ja').addEventListener('click', function () { uebAnnehmen(token); }); return; }
+    var inf = { email: info.email, display_name: info.anzeige_name };
+    $('rp-ueb-reg').addEventListener('click', function () { openAuth('register', inf); });
+    $('rp-ueb-login').addEventListener('click', function () { openAuth('login', inf); });
+    uebWatcher(token);
+  }
+  var _uebWatch = null;
+  function uebWatcher(token) {
+    if (_uebWatch) return;
+    var tries = 0;
+    _uebWatch = setInterval(function () {
+      tries++;
+      var li = false; try { li = !!localStorage.getItem('ji_token'); } catch (e) {}
+      if (li) { clearInterval(_uebWatch); _uebWatch = null; setTimeout(function () { uebAnnehmen(token); }, 900); }
+      if (tries > 400) { clearInterval(_uebWatch); _uebWatch = null; }
+    }, 1500);
+  }
+  var _uebLaeuft = false;
+  async function uebAnnehmen(token) {
+    if (_uebLaeuft) return; _uebLaeuft = true;
+    var b = $('rp-ueb-band');
+    try {
+      var r = await Auth.apiCall('/objekt-uebergabe/uebernehmen', { method: 'POST', body: { token: token } });
+      _uebTokenWeg(); if (b) b.remove();
+      toast('✓ Objekt von ' + (r.brand_name || 'deinem Partner') + ' übernommen' + (r.seat_assigned ? ' - Zugang freigeschaltet' : ''));
+      /* neuer Mandant: Marke und Plan frisch laden, die Kopie öffnet sich nach dem Neuladen (rp_offen) */
+      if (r.neuer_mandant) { setTimeout(function () { location.href = location.pathname + '?rp_offen=' + encodeURIComponent(r.object_id); }, 1100); return; }
+      setTimeout(function () { try { if (typeof window.loadSaved === 'function') window.loadSaved(r.object_id); if (typeof window.renderSaved === 'function') window.renderSaved(); } catch (e) {} }, 300);
+    } catch (e) {
+      var code = e && e.message;
+      if (e && (e.status === 409 || e.status === 410 || e.status === 404) && code !== 'partnerkonto' && code !== 'mandant_anderer_partner') _uebTokenWeg();
+      if (b) b.remove();
+      toast(UEB_ANNAHME_FEHLER[code] || ('Übernahme fehlgeschlagen' + (code ? ': ' + code : '')));
+    } finally { _uebLaeuft = false; }
+  }
+  /* nach dem Neuladen (neuer Mandant): die Kopie öffnen */
+  function uebOffen() {
+    var id = null; try { id = new URLSearchParams(location.search).get('rp_offen'); } catch (e) {}
+    if (!id || !/^[0-9a-f-]{36}$/i.test(id)) return;
+    try { var q2 = new URLSearchParams(location.search); q2.delete('rp_offen'); history.replaceState({}, '', location.pathname + (q2.toString() ? '?' + q2.toString() : '')); } catch (e) {}
+    var n = 0;
+    (function versuch() {
+      n++;
+      if (typeof window.loadSaved === 'function' && window.Auth && Auth.isLoggedIn && Auth.isLoggedIn()) {
+        setTimeout(function () { try { window.loadSaved(id); if (typeof window.renderSaved === 'function') window.renderSaved(); } catch (e) {} }, 1500);
+        return;
+      }
+      if (n < 20) setTimeout(versuch, 700);
+    })();
+  }
+
   // ── Boot ───────────────────────────────────────────────────
   var _mo = new MutationObserver(function () { if (_st.gated) { try { ensureEntry(); } catch (e) {} } });
   async function boot() {
     try {
       await handleInvite();
+      if (!_st._uebGelaufen) { _st._uebGelaufen = true; try { await handleUebergabe(); uebOffen(); } catch (e) {} }   /* v3317 · einmal je Seite, boot() laeuft bis zu siebenmal */
       _st.gated = await isPartner(); if (!_st.gated) return false;
       fixPlanLabel();
       handleReturn();
@@ -1185,5 +1398,7 @@ if (!window._pdfGold) {
   })(0);
 
   window.openResellerPortal = openResellerPortal;
-  window.DealPilotResellerPortal = { boot: boot, open: openResellerPortal };
+  window.DealPilotResellerPortal = { boot: boot, open: openResellerPortal,
+    /* v3317 · direkt in "Übergeben" öffnen, optional mit vorgewähltem Objekt */
+    uebergeben: function (objectId) { if (objectId) _st.uebObj = objectId; _st.sec = 'ueberg'; if (_st.open) go('ueberg'); else openResellerPortal(); } };
 })();

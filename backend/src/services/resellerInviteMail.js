@@ -15,6 +15,13 @@
  *   - Absendername: der Partner (mailerService fromName), Adresse bleibt
  *     technisch info@dealpilot.immo; Reply-To an die Partner-Kontaktadresse.
  * OHNE Partner-Branding ist die Mail inhaltlich wie vorher.
+ *
+ * v3317 · Der Rahmen (Kopf mit Logo, Akzentlinie, Fuss "Plattform: DealPilot",
+ * Absendername, Reply-To) ist jetzt ein eigener Baustein: marke(r) + rahmen().
+ * Grund: die Objekt-Uebergabe (services/objektUebergabe.js) schickt eine zweite
+ * Partner-Mail und soll GENAU denselben Rahmen tragen, nicht einen nachgebauten.
+ * Die Einladung ist Zeichen fuer Zeichen dieselbe wie vorher (Vergleich alt/neu
+ * in tools/objekt-uebergabe-pruefen.mjs, Abschnitt RAHMEN).
  */
 const { sendMail } = require('./mailerService');
 const { logoUrl } = require('../routes/partnerLogo');
@@ -39,15 +46,14 @@ function _knopfText(hex) {
 }
 
 /**
- * @param {object} p
- *   p.email, p.displayName, p.link
- *   p.reseller { id, name, brand_name, brand_logo_b64, brand_accent, brand_mail_accent,
- *                whitelabel_enabled, brand_email, brand_website, brand_company,
- *                hat_variante, stand, basis }
+ * Die Marke eines Partners fuer eine Mail (v3317 aus sendInvite herausgeloest).
+ * @param r { id, name, brand_name, brand_logo_b64, brand_accent, brand_mail_accent,
+ *            whitelabel_enabled, brand_email, brand_website, brand_company,
+ *            hat_variante, stand, basis }
  */
-async function sendInvite(p) {
-  var r = p.reseller || {};
-  var wl = r.whitelabel_enabled && r.brand_name;
+function marke(r) {
+  r = r || {};
+  var wl = !!(r.whitelabel_enabled && r.brand_name);
   var brandName = wl ? r.brand_name : (r.name || 'DealPilot');
   /* W9-mailaccent: Die Mail-Farbe ist vom App-Akzent entkoppelt (Entscheidung 15.07.).
      brand_mail_accent hat Vorrang; leer/NULL -> Fallback auf brand_accent. */
@@ -71,6 +77,46 @@ async function sendInvite(p) {
         (site ? ' · <a href="' + esc(siteHref) + '" style="color:#8a8473;text-decoration:none">' + esc(site.replace(/^https?:\/\//i, '')) + '</a>' : '') +
         '<br>Plattform: DealPilot</p>'
     : '';
+  var textFuss = wl ? '\n\n' + (r.brand_company || brandName) + (site ? ' · ' + site : '') + '\nPlattform: DealPilot' : '';
+  var replyTo = (wl && /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(r.brand_email || '')) ? r.brand_email : undefined;
+
+  return { wl: wl, brandName: brandName, accent: accent, logoHtml: logoHtml, fussPartner: fussPartner,
+           textFuss: textFuss, replyTo: replyTo, from: getMailFrom(brandName), fromName: wl ? brandName : undefined };
+}
+
+/** Akzent-Knopf in der Partnerfarbe. */
+function knopf(m, label, link) {
+  return '<a href="' + esc(link) + '" style="background:' + esc(m.accent) + ';color:' + _knopfText(m.accent) + ';font-weight:700;' +
+    'padding:13px 26px;border-radius:9px;text-decoration:none;font-size:14px;display:inline-block">' +
+    label + '</a>';
+}
+
+/** Der Rahmen: Kopf mit Logo, Akzentlinie, Inhalt, Fuss des Partners. `innen` ist fertiges HTML. */
+function rahmen(m, innen) {
+  return '<div style="max-width:560px;margin:0 auto;font-family:Helvetica,Arial,sans-serif;background:#fff;border:1px solid #e6e0d4;border-radius:14px;overflow:hidden">' +
+      '<div style="background:#0b0b0a;padding:22px 26px">' + m.logoHtml + '</div>' +
+      '<div style="background:linear-gradient(105deg,' + esc(m.accent) + ',' + esc(m.accent) + ');height:4px"></div>' +
+      '<div style="padding:26px 28px;color:#1c1a17">' +
+        innen + m.fussPartner +
+      '</div>' +
+    '</div>';
+}
+
+/** Versand mit Absendername und Reply-To des Partners. */
+function senden(m, opts) {
+  return sendMail({ from: m.from, fromName: m.fromName, replyTo: m.replyTo,
+                    to: opts.to, subject: opts.subject, text: opts.text, html: opts.html,
+                    attachments: opts.attachments });
+}
+
+/**
+ * @param {object} p
+ *   p.email, p.displayName, p.link
+ *   p.reseller  siehe marke()
+ */
+async function sendInvite(p) {
+  var m = marke(p.reseller);
+  var wl = m.wl, brandName = m.brandName;
 
   var subject = wl ? brandName + ' lädt dich ein' : brandName + ' lädt dich zu DealPilot ein';
   var absatz = wl
@@ -80,33 +126,23 @@ async function sendInvite(p) {
       'Immobilien-Investitionsanalyse. Du bekommst einen eigenen Zugang, mit dem du Objekte ' +
       'erfassen und zur Prüfung freigeben kannst.';
 
-  var html =
-    '<div style="max-width:560px;margin:0 auto;font-family:Helvetica,Arial,sans-serif;background:#fff;border:1px solid #e6e0d4;border-radius:14px;overflow:hidden">' +
-      '<div style="background:#0b0b0a;padding:22px 26px">' + logoHtml + '</div>' +
-      '<div style="background:linear-gradient(105deg,' + esc(accent) + ',' + esc(accent) + ');height:4px"></div>' +
-      '<div style="padding:26px 28px;color:#1c1a17">' +
+  var html = rahmen(m,
         '<p style="font-size:15px;margin:0 0 14px">Hallo ' + esc(p.displayName) + ',</p>' +
         '<p style="font-size:14px;line-height:1.6;color:#3a352c">' + absatz + '</p>' +
         '<p style="text-align:center;margin:24px 0">' +
-          '<a href="' + esc(p.link) + '" style="background:' + esc(accent) + ';color:' + _knopfText(accent) + ';font-weight:700;' +
-          'padding:13px 26px;border-radius:9px;text-decoration:none;font-size:14px;display:inline-block">' +
-          'Einladung annehmen &amp; Konto anlegen</a>' +
+          knopf(m, 'Einladung annehmen &amp; Konto anlegen', p.link) +
         '</p>' +
         '<p style="font-size:12px;color:#8a8473;line-height:1.6">Oder kopiere diesen Link:<br>' + esc(p.link) + '</p>' +
         '<p style="font-size:12px;color:#8a8473;border-top:1px solid #eee;padding-top:14px;margin-top:18px">' +
           'Der Link ist 21 Tage gültig. Wenn du nichts damit anfangen kannst, ignoriere diese Mail einfach.' +
-        '</p>' + fussPartner +
-      '</div>' +
-    '</div>';
+        '</p>');
 
   var text = 'Hallo ' + p.displayName + ',\n\n' +
     (wl ? brandName + ' lädt dich ein.\n' : brandName + ' lädt dich zu DealPilot ein.\n') +
     'Einladung annehmen und Konto anlegen:\n' + p.link + '\n\nDer Link ist 21 Tage gültig.' +
-    (wl ? '\n\n' + (r.brand_company || brandName) + (site ? ' · ' + site : '') + '\nPlattform: DealPilot' : '');
+    m.textFuss;
 
-  var replyTo = (wl && /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(r.brand_email || '')) ? r.brand_email : undefined;
-  return sendMail({ from: getMailFrom(brandName), fromName: wl ? brandName : undefined, replyTo: replyTo,
-                    to: p.email, subject: subject, text: text, html: html });
+  return senden(m, { to: p.email, subject: subject, text: text, html: html });
 }
 
-module.exports = { sendInvite: sendInvite };
+module.exports = { sendInvite: sendInvite, marke: marke, rahmen: rahmen, knopf: knopf, senden: senden, esc: esc };

@@ -424,6 +424,8 @@ app.use('/api/v1/marktbericht', marktberichtRoutes);  // v539: Marktbericht-Prox
 app.use('/api/v1', resellerRoutes);  // V200
 app.use('/api/v1/reseller', require('./routes/resellerPortal'));  // reseller-portal-p3
 app.use('/api/v1/reseller-invite', require('./routes/resellerInvite'));  // reseller-invite-p5
+app.use('/api/v1/objekt-uebergabe', rateLimit({ windowMs: 60000, max: 60 }), require('./routes/objektUebergabe'));  // v3317 · Objekt an Kunden uebergeben (Kundenseite)
+app.use('/api/v1/public/objekt-uebergabe', rateLimit({ windowMs: 60000, max: 240 }), require('./routes/objektUebergabe').bildRouter);  // v3317 · Titelfoto der Uebergabe-Mail
 app.use('/api/v1/admin-reseller', require('./routes/resellerAdminPanel'));  // reseller-admin-panel-p7
 /* v1423: Rabattcodes im Admin. Eigener Pfad statt Unterpfad von
    /api/v1/admin — dort haengt bereits admin.js mit eigenen :id-Routen,
