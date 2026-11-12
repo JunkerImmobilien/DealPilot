@@ -8718,7 +8718,7 @@
      80 % → Gut), A3b Bewertung/Prüfsteine/Zielkaufpreis im Quick-Check, A5b Investor Deal Score (24 von 24 Kennzahlen),
      A8 Variante „Optimiert“ (Boden −20 %). Objekt A trägt seither 690.000 €, das Hausfoto, geb_ant 80,72 und eine neue Pilot-Analyse. */
   var QG_A = '46b268c1-4871-4a5e-b9ef-bda5e03e38fc', QG_B = '3888ccb6-cb2d-4b60-b56a-45874930f295';
-  var QG_PFAD = 'messe-dateien/am-quittengarten-12/', QG_BUSTER = 'v3330e';   /* v3330e: Mitschnitt neu (Auslese, BMF 690.000 €); v3330d: Exposé mit 690.000 € und Hausfoto (Marcel 12.11.: Score bei 100 % Solide) */
+  var QG_PFAD = 'messe-dateien/am-quittengarten-12/', QG_BUSTER = 'v3330f';   /* v3330f: Kegel Wahl-Tafel, Titelbild; v3330e: Mitschnitt neu (Auslese, BMF 690.000 €); v3330d: Exposé mit 690.000 € und Hausfoto (Marcel 12.11.: Score bei 100 % Solide) */
   var QG_DATEIEN = ['01-expose-am-quittengarten-12.pdf', '02-mieterliste-am-quittengarten-12.pdf', '03-energieausweis-am-quittengarten-12.pdf'];
   var _qg = { geladen: false };
   window.DPM_QG = window.DPM_QG || {};
@@ -9053,6 +9053,11 @@
           await r19Seite(bank, 1);
           var K = r19K();
           await b2oZeile(s, 'Seite 1', 'Kaufpreis <b>' + (eur(K.kp) || '–') + '</b>, Gesamtinvestition ' + (eur(K.gi) || '–') + '.');
+          /* v3330d · Marcel 12.11.: das Titelbild ganz zeigen - das Hausfoto aus dem Exposé */
+          if (window.imgs && window.imgs.length) {
+            await r19Seite(bank, 1, 260);
+            await b2oZeile(s, 'Das Titelbild', 'Das Foto aus dem Exposé — beim Einlesen <b>als Objektfoto übernommen</b>.');
+          }
           var kz = r19Stelle(/^KENNZAHLEN|^KENNZAHL/, 2);
           await r19Seite(bank, kz.seite, kz.oben);
           await b2oZeile(s, 'Die Kennzahlen', 'Rendite, Cashflow, DSCR, Beleihungsauslauf — mit Ampeln.');
@@ -9083,16 +9088,21 @@
            (das Objekt trägt den Gebäudeanteil der Variante seit 12.11. selbst, geb_ant 80,72) */
         for (var i = 0; i < 4 && r6BmfPane() && r6BmfPane().id !== 'p-hebel' && r6BmfPane().id !== 'p-boden'; i++) await r6BmfWeiter();
         await warte(800);
-        var ko = function () { return r6BmfKarte('optimiert'); };
-        if (ko()) {
+        /* GEMESSEN im Prüflauf 12.11.: Schritt 4 ist die Wahl-Tafel (DpBmfWahlTafel), Knopf button[data-tafel];
+           die Karten mit _v292SelectVariant liegen dort unsichtbar (Rechteck 0) - der Kegel stand daneben. */
+        var kb = function () { var b = q('#bmfOverlay .bmfmo-pane.active button[data-tafel="optimiert"]'); return b && b.offsetWidth ? b : null; };
+        var ko = function () { var b = kb(); if (!b) return r6BmfKarte('optimiert'); var r = b.parentElement; while (r && r.parentElement && !/Optimiert/.test(r.textContent)) r = r.parentElement; return r || b; };
+        if (ko() && ko().offsetWidth) {
           var b0 = ko(); r6BmfOben(b0); await warte(500);
           await zeige(ko, 8);
           var V = null; try { V = window._v292State.response.phase5_varianten.optimiert; } catch (e) {}
           await b2oZeile(s, 'Optimiert', 'Boden mit 20 % Abschlag' + (V ? ': Boden <b>' + String(V.boden_pct).replace('.', ',') + ' %</b>, Gebäude <b>' + String(V.gebaeude_pct).replace('.', ',') + ' %</b>' : '') + '.');
-          var k1 = ko(); if (k1) k1.click();
+          var k1 = kb(); if (k1) { if (/Wählen/.test(r6Text(k1))) k1.click(); } else { var k2 = r6BmfKarte('optimiert'); if (k2) k2.click(); }
+          try { if (window._v292State && _v292State.selectedVariant !== 'optimiert') window._v292SelectVariant('optimiert'); } catch (e) {}
           DPM_QG.a8v = { gewaehlt: window._v292State && _v292State.selectedVariant, boden_pct: V && V.boden_pct };
           await warte(900);
         }
+        try { if (window._v292State && _v292State.selectedVariant !== 'optimiert') window._v292SelectVariant('optimiert'); } catch (e) {}
         for (var i2 = 0; i2 < 3 && r6BmfPane() && r6BmfPane().id !== 'p-boden'; i2++) await r6BmfWeiter();
         await warte(800);
         var kart = function () { var p = r6BmfPane(); var e = p && rhIm(p, /^Gebäudeanteil$/i); return e && (e.closest('div[style*="grid"]') || e.parentElement && e.parentElement.parentElement) || p; };
