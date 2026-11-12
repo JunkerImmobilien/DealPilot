@@ -61,7 +61,9 @@ router.get('/schnellcheck', schnellLimit, async (req, res) => {
   const q = '?plz=' + plz + (ort ? '&ort=' + encodeURIComponent(ort) : '');
   const [lage, miete] = await Promise.all([mbJson('/lage/gemessen' + q, 8000), mbJson('/zensus/fortgeschrieben' + q, 6000)]);
   const gem = lage && lage.gebiet && lage.gebiet.gemeinde_ags;
-  const ms = gem ? await mbJson('/mietspiegel?ags=' + encodeURIComponent(gem), 4000) : null;
+  /* landing-dealcheck-5: Einwohnerzahl, Kappungsgrenze, Mietpreisbremse (mb /schnell/ort, nur eigene Daten) */
+  const [ms, ort2] = gem ? await Promise.all([mbJson('/mietspiegel?ags=' + encodeURIComponent(gem), 4000),
+    mbJson('/schnell/ort?ags=' + encodeURIComponent(gem), 4000)]) : [null, null];
   const fe = (lage && lage.felder) || {};
   const d = {
     plz, gebiet: (miete && miete.available && miete.gebiet) || null, gemeinde_eindeutig: !!gem,
@@ -69,6 +71,9 @@ router.get('/schnellcheck', schnellLimit, async (req, res) => {
     bevoelkerung: kachelAusFeld(fe.ds2_bevoelkerung),
     leerstand: kachelAusFeld(fe.ds2_mietausfall),
     miete: miete && miete.available && miete.qm > 0 ? { qm: miete.qm, ebene: miete.ebene || null, monat: miete.fortgeschrieben_auf || null } : null,
+    einwohner: ort2 && ort2.einwohner ? ort2.einwohner : null,
+    kappung: ort2 && ort2.kappung ? { pct: ort2.kappung.pct, verordnung: ort2.kappung.herkunft === 'verordnung', pruefen: ort2.kappung.pruefen, text: ort2.kappung.text } : null,
+    mietpreisbremse: ort2 && ort2.mietpreisbremse ? { gilt: ort2.mietpreisbremse.gilt, bis: ort2.mietpreisbremse.bis, pruefen: ort2.mietpreisbremse.pruefen, text: ort2.mietpreisbremse.text } : null,
     mietspiegel: ms && ms.art ? { art: ms.art, gemeinde: ms.gemeinde || null, stand: ms.stand || null } : (ms ? { art: null } : null),
     quellen: 'Amtliche Daten: Regionaldatenbank der Statistischen Ämter, Zensus 2022, Destatis-Nettokaltmietenindex, Mietspiegel der Gemeinde',
     lizenz: 'dl-de/by-2-0'

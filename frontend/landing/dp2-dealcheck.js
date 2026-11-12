@@ -224,7 +224,7 @@
     setze('dkLageTitel', 'Lage & Markt · PLZ ' + plz);
     setze('dkLageQ', '');
     g.innerHTML = '';
-    for (var i = 0; i < 4; i++) { var l = document.createElement('div'); l.className = 'dk-lk laedt'; g.appendChild(l); }
+    for (var i = 0; i < 6; i++) { var l = document.createElement('div'); l.className = 'dk-lk laedt'; g.appendChild(l); }
     fetch(appApi() + '/market-stats/schnellcheck?plz=' + plz)
       .then(function (r) { return r.ok ? r.json() : (r.status === 429 ? { _bremse: true } : null); })
       .then(function (d) {
@@ -234,17 +234,31 @@
         if (d.gebiet) setze('dkLageTitel', 'Lage & Markt · ' + String(d.gebiet).split(',')[0]);
         var k = [];
         if (d.makrolage) k.push(kachel('Makrolage', d.makrolage.wert + ' / 100', d.makrolage.wort, d.makrolage.ton));
-        if (d.bevoelkerung) k.push(kachel('Einwohner', (d.bevoelkerung.wert > 0 ? '+' : d.bevoelkerung.wert < 0 ? '−' : '±') + dez(Math.abs(d.bevoelkerung.wert), 1) + ' %/J', d.bevoelkerung.wort, d.bevoelkerung.ton));
+        /* landing-dealcheck-5 · Marcel 12.11.2026 „es gibt nichts zu den Einwohnern": die Zahl selbst, mit Ebene
+           (Gemeinde oder Kreis) und Entwicklung; ohne Zahl bleibt die Entwicklung allein wie bisher. */
+        var bv = d.bevoelkerung, ew = d.einwohner;
+        var trend = bv ? (bv.wert > 0 ? '+' : bv.wert < 0 ? '−' : '±') + dez(Math.abs(bv.wert), 1) + ' %/J' : null;
+        if (ew && ew.wert > 0) k.push(kachel(ew.ebene === 'gemeinde' ? 'Einwohner' : 'Einwohner Kreis', Math.round(ew.wert).toLocaleString('de-DE'),
+          (bv ? bv.wort + ' · ' + trend : (ew.fuenf_jahre_pct != null ? (ew.fuenf_jahre_pct > 0 ? '+' : '') + dez(ew.fuenf_jahre_pct, 1) + ' % in 5 J.' : 'Stand ' + ew.jahr)), bv ? bv.ton : null));
+        else if (bv) k.push(kachel('Einwohner', trend, bv.wort, bv.ton));
         if (d.leerstand) k.push(kachel('Leerstand', dez(d.leerstand.wert, 1) + ' %', d.leerstand.wort + ' · Zensus', d.leerstand.ton));
         if (d.miete) {
           var art = d.mietspiegel && d.mietspiegel.art;
-          var ms = art === 'qualifiziert' ? 'qualif. Mietspiegel' : art === 'einfach' ? 'einf. Mietspiegel' : art ? 'Mietspiegel' : 'Bestandsmiete';
-          k.push(kachel('Miete Ø je m²', dez(d.miete.qm, 2) + ' €', ms, null));
+          /* landing-dealcheck-5 · Marcel 12.11.2026 „die Miete ist sehr gering": es ist der Durchschnitt ALLER laufenden
+             Mietverträge (Zensus, fortgeschrieben) - alte Verträge ziehen ihn nach unten, Neuvermietung liegt meist darüber.
+             Das steht jetzt an der Kachel; bis hierhin stand dort die Art des Mietspiegels, als wäre es dessen Wert. */
+          k.push(kachel('Bestandsmiete Ø', dez(d.miete.qm, 2) + ' €/m²', 'alle laufenden Verträge', null));
+        }
+        if (d.kappung && d.kappung.pct) k.push(kachel('Kappungsgrenze', d.kappung.pct + ' % in 3 J.',
+          d.kappung.verordnung ? 'Landesverordnung' : 'gesetzlich', null));
+        if (d.mietpreisbremse && d.mietpreisbremse.gilt != null) {
+          var bis = d.mietpreisbremse.bis && /^\d{4}-\d{2}/.test(d.mietpreisbremse.bis) ? 'bis ' + d.mietpreisbremse.bis.slice(5, 7) + '/' + d.mietpreisbremse.bis.slice(0, 4) : 'Neuvermietung';
+          k.push(kachel('Mietpreisbremse', d.mietpreisbremse.gilt ? 'gilt' : 'keine', d.mietpreisbremse.gilt ? bis : 'nicht in der Verordnung', null));
         }
         if (!k.length) { setze('dkLageQ', 'Für diese PLZ liegen uns noch keine amtlichen Lagedaten vor – in der App gibt es den vollen Marktbericht.'); return; }
         k.forEach(function (x, i) { x.style.animationDelay = (i * 90) + 'ms'; g.appendChild(x); });
         var mo = d.miete && d.miete.monat && /^\d{4}-\d{2}$/.test(d.miete.monat) ? d.miete.monat.slice(5) + '/' + d.miete.monat.slice(0, 4) : null;
-        setze('dkLageQ', 'Amtliche Daten: Regionaldatenbank, Zensus 2022' + (mo ? ' (Miete fortgeschrieben auf ' + mo + ')' : '') + (d.mietspiegel && d.mietspiegel.art ? ', Mietspiegel der Gemeinde' : '') + '.');
+        setze('dkLageQ', 'Amtliche Daten: Regionaldatenbank, Zensus 2022' + (mo ? ' (Miete fortgeschrieben auf ' + mo + ')' : '') + (d.mietspiegel && d.mietspiegel.art && d.mietspiegel.art !== 'unklar' ? ', ' + (d.mietspiegel.art === 'qualifiziert' ? 'qualifizierter' : d.mietspiegel.art === 'einfach' ? 'einfacher' : '') + ' Mietspiegel der Gemeinde vorhanden' : '') + (d.kappung || d.mietpreisbremse ? ', Landesverordnungen nach § 558 Abs. 3 und § 556d BGB' : '') + (d.einwohner && d.einwohner.ebene === 'kreis' ? '; Einwohner auf Kreisebene' : '') + '.');
       })
       .catch(function () { if (n === lauf) { g.innerHTML = ''; setze('dkLageQ', 'Lage & Markt gerade nicht abrufbar.'); } });
   }

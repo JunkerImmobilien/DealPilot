@@ -18,6 +18,7 @@ import { indexreihen } from '../lib/indexreihen.js';                            
 import { mietspiegelFuer } from '../lib/mietspiegel/verzeichnis.js';              /* v3250 */
 import { mietspiegelMitWerten } from '../lib/mietspiegel/werte.js';               /* v3255 */
 import { mietspiegelMitNaeherung } from '../lib/mietspiegel/naeherung.js';       /* v3266 */
+import { kappungFuer, mietpreisbremseFuer } from '../lib/kappung.js';           /* landing-dealcheck-5 */
 import { zensusMieteAmStichtag, nkmIndexAm, NKM_INDEX } from '../lib/zensus_miete.js';   /* v3028 */
 import { GeoMapImportService } from '../services/GeoMapImportService.js';
 import { GeoMapConnector } from '../connectors/GeoMapConnector.js';
@@ -1067,6 +1068,35 @@ router.get('/mietspiegel', async (req, res) => {
       "SELECT dimension, auspraegung, auspraegung_text, wert, gebiet_name FROM mb.zensus_werte WHERE ebene = 'gemeinde' AND kennzahl = 'nettokaltmiete_qm' AND ags = $1",
       [ags]));
     res.json(satz);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+// landing-dealcheck-5 · GET /schnell/ort?ags=05758012 — Zusatz für den Deal-Check der Landing (Marcel 12.11.2026:
+// „es gibt nichts zu den Einwohnern … angeben, ob dort eine Mietpreisbremse und Kappungsgrenze ist?").
+// Nur eigene Tabellen und Dateien, kein Kontingent: Einwohnerzahl aus mb.makro_werte (Regionaldatenbank,
+// Gemeinde wenn vorhanden, sonst Kreis - die Ebene steht in der Antwort), Kappungsgrenze und Mietpreisbremse
+// aus lib/data/kappungsgrenzen.json (Spiegel der App-Liste, Landesverordnungen).
+router.get('/schnell/ort', async (req, res) => {
+  try {
+    const ags = String(req.query.ags || '').replace(/\D/g, '');
+    if (ags.length !== 8) return res.status(400).json({ error: 'ags (8-stellig) erforderlich' });
+    const rows = await q(
+      "SELECT ags, gebiet_name, jahr, wert FROM mb.makro_werte WHERE kennzahl = 'bevoelkerung' AND ags = ANY($1) AND wert > 0 ORDER BY length(ags) DESC, jahr DESC",
+      [[ags, ags.slice(0, 5)]]);
+    let einwohner = null;
+    if (rows.length) {
+      const eb = rows[0].ags, reihe = rows.filter((r) => r.ags === eb);
+      const j = reihe[0], vj = reihe.find((r) => r.jahr === j.jahr - 1), f5 = reihe.find((r) => r.jahr === j.jahr - 5);
+      const pct = (a, b) => (b && Number(b.wert) > 0 ? Math.round((Number(a.wert) / Number(b.wert) - 1) * 1000) / 10 : null);
+      einwohner = { wert: Number(j.wert), jahr: j.jahr, ebene: eb.length === 8 ? 'gemeinde' : 'kreis', gebiet: j.gebiet_name || null,
+        vorjahr_pct: pct(j, vj), fuenf_jahre_pct: pct(j, f5), stichtag: j.jahr + '-12-31' };
+    }
+    const k = kappungFuer(ags), b = mietpreisbremseFuer(ags);
+    res.set('Cache-Control', 'public, max-age=3600').json({
+      ags, einwohner,
+      kappung: { pct: k.pct, herkunft: k.herkunft, pruefen: !!k.pruefen, text: k.text, url: k.url || null },
+      mietpreisbremse: { gilt: b.gilt, bis: b.bis || null, pruefen: !!b.pruefen, text: b.text, url: b.url || null }
+    });
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 

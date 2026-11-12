@@ -94,7 +94,7 @@
 .dk-lage-k{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
 .dk-lage-k span{font:700 10px/1.2 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:rgba(236,230,214,.6);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .dk-lage-k a{font:600 11px/1 var(--body);color:var(--gdh);white-space:nowrap;text-decoration:none}
-.dk-lage-g{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.dk-lage-g{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
 .dk-lk{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:9px;padding:8px 8px 7px;display:flex;flex-direction:column;gap:4px;min-width:0;
   opacity:0;transform:translateY(6px);animation:dkRein .45s ease forwards}
 .dk-lk span{font:600 8.5px/1.2 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:rgba(236,230,214,.5)}

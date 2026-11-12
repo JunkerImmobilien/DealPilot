@@ -208,3 +208,37 @@ export function erhoehungspfad558(istJahr, ansatzJahr, lzsPct, kappungPct, rndJa
     + ', danach alle drei Jahre um die Kappungsgrenze von ' + kappungPct + ' %, höchstens bis zur marktüblichen Miete';
   return out;
 }
+
+/* ══ landing-dealcheck-5 · Mietpreisbremse (§ 556d Abs. 1 BGB) je Gemeinde (Marcel 12.11.2026:
+   „können wir angeben, ob dort eine Mietpreisbremse und Kappungsgrenze ist?") ══════════════════
+   Dieselbe Entscheidung wie frontend/js/mietpotenzial-kern.js mietpreisbremseAus() mit AGS - dort ist
+   sie die Rechnung der App, hier der Spiegel fürs Backend (das Image enthält frontend/ nicht).
+   tools/mietrecht-spiegel-pruefen.mjs vergleicht beide über jede AGS der Liste und je Land eine fremde. */
+const voKurz = (voll) => {
+  voll = String(voll || ''); let kl = /\(([^)]+)\)/.exec(voll);
+  if (kl && /^\s*(§|\d)/.test(kl[1])) kl = null;
+  return kl ? kl[1].split(/\s[–—-]\s/)[0] : voll.split(' vom ')[0];
+};
+const deDatum = (iso) => (/^\d{4}-\d{2}-\d{2}$/.test(iso || '') ? iso.split('-').reverse().join('.') : '');
+export function mietpreisbremseFuer(ags, heute = new Date()) {
+  const leer = (warum) => ({ gilt: null, pruefen: true, text: 'Mietpreisbremse: ' + warum + ', bitte prüfen.' });
+  const K = liste();
+  if (!K || !K.laender) return leer('die Liste der Landesverordnungen liegt nicht vor');
+  const a = String(ags || '').replace(/\D/g, '');
+  if (a.length !== 8) return leer('Gemeinde noch nicht ermittelt');
+  const L = K.laender[PRAEFIX[a.slice(0, 2)]];
+  if (!L) return leer('Land nicht in der Liste');
+  const g = (Array.isArray(L.gemeinden) ? L.gemeinden : []).find((x) => x && x.ags === a) || null;
+  const tag = heute instanceof Date ? heute.toISOString().slice(0, 10) : String(heute);
+  const V = L.mietpreisbremse_verordnung || {};
+  const vo = voKurz(V.verordnung || L.verordnung);
+  if (g && g.mietpreisbremse) {
+    const bis = g.mietpreisbremse_gueltig_bis || V.gueltig_bis || L.gueltig_bis || null;
+    if (bis && bis < tag) return { gilt: null, pruefen: true, bis, herkunft: 'ausgelaufen',
+      text: 'Mietpreisbremse: die Verordnung (' + vo + ') ist am ' + deDatum(bis) + ' ausgelaufen, bitte prüfen.' };
+    return { gilt: true, pruefen: !!L.unsicher, bis, verordnung: vo, url: V.url || L.url || null, name: g.name || '',
+      text: 'Mietpreisbremse gilt' + (bis ? ' bis ' + deDatum(bis) : '') + ' (' + vo + ')' + (L.unsicher ? ' — Landesliste unsicher, bitte prüfen.' : '.') };
+  }
+  return { gilt: false, pruefen: !!L.unsicher, url: V.url || L.url || null, verordnung: vo,
+    text: 'Keine Mietpreisbremse: die Gemeinde steht nicht in der ' + vo + (L.unsicher ? ' — Landesliste unsicher, bitte prüfen.' : '.') };
+}
