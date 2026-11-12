@@ -1232,9 +1232,11 @@
       + (A.unv.length ? ' · ' + A.unv.length + ' ohne Zielbild' : '')
       + (A.ohne.length ? ' · ' + A.ohne.length + ' ohne Angaben' : '');
     var KZ = (window.DpPotenzial && DpPotenzial.KENNZEICHNUNG) || 'Die Ertragswerte nach Mieterhöhung und im Zielbild sind ein Ausblick, kein Verkehrswert nach § 194 BauGB.';
-    var kopf = '<div class="cpk-h"><span class="cpk-ico"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17l6-6 4 4 8-8M15 7h6v6"/></svg></span>'
-      + '<span>Bestand &amp; Zielbild</span><em title="' + esc(KZ) + '">Potenzialwert · Plan, kein Verkehrswert</em></div>'
-      + '<div class="zb-zahl">' + kopfZahl + '</div>';
+    /* v3325 · Marcel 12.11.2026: „Bestand & Zielbild" stand als Abschnittskopf (03) und als
+       Kartenkopf doppelt untereinander. Der Kartenkopf ist raus; sein Hinweis „Potenzialwert ·
+       Plan, kein Verkehrswert" steht jetzt im Abschnittskopf (Tag, Erklärung im title). */
+    var kopf = '<div class="zb-zahl" title="' + esc(KZ) + '">' + kopfZahl + '</div>';
+    try { var _zbTag = document.querySelector('#dp-stage [data-sek="zielbild"] .tag'); if (_zbTag) _zbTag.title = KZ; } catch (e) {}
     function knopf(key, txt){ return key ? '<button type="button" class="zb-btn" onclick="DealPilotDashboard.zumZielbild(\''+esc(key)+'\')">'+(txt||'Im Objekt öffnen')+' ›</button>' : ''; }
     /* v3321 · Marcel 12.11.2026: „Am Markt und Bäckerstraße … Im Objekt öffnen - das verstehe
        ich nicht." Die Objekte „nur Mieterhöhung" (A.hinweise) stehen schon in der Tabelle mit
@@ -2656,7 +2658,18 @@
         var meta = ch.getDatasetMeta(1); if (!meta || meta.hidden) return;
         var ctx = ch.ctx; ctx.save();
         ctx.font = '700 10px "JetBrains Mono", ui-monospace, monospace'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-        meta.data.forEach(function (pt, i) { ctx.fillStyle = i === 0 ? (isDark() ? '#0a0805' : '#fff') : '#fff'; ctx.fillText(i === 0 ? 'A' : String(i), pt.x, pt.y + 0.5); });
+        /* v3325: liegen zwei Punkte fast aufeinander (gemessen 390 px: „A" und „1" 6 px
+           übereinander), steht die Nummer des späteren ÜBER seinem Punkt statt darin;
+           ist auch dort kein Platz, entfällt sie (die Tabelle führt jede Nummer). */
+        var belegt = [];
+        var frei = function (x, y, w) { return belegt.every(function (b) { return Math.abs(b.x - x) >= (b.w + w) / 2 + 2 || Math.abs(b.y - y) >= 12; }); };
+        meta.data.forEach(function (pt, i) {
+          var txt = i === 0 ? 'A' : String(i), w = ctx.measureText(txt).width, y = pt.y + 0.5;
+          var farbe = i === 0 ? (isDark() ? '#0a0805' : '#fff') : '#fff';
+          if (!frei(pt.x, y, w)) { y = pt.y - 17; farbe = axisCol; if (!frei(pt.x, y, w)) return; }
+          belegt.push({ x: pt.x, y: y, w: w });
+          ctx.fillStyle = farbe; ctx.fillText(txt, pt.x, y);
+        });
         ctx.restore();
       } }],
       options: {
@@ -2964,13 +2977,32 @@
           ctx.save();
           ctx.font = (schmal ? '600 9.5px' : '600 11px') + ' "JetBrains Mono", ui-monospace, monospace';
           ctx.textBaseline = 'middle';
+          /* v3325 · Marcel 12.11.2026: „die Überlappungen müssen raus" — gemessen bei 390 px:
+             −7.191 € lag 8 px über dem Namen „4 Gohliser Str…" (Betrag links vom Balken, der
+             Balken reicht fast bis an die Namensspalte). Passt der Betrag nicht mehr VOR den
+             Balken, steht er IM Balken (weiß), und ist auch der zu kurz, auf der anderen Seite
+             der Nulllinie. Gleiches spiegelbildlich am rechten Rand. */
+          var ca = ch.chartArea;
           meta.data.forEach(function (bar, i) {
             var v = wirkReihe[i]; if (v == null) return;
             var txt = (v > 0 ? '+' : v < 0 ? '−' : '±') + Math.abs(v).toLocaleString('de-DE') + ' €';
             var rechts = v >= 0;
-            ctx.fillStyle = i === nS ? (isDark() ? '#E8E2D4' : '#2A2727') : (v > 0 ? '#2f7d52' : v < 0 ? '#9a4b45' : axisCol);
-            ctx.textAlign = rechts ? 'left' : 'right';
-            ctx.fillText(txt, bar.x + (rechts ? 6 : -6), bar.y);
+            var tw = ctx.measureText(txt).width;
+            var base = (typeof bar.base === 'number') ? bar.base : bar.x;
+            var farbe = i === nS ? (isDark() ? '#E8E2D4' : '#2A2727') : (v > 0 ? '#2f7d52' : v < 0 ? '#9a4b45' : axisCol);
+            var x = bar.x + (rechts ? 6 : -6), ausr = rechts ? 'left' : 'right';
+            var passt = rechts ? (x + tw <= ca.right - 2) : (x - tw >= ca.left + 2);
+            if (!passt) {
+              if (Math.abs(bar.x - base) >= tw + 12) {          /* im Balken */
+                x = bar.x + (rechts ? -6 : 6); ausr = rechts ? 'right' : 'left';
+                farbe = (i === nS && isDark()) ? '#2A2727' : '#fff';
+              } else {                                          /* andere Seite der Null */
+                x = base + (rechts ? -6 : 6); ausr = rechts ? 'right' : 'left';
+              }
+            }
+            ctx.fillStyle = farbe;
+            ctx.textAlign = ausr;
+            ctx.fillText(txt, x, bar.y);
           });
           ctx.restore();
         }
@@ -3559,7 +3591,7 @@
       + '<div id="dp-gesamtbew"></div>'   /* v2951 \u00b7 Gesamtbewertung */
       /* v2950 \u00b7 Abschnitt 03 \u2014 Bestand gegen Zielbild fuer das ganze Portfolio (renderZielbild).
          Die Abschnitte dahinter ruecken eine Nummer auf (04 Geteilte Objekte \u2026 09 Jahresabschluss). */
-      + '<div class="sl" data-sek="zielbild" data-cp="genau"><span class="e">03</span><h2>Bestand &amp; Zielbild</h2><span class="tag">Potenzial \u00b7 alle Objekte</span><span class="rule"></span></div>'
+      + '<div class="sl" data-sek="zielbild" data-cp="genau"><span class="e">03</span><h2>Bestand &amp; Zielbild</h2><span class="tag">Potenzialwert \u00b7 Plan, kein Verkehrswert</span><span class="rule"></span></div>'
       + '<div id="dp-zielbild" class="zb-wrap"></div>'
       /* v2951 \u00b7 hier haengt sich der Portfolio-Pilot ein (portfolio-pilot.js mount) - in beiden Ansichten */
       + '<div id="dp-pp-slot" class="cp-frei"></div>'
