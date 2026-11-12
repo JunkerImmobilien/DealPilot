@@ -3469,7 +3469,11 @@ try { window._buildAIPayload = _buildAIPayload; } catch (e) {}
     /* v2947 (N78.5) · Bericht-Werte heissen nach ihrer Herkunft: der Score des Berichts ist nicht
        der DealPilot-Score des Objekts (85 gegen 78), die Rendite des Berichts rechnet ohne
        Zusatzeinnahmen (7,03 % gegen 7,23 % mit 1.080 €). */
-    { key: 'deal_score',   label: 'Score laut Marktbericht', color: '#3FA56C', fmt: function (v) { return Math.round(v) + ' / 100'; } },
+    /* v3326 · Marcel 12.11.2026: „Da ist oben ein Investor-Deal-Score. Der darf dort auf gar keinen Fall angezeigt
+       werden … generell wird dort kein Score mehr angezeigt." Hier stand die Linie 'deal_score' („Score laut
+       Marktbericht"). Herkunft: mb.object_snapshots.deal_score <- payload.deal_score.score <- ScoringService.dealScore()
+       (ReportOrchestrator) - die eigene Bewertung des Marktberichts, die der Bericht selbst seit v1203 nicht mehr zeigt.
+       Der Verlauf (v972b) hat sie weiter als Linie, Tabellenzeile und KI-Feld gefuehrt. Weg aus Linie, Tabelle und KI-Text. */
     { key: 'micro_score',  label: 'Lage (Mikro)', color: '#9b6fd4', fmt: function (v) { return Math.round(v) + ' / 100'; } },
     { key: 'macro_score',  label: 'Lage (Makro)', color: '#5a7fd4', fmt: function (v) { return Math.round(v) + ' / 100'; } },
     { key: 'price_cagr_pct', label: 'Markt (Wertentw.)', color: '#c98a2f', fmt: function (v) { return _dpVNum(v, 1) + ' %'; } },
@@ -3637,7 +3641,7 @@ try { window._buildAIPayload = _buildAIPayload; } catch (e) {}
      Zwischengespeichert wird je Objekt und Berichtsstand: ein neuer
      Marktbericht ergibt einen neuen Schluessel und damit einen neuen Text. */
   var VTXT_FELDER = ['market_value', 'market_value_low', 'market_value_high', 'median_sqm',
-    'deal_score', 'micro_score', 'macro_score', 'price_cagr_pct', 'gross_yield_pct', 'rent_multiplier',
+    'micro_score', 'macro_score', 'price_cagr_pct',   /* v3326 · ohne deal_score */ 'gross_yield_pct', 'rent_multiplier',
     'confidence', 'comparable_group', 'living_area', 'build_year', 'sachwert_eur', 'ertragswert_eur',
     'lzs_pct', 'lzs_stufe', 'fuehrend', 'bevoelkerung_trend_pct',
     'mpi_ohne_abschlag', 'abschlag_pct'];   /* v2947 · sonst liest der Text den Abschlag als Preissturz */
@@ -3645,7 +3649,7 @@ try { window._buildAIPayload = _buildAIPayload; } catch (e) {}
     if (typeof Auth === 'undefined' || !Auth.apiCall) { out.innerHTML = ''; return; }
     var objKey = window._currentObjKey || '';
     var stand = hist.map(function (h) { return h.id || h.report_id || h.created_at; }).join(',');
-    var merk = 'dp_vtxt_v3323_' + objKey;   /* v3323 · neuer Prompt (Kurz gesagt + drei Abschnitte) - neuer Schluessel */
+    var merk = 'dp_vtxt_v3326_' + objKey;   /* v3326 · Prompt ohne Score - neuer Schluessel, alte Texte nannten ihn (v3323: Kurz gesagt + drei Abschnitte) */
     try {
       var alt = JSON.parse(localStorage.getItem(merk) || 'null');
       if (alt && alt.stand === stand && alt.text) { out.innerHTML = _dpVEscP(alt.text); _dpVKurzMarkieren(out); return; }
@@ -3721,6 +3725,8 @@ try { window._buildAIPayload = _buildAIPayload; } catch (e) {}
         if ((typeof window._currentObjKey === 'string' ? window._currentObjKey : null) !== objKey) return;
         var hist = (data && data.history) || [];
         hist = hist.filter(function (h) { return h && h.market_value != null; });
+        /* v3326 · kein Score in Wert & Verlauf - das Feld faellt hier, bevor Verlauf, Wertvergleich oder KI-Text es sehen */
+        hist.forEach(function (h) { delete h.deal_score; });
         /* v2842 · Marcel: „Sind da Abschläge drin?" - je Bericht der Abschlag und der Wert OHNE
            Abschlag. Berichte ohne Abschlag (vor v2367) führen das Angebotsniveau selbst. */
         hist.forEach(function (h) {

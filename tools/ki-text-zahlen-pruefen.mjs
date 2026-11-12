@@ -127,5 +127,30 @@ console.log('8) v3207 · „Marktwert" im Text = Kopfzahl des fuehrenden Verfahr
   ok(!K.pruefeText(echt, K.textFakten(pm)).some((x) => x.art === 'marktwert_bezug'), 'ohne fuehrendes Verfahren (Kopf = Angebote) -> kein Befund');
 }
 
+console.log('9) v3326 · kein Score in Wert & Verlauf (Marcel 12.11.2026)');
+{
+  /* Saetze nach dem Muster der Einordnung vor v3326 (Westerfeldstr. 140) */
+  const echt = '## Kurz gesagt\nDer Marktwert stieg von 790.000 € auf 835.000 €. Der Score laut Marktbericht blieb bei 85.\n\n'
+    + '## Lage und Rendite\nDer Score laut Marktbericht lag stabil bei 85 (Sehr gut).\n\n## Woher die Bewegung kommt\nDie Bewegung liegt am Angebotsabschlag.';
+  const r = K.ohneScore(echt);
+  ok(!/score/i.test(r.text), 'kein „Score" mehr im Text');
+  ok(r.entfernt.length === 2, '2 Saetze entfernt (' + r.entfernt.length + ')');
+  ok(/Der Marktwert stieg/.test(r.text) && /Angebotsabschlag/.test(r.text), 'die uebrigen Saetze bleiben');
+  ok(!/Lage und Rendite/.test(r.text), 'leerer Abschnitt faellt mit seiner Ueberschrift');
+  ok(K.ohneScore('## Wert\nDie Mikrolage liegt bei 90 von 100 Punkten.').entfernt.length === 0, 'Mikrolage in Punkten bleibt');
+  ok(K.ohneScore('Der DealPilot-Score ist 78. Gut.').text === 'Gut.', 'DealPilot-Score faellt');
+  const src = fs.readFileSync(RGS, 'utf8');
+  const vt = src.slice(src.indexOf('const VTXT_NAMEN'), src.indexOf('const ZINSSTUFE_KLARTEXT'));
+  ok(!/deal_score\s*:/.test(vt), 'VTXT_NAMEN ohne deal_score');
+  const gv = src.slice(src.indexOf('export async function generateVerlaufText'));
+  ok(/ohneScore\(/.test(gv) && /Nenne KEINEN Score/.test(gv) && !/Score laut Marktbericht/.test(gv), 'generateVerlaufText: Verbot im Prompt, Nachpruefung gerufen, kein „Score laut Marktbericht"');
+  const ui = fs.readFileSync(path.join(W, 'frontend', 'js', 'ui.js'), 'utf8');
+  const met = ui.slice(ui.indexOf('var METRICS = ['), ui.indexOf('function _dpVEur'));
+  ok(!/key:\s*'deal_score'/.test(met), 'ui.js METRICS (Linie/Tabelle) ohne deal_score');
+  const vf = ui.slice(ui.indexOf('var VTXT_FELDER'), ui.indexOf('function _dpVerlaufKiText'));
+  ok(!/'deal_score'/.test(vf), 'ui.js VTXT_FELDER (KI-Auftrag) ohne deal_score');
+  ok(/delete h\.deal_score/.test(ui), 'ui.js _dpLoadVerlauf streicht deal_score aus dem Verlauf');
+}
+
 console.log((fehler ? 'ROT' : 'GRUEN') + ': ' + (n - fehler) + '/' + n);
 process.exit(fehler ? 1 : 0);

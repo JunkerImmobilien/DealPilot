@@ -13,7 +13,7 @@ import { AsyncLocalStorage } from 'async_hooks';
    (services/kiVerbrauch.js) die Euro, schreibt ki_verbrauch und marktbericht_cost_log.openai_eur.
    Hier steht bewusst KEIN Preis - eine zweite Preisliste liefe auseinander. */
 const _kiSammler = new AsyncLocalStorage();
-import { textFakten, faktenAnweisung, pruefeUndRepariere } from '../lib/ki_text_pruefung.js';
+import { textFakten, faktenAnweisung, pruefeUndRepariere, ohneScore } from '../lib/ki_text_pruefung.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const SYSTEM_PROMPT = fs.readFileSync(path.join(__dirname, 'report_prompt.txt'), 'utf8');
@@ -552,7 +552,8 @@ export async function openaiSelfCheck() {
 const VTXT_NAMEN = {
   market_value: 'Marktwert (EUR)', market_value_low: 'Marktwert untere Spanne (EUR)',
   market_value_high: 'Marktwert obere Spanne (EUR)', median_sqm: 'Vergleichsmedian (EUR/m2)',
-  deal_score: 'Score laut Marktbericht (0-100)',   /* v3323 · eigene Bewertung des Berichts, nicht der Score der Objektkarte */ micro_score: 'Mikrolage (0-100)', macro_score: 'Makrolage (0-100)',
+  /* v3326 · deal_score (Score laut Marktbericht) faellt: kein Score in Wert & Verlauf (Marcel 12.11.2026) */
+  micro_score: 'Mikrolage (Punkte von 100)', macro_score: 'Makrolage (Punkte von 100)',
   price_cagr_pct: 'Wertentwicklung Markt (% p.a.)', gross_yield_pct: 'Bruttorendite (%)',
   rent_multiplier: 'Kaufpreisfaktor', confidence: 'Konfidenz', comparable_group: 'Vergleichsgruppe',
   living_area: 'Wohnflaeche im Bericht (m2)', build_year: 'Baujahr im Bericht',
@@ -657,7 +658,8 @@ export async function generateVerlaufText(payload) {
   const labels = p.labels || {};
   const series = Array.isArray(p.series) ? p.series : [];
   const metrics = Array.isArray(p.metrics) ? p.metrics : [];
-  const felder = (Array.isArray(p.felder) && p.felder.length) ? p.felder : metrics;
+  /* v3326 · kein Score in die Einordnung, auch wenn ein alter Browser ihn noch mitschickt */
+  const felder = ((Array.isArray(p.felder) && p.felder.length) ? p.felder : metrics).filter((k) => !/score/i.test(k) || k === 'micro_score' || k === 'macro_score');
   if (series.length < 2) return { text: '', error: 'Zu wenig Berichte.' };
   const lines = series.map((row, i) => {
     const parts = felder.filter((k) => row[k] != null && row[k] !== '')
@@ -682,15 +684,16 @@ export async function generateVerlaufText(payload) {
     + 'gegliedert mit Zwischenueberschriften, die jeweils in einer eigenen Zeile mit "## " beginnen. Gliederung, genau in dieser Reihenfolge: '
     + '## Kurz gesagt (zwei bis drei Saetze: wohin sich der Wert ueber alle Berichte bewegt hat, mit erster und letzter Zahl, und der wichtigste Grund); '
     + '## Wert (Marktwert erster gegen letzter Bericht in EUR und Prozent, Breite der Spanne, Sach- und Ertragswert und fuehrendes Verfahren nur wenn geliefert, Abstand des heutigen Kaufpreises zum letzten Marktwert); '
-    + '## Lage und Rendite (Mikro- und Makrolage, Score laut Marktbericht, Bruttorendite und Faktor - nur, was sich bewegt hat, sonst ein Satz, dass es stabil ist); '
+    + '## Lage und Rendite (Mikro- und Makrolage, Bruttorendite und Faktor - nur, was sich bewegt hat, sonst ein Satz, dass es stabil ist); '
     + '## Woher die Bewegung kommt (aendern sich zwischen den Berichten Wohnflaeche, Baujahr, Vergleichsgruppe oder der Angebotsabschlag, liegt die Bewegung an der EINGABE oder an der METHODE, nicht am Markt - das klar sagen; sonst: an den Marktdaten). '
     + 'Regeln: Sage klar, ob Kennzahlen STEIGEN, FALLEN, SCHWANKEN oder STABIL sind - erfinde keinen Trend, wenn die Werte nur schwanken. '
     + 'Nenne nur Ursachen, die in den Feldern stehen; Woerter wie konjunkturell, Zinsumfeld oder Marktschwaeche nur, wenn ein geliefertes Feld sie belegt. '
     + 'Ein Bericht mit Angebotsabschlag und einer ohne sind nicht direkt vergleichbar: vergleiche dann die Werte ohne Abschlag oder nenne den Unterschied. '
     + 'Nenne konkrete Zahlen mit Datum, runde Euro auf Tausend. Verwende NUR die gelieferten Werte; fehlt ein Wert, lass ihn weg - '
     + 'nie schaetzen, nie einen Wert aus anderer Quelle ergaenzen. Keine Anlageberatung, keine Kaufempfehlung, keine Aufzaehlung jedes einzelnen Berichts. '
-    + 'Der Score im Bericht heisst immer "Score laut Marktbericht", nie DealPilot-Score. '
-    + 'Score-Stufen: ab 85 Sehr gut, ab 70 Gut, ab 50 Solide, ab 35 Schwach, darunter Kritisch.';
+    /* v3326 · Marcel 12.11.2026: in Wert & Verlauf wird kein Score angezeigt - auch nicht im Text */
+    + 'Nenne KEINEN Score: weder einen Score des Marktberichts noch DealPilot-Score noch Investor Deal Score, und verwende das Wort Score nicht. '
+    + 'Mikro- und Makrolage heissen Mikrolage und Makrolage (Punkte von 100).';
   const messages = [{ role: 'system', content: sys },
     { role: 'user', content: (objekt ? 'Objekt:\n' + objekt + '\n\n' : '') + 'Verlaufsdaten (aelteste zuerst):\n' + lines }];
   const isNewModel = /^(gpt-5|o\d|gpt-4\.1)/.test(cfg.ai.model || '');
@@ -701,7 +704,8 @@ export async function generateVerlaufText(payload) {
     return await _kiSammler.run(_posten, async () => {
       let r = await rawCompletion(messages, { maxTok: parseInt(process.env.OPENAI_MAX_TOKENS_PER_GROUP || '2000', 10), effort: isReasoning ? effort : null, isNewModel });
       if (!r.content) r = await rawCompletion(messages, { maxTok: 3000, effort: null, isNewModel });
-      return { text: (r.content || '').trim(), ki_posten: _posten };   /* v3318 */
+      const _os = ohneScore((r.content || '').trim());   /* v3326 · Saetze mit Score fallen */
+      return { text: _os.text, score_saetze_entfernt: _os.entfernt.length, ki_posten: _posten };   /* v3318 */
     });
   } catch (e) { return { text: '', error: e.message, ki_posten: _posten }; }
 }

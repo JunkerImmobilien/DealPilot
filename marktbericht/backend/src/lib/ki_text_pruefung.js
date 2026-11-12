@@ -284,3 +284,34 @@ export async function pruefeUndRepariere(md, F, neuSchreiben) {
   if (bef.length) { text = entferneSaetze(text, bef); prot.entfernt = bef.map((b) => b.satz); }
   return { md: text, prot };
 }
+
+/* ══ v3326 · KEIN SCORE IN DER EINORDNUNG DES VERLAUFS ════════════════════
+   Marcel 12.11.2026 zu „Wert & Verlauf": „generell wird dort kein Score mehr
+   angezeigt. Immer ausblenden oder rausnehmen." Der Prompt verbietet den Score;
+   diese Nachpruefung nimmt jeden Satz heraus, der trotzdem einen nennt
+   (Score laut Marktbericht, DealPilot-Score, Investor Deal Score, „Deal-Score").
+   Ueberschriften bleiben, ein Abschnitt ohne Saetze faellt mit seiner Ueberschrift.
+   Gerufen in ReportGenerationService.generateVerlaufText(), geprueft in
+   tools/ki-text-zahlen-pruefen.mjs (Abschnitt 6). */
+export const SCORE_RE = /score/i;
+export function ohneScore(md) {
+  const zeilen = String(md || '').split('\n');
+  const raus = [];
+  const neu = zeilen.map((z) => {
+    if (/^#{2,4}\s/.test(z)) return z;
+    const teile = z.split(/(?<=[.!?])\s+(?=[A-ZÄÖÜ„"])/);
+    const bleibt = teile.filter((t) => { if (SCORE_RE.test(t)) { raus.push(t.trim()); return false; } return true; });
+    return bleibt.join(' ');
+  });
+  /* Ueberschrift ohne Inhalt bis zur naechsten Ueberschrift: weg */
+  const out = [];
+  for (let i = 0; i < neu.length; i++) {
+    if (/^#{2,4}\s/.test(neu[i])) {
+      let j = i + 1, inhalt = false;
+      while (j < neu.length && !/^#{2,4}\s/.test(neu[j])) { if (neu[j].trim()) inhalt = true; j++; }
+      if (!inhalt) { i = j - 1; continue; }
+    }
+    out.push(neu[i]);
+  }
+  return { text: out.join('\n').replace(/\n{3,}/g, '\n\n').trim(), entfernt: raus };
+}
