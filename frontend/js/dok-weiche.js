@@ -40,6 +40,8 @@
   }
   /* wie pdf.js (TR7-trial): Wasserzeichen, wenn das Limit es verlangt oder die Testphase läuft */
   function wasserzeichen() {
+    /* v3337 · dieselbe Entscheidung wie pdf.js: Sub.wasserzeichenNoetig() (unbekannter Plan ist kein Free) */
+    try { if (typeof Sub !== 'undefined' && typeof Sub.wasserzeichenNoetig === 'function') return Sub.wasserzeichenNoetig(); } catch (e) {}
     try {
       var trial = typeof Sub !== 'undefined' && Sub.isTrial && Sub.isTrial();
       var lim = window.DealPilotConfig && DealPilotConfig.pricing ? DealPilotConfig.pricing.current().limits : { watermark: true };

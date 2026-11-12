@@ -10,12 +10,16 @@
         ungueltige Kachel 400; Ratenbremse 429; kein PNG wird nicht abgelegt; nur z/x/y
         in der Abfrage, User-Agent ohne Personendaten
      D  Verdrahtung: Route, Skript in index.html, die drei PDF-Wege
+     E  v3337 · kein Geoapify-Rueckfall (/marktbericht/static-map) im PDF-Weg: objektInfo() aus
+        dp-dokumente.js echt ausgefuehrt - Lagekarte da = ihr Bild, Lagekarte weg = kein Bild und
+        KEIN Abruf der Kartenkachel; pdf.js, pdf-investment-bank.js, dp-dokumente.js ohne static-map
    RC=0 sauber. */
 import { readFileSync, mkdtempSync, rmSync, existsSync, utimesSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createRequire } from 'node:module';
+import vm from 'node:vm';
 
 const WURZEL = join(dirname(fileURLToPath(import.meta.url)), '..');
 const require = createRequire(import.meta.url);
@@ -144,6 +148,37 @@ ok(/DpLagekarte\.fuerAdresse\(/.test(lies('frontend/js/pdf-investment-bank.js'))
 const lk = lies('frontend/js/lagekarte.js');
 ok(!/tile\.openstreetmap\.org/.test(lk.replace(/\/\*[\s\S]*?\*\//g, '')), 'der Browser ruft tile.openstreetmap.org nie selbst ab');
 ok(/OpenStreetMap-Mitwirkende/.test(lk) && /fillText\(VERMERK/.test(lk), 'Namensnennung „© OpenStreetMap-Mitwirkende“ wird ins Bild gezeichnet');
+
+/* ── E · kein Geoapify-Rueckfall im PDF-Weg (v3337) ───────────────────── */
+console.log('E · kein Geoapify-Rueckfall im PDF-Weg');
+const ohneKommentar = (t) => t.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:'"\\])\/\/[^\n]*/g, '$1');
+for (const p of ['frontend/js/dp-dokumente.js', 'frontend/js/pdf.js', 'frontend/js/pdf-investment-bank.js']) {
+  ok(!/static-map/.test(ohneKommentar(lies(p))), p + ': kein Aufruf von /marktbericht/static-map');
+}
+ok(!/D\(\)\.karte\(/.test(ohneKommentar(lies('frontend/js/dp-dokumente.js'))), 'dp-dokumente.js: DpDokument.karte() (Geoapify) wird nicht mehr gerufen');
+{ /* objektInfo() echt laufen lassen: Quelltext aus der Datei, Umgebung nachgebaut */
+  const quelle = lies('frontend/js/dp-dokumente.js');
+  const a = quelle.indexOf('function objektInfo('), e = quelle.indexOf('function fotosFuer(');
+  ok(a > 0 && e > a, 'objektInfo() in dp-dokumente.js gefunden');
+  const lauf = async (lagekarte) => {
+    const rufe = [], geoapify = [];
+    const ctx = { window: {}, Promise, encodeURIComponent };
+    ctx.window.Auth = { apiCall: (p) => { rufe.push(p); return Promise.resolve(/^\/objects\//.test(p) ? { photos: [], data: {} } : { lat: 52.2861968, lon: 8.656101 }); } };
+    ctx.window.DpLagekarte = { bild: () => Promise.resolve(lagekarte) };
+    ctx.window.DpDokument = { karte: (...x) => { geoapify.push(x); return Promise.resolve('data:image/png;base64,GEOAPIFY'); } };
+    ctx.fetch = (u) => { geoapify.push(u); return Promise.resolve({ ok: true, headers: { get: () => 'image/png' }, blob: async () => null }); };
+    ctx.DpLagekarte = ctx.window.DpLagekarte;
+    vm.createContext(ctx);
+    vm.runInContext('var D = function () { return window.DpDokument; }; function api(p) { return window.Auth.apiCall(p); }\n' + quelle.slice(a, e) + '\nthis.objektInfo = objektInfo;', ctx);
+    const info = await ctx.objektInfo('obj-1', 'Musterweg 1, 32609 Musterort');
+    return { info, rufe, geoapify };
+  };
+  const mit = await lauf({ src: 'data:image/png;base64,OSM' });
+  ok(mit.info.karte === 'data:image/png;base64,OSM' && mit.geoapify.length === 0, 'Lagekarte da: Deckblatt traegt die OSM-Lagekarte, kein Geoapify-Abruf');
+  const ohne = await lauf(null);
+  ok(ohne.info.karte === null && ohne.geoapify.length === 0, 'Lagekarte faellt aus: kein Kartenbild (null), kein Geoapify-Abruf (' + ohne.geoapify.length + ')');
+  ok(ohne.rufe.length === 2 && ohne.rufe.every((p) => !/static-map/.test(p)), 'auch ueber Auth.apiCall kein static-map: ' + ohne.rufe.map((p) => p.split('?')[0]).join(', '));
+}
 
 console.log(fehler ? '\nROT: ' + fehler + ' von ' + n + ' Punkten' : '\nsauber (RC=0), ' + n + ' Punkte');
 process.exit(fehler ? 1 : 0);

@@ -218,9 +218,16 @@ function _applyWatermarkIfFree(doc, W) {
     var _isTrial = false;
     try { _isTrial = (typeof Sub !== 'undefined' && Sub.isTrial && Sub.isTrial()); }
     catch (e) {}
-    var limits = (window.DealPilotConfig && DealPilotConfig.pricing
-                    ? DealPilotConfig.pricing.current().limits : { watermark: true });
-    if (limits.watermark === false && !_isTrial) return;
+    /* v3337 · die Entscheidung trifft Sub.wasserzeichenNoetig() (subscription.js):
+       ein noch nicht geladener Plan ist kein Free-Plan. Rueckfall nur, wenn
+       subscription.js fehlt. */
+    if (typeof Sub !== 'undefined' && typeof Sub.wasserzeichenNoetig === 'function') {
+      if (!Sub.wasserzeichenNoetig()) return;
+    } else {
+      var limits = (window.DealPilotConfig && DealPilotConfig.pricing
+                      ? DealPilotConfig.pricing.current().limits : { watermark: true });
+      if (limits.watermark === false && !_isTrial) return;
+    }
     doc.__dpWmDone = true;
     var pages = doc.internal.getNumberOfPages();
     for (var i = 1; i <= pages; i++) {
@@ -1339,6 +1346,8 @@ async function exportPDF() {
 
 async function _exportPDFInner() {
   _dpPdfStdReset();   /* v3018 · welche Standardteile dieses PDF druckt */
+  /* v3337 · Plan vor dem Druck sicher laden (Wasserzeichen haengt daran) */
+  if (typeof Sub !== 'undefined' && typeof Sub.planSicher === 'function') { try { await Sub.planSicher(); } catch (e) {} }
 
   // Track usage (and enforce plan limit) before generating PDF
   if (typeof Sub !== 'undefined' && Sub.isApiMode()) {

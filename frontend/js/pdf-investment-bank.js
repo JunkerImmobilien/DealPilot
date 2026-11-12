@@ -518,6 +518,8 @@
     var _std = {};   /* v3018 · welche Standardteile diese Fassung druckt */
     if (typeof window.jspdf === 'undefined') { alert('PDF-Bibliothek noch nicht geladen - bitte kurz warten und erneut versuchen.'); return; }
     try { if (typeof window.calcNow === 'function') window.calcNow(); } catch (e) {}
+    /* v3337 · Plan vor dem Druck sicher laden (Wasserzeichen im save-Haken haengt daran) */
+    if (typeof Sub !== 'undefined' && typeof Sub.planSicher === 'function') { try { await Sub.planSicher(); } catch (e) {} }
 
     /* v1505: erst pruefen, dann drucken. */
     /* v3018d · dasselbe Tor wie das Investment-PDF (pdf-pruefung.js, mit Sprung zum Feld) */

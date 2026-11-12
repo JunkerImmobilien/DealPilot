@@ -296,7 +296,51 @@ var Sub = (function() {
     return Boolean(sub.plan_features && sub.plan_features[featureKey]);
   }
 
+  /* ── v3337 · Wasserzeichen nur bei BEKANNTEM Plan ─────────────────────
+     Gemessen 12.11.2026 (Staging, isolierter Headless-Chrome): angemeldeter
+     Investor, /subscription faellt aus, dp_last_plan fehlt -> _cache ist das
+     synthetische free (_fallback), getCurrentSync() 'free', das klassische
+     Investment-PDF traegt 30x „DealPilot Free". dp_last_plan fehlt nach JEDER
+     Anmeldung, bis der erste Abruf gelingt (getCurrent() raeumt ihn vor dem
+     Login, W17-logoutfix). Dieselbe Familie wie W4 (15.07.): ein unbekannter
+     Plan wurde still als „free" gelesen. Ab hier gilt:
+       planUnbekannt()       angemeldet, API-Modus, weder echte Antwort noch
+                             letzter bekannter Plan
+       planSicher()          vor einem PDF: einmal frisch nachladen
+       wasserzeichenNoetig() die EINE Entscheidung (pdf.js, dok-weiche.js):
+                             unbekannt -> kein Free-Stempel, Testphase -> ja,
+                             sonst das Limit des Plans. */
+  function planUnbekannt() {
+    try {
+      if (!isApiMode()) return false;
+      if (!window.Auth || typeof Auth.isLoggedIn !== 'function' || !Auth.isLoggedIn()) return false;
+      if (_cache && _cache.plan_id && !_cache._fallback) return false;
+      var lk = null; try { lk = localStorage.getItem('dp_last_plan'); } catch (e) {}
+      return !lk;
+    } catch (e) { return false; }
+  }
+  async function planSicher() {
+    if (!planUnbekannt()) return true;
+    try { await getCurrent(true); } catch (e) {}
+    return !planUnbekannt();
+  }
+  var _wzWarn = false;
+  function wasserzeichenNoetig() {
+    if (planUnbekannt()) {
+      if (!_wzWarn) { _wzWarn = true; console.warn('[Wasserzeichen] Plan nicht geladen (/subscription ohne Antwort) - kein „Free"-Stempel.'); }
+      return false;
+    }
+    try {
+      if (_cache && _cache.trial === true) return true;
+      var lim = window.DealPilotConfig && DealPilotConfig.pricing ? DealPilotConfig.pricing.current().limits : { watermark: true };
+      return !lim || lim.watermark !== false;
+    } catch (e) { return true; }
+  }
+
   return {
+    planUnbekannt: planUnbekannt,
+    planSicher: planSicher,
+    wasserzeichenNoetig: wasserzeichenNoetig,
     getCurrent: getCurrent,
     /**
      * V96: Synchroner Cache-Read für UI-Komponenten die nicht awaiten können

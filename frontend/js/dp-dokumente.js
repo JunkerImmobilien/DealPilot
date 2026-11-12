@@ -47,13 +47,13 @@
       var adr = adresse || (o && o.name) || '';
       if (!adr) return info;
       return api('/marktbericht/geocode?address=' + encodeURIComponent(adr)).then(function (g) {
-        /* v3336 · zuerst die OSM-Lagekarte mit Punkt und Namensnennung (lagekarte.js, Kacheln aus der eigenen
-           Ablage, 0 EUR); nur wenn sie ausfaellt, die bisherige Kartenkachel des Marktberichts. Deckblatt 210 x 118 mm. */
+        /* v3336 · die OSM-Lagekarte mit Punkt und Namensnennung (lagekarte.js, Kacheln aus der eigenen
+           Ablage, 0 EUR). Deckblatt 210 x 118 mm.
+           v3337 · Marcel 12.11.2026: der Rueckfall auf die Kartenkachel des Marktberichts (/marktbericht/static-map,
+           Geoapify, ohne Namensnennung im Bild) ist gestrichen. Faellt die Lagekarte aus, bleibt das Deckblatt
+           ohne Kartenbild - wie vor v3336 ohne Foto. */
         var osm = window.DpLagekarte ? DpLagekarte.bild(g && g.lat, g && g.lon, { breite: 760, hoehe: 427 }) : Promise.resolve(null);
-        return osm.then(function (lk) {
-          if (lk) { info.karte = lk.src; return info; }
-          return D().karte(g && g.lat, g && g.lon, 16, 1400, 700).then(function (k) { info.karte = k; return info; });
-        });
+        return osm.then(function (lk) { if (lk) info.karte = lk.src; return info; });
       }).catch(function () { return info; });
     }).catch(function () { return { fotos: [], seq: '', kuerzel: '', karte: null }; });
   }
