@@ -299,6 +299,11 @@ function buildPrompt(payload, opts) {
   const mr = payload.marktradar || [];
   const mbr = payload.marktbericht || null;   /* v947-mbsource: der echte Bericht */
   const isc = payload.investor_score || null;
+  /* v3323 · Marcel 12.11.2026: „den Deal Score haben wir ja gar nicht mehr eingeblendet, wenn wir den passenden Plan
+     haben … deswegen können wir uns darauf nicht mehr beziehen". Welcher Score in der App zu sehen ist, schickt das
+     Frontend mit (ui.js score_sichtbar, dieselbe Weiche wie calc.js deal_score_v2): 'investor' | 'dealpilot' | 'beide'.
+     Ohne Angabe (alte Clients) bleibt alles wie bisher ('beide'). */
+  const scoreSicht = ['investor', 'dealpilot', 'beide'].indexOf(payload.score_sichtbar) >= 0 ? payload.score_sichtbar : 'beide';
   /* v2009 - Vermarktungsdauer. Bis hierher gab es sie nur im Request. */
   const vh = payload.verhandlung || null;
   /* v2011 - die sieben Bloecke aus Marcels Liste. */
@@ -1081,6 +1086,8 @@ function buildPrompt(payload, opts) {
        Feld `score_vergleich` verlangt, das erklaeren soll, WELCHE
        Zusatz-KPIs die Differenz treiben. Das Modell musste raten. */
     isc ? ('Investor Deal Score: ' + (isc.total != null ? isc.total : '–') + ' / 100 (beruecksichtigt zusaetzlich Lage/Substanz/Upside — 24 KPIs)') : '',
+    scoreSicht === 'investor' ? 'SICHTBARER SCORE: Der Nutzer sieht in seinem Plan NUR den Investor Deal Score. Den DealScore oben nie nennen (weder Name noch Zahl) - wo ein Score genannt wird, ist es der Investor Deal Score.' : '',
+    scoreSicht === 'dealpilot' ? 'SICHTBARER SCORE: Der Nutzer sieht in seinem Plan NUR den DealScore (in der App „DealPilot-Score"). Einen Investor Deal Score nie nennen.' : '',
     /* v3016p · unter 70 % der KPIs zeigt die App keinen Score - die Analyse nennt dann auch keinen */
     payload.score_unvollstaendig ? ('Deal Score und Investor Deal Score: NICHT belastbar, erst ' + payload.score_unvollstaendig + ' erfasst (Schwelle 70 %). Nenne KEINEN Score-Wert und keine Score-Stufe; sag stattdessen, dass fuer ein belastbares Urteil noch Angaben fehlen.') : '',
     /* v2009 - die Aufschluesselung des Investor Deal Score. */
@@ -1907,7 +1914,9 @@ function buildPrompt(payload, opts) {
     _ak ? '  "anschlussfinanzierung": [{ "frage": "Was kostet mich das Ende der Zinsbindung?", "antwort": "3-5 Saetze mit Restschuld, Rate je Anschlusszins, Cashflow und DSCR danach" }, "... 4-6 Eintraege"],'
         : '  "anschlussfinanzierung": "Restschuld nach Zinsbindung + noetiger EK-Einsatz/Sondertilgung damit die Anschlussfinanzierung traegt, 4-6 Saetze mit Zahlen soweit ableitbar",',
     _ak ? '  "exit_strategien": [{ "frage": "Wann kann ich steuerfrei verkaufen?", "antwort": "3-5 Saetze mit Fristende, Marktpreis, Restschuld und Netto-Erloes vor Steuer; keine Steuerberatung" }, "... 4-6 Eintraege"],' : '',
-    '  "score_vergleich": "Falls DealPilot-Score UND Investor Deal Score vorliegen und sich unterscheiden: erklaere Konvergenz/Divergenz und welche Zusatz-KPIs (Lage/Substanz/Upside) den Unterschied treiben, 4-6 Saetze. Sonst leer lassen.",',
+    scoreSicht === 'beide'
+      ? '  "score_vergleich": "Falls DealPilot-Score UND Investor Deal Score vorliegen und sich unterscheiden: erklaere Konvergenz/Divergenz und welche Zusatz-KPIs (Lage/Substanz/Upside) den Unterschied treiben, 4-6 Saetze. Sonst leer lassen.",'
+      : '  "score_vergleich": null,',   /* v3323 · nur ein Score sichtbar - kein Vergleich */
     /* v2013b - GEMESSEN am echten Lauf: die Fotos gingen durch (22 von
        22 Schluesseln kamen zurueck), aber das Modell schrieb KEIN Wort
        zum Bildeindruck. Der Grund stand im Antwortformat: es gab kein
@@ -4616,7 +4625,11 @@ async function dokumenteAuswerten(dokumente, objekt, opts) {
     '  "risiken": [{"titel": string, "beschreibung": string (2-3 Saetze: Sachverhalt, Folge fuer den Kaeufer, was zu tun ist), "schwere": "hoch"|"mittel"|"niedrig", "kosten_eur": number|null (Anteil des Objekts, sonst gesamt mit Hinweis), "kosten_gesamt_eur": number|null (Betrag der ganzen Gemeinschaft wie im Dokument, nur bei Gemeinschaftskosten), "jahr": number|null, "quelle": string}],',
     '  "risiken_text": string (fuer das Feld "Bekannte Risiken": je Risiko eine Zeile "– Titel: ein Satz (Quelle)", hoch zuerst),',
     '  "investitionsthese": string (3-5 Saetze: was spricht fuer das Objekt, gestuetzt auf Unterlagen und Eckdaten, mit Zahlen; ehrlich, wenn die Unterlagen dagegen sprechen),',
-    '  "weg": null | {"kernpunkte": [string] (die 5-10 wichtigsten Punkte aus allen WEG-Unterlagen, chronologisch, je mit Jahr), "ruecklage": string (Stand und Entwicklung, Anteil des Objekts), "hausgeld": string, "sanierungen": [{"massnahme": string, "status": "beschlossen"|"geplant"|"vertagt"|"erledigt", "jahr": number|null, "kosten_eur": number|null (Gesamtkosten der Gemeinschaft wie im Dokument), "anteil_objekt_eur": number|null}], "sonderumlagen": [string], "verwaltung": string (Verwalter, Wechsel, Stimmung in der Gemeinschaft), "fazit": string (2-3 Saetze)},',
+    '  "weg": null | {"kernpunkte": [string] (die 5-10 wichtigsten Punkte aus allen WEG-Unterlagen, chronologisch, je mit Jahr), "ruecklage": string (Stand und Entwicklung, Anteil des Objekts), "hausgeld": string, "sanierungen": [{"massnahme": string, "status": "beschlossen"|"geplant"|"vertagt"|"erledigt", "jahr": number|null, "kosten_eur": number|null (Gesamtkosten der Gemeinschaft wie im Dokument), "anteil_objekt_eur": number|null}], "sonderumlagen": [string], "verwaltung": string (Verwalter, Wechsel, Stimmung in der Gemeinschaft), "fazit": string (2-3 Saetze), '
+      /* v3323 · Marcel 12.11.2026: Reiter „Hausverlauf" - was in der Gemeinschaft passiert ist, chronologisch.
+         Die Kernpunkte tragen nur ein Jahr; die Chronik je Ereignis Datum, Art, Betrag, Status und Quelle
+         (frontend/js/hausverlauf.js, Pruefer tools/hausverlauf-pruefen.mjs). */
+      + '"chronik": [{"datum": string|null DD.MM.JJJJ (Versammlung, Beschluss oder Faelligkeit, nur wenn im Dokument), "jahr": number, "art": "beschluss"|"sonderumlage"|"instandhaltung"|"schaden"|"verwaltung"|"ruecklage"|"hausgeld"|"rechtsstreit"|"sonstiges", "titel": string (kurz, z. B. "Dachsanierung beschlossen"), "text": string (ein Satz mit Zahl: was beschlossen oder festgestellt wurde), "betrag_eur": number|null (Betrag der ganzen Gemeinschaft wie im Dokument), "status": "beschlossen"|"abgelehnt"|"vertagt"|"geplant"|"erledigt"|null, "quelle": string (Dokument mit Datum und TOP)}] (ALLE Ereignisse aus allen WEG-Unterlagen, aelteste zuerst: Beschluesse, Sonderumlagen, Instandhaltung, Schaeden, Verwalterwechsel, Ruecklage, Hausgeld, Rechtsstreit; jedes Ereignis einmal, auch wenn es in mehreren Protokollen steht - dann mit dem Verlauf im Text)},',
     '  "grundbuch": null | {"lasten": [string] (Abt. II in Klartext mit Bedeutung), "grundschulden": string},',
     /* v3017 · Baulastenauskunft: eigene Art, nicht im Grundbuch */
     '  "baulasten": null | {"keine": boolean (Auskunft sagt ausdruecklich: keine Baulasten), "eintraege": [string] (je Baulast Klartext: Art, ob dieses Grundstueck belastet oder beguenstigt ist, was das fuer Nutzung, Bebauung oder Verkauf bedeutet)},',

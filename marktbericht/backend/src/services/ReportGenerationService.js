@@ -543,13 +543,14 @@ export async function openaiSelfCheck() {
 const VTXT_NAMEN = {
   market_value: 'Marktwert (EUR)', market_value_low: 'Marktwert untere Spanne (EUR)',
   market_value_high: 'Marktwert obere Spanne (EUR)', median_sqm: 'Vergleichsmedian (EUR/m2)',
-  deal_score: 'DealPilot-Score (0-100)', micro_score: 'Mikrolage (0-100)', macro_score: 'Makrolage (0-100)',
+  deal_score: 'Score laut Marktbericht (0-100)',   /* v3323 · eigene Bewertung des Berichts, nicht der Score der Objektkarte */ micro_score: 'Mikrolage (0-100)', macro_score: 'Makrolage (0-100)',
   price_cagr_pct: 'Wertentwicklung Markt (% p.a.)', gross_yield_pct: 'Bruttorendite (%)',
   rent_multiplier: 'Kaufpreisfaktor', confidence: 'Konfidenz', comparable_group: 'Vergleichsgruppe',
   living_area: 'Wohnflaeche im Bericht (m2)', build_year: 'Baujahr im Bericht',
   sachwert_eur: 'Sachwert ImmoWertV (EUR)', ertragswert_eur: 'Ertragswert ImmoWertV (EUR)',
   lzs_pct: 'Liegenschaftszins (%)', lzs_stufe: 'Herkunftsstufe Zins', fuehrend: 'fuehrendes Verfahren',
-  bevoelkerung_trend_pct: 'Bevoelkerungstrend (% p.a.)'
+  bevoelkerung_trend_pct: 'Bevoelkerungstrend (% p.a.)',
+  mpi_ohne_abschlag: 'Marktwert ohne Angebotsabschlag (EUR)', abschlag_pct: 'Angebotsabschlag (%)'   /* v3323 */
 };
 /* v2401 · Die KI bekommt die Herkunftsstufe des Zinses im Klartext, nicht nur
    den Buchstaben - sonst liest sie „N" als nichts oder als „amtlich". */
@@ -662,19 +663,24 @@ export async function generateVerlaufText(payload) {
     o.baujahr_heute != null ? 'Baujahr heute laut Objekt: ' + o.baujahr_heute : null,
     o.kaufpreis_heute != null ? 'Kaufpreis heute laut Objekt: ' + o.kaufpreis_heute + ' EUR' : null
   ].filter(Boolean).join('\n');
+  /* v3323 · Marcel 12.11.2026: „die KI-Einordnung des Verlaufs … könnte besser zusammengeschrieben werden".
+     Gemessen an Westerfeldstr. 140 (12.11.2026): 7 Abschnitte, rund 600 Woerter, der Wert „sinkt konjunkturell"
+     (ohne jeden Beleg - die Berichte wechselten den Angebotsabschlag), und die eigene Bewertung des Berichts hiess
+     „DealPilot-Score". Jetzt: zuerst „Kurz gesagt" (die App zeigt im Modus Einfach nur diesen Abschnitt), dann
+     drei kurze Abschnitte, 180-300 Woerter, und Ursachen nur aus den gelieferten Feldern. */
   const sys = 'Du bist ein nuechterner Immobilien-Analyst und ordnest die Marktberichte EINES Objekts im Zeitverlauf ein. '
-    + 'Schreibe ausfuehrlich, sachlich und auf Deutsch, insgesamt etwa 350 bis 550 Woerter, gegliedert mit Zwischenueberschriften, '
-    + 'die jeweils in einer eigenen Zeile mit "## " beginnen. Gliederung: '
-    + '## Gesamtbild (zwei bis drei Saetze: was ist ueber alle Berichte passiert); '
-    + '## Marktwert und Spanne (Entwicklung mit konkreten Zahlen und Prozent, Breite der Spanne, Vergleichsmedian); '
-    + '## Sach- und Ertragswert (nur wenn Werte vorliegen: Abstand zum Marktwert, fuehrendes Verfahren, Liegenschaftszins); '
-    + '## Lage und Score (DealPilot-Score, Mikro- und Makrolage, Bevoelkerungstrend); '
-    + '## Rendite und Kaufpreis (Bruttorendite, Faktor, Abstand des heutigen Kaufpreises zum letzten Marktwert); '
-    + '## Woher die Bewegung kommt (Aendern sich Wohnflaeche, Baujahr oder Vergleichsgruppe zwischen den Berichten, liegt die Bewegung an der EINGABE, nicht am Markt - das klar benennen); '
-    + '## Einordnung (was der Verlauf fuer die Belastbarkeit der Zahlen bedeutet). '
+    + 'Schreibe klar und verstaendlich fuer einen Privatinvestor, sachlich, auf Deutsch, insgesamt 180 bis 300 Woerter, in ganzen Saetzen, '
+    + 'gegliedert mit Zwischenueberschriften, die jeweils in einer eigenen Zeile mit "## " beginnen. Gliederung, genau in dieser Reihenfolge: '
+    + '## Kurz gesagt (zwei bis drei Saetze: wohin sich der Wert ueber alle Berichte bewegt hat, mit erster und letzter Zahl, und der wichtigste Grund); '
+    + '## Wert (Marktwert erster gegen letzter Bericht in EUR und Prozent, Breite der Spanne, Sach- und Ertragswert und fuehrendes Verfahren nur wenn geliefert, Abstand des heutigen Kaufpreises zum letzten Marktwert); '
+    + '## Lage und Rendite (Mikro- und Makrolage, Score laut Marktbericht, Bruttorendite und Faktor - nur, was sich bewegt hat, sonst ein Satz, dass es stabil ist); '
+    + '## Woher die Bewegung kommt (aendern sich zwischen den Berichten Wohnflaeche, Baujahr, Vergleichsgruppe oder der Angebotsabschlag, liegt die Bewegung an der EINGABE oder an der METHODE, nicht am Markt - das klar sagen; sonst: an den Marktdaten). '
     + 'Regeln: Sage klar, ob Kennzahlen STEIGEN, FALLEN, SCHWANKEN oder STABIL sind - erfinde keinen Trend, wenn die Werte nur schwanken. '
-    + 'Nenne konkrete Zahlen mit Datum. Verwende NUR die gelieferten Werte; fehlt ein Wert, lass den Abschnitt weg oder sage, dass er fehlt - '
-    + 'nie schaetzen, nie einen Wert aus anderer Quelle ergaenzen. Keine Anlageberatung, keine Kaufempfehlung. '
+    + 'Nenne nur Ursachen, die in den Feldern stehen; Woerter wie konjunkturell, Zinsumfeld oder Marktschwaeche nur, wenn ein geliefertes Feld sie belegt. '
+    + 'Ein Bericht mit Angebotsabschlag und einer ohne sind nicht direkt vergleichbar: vergleiche dann die Werte ohne Abschlag oder nenne den Unterschied. '
+    + 'Nenne konkrete Zahlen mit Datum, runde Euro auf Tausend. Verwende NUR die gelieferten Werte; fehlt ein Wert, lass ihn weg - '
+    + 'nie schaetzen, nie einen Wert aus anderer Quelle ergaenzen. Keine Anlageberatung, keine Kaufempfehlung, keine Aufzaehlung jedes einzelnen Berichts. '
+    + 'Der Score im Bericht heisst immer "Score laut Marktbericht", nie DealPilot-Score. '
     + 'Score-Stufen: ab 85 Sehr gut, ab 70 Gut, ab 50 Solide, ab 35 Schwach, darunter Kritisch.';
   const messages = [{ role: 'system', content: sys },
     { role: 'user', content: (objekt ? 'Objekt:\n' + objekt + '\n\n' : '') + 'Verlaufsdaten (aelteste zuerst):\n' + lines }];

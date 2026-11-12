@@ -612,7 +612,7 @@
     var m = modus();
     var nav = '<div class="dp-si-nav" role="navigation" aria-label="Inhalt">'
       + (opts.mitPot ? '<button type="button" class="btn-clean" data-dp-si-sprung="[data-dp-pot-wirt]">Ist · Mieterhöhung · Zielbild</button><button type="button" class="btn-clean" data-dp-si-sprung="[data-dp-pot-markt]">Marktpreise</button>' : '')
-      + (opts.mitAnkauf ? '<button type="button" class="btn-clean" data-dp-si-sprung=".abw-tafel-host">Ankauf gegen Bestand</button><button type="button" class="btn-clean" data-dp-si-sprung="[data-dp-si-pilot]">Pilot damals und heute</button>' : '')
+      + (opts.mitAnkauf ? '<button type="button" class="btn-clean" data-dp-si-sprung=".abw-tafel-host">Ankauf gegen Bestand</button><button type="button" class="btn-clean" data-dp-si-sprung="[data-dp-si-pilot]">Pilot beim Ankauf</button>' : '')
       + '</div>';
     return '<div class="dp-si" data-dp-si-modus="' + m + '">'
       + '<div class="dp-si-kopf"><div class="dp-si-um" role="group" aria-label="Darstellung">'

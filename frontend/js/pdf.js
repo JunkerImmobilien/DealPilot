@@ -1144,7 +1144,9 @@ function _renderAiJsonInPdf(doc, a, cy, M, CW, W, C, stripMd, newPage) {
      Risiken und Risikoanalyse). */
   var _urteil = clean(a.empfehlung || a.fazit_kurz || '');
   var _gb = clean(a.gesamtbewertung || '');
-  block('Gesamtbewertung', (_urteil ? 'Urteil: ' + _urteil.toUpperCase() + (_gb ? '\n\n' : '') : '') + _gb, [232, 240, 248], [60, 102, 148]);
+  /* v3323 · Marcel 12.11.2026: Empfehlungen nur im Ankauf - im Bestand kein „Urteil: HALTEN" */
+  var _bestU = false; try { _bestU = !!(window.DpBestand && window.DpBestand.istBestand()); } catch (e) { _bestU = false; }
+  block('Gesamtbewertung', (_urteil && !_bestU ? 'Urteil: ' + _urteil.toUpperCase() + (_gb ? '\n\n' : '') : '') + _gb, [232, 240, 248], [60, 102, 148]);
 
   // 2. Stärken / Risiken
   bulletBlock('Stärken', a.staerken,   [232, 247, 234], [42, 138, 86]);
@@ -1170,7 +1172,7 @@ function _renderAiJsonInPdf(doc, a, cy, M, CW, W, C, stripMd, newPage) {
   }
 
   // 5. Investor-Fit
-  if (a.investor_fit && typeof a.investor_fit === 'object') {
+  if (a.investor_fit && typeof a.investor_fit === 'object' && !_bestU) {   /* v3323 · Investor-Fit fragt nach dem Kauf - nur im Ankauf */
     var f = a.investor_fit;
     var ft = '';
     if (f.cashflow_investor)        ft += '• Cashflow-Investor: ' + clean(f.cashflow_investor) + '\n';
@@ -1181,7 +1183,7 @@ function _renderAiJsonInPdf(doc, a, cy, M, CW, W, C, stripMd, newPage) {
 
   // 6. Empfehlung - v3018a: nur die Begruendung, das Urteil steht in der Gesamtbewertung
   if (a.empfehlung_begruendung) {
-    block('Begründung des Urteils', _dpOhneUrteil(clean(a.empfehlung_begruendung), _urteil), [248, 244, 232], C.GOLD);
+    block(_bestU ? 'Einordnung' : 'Begründung des Urteils', _dpOhneUrteil(clean(a.empfehlung_begruendung), _urteil), [248, 244, 232], C.GOLD);
   }
 
   // V29: Klassische Sektionen aus der alten KI-Analyse
@@ -1259,14 +1261,14 @@ function _renderAiJsonInPdf(doc, a, cy, M, CW, W, C, stripMd, newPage) {
       var roh = st && st.daten ? st.daten._ai : null, alt = roh ? (typeof roh === 'string' ? JSON.parse(roh) : roh) : null;
       if (alt && typeof alt === 'object' && (alt.empfehlung || alt.gesamtbewertung)) {
         var kp = function (x) { if (x && x.bestand_modus) return 'entfällt (im Bestand)'; var o = x && x.kaufpreis_offerte; return o && o.empfohlen ? clean(String(o.empfohlen)) : '–'; };   /* v2982 */
-        t.push('Empfehlung beim Ankauf: ' + clean(alt.empfehlung || '–') + ' · heute: ' + clean(a.empfehlung || '–'));
-        t.push('Empfohlener Kaufpreis beim Ankauf: ' + kp(alt) + ' · heute: ' + kp(a));
+        /* v3323 · nur, was der Pilot beim KAUF gesagt hat - im Bestand spricht er keine Empfehlung aus */
+        t.push('Urteil beim Ankauf: ' + clean(alt.empfehlung || '–') + (kp(alt) !== '–' ? ' · empfohlener Kaufpreis damals: ' + kp(alt) : ''));
       }
     } catch (e) {}
-    if (a.soll_ist_steuer) t.push('Steuerlich: ' + clean(a.soll_ist_steuer));
     if (t.length) block('Ankauf gegen heute', t.join('\n\n'));
   })();
-  if (a.steuer_zusammenfassung) block('Steuerliche Zusammenfassung', clean(a.steuer_zusammenfassung) + '\n\nEine Einordnung aus den Eingaben im Reiter Steuer — keine Steuerberatung.');
+  /* v3323 · „steuerlich Ankauf gegen heute" gehört zur Steuer (Marcel 12.11.2026) */
+  if (a.steuer_zusammenfassung) block('Steuerliche Zusammenfassung', clean(a.steuer_zusammenfassung) + (a.soll_ist_steuer ? '\n\nAnkauf gegen heute: ' + clean(a.soll_ist_steuer) : '') + '\n\nEine Einordnung aus den Eingaben im Reiter Steuer — keine Steuerberatung.');
   (function () {
     var SV = window.DpSteuerVerlauf, r = null;
     try { r = SV && SV.reihe ? SV.reihe() : null; } catch (e) { r = null; }

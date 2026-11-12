@@ -177,7 +177,7 @@
       '.dp-pa4-urteil small{font:600 10.5px "JetBrains Mono",monospace;letter-spacing:.08em;color:#A49D92;text-transform:uppercase}',
       '.dp-pa4-urteil .z{font:700 30px/1 "Space Grotesk",Inter,sans-serif;color:var(--wl-e8cc7a,#E8CC7A)}',
       '.dp-pa4-urteil .u{font:500 11.5px Inter,sans-serif;color:#A49D92}',
-      '.dp-pa4-brief p{margin:0;font:400 13.5px/1.55 Inter,system-ui,sans-serif;color:#F1EDE5;max-width:80ch}',
+      '.dp-pa4-brief p{margin:0;font:400 13.5px/1.55 Inter,system-ui,sans-serif;color:#F1EDE5}',
       '.dp-pa4-brief p+p{margin-top:6px}',
       '@media (max-width:620px){.dp-pa4-brief{grid-template-columns:1fr}}',
       /* Kennzahl-Karten (wie die Zahlen des Steuerverlaufs) */
@@ -191,7 +191,7 @@
       '.dp-pa4-ta{display:grid;gap:12px}',
       '.dp-pa4-a{border-left:3px solid var(--wl-c9a84c,#C9A84C);padding:2px 0 2px 14px;display:grid;gap:4px}',
       '.dp-pa4-a h4{margin:0;font:600 10.5px "JetBrains Mono",monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--wl-b8932f,#8a6d1f)}',
-      '.dp-pa4-a p,.dp-pa4-a li{margin:0;font:400 13.5px/1.6 Inter,system-ui,sans-serif;color:#2A2727;max-width:84ch}',
+      '.dp-pa4-a p,.dp-pa4-a li{margin:0;font:400 13.5px/1.6 Inter,system-ui,sans-serif;color:#2A2727}',
       '.dp-pa4-a ul{margin:0;padding-left:18px;display:grid;gap:3px}',
       '.dp-pa4-a dl{margin:0;display:grid;gap:4px}.dp-pa4-a dt{font:600 12.5px Inter,sans-serif;color:#2A2727}.dp-pa4-a dd{margin:0 0 4px;font:400 13.5px/1.6 Inter,sans-serif;color:#2A2727}',
       /* Worauf es ankommt */
@@ -210,7 +210,7 @@
       '.dp-pa4-szk dt{color:#7A7370}.dp-pa4-szk dd{margin:0;text-align:right;font-weight:600}',
       '.dp-pa4-vor{display:inline-block;font:600 9.5px "JetBrains Mono",monospace;letter-spacing:.05em;text-transform:uppercase;padding:2px 6px;border-radius:5px;border:1px solid #B8AFA0;color:#7A7370;margin-left:6px;vertical-align:1px}',
       /* erklärender Text im Detail */
-      '.dp-pa4-erkl{margin:10px 0 0;font:400 12.5px/1.6 Inter,sans-serif;color:#4A4542;max-width:90ch}',
+      '.dp-pa4-erkl{margin:10px 0 0;font:400 12.5px/1.6 Inter,sans-serif;color:#4A4542}',
       '.dp-pa4-erkl b{color:#2A2727}',
       /* Tabelle Steuer nach Gruppen */
       '.dp-pa4-tab{overflow-x:auto;border:1px solid #E6DCC2;border-radius:12px;margin-top:12px}',
@@ -245,7 +245,36 @@
       '.dp-pa4-chips{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 8px}',
       '.dp-pa4-chips button{border:1px solid #E6DCC2;background:#fff;border-radius:999px;padding:3px 10px;font:500 11.5px Inter,sans-serif;cursor:pointer;color:#2A2727;opacity:.5}',
       '.dp-pa4-chips button.an{opacity:1}',
-      '.dp-pa4-chips button i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px;vertical-align:0}'
+      '.dp-pa4-chips button i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px;vertical-align:0}',
+      /* v3323 · Marcel 12.11.2026: Texte „bis zum Ende ausgeschrieben … in Blocksatz“ - Blocksatz mit Silbentrennung (html lang=de), volle Breite */
+      '.dp-pa-wrap[data-dp-pa-v4] .dp-pa-content p,.dp-pa-wrap[data-dp-pa-v4] .dp-pa-content li,.dp-pa-wrap[data-dp-pa-v4] .dp-pa-content dd,.dp-pa-wrap[data-dp-pa-v4] .dp-pa-kv{text-align:justify;-webkit-hyphens:auto;hyphens:auto;overflow-wrap:break-word}',
+      '.dp-pa-wrap[data-dp-pa-v4] .dp-pa-content .dp-pa-p{max-width:none !important}',
+      /* v3323 · Wert & Verlauf: im Einfach ohne die Tafel der Absolutwerte (der Verlauf selbst steht jetzt in beiden) */
+      '.dp-pa-wrap[data-dp-pa-modus="einfach"] .dpv-card:has(.dpv-tbl){display:none !important}',
+      '.dp-pa4-bt{display:block;font:600 10.5px "JetBrains Mono",monospace;letter-spacing:.08em;text-transform:uppercase;color:#A49D92;margin:0 0 4px}',
+      /* Strategie neben der Bestandsstrategie */
+      '.dp-pa4-strat-reihe{display:grid;grid-template-columns:minmax(0,1fr) 220px;gap:14px;align-items:start}',
+      '@media (max-width:700px){.dp-pa4-strat-reihe{grid-template-columns:1fr}}',
+      '.dp-pa4-strat{border:1px solid #E6DCC2;border-radius:12px;padding:10px 12px;background:#FBF6E9;display:grid;gap:2px;align-content:start}',
+      '.dp-pa4-strat small{font:600 10px "JetBrains Mono",monospace;letter-spacing:.08em;text-transform:uppercase;color:#6B645A;margin-bottom:2px}',
+      '.dp-pa4-strat b{font:700 14px "Space Grotesk",Inter,sans-serif;color:#2A2727}',
+      '.dp-pa4-strat em{font-style:normal;font:400 11px Inter,sans-serif;color:#7A7370;margin-bottom:4px}',
+      '.dp-pa-wrap[data-dp-pa-v4] .dp-pa4-link{justify-self:start;border:0 !important;background:transparent !important;padding:2px 0 !important;font:600 12px Inter,sans-serif !important;color:var(--wl-b8932f,#8a6d1f) !important;text-decoration:underline;cursor:pointer;box-shadow:none !important;min-height:0 !important}',
+      /* Investor-Fit kompakt */
+      '.dp-pa4-fit{display:grid;gap:8px}',
+      '.dp-pa4-fit > div{display:grid;grid-template-columns:180px auto minmax(0,1fr);gap:4px 10px;align-items:baseline}',
+      '.dp-pa4-fit .l{font:600 12.5px Inter,sans-serif;color:#2A2727}',
+      '.dp-pa4-fit p{margin:0 !important}',
+      '@media (max-width:620px){.dp-pa4-fit > div{grid-template-columns:1fr auto}.dp-pa4-fit p{grid-column:1/-1}}',
+      '.dp-pa4-fitp{display:inline-block;font:600 11px Inter,sans-serif;color:#fff;border-radius:999px;padding:2px 9px}',
+      /* Wegweiser in die Reiter */
+      '.dp-pa4-weg{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin:14px 0 0}',
+      '.dp-pa-wrap[data-dp-pa-v4] .dp-pa4-wk{position:relative;display:grid !important;gap:2px;text-align:left !important;border:1px solid #E6DCC2 !important;background:#fff !important;border-radius:12px !important;padding:11px 28px 11px 13px !important;cursor:pointer;box-shadow:none !important;min-height:0 !important;color:#2A2727 !important}',
+      '.dp-pa-wrap[data-dp-pa-v4] .dp-pa4-wk:hover{border-color:var(--wl-c9a84c,#C9A84C) !important;background:#FBF6E9 !important}',
+      '.dp-pa4-wk small{font:600 10px "JetBrains Mono",monospace;letter-spacing:.08em;text-transform:uppercase;color:#6B645A}',
+      '.dp-pa4-wk b{font:700 15px "Space Grotesk",Inter,sans-serif;color:#2A2727;font-variant-numeric:tabular-nums}',
+      '.dp-pa4-wk em{font-style:normal;font:400 11.5px Inter,sans-serif;color:#7A7370}',
+      '.dp-pa4-wk i{position:absolute;right:11px;top:50%;transform:translateY(-50%);font:700 18px/1 "Space Grotesk",sans-serif;font-style:normal;color:var(--wl-b8932f,#b8932f)}'
     ].join('\n');
     document.head.appendChild(s);
   }
@@ -260,6 +289,28 @@
       }
     } catch (e) {}
     return null;
+  }
+  /* v3323 · Marcel 12.11.2026: „den Deal Score haben wir ja gar nicht mehr eingeblendet, wenn wir den
+     passenden Plan haben … deswegen können wir uns darauf nicht mehr beziehen". Welcher Score im Plan
+     sichtbar ist, sagt dieselbe Weiche wie calc.js (deal_score_v2): voll → Investor Deal Score, 'demo'
+     (Free) → beide, sonst (Starter) → DealPilot-Score. Unter 70 % der KPIs zeigt die App gar keinen. */
+  function scoreSicht() {
+    try {
+      var P = window.DealPilotConfig && window.DealPilotConfig.pricing;
+      if (!P) return 'investor';
+      if (typeof P.hasFullFeature === 'function' && P.hasFullFeature('deal_score_v2')) return 'investor';
+      if (typeof P.featureMode === 'function' && P.featureMode('deal_score_v2') === 'demo') return 'beide';
+      return 'dealpilot';
+    } catch (e) { return 'investor'; }
+  }
+  function sichtbarerScore() {
+    try { var vq = window.dpScoreVollstaendigkeit ? window.dpScoreVollstaendigkeit() : null; if (vq && !vq.belastbar) return null; } catch (e) {}
+    if (scoreSicht() === 'dealpilot') {
+      try { var d1 = window.DealScore.computeFromKpis(window.State.kpis); d1 = d1 && typeof d1 === 'object' ? d1.score : d1; if (isFinite(d1)) return { wert: Math.round(d1), name: 'DealPilot-Score' }; } catch (e) {}
+      return null;
+    }
+    var s = investorScore();
+    return s == null ? null : { wert: s, name: 'Investor Deal Score' };
   }
   function wertDaten() {
     try { var d = window.DpWertZielbild && window.DpWertZielbild.daten ? window.DpWertZielbild.daten() : null; return d && d.wert ? d.wert : null; } catch (e) { return null; }
@@ -285,8 +336,8 @@
       z.push(zahlKachel('Marktpreis Ø', eur(w.marktpreisindikation.mitte), oh, 'var(--wl-c9a84c,#C9A84C)'));
     }
     if (w && w.ertragswert && zahl(w.ertragswert.wert)) z.push(zahlKachel('Ertragswert', eur(w.ertragswert.wert), w.ertragswert.vorlaeufig ? 'vorläufig' : (zahl(w.ertragswert.lzs_pct) ? 'LZS ' + de(w.ertragswert.lzs_pct, 2) + ' %' : ''), C.c1));
-    var sc = investorScore();
-    if (sc != null) z.push(zahlKachel('Investor Deal Score', String(sc), (window.ScoreTier && window.ScoreTier.stufe ? window.ScoreTier.stufe(sc).wort : ''), '#2A2727'));
+    var sc = sichtbarerScore();
+    if (sc) z.push(zahlKachel(sc.name, String(sc.wert), (window.ScoreTier && window.ScoreTier.stufe ? window.ScoreTier.stufe(sc.wert).wort : ''), '#2A2727'));
     return '<div class="dp-pa4-zahlen" data-dp-pa4-kz="' + (bestand ? 'b' : 'a') + '"' + (z.length ? '' : ' style="display:none"') + '>' + z.join('') + '</div>';
   }
   /* Der Marktbericht (DpWertZielbild) lädt oft erst nach dem Zeichnen - dann die Kacheln neu */
@@ -296,75 +347,121 @@
     });
   }
 
-  /** Das Gesamtstatement: alle Aussagen der Analyse in einer Lesefolge (Detail). */
+  /* ══ v3323 · ÜBERSICHT SCHLANK ═══════════════════════════════════════════════════════════════
+     Marcel 12.11.2026: „wirklich Übersicht, einmal Gesamtbewertung, die Einordnung, Investmentbewertung …
+     für die Strategie, die man fährt, die Bestandsstrategie daneben … Risiko und sowas muss da nicht rein,
+     weil das haben wir in einem anderen Tab, genauso wie Lage und Markt. Abgleich mit dem Marktbericht
+     brauchen wir nicht." Abgeglichen (gemessen an Westerfeldstr. 140, 12.11.2026) – was hier wegfällt,
+     steht dort vollständig:
+       Stärken, Risiken, Risikoanalyse, Szenarien, Optischer Eindruck   → Risiken & Szenarien (risiko())
+       Makro-, Mikrolage, Kaufpreisniveau, Mietspiegel, Abgleich        → Lage & Markt (ui.js pL)
+       Was im Haus steckt (potenzial_text)                              → Potenzialanalyse (DpPaPotenzial)
+       Steuer (steuer_zusammenfassung)                                  → Steuer (steuer())
+       Kaufpreis/Verhandlung, Bank, Anschluss (Ankauf)                  → Kaufpreis & Offerte, Finanzierung & Bank, Risiken
+     Score-Vergleich nur, wo der Plan BEIDE Scores zeigt (scoreSicht() 'beide'); Investor-Fit nur im Ankauf
+     (er fragt, zu welchem Anleger ein Kauf passt). Die Gesamtbewertung steht EINMAL (oben im Briefing). */
+  function strategie() {
+    var ex = '', pr = '';
+    try { var e = document.getElementById('exitstr'); ex = e ? String(e.value || '').trim() : ''; } catch (x) {}
+    try { var ip = window.DealPilotInvestmentProfile; if (ip && typeof ip.get === 'function') pr = String(ip.get('ai_strat') || '').trim(); } catch (x) {}
+    return { exit: ex, profil: pr };
+  }
+  function strategieKasten() {
+    var s = strategie();
+    if (!s.exit && !s.profil) return '';
+    return '<div class="dp-pa4-strat"><small>Deine Strategie</small>'
+      + (s.exit ? '<b>' + esc(s.exit) + '</b><em>Exitstrategie im Reiter Objekt</em>' : '')
+      + (s.profil ? '<b>' + esc(s.profil) + '</b><em>Strategie im Investmentprofil</em>' : '')
+      + '<button type="button" class="btn-clean dp-pa4-link" onclick="try{switchTab(0);setTimeout(function(){var e=document.getElementById(\'exitstr\');if(e){e.scrollIntoView({block:\'center\'});e.focus();}},300)}catch(e){}">ändern</button></div>';
+  }
+  function fitBlock(a) {
+    var f = a.investor_fit && typeof a.investor_fit === 'object' ? a.investor_fit : null;
+    if (!f) return '';
+    var pill = function (v) {
+      var s = String(v || '').toLowerCase().trim();
+      var k = s.indexOf('ja') === 0 ? ['Ja', C.gut] : s.indexOf('nein') === 0 ? ['Nein', C.rot] : ['Teilweise', 'var(--wl-b8932f,#b8932f)'];
+      return '<span class="dp-pa4-fitp" style="background:' + k[1] + '">' + k[0] + '</span>';
+    };
+    var grund = function (v) { return String(v || '').replace(/^\s*(ja|nein|teilweise)\b[\s,.:–—-]*/i, ''); };
+    var z = [['Cashflow-Investor', f.cashflow_investor], ['Wertsteigerungs-Investor', f.wertsteigerungs_investor], ['Sicherheitsorientiert', f.sicherheitsorientiert]]
+      .filter(function (r) { return has(r[1]); });
+    if (!z.length) return '';
+    return abschnitt('Zu welchem Anleger der Kauf passt', '<div class="dp-pa4-fit">' + z.map(function (r) {
+      return '<div><span class="l">' + r[0] + '</span>' + pill(r[1]) + '<p>' + txt(grund(r[1])) + '</p></div>';
+    }).join('') + '</div>');
+  }
+
+  /** Das Gesamtstatement (Detail): Einordnung, Investmentbewertung, Strategie, Insight – die Gesamtbewertung steht oben. */
   function gesamtstatement(a, bestand) {
-    var t = [], ra = a.risikoanalyse && typeof a.risikoanalyse === 'object' ? a.risikoanalyse : null, sz = a.szenarien && typeof a.szenarien === 'object' ? a.szenarien : null;
-    t.push(abschnitt('Gesamtbewertung', absatz(a.gesamtbewertung || a.fazit_kurz)));
+    var t = [];
     t.push(abschnitt(bestand ? 'Einordnung' : 'Begründung des Urteils', absatz(a.empfehlung_begruendung)));
     t.push(abschnitt('Investmentbewertung', absatz(a.investmentbewertung)));
-    if (bestand && a.bestand_modus) t.push(abschnitt('Bestandsstrategie · was du jetzt tun kannst', absatz(a.verhandlungsempfehlung)));
-    t.push(abschnitt('Stärken', liste(a.staerken)));
-    t.push(abschnitt('Risiken', liste(a.risiken)));
-    if (ra) t.push(abschnitt('Risikoanalyse', '<dl>'
-      + (has(ra.finanzierungsrisiko) ? '<dt>Finanzierungsrisiko (LTV und DSCR)</dt><dd>' + txt(ra.finanzierungsrisiko) + '</dd>' : '')
-      + (has(ra.cashflow_stabilitaet) ? '<dt>Cashflow-Stabilität</dt><dd>' + txt(ra.cashflow_stabilitaet) + '</dd>' : '')
-      + (has(ra.annahmen_abhaengigkeit) ? '<dt>Abhängigkeit von Annahmen</dt><dd>' + txt(ra.annahmen_abhaengigkeit) + '</dd>' : '') + '</dl>'));
-    if (sz && (has(sz.worst_case) || has(sz.best_case))) t.push(abschnitt('Szenarien', '<dl>'
-      + (has(sz.worst_case) ? '<dt>Worst Case (Miete −10 %, Zins +1 %)</dt><dd>' + txt(sz.worst_case) + '</dd>' : '')
-      + (has(sz.best_case) ? '<dt>Best Case (Miete +5 %, höhere Wertsteigerung)</dt><dd>' + txt(sz.best_case) + '</dd>' : '') + '</dl>'));
-    if (has(a.makrolage_recherche) || has(a.mikrolage_recherche) || has(a.kaufpreisniveau)) t.push(abschnitt('Lage und Markt', '<dl>'
-      + (has(a.makrolage_recherche) ? '<dt>Makrolage</dt><dd>' + txt(a.makrolage_recherche) + '</dd>' : '')
-      + (has(a.mikrolage_recherche) ? '<dt>Mikrolage</dt><dd>' + txt(a.mikrolage_recherche) + '</dd>' : '')
-      + (has(a.kaufpreisniveau) ? '<dt>Kaufpreisniveau</dt><dd>' + txt(a.kaufpreisniveau) + '</dd>' : '') + '</dl>'));
-    if (has(a.berichts_abgleich)) t.push(abschnitt('Abgleich mit dem Marktbericht', absatz(a.berichts_abgleich)));
-    if (!bestand) {
-      var off = a.kaufpreis_offerte && typeof a.kaufpreis_offerte === 'object' ? a.kaufpreis_offerte : null;
-      t.push(abschnitt('Kaufpreis und Verhandlung', absatz(a.verhandlungsempfehlung) + (off ? absatz(off.begruendung) : '')));
-      t.push(abschnitt('Finanzierung und Bank', liste(a.bankargumente)));
-      if (has(a.anschlussfinanzierung) && typeof a.anschlussfinanzierung === 'string') t.push(abschnitt('Anschlussfinanzierung', absatz(a.anschlussfinanzierung)));
-    }
-    t.push(abschnitt('Was im Haus steckt', absatz(a.potenzial_text)));
-    t.push(abschnitt('Steuer', absatz(a.steuer_zusammenfassung)));
-    t.push(abschnitt('Optischer Eindruck aus den Fotos', absatz(a.optischer_eindruck)));
+    if (bestand && a.bestand_modus && has(a.verhandlungsempfehlung))
+      t.push('<div class="dp-pa4-strat-reihe">' + abschnitt('Bestandsstrategie · was du jetzt tun kannst', absatz(a.verhandlungsempfehlung)) + strategieKasten() + '</div>');
+    else if (bestand) t.push(strategieKasten());
+    if (!bestand) t.push(fitBlock(a));
     t.push(abschnitt('DealPilot-Insight', absatz(a.dealpilot_insight)));
     var h = t.filter(Boolean).join('');
     return h ? '<div class="dp-pa4-ta">' + h + '</div>' : '';
   }
 
-  /** Unterreiter Übersicht. extra = Karten aus ui.js (Score-Vergleich, Investor-Fit, Hinweise). */
-  /** kurz(t): erster Satz, höchstens n Zeichen (Einfach) */
-  function kurz(t, n) { var s = saetze(t, 1); n = n || 150; return s.length > n ? s.slice(0, n).replace(/\s+\S*$/, '') + ' …' : s; }
+  /** v3323 · Karten „Mehr in den Reitern": je Reiter eine Zahl statt eines Absatzes (Einfach und Detail) */
+  function wegweiser(a, bestand) {
+    var k = [];
+    var nS = Array.isArray(a.staerken) ? a.staerken.length : 0, nR = Array.isArray(a.risiken) ? a.risiken.length : 0;
+    if (nS || nR) k.push(['risk', 'Risiken & Szenarien', nS + ' Stärken · ' + nR + ' Risiken', 'Worst, Plan und Best Case']);
+    var lg = null; try { var st = JSON.parse((document.getElementById('_mb_state') || {}).value || 'null'); lg = st && st.card; } catch (e) { lg = null; }
+    if (lg && (zahl(lg.microRaw) || zahl(lg.macroRaw))) k.push(['loc', 'Lage & Markt', (zahl(lg.microRaw) ? 'Mikro ' + Math.round(lg.microRaw) : '') + (zahl(lg.microRaw) && zahl(lg.macroRaw) ? ' · ' : '') + (zahl(lg.macroRaw) ? 'Makro ' + Math.round(lg.macroRaw) : ''), 'von 100, laut Marktbewertung']);
+    else if (has(a.makrolage_recherche) || has(a.mikrolage_recherche)) k.push(['loc', 'Lage & Markt', 'Makro- und Mikrolage', 'mit Quellen']);
+    try {
+      var pk = window.DpPaPotenzial && window.DpPaPotenzial.kurz ? window.DpPaPotenzial.kurz() : null;
+      if (pk) k.push(['pot', 'Potenzialanalyse', pk.zahl, pk.unter]);
+    } catch (e) {}
+    try {
+      var hv = window.DpHausverlauf && window.DpHausverlauf.kurz ? window.DpHausverlauf.kurz() : null;
+      if (hv) k.push(['haus', 'Hausverlauf', hv.zahl, hv.unter]);
+    } catch (e) {}
+    if (!k.length) return '';
+    return '<div class="dp-pa4-weg">' + k.map(function (x) {
+      return '<button type="button" class="btn-clean dp-pa4-wk" data-dp-pa4-geh="' + x[0] + '"><small>' + esc(x[1]) + '</small><b>' + esc(x[2]) + '</b><em>' + esc(x[3]) + '</em><i aria-hidden="true">›</i></button>';
+    }).join('') + '</div>';
+  }
+
+  /** Unterreiter Übersicht. extra = Karten aus ui.js (Score-Vergleich, Hinweise). */
+  /** kurz(t): der erste GANZE Satz (v3323: nie mitten im Satz abschneiden – Marcel: „bis zum Ende ausgeschrieben") */
+  function kurz(t) { return saetze(t, 1); }
 
   function uebersicht(a, bestand, extra) {
     extra = extra || {};
+    window._dpPaLetzte = a;
     var st = window._dpEmpfStufe ? window._dpEmpfStufe(a.empfehlung || a.fazit_kurz) : { label: a.empfehlung || '—', farbe: 'var(--wl-c9a84c,#C9A84C)' };
-    var sc = investorScore();
-    /* v3099e · Marcel: im Bestand KEIN Urteil wie „Halten" - „meistens haben wir eh Spekulationsfristen,
-       wir können eh nicht verkaufen". Im Ankauf bleibt es. Einfach: zwei Sätze statt fünf. */
-    var kurzT = saetze(a.gesamtbewertung || a.fazit_kurz, 2), grund = bestand ? '' : kurz(a.empfehlung_begruendung, 220);
+    var sc = sichtbarerScore();
+    /* v3099e · Marcel: im Bestand KEIN Urteil wie „Halten". Im Ankauf bleibt es. Einfach: zwei ganze Sätze. */
+    var kurzT = saetze(a.gesamtbewertung || a.fazit_kurz, 2), grund = bestand ? '' : saetze(a.empfehlung_begruendung, 1);
     var brief = '<div class="dp-pa4-brief"><div class="dp-pa4-urteil"><small>' + (bestand ? 'Stand heute' : 'Urteil zum Ankauf') + '</small>'
       + (bestand ? '' : '<span class="dp-pa-empf" style="background:' + st.farbe + ';justify-self:start">' + esc(st.label) + '</span>')
-      + (sc != null ? '<span class="z">' + sc + '</span><span class="u">Investor Deal Score</span>' : '') + '</div>'
+      + (sc ? '<span class="z">' + sc.wert + '</span><span class="u">' + esc(sc.name) + '</span>' : '') + '</div>'
       + '<div><div class="dp-pa-e">' + (kurzT ? '<p>' + txt(kurzT) + '</p>' : '') + (grund ? '<p>' + txt(grund) + '</p>' : '') + '</div>'
-      + '<div class="dp-pa-d">' + absatz(a.gesamtbewertung || a.fazit_kurz) + '</div></div></div>';
+      + '<div class="dp-pa-d"><small class="dp-pa4-bt">Gesamtbewertung</small>' + absatz(a.gesamtbewertung || a.fazit_kurz) + '</div></div></div>';
     var h = (extra.hinweis || '') + brief + kennzahlen(bestand);
+    /* Einfach: was du jetzt tun kannst (Bestand) – zwei ganze Sätze, daneben die gewählte Strategie */
+    if (bestand && a.bestand_modus && has(a.verhandlungsempfehlung))
+      h += '<div class="dp-pa-e">' + karte(kopfzeile('Was du jetzt tun kannst') + '<div class="dp-pa4-strat-reihe"><p class="dp-pa-p">' + txt(saetze(a.verhandlungsempfehlung, 2)) + '</p>' + strategieKasten() + '</div>') + '</div>';
+    else if (bestand) h += '<div class="dp-pa-e">' + strategieKasten() + '</div>';
     /* Einfach: die Tendenz als kleine Grafik (Vermögen im Objekt über die Jahre) */
     h += '<div class="dp-pa-e dp-pa4-mini" data-dp-pa4-mini="vermoegen"></div>';
-    if (bestand && a.bestand_modus && has(a.verhandlungsempfehlung))
-      h += '<div class="dp-pa-e">' + karte(kopfzeile('Was du jetzt tun kannst') + '<p class="dp-pa-p">' + txt(kurz(a.verhandlungsempfehlung, 220)) + '</p>') + '</div>';
-    /* Einfach: worauf es ankommt - je zwei, ein Satz */
-    var st2 = (Array.isArray(a.staerken) ? a.staerken : []).slice(0, 2), ri2 = (Array.isArray(a.risiken) ? a.risiken : []).slice(0, 2);
-    if (st2.length || ri2.length) h += '<div class="dp-pa-e">' + karte(kopfzeile('Worauf es ankommt') + '<div class="dp-pa4-zwei">'
-      + '<div><b style="font:600 12px Inter,sans-serif;color:#2E7D50">Dafür</b><ul class="dp-pa4-liste">' + st2.map(function (x) { return '<li>' + txt(kurz(x, 130)) + '</li>'; }).join('') + '</ul></div>'
-      + '<div><b style="font:600 12px Inter,sans-serif;color:#B8625C">Dagegen</b><ul class="dp-pa4-liste">' + ri2.map(function (x) { return '<li>' + txt(kurz(x, 130)) + '</li>'; }).join('') + '</ul></div></div>'
-      + '<button type="button" class="btn-clean dp-pa4-mehr" data-dp-pa-modus-setzen="detail">Ausführlich lesen (Detail)</button>') + '</div>';
-    /* Detail: das ganze Statement */
+    /* Detail: das Statement ohne die Teile, die einen eigenen Reiter haben */
     var gs = gesamtstatement(a, bestand);
-    h += '<div class="dp-pa-d">' + karte(kopfzeile(bestand ? 'Gesamtstatement zum Bestand' : 'Gesamtstatement zum Ankauf') + gs
-      + '<p class="dp-pa4-erkl">Das Statement fasst alle Teile der Pilot-Analyse in einer Lesefolge zusammen: ' + (bestand ? 'erst die Einordnung' : 'erst das Urteil und seine Begründung') + ', dann Stärken, Risiken und Szenarien, '
-      + 'danach Lage, ' + (bestand ? 'Potenzial und Steuer' : 'Kaufpreis, Bank, Potenzial und Steuer') + '. Die Zahlen darin sind der Stand der Analyse; die Kacheln oben zeigen die heutige Rechnung.</p>')
-      + (extra.score || '') + (extra.fit || '') + '</div>';
+    if (gs) h += '<div class="dp-pa-d">' + karte(kopfzeile(bestand ? 'Einordnung und Strategie' : 'Begründung und Einordnung') + gs) + '</div>';
+    if (extra.score && scoreSicht() === 'beide') h += '<div class="dp-pa-d">' + extra.score + '</div>';
+    h += '<div data-dp-pa4-weg="1">' + wegweiser(a, bestand) + '</div>';
     return h;
+  }
+  /* Die Wegweiser lesen Potenzial und Hausverlauf, die oft erst nach dem Zeichnen da sind */
+  function wegNeu() {
+    Array.prototype.forEach.call(document.querySelectorAll('[data-dp-pa4-weg]'), function (hst) {
+      try { var a = window._dpPaLetzte || {}; hst.innerHTML = wegweiser(a, !!(hst.closest('.dp-pa-bestand'))); } catch (e) {}
+    });
   }
 
   /** Unterreiter Risiken & Szenarien */
@@ -492,6 +589,8 @@
         ? '<p class="dp-pa-p dp-pa-e">' + txt(kurz(a.steuer_zusammenfassung, 220)) + '</p><p class="dp-pa-p dp-pa-d">' + txt(a.steuer_zusammenfassung) + '</p>'
         : '<div class="dp-pa-fuss" style="margin-top:0">Diese Analyse wurde vor der steuerlichen Zusammenfassung erstellt. Beim nächsten Abruf steht sie hier.</div>')
       + '<div class="dp-pa-fuss dp-pa-d">Eine Einordnung aus deinen Eingaben im Reiter Steuer – keine Steuerberatung. Lass sie von deinem Steuerberater bestätigen.</div>', 'dp-pa4-mt');
+    /* v3323 · Marcel 12.11.2026: „steuerlich Ankauf gegen heute … die Steuersachen zu Steuern“ - stand bis hier unter Ankauf · Bestand · Zielbild */
+    if (bestand && has(a.soll_ist_steuer)) h += karte(kopfzeile('Steuerlich: Ankauf gegen heute') + '<p class="dp-pa-p">' + txt(a.soll_ist_steuer) + '</p>', 'dp-pa4-mt');
     h += belegeHtml(bestand);
     h += '<div class="dp-pa-d">' + karte(kopfzeile((_bg.corp ? 'Betriebseinnahmen und Betriebsausgaben' : 'Einnahmen und Werbungskosten') + ' nach Gruppen') + '<div class="dp-pa4-tab" data-dp-pa4-steuertab="1"></div>'
       + erkl('Die Gruppen sind die des Reiters Steuer: <b>Finanzierung</b> (Zinsen und Finanzierungskosten), <b>Betriebskosten</b> (umgelegt und nicht umlagefähig), <b>Verwaltung</b>, <b>Sonstiges</b>, <b>AfA</b> sowie <b>Erhaltung und anschaffungsnaher Aufwand</b>. '
@@ -853,16 +952,23 @@
     reiter.push('<button type="button" class="btn-clean dp-pa-tab" id="dp-pa-tab-wert" style="display:none" onclick="_dpPaTab(\'wert\',this)">Wert &amp; Verlauf</button>');
     inhalt.push(panel('wert', o.wert, false));
     add('loc', 'Lage &amp; Markt', o.lage ? '<div class="dp-pa-e dp-pa4-mini" data-dp-pa4-mini="lage"></div>' + kuerzen(o.lage) : o.lage);
+    /* v3323 · zwei neue Reiter: Potenzialanalyse (pa-potenzial.js) und Hausverlauf (hausverlauf.js) */
+    var potH = ''; try { potH = window.DpPaPotenzial ? window.DpPaPotenzial.html(o.analyse || {}, bestand) : ''; } catch (eP) { potH = ''; }
+    var hausH = ''; try { hausH = window.DpHausverlauf ? window.DpHausverlauf.html() : ''; } catch (eH) { hausH = ''; }
     if (bestand) {
+      add('pot', 'Potenzialanalyse', potH);
       add('steuer', 'Steuer', o.steuer);
       add('risk', 'Risiken &amp; Szenarien', o.risiko);
+      add('haus', 'Hausverlauf', hausH);
       add('unterlagen', 'Unterlagen &amp; WEG', unterlagenPanel(o.unterlagen));
       add('anschluss', 'Anschluss &amp; Exit', kuerzen(o.anschlussExit));
     } else {
       add('risk', 'Risiken &amp; Szenarien', o.risiko);
+      add('pot', 'Potenzialanalyse', potH);
       add('verh', 'Kaufpreis &amp; Offerte', kuerzen(o.verhandlung));
       add('bank', 'Finanzierung &amp; Bank', kuerzen(o.bank));
       add('steuer', 'Steuer', o.steuer);
+      add('haus', 'Hausverlauf', hausH);
       add('unterlagen', 'Unterlagen &amp; WEG', unterlagenPanel(o.unterlagen));
     }
     var phase = bestand ? 'Bestand' : 'Ankauf', info = '', seit = '';
@@ -900,7 +1006,7 @@
       + '<button type="button" class="btn-clean dp-pa4-mehr-r" data-dp-pa4-blaettern="1" aria-label="Weitere Reiter" tabindex="-1">›</button>'
       + '</div>' + seg() + '</div>';
     try { localStorage.setItem('dp_pa_si_ansicht', m === 'detail' ? 'genau' : 'einfach'); } catch (e) {}
-    try { setTimeout(function () { leisteMessen(); minisZeichnen(); if (window.DpWertZielbild && window.DpWertZielbild.laden) window.DpWertZielbild.laden().then(function () { kzNeu(); minisZeichnen(); }, function () {}); }, 0); } catch (e) {}
+    try { setTimeout(function () { leisteMessen(); minisZeichnen(); if (window.DpWertZielbild && window.DpWertZielbild.laden) window.DpWertZielbild.laden().then(function () { kzNeu(); minisZeichnen(); wegNeu(); }, function () {}); }, 0); } catch (e) {}
     return '<div class="dp-pa-wrap' + (bestand ? ' dp-pa-bestand' : '') + '" data-dp-pa-v4="1" data-dp-pa-modus="' + m + '" data-dp-pa-ansicht="' + (bestand ? 'bestand' : 'ankauf') + '">'
       + kopf + leiste
       + '<div class="dp-pa-content">' + inhalt.join('') + '</div></div>';
@@ -941,6 +1047,15 @@
       if (rl) { var w = Math.max(120, rl.clientWidth * 0.7) * Number(bl.getAttribute('data-dp-pa4-blaettern')); try { rl.scrollBy({ left: w, behavior: 'smooth' }); } catch (e) { rl.scrollLeft += w; } }
       return;
     }
+    /* v3323 · Wegweiser-Karten der Übersicht öffnen ihren Reiter */
+    var gh = t.closest('[data-dp-pa4-geh]');
+    if (gh) {
+      ev.preventDefault();
+      var wr = gh.closest('.dp-pa-wrap'), id = gh.getAttribute('data-dp-pa4-geh');
+      var tb = wr && [].filter.call(wr.querySelectorAll('.dp-pa-rail .dp-pa-tab'), function (b) { return (b.getAttribute('onclick') || '').indexOf("'" + id + "'") >= 0; })[0];
+      if (tb) { tb.click(); try { tb.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' }); wr.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (e) {} }
+      return;
+    }
     var rt = t.closest('.dp-pa4-rail-box .dp-pa-tab');
     if (rt) { setTimeout(function () { try { rt.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' }); } catch (e) {} leisteMessen(); }, 0); }
     var p = t.closest('[data-dp-pa4-pdf]');
@@ -953,6 +1068,6 @@
     }
   });
 
-  window.DpPilotV4 = { VERSION: 'v3259', leisteMessen: leisteMessen, huelle: huelle, uebersicht: uebersicht, risiko: risiko, steuer: steuer, gesamtstatement: gesamtstatement,
+  window.DpPilotV4 = { VERSION: 'v3323', wegNeu: wegNeu, scoreSicht: scoreSicht, sichtbarerScore: sichtbarerScore, leisteMessen: leisteMessen, huelle: huelle, uebersicht: uebersicht, risiko: risiko, steuer: steuer, gesamtstatement: gesamtstatement,
     wertverlauf: wertverlauf, indexVerlauf: indexVerlauf, linien: linien, modus: modus, setzeModus: setzeModus, neuZeichnen: neuZeichnen, saetze: saetze, steuerTabelle: steuerTabelle };
 })();

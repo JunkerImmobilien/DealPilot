@@ -1492,6 +1492,8 @@ function _buildAIPayload() {
       };
     }
   } catch (e) { /* optional */ }
+  /* v3323 · welcher Score im Plan sichtbar ist - der Prompt nennt nur diesen (openaiService.js buildPrompt scoreSicht) */
+  try { if (window.DpPilotV4 && window.DpPilotV4.scoreSicht) payload.score_sichtbar = window.DpPilotV4.scoreSicht(); } catch (e) { /* optional */ }
   // v590: Investor Deal Score (DS2) fuer Score-Vergleich, falls vorhanden
   try {
     var _d2 = window._dpLastDs2;
@@ -2402,7 +2404,9 @@ function _renderAIServerAnalysis(a) {
       + String(_im.zeile).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</div>';
     if (!t) return '';
     return '<div class="dp-pa-card">' + sec('', I.bank, 'ANKAUF \u00b7 BESTAND \u00b7 ZIELBILD') + '<div data-dp-pot-wirt="1">' + t + '</div>'
-      + (has(a.potenzial_text) ? '<div style="margin-top:12px">' + sec('', I.bank, 'PILOT: WAS IM HAUS STECKT') + (function () {
+      /* v3323 · der Absatz des Piloten steht in Fassung 4 ganz in der Potenzialanalyse - hier der Weg dorthin */
+      + (has(a.potenzial_text) && window.DpPaPotenzial && window.DpPilotV4 ? '<p class="dp-pa-p" style="margin-top:10px">Was der Pilot zu Mieterhöhung, Zielbild und Aufteilung sagt, steht im Reiter <button type="button" class="btn-clean dp-pa4-link" data-dp-pa4-geh="pot">Potenzialanalyse</button>.</p>'
+        : has(a.potenzial_text) ? '<div style="margin-top:12px">' + sec('', I.bank, 'PILOT: WAS IM HAUS STECKT') + (function () {
           /* v2842 · Marcel: „die Texte zwischen den Tabellen sind zu lang" - zwei Sätze, der Rest aufklappbar */
           var t = String(a.potenzial_text), m = t.match(/^([\s\S]*?[.!?])\s+([\s\S]*?[.!?])\s+([\s\S]+)$/);
           if (!m) return p(t);
@@ -2418,34 +2422,31 @@ function _renderAIServerAnalysis(a) {
     var AK = window.DealPilotAnkauf, st = AK && AK.stand ? AK.stand() : (window._dpAnkauf || null);
     var roh = st && st.daten ? st.daten._ai : null, alt = null;
     try { alt = roh ? (typeof roh === 'string' ? JSON.parse(roh) : roh) : null; } catch (e) { alt = null; }
-    var kopf = sec('', I.bank, 'PILOT-ANALYSE: ANKAUF GEGEN HEUTE');
+    /* v3323 · Marcel 12.11.2026: „eine Empfehlung … sollten wir da nicht aussprechen. Das machen wir nur im Ankauf
+       … ich weiß auch nicht, ob wir da jetzt nochmal eine Gesamtbewertung brauchen.“ Bis hier stand eine Tafel
+       Ankauf | Heute mit Empfehlung (Kaufen | Halten), empfohlenem Kaufpreis, Begründung und der Gesamtbewertung beim
+       Ankauf zum Aufklappen. Jetzt nur noch, was der Pilot beim KAUF gesagt hat - das Urteil von damals ist eine
+       Tatsache des Ankaufs; heute spricht der Pilot im Bestand keine Empfehlung aus (Übersicht: Einordnung). */
+    var kopf = sec('', I.bank, 'PILOT BEIM ANKAUF');
     if (!alt || typeof alt !== 'object' || !(alt.empfehlung || alt.gesamtbewertung)) {
       return '<div class="dp-pa-card" style="margin-top:12px" data-dp-si-pilot="1">' + kopf + '<p class="dp-pa-p">Beim Festschreiben des Ankauf-Stands lag keine Pilot-Analyse vor. '
-        + 'Was der Pilot damals gesagt hätte, lässt sich nicht nachträglich erzeugen — eine neue Analyse beschreibt immer den heutigen Stand.</p></div>';
+        + 'Was der Pilot damals gesagt hätte, lässt sich nicht nachträglich erzeugen.</p></div>';
     }
     function dat(x) { var d = x && x._fuer && x._fuer.stand ? new Date(x._fuer.stand) : null; return d && !isNaN(d) ? d.toLocaleDateString('de-DE') : 'ohne Datum'; }
-    function kp(x) { if (x && x.bestand_modus) return 'entfällt (im Bestand)'; var o = x && x.kaufpreis_offerte; return o && o.empfohlen ? _escClean(String(o.empfohlen)) : '–'; }   /* v2982 */
-    function kurz(t, n) { t = String(t || ''); return t.length > n ? t.slice(0, n).replace(/\s+\S*$/, '') + ' …' : t; }
-    var gleich = alt._fuer && a._fuer && alt._fuer.stand === a._fuer.stand;
-    var zeile = function (wort, x, y) { return '<tr><td class="abw-wort">' + wort + '</td><td>' + x + '</td><td>' + y + '</td></tr>'; };
+    var _stA = window._dpEmpfStufe ? window._dpEmpfStufe(alt.empfehlung || alt.fazit_kurz) : null;
+    var _kpA = alt.kaufpreis_offerte && alt.kaufpreis_offerte.empfohlen ? _escClean(String(alt.kaufpreis_offerte.empfohlen)) : '';
     return '<div class="dp-pa-card" style="margin-top:12px" data-dp-si-pilot="1">' + kopf
-      + (gleich ? '<p class="dp-pa-p">Seit dem Festschreiben wurde keine neue Analyse abgerufen — beide Spalten zeigen dieselbe. Ruf sie neu ab, dann steht hier, wie der Pilot das Objekt <b>heute</b> sieht.</p>' : '')
-      + '<table class="abw-tafel"><thead><tr><th></th><th>Beim Ankauf</th><th>Heute</th></tr></thead><tbody>'
-      + zeile('Stand', dat(alt), dat(a))
-      + zeile('Empfehlung', '<b>' + _escClean(alt.empfehlung || '–') + '</b>', '<b>' + _escClean(a.empfehlung || '–') + '</b>')
-      + zeile('Empfohlener Kaufpreis', kp(alt), kp(a))
-      + zeile('Begründung', _escClean(kurz(alt.empfehlung_begruendung, 260)), _escClean(kurz(a.empfehlung_begruendung, 260)))
-      + '</tbody></table>'
-      /* v2982 · Marcel zu Hüllhorst: „erst prüfen und jetzt kaufen? warum? ist doch schon im Bestand." */
-      + (a.bestand_modus
-          ? '<p class="dp-pa-p" style="margin-top:8px">Beim Ankauf war die Frage „kaufen?", heute ist sie „halten?": das Objekt ist im Bestand. Die beiden Empfehlungen beantworten deshalb verschiedene Fragen.</p>'
-          : (gleich ? '' : '<p class="dp-pa-p" style="margin-top:8px"><b>Die heutige Analyse bewertet das Objekt noch als Kaufangebot.</b> Sie stammt aus der Zeit, bevor der Pilot Bestandsobjekte als Halteentscheidung bewertet. Ruf die Analyse neu ab, dann heißt die Empfehlung Halten, Optimieren oder Verkauf prüfen.</p>'))
-      + '<details style="margin-top:10px"><summary style="cursor:pointer;font:600 12px Inter,sans-serif">Gesamtbewertung beim Ankauf lesen</summary>'
-      + '<p class="dp-pa-p" style="margin-top:8px">' + _escClean(alt.gesamtbewertung || '') + '</p></details></div>';
+      + '<div style="display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;margin:2px 0 8px;font:500 12.5px Inter,sans-serif;color:#4A4542">'
+      + '<span>Analyse vom <b>' + dat(alt) + '</b></span>'
+      + (alt.empfehlung ? '<span>Urteil damals: <span class="dp-pa-empf" style="background:' + (_stA ? _stA.farbe : 'var(--wl-c9a84c,#C9A84C)') + '">' + _escClean(_stA ? _stA.label : alt.empfehlung) + '</span></span>' : '')
+      + (_kpA ? '<span>empfohlener Kaufpreis damals: <b>' + _kpA + '</b></span>' : '') + '</div>'
+      + (has(alt.empfehlung_begruendung) ? p(alt.empfehlung_begruendung) : '')
+      + '<div class="dp-pa-fuss">Das war die Kaufentscheidung. Im Bestand spricht der Pilot keine Empfehlung aus – wie das Objekt heute dasteht, zeigt die Übersicht; die Zahlen damals gegen heute stehen in der Tafel darüber.</div></div>';
   })();
   /* v2160 · N62.6 — der Steuer-Text des Modells gehoert AN die Tafel:
      die Tafel zeigt die Zahlen, der Text erklaert ihre Bewegung. */
-  if (_siHtml && has(a.soll_ist_steuer)) {
+  /* v3323 · in Fassung 4 steht der Satz im Unterreiter Steuer (pilot-analyse-v4.js steuer()) */
+  if (_siHtml && has(a.soll_ist_steuer) && !(window.DpPilotV4 && window.DpPilotV4.huelle)) {
     _siHtml += '<div class="dp-pa-card" style="margin-top:12px">' + sec('', I.bank, 'STEUERLICH: ANKAUF GEGEN HEUTE') + p(a.soll_ist_steuer) + '</div>';
   }
   /* v2160 · N62.6 — der Steuer-Reiter. Er steht immer: eine Analyse von
@@ -2630,10 +2631,12 @@ function _renderAIServerAnalysis(a) {
         ? (function () { try { return window.DpWertZielbild ? window.DpWertZielbild.reiterHtml(_gV4, { mitAnkauf: !!_siHtml, mitPot: !!_potHtml }) : _gV4; } catch (eW) { return _gV4; } })()
         : _siInner;
       var _wertInner = '<div data-dp-pa-wertverlauf="1"></div><div id="dp-pa-wert-body"></div>'
-        + '<div id="dp-pa-verlauf-wrap" class="dp-pa-d" style="display:none;margin-top:16px"><h4 class="dp-wv-h" style="margin:0 0 8px">Verlauf · Marktberichte und Abrufe</h4>'
+        /* v3323 · Marcel 12.11.2026: „unter Wert und Verlauf … die Marktberichtentwicklung … da müsste eigentlich alles drin stehen" -
+           der Verlauf stand nur im Detail (class dp-pa-d); jetzt in beiden, im Einfach ohne Tafel und mit „Kurz gesagt" */
+        + '<div id="dp-pa-verlauf-wrap" style="display:none;margin-top:16px"><h4 class="dp-wv-h" style="margin:0 0 8px">Verlauf · Marktberichte und Abrufe</h4>'
         + '<div class="dp-pa-card" id="dp-pa-verlauf-body"></div></div>';
       var _v4 = V4.huelle({
-        bestand: _bestand, kopf: _kopf,
+        bestand: _bestand, kopf: _kopf, analyse: a,   /* v3323 · fuer Potenzialanalyse */
         uebersicht: V4.uebersicht(a, _bestand, { hinweis: _pbHinweis, score: _pbScore, fit: _pbFit }),
         si: _siV4, wert: _wertInner, lage: pL, steuer: V4.steuer(a, _bestand),
         risiko: V4.risiko(a, _bestand, { optisch: _pbOptisch, anschluss: _bestand ? '' : _pbAnschluss }),
@@ -3546,7 +3549,7 @@ try { window._buildAIPayload = _buildAIPayload; } catch (e) {}
       '</div>' +
       '<div class="dp-pa-card dpv-card">' +
         '<div class="dpv-h">KI-Einordnung des Verlaufs</div>' +
-        '<div class="dpv-sub">Ausf\u00fchrliche Einordnung aller Berichte \u00b7 im Plan enthalten</div>' +
+        '<div class="dpv-sub">Einordnung aller Berichte \u00b7 im Plan enthalten</div>' +
         /* v2171 · Hier stand ein Knopf „Trend-Text erzeugen", und der Text
            war drei bis fuenf Saetze lang. Marcel am 13.10.2026: „das sollte
            schon neu erstellt werden und auch ausfuehrlich ohne extra
@@ -3642,10 +3645,10 @@ try { window._buildAIPayload = _buildAIPayload; } catch (e) {}
     if (typeof Auth === 'undefined' || !Auth.apiCall) { out.innerHTML = ''; return; }
     var objKey = window._currentObjKey || '';
     var stand = hist.map(function (h) { return h.id || h.report_id || h.created_at; }).join(',');
-    var merk = 'dp_vtxt_v2171_' + objKey;
+    var merk = 'dp_vtxt_v3323_' + objKey;   /* v3323 · neuer Prompt (Kurz gesagt + drei Abschnitte) - neuer Schluessel */
     try {
       var alt = JSON.parse(localStorage.getItem(merk) || 'null');
-      if (alt && alt.stand === stand && alt.text) { out.innerHTML = _dpVEscP(alt.text); return; }
+      if (alt && alt.stand === stand && alt.text) { out.innerHTML = _dpVEscP(alt.text); _dpVKurzMarkieren(out); return; }
     } catch (e) {}
     var labels = mets.reduce(function (a, m) { a[m.key] = m.label; return a; }, {});
     var payload = {
@@ -3670,10 +3673,21 @@ try { window._buildAIPayload = _buildAIPayload; } catch (e) {}
         if (data && data.needs_credits) { out.innerHTML = '<span class="dpv-err">Die Einordnung ist gerade nicht verfügbar.</span>'; return; }
         var t = (data && (data.text || data.report_md)) || '';
         if (!t) { out.innerHTML = '<span class="dpv-err">Die Einordnung kam leer zurück.</span>'; return; }
-        out.innerHTML = _dpVEscP(t);
+        out.innerHTML = _dpVEscP(t); _dpVKurzMarkieren(out);
         try { localStorage.setItem(merk, JSON.stringify({ stand: stand, text: t })); } catch (e) {}
       })
       .catch(function () { out.innerHTML = '<span class="dpv-err">Die Einordnung konnte nicht erstellt werden.</span>'; });
+  }
+  /* v3323 · Einfach zeigt nur den ersten Abschnitt („Kurz gesagt"), Detail alles */
+  function _dpVKurzMarkieren(out) {
+    try {
+      var hs = out.querySelectorAll('h4.dpv-zh'); if (hs.length < 2) return;
+      var n = hs[1];
+      while (n) { var nx = n.nextSibling; if (n.nodeType === 1) n.classList.add('dp-pa-d'); n = nx; }
+      var m = document.createElement('p'); m.className = 'dp-pa-e dpv-mehr';
+      m.innerHTML = '<button type="button" class="btn-clean dp-pa4-mehr" data-dp-pa-modus-setzen="detail">Ganze Einordnung lesen (Detail)</button>';
+      out.appendChild(m);
+    } catch (e) {}
   }
   /* v2171: Zeilen mit „## " werden Zwischenueberschriften, „**x**" fett. */
   function _dpVEscP(t) {
@@ -3756,7 +3770,7 @@ try { window._buildAIPayload = _buildAIPayload; } catch (e) {}
       return '<tr><td class="abw-wort">' + _dpVDate(a.abgerufen_am) + '</td><td class="abw-zahl">' + qm(M.kauf_haus, 0) + '</td><td class="abw-zahl">' + qm(M.kauf_etw, 0) + '</td><td class="abw-zahl">' + qm(M.miete, 2)
         + '</td><td class="abw-zahl">' + mpi + '</td><td class="abw-zahl">' + eur(B.ertragswert) + '</td></tr>';
     }).join('');
-    return '<div class="dp-pa-card" style="margin-top:14px"><h4 class="dpv-h">Abgelegte Marktpreis-Abrufe (' + abrufe.length + ')</h4>'
+    return '<div class="dp-pa-card dp-pa-d" style="margin-top:14px"><h4 class="dpv-h">Abgelegte Marktpreis-Abrufe (' + abrufe.length + ')</h4>'   /* v3323 · nur im Detail */
       + '<p class="dp-pa-p" style="color:#8b8678;margin:2px 0 8px">Jeder Abruf „Marktpreise“ wird mit Datum gespeichert. Kauf- und Mietpreise sind Angebotspreise; die Marktpreisindikation steht nach Abschlag.</p>'
       + '<div style="overflow-x:auto"><table class="abw-tafel dp-wv-tafel" style="min-width:540px"><thead><tr><th>Abruf</th><th>Kauf Haus</th><th>Kauf ETW</th><th>Angebotsmiete</th><th>Marktpreisindikation Bestand<br><span style="font-weight:400;text-transform:none">nach Abschlag</span></th><th>Ertragswert Bestand</th></tr></thead><tbody>'
       + zeilen + '</tbody></table></div></div>';
