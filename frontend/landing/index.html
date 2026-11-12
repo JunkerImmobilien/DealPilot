@@ -50,6 +50,7 @@ if (location.hash === '#forschung') location.replace('forschung.html');</script>
 <link rel="stylesheet" href="dp2-live.css?v=landing-makler-hub-3">
 <link rel="stylesheet" href="dp2-module.css?v=landing-module-2">
 <link rel="stylesheet" href="dp2-kern.css?v=landing-kern-2c">
+<link rel="stylesheet" href="dp2-dealcheck.css?v=landing-dealcheck-2">
 </head><body>
 
 <svg style="display:none" aria-hidden="true">
@@ -331,35 +332,52 @@ if (location.hash === '#forschung') location.replace('forschung.html');</script>
      landing-kern-3 · der Knopf trägt die fünf Zahlen als Fragment (#dc=1&kp=…) in die App;
      dort nimmt js/dealcheck-uebernahme.js sie an und legt nach der Anmeldung auf Nachfrage
      ein Objekt an. Vorbelegung 150.000 € / 880 € (Begründung in dp2-dealcheck.js). -->
-<section class="sec sec-cream dealcheck" id="dealcheck"><div class="wrap">
-  <div class="head ctr rv"><div class="eye ctr">Deal-Check · ohne Anmeldung</div>
-    <h2>Rechnet sich das Objekt? <span class="ac">Prüf es jetzt.</span></h2>
-    <p>Kaufpreis und Kaltmiete eintragen – DealPilot rechnet mit denselben Kernen wie in der App.</p></div>
-  <div class="dc-g rv">
-    <form class="dc-ein" onsubmit="return false" autocomplete="off">
-      <label><span>Kaufpreis</span><input id="dcKp" inputmode="decimal" value="150.000"><i>€</i></label>
-      <label><span>Nettokaltmiete im Monat</span><input id="dcNkm" inputmode="decimal" value="880"><i>€</i></label>
-      <label><span>Eigenkapital</span><input id="dcEk" inputmode="decimal" placeholder="15.000"><i>€</i><small>leer = 10 % des Kaufpreises</small></label>
-      <label><span>Zins</span><input id="dcZins" inputmode="decimal" value="4,0"><i>%</i><small id="dcZinsHinweis">Sollzins, 10 Jahre</small></label>
-      <label><span>Nebenkosten</span><input id="dcNk" inputmode="decimal" value="10"><i>%</i><small>Grunderwerbsteuer, Notar, Makler</small></label>
+<!-- landing-dealcheck-2 · Marcel 12.11.2026: „cooler animieren … mit Wendekarte eingeben, man sieht nur so einen Score mit
+     Progress-Bar … einfacher, kleiner". Vorderseite: Kaufpreis, Kaltmiete, Zinsbindung (indikativer Zins je Bindung,
+     /api/v1/market-rates/bauzins), optional PLZ. Rückseite: Score zählt hoch, Stufe, Cashflow, zwei Kennzahlen,
+     Lage & Markt aus eigenen amtlichen Daten (/api/v1/market-stats/schnellcheck), Übernahme in die App wie bisher. -->
+<section class="sec sec-cream dealcheck dk" id="dealcheck"><div class="wrap dk-g">
+  <div class="dk-text rv"><div class="eye">Deal-Check · 20 Sekunden</div>
+    <h2>Rechnet sich das? <span class="ac">Dreh die Karte um.</span></h2>
+    <p>Zwei Zahlen, eine Zinsbindung – DealPilot rechnet mit denselben Kernen wie in der App und sagt dir sofort, wo der Deal steht.</p>
+    <ul class="dk-pkt"><li>Echter Deal Score, keine Schätzformel</li><li>Zins tagesaktuell je Zinsbindung</li><li>Mit PLZ: Lage &amp; Markt aus amtlichen Daten</li></ul></div>
+  <div class="dk-szene rv"><div class="dk-karte" id="dkKarte">
+    <form class="dk-seite dk-vorn" id="dkVorn" onsubmit="return false" autocomplete="off" aria-label="Deal-Check Eingaben">
+      <div class="dk-kopf"><span class="dk-marke">Deal-Check</span><span class="dk-nr">Boarding · Vorab</span></div>
+      <label class="dk-f"><span>Kaufpreis</span><input id="dcKp" inputmode="decimal" value="150.000" aria-label="Kaufpreis in Euro"><i>€</i></label>
+      <label class="dk-f"><span>Kaltmiete im Monat</span><input id="dcNkm" inputmode="decimal" value="880" aria-label="Nettokaltmiete im Monat in Euro"><i>€</i></label>
+      <fieldset class="dk-bind"><legend>Zinsbindung</legend>
+        <div class="dk-chips" id="dkChips" role="radiogroup" aria-label="Zinsbindung">
+          <button type="button" role="radio" aria-checked="false" data-b="5"><b>5 J</b><small>–</small></button>
+          <button type="button" role="radio" aria-checked="true" class="an" data-b="10"><b>10 J</b><small>–</small></button>
+          <button type="button" role="radio" aria-checked="false" data-b="15"><b>15 J</b><small>–</small></button>
+          <button type="button" role="radio" aria-checked="false" data-b="20"><b>20 J</b><small>–</small></button>
+        </div>
+        <label class="dk-f dk-zins-eigen" id="dkZinsEigen" hidden><span>Zins selbst eintragen</span><input id="dcZins" inputmode="decimal" placeholder="z. B. 4,1" aria-label="Sollzins in Prozent"><i>%</i></label>
+        <small class="dk-stand" id="dkStand">Zins wird geladen …</small>
+      </fieldset>
+      <label class="dk-f dk-plz"><span>PLZ <em>optional · Lage &amp; Markt</em></span><input id="dcPlz" inputmode="numeric" maxlength="5" placeholder="z. B. 32049" aria-label="Postleitzahl, optional"></label>
+      <button type="submit" class="btn-p dk-los" id="dkDreh">Deal prüfen <span aria-hidden="true">↻</span></button>
     </form>
-    <div class="dc-erg leer" id="dcErg" aria-live="polite">
-      <div class="dc-kopf">
-        <div class="dc-ring" id="dcRing"><b id="dcScore">–</b><small>/ 100</small></div>
-        <div><div class="dc-stufe" id="dcStufe">–</div><div class="dc-vorab">Vorab-Einstufung · Deal Score</div></div>
+    <div class="dk-seite dk-hinten" id="dcErg" aria-live="polite" aria-hidden="true">
+      <div class="dk-kopf"><span class="dk-marke">Deal Score</span><button type="button" class="dk-zur" id="dkZur">↺ Eingaben ändern</button></div>
+      <div class="dk-score">
+        <div class="dk-ring" id="dcRing"><svg viewBox="0 0 120 120" aria-hidden="true"><circle class="dk-ring-bg" cx="60" cy="60" r="52"/><circle class="dk-ring-v" id="dkRingV" cx="60" cy="60" r="52"/></svg>
+          <div class="dk-ring-z"><b id="dcScore">0</b><small>/ 100</small></div></div>
+        <div class="dk-stufe-box"><div class="dk-stufe" id="dcStufe">–</div>
+          <div class="dk-skala" aria-hidden="true"><i id="dkBalken"></i><s style="left:35%"></s><s style="left:50%"></s><s style="left:70%"></s><s style="left:85%"></s></div>
+          <div class="dk-skala-w" aria-hidden="true"><span>Kritisch</span><span>Solide</span><span>Sehr gut</span></div></div>
       </div>
-      <div class="dc-kpi">
-        <div><span>Bruttomietrendite</span><b id="dcBmy">–</b></div>
-        <div><span>Nettomietrendite</span><b id="dcNmy">–</b></div>
-        <div id="dcCfK"><span>Cashflow / Monat vor Steuern</span><b id="dcCf">–</b></div>
+      <div class="dk-kpi">
+        <div id="dcCfK" class="dk-cf"><span>Cashflow / Monat</span><b id="dcCf">–</b></div>
+        <div><span>Bruttorendite</span><b id="dcBmy">–</b></div>
         <div><span>DSCR</span><b id="dcDscr">–</b></div>
       </div>
-      <p class="dc-annahme" id="dcAnnahme"></p>
-      <a class="btn-p" id="dcLos" href="https://app.dealpilot.immo/?register=1">Ganz rechnen — 4 Wochen Pro kostenlos</a>
-      <p class="cta-haken dc-haken"><span>Deine Zahlen kommen mit</span><span>Keine Zahlungsdaten</span><span>Lage, Steuer, Wert und Bankunterlage in der App</span></p>
-      <p class="dc-hinweis">Indikative Vorab-Rechnung, keine Finanzierungs- oder Steuerberatung.</p>
+      <div class="dk-lage" id="dkLage" hidden><div class="dk-lage-k"><span id="dkLageTitel">Lage &amp; Markt</span><a id="dkLageMehr" href="https://app.dealpilot.immo/?register=1">mehr in der App →</a></div><div class="dk-lage-g" id="dkLageG"></div><small id="dkLageQ"></small></div>
+      <a class="btn-p dk-weiter" id="dcLos" href="https://app.dealpilot.immo/?register=1">In DealPilot weiterrechnen →</a>
+      <p class="dk-annahme" id="dcAnnahme"></p>
     </div>
-  </div>
+  </div></div>
 </div></section>
 
 <!-- ══ DEALPILOT LIVE ════════════════════════════════════════════════
@@ -596,7 +614,7 @@ if (location.hash === '#forschung') location.replace('forschung.html');</script>
      staging.dealpilot.immo -> app.staging.dealpilot.immo, sonst app.dealpilot.immo. -->
 <script>(function () {
   var h = location.hostname, app = /(^|\.)staging\.dealpilot\.immo$/.test(h) ? 'https://app.staging.dealpilot.immo/' : 'https://app.dealpilot.immo/';
-  ['js/dscr-engine.js?v=v3031b', 'js/deal-kpis.js?v=v3215', 'js/score-tiers.js?v=v3254', 'js/dealscore.js?v=v3289', 'dp2-dealcheck.js?v=landing-kern-3']
+  ['js/dscr-engine.js?v=v3031b', 'js/deal-kpis.js?v=v3215', 'js/score-tiers.js?v=v3254', 'js/dealscore.js?v=v3289', 'dp2-dealcheck.js?v=landing-dealcheck-2']
     .forEach(function (s) { var e = document.createElement('script'); e.src = (s.indexOf('js/') === 0 ? app : '') + s; e.async = false; document.body.appendChild(e); });
 })();</script>
 <script src="dp2-live.js?v=landing-videothek-9"></script><!-- landing-videothek-1 -->
