@@ -35,8 +35,14 @@
        Eigenkapital (10 %) und Nebenkosten (10 %) stehen als Annahme auf der Rückseite.
      · ZINS JE BINDUNG aus /api/v1/market-rates/bauzins (öffentlich, dieselbe Quelle wie
        die Live-Marktzinsen der App: Bundesanleihe des Tages + Marktaufschlag aus der
-       MFI-Zinsstatistik der Bundesbank + K). Gewählt wird die Stufe „standard" (80 %
-       Beleihung) — wie bisher für 10 Jahre, damit die Vorbelegung dieselbe Zahl zeigt.
+       MFI-Zinsstatistik der Bundesbank + K). Gewählt wurde die Stufe „standard" (80 %
+       Beleihung). landing-dealcheck-3 · Marcel 12.11.2026 „höheren": das Darlehen ist hier
+       Kaufpreis + 10 % Nebenkosten − 10 % Eigenkapital = 100 % des Kaufpreises, also gilt die
+       Stufe „voll" (stufen_ltv 100, Zuschlag +0,45 pp aus formel.zuschlaege, dieselbe Kurve wie
+       die App). Gemessen 12.11.2026 mit den echten Kernen, 150.000 € / 880 € / 10 J:
+         standard 4,16 %: CF +23 €, DSCR 1,03, 62 · Solide
+         voll     4,61 %: CF −33 €, DSCR 0,96, 53 · Solide
+       Die Übergabe in die App trägt denselben Zins (&zins=…).
        Kommt kein Zins an, wird KEINER erfunden: dann erscheint ein Feld zum Selbsteintragen.
      · LAGE & MARKT aus /api/v1/market-stats/schnellcheck (v3324, nur eigene amtliche
        Tabellen, 0 € je Abruf — Begründung im Kopf von backend/src/routes/marketStats.js).
@@ -47,6 +53,7 @@
   var box = document.getElementById('dealcheck');
   if (!box) return;
   var VORGABE = { ek_pct: 10, tilg: 1.5, nul_pct: 17, nk_pct: 10, bindung: '10' };
+  var STUFE = 'voll';   /* landing-dealcheck-3 · Beleihungsstufe aus /market-rates/bauzins (voll = 100 %) */
   var RING_U = 2 * Math.PI * 52;
   var $ = function (id) { return document.getElementById(id); };
   var karte = $('dkKarte'), vorn = $('dkVorn'), hinten = $('dcErg');
@@ -103,7 +110,9 @@
       if (!ir) throw new Error('kein Zins');
       var z = {}, n = 0;
       ['5', '10', '15', '20'].forEach(function (b) {
-        var s = ir[b], w = s && (s.standard != null ? s.standard : null);
+        /* landing-dealcheck-3 · Stufe „voll" (100 % Beleihung, stufen_ltv des Endpunkts): bei 10 % Eigenkapital
+           und 10 % Nebenkosten ist das Darlehen = Kaufpreis. Bis hier stand „standard" (80 %). */
+        var s = ir[b], w = s && (s[STUFE] != null ? s[STUFE] : null);
         if (w != null && isFinite(w)) { z[b] = Math.round(w * 100) / 100; n++; }
       });
       if (!n) throw new Error('kein Zins');
@@ -111,7 +120,8 @@
       if (zinsen[bindung] == null) bindung = Object.keys(zinsen)[0];
       var bd = d.formel && d.formel.bund_datum && (d.formel.bund_datum['10'] || d.formel.bund_datum[bindung]);
       var st = datum(bd) || datum(d.abgerufen);
-      standText = 'Indikativer Sollzins bei 80 % Beleihung, aus Daten der Deutschen Bundesbank' + (st ? ' · Stand ' + st : '');
+      var ltvS = d.stufen_ltv && d.stufen_ltv[STUFE];
+      standText = 'Zins für Vollfinanzierung (' + (ltvS || 100) + ' % Beleihung), indikativ aus Daten der Deutschen Bundesbank' + (st ? ' · Stand ' + st : '');
       setze('dkStand', standText);
       chipsZeigen();
     })
