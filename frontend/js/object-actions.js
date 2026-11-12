@@ -2122,7 +2122,7 @@
   function _unterlagenListe() {
     var aus = [];
     _files.forEach(function (f) {
-      if (f.cache && f.cache.mietliste && f.cache.mietliste.success && f.type === 'expose') aus.push({ typ: 'mietaufstellung', label: 'Mieterliste (aus dem Exposé)', dateiname: f.name, extracted: f.cache.mietliste.extracted || {}, datum: (f.cache.mietliste.extracted || {}).stichtag || '' });
+      if (f.cache && f.cache.mietliste && f.cache.mietliste.success && f.type === 'expose') aus.push({ typ: 'mietaufstellung', label: 'Mieterliste (aus dem Exposé)', ausExpose: true, dateiname: f.name, extracted: f.cache.mietliste.extracted || {}, datum: (f.cache.mietliste.extracted || {}).stichtag || '' });
       var a = f.cache && f.cache.dokument; if (!a || !a.success) return;
       [a].concat(a.weitere || []).forEach(function (t) {
         var x = t.extracted || {};
@@ -2155,7 +2155,11 @@
       var l = U.einheitenAus(t.typ, t.extracted);
       if (!l.length) return;
       var miete = l.filter(function (e) { return numDe(e.ist) > 0 || e.status === 'leer'; }).length;   /* v3029-import: ist mit Komma */
-      var punkte = miete * 1000 + l.length;
+      /* v3330 · eine eigene Mieterliste schlägt die „Mieterliste aus dem Exposé“. Gemessen 12.11.2026
+         (Am Quittengarten 12): das Exposé sagte nur „Mieterliste liegt bei“ und „4 × 3 Zimmer, 4 × 2
+         Zimmer“, die Lesung erfand daraus 8 Einheiten zu 530/500 € (Summe 4.120 statt 4.240 €). Beide
+         Listen hatten 14 Zeilen mit Miete - Gleichstand, und das Exposé lag vorn. */
+      var punkte = (t.typ === 'mietaufstellung' && !t.ausExpose ? 1e6 : 0) + miete * 1000 + l.length;
       if (punkte > bestPunkte) { best = l; bestPunkte = punkte; best._summeListe = numDe((t.extracted || {}).summe_kaltmiete_monat_eur); }
     });
     return best;
