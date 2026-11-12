@@ -233,6 +233,10 @@ body.mit-tafel #tafel{display:flex;flex-direction:column;gap:18px}
 
   /* Texte für Intro/Outro je Drehbuch - der Agent passt sie an */
   var TEXTE = {
+    /* v3330b · Spot „Das Haus hab ich.“: Endkarte A13 (Marcel 12.11.: dealpilot.immo, QR) - Aufruf &outro=amstand&qr=https://dealpilot.immo */
+    'spot-quittengarten': {
+      outro: { titel: 'DealPilot', titel2: '28 Tage testen.', unter: 'dealpilot.immo', url: QR, qrtext: 'Scannen & testen' }
+    },
     'quickcheck-rundgang': {
       intro: { von: 'EXPOSÉ', vonK: 'PDF · SPRACHE · INSERAT', nach: 'URTEIL', nachK: 'MARKTWERT · LAGE · PILOT', gate: 'Quick', zeit: '2 Min.', sitz: 'Boarding', stempel: 'CLEARED', claim: 'Quick Boarding — vom Exposé zum Objekt' },
       outro: { titel: 'Dein nächstes Objekt —', titel2: 'in 30 Sekunden geprüft.', unter: 'Jetzt am Stand ausprobieren', url: QR, qrtext: 'Scannen & testen' }
