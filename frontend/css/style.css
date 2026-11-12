@@ -41625,6 +41625,8 @@ body.dp-dg-2 :is(#s0, #s1, #s2, #s3, #s4, #s3-tax, #s5, #s6, #s8) [data-dp-dg="3
   /* (3) Reiter Objekt, Bodenrichtwert: „Bodenrichtwert-Portal Nordrhein-Westfalen" ragte 27 px
          ueber die Karte hinaus. */
   #brw-portal-btn { white-space: normal; max-width: 100%; text-align: left; height: auto; min-height: 36px; }
+  /* v3340b: die Beschriftung steht in einem eigenen <span> mit nowrap (13 px hinaus). */
+  html body #brw-portal-btn > span:not(.btn-brw-icon) { white-space: normal !important; min-width: 0; overflow-wrap: anywhere; }
   /* (4) Reiter Finanzierung: „Marktzins übernehmen" war 22 px hoch und abgeschnitten (136/132).
          Die Stand-Zeilen der Konditionen (#d1_grp_kond_stand) und der Pilot-Analyse
          (.dp-pa-stand) kuerzen mit … ABSICHTLICH - ein Tipp klappt sie auf
@@ -41632,7 +41634,7 @@ body.dp-dg-2 :is(#s0, #s1, #s2, #s3, #s4, #s3-tax, #s5, #s6, #s8) [data-dp-dg="3
   /* v3340a: zwei IDs plus html body - finanzierung-raster.css (#s3 #d1t_field …, 2,3,0) setzt
      min-height:0 und padding 2px 8px mit !important. */
   html body #s3 #d1t_field .dp-mz-knopf-zeile > .btn.dp-mz-uebernehmen {
-    min-height: 32px !important; padding: 5px 8px !important; white-space: normal; text-overflow: clip; text-align: left; }
+    min-height: 32px !important; padding: 5px 8px !important; white-space: normal !important; text-overflow: clip; text-align: left; }
   /* (6) Reiter Bewertung, Stress-Matrix: die Achse unten nahm ihre Spaltenbreite vom Inhalt
          (35/57/58/50/44 px gegen 5 x 43 px der Zellen) - „Wachstum" lief 29 px (bei 360 px:
          59 px) aus der Karte. Jetzt dieselben fuenf Spalten wie die Zellen. */
