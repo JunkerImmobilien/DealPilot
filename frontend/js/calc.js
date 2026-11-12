@@ -233,6 +233,34 @@ function updHeaderBadges() {
   }
   document.body.classList.remove('hdr-banner-only');
 
+  /* v3335 · KEIN INVESTOR DEAL SCORE IM KOPF — NIE.
+     Marcel am 12.11.2026: „Ich meine den Investor Deal Score im Header, der
+     zwischen der Tab-Bar angezeigt wird. Den haben wir schon lange nicht
+     mehr, und der soll dort NIE angezeigt werden."
+
+     Gemessen: der Band (Ring + fuenf Kacheln) wurde hier IMMER gebaut, auch
+     wenn `#hdr-badges` in `header.hdr` lag. Versteckt hatte ihn nur CSS, und
+     das an Breiten und Ansichten gebunden: bis 700 px (style.css v1879c,
+     layout-varianten.css v1880a) — zwischen 701 und 900 px aber zeigte
+     `html[data-dp-layout] body header.hdr #hdr-badges{display:flex}` ihn
+     wieder (unter 900 px nimmt die linke Schiene ihn nicht mehr mit), und
+     in „Heute" auf dem Desktop `body:not(.hdr-collapsed) #hdr-badges
+     {display:block}`. Drei Waechter, jeder fuer ein anderes Fenster.
+
+     Jetzt entscheidet der Erzeuger: liegt der Behaelter im Kopf, wird kein
+     Score gebaut. In den Schienen der Ansichten (Aktenmappe, Kanzlei,
+     Tower — Marcels Score-Band v1664) liegt er NICHT im Kopf und bleibt.
+     `layout-varianten.js` zeichnet nach jedem Umbau neu, damit der Ort
+     beim Bauen gilt. Der 70-%-Hinweis darueber ist keine Kennzahl und
+     bleibt unberuehrt. */
+  if (box.closest('header.hdr')) {
+    box.innerHTML = '';
+    _setHdrEmpty(true);
+    if (typeof _updateHdrHeight === 'function') _updateHdrHeight();
+    if (typeof _updateHdrToggleVisibility === 'function') _updateHdrToggleVisibility();
+    return;
+  }
+
   var score = Math.round(result.score || 0);
   if (!score || isNaN(score)) {
     box.innerHTML = '';
@@ -5375,29 +5403,11 @@ window.dpUpdateAll = dpUpdateAll;
    gefuellt. Es traegt die Tier-Klasse der grossen Karte, damit Gruen,
    Gold und Rot ohne zweite Farbtabelle stimmen. */
 function _setHdrScoreMini(score, verdict, tier) {
-  var row = document.querySelector('.hdr-v61-row1');
-  if (!row) return;
-  var el = document.getElementById('hdr-score-mini');
-  if (!el) {
-    el = document.createElement('span');
-    el.id = 'hdr-score-mini';
-    el.className = 'hdr-score-mini';
-    /* Vor den Spacer, damit die Kurzfassung links bei der Adresse steht
-       und nicht rechts zwischen den Werkzeugknoepfen landet. */
-    var spacer = row.querySelector('.hdr-spacer');
-    if (spacer) row.insertBefore(el, spacer); else row.appendChild(el);
-    /* Ein Klick klappt wieder auf — wer die Zahl sieht, will meist die
-       Begruendung dazu. */
-    el.addEventListener('click', function () {
-      if (typeof toggleHdrScore === 'function') toggleHdrScore();
-    });
-  }
-  var s = parseInt(score, 10);
-  if (!Number.isFinite(s)) { el.style.display = 'none'; return; }
-  el.style.display = '';
-  el.className = 'hdr-score-mini hdr-score-mini-' + (tier || 'gold');
-  el.title = 'Investor Deal Score ' + s + ' — klicken zum Aufklappen';
-  el.innerHTML = '<b>' + s + '</b><span>' + (verdict || '') + '</span>';
+  /* v3335 · Die Kurzfassung steht in `.hdr-v61-row1`, also IM Kopf — und
+     dort steht nie ein Investor Deal Score (Marcel 12.11.2026, siehe
+     updHeaderBadges). Sie wird nicht mehr angelegt; ein vorhandenes
+     Element wird verborgen. */
+  _clearHdrScoreMini();
 }
 window._setHdrScoreMini = _setHdrScoreMini;
 

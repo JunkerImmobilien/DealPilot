@@ -1455,6 +1455,11 @@
     } catch (e) {}
     kopfOffenHalten(true);
     baueSchienen(v);
+    /* v3335 · `updHeaderBadges()` (calc.js) baut den Score nur, wenn
+       `#hdr-badges` NICHT im Kopf liegt (Marcel 12.11.2026: nie im Kopf).
+       Der Ort steht erst nach baueSchienen() fest — unter 900 px nimmt die
+       linke Schiene ihn nicht mit —, also hier einmal neu zeichnen. */
+    try { if (typeof window.updHeaderBadges === 'function') window.updHeaderBadges(); } catch (e) {}
     try { localStorage.setItem(LS, v); } catch (e) {}
     schalterNachziehen();
     planPillenAufraeumen();
