@@ -444,10 +444,19 @@
          Westerfeldstr. 146 (2026-1161): Aufteilerwert in der Stufen-Tabelle, die Wohnungen selbst nirgends. */
       if (PD.wert_je_wohnung && PD.wert_je_wohnung.length) {
         var WS = PD.wert_je_wohnung_summe;
-        h += '<h3>Wert je Wohnung · nach Aufteilung</h3>'
-          + tab(B, ['WE', 'm²', 'Wert führend', 'Verfahren · Herkunft', 'Ertragswert stützend'], PD.wert_je_wohnung.map(function (w) {
-            return [w.we, B.zahl(w.wfl, 0), w.wert, w.verfahren, w.stuetzend]; })
-            .concat(WS ? [{ w: ['Summe nach Aufteilung', '', WS.summe + (WS.vollstaendig ? '' : '*'), WS.bezeichnung + ' · führend', ''], art: 'summe' }] : []), 'dicht');
+        /* v3332a · eigene Tabelle: tab() setzt jede Spalte ab der zweiten rechtsbündig und ohne Umbruch -
+           die lange Herkunft schob die Seite über den Rand (das ganze Dokument wurde verkleinert gedruckt) */
+        var _vz = function (t) { var i = String(t || '').indexOf(' · '); return i < 0 ? [String(t || ''), ''] : [t.slice(0, i), t.slice(i + 3)]; };
+        h += '<h3>Wert je Wohnung · nach Aufteilung</h3><table class="dicht"><thead><tr><th>WE</th><th class="r">m²</th><th class="r">Wert führend</th>'
+          + '<th>Verfahren · Herkunft</th><th class="r">Ertragswert stützend</th></tr></thead><tbody>'
+          + PD.wert_je_wohnung.map(function (w) {
+            var v = _vz(w.verfahren);
+            return '<tr><td>' + B.esc(w.we) + '</td><td class="r num">' + B.esc(B.zahl(w.wfl, 0)) + '</td><td class="r num">' + B.esc(w.wert) + '</td>'
+              + '<td style="white-space:normal">' + B.esc(v[0]) + (v[1] ? '<div class="det">' + B.esc(v[1]) + '</div>' : '') + '</td><td class="r num">' + B.esc(w.stuetzend) + '</td></tr>';
+          }).join('')
+          + (WS ? '<tr class="summe"><td>Summe nach Aufteilung</td><td></td><td class="r num">' + B.esc(WS.summe + (WS.vollstaendig ? '' : '*')) + '</td><td style="white-space:normal">'
+            + B.esc(WS.bezeichnung) + ' · führend</td><td></td></tr>' : '')
+          + '</tbody></table>';
       }
       if (PD.bruecke && PZ && typeof PZ.ueberleitungZeilen === 'function') {
         var UZ = PZ.ueberleitungZeilen(PD.bruecke) || [], um = Math.max.apply(null, UZ.filter(function (z) { return z.schritt; }).map(function (z) { return Math.abs(z.w); }).concat([1]));
