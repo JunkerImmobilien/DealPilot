@@ -217,7 +217,17 @@
     var topK = st.zielbild ? 'zielbild' : 'mieterhoehung';
     return { stand: (p.stand || z.stand || '').slice(0, 10) || null, art: z.art || null, stufen: st, top: topK,
       mehrertrag_jahr: mz.mehr, wertzuwachs_nach_kosten: mz.zuw, ertragswert_gesperrt: !!z.ertragswert_gesperrt,
-      kennzeichnung: z.kennzeichnung || null };
+      kennzeichnung: z.kennzeichnung || null, aufteilung: aufteilungAus(z) };   /* v3322 */
+  }
+  /* v3322 · aufgeteilt: der gespeicherte Aufteilerwert (Vergleichswert je Einheit führend, potenzial.js
+     zusammenfassung → aufteilungKurz). null ohne Aufteilung; { gesperrt } wenn er nicht führen kann. */
+  function aufteilungAus(z) {
+    var a = z && z.aufteilung; if (!a || z.ertragswert_gesperrt) return null;
+    var T = a.aufteiler && a.aufteiler.bestand;
+    if (!T) return { gesperrt: a.aufteiler_gesperrt || 'Aufteilerwert noch nicht gerechnet – im Objekt neu rechnen.' };
+    return { wert: zahl(T.wert), summe: zahl(T.summe), bezeichnung: T.bezeichnung || null, vollstaendig: !!T.vollstaendig, kosten: zahl(a.kosten) || 0,
+      n: (a.je_wohnung || []).filter(function (w) { return w.art !== 'gewerbe'; }).length || null,
+      zielbild: a.aufteiler.zielbild ? zahl(a.aufteiler.zielbild.wert) : null };
   }
 
   /* ── v2951 · WARUM ein gespeichertes Objekt im Portfolio-Vergleich fehlt
@@ -388,6 +398,7 @@
   function daten() {
     var W = null, Z = null, A = null;
     try { W = (_hist.key === key()) ? wertDaten(_hist.eintrag) : null; } catch (e) { W = null; }
+    try { W = mitAufteilung(W); } catch (e) { /* v3322 · nur Anzeige */ }
     try { Z = zielDaten(); } catch (e) { Z = null; }
     try { A = ankaufDaten(); } catch (e) { A = null; }
     if (!W && !Z) return null;
@@ -404,6 +415,34 @@
     } else if (Z) Z.ertragswert_hinweis = null;
     var K = []; try { K = kernaussagen(Z, W); } catch (e) { K = []; }
     return { version: VERSION, objekt_key: key(), stand: new Date().toISOString().slice(0, 10), wert: W, zielbild: Z, ankauf: A, kernaussagen: K };
+  }
+
+  /* ── v3322 · AUFGETEILT: VERGLEICHSWERT JE EINHEIT FÜHRT ────────────────
+     Marcel 12.11.2026: „Wenn aufgeteilt, haben wir ja Vergleichswert, was führend ist … dass die ganzen
+     Wohnungen einzeln über das Vergleichswertverfahren gerechnet und angegeben werden." Der Marktbericht
+     bewertet das Haus als Ganzes (sein führendes Verfahren bleibt am Bericht und im Wertanker calc.js,
+     der _wertDaten liest - hier nur die Anzeige). Ist das Haus „in Wohnungseigentum aufgeteilt" und hat der
+     Dienst den Aufteilerwert gerechnet (PotenzialService aufteilerRechnen), steht er als eigene Zeile oben
+     und trägt „führend"; der Ertragswert des Hauses stützt. Nichts neu gerechnet. */
+  function mitAufteilung(W) {
+    if (!W || !Array.isArray(W.verfahren)) return W;
+    var M = global._dpMfh, PZ = global.DpPotenzial;
+    if (!M || !M.aufgeteilt || !PZ || typeof PZ.aufteilungKurz !== 'function') return W;
+    var m = null, r = null; try { m = PZ.modell(); r = PZ.ergebnis(); } catch (e) { r = null; }
+    var a = null; try { a = PZ.aufteilungKurz(r, m); } catch (e) { a = null; }
+    var T = a && a.aufteiler && a.aufteiler.bestand;
+    if (!T || T.wert == null) return W;
+    var n = a.je_wohnung.filter(function (w) { return w.art !== 'gewerbe'; }).length, mw = W.marktpreisindikation.mitte;
+    W.verfahren.forEach(function (v) { if (v.fuehrend) { v.fuehrend = false; v.zusatz = (v.zusatz ? v.zusatz + ' · ' : '') + 'Haus als Ganzes, stützend'; } });
+    var pos = 0; while (pos < W.verfahren.length && /^mpi/.test(W.verfahren[pos].schluessel)) pos++;
+    W.verfahren.splice(pos, 0, { schluessel: 'aufteiler', name: 'Vergleichswert je Einheit (Summe)',
+      zusatz: (T.bezeichnung || 'Vergleichswert') + ' · ' + n + ' Wohnungen einzeln' + (a.kosten > 0 ? ', abzüglich Aufteilungskosten ' + eur(a.kosten) : '') + (T.vollstaendig ? '' : ' · unvollständig'),
+      unten: null, mitte: T.wert, oben: null, fuehrend: true, abw_zur_mpi_pct: rund1(abw(T.wert, mw)) });
+    W.aufteilung = { wert: T.wert, summe: T.summe, bezeichnung: T.bezeichnung || null, n: n };
+    W.klartext = 'In Wohnungseigentum aufgeteilt: führend ist der Vergleichswert je Einheit – ' + n + ' Wohnungen einzeln bewertet, zusammen ' + eur(T.wert)
+      + (T.vollstaendig ? '' : ' (unvollständig)') + '. Der Ertragswert des Hauses als Ganzes stützt. '
+      + String(W.klartext || '').replace(/^Führend ist der [^:]*: an ihm misst sich der Preis, die übrigen Werte sind die Gegenprobe\.\s*/, '');
+    return W;
   }
 
   /* ── Gestaltung ───────────────────────────────────────────────────────── */
@@ -858,5 +897,6 @@
      statt aus einem zweiten Abruf (pdf-wert-zielbild.js daten()) */
   function bericht() { return (_hist.key && _hist.key === key()) ? _hist.eintrag : null; }
   global.DpWertZielbild = { VERSION: VERSION, daten: daten, laden: laden, bericht: bericht, karte: karte, potenzialHost: potenzialHost,
-    einfachHtml: einfachHtml, reiterHtml: reiterHtml, _wertDaten: wertDaten, zielbildFuer: zielbildFuer, zielbildGrund: zielbildGrund };
+    einfachHtml: einfachHtml, reiterHtml: reiterHtml, _wertDaten: wertDaten, zielbildFuer: zielbildFuer, zielbildGrund: zielbildGrund,
+    _mitAufteilung: mitAufteilung };   /* v3322 · Prüfer aufteilung-pruefen.mjs */
 })(window);

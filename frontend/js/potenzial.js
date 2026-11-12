@@ -1664,6 +1664,11 @@
         zins_haus: r.basis ? r.basis.lzs_pct : null,
         negativ_hinweis: r.aufteilung.negativ_hinweis || null,   /* v2431 */
         marktpreisindikation_etw: r.aufteilung.mpi_etw || null };   /* v2541 */
+      /* v3322 · Marcel 12.11.2026: aufgeteilt → Vergleichswert je Einheit führend, „auch unter Einheiten und
+         unter Pilotanalyse" und im Portfolio-Cockpit. Bis v3317 fehlte der Aufteilerwert hier: Cockpit (liest
+         nur das Gespeicherte, zielbildFuer) und Pilot-Auftrag kannten nur die Ertragswert-Summe. */
+      var _ak = aufteilungKurz(r, m);
+      if (_ak) { z.aufteilung.aufteiler = _ak.aufteiler; z.aufteilung.aufteiler_gesperrt = _ak.gesperrt; z.aufteilung.je_wohnung = _ak.je_wohnung; }
     }
     if (m.haus && m.haus.massnahmen.length) z.haus_massnahmen = { kosten: Math.round(m.haus.kosten),   /* v2966 */
       text: m.haus.massnahmen.map(function (x) { return x.t + (x.k ? ' ' + Math.round(x.k) + ' €' : '') + (x.bewohnt ? ' (umgelegt nach § 559 BGB' + (zahl(x.erh) ? ', davon ' + zahl(x.erh) + ' % Erhaltung' : '') + ')' : ''); }).join(', '),
@@ -2270,13 +2275,62 @@
       + '</tbody></table></div>'
       + (a.negativ_hinweis && !a.aufteiler ? '<p class="dp-pot-hin" style="color:#4a4436">' + esc(a.negativ_hinweis) + '</p>' : '')
       + (a.aufteiler && a.aufteiler.bestand ? '<p class="dp-pot-hin">Führendes Verfahren je Wohnung (Bestand): ' + verfahrenText(a.aufteiler.bestand.zaehl) + '.</p>' : '')
-      + (a.aufteiler_gesperrt ? '<p class="dp-pot-hin">' + esc(a.aufteiler_gesperrt.grund) + '</p>' : '');   /* v3265 */
+      + (a.aufteiler_gesperrt ? '<p class="dp-pot-hin">' + esc(a.aufteiler_gesperrt.grund) + '</p>' : '')   /* v3265 */
+      + wertJeWohnungHtml(r, m);   /* v3322 */
   }
   /* v3200 · wie viele Wohnungen nach welchem Verfahren */
+  /* v3322 · Aufteilerwert knapp, als Daten: je Stufe Summe/Wert/Verfahren, je Wohnung der führende Wert mit
+     Herkunft und der stützende Ertragswert. Nur gelesen, was der Marktbericht-Dienst gerechnet hat
+     (PotenzialService aufteilerRechnen) - nichts neu gerechnet. null ohne Aufteilung. Für zusammenfassung()
+     (gespeichert: Portfolio-Cockpit, Pilot-Auftrag) und pdfDaten() (Tabelle „Wert je Wohnung“). */
+  function aufteilungKurz(r, m) {
+    var A = r && r.verfuegbar !== false && r.aufteilung;
+    if (!A || !A.je_stufe || !A.je_stufe.bestand) return null;
+    var T = null;
+    if (A.aufteiler) {
+      T = {};
+      ['bestand', 'mieterhoehung', 'zielbild'].forEach(function (k) {
+        var t = A.aufteiler[k]; if (!t) return;
+        T[k] = { summe: t.summe, wert: t.wert, vollstaendig: !!t.vollstaendig, bezeichnung: t.bezeichnung || null,
+          potenzial: t.potenzial, negativ: !!t.negativ, zaehl: t.zaehl || null };
+      });
+    }
+    var lage = {};
+    ((m && m.wohnungen) || []).forEach(function (w) { if (w && w.nr != null) lage[String(w.nr)] = w.lage || ''; });
+    var J = [];
+    (r.wohnungen || []).forEach(function (w) {
+      var f = w && w.fuehrend && w.fuehrend.bestand; if (!f) return;
+      J.push({ nr: w.nr != null ? String(w.nr) : '', lage: lage[String(w.nr)] || '', art: w.art || 'wohnen', wfl: w.wfl,
+        wert: f.wert != null ? f.wert : null, verfahren: f.verfahren || null, bezeichnung: f.bezeichnung || null,
+        herkunft: f.herkunft || null, indikativ: !!f.indikativ, ersatzweise: !!f.ersatzweise,
+        stuetzend: f.stuetzend != null ? f.stuetzend : null,
+        zielbild: w.fuehrend.zielbild && w.fuehrend.zielbild.wert != null ? w.fuehrend.zielbild.wert : null });
+    });
+    return { kosten: A.kosten_eur, aufteiler: T, gesperrt: A.aufteiler_gesperrt ? A.aufteiler_gesperrt.grund : null, je_wohnung: J };
+  }
+  /* v3322 · je Wohnung der führende Wert mit Verfahren und Herkunft, der Ertragswert stützend - eingeklappt.
+     EIN Baustein für Pilot-Analyse (aufteilungHtml) und Reiter Einheiten (mfh-einheiten.js aufteilungKarte). */
+  function wertJeWohnungHtml(r, m) {
+    var a = null; try { a = aufteilungKurz(r, m); } catch (e) { a = null; }
+    if (!a || !a.aufteiler || !a.aufteiler.bestand || !a.je_wohnung.length) return '';
+    var T = a.aufteiler.bestand;
+    return '<details class="dp-pot-wjw" style="margin-top:8px"><summary>Wert je Wohnung · Vergleichswert führend, Ertragswert stützend (' + a.je_wohnung.length + ')</summary>'
+      + '<div class="dp-pot-scroll"><table class="dptk-alle"><thead><tr><th>Wohnung</th><th>m²</th><th>Wert führend</th><th>Verfahren · Herkunft</th><th>Ertragswert stützend</th></tr></thead><tbody>'
+      + a.je_wohnung.map(function (w) {
+          return '<tr><td>' + esc((w.nr ? w.nr + ' ' : '') + (w.lage || '')) + '</td><td>' + (w.wfl ? Math.round(w.wfl) : '—') + '</td>'
+            + '<td><b>' + (w.wert != null ? eur(w.wert) : '—') + '</b></td>'
+            + '<td>' + esc(w.bezeichnung || 'ohne Wert') + (w.herkunft ? '<small style="display:block">' + esc(w.herkunft) + '</small>' : '') + '</td>'
+            + '<td>' + (w.stuetzend != null ? eur(w.stuetzend) : (w.ersatzweise ? 'ist führend' : '—')) + '</td></tr>';
+        }).join('')
+      + '<tr class="dp-pot-sum"><td>Summe</td><td></td><td>' + eur(T.summe) + (T.vollstaendig ? '' : '*') + '</td><td>' + esc(T.bezeichnung || 'Vergleichswert') + '</td><td></td></tr>'
+      + '</tbody></table></div>'
+      + (T.vollstaendig ? '' : '<p class="dp-pot-hin">* nicht jede Wohnung hat einen Wert – es wird nichts ergänzt.</p>') + '</details>';
+  }
   function verfahrenText(z) {
     if (!z) return '';
     var t = [];
-    if (z.amtlich) t.push(z.amtlich + ' × Vergleichswert aus dem amtlichen Vergleichsfaktor');
+    /* v3322 · Immobilienrichtwert beim Namen */
+    if (z.amtlich) t.push(z.amtlich + ' × Vergleichswert aus ' + (!z.irw ? 'dem amtlichen Vergleichsfaktor' : (z.irw === z.amtlich ? 'dem Immobilienrichtwert' : 'amtlichem Vergleichsfaktor bzw. Immobilienrichtwert (' + z.irw + ' ×)')));
     if (z.angebote) t.push(z.angebote + ' × Vergleichswert aus Angebotspreisen (abzüglich Angebotsabschlag, indikativ)');
     if (z.ertragswert) t.push(z.ertragswert + ' × Ertragswert als Eigentumswohnung ersatzweise (kein Vergleichswert verfügbar)');
     if (z.gewerbe) t.push(z.gewerbe + ' × Gewerbe mit Anteil am Haus');
@@ -2400,6 +2454,17 @@
       d.kennzahlen.push(['Aufteilungspotenzial'].concat(d.spalten.map(function (k) {
         var s = AT && AT[k] ? AT[k] : r.aufteilung.je_stufe[k]; return !s ? '—' : (s.potenzial < 0 ? 'kein Potenzial' : '+' + eur(s.potenzial)); })));
       d.aufteilung_hinweis = r.aufteilung.negativ_hinweis || null;
+      /* v3322 · je Wohnung der führende Wert (Vergleichswert je Einheit), Verfahren und stützender Ertragswert */
+      var _akP = AT ? aufteilungKurz(r, m) : null;
+      if (_akP && _akP.je_wohnung.length) {
+        d.wert_je_wohnung = _akP.je_wohnung.map(function (w) {
+          return { we: (w.nr ? w.nr + ' ' : '') + (w.lage || ''), wfl: w.wfl, wert: w.wert != null ? eur(w.wert) : '—',
+            verfahren: (w.bezeichnung || '—') + (w.herkunft && !w.ersatzweise ? ' · ' + w.herkunft : ''),
+            stuetzend: w.stuetzend != null ? eur(w.stuetzend) : (w.ersatzweise ? 'ist führend' : '—') };
+        });
+        d.wert_je_wohnung_summe = AT.bestand ? { summe: eur(AT.bestand.summe), wert: eur(AT.bestand.wert), bezeichnung: AT.bestand.bezeichnung || 'Vergleichswert',
+          vollstaendig: !!AT.bestand.vollstaendig } : null;
+      }
     }
     d.fuss = KENNZEICHNUNG + ' Der Score rechnet ebenfalls mit dem Bestand.'
       + (r && r.verfuegbar && r.basis ? ' Liegenschaftszins ' + pct(r.basis.lzs_pct) + ' (Haus)'
@@ -3118,6 +3183,7 @@
     mhTermine: mhTermine, wirksamNachZugang: wirksamNachZugang, TERMIN_REGEL: TERMIN_REGEL, mmjj: mmjj,   /* v3028 */
     zielBmrAn: zielBmrAn, zielBmrPruefen: zielBmrPruefen,   /* v3213 · W-6 */
     zielBremseUmtragen: zielBremseUmtragen, zielBremseKappen: zielBremseKappen, BREMSE_AUSNAHME_FELD: BREMSE_AUSNAHME_FELD, _bremseUmtragenNeu: bremseUmtragenNeu,   /* v3312 */
+    aufteilungKurz: aufteilungKurz, wertJeWohnungHtml: wertJeWohnungHtml,   /* v3322 */
     _hash: hash, _auftrag: auftrag
   };
 })();

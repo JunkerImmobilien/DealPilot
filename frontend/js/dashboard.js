@@ -1048,7 +1048,7 @@
         /* v3234 · fuer die Objekt-Tabelle (_zbObjTabelle): Soll-Stufe und Herkunft der Spalten, nur gelesen */
         ewM: M.ertragswert, mpiM: M.marktpreisindikation, mpiZ: T.marktpreisindikation, kostenM: (S.mieterhoehung ? S.mieterhoehung.kosten : 0) || 0,
         hatMh: !!S.mieterhoehung, hatZb: !!S.zielbild,
-        auf: z.aufteilung || null };   /* v3321 · aufgeteilt: Vergleichswert je Einheit (zielbildFuer) */
+        auf: z.aufteilung || null };   /* v3322 · aufgeteilt: Vergleichswert je Einheit (zielbildFuer) */
       /* v2988 · woher das Zielbild kommt, und ob es von der Investition (san) abweicht */
       try { e.herk = (window.DpPotenzial && DpPotenzial.herkunftAusDaten) ? DpPotenzial.herkunftAusDaten(o) : null; } catch (x) { e.herk = null; }
       if (zw != null && B.ertragswert != null && T.ertragswert != null) {
@@ -1163,7 +1163,7 @@
       var ewGrund = e.gesperrt ? 'mit Stufe 3' : 'nicht gerechnet';
       return '<tr title="' + esc(tip) + '">'
         + '<th scope="row">' + esc(e.name) + '<small>' + esc(art) + (e.stand ? ' · ' + esc(dat(e.stand)) : '') + '</small>'
-        /* v3321 · Marcel 12.11.2026: aufgeteilt → führend der Vergleichswert je Einheit, der Ertragswert stützt */
+        /* v3322 · Marcel 12.11.2026: aufgeteilt → führend der Vergleichswert je Einheit, der Ertragswert stützt */
         + (e.auf ? '<small class="zb-ot-auf">' + (e.auf.wert != null ? 'aufgeteilt · führend: Vergleichswert je Einheit ' + esc(E(e.auf.wert)) + (e.auf.n ? ' (' + e.auf.n + ' WE' + (e.auf.vollstaendig ? '' : ', unvollständig') + ')' : '') + ' · Ertragswert stützend' : 'aufgeteilt · ' + esc(e.auf.gesperrt)) + '</small>' : '')
         + '</th>'
         + td(E(e.mB))

@@ -814,7 +814,7 @@
         var amt = verf === 'vergleichswert_amtlich';
         html += '<div class="mfh-we-wert">'
           + '<div class="mfh-we-wert-haupt"><span>Vergleichswert · führend</span><b>' + eurN(fv.wert) + '</b>'
-          + '<small>' + (amt ? 'amtlicher Vergleichsfaktor' : 'indikativ, aus Angebotspreisen abgeleitet') + '</small></div>'
+          + '<small>' + (amt ? (vg && vg.quelle === 'Immobilienrichtwert' ? 'Immobilienrichtwert' : 'amtlicher Vergleichsfaktor') : 'indikativ, aus Angebotspreisen abgeleitet') + '</small></div>'   /* v3322: IRW beim Namen */
           + '<div class="mfh-we-kv">'
           + (amt
               ? '<div><span>Vergleichsfaktor</span><b>' + (vg && vg.faktor_qm ? Math.round(vg.faktor_qm).toLocaleString('de-DE') + ' €/m²' : '—') + '</b></div>'
@@ -1274,7 +1274,9 @@
       + '</tbody></table>'
       + (A.aufteiler_gesperrt ? '<p class="mfh-leise" style="margin:6px 0 0;color:#B8625C">' + esc(A.aufteiler_gesperrt.grund) + '</p>' : '')
       + ((T && !T.vollstaendig) || !S.vollstaendig ? '<p class="mfh-leise" style="margin:6px 0 0">* nicht für jede Wohnung ein Wert.</p>' : '')
-      + '<p class="mfh-leise" style="margin:6px 0 8px">Stufe Bestand. Mieterhöhung und Zielbild, je Wohnung und mit Herkunft: Pilot-Analyse › Wertpotenzial und PDF.</p>' + knopf, 'Bestand');
+      /* v3322 · Marcel 12.11.2026 „auch unter Einheiten": je Wohnung der führende Wert (derselbe Baustein wie Pilot-Analyse) */
+      + (T && P.wertJeWohnungHtml ? (function () { try { return P.wertJeWohnungHtml(r, P.modell(o)); } catch (x) { return ''; } })() : '')
+      + '<p class="mfh-leise" style="margin:6px 0 8px">Stufe Bestand. Mieterhöhung und Zielbild: Pilot-Analyse › Ankauf · Soll · Zielbild und PDF.</p>' + knopf, 'Bestand');
   }
 
   function koerper() { return [schritt1, schritt2, schritt3, schritt4][_schritt](); }

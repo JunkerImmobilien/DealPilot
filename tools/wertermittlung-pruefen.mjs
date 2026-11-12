@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 /* ══════════════════════════════════════════════════════════════════════
    DealPilot · tools/wertermittlung-pruefen.mjs · v2580 · v2595 · v2600 · v2790 · v2800
+   v3322: B66 - aufgeteilt: Vergleichswert je Einheit fuehrt (aufteilerRechnen gegen Hand-Rechnung), Ertragswert stuetzt.
    v3265: B63 - MFH aufgeteilt: Wert je Wohnung aus dem Angebotsniveau des letzten Abrufs (derselbe Kern, mit Abschlag), Name des fuehrenden Verfahrens.
    v3242: B60 - ETW ohne amtliche Grundlage: Vergleichswert aus Angebotspreisen fuehrt (Stufe M), amtlich geht vor, MFH/ZFH unveraendert.
    v2854: Sanierungsstau in den Potenzial-Stufen nicht doppelt (B54, PotenzialService geladen).
@@ -1627,6 +1628,52 @@ fallB('B65', () => {
     if (!(v.zielbild >= v.mieterhoehung && v.mieterhoehung >= v.bestand)) fehl.push(w.nr + ' ' + k + ' ' + JSON.stringify(v)); }));
   pruefe('B', 'B65', 'alle Wohnungen, als ETW und als Anteil: Zielbild ≥ Mieterhöhung ≥ Bestand', !fehl.length,
     fehl.length ? fehl.join(' | ') : 'Wohnung 1 ETW ' + JSON.stringify(w1.als_etw) + ' · Anteil ' + JSON.stringify(w1.anteil_am_haus));
+});
+
+/* ══ v3322 · B66 AUFGETEILT → VERGLEICHSWERT JE EINHEIT FÜHRT, ERTRAGSWERT STÜTZT ═══════════════
+   Marcel 12.11.2026: „wenn aufgeteilt … dass die ganzen Wohnungen einzeln über das Vergleichswertverfahren
+   gerechnet und angegeben werden". Ein amtliches Anwendungsbeispiel für die SUMME je Einheit gibt es nicht;
+   Prüfmaß ist die Hand-Rechnung nach der Rangfolge je Wohnung (§ 20/§ 24 ImmoWertV amtliche Kaufpreisbasis,
+   § 25 Abs. 1: Angebotspreise nur mit Abschlag, sonst Ertragswert ersatzweise; Gewerbe mit Anteil am Haus):
+     W1 Vergleichsfaktor 150.000 · W2 Immobilienrichtwert 160.000 · W3 Angebote mit 10 % Abschlag 145.000 ·
+     W4 Angebote OHNE Abschlag → Ertragswert ersatzweise 135.000 · W5 Gewerbe Anteil 80.000 · W6 ohne Wert
+     Summe 670.000, Kosten 9.000 → Aufteilerwert 661.000, Haus 600.000 → Potenzial 61.000, unvollständig (W6).
+   Dazu der ganze Lauf (B64-Prüffall, aufgeteilt, ohne Vergleichsbasis): Summe = Σ Ertragswert als ETW,
+   ersatzweise benannt. Nie ein Nachbarwert: W6 bleibt ohne Wert. */
+fallB('B66', () => {
+  const R = PSM && PSM._aufteilerRechnen;
+  if (typeof R !== 'function') return pruefe('B', 'B66', 'PotenzialService._aufteilerRechnen geladen', false, psGrund || 'fehlt');
+  const W = [
+    { nr: '1', art: 'wohnen', wfl: 60, vergleich_etw: { bestand: { wert: 150000, faktor_qm: 2500, ausschuss: 'Der Gutachterausschuss Prüfstadt', stufe: 'A' } }, als_etw: { bestand: 140000 } },
+    { nr: '2', art: 'wohnen', wfl: 70, vergleich_etw: { bestand: { wert: 160000, faktor_qm: 2286, quelle: 'Immobilienrichtwert', ausschuss: 'Der Gutachterausschuss Prüfstadt', stufe: 'A' } }, als_etw: { bestand: 150000 } },
+    { nr: '3', art: 'wohnen', wfl: 63, mpi_etw: { bestand: 145000, zielbild: 160000, abschlag_pct: 10, median_qm: 2558, quelle: 'abruf' }, als_etw: { bestand: 138000 } },
+    { nr: '4', art: 'wohnen', wfl: 70, mpi_etw: { bestand: 170000, abschlag_pct: 0 }, als_etw: { bestand: 135000 } },
+    { nr: 'G', art: 'gewerbe', wfl: 50, anteil_am_haus: { bestand: 80000 } },
+    { nr: '6', art: 'wohnen', wfl: 55, vergleich_etw: { bestand: { wert: null, offen: ['Geschosslage'] } }, als_etw: { bestand: null } },
+  ];
+  const T = R(W, { bestand: { summe: 1 } }, { bestand: { wert: 600000 }, zielbild: { wert: 650000 } }, 9000, ['bestand', 'zielbild']);
+  const t = T.bestand || {};
+  wert('B', 'B66', 'Summe der Einzelwerte (Hand-Rechnung 670.000 €)', t.summe, 670000, 0);
+  wert('B', 'B66', 'Aufteilerwert = Summe − Kosten der Aufteilung (661.000 €)', t.wert, 661000, 0);
+  wert('B', 'B66', 'Aufteilungspotenzial gegen das Haus als Ganzes (61.000 €)', t.potenzial, 61000, 0);
+  pruefe('B', 'B66', 'Wohnung ohne Wert → Summe unvollständig, kein Ersatzwert', t.vollstaendig === false && W[5].fuehrend.bestand.wert === null, JSON.stringify(t.zaehl));
+  pruefe('B', 'B66', 'Rangfolge je Wohnung: Vergleichsfaktor · Immobilienrichtwert · Angebote mit Abschlag · Ertragswert ersatzweise · Gewerbe',
+    W.map((w) => w.fuehrend.bestand.verfahren).join(',') === 'vergleichswert_amtlich,vergleichswert_amtlich,vergleichswert_angebote,ertragswert_etw,anteil_haus,',
+    W.map((w) => w.fuehrend.bestand.verfahren).join(','));
+  pruefe('B', 'B66', 'Angebotspreise ohne Abschlag führen nicht (§ 25 Abs. 1 ImmoWertV)', W[3].fuehrend.bestand.ersatzweise === true && W[3].fuehrend.bestand.wert === 135000);
+  pruefe('B', 'B66', 'Ertragswert der Wohnung stützt den Vergleichswert (W1 140.000, W3 138.000)', W[0].fuehrend.bestand.stuetzend === 140000 && W[2].fuehrend.bestand.stuetzend === 138000 && W[3].fuehrend.bestand.stuetzend === null);
+  pruefe('B', 'B66', 'Immobilienrichtwert heißt so (nicht „Vergleichsfaktor“), Herkunft mit Ausschuss und Stufe',
+    W[1].fuehrend.bestand.bezeichnung === 'Vergleichswert (Immobilienrichtwert)' && /^Immobilienrichtwert 2\.286 €\/m² · Gutachterausschuss Prüfstadt · Stufe A$/.test(W[1].fuehrend.bestand.herkunft), W[1].fuehrend.bestand.herkunft);
+  pruefe('B', 'B66', 'Angebotswert als indikativ gekennzeichnet, mit Abschlag in der Herkunft', W[2].fuehrend.bestand.indikativ === true && /abzüglich 10 % Abschlag, indikativ$/.test(W[2].fuehrend.bestand.herkunft), W[2].fuehrend.bestand.herkunft);
+  pruefe('B', 'B66', 'Name der Summe nennt beide amtlichen Wege, Angebote und Ersatz', t.bezeichnung === 'Vergleichswert (amtlicher Vergleichsfaktor/Immobilienrichtwert und aus Angebotspreisen), 1 × Ertragswert ersatzweise', t.bezeichnung);
+  pruefe('B', 'B66', 'Stufe ohne Ertragswert-Lauf der Aufteilung (je_stufe fehlt) → kein Aufteilerwert', !T.zielbild);
+  pruefe('B', 'B66', 'nur Immobilienrichtwert → „Vergleichswert (Immobilienrichtwert)“', PSM._aufteilerBezeichnung({ amtlich: 2, irw: 2 }) === 'Vergleichswert (Immobilienrichtwert)');
+  /* der ganze Lauf: B64-Prüffall aufgeteilt, ohne Vergleichsbasis → Ertragswert als ETW ersatzweise */
+  const A = B64 && B64.aufteilung;
+  if (!A || !A.aufteiler || !A.aufteiler.bestand) return pruefe('B', 'B66', 'Lauf B64 aufgeteilt mit Aufteilerwert', false, B64g || 'kein aufteiler');
+  const sEtw = B64.wohnungen.reduce((a, w) => a + (w.als_etw && w.als_etw.bestand > 0 ? w.als_etw.bestand : 0), 0);
+  wert('B', 'B66', 'Lauf: Summe nach Aufteilung = Σ Ertragswert als ETW (ohne Vergleichsbasis)', A.aufteiler.bestand.summe, sEtw, 0);
+  pruefe('B', 'B66', 'Lauf: ersatzweise benannt, nie „Vergleichswert“ ohne Vergleichsbasis', /^Ertragswert als Eigentumswohnung \(ersatzweise/.test(A.aufteiler.bestand.bezeichnung || ''), A.aufteiler.bestand.bezeichnung);
 });
 
 /* ══ EBENE C ═════════════════════════════════════════════════════════ */

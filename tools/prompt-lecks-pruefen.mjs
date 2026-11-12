@@ -278,7 +278,12 @@ const auftrag = {
     sanierung_regel: 'PRUEF-SANIERUNG-REGEL',
     /* v3028 · Termine je Wohnung: verlangbar ab · wirksam ab (potenzial.js mhTermine) */
     wohnungen: [{ nr: '1', lage: 'EG', wfl: 60, ist: 500, soll: 560, soll_ab: 'PRUEF-VERLANGBAR-SOFORT-WIRKSAM-01/2027' },
-                { nr: '2', lage: 'OG', wfl: 70, ist: 600, soll: 650, soll_ab: 'PRUEF-VERLANGBAR-03/2027-WIRKSAM-06/2027' }]
+                { nr: '2', lage: 'OG', wfl: 70, ist: 600, soll: 650, soll_ab: 'PRUEF-VERLANGBAR-03/2027-WIRKSAM-06/2027' }],
+    /* v3322 · aufgeteilt: Aufteilerwert (Vergleichswert je Einheit führend), potenzial.js aufteilungKurz() */
+    aufteilung: { kosten: 3600, zins_etw: 2.9, je_stufe: { bestand: { summe: 431111, potenzial: 2511 } },
+      aufteiler: { bestand: { summe: 452222, wert: 448622, vollstaendig: true, bezeichnung: 'PRUEF-AUFTEILER-BEZEICHNUNG', potenzial: 23622 } },
+      je_wohnung: [{ nr: '1', lage: 'EG', wfl: 60, wert: 211333, bezeichnung: 'Vergleichswert (amtlicher Vergleichsfaktor)', herkunft: 'PRUEF-HERKUNFT-WE1', stuetzend: 200444 },
+                   { nr: '2', lage: 'OG', wfl: 70, wert: 240889, bezeichnung: 'Vergleichswert (indikativ, aus Angebotspreisen abgeleitet)', herkunft: 'PRUEF-HERKUNFT-WE2', stuetzend: 230667 }] }
   },
   /* ── v3026 · Indexmiete (potenzial.js indexmieteDaten) ── */
   indexmiete: {
@@ -447,6 +452,14 @@ const ERWARTET = [
   /* ── v3028 · Mieterhöhung: verlangbar ab und wirksam ab getrennt ─ */
   ['potenzial.wohnungen[0].soll_ab', 'potenzial.js zusammenfassung()', 'PRUEF-VERLANGBAR-SOFORT-WIRKSAM-01/2027'],
   ['potenzial.wohnungen[1].soll_ab', 'potenzial.js zusammenfassung()', 'PRUEF-VERLANGBAR-03/2027-WIRKSAM-06/2027'],
+  /* ── v3322 · aufgeteilt: Vergleichswert je Einheit führend, Ertragswert stützend ── */
+  ['potenzial.aufteilung.aufteiler.bestand.bezeichnung', 'potenzial.js aufteilungKurz()', 'PRUEF-AUFTEILER-BEZEICHNUNG'],
+  ['potenzial.aufteilung.aufteiler.bestand.wert', 'potenzial.js aufteilungKurz()', 'Aufteilerwert nach Kosten ' + z(448622)],
+  ['potenzial.aufteilung.aufteiler.bestand.summe', 'potenzial.js aufteilungKurz()', 'Summe der Einzelwerte ' + z(452222)],
+  ['potenzial.aufteilung.je_wohnung[0].wert', 'potenzial.js aufteilungKurz()', z(211333)],
+  ['potenzial.aufteilung.je_wohnung[0].herkunft', 'potenzial.js aufteilungKurz()', 'PRUEF-HERKUNFT-WE1'],
+  ['potenzial.aufteilung.je_wohnung[1].stuetzend', 'potenzial.js aufteilungKurz()', z(230667)],
+  ['potenzial: Regel fuehrend/stuetzend', 'v3322', 'Die Ertragswert-Summe oben ist nur STUETZEND'],
   ['potenzial: Spalte verlangbar/wirksam', 'v3028', 'Soll/Monat (verlangbar ab · wirksam ab)'],
   ['potenzial: Regel sofort nur fuers Verlangen', 'v3028', 'Das Wort "sofort" nur fuer das Verlangen'],
   ['potenzial: Regel Jahr ab wirksam', 'v3028', 'zaehlt nur ab "wirksam ab"'],

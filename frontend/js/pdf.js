@@ -3645,7 +3645,7 @@ async function _exportPDFInner() {
           doc.setFont('helvetica', istKopf ? 'bold' : 'normal'); doc.setFontSize(istKopf ? 7 : 8);
           var zellen = werte.map(function (w, i) {
             var bw = breiten[i] * fak, t = _pc(w);
-            if (!istKopf && /Maßnahmen/.test(kopf[i])) return doc.splitTextToSize(t, bw - 5).slice(0, 3);
+            if (!istKopf && /Maßnahmen|Verfahren/.test(kopf[i])) return doc.splitTextToSize(t, bw - 5).slice(0, 3);   /* v3322: Verfahren · Herkunft */
             if (!istKopf && /^Mieterhöhung/.test(kopf[i])) return doc.splitTextToSize(t, bw - 3).slice(0, 3);   /* v3028: Betrag · verlangbar · wirksam */
             if (i === 0) return [doc.splitTextToSize(t, bw - 3)[0] || ''];
             return [t];
@@ -3669,7 +3669,7 @@ async function _exportPDFInner() {
             z.forEach(function (t, j) {
               var ty = cy + rh0 - 1.8 + j * 3.4;
               if (i === 0) doc.text(t, x + 2, ty);
-              else if (/Maßnahmen/.test(kopf[i])) doc.text(t, x + 3, ty);
+              else if (/Maßnahmen|Verfahren/.test(kopf[i])) doc.text(t, x + 3, ty);
               else doc.text(t, x + bw - 2, ty, { align: 'right' });
             });
             x += bw;
@@ -3686,6 +3686,14 @@ async function _exportPDFInner() {
           _PD.wohnungen.map(function (w) { return [w.we, String(Math.round(w.wfl || 0)), w.ist, w.soll]; }));
         else _tab(['WE', 'm²', 'Ist €/M', 'Mieterhöhung', 'Ziel €/M', 'Maßnahmen'], [30, 11, 18, 30, 18, 48],
           _PD.wohnungen.map(function (w) { return [w.we, String(Math.round(w.wfl || 0)), w.ist, w.soll, w.ziel, w.massnahmen]; }));
+      }
+      /* v3322 · Marcel 12.11.2026: aufgeteilt → jede Wohnung einzeln im Vergleichswertverfahren, angegeben je
+         Einheit; der Ertragswert stützt. Daten aus DpPotenzial.pdfDaten().wert_je_wohnung (nichts neu gerechnet). */
+      if (_PD.wert_je_wohnung && _PD.wert_je_wohnung.length) {
+        var _WS = _PD.wert_je_wohnung_summe;
+        _tab(['WE', 'm²', 'Wert führend', 'Verfahren · Herkunft', 'Ertragswert stützend'], [24, 10, 24, 73, 24],
+          _PD.wert_je_wohnung.map(function (w) { return [w.we, String(Math.round(w.wfl || 0)), w.wert, w.verfahren, w.stuetzend]; })
+            .concat(_WS ? [['Summe nach Aufteilung', '', _WS.summe + (_WS.vollstaendig ? '' : '*'), _WS.bezeichnung + ' · führend', '']] : []), /^Summe nach Aufteilung/);
       }
       /* v2543 · WERTÜBERLEITUNG statt Wertbrücke (Marcel 20.10.2026: Variante B, Farben der
          Marke) - dieselben Zeilen wie im Tab Bewertung (DpPotenzial.ueberleitungZeilen). Stände als

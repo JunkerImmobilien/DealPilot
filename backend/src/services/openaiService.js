@@ -155,7 +155,27 @@ function _potenzialBlock(pz) {
       z.push('  ' + k + ': Summe ' + e(y.summe) + ', ' + (y.potenzial < 0 ? 'KEIN Aufteilungspotenzial (nach Kosten unter dem Haus als Ganzes)'
         : 'Potenzial nach Kosten gegen Haus als Ganzes ' + e(y.potenzial)));
     });
-    if (a.negativ_hinweis) z.push('  Begruendung (so wiedergeben, keinen Minusbetrag als Potenzial nennen): ' + a.negativ_hinweis);
+    if (a.negativ_hinweis && !(a.aufteiler && a.aufteiler.bestand)) z.push('  Begruendung (so wiedergeben, keinen Minusbetrag als Potenzial nennen): ' + a.negativ_hinweis);
+    /* v3322 · Marcel 12.11.2026: aufgeteilt -> je Wohnung FUEHRT das Vergleichswertverfahren, der Ertragswert
+       stuetzt. Bis v3317 kam hier nur die Ertragswert-Summe an (potenzial.js zusammenfassung ohne aufteiler). */
+    var T = a.aufteiler;
+    if (T && T.bestand) {
+      z.push('  FUEHREND (so benennen): Vergleichswert je Einheit - jede Wohnung einzeln bewertet (' + (T.bestand.bezeichnung || 'Vergleichswert') + ').'
+        + ' Die Ertragswert-Summe oben ist nur STUETZEND. Nenne als Wert nach Aufteilung den Aufteilerwert, nicht die Ertragswert-Summe.');
+      Object.keys(T).forEach(function (k) {
+        var y = T[k]; if (!y) return;
+        z.push('  ' + k + ': Summe der Einzelwerte ' + e(y.summe) + (y.vollstaendig ? '' : ' (unvollstaendig - nicht jede Wohnung hat einen Wert)')
+          + ', Aufteilerwert nach Kosten ' + e(y.wert) + ', ' + (y.potenzial < 0 ? 'KEIN Aufteilungspotenzial gegen das Haus als Ganzes' : 'Aufteilungspotenzial ' + e(y.potenzial)));
+      });
+      if (Array.isArray(a.je_wohnung) && a.je_wohnung.length) {
+        z.push('  Wohnung | m2 | Wert fuehrend | Verfahren und Herkunft | Ertragswert stuetzend');
+        a.je_wohnung.forEach(function (w) {
+          z.push('  ' + (w.nr || '') + (w.lage ? ' ' + w.lage : '') + ' | ' + (w.wfl || '-') + ' | ' + e(w.wert) + ' | ' + (w.bezeichnung || '-')
+            + (w.herkunft ? ' (' + w.herkunft + ')' : '') + ' | ' + (w.stuetzend != null ? e(w.stuetzend) : (w.ersatzweise ? 'ist ersatzweise fuehrend' : '-')));
+        });
+      }
+      z.push('  Angebotspreise sind keine Kaufpreise: ein Wert "indikativ, aus Angebotspreisen abgeleitet" immer so kennzeichnen; genauer wird er mit dem amtlichen Vergleichsfaktor des Gutachterausschusses.');
+    } else if (a.aufteiler_gesperrt) z.push('  Vergleichswert je Wohnung fuehrt noch nicht: ' + a.aufteiler_gesperrt);
     /* v2541 · dieselben Wohnungen nach Angebotspreisen fuer Eigentumswohnungen (nur nach dem Abruf „Marktpreise") */
     var me = a.marktpreisindikation_etw;
     if (me && me.summe_bestand != null) z.push('  Nach Angebotspreisen fuer Eigentumswohnungen am Ort (Median ' + (me.median_qm != null ? me.median_qm + ' EUR/m2' : '-')

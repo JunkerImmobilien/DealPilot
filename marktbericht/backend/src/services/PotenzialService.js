@@ -1002,9 +1002,69 @@ function aufteilerBezeichnung(z) {
   if (!z) return null;
   const vg = (z.amtlich || 0) + (z.angebote || 0);
   if (!vg) return z.ertragswert ? 'Ertragswert als Eigentumswohnung (ersatzweise, kein Vergleichswert verfügbar)' : null;
-  const art = z.amtlich && !z.angebote ? 'Vergleichswert (amtlicher Vergleichsfaktor)'
-    : (!z.amtlich ? 'Vergleichswert (indikativ, aus Angebotspreisen abgeleitet)' : 'Vergleichswert (amtlich und aus Angebotspreisen)');
+  /* v3322 · Immobilienrichtwert beim Namen (bis v3317 hieß auch er „amtlicher Vergleichsfaktor“) */
+  const amt = !z.irw ? 'amtlicher Vergleichsfaktor' : (z.irw === z.amtlich ? 'Immobilienrichtwert' : 'amtlicher Vergleichsfaktor/Immobilienrichtwert');
+  const art = z.amtlich && !z.angebote ? 'Vergleichswert (' + amt + ')'
+    : (!z.amtlich ? 'Vergleichswert (indikativ, aus Angebotspreisen abgeleitet)' : 'Vergleichswert (' + amt + ' und aus Angebotspreisen)');
   return art + (z.ertragswert ? ', ' + z.ertragswert + ' × Ertragswert ersatzweise' : '');
+}
+
+/* v3322 · AUFTEILERWERT als eigene Funktion (bis v3317 in rechne(), nur über den ganzen Lauf prüfbar).
+   Je Wohnung das führende Verfahren: 1. Vergleichswert aus amtlicher Kaufpreisbasis (Vergleichsfaktor oder
+   Immobilienrichtwert, § 20/§ 24 ImmoWertV), 2. sonst Angebotspreise MIT Abschlag (indikativ, wie Stufe M),
+   3. sonst der Ertragswert als Eigentumswohnung ersatzweise; Gewerbe mit seinem Anteil am Haus. Stützend
+   bleibt der Ertragswert der Wohnung (als_etw). Kein Treffer heißt kein Wert: fehlt eine Wohnung ganz, ist
+   die Summe unvollständig (vollstaendig: false), es wird nichts ergänzt. Setzt r.fuehrend[s] je Wohnung.
+   Rückgabe { [stufe]: { summe, wert, vollstaendig, zaehl, bezeichnung, potenzial, negativ } }. */
+function aufteilerRechnen(wohnungen, jeStufe, haus, kostenEur, stufen) {
+  const aus = (s) => String(s || '').replace(/^(Der|Die|Das)\s+/, '');
+  const T = {};
+  for (const s of stufen) {
+    if (!jeStufe || !jeStufe[s] || !haus || !haus[s]) continue;
+    let sum = 0, voll = true; const zaehl = { amtlich: 0, irw: 0, angebote: 0, ertragswert: 0, gewerbe: 0, fehlt: 0 };
+    (wohnungen || []).forEach((r) => {
+      r.fuehrend = r.fuehrend || {};
+      if (r.art === 'gewerbe') {
+        const v = r.anteil_am_haus ? r.anteil_am_haus[s] : null;
+        r.fuehrend[s] = { wert: v, verfahren: 'anteil_haus', bezeichnung: VERFAHREN_TEXT.anteil_haus, herkunft: 'Anteil am Ertragswert des Hauses' };
+        if (v == null) { voll = false; zaehl.fehlt++; } else { sum += v; zaehl.gewerbe++; }
+        return;
+      }
+      const vg = r.vergleich_etw ? r.vergleich_etw[s] : null;
+      const mp = r.mpi_etw ? (s === 'zielbild' ? r.mpi_etw.zielbild : r.mpi_etw.bestand) : null;
+      /* v3265 · wie Stufe M (v3242): Angebotspreise führen nur MIT Abschlag - ohne ihn sind es
+         Angebots-, keine Kaufpreise (§ 25 Abs. 1 ImmoWertV) */
+      const mpAb = r.mpi_etw && Number(r.mpi_etw.abschlag_pct) > 0;
+      const stz = r.als_etw && r.als_etw[s] > 0 ? r.als_etw[s] : null;
+      const irw = !!(vg && vg.quelle === 'Immobilienrichtwert');
+      let v = null, verf = null, herk = null;
+      if (vg && vg.wert > 0) {
+        v = vg.wert; verf = 'vergleichswert_amtlich'; zaehl.amtlich++; if (irw) zaehl.irw++;
+        herk = (irw ? 'Immobilienrichtwert' : 'amtlicher Vergleichsfaktor') + (vg.faktor_qm ? ' ' + Math.round(vg.faktor_qm).toLocaleString('de-DE') + ' €/m²' : '')
+          + (vg.ausschuss ? ' · ' + aus(vg.ausschuss) : '') + (vg.stufe ? ' · Stufe ' + vg.stufe : '');
+      } else if (mp > 0 && mpAb) {
+        v = Math.round(mp); verf = 'vergleichswert_angebote'; zaehl.angebote++;
+        herk = 'Angebotspreise für Eigentumswohnungen am Ort' + (r.mpi_etw.median_qm ? ' (' + Math.round(r.mpi_etw.median_qm).toLocaleString('de-DE') + ' €/m²)' : '')
+          + ' abzüglich ' + String(r.mpi_etw.abschlag_pct).replace('.', ',') + ' % Abschlag, indikativ';
+      } else if (stz) {
+        v = stz; verf = 'ertragswert_etw'; zaehl.ertragswert++;
+        herk = 'kein Vergleichswert verfügbar' + (vg && vg.offen && vg.offen.length ? ' (für den amtlichen Vergleichsfaktor fehlt: ' + vg.offen.join(', ') + ')' : '');
+      } else { voll = false; zaehl.fehlt++; }
+      /* v3265 · am Ergebnis je Wohnung: was führt, was stützt, und ob der Ertragswert nur ersatzweise steht */
+      r.fuehrend[s] = { wert: v, verfahren: verf,
+        bezeichnung: verf ? (irw && verf === 'vergleichswert_amtlich' ? 'Vergleichswert (Immobilienrichtwert)' : VERFAHREN_TEXT[verf]) : null,
+        herkunft: herk,   /* v3322 · Herkunft je Zahl */
+        indikativ: verf === 'vergleichswert_angebote',
+        quelle: verf === 'vergleichswert_angebote' ? (r.mpi_etw.quelle || 'markt') : null,
+        stuetzend: verf && verf !== 'ertragswert_etw' ? stz : null,
+        ersatzweise: verf === 'ertragswert_etw' };
+      if (v != null) sum += v;
+    });
+    const wert = Math.round(sum - (Number(kostenEur) || 0));
+    T[s] = { summe: Math.round(sum), wert, vollstaendig: voll, zaehl, bezeichnung: aufteilerBezeichnung(zaehl),
+      potenzial: Math.round(wert - haus[s].wert), negativ: wert < haus[s].wert };
+  }
+  return T;
 }
 
 export const PotenzialService = {
@@ -1401,42 +1461,8 @@ export const PotenzialService = {
           grund: (ohneFl === 1 ? 'Eine Wohnung hat' : ohneFl + ' Wohnungen haben') + ' keine Wohnfläche — der Vergleichswert je Wohnung führt erst, wenn alle Wohnungen eine Wohnfläche haben.' };
       }
       if (out.aufteilung && ohneFl === 0) {
-        const A = out.aufteilung; A.aufteiler = {};
-        for (const s of stufenAlle) {
-          if (!A.je_stufe[s] || !out.haus[s]) continue;
-          let sum = 0, voll = true; const zaehl = { amtlich: 0, angebote: 0, ertragswert: 0, gewerbe: 0, fehlt: 0 };
-          out.wohnungen.forEach((r) => {
-            r.fuehrend = r.fuehrend || {};
-            if (r.art === 'gewerbe') {
-              const v = r.anteil_am_haus ? r.anteil_am_haus[s] : null;
-              r.fuehrend[s] = { wert: v, verfahren: 'anteil_haus' };
-              if (v == null) { voll = false; zaehl.fehlt++; } else { sum += v; zaehl.gewerbe++; }
-              return;
-            }
-            const vg = r.vergleich_etw ? r.vergleich_etw[s] : null;
-            const mp = r.mpi_etw ? (s === 'zielbild' ? r.mpi_etw.zielbild : r.mpi_etw.bestand) : null;
-            /* v3265 · wie Stufe M (v3242): Angebotspreise führen nur MIT Abschlag - ohne ihn sind es
-               Angebots-, keine Kaufpreise (§ 25 Abs. 1 ImmoWertV) */
-            const mpAb = r.mpi_etw && Number(r.mpi_etw.abschlag_pct) > 0;
-            const stz = r.als_etw && r.als_etw[s] > 0 ? r.als_etw[s] : null;
-            let v = null, verf = null;
-            if (vg && vg.wert > 0) { v = vg.wert; verf = 'vergleichswert_amtlich'; zaehl.amtlich++; }
-            else if (mp > 0 && mpAb) { v = Math.round(mp); verf = 'vergleichswert_angebote'; zaehl.angebote++; }
-            else if (stz) { v = stz; verf = 'ertragswert_etw'; zaehl.ertragswert++; }
-            else { voll = false; zaehl.fehlt++; }
-            /* v3265 · am Ergebnis je Wohnung: was führt, was stützt, und ob der Ertragswert nur ersatzweise steht */
-            r.fuehrend[s] = { wert: v, verfahren: verf,
-              bezeichnung: verf ? VERFAHREN_TEXT[verf] : null,
-              indikativ: verf === 'vergleichswert_angebote',
-              quelle: verf === 'vergleichswert_angebote' ? (r.mpi_etw.quelle || 'markt') : null,
-              stuetzend: verf && verf !== 'ertragswert_etw' ? stz : null,
-              ersatzweise: verf === 'ertragswert_etw' };
-            if (v != null) sum += v;
-          });
-          const wert = Math.round(sum - A.kosten_eur);
-          A.aufteiler[s] = { summe: Math.round(sum), wert, vollstaendig: voll, zaehl, bezeichnung: aufteilerBezeichnung(zaehl),
-            potenzial: Math.round(wert - out.haus[s].wert), negativ: wert < out.haus[s].wert };
-        }
+        const A = out.aufteilung;
+        A.aufteiler = aufteilerRechnen(out.wohnungen, A.je_stufe, out.haus, A.kosten_eur, stufenAlle);   /* v3322 · eigene Funktion, Prüfer B66 */
         A.aufteiler_hinweis = 'Aufteilerwert: je Wohnung das führende Verfahren - Vergleichswert aus dem amtlichen Vergleichsfaktor '
           + 'des Gutachterausschusses (§ 20 ImmoWertV, Merkmale der Wohnung), sonst aus Angebotspreisen für Eigentumswohnungen '
           + '(abzüglich Angebotsabschlag; indikativ, aus Angebotspreisen abgeleitet), sonst ersatzweise der Ertragswert als Eigentumswohnung. Stützend: der Ertragswert jeder Wohnung '
@@ -1471,6 +1497,6 @@ export default PotenzialService;
 export { eineStufe as _eineStufe };
 export { stufe558 as _stufe558 };   /* v3150 · Pruefer B61 */
 export { stufeNeuvermietung as _stufeNeuvermietung };   /* v3152 · Pruefer B62 */
-export { etwAusAbruf as _etwAusAbruf, etwNiveauAusAbruf as _etwNiveauAusAbruf, aufteilerBezeichnung as _aufteilerBezeichnung };   /* v3265 · Pruefer B63 */
+export { etwAusAbruf as _etwAusAbruf, etwNiveauAusAbruf as _etwNiveauAusAbruf, aufteilerBezeichnung as _aufteilerBezeichnung, aufteilerRechnen as _aufteilerRechnen };   /* v3322 · B66 */   /* v3265 · Pruefer B63 */
 /* v2988 · fuer Knotenprobe und Pruefer: Miete nach Modernisierung, Stufenmiete, Bestandsbasis */
 export { mieteNachModernisierung as _mieteNachModernisierung, stufenMiete as _stufenMiete, bestandsBasis as _bestandsBasis };

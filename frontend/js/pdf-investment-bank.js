@@ -1488,6 +1488,14 @@
             return [sauberE(w.we), fmt(w.wfl, 0), sauberE(w.ist), sauberE(w.soll), sauberE(w.ziel), sauberE(w.massnahmen)];
           }), { titel: 'Wertpotenzial' });
       }
+      /* v3322 · aufgeteilt: Wert je Wohnung, Vergleichswert führend, Ertragswert stützend (pdfDaten().wert_je_wohnung) */
+      if (PD.wert_je_wohnung && PD.wert_je_wohnung.length) {
+        var WS = PD.wert_je_wohnung_summe;
+        tabelle([['WE', 24, 'l'], ['m²', 10], ['Wert führend', 24], ['Verfahren · Herkunft', 72, 'u'], ['Ertragswert stützend', 24]],
+          PD.wert_je_wohnung.map(function (w) { return [sauberE(w.we), fmt(w.wfl, 0), sauberE(w.wert), sauberE(w.verfahren), sauberE(w.stuetzend)]; })
+            .concat(WS ? [[sauberE('Summe nach Aufteilung'), '', sauberE(WS.summe + (WS.vollstaendig ? '' : '*')), sauberE(WS.bezeichnung + ' · führend'), '']] : []),
+          { titel: 'Wertpotenzial' });
+      }
       /* v2543 · WERTÜBERLEITUNG statt Wertbrücke (Marcel 20.10.2026: Variante B, Farben der
          Marke) - dieselben Zeilen wie im Tab Bewertung (DpPotenzial.ueberleitungZeilen). Stände als
          Zeilen mit Summenstrich, Veränderungen als Balken um null; keine gekürzte Achse mehr. */
