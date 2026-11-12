@@ -275,22 +275,37 @@
       .catch(function () { if (n === lauf) { g.innerHTML = ''; setze('dkLageQ', 'Lage & Markt gerade nicht abrufbar.'); } });
   }
 
-  /* landing-dealcheck-6 · Ein Satz zur eigenen Miete gegen die Vergleichsmiete — nur mit Wohnfläche.
-     § 558 BGB: Erhöhung bis zur Vergleichsmiete, höchstens um die Kappungsgrenze in drei Jahren.
-     § 556d BGB: bei Neuvermietung mit Mietpreisbremse höchstens 10 % über der Vergleichsmiete. */
+  /* landing-dealcheck-7 · HÖCHSTMIETE (Marcel 12.11.2026: „den obersten Wert der Miete angeben mit den zulässigen
+     Abweichungen"). Je m² nettokalt, nur aus Gesetz und Vergleichsmiete:
+       Bestand   § 558 BGB  bis zur ortsüblichen Vergleichsmiete DIESER Wohnung - am oberen Rand der Mietspiegel-
+                            Spanne, wenn Ausstattung und Lage es tragen; je 3 Jahre höchstens die Kappungsgrenze.
+       Neu, Bremse § 556d   höchstens 10 % über der Vergleichsmiete (Ausnahmen § 556e/§ 556f: Vormiete, Neubau,
+                            umfassende Modernisierung).
+       Neu, ohne Bremse     keine Obergrenze im Mietrecht; Grenze ist § 5 WiStG (mehr als 20 % über der
+                            ortsüblichen Miete bei geringem Angebot = Ordnungswidrigkeit).
+     Ohne Spanne (DealPilot-Näherung) steht der obere Rand als typischer Wert: Median Oberwert/Mittelwert über
+     3.051 Tabellenfelder aus 70 freien Mietspiegeln = 1,186 (gemessen 12.11.2026) - dann „ca." und benannt. */
+  var OBEN_TYPISCH = 1.186;
   function mieteSatz(vg, kp, mb, wfl) {
-    var nkm = zahl(F.nkm);
-    if (!vg || !(vg.qm > 0) || !wfl || !(nkm > 0)) return null;
-    var ist = nkm / wfl, abw = (ist / vg.qm - 1) * 100, kpct = kp && kp.pct ? kp.pct : 20;
-    var t = 'Deine Miete: <b>' + dez(ist, 2) + ' €/m²</b>';
-    if (abw < -3) {
-      var ziel = Math.min(vg.qm, ist * (1 + kpct / 100)), plus = (ziel - ist) * wfl;
-      t += ', ' + dez(Math.abs(abw), 0) + ' % unter der Vergleichsmiete. Nach § 558 BGB in 3 Jahren bis <b>' + dez(ziel, 2) + ' €/m²</b> möglich (+' + dez(Math.round(plus), 0) + ' € im Monat, Kappung ' + kpct + ' %).';
-    } else if (abw > 3) {
-      t += ', ' + dez(abw, 0) + ' % über der Vergleichsmiete – eine Erhöhung nach § 558 BGB ist derzeit nicht drin.';
-    } else t += ' – entspricht etwa der Vergleichsmiete.';
-    if (mb && mb.gilt === true) t += ' Bei Neuvermietung gilt die Mietpreisbremse: höchstens <b>' + dez(vg.qm * 1.1, 2) + ' €/m²</b>.';
-    if (vg.quelle !== 'mietspiegel') t += ' <small>(Vergleichsmiete als Näherung – für ein Erhöhungsverlangen mit Mietspiegel, Vergleichswohnungen oder Gutachten belegen.)</small>';
+    if (!vg || !(vg.qm > 0)) return null;
+    var nkm = zahl(F.nkm), mitW = wfl && nkm > 0, kpct = kp && kp.pct ? kp.pct : 20;
+    var spanne = vg.quelle === 'mietspiegel' && vg.oben > 0, oben = spanne ? vg.oben : vg.qm * OBEN_TYPISCH, ca = spanne ? '' : 'ca. ';
+    var mon = function (qm) { return mitW ? ' <small>(' + dez(Math.round(qm * wfl), 0) + ' €/Monat)</small>' : ''; };
+    var t = '<b>Höchstmiete je m² nettokalt</b><br>';
+    t += 'Bestand: bis <b>' + ca + dez(oben, 2) + ' €</b>' + mon(oben) + ' – oberer Rand ' + (spanne ? 'des Mietspiegels' : 'der Vergleichsmiete') + ', wenn Ausstattung und Lage es tragen; je Erhöhung höchstens ' + kpct + ' % in 3 Jahren (§ 558 BGB).<br>';
+    if (mb && mb.gilt === true) t += 'Neuvermietung: bis <b>' + ca + dez(oben * 1.1, 2) + ' €</b>' + mon(oben * 1.1) + ' – Mietpreisbremse, 10 % über der Vergleichsmiete (§ 556d BGB, Ausnahmen § 556e/f).';
+    else if (mb && mb.gilt === false) t += 'Neuvermietung: keine Mietpreisbremse; Grenze ist der Mietwucher ab 20 % über der Vergleichsmiete (§ 5 WiStG) – bis <b>' + ca + dez(oben * 1.2, 2) + ' €</b>' + mon(oben * 1.2) + '.';
+    else t += 'Neuvermietung: ob die Mietpreisbremse gilt, bitte prüfen.';
+    if (mitW) {
+      var ist = nkm / wfl, abw = (ist / vg.qm - 1) * 100;
+      t += '<br>Deine Miete: <b>' + dez(ist, 2) + ' €/m²</b>';
+      if (abw < -3) {
+        var ziel = Math.min(oben, ist * (1 + kpct / 100));
+        t += ', ' + dez(Math.abs(abw), 0) + ' % unter der Vergleichsmiete (Mittel ' + dez(vg.qm, 2) + ' €) – in 3 Jahren bis <b>' + dez(ziel, 2) + ' €/m²</b> (+' + dez(Math.round((ziel - ist) * wfl), 0) + ' €/Monat).';
+      } else if (abw > 3) t += ', ' + dez(abw, 0) + ' % über dem Mittel der Vergleichsmiete (' + dez(vg.qm, 2) + ' €).';
+      else t += ' – etwa das Mittel der Vergleichsmiete.';
+    }
+    if (!spanne) t += ' <small>Vergleichsmiete als DealPilot-Näherung (±' + dez(vg.abweichung_pct || 7.5, 1) + ' %) – für ein Erhöhungsverlangen mit Mietspiegel, Vergleichswohnungen oder Gutachten belegen.</small>';
     return t;
   }
 
