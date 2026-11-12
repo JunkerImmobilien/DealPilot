@@ -320,8 +320,13 @@
   }
 
   /* ── Drehen ─────────────────────────────────────────────────────────── */
+  /* landing-dealcheck-9 · Karte so hoch wie die sichtbare Seite (wächst mit den nachgeladenen Kacheln mit) */
+  function hoehe() { var s = karte.classList.contains('gedreht') ? hinten : vorn; if (s && s.offsetHeight) karte.style.height = s.offsetHeight + 'px'; }
+  if ('ResizeObserver' in window) { var ro = new ResizeObserver(hoehe); ro.observe(vorn); ro.observe(hinten); }
+  window.addEventListener('resize', hoehe);
   function seite(hintenAn) {
     karte.classList.toggle('gedreht', hintenAn);
+    hoehe();
     hinten.setAttribute('aria-hidden', hintenAn ? 'false' : 'true');
     vorn.setAttribute('aria-hidden', hintenAn ? 'true' : 'false');
     if ('inert' in hinten) { hinten.inert = !hintenAn; vorn.inert = hintenAn; }

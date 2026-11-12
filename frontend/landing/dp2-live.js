@@ -21,7 +21,7 @@
    ═══════════════════════════════════════════════════════════════════════ */
 (function () {
   'use strict';
-  var QUELLE = 'assets/videothek/videos.json?v=landing-videothek-9';   /* landing-videothek-9: Modul 26 neu (v3291); landing-videothek-8: 20 Videos neu (N145, v3285); landing-videothek-7: Ue3, Modul 28 */
+  var QUELLE = 'assets/videothek/videos.json?v=landing-videothek-10';   /* landing-videothek-10: Werbespot 'Das Haus hab ich.' als erstes Video (Marcel 12.11.2026); landing-videothek-9: Modul 26 neu (v3291); landing-videothek-8: 20 Videos neu (N145, v3285); landing-videothek-7: Ue3, Modul 28 */
   /* landing-videothek-4 · Jedes Video gibt es mit und ohne Sprecher (Marcel 19.10.2026:
      „die Videos muss es vertont und unvertont geben"). videos.json traegt je Eintrag
      `datei_ton`; die Wahl merkt sich der Browser, Standard: mit Sprecher. */

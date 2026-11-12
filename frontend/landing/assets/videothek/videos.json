@@ -10,6 +10,28 @@
   ],
   "videos": [
     {
+      "id": "spot-das-haus-hab-ich", "kategorie": "ueberblick", "nr": "Spot", "dauer": 91,
+      "titel": "Das Haus hab ich.",
+      "unterzeile": "Vom Exposé bis zum Kauf. Ein Objekt, ein Weg, in 90 Sekunden.",
+      "story": "Freitag kommt das Exposé für acht Wohnungen. Unterlagen rein, Score ablesen, Finanzierung einstellen, durchrechnen, Investment-PDF für die Bank, Kaufpreisaufteilung und Steuer. Am Ende steht er vor seinem Haus.",
+      "nutzen": "In 90 Sekunden sehen, wie DealPilot einen Kauf von Anfang bis Ende trägt.",
+      "kapitel": [
+        { "t": 0, "titel": "Das Exposé", "stichworte": "Makler Exposé acht Wohnungen" },
+        { "t": 10, "titel": "Unterlagen rein", "stichworte": "Exposé Mieterliste Energieausweis ausgelesen" },
+        { "t": 16, "titel": "Score und Finanzierung", "stichworte": "Deal Score volle Finanzierung 80 Prozent" },
+        { "t": 24, "titel": "Bewertung", "stichworte": "Starker Kauf Preis" },
+        { "t": 33, "titel": "Durchgerechnet", "stichworte": "Wohnungen Neuvermietung Investor Deal Score" },
+        { "t": 46, "titel": "Investment-PDF", "stichworte": "Bank Foto Zahlen" },
+        { "t": 51, "titel": "Kaufpreisaufteilung", "stichworte": "optimiert Notar Restnutzungsdauer" },
+        { "t": 63, "titel": "Das Haus hab ich", "stichworte": "Kauf" },
+        { "t": 68, "titel": "Steuer und Plan gegen Ist", "stichworte": "Anlage V Steuerberater Bank Kennzahlen" }
+      ],
+      "spruch": "Das Haus hab ich.",
+      "datei": "dealpilot-spot-das-haus-hab-ich.mp4", "datei_ton": "dealpilot-spot-das-haus-hab-ich.mp4",
+      "poster": "dealpilot-spot-das-haus-hab-ich.webp",
+      "youtube": { "titel": "DealPilot · Das Haus hab ich. (Werbespot, 90 Sekunden)", "tags": ["DealPilot", "Immobilien", "Kapitalanlage", "Mehrfamilienhaus", "Werbespot"], "youtube_id": null }
+    },
+    {
       "id": "ueberblick-1-quick-boarding", "kategorie": "ueberblick", "nr": "Ü1", "dauer": 221,
       "titel": "Quick-Check",
       "unterzeile": "Vom Exposé zum ersten Urteil — in wenigen Minuten.",

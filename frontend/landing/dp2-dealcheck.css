@@ -30,6 +30,12 @@
 .dk-seite::before{content:'';position:absolute;left:0;right:0;top:0;height:3px;background:var(--runway)}
 .dk-hinten{transform:rotateY(180deg)}
 .dk-karte:not(.gedreht) .dk-hinten,.dk-karte.gedreht .dk-vorn{pointer-events:none}
+/* landing-dealcheck-9 · Marcel 12.11.2026: „wenn ich die Karte wieder drehe, wird sie nicht wieder klein". Beide Seiten
+   liegen in derselben Gitterzelle, die Zelle war immer so hoch wie die längere Rückseite. Jetzt hat jede Seite ihre
+   eigene Höhe (align-self:start), und die Karte bekommt per JS die Höhe der sichtbaren Seite, weich übergeblendet. */
+.dk-seite{align-self:start}
+.dk-karte{transition:transform .8s cubic-bezier(.2,.8,.2,1),height .5s ease}
+@media (prefers-reduced-motion:reduce){.dk-karte{transition:none}}
 
 .dk-kopf{display:flex;justify-content:space-between;align-items:center;gap:10px}
 .dk-marke{font:700 11px/1 var(--mono);letter-spacing:.2em;text-transform:uppercase;color:var(--gdh)}
