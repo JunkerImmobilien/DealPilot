@@ -5022,9 +5022,9 @@
       async function (s) {   /* 8 · Pilot fragen */
         var ch = function () { return q('#dp-pp-chips'); };
         await zeige(ch, 8);
-        var c = [].map.call(document.querySelectorAll('#dp-pp-chips button, #dp-pp-chips [class*=chip]'), function (b) { return r6Text(b).replace(/\s*›\s*$/, ''); }).filter(Boolean);
+        var c = [].map.call(document.querySelectorAll('#dp-pp-chips button, #dp-pp-chips [class*=chip], #dp-pp-chips option:not([value=""])')   /* v3321: Auswahlfeld */, function (b) { return r6Text(b).replace(/\s*›\s*$/, ''); }).filter(Boolean);
         c = c.filter(function (y, i) { return c.indexOf(y) === i; });
-        await b2oZeile(s, 'Pilot fragen', (c.length ? c.length + ' Schnellfragen: <b>' + c.slice(0, 3).join('</b>, <b>') + '</b> …' : 'Schnellfragen') + ' — ein Klick genügt.');
+        await b2oZeile(s, 'Pilot fragen', (c.length ? c.length + ' Schnellfragen: <b>' + c.slice(0, 3).join('</b>, <b>') + '</b> …' : 'Schnellfragen') + ' — aus der Liste wählen, fertig.');
       },
       async function (s) {   /* 9 · eigene Frage */
         await zeige(function () { var i = q('#dp-pp-in'); return i && (i.parentElement || i); }, 8);

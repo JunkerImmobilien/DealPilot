@@ -704,6 +704,7 @@
       + '<div class="cpk-g">Ertrag</div><div class="cpt-grid">' + g1 + '</div>'
       + '<div class="cpk-g">Kapital</div><div class="cpt-grid">' + g2 + '</div>'
       + '<div class="cpk-g">Rendite &amp; Finanzierung</div><div class="cpt-grid">' + g3 + '</div>'
+      + _seitZeileHtml()   /* v3321: „Seit dem Kauf" als Zeile unter den Kennzahlen */
       + '<details class="cpk-det" id="dp-kz-det"' + (_detOffen ? ' open' : '') + '><summary>Wert heute je Objekt · ' + esc(quelleTxt) + '</summary><ul class="kz-liste">' + liste + '</ul>'
       + '<p>EK-Rendite = Cashflow ÷ eingesetztes Eigenkapital (wie am Objekt). Inkl. Tilgung = (Cashflow v. St. + Tilgung) ÷ EK. Abstand = Wert heute − ursprüngliches Darlehen.</p></details>';
   }
@@ -873,7 +874,6 @@
        Kennzahl-Spalte im Score-Kopf (v3216) sind EINE Karte mit einer ruhigen
        Kachelreihe geworden (_heroKzHtml). Gerechnet wird dort nichts neu -
        dieselben Summen aus aggStats(). Hier bleibt nur „Seit dem Kauf". */
-    var seitHtml = '';
 
     /* ── v2098 · SEIT ANKAUF, UEBER DEN GANZEN BESTAND ────────────────
      * Backlog N60.16: „die Abweichung ueber den ganzen Bestand - wie
@@ -913,24 +913,16 @@
         else ohneScore++;
         liste.push({ name: _objName(o), urteil: r.urteil || null, ankauf: r.scoreAnkauf, heute: r.scoreJetzt, stichtag: r.stichtag || null });
       });
-      if (!mitStand) return;
+      if (!mitStand) { _seitListe = []; return; }
       _seitListe = liste;
-      /* ── v2950 · Marcel 25.10.2026: „was drückt die Karte aus? … das
-         versteht niemand". Sie zaehlt Objekte, deren DealScore HEUTE ueber
-         oder unter dem Score beim Ankauf (eingefrorener Stand) liegt - das
-         steht jetzt im Titel und in einem Satz, mit allen drei Werten
-         (besser · gleich · schlechter). Ein Klick klappt die Liste der
-         Objekte mit Score beim Kauf → heute auf. Gerechnet wird weiter nur
-         von `DealPilotAnkauf.abweichungFuer`. */
-      seitHtml = '<div class="cpk cp-seit"><div class="cpk-h"><span>Seit dem Kauf</span><em>DealScore heute gegen Ankauf</em></div>'
-        + '<button type="button" class="cp-seit-z" onclick="DealPilotDashboard.toggleSeitAnkauf()" aria-expanded="' + (_seitOffen ? 'true' : 'false') + '" title="Objekte einzeln mit DealScore beim Kauf und heute">'
-        + '<span class="pos"><b>' + besser + '</b> besser</span><span><b>' + gleich + '</b> gleich</span><span class="neg"><b>' + schlechter + '</b> schlechter</span>'
-        + '<small>' + mitStand + ' von ' + arr.length + ' Objekten mit Ankauf-Stand' + (ohneScore ? ' · ' + ohneScore + ' ohne Score' : '') + ' · ' + (_seitOffen ? 'Liste schließen ▴' : 'Liste anzeigen ▾') + '</small></button>'
-        + (_seitOffen ? _seitListeHtml() : '') + '</div>';
+      /* v3321 · Marcel 12.11.2026: „seit dem Kauf … brauchen wir nicht so groß … vielleicht
+         unter die Kennzahlen". Keine eigene Karte mehr - eine schmale Zeile am Fuß der
+         Kennzahlen-Karte (_seitZeileHtml, aus _heroKzHtml), dieselbe Liste zum Aufklappen. */
+      /* (bis v3317 stand hier die Karte .cp-seit, v2950) */
     })();
 
     host.classList.add('cp-kz-wrap');
-    host.innerHTML = '<div class="cpk" id="dp-kz-card">' + _heroKzHtml(s) + '</div>' + seitHtml;
+    host.innerHTML = '<div class="cpk" id="dp-kz-card">' + _heroKzHtml(s) + '</div>';
     try { renderZielbild(); } catch (e) { console.warn('[v2950] Bestand & Zielbild', e); }
     try { renderGesamtbew(); } catch (e) { console.warn('[v2951] Gesamtbewertung', e); }
     try { renderEinfach(); } catch (e) { console.warn('[v2951] Einfach', e); }
@@ -939,6 +931,27 @@
   /* ── v2950 · Liste zur Karte „Seit dem Kauf" ── */
   var _seitListe = [], _seitOffen = false;
   function toggleSeitAnkauf(){ _seitOffen = !_seitOffen; try{ renderOverview(); }catch(e){} }
+  /* v3321 · Zaehlung aus _seitListe (gerechnet nur von DealPilotAnkauf.abweichungFuer) */
+  function _seitZahlen(){
+    var z = { b:0, g:0, s:0, o:0, n:_seitListe.length };
+    _seitListe.forEach(function(x){ if (x.urteil==='besser') z.b++; else if (x.urteil==='gleich') z.g++; else if (x.urteil==='schlechter') z.s++; else z.o++; });
+    return z;
+  }
+  /* v3321 · schmale Zeile „Seit dem Kauf" - Fuß der Kennzahlen-Karte (Genau) und
+     Kopfkarte der Ansicht Einfach. Kleiner Balken besser/gleich/schlechter, Klick = Liste. */
+  function _seitZeileHtml(mitListe){
+    if (!_seitListe.length) return '';
+    var z = _seitZahlen(), n = z.n || 1;
+    function seg(cls, v){ return v ? '<i class="sz-' + cls + '" style="flex:' + v + ' 1 0"></i>' : ''; }
+    return '<div class="cp-sz">'
+      + '<button type="button" class="cp-sz-z" onclick="DealPilotDashboard.toggleSeitAnkauf()" aria-expanded="' + (_seitOffen ? 'true' : 'false') + '" title="DealScore heute gegen den Stand beim Kauf – Liste der Objekte ein- oder ausblenden">'
+      +   '<span class="cp-sz-t">Seit dem Kauf<small>DealScore heute gegen Ankauf</small></span>'
+      +   '<span class="cp-sz-bar" aria-hidden="true">' + seg('b', z.b) + seg('g', z.g) + seg('s', z.s) + seg('o', z.o) + '</span>'
+      +   '<span class="cp-sz-w"><b class="pos">' + z.b + '</b> besser · <b>' + z.g + '</b> gleich · <b class="neg">' + z.s + '</b> schlechter</span>'
+      +   '<span class="cp-sz-m">' + (_seitOffen ? 'schließen ▴' : 'Objekte ▾') + '</span>'
+      + '</button>'
+      + (mitListe !== false && _seitOffen ? _seitListeHtml() : '') + '</div>';
+  }
   function _objName(o){
     var n = (o && (o._name || o.name || o.kuerzel || o._obj_seq)) || 'Objekt';
     return String(n);
@@ -1034,7 +1047,8 @@
         mpiB: B.marktpreisindikation, rndB: B.rnd, rndZ: T.rnd, grund: g ? g.text : null, code: g ? g.code : null,
         /* v3234 · fuer die Objekt-Tabelle (_zbObjTabelle): Soll-Stufe und Herkunft der Spalten, nur gelesen */
         ewM: M.ertragswert, mpiM: M.marktpreisindikation, mpiZ: T.marktpreisindikation, kostenM: (S.mieterhoehung ? S.mieterhoehung.kosten : 0) || 0,
-        hatMh: !!S.mieterhoehung, hatZb: !!S.zielbild };
+        hatMh: !!S.mieterhoehung, hatZb: !!S.zielbild,
+        auf: z.aufteilung || null };   /* v3321 · aufgeteilt: Vergleichswert je Einheit (zielbildFuer) */
       /* v2988 · woher das Zielbild kommt, und ob es von der Investition (san) abweicht */
       try { e.herk = (window.DpPotenzial && DpPotenzial.herkunftAusDaten) ? DpPotenzial.herkunftAusDaten(o) : null; } catch (x) { e.herk = null; }
       if (zw != null && B.ertragswert != null && T.ertragswert != null) {
@@ -1148,7 +1162,10 @@
       var ewFehlt = e.ewB == null || e.ewZ == null;
       var ewGrund = e.gesperrt ? 'mit Stufe 3' : 'nicht gerechnet';
       return '<tr title="' + esc(tip) + '">'
-        + '<th scope="row">' + esc(e.name) + '<small>' + esc(art) + (e.stand ? ' · ' + esc(dat(e.stand)) : '') + '</small></th>'
+        + '<th scope="row">' + esc(e.name) + '<small>' + esc(art) + (e.stand ? ' · ' + esc(dat(e.stand)) : '') + '</small>'
+        /* v3321 · Marcel 12.11.2026: aufgeteilt → führend der Vergleichswert je Einheit, der Ertragswert stützt */
+        + (e.auf ? '<small class="zb-ot-auf">' + (e.auf.wert != null ? 'aufgeteilt · führend: Vergleichswert je Einheit ' + esc(E(e.auf.wert)) + (e.auf.n ? ' (' + e.auf.n + ' WE' + (e.auf.vollstaendig ? '' : ', unvollständig') + ')' : '') + ' · Ertragswert stützend' : 'aufgeteilt · ' + esc(e.auf.gesperrt)) + '</small>' : '')
+        + '</th>'
         + td(E(e.mB))
         + td(E(e.mM), e.hatMh ? '' : 'zb-ot-gl', e.hatMh ? '' : 'wie Bestand')
         + td(E(e.mZ), e.hatZb ? '' : 'zb-ot-gl', e.hatZb ? '' : 'wie Soll')
@@ -1219,14 +1236,17 @@
       + '<span>Bestand &amp; Zielbild</span><em title="' + esc(KZ) + '">Potenzialwert · Plan, kein Verkehrswert</em></div>'
       + '<div class="zb-zahl">' + kopfZahl + '</div>';
     function knopf(key, txt){ return key ? '<button type="button" class="zb-btn" onclick="DealPilotDashboard.zumZielbild(\''+esc(key)+'\')">'+(txt||'Im Objekt öffnen')+' ›</button>' : ''; }
-    var gruende = A.ohne.concat(A.ohneEw.filter(function(e){ return A.ohne.indexOf(e) < 0; })).concat(A.hinweise);
+    /* v3321 · Marcel 12.11.2026: „Am Markt und Bäckerstraße … Im Objekt öffnen - das verstehe
+       ich nicht." Die Objekte „nur Mieterhöhung" (A.hinweise) stehen schon in der Tabelle mit
+       genau diesem Vermerk - hier stehen nur noch Objekte, denen wirklich etwas FEHLT. */
+    var gruende = A.ohne.concat(A.ohneEw.filter(function(e){ return A.ohne.indexOf(e) < 0; }));
     gruende = gruende.filter(function(x){ return !x.unveraendert; });
     /* Objekte ohne Zielbild: kompakt, eine Zeile je Objekt, eingeklappt */
     var unvHtml = A.unv.length ? det('unv', 'Ohne Zielbild · anzeigen (' + A.unv.length + ')',
         '<p class="zb-det-satz">Gerechnet wie heute: Miete bleibt, keine Maßnahmen. Mit einem Zielbild rechnet das Objekt mit seinem Potenzial.</p>'
         + '<div class="zb-liste">' + A.unv.map(function(x){ return '<div class="zb-zl"><span class="zb-zl-n" title="'+esc(x.name)+'">'+esc(x.name)+'</span><span class="zb-zl-w">'+EK(x.mB)+' / Jahr</span>'+knopf(x.key, 'Zielbild anlegen')+'</div>'; }).join('') + '</div>') : '';
-    var gruendeHtml = gruende.length ? '<div class="zb-gr"><div class="zb-gr-t">Nicht oder nur teilweise enthalten · mit Grund</div>'
-      + gruende.map(function(x){ return '<div class="zb-gr-row"><span class="zb-gr-n">'+esc(x.name)+'</span><span class="zb-gr-g">'+esc(x.grund||'')+'</span>'+knopf(x.key)+'</div>'; }).join('')
+    var gruendeHtml = gruende.length ? '<div class="zb-gr"><div class="zb-gr-t">Fehlt im Vergleich · ' + gruende.length + ' Objekt' + (gruende.length === 1 ? '' : 'e') + '</div>'
+      + gruende.map(function(x){ var g = x.grund || (A.ohne.indexOf(x) < 0 ? 'Kein Ertragswert gerechnet – im Objekt unter Bewertung › Wert & Zielbild neu rechnen.' : ''); return '<div class="zb-gr-row"><span class="zb-gr-n">'+esc(x.name)+'</span><span class="zb-gr-g">'+esc(g)+'</span>'+knopf(x.key, 'Objekt öffnen')+'</div>'; }).join('')
       + '</div>' : '';
     var neuSatz = '<p class="zb-det-satz"><b>Neu rechnen:</b> Der Vergleich liest die Berechnungen, die am Objekt gespeichert sind'
       + (A.staende.length ? ' (Stand ' + (A.staende[0] === A.staende[A.staende.length-1] ? dat(A.staende[0]) : dat(A.staende[0]) + ' bis ' + dat(A.staende[A.staende.length-1])) + ')' : '')
@@ -1249,17 +1269,30 @@
     var bmyD = (bmyB != null && bmyZ != null) ? bmyZ - bmyB : null;
     var bmyM = (A.kpMit + A.kostenM) > 0 ? A.mieteM / (A.kpMit + A.kostenM) * 100 : null;
     var ewMs = A.ewN ? _zbEwSoll(A) : null;
-    var tab = '<div class="zb-vgl-scroll"><table class="zb-vgl zb-vgl-4"><thead><tr><th></th><th>Bestand</th><th>Soll<small>Mieterhöhung</small></th><th>Zielbild</th><th>Veränderung<small>Zielbild − Bestand</small></th></tr></thead><tbody>'
-      + zeile('Kaltmiete im Jahr', EK(A.mieteB), EK(A.mieteM), EK(A.mieteZ), VZ(mehrZ) + ' · ' + P(A.mieteB ? mehrZ / A.mieteB * 100 : null), mehrZ, nMit + ' Objekte')
-      + (Math.abs(mehrM) >= 1 || A.nMh ? zeile('davon ohne Mieterwechsel', '–', '–', '–', VZ(mehrM), mehrM, 'Mieterhöhung bis Vergleichsmiete (Bestand → Soll)')
-          + zeile('davon Umbau oder Neuvermietung', '–', '–', '–', VZ(A.mieteZ - A.mieteM), A.mieteZ - A.mieteM, 'Soll → Zielbild') : '')
-      + zeile('Bruttomietrendite', _fPr(bmyB, 2), _fPr(bmyM, 2), _fPr(bmyZ, 2), bmyD == null ? '–' : (bmyD >= 0 ? '+' : '−') + Math.abs(bmyD).toFixed(2).replace('.', ',') + ' Pkt.', bmyD, 'Soll/Zielbild: ÷ (Kaufpreis + Maßnahmen der Stufe)')
-      + zeile('Maßnahmen', '–', A.kostenM ? EK(A.kostenM) : 'keine', A.kosten ? EK(A.kosten) : 'keine', A.kosten ? VZ(-A.kosten) : '–', A.kosten ? -1 : null, 'bis zur Stufe, ohne Finanzierung')
-      + (A.ewN ? zeile('Ertragswert', EK(A.ewB), ewMs != null ? EK(ewMs) : '–', EK(A.ewZ), VZ(A.ewZ - A.ewB) + ' · ' + P(A.ewB ? (A.ewZ - A.ewB) / A.ewB * 100 : null), A.ewZ - A.ewB, A.ewN + ' von ' + A.n + ' Objekten (beide Stufen gerechnet)')
-               + zeile('<b>Wertzuwachs nach Kosten</b>', '', '', '', '<b>' + VZ(A.zuw) + '</b>', A.zuw, 'Ertragswert-Plus − ' + EK(A.ewKosten) + ' Maßnahmen dieser Objekte')
+    /* v3321 · Marcel 12.11.2026: „Bestand und Zielbild … die Unterrechnung … noch besser
+       darstellen" und „Marktpreisindikation … nur Bestand … verstehe ich nicht". Die zwei
+       Zeilen „davon …" mit drei Strichen sind in die Zellen gewandert (Schritt je Stufe klein
+       unter dem Wert: Soll = + Mieterhoehung, Zielbild = + Umbau/Neuvermietung), dazu oben ein
+       Balken „Woher das Plus kommt". Die Zeile Marktpreisindikation ist raus: sie stand nur im
+       Bestand (kein Vergleich Bestand → Zielbild) und ueber eine andere Objektmenge als die
+       Gesamtbewertung - dort steht sie fuer alle Objekte. Je Objekt bleibt die Spalte. */
+    function zelle(v, schritt){ return v + (schritt ? '<small>' + schritt + '</small>' : ''); }
+    var ewM0 = ewMs != null ? ewMs : null;
+    var tab = '<div class="zb-vgl-scroll"><table class="zb-vgl zb-vgl-4"><thead><tr><th></th><th>Bestand<small>heute</small></th><th>Soll<small>nach Mieterhöhung</small></th><th>Zielbild<small>nach Umbau/Neuvermietung</small></th><th>Veränderung<small>Zielbild − Bestand</small></th></tr></thead><tbody>'
+      + zeile('Kaltmiete im Jahr', EK(A.mieteB), zelle(EK(A.mieteM), Math.abs(mehrM) >= 1 ? VZ(mehrM) : ''), zelle(EK(A.mieteZ), Math.abs(A.mieteZ - A.mieteM) >= 1 ? VZ(A.mieteZ - A.mieteM) : ''), VZ(mehrZ) + ' · ' + P(A.mieteB ? mehrZ / A.mieteB * 100 : null), mehrZ, nMit + ' Objekte')
+      + zeile('Bruttomietrendite', _fPr(bmyB, 2), _fPr(bmyM, 2), _fPr(bmyZ, 2), bmyD == null ? '–' : (bmyD >= 0 ? '+' : '−') + Math.abs(bmyD).toFixed(2).replace('.', ',') + ' Pkt.', bmyD, 'Miete ÷ (Kaufpreis + Maßnahmen)')
+      + zeile('Maßnahmen', '–', A.kostenM ? EK(A.kostenM) : 'keine', A.kosten ? EK(A.kosten) : 'keine', A.kosten ? VZ(-A.kosten) : '–', A.kosten ? -1 : null, 'Kosten bis zur Stufe')
+      + (A.ewN ? zeile('Ertragswert', EK(A.ewB), ewM0 != null ? zelle(EK(ewM0), VZ(ewM0 - A.ewB)) : '–', zelle(EK(A.ewZ), ewM0 != null ? VZ(A.ewZ - ewM0) : ''), VZ(A.ewZ - A.ewB) + ' · ' + P(A.ewB ? (A.ewZ - A.ewB) / A.ewB * 100 : null), A.ewZ - A.ewB, A.ewN + ' von ' + A.n + ' Objekten mit Ertragswert')
+               + '<tr class="zb-vgl-sum"><th scope="row">Wertzuwachs nach Kosten<small>Ertragswert-Plus − ' + EK(A.ewKosten) + ' Maßnahmen</small></th><td colspan="3"></td><td' + tonV(A.zuw) + '><b>' + VZ(A.zuw) + '</b></td></tr>'
                : zeile('Ertragswert', 'noch keiner', '', '', '–', null, 'je Objekt unter Bewertung rechnen'))
-      + (A.mpiN ? zeile('Marktpreisindikation', EK(A.mpiB), '', '', '–', null, A.mpiN + ' von ' + A.n + ' Objekten · nur Bestand') : '')
       + '</tbody></table></div>';
+    /* Balken: woher das Plus der Kaltmiete kommt (nur aus den Summen oben) */
+    var stufM = Math.max(0, mehrM), stufZ = Math.max(0, A.mieteZ - A.mieteM);
+    var bruecke = (mehrZ > 0 && (stufM + stufZ) > 0) ? '<div class="zb-wh">'
+      + '<div class="zb-wh-t">Woher das Plus von ' + EK(mehrZ) + ' Kaltmiete im Jahr kommt</div>'
+      + '<div class="zb-wh-bar">' + (stufM ? '<i class="zb-wh-m" style="flex:' + stufM + ' 1 0"></i>' : '') + (stufZ ? '<i class="zb-wh-z" style="flex:' + stufZ + ' 1 0"></i>' : '') + '</div>'
+      + '<div class="zb-wh-l">' + (stufM ? '<span><i class="zb-wh-m"></i>Mieterhöhung bei gleichen Mietern <b>' + VZ(stufM) + '</b></span>' : '')
+      + (stufZ ? '<span><i class="zb-wh-z"></i>Umbau oder Neuvermietung <b>' + VZ(stufZ) + '</b></span>' : '') + '</div></div>' : '';
 
     /* v3234 · Marcel 09.11.2026: „Zielbild-Tabelle wie unter Pilot-Analyse mit der Tabelle,
        nur für alle Objekte … darf gerne noch genauer." Die Tafel der Pilot-Analyse
@@ -1271,19 +1304,22 @@
        Summen sind die von _zielbildAgg (A.mieteB/M/Z, A.kosten, A.ewB/ewZ, A.zuw, A.mpiB). */
     var objTab = _zbObjTabelle(A);
 
-    /* Basis-Abgleich mit den Kennzahlen (Marcel: „das muss ja auch valide sein") */
-    var abgl = '<p class="zb-det-satz"><b>Abgleich mit den Kennzahlen oben:</b> Die Kennzahlen in Abschnitt 02 rechnen über <b>alle ' + A.n + ' Objekte</b>, dieser Vergleich nur über die <b>' + nMit + ' mit Angaben</b>. '
-      + 'Für diese ' + nMit + ' Objekte steht in den Objektdaten eine Jahresmiete von ' + E(A.mieteObjMit) + ' (Kaltmiete plus Zusatzeinnahmen); dieser Vergleich rechnet mit ' + E(A.mieteB)
-      + ' – nur die Wohnungsmieten je Einheit' + (Math.abs(A.mieteObjMit - A.mieteB) >= 1 ? ', Unterschied ' + VZ(A.mieteB - A.mieteObjMit) + ' (Stellplätze, Zusatzeinnahmen, abweichende Einheitenmieten)' : '') + '.</p>';
-    var lesart = '<p class="zb-det-satz">Je Objekt drei Stände aus dem Modul „Mieterhöhung und Zielbild“ – <b>Bestand</b> (heutige Mieten), <b>Mieterhöhung</b> (gleiche Mieter, bis zur Vergleichsmiete) und <b>Zielbild</b> (nach Umbau oder Neuvermietung) –, über alle Objekte addiert. Der Ertragswert je Stufe kommt aus der Wertermittlung (ImmoWertV), nicht aus einer Schätzung.'
-      + (A.ewN && A.kpEw ? ' Zum Vergleich: dieselben ' + A.ewN + ' Objekte haben zusammen ' + EK(A.kpEw) + ' gekostet – der Ertragswert Bestand liegt ' + P((A.ewB / A.kpEw - 1) * 100) + ' daneben.' : '') + '</p>';
-
+    /* v3321 · „Wie wird gerechnet?" knapp, drei Punkte (Marcel 12.11.2026: „so gut wie möglich
+       beschreiben, aber auch nicht zu viel"). Inhalt wie bis v3317, nur kürzer. */
+    var wieTxt = '<ul class="zb-wie">'
+      + '<li><b>Drei Stände je Objekt</b> aus „Mieterhöhung und Zielbild“: Bestand (heutige Mieten), Soll (gleiche Mieter, Mieterhöhung bis zur Vergleichsmiete), Zielbild (nach Umbau oder Neuvermietung). Hier addiert über alle Objekte.</li>'
+      + '<li><b>Ertragswert</b> je Stand nach ImmoWertV aus der Wertermittlung des Objekts – ein Ausblick, kein Verkehrswert. Wertzuwachs nach Kosten = Ertragswert-Plus minus Maßnahmen.'
+      + (A.ewN && A.kpEw ? ' Zum Vergleich: diese ' + A.ewN + ' Objekte kosteten ' + EK(A.kpEw) + ', der Ertragswert heute liegt ' + P((A.ewB / A.kpEw - 1) * 100) + ' daneben.' : '') + '</li>'
+      + '<li><b>Miete:</b> gerechnet wird nur mit den Wohnungsmieten je Einheit (' + E(A.mieteB) + '); die Kennzahlen oben nehmen Zusatzeinnahmen und Stellplätze mit'
+      + (Math.abs(A.mieteObjMit - A.mieteB) >= 1 ? ' (' + E(A.mieteObjMit) + ')' : '') + '. Daher weicht die Bruttomietrendite leicht ab.</li>'
+      + '<li><b>Neu rechnen</b>'
+      + (A.staende.length ? ' (Stand ' + (A.staende[0] === A.staende[A.staende.length-1] ? dat(A.staende[0]) : dat(A.staende[0]) + ' bis ' + dat(A.staende[A.staende.length-1])) + ')' : '')
+      + ': „neu rechnen ↻“ am Objekt rechnet die Ertragswerte kostenlos neu und speichert. Ein Kontingent kostet nur ein neuer Marktbericht.</li></ul>';
 
     host.innerHTML = '<div class="cpk zb-card">' + kopf
-      + tab
-      + gruendeHtml
-      + objTab + unvHtml
-      + det('wie', 'Wie wird gerechnet?', lesart + abgl + neuSatz)
+      + bruecke + tab
+      + objTab + gruendeHtml + unvHtml
+      + det('wie', 'Wie wird gerechnet?', wieTxt)
       /* v3248 \u00b7 Marcel 09.11.2026: \u201eDie Auswertung - also die Gesamtauswertung fuers Portfolio -
          die muss da nicht hin. Die koennten wir im Portfolio-Cockpit erfragen." Der Block
          \u201eAuswertung" (die Saetze aus _zbSaetze und der Knopf \u201eVom Portfolio-Piloten ausfuehrlich
@@ -1323,7 +1359,7 @@
         ((j && j.history) || []).forEach(function(h){ if (h && h.market_value != null && (!l || new Date(h.created_at) >= new Date(l.created_at))) l = h; });
         _mbHist[k] = l || false;
       }, function(){ _mbHist[k] = false; });
-    })).then(function(){ _mbHistLaedt = null; renderGesamtbew(); _renderHeroKz(); /* v3216 */ });
+    })).then(function(){ _mbHistLaedt = null; renderGesamtbew(); _renderHeroKz(); /* v3216 */ try { renderEinfach(); } catch (e) {} /* v3321 */ });
   }
   function _bewertungJeObjekt(arr, A){
     var zb = {}; ((A && A.mit) || []).forEach(function(e){ zb[e.key] = e; });
@@ -1341,6 +1377,16 @@
         ewQuelle: ew == null ? null : (e && e.ewB != null ? 'Zielbild-Lauf' : 'Marktbericht'),
         stand: h && h.created_at ? _fDat(h.created_at) : '', grund: grund };
     });
+  }
+  /* v3321 · die Summen des Blocks „Nach Bewertung" als EINE Stelle - fuer die Gesamtbewertung
+     (Genau) und die Karte Gesamtbewertung der Ansicht Einfach. Nur addiert. */
+  function _bewSummen(BW){
+    var mitEw = BW.filter(function(x){ return x.ew != null; }), mitMpi = BW.filter(function(x){ return x.mpi != null; });
+    var sum = function(L, f){ return L.reduce(function(t, x){ return t + (x[f] || 0); }, 0); };
+    var R = { mitEw: mitEw, mitMpi: mitMpi, ewS: sum(mitEw, 'ew'), kpEwS: sum(mitEw, 'kp'), mpiS: sum(mitMpi, 'mpi'), kpMpiS: sum(mitMpi, 'kp'),
+      ohneEw: BW.filter(function(x){ return x.ew == null; }) };
+    R.abst = R.kpEwS ? (R.ewS / R.kpEwS - 1) * 100 : null;
+    return R;
   }
   function _bewertungTabelle(B){
     var P = function(a, b){ return a != null && b > 0 ? _fP((a / b - 1) * 100) : '–'; };
@@ -1388,11 +1434,8 @@
       + '</div>';
     /* v2953 · je Objekt: Zielbild-Lauf, sonst Marktbericht (_bewertungJeObjekt) */
     var BW = _bewertungJeObjekt(arr, A);
-    var mitEw = BW.filter(function(x){ return x.ew != null; }), mitMpi = BW.filter(function(x){ return x.mpi != null; });
-    var sum = function(L, f){ return L.reduce(function(t, x){ return t + (x[f] || 0); }, 0); };
-    var ewS = sum(mitEw, 'ew'), kpEwS = sum(mitEw, 'kp'), mpiS = sum(mitMpi, 'mpi'), kpMpiS = sum(mitMpi, 'kp');
-    var ohneEw = BW.filter(function(x){ return x.ew == null; });
-    var abst = kpEwS ? (ewS / kpEwS - 1) * 100 : null;
+    var BS = _bewSummen(BW);   /* v3321 */
+    var mitEw = BS.mitEw, mitMpi = BS.mitMpi, ewS = BS.ewS, kpEwS = BS.kpEwS, mpiS = BS.mpiS, kpMpiS = BS.kpMpiS, ohneEw = BS.ohneEw, abst = BS.abst;
     var b3 = '<div class="gb-k"><div class="gb-t"><span>3</span>Nach Bewertung</div>'
       + (mitEw.length ? z('Ertragswert', EK(ewS), '', mitEw.length + ' von ' + G.n + ' Objekten')
           + z('Kaufpreise derselben Objekte', EK(kpEwS), 'gb-sub')
@@ -1406,9 +1449,10 @@
        gerechnet' auch eingeklappt werden." Erklaerung UND die Tabelle „Bewertung je Objekt"
        liegen in einem eingeklappten Block; offen nur, wenn der Nutzer ihn aufgeklappt hat. */
     var wie = '<details class="cpk-det gb-wie"' + (_wgOffen ? ' open' : '') + '><summary>Wie wird gerechnet? · Bewertung je Objekt</summary>'
-      + '<p><b>Investiert:</b> das Geld, das in die Objekte geflossen ist. Nebenkosten (Grunderwerbsteuer, Notar, Makler) sind bezahlt, aber kein Vermögenswert – sie stecken in keinem Wert daneben. Die Gesamtinvestition ist dieselbe wie in der Kachel oben.</p>'
-      + '<p><b>Bilanz heute:</b> Eigenkapital ist, was nach Abzug der Restschuld vom Wert übrig bleibt (wie die Vermögensbilanz in Abschnitt 05). Als Wert steht der Kaufpreis – nicht die Gesamtinvestition und kein Gutachten.</p>'
-      + '<p><b>Nach Bewertung:</b> verglichen wird mit den Kaufpreisen <b>derselben</b> Objekte, nicht mit der Gesamtinvestition von ' + EK(s.gi) + '. Der Ertragswert ist der Wert aus den Mieten nach ImmoWertV, die Marktpreisindikation der Wert aus Angebotspreisen vergleichbarer Objekte, abzüglich des üblichen Verhandlungsabschlags.</p>' + _bewertungTabelle(BW) + '</details>';
+      /* v3321: knapper, Inhalt unveraendert */
+      + '<ul class="zb-wie"><li><b>Investiert:</b> alles, was in die Objekte geflossen ist. Nebenkosten (Grunderwerbsteuer, Notar, Makler) sind bezahlt, aber kein Vermögenswert.</li>'
+      + '<li><b>Bilanz heute:</b> Wert minus Restschuld = dein Eigenkapital. Als Wert zählt der Kaufpreis, kein Gutachten.</li>'
+      + '<li><b>Nach Bewertung:</b> Ertragswert (aus den Mieten, ImmoWertV) und Marktpreisindikation (Angebotspreise vergleichbarer Objekte minus üblichem Verhandlungsabschlag), je verglichen mit den Kaufpreisen <b>derselben</b> Objekte.</li></ul>' + _bewertungTabelle(BW) + '</details>';
     host.innerHTML = '<div class="cpk gb-wrap"><div class="cpk-h"><span class="cpk-ico"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M5 21V9h4v12M13 21V5h4v16"/></svg></span><span>Gesamtbewertung</span><em>Investition · Bilanz · Bewertung</em></div>'
       + (imAnkauf ? '<div class="gb-hin">Kacheln oben im Ankauf-Stand – die Bilanz rechnet mit heute</div>' : '')
       + '<div class="gb-grid">' + b1 + b2 + b3 + '</div>' + fehlt + wie + '</div>';
@@ -1429,55 +1473,95 @@
     if (v === 'genau' && _detailsLoaded) { try { destroyCharts(); buildCharts(); } catch (e) {} try { renderSteuerKette(); } catch (e) {} }   /* v3248: auch die Steuerkette */
     if (sprung) { var z = st.querySelector('.cp-sek[data-sek="' + sprung + '"]'); if (z) { z.classList.remove('cp-zu'); _zuMerken(); setTimeout(function(){ z.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 80); } }
   }
+  /* ════ v3321 · EINFACH MIT ROTEM FADEN ════
+     Marcel 12.11.2026: „in der einfachen Ansicht … kompakter, dass da ein roter Faden ist …
+     haben wir jetzt ja fast gar nichts mehr drauf … Gesamtbewertung (Investiert, Bilanz,
+     Nachbewertung) … die Gegenüberstellung mit Zielbild … seit dem Kauf … mit unterarbeiten."
+     Vier nummerierte Karten statt sieben gleich großer Kacheln: 1 Heute · 2 Gesamtbewertung ·
+     3 Bestand → Zielbild · 4 Steuer & Ausblick. Gerechnet wird NICHTS neu: aggStats(),
+     _bilanzHeute(), _bewertungJeObjekt()/_bewSummen() (dieselben Summen wie die Gesamtbewertung),
+     _zielbildAgg(), steuerKette() und projectAll() - die Quellen der Ansicht Genau. */
   function renderEinfach(){
     var host = $('dp-einfach'); if (!host) return;
     if (!_detailsLoaded) { host.innerHTML = '<div class="dp-chart-loading" style="height:60px"><span class="dp-spin"></span>Kernaussagen werden geladen…</div>'; return; }
     var arr = detailArr(); if (!arr.length) { host.innerHTML = '<div class="health-sub">Keine gewonnenen Objekte.</div>'; return; }
-    var s = aggStats(), H = _bilanzHeute(arr), A = _zielbildAgg(arr) || { mit: [] };
+    var s = aggStats(), H = _bilanzHeute(arr), A = _zielbildAgg(arr) || { mit: [], unv: [] };
     var PR = []; try { PR = projectAll(_projYears); } catch (e) {}
     var L = PR[PR.length-1] || {};
-    var seit = { b:0, g:0, s:0 }; _seitListe.forEach(function(x){ if (x.urteil==='besser') seit.b++; else if (x.urteil==='gleich') seit.g++; else if (x.urteil==='schlechter') seit.s++; });
-    function k(titel, wert, ton, vgl, satz, sek){
-      return '<button type="button" class="ke-k" onclick="DealPilotDashboard.ansicht(\'genau\',\''+sek+'\')">'
-        + '<span class="ke-t">'+titel+'</span><span class="ke-v'+(ton?' ke-'+ton:'')+'">'+wert+'</span>'
-        + (vgl?'<span class="ke-c">'+vgl+'</span>':'') + '<span class="ke-s">'+satz+'</span><span class="ke-mehr">Genau ansehen ›</span></button>';
+    _mbHistLaden(arr);
+    var BS = _bewSummen(_bewertungJeObjekt(arr, A));
+    var EK = _fEK, n = arr.length;
+    function karte(nr, titel, sek, inhalt, satz, cls){
+      return '<section class="ke2-k' + (cls ? ' ' + cls : '') + '">'
+        + '<div class="ke2-h"><span class="ke2-nr">' + nr + '</span><span class="ke2-t">' + titel + '</span>'
+        + '<button type="button" class="ke2-mehr" onclick="DealPilotDashboard.ansicht(\'genau\',\'' + sek + '\')">Genau ›</button></div>'
+        + inhalt + (satz ? '<p class="ke2-satz">' + satz + '</p>' : '') + '</section>';
     }
-    var K = [];
-    K.push(k('Vermögen · Eigenkapital heute', _fEK(H.ek), H.ek>=0?'pos':'neg', 'Objektwerte ' + _fEK(H.wert) + ' − Restschuld ' + _fEK(H.rest),
-      'Was dir von deinen ' + H.objs.length + ' Objekten heute gehört: Wert zum Kaufpreis abzüglich der offenen Darlehen. Eigenkapitalquote ' + _fPr(H.wert ? H.ek/H.wert*100 : null) + '.', 'kennzahlen'));
-    K.push(k('Miete · im Monat', _fE(s.mieteM), 'pos', 'Bruttomietrendite ' + _fPr(s.brutto, 2),
-      'Netto kalt über alle Objekte, ' + _fE(s.mieteJ) + ' im Jahr. Die Rendite setzt die Jahresmiete ins Verhältnis zur Summe der Kaufpreise.', 'kennzahlen'));
-    K.push(k('Cashflow · vor Steuer im Monat', _fE(s.cfVsM), s.cfVsM>=0?'pos':'neg', 'nach Steuer ' + _fE(s.cfNsM) + ' im Monat',
-      'Was nach Bewirtschaftung, Zins und Tilgung übrig bleibt' + (s.dscr != null ? '; die Miete deckt Zins und Tilgung ' + s.dscr.toFixed(2).replace('.', ',') + '-fach' : '') + '.'
-        + (s.cfNsM > s.cfVsM ? ' Nach Steuer bleibt mehr, weil Abschreibung und Zinsen deine Steuer senken.' : ''), 'kennzahlen'));
-    if (A.mit && A.mit.length) {
+    function w(l, v, sub, ton){ return '<div class="ke2-w"><span class="ke2-l">' + l + '</span><span class="ke2-v' + (ton ? ' ke-' + ton : '') + '">' + v + '</span>' + (sub ? '<span class="ke2-s">' + sub + '</span>' : '') + '</div>'; }
+    var pfeil = '<span class="ke2-pf" aria-hidden="true">→</span>';
+    var sg = function(v){ return (v >= 0 ? '+' : '−') + _fE(Math.abs(v)).replace(/^−/, ''); };
+
+    /* 1 · Heute */
+    var k1 = karte(1, 'Heute', 'kennzahlen',
+      '<div class="ke2-row ke2-4">'
+      + w('Eigenkapital', EK(H.ek), 'Quote ' + _fPr(H.wert ? H.ek / H.wert * 100 : null), H.ek >= 0 ? 'pos' : 'neg')
+      + w('Miete im Monat', _fE(s.mieteM), 'Rendite ' + _fPr(s.brutto, 2) + ' brutto')
+      + w('Cashflow im Monat', sg(s.cfVsM), 'nach Steuer ' + sg(s.cfNsM), s.cfVsM >= 0 ? 'pos' : 'neg')
+      + w('Kapitaldienst gedeckt', s.dscr != null ? s.dscr.toFixed(2).replace('.', ',') + '-fach' : '–', 'DSCR · Miete ÷ Zins und Tilgung')
+      + '</div>' + _seitZeileHtml(false),
+      n + ' Objekte. Nach Bewirtschaftung, Zins und Tilgung bleiben ' + sg(s.cfVsM) + ' im Monat' + (s.cfNsM > s.cfVsM ? ', nach Steuer sogar mehr' : '') + '.', 'ke2-voll');
+
+    /* 2 · Gesamtbewertung */
+    var ewTxt = BS.mitEw.length ? EK(BS.ewS) : 'noch keiner';
+    var k2 = karte(2, 'Gesamtbewertung', 'kennzahlen',
+      '<div class="ke2-row ke2-fluss">'
+      + w('Investiert', EK(s.gi), 'mit Nebenkosten')
+      + pfeil + w('Dir gehört heute', EK(H.ek), 'Kaufpreise ' + EK(H.wert) + ' − Restschuld ' + EK(H.rest))
+      + pfeil + w('Wert nach Ertrag', ewTxt, BS.mitEw.length ? (BS.abst != null ? _fP(BS.abst) + ' zum Kaufpreis' : '') + (BS.mitEw.length < n ? ' · ' + BS.mitEw.length + ' von ' + n + ' Objekten' : '') : 'im Objekt unter Bewertung rechnen', BS.abst == null ? null : (BS.abst >= 0 ? 'pos' : 'neg'))
+      + '</div>',
+      BS.mitEw.length && BS.abst != null
+        ? 'Gemessen an den Mieten sind ' + (BS.mitEw.length < n ? 'diese ' + BS.mitEw.length + ' Objekte' : 'deine Objekte') + ' ' + _fPr(Math.abs(BS.abst), 1) + (BS.abst >= 0 ? ' mehr wert, als du bezahlt hast.' : ' weniger wert, als du bezahlt hast.')
+        : '');
+
+    /* 3 · Bestand → Zielbild */
+    var k3;
+    var mitPlan = (A.mit || []).length - (A.unv || []).length;
+    if (mitPlan > 0) {
       var mz = A.mieteZ - A.mieteB;
-      K.push(k('Zielbild · mehr Miete im Jahr', _fVZ(mz), 'pos', A.nZiel + ' von ' + A.n + ' mit Zielbild' + (A.nMh ? ', ' + A.nMh + ' nur Mieterhöhung' : ''),
-        'Wenn Mieterhöhung und Zielbild umgesetzt sind' + (A.ewN ? '; nach Abzug von ' + _fEK(A.ewKosten) + ' Maßnahmen bleibt beim Ertragswert ein Zuwachs von ' + _fEK(A.zuw) + ' (Ausblick, kein Verkehrswert)' : '') + '.', 'zielbild'));
+      k3 = karte(3, 'Bestand → Zielbild', 'zielbild',
+        '<div class="ke2-row ke2-fluss">'
+        + w('Kaltmiete heute', EK(A.mieteB), 'im Jahr') + pfeil
+        + w('Kaltmiete Zielbild', EK(A.mieteZ), _fVZ(mz) + ' · ' + _fP(A.mieteB ? mz / A.mieteB * 100 : null), mz >= 0 ? 'pos' : 'neg')
+        + '</div>'
+        + (A.ewN ? '<div class="ke2-row ke2-2">' + w('Maßnahmen', A.kosten ? EK(A.kosten) : 'keine') + w('Wertzuwachs nach Kosten', _fVZ(A.zuw), A.ewN + ' Objekte mit Ertragswert', A.zuw >= 0 ? 'pos' : 'neg') + '</div>' : ''),
+        A.nZiel + ' von ' + A.n + ' Objekten mit Zielbild' + (A.nMh ? ', ' + A.nMh + ' nur mit Mieterhöhung' : '') + '.'
+          + (A.ewN ? (A.zuw >= 0 ? ' Die Maßnahmen bringen mehr Wert, als sie kosten.' : ' Die Maßnahmen kosten mehr, als sie an Ertragswert bringen.') : '') + ' Ein Ausblick, kein Verkehrswert.');
     } else {
-      K.push(k('Zielbild', 'noch keins', null, A.n + ' Objekte ohne Angaben', 'Soll-Miete und Zielbild trägst du im Objekt unter Bewertung ein – dann rechnet DealPilot den Ausblick.', 'zielbild'));
+      k3 = karte(3, 'Bestand → Zielbild', 'zielbild', '<div class="ke2-leer">Noch kein Zielbild erfasst.</div>', 'Mieterhöhung und Zielbild trägst du im Objekt unter Bewertung ein – dann steht hier, was dein Bestand kann.');
     }
-    /* v3248 \u00b7 Steuer ueber alle Objekte hatte in der Ansicht Einfach keine Kachel - der
-       Abschnitt 04 ist dort ausgeblendet (data-cp="genau") und war so nur ueber \u201eGenau" zu finden.
-       Zahl aus steuerKette() - derselben Rechnung wie Abschnitt 04, nichts neu gerechnet. */
+
+    /* 4 · Steuer & Ausblick */
+    var stW = '', stSatz = '';
     try {
       var _sk = steuerKette(_kettenJahr());
       if (!_sk.geladen) _ketteNachladen();
       if (_sk.geladen && _sk.toepfe.length) {
-        var _skS = 0, _skN = 0, _skBez = true;
-        _sk.toepfe.forEach(function(tp){ _skN += tp.schritte.length; if (tp.estPflichtig || tp.satz != null) _skS += tp.summe; else _skBez = false; });
-        K.push(k('Steuer · Wirkung ' + _kettenJahr(), (_skS >= 0 ? '+' : '−') + _fE(Math.abs(_skS)), _skS >= 0 ? 'pos' : 'neg', _skN + ' Objekt' + (_skN === 1 ? '' : 'e') + ' · ' + _sk.toepfe.length + ' Steuer' + (_sk.toepfe.length === 1 ? 'topf' : 'töpfe'),
-          (_skS >= 0 ? 'So viel Steuer sparen deine Objekte zusammen' : 'So viel Steuer kosten deine Objekte zusammen') + ' – aus den echten Ergebnissen im Reiter Steuern, mit Progression.' + (_skBez ? '' : ' Für eine Gesellschaft ist kein Steuersatz hinterlegt.'), 'steuer'));
+        var _skS = 0, _skBez = true;
+        _sk.toepfe.forEach(function(tp){ if (tp.estPflichtig || tp.satz != null) _skS += tp.summe; else _skBez = false; });
+        stW = w('Steuerwirkung ' + _kettenJahr(), (_skS >= 0 ? '+' : '−') + _fE(Math.abs(_skS)), _skS >= 0 ? 'gespart, alle Objekte' : 'Mehrsteuer, alle Objekte', _skS >= 0 ? 'pos' : 'neg');
+        stSatz = (_skS >= 0 ? 'Deine Objekte senken deine Steuer' : 'Deine Objekte erhöhen deine Steuer') + ' – aus den Ergebnissen im Reiter Steuer, mit Progression.' + (_skBez ? '' : ' Für eine Gesellschaft fehlt der Steuersatz.');
       } else if (_sk.geladen) {
-        K.push(k('Steuer über alle Objekte', 'noch keine', null, 'kein Objekt mit Ergebnis ' + _kettenJahr(), 'Sobald ein Objekt im Reiter Steuern gerechnet und gespeichert ist, steht hier die Wirkung über alle Objekte.', 'steuer'));
+        stW = w('Steuerwirkung ' + _kettenJahr(), 'noch keine', 'kein Objekt mit Ergebnis');
       }
     } catch (e) {}
-    if (L.eq != null) K.push(k('Entwicklung · Eigenkapital ' + L.yr, _fEK(L.eq), 'gold', _fVZ(L.eq - H.ek) + ' in ' + PR.length + ' Jahren',
-      'Modellprojektion: Schulden werden getilgt, die Objekte gewinnen 2 % im Jahr an Wert. Ein Trend, keine Zusage.', 'projektion'));
-    if (_seitListe.length) K.push(k('Seit dem Kauf · DealScore', seit.b + ' besser · ' + seit.g + ' gleich · ' + seit.s + ' schlechter', null, _seitListe.length + ' Objekte mit Ankauf-Stand',
-      'Verglichen wird der DealScore heute mit dem beim Kauf festgeschriebenen Stand.', 'kennzahlen'));
-    host.innerHTML = '<div class="ke-grid">' + K.join('') + '</div>'
-      + '<p class="cp-erkl ke-fuss">Einfach zeigt die Kernaussagen. <b>Genau</b> zeigt alle Kennzahlen, die Gesamtbewertung, den Vergleich Bestand/Zielbild, die Steuer und die Grafiken – jede Kachel springt dorthin.</p>';
+    var auW = L.eq != null ? w('Eigenkapital ' + L.yr, EK(L.eq), _fVZ(L.eq - H.ek) + ' in ' + PR.length + ' Jahren', 'gold') : '';
+    var k4sek = stW ? 'steuer' : 'projektion';
+    var k4 = (stW || auW) ? karte(4, 'Steuer &amp; Ausblick', k4sek,
+      '<div class="ke2-row ke2-2">' + stW + auW + '</div>'
+      + '<button type="button" class="ke2-link" onclick="DealPilotDashboard.ansicht(\'genau\',\'steuer\')">Steuer-Mappe (PDF für die Anlage V) ›</button>',
+      (stSatz ? stSatz + ' ' : '') + (auW ? 'Der Ausblick ist eine Modellrechnung (Wert +2 % im Jahr, Tilgung wie vereinbart), keine Zusage.' : '')) : '';
+
+    host.innerHTML = '<div class="ke2">' + k1 + '<div class="ke2-paar">' + k2 + k3 + '</div>' + k4 + '</div>';
   }
 
   /* ════ v2951 · ABSCHNITTE EINKLAPPEN ════
@@ -2363,7 +2447,7 @@
       });
 
       var topf = { halter: h, name: estPflichtig ? _estTopfName(liste) : _halterName(h), estPflichtig: estPflichtig,
-                   satz: satz, zve: 0, schritte: [], summe: 0 };
+                   satz: satz, zve: 0, schritte: [], summe: 0, ohne: [] };   /* v3321: ohne = Objekte ohne Ergebnis im Jahr */
 
       if (estPflichtig) {
         topf.zve = zveFuer(y);
@@ -2372,7 +2456,7 @@
           /* v1404: nur DEIN Anteil. Bei einer GbR mit 50 Prozent zaehlt ein
              Verlust von 20.000 bei dir mit 10.000. Privat liefert immer 1. */
           var v = ((o.wk_per_year && Number(o.wk_per_year[yk])) || 0) * _anteilVon(o.halter);
-          if (!v) return;                       /* kein Ergebnis in diesem Jahr */
+          if (!v) { topf.ohne.push(o.address || 'Objekt'); return; }   /* kein Ergebnis in diesem Jahr - v3321: genannt statt verschwiegen */
           var vor = Math.max(0, basis);
           var nach = Math.max(0, basis + v);
           var wirkung = estg2026(vor, y) - estg2026(nach, y);
@@ -2391,7 +2475,7 @@
         var basisK = 0;
         liste.forEach(function (o) {
           var v = (o.wk_per_year && Number(o.wk_per_year[yk])) || 0;
-          if (!v) return;
+          if (!v) { topf.ohne.push(o.address || 'Objekt'); return; }   /* v3321 */
           basisK += v;
           topf.schritte.push({
             id: o.id, name: o.address || 'Objekt',
@@ -2630,6 +2714,10 @@
       '.sk-k-gut .sk-k-v{color:#3FA56C}',
       '.sk-k-schlecht .sk-k-v{color:#B8625C}',
       '.sk-box{height:260px;margin-bottom:14px}',
+      '.sk-box-h{min-height:200px}',   /* v3321: Hoehe je nach Zahl der Objekte (inline) */
+      '.sk-ueber{font-size:12.5px;line-height:1.5;color:var(--c-mut,#6b6660);margin:0 2px 10px}',
+      '.sk-ueber b{color:var(--c-ink,#1b1815)}',
+      '.sk-ohne{font-size:11.5px;line-height:1.45;color:var(--c-mut,#6b6660);margin:-6px 0 12px;padding:7px 10px;border-radius:7px;background:rgba(184,98,92,.07);border-left:3px solid #B8625C}',
       /* v1405 · Umschalter ueber der Grafik */
       '.sk-umsch{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:10px}',
       '.sk-u-btn{font:600 11.5px/1 Inter,sans-serif;padding:7px 12px;border-radius:7px;cursor:pointer;',
@@ -2665,7 +2753,7 @@
       '  font-size:11.5px;line-height:1.55;color:var(--dp-muted-txt, var(--dp-muted,#7A7370))}',
       '.sk-leer{border:1px dashed rgba(122,115,112,.26);border-radius:11px;padding:20px;',
       '  font-size:12.5px;line-height:1.55;color:var(--dp-muted-txt, var(--dp-muted,#7A7370));text-align:center}',
-      '@media(max-width:640px){.sk-box{height:220px}.sk-topf{padding:13px 12px 12px}}'
+      '@media(max-width:640px){.sk-box:not(.sk-box-h){height:220px}.sk-topf{padding:13px 12px 12px}}'
     ].join('');
     document.head.appendChild(s);
   }
@@ -2693,6 +2781,16 @@
     var pz = function (n) { return n.toFixed(2).replace('.', ',') + ' %'; };
 
     var html = '';
+    /* v3321 · Marcel 12.11.2026: „haben wir überhaupt auf Wirkung je Objekt alles drauf?"
+       Gemessen: im Topf Privat stehen nur Objekte mit Ergebnis im Jahr, die Objekte einer
+       Gesellschaft stehen in deren eigenem Topf. Die Zeile sagt jetzt, wo jedes Objekt steht. */
+    var _nAlle = 0;
+    k.toepfe.forEach(function (t) { _nAlle += t.schritte.length + (t.ohne ? t.ohne.length : 0); });
+    html += '<div class="sk-ueber">' + _kettenJahr() + ' · ' + _nAlle + ' Objekt' + (_nAlle === 1 ? '' : 'e') + ': '
+      + k.toepfe.map(function (t) {
+          return '<b>' + t.schritte.length + '</b> ' + _esc(t.estPflichtig ? 'privat (Einkommensteuer)' : t.name)
+            + (t.ohne && t.ohne.length ? ' + ' + t.ohne.length + ' ohne Ergebnis' : '');
+        }).join(' · ') + '</div>';
     k.toepfe.forEach(function (t, idx) {
       var cid = 'dpc-kette-' + idx;
       var istEst = t.estPflichtig;
@@ -2731,10 +2829,11 @@
           +   '<span class="sk-u-hint">'
           +     (_ketteAnsicht === 'kurve'
                   ? 'Die Kurve ist der Steuertarif selbst. Jeder Punkt ist ein Objekt — er sitzt dort, wo dein Einkommen nach diesem Objekt liegt.'
-                  : 'Grün spart, Rot kostet. Die Linie zeigt den Grenzsteuersatz nach jedem Objekt.')
+                  : 'Je Objekt die Steuer, die es spart (grün) oder kostet (rot) – in der Reihenfolge des Kaufs, unten die Summe.')
           +   '</span>'
           + '</div>'
-          + '<div class="chart-box sk-box"><canvas id="' + cid + '"></canvas></div>';
+          + '<div class="chart-box sk-box' + (_ketteAnsicht === 'kurve' ? '' : ' sk-box-h') + '"' + (_ketteAnsicht === 'kurve' ? '' : ' style="height:' + (60 + (t.schritte.length + 1) * 34) + 'px"') + '><canvas id="' + cid + '"></canvas></div>'
+          + (t.ohne && t.ohne.length ? '<div class="sk-ohne">Ohne Ergebnis ' + _kettenJahr() + ' (im Reiter Steuer noch nicht gerechnet oder gespeichert): ' + t.ohne.map(_esc).join(' · ') + '</div>' : '');
       } else {
         html += '<div class="sk-zahlen">'
           + _kachel('Ergebnis der Gesellschaft', eur(t.gesamtergebnis || 0), '')
@@ -2744,6 +2843,7 @@
                     t.satz != null ? eur(t.summe) : '—',
                     t.satz != null ? (t.summe > 0 ? 'sk-k-gut' : 'sk-k-schlecht') : '')
           + '</div>'
+          + (t.ohne && t.ohne.length ? '<div class="sk-ohne">Ohne Ergebnis ' + _kettenJahr() + ': ' + t.ohne.map(_esc).join(' · ') + '</div>' : '')
           + (t.satz == null
               ? '<div class="sk-fuss">Für diese Gesellschaft ist <b>kein Steuersatz hinterlegt</b> — '
                 + 'Körperschaftsteuer und Gewerbesteuer-Hebesatz stehen unter '
@@ -2815,43 +2915,74 @@
         _kurveBauen(cv, t, SER, axisCol, gridCol, eur, pz);
         return;
       }
-      var labels = ['ohne Objekte'].concat(t.schritte.map(function (s) { return _kurz(s.name); }));
-      var satzReihe = [_grenzsatz(t.zve)].concat(t.schritte.map(function (s) { return s.satzNach; }));
-      var wirkReihe = [0].concat(t.schritte.map(function (s) { return Math.round(s.wirkung); }));
+      /* v3321 · Marcel 12.11.2026: „die Wirkung je Objekt … ob man das noch professioneller
+         darstellen kann … ist das aussagekräftig?" Bis v3317: senkrechte Säulen plus eine
+         geglättete Grenzsatz-Linie (tension .25) - sie bog sich zwischen den Punkten unter den
+         echten Satz und erfand einen Verlauf, den es nicht gibt. Jetzt waagerechte Balken mit
+         vollem Objektnamen, Betrag am Balken und die Summe als eigener Balken. Der Grenzsatz
+         steht in der Tabelle darunter und in der Progressionskurve. Zahlen unverändert aus
+         steuerKette() (s.wirkung, t.summe). */
+      var labels = t.schritte.map(function (s) { var n = String(s.name || ''); return n.length > 32 ? n.substring(0, 30) + '…' : n; }).concat(['Summe aller Objekte']);
+      var wirkReihe = t.schritte.map(function (s) { return Math.round(s.wirkung); }).concat([Math.round(t.summe)]);
+      var nS = t.schritte.length;
+      var GOLD = SER[0];
+      var farben = wirkReihe.map(function (v, i) {
+        if (i === nS) return isDark() ? '#E8E2D4' : '#2A2727';
+        return v > 0 ? GRUEN + 'd9' : (v < 0 ? ROT + 'd9' : 'rgba(0,0,0,.15)');
+      });
+      var wertText = {
+        id: 'skWerte',
+        afterDatasetsDraw: function (ch) {
+          var ctx = ch.ctx, meta = ch.getDatasetMeta(0);
+          ctx.save();
+          ctx.font = '600 11px "JetBrains Mono", ui-monospace, monospace';
+          ctx.textBaseline = 'middle';
+          meta.data.forEach(function (bar, i) {
+            var v = wirkReihe[i]; if (v == null) return;
+            var txt = (v > 0 ? '+' : v < 0 ? '−' : '±') + Math.abs(v).toLocaleString('de-DE') + ' €';
+            var rechts = v >= 0;
+            ctx.fillStyle = i === nS ? (isDark() ? '#E8E2D4' : '#2A2727') : (v > 0 ? '#2f7d52' : v < 0 ? '#9a4b45' : axisCol);
+            ctx.textAlign = rechts ? 'left' : 'right';
+            ctx.fillText(txt, bar.x + (rechts ? 6 : -6), bar.y);
+          });
+          ctx.restore();
+        }
+      };
+      var maxAbs = Math.max.apply(null, wirkReihe.map(function (v) { return Math.abs(v); }).concat([1]));
+      var rand = maxAbs * 0.32;
+      var minX = Math.min(0, Math.min.apply(null, wirkReihe)) - (Math.min.apply(null, wirkReihe) < 0 ? rand : 0);
+      var maxX = Math.max(0, Math.max.apply(null, wirkReihe)) + (Math.max.apply(null, wirkReihe) > 0 ? rand : 0);
 
       _ketteCharts.push(new Chart(cv, {
         type: 'bar',
+        plugins: [wertText],
         data: { labels: labels, datasets: [
-          { type: 'bar', label: 'Steuerwirkung', data: wirkReihe, yAxisID: 'y',
-            backgroundColor: wirkReihe.map(function (v) { return v > 0 ? GRUEN + 'cc' : (v < 0 ? ROT + 'cc' : 'rgba(0,0,0,0)'); }),
-            borderRadius: 4, borderSkipped: false, maxBarThickness: 46, order: 2 },
-          { type: 'line', label: 'Grenzsteuersatz', data: satzReihe, yAxisID: 'y1',
-            borderColor: SER[0], backgroundColor: SER[0] + '1a', borderWidth: 2.4,
-            tension: .25, fill: false, pointRadius: 4, pointBackgroundColor: SER[0],
-            pointBorderColor: isDark() ? '#0a0805' : '#fff', pointBorderWidth: 1.6, order: 1 }
+          { label: 'Steuerwirkung', data: wirkReihe, backgroundColor: farben,
+            borderRadius: 4, borderSkipped: false, barPercentage: .72, categoryPercentage: .9, maxBarThickness: 22 }
         ]},
         options: {
+          indexAxis: 'y',
           responsive: true, maintainAspectRatio: false, devicePixelRatio: 2,
-          interaction: { mode: 'index', intersect: false },
+          layout: { padding: { right: 8 } },
           plugins: {
-            legend: { display: true },
-            tooltip: { callbacks: { label: function (ctx) {
-              if (ctx.datasetIndex === 1) return ' Grenzsteuersatz: ' + ctx.parsed.y.toFixed(2).replace('.', ',') + ' %';
-              var s = t.schritte[ctx.dataIndex - 1];
-              if (!s) return ' Ausgangslage';
-              return [' Ergebnis V+V: ' + eur(s.erg),
-                      ' Steuerwirkung: ' + eur(s.wirkung),
-                      ' Basis: ' + eur(s.basisVor) + ' → ' + eur(s.basisNach)];
-            } } }
+            legend: { display: false },
+            tooltip: { callbacks: {
+              title: function (ctx) { var i = ctx[0] && ctx[0].dataIndex; return i === nS ? 'Summe aller Objekte' : (t.schritte[i] ? t.schritte[i].name : ''); },
+              label: function (ctx) {
+                if (ctx.dataIndex === nS) return ' Steuerwirkung gesamt: ' + eur(t.summe);
+                var s = t.schritte[ctx.dataIndex];
+                if (!s) return '';
+                return [' Ergebnis V+V: ' + eur(s.erg),
+                        ' Steuerwirkung: ' + eur(s.wirkung),
+                        ' Grenzsatz: ' + pz(s.satzVor) + ' → ' + pz(s.satzNach)];
+              } } }
           },
           scales: {
-            x: { grid: { color: gridCol, drawBorder: false }, ticks: { color: axisCol, maxRotation: 0, autoSkip: false } },
-            y: { position: 'left', grid: { color: gridCol, drawBorder: false },
-                 ticks: { color: axisCol, callback: function (v) { return Math.round(v / 1000) + 'k €'; } },
-                 title: { display: true, text: 'Steuerwirkung', color: axisCol } },
-            y1: { position: 'right', grid: { display: false },
-                  ticks: { color: SER[0], callback: function (v) { return Math.round(v) + ' %'; } },
-                  title: { display: true, text: 'Grenzsteuersatz', color: SER[0] } }
+            x: { min: minX, max: maxX, grid: { color: function (c) { return c.tick && c.tick.value === 0 ? (isDark() ? 'rgba(232,226,212,.5)' : 'rgba(42,39,39,.45)') : gridCol; }, drawBorder: false },
+                 ticks: { color: axisCol, maxTicksLimit: 7, callback: function (v) { return (v < 0 ? '−' : v > 0 ? '+' : '') + Math.round(Math.abs(v) / 1000) + 'k €'; } },
+                 title: { display: true, text: 'Steuer gespart (+) bzw. mehr gezahlt (−) im Jahr ' + _kettenJahr(), color: axisCol } },
+            y: { grid: { display: false }, ticks: { color: function (c) { return c.index === nS ? (isDark() ? '#E8E2D4' : '#2A2727') : axisCol; },
+                 font: function (c) { return c.index === nS ? { weight: '700' } : {}; }, autoSkip: false } }
           }
         }
       }));
@@ -3393,7 +3524,7 @@
       + '<span class="cp-objsel"><span class="cp-objsel-lab">Objekt</span><select id="dp-dash-objsel" onchange="DealPilotDashboard.selectObject(this.value)"></select></span><span id="dp-halter-filter" class="mand-chips"></span></div>'  /* mand-chips v803 */
       + '<div class="hero" id="dp-pscore-hero"></div>'
       /* v2951 \u00b7 Umschalter Einfach | Genau (Merker dp_cockpit_ansicht) und die Kernaussagen */
-      + '<div class="cp-frei cp-ansicht"><div class="cp-ans-t"><b>Ansicht</b><span><b>Einfach</b> zeigt die Kernaussagen mit je einem Satz. <b>Genau</b> zeigt alle Kennzahlen, Grafiken und Tabellen mit Erkl\u00e4rung.</span></div>'
+      + '<div class="cp-frei cp-ansicht"><div class="cp-ans-t"><b>Ansicht</b><span><b>Einfach:</b> das Wichtigste auf einen Blick. <b>Genau:</b> alle Zahlen, Tabellen und Grafiken.</span></div>'
       +   '<div class="cp-ans-sw" role="group" aria-label="Ansicht"><button type="button" data-a="einfach" onclick="DealPilotDashboard.ansicht(\'einfach\')">Einfach</button><button type="button" data-a="genau" onclick="DealPilotDashboard.ansicht(\'genau\')">Genau</button></div></div>'
       + '<div id="dp-einfach" class="cp-frei cp-nur-einfach"></div>'
       + '<div class="sl" data-sek="kennzahlen" data-cp="genau"><span class="e">02</span><h2>Kennzahlen</h2><span class="tag">Portfolio \u00b7 aggregiert</span><span class="rule"></span></div>'
@@ -3430,6 +3561,23 @@
       +   '<span class="tag" title="Rechnet mit den ECHTEN steuerlichen Ergebnissen deiner Objekte (Tab Steuern), nicht mit den pauschalen Annahmen der Modellprojektion.\n\nDie Objekte stehen in der Reihenfolge ihres Kaufs \u2014 jedes trifft auf das Einkommen, das die vorherigen bereits verschoben haben.\n\nGesellschaften werden getrennt gef\u00fchrt: K\u00f6rperschaftsteuer ist proportional und wirkt nicht auf dein privates Einkommen.">Echte Objektdaten \u00b7 \u00a7 32a / \u00a7 8 KStG</span>'
       +   '<span class="rule"></span></div>'
       + '<div id="dp-steuerkette" class="sk-wrap"></div>'
+      /* v3321 · Marcel 12.11.2026: „Steuer über alle Objekte und unten nochmal die Steuermappe -
+         vielleicht kann man das kombinieren.“ Die Mappe steht jetzt im Abschnitt 04 unter der
+         Steuerkette (eigener Kopf .dp-mappe-k); der Abschnitt 07 ist weg. */
+      + '<div class="dp-mappe"><div class="dp-mappe-k">Steuer-Mappe <span>PDF für die Anlage V · § 21 EStG</span></div>'
+      +   '<div class="dp-mappe-t">Ein PDF über <b>alle</b> Objekte mit erfassten Steuerdaten — je Objekt eine Aufstellung der Werbungskosten, am Ende eine Zusammenfassung mit Summe.</div>'
+      +   '<div class="dp-mappe-r">'
+      +     '<label class="dp-mappe-l">Veranlagungsjahr</label>'
+      +     '<select id="dp-mappe-jahr" class="dp-mappe-sel"></select>'
+      +     '<label class="dp-mappe-cb"><input type="checkbox" id="dp-mappe-av" checked> Anlage-V-Zuordnung anhängen</label>'
+      +     '<button class="dp-mappe-btn" onclick="DealPilotDashboard.steuerMappe()">Steuer-Mappe erstellen</button>'
+      +   '</div>'
+      /* v1218b · Der Hinweis stammte aus v1215, als es die Zuordnung noch
+         nicht gab. Seit v1217/v1218 gibt es sie — und damit stand direkt
+         unter der Checkbox „Anlage-V-Zuordnung anhängen" der Satz, sie sei
+         „nicht enthalten". Ein Widerspruch in einer Zeile Abstand. */
+      +   '<div class="dp-mappe-h">Die Zeilennummern stammen aus dem <b>amtlichen Formular</b> des jeweiligen Jahres. Für Jahre ohne hinterlegte Zuordnung erscheint die Ansicht nicht — die Nummern ändern sich je Veranlagungsjahr und werden nicht geraten. Positionen, deren Zeile eine steuerfachliche Entscheidung wäre, sind ausgewiesen statt weggelassen.</div>'
+      + '</div>'
       + '<details id="dp-charts-sec" data-sek="projektion" data-cp="genau" open><summary class="sl dp-charts-summary"><span class="e">05</span><h2>Projektion &amp; Verlauf</h2><span class="tag mp-info" title="Modellprojektion mit pauschalen Annahmen \u2013 nicht die centgenaue Objekt-Rechnung:\n\u2022 Mietsteigerung +1,5 % p.a.\n\u2022 Bewirtschaftung +2,0 % p.a.\n\u2022 Wertsteigerung +2,0 % p.a.\n\u2022 AfA 2,0 % (Geb\u00e4udeanteil 80 %)\n\u2022 Kalkulationszins ~3,5 %\nDient als Trend und Gr\u00f6\u00dfenordnung; die exakte Berechnung erfolgt je Objekt im Objekt-Tab.">Modellprojektion (vereinfacht)</span><span class="yrs sl-yrs" id="dp-proj-years"><button data-y="10" onclick="event.stopPropagation();event.preventDefault();DealPilotDashboard.setProjYears(10)">10 J.</button><button data-y="20" class="active" onclick="event.stopPropagation();event.preventDefault();DealPilotDashboard.setProjYears(20)">20 J.</button><button data-y="30" onclick="event.stopPropagation();event.preventDefault();DealPilotDashboard.setProjYears(30)">30 J.</button></span><span class="dp-charts-hint">ein-/ausblenden</span></summary>'
       /* v2950 \u00b7 Vermoegensbericht statt sieben Diagrammen (buildCharts) */
       + '<div class="charts vb-charts">'
@@ -3446,29 +3594,14 @@
       +   '<span class="pj-sw" role="group" aria-label="Darstellung"><button type="button" data-a="tabelle" class="on" onclick="DealPilotDashboard.projAnsicht(\'tabelle\')">Tabelle</button><button type="button" data-a="chart" onclick="DealPilotDashboard.projAnsicht(\'chart\')">Chart</button></span></div>'
       + '<div class="pw"><table class="pt" id="dp-proj-table"></table></div>'
       + '<div class="pj-chart"><div class="pj-box"><canvas id="dpc-proj-mix"></canvas></div><p class="cp-erkl">Alle Reihen der Tabelle in einem Bild: <b>Miete</b> als S\u00e4ulen und <b>Cashflow vor und nach Steuer</b> auf der linken Achse, <b>Restschuld</b> und <b>Eigenkapital</b> auf der rechten. Ein Klick auf einen Eintrag der Legende blendet die Reihe aus oder ein.</p></div></div>'
-      /* v1215-mappe · Abschnitt 07 — der erste Export-Knopf im Cockpit.
+      /* v1215-mappe · (bis v3317 Abschnitt 07, seit v3321 in 04) — der erste Export-Knopf im Cockpit.
          Gemessen am 03.09.2026: das Cockpit hatte keinen einzigen. Marcels
          Entscheidung vom 30.08.: die Auswahl gehoert hierher, zusammen mit
          dem Jahr. Die Objektauswahl kann der Export bereits (opts.objectIds),
          die Oberflaeche dafuer fehlt noch — deshalb steht hier, dass ALLE
          Objekte des Jahres genommen werden, statt es offenzulassen. */
-      + '<div class="sl" data-sek="mappe"><span class="e">07</span><h2>Steuer-Mappe</h2><span class="tag">Anlage V · § 21 EStG</span><span class="rule"></span></div>'
-      + '<div class="dp-mappe">'
-      +   '<div class="dp-mappe-t">Ein PDF über <b>alle</b> Objekte mit erfassten Steuerdaten — je Objekt eine Aufstellung der Werbungskosten, am Ende eine Zusammenfassung mit Summe.</div>'
-      +   '<div class="dp-mappe-r">'
-      +     '<label class="dp-mappe-l">Veranlagungsjahr</label>'
-      +     '<select id="dp-mappe-jahr" class="dp-mappe-sel"></select>'
-      +     '<label class="dp-mappe-cb"><input type="checkbox" id="dp-mappe-av" checked> Anlage-V-Zuordnung anhängen</label>'
-      +     '<button class="dp-mappe-btn" onclick="DealPilotDashboard.steuerMappe()">Steuer-Mappe erstellen</button>'
-      +   '</div>'
-      /* v1218b · Der Hinweis stammte aus v1215, als es die Zuordnung noch
-         nicht gab. Seit v1217/v1218 gibt es sie — und damit stand direkt
-         unter der Checkbox „Anlage-V-Zuordnung anhängen" der Satz, sie sei
-         „nicht enthalten". Ein Widerspruch in einer Zeile Abstand. */
-      +   '<div class="dp-mappe-h">Die Zeilennummern stammen aus dem <b>amtlichen Formular</b> des jeweiligen Jahres. Für Jahre ohne hinterlegte Zuordnung erscheint die Ansicht nicht — die Nummern ändern sich je Veranlagungsjahr und werden nicht geraten. Positionen, deren Zeile eine steuerfachliche Entscheidung wäre, sind ausgewiesen statt weggelassen.</div>'
-      + '</div>'
       /* v3228 · Abschnitt 09 „Jahresabschluss“ ist nach Einstellungen / Mandanten gewandert
-         (Knopf an der Karte der GmbH/UG, Marcel 08.11.2026). Das Cockpit endet mit 08 Steuer-Mappe. */
+         (Knopf an der Karte der GmbH/UG, Marcel 08.11.2026). Seit v3321 endet das Cockpit mit 06 Gesamt-Projektion; die Steuer-Mappe steht in 04. */
       + '</div></div>';
     m.setAttribute('data-dp-built','1');
     /* v1215-mappe: Stil und Jahresliste erst hier — vorher gibt es das

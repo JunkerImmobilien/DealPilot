@@ -158,21 +158,25 @@
          gefuellt (standZeigen); leer ist er unsichtbar. */
       '<div class="dp-pp-stand" id="dp-pp-stand" style="display:none"></div>' +
       '<div class="dp-pp-log" id="dp-pp-log">' +
-        '<div class="dp-pp-hint">Ich kenne deine Vermögensbilanz — Gesamtinvestition, Eigenkapital, Restschuld, ' +
-        'Cashflow und die Entwicklung der nächsten zehn Jahre — und jedes einzelne Objekt darin. ' +
-        'Wähl eine Frage aus der Liste oder frag direkt.</div>' +
+        /* v3321 · kürzer (Marcel 12.11.2026: „generell ist recht viel Text") */
+        '<div class="dp-pp-hint">Frag mich zu deinem Portfolio oder zu einem Objekt – aus der Liste oder frei.</div>' +
       '</div>' +
       /* v1705d: Schnellfragen. Ein leeres Eingabefeld ist eine Huerde -
          wer nicht weiss, was das Werkzeug kann, fragt es nicht. Die vier
          Fragen sind die, die das Portfolio wirklich beantworten kann,
          weil die Daten dafuer im Payload stehen: Cashflow je Objekt,
          Zinsbindung, Projektion, Klumpen. */
-      /* v3248 · statt der vier Chips die Liste „Pilot fragen" (LISTE) */
-      '<div class="dp-pp-fragen" id="dp-pp-chips"><div class="dp-pp-fragen-t">Pilot fragen</div><ul>' +
+      /* v3248 · statt der vier Chips die Liste „Pilot fragen" (LISTE).
+         v3321 · Marcel 12.11.2026: „Da könnten wir vielleicht einfach eine Auswahlliste machen,
+         dann wirkt das nicht so groß." Dieselbe LISTE als Auswahlfeld; die Wahl stellt die
+         Frage sofort (listeFragen) und das Feld springt zurück auf den Platzhalter. */
+      '<div class="dp-pp-fragen dp-pp-wahl" id="dp-pp-chips">' +
+        '<label class="dp-pp-fragen-t" for="dp-pp-sel">Pilot fragen</label>' +
+        '<select id="dp-pp-sel" class="dp-pp-frage dp-pp-sel"><option value="">Frage auswählen …</option>' +
         LISTE.map(function (f, i) {
-          return '<li><button type="button" class="dp-pp-frage" data-frage="' + i + '">' + esc(f.kurz) + '<span aria-hidden="true">›</span></button></li>';
+          return '<option value="' + i + '">' + esc(f.kurz) + '</option>';
         }).join('') +
-      '</ul></div>' +
+      '</select></div>' +
       '<div class="dp-pp-bar">' +
         '<textarea id="dp-pp-in" class="dp-pp-in" rows="1" placeholder="Frage zum Portfolio oder zu einem Objekt…"></textarea>' +
         '<button id="dp-pp-send" class="dp-pp-send" type="button">Senden</button>' +
@@ -190,11 +194,11 @@
     /* Ein Horcher am Behaelter statt vier an den Knoepfen - die Chips
        werden nie neu gebaut, aber ein Horcher je Knopf waere trotzdem
        vier Stellen, an denen man einen vergessen kann. */
-    var ch = el('dp-pp-chips');
-    if (ch) ch.addEventListener('click', function (e) {
-      var b = e.target.closest ? e.target.closest('.dp-pp-frage') : null;
-      if (!b) return;
-      listeFragen(+b.getAttribute('data-frage'));   /* v3248 */
+    var ch = el('dp-pp-sel');
+    if (ch) ch.addEventListener('change', function () {
+      var v = this.value; this.value = '';
+      if (v === '') return;
+      listeFragen(+v);   /* v3248 · v3321 als Auswahlfeld */
     });
     var s = el('dp-pp-send');
     if (s) s.addEventListener('click', function () { frage(); });

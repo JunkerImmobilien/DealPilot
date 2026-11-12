@@ -1498,3 +1498,110 @@ body.dp-theme-dark #dashboard-main .dp-pp-chip:hover{
 #dashboard-main .dp-pp-frage:hover{color:var(--wl-b8932f, #b8932f)}
 #dashboard-main .dp-pp-frage:disabled{opacity:.5;cursor:default}
 @media (max-width:640px){#dashboard-main .dp-pp-fragen ul{grid-template-columns:1fr}}
+
+/* ════ v3321 · Portfolio-Cockpit einfacher (Marcel 12.11.2026) ════════════════
+   1) Goldene Kopfflächen nur noch beim Abschnitt 01 (Portfolio Score). Die übrigen
+      Abschnittsköpfe sind ruhig: weiße Fläche, feine Linie, goldener Strich links.
+   2) „Seit dem Kauf" als schmale Zeile (.cp-sz) statt eigener Karte.
+   3) Einfach: vier nummerierte Karten mit rotem Faden (.ke2).
+   4) Bestand & Zielbild: Balken „Woher das Plus kommt" (.zb-wh), Schritte in den Zellen.
+   5) Steuer-Mappe im Abschnitt 04 (.dp-mappe-k), Pilot-Fragen als Auswahlfeld. */
+#dashboard-main .stage.fc .cp-sek .sl{background:var(--c-panel);border:1px solid var(--border,#E0DBD3);box-shadow:inset 3px 0 0 var(--wl-c9a84c, #C9A84C);padding:7px 12px 7px 14px}
+#dashboard-main .stage.fc .cp-sek .sl::after{display:none}
+#dashboard-main .stage.fc .cp-sek .sl h2{color:var(--c-ink);font-size:16px}
+#dashboard-main .stage.fc .cp-sek .sl .tag{color:var(--c-mut);border-color:var(--border,#E0DBD3)}
+#dashboard-main .stage.fc .cp-sek .sl .e{background:#2A2727;color:var(--wl-e8cc7a, #E8CC7A)}
+#dashboard-main .stage.fc .cp-sek .sl .yrs button{color:var(--c-mut);border-color:var(--border,#E0DBD3);background:transparent}
+#dashboard-main .stage.fc .cp-sek .sl .yrs button.active{background:#2A2727;color:var(--wl-e8cc7a, #E8CC7A);border-color:#2A2727}
+#dashboard-main .stage.fc .cp-sek .sl .dp-charts-hint{color:var(--c-mut)}
+#dashboard-main .stage.fc .cp-sek .cp-chev{background:color-mix(in srgb,var(--wl-c9a84c, #C9A84C) 14%,transparent)}
+#dashboard-main .stage.fc .cp-sek .cp-chev::before{border-color:var(--wl-b8932f, #b8932f)}
+
+/* Seit dem Kauf - Zeile */
+#dashboard-main .cp-sz{margin-top:12px;border-top:1px solid var(--border,#E0DBD3);padding-top:10px}
+#dashboard-main .cp-sz-z{display:flex;align-items:center;gap:14px;width:100%;border:0;background:none;padding:2px 0;cursor:pointer;font:inherit;color:var(--c-ptext);text-align:left;flex-wrap:wrap}
+#dashboard-main .cp-sz-t{font:600 10px/1.3 'JetBrains Mono',monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--c-accd-txt);display:flex;flex-direction:column;min-width:150px}
+#dashboard-main .cp-sz-t small{font:400 10.5px/1.3 Inter,system-ui,sans-serif;letter-spacing:0;text-transform:none;color:var(--c-pmut)}
+#dashboard-main .cp-sz-bar{display:flex;gap:2px;flex:1 1 140px;max-width:260px;height:8px;border-radius:999px;overflow:hidden;background:var(--border,#E0DBD3)}
+#dashboard-main .cp-sz-bar i{display:block;height:100%}
+#dashboard-main .cp-sz-bar .sz-b{background:#3FA56C}
+#dashboard-main .cp-sz-bar .sz-g{background:#A9A39A}
+#dashboard-main .cp-sz-bar .sz-s{background:#B8625C}
+#dashboard-main .cp-sz-bar .sz-o{background:#DDD8CF}
+#dashboard-main .cp-sz-w{font:500 12.5px/1.3 Inter,system-ui,sans-serif;white-space:nowrap}
+#dashboard-main .cp-sz-w b{font:700 14px 'Space Grotesk',sans-serif}
+#dashboard-main .cp-sz-w b.pos{color:var(--c-greenl)}
+#dashboard-main .cp-sz-w b.neg{color:var(--c-redl)}
+#dashboard-main .cp-sz-m{margin-left:auto;font:600 11px Inter,system-ui,sans-serif;color:var(--c-accd-txt)}
+#dashboard-main .cp-sz .sa-liste{margin-top:8px}
+
+/* Einfach - vier Karten */
+#dashboard-main .ke2{display:flex;flex-direction:column;gap:12px;margin:0 0 6px}
+#dashboard-main .ke2-paar{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+#dashboard-main .ke2-k{background:var(--c-panel);color:var(--c-ptext);border:1px solid var(--border,#E0DBD3);border-radius:12px;padding:14px 18px 14px;box-shadow:0 2px 12px rgba(42,39,39,.06);min-width:0;display:flex;flex-direction:column}
+#dashboard-main .ke2-h{display:flex;align-items:center;gap:9px;margin-bottom:12px}
+#dashboard-main .ke2-nr{flex:0 0 22px;width:22px;height:22px;border-radius:6px;background:#2A2727;color:var(--wl-e8cc7a, #E8CC7A);font:700 11px/22px 'JetBrains Mono',monospace;text-align:center}
+#dashboard-main .ke2-t{font:600 15px/1.2 'Space Grotesk',sans-serif;color:var(--c-ink)}
+#dashboard-main .ke2-mehr{margin-left:auto;border:1px solid var(--border,#E0DBD3);background:none;border-radius:999px;padding:4px 11px;font:600 11px Inter,system-ui,sans-serif;color:var(--c-accd-txt);cursor:pointer}
+#dashboard-main .ke2-mehr:hover{border-color:var(--wl-c9a84c, #C9A84C)}
+#dashboard-main .ke2-row{display:grid;gap:10px}
+#dashboard-main .ke2-4{grid-template-columns:repeat(4,minmax(0,1fr))}
+#dashboard-main .ke2-2{grid-template-columns:repeat(2,minmax(0,1fr));margin-top:10px}
+#dashboard-main .ke2-fluss{grid-template-columns:minmax(0,1fr) auto minmax(0,1fr) auto minmax(0,1fr);align-items:stretch}
+#dashboard-main .ke2-fluss:has(> .ke2-w:nth-child(3):last-child){grid-template-columns:minmax(0,1fr) auto minmax(0,1fr)}
+#dashboard-main .ke2-w{display:flex;flex-direction:column;gap:3px;min-width:0;padding:10px 12px;border-radius:9px;background:color-mix(in srgb,var(--wl-c9a84c, #C9A84C) 5%,var(--c-panel));border:1px solid color-mix(in srgb,var(--wl-c9a84c, #C9A84C) 14%,transparent)}
+#dashboard-main .ke2-l{font:600 9.5px/1.2 'JetBrains Mono',monospace;letter-spacing:.07em;text-transform:uppercase;color:var(--c-pmut)}
+#dashboard-main .ke2-v{font:700 21px/1.15 'Space Grotesk',sans-serif;font-variant-numeric:tabular-nums;color:var(--c-ptext);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#dashboard-main .ke2-v.ke-pos{color:var(--c-greenl)}
+#dashboard-main .ke2-v.ke-neg{color:var(--c-redl)}
+#dashboard-main .ke2-v.ke-gold{color:var(--c-accd-txt)}
+#dashboard-main .ke2-s{font:400 11px/1.35 Inter,system-ui,sans-serif;color:var(--c-pmut)}
+#dashboard-main .ke2-pf{align-self:center;color:var(--wl-c9a84c, #C9A84C);font:700 16px Inter,system-ui,sans-serif}
+#dashboard-main .ke2-satz{margin:10px 0 0;font:400 12.5px/1.5 Inter,system-ui,sans-serif;color:var(--c-ptext);text-align:justify;hyphens:auto}
+#dashboard-main .ke2-leer{font:500 13px Inter,system-ui,sans-serif;color:var(--c-pmut);padding:6px 0}
+#dashboard-main .ke2-link{align-self:flex-start;margin-top:10px;border:0;background:none;padding:0;font:600 12px Inter,system-ui,sans-serif;color:var(--c-accd-txt);cursor:pointer}
+#dashboard-main .ke2-link:hover{text-decoration:underline}
+#dashboard-main .ke2-k .cp-sz{margin-top:12px}
+
+/* Bestand & Zielbild - Woher das Plus kommt, Schritte in den Zellen */
+#dashboard-main .zb-wh{margin:0 0 14px;padding:10px 12px;border-radius:9px;background:color-mix(in srgb,var(--wl-c9a84c, #C9A84C) 5%,var(--c-panel));border:1px solid color-mix(in srgb,var(--wl-c9a84c, #C9A84C) 14%,transparent)}
+#dashboard-main .zb-wh-t{font:600 10px/1.3 'JetBrains Mono',monospace;letter-spacing:.05em;text-transform:uppercase;color:var(--c-accd-txt);margin-bottom:8px}
+#dashboard-main .zb-wh-bar{display:flex;gap:3px;height:12px;border-radius:999px;overflow:hidden}
+#dashboard-main .zb-wh-bar i{display:block;height:100%}
+#dashboard-main i.zb-wh-m{background:var(--wl-c9a84c, #C9A84C)}
+#dashboard-main i.zb-wh-z{background:#2A2727}
+#dashboard-main .zb-wh-l{display:flex;flex-wrap:wrap;gap:6px 18px;margin-top:8px;font:400 12px/1.35 Inter,system-ui,sans-serif;color:var(--c-ptext)}
+#dashboard-main .zb-wh-l span{display:inline-flex;align-items:center;gap:6px}
+#dashboard-main .zb-wh-l i{display:inline-block;width:10px;height:10px;border-radius:3px}
+#dashboard-main .zb-wh-l b{font:600 12px 'JetBrains Mono',monospace;color:var(--c-greenl)}
+#dashboard-main .zb-vgl td small{display:block;font:500 10px 'JetBrains Mono',monospace;color:var(--c-greenl);margin-top:2px}
+#dashboard-main .zb-vgl tr.zb-vgl-sum th,#dashboard-main .zb-vgl tr.zb-vgl-sum td{border-top:1px solid color-mix(in srgb,var(--wl-c9a84c, #C9A84C) 35%,transparent);background:color-mix(in srgb,var(--wl-c9a84c, #C9A84C) 4%,transparent)}
+#dashboard-main ul.zb-wie{margin:8px 0 0;padding:0 0 0 16px;font:400 12px/1.55 Inter,system-ui,sans-serif;color:var(--c-pmut)}
+#dashboard-main ul.zb-wie li{margin:0 0 5px;text-align:justify;hyphens:auto}
+#dashboard-main ul.zb-wie b{color:var(--c-ptext)}
+
+/* Steuer-Mappe im Abschnitt 04 */
+#dashboard-main .dp-mappe{background:var(--c-panel)}
+#dashboard-main .dp-mappe-k{font:600 14px/1.3 'Space Grotesk',sans-serif;color:var(--c-ink);margin:0 0 6px}
+#dashboard-main .dp-mappe-k span{font:500 10px 'JetBrains Mono',monospace;color:var(--c-mut);margin-left:8px;letter-spacing:.03em}
+
+/* Portfolio-Pilot: Fragen als Auswahlfeld */
+#dashboard-main .dp-pp-wahl{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+#dashboard-main .dp-pp-wahl .dp-pp-fragen-t{margin:0}
+#dashboard-main select.dp-pp-sel{flex:1 1 260px;max-width:460px;width:auto;display:block;border:1px solid var(--border,#E0DBD3);border-radius:8px;padding:8px 10px;background:var(--c-panel);font:500 13px Inter,system-ui,sans-serif;color:var(--c-ptext);cursor:pointer}
+#dashboard-main select.dp-pp-sel:focus{outline:2px solid var(--wl-c9a84c, #C9A84C);outline-offset:1px}
+
+@media(max-width:900px){
+  #dashboard-main .ke2-4{grid-template-columns:repeat(2,minmax(0,1fr))}
+  #dashboard-main .ke2-paar{grid-template-columns:1fr}
+}
+@media(max-width:640px){
+  #dashboard-main .ke2-k{padding:12px 12px}
+  #dashboard-main .ke2-fluss{grid-template-columns:1fr!important}
+  #dashboard-main .ke2-pf{transform:rotate(90deg);justify-self:center;line-height:1}
+  #dashboard-main .ke2-v{font-size:18px}
+  #dashboard-main .ke2-2{grid-template-columns:1fr 1fr}
+  #dashboard-main .cp-sz-z{gap:8px}
+  #dashboard-main .cp-sz-m{margin-left:0}
+  #dashboard-main select.dp-pp-sel{max-width:none;flex-basis:100%}
+}

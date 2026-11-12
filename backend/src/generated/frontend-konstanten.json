@@ -1,10 +1,10 @@
 {
- "erzeugt_am": "2026-11-12T06:29:43.160Z",
+ "erzeugt_am": "2026-11-12T06:45:47.410Z",
  "quellen": {
   "voice-import": "e66c4689fd6498d0",
   "objektart-felder": "f7d9212555982a97",
   "storage": "2958544405788fa1",
-  "index-html": "dd1aa00fee3b31ca",
+  "index-html": "3ec10d2dfb8169e3",
   "grest": "81f3fb0a4de3a6cf"
  },
  "daten": {
@@ -4211,7 +4211,7 @@
     "abschnitte": [
      {
       "h": "Aufbau: sieben Abschnitte von oben nach unten",
-      "text": "Das Cockpit zeigt dein Portfolio in nummerierten Abschnitten: 01 Portfolio Score · 02 Kennzahlen · 03 Bestand & Zielbild · 04 Steuer über alle Objekte · 05 Projektion & Verlauf · 06 Gesamt-Projektion · 07 Steuer-Mappe. Den Jahresabschluss einer GmbH oder UG findest du unter Einstellungen / Mandanten an der Karte der Gesellschaft.\n\nUnter dem Score schaltest du die Ansicht um: Einfach zeigt die Kernaussagen als Kacheln mit je einem Satz (ein Klick springt in die genaue Ansicht), Genau zeigt alle Abschnitte mit Erklärungen. Jeder gelbe Abschnitts-Streifen lässt sich per Klick ein- und ausklappen; DealPilot merkt sich das.\n\nOben rechts wählst du unter Objekt entweder „Alle Objekte“ oder ein einzelnes gewonnenes Objekt — Score und Kennzahlen rechnen dann nur dieses. Im Pro-Plan stehen daneben Filter-Knöpfe je Halter („Alle“ plus deine Mandanten).\n\n03 Bestand & Zielbild summiert Mieterhöhung und Zielbild aller Objekte, für die sie im Objekt erfasst und gerechnet sind: Kaltmiete, Maßnahmen, Ertragswert und Wertzuwachs nach Kosten, mit Grafik und Auswertung. Objekte ohne Angaben werden genannt, nicht mitgezählt. Die Werte sind ein Ausblick, kein Verkehrswert. Zu jedem fehlenden Objekt steht der Grund mit einem Knopf ins Objekt; dort rechnet DealPilot die Ertragswerte je Stufe kostenlos neu. Darunter erklärt der Portfolio-Pilot die Auswertung auf Knopfdruck ausführlich (KI-Text, kein Kontingent) und prüft danach jede Zahl seines Textes gegen das Cockpit."
+      "text": "Das Cockpit zeigt dein Portfolio in nummerierten Abschnitten: 01 Portfolio Score · 02 Kennzahlen · 03 Bestand & Zielbild · 04 Steuer über alle Objekte (mit der Steuer-Mappe) · 05 Projektion & Verlauf · 06 Gesamt-Projektion. Den Jahresabschluss einer GmbH oder UG findest du unter Einstellungen / Mandanten an der Karte der Gesellschaft.\n\nUnter dem Score schaltest du die Ansicht um: Einfach zeigt vier Karten in fester Reihenfolge: 1 Heute (Eigenkapital, Miete, Cashflow, DSCR, dazu „Seit dem Kauf“), 2 Gesamtbewertung (investiert → dir gehört heute → Wert nach Ertrag), 3 Bestand → Zielbild, 4 Steuer & Ausblick; „Genau ›“ springt in den passenden Abschnitt. Genau zeigt alle Abschnitte mit Erklärungen. Jeder Abschnittskopf lässt sich per Klick ein- und ausklappen; DealPilot merkt sich das.\n\nOben rechts wählst du unter Objekt entweder „Alle Objekte“ oder ein einzelnes gewonnenes Objekt — Score und Kennzahlen rechnen dann nur dieses. Im Pro-Plan stehen daneben Filter-Knöpfe je Halter („Alle“ plus deine Mandanten).\n\n03 Bestand & Zielbild summiert Mieterhöhung und Zielbild aller Objekte, für die sie im Objekt erfasst und gerechnet sind: Kaltmiete, Maßnahmen, Ertragswert und Wertzuwachs nach Kosten, mit Grafik und Auswertung. Objekte ohne Angaben werden genannt, nicht mitgezählt. Die Werte sind ein Ausblick, kein Verkehrswert. Zu jedem fehlenden Objekt steht der Grund mit einem Knopf ins Objekt; dort rechnet DealPilot die Ertragswerte je Stufe kostenlos neu. Darunter beantwortet der Portfolio-Pilot Fragen zum Portfolio – aus der Auswahlliste „Pilot fragen“ oder frei (KI-Text, kein Kontingent) – und prüft danach jede Zahl seines Textes gegen das Cockpit."
      },
      {
       "h": "Portfolio Score — so wird er berechnet",
@@ -4231,7 +4231,7 @@
      },
      {
       "h": "Steuer-Mappe erstellen",
-      "text": "Abschnitt 07 erzeugt ein PDF über alle Objekte mit erfassten Steuerdaten. Darin steht je Objekt eine Aufstellung der Werbungskosten und am Ende eine Zusammenfassung mit Summe.\n\nSo geht's:\n1. Unter Veranlagungsjahr das Jahr wählen. Zur Auswahl stehen nur Jahre, für die Steuerdaten da sind, jeweils mit der Zahl der Objekte. Vorausgewählt ist das letzte abgeschlossene Jahr.\n2. Den Haken Anlage-V-Zuordnung anhängen setzen oder entfernen.\n3. Auf Steuer-Mappe erstellen klicken.\n\nDie Zeilennummern stammen aus dem amtlichen Formular des jeweiligen Jahres. Für Jahre ohne hinterlegte Zuordnung erscheint die Ansicht nicht — die Nummern werden nicht geraten. Steht im Feld „keine Steuerdaten erfasst“, ist der Knopf gesperrt."
+      "text": "Im Abschnitt 04 (Steuer über alle Objekte) erzeugt die Steuer-Mappe ein PDF über alle Objekte mit erfassten Steuerdaten. Darin steht je Objekt eine Aufstellung der Werbungskosten und am Ende eine Zusammenfassung mit Summe.\n\nSo geht's:\n1. Unter Veranlagungsjahr das Jahr wählen. Zur Auswahl stehen nur Jahre, für die Steuerdaten da sind, jeweils mit der Zahl der Objekte. Vorausgewählt ist das letzte abgeschlossene Jahr.\n2. Den Haken Anlage-V-Zuordnung anhängen setzen oder entfernen.\n3. Auf Steuer-Mappe erstellen klicken.\n\nDie Zeilennummern stammen aus dem amtlichen Formular des jeweiligen Jahres. Für Jahre ohne hinterlegte Zuordnung erscheint die Ansicht nicht — die Nummern werden nicht geraten. Steht im Feld „keine Steuerdaten erfasst“, ist der Knopf gesperrt."
      },
      {
       "h": "Jahresabschluss für GmbH und UG",
@@ -5557,7 +5557,7 @@
   }
  },
  "inhalt": {
-  "hilfe": "4300cb70fe29cbfc",
+  "hilfe": "510fb839b5b53c1c",
   "bewertung": "f427bd734c0570c3"
  }
 }

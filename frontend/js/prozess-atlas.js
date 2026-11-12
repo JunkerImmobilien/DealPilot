@@ -76,8 +76,8 @@
           ein: ['Mieten', 'Kosten', 'Marktberichte'], aus: ['Soll/Ist-Abweichung', 'Wertverlauf'],
           ziel: { tab: 's0' }, beleg: 'frontend/js/ankauf-ansicht.js:sollSpeichern' },
         { id: 'be3', s: 2, z: 2, t: 'Portfolio steuern', k: 'Portfolio-Cockpit',
-          d: 'Alle Objekte zusammen: Portfolio Score, Kennzahlen, Bestand & Zielbild, geteilte Objekte, Steuer über alle Objekte, Projektion und Steuer-Mappe. Der Jahresabschluss einer Gesellschaft liegt unter Einstellungen / Mandanten.',
-          unter: [['01 Portfolio Score', 'So setzt sich der Score zusammen.'], ['03 Bestand & Zielbild', 'Potenzial aller Objekte.'], ['04 Steuer über alle Objekte', ''], ['07 Steuer-Mappe', 'Anlage V · § 21 EStG.']],
+          d: 'Alle Objekte zusammen: Portfolio Score, Kennzahlen, Bestand & Zielbild, Steuer über alle Objekte mit Steuer-Mappe und Projektion. Der Jahresabschluss einer Gesellschaft liegt unter Einstellungen / Mandanten.',
+          unter: [['01 Portfolio Score', 'So setzt sich der Score zusammen.'], ['03 Bestand & Zielbild', 'Potenzial aller Objekte.'], ['04 Steuer über alle Objekte', 'mit der Steuer-Mappe (Anlage V · § 21 EStG).']],
           ein: ['alle Objekte'], aus: ['Portfolio Score', 'Gesamt-Projektion', 'Steuer-Mappe'],
           ziel: { aktion: 'cockpit' }, beleg: 'frontend/js/ui.js:setMainView' }
       ],
