@@ -8874,8 +8874,16 @@
         kegelHoch(false);
         /* danach läuft die DealPilot-Marktbewertung (abgespielt) */
         await warteAuf(function () { return !q('#oabi-ov .oabi-modal'); }, 8000);
-        await warteAuf(function () { var st = qcEl('_mb_state'); return st && /"card"/.test(st.value || ''); }, 20000);
-        await warte(900);
+        var tm = Date.now();
+        var ob = function () { return qcEl('oab-results') || qcEl('qc7-sources'); };
+        await qcHole(ob()); await zeige(ob, 8);
+        s.zeile('Marktbewertung', 'Dazu schätzt DealPilot den Markt am Ort …');
+        var st = await warteAuf(function () { var x = qcEl('_mb_state'); return x && /"card"/.test(x.value || '') ? x : null; }, 20000);
+        DPM_QG.marktMs = Date.now() - tm;
+        var kk = null; try { kk = JSON.parse(st.value).card; } catch (e) {}
+        await warte(700);
+        await qcHole(ob()); await zeige(ob, 8);
+        if (kk && kk.mw) await b2oZeile(s, 'Marktbewertung', 'Marktwert <b>' + eur(kk.mw.med) + '</b>, Spanne ' + eur(kk.mw.low) + ' – ' + eur(kk.mw.high) + '.');
         DPM_QG.zeiten.push({ szene: 'A2', ms: Date.now() - t1 });
       },
       /* ── A3 · Beleihung 80 %, Score ── */
@@ -8921,11 +8929,13 @@
           await zeige(function () { var x = q('#mfh-modal'); return x && (x.querySelector('table') || x.querySelector('.mfh-box') || x); }, 6);
           var f = qgMfhFuss();
           await b2oZeile(s, 'Jede Wohnung', (f ? '<b>' + f.n + ' Wohnungen</b>, Ist <b>' + f.ist + '</b> im Monat' : 'Die Wohnungen') + ' — aus der Mieterliste.');
-          var zv = function () { return rhIm('#mfh-modal', /^Zielmiete nach Sanierung/i) || rhIm('#mfh-modal', /ZIELMIETE NACH SANIERUNG/); };
-          var zvBox = function () { var e = zv(); return e && (e.closest('div[style]') || e.parentElement); };
-          var e0 = zv(); if (e0) { try { e0.scrollIntoView({ block: 'start' }); } catch (x) {} await warte(400); }
+          /* GEMESSEN im Prüflauf 12.11.: der Kasten „Zielmiete nach Sanierung“ (closest div[style]) war das ganze
+             Fenster, und die erste €/m²-Zahl darin die Mitte (7,42), nicht der Vorschlag. Gezeigt wird die Zeile
+             der Wohnung 1, gelesen ihr Vorschlag „8,51 €/m² · 630 €/Monat“. */
+          var zvBox = function () { var b = qgMfhKnopf('1'); var d = b && b.closest('div'); return d && d.parentElement; };
+          var e0 = zvBox(); if (e0) { try { e0.scrollIntoView({ block: 'center' }); } catch (x) {} await warte(400); }
           await zeige(zvBox, 6);
-          var vor = /([\d,]+ €\/m²)/.exec(r6Text(zvBox()));
+          var vor = /([\d,]+ €\/m²) · [\d.]+ €\/Monat/.exec(r6Text(zvBox()));
           await b2oZeile(s, 'Zielbild je Wohnung', 'Bei Neuvermietung schlägt DealPilot <b>' + (vor ? vor[1] : 'eine Zielmiete') + '</b> vor — übernommen für Wohnung 1, 2, 3 und 6.');
           var nr = ['1', '2', '3', '6'];
           for (var i = 0; i < nr.length; i++) { var kb = qgMfhKnopf(nr[i]); if (kb) { kb.click(); await warte(450); } }
@@ -8999,6 +9009,9 @@
       async function (s) {
         var t1 = Date.now();
         reiter('s3-tax'); await warte(900);
+        /* GEMESSEN im Prüflauf 12.11.: Objekt A trägt schon den eigenen Satz aus der RND (3,13 %) - die
+           Übersicht zeigte dann die AfA von A9 vor A9. Erst gesetzlich 2 % (das Objekt wird nur gelesen). */
+        var sel0 = q('#afa_satz'); if (sel0 && sel0.value !== '2.0') { sel0.value = '2.0'; sel0.dispatchEvent(new Event('change', { bubbles: true })); await warte(900); }
         var bb = function () { return [].filter.call(document.querySelectorAll('#s3-tax button'), function (x) { return /openBMFModal/.test(x.getAttribute('onclick') || ''); })[0] || null; };
         await zeige(bb, 10);
         await b2oZeile(s, 'Kaufpreisaufteilung', 'Gebäude und Boden nach der <b>Arbeitshilfe</b> des Finanzministeriums.');
@@ -9011,7 +9024,7 @@
         var kart = function () { var p = r6BmfPane(); var e = p && rhIm(p, /^Gebäudeanteil$/i); return e && (e.closest('div[style*="grid"]') || e.parentElement && e.parentElement.parentElement) || p; };
         var p0 = r6BmfPane(); if (p0) { var sc = p0.closest('.bmfmo-body'); if (sc) sc.scrollTop = 0; }
         await zeige(kart, 6);
-        var tt = r6Inner(r6BmfPane()), ga = /GEBÄUDEANTEIL\s*([\d,]+ %)/i.exec(tt), af = /AFA JE JAHR\s*([\d.]+ €)/i.exec(tt), gw = /GEWÄHLT\s*([^\n]+)/i.exec(tt);
+        var tt = r6Inner(r6BmfPane()), ga = /GEBÄUDEANTEIL\s*([\d,]+ %)/i.exec(tt), af = /AFA JE JAHR\s*([\d.]+ €)/i.exec(tt), gw = /(?:^|\n)\s*GEWÄHLT\s*\n\s*([^\n]+)/.exec(tt);   /* ohne i: „Was gewählt ist, …“ steht darüber */
         DPM_QG.a8 = { gebaeude: ga && ga[1], afa: af && af[1], wahl: gw && gw[1] };
         await b2oZeile(s, (gw ? gw[1].trim() : 'Amtlich'), 'Gebäudeanteil <b>' + (ga ? ga[1] : '–') + '</b>, AfA <b>' + (af ? af[1] : '–') + '</b> im Jahr.');
         var kl = function () { var e = q('#bmf-boden-klausel-text'); if (!e || !e.offsetWidth) return null; var x = e; for (var j = 0; j < 3 && x && !/kopieren/i.test(x.textContent); j++) x = x.parentElement; return x || e; };
@@ -9086,12 +9099,16 @@
         DPM_QG.a10 = { jahr: j, zellen: c };
         await b2oZeile(s, 'Steuer je Jahr · ' + j, 'Miete <b>' + (c[1] || '–') + '</b>, Zinsen ' + (c[2] || '–') + ', AfA ' + (c[3] || '–') + ' — Ergebnis <b>' + (c[n - 2] || '–') + '</b>.');
         r15Modus(1); await warte(800); await r15Jahr(j);
-        var av = function () { var b = r15Box(); return b && (rhIm(b, /Anlage V/) || b); };
+        /* GEMESSEN 12.11.: die Zeile der Anlage V steht im Hinweis (title) des ℹ je Position, nicht im Text -
+           ein Browser-Hinweis kommt in keine Aufnahme. Gelesen wird er hier und steht in der Zeile. */
+        var hz = function () { var b = r15Box(); return b ? [].filter.call(b.querySelectorAll('.ytf-help[title]'), function (e) { return /Schuldzinsen/.test(e.getAttribute('title')) && /Zeile \d+/.test(e.getAttribute('title')); })[0] || null : null; };
+        var av = function () { var e = hz(); return e && (e.closest('tr') || e.parentElement); };
         var a0 = av(); if (a0) { r15Oben(a0); await warte(400); }
-        await zeige(function () { var e = av(); return e && (e.closest('tr,div') || e); }, 6);
-        var at = r6Inner(r15Box()), zn = /Zeile (\d+)/.exec(at);
-        DPM_QG.a10.zeile = zn ? zn[1] : null;
-        await b2oZeile(s, 'Zeile für Zeile', 'Jede Position mit ihrer Zeile der <b>Anlage V</b>' + (zn ? ' — etwa Zeile ' + zn[1] : '') + '.');
+        await zeige(function () { return av() || r15Box(); }, 6);
+        var ti = hz() ? hz().getAttribute('title') : '', zn = /ANLAGE V (\d{4})[^\n]*\n\s*Zeile (\d+)\s*·\s*Kennzahl (\d+)/.exec(ti);
+        var zw = av() && av().querySelector('input'), zb2 = zw && zw.value ? eur(Number(zw.value)) : null;
+        DPM_QG.a10.anlageV = zn ? { formular: zn[1], zeile: zn[2], kennzahl: zn[3] } : null;
+        await b2oZeile(s, 'Zeile für Zeile', 'Schuldzinsen' + (zb2 ? ' <b>' + zb2 + '</b>' : '') + (zn ? ' → <b>Anlage V Zeile ' + zn[2] + '</b>, Kennzahl ' + zn[3] + (String(zn[1]) !== String(j) ? ' (Formular ' + zn[1] + ')' : '') : ' — mit ihrer Zeile der Anlage V') + '.');
         r15Modus(0); await warte(500);
         DPM_QG.zeiten.push({ szene: 'A10', ms: Date.now() - t1 });
       },
