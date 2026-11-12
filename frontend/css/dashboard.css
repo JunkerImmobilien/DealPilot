@@ -1758,3 +1758,5 @@ html body #dashboard-main #dp-stage #dp-dash-objsel option{background:#fff !impo
   #dashboard-main #dp-stage table.dptk:not(.zb-ot-tab){table-layout:auto !important}
   #dashboard-main #dp-stage table.dptk:not(.zb-ot-tab) thead th{white-space:normal !important;hyphens:auto;-webkit-hyphens:auto}
 }
+/* v3333b · Vermögensbilanz-Objektliste auch am Schreibtisch zweizeilig statt „Ravensberger W…“ (23 px abgeschnitten, gemessen 1024/1280/1440) */
+#dashboard-main #dp-stage .vb-on,#dashboard-main #dp-stage .vb-on small{white-space:normal;overflow:visible;text-overflow:clip;overflow-wrap:anywhere}
