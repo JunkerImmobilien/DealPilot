@@ -44699,3 +44699,13 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Was:** Lagekarte statt leerem Bildplatz in allen drei PDF-Wegen (OSM-Kacheln über eigenes Backend, Ablage 30 Tage, ≤ 60/min an OSM, Namensnennung im Bild; v3336/a), Je-Objekt-Karten 601–1279 px (v3333c), Spot-Drehbuch `spot-quittengarten` (nur Staging-Objekte), Mieterliste schlägt KI-Fantasieliste aus dem Exposé (`object-actions.js`, kam schon mit 1.0.106).
 - **Nachweis:** Sicherungen `/root/backups/*-20261112-0919.sql.gz` (6,9 / 31 MB, Kopf gelesen), keine Migration, Gold-Audit 366, Backend ohne Fehler, `js/lagekarte.js` 200, Kachel-Route ohne Anmeldung 401 (gewollt).
 - **Rest:** Geoapify-Rückfall im einheitlichen Deckblatt druckt keine Namensnennung (Marcel entscheidet: streichen?). Nebenbefund: klassisches Investment-PDF zeigt „DealPilot Free“-Wasserzeichen trotz Plan investor (Testkonto Staging) — offen.
+
+### Rollout 1.0.108 · 12.11.2026 (`26d7cb9`, v3337, v3338/a/b, Spot-Drehbuch)
+- **Was:** Wasserzeichen nur noch bei echtem Free-Plan (v3337, `subscription.js` planSicher/wasserzeichenNoetig), Geoapify-Rückfall aus dem Investment-PDF entfernt, OSM-Namensnennung im Marktbericht und Seitenumbruch-Fußzeile repariert (v3338/a/b).
+- **Nachweis:** Sicherungen beider DBs vor dem Lauf, Gold-Audit 366, Backend healthy, 0 Fehler nach Start.
+- **Rest:** Marktbericht-PDF lädt zwei Kartenbilder unnötig mit.
+
+### Rollout 1.0.109 · 12.11.2026 (`3a27c8d`, v3339)
+- **Was:** Exposé-Textseiten werden nicht mehr als Objektfotos übernommen (`pdf-import.js` BILD_MAX_WOERTER 250 → 30; Ursache des alten Angebotspreises im Bank-PDF-Titelbild). Quick-Check rechnet mit Leerstand aus den Einstellungen und Garagen/Stellplätzen aus der Mieterliste (`qc_nkm_sonst`, `_qcLeerstandPct`) → gleicher Score wie das Objekt; Prüfer `qc-objekt-gleich-pruefen.mjs`.
+- **Nachweis:** Sicherungen `/root/backups/*-20261112-1054.sql.gz` (6,9 / 31 MB, Kopf gelesen), keine Migration, Gold-Audit 366, Backend healthy, Fehler im Log nur EZB-Zeitüberschreitungen, Buster `pdf-import.js?v=v3339` live. Altbestand lesend gemessen: 100 Objektfotos auf Prod, keins im Seitenformat (A4, > 0,9 MP); auf Staging 4 in den zwei Demo-Objekten.
+- **Rest:** Demo-Objekte A/B auf Staging tragen noch Exposé-Seiten als Fotos (bei der neuen Aufnahme ersetzen).
