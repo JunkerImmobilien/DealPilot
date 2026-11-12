@@ -1682,8 +1682,8 @@ body.dp-theme-dark #dashboard-main .dp-pp-chip:hover{
 #dashboard-main #dp-stage select.dp-pp-sel,#dashboard-main #dp-stage select.dp-mappe-sel{background:#fff;color:#2A2727;border:1px solid var(--dpl-linie, #E6E1D6);border-radius:2px;height:38px;padding:0 11px;font:400 13px Inter,system-ui,sans-serif}
 #dashboard-main #dp-stage select.dp-pp-sel:focus,#dashboard-main #dp-stage select.dp-mappe-sel:focus{outline:none;border-color:var(--wl-c9a84c, #C9A84C);box-shadow:0 0 0 2px color-mix(in srgb,var(--wl-c9a84c, #C9A84C) 16%,transparent)}
 @media(max-width:768px){
-  #dashboard-main #dp-stage.stage.fc .sl h2{font-size:18px}
-  #dashboard-main #dp-stage.stage.fc .sl.sl-head h2{font-size:21px}
+  #dashboard-main #dp-stage.stage.fc .sl h2{font-size:18px !important}   /* style.css:17731 setzt am Handy h2 {17px !important}; der Reiter Objekt hat 18 px */
+  #dashboard-main #dp-stage.stage.fc .sl.sl-head h2{font-size:21px !important}
   #dashboard-main #dp-stage.stage.fc .sl::before{top:3px;height:18px}
   #dashboard-main #dp-stage.stage.fc .sl .cp-objsel select{height:44px}
   #dashboard-main #dp-stage select.dp-pp-sel,#dashboard-main #dp-stage select.dp-mappe-sel{height:44px}
