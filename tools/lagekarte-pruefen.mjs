@@ -121,6 +121,14 @@ try {
   urls.length = 0;
   const [p1, p2] = await Promise.all([OSM.kachel(16, 500, 500, { dir, fetchFn: gut }), OSM.kachel(16, 500, 500, { dir, fetchFn: gut })]);
   ok(urls.length === 1 && p1.buf.equals(p2.buf), 'gleichzeitige Abrufe derselben Kachel: ein Netzabruf');
+  /* eine Lagekarte = bis zu 12 Kacheln auf einmal: alle kommen an, hoechstens 2 gleichzeitig beim Kachelserver
+     (erster Lauf auf Staging: ohne Schlange bekamen 10 von 12 ein 429, die Karte fiel weg) */
+  OSM._zuruecksetzen();
+  let gleichzeitig = 0, spitze = 0;
+  const langsam = async () => { gleichzeitig++; spitze = Math.max(spitze, gleichzeitig); await new Promise((r) => setTimeout(r, 30)); gleichzeitig--;
+    return { ok: true, status: 200, arrayBuffer: async () => PNG.buffer.slice(PNG.byteOffset, PNG.byteOffset + PNG.length) }; };
+  const zwoelf = await Promise.allSettled(Array.from({ length: 12 }, (_, i) => OSM.kachel(16, 700 + (i % 4), 900 + Math.floor(i / 4), { dir, fetchFn: langsam })));
+  ok(zwoelf.every((r) => r.status === 'fulfilled' && r.value.herkunft === 'netz') && spitze <= 2, '12 Kacheln gleichzeitig: alle geliefert, Spitze ' + spitze + ' gleichzeitig beim Kachelserver');
 } finally { rmSync(dir, { recursive: true, force: true }); OSM._zuruecksetzen(); }
 
 /* ── D · Verdrahtung ───────────────────────────────────────────────── */

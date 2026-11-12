@@ -17,7 +17,8 @@
    - Kosten: 0 EUR (OSM-Kacheln sind frei; Lizenz ODbL, Namensnennung
      „© OpenStreetMap-Mitwirkende" steht im Bild, lagekarte.js).
    - Ratenbegrenzung: hoechstens NETZ_JE_MINUTE Abrufe an OSM je Minute und
-     NETZ_PARALLEL gleichzeitig; darueber 429 - die Lagekarte faellt dann weg,
+     NETZ_PARALLEL gleichzeitig (weitere warten bis 15 s in der Schlange); ueber dem
+     Minutendeckel 429 - die Lagekarte faellt dann weg,
      das PDF entsteht wie vorher ohne Bild.
    - Faellt OSM aus und liegt eine aeltere Kachel in der Ablage, kommt die
      aeltere (lieber eine Woche alte Strasse als keine Karte).
@@ -56,8 +57,12 @@ let _laufend = 0;
 const _unterwegs = new Map();   /* dieselbe Kachel nur einmal gleichzeitig holen */
 function _freigabe(jetzt) {
   while (_zeiten.length && jetzt - _zeiten[0] > 60000) _zeiten.shift();
-  return _zeiten.length < NETZ_JE_MINUTE && _laufend < NETZ_PARALLEL;
+  return _zeiten.length < NETZ_JE_MINUTE;
 }
+const _pause = (ms) => new Promise((r) => setTimeout(r, ms));
+/* Gleichzeitige Abrufe warten in der Schlange (eine Lagekarte braucht bis zu 12 Kacheln auf einmal),
+   hoechstens WARTE_MS - danach gilt die Kachel als nicht lieferbar. */
+const WARTE_MS = 15000;
 
 function _fehler(status, text) { const e = new Error(text); e.status = status; return e; }
 
@@ -94,9 +99,15 @@ async function kachel(z, x, y, o) {
     throw _fehler(429, 'kachel_rate');
   }
   const fetchFn = o.fetchFn || globalThis.fetch;
-  _zeiten.push(jetzt); _laufend++;
+  _zeiten.push(jetzt);
   const lauf = (async () => {
     await null;   /* erst nach _unterwegs.set weiterlaufen, sonst raeumt finally vor dem Eintrag ab */
+    const bis = Date.now() + WARTE_MS;
+    while (_laufend >= NETZ_PARALLEL) {
+      if (Date.now() > bis) { _unterwegs.delete(schluessel); if (alt) return { buf: alt, herkunft: 'ablage-alt' }; throw _fehler(429, 'kachel_warteschlange'); }
+      await _pause(40);
+    }
+    _laufend++;
     try {
       const r = await fetchFn(QUELLE + '/' + k.z + '/' + k.x + '/' + k.y + '.png', {
         headers: { 'User-Agent': USER_AGENT, Accept: 'image/png' },
