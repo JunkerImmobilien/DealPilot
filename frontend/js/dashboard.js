@@ -1278,7 +1278,7 @@
        Gesamtbewertung - dort steht sie fuer alle Objekte. Je Objekt bleibt die Spalte. */
     function zelle(v, schritt){ return v + (schritt ? '<small>' + schritt + '</small>' : ''); }
     var ewM0 = ewMs != null ? ewMs : null;
-    var tab = '<div class="zb-vgl-scroll"><table class="zb-vgl zb-vgl-4"><thead><tr><th></th><th>Bestand<small>heute</small></th><th>Soll<small>nach Mieterhöhung</small></th><th>Zielbild<small>nach Umbau/Neuvermietung</small></th><th>Veränderung<small>Zielbild − Bestand</small></th></tr></thead><tbody>'
+    var tab = '<div class="zb-vgl-scroll"><table class="zb-vgl zb-vgl-4"><thead><tr><th></th><th>Bestand <small>heute</small></th><th>Soll <small>Mieterhöhung</small></th><th>Zielbild <small>Umbau, Neuvermietung</small></th><th>Veränderung <small>Zielbild − Bestand</small></th></tr></thead><tbody>'
       + zeile('Kaltmiete im Jahr', EK(A.mieteB), zelle(EK(A.mieteM), Math.abs(mehrM) >= 1 ? VZ(mehrM) : ''), zelle(EK(A.mieteZ), Math.abs(A.mieteZ - A.mieteM) >= 1 ? VZ(A.mieteZ - A.mieteM) : ''), VZ(mehrZ) + ' · ' + P(A.mieteB ? mehrZ / A.mieteB * 100 : null), mehrZ, nMit + ' Objekte')
       + zeile('Bruttomietrendite', _fPr(bmyB, 2), _fPr(bmyM, 2), _fPr(bmyZ, 2), bmyD == null ? '–' : (bmyD >= 0 ? '+' : '−') + Math.abs(bmyD).toFixed(2).replace('.', ',') + ' Pkt.', bmyD, 'Miete ÷ (Kaufpreis + Maßnahmen)')
       + zeile('Maßnahmen', '–', A.kostenM ? EK(A.kostenM) : 'keine', A.kosten ? EK(A.kosten) : 'keine', A.kosten ? VZ(-A.kosten) : '–', A.kosten ? -1 : null, 'Kosten bis zur Stufe')
@@ -2946,7 +2946,10 @@
          vollem Objektnamen, Betrag am Balken und die Summe als eigener Balken. Der Grenzsatz
          steht in der Tabelle darunter und in der Progressionskurve. Zahlen unverändert aus
          steuerKette() (s.wirkung, t.summe). */
-      var labels = t.schritte.map(function (s, i) { var n = String(s.name || ''); return (i + 1) + '  ' + (n.length > 32 ? n.substring(0, 30) + '…' : n); }).concat(['Summe aller Objekte']);
+      /* schmal (Handy): kurze Namen, damit Name und Betrag nebeneinander passen */
+      var schmal = (cv.parentNode && cv.parentNode.clientWidth < 560);
+      var nMax = schmal ? 14 : 32;
+      var labels = t.schritte.map(function (s, i) { var n = String(s.name || ''); return (i + 1) + '  ' + (n.length > nMax ? n.substring(0, nMax - 1) + '…' : n); }).concat([schmal ? 'Summe' : 'Summe aller Objekte']);
       var wirkReihe = t.schritte.map(function (s) { return Math.round(s.wirkung); }).concat([Math.round(t.summe)]);
       var nS = t.schritte.length;
       var GOLD = SER[0];
@@ -2959,7 +2962,7 @@
         afterDatasetsDraw: function (ch) {
           var ctx = ch.ctx, meta = ch.getDatasetMeta(0);
           ctx.save();
-          ctx.font = '600 11px "JetBrains Mono", ui-monospace, monospace';
+          ctx.font = (schmal ? '600 9.5px' : '600 11px') + ' "JetBrains Mono", ui-monospace, monospace';
           ctx.textBaseline = 'middle';
           meta.data.forEach(function (bar, i) {
             var v = wirkReihe[i]; if (v == null) return;
@@ -2973,7 +2976,7 @@
         }
       };
       var maxAbs = Math.max.apply(null, wirkReihe.map(function (v) { return Math.abs(v); }).concat([1]));
-      var rand = maxAbs * 0.32;
+      var rand = maxAbs * (schmal ? 0.6 : 0.32);
       var minX = Math.min(0, Math.min.apply(null, wirkReihe)) - (Math.min.apply(null, wirkReihe) < 0 ? rand : 0);
       var maxX = Math.max(0, Math.max.apply(null, wirkReihe)) + (Math.max.apply(null, wirkReihe) > 0 ? rand : 0);
 
@@ -3003,8 +3006,8 @@
           },
           scales: {
             x: { min: minX, max: maxX, grid: { color: function (c) { return c.tick && c.tick.value === 0 ? (isDark() ? 'rgba(232,226,212,.5)' : 'rgba(42,39,39,.45)') : gridCol; }, drawBorder: false },
-                 ticks: { color: axisCol, maxTicksLimit: 7, callback: function (v) { return (v < 0 ? '−' : v > 0 ? '+' : '') + Math.round(Math.abs(v) / 1000) + 'k €'; } },
-                 title: { display: true, text: 'Steuer gespart (+) bzw. mehr gezahlt (−) im Jahr ' + _kettenJahr(), color: axisCol } },
+                 ticks: { color: axisCol, maxTicksLimit: schmal ? 4 : 7, callback: function (v) { return (v < 0 ? '−' : v > 0 ? '+' : '') + Math.round(Math.abs(v) / 1000) + 'k €'; } },
+                 title: { display: true, text: schmal ? 'gespart (+) / mehr gezahlt (−) ' + _kettenJahr() : 'Steuer gespart (+) bzw. mehr gezahlt (−) im Jahr ' + _kettenJahr(), color: axisCol } },
             y: { grid: { display: false }, ticks: { color: function (c) { return c.index === nS ? (isDark() ? '#E8E2D4' : '#2A2727') : axisCol; },
                  font: function (c) { return c.index === nS ? { weight: '700' } : {}; }, autoSkip: false } }
           }
