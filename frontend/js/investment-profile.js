@@ -111,8 +111,12 @@ window.DealPilotInvestmentProfile = (function() {
     try {
       if (typeof window.dpGetIndicativeZins === 'function') {
         var stufe = window.dpGetIndicativeZins(binding, get('zins_margin') || 'standard');
-        var l = (ltv != null && isFinite(Number(ltv)) && Number(ltv) > 0) ? Number(ltv) : vorgabeLtv();
+        var _echt = (ltv != null && isFinite(Number(ltv)) && Number(ltv) > 0);
+        var l = _echt ? Number(ltv) : vorgabeLtv();
         var nachLtv = (l != null) ? window.dpGetIndicativeZins(binding, null, l) : null;
+        /* v3349c · eine ECHTE Beleihung (Quick-Check, Objekt) bekommt genau ihren Zins - derselbe Wert wie der
+           Hinweis „Marktzins bei LTV …“ im Reiter Objekt. Die Stufe als Untergrenze gilt nur für die Vorgabe. */
+        if (_echt && typeof nachLtv === 'number' && isFinite(nachLtv)) return nachLtv;
         var r = (typeof nachLtv === 'number' && isFinite(nachLtv))
           ? ((typeof stufe === 'number' && isFinite(stufe)) ? Math.max(stufe, nachLtv) : nachLtv) : stufe;
         if (typeof r === 'number' && isFinite(r)) return r;

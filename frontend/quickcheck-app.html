@@ -4691,7 +4691,8 @@ const QcApp = (function() {
   function scheduleUpdate() { clearTimeout(_updateTimer); _updateTimer = setTimeout(updateAll, 50); }
 
   function updateAll() {
-    try { _ekNachziehen(); } catch (_e) {}   /* qc-v2420: EK folgt KP/PLZ/Nebenkosten, solange es von hier stammt */
+    try { _ekNachziehen(); } catch (_e) {}
+    try { if (window._qcZinsNachLtv) window._qcZinsNachLtv(); } catch (_e) {}   /* v3349c: Zins folgt der Beleihung */   /* qc-v2420: EK folgt KP/PLZ/Nebenkosten, solange es von hier stammt */
     const inputs = QcEngine.getInputs();
     /* v969n: DealPilot Score (V1) im iframe. DealKpis -> computeFromKpis.
        Fallback: QcEngine.computeScore.
@@ -7778,6 +7779,48 @@ document.addEventListener('DOMContentLoaded', () => QcApp.init());
       } catch(e){}
       if (tries >= MAX) clearInterval(iv);
     }, 700);
+  })();
+  /* v3349c · Marcel 13.11.2026: „bei 100 % Beleihung steht im Tab Objekt bei 10 Jahren 4,6, in den Einstellungen
+     und im Quick-Check etwas anderes“. Gemessen: der Quick-Check übernahm getZins() OHNE Beleihung, also den Zins
+     der Vorgabe-Finanzierung aus den Einstellungen (Eigenkapital 10 %, Nebenkosten mitfinanziert = LTV 102 %,
+     4,68 %), egal welcher Beleihungsknopf hier gewählt ist. Das gespeicherte Objekt (Darlehen = Kaufpreis,
+     LTV 100 %) bekam 4,68 %, sein Marktzins-Hinweis sagt 4,60 %. Jetzt folgt der Zins der Beleihung DIESES
+     Quick-Checks (Darlehen / Kaufpreis, wie die LTV-Kachel), solange niemand selbst einen Zins tippt und in
+     den Einstellungen kein eigener Zinssatz steht. */
+  (function(){
+    var zEl = document.getElementById("qc_zins"); if (!zEl) return;
+    zEl.addEventListener("input", function(e){ if (e && e.isTrusted) zEl.dataset.userSet = "1"; });
+    function ltvJetzt(){
+      var kp = num((document.getElementById("qc_kp") || {}).value); if (!(kp > 0)) return null;
+      var knk = (typeof window._qcKnkPct === "function") ? Number(window._qcKnkPct()) || 0 : 0;
+      var gesamt = kp * (1 + knk / 100);
+      var ekRoh = ((document.getElementById("qc_ek") || {}).value || "").trim();
+      var ek = ekRoh !== "" ? num(ekRoh) : gesamt * 0.20;
+      return Math.max(0, gesamt - ek) / kp * 100;
+    }
+    function nachziehen(){
+      try {
+        if (zEl.dataset.userSet === "1") return;
+        var IP = window.parent && window.parent.DealPilotInvestmentProfile; if (!IP || typeof IP.getZins !== "function") return;
+        var ov = (typeof IP.get === "function") ? IP.get("zins_override") : null;
+        if (ov != null && String(ov).trim() !== "") return;
+        /* nur einen Zins ersetzen, der von hier oder aus dem Profil stammt - nie einen recherchierten/importierten */
+        var _fmt = function(x){ return (Math.round(x * 100) / 100).toFixed(2).replace(".", ","); };
+        var _ist = (zEl.value || "").trim(), _prof = IP.getZins();
+        var _vonUns = _ist === "" || _ist === zEl.dataset.zinsAuto || (_prof != null && isFinite(_prof) && num(_ist) === Math.round(_prof * 100) / 100);
+        if (!_vonUns) return;
+        var l = ltvJetzt(); if (l == null || !(l > 0)) return;
+        var z = IP.getZins(l); if (z == null || !isFinite(z) || z <= 0) return;
+        var neu = (Math.round(z * 100) / 100).toFixed(2).replace(".", ",");
+        if (zEl.value === neu) return;
+        zEl.value = neu; zEl.dataset.zinsAuto = neu; zEl.dataset.zinsLtv = String(Math.round(l));
+        try { zEl.dispatchEvent(new Event("input", { bubbles: true })); } catch(e){}
+      } catch(e){}
+    }
+    window._qcZinsNachLtv = nachziehen;
+    ["qc_kp", "qc_ek"].forEach(function(id){ var e = document.getElementById(id); if (e) { e.addEventListener("input", function(){ setTimeout(nachziehen, 120); }); e.addEventListener("change", function(){ setTimeout(nachziehen, 120); }); } });
+    document.addEventListener("click", function(e){ if (e.target && e.target.closest && e.target.closest(".ltv-btn")) setTimeout(nachziehen, 200); }, true);
+    setTimeout(nachziehen, 2600); setTimeout(nachziehen, 6000);
   })();
 })();
 </script>
