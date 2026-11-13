@@ -113,11 +113,13 @@
        aber ganz heraus (2 × 40 € fehlten in der Objektmiete). Sie wird jetzt mitgezählt
        (aus.stellplatzMiete) und geht in die Zusatzeinnahmen (object-actions.js). */
     aus.stellplatzMiete = 0; aus.stellplatzAnzahl = 0;
+    /* v3352 · Marcel 13.11.2026: Stellplätze und Küchen als eigene Mietposten (Quick-Check: Felder Stellplatz und Küche) */
+    aus.kuecheMiete = 0; aus.kuecheAnzahl = 0; aus.garagenAnzahl = 0;
     liste.forEach(function (w, i) {
       if (!w) return;
       var art = String(w.nutzung || w.art || '').toLowerCase();
       if (/stellplatz|garage|keller/.test(art)) {
-        if (typ === 'mietaufstellung' && zahl(w.kaltmiete_eur) > 0 && String(w.status || '').toLowerCase() !== 'leer') { aus.stellplatzMiete += zahl(w.kaltmiete_eur); aus.stellplatzAnzahl++; }
+        if (typ === 'mietaufstellung' && zahl(w.kaltmiete_eur) > 0 && String(w.status || '').toLowerCase() !== 'leer') { aus.stellplatzMiete += zahl(w.kaltmiete_eur); aus.stellplatzAnzahl++; if (/garage/.test(art)) aus.garagenAnzahl++; }
         return;
       }
       var e = { nr: String(w.nr || (i + 1)).replace(/^(we|wohnung|nr\.?)\s*/i, ''), lage: w.lage || '' };
@@ -127,6 +129,7 @@
       if (typ === 'mietaufstellung') {
         /* v3029-import · auf den Cent, nicht auf den Euro (6 × 512,50 € waren 3.078 statt 3.075 €) */
         if (zahl(w.kaltmiete_eur) > 0) { e.ist = String(Math.round(zahl(w.kaltmiete_eur) * 100) / 100).replace('.', ','); e.status = 'vermietet'; }
+        if (zahl(w.kueche_miete_eur) > 0 && String(w.status || '').toLowerCase() !== 'leer') { aus.kuecheMiete += zahl(w.kueche_miete_eur); aus.kuecheAnzahl++; }   /* v3352 */
         if (String(w.status || '').toLowerCase() === 'leer') { e.status = 'leer'; }
         if (VERTRAG[w.vertragsart]) e.mv_art = VERTRAG[w.vertragsart];
         if (datumIso(w.mietbeginn)) e.mv_beginn = datumIso(w.mietbeginn);

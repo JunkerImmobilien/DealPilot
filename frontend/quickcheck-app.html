@@ -4858,8 +4858,11 @@ const QcApp = (function() {
         '<span class="nul-pill">' + fmt0(k.nulY / 12) + ' € nicht umlagefähig</span> (trägst du: v. a. Verwaltung und Instandhaltungsrücklage; ' + fmt0(k.nulY) + ' €/Jahr)' +
         '<span class="qc-herkunft">Anteil nicht umlagefähig ' + (splitIst != null ? String(splitIst).replace('.', ',') : '–') + ' %: ' + quelle +
         '. Eine amtliche Quote gibt es nicht — die genaue Aufteilung steht in der Hausgeldabrechnung bzw. im Wirtschaftsplan.</span>';
+      /* v3352 · Marcel 13.11.2026: den nicht umlagefähigen Teil hinter dem Prozent auch in Euro */
+      try { const _sh = document.getElementById('qc-hg-split-hint'); if (_sh) _sh.innerHTML = '= <b>' + fmt0(k.nulY / 12) + ' €/Monat</b> nicht umlagefähig (' + fmt0(k.nulY) + ' €/Jahr). Rest geht über die Nebenkosten auf den Mieter.'; } catch (_e) {}
     } else {
       derived.textContent = 'Tragen Sie Hausgeld und NUL-Anteil ein …';
+      try { const _sh = document.getElementById('qc-hg-split-hint'); if (_sh) _sh.textContent = 'Rest geht über die Nebenkosten auf den Mieter.'; } catch (_e) {}
     }
 
     document.querySelectorAll('[data-avm-btn]').forEach(btn => {
@@ -5459,7 +5462,7 @@ const QcApp = (function() {
   function _applySelectionToQc(r) {
     const mm = _selectedValue(r, 'marktmiete');
     if (mm) {
-      setVal('qc_nkm_grund', String(Math.round(mm)));
+      _qcNkmMarkt(String(Math.round(mm)));
       if (typeof mieteAddUp === 'function') mieteAddUp();
       const fEl = document.getElementById('qc_nkm_grund');
       if (fEl) { const fld = fEl.closest('.field'); if (fld) fld.classList.add('has-source'); }
@@ -5483,7 +5486,7 @@ const QcApp = (function() {
           for (var _i = 0; _i < (_avmResults || []).length; _i++) { if (_avmResults[_i] && _avmResults[_i].provider === _pn) { _mm = _selectedValue(_avmResults[_i], 'marktmiete'); break; } }
         }
         if (_mm != null && isFinite(_mm)) {
-          setVal('qc_nkm_grund', String(Math.round(_mm)));
+          _qcNkmMarkt(String(Math.round(_mm)));
           if (typeof mieteAddUp === 'function') mieteAddUp();
           var _f = document.getElementById('qc_nkm_grund'); if (_f) { var _fl = _f.closest('.field'); if (_fl) _fl.classList.add('has-source'); }
           return;
@@ -5520,7 +5523,7 @@ const QcApp = (function() {
     }
     if (!mms.length) return;
     var avg = Math.round(mms.reduce(function (a, b) { return a + b; }, 0) / mms.length);
-    setVal('qc_nkm_grund', String(avg));
+    _qcNkmMarkt(String(avg));
     if (typeof mieteAddUp === 'function') mieteAddUp();
     var fEl = document.getElementById('qc_nkm_grund');
     if (fEl) { var fld = fEl.closest('.field'); if (fld) fld.classList.add('has-source'); }
@@ -5651,7 +5654,7 @@ const QcApp = (function() {
   }
 
   function applyAvmNkm(value) {
-    setVal('qc_nkm_grund', String(value));
+    _qcNkmMarkt(String(value));
     mieteAddUp();
     document.getElementById('qc_nkm_grund').closest('.field').classList.add('has-source');
     showToast('✓ Marktmiete als Grundmiete übernommen');
@@ -7430,7 +7433,7 @@ function renderTransferList() {
   };
   window._oabApplyConsensus = function (mw, mm) {
     try {
-      if (mm) { setVal('qc_nkm_grund', String(Math.round(mm))); if (typeof mieteAddUp === 'function') mieteAddUp(); }
+      if (mm) { _qcNkmMarkt(String(Math.round(mm))); if (typeof mieteAddUp === 'function') mieteAddUp(); }
       if (typeof scheduleUpdate === 'function') scheduleUpdate();
     } catch (e) {}
   };
@@ -7477,7 +7480,7 @@ function renderTransferList() {
                  der Score rührte sich nicht. Der Schutz gilt Getipptem, nicht
                  einem ausdrücklichen Klick. */
               if (mm) { var _nk = document.getElementById('qc_nkm'); if (_nk) delete _nk.dataset.userSet;
-                setVal('qc_nkm_grund', String(Math.round(mm))); if (typeof mieteAddUp === 'function') mieteAddUp(); }
+                _qcNkmMarkt(String(Math.round(mm))); if (typeof mieteAddUp === 'function') mieteAddUp(); }
               if (typeof scheduleUpdate === 'function') scheduleUpdate();
             } catch (e) {}
           },
@@ -7507,7 +7510,7 @@ function renderTransferList() {
   };
   window._oabApplyConsensus = function (mw, mm) {
     try {
-      if (mm) { setVal('qc_nkm_grund', String(Math.round(mm))); if (typeof mieteAddUp === 'function') mieteAddUp(); }
+      if (mm) { _qcNkmMarkt(String(Math.round(mm))); if (typeof mieteAddUp === 'function') mieteAddUp(); }
       if (typeof scheduleUpdate === 'function') scheduleUpdate();
     } catch (e) {}
   };
@@ -7626,6 +7629,49 @@ document.addEventListener('DOMContentLoaded', () => QcApp.init());
       try { if (typeof QcApp !== "undefined" && QcApp.addExposePhotos) QcApp.addExposePhotos(d.photos||[]); } catch(_){}
     }
   });
+})();
+</script>
+<script id="qc-marktmiete-frage">
+/* v3352 · Marcel 13.11.2026: „wenn wir eine Marktpreisindikation gemacht haben und auf obere Spanne klicken,
+   überschreibt er automatisch die Miete. Dann gefragt werden: soll die Marktmiete übernommen werden, oder
+   mit der ausgelesenen Miete weitergerechnet?“ Alle Stellen, die die Marktmiete in die Grundmiete schrieben
+   (Spanne, Konsens, Übernehmen-Knopf, Quellwahl), laufen jetzt über _qcNkmMarkt. Liegt eine Miete aus den
+   Unterlagen oder eine eigene Eingabe vor und weicht ab, wird gefragt statt überschrieben. */
+(function(){
+  function num(x){ return parseFloat(String(x||"").replace(/\./g,"").replace(",",".")) || 0; }
+  function eur(n){ return Math.round(n).toLocaleString("de-DE") + " €"; }
+  function g(id){ return document.getElementById(id); }
+  window._qcIstMiete = null;
+  function istLesen(quelle){ var gr = g("qc_nkm_grund"), nk = g("qc_nkm"); var w = num(gr && gr.value) || num(nk && nk.value);
+    window._qcIstMiete = w > 0 ? { wert: w, quelle: quelle } : null; }
+  window.addEventListener("message", function(ev){ var d = ev.data; if (d && d.source === "dp-app" && d.type === "qc-import-result") setTimeout(function(){ istLesen("aus den Unterlagen"); }, 400); });
+  function binden(){ ["qc_nkm_grund", "qc_nkm"].forEach(function(id){ var e = g(id); if (e && !e._istB) { e._istB = 1; e.addEventListener("input", function(ev){ if (ev.isTrusted) { istLesen("eigene Eingabe"); weg(); } }); } }); }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", binden); else binden();
+  function rechnen(){ try { if (typeof QcApp !== "undefined") { if (QcApp.mieteAddUp) QcApp.mieteAddUp(); if (QcApp.scheduleUpdate) QcApp.scheduleUpdate(); } } catch(e){} }
+  function setzen(w){ var gr = g("qc_nkm_grund"); if (gr) gr.value = String(Math.round(w)); }
+  function weg(){ var b = g("qc-mm-frage"); if (b) b.remove(); }
+  function leiste(html){ weg(); var gr = g("qc_nkm_grund") || g("qc_nkm"); var feld = gr && gr.closest(".field"); var ziel = (g("qc_nkm") && g("qc_nkm").closest(".field")) || feld; if (!ziel) return null;
+    var b = document.createElement("div"); b.id = "qc-mm-frage";
+    b.setAttribute("style", "margin:8px 0 4px;padding:10px 12px;border-radius:8px;border:1px solid rgba(201,168,76,.45);background:#FBF6E9;font-size:12.5px;line-height:1.45;color:#2A2727");
+    b.innerHTML = html; ziel.parentNode.insertBefore(b, ziel.nextSibling); return b; }
+  function frage(markt, ist){
+    var b = leiste('<div style="margin-bottom:7px"><b>Marktmiete ' + eur(markt) + '/Monat</b> aus der Marktpreisindikation. Gerechnet wird mit <b>' + eur(ist.wert) + '</b> (' + ist.quelle + ').</div>'
+      + '<button type="button" data-a="markt" style="margin:0 6px 4px 0;padding:6px 10px;border-radius:6px;border:1px solid #C9A84C;background:#C9A84C;color:#fff;font-weight:600;cursor:pointer">Marktmiete übernehmen</button>'
+      + '<button type="button" data-a="ist" style="margin:0 0 4px;padding:6px 10px;border-radius:6px;border:1px solid rgba(42,39,39,.25);background:#fff;color:#2A2727;cursor:pointer">Mit ' + eur(ist.wert) + ' weiterrechnen</button>');
+    if (!b) return;
+    b.addEventListener("click", function(e){ var t = e.target.closest("button"); if (!t) return;
+      if (t.getAttribute("data-a") === "markt") { setzen(markt); rechnen();
+        var z = leiste('Marktmiete <b>' + eur(markt) + '</b> übernommen. <button type="button" data-a="zurueck" style="margin-left:6px;padding:4px 9px;border-radius:6px;border:1px solid rgba(42,39,39,.25);background:#fff;cursor:pointer">zurück zu ' + eur(ist.wert) + '</button>');
+        if (z) z.addEventListener("click", function(e2){ if (e2.target.closest('button[data-a="zurueck"]')) { setzen(ist.wert); rechnen(); weg(); } });
+      } else weg();
+    });
+  }
+  window._qcNkmMarkt = function(v){
+    var w = num(v); if (!(w > 0)) return;
+    var ist = window._qcIstMiete;
+    if (!ist || Math.abs(ist.wert - w) < 1) { setzen(w); return; }
+    frage(w, ist);
+  };
 })();
 </script>
 <script id="qc-profile-defaults">

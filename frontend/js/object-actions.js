@@ -2106,7 +2106,10 @@
            in recompute() löschte sie danach - die Zeilen fehlten ganz. Ein Vertrag ist EINE Einheit: er
            überschreibt kein Objektfeld, das eine andere Unterlage schon gesetzt hat. */
         if (t.typ === 'mietvertrag' && /^(nkm|wfl|zimmer|ze)$/.test(z.feld) && _merged[z.feld] && _merged[z.feld].typ !== 'mietvertrag') return;
-        _merged[z.feld] = { nurAktiv: t.typ === 'hausgeld', label: z.wort, value: z.anzeige, raw: z.neu, source: t.label || 'Dokument', kind: z.feld === 'ds2_energie' ? 'select' : 'input', herleitung: z.herleitung, einheit: z.einheit, ort: z.ort, typ: t.typ };
+        /* v3352 · beim ganzen Haus (MFH/WGH/ZFH) IST der Gesamtplan der Gemeinschaft das Hausgeld des Objekts -
+           dort vorgehakt. Bei ETW/Einzelwohnung bleibt es beim aktiven Anstoßen (v3088a). */
+        var _ganzesHaus = /^(MFH|WGH|ZFH)$/.test(ktx.objart || '');
+        _merged[z.feld] = { nurAktiv: t.typ === 'hausgeld' && !_ganzesHaus, label: z.wort, value: z.anzeige, raw: z.neu, source: t.label || 'Dokument', kind: z.feld === 'ds2_energie' ? 'select' : 'input', herleitung: z.herleitung, einheit: z.einheit, ort: z.ort, typ: t.typ };
       });
       /* v3017 · Wirtschaftsplan/Abrechnung → Steuer-Reiter. Weicht der Vorschlag vom heutigen Wert ab,
          ist die Zeile nicht vorgehakt und zeigt den bisherigen Wert („erstmal drauf hinweisen") */
@@ -2221,11 +2224,13 @@
     if (we.length && window.DpMfhEinheiten && typeof window.DpMfhEinheiten.vorbelegen === 'function') {
       var miete = we.reduce(function (s, e) { return s + (numDe(e.ist) || 0); }, 0);
       var stp = numDe(we.stellplatzMiete) || 0;
+      var kue = numDe(we.kuecheMiete) || 0;   /* v3352 · Küchen- bzw. Möblierungsmiete der Liste */
       /* v3029-import · Abgleich mit der Summe, die die Liste selbst nennt (Wohnen/Gewerbe + Stellplätze) */
       var herl = 'öffnet nach dem Übernehmen das Fenster „Einheiten erfassen“ — dort prüfen und übernehmen' + (_mvRein.length ? ' · Mietverträge eingearbeitet: ' + _mvRein.join(', ') : '');
       var sl = we._summeListe;
       if (sl > 0) {
-        var diff = Math.round((miete + stp - sl) * 100) / 100;
+        var diff = Math.round((miete + stp + kue - sl) * 100) / 100;
+        if (Math.abs(diff) >= 1 && kue > 0 && Math.abs(miete + stp - sl) < 1) diff = 0;   /* Liste summiert ohne Küchen */
         herl += Math.abs(diff) < 1 ? ' · Summe stimmt mit der Liste überein (' + fmt0(sl) + ' €/Monat)'
           : ' · ACHTUNG: Einheiten + Stellplätze ergeben ' + (miete + stp).toLocaleString('de-DE', { maximumFractionDigits: 2 }) + ' €/Monat, die Liste nennt ' + sl.toLocaleString('de-DE', { maximumFractionDigits: 2 }) + ' € - bitte im Fenster prüfen';
       }
@@ -2237,16 +2242,24 @@
          (4.080 €). Ist die Objektmiete genau Wohnungen + Stellplätze der Liste, gilt die Summe der Wohnungen. */
       if (stp > 0 && miete > 0 && _merged.nkm && !_merged.nkm.dgSumme) {
         var _nkmAlt = numDe(_merged.nkm.raw);
-        if (_nkmAlt > 0 && Math.abs(_nkmAlt - (miete + stp)) < 1) {
+        if (_nkmAlt > 0 && (Math.abs(_nkmAlt - (miete + stp)) < 1 || (kue > 0 && Math.abs(_nkmAlt - (miete + stp + kue)) < 1))) {
           var _nkmNeu = Math.round(miete * 100) / 100;
           _merged.nkm.raw = String(_nkmNeu);
           _merged.nkm.value = _nkmNeu.toLocaleString('de-DE', { maximumFractionDigits: 2 }) + ' €';
           _merged.nkm.herleitung = (_merged.nkm.source || 'Unterlage') + ' nannte ' + fmt0(_nkmAlt) + ' € inklusive Stellplätze - die ' + fmt0(stp) + ' € stehen unten als Zusatzeinnahme';
         }
       }
-      if (stp > 0) {
-        _merged.ze = { label: 'Zusätzliche Einnahmen / Monat (Stellplätze)', value: stp.toLocaleString('de-DE', { maximumFractionDigits: 2 }) + ' €', raw: String(Math.round(stp * 100) / 100), source: 'Mieterliste', kind: 'input',
-          herleitung: (we.stellplatzAnzahl || 0) + ' Stellplätze/Garagen aus der Mieterliste' };
+      /* v3352 · Marcel 13.11.2026: „die Stellplätze hast du unter Sonstiges geschrieben, da gibt es Felder für“.
+         Im Quick-Check gehen sie in das Feld Stellplatz (qc_nkm_stp), Küchenmieten in Küche (qc_nkm_kueche); im
+         Objekt gibt es nur ein Feld Zusatzeinnahmen (ze), dort die Summe. */
+      var _de2 = function (n) { return n.toLocaleString('de-DE', { maximumFractionDigits: 2 }) + ' €'; }, _r2 = function (n) { return String(Math.round(n * 100) / 100); };
+      var _stpText = (we.stellplatzAnzahl || 0) + ' Stellplätze' + (we.garagenAnzahl ? ' (davon ' + we.garagenAnzahl + ' Garagen)' : '') + ' aus der Mieterliste';
+      if (_qcMode) {
+        if (stp > 0) _merged.ze_stp = { label: 'Miete Stellplätze / Monat', value: _de2(stp), raw: _r2(stp), source: 'Mieterliste', kind: 'input', herleitung: _stpText };
+        if (kue > 0) _merged.ze_kueche = { label: 'Miete Küchen / Monat', value: _de2(kue), raw: _r2(kue), source: 'Mieterliste', kind: 'input', herleitung: (we.kuecheAnzahl || 0) + ' Einheiten mit Küchenmiete aus der Mieterliste' };
+      } else if (stp + kue > 0) {
+        _merged.ze = { label: 'Zusätzliche Einnahmen / Monat (' + (stp > 0 && kue > 0 ? 'Stellplätze und Küchen' : stp > 0 ? 'Stellplätze' : 'Küchen') + ')', value: _de2(stp + kue), raw: _r2(stp + kue), source: 'Mieterliste', kind: 'input',
+          herleitung: (stp > 0 ? _stpText + ' ' + _de2(stp) : '') + (stp > 0 && kue > 0 ? ' · ' : '') + (kue > 0 ? (we.kuecheAnzahl || 0) + ' Küchen ' + _de2(kue) : '') };
       }
     }
   }

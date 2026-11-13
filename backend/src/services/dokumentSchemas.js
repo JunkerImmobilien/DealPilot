@@ -521,7 +521,7 @@ const SCHEMATA = {
       '{',
       '  "stichtag": string DD.MM.JJJJ,',
       '  "adresse": string,',
-      '  "einheiten": [{"nr": string, "lage": string, "nutzung": "wohnen"|"gewerbe"|"stellplatz", "wfl_m2": number, "zimmer": number, "kaltmiete_eur": number (je Monat), "nk_vorauszahlung_eur": number, "status": "vermietet"|"leer", "mietbeginn": string DD.MM.JJJJ, "vertragsart": "unbefristet"|"staffel"|"index"|"zeitmiete"|"gewerbe", "letzte_erhoehung": string DD.MM.JJJJ, "kaution_eur": number}],',
+      '  "einheiten": [{"nr": string, "lage": string, "nutzung": "wohnen"|"gewerbe"|"stellplatz"|"garage", "wfl_m2": number, "zimmer": number, "kaltmiete_eur": number (je Monat, OHNE Kuechenmiete/Moeblierungszuschlag), "kueche_miete_eur": number (je Monat, nur wenn die Liste fuer die Einheit eine eigene Kuechen- oder Moeblierungsmiete nennt, sonst weglassen), "nk_vorauszahlung_eur": number, "status": "vermietet"|"leer", "mietbeginn": string DD.MM.JJJJ, "vertragsart": "unbefristet"|"staffel"|"index"|"zeitmiete"|"gewerbe", "letzte_erhoehung": string DD.MM.JJJJ, "kaution_eur": number}],',
       '  "summe_kaltmiete_monat_eur": number,',
       '  "summe_wfl_m2": number,',
       '  "risiken": [{"titel": string (kurz), "beschreibung": string (1-2 Saetze: was steht da, was folgt daraus fuer einen Kaeufer/Investor), "schwere": "hoch"|"mittel"|"niedrig", "kosten_eur": number|null, "jahr": number|null, "fundstelle": string (Seite/TOP/Abteilung)}] (z. B. Leerstand, Gewerbeanteil, viele Altvertraege ohne Erhoehung)',
