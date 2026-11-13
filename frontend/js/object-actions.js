@@ -1724,8 +1724,13 @@
     text = String(text || '').slice(0, 12000);   /* v2218h · wie bisher: 12.000 Zeichen an die KI */
     var res = await fetch('/api/v1/ai/' + (isMarket ? 'extract-market-data' : 'extract-expose'), { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token() }, body: JSON.stringify({ text: text }) });
     var j = await res.json().catch(function () { return {}; });
+    /* v3349d · gemessen 13.11.2026: eine 429 („Zu viele Dokument-Auswertungen“) kam hier als leeres Ergebnis
+       zurück, jede Datei stand als „Exposé · nichts gelesen“ da, ohne den Grund */
+    if (!res.ok) { var _err = new Error((j && j.error) || ('Status ' + res.status)); _err.status = res.status; throw _err; }
     return (j && j.extracted) ? j.extracted : (j || {});
   }
+  var LIMIT_TEXT = 'Stundenlimit der KI-Auswertung erreicht, in einer Stunde erneut einlesen';
+  function _istLimit(e) { return !!e && (e.status === 429 || /zu viele|429|stunde warten/i.test(String(e.message || e.error || e))); }
 
   /* ── svwert-Label: §194 ↔ Marktpreisindikation (AVM) ── */
   function _firstTextNode(el) {
@@ -2816,12 +2821,14 @@
     if (window.DokumentImport && istDokument(f.text, f.name)) {
       f.type = 'dokument'; await ensureExtract(f);
       if (f.cache.dokument && f.cache.dokument.success) return;
+      if (f.limit) return;   /* v3349d · beim Stundenlimit nicht noch zwei weitere Abrufe versuchen */
       delete f.cache.dokument;        /* unklar → der alte Weg */
     }
     var cls = classifyType({ name: f.name }, String(f.text || '').slice(0, 12000));   /* Einordnung wie bisher auf dem Anfang */
     if (cls === 'market' || cls === 'expose') { f.type = cls; await ensureExtract(f); return; }
     setStatus(f, 'Typ prüfen…');
     f.type = 'market'; await ensureExtract(f);
+    if (f.limit) return;
     if (f.cache.market && hasMarketSignals(f.cache.market)) return;   // bestätigt Marktbericht
     f.type = 'expose'; await ensureExtract(f);                        // sonst Exposé
   }
@@ -2835,6 +2842,7 @@
         f.cache.dokument = _a; f.status = (_a && _a.success) ? 'ok' : (_a && _a.gesperrt) ? 'gesperrt' : 'err';
         if (_a && _a.success) f.dokLabel = _a.label || 'Dokument';
         if (_a && !_a.success && _a.error) f.fehler = _a.unklar ? 'Art unklar' : 'nicht gelesen';
+        if (_a && !_a.success && _istLimit(_a)) { f.limit = true; f.fehler = LIMIT_TEXT; }
       } else {
         f.cache[f.type] = await callExtract(f.text, f.type === 'market'); f.status = 'ok';
         /* v3016b · ein MFH-Exposé trägt oft eine Mieterliste - das Exposé-Schema kennt keine
@@ -2844,7 +2852,7 @@
         }
       }
     }
-    catch (e) { f.status = 'err'; }
+    catch (e) { f.status = 'err'; if (_istLimit(e)) { f.limit = true; f.fehler = LIMIT_TEXT; delete f.cache[f.type]; } }
     renderFileRow(f);
   }
   async function onTypeChange(f, v) {

@@ -177,7 +177,16 @@
     setz('stellplatz_miete', zahl(ext.stellplatz_miete_eur));
     setz('mv_befristet_bis', isoAus(ext.befristet_bis));
     setz('mv_kuendigungsverzicht_bis', isoAus(ext.kuendigungsverzicht_bis));
-    setz('mv_letzte_erhoehung', isoAus(ext.letzte_erhoehung));
+    /* v3349d · gemessen an Lindenallee 14, WE 3 (Staffel): „letzte Erhöhung 01.08.2028“ - die Lesung nahm eine
+       künftige Staffelstufe. Eine letzte Erhöhung liegt nie in der Zukunft; bei Staffeln gilt die jüngste
+       Stufe bis heute. */
+    var _letzte = isoAus(ext.letzte_erhoehung);
+    if (_letzte && _letzte > heute) _letzte = '';
+    if (Array.isArray(ext.staffeln)) {
+      var _bisHeute = ext.staffeln.map(function (s) { return isoAus(s && s.ab); }).filter(function (d) { return d && d <= heute && d > String(isoAus(ext.mietbeginn) || ''); }).sort();
+      if (_bisHeute.length && (!_letzte || _bisHeute[_bisHeute.length - 1] > _letzte)) _letzte = _bisHeute[_bisHeute.length - 1];
+    }
+    setz('mv_letzte_erhoehung', _letzte);
     if (ext.mieter_name && ext.mieter_name.name && (neuerVertrag || !String(e.mv_mieter || '').trim())) setz('mv_mieter', ext.mieter_name.name);   /* v3150 */
     if (Array.isArray(ext.staffeln)) {
       var naechste = ext.staffeln.map(function (s) { return isoAus(s && s.ab); }).filter(function (d) { return d && d > heute; }).sort()[0];
