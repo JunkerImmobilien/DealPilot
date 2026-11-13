@@ -169,14 +169,17 @@ export function zielMaximum(v, bremse, ausnahme) {
     : 'gilt, wenn Ausstattung, Lage und Zustand der Wohnung die Einordnung am Oberwert der Spanne tragen (BGH VIII ZR 82/18). Sonst gilt der Mittelwert ' + ca + qmDe(v.mittel) + ' €/m²';
   const neuMax = r2(oben * f), kons = r2(v.mittel);
   const ausn = mitBremse && (ausnahme === '556e' || ausnahme === '556f');
+  /* v3347 · Marcel 13.11.2026: Maximum mit Bedingung UND der sichere Wert (vom Mittelwert), wie die Landing */
+  const neuSicher = r2(v.mittel * f);
+  const sicher = (oben > v.mittel) ? ' Ohne Einordnung am Oberwert ' + ca + qmDe(neuSicher) + ' €/m².' : '';
   const texte = [
     'Bestandsmieter: bis zum Oberwert ' + ca + qmDe(oben) + ' €/m² (§ 558 BGB), in Schritten der Kappungsgrenze, frühestens 15 Monate nach der letzten Erhöhung.',
     mitBremse
       ? 'Neuvermietung: höchstens 110 % der Vergleichsmiete, ' + ca + qmDe(neuMax) + ' €/m² (Mietpreisbremse § 556d BGB' + (gilt == null ? ', ob sie gilt, bitte prüfen' : '') + ')'
-        + (ausn ? '. Eingetragene Ausnahme (' + (ausnahme === '556e' ? 'höhere Vormiete § 556e' : 'umfassende Modernisierung § 556f') + ') erlaubt mehr.' : '. Mehr nur mit Vormiete (§ 556e) oder nach umfassender Modernisierung (§ 556f).')
-      : 'Neuvermietung: ohne Mietpreisbremse frei vereinbar, unbedenklich bis 120 % der Vergleichsmiete, ' + ca + qmDe(neuMax) + ' €/m². Darüber Bußgeldrisiko nach § 5 WiStG nur bei Ausnutzung eines geringen Angebots.',
+        + (ausn ? '. Eingetragene Ausnahme (' + (ausnahme === '556e' ? 'höhere Vormiete § 556e' : 'umfassende Modernisierung § 556f') + ') erlaubt mehr.' : '. Mehr nur mit Vormiete (§ 556e) oder nach umfassender Modernisierung (§ 556f).') + sicher
+      : 'Neuvermietung: ohne Mietpreisbremse frei vereinbar, unbedenklich bis 120 % der Vergleichsmiete, ' + ca + qmDe(neuMax) + ' €/m².' + sicher + ' Darüber Bußgeldrisiko nach § 5 WiStG nur bei Ausnutzung eines geringen Angebots.',
   ];
-  return { bestand_max_qm: r2(oben), neu_max_qm: neuMax, konservativ_qm: kons, risiko_ab_qm: neuMax, faktor: f,
+  return { bestand_max_qm: r2(oben), neu_max_qm: neuMax, neu_sicher_qm: neuSicher, konservativ_qm: kons, risiko_ab_qm: neuMax, faktor: f,
     bremse_gilt: gilt, ausnahme: ausn ? ausnahme : null, ca: !!v.ca, bedingung: bed, texte, hinweis: HINWEIS_RECHT };
 }
 

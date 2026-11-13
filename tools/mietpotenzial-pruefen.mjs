@@ -483,10 +483,10 @@ const EINH = [{ nr: '1', wfl: '60', ist: '480', status: 'vermietet' }, { nr: '2'
   const MSF = { ms_art: 'qualifiziert', ms_unten: '6,80', ms_mittel: '7,60', ms_oben: '8,40', ms_stand: '2025-03' };
   let P = await lauf(Object.assign({ plz: '52062', ds2_marktmiete: '14' }, MSF));
   let m = P.modell({ einheiten: EIN1 });
-  gleich('K9 Mietspiegel-Eingabe (v3343: ohne Merkmale Mittelwert) vor der Marktmiete: 7,60, § 558 bis 456', [m.vgl.qm, m.vgl.quelle_art, !!m.vgl.marktmiete, P.soll558(m.wohnungen[0])], [7.6, 'mietspiegel_qualifiziert', false, 456]);
-  gleich('K9 an der Einheit: Quelle, Mietspiegel und Hinweise', [m.wohnungen[0].soll.vgl_quelle_art, m.wohnungen[0].soll.ms.genutzt, m.wohnungen[0].soll.vgl_hinweise.length > 0], ['mietspiegel_qualifiziert', 'mittel', true]);
+  gleich('K9 Mietspiegel-Eingabe (Standard oben, v3347) vor der Marktmiete: 8,40, § 558 bis 504', [m.vgl.qm, m.vgl.quelle_art, !!m.vgl.marktmiete, P.soll558(m.wohnungen[0])], [8.4, 'mietspiegel_qualifiziert', false, 504]);
+  gleich('K9 an der Einheit: Quelle, Mietspiegel und Hinweise', [m.wohnungen[0].soll.vgl_quelle_art, m.wohnungen[0].soll.ms.genutzt, m.wohnungen[0].soll.vgl_hinweise.length > 0], ['mietspiegel_qualifiziert', 'oben', true]);
   let zv = P.mietrechtDaten(m, 0).zeilen.find((z) => z.k === 'Vergleichsmiete');
-  wahr('K9 Mietrecht-Zeile „Vergleichsmiete“: 7,60 €/m² · Mittelwert, Quelle und § 558a Abs. 3', zv && /7,60/.test(zv.v) && /Mittelwert/.test(zv.v) && /eigene Eingabe aus dem Mietspiegel der Stadt/.test(zv.u) && /§ 558a Abs\. 3/.test(zv.u));
+  wahr('K9 Mietrecht-Zeile „Vergleichsmiete“: 8,40 €/m² · oberer Spannenwert, Quelle und § 558a Abs. 3', zv && /8,40/.test(zv.v) && /oberer Spannenwert/.test(zv.v) && /eigene Eingabe aus dem Mietspiegel der Stadt/.test(zv.u) && /§ 558a Abs\. 3/.test(zv.u));
   P = await lauf(Object.assign({ plz: '52062', ms_wahl: 'mittel' }, MSF));
   m = P.modell({ einheiten: EIN1 });
   gleich('K10 Schalter ms_wahl = mittel: 7,60, § 558 bis 456', [m.vgl.qm, P.soll558(m.wohnungen[0])], [7.6, 456]);
@@ -497,7 +497,7 @@ const EINH = [{ nr: '1', wfl: '60', ist: '480', status: 'vermietet' }, { nr: '2'
   m = P.modell({ einheiten: EIN1 });
   gleich('K11 eigene belegte Vergleichsmiete schlägt den Mietspiegel', [m.vgl.qm, m.vgl.quelle_art, m.wohnungen[0].soll.ms === undefined], [8, 'eigen', true]);
   P = await lauf(Object.assign({ plz: '52062' }, MSF), { _dpMarktdaten: { vergleichsmiete: { qm: 9.5, art: 'mietpreisuebersicht', quelle: 'Gutachterausschuss Muster' } } });
-  gleich('K12 Mietspiegel-Eingabe vor der amtlichen Mietpreisübersicht', [P.modell({ einheiten: EIN1 }).vgl.qm, P.modell({ einheiten: EIN1 }).vgl.quelle_art], [7.6, 'mietspiegel_qualifiziert']);
+  gleich('K12 Mietspiegel-Eingabe vor der amtlichen Mietpreisübersicht', [P.modell({ einheiten: EIN1 }).vgl.qm, P.modell({ einheiten: EIN1 }).vgl.quelle_art], [8.4, 'mietspiegel_qualifiziert']);
   P = await lauf(Object.assign({ plz: '52062', ds2_marktmiete: '14', ms_wahl: 'oben' }, MSF));
   gleich('K12b eigene Wahl „oben“ schlägt die Einordnung (v3343): 8,40, § 558 bis 504', [P.modell({ einheiten: EIN1 }).vgl.qm, P.soll558(P.modell({ einheiten: EIN1 }).wohnungen[0])], [8.4, 504]);
   P = await lauf(Object.assign({ plz: '52062', ms_art: 'qualifiziert', ms_oben: '8,40', ms_unten: '6,80', ms_stand: '2024-05' }));
@@ -666,15 +666,15 @@ const EINH = [{ nr: '1', wfl: '60', ist: '480', status: 'vermietet' }, { nr: '2'
   let P = await lauf({ plz: '32423', baujahr: '1972', wfl: '50', ds2_marktmiete: '12' }, '05770024');
   P.modell(); await warte(); await warte();
   let m = P.modell();
-  gleich('M4 Einzelobjekt Minden: Register-Werte rechnen, Mittelwert 7,70 (v3343: Standard ohne Merkmale), qualifiziert, Quelle Register',
-    [m.vgl.qm, m.vgl.quelle_art, m.vgl.ms.quelle, m.vgl.ms.unten, m.vgl.ms.mittel, m.vgl.werte && m.vgl.werte.zelle], [7.7, 'mietspiegel_qualifiziert', 'register', 6.55, 7.7, 'Baujahr 1961 bis 1977 · 50 m²']);
+  gleich('M4 Einzelobjekt Minden: Register-Werte rechnen, oberer Wert 8,93 (Standard, v3347), qualifiziert, Quelle Register',
+    [m.vgl.qm, m.vgl.quelle_art, m.vgl.ms.quelle, m.vgl.ms.unten, m.vgl.ms.mittel, m.vgl.werte && m.vgl.werte.zelle], [8.93, 'mietspiegel_qualifiziert', 'register', 6.55, 7.7, 'Baujahr 1961 bis 1977 · 50 m²']);
   wahr('M4 Abruf mit Baujahr und Fläche über den Proxy', rufe.some((u) => /^\/marktbericht\/mietspiegel\?ags=05770024&baujahr=1972&wfl=50$/.test(u)));
   P = await lauf({ plz: '32423', baujahr: '1972', wfl: '50', ds2_marktmiete: '12', 'ms-hinweis': '' }, '05770024');
   P.modell(); await warte(); await warte();
   P.msHinweis && P.msHinweis();
   const txt = String((P._el['ms-hinweis'] || {}).innerHTML || '').replace(/<[^>]+>/g, '').replace(/&nbsp;| /g, ' ');
   wahr('M7 Anzeige #ms-hinweis: „Mietspiegel der Gemeinde Minden · Werte für Baujahr 1972, 50 m²: 6,55 / 7,70 / 8,93 €/m² · gerechnet mit oberem Wert“',
-    /Mietspiegel der Gemeinde Minden · Werte für Baujahr 1972, 50 m²: 6,55 \/ 7,70 \/ 8,93 €\/m² · gerechnet mit (dem )?Mittelwert/.test(txt));
+    /Mietspiegel der Gemeinde Minden · Werte für Baujahr 1972, 50 m²: 6,55 \/ 7,70 \/ 8,93 €\/m² · gerechnet mit oberem Wert/.test(txt));
   wahr('M7 kein „Werte eintragen“, wenn das Register sie führt', !/Werte aus dem Mietspiegel eintragen/.test(txt));
   P = await lauf({ plz: '32423', baujahr: '1972', wfl: '50', ms_wahl: 'mittel', ds2_marktmiete: '12' }, '05770024');
   P.modell(); await warte(); await warte();
@@ -695,14 +695,14 @@ const EINH = [{ nr: '1', wfl: '60', ist: '480', status: 'vermietet' }, { nr: '2'
   gleich('M3 außerhalb der Tabelle: kein Mietspiegelwert, Schätzung bleibt', m.vgl.quelle_art, 'angebot_abschlag');
   /* MFH: je Wohnung die eigene Zelle (Wohnungsgröße) */
   const W = werteFuer('05770024');
-  const soll = (fl) => mietspiegelWerteFuer(W, { baujahr: 1972, wfl: fl }).mittel;   /* v3343 · Standard Mittelwert */
+  const soll = (fl) => mietspiegelWerteFuer(W, { baujahr: 1972, wfl: fl }).oben;   /* v3347 · Standard oberer Wert (Marcel 13.11.) */
   const EIN = [{ nr: '1', wfl: '35', ist: '250', status: 'vermietet', mv_letzte_erhoehung: '2023-01-01' },
     { nr: '2', wfl: '95', ist: '500', status: 'vermietet', mv_letzte_erhoehung: '2023-01-01' }];
   P = await lauf({ plz: '32423', baujahr: '1972', ds2_marktmiete: '12' }, '05770024', EIN);
   P.modell({ einheiten: EIN }); await warte(); await warte();
   m = P.modell({ einheiten: EIN });
   const vq = m.wohnungen.map((w) => w.soll && w.soll.vgl_qm);
-  gleich('M6 MFH: je Wohnung eigene Zelle — 35 m² und 95 m² (Mittelwert)', vq, [soll(35), soll(95)]);
+  gleich('M6 MFH: je Wohnung eigene Zelle — 35 m² und 95 m² (oberer Wert)', vq, [soll(35), soll(95)]);
   wahr('M6 die beiden Zellen unterscheiden sich (Wohnungsgröße zählt)', vq[0] > vq[1]);
   gleich('M6 Quelle je Wohnung: qualifizierter Mietspiegel', m.wohnungen.map((w) => w.soll && w.soll.vgl_quelle_art), ['mietspiegel_qualifiziert', 'mietspiegel_qualifiziert']);
 }
@@ -793,7 +793,7 @@ const EINH = [{ nr: '1', wfl: '60', ist: '480', status: 'vermietet' }, { nr: '2'
   P = await lauf({ plz: '32423', baujahr: '1972', wfl: '50', ds2_marktmiete: '12' }, '05770024');
   P.modell(); await warte(); await warte();
   m = P.modell();
-  gleich('N8 freie (bzw. auf Staging ausgelieferte) Werte: Mietspiegel, nie Näherung', [m.vgl.quelle_art, m.vgl.qm], ['mietspiegel_qualifiziert', 7.7]);
+  gleich('N8 freie (bzw. auf Staging ausgelieferte) Werte: Mietspiegel, nie Näherung', [m.vgl.quelle_art, m.vgl.qm], ['mietspiegel_qualifiziert', 8.93]);
   P = await lauf({ plz: '32423', baujahr: '1972', wfl: '50', ds2_marktmiete: '12', 'ms-hinweis': '' }, '05770024', { nur_frei: '1' });
   P.modell(); await warte(); await warte();
   m = P.modell();

@@ -285,7 +285,9 @@
        „Mietwucher" nie für § 5 WiStG. Alles als Orientierung, keine Rechtsberatung.
      Ohne Spanne (DealPilot-Näherung): oberer Rand typisch × 1,186 = Median Oberwert/Mittelwert über 3.051 Felder aus
      70 freien Mietspiegeln (gemessen 12.11.2026), mit „ca.". */
-  var OBEN_TYPISCH = 1.186;
+  /* landing-dealcheck-10 · Marcel 13.11.2026: EIN Faktor mit der App (lib/mietanker.js NAEHERUNG_OBEN 1,14,
+     477 Rasterpunkte). Die 1,186 oben stammt aus einer anderen Zählung (3.051 Felder) und lag höher. */
+  var OBEN_TYPISCH = 1.14;
   /* landing-dealcheck-8b · Marcel 12.11.2026: „bitte ohne ; oder – nur mit Punkt und Komma … Mietwucher anders
      ausdrücken". Kurze Sätze, kein Gedankenstrich, kein Semikolon, das Wort Mietwucher fällt weg. */
   function mieteSatz(vg, kp, mb, wfl) {
@@ -299,7 +301,7 @@
     if (mb && mb.gilt === true) t += '<b>Neuvermietung:</b> hier gilt die Mietpreisbremse. Nach § 556d BGB sind höchstens 110 % der Vergleichsmiete erlaubt, also ' + eu(vg.qm * 1.1)
       + ', am oberen Rand ' + eu(oben * 1.1, true) + '. Ausnahmen gibt es bei höherer Vormiete, Modernisierung in den letzten 3 Jahren und Erstbezug nach dem 01.10.2014.';
     else if (mb && mb.gilt === false) t += '<b>Neuvermietung:</b> hier gilt keine Mietpreisbremse, die Miete ist frei vereinbar. Unbedenklich sind bis zu 120 % der Vergleichsmiete, also ' + eu(vg.qm * 1.2)
-      + '. Wer darüber geht und dabei ein knappes Wohnungsangebot ausnutzt, riskiert ein Bußgeld wegen überhöhter Miete (§ 5 WiStG).';
+      + ', am oberen Rand ' + eu(oben * 1.2, true) + ', wenn Ausstattung, Lage und Zustand das tragen. Wer darüber geht und dabei ein knappes Wohnungsangebot ausnutzt, riskiert ein Bußgeld wegen überhöhter Miete (§ 5 WiStG).';
     else t += '<b>Neuvermietung:</b> ob die Mietpreisbremse gilt, bitte prüfen.';
     if (mitW) {
       var ist = nkm / wfl, abw = (ist / vg.qm - 1) * 100;

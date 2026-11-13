@@ -1091,10 +1091,13 @@
   }
   /* v3343 · ohne eigene Wahl gilt die Einordnung nach den Merkmalen (lib/mietanker.js einordnung, BGH VIII ZR 82/18):
      Oberwert nur, wenn Ausstattung, Lage und Zustand ihn tragen, sonst Mittelwert. Bis v3342 stand hier „oben". */
+  /* v3347 · Marcel 13.11.2026 „ja" (Entscheidung 09.11. bestätigt): ohne eigene Wahl rechnet § 558 mit dem
+     OBEREN Spannenwert, das Maximum für den Investor. Die Bedingung (Ausstattung, Lage, Zustand tragen den
+     Oberwert, BGH VIII ZR 82/18) steht als Hinweis daneben (mietpotenzial-kern HW_MS.oben). Der v3343-Weg
+     (Einordnung nach Merkmalen, Rückfall „mittel") gilt nur noch für den Ertragswert, nicht für das Soll. */
   function msWahl() {
     var w = wert('ms_wahl'); if (K.MS_WAHL[w]) return w;
-    var z = zielMaxFuer(msObjektWfl()), e = z && z.vergleich && z.vergleich.einordnung;
-    return e && K.MS_WAHL[e.wahl] ? e.wahl : 'mittel';
+    return 'oben';
   }
   /* v3246 · Stufe des Abschlags Angebotsmiete -> Vergleichsmiete. Zahlen: config.js mieteAngebotAbschlag (EINE Stelle). */
   function mieteAbschlag() {
