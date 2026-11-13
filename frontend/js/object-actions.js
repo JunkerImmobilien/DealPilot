@@ -1978,7 +1978,7 @@
     if (_mm != null && _mm > 0) addRow('ds2_marktmiete', 'Marktmiete (€/m²)', _mm.toFixed(2).replace('.', ',') + ' €/m²', _mm.toFixed(2).replace('.', ','), S, 'input');
     if (d.energieklasse) addRow('ds2_energie', 'Energieklasse', String(d.energieklasse).toUpperCase(), String(d.energieklasse).toUpperCase(), S, 'select', false);
     if (d.sanierungsjahr) addRow('modernis', 'Modernisierungsjahr', d.sanierungsjahr, d.sanierungsjahr, S, 'input');
-    if (d.stellplatz) { var _sp = String(d.stellplatz).toLowerCase(); if (_sp.indexOf('kein') < 0) { if (/tiefgarage|garage|duplex/.test(_sp)) addRow('garagen', 'Garagenpl\u00e4tze', '1', '1', S, 'input'); else if (/stellplatz|au\u00dfen|aussen|parkplatz|carport|freiplatz/.test(_sp)) addRow('stellpl_aussen', 'Au\u00dfenstellpl\u00e4tze', '1', '1', S, 'input'); } }
+    if (d.stellplatz) { var _sp = String(d.stellplatz).toLowerCase(); if (_sp.indexOf('kein') < 0) { if (/tiefgarage|garage|duplex/.test(_sp)) addRow('garagen', 'Garagenpl\u00e4tze', '1', '1', S, 'input'); else if (/stellplatz|stellpl\u00e4tz|au\u00dfen|aussen|parkplatz|carport|freiplatz/.test(_sp)) { /* v3349 \u00b7 \u201e8 Au\u00dfenstellpl\u00e4tze\u201c ergab bis hier 1 */ var _spN = parseInt((_sp.match(/(\d{1,3})/) || [])[1], 10); _spN = (_spN > 0 && _spN < 500) ? String(_spN) : '1'; addRow('stellpl_aussen', 'Au\u00dfenstellpl\u00e4tze', _spN, _spN, S, 'input'); } } }
   }
 
   var _files = [];   // { name, text, type, userType, cache, status, row, file }
@@ -2048,6 +2048,9 @@
       if (_wegMv.length) _importHinweise.push('Der Mietvertrag gilt für EINE Einheit - Miete und Fläche des Hauses wurden daraus nicht gesetzt. Trag die Einheit unter „Einheiten erfassen" ein.');
     }
     _unterlagenZeilen();   /* v3016 */
+    /* v3349 · der Quick-Check hat keine Einheitenliste: nennt keine Unterlage Wohnfläche oder Miete des
+       ganzen Hauses, rechnet er mit den Summen der Einheiten (wie die Einsteiger-Stufe, _dgEinheitenSummen) */
+    if (_qcMode) { try { _dgEinheitenSummen({ importErlaubt: function () { return false; } }); } catch (e) {} }
   }
   var _vergleich = [], _importHinweise = [];
   /* v3198 · Mietverträge, die in die Einheiten DIESES Imports gehören (neues Objekt oder Quick-Check) */
@@ -2093,6 +2096,11 @@
       (D.abgleich(t.extracted || {}, t.typ, ktx) || []).forEach(function (z) {
         if (z.hinweis) { _importHinweise.push(z.hinweis); return; }
         /* v3088a · Marcel 02.11.2026: Wirtschaftsplan/Abrechnung „immer erst mal auflisten und zum Übernehmen aktiv anstoßen“ - nie vorgehakt */
+        /* v3349 · Marcel 13.11.2026 (Lindenallee 14 im QuickBoarding): im Quick-Check läuft ein Mietvertrag
+           hier durch und überschrieb Fläche und Miete des Exposés (518 m² → 72 m², 3.660 → 545 €); die MFH-Regel
+           in recompute() löschte sie danach - die Zeilen fehlten ganz. Ein Vertrag ist EINE Einheit: er
+           überschreibt kein Objektfeld, das eine andere Unterlage schon gesetzt hat. */
+        if (t.typ === 'mietvertrag' && /^(nkm|wfl|zimmer|ze)$/.test(z.feld) && _merged[z.feld] && _merged[z.feld].typ !== 'mietvertrag') return;
         _merged[z.feld] = { nurAktiv: t.typ === 'hausgeld', label: z.wort, value: z.anzeige, raw: z.neu, source: t.label || 'Dokument', kind: z.feld === 'ds2_energie' ? 'select' : 'input', herleitung: z.herleitung, einheit: z.einheit, ort: z.ort, typ: t.typ };
       });
       /* v3017 · Wirtschaftsplan/Abrechnung → Steuer-Reiter. Weicht der Vorschlag vom heutigen Wert ab,
@@ -3265,6 +3273,19 @@
         pendingList.push({ key: id, label: it.label, value: it.value, target: id, source: it.source });
       }
     });
+    /* v3349 · Marcel 13.11.2026: „im Quickboarding nur mit den Werten rechnen, die wir brauchen, beim
+       Speichern aber alle Werte behalten“. Bis hier fielen nicht angehakte Zeilen still weg - beim
+       Lindenallee-Paket Hausgeld, WEG-Rücklage und die Steuerwerte aus dem Wirtschaftsplan (die sind
+       nach v3088a nie vorgehakt). Jetzt gehen sie mit ins Speichern-Fenster, dort NICHT angehakt
+       (aus: true) - übernommen werden sie weiterhin nur auf ausdrücklichen Haken. */
+    ov.querySelectorAll('.oabi-tbl input[type="checkbox"]:not(:checked)').forEach(function (cb) {
+      var id = cb.getAttribute('data-id'); if (!id) return;
+      var it = _merged[id]; if (!it || _qcPendingMerged[id]) return;
+      if (OBJ2QC[id] && !it.nurAktiv) return;   /* ein abgewähltes Quick-Check-Feld bleibt abgewählt; Hausgeld aus dem Wirtschaftsplan geht mit */
+      var kopie = {}; Object.keys(it).forEach(function (k) { kopie[k] = it[k]; }); kopie._aus = true;
+      _qcPendingMerged[id] = kopie;
+      pendingList.push({ key: id, label: it.label, value: it.value, target: id, source: it.source, aus: true });
+    });
     /* v506-qc-derive: QC-spezifische Umrechnungen */
     try {
       // Hausgeld: qc_hg verlangt GESAMT (Label 'Hausgeld / Monat inkl. ...'),
@@ -3312,6 +3333,7 @@
     Object.keys(_qcPendingMerged).forEach(function (id) {
       if (targets && !targets[id]) return;
       var it = _qcPendingMerged[id]; if (!it) return;
+      if (!targets && it._aus) return;   /* v3349 · ohne Auswahl nur, was im Import angehakt war */
       var _art2 = _wertSchreiben(id, it);
       if (_art2) {
         if (_art2 === "text" && id === "svwert") { try { markSvwertAvm(); } catch (e) {} }

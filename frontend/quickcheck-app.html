@@ -6847,7 +6847,7 @@ const QcApp = (function() {
   function openSaveModal() { /* qb-final2-iframe */
     var __items=[];
     try { Object.keys(_pendingTransfer).forEach(function(key){ var it=_pendingTransfer[key]||{};
-      __items.push({key:key,label:it.label,value:it.value,target:it.target,source:it.source||'',isMarktwert:!!it.isMarktwert}); }); } catch(e){}
+      __items.push({key:key,label:it.label,value:it.value,target:it.target,source:it.source||'',isMarktwert:!!it.isMarktwert,aus:!!it.aus}); }); } catch(e){}
     var __avmRaw={}; /* v893j-modalpick: Roh-Spannen je Provider fuers interaktive Modal */
     try {
       (_avmResults||[]).forEach(function(r){ if(!r||!r.provider) return;
@@ -6880,7 +6880,7 @@ const QcApp = (function() {
     Object.keys(_pendingTransfer).forEach(function (k) { if (k.indexOf('pdf_') === 0) delete _pendingTransfer[k]; });
     (list || []).forEach(function (it) {
       if (!it || !it.key) return;
-      _pendingTransfer['pdf_' + it.key] = { label: it.label, value: it.value, target: it.target, source: it.source || 'Exposé/Marktbericht' };
+      _pendingTransfer['pdf_' + it.key] = { label: it.label, value: it.value, target: it.target, source: it.source || 'Exposé/Marktbericht', aus: !!it.aus /* v3349 */ };
     });
   }
 function renderTransferList() {
@@ -6908,7 +6908,7 @@ function renderTransferList() {
       items.forEach(item => {
         const idAttr = 'transfer-cb-' + item.key;
         html += `<label class="transfer-item">
-          <input type="checkbox" id="${idAttr}" data-key="${item.key}" checked>
+          <input type="checkbox" id="${idAttr}" data-key="${item.key}"${item.aus ? '' : ' checked'}>
           <div class="transfer-item-body">
             <div class="transfer-item-l">
               <span>${item.label}</span>

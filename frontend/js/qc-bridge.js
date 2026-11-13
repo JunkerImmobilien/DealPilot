@@ -32,7 +32,7 @@
      quickcheck-app.html am Browser-Cache vorbeikommt. Das qcpm-Overlay
      (ab Zeile ~348), auf das sich der Nicht-anfassen-Vermerk in
      CLAUDE.md bezieht, ist unberuehrt. */
-  var IFRAME_SRC = 'quickcheck-app.html?v=qc-v3339'; /* v3339: Leerstand aus den Einstellungen wie im Objekt, Garagen der Mieterliste als Einzelposten; v3299a: Logo-Groesse Schiene, eigene Flaeche ohne Kontrastzahl; v3299: logo-kontrast.js + Partnername statt DealPilot; v3266: mietpotenzial-kern.js (Hinweis Speicherverbot, DealPilot-Naeherung); v3223: pilot-tower (W-4 Einstellung); v3222: zusammengefuehrt (W-4 pilot-tower, W-17 deal-kpis); v3215: deal-kpis.js-Buster (W-17, weitere Darlehen; im Quick-Check ohne Wirkung); v3201c: nachgemessen; v3201: Optik wie Reiter Objekt/Miete; v3199: N128 Zusatzdaten (QcApp const), Flugzeug aus; v3177: Passwortfeld raus (Browser schrieb die E-Mail in Sanierung); v3098: Marktbewertung meldet Kontingent sichtbar; v3096: zweite Stufe Zielkaufpreis zurueck in der Karte; v3088: Notar/Grundbuch nach GNotKG; v3087: Kaufnebenkosten Notar 1,0, Sonstige nur selbst gesetzt */   /* v3081: Bewertung in einer Karte; v3075: Zustand, Sanierung, Mietpotenzial (P1); v3043: Abschlag-Deckelung */
+  var IFRAME_SRC = 'quickcheck-app.html?v=qc-v3349'; /* v3349: Import-Reste ins Speichern-Fenster (nicht angehakt); v3339: Leerstand aus den Einstellungen wie im Objekt, Garagen der Mieterliste als Einzelposten; v3299a: Logo-Groesse Schiene, eigene Flaeche ohne Kontrastzahl; v3299: logo-kontrast.js + Partnername statt DealPilot; v3266: mietpotenzial-kern.js (Hinweis Speicherverbot, DealPilot-Naeherung); v3223: pilot-tower (W-4 Einstellung); v3222: zusammengefuehrt (W-4 pilot-tower, W-17 deal-kpis); v3215: deal-kpis.js-Buster (W-17, weitere Darlehen; im Quick-Check ohne Wirkung); v3201c: nachgemessen; v3201: Optik wie Reiter Objekt/Miete; v3199: N128 Zusatzdaten (QcApp const), Flugzeug aus; v3177: Passwortfeld raus (Browser schrieb die E-Mail in Sanierung); v3098: Marktbewertung meldet Kontingent sichtbar; v3096: zweite Stufe Zielkaufpreis zurueck in der Karte; v3088: Notar/Grundbuch nach GNotKG; v3087: Kaufnebenkosten Notar 1,0, Sonstige nur selbst gesetzt */   /* v3081: Bewertung in einer Karte; v3075: Zustand, Sanierung, Mietpotenzial (P1); v3043: Abschlag-Deckelung */
   // qb-buffer: Zwischenspeicher-Pass. Score erreichbar -> Snapshot -> EIN Pass (debounced),
   //   ohne echtes Objekt (object_id NULL). 'Als Objekt speichern' legt erst dann ein Portfolio-Objekt an.
   var _bufState = { code:null, timer:0, lastSig:'', busy:false };
@@ -508,7 +508,7 @@
       if(!srcItems.length) return qh || '<p class="qcpm-empty">Keine weiteren ausgelesenen Daten.</p>';
       var g={},o=[]; srcItems.forEach(function(it){ var s=it.source||''; if(!g[s]){g[s]=[];o.push(s);} g[s].push(it); });
       var h=''; o.forEach(function(src){ h+='<div class="qcpm-sec"><div class="qcpm-sec-h"><span class="qcpm-logo qcpm-l-x">'+(src?src.charAt(0).toUpperCase():'?')+'</span><span class="qcpm-sec-t">'+_qcpmEsc(src||'Daten')+'</span></div>';
-        g[src].forEach(function(it){ h+='<label class="qcpm-item"><input type="checkbox" class="qcpm-cb" data-key="'+_qcpmEsc(it.key)+'" checked><span class="l"><span class="nm">'+_qcpmEsc(it.label||'')+'</span><span class="t">\u2192 '+_qcpmEsc(it.target||'')+'</span></span><span class="v">'+_qcpmEsc(it.value==null?'':String(it.value))+'</span></label>'; });
+        g[src].forEach(function(it){ h+='<label class="qcpm-item"><input type="checkbox" class="qcpm-cb" data-key="'+_qcpmEsc(it.key)+'"'+(it.aus?'':' checked')+'><span class="l"><span class="nm">'+_qcpmEsc(it.label||'')+'</span><span class="t">\u2192 '+_qcpmEsc(it.target||'')+'</span></span><span class="v">'+_qcpmEsc(it.value==null?'':String(it.value))+'</span></label>'; });
         h+='</div>'; }); return qh+h; }
 
     var srcChips='<label class="qcpm-src'+(state.src==='konsens'?' on':'')+'" data-src="konsens"><input type="radio" name="qcpm-src" '+(state.src==='konsens'?'checked':'')+'>Konsens (\u00d8)</label>';
@@ -524,7 +524,7 @@
       +'<div class="qcpm-pane active" data-pane="avm">'
       +(provs.length?'<div class="qcpm-ctrls">'
       +'<span class="qcpm-cl">Spanne</span><div class="qcpm-seg" id="qcpm-span"><button data-span="low">Unten</button><button data-span="mid" class="on">\u00d8</button><button data-span="high">Oben</button></div></div>':'')
-      +'<label class="qcpm-all"><input type="checkbox" id="qcpm-all" checked> Alle \u00fcbernehmen</label>'
+      +'<label class="qcpm-all"><input type="checkbox" id="qcpm-all"'+((items||[]).some(function(x){return x&&x.aus;})?'':' checked')+'> Alle \u00fcbernehmen</label>'
       +'<div id="qcpm-secs">'+secHtml()+'</div></div>'
       +'<div class="qcpm-pane" data-pane="src">'+srcHtml()+'</div>'
       +'</div>'
