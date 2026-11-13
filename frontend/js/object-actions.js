@@ -2227,6 +2227,18 @@
       _merged.mfh_einheiten_liste = { label: 'Einheiten erfassen', value: we.length + ' Einheiten' + (miete ? ' · ' + miete.toLocaleString('de-DE', { maximumFractionDigits: 2 }) + ' €/Monat Ist-Miete' : ''), raw: we, source: 'Unterlagen', kind: 'einheiten', herleitung: herl };
       /* v3029-import · Stellplätze und Garagen der Mieterliste: bis v3028 fielen sie still heraus
          (z. B. 2 × 40 € fehlten in der Objektmiete). Sie gehören in die Zusatzeinnahmen. */
+      /* v3349 · gemessen an Lindenallee 14: das Exposé nennt „3.660 € (Wohnungen) + 210 € (Stellplätze)“, die
+         Auslese gab 3.870 € als Nettokaltmiete - mit den Stellplätzen der Mieterliste unten zählten sie doppelt
+         (4.080 €). Ist die Objektmiete genau Wohnungen + Stellplätze der Liste, gilt die Summe der Wohnungen. */
+      if (stp > 0 && miete > 0 && _merged.nkm && !_merged.nkm.dgSumme) {
+        var _nkmAlt = numDe(_merged.nkm.raw);
+        if (_nkmAlt > 0 && Math.abs(_nkmAlt - (miete + stp)) < 1) {
+          var _nkmNeu = Math.round(miete * 100) / 100;
+          _merged.nkm.raw = String(_nkmNeu);
+          _merged.nkm.value = _nkmNeu.toLocaleString('de-DE', { maximumFractionDigits: 2 }) + ' €';
+          _merged.nkm.herleitung = (_merged.nkm.source || 'Unterlage') + ' nannte ' + fmt0(_nkmAlt) + ' € inklusive Stellplätze - die ' + fmt0(stp) + ' € stehen unten als Zusatzeinnahme';
+        }
+      }
       if (stp > 0) {
         _merged.ze = { label: 'Zusätzliche Einnahmen / Monat (Stellplätze)', value: stp.toLocaleString('de-DE', { maximumFractionDigits: 2 }) + ' €', raw: String(Math.round(stp * 100) / 100), source: 'Mieterliste', kind: 'input',
           herleitung: (we.stellplatzAnzahl || 0) + ' Stellplätze/Garagen aus der Mieterliste' };
