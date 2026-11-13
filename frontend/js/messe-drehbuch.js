@@ -9461,9 +9461,13 @@
          Objekt B trägt seit 13.11.2026 die Liste „Weitere Sanierungen“ (#san_plan, sanierung-plan.js). */
       async function (s) {
         var t1 = Date.now();
+        /* GEMESSEN im Prüflauf 13.11.: die Liste stand bei Detailgrad 1 (nach der Maßnahme in B2) unsichtbar
+           (#san-plan-wrap display:none) - erst Experte (flüchtig), dann der Reiter */
+        rhExperte(); await warte(500);
         reiter('s1'); await warte(1200);
+        if (!q('#s1.active') || !q('#s1').offsetWidth) { reiter('s1'); await warte(1000); }
         var box = function () { var b = q('#san-plan-box'); return b && b.offsetWidth ? b : null; };
-        await warteAuf(box, 6000);
+        if (!(await warteAuf(box, 4000))) { rhExperte(); try { window.calc(); } catch (e) {} await warteAuf(box, 4000); }
         var L = []; try { L = DpSanierungPlan.liste() || []; } catch (e) {}
         var jahre = {}; L.forEach(function (e) { if (e && e.jahr) jahre[e.jahr] = 1; });
         var summe = L.reduce(function (a, e) { return a + (Number(e.betrag) || 0); }, 0);
@@ -9492,10 +9496,10 @@
         var za = function () { var p = r11Panel(); return p && p.querySelector('.dp-stv-zahlen'); };
         await warteAuf(za, 6000);
         await zeige(za, 8);
-        var zt = r6Text(za()), wp = /Dauerhaft positiv ab\s*(\d{4})/i.exec(zt), sw = /Steuerwirkung bis dahin\s*([+−-]\s*[\d.]+ €)/i.exec(zt);
+        var zt = r6Text(za()), wp = /(?:Dauerhaft|Steuerlich) positiv ab\s*(\d{4})/i.exec(zt), sw0 = /(Steuerwirkung|Erstattungen) bis dahin\s*([+−-]\s*[\d.]+ €)/i.exec(zt), sw = sw0 ? [sw0[0], sw0[2]] : null, swW = sw0 ? sw0[1] : 'Steuerwirkung';
         DPM_QGB.b5 = { zahlen: zt.slice(0, 260), cfNachSteuer: cfn && cfn[1] };
         var vj = /nach (\d+) Verlustjahr(?:en)?/i.exec(zt);
-        await b2oZeile(s, 'Erst Erstattung, dann Steuer', 'Steuerlich dauerhaft positiv ab <b>' + (wp ? wp[1] : '–') + '</b>' + (vj ? ' (nach ' + vj[1] + (vj[1] === '1' ? ' Verlustjahr' : ' Verlustjahren') + ')' : '') + (sw ? ' — bis dahin Steuerwirkung <b>' + sw[1].replace(/\s+/g, ' ') + '</b>' : '') + '.');
+        await b2oZeile(s, 'Erst Erstattung, dann Steuer', 'Steuerlich dauerhaft positiv ab <b>' + (wp ? wp[1] : '–') + '</b>' + (vj ? ' (nach ' + vj[1] + (vj[1] === '1' ? ' Verlustjahr' : ' Verlustjahren') + ')' : '') + (sw ? ' — ' + swW + ' bis dahin <b>' + sw[1].replace(/\s+/g, ' ') + '</b>' : '') + '.');
         var dg = function () { var p = r11Panel(); return p && p.querySelector('.dp-stv-diag'); };
         if (dg()) {
           await zeige(dg, 6);
