@@ -7002,6 +7002,10 @@ function renderTransferList() {
         if (_useCk ? _ck.has(key) : (!cb || cb.checked)) _pendingTargets[_pendingTransfer[key].target] = true;
       });
     } catch (e) {}
+    /* v3349 · Mieten-Einzelposten mitschicken: getInputs() liest nur die Gesamtmiete (FIELDS), der Carrier im
+       Parent kennt qc_nkm_grund/stp/kueche/sonst aber. Gemessen an Lindenallee 14: Grundmiete + 210 EUR Stellplaetze
+       kamen im Objekt als EINE Kaltmiete an (ze 0) - quick-check.js lief in den Legacy-Zweig. */
+    try { ['nkm_grund', 'nkm_stp', 'nkm_kueche', 'nkm_sonst'].forEach(function (k) { var e = document.getElementById('qc_' + k); if (e && String(e.value || '').trim() !== '') inputs[k] = String(e.value).trim(); }); } catch (e) {}
     try { window.parent.postMessage({ source: 'dp-qc', type: 'qc-save', inputs: inputs, avm: avm, pendingTargets: _pendingTargets, photos: (typeof _photos !== 'undefined' ? _photos : []) }, '*'); } catch (e) {}
     closeSaveModal();
     showToast('💾 Objekt wird in DealPilot übernommen …');

@@ -2063,6 +2063,8 @@
     var notesParts = [];
     if (snapshot.zimmer)     notesParts.push(snapshot.zimmer + '-Zimmer');
     if (snapshot.stellplatz) notesParts.push('Stellplatz: ' + snapshot.stellplatz);
+    /* v3349 · eine Anzahl (aus dem Import, z. B. „8 Außenstellplätze“) gehört ins Feld des Objekts */
+    if (/^\d{1,3}$/.test(String(snapshot.stellplatz || '').trim()) && !v('stellpl_aussen')) set('stellpl_aussen', String(snapshot.stellplatz).trim());
     if (notesParts.length && !v('thesis')) {
       set('thesis', notesParts.join(' · '));
     }
