@@ -41699,3 +41699,28 @@ body.dp-dg-2 :is(#s0, #s1, #s2, #s3, #s4, #s3-tax, #s5, #s6, #s8) [data-dp-dg="3
   html body .ai-credits-row { grid-template-columns: minmax(0, 1fr) !important; }
   html body .ai-credits-cell { min-width: 0; overflow-wrap: anywhere; }
 }
+
+/* v3351 · Marcel 13.11.2026: „unter Mietentwicklung kann man nicht sehen, was ausgewählt ist“.
+   Gemessen (Westerfeldstr. 146): „Aus Wohnungen“ trägt .active, rgb(255,255,255) wie die anderen. Die
+   Sammelregel `.sec button:not(.dp-tip):not(.tab)…` (acht :not = 0,9,1) schlägt `.sec .me-mode-btn.active`
+   (0,3,0) trotz beider !important. Gezielt nur die aktiven Umschalter, Spezifität 0,10,0 per wiederholter
+   Klasse - kein :not(#id), keine Sammelregel auf Container-Kinder. */
+.sec .me-mode-btn.active.active.active.active.active.active.active.active.active,
+.sec .cf-mode-btn.active.active.active.active.active.active.active.active.active,
+.sec .bwk-mode-btn.active.active.active.active.active.active.active.active.active,
+.sec .mode-btn.active.active.active.active.active.active.active.active.active,
+.sec .mr-pf-margin-btn.active.active.active.active.active.active.active.active.active {
+  background: var(--gold, var(--wl-c9a84c, #C9A84C)) !important;
+  color: #fff !important;
+  border-color: var(--gold, var(--wl-c9a84c, #C9A84C)) !important;
+  font-weight: 600 !important;
+}
+.sec .me-mode-btn.active.active.active.active.active.active.active.active.active:hover,
+.sec .cf-mode-btn.active.active.active.active.active.active.active.active.active:hover,
+.sec .bwk-mode-btn.active.active.active.active.active.active.active.active.active:hover,
+.sec .mode-btn.active.active.active.active.active.active.active.active.active:hover,
+.sec .mr-pf-margin-btn.active.active.active.active.active.active.active.active.active:hover {
+  background: var(--gold, var(--wl-c9a84c, #C9A84C)) !important;
+  filter: brightness(.92);
+  color: #fff !important;
+}

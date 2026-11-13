@@ -348,7 +348,10 @@
       u: f.mv_beginn ? 'Mietvertrag seit ' + deDatum(String(f.mv_beginn).slice(0, 10)) : '' });
     if (!(ist > 0)) z.push({ c: 'soll', t: 'Mieterhöhung', v: '—', u: 'nicht vermietet — es zählt die Neuvermietung' });
     else if (so.vertrag) z.push({ c: 'soll', t: 'Mieterhöhung', v: vertragZeileV(so, ist, qm), u: vertragZeileU(so) });   /* v3244 */
-    else if (so.miete != null && so.miete > ist + 0.01) {
+    /* v3351 · Marcel 13.11.2026 (Westerfeldstr. 146, Whg. 1): Ist 590 € = 8,43 €/m², oberer Mietspiegelwert 8,43 -
+       Grenze 590,10 €. Die 10 Cent galten als Erhöhung, die Leiter zeigte „auf 590 €, verlangbar ab sofort“ mit
+       Übernehmen-Knopf und einen Balken „+0 %“. Eine Erhöhung beginnt jetzt bei einem vollen Euro. */
+    else if (so.miete != null && so.miete >= ist + 1) {
       var eigenS = /^eigene Angabe/.test(so.herkunft || ''), wirk = so.termine && so.termine.wirksam_ab;
       z.push({ c: 'soll', t: 'Mieterhöhung', v: 'auf ' + eur(so.miete) + '/Monat' + qm(so.miete),
         u: (so.termine ? so.termine.text : '') + (so.grenze ? ' · Grenze ' + so.grenze : '')
@@ -358,7 +361,7 @@
           + (so.termine && so.termine.letzte_fehlt ? ' · letzte Erhöhung nicht eingetragen' : ''),
         tag: eigenS ? 'eigene Angabe' : 'DealPilot rechnet vor',
         k: (eigenS || !f.sollSetzen) ? null : { lbl: 'übernehmen', fn: function () { f.sollSetzen(so.miete, wirk); } } });
-    } else z.push({ c: 'soll', t: 'Mieterhöhung', v: 'kein Spielraum', u: so.grund || '' });
+    } else z.push({ c: 'soll', t: 'Mieterhöhung', v: 'kein Spielraum', u: so.grund || ((so.miete != null && so.vgl_qm > 0) ? 'die Miete liegt schon an der Grenze' + (so.grenze ? ' (' + so.grenze + ')' : '') + ' · Vergleichsmiete ' + eur2(so.vgl_qm) + '/m²' + (vglKurz(so) ? ' (' + vglKurz(so) + ')' : '') : '') });
     var br = d.bremse, og = d.obergrenze;
     if (br && br.gilt === true && og) z.push({ c: 'neu', t: 'Bei Neuvermietung', v: 'höchstens ' + eur2(og) + '/m²',
       u: 'Mietpreisbremse gilt' + (br.bis ? ' bis ' + deDatum(br.bis) : '') + ' · Vergleichsmiete + 10 %',
@@ -384,7 +387,7 @@
        sonst weglassen) / Zielbild". Werte €/Monat aus denselben Zeilen - nichts neu gerechnet. */
     z._balken = [];
     if (ist > 0) z._balken.push({ c: 'heute', t: 'Ist', v: ist });
-    if (ist > 0 && so.miete != null && so.miete > ist + 0.01) z._balken.push({ c: 'soll', t: 'nach Mieterhöhung', v: so.miete });
+    if (ist > 0 && so.miete != null && so.miete >= ist + 1) z._balken.push({ c: 'soll', t: 'nach Mieterhöhung', v: so.miete });
     if (zq > 0 && wfl > 0) z._balken.push({ c: 'ziel', t: 'Zielbild', v: zq * wfl, bad: bad });
     return z;
   }
@@ -652,7 +655,7 @@
       var ist = zahl(w.ist), wfl = zahl(w.wfl);
       if (s.vertrag) z.push({ k: 'Nächste Erhöhung', v: vertragZeileV(s, ist, function (x) { return wfl ? ' (' + eur2(x / wfl) + '/m²)' : ''; }), u: vertragZeileU(s) });   /* v3244 */
       else if (!(ist > 0)) z.push({ k: 'Nächste Erhöhung', v: '—', u: 'nicht vermietet' });
-      else if (s.miete != null && s.miete > ist + 0.01) z.push({ k: 'Nächste Erhöhung',
+      else if (s.miete != null && s.miete >= ist + 1) z.push({ k: 'Nächste Erhöhung',
         v: 'auf ' + eur(s.miete) + '/Monat' + (wfl ? ' (' + eur2(s.miete / wfl) + '/m²)' : ''),
         /* v3062a · die § 559-Umlage gehört in die Zeile: Wohnung 3 Westerfeldstr. stieg auf 9,92 €/m² bei
            Vergleichsmiete 8,40 - 588 € nach § 558 plus 107 € Umlage. „Grenze: Vergleichsmiete" allein war falsch. */
