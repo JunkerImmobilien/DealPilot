@@ -2113,7 +2113,7 @@ function _ytfJahresHinweise(heute) {
     + ' kannst du bis zum 31.03.' + j + ' bei der Gemeinde einen Teilerlass beantragen. Fehlt mehr als die Hälfte des üblichen Rohertrags,'
     + ' werden 25 % erlassen, fehlt er ganz, 50 % (§§ 34, 35 GrStG).';
   if (!t) return '';
-  return '<div class="ytf-hinweis" style="margin:8px 0 12px;padding:10px 12px;border-left:3px solid var(--gold, #C9A84C);background:rgba(201,168,76,.08);border-radius:6px;font-size:12.5px;line-height:1.5">'
+  return '<div class="ytf-hinweis" style="margin:8px 0 12px;padding:10px 12px;border-left:3px solid var(--gold, var(--wl-c9a84c, #C9A84C));background:color-mix(in srgb, var(--gold, var(--wl-c9a84c, #C9A84C)) 8%, transparent);border-radius:6px;font-size:12.5px;line-height:1.5">'
     + t + ' <span style="color:var(--muted)">Hinweis, keine Steuerberatung.</span></div>';
 }
 if (typeof window !== 'undefined') window._ytfJahresHinweise = _ytfJahresHinweise;
