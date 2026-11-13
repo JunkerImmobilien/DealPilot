@@ -44756,3 +44756,23 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Commit:** `4fd1d5fb`, `aa1201b7` (frontend-konstanten).
 - **Nachweis:** `tools/mietanker-pruefen.mjs` 55/55 (Herford 6,00/6,98/7,80 → Maximum 9,36, Bremse 8,58; Bünde Näherung 6,11, ca. 6,97, Maximum 8,36; 1,02^4; Kappung 6,00 → 7,20 → 7,50). `wertermittlung-pruefen` RC=0, B70 Prognose, C2 alt→neu als „Entscheidung offen“ (Ebene C NICHT neu eingefroren). `mietpotenzial-pruefen` 288/288 (Standard Mittelwert statt oben). Staging-Wertkern Quittengarten: Bestand 490.000 → 590.000 (Wohnen 36.960 → 42.794; zusätzlich 2.880 €/J. Zusatzeinnahmen aus Feld `ze`, die im alten gespeicherten Ergebnis fehlten), Zielbild 490.000 → 745.000 (8 × 8,36 €/m²), Prognose 2030 (1,5 % eigen) 670.000, ohne Alterung 795.000.
 - **Rest:** Prod erst nach Marcels Blick auf die alt→neu-Liste. Offen: Faktor Oberwert ohne Spanne 1,14 (alle 69 freien Mietspiegel, dichtes Raster über die echte Rechenfunktion, Median 1,145) gegen 1,186 der Landing (nur Tabellenfelder mit eigenem Oberwert, 2.930); Angebotsmiete mit Abschlag nicht im Wertkern (Näherung vor Angebot wie App v3266); Zielbild-Jahr ohne Eingabe nicht aus dem Kappungspfad abgeleitet; Pilot-Analyse im Browser nicht nachgemessen (Messe-Studio-Tab offen).
+
+### Rollout 1.0.112 · 13.11.2026 abends (`720ba8d`, Staging `ce923da4`; v3344–v3354a)
+- **Was:**
+  - Mietlogik v3347 (Mieterhöhung bis zum Oberwert, 120-%-Regel, Faktor 1,14). Marcel hat den Rollout am 13.11. freigegeben.
+  - Steuer-Hinweise v3348.
+  - QuickBoarding-Import MFH v3349–v3349d: Mietvertrag überschreibt keine Hausfläche, keine doppelten Stellplätze, Mieten-Einzelposten und Stellplatzanzahl beim Speichern, Rest der Auslese ins Speichern-Fenster.
+  - Zins nach echter Beleihung v3349c/e: Quick-Check, `getZins(ltv)`, Konditions-Leiste mit „100 % + NK“ und „Objekt“.
+  - KI-Kontingent vor dem Einlesen v3350: `/ai/kontingent/reservieren`, Toleranz 10.
+  - Mietleiter ohne Cent-Erhöhung, aktive Umschalter sichtbar v3351.
+  - Quick-Check v3352–v3354: Stellplatz und Küche einzeln, Rückfrage vor der Marktmiete, Hausgeld-Anteil in Euro, Wirtschaftsplan beim ganzen Haus vorgehakt, Quellen nachholen, Barcode raus, Miete über dem Markt ohne Risiko-Behauptung.
+  - Kein Aufblitzen der alten Ansicht beim Laden v3353.
+- **Commit:** Merge `720ba8d`. Backend und mb-backend neu gebaut, Sicherungen `/root/backups/haupt-`/`mb-20261113-*`.
+- **Nachweis:**
+  - Gold-Audit auf der Basislinie.
+  - Prod-Container führen `kontingent/reservieren`, `kueche_miete_eur` und `neu_sicher_qm`. `index.html` mit `data-dpl-vorab` und `qc-bridge.js?v=v3354a`.
+  - Auf Staging gemessen: Lindenallee 14 (13 PDFs, 15 KI-Abrufe) ergibt 518 m², 3.660 € plus 210 € Stellplätze, Hausgeld 4.254 €/Monat. Zins 80/90/100/111 % = 4,15/4,37/4,60/5,10.
+- **Rest:**
+  - Ampel-Korrektur `calc.js` (geplante Erhaltung in der 15-%-Ampel) zweimal von der Rechteprüfung abgelehnt, wartet auf Marcels Freigabe.
+  - Quick-Check „Quellen nachholen“ nicht im echten Abruf geklickt.
+  - Positionen des Wirtschaftsplans (Nebenkosten-Zusammensetzung) werden noch nicht ausgelesen.
