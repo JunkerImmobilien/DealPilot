@@ -9266,7 +9266,7 @@
      Ertragswert je Stufe (POST /marktbericht/potenzial, ohne Kontingent, aber Bewertungsdienst) ist
      EINMAL echt erzeugt (?qgbmit, 13.11.2026) und liegt in js/messe-quittengarten-bestand-daten.js;
      Schlüssel = varianten des Auftrags. Fehlt ein Schlüssel, sperrt RH_SPERRE (503, DPM_QGB.fehlt). */
-  var QGB_BUSTER = 'v3348', QGB_KOSTEN = '100000';
+  var QGB_BUSTER = 'v3348a', QGB_KOSTEN = '100000';
   window.DPM_QGB = window.DPM_QGB || {};
   function qgbSpot() { return _aktiv === DREHBUECHER['spot-quittengarten-bestand']; }
   function qgbLaden() {
@@ -9355,7 +9355,7 @@
           await zeige(gr, 8);
           var gt = r6Text(gr()), mi = /Mieteinnahmen \/ Monat\s*([\d.]+ €)/i.exec(gt), cn = /Cashflow n\. St\.\s*[+−-]?\s*[\d.]+ €\s*([+−-]\s*[\d.]+ €) im Monat/i.exec(gt);
           DPM_QGB.b1.grid = gt.slice(0, 300);
-          await b2oZeile(s, 'Jeden Monat', 'Miete <b>' + (mi ? mi[1] : '–') + '</b> kalt' + (cn ? ', Cashflow nach Steuern <b>' + cn[1].replace(/\s+/g, '') + '</b>' : '') + ' — über alle Objekte.');
+          await b2oZeile(s, 'Jeden Monat', 'Miete <b>' + (mi ? mi[1] : '–') + '</b> kalt' + (cn ? ', Cashflow nach Steuern <b>' + cn[1].replace(/\s+/g, '').replace('€', ' €') + '</b>' : '') + ' — über alle Objekte.');
         }
         DPM_QGB.zeiten.push({ szene: 'B1', ms: Date.now() - t1 });
       },
