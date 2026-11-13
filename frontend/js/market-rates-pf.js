@@ -157,7 +157,8 @@ var MarketRatesPF = (function() {
   window.dpBauzinsDetailText = function (key, stufe) { try { return _detailText(_currentData, String(key), stufe || _activeMargin); } catch (e) { return null; } };
 
   function setMargin(marginKey) {
-    if (!['premium', 'standard', 'schwach', 'voll'].includes(marginKey)) return;   /* v2254: voll */
+    if (!['premium', 'standard', 'schwach', 'voll', 'objekt', 'vollnk'].includes(marginKey)) return;   /* v2254: voll · v3349e: objekt, vollnk */
+    _margeVomNutzer = true;
     _activeMargin = marginKey;
     // Buttons visuell
     document.querySelectorAll('.mr-pf-margin-btn').forEach(function(b) {
@@ -200,9 +201,44 @@ var MarketRatesPF = (function() {
   }
   window._mrPfSyncTopStrip = _syncTopStrip;
 
+  /* v3349e · Marcel 13.11.2026: „im Tab Finanzierung haben wir nur 60, 80, 90 und 100 % Beleihung, aber nicht
+     mit den Nebenkosten“ - und die Leiste stand fest auf 80 %, egal wie das Objekt finanziert ist (gemessen:
+     Objekt mit Darlehen = Kaufpreis, LTV 100 %, Zins 4,60 %; die Kacheln zeigten 4,15 % bei 10 Jahren).
+     Zwei Stufen dazu, aus dem geöffneten Objekt gerechnet (dieselbe Formel wie der Hinweis am Zinsfeld):
+     „100 % + NK“ = Kaufpreis und Kaufnebenkosten finanziert, „Objekt“ = die echte Beleihung (LTV-Kennzahl).
+     Ist ein Objekt mit Darlehen offen, steht die Leiste auf „Objekt“, bis jemand selbst eine Stufe wählt. */
+  var _margeVomNutzer = false;
+  function _objLtvs() {
+    var S = window.State || {}, K = S.kpis || {};
+    var kp = 0; try { var e = document.getElementById('kp'); kp = e ? (typeof window.parseDe === 'function' ? window.parseDe(e.value) : parseFloat(String(e.value).replace(/\./g, '').replace(',', '.'))) : 0; } catch (x) {}
+    var san = 0; try { var es = document.getElementById('san'); san = es ? (typeof window.parseDe === 'function' ? window.parseDe(es.value) : parseFloat(es.value)) || 0 : 0; } catch (x) {}
+    var obj = (typeof K.ltv === 'number' && isFinite(K.ltv) && K.ltv > 0) ? K.ltv : null;
+    var nk = (kp > 0 && typeof S.gi === 'number' && S.gi > kp) ? (S.gi - (san || 0)) / kp * 100 : null;
+    return { objekt: obj, vollnk: (nk != null && nk > 100) ? nk : null };
+  }
+  function _objStufen(d) {
+    if (!d || !d.formel || !d.indicativeRates || typeof window.dpBauzinsRechnen !== 'function') return;
+    var L = _objLtvs();
+    d.stufen_ltv = d.stufen_ltv || {};
+    ['objekt', 'vollnk'].forEach(function (st) {
+      var l = L[st];
+      if (l == null) delete d.stufen_ltv[st]; else d.stufen_ltv[st] = Math.round(l * 10) / 10;
+      Object.keys(d.indicativeRates).forEach(function (k) {
+        var ir = d.indicativeRates[k]; if (!ir) return;
+        var z = (l == null) ? null : window.dpBauzinsRechnen(d.formel, k, l);
+        if (typeof z === 'number' && isFinite(z)) ir[st] = z; else delete ir[st];
+      });
+    });
+    if (!_margeVomNutzer) _activeMargin = (L.objekt != null) ? 'objekt' : 'standard';
+    else if ((_activeMargin === 'objekt' || _activeMargin === 'vollnk') && L[_activeMargin] == null) _activeMargin = 'standard';
+    window._dpPfObjLtv = L;
+  }
+  window._dpPfObjStufen = function () { try { if (_currentData) { _objStufen(_currentData); _renderUI(); _syncTopStrip(); if (window._dpPfBandSync) window._dpPfBandSync(_activeMargin); } } catch (e) {} };
+
   function _renderUI() {
     if (!_currentData) return;
     var d = _currentData;
+    try { _objStufen(d); } catch (_e) {}
 
     // ── Tiles ─────────────────────────────────────────────
     BUCKETS_PF.forEach(function(b) {
@@ -401,6 +437,16 @@ var MarketRatesPF = (function() {
   var PLANE='<svg viewBox="0 0 24 24" fill="currentColor" width="15" height="15" aria-hidden="true"><path d="M21.5 2.5l-7 19.5-3.8-8.2-8.2-3.8z"/></svg>';
   /* v2245: die Stufen SIND feste Beleihungen der Marktformel (60 / 80 / 90 %) */
   var LBL={ premium:'LTV 60 %', standard:'LTV 80 %', schwach:'LTV 90 %', voll:'LTV 100 %' };
+  function _lbl(key){ var L=window._dpPfObjLtv||{}; if(key==='objekt'&&L.objekt!=null) return 'LTV '+Math.round(L.objekt)+' %'; if(key==='vollnk'&&L.vollnk!=null) return 'LTV '+Math.round(L.vollnk)+' %'; return LBL[key]||''; }
+  function _extraKnoepfe(){
+    var band=document.getElementById('dpfk-band'); if(!band) return; var L=window._dpPfObjLtv||{};
+    [['vollnk','100&nbsp;%&nbsp;+&nbsp;NK','Kaufpreis und Kaufnebenkosten finanziert'],['objekt','Objekt','Die Beleihung dieses Objekts (Darlehen / Kaufpreis bzw. Wert)']].forEach(function(x){
+      var b=band.querySelector('.dpfk-ltv-btn[data-margin="'+x[0]+'"]');
+      if(!b){ var w=band.querySelector('.dpfk-ltv'); if(!w) return; b=document.createElement('button'); b.type='button'; b.className='dpfk-ltv-btn'; b.setAttribute('data-margin',x[0]); b.innerHTML=x[1]; w.appendChild(b); }
+      var l=L[x[0]]; b.style.display=(l==null)?'none':''; b.title=x[2]+(l!=null?' · LTV '+String(Math.round(l*10)/10).replace('.',',')+' %':'');
+      if(x[0]==='objekt') b.innerHTML='Objekt'+(l!=null?'&nbsp;'+Math.round(l)+'&nbsp;%':'');
+    });
+  }
   function activeKey(){
     var a=document.querySelector('.mr-pf-margin-btn.active');
     return a ? a.getAttribute('data-margin') : 'standard';
@@ -408,8 +454,11 @@ var MarketRatesPF = (function() {
   function syncActive(key){
     var band=document.getElementById('dpfk-band'); if(!band) return;
     band.querySelectorAll('.dpfk-ltv-btn').forEach(function(x){ x.classList.toggle('active', x.getAttribute('data-margin')===key); });
-    var lab=document.getElementById('dpfk-ltvlabel'); if(lab) lab.textContent=LBL[key]||'';
+    try { _extraKnoepfe(); } catch(e){}
+    band.querySelectorAll('.dpfk-ltv-btn').forEach(function(x){ x.classList.toggle('active', x.getAttribute('data-margin')===key); });
+    var lab=document.getElementById('dpfk-ltvlabel'); if(lab) lab.textContent=_lbl(key);
   }
+  window._dpPfBandSync = function(key){ try { syncActive(key || activeKey()); } catch(e){} };
   function deco(){
     var strip=document.getElementById('mrpf-top-strip'); if(!strip) return;
     /* Reste der alten Merge-Kopfzeile entfernen (falls je gelaufen) */
@@ -452,7 +501,16 @@ var MarketRatesPF = (function() {
     }
     syncActive(activeKey());
   }
-  function boot(){ deco(); setTimeout(deco, 600); setTimeout(deco, 1600); }
+  /* v3349e · nach jedem Rechenlauf (neue Beleihung, anderes Objekt) die Stufen „Objekt“ und „100 % + NK“ nachziehen */
+  var _t=null;
+  function _nachCalc(){ clearTimeout(_t); _t=setTimeout(function(){ try{ if(window._dpPfObjStufen) window._dpPfObjStufen(); }catch(e){} }, 150); }
+  function _haken(){
+    if(typeof window.calc!=='function') return false; if(window.calc._dpPfObj) return true;
+    var alt=window.calc, neu=function(){ var r=alt.apply(this, arguments); _nachCalc(); return r; };
+    try{ for(var k in alt){ if(Object.prototype.hasOwnProperty.call(alt,k)) neu[k]=alt[k]; } }catch(e){}
+    neu._dpPfObj=true; window.calc=neu; return true;
+  }
+  function boot(){ deco(); setTimeout(deco, 600); setTimeout(deco, 1600); if(!_haken()){ var n=0, iv=setInterval(function(){ if(_haken()||++n>20) clearInterval(iv); }, 500); } setTimeout(_nachCalc, 2000); }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', boot);
   else boot();
 })();
