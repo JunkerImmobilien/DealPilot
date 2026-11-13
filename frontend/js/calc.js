@@ -1141,7 +1141,9 @@ function _calcImmediate(){
     } else if (sanIstNetto <= sanLimit) {
       /* v3029-rechnen: unter der Grenze ist Erhaltungsaufwand sofort abziehbar - Herstellungskosten
          im Sinne des § 255 Abs. 2 HGB (Erweiterung, Standardhebung) aber nie. „voll abzugsfaehig" war zu stark. */
-      sanStatusEl.innerHTML = '<span class="badge badge-green" title="Erweiterungen und Standardhebungen (§ 255 Abs. 2 HGB) bleiben auch unter der Grenze Herstellungskosten und laufen über die AfA.">✓ Unter Grenze ('+sanPct.toFixed(1).replace('.', ',')+' %) – Erhaltungsaufwand sofort abziehbar</span>';
+      /* v3348 · Sanierung auf Raten: auch nach 3 Jahren rechnet das Finanzamt Maßnahmen eines einheitlichen
+         Sanierungsplans zusammen (in der Regel innerhalb von 5 Jahren, BMF-Schreiben vom 18.07.2003 zur Abgrenzung von Anschaffungs-, Herstellungs- und Erhaltungsaufwand) */
+      sanStatusEl.innerHTML = '<span class="badge badge-green" title="Erweiterungen und Standardhebungen (§ 255 Abs. 2 HGB) bleiben auch unter der Grenze Herstellungskosten und laufen über die AfA. Achtung, Sanierung auf Raten: Maßnahmen nach einem einheitlichen Plan, in der Regel innerhalb von 5 Jahren, rechnet das Finanzamt auch nach den 3 Jahren zusammen.">✓ Unter Grenze ('+sanPct.toFixed(1).replace('.', ',')+' %) – Erhaltungsaufwand sofort abziehbar</span>';
     } else {
       sanStatusEl.innerHTML = '<span class="badge badge-red">⚠ Über 15 % ('+sanPct.toFixed(1).replace('.', ',')+' %) – anschaffungsnahe HK ('+_sanNd+' Jahre AfA)</span>';
     }

@@ -2099,6 +2099,25 @@ function _computeYearTotal(year, yearIdx, vorgabe, ohneVortrag) {
  * Render the yearly tax form.
  * Two modes: 'quick' (collapsed grid) and 'detail' (full Excel-like form per year).
  */
+/* v3348 · Marcel 13.11.2026 (Abgleich mit einem Steuer-Ratgeber für Vermieter): zwei Hinweise nach Jahreszeit.
+   Oktober bis Dezember: Abflussprinzip (§ 11 Abs. 2 EStG) mit 10-Tage-Regel für wiederkehrende Zahlungen.
+   Januar bis März: Teilerlass der Grundsteuer bei Ertragsminderung (§ 34 GrStG: Rohertrag um mehr als 50 %
+   gemindert 25 %, bei 100 % 50 %, ohne eigenes Verschulden), Antrag bis 31. März des Folgejahres (§ 35 GrStG).
+   Kundentext nur mit Punkt und Komma (Marcel 12.11.). */
+function _ytfJahresHinweise(heute) {
+  var d = heute || new Date(), m = d.getMonth() + 1, j = d.getFullYear(), t = '';
+  if (m >= 10) t = '<b>Jahresende.</b> Was du bis zum 31.12. bezahlst, zählt steuerlich noch für ' + j
+    + '. Wer eine Reparatur ohnehin plant, senkt mit der Zahlung in diesem Jahr die Steuer ' + j + '. Wiederkehrende Zahlungen wie Zinsen oder Hausgeld,'
+    + ' die bis 10 Tage um den Jahreswechsel fließen, gehören in das Jahr, für das sie gezahlt werden (§ 11 EStG).';
+  else if (m <= 3) t = '<b>Grundsteuer.</b> Stand im Jahr ' + (j - 1) + ' eine Wohnung ohne dein Verschulden leer oder fiel die Miete stark aus,'
+    + ' kannst du bis zum 31.03.' + j + ' bei der Gemeinde einen Teilerlass beantragen. Fehlt mehr als die Hälfte des üblichen Rohertrags,'
+    + ' werden 25 % erlassen, fehlt er ganz, 50 % (§§ 34, 35 GrStG).';
+  if (!t) return '';
+  return '<div class="ytf-hinweis" style="margin:8px 0 12px;padding:10px 12px;border-left:3px solid var(--gold, #C9A84C);background:rgba(201,168,76,.08);border-radius:6px;font-size:12.5px;line-height:1.5">'
+    + t + ' <span style="color:var(--muted)">Hinweis, keine Steuerberatung.</span></div>';
+}
+if (typeof window !== 'undefined') window._ytfJahresHinweise = _ytfJahresHinweise;
+
 function renderYearlyTaxForm() {
   var box = document.getElementById('yearly-tax-form-box');
   if (!box) return;
@@ -2124,6 +2143,7 @@ function renderYearlyTaxForm() {
       '<button class="btn btn-outline btn-sm" onclick="resetAllTaxOverrides()" title="Alle manuellen Eingaben zurücksetzen">↺ Vorschläge wiederherstellen</button>' +
     '</div>';
 
+  html += _ytfJahresHinweise();
   if (mode === 'quick') {
     html += _renderQuickForm(years);
   } else {
