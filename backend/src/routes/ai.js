@@ -120,16 +120,47 @@ const router = express.Router();
 // hatten KEIN Credit-Verbrauch — User konnte unbegrenzt OpenAI-Calls auf Marcels
 // Server-Key auslösen. Schutz jetzt: harter Rate-Limit pro User (nicht pro IP).
 // 30 Extractions/h pro User = mehr als jeder legitime Workflow braucht.
-const extractLimiter = rateLimit({
-  windowMs: 60 * 60 * 1000,
-  max: 30,
-  standardHeaders: true,
-  legacyHeaders: false,
-  keyGenerator: function(req) {
-    return req.user && req.user.id ? 'u:' + req.user.id : req.ip;
-  },
-  message: { error: 'Zu viele Dokument-Auswertungen — bitte eine Stunde warten oder einen eigenen OpenAI-Key in den Einstellungen hinterlegen.' }
-});
+/* v3350 · Marcel 13.11.2026: „Das KI-Limit soll VOR dem Einlesen geprüft werden. Wenn es nur ein paar mehr
+   Aufrufe sind, sollen die PDFs trotzdem gelesen werden.“ Gemessen: 13 Lindenallee-PDFs brauchen rund 30
+   Abrufe; beim zweiten Paket in der Stunde liefen die halben Dateien leer. Bis v3349 stand hier
+   express-rate-limit (30/h, fest). Jetzt ein eigener Zähler je Nutzer (gleitende Stunde) mit Reservierung:
+   POST /ai/kontingent/reservieren { anzahl } prüft VOR dem Einlesen. Passt das Paket mit höchstens
+   EXTRACT_TOLERANZ Abrufen über die Grenze, gilt für 20 Minuten eine erhöhte Grenze (genau so viele Abrufe,
+   wie das Paket braucht). Sonst sagt die Antwort, wie viele frei sind und ab wann wieder - gelesen wird nichts. */
+const EXTRACT_MAX = 30, EXTRACT_FENSTER_MS = 60 * 60 * 1000, EXTRACT_TOLERANZ = 10, EXTRACT_RESERV_MS = 20 * 60 * 1000;
+const _extractLog = new Map();   /* key -> [Zeitstempel] */
+const _extractReserv = new Map(); /* key -> { bis, max } */
+function _extractKey(req) { return req.user && req.user.id ? 'u:' + req.user.id : 'ip:' + req.ip; }
+function _extractStand(key) {
+  const jetzt = Date.now();
+  const log = (_extractLog.get(key) || []).filter(function (t) { return jetzt - t < EXTRACT_FENSTER_MS; });
+  _extractLog.set(key, log);
+  const r = _extractReserv.get(key);
+  const max = (r && r.bis > jetzt) ? Math.max(EXTRACT_MAX, r.max) : EXTRACT_MAX;
+  const frei_ab = log.length ? new Date(log[0] + EXTRACT_FENSTER_MS).toISOString() : null;
+  return { genutzt: log.length, max: max, grundgrenze: EXTRACT_MAX, frei: Math.max(0, max - log.length), frei_ab: frei_ab, toleranz: EXTRACT_TOLERANZ };
+}
+function extractLimiter(req, res, next) {
+  const key = _extractKey(req), st = _extractStand(key);
+  if (st.genutzt >= st.max) {
+    res.set('Retry-After', String(st.frei_ab ? Math.max(1, Math.ceil((Date.parse(st.frei_ab) - Date.now()) / 1000)) : 3600));
+    return res.status(429).json({ error: 'Zu viele Dokument-Auswertungen — bitte eine Stunde warten oder einen eigenen OpenAI-Key in den Einstellungen hinterlegen.', kontingent: st });
+  }
+  _extractLog.get(key).push(Date.now());
+  next();
+}
+extractLimiter._stand = _extractStand;
+extractLimiter._key = _extractKey;
+extractLimiter._reservieren = function (key, anzahl) {
+  const st = _extractStand(key), n = Math.max(0, Math.round(Number(anzahl) || 0));
+  const bedarf = st.genutzt + n;
+  if (bedarf <= st.max) return Object.assign({ ok: true, benoetigt: n, ueber: 0 }, st);
+  if (bedarf <= EXTRACT_MAX + EXTRACT_TOLERANZ) {
+    _extractReserv.set(key, { bis: Date.now() + EXTRACT_RESERV_MS, max: bedarf });
+    return Object.assign({ ok: true, benoetigt: n, ueber: bedarf - EXTRACT_MAX }, _extractStand(key));
+  }
+  return Object.assign({ ok: false, benoetigt: n, ueber: bedarf - EXTRACT_MAX }, st);
+};
 
 /* ═══════════════════════════════════════════════════════════════════════
    v1290d · DER DIALOG BRAUCHT EINE EIGENE SCHRANKE
@@ -2188,6 +2219,15 @@ router.post('/extract-beleg', authenticate, extractLimiter, async (req, res, nex
   } catch (err) { next(err); }
 });
 
+
+/* v3350 · Kontingent der Dokument-Auswertungen: Stand und Reservierung vor dem Einlesen */
+router.get('/kontingent', _authRoh, function (req, res) {
+  res.json(extractLimiter._stand(extractLimiter._key(req)));
+});
+router.post('/kontingent/reservieren', _authRoh, function (req, res) {
+  const anzahl = req.body && req.body.anzahl;
+  res.json(extractLimiter._reservieren(extractLimiter._key(req), anzahl));
+});
 
 module.exports = router;
 

@@ -2948,6 +2948,23 @@
         await resolveType(f);
       } catch (e) { f.status = 'err'; renderFileRow(f); }
     }
+    /* v3350 · Marcel 13.11.2026: das KI-Limit VOR dem Einlesen prüfen, ein paar Abrufe über der Grenze sind
+       erlaubt (Backend: /ai/kontingent/reservieren, Toleranz 10). Bedarf grob: 2 Abrufe je Datei (Einordnung
+       und Auslese, beim Exposé mit Mieterliste ein dritter) plus 1 für die Gesamtauswertung. Reicht das
+       Kontingent nicht, wird NICHTS gelesen - lieber eine klare Meldung als ein halb gelesenes Paket. */
+    if (neu.length && window.Auth && typeof window.Auth.apiCall === 'function') {
+      var _bedarf = neu.length * 2 + 1, _k = null;
+      try { _k = await window.Auth.apiCall('/ai/kontingent/reservieren', { method: 'POST', body: { anzahl: _bedarf } }); } catch (e) { _k = null; }
+      if (_k && _k.ok === false) {
+        var _ab = _k.frei_ab ? new Date(_k.frei_ab).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' }) : null;
+        var _txt = 'Für ' + neu.length + ' Unterlagen braucht DealPilot rund ' + _bedarf + ' KI-Auswertungen, in dieser Stunde sind noch ' + (_k.frei || 0) + ' frei' + (_ab ? ', die nächsten ab ' + _ab + ' Uhr' : '') + '. Nichts wurde gelesen. Weniger Dateien auf einmal wählen oder später erneut einlesen.';
+        neu.forEach(function (f) { f.status = 'err'; f.limit = true; f.fehler = 'nicht gelesen, KI-Kontingent reicht nicht'; renderFileRow(f); });
+        try { var _h = document.createElement('div'); _h.className = 'oabi-limit-hinweis'; _h.setAttribute('style', 'margin:8px 0;padding:9px 12px;border-radius:8px;background:rgba(184,98,92,.09);border:1px solid rgba(184,98,92,.35);color:#8a3f3a;font-size:13px'); _h.textContent = _txt; filesHost.parentNode.insertBefore(_h, filesHost); } catch (e) {}
+        try { toast(_txt); } catch (e) {}
+        return;
+      }
+      if (_k && _k.ueber > 0) { try { toast('KI-Kontingent: ' + _k.ueber + ' Auswertungen über der Stundengrenze, für dieses Paket freigegeben.'); } catch (e) {} }
+    }
     var naechste = 0;
     async function arbeiter() { while (naechste < neu.length) { await eineDatei(neu[naechste++]); } }
     var GLEICHZEITIG = 3, laeufer = [];
