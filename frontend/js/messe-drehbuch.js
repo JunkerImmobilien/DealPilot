@@ -9457,6 +9457,32 @@
         }
         DPM_QGB.zeiten.push({ szene: 'B4', ms: Date.now() - t1 });
       },
+      /* ── B5a · Erhaltung geplant, 15-%-Grenze (Marcel 13.11.: echte Maßnahmen in den ersten Jahren, Ampel grün) ──
+         Objekt B trägt seit 13.11.2026 die Liste „Weitere Sanierungen“ (#san_plan, sanierung-plan.js). */
+      async function (s) {
+        var t1 = Date.now();
+        reiter('s1'); await warte(1200);
+        var box = function () { var b = q('#san-plan-box'); return b && b.offsetWidth ? b : null; };
+        await warteAuf(box, 6000);
+        var L = []; try { L = DpSanierungPlan.liste() || []; } catch (e) {}
+        var jahre = {}; L.forEach(function (e) { if (e && e.jahr) jahre[e.jahr] = 1; });
+        var summe = L.reduce(function (a, e) { return a + (Number(e.betrag) || 0); }, 0);
+        var b0 = box(); if (b0) { var sx = scroller(b0); if (sx) { sx.scrollTop += rect(b0).top - 140; await warte(500); } }
+        await zeige(box, 8);
+        DPM_QGB.b5a = { liste: L.map(function (e) { return e.bez + ' ' + e.jahr + ' ' + e.betrag + ' ' + e.art; }) };
+        await b2oZeile(s, 'Vorher geplant', (L.length ? '<b>' + L.length + ' Maßnahmen</b> als Erhaltung, ' + Object.keys(jahre).sort().join(', ') + ' — zusammen <b>' + eur(summe) + '</b>' : 'Die Erhaltung der nächsten Jahre') + ', Jahr für Jahr in Cashflow und Steuer.');
+        /* GEMESSEN 13.11.: die Ampel #san_limit_status zählt nur #san (hier 0) und zeigt „Keine Sanierung“ -
+           die Prüfung der geplanten Erhaltung steht in der Summenzeile der Liste (sp-summe). Die wird gezeigt. */
+        var su = function () { var e = q('#san-plan-box .sp-summe'); return e && e.offsetWidth ? e : null; };
+        var stx = r6Text(su()), gz = /= ([\d.]+ €) netto von ([\d.]+ €)/.exec(stx), ueber = /überschritten/.test(stx);
+        DPM_QGB.b5a.summe = stx.slice(0, 240); DPM_QGB.b5a.ampel = r6Text(q('#san_limit_status'));
+        if (su()) { var s0 = su(); var sx2 = scroller(s0); if (sx2) { var rr = rect(s0); if (rr.bottom > innerHeight - 140) { sx2.scrollTop += rr.bottom - (innerHeight - 200); await warte(500); } } }
+        await zeige(su, 8);
+        if (gz) await b2oZeile(s, '15-%-Grenze', 'Erhaltung in den drei Jahren nach dem Kauf <b>' + gz[1] + '</b> netto von ' + gz[2] + (ueber ? ' — <b>überschritten</b>.' : ' — <b>darunter</b>, sofort als Werbungskosten.'));
+        DPM_QGB.zeiten.push({ szene: 'B5a', ms: Date.now() - t1 });
+        reiter('s5'); await warte(1200);
+        await warteAuf(function () { return q('#ai-content .dp-pa-tab'); }, 8000);
+      },
       /* ── B5 · Steuerverlauf, Cashflow nach Steuern, Wendepunkt ── */
       async function (s) {
         var t1 = Date.now();
@@ -9468,13 +9494,43 @@
         await zeige(za, 8);
         var zt = r6Text(za()), wp = /Dauerhaft positiv ab\s*(\d{4})/i.exec(zt), sw = /Steuerwirkung bis dahin\s*([+−-]\s*[\d.]+ €)/i.exec(zt);
         DPM_QGB.b5 = { zahlen: zt.slice(0, 260), cfNachSteuer: cfn && cfn[1] };
-        await b2oZeile(s, 'Steuer Jahr für Jahr', 'Steuerlich dauerhaft positiv ab <b>' + (wp ? wp[1] : '–') + '</b>' + (sw ? ' — bis dahin Steuerwirkung ' + sw[1].replace(/\s+/g, ' ') : '') + '.');
+        var vj = /nach (\d+) Verlustjahr(?:en)?/i.exec(zt);
+        await b2oZeile(s, 'Erst Erstattung, dann Steuer', 'Steuerlich dauerhaft positiv ab <b>' + (wp ? wp[1] : '–') + '</b>' + (vj ? ' (nach ' + vj[1] + (vj[1] === '1' ? ' Verlustjahr' : ' Verlustjahren') + ')' : '') + (sw ? ' — bis dahin Steuerwirkung <b>' + sw[1].replace(/\s+/g, ' ') + '</b>' : '') + '.');
         var dg = function () { var p = r11Panel(); return p && p.querySelector('.dp-stv-diag'); };
         if (dg()) {
           await zeige(dg, 6);
           await b2oZeile(s, 'Der Wendepunkt', 'Ab ' + (wp ? wp[1] : 'hier') + ' zahlst du Steuern auf das Haus' + (cfn ? ' — Cashflow nach Steuern heute <b>' + cfn[1].replace(/\s+/g, ' ') + ' im Monat</b>' : '') + '.');
         }
         DPM_QGB.zeiten.push({ szene: 'B5', ms: Date.now() - t1 });
+      },
+      /* ── B5b · Steuer je Jahr, Zeile für Zeile wie die Anlage V (wie A10, Marcel 13.11.: passend zur neuen Kurve) ── */
+      async function (s) {
+        var t1 = Date.now();
+        reiter('s3-tax'); await warte(1200);
+        r15Modus(0); await warte(600);
+        var kopf = function () { var b = r15Box(); return b && b.closest('.card'); };
+        r15Oben(kopf()); await warte(400);
+        var j = new Date().getFullYear();
+        if (!r15Zeile(j)) j = j - 1;
+        var zl = function () { return r15Zeile(j); };
+        r15Oben(zl() || kopf()); await warte(400);
+        await zeige(function () { return zl() || kopf(); }, 6);
+        var c = r15Zellen(j), n = c.length;
+        DPM_QGB.b5b = { jahr: j, zellen: c };
+        await b2oZeile(s, 'Steuer je Jahr · ' + j, 'Miete <b>' + (c[1] || '–') + '</b>, Zinsen ' + (c[2] || '–') + ', AfA ' + (c[3] || '–') + ' — Ergebnis <b>' + (c[n - 2] || '–') + '</b>.');
+        r15Modus(1); await warte(800); await r15Jahr(j);
+        var hz = function () { var b = r15Box(); return b ? [].filter.call(b.querySelectorAll('.ytf-help[title]'), function (e) { return /Schuldzinsen/.test(e.getAttribute('title')) && /Zeile \d+/.test(e.getAttribute('title')); })[0] || null : null; };
+        var av = function () { var e = hz(); return e && (e.closest('tr') || e.parentElement); };
+        var a0 = av(); if (a0) { r15Oben(a0); await warte(400); }
+        await zeige(function () { return av() || r15Box(); }, 6);
+        var ti = hz() ? hz().getAttribute('title') : '', zn = /ANLAGE V (\d{4})[^\n]*\n\s*Zeile (\d+)\s*·\s*Kennzahl (\d+)/.exec(ti);
+        var zw = av() && av().querySelector('input'), zb2 = zw && zw.value ? eur(Number(zw.value)) : null;
+        DPM_QGB.b5b.anlageV = zn ? { formular: zn[1], zeile: zn[2], kennzahl: zn[3] } : null;
+        await b2oZeile(s, 'Zeile für Zeile', 'Schuldzinsen' + (zb2 ? ' <b>' + zb2 + '</b>' : '') + (zn ? ' → <b>Anlage V Zeile ' + zn[2] + '</b>, Kennzahl ' + zn[3] + (String(zn[1]) !== String(j) ? ' (Formular ' + zn[1] + ')' : '') : ' — mit ihrer Zeile der Anlage V') + '.');
+        r15Modus(0); await warte(500);
+        reiter('s5'); await warte(1200);
+        await warteAuf(function () { return q('#ai-content .dp-pa-tab'); }, 8000);
+        DPM_QGB.zeiten.push({ szene: 'B5b', ms: Date.now() - t1 });
       },
       /* ── B6 · Beleihungsspielraum (Exit-Strategien) ── */
       async function (s) {
