@@ -2949,11 +2949,11 @@
       } catch (e) { f.status = 'err'; renderFileRow(f); }
     }
     /* v3350 · Marcel 13.11.2026: das KI-Limit VOR dem Einlesen prüfen, ein paar Abrufe über der Grenze sind
-       erlaubt (Backend: /ai/kontingent/reservieren, Toleranz 10). Bedarf grob: 2 Abrufe je Datei (Einordnung
+       erlaubt (Backend: /ai/kontingent/reservieren, Toleranz 10). Bedarf grob: rund 1,2 Abrufe je Datei (Einordnung
        und Auslese, beim Exposé mit Mieterliste ein dritter) plus 1 für die Gesamtauswertung. Reicht das
        Kontingent nicht, wird NICHTS gelesen - lieber eine klare Meldung als ein halb gelesenes Paket. */
     if (neu.length && window.Auth && typeof window.Auth.apiCall === 'function') {
-      var _bedarf = neu.length * 2 + 1, _k = null;
+      var _bedarf = Math.ceil(neu.length * 1.2) + 1, _k = null;   /* gemessen 13.11.: 13 Lindenallee-PDFs = 15 Abrufe */
       try { _k = await window.Auth.apiCall('/ai/kontingent/reservieren', { method: 'POST', body: { anzahl: _bedarf } }); } catch (e) { _k = null; }
       if (_k && _k.ok === false) {
         var _ab = _k.frei_ab ? new Date(_k.frei_ab).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' }) : null;
