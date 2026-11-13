@@ -5805,7 +5805,7 @@ const QcApp = (function() {
         /* v3075 · Angebots-/Marktmiete und zulaessige Bestandsmiete nie gleichsetzen (Marcel 02.11.2026) */
         pros.push(`Marktmiete <strong>${Math.round((avmMieteForCheck/nkmCurrent - 1) * 100)}% über der Bestandsmiete</strong> — Potenzial bei Neuvermietung; im Bestand gilt die Kappungsgrenze (siehe Mietpotenzial)`);
       } else if (nkmCurrent && avmMieteForCheck && avmMieteForCheck < nkmCurrent * 0.90) {
-        cons.push(`NKM <strong>${Math.round((nkmCurrent/avmMieteForCheck - 1) * 100)}% über Marktmiete</strong> — Risiko bei Mieterwechsel`);
+        cons.push(`NKM <strong>${Math.round((nkmCurrent/avmMieteForCheck - 1) * 100)}% über dem Mittel der Marktmiete</strong>, bei Neuvermietung nur mit passender Ausstattung und Lage erzielbar`);   /* v3354: kein rechtliches Risiko beim Mieterwechsel */
       }
     }
 
@@ -6125,7 +6125,19 @@ const QcApp = (function() {
         if (!(mp && mp.markt_monat > 0)) pot = span
           ? 'Die DealPilot-Marktbewertung fand für diese Adresse keine Vergleichsmieten — ein Abgleich und ein Mietpotenzial sind deshalb nicht möglich. Mietspiegel der Gemeinde oder aktuelle Angebote selbst prüfen.'
           : 'Für den Abgleich oben die DealPilot-Marktbewertung abrufen.';
-        else if (mp.markt_monat < nkm * 0.9) pot = 'Die Ist-Miete liegt über der Marktmiete — Risiko bei Mieterwechsel.';
+        else if (mp.markt_monat < nkm - 0.5) {
+          /* v3354 · Marcel 13.11.2026: „ist das wirklich das Maximum? Außerdem habe ich kein Risiko beim Mieterwechsel,
+             weil ich frei gestalten kann.“ Ohne Mietpreisbremse ist die Miete bei Neuvermietung frei (Grenze § 5 WiStG,
+             rund 120 % der ortsüblichen Miete, dieselbe Rechnung wie mietanker.js zielMaximum v3347); mit Bremse darf die
+             Vormiete weiter verlangt werden (§ 556e Abs. 1 BGB). Ein rechtliches Risiko beim Mieterwechsel gibt es in
+             beiden Fällen nicht. Gezeigt werden Mittel, obere Spanne und die Grenze. */
+          const pctUeber = Math.round((nkm / mp.markt_monat - 1) * 100);
+          const oben = mp.markt_oben > 0 ? mp.markt_oben : null, grenze = Math.round(mp.markt_monat * 1.2);
+          const sp = 'Die Ist-Miete liegt ' + pctUeber + ' % über dem Mittel der Marktbewertung' + (oben ? ' (obere Spanne ' + e0(oben) + ', ' + qm(oben) + ')' : '') + '. ';
+          if (mp.bremse && mp.bremse.gilt === false) pot = sp + 'Ohne Mietpreisbremse ist die Miete bei Neuvermietung frei vereinbar, ein rechtliches Risiko beim Mieterwechsel gibt es nicht. Die Grenze liegt bei rund 120 % der ortsüblichen Miete, also etwa ' + e0(grenze) + ' (' + qm(grenze) + '), wenn Ausstattung, Lage und Zustand das tragen. ' + (nkm < grenze - 0.5 ? 'Bis dahin ist noch Luft.' : 'Die Ist-Miete liegt schon an dieser Grenze.');
+          else if (mp.bremse && mp.bremse.gilt === true) pot = sp + 'Bei Neuvermietung darfst du die bisherige Miete weiter verlangen (Vormiete, § 556e BGB), auch wenn sie über der Mietpreisbremse liegt. Ob der Markt sie trägt, hängt an Ausstattung, Lage und Zustand.';
+          else pot = sp + 'Ob die Mietpreisbremse an dieser Adresse gilt, bitte prüfen. Ohne Bremse ist die Miete bei Neuvermietung frei vereinbar, mit Bremse darf die Vormiete weiter verlangt werden (§ 556e BGB).';
+        }
       }
       h += `<div class="qcb-box qcb-miete"><span><span class="qcb-l">Angesetzte Miete</span><br>${kopfT}</span>`
         + `<span class="v">${e0(nkm)} / Monat${wfl > 0 ? `<br><small style="font:500 12px Inter,sans-serif;color:#7A7370">${qm(nkm)} kalt</small>` : ''}</span>`
@@ -6246,7 +6258,7 @@ const QcApp = (function() {
       const mietDiff = (mmSel - nkm) / nkm * 100;
       if (Math.abs(mietDiff) > 8) {
         if (mietDiff > 0) verdictParts.push(`Marktmiete (${_selectionLabel('marktmiete')}) liegt <b>${mietDiff.toFixed(1)}% über deiner aktuellen NKM</b> — Mietsteigerungspotenzial bei Neuvermietung.`);
-        else              verdictParts.push(`NKM liegt <b>${Math.abs(mietDiff).toFixed(1)}% über der AVM-Marktmiete</b> — Risiko bei Mieterwechsel, eventuell überzahlt.`);
+        else              verdictParts.push(`NKM liegt <b>${Math.abs(mietDiff).toFixed(1)}% über dem Mittel der Marktmiete</b>. Rechtlich darf die Miete bei Neuvermietung bleiben, ob der Markt sie trägt, hängt an Ausstattung und Lage.`);   /* v3354 */
       }
     }
     if (r.fairPriceLabel === 'VERY_EXPENSIVE' || r.fairPriceLabel === 'EXPENSIVE') {
@@ -8472,6 +8484,7 @@ html.qc-embedded, html.qc-embedded body{ min-height:0 !important; height:auto !i
     var zul = leer ? null : Km.zulaessig({ ist:grund, wfl:wfl, vgl_qm:vglQm, kappung_pct:kapp.pct, letzte:null });
     var neu = (mm>0 && wfl>0) ? Km.neuvermietung({ markt_qm:mm/wfl, wfl:wfl, vgl_qm:null, bremse:bremse }) : null;
     return { kapp:kapp, bremse:bremse, zul:zul, neu:neu, zusatz:zusatz, leer:leer, markt_monat:mm, vgl_qm:vglQm,
+      markt_oben:(mmSpanne && Number(mmSpanne.high) > 0 ? Number(mmSpanne.high) : null),   /* v3354 */
       vgl_quelle:(vglQm ? 'marktbewertung' : null),
       nkm_heute:nkm, nkm_3j:(zul && zul.miete_monat>0 ? zul.miete_monat : grund) + zusatz };
   };
