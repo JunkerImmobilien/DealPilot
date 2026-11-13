@@ -1522,6 +1522,8 @@
     var kma = kmAntwort(u, m, opt); if (kma) return kma;
     /* v3330 · Spot Am Quittengarten 12: BMF-Aufteilung abgespielt */
     var qga = qgAntwort(u, m, opt); if (qga) return qga;
+    /* v3348 · Spot Bestand: Ertragswert je Stufe abgespielt (bzw. im Mitschnitt-Lauf einmal echt) */
+    var qgba = qgbAntwort(u, m, opt); if (qgba) return qgba;
     var body = null; try { body = opt && typeof opt.body === 'string' ? JSON.parse(opt.body) : null; } catch (e) {}
     if (/\/ai\/transcribe-chunk/.test(u)) { _rh.spr = Math.min(_rh.sprMax || D.sprache.text.length, (_rh.spr || 0) + 1); return rhJ({ text: D.sprache.text.slice(0, _rh.spr).join(' ') }); }
     if (/\/ai\/voice-quickmatch/.test(u)) { var ids = []; for (var i = 0; i < (_rh.spr || 0); i++) ids = ids.concat(D.sprache.ids[i] || []); return rhJ({ ids: ids }); }
@@ -9250,6 +9252,249 @@
         var bw = function () { var x = q('#ai-content .abw-bewegt'); return x && x.offsetWidth ? x : null; };
         if (bw()) { await zeige(bw, 8); await b2oZeile(s, 'Was sich bewegt hat', 'Jede Kennzahl mit ihrem Wert beim Kauf und heute.'); }
         DPM_QG.zeiten.push({ szene: 'A12', ms: Date.now() - t1 });
+      }
+    ]
+  };
+
+  /* ═══ SPOT · „DAS HAUS HAB ICH." · TEIL BESTAND (v3348) ════════════════════════════════
+     Marcel 13.11.2026: neuer Schluss „nach dem Kauf, im Bestand“, Szenen B1-B6 an Objekt B
+     (Am Quittengarten 12, Kopie als Bestand, gewonnen, QG_B) - NUR GELESEN (qgGesperrt).
+     B1 Portfolio-Cockpit · B2 eine Maßnahme (Fassade/Dämmung, Kosten getippt) und ihre Wirkung in der
+     Potenzialanalyse · B3 Ankauf · Bestand · Zielbild · B4 Wert & Verlauf (Marktbericht gegen Plan-Wert)
+     · B5 Steuerverlauf mit Wendepunkt · B6 Beleihungsspielraum (Exit-Strategien).
+     Die Maßnahme steht nur im Formular (Speichern gesperrt), das Aufräumen lädt B neu vom Server.
+     Ertragswert je Stufe (POST /marktbericht/potenzial, ohne Kontingent, aber Bewertungsdienst) ist
+     EINMAL echt erzeugt (?qgbmit, 13.11.2026) und liegt in js/messe-quittengarten-bestand-daten.js;
+     Schlüssel = varianten des Auftrags. Fehlt ein Schlüssel, sperrt RH_SPERRE (503, DPM_QGB.fehlt). */
+  var QGB_BUSTER = 'v3348', QGB_KOSTEN = '100000';
+  window.DPM_QGB = window.DPM_QGB || {};
+  function qgbSpot() { return _aktiv === DREHBUECHER['spot-quittengarten-bestand']; }
+  function qgbLaden() {
+    return new Promise(function (ok) {
+      if (window.DPM_QGB_DATEN) { ok(true); return; }
+      var s = document.createElement('script'); s.src = 'js/messe-quittengarten-bestand-daten.js?v=' + QGB_BUSTER;
+      s.onload = function () { ok(!!window.DPM_QGB_DATEN); }; s.onerror = function () { ok(false); };
+      document.head.appendChild(s);
+    });
+  }
+  function qgbSchluessel(body) { try { var b = typeof body === 'string' ? JSON.parse(body) : body; return JSON.stringify(b.varianten || null); } catch (e) { return null; } }
+  function qgbAntwort(u, m, opt) {
+    if (!lauf || !qgbSpot() || m !== 'POST' || !/\/marktbericht\/potenzial$/.test(u.split('?')[0])) return null;
+    var k = qgbSchluessel(opt && opt.body);
+    if (kmParam('qgbmit') != null && window.__dpmRh) {   /* Mitschnitt-Lauf: einmal echt, Antwort notiert */
+      var echt = window.__dpmRh;
+      return echt(location.origin + u, opt).then(function (r) {
+        r.clone().json().then(function (j) { (DPM_QGB.mitschnitt = DPM_QGB.mitschnitt || {})[k] = j; }).catch(function () {});
+        return r;
+      });
+    }
+    var D = window.DPM_QGB_DATEN, a = D && D.potenzial && D.potenzial[k];
+    if (a) return rhJ(JSON.parse(JSON.stringify(a)));
+    try { DPM_QGB.fehlt.push(k); } catch (e) {}
+    return null;
+  }
+  function qgbPaText() { return r6Text(r11Panel()); }
+  function qgbZiel() { var p = r11Panel(); var l = p ? p.querySelectorAll('.dp-pap-stufen .dp-pap-st') : []; return l.length > 1 ? l[l.length - 1] : null; }
+  function qgbStufe(e) {
+    var t = r6Text(e), f = function (re) { var x = re.exec(t); return x ? x[1].replace(/\s+/g, ' ').trim() : null; };
+    return { ew: f(/Ertragswert\s*([\d.]+ €)/), zuwachs: f(/Wertzuwachs nach Kosten\s*([+−-]\s*[\d.]+ €)/), rnd: f(/Restnutzungsdauer\s*(\d+) J/), massn: f(/Maßnahmen\s*([\d.]+ €)/) };
+  }
+  async function qgbRechnen() {
+    var r = null; try { r = await Promise.race([DpPotenzial.rechnen({ erzwingen: true }), warte(12000)]); } catch (e) {}
+    await warte(900);
+    return r;
+  }
+  function qgbZeileTab(re) { return function () { var p = r11Panel(); if (!p) return null; var c = [].filter.call(p.querySelectorAll('tr'), function (tr) { var w = tr.querySelector('td'); return w && re.test(r6Text(w)); })[0]; return c || null; }; }
+
+  DREHBUECHER['spot-quittengarten-bestand'] = {
+    titel: 'Das Haus hab ich.', unterzeile: 'Nach dem Kauf, im Bestand — Am Quittengarten 12', objekt: null,
+    abspann: [{ ms: 6200, html: ABSPANN_LOGO }],
+    aufraeumen: function () {
+      ['#mfh-we-ov', '#mfh-modal'].forEach(function (sel) { var x = q(sel); if (x && x.parentNode) x.parentNode.removeChild(x); });
+      try { if (_qg.paSi !== undefined) { if (_qg.paSi === null) localStorage.removeItem('dp_pa_si_ansicht'); else localStorage.setItem('dp_pa_si_ansicht', _qg.paSi); } } catch (e) {}
+      _qg.paSi = undefined;
+      try { if (typeof setMainView === 'function') setMainView('single'); } catch (e) {}
+      /* die getippte Maßnahme liegt nur im Formular - B frisch vom Server (Schreiben bleibt gesperrt: _qg.geladen) */
+      try { if (_qg.geladen && window._currentObjKey === QG_B && typeof window.loadSaved === 'function') setTimeout(function () { try { window.loadSaved(QG_B); } catch (e) {} }, 600); } catch (e) {}
+      rhAufraeumen();
+    },
+    szenen: [
+      /* ── B1 · Portfolio-Cockpit ── */
+      async function (s) {
+        if (kmParam('schleife') != null) { karte('<h1>Nur für die Aufnahme</h1><p>Dieses Drehbuch gehört zu einem Spot und läuft nicht in der Schleife.</p>'); await warte(5000); stopp(); throw 'stopp'; }
+        window.DPM_QGB = { zeiten: [], t0: Date.now(), fehlt: [], mitschnitt: null };
+        await qgbLaden();
+        if (!window.DPM_QGB_DATEN && kmParam('qgbmit') == null) throw new Error('Mitschnitt messe-quittengarten-bestand-daten.js fehlt');
+        DPM_REIHE.angelegt = []; DPM_REIHE.gesperrt = []; DPM_REIHE.gespielt = []; DPM_REIHE.geloescht = []; DPM_REIHE.abrufe = []; DPM_REIHE.fertig = null;
+        var ls = function (k) { try { return localStorage.getItem(k); } catch (e) { return null; } };
+        _rh = { start: Date.now() - 1000, berichte: [], spr: 0, sprMax: 0, merker: { dp_detailgrad_zuletzt: ls('dp_detailgrad_zuletzt'), dp_mb_auftraege: ls('dp_mb_auftraege'), dp_mb_pref_span: ls('dp_mb_pref_span'), qc_span_config: ls('qc_span_config') }, kacheln: [] };
+        await rhLaden();
+        rhSpion(); rhMikroAn();
+        _qg = { geladen: true };
+        try { _qg.paSi = localStorage.getItem('dp_pa_si_ansicht'); } catch (e) {}
+        /* immer frisch laden - auch wenn B schon offen ist (ein abgebrochener Lauf ließe die Maßnahme stehen) */
+        try { if (typeof setMainView === 'function') setMainView('single'); } catch (e) {}
+        await window.loadSaved(QG_B);
+        await warteAuf(function () { return window._currentObjKey === QG_B && /Quittengarten/.test(wert('str')); }, 9000);
+        rhExperte(); await warte(1500);
+        /* Ertragswert je Stufe ohne Maßnahme (gespielt) - der Vergleich für B2 */
+        var r0 = await qgbRechnen();
+        DPM_QGB.ohne = r0 && r0.haus ? { bestand: r0.haus.bestand && r0.haus.bestand.wert, ziel: r0.haus.zielbild && r0.haus.zielbild.wert, rnd: r0.haus.zielbild && r0.haus.zielbild.rnd } : null;
+        var t1 = Date.now();
+        var kb = sbKnopf('cockpit')(); if (kb) kb.click(); else if (typeof window.sbActionsAction === 'function') sbActionsAction('cockpit');
+        var kopf = function () { return qs('#dp-pscore-hero .dpz-kopf'); };
+        await warteAuf(kopf, 8000);
+        await warte(1200);
+        var m = q('.main-col'); if (m) m.scrollTop = 0;
+        await zeige(kopf, 8);
+        var kt = r6Text(kopf()), st = /(Sehr gut|Gut|Solide|Schwach|Kritisch)\s*(\d+)\s*\/\s*100/i.exec(kt), no = /Objekte\s*(\d+)/i.exec(kt), vo = /Vol\.\s*([\d,]+ Mio)/i.exec(kt);
+        DPM_QGB.b1 = { kopf: kt.slice(0, 200) };
+        await b2oZeile(s, 'Alle Objekte auf einen Blick', (no ? '<b>' + no[1] + ' Objekte</b> im Bestand' : 'Alle Objekte') + (vo ? ', ' + vo[1] + ' €' : '') + (st ? ' — Portfolio-Score <b>' + st[2] + ' · ' + st[1] + '</b>' : '') + '.');
+        var gr = function () { return qs('.cpt-grid'); };
+        if (gr()) {
+          await zeige(gr, 8);
+          var gt = r6Text(gr()), mi = /Mieteinnahmen \/ Monat\s*([\d.]+ €)/i.exec(gt), cn = /Cashflow n\. St\.\s*[+−-]?\s*[\d.]+ €\s*([+−-]\s*[\d.]+ €) im Monat/i.exec(gt);
+          DPM_QGB.b1.grid = gt.slice(0, 300);
+          await b2oZeile(s, 'Jeden Monat', 'Miete <b>' + (mi ? mi[1] : '–') + '</b> kalt' + (cn ? ', Cashflow nach Steuern <b>' + cn[1].replace(/\s+/g, '') + '</b>' : '') + ' — über alle Objekte.');
+        }
+        DPM_QGB.zeiten.push({ szene: 'B1', ms: Date.now() - t1 });
+      },
+      /* ── B2 · eine Maßnahme planen und sehen, ob sie sich rechnet ── */
+      async function (s) {
+        var t1 = Date.now();
+        try { if (typeof setMainView === 'function') setMainView('single'); } catch (e) {}
+        await warte(900);
+        reiter('s0'); await warte(900);
+        var ob = function () { var b = q('#mfh-oeffnen'); return b && b.offsetWidth ? b : null; };
+        var b0 = ob(); if (b0) { try { b0.scrollIntoView({ block: 'center' }); } catch (x) {} await warte(400); }
+        await zeige(ob, 10);
+        await warte(1200);
+        b0 = ob(); if (b0) b0.click();
+        await warteAuf(function () { return q('#mfh-modal [data-zb-chip="fassade"]'); }, 6000);
+        kegelHoch(true);
+        await warte(900);
+        var chips = function () { var c = q('#mfh-modal .dp-zb-chips'); return c && (c.closest('.mfh-blatt') || c.parentElement); };
+        var c0 = q('#mfh-modal .dp-zb-chips'); if (c0) { try { c0.scrollIntoView({ block: 'center' }); } catch (x) {} await warte(400); }
+        await zeige(chips, 8);
+        var ch = q('#mfh-modal [data-zb-chip="fassade"]');
+        await b2oZeile(s, 'Eine Maßnahme planen', 'Für das ganze Haus: <b>' + (ch ? r6Text(ch).replace(/\s*\+\d+ P\.$/, '') : 'Fassade') + '</b> — ' + (ch && ch.querySelector('em') ? r6Text(ch.querySelector('em')).replace('P.', 'Modernisierungspunkte') : 'mit Modernisierungspunkten') + '.');
+        ch = q('#mfh-modal [data-zb-chip="fassade"]'); if (ch && ch.getAttribute('aria-pressed') !== 'true') ch.click();
+        var kf = await warteAuf(function () { return q('#mfh-modal [data-zb-k="0"]'); }, 4000);
+        if (kf) {
+          await zeige(function () { var k = q('#mfh-modal [data-zb-k="0"]'); return k && (k.closest('.dp-zb-m, .dp-zb-det, div') || k); }, 10);
+          var T = QGB_KOSTEN; kf.focus();
+          for (var i = 1; i <= T.length; i++) { kf.value = T.slice(0, i); kf.dispatchEvent(new Event('input', { bubbles: true })); await warte(160); }
+          kf.dispatchEvent(new Event('change', { bubbles: true }));
+          await warte(700);
+          var sumT = r6Text(q('#mfh-modal')), su = /Maßnahmen ([\d.]+ €)/.exec(sumT);
+          await b2oZeile(s, 'Was sie kostet', 'Kosten <b>' + (su ? su[1] : '–') + '</b> — gerechnet im Zielbild, nach der Maßnahme.');
+        }
+        /* Schritt 4: nur das Zielbild - Modernisierungsgrad und Sanierungskosten NICHT ins Objekt (B wird nur gelesen) */
+        var r4 = q('#mfh-modal .mfh-reiter[data-s="3"]'); if (r4) r4.click();
+        await warte(1200);
+        ['mfh-uep', 'mfh-san'].forEach(function (id) { var c = document.getElementById(id); if (c && c.checked) c.click(); });
+        await warte(400);
+        var ub = q('#mfh-weiter'); if (ub && /Übernehmen/.test(r6Text(ub))) ub.click();
+        await warteAuf(function () { return !q('#mfh-modal'); }, 6000);
+        kegelHoch(false);
+        reiter('s5'); await warte(1200);
+        await warteAuf(function () { return q('#ai-content .dp-pa-tab'); }, 8000);
+        await r11PaTab(/Potenzialanalyse/);
+        var r1 = await qgbRechnen();
+        DPM_QGB.mit = r1 && r1.haus ? { bestand: r1.haus.bestand && r1.haus.bestand.wert, ziel: r1.haus.zielbild && r1.haus.zielbild.wert, rnd: r1.haus.zielbild && r1.haus.zielbild.rnd } : null;
+        await warteAuf(function () { var z = qgbZiel(); return z && /Ertragswert/.test(r6Text(z)) && /Maßnahmen/.test(r6Text(z)); }, 8000);
+        await warte(600);
+        var z0 = qgbZiel(); if (z0) { var sx = scroller(z0); if (sx) { sx.scrollTop += rect(z0).top - 160; await warte(400); } }
+        await zeige(function () { var l = r11Panel() && r11Panel().querySelector('.dp-pap-stufen'); return l || qgbZiel(); }, 8);
+        var Z = qgbStufe(qgbZiel());
+        DPM_QGB.b2 = { zielbild: Z, ohne: DPM_QGB.ohne };
+        var ohneEw = DPM_QGB.ohne && DPM_QGB.ohne.ziel ? eur(DPM_QGB.ohne.ziel) : null, ohneRnd = DPM_QGB.ohne && DPM_QGB.ohne.rnd ? Math.round(DPM_QGB.ohne.rnd) : null;
+        await b2oZeile(s, 'Was sie bringt', 'Ertragswert im Zielbild <b>' + (Z.ew || '–') + '</b>' + (ohneEw ? ' statt ' + ohneEw : '') + (Z.rnd ? ', Restnutzungsdauer ' + Z.rnd + (ohneRnd ? ' statt ' + ohneRnd : '') + ' Jahre' : '') + '.');
+        var bestEw = DPM_QGB.ohne && DPM_QGB.ohne.bestand, plus = (DPM_QGB.ohne && DPM_QGB.ohne.ziel && DPM_QGB.mit && DPM_QGB.mit.ziel) ? DPM_QGB.mit.ziel - DPM_QGB.ohne.ziel : null;
+        var kost = Number(QGB_KOSTEN);
+        await zeige(qgbZiel, 8);
+        await b2oZeile(s, plus != null && plus > kost ? 'Sie rechnet sich' : 'Rechnet sie sich?', 'Wertzuwachs nach Kosten <b>' + (Z.zuwachs || '–') + '</b>' + (plus != null ? ' — die Maßnahme bringt ' + eur(plus) + ' Wert für ' + eur(kost) + ' Kosten' : '') + '.');
+        DPM_QGB.b2.plus = plus; DPM_QGB.b2.bestand = bestEw;
+        DPM_QGB.zeiten.push({ szene: 'B2', ms: Date.now() - t1 });
+      },
+      /* ── B3 · Ankauf · Bestand · Zielbild ── */
+      async function (s) {
+        var t1 = Date.now();
+        await r11PaTab(/Ankauf · Bestand/);
+        var gk = r11Panel() && r11Panel().querySelector('.dp-si-um [data-dp-si-knopf="genau"]');
+        if (gk && gk.getAttribute('aria-pressed') !== 'true') { gk.click(); await warte(700); }
+        var km = qgbZeileTab(/^Kaltmiete p\. a\./), ew = qgbZeileTab(/^Ertragswert/), wz = qgbZeileTab(/^Wertzuwachs nach Kosten/);
+        await warteAuf(km, 6000);
+        var k0 = km(); if (k0) { var sx = scroller(k0); if (sx) { sx.scrollTop += rect(k0).top - 200; await warte(500); } }
+        var zellen = function (tr) { return tr ? [].map.call(tr.querySelectorAll('td'), function (td) { return r6Text(td); }) : []; };
+        var ck = zellen(km()), betr = function (t) { var x = /([\d.]+ €)/.exec(t || ''); return x ? x[1] : '–'; };
+        var kopfZ = function () { var tb = km() && km().closest('table'); var th = tb ? [].map.call(tb.querySelectorAll('thead th'), function (x) { return r6Text(x); }) : []; return th; };
+        DPM_QGB.b3 = { kopf: kopfZ(), kaltmiete: ck };
+        await zeige(km, 8);
+        await b2oZeile(s, 'Ankauf · Bestand · Zielbild', 'Kaltmiete im Jahr: beim Kauf <b>' + betr(ck[1]) + '</b>, heute <b>' + betr(ck[ck.length - 2]) + '</b>, im Zielbild <b>' + betr(ck[ck.length - 1]) + '</b>.');
+        var ce = zellen(ew()), cw = zellen(wz());
+        DPM_QGB.b3.ertragswert = ce; DPM_QGB.b3.wertzuwachs = cw;
+        await zeigeGruppe(ew, wz, 8);
+        var zw = /([+−-]\s*[\d.]+ €)/.exec(cw.join(' '));
+        await b2oZeile(s, 'Der Wert', 'Ertragswert heute <b>' + betr(ce[ce.length - 2]) + '</b> — im Zielbild <b>' + betr(ce[ce.length - 1]) + '</b>' + (zw ? ', nach Kosten <b>' + zw[1].replace(/\s+/g, ' ') + '</b>' : '') + '.');
+        DPM_QGB.zeiten.push({ szene: 'B3', ms: Date.now() - t1 });
+      },
+      /* ── B4 · Wert & Verlauf: jeder Marktbericht gegen den Plan-Wert ── */
+      async function (s) {
+        var t1 = Date.now();
+        await r11PaTab(/Wert & Verlauf/);
+        var za = function () { var p = r11Panel(); return p && p.querySelector('.dp-pa4-zahlen'); };
+        await warteAuf(za, 6000);
+        await zeige(za, 8);
+        var st = r6Text(r11Panel() && r11Panel().querySelector('.dp-pa4-satz'));
+        var sm = /Marktbericht vom ([\d.]+) sieht den Marktpreis bei ([\d.]+ €), ([\d,]+ %) (über|unter) deinem Plan-Wert für (\d{4}) \(([\d.]+ €)\)/.exec(st);
+        DPM_QGB.b4 = { satz: st.slice(0, 240) };
+        await b2oZeile(s, 'Wert & Verlauf', sm ? 'Marktbericht vom ' + sm[1] + ': <b>' + sm[2] + '</b> — <b>' + sm[3] + ' ' + sm[4] + '</b> deinem Plan-Wert für ' + sm[5] + ' (' + sm[6] + ').' : 'Der letzte Marktbericht gegen deinen Plan-Wert.');
+        var ch = function () { var p = r11Panel(); return p && p.querySelector('.dp-pa4-ch'); };
+        if (ch()) {
+          await zeige(ch, 6);
+          await b2oZeile(s, 'Jeder Bericht ein Punkt', 'Plan-Wert, Restschuld und jeder neue Marktbericht — <b>Jahr für Jahr</b> in einer Grafik.');
+        }
+        DPM_QGB.zeiten.push({ szene: 'B4', ms: Date.now() - t1 });
+      },
+      /* ── B5 · Steuerverlauf, Cashflow nach Steuern, Wendepunkt ── */
+      async function (s) {
+        var t1 = Date.now();
+        var ue = [].filter.call(document.querySelectorAll('#ai-content .dp-pa-panel'), function (p) { return /Cashflow vor Steuer/i.test(p.textContent || ''); })[0];
+        var cfn = ue ? /nach Steuer\s*([+−-]\s*[\d.]+ €)\s*\/\s*Monat/.exec(r6Text(ue)) : null;
+        await r11PaTab(/^Steuer$/);
+        var za = function () { var p = r11Panel(); return p && p.querySelector('.dp-stv-zahlen'); };
+        await warteAuf(za, 6000);
+        await zeige(za, 8);
+        var zt = r6Text(za()), wp = /Dauerhaft positiv ab\s*(\d{4})/i.exec(zt), sw = /Steuerwirkung bis dahin\s*([+−-]\s*[\d.]+ €)/i.exec(zt);
+        DPM_QGB.b5 = { zahlen: zt.slice(0, 260), cfNachSteuer: cfn && cfn[1] };
+        await b2oZeile(s, 'Steuer Jahr für Jahr', 'Steuerlich dauerhaft positiv ab <b>' + (wp ? wp[1] : '–') + '</b>' + (sw ? ' — bis dahin Steuerwirkung ' + sw[1].replace(/\s+/g, ' ') : '') + '.');
+        var dg = function () { var p = r11Panel(); return p && p.querySelector('.dp-stv-diag'); };
+        if (dg()) {
+          await zeige(dg, 6);
+          await b2oZeile(s, 'Der Wendepunkt', 'Ab ' + (wp ? wp[1] : 'hier') + ' zahlst du Steuern auf das Haus' + (cfn ? ' — Cashflow nach Steuern heute <b>' + cfn[1].replace(/\s+/g, ' ') + ' im Monat</b>' : '') + '.');
+        }
+        DPM_QGB.zeiten.push({ szene: 'B5', ms: Date.now() - t1 });
+      },
+      /* ── B6 · Beleihungsspielraum (Exit-Strategien) ── */
+      async function (s) {
+        var t1 = Date.now();
+        await r11PaTab(/Anschluss/);
+        var ex = function () { var e = q('#ai-content [data-dp-bestand="exit"]'); return e && e.offsetWidth ? e : null; };
+        await warteAuf(function () { return ex() && /Beleihungsspielraum/.test(r6Text(ex())); }, 6000);
+        var zl = function (re) { return function () { var e = ex(); return e ? [].filter.call(e.querySelectorAll('tr'), function (tr) { return re.test(r6Text(tr)); })[0] || null : null; }; };
+        var bs = zl(/^Beleihungsspielraum/), ne = zl(/^Netto-Erlös/), mp = zl(/^Marktpreisindikation/), rs = zl(/^Restschuld/);
+        var w = function (f) { var tr = f(); var td = tr ? tr.querySelectorAll('td') : []; return td.length > 1 ? r6Text(td[td.length - 1]) : null; };
+        var b0 = bs(); if (b0) { var sx = scroller(b0); if (sx) { sx.scrollTop += rect(b0).top - 360; await warte(500); } }
+        var bw = w(bs), betr = /([\d.]+) €/.exec(bw || ''), null0 = !betr || Number(betr[1].replace(/\./g, '')) === 0;
+        DPM_QGB.b6 = { spielraum: bw, marktpreis: w(mp), restschuld: w(rs), netto: w(ne) };
+        await zeigeGruppe(mp, bs, 8);
+        if (!null0) await b2oZeile(s, 'Kapital im Haus', 'Beleihungsspielraum bei 80 % des Marktpreises: <b>' + bw + '</b> — Marktpreis ' + (w(mp) || '–') + ', Restschuld ' + (w(rs) || '–') + '.');
+        else await b2oZeile(s, 'Kapital im Haus', 'Netto-Erlös vor Steuer <b>' + (w(ne) || '–') + '</b> — Marktpreis ' + (w(mp) || '–') + ' gegen Restschuld ' + (w(rs) || '–') + '.');
+        var fu = function () { var e = ex(); return e && e.querySelector('.dp-pa-fuss'); };
+        if (fu()) { await zeige(fu, 6); await b2oZeile(s, 'Ehrlich gerechnet', 'Der Spielraum ist rechnerisch — <b>die Bank setzt ihren eigenen Beleihungswert an</b>.'); }
+        DPM_QGB.zeiten.push({ szene: 'B6', ms: Date.now() - t1 });
+        DPM_QGB.ende = { gesperrt: DPM_REIHE.gesperrt.slice(), gespielt: DPM_REIHE.gespielt.slice(), abrufe: DPM_REIHE.abrufe.slice(), fehlt: DPM_QGB.fehlt.slice() };
       }
     ]
   };
