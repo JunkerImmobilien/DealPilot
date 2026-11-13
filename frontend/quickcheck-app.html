@@ -3679,7 +3679,7 @@ button[onclick="QcApp.openQc6Settings()"] { display:none !important; }
            der QR des Boarding-Passes (renderQR/_shareUrl) - eine Auskunft,
            zwei Anzeigen, kein zweiter Weg. -->
       <a class="dp-pf-qr" id="qc7-qr" target="_blank" rel="noopener" title="Pass teilen"></a>
-      <span class="dp-pf-rz"><span class="dp-pf-bc"></span><button class="dp-pf-launch qc6-run" data-provider="combo" onclick="QcApp.openCreditModal()"><!-- v575-qcbtn -->Abrufen<!-- v1430: Flugzeug-Symbol entfernt (Backlog v22 Punkt 14) --></button></span>
+      <span class="dp-pf-rz"><!-- v3353 · Barcode-Deko raus (Marcel 13.11.2026) --><button class="dp-pf-launch qc6-run" data-provider="combo" onclick="QcApp.openCreditModal()"><!-- v575-qcbtn -->Abrufen<!-- v1430: Flugzeug-Symbol entfernt (Backlog v22 Punkt 14) --></button></span>
     </span>
 
   </div>
@@ -7073,6 +7073,12 @@ function renderTransferList() {
     document.querySelectorAll('#qc7-sources input[type="checkbox"]:checked').forEach(function(cb){ out.push(cb.value); });
     return out;
   }
+  /* v3353 · Marcel 13.11.2026: „die Marktbewertung nachholen, wenn ich vergessen habe sie auszuwählen - jetzt muss ich
+     jedes Mal einen neuen Vorgang starten“. Nach dem Abruf stand der Knopf auf „Neuer Vorgang“. Jetzt merkt sich der
+     Vorgang, was schon abgerufen ist; kommt eine neue Quelle dazu, heißt der Knopf wieder „Abrufen“ und holt NUR die
+     neuen (Kontingent nur für diese). */
+  var _qbAbgerufen = {};
+  function _offeneQuellen() { return _selectedSources().filter(function (s) { return !_qbAbgerufen[s]; }); }
 
   // Exposé-Checkbox: beim Anhaken sofort Datei-Dialog öffnen (vorher reinladen)
   var _exposeFileLoaded = false;
@@ -7080,6 +7086,7 @@ function renderTransferList() {
     var label = cb.closest('.qc7-src');
     if (label) label.classList.toggle('on', cb.checked);
     _updateCreditHint();  /* v413-credit-hint */
+    try { if (Object.keys(_qbAbgerufen).length) _qbSetRunBtn(_offeneQuellen().length ? 'nachholen' : 'reset'); } catch (e) {}   /* v3353 */
     // V8: Exposé öffnet den Datei-Dialog NICHT mehr beim Anhaken,
     // sondern erst beim Klick auf "Abrufen" (siehe _runSelected).
   }
@@ -7171,7 +7178,7 @@ function renderTransferList() {
   }
 
   function openCreditModal() {
-    var sources = _selectedSources();
+    var sources = Object.keys(_qbAbgerufen).length ? _offeneQuellen() : _selectedSources();   /* v3353 */
     if (!sources.length) { showToast('Bitte mindestens eine Quelle auswählen'); return; }
 
     var listEl  = document.getElementById('qc6-credit-list');
@@ -7208,7 +7215,7 @@ function renderTransferList() {
 
   function confirmCreditModal() {
     closeCreditModal();
-    _runSelected(_selectedSources());
+    _runSelected(Object.keys(_qbAbgerufen).length ? _offeneQuellen() : _selectedSources());   /* v3353 */
   }
 
   /* ─── Progress-UI ─── */
@@ -7337,13 +7344,15 @@ function renderTransferList() {
     setTimeout(function(){ _progressRender(null); }, 1400);
     if (_qbFehler.length) showToast('⚠ Abruf abgeschlossen, aber nicht alles kam an — ' + _qbFehler.join(' · '), 8000);
     else showToast('✓ Abruf abgeschlossen (' + ordered.map(function(s){return labels[s];}).join(' + ') + ')');
+    try { ordered.forEach(function (s) { if (_qbFehler.indexOf(labels[s]) === -1) _qbAbgerufen[s] = true; }); } catch (e) {}   /* v3353 */
     try { _qbSetRunBtn('reset'); } catch(e){}
   }
 
   function _qbSetRunBtn(mode){
     var b=document.querySelector('.dp-pf-launch.qc6-run'); if(!b) return;
     if(mode==='reset'){ b.innerHTML='<span class="dp-pf-ic"><svg class="dp-pf-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg></span> Neuer Vorgang'; b.setAttribute('onclick','QcApp.qbResetVorgang()'); }
-    else { b.innerHTML='Abrufen'; b.setAttribute('onclick','QcApp.openCreditModal()'); }
+    else if(mode==='nachholen'){ b.innerHTML='Abrufen'; b.title='Nur die neu gewählten Quellen abrufen'; b.setAttribute('onclick','QcApp.openCreditModal()'); }   /* v3353 */
+    else { b.innerHTML='Abrufen'; b.removeAttribute('title'); b.setAttribute('onclick','QcApp.openCreditModal()'); }
   }
   function qbResetVorgang(){
     if(!window.confirm('Wirklich verwerfen? Eingaben, importierte Daten und der geteilte Pass gehen verloren.')) return;
@@ -7353,6 +7362,7 @@ function renderTransferList() {
     try { window.__qbPlzOrtLast=''; } catch(e){}
     try { window.parent.postMessage({source:'dp-qc',type:'qc-reset-buffer'},'*'); } catch(e){}
     try { if (window.__qcLageVorgabe) window.__qcLageVorgabe.vorbelegen(); } catch(e){} /* v2159 */
+    _qbAbgerufen = {};   /* v3353 */
     _qbSetRunBtn('abrufen');
     try { if (typeof scheduleUpdate==='function') scheduleUpdate(); } catch(e){}
     showToast('Neuer Vorgang \u2014 alles zur\u00fcckgesetzt');

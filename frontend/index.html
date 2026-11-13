@@ -35,6 +35,11 @@
 <meta name="apple-mobile-web-app-title" content="DealPilot">
 <link rel="apple-touch-icon" href="/assets/dp-pwa-192.png">
 <link rel="stylesheet" href="/fonts/dp-fonts.css">
+<!-- v3353 · Marcel 13.11.2026: „beim Neuladen wird DealPilot kurz im alten Design angezeigt und wechselt dann in die
+     Aktenmappe“. Das Layout (layout-varianten.js) verschiebt Knoten erst nach DOMContentLoaded. Bis dahin bleibt die
+     Seite unsichtbar; layout-varianten.js nimmt die Marke nach setze() ab, spätestens nach 3 s fällt sie von selbst. -->
+<style>html[data-dpl-vorab] body{visibility:hidden}</style>
+<script>(function(){try{if(/[?&]layout=aus(&|$)/.test(location.search))return;var h=document.documentElement;h.setAttribute('data-dpl-vorab','1');setTimeout(function(){h.removeAttribute('data-dpl-vorab');},3000);}catch(e){}})();</script>
 <link rel="stylesheet" href="css/style.css?v=v3351">
 <link rel="stylesheet" href="css/avsec-streifen.css?v=v2780b"><!-- v1148-spalt-1025px -->
 <link rel="stylesheet" href="css/avsec-karte-neu.css?v=v2780a"><!-- v2760/v2780a · Kartenfassung unter 940 px Kartenbreite -->
@@ -4032,7 +4037,7 @@ label.dp-required.qc-required::after {
 <script src="js/immokalk-import.js?v=v1260"></script>
 <script src="js/import-export-modal.js?v=v1678"></script>
 <script src="js/quick-check.js?v=v3349b"></script>
-<script src="js/qc-bridge.js?v=v3352"></script>
+<script src="js/qc-bridge.js?v=v3353"></script>
 <script src="js/bodenrichtwert.js?v=v3208by"></script>
 <script src="js/brw-karte.js?v=v3241"></script><!-- v3237 · Bodenrichtwert-Karte -->
 <!-- v1391: welche Felder zu welcher Objektart gehoeren -->
@@ -4133,7 +4138,7 @@ label.dp-required.qc-required::after {
 <script src="js/main.js?v=v3280"></script>
   <!-- v372-autocomplete-removed: <script src="js/autocomplete.js?v=160" defer></script> -->
   <script src="js/session-expired-banner.js?v=500"></script><!-- v500-session-banner -->
-  <script src="js/object-actions.js?v=v3352"></script>
+  <script src="js/object-actions.js?v=v3353"></script>
   <script src="js/unterlagen-eingang.js?v=v3349d"></script><!-- v3120 · ein Eingang fuer Belege, Unterlagen, Rechnungen -->
   <script src="js/dpsh-score-hero.js?v=v3254"></script><!-- dpsh-score-hero -->
   <script src="js/quick-boarding-share.js?v=v3224"></script>
@@ -4609,7 +4614,7 @@ document.addEventListener('DOMContentLoaded', function(){
          Co-Pilot darunter Aenderungen im Satz entgegen; zwei Wege zum
          selben Ziel sind einer zuviel. Die Datei bleibt im Repo, falls der
          Sprechlauf dort doch noch gebraucht wird. -->
-    <script src="js/layout-varianten.js?v=v3335"></script>
+    <script src="js/layout-varianten.js?v=v3353"></script>
 <!-- v1714 - die Objektkarten-Entwuerfe zum Umschalten -->
 <script src="js/objektkarten-stil.js?v=v3235"></script>
     <script src="js/karten-stil.js?v=v3235"></script><!-- v1953 · Trichter (Bordkarte ist raus) -->

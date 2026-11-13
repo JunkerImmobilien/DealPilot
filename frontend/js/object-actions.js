@@ -3355,7 +3355,7 @@
         if (_ges > 0) {
           qcData['qc_hg'] = String(Math.round(_ges));
           var _hgVorg = (_hgU && _hgU.hgVorgabe) || (_hgN && _hgN.hgVorgabe);
-          if (_n > 0 && !_hgVorg) qcData['qc_hg_split'] = String(Math.round(_n / (_u + _n) * 100));
+          if (_n > 0 && !_hgVorg) qcData['qc_hg_split'] = String(Math.round(_n / (_u + _n) * 1000) / 10).replace('.', ',');   /* v3352a · eine Nachkommastelle (30,7 statt 31) */
           delete _qcPendingMerged['hg_nul'];
           pendingList = pendingList.filter(function (x) { return x.key !== 'hg_nul'; });
         }

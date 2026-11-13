@@ -1835,6 +1835,8 @@
          Aktenmappe - sonst saesse er in einer Ansicht, die in keiner Wahl mehr auftaucht. ?layout=aus bleibt als Pruefweg fuer eine Sitzung. */
       setze('v1b');
     }
+    /* v3353 · die Vorab-Sperre aus index.html (data-dpl-vorab) erst lösen, wenn das Layout steht */
+    try { requestAnimationFrame(function () { document.documentElement.removeAttribute('data-dpl-vorab'); }); } catch (e) { document.documentElement.removeAttribute('data-dpl-vorab'); }
 
     /* ── v1893 · DAS ABZEICHEN GEHOERT AUCH IN „HEUTE" IN DEN KOPF ──────────
        Gemessen am 06.10.2026 bei 390 px in der Ansicht „Heute": das Abzeichen
