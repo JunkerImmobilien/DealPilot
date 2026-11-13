@@ -44776,3 +44776,31 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
   - Ampel-Korrektur `calc.js` (geplante Erhaltung in der 15-%-Ampel) zweimal von der Rechteprüfung abgelehnt, wartet auf Marcels Freigabe.
   - Quick-Check „Quellen nachholen“ nicht im echten Abruf geklickt.
   - Positionen des Wirtschaftsplans (Nebenkosten-Zusammensetzung) werden noch nicht ausgelesen.
+
+### Rollout 1.0.113 · 13.11.2026 spät (`d79a2f1`; v3355–v3356a)
+- **Was:**
+  - 15-%-Ampel zählt die geplante Erhaltung im 3-Jahres-Fenster (v3355, von Marcel freigegeben).
+  - Mietprüfung (v3356, Befundliste `Dateien/Fehler/mieten-pruefung-2026-11-13.md`):
+    - 1-€-Schwelle im Kern und im Kappungspfad.
+    - Näherung rechnet § 558 mit dem Oberwert.
+    - Neubau-Ausnahme § 556f Satz 1 (Baujahr ab 2015).
+    - 120-%-Grenze mit Zahl ohne Bremse.
+    - Absturz des Vorschlags ohne Marktbewertung behoben.
+    - Quick-Check: Vergleichsmiete aus Marktmiete minus Abschlag, Maximum-Balken, nur gemessene obere Spanne, Anbieter neutral, keine pauschalen Risiko-Sätze.
+    - Pilot-Analyse: Texte zu Zielbild und Hebel.
+    - Landing: Spielraum beim Mittel.
+- **Nachweis:**
+  - mietpotenzial 288/288, mietanker 58 grün (neu B1, B2), Score-Ketten gleich, Gold-Audit auf der Basislinie.
+  - Staging Westerfeld Whg. 1: keine Soll-Miete mehr, „kein Spielraum“, Neuvermietung 9,27 €/m² überall gleich.
+  - Quittengarten-Ampel 61,8 % „unter Grenze“.
+  - Prod-mb-backend führt `556f_neubau`.
+- **Rest aus der Befundliste:**
+  - A3 (MFH-Näherung je Wohnungsgröße)
+  - A5 (drei Neuvermietungszahlen benennen)
+  - A6 (Maximum aus eigener Eingabe)
+  - A7 voll (Quick-Check über die Mietspiegel-Route)
+  - A9 (Merker „Mietsteigerung vom Nutzer gesetzt“)
+  - B8 (Entscheidung „bitte prüfen“)
+  - B9, B10
+  - D1 (rund 230 Gedankenstriche und 47 Semikolons in Kundentexten, mit Prüfregel abtragen)
+  - E (Belegzeile je Wohnung)
