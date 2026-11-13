@@ -366,7 +366,12 @@
     if (br && br.gilt === true && og) z.push({ c: 'neu', t: 'Bei Neuvermietung', v: 'höchstens ' + eur2(og) + '/m²',
       u: 'Mietpreisbremse gilt' + (br.bis ? ' bis ' + deDatum(br.bis) : '') + ' · Vergleichsmiete + 10 %',
       k: f.zielSetzen ? { lbl: 'als Zielmiete', fn: function () { f.zielSetzen(og); } } : null });
-    else if (br && br.gilt === false) z.push({ c: 'neu', t: 'Bei Neuvermietung', v: 'frei', u: 'keine Mietpreisbremse an dieser Adresse' });
+    else if (br && br.gilt === false) {   /* v3356 · Prüfung B3: die 120-%-Grenze mit Zahl, wie mietanker.js zielMaximum */
+      var _vq = zahl(so.vgl_qm) || zahl(w.vgl_qm), _og = _vq > 0 ? Math.round(_vq * 1.2 * 100) / 100 : 0;
+      z.push({ c: 'neu', t: 'Bei Neuvermietung', v: _og > 0 ? 'frei, bis ca. ' + eur2(_og) + '/m²' : 'frei',
+        u: (br.neubau ? br.text : 'keine Mietpreisbremse an dieser Adresse') + (_og > 0 ? ' · unbedenklich bis rund 120 % der Vergleichsmiete (§ 5 WiStG), wenn Ausstattung, Lage und Zustand das tragen' : ''),
+        k: (_og > 0 && f.zielSetzen) ? { lbl: 'als Zielmiete', fn: function () { f.zielSetzen(_og); } } : null });
+    }
     else z.push({ c: 'neu', t: 'Bei Neuvermietung', v: 'bitte prüfen', u: (br && br.text) || '' });
     /* v3130 · N115 · Vorschlag Zielmiete nach Sanierung (nur Vorschlag, „übernehmen" setzt das Feld) */
     var zv = vorschlagFuer(m, idx);
@@ -547,7 +552,7 @@
     }).join('');
     var br = res.bremse || {};
     return '<div class="dp-zv">' + kopf
-      + '<p class="dp-zv-her">Grundlage: ' + esc(res.markt.herkunft) + '.</p>'
+      + '<p class="dp-zv-her">Grundlage: ' + esc(res.markt ? res.markt.herkunft : 'rechtliches Maximum der Wohnung (Mietspiegel bzw. DealPilot-Näherung), ohne Marktbewertung') + '.</p>'   /* v3356 · B4: ohne Marktbewertung brach der Vorschlag still ab */
       + '<div class="dp-zv-liste">' + zeilen + '</div>'
       + (offen > 1 ? '<div class="dp-zv-alle"><button type="button" class="dp-ml-k" data-zv-alle="1">alle ' + offen + ' übernehmen ›</button></div>' : '')
       + '<p class="dp-zv-fuss">' + esc(br.gilt === true ? 'Mietpreisbremse gilt hier: bei Neuvermietung höchstens ortsübliche Vergleichsmiete + 10 % (§ 556d BGB); ausgenommen die erste Vermietung nach umfassender Modernisierung (§ 556f BGB).'
@@ -603,7 +608,15 @@
      Rechnet NICHTS Neues zur Miete: Kappung, Termine und Soll kommen aus
      kappung()/sollFuer() über modell(). Neu ist nur die Bremse (§ 556d Abs. 1
      BGB: bei Mietbeginn höchstens ortsübliche Vergleichsmiete + 10 %). */
-  function mietpreisbremse(ags) { return K.mietpreisbremseAus(_kapp, { ags: ags }); }   /* v3075 · Regel im Kern */
+  function mietpreisbremse(ags) {   /* v3075 · Regel im Kern */
+    var br = K.mietpreisbremseAus(_kapp, { ags: ags });
+    /* v3356 · Prüfung 13.11.2026 B1: Erstbezug nach dem 01.10.2014 (Baujahr ab 2015) - § 556f Satz 1 BGB,
+       die Bremse gilt für diese Wohnung dauerhaft nicht */
+    var bj = parseInt(wert('baujahr'), 10);
+    if (br && br.gilt === true && bj >= 2015) return Object.assign({}, br, { gilt: false, neubau: true,
+      text: 'Mietpreisbremse gilt hier nicht: Erstbezug nach dem 01.10.2014 (Baujahr ' + bj + ', § 556f BGB)' });
+    return br;
+  }
 
   /* Eine Wohnung des Modells (m.wohnungen[i]) als höchstens vier Zeilen. */
   function mietrechtDaten(m, i) {
@@ -681,7 +694,7 @@
       u: br.gilt === true
         ? (obergrenze ? 'bei Neuvermietung höchstens ' + eur2(obergrenze) + '/m² (Vergleichsmiete ' + eur2(vglQm) + ' + 10 %'
             + (vglHer ? ', ' + vglHer : '') + ')' : 'Vergleichsmiete eintragen — dann rechnet DealPilot die Obergrenze')
-        : br.gilt === false ? 'Neuvermietung ohne Obergrenze nach § 556d' : '',
+        : br.gilt === false ? (br.neubau ? br.text + '. ' : '') + 'Neuvermietung frei vereinbar' + (vglQm > 0 ? ', unbedenklich bis rund 120 % der Vergleichsmiete, ca. ' + eur2(vglQm * 1.2) + '/m² (§ 5 WiStG)' : '') : '',   /* v3356 · B3 */
       warn: br.gilt === null || !!br.pruefen || (br.gilt === true && markt), lang: br.text
         + (br.gilt === true && naeh ? ' Die Obergrenze ist auf der DealPilot-Näherung der ortsüblichen Vergleichsmiete gerechnet: sie leitet die Vergleichsmiete aus der amtlichen Zensus-Bestandsmiete ab und ist an den freien Mietspiegeln kalibriert (mittlere Abweichung rund 7,5 %). Maßgeblich bleibt die Vergleichsmiete laut Mietspiegel — liegt sie niedriger, ist auch die zulässige Miete niedriger; vor der Neuvermietung mit dem Mietspiegel prüfen.' : '')
         + (br.gilt === true && markt && !naeh ? ' Die Obergrenze ist auf einer Schätzung aus Angebotsmieten gerechnet, nicht auf der ortsüblichen Vergleichsmiete (Mietspiegel) — die kann niedriger liegen.' : '')
@@ -702,8 +715,8 @@
             + ' · es gilt der kleinere Wert, nie unter der Ist-Miete von ' + eur(istR)
             + (s.umlage559 && s.umlage559.monat > 0 ? ' · dazu Modernisierungsumlage § 559: ' + eur(s.umlage559.monat) + '/Monat' : '')
             + (obergrenze ? ' · Neuvermietung: ' + eur2(vglQm) + '/m² × 1,10 = ' + eur2(obergrenze) + '/m² (Mietpreisbremse)'
-              : br.gilt === false ? ' · Neuvermietung: frei, keine Mietpreisbremse' : '');
-          z.push({ k: 'Rechenweg', v: m558R > istR + 0.01 ? 'höchstens ' + eur(m558R) + '/Monat' : 'keine Erhöhung', u: rw });
+              : br.gilt === false ? ' · Neuvermietung: frei, unbedenklich bis ' + eur2(vglQm) + '/m² × 1,20 = ' + eur2(vglQm * 1.2) + '/m² (§ 5 WiStG)' : '');   /* v3356 · B3 */
+          z.push({ k: 'Rechenweg', v: m558R >= istR + 1 ? 'höchstens ' + eur(m558R) + '/Monat' : 'keine Erhöhung', u: rw });
         }
       }
     }
@@ -1089,8 +1102,13 @@
     var fl = Math.round(zahl(msObjektWfl()) * 100) / 100, bj = parseInt(wert('baujahr'), 10);
     if (!(bj > 1000) || !(fl > 0)) return null;
     msWerteFuer(fl);   /* holt einmal je Gemeinde × Baujahr × Fläche */
-    var c = _msNz[agsJetzt() + '|' + bj + '|' + fl + '|' + msMerkmalQuery()];   /* v3343 · derselbe Schlüssel wie msWerteFuer */
-    return c && c.qm > 0 ? c : null;
+    var _k = agsJetzt() + '|' + bj + '|' + fl + '|' + msMerkmalQuery();
+    var c = _msNz[_k];   /* v3343 · derselbe Schlüssel wie msWerteFuer */
+    if (!(c && c.qm > 0)) return null;
+    /* v3356 · Prüfung 13.11.2026 A1: die Spanne der Näherung (Backend vergleich_wohnung, oben = Mittel × 1,14) mitgeben,
+       damit § 558 auch hier mit dem gewählten Wert rechnet (v3347: oben) */
+    var vz = _msVz[_k] && _msVz[_k].vergleich;
+    return Object.assign({}, c, { unten: vz && vz.unten > 0 ? vz.unten : null, mittel: c.qm, oben: vz && vz.oben > 0 ? vz.oben : null });
   }
   /* v3343 · ohne eigene Wahl gilt die Einordnung nach den Merkmalen (lib/mietanker.js einordnung, BGH VIII ZR 82/18):
      Oberwert nur, wenn Ausstattung, Lage und Zustand ihn tragen, sonst Mittelwert. Bis v3342 stand hier „oben". */
@@ -1128,8 +1146,13 @@
         herkunft: t + (a.quelle ? ' — ' + a.quelle : '') + ((a.datum || a.stand) ? ', Stand ' + deDatum(String(a.datum || a.stand).slice(0, 10)) : '') + (a.ausserhalb ? ', außerhalb der Tabelle' : '') };
     }
     var nz = msNaeherung();   /* v3266 · Stufe N zwischen amtlicher Mietpreisübersicht und Schätzung aus Angebotsmieten */
-    if (nz) return { qm: nz.qm, herkunft: nz.text, art: 'dealpilot_naeherung', quelle_art: 'dealpilot_naeherung', schaetzung: true,
-      naeherung: nz, hinweise: (nz.hinweise || []).slice() };
+    if (nz) {
+      /* v3356 · A1: wie beim Mietspiegel der gewählte Wert (Standard oben), Mittelwert daneben */
+      var _w = msWahl(), _qmN = (_w === 'oben' && nz.oben > 0) ? nz.oben : (_w === 'unten' && nz.unten > 0) ? nz.unten : nz.qm;
+      var _txtN = _qmN !== nz.qm ? nz.text + ', ' + (K.MS_WAHL[_w] || _w) + ' ca. ' + String(Math.round(_qmN * 100) / 100).replace('.', ',') + ' €/m² (Mittelwert ' + String(Math.round(nz.qm * 100) / 100).replace('.', ',') + ' €/m²)' : nz.text;
+      return { qm: _qmN, herkunft: _txtN, art: 'dealpilot_naeherung', quelle_art: 'dealpilot_naeherung', schaetzung: true,
+        naeherung: nz, mittel_qm: nz.qm, wahl: _w, hinweise: (nz.hinweise || []).slice() };
+    }
     v = zahl(wert('ds2_marktmiete'));
     if (v > 0) {
       var abS = mieteAbschlag();

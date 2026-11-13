@@ -5066,7 +5066,7 @@ const QcApp = (function() {
   // unter /api/v1/avm/pricehubble aufgelöst.
   async function priceHubble(opts) {
     const silent = !!(opts && opts.silent);
-    if (!silent) showToast('🏛 PriceHubble wird angefragt...');
+    if (!silent) showToast('🏛 Bewertungspartner wird angefragt …');
     const inputs = QcEngine.getInputs();
 
     let result = null;
@@ -5157,7 +5157,7 @@ const QcApp = (function() {
     if (typeof scheduleUpdate === "function") scheduleUpdate();
     if (!silent) {
       if (usedFallback) showToast('ℹ Demo-Daten · ' + _selectionLabel('marktwert') + ' übernommen');
-      else showToast('✓ PriceHubble: ' + fmt0(result.marktwert) + ' € · ' + _selectionLabel('marktwert') + ' übernommen');
+      else showToast('✓ Bewertungspartner: ' + fmt0(result.marktwert) + ' € · ' + _selectionLabel('marktwert') + ' übernommen');
     }
   }
 
@@ -5166,7 +5166,7 @@ const QcApp = (function() {
      ════════════════════════════════════════════════════════════════ */
   async function sprengnetter(opts) {
     const silent = !!(opts && opts.silent);
-    if (!silent) showToast('🏛 Sprengnetter wird angefragt...');
+    if (!silent) showToast('🏛 Bewertungspartner wird angefragt …');
     const inputs = QcEngine.getInputs();
     let result = null;
     let usedFallback = false;
@@ -5203,7 +5203,7 @@ const QcApp = (function() {
         if (data.ok && data.result) result = data.result;
       } else {
         const err = await res.json().catch(() => ({}));
-        showToast('✗ Sprengnetter: ' + (err.detail || err.error || 'HTTP ' + res.status));
+        showToast('✗ Bewertungspartner: ' + (err.detail || err.error || 'HTTP ' + res.status));
       }
     } catch (e) {
       // Standalone-Mode → Demo-Fallback
@@ -5224,7 +5224,7 @@ const QcApp = (function() {
     if (typeof scheduleUpdate === "function") scheduleUpdate();   // Score sofort aktualisieren
     if (!silent) {
       if (usedFallback) showToast('ℹ Demo-Daten · ' + _selectionLabel('marktwert') + ' übernommen');
-      else showToast('✓ Sprengnetter: ' + fmt0(result.marktwert) + ' € · ' + _selectionLabel('marktwert') + ' übernommen');
+      else showToast('✓ Bewertungspartner: ' + fmt0(result.marktwert) + ' € · ' + _selectionLabel('marktwert') + ' übernommen');
     }
   }
 
@@ -5787,13 +5787,13 @@ const QcApp = (function() {
         // Sprengnetter: abgeleitete Werte
         const demand = _demandScore(avm);
         const risk   = _rentRiskScore(avm);
-        if (demand.score >= 4)      pros.push(`Nachfrage-Indikator <strong>${demand.label}</strong> (Sprengnetter-Proxy)`);
-        else if (demand.score <= 2) cons.push(`Nachfrage-Indikator <strong>${demand.label}</strong> — Wiederverkauf kann dauern`);
+        if (demand.score >= 4)      pros.push(`Nachfrage-Indikator <strong>${demand.label}</strong> (Schätzung des Bewertungspartners)`);
+        else if (demand.score <= 2) cons.push(`Nachfrage-Indikator <strong>${demand.label}</strong> (Schätzung des Bewertungspartners)`);   /* v3356 · D2 */
         if (risk.score >= 4)        cons.push(`Mietausfall-Risiko <strong>${risk.label}</strong> (Brutto-Renditen-Proxy)`);
         if (avm.fairPriceLabel === 'TOP_OFFER' || avm.fairPriceLabel === 'GOOD_OFFER')
-          pros.push(`Sprengnetter Fair-Price: <strong>${_fairPriceText(avm.fairPriceLabel)}</strong>`);
+          pros.push(`Preiseinschätzung des Bewertungspartners: <strong>${_fairPriceText(avm.fairPriceLabel)}</strong>`);
         else if (avm.fairPriceLabel === 'VERY_EXPENSIVE')
-          cons.push(`Sprengnetter Fair-Price: <strong>${_fairPriceText(avm.fairPriceLabel)}</strong>`);
+          cons.push(`Preiseinschätzung des Bewertungspartners: <strong>${_fairPriceText(avm.fairPriceLabel)}</strong>`);
         if (avm.wertentwicklung != null && avm.wertentwicklung >= 2.5)
           pros.push(`Wertsteigerung <strong>+${avm.wertentwicklung.toFixed(2)}% p.a.</strong> (CAGR)`);
         else if (avm.wertentwicklung != null && avm.wertentwicklung < 0)
@@ -5820,7 +5820,7 @@ const QcApp = (function() {
         const zs = _c.zensus;
         if (zs && zs.leer != null) {
           const wo = zs.ebene + (zs.name ? ' ' + zs.name : '');
-          if (zs.leer >= 7)        cons.push(`Leerstand <strong>${_de(zs.leer, 1)} %</strong> (Zensus 2022, ${wo}) — erhöhtes Vermietungsrisiko`);
+          if (zs.leer >= 7)        cons.push(`Leerstand <strong>${_de(zs.leer, 1)} %</strong> (Zensus 2022, ${wo}), über dem Bundesschnitt`);   /* v3356 · D2: keine pauschale Folgerung */
           else if (zs.leer <= 2.5) pros.push(`Leerstand nur <strong>${_de(zs.leer, 1)} %</strong> (Zensus 2022, ${wo}) — angespannter Mietmarkt`);
         }
         /* v2502 · Marcel 20.10.2026: die Zensus-Bestandsmiete (Stichtag 2022,
@@ -6105,8 +6105,8 @@ const QcApp = (function() {
       const leer = !!(mp && mp.leer);
       const q = [];
       if (mp && mp.bremse) q.push(mp.bremse.gilt === true
-        ? 'Mietpreisbremse gilt — ' + link(mp.bremse.verordnung || 'Landesverordnung', mp.bremse.url) + ': bei Neuvermietung höchstens ortsübliche Vergleichsmiete + 10 % (§ 556d BGB); einen Mietspiegelwert haben wir für den Ort nicht, vor Vertragsschluss prüfen'
-        : mp.bremse.gilt === false ? 'keine Mietpreisbremse — die Gemeinde steht nicht in der ' + link(mp.bremse.verordnung || 'Landesverordnung', mp.bremse.url)
+        ? 'Mietpreisbremse gilt — ' + link(mp.bremse.verordnung || 'Landesverordnung', mp.bremse.url) + ': bei Neuvermietung höchstens ortsübliche Vergleichsmiete + 10 % (§ 556d BGB); im Quick-Check ist die Vergleichsmiete aus der Marktmiete geschätzt, vor Vertragsschluss mit dem Mietspiegel prüfen'
+        : mp.bremse.gilt === false ? (mp.bremse.neubau ? esc(mp.bremse.text) : 'keine Mietpreisbremse, die Gemeinde steht nicht in der ' + link(mp.bremse.verordnung || 'Landesverordnung', mp.bremse.url))
         : esc(mp.bremse.text || ''));
       if (mp && mp.kapp) q.push('Kappungsgrenze ' + mp.kapp.pct + ' % in drei Jahren (' + (mp.kapp.herkunft === 'verordnung' ? link(mp.kapp.verordnung || 'Landesverordnung', mp.kapp.url) : 'gesetzlich, § 558 Abs. 3 Satz 1 BGB') + ')');
       let kopfT, pot = '';
@@ -6115,7 +6115,7 @@ const QcApp = (function() {
         kopfT = 'Keine Miete angegeben — angesetzt ist die Marktmiete der DealPilot-Bewertung.';
       } else {
         kopfT = (mp && mp.markt_monat > 0)
-          ? 'Deine Ist-Miete, abgeglichen mit der Marktmiete der DealPilot-Bewertung (' + e0(mp.markt_monat) + ', ' + qm(mp.markt_monat) + ') als Annahme für die ortsübliche Miete.'
+          ? 'Deine Ist-Miete, abgeglichen mit der Marktmiete der DealPilot-Bewertung (' + e0(mp.markt_monat) + ', ' + qm(mp.markt_monat) + ')' + (mp.vgl_abschlag && mp.vgl_qm > 0 ? '. Die ortsübliche Vergleichsmiete ist daraus geschätzt, abzüglich ' + mp.vgl_abschlag.pct + ' % (' + String(mp.vgl_qm.toFixed(2)).replace('.', ',') + ' €/m², nicht amtlich).' : ' als Annahme für die ortsübliche Miete.')
           : 'Deine Ist-Miete.';   /* v3081f: ohne Marktmiete kein Abgleich behaupten */
         const z = mp && mp.zul;
         const grundM = QcEngine.num(inputs.nkm_grund) > 0 ? Math.min(QcEngine.num(inputs.nkm_grund), nkm) : nkm;
@@ -6125,14 +6125,14 @@ const QcApp = (function() {
         if (!(mp && mp.markt_monat > 0)) pot = span
           ? 'Die DealPilot-Marktbewertung fand für diese Adresse keine Vergleichsmieten — ein Abgleich und ein Mietpotenzial sind deshalb nicht möglich. Mietspiegel der Gemeinde oder aktuelle Angebote selbst prüfen.'
           : 'Für den Abgleich oben die DealPilot-Marktbewertung abrufen.';
-        else if (mp.markt_monat < nkm - 0.5) {
+        else if (nkm > mp.markt_monat * 1.03) {   /* v3356 · C3: erst ab 3 % darüber */
           /* v3354 · Marcel 13.11.2026: „ist das wirklich das Maximum? Außerdem habe ich kein Risiko beim Mieterwechsel,
              weil ich frei gestalten kann.“ Ohne Mietpreisbremse ist die Miete bei Neuvermietung frei (Grenze § 5 WiStG,
              rund 120 % der ortsüblichen Miete, dieselbe Rechnung wie mietanker.js zielMaximum v3347); mit Bremse darf die
              Vormiete weiter verlangt werden (§ 556e Abs. 1 BGB). Ein rechtliches Risiko beim Mieterwechsel gibt es in
              beiden Fällen nicht. Gezeigt werden Mittel, obere Spanne und die Grenze. */
           const pctUeber = Math.round((nkm / mp.markt_monat - 1) * 100);
-          const oben = mp.markt_oben > 0 ? mp.markt_oben : null, grenze = Math.round(mp.markt_monat * 1.2);
+          const oben = mp.markt_oben > 0 ? mp.markt_oben : null, grenze = mp.grenze_monat || Math.round(mp.markt_monat * 1.2);   /* v3356 · B5: Grenze auf der geschätzten Vergleichsmiete */
           const sp = 'Die Ist-Miete liegt ' + pctUeber + ' % über dem Mittel der Marktbewertung' + (oben ? ' (obere Spanne ' + e0(oben) + ', ' + qm(oben) + ')' : '') + '. ';
           if (mp.bremse && mp.bremse.gilt === false) pot = sp + 'Ohne Mietpreisbremse ist die Miete bei Neuvermietung frei vereinbar, ein rechtliches Risiko beim Mieterwechsel gibt es nicht. Die Grenze liegt bei rund 120 % der ortsüblichen Miete, also etwa ' + e0(grenze) + ' (' + qm(grenze) + '), wenn Ausstattung, Lage und Zustand das tragen. ' + (nkm < grenze - 0.5 ? 'Bis dahin ist noch Luft.' : 'Die Ist-Miete liegt schon an dieser Grenze.');
           else if (mp.bremse && mp.bremse.gilt === true) pot = sp + 'Bei Neuvermietung darfst du die bisherige Miete weiter verlangen (Vormiete, § 556e BGB), auch wenn sie über der Mietpreisbremse liegt. Ob der Markt sie trägt, hängt an Ausstattung, Lage und Zustand.';
@@ -6148,11 +6148,13 @@ const QcApp = (function() {
          können, ist das ein Potenzial - da eine Karte wäre top.“ Drei Balken wie die Mietleiter
          (potenzial.js): Ist · in drei Jahren zulässig (Kappung, höchstens Marktmiete) · bei Neuvermietung
          (Marktmiete der Bewertung). Nur wenn die Ist-Miete darunter liegt; gerechnet hat _qcMietpotenzial. */
-      if (!leer && mp && mp.markt_monat > nkm + 0.5) {
+      if (!leer && mp && Math.max(mp.markt_monat || 0, mp.grenze_monat || 0) >= nkm + 1) {   /* v3356 · C2: auch das Maximum zählt */
         const z3 = (mp.zul && mp.zul.miete_monat > 0) ? mp.nkm_3j : null;
         const balken = [{ c: 'ist', t: 'Ist heute', v: nkm }];
         if (z3 != null && z3 > nkm + 0.5) balken.push({ c: 'soll', t: 'in 3 Jahren zulässig', v: z3 });
-        balken.push({ c: 'markt', t: 'bei Neuvermietung', v: mp.markt_monat });
+        if (mp.markt_monat >= nkm + 1) balken.push({ c: 'markt', t: 'Neuvermietung Durchschnitt', v: mp.markt_monat });
+        /* v3356 · C2: das Maximum bei Neuvermietung (Vergleichsmiete × 1,2 ohne Bremse, × 1,1 mit Bremse) */
+        if (mp.grenze_monat > Math.max(nkm, mp.markt_monat) + 0.5) balken.push({ c: 'markt', t: 'Neuvermietung Maximum', v: mp.grenze_monat });
         const max = Math.max.apply(null, balken.map(b => b.v));
         const jahr = x => e0(x * 12);
         h += `<div class="qcb-box qcb-pot"><span class="qcb-l">Mietpotenzial</span><div class="qcb-bal">`
@@ -6262,20 +6264,20 @@ const QcApp = (function() {
       }
     }
     if (r.fairPriceLabel === 'VERY_EXPENSIVE' || r.fairPriceLabel === 'EXPENSIVE') {
-      verdictParts.push(`Sprengnetter Fair-Price-Label: <b>${_fairPriceText(r.fairPriceLabel).replace(/^[^ ]+ /, '')}</b>.`);
+      verdictParts.push(`Preiseinschätzung des Bewertungspartners: <b>${_fairPriceText(r.fairPriceLabel).replace(/^[^ ]+ /, '')}</b>.`);
     }
     if (demand.score <= 2) verdictParts.push(`Nachfrage-Indikator niedrig (${demand.label}) — Wiederverkauf könnte länger dauern.`);
-    if (risk.score >= 4)   verdictParts.push(`Mietausfall-Risiko ${risk.label.toLowerCase()} — auf Mieterbonität achten, ggf. Mietausfallversicherung.`);
+    if (risk.score >= 4)   verdictParts.push(`Mietausfall-Schätzung des Bewertungspartners: ${risk.label.toLowerCase()}.`);   /* v3356 · D2 */
     if (r.wertentwicklung != null) {
       if (r.wertentwicklung < 0)      verdictParts.push(`Region hat zuletzt <b>${r.wertentwicklung.toFixed(2)}% p.a. an Wert verloren</b> — Vorsicht.`);
       else if (r.wertentwicklung > 3) verdictParts.push(`Wertsteigerung +${r.wertentwicklung.toFixed(2)}% p.a. — solides Lage-Momentum.`);
     }
 
-    const verdict = verdictParts.length ? verdictParts.join(' ') : 'Sprengnetter-Daten liegen im erwarteten Marktrahmen.';
+    const verdict = verdictParts.length ? verdictParts.join(' ') : 'Die Daten des Bewertungspartners liegen im erwarteten Marktrahmen.';
 
     host.innerHTML = `
 <div class="ai-marktcheck">
-  <div class="ai-marktcheck-head">🏛 Marktcheck — Sprengnetter AVM <span style="font-weight:400;font-size:12px;color:var(--ch2)">(${_selectionLabel('marktwert')}-Spanne)</span></div>
+  <div class="ai-marktcheck-head">🏛 Marktcheck des Bewertungspartners <span style="font-weight:400;font-size:12px;color:var(--ch2)">(${_selectionLabel('marktwert')}-Spanne)</span></div>
   <div class="ai-marktcheck-grid">
     <div class="ai-marktcheck-cell">
       <div class="ai-marktcheck-cell-l">AVM-Wert (${_selectionLabel('marktwert')})</div>
@@ -7184,7 +7186,7 @@ function renderTransferList() {
     if (sources.indexOf('voice') !== -1)  parts.push({ key:'voice', name:'Sprachaufzeichnung', sub:'Objekt einsprechen, Felder befüllen', type:'kerosin', calls:1 });
     if (sources.indexOf('expose') !== -1) parts.push({ key:'expose', name:'Exposé/Marktbericht', sub:'PDF auslesen', type:'free', calls:0 });
     if (sources.indexOf('ph')  !== -1)    parts.push({ key:'ph',  name:'PriceHubble', sub:'Marktwert, Mikro-/Makrolage', type:'ph',  calls:1 });
-    if (sources.indexOf('spr') !== -1)    parts.push({ key:'spr', name:'Sprengnetter', sub: hasKp ? 'Wert, Miete, Fair-Price' : 'Wert, Miete (kein Kaufpreis)', type:'spr', calls: 1 });
+    if (sources.indexOf('spr') !== -1)    parts.push({ key:'spr', name:'Bewertungspartner', sub: hasKp ? 'Wert, Miete, Fair-Price' : 'Wert, Miete (kein Kaufpreis)', type:'spr', calls: 1 });
     /* v409-actionbar-trim: KI-Recherche als Abruf-Quelle entfernt */
     return parts;
   }
@@ -7268,7 +7270,7 @@ function renderTransferList() {
       var host = document.getElementById('qc6-progress');
       var box = document.createElement('div');
       box.className = 'qc6-pausebox';
-      box.innerHTML = '<div class="qc6-pausebox-txt">\u26A0 <b>' + (prov==='ph'?'PriceHubble':prov==='dpmb'?'DealPilot':'Sprengnetter') +
+      box.innerHTML = '<div class="qc6-pausebox-txt">\u26A0 <b>' + (prov==='dpmb'?'DealPilot':'Bewertungspartner') +
         '</b> braucht noch: <b>' + miss.map(function(f){return f[1];}).join(', ') +
         '</b>. Bitte ausf\u00FCllen, dann auf \u201EWeiter\u201C.</div>' +
         '<button type="button" class="qc6-pausebox-btn">Weiter</button>';
@@ -7285,7 +7287,7 @@ function renderTransferList() {
     // Reihenfolge erzwingen: expose, ph, spr, ki
     var order = ['voice','expose','immometrica','ph','spr','dpmb', 'ki'];  /* v505-voice-first; v667 immometrica */
     var ordered = order.filter(function(s){ return sources.indexOf(s) !== -1; });
-    var labels = { voice:'Sprachaufzeichnung', expose:'Exposé/Marktbericht', immometrica:'ImmoMetrica', ph:'PriceHubble', spr:'Sprengnetter', dpmb:'DealPilot', ki:'KI-Recherche' };
+    var labels = { voice:'Sprachaufzeichnung', expose:'Exposé/Marktbericht', immometrica:'ImmoMetrica', ph:'Bewertungspartner', spr:'Bewertungspartner', dpmb:'DealPilot', ki:'KI-Recherche' };
     var steps = ordered.map(function(s){ return { key:s, label:labels[s], state:'pending' }; });
     var _qbFehler = [];   /* v3098 · gescheiterte Abrufe fuer die Schlussmeldung */
     _progressRender(steps);
@@ -7333,7 +7335,7 @@ function renderTransferList() {
             _miss = _missingForProvider(_prov); // nach "Weiter" erneut prüfen
           }
           if (_miss.length) {
-            showToast('⚠ ' + (_prov==='ph'?'PriceHubble':'Sprengnetter') + ' übersprungen — es fehlt noch: ' + _miss.join(', '));
+            showToast('⚠ ' + 'Bewertungspartner' + ' übersprungen — es fehlt noch: ' + _miss.join(', '));
           } else if (_prov === 'ph') {
             await priceHubble({ silent:true });
           } else {
@@ -7968,7 +7970,7 @@ document.addEventListener('DOMContentLoaded', () => QcApp.init());
   <script src="js/qc-heuristik.js?v=v3085"></script>
   <script src="js/dealscore.js?v=v3289"></script>
   <!-- v3075 · die zulaessige Miete (Kappung, Vergleichsmiete, Sperrfrist) - derselbe Kern wie potenzial.js -->
-  <script src="js/mietpotenzial-kern.js?v=v3343"></script>
+  <script src="js/mietpotenzial-kern.js?v=v3356"></script>
   <script src="js/avm-section.js?v=v3023a"></script>
   <script src="js/avsec-spanne.js?v=v1875c"></script><!-- v1875 · Spanne in der Karte -->
   <!-- W18-qcwl: der QC laeuft in einem IFRAME — der Sweeper des Elterndokuments
@@ -8480,11 +8482,23 @@ html.qc-embedded, html.qc-embedded body{ min-height:0 !important; height:auto !i
     try { var _st = JSON.parse((document.getElementById('_mb_state')||{}).value||'null'); if (_st && _st.card && _st.card.mm) { mmSpanne = _st.card.mm; mm = Number(_st.card.mm.med)||0; } } catch (e) {}
     if (!(mm>0)) { try { mm = Number(avm && (avm.marktmiete || avm.marktmieteCold)) || 0; } catch (e) {} }
     var leer = !!(mmSpanne && ['low','med','high'].some(function(x){ return Math.abs(Number(mmSpanne[x]||0) - nkm) < 1; }));
-    var vglQm = (mm>0 && wfl>0) ? Math.round(mm/wfl*100)/100 : null;
+    /* v3356 · Prüfung 13.11.2026 B1: Erstbezug nach dem 01.10.2014 - Bremse gilt nicht (§ 556f BGB) */
+    var bjQ = parseInt(i.bj, 10);
+    if (bremse && bremse.gilt === true && bjQ >= 2015) bremse = Object.assign({}, bremse, { gilt: false, neubau: true, text: 'Mietpreisbremse gilt hier nicht: Erstbezug nach dem 01.10.2014 (Baujahr ' + bjQ + ', § 556f BGB)' });
+    /* v3356 · B5/A7: die Vergleichsmiete ist NICHT die Angebotsmiete - wie im Objekt (vglAusAngebot) abzüglich des
+       Abschlags nach Marktlage (config.js mieteAngebotAbschlag, angespannt bei Bremse, sonst mittel) */
+    var abS = null;
+    try { var Cf = (window.parent && window.parent.DealPilotConfig) || window.DealPilotConfig, ab = Cf && Cf.mieteAngebotAbschlag;
+      if (ab && ab.stufen) { var st = (bremse && bremse.gilt === true && !bremse.neubau) ? 'angespannt' : 'mittel'; abS = { pct: ab.stufen[st], stufe: st }; } } catch (e) {}
+    var vglA = (mm>0 && wfl>0 && Km.vglAusAngebot) ? Km.vglAusAngebot(mm/wfl, abS) : null;
+    var vglQm = vglA ? vglA.qm : ((mm>0 && wfl>0) ? Math.round(mm/wfl*100)/100 : null);
     var zul = leer ? null : Km.zulaessig({ ist:grund, wfl:wfl, vgl_qm:vglQm, kappung_pct:kapp.pct, letzte:null });
     var neu = (mm>0 && wfl>0) ? Km.neuvermietung({ markt_qm:mm/wfl, wfl:wfl, vgl_qm:null, bremse:bremse }) : null;
     return { kapp:kapp, bremse:bremse, zul:zul, neu:neu, zusatz:zusatz, leer:leer, markt_monat:mm, vgl_qm:vglQm,
-      markt_oben:(mmSpanne && Number(mmSpanne.high) > 0 ? Number(mmSpanne.high) : null),   /* v3354 */
+      /* v3356 · B6: eine „obere Spanne“ nur, wenn sie gemessen ist - dealpilot-mb.js setzt ohne q75 high = Mitte × 1,1 */
+      markt_oben:(mmSpanne && Number(mmSpanne.high) > 0 && Number(mmSpanne.med) > 0 && Math.abs(Number(mmSpanne.high) / Number(mmSpanne.med) - 1.1) > 0.005 ? Number(mmSpanne.high) : null),
+      vgl_abschlag: abS, vgl_text: vglA ? vglA.text : null,
+      grenze_monat: (vglQm > 0 && wfl > 0) ? Math.round(vglQm * wfl * ((bremse && bremse.gilt === false) ? 1.2 : 1.1)) : null,
       vgl_quelle:(vglQm ? 'marktbewertung' : null),
       nkm_heute:nkm, nkm_3j:(zul && zul.miete_monat>0 ? zul.miete_monat : grund) + zusatz };
   };

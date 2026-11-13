@@ -1091,7 +1091,7 @@ router.get('/mietspiegel', async (req, res) => {
           const br = mietpreisbremseFuer(ags);
           satz.vergleich_wohnung = { quelle: v.quelle, unten: v.unten, mittel: v.mittel, oben: v.oben, ca: v.ca, qm: v.qm,
             einordnung: v.einordnung, etikett: v.etikett, herkunft: v.herkunft };
-          satz.ziel_maximum = zielMaximum(v, br, req.query.ausnahme || '');
+          satz.ziel_maximum = zielMaximum(v, br, (req.query.ausnahme || (Number(req.query.baujahr) >= 2015 ? '556f_neubau' : '')));
           const zj = Number(req.query.zieljahr);
           if (zj > jahr && zj <= jahr + 30) {
             const rate = mietsteigerungRate(req.query.mietstg);
@@ -1099,8 +1099,8 @@ router.get('/mietspiegel', async (req, res) => {
               const f = fortschreibung(rate.pct, zj - jahr);
               const vF = spanneFortschreiben(v, f);
               satz.ziel_prognose = { jahr: zj, rate, faktor: Math.round(f * 10000) / 10000, vergleich: { unten: vF.unten, mittel: vF.mittel, oben: vF.oben, ca: v.ca },
-                ziel_maximum: zielMaximum(vF, br, req.query.ausnahme || ''),
-                pfad: Number(req.query.ist_qm) > 0 ? kappungsPfad({ ist_qm: Number(req.query.ist_qm), vgl_qm: v.oben, rate_pct: rate.pct,
+                ziel_maximum: zielMaximum(vF, br, (req.query.ausnahme || (Number(req.query.baujahr) >= 2015 ? '556f_neubau' : ''))),
+                pfad: Number(req.query.ist_qm) > 0 ? kappungsPfad({ ist_qm: Number(req.query.ist_qm), vgl_qm: v.oben, rate_pct: rate.pct, wfl: Number(req.query.wfl) || 0,
                   kappung_pct: Number(req.query.kappung_pct) || 20, monate: (zj - jahr) * 12, erste_ab_monat: Number(req.query.erste_ab_monat) || 0 }) : null };
             }
           }

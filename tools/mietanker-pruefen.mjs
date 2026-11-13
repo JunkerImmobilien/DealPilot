@@ -86,6 +86,10 @@ const brH = KP.mietpreisbremseFuer('05758012', new Date('2026-11-12'));
 /* B */
 {
   const z = MA.zielMaximum(vH, { gilt: true });
+  /* v3356 · B1 Neubau-Ausnahme § 556f Satz 1: Bremse gilt nicht, Maximum 120 % */
+  { const zN = MA.zielMaximum(vH, { gilt: true }, '556f_neubau'); gleich('B1', 'Neubau trotz Bremse 120 % × 7,80', zN.neu_max_qm, 9.36); ok('B1', 'Neubau-Text nennt § 556f', /556f/.test(zN.texte[1]) && zN.bremse_gilt === false); }
+  /* v3356 · B2 Kappungspfad ohne Cent-Schritte */
+  { const pC = MA.kappungsPfad({ ist_qm: 8.42, vgl_qm: 8.43, rate_pct: 1.8, kappung_pct: 20, monate: 72, wfl: 70 }); ok('B2', 'kein Schritt unter 1 € je Wohnung', pC.schritte.every(function (x, i, a) { var vor = i ? a[i - 1].qm : 8.42; return (x.qm - vor) * 70 >= 0.99; }), JSON.stringify(pC.schritte.slice(0, 3))); }
   gleich('B', 'mit Bremse 110 % × 7,80', z.neu_max_qm, 8.58);
   ok('B', 'Text § 556d, Ausnahmen genannt', /§ 556d/.test(z.texte[1]) && /§ 556e/.test(z.texte[1]));
   const zp = MA.zielMaximum(vH, { gilt: null });

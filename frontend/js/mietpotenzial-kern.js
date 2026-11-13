@@ -333,9 +333,11 @@
         if (ctx.vgl_ms) r.ms = ctx.vgl_ms;
       }
     }
-    if (m558 <= ist + 0.01 && !(u.monat > 0)) {
+    /* v3356 · Prüfung 13.11.2026 B2: eine Erhöhung beginnt bei einem vollen Euro (Westerfeldstr. 146, Whg. 1: Grenze
+       590,10 € bei 590 € Ist gab „verlangbar ab sofort“ und eine Stufe „+0 €“). Unter 1 € ist es kein Spielraum. */
+    if (m558 < ist + 1 && !(u.monat > 0)) {
       r.grund = !(vgl > 0) ? 'Keine Vergleichsmiete eingetragen.'
-        : (kappe <= ist + 0.01 && vgl * wfl > ist + 0.01) ? 'Die Kappungsgrenze ist durch die letzte Erhöhung ausgeschöpft.'
+        : (kappe < ist + 1 && vgl * wfl >= ist + 1) ? 'Die Kappungsgrenze ist durch die letzte Erhöhung ausgeschöpft.'
         : 'Die Miete liegt schon an der Vergleichsmiete.';
       return r;
     }
@@ -395,7 +397,7 @@
     if (ziel == null) {
       m = kappe; r.grund = 'kappung'; r.vgl_fehlt = true;
       r.grund_text = 'Kappungsgrenze ' + k + ' % in 3 Jahren (§ 558 Abs. 3 BGB). Die ortsübliche Vergleichsmiete ist nicht eingetragen — gerechnet unter der Annahme, dass sie mindestens so hoch liegt; liegt sie darunter, ist sie die Grenze.';
-    } else if (ziel <= ist + 0.01) {
+    } else if (ziel < ist + 1) {   /* v3356 · B2: unter 1 € keine Erhöhung */
       m = ist; r.grund = 'vergleichsmiete_erreicht';
       r.grund_text = 'Die Miete liegt schon an oder über der ortsüblichen Vergleichsmiete (' + eur2(vgl) + '/m²) — keine Erhöhung nach § 558 BGB.';
     } else if (kappe < ziel) {

@@ -314,7 +314,10 @@
           + (ist > oben ? 'Sie liegt auch über dem oberen Rand. Sie darf so bleiben, eine weitere Erhöhung nach § 558 BGB ist aber voraussichtlich ausgeschöpft.'
                         : 'Sie liegt noch in der Spanne. Eine weitere Erhöhung geht nur, wenn Ausstattung und Lage eine Einordnung weiter oben tragen.')
           + ' Modernisierung, Index- oder Staffelmiete sind davon getrennt zu prüfen.';
-      } else t += ', das entspricht etwa dem Mittel.';
+      } else {   /* landing-dealcheck-11 · Prüfung 13.11.2026 D5: auch beim Mittel den Spielraum bis zum Oberwert nennen */
+        var zielM = Math.min(oben, ist * (1 + kpct / 100));
+        t += ', das entspricht etwa dem Mittel.' + (zielM * wfl >= nkm + 1 ? ' In 3 Jahren sind bis zu <b>' + dez(zielM, 2) + ' €</b> möglich, also ' + dez(Math.round((zielM - ist) * wfl), 0) + ' € mehr im Monat, wenn Ausstattung und Lage den oberen Wert tragen.' : '');
+      }
     }
     t += ' <small>Orientierung, keine Rechtsberatung.';
     if (!spanne) t += ' Die Vergleichsmiete ist eine DealPilot-Näherung (±' + dez(vg.abweichung_pct || 7.5, 1) + ' %). Für eine Mieterhöhung braucht es den Mietspiegel, drei Vergleichswohnungen oder ein Gutachten.';

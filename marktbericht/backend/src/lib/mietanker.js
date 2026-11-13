@@ -160,7 +160,9 @@ export function bandWohnung(v) {
  */
 export function zielMaximum(v, bremse, ausnahme) {
   if (!v || !(v.mittel > 0)) return null;
-  const gilt = bremse ? bremse.gilt : null;
+  /* v3356 · Prüfung 13.11.2026 B1: § 556f Satz 1 BGB, Erstbezug nach dem 01.10.2014 - die Bremse gilt dauerhaft nicht */
+  const neubau = ausnahme === '556f_neubau';
+  const gilt = neubau ? false : (bremse ? bremse.gilt : null);
   const mitBremse = gilt !== false;           /* „bitte prüfen" rechnet vorsichtig wie mit Bremse */
   const f = mitBremse ? FAKTOR_BREMSE : FAKTOR_WISTG;
   const oben = v.oben > 0 ? v.oben : v.mittel;
@@ -177,10 +179,10 @@ export function zielMaximum(v, bremse, ausnahme) {
     mitBremse
       ? 'Neuvermietung: höchstens 110 % der Vergleichsmiete, ' + ca + qmDe(neuMax) + ' €/m² (Mietpreisbremse § 556d BGB' + (gilt == null ? ', ob sie gilt, bitte prüfen' : '') + ')'
         + (ausn ? '. Eingetragene Ausnahme (' + (ausnahme === '556e' ? 'höhere Vormiete § 556e' : 'umfassende Modernisierung § 556f') + ') erlaubt mehr.' : '. Mehr nur mit Vormiete (§ 556e) oder nach umfassender Modernisierung (§ 556f).') + sicher
-      : 'Neuvermietung: ohne Mietpreisbremse frei vereinbar, unbedenklich bis 120 % der Vergleichsmiete, ' + ca + qmDe(neuMax) + ' €/m².' + sicher + ' Darüber Bußgeldrisiko nach § 5 WiStG nur bei Ausnutzung eines geringen Angebots.',
+      : 'Neuvermietung: ' + (neubau ? 'Mietpreisbremse gilt nicht (Erstbezug nach dem 01.10.2014, § 556f BGB), ' : 'ohne Mietpreisbremse ') + 'frei vereinbar, unbedenklich bis 120 % der Vergleichsmiete, ' + ca + qmDe(neuMax) + ' €/m².' + sicher + ' Darüber Bußgeldrisiko nach § 5 WiStG nur bei Ausnutzung eines geringen Angebots.',
   ];
   return { bestand_max_qm: r2(oben), neu_max_qm: neuMax, neu_sicher_qm: neuSicher, konservativ_qm: kons, risiko_ab_qm: neuMax, faktor: f,
-    bremse_gilt: gilt, ausnahme: ausn ? ausnahme : null, ca: !!v.ca, bedingung: bed, texte, hinweis: HINWEIS_RECHT };
+    bremse_gilt: gilt, neubau: neubau, ausnahme: ausn ? ausnahme : (neubau ? '556f_neubau' : null), ca: !!v.ca, bedingung: bed, texte, hinweis: HINWEIS_RECHT };
 }
 
 /** Kontext aus Objektangaben (Wertkern und Route nutzen denselben Weg). */
@@ -247,7 +249,10 @@ export function kappungsPfad(p) {
     /* Basis der Kappung: die Miete drei Jahre vor der Wirksamkeit */
     const vor = verlauf.filter((x) => x.monat <= m - 36).pop() || verlauf[0];
     const grenze = Math.min(vT, vor.qm * (1 + k));
-    if (grenze > qm + 0.005) { qm = r2(grenze); schritte.push({ monat: m, qm }); verlauf.push({ monat: m, qm }); m += 15; }
+    /* v3356 · Prüfung 13.11.2026 B2: eine Stufe ist mindestens 1 € im Monat (mit Fläche) bzw. 2 Cent je m² -
+       bei Westerfeld Whg. 1 lief der Pfad sonst in 1-Cent-Schritten alle 15 Monate */
+    const minStufe = num(p.wfl) > 0 ? 1 / num(p.wfl) : 0.02;
+    if (grenze >= qm + minStufe) { qm = r2(grenze); schritte.push({ monat: m, qm }); verlauf.push({ monat: m, qm }); m += 15; }
     else m += 1;
   }
   return { schritte, ende_qm: qm };

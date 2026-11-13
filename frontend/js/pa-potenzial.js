@@ -141,7 +141,7 @@
     if (S) {
       var J = pp.jahre || {};
       h += karte(kopf('Was in dem Objekt steckt · Kaltmiete je Monat') + treppe(S)
-        + '<p class="dp-pa4-erkl" style="margin-top:8px"><b>Heute</b> ist die Ist-Miete. <b>Nach Mieterhöhung</b> ist die Miete, die du nach § 558 BGB verlangen darfst (Vergleichsmiete, Kappungsgrenze, Sperrfrist). <b>Im Zielbild</b> sind deine geplanten Maßnahmen und Neuvermietungen umgesetzt.</p>');
+        + '<p class="dp-pa4-erkl" style="margin-top:8px"><b>Heute</b> ist die Ist-Miete. <b>Nach Mieterhöhung</b> ist die Miete, die du nach § 558 BGB verlangen darfst (Vergleichsmiete, Kappungsgrenze, Sperrfrist). <b>Im Zielbild</b> steht je Wohnung deine Zielmiete, ohne eigene Angabe das rechtliche Maximum bei Neuvermietung (begrenzt auf den Markt), dazu deine Maßnahmen. </p>');
       h += '<div class="dp-pap-stufen dp-pa4-mt">'
         + stufeKarte('Heute', '#2A2727', S.bestand, S.bestand, null, 'bestand')
         + stufeKarte('Nach Mieterhöhung', 'var(--wl-b8932f,#b8932f)', S.mh, S.bestand, J.mieterhoehung, 'mh')
@@ -153,7 +153,7 @@
     /* Die Hebel einzeln: Mieterhöhung, Mieterwechsel, Modernisierung, Aufteilung, Indexmiete */
     var hebel = [];
     if (S && S.mh && zahl(S.mh._mehr) && S.mh._mehr > 0)
-      hebel.push(['Mieterhöhung bis zur Vergleichsmiete', sEur(S.mh._mehr * 12) + ' im Jahr', pp.mieterhoehung_rechenweg && pp.mieterhoehung_rechenweg.satz ? saetze(pp.mieterhoehung_rechenweg.satz, 1) : (pp.kappung && pp.kappung.text ? pp.kappung.text : '')]);
+      hebel.push(['Nächste Mieterhöhung (§ 558)',   /* v3356 · A8: S.mh ist die nächste Stufe bis zur Kappung, nicht der ganze Weg */ sEur(S.mh._mehr * 12) + ' im Jahr', pp.mieterhoehung_rechenweg && pp.mieterhoehung_rechenweg.satz ? saetze(pp.mieterhoehung_rechenweg.satz, 1) : (pp.kappung && pp.kappung.text ? pp.kappung.text : '')]);
     if (pp && pp.neuvermietung && zahl(pp.neuvermietung.barwert_eur) && pp.neuvermietung.barwert_eur > 0)
       hebel.push(['Bei Mieterwechsel', sEur(pp.neuvermietung.barwert_eur) + ' Barwert', saetze(pp.neuvermietung.satz, 1)]);
     if (S && S.zb && zahl(S.zb.kosten) && S.zb.kosten > 0)
