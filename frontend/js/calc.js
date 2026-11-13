@@ -1135,17 +1135,22 @@ function _calcImmediate(){
       : (Math.abs(_nd - 100 / 3) < 1e-9 ? '33⅓' : _nd.toFixed(1).replace('.', ','));
   })();
   var sanStatusEl = el('san_limit_status');
+  /* v3355 · Marcel 13.11.2026 freigegeben: die Ampel zählt die geplante Erhaltung in den drei Jahren nach dem Kauf
+     mit (sanierung-plan.js, State.san15.planNetto). Bis v3354 stand bei leerem #san „Keine Sanierung“, obwohl der
+     Erhaltungsplan darunter 58.000 € im Fenster führte (gemessen am Spot-Objekt Am Quittengarten 12). */
+  var _sanPlanN = (State.san15 && State.san15.planNetto > 0) ? State.san15.planNetto : 0;
+  var _san15N = sanIstNetto + _sanPlanN, _san15Pct = sanLimit > 0 ? (_san15N / sanLimit * 100) : 0;
   if (sanStatusEl) {
-    if (sanIst === 0) {
+    if (sanIst === 0 && !_sanPlanN) {
       sanStatusEl.innerHTML = '<span class="badge badge-muted">Keine Sanierung</span>';
-    } else if (sanIstNetto <= sanLimit) {
+    } else if (_san15N <= sanLimit) {
       /* v3029-rechnen: unter der Grenze ist Erhaltungsaufwand sofort abziehbar - Herstellungskosten
          im Sinne des § 255 Abs. 2 HGB (Erweiterung, Standardhebung) aber nie. „voll abzugsfaehig" war zu stark. */
       /* v3348 · Sanierung auf Raten: auch nach 3 Jahren rechnet das Finanzamt Maßnahmen eines einheitlichen
          Sanierungsplans zusammen (in der Regel innerhalb von 5 Jahren, BMF-Schreiben vom 18.07.2003 zur Abgrenzung von Anschaffungs-, Herstellungs- und Erhaltungsaufwand) */
-      sanStatusEl.innerHTML = '<span class="badge badge-green" title="Erweiterungen und Standardhebungen (§ 255 Abs. 2 HGB) bleiben auch unter der Grenze Herstellungskosten und laufen über die AfA. Achtung, Sanierung auf Raten: Maßnahmen nach einem einheitlichen Plan, in der Regel innerhalb von 5 Jahren, rechnet das Finanzamt auch nach den 3 Jahren zusammen.">✓ Unter Grenze ('+sanPct.toFixed(1).replace('.', ',')+' %) – Erhaltungsaufwand sofort abziehbar</span>';
+      sanStatusEl.innerHTML = '<span class="badge badge-green" title="Erweiterungen und Standardhebungen (§ 255 Abs. 2 HGB) bleiben auch unter der Grenze Herstellungskosten und laufen über die AfA. Achtung, Sanierung auf Raten: Maßnahmen nach einem einheitlichen Plan, in der Regel innerhalb von 5 Jahren, rechnet das Finanzamt auch nach den 3 Jahren zusammen.">✓ Unter Grenze ('+_san15Pct.toFixed(1).replace('.', ',')+' %) – Erhaltungsaufwand sofort abziehbar</span>';
     } else {
-      sanStatusEl.innerHTML = '<span class="badge badge-red">⚠ Über 15 % ('+sanPct.toFixed(1).replace('.', ',')+' %) – anschaffungsnahe HK ('+_sanNd+' Jahre AfA)</span>';
+      sanStatusEl.innerHTML = '<span class="badge badge-red">⚠ Über 15 % ('+_san15Pct.toFixed(1).replace('.', ',')+' %) – anschaffungsnahe HK ('+_sanNd+' Jahre AfA)</span>';
     }
   }
   /* Die USt-Zeilen nur zeigen, wenn brutto gerechnet wird — sonst stünde
