@@ -7674,11 +7674,11 @@ document.addEventListener('DOMContentLoaded', () => QcApp.init());
   function weg(){ var b = g("qc-mm-frage"); if (b) b.remove(); }
   function leiste(html){ weg(); var gr = g("qc_nkm_grund") || g("qc_nkm"); var feld = gr && gr.closest(".field"); var ziel = (g("qc_nkm") && g("qc_nkm").closest(".field")) || feld; if (!ziel) return null;
     var b = document.createElement("div"); b.id = "qc-mm-frage";
-    b.setAttribute("style", "margin:8px 0 4px;padding:10px 12px;border-radius:8px;border:1px solid rgba(201,168,76,.45);background:#FBF6E9;font-size:12.5px;line-height:1.45;color:#2A2727");
+    b.setAttribute("style", "margin:8px 0 4px;padding:10px 12px;border-radius:8px;border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 45%, transparent);background:#FBF6E9;font-size:12.5px;line-height:1.45;color:#2A2727");
     b.innerHTML = html; ziel.parentNode.insertBefore(b, ziel.nextSibling); return b; }
   function frage(markt, ist){
     var b = leiste('<div style="margin-bottom:7px"><b>Marktmiete ' + eur(markt) + '/Monat</b> aus der Marktpreisindikation. Gerechnet wird mit <b>' + eur(ist.wert) + '</b> (' + ist.quelle + ').</div>'
-      + '<button type="button" data-a="markt" style="margin:0 6px 4px 0;padding:6px 10px;border-radius:6px;border:1px solid #C9A84C;background:#C9A84C;color:#fff;font-weight:600;cursor:pointer">Marktmiete übernehmen</button>'
+      + '<button type="button" data-a="markt" style="margin:0 6px 4px 0;padding:6px 10px;border-radius:6px;border:1px solid var(--wl-c9a84c, #C9A84C);background:var(--wl-c9a84c, #C9A84C);color:#fff;font-weight:600;cursor:pointer">Marktmiete übernehmen</button>'
       + '<button type="button" data-a="ist" style="margin:0 0 4px;padding:6px 10px;border-radius:6px;border:1px solid rgba(42,39,39,.25);background:#fff;color:#2A2727;cursor:pointer">Mit ' + eur(ist.wert) + ' weiterrechnen</button>');
     if (!b) return;
     b.addEventListener("click", function(e){ var t = e.target.closest("button"); if (!t) return;
