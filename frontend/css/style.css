@@ -41794,3 +41794,7 @@ html body .dp-pf-msheet-head .dp-pf-mclose:not(#dp-nie):not(#dp-nie-2):not(#dp-n
 html body #s3 #d1t_field .dp-mz-knopf-zeile > .btn.dp-mz-uebernehmen {
   white-space: normal !important; text-overflow: clip; text-align: left; height: auto !important; justify-content: flex-start;
 }
+/* v3370a · Reiter Finanzierung, 1440 px: „Zinsrisiko" (#zaer_display) schnitt „+1,00 % p.a. (Anschluss 5,00 % − Aktuell 4,00 %)"
+   bei 239 von 335 px mit … ab. Das Anzeigefeld bricht jetzt um, statt zu kuerzen. */
+html body #s3 #zaer_display { white-space: normal !important; overflow: visible !important; text-overflow: clip !important;
+  height: auto !important; min-height: 38px; line-height: 1.3 !important; padding-top: 5px !important; padding-bottom: 5px !important; }
