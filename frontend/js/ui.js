@@ -1917,6 +1917,7 @@ window._dpPaTab = function (id, btn) {
     if ((id === 'anschluss' || id === 'exit') && window.DpBestand) { try { window.DpBestand.mountAll(); } catch (e3) {} }   /* v2985 */
     if (window.DpPilotV4 && (id === 'wert' || id === 'steuer')) { try { window.DpPilotV4.neuZeichnen(); } catch (e7) {} }   /* v3099 */
     if (id === 'si' && window.DpJahresstaende) { try { window.DpJahresstaende.mount(); } catch (e4) {} }   /* v2989 */
+    if (id === 'jahre' && window.DpJahresbuch) { try { window.DpJahresbuch.mountAll(); } catch (e8) {} }   /* v3363 */
     if (id === 'si' && typeof window._dpPaSollIstNeu === 'function') {
       var altH = wrap.querySelector('.abw-tafel-host');
       if (altH) {
@@ -2643,6 +2644,7 @@ function _renderAIServerAnalysis(a) {
         si: _siV4, wert: _wertInner, lage: pL, steuer: V4.steuer(a, _bestand),
         risiko: V4.risiko(a, _bestand, { optisch: _pbOptisch, anschluss: _bestand ? '' : _pbAnschluss }),
         verhandlung: pV, bank: pK, unterlagen: _ulHtml,
+        jahre: (_bestand && window.DpJahresbuch) ? '<div data-dp-jb-host="1"></div>' : '',   /* v3363 · Unterreiter Jahre */
         anschlussExit: _bestand ? pAF + '<div style="margin-top:16px"></div>' + pEX : ''
       });
       try { setTimeout(function () { if (window.DpSteuerVerlauf) window.DpSteuerVerlauf.mountAll(); }, 0); } catch (e5) {}

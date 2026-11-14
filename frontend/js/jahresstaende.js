@@ -189,7 +189,8 @@
   function neuerStand(daten, datum) {
     datum = datum || new Date();
     var r = rechenstand();
-    return { jahr: datum.getFullYear(), am: datum.toISOString(), version: r ? r.version : null, kz: kennzahlen(daten, datum) };
+    /* v3363 · quelle: ein Jahresstand ist ein Abzug des Formulars - das Ist steht im Jahresbuch (_jahre) */
+    return { jahr: datum.getFullYear(), am: datum.toISOString(), version: r ? r.version : null, quelle: 'formular', kz: kennzahlen(daten, datum) };
   }
   /* Rein: der Stand ersetzt den desselben Jahres, alle anderen bleiben
      unberührt. Rückgabe ist eine NEUE Liste, nach Jahr sortiert. */

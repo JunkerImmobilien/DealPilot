@@ -2141,6 +2141,8 @@ function renderYearlyTaxForm() {
       /* v3164 · Jahresansicht: jeder Posten mit den Belegen, aus denen er stammt (unterlagen-eingang.js) */
       (window.DpEingang && window.DpEingang.jahresAnsicht ? '<button class="btn btn-outline btn-sm" onclick="DpEingang.jahresAnsicht()" style="margin-left:auto" title="Jedes Jahr: welcher Wert aus welcher Rechnung kommt">Belege je Jahr</button>' : '') +
       '<button class="btn btn-outline btn-sm" onclick="resetAllTaxOverrides()" title="Alle manuellen Eingaben zurücksetzen">↺ Vorschläge wiederherstellen</button>' +
+      /* v3363 · Jahresbuch (Ist-Miete je Jahr, Status der Steuer) - dieselbe Eingabe wie im Reiter Miete */
+      (window.DpJahresbuch && window.DpJahresbuch.verfuegbar() ? '<button class="btn btn-outline btn-sm" onclick="DpJahresbuch.oeffnen()" title="Ist-Miete, Restschuld und Status der Steuer je Jahr">Jahre</button>' : '') +
     '</div>';
 
   html += _ytfJahresHinweise();
@@ -2207,6 +2209,7 @@ function _renderQuickForm(years) {
     '<th class="num" title="Erhaltungsaufwand und anschaffungsnahe Herstellungskosten des Jahres (im Detail-Modus unter 6.5)">Erhaltung / Sanierung</th>' +
     '<th class="num ytf-result">= Verlust/Überschuss</th>' +
     '<th class="num ytf-result">Steuer-Effekt</th>' +
+    (window.DpJahresbuch ? '<th title="geplant, erklärt oder Bescheid. Ein Bescheid sperrt nichts, beim Ändern fragt DealPilot nach.">Status</th>' : '') +   /* v3363 · E6 */
     '</tr></thead><tbody>';
 
   years.forEach(function(y) {
@@ -2237,6 +2240,10 @@ function _renderQuickForm(years) {
         ergSign + Math.round(totals.ergebnis).toLocaleString('de-DE') + ' €</td>' +
       '<td class="num ytf-result" style="color:' + refundColor + ';font-weight:700">' +
         refundSign + Math.round(totals.refund).toLocaleString('de-DE') + ' €</td>' +
+      (window.DpJahresbuch ? '<td>' + (y.year <= new Date().getFullYear()
+        ? '<select data-jb-status-jahr="' + y.year + '" onchange="DpJahresbuch.statusSetzen(' + y.year + ', this.value)" aria-label="Status der Steuer ' + y.year + '">'
+          + DpJahresbuch.STATUS.map(function (s) { return '<option value="' + s[0] + '"' + (DpJahresbuch.status(y.year) === s[0] ? ' selected' : '') + '>' + s[1] + '</option>'; }).join('') + '</select>'
+        : '–') + '</td>' : '') +   /* v3363 */
     '</tr>';
   });
 
@@ -2525,6 +2532,8 @@ window.dpSteuerSetzen = function (year, field, val) {
 
 function updateTaxOverride(input) {
   var year = parseInt(input.dataset.year);
+  /* v3363 · E6: erklärt oder Bescheid sperrt nicht - aber es wird nachgefragt (jahresbuch.js) */
+  if (window.DpJahresbuch && !window.DpJahresbuch.aenderungErlaubt(year)) { renderYearlyTaxForm(); return; }
   var field = input.dataset.field;
   var rawVal = input.value;
   var val = rawVal === '' ? undefined : parseFloat(rawVal);

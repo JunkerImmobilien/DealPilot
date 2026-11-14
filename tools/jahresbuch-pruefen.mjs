@@ -72,6 +72,39 @@ const E = ctx.DpErhoehungen;
 }
 
 /* ── J ── (Jahresbuch, ab v3363) */
+{
+  let fragen = [];
+  const c2 = kontext({ _currentObjData: { _jahre: { '2024': { steuer_status: 'bescheid' }, '2025': { steuer_status: 'erklaert' } } },
+    confirm: (t) => { fragen.push(t); return false; } });
+  vm.runInContext(lies('frontend/js/jahresbuch.js'), c2);
+  const B = c2.DpJahresbuch;
+  ok(JSON.stringify(B.jahreVon(2023, 2026)) === '[2026,2025,2024,2023]', 'J Jahre vom Kauf bis heute, jüngstes zuerst');
+  ok(B.jahreVon(null, 2026).length === 0 && B.jahreVon(2027, 2026).length === 0, 'J ohne Kaufjahr oder Kauf in der Zukunft: keine Jahre');
+  ok(B.summeEinheiten({ '0': { miete_m: 500 }, '1': { miete_m: 600, leer_monate: 3 } }) === 500 * 12 + 600 * 9, 'J Summe der Wohnungen mit Leerstand');
+  ok(B.summeEinheiten({}) === null, 'J ohne Wohnungsangaben kein Vorschlag');
+  const z1 = B.zeile({ jahr: 2025, plan: { nkm_y: 12000, cfop_y: 1500, rs: 180000 }, ist: { nkm_j: '11.400', rs_ist: 178000 }, av: { wert: 12000, eigen: false } });
+  ok(z1.miete_ist === 11400 && z1.miete_abw === -600 && z1.rs_abw === -2000, 'J Abweichung Miete und Restschuld gegen den Plan');
+  ok(z1.abgleich && z1.abgleich.art === 'vorschlag', 'J Anlage V nur Vorschlag: Ist-Miete wird angeboten, nicht übernommen (E7)');
+  const z2 = B.zeile({ jahr: 2025, ist: { nkm_j: 11400 }, av: { wert: 11000, eigen: true } });
+  ok(z2.abgleich.art === 'abweichung' && /maßgeblich/.test(z2.abgleich.text), 'J eigene Anlage V weicht ab: Hinweis, keine Angleichung');
+  const z3 = B.zeile({ jahr: 2025, ist: { nkm_j: 11400 }, av: { wert: 11400.4, eigen: true } });
+  ok(z3.abgleich.art === 'gleich', 'J gleich bis 1 €');
+  ok(B.zeile({ jahr: 2025, ist: {}, av: { wert: 1, eigen: true } }).abgleich === null, 'J ohne Ist-Miete kein Abgleich');
+  ok(B.zeile({ jahr: 2025, ist: { nkm_j: 13800 }, ziel_nkm: 1150 }).ziel_erreicht === true && B.zeile({ jahr: 2025, ist: { nkm_j: 13000 }, ziel_nkm: 1150 }).ziel_erreicht === false, 'J Ziel erreicht nur als Vorschlag ab Ist ≥ Ziel');
+  const s1 = B.setzen({}, 2025, 'nkm_j', 11400);
+  ok(s1['2025'].nkm_j === 11400 && !!s1['2025'].geaendert_am, 'J setzen');
+  ok(!('2025' in B.setzen(s1, 2025, 'nkm_j', '')), 'J leerer Wert räumt das Jahr ab');
+  ok(B.status(2024) === 'bescheid' && B.status(2023) === 'geplant', 'J Status je Jahr, fehlt = geplant');
+  ok(B.aenderungErlaubt(2024) === false && fragen.length === 1 && /Bescheid/.test(fragen[0]), 'J Bescheid: Nachfrage, Nein lässt die Zelle stehen (E6)');
+  ok(B.aenderungErlaubt(2023) === true && fragen.length === 1, 'J geplant: keine Nachfrage');
+  const tax = lies('frontend/js/tax.js');
+  const iU = tax.indexOf('function updateTaxOverride'), iA = tax.indexOf('DpJahresbuch.aenderungErlaubt(year)', iU), iS = tax.indexOf('_setYearOverride(year, field, val)', iU);
+  ok(iU > 0 && iA > iU && iS > iA, 'J tax.js fragt vor dem Ändern einer Zelle');
+  ok(/add\('jahre', 'Jahre'/.test(lies('frontend/js/pilot-analyse-v4.js')), 'J Unterreiter Jahre in der Pilot-Analyse');
+  ok(/k === '_jahre'/.test(lies('frontend/js/ankauf.js')) || /'_jahre'\) continue/.test(lies('frontend/js/ankauf.js')), 'J ankauf.js friert _jahre nicht ein');
+  ok(!/(^|[^a-z])_jahre\b|DpJahresbuch/.test(lies('frontend/js/calc.js')), 'J calc.js liest das Jahresbuch nicht (Paket 5 wartet auf E4)');
+  ok(/js\/jahresbuch\.js\?v=/.test(lies('frontend/index.html')), 'J index.html lädt jahresbuch.js');
+}
 
-console.log(`jahresbuch-pruefen (v3362): ${gruen} von ${gruen + rot} ok`);
+console.log(`jahresbuch-pruefen (v3362, v3363): ${gruen} von ${gruen + rot} ok`);
 process.exit(rot ? 1 : 0);

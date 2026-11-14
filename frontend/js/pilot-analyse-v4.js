@@ -951,6 +951,8 @@
     var add = function (id, lbl, inner, opt) { opt = opt || {}; if (!inner && !opt.leer) return; reiter.push(tab(id, lbl, !reiter.length, opt.tabExtra)); inhalt.push(panel(id, inner, inhalt.length === 0)); };
     add('uebersicht', 'Übersicht', o.uebersicht);
     add('si', bestand ? 'Ankauf · Bestand · Soll · Zielbild' : 'Ankauf · Soll · Zielbild', o.si ? '<div class="dp-pa-e dp-pa4-mini" data-dp-pa4-mini="abz"></div>' + o.si : o.si);
+    /* v3363 · E2: Unterreiter „Jahre" (jahresbuch.js), nur im Bestand - gefüllt beim Öffnen (_dpPaTab) */
+    if (bestand && o.jahre) { add('jahre', 'Jahre', o.jahre); try { setTimeout(function () { if (window.DpJahresbuch) window.DpJahresbuch.mountAll(); }, 0); } catch (eJ) {} }
     /* Wert & Verlauf erscheint wie bisher erst mit einem Bericht oder Abruf (_dpLoadVerlauf) */
     reiter.push('<button type="button" class="btn-clean dp-pa-tab" id="dp-pa-tab-wert" style="display:none" onclick="_dpPaTab(\'wert\',this)">Wert &amp; Verlauf</button>');
     inhalt.push(panel('wert', o.wert, false));
