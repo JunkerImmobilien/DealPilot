@@ -2630,6 +2630,8 @@ function _renderAIServerAnalysis(a) {
       var _siV4 = (_siHtml || _potHtml)
         ? (function () { try { return window.DpWertZielbild ? window.DpWertZielbild.reiterHtml(_gV4, { mitAnkauf: !!_siHtml, mitPot: !!_potHtml }) : _gV4; } catch (eW) { return _gV4; } })()
         : _siInner;
+      /* v3361 · Zielbild-Fassungen: Auswahl über der Tafel (nur wenn es frühere Fassungen gibt) */
+      try { var _zbfL = window.DpZielbildFassungen ? window.DpZielbildFassungen.leisteHtml() : ''; if (_zbfL && _siV4) _siV4 = _zbfL + _siV4; } catch (eF) {}
       var _wertInner = '<div data-dp-pa-wertverlauf="1"></div><div id="dp-pa-wert-body"></div>'
         /* v3323 · Marcel 12.11.2026: „unter Wert und Verlauf … die Marktberichtentwicklung … da müsste eigentlich alles drin stehen" -
            der Verlauf stand nur im Detail (class dp-pa-d); jetzt in beiden, im Einfach ohne Tafel und mit „Kurz gesagt" */

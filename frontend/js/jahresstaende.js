@@ -163,10 +163,28 @@
     var mb = marktbericht();
     kz.wert_mb = mb ? r0(mb.wert) : null;
     kz.wert_mb_stand = mb ? mb.stand : null;
+    /* v3361 · das Ziel, das an diesem Tag galt, reist mit dem Stand - sonst misst ein späteres Zielbild
+       alle Jahre rückwirkend (Bericht zielbild-jahresverlauf, Widerspruch 4) */
+    var zl = zielJetzt();
+    kz.ziel_nkm = zl.nkm; kz.zielbild = zl.titel;
     var k = S().kpis || {};
     kz.ek = zahl(daten && daten.ek);
     if (kz.ek == null && kpisPassen() && istZahl(k.ek)) kz.ek = r0(k.ek);
     return kz;
+  }
+  /* v3361 · Zielbild-Miete des aktiven Zielbilds (dieselbe Rechnung wie sammeln) und sein Name */
+  function zielJetzt() {
+    var out = { nkm: null, titel: null };
+    try {
+      var PZ = global.DpPotenzial, m = PZ && PZ.modell ? PZ.modell() : null;
+      if (m && m.aktiv && m.stufen && m.stufen.zielbild && PZ.kennzahlen) {
+        var kz = PZ.kennzahlen(m);
+        if (kz && kz.zielbild && istZahl(kz.zielbild.miete_j)) out.nkm = r0(kz.zielbild.miete_j / 12);
+      }
+      var F = global.DpZielbildFassungen;
+      if (F && F.aktivTitel) out.titel = F.aktivTitel();
+    } catch (e) {}
+    return out;
   }
   function neuerStand(daten, datum) {
     datum = datum || new Date();
@@ -467,7 +485,9 @@
     { k: 'rs_gesamt', w: 'Restschuld (Projektion)', f: eur },
     { k: 'rs_d1', w: '· Darlehen 1', f: eur },
     { k: 'rs_d2', w: '· Darlehen 2', f: eur },
-    { k: 'wert_mb', w: 'Wert laut Marktbericht', f: eur }
+    { k: 'wert_mb', w: 'Wert laut Marktbericht', f: eur },
+    { k: 'ziel_nkm', w: 'Ziel: Kaltmiete / Monat', f: eur },   /* v3361 · das Ziel, das damals galt */
+    { k: 'zielbild', w: 'Zielbild', f: function (x) { return x ? esc(x) : '–'; }, text: true }
   ];
   function tabelleHtml(e) {
     var A = AK(), a = A && A.stand ? A.stand() : null;
@@ -480,14 +500,15 @@
     (e.jahresstaende || []).forEach(function (s) { spalten.push({ kopf: String(s.jahr), unter: datumDe(String(s.am || '').slice(0, 10)) + ' · ' + (s.version || '?'), kz: s.kz || {} }); });
     var kH = Object.assign({}, e.kz_heute || {});
     kH.nkm = zahl(e.daten_heute && e.daten_heute.nkm);
+    if (!istZahl(kH.ziel_nkm) && e.ziel && istZahl(e.ziel.nkm)) kH.ziel_nkm = r0(e.ziel.nkm);   /* v3361 */
     var rv = rechenstand();
     spalten.push({ kopf: 'heute', unter: 'live · ' + (rv ? rv.version : '?'), kz: kH });
-    var zeilen = ZEILEN.filter(function (z) { return spalten.some(function (s) { return istZahl(zahl(s.kz[z.k])); }); });
+    var zeilen = ZEILEN.filter(function (z) { return spalten.some(function (s) { return z.text ? !!s.kz[z.k] : istZahl(zahl(s.kz[z.k])); }); });
     return '<table class="abw-tafel dp-wv-tafel"><thead><tr><th>Kennzahl</th>'
       + spalten.map(function (s) { return '<th class="abw-zahl">' + esc(s.kopf) + '<div class="dp-pa-herk">' + esc(s.unter) + '</div></th>'; }).join('')
       + '</tr></thead><tbody>'
       + zeilen.map(function (z) {
-          return '<tr><td class="abw-wort">' + z.w + '</td>' + spalten.map(function (s) { return '<td class="abw-zahl">' + z.f(zahl(s.kz[z.k])) + '</td>'; }).join('') + '</tr>';
+          return '<tr><td class="abw-wort">' + z.w + '</td>' + spalten.map(function (s) { return '<td class="abw-zahl">' + z.f(z.text ? s.kz[z.k] : zahl(s.kz[z.k])) + '</td>'; }).join('') + '</tr>';
         }).join('')
       + '</tbody></table>';
   }
@@ -503,6 +524,7 @@
           ? '<b>Zielerreichung ' + esc(z.ampel.wort) + '</b> — Mittel aus ' + z.anzahl + (z.anzahl === 1 ? ' Hebel' : ' Hebeln') + ' mit Zielwert (' + z.woraus.map(esc).join(', ') + '), je Hebel auf 0–100 % begrenzt.'
           : 'Noch keine Gesamtzahl: kein Hebel hat Ankauf, heute und Ziel zugleich.') + '</span></div>';
     var satz = rechenstandSatz({ version: e.ankauf.version });
+    var zbW = ''; try { zbW = global.DpZielbildFassungen ? global.DpZielbildFassungen.wechselSatz() : ''; } catch (x) { zbW = ''; }   /* v3361 */
     var fr = z.fristen.length ? '<div class="dp-ziel-h"><b>Fristen</b><div class="dp-ziel-w" style="grid-column:2 / -1">'
       + z.fristen.map(function (f) { return esc(f.wort) + ': <b>' + datumDe(f.ende) + '</b>' + (f.monate != null ? (f.monate <= 0 ? ' (abgelaufen)' : ' (noch ' + f.monate + ' Monate)') : ''); }).join(' · ')
       + '</div></div>' : '';
@@ -510,6 +532,7 @@
     return '<div class="dp-pa-card dp-ziel" data-dp-ziel="1" style="margin-bottom:12px">'
       + '<div class="dp-pa-sec"><span>ZIELERREICHUNG</span></div>'
       + kopf
+      + (zbW ? '<div class="dp-pa-fuss" style="margin:0 0 6px">' + esc(zbW) + ' Die Zielerreichung misst gegen das aktive Zielbild, die Jahresstände behalten das Ziel ihres Jahres.</div>' : '')
       + z.hebel.map(hebelHtml).join('') + fr
       + (satz ? '<div class="dp-pa-fuss" style="margin-top:8px">' + esc(satz) + '</div>' : '')
       + '<h4 class="dp-wv-h" style="margin:14px 0 4px">Jahresstände</h4>'
@@ -585,7 +608,7 @@
   global.DpJahresstaende = {
     VERSION: VERSION, AB_VERSION: AB_VERSION, ZIEL_RING_IM_KOPF: ZIEL_RING_IM_KOPF, RECHENKERNE: RECHENKERNE,
     rechenstand: rechenstand, rechenstandSatz: rechenstandSatz, festschreibAnhang: festschreibAnhang, planJetzt: planJetzt,
-    kennzahlen: kennzahlen, neuerStand: neuerStand, einfuegen: einfuegen, beimSpeichern: beimSpeichern, liste: liste, festhalten: festhalten,
+    kennzahlen: kennzahlen, neuerStand: neuerStand, zielJetzt: zielJetzt, einfuegen: einfuegen, beimSpeichern: beimSpeichern, liste: liste, festhalten: festhalten,
     rechne: rechne, sammeln: sammeln, zielerreichung: zielerreichung, payload: payload,
     html: html, tabelleHtml: tabelleHtml, mount: mount, kopfRing: kopfRing
   };

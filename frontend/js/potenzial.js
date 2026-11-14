@@ -1704,8 +1704,11 @@
     var H = herkunft();
     var frage = 'Zielbild leeren?\n\nEntfernt werden: alle Maßnahmen (' + eur(H.summe) + (H.n_wohnungen ? ', ' + H.n_wohnungen + ' Wohnungen' : '') + (H.haus_n ? ', Hausmaßnahmen' : '')
       + '), Soll- und Zielmieten, „Zielbild ab wann" und die marktübliche Miete nach Modernisierung.\n'
-      + 'Nicht berührt: Ist-Mieten, Flächen, Sanierungskosten im Reiter Investition.';
+      + 'Nicht berührt: Ist-Mieten, Flächen, Sanierungskosten im Reiter Investition.'
+      + (window.DpZielbildFassungen ? '\nDas bisherige Zielbild wird vorher als Fassung abgelegt und bleibt lesbar.' : '');   /* v3361 */
     if (!window.confirm(frage)) return false;
+    /* v3361 · Paket 2: nichts geht mehr verloren - erst ablegen, dann leeren (gespeichert wird unten mit saveObj) */
+    try { if (window.DpZielbildFassungen) window.DpZielbildFassungen.ablegen({ grund: 'vor dem Leeren', ohneSpeichern: true }); } catch (e) {}
     var D = window._dpMfh;
     if (D && Array.isArray(D.einheiten)) {
       D.einheiten.forEach(function (e) { if (!e) return; e.massnahmen = []; e.massnahme = ''; e.kosten = ''; e.soll = ''; e.ziel_qm = ''; e.ziel_wann = ''; delete e.ziel_bremse; });
@@ -3006,6 +3009,7 @@
   var _objListe = null;
   function objektKarte() {
     var karte = el('zb-karte'); if (!karte) return;
+    try { if (window.DpZielbildFassungen) window.DpZielbildFassungen.mount(); } catch (e) {}   /* v3361 · Fassungen über der Karte */
     /* v2430b · die Gemeinde gleich holen (Leseroute, kein Kontingent) - sonst
        stand bis zum ersten Rechnen „20 %, Gemeinde noch nicht ermittelt". */
     if (!agsJetzt() && wert('plz')) agsHolen().then(function (a) { if (a) { try { msRegisterHolen(); } catch (e) {} try { objektSumme(); } catch (e) {} try { mietrechtKarte(); } catch (e) {} } });

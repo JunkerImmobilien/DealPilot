@@ -180,6 +180,7 @@
       if (k === '_ankauf') continue;   /* keine Matrjoschka */
       if (k === '_thumb') continue;    /* jederzeit neu erzeugbar */
       if (k === '_jahresstaende') continue;   /* v2989 · gehoeren zum Bestand, nicht zum Ankauf */
+      if (k === '_zielbilder' || k === '_zielbild_aktiv' || k === '_erhoehungen' || k === '_jahre') continue;   /* v3361 · Fassungen, Erhoehungen, Jahresbuch: Bestand */
       kopie[k] = d[k];
     }
     /* v2216f · TIEFE Kopie. Gemessen 14.10.2026 an 2026-1056: `_mfh` (die

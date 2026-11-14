@@ -405,6 +405,8 @@
           '<div class="mfh-feldzeile"><label for="mfh-zbjahr">Zielbild fertig (Jahr)</label>'
           + '<input class="mfh-in mfh-md mfh-in-gross" id="mfh-zbjahr" inputmode="numeric" maxlength="4" style="width:96px" value="' + esc((el('zb_fertig_jahr') && el('zb_fertig_jahr').value) || '') + '" placeholder="z. B. 2028">'
           + '<span class="mfh-leise">für Pilot-Analyse und PDF · leer = offen</span></div>'
+          /* v3361 · Zielbild-Fassungen: abgelegt wird in der Karte im Reiter Investition (gespeicherter Stand, nicht der Arbeitsstand hier) */
+          + (window.DpZielbildFassungen ? '<p class="mfh-leise" style="margin:2px 0 8px">Ein neues Zielbild legst du im Reiter Investition in der Karte <b>Mieterhöhung und Zielbild</b> an. Das bisherige bleibt dann als Fassung lesbar.</p>' : '')
           + '<div class="mfh-haus-mass">'
           + intro('Maßnahmen für das ganze Haus (Dach, Fassade, Fenster, Heizung, Leitungen) mit Kosten.',
               'Die Kosten werden nach Wohnfläche auf die Wohnungen verteilt, die Modernisierungspunkte gelten für jede Wohnung. Was eine einzelne Wohnung bekommt (z. B. ihr Bad), steht unter Einheiten › Details.')
