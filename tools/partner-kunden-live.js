@@ -84,7 +84,7 @@ async function kunde(email, name) {
   /* Rechte setzen und wirken lassen */
   const r = await http(tP, 'PUT', '/partner/kunden/' + k1c.id, { stufe: 2, rechte: { pdf: true, markt: true, ki: true, senden: true }, kontingent: { marktbericht: 3 }, netzwerk: false, marke: 'partner' });
   ok('Stufe und Rechte speichern', r.status === 200, r.status);
-  const nw = await http(t1, 'GET', '/network');
+  const nw = await http(t1, 'GET', '/network-cards');
   ok('Partnernetzwerk beim Platzkunden aus', nw.status === 200 && nw.j.partner_aus === true && nw.j.cards.length === 0, nw.j && nw.j.partner_aus);
 
   /* Senden eines Objekts */
