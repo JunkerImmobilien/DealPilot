@@ -91,6 +91,10 @@ function umgebung(felder, o = {}) {
   ok(ctx._currentObjData._zielbilder.length === 1 && ctx._currentObjData._zielbild_aktiv.titel === 'Zielbild 2030', 'B im Objekt abgelegt');
   ok(gespeichert.length === 1, 'B saveObj gerufen');
   ok(F.statusSetzen(f.id, 'erreicht') && ctx._currentObjData._zielbilder[0].status === 'erreicht', 'B Status setzen');
+  /* v3363b · Speichern in Folge: der zweite Wunsch läuft erst NACH dem ersten, nie parallel */
+  ok(gespeichert.length === 1, 'B Folge: während ein Speichern läuft, startet kein zweites (' + gespeichert.length + ')');
+  await new Promise((r) => setImmediate(r));
+  await new Promise((r) => setImmediate(r));
   ok(!F.statusSetzen(f.id, 'gelöscht'), 'B unbekannter Status abgewiesen');
   ok(/vorher Zielbild 2028/.test(F.wechselSatz()) && /11\/2026/.test(F.wechselSatz()), 'B Satz zum Wechsel: ' + F.wechselSatz());
   const f2 = F.ablegen({ ohneSpeichern: true });

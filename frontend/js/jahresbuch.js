@@ -135,7 +135,23 @@
     return /^\d{4}/.test(s) ? +s.slice(0, 4) : null;
   }
   function status(jahr) { var e = jahreDaten()[String(jahr)]; return (e && e.steuer_status) || 'geplant'; }
-  function speichern() { try { if (typeof global.saveObj === 'function') global.saveObj({ silent: true }); } catch (e) {} }
+  /* v3363b · SPEICHERN IN FOLGE. Gemessen 14.11.2026 an Westerfeldstr. 146 (Staging): drei schnelle
+     saveObj-Aufrufe (Wert, Status, Schließen) liefen parallel, zwei PUT mit derselben Version - der
+     zweite kam mit 409 zurück und das Objekt stand danach im Konflikt (_dpObjKonflikt), weitere
+     Speicherungen wurden abgewiesen. Jetzt: läuft einer, folgt genau EIN weiterer danach. Dieselbe
+     Folge für Zielbild-Fassungen, Mieterhöhungen und Jahresbuch (window.DpSpeichernFolge). */
+  if (!global.DpSpeichernFolge) global.DpSpeichernFolge = (function () {
+    var lauf = null, nochmal = false;
+    function los() {
+      if (lauf) { nochmal = true; return lauf; }
+      var p = null;
+      try { if (typeof global.saveObj === 'function') p = global.saveObj({ silent: true }); } catch (e) { p = null; }
+      lauf = Promise.resolve(p).catch(function () {}).then(function () { lauf = null; if (nochmal) { nochmal = false; return los(); } });
+      return lauf;
+    }
+    return los;
+  })();
+  function speichern() { return global.DpSpeichernFolge(); }
   function schreiben(jahr, feld, wert, ohneSpeichern) {
     var d = D(); if (!d) return;
     d._jahre = setzen(d._jahre, jahr, feld, wert);

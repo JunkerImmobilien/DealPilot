@@ -169,6 +169,22 @@
     return zeichne;
   }
 
+  /* v3363b · SPEICHERN IN FOLGE. Gemessen 14.11.2026 an Westerfeldstr. 146 (Staging): drei schnelle
+     saveObj-Aufrufe (Wert, Status, Schließen) liefen parallel, zwei PUT mit derselben Version - der
+     zweite kam mit 409 zurück und das Objekt stand danach im Konflikt (_dpObjKonflikt), weitere
+     Speicherungen wurden abgewiesen. Jetzt: läuft einer, folgt genau EIN weiterer danach. Dieselbe
+     Folge für Zielbild-Fassungen, Mieterhöhungen und Jahresbuch (window.DpSpeichernFolge). */
+  if (!global.DpSpeichernFolge) global.DpSpeichernFolge = (function () {
+    var lauf = null, nochmal = false;
+    function los() {
+      if (lauf) { nochmal = true; return lauf; }
+      var p = null;
+      try { if (typeof global.saveObj === 'function') p = global.saveObj({ silent: true }); } catch (e) { p = null; }
+      lauf = Promise.resolve(p).catch(function () {}).then(function () { lauf = null; if (nochmal) { nochmal = false; return los(); } });
+      return lauf;
+    }
+    return los;
+  })();
   /* ── Objektebene (Reiter Miete, Karte Mietvertrag) ─────────────── */
   function D() { return global._currentObjData || null; }
   function objektListe() { var d = D(); return d && Array.isArray(d._erhoehungen) ? d._erhoehungen : []; }
@@ -200,7 +216,7 @@
       geaendert: function (a) {
         if (a.letzte) setzeFeld('mv_letzte_erhoehung', a.letzte);
         if (a.betrag != null) setzeFeld('mv_letzte_erhoehung_betrag', String(a.betrag).replace('.', ','));
-        try { if (typeof global.saveObj === 'function') global.saveObj({ silent: true }); } catch (e) {}
+        try { global.DpSpeichernFolge(); } catch (e) {}
         try { global.dispatchEvent(new CustomEvent('dp:erhoehungen', { detail: a })); } catch (e) {}
       }
     });
