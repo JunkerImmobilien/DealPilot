@@ -604,6 +604,7 @@
             f('mv_notiz', 'Notiz zum Vertrag', '', 'text', true) +
           '</div>' +
           historieHtml(e) +   /* v3160 */
+          '<div id="mfh-we-erh-liste"></div>' +   /* v3362 · Mieterhöhungen als Liste (mieterhoehungen.js) */
           /* v2600 · E2/E3 · Hinweis zur Restlaufzeit und der waehlbare Leerstandsabzug (nur bei „leer") */
           '<p class="mfh-we-hint">Liegt die Ist-Miete außerhalb von ± 20 % um die marktübliche Miete, rechnet der Ertragswert mit der marktüblichen Miete; '
             + 'die Abweichung wird über die <b>Restlaufzeit</b> beziffert: bei Miete <i>über</i> dem Markt nur mit <b>Befristet bis</b> oder <b>Kündigungsverzicht bis</b>, '
@@ -908,6 +909,17 @@
         aktualisieren();
       });
     });
+    /* v3362 · Mieterhöhungsliste der Wohnung: die jüngste Erhöhung setzt „Letzte Erhöhung" und den Betrag
+       (DpErhoehungen.ableiten) - dieselben Felder oben im Block, damit Leiter und Kappung sie sehen */
+    try {
+      if (window.DpErhoehungen) window.DpErhoehungen.einheitBinden(el('mfh-we-erh-liste'), e, function () {
+        ['mv_letzte_erhoehung', 'mv_letzte_erhoehung_betrag'].forEach(function (k) {
+          var f = ov.querySelector('[data-wk="' + k + '"]'); if (!f) return;
+          f.value = e[k] == null ? '' : e[k];
+          try { f.dispatchEvent(new Event('change', { bubbles: true })); } catch (x) {}
+        });
+      });
+    } catch (x) { console.warn('[erhoehungen]', x); }
     /* v2023 - Haken schreiben true/false, nicht .value ("on"). */
     ov.querySelectorAll("[data-wkb]").forEach(function (box) {
       var k = box.getAttribute("data-wkb");
