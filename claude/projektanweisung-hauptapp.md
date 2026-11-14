@@ -44804,3 +44804,9 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
   - B9, B10
   - D1 (rund 230 Gedankenstriche und 47 Semikolons in Kundentexten, mit Prüfregel abtragen)
   - E (Belegzeile je Wohnung)
+
+### v3357–v3359 · 14.11.2026 (nur Staging) · Partner und Kunden, Messkabine
+- **Was:** Partnerkonzept vollständig (Migration 105, `services/partnerKunden.js`, Routen `/partner/*` und `/mein-partner/*`, `js/partner-kunden.js`, Plan-Schutz, Rechte im Backend, Kundenstände ausgeschlossen, Fristen-Takt, Abo-Ende). Messkabine: Schließen-Knöpfe, Schriften, Felder (v3358). Seitenleiste „Von Kunden freigegeben“ (v3359).
+- **Commit:** `32f39ada`, `1457633d`, `31b02e9a`, `519d0995`, `fa8054a9`, `74103560`. Staging-DB vorher gesichert (`/root/backups/haupt-vor3357-*`).
+- **Nachweis:** `partner-kunden-pruefen.mjs` 17 grün, `partner-kunden-live.js` 26 grün (Staging), `partner-seats-webhook-pruefen.mjs` 21 grün, `ki-deckel-pruefen` grün, `takt-sperre-pruefen` grün, Gold-Audit RC 0. Schließen-Knöpfe gemessen 32/44 px, Radius 9 px.
+- **Rest:** Prod erst nach Marcels Test auf Staging (Partnerseite im Browser mit info@). Teamrollen, Mail, automatische Erinnerung, AVV, Hilfe-Artikel.
