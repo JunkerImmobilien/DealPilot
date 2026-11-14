@@ -300,7 +300,7 @@
     // ──────── TAB 4: STEUER-DETAILS ───────────────────────────────────────
     'tab4.zve': {
       title: 'zvE — zu versteuerndes Einkommen',
-      body: 'Dein zu versteuerndes Einkommen ohne diese Immobilie. Du findest es im letzten Steuerbescheid unter "zu versteuerndes Einkommen". Daraus berechnet sich der Grenzsteuersatz: bei zvE 30.000 € ≈ 25%, bei 60.000 € ≈ 35%, bei 80.000 € ≈ 42% (Höchstsatz).',
+      body: 'Dein zu versteuerndes Einkommen ohne diese Immobilie. Du findest es im letzten Steuerbescheid unter "zu versteuerndes Einkommen". Daraus berechnet sich der Grenzsteuersatz (Tarif 2026, ohne Soli und Kirchensteuer): bei zvE 30.000 € rund 28 %, bei 60.000 € rund 39 %, ab 69.879 € 42 % (Spitzensteuersatz), ab 277.826 € 45 %.',
       paragraph: '§ 32a EStG',
       severity: 'beginner'
     },

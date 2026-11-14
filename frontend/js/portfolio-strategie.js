@@ -63,17 +63,42 @@
 
   /* ── Fristen je Objekt: das Stück von AP 7, das sich heute schon aus den Objektdaten lesen lässt ── */
   function fristen(d) {
-    var heute = new Date();
+    var heute = new Date(); heute = new Date(heute.getFullYear(), heute.getMonth(), heute.getDate());   /* v3380: Tage ohne Uhrzeit zaehlen */
+    /* v3380 · ZWEI FRISTEN, ZWEI ANFANGSTAGE.
+       § 23 Abs. 1 Satz 1 Nr. 1 EStG zaehlt ab dem Kaufvertrag (obligatorisches Geschaeft, H 23
+       EStH „Anschaffungs-/Veraeusserungszeitpunkt"), die Dreijahresfrist des § 6 Abs. 1 Nr. 1a ab
+       der Anschaffung im Sinne des Uebergangs von Besitz, Nutzen und Lasten. Bis v3379 liefen
+       beide ab dem wirtschaftlichen Uebergang. Und „nicht mehr als zehn Jahre": am letzten Tag
+       der Frist ist ein Verkauf noch steuerpflichtig, frei erst am Tag danach (wie
+       ueberfuehrung-kern.js frist23 und steuer-verlauf.js) - hier stand am Fristtag schon „frei". */
     var kauf = datum(d.wirtschaftlicher_uebergang || d.kaufdat || d.kaufdatum);
+    var vertrag = datum(d.kaufdat || d.kaufdatum || d.wirtschaftlicher_uebergang);
     var out = { kauf: kauf, spekulation_ende: null, spekulation_rest_tage: null, san_frist_ende: null, san_rest_tage: null, san_quote: null };
+    if (vertrag) {
+      var s = new Date(vertrag); s.setFullYear(s.getFullYear() + 10);   /* § 23 Abs. 1 Nr. 1 EStG: zehn Jahre, Fristende */
+      out.spekulation_ende = s; out.spekulation_rest_tage = tage(heute, s) + 1;   /* frei ab dem Tag nach Fristende */
+    }
     if (kauf) {
-      var s = new Date(kauf); s.setFullYear(s.getFullYear() + 10);      /* § 23 Abs. 1 Nr. 1 EStG: zehn Jahre */
-      out.spekulation_ende = s; out.spekulation_rest_tage = tage(heute, s);
       var f = new Date(kauf); f.setFullYear(f.getFullYear() + 3);       /* § 6 Abs. 1 Nr. 1a EStG: drei Jahre */
       out.san_frist_ende = f; out.san_rest_tage = tage(heute, f);
     }
+    /* v3380 · 15-%-Quote wie calc.js (v1261/v2890): Aufwand OHNE Umsatzsteuer gegen die
+       Anschaffungskosten des Gebaeudes EINSCHLIESSLICH anteiliger Nebenkosten (DealKpis.gebaeudeAhk).
+       Bis v3379: Bruttobetrag gegen Kaufpreis x Gebaeudeanteil - die Ampel schlug zu frueh an. */
     var kp = num(d.kp), geb = num(d.geb_ant), san = num(d.san);
-    if (kp && geb != null && san != null) out.san_quote = san / (kp * geb / 100);
+    if (kp && geb != null && geb > 0 && san != null) {
+      var netto = (String(d.san_ust || 'brutto') === 'netto') ? san : san / 1.19;
+      var basis = kp * geb / 100;
+      try {
+        var nkF = ['makler_e', 'notar_e', 'gba_e', 'gest_e', 'ji_e'].map(function (k) { return num(d[k]) || 0; });
+        var nkS = nkF.reduce(function (a, b) { return a + b; }, 0);
+        if (global.DealKpis && typeof DealKpis.gebaeudeAhk === 'function' && nkS > 0) {
+          var ahk = DealKpis.gebaeudeAhk({ kp: kp, nk: nkS, nkNurImmo: nkF[3], gebAntPct: geb, inventar: num(d.moebl) || 0 });
+          if (ahk && ahk.gebAhk > 0) basis = ahk.gebAhk;
+        }
+      } catch (_eA) {}
+      if (basis > 0) out.san_quote = netto / basis;
+    }
     return out;
   }
   function fmtDatum(x) { return x ? x.toLocaleDateString('de-DE') : '–'; }

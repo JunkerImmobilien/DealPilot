@@ -1419,9 +1419,43 @@ function _setYearOverride(year, field, value) {
  *   hausverwaltung, steuerber, porto, verw_sonst, fahrtkosten, verpflegung, hotel,
  *   inserat, gericht, telefon, sonst_kosten, afa, sonst_bewegl_wg }
  */
-function _computeAutoForYear(yearIdx, year) {
+/* ═══ v3380 · DAS ANSCHAFFUNGSJAHR ZAEHLT AUCH FUER INVENTAR UND ANSCHAFFUNGSNAHE HK NUR ANTEILIG ═══
+   § 7 Abs. 1 Satz 4 EStG: im Jahr der Anschaffung vermindert sich die AfA um ein Zwoelftel fuer
+   jeden vollen Monat vor dem Monat der Anschaffung. Die Gebaeude-AfA tat das seit v268/v2891
+   (State._afaSeriesNormal, Engine mit `ersterAnteil`); Inventar (Kueche, Moebel) und
+   anschaffungsnahe Herstellungskosten (Teil der Gebaeude-AHK, laufen mit dessen Satz) rechneten
+   im Kaufjahr das VOLLE Jahr. Gemessen 14.11.2026 an der echten tax.js, Kauf 01.10.2026:
+   Inventar 10.000 EUR auf 10 Jahre -> 1.000 statt 250 EUR, anschaffungsnahe HK 20.000 EUR zu 2 %
+   -> 400 statt 100 EUR. Der gekuerzte Teil geht nicht verloren: das Jahr nach dem letzten vollen
+   Jahr nimmt den Rest (wie linearSeries in afa-engine.js).
+   `teiljahr` setzen alle Kalenderjahr-Aufrufer in tax.js. calc.js ruft _computeAutoForYear(0, …)
+   fuer das eingeschwungene VOLLE erste Jahr (Score, Kacheln) und gibt den Parameter nicht mit -
+   dort bleibt es beim vollen Jahresbetrag, bitgleich zu vorher. Erhaltungsaufwand kennt keine
+   Zeitanteiligkeit (Abfluss, § 11 Abs. 2 EStG). */
+function _dpErstjahrAnteil() {
+  try {
+    var A = window.DealPilotAnteilig;
+    if (!A || typeof A.getRelevantDate !== 'function' || typeof A.startFactorMonths !== 'function') return 1;
+    var rd = A.getRelevantDate();
+    if (!rd) return 1;
+    var f = A.startFactorMonths(rd, parseInt(String(rd).slice(0, 4), 10));
+    return (f > 0 && f < 1) ? f : 1;
+  } catch (e) { return 1; }
+}
+/* Betrag eines linear verteilten Gesamtbetrags im Jahr `idx` (0 = Anschaffungsjahr mit Anteil f1). */
+function _dpLinearImJahr(gesamt, jahresBetrag, idx, f1) {
+  if (!(gesamt > 0) || !(jahresBetrag > 0) || !(idx >= 0)) return 0;
+  var f = (f1 > 0 && f1 < 1) ? f1 : 1;
+  var vorher = idx === 0 ? 0 : jahresBetrag * f + jahresBetrag * (idx - 1);
+  var dies = idx === 0 ? jahresBetrag * f : jahresBetrag;
+  return Math.max(0, Math.min(dies, gesamt - vorher));
+}
+window._dpLinearImJahr = _dpLinearImJahr;
+
+function _computeAutoForYear(yearIdx, year, teiljahr) {
   // yearIdx is 0-based index into State.cfRows (year 1 = idx 0)
   var row = (State.cfRows && State.cfRows[yearIdx]) ? State.cfRows[yearIdx] : null;
+  var _f1 = teiljahr ? _dpErstjahrAnteil() : 1;   /* v3380 */
 
   // V112 BUG-FIX: kpis.afa enthält Gebäude-AfA + Küche-AfA. Aber im Steuerformular pro Jahr
   //   ist Feld 5 "AfA Gebäude" (sollte NUR Gebäude sein), und Feld 6 "AfA bewegliche
@@ -1539,8 +1573,11 @@ function _computeAutoForYear(yearIdx, year) {
     sanAfaJaehrlich = san_inp / sanLaufzeit;
   }
   /* v3006b: das letzte Jahr nimmt nur den Rest (bei 3 %: 1 % im 34. Jahr) */
-  var sanThisYear = (sanLaufzeit > 0 && yearIdx < sanLaufzeit)
-    ? Math.max(0, Math.min(sanAfaJaehrlich, san_inp - sanAfaJaehrlich * yearIdx)) : 0;
+  /* v3380: anschaffungsnah = Gebaeude-AHK -> im Kaufjahr monatsanteilig, Rest am Ende; Erhaltung wie bisher */
+  var sanThisYear = sanAnschaffungsnah
+    ? (sanLaufzeit > 0 ? _dpLinearImJahr(san_inp, sanAfaJaehrlich, yearIdx, _f1) : 0)
+    : ((sanLaufzeit > 0 && yearIdx < sanLaufzeit)
+        ? Math.max(0, Math.min(sanAfaJaehrlich, san_inp - sanAfaJaehrlich * yearIdx)) : 0);
 
   // MÖBLIERUNG
   var moeblLaufzeit = moeblYearsChoice;
@@ -1552,7 +1589,8 @@ function _computeAutoForYear(yearIdx, year) {
     : ((window.State && State._ahk && isFinite(State._ahk.nkQuote)) ? State._ahk.nkQuote : 0);
   var moeblBasis = moebl_inp * (1 + _nkQ);
   var moeblPerYear = moeblActive ? (moeblBasis / moeblLaufzeit) : 0;
-  var moeblThisYear = (moeblActive && yearIdx < moeblLaufzeit) ? moeblPerYear : 0;
+  /* v3380: im Kaufjahr monatsanteilig (§ 7 Abs. 1 Satz 4 EStG), das Jahr nach dem letzten vollen nimmt den Rest */
+  var moeblThisYear = (moeblActive && moeblLaufzeit > 0) ? _dpLinearImJahr(moeblBasis, moeblPerYear, yearIdx, _f1) : 0;
 
   // Einnahmen: Nettokaltmiete + zusätzliche Einnahmen (z.B. Stellplatz, Garage)
   var nkm_m = parseDe((document.getElementById('nkm') || {}).value) || 0;
@@ -1969,7 +2007,7 @@ function _dpGbrFeststellungHtml(f) {
 }
 
 function _computeYearTotal(year, yearIdx, vorgabe, ohneVortrag) {
-  var auto = vorgabe ? {} : _computeAutoForYear(yearIdx, year);
+  var auto = vorgabe ? {} : _computeAutoForYear(yearIdx, year, true);
   var fields = [
     'schuldzinsen', 'kontofuehrung', 'bereitstellung', 'notar_grundschuld',
     'vermittlung', 'finanz_sonst',
@@ -2298,11 +2336,11 @@ function _renderDetailForm(years) {
     inserat: 'Kosten für Vermietungsanzeigen (Immoscout24, Print, etc.).',
     gericht: 'Gerichts-, Anwalts- oder Mahnkosten (z.B. Räumungsklage, Streitigkeiten).',
     telefon: 'Telefon-/Internetkosten anteilig für die Vermietungstätigkeit.',
-    sonst_kosten: 'Sonstige Kosten (Strom-/Gas-Kosten bei Leerstand, Reparaturen unter 4.000 €, etc.).',
+    sonst_kosten: 'Sonstige Kosten (z. B. Strom- und Gaskosten bei Leerstand). Reparaturen gehören in den Erhaltungsaufwand.',   /* v3380: „Reparaturen unter 4.000 €" war die Vereinfachungsregel R 21.1 Abs. 2 EStR und gehoerte nicht in diese Zeile */
     afa: 'Jährliche Abschreibung des Gebäudes (i.d.R. 2% linear vom Gebäudeanteil der Anschaffungskosten).',
     sonst_bewegl_wg: 'Bewegliche Wirtschaftsgüter (Einbauküche, Möbel) abschreibbar über 10 Jahre.',
-    anschaffungsnah: 'Sanierungskosten in den ersten 3 Jahren NACH Anschaffung. Wenn > 15% des Gebäudewerts → werden zu Anschaffungskosten und nur über AfA abgeschrieben (NICHT direkt absetzbar). § 6 Abs. 1 Nr. 1a EStG.',
-    erhaltungsaufwand: 'Reparaturen / Erhaltungsmaßnahmen NACH den ersten 3 Jahren. Direkt absetzbar im Jahr der Zahlung. Bei größeren Beträgen Verteilung über 2-5 Jahre möglich (§ 82b EStDV).',
+    anschaffungsnah: 'Instandsetzung und Modernisierung in den ersten 3 Jahren nach der Anschaffung. Übersteigen sie ohne Umsatzsteuer 15 % der Anschaffungskosten des Gebäudes, sind es Herstellungskosten. Sie laufen dann mit dem AfA-Satz des Gebäudes und sind nicht sofort absetzbar. § 6 Abs. 1 Nr. 1a EStG.',
+    erhaltungsaufwand: 'Reparaturen und Erhaltungsmaßnahmen, die keine anschaffungsnahen Herstellungskosten sind (auch in den ersten 3 Jahren, solange die 15-%-Grenze nicht überschritten ist). Absetzbar im Jahr der Zahlung, auf Antrag verteilt auf 2 bis 5 Jahre (§ 82b EStDV).',
     einnahmen_km: 'Kaltmiete (= Nettokaltmiete + zus. Einnahmen wie Stellplatz). Wird automatisch aus Tab "Miete & Steuern" übernommen.',
     einnahmen_nk: 'Umlagefähige Nebenkosten (durchlaufender Posten). Werden automatisch aus Tab "Bewirtschaftung" übernommen.'
   };
@@ -2515,7 +2553,7 @@ window.dpSteuerWert = function (year, field) {
   try {
     var idx = year - _v269_getStartYear();
     if (State && State.cfRows && idx >= 0 && idx < State.cfRows.length) {
-      var a = _computeAutoForYear(idx, year);
+      var a = _computeAutoForYear(idx, year, true);
       if (a && a[field] !== undefined) return { wert: Number(a[field]) || 0, eigen: false };
     }
   } catch (e) { /* ohne Zeitleiste kein Vorschlag */ }
@@ -2548,7 +2586,7 @@ function updateTaxOverride(input) {
       var startYear = _v269_getStartYear(); // V269a1 (Bug: .year war undefined)
       yearIdx = year - startYear;
       if (yearIdx >= 0 && yearIdx < State.cfRows.length) {
-        var auto = _computeAutoForYear(yearIdx, year);
+        var auto = _computeAutoForYear(yearIdx, year, true);
         var autoVal = auto[field];
         if (autoVal !== undefined && Math.round(val) === Math.round(autoVal)) {
           // Wert entspricht Auto-Vorschlag → KEIN Override, bestehenden löschen
@@ -2623,7 +2661,7 @@ function dpWkStand(jahr, feld) {
   var j = parseInt(jahr, 10), ov = _getYearOverride(j, feld), auto = null;
   try {
     var s = (typeof _v269_getStartYear === 'function') ? _v269_getStartYear() : null, idx = s != null ? j - s : -1;
-    if (window.State && State.cfRows && idx >= 0 && idx < State.cfRows.length) { var a = _computeAutoForYear(idx, j); if (a && typeof a[feld] === 'number' && isFinite(a[feld])) auto = a[feld]; }
+    if (window.State && State.cfRows && idx >= 0 && idx < State.cfRows.length) { var a = _computeAutoForYear(idx, j, true); if (a && typeof a[feld] === 'number' && isFinite(a[feld])) auto = a[feld]; }
   } catch (e) {}
   return { override: (typeof ov === 'number' && isFinite(ov)) ? ov : null, auto: auto };
 }
@@ -3376,7 +3414,15 @@ function _mieteQuote66() {
   if (marktQm == null || wfl == null) return { stand: 'keine-markt', ist: ist };
   var markt = marktQm * wfl;
   if (!(markt > 0)) return { stand: 'keine-markt', ist: ist };
-  return { stand: 'ok', ist: ist, markt: markt, quote: (ist / markt) * 100 };
+  /* v3380 · R 21.3 Satz 2 EStR, BFH 10.05.2016 IX R 44/15: verglichen wird die WARMMIETE -
+     ortsuebliche Kaltmiete zuzueglich der nach der BetrKV umlagefaehigen Kosten gegen
+     Kaltmiete zuzueglich der gezahlten Umlagen. Bis v3379 kalt gegen kalt: bei 5,00 gegen
+     8,00 EUR/m2 und 2,50 EUR/m2 Umlagen 62,5 % („Pruefung noetig"), richtig 71,4 %
+     (vollentgeltlich). Die tatsaechlichen Umlagen (#umlagef) stehen auf beiden Seiten -
+     die ortsueblichen kennt DealPilot nicht getrennt. Ohne Umlagen bleibt es kalt. */
+  var uml = n('umlagef') || 0;
+  return { stand: 'ok', ist: ist + uml, markt: markt + uml, kalt: { ist: ist, markt: markt },
+           umlagen: uml, quote: ((ist + uml) / (markt + uml)) * 100 };
 }
 
 function renderMiete66() {
@@ -3398,8 +3444,10 @@ function renderMiete66() {
   }
 
   var q = r.quote, cls, kopf, txt;
-  var zahlen = 'Angesetzt ' + eur(r.ist) + ' / Monat gegen ortsüblich ' + eur(r.markt)
-             + ' / Monat — <b>' + q.toLocaleString('de-DE', { maximumFractionDigits: 1 }) + ' %</b>.';
+  var zahlen = (r.umlagen > 0 ? 'Warmmiete ' : 'Kaltmiete ') + eur(r.ist) + ' / Monat gegen ortsüblich ' + eur(r.markt)
+             + ' / Monat — <b>' + q.toLocaleString('de-DE', { maximumFractionDigits: 1 }) + ' %</b>.'
+             + (r.umlagen > 0 ? ' Verglichen wird mit den umlagefähigen Kosten (' + eur(r.umlagen) + ' / Monat), wie es die Finanzverwaltung tut.'
+                              : ' Ohne eingetragene Umlagen kalt verglichen. Die Finanzverwaltung vergleicht mit den umlagefähigen Kosten.');
 
   if (q >= 66) {
     cls = 'g'; kopf = 'Vollentgeltlich';

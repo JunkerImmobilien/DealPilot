@@ -364,7 +364,7 @@ function _renderWerbungskostenPage(doc, year, yearIdx, W, H, M, CW, q) {
 
   // Section 5: AfA
   cy = _renderWkSection(doc, cy, M, CW, '5. Absetzungen für Abnutzung (AfA)', [
-    ['AfA Gebäude (linear)', v.afa, bem.afa],
+    ['AfA Gebäude (einschl. § 7b)', v.afa, bem.afa],
     ['AfA bewegliche Wirtschaftsgüter', v.sonst_bewegl_wg, bem.sonst_bewegl_wg]
   ]);
 
@@ -374,7 +374,7 @@ function _renderWerbungskostenPage(doc, year, yearIdx, W, H, M, CW, q) {
   // Section 6: Anschaffungsnah / Erhaltungsaufwand
   cy = _renderWkSection(doc, cy, M, CW, '6. Anschaffungsnahe Herstellkosten / Erhaltungsaufwand', [
     ['Anschaffungsnah (§6 Abs.1 Nr.1a EStG)', v.anschaffungsnah || 0, bem.anschaffungsnah],
-    ['Erhaltungsaufwand (nach 3 Jahren)', v.erhaltungsaufwand || 0, bem.erhaltungsaufwand]
+    ['Erhaltungsaufwand (sofort oder § 82b EStDV verteilt)', v.erhaltungsaufwand || 0, bem.erhaltungsaufwand]
   ]);
 
   // ── SUMMARY ────────────────────────────────────
@@ -616,7 +616,10 @@ function _renderWerbungskostenSummaryPage(doc, startYear, nYears, W, H, M, CW) {
     var totals = _computeYearTotal(year, i);
     var v = totals.values;
     var fkz = v.schuldzinsen + v.kontofuehrung + v.bereitstellung + v.notar_grundschuld + v.vermittlung + v.finanz_sonst;
-    var btr = v.nk_n_umlf + v.betr_sonst;
+    /* v3380 · Die Jahresmatrix ging nicht auf: „Summe WK" (_computeYearTotal) enthaelt die
+       umlagefaehigen Nebenkosten, die Spalte „2. Betr." nicht - derselbe Fehler, den v1131 in der
+       Einzelaufstellung behoben hatte. Jetzt steht nk_umlf auch hier, die Zeile ist nachrechenbar. */
+    var btr = (v.nk_umlf || 0) + v.nk_n_umlf + v.betr_sonst;
     var vrw = v.hausverwaltung + v.steuerber + v.porto + v.verw_sonst;
     var sst = v.fahrtkosten + v.verpflegung + v.hotel + v.inserat + v.gericht + v.telefon + v.sonst_kosten;
     var afa_total = v.afa + v.sonst_bewegl_wg + (v.anschaffungsnah || 0) + (v.erhaltungsaufwand || 0);
@@ -1175,9 +1178,9 @@ var _AV_LABEL = {
   fahrtkosten: 'Fahrtkosten zur Immobilie', verpflegung: 'Verpflegungsmehraufwand',
   hotel: 'Übernachtungskosten', inserat: 'Inseratskosten', gericht: 'Gerichts-/Anwaltskosten',
   telefon: 'Telefon/Internet', sonst_kosten: 'Sonstiges (Leerstand, etc.)',
-  afa: 'AfA Gebäude (linear)', sonst_bewegl_wg: 'AfA bewegliche Wirtschaftsgüter',
+  afa: 'AfA Gebäude (einschl. § 7b)', sonst_bewegl_wg: 'AfA bewegliche Wirtschaftsgüter',
   anschaffungsnah: 'Anschaffungsnah (§ 6 Abs. 1 Nr. 1a EStG)',
-  erhaltungsaufwand: 'Erhaltungsaufwand (nach 3 Jahren)',
+  erhaltungsaufwand: 'Erhaltungsaufwand (sofort oder § 82b EStDV verteilt)',
   einnahmen_km: 'Mieteinnahmen (kalt)', einnahmen_nk: 'Umlagen / Nebenkosten'
 };
 
