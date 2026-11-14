@@ -2912,8 +2912,12 @@
   }
 
   /* ── Tab Objekt: „Mieterhöhung und Zielbild (optional)" ──────────────── */
-  function chipsHtml(liste, mitPunkte, e, geb, fuerEinheit, fuerHaus) {
-    return '<div class="dp-zb-chips">' + MASSNAHMEN.filter(function (k) { return fuerHaus ? k.haus : (fuerEinheit ? k.einheit : true); }).map(function (k) {
+  /* v3360 · nurWohnung (ETW): nur Gewerke der Wohnung, dazu was schon gewählt ist. Dach, Fassade, Heizung
+     und Leitungen laufen bei einer Eigentumswohnung über die Gemeinschaft (Sonderumlage, sonderumlage.js). */
+  function chipsHtml(liste, mitPunkte, e, geb, fuerEinheit, fuerHaus, nurWohnung) {
+    return '<div class="dp-zb-chips">' + MASSNAHMEN.filter(function (k) {
+      if (nurWohnung) return k.einheit || (liste || []).some(function (x) { return x && x.id === k.id; });
+      return fuerHaus ? k.haus : (fuerEinheit ? k.einheit : true); }).map(function (k) {
       var m = (liste || []).filter(function (x) { return x.id === k.id; })[0];
       var p = k.gewerk ? Math.max(0, (k.max != null ? Math.min(maxP(k.gewerk), k.max) : maxP(k.gewerk)) - punkteJetzt(k.gewerk, e, geb)) : 0;   /* v3001a: Teilmassnahme (Elektrik 1 von 2) zeigt ihren Teil, wie punkteGewinn rechnet */
       return '<button type="button" class="dp-zb-chip' + (m ? ' on' : '') + '" data-zb-chip="' + k.id + '" aria-pressed="' + (m ? 'true' : 'false') + '"'
@@ -2970,7 +2974,8 @@
     opts = opts || {};
     chipStil();
     function zeichne() {
-      host.innerHTML = chipsHtml(liste, true, opts.e || null, opts.geb || null, !!opts.fuerEinheit, !!opts.fuerHaus)
+      host.innerHTML = chipsHtml(liste, true, opts.e || null, opts.geb || null, !!opts.fuerEinheit, !!opts.fuerHaus, !!opts.nurWohnung)
+        + (opts.nurWohnung ? '<div class="cf-hint" data-dp-zb-etw="1" style="margin:4px 0 6px">Dach, Fassade, Heizung und Leitungen gehören bei einer Eigentumswohnung zum Gemeinschaftseigentum. Sie beschließt die Gemeinschaft, deinen Anteil trägst du als Sonderumlage im Reiter Bewirtschaftung unter <b>Sonderumlagen der WEG</b>.</div>' : '')
         + '<div class="dp-zb-mliste">' + massnahmenZeilen(liste, opts.e || null) + '</div>';
       host.querySelectorAll('[data-zb-chip]').forEach(function (b) {
         b.onclick = function () {
@@ -3027,14 +3032,40 @@
     }
     if (sumHost) sumHost.style.display = 'none';
     if (einzel) einzel.style.display = '';
+    einheitenHinweis();   /* v3360 */
     var host = el('zb-massnahmen-host'), fld = el('zb_massnahmen');
     if (!host || !fld) return;
     _objListe = objektMassnahmen();
-    massnahmenBinden(host, _objListe, { geaendert: function () {
+    massnahmenBinden(host, _objListe, { nurWohnung: ((el('objart') && el('objart').value) || '') === 'ETW', geaendert: function () {
       fld.value = _objListe.length ? JSON.stringify(_objListe) : '';
       objektSumme();
     } });
     objektSumme();
+  }
+  /* v3360 · Paket 1 (Bericht zielbild-jahresverlauf 2026-11-14, E1): Objektarten mit Einheiten (ZFH, MFH,
+     Gewerbe …) führen das Zielbild IMMER je Wohnung. Solange noch keine Einheiten erfasst sind, rechnet modell()
+     das Objekt als Einzelobjekt (Rückfall, damit nichts verloren geht) - die Karte sagt dann, wo das Zielbild
+     hingehört, mit Absprung ins Fenster „Einheiten erfassen". */
+  function einheitenHinweis() {
+    var einzel = el('zb-einzel'); if (!einzel) return;
+    var h = el('zb-einheiten-hinweis');
+    var art = (el('objart') && el('objart').value) || '';
+    var zeigen = artMitEinheiten() && !(window._dpMfh && Array.isArray(window._dpMfh.einheiten) && window._dpMfh.einheiten.length);
+    if (!zeigen) { if (h) h.style.display = 'none'; return; }
+    if (!h) {
+      h = document.createElement('div'); h.id = 'zb-einheiten-hinweis'; h.className = 'dp-zb-herkunft';
+      h.style.cssText = 'font-size:12.5px;line-height:1.5;margin:0 0 12px;padding:8px 10px;border-left:3px solid var(--wl-c9a84c, #C9A84C);background:rgba(127,127,127,.06)';
+      einzel.insertBefore(h, einzel.firstChild);
+      h.addEventListener('click', function (ev) {
+        var b = ev.target && ev.target.closest ? ev.target.closest('[data-dp-zb-einheiten]') : null;
+        if (!b) return; ev.preventDefault();
+        try { if (M().oeffnen) M().oeffnen(1); } catch (e) {}
+      });
+    }
+    h.style.display = '';
+    h.innerHTML = '<b>' + (art === 'ZFH' ? 'Zwei Wohnungen?' : 'Mehrere Einheiten?') + '</b> Erfasse die Einheiten, dann bekommt jede Wohnung ihr eigenes Zielbild mit Zielmiete und Maßnahmen. '
+      + 'Bis dahin rechnet diese Karte das Objekt als Ganzes. '
+      + '<button type="button" class="btn btn-sm" data-dp-zb-einheiten="1" style="margin-left:4px">Einheiten erfassen</button>';
   }
   function objektSumme() {
     try { msHinweis(); } catch (e) {}   /* v3246 */
