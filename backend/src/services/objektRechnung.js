@@ -139,6 +139,7 @@ function rechnen(daten, opt) {
      weg_r steckt im Hausgeld und wird NICHT addiert. Fehlt sie, wird nichts geschaetzt. */
   const bwkModus = d._bwk_mode || 'detail';
   let bwkUl = 0, bwkNul = 0, bwkHerkunft = null, bwkArt = null, bwkQu = null, bwkQn = null, bwkQkp = null;
+  let ruecklageSt = 0;   /* v3381 */
   if (bwkModus === 'percent') {
     if ((d._bwk_pct_mode || 'nkm') === 'kp') {
       const q = dez(d.bwk_kp_pct);
@@ -168,6 +169,11 @@ function rechnen(daten, opt) {
       bwkUl = sum(ulT);
       bwkNul = sum(nulT);
       bwkArt = 'detail';
+      /* v3381 · Ruecklagen sind keine Werbungskosten (calc.js v3268, BFH 26.01.1988 IX R 119/83):
+         die eigene Instandhaltungsruecklage (eigen_r) und der Ruecklagenanteil des Hausgelds (weg_r,
+         hoechstens hg_nul) bleiben im Cashflow, fallen aber aus der Steuerbemessung. Bis v3380
+         rechnete der Server die Steuer (cashflow_nach_steuer_monat der Flow-API) mit ihnen. */
+      ruecklageSt = (z(d.eigen_r) || 0) + Math.max(0, Math.min(z(d.weg_r) || 0, z(d.hg_nul) || 0));
     }
   }
   bwkHerkunft = bwkArt;
@@ -230,7 +236,8 @@ function rechnen(daten, opt) {
       kp: kp, nk: summe, san: z(d.san) || 0, moebl: z(d.moebl) || 0,
       nkm: nkm, ze: ze, uf: 0,
       bwk_ul: bwkUl, bwk_nul: bwkNul,
-      leerstand_pct: leerPct,                  /* v3030: wie calc.js (v3289: alter Euro-Mietausfall umgerechnet) */
+      bwk_nul_st: ruecklageSt > 0 ? Math.max(0, bwkNul - ruecklageSt) : null,   /* v3381: ohne Ruecklagen (null = wie bwk_nul) */
+      leerstand_pct: leerPct,                 /* v3030: wie calc.js (v3289: alter Euro-Mietausfall umgerechnet) */
       d1: darlehen, d1z: zins.wert, d1t: tilg.wert, ek: ek,
       d2: d2, d2z: d2z, d2t: d2t,
       afa: afa, grenz: dez(d.grenz) || 0,
