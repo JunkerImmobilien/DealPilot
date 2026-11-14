@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Plan gegen Ist</title>
+<!-- v3364 · Demo für Marcel (Bericht zielbild-jahresverlauf 2026-11-14, Paket 6). Zeichnet mit DERSELBEN Datei
+     wie die App (frontend/js/jahresbuch-grafik.js), nur mit Beispielzahlen. Öffnen: Datei im Browser doppelklicken. -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=JetBrains+Mono&family=Space+Grotesk:wght@600&display=swap" rel="stylesheet">
+<style>
+  :root { --surface: #FDFCFA; --text: #2A2727; --muted: #6B645A; --jbg-flaeche: #FDFCFA; --rand: rgba(128,128,128,.25); }
+  :root[data-theme="dark"] { --surface: #121212; --text: #ECE7DC; --muted: #A79F92; --jbg-flaeche: #121212; }
+  body { margin: 0; background: var(--surface); color: var(--text); font: 400 14px/1.55 Inter, system-ui, sans-serif; }
+  main { max-width: 1040px; margin: 0 auto; padding: 24px 16px 48px; }
+  h1 { font: 600 24px "Space Grotesk", Inter, sans-serif; margin: 0 0 4px; }
+  h2 { font: 600 16px "Space Grotesk", Inter, sans-serif; margin: 28px 0 6px; }
+  p { margin: 6px 0; max-width: 760px; }
+  .klein { color: var(--muted); font-size: 12.5px; }
+  .karte { border: 1px solid var(--rand); border-radius: 12px; padding: 14px 16px; margin: 12px 0; }
+  .schmal { width: 358px; max-width: 100%; }
+  .leiste { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0 0; }
+  button { font: inherit; padding: 6px 12px; border-radius: 8px; border: 1px solid var(--rand); background: transparent; color: inherit; cursor: pointer; }
+  ol li { margin: 4px 0; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Jahr für Jahr: Plan gegen Ist</h1>
+  <p>So sieht die Verlaufsgrafik im Unterreiter <b>Jahre</b> der Pilot-Analyse aus. Beispielobjekt mit erfundenen Zahlen: Kauf 2021, Mieterhöhungen 07/2023 und 04/2025, das Zielbild wurde im März 2024 neu gefasst.</p>
+  <div class="leiste"><button type="button" onclick="document.documentElement.dataset.theme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark'">Hell oder dunkel</button></div>
+
+  <div class="karte"><div id="breit"></div></div>
+
+  <h2>Am Handy (358 px Inhalt)</h2>
+  <div class="karte schmal"><div id="schmal"></div></div>
+
+  <h2>Was zu entscheiden ist</h2>
+  <ol>
+    <li><b>Zwei Bilder übereinander</b> (Miete oben, Cashflow unten) statt eines Bildes mit zwei Skalen. Passt das, oder soll der Wert laut Marktbericht als drittes Bild dazu?</li>
+    <li><b>Ziel als Stufenlinie</b> in Textfarbe: sie springt im Jahr, in dem ein neues Zielbild gilt. Frühere Jahre behalten ihr damaliges Ziel.</li>
+    <li><b>Projektion heute</b> (hohle Punkte) für Jahre ohne eingetragene Ist-Miete und für die Zukunft. Sie rechnet heute auch für vergangene Jahre mit der heutigen Miete, die Umstellung ist Paket 5 und wartet auf deine Entscheidung.</li>
+    <li>Cashflow: <b>hohler Balken = Plan vom Ankauf, gefüllter Balken = Jahresstand</b> (beim Speichern im Jahr festgehalten).</li>
+  </ol>
+  <p class="klein">Farben: Gold nur über das Whitelabel-Token, Plan grau gestrichelt, Ziel in Textfarbe. Gold allein erreicht auf hellem Grund keinen Kontrast von 3 zu 1, deshalb tragen alle Linien eine Beschriftung oder Legende, und die Tafel darunter nennt jede Zahl.</p>
+</main>
+<script src="../../frontend/js/jahresbuch-grafik.js"></script>
+<script>
+  var plan = [9600, 9792, 9988, 10188, 10391, 10599, 10811, 11027, 11248];
+  var d = { heute: 2026, jahre: [], ereignisse: [
+    { jahr: 2023, monat: 7, art: 'erhoehung', text: 'Mieterhöhung 01.07.2023 auf 850 €' },
+    { jahr: 2025, monat: 4, art: 'erhoehung', text: 'Mieterhöhung 01.04.2025 auf 900 €' },
+    { jahr: 2024, monat: 3, art: 'zielbild', kurz: 'neues Zielbild', text: 'Zielbild-Wechsel 15.03.2024 (vorher Zielbild 2025)' },
+    { jahr: 2028, monat: 12, art: 'zinsbindung', kurz: 'Zinsbindung', text: 'Ende der Zinsbindung Darlehen 1' }
+  ] };
+  var ist = { 2021: 9600, 2022: 9600, 2023: 9900, 2024: 10200, 2025: 10650 };
+  var proj = { 2026: 10800, 2027: 11016, 2028: 11236, 2029: 11461 };
+  var ziel = { 2021: 12000, 2022: 12000, 2023: 12000, 2024: 13200, 2025: 13200, 2026: 13200, 2027: 13200, 2028: 13200, 2029: 13200 };
+  var cfPlan = [1450, 1520, 1600, 1680, 1760, 1850, 1930, 2010, 2100];
+  var cfIst = { 2021: 900, 2022: -350, 2023: 1500, 2024: 1820, 2025: 2050 };
+  for (var y = 2021; y <= 2029; y++) d.jahre.push({ jahr: y, miete_plan: plan[y - 2021], miete_ist: ist[y] || null, miete_proj: proj[y] || null,
+    ziel_j: ziel[y], cf_plan: cfPlan[y - 2021], cf_ist: cfIst[y] != null ? cfIst[y] : null });
+  DpJahresbuchGrafik.zeichnen(document.getElementById('breit'), d);
+  DpJahresbuchGrafik.zeichnen(document.getElementById('schmal'), d);
+</script>
+</body>
+</html>

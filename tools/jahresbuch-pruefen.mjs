@@ -106,5 +106,23 @@ const E = ctx.DpErhoehungen;
   ok(/js\/jahresbuch\.js\?v=/.test(lies('frontend/index.html')), 'J index.html lädt jahresbuch.js');
 }
 
-console.log(`jahresbuch-pruefen (v3362, v3363): ${gruen} von ${gruen + rot} ok`);
+/* ── G ── Verlaufsgrafik (v3364, jahresbuch-grafik.js) */
+{
+  const c3 = kontext();
+  vm.runInContext(lies('frontend/js/jahresbuch-grafik.js'), c3);
+  const Gr = c3.DpJahresbuchGrafik;
+  const d = { heute: 2026, ereignisse: [{ jahr: 2023, monat: 7, art: 'erhoehung', text: 'Mieterhöhung' }, { jahr: 2024, monat: 3, art: 'zielbild', kurz: 'neues Zielbild', text: 'Wechsel' }], jahre: [] };
+  for (let y = 2021; y <= 2029; y++) d.jahre.push({ jahr: y, miete_plan: 9600 + (y - 2021) * 200, miete_ist: y <= 2025 ? 9600 + (y - 2021) * 250 : null, miete_proj: y >= 2026 ? 10800 : null, ziel_j: y < 2024 ? 12000 : 13200, cf_plan: 1500, cf_ist: y <= 2025 ? (y === 2022 ? -350 : 1200) : null });
+  const svg = Gr.svg(d);
+  ok(/Kaltmiete je Jahr/.test(svg) && /Cashflow vor Steuer je Jahr/.test(svg), 'G zwei Bilder über derselben Jahresachse');
+  ok((svg.match(/stroke:var\(--jbg-flaeche/g) || []).length === 5, 'G fünf gefüllte Ist-Punkte (2021-2025)');
+  ok((svg.match(/fill:var\(--jbg-flaeche, #FDFCFA\);stroke:var\(--wl-c9a84c/g) || []).length === 4, 'G vier hohle Punkte der Projektion (2026-2029)');
+  ok((svg.match(/data-jbg-i=/g) || []).length === 9, 'G Trefferflächen je Jahr für das Kästchen');
+  const ohneToken = (lies('frontend/js/jahresbuch-grafik.js') + lies('frontend/js/jahresbuch.js') + lies('frontend/js/zielbild-fassungen.js') + lies('frontend/js/mieterhoehungen.js')).replace(/var\(--wl-c9a84c, #C9A84C\)/g, '');
+  ok(!/#C9A84C|#E8CC7A|#b8932f/i.test(ohneToken), 'G Gold nur über var(--wl-c9a84c) (gold-audit)');
+  ok(Gr.svg({ jahre: [d.jahre[0]] }) === '', 'G mit einem Jahr kein Bild');
+  ok(/data-dp-jb-grafik/.test(lies('frontend/js/jahresbuch.js')) && /js\/jahresbuch-grafik\.js\?v=/.test(lies('frontend/index.html')), 'G eingebaut im Unterreiter Jahre');
+}
+
+console.log(`jahresbuch-pruefen (v3362, v3363, v3364): ${gruen} von ${gruen + rot} ok`);
 process.exit(rot ? 1 : 0);
