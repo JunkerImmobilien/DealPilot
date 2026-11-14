@@ -35,7 +35,7 @@
 (function (global) {
   'use strict';
   if (global.DpJahresbuch) return;
-  var VERSION = 'v3363';
+  var VERSION = 'v3363a';
   var STATUS = [['geplant', 'geplant'], ['erklaert', 'erklärt'], ['bescheid', 'Bescheid']];
 
   function doc() { return global.document || null; }
@@ -83,12 +83,17 @@
     z.miete_proj = q.proj && istZahl(q.proj.nkm_y) ? r0(q.proj.nkm_y) : null;
     z.miete_ist = istZahl(zahl(ist.nkm_j)) ? zahl(ist.nkm_j) : null;
     z.miete_einheiten = summeEinheiten(ist.einheiten);
-    z.miete_abw = istZahl(z.miete_ist) && istZahl(z.miete_plan) ? z.miete_ist - z.miete_plan : null;
+    /* Ohne eingefrorenen Plan (Ankauf-Stand vor v2989) steht die heutige Projektion da - gekennzeichnet, nie als Plan */
+    z.ohne_plan = !q.plan;
+    z.miete_basis = istZahl(z.miete_plan) ? z.miete_plan : z.miete_proj;
+    z.miete_abw = istZahl(z.miete_ist) && istZahl(z.miete_basis) ? z.miete_ist - z.miete_basis : null;
     z.cf_plan = istZahl(plan.cfop_y) ? plan.cfop_y : null;
+    z.cf_proj = q.proj && istZahl(q.proj.cfop_y) ? r0(q.proj.cfop_y) : null;
+    z.rs_proj = q.proj && istZahl(q.proj.rs) ? r0(q.proj.rs) : null;
     z.cf_stand = q.stand && q.stand.kz && istZahl(zahl(q.stand.kz._kpis_cf_vs)) ? zahl(q.stand.kz._kpis_cf_vs) : null;
     z.rs_plan = istZahl(plan.rs) ? plan.rs : null;
     z.rs_ist = istZahl(zahl(ist.rs_ist)) ? zahl(ist.rs_ist) : null;
-    z.rs_abw = istZahl(z.rs_ist) && istZahl(z.rs_plan) ? z.rs_ist - z.rs_plan : null;
+    z.rs_abw = istZahl(z.rs_ist) && istZahl(z.rs_plan != null ? z.rs_plan : z.rs_proj) ? z.rs_ist - (z.rs_plan != null ? z.rs_plan : z.rs_proj) : null;
     z.av = q.av || null;
     z.steuer = q.steuer || null;
     z.status = ist.steuer_status || 'geplant';
@@ -244,7 +249,7 @@
   var _offen = null;   /* aufgeklapptes Jahr */
   function zelleMiete(z) {
     var t = istZahl(z.miete_ist) ? '<b>' + eur(z.miete_ist) + '</b>' : '<span style="color:#6B645A">–</span>';
-    if (istZahl(z.miete_abw)) t += '<small class="' + (z.miete_abw >= 0 ? 'dp-jb-gut' : 'dp-jb-schlecht') + '">' + eurVz(z.miete_abw) + ' zum Plan</small>';
+    if (istZahl(z.miete_abw)) t += '<small class="' + (z.miete_abw >= 0 ? 'dp-jb-gut' : 'dp-jb-schlecht') + '">' + eurVz(z.miete_abw) + (z.ohne_plan ? ' zur Projektion' : ' zum Plan') + '</small>';
     else if (!istZahl(z.miete_ist) && istZahl(z.av && z.av.wert) && z.av.eigen) t += '<small>Anlage V ' + eur(z.av.wert) + '</small>';
     return t;
   }
@@ -287,11 +292,12 @@
       if (z.abgleich && z.abgleich.art !== 'gleich') hin += '<div class="dp-jb-h">' + esc(z.abgleich.text) + (z.abgleich.art === 'vorschlag' ? ' <button type="button" class="dp-jb-knopf" data-jb-aktion="av" data-jb-jahr="' + z.jahr + '">übernehmen</button>' : '') + '</div>';
       if (z.ziel_erreicht && z.ziel_fassung && z.ziel_fassung.status !== 'erreicht') hin += '<div class="dp-jb-h dp-jb-ok">Die Ist-Miete ' + z.jahr + ' erreicht das Ziel von ' + esc(z.ziel_titel || 'Zielbild') + '. <button type="button" class="dp-jb-knopf" data-jb-aktion="erreicht" data-jb-fassung="' + esc(z.ziel_fassung.id) + '">als erreicht kennzeichnen</button></div>';
       else if (z.ziel_erreicht && !z.ziel_fassung) hin += '<div class="dp-jb-h dp-jb-ok">Die Ist-Miete ' + z.jahr + ' erreicht das Ziel des aktiven Zielbilds. Ein neues Zielbild legst du im Reiter Investition an.</div>';
+      var oP = function (planW, projW) { return istZahl(planW) ? eur(planW) : (istZahl(projW) ? '<span style="color:#6B645A">' + eur(projW) + '</span><small>Projektion heute</small>' : '–'); };
       var zeile = '<tr data-jb-jahr-zeile="' + z.jahr + '"><td><b>' + z.jahr + '</b>' + (z.jahr === heuteJahr() ? '<small>laufend</small>' : '') + '</td>'
-        + '<td>' + eur(z.miete_plan) + '</td>'
+        + '<td>' + oP(z.miete_plan, z.miete_proj) + '</td>'
         + '<td>' + zelleMiete(z) + '</td>'
-        + '<td>' + eur(z.cf_plan) + (istZahl(z.cf_stand) ? '<small>Stand ' + eur(z.cf_stand) + '</small>' : '') + '</td>'
-        + '<td>' + eur(z.rs_plan) + (istZahl(z.rs_ist) ? '<small class="' + (z.rs_abw <= 0 ? 'dp-jb-gut' : 'dp-jb-schlecht') + '">Ist ' + eur(z.rs_ist) + '</small>' : '') + '</td>'
+        + '<td>' + oP(z.cf_plan, z.cf_proj) + (istZahl(z.cf_stand) ? '<small>Stand ' + eur(z.cf_stand) + '</small>' : '') + '</td>'
+        + '<td>' + oP(z.rs_plan, z.rs_proj) + (istZahl(z.rs_ist) ? '<small class="' + (z.rs_abw <= 0 ? 'dp-jb-gut' : 'dp-jb-schlecht') + '">Ist ' + eur(z.rs_ist) + '</small>' : '') + '</td>'
         + '<td>' + (z.steuer ? eurVz(z.steuer.ergebnis) : '–') + '<small><span class="dp-jb-st dp-jb-st-' + z.status + '">' + statusWort(z.status) + '</span></small></td>'
         + '<td>' + (istZahl(z.ziel_nkm) ? eur(z.ziel_nkm) + '/Monat' : '–') + (z.ziel_titel ? '<small>' + esc(z.ziel_titel) + '</small>' : '') + (z.mb ? '<small>Wert ' + eur(z.mb.wert) + '</small>' : '') + '</td>'
         + '<td><button type="button" class="dp-jb-knopf" data-jb-aktion="auf" data-jb-jahr="' + z.jahr + '" aria-expanded="' + (_offen === z.jahr) + '">' + (_offen === z.jahr ? 'zu' : 'eintragen') + '</button></td></tr>';
@@ -311,6 +317,7 @@
       + '<div class="dp-pa-sec"><span>JAHR FÜR JAHR: PLAN GEGEN IST</span></div>'
       + '<p class="dp-jb-satz">Plan ist die Rechnung vom Ankauf, eingefroren. Ist trägst du je Jahr ein. Steuerwerte kommen aus der Anlage V im Reiter Steuer. Vergangene Jahre der Projektion rechnen weiter mit der heutigen Miete, die Ist-Spalte zeigt, was wirklich war.</p>'
       + '<div data-dp-jb-grafik="1"></div>'
+      + (Z.some(function (z) { return z.ohne_plan; }) ? '<p class="dp-jb-satz">Dieser Ankauf-Stand ist älter als die eingefrorene Planrechnung. Grau steht deshalb die heutige Projektion, sie ist kein Plan vom Ankauf.</p>' : '')
       + vorb + tafelHtml(Z, mfh) + '</div>';
   }
   /* Vorbelegung (nur auf Klick, Bericht 3.7) */
