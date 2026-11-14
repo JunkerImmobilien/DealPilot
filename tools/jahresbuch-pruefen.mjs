@@ -124,5 +124,25 @@ const E = ctx.DpErhoehungen;
   ok(/data-dp-jb-grafik/.test(lies('frontend/js/jahresbuch.js')) && /js\/jahresbuch-grafik\.js\?v=/.test(lies('frontend/index.html')), 'G eingebaut im Unterreiter Jahre');
 }
 
-console.log(`jahresbuch-pruefen (v3362, v3363, v3364): ${gruen} von ${gruen + rot} ok`);
+/* ── V · v3366 (E4): vergangene Jahre mit der echten Miete, ab heute fortgeschrieben ── */
+{
+  const q = [{ liste: [{ datum: '2025-04-01', art: '558', von: 850, auf: 900 }], heute: 900 }];
+  const j = (y) => Math.round(900 * 12 * E.jahresFaktor(q, y));
+  ok(j(2023) === 10200, 'V Kauf 2023 mit 850 €: 2023 = 10.200 € (' + j(2023) + ')');
+  ok(j(2025) === 10650, 'V 2025: drei Monate 850, neun Monate 900 = 10.650 € (' + j(2025) + ')');
+  ok(j(2026) === 10800, 'V 2026 = heutige Miete 10.800 €');
+  const ohne = [{ liste: [], heute: 900, letzte: '2025-04-01', betrag: 50 }];
+  ok(Math.round(900 * 12 * E.jahresFaktor(ohne, 2024)) === 10200, 'V ohne Liste: Letzte Erhöhung und um aus dem Reiter Miete');
+  ok(E.jahresFaktor([{ liste: [], heute: 900 }], 2023) === 1, 'V ohne jede Angabe: heutige Miete, nichts erfunden');
+  ok(E.jahresFaktor([{ liste: [{ datum: '2025-04-01', art: '558', auf: 900 }], heute: 900 }], 2024) === 1, 'V Eintrag ohne bisherige Miete: davor die heutige');
+  const zwei = [{ liste: [], heute: 500 }, { liste: [{ datum: '2025-01-01', art: '558', von: 400, auf: 500 }], heute: 500 }];
+  ok(Math.abs(E.jahresFaktor(zwei, 2024) - 0.9) < 1e-9, 'V zwei Wohnungen: Faktor auf die Summe (900/1000)');
+  const me = lies('frontend/js/mietentwicklung.js');
+  ok(/function bestandVersatz/.test(me) && /E\.istFaktor\(_basisJahr\(\) \+ y\)/.test(me) && /factorRoh\(y\) \/ f0/.test(me), 'V factor(): vor heute Ist, ab heute fortgeschrieben');
+  ok(/DealPilotAnkaufAnsicht/.test(me.slice(me.indexOf('function bestandVersatz'), me.indexOf('function bestandVersatz') + 600)), 'V Ankauf-Ansicht rechnet unverändert');
+  const tx = lies('frontend/js/tax.js'), ca = lies('frontend/js/calc.js');
+  ok(/MietEntwicklung\.factor\(y\)/.test(tx) && /MietEntwicklung\.factor\(y\)/.test(ca), 'V Projektion und Steuer lesen dieselbe Kurve');
+}
+
+console.log(`jahresbuch-pruefen (v3362, v3363, v3364, v3366): ${gruen} von ${gruen + rot} ok`);
 process.exit(rot ? 1 : 0);

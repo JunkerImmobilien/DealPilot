@@ -254,7 +254,37 @@ window.MietEntwicklung = (function() {
     return { jahr: jahr, faktor: soll / ist, ist: ist, soll: soll };
   }
 
+  /* ══ v3366 · IM BESTAND: VERGANGENE JAHRE MIT DER ECHTEN MIETE ═══════════
+     Marcel 14.11.2026 (E4): „wir sollten mit der Miete rechnen, die wir unter dem
+     Tab Miete eingegeben haben". Bis hier bekam schon das Kaufjahr die HEUTIGE
+     Miete, und die Steigerung lief ab dem Kaufjahr - im Jahr 2026 stand bei einem
+     Kauf 2023 also nicht die Miete von heute, sondern heute × 1,02³.
+     Jetzt, nur im Bestand (Ankauf festgehalten, nicht in der Ankauf-Ansicht):
+       - Jahre vor dem laufenden: Miete aus dem Reiter Miete (Mieterhöhungen,
+         sonst „Letzte Erhöhung" und „um", sonst die heutige Miete),
+         DpErhoehungen.istFaktor(Kalenderjahr)
+       - ab dem laufenden Jahr: die heutige Miete, fortgeschrieben ab heute,
+         also faktorRoh(y) / faktorRoh(versatz).
+     Ankauf-Analysen (Kaufjahr = heute oder später) rechnen unverändert. */
+  function bestandVersatz() {
+    try {
+      var A = window.DealPilotAnkauf; if (!(A && A.vorhanden && A.vorhanden())) return 0;
+      var AA = window.DealPilotAnkaufAnsicht; if (AA && AA.aktiv && AA.aktiv()) return 0;
+      var by = _basisJahr(), cy = new Date().getFullYear();
+      return (by > 1990 && cy > by) ? Math.min(40, cy - by) : 0;
+    } catch (e) { return 0; }
+  }
   function factor(y) {
+    var off = bestandVersatz();
+    if (!off) return factorRoh(y);
+    if (y < off) {
+      var E = window.DpErhoehungen;
+      return (E && typeof E.istFaktor === 'function') ? E.istFaktor(_basisJahr() + y) : 1.0;
+    }
+    var f0 = factorRoh(off);
+    return f0 > 0 ? factorRoh(y) / f0 : factorRoh(y - off);
+  }
+  function factorRoh(y) {
     if (y <= 0) return 1.0;
     /* v2410 - „Aus Wohnungen" rechnet die Soll-Miete JE WOHNUNG selbst
        (`_mieteEinheit`); der pauschale Sprung kaeme sonst ein zweites
@@ -415,18 +445,46 @@ window.MietEntwicklung = (function() {
        Zeichen HTML), gezeigt nicht. Sie wandert hinter den Block und gilt fuer beide Modi. */
     var wrapT = document.getElementById('me_table_wrap');
     if (wrapT && blkD && wrapT.parentNode === blkD) blkD.parentNode.insertBefore(wrapT, blkD.nextSibling);
-    if (wrapT) wrapT.style.display = (mode === 'detail' || mode === 'einheiten') ? '' : 'none';
+    var _bv = bestandVersatz();   /* v3366: im Bestand immer - die Jahre bis heute stehen dort mit der echten Miete */
+    if (wrapT) wrapT.style.display = (mode === 'detail' || mode === 'einheiten' || _bv) ? '' : 'none';
     /* v2025 - die Tabelle gilt auch fuer den dritten Modus. Vorher lief
        sie nur bei `detail`, und „Aus Wohnungen" zeigte gar keine. */
-    if (mode === 'detail' || mode === 'einheiten') {
+    if (mode === 'detail' || mode === 'einheiten' || _bv) {
       _renderTable();
       _renderOpp();
     }
   }
 
+  /* v3366 · Bestand: Kalenderjahre, bis gestern Ist aus dem Reiter Miete, ab heute Plan.
+     Dieselbe Kurve wie Projektion und Steuer (beide lesen factor). */
+  function _bestandTabelle(wrap, off) {
+    var by = _basisJahr(), cy = by + off, btj = Math.max(1, Math.round(_v('btj', 15)));
+    var nkm_m = _v('nkm', 0), ze_m = _v('ze', 0), inc = appliesToZE();
+    var E = window.DpErhoehungen, alle = (E && E.alle) ? E.alle() : [];
+    var fE = function (n) { return Math.round(n || 0).toLocaleString('de-DE') + ' €'; };
+    var bis = Math.max(off + 3, Math.min(btj, off + 6));
+    var zeilen = '';
+    for (var i = 0; i < bis; i++) {
+      var f = factor(i), cal = by + i, ist = cal < cy;
+      var jahr = nkm_m * 12 * f + ze_m * 12 * (inc ? f : 1);   /* wie calc.js _nkmJYear */
+      var erh = alle.filter(function (x) { return String(x.datum).slice(0, 4) === String(cal); });
+      zeilen += '<tr class="' + (ist ? 'me-row-ist' : (cal === cy ? 'me-row-heute' : 'me-row-plan')) + (erh.length ? ' me-row-hike' : '') + '">'
+        + '<td>' + cal + (erh.length ? ' ⬆' : '') + '</td>'
+        + '<td>' + (ist ? 'Ist' : (cal === cy ? 'heute' : 'Plan')) + '</td>'
+        + '<td>' + fE(jahr) + '</td>'
+        + '<td>' + fE(nkm_m * f) + '</td></tr>';
+    }
+    var nE = alle.length;
+    wrap.innerHTML = '<div class="me-herkunft">Im Bestand: <b>bis ' + (cy - 1) + ' die echte Miete</b> aus den Mieterhöhungen'
+      + (nE ? ' (' + nE + ' eingetragen)' : ' (noch keine eingetragen, gerechnet wird mit der heutigen Miete' + ((document.getElementById('mv_letzte_erhoehung') || {}).value ? ' und der letzten Erhöhung' : '') + ')')
+      + ', <b>ab ' + cy + '</b> die heutige Miete mit der Mietentwicklung fortgeschrieben. Eine Erhöhung trägst du in der Karte Mietvertrag ein.</div>'
+      + '<table><thead><tr><th>Jahr</th><th>Stand</th><th>Kaltmiete im Jahr</th><th>je Monat</th></tr></thead><tbody>' + zeilen + '</tbody></table>';
+  }
   function _renderTable() {
     var wrap = document.getElementById('me_table_wrap');
     if (!wrap) return;
+    var _off = bestandVersatz();
+    if (_off) { _bestandTabelle(wrap, _off); return; }
     var snap = snapshot();
     var fmtE = function(n) {
       return new Intl.NumberFormat('de-DE', {
@@ -595,6 +653,12 @@ window.MietEntwicklung = (function() {
 
   // Re-render Tabelle bei jeder calc()-Aktualisierung
   function refresh() { _renderUI(); try { _renderSollHinweis(); } catch (e) {} }
+  /* v3366 · eine neue Mieterhöhung ändert die Miete vergangener Jahre: neu rechnen und zeigen */
+  window.addEventListener('dp:erhoehungen', function () {
+    try { if (typeof window.calc === 'function') window.calc(); } catch (e) {}
+    try { refresh(); } catch (e) {}
+  });
+  window.addEventListener('dp:object-ready', function () { setTimeout(function () { try { refresh(); } catch (e) {} }, 900); });
 
   /* v2027 - der Knopf muss mitgehen, wenn die Objektart wechselt.
      Ohne das bliebe er nach einem Wechsel von MFH auf ETW stehen, bis
@@ -630,7 +694,9 @@ window.MietEntwicklung = (function() {
        Ohne diese Zeile waere der dritte Modus gebaut und unerreichbar. */
     einheitenStand: einheitenStand,
     einheitenNutzbar: einheitenNutzbar,
-    sollJahr: sollJahr   /* v2410 */
+    sollJahr: sollJahr,   /* v2410 */
+    bestandVersatz: bestandVersatz,   /* v3366 */
+    factorRoh: factorRoh
   };
 })();
 

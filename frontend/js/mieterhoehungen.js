@@ -39,7 +39,7 @@
 (function (global) {
   'use strict';
   if (global.DpErhoehungen) return;
-  var VERSION = 'v3362';
+  var VERSION = 'v3366';
   var ARTEN = [['558', 'Erhöhung auf die Vergleichsmiete (§ 558 BGB)'], ['559', 'Modernisierungsumlage (§ 559 BGB)'], ['staffel', 'Staffelmiete'],
     ['index', 'Indexmiete'], ['neuvermietung', 'Neuvermietung'], ['sonstig', 'sonstige Änderung']];
   var SPERRE_ARTEN = { '558': 1, staffel: 1, index: 1 };
@@ -103,6 +103,47 @@
     return { id: 'erh-alt-' + letzte.replace(/-/g, ''), datum: letzte, art: '558', von: istZahl(b) && istZahl(i) ? Math.round((i - b) * 100) / 100 : null,
       auf: istZahl(i) && i > 0 ? i : null, beleg: 'aus den Vertragsangaben übernommen', am: new Date().toISOString() };
   }
+
+  /* ── v3366 · Miete vergangener Jahre (Marcel 14.11.2026, E4: „wir sollten mit der Miete
+     rechnen, die wir unter dem Tab Miete eingegeben haben") ─────────────────────────
+     quellen = [{ liste, heute (Kaltmiete je Monat heute), letzte (JJJJ-MM-TT), betrag }],
+     je Mietquelle eine (Objekt oder je vermietete Wohnung). Monatsmiete am Ersten jedes
+     Monats: aus der Liste, davor die bisherige Miete des ersten Eintrags; ohne Liste aus
+     „Letzte Erhöhung" und „um"; ohne beides die heutige Miete (nichts wird erfunden).
+     Ergebnis: Jahresdurchschnitt geteilt durch die Miete heute, also der Faktor auf die
+     heutige Kaltmiete. Ohne Miete heute 1. */
+  function mieteMonat(q, iso) {
+    var heute = zahl(q.heute);
+    var l = sortiert(q.liste).filter(function (x) { return istZahl(zahl(x.auf)); });
+    if (l.length) {
+      var bis = l.filter(function (x) { return x.datum <= iso; });
+      if (bis.length) return zahl(bis[bis.length - 1].auf);
+      var v = zahl(l[0].von); return istZahl(v) ? v : heute;
+    }
+    var b = zahl(q.betrag);
+    if (istDatum(q.letzte) && istZahl(b) && istZahl(heute) && iso < q.letzte) return Math.max(0, heute - b);
+    return heute;
+  }
+  function jahresFaktor(quellen, jahr) {
+    var heute = 0, schnitt = 0;
+    (quellen || []).forEach(function (q) {
+      var h = zahl(q && q.heute); if (!(h > 0)) return;
+      heute += h;
+      for (var m = 1; m <= 12; m++) { var x = mieteMonat(q, jahr + '-' + String(m).padStart(2, '0') + '-01'); schnitt += (istZahl(x) ? x : h) / 12; }
+    });
+    return heute > 0 ? schnitt / heute : 1;
+  }
+  /** Die Quellen des offenen Objekts: vermietete Wohnungen, sonst das Objekt selbst. */
+  function quellenObjekt() {
+    var M = global._dpMfh, w = [];
+    if (M && Array.isArray(M.einheiten)) M.einheiten.forEach(function (e) {
+      if (!e || e.status === 'leer' || !(zahl(e.ist) > 0)) return;
+      w.push({ liste: e.erhoehungen, heute: zahl(e.ist), letzte: e.mv_letzte_erhoehung, betrag: e.mv_letzte_erhoehung_betrag });
+    });
+    if (w.length) return w;
+    return [{ liste: objektListe(), heute: zahl((el('nkm') || {}).value), letzte: (el('mv_letzte_erhoehung') || {}).value, betrag: (el('mv_letzte_erhoehung_betrag') || {}).value }];
+  }
+  function istFaktor(jahr) { try { return jahresFaktor(quellenObjekt(), jahr); } catch (e) { return 1; } }
 
   /* ── Anzeige (eine Maske für Objekt und Wohnung) ──────────────── */
   function stil() {
@@ -253,6 +294,7 @@
   global.DpErhoehungen = {
     VERSION: VERSION, ARTEN: ARTEN, artWort: artWort,
     ableiten: ableiten, mieteAm: mieteAm, imJahr: imJahr, eintragAus: eintragAus, ausVertrag: ausVertrag, sortiert: sortiert,
-    html: html, binden: binden, objektMount: objektMount, einheitBinden: einheitBinden, objektListe: objektListe, alle: alle
+    html: html, binden: binden, objektMount: objektMount, einheitBinden: einheitBinden, objektListe: objektListe, alle: alle,
+    mieteMonat: mieteMonat, jahresFaktor: jahresFaktor, quellenObjekt: quellenObjekt, istFaktor: istFaktor   /* v3366 */
   };
 })(typeof window !== 'undefined' ? window : globalThis);

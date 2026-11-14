@@ -35,7 +35,7 @@
 (function (global) {
   'use strict';
   if (global.DpJahresbuch) return;
-  var VERSION = 'v3363a';
+  var VERSION = 'v3366';
   var STATUS = [['geplant', 'geplant'], ['erklaert', 'erklärt'], ['bescheid', 'Bescheid']];
 
   function doc() { return global.document || null; }
@@ -81,7 +81,11 @@
     var ist = q.ist || {}, plan = q.plan || {}, z = { jahr: q.jahr };
     z.miete_plan = istZahl(plan.nkm_y) ? plan.nkm_y : null;
     z.miete_proj = q.proj && istZahl(q.proj.nkm_y) ? r0(q.proj.nkm_y) : null;
-    z.miete_ist = istZahl(zahl(ist.nkm_j)) ? zahl(ist.nkm_j) : null;
+    /* v3366 (E4): die Ist-Miete kommt aus dem Reiter Miete - die Projektion rechnet vergangene
+       Jahre jetzt mit den eingetragenen Mieterhöhungen. Eine frühere eigene Jahressumme (bis v3365)
+       bleibt sichtbar und geht vor. */
+    z.miete_eigen = istZahl(zahl(ist.nkm_j));
+    z.miete_ist = z.miete_eigen ? zahl(ist.nkm_j) : (q.jahr <= heuteJahr() ? z.miete_proj : null);
     z.miete_einheiten = summeEinheiten(ist.einheiten);
     /* Ohne eingefrorenen Plan (Ankauf-Stand vor v2989) steht die heutige Projektion da - gekennzeichnet, nie als Plan */
     z.ohne_plan = !q.plan;
@@ -291,13 +295,13 @@
     }).join(' · ') : 'keine eingetragen';
     return '<tr class="dp-jb-edit" data-jb-edit="' + z.jahr + '"><td colspan="8">'
       + '<div class="dp-jb-f">'
-      + f('nkm_j', 'Ist-Kaltmiete ' + z.jahr + ' (Summe des Jahres, €)', ph ? 'Vorschlag ' + ph : '')
-      + (mfh && mfh.length ? '' : f('leer_monate', 'Leerstand (Monate)', '0', 'numeric'))
+      + (z.miete_eigen ? f('nkm_j', 'Eigene Jahressumme ' + z.jahr + ' (leer = aus dem Reiter Miete)', '') : '')
+      + f('leer_monate', 'Leerstand (Monate)', '0', 'numeric')
       + f('rs_ist', 'Restschuld am 31.12. laut Kontoauszug (€)', istZahl(z.rs_plan) ? 'Plan ' + z.rs_plan : '')
       + '<label>Steuer ' + z.jahr + '<select data-jb-feld="steuer_status">' + st + '</select></label>'
       + f('notiz', 'Notiz', 'z. B. Mieterwechsel im Mai', 'text')
-      + '</div>' + ein
-      + '<div class="dp-jb-h">Mieterhöhungen ' + z.jahr + ': ' + erh + '. Eintragen im Reiter Miete (Karte Mietvertrag) oder je Wohnung unter Einheiten erfassen.</div>'
+      + '</div>'
+      + '<div class="dp-jb-h">Die Miete ' + z.jahr + ' kommt aus dem Reiter Miete. Mieterhöhungen ' + z.jahr + ': ' + erh + '. Eintragen im Reiter Miete (Karte Mietvertrag) oder je Wohnung unter Einheiten erfassen.</div>'
       + '<button type="button" class="dp-jb-knopf" data-jb-aktion="zu">Fertig</button>'
       + '</td></tr>';
   }
@@ -328,10 +332,10 @@
     if (!Z.length) return '<div class="dp-jb"><p class="dp-jb-satz">Ohne Kaufdatum gibt es noch keine Jahre.</p></div>';
     var M = global._dpMfh, mfh = global.DpMfhEinheiten && global.DpMfhEinheiten.artMitEinheiten && global.DpMfhEinheiten.artMitEinheiten() && M && Array.isArray(M.einheiten) ? M.einheiten : null;
     var leer = !Object.keys(jahreDaten()).length;
-    var vorb = leer && vorbelegbar() ? '<div class="dp-jb-h">Es liegen schon Angaben vor (Mieteinnahmen der Anlage V, letzte Erhöhungen). <button type="button" class="dp-jb-knopf" data-jb-aktion="vorbelegen">Aus vorhandenen Daten vorbelegen</button></div>' : '';
+    var vorb = leer && vorbelegbar() ? '<div class="dp-jb-h">Im Reiter Miete steht eine letzte Erhöhung, aber noch keine Liste. <button type="button" class="dp-jb-knopf" data-jb-aktion="vorbelegen">Als ersten Eintrag übernehmen</button></div>' : '';
     return '<div class="dp-jb" data-dp-jb="1">'
       + '<div class="dp-pa-sec"><span>JAHR FÜR JAHR: PLAN GEGEN IST</span></div>'
-      + '<p class="dp-jb-satz">Plan ist die Rechnung vom Ankauf, eingefroren. Ist trägst du je Jahr ein. Steuerwerte kommen aus der Anlage V im Reiter Steuer. Vergangene Jahre der Projektion rechnen weiter mit der heutigen Miete, die Ist-Spalte zeigt, was wirklich war.</p>'
+      + '<p class="dp-jb-satz">Plan ist die Rechnung vom Ankauf, eingefroren. Ist kommt aus den Reitern: die Miete aus dem Reiter Miete (Mieterhöhungen), die Steuer aus der Anlage V im Reiter Steuer, der Wert aus deinen Marktberichten.</p>'
       + '<div data-dp-jb-grafik="1"></div>'
       + (Z.some(function (z) { return z.ohne_plan; }) ? '<p class="dp-jb-satz">Dieser Ankauf-Stand ist älter als die eingefrorene Planrechnung. Grau steht deshalb die heutige Projektion, sie ist kein Plan vom Ankauf.</p>' : '')
       + vorb + tafelHtml(Z, mfh) + '</div>';
@@ -339,16 +343,13 @@
   /* Vorbelegung (nur auf Klick, Bericht 3.7) */
   function vorbelegbar() {
     var Z = zeilen();
-    if (Z.some(function (z) { return z.av && z.av.eigen && z.jahr <= heuteJahr(); })) return true;
+    /* v3366: keine Jahressumme mehr aus der Anlage V - die Miete kommt aus dem Reiter Miete */
     var E = global.DpErhoehungen;
     return !!(E && !E.objektListe().length && /^\d{4}-\d{2}-\d{2}$/.test(String((el('mv_letzte_erhoehung') || {}).value || '')));
   }
   function vorbelegen() {
     var d = D(); if (!d) return 0;
     var n = 0, j = d._jahre || {};
-    zeilen().forEach(function (z) {
-      if (z.av && z.av.eigen && !(j[String(z.jahr)] && j[String(z.jahr)].nkm_j != null)) { j = setzen(j, z.jahr, 'nkm_j', Math.round(z.av.wert)); n++; }
-    });
     d._jahre = j;
     var E = global.DpErhoehungen;
     if (E && !E.objektListe().length) {

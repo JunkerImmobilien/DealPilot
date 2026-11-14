@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Jahresabgleich im Bestand</title>
+<!-- v3367 · Klickdummy für Marcel (14.11.2026): „ein komplettes Konzept in der Pilot-Analyse, wie wir Plan gegen Ist jedes Jahr
+     machen können". Erfundene Zahlen. Die Grafik zeichnet mit DERSELBEN Datei wie die App (frontend/js/jahresbuch-grafik.js).
+     Öffnen: Datei im Browser doppelklicken. Konzept: Dateien/Fehler/jahresabgleich-konzept-2026-11-14.md -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&family=Space+Grotesk:wght@600&display=swap" rel="stylesheet">
+<style>
+  :root { --surface:#FDFCFA; --karte:#FFFFFF; --text:#2A2727; --muted:#6B645A; --rand:rgba(42,39,39,.14); --gold:#C9A84C; --gold-bg:rgba(201,168,76,.12);
+          --gruen:#3FA56C; --rot:#B8625C; --gelb:#C99A2E; --jbg-flaeche:#FDFCFA; }
+  :root[data-theme="dark"] { --surface:#0B0B0B; --karte:#151515; --text:#ECE7DC; --muted:#A79F92; --rand:rgba(236,231,220,.14); --gold-bg:rgba(201,168,76,.14); --jbg-flaeche:#151515; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --surface:#0B0B0B; --karte:#151515; --text:#ECE7DC; --muted:#A79F92; --rand:rgba(236,231,220,.14); --gold-bg:rgba(201,168,76,.14); --jbg-flaeche:#151515; } }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--surface); color:var(--text); font:400 14px/1.55 Inter, system-ui, sans-serif; }
+  main { max-width:1080px; margin:0 auto; padding:24px 16px 56px; }
+  h1 { font:600 24px "Space Grotesk", Inter, sans-serif; margin:0 0 4px; }
+  h2 { font:600 16px "Space Grotesk", Inter, sans-serif; margin:30px 0 8px; }
+  p { margin:6px 0; max-width:780px; }
+  .klein { color:var(--muted); font-size:12.5px; }
+  .mono { font:500 11px "JetBrains Mono", monospace; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); }
+  button { font:inherit; color:inherit; cursor:pointer; }
+  .leiste { display:flex; gap:8px; flex-wrap:wrap; margin:12px 0 0; }
+  .knopf { padding:7px 12px; border-radius:8px; border:1px solid var(--rand); background:transparent; }
+  .knopf.gold { border-color:var(--gold); background:var(--gold-bg); font-weight:600; }
+  /* Unterreiter der Pilot-Analyse (Vorschlag: 7 statt 11) */
+  .reiter { display:flex; gap:4px; overflow-x:auto; border-bottom:1px solid var(--rand); margin:18px 0 16px; padding-bottom:0; }
+  .reiter button { border:none; background:none; padding:9px 12px; white-space:nowrap; border-bottom:2px solid transparent; color:var(--muted); }
+  .reiter button.an { color:var(--text); border-bottom-color:var(--gold); font-weight:600; }
+  .flaeche { border:1px solid var(--rand); border-radius:12px; background:var(--karte); padding:16px; }
+  /* Jahre */
+  .jahre { display:flex; gap:6px; flex-wrap:wrap; margin:0 0 14px; }
+  .jahre button { border:1px solid var(--rand); background:transparent; border-radius:8px; padding:6px 12px; font-weight:500; display:flex; align-items:center; gap:6px; }
+  .jahre button.an { border-color:var(--gold); background:var(--gold-bg); }
+  .punkt { width:8px; height:8px; border-radius:2px; display:inline-block; }
+  .p-ok { background:var(--gruen); } .p-teil { background:var(--gelb); } .p-offen { background:var(--rot); } .p-leer { background:var(--rand); }
+  .urteil { font:600 18px "Space Grotesk", Inter, sans-serif; margin:2px 0 4px; }
+  /* Schritte */
+  .schritte { display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:6px; margin:12px 0 16px; }
+  .schritt { border:1px solid var(--rand); border-radius:8px; padding:8px 10px; font-size:12.5px; display:flex; gap:8px; align-items:center; }
+  .schritt b { font-weight:600; }
+  /* Karten */
+  .karten { display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:12px; }
+  .karte { border:1px solid var(--rand); border-radius:10px; padding:14px; display:flex; flex-direction:column; gap:8px; }
+  .karte-kopf { display:flex; justify-content:space-between; align-items:center; gap:8px; }
+  .karte-kopf .titel { font-weight:600; }
+  .stand { font-size:11.5px; font-weight:600; border-radius:6px; padding:2px 8px; }
+  .s-ok { color:var(--gruen); background:rgba(63,165,108,.12); } .s-teil { color:var(--gelb); background:rgba(201,154,46,.14); } .s-offen { color:var(--rot); background:rgba(184,98,92,.12); }
+  .vergleich { display:grid; grid-template-columns:1fr 1fr 1fr; gap:4px; }
+  .vergleich div { border-radius:6px; padding:6px 8px; background:var(--gold-bg); }
+  .vergleich small { display:block; color:var(--muted); font-size:11px; }
+  .vergleich b { font-weight:600; font-size:15px; }
+  .gut { color:var(--gruen); } .schlecht { color:var(--rot); }
+  .karte p { margin:0; font-size:13px; }
+  .karte .quelle { font-size:12px; color:var(--muted); }
+  .karte .knopf { align-self:flex-start; margin-top:auto; }
+  /* Kauf gegen heute */
+  table { width:100%; border-collapse:collapse; font-size:13px; }
+  th, td { text-align:right; padding:7px 8px; border-bottom:1px solid var(--rand); }
+  th:first-child, td:first-child { text-align:left; }
+  th { font:500 11px "JetBrains Mono", monospace; letter-spacing:.05em; text-transform:uppercase; color:var(--muted); }
+  .hinweis { position:fixed; left:50%; bottom:20px; transform:translateX(-50%); background:var(--text); color:var(--surface); padding:10px 14px; border-radius:8px; font-size:13px; max-width:calc(100% - 32px); opacity:0; transition:opacity .2s; pointer-events:none; }
+  .hinweis.an { opacity:1; }
+  ol li { margin:5px 0; }
+  @media (max-width: 720px) { .karten { grid-template-columns:1fr; } .schritte { grid-template-columns:repeat(2, minmax(0,1fr)); } .tabelle { overflow-x:auto; } }
+</style>
+</head>
+<body>
+<main>
+  <span class="mono">Klickdummy · Vorschlag 14.11.2026</span>
+  <h1>Jahresabgleich im Bestand</h1>
+  <p>So könnte die Pilot-Analyse eines Bestandsobjekts aussehen. Pro Jahr gibt es <b>einen Abgleich in vier Schritten</b>: Miete, Steuer, Wert und Haus. Jeder Schritt kommt aus dem Reiter, in dem du ihn ohnehin pflegst. Hier siehst du nur, ob er erledigt ist und wie das Jahr gegen deinen Plan vom Kauf steht. Beispiel mit erfundenen Zahlen: Eigentumswohnung, gekauft 2021.</p>
+  <div class="leiste"><button type="button" class="knopf" onclick="var r=document.documentElement;r.dataset.theme=r.dataset.theme==='dark'?'light':'dark'">Hell oder dunkel</button></div>
+
+  <nav class="reiter" aria-label="Unterreiter der Pilot-Analyse">
+    <button type="button" class="an">Jahresabgleich</button>
+    <button type="button" data-hin="Übersicht: die KI-Analyse wie heute.">Übersicht</button>
+    <button type="button" data-hin="Wie heute: Ankauf, Bestand, Soll und Zielbild nebeneinander.">Ankauf · Bestand · Zielbild</button>
+    <button type="button" data-hin="Zusammengelegt aus „Wert &amp; Verlauf“ und „Lage &amp; Markt“.">Wert &amp; Lage</button>
+    <button type="button" data-hin="Wie heute, mit dem Steuerstatus je Jahr.">Steuer</button>
+    <button type="button" data-hin="Zusammengelegt aus „Hausverlauf“ und „Unterlagen &amp; WEG“.">Haus &amp; Unterlagen</button>
+    <button type="button" data-hin="Zusammengelegt aus Potenzialanalyse, Risiken und Anschluss &amp; Exit.">Potenzial &amp; Exit</button>
+  </nav>
+
+  <section class="flaeche">
+    <div class="jahre" id="jahre"></div>
+    <div class="urteil" id="urteil"></div>
+    <p class="klein" id="unterzeile"></p>
+    <div class="schritte" id="schritte"></div>
+    <div class="karten" id="karten"></div>
+
+    <h2>Kauf gegen heute</h2>
+    <p class="klein">Was du beim Kauf für dieses Jahr gerechnet hast, gegen das, was tatsächlich war. Der Plan ist eingefroren, er ändert sich nie.</p>
+    <div class="tabelle"><table id="vergleich"></table></div>
+
+    <h2>Plan gegen Ist über alle Jahre</h2>
+    <div id="grafik"></div>
+  </section>
+
+  <h2>Was du entscheiden musst</h2>
+  <ol>
+    <li><b>Jahresabgleich als erster Unterreiter</b> im Bestand, statt „Übersicht“ und „Jahre“ getrennt. Die KI-Übersicht rutscht auf Platz zwei.</li>
+    <li><b>Sieben statt elf Unterreiter.</b> Zusammengelegt werden Wert &amp; Verlauf mit Lage &amp; Markt, Hausverlauf mit Unterlagen &amp; WEG, und Potenzial, Risiken und Anschluss &amp; Exit.</li>
+    <li><b>Ein Jahr gilt als abgeglichen</b>, wenn alle vier Schritte grün sind. Soll das Jahr dann automatisch „abgeschlossen“ werden oder per Knopf?</li>
+    <li><b>Erinnerung:</b> Ab Februar steht auf der Objektkarte „Jahresabgleich 2025: 2 von 4“, bis alles grün ist. Gewünscht, oder nur in der Pilot-Analyse?</li>
+  </ol>
+  <p class="klein">Farben: Grün und Rot sind Statusfarben und bleiben in jeder Marke gleich. Gold steht in der App nur über das Whitelabel-Token.</p>
+</main>
+<div class="hinweis" id="hinweis" role="status"></div>
+<script src="../../frontend/js/jahresbuch-grafik.js"></script>
+<script>
+(function () {
+  var eur = function (x) { return Math.round(x).toLocaleString('de-DE') + ' €'; };
+  var vz = function (x) { return (x > 0 ? '+' : (x < 0 ? '−' : '')) + Math.abs(Math.round(x)).toLocaleString('de-DE') + ' €'; };
+  /* Erfundene Daten: Plan vom Kauf 2021 (eingefroren), Ist aus den Reitern */
+  var J = {
+    2022: { miete: { plan: 9792, ist: 9600, erh: [] }, steuer: { plan: -2100, ist: -2380, status: 'bescheid' }, wert: { plan: 214000, ist: 218000, am: '12.05.2022' }, haus: { hg_plan: 2640, hg_ist: 2710, su: 0, protokoll: '18.06.2022', beschluesse: 'Keine Sonderumlage. Treppenhaus streichen 2023.' }, cf: { plan: 1520, ist: -350 } },
+    2023: { miete: { plan: 9988, ist: 9900, erh: ['01.07.2023: 800 € → 850 € (§ 558)'] }, steuer: { plan: -1800, ist: -1650, status: 'bescheid' }, wert: { plan: 217200, ist: null }, haus: { hg_plan: 2690, hg_ist: 2950, su: 1200, protokoll: '24.05.2023', beschluesse: 'Sonderumlage Dach 1.200 € je Wohnung, fällig 10/2023.' }, cf: { plan: 1600, ist: 1500 } },
+    2024: { miete: { plan: 10188, ist: 10200, erh: [] }, steuer: { plan: -1500, ist: -1420, status: 'erklaert' }, wert: { plan: 220500, ist: 226000, am: '03.09.2024' }, haus: { hg_plan: 2740, hg_ist: 2790, su: 0, protokoll: '11.06.2024', beschluesse: 'Hausgeld +3 % ab 2025.' }, cf: { plan: 1680, ist: 1820 } },
+    2025: { miete: { plan: 10391, ist: 10650, erh: ['01.04.2025: 850 € → 900 € (§ 558)'] }, steuer: { plan: -1250, ist: null, status: 'geplant' }, wert: { plan: 223800, ist: null }, haus: { hg_plan: 2800, hg_ist: null, su: null, protokoll: null, beschluesse: '' }, cf: { plan: 1760, ist: 2050 } },
+    2026: { laufend: true, miete: { plan: 10599, ist: 10800, erh: [] }, steuer: { plan: -1050, ist: null, status: 'geplant' }, wert: { plan: 227200, ist: null }, haus: { hg_plan: 2860, hg_ist: null, su: null, protokoll: null, beschluesse: '' }, cf: { plan: 1850, ist: null } }
+  };
+  var JAHRE = Object.keys(J).map(Number);
+  var gewaehlt = 2025;
+  function zeige(t) { var h = document.getElementById('hinweis'); h.textContent = t; h.classList.add('an'); clearTimeout(zeige._t); zeige._t = setTimeout(function () { h.classList.remove('an'); }, 2600); }
+  function schritte(j) {
+    var d = J[j];
+    var miete = d.miete.ist != null ? 'ok' : 'offen';
+    var steuer = d.steuer.status === 'bescheid' ? 'ok' : (d.steuer.status === 'erklaert' ? 'teil' : 'offen');
+    var wert = d.wert.ist != null ? 'ok' : 'offen';
+    var haus = d.haus.protokoll ? (d.haus.hg_ist != null ? 'ok' : 'teil') : 'offen';
+    return { miete: miete, steuer: steuer, wert: wert, haus: haus };
+  }
+  function zahlOk(s) { return ['miete', 'steuer', 'wert', 'haus'].filter(function (k) { return s[k] === 'ok'; }).length; }
+  var WORT = { ok: 'erledigt', teil: 'teilweise', offen: 'offen' };
+  function render() {
+    var d = J[gewaehlt], s = schritte(gewaehlt), n = zahlOk(s);
+    document.getElementById('jahre').innerHTML = JAHRE.map(function (j) {
+      var x = zahlOk(schritte(j)), kl = x === 4 ? 'p-ok' : (x >= 2 ? 'p-teil' : 'p-offen');
+      return '<button type="button" data-j="' + j + '" class="' + (j === gewaehlt ? 'an' : '') + '"><span class="punkt ' + kl + '"></span>' + j + (J[j].laufend ? ' · laufend' : '') + '</button>';
+    }).join('');
+    var dm = d.miete.ist - d.miete.plan;
+    document.getElementById('urteil').textContent = gewaehlt + ': ' + (n === 4 ? 'abgeglichen' : n + ' von 4 Schritten erledigt');
+    document.getElementById('unterzeile').textContent = 'Miete ' + (dm >= 0 ? vz(dm) + ' über' : vz(dm) + ' unter') + ' dem Plan vom Kauf'
+      + (d.cf.ist != null ? ', Cashflow ' + vz(d.cf.ist - d.cf.plan) + ' zum Plan' : '') + '.'
+      + (n < 4 ? ' Offen: ' + ['miete', 'steuer', 'wert', 'haus'].filter(function (k) { return s[k] !== 'ok'; }).map(function (k) { return { miete: 'Miete', steuer: 'Steuer', wert: 'Wert', haus: 'Haus' }[k]; }).join(', ') + '.' : '');
+    document.getElementById('schritte').innerHTML = [['miete', '1 · Miete'], ['steuer', '2 · Steuer'], ['wert', '3 · Wert'], ['haus', '4 · Haus']].map(function (x) {
+      return '<div class="schritt"><span class="punkt p-' + s[x[0]] + '"></span><span><b>' + x[1] + '</b><br><span class="klein">' + WORT[s[x[0]]] + '</span></span></div>';
+    }).join('');
+    var stand = function (k) { return '<span class="stand s-' + s[k] + '">' + WORT[s[k]] + '</span>'; };
+    var drei = function (pl, ist, gutWennHoeher) {
+      var diff = ist != null ? ist - pl : null, gut = diff == null ? '' : ((gutWennHoeher ? diff >= 0 : diff <= 0) ? 'gut' : 'schlecht');
+      return '<div class="vergleich"><div><small>Plan vom Kauf</small><b>' + eur(pl) + '</b></div><div><small>Ist</small><b>' + (ist != null ? eur(ist) : '–') + '</b></div><div><small>Abweichung</small><b class="' + gut + '">' + (diff != null ? vz(diff) : '–') + '</b></div></div>';
+    };
+    var k = [];
+    k.push('<div class="karte"><div class="karte-kopf"><span class="titel">Miete ' + gewaehlt + '</span>' + stand('miete') + '</div>'
+      + drei(d.miete.plan, d.miete.ist, true)
+      + '<p>' + (d.miete.erh.length ? 'Mieterhöhung: ' + d.miete.erh.join(', ') : 'Keine Mieterhöhung in diesem Jahr.') + '</p>'
+      + '<p class="quelle">Aus dem Reiter Miete: Kaltmiete und Liste der Mieterhöhungen.</p>'
+      + '<button type="button" class="knopf" data-hin="Springt in den Reiter Miete, Karte Mietvertrag, Liste der Mieterhöhungen.">Mieterhöhung eintragen</button></div>');
+    var stWort = { geplant: 'geplant', erklaert: 'erklärt, Bescheid fehlt', bescheid: 'Bescheid liegt vor' }[d.steuer.status];
+    k.push('<div class="karte"><div class="karte-kopf"><span class="titel">Steuer ' + gewaehlt + '</span>' + stand('steuer') + '</div>'
+      + drei(d.steuer.plan, d.steuer.ist, true)
+      + '<p>Ergebnis Vermietung und Verpachtung (Anlage V). Stand: <b>' + stWort + '</b>.</p>'
+      + '<p class="quelle">Aus dem Reiter Steuer: Anlage V des Jahres, Status je Jahr.</p>'
+      + '<button type="button" class="knopf' + (s.steuer === 'offen' ? ' gold' : '') + '" data-hin="Springt in den Reiter Steuer, Spalte ' + gewaehlt + ' der Anlage V.">' + (d.steuer.status === 'geplant' ? 'Anlage V ' + gewaehlt + ' ausfüllen' : 'Anlage V ansehen') + '</button></div>');
+    k.push('<div class="karte"><div class="karte-kopf"><span class="titel">Wert ' + gewaehlt + '</span>' + stand('wert') + '</div>'
+      + drei(d.wert.plan, d.wert.ist, true)
+      + '<p>' + (d.wert.ist != null ? 'Marktbericht vom ' + d.wert.am + '.' : 'Für ' + gewaehlt + ' liegt noch kein Marktbericht vor. Der letzte ist vom ' + lezterBericht(gewaehlt) + '.') + '</p>'
+      + '<p class="quelle">Aus deinen Marktberichten zu diesem Objekt.</p>'
+      + '<button type="button" class="knopf' + (s.wert === 'offen' ? ' gold' : '') + '" data-hin="Startet den Marktbericht zu diesem Objekt mit den heutigen Daten.">' + (d.wert.ist != null ? 'Marktbericht öffnen' : 'Marktbericht ' + gewaehlt + ' abrufen') + '</button></div>');
+    k.push('<div class="karte"><div class="karte-kopf"><span class="titel">Haus ' + gewaehlt + '</span>' + stand('haus') + '</div>'
+      + drei(d.haus.hg_plan, d.haus.hg_ist, false)
+      + '<p>' + (d.haus.protokoll ? 'Eigentümerversammlung vom ' + d.haus.protokoll + ': ' + d.haus.beschluesse + (d.haus.hg_ist == null ? ' Die Jahresabrechnung fehlt noch.' : '') : 'Für ' + gewaehlt + ' liegen noch kein Protokoll und keine Jahresabrechnung vor.') + '</p>'
+      + '<p class="quelle">Hausgeld im Jahr. Aus Unterlagen &amp; WEG: Protokolle, Jahresabrechnung, Wirtschaftsplan.</p>'
+      + '<button type="button" class="knopf' + (s.haus !== 'ok' ? ' gold' : '') + '" data-hin="Öffnet den Eingang für Unterlagen: Protokoll oder Jahresabrechnung hochladen, die KI liest Beschlüsse, Sonderumlagen und Hausgeld.">Protokoll oder Abrechnung hochladen</button></div>');
+    document.getElementById('karten').innerHTML = k.join('');
+    var su = d.haus.su;
+    document.getElementById('vergleich').innerHTML = '<thead><tr><th>Kennzahl ' + gewaehlt + '</th><th>Plan vom Kauf</th><th>Tatsächlich</th><th>Abweichung</th></tr></thead><tbody>'
+      + zeile('Kaltmiete im Jahr', d.miete.plan, d.miete.ist, true)
+      + zeile('Cashflow vor Steuer', d.cf.plan, d.cf.ist, true)
+      + zeile('Ergebnis V+V (Steuer)', d.steuer.plan, d.steuer.ist, true)
+      + zeile('Hausgeld', d.haus.hg_plan, d.haus.hg_ist, false)
+      + zeile('Sonderumlage', 0, su, false)
+      + zeile('Wert laut Marktbericht', d.wert.plan, d.wert.ist, true) + '</tbody>';
+    grafik();
+  }
+  function lezterBericht(j) { var l = JAHRE.filter(function (x) { return x < j && J[x].wert.ist != null; }); return l.length ? J[l[l.length - 1]].wert.am : '–'; }
+  function zeile(t, p, i, hoeherGut) {
+    var d = i != null ? i - p : null, kl = d == null || d === 0 ? '' : ((hoeherGut ? d > 0 : d < 0) ? 'gut' : 'schlecht');
+    return '<tr><td>' + t + '</td><td>' + eur(p) + '</td><td>' + (i != null ? eur(i) : '<span class="klein">noch offen</span>') + '</td><td class="' + kl + '">' + (d != null ? vz(d) : '–') + '</td></tr>';
+  }
+  function grafik() {
+    var d = { heute: 2026, jahre: [], ereignisse: [
+      { jahr: 2023, monat: 7, art: 'erhoehung', text: 'Mieterhöhung 01.07.2023 auf 850 €' },
+      { jahr: 2025, monat: 4, art: 'erhoehung', text: 'Mieterhöhung 01.04.2025 auf 900 €' },
+      { jahr: 2024, monat: 3, art: 'zielbild', kurz: 'neues Zielbild', text: 'Zielbild-Wechsel 15.03.2024' }
+    ] };
+    var plan = { 2021: 9600 }, ist = { 2021: 9600 }, cfP = { 2021: 1450 }, cfI = { 2021: 900 };
+    JAHRE.forEach(function (j) { plan[j] = J[j].miete.plan; if (j < 2026) ist[j] = J[j].miete.ist; cfP[j] = J[j].cf.plan; if (J[j].cf.ist != null) cfI[j] = J[j].cf.ist; });
+    var proj = { 2026: 10800, 2027: 11016, 2028: 11236, 2029: 11461 };
+    for (var y = 2021; y <= 2029; y++) d.jahre.push({ jahr: y, miete_plan: plan[y] || Math.round(10599 * Math.pow(1.02, y - 2026)), miete_ist: ist[y] || null, miete_proj: proj[y] || null,
+      ziel_j: y < 2024 ? 12000 : 13200, cf_plan: cfP[y] || Math.round(1850 + (y - 2026) * 80), cf_ist: cfI[y] != null ? cfI[y] : null });
+    if (window.DpJahresbuchGrafik) DpJahresbuchGrafik.zeichnen(document.getElementById('grafik'), d);
+  }
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest('button'); if (!b) return;
+    if (b.dataset.j) { gewaehlt = +b.dataset.j; render(); return; }
+    if (b.dataset.hin) zeige(b.dataset.hin);
+  });
+  render();
+})();
+</script>
+</body>
+</html>
