@@ -99,7 +99,7 @@
       '#dppk-dlg .pk-hinweis{background:#FBF6E9;border-left:3px solid ' + G + ';border-radius:8px;padding:10px 12px;font-size:13px;line-height:1.5;margin-bottom:12px}',
       '#dppk-dlg .pk-hinweis.rot{border-left-color:#B8625C;background:#FBF1F0}',
       '#dppk-dlg .pk-code{font:600 28px "JetBrains Mono",monospace;letter-spacing:.12em;text-align:center;padding:14px;border:1px dashed ' + G + ';border-radius:10px;background:#FBF6E9;margin:6px 0 12px}',
-      '#dppk-band{position:fixed;left:50%;transform:translateX(-50%);bottom:18px;z-index:100040;max-width:min(720px,calc(100vw - 32px));background:#050505;color:#FDFCFA;border:1px solid ' + G + ';border-radius:12px;padding:12px 14px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;box-shadow:0 14px 40px rgba(0,0,0,.4);font:400 13px Inter,sans-serif}',
+      '#dppk-band{position:fixed;left:50%;transform:translateX(-50%);bottom:18px;z-index:100040;max-width:min(720px,calc(100vw - 32px));width:max-content;background:#050505;color:#FDFCFA;border:1px solid ' + G + ';border-radius:12px;padding:12px 14px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;box-shadow:0 14px 40px rgba(0,0,0,.4);font:400 13px Inter,sans-serif}',
       '#dppk-band b{color:' + G + '}',
       '#dppk-band .pk-btn{border:1px solid ' + G + ';background:' + G + ';color:#fff;border-radius:8px;padding:7px 12px;font:600 12.5px Inter,sans-serif;cursor:pointer}',
       '#dppk-band .pk-btn.leer{background:transparent;color:#FDFCFA;border-color:rgba(253,252,250,.3)}',

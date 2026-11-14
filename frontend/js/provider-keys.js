@@ -15,7 +15,7 @@
       '<div id="pk-imo" style="border:1px solid rgba(201,168,76,.3);border-radius:12px;padding:14px 15px;background:#FAF9F4">' +
         '<div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">' +
           '<span style="font-weight:700;font-size:15px"><span style="color:#C9A84C">Immo</span>Metrica</span>' +
-          '<span id="pk-imo-badge" style="margin-left:auto;font-size:11px;font-family:ui-monospace,monospace;padding:3px 9px;border-radius:999px;border:1px solid #ddd;color:#888">…</span>' +
+          '<span id="pk-imo-badge" style="margin-left:auto;font-size:11px;font-family:JetBrains Mono,ui-monospace,monospace;padding:3px 9px;border-radius:999px;border:1px solid #ddd;color:#888">…</span>' +
         '</div>' +
         '<p class="hint" style="margin:0 0 12px">Meta-Suche für Off-Market-Deals. Erfordert ein <b>Investor-Pro-Abo</b> bei ImmoMetrica – den API-Token findest du dort im Dashboard.</p>' +
         '<div id="pk-imo-body"></div>' +
@@ -31,17 +31,17 @@
 
   function bodyEmpty() {
     return '' +
-      '<label style="display:block;font-family:ui-monospace,monospace;font-size:10px;letter-spacing:.1em;color:#888;text-transform:uppercase;margin-bottom:5px">API-Token</label>' +
+      '<label style="display:block;font-family:JetBrains Mono,ui-monospace,monospace;font-size:10px;letter-spacing:.1em;color:#888;text-transform:uppercase;margin-bottom:5px">API-Token</label>' +
       '<input id="pk-imo-input" type="text" autocomplete="off" spellcheck="false" placeholder="Token aus dem ImmoMetrica-Dashboard" ' +
-        'style="width:100%;border:1px solid #ddd;border-radius:8px;padding:10px 11px;font-family:ui-monospace,monospace;font-size:13px">' +
+        'style="width:100%;border:1px solid #ddd;border-radius:8px;padding:10px 11px;font-family:JetBrains Mono,ui-monospace,monospace;font-size:13px">' +
       '<div style="margin-top:11px"><button type="button" class="btn btn-gold" onclick="DealPilotProviderKeys.save()">Speichern &amp; verbinden</button></div>';
   }
 
   function bodySaved(hint) {
     return '' +
-      '<label style="display:block;font-family:ui-monospace,monospace;font-size:10px;letter-spacing:.1em;color:#888;text-transform:uppercase;margin-bottom:5px">API-Token (gespeichert)</label>' +
+      '<label style="display:block;font-family:JetBrains Mono,ui-monospace,monospace;font-size:10px;letter-spacing:.1em;color:#888;text-transform:uppercase;margin-bottom:5px">API-Token (gespeichert)</label>' +
       '<input id="pk-imo-mask" type="text" disabled value="' + esc('••••••••••••' + (hint || '')) + '" ' +
-        'style="width:100%;border:1px solid #ddd;border-radius:8px;padding:10px 11px;font-family:ui-monospace,monospace;font-size:13px;color:#777;background:#f4f3ee">' +
+        'style="width:100%;border:1px solid #ddd;border-radius:8px;padding:10px 11px;font-family:JetBrains Mono,ui-monospace,monospace;font-size:13px;color:#777;background:#f4f3ee">' +
       '<div style="display:flex;gap:9px;flex-wrap:wrap;margin-top:11px">' +
         '<button type="button" class="btn btn-sm btn-ghost" onclick="DealPilotProviderKeys.reveal()">Anzeigen</button>' +
         '<button type="button" class="btn btn-sm btn-ghost" onclick="DealPilotProviderKeys.copy()">Kopieren</button>' +

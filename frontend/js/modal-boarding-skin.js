@@ -14,7 +14,7 @@
     var css = [
       ".oabi-ov.oabi-boarding .oabi-modal{display:flex;flex-direction:column;overflow:hidden;padding:0;background:#fff}",
       ".oabi-boarding .bdg-brand{flex:none;background:#070707;padding:14px 22px;display:flex;align-items:center;gap:12px}",
-      ".oabi-boarding .bdg-brand .logo{font:700 17px 'Space Grotesk','DM Sans',system-ui,sans-serif;color:#fff;letter-spacing:.3px}",
+      ".oabi-boarding .bdg-brand .logo{font:700 17px 'Space Grotesk','Inter',system-ui,sans-serif;color:#fff;letter-spacing:.3px}",
       ".oabi-boarding .bdg-brand .logo b{color:var(--wl-e8cc7a, #E8CC7A);font-weight:700}",
       ".oabi-boarding .bdg-brand .tag{margin-left:auto;font:700 10px 'JetBrains Mono',monospace;letter-spacing:2px;color:var(--wl-c9a84c, #C9A84C)}",
       /* v1116-x: war ein nacktes Text-x (24px, #8a8a90, ohne Flaeche).
@@ -34,7 +34,7 @@
       ".oabi-boarding .bdg-hero .oabi-head>span{display:none}",
       ".oabi-boarding #imo-x{display:none}",
       ".oabi-boarding .bdg-kick{font:700 11px 'JetBrains Mono',monospace;letter-spacing:3px;color:#5a4a14;margin-bottom:5px}",
-      ".oabi-boarding .bdg-hero .oabi-head h3{color:#1a1407;font:700 21px 'Space Grotesk','DM Sans',system-ui,sans-serif;margin:0;line-height:1.2}",
+      ".oabi-boarding .bdg-hero .oabi-head h3{color:#1a1407;font:700 21px 'Space Grotesk','Inter',system-ui,sans-serif;margin:0;line-height:1.2}",
       ".oabi-boarding .bdg-hero .oabi-sub{background:none;color:#3a2e08;padding:3px 22px 16px;margin:0;font-size:13px;line-height:1.5}",
       ".oabi-boarding .oabi-body{flex:1 1 auto;min-height:0;overflow:auto;background:#fff}",
       ".oabi-boarding .oabi-foot{flex:none;background:#fff}",

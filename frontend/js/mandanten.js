@@ -842,7 +842,7 @@
         +   '<button type="button" class="btn btn-outline btn-sm" onclick="DealPilotMandanten.uiEdit(\'privat\')">Bearbeiten</button>'
         + '</div>'
         + '<div class="dp-ges-sperre" style="margin-top:14px;padding:20px 22px;border:1px solid var(--wl-c9a84c, #C9A84C);border-radius:14px;background:#FAF9F4">'
-        +   '<div style="font:700 13px/1 \'DM Sans\',sans-serif;letter-spacing:1.4px;text-transform:uppercase;color:var(--wl-b8932f,#b8932f);margin-bottom:8px">Ab Detailgrad Experte</div>'
+        +   '<div style="font:700 13px/1 \'Inter\',sans-serif;letter-spacing:1.4px;text-transform:uppercase;color:var(--wl-b8932f,#b8932f);margin-bottom:8px">Ab Detailgrad Experte</div>'
         +   '<p style="margin:0 0 14px;color:#2A2727;font-size:14px;line-height:1.55">Mit <b>Mandanten</b> hältst du Objekte privat <i>oder</i> in einer Gesellschaft (GmbH, UG, GbR) — mit eigener Steuerrechnung, Kosten der Gesellschaft, Jahresabschluss und Überführung. '
         +     (_nGes ? 'Du hast ' + (_nGes === 1 ? 'eine Gesellschaft' : _nGes + ' Gesellschaften') + ' angelegt; ihre Objekte rechnen in jedem Detailgrad weiter mit ihrer Steuer.' : 'Der Detailgrad gilt für alle Objekte und ist nur Anzeige — nichts wird gelöscht.')
         +   '</p>'
@@ -859,7 +859,7 @@
         +   '<button type="button" class="btn btn-outline btn-sm" onclick="DealPilotMandanten.uiEdit(\'privat\')">Bearbeiten</button>'
         + '</div>'
         + '<div style="margin-top:14px;padding:20px 22px;border:1px solid var(--gold,#C9A84C);border-radius:14px;background:#FAF9F4">'
-        +   '<div style="font:700 13px/1 \'DM Sans\',sans-serif;letter-spacing:1.4px;text-transform:uppercase;color:var(--wl-b8932f,#b8932f);margin-bottom:8px">Pro-Funktion</div>'
+        +   '<div style="font:700 13px/1 \'Inter\',sans-serif;letter-spacing:1.4px;text-transform:uppercase;color:var(--wl-b8932f,#b8932f);margin-bottom:8px">Pro-Funktion</div>'
         +   '<p style="margin:0 0 14px;color:#2A2727;font-size:14px;line-height:1.55">Mit <b>Mandanten</b> h\u00e4ltst du Objekte privat <i>oder</i> in einer GmbH/UG \u2014 mit eigener K\u00f6rperschaftsteuer-Rechnung, Cockpit-Filter pro Halter und (in Vorbereitung) GuV/Bilanz-Export. Verf\u00fcgbar im <b>Pro</b>-Plan.</p>'
         +   '<button type="button" class="btn btn-gold" onclick="(function(){var b=document.querySelector(\'.st-tab[data-tab=&quot;plan&quot;]\');if(b)b.click();})()"><span class="ic"><svg width="12" height="12"><use href="#i-star"/></svg></span>Pro freischalten</button>'
         + '</div>';

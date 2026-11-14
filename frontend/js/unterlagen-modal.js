@@ -572,7 +572,7 @@
       + '</div>'
       + '<div style="margin-bottom:6px"><b>Betreff:</b> ' + _esc(r.betreff) + '</div>'
       + '<textarea id="dp-ul-brief" readonly style="width:100%;min-height:320px;'
-      + 'font-family:ui-monospace,monospace;font-size:12.5px;line-height:1.55">'
+      + 'font-family:JetBrains Mono,ui-monospace,monospace;font-size:12.5px;line-height:1.55">'
       + _esc(r.text) + '</textarea>'
       + '<div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">'
       + '<button type="button" style="' + _KNOPF_GOLD + '"'

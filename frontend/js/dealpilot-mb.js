@@ -82,10 +82,10 @@ if (!window._wlc) {
       '.dpx .dpx-lage{margin-top:11px;min-height:26px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}' +
       '.dpx .dpx-lchip{font:700 9.5px/1 "JetBrains Mono",monospace;padding:4px 9px;border-radius:999px;background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 14%, transparent);color:var(--wl-9a7f33, #9a7f33)}' +
       '.dpx .dpx-spanrow{display:flex;align-items:center;gap:8px;margin-top:12px}' +
-      '.dpx .dpx-spanlbl{font:600 11px/1 "DM Sans",sans-serif;color:#6b6660}' +
-      '#' + HOST_ID + ' .dpx-seg{display:inline-flex;border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 40%, transparent);border-radius:11px;overflow:hidden;background:rgba(248,246,241,.7)}#' + HOST_ID + ' .dpx-seg button{appearance:none;border:0;background:transparent;padding:7px 13px;font:600 12.5px/1 "DM Sans",sans-serif;color:#6b6660!important;cursor:pointer}#' + HOST_ID + ' .dpx-seg button+button{border-left:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 25%, transparent)}#' + HOST_ID + ' .dpx-seg button.on{background:linear-gradient(180deg,var(--wl-d4b65a, #d4b65a),var(--wl-bd9c3f, #bd9c3f))!important;color:#fff!important}' +
+      '.dpx .dpx-spanlbl{font:600 11px/1 "Inter",sans-serif;color:#6b6660}' +
+      '#' + HOST_ID + ' .dpx-seg{display:inline-flex;border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 40%, transparent);border-radius:11px;overflow:hidden;background:rgba(248,246,241,.7)}#' + HOST_ID + ' .dpx-seg button{appearance:none;border:0;background:transparent;padding:7px 13px;font:600 12.5px/1 "Inter",sans-serif;color:#6b6660!important;cursor:pointer}#' + HOST_ID + ' .dpx-seg button+button{border-left:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 25%, transparent)}#' + HOST_ID + ' .dpx-seg button.on{background:linear-gradient(180deg,var(--wl-d4b65a, #d4b65a),var(--wl-bd9c3f, #bd9c3f))!important;color:#fff!important}' +
       '.dpx .dpx-foot{display:flex;align-items:center;gap:10px;padding:12px 14px 6px}' +
-      '#' + HOST_ID + ' .dpx-apply{margin-left:auto;display:inline-flex;align-items:center;justify-content:center;gap:6px;border:none!important;border-radius:11px;padding:9px 14px;font:700 12px/1 "DM Sans",sans-serif;color:#2c2410!important;cursor:pointer;background:linear-gradient(110deg,var(--wl-e8cc7a, #E8CC7A),var(--wl-c9a84c, #C9A84C) 60%,var(--wl-b8932f, #b8932f))!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.5),0 4px 13px -7px rgba(160,120,20,.55)}.dpx .dpx-apply svg{width:14px;height:14px;flex:0 0 auto}' +
+      '#' + HOST_ID + ' .dpx-apply{margin-left:auto;display:inline-flex;align-items:center;justify-content:center;gap:6px;border:none!important;border-radius:11px;padding:9px 14px;font:700 12px/1 "Inter",sans-serif;color:#2c2410!important;cursor:pointer;background:linear-gradient(110deg,var(--wl-e8cc7a, #E8CC7A),var(--wl-c9a84c, #C9A84C) 60%,var(--wl-b8932f, #b8932f))!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.5),0 4px 13px -7px rgba(160,120,20,.55)}.dpx .dpx-apply svg{width:14px;height:14px;flex:0 0 auto}' +
       '.dpx .dpx-legal{padding:7px 14px 12px;font:9px/1.3 "JetBrains Mono",monospace;color:#b3ab98;text-align:center}' +
       '.dpx.collapsed .dpx-perf,.dpx.collapsed .dpx-body,.dpx.collapsed .dpx-foot,.dpx.collapsed .dpx-legal{display:none}';
     var st = document.createElement('style'); st.id = 'dpx-style'; st.textContent = css; document.head.appendChild(st);
@@ -790,7 +790,7 @@ if (!window._wlc) {
         st.textContent='#'+ID+'{position:fixed;inset:0;z-index:99998;display:flex;align-items:center;justify-content:center;background:rgba(12,11,9,.45)}'+
           '#'+ID+' .b{background:#fff;border-radius:14px;padding:22px 26px;display:flex;flex-direction:column;align-items:center;gap:13px;box-shadow:0 20px 60px -16px rgba(0,0,0,.5)}'+
           '#'+ID+' .sp{width:34px;height:34px;border:3px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 25%, transparent);border-top-color:var(--wl-c9a84c, #C9A84C);border-radius:50%;animation:dpmbspin .8s linear infinite}'+
-          '#'+ID+' .t{font:600 13.5px/1.4 "DM Sans",sans-serif;color:#1b1815}@keyframes dpmbspin{to{transform:rotate(360deg)}}';
+          '#'+ID+' .t{font:600 13.5px/1.4 "Inter",sans-serif;color:#1b1815}@keyframes dpmbspin{to{transform:rotate(360deg)}}';
         document.head.appendChild(st);
       }
       var o=document.createElement('div'); o.id=ID;

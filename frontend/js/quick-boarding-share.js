@@ -17,7 +17,7 @@
     if (document.getElementById('qbs-style')) return;
     var s = document.createElement('style'); s.id = 'qbs-style';
     s.textContent = [
-      '#qb-share-btn{display:inline-flex;align-items:center;gap:7px;margin:10px 0 0;padding:9px 16px;border-radius:9px;border:1px solid #C9A84C;background:linear-gradient(180deg,#fff,#fbf6ea);color:#5a4a14;font:600 12.5px "DM Sans",system-ui,sans-serif;cursor:pointer}',
+      '#qb-share-btn{display:inline-flex;align-items:center;gap:7px;margin:10px 0 0;padding:9px 16px;border-radius:9px;border:1px solid #C9A84C;background:linear-gradient(180deg,#fff,#fbf6ea);color:#5a4a14;font:600 12.5px "Inter",system-ui,sans-serif;cursor:pointer}',
       '#qb-share-btn:hover{box-shadow:0 4px 14px rgba(201,168,76,.30);transform:translateY(-1px)}',
       '#qb-share-btn svg{height:15px;width:auto}',
       '.qbs-ov{position:fixed;inset:0;z-index:9000;background:rgba(5,4,3,.72);display:flex;align-items:center;justify-content:center;padding:18px;font-family:Inter,system-ui,sans-serif}',

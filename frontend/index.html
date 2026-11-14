@@ -40,7 +40,7 @@
      Seite unsichtbar; layout-varianten.js nimmt die Marke nach setze() ab, spätestens nach 3 s fällt sie von selbst. -->
 <style>html[data-dpl-vorab] body{visibility:hidden}</style>
 <script>(function(){try{if(/[?&]layout=aus(&|$)/.test(location.search))return;var h=document.documentElement;h.setAttribute('data-dpl-vorab','1');setTimeout(function(){h.removeAttribute('data-dpl-vorab');},3000);}catch(e){}})();</script>
-<link rel="stylesheet" href="css/style.css?v=v3358">
+<link rel="stylesheet" href="css/style.css?v=v3370">
 <link rel="stylesheet" href="css/avsec-streifen.css?v=v2780b"><!-- v1148-spalt-1025px -->
 <link rel="stylesheet" href="css/avsec-karte-neu.css?v=v2780a"><!-- v2760/v2780a · Kartenfassung unter 940 px Kartenbreite -->
 <script src="js/einbettung.js?v=v2998a"></script><!-- v2998 · Anmeldekarte eingebettet in die Landingpage (nur im iframe mit ?einbettung=1) -->
@@ -55,7 +55,7 @@
       m={'data-ui-theme':['kontor','panel','kanzlei','boarding','konsole'],'data-ui-cards':['kompakt','wallet'],'data-ui-surface':['light']},
       f={'data-ui-theme':s.ui_theme,'data-ui-cards':s.ui_cards,'data-ui-surface':s.ui_surface};
       Object.keys(m).forEach(function(a){var v=f[a]||'';if(m[a].indexOf(v)>=0)r.setAttribute(a,v);});}catch(e){}})();</script>
-<link rel="stylesheet" href="css/bmf-modal.css?v=W34">  <!-- V289 -->
+<link rel="stylesheet" href="css/bmf-modal.css?v=v3370">  <!-- V289 -->
 <link rel="stylesheet" href="css/bmf-modal-v292.css?v=v1500"><!-- V292-modal-refactor -->
 <link rel="stylesheet" href="css/bmf-einheitlich.css?v=v3196"><!-- v3185 -->
 <link rel="stylesheet" href="css/bewertung-kompakt.css?v=v3196"><!-- v3192 · Kennzahlen kompakt in Kategorien --><!-- v3185 · BMF-Rechner: ein Erscheinungsbild -->
@@ -63,8 +63,8 @@
 <link rel="stylesheet" href="css/finanzierung-raster.css?v=v3261"><!-- v3238 - Marcel 09.11.2026: Reiter Finanzierung in Gruppen, Anschlussfinanzierung als eigener Kasten; v3261: Eckdaten-Kacheln und eingeklappte Gruppen je Darlehen -->
 <link rel="stylesheet" href="css/deal-aktion-karten.css?v=v3253"><!-- v3232 · Marcel 08.11.2026: Deal-Aktion in weißen Karten wie Reiter Objekt -->
 <link rel="stylesheet" href="css/objekt-ansichten.css?v=v3247"><!-- v3237 · Marcel 09.11.2026: Reiter Objekt - Lage kompakt, Wertparameter als Kacheln, Bodenrichtwert-Karte -->
-  <link rel="stylesheet" href="css/legal.css?v=W34">
-<link rel="stylesheet" href="css/pricing-modal.css?v=v3358">
+  <link rel="stylesheet" href="css/legal.css?v=v3370">
+<link rel="stylesheet" href="css/pricing-modal.css?v=v3370">
 <!-- V63.77: RND-Modul (Restnutzungsdauer-Gutachten) -->
 <link rel="stylesheet" href="css/hell-varianten.css?v=v1652c">
 <link rel="stylesheet" href="css/rnd-styles.css?v=v3258"><!-- v3258 · RND-Assistent im Stil des Makler Hub -->
@@ -466,7 +466,7 @@ label.dp-required.qc-required::after {
   display: none !important;
 }
 </style>
-  <link rel="stylesheet" href="css/tour.css?v=W34">
+  <link rel="stylesheet" href="css/tour.css?v=v3370">
     <!-- V248-04: IBM Plex Sans als Hauptschrift -->
     
   <!-- V286-cache-applied -->
@@ -495,7 +495,7 @@ label.dp-required.qc-required::after {
 <!-- V292.6.5-cache-applied -->
 <!-- V292.6.6-cache-applied -->
 <!-- V292.6.8-cache-applied -->
-  <link rel="stylesheet" href="css/dashboard.css?v=v3333c">
+  <link rel="stylesheet" href="css/dashboard.css?v=v3370">
 <!--v922-fonts-->
 </head>
 <body>
@@ -3971,16 +3971,16 @@ label.dp-required.qc-required::after {
 <script src="js/datenraum.js?v=1375"></script>
 <script src="js/tooltip-content.js?v=v3279"></script>
   <script src="js/tooltip-engine.js?v=2351"></script>
-  <script src="js/immometrica-import.js?v=v2421"></script>
+  <script src="js/immometrica-import.js?v=v3370"></script>
   <script src="js/immometrica-qc.js?v=v2199"></script>
-  <script src="js/modal-boarding-skin.js?v=v3090"></script>
-  <script src="js/provider-keys.js?v=v2180"></script>
+  <script src="js/modal-boarding-skin.js?v=v3370"></script>
+  <script src="js/provider-keys.js?v=v3370"></script>
   <script src="js/ueberfuehrung-kern.js?v=v3268"></script>
-  <script src="js/mandanten.js?v=v3270"></script>
+  <script src="js/mandanten.js?v=v3370"></script>
   <script src="js/ueberfuehrung-wizard.js?v=v3215"></script>
   <script src="js/apikeys.js?v=v3167"></script>
   <script src="js/telegram-panel.js?v=v2421"></script>
-  <script src="js/unterlagen-modal.js?v=v2920"></script>
+  <script src="js/unterlagen-modal.js?v=v3370"></script>
   <script src="js/standardwerte-karten.js?v=v3223c"></script>
   <script src="js/settings.js?v=v3235"></script>
   <script src="js/einstellungen-schlank.js?v=v3270"></script>
@@ -4007,9 +4007,9 @@ label.dp-required.qc-required::after {
 <script src="js/nachrechnen.js?v=v3031"></script><!-- v3031: Kennzahlen/Scores gespeicherter Objekte neu rechnen (nur auf Aufruf) -->
 <!-- v845-newsearch-removed: sb-search.js entfernt (Kollision mit sidebar-search.js) -->
 <script src="js/inventar-sync.js?v=v3006c"></script><!-- V291-inv-sync-applied -->
-<script src="js/all-objects.js?v=v3224"></script>
+<script src="js/all-objects.js?v=v3370"></script>
 <script src="js/track-record.js?v=v3299"></script>
-<script src="js/pdf.js?v=v3337"></script>
+<script src="js/pdf.js?v=v3370"></script>
 <script src="js/pdf-pruefung.js?v=v3029"></script><!-- v3018d · EIN Tor vor jedem PDF -->
 <script src="js/auth.js?v=v3275"></script>
   <script src="js/auth-401-handler.js?v=v2180" defer></script>
@@ -4045,7 +4045,7 @@ label.dp-required.qc-required::after {
 <script src="js/immokalk-import.js?v=v1260"></script>
 <script src="js/import-export-modal.js?v=v1678"></script>
 <script src="js/quick-check.js?v=v3349b"></script>
-<script src="js/qc-bridge.js?v=v3358"></script>
+<script src="js/qc-bridge.js?v=v3370"></script>
 <script src="js/bodenrichtwert.js?v=v3208by"></script>
 <script src="js/brw-karte.js?v=v3241"></script><!-- v3237 · Bodenrichtwert-Karte -->
 <!-- v1391: welche Felder zu welcher Objektart gehoeren -->
@@ -4077,7 +4077,7 @@ label.dp-required.qc-required::after {
 <!-- V63.63: V25-Bank-Charts (4 SVG-basierte Charts: Equity-Aufbau, Cockpit, Waterfall, Stress) -->
 <script src="js/bank-charts.js?v=v3358"></script>
 <!-- V63.70: User-Hilfe-System mit Suche + KI-Assistent -->
-<script src="js/help.js?v=v3365"></script>
+<script src="js/help.js?v=v3370"></script>
 <script src="js/modal-handy.js?v=v2201"></script>
 <script src="js/pilot-figur.js?v=v2189"></script>
 <script src="js/prozess-atlas.js?v=v3321"></script>
@@ -4125,7 +4125,7 @@ label.dp-required.qc-required::after {
 <script src="js/jahresbuch.js?v=v3366"></script><!-- v3363 · Jahr für Jahr: Plan gegen Ist im Bestand (_jahre) -->
 <script src="js/jahresbuch-grafik.js?v=v3364b"></script><!-- v3364 · Verlaufsgrafik Plan gegen Ist (Vorlage design/Vorschläge/plan-gegen-ist.html) -->
 <script src="js/wert-zielbild.js?v=v3334a"></script><!-- v2840 · Tab Bewertung: Segment „Wert &amp; Zielbild"; Pilot-Analyse: Einfach | Genau -->
-<script src="js/dealpilot-mb.js?v=v3130"></script>
+<script src="js/dealpilot-mb.js?v=v3370"></script>
 <script src="js/mb-abgleich.js?v=v3343"></script><!-- v3002 · Abgleich mit dem Marktbericht in den Reitern Objekt und Miete -->
 <script src="js/mb-auftrag.js?v=v3253"></script>
   <script src="js/marktbericht-view.js?v=v3223"></script>
@@ -4139,7 +4139,7 @@ label.dp-required.qc-required::after {
 <!-- V63.76: Investmentprofil (Settings-Tab) -->
 <script src="js/investment-profile.js?v=v3349c"></script>
 <script src="js/bwk-profil.js?v=v3091"></script>
-<script src="js/dashboard.js?v=v3325b"></script>
+<script src="js/dashboard.js?v=v3370"></script>
 <script src="js/portfolio-strategie.js?v=v3268"></script><!-- v1880 · Modul hinter Feature-Schluessel -->
 <script src="js/vermoegen.js?v=v3233"></script><!-- v3217 · W-11 Vermögen & Haushalt, W-5 Profilfoto (user_settings vermoegen) -->
 <script src="js/portfolio-spiegel.js?v=v1802"></script><!-- v1793: liest portfolioPayload() und legt es fuer den Bot ab - rechnet NICHTS -->
@@ -4150,11 +4150,11 @@ label.dp-required.qc-required::after {
 <script src="js/main.js?v=v3280"></script>
   <!-- v372-autocomplete-removed: <script src="js/autocomplete.js?v=160" defer></script> -->
   <script src="js/session-expired-banner.js?v=500"></script><!-- v500-session-banner -->
-  <script src="js/object-actions.js?v=v3353"></script>
+  <script src="js/object-actions.js?v=v3370"></script>
   <script src="js/unterlagen-eingang.js?v=v3349d"></script><!-- v3120 · ein Eingang fuer Belege, Unterlagen, Rechnungen -->
-  <script src="js/dpsh-score-hero.js?v=v3254"></script><!-- dpsh-score-hero -->
-  <script src="js/quick-boarding-share.js?v=v3224"></script>
-  <script src="js/voice-import.js?v=v3279"></script>
+  <script src="js/dpsh-score-hero.js?v=v3370"></script><!-- dpsh-score-hero -->
+  <script src="js/quick-boarding-share.js?v=v3370"></script>
+  <script src="js/voice-import.js?v=v3370"></script>
   <!-- v1895: der sichtbare Vermerk an jedem pauschal angesetzten
        Bewirtschaftungsposten. Liest nur `_dp_herkunft`, rechnet nichts. -->
   <script src="js/bwk-vermerk.js?v=v1895b"></script>
@@ -4590,7 +4590,7 @@ document.addEventListener('DOMContentLoaded', function(){
 <script src="js/copilot-aenderungen.js?v=v1875a"></script><!-- v1760 · der Co-Pilot versteht Aenderungen -->
 <script src="js/pilot-berichte.js?v=v2947"></script><!-- v1769 · beide Piloten holen die Marktberichte (V6) -->
     <script src="js/rp-pdf-engine.js?v=W27"></script>
-    <script src="js/partner-kunden.js?v=v3359"></script><!-- v3357 · Partner-Cockpit und Mein Partner (vor reseller-portal.js: Einladungen bestehender Konten werden erst bestaetigt) -->
+    <script src="js/partner-kunden.js?v=v3370"></script><!-- v3357 · Partner-Cockpit und Mein Partner (vor reseller-portal.js: Einladungen bestehender Konten werden erst bestaetigt) -->
     <script src="js/reseller-portal.js?v=v3357"></script><!-- v1112b-rp-mobile -->
     <script src="js/logo-kontrast.js?v=v3299a"></script><!-- v3299 · Logo-Kontrast, VOR whitelabel-override -->
     <script src="js/whitelabel-override.js?v=v3299a"></script>

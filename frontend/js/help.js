@@ -1068,7 +1068,7 @@
       '.hkv-duo{display:grid;grid-template-columns:1fr 1fr;gap:13px}',
       '.hkv-col{border:1px solid rgba(0,0,0,.09);border-radius:9px;padding:12px 14px;background:#faf7f0}',
       '.hkv-col.acc{border-color:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 40%, transparent)}',
-      '.hkv-col .k{font:700 10px "DM Sans",sans-serif;letter-spacing:.09em;text-transform:uppercase;color:#9a7f33}',
+      '.hkv-col .k{font:700 10px "Inter",sans-serif;letter-spacing:.09em;text-transform:uppercase;color:#9a7f33}',
       '.hkv-col .v{font:700 25px "Cormorant Garamond",Georgia,serif;margin-top:2px;color:#1b1815}',
       '.hkv-col .d{font-size:10.5px;color:#6f675b;margin-top:2px}',
       '.hkv-seg{display:flex;border:1px solid rgba(0,0,0,.09);border-radius:9px;overflow:hidden}',

@@ -570,7 +570,7 @@ function captureBankChartSvg(hostId, scale) {
         var ff = t.getAttribute('font-family') || '';
         if (/Cormorant/i.test(ff)) {
           t.setAttribute('font-family', 'Georgia, "Times New Roman", serif');
-        } else if (/DM Sans/i.test(ff)) {
+        } else if (/DM Sans|Inter|Space Grotesk|JetBrains/i.test(ff)) {   /* v3370: seit v3358 schreiben die Diagramme Inter - ohne Zuordnung fiel das Bild auf Serifen zurueck */
           t.setAttribute('font-family', 'Helvetica, Arial, sans-serif');
         }
       }

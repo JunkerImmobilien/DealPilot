@@ -13,14 +13,14 @@ body{font-family:'Inter',system-ui,sans-serif;/* v3358 · Messkabine B3: DM Sans
 .logo-sub{font-size:8px;color:color-mix(in srgb, var(--gold) 50%, transparent);letter-spacing:.14em;text-transform:uppercase;margin-top:2px}
 .hdr-obj{font-size:16px;color:var(--dp-ink-1);flex:1;text-align:left;padding:0 18px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:500;letter-spacing:.01em;display:flex;align-items:center;gap:14px;min-width:0}
 .hdr-actions{display:flex;gap:6px;align-items:center;flex-shrink:0}
-.btn{display:inline-flex;align-items:center;gap:5px;padding:8px 13px;border-radius:var(--r);font-size:11.5px;font-weight:500;cursor:pointer;border:none;font-family:'DM Sans',sans-serif;transition:all .15s;white-space:nowrap}
+.btn{display:inline-flex;align-items:center;gap:5px;padding:8px 13px;border-radius:var(--r);font-size:11.5px;font-weight:500;cursor:pointer;border:none;font-family:'Inter',sans-serif;transition:all .15s;white-space:nowrap}
 .btn-gold{background:var(--gold);color:#fff}.btn-gold:hover{background:var(--gold-l);transform:translateY(-1px)}
 .btn-ghost{background:rgba(255,255,255,.08);color:rgba(255,255,255,.7);border:1px solid rgba(255,255,255,.15)}.btn-ghost:hover{border-color:var(--gold);color:var(--gold)}
 .btn-outline{background:var(--white);color:var(--muted);border:1px solid var(--border)}.btn-outline:hover{border-color:var(--gold);color:var(--gold)}
 .btn-sm{padding:5px 11px;font-size:11px}.btn-danger:hover{border-color:var(--red)!important;color:var(--red)!important}
 .tabs{background:var(--white);border-bottom:1px solid var(--border);padding:0 22px;display:flex;overflow-x:auto;position:sticky;top:64px;z-index:200;scrollbar-width:none;box-shadow:0 2px 8px rgba(0,0,0,.04)}
 .tabs::-webkit-scrollbar{display:none}
-.tab{padding:14px 14px;font-size:12px;color:var(--muted);cursor:pointer;border:none;border-bottom:2.5px solid transparent;background:none;white-space:nowrap;font-family:'DM Sans',sans-serif;transition:all .15s;display:flex;align-items:center;gap:5px}
+.tab{padding:14px 14px;font-size:12px;color:var(--muted);cursor:pointer;border:none;border-bottom:2.5px solid transparent;background:none;white-space:nowrap;font-family:'Inter',sans-serif;transition:all .15s;display:flex;align-items:center;gap:5px}
 .tab:hover{color:var(--ch)}.tab.active{color:var(--gold);border-bottom-color:var(--gold);font-weight:500}
 .tab-num{width:17px;height:17px;border-radius:50%;background:var(--gold-dim);color:var(--gold);font-size:9px;font-weight:600;display:inline-flex;align-items:center;justify-content:center}
 .tab.active .tab-num{background:var(--gold);color:#fff}
@@ -42,7 +42,7 @@ body{font-family:'Inter',system-ui,sans-serif;/* v3358 · Messkabine B3: DM Sans
 .field label{font-size:11px;font-weight:500;color:var(--muted)}
 .hint{font-size:10px;color:var(--muted2);font-style:italic}
 .inp-wrap{position:relative}
-input[type=text],input[type=number],input[type=date],input[type=password],input[type=email],select,textarea{height:38px;width:100%;padding:0 11px;border:1.5px solid var(--border);border-radius:var(--r);font-size:13px;color:var(--text);font-family:'DM Sans',sans-serif;background:var(--white);outline:none;transition:border .15s,box-shadow .15s}
+input[type=text],input[type=number],input[type=date],input[type=password],input[type=email],select,textarea{height:38px;width:100%;padding:0 11px;border:1.5px solid var(--border);border-radius:var(--r);font-size:13px;color:var(--text);font-family:'Inter',sans-serif;background:var(--white);outline:none;transition:border .15s,box-shadow .15s}
 input:focus,select:focus,textarea:focus{border-color:var(--gold);box-shadow:0 0 0 3px color-mix(in srgb, var(--gold) 12%, transparent)}
 textarea{height:72px;resize:vertical;padding:9px 11px;line-height:1.5}
 select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%237A7370' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 11px center;padding-right:28px}
@@ -110,7 +110,7 @@ select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%
 .kpi:hover{transform:translateY(-2px);border-color:color-mix(in srgb, var(--gold) 45%, transparent)}
 .kpi::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--gold),var(--gold-l, #E2C97E))}
 .kpi-label{font-size:10px;color:rgba(255,255,255,.55);text-transform:uppercase;letter-spacing:.08em;font-weight:600;margin-bottom:8px}
-.kpi-val{font-family:'DM Sans',sans-serif;font-size:30px;font-weight:700;color:#fff;line-height:1.1;letter-spacing:-.01em;font-variant-numeric:tabular-nums}
+.kpi-val{font-family:'Inter',sans-serif;font-size:30px;font-weight:700;color:#fff;line-height:1.1;letter-spacing:-.01em;font-variant-numeric:tabular-nums}
 .kpi-val.gn{color:#2FBE6E}.kpi-val.rd{color:#D55B5B}
 .kpi-sub{font-size:11px;color:rgba(255,255,255,.45);margin-top:6px;letter-spacing:.02em}
 .scen-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:16px}
@@ -158,9 +158,9 @@ select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%
 .api-key-row{display:flex;gap:9px;align-items:center;margin-top:14px}
 .api-key-row input{flex:1;height:38px;padding:0 13px;background:rgba(255,255,255,.08);border:1.5px solid rgba(255,255,255,.15);border-radius:var(--r);color:rgba(255,255,255,.85);font-family:monospace;font-size:12.5px;outline:none}
 .api-key-row input:focus{border-color:var(--gold)}
-.api-key-row button{padding:9px 16px;background:color-mix(in srgb, var(--gold) 18%, transparent);color:var(--gold);border:1.5px solid color-mix(in srgb, var(--gold) 35%, transparent);border-radius:var(--r);cursor:pointer;font-size:12px;font-family:'DM Sans',sans-serif;transition:all .15s}
+.api-key-row button{padding:9px 16px;background:color-mix(in srgb, var(--gold) 18%, transparent);color:var(--gold);border:1.5px solid color-mix(in srgb, var(--gold) 35%, transparent);border-radius:var(--r);cursor:pointer;font-size:12px;font-family:'Inter',sans-serif;transition:all .15s}
 .key-status{font-size:10.5px;color:rgba(255,255,255,.35);margin-top:5px}
-.ai-btn{width:100%;padding:13px;background:color-mix(in srgb, var(--gold) 8%, transparent);color:#8C7430;border:1.8px solid var(--gold);border-radius:var(--r);font-family:'DM Sans',sans-serif;font-size:13.5px;font-weight:600;cursor:pointer;letter-spacing:.04em;transition:all .18s;margin-top:8px}
+.ai-btn{width:100%;padding:13px;background:color-mix(in srgb, var(--gold) 8%, transparent);color:#8C7430;border:1.8px solid var(--gold);border-radius:var(--r);font-family:'Inter',sans-serif;font-size:13.5px;font-weight:600;cursor:pointer;letter-spacing:.04em;transition:all .18s;margin-top:8px}
 .ai-btn:hover{background:var(--gold);color:#fff;border-color:var(--gold)}.ai-btn:disabled{opacity:.55;cursor:not-allowed}
 .empty-state{color:var(--muted);font-size:13px;text-align:center;padding:32px}
 .save-item{display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:1px solid var(--surface2)}
@@ -253,7 +253,7 @@ select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%
   border: 1.5px solid rgba(255,255,255,.15);
   border-radius: var(--r);
   color: rgba(255,255,255,.8);
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: 12.5px;
   flex: 1;
   outline: none;
@@ -414,7 +414,7 @@ select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%
   border-radius: 4px;
   cursor: pointer;
   font-size: 10px;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   transition: all 0.12s;
 }
 .sb-item-btn:hover {
@@ -441,7 +441,7 @@ select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%
   border-radius: 6px;
   cursor: pointer;
   font-size: 10.5px;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   transition: all 0.15s;
 }
 .sb-fbtn:hover {
@@ -554,7 +554,7 @@ select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%
   font-weight: 500;
   cursor: pointer;
   border-radius: 5px;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   transition: all 0.15s;
   white-space: nowrap;
 }
@@ -769,7 +769,7 @@ select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%
   font-weight: 500;
   cursor: pointer;
   border-radius: 5px;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   transition: all 0.15s;
   white-space: nowrap;
 }
@@ -892,7 +892,7 @@ select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%
   border: 1.5px solid var(--border);
   border-radius: 7px;
   font-size: 14px;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   background: var(--surface);
   outline: none;
   transition: border-color 0.15s, background 0.15s;
@@ -919,7 +919,7 @@ select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%
   border-radius: 8px;
   font-size: 14px;
   font-weight: 600;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   cursor: pointer;
   letter-spacing: 0.02em;
   transition: all 0.15s;
@@ -1080,7 +1080,7 @@ select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%
   border: none; background: transparent;
   padding: 8px 18px; cursor: pointer;
   font-size: 13px; font-weight: 500;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   border-radius: 6px; color: var(--muted);
   transition: all .15s;
 }
@@ -1170,7 +1170,7 @@ select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%
   background: transparent; color: var(--gold-d);
   border-radius: 8px;
   font-size: 13px; font-weight: 600;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   cursor: pointer; margin-top: 8px;
   transition: all 0.15s;
 }
@@ -1346,7 +1346,7 @@ select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%
   border-radius: 3px;
   text-align: right;
   background: var(--white);
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
 }
 .fesh-summary {
   display: flex;
@@ -1367,7 +1367,7 @@ select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%
   font-size: 11.5px;
   cursor: pointer;
   transition: all 0.15s;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
 }
 .fesh-apply-btn:hover { background: var(--gold-d); transform: translateY(-1px); }
 
@@ -1397,7 +1397,7 @@ select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%
   width: 100%;
   border-collapse: collapse;
   font-size: 10.5px;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   margin-top: 12px;
 }
 .bank-table thead th {
@@ -1648,7 +1648,7 @@ select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%
   box-shadow: 0 0 0 1px rgba(63,165,108,0.18), 0 12px 28px rgba(0,0,0,0.25);
 }
 .cf-phase-title {
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: 13px;
   font-weight: 700;
   color: var(--gold);
@@ -1760,7 +1760,7 @@ select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%
   font-weight: 600;
   text-align: left;
   cursor: pointer;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   transition: all 0.15s;
 }
 .sb-nav-btn:hover {
@@ -1993,7 +1993,7 @@ select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%
   background: var(--surface);
   border: none;
   font-size: 12px;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-weight: 600;
   color: var(--muted);
   cursor: pointer;
@@ -2023,7 +2023,7 @@ select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%
   width: 100%;
   border-collapse: collapse;
   font-size: 11.5px;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
 }
 .ytf-table thead th {
   background: var(--surface2);
@@ -2072,7 +2072,7 @@ select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%
   font-size: 11px;
   text-align: right;
   background: var(--white);
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-variant-numeric: tabular-nums;
 }
 .ytf-input-wrap input:focus {
@@ -3532,7 +3532,7 @@ select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%
   font-size: 10.5px;
   background: var(--surface);
   color: var(--ch);
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
 }
 .ytf-bemerkung-input:focus {
   outline: none;
@@ -3801,7 +3801,7 @@ select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%
   color: var(--muted);
   font-size: 11.5px;
   cursor: pointer;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
 }
 .ds-settings-btn:hover {
   border-color: var(--gold);
@@ -4168,7 +4168,7 @@ select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%
   font-weight: 600;
   font-size: 12px;
   cursor: pointer;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   white-space: nowrap;
 }
 .st-tab.active {
@@ -4301,7 +4301,7 @@ select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%
   justify-content: space-between;
   align-items: center;
   cursor: pointer;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   position: sticky;
   top: 0;
   background:var(--dp-s1);
@@ -4358,7 +4358,7 @@ select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%
   padding: 7px 10px;
   cursor: pointer;
   border-radius: 4px;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
 }
 .sb-submenu-btn:hover {
   background: color-mix(in srgb, var(--gold) 12%, transparent);
@@ -4449,7 +4449,7 @@ select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%
   border: none;
   color:var(--dp-ink-80);
   font-size: 12px;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   padding: 8px 10px;
   cursor: pointer;
   border-radius: 5px;
@@ -4488,7 +4488,7 @@ select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%
   border: 1px solid var(--border);
   border-radius: 6px;
   font-size: 13px;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   background: var(--white);
 }
 .ao-search:focus { outline: 2px solid var(--gold); outline-offset: -1px; border-color: var(--gold); }
@@ -4504,7 +4504,7 @@ select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%
   width: 100%;
   border-collapse: collapse;
   font-size: 12.5px;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
 }
 .ao-table th {
   position: sticky;
@@ -4545,7 +4545,7 @@ select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%
   color: var(--gold-d);
   font-size: 11px;
   cursor: pointer;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-weight: 600;
 }
 .ao-load-btn:hover { background: var(--gold); color: var(--white); }
@@ -4623,7 +4623,7 @@ select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%
   font-weight: 600;
   letter-spacing: 0.04em;
   cursor: pointer;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   transition: background 0.12s, color 0.12s;
 }
 .me-mode-btn:hover { color: var(--gold); }
@@ -6288,7 +6288,7 @@ select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%
   color: rgba(255,255,255,0.92);
   position: relative;
   box-shadow: 0 0 0 1px color-mix(in srgb, var(--gold) 20%, transparent), 0 18px 40px rgba(0,0,0,0.30);
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
 }
 
 /* ── Top-Bar: Brand links + Top-Deal rechts ── */
@@ -6625,7 +6625,7 @@ select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%
   flex-direction: column;
   box-shadow: 0 20px 60px rgba(0,0,0,0.50);
   color: rgba(255,255,255,0.92);
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
 }
 .bmf-header {
   display: flex;
@@ -7338,7 +7338,7 @@ select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%
   flex-direction: column;
   box-shadow: 0 20px 60px rgba(0,0,0,0.50);
   color: rgba(255,255,255,0.92);
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
 }
 .ds2-settings-header {
   display: flex;
@@ -7774,7 +7774,7 @@ select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%
   position: relative;
   box-shadow: 0 0 0 1px color-mix(in srgb, var(--gold) 20%, transparent), 0 24px 60px rgba(0,0,0,0.55);
   color: rgba(255,255,255,0.92);
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   animation: beta-slide 0.25s cubic-bezier(0.4,0,0.2,1);
 }
 @keyframes beta-slide { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
@@ -8991,7 +8991,7 @@ select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%
   justify-content: flex-end;
   padding: 24px 25vw 24px 24px;
   overflow: auto;
-  font-family: 'DM Sans', -apple-system, sans-serif;
+  font-family: 'Inter', -apple-system, sans-serif;
 }
 
 /* Hintergrund-Layer: nur noch der "COMING SOON"-Sticker */
@@ -11360,7 +11360,7 @@ body.bsheet-body-locked { overflow: hidden; }
   overflow: hidden !important;
   box-shadow: 0 24px 60px rgba(0,0,0,0.45) !important;
   /* Defensive Reset gegen vererbte Styles */
-  font-family: 'DM Sans', -apple-system, sans-serif;
+  font-family: 'Inter', -apple-system, sans-serif;
   color: var(--ch);
   text-align: left;
 }
@@ -12836,7 +12836,7 @@ select option {
 .qc-cat-bar.qc-cat-red   .qc-cat-num { color: #DDA29E; }
 
 .qc-cat-max {
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: 11px;
   font-weight: 500;
   color: rgba(255, 255, 255, 0.4);
@@ -13692,7 +13692,7 @@ select option {
   overflow: hidden;
   text-overflow: ellipsis;
   min-width: 0;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
 }
 .hdr-autosave {
   display: inline-flex;
@@ -15760,7 +15760,7 @@ body.hdr-collapsed .hdr-toggle-btn {
    Serife bleibt der Hauptansicht (.sec-title, .total-val); im
    Einstellungsdialog gilt die Schrift der App. */
 .ds-pane-title {
-  font-family: 'DM Sans', system-ui, sans-serif;
+  font-family: 'Inter', system-ui, sans-serif;
   font-size: 15px;
   font-weight: 600;
   letter-spacing: .1px;
@@ -18941,7 +18941,7 @@ html body .body {
   color: #1A1414;
   border: none;
   border-radius: 8px;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: 13px;
   font-weight: 700;
   letter-spacing: 0.02em;
@@ -20280,7 +20280,7 @@ body.fb-modal-open.plan-free .body::before {
     0 0 0 1px color-mix(in srgb, var(--gold) 20%, transparent),
     inset 0 1px 0 rgba(255,255,255,.05);
   color: #e8e2d4;
-  font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", sans-serif;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   font-size: 13px;
   line-height: 1.45;
 }
@@ -20496,7 +20496,7 @@ body.fb-modal-open.plan-free .body::before {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: ui-monospace, monospace;
+  font-family: JetBrains Mono,ui-monospace, monospace;
   box-shadow: 0 4px 10px color-mix(in srgb, var(--gold) 40%, transparent);
   flex-shrink: 0;
 }
@@ -20804,7 +20804,7 @@ body.fb-modal-open.plan-free .body::before {
   border-radius: 6px;
   background: rgba(0,0,0,.4);
   border: 1px solid color-mix(in srgb, var(--gold) 12%, transparent);
-  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-family: JetBrains Mono,ui-monospace, "SF Mono", Menlo, Consolas, monospace;
   font-size: 11px;
   color: #cfc8b8;
   line-height: 1.55;
@@ -24361,7 +24361,7 @@ body:not(.hdr-collapsed) #hdr-badges {
               inset 0 1px 0 rgba(255,255,255,0.40);
   z-index: 3;
   white-space: nowrap;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
 }
 #hdr-badges .sc-investor-badge .ic {
   display: inline-flex;
@@ -24426,7 +24426,7 @@ body:not(.hdr-collapsed) #hdr-badges {
   padding: 2px 9px;
   border-radius: 9px;
   white-space: nowrap;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
 }
 
 /* Info-Block rechts vom Donut */
@@ -24443,7 +24443,7 @@ body:not(.hdr-collapsed) #hdr-badges {
   display: flex;
   align-items: center;
   gap: 6px;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
 }
 #hdr-badges .sc-v {
   font-size: 14px;
@@ -24451,13 +24451,13 @@ body:not(.hdr-collapsed) #hdr-badges {
   font-weight: 700;
   margin-top: 4px;
   letter-spacing: -0.2px;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
 }
 #hdr-badges .sc-sub {
   font-size: 10.5px;
   color: rgba(168,162,153,0.95);
   margin-top: 2px;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
 }
 #hdr-badges .sc-tip {
   font-size: 10px;
@@ -24466,7 +24466,7 @@ body:not(.hdr-collapsed) #hdr-badges {
   display: flex;
   align-items: center;
   gap: 4px;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
 }
 #hdr-badges .sc-tip .ic {
   display: inline-flex;
@@ -24487,7 +24487,7 @@ body:not(.hdr-collapsed) #hdr-badges {
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.02), 0 2px 8px rgba(0,0,0,0.5);
   transition: all 0.2s ease;
   cursor: default;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
 }
 #hdr-badges .sc-pill:hover {
   background: #050505;
@@ -24858,7 +24858,7 @@ header.hdr.has-v64-score + nav.tabs .tabs-version-badge {
   color: rgba(168,162,153,0.6) !important;
   background: rgba(255,255,255,0.04) !important;
   border: 1px solid rgba(255,255,255,0.06) !important;
-  font-family: ui-monospace, monospace;
+  font-family: JetBrains Mono,ui-monospace, monospace;
   letter-spacing: 0.5px;
 }
 
@@ -25190,7 +25190,7 @@ aside.sidebar .sb-logo-deal {
   letter-spacing: -0.8px;
   line-height: 1;
   position: relative;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
 }
 aside.sidebar .sb-logo-pilot {
   background: linear-gradient(135deg,
@@ -25209,7 +25209,7 @@ aside.sidebar .sb-logo-by {
   letter-spacing: 0.6px;
   position: relative;
   font-weight: 500;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
 }
 
 /* V65.0: Shimmer raus — Logo-PNG hat selber Charakter, kein extra-Effekt nötig.
@@ -26365,7 +26365,7 @@ aside.sidebar .sb-card .sbc-address {
   border: 1px solid color-mix(in srgb, var(--gold) 28%, transparent);
   border-radius: 7px;
   flex-shrink: 0;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   align-self: center;
 }
 .tabs-status-badge.tabs-status-done {
@@ -26981,7 +26981,7 @@ aside.sidebar .sb-portfolio-collapsible .sb-collapsible-header {
   font-weight: 600 !important;
   letter-spacing: 0.4px !important;
   text-transform: uppercase !important;
-  font-family: 'DM Sans', sans-serif !important;
+  font-family: 'Inter', sans-serif !important;
   transition: all 0.18s ease !important;
   position: static !important;
   top: auto !important;
@@ -27067,7 +27067,7 @@ aside.sidebar .sb-portfolio-content .port-row {
   border-bottom: 1px solid color-mix(in srgb, var(--gold) 8%, transparent) !important;
   font-size: 11.5px !important;
   color: rgba(232,226,212,0.78) !important;
-  font-family: 'DM Sans', sans-serif !important;
+  font-family: 'Inter', sans-serif !important;
 }
 aside.sidebar .sb-portfolio-content .port-row:last-child {
   border-bottom: 0 !important;
@@ -27107,7 +27107,7 @@ aside.sidebar .sb-actions-trigger {
   font-weight: 600 !important;
   letter-spacing: 0.4px !important;
   text-transform: uppercase !important;
-  font-family: 'DM Sans', sans-serif !important;
+  font-family: 'Inter', sans-serif !important;
   transition: all 0.18s ease !important;
   box-shadow: none !important;
 }
@@ -27187,7 +27187,7 @@ aside.sidebar .sb-actions-trigger .sb-actions-arrow {
   letter-spacing: 1.4px !important;
   color: var(--gold-3, #9a7f33) !important;
   font-weight: 700 !important;
-  font-family: 'DM Sans', sans-serif !important;
+  font-family: 'Inter', sans-serif !important;
   margin-bottom: 14px !important;
   padding: 0 0 10px 0 !important;
   border-bottom: 0 !important;
@@ -29285,7 +29285,7 @@ aside.sidebar .sb-logo-shimmer:hover::after {
   font-size: 28px;
   font-weight: 700;
   color: var(--gold-d, #8a6f27);
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   line-height: 1.15;
   margin-bottom: 4px;
   letter-spacing: -0.5px;
@@ -29314,7 +29314,7 @@ aside.sidebar .sb-logo-shimmer:hover::after {
   font-size: 13px;
   font-weight: 600;
   letter-spacing: 0.3px;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   border: 1px solid transparent;
   cursor: pointer;
   transition: all 0.15s ease;
@@ -29412,7 +29412,7 @@ aside.sidebar .sb-logo-shimmer:hover::after {
   font-size: 13px;
   font-weight: 600;
   letter-spacing: 0.3px;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   background: linear-gradient(135deg, var(--gold, #C9A84C) 0%, var(--gold-d, #8a6f27) 100%);
   color: #fff;
   border: 1px solid var(--gold-d, #8a6f27);
@@ -31963,7 +31963,7 @@ html[data-bg="white"] .auth-disclaimer-hint {
 }
 #s6 .kpi-grid-eval .kpi-val {
   color: #fff !important;
-  font-family: 'DM Sans', sans-serif !important;
+  font-family: 'Inter', sans-serif !important;
   font-size: 30px !important;
   font-weight: 700 !important;
   line-height: 1.1 !important;
@@ -32636,7 +32636,7 @@ select.oab-missing-hl {
   background:color-mix(in srgb, var(--gold) 6%, transparent) !important;
   border:1px solid color-mix(in srgb, var(--gold) 30%, transparent) !important;
 }
-.ds-brand-name{ font-family:'Space Grotesk','DM Sans',sans-serif !important; letter-spacing:-.01em; }
+.ds-brand-name{ font-family:'Space Grotesk','Inter',sans-serif !important; letter-spacing:-.01em; }
 
 /* Erklaer-/Top-Deal-Box transparent, damit das Sternenfeld durchscheint */
 .ds-top-deal{
@@ -34464,7 +34464,7 @@ body.dp-sidebar-collapsed #sidebar .sb-card[data-tip]:hover::after {
   display:flex; align-items:center; gap:12px;
 }
 #feedback-modal .fb-brandbar .fb-bb-logo{
-  font:700 17px 'Space Grotesk','DM Sans',system-ui,sans-serif; color:#fff; letter-spacing:.3px;
+  font:700 17px 'Space Grotesk','Inter',system-ui,sans-serif; color:#fff; letter-spacing:.3px;
 }
 #feedback-modal .fb-brandbar .fb-bb-logo b{ color:var(--gold-hi); font-weight:700; }
 #feedback-modal .fb-brandbar .fb-bb-tag{
@@ -34716,7 +34716,7 @@ body.dp-sidebar-collapsed #sidebar .sb-card[data-tip]:hover::after {
   position:absolute; top:0; left:0; right:0; height:46px;
   display:flex; align-items:center; padding:0 24px;
   background:#070707 !important; color:#fff !important;
-  font:700 17px 'Space Grotesk','DM Sans',system-ui,sans-serif !important; letter-spacing:.3px;
+  font:700 17px 'Space Grotesk','Inter',system-ui,sans-serif !important; letter-spacing:.3px;
   z-index:8; pointer-events:none;
 }
 .settings-modal.set-modal-v2::after,
@@ -34982,7 +34982,7 @@ body.dp-sidebar-collapsed #sidebar .sb-card[data-tip]:hover::after {
 .dp-modal-topband{ grid-area:band; display:flex; flex-direction:column; }
 /* Schwarze Brandbar */
 .dp-mtb-brand{ background:#070707; height:46px; display:flex; align-items:center; padding:0 24px; }
-.dp-mtb-logo{ font:700 17px 'Space Grotesk','DM Sans',system-ui,sans-serif; color:#fff; letter-spacing:.3px; }
+.dp-mtb-logo{ font:700 17px 'Space Grotesk','Inter',system-ui,sans-serif; color:#fff; letter-spacing:.3px; }
 .dp-mtb-tag{ margin-left:auto; font:700 10px 'JetBrains Mono',monospace; letter-spacing:2px; color:var(--gold); }
 /* Gold-Band, volle Breite */
 .dp-mtb-hero{ height:54px; background:linear-gradient(110deg,var(--gold-hi),var(--gold) 55%,var(--gold-lo)); }
@@ -35243,7 +35243,7 @@ input[type=date].tr::-webkit-datetime-edit { text-align: right; }
 #halter_seit, #ueberf_ende, #ueberf_rest_zins,
 #verkehrswert_ueberf[readonly], #ueberf_preis[readonly], #gesellschafterdarlehen[readonly],
 #ueberf_restschuld[readonly], #halter_seit[readonly], #ueberf_ende[readonly], #ueberf_rest_zins[readonly] {
-  font-family: 'DM Sans', sans-serif !important;
+  font-family: 'Inter', sans-serif !important;
   font-weight: 400 !important;
 }
 /* === v816j-field-font END === */
@@ -38160,7 +38160,7 @@ button.btn-brw.brw-veraltet::after {
   outline-offset: 2px;
 }
 .sb-neu-plus {
-  font: 400 18px/1 ui-monospace, monospace;
+  font: 400 18px/1 JetBrains Mono,ui-monospace, monospace;
   margin-top: -2px;
 }
 /* Eingeklappte Sidebar: nur das Plus, der Text wuerde sonst umbrechen. */
@@ -39873,7 +39873,7 @@ header.hdr .hdr-v61-row1 .hdr-mobile-menu.active span:nth-child(3) {
   border-left: 3px solid var(--wl-c9a84c, #C9A84C);
   border-radius: 0 5px 5px 0;
   background: color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 7%, transparent);
-  font-family: var(--font-mono, ui-monospace, monospace);
+  font-family: var(--font-mono, JetBrains Mono,ui-monospace, monospace);
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.09em;
@@ -41387,7 +41387,7 @@ html body #nk-aus-einstellungen { white-space: normal !important; max-width: 100
   html body .pricing-modal-close,
   html body button[class*="close"]:has(> svg:only-child) {
     width: 44px !important; height: 44px !important; min-width: 44px !important; min-height: 44px !important;
-    padding: 0 !important; border-radius: 50% !important; flex: 0 0 44px;
+    padding: 0 !important; border-radius: 9px !important; flex: 0 0 44px;   /* v3370: Haus-Knopf eckig 9 px statt Kreis */
   }
   html body .pricing-modal-close > svg,
   html body button[class*="close"]:has(> svg:only-child) > svg { width: 20px !important; height: 20px !important; flex: 0 0 20px; }
@@ -41425,7 +41425,7 @@ html body #nk-aus-einstellungen { white-space: normal !important; max-width: 100
 /* Klasse zwoelffach: `.sec button:not(...)` traegt neun :not() (0,10,1) und gewann (gemessen). */
 html body .dp-pf-msheet-head .dp-pf-mclose.dp-pf-mclose.dp-pf-mclose.dp-pf-mclose.dp-pf-mclose.dp-pf-mclose.dp-pf-mclose.dp-pf-mclose.dp-pf-mclose.dp-pf-mclose.dp-pf-mclose.dp-pf-mclose {
   width: 44px !important; height: 44px !important; min-width: 44px !important; min-height: 44px !important;
-  padding: 0 !important; border-radius: 50% !important; background: transparent !important;
+  padding: 0 !important; border-radius: 9px !important; /* v3370: Haus-Knopf 9 px statt Kreis */ background: transparent !important;
   border: 1px solid rgba(255,255,255,.22) !important; color: var(--wl-e8cc7a, #E8CC7A) !important;
   font-size: 18px !important; line-height: 1 !important; box-shadow: none !important;
   display: inline-flex !important; align-items: center; justify-content: center; margin-top: 0;
@@ -41749,3 +41749,48 @@ body.dp-dg-2 :is(#s0, #s1, #s2, #s3, #s4, #s3-tax, #s5, #s6, #s8) [data-dp-dg="3
 }
 /* v3358 · D1: „Wohneinheiten im Gebäude“ war abgeschnitten (145/122) */
 .od-raster.od-gebaeude > .f > label { white-space: normal !important; overflow: visible !important; text-overflow: clip !important; }
+
+/* v3370 · Messkabine zweite Runde (angemeldet, 14.11.2026, Dateien/Fehler/messkabine-ui-pruefung-2026-11-14.md).
+   (1) Der Haus-Knopf aus v3358 (0,2,0) verlor auf dem Handy gegen drei staerkere Regeln - gemessen bei 390 px:
+       iexp-close (Import/Export/Tilgungsplan) und pricing-modal-close 44 x 44 RUND (`html body button[class*="close"]
+       :has(> svg:only-child)`, 0,2,4), set-modal-close (Einstellungen, Hilfe) 32 x 32 statt 44 (`html #help-modal …`
+       1,1,1), dpm-x (Track Record, Bankexport) 40 x 40 Radius 10 (Regel bis 900 px). Dazu Knoepfe, die gar nicht
+       in der Liste standen: Mein Partner .pk-zu 34 x 44 (hochkant), Meine Freigaben .mf-x 30 x 44 Radius 50 % (Oval),
+       BMF .bmfmo-close-top 41 x 44 Radius 8. Jetzt zwei IDs Spezifitaet (:not(#dp-nie):not(#dp-nie-2)), wie einheitlich.css.
+       Nur Form und Groesse - Farben bleiben je Fenster. Nicht dabei: .qcpm-x (Nicht anfassen), .jb-zu und .dp-erh-x
+       (Module der Hauptsitzung), Tour-Blase, Karten-X im Inhalt. */
+html body :is(.bmf-close, .beta-close, .fb-close, .dp-band-close, .set-modal-close, .dpw-zu, .iexp-close, .pricing-close,
+  .pricing-modal-close, .bsheet-close, .dp-pf-mclose, .v10-modal-close, .dpb-zu, .dpm-x, .pk-zu, .mf-x, .rp-x, .hh-x,
+  .bmfmo-close-top, .wizard-close, .rnd-wiz-close, .dp-legal-close, .bi-x, .da-modal-close, .upgrade-close, .dpdi-close,
+  .tax-bestand-overlay-close, .dpuew-x, .bb-zu, .dpnq-x, .dpes-x):not(#dp-nie):not(#dp-nie-2) {
+  width: 32px !important; height: 32px !important; min-width: 32px !important; min-height: 32px !important;
+  max-width: 32px !important; max-height: 32px !important; flex: 0 0 32px !important; padding: 0 !important;
+  border-radius: 9px !important; box-sizing: border-box !important;
+  display: inline-flex !important; align-items: center !important; justify-content: center !important; line-height: 1 !important;
+}
+@media (max-width: 640px) {
+  html body :is(.bmf-close, .beta-close, .fb-close, .dp-band-close, .set-modal-close, .dpw-zu, .iexp-close, .pricing-close,
+    .pricing-modal-close, .bsheet-close, .dp-pf-mclose, .v10-modal-close, .dpb-zu, .dpm-x, .pk-zu, .mf-x, .rp-x, .hh-x,
+    .bmfmo-close-top, .wizard-close, .rnd-wiz-close, .dp-legal-close, .bi-x, .da-modal-close, .upgrade-close, .dpdi-close,
+    .tax-bestand-overlay-close, .dpuew-x, .bb-zu, .dpnq-x, .dpes-x):not(#dp-nie):not(#dp-nie-2) {
+    width: 44px !important; height: 44px !important; min-width: 44px !important; min-height: 44px !important;
+    max-width: 44px !important; max-height: 44px !important; flex: 0 0 44px !important;
+  }
+}
+/* Die Datenaufnahme-Schublade ist nur auf dem Handy offen; dort 44 px wie oben (v2969a hielt sie auch breit bei 44). */
+html body .dp-pf-msheet-head .dp-pf-mclose:not(#dp-nie):not(#dp-nie-2):not(#dp-nie-3) {
+  width: 44px !important; height: 44px !important; min-width: 44px !important; min-height: 44px !important;
+  max-width: 44px !important; max-height: 44px !important; flex: 0 0 44px !important;
+}
+
+/* (2) Reiter Finanzierung, 1440 px: die fuenf Kacheln standen in einer 521 px breiten Karte zu je 99 px -
+       „1.968,40 €" (81/79), „Zinsen 1.574,72 €" (86/79), „Annuitätendarlehen" (97/79) mit … abgeschnitten.
+       Unter 600 px Kartenbreite drei Kacheln je Zeile (vorher erst unter 480). */
+@container fz (max-width: 600px) {
+  .fz-gruppen .fz-kopf, .fz-kopf { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+/* (3) „Marktzins übernehmen" war auch am Rechner abgeschnitten (126/113, links und rechts angeschnitten);
+       v3340a hatte nur das Handy geloest. Jetzt auf allen Breiten Umbruch. */
+html body #s3 #d1t_field .dp-mz-knopf-zeile > .btn.dp-mz-uebernehmen {
+  white-space: normal !important; text-overflow: clip; text-align: left; height: auto !important; justify-content: flex-start;
+}

@@ -121,15 +121,15 @@
       '.imo-left{border-right:1px solid var(--border,#E0DBD3);display:flex;flex-direction:column;min-height:0}',
       '.imo-right{display:flex;flex-direction:column;min-height:0;overflow:auto}',
       '.imo-src{display:flex;gap:8px;padding:12px 18px;flex-wrap:wrap;border-bottom:1px solid var(--border,#E0DBD3);background:var(--surface2,#F0ECE4)}',
-      ".imo-pill{font:600 12px 'DM Sans',system-ui,sans-serif;padding:7px 13px;border-radius:999px;cursor:pointer;background:#fff;border:1px solid var(--border,#E0DBD3);color:var(--ch2,#3D3A3A)}",
+      ".imo-pill{font:600 12px 'Inter',system-ui,sans-serif;padding:7px 13px;border-radius:999px;cursor:pointer;background:#fff;border:1px solid var(--border,#E0DBD3);color:var(--ch2,#3D3A3A)}",
       '.imo-pill:hover{border-color:var(--gold,#C9A84C)}',
       '.imo-pill.on{border-color:var(--gold,#C9A84C);color:var(--ch,#2A2727);box-shadow:0 0 0 2px rgba(201,168,76,.18)}',
       '.imo-list{overflow:auto;padding:14px 18px;background:var(--surface,#F8F6F1)}',
-      '.imo-note{font:11px ui-monospace,monospace;color:var(--muted,#7A7370);margin-bottom:9px}',
+      '.imo-note{font:11px JetBrains Mono,ui-monospace,monospace;color:var(--muted,#7A7370);margin-bottom:9px}',
       /* v2003 · der Knopf sitzt IM Hinweis, damit "50 von 1727 geladen" und
          der Ausweg eine Zeile bleiben. Gold als Rahmen, nicht als Flaeche:
          er ist ein Angebot, keine Hauptaktion. */
-      '.imo-mehr{font:11px ui-monospace,monospace;margin-left:6px;padding:3px 9px;cursor:pointer;'
+      '.imo-mehr{font:11px JetBrains Mono,ui-monospace,monospace;margin-left:6px;padding:3px 9px;cursor:pointer;'
         + 'border:1px solid var(--gold,var(--wl-c9a84c,#C9A84C));border-radius:999px;'
         + 'background:transparent;color:var(--ch2,#5B5550)}',
       '.imo-mehr:hover{background:var(--gold-bg,rgba(201,168,76,.12))}',
@@ -137,18 +137,18 @@
       '.imo-o{border:1px solid var(--border,#E0DBD3);border-radius:12px;padding:12px 13px;margin-bottom:10px;cursor:pointer;background:#fff;transition:border-color .12s,box-shadow .12s}',
       '.imo-o:hover{border-color:var(--gold,#C9A84C)}',
       '.imo-o.on{border-color:var(--gold,#C9A84C);box-shadow:0 0 0 2px rgba(201,168,76,.18)}',
-      ".imo-o .t{font:600 13.5px 'DM Sans',system-ui,sans-serif;color:var(--ch,#2A2727);line-height:1.3}",
+      ".imo-o .t{font:600 13.5px 'Inter',system-ui,sans-serif;color:var(--ch,#2A2727);line-height:1.3}",
       '.imo-o .a{font-size:12px;color:var(--muted,#7A7370);margin:3px 0 8px}',
-      '.imo-o .meta{display:flex;gap:13px;flex-wrap:wrap;font:500 12px ui-monospace,monospace;color:var(--ch2,#3D3A3A)}',
+      '.imo-o .meta{display:flex;gap:13px;flex-wrap:wrap;font:500 12px JetBrains Mono,ui-monospace,monospace;color:var(--ch2,#3D3A3A)}',
       '.imo-o .meta b{color:var(--gold-3,#9a7f33)}',
       '.imo-detail{overflow:auto;padding:14px 18px;flex:1}',
       '.imo-empty{color:var(--muted,#7A7370);text-align:center;padding:54px 14px;font-size:13px}',
-      '.imo-dl{font:700 10px ui-monospace,monospace;letter-spacing:.12em;color:var(--gold-3,#9a7f33);text-transform:uppercase;margin-bottom:10px}',
+      '.imo-dl{font:700 10px JetBrains Mono,ui-monospace,monospace;letter-spacing:.12em;color:var(--gold-3,#9a7f33);text-transform:uppercase;margin-bottom:10px}',
       '.imo-f{display:grid;grid-template-columns:auto 100px 1fr;align-items:start;gap:9px;padding:7px 0;border-bottom:1px solid rgba(42,39,39,.06);font-size:13px}',
       '.imo-f input{margin-top:2px;accent-color:var(--gold,#C9A84C);width:15px;height:15px}',
-      '.imo-f .lbl{color:var(--gold-3,#9a7f33);font:600 12px ui-monospace,monospace}',
+      '.imo-f .lbl{color:var(--gold-3,#9a7f33);font:600 12px JetBrains Mono,ui-monospace,monospace}',
       '.imo-f .val{color:var(--ch,#2A2727)}',
-      '.imo-f .map{grid-column:2 / -1;font:11px ui-monospace,monospace;color:var(--muted,#7A7370);margin-top:1px}',
+      '.imo-f .map{grid-column:2 / -1;font:11px JetBrains Mono,ui-monospace,monospace;color:var(--muted,#7A7370);margin-top:1px}',
       '.imo-f .map b{color:var(--green,#3FA56C);font-weight:600}',
       '.imo-sum{margin-top:10px;background:var(--surface,#F8F6F1);border:1px solid var(--border,#E0DBD3);border-radius:10px;padding:11px;font-size:12px;color:var(--ch2,#3D3A3A);white-space:pre-wrap;max-height:150px;overflow:auto;line-height:1.5}',
       '@media(max-width:680px){.oabi-ov.imo-mode .oabi-body{grid-template-columns:1fr}.imo-left{border-right:0;border-bottom:1px solid var(--border,#E0DBD3);max-height:44vh}.imo-right{max-height:42vh}}'
@@ -190,7 +190,7 @@
   function loadSources() {
     var host = document.getElementById('imo-src');
     if (_imoStubSync()) { var _d=_imoStubData(); state.sources=_d.sources; renderSources(); if(state.sources[0]) selectSource(state.sources[0]); return; }  /* v769-imo-stub */
-    host.innerHTML = '<span style="font:12px ui-monospace,monospace;color:var(--muted,#7A7370)">Lade Quellen\u2026</span>';
+    host.innerHTML = '<span style="font:12px JetBrains Mono,ui-monospace,monospace;color:var(--muted,#7A7370)">Lade Quellen\u2026</span>';
     fetch(API + '/searches', { headers: hdr() })
       .then(function (r) { return r.json(); })
       .then(function (searches) {

@@ -797,7 +797,7 @@
 '.dpsh-st:first-child{border-left:none;padding-left:0}',
 '.dpsh-sl{font-family:"JetBrains Mono",monospace;font-size:8.5px;letter-spacing:1px;color:#8a8378;text-transform:uppercase}',
 '.dpsh-sv{font-family:"Space Grotesk",sans-serif;font-size:14px;font-weight:700;color:#fff;margin-top:2px;white-space:nowrap}',
-'.dpsh-sectitle{font-family:"DM Sans",sans-serif;font-size:10.5px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;color:var(--gold, #C9A84C);margin-bottom:12px;position:relative;padding-right:14px;display:inline-block}',
+'.dpsh-sectitle{font-family:"Inter",sans-serif;font-size:10.5px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;color:var(--gold, #C9A84C);margin-bottom:12px;position:relative;padding-right:14px;display:inline-block}',
 '.dpsh-sectitle::after{content:"";position:absolute;right:-6px;top:50%;width:80px;height:1px;transform:translateY(-50%);background:linear-gradient(90deg,var(--gold, #C9A84C),transparent)}',
 '.dpsh-cbars{display:flex;flex-direction:column;gap:10px}',
 '.dpsh-cbar-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:5px}',
