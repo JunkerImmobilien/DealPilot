@@ -22,7 +22,7 @@
 (function (global) {
   'use strict';
   if (global.DpJahresbuchGrafik) return;
-  var VERSION = 'v3364a';
+  var VERSION = 'v3364b';
   var GOLD = 'var(--wl-c9a84c, #C9A84C)', GRAU = '#8A8278';
   var W = 720, L = 64, R = 16, H1 = 210, H2 = 130, LUECKE = 34, OBEN = 22;
 
@@ -30,7 +30,7 @@
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   function eur(x) { return istZahl(x) ? Math.round(x).toLocaleString('de-DE') + ' €' : '–'; }
   function kurz(x) { if (!istZahl(x)) return ''; var a = Math.abs(x); return (x < 0 ? '−' : '') + (a >= 1e6 ? (a / 1e6).toLocaleString('de-DE', { maximumFractionDigits: 1 }) + ' Mio.' : a >= 1000 ? Math.round(a / 1000).toLocaleString('de-DE') + ' T' : Math.round(a)); }
-  function schritt(max) { var r = Math.pow(10, Math.floor(Math.log10(max || 1))), n = max / r; return (n <= 2 ? 0.5 : n <= 5 ? 1 : 2) * r; }
+  function schritt(max) { var r = Math.pow(10, Math.floor(Math.log10(max || 1))), n = max / r; return (n <= 1 ? 1 : n <= 2 ? 2 : n <= 5 ? 5 : 10) * r; }   /* v3364b · Schritt nie kleiner als ein Viertel der Spanne */
 
   /** d = { jahre: [{ jahr, miete_plan, miete_ist, miete_proj, ziel_j, cf_plan, cf_ist, ist_jahr (bool) }],
           ereignisse: [{ jahr, monat, art: 'erhoehung'|'zielbild'|'zinsbindung'|'frist', text }], heute } */
