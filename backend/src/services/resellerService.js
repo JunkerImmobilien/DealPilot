@@ -198,7 +198,9 @@ async function _planVorPlatzMerken(clientId, userId) {
   try {
     const cur = await planService.getUserCurrentPlan(userId);
     const pv = cur && cur.planId ? cur.planId : 'free';
-    await query(`UPDATE reseller_clients SET plan_vorher = COALESCE(plan_vorher, $2) WHERE id = $1`, [clientId, pv === 'investor' ? 'free' : pv]);
+    /* mit Ablauf merken (Plan|ISO-Datum): eine Testphase (28 Tage Pro) kommt beim Entzug nur mit ihrer RESTzeit zurueck */
+    const bis = cur && cur.expiresAt ? new Date(cur.expiresAt).toISOString() : '';
+    await query(`UPDATE reseller_clients SET plan_vorher = COALESCE(plan_vorher, $2) WHERE id = $1`, [clientId, pv === 'investor' ? 'free' : (pv + '|' + bis)]);
   } catch (e) {}
 }
 /* W1a-investor: Seat = Investor-Tier (59-EUR-Referenz aus dem Konzept), nicht Starter */
@@ -261,8 +263,11 @@ async function unassignSeat(resellerId, clientId) {
     const uid = cu.rows[0] && cu.rows[0].user_id;
     if (uid && r.rowCount && !(await hatBezahltesAbo(uid))) {
       const pv = (await query(`SELECT plan_vorher FROM reseller_clients WHERE id = $1`, [clientId])).rows[0];
-      const ziel = pv && pv.plan_vorher && pv.plan_vorher !== 'investor' ? pv.plan_vorher : 'free';
-      await planService.setUserPlanManual(uid, ziel, 'monthly', 3650);
+      const roh = pv && pv.plan_vorher ? String(pv.plan_vorher) : 'free';
+      const plan = roh.split('|')[0] || 'free', bis = roh.split('|')[1] ? new Date(roh.split('|')[1]) : null;
+      const rest = bis && !isNaN(bis) ? Math.ceil((bis - Date.now()) / 864e5) : null;
+      if (plan !== 'free' && plan !== 'investor' && rest != null && rest > 0) await planService.setUserPlanManual(uid, plan, 'monthly', rest);
+      else await planService.setUserPlanManual(uid, 'free', 'monthly', 3650);
       await query(`UPDATE reseller_clients SET plan_vorher = NULL WHERE id = $1`, [clientId]);
     }
   } catch (e) {}
