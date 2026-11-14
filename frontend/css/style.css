@@ -5,7 +5,7 @@
    Die Literale im :root darunter BLEIBEN — sie sind die Fallback-Quelle. */
 :root{/*v902-goldshades*/--gold-hi:#E8CC7A;--gold-lo:#b8932f;/*v900-accent-central*/--gold:#C9A84C;--gold-l:#E2C97E;--gold-bg:#FAF5E8;--gold-dim:color-mix(in srgb, var(--gold) 12%, transparent);--gold-dim2:color-mix(in srgb, var(--gold) 22%, transparent);--ch:#2A2727;--ch2:#3D3A3A;--surface:#F8F6F1;--surface2:#F0ECE4;--white:#fff;--border:#E0DBD3;--border-g:color-mix(in srgb, var(--gold) 30%, transparent);--text:#2A2727;--muted:#7A7370;--muted2:#9A9390;--green:#3FA56C;--green-bg:#EAF7F0;--green-dim:rgba(42,154,90,.12);--red:#B8625C;--red-bg:#FBF1F0;--blue:#185FA5;--blue-bg:#E8F0FA;--r:8px;--r2:12px;--shadow:0 2px 12px rgba(42,39,39,.08);--shadow-md:0 4px 24px rgba(42,39,39,.12)}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'DM Sans',sans-serif;background:var(--surface);color:var(--text);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
+body{font-family:'Inter',system-ui,sans-serif;/* v3358 · Messkabine B3: DM Sans ist keine Hausschrift */background:var(--surface);color:var(--text);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
 ::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-track{background:var(--surface2)}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
 .hdr{background:var(--dp-s1);height:64px;padding:0 22px;display:flex;align-items:center;justify-content:space-between;border-bottom:2.5px solid var(--gold);position:sticky;top:0;z-index:300;box-shadow:0 2px 20px rgba(0,0,0,.3)}
 .hdr-logo{display:flex;align-items:center;gap:12px}
@@ -19964,7 +19964,7 @@ body .help-modal.global-view-overlay {
 }
 .fb-diag-content {
   padding: 4px 14px 12px;
-  font-family: ui-monospace, monospace;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;   /* v3358 · B6 */
   font-size: 11px;
   color: rgba(255,255,255,0.55);
 }
@@ -20183,7 +20183,7 @@ body .help-modal.global-view-overlay {
 .fb-diag-line {
   padding: 3px 0;
   font-size: 11px;
-  font-family: ui-monospace, "SFMono-Regular", Consolas, monospace;
+  font-family: 'JetBrains Mono', ui-monospace, "SFMono-Regular", Consolas, monospace;   /* v3358 · B6 */
   color: rgba(255,255,255,0.7);
   display: flex;
   gap: 8px;
@@ -20366,7 +20366,7 @@ body.fb-modal-open.plan-free .body::before {
 #feedback-modal .hero-cat .ic { width: 11px; height: 11px; display: inline-flex; }
 #feedback-modal .hero-cat .ic svg { width: 100%; height: 100%; }
 #feedback-modal .hero-h {
-  font-family: Georgia, "Cormorant Garamond", serif;
+  font-family: "Cormorant Garamond", Georgia, serif;   /* v3358 · B2: Cormorant zuerst */
   font-size: 30px;
   color: #fff;
   margin: 8px 0 0;
@@ -41724,3 +41724,28 @@ body.dp-dg-2 :is(#s0, #s1, #s2, #s3, #s4, #s3-tax, #s5, #s6, #s8) [data-dp-dg="3
   filter: brightness(.92);
   color: #fff !important;
 }
+
+/* v3358 · Messkabine 14.11.2026 (Dateien/Fehler/messkabine-ui-pruefung-2026-11-14.md, A1-A7): EIN Schliessen-Knopf.
+   Sieben Bauarten mit Radien 0/4/8/9 px und 50 %, auf dem Handy durch min-height 44 (style.css:23106) zu Ovalen
+   gestreckt (bmf-close 32x44, beta-close 30x44), iexp-close und pricing-close wechselten die Form zwischen den Breiten.
+   Jetzt: quadratisch, 32 px Desktop / 44 px Handy, Radius 9 px, Zeichen mittig. Farben bleiben je Fenster. */
+.bmf-close.bmf-close, .beta-close.beta-close, .fb-close.fb-close, .dp-band-close.dp-band-close, .dpw-zu.dpw-zu,
+.iexp-close.iexp-close, .pricing-close.pricing-close, .pricing-modal-close.pricing-modal-close, .bsheet-close.bsheet-close,
+.dp-pf-mclose.dp-pf-mclose, .v10-modal-close.v10-modal-close, .dpb-zu.dpb-zu {
+  width: 32px !important; height: 32px !important; min-width: 32px !important; min-height: 32px !important; max-width: 32px !important; max-height: 32px !important;
+  flex: 0 0 32px !important; padding: 0 !important; border-radius: 9px !important; box-sizing: border-box !important;
+  display: inline-flex !important; align-items: center !important; justify-content: center !important;
+  line-height: 1 !important; font-family: Inter, system-ui, sans-serif !important;
+}
+.dpw-zu.dpw-zu { border: 1px solid #E0DBD3 !important; background: #fff !important; color: #7A7370 !important; font-size: 18px !important; }
+.fb-close.fb-close > span { display: inline-flex !important; width: 16px; height: 16px; }
+@media (max-width: 640px) {
+  .bmf-close.bmf-close, .beta-close.beta-close, .fb-close.fb-close, .dp-band-close.dp-band-close, .dpw-zu.dpw-zu,
+  .iexp-close.iexp-close, .pricing-close.pricing-close, .pricing-modal-close.pricing-modal-close, .bsheet-close.bsheet-close,
+  .dp-pf-mclose.dp-pf-mclose, .v10-modal-close.v10-modal-close, .dpb-zu.dpb-zu {
+    width: 44px !important; height: 44px !important; min-width: 44px !important; min-height: 44px !important; max-width: 44px !important; max-height: 44px !important;
+    flex: 0 0 44px !important; border-radius: 9px !important;
+  }
+}
+/* v3358 · D1: „Wohneinheiten im Gebäude“ war abgeschnitten (145/122) */
+.od-raster.od-gebaeude > .f > label { white-space: normal !important; overflow: visible !important; text-overflow: clip !important; }

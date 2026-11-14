@@ -109,8 +109,7 @@
 
   background: var(--dp-bg);
   color: var(--dp-text);
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
-               'Helvetica Neue', Arial, sans-serif;
+  font-family: Inter, system-ui, sans-serif;   /* v3358 · Messkabine B1: Hausschrift statt Systemschrift */
   padding: 80px 20px;
   box-sizing: border-box;
   position: relative;
@@ -1048,3 +1047,6 @@
   #pricing-modal .pm-falte-btn{ display: none !important; }
   #pricing-modal .dp-feature-table-wrap .pm-falte-zu{ display: block !important; }
 }
+
+/* v3358 · B1: Ueberschriften in Space Grotesk */
+.pricing-modal-overlay h1, .pricing-modal-overlay h2, .pricing-modal-overlay h3 { font-family: 'Space Grotesk', Inter, sans-serif; }

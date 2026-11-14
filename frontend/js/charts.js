@@ -58,7 +58,7 @@ function _baseOpts(c) {
       legend: {
         position: 'top', align: 'start',
         labels: {
-          font: { size: 11, family: 'DM Sans', weight: '500' },
+          font: { size: 11, family: 'Inter', weight: '500' },
           color: c.ch, boxWidth: 12, boxHeight: 12,
           usePointStyle: true, padding: 14
         }
@@ -66,16 +66,16 @@ function _baseOpts(c) {
       tooltip: {
         backgroundColor: c.ch, titleColor: c.gold, bodyColor: '#fff',
         borderColor: c.gold, borderWidth: 1, padding: 11, cornerRadius: 6,
-        titleFont: { size: 12, family: 'DM Sans', weight: '600' },
-        bodyFont:  { size: 11, family: 'DM Sans' },
+        titleFont: { size: 12, family: 'Inter', weight: '600' },
+        bodyFont:  { size: 11, family: 'Inter' },
         displayColors: true, boxPadding: 4
       }
     },
     scales: {
       x: { grid: { color: c.grid, drawBorder: false },
-           ticks: { font: { size: 10, family: 'DM Sans' }, color: c.text, padding: 4 } },
+           ticks: { font: { size: 10, family: 'Inter' }, color: c.text, padding: 4 } },
       y: { grid: { color: c.grid, drawBorder: false },
-           ticks: { font: { size: 10, family: 'DM Sans' }, color: c.text, padding: 6,
+           ticks: { font: { size: 10, family: 'Inter' }, color: c.text, padding: 6,
                     callback: function(v) { return _fmtK(v) + ' €'; } } }
     }
   };
@@ -101,7 +101,7 @@ function _ezbLine(c, bindjIdx, label) {
       ctx.setLineDash([]);
       if (label) {
         ctx.fillStyle = c.gold;
-        ctx.font = '600 9.5px DM Sans';
+        ctx.font = '600 9.5px Inter';
         ctx.textAlign = 'center';
         ctx.fillText(label, x, area.top - 2);
       }
@@ -356,26 +356,26 @@ function buildCharts() {
             var yRs   = ySc.getPixelForValue(lastRs);
 
             ctx.save();
-            ctx.font = '600 11px DM Sans';
+            ctx.font = '600 11px Inter';
             ctx.textAlign = 'left';
             ctx.fillStyle = c.green;
             ctx.fillText(_fmtK(lastWert) + ' €', area.right + 8, yWert + 4);
-            ctx.font = '9px DM Sans';
+            ctx.font = '9px Inter';
             ctx.fillStyle = c.text;
             ctx.fillText('Marktwert', area.right + 8, yWert + 16);
 
-            ctx.font = '600 11px DM Sans';
+            ctx.font = '600 11px Inter';
             ctx.fillStyle = c.red;
             ctx.fillText(_fmtK(lastRs) + ' €', area.right + 8, yRs + 4);
-            ctx.font = '9px DM Sans';
+            ctx.font = '9px Inter';
             ctx.fillStyle = c.text;
             ctx.fillText('Restschuld', area.right + 8, yRs + 16);
 
             var midY = (yWert + yRs) / 2;
-            ctx.font = '700 12px DM Sans';
+            ctx.font = '700 12px Inter';
             ctx.fillStyle = c.gold;
             ctx.fillText('+' + _fmtK(lastEq) + ' €', area.right + 8, midY + 2);
-            ctx.font = '9px DM Sans';
+            ctx.font = '9px Inter';
             ctx.fillStyle = c.text;
             ctx.fillText('Equity', area.right + 8, midY + 14);
             ctx.restore();

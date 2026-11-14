@@ -343,11 +343,11 @@ if (!window._wlc) {
                 yLabels.map(function(l) { return '<line x1="80" y1="' + l.y + '" x2="1080" y2="' + l.y + '" stroke-dasharray="2 4"/>'; }).join('') +
               '</g>' +
               // Y-Labels
-              '<g font-family="DM Sans" font-size="11" fill="#7A7370" font-weight="500" text-anchor="end">' +
+              '<g font-family="Inter" font-size="11" fill="#7A7370" font-weight="500" text-anchor="end">' +
                 yLabels.map(function(l) { return '<text x="68" y="' + (l.y + 4) + '">' + l.label + '</text>'; }).join('') +
               '</g>' +
               // X-Labels
-              '<g font-family="DM Sans" font-size="10.5" fill="#9C9590" font-weight="500" text-anchor="middle">' +
+              '<g font-family="Inter" font-size="10.5" fill="#9C9590" font-weight="500" text-anchor="middle">' +
                 xLabels.map(function(l) { return '<text x="' + l.x.toFixed(1) + '" y="345">' + l.label + '</text>'; }).join('') +
               '</g>' +
               // Equity-Fläche
@@ -356,7 +356,7 @@ if (!window._wlc) {
               (ezbX ? '<g>' +
                 '<line x1="' + ezbX.toFixed(1) + '" y1="50" x2="' + ezbX.toFixed(1) + '" y2="320" stroke="' + window._wlc('#C9A84C') + '" stroke-width="1" stroke-dasharray="2 4" opacity="0.55"/>' +
                 '<rect x="' + (ezbX - 38).toFixed(1) + '" y="35" width="76" height="18" rx="3" fill="' + window._wlc('#C9A84C') + '" opacity="0.95"/>' +
-                '<text x="' + ezbX.toFixed(1) + '" y="48" font-family="DM Sans" font-size="9.5" fill="#1A1414" font-weight="700" text-anchor="middle" letter-spacing="0.10em">EZB · ' + ((cfRows[ezbIdx] && cfRows[ezbIdx].cal ? cfRows[ezbIdx].cal : new Date().getFullYear()) + 1) + '</text>' +
+                '<text x="' + ezbX.toFixed(1) + '" y="48" font-family="Inter" font-size="9.5" fill="#1A1414" font-weight="700" text-anchor="middle" letter-spacing="0.10em">EZB · ' + ((cfRows[ezbIdx] && cfRows[ezbIdx].cal ? cfRows[ezbIdx].cal : new Date().getFullYear()) + 1) + '</text>' +
               '</g>' : '') +
               // Equity-Label IN der Fläche
               '<text x="' + ((px(0) + px(n-1)) / 2).toFixed(1) + '" y="200" font-family="Cormorant Garamond" font-size="42" fill="#3FA56C" font-weight="700" text-anchor="middle" opacity="0.18">EQUITY</text>' +
@@ -374,13 +374,13 @@ if (!window._wlc) {
               // End-Annotationen RECHTS (versetzt nach LINKS damit Datenpunkt sichtbar bleibt)
               '<g>' +
                 '<rect x="' + (px(n-1) - 175).toFixed(1) + '" y="' + (py(endWert) - 20).toFixed(1) + '" width="80" height="36" rx="6" fill="#FAFAF7" stroke="#3FA56C" stroke-width="1.5" opacity="0.95"/>' +
-                '<text x="' + (px(n-1) - 135).toFixed(1) + '" y="' + (py(endWert) - 6).toFixed(1) + '" font-family="DM Sans" font-size="13" fill="#3FA56C" font-weight="700" text-anchor="middle">' + _fmtK(endWert) + '</text>' +
-                '<text x="' + (px(n-1) - 135).toFixed(1) + '" y="' + (py(endWert) + 8).toFixed(1) + '" font-family="DM Sans" font-size="9" fill="#3FA56C" font-weight="500" text-anchor="middle" letter-spacing="0.05em">MARKTWERT</text>' +
+                '<text x="' + (px(n-1) - 135).toFixed(1) + '" y="' + (py(endWert) - 6).toFixed(1) + '" font-family="Inter" font-size="13" fill="#3FA56C" font-weight="700" text-anchor="middle">' + _fmtK(endWert) + '</text>' +
+                '<text x="' + (px(n-1) - 135).toFixed(1) + '" y="' + (py(endWert) + 8).toFixed(1) + '" font-family="Inter" font-size="9" fill="#3FA56C" font-weight="500" text-anchor="middle" letter-spacing="0.05em">MARKTWERT</text>' +
               '</g>' +
               '<g>' +
                 '<rect x="' + (px(n-1) - 175).toFixed(1) + '" y="' + (py(endRs) - 16).toFixed(1) + '" width="80" height="36" rx="6" fill="#FAFAF7" stroke="#B8625C" stroke-width="1.5" opacity="0.95"/>' +
-                '<text x="' + (px(n-1) - 135).toFixed(1) + '" y="' + (py(endRs) - 2).toFixed(1) + '" font-family="DM Sans" font-size="13" fill="#B8625C" font-weight="700" text-anchor="middle">' + _fmtK(endRs) + '</text>' +
-                '<text x="' + (px(n-1) - 135).toFixed(1) + '" y="' + (py(endRs) + 12).toFixed(1) + '" font-family="DM Sans" font-size="9" fill="#B8625C" font-weight="500" text-anchor="middle" letter-spacing="0.05em">RESTSCHULD</text>' +
+                '<text x="' + (px(n-1) - 135).toFixed(1) + '" y="' + (py(endRs) - 2).toFixed(1) + '" font-family="Inter" font-size="13" fill="#B8625C" font-weight="700" text-anchor="middle">' + _fmtK(endRs) + '</text>' +
+                '<text x="' + (px(n-1) - 135).toFixed(1) + '" y="' + (py(endRs) + 12).toFixed(1) + '" font-family="Inter" font-size="9" fill="#B8625C" font-weight="500" text-anchor="middle" letter-spacing="0.05em">RESTSCHULD</text>' +
               '</g>' +
               // Equity-Klammer rechts (zwischen den Endpunkten)
               '<g>' +
@@ -388,8 +388,8 @@ if (!window._wlc) {
                 '<line x1="' + (px(n-1) - 40).toFixed(1) + '" y1="' + py(endWert).toFixed(1) + '" x2="' + (px(n-1) - 30).toFixed(1) + '" y2="' + py(endWert).toFixed(1) + '" stroke="' + window._wlc('#C9A84C') + '" stroke-width="1.5"/>' +
                 '<line x1="' + (px(n-1) - 40).toFixed(1) + '" y1="' + py(endRs).toFixed(1) + '" x2="' + (px(n-1) - 30).toFixed(1) + '" y2="' + py(endRs).toFixed(1) + '" stroke="' + window._wlc('#C9A84C') + '" stroke-width="1.5"/>' +
                 '<rect x="' + (px(n-1) - 82).toFixed(1) + '" y="' + ((py(endWert) + py(endRs)) / 2 - 17).toFixed(1) + '" width="94" height="34" rx="6" fill="' + window._wlc('#C9A84C') + '"/>' +
-                '<text x="' + (px(n-1) - 35).toFixed(1) + '" y="' + ((py(endWert) + py(endRs)) / 2 - 3).toFixed(1) + '" font-family="DM Sans" font-size="13" fill="#1A1414" font-weight="800" text-anchor="middle">' + _fmtK(equityGain, true) + '</text>' +
-                '<text x="' + (px(n-1) - 35).toFixed(1) + '" y="' + ((py(endWert) + py(endRs)) / 2 + 11).toFixed(1) + '" font-family="DM Sans" font-size="9" fill="#1A1414" font-weight="600" text-anchor="middle" letter-spacing="0.10em">EQUITY</text>' +
+                '<text x="' + (px(n-1) - 35).toFixed(1) + '" y="' + ((py(endWert) + py(endRs)) / 2 - 3).toFixed(1) + '" font-family="Inter" font-size="13" fill="#1A1414" font-weight="800" text-anchor="middle">' + _fmtK(equityGain, true) + '</text>' +
+                '<text x="' + (px(n-1) - 35).toFixed(1) + '" y="' + ((py(endWert) + py(endRs)) / 2 + 11).toFixed(1) + '" font-family="Inter" font-size="9" fill="#1A1414" font-weight="600" text-anchor="middle" letter-spacing="0.10em">EQUITY</text>' +
               '</g>' +
             '</svg>' +
           '</div>' +
@@ -565,9 +565,9 @@ if (!window._wlc) {
         '</defs>' +
         // Threshold-Lines
         (thY != null ? '<line x1="0" y1="' + thY.toFixed(1) + '" x2="540" y2="' + thY.toFixed(1) + '" stroke="' + thresholdLine.color + '" stroke-width="1" stroke-dasharray="3 3" opacity="0.40"/>' +
-          '<text x="535" y="' + (thY - 3).toFixed(1) + '" font-family="DM Sans" font-size="9" fill="' + thresholdLine.color + '" text-anchor="end" font-weight="600">' + _esc(thresholdLine.label) + '</text>' : '') +
+          '<text x="535" y="' + (thY - 3).toFixed(1) + '" font-family="Inter" font-size="9" fill="' + thresholdLine.color + '" text-anchor="end" font-weight="600">' + _esc(thresholdLine.label) + '</text>' : '') +
         (thY2 != null ? '<line x1="0" y1="' + thY2.toFixed(1) + '" x2="540" y2="' + thY2.toFixed(1) + '" stroke="' + thresholdLine2.color + '" stroke-width="1" stroke-dasharray="3 3" opacity="0.40"/>' +
-          '<text x="535" y="' + (thY2 - 3).toFixed(1) + '" font-family="DM Sans" font-size="9" fill="' + thresholdLine2.color + '" text-anchor="end" font-weight="600">' + _esc(thresholdLine2.label) + '</text>' : '') +
+          '<text x="535" y="' + (thY2 - 3).toFixed(1) + '" font-family="Inter" font-size="9" fill="' + thresholdLine2.color + '" text-anchor="end" font-weight="600">' + _esc(thresholdLine2.label) + '</text>' : '') +
         '<path d="' + areaPath + '" fill="url(#' + gradId + ')"/>' +
         '<path d="' + path + '" fill="none" stroke="' + color + '" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>' +
         (ezbX != null ? '<line x1="' + ezbX.toFixed(1) + '" y1="0" x2="' + ezbX.toFixed(1) + '" y2="100" stroke="' + window._wlc('#C9A84C') + '" stroke-width="1" stroke-dasharray="2 4" opacity="0.55"/>' : '') +
@@ -870,7 +870,7 @@ if (!window._wlc) {
                 '<line x1="80" y1="245" x2="1080" y2="245" stroke-dasharray="2 4"/>' +
               '</g>' +
               // Y-Labels
-              '<g font-family="DM Sans" font-size="10.5" fill="#7A7370" font-weight="500" text-anchor="end">' +
+              '<g font-family="Inter" font-size="10.5" fill="#7A7370" font-weight="500" text-anchor="end">' +
                 '<text x="68" y="54">' + _fmtK(yTop) + '</text>' +
                 '<text x="68" y="119">' + _fmtK(yTop * 0.75) + '</text>' +
                 '<text x="68" y="184">' + _fmtK(yTop * 0.5) + '</text>' +
@@ -891,7 +891,7 @@ if (!window._wlc) {
                   '<rect x="' + bar2X + '" y="' + bar2Top.toFixed(1) + '" width="' + barW + '" height="' + bar2H.toFixed(1) + '" rx="6" fill="url(#bc-wf-bar2)"/>' +
                   '<rect x="' + bar2X + '" y="' + bar2Top.toFixed(1) + '" width="' + barW + '" height="3" rx="6" fill="#A0F0BE" opacity="0.7"/>' +
                 '</g>'
-                : '<text x="' + (bar2X + barW/2) + '" y="295" font-family="DM Sans" font-size="10" fill="#9C9590" text-anchor="middle">– 0 € –</text>') +
+                : '<text x="' + (bar2X + barW/2) + '" y="295" font-family="Inter" font-size="10" fill="#9C9590" text-anchor="middle">– 0 € –</text>') +
               '<line x1="' + (bar2X + barW) + '" y1="' + bar2Top.toFixed(1) + '" x2="' + bar3X + '" y2="' + bar2Top.toFixed(1) + '" stroke="#2A2727" stroke-width="1.2" stroke-dasharray="4 3" opacity="0.40"/>' +
               // Bar 3: Steuervorteil (oder -last)
               // V63.85 BUG #3: Mindesthöhe + Label IMMER sichtbar
@@ -907,7 +907,7 @@ if (!window._wlc) {
                   '<g filter="url(#bc-wf-shadow)">' +
                     '<rect x="' + bar3X + '" y="' + bar2Top.toFixed(1) + '" width="' + barW + '" height="' + Math.max(bar3MinH, bar3Top - bar2Top).toFixed(1) + '" rx="6" fill="#B8625C" opacity="0.65"/>' +
                   '</g>')
-                : '<text x="' + (bar3X + barW/2) + '" y="295" font-family="DM Sans" font-size="10" fill="#9C9590" text-anchor="middle">– 0 € –</text>') +
+                : '<text x="' + (bar3X + barW/2) + '" y="295" font-family="Inter" font-size="10" fill="#9C9590" text-anchor="middle">– 0 € –</text>') +
               '<line x1="' + (bar3X + barW) + '" y1="' + bar3Top.toFixed(1) + '" x2="' + bar4X + '" y2="' + bar3Top.toFixed(1) + '" stroke="#2A2727" stroke-width="1.2" stroke-dasharray="4 3" opacity="0.40"/>' +
               // Bar 4: Wertsteigerung
               '<g filter="url(#bc-wf-shadow)">' +
@@ -925,7 +925,7 @@ if (!window._wlc) {
                 '</g>' +
               '</g>' +
               // X-Labels
-              '<g font-family="DM Sans" font-size="10.5" fill="#2A2727" font-weight="600" text-anchor="middle">' +
+              '<g font-family="Inter" font-size="10.5" fill="#2A2727" font-weight="600" text-anchor="middle">' +
                 '<text x="' + (bar1X + barW/2) + '" y="325">' + (hasBsparW ? 'Tilgung + Bausparen' : 'Tilgung') + '</text>' +
                 /* v2465 · gemessen im Bank-PDF: die Unterzeilen liefen ineinander
                    („SCHULD ABGEBAUTKONTO-RESERVE") - im Bild fehlt die Webschrift, die
@@ -941,7 +941,7 @@ if (!window._wlc) {
                 '<text x="' + (bar5X + barW5/2) + '" y="340" font-size="9" fill="' + window._wlc('#A68A36') + '" font-weight="600" letter-spacing="0.05em">VERMÖGENSZUWACHS</text>' +
               '</g>' +
               // Werte AUF den Bars
-              '<g font-family="DM Sans" font-weight="700" text-anchor="middle">' +
+              '<g font-family="Inter" font-weight="700" text-anchor="middle">' +
                 '<text x="' + (bar1X + barW/2) + '" y="' + (bar1Top + Math.min(30, bar1H/2 + 5)).toFixed(1) + '" font-size="14" fill="#1A1414">' + _fmtK(tilgEffektiv, true) + '</text>' +
                 (bar2H > 18 ? '<text x="' + (bar2X + barW/2) + '" y="' + (bar2Top + Math.min(30, bar2H/2 + 5)).toFixed(1) + '" font-size="14" fill="#FAFAF7">' + _fmtK(cfVstSum, true) + '</text>' : '') +
                 // V63.85 BUG #3: Steuer-Wert IMMER zeigen — Label ÜBER dem Bar (nicht in ihm)

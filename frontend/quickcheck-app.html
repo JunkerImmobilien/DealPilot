@@ -49,7 +49,7 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   background: var(--surface);
   color: var(--text);
   font-size: 14px;
@@ -439,7 +439,7 @@ body::before {
   color: var(--ch);
   cursor: pointer;
   transition: all 0.15s;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   position: relative;
 }
 .btn:hover:not([disabled]) {
@@ -1443,12 +1443,12 @@ body::before {
 .avm6-spancol{display:flex;flex-direction:column;gap:5px}
 .avm6-seg-lbl{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--gold-3,#9a7f33)}
 .avm6-seg{display:inline-flex;border:1px solid color-mix(in srgb, var(--gold, #C9A84C) 45%, transparent);border-radius:8px;overflow:hidden}
-.avm6-seg button{padding:5px 11px;border:0;border-right:1px solid color-mix(in srgb, var(--gold, #C9A84C) 30%, transparent);background:#fff;cursor:pointer;font:600 12px/1 'DM Sans',system-ui,sans-serif;color:var(--ch2,#6b6660)}
+.avm6-seg button{padding:5px 11px;border:0;border-right:1px solid color-mix(in srgb, var(--gold, #C9A84C) 30%, transparent);background:#fff;cursor:pointer;font:600 12px/1 'Inter',system-ui,sans-serif;color:var(--ch2,#6b6660)}
 .avm6-seg button:last-child{border-right:0}
 .avm6-seg button.sel{background:var(--gold,#C9A84C);color:#fff}
 .avm6-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:8px;padding-top:10px;border-top:1px solid rgba(42,39,39,0.07)}
 .avm6-disc{flex:1 1 auto;font-size:10.5px;color:var(--muted,#7A7370)}
-.avm6-apply{display:inline-flex;align-items:center;gap:7px;padding:8px 14px;border:1px solid color-mix(in srgb, var(--gold, #C9A84C) 50%, transparent);border-radius:10px;background:#fff;cursor:pointer;font:700 12.5px/1 'DM Sans',system-ui,sans-serif;color:var(--gold-3,#9a7f33);transition:background .15s ease,box-shadow .15s ease}
+.avm6-apply{display:inline-flex;align-items:center;gap:7px;padding:8px 14px;border:1px solid color-mix(in srgb, var(--gold, #C9A84C) 50%, transparent);border-radius:10px;background:#fff;cursor:pointer;font:700 12.5px/1 'Inter',system-ui,sans-serif;color:var(--gold-3,#9a7f33);transition:background .15s ease,box-shadow .15s ease}
 .avm6-apply:hover{background:color-mix(in srgb, var(--gold, #C9A84C) 10%, transparent);box-shadow:0 4px 12px -6px color-mix(in srgb, var(--gold, #C9A84C) 50%, transparent)}
 .avm6-apply svg{width:13px;height:13px;stroke:currentColor}
 @media (max-width:640px){.avm6-cols{flex-direction:column}.avm6-coldiv{width:auto;height:1px}}
@@ -2032,7 +2032,7 @@ body::before {
   font-weight: 600;
   cursor: pointer;
   transition: all 0.15s;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
 }
 .save-btn:hover:not([disabled]) {
   border-color: var(--gold);
@@ -2230,7 +2230,7 @@ body::before {
   border-top: 1px solid var(--border);
 }
 
-.modal input[type="password"] {
+.modal input[type="text"], .modal input[type="password"] {   /* v3358 · Messkabine C1: das Schluesselfeld ist seit v3177 type=text */
   width: 100%;
   padding: 10px 12px;
   background: #fff;
@@ -2239,7 +2239,7 @@ body::before {
   font: inherit;
   margin-bottom: 12px;
 }
-.modal input[type="password"]:focus {
+.modal input[type="text"]:focus, .modal input[type="password"]:focus {
   outline: none;
   border-color: var(--gold);
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--gold, #C9A84C) 12%, transparent);
@@ -2296,7 +2296,7 @@ body::before {
   border: 0;
   background: transparent;
   padding: 7px 14px;
-  font: 600 13px/1 'DM Sans', system-ui, sans-serif;
+  font: 600 13px/1 'Inter', system-ui, sans-serif;
   color: var(--ch2, #6b6660);
   cursor: pointer;
   transition: background .18s ease, color .18s ease;
@@ -2314,7 +2314,7 @@ body::before {
   gap: 8px;
 }
 .qc6-seg-lbl {
-  font: 600 12px/1 'DM Sans', system-ui, sans-serif;
+  font: 600 12px/1 'Inter', system-ui, sans-serif;
   color: var(--ch2, #6b6660);
   letter-spacing: .02em;
 }
@@ -2325,7 +2325,7 @@ body::before {
   border: 1px solid rgba(42,39,39,0.18);
   border-radius: 10px;
   padding: 8px 30px 8px 12px;
-  font: 500 13px/1.2 'DM Sans', system-ui, sans-serif;
+  font: 500 13px/1.2 'Inter', system-ui, sans-serif;
   color: var(--ch, #2A2727);
   background: #fff url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'><path d='M2 4l4 4 4-4' fill='none' stroke='%239a7f33' stroke-width='1.5' stroke-linecap='round'/></svg>") no-repeat right 10px center;
   cursor: pointer;
@@ -2387,15 +2387,15 @@ body::before {
 .qc6-credit-row:last-of-type { border-bottom: 0; }
 .qc6-credit-name {
   display: flex; align-items: center; gap: 8px;
-  font: 500 14px/1.2 'DM Sans', system-ui, sans-serif;
+  font: 500 14px/1.2 'Inter', system-ui, sans-serif;
   color: var(--ch, #2A2727);
 }
 .qc6-credit-sub {
-  font: 400 12px/1.2 'DM Sans', system-ui, sans-serif;
+  font: 400 12px/1.2 'Inter', system-ui, sans-serif;
   color: var(--ch2, #6b6660);
 }
 .qc6-credit-cost {
-  font: 600 14px/1 'DM Sans', system-ui, sans-serif;
+  font: 600 14px/1 'Inter', system-ui, sans-serif;
   color: var(--gold-3, #9a7f33);
   white-space: nowrap;
 }
@@ -2405,26 +2405,26 @@ body::before {
   border-top: 2px solid color-mix(in srgb, var(--gold, #C9A84C) 40%, transparent);
 }
 .qc6-credit-total .lbl {
-  font: 600 15px/1 'DM Sans', system-ui, sans-serif; color: var(--ch, #2A2727);
+  font: 600 15px/1 'Inter', system-ui, sans-serif; color: var(--ch, #2A2727);
 }
 .qc6-credit-total .val {
   font: 700 18px/1 'Cormorant Garamond', Georgia, serif; color: var(--gold-3, #9a7f33);
 }
 .qc6-credit-note {
   margin-top: 10px;
-  font: 400 12px/1.4 'DM Sans', system-ui, sans-serif;
+  font: 400 12px/1.4 'Inter', system-ui, sans-serif;
   color: var(--ch2, #6b6660);
 }
 
 /* ── Settings-Modal Inhalt ── */
 .qc6-set-section { margin: 6px 0 14px; }
 .qc6-set-label {
-  font: 600 13px/1.2 'DM Sans', system-ui, sans-serif;
+  font: 600 13px/1.2 'Inter', system-ui, sans-serif;
   color: var(--ch, #2A2727);
   margin-bottom: 8px;
 }
 .qc6-set-hint {
-  font: 400 12px/1.4 'DM Sans', system-ui, sans-serif;
+  font: 400 12px/1.4 'Inter', system-ui, sans-serif;
   color: var(--ch2, #6b6660);
   margin-top: 6px;
 }
@@ -2442,7 +2442,7 @@ body::before {
 .qc6-prog-step {
   display: flex; align-items: center; gap: 10px;
   padding: 6px 0;
-  font: 500 13px/1.2 'DM Sans', system-ui, sans-serif;
+  font: 500 13px/1.2 'Inter', system-ui, sans-serif;
   color: var(--ch2, #6b6660);
 }
 .qc6-prog-step .dot {
@@ -2473,7 +2473,7 @@ body::before {
 }
 .avm6-spanrow + .avm6-spanrow { margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(42,39,39,0.08); }
 .avm6-span-title {
-  font: 600 13px/1.2 'DM Sans', system-ui, sans-serif;
+  font: 600 13px/1.2 'Inter', system-ui, sans-serif;
   color: var(--ch, #2A2727);
   margin-bottom: 6px;
   display: flex; align-items: center; gap: 6px;
@@ -2486,16 +2486,16 @@ body::before {
   color: var(--gold-3, #9a7f33);
 }
 .avm6-span-range {
-  font: 500 13px/1.2 'DM Sans', system-ui, sans-serif;
+  font: 500 13px/1.2 'Inter', system-ui, sans-serif;
   color: var(--ch2, #6b6660);
 }
 .avm6-span-sqm {
-  font: 400 12px/1.2 'DM Sans', system-ui, sans-serif;
+  font: 400 12px/1.2 'Inter', system-ui, sans-serif;
   color: var(--ch2, #6b6660);
   margin-top: 3px;
 }
 .avm6-applied-tag {
-  font: 600 11px/1 'DM Sans', system-ui, sans-serif;
+  font: 600 11px/1 'Inter', system-ui, sans-serif;
   color: var(--gold-3, #9a7f33);
   text-transform: uppercase; letter-spacing: .04em;
   background: color-mix(in srgb, var(--gold, #C9A84C) 14%, transparent);
@@ -2532,7 +2532,7 @@ body::before {
   border-radius: 10px;
   background: #fff;
   cursor: pointer;
-  font: 500 13px/1 'DM Sans', system-ui, sans-serif;
+  font: 500 13px/1 'Inter', system-ui, sans-serif;
   color: var(--ch, #2A2727);
   transition: border-color .15s ease, background .15s ease, box-shadow .15s ease;
   user-select: none;
@@ -2555,7 +2555,7 @@ body::before {
 .qc7-src.on .qc7-box { background: var(--gold, #C9A84C); border-color: var(--gold, #C9A84C); }
 .qc7-src.on .qc7-box svg { opacity: 1; }
 /* v413-credit-hint: dezente Credit-Hinweiszeile unter der Aktionsleiste */
-.qc-credit-hint{margin:8px 2px 0;padding:8px 12px;font:500 12.5px/1.5 'DM Sans',system-ui,sans-serif;color:var(--wl-9c7223, #9C7223);background:rgba(229,168,71,0.10);border:1px solid rgba(229,168,71,0.42);border-radius:9px;display:flex;align-items:center;gap:8px}
+.qc-credit-hint{margin:8px 2px 0;padding:8px 12px;font:500 12.5px/1.5 'Inter',system-ui,sans-serif;color:var(--wl-9c7223, #9C7223);background:rgba(229,168,71,0.10);border:1px solid rgba(229,168,71,0.42);border-radius:9px;display:flex;align-items:center;gap:8px}
 .qc-credit-hint b{color:#7a5a16;font-weight:700}
 .qc-credit-dot{width:7px;height:7px;border-radius:50%;background:var(--gold,#C9A84C);flex-shrink:0;display:inline-block}
 /* v412-optik-paritaet: Marken-Logos + heller Abrufen-Button (wie Objekt-Tab) */
@@ -2571,7 +2571,7 @@ body::before {
 /* ── Credit-Modal: getrennte Credit-Typen ── */
 .qc7-credit-badge {
   display: inline-block;
-  font: 600 11px/1 'DM Sans', system-ui, sans-serif;
+  font: 600 11px/1 'Inter', system-ui, sans-serif;
   padding: 4px 8px; border-radius: 999px;
   background: color-mix(in srgb, var(--gold, #C9A84C) 16%, transparent); color: var(--gold-3, #9a7f33);
   white-space: nowrap;
@@ -2585,9 +2585,9 @@ body::before {
 }
 .qc7-credit-totline {
   display: flex; align-items: center; justify-content: space-between;
-  font: 600 14px/1 'DM Sans', system-ui, sans-serif; color: var(--ch, #2A2727);
+  font: 600 14px/1 'Inter', system-ui, sans-serif; color: var(--ch, #2A2727);
 }
-.qc7-credit-totline .v { font: 700 16px/1 'DM Sans', system-ui, sans-serif; color: var(--gold-3, #9a7f33); }
+.qc7-credit-totline .v { font: 700 16px/1 'Inter', system-ui, sans-serif; color: var(--gold-3, #9a7f33); }
 
 /* ── Pflichtfeld-Fehlblock im Modal ── */
 .qc7-missing {
@@ -2598,20 +2598,20 @@ body::before {
   border-radius: 12px;
 }
 .qc7-missing-head {
-  font: 600 13px/1.2 'DM Sans', system-ui, sans-serif;
+  font: 600 13px/1.2 'Inter', system-ui, sans-serif;
   color: #9c3f39; margin-bottom: 6px;
   display: flex; align-items: center; gap: 6px;
 }
 .qc7-missing ul { margin: 0; padding-left: 18px; }
 .qc7-missing li {
-  font: 400 13px/1.5 'DM Sans', system-ui, sans-serif; color: var(--ch, #2A2727);
+  font: 400 13px/1.5 'Inter', system-ui, sans-serif; color: var(--ch, #2A2727);
 }
 .qc7-missing li b { color: #9c3f39; }
 
 /* ── Card V7: professionelle Typografie + Icon-Slot ── */
 /* Werte in DM Sans (financial/tabular), größer, klare Hierarchie */
 .avm6-span-title {
-  font: 600 12px/1.2 'DM Sans', system-ui, sans-serif !important;
+  font: 600 12px/1.2 'Inter', system-ui, sans-serif !important;
   text-transform: uppercase; letter-spacing: .04em;
   color: var(--ch2, #6b6660) !important;
 }
@@ -2619,13 +2619,13 @@ body::before {
   display: inline-flex; color: var(--gold-3, #9a7f33);
 }
 .avm6-span-main {
-  font: 700 28px/1.05 'DM Sans', system-ui, sans-serif !important;
+  font: 700 28px/1.05 'Inter', system-ui, sans-serif !important;
   color: var(--ch, #2A2727) !important;
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.01em;
 }
 .avm6-span-range {
-  font: 500 14px/1.3 'DM Sans', system-ui, sans-serif !important;
+  font: 500 14px/1.3 'Inter', system-ui, sans-serif !important;
   color: var(--ch2, #6b6660) !important;
   font-variant-numeric: tabular-nums;
 }
@@ -2633,16 +2633,16 @@ body::before {
   color: var(--ch, #2A2727); font-weight: 700;
 }
 .avm6-span-sqm {
-  font: 500 13px/1.3 'DM Sans', system-ui, sans-serif !important;
+  font: 500 13px/1.3 'Inter', system-ui, sans-serif !important;
   color: var(--ch2, #6b6660) !important;
   font-variant-numeric: tabular-nums;
   margin-top: 4px !important;
 }
 .avm6-span-vals { gap: 4px 12px !important; align-items: baseline; }
 /* Provider-Name bleibt im Marken-Serif, das ist gewollt; Konfidenz-Badge sans */
-.avm5-conf { font-family: 'DM Sans', system-ui, sans-serif; }
+.avm5-conf { font-family: 'Inter', system-ui, sans-serif; }
 .avm6-applied-tag {
-  font-family: 'DM Sans', system-ui, sans-serif !important;
+  font-family: 'Inter', system-ui, sans-serif !important;
 }
 
 /* Mobile */
@@ -2705,7 +2705,7 @@ body::before {
   color: var(--gold);
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   margin-right: 4px;
   vertical-align: 1px;
 }
@@ -2720,7 +2720,7 @@ body::before {
   letter-spacing: 0.05em;
   text-transform: uppercase;
   margin-left: auto;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
 }
 .avm5-conf.good { background: var(--green-dim, rgba(63,165,108,.12)); color: var(--green, #3FA56C); border-color: rgba(63,165,108,0.3); }
 .avm5-conf.mid  { background: var(--gold-dim); color: var(--gold); border-color: color-mix(in srgb, var(--gold, #C9A84C) 30%, transparent); }
@@ -2783,7 +2783,7 @@ body::before {
   border-top: 1px solid var(--border);
 }
 .avm6-span-title {
-  font: 600 10px/1.2 'DM Sans', sans-serif !important;
+  font: 600 10px/1.2 'Inter', sans-serif !important;
   text-transform: uppercase;
   letter-spacing: 0.12em;
   color: var(--gold) !important;
@@ -2811,7 +2811,7 @@ body::before {
   letter-spacing: 0;
 }
 .avm6-span-range {
-  font: 500 13px/1.3 'DM Sans', sans-serif !important;
+  font: 500 13px/1.3 'Inter', sans-serif !important;
   color: var(--muted) !important;
   font-variant-numeric: tabular-nums;
 }
@@ -2821,13 +2821,13 @@ body::before {
   font-weight: 600;
 }
 .avm6-span-sqm {
-  font: 500 12px/1.4 'DM Sans', sans-serif !important;
+  font: 500 12px/1.4 'Inter', sans-serif !important;
   color: var(--ch2) !important;
   font-variant-numeric: tabular-nums;
   margin-top: 6px !important;
 }
 .avm6-applied-tag {
-  font: 600 9.5px/1.2 'DM Sans', sans-serif !important;
+  font: 600 9.5px/1.2 'Inter', sans-serif !important;
   color: var(--gold) !important;
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -2934,7 +2934,7 @@ body.dp-neue-karte .card > .card-title {
   display: flex;
   align-items: center;
   gap: 10px;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: 11.5px;
   font-weight: 700;
   text-transform: uppercase;
@@ -3000,7 +3000,7 @@ body.dp-neue-karte .card .field > select {
   padding: 0 11px;
   border: 1.5px solid var(--border, #E0DBD3);
   border-radius: 8px;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: 13px;
   color: var(--text, #2A2727);
   background-color: var(--white, #fff);
@@ -3054,7 +3054,7 @@ body.dp-neue-karte .card .field > .hint {
   body.dp-neue-karte .card .field > select {
     height: 36px;
     min-height: 44px;
-    font-size: 12.5px;
+    font-size: 16px;   /* v3358 · Messkabine C2: unter 16 px zoomt iOS beim Antippen */
     padding: 0 10px;
   }
 }
@@ -3067,6 +3067,9 @@ body.dp-neue-karte .card .field > label { color: rgba(42, 39, 39, .85); }
 body.dp-neue-karte .card > .card-title { font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 10px; font-weight: 700; color: #6B645A; letter-spacing: 1.2px; }
 body.dp-neue-karte .card .field > .hint { font-size: 11.5px; }
 /* /v3201 */
+/* v3358 · Messkabine A5: Schliessen-Knopf der Quick-Check-Fenster wie der Haus-Knopf (32 px, 9 px Radius, Inter) */
+.modal-close.modal-close{width:32px !important;height:32px !important;min-width:32px !important;min-height:32px !important;padding:0 !important;border-radius:9px !important;border:1px solid #E0DBD3 !important;background:#fff !important;display:inline-flex !important;align-items:center !important;justify-content:center !important;font:400 18px/1 Inter,system-ui,sans-serif !important;color:#7A7370 !important}
+@media (max-width:640px){.modal-close.modal-close{width:44px !important;height:44px !important;min-width:44px !important;min-height:44px !important}}
 </style>
 <style id="qc-app-overrides">
 button[onclick="QcApp.openQc6Settings()"] { display:none !important; }
@@ -3865,7 +3868,7 @@ button[onclick="QcApp.openQc6Settings()"] { display:none !important; }
       <div class="field">
         <label class="req" for="qc_hg">Hausgeld / Monat (€)</label>
         <input type="text" id="qc_hg" placeholder="221" inputmode="decimal" autocomplete="off">
-        <div class="qc-hg-hint" id="qc-hg-hint" style="font:500 11.5px/1.35 'DM Sans',system-ui,sans-serif;color:#6b6660;margin:5px 2px 0;min-height:14px"></div>
+        <div class="qc-hg-hint" id="qc-hg-hint" style="font:500 11.5px/1.35 'Inter',system-ui,sans-serif;color:#6b6660;margin:5px 2px 0;min-height:14px"></div>
         <span class="hint">Inkl. Heizung + Rücklagen — wie im Exposé oder Wirtschaftsplan</span>
         <span class="source">PDF</span>
       </div>
@@ -3893,7 +3896,7 @@ button[onclick="QcApp.openQc6Settings()"] { display:none !important; }
       <button class="ltv-btn" data-ltv="85" onclick="QcApp.setLtv(85, this)">85%</button>
       <button class="ltv-btn" data-ltv="80" onclick="QcApp.setLtv(80, this)">80%</button>
     </div>
-    <div class="qc-ltv-satz" id="qc-ltv-satz" style="font:500 11.5px/1.35 'DM Sans',system-ui,sans-serif;color:#6b6660;margin:-4px 2px 10px">Darlehen = 100 % vom Kaufpreis · Kaufnebenkosten aus Eigenkapital</div><!-- qc-v2420, qc-v2450, qc-v2546a -->
+    <div class="qc-ltv-satz" id="qc-ltv-satz" style="font:500 11.5px/1.35 'Inter',system-ui,sans-serif;color:#6b6660;margin:-4px 2px 10px">Darlehen = 100 % vom Kaufpreis · Kaufnebenkosten aus Eigenkapital</div><!-- qc-v2420, qc-v2450, qc-v2546a -->
     <!-- qc-v2546a · Kaufnebenkosten einzeln, in % und €, jede Position abwählbar -->
     <div class="qc-knk-box" id="qc-knk-box"></div>
     <input type="hidden" id="qc_knk_teile" value="">
@@ -8020,7 +8023,7 @@ html.qc-embedded, html.qc-embedded body{ min-height:0 !important; height:auto !i
   --cmut:#9a9080;--cline:color-mix(in srgb, var(--gold, #C9A84C) 20%, transparent);--ctrack:color-mix(in srgb, var(--gold, #C9A84C) 14%, transparent);
   position:relative;display:flex;align-items:stretch;border-radius:14px;overflow:hidden;
   border:1px solid color-mix(in srgb, var(--gold, #C9A84C) 22%, transparent);background:#0a0a0a;color:#fff;
-  box-shadow:0 24px 60px -38px rgba(0,0,0,.9);font-family:'Space Grotesk','DM Sans',system-ui,sans-serif; }
+  box-shadow:0 24px 60px -38px rgba(0,0,0,.9);font-family:'Space Grotesk','Inter',system-ui,sans-serif; }
 #qb-bp .qb-main{ flex:1;min-width:0;display:flex;flex-direction:column;background:#0a0a0a; }
 #qb-bp .ghead{ position:relative;overflow:hidden;display:flex;align-items:center;gap:9px;padding:11px 16px;background:linear-gradient(110deg,var(--gold-hi, #E8CC7A),var(--gold, #C9A84C) 52%,var(--gold-lo, #b8932f));min-height:44px; }
 #qb-bp .ghead::after{ content:"";position:absolute;inset:0;opacity:.42;pointer-events:none;background:repeating-linear-gradient(102deg,rgba(255,255,255,.10) 0 1px,transparent 1px 8px); }
@@ -8328,15 +8331,15 @@ html.qc-embedded, html.qc-embedded body{ min-height:0 !important; height:auto !i
 <style id="qb-sticky-fix">/* v708: Quickboarding-Karte scrollt normal mit (kein Kleben) */
 .score-perspective{position:static !important;top:auto !important;z-index:auto !important}</style>
 <style id="qb-credithint-skin">/* v715: Kerosin-Hinweis im QC = gleiche Optik wie Objekt-Tab (.oab-credit-hint) */
-.qc-credit-hint{color:var(--ch2,#6b6660) !important;background:color-mix(in srgb, var(--gold, #C9A84C) 8%, transparent) !important;border:1px solid color-mix(in srgb, var(--gold, #C9A84C) 22%, transparent) !important;border-radius:9px !important;font:500 12px/1.3 'DM Sans',system-ui,sans-serif !important}
+.qc-credit-hint{color:var(--ch2,#6b6660) !important;background:color-mix(in srgb, var(--gold, #C9A84C) 8%, transparent) !important;border:1px solid color-mix(in srgb, var(--gold, #C9A84C) 22%, transparent) !important;border-radius:9px !important;font:500 12px/1.3 'Inter',system-ui,sans-serif !important}
 .qc-credit-hint b{color:var(--ch,#2A2727) !important;font-weight:700 !important}
 .qc-credit-dot{background:var(--gold,#C9A84C) !important;box-shadow:0 0 0 3px color-mix(in srgb, var(--gold, #C9A84C) 18%, transparent) !important}</style>
 <style id="qb-pflead">/* v723: PRE-FLIGHT-Kopfzeile ueber der QC-Quellenleiste (wie Objekt-Tab) */
 .qc-pf-lead{display:inline-flex;align-items:center;gap:12px;margin:0 0 10px;padding:8px 14px;border:1px solid color-mix(in srgb, var(--gold, #C9A84C) 35%, transparent);border-radius:10px;background:color-mix(in srgb, var(--gold, #C9A84C) 6%, transparent)}
 .qc-pf-lead-txt{display:flex;align-items:baseline;gap:8px}
 .qc-pf-lead-txt b{font:700 12px/1 'JetBrains Mono',monospace;letter-spacing:.12em;color:#2A2727}
-.qc-pf-lead-txt small{font:500 11.5px/1 'DM Sans',system-ui,sans-serif;color:#7A7370}
-.qc-pf-lead-cnt{font:600 12px/1 'DM Sans',system-ui,sans-serif;color:var(--wl-7a5d18, #7a5d18);background:color-mix(in srgb, var(--gold, #C9A84C) 16%, transparent);padding:4px 10px;border-radius:20px}
+.qc-pf-lead-txt small{font:500 11.5px/1 'Inter',system-ui,sans-serif;color:#7A7370}
+.qc-pf-lead-cnt{font:600 12px/1 'Inter',system-ui,sans-serif;color:var(--wl-7a5d18, #7a5d18);background:color-mix(in srgb, var(--gold, #C9A84C) 16%, transparent);padding:4px 10px;border-radius:20px}
 .qc-pf-lead-cnt b{font-weight:700;color:#2A2727}</style>
 <script>/* qb-pflead: statische Anzeige + Live-Zaehler aktiver Quellen */
 (function(){

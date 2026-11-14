@@ -1515,7 +1515,8 @@
       '#mfh-modal .mfh-erbe .mfh-erbe-v{color:#8A8272}',
       '#mfh-modal .mfh-tab-zustand{min-width:620px}',
       /* Felder: Radius 2, 32 px in Tabellenzeilen, 38 px frei stehend */
-      '#mfh-modal .mfh-in{border-radius:2px;height:32px;padding:4px 8px}',
+      '#mfh-modal .mfh-in{border-radius:2px;height:38px;padding:4px 8px}',   /* v3358 · Messkabine C3: wie alle Felder 38 px */
+      '@media (max-width:640px){#mfh-modal .mfh-in{height:44px;font-size:16px}}',
       '#mfh-modal .mfh-in.mfh-in-gross{height:38px}',
       '#mfh-modal .mfh-feldzeile{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:12.5px;margin:0 0 8px}',
       '#mfh-modal .mfh-feldzeile>label{color:#2A2727}',
