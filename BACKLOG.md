@@ -36,6 +36,14 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
+### N164 · Steuer-Audit: offene Entscheidungen (Marcel 14.11.2026: „bitte prüfe auch noch mal alle Steuerberechnungen“) — **v3380/v3381 auf Staging, Bericht `Dateien/Fehler/steuer-audit-2026-11-14.md`; offen:**
+- BMF-Arbeitshilfe Kaufpreisaufteilung auf Fassung 02/2026 heben (Baupreisindex ab 2022 fest 164 statt ~189/197, Gebäudeanteil 3,5–4,5 Punkte zu niedrig) — wichtigster Punkt
+- IRR des privaten Exits ohne § 23-Steuer innerhalb der Frist
+- RND-Gutachten-Vorteil (`rnd-calc.js calcAfaVergleich`) rund doppelt zu hoch
+- Flow-API-Steuer ist Näherung, kein Prüfer; Kirchensteuer-Sonderausgabe; Kleinpunkte (Zeile 57 ff., GWG, Disagio)
+
+### N163 · Jahresabgleich im Bestand + E4 echte Miete (Marcel 14.11.2026) — **E4 v3366 (`dd484834`) auf Staging nachgemessen; Konzept + Klickdummy `design/Vorschläge/jahresabgleich.html`, Entscheidung Marcel offen; Prod-Liste alt→neu braucht Freigabe zum Lesen der Prod-DB**
+
 ### N162 · Denkmal-AfA § 7i / § 7h EStG (Marcel 13.11.2026 „ja“, aus dem Abgleich mit einem Steuer-Ratgeber für Vermieter) — **offen**
 
 - Gemessen 13.11.2026: `afa-engine.js` kennt linear 2/2,5/3 %, degressiv 5 % (§ 7 Abs. 5a) und § 7b, **aber keine Denkmal-AfA**; „7i“ steht nur in `anlage-v-2025.js` (Formularzeile) und `voice-import.js`.
