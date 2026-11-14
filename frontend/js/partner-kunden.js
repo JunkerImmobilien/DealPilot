@@ -699,6 +699,51 @@
     pane.appendChild(c);
   }
 
+  /* ── Seitenleiste des Partners: „Von Kunden freigegeben › Name“ (Konzept 5.4) ──
+     Unter den eigenen Objekten, getrennt je Kunde, aufklappbar. Kundenstaende stehen nie in der Objektliste
+     selbst (Backend schliesst sie aus), damit sie nicht mit eigenen Objekten verwechselt werden. */
+  var _ksCache = null, _ksZeit = 0, _ksAuf = {};
+  function sbGruppe() {
+    if (!S.partner) return;
+    var list = document.getElementById('sb-list'); if (!list || !list.parentNode) return;
+    var jetzt = Date.now();
+    var holen = (_ksCache && jetzt - _ksZeit < 60000) ? Promise.resolve(_ksCache) : api('/partner/kundenstaende').then(function (r) { _ksCache = r.kundenstaende || []; _ksZeit = Date.now(); return _ksCache; });
+    holen.then(function (l) {
+      var alt = document.getElementById('dppk-sbgruppe');
+      if (!l.length) { if (alt) alt.remove(); return; }
+      if (!alt) { alt = document.createElement('div'); alt.id = 'dppk-sbgruppe'; alt.setAttribute('style', 'margin:10px 0 6px;padding:0 4px'); }
+      if (alt.parentNode !== list.parentNode || alt.previousSibling !== list) list.parentNode.insertBefore(alt, list.nextSibling);
+      var g = {}; l.forEach(function (x) { (g[x.kunde] = g[x.kunde] || []).push(x); });
+      alt.innerHTML = '<div style="font:600 10.5px JetBrains Mono,monospace;letter-spacing:.08em;text-transform:uppercase;color:' + G + ';margin:6px 6px 6px">Von Kunden freigegeben</div>' +
+        Object.keys(g).map(function (kn) {
+          var neu = g[kn].filter(function (x) { return !x.gelesen_am; }).length, auf = !!_ksAuf[kn];
+          return '<div style="border:1px dashed color-mix(in srgb, ' + G + ' 55%, transparent);border-radius:10px;margin:0 0 8px;overflow:hidden">' +
+            '<button type="button" data-kn="' + esc(kn) + '" style="width:100%;display:flex;align-items:center;gap:8px;background:transparent;border:0;color:inherit;padding:8px 10px;cursor:pointer;font:600 12.5px Inter,sans-serif;text-align:left">' +
+            '<span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">› ' + esc(kn) + '</span>' + (neu ? '<span style="background:#3FA56C;color:#fff;border-radius:9px;padding:1px 7px;font:600 10.5px Inter">' + neu + ' neu</span>' : '') +
+            '<span style="opacity:.7;font:500 11px Inter">' + g[kn].length + '</span></button>' +
+            (auf ? g[kn].map(function (x) {
+              return '<button type="button" data-ks="' + x.kopie_object_id + '" data-s="' + x.share_id + '" style="width:100%;display:block;text-align:left;background:transparent;border:0;border-top:1px solid rgba(255,255,255,.08);color:inherit;padding:7px 12px;cursor:pointer;font:400 12px Inter,sans-serif">' +
+                '<b style="display:block;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + esc(x.name || x.seq_no || 'Objekt') + '</b><span style="opacity:.7">Stand ' + x.stand_nr + ' vom ' + datum(x.stand_am) + (x.gelesen_am ? '' : ' · neu') + '</span></button>';
+            }).join('') : '') + '</div>';
+        }).join('');
+      [].forEach.call(alt.querySelectorAll('[data-kn]'), function (b) { b.onclick = function () { var k = b.getAttribute('data-kn'); _ksAuf[k] = !_ksAuf[k]; sbGruppe(); }; });
+      [].forEach.call(alt.querySelectorAll('[data-ks]'), function (b) {
+        b.onclick = function () {
+          api('/partner/kundenstaende/' + b.getAttribute('data-s') + '/geoeffnet', { method: 'POST' }).then(function () { _ksZeit = 0; }).catch(function () {});
+          try { if (typeof setMainView === 'function') setMainView('single'); } catch (e) {}
+          if (typeof window.loadSaved === 'function') window.loadSaved(b.getAttribute('data-ks'));
+        };
+      });
+    }).catch(function () {});
+  }
+  function renderBeobachten() {
+    if (typeof window.renderSaved !== 'function' || window.renderSaved._dppk) return false;
+    var alt = window.renderSaved;
+    var neu = function () { var r = alt.apply(this, arguments); Promise.resolve(r).then(function () { setTimeout(sbGruppe, 30); }); return r; };
+    for (var k in alt) { try { if (Object.prototype.hasOwnProperty.call(alt, k)) neu[k] = alt[k]; } catch (e) {} }
+    neu._dppk = true; window.renderSaved = neu; return true;
+  }
+
   /* ── Start ───────────────────────────────────────────────────────────── */
   var _gestartet = false;
   function start() {
@@ -708,8 +753,8 @@
     _gestartet = true;
     stil();
     api('/mein-partner').then(function (m) { S.kunde = m; menuePflegen(); rechteAnwenden(); bandPflegen(); partnerzeile(); }).catch(function () {});
-    api('/partner/cockpit').then(function (c) { S.partner = c; menuePflegen(); }).catch(function () { S.partner = null; menuePflegen(); });
-    var n = 0, iv = setInterval(function () { var a = speichernSperren(), b = ladenBeobachten(); if ((a || window.saveObj && window.saveObj._dppk) && (b || window.loadSaved && window.loadSaved._dppk) || ++n > 40) clearInterval(iv); }, 500);
+    api('/partner/cockpit').then(function (c) { S.partner = c; menuePflegen(); sbGruppe(); }).catch(function () { S.partner = null; menuePflegen(); });
+    var n = 0, iv = setInterval(function () { var a = speichernSperren(), b = ladenBeobachten(); renderBeobachten(); if ((a || window.saveObj && window.saveObj._dppk) && (b || window.loadSaved && window.loadSaved._dppk) || ++n > 40) clearInterval(iv); }, 500);
     new MutationObserver(function () {
       if (document.querySelector('.dab-tafel') && !document.querySelector('.dab-tafel .dab-partnerzeile') && S.kunde && S.kunde.verbunden) partnerzeile();
       if (document.querySelector('.st-pane[data-pane="account"]') && !document.getElementById('dppk-st')) einstellungenErgaenzen();
