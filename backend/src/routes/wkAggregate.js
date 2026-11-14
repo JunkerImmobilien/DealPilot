@@ -15,7 +15,7 @@ router.get('/wk-aggregate', authenticate, async (req, res) => {
     // Alle Objekte des Users mit Status "won" (siehe deal-action _deal_won)
     const result = await query(`
       SELECT id, data, updated_at, name  FROM objects
-      WHERE user_id = $1
+      WHERE user_id = $1 AND kunden_freigabe_id IS NULL  -- v3357: Kundenstaende zaehlen nicht
       ORDER BY COALESCE(data->>'kaufdat', data->>'wirtschaftlicher_uebergang', data->>'purchase_date') ASC NULLS LAST, created_at ASC  -- V276.4-kaufdat-fix
     `, [userId]);
 

@@ -29,6 +29,11 @@ async function _kiPruefung(req, res, next) {
     if (req.method !== 'POST' || _KI_FREI.indexOf(req.path) >= 0) return next();
     const b = req.body || {};
     if (typeof b.userApiKey === 'string' && b.userApiKey.startsWith('sk-')) return next();
+    /* v3357 · Partnerplatz: KI vom Partner ausgeschaltet */
+    if (req.user && req.user.id) {
+      const _pk = await require('../services/partnerKunden').kiErlaubt(req.user.id).catch(() => ({ ok: true }));
+      if (!_pk.ok) return res.status(403).json({ error: 'partner_recht', message: _pk.message });
+    }
     /* ohne Vorgang (Middleware in index.js fehlt): hier einen anlegen, sonst fehlt der Nutzer in der Zeile */
     if (!kiVerbrauch.vorgangAktuell()) kiVerbrauch.setzeKontext({ req: req });
     await kiVerbrauch.vorAufruf({});
@@ -2077,7 +2082,7 @@ async function _copilotObjektwissen(uid, payload) {
         if (t && t.anzahl) wissen.todos = { liste: t.objekte[0].todos, hinweis: t.hinweis };
       }
     } else if (istPortfolio) {
-      const r = await query('SELECT id, data FROM objects WHERE user_id = $1 ORDER BY seq_no NULLS LAST, created_at', [uid]);
+      const r = await query('SELECT id, data FROM objects WHERE user_id = $1 AND kunden_freigabe_id IS NULL ORDER BY seq_no NULLS LAST, created_at', [uid]);
       const ow = require('../services/objektWissen');
       const je = [];
       r.rows.forEach((z) => { const u = ow.unterlagen(z.data, { kurz: true }); if (u) je.push(Object.assign({ id: z.id, adresse: ow.adresse(z.data) }, u)); });

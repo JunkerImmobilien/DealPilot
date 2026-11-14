@@ -85,7 +85,7 @@ async function listForUser(userId, { limit = 100, offset = 0 } = {}) {
               ELSE NULL
             END AS thumbnail
      FROM objects
-     WHERE user_id = $1
+     WHERE user_id = $1 AND kunden_freigabe_id IS NULL   -- v3357: Kundenstaende stehen im Partner-Cockpit, nicht in der Objektliste
      ORDER BY updated_at DESC
      LIMIT $2 OFFSET $3`,
     [userId, limit, offset]
@@ -180,11 +180,14 @@ async function create(userId, { data, aiAnalysis, photos }) {
 async function update(userId, objectId, { data, aiAnalysis, photos, expectedVersion }) {
   // Check ownership and version
   const existing = await query(
-    'SELECT user_id, version, seq_no FROM objects WHERE id = $1',
+    'SELECT user_id, version, seq_no, kunden_freigabe_id FROM objects WHERE id = $1',
     [objectId]
   );
   if (existing.rowCount === 0) throw new HttpError(404, 'Object not found');
   if (existing.rows[0].user_id !== userId) throw new HttpError(403, 'Not authorized');
+  /* v3357 · ein Kundenstand (Kopie, die ein Kunde gesendet hat) ist schreibgeschuetzt - „Als eigenes Objekt
+     uebernehmen“ legt eine bearbeitbare Kopie an */
+  if (existing.rows[0].kunden_freigabe_id) throw new HttpError(409, 'kundenstand_schreibgeschuetzt');
 
   if (expectedVersion != null && existing.rows[0].version !== expectedVersion) {
     throw new HttpError(409, `Version conflict (expected ${expectedVersion}, got ${existing.rows[0].version})`);

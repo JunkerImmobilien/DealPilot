@@ -1162,6 +1162,16 @@ if (!window._pdfGold) {
     try { loggedIn = !!localStorage.getItem('ji_token'); } catch (e) {}
 
     if (loggedIn) {
+      /* v3357 · Konzept 13.11.2026: ein BESTEHENDES Konto wird nie still verbunden - erst fragen (mein-partner.js) */
+      if (window.DpMeinPartner && typeof window.DpMeinPartner.einladungFragen === 'function') {
+        try {
+          var _ri = await fetch('/api/v1/reseller-invite/info?token=' + encodeURIComponent(token));
+          var _info = _ri.ok ? await _ri.json() : null;
+          if (!_info || !_info.valid) { try { localStorage.removeItem('rp_invite_token'); } catch (e) {} return; }
+          window.DpMeinPartner.einladungFragen(token, _info);
+          return;
+        } catch (e) { return; }
+      }
       try {
         var r = await Auth.apiCall('/reseller-invite/accept', { method: 'POST', body: { token: token } });
         try { localStorage.removeItem('rp_invite_token'); } catch (e) {}

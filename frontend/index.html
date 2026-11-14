@@ -763,6 +763,14 @@ label.dp-required.qc-required::after {
       <button class="sb-act-item" type="button" data-act="vermoegen" onclick="sbActionsAction('vermoegen')">
         <span class="sb-act-ico" data-icon="vermoegen"></span><span class="sb-act-l">Vermögen &amp; Haushalt</span>
       </button>
+      <!-- v3357 · Partner und Kunden (Konzept 13.11.2026, Abschnitt 4). Sichtbar nur per Klasse dp-frei
+           (partner-kunden.js nach dem Abruf), nie per Inline-Stil - ein fremdes Skript schreibt style neu (v1935d). -->
+      <button class="sb-act-item sb-act-partner" type="button" data-act="partner-cockpit" onclick="sbActionsAction('partner-cockpit')">
+        <span class="sb-act-ico" data-icon="partner"></span><span class="sb-act-l">Partner-Cockpit</span><span class="sb-act-punkt" aria-hidden="true"></span>
+      </button>
+      <button class="sb-act-item sb-act-meinpartner" type="button" data-act="mein-partner" onclick="sbActionsAction('mein-partner')">
+        <span class="sb-act-ico" data-icon="meinpartner"></span><span class="sb-act-l">Mein Partner</span><span class="sb-act-punkt" aria-hidden="true"></span>
+      </button>
       <!-- v1880 · Portfolio-Strategie: Forschungsvorhaben 827-757-583, hinter dem Feature-Schluessel portfolio_strategie (Migration 085: ueberall false; auf Staging fuer Marcel an) -->
       <!-- v1935c · AUS DEN ANSICHTEN GENOMMEN, NICHT ABGESCHALTET.
            Marcel am 07.10.2026: "die Portfolio-Strategie kannst du erst mal aus
@@ -3993,7 +4001,7 @@ label.dp-required.qc-required::after {
 <script src="js/collapsible-cards.js?v=v3032"></script>
 <script src="js/v10.js?v=v2254"></script>
 <script src="js/marktdaten-modal.js?v=v2247c"></script>
-<script src="js/ui.js?v=v3326"></script>
+<script src="js/ui.js?v=v3357"></script>
 <script src="js/sidebar-collapse.js?v=20260611174630"></script>
 <script src="js/storage.js?v=v3314"></script>
 <script src="js/nachrechnen.js?v=v3031"></script><!-- v3031: Kennzahlen/Scores gespeicherter Objekte neu rechnen (nur auf Aufruf) -->
@@ -4578,7 +4586,8 @@ document.addEventListener('DOMContentLoaded', function(){
 <script src="js/copilot-aenderungen.js?v=v1875a"></script><!-- v1760 · der Co-Pilot versteht Aenderungen -->
 <script src="js/pilot-berichte.js?v=v2947"></script><!-- v1769 · beide Piloten holen die Marktberichte (V6) -->
     <script src="js/rp-pdf-engine.js?v=W27"></script>
-    <script src="js/reseller-portal.js?v=v3317b"></script><!-- v1112b-rp-mobile -->
+    <script src="js/partner-kunden.js?v=v3357"></script><!-- v3357 · Partner-Cockpit und Mein Partner (vor reseller-portal.js: Einladungen bestehender Konten werden erst bestaetigt) -->
+    <script src="js/reseller-portal.js?v=v3357"></script><!-- v1112b-rp-mobile -->
     <script src="js/logo-kontrast.js?v=v3299a"></script><!-- v3299 · Logo-Kontrast, VOR whitelabel-override -->
     <script src="js/whitelabel-override.js?v=v3299a"></script>
     <script src="js/branding-darstellung.js?v=W12"></script>

@@ -51,7 +51,7 @@ async function portfolioKontext(userId) {
    * kann der Bot statt einer Altersangabe eine Aussage machen. */
   const g = await query(
     `SELECT count(*)::int AS n FROM objects
-      WHERE user_id = $1 AND updated_at > $2`,
+      WHERE user_id = $1 AND kunden_freigabe_id IS NULL AND updated_at > $2`,
     [userId, r.rows[0].erfasst_am]
   );
 
@@ -89,7 +89,7 @@ function standSatz(erfasstAm, alterMin, geaendertSeitdem) {
 async function objekteListe(userId, limit) {
   const r = await query(
     `SELECT id, data, updated_at FROM objects
-      WHERE user_id = $1
+      WHERE user_id = $1 AND kunden_freigabe_id IS NULL
       ORDER BY updated_at DESC NULLS LAST
       LIMIT $2`,
     [userId, limit || 60]

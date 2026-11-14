@@ -564,7 +564,7 @@ async function bauen(userId, opt) {
     `SELECT id, name, kuerzel, ort, seq_no, version, created_at, updated_at,
             data, ai_analysis, photos
        FROM objects
-      WHERE user_id = $1
+      WHERE user_id = $1 AND kunden_freigabe_id IS NULL
       ORDER BY seq_no NULLS LAST, created_at`,
     [userId]
   );

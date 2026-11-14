@@ -70,7 +70,7 @@ async function objekte_liste(ctx) {
             (data::jsonb->>'_dealpilot_score')::int   AS score,
             (data::jsonb->>'_ds2_score')::int         AS ids_score,
             COALESCE((data::jsonb->>'_ds2_computed')::boolean,false) AS ids_ok
-       FROM objects WHERE user_id = $1`,
+       FROM objects WHERE user_id = $1 AND kunden_freigabe_id IS NULL`,
     [ctx.userId]);
   const extra = {};
   r.rows.forEach((z) => { extra[z.id] = z; });
@@ -168,7 +168,7 @@ async function objekt_lesen(ctx, args) {
  * Nichts wird hier gerechnet. Stufe `lesen`, kostet nichts. */
 async function bank_uebersicht(ctx, args) {
   const r = await query(
-    `SELECT id, name, data FROM objects WHERE user_id = $1 ORDER BY seq_no NULLS LAST, created_at`,
+    `SELECT id, name, data FROM objects WHERE user_id = $1 AND kunden_freigabe_id IS NULL ORDER BY seq_no NULLS LAST, created_at`,
     [ctx.userId]);
   const sp = await dialog.portfolioKontext(ctx.userId);
   const spiegel = {};
@@ -444,7 +444,7 @@ async function potenzial_lesen(ctx, args) {
       potenzial: pz,
       so_sagen: pz ? null : 'Fuer dieses Objekt ist weder eine Soll-Miete noch ein Zielbild eingetragen. Das geht im Tab Objekt (ETW/EFH/ZFH) oder beim MFH je Wohnung im Fenster „Einheiten erfassen".' };
   }
-  const r = await query('SELECT id, data FROM objects WHERE user_id = $1', [ctx.userId]);
+  const r = await query('SELECT id, data FROM objects WHERE user_id = $1 AND kunden_freigabe_id IS NULL', [ctx.userId]);
   const liste = [];
   let darf = () => false;
   try { darf = await ertragswertFreigabe.pruefer(ctx.userId); } catch (e) { darf = () => false; }
@@ -496,7 +496,7 @@ async function objekt_unterlagen(ctx, args) {
       + 'Steht unter baulasten ein Satz statt einer Liste, liegt keine Auskunft vor - sag das, erfinde keine.' });
 }
 async function _objekteAlle(userId) {
-  const r = await query('SELECT id, name, data FROM objects WHERE user_id = $1 ORDER BY seq_no NULLS LAST, created_at', [userId]);
+  const r = await query('SELECT id, name, data FROM objects WHERE user_id = $1 AND kunden_freigabe_id IS NULL ORDER BY seq_no NULLS LAST, created_at', [userId]);
   return r.rows.map((z) => { let d = z.data; if (typeof d === 'string') { try { d = JSON.parse(d); } catch (e) { d = {}; } } return { id: z.id, name: z.name, d: d || {} }; });
 }
 async function portfolio_potenzial(ctx, args) {
@@ -791,7 +791,7 @@ async function portfolio_lesen(ctx) {
    * Also steht der Satz jetzt fertig im Ergebnis. */
   let angelegt = null;
   try {
-    const r = await query(`SELECT count(*)::int AS n FROM objects WHERE user_id = $1`,
+    const r = await query(`SELECT count(*)::int AS n FROM objects WHERE user_id = $1 AND kunden_freigabe_id IS NULL`,
       [ctx.userId]);
     angelegt = r.rows.length ? r.rows[0].n : null;
   } catch (e) { /* ohne die Zahl bleibt der Rest richtig */ }
@@ -1697,7 +1697,7 @@ async function objekte_felder(ctx, args) {
 
   const r = await query(
     `SELECT id, name, ort, data FROM objects
-      WHERE user_id = $1 ORDER BY updated_at DESC LIMIT 200`,
+      WHERE user_id = $1 AND kunden_freigabe_id IS NULL ORDER BY updated_at DESC LIMIT 200`,
     [ctx.userId]);
 
   const zeilen = r.rows.map((z, i) => {

@@ -47,7 +47,8 @@ function standardDeps() {
   return {
     query: require('../db/pool').query,
     syncPoolQuantity: require('./resellerService').syncPoolQuantity,
-    getSubscription: require('./stripeService').getSubscription
+    getSubscription: require('./stripeService').getSubscription,
+    aboEnde: (rid) => require('./partnerKunden').aboEnde(rid)   /* v3357 */
   };
 }
 
@@ -105,8 +106,13 @@ async function handlePartnerSeatsEvent(event, deps) {
     } else {
       return { handled: true, aktion: 'uebersprungen', grund: 'status_' + sub.status };
     }
+    /* v3357 · erst die Frist (gibt die Plaetze in den Pool), dann abgleichen - so baut der Abgleich sie ab */
+    let ende = null;
+    if (menge === 0 && typeof deps.aboEnde === 'function') { try { ende = await deps.aboEnde(resellerId); } catch (e) { ende = { fehler: e.message }; } }
     const pool = await abgleichen(deps, resellerId, sub, menge, menge > 0);
-    return { handled: true, aktion: 'abgeglichen', menge, pool };
+    /* v3357 · Ende des Partner-Abos: zugewiesene Plaetze laufen in die Frist (wie ein Platzentzug), statt
+       10 Jahre Investor zu behalten (Luecke aus dem Konzept 13.11.2026, Abschnitt 1.2) */
+    return { handled: true, aktion: 'abgeglichen', menge, pool, abo_ende: ende };
   }
 
   return { handled: false };

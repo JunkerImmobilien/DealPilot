@@ -46,6 +46,11 @@ const REQ_LABELS = {
 
 router.get('/', async (req, res) => {
   try {
+    /* v3357 · Partnerplatz: der Partner entscheidet, ob sein Kunde das Partnernetzwerk sieht (Vorgabe aus) */
+    if (req.user && req.user.id) {
+      const _r = await require('../services/partnerKunden').rechteFuer(req.user.id).catch(() => null);
+      if (_r && !_r.netzwerk) return res.json({ cards: [], categories: [], partner_aus: true });
+    }
     const cards = await svc.listActive();
     let categories = [];
     try { categories = await svc.listCategories(); } catch (e2) { /* Mig 051 evtl. noch nicht da */ }

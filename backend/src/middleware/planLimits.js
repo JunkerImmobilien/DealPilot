@@ -39,7 +39,7 @@ function requireUnderLimit(metric) {
       if (metric === 'objects') {
         limit = plan.max_objects;
         if (limit == null || limit < 0) return next(); // V225: unlimited (NULL oder -1)
-        const r = await query('SELECT COUNT(*) AS cnt FROM objects WHERE user_id = $1', [req.user.id]);
+        const r = await query('SELECT COUNT(*) AS cnt FROM objects WHERE user_id = $1 AND kunden_freigabe_id IS NULL', [req.user.id]);
         current = parseInt(r.rows[0].cnt, 10);
       } else if (metric === 'ai_analyses_monthly') {
         limit = plan.max_ai_analyses_monthly;

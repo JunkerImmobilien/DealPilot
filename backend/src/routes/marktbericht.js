@@ -331,6 +331,9 @@ async function runReport(req, res) {
      Stufe 0 heisst „diese Tiefe ist schon bezahlt" und wird
      durchgelassen. */
   if (stufe > 0) {
+    /* v3357 · Partnerplatz: Recht und Monatskontingent, das der Partner gesetzt hat */
+    try { const _pr = await require('../services/partnerKunden').marktberichtErlaubt(req.user.id);
+      if (!_pr.ok) return res.status(403).json({ error: 'partner_recht', message: _pr.message }); } catch (e) {}
     const darf = await aiCreditsService.pruefeStufe(req.user.id, stufe);
     if (!darf.ok) {
       const WAS = { mpi: 'Marktpreisindikation',
@@ -687,6 +690,9 @@ router.post('/reports/generate-stream', authenticate, requireVerified, async fun
      Stufe 0 heisst „diese Tiefe ist schon bezahlt" und wird
      durchgelassen. */
   if (stufe > 0) {
+    /* v3357 · Partnerplatz: Recht und Monatskontingent, das der Partner gesetzt hat */
+    try { const _pr = await require('../services/partnerKunden').marktberichtErlaubt(req.user.id);
+      if (!_pr.ok) return res.status(403).json({ error: 'partner_recht', message: _pr.message }); } catch (e) {}
     const darf = await aiCreditsService.pruefeStufe(req.user.id, stufe);
     if (!darf.ok) {
       const WAS = { mpi: 'Marktpreisindikation',

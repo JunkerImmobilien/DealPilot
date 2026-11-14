@@ -36,7 +36,8 @@ router.get('/my-branding', authenticate, async (req, res, next) => {
     const r = await query(
       'SELECT ' + BRANDING_SPALTEN +
       ' FROM reseller_clients rc JOIN resellers rs ON rs.id = rc.reseller_id' +
-      ' WHERE rc.user_id = $1 LIMIT 1', [req.user.id]);
+      /* v3357 · Marke je Kunde (rc.marke) und nur bei aktiver Verbindung */
+      " WHERE rc.user_id = $1 AND rc.getrennt_am IS NULL AND rc.marke = 'partner' LIMIT 1", [req.user.id]);
     let b = r.rows[0];
     if (b) {
       if (!b.whitelabel_enabled) return res.json({ branding: null });

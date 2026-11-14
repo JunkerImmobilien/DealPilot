@@ -155,7 +155,7 @@ async function runOnce(opts) {
     try {
       const objs = await query(
         `SELECT id, name, kuerzel, data->'_soll_einheiten' AS se FROM objects
-          WHERE user_id = $1 AND data ? '_soll_einheiten'
+          WHERE user_id = $1 AND kunden_freigabe_id IS NULL AND data ? '_soll_einheiten'
             AND COALESCE(data->>'_deal_won', 'false') = 'true'
             AND COALESCE(data->>'_deal_lost', 'false') <> 'true'`, [u.id]);
       const posten = [];

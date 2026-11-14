@@ -3020,6 +3020,8 @@ function bsheetAction(action) {
     switch (action) {
       case 'cockpit':       if (typeof setMainView === 'function') setMainView('dashboard'); break; /* v844-cockpit-handler */
       case 'vermoegen':     if (typeof window.openVermoegen === 'function') window.openVermoegen(); break; /* v3217 · W-11 */
+      case 'partner-cockpit': if (window.DpPartnerKunden) window.DpPartnerKunden.cockpitOeffnen(); break;   /* v3357 */
+      case 'mein-partner':    if (window.DpPartnerKunden) window.DpPartnerKunden.meinPartnerOeffnen(); break;   /* v3357 */
       case 'view-single':   if (typeof setMainView === 'function') setMainView('single'); break;
       case 'view-all':      if (typeof setMainView === 'function') setMainView('all'); break;
       case 'quickcheck':    if (typeof enterQuickCheckMode === 'function') enterQuickCheckMode(); break;
@@ -3192,6 +3194,7 @@ function _sbActionsRenderIcons() {
     single: 'house', all: 'folder', quickcheck: 'sparkles', new: 'plus', market: 'fileText',
     trackrec: 'trophy', bankexport: 'bank', cockpit: 'barChart', /* v844-cockpit-icon */
     vermoegen: 'coins', /* v3217 · W-11 */
+    partner: 'handshake', meinpartner: 'user', /* v3357 */
     pdf: 'fileText',
     csv: 'fileText',
     settings: 'settings',
@@ -3227,7 +3230,7 @@ function sbActionsAction(action) {
        Aktion, die eine Ansicht wechselt, wird er deshalb leise geschlossen;
        Fenster wie Einstellungen oder Import lassen ihn stehen. */
     try {
-      var _nurFenster = ['settings',   /* v3253: 'marktbericht' raus - führt jetzt in den Reiter Objekt */ 'help', 'feedback', 'hub-import', 'hub-export', 'pdf', 'csv', 'export-csv', 'import-excel', 'import-json', 'export-json'];
+      var _nurFenster = ['settings', 'partner-cockpit', 'mein-partner',   /* v3253: 'marktbericht' raus - führt jetzt in den Reiter Objekt */ 'help', 'feedback', 'hub-import', 'hub-export', 'pdf', 'csv', 'export-csv', 'import-excel', 'import-json', 'export-json'];
       if (_nurFenster.indexOf(action) < 0 && document.body.classList.contains('mb-standalone-active') && typeof window._mbLeiseSchliessen === 'function') {
         window._mbLeiseSchliessen();
         if (action === 'new' && typeof setMainView === 'function') setMainView('single');
@@ -3237,6 +3240,8 @@ function sbActionsAction(action) {
       case 'dashboard':   if (typeof setMainView === 'function') setMainView('dashboard'); break;
       case 'cockpit':       if (typeof setMainView === 'function') setMainView('dashboard'); break; /* v844-cockpit-handler */
       case 'vermoegen':     if (typeof window.openVermoegen === 'function') window.openVermoegen(); break; /* v3217 · W-11 */
+      case 'partner-cockpit': if (window.DpPartnerKunden) window.DpPartnerKunden.cockpitOeffnen(); break;   /* v3357 */
+      case 'mein-partner':    if (window.DpPartnerKunden) window.DpPartnerKunden.meinPartnerOeffnen(); break;   /* v3357 */
       case 'view-single':   if (typeof setMainView === 'function') setMainView('single'); break;
       case 'view-all':      if (typeof setMainView === 'function') setMainView('all'); break;
       case 'quickcheck':    if (typeof enterQuickCheckMode === 'function') enterQuickCheckMode(); break;

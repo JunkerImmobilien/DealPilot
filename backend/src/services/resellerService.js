@@ -182,6 +182,25 @@ async function listClients(resellerId) {
 }
 
 // ── Seat zuweisen / entziehen ───────────────────────────────────
+/* v3357 · PLAN-SCHUTZ (Konzept 13.11.2026, Abschnitt 2, Pflicht). Bis hier setzte ein Platz JEDEN Kunden still auf
+   Investor und beim Entziehen auf Free - ein zahlender Pro-Kunde waere herabgestuft worden, sein Stripe-Abo liefe
+   weiter. Jetzt: ein bezahltes Abo (Stripe, aktiv) wird nie angefasst; einen Platz bekommt so ein Kunde nicht
+   (er verbindet sich als 'eigen'). Sonst merkt sich der Kunde den Plan VOR dem Platz und bekommt ihn beim Entzug
+   zurueck. */
+async function hatBezahltesAbo(userId) {
+  const r = await query(
+    `SELECT 1 FROM subscriptions WHERE user_id = $1 AND stripe_subscription_id IS NOT NULL
+        AND status IN ('active','trialing','past_due') AND plan_id <> 'free'
+        AND (current_period_end IS NULL OR current_period_end > now()) LIMIT 1`, [userId]);
+  return r.rowCount > 0;
+}
+async function _planVorPlatzMerken(clientId, userId) {
+  try {
+    const cur = await planService.getUserCurrentPlan(userId);
+    const pv = cur && cur.planId ? cur.planId : 'free';
+    await query(`UPDATE reseller_clients SET plan_vorher = COALESCE(plan_vorher, $2) WHERE id = $1`, [clientId, pv === 'investor' ? 'free' : pv]);
+  } catch (e) {}
+}
 /* W1a-investor: Seat = Investor-Tier (59-EUR-Referenz aus dem Konzept), nicht Starter */
 /* v3317b · opts.lizenzId: genau DIESEN (fuer eine Uebergabe reservierten) Platz nehmen, sonst einen freien. */
 async function assignSeat(resellerId, clientId, opts) {
@@ -192,6 +211,9 @@ async function assignSeat(resellerId, clientId, opts) {
     [clientId, resellerId]
   );
   if (!c.rowCount) { const e = new Error('Client gehört nicht zu diesem Reseller'); e.status = 404; throw e; }
+  if (c.rows[0].user_id && await hatBezahltesAbo(c.rows[0].user_id)) {   /* v3357 · Plan-Schutz */
+    const e = new Error('eigenes_abo'); e.status = 409; e.detail = 'Der Kunde hat ein eigenes bezahltes Abo, er wird ohne Platz verbunden.'; throw e;
+  }
 
   // IDEMPOTENT: hat der Client schon einen aktiven Seat? -> den zurückgeben,
   // nicht doppelt zuweisen (sonst uq_license_active_per_client-Verletzung).
@@ -217,6 +239,8 @@ async function assignSeat(resellerId, clientId, opts) {
     [resellerId, clientId, lizenzId]
   );
   if (!r.rowCount) { const e = new Error('Kein freier Seat im Pool'); e.status = 409; throw e; }
+  if (c.rows[0].user_id) await _planVorPlatzMerken(clientId, c.rows[0].user_id);   /* v3357 */
+  try { await query(`UPDATE reseller_clients SET platz_art = 'platz' WHERE id = $1`, [clientId]); } catch (e) {}
 
   /* v3299 · Hier stand "mindestens Starter" - vergeben wird seit jeher Investor
      (10 Jahre, manuell), gemessen in der Partner-Demo 11.11.2026. */
@@ -232,7 +256,16 @@ async function unassignSeat(resellerId, clientId) {
      RETURNING *`,
     [resellerId, clientId]
   );
-  try { if (cu.rows[0] && cu.rows[0].user_id) await planService.setUserPlanManual(cu.rows[0].user_id, 'free', 'monthly', 3650); } catch (e) {}
+  /* v3357 · Plan-Schutz: ein bezahltes Abo bleibt; sonst der Plan von VOR dem Platz (Standard Free) */
+  try {
+    const uid = cu.rows[0] && cu.rows[0].user_id;
+    if (uid && r.rowCount && !(await hatBezahltesAbo(uid))) {
+      const pv = (await query(`SELECT plan_vorher FROM reseller_clients WHERE id = $1`, [clientId])).rows[0];
+      const ziel = pv && pv.plan_vorher && pv.plan_vorher !== 'investor' ? pv.plan_vorher : 'free';
+      await planService.setUserPlanManual(uid, ziel, 'monthly', 3650);
+      await query(`UPDATE reseller_clients SET plan_vorher = NULL WHERE id = $1`, [clientId]);
+    }
+  } catch (e) {}
   return r.rows[0] || null;
 }
 
@@ -469,9 +502,15 @@ async function acceptInvite(token, userId) {
     [invite.id, client.id]
   );
 
-  // Freien Seat automatisch zuweisen (falls vorhanden) — best effort
+  /* v3357 · Zugangsart: ein bezahltes Abo bleibt (eigen), sonst Platz, wenn die Einladung ihn mitgibt */
+  const bezahlt = await hatBezahltesAbo(userId);
+  const art = (invite.platz_mitgeben !== false && !bezahlt) ? 'platz' : 'eigen';
+  await query(`UPDATE reseller_clients SET platz_art = $2, herkunft = 'einladung', verbunden_am = now(), getrennt_am = NULL, getrennt_von = NULL,
+                      stufe = COALESCE(stufe, 2) WHERE id = $1`, [client.id, art]);
   var seatAssigned = false;
-  try { await assignSeat(invite.reseller_id, client.id); seatAssigned = true; } catch (e) { /* kein freier Seat -> Partner weist später zu */ }
+  if (art === 'platz') { try { await assignSeat(invite.reseller_id, client.id); seatAssigned = true; } catch (e) { /* kein freier Seat -> Partner weist später zu */ } }
+  try { await query(`INSERT INTO partner_meldungen (reseller_id, client_id, art, text) VALUES ($1,$2,'verbindung_angenommen',$3)`,
+    [invite.reseller_id, client.id, invite.display_name + ' hat die Einladung angenommen' + (art === 'eigen' ? ' (eigener Plan)' : '')]); } catch (e) {}
 
   const rname = await query(
     `SELECT COALESCE(NULLIF(brand_name,''), name) AS brand_name FROM resellers WHERE id=$1`,
@@ -494,6 +533,7 @@ async function deleteClient(resellerId, clientId) {
 }
 
 module.exports = {
+  hatBezahltesAbo,
   FREI_SQL,   /* v3317b */
   getResellerForUser,
   ensureReseller,
