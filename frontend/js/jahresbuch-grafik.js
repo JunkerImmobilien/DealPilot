@@ -22,7 +22,7 @@
 (function (global) {
   'use strict';
   if (global.DpJahresbuchGrafik) return;
-  var VERSION = 'v3364';
+  var VERSION = 'v3364a';
   var GOLD = 'var(--wl-c9a84c, #C9A84C)', GRAU = '#8A8278';
   var W = 720, L = 64, R = 16, H1 = 210, H2 = 130, LUECKE = 34, OBEN = 22;
 
@@ -42,11 +42,14 @@
     var xJahr = function (jahr, monat) { var i = jahr - J[0].jahr; return x0 + dx * (i + ((monat || 6.5) - 0.5) / 12); };
     /* oben: Miete */
     var mw = []; J.forEach(function (z) { ['miete_plan', 'miete_ist', 'miete_proj', 'ziel_j'].forEach(function (k) { if (istZahl(z[k])) mw.push(z[k]); }); });
-    var mMax = mw.length ? Math.max.apply(null, mw) * 1.08 : 1, mMin = 0;
-    var st = schritt(mMax / 4); mMax = Math.ceil(mMax / st) * st;
+    /* v3364a · die Achse beginnt knapp unter dem kleinsten Wert (Linienbild, kein Balken) - bei 0 lagen
+       38.000 und 43.000 € im oberen Fünftel (gemessen Westerfeldstr. 146) */
+    var mMax = mw.length ? Math.max.apply(null, mw) * 1.04 : 1, mLo = mw.length ? Math.min.apply(null, mw) * 0.9 : 0;
+    var st = schritt((mMax - mLo) / 4 || 1); mMax = Math.ceil(mMax / st) * st;
+    var mMin = Math.max(0, Math.floor(mLo / st) * st); if (mMax <= mMin) mMax = mMin + st;
     var y1 = function (v) { return OBEN + H1 - (v - mMin) / (mMax - mMin) * H1; };
     var g = [];
-    for (var t = 0; t <= mMax + 1e-6; t += st) g.push('<line x1="' + x0 + '" x2="' + x1 + '" y1="' + y1(t).toFixed(1) + '" y2="' + y1(t).toFixed(1) + '" style="stroke:currentColor;stroke-opacity:.12"/><text x="' + (x0 - 6) + '" y="' + (y1(t) + 3.5).toFixed(1) + '" text-anchor="end" class="jbg-ax">' + kurz(t) + '</text>');
+    for (var t = mMin; t <= mMax + 1e-6; t += st) g.push('<line x1="' + x0 + '" x2="' + x1 + '" y1="' + y1(t).toFixed(1) + '" y2="' + y1(t).toFixed(1) + '" style="stroke:currentColor;stroke-opacity:.12"/><text x="' + (x0 - 6) + '" y="' + (y1(t) + 3.5).toFixed(1) + '" text-anchor="end" class="jbg-ax">' + kurz(t) + '</text>');
     function linie(k, filter) {
       var pts = []; J.forEach(function (z, i) { if (istZahl(z[k]) && (!filter || filter(z))) pts.push([xm(i), y1(z[k])]); });
       return pts;
@@ -111,7 +114,7 @@
     if (hat('miete_ist')) e.push('<span><svg width="22" height="10"><line x1="0" x2="22" y1="5" y2="5" style="stroke:' + GOLD + '" stroke-width="2.5"/><circle cx="11" cy="5" r="4" style="fill:' + GOLD + '"/></svg>Ist (eingetragen)</span>');
     if (hat('miete_proj')) e.push('<span><svg width="22" height="10"><circle cx="11" cy="5" r="3.5" style="fill:none;stroke:' + GOLD + '" stroke-width="2"/></svg>Projektion heute</span>');
     if (hat('ziel_j')) e.push('<span><svg width="22" height="8"><line x1="0" x2="22" y1="4" y2="4" style="stroke:currentColor" stroke-width="2" stroke-dasharray="8 3 2 3"/></svg>Ziel (Zielbild des Jahres)</span>');
-    e.push('<span><svg width="22" height="10"><rect x="2" y="1" width="8" height="8" rx="2" style="fill:none;stroke:' + GRAU + '" stroke-width="1.5"/><rect x="12" y="1" width="8" height="8" rx="2" style="fill:' + GOLD + '"/></svg>Cashflow Plan · Jahresstand</span>');
+    e.push('<span><svg width="22" height="10"><rect x="2" y="1" width="8" height="8" rx="2" style="fill:none;stroke:' + GRAU + '" stroke-width="1.5"/><rect x="12" y="1" width="8" height="8" rx="2" style="fill:' + GOLD + '"/></svg>Cashflow ' + (d.cf_projektion ? 'Plan oder Projektion' : 'Plan') + ' · Jahresstand</span>');
     if ((d.ereignisse || []).some(function (x) { return x.art === 'erhoehung'; })) e.push('<span><svg width="12" height="10"><path d="M6 1l-5 8h10z" style="fill:' + GOLD + '"/></svg>Mieterhöhung</span>');
     return '<div class="jbg-leg">' + e.join('') + '</div>';
   }
@@ -121,7 +124,7 @@
     var ev = (d.ereignisse || []).filter(function (e) { return e.jahr === z.jahr; }).map(function (e) { return '<div class="jbg-tev">' + esc(e.text) + '</div>'; }).join('');
     return '<div class="jbg-tj">' + z.jahr + (z.jahr === d.heute ? ' · laufend' : '') + '</div>'
       + r('Miete Plan', z.miete_plan) + r('Miete Ist', z.miete_ist) + (istZahl(z.miete_ist) ? '' : r('Projektion heute', z.miete_proj)) + r('Ziel', z.ziel_j)
-      + r('Cashflow Plan', z.cf_plan) + r('Cashflow Jahresstand', z.cf_ist) + ev;
+      + r(z.cf_ist_projektion ? 'Cashflow Projektion' : 'Cashflow Plan', z.cf_plan) + r('Cashflow Jahresstand', z.cf_ist) + ev;
   }
   function stil(doc) {
     if (!doc || doc.getElementById('dp-jbg-stil') || !doc.head) return;
@@ -174,13 +177,14 @@
     var zj = parseInt((global.document.getElementById('zb_fertig_jahr') || {}).value, 10);
     var bis = Math.min(Z[0].jahr + 14, Math.max(heute + 3, zj >= heute && zj <= heute + 10 ? zj : 0));
     var jahre = Z.map(function (z) { return { jahr: z.jahr, miete_plan: z.miete_plan, miete_ist: z.miete_ist, miete_proj: z.miete_proj,
-      ziel_j: istZahl(z.ziel_nkm) ? z.ziel_nkm * 12 : null, cf_plan: z.cf_plan, cf_ist: z.cf_stand }; });
+      ziel_j: istZahl(z.ziel_nkm) ? z.ziel_nkm * 12 : null, cf_plan: istZahl(z.cf_plan) ? z.cf_plan : z.cf_proj, cf_ist_projektion: !istZahl(z.cf_plan) && istZahl(z.cf_proj), cf_ist: z.cf_stand }; });
     var zielHeute = Z[Z.length - 1] && istZahl(Z[Z.length - 1].ziel_nkm) ? Z[Z.length - 1].ziel_nkm * 12 : null;
     for (var y = heute + 1; y <= bis; y++) {
       var p = plan.filter(function (x) { return x && x.cal === y; })[0], r = rows.filter(function (x) { return x && x.cal === y; })[0];
       jahre.push({ jahr: y, miete_plan: p && istZahl(p.nkm_y) ? p.nkm_y : null, miete_ist: null, miete_proj: r && istZahl(r.nkm_y) ? Math.round(r.nkm_y) : null,
-        ziel_j: zielHeute, cf_plan: p && istZahl(p.cfop_y) ? p.cfop_y : null, cf_ist: null });
+        ziel_j: zielHeute, cf_plan: p && istZahl(p.cfop_y) ? p.cfop_y : (r && istZahl(r.cfop_y) ? Math.round(r.cfop_y) : null), cf_ist_projektion: !(p && istZahl(p.cfop_y)), cf_ist: null });
     }
+    var cfProj = jahre.some(function (z) { return z.cf_ist_projektion && istZahl(z.cf_plan); });
     var ev = [];
     try { (global.DpErhoehungen ? global.DpErhoehungen.alle() : []).forEach(function (x) { ev.push({ jahr: +x.datum.slice(0, 4), monat: +x.datum.slice(5, 7), art: 'erhoehung', text: 'Mieterhöhung ' + x.datum.split('-').reverse().join('.') + (x.nr ? ', Wohnung ' + x.nr : '') + ' auf ' + eur(x.auf) }); }); } catch (e) {}
     try { (global.DpZielbildFassungen ? global.DpZielbildFassungen.liste() : []).forEach(function (f) { if (f && f.abgeloest_am) ev.push({ jahr: +f.abgeloest_am.slice(0, 4), monat: +f.abgeloest_am.slice(5, 7), art: 'zielbild', kurz: 'neues Zielbild', text: 'Zielbild-Wechsel ' + f.abgeloest_am.split('-').reverse().join('.') + ' (vorher ' + (f.titel || 'Zielbild') + ')' }); }); } catch (e) {}
@@ -190,7 +194,7 @@
       var ex = global.DpBestand && global.DpBestand.exit ? global.DpBestand.exit(new Date()) : null;
       if (ex && ex.frist_ende) ev.push({ jahr: ex.frist_ende.getFullYear(), monat: ex.frist_ende.getMonth() + 1, art: 'frist', kurz: '10 Jahre', text: 'Ende der Zehnjahresfrist (§ 23 EStG)' });
     } catch (e) {}
-    return { jahre: jahre, ereignisse: ev, heute: heute };
+    return { jahre: jahre, ereignisse: ev, heute: heute, cf_projektion: cfProj };
   }
   function mountAll() {
     var doc = global.document; if (!doc || !doc.querySelectorAll) return;
