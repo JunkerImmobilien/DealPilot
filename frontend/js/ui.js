@@ -2638,11 +2638,8 @@ function _renderAIServerAnalysis(a) {
       /* v3361 · Zielbild-Fassungen: Auswahl über der Tafel (nur wenn es frühere Fassungen gibt) */
       try { _siV4.zbf = window.DpZielbildFassungen ? window.DpZielbildFassungen.leisteHtml() : ''; } catch (eF) {}
       /* v3440 · Reihenfolge der Demo: Wert je Verfahren, dann Wert gegen Plan mit allen Berichten */
-      var _wertInner = '<div id="dp-pa-wert-body"></div><div data-dp-pa-wertverlauf="1"></div>'
-        /* v3323 · Marcel 12.11.2026: „unter Wert und Verlauf … die Marktberichtentwicklung … da müsste eigentlich alles drin stehen" -
-           der Verlauf stand nur im Detail (class dp-pa-d); jetzt in beiden, im Einfach ohne Tafel und mit „Kurz gesagt" */
-        + '<div id="dp-pa-verlauf-wrap" style="display:none;margin-top:16px"><h4 class="dp-wv-h" style="margin:0 0 8px">Verlauf · Marktberichte und Abrufe</h4>'
-        + '<div class="dp-pa-card" id="dp-pa-verlauf-body"></div></div>';
+      /* v3443 · der Verlauf der Berichte und Abrufe (#dp-pa-verlauf-wrap) steht jetzt am Ende des Reiters (pilot-analyse-v4.js huelle) */
+      var _wertInner = '<div id="dp-pa-wert-body"></div><div data-dp-pa-wertverlauf="1"></div>';
       var _v4 = V4.huelle({
         bestand: _bestand, kopf: _kopf, analyse: a,   /* v3323 · fuer Potenzialanalyse */
         uebersicht: V4.uebersicht(a, _bestand, { hinweis: _pbHinweis, score: _pbScore, fit: _pbFit }),

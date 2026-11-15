@@ -958,6 +958,32 @@
       try { wertverlaufIn(host, hist || []); } catch (e) { host.innerHTML = ''; }
     });
   }
+  /* v3443 · Alle Berichte zu diesem Objekt, neueste zuerst, mit PDF (DealActionBoarding.downloadReport) - am Ende von Wert & Lage */
+  function berichteHtml(hist) {
+    hist = hist || [];
+    if (!hist.length) return '';
+    var S = window.State, R = S && Array.isArray(S.cfRows) ? S.cfRows : [];
+    var planJahr = function (j) { var r = R.filter(function (x) { return x.cal === j; })[0]; return r && zahl(r.wert_y) ? Number(r.wert_y) : null; };
+    var nachW = function (h) { return zahl(h.mpi_nach_abschlag) ? Number(h.mpi_nach_abschlag) : (zahl(h.market_value) ? Number(h.market_value) : null); };
+    var pdfDa = !!(window.DealActionBoarding && typeof window.DealActionBoarding.downloadReport === 'function');
+    var zeilen = hist.slice().reverse().map(function (h) {
+      var d = new Date(h.created_at), j = isNaN(d) ? null : d.getFullYear(), p = j ? planJahr(j) : null, w = nachW(h);
+      var ab = p && w != null ? (w - p) / p * 100 : null;
+      var ohne = zahl(h.mpi_ohne_abschlag) && Number(h.mpi_ohne_abschlag) !== w ? '<small>ohne Abschlag ' + eur(h.mpi_ohne_abschlag) + '</small>' : '';
+      var lg = [zahl(h.micro_score) ? 'Mikro ' + Math.round(h.micro_score) : '', zahl(h.macro_score) ? 'Makro ' + Math.round(h.macro_score) : ''].filter(Boolean).join(' · ');
+      var rid = parseInt(h.report_id, 10);
+      var pdf = pdfDa && rid > 0 ? '<button type="button" class="btn-clean dp-pa4-btn" style="padding:4px 10px;font-size:12px" onclick="try{DealActionBoarding.downloadReport(' + rid + ')}catch(e){}">PDF</button>' : '';
+      return { z: [isNaN(d) ? '–' : d.toLocaleDateString('de-DE'), p != null ? eur(p) : '', w != null ? eur(w) + ohne : '',
+          ab == null ? '' : (ab > 0 ? '+' : ab < 0 ? '−' : '±') + de(Math.abs(ab), 1) + ' %', zahl(h.ertragswert_eur) ? eur(h.ertragswert_eur) : '', lg, pdf],
+        zk: [null, null, null, ab == null ? null : (ab >= 0 ? 'gut' : 'schlecht')] };
+    });
+    return abKopf('Alle Berichte zu diesem Objekt', zeilen.length + (zeilen.length === 1 ? ' Bericht' : ' Berichte') + ' · gegen deinen Plan-Wert')
+      + tabelle(['Datum', 'Plan-Wert', 'Marktpreis Ø', 'gegen Plan', 'Ertragswert', 'Lage', ''], zeilen);
+  }
+  function berichteAlle(hist) {
+    var h = ''; try { h = berichteHtml(hist); } catch (e) { h = ''; }
+    Array.prototype.forEach.call(document.querySelectorAll('[data-dp-pa5-berichte]'), function (x) { x.innerHTML = h; });
+  }
   function wertverlaufIn(host, hist) {
     var S = window.State, R = S && Array.isArray(S.cfRows) ? S.cfRows : [];
     stil();
@@ -968,6 +994,7 @@
        Jahresabgleich und im Exit) und die Lage beim Kauf gegen heute */
     wertKopfAlle(hist);
     lageAlle(hist);
+    berichteAlle(hist);
     if (R.length < 2) { host.innerHTML = ''; return; }
     var bj = hist.map(function (h) { var d = new Date(h.created_at); return isNaN(d) ? null : d.getFullYear(); }).filter(Boolean);
     var bis = Math.max(heute + 3, bj.length ? Math.max.apply(null, bj) : heute);
@@ -1011,8 +1038,7 @@
     host.innerHTML = abKopf('Wert gegen Plan', 'Plan-Wert · Restschuld · Berichte') + '<div data-dp-pa4-g></div>'
       + erkl('<b>So liest du die Grafik:</b> Die gestrichelte Linie ist dein <b>Plan-Wert</b> – der Kaufpreis, fortgeschrieben mit der Wertsteigerung aus deinen Eingaben. Die blaue Linie mit der Fläche ist die <b>Restschuld</b> deiner Darlehen; der Abstand zwischen beiden ist das Eigenkapital im Objekt nach Plan. '
         + 'Die Punkte sind die <b>Marktpreisindikationen</b> deiner Marktberichte: gefüllt mit dem Abschlag auf Angebotspreise (aktueller Marktdurchschnitt), hohl ohne Abschlag.')
-      + (zeilen.length ? abKopf('Alle Berichte zu diesem Objekt', zeilen.length + (zeilen.length === 1 ? ' Bericht' : ' Berichte') + ' · gegen deinen Plan-Wert')
-        + tabelle(['Datum', 'Plan-Wert', 'Marktpreis Ø', 'gegen Plan', 'Ertragswert', 'Lage'], zeilen) : '');
+;
     linien(host.querySelector('[data-dp-pa4-g]'), {
       x: jahre.map(String), reihen: reihen, fmt: eur, achse: te, hoehe: 300, aria: 'Wert gegen Plan von ' + jahre[0] + ' bis ' + jahre[jahre.length - 1],
       tip: function (i) {
@@ -1477,7 +1503,11 @@
        Plan-Wert/Restschuld), dann Wert je Verfahren, Wert gegen Plan mit allen Berichten, Lage beim Kauf gegen heute */
     var mbWeg = '<div data-dp-pa5-wertkopf="' + (bestand ? 'b' : 'a') + '">' + wertKopf(bestand, histJetzt()) + '</div>';
     reiter.push('<button type="button" class="btn-clean dp-pa-tab" id="dp-pa-tab-wert" data-dp-pa-immer="1" onclick="_dpPaTab(\'wert\',this)">Wert &amp; Lage</button>');
-    inhalt.push(panel('wert', mbWeg + (o.wert || '') + teil('loc', '<div data-dp-pa5-lage="' + (bestand ? 'b' : 'a') + '">' + lageHtml(bestand, histJetzt()) + '</div>' + (o.lage ? '<div style="margin-top:22px"></div>' + kuerzen(o.lage) : '')), false));
+    inhalt.push(panel('wert', mbWeg + (o.wert || '') + teil('loc', '<div data-dp-pa5-lage="' + (bestand ? 'b' : 'a') + '">' + lageHtml(bestand, histJetzt()) + '</div>' + (o.lage ? '<div style="margin-top:22px"></div>' + kuerzen(o.lage) : ''))
+      /* v3443 · Marcel 15.11.2026: „unter Wert & Lage sollten auch die Berichte aufgelistet sein, unten" - die Liste aller
+         Berichte (mit PDF) und der Verlauf der Abrufe stehen jetzt am Ende des Reiters, nach Lage & Markt */
+      + '<div id="dp-pa-berichte" style="margin-top:26px"><div data-dp-pa5-berichte="1"></div>'
+      + '<div id="dp-pa-verlauf-wrap" style="display:none;margin-top:16px"><div class="dp-pa-card" id="dp-pa-verlauf-body"></div></div></div>', false));
     /* v3323 · Potenzialanalyse (pa-potenzial.js) und Hausverlauf (hausverlauf.js) */
     var potH = ''; try { potH = window.DpPaPotenzial ? window.DpPaPotenzial.html(o.analyse || {}, bestand) : ''; } catch (eP) { potH = ''; }
     var hausH = ''; try { hausH = window.DpHausverlauf ? window.DpHausverlauf.html() : ''; } catch (eH) { hausH = ''; }
@@ -1597,6 +1627,6 @@
     }
   });
 
-  window.DpPilotV4 = { VERSION: 'v3442', unterZeigen: unterZeigen, siZeichnen: siZeichnen, siTabelle: siTabelle, wegNeu: wegNeu, scoreSicht: scoreSicht, sichtbarerScore: sichtbarerScore, leisteMessen: leisteMessen, huelle: huelle, uebersicht: uebersicht, risiko: risiko, steuer: steuer, gesamtstatement: gesamtstatement,
+  window.DpPilotV4 = { VERSION: 'v3443', unterZeigen: unterZeigen, siZeichnen: siZeichnen, siTabelle: siTabelle, wegNeu: wegNeu, scoreSicht: scoreSicht, sichtbarerScore: sichtbarerScore, leisteMessen: leisteMessen, huelle: huelle, uebersicht: uebersicht, risiko: risiko, steuer: steuer, gesamtstatement: gesamtstatement,
     wertverlauf: wertverlauf, indexVerlauf: indexVerlauf, linien: linien, modus: modus, setzeModus: setzeModus, neuZeichnen: neuZeichnen, saetze: saetze, steuerTabelle: steuerTabelle };
 })();
