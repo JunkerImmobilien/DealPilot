@@ -31,7 +31,7 @@
      Zahlen dran". Farben wie steuer-verlauf.js: Gold der Marke (Balken, Fläche), Anthrazit als Linie mit
      weißen Punkten, Grün für Gutes, Rot für Negatives, Gold dunkel gestrichelt für Plan/Marken. Gold nur
      als var(--wl-…) und deshalb nur in style="…" (var() wirkt nicht in SVG-Attributen). */
-  var C = { c1: '#2A2727', c2: 'var(--wl-c9a84c, #C9A84C)', plan: 'var(--wl-b8932f, #b8932f)', linie: '#2A2727', gut: '#3FA56C', rot: '#B8625C',
+  var C = { c1: '#2A2727', c2: 'var(--wl-c9a84c, #C9A84C)', plan: 'var(--wl-b8932f, #b8932f)', linie: '#2A2727', gut: '#3FA56C', rot: '#B8625C', blau: '#2f6db5', aqua: '#1baf7a',
             gold: 'var(--wl-c9a84c, #C9A84C)', goldHell: 'var(--wl-e8cc7a, #E8CC7A)' };
 
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
@@ -79,7 +79,161 @@
     try { if (_letzteHist) wertverlauf(_letzteHist); } catch (e) {}
     try { steuerTabelleAlle(); } catch (e) {}
     try { minisZeichnen(); } catch (e) {}
+    try { siZeichnen(); } catch (e) {}
+    try { wertKopfAlle(); lageAlle(); } catch (e) {}
+    try { Array.prototype.forEach.call(document.querySelectorAll('[data-dp-pa5-steuerkopf]'), function (h) { var c = window._dpBegriff ? window._dpBegriff().corp : false; h.innerHTML = steuerKopf(h.getAttribute('data-dp-pa5-steuerkopf') === 'b', c); }); } catch (e) {}
   }
+
+  /* ══ v3440 · GESTALTUNG WIE DIE DEMO (design/Vorschläge/pilot-analyse-demo.html, Fassung 2) ══════════
+     Marcel 15.11.2026: „die Demo ist super, gerne noch professionelle Grafiken rein … setz alles um, was geht".
+     Gemessen vorher (Staging v3420): jede Teilfläche war eine eigene .dp-pa-card (weiß, Rahmen, Schatten) im
+     weißen Panel - Kasten in Kasten; Überschriften mit goldenem Balken; im Detail eine goldene Randlinie.
+     Kaskade: .dp-pa-card steht EINMAL in style.css (Z. 33279, ohne !important) und .abw-tafel-host (Z. 40369/
+     40487) - beides wird hier unter .dp-pa-wrap[data-dp-pa-v4] .dp-pa-content (0,3,0 + Klasse) flach gelegt.
+     Knöpfe tragen .btn-clean: „.sec button:not(…)" (0,9,1 !important) nimmt sie aus.
+     Jetzt: EIN Rahmen um den Inhalt, je Reiter oben ein Ergebnissatz (Space Grotesk 19 px) mit einem
+     Hauptknopf, Kennzahlleisten mit Trennlinien, Tabellen mit Gruppenzeilen, Zahlen rechtsbündig in fester
+     Ziffernbreite, Köpfe in JetBrains Mono, Gold nur am aktiven Reiter, am Hauptknopf und am gewählten
+     Unterschalter. Grün und Rot nur für Abweichungen. */
+  var GB = 'color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 12%, #fff)';
+  var STIL5 = [
+    '.dp-pa-wrap[data-dp-pa-v4] .dp-pa4-leiste{margin:0;border-radius:14px 14px 0 0;border-bottom-color:#EFEAE0}',
+    '.dp-pa-wrap[data-dp-pa-v4] > .dp-pa-content{border:1px solid #E6DCC2;border-top:0;border-radius:0 0 14px 14px;background:#fff;padding:22px 22px 26px;box-sizing:border-box;max-width:100%}',
+    '@media (max-width:640px){.dp-pa-wrap[data-dp-pa-v4] > .dp-pa-content{padding:16px 12px 20px}}',
+    /* ein Rahmen statt Kasten in Kasten */
+    '.dp-pa-wrap[data-dp-pa-v4] .dp-pa-content .dp-pa-card,.dp-pa-wrap[data-dp-pa-v4] .dp-pa-content .abw-tafel-host{background:transparent !important;border:0 !important;border-radius:0 !important;box-shadow:none !important;padding:0 !important;margin:0 0 26px !important}',
+    '.dp-pa-wrap[data-dp-pa-v4] .dp-pa-content .dp-pa-cols > .dp-pa-card{margin:0 !important}',
+    '.dp-pa-wrap[data-dp-pa-v4] .dp-pa-content .dp-pa-cols{gap:28px;margin:0 0 26px}',
+    '.dp-pa-wrap[data-dp-pa-v4] .dp-pa-content .dp-pa-sec{margin:0 0 10px;gap:10px}',
+    '.dp-pa-wrap[data-dp-pa-v4] .dp-pa-content .dp-pa-sec .dp-pa-bar,.dp-pa-wrap[data-dp-pa-v4] .dp-pa-content .dp-pa-sec .dp-pa-sq{display:none}',
+    '.dp-pa-wrap[data-dp-pa-v4] .dp-pa-content .dp-pa-lbl{font:500 10.5px/1.3 "JetBrains Mono",monospace;letter-spacing:.09em;color:#6B645A}',
+    '.dp-pa-wrap[data-dp-pa-v4] .dp-pa-content .dp-pa-sec.good .dp-pa-lbl{color:#2E7D50}.dp-pa-wrap[data-dp-pa-v4] .dp-pa-content .dp-pa-sec.bad .dp-pa-lbl{color:#B8625C}',
+    '.dp-pa-wrap[data-dp-pa-v4] .dp-pa-content .dp-pa-rule{background:#EFEAE0}',
+    '.dp-pa-wrap[data-dp-pa-v4] .abw-kopf h4{font:600 15px "Space Grotesk",Inter,sans-serif;color:#2A2727}',
+    /* Gold zurücknehmen: Textabschnitte, Hinweissätze, Wegweiser */
+    '.dp-pa-wrap[data-dp-pa-v4] .dp-pa4-a{border-left:2px solid #EFEAE0}',
+    '.dp-pa-wrap[data-dp-pa-v4] .dp-pa4-a h4{color:#6B645A}',
+    '.dp-pa-wrap[data-dp-pa-v4] .dp-pa4-satz,.dp-pa-wrap[data-dp-pa-v4] .dp-stv-satz{background:#FAF8F3;border-left:2px solid #D9D2C3}',
+    '.dp-pa-wrap[data-dp-pa-v4] .dp-pa4-wk i{color:#9A9285}',
+    '.dp-pa-wrap[data-dp-pa-v4] .dp-pa4-link{color:#2A2727 !important}',
+    '.dp-pa-wrap[data-dp-pa-v4] .abw-bewegt{background:#FAF8F3}',
+    '.dp-pa-wrap[data-dp-pa-v4] .abw-tafel tr.abw-gruppe td{color:#6B645A;border-bottom-color:#EFEAE0}',
+    /* Hauptknopf und leiser Knopf */
+    '.dp-pa-wrap[data-dp-pa-v4] .dp-pa4-btn,.dp-pa-wrap[data-dp-pa-v4] .dp-pa5-knopf{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--wl-c9a84c, #C9A84C) !important;background:' + GB + ' !important;color:#2A2727 !important;border-radius:8px !important;padding:7px 13px !important;font:600 13px Inter,system-ui,sans-serif !important;cursor:pointer;box-shadow:none !important;min-height:0 !important;white-space:nowrap}',
+    '.dp-pa-wrap[data-dp-pa-v4] .dp-pa4-btn.leise,.dp-pa-wrap[data-dp-pa-v4] .dp-pa5-knopf.leise{border-color:#E6DCC2 !important;background:#fff !important;font-weight:500 !important}',
+    '.dp-pa-wrap[data-dp-pa-v4] .dp-pa4-btn:hover,.dp-pa-wrap[data-dp-pa-v4] .dp-pa5-knopf:hover{border-color:var(--wl-b8932f, #b8932f) !important}',
+    /* Ergebnissatz je Reiter */
+    '.dp-pa5-erg{display:flex;gap:14px 18px;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;padding:0 0 16px;border-bottom:1px solid #EFEAE0;margin:0 0 18px}',
+    '.dp-pa-wrap[data-dp-pa-v4] .dp-pa-content p.dp-pa5-satz{flex:1 1 380px;margin:0;font:500 19px/1.38 "Space Grotesk",Inter,sans-serif;letter-spacing:-.005em;color:#2A2727;max-width:760px;text-align:left !important;-webkit-hyphens:manual;hyphens:manual}',
+    '.dp-pa5-satz b{font-weight:600}',
+    '.dp-pa5-rechts{display:flex;gap:8px;align-items:center;flex-wrap:wrap;flex:0 0 auto}',
+    '@media (max-width:640px){.dp-pa-wrap[data-dp-pa-v4] .dp-pa-content p.dp-pa5-satz{font-size:17px;flex-basis:100%}}',
+    /* Score rechts im Ergebnis (Übersicht) - Klassen dp-pa4-urteil/.z/.u bleiben (Messe-Drehbuch Modul 11) */
+    '.dp-pa-wrap[data-dp-pa-v4] .dp-pa5-erg .dp-pa4-urteil{display:flex;align-items:center;gap:10px;min-width:0;border:1px solid #EFEAE0;border-radius:10px;padding:8px 12px;background:#fff}',
+    '.dp-pa-wrap[data-dp-pa-v4] .dp-pa5-erg .dp-pa4-urteil .z{font:600 26px/1 "Space Grotesk",Inter,sans-serif;color:#2A2727;font-variant-numeric:tabular-nums}',
+    '.dp-pa-wrap[data-dp-pa-v4] .dp-pa5-erg .dp-pa4-urteil .u{display:grid;font:500 11.5px/1.35 Inter,sans-serif;color:#6B645A}',
+    '.dp-pa-wrap[data-dp-pa-v4] .dp-pa5-erg .dp-pa4-urteil .u b{font:600 13px Inter,sans-serif;color:#2A2727}',
+    '.dp-pa-wrap[data-dp-pa-v4] .dp-pa5-erg .dp-pa-empf{padding:5px 12px;font-size:12.5px}',
+    /* Kennzahlleiste mit Trennlinien (ersetzt die Kacheln mit farbiger Oberkante) */
+    '.dp-pa-wrap[data-dp-pa-v4] .dp-pa4-zahlen{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:0;border:1px solid #EFEAE0;border-radius:10px;overflow:hidden;margin:0 0 20px}',
+    '.dp-pa-wrap[data-dp-pa-v4] .dp-pa4-zahlen.l4{grid-template-columns:repeat(4,minmax(0,1fr))}',
+    '.dp-pa-wrap[data-dp-pa-v4] .dp-pa4-z{border:0;border-right:1px solid #EFEAE0;padding:12px 14px;gap:2px;min-width:0}',
+    '.dp-pa-wrap[data-dp-pa-v4] .dp-pa4-z:last-child{border-right:0}',
+    '.dp-pa-wrap[data-dp-pa-v4] .dp-pa4-z span{font:500 10.5px/1.3 "JetBrains Mono",monospace;letter-spacing:.07em;color:#6B645A}',
+    '.dp-pa-wrap[data-dp-pa-v4] .dp-pa4-z b{font:600 20px/1.25 "Space Grotesk",Inter,sans-serif;margin-top:2px}',
+    '.dp-pa-wrap[data-dp-pa-v4] .dp-pa4-z em{font-size:12px;color:#6B645A}',
+    '@media (max-width:640px){.dp-pa-wrap[data-dp-pa-v4] .dp-pa4-zahlen,.dp-pa-wrap[data-dp-pa-v4] .dp-pa4-zahlen.l4{grid-template-columns:repeat(2,minmax(0,1fr))}'
+      + '.dp-pa-wrap[data-dp-pa-v4] .dp-pa4-z:nth-child(2n){border-right:0}.dp-pa-wrap[data-dp-pa-v4] .dp-pa4-z:nth-child(n+3){border-top:1px solid #EFEAE0}'
+      + '.dp-pa-wrap[data-dp-pa-v4] .dp-pa4-z b{font-size:17px}}',
+    /* Steuerverlauf (steuer-verlauf.js) in der Pilot-Analyse: dieselbe Leiste, Raster als Haarlinie */
+    '.dp-pa-wrap[data-dp-pa-v4] .dp-stv-zahlen{gap:0;border:1px solid #EFEAE0;border-radius:10px;overflow:hidden}',
+    '.dp-pa-wrap[data-dp-pa-v4] .dp-stv-z{border:0;border-right:1px solid #EFEAE0;padding:12px 14px}',
+    '.dp-pa-wrap[data-dp-pa-v4] .dp-stv-z:last-child{border-right:0}',
+    '.dp-pa-wrap[data-dp-pa-v4] .dp-stv-z span{font:500 10.5px/1.3 "JetBrains Mono",monospace;letter-spacing:.07em}',
+    '.dp-pa-wrap[data-dp-pa-v4] .dp-stv-z b{font-weight:600}',
+    '@media (max-width:640px){.dp-pa-wrap[data-dp-pa-v4] .dp-stv-z:nth-child(2n){border-right:0}.dp-pa-wrap[data-dp-pa-v4] .dp-stv-z:nth-child(n+3){border-top:1px solid #EFEAE0}}',
+    '.dp-pa-wrap[data-dp-pa-v4] .dp-stv-ch .gl{stroke:#F1ECE1}.dp-pa-wrap[data-dp-pa-v4] .dp-stv-ch .nl{stroke:#9A9285;stroke-width:1}',
+    /* Abschnittsköpfe */
+    '.dp-pa5-ab{display:flex;align-items:baseline;gap:6px 12px;margin:26px 0 10px;flex-wrap:wrap}',
+    '.dp-pa5-ab:first-child{margin-top:0}',
+    '.dp-pa5-ab h3{margin:0;font:600 15px/1.3 "Space Grotesk",Inter,sans-serif;color:#2A2727}',
+    '.dp-pa5-eti{margin-left:auto;font:500 10.5px/1.3 "JetBrains Mono",monospace;letter-spacing:.08em;text-transform:uppercase;color:#9A9285}',
+    '@media (max-width:640px){.dp-pa5-eti{margin-left:0;flex-basis:100%}}',
+    /* Tabellen */
+    '.dp-pa5-tab{overflow-x:auto;border:1px solid #EFEAE0;border-radius:10px;max-width:100%;--dpm-schiene:1}',
+    '.dp-pa5-tab table{width:100%;border-collapse:collapse;font:400 13px/1.45 Inter,system-ui,sans-serif;color:#2A2727}',
+    '.dp-pa5-tab th,.dp-pa5-tab td{text-align:right;padding:8px 10px;border-bottom:1px solid #EFEAE0;font-variant-numeric:tabular-nums;white-space:nowrap;vertical-align:top}',
+    '.dp-pa5-tab th:first-child,.dp-pa5-tab td:first-child{text-align:left;white-space:normal;min-width:140px}',
+    '.dp-pa5-tab thead th{font:500 10.5px/1.35 "JetBrains Mono",monospace;letter-spacing:.07em;text-transform:uppercase;color:#6B645A;border-bottom-color:#E6DCC2;vertical-align:bottom;background:#fff}',
+    '.dp-pa5-tab thead th small{display:block;text-transform:none;letter-spacing:0;font:400 11px Inter,sans-serif;color:#9A9285}',
+    '.dp-pa5-tab td small{display:block;color:#9A9285;font-size:11px;font-weight:400}',
+    '.dp-pa5-tab tr.gr td{font:500 10.5px/1.3 "JetBrains Mono",monospace;letter-spacing:.07em;text-transform:uppercase;color:#6B645A;padding-top:14px;background:none}',
+    '.dp-pa5-tab tr.su td{font-weight:600;border-top:1px solid #E6DCC2}',
+    '.dp-pa5-tab tbody tr:not(.gr):hover td{background:#FAF8F3}',
+    '.dp-pa5-tab tbody tr:last-child td{border-bottom:0}',
+    '.dp-pa5-tab .hebel{background:#FCFBF7}',
+    '.dp-pa5-tab .gut{color:#2E7D50}.dp-pa5-tab .schlecht{color:#B8625C}',
+    '.dp-pa-wrap[data-dp-pa-v4] .dp-pa-content .dp-pa5-hin{margin:8px 0 0;font:400 12.5px/1.55 Inter,system-ui,sans-serif;color:#6B645A;text-align:left !important;max-width:90ch}',
+    /* Tabellen anderer Module in denselben Ton (Kopf in Mono, feste Ziffernbreite) */
+    '.dp-pa-wrap[data-dp-pa-v4] .dp-pa-content :is(.abw-tafel,.dp-pot table,.dp-pa4-tab table,.dp-pap-tab table,.dp-wz-t) th{font-family:"JetBrains Mono",monospace;font-weight:500;letter-spacing:.07em;color:#6B645A;background:#fff}',
+    '.dp-pa-wrap[data-dp-pa-v4] .dp-pa-content :is(.abw-tafel,.dp-pot table,.dp-pa4-tab table,.dp-pap-tab table,.dp-wz-t) td{font-variant-numeric:tabular-nums}',
+    '.dp-pa-wrap[data-dp-pa-v4] .dp-pa4-tab{border-color:#EFEAE0;border-radius:10px}.dp-pa-wrap[data-dp-pa-v4] .dp-pa4-tab tr.gr td{background:none}',
+    /* Unterumschalter Potenzial · Risiken · Anschluss · Exit */
+    '.dp-pa5-unter{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 18px}',
+    '.dp-pa-wrap[data-dp-pa-v4] .dp-pa5-unter button{border:1px solid #E6DCC2 !important;background:#fff !important;color:#4A4542 !important;border-radius:8px !important;padding:6px 13px !important;font:500 13px Inter,system-ui,sans-serif !important;cursor:pointer;box-shadow:none !important;min-height:0 !important}',
+    '.dp-pa-wrap[data-dp-pa-v4] .dp-pa5-unter button[aria-pressed="true"]{border-color:var(--wl-c9a84c, #C9A84C) !important;background:' + GB + ' !important;color:#050505 !important;font-weight:600 !important}',
+    '.dp-pa-wrap[data-dp-pa-v4] .dp-pa5-zu{display:none !important}',
+    '.dp-pa-wrap[data-dp-pa-v4] [data-dp-pa5-teil]{margin-top:0 !important}',
+    /* zwei Spalten (Übersicht) */
+    '.dp-pa5-zwei{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 28px;margin:0 0 6px}',
+    '@media (max-width:720px){.dp-pa5-zwei{grid-template-columns:1fr}}',
+    '.dp-pa5-zwei > div{min-width:0}',
+    /* Zielerreichung */
+    '.dp-pa5-ziel{display:grid;grid-template-columns:minmax(96px,170px) minmax(0,1fr) 52px;gap:4px 12px;align-items:center}',
+    '.dp-pa5-ziel > span{font:400 13px Inter,sans-serif;color:#4A4542}',
+    '.dp-pa5-ziel .bahn{height:8px;border-radius:4px;background:#F1ECE1;position:relative;overflow:hidden}',
+    '.dp-pa5-ziel .bahn i{position:absolute;left:0;top:0;bottom:0;border-radius:4px;background:#2f6db5}',
+    '.dp-pa5-ziel > b{text-align:right;font:600 13px Inter,sans-serif;font-variant-numeric:tabular-nums;color:#2A2727}',
+    '.dp-pa5-ziel > small{grid-column:2 / -1;margin:-2px 0 6px;font:400 11.5px/1.4 Inter,sans-serif;color:#9A9285}',
+    /* Szenarien flach, Statusfarbe nur als Oberkante */
+    '.dp-pa-wrap[data-dp-pa-v4] .dp-pa4-szk{border:1px solid #EFEAE0;border-top:3px solid var(--c,#2A2727);border-radius:10px;background:#fff}',
+    /* Detail-Hülle der DpPotenzial-Karte: ihre eigene Kennzahlen-Tafel ist durch die Kennzahlen-Tabelle ersetzt */
+    '.dp-pa-wrap[data-dp-pa-v4] [data-dp-pa5-pot] .dp-pot > .dp-pot-scroll:not([style]){display:none}',
+    '.dp-pa-wrap[data-dp-pa-v4] [data-dp-pa5-pot] .dp-pa-sec{display:none}',
+    /* Grafiken: Raster als Haarlinie, Werte in Textfarbe (dataviz: Text trägt nie die Reihenfarbe) */
+    '.dp-pa-wrap[data-dp-pa-v4] .dp-pa4-ch .gl{stroke:#F1ECE1}.dp-pa-wrap[data-dp-pa-v4] .dp-pa4-ch .nl{stroke:#9A9285;stroke-width:1}',
+    '.dp-pa-wrap[data-dp-pa-v4] .dp-pa4-ch .wz,.dp-pa-wrap[data-dp-pa-v4] .dp-pa4-ch .wz-l{fill:#2A2727}',
+    '.dp-pa-wrap[data-dp-pa-v4] .dp-pa4-leg{font:500 10.5px "JetBrains Mono",monospace;gap:8px 16px}',
+    /* Wert je Verfahren (wertvergleich.js): Erklärtexte nur im Detail, Zwischenköpfe in Textfarbe */
+    '.dp-pa-wrap[data-dp-pa-v4] .dp-wv .dp-wv-h{color:#2A2727}',
+    '.dp-pa-wrap[data-dp-pa-modus="einfach"] .dp-wv > .dp-wv-h,.dp-pa-wrap[data-dp-pa-modus="einfach"] .dp-wv > p.dp-pa-p{display:none !important}'
+  ];
+
+  /* ── Bausteine der Fassung 5 (v3440) ─────────────────────────────────── */
+  function ergebnis(satz, rechts) { return '<div class="dp-pa5-erg"><p class="dp-pa5-satz">' + satz + '</p>' + (rechts ? '<div class="dp-pa5-rechts">' + rechts + '</div>' : '') + '</div>'; }
+  function knopf(text, onclick, leise, extra) { return '<button type="button" class="btn-clean dp-pa5-knopf' + (leise ? ' leise' : '') + '"' + (onclick ? ' onclick="' + onclick + '"' : '') + (extra || '') + '>' + text + '</button>'; }
+  function abKopf(titel, eti) { return '<div class="dp-pa5-ab"><h3>' + esc(titel) + '</h3>' + (eti ? '<span class="dp-pa5-eti">' + esc(eti) + '</span>' : '') + '</div>'; }
+  function hinweis(t, kl) { return t ? '<p class="dp-pa5-hin' + (kl ? ' ' + kl : '') + '">' + t + '</p>' : ''; }
+  /* Tabelle: kopf = [Text|{t,u,kl}], zeilen = [{gr:'…'} | {z:[…], kl:'…', d:true (nur Detail)}] */
+  function tabelle(kopf, zeilen, attr) {
+    var n = kopf.length;
+    var th = kopf.map(function (k) { k = typeof k === 'string' ? { t: k } : k; return '<th' + (k.kl ? ' class="' + k.kl + '"' : '') + '>' + k.t + (k.u ? '<small>' + k.u + '</small>' : '') + '</th>'; }).join('');
+    var tb = zeilen.map(function (z) {
+      if (!z) return '';
+      if (z.gr) return '<tr class="gr' + (z.d ? ' dp-pa-d' : '') + '"><td colspan="' + n + '">' + z.gr + '</td></tr>';
+      var kl = [z.kl || '', z.d ? 'dp-pa-d' : ''].join(' ').trim();
+      return '<tr' + (kl ? ' class="' + kl + '"' : '') + '>' + z.z.map(function (c, i) {
+        c = (c == null || c === '') ? '–' : c;
+        var ck = z.zk && z.zk[i] ? z.zk[i] : (kopf[i] && kopf[i].kl ? kopf[i].kl : '');
+        return '<td' + (ck ? ' class="' + ck + '"' : '') + '>' + c + '</td>';
+      }).join('') + '</tr>';
+    }).join('');
+    return '<div class="dp-pa5-tab"' + (attr || '') + '><table><thead><tr>' + th + '</tr></thead><tbody>' + tb + '</tbody></table></div>';
+  }
+  function pct(v, n) { return de(v, n == null ? 2 : n) + ' %'; }
+  function feldWert(id) { var e = document.getElementById(id); return e ? String(e.value || '').trim() : ''; }
+  function feldZahl(id) { var t = feldWert(id); if (!t) return null; if (t.indexOf(',') >= 0) t = t.replace(/\./g, '').replace(',', '.'); var n = parseFloat(t); return isFinite(n) ? n : null; }
+  function datumDe(iso) { var s = String(iso || '').slice(0, 10); return /^\d{4}-\d{2}-\d{2}$/.test(s) ? s.split('-').reverse().join('.') : ''; }
 
   /* ── Stil ────────────────────────────────────────────────────────────── */
   function stil() {
@@ -150,13 +304,14 @@
       '.dp-pa-wrap[data-dp-pa-v4] .dp-pa4-seg button{border:0 !important;background:transparent !important;color:#7A7370 !important;font:600 12.5px "Space Grotesk",Inter,sans-serif !important;padding:6px 14px !important;border-radius:7px !important;cursor:pointer;box-shadow:none !important;min-height:0 !important}',
       '.dp-pa-wrap[data-dp-pa-v4] .dp-pa4-seg button[aria-pressed="true"]{background:linear-gradient(110deg,var(--wl-e8cc7a,#E8CC7A),var(--wl-c9a84c,#C9A84C) 55%,var(--wl-b8932f,#b8932f)) !important;color:#050505 !important}',
       /* v3259 · die Zeile „Kurzfassung … / Ausführlich …" ist gefallen - der Text steht als Tooltip am Umschalter */
-      '.dp-pa-wrap[data-dp-pa-v4][data-dp-pa-modus="detail"] > .dp-pa-content{border-left:3px solid var(--wl-c9a84c,#C9A84C);padding-left:12px}',
+      /* v3440 · hier stand die goldene Randlinie im Detail - Gold nur noch am aktiven Reiter und an offenen Aufgaben (Demo Fassung 2) */
       /* „Pilot-Analyse starten" stand über allem - jetzt „Neu abrufen" unter der Stand-Zeile; PDF-Bausteine auf Knopfdruck */
       '#s5 .ai-box:has(#ai-content .dp-pa-wrap[data-dp-pa-v4]) > #ai-btn{display:none !important}',
       '#s5 .ai-box:has(#ai-content .dp-pa-wrap[data-dp-pa-v4]):not(.dp-pa4-pdf-offen) > .ai-pdf-toggle{display:none !important}',
       /* eigene Schalter anderer Module folgen dem Kopf */
       '.dp-pa-wrap[data-dp-pa-v4] .dpu-umschalter{display:none !important}',
-      '.dp-pa-wrap[data-dp-pa-modus="einfach"] .dp-stv-fuss,.dp-pa-wrap[data-dp-pa-modus="einfach"] #dp-pa-wert-body{display:none !important}',
+      /* v3440 · „Wert je Verfahren" (#dp-pa-wert-body) steht jetzt in beiden Ansichten */
+      '.dp-pa-wrap[data-dp-pa-modus="einfach"] .dp-stv-fuss{display:none !important}',
       /* Mini-Grafiken (Einfach) und Beleg-Stand */
       '.dp-pa4-mini{margin:0 0 12px}',
       '.dp-pa4-mini h5{margin:0 0 6px;font:600 10.5px "JetBrains Mono",monospace;letter-spacing:.08em;text-transform:uppercase;color:#6B645A}',
@@ -278,7 +433,7 @@
       '.dp-pa4-wk b{font:700 15px "Space Grotesk",Inter,sans-serif;color:#2A2727;font-variant-numeric:tabular-nums}',
       '.dp-pa4-wk em{font-style:normal;font:400 11.5px Inter,sans-serif;color:#7A7370}',
       '.dp-pa4-wk i{position:absolute;right:11px;top:50%;transform:translateY(-50%);font:700 18px/1 "Space Grotesk",sans-serif;font-style:normal;color:var(--wl-b8932f,#b8932f)}'
-    ].join('\n');
+    ].concat(STIL5).join('\n');
     document.head.appendChild(s);
   }
 
@@ -329,7 +484,8 @@
   function kopfzeile(lbl) { return '<div class="dp-pa-sec"><span class="dp-pa-bar"></span><span class="dp-pa-lbl">' + esc(lbl) + '</span><span class="dp-pa-rule"></span></div>'; }
 
   /** Kennzahlen des Objekts, wie sie heute gerechnet sind (State.kpis, Marktbericht) */
-  function kennzahlen(bestand) {
+  /* v3440 · vier: Kennzahlleiste der Übersicht (vier Werte, der Score steht rechts im Ergebnis) */
+  function kennzahlen(bestand, vier) {
     var k = kpis(), w = wertDaten(), z = [];
     if (zahl(k.kp) && k.kp > 0) z.push(zahlKachel(bestand ? 'Kaufpreis (Ankauf)' : 'Kaufpreis', eur(k.kp), zahl(k.bmy) ? 'Bruttorendite ' + de(k.bmy, 2) + ' %' : '', '#E6DCC2'));
     if (zahl(k.cf_m)) z.push(zahlKachel('Cashflow vor Steuer · volles Jahr', sEur(k.cf_m) + ' / Monat', zahl(k.cf_ns) ? 'nach Steuer ' + sEur(k.cf_ns / 12) + ' / Monat (volles Jahr)' : '', k.cf_m >= 0 ? C.gut : C.rot));
@@ -339,14 +495,15 @@
       z.push(zahlKachel('Marktpreis Ø', eur(w.marktpreisindikation.mitte), oh, 'var(--wl-c9a84c,#C9A84C)'));
     }
     if (w && w.ertragswert && zahl(w.ertragswert.wert)) z.push(zahlKachel('Ertragswert', eur(w.ertragswert.wert), w.ertragswert.vorlaeufig ? 'vorläufig' : (zahl(w.ertragswert.lzs_pct) ? 'LZS ' + de(w.ertragswert.lzs_pct, 2) + ' %' : ''), C.c1));
-    var sc = sichtbarerScore();
+    var sc = vier ? null : sichtbarerScore();
     if (sc) z.push(zahlKachel(sc.name, String(sc.wert), (window.ScoreTier && window.ScoreTier.stufe ? window.ScoreTier.stufe(sc.wert).wort : ''), '#2A2727'));
-    return '<div class="dp-pa4-zahlen" data-dp-pa4-kz="' + (bestand ? 'b' : 'a') + '"' + (z.length ? '' : ' style="display:none"') + '>' + z.join('') + '</div>';
+    if (vier) z = z.slice(0, 4);
+    return '<div class="dp-pa4-zahlen' + (vier && z.length === 4 ? ' l4' : '') + '" data-dp-pa4-kz="' + (bestand ? 'b' : 'a') + (vier ? '4' : '') + '"' + (z.length ? '' : ' style="display:none"') + '>' + z.join('') + '</div>';
   }
   /* Der Marktbericht (DpWertZielbild) lädt oft erst nach dem Zeichnen - dann die Kacheln neu */
   function kzNeu() {
     Array.prototype.forEach.call(document.querySelectorAll('[data-dp-pa4-kz]'), function (h) {
-      try { var t = document.createElement('div'); t.innerHTML = kennzahlen(h.getAttribute('data-dp-pa4-kz') === 'b'); if (t.firstChild) h.parentNode.replaceChild(t.firstChild, h); } catch (e) {}
+      try { var a = h.getAttribute('data-dp-pa4-kz') || '', t = document.createElement('div'); t.innerHTML = kennzahlen(a.charAt(0) === 'b', a.indexOf('4') > 0); if (t.firstChild) h.parentNode.replaceChild(t.firstChild, h); } catch (e) {}
     });
   }
 
@@ -439,24 +596,35 @@
     window._dpPaLetzte = a;
     var st = window._dpEmpfStufe ? window._dpEmpfStufe(a.empfehlung || a.fazit_kurz) : { label: a.empfehlung || '—', farbe: 'var(--wl-c9a84c,#C9A84C)' };
     var sc = sichtbarerScore();
-    /* v3099e · Marcel: im Bestand KEIN Urteil wie „Halten". Im Ankauf bleibt es. Einfach: zwei ganze Sätze. */
-    var kurzT = saetze(a.gesamtbewertung || a.fazit_kurz, 2), grund = bestand ? '' : saetze(a.empfehlung_begruendung, 1);
-    var brief = '<div class="dp-pa4-brief"><div class="dp-pa4-urteil"><small>' + (bestand ? 'Stand heute' : 'Urteil zum Ankauf') + '</small>'
-      + (bestand ? '' : '<span class="dp-pa-empf" style="background:' + st.farbe + ';justify-self:start">' + esc(st.label) + '</span>')
-      + (sc ? '<span class="z">' + sc.wert + '</span><span class="u">' + esc(sc.name) + '</span>' : '') + '</div>'
-      + '<div><div class="dp-pa-e">' + (kurzT ? '<p>' + txt(kurzT) + '</p>' : '') + (grund ? '<p>' + txt(grund) + '</p>' : '') + '</div>'
-      + '<div class="dp-pa-d"><small class="dp-pa4-bt">Gesamtbewertung</small>' + absatz(a.gesamtbewertung || a.fazit_kurz) + '</div></div></div>';
-    var h = (extra.hinweis || '') + brief + kennzahlen(bestand);
-    /* Einfach: was du jetzt tun kannst (Bestand) – zwei ganze Sätze, daneben die gewählte Strategie */
-    if (bestand && a.bestand_modus && has(a.verhandlungsempfehlung))
-      h += '<div class="dp-pa-e">' + karte(kopfzeile('Was du jetzt tun kannst') + '<div class="dp-pa4-strat-reihe"><p class="dp-pa-p">' + txt(saetze(a.verhandlungsempfehlung, 2)) + '</p>' + strategieKasten() + '</div>') + '</div>';
-    else if (bestand) h += '<div class="dp-pa-e">' + strategieKasten() + '</div>';
+    var gb = a.gesamtbewertung || a.fazit_kurz;
+    /* v3440 · Demo Fassung 2: oben EIN Ergebnissatz, rechts Urteil (nur Ankauf, v3099e: im Bestand kein „Halten")
+       und Score. Der Satz ist der erste ganze Satz der Gesamtbewertung - nichts wird dazugeschrieben. */
+    var satz = saetze(bestand ? gb : (a.empfehlung_begruendung || gb), 1) || saetze(gb, 1);
+    var stufe = sc && window.ScoreTier && window.ScoreTier.stufe ? window.ScoreTier.stufe(sc.wert).wort : '';
+    var rechts = (!bestand || sc) ? '<div class="dp-pa4-urteil">' + (bestand ? '' : '<span class="dp-pa-empf" style="background:' + st.farbe + '">' + esc(st.label) + '</span>')
+      + (sc ? '<span class="z">' + sc.wert + '</span><span class="u">' + (stufe ? '<b>' + esc(stufe) + '</b>' : '') + esc(sc.name) + '</span>' : '') + '</div>' : '';
+    var h = (extra.hinweis || '') + ergebnis(satz ? txt(satz) : (bestand ? 'Stand heute' : 'Urteil zum Ankauf'), rechts) + kennzahlen(bestand, true);
+    /* Einordnung | Was jetzt zu tun ist (Bestand) bzw. Zu welchem Anleger der Kauf passt (Ankauf) */
+    var links = abKopf(bestand ? 'Einordnung' : 'Begründung')
+      + '<div class="dp-pa-e">' + absatz(saetze(a.empfehlung_begruendung || gb, 2)) + '</div>'
+      + '<div class="dp-pa-d"><div class="dp-pa4-ta">'
+      + abschnitt('Gesamtbewertung', absatz(gb))
+      + abschnitt(bestand ? 'Einordnung' : 'Begründung des Urteils', absatz(a.empfehlung_begruendung))
+      + abschnitt('Investmentbewertung', absatz(a.investmentbewertung))
+      + abschnitt('DealPilot-Insight', absatz(a.dealpilot_insight)) + '</div></div>';
+    var re = '';
+    if (bestand) {
+      var tun = a.bestand_modus && has(a.verhandlungsempfehlung) ? a.verhandlungsempfehlung : '';
+      re = abKopf('Was jetzt zu tun ist') + (tun ? '<div class="dp-pa-e">' + absatz(saetze(tun, 2)) + '</div><div class="dp-pa-d">' + absatz(tun) + '</div>' : '') + strategieKasten();
+      if (!tun && !strategieKasten()) re = '';
+    } else {
+      re = fitBlock(a);
+      if (re) re = abKopf('Zu welchem Anleger der Kauf passt') + re.replace(/^<div class="dp-pa4-a"><h4>[^<]*<\/h4>/, '<div class="dp-pa4-a" style="border-left:0;padding-left:0">');
+    }
+    h += '<div class="dp-pa5-zwei"><div>' + links + '</div>' + (re ? '<div>' + re + '</div>' : '') + '</div>';
     /* Einfach: die Tendenz als kleine Grafik (Vermögen im Objekt über die Jahre) */
-    h += '<div class="dp-pa-e dp-pa4-mini" data-dp-pa4-mini="vermoegen"></div>';
-    /* Detail: das Statement ohne die Teile, die einen eigenen Reiter haben */
-    var gs = gesamtstatement(a, bestand);
-    if (gs) h += '<div class="dp-pa-d">' + karte(kopfzeile(bestand ? 'Einordnung und Strategie' : 'Begründung und Einordnung') + gs) + '</div>';
-    if (extra.score && scoreSicht() === 'beide') h += '<div class="dp-pa-d">' + extra.score + '</div>';
+    h += '<div class="dp-pa-e dp-pa4-mini dp-pa4-mt" style="margin-top:22px" data-dp-pa4-mini="vermoegen"></div>';
+    if (extra.score && scoreSicht() === 'beide') h += '<div class="dp-pa-d dp-pa4-mt">' + extra.score + '</div>';
     h += '<div data-dp-pa4-weg="1">' + wegweiser(a, bestand) + '</div>';
     return h;
   }
@@ -575,13 +743,64 @@
       + erkl('Ein Eingang für alles: Wirtschaftsplan und Abrechnung gehen mit Jahr in die Werbungskosten, Rechnungen über den Beleg-Leser, Mietverträge in die passende Einheit, Protokolle in die WEG-Auswertung. Nichts wird ohne deine Bestätigung übernommen.'), 'dp-pa4-mt');
   }
 
+  /* v3440 · Ergebnissatz und Kennzahlleiste des Reiters Steuer. RECHNET NICHTS: Jahre aus DpSteuerVerlauf.reihe()
+     (= _computeYearTotal, dieselbe Quelle wie Reiter Steuer und Steuerverlauf), AfA aus den Jahreswerten,
+     Gebäudeanteil, AfA-Satz und Grenzsteuersatz aus den Feldern, die Frist wie steuer-verlauf.js (§ 23 EStG). */
+  function steuerKopf(bestand, corp) {
+    var SV = window.DpSteuerVerlauf, R = null, A = null;
+    try { R = SV && SV.reihe ? SV.reihe() : null; A = R && R.length ? SV.auswerten(R) : null; } catch (e) { R = null; }
+    var heute = new Date().getFullYear(), satz = '', offen = [];
+    if (A && R && R.length) {
+      if (A.wende === 0) satz = 'Das Objekt ist <b>vom ersten Jahr an steuerlich positiv</b>.';
+      else if (A.jahr) satz = 'Das Objekt wird <b>' + (A.jahr <= heute ? 'seit ' : 'ab ') + A.jahr + ' dauerhaft steuerlich positiv</b>' + (A.erstattung > 0 ? ', bis dahin ' + sEur(A.netto) + ' Steuerwirkung' : '') + '.';
+      else satz = 'Das Objekt bleibt bis ' + R[R.length - 1].jahr + ' <b>steuerlich negativ</b>, es senkt deine Steuer in jedem Jahr.';
+      if (!bestand) { var r0 = R[0]; satz = 'Im ersten Jahr (' + r0.jahr + ') <b>' + sEur(r0.erg) + ' Ergebnis ' + (corp ? 'des Objekts' : 'V+V') + '</b>, ' + (r0.steuer >= 0 ? 'rund ' + eur(r0.steuer) + ' Erstattung' : 'rund ' + eur(-r0.steuer) + ' Steuer') + '. ' + satz; }
+    }
+    if (bestand) {
+      var O = window._taxYearlyOverrides || {};
+      (window.State && Array.isArray(window.State.cfRows) ? window.State.cfRows : []).forEach(function (r) {
+        if (r.cal >= heute) return;
+        var stj = null; try { stj = window.DpEingang ? window.DpEingang.jahrStand(r.cal) : null; } catch (e) {}
+        var e = O['y' + r.cal] || {}, n = Object.keys(e).filter(function (k) { return zahl(e[k]); }).length;
+        if (!(stj && stj.belegt) && !n) offen.push(r.cal);
+      });
+      if (offen.length) satz += ' Für ' + (offen.length > 2 ? offen.slice(0, -1).join(', ') + ' und ' + offen[offen.length - 1] : offen.join(' und ')) + ' fehlen noch Belege.';
+    }
+    if (!satz) satz = 'Der Steuerverlauf erscheint, sobald das Objekt gerechnet ist.';
+    var kn = offen.length
+      ? knopf('Belege einlesen', 'if(window.DpEingang)DpEingang.oeffnen();else if(window.DealPilotBelegImport)DealPilotBelegImport.open(\'wk\')')
+      : knopf('Zum Reiter Steuer', 'try{var b=[].filter.call(document.querySelectorAll(\'.tab\'),function(x){return /Steuer/.test(x.textContent||\'\')})[0];if(b)b.click();}catch(e){}', true);
+    /* Kennzahlleiste */
+    var z = [];
+    try {
+      var S = window.State, idx = 0;
+      if (S && Array.isArray(S.cfRows)) S.cfRows.forEach(function (r, i) { if (bestand && r.cal === heute) idx = i; });
+      var t = S && S.cfRows && S.cfRows[idx] && typeof window._computeYearTotal === 'function' ? window._computeYearTotal(S.cfRows[idx].cal, idx) : null;
+      var afa = t && t.values && zahl(t.values.afa) ? Math.abs(Number(t.values.afa)) : null, satzA = feldZahl('afa_satz');
+      if (afa != null && afa > 0) z.push(zahlKachel('AfA im Jahr', eur(afa), (satzA != null ? de(satzA, 2) + ' % · ' : '') + S.cfRows[idx].cal));
+    } catch (e) {}
+    var ga = feldZahl('geb_ant');
+    if (ga != null && ga > 0) z.push(zahlKachel('Gebäudeanteil', de(ga, 1) + ' %', 'Basis der AfA'));
+    if (corp) z.push(zahlKachel('Zehnjahresfrist', 'keine', 'in der GmbH/UG ist ein Verkauf steuerpflichtig'));
+    else {
+      var kd = feldWert('kaufdat').slice(0, 10);
+      if (/^\d{4}-\d{2}-\d{2}$/.test(kd)) {
+        var fr = new Date(Date.UTC(+kd.slice(0, 4) + 10, +kd.slice(5, 7) - 1, +kd.slice(8, 10) + 1));
+        var mon = Math.round((fr - Date.now()) / (30.44 * 864e5));
+        z.push(zahlKachel('Zehnjahresfrist', ('0' + (fr.getUTCMonth() + 1)).slice(-2) + '/' + fr.getUTCFullYear(), mon <= 0 ? 'abgelaufen, Verkauf steuerfrei' : 'steuerfrei ab ' + ('0' + fr.getUTCDate()).slice(-2) + '.' + ('0' + (fr.getUTCMonth() + 1)).slice(-2) + '.' + fr.getUTCFullYear() + (mon >= 12 ? ', noch ' + Math.floor(mon / 12) + ' J.' : ', noch ' + mon + ' Mon.')));
+      }
+    }
+    var gs = feldZahl('grenz');
+    if (gs != null && gs > 0) z.push(zahlKachel('Grenzsteuersatz', de(gs, 2) + ' %', 'aus deinen Steuerangaben'));
+    return ergebnis(satz, kn) + (z.length ? '<div class="dp-pa4-zahlen' + (z.length === 4 ? ' l4' : '') + '">' + z.join('') + '</div>' : '');
+  }
   /** Unterreiter Steuer: Verlauf wie im Reiter Steuer, Text, im Detail die Tabelle */
   function steuer(a, bestand) {
     /* v3268 · Halter GmbH/UG: Betriebsausgaben statt Werbungskosten, und KEIN steuerfreier Verkauf nach zehn Jahren */
     var _bg = (window._dpBegriff ? window._dpBegriff() : { corp: false, wort: 'Werbungskosten' });
     /* v3270 · Gesellschaftsobjekt unter Detailgrad Experte: wem es gehört, und dass die Einzelheiten ab Experte stehen */
     var _gesH = ''; try { _gesH = (window.DealPilotMandanten && DealPilotMandanten.hinweisHtml) ? DealPilotMandanten.hinweisHtml(null, 'pilot') : ''; } catch (e) { _gesH = ''; }
-    var h = _gesH + karte(kopfzeile('Steuerverlauf · wann das Objekt steuerlich positiv wird') + '<div data-dp-steuerverlauf="1"></div>'
+    var h = _gesH + '<div data-dp-pa5-steuerkopf="' + (bestand ? 'b' : 'a') + '">' + steuerKopf(bestand, _bg.corp) + '</div>' + karte(kopfzeile('Steuerverlauf · wann das Objekt steuerlich positiv wird') + '<div data-dp-steuerverlauf="1"></div>'
       + erkl(_bg.corp
         ? '<b>So liest du die Grafik:</b> Die Balken zeigen je Jahr das Ergebnis des Objekts in der Gesellschaft (Betriebseinnahmen minus Betriebsausgaben). '
           + 'Die Linie ist der Cashflow nach Steuern. Eine Zehnjahresfrist gibt es in der GmbH/UG nicht: ' + ((window.DealPilotUeberfuehrungKern && DealPilotUeberfuehrungKern.HINWEIS_VERKAUF_GES) || 'ein Veräußerungsgewinn ist immer steuerpflichtig.') + ' Es ist dieselbe Rechnung wie im Reiter Steuer.'
@@ -593,7 +812,7 @@
         : '<div class="dp-pa-fuss" style="margin-top:0">Diese Analyse wurde vor der steuerlichen Zusammenfassung erstellt. Beim nächsten Abruf steht sie hier.</div>')
       + '<div class="dp-pa-fuss dp-pa-d">Eine Einordnung aus deinen Eingaben im Reiter Steuer – keine Steuerberatung. Lass sie von deinem Steuerberater bestätigen.</div>', 'dp-pa4-mt');
     /* v3323 · Marcel 12.11.2026: „steuerlich Ankauf gegen heute … die Steuersachen zu Steuern“ - stand bis hier unter Ankauf · Bestand · Zielbild */
-    if (bestand && has(a.soll_ist_steuer)) h += karte(kopfzeile('Steuerlich: Ankauf gegen heute') + '<p class="dp-pa-p">' + txt(a.soll_ist_steuer) + '</p>', 'dp-pa4-mt');
+    /* v3440 · „Steuerlich: Ankauf gegen heute" (a.soll_ist_steuer) steht jetzt in Ankauf · Bestand · Zielbild unter der Kennzahlen-Tabelle */
     h += belegeHtml(bestand);
     h += '<div class="dp-pa-d">' + karte(kopfzeile((_bg.corp ? 'Betriebseinnahmen und Betriebsausgaben' : 'Einnahmen und Werbungskosten') + ' nach Gruppen') + '<div class="dp-pa4-tab" data-dp-pa4-steuertab="1"></div>'
       + erkl('Die Gruppen sind die des Reiters Steuer: <b>Finanzierung</b> (Zinsen und Finanzierungskosten), <b>Betriebskosten</b> (umgelegt und nicht umlagefähig), <b>Verwaltung</b>, <b>Sonstiges</b>, <b>AfA</b> sowie <b>Erhaltung und anschaffungsnaher Aufwand</b>. '
@@ -609,6 +828,15 @@
      (Verlauf unter der Linie), Zahlen an den Werten (cfg.kurz, ausgedünnt, damit nichts überlappt;
      r.zahlen === false schaltet eine Reihe aus). */
   var _gid = 0;
+  /* v3440 · Säule mit 4 px Rundung am Datenende, eckig an der Grundlinie (dataviz, Marks) */
+  function saeule(x, y0, y1, w) {
+    var h = Math.abs(y1 - y0), r = Math.min(4, w / 2, h), top = Math.min(y0, y1), unten = Math.max(y0, y1);
+    if (h < 1.5) return 'M' + x.toFixed(1) + ',' + (y0 - 0.75).toFixed(1) + 'h' + w.toFixed(1) + 'v1.5h-' + w.toFixed(1) + 'z';
+    if (y1 <= y0) return 'M' + x.toFixed(1) + ',' + unten.toFixed(1) + 'V' + (top + r).toFixed(1) + 'Q' + x.toFixed(1) + ',' + top.toFixed(1) + ' ' + (x + r).toFixed(1) + ',' + top.toFixed(1)
+      + 'H' + (x + w - r).toFixed(1) + 'Q' + (x + w).toFixed(1) + ',' + top.toFixed(1) + ' ' + (x + w).toFixed(1) + ',' + (top + r).toFixed(1) + 'V' + unten.toFixed(1) + 'Z';
+    return 'M' + x.toFixed(1) + ',' + top.toFixed(1) + 'V' + (unten - r).toFixed(1) + 'Q' + x.toFixed(1) + ',' + unten.toFixed(1) + ' ' + (x + r).toFixed(1) + ',' + unten.toFixed(1)
+      + 'H' + (x + w - r).toFixed(1) + 'Q' + (x + w).toFixed(1) + ',' + unten.toFixed(1) + ' ' + (x + w).toFixed(1) + ',' + (unten - r).toFixed(1) + 'V' + top.toFixed(1) + 'Z';
+  }
   function linien(host, cfg) {
     if (!host) return;
     stil();
@@ -627,7 +855,11 @@
     var fmt = cfg.fmt || function (v) { return String(v); };
     var kurz = cfg.kurz || cfg.achse || fmt;
     var schritt = n <= 8 ? 1 : Math.ceil(n / 7);
-    var zeigen = function (i) { return cfg.nurLetzte ? i === n - 1 : (i % schritt === 0 || i === n - 1); };   /* nurLetzte: viele Reihen (Index) */
+    /* v3440 · dataviz: sparsam beschriften - Linien am letzten Wert, Balken am ersten, letzten und an den Extremen;
+       der Rest steht im Tooltip und in den Tabellen. Bis v3439 trug jede zweite Stelle eine Zahl (schritt). */
+    var zeigen = function (i) { return cfg.nurLetzte ? i === n - 1 : (cfg.dicht ? (i % schritt === 0 || i === n - 1) : i === n - 1); };
+    var extrem = function (werte, i) { var v = werte.filter(zahl).map(Number); if (!v.length || !zahl(werte[i])) return false; var w = Number(werte[i]); return w === Math.max.apply(null, v) || w === Math.min.apply(null, v); };
+    var erstLetzt = function (werte, i) { var idx = []; werte.forEach(function (w, j) { if (zahl(w)) idx.push(j); }); return i === idx[0] || i === idx[idx.length - 1]; };   /* nurLetzte: viele Reihen (Index) */
     var s = '', lab = '', gid = 'dpPa4g' + (++_gid);
     s += '<defs><linearGradient id="' + gid + '" x1="0" x2="0" y1="0" y2="1"><stop offset="0" style="stop-color:var(--wl-c9a84c, #C9A84C);stop-opacity:.32"/><stop offset="1" style="stop-color:var(--wl-c9a84c, #C9A84C);stop-opacity:.02"/></linearGradient></defs>';
     for (var v = lo; v <= hi + st / 2; v += st) s += '<line class="gl" x1="' + L + '" x2="' + (W - Rr) + '" y1="' + y(v).toFixed(1) + '" y2="' + y(v).toFixed(1) + '"/><text class="ax" x="' + (L - 7) + '" y="' + (y(v) + 3.5).toFixed(1) + '" text-anchor="end">' + esc(cfg.achse ? cfg.achse(v) : fmt(v)) + '</text>';
@@ -642,8 +874,8 @@
         w = Number(w);
         var xx = x(i) - (kB * bw + (kB - 1) * 3) / 2 + j * (bw + 3), y1 = y(w), y0 = y(0), hh = Math.max(1.5, Math.abs(y1 - y0));
         var f = (w < 0 && r.farbeNeg) ? r.farbeNeg : r.farbe;
-        s += '<rect x="' + xx.toFixed(1) + '" y="' + Math.min(y0, y1).toFixed(1) + '" width="' + bw.toFixed(1) + '" height="' + hh.toFixed(1) + '" rx="3" style="fill:' + f + '"/>';
-        if (cfg.zahlen !== false && r.zahlen !== false && zeigen(i)) {
+        s += '<path d="' + saeule(xx, y0, y1, bw) + '" style="fill:' + f + '"/>';
+        if (cfg.zahlen !== false && r.zahlen !== false && (cfg.dicht ? zeigen(i) : (erstLetzt(r.werte, i) || extrem(r.werte, i)))) {
           var ty = w >= 0 ? y1 - 5 : y1 + 13;
           lab += '<text class="wz" x="' + (xx + bw / 2).toFixed(1) + '" y="' + ty.toFixed(1) + '" text-anchor="middle">' + esc(kurz(w)) + '</text>';
         }
@@ -656,14 +888,14 @@
       if (r.art === 'linie' || r.art === 'gestrichelt') {
         if (r.flaeche && pk.length > 1) {
           var yb = y(Math.max(lo, Math.min(0, hi)));
-          s += '<polygon points="' + pk[0][0].toFixed(1) + ',' + yb.toFixed(1) + ' ' + pts + ' ' + pk[pk.length - 1][0].toFixed(1) + ',' + yb.toFixed(1) + '" style="fill:url(#' + gid + ')"/>';
+          s += '<polygon points="' + pk[0][0].toFixed(1) + ',' + yb.toFixed(1) + ' ' + pts + ' ' + pk[pk.length - 1][0].toFixed(1) + ',' + yb.toFixed(1) + '" style="fill:' + r.farbe + ';fill-opacity:.10"/>';
         }
-        if (pk.length > 1) s += '<polyline fill="none" style="stroke:' + r.farbe + '" stroke-width="' + (r.art === 'linie' ? 2.4 : 2) + '" stroke-linejoin="round"' + (r.art === 'gestrichelt' ? ' stroke-dasharray="6 4"' : '') + ' points="' + pts + '"/>';
-        if (r.art === 'linie') pk.forEach(function (p) { s += '<circle cx="' + p[0].toFixed(1) + '" cy="' + p[1].toFixed(1) + '" r="3.4" fill="#fff" style="stroke:' + r.farbe + '" stroke-width="1.8"/>'; });
+        if (pk.length > 1) s += '<polyline fill="none" style="stroke:' + r.farbe + '" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"' + (r.art === 'gestrichelt' ? ' stroke-dasharray="6 4"' : '') + ' points="' + pts + '"/>';
+        if (r.art === 'linie' && pk.length) { var pe = pk[pk.length - 1]; s += '<circle cx="' + pe[0].toFixed(1) + '" cy="' + pe[1].toFixed(1) + '" r="4" style="fill:' + r.farbe + '" stroke="#fff" stroke-width="2"/>'; }
       } else if (r.art === 'raute') {
         pk.forEach(function (p) { s += '<rect x="' + (p[0] - 5).toFixed(1) + '" y="' + (p[1] - 5).toFixed(1) + '" width="10" height="10" transform="rotate(45 ' + p[0].toFixed(1) + ' ' + p[1].toFixed(1) + ')" style="fill:' + r.farbe + '" stroke="#fff" stroke-width="2"/>'; });
       } else {
-        pk.forEach(function (p) { s += '<circle cx="' + p[0].toFixed(1) + '" cy="' + p[1].toFixed(1) + '" r="6" style="fill:' + (r.hohl ? '#fff' : r.farbe) + ';stroke:' + (r.hohl ? r.farbe : '#fff') + '" stroke-width="2"/>'; });
+        pk.forEach(function (p) { s += '<circle cx="' + p[0].toFixed(1) + '" cy="' + p[1].toFixed(1) + '" r="5" style="fill:' + (r.hohl ? '#fff' : r.farbe) + ';stroke:' + (r.hohl ? r.farbe : '#fff') + '" stroke-width="2"/>'; });
       }
       /* Zahlen: Linien ausgedünnt, Punkte (Berichte) immer; über dem Wert, bei 'unten' darunter */
       if (cfg.zahlen !== false && r.zahlen !== false) pk.forEach(function (p) {
@@ -713,9 +945,15 @@
   }
   function wertverlaufIn(host, hist) {
     var S = window.State, R = S && Array.isArray(S.cfRows) ? S.cfRows : [];
-    if (R.length < 2) { host.innerHTML = ''; return; }
     stil();
     var heute = new Date().getFullYear();
+    var nachW = function (h) { return zahl(h.mpi_nach_abschlag) ? Number(h.mpi_nach_abschlag) : (zahl(h.market_value) ? Number(h.market_value) : null); };
+    var planJahr = function (j) { var r = R.filter(function (x) { return x.cal === j; })[0]; return r && zahl(r.wert_y) ? Number(r.wert_y) : null; };
+    /* v3440 · Ergebnissatz oben im Reiter (ersetzt die Kacheln Plan-Wert und Restschuld - die Restschuld steht im
+       Jahresabgleich und im Exit) und die Lage beim Kauf gegen heute */
+    wertKopfAlle(hist);
+    lageAlle(hist);
+    if (R.length < 2) { host.innerHTML = ''; return; }
     var bj = hist.map(function (h) { var d = new Date(h.created_at); return isNaN(d) ? null : d.getFullYear(); }).filter(Boolean);
     var bis = Math.max(heute + 3, bj.length ? Math.max.apply(null, bj) : heute);
     var R2 = R.filter(function (r) { return r.cal <= bis; }).slice(0, 16);
@@ -727,41 +965,41 @@
     hist.forEach(function (h) {
       var d = new Date(h.created_at); if (isNaN(d)) return;
       var j = jahre.indexOf(d.getFullYear()); if (j < 0) return;
-      var nach = zahl(h.mpi_nach_abschlag) ? Number(h.mpi_nach_abschlag) : (zahl(h.market_value) ? Number(h.market_value) : null);
+      var nach = nachW(h);
       var ohne = zahl(h.mpi_ohne_abschlag) ? Number(h.mpi_ohne_abschlag) : null;
       if (nach != null) mpi[j] = nach;   /* der jüngste Bericht des Jahres gewinnt (hist ist aufsteigend) */
       if (ohne != null && ohne !== nach) mpo[j] = ohne;
       (proJahr[j] = proJahr[j] || []).push(d.toLocaleDateString('de-DE') + (nach != null ? ': ' + eur(nach) : ''));
     });
-    var kj = parseInt(String((document.getElementById('kaufdat') || {}).value || '').slice(0, 4), 10), k = kpis();
+    var kj = parseInt(feldWert('kaufdat').slice(0, 4), 10), k = kpis();
     var kpR = jahre.map(function (j) { return (j === kj && zahl(k.kp)) ? Number(k.kp) : null; });
+    /* v3440 · Farben nach dem Skill dataviz, geprüft mit validate_palette (hell, Fläche #fcfcfb): Blau #2f6db5,
+       Gold dunkel #b8932f, Aqua #1baf7a - CVD-Abstand mindestens 8,5; den Kontrast-Hinweis fangen Tooltip und
+       die Tabelle der Berichte darunter auf. Gold der Marke nur als var(--wl-…). */
     var reihen = [
       { name: 'Plan-Wert (deine Wertsteigerung)', farbe: C.plan, werte: plan, art: 'gestrichelt' },
-      { name: 'Restschuld', farbe: C.linie, werte: rs, art: 'linie', flaeche: true, unten: true },
-      { name: 'Marktpreis Ø laut Bericht', farbe: C.gut, werte: mpi, art: 'punkt' }
+      { name: 'Restschuld', farbe: C.blau, werte: rs, art: 'linie', flaeche: true, unten: true },
+      { name: 'Marktpreis Ø laut Bericht', farbe: C.aqua, werte: mpi, art: 'punkt' }
     ];
-    if (mpo.some(zahl)) reihen.push({ name: 'ohne Abschlag', farbe: C.gut, werte: mpo, art: 'punkt', hohl: true, zahlen: false });
+    if (mpo.some(zahl)) reihen.push({ name: 'ohne Abschlag', farbe: C.aqua, werte: mpo, art: 'punkt', hohl: true, zahlen: false });
     if (kpR.some(zahl)) reihen.push({ name: 'Kaufpreis', farbe: '#2A2727', werte: kpR, art: 'raute' });
-    /* Zahlen oben */
-    var letzter = null; hist.forEach(function (h) { var nach = zahl(h.mpi_nach_abschlag) ? Number(h.mpi_nach_abschlag) : (zahl(h.market_value) ? Number(h.market_value) : null); if (nach != null) letzter = { h: h, wert: nach }; });
-    var ih = jahre.indexOf(heute), pHeute = ih >= 0 ? plan[ih] : null, rHeute = ih >= 0 ? rs[ih] : null;
-    var zahlen = [];
-    if (letzter) zahlen.push(zahlKachel('Marktpreis Ø · letzter Bericht', eur(letzter.wert), (zahl(letzter.h.mpi_ohne_abschlag) && Number(letzter.h.mpi_ohne_abschlag) !== letzter.wert ? 'ohne Abschlag ' + eur(letzter.h.mpi_ohne_abschlag) + ' · ' : '') + new Date(letzter.h.created_at).toLocaleDateString('de-DE'), C.c2));
-    if (pHeute != null) zahlen.push(zahlKachel('Plan-Wert ' + heute, eur(pHeute), 'Kaufpreis fortgeschrieben', C.plan));
-    if (letzter && pHeute) { var ab = (letzter.wert - pHeute) / pHeute * 100; zahlen.push(zahlKachel('Bericht gegen Plan', (ab > 0 ? '+' : ab < 0 ? '−' : '') + de(Math.abs(ab), 1) + ' %', ab >= 0 ? 'über dem Plan' : 'unter dem Plan', ab >= 0 ? C.gut : C.rot)); }
-    if (rHeute != null) zahlen.push(zahlKachel('Restschuld ' + heute, eur(rHeute), pHeute ? 'Eigenkapital im Objekt ' + eur(pHeute - rHeute) + ' (Plan)' : '', C.c1));
-    var satz = '';
-    if (letzter && pHeute) {
-      var ab2 = (letzter.wert - pHeute) / pHeute * 100;
-      satz = 'Der letzte Marktbericht vom ' + new Date(letzter.h.created_at).toLocaleDateString('de-DE') + ' sieht den Marktpreis bei <b>' + eur(letzter.wert) + '</b>, '
-        + (Math.abs(ab2) < 1 ? 'praktisch auf deinem Plan-Wert.' : '<b>' + de(Math.abs(ab2), 1) + ' % ' + (ab2 > 0 ? 'über' : 'unter') + '</b> deinem Plan-Wert für ' + heute + ' (' + eur(pHeute) + ').');
-    } else if (!hist.length) satz = 'Noch kein Marktbericht zu diesem Objekt – die Grafik zeigt deinen Plan-Wert und die Restschuld. Mit dem ersten Bericht erscheint der Marktpreis als Punkt.';
-    var oben = (zahlen.length ? '<div class="dp-pa4-zahlen">' + zahlen.join('') + '</div>' : '') + (satz ? '<p class="dp-pa4-satz">' + satz + '</p>' : '');
-    host.innerHTML = oben + '<div data-dp-pa4-g></div>'
-      + erkl('<b>So liest du die Grafik:</b> Die gestrichelte Linie ist dein <b>Plan-Wert</b> – der Kaufpreis, fortgeschrieben mit der Wertsteigerung aus deinen Eingaben. Die dunkle Linie mit der Fläche ist die <b>Restschuld</b> deiner Darlehen; der Abstand zwischen beiden ist das Eigenkapital im Objekt nach Plan. '
-        + 'Die Punkte sind die <b>Marktpreisindikationen</b> deiner Marktberichte: gefüllt mit dem Abschlag auf Angebotspreise (aktueller Marktdurchschnitt), hohl ohne Abschlag. Der Ertragswert steht ohne Spanne in der Tafel darunter, weil er ein gerechneter Einzelwert ist.');
+    /* Alle Berichte gegen den Plan-Wert, neueste zuerst */
+    var zeilen = hist.slice().reverse().map(function (h) {
+      var d = new Date(h.created_at), j = isNaN(d) ? null : d.getFullYear(), p = j ? planJahr(j) : null, w = nachW(h);
+      var ab = p && w != null ? (w - p) / p * 100 : null;
+      var ohne = zahl(h.mpi_ohne_abschlag) && Number(h.mpi_ohne_abschlag) !== w ? '<small>ohne Abschlag ' + eur(h.mpi_ohne_abschlag) + '</small>' : '';
+      var lg = [zahl(h.micro_score) ? 'Mikro ' + Math.round(h.micro_score) : '', zahl(h.macro_score) ? 'Makro ' + Math.round(h.macro_score) : ''].filter(Boolean).join(' · ');
+      return { z: [isNaN(d) ? '–' : d.toLocaleDateString('de-DE'), p != null ? eur(p) : '', w != null ? eur(w) + ohne : '',
+          ab == null ? '' : (ab > 0 ? '+' : ab < 0 ? '−' : '±') + de(Math.abs(ab), 1) + ' %', zahl(h.ertragswert_eur) ? eur(h.ertragswert_eur) : '', lg],
+        zk: [null, null, null, ab == null ? null : (ab >= 0 ? 'gut' : 'schlecht')] };
+    });
+    host.innerHTML = abKopf('Wert gegen Plan', 'Plan-Wert · Restschuld · Berichte') + '<div data-dp-pa4-g></div>'
+      + erkl('<b>So liest du die Grafik:</b> Die gestrichelte Linie ist dein <b>Plan-Wert</b> – der Kaufpreis, fortgeschrieben mit der Wertsteigerung aus deinen Eingaben. Die blaue Linie mit der Fläche ist die <b>Restschuld</b> deiner Darlehen; der Abstand zwischen beiden ist das Eigenkapital im Objekt nach Plan. '
+        + 'Die Punkte sind die <b>Marktpreisindikationen</b> deiner Marktberichte: gefüllt mit dem Abschlag auf Angebotspreise (aktueller Marktdurchschnitt), hohl ohne Abschlag.')
+      + (zeilen.length ? abKopf('Alle Berichte zu diesem Objekt', zeilen.length + (zeilen.length === 1 ? ' Bericht' : ' Berichte') + ' · gegen deinen Plan-Wert')
+        + tabelle(['Datum', 'Plan-Wert', 'Marktpreis Ø', 'gegen Plan', 'Ertragswert', 'Lage'], zeilen) : '');
     linien(host.querySelector('[data-dp-pa4-g]'), {
-      x: jahre.map(String), reihen: reihen, fmt: eur, achse: te, hoehe: 320, aria: 'Wert gegen Plan von ' + jahre[0] + ' bis ' + jahre[jahre.length - 1],
+      x: jahre.map(String), reihen: reihen, fmt: eur, achse: te, hoehe: 300, aria: 'Wert gegen Plan von ' + jahre[0] + ' bis ' + jahre[jahre.length - 1],
       tip: function (i) {
         var t = '';
         if (zahl(plan[i]) && zahl(rs[i])) t += '<div><span>Eigenkapital (Plan)</span><span>' + eur(plan[i] - rs[i]) + '</span></div>';
@@ -769,6 +1007,80 @@
         return t;
       }
     });
+  }
+
+  /* v3440 · Ergebnissatz des Reiters Wert & Lage mit dem Hauptknopf (DpJahresabgleich.mbAbrufen) */
+  function wertKopf(bestand, hist) {
+    hist = hist || [];
+    var heute = new Date().getFullYear(), R = window.State && Array.isArray(window.State.cfRows) ? window.State.cfRows : [];
+    var letzter = null; hist.forEach(function (h) { var n = zahl(h.mpi_nach_abschlag) ? Number(h.mpi_nach_abschlag) : (zahl(h.market_value) ? Number(h.market_value) : null); if (n != null) letzter = { h: h, wert: n }; });
+    var rH = R.filter(function (r) { return r.cal === heute; })[0], pHeute = rH && zahl(rH.wert_y) ? Number(rH.wert_y) : null;
+    var satz = '', alt = null;
+    if (letzter) {
+      var d = new Date(letzter.h.created_at); alt = isNaN(d) ? null : Math.round((Date.now() - d) / (30.44 * 864e5));
+      if (bestand && pHeute) {
+        var ab = (letzter.wert - pHeute) / pHeute * 100;
+        satz = 'Der letzte Marktbericht vom ' + d.toLocaleDateString('de-DE') + ' sieht den Marktpreis bei <b>' + eur(letzter.wert) + '</b>, '
+          + (Math.abs(ab) < 1 ? 'praktisch auf deinem Plan-Wert.' : '<b>' + de(Math.abs(ab), 1) + ' % ' + (ab > 0 ? 'über' : 'unter') + '</b> deinem Plan-Wert für ' + heute + ' (' + eur(pHeute) + ').')
+          + (alt != null && alt >= 12 ? ' Der Bericht ist ' + alt + ' Monate alt.' : '');
+      } else {
+        var kp = zahl(kpis().kp) ? Number(kpis().kp) : null, dk = kp ? (kp - letzter.wert) / letzter.wert * 100 : null;
+        satz = 'Marktpreis laut Bericht vom ' + d.toLocaleDateString('de-DE') + ' <b>' + eur(letzter.wert) + '</b>'
+          + (dk != null ? ', der Kaufpreis liegt <b>' + (Math.abs(dk) < 0.5 ? 'gleichauf' : de(Math.abs(dk), 1) + ' % ' + (dk < 0 ? 'darunter' : 'darüber')) + '</b>.' : '.');
+      }
+    } else satz = bestand ? 'Noch kein Marktbericht zu diesem Objekt. Ein Bericht im Jahr reicht für den Jahresabgleich; jeder bleibt gespeichert und steht hier gegen deinen Plan-Wert.'
+      : 'Noch keine Bewertung. Der Marktbericht bewertet das Objekt aus amtlichen Daten (Bodenrichtwert, Liegenschaftszins, Sachwertfaktor) und den Mieten und Angeboten vor Ort.';
+    var dringend = !letzter || (bestand && alt != null && alt >= 12);
+    return ergebnis(satz, knopf(bestand ? 'Neuen Marktbericht abrufen' : 'Objekt mit KI bewerten', 'try{if(window.DpJahresabgleich)DpJahresabgleich.mbAbrufen()}catch(e){}', !dringend));
+  }
+  var _wertHist = null, _wertKey = null;
+  /* die Berichte gehören zu EINEM Objekt - nach einem Objektwechsel gelten sie nicht mehr */
+  function histJetzt() { return _wertKey && _wertKey === window._currentObjKey ? _wertHist : null; }
+  function wertKopfAlle(hist) {
+    if (hist) { _wertHist = hist; _wertKey = window._currentObjKey; }
+    Array.prototype.forEach.call(document.querySelectorAll('[data-dp-pa5-wertkopf]'), function (h) { try { h.innerHTML = wertKopf(h.getAttribute('data-dp-pa5-wertkopf') === 'b', histJetzt()); } catch (e) {} });
+  }
+  /* v3440 · Lage beim Kauf gegen heute: der Bericht zum Ankauf-Stichtag (sonst der erste) gegen den letzten. Mit nur
+     einem Bericht oder im Ankauf: nur heute, aus dem letzten Bericht oder der Marktbewertung (#_mb_state). Gerechnet
+     wird nur die Veränderung zwischen zwei angezeigten Zahlen. */
+  function lageHtml(bestand, hist) {
+    hist = (hist || []).filter(function (h) { return h && !isNaN(new Date(h.created_at)); });
+    var M = [['Mikrolage', 'micro_score', function (v) { return Math.round(v) + ' / 100'; }, 'pkt'],
+             ['Makrolage', 'macro_score', function (v) { return Math.round(v) + ' / 100'; }, 'pkt'],
+             ['Marktpreis Ø ohne Abschlag', 'mpi_ohne_abschlag', eur, 'pct'],
+             ['Bruttomietrendite laut Bericht', 'gross_yield_pct', function (v) { return pct(v, 1); }, 'pp'],
+             ['Faktor laut Bericht', 'rent_multiplier', function (v) { return de(v, 1) + '×'; }, 'pct'],
+             ['Wertentwicklung im Markt', 'price_cagr_pct', function (v) { return pct(v, 1) + ' p. a.'; }, 'pp']];
+    var letzt = hist.length ? hist[hist.length - 1] : null;
+    if (bestand && hist.length >= 2) {
+      var sd = ''; try { var st = window.DealPilotAnkauf && DealPilotAnkauf.stand ? DealPilotAnkauf.stand() : null; sd = st && st.stichtag ? String(st.stichtag).slice(0, 10) : ''; } catch (e) {}
+      var basis = hist[0];
+      if (sd) hist.forEach(function (h) { if (String(h.created_at).slice(0, 10) <= sd) basis = h; });
+      if (basis === letzt) basis = hist[0];
+      if (basis !== letzt) {
+        var z = M.filter(function (m) { return zahl(basis[m[1]]) || zahl(letzt[m[1]]); }).map(function (m) {
+          var a = zahl(basis[m[1]]) ? Number(basis[m[1]]) : null, b = zahl(letzt[m[1]]) ? Number(letzt[m[1]]) : null, v = '';
+          if (a != null && b != null) v = m[3] === 'pct' ? (a ? (b >= a ? '+' : '−') + de(Math.abs((b - a) / a * 100), 1) + ' %' : '') : (m[3] === 'pp' ? (b >= a ? '+' : '−') + de(Math.abs(b - a), 1) + ' %-Pkt.' : (b - a > 0 ? '+' : (b - a < 0 ? '−' : '±')) + Math.abs(Math.round(b - a)));
+          var ton = a != null && b != null && b !== a && (m[1] === 'micro_score' || m[1] === 'macro_score' || m[1] === 'mpi_ohne_abschlag') ? (b > a ? 'gut' : 'schlecht') : null;
+          return { z: [m[0], a != null ? m[2](a) : '', b != null ? m[2](b) : '', v], zk: [null, null, null, ton] };
+        });
+        if (z.length) return abKopf('Lage und Markt', 'beim Kauf gegen heute') + tabelle(['Kennzahl', { t: 'beim Kauf', u: new Date(basis.created_at).toLocaleDateString('de-DE') }, { t: 'heute', u: new Date(letzt.created_at).toLocaleDateString('de-DE') }, 'Veränderung'], z);
+      }
+    }
+    var c = null; try { var ms = JSON.parse((document.getElementById('_mb_state') || {}).value || 'null'); c = ms && ms.card; } catch (e) { c = null; }
+    var zz = [];
+    if (letzt) M.forEach(function (m) { if (zahl(letzt[m[1]])) zz.push({ z: [m[0], m[2](Number(letzt[m[1]]))] }); });
+    else if (c) {
+      if (zahl(c.microRaw)) zz.push({ z: ['Mikrolage', Math.round(c.microRaw) + ' / 100'] });
+      if (zahl(c.macroRaw)) zz.push({ z: ['Makrolage', Math.round(c.macroRaw) + ' / 100'] });
+      if (zahl(c.trendRaw)) zz.push({ z: ['Preistrend', (c.trendRaw > 0 ? '+' : '') + de(c.trendRaw, 1) + ' %'], zk: [null, c.trendRaw >= 0 ? 'gut' : 'schlecht'] });
+    }
+    if (!zz.length) return '';
+    return abKopf('Lage und Markt', letzt ? 'laut Bericht vom ' + new Date(letzt.created_at).toLocaleDateString('de-DE') : 'laut Marktbewertung') + tabelle(['Kennzahl', 'heute'], zz);
+  }
+  function lageAlle(hist) {
+    if (hist) { _wertHist = hist; _wertKey = window._currentObjKey; }
+    Array.prototype.forEach.call(document.querySelectorAll('[data-dp-pa5-lage]'), function (h) { try { h.innerHTML = lageHtml(h.getAttribute('data-dp-pa5-lage') === 'b', histJetzt()); } catch (e) { h.innerHTML = ''; } });
   }
 
   /** Index-Verlauf der Marktberichte (ersetzt das Chart.js-Bild, gleiche Bauart) */
@@ -808,7 +1120,7 @@
       cfg.reihen.forEach(function (r, j) {
         var w = r.werte[i]; if (!zahl(w)) return;
         var y1 = y(Number(w)), y0 = y(0), hh = Math.max(1.5, Math.abs(y1 - y0));
-        s += '<rect x="' + (x0 + j * (bw + 2)).toFixed(1) + '" y="' + Math.min(y0, y1).toFixed(1) + '" width="' + bw.toFixed(1) + '" height="' + hh.toFixed(1) + '" rx="3" style="fill:' + ((Number(w) < 0 && r.farbeNeg) ? r.farbeNeg : r.farbe) + '"/>'
+        s += '<path d="' + saeule(x0 + j * (bw + 2), y0, y1, bw) + '" style="fill:' + ((Number(w) < 0 && r.farbeNeg) ? r.farbeNeg : r.farbe) + '"/>'
           /* v3151 · die Zahl am Balken */
           + '<text class="wz" x="' + (x0 + j * (bw + 2) + bw / 2).toFixed(1) + '" y="' + (Number(w) >= 0 ? y1 - 5 : y1 + 13).toFixed(1) + '" text-anchor="middle">' + esc(Math.round(Number(w)).toLocaleString('de-DE') + ' €') + '</text>';
       });
@@ -855,7 +1167,7 @@
     host.innerHTML = '<h5>Wohin es läuft · Vermögen aus dem Objekt</h5><div></div>' + satz;
     linien(host.querySelector('div'), { x: R.map(function (r) { return String(r.cal); }), hoehe: 260, null: true, fmt: eur, achse: te, aria: 'Eigenkapital im Objekt und aufsummierter Cashflow nach Steuer je Kalenderjahr',
       reihen: [{ name: 'Eigenkapital im Objekt (Plan-Wert − Restschuld)', farbe: C.gold, farbeNeg: C.rot, nameNeg: 'Eigenkapital negativ', werte: eq, art: 'balken' },
-               { name: 'Cashflow nach Steuer inkl. Erstattungen, je Kalenderjahr aufsummiert', farbe: C.linie, werte: cf, art: 'linie' }],
+               { name: 'Cashflow nach Steuer inkl. Erstattungen, je Kalenderjahr aufsummiert', farbe: C.blau, werte: cf, art: 'linie' }],
       tip: function (i) {
         var r = R[i]; if (!r) return '';
         return '<div style="display:block;color:#7A7370;margin-top:3px;border-top:1px solid #F1ECE1;padding-top:3px">Jahr ' + r.cal + ': vor Steuer ' + esc(sEur(r.cfop_y || 0))
@@ -941,6 +1253,176 @@
     return karte(kopfzeile('Unterlagen & WEG') + '<p class="dp-pa-p">Noch keine Unterlagen ausgewertet.</p>' + erklaerung + knoepfe) + verlauf;
   }
 
+  /* ══ v3440 · ANKAUF · BESTAND · ZIELBILD ALS EINE KENNZAHLEN-TABELLE ═════════════════════════════════
+     Marcel 15.11.2026 (Demo Fassung 2): „die Kennzahlentabelle ist super, könnte man dort die Aufteilung mit
+     integrieren?" Bis v3439 standen hier drei Fassungen derselben Zahlen: die Einfach-Kacheln (wert-zielbild.js
+     kernaussagen), die Tafel aus DpPotenzial (tafelHtml, „Ankauf · Bestand · Zielbild") und die Jahresstände.
+     Jetzt EINE Tabelle, Spalten Ankauf · Heute · nach Mieterhöhung · Zielbild · Aufteilung (Ankauf-Phase ohne
+     „Heute", dort ist der heutige Stand der Ankauf), Gruppen Miete und Rendite · Wert · Finanzierung und Steuer.
+     RECHNET NICHTS NEU - gelesen wird:
+       Heute, Mieterhöhung, Zielbild  DpWertZielbild.daten().zielbild (dieselbe Quelle wie Bewertung und PDFs:
+                                      DpPotenzial.modell/kennzahlen/stufenWerte), Wertzuwachs = mehrUndZuwachs()
+       Ankauf (Bestand)               DealPilotAnkauf.abweichung().zeilen (eingefrorener Stand, wie „Ankauf gegen
+                                      Bestand"), Cashflow/Monat = Cashflow v. Steuer ÷ 12 wie potenzial.js ankaufKurz
+       Aufteilung                     DpPotenzial.aufteilungKurz() (Aufteilerwert des Marktbericht-Dienstes, nur MFH)
+       Restschuld heute               State.cfRows (rs des laufenden Jahres)
+     Zielerreichung aus DpJahresstaende.zielerreichung() (Daten, nicht deren Tafel). */
+  function siDaten(bestand) {
+    var D = null; try { D = window.DpWertZielbild && window.DpWertZielbild.daten ? window.DpWertZielbild.daten() : null; } catch (e) { D = null; }
+    var Z = D && D.zielbild ? D.zielbild : null, ab = null, zA = {}, auf = null;
+    try { var AK = window.DealPilotAnkauf; ab = bestand && AK && AK.vorhanden && AK.vorhanden() ? AK.abweichung() : null; } catch (e) { ab = null; }
+    (ab && Array.isArray(ab.zeilen) ? ab.zeilen : []).forEach(function (z) { zA[z.schluessel] = z; });
+    try { var PZ = window.DpPotenzial; if (PZ && PZ.aufteilungKurz) auf = PZ.aufteilungKurz(PZ.ergebnis(), PZ.modell()); } catch (e) { auf = null; }
+    var mfh = false; try { mfh = !!(window.DpMfhEinheiten && window.DpMfhEinheiten.artMitEinheiten && window.DpMfhEinheiten.artMitEinheiten()); } catch (e) {}
+    return { D: D, Z: Z, ab: ab, zA: zA, auf: auf, mfh: mfh };
+  }
+  function siTabelle(bestand) {
+    var d = siDaten(bestand), Z = d.Z, zA = d.zA, S = Z ? Z.stufen : {}, J = (Z && Z.jahre) || {};
+    var hatAnkauf = bestand && Object.keys(zA).length > 0;
+    if (!Z && !hatAnkauf) return null;
+    var T = d.auf && d.auf.aufteiler && d.auf.aufteiler.bestand ? d.auf.aufteiler.bestand : null;
+    var mitAuf = !!(T || (d.auf && d.auf.gesperrt));
+    var sp = [];
+    if (hatAnkauf) sp.push({ k: 'ankauf', t: 'Ankauf', u: datumDe(d.ab.stichtag) });
+    if (Z || hatAnkauf) sp.push({ k: 'bestand', t: bestand ? 'Heute' : 'Ankauf', u: bestand ? String(new Date().getFullYear()) : 'heute gerechnet' });
+    if (S.mieterhoehung) sp.push({ k: 'mieterhoehung', t: 'nach Mieterhöhung', u: J.mieterhoehung ? 'ab ' + J.mieterhoehung : 'Mieter bleibt', kl: 'hebel' });
+    if (S.zielbild) sp.push({ k: 'zielbild', t: 'Zielbild', u: J.zielbild ? String(J.zielbild) : 'Jahr offen', kl: 'hebel' });
+    if (mitAuf) sp.push({ k: 'aufteilung', t: 'Aufteilung', u: d.auf.je_wohnung && d.auf.je_wohnung.length ? d.auf.je_wohnung.filter(function (w) { return w.art !== 'gewerbe'; }).length + ' Wohnungen einzeln' : 'in Eigentumswohnungen', kl: 'hebel' });
+    var A = function (s) { var z = zA[s]; return z && zahl(z.ankauf) ? Number(z.ankauf) : null; };
+    var H = function (s) { var z = zA[s]; return z && zahl(z.bestand) ? Number(z.bestand) : null; };
+    /* Wert einer Kennzahl je Spalte; die Spalte Heute nimmt die Stufe Bestand, ohne Zielbild-Modell den Abgleich */
+    var w = function (feld, k) {
+      if (k === 'aufteilung') return null;
+      if (k === 'ankauf') return { miete_jahr: A('_kpis_miete_j'), miete_qm: A('_nkm_qm'), bmy: A('_kpis_bmy'), cf_monat: A('_kpis_cf_vs') != null ? A('_kpis_cf_vs') / 12 : null, dscr: A('_kpis_dscr') }[feld];
+      var st = S[k];
+      if (st && st[feld] != null) return st[feld];
+      if (k === 'bestand' && hatAnkauf) return { miete_jahr: H('_kpis_miete_j'), miete_qm: H('_nkm_qm'), bmy: H('_kpis_bmy'), cf_monat: H('_kpis_cf_vs') != null ? H('_kpis_cf_vs') / 12 : null, dscr: H('_kpis_dscr') }[feld];
+      return null;
+    };
+    var kopf = [{ t: 'Kennzahl' }].concat(sp.map(function (c) { return { t: c.t, u: c.u, kl: c.kl }; }));
+    var zeile = function (titel, f, opt) {
+      opt = opt || {};
+      var zz = sp.map(function (c) { var v = null; try { v = f(c.k); } catch (e) { v = null; } return v; });
+      if (!zz.some(function (v) { return v != null && v !== ''; })) return null;
+      return { z: [titel + (opt.u ? '<small>' + opt.u + '</small>' : '')].concat(zz.map(function (v) { return v == null ? '' : (typeof v === 'object' ? v.h : v); })), kl: opt.kl, d: opt.d,
+        zk: [null].concat(sp.map(function (c, i) { var v = zz[i]; return [c.kl || '', v && typeof v === 'object' && v.kl ? v.kl : ''].join(' ').trim() || null; })) };
+    };
+    var sub = function (h, s) { return s ? h + '<small>' + s + '</small>' : h; };
+    var ewGesperrt = !!(Z && Z.ertragswert_gesperrt);
+    var zeilen = [{ gr: 'Miete und Rendite' },
+      zeile('Kaltmiete im Jahr', function (k) { var v = w('miete_jahr', k); return v == null ? null : sub(eur(v), w('miete_qm', k) != null ? de(w('miete_qm', k), 2) + ' €/m² im Monat' : ''); }),
+      zeile('Bruttomietrendite', function (k) { var v = w('bmy', k); return v == null ? null : pct(v); }, { u: 'auf Kaufpreis und Maßnahmen' }),
+      zeile('Cashflow vor Steuer im Monat', function (k) { var v = w('cf_monat', k); return v == null ? null : { h: sEur(v), kl: v < 0 ? 'schlecht' : '' }; }),
+      zeile('DSCR', function (k) { var v = w('dscr', k); return v == null ? null : { h: de(v, 2), kl: v < 1 ? 'schlecht' : '' }; }, { d: true }),
+      { gr: 'Wert' },
+      zeile('Maßnahmenkosten', function (k) { if (k === 'aufteilung') return d.auf && d.auf.kosten > 0 ? sub(eur(d.auf.kosten), 'Kosten der Aufteilung') : null; if (k === 'ankauf' || k === 'bestand') return null; var st = S[k]; return st ? eur(st.kosten || 0) : null; }),
+      ewGesperrt ? zeile('Ertragswert', function (k) { return k === 'bestand' ? 'mit Stufe 3' : null; }) :
+      zeile('Ertragswert', function (k) { var st = S[k]; return st && st.ertragswert != null ? sub('<b>' + eur(st.ertragswert) + '</b>', st.rnd != null ? 'RND ' + de(st.rnd, 0) + ' J.' : '') : null; },
+        { u: Z && Z.lzs && Z.lzs.pct != null ? 'Liegenschaftszins ' + de(Z.lzs.pct, 2) + ' %' + (Z.lzs.stufe ? ' · Stufe ' + esc(Z.lzs.stufe) : '') : '' }),
+      ewGesperrt ? null : zeile('Marktpreisindikation', function (k) { var st = S[k]; return st && st.marktpreisindikation != null ? sub(eur(st.marktpreisindikation), st.mpi_ohne_abschlag != null ? 'ohne Abschlag ' + eur(st.mpi_ohne_abschlag) : '') : null; },
+        { d: true, u: S.bestand && S.bestand.mpi_abschlag_pct > 0 ? 'Angebote am Ort, nach ' + de(S.bestand.mpi_abschlag_pct, 1) + ' % Abschlag' : 'Angebote am Ort' }),
+      T ? zeile('Aufteilerwert', function (k) { return k === 'aufteilung' ? sub('<b>' + eur(T.wert) + (T.vollstaendig ? '' : '*') + '</b>', esc(T.bezeichnung || 'Vergleichswert') + ' führend') : null; }, { u: 'Wohnungen einzeln, nach Aufteilungskosten' }) : null,
+      ewGesperrt ? null : zeile('Wertzuwachs nach Kosten', function (k) {
+        if (k === 'aufteilung') return T && zahl(T.potenzial) ? (T.potenzial < 0 ? { h: 'kein Potenzial', kl: 'schlecht' } : { h: '+' + eur(T.potenzial), kl: 'gut' }) : null;
+        var v = Z && Z.wertzuwachs_nach_kosten ? Z.wertzuwachs_nach_kosten[k] : null; return v == null ? null : { h: sEur(v), kl: v >= 0 ? 'gut' : 'schlecht' }; },
+        { kl: 'su', u: 'Ertragswert der Stufe − heute − Maßnahmen' })];
+    /* Finanzierung und Steuer: Ankauf gegen heute (die Stufen ändern Finanzierung und Steuer nicht) */
+    var R = window.State && Array.isArray(window.State.cfRows) ? window.State.cfRows : [], heute = new Date().getFullYear();
+    var rsH = (R.filter(function (r) { return r.cal === heute; })[0] || {}).rs;
+    var kp = kpis();
+    var fz = [
+      zeile('Restschuld', function (k) { return k === 'bestand' && zahl(rsH) ? sub(eur(rsH), 'Projektion ' + heute) : null; }),
+      zeile('Cashflow nach Steuer im Jahr', function (k) { var v = k === 'ankauf' ? A('_kpis_cf_ns') : (k === 'bestand' ? (hatAnkauf ? H('_kpis_cf_ns') : (zahl(kp.cf_ns) ? Number(kp.cf_ns) : null)) : null); return v == null ? null : { h: sEur(v), kl: v < 0 ? 'schlecht' : '' }; }),
+      zeile('Beleihungsauslauf (LTV)', function (k) { var v = k === 'ankauf' ? A('_kpis_ltv') : (k === 'bestand' ? (hatAnkauf ? H('_kpis_ltv') : (zahl(kp.ltv) ? Number(kp.ltv) : null)) : null); return v == null ? null : pct(v, 1); }),
+      zeile('Zinssatz', function (k) { var v = k === 'ankauf' ? A('d1z') : (k === 'bestand' ? H('d1z') : null); return v == null ? null : pct(v); }),
+      zeile('Steuerwirkung im Jahr', function (k) { var v = k === 'ankauf' ? A('_steuerwirkung') : (k === 'bestand' ? H('_steuerwirkung') : null); return v == null ? null : sEur(v); }, { u: 'Plus = Erstattung' })
+    ].filter(Boolean);
+    if (fz.length) { zeilen.push({ gr: 'Finanzierung und Steuer', d: true }); fz.forEach(function (z) { z.d = true; zeilen.push(z); }); }
+    var satz = [];
+    var mA = w('miete_jahr', 'ankauf'), mH = w('miete_jahr', 'bestand');
+    if (bestand && mA != null && mH != null && Math.round(mH - mA) !== 0) satz.push('Seit dem Kauf <b>' + sEur(mH - mA) + ' Miete im Jahr</b>');
+    var mehr = Z && Z.mehrertrag_jahr ? Z.mehrertrag_jahr.mieterhoehung : null;
+    if (zahl(mehr) && mehr > 0) satz.push((satz.length ? 'mit der nächsten Mieterhöhung kommen ' : 'Mit der Mieterhöhung kommen ') + '<b>' + sEur(mehr) + '</b> im Jahr dazu');
+    var zw = Z && Z.wertzuwachs_nach_kosten ? Z.wertzuwachs_nach_kosten.zielbild : null;
+    if (zahl(zw) && !ewGesperrt) satz.push((satz.length ? 'das Zielbild bringt nach ' : 'Das Zielbild bringt nach ') + eur((S.zielbild && S.zielbild.kosten) || 0) + ' Kosten <b>' + sEur(zw) + ' Wert</b>');
+    if (T && zahl(T.potenzial) && T.potenzial > 0) satz.push((satz.length ? 'die Aufteilung ' : 'Die Aufteilung bringt ') + '<b>+' + eur(T.potenzial) + '</b>' + (satz.length ? '' : ' Wert'));
+    var s = satz.length ? satz.join(', ').replace(/^(.)/, function (c) { return c.toUpperCase(); }) + '.' : (hatAnkauf ? 'Der Ankauf-Stand vom ' + datumDe(d.ab.stichtag) + ' gegen heute, Kennzahl für Kennzahl.' : 'Was in dem Objekt steckt: heute, nach Mieterhöhung und im Zielbild.');
+    var hin = [];
+    if (!mitAuf) hin.push(d.mfh ? 'Aufteilung: der Aufteilerwert erscheint, sobald die Ertragswerte gerechnet sind und das Haus aufgeteilt werden kann.' : 'Aufteilung: nur beim Haus mit mehreren Wohnungen, deshalb hier keine Spalte.');
+    else if (!T && d.auf.gesperrt) hin.push('Aufteilung: ' + esc(d.auf.gesperrt));
+    if (S.mieterhoehung) hin.push('Mieterhöhung nach § 558 BGB' + (J.mieterhoehung ? ' ab ' + J.mieterhoehung : '') + ', Mieter bleibt.');
+    if (Z && Z.kurz_ausblick) hin.push(esc(Z.kurz_ausblick));
+    return { satz: s, html: tabelle(kopf, zeilen.filter(Boolean)), hinweis: hin.join(' '), Z: Z, hatAnkauf: hatAnkauf };
+  }
+  function zielBalken() {
+    var J = window.DpJahresstaende, z = null;
+    try { z = J && J.zielerreichung ? J.zielerreichung() : null; } catch (e) { z = null; }
+    if (!z || !Array.isArray(z.hebel) || !z.hebel.length) return '';
+    var zeilen = z.hebel.filter(function (h) { return zahl(h.pct); });
+    if (!zeilen.length) return '';
+    return abKopf('Zielerreichung', 'Ankauf → heute → Ziel' + (zahl(z.gesamt) ? ' · gesamt ' + Math.round(z.gesamt) + ' %' : ''))
+      + '<div class="dp-pa5-ziel">' + zeilen.map(function (h) {
+        var p = Math.max(0, Math.min(100, Number(h.pct)));
+        return '<span>' + esc(h.wort) + '</span><div class="bahn" title="' + esc(h.text || '') + '"><i style="width:' + p.toFixed(1) + '%"></i></div><b>' + Math.round(Number(h.pct)) + ' %</b>'
+          + (h.zaehlt === false ? '<small>nicht in der Gesamtzahl</small>' : '');
+      }).join('') + '</div>';
+  }
+  function siInhalt(bestand, teile) {
+    var t = null; try { t = siTabelle(bestand); } catch (e) { try { console.warn('[pilot-analyse v3440] Kennzahlen', e); } catch (x) {} t = null; }
+    var h = '';
+    if (t) {
+      var Z = t.Z;
+      h += ergebnis(t.satz, Z && Z.ertragswert_hinweis ? '<button type="button" class="btn-clean dp-pa5-knopf" data-dp-pot-rechnen="1">Ertragswerte rechnen</button>' : '');
+      if (Z && Z.ertragswert_hinweis) h += hinweis(esc(Z.ertragswert_hinweis));
+      h += abKopf('Kennzahlen', bestand ? 'Ankauf eingefroren · heute aus den Reitern · Hebel aus Bewertung' : 'Hebel aus dem Reiter Bewertung') + t.html + hinweis(t.hinweis);
+      if (bestand && teile.steuerText) h += '<div class="dp-pa-d">' + hinweis('<b>Steuerlich, Ankauf gegen heute:</b> ' + txt(teile.steuerText)) + '</div>';
+    } else if (teile.leer) h += teile.leer;
+    if (bestand) h += zielBalken();
+    return h;
+  }
+  function siZeichnen() {
+    Array.prototype.forEach.call(document.querySelectorAll('[data-dp-pa5-si]'), function (host) {
+      try { var a = host.getAttribute('data-dp-pa5-si'); host.innerHTML = siInhalt(a === 'b', _siTeile[a] || {}); } catch (e) {}
+    });
+  }
+  /* Der Reiter: oben die Tabelle (neu gezeichnet, sobald Marktbericht, Ertragswerte oder Abrufe da sind), darunter
+     „Kauf gegen heute, alle Kennzahlen" mit „Pilot beim Ankauf" und im Detail die Rechenwege der DpPotenzial-Karte. */
+  function siReiter(bestand, teile, analyse) {
+    teile = teile || {};
+    _siTeile[bestand ? 'b' : 'a'] = { leer: teile.leer || '', steuerText: analyse && has(analyse.soll_ist_steuer) ? analyse.soll_ist_steuer : '' };
+    var h = (teile.zbf || '') + '<div data-dp-pa5-si="' + (bestand ? 'b' : 'a') + '">' + siInhalt(bestand, _siTeile[bestand ? 'b' : 'a']) + '</div>';
+    if (teile.sollIst) h += abKopf('Kauf gegen heute, alle Kennzahlen', 'Ertrag · Kosten · Finanzierung · Steuer') + teile.sollIst;
+    if (teile.pot) h += '<div class="dp-pa-d" data-dp-pa5-pot="1">' + abKopf('Rechenweg, Marktpreise und Aufteilung', 'aus dem Reiter Bewertung') + teile.pot + '</div>';
+    return h;
+  }
+  var _siTeile = {};
+  var _siT = null;
+  function siBald() { clearTimeout(_siT); _siT = setTimeout(siZeichnen, 60); }
+  ['dp:potenzial', 'dp:potenzial-markt', 'dp:mb-ready'].forEach(function (ev) { window.addEventListener(ev, siBald); });
+
+  /* ══ v3440 · UNTERUMSCHALTER in Potenzial & Exit / Potenzial & Risiken ═══════════════════════════════
+     Gemessen v3420: der Reiter war 2.693 px (Einfach) bzw. 5.470 px (Detail) lang, alles in einem Stück. Jetzt ist
+     immer EIN Abschnitt sichtbar. Die Abschnitte behalten ihre Kennungen (#dp-pa-pot, #dp-pa-risk, #dp-pa-anschluss,
+     neu #dp-pa-exit) - pa-potenzial.js neuZeichnen, Wegweiser-Alias und Messe-Drehbuch finden sie weiter.
+     unterZeigen(id) schaltet; ein Wegweiser auf einen Abschnitt schaltet mit. */
+  var UNTER_NAME = { pot: 'Potenzial', risk: 'Risiken', anschluss: 'Anschluss', exit: 'Exit' };
+  function unterLeiste(teile, bestand) {
+    if (teile.length < 2) return '';
+    return '<div class="dp-pa5-unter" role="group" aria-label="Abschnitt">' + teile.map(function (t, i) {
+      return '<button type="button" class="btn-clean" data-dp-pa5-unter="' + t + '" aria-pressed="' + (i === 0) + '">' + (t === 'risk' && !bestand ? 'Risiken und Szenarien' : UNTER_NAME[t]) + '</button>';
+    }).join('') + '</div>';
+  }
+  function unterZeigen(wr, id) {
+    if (!wr) return false;
+    var leiste = wr.querySelector('.dp-pa5-unter'); if (!leiste) return false;
+    var hat = false;
+    Array.prototype.forEach.call(leiste.querySelectorAll('[data-dp-pa5-unter]'), function (b) { var an = b.getAttribute('data-dp-pa5-unter') === id; if (an) hat = true; b.setAttribute('aria-pressed', String(an)); });
+    if (!hat) return false;
+    Array.prototype.forEach.call(wr.querySelectorAll('[data-dp-pa5-teil]'), function (t) { t.classList.toggle('dp-pa5-zu', t.getAttribute('data-dp-pa5-teil') !== id); });
+    try { neuZeichnen(); } catch (e) {}
+    return true;
+  }
+
   /* ── Hülle ───────────────────────────────────────────────────────────── */
   function huelle(o) {
     stil();
@@ -953,20 +1435,28 @@
        vorn; im Ankauf 8 statt 10. Zusammengelegt wird nur die Hülle: jeder bisherige Teil steht mit seiner alten
        Kennung (#dp-pa-loc, #dp-pa-pot, #dp-pa-risk …) als Abschnitt im neuen Reiter, damit pa-potenzial.js,
        ui.js (_dpVerlaufLocLine) und Wegweiser-Karten ihn weiter finden. Vorlage: design/Vorschläge/pilot-analyse-demo.html */
+    /* v3440 · Abschnitte mit Unterumschalter: immer nur einer sichtbar */
+    var unterReiter = function (paare, b) {
+      var da = paare.filter(function (x) { return x[1]; });
+      if (!da.length) return '';
+      return unterLeiste(da.map(function (x) { return x[0]; }), b) + da.map(function (x, i) {
+        return '<div id="dp-pa-' + x[0] + '" data-dp-pa5-teil="' + x[0] + '"' + (i ? ' class="dp-pa5-zu"' : '') + '>' + x[1] + '</div>'; }).join('');
+    };
     var teil = function (id, inner, erst) { return inner ? '<div id="dp-pa-' + id + '"' + (erst ? '' : ' class="dp-pa4-mt" style="margin-top:18px"') + '>' + inner + '</div>' : ''; };
     if (bestand && o.jahre) {
       add('jahr', 'Jahresabgleich', '<div data-dp-ja-host="1"></div><div style="margin-top:18px"></div>' + o.jahre);
       try { setTimeout(function () { if (window.DpJahresabgleich) window.DpJahresabgleich.mountAll(); if (window.DpJahresbuch) window.DpJahresbuch.mountAll(); }, 0); } catch (eJ) {}
     }
     add('uebersicht', 'Übersicht', o.uebersicht);
-    add('si', bestand ? 'Ankauf · Bestand · Zielbild' : 'Ankauf · Soll · Zielbild', o.si ? '<div class="dp-pa-e dp-pa4-mini" data-dp-pa4-mini="abz"></div>' + o.si : o.si);
+    /* v3440 · o.si ist ein Objekt mit den Teilen (ui.js); als Text (ältere Aufrufer) wie bis v3439 */
+    if (o.si && typeof o.si === 'object') { if (o.si.pot || o.si.sollIst || o.si.leer) add('si', bestand ? 'Ankauf · Bestand · Zielbild' : 'Ankauf · Soll · Zielbild', siReiter(bestand, o.si, o.analyse)); }
+    else add('si', bestand ? 'Ankauf · Bestand · Zielbild' : 'Ankauf · Soll · Zielbild', o.si ? '<div class="dp-pa-e dp-pa4-mini" data-dp-pa4-mini="abz"></div>' + o.si : o.si);
     /* Wert & Lage ist immer da (v3420): ohne Bericht mit dem Weg zur KI-Bewertung, darunter Lage & Markt */
-    var mbWeg = '<div class="dp-pa-card"><div class="dp-pa-sec"><span class="dp-pa-bar"></span><span class="dp-pa-lbl">' + (bestand ? 'Wert im Jahresabgleich' : 'Was ist das Objekt wert?') + '</span><span class="dp-pa-rule"></span></div>'
-      + '<p class="dp-pa-p">' + (bestand ? 'Ein Marktbericht im Jahr reicht für den Jahresabgleich. Jeder Bericht bleibt gespeichert und steht unten im Verlauf gegen deinen Plan-Wert.'
-        : 'Der Marktbericht bewertet das Objekt aus amtlichen Daten (Bodenrichtwert, Liegenschaftszins, Sachwertfaktor des Gutachterausschusses) und den Mieten und Angeboten vor Ort.') + '</p>'
-      + '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px"><button type="button" class="btn-clean dp-pa4-btn" onclick="try{if(window.DpJahresabgleich)DpJahresabgleich.mbAbrufen()}catch(e){}">' + (bestand ? 'Neuen Marktbericht abrufen' : 'Objekt mit KI bewerten') + '</button></div></div>';
+    /* v3440 · oben der Ergebnissatz mit dem Hauptknopf (ersetzt die Karte „Wert im Jahresabgleich“ und die Kacheln
+       Plan-Wert/Restschuld), dann Wert je Verfahren, Wert gegen Plan mit allen Berichten, Lage beim Kauf gegen heute */
+    var mbWeg = '<div data-dp-pa5-wertkopf="' + (bestand ? 'b' : 'a') + '">' + wertKopf(bestand, histJetzt()) + '</div>';
     reiter.push('<button type="button" class="btn-clean dp-pa-tab" id="dp-pa-tab-wert" data-dp-pa-immer="1" onclick="_dpPaTab(\'wert\',this)">Wert &amp; Lage</button>');
-    inhalt.push(panel('wert', mbWeg + '<div style="margin-top:14px"></div>' + (o.wert || '') + teil('loc', o.lage ? '<div class="dp-pa-e dp-pa4-mini" data-dp-pa4-mini="lage"></div>' + kuerzen(o.lage) : ''), false));
+    inhalt.push(panel('wert', mbWeg + (o.wert || '') + teil('loc', '<div data-dp-pa5-lage="' + (bestand ? 'b' : 'a') + '">' + lageHtml(bestand, histJetzt()) + '</div>' + (o.lage ? '<div style="margin-top:22px"></div>' + kuerzen(o.lage) : '')), false));
     /* v3323 · Potenzialanalyse (pa-potenzial.js) und Hausverlauf (hausverlauf.js) */
     var potH = ''; try { potH = window.DpPaPotenzial ? window.DpPaPotenzial.html(o.analyse || {}, bestand) : ''; } catch (eP) { potH = ''; }
     var hausH = ''; try { hausH = window.DpHausverlauf ? window.DpHausverlauf.html() : ''; } catch (eH) { hausH = ''; }
@@ -974,13 +1464,13 @@
     if (bestand) {
       add('steuer', 'Steuer', o.steuer);
       add('haus', 'Haus &amp; Unterlagen', hausUl);
-      add('potx', 'Potenzial &amp; Exit', teil('pot', potH, true) + teil('risk', o.risiko, !potH) + teil('anschluss', kuerzen(o.anschlussExit), !potH && !o.risiko));
+      add('potx', 'Potenzial &amp; Exit', unterReiter([['pot', potH], ['risk', o.risiko], ['anschluss', o.anschluss != null ? kuerzen(o.anschluss) : kuerzen(o.anschlussExit)], ['exit', o.exit != null ? kuerzen(o.exit) : '']], true));
     } else {
       add('verh', 'Kaufpreis &amp; Offerte', kuerzen(o.verhandlung));
       add('bank', 'Finanzierung &amp; Bank', kuerzen(o.bank));
       add('steuer', 'Steuer', o.steuer);
       add('haus', 'Haus &amp; Unterlagen', hausUl);
-      add('potx', 'Potenzial &amp; Risiken', teil('pot', potH, true) + teil('risk', o.risiko, !potH));
+      add('potx', 'Potenzial &amp; Risiken', unterReiter([['pot', potH], ['risk', o.risiko]], false));
     }
     var phase = bestand ? 'Bestand' : 'Ankauf', info = '', seit = '';
     try {
@@ -1017,7 +1507,7 @@
       + '<button type="button" class="btn-clean dp-pa4-mehr-r" data-dp-pa4-blaettern="1" aria-label="Weitere Reiter" tabindex="-1">›</button>'
       + '</div>' + seg() + '</div>';
     try { localStorage.setItem('dp_pa_si_ansicht', m === 'detail' ? 'genau' : 'einfach'); } catch (e) {}
-    try { setTimeout(function () { leisteMessen(); minisZeichnen(); if (window.DpWertZielbild && window.DpWertZielbild.laden) window.DpWertZielbild.laden().then(function () { kzNeu(); minisZeichnen(); wegNeu(); }, function () {}); }, 0); } catch (e) {}
+    try { setTimeout(function () { leisteMessen(); minisZeichnen(); if (window.DpWertZielbild && window.DpWertZielbild.laden) window.DpWertZielbild.laden().then(function () { kzNeu(); minisZeichnen(); wegNeu(); siZeichnen(); }, function () {}); }, 0); } catch (e) {}
     return '<div class="dp-pa-wrap' + (bestand ? ' dp-pa-bestand' : '') + '" data-dp-pa-v4="1" data-dp-pa-modus="' + m + '" data-dp-pa-ansicht="' + (bestand ? 'bestand' : 'ankauf') + '">'
       + kopf + leiste
       + '<div class="dp-pa-content">' + inhalt.join('') + '</div></div>';
@@ -1065,13 +1555,15 @@
       var wr = gh.closest('.dp-pa-wrap'), id = gh.getAttribute('data-dp-pa4-geh');
       var such = function (k) { return wr && [].filter.call(wr.querySelectorAll('.dp-pa-rail .dp-pa-tab'), function (b) { return (b.getAttribute('onclick') || '').indexOf("'" + k + "'") >= 0; })[0]; };
       /* v3420 · zusammengelegte Reiter: alte Kennung → neuer Reiter, danach zum Abschnitt rollen */
-      var ALIAS = { loc: 'wert', unterlagen: 'haus', hausv: 'haus', pot: 'potx', risk: 'potx', anschluss: 'potx', jahre: 'jahr' };
+      var ALIAS = { loc: 'wert', unterlagen: 'haus', hausv: 'haus', pot: 'potx', risk: 'potx', anschluss: 'potx', exit: 'potx', jahre: 'jahr' };
       var tb = such(id), ab = null;
       if (!tb && ALIAS[id]) { tb = such(ALIAS[id]); ab = id; }
-      if (tb && ab) setTimeout(function () { var z = wr.querySelector('.dp-pa-panel.active #dp-pa-' + ab); if (z) try { z.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (e) {} }, 60);
+      if (tb && ab) setTimeout(function () { var pn = wr.querySelector('.dp-pa-panel.active'); if (pn && pn.querySelector('[data-dp-pa5-teil="' + ab + '"]')) { unterZeigen(pn, ab); return; } var z = wr.querySelector('.dp-pa-panel.active #dp-pa-' + ab); if (z) try { z.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (e) {} }, 60);
       if (tb) { tb.click(); try { tb.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' }); wr.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (e) {} }
       return;
     }
+    var un = t.closest('[data-dp-pa5-unter]');
+    if (un && un.closest('.dp-pa-wrap[data-dp-pa-v4]')) { ev.preventDefault(); unterZeigen(un.closest('.dp-pa-panel') || un.closest('.dp-pa-wrap'), un.getAttribute('data-dp-pa5-unter')); return; }
     var rt = t.closest('.dp-pa4-rail-box .dp-pa-tab');
     if (rt) { setTimeout(function () { try { rt.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' }); } catch (e) {} leisteMessen(); }, 0); }
     var p = t.closest('[data-dp-pa4-pdf]');
@@ -1084,6 +1576,6 @@
     }
   });
 
-  window.DpPilotV4 = { VERSION: 'v3323', wegNeu: wegNeu, scoreSicht: scoreSicht, sichtbarerScore: sichtbarerScore, leisteMessen: leisteMessen, huelle: huelle, uebersicht: uebersicht, risiko: risiko, steuer: steuer, gesamtstatement: gesamtstatement,
+  window.DpPilotV4 = { VERSION: 'v3440', unterZeigen: unterZeigen, siZeichnen: siZeichnen, siTabelle: siTabelle, wegNeu: wegNeu, scoreSicht: scoreSicht, sichtbarerScore: sichtbarerScore, leisteMessen: leisteMessen, huelle: huelle, uebersicht: uebersicht, risiko: risiko, steuer: steuer, gesamtstatement: gesamtstatement,
     wertverlauf: wertverlauf, indexVerlauf: indexVerlauf, linien: linien, modus: modus, setzeModus: setzeModus, neuZeichnen: neuZeichnen, saetze: saetze, steuerTabelle: steuerTabelle };
 })();

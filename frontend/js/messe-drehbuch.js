@@ -3078,6 +3078,10 @@
      Nichts wird abgerufen: „Neu rechnen“, „Marktpreise abrufen“ und „Neu abrufen“ werden nur gezeigt. */
   function r11Pa() { return [].filter.call(document.querySelectorAll('#ai-content'), function (e) { return e.offsetWidth; })[0] || null; }
   function r11In(sel) { return function () { var a = r11Pa(); return a && a.querySelector(sel); }; }
+  /* v3440 · Potenzial & Exit / Potenzial & Risiken haben einen Unterumschalter - immer nur ein Abschnitt sichtbar */
+  async function r11Unter(id) { var p = r11Panel(); var b = p && p.querySelector('[data-dp-pa5-unter="' + id + '"]'); if (b && b.getAttribute('aria-pressed') !== 'true') { b.click(); await warte(500); } return !!b; }
+  /* v3440 · Spalte einer Tabelle über ihren Kopf (die Kennzahlen-Tabelle trägt rechts eine Spalte Aufteilung) */
+  function r11Spalte(tr, re) { var tb = tr && tr.closest('table'); var th = tb ? [].map.call(tb.querySelectorAll('thead th'), function (x) { return r6Text(x); }) : []; for (var i = 1; i < th.length; i++) if (re.test(th[i])) return i; return -1; }
   function r11PanelSel(sel) { return function () { var p = r11Panel(); return p && p.querySelector(sel); }; }
   function r11Modus(m) { var a = r11Pa(), b = a && a.querySelector('[data-dp-pa-modus-knopf="' + m + '"]'); if (b && b.getAttribute('aria-pressed') !== 'true') b.click(); }
   var _r11Modus = null;
@@ -3145,6 +3149,7 @@
       },
       async function (s) {   /* 7 · Risiken & Szenarien */
         await r11PaTab(/Risiken/);
+        await r11Unter('risk');
         await zeige(r11PanelSel('.dp-pa-cols'), 8);
         await b2oZeile(s, 'Stärken und Risiken', 'Links die Stärken, rechts die Risiken — jeweils kurz begründet, nebeneinander zum Abwägen.');
         var sz = r11Karte(/^Szenarien/i);
@@ -6081,15 +6086,15 @@
         await zeige(function () { return t; }, 8);
         await b2oZeile(s, 'Ein eigener Reiter', 'In der Reiterleiste der Pilot-Analyse: <b>„' + (t ? r6Text(t) : 'Ankauf · Bestand · Zielbild') + '“</b>.');
         await r11PaTab(/Zielbild/);
-        var tab = function () { var p = r11Panel(); return p && p.querySelector('[data-dp-pot-wirt] table'); };
+        var tab = function () { var p = r11Panel(); return p && (p.querySelector('[data-dp-pa5-si] table') || p.querySelector('[data-dp-pot-wirt] table')); };   /* v3440 */
         await zeige(tab, 6);
         /* v2481n · GEMESSEN: der Kopf trägt das Jahr als eigenes Kind („Mieterhöhung" + „2026") - r6Text klebte es an */
         var T = tab(), kopf = T && T.querySelector('thead tr') ? [].map.call(T.querySelector('thead tr').querySelectorAll('th'), function (x) { return [].map.call(x.childNodes, function (n) { return String(n.textContent || '').replace(/\s+/g, ' ').trim(); }).filter(Boolean).join(' '); }).filter(Boolean) : [];
         var zeile = function (re) { var r = T && [].filter.call(T.querySelectorAll('tbody tr'), function (x) { return re.test(r6Text(x.cells[0])); })[0]; return r ? [].map.call(r.cells, function (c) { return r6Text(c).replace(/^([^€]*€).+$/, '$1'); }) : null; };   /* v3276q · „22.920 €5,05 €/m²“ - nur der Betrag */
-        var ew = zeile(/^Ertragswert/), km = zeile(/^Kaltmiete p\. a\./), mpi = zeile(/^Marktpreisindikation/), rf = zeile(/^Rohertragsfaktor/);
+        var ew = zeile(/^Ertragswert/), km = zeile(/^Kaltmiete (p\. a\.|im Jahr)/), mpi = zeile(/^Marktpreisindikation/), rf = zeile(/^Rohertragsfaktor/);
         /* v2481m · seit v2541 tragen die Köpfe ein Jahr („Bestand 2026", „Zielbild Jahr offen") - Spalte per Muster */
         var sx = function (re) { for (var i = 1; i < kopf.length; i++) if (re.test(kopf[i])) return i; return -1; };
-        var iB = sx(/^Bestand/), iM = sx(/^Mieterh/), iZ = sx(/^Zielbild/), iA = sx(/^Ankauf/);
+        var iB = sx(/^(Bestand|Heute)/), iM = sx(/^(nach )?Mieterh/), iZ = sx(/^Zielbild/), iA = sx(/^Ankauf/);
         DPM_REIHE.r26pa = { kopf: kopf, ertragswert: ew, kaltmiete: km, mpi: mpi, rf: rf };
         var sp = kopf.slice(1);   /* ohne die Spalte „Kennzahl" */
         await b2oZeile(s, sp.length + ' Spalten nebeneinander', sp.join(' · ') + (km && iB > 0 ? ' — Kaltmiete im Jahr von <b>' + km[iB] + '</b> bis <b>' + km[iZ > 0 ? iZ : km.length - 1] + '</b>' : '') + '.', 800);
@@ -6103,16 +6108,16 @@
         /* v2481g · GEMESSEN: die Aufteilung steht als ZEILEN in derselben Tafel, nicht als eigene Tabelle - gezeigt werden diese Zeilen samt Begründung */
         var auf = function () {
           var p = r11Panel(); if (!p) return null;
-          var z = [].filter.call(p.querySelectorAll('[data-dp-pot-wirt] tr'), function (r) { return r.offsetWidth && /Aufteilung/i.test(r6Text(r.cells[0] || r)); });
+          var z = [].filter.call(p.querySelectorAll('[data-dp-pa5-si] tr, [data-dp-pot-wirt] tr'), function (r) { return r.offsetWidth && /Aufteilung/i.test(r6Text(r.cells[0] || r)); });
           return z.length ? b2oHuelle(z[0], z[z.length - 1]) : null;
         };
         var au = auf();
         if (au) {
           /* v3288b · die Hülle liegt position:fixed und lässt sich nicht holen - erst die erste Zeile ins Bild (Prüflauf: Kegel 0 %) */
-          var auErst = [].filter.call(r11Panel().querySelectorAll('[data-dp-pot-wirt] tr'), function (r) { return r.offsetWidth && /Aufteilung/i.test(r6Text(r.cells[0] || r)); })[0];
+          var auErst = [].filter.call(r11Panel().querySelectorAll('[data-dp-pa5-si] tr, [data-dp-pot-wirt] tr'), function (r) { return r.offsetWidth && /Aufteilung/i.test(r6Text(r.cells[0] || r)); })[0];
           if (auErst) { holen(auErst); await warte(400); }
           await zeige(auf, 6);
-          var at = [].map.call(r11Panel().querySelectorAll('[data-dp-pot-wirt] tr'), function (r) { return /Aufteilung/i.test(r6Text(r.cells[0] || r)) ? r6Text(r) : ''; }).join(' '), neg = /kein Potenzial/i.test(at);
+          var at = [].map.call(r11Panel().querySelectorAll('[data-dp-pa5-si] tr, [data-dp-pot-wirt] tr'), function (r) { return /Aufteilung/i.test(r6Text(r.cells[0] || r)) ? r6Text(r) : ''; }).join(' '), neg = /kein Potenzial/i.test(at);
           await b2oZeile(s, 'Nach der Aufteilung', neg ? 'Jede Wohnung als Eigentumswohnung, die Summe gegen das Haus — hier <b>kein Potenzial</b>, und DealPilot sagt warum.' : 'Jede Wohnung als Eigentumswohnung, die Summe nach Aufteilungskosten gegen den Wert des Hauses.');
         }
         var pt = function () { var p = r11Panel(); var e = p && rhIm(p, /^\s*PILOT: WAS IM HAUS STECKT\s*$/); return e && (e.closest('div[style*="margin-top:12px"]') || e.parentElement); };
@@ -9002,10 +9007,10 @@
         await warteAuf(function () { return q('#ai-content .dp-pa-tab'); }, 8000);
         await r11PaTab(/Zielbild/);
         await warte(600);
-        var km = function () { var p = r11Panel(); var e = p && rhIm(p, /^Kaltmiete p\. a\.$/); return e && (e.closest('tr') || e.parentElement); };
+        var km = function () { var p = r11Panel(); var e = p && rhIm(p, /^Kaltmiete (p\. a\.|im Jahr)$/); return e && (e.closest('tr') || e.parentElement); };
         var e0 = km(); if (e0) { try { e0.scrollIntoView({ block: 'center' }); } catch (x) {} await warte(400); }
         await zeige(function () { return km() || r11Panel(); }, 8);
-        var t = qgPanelText(), r = /Kaltmiete p\. a\.\s*([\d.]+ €)\s*([\d,]+ €\/m²)?\s*([\d.]+ €)\s*([\d,]+ €\/m²)?/.exec(t);
+        var t = qgPanelText(), r = /Kaltmiete (?:p\. a\.|im Jahr)\s*([\d.]+ €)\s*(?:([\d,]+ €\/m²)(?: im Monat)?)?\s*([\d.]+ €)\s*(?:([\d,]+ €\/m²)(?: im Monat)?)?/.exec(t);
         DPM_QG.a5 = r ? r.slice(1) : null;
         await b2oZeile(s, 'Heute und Zielbild', r ? 'Kaltmiete heute <b>' + r[1] + '</b> im Jahr — im Zielbild <b>' + r[3] + '</b>.' : 'Ist und Zielbild nebeneinander, Wohnung für Wohnung gerechnet.');
         DPM_QG.zeiten.push({ szene: 'A5', ms: Date.now() - t1 });
@@ -9294,8 +9299,14 @@
     return null;
   }
   function qgbPaText() { return r6Text(r11Panel()); }
-  function qgbZiel() { var p = r11Panel(); var l = p ? p.querySelectorAll('.dp-pap-stufen .dp-pap-st') : []; return l.length > 1 ? l[l.length - 1] : null; }
+  /* v3440 · „Was in dem Objekt steckt“ (Stufenkarten) ist gefallen - die Zielbild-Spalte der Kennzahlen-Tabelle trägt dieselben Zahlen */
+  function qgbZiel() { var p = r11Panel(); var t = p ? p.querySelector('[data-dp-pa5-si] table') : null; if (t) return t; var l = p ? p.querySelectorAll('.dp-pap-stufen .dp-pap-st') : []; return l.length > 1 ? l[l.length - 1] : null; }
   function qgbStufe(e) {
+    if (e && e.tagName === 'TABLE') {   /* v3440 · Spalte Zielbild der Kennzahlen-Tabelle */
+      var zl = function (re) { var tr = [].filter.call(e.querySelectorAll('tbody tr'), function (x) { return x.cells[0] && re.test(r6Text(x.cells[0])); })[0]; var i = tr ? r11Spalte(tr, /^Zielbild/) : -1; return tr && i > 0 && tr.cells[i] ? r6Text(tr.cells[i]) : ''; };
+      var g = function (t, re) { var x = re.exec(t || ''); return x ? x[1].replace(/\s+/g, ' ').trim() : null; };
+      return { ew: g(zl(/^Ertragswert/), /([\d.]+ €)/), zuwachs: g(zl(/^Wertzuwachs/), /([+−-]\s*[\d.]+ €)/), rnd: g(zl(/^Ertragswert/), /RND (\d+)/), massn: g(zl(/^Maßnahmen/), /([\d.]+ €)/) };
+    }
     var t = r6Text(e), f = function (re) { var x = re.exec(t); return x ? x[1].replace(/\s+/g, ' ').trim() : null; };
     return { ew: f(/Ertragswert\s*([\d.]+ €)/), zuwachs: f(/Wertzuwachs nach Kosten\s*([+−-]\s*[\d.]+ €)/), rnd: f(/Restnutzungsdauer\s*(\d+) J/), massn: f(/Maßnahmen\s*([\d.]+ €)/) };
   }
@@ -9399,7 +9410,7 @@
         kegelHoch(false);
         reiter('s5'); await warte(1200);
         await warteAuf(function () { return q('#ai-content .dp-pa-tab'); }, 8000);
-        await r11PaTab(/Potenzial/);
+        await r11PaTab(/^Ankauf · (Bestand|Soll)/);   /* v3440 · die Stufen stehen in der Kennzahlen-Tabelle */
         var r1 = await qgbRechnen();
         DPM_QGB.mit = r1 && r1.haus ? { bestand: r1.haus.bestand && r1.haus.bestand.wert, ziel: r1.haus.zielbild && r1.haus.zielbild.wert, rnd: r1.haus.zielbild && r1.haus.zielbild.rnd } : null;
         await warteAuf(function () { var z = qgbZiel(); return z && /Ertragswert/.test(r6Text(z)) && /Maßnahmen/.test(r6Text(z)); }, 8000);
@@ -9423,7 +9434,7 @@
         await r11PaTab(/Ankauf · Bestand/);
         var gk = r11Panel() && r11Panel().querySelector('.dp-si-um [data-dp-si-knopf="genau"]');
         if (gk && gk.getAttribute('aria-pressed') !== 'true') { gk.click(); await warte(700); }
-        var km = qgbZeileTab(/^Kaltmiete p\. a\./), ew = qgbZeileTab(/^Ertragswert/), wz = qgbZeileTab(/^Wertzuwachs nach Kosten/);
+        var km = qgbZeileTab(/^Kaltmiete (p\. a\.|im Jahr)/), ew = qgbZeileTab(/^Ertragswert/), wz = qgbZeileTab(/^Wertzuwachs nach Kosten/);
         await warteAuf(km, 6000);
         var k0 = km(); if (k0) { var sx = scroller(k0); if (sx) { sx.scrollTop += rect(k0).top - 200; await warte(500); } }
         var zellen = function (tr) { return tr ? [].map.call(tr.querySelectorAll('td'), function (td) { return r6Text(td); }) : []; };
@@ -9431,22 +9442,22 @@
         var kopfZ = function () { var tb = km() && km().closest('table'); var th = tb ? [].map.call(tb.querySelectorAll('thead th'), function (x) { return r6Text(x); }) : []; return th; };
         DPM_QGB.b3 = { kopf: kopfZ(), kaltmiete: ck };
         await zeige(km, 8);
-        await b2oZeile(s, 'Ankauf · Bestand · Zielbild', 'Kaltmiete im Jahr: beim Kauf <b>' + betr(ck[1]) + '</b>, heute <b>' + betr(ck[ck.length - 2]) + '</b>, im Zielbild <b>' + betr(ck[ck.length - 1]) + '</b>.');
+        await b2oZeile(s, 'Ankauf · Bestand · Zielbild', 'Kaltmiete im Jahr: beim Kauf <b>' + betr(ck[Math.max(1, r11Spalte(km(), /^Ankauf/))]) + '</b>, heute <b>' + betr(ck[r11Spalte(km(), /^(Heute|Bestand)/) > 0 ? r11Spalte(km(), /^(Heute|Bestand)/) : ck.length - 2]) + '</b>, im Zielbild <b>' + betr(ck[r11Spalte(km(), /^Zielbild/) > 0 ? r11Spalte(km(), /^Zielbild/) : ck.length - 1]) + '</b>.');
         var ce = zellen(ew()), cw = zellen(wz());
         DPM_QGB.b3.ertragswert = ce; DPM_QGB.b3.wertzuwachs = cw;
         await zeigeGruppe(ew, wz, 8);
         var zw = /([+−-]\s*[\d.]+ €)/.exec(cw.join(' '));
-        await b2oZeile(s, 'Der Wert', 'Ertragswert heute <b>' + betr(ce[ce.length - 2]) + '</b> — im Zielbild <b>' + betr(ce[ce.length - 1]) + '</b>' + (zw ? ', nach Kosten <b>' + zw[1].replace(/\s+/g, ' ') + '</b>' : '') + '.');
+        await b2oZeile(s, 'Der Wert', 'Ertragswert heute <b>' + betr(ce[r11Spalte(ew(), /^(Heute|Bestand)/) > 0 ? r11Spalte(ew(), /^(Heute|Bestand)/) : ce.length - 2]) + '</b> — im Zielbild <b>' + betr(ce[r11Spalte(ew(), /^Zielbild/) > 0 ? r11Spalte(ew(), /^Zielbild/) : ce.length - 1]) + '</b>' + (zw ? ', nach Kosten <b>' + zw[1].replace(/\s+/g, ' ') + '</b>' : '') + '.');
         DPM_QGB.zeiten.push({ szene: 'B3', ms: Date.now() - t1 });
       },
       /* ── B4 · Wert & Verlauf: jeder Marktbericht gegen den Plan-Wert ── */
       async function (s) {
         var t1 = Date.now();
         await r11PaTab(/Wert & (Verlauf|Lage)/);
-        var za = function () { var p = r11Panel(); return p && p.querySelector('.dp-pa4-zahlen'); };
-        await warteAuf(za, 6000);
+        var za = function () { var p = r11Panel(); return p && p.querySelector('[data-dp-pa5-wertkopf] .dp-pa5-erg'); };   /* v3440 · Ergebnissatz statt Kacheln */
+        await warteAuf(function () { var e = za(); return e && /Marktbericht vom/.test(r6Text(e)); }, 6000);
         await zeige(za, 8);
-        var st = r6Text(r11Panel() && r11Panel().querySelector('.dp-pa4-satz'));
+        var st = r6Text(r11Panel() && r11Panel().querySelector('[data-dp-pa5-wertkopf] .dp-pa5-satz'));
         var sm = /Marktbericht vom ([\d.]+) sieht den Marktpreis bei ([\d.]+ €), ([\d,]+ %) (über|unter) deinem Plan-Wert für (\d{4}) \(([\d.]+ €)\)/.exec(st);
         DPM_QGB.b4 = { satz: st.slice(0, 240) };
         await b2oZeile(s, 'Wert & Verlauf', sm ? 'Marktbericht vom ' + sm[1] + ': <b>' + sm[2] + '</b> — <b>' + sm[3] + ' ' + sm[4] + '</b> deinem Plan-Wert für ' + sm[5] + ' (' + sm[6] + ').' : 'Der letzte Marktbericht gegen deinen Plan-Wert.');
@@ -9540,6 +9551,7 @@
       async function (s) {
         var t1 = Date.now();
         await r11PaTab(/Anschluss|Exit/);
+        await r11Unter('exit');
         var ex = function () { var e = q('#ai-content [data-dp-bestand="exit"]'); return e && e.offsetWidth ? e : null; };
         await warteAuf(function () { return ex() && /Beleihungsspielraum/.test(r6Text(ex())); }, 6000);
         var zl = function (re) { return function () { var e = ex(); return e ? [].filter.call(e.querySelectorAll('tr'), function (tr) { return re.test(r6Text(tr)); })[0] || null : null; }; };

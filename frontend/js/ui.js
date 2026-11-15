@@ -2626,15 +2626,19 @@ function _renderAIServerAnalysis(a) {
          Ankauf · Bestand · Soll (Mieterhöhung) · Zielbild stehen - „das ist eigentlich das Erste, was ich
          sehen will" -, danach Zielerreichung und Jahresstände, dann die Abgleiche. Gemessen: die
          Jahresstände standen oben (846 px) und in beiden Ansichten. Jetzt nur im Detail, an zweiter Stelle. */
-      var _zhV4 = '';
-      try { _zhV4 = (_bestand && window.DpJahresstaende) ? '<div data-dp-ziel-host="1">' + window.DpJahresstaende.html() + '</div>' : ''; } catch (eZ) { _zhV4 = ''; }
-      var _gV4 = _potHtml + (_zhV4 ? '<div style="margin-top:12px"></div>' + _zhV4 : '') + (_siHtml ? '<div style="margin-top:12px"></div>' + _siHtml : '');
-      var _siV4 = (_siHtml || _potHtml)
-        ? (function () { try { return window.DpWertZielbild ? window.DpWertZielbild.reiterHtml(_gV4, { mitAnkauf: !!_siHtml, mitPot: !!_potHtml }) : _gV4; } catch (eW) { return _gV4; } })()
-        : _siInner;
+      /* v3440 · Marcel 15.11.2026 („die Demo ist super … setz alles um, was geht", Vorlage
+         design/Vorschläge/pilot-analyse-demo.html Fassung 2): Ankauf · Bestand · Zielbild ist jetzt EINE
+         Kennzahlen-Tabelle (pilot-analyse-v4.js siReiter) statt der Tafel aus DpPotenzial, den
+         Einfach-Kacheln aus wert-zielbild.js und den Jahresständen. Die Jahresstände (bis v3439 hier als
+         _zhV4 eingehängt, DpJahresstaende.html) wandern in den Jahresabgleich (Tabelle „Jahr für Jahr").
+         Hier werden nur noch die Teile übergeben: die DpPotenzial-Karte (Abrufleiste, Marktpreise,
+         Aufteilung, „So ist gerechnet" - im Detail, ihre Kennzahlen-Tafel ausgeblendet), „Ankauf gegen
+         Bestand" mit „Pilot beim Ankauf" und der Hinweis ohne Soll-Miete und Zielbild. */
+      var _siV4 = { pot: _potHtml, sollIst: _siHtml, leer: (_siHtml || _potHtml) ? '' : _siInner, zbf: '' };
       /* v3361 · Zielbild-Fassungen: Auswahl über der Tafel (nur wenn es frühere Fassungen gibt) */
-      try { var _zbfL = window.DpZielbildFassungen ? window.DpZielbildFassungen.leisteHtml() : ''; if (_zbfL && _siV4) _siV4 = _zbfL + _siV4; } catch (eF) {}
-      var _wertInner = '<div data-dp-pa-wertverlauf="1"></div><div id="dp-pa-wert-body"></div>'
+      try { _siV4.zbf = window.DpZielbildFassungen ? window.DpZielbildFassungen.leisteHtml() : ''; } catch (eF) {}
+      /* v3440 · Reihenfolge der Demo: Wert je Verfahren, dann Wert gegen Plan mit allen Berichten */
+      var _wertInner = '<div id="dp-pa-wert-body"></div><div data-dp-pa-wertverlauf="1"></div>'
         /* v3323 · Marcel 12.11.2026: „unter Wert und Verlauf … die Marktberichtentwicklung … da müsste eigentlich alles drin stehen" -
            der Verlauf stand nur im Detail (class dp-pa-d); jetzt in beiden, im Einfach ohne Tafel und mit „Kurz gesagt" */
         + '<div id="dp-pa-verlauf-wrap" style="display:none;margin-top:16px"><h4 class="dp-wv-h" style="margin:0 0 8px">Verlauf · Marktberichte und Abrufe</h4>'
@@ -2646,7 +2650,8 @@ function _renderAIServerAnalysis(a) {
         risiko: V4.risiko(a, _bestand, { optisch: _pbOptisch, anschluss: _bestand ? '' : _pbAnschluss }),
         verhandlung: pV, bank: pK, unterlagen: _ulHtml,
         jahre: (_bestand && window.DpJahresbuch) ? '<div data-dp-jb-host="1"></div>' : '',   /* v3363 · Unterreiter Jahre */
-        anschlussExit: _bestand ? pAF + '<div style="margin-top:16px"></div>' + pEX : ''
+        anschlussExit: _bestand ? pAF + '<div style="margin-top:16px"></div>' + pEX : '',
+        anschluss: _bestand ? pAF : '', exit: _bestand ? pEX : ''   /* v3440 · Unterumschalter Anschluss | Exit */
       });
       try { setTimeout(function () { if (window.DpSteuerVerlauf) window.DpSteuerVerlauf.mountAll(); }, 0); } catch (e5) {}
       return _v4;

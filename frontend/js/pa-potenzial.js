@@ -138,17 +138,16 @@
     var d = daten(); if (!d) return '';
     var pp = d.pp, S = stufen(pp), h = '';
     var hatText = a.potenzial_text != null && String(a.potenzial_text).trim() !== '';
+    /* v3440 · Marcel 15.11.2026 (Demo Fassung 2): „Was in dem Objekt steckt" (Treppe und drei Stufenkarten) ist
+       gefallen - dieselben Summen je Stufe stehen in der Kennzahlen-Tabelle (Reiter Ankauf · Bestand · Zielbild).
+       Hier bleiben der Ergebnissatz, die Hebel einzeln, was rechtlich gilt und je Wohnung. */
     if (S) {
-      var J = pp.jahre || {};
-      h += karte(kopf('Was in dem Objekt steckt · Kaltmiete je Monat') + treppe(S)
-        + '<p class="dp-pa4-erkl" style="margin-top:8px"><b>Heute</b> ist die Ist-Miete. <b>Nach Mieterhöhung</b> ist die Miete, die du nach § 558 BGB verlangen darfst (Vergleichsmiete, Kappungsgrenze, Sperrfrist). <b>Im Zielbild</b> steht je Wohnung deine Zielmiete, ohne eigene Angabe das rechtliche Maximum bei Neuvermietung (begrenzt auf den Markt), dazu deine Maßnahmen. </p>');
-      h += '<div class="dp-pap-stufen dp-pa4-mt">'
-        + stufeKarte('Heute', '#2A2727', S.bestand, S.bestand, null, 'bestand')
-        + stufeKarte('Nach Mieterhöhung', 'var(--wl-b8932f,#b8932f)', S.mh, S.bestand, J.mieterhoehung, 'mh')
-        + stufeKarte('Zielbild', 'var(--wl-c9a84c,#C9A84C)', S.zb, S.bestand, J.zielbild, 'zb') + '</div>';
+      var J0 = pp.jahre || {}, mehrM = S.mh && zahl(S.mh._mehr) && S.mh._mehr > 0 ? S.mh._mehr : null;
+      var satzP = mehrM ? 'Ungenutzt sind <b>' + sEur(mehrM) + ' Miete im Monat</b>' + (J0.mieterhoehung ? ' ab ' + esc(J0.mieterhoehung) : '') + ', ohne Mieterwechsel nach § 558 BGB.'
+        : (S.zb ? 'Die Miete ist nach § 558 BGB ausgeschöpft, weiter geht es über das Zielbild.' : 'Die Miete ist nach § 558 BGB ausgeschöpft.');
+      h += '<div class="dp-pa5-erg"><p class="dp-pa5-satz">' + satzP + ' Die Summen je Stufe stehen im Reiter Ankauf · Bestand · Zielbild.</p>'
+        + '<div class="dp-pa5-rechts"><button type="button" class="btn-clean dp-pa5-knopf leise" data-dp-pa4-geh="si">Zur Kennzahlen-Tabelle</button></div></div>';
       if (pp.ertragswert_gesperrt && pp.ertragswert_hinweis) h += '<p class="dp-pa-fuss">' + esc(pp.ertragswert_hinweis) + '</p>';
-      else if (S._sw && S._sw.quelle === 'abruf' && S._sw.datum && [S.bestand, S.mh, S.zb].some(function (x) { return x && x._ewQuelle; }))
-        h += '<p class="dp-pa-fuss">Ertragswerte aus dem gespeicherten Abruf vom ' + esc(S._sw.datum) + (S._sw.veraltet ? ' – seitdem hat sich am Objekt etwas geändert; im Reiter Ankauf · Bestand · Soll · Zielbild neu rechnen' : '') + '.</p>';
     }
     /* Die Hebel einzeln: Mieterhöhung, Mieterwechsel, Modernisierung, Aufteilung, Indexmiete */
     var hebel = [];
@@ -164,9 +163,10 @@
       else if (zahl(d.auf.wert)) hebel.push(['Aufteilung in Eigentumswohnungen', eur(d.auf.wert), (d.auf.n ? d.auf.n + ' Wohnungen einzeln, ' : '') + (d.auf.bezeichnung || 'Vergleichswert') + ' führend' + (zahl(d.auf.kosten) && d.auf.kosten > 0 ? ', nach ' + eur(d.auf.kosten) + ' Aufteilungskosten' : '') + '.']);   /* v3334a · ohne bekannte Kosten keine „0 €“ */
     }
     if (d.im && d.im.zeile) hebel.push(['Indexmiete', 'Indexvertrag', String(d.im.zeile)]);
-    if (hebel.length) h += karte(kopf('Deine Hebel') + '<div class="dp-pap-hebel">' + hebel.map(function (x) {
-      return '<div class="dp-pap-h"><small>' + esc(x[0]) + '</small><b>' + esc(x[1]) + '</b>' + (x[2] ? '<p>' + esc(x[2]) + '</p>' : '') + '</div>';
-    }).join('') + '</div>', 'dp-pa4-mt');
+    /* v3440 · die Hebel als Tabelle (Hebel · Wirkung · Was gilt) wie die Demo */
+    if (hebel.length) h += karte(kopf('Deine Hebel') + '<div class="dp-pa5-tab"><table><thead><tr><th>Hebel</th><th>Wirkung</th><th style="text-align:left">Was gilt</th></tr></thead><tbody>' + hebel.map(function (x) {
+      return '<tr><td>' + esc(x[0]) + '</td><td><b>' + esc(x[1]) + '</b></td><td style="text-align:left;white-space:normal;min-width:220px">' + (x[2] ? esc(x[2]) : '') + '</td></tr>';
+    }).join('') + '</tbody></table></div>', 'dp-pa4-mt');
     /* Ohne Soll-Miete und Zielbild: was eingetragen werden muss, und was rechtlich gilt */
     if (!S) {
       var mfh = false; try { mfh = !!(window.DpMfhEinheiten && window.DpMfhEinheiten.artMitEinheiten && window.DpMfhEinheiten.artMitEinheiten()); } catch (e) {}
@@ -218,5 +218,5 @@
     if (t && (t.getAttribute('onclick') || '').indexOf("'pot") >= 0) setTimeout(neuZeichnen, 0);
   });
 
-  window.DpPaPotenzial = { VERSION: 'v3323', html: html, kurz: kurz, daten: daten, neuZeichnen: neuZeichnen };
+  window.DpPaPotenzial = { VERSION: 'v3440', html: html, kurz: kurz, daten: daten, neuZeichnen: neuZeichnen };
 })();
