@@ -44822,3 +44822,9 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Commit:** `8b1a9c6e` (v3400), `85cf7dbb` (v3401/v3402). Backend neu gebaut.
 - **Nachweis:** `steuer-audit-pruefen --live` 76 grün (Anleitungsbeispiele I/II exakt, III 75,51 statt 75,52 % wegen LibreOffice-Rundung), steuerjahr 36, flow-berechnen RC 0, Score-Ketten 216, buster-ebenen sauber, rnd-Prüfer grün. Wirkung: `wissen/2026-11-15.md`.
 - **Rest:** Browser-Abnahme (Staging-Tabs anderer Sitzung belegt), RND-Gutachten-Feld der Arbeitshilfe von Pipeline/Modal befüllen, Prod.
+
+### v3410–v3410b · 15.11.2026 (nur Staging) · Optik einheitlich: Feldradius, Knopfecken, Schließen im Erststart
+- **Was:** Marcel „das soll einheitlich aussehen“ (Messkabine Runde 2). Felder in allen Fenstern 2 px (`einheitlich.css` Abschnitt v3410, Quick-Check-Schlüsselfeld in `quickcheck-app.html`); Knöpfe 8 px wie `.btn` statt Pille (`.dpm-btn`, `.dab-chip` auch inline in `deal-action-boarding.js:481`, `.oe-chip`, Wünsche-Filter, `.ke2-mehr`, Preis-Umschalter, Erststart `.dpo-b`); Statusanzeigen bleiben Pillen. Erststart mit X (32/44 px, r 9), schließt ohne Erledigt-Merker. Upgrade-Hinweis z 100050 (lag unter Pilot-Blase bzw. Aufgabenband), Aufgabenband bei offenem Erststart z 99990.
+- **Commit:** `3ae542c0`, `22cde7ce` (v3410), `0cb063a4`, `82b07a4e` (v3410a), `71a3de1c`, `0ec2b6ee` (v3410b), Doku danach.
+- **Nachweis:** eigene Headless-Instanz, 1280 und 390 px: 16 Fenster + 9 Einstellungs-Unterreiter 0 Felder ≠ 2 px, Knöpfe 8 px, 9 der 14 Zusatz-X geöffnet (alle 32/44 r 9, oben, schließen), Erststart-X schließt ohne Erledigt und kommt am selben Schritt wieder, Investment-PDF erzeugt (Diagramme Sans). buster-ebenen sauber, Gold-Audit RC 0 (366), deploy-staging dreimal grün. Bericht: `Dateien/Fehler/messkabine-ui-pruefung-2026-11-14.md` Runde 3.
+- **Rest:** 5 Zusatz-X ohne passende Testdaten nicht geöffnet; Feldhöhen C5 und Erststart-Knopfhöhe 42 px nicht entschieden; Prod.
