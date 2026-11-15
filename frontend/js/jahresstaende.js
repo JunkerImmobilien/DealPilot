@@ -41,11 +41,17 @@
  * ══════════════════════════════════════════════════════════════════════ */
 (function (global) {
   'use strict';
-  var VERSION = 'v2989';
+  var VERSION = 'v3430';
 
   /* Vorschlag (Aufgabe 4): kleiner Ring „Ziel NN %" im Objektkopf neben dem
      Deal Score, nur im Bestand. false schaltet ihn ab. */
   var ZIEL_RING_IM_KOPF = true;
+
+  /* v3430 · Marcel 15.11.2026 (Demo Fassung 2): „brauchen wir unter Ankauf Bestand Zielbild noch Jahresstände,
+     oder müsste das unter Jahresabgleich?" - die Jahresstände stehen jetzt als Spalten DSCR und Score in der
+     Tabelle „Jahr für Jahr" des Jahresabgleichs (jahresabgleich.js), der Knopf „Stand festhalten" dort auch.
+     html() zeigt unter Ankauf · Bestand · Zielbild nur noch die Zielerreichung. false holt die Tafel zurück. */
+  var JAHRESSTAENDE_IM_JAHRESABGLEICH = true;
 
   /* Die Rechenkerne, deren Buster den Rechenstand bilden. Jede Änderung an
      einem davon zieht laut CLAUDE.md den Buster hoch - der höchste ist damit
@@ -232,6 +238,7 @@
     if (typeof global.saveObj !== 'function') return;
     Promise.resolve(global.saveObj()).then(function () {
       mount();
+      try { if (global.DpJahresabgleich) global.DpJahresabgleich.mountAll(); } catch (e) {}   /* v3430 · die Tabelle dort zeigt den Stand */
       if (typeof global.toast === 'function') global.toast('✓ Stand ' + new Date().getFullYear() + ' festgehalten');
     }, function () {});
   }
@@ -536,13 +543,17 @@
       + (zbW ? '<div class="dp-pa-fuss" style="margin:0 0 6px">' + esc(zbW) + ' Die Zielerreichung misst gegen das aktive Zielbild, die Jahresstände behalten das Ziel ihres Jahres.</div>' : '')
       + z.hebel.map(hebelHtml).join('') + fr
       + (satz ? '<div class="dp-pa-fuss" style="margin-top:8px">' + esc(satz) + '</div>' : '')
-      + '<h4 class="dp-wv-h" style="margin:14px 0 4px">Jahresstände</h4>'
+      + (JAHRESSTAENDE_IM_JAHRESABGLEICH ? '<div class="dp-pa-fuss" style="margin-top:8px">Die Jahresstände (' + n + ') stehen im Jahresabgleich, Tabelle „Jahr für Jahr“.</div></div>' : '')
+      + (JAHRESSTAENDE_IM_JAHRESABGLEICH ? '' : '<h4 class="dp-wv-h" style="margin:14px 0 4px">Jahresstände</h4>'
       + tabelleHtml(e)
       + '<div class="dp-pa-fuss">' + (n ? n + (n === 1 ? ' Jahresstand' : ' Jahresstände') + ' festgehalten. ' : 'Noch kein Jahresstand festgehalten. ')
       + 'Je Kalenderjahr gilt der zuletzt gespeicherte Stand; Vorjahre bleiben eingefroren. Gespeichert wird beim normalen Speichern im Bestand.</div>'
       + '<button type="button" class="btn-clean dp-ziel-knopf" onclick="DpJahresstaende.festhalten()">Stand ' + new Date().getFullYear() + ' festhalten</button>'
-      + '</div>';
+      + '</div>');
   }
+
+  /** v3430 · der Jahresstand eines Kalenderjahres (für die Tabelle im Jahresabgleich), sonst null */
+  function standJahr(jahr) { var l = liste(); for (var i = 0; i < l.length; i++) if (l[i] && l[i].jahr === jahr) return l[i]; return null; }
 
   /* Füllt alle Platzhalter [data-dp-ziel-host] (Pilot-Analyse, Reiter si). */
   var _laedt = false;
@@ -611,6 +622,7 @@
     rechenstand: rechenstand, rechenstandSatz: rechenstandSatz, festschreibAnhang: festschreibAnhang, planJetzt: planJetzt,
     kennzahlen: kennzahlen, neuerStand: neuerStand, zielJetzt: zielJetzt, einfuegen: einfuegen, beimSpeichern: beimSpeichern, liste: liste, festhalten: festhalten,
     rechne: rechne, sammeln: sammeln, zielerreichung: zielerreichung, payload: payload,
-    html: html, tabelleHtml: tabelleHtml, mount: mount, kopfRing: kopfRing
+    html: html, tabelleHtml: tabelleHtml, mount: mount, kopfRing: kopfRing,
+    JAHRESSTAENDE_IM_JAHRESABGLEICH: JAHRESSTAENDE_IM_JAHRESABGLEICH, standJahr: standJahr   /* v3430 */
   };
 })(window);

@@ -14,6 +14,8 @@
      ereignisse(ausw, su, doks)  reine Funktion (Prüfer tools/hausverlauf-pruefen.mjs): Liste, älteste zuerst
      html()                      Inhalt des Unterreiters (leer → Einstieg zum Hochladen)
      kurz()                      { zahl, unter } für die Wegweiser-Karte der Übersicht
+     wegJahre(ausw, su, doks)    v3430 · das Haus je Jahr (Hausgeld Plan/Ist, Rücklage, Sonderumlagen, Beschlüsse, Unterlagen)
+     html()                      v3430 · Urteil, Kennzahlleiste, Grafik Hausgeld/Rücklage, Tabelle je Jahr, dann die Zeitleiste
    Neue Unterlagen: derselbe Weg wie „Unterlagen nachreichen" (DpUnterlagen.nachreichen → Import, ergänzen). */
 (function (g) {
   'use strict';
@@ -117,15 +119,145 @@
     return out;
   }
 
+  /* ── v3430 · DAS HAUS JE JAHR ─────────────────────────────────────────
+     Marcel 15.11.2026: „die Auswertung der WEG-Protokolle und Wirtschaftspläne, das ist ja auch jedes Jahr
+     Bestandteil". GEMESSEN vor v3430: die Auswertung kannte Hausgeld und Rücklage nur als Fließtext
+     (weg.hausgeld, weg.ruecklage), die gespeicherte Dokumentliste trug bei Wirtschaftsplan/Abrechnung (Art
+     „hausgeld") weder Jahr noch Art - der Jahresabgleich fand deshalb nie eine Abrechnung. Seit v3430:
+       weg.jahre[]  (Backend dokumenteAuswerten) je Kalenderjahr Hausgeld laut Wirtschaftsplan und laut
+                    Abrechnung, Rücklage, Sonderumlagen, Beschlüsse, Verwalter, welche Unterlagen vorliegen
+       dokumente[]  art + jahr bei Wirtschaftsplan/Abrechnung (object-actions.js, beim Übernehmen)
+     Ältere Auswertungen ohne weg.jahre: zusammengesetzt aus Dokumentdaten, Chronik und #weg_su - nichts erfunden.
+
+     wegJahre(ausw, su, doks, opt) reine Funktion (Prüfer tools/jahresabgleich-pruefen.mjs, Abschnitt W):
+       [{ jahr, versammlung, protokoll, wirtschaftsplan, abrechnung, hausgeld_plan_monat, hausgeld_ist_jahr,
+          abrechnungsergebnis, ruecklage_stand, ruecklage_zufuehrung, ruecklage_anteil, su_gesamt, su_anteil,
+          beschluesse: [], verwalter, quellen: [], erledigt }]  älteste zuerst
+     „erledigt" = Protokoll des Jahres und (Jahresabrechnung oder Wirtschaftsplan) des Jahres. */
+  function jahrAus(s) { var m = String(s == null ? '' : s).match(/(?:^|\D)((?:19|20)\d\d)(?:\D|$)/); return m ? +m[1] : null; }
+  function artDok(d) {
+    var a = String((d && (d.art || '')) || '').toLowerCase(), t = String((d && d.typ) || ''), lb = String((d && d.label) || '').toLowerCase();
+    if (/abrechnung/.test(a) || t === 'jahresabrechnung') return 'abrechnung';
+    if (/wirtschaftsplan/.test(a) || t === 'wirtschaftsplan') return 'wirtschaftsplan';
+    if (t === 'weg_protokoll') return /einladung/.test(a) ? null : 'protokoll';   /* Art Abrechnung/Wirtschaftsplan oben schon erkannt */
+    if (t === 'hausgeld') {   /* Bezeichnung „Wirtschaftsplan / Hausgeldabrechnung" nennt beides - nur eindeutige zählen */
+      var wp = /wirtschaftsplan/.test(lb), ab = /abrechnung/.test(lb);
+      return wp && !ab ? 'wirtschaftsplan' : (ab && !wp ? 'abrechnung' : null);
+    }
+    return null;
+  }
+  function wegJahre(ausw, su, doks, opt) {
+    opt = opt || {};
+    var a = ausw && typeof ausw === 'object' ? ausw : {}, w = a.weg && typeof a.weg === 'object' ? a.weg : {}, map = {};
+    var get = function (j) {
+      j = zahl(j); if (!j || j < 1950 || j > 2100) return null;
+      return map[j] || (map[j] = { jahr: j, versammlung: null, protokoll: false, wirtschaftsplan: false, abrechnung: false, hausgeld_plan_monat: null, hausgeld_ist_jahr: null,
+        abrechnungsergebnis: null, ruecklage_stand: null, ruecklage_zufuehrung: null, ruecklage_anteil: null, su_gesamt: null, su_anteil: null, beschluesse: [], verwalter: null, quellen: [] });
+    };
+    var plusQ = function (z, q) { if (z && q && z.quellen.indexOf(q) < 0) z.quellen.push(q); };
+    var plusB = function (z, t) { t = String(t || '').trim(); if (z && t && !z.beschluesse.some(function (x) { return norm(x) === norm(t); })) z.beschluesse.push(t); };
+    /* 1 · weg.jahre (seit v3430) */
+    (Array.isArray(w.jahre) ? w.jahre : []).forEach(function (x) {
+      if (!x || typeof x !== 'object') return;
+      var z = get(x.jahr); if (!z) return;
+      var dt = datumAus(x.versammlung);
+      if (dt) { z.versammlung = dt.text; z.protokoll = true; }
+      if (x.protokoll === true) z.protokoll = true;
+      if (x.wirtschaftsplan === true) z.wirtschaftsplan = true;
+      if (x.jahresabrechnung === true) z.abrechnung = true;
+      ['hausgeld_plan_monat', 'hausgeld_ist_jahr', 'abrechnungsergebnis', 'ruecklage_stand', 'ruecklage_zufuehrung'].forEach(function (k) {
+        var v = zahl(x[k + '_eur']); if (v != null) z[k] = v;
+      });
+      var sg = zahl(x.sonderumlagen_gesamt_eur), sa = zahl(x.sonderumlagen_anteil_eur);
+      if (sg != null) z.su_gesamt = sg; if (sa != null) z.su_anteil = sa;
+      if (z.hausgeld_plan_monat != null) z.wirtschaftsplan = true;
+      if (z.hausgeld_ist_jahr != null || z.abrechnungsergebnis != null) z.abrechnung = true;
+      (Array.isArray(x.beschluesse) ? x.beschluesse : []).forEach(function (b) { plusB(z, b); });
+      if (x.verwalter && String(x.verwalter).trim()) z.verwalter = String(x.verwalter).trim();
+      plusQ(z, x.quelle);
+    });
+    /* 2 · die Dokumente selbst */
+    (Array.isArray(doks) ? doks : []).forEach(function (d) {
+      if (!d) return;
+      var art = artDok(d); if (!art) return;
+      var dt = datumAus(d.datum), j = zahl(d.jahr) || jahrAus(d.label) || (dt ? dt.jahr : null);
+      if (art === 'protokoll') j = dt ? dt.jahr : j;
+      var z = get(j); if (!z) return;
+      if (art === 'protokoll') { z.protokoll = true; if (dt && !z.versammlung) z.versammlung = dt.text; }
+      if (art === 'wirtschaftsplan') z.wirtschaftsplan = true;
+      if (art === 'abrechnung') z.abrechnung = true;
+      plusQ(z, (d.label || '') + (d.datum ? ' ' + d.datum : (d.jahr ? ' ' + d.jahr : '')));
+    });
+    /* 3 · Chronik: Beschlüsse, Verwalter, Sonderumlagen der Gemeinschaft */
+    (Array.isArray(w.chronik) ? w.chronik : []).forEach(function (c) {
+      if (!c || typeof c !== 'object') return;
+      var dt = datumAus(c.datum), z = get(dt ? dt.jahr : c.jahr); if (!z) return;
+      var art = String(c.art || '').toLowerCase();
+      if (art === 'beschluss' || (c.status === 'beschlossen' && art !== 'sonderumlage')) plusB(z, c.titel || c.text);
+      if (art === 'verwaltung' && !z.verwalter) z.verwalter = String(c.titel || c.text || '').trim() || null;
+      if (art === 'sonderumlage' && zahl(c.betrag_eur) != null && z.su_gesamt == null && c.status !== 'abgelehnt' && c.status !== 'vertagt') z.su_gesamt = zahl(c.betrag_eur);
+    });
+    /* 4 · Sonderumlagen des Objekts (#weg_su, Anteil) - gehen vor, sie sind übernommen und bestätigt */
+    var suJ = {};
+    (Array.isArray(su) ? su : []).forEach(function (s) {
+      if (!s || typeof s !== 'object') return;
+      var dt = datumAus(s.faellig), j = zahl(s.jahr) || (dt ? dt.jahr : null), b = zahl(s.betrag);
+      if (!j || !(b > 0)) return; suJ[j] = (suJ[j] || 0) + b;
+    });
+    Object.keys(suJ).forEach(function (j) { var z = get(j); if (z) z.su_anteil = Math.round(suJ[j]); });
+    var mea = zahl(opt.mea_pct);
+    var aus = Object.keys(map).map(function (k) { return map[k]; }).sort(function (x, y) { return x.jahr - y.jahr; });
+    aus.forEach(function (z) {
+      if (z.ruecklage_stand != null) z.ruecklage_anteil = opt.etw ? (mea > 0 ? Math.round(z.ruecklage_stand * mea / 100) : null) : z.ruecklage_stand;
+      if (z.su_anteil == null && z.su_gesamt != null && !opt.etw) z.su_anteil = z.su_gesamt;
+      if (z.su_anteil == null && z.su_gesamt != null && opt.etw && mea > 0) z.su_anteil = Math.round(z.su_gesamt * mea / 100);
+      z.erledigt = !!(z.protokoll && (z.abrechnung || z.wirtschaftsplan));
+    });
+    return aus;
+  }
+  /** Urteil über das Haus aus den Jahreswerten (Regel, keine KI): { wort, satz } oder null */
+  function urteil(J, ev, seit) {
+    if (!J || !J.length) return null;
+    var ab = zahl(seit) || J[0].jahr, nach = J.filter(function (z) { return z.jahr >= ab; });
+    var su = nach.filter(function (z) { return (z.su_anteil || 0) > 0 || (z.su_gesamt || 0) > 0; });
+    var rl = J.filter(function (z) { return z.ruecklage_stand != null; });
+    var trend = rl.length >= 2 ? rl[rl.length - 1].ruecklage_stand - rl[0].ruecklage_stand : null;
+    var hg = J.filter(function (z) { return z.hausgeld_plan_monat != null; });
+    var hgPct = hg.length >= 2 && hg[0].hausgeld_plan_monat > 0 ? (hg[hg.length - 1].hausgeld_plan_monat / hg[0].hausgeld_plan_monat - 1) * 100 : null;
+    var streit = (ev || []).filter(function (e) { return e.art === 'rechtsstreit' && String(e.status || '').toLowerCase() !== 'erledigt'; }).length;
+    var jahreN = Math.max(1, (J[J.length - 1].jahr - ab) + 1);
+    var wort = streit || su.length >= 2 ? 'Unruhiges Haus.' : (su.length || (trend != null && trend < 0) ? 'Haus mit Baustellen.' : 'Ruhiges Haus.');
+    var t = [];
+    t.push(su.length ? (su.length === 1 ? 'Eine Sonderumlage' : su.length + ' Sonderumlagen') + ' in ' + jahreN + (jahreN === 1 ? ' Jahr' : ' Jahren') + ' (' + su.map(function (z) { return z.jahr; }).join(', ') + ').'
+      : 'Keine Sonderumlage in ' + jahreN + (jahreN === 1 ? ' Jahr' : ' Jahren') + ' der Unterlagen.');
+    if (trend != null) t.push('Die Rücklage ' + (trend > 0 ? 'steigt' : trend < 0 ? 'sinkt' : 'bleibt gleich') + ' (' + rl[0].jahr + ': ' + eur(rl[0].ruecklage_stand) + ', ' + rl[rl.length - 1].jahr + ': ' + eur(rl[rl.length - 1].ruecklage_stand) + ').');
+    if (hgPct != null && Math.abs(hgPct) >= 0.5) t.push('Hausgeld ' + (hgPct > 0 ? '+' : '−') + Math.abs(hgPct).toLocaleString('de-DE', { maximumFractionDigits: 1 }) + ' % seit ' + hg[0].jahr + '.');
+    if (streit) t.push(streit === 1 ? 'Ein Rechtsstreit ist offen.' : streit + ' Rechtsstreite sind offen.');
+    return { wort: wort, satz: t.join(' ') };
+  }
+
   /* ── Browser ───────────────────────────────────────────────────────── */
   function el(id) { return typeof document !== 'undefined' ? document.getElementById(id) : null; }
+  function wert(id) { var e = el(id); return e ? String(e.value || '').trim() : ''; }
+  function istEtw() { return /ETW/i.test(wert('objart')); }
   function lesen() {
     var d = null, su = [];
     try { var f = el('_dok_auswertung'); d = f && f.value ? JSON.parse(f.value) : null; } catch (e) { d = null; }
     try { su = g.DpSonderumlage && g.DpSonderumlage.liste ? g.DpSonderumlage.liste() : []; } catch (e) { su = []; }
     var doks = d && Array.isArray(d.dokumente) ? d.dokumente : [];
     var hatWeg = !!(d && d.auswertung && d.auswertung.weg) || doks.some(function (x) { return x && WEG_TYPEN.test(String(x.typ || '')); }) || su.length > 0;
-    return { d: d, su: su, doks: doks, hatWeg: hatWeg, liste: ereignisse(d && d.auswertung, su, doks) };
+    var jahre = [];
+    try { jahre = wegJahre(d && d.auswertung, su, doks, { etw: istEtw(), mea_pct: wert('mea') }); } catch (e) { jahre = []; }
+    return { d: d, su: su, doks: doks, hatWeg: hatWeg, liste: ereignisse(d && d.auswertung, su, doks), jahre: jahre };
+  }
+  /** Ein Jahr für den Jahresabgleich (jahresabgleich.js) */
+  function jahrDaten(j, L) {
+    L = L || lesen();
+    return (L.jahre || []).filter(function (z) { return z.jahr === j; })[0] || null;
+  }
+  function kaufJahr() {
+    try { var A = g.DealPilotAnkauf, s = A && A.vorhanden && A.vorhanden() ? A.stand() : null; if (s && s.stichtag) return +String(s.stichtag).slice(0, 4); } catch (e) {}
+    return jahrAus(wert('kaufdat'));
   }
   function kurz() {
     var L = lesen(); if (!L.hatWeg || !L.liste.length) return null;
@@ -136,6 +268,29 @@
     if (document.getElementById('dp-hv-stil')) return;
     var s = document.createElement('style'); s.id = 'dp-hv-stil';
     s.textContent = [
+      '.dp-hv-erg{display:flex;gap:16px;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;padding:2px 0 14px;border-bottom:1px solid #EFE8D6;margin-bottom:14px}',
+      '.dp-hv-erg .satz{font:500 17px/1.4 "Space Grotesk",Inter,sans-serif;color:#2A2727;max-width:720px}',
+      '.dp-hv-erg .satz b{font-weight:700}',
+      '.dp-hv-erg .q{display:block;font:400 12.5px/1.55 Inter,sans-serif;color:#6B645A;margin-top:6px}',
+      '.dp-hv-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border:1px solid #EFE8D6;border-radius:10px;overflow:hidden;background:#fff}',
+      '.dp-hv-kpi{padding:11px 14px;border-right:1px solid #EFE8D6;min-width:0}.dp-hv-kpi:last-child{border-right:none}',
+      '.dp-hv-kpi small{display:block;font:500 10px "JetBrains Mono",monospace;letter-spacing:.08em;text-transform:uppercase;color:#6B645A}',
+      '.dp-hv-kpi b{display:block;font:600 19px "Space Grotesk",Inter,sans-serif;color:#2A2727;margin-top:2px;overflow-wrap:anywhere}',
+      '.dp-hv-kpi span{display:block;font:400 11.5px Inter,sans-serif;color:#7A7370;margin-top:1px}',
+      '.dp-hv-abs{display:flex;align-items:baseline;gap:12px;margin:22px 0 8px}',
+      '.dp-hv-abs h4{margin:0;font:600 14.5px "Space Grotesk",Inter,sans-serif;color:#2A2727}',
+      '.dp-hv-abs span{margin-left:auto;font:500 10px "JetBrains Mono",monospace;letter-spacing:.08em;text-transform:uppercase;color:#9A9285}',
+      '.dp-hv-tab{overflow-x:auto;border:1px solid #EFE8D6;border-radius:10px;background:#fff}',
+      '.dp-hv-tab table{width:100%;border-collapse:collapse;font:400 12.5px Inter,sans-serif;color:#2A2727;min-width:640px}',
+      '.dp-hv-tab th,.dp-hv-tab td{text-align:right;padding:8px 10px;border-bottom:1px solid #F1EBDD;font-variant-numeric:tabular-nums;white-space:nowrap;vertical-align:top}',
+      '.dp-hv-tab tr:last-child td{border-bottom:none}',
+      '.dp-hv-tab th:first-child,.dp-hv-tab td:first-child{text-align:left}',
+      '.dp-hv-tab td.txt,.dp-hv-tab th.txt{text-align:left;white-space:normal;min-width:200px}',
+      '.dp-hv-tab th{font:500 10px "JetBrains Mono",monospace;letter-spacing:.07em;text-transform:uppercase;color:#6B645A;border-bottom:1px solid #E6DCC2;vertical-align:bottom}',
+      '.dp-hv-tab td small{display:block;color:#9A9285;font-size:11px}',
+      '.dp-hv-tab .rot{color:#B8625C}',
+      '.dp-hv-u{display:inline-flex;gap:3px}.dp-hv-u i{font:600 9.5px "JetBrains Mono",monospace;font-style:normal;width:16px;height:16px;border-radius:4px;display:inline-grid;place-items:center;background:rgba(42,39,39,.06);color:#9A9285}',
+      '.dp-hv-u i.da{background:rgba(63,165,108,.14);color:#2f7d52}',
       '.dp-hv-lage{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin:0 0 12px}',
       '.dp-hv-k{border:1px solid #E6DCC2;border-radius:12px;background:#fff;padding:11px 13px;display:grid;gap:3px;align-content:start;min-width:0}',
       '.dp-hv-k small{font:600 10px "JetBrains Mono",monospace;letter-spacing:.08em;text-transform:uppercase;color:#6B645A}',
@@ -160,7 +315,8 @@
       '.dp-hv-st{display:inline-block;font:600 10.5px Inter,sans-serif;padding:1px 8px;border-radius:999px;background:rgba(42,39,39,.07);color:#4A4542}',
       '.dp-hv-st.beschlossen{background:rgba(184,98,92,.13);color:#B8625C}.dp-hv-st.erledigt{background:rgba(63,165,108,.14);color:#2f7d52}',
       '.dp-hv-st.geplant,.dp-hv-st.angekuendigt{background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 18%, transparent);color:#8a6d1f}',
-      '.dp-pa-wrap[data-dp-pa-modus="einfach"] .dp-hv-e.leise{display:none}'
+      '.dp-pa-wrap[data-dp-pa-modus="einfach"] .dp-hv-e.leise{display:none}',
+      '@media (max-width:720px){.dp-hv-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.dp-hv-kpi:nth-child(2n){border-right:none}.dp-hv-kpi:nth-child(-n+2){border-bottom:1px solid #EFE8D6}.dp-hv-erg .satz{font-size:15.5px}}'
     ].join('\n');
     document.head.appendChild(s);
   }
@@ -169,24 +325,88 @@
       + '<button type="button" class="btn-clean dp-pa4-btn" onclick="try{if(window.DpUnterlagen&&DpUnterlagen.nachreichen)DpUnterlagen.nachreichen();else if(window.DpEingang)DpEingang.oeffnen();}catch(e){}">WEG-Unterlagen hochladen</button>'
       + '<button type="button" class="btn-clean dp-pa4-btn leise" data-dp-pa4-geh="unterlagen">Zu Unterlagen &amp; WEG</button></div>';
   }
+  function eurO(v) { return v != null ? eur(v) : '–'; }
+  function kennzahlen(L, w) {
+    var J = L.jahre || [], k = [];
+    var hg = J.filter(function (z) { return z.hausgeld_plan_monat != null; }), hgL = hg[hg.length - 1];
+    var hgI = J.filter(function (z) { return z.hausgeld_ist_jahr != null; }), hgIL = hgI[hgI.length - 1];
+    var ul = zahl(wert('hg_ul')), nul = zahl(wert('hg_nul'));
+    if (hgL) k.push(['Hausgeld im Monat', eur(hgL.hausgeld_plan_monat), 'Wirtschaftsplan ' + hgL.jahr + (hg.length > 1 ? ', ' + hg[0].jahr + ': ' + eur(hg[0].hausgeld_plan_monat) : '')]);
+    else if (hgIL) k.push(['Hausgeld im Monat', eur(hgIL.hausgeld_ist_jahr / 12), 'laut Abrechnung ' + hgIL.jahr]);
+    else if ((ul || 0) + (nul || 0) > 0) k.push(['Hausgeld im Monat', eur(((ul || 0) + (nul || 0)) / 12), 'aus dem Reiter Bewirtschaftung' + (nul ? ', nicht umlegbar ' + eur(nul / 12) : '')]);
+    else k.push(['Hausgeld im Monat', '–', 'kein Wirtschaftsplan eingelesen']);
+    var rl = J.filter(function (z) { return z.ruecklage_stand != null; }), rlL = rl[rl.length - 1];
+    k.push(['Rücklage der Gemeinschaft', rlL ? eur(rlL.ruecklage_stand) : '–', rlL ? (rlL.jahr + (rlL.ruecklage_anteil != null && rlL.ruecklage_anteil !== rlL.ruecklage_stand ? ' · Anteil ' + eur(rlL.ruecklage_anteil) : '') + (rl.length > 1 ? ' · ' + rl[0].jahr + ': ' + eur(rl[0].ruecklage_stand) : '')) : (w.ruecklage ? String(w.ruecklage).slice(0, 70) : 'nicht genannt')]);
+    var kj = kaufJahr(), suS = 0, suN = 0;
+    J.forEach(function (z) { if ((!kj || z.jahr >= kj) && (z.su_anteil || 0) > 0) { suS += z.su_anteil; suN++; } });
+    k.push(['Sonderumlagen', suN ? eur(suS) : 'keine', (kj ? 'seit dem Kauf ' + kj : 'in den Unterlagen') + (suN ? ' · in ' + suN + (suN === 1 ? ' Jahr' : ' Jahren') + (istEtw() ? ', dein Anteil' : '') : '')]);
+    var vw = J.filter(function (z) { return z.verwalter; }), vwL = vw[vw.length - 1];
+    var wechsel = (L.liste || []).filter(function (e) { return e.art === 'verwaltung' && /wechsel|neu bestellt|neue verwaltung|neuer verwalter/i.test((e.titel || '') + ' ' + (e.text || '')); });
+    k.push(['Verwaltung', vwL ? esc(String(vwL.verwalter).slice(0, 40)) : (w.verwaltung ? esc(String(w.verwaltung).split(/[.;]/)[0].slice(0, 40)) : '–'), wechsel.length ? 'Wechsel ' + (wechsel[wechsel.length - 1].jahr || '') : (vw.length > 1 ? 'seit ' + vw[0].jahr + ' genannt' : 'kein Wechsel genannt')]);
+    return '<div class="dp-hv-kpis">' + k.map(function (x) { return '<div class="dp-hv-kpi"><small>' + esc(x[0]) + '</small><b>' + x[1] + '</b><span>' + esc(x[2]) + '</span></div>'; }).join('') + '</div>';
+  }
+  function tabelle(J) {
+    if (!J.length) return '';
+    var u = function (z) { return '<span class="dp-hv-u" title="Protokoll · Wirtschaftsplan · Abrechnung">'
+      + '<i class="' + (z.protokoll ? 'da' : '') + '">P</i><i class="' + (z.wirtschaftsplan ? 'da' : '') + '">W</i><i class="' + (z.abrechnung ? 'da' : '') + '">A</i></span>'; };
+    return '<div class="dp-hv-tab"><table><thead><tr><th>Jahr</th><th class="txt">Versammlung und Beschlüsse</th><th>Hausgeld<br>Plan · Monat</th><th>Hausgeld<br>Abrechnung · Jahr</th><th>Sonder&shy;umlage</th><th>Rücklage</th><th>Unterlagen</th></tr></thead><tbody>'
+      + J.slice().reverse().map(function (z) {
+        var b = z.beschluesse.slice(0, 3).map(esc).join(' · ');
+        return '<tr data-dp-hv-jahr="' + z.jahr + '"><td><b>' + z.jahr + '</b></td>'
+          + '<td class="txt">' + (z.versammlung ? z.versammlung.slice(0, 6) + (b ? ' · ' : '') : '') + (b || (z.versammlung ? 'Versammlung' : '<span style="color:#9A9285">kein Protokoll</span>')) + '</td>'
+          + '<td>' + eurO(z.hausgeld_plan_monat) + '</td>'
+          + '<td>' + eurO(z.hausgeld_ist_jahr) + (z.abrechnungsergebnis != null ? '<small>' + (z.abrechnungsergebnis > 0 ? 'Nachzahlung ' : 'Guthaben ') + eur(Math.abs(z.abrechnungsergebnis)) + '</small>' : '') + '</td>'
+          + '<td' + ((z.su_anteil || z.su_gesamt) ? ' class="rot"' : '') + '>' + (z.su_anteil != null ? eur(z.su_anteil) : (z.su_gesamt != null ? eur(z.su_gesamt) + '<small>Gemeinschaft</small>' : '–')) + '</td>'
+          + '<td>' + eurO(z.ruecklage_stand) + (z.ruecklage_anteil != null && z.ruecklage_anteil !== z.ruecklage_stand ? '<small>Anteil ' + eur(z.ruecklage_anteil) + '</small>' : '') + '</td>'
+          + '<td>' + u(z) + '</td></tr>';
+      }).join('') + '</tbody></table></div>';
+  }
+  /** Spec der Grafik Hausgeld + Rücklage (jahresbuch-grafik.js), null ohne zwei Jahre mit Zahl */
+  function grafikSpec(J) {
+    var mit = J.filter(function (z) { return z.hausgeld_plan_monat != null || z.hausgeld_ist_jahr != null || z.ruecklage_stand != null; });
+    if (mit.length < 2) return null;
+    var G = g.DpJahresbuchGrafik || {}, a = mit[0].jahr, b = mit[mit.length - 1].jahr, jahre = [];
+    for (var y = a; y <= b; y++) jahre.push(y);
+    var wp = {}, ab = {}, rl = {}, marken = [];
+    J.forEach(function (z) {
+      if (z.hausgeld_plan_monat != null) wp[z.jahr] = Math.round(z.hausgeld_plan_monat * 12);
+      if (z.hausgeld_ist_jahr != null) ab[z.jahr] = z.hausgeld_ist_jahr;
+      if (z.ruecklage_stand != null) rl[z.jahr] = z.ruecklage_stand;
+      var su = z.su_anteil != null ? z.su_anteil : z.su_gesamt;
+      if (su > 0) marken.push({ jahr: z.jahr, text: 'Sonderumlage ' + z.jahr + ': ' + eur(su) + (z.su_anteil != null ? (istEtw() ? ' (dein Anteil)' : '') : ' (Gemeinschaft)'), farbe: G.ROT || '#B8625C', art: 'Sonderumlage', legende: 'Sonderumlage' });
+    });
+    var panels = [];
+    if (Object.keys(wp).length || Object.keys(ab).length) panels.push({ titel: 'Hausgeld je Jahr' + (istEtw() ? ', deine Wohnung' : ''), kurz: 'Hausgeld', art: 'balken', hoehe: 130, marken: marken, serien: [
+      { name: 'Wirtschaftsplan (Plan)', typ: 'balken', farbe: G.GRAU || '#8A8278', deckkraft: 0.45, werte: wp },
+      { name: 'Jahresabrechnung (Ist)', typ: 'balken', farbe: G.GOLD, werte: ab }] });
+    if (Object.keys(rl).length >= 2) panels.push({ titel: 'Erhaltungsrücklage der Gemeinschaft, Stand', kurz: 'Rücklage', art: 'linie', hoehe: 110, marken: panels.length ? [] : marken, serien: [
+      { name: 'Rücklage', typ: 'linie', strich: 'ist', farbe: G.TINTE || '#5B544C', werte: rl, ende: false }] });
+    return panels.length ? { jahre: jahre, heute: new Date().getFullYear(), panels: panels, titel: 'Hausgeld und Rücklage je Jahr' } : null;
+  }
+  function abschnitt(t, eti) { return '<div class="dp-hv-abs"><h4>' + t + '</h4>' + (eti ? '<span>' + esc(eti) + '</span>' : '') + '</div>'; }
   function html() {
     if (typeof document === 'undefined') return '';
     stil();
     var L = lesen();
     var leer = '<div class="dp-pa-card"><div class="dp-pa-sec"><span class="dp-pa-bar"></span><span class="dp-pa-lbl">Hausverlauf</span><span class="dp-pa-rule"></span></div>'
-      + '<p class="dp-pa-p">Hier steht, was in der Eigentümergemeinschaft passiert ist – Versammlungen, Beschlüsse, Sonderumlagen, Instandhaltung und Verwalterwechsel, nach Jahren geordnet. '
-      + 'Die Grundlage sind die WEG-Unterlagen dieses Objekts: Protokolle der Eigentümerversammlung, Wirtschaftspläne und Hausgeldabrechnungen.</p>'
+      + '<p class="dp-pa-p">Hier steht, wie sich das Haus verhält – Hausgeld laut Wirtschaftsplan und Abrechnung, Rücklage, Sonderumlagen, Beschlüsse und Verwalter, Jahr für Jahr. '
+      + 'Die Grundlage sind die WEG-Unterlagen dieses Objekts: Protokolle der Eigentümerversammlung, Wirtschaftspläne und Jahresabrechnungen. Sie gehören jedes Jahr in den Jahresabgleich.</p>'
       + '<p class="dp-pa-p">Noch ist keine WEG-Unterlage eingelesen. Lade ein Protokoll hoch – nichts wird ohne deine Bestätigung ins Objekt übernommen.</p>' + knoepfe() + '</div>';
     /* ohne WEG-Unterlagen nur bei Wohnungseigentum (dort gibt es eine Gemeinschaft) - ein ganzes Haus ohne WEG bekommt keinen leeren Reiter */
-    var etw = false; try { etw = /ETW/i.test(String((el('objart') || {}).value || '')); } catch (e) {}
-    if (!L.hatWeg || !L.liste.length) return etw ? leer : '';
-    var w = (L.d && L.d.auswertung && L.d.auswertung.weg) || {};
-    /* oben: der Stand heute in drei Karten (Verwaltung, Rücklage, Hausgeld) + Fazit */
-    var lage = [['Verwaltung', w.verwaltung], ['Erhaltungsrücklage', w.ruecklage], ['Hausgeld', w.hausgeld]].filter(function (x) { return x[1] && String(x[1]).trim(); });
-    var h = '';
-    if (lage.length || w.fazit) h += '<div class="dp-pa-card"><div class="dp-pa-sec"><span class="dp-pa-bar"></span><span class="dp-pa-lbl">Die Gemeinschaft heute</span><span class="dp-pa-rule"></span></div>'
-      + (w.fazit ? '<p class="dp-pa-p">' + esc(w.fazit) + '</p>' : '')
-      + (lage.length ? '<div class="dp-hv-lage" style="margin-top:8px">' + lage.map(function (x) { return '<div class="dp-hv-k"><small>' + esc(x[0]) + '</small><p>' + esc(x[1]) + '</p></div>'; }).join('') + '</div>' : '') + '</div>';
+    if (!L.hatWeg || (!L.liste.length && !L.jahre.length)) return istEtw() ? leer : '';
+    var w = (L.d && L.d.auswertung && L.d.auswertung.weg) || {}, J = L.jahre || [];
+    var u = urteil(J, L.liste, kaufJahr());
+    var h = '<div class="dp-pa-card" data-dp-hv="1">';
+    h += '<div class="dp-hv-erg"><div class="satz">' + (u ? '<b>' + esc(u.wort) + '</b> ' + esc(u.satz) : '<b>Das Haus in den Unterlagen.</b>')
+      + (w.fazit ? '<span class="q">' + esc(w.fazit) + '</span>' : '') + '</div>'
+      + '<button type="button" class="btn-clean dp-pa4-btn" onclick="try{if(window.DpUnterlagen&&DpUnterlagen.nachreichen)DpUnterlagen.nachreichen();else if(window.DpEingang)DpEingang.oeffnen();}catch(e){}">Unterlagen hochladen</button></div>';
+    h += kennzahlen(L, w);
+    var sp = grafikSpec(J);
+    if (sp) h += abschnitt('Hausgeld und Rücklage', 'je Jahr · aus Wirtschaftsplänen und Abrechnungen') + '<div data-dp-hv-grafik="1"></div>';
+    if (J.length) h += abschnitt('Jahr für Jahr', 'aus Protokollen, Wirtschaftsplänen, Abrechnungen') + tabelle(J)
+      + '<p class="dp-pa-fuss" style="margin-top:6px">P Protokoll · W Wirtschaftsplan · A Jahresabrechnung. Ein Jahr ist im Jahresabgleich erledigt, wenn das Protokoll und der Wirtschaftsplan oder die Abrechnung des Jahres vorliegen.'
+      + (!(w.jahre && w.jahre.length) ? ' Diese Auswertung ist älter als die Jahreswerte (v3430): Hausgeld und Rücklage je Jahr stehen hier, sobald du Unterlagen nachreichst.' : '') + '</p>';
+    h += '</div>';
     /* die Zeitleiste, nach Jahren */
     var arten = []; L.liste.forEach(function (e) { if (arten.indexOf(e.art) < 0) arten.push(e.art); });
     var filter = arten.length > 1 ? '<div class="dp-hv-filter" role="group" aria-label="Nach Art filtern">' + arten.map(function (a) {
@@ -205,15 +425,23 @@
         + (e.betrag != null ? '<span class="betrag">' + eur(e.betrag) + (e.anteil ? ' <small style="font:400 10.5px Inter;color:#7A7370">Anteil</small>' : '') + '</span>' : '') + '</div>'
         + (e.text ? '<p>' + esc(e.text) + '</p>' : '') + (e.quelle ? '<span class="q dp-pa-d">Quelle: ' + esc(e.quelle) + '</span>' : '') + '</div>';
     });
-    h += '<div class="dp-pa-card dp-pa4-mt"><div class="dp-pa-sec"><span class="dp-pa-bar"></span><span class="dp-pa-lbl">Was passiert ist</span><span class="dp-pa-rule"></span></div>'
+    if (L.liste.length) h += '<div class="dp-pa-card dp-pa4-mt"><div class="dp-pa-sec"><span class="dp-pa-bar"></span><span class="dp-pa-lbl">Was passiert ist</span><span class="dp-pa-rule"></span></div>'
       + filter + '<div class="dp-hv-zeit">' + zeit + '</div>'
       + (L.liste.some(function (e) { return e.herkunft === 'kernpunkt'; }) ? '<p class="dp-pa-fuss">Diese Auswertung nennt die Ereignisse nur mit Jahr. Beim nächsten Einlesen von Unterlagen steht jedes mit seinem Datum und seiner Quelle hier.</p>' : '')
       + '</div>';
     h += '<div class="dp-pa-card dp-pa4-mt"><div class="dp-pa-sec"><span class="dp-pa-bar"></span><span class="dp-pa-lbl">Weitere WEG-Unterlagen</span><span class="dp-pa-rule"></span></div>'
-      + '<p class="dp-pa-p">Ein neues Protokoll oder einen neuen Wirtschaftsplan hochladen: die Auswertung wird mit den bisherigen Unterlagen zusammengeführt, der Verlauf ergänzt. Nichts wird ohne deine Bestätigung ins Objekt übernommen.</p>'
-      + '<p class="dp-pa-p" style="font-size:12px;color:#7A7370">Eingelesen: ' + L.doks.filter(function (x) { return x && WEG_TYPEN.test(String(x.typ || '')); }).map(function (x) { return esc(x.label + (x.datum ? ' ' + x.datum : '')); }).join(' · ') + '</p>'
+      + '<p class="dp-pa-p">Jedes Jahr ein neues Protokoll, den Wirtschaftsplan und die Jahresabrechnung hochladen: die Auswertung wird mit den bisherigen Unterlagen zusammengeführt, die Jahreswerte ergänzt. Nichts wird ohne deine Bestätigung ins Objekt übernommen.</p>'
+      + '<p class="dp-pa-p" style="font-size:12px;color:#7A7370">Eingelesen: ' + (L.doks.filter(function (x) { return x && WEG_TYPEN.test(String(x.typ || '')); }).map(function (x) { return esc(x.label + (x.datum ? ' ' + x.datum : (x.jahr ? ' ' + x.jahr : ''))); }).join(' · ') || '–') + '</p>'
       + knoepfe() + '</div>';
+    /* die Grafik zeichnet nach dem Einhängen (der Host ist erst dann im Dokument) */
+    if (sp) setTimeout(mountGrafik, 0);
     return h;
+  }
+  function mountGrafik() {
+    var G = g.DpJahresbuchGrafik; if (!G || !G.malen || typeof document === 'undefined') return;
+    var hs = document.querySelectorAll('[data-dp-hv-grafik]'); if (!hs.length) return;
+    var sp = null; try { sp = grafikSpec(lesen().jahre || []); } catch (e) { sp = null; }
+    for (var i = 0; i < hs.length; i++) { try { if (sp) G.malen(hs[i], sp); else hs[i].innerHTML = ''; } catch (e) { hs[i].innerHTML = ''; } }
   }
   if (typeof document !== 'undefined') document.addEventListener('click', function (ev) {
     var b = ev.target && ev.target.closest ? ev.target.closest('[data-dp-hv-art]') : null; if (!b) return;
@@ -222,6 +450,6 @@
     if (card) Array.prototype.forEach.call(card.querySelectorAll('[data-dp-hv-e="' + art + '"]'), function (e) { e.style.display = an ? '' : 'none'; });
   });
 
-  g.DpHausverlauf = { VERSION: 'v3323', ereignisse: ereignisse, html: html, kurz: kurz, lesen: lesen, ARTEN: ARTEN };
+  g.DpHausverlauf = { VERSION: 'v3430', ereignisse: ereignisse, wegJahre: wegJahre, urteil: urteil, artDok: artDok, html: html, kurz: kurz, lesen: lesen, jahrDaten: jahrDaten, grafikSpec: grafikSpec, mountGrafik: mountGrafik, ARTEN: ARTEN };
   if (typeof module !== 'undefined' && module.exports) module.exports = g.DpHausverlauf;
 })(typeof window !== 'undefined' ? window : globalThis);

@@ -3041,7 +3041,9 @@
     }
     if (it.kind === 'merken') {
       if (!_auswertung || !window.DpUnterlagen) return null;
-      var neueDoks = _unterlagenListe().map(function (x) { return { typ: x.typ, label: x.label, datei: x.dateiname, datum: x.datum }; });
+      /* v3430 · Wirtschaftsplan/Abrechnung (Art „hausgeld") tragen sonst weder Art noch Jahr - der Jahresabgleich braucht beides (hausverlauf.js wegJahre) */
+      var neueDoks = _unterlagenListe().map(function (x) { var ex = x.extracted || {}, o = { typ: x.typ, label: x.label, datei: x.dateiname, datum: x.datum };
+        if (ex.art && typeof ex.art === 'string') o.art = ex.art; if (typeof ex.jahr === 'number' && ex.jahr > 1950 && ex.jahr < 2100) o.jahr = ex.jahr; return o; });
       /* v3017 · Nachreichen: die Liste der Unterlagen wächst, die Auswertung ist schon zusammengeführt */
       var alt = _ergaenzen ? (window.DpUnterlagen.laden() || {}) : {};
       var doks = (alt.dokumente || []).filter(function (x) { return !neueDoks.some(function (n) { return n.datei && n.datei === x.datei; }); }).concat(neueDoks);

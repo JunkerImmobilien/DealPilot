@@ -35,7 +35,7 @@
 (function (global) {
   'use strict';
   if (global.DpJahresbuch) return;
-  var VERSION = 'v3366';
+  var VERSION = 'v3430';
   var STATUS = [['geplant', 'geplant'], ['erklaert', 'erklärt'], ['bescheid', 'Bescheid']];
 
   function doc() { return global.document || null; }
@@ -368,7 +368,12 @@
   function mountAll() {
     var d = doc(); if (!d || !d.querySelectorAll) return;
     var hs = d.querySelectorAll('[data-dp-jb-host]');
-    for (var i = 0; i < hs.length; i++) { try { hs[i].innerHTML = html(); binden(hs[i]); } catch (e) { hs[i].innerHTML = ''; console.warn('[jahresbuch]', e); } }
+    for (var i = 0; i < hs.length; i++) {
+      /* v3430 · im Reiter Jahresabgleich steht die Tabelle „Jahr für Jahr" von jahresabgleich.js (Jahresbuch, Jahresstände und
+         „Kauf gegen heute" in einer). Die Eingabe (Steuerstatus, Restschuld, Notiz) bleibt hier, im Fenster „Jahre" (oeffnen). */
+      var imJa = !(hs[i].closest && hs[i].closest('#dp-jb-ov')) && global.DpJahresabgleich && hs[i].parentNode && hs[i].parentNode.querySelector && hs[i].parentNode.querySelector('[data-dp-ja-host]');
+      try { hs[i].innerHTML = imJa ? '' : html(); if (!imJa) binden(hs[i]); } catch (e) { hs[i].innerHTML = ''; console.warn('[jahresbuch]', e); }
+    }
     if (hs.length) mbLaden().then(function (l) { if (l && l.length && !mountAll._mbFertig) { mountAll._mbFertig = global._currentObjKey; mountAll(); } });
     try { if (global.DpJahresbuchGrafik) global.DpJahresbuchGrafik.mountAll(); } catch (e) {}
     einstiege();
@@ -378,19 +383,24 @@
     host.addEventListener('click', function (ev) {
       var b = ev.target && ev.target.closest ? ev.target.closest('[data-jb-aktion]') : null; if (!b) return;
       ev.preventDefault();
-      var a = b.getAttribute('data-jb-aktion'), y = parseInt(b.getAttribute('data-jb-jahr'), 10);
+      aktion(b.getAttribute('data-jb-aktion'), parseInt(b.getAttribute('data-jb-jahr'), 10), b.getAttribute('data-jb-fassung'));
+    });
+    host.addEventListener('change', aendern);
+  }
+  /** v3430 · die Knöpfe auch für den Jahresabgleich (jahresabgleich.js nutzt av und erreicht) */
+  function aktion(a, y, fassung) {
       if (a === 'auf') { _offen = _offen === y ? null : y; mountAll(); return; }
       if (a === 'zu') { _offen = null; speichern(); mountAll(); return; }
       if (a === 'vorbelegen') { var n = vorbelegen(); if (typeof global.toast === 'function') global.toast('✓ ' + n + ' Angaben vorbelegt'); mountAll(); return; }
       if (a === 'av') {
         var z = zeilen().filter(function (x) { return x.jahr === y; })[0];
         if (z && istZahl(z.miete_ist) && typeof global.dpSteuerSetzen === 'function' && aenderungErlaubt(y)) global.dpSteuerSetzen(y, 'einnahmen_km', z.miete_ist);
-        setTimeout(mountAll, 200); return;
+        setTimeout(function () { mountAll(); try { if (global.DpJahresabgleich) global.DpJahresabgleich.mountAll(); } catch (x) {} }, 200); return;
       }
       if (a === 'summe') { var z2 = zeilen().filter(function (x) { return x.jahr === y; })[0]; if (z2 && istZahl(z2.miete_einheiten)) schreiben(y, 'nkm_j', z2.miete_einheiten); mountAll(); return; }
-      if (a === 'erreicht') { var F = global.DpZielbildFassungen; if (F) F.statusSetzen(b.getAttribute('data-jb-fassung'), 'erreicht'); mountAll(); }
-    });
-    host.addEventListener('change', function (ev) {
+      if (a === 'erreicht') { var F = global.DpZielbildFassungen; if (F) F.statusSetzen(fassung, 'erreicht'); mountAll(); try { if (global.DpJahresabgleich) global.DpJahresabgleich.mountAll(); } catch (x) {} }
+  }
+  function aendern(ev) {
       var t = ev.target; if (!t || !t.getAttribute) return;
       var y = _offen; if (y == null) return;
       var feld = t.getAttribute('data-jb-feld'), ei = t.getAttribute('data-jb-einheit');
@@ -403,7 +413,6 @@
         if (Object.keys(x).length) e[ei] = x; else delete e[ei];
         schreiben(y, 'einheiten', Object.keys(e).length ? e : '', true); mountAll();
       }
-    });
   }
   function oeffnen(jahr) {
     var d = doc(); if (!d || !verfuegbar()) { if (typeof global.toast === 'function') global.toast('ℹ Das Jahresbuch gibt es im Bestand (gewonnen, mit Ankauf-Stand).'); return; }
@@ -419,7 +428,7 @@
   }
   function schliessen() {
     var ov = el('dp-jb-ov');
-    if (ov && ov.parentNode) { ov.parentNode.removeChild(ov); speichern(); mountAll(); }
+    if (ov && ov.parentNode) { ov.parentNode.removeChild(ov); speichern(); mountAll(); try { if (global.DpJahresabgleich) global.DpJahresabgleich.mountAll(); } catch (x) {} }
   }
   /* Einstieg im Reiter Miete (eine Zeile oben), nur im Bestand */
   function einstiege() {
@@ -445,6 +454,6 @@
     VERSION: VERSION, STATUS: STATUS,
     jahreVon: jahreVon, summeEinheiten: summeEinheiten, zeile: zeile, setzen: setzen, nachfragen: nachfragen,
     verfuegbar: verfuegbar, zeilen: zeilen, status: status, statusSetzen: statusSetzen, statusWort: statusWort, aenderungErlaubt: aenderungErlaubt,
-    html: html, mountAll: mountAll, oeffnen: oeffnen, schliessen: schliessen, vorbelegen: vorbelegen, mbLaden: mbLaden
+    html: html, mountAll: mountAll, oeffnen: oeffnen, schliessen: schliessen, vorbelegen: vorbelegen, mbLaden: mbLaden, aktion: aktion   /* v3430 */
   };
 })(typeof window !== 'undefined' ? window : globalThis);

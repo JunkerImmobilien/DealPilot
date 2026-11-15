@@ -100,7 +100,7 @@ const E = ctx.DpErhoehungen;
   const tax = lies('frontend/js/tax.js');
   const iU = tax.indexOf('function updateTaxOverride'), iA = tax.indexOf('DpJahresbuch.aenderungErlaubt(year)', iU), iS = tax.indexOf('_setYearOverride(year, field, val)', iU);
   ok(iU > 0 && iA > iU && iS > iA, 'J tax.js fragt vor dem Ändern einer Zelle');
-  ok(/add\('jahre', 'Jahre'/.test(lies('frontend/js/pilot-analyse-v4.js')), 'J Unterreiter Jahre in der Pilot-Analyse');
+  ok(/add\('jahr', 'Jahresabgleich'.*o\.jahre/.test(lies('frontend/js/pilot-analyse-v4.js')), 'J Jahresbuch im Unterreiter Jahresabgleich (seit v3420, vorher „Jahre“)');
   ok(/k === '_jahre'/.test(lies('frontend/js/ankauf.js')) || /'_jahre'\) continue/.test(lies('frontend/js/ankauf.js')), 'J ankauf.js friert _jahre nicht ein');
   ok(!/(^|[^a-z])_jahre\b|DpJahresbuch/.test(lies('frontend/js/calc.js')), 'J calc.js liest das Jahresbuch nicht (Paket 5 wartet auf E4)');
   ok(/js\/jahresbuch\.js\?v=/.test(lies('frontend/index.html')), 'J index.html lädt jahresbuch.js');
