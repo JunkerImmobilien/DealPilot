@@ -44,7 +44,7 @@
 (function (global) {
   'use strict';
   if (global.DpJahresabgleich) return;
-  var VERSION = 'v3432';
+  var VERSION = 'v3434';
   var GOLD = 'var(--wl-c9a84c, #C9A84C)';
   var SCHRITTE = [['miete', 'Miete'], ['steuer', 'Steuer'], ['wert', 'Wert'], ['haus', 'Haus']];
   var WORT = { ok: 'erledigt', teil: 'teilweise', offen: 'offen', laufend: 'läuft' };
@@ -217,7 +217,8 @@
       '.dp-ja-w{font:600 19px "Space Grotesk",Inter,sans-serif;font-variant-numeric:tabular-nums;color:' + T + ';overflow-wrap:anywhere}',
       '.dp-ja-vgl{font:400 12px Inter,sans-serif;color:' + M + ';font-variant-numeric:tabular-nums}',
       '.dp-pa-wrap .dp-ja-schritt p{margin:0;font:400 12.5px/1.5 Inter,sans-serif;color:' + M + ';text-align:left !important}',
-      '.dp-pa-wrap .dp-ja-schritt button{align-self:flex-start;margin-top:auto}',
+      '.dp-pa-wrap .dp-ja-schritt button{align-self:flex-start;margin-top:auto;max-width:100%;white-space:normal !important;text-align:left;height:auto !important}',
+      '.dp-pa-wrap .dp-ja-schritt button + button{margin-top:0}',
       '.dp-pa-wrap .dp-ja button.dp-ja-gold{border-color:' + GOLD + ' !important;background:color-mix(in srgb, ' + GOLD + ' 12%, #fff) !important;font-weight:600 !important}',
       '.dp-ja .dp-ja-gut{color:#2f7d52 !important}.dp-ja .dp-ja-schlecht{color:#B8625C !important}',
       '.dp-ja-pot{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:16px;align-items:center;border:1px solid ' + LI + ';border-radius:10px;padding:14px 16px;margin-top:12px;background:#fff}',
@@ -249,7 +250,8 @@
       '.dp-ja-notiz.ok{border-left-color:#3FA56C}',
       '.dp-ja-fuss{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:10px;font-size:12px;color:' + LE + '}',
       '@media (max-width:760px){.dp-ja-schritte{grid-template-columns:repeat(2,minmax(0,1fr))}.dp-ja-schritt:nth-child(2n){border-right:none}.dp-ja-schritt:nth-child(-n+2){border-bottom:1px solid ' + LI + '}'
-        + '.dp-ja-pot{grid-template-columns:1fr}.dp-ja-satz{font-size:16px}.dp-ja-schritt{padding:12px}}'
+        + '.dp-ja-pot{grid-template-columns:1fr}.dp-ja-satz{font-size:16px}.dp-ja-schritt{padding:12px}'
+        + '.dp-pa-wrap .dp-ja-schritt button{font-size:12px !important;padding:5px 8px !important}}'
     ].join('\n');
     d.head.appendChild(s);
   }
