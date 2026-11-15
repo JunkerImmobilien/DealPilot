@@ -626,7 +626,7 @@
           e.map(function (x) {
             var art = (x.ueber_bestand || x.deal_won ? 'Bestand' : 'Ankauf') + (x.objart ? ', ' + x.objart : '');
             var stand = x.stand_nr > 1 ? 'Stand ' + x.stand_nr + ', aktualisiert' : 'erster Stand';
-            return '<div class="pk-zeile"><div class="pk-name"><b>' + esc(adresse(x)) + '</b><small>' + esc([x.seq_no, art, stand, 'freigegeben am ' + datum(x.stand_am)].filter(Boolean).join(' · ')) + '</small></div>' +
+            return '<div class="pk-zeile"><div class="pk-name"><b>' + esc(adresse(x)) + '</b><small>' + esc([art, stand, 'freigegeben am ' + datum(x.stand_am)].join(' · '))   /* seq_no der Kopie (K-…) sagt dem Partner nichts */ + '</small></div>' +
               (x.gelesen_am ? '' : '<span class="pk-chip gruen">neu</span>') +
               '<button type="button" class="pk-btn klein gold" data-laden="' + x.kopie_object_id + '" data-s="' + x.share_id + '">Ansehen</button>' +
               '<button type="button" class="pk-btn klein" data-ueb="' + x.share_id + '">Als eigenes Objekt übernehmen</button></div>';
