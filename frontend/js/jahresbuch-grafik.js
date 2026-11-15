@@ -29,10 +29,10 @@
 (function (global) {
   'use strict';
   if (global.DpJahresbuchGrafik) return;
-  var VERSION = 'v3432';
+  var VERSION = 'v3433';
   var GOLD = 'var(--wl-c9a84c, #C9A84C)', GRAU = '#8A8278', TINTE = '#5B544C', ROT = '#B8625C';
   var FLAECHE = 'var(--jbg-flaeche, #FDFCFA)';
-  var W = 720, L = 60, R = 54, OBEN = 26, LUECKE = 56;
+  var W0 = 720, L = 60, R = 54, OBEN = 26, LUECKE = 56;   /* v3432 · W je Bild: so breit wie der Platz (340-720), sonst wird die Schrift am Handy 4 px klein */
 
   function istZahl(v) { return typeof v === 'number' && isFinite(v); }
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
@@ -77,6 +77,7 @@
   function bild(spec) {
     var J = (spec && spec.jahre) || [];
     if (J.length < 2 || !spec.panels || !spec.panels.length) return '';
+    var W = spec.W || W0;
     var n = J.length, x0 = L, x1 = W - R, dx = (x1 - x0) / n;
     var xm = function (i) { return x0 + dx * (i + 0.5); };
     var xJahr = function (jahr, monat) { var i = jahr - J[0]; return x0 + dx * (i + ((istZahl(monat) ? monat : 6.5) - 0.5) / 12); };
@@ -216,10 +217,13 @@
   function malen(host, spec) {
     if (!host) return;
     var doc = host.ownerDocument; stil(doc);
+    var bw = host.clientWidth || 0;
+    spec.W = bw > 0 ? Math.max(340, Math.min(W0, Math.round(bw))) : W0;
+    host._jbgSpec = spec;   /* nachziehen(): neu zeichnen, wenn der Platz sich ändert (verdeckter Reiter, Drehen) */
     var s = bild(spec);
     if (!s) { host.innerHTML = ''; return; }
     host.innerHTML = '<div class="jbg">' + legendeHtml(spec) + s + '<div class="jbg-tip" role="status"></div></div>';
-    var box = host.querySelector('.jbg'), tip = host.querySelector('.jbg-tip'), kreuz = host.querySelector('.jbg-cross');
+    var box = host.querySelector('.jbg'), tip = host.querySelector('.jbg-tip'), kreuz = host.querySelector('.jbg-cross'), W = spec.W || W0;
     Array.prototype.forEach.call(host.querySelectorAll('[data-jbg-i]'), function (r) {
       function zeig() {
         var i = +r.getAttribute('data-jbg-i'), x = +r.getAttribute('x') + (+r.getAttribute('width')) / 2;
@@ -233,6 +237,19 @@
       r.addEventListener('mouseleave', function () { tip.style.display = 'none'; kreuz.style.strokeOpacity = '0'; });
       r.addEventListener('click', function () { zeig(); if (typeof spec.onJahr === 'function') spec.onJahr(+r.getAttribute('data-jbg-jahr')); });
     });
+  }
+
+  /** Bilder, deren Platz sich geändert hat (in einem verdeckten Reiter gezeichnet, Fenster gedreht), neu zeichnen */
+  function nachziehen() {
+    var doc = global.document; if (!doc || !doc.querySelectorAll) return;
+    Array.prototype.forEach.call(doc.querySelectorAll('[data-dp-jb-grafik],[data-dp-hv-grafik]'), function (h) {
+      var sp = h._jbgSpec, bw = h.clientWidth || 0; if (!sp || !bw) return;
+      if (Math.abs(Math.max(340, Math.min(W0, Math.round(bw))) - (sp.W || W0)) > 8) { try { malen(h, sp); } catch (e) {} }
+    });
+  }
+  if (global.document && global.document.addEventListener) {
+    global.document.addEventListener('click', function (ev) { if (ev.target && ev.target.closest && ev.target.closest('.dp-pa-tab,.tab')) setTimeout(nachziehen, 80); });
+    if (global.addEventListener) global.addEventListener('resize', function () { clearTimeout(nachziehen._t); nachziehen._t = setTimeout(nachziehen, 200); });
   }
 
   /* ── Alte Form (bis v3364b): d = { jahre: [{ jahr, miete_plan, miete_ist, miete_proj, ziel_j, cf_plan, cf_ist }], ereignisse, heute } ── */
@@ -305,5 +322,5 @@
   }
 
   global.DpJahresbuchGrafik = { VERSION: VERSION, bild: bild, malen: malen, legendeHtml: legendeHtml, tippHtml: tippHtml, ausAlt: ausAlt,
-    svg: svg, legende: legende, zeichnen: zeichnen, daten: daten, mountAll: mountAll, GOLD: GOLD, GRAU: GRAU, TINTE: TINTE, ROT: ROT };
+    svg: svg, legende: legende, zeichnen: zeichnen, daten: daten, mountAll: mountAll, nachziehen: nachziehen, GOLD: GOLD, GRAU: GRAU, TINTE: TINTE, ROT: ROT };
 })(typeof window !== 'undefined' ? window : globalThis);
