@@ -1,6 +1,6 @@
 // backend/src/services/bmfService.js
 // V282 — BMF Kaufpreisaufteilung (Phase 1 / Labor)
-// Sandwich-Ansatz: Schreibt User-Inputs in die offizielle BMF-Vorlage (Juni 2023),
+// Sandwich-Ansatz: Schreibt User-Inputs in die offizielle BMF-Vorlage (seit v3400: Stand März 2026),
 // lässt LibreOffice headless die Formeln recalcen, liest Ergebnisse aus.
 //
 // KEINE parallele Logik zu bestehenden Berechnungen — das ist ein eigenständiges
@@ -15,14 +15,28 @@ const os = require('os');
 let ExcelJS;
 try { ExcelJS = require('exceljs'); } catch (e) { ExcelJS = null; }
 
-const TEMPLATE_PATH = path.join(__dirname, '..', '..', 'templates', 'BMF_Vorlage_Juni2023.xlsx');
+/* v3400 · Marcel 15.11.2026: „die neue Fassung holen und einarbeiten, und auch die Excel-Datei
+   der Arbeitshilfe nehmen, die wir befuellen". Bis v3399 lag hier die Fassung Juni 2023. Sie
+   fuehrte den Baupreisindex fuer die Kaufjahre 2022 bis 2027 einheitlich mit 164 (2010 = 100),
+   die BMF-Fassung vom 16.03.2026 (Datenportal bundesfinanzministerium.de, Blattkopf KPA!D1
+   „Fassung Januar 2025", Verfall KPA!K2 30.09.2027) mit 2023 = 177,9, 2024 = 183,3, ab 2025 = 189,1.
+   Dazu: Bewirtschaftungskosten nach VPI Oktober 2025, Barwertfaktor auf 4 Stellen, typisierte
+   Zinssaetze 2023/2024 als Zahl, Einheiten-Schaetzung 94 statt 92 m2, und neu eine nachgewiesene
+   Restnutzungsdauer (Gutachten, § 7 Abs. 4 Satz 2 EStG) auf dem Blatt „Fiktives Baujahr" D16/D17.
+   Das Blatt „Fiktives Baujahr" ist um fuenf Zeilen gewachsen: Modernisierung D22-D29 (war D17-D24),
+   Modernisierungsgrad D52 (war D47), fiktives Baujahr D54 (war D49). Quelle und Anleitung liegen
+   in Dateien/BMF-Arbeitshilfe/2026-03/. Pruefer: tools/steuer-audit-pruefen.mjs Abschnitt H. */
+const TEMPLATE_PATH = process.env.BMF_TEMPLATE_PATH
+  || path.join(__dirname, '..', '..', 'templates', 'BMF_Arbeitshilfe_2026-03.xlsx');
+const TEMPLATE_VERSION = 'Stand März 2026';
 const LIBREOFFICE_BIN = process.env.LIBREOFFICE_BIN || 'libreoffice';
 const RECALC_TIMEOUT_MS = parseInt(process.env.BMF_RECALC_TIMEOUT_MS || '60000', 10);
 
 // ----------------------------------------------------------------------
 // Input/Output-Mapping in der BMF-Vorlage (KPA-Sheet)
 // ----------------------------------------------------------------------
-// Diese Map wurde anhand der Original-XLSX (Fassung Juni 2023) extrahiert.
+// Diese Map wurde anhand der Original-XLSX (Fassung Juni 2023) extrahiert und in v3400 an der
+// Fassung Stand Maerz 2026 neu abgenommen (KPA unveraendert, „Fiktives Baujahr" +5 Zeilen).
 // Bei einem späteren BMF-Update muss nur diese Map angepasst werden.
 
 const INPUT_CELLS = {
@@ -71,17 +85,22 @@ const INPUT_CELLS = {
   // 25/26) Regionalfaktor + Sachwertfaktor (Default 1.0)
   regionalfaktor:      { sheet: 'KPA', cell: 'G47' },
   sachwertfaktor:      { sheet: 'KPA', cell: 'K47' },
-  // --- Modernisierungs-Eingaben (Sheet 'Fiktives Baujahr', D17–D24) ---
+  // --- v3400 · nachgewiesene Restnutzungsdauer (Sheet 'Fiktives Baujahr', neu seit 2025/2026) ---
+  // D16 "Ja"/"Nein" (Vorgabe Nein), D17 RND laut Gutachten in vollen Jahren. Mit "Ja" rechnet die
+  // Arbeitshilfe diese RND statt GND - Alter und ohne die Mindest-RND von 30 % (SW-NHK!F82/F83).
+  rnd_gutachten_vorhanden: { sheet: 'Fiktives Baujahr', cell: 'D16' },
+  rnd_gutachten_jahre:     { sheet: 'Fiktives Baujahr', cell: 'D17' },
+  // --- Modernisierungs-Eingaben (Sheet 'Fiktives Baujahr', D22–D29; bis v3399 D17–D24) ---
   // Werte: "ja" / "nein" / "teilweise"
   // Pflicht bei alten Gebäuden (sonst #N/A in Sachwert-/Ertragswertkette).
-  mod_dach:        { sheet: 'Fiktives Baujahr', cell: 'D17' },
-  mod_fenster:     { sheet: 'Fiktives Baujahr', cell: 'D18' },
-  mod_leitungen:   { sheet: 'Fiktives Baujahr', cell: 'D19' },
-  mod_heizung:     { sheet: 'Fiktives Baujahr', cell: 'D20' },
-  mod_waermedaemmung: { sheet: 'Fiktives Baujahr', cell: 'D21' },
-  mod_baeder:      { sheet: 'Fiktives Baujahr', cell: 'D22' },
-  mod_innenausbau: { sheet: 'Fiktives Baujahr', cell: 'D23' },
-  mod_grundriss:   { sheet: 'Fiktives Baujahr', cell: 'D24' },
+  mod_dach:        { sheet: 'Fiktives Baujahr', cell: 'D22' },
+  mod_fenster:     { sheet: 'Fiktives Baujahr', cell: 'D23' },
+  mod_leitungen:   { sheet: 'Fiktives Baujahr', cell: 'D24' },
+  mod_heizung:     { sheet: 'Fiktives Baujahr', cell: 'D25' },
+  mod_waermedaemmung: { sheet: 'Fiktives Baujahr', cell: 'D26' },
+  mod_baeder:      { sheet: 'Fiktives Baujahr', cell: 'D27' },
+  mod_innenausbau: { sheet: 'Fiktives Baujahr', cell: 'D28' },
+  mod_grundriss:   { sheet: 'Fiktives Baujahr', cell: 'D29' },
 };
 
 const OUTPUT_CELLS = {
@@ -97,8 +116,12 @@ const OUTPUT_CELLS = {
   kaufpreisanteil_grund:    { sheet: 'KPA', cell: 'J120', label: 'Kaufpreisanteil Grund & Boden (€)' },
   kaufpreisanteil_gebaeude: { sheet: 'KPA', cell: 'J121', label: 'Kaufpreisanteil Gebäude (€)' },
   // Aus Sheet "Fiktives Baujahr"
-  fiktives_baujahr:         { sheet: 'Fiktives Baujahr', cell: 'D49', label: 'Fiktives Baujahr' },
-  modernisierungsgrad:      { sheet: 'Fiktives Baujahr', cell: 'D47', label: 'Modernisierungsgrad' },
+  fiktives_baujahr:         { sheet: 'Fiktives Baujahr', cell: 'D54', label: 'Fiktives Baujahr' },
+  modernisierungsgrad:      { sheet: 'Fiktives Baujahr', cell: 'D52', label: 'Modernisierungsgrad' },
+  // v3400 · Zwischenwerte des Sachwertwegs, damit der Rechenweg nachvollziehbar ist
+  baupreisindex:            { sheet: 'SW-NHK', cell: 'F78', label: 'Baupreisindex (2010 = 100)' },
+  restnutzungsdauer:        { sheet: 'SW-NHK', cell: 'F82', label: 'Restnutzungsdauer (Jahre)' },
+  gesamtnutzungsdauer:      { sheet: 'SW-NHK', cell: 'F81', label: 'Gesamtnutzungsdauer (Jahre)' },
 };
 
 // Die Strings MÜSSEN exakt mit dem Lookup-Sheet "EW-Bewertungsparameter" Spalte A
@@ -395,6 +418,10 @@ async function calculateKpa(inputs, opts = {}) {
     );
   }
 
+  /* v3400 · eine RND laut Gutachten ohne den Schalter waere wirkungslos (D18 = WENN(D16="Ja";D17;"")) */
+  if (Number(inputs.rnd_gutachten_jahre) > 0 && !inputs.rnd_gutachten_vorhanden) {
+    inputs = Object.assign({}, inputs, { rnd_gutachten_vorhanden: 'Ja' });
+  }
   for (const [key, target] of Object.entries(INPUT_CELLS)) {
     if (!(key in inputs)) continue;
     let v = inputs[key];
@@ -413,7 +440,7 @@ async function calculateKpa(inputs, opts = {}) {
 
     // Numerisch wenn möglich (außer für Dropdown-Strings)
     const stringFields = ['lage','grundstuecksart','vergleichsfaktor_vorhanden',
-                          'bezugsmassstab','miete_bekannt',
+                          'bezugsmassstab','miete_bekannt','rnd_gutachten_vorhanden',
                           'mod_dach','mod_fenster','mod_leitungen','mod_heizung',
                           'mod_waermedaemmung','mod_baeder','mod_innenausbau','mod_grundriss'];
     if (!stringFields.includes(key) && typeof v !== 'number') {
@@ -514,7 +541,7 @@ async function calculateKpa(inputs, opts = {}) {
     pdf_base64: pdfBase64,
     pdf_name: `BMF_Arbeitshilfe_${new Date().toISOString().slice(0,10)}.pdf`,
     meta: {
-      template_version: 'Fassung Juni 2023',
+      template_version: TEMPLATE_VERSION,
       template_path: TEMPLATE_PATH,
       job_id: jobId,
       recalc_engine: 'LibreOffice headless',
@@ -553,6 +580,8 @@ async function selfTest() {
 module.exports = {
   calculateKpa,
   selfTest,
+  TEMPLATE_VERSION,
+  TEMPLATE_PATH,
   GRUNDSTUECKSART_OPTIONS,
   INPUT_CELLS,
   OUTPUT_CELLS,

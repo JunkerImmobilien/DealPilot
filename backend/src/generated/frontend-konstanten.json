@@ -1,10 +1,10 @@
 {
- "erzeugt_am": "2026-11-15T08:50:30.246Z",
+ "erzeugt_am": "2026-11-15T08:52:56.391Z",
  "quellen": {
   "voice-import": "b85d1194e6f250e3",
   "objektart-felder": "f7d9212555982a97",
   "storage": "da010df78b3b86e4",
-  "index-html": "27cb5afbeebdc24e",
+  "index-html": "dfe789168d80cbbc",
   "grest": "81f3fb0a4de3a6cf"
  },
  "daten": {
@@ -3989,7 +3989,7 @@
      },
      {
       "h": "BMF-Rechner: Kaufpreis aufteilen",
-      "text": "Der Knopf BMF-Rechner in der AfA-Konfiguration öffnet „Anschaffungskosten & BMF-Kaufpreisaufteilung“ nach der BMF-Arbeitshilfe (Juni 2023).\n\n1 Anschaffungskosten — übernimmt die Werte aus dem Reiter Investition: Kaufpreis, Grunderwerbsteuer, Notar, Grundbuchamt, Makler. Dazu Erwerbskosten wie Fahrten (mit Fahrtkosten-Helfer), Verpflegung, Unterkunft, Gutachten, Anwalt. Herstellungskosten nach § 255 Abs. 2 HGB zählen zu 100 % zum Gebäude.\n\n2 BMF-Aufteilung — Grundstücksart, Baujahr, Flächen, Bodenrichtwert, Miete und Modernisierungen. Alle drei Verfahren werden gerechnet; maßgebend ist bei bekannter Miete der Ertragswert, mit Vergleichsfaktor der Vergleichswert, sonst der Sachwert. KI-Vorschlag schlägt Gutachterausschuss-Werte vor; übernommen werden sie erst mit „BRW → BMF“ bzw. „Lzs → BMF“. Liegt ein amtlicher Zinssatz vor, steht darunter die Aufteilung nach Jacoby zum Vergleich.\n\nDie Reiter 2 bis 4 öffnen erst, wenn die Pflichtangaben vollständig sind."
+      "text": "Der Knopf BMF-Rechner in der AfA-Konfiguration öffnet „Anschaffungskosten & BMF-Kaufpreisaufteilung“ nach der BMF-Arbeitshilfe (Stand März 2026).\n\n1 Anschaffungskosten — übernimmt die Werte aus dem Reiter Investition: Kaufpreis, Grunderwerbsteuer, Notar, Grundbuchamt, Makler. Dazu Erwerbskosten wie Fahrten (mit Fahrtkosten-Helfer), Verpflegung, Unterkunft, Gutachten, Anwalt. Herstellungskosten nach § 255 Abs. 2 HGB zählen zu 100 % zum Gebäude.\n\n2 BMF-Aufteilung — Grundstücksart, Baujahr, Flächen, Bodenrichtwert, Miete und Modernisierungen. Alle drei Verfahren werden gerechnet; maßgebend ist bei bekannter Miete der Ertragswert, mit Vergleichsfaktor der Vergleichswert, sonst der Sachwert. KI-Vorschlag schlägt Gutachterausschuss-Werte vor; übernommen werden sie erst mit „BRW → BMF“ bzw. „Lzs → BMF“. Liegt ein amtlicher Zinssatz vor, steht darunter die Aufteilung nach Jacoby zum Vergleich.\n\nDie Reiter 2 bis 4 öffnen erst, wenn die Pflichtangaben vollständig sind."
      },
      {
       "h": "Varianten, Bodenabschlag und Ausgabe",
@@ -5569,7 +5569,7 @@
   }
  },
  "inhalt": {
-  "hilfe": "192bbaa3f7770ff0",
+  "hilfe": "409743077f820db2",
   "bewertung": "f427bd734c0570c3"
  }
 }

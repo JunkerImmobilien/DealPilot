@@ -84,7 +84,7 @@
     },
     {
       id: 'xlsx', titel: 'BMF-Original als XLSX', unter: 'Excel-Datei',
-      fuer: 'Die Arbeitshilfe (Fassung Juni 2023) ausgefüllt als Excel-Datei.',
+      fuer: 'Die Arbeitshilfe (Stand März 2026) ausgefüllt als Excel-Datei.',
       sperre: function () { var p = window.DpBmfAusgabe && DpBmfAusgabe.pruefen(); return p && !p.ok ? 'Fehlen noch Werte: ' + p.fehlt.join(', ') : null; },
       tun: function () { if (window.DpBmfAusgabe) return DpBmfAusgabe.xlsx(); toast('BMF-Ausgabe nicht geladen.'); }
     }

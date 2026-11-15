@@ -251,7 +251,7 @@ function syncFromTabInvest(){
       guenstige Wert, und vor dem Finanzamt nicht haltbar.
 
    UND DIE ALTE LISTE WAR ZU KURZ. `required` fuehrte fuenf Felder;
-   fachlich sind es acht (BMF-Arbeitshilfe Juni 2023, dazu
+   fachlich sind es acht (BMF-Arbeitshilfe Stand März 2026, dazu
    docs/kundendaten-checkliste.md, Abschnitt A2). Es fehlten ausgerechnet
    die GRUNDSTUECKSFLAECHE — die den Befund oben ausloest — und der
    MITEIGENTUMSANTEIL, ohne den bei einer Eigentumswohnung der Bodenwert
@@ -835,7 +835,7 @@ function _mockupRenderBmfResult(r, demoLabel){
 
   var sb = $('bmfStatus');
   sb.className = 'banner ok';
-  sb.innerHTML = '<strong>✓ Berechnung abgeschlossen.</strong> Quelle: BMF-Vorlage Fassung Juni 2023 — Ertragswertverfahren als maßgebend. ' +
+  sb.innerHTML = '<strong>✓ Berechnung abgeschlossen.</strong> Quelle: BMF-Vorlage Stand März 2026 — Ertragswertverfahren als maßgebend. ' +
     '<br><span style="font-size:11.5px;color:var(--muted);font-style:italic">Gebäudeanteil ' + fmtPct(r.geb_pct) + ', AfA-Basis ' + fmtEur(kpGeb,2) + '</span>';
 
   toast('BMF-Ergebnis: ' + fmtPct(r.geb_pct) + ' Gebäudeanteil');
@@ -890,7 +890,7 @@ function bmfAusgabenZeigen(hostEl) {
     +     '<span class="bmf-ausg-s">Das ausgefüllte amtliche Formular</span></button>'
     +   '<button type="button" class="bmf-ausg" data-was="xlsx">'
     +     '<span class="bmf-ausg-l">BMF-Original als XLSX</span>'
-    +     '<span class="bmf-ausg-s">Die amtliche Arbeitshilfe (Juni 2023), ausgefüllt</span></button>'
+    +     '<span class="bmf-ausg-s">Die amtliche Arbeitshilfe (Stand März 2026), ausgefüllt</span></button>'
     + '</div>';
   host.appendChild(box);
 
@@ -2179,7 +2179,7 @@ function _ensureModalLoaded(callback){
      offen ist — davon der Abruf der Vorlage mit `no-store` bei JEDEM
      ersten Öffnen. Der Buster in der URL macht den Cache sicher; der
      Browser darf die Vorlage behalten. */
-  fetch('/js/bmf-modal-html.html?v=v1871')
+  fetch('/js/bmf-modal-html.html?v=v3400')
     .then(function(r){
       if(!r.ok){ throw new Error('HTTP ' + r.status); }
       return r.text();
@@ -2753,7 +2753,7 @@ function _renderKlauselText(){ /* V293-E-klausel-no-pct: Prozente entfernt, nur 
       'für das Objekt <em>' + (addr || '[Objektadresse]') + '</em> wie folgt auf:</p>' +
       '<ul style="margin:8px 0;padding-left:22px"><li>Auf den Grund und Boden entfallen <strong>' + _eur(basisGrund) + '</strong>.</li>' +
       '<li>Auf das Gebäude entfallen <strong>' + _eur(basisGeb) + '</strong>.</li></ul>' +
-      '<p>Die Aufteilung wurde anhand der BMF-Arbeitshilfe (Juni 2023) ermittelt und gilt vorbehaltlich abweichender Feststellung durch das Finanzamt. Sie ist Grundlage für die Absetzung für Abnutzung (AfA) nach § 7 Abs. 4 EStG.</p>',
+      '<p>Die Aufteilung wurde anhand der BMF-Arbeitshilfe (Stand März 2026) ermittelt und gilt vorbehaltlich abweichender Feststellung durch das Finanzamt. Sie ist Grundlage für die Absetzung für Abnutzung (AfA) nach § 7 Abs. 4 EStG.</p>',
 
     moderat:
       '<p><strong>Kaufpreisaufteilung (' + _kopfAbw + ')</strong></p>' +
@@ -2761,7 +2761,7 @@ function _renderKlauselText(){ /* V293-E-klausel-no-pct: Prozente entfernt, nur 
       'für das Objekt <em>' + (addr || '[Objektadresse]') + '</em> aus folgenden Komponenten zusammensetzt:</p>' +
       '<ul style="margin:8px 0;padding-left:22px"><li>Grund und Boden: <strong>' + _eur(basisGrund) + '</strong></li>' +
       '<li>Gebäudesubstanz (abnutzbares Wirtschaftsgut): <strong>' + _eur(basisGeb) + '</strong></li></ul>' +
-      '<p>Die Aufteilung berücksichtigt den nach BMF-Arbeitshilfe (Juni 2023) ermittelten Sachwertanteil unter Beachtung von Baujahr, Wohnfläche, Bodenrichtwert und Lage. ' +
+      '<p>Die Aufteilung berücksichtigt den nach BMF-Arbeitshilfe (Stand März 2026) ermittelten Sachwertanteil unter Beachtung von Baujahr, Wohnfläche, Bodenrichtwert und Lage. ' +
       'Die Vertragsparteien sind übereingekommen, dass diese Aufteilung der wirtschaftlichen Wertverteilung entspricht und der steuerlichen Behandlung — insbesondere der AfA-Berechnung — zugrunde gelegt wird. ' +
       'Stand: ' + datum + '.</p>',
 
@@ -2770,7 +2770,7 @@ function _renderKlauselText(){ /* V293-E-klausel-no-pct: Prozente entfernt, nur 
       '<p>Hiermit erklären die Vertragsparteien rechtsverbindlich: Der vereinbarte Gesamtkaufpreis in Höhe von <strong>' + _eur(kp) + '</strong> für das in der Vertragsurkunde näher bezeichnete Objekt <em>' + (addr || '[Objektadresse]') + '</em> entfällt nach übereinstimmender Bewertung wie folgt:</p>' +
       '<ul style="margin:8px 0;padding-left:22px"><li>Grund und Boden: <strong>' + _eur(basisGrund) + '</strong></li>' +
       '<li>Gebäude inkl. wesentlicher Gebäudeteile: <strong>' + _eur(basisGeb) + '</strong></li></ul>' +
-      '<p>Diese Aufteilung wurde im Rahmen einer Wertermittlung nach BMF-Arbeitshilfe (Juni 2023, maßgebendes Verfahren nach der Arbeitshilfe) unter Heranziehung lagespezifischer Bodenrichtwerte, der tatsächlichen Restnutzungsdauer des Gebäudes sowie ggf. vorgenommener Modernisierungen erstellt. ' +
+      '<p>Diese Aufteilung wurde im Rahmen einer Wertermittlung nach BMF-Arbeitshilfe (Stand März 2026, maßgebendes Verfahren nach der Arbeitshilfe) unter Heranziehung lagespezifischer Bodenrichtwerte, der tatsächlichen Restnutzungsdauer des Gebäudes sowie ggf. vorgenommener Modernisierungen erstellt. ' +
       '<strong>Sie hat verbindlichen Charakter</strong> und gilt insbesondere als wirtschaftlich angemessen i.S.d. BFH-Rechtsprechung (BFH IX R 26/19 v. 21.07.2020). ' +
       'Die Parteien sind sich einig, dass eine pauschale 80/20-Aufteilung im konkreten Fall nicht sachgerecht wäre. ' +
       'Eine abweichende Wertfeststellung durch das Finanzamt setzt eine substantiierte Gegenbewertung voraus (vgl. § 199 BewG). Stand: ' + datum + '.</p>'

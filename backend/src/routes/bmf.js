@@ -72,7 +72,7 @@ router.get('/meta', authenticate, requireFeature('bmf_advanced'), (req, res) => 
     grundstuecksart_options: bmfService.GRUNDSTUECKSART_OPTIONS,
     input_cells: Object.keys(bmfService.INPUT_CELLS),
     output_cells: Object.keys(bmfService.OUTPUT_CELLS),
-    template_version: 'Juni 2023',
+    template_version: bmfService.TEMPLATE_VERSION,   /* v3400 */
     api_version: 'V288'
   });
 });

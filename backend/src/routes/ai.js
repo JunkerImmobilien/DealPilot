@@ -1810,7 +1810,7 @@ router.post('/bmf-gaa', authenticate, plzValidator.middleware, async (req, res, 
     const wfl = parseFloat(payload.wohnflaeche) || null;
 
     const prompt = [
-      'Du bist Gutachter-Experte für deutsche Immobilien-Bewertung nach BMF-Arbeitshilfe (Fassung Juni 2023).',
+      'Du bist Gutachter-Experte für deutsche Immobilien-Bewertung nach BMF-Arbeitshilfe (Stand März 2026).',
       'Schätze für diese Immobilie die 4 wichtigsten GAA-Werte (Gutachterausschuss-Werte):',
       '',
       'Adresse: ' + address,

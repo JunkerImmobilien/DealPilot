@@ -16,10 +16,14 @@
  *  E  v3380 Fristen: § 23 ab Kaufvertrag, frei erst nach dem Fristtag; 15-%-Quote netto gegen
  *     Gebaeude-AHK einschl. Nebenkosten (§ 6 Abs. 1 Nr. 1a EStG)
  *  F  v3381 Backend objektRechnung: Ruecklagen nicht in der Steuerbemessung (wie calc.js v3268)
+ *  H  v3400 BMF-Arbeitshilfe Stand Maerz 2026: Vorlage (Hash), Baupreisindex, Zellzuordnung gegen die
+ *     Zeilenbeschriftung; --live: Anwendungsbeispiele I-III der Anleitung im Staging-Backend (LibreOffice)
+ *  I  v3401 IRR privat: § 23-Steuer beim Verkauf in der Frist (frist23/paragraph23/steuer23)
+ *  J  v3402 RND-Gutachten-Vorteil als Barwert der AfA-Verschiebung bis zum Verkauf
  *  G  Texte: Grenzsteuer-Beispiele im Tooltip gegen den Tarif, Werbungskosten-PDF-Matrix
  *     nachrechenbar, Grunderwerbsteuersaetze der Laender, GrESt ohne Inventar (§ 9 GrEStG)
  *
- * Aufruf: node tools/steuer-audit-pruefen.mjs   (RC=0 sauber) */
+ * Aufruf: node tools/steuer-audit-pruefen.mjs [--live]   (RC=0 sauber) */
 import fs from 'node:fs';
 import vm from 'node:vm';
 import path from 'node:path';
@@ -229,6 +233,181 @@ function lade(felder, state) {
   ok(abw.length === 0, 'G Grunderwerbsteuersaetze 16 Laender: ' + (abw.length ? 'abweichend ' + abw.join(',') : 'gleich'));
   const nk = lade().DealKpis.nebenkosten({ kp: 300000, inventar: 10000, gest_p: 6.5, notar_p: 1.5 });
   ok(nk.grest === 18850 && nk.notar === 4500, 'G GrESt ohne Inventar (§ 9 GrEStG): 290.000 x 6,5 % = 18.850');
+}
+
+/* ── H · v3400 BMF-Arbeitshilfe Kaufpreisaufteilung, Stand Maerz 2026 ──
+   Quelle: bundesfinanzministerium.de, Datenportal „Kaufpreisaufteilung-Grundstuecke", aktualisiert
+   16.03.2026 („Arbeitshilfe und Anleitung mit Stand vom Maerz 2026"), Kopie unter
+   Dateien/BMF-Arbeitshilfe/2026-03/. Die Vorlage ist der Rechenkern (bmfService.js schreibt die
+   Eingaben hinein, LibreOffice rechnet). Hier ohne LibreOffice: ist die richtige Vorlage verdrahtet,
+   stehen ihre Tabellen auf dem neuen Stand, zeigen die Zellen der Map auf die richtigen Zeilen?
+   Mit --live zusaetzlich die drei amtlichen Anwendungsbeispiele der Anleitung (S. 5-12) im
+   Staging-Backend durch die echte Strecke (calculateKpa, LibreOffice). */
+function xlsxLesen(datei) {
+  const zlib = createRequire(import.meta.url)('node:zlib');
+  const b = fs.readFileSync(datei);
+  let eocd = b.length - 22; while (eocd > 0 && b.readUInt32LE(eocd) !== 0x06054b50) eocd--;
+  const n = b.readUInt16LE(eocd + 10); let p = b.readUInt32LE(eocd + 16); const teile = {};
+  for (let k = 0; k < n; k++) {
+    const meth = b.readUInt16LE(p + 10), csz = b.readUInt32LE(p + 20), fnl = b.readUInt16LE(p + 28),
+      exl = b.readUInt16LE(p + 30), cml = b.readUInt16LE(p + 32), off = b.readUInt32LE(p + 42);
+    const name = b.slice(p + 46, p + 46 + fnl).toString('utf8');
+    const lfn = b.readUInt16LE(off + 26), lex = b.readUInt16LE(off + 28);
+    const roh = b.slice(off + 30 + lfn + lex, off + 30 + lfn + lex + csz);
+    teile[name] = (meth === 8 ? zlib.inflateRawSync(roh) : roh).toString('utf8');
+    p += 46 + fnl + exl + cml;
+  }
+  const dec = (s) => s.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&apos;/g, "'").replace(/&amp;/g, '&');
+  const ss = [...(teile['xl/sharedStrings.xml'] || '').matchAll(/<si>([\s\S]*?)<\/si>/g)]
+    .map((m) => dec([...m[1].matchAll(/<t[^>]*>([\s\S]*?)<\/t>/g)].map((t) => t[1]).join('')));
+  const rels = {};
+  for (const m of (teile['xl/_rels/workbook.xml.rels'] || '').matchAll(/<Relationship ([^>]*)\/?>/g)) {
+    const id = (m[1].match(/Id="([^"]+)"/) || [])[1], t = (m[1].match(/Target="([^"]+)"/) || [])[1];
+    if (id) rels[id] = t;
+  }
+  const blaetter = {};
+  for (const m of teile['xl/workbook.xml'].matchAll(/<sheet [^>]*?name="([^"]+)"[^>]*?r:id="([^"]+)"/g)) {
+    const x = teile['xl/' + rels[m[2]].replace(/^\/?xl\//, '')] || ''; const z = {};
+    for (const c of x.matchAll(/<c r="([A-Z]+\d+)"([^>]*?)(?:\/>|>([\s\S]*?)<\/c>)/g)) {
+      const t = (c[2].match(/t="([^"]+)"/) || [])[1], inner = c[3] || '';
+      const f = (inner.match(/<f[^>]*>([\s\S]*?)<\/f>/) || [])[1];
+      let v = (inner.match(/<v>([\s\S]*?)<\/v>/) || [])[1];
+      if (v != null) v = (t === 's') ? ss[+v] : (t === 'str' || t === 'e' || isNaN(+v)) ? dec(v) : +v;
+      z[c[1]] = { v, f: f != null ? dec(f) : null };
+    }
+    blaetter[dec(m[1])] = z;
+  }
+  return blaetter;
+}
+{
+  const require_ = createRequire(import.meta.url);
+  const quelle = fs.readFileSync(path.join(ROOT, 'backend/src/services/bmfService.js'), 'utf8');
+  const vorlage = (quelle.match(/templates', '([^']+\.xlsx)'/) || [])[1];
+  ok(vorlage === 'BMF_Arbeitshilfe_2026-03.xlsx', 'H bmfService rechnet mit der Vorlage Stand Maerz 2026 (' + vorlage + ')');
+  const datei = path.join(ROOT, 'backend/templates', vorlage || '-');
+  const hash = fs.existsSync(datei) ? require_('node:crypto').createHash('sha256').update(fs.readFileSync(datei)).digest('hex') : null;
+  /* SHA-256 der am 15.11.2026 geladenen BMF-Datei (…-Arbeitshilfe-Berechnung.xlsx?__blob=publicationFile&v=9) */
+  ok(hash === '2a0f2b8be17cb605ca9e1d2e8fea072904b5a19d3692e8c23f2716ca1055ccd8', 'H Vorlage ist die BMF-Datei vom 16.03.2026, unveraendert');
+  ok(/TEMPLATE_VERSION = 'Stand März 2026'/.test(quelle), 'H Fassungsangabe der Antwort: Stand Maerz 2026');
+  if (hash) {
+    const X = xlsxLesen(datei);
+    const kpa = X['KPA'], bi = X['SW-Bau-Index'], nhk = X['SW-NHK'];
+    ok(kpa && kpa.K2 && kpa.K2.v === '30.09.2027', 'H Verfalldatum der Vorlage KPA!K2 = 30.09.2027 (' + (kpa && kpa.K2 && kpa.K2.v) + ')');
+    /* Baupreisindex Wohngebaeude, 2010 = 100 (Anleitung S. 11: „Index fuer Wohngebaeude 2025: 189,1") */
+    const idx = {};
+    for (const [ref, c] of Object.entries(bi)) {
+      const m = ref.match(/^A(\d+)$/);
+      if (m && typeof c.v === 'number') { const f = bi['F' + m[1]]; idx[c.v] = f && f.v; }
+    }
+    ok(idx[2022] === 164 && idx[2023] === 177.9 && idx[2024] === 183.3 && idx[2025] === 189.1 && idx[2026] === 189.1,
+      'H Baupreisindex 2022/2023/2024/2025/2026 = 164 / 177,9 / 183,3 / 189,1 / 189,1 (' + [2022, 2023, 2024, 2025, 2026].map((j) => idx[j]).join(' / ') + ')');
+    ok(nhk && nhk.F82 && /'Fiktives Baujahr'!D18/.test(nhk.F82.f || ''), 'H RND der Vorlage beruecksichtigt eine nachgewiesene RND (SW-NHK!F82 liest Fiktives Baujahr!D18)');
+    /* die Map gegen die Beschriftung der Zeile - eine verrutschte Zeile schreibt in ein fremdes Feld */
+    const map = {};
+    for (const m of quelle.matchAll(/^\s+(\w+):\s+\{ sheet: '([^']+)', cell: '([A-Z]+)(\d+)'/gm)) map[m[1]] = { blatt: m[2], sp: m[3], z: +m[4] };
+    const lbl = (b, z, sp) => { const c = (X[b] || {})[(sp || 'C') + z] || {}; return String(c.v || c.f || ''); };   /* Formelbeschriftung (KPA!D11) zaehlt mit */
+    const soll = { mod_dach: /Dacherneuerung/, mod_fenster: /Fenster/, mod_leitungen: /Leitungssysteme/, mod_heizung: /Heizungsanlage/,
+      mod_waermedaemmung: /Wärmedämmung der Außenwände/, mod_baeder: /Bädern/, mod_innenausbau: /Innenausbaus/, mod_grundriss: /Grundrissgestaltung/,
+      rnd_gutachten_vorhanden: /Gutachten/, rnd_gutachten_jahre: /Restnutzungsdauer \(RND\) gemäß des Gutachtens/,
+      fiktives_baujahr: /^Fiktives Baujahr/, modernisierungsgrad: /^Modernisierungsgrad/ };
+    const falsch = Object.keys(soll).filter((k) => !map[k] || map[k].blatt !== 'Fiktives Baujahr' || !soll[k].test(lbl('Fiktives Baujahr', map[k].z)));
+    ok(falsch.length === 0, 'H Zellen auf „Fiktives Baujahr" passen zur Beschriftung der Zeile (Modernisierung D22-D29, RND D16/D17, Ausgabe D52/D54)' + (falsch.length ? ': ' + falsch.join(', ') : ''));
+    const kpaSoll = { bodenwert: [59, /^Bodenwert/], sachwert_vorlaeufig: [72, /vorläufiger Sachwert/], ertragswert: [101, /vorläufiger Ertragswert/],
+      vergleichswert: [112, /Vergleichswert/], gebaeudeanteil_prozent: [116, /Wertanteil/], kaufpreisanteil_grund: [120, /Grund und Boden/],
+      kaufpreisanteil_gebaeude: [121, /baulichen Anlagen/] };
+    const kf = Object.keys(kpaSoll).filter((k) => !map[k] || map[k].z !== kpaSoll[k][0] || !kpaSoll[k][1].test(lbl('KPA', map[k].z, 'D')));
+    ok(kf.length === 0, 'H Ergebniszellen auf KPA passen zur Beschriftung' + (kf.length ? ': ' + kf.join(', ') : ''));
+    const eing = { kaufdatum: ['G9', 9, /Datum des Kaufvertrages/], baujahr: ['G11', 11, /Baujahr/], grundstuecksgroesse: ['G17', 17, /Grundstücksgröße/],
+      miete_monatlich: ['G40', 40, /Nettokaltmiete/], regionalfaktor: ['G47', 47, /Regionalfaktor/] };
+    const ef = Object.keys(eing).filter((k) => !map[k] || (map[k].sp + map[k].z) !== eing[k][0] || !eing[k][2].test(lbl('KPA', eing[k][1], 'D')));
+    ok(ef.length === 0, 'H Eingabezellen auf KPA passen zur Beschriftung' + (ef.length ? ': ' + ef.join(', ') : ''));
+    ok(!/BMF_Vorlage_Juni2023/.test(quelle), 'H keine Restverdrahtung auf die Fassung Juni 2023');
+  }
+  const reste = ['bmf-bodenabschlag.js', 'bmf-modal.js', 'bmf-modal-html.html', 'bmf-wahl.js', 'deal-action-boarding.js', 'help.js', 'pdf-anlage-bmf.js']
+    .filter((f) => /Juni 2023/.test(js(f)));
+  ok(reste.length === 0, 'H Kundentexte nennen nicht mehr die Fassung Juni 2023' + (reste.length ? ': ' + reste.join(', ') : ''));
+}
+
+/* ── I · v3401 IRR des privaten Exits mit § 23 EStG ─────────────────────
+   Verkauf rechnerisch am 31.12. des Jahres Basisjahr + btj − 1. Frist zehn Jahre ab Kaufvertrag
+   (§ 23 Abs. 1 Satz 1 Nr. 1 EStG), Gewinn = Preis − (AK − AfA) (§ 23 Abs. 3 Satz 4), Freigrenze
+   1.000 € (§ 23 Abs. 3 Satz 5). Dieselben Kernfunktionen, die calc.js aufruft. */
+{
+  const ctx = {}; ctx.window = ctx; vm.createContext(ctx);
+  vm.runInContext(js('ueberfuehrung-kern.js'), ctx);
+  const K = ctx.DealPilotUeberfuehrungKern;
+  const p23 = (kauf, btj, preis, ak, afa) => K.paragraph23({ kaufdat: kauf, stichtag: (2026 + btj - 1) + '-12-31', art: 'kauf',
+    kaufpreis: preis, verkehrswert: preis, akPrivat: ak, afaBisher: afa, werbungskosten: 0 });
+  const a = p23('2026-06-01', 10, 380000, 330000, 60000);
+  ok(a.frist.art === 'steuerpflichtig' && a.gewinn === 110000 && a.steuerpflichtig, 'I Kauf 01.06.2026, btj 10: Verkauf 31.12.2035 in der Frist, Gewinn 380.000 − (330.000 − 60.000) = 110.000 (' + a.gewinn + ')');
+  ok(p23('2026-06-01', 11, 380000, 330000, 66000).steuerfrei === true, 'I btj 11: Verkauf 31.12.2036 nach Fristende 01.06.2036 steuerfrei');
+  ok(p23('2026-01-01', 10, 380000, 330000, 60000).frist.art === 'steuerpflichtig', 'I ohne Kaufdatum (01.01. des Basisjahres): btj 10 steuerpflichtig, die Frist endet erst am 01.01.2036');
+  ok(p23('2026-03-01', 5, 300500, 330000, 30000).unterFreigrenze === true, 'I Gewinn 500 € unter der Freigrenze 1.000 € bleibt steuerfrei');
+  const T = lade().Tax;
+  const st = K.steuer23(110000, { steuerLast: (z) => T.steuerLast(z, 2035).gesamt, zve: 60000, grenzPct: 42 });
+  const soll = T.steuerLast(170000, 2035).gesamt - T.steuerLast(60000, 2035).gesamt;
+  ok(nah(st.betrag, Math.round(soll * 100) / 100, 0.01), 'I Steuer auf den Gewinn = Last mit und ohne Gewinn beim zvE (' + st.betrag + ')');
+  const calc = js('calc.js');
+  ok(/_gesK\.paragraph23\(/.test(calc) && /_exitErloes -= _st23\.betrag/.test(calc) && /if \(!_mandParams && _gesK/.test(calc),
+    'I calc.js zieht die § 23-Steuer im privaten Exit vom Erloes ab (nur ohne Gesellschaft, die rechnet KSt)');
+  ok(!/10 Jahre = Spekulationsfrist nach § 23 EStG \(steuerfreier Verkauf möglich\)/.test(js('tooltip-content.js')), 'I Hilfetext Betrachtungszeitraum: 10 Jahre heisst nicht mehr „steuerfrei"');
+}
+
+/* ── J · v3402 RND-Gutachten: Vorteil als Barwert der AfA-Verschiebung ──
+   Beispiel des Audits (Abschnitt 7): Gebaeude 300.000 €, RND 25, Standard 2 %, 42 %, 3 % Abzins.
+   Die AfA-Summe bleibt die AHK, der Vorteil ist nur der Zinseffekt bis zum Verkauf. */
+{
+  const ctx = { console: { log() {}, warn() {} }, Math, JSON, Number, String, Object, Array, Date, isFinite, parseFloat, parseInt };
+  ctx.window = ctx; ctx.self = ctx; vm.createContext(ctx);
+  vm.runInContext(js('rnd-calc.js'), ctx);
+  const R = ctx.DealPilotRND;
+  const b = { gebaeudeanteil: 300000, rnd: 25, grenzsteuersatz: 0.42, standardAfaSatz: 0.02, gutachterkosten: 999, abzinsung: 0.03 };
+  const v = (x) => R.calcAfaVergleich(Object.assign({}, b, x));
+  const dauer = v({}), frei10 = v({ haltedauer: 10, verkaufSteuerpflichtig: false }), pfl10 = v({ haltedauer: 10 });
+  ok(nah(dauer.steuerersparnis_barwert, 22923.26, 0.01) && dauer.haltedauer === 50, 'J Halten auf Dauer: Barwert der Verschiebung 22.923,26 € (' + dauer.steuerersparnis_barwert + ', bis v3401 ' + dauer.barwert_rente_rnd_alt + ')');
+  ok(nah(frei10.steuerersparnis_barwert, 21496.11, 0.01), 'J steuerfreier Verkauf nach 10 Jahren: 21.496,11 € (' + frei10.steuerersparnis_barwert + ')');
+  ok(pfl10.verkauf_steuerpflichtig && pfl10.steuerersparnis_barwert < frei10.steuerersparnis_barwert && pfl10.rueckholung_23 > 0,
+    'J Verkauf in der Frist: die Mehr-AfA kommt als § 23-Gewinn zurueck (' + pfl10.steuerersparnis_barwert + ', Rueckholung ' + pfl10.rueckholung_23 + ')');
+  const ohneZins = v({ abzinsung: 1e-9 });
+  ok(Math.abs(ohneZins.steuerersparnis_barwert) < 1, 'J ohne Zins kein Vorteil bei Halten auf Dauer (AfA-Summe gleich): ' + ohneZins.steuerersparnis_barwert);
+  ok(dauer.steuerersparnis_jahr === 2520, 'J Steuerersparnis im ersten Jahr unveraendert (6.000 × 42 % = 2.520)');
+  const spiegel = fs.readFileSync(path.join(ROOT, 'backend/src/generated/rechenkerne/rnd-calc.js'), 'utf8').replace(/\r\n/g, '\n');
+  ok(spiegel === js('rnd-calc.js').replace(/\r\n/g, '\n'), 'J Backend-Spiegel rnd-calc.js gleich dem Frontend (rechenkerne-spiegeln)');
+}
+
+/* ── H live · Anwendungsbeispiele der Anleitung durch die echte Strecke ── */
+if (process.argv.includes('--live')) {
+  const { execFileSync } = createRequire(import.meta.url)('node:child_process');
+  const FAELLE = [
+    /* Anleitung Anhang I, S. 5-6 (Vergleichswert) */
+    ['I Vergleichswert', { lage: 'Musterstr. 1', grundstuecksart: 'Wohnungseigentum [WE]', kaufdatum: '2025-02-01', kaufpreis: 220000, baujahr: 2000,
+      wohnflaeche: 90, mea_zaehler: 1, mea_nenner: 8, grundstuecksgroesse: 1200, bodenrichtwert: 550, vergleichsfaktor_vorhanden: 'Ja',
+      bezugsmassstab: 'Wohn- bzw. Nutzfläche', vergleichsfaktor: 2450, miete_bekannt: 'Nein' }, 62.59, 82302, 137698, 0],
+    /* Anhang II, S. 6-9 (Ertragswert) */
+    ['II Ertragswert', { lage: 'Musterstr. 1', grundstuecksart: 'Mietwohngrundstücke (Mehrfamilienhäuser)', kaufdatum: '2025-02-01', kaufpreis: 1100000,
+      baujahr: 1981, wohnflaeche: 800, grundstuecksgroesse: 1000, bodenrichtwert: 380, vergleichsfaktor_vorhanden: 'Nein', miete_bekannt: 'Ja',
+      miete_monatlich: 5000, wohneinheiten: 9 }, 62.4, 413600, 686400, 0],
+    /* Anhang III, S. 9-12 (Sachwert). Excel rundet 835 × 2,3 = 1.920,5 auf 1.921, LibreOffice den
+       Gleitkommawert 1.920,4999… auf 1.920 - daher 75,51 statt 75,52 % und 55 € Versatz. */
+    ['III Sachwert', { lage: 'Musterstr. 1', grundstuecksart: '[EFH] freistehend, KG, EG, DG voll ausgebaut', kaufdatum: '2025-05-02', kaufpreis: 550000,
+      baujahr: 2002, wohnflaeche: 140, grundstuecksgroesse: 500, bodenrichtwert: 250, grundstuecksgroesse2: 200, bodenrichtwert2: 63,
+      vergleichsfaktor_vorhanden: 'Nein', miete_bekannt: 'Nein', regionalfaktor: 1, sachwertfaktor: 1.1 }, 75.52, 134640, 415360, 0.011],
+  ];
+  const skript = "const s=require('/app/src/services/bmfService.js');(async()=>{const F=" + JSON.stringify(FAELLE.map((f) => f[1]))
+    + ";const o=[];for(const e of F){const r=await s.calculateKpa(e,{includeFile:false});const g=(k)=>r.results&&r.results[k]&&r.results[k].value;"
+    + "o.push({p:g('gebaeudeanteil_prozent'),b:g('kaufpreisanteil_grund'),h:g('kaufpreisanteil_gebaeude'),v:r.meta&&r.meta.template_version})}console.log(JSON.stringify(o))})()";
+  let roh = null;
+  try {
+    roh = execFileSync('ssh', ['-o', 'BatchMode=yes', 'root@116.203.214.11', 'docker exec -i dealpilot-backend node -'], { input: skript, encoding: 'utf8', timeout: 240000 });
+  } catch (e) { ok(false, 'H live: Staging-Backend nicht erreichbar (' + e.message.split('\n')[0] + ')'); }
+  if (roh) {
+    const erg = JSON.parse(roh.trim().split('\n').pop());
+    FAELLE.forEach((f, k) => {
+      const r = erg[k] || {};
+      ok(r.v === 'Stand März 2026' && nah(r.p, f[2], f[5] + 1e-9) && Math.abs(r.b - f[3]) <= (f[5] ? 60 : 0.5) && Math.abs(r.h - f[4]) <= (f[5] ? 60 : 0.5),
+        'H live Anleitung ' + f[0] + ': Gebaeudeanteil ' + r.p + ' % (Soll ' + f[2] + '), Grund ' + r.b + ' (Soll ' + f[3] + '), Gebaeude ' + r.h + ' (Soll ' + f[4] + '), ' + r.v);
+    });
+  }
 }
 
 console.log('steuer-audit-pruefen: ' + gruen + ' gruen, ' + rot + ' rot');

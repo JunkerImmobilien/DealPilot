@@ -596,7 +596,7 @@ async function runPipeline(rawInputs) {
     meta: {
       calculated_at: new Date().toISOString(),
       engine_version: ENGINE_VERSION,
-      bmf_template_version: 'Juni 2023'
+      bmf_template_version: bmfService.TEMPLATE_VERSION   /* v3400 */
     }
   };
 }

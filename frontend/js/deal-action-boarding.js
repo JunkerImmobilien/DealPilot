@@ -128,7 +128,7 @@
       '<div id="dab-st-fehlt" class="dab-st-fehlt" style="display:none"></div>' +
       kachel('kpa', IC_BLATT, 'Kaufpreisaufteilung', 'Herleitung und Aufteilung für Finanzamt und Berater.', 'PDF abrufen', { attr: ' data-steuer="kpa"' }) +
       kachel('bmf_ah', IC_BLATT, 'BMF-Arbeitshilfe', 'Das amtliche Formular, mit den Objektwerten ausgefüllt.', 'PDF abrufen', { attr: ' data-steuer="bmf_ah"' }) +
-      kachel('bmf_xlsx', IC_BLATT, 'BMF-Original', 'Die Arbeitshilfe (Juni 2023) als Excel-Datei.', 'XLSX laden', { attr: ' data-steuer="bmf_xlsx"' });
+      kachel('bmf_xlsx', IC_BLATT, 'BMF-Original', 'Die Arbeitshilfe (Stand März 2026) als Excel-Datei.', 'XLSX laden', { attr: ' data-steuer="bmf_xlsx"' });
 
     return '' +
       '<div class="dab-cockpit" id="dab-cockpit">' +

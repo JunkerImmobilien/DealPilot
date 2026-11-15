@@ -276,7 +276,7 @@
     var K = [
       ['kpa', 'Kaufpreisaufteilung', 'PDF', 'Herleitung, gewählte Aufteilung und Vertragstext – Anlage für Finanzamt und Berater'],
       ['ah', 'BMF-Arbeitshilfe', 'PDF', 'Das amtliche Formular, mit den Werten dieses Objekts ausgefüllt'],
-      ['xlsx', 'BMF-Original', 'XLSX', 'Die Arbeitshilfe (Fassung Juni 2023) als Excel-Datei'],
+      ['xlsx', 'BMF-Original', 'XLSX', 'Die Arbeitshilfe (Stand März 2026) als Excel-Datei'],
       ['berater', 'Text für den Berater', 'Kopieren', 'Kurzfassung mit Zahlen und Begründung für den Steuerberater'],
       ['vertrag', 'Text für den Kaufvertrag', 'Kopieren', 'Der Satz für die Urkunde – Grund und Boden, Gebäude, Inventar'],
       /* v3188 · Marcel: „wenn wir hinten bei der Übersicht … eine Anfrage machen … Gutachten“ - geht mit Objekt,
@@ -340,7 +340,7 @@
       'der Rechtsprechung des Bundesfinanzhofs (BFH, Urteil vom 21.07.2020, IX R 26/19).';
     /* Begründung je Auswahl - die Punkte werden fortlaufend nummeriert */
     var P = [];
-    P.push('Verfahren. Die Aufteilung folgt der Arbeitshilfe des Bundesfinanzministeriums (Fassung Juni 2023). ' +
+    P.push('Verfahren. Die Aufteilung folgt der Arbeitshilfe des Bundesfinanzministeriums (Stand März 2026). ' +
       'Maßgeblich ist das ' + (verfahren || 'dort vorgesehene Verfahren') + ', weil es der Grundstücksart entspricht. ' +
       'Der Bodenwert ergibt sich aus Grundstücksfläche und amtlichem Bodenrichtwert, der Gebäudeanteil als ' +
       'Differenz zum maßgebenden Verkehrswert' +
@@ -780,7 +780,7 @@
   'use strict';
 
   var VARIANTEN = [
-    { id: 'amtlich',     name: 'Amtlich (BMF-Arbeitshilfe)', kurz: 'Amtlich',     unter: 'Arbeitshilfe des BMF, Stand Juni 2023', nachweis: 'keiner nötig' },
+    { id: 'amtlich',     name: 'Amtlich (BMF-Arbeitshilfe)', kurz: 'Amtlich',     unter: 'Arbeitshilfe des BMF, Stand März 2026', nachweis: 'keiner nötig' },
     { id: 'konservativ', name: 'Konservativ',  kurz: 'Konservativ', unter: '15 % Abschlag auf den Bodenwert', nachweis: 'kurze Begründung' },
     { id: 'optimiert',   name: 'Optimiert',    kurz: 'Optimiert',   unter: '20 % Abschlag auf den Bodenwert', nachweis: 'Begründung + Belege' },
     { id: 'jacoby',      name: 'Umgekehrte Ertragswertmethode', kurz: 'Jacoby', unter: 'nach Jacoby, aus dem Ertragswert – nur bei vermieteten Objekten', nachweis: 'Herleitung + Begründung' }
@@ -829,7 +829,7 @@
         z.geb = pv.gebaeude_pct;
         z.gebAk = p8[v.id] ? p8[v.id].gebaeude_ak : null;
         if (v.id === 'amtlich' && r.phase4_bmf && r.phase4_bmf.verfahren) {
-          z.unter = 'Arbeitshilfe des BMF, Stand Juni 2023 · ' + ({ ertragswert: 'Ertragswert', sachwert: 'Sachwert', vergleichswert: 'Vergleichswert' }[r.phase4_bmf.verfahren] || r.phase4_bmf.verfahren);
+          z.unter = 'Arbeitshilfe des BMF, Stand März 2026 · ' + ({ ertragswert: 'Ertragswert', sachwert: 'Sachwert', vergleichswert: 'Vergleichswert' }[r.phase4_bmf.verfahren] || r.phase4_bmf.verfahren);
         }
       } else {
         var j = r.phase4_bmf && r.phase4_bmf.jacoby;
