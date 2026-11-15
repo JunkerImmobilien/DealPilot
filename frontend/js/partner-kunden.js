@@ -140,6 +140,7 @@
       'html[data-pk-offen] nav.tabs > :not(#dppk-tabzeile){display:none !important}',
       /* v3450 · Marcel 15.11.: „Im Partner-Cockpit steht immer die Pille Ist · heute | Soll · Ankauf-Stand …“ - alles, was zum
          geladenen Objekt gehoert, steht hinter dem Cockpit nicht (nach „← Objekte“ wieder da, die Regel haengt nur am Attribut) */
+      'html[data-pk-offen] .main-col .body > .sec{display:none !important}',   /* v3452 · ein Objekt, das im Hintergrund laedt, stellt .sec wieder auf display:'' */
       'html[data-pk-offen] #ank-ansicht-host,html[data-pk-offen] #dppk-ks,html[data-pk-offen] #dppk-anm-liste,html[data-pk-offen] #dppk-anm-layer{display:none !important}',
       /* gemessen 15.11. bei offenem Cockpit (1280 px, Objekt mit Ankauf-Stand): im Kopf standen weiter Objektnummer, Anschrift,
          „Gespeichert …“, „Ziel 8 %“ und „21 / 24 Felder“ des zuletzt geladenen Objekts. Das Kontingent bleibt, es gehoert zum Konto. */
@@ -384,7 +385,7 @@
   }
   var NUR_FENSTER = ['partner-cockpit', 'mein-partner', 'settings', 'help', 'feedback', 'hub-import', 'hub-export', 'pdf', 'csv', 'export-csv', 'import-excel', 'import-json', 'export-json'];   /* wie ui.js sbActionsAction _nurFenster */
   if (window.DealPilotAnsichten) window.DealPilotAnsichten.melde('partner', cockpitSchliessen);
-  window.addEventListener('dp:object-ready', function () { if (PK.offen) zurueckZuObjekten(); });
+  window.addEventListener('dp:object-ready', function () { if (PK.offen && !PK.hintergrund) zurueckZuObjekten(); });
   document.addEventListener('click', function (e) {
     if (!PK.offen) return;
     var t = e.target && e.target.closest ? e.target.closest('.sb-card, .sb-act-item') : null;
@@ -1000,11 +1001,16 @@
     var reiter = PK.herkunft && TITEL[PK.herkunft] ? PK.herkunft : 'staende';
     if (reiter === 'staende' && ks && ks.client_id) PK.filter = ks.client_id;
     try { if (window.DpAnmerkungen) DpAnmerkungen.ende(); } catch (e) {}
-    var weiter = function () { cockpitOeffnen(reiter); };
+    /* v3452 · gemessen 15.11.: wer erst lud und dann das Cockpit oeffnete, wartete bis zu 8 s (loadSaved sichert
+       vorher) und bekam das Cockpit danach von dp:object-ready wieder zugeklappt. Jetzt: Cockpit sofort, das eigene
+       Objekt laedt dahinter; solange gilt dp:object-ready nicht als Wechsel ins Objekt. */
     var ziel = PK.letztesEigenes;
+    cockpitOeffnen(reiter);
     if (ziel && ziel !== window._currentObjKey && typeof window.loadSaved === 'function') {
-      Promise.resolve(window.loadSaved(ziel)).then(function () { setTimeout(weiter, 700); }, weiter);
-    } else weiter();
+      PK.hintergrund = true;
+      var frei = function () { setTimeout(function () { PK.hintergrund = false; }, 2500); };
+      Promise.resolve(window.loadSaved(ziel)).then(frei, frei);
+    }
   }
   function speichernSperren() {
     if (typeof window.saveObj !== 'function' || window.saveObj._dppk) return false;

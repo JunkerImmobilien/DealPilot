@@ -94,6 +94,12 @@
     return teile.join(' > ');
   }
   function beschriftung(el) {
+    /* v3452 · Kachel/Abschnitt: die eigene Ueberschrift, nicht die id (gemessen: „dpfk-band“) */
+    if (!/^(INPUT|SELECT|TEXTAREA)$/.test(el.tagName)) {
+      var u = el.querySelector('h1, h2, h3, h4, legend, .title, .card-title, .kpi-label, strong, b');
+      var ut = u && (u.textContent || '').trim().replace(/\s+/g, ' ');
+      if (ut) return ut.slice(0, 120);
+    }
     if (el.id) { var l = document.querySelector('label[for="' + cssEsc(el.id) + '"]'); if (l && l.textContent.trim()) return l.textContent.trim().replace(/\s+/g, ' ').slice(0, 120); }
     var c = el.closest('label, .field, .form-group, .fg, .inp-row, .row, .kpi, .card, fieldset, section');
     if (c) {
@@ -108,7 +114,7 @@
     if (el.tagName === 'SELECT') { var o = el.options[el.selectedIndex]; return o ? o.text : el.value; }
     if (el.type === 'checkbox' || el.type === 'radio') return el.checked ? 'ja' : 'nein';
     if ('value' in el && /INPUT|TEXTAREA/.test(el.tagName)) return el.value;
-    return (el.innerText || '').trim().replace(/\s+/g, ' ').slice(0, 160);
+    return (el.innerText || '').trim().replace(/\s+/g, ' ').slice(0, 80);
   }
   function reiterVon(sec) {
     if (!sec) return '';
