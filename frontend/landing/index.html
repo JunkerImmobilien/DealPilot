@@ -63,7 +63,7 @@ if (location.hash === '#forschung') location.replace('forschung.html');</script>
 <link rel="stylesheet" href="dp2-live.css?v=landing-makler-hub-3">
 <link rel="stylesheet" href="dp2-module.css?v=landing-module-2">
 <link rel="stylesheet" href="dp2-kern.css?v=landing-kern-2c">
-<link rel="stylesheet" href="dp2-dealcheck.css?v=landing-dealcheck-9">
+<link rel="stylesheet" href="dp2-dealcheck.css?v=landing-seo-3">
 <link rel="stylesheet" href="seo.css?v=landing-seo-1">
 </head><body>
 
@@ -355,45 +355,7 @@ if (location.hash === '#forschung') location.replace('forschung.html');</script>
     <h2>Rechnet sich das? <span class="ac">Dreh die Karte um.</span></h2>
     <p>Zwei Zahlen, eine Zinsbindung – DealPilot rechnet mit denselben Kernen wie in der App und sagt dir sofort, wo der Deal steht.</p>
     <ul class="dk-pkt"><li>Echter Deal Score, keine Schätzformel</li><li>Zins tagesaktuell je Zinsbindung</li><li>Mit PLZ: Lage &amp; Markt aus amtlichen Daten</li></ul></div>
-  <div class="dk-szene rv"><div class="dk-karte" id="dkKarte">
-    <form class="dk-seite dk-vorn" id="dkVorn" onsubmit="return false" autocomplete="off" aria-label="Deal-Check Eingaben">
-      <div class="dk-kopf"><span class="dk-marke">Deal-Check</span><span class="dk-nr">Boarding · Vorab</span></div>
-      <label class="dk-f"><span>Kaufpreis</span><input id="dcKp" inputmode="decimal" value="150.000" aria-label="Kaufpreis in Euro"><i>€</i></label>
-      <label class="dk-f"><span>Kaltmiete im Monat</span><input id="dcNkm" inputmode="decimal" value="950" aria-label="Nettokaltmiete im Monat in Euro"><i>€</i></label>
-      <fieldset class="dk-bind"><legend>Zinsbindung</legend>
-        <div class="dk-chips" id="dkChips" role="radiogroup" aria-label="Zinsbindung">
-          <button type="button" role="radio" aria-checked="false" data-b="5"><b>5 J</b><small>–</small></button>
-          <button type="button" role="radio" aria-checked="true" class="an" data-b="10"><b>10 J</b><small>–</small></button>
-          <button type="button" role="radio" aria-checked="false" data-b="15"><b>15 J</b><small>–</small></button>
-          <button type="button" role="radio" aria-checked="false" data-b="20"><b>20 J</b><small>–</small></button>
-        </div>
-        <label class="dk-f dk-zins-eigen" id="dkZinsEigen" hidden><span>Zins selbst eintragen</span><input id="dcZins" inputmode="decimal" placeholder="z. B. 4,1" aria-label="Sollzins in Prozent"><i>%</i></label>
-        <small class="dk-stand" id="dkStand">Zins wird geladen …</small>
-      </fieldset>
-      <label class="dk-f dk-plz"><span>PLZ <em>optional · Lage &amp; Markt</em></span><input id="dcPlz" inputmode="numeric" maxlength="5" placeholder="z. B. 32049" aria-label="Postleitzahl, optional"></label>
-      <div class="dk-zwei" id="dkObj"><label class="dk-f"><span>Baujahr <em>optional</em></span><input id="dcBj" inputmode="numeric" maxlength="4" placeholder="z. B. 1975" aria-label="Baujahr, optional"></label>
-        <label class="dk-f"><span>Wohnfläche <em>optional</em></span><input id="dcWfl" inputmode="decimal" maxlength="5" placeholder="z. B. 70" aria-label="Wohnfläche in Quadratmetern, optional"><i>m²</i></label></div>
-      <button type="submit" class="btn-p dk-los" id="dkDreh">Deal prüfen <span aria-hidden="true">↻</span></button>
-    </form>
-    <div class="dk-seite dk-hinten" id="dcErg" aria-live="polite" aria-hidden="true">
-      <div class="dk-kopf"><span class="dk-marke">Deal Score</span><button type="button" class="dk-zur" id="dkZur">↺ Eingaben ändern</button></div>
-      <div class="dk-score">
-        <div class="dk-ring" id="dcRing"><svg viewBox="0 0 120 120" aria-hidden="true"><circle class="dk-ring-bg" cx="60" cy="60" r="52"/><circle class="dk-ring-v" id="dkRingV" cx="60" cy="60" r="52"/></svg>
-          <div class="dk-ring-z"><b id="dcScore">0</b><small>/ 100</small></div></div>
-        <div class="dk-stufe-box"><div class="dk-stufe" id="dcStufe">–</div>
-          <div class="dk-skala" aria-hidden="true"><i id="dkBalken"></i><s style="left:35%"></s><s style="left:50%"></s><s style="left:70%"></s><s style="left:85%"></s></div>
-          <div class="dk-skala-w" aria-hidden="true"><span>Kritisch</span><span>Solide</span><span>Sehr gut</span></div></div>
-      </div>
-      <div class="dk-kpi">
-        <div id="dcCfK" class="dk-cf"><span>Cashflow / Monat</span><b id="dcCf">–</b></div>
-        <div><span>Bruttorendite</span><b id="dcBmy">–</b></div>
-        <div><span>DSCR</span><b id="dcDscr">–</b></div>
-      </div>
-      <div class="dk-lage" id="dkLage" hidden><div class="dk-lage-k"><span id="dkLageTitel">Lage &amp; Markt</span><a id="dkLageMehr" href="https://app.dealpilot.immo/?register=1">mehr in der App →</a></div><div class="dk-lage-g" id="dkLageG"></div><small id="dkLageQ"></small></div>
-      <a class="btn-p dk-weiter" id="dcLos" href="https://app.dealpilot.immo/?register=1">In DealPilot weiterrechnen →</a>
-      <p class="dk-annahme" id="dcAnnahme"></p>
-    </div>
-  </div></div>
+  <div class="dk-szene rv"><div class="dk-karte" id="dkKarte"><!-- landing-seo-3 · Inhalt baut dp2-dealcheck.js (eine Komponente für Startseite und Rechner-Seiten) --></div></div>
 </div></section>
 
 <!-- ══ DEALPILOT LIVE ════════════════════════════════════════════════
@@ -677,11 +639,7 @@ if (location.hash === '#forschung') location.replace('forschung.html');</script>
 <!-- landing-kern-2 · Deal-Check: die ECHTEN Kerne aus der App, gleiche Buster wie frontend/index.html
      (tools/buster-ebenen-pruefen.mjs liest die Zeilen unten). Die App-Domain folgt umgebung.js:
      staging.dealpilot.immo -> app.staging.dealpilot.immo, sonst app.dealpilot.immo. -->
-<script>(function () {
-  var h = location.hostname, app = /(^|\.)staging\.dealpilot\.immo$/.test(h) ? 'https://app.staging.dealpilot.immo/' : 'https://app.dealpilot.immo/';
-  ['js/dscr-engine.js?v=v3031b', 'js/deal-kpis.js?v=v3215', 'js/score-tiers.js?v=v3254', 'js/dealscore.js?v=v3289', 'dp2-dealcheck.js?v=landing-dealcheck-11']
-    .forEach(function (s) { var e = document.createElement('script'); e.src = (s.indexOf('js/') === 0 ? app : '') + s; e.async = false; document.body.appendChild(e); });
-})();</script>
+<script src="dealcheck-laden.js?v=landing-seo-3"></script><!-- landing-seo-3 · Kerne + Deal-Check, Buster dort (buster-ebenen-pruefen liest die Datei) -->
 <script src="dp2-live.js?v=landing-videothek-10"></script><!-- landing-videothek-1 -->
 <!-- v1588: Zwei Funktionen, die der alten Landing schon gehoerten und
      hier gefehlt haben. Beide betreffen Geld, deshalb standen sie ganz

@@ -12,7 +12,8 @@
 <link rel="stylesheet" href="dp2.css?v=v2971b">
 <link rel="stylesheet" href="dp2-teile.css?v=v2973">
 <link rel="stylesheet" href="dp2-kern.css?v=landing-kern-2c">
-<link rel="stylesheet" href="seo.css?v=landing-seo-2">
+<link rel="stylesheet" href="dp2-dealcheck.css?v=landing-seo-3">
+<link rel="stylesheet" href="seo.css?v=landing-seo-3">
 <style>
 /* Methodik-Seite: Bausteine wie sicherheit.html (Kopf .sk, Abschnitte .kz,
    Tabellen .tab-d, Hinweis), dazu Inhaltsverzeichnis und Fliesstext.
@@ -197,34 +198,21 @@ section[id]{scroll-margin-top:70px}
 
 <main>
 <!-- landing-seo-2 · Marcel 15.11.2026 (SEO-Empfehlung): Rechner-Seite „Kaufpreisfaktor berechnen". Demo-first: liegt auf Staging,
-     Prod erst nach Marcels Blick. Gerechnet wird mit den Kernen der App (rechner-kern.js lädt sie, rechner.js
-     bildet nur ab). Kundentext ohne Gedankenstrich und Semikolon. -->
+     Prod erst nach Marcels Blick. landing-seo-3 · Marcel 15.11.2026: „ein Rechner, nicht vier“ - hier steht der Deal-Check der
+     Startseite (dp2-dealcheck.js, Fokus per data-dk-fokus), kein eigener Rechner mehr. Kundentext ohne Gedankenstrich und Semikolon. -->
 <div class="sk"><div class="raster"></div><div class="w">
   <div class="kick">Rechner · Faktor</div>
   <h1>Kaufpreisfaktor und Rohertragsfaktor <em>berechnen.</em></h1>
-  <p>Wie viele Jahresmieten kostet die Immobilie? Kaufpreis und Miete eintragen, der Rechner zeigt Faktor, Bruttomietrendite und Quadratmeterpreis und rechnet zurück, welcher Kaufpreis zu deinem Zielfaktor passt.</p>
+  <p>Wie viele Jahresmieten kostet die Immobilie? Kaufpreis und Miete eintragen, Karte umdrehen. Der Deal-Check zeigt den Kaufpreisfaktor, die Bruttomietrendite und den Cashflow, gerechnet mit demselben Rechenkern wie die DealPilot-App.</p>
   <div class="brot"><a href="/">DEALPILOT</a> › <a href="leistungsumfang.html">FUNKTIONEN</a> › KAUFPREISFAKTOR BERECHNEN</div>
 </div></div>
 
-<section id="rechner"><div class="w-schmal">
-<div class="rr-box">
-<form class="rr" data-rechner="faktor" autocomplete="off" aria-label="Faktor-Rechner">
-  <label><span>Kaufpreis in €</span><input name="kp" inputmode="decimal" autocomplete="off" value="200.000"></label>
-  <label><span>Nettokaltmiete im Monat in €</span><input name="nkm" inputmode="decimal" autocomplete="off" value="800"></label>
-  <input type="hidden" name="nk" value="0">
-  <label><span>Wohnfläche in m² <em>optional</em></span><input name="wfl" inputmode="decimal" autocomplete="off" value="65"></label>
-  <label><span>Dein Zielfaktor <em>optional</em></span><input name="zielfaktor" inputmode="decimal" autocomplete="off" value="18"></label>
-  <p class="rr-hinweis">Für den Rohertragsfaktor zählt die marktüblich erzielbare Miete. Für den Kaufpreisfaktor nimmst du die vereinbarte Miete.</p>
-</form>
-<div class="rr-erg" aria-live="polite">
-  <div class="rr-k haupt"><span>Faktor</span><b data-aus="fak">…</b></div>
-  <div class="rr-k"><span>Bruttomietrendite</span><b data-aus="bmy">…</b></div>
-  <div class="rr-k"><span>Jahresnettokaltmiete</span><b data-aus="jahresmiete">…</b></div>
-  <div class="rr-k"><span>Kaufpreis je m²</span><b data-aus="qm">…</b></div>
-  <div class="rr-k"><span>Kaufpreis beim Zielfaktor</span><b data-aus="zielkp">…</b></div>
-  <p class="rr-fuss">Indikative Rechnung, keine Wertermittlung. Deine Eingaben bleiben im Browser.</p>
-</div>
-</div>
+<section class="sec sec-cream dealcheck dk" id="dealcheck" data-dk-fokus="faktor" data-dk-kp="200.000" data-dk-nkm="800"><div class="wrap dk-g">
+  <div class="dk-text"><div class="eye">Deal-Check · Kaufpreisfaktor</div>
+    <h2>Faktor prüfen. <span class="ac">Dreh die Karte um.</span></h2>
+    <p>Zwei Zahlen und eine Zinsbindung genügen. Annahmen wie auf der Startseite: 10 Prozent Eigenkapital, 10 Prozent Nebenkosten, 1,5 Prozent Tilgung, 17 Prozent nicht umlagefähige Kosten, Zins tagesaktuell je Zinsbindung.</p>
+    <ul class="dk-pkt"><li>Kaufpreisfaktor und Bruttomietrendite</li><li>Echter Deal Score, keine Schätzformel</li><li>Mit PLZ: Lage und Markt aus amtlichen Daten</li></ul></div>
+  <div class="dk-szene"><div class="dk-karte" id="dkKarte"><!-- baut dp2-dealcheck.js --></div></div>
 </div></section>
 
 <section class="sec-creme" id="erklaerung"><div class="w-schmal">
@@ -260,7 +248,7 @@ section[id]{scroll-margin-top:70px}
 <p>In DealPilot bekommt dasselbe Objekt eine Wertindikation nach ImmoWertV mit den Daten der Gutachterausschüsse, eine vollständige Rechnung mit Finanzierung, Cashflow und Steuer und den Investor Deal Score aus 24 Kennzahlen.</p>
 </div>
 <div class="sk-knopf" style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin:18px 0 30px">
-  <a class="btn-p" data-app-uebergabe href="https://app.dealpilot.immo/?register=1">Vier Wochen als Pro, kostenlos</a>
+  <a class="btn-p" href="https://app.dealpilot.immo/?register=1">Vier Wochen als Pro, kostenlos</a>
   <span style="font:700 10px/1.4 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--mut)">Keine Zahlungsdaten · danach automatisch Free</span>
 </div>
 <div class="rr-mehr">
@@ -298,5 +286,5 @@ section[id]{scroll-margin-top:70px}
 
 <script src="dp2.js?v=landing-zahlen-2"></script>
   <script src="assets/umgebung.js?v=v1644"></script><!-- v1644 · Landing zeigt auf DIE App, in der sie steht -->
-<script src="rechner-kern.js?v=landing-seo-2"></script><!-- landing-seo-2 · lädt deal-kpis.js, dscr-engine.js aus der App, dann rechner.js -->
+<script src="dealcheck-laden.js?v=landing-seo-3"></script><!-- landing-seo-3 · Kerne der App und der Deal-Check der Startseite -->
 </body></html>

@@ -12,7 +12,8 @@
 <link rel="stylesheet" href="dp2.css?v=v2971b">
 <link rel="stylesheet" href="dp2-teile.css?v=v2973">
 <link rel="stylesheet" href="dp2-kern.css?v=landing-kern-2c">
-<link rel="stylesheet" href="seo.css?v=landing-seo-2">
+<link rel="stylesheet" href="dp2-dealcheck.css?v=landing-seo-3">
+<link rel="stylesheet" href="seo.css?v=landing-seo-3">
 <style>
 /* Methodik-Seite: Bausteine wie sicherheit.html (Kopf .sk, Abschnitte .kz,
    Tabellen .tab-d, Hinweis), dazu Inhaltsverzeichnis und Fliesstext.
@@ -125,7 +126,7 @@ section[id]{scroll-margin-top:70px}
 </script>
 <!-- faq-schema:anfang · erzeugt von tools/faq-schema.mjs, nicht von Hand ändern -->
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Was ist der Cashflow einer Immobilie?","acceptedAnswer":{"@type":"Answer","text":"Der Cashflow ist der Betrag, der dir nach allen laufenden Zahlungen bleibt oder den du zuschießen musst: Nettokaltmiete minus nicht umlagefähige Kosten minus Zins und Tilgung. Umlagefähige Nebenkosten wie Heizung oder Müll zahlt der Mieter, sie laufen durch und ändern den Cashflow nicht."}},{"@type":"Question","name":"Warum ist der Cashflow nach Steuer oft besser als vor Steuer?","acceptedAnswer":{"@type":"Answer","text":"Weil Zinsen, nicht umlagefähige Kosten und die AfA steuerlich abziehbar sind, die Tilgung aber nicht. In den ersten Jahren ist das Ergebnis aus Vermietung deshalb häufig negativ. Das mindert deine übrige Steuer, und die Erstattung verbessert den Cashflow."}},{"@type":"Question","name":"Was ist ein guter DSCR?","acceptedAnswer":{"@type":"Answer","text":"Ein DSCR von 1 heißt, dass die Miete nach Kosten den Kapitaldienst gerade deckt. Viele Banken erwarten mehr als 1, damit Puffer für Leerstand und Reparaturen bleibt. Welchen Wert deine Bank verlangt, sagt sie dir im Gespräch."}},{"@type":"Question","name":"Woher kommt der vorgeschlagene Zins?","acceptedAnswer":{"@type":"Answer","text":"Aus der Bundesanleihe des Tages, einem Marktaufschlag aus der Zinsstatistik der Deutschen Bundesbank und einem Zuschlag je nach Beleihung. Er ist indikativ und ersetzt kein Angebot deiner Bank. Trägst du einen eigenen Zins ein, rechnet der Rechner mit deinem."}},{"@type":"Question","name":"Werden meine Eingaben gespeichert?","acceptedAnswer":{"@type":"Answer","text":"Nein. Der Rechner rechnet in deinem Browser. Nur der aktuelle Zins wird geladen. Erst wenn du über den Knopf in die App wechselst, nimmt sie Kaufpreis, Miete, Eigenkapital, Zins und Nebenkosten mit."}}]}
+{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Was ist der Cashflow einer Immobilie?","acceptedAnswer":{"@type":"Answer","text":"Der Cashflow ist der Betrag, der dir nach allen laufenden Zahlungen bleibt oder den du zuschießen musst: Nettokaltmiete minus nicht umlagefähige Kosten minus Zins und Tilgung. Umlagefähige Nebenkosten wie Heizung oder Müll zahlt der Mieter, sie laufen durch und ändern den Cashflow nicht."}},{"@type":"Question","name":"Warum ist der Cashflow nach Steuer oft besser als vor Steuer?","acceptedAnswer":{"@type":"Answer","text":"Weil Zinsen, nicht umlagefähige Kosten und die AfA steuerlich abziehbar sind, die Tilgung aber nicht. In den ersten Jahren ist das Ergebnis aus Vermietung deshalb häufig negativ. Das mindert deine übrige Steuer, und die Erstattung verbessert den Cashflow."}},{"@type":"Question","name":"Was ist ein guter DSCR?","acceptedAnswer":{"@type":"Answer","text":"Ein DSCR von 1 heißt, dass die Miete nach Kosten den Kapitaldienst gerade deckt. Viele Banken erwarten mehr als 1, damit Puffer für Leerstand und Reparaturen bleibt. Welchen Wert deine Bank verlangt, sagt sie dir im Gespräch."}},{"@type":"Question","name":"Woher kommt der vorgeschlagene Zins?","acceptedAnswer":{"@type":"Answer","text":"Aus der Bundesanleihe des Tages, einem Marktaufschlag aus der Zinsstatistik der Deutschen Bundesbank und einem Zuschlag je nach Beleihung. Er ist indikativ und ersetzt kein Angebot deiner Bank. Trägst du einen eigenen Zins ein, rechnet der Rechner mit deinem."}},{"@type":"Question","name":"Werden meine Eingaben gespeichert?","acceptedAnswer":{"@type":"Answer","text":"Nein. Gerechnet wird in deinem Browser. Geladen werden nur der Tageszins und, wenn du eine PLZ einträgst, die Lagedaten zu dieser PLZ. Erst wenn du über den Knopf auf der Karte in die App wechselst, nimmt sie Kaufpreis, Miete, Eigenkapital, Zins und Nebenkosten mit."}}]}
 </script>
 <!-- faq-schema:ende -->
 </head><body>
@@ -197,51 +198,21 @@ section[id]{scroll-margin-top:70px}
 
 <main>
 <!-- landing-seo-2 · Marcel 15.11.2026 (SEO-Empfehlung): Rechner-Seite „Cashflow berechnen". Demo-first: liegt auf Staging,
-     Prod erst nach Marcels Blick. Gerechnet wird mit den Kernen der App (rechner-kern.js lädt sie, rechner.js
-     bildet nur ab). Kundentext ohne Gedankenstrich und Semikolon. -->
+     Prod erst nach Marcels Blick. landing-seo-3 · Marcel 15.11.2026: „ein Rechner, nicht vier“ - hier steht der Deal-Check der
+     Startseite (dp2-dealcheck.js, Fokus per data-dk-fokus), kein eigener Rechner mehr. Kundentext ohne Gedankenstrich und Semikolon. -->
 <div class="sk"><div class="raster"></div><div class="w">
   <div class="kick">Rechner · Cashflow</div>
   <h1>Cashflow einer Immobilie <em>berechnen.</em></h1>
-  <p>Was bleibt im Monat übrig, wenn Kosten, Zins und Tilgung bezahlt sind? Und was ändert die Steuer? Der Rechner nutzt denselben Rechenkern wie die DealPilot-App und einen tagesaktuellen Bauzins.</p>
+  <p>Was bleibt im Monat übrig, wenn Kosten, Zins und Tilgung bezahlt sind? Der Deal-Check rechnet es mit tagesaktuellem Bauzins vor, mit demselben Rechenkern wie die DealPilot-App. Wie die Steuer den Cashflow ändert, steht darunter.</p>
   <div class="brot"><a href="/">DEALPILOT</a> › <a href="leistungsumfang.html">FUNKTIONEN</a> › CASHFLOW BERECHNEN</div>
 </div></div>
 
-<section id="rechner"><div class="w-schmal">
-<div class="rr-box">
-<form class="rr" data-rechner="cashflow" autocomplete="off" aria-label="Cashflow-Rechner">
-  <div class="rr-zwei">
-  <label><span>Kaufpreis in €</span><input name="kp" inputmode="decimal" autocomplete="off" value="200.000"></label>
-  <label><span>Kaufnebenkosten in %</span><input name="nk" inputmode="decimal" autocomplete="off" value="10"></label>
-  </div>
-  <div class="rr-zwei">
-  <label><span>Nettokaltmiete im Monat in €</span><input name="nkm" inputmode="decimal" autocomplete="off" value="800"></label>
-  <label><span>Nicht umlagefähig im Monat in €</span><input name="nul" inputmode="decimal" autocomplete="off" value="136"></label>
-  </div>
-  <label><span>Eigenkapital in €</span><input name="ek" inputmode="decimal" autocomplete="off" value="40.000"></label>
-  <div class="rr-zwei">
-  <label><span>Sollzins in %</span><input name="zins" inputmode="decimal" autocomplete="off" value="" placeholder="z. B. 4,2"></label>
-  <label><span>Tilgung in %</span><input name="tilg" inputmode="decimal" autocomplete="off" value="1,5"></label>
-  </div>
-  <p class="rr-hinweis" data-hinweis="zinsquelle">Zins wird geladen …</p>
-  <div class="rr-zwei">
-  <label><span>Grenzsteuersatz in %</span><input name="grenz" inputmode="decimal" autocomplete="off" value="42"></label>
-  <label><span>Gebäudeanteil in %</span><input name="geb" inputmode="decimal" autocomplete="off" value="75"></label>
-  </div>
-  <label><span>AfA-Satz in %</span><input name="afa" inputmode="decimal" autocomplete="off" value="2"></label>
-  <p class="rr-hinweis">2 Prozent für Gebäude, die nach 1924 und vor 2023 fertig wurden, 2,5 Prozent davor, 3 Prozent ab 2023 (§ 7 Abs. 4 EStG).</p>
-</form>
-<div class="rr-erg" aria-live="polite">
-  <div class="rr-k haupt"><span>Cashflow vor Steuer</span><b data-aus="cf_m">…</b></div>
-  <div class="rr-k"><span>Cashflow nach Steuer</span><b data-aus="cf_ns_m">…</b></div>
-  <div class="rr-k"><span>Steuerwirkung</span><b data-aus="steuer">…</b></div>
-  <div class="rr-k"><span>Rate (Zins und Tilgung)</span><b data-aus="rate">…</b></div>
-  <div class="rr-k"><span>Darlehen</span><b data-aus="darlehen">…</b></div>
-  <div class="rr-k"><span>DSCR</span><b data-aus="dscr">…</b></div>
-  <div class="rr-k"><span>AfA</span><b data-aus="afa_j">…</b></div>
-  <div class="rr-k"><span>Eigenkapitalrendite</span><b data-aus="ekr">…</b></div>
-  <p class="rr-fuss">Indikative Rechnung, keine Finanzierungs- oder Steuerberatung. Solidaritätszuschlag und Kirchensteuer kannst du im Grenzsteuersatz berücksichtigen. Deine Eingaben bleiben im Browser.</p>
-</div>
-</div>
+<section class="sec sec-cream dealcheck dk" id="dealcheck" data-dk-fokus="cashflow" data-dk-kp="200.000" data-dk-nkm="800"><div class="wrap dk-g">
+  <div class="dk-text"><div class="eye">Deal-Check · Cashflow</div>
+    <h2>Cashflow prüfen. <span class="ac">Dreh die Karte um.</span></h2>
+    <p>Kaufpreis, Miete und Zinsbindung eintragen. Annahmen wie auf der Startseite: 10 Prozent Eigenkapital, 10 Prozent Nebenkosten, 1,5 Prozent Tilgung, 17 Prozent nicht umlagefähige Kosten, Zins tagesaktuell je Zinsbindung.</p>
+    <ul class="dk-pkt"><li>Cashflow im Monat und DSCR der Bank</li><li>Zins tagesaktuell je Zinsbindung</li><li>Mit PLZ: Lage und Markt aus amtlichen Daten</li></ul></div>
+  <div class="dk-szene"><div class="dk-karte" id="dkKarte"><!-- baut dp2-dealcheck.js --></div></div>
 </div></section>
 
 <section class="sec-creme" id="erklaerung"><div class="w-schmal">
@@ -253,16 +224,16 @@ section[id]{scroll-margin-top:70px}
 <p class="formel">Cashflow nach Steuer = Cashflow vor Steuer − (Miete − Kosten − Zins − AfA) × Grenzsteuersatz</p>
 <p>Der <b>DSCR</b> (Debt Service Coverage Ratio) zeigt, wie oft die Miete nach Kosten den Kapitaldienst aus Zins und Tilgung deckt. Liegt er unter 1, trägt sich die Finanzierung nicht aus dem Objekt. Banken schauen genau auf diese Zahl.</p>
 <h3>Beispiel</h3>
-<p>Kaufpreis 200.000 €, 10 Prozent Nebenkosten, 40.000 € Eigenkapital. Das Darlehen beträgt 180.000 € zu 4,2 Prozent Zins und 1,5 Prozent Tilgung. Die Miete liegt bei 800 € im Monat, nicht umlagefähig sind 136 €. Gebäudeanteil 75 Prozent, AfA 2 Prozent, Grenzsteuersatz 42 Prozent.</p>
+<p>Kaufpreis 200.000 €, 10 Prozent Nebenkosten, 20.000 € Eigenkapital. Das Darlehen beträgt 200.000 € zu 4,2 Prozent Zins und 1,5 Prozent Tilgung. Die Miete liegt bei 800 € im Monat, nicht umlagefähig sind 136 €. Gebäudeanteil 75 Prozent, AfA 2 Prozent, Grenzsteuersatz 42 Prozent.</p>
 <div class="tab-wrap"><table class="tab-d"><thead><tr><th>Position</th><th class="r">im Monat</th></tr></thead><tbody>
 <tr><td>Nettokaltmiete</td><td class="r">800 €</td></tr>
 <tr><td>Nicht umlagefähige Kosten</td><td class="r">−136 €</td></tr>
-<tr><td>Zins und Tilgung</td><td class="r">−855 €</td></tr>
-<tr><td>Cashflow vor Steuer</td><td class="r">−191 €</td></tr>
-<tr><td>Steuererstattung (AfA 3.300 € im Jahr)</td><td class="r">+101 €</td></tr>
-<tr><td>Cashflow nach Steuer</td><td class="r">−90 €</td></tr>
+<tr><td>Zins und Tilgung</td><td class="r">−950 €</td></tr>
+<tr><td>Cashflow vor Steuer</td><td class="r">−286 €</td></tr>
+<tr><td>Steuererstattung (AfA 3.300 € im Jahr)</td><td class="r">+131 €</td></tr>
+<tr><td>Cashflow nach Steuer</td><td class="r">−155 €</td></tr>
 </tbody></table></div>
-<p>Der DSCR liegt hier bei 0,78. Das Objekt trägt sich mit diesem Eigenkapital nicht selbst, du legst jeden Monat etwas zu. Ob die Miete zum Kaufpreis passt, zeigt der <a href="immobilien-rendite-berechnen.html">Rendite-Rechner</a>.</p>
+<p>Der DSCR liegt hier bei 0,70. Das Objekt trägt sich mit diesem Eigenkapital nicht selbst, du legst jeden Monat etwas zu. Ob die Miete zum Kaufpreis passt, zeigt der <a href="immobilien-rendite-berechnen.html">Rendite-Rechner</a>.</p>
 </div>
 </div></section>
 
@@ -272,16 +243,16 @@ section[id]{scroll-margin-top:70px}
   <details class="fq"><summary>Warum ist der Cashflow nach Steuer oft besser als vor Steuer?</summary><div class="ant"><p>Weil Zinsen, nicht umlagefähige Kosten und die AfA steuerlich abziehbar sind, die Tilgung aber nicht. In den ersten Jahren ist das Ergebnis aus Vermietung deshalb häufig negativ. Das mindert deine übrige Steuer, und die Erstattung verbessert den Cashflow.</p></div></details>
   <details class="fq"><summary>Was ist ein guter DSCR?</summary><div class="ant"><p>Ein DSCR von 1 heißt, dass die Miete nach Kosten den Kapitaldienst gerade deckt. Viele Banken erwarten mehr als 1, damit Puffer für Leerstand und Reparaturen bleibt. Welchen Wert deine Bank verlangt, sagt sie dir im Gespräch.</p></div></details>
   <details class="fq"><summary>Woher kommt der vorgeschlagene Zins?</summary><div class="ant"><p>Aus der Bundesanleihe des Tages, einem Marktaufschlag aus der Zinsstatistik der Deutschen Bundesbank und einem Zuschlag je nach Beleihung. Er ist indikativ und ersetzt kein Angebot deiner Bank. Trägst du einen eigenen Zins ein, rechnet der Rechner mit deinem.</p></div></details>
-  <details class="fq"><summary>Werden meine Eingaben gespeichert?</summary><div class="ant"><p>Nein. Der Rechner rechnet in deinem Browser. Nur der aktuelle Zins wird geladen. Erst wenn du über den Knopf in die App wechselst, nimmt sie Kaufpreis, Miete, Eigenkapital, Zins und Nebenkosten mit.</p></div></details>
+  <details class="fq"><summary>Werden meine Eingaben gespeichert?</summary><div class="ant"><p>Nein. Gerechnet wird in deinem Browser. Geladen werden nur der Tageszins und, wenn du eine PLZ einträgst, die Lagedaten zu dieser PLZ. Erst wenn du über den Knopf auf der Karte in die App wechselst, nimmt sie Kaufpreis, Miete, Eigenkapital, Zins und Nebenkosten mit.</p></div></details>
 </div></section>
 
 <section class="sec-creme" id="weiter"><div class="w-schmal">
 <div class="kz"><div class="kick">In der App weiterrechnen</div><h2>Ein Objekt, alle Zahlen. Vier Wochen Pro kostenlos.</h2></div>
 <div class="m-text">
-<p>In DealPilot rechnest du den Cashflow über 15 Jahre, mit Anschlussfinanzierung, Mietsteigerung, Restnutzungsdauer und Kaufpreisaufteilung nach der Arbeitshilfe des Bundesfinanzministeriums. Am Ende steht der Investment-Case als PDF für die Bank. Der Knopf nimmt deine Zahlen aus diesem Rechner mit.</p>
+<p>In DealPilot rechnest du den Cashflow über 15 Jahre, mit Anschlussfinanzierung, Mietsteigerung, Restnutzungsdauer und Kaufpreisaufteilung nach der Arbeitshilfe des Bundesfinanzministeriums. Am Ende steht der Investment-Case als PDF für die Bank. Der Knopf auf der Rückseite der Karte nimmt deine Zahlen mit.</p>
 </div>
 <div class="sk-knopf" style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin:18px 0 30px">
-  <a class="btn-p" data-app-uebergabe href="https://app.dealpilot.immo/?register=1">Vier Wochen als Pro, kostenlos</a>
+  <a class="btn-p" href="https://app.dealpilot.immo/?register=1">Vier Wochen als Pro, kostenlos</a>
   <span style="font:700 10px/1.4 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--mut)">Keine Zahlungsdaten · danach automatisch Free</span>
 </div>
 <div class="rr-mehr">
@@ -319,5 +290,5 @@ section[id]{scroll-margin-top:70px}
 
 <script src="dp2.js?v=landing-zahlen-2"></script>
   <script src="assets/umgebung.js?v=v1644"></script><!-- v1644 · Landing zeigt auf DIE App, in der sie steht -->
-<script src="rechner-kern.js?v=landing-seo-2"></script><!-- landing-seo-2 · lädt deal-kpis.js, dscr-engine.js aus der App, dann rechner.js -->
+<script src="dealcheck-laden.js?v=landing-seo-3"></script><!-- landing-seo-3 · Kerne der App und der Deal-Check der Startseite -->
 </body></html>

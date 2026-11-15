@@ -57,6 +57,69 @@
   'use strict';
   var box = document.getElementById('dealcheck');
   if (!box) return;
+  /* landing-seo-3 · die Karte steht HIER (vorher als Markup in index.html), damit Startseite und
+     Rechner-Seiten dieselbe Komponente haben. @@KP@@/@@NKM@@ = Startwerte, @@KPI@@ = Kennzahlen je Fokus. */
+  var KARTE = [
+    "<form class=\"dk-seite dk-vorn\" id=\"dkVorn\" onsubmit=\"return false\" autocomplete=\"off\" aria-label=\"Deal-Check Eingaben\">",
+    "  <div class=\"dk-kopf\"><span class=\"dk-marke\">Deal-Check</span><span class=\"dk-nr\">Boarding · Vorab</span></div>",
+    "  <label class=\"dk-f\"><span>Kaufpreis</span><input id=\"dcKp\" inputmode=\"decimal\" value=\"@@KP@@\" aria-label=\"Kaufpreis in Euro\"><i>€</i></label>",
+    "  <label class=\"dk-f\"><span>Kaltmiete im Monat</span><input id=\"dcNkm\" inputmode=\"decimal\" value=\"@@NKM@@\" aria-label=\"Nettokaltmiete im Monat in Euro\"><i>€</i></label>",
+    "  <fieldset class=\"dk-bind\"><legend>Zinsbindung</legend>",
+    "    <div class=\"dk-chips\" id=\"dkChips\" role=\"radiogroup\" aria-label=\"Zinsbindung\">",
+    "      <button type=\"button\" role=\"radio\" aria-checked=\"false\" data-b=\"5\"><b>5 J</b><small>–</small></button>",
+    "      <button type=\"button\" role=\"radio\" aria-checked=\"true\" class=\"an\" data-b=\"10\"><b>10 J</b><small>–</small></button>",
+    "      <button type=\"button\" role=\"radio\" aria-checked=\"false\" data-b=\"15\"><b>15 J</b><small>–</small></button>",
+    "      <button type=\"button\" role=\"radio\" aria-checked=\"false\" data-b=\"20\"><b>20 J</b><small>–</small></button>",
+    "    </div>",
+    "    <label class=\"dk-f dk-zins-eigen\" id=\"dkZinsEigen\" hidden><span>Zins selbst eintragen</span><input id=\"dcZins\" inputmode=\"decimal\" placeholder=\"z. B. 4,1\" aria-label=\"Sollzins in Prozent\"><i>%</i></label>",
+    "    <small class=\"dk-stand\" id=\"dkStand\">Zins wird geladen …</small>",
+    "  </fieldset>",
+    "  <label class=\"dk-f dk-plz\"><span>PLZ <em>optional · Lage &amp; Markt</em></span><input id=\"dcPlz\" inputmode=\"numeric\" maxlength=\"5\" placeholder=\"z. B. 32049\" aria-label=\"Postleitzahl, optional\"></label>",
+    "  <div class=\"dk-zwei\" id=\"dkObj\"><label class=\"dk-f\"><span>Baujahr <em>optional</em></span><input id=\"dcBj\" inputmode=\"numeric\" maxlength=\"4\" placeholder=\"z. B. 1975\" aria-label=\"Baujahr, optional\"></label>",
+    "    <label class=\"dk-f\"><span>Wohnfläche <em>optional</em></span><input id=\"dcWfl\" inputmode=\"decimal\" maxlength=\"5\" placeholder=\"z. B. 70\" aria-label=\"Wohnfläche in Quadratmetern, optional\"><i>m²</i></label></div>",
+    "  <button type=\"submit\" class=\"btn-p dk-los\" id=\"dkDreh\">Deal prüfen <span aria-hidden=\"true\">↻</span></button>",
+    "</form>",
+    "<div class=\"dk-seite dk-hinten\" id=\"dcErg\" aria-live=\"polite\" aria-hidden=\"true\">",
+    "  <div class=\"dk-kopf\"><span class=\"dk-marke\">Deal Score</span><button type=\"button\" class=\"dk-zur\" id=\"dkZur\">↺ Eingaben ändern</button></div>",
+    "  <div class=\"dk-score\">",
+    "    <div class=\"dk-ring\" id=\"dcRing\"><svg viewBox=\"0 0 120 120\" aria-hidden=\"true\"><circle class=\"dk-ring-bg\" cx=\"60\" cy=\"60\" r=\"52\"/><circle class=\"dk-ring-v\" id=\"dkRingV\" cx=\"60\" cy=\"60\" r=\"52\"/></svg>",
+    "      <div class=\"dk-ring-z\"><b id=\"dcScore\">0</b><small>/ 100</small></div></div>",
+    "    <div class=\"dk-stufe-box\"><div class=\"dk-stufe\" id=\"dcStufe\">–</div>",
+    "      <div class=\"dk-skala\" aria-hidden=\"true\"><i id=\"dkBalken\"></i><s style=\"left:35%\"></s><s style=\"left:50%\"></s><s style=\"left:70%\"></s><s style=\"left:85%\"></s></div>",
+    "      <div class=\"dk-skala-w\" aria-hidden=\"true\"><span>Kritisch</span><span>Solide</span><span>Sehr gut</span></div></div>",
+    "  </div>",
+    "  <div class=\"dk-kpi\">@@KPI@@</div>",
+    "  <div class=\"dk-lage\" id=\"dkLage\" hidden><div class=\"dk-lage-k\"><span id=\"dkLageTitel\">Lage &amp; Markt</span><a id=\"dkLageMehr\" href=\"https://app.dealpilot.immo/?register=1\">mehr in der App →</a></div><div class=\"dk-lage-g\" id=\"dkLageG\"></div><small id=\"dkLageQ\"></small></div>",
+    "  <a class=\"btn-p dk-weiter\" id=\"dcLos\" href=\"https://app.dealpilot.immo/?register=1\">In DealPilot weiterrechnen →</a>",
+    "  <p class=\"dk-annahme\" id=\"dcAnnahme\"></p>",
+    "</div>"
+  ].join('\n');
+
+  /* landing-seo-3 · PARAMETER am <section id="dealcheck"> (Marcel 15.11.2026: „ein Rechner, nicht vier“):
+       data-dk-fokus  rendite | cashflow | faktor   welche Kennzahl auf der Rückseite vorn steht (ohne: Startseite)
+       data-dk-kp     Startwert Kaufpreis, z. B. "200.000" (ohne: 150.000)
+       data-dk-nkm    Startwert Kaltmiete im Monat (ohne: 950)
+     Gerechnet wird für jeden Fokus dasselbe, nur die Anzeige der Kennzahlen wechselt. */
+  var FOKUS = box.getAttribute('data-dk-fokus') || '';
+  var KPI = {
+    cf:   { id: 'dcCf',   label: 'Cashflow / Monat', kl: 'dk-cf', huelle: 'dcCfK' },
+    bmy:  { id: 'dcBmy',  label: 'Bruttorendite' },
+    nmy:  { id: 'dcNmy',  label: 'Nettorendite' },
+    fak:  { id: 'dcFak',  label: 'Kaufpreisfaktor' },
+    dscr: { id: 'dcDscr', label: 'DSCR' }
+  };
+  var REIHE = { rendite: ['bmy', 'nmy', 'cf'], faktor: ['fak', 'bmy', 'cf'], cashflow: ['cf', 'dscr', 'bmy'] }[FOKUS] || ['cf', 'bmy', 'dscr'];
+  function kpiHtml() {
+    return REIHE.map(function (k, i) {
+      var d = KPI[k], kl = [d.kl, i === 0 && k !== 'cf' ? 'dk-haupt' : ''].filter(Boolean).join(' ');
+      return '<div' + (d.huelle ? ' id="' + d.huelle + '"' : '') + (kl ? ' class="' + kl + '"' : '') + '><span>' + d.label + '</span><b id="' + d.id + '">–</b></div>';
+    }).join('');
+  }
+  var kEl = document.getElementById('dkKarte');
+  if (kEl && !document.getElementById('dkVorn')) {
+    kEl.innerHTML = KARTE.replace('@@KP@@', box.getAttribute('data-dk-kp') || '150.000')
+      .replace('@@NKM@@', box.getAttribute('data-dk-nkm') || '950').replace('@@KPI@@', kpiHtml());
+  }
   var VORGABE = { ek_pct: 10, tilg: 1.5, nul_pct: 17, nk_pct: 10, bindung: '10' };
   var STUFE = 'voll';   /* landing-dealcheck-3 · Beleihungsstufe aus /market-rates/bauzins (voll = 100 %) */
   var RING_U = 2 * Math.PI * 52;
@@ -163,7 +226,7 @@
     setze('dcScore', String(s));
     $('dkRingV').style.strokeDashoffset = String(RING_U * (1 - Math.max(0, Math.min(100, r.score * anteil)) / 100));
     $('dkBalken').style.width = Math.max(0, Math.min(100, r.score * anteil)) + '%';
-    setze('dcCf', (cf >= 0 ? '+' : '−') + eur(Math.abs(cf)));
+    if ($('dcCf')) setze('dcCf', (cf >= 0 ? '+' : '−') + eur(Math.abs(cf)));
   }
 
   function zeigen(r) {
@@ -174,7 +237,9 @@
     setze('dcStufe', r.st.wort);
     setze('dcBmy', pct(r.k.bmy));
     setze('dcDscr', r.k.d_total > 0 ? dez(Math.round(r.k.dscr * 100) / 100, 2) : 'entfällt');
-    $('dcCfK').classList.toggle('neg', r.k.cf_m < 0);
+    if ($('dcCfK')) $('dcCfK').classList.toggle('neg', r.k.cf_m < 0);
+    setze('dcNmy', pct(r.k.nmy));                       /* landing-seo-3 · Fokus Rendite */
+    setze('dcFak', dez(Math.round(r.k.fak * 10) / 10, 1));   /* landing-seo-3 · Fokus Faktor */
     var los = $('dcLos');
     if (los) {
       /* landing-kern-3 · nur das Fragment ändern — umgebung.js schreibt den Host um */

@@ -12,7 +12,8 @@
 <link rel="stylesheet" href="dp2.css?v=v2971b">
 <link rel="stylesheet" href="dp2-teile.css?v=v2973">
 <link rel="stylesheet" href="dp2-kern.css?v=landing-kern-2c">
-<link rel="stylesheet" href="seo.css?v=landing-seo-2">
+<link rel="stylesheet" href="dp2-dealcheck.css?v=landing-seo-3">
+<link rel="stylesheet" href="seo.css?v=landing-seo-3">
 <style>
 /* Methodik-Seite: Bausteine wie sicherheit.html (Kopf .sk, Abschnitte .kz,
    Tabellen .tab-d, Hinweis), dazu Inhaltsverzeichnis und Fliesstext.
@@ -125,7 +126,7 @@ section[id]{scroll-margin-top:70px}
 </script>
 <!-- faq-schema:anfang · erzeugt von tools/faq-schema.mjs, nicht von Hand ändern -->
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Was ist der Unterschied zwischen Bruttomietrendite und Nettomietrendite?","acceptedAnswer":{"@type":"Answer","text":"Die Bruttomietrendite teilt die Jahresnettokaltmiete durch den Kaufpreis. Die Nettomietrendite zieht vorher die nicht umlagefähigen Kosten ab und teilt durch die Gesamtinvestition aus Kaufpreis, Kaufnebenkosten und Sanierung. Sie liegt deshalb fast immer deutlich unter der Bruttomietrendite."}},{"@type":"Question","name":"Welche Kaufnebenkosten fallen beim Immobilienkauf an?","acceptedAnswer":{"@type":"Answer","text":"Die Grunderwerbsteuer liegt je nach Bundesland zwischen 3,5 und 6,5 Prozent des Kaufpreises. Für Notar und Grundbuch kommen meist 1,5 bis 2 Prozent dazu, bei einem Kauf über einen Makler zusätzlich die Maklerprovision. Zusammen sind das oft 7 bis 12 Prozent."}},{"@type":"Question","name":"Welche Rendite ist gut?","acceptedAnswer":{"@type":"Answer","text":"Eine feste Grenze gibt es nicht. Eine Rendite hängt von Lage, Zustand, Mietniveau und Zins ab, und eine hohe Rendite in einer schwachen Lage kann mehr Risiko bedeuten als eine niedrigere in einer starken. DealPilot ordnet die Rendite deshalb im Investor Deal Score zusammen mit 23 weiteren Kennzahlen ein."}},{"@type":"Question","name":"Werden meine Eingaben gespeichert?","acceptedAnswer":{"@type":"Answer","text":"Nein. Der Rechner rechnet in deinem Browser. Erst wenn du über den Knopf in die App wechselst, nimmt sie Kaufpreis, Miete und Nebenkosten mit, damit du nicht neu tippen musst."}}]}
+{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Was ist der Unterschied zwischen Bruttomietrendite und Nettomietrendite?","acceptedAnswer":{"@type":"Answer","text":"Die Bruttomietrendite teilt die Jahresnettokaltmiete durch den Kaufpreis. Die Nettomietrendite zieht vorher die nicht umlagefähigen Kosten ab und teilt durch die Gesamtinvestition aus Kaufpreis, Kaufnebenkosten und Sanierung. Sie liegt deshalb fast immer deutlich unter der Bruttomietrendite."}},{"@type":"Question","name":"Welche Kaufnebenkosten fallen beim Immobilienkauf an?","acceptedAnswer":{"@type":"Answer","text":"Die Grunderwerbsteuer liegt je nach Bundesland zwischen 3,5 und 6,5 Prozent des Kaufpreises. Für Notar und Grundbuch kommen meist 1,5 bis 2 Prozent dazu, bei einem Kauf über einen Makler zusätzlich die Maklerprovision. Zusammen sind das oft 7 bis 12 Prozent."}},{"@type":"Question","name":"Welche Rendite ist gut?","acceptedAnswer":{"@type":"Answer","text":"Eine feste Grenze gibt es nicht. Eine Rendite hängt von Lage, Zustand, Mietniveau und Zins ab, und eine hohe Rendite in einer schwachen Lage kann mehr Risiko bedeuten als eine niedrigere in einer starken. DealPilot ordnet die Rendite deshalb im Investor Deal Score zusammen mit 23 weiteren Kennzahlen ein."}},{"@type":"Question","name":"Werden meine Eingaben gespeichert?","acceptedAnswer":{"@type":"Answer","text":"Nein. Gerechnet wird in deinem Browser. Geladen werden nur der Tageszins und, wenn du eine PLZ einträgst, die Lagedaten zu dieser PLZ. Erst wenn du über den Knopf auf der Karte in die App wechselst, nimmt sie deine Zahlen mit, damit du nicht neu tippen musst."}}]}
 </script>
 <!-- faq-schema:ende -->
 </head><body>
@@ -197,36 +198,21 @@ section[id]{scroll-margin-top:70px}
 
 <main>
 <!-- landing-seo-2 · Marcel 15.11.2026 (SEO-Empfehlung): Rechner-Seite „Rendite berechnen". Demo-first: liegt auf Staging,
-     Prod erst nach Marcels Blick. Gerechnet wird mit den Kernen der App (rechner-kern.js lädt sie, rechner.js
-     bildet nur ab). Kundentext ohne Gedankenstrich und Semikolon. -->
+     Prod erst nach Marcels Blick. landing-seo-3 · Marcel 15.11.2026: „ein Rechner, nicht vier“ - hier steht der Deal-Check der
+     Startseite (dp2-dealcheck.js, Fokus per data-dk-fokus), kein eigener Rechner mehr. Kundentext ohne Gedankenstrich und Semikolon. -->
 <div class="sk"><div class="raster"></div><div class="w">
   <div class="kick">Rechner · Rendite</div>
   <h1>Immobilien Rendite <em>berechnen.</em></h1>
-  <p>Kaufpreis, Nebenkosten und Miete eintragen. Der Rechner zeigt Bruttomietrendite, Nettomietrendite und Kaufpreisfaktor, gerechnet mit demselben Rechenkern wie die DealPilot-App.</p>
+  <p>Kaufpreis und Miete eintragen, Karte umdrehen. Der Deal-Check zeigt Bruttomietrendite und Nettomietrendite, dazu Cashflow und Deal Score, gerechnet mit demselben Rechenkern wie die DealPilot-App.</p>
   <div class="brot"><a href="/">DEALPILOT</a> › <a href="leistungsumfang.html">FUNKTIONEN</a> › RENDITE BERECHNEN</div>
 </div></div>
 
-<section id="rechner"><div class="w-schmal">
-<div class="rr-box">
-<form class="rr" data-rechner="rendite" autocomplete="off" aria-label="Rendite-Rechner">
-  <label><span>Kaufpreis in €</span><input name="kp" inputmode="decimal" autocomplete="off" value="200.000"></label>
-  <div class="rr-zwei">
-  <label><span>Kaufnebenkosten in %</span><input name="nk" inputmode="decimal" autocomplete="off" value="10"></label>
-  <label><span>Sanierung in € <em>optional</em></span><input name="san" inputmode="decimal" autocomplete="off" value=""></label>
-  </div>
-  <label><span>Nettokaltmiete im Monat in €</span><input name="nkm" inputmode="decimal" autocomplete="off" value="800"></label>
-  <label><span>Nicht umlagefähige Kosten im Monat in €</span><input name="nul" inputmode="decimal" autocomplete="off" value="136"></label>
-  <p class="rr-hinweis">Verwaltung, Instandhaltung und Mietausfall, die der Mieter nicht trägt. Als Anhalt rechnet DealPilot mit 17 Prozent der Nettokaltmiete.</p>
-</form>
-<div class="rr-erg" aria-live="polite">
-  <div class="rr-k haupt"><span>Bruttomietrendite</span><b data-aus="bmy">…</b></div>
-  <div class="rr-k"><span>Nettomietrendite</span><b data-aus="nmy">…</b></div>
-  <div class="rr-k"><span>Kaufpreisfaktor</span><b data-aus="fak">…</b></div>
-  <div class="rr-k"><span>Gesamtinvestition</span><b data-aus="gi">…</b></div>
-  <div class="rr-k"><span>Miete nach Kosten</span><b data-aus="ueberschuss">…</b></div>
-  <p class="rr-fuss">Indikative Rechnung, keine Finanzierungs- oder Steuerberatung. Deine Eingaben bleiben im Browser.</p>
-</div>
-</div>
+<section class="sec sec-cream dealcheck dk" id="dealcheck" data-dk-fokus="rendite" data-dk-kp="200.000" data-dk-nkm="800"><div class="wrap dk-g">
+  <div class="dk-text"><div class="eye">Deal-Check · Rendite</div>
+    <h2>Rendite prüfen. <span class="ac">Dreh die Karte um.</span></h2>
+    <p>Zwei Zahlen und eine Zinsbindung genügen. Annahmen wie auf der Startseite: 10 Prozent Eigenkapital, 10 Prozent Nebenkosten, 1,5 Prozent Tilgung, 17 Prozent nicht umlagefähige Kosten, Zins tagesaktuell je Zinsbindung.</p>
+    <ul class="dk-pkt"><li>Brutto- und Nettomietrendite</li><li>Echter Deal Score, keine Schätzformel</li><li>Mit PLZ: Lage und Markt aus amtlichen Daten</li></ul></div>
+  <div class="dk-szene"><div class="dk-karte" id="dkKarte"><!-- baut dp2-dealcheck.js --></div></div>
 </div></section>
 
 <section class="sec-creme" id="erklaerung"><div class="w-schmal">
@@ -253,16 +239,16 @@ section[id]{scroll-margin-top:70px}
   <details class="fq" open><summary>Was ist der Unterschied zwischen Bruttomietrendite und Nettomietrendite?</summary><div class="ant"><p>Die Bruttomietrendite teilt die Jahresnettokaltmiete durch den Kaufpreis. Die Nettomietrendite zieht vorher die nicht umlagefähigen Kosten ab und teilt durch die Gesamtinvestition aus Kaufpreis, Kaufnebenkosten und Sanierung. Sie liegt deshalb fast immer deutlich unter der Bruttomietrendite.</p></div></details>
   <details class="fq"><summary>Welche Kaufnebenkosten fallen beim Immobilienkauf an?</summary><div class="ant"><p>Die Grunderwerbsteuer liegt je nach Bundesland zwischen 3,5 und 6,5 Prozent des Kaufpreises. Für Notar und Grundbuch kommen meist 1,5 bis 2 Prozent dazu, bei einem Kauf über einen Makler zusätzlich die Maklerprovision. Zusammen sind das oft 7 bis 12 Prozent.</p></div></details>
   <details class="fq"><summary>Welche Rendite ist gut?</summary><div class="ant"><p>Eine feste Grenze gibt es nicht. Eine Rendite hängt von Lage, Zustand, Mietniveau und Zins ab, und eine hohe Rendite in einer schwachen Lage kann mehr Risiko bedeuten als eine niedrigere in einer starken. DealPilot ordnet die Rendite deshalb im Investor Deal Score zusammen mit 23 weiteren Kennzahlen ein.</p></div></details>
-  <details class="fq"><summary>Werden meine Eingaben gespeichert?</summary><div class="ant"><p>Nein. Der Rechner rechnet in deinem Browser. Erst wenn du über den Knopf in die App wechselst, nimmt sie Kaufpreis, Miete und Nebenkosten mit, damit du nicht neu tippen musst.</p></div></details>
+  <details class="fq"><summary>Werden meine Eingaben gespeichert?</summary><div class="ant"><p>Nein. Gerechnet wird in deinem Browser. Geladen werden nur der Tageszins und, wenn du eine PLZ einträgst, die Lagedaten zu dieser PLZ. Erst wenn du über den Knopf auf der Karte in die App wechselst, nimmt sie deine Zahlen mit, damit du nicht neu tippen musst.</p></div></details>
 </div></section>
 
 <section class="sec-creme" id="weiter"><div class="w-schmal">
 <div class="kz"><div class="kick">In der App weiterrechnen</div><h2>Ein Objekt, alle Zahlen. Vier Wochen Pro kostenlos.</h2></div>
 <div class="m-text">
-<p>In DealPilot rechnest du dasselbe Objekt mit Finanzierung, Cashflow vor und nach Steuer, AfA und Restnutzungsdauer durch, bekommst den Investor Deal Score aus 24 Kennzahlen und eine Wertindikation nach ImmoWertV. Der Knopf nimmt deine Zahlen aus diesem Rechner mit.</p>
+<p>In DealPilot rechnest du dasselbe Objekt mit Finanzierung, Cashflow vor und nach Steuer, AfA und Restnutzungsdauer durch, bekommst den Investor Deal Score aus 24 Kennzahlen und eine Wertindikation nach ImmoWertV. Der Knopf auf der Rückseite der Karte nimmt deine Zahlen mit.</p>
 </div>
 <div class="sk-knopf" style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin:18px 0 30px">
-  <a class="btn-p" data-app-uebergabe href="https://app.dealpilot.immo/?register=1">Vier Wochen als Pro, kostenlos</a>
+  <a class="btn-p" href="https://app.dealpilot.immo/?register=1">Vier Wochen als Pro, kostenlos</a>
   <span style="font:700 10px/1.4 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--mut)">Keine Zahlungsdaten · danach automatisch Free</span>
 </div>
 <div class="rr-mehr">
@@ -300,5 +286,5 @@ section[id]{scroll-margin-top:70px}
 
 <script src="dp2.js?v=landing-zahlen-2"></script>
   <script src="assets/umgebung.js?v=v1644"></script><!-- v1644 · Landing zeigt auf DIE App, in der sie steht -->
-<script src="rechner-kern.js?v=landing-seo-2"></script><!-- landing-seo-2 · lädt deal-kpis.js, dscr-engine.js aus der App, dann rechner.js -->
+<script src="dealcheck-laden.js?v=landing-seo-3"></script><!-- landing-seo-3 · Kerne der App und der Deal-Check der Startseite -->
 </body></html>

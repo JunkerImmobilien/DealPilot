@@ -12,27 +12,7 @@
 .seo-abschnitt .kb{font-size:14.5px;line-height:1.62}
 @media (max-width:760px){.seo-abschnitt{margin-top:44px}.seo-abschnitt .blatt > *{padding:24px 20px}}
 
-/* ── landing-seo-2 · Rechner-Seiten ───────────────────────────────────── */
-.rr-box{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:0;border:1px solid var(--cream-line);background:#fff}
-.rr{padding:26px 26px 22px;border-right:1px solid var(--cream-line)}
-.rr .rr-zwei{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.rr label{display:block;margin:0 0 14px}
-.rr label span{display:block;font:700 10px/1.3 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--mut);margin-bottom:6px}
-.rr label span em{font-style:normal;letter-spacing:.04em;text-transform:none;font-weight:500}
-.rr input{width:100%;box-sizing:border-box;padding:11px 12px;border:1px solid var(--cream-line);border-radius:2px;background:var(--cream);
-  font:600 16px/1.2 var(--disp);color:var(--ink)}
-.rr input:focus{outline:none;border-color:var(--wl-c9a84c, #C9A84C);background:#fff}
-.rr .rr-hinweis{font-size:12.5px;line-height:1.5;color:var(--mut);margin:-6px 0 12px}
-.rr-erg{padding:26px;background:var(--ink);color:#ECE6D6;display:flex;flex-direction:column;gap:12px}
-.rr-erg .rr-k{display:flex;justify-content:space-between;align-items:baseline;gap:12px;border-bottom:1px solid var(--line);padding-bottom:10px}
-.rr-erg .rr-k span{font:700 10px/1.4 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:rgba(236,230,214,.7)}
-.rr-erg .rr-k b{font:700 19px/1.2 var(--disp);color:#fff;text-align:right}
-.rr-erg .rr-k.haupt b{font-size:30px;color:var(--gdh)}
-.rr-erg .rr-k b.neg{color:#D8564C}
-.rr-erg .btn-p{margin-top:auto;text-align:center}
-.rr-erg .rr-fuss{font-size:12px;line-height:1.5;color:rgba(236,230,214,.62);margin:0}
-@media (max-width:760px){.rr-box{grid-template-columns:1fr}.rr{border-right:0;border-bottom:1px solid var(--cream-line);padding:20px 16px}.rr-erg{padding:20px 16px}.rr .rr-zwei{grid-template-columns:1fr}}
-
+/* ── landing-seo-2/-3 · Rechner-Seiten: der Rechner ist der Deal-Check (dp2-dealcheck.css), hier nur FAQ und Weiterlinks ── */
 /* FAQ wie fragen.html (details.fq), damit tools/faq-schema.mjs dieselbe Form liest */
 .fq{background:#fff;border:1px solid var(--cream-line);margin-bottom:10px;overflow:hidden}
 .fq[open]{border-color:var(--gd)}

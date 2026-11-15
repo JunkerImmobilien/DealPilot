@@ -148,3 +148,8 @@
   .dk-lk.laedt{animation:none}
   .dk-los span{transition:none}
 }
+
+/* landing-seo-3 · Kennzahl im Fokus (Rechner-Seiten: Rendite, Faktor) und Platz, solange dp2-dealcheck.js die Karte baut */
+.dk-kpi .dk-haupt b{color:var(--gdh);font-size:22px}
+.dk-karte:empty{min-height:560px}
+@media (max-width:420px){.dk-kpi .dk-haupt{grid-column:1/-1}}
