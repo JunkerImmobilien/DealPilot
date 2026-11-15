@@ -1,0 +1,64 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   geschichten.css · landing-geschichten-1 (15.11.2026)
+   Marcel 15.11.2026: „Die Geschichten, die jeder kennt, könnten besser
+   animiert werden." Jede Geschichte bekommt oben ein Cockpit-Instrument,
+   das beim Scrollen in drei Schritten abläuft (geschichten.js):
+     1 · Problem   die Lage, die Zahl steht noch neutral
+     2 · Die Zahl kippt   sie dreht auf den roten Wert, Ampel rot
+     3 · DealPilot   Landebahn läuft, Kennzahl zählt hoch, Ampel grün
+   Ohne JS und bei „weniger Bewegung" steht sofort Schritt 3 (Endzustand
+   steht im HTML). Gold nur über Tokens, Rot und Grün sind Statusfarben.
+   ═══════════════════════════════════════════════════════════════════════ */
+.gs-k{padding:0;overflow:hidden}
+.gs-k .gs-inhalt{padding:20px 22px 22px;display:flex;flex-direction:column;gap:10px}
+
+.gs-szene{position:relative;background:var(--ob,#050505);color:#ECE6D6;padding:14px 18px 16px;
+  border-bottom:1px solid var(--line);overflow:hidden;isolation:isolate}
+.gs-szene::before{content:'';position:absolute;inset:0;z-index:-1;opacity:.10;
+  background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);
+  background-size:28px 28px}
+.gs-sz-kopf{display:flex;align-items:center;gap:10px;font:700 9.5px/1 var(--mono);letter-spacing:.16em;text-transform:uppercase}
+.gs-sz-flug{color:var(--gdh)}
+.gs-sz-phase{color:rgba(236,230,214,.62);position:relative;min-width:0;flex:1}
+.gs-sz-phase b{font-weight:700;transition:opacity .35s ease}
+.gs-ampel{display:flex;gap:5px;margin-left:auto}
+.gs-ampel i{width:8px;height:8px;border-radius:50%;background:rgba(236,230,214,.14);transition:background .35s ease,box-shadow .35s ease}
+.gs-szene[data-phase="2"] .gs-ampel i:nth-child(1){background:#D8564C;box-shadow:0 0 8px rgba(216,86,76,.7)}
+.gs-szene[data-phase="1"] .gs-ampel i:nth-child(2){background:var(--gdh);box-shadow:0 0 8px var(--line)}
+.gs-szene[data-phase="3"] .gs-ampel i:nth-child(3){background:#3FA56C;box-shadow:0 0 8px rgba(63,165,108,.7)}
+
+.gs-sz-problem{margin:11px 0 12px;font:500 13.5px/1.45 var(--body,Inter),system-ui,sans-serif;color:rgba(236,230,214,.86);min-height:2.9em}
+.gs-sz-wechsel{display:grid;grid-template-columns:minmax(0,1fr) 46px minmax(0,1fr);align-items:end;gap:8px}
+.gs-sz-wert span{display:block;font:600 9px/1.3 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:rgba(236,230,214,.55);margin-bottom:6px;min-height:2.6em}
+.gs-sz-wert b{display:block;font:700 22px/1.05 var(--disp);font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* Die Zahl, die kippt: zwei Werte übereinander, Schritt 2 dreht auf den unteren */
+.gs-sz-kipp{position:relative;height:1.05em;font:700 22px/1.05 var(--disp);perspective:400px}
+.gs-sz-kipp b{position:absolute;left:0;right:0;top:0;backface-visibility:hidden;transition:transform .6s cubic-bezier(.2,.8,.2,1),opacity .6s ease,color .4s ease}
+.gs-sz-kipp .k1{color:#fff}
+.gs-sz-kipp .k2{color:#E08A7E;transform:rotateX(-90deg);opacity:0}
+.gs-szene[data-phase="2"] .k1,.gs-szene[data-phase="3"] .k1{transform:rotateX(90deg);opacity:0}
+.gs-szene[data-phase="2"] .k2,.gs-szene[data-phase="3"] .k2{transform:none;opacity:1}
+.gs-szene[data-phase="3"] .k2{color:rgba(224,138,126,.55)}
+
+/* Landebahn zwischen Problem und Lösung */
+.gs-sz-bahn{position:relative;height:22px;align-self:center}
+.gs-sz-bahn::before{content:'';position:absolute;left:0;right:0;top:50%;height:2px;margin-top:-1px;background:rgba(236,230,214,.12)}
+.gs-sz-bahn::after{content:'';position:absolute;left:0;top:50%;height:2px;margin-top:-1px;width:100%;background:var(--runway);
+  transform:scaleX(0);transform-origin:left;transition:transform .7s cubic-bezier(.2,.8,.2,1)}
+.gs-sz-bahn svg{position:absolute;right:-4px;top:50%;width:14px;height:14px;margin-top:-7px;color:var(--gdh);opacity:0;transition:opacity .3s ease .5s}
+.gs-szene[data-phase="3"] .gs-sz-bahn::after{transform:scaleX(1)}
+.gs-szene[data-phase="3"] .gs-sz-bahn svg{opacity:1}
+
+.gs-sz-loes{opacity:.18;transform:translateY(6px);transition:opacity .5s ease .35s,transform .5s ease .35s}
+.gs-sz-loes b{color:#5BD98E}
+.gs-szene[data-phase="3"] .gs-sz-loes{opacity:1;transform:none}
+
+@media (max-width:420px){
+  .gs-szene{padding:12px 14px 14px}
+  .gs-sz-wechsel{grid-template-columns:minmax(0,1fr) 30px minmax(0,1fr)}
+  .gs-sz-wert b,.gs-sz-kipp{font-size:19px}
+}
+@media (prefers-reduced-motion:reduce){
+  .gs-szene *,.gs-szene *::after{transition:none!important}
+}

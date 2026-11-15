@@ -12,6 +12,7 @@
 <link rel="stylesheet" href="dp2.css?v=v2971b">
 <link rel="stylesheet" href="dp2-teile.css?v=v2973">
 <link rel="stylesheet" href="dp2-kern.css?v=landing-kern-2c">
+<link rel="stylesheet" href="geschichten.css?v=landing-geschichten-1">
 <style>
 /* Methodik-Seite: Bausteine wie sicherheit.html (Kopf .sk, Abschnitte .kz,
    Tabellen .tab-d, Hinweis), dazu Inhaltsverzeichnis und Fliesstext.
@@ -199,8 +200,219 @@ section[id]{scroll-margin-top:70px}
   <div class="brot"><a href="/">DEALPILOT</a> › GESCHICHTEN</div>
 </div></div>
 <section class="sec-creme"><div class="w">
-  <div class="gs-grid" id="gsGrid"></div>
-  <noscript><p>Die Geschichten brauchen JavaScript.</p></noscript>
+  <!-- landing-geschichten-1 · Marcel 15.11.2026 („könnten besser animiert werden“): Texte statisch im HTML
+       (vorher per JS aus dp2-daten.js, für Suchmaschinen unsichtbar), erzeugt aus window.DP_STORIES, unverändert.
+       Je Geschichte ein Instrument (geschichten.css/.js), Zahlen darin nur aus dem Text der Geschichte. -->
+  <div class="gs-grid" id="gsGrid">
+  <article class="gs-k" id="geschichte-01">
+    <div class="gs-szene" data-phase="3" aria-hidden="true">
+      <div class="gs-sz-kopf"><span class="gs-sz-flug">DP · 01</span><span class="gs-sz-phase"><b>DealPilot</b></span><span class="gs-ampel"><i></i><i></i><i></i></span></div>
+      <div class="gs-sz-problem">Exposé mit 18 Seiten, Besichtigung in 36 Stunden.</div>
+      <div class="gs-sz-wechsel">
+        <div class="gs-sz-wert"><span>Von Hand mit Excel</span><div class="gs-sz-kipp"><b class="k1">3 Std.</b><b class="k2">und ein Bauchgefühl</b></div></div>
+        <div class="gs-sz-bahn"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z" transform="rotate(90 12 12)"/></svg></div>
+        <div class="gs-sz-wert gs-sz-loes"><span>Exposé eingelesen in unter</span><b data-ziel="30" data-nach=" s">30 s</b></div>
+      </div>
+    </div>
+    <div class="gs-inhalt"><div class="gs-tag">Der Anruf am Donnerstagabend</div>
+    <blockquote>„Donnerstag, 19:42 Uhr. Du bist gerade beim Abendessen mit deiner Familie. Dein Bekannter schreibt: Drei-Familien-Haus, Vor-Ort-Termin am Samstag um zehn — und vor dir liegt ein 18-seitiges Exposé."</blockquote><p>Du kennst diese Situation. Jeder, der ernsthaft in Immobilien investiert, kennt sie. Du hast 36 Stunden, um zu wissen, ob du Samstag früh in dein Auto steigst und 280 km zur Besichtigung fährst — oder ob du höflich absagst.</p><p>Vor DealPilot hieß das: Excel auf, 90 Minuten konzentriert tippen, vier Browsertabs mit Mietspiegel, Zinsrechner, AfA-Hilfe und Bundesbank-Zinsstatistik. Drei Stunden später hast du eine Excel-Datei, der du nicht ganz vertraust, und ein Bauchgefühl.</p><p>Mit DealPilot ziehst du das Exposé in den PDF-Import. Die KI extrahiert Kaufpreis, Wohnfläche, Baujahr, Adresse, Miete und Hausgeld — in unter 30 Sekunden. Im Boarding tippst du deine Finanzierungsannahmen. Faktor 18,2 — Bruttomietrendite 5,5 % — Cashflow nach Werbungskosten plus 187 € — LTV 87 %.</p><p>Du gehst zurück zum Tisch. Sagst „Ja, gern noch ein Glas". Und am Samstag stehst du rechtzeitig auf dem Hof — mit einem informierten Bauchgefühl, nicht einem blinden.</p><div class="gs-pay">✈ PDF-Import + Boarding · 4 Minuten statt 3 Stunden</div></div>
+  </article>
+  <article class="gs-k" id="geschichte-02">
+    <div class="gs-szene" data-phase="3" aria-hidden="true">
+      <div class="gs-sz-kopf"><span class="gs-sz-flug">DP · 02</span><span class="gs-sz-phase"><b>DealPilot</b></span><span class="gs-ampel"><i></i><i></i><i></i></span></div>
+      <div class="gs-sz-problem">54.000 € Sanierung im ersten Jahr, gedacht als Werbungskosten.</div>
+      <div class="gs-sz-wechsel">
+        <div class="gs-sz-wert"><span>Sofort absetzbar</span><div class="gs-sz-kipp"><b class="k1">54.000 €</b><b class="k2">über 40 Jahre</b></div></div>
+        <div class="gs-sz-bahn"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z" transform="rotate(90 12 12)"/></svg></div>
+        <div class="gs-sz-wert gs-sz-loes"><span>Live-Balken warnt an der Grenze</span><b data-ziel="15" data-nach=" %">15 %</b></div>
+      </div>
+    </div>
+    <div class="gs-inhalt"><div class="gs-tag">Die 15-%-Falle</div>
+    <blockquote>„Im ersten Jahr: 24.000 € fürs Dach, 12.000 € neue Heizung, 18.000 € drei Bäder. Du freust dich, das alles im ersten Jahr als Werbungskosten absetzen zu können."</blockquote><p>Sechs Monate später sitzt dein Steuerberater dir gegenüber und sagt den Satz, den kein Investor hören will: „Das müssen wir aktivieren. Sie sind über der 15-%-Grenze."</p><p>Anschaffungsnahe Herstellungskosten. Wenn du in den ersten drei Jahren nach Kauf mehr als 15 % der Gebäude-Anschaffungskosten in Instandsetzung steckst, gelten die Beträge nicht mehr als sofort absetzbare Werbungskosten — sie werden über die Restnutzungsdauer abgeschrieben. Aus 54.000 € sofortigem Werbungskostenabzug werden über 40 Jahre verteilt. Das frisst deinen Cashflow im ersten Jahr — und du hast es schlicht nicht gewusst.</p><p>DealPilot kennt diese Falle. Während du Sanierungsbeträge im Investitionsmodul eingibst, läuft im Hintergrund ein Balken, der dir live zeigt: „Du bist bei 11 % deiner Gebäude-AK. Spielraum: 13.400 €." Überschreitest du die Grenze, springt die Anzeige auf Rot.</p><p>Ein einziger Hinweis. Ein roter Balken. Und du sparst dir den Termin mit dem Steuerberater, bei dem dir fünfstellige Liquidität durch die Lappen gehen.</p><div class="gs-pay">✈ Live-Balken im Investitionsmodul · Fünfstellige Steuerfalle vermieden</div></div>
+  </article>
+  <article class="gs-k" id="geschichte-03">
+    <div class="gs-szene" data-phase="3" aria-hidden="true">
+      <div class="gs-sz-kopf"><span class="gs-sz-flug">DP · 03</span><span class="gs-sz-phase"><b>DealPilot</b></span><span class="gs-ampel"><i></i><i></i><i></i></span></div>
+      <div class="gs-sz-problem">Mail um 21:14 Uhr. Der Investment-Case soll bis 9 Uhr bei der Bank sein.</div>
+      <div class="gs-sz-wechsel">
+        <div class="gs-sz-wert"><span>Formatierte Seiten</span><div class="gs-sz-kipp"><b class="k1">keine</b><b class="k2">Frist 9 Uhr</b></div></div>
+        <div class="gs-sz-bahn"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z" transform="rotate(90 12 12)"/></svg></div>
+        <div class="gs-sz-wert gs-sz-loes"><span>Investment-Case mit einem Klick</span><b data-ziel="6" data-nach=" Seiten">6 Seiten</b></div>
+      </div>
+    </div>
+    <div class="gs-inhalt"><div class="gs-tag">Das Bankgespräch</div>
+    <blockquote>„Mittwochabend, 21:14 Uhr. Mail von deiner Filialleiterin. Sie braucht den vollständigen Investment-Case bis morgen 9 Uhr — sonst rutscht dein Termin am Freitag aus dem Ressort."</blockquote><p>Du hast noch keine einzige Seite formatiert. Banker brauchen strukturierte Unterlagen — nicht eine Excel mit 20 Tabs und drei Farbschemata. Nicht eine handgetippte Word-Datei. Sondern eine ordentlich gegliederte Vorlage, in der die Bank in unter zehn Minuten sieht: Was wird gekauft, was kostet's, wie ist es finanziert, wie sieht der Cashflow aus, was passiert am Ende der Zinsbindung — und warum ist das Risiko vertretbar.</p><p>DealPilot baut diese Vorlage automatisch. Sobald du alle Module ausgefüllt hast, bekommst du mit einem Klick einen vollständigen Investment-Case: Deckblatt mit Titelfoto und vier Cover-KPIs. Executive Summary mit Cashflow-Szenario heute, Ende Zinsbindung und Anschluss. Eine Seite Objekt &amp; Finanzierungsstruktur. 15-Jahres-Cashflow-Projektion. KI-Analyse als Fließtext. Annahmen und Disclaimer.</p><p>Sechs Seiten. Vollständig. Bankfähig. Du klickst, du lädst hoch, du gehst ins Bett. Am Donnerstag 8:53 Uhr versendet. Am Freitag im Termin: die Beraterin hat schon Notizen am Rand. Das ist der Unterschied zwischen einem Kunden, der vorbereitet kommt, und einem, der drei Termine später noch verhandeln muss.</p><div class="gs-pay">✈ Investment-Case mit einem Klick · 6 Seiten bankfähig</div></div>
+  </article>
+  <article class="gs-k" id="geschichte-04">
+    <div class="gs-szene" data-phase="3" aria-hidden="true">
+      <div class="gs-sz-kopf"><span class="gs-sz-flug">DP · 04</span><span class="gs-sz-phase"><b>DealPilot</b></span><span class="gs-ampel"><i></i><i></i><i></i></span></div>
+      <div class="gs-sz-problem">Der Eigentümer verlangt 485.000 €. Zu teuer, aber wie viel?</div>
+      <div class="gs-sz-wechsel">
+        <div class="gs-sz-wert"><span>Cashflow bei 485.000 €</span><div class="gs-sz-kipp"><b class="k1">Bauchgefühl</b><b class="k2">−87 €</b></div></div>
+        <div class="gs-sz-bahn"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z" transform="rotate(90 12 12)"/></svg></div>
+        <div class="gs-sz-wert gs-sz-loes"><span>Cashflow bei 425.000 €</span><b data-ziel="156" data-vor="+" data-nach=" €">+156 €</b></div>
+      </div>
+    </div>
+    <div class="gs-inhalt"><div class="gs-tag">Die Verhandlung</div>
+    <blockquote>„Du hast ein Objekt gefunden, das passt. Der Eigentümer verlangt 485.000 €. Dein Bauchgefühl sagt: zu teuer. Aber wie viel zu teuer? Und mit welcher Begründung verhandelst du, ohne gleich rausgeschmissen zu werden?"</blockquote><p>Verhandlung ohne Daten ist Pokern. Verhandlung mit Daten ist Schach. DealPilot rechnet dir aus, welcher Kaufpreis bei deinen Annahmen welche Rendite ergibt. Du siehst sofort: Bei 485.000 € landest du bei 4,2 % Bruttomietrendite und einem Cashflow von minus 87 €. Bei 455.000 € sind es 4,5 % und plus 34 €. Bei 425.000 € sind es 4,8 % und plus 156 €.</p><p>Mit dieser Information startest du die KI-Investment-Analyse. Die KI nimmt deine Zahlen, recherchiert die Lage im Web, vergleicht mit ähnlichen Verkäufen und sagt dir: Erstangebot 410.000 € — Zielpreis 430.000 € — Schmerzgrenze 455.000 €. Plus eine fertige Kaufpreis-Offerte als Text, formell gehalten, mit Begründungen für die E-Mail an den Verkäufer. Plus fünf Argumente für die Bank, warum dein Angebot vertretbar ist.</p><p>Du verhandelst nicht mehr aus dem Bauch. Du verhandelst mit Zahlen, die du belegen kannst. Verkäufer respektieren begründete Argumente. Du fängst die Verhandlung mit drei Schritten Vorsprung an.</p><div class="gs-pay">✈ KI-Verhandlungsempfehlung · konkrete Euro-Beträge</div></div>
+  </article>
+  <article class="gs-k" id="geschichte-05">
+    <div class="gs-szene" data-phase="3" aria-hidden="true">
+      <div class="gs-sz-kopf"><span class="gs-sz-flug">DP · 05</span><span class="gs-sz-phase"><b>DealPilot</b></span><span class="gs-ampel"><i></i><i></i><i></i></span></div>
+      <div class="gs-sz-problem">Zehn Jahre nach Kauf. Die Bank schlägt die Anschlussfinanzierung vor.</div>
+      <div class="gs-sz-wechsel">
+        <div class="gs-sz-wert"><span>Sollzins</span><div class="gs-sz-kipp"><b class="k1">2,1 %</b><b class="k2">5,2 %</b></div></div>
+        <div class="gs-sz-bahn"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z" transform="rotate(90 12 12)"/></svg></div>
+        <div class="gs-sz-wert gs-sz-loes"><span>Stresstest von Anfang an</span><b data-ziel="1.5" data-vor="Markt +" data-nach=" %" data-dez="1">Markt +1,5 %</b></div>
+      </div>
+    </div>
+    <div class="gs-inhalt"><div class="gs-tag">Ende der Zinsbindung</div>
+    <blockquote>„Zehn Jahre nach Kauf. Du sitzt mit deinem Berater zusammen. Die Bank schlägt 5,2 % für die Anschlussfinanzierung vor — du hattest 2,1 % bei Abschluss. Du fragst dich: Hält mein Cashflow das aus? Oder muss ich verkaufen?"</blockquote><p>Das ist die wichtigste Frage, die die wenigsten Investoren rechtzeitig stellen. Wer 2015 mit 1,8 % gekauft hat, wer 2017 mit 1,4 % refinanziert hat, wer 2019 das Maximaltilgungspaket gewählt hat — der kann 2026 in eine Anschlussfinanzierung rutschen, bei der die monatliche Rate sich verdoppelt. Wer das nicht durchgerechnet hat, schaut blass auf die Zahlen.</p><p>DealPilot rechnet diesen Stresstest von Anfang an mit. Du gibst eine Annahme für den Anschlusszins ein — etwa „aktueller Marktzins plus 1,5 %" — und siehst sofort: Wie hoch ist die neue Rate? Wie verändert sich der Cashflow? Trägt die aktuelle Miete die Belastung? Rutscht das Objekt in den negativen Bereich?</p><p>Wenn der Stresstest zeigt, dass dein Objekt eine Anschlussfinanzierung bei 5 oder 6 % nicht überlebt: weißt du es zehn Jahre vorher. Du hast Zeit zu reagieren — Sondertilgung erhöhen, Miete anpassen, Bausparvertrag einrichten, notfalls vor der Anschlussfinanzierung verkaufen. Das ist kein Pessimismus. Das ist Risikomanagement, das die Bank von dir erwartet.</p><div class="gs-pay">✈ Anschluss-Stresstest · Tilgungsplan über volle Laufzeit</div></div>
+  </article>
+  <article class="gs-k" id="geschichte-06">
+    <div class="gs-szene" data-phase="3" aria-hidden="true">
+      <div class="gs-sz-kopf"><span class="gs-sz-flug">DP · 06</span><span class="gs-sz-phase"><b>DealPilot</b></span><span class="gs-ampel"><i></i><i></i><i></i></span></div>
+      <div class="gs-sz-problem">Drei Objekte. Alle sehen auf den ersten Blick okay aus.</div>
+      <div class="gs-sz-wechsel">
+        <div class="gs-sz-wert"><span>Welches ist das beste?</span><div class="gs-sz-kipp"><b class="k1">A, B oder C</b><b class="k2">Bauchgefühl</b></div></div>
+        <div class="gs-sz-bahn"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z" transform="rotate(90 12 12)"/></svg></div>
+        <div class="gs-sz-wert gs-sz-loes"><span>Investor Deal Score Objekt C</span><b data-ziel="81" data-nach=" / 100">81 / 100</b></div>
+      </div>
+    </div>
+    <div class="gs-inhalt"><div class="gs-tag">24 KPIs. Eine Zahl.</div>
+    <blockquote>„Du hast drei Objekte zur Auswahl. Alle drei sehen auf den ersten Blick okay aus. Alle drei haben Stärken, alle drei haben Risiken. Aber welches ist objektiv das beste?"</blockquote><p>Hier kommt der Investor Deal Score 2.0 ins Spiel. Eine Bewertung von 0 bis 100, basierend auf 24 Einzelkennzahlen aus fünf Bereichen — Rendite, Cashflow, Finanzierung, Risiko und Potenzial. Jede Kennzahl mit Schwellenwerten kalibriert aus der Praxis institutioneller Investoren. Jede gibt Punkte. Die Punkte werden mit Bereichs-Gewichten verrechnet. Heraus kommt: eine Zahl, die du vergleichen kannst.</p><p>Objekt A: 73 Punkte. Stärken: starke Rendite, niedriger Kaufpreis-pro-Quadratmeter, gute Lage. Schwäche: kritischer DSCR (1,05). Objekt B: 67 Punkte. Stärken: Top-Lage, niedriger Leerstand. Schwäche: hoher Kaufpreis-Faktor, magere Rendite. Objekt C: 81 Punkte. Stärken: ausgewogen über alle Bereiche, gute Finanzierungsstruktur, klares Wertsteigerungs-Potenzial.</p><p>Klare Sache — bis du das Kleingedruckte liest. Objekt A punktet genau in dem Bereich, der dir als Cashflow-Investor wichtig ist. Du gewichtest neu. Live-Anzeige aktualisiert sich. Objekt A: 78. Objekt C: 79. Hart umkämpft — aber jetzt begründet.</p><div class="gs-pay">✈ Deal Score 2.0 · 24 KPIs · Anpassbare Gewichte</div></div>
+  </article>
+  <article class="gs-k" id="geschichte-07">
+    <div class="gs-szene" data-phase="3" aria-hidden="true">
+      <div class="gs-sz-kopf"><span class="gs-sz-flug">DP · 07</span><span class="gs-sz-phase"><b>DealPilot</b></span><span class="gs-ampel"><i></i><i></i><i></i></span></div>
+      <div class="gs-sz-problem">Die Beraterin fragt: „Wie sieht Ihr Bestand derzeit aus?“</div>
+      <div class="gs-sz-wechsel">
+        <div class="gs-sz-wert"><span>Alle Cashflows zusammengezählt</span><div class="gs-sz-kipp"><b class="k1">zuletzt?</b><b class="k2">im Kopf</b></div></div>
+        <div class="gs-sz-bahn"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z" transform="rotate(90 12 12)"/></svg></div>
+        <div class="gs-sz-wert gs-sz-loes"><span>Track-Record-PDF</span><b data-ziel="1" data-nach=" Klick">1 Klick</b></div>
+      </div>
+    </div>
+    <div class="gs-inhalt"><div class="gs-tag">Die Folgefinanzierung</div>
+    <blockquote>„Du betrittst die Bankfiliale für eine Folgefinanzierung. Die Beraterin reicht dir Kaffee und fragt: ‚Wie sieht Ihr Bestand derzeit aus?' Du beginnst, in deinem Kopf zu rechnen — wann hattest du das letzte Mal alle Cashflows zusammengezählt?"</blockquote><p>Wer mehr als zwei Objekte besitzt, kennt diese Frage. Und wer sie ein paarmal bekommen hat, weiß, wie peinlich es ist, wenn man die Antwort schuldig bleibt — oder schlimmer: wenn man eine Antwort gibt und sie sich später als falsch herausstellt.</p><p>DealPilot kennt dein Portfolio. In der Portfolio-Übersicht liegen alle deine Objekte als suchbare, sortierbare Tabelle — Kürzel, Adresse, Kaufpreis, Gesamtinvestition, Rendite, DSCR, LTV, Cashflow, Deal Score. Eine Sidebar zeigt dir auf einen Blick die Highlights jedes Objekts.</p><p>Und das Track-Record-PDF: Ein Bestandsnachweis, den du der Bank in die Hand drückst. Jedes Objekt mit Foto, Kaufpreis, Cashflow, Rendite und Deal Score auf einer kompakten Seite. Plus Portfolio-Aggregate. Statt nervös im Kopf zu rechnen, sagst du: „Hier ist mein aktueller Track-Record." Die Beraterin blättert. Lächelt. Du hast die Folgefinanzierung schon zur Hälfte gewonnen.</p><div class="gs-pay">✈ Portfolio-Übersicht · Track-Record für die Bank</div></div>
+  </article>
+  <article class="gs-k" id="geschichte-08">
+    <div class="gs-szene" data-phase="3" aria-hidden="true">
+      <div class="gs-sz-kopf"><span class="gs-sz-flug">DP · 08</span><span class="gs-sz-phase"><b>DealPilot</b></span><span class="gs-ampel"><i></i><i></i><i></i></span></div>
+      <div class="gs-sz-problem">Die Hausbank nennt dir 4,1 %. Klingt fair, aber im Vergleich wozu?</div>
+      <div class="gs-sz-wechsel">
+        <div class="gs-sz-wert"><span>Angebot der Hausbank</span><div class="gs-sz-kipp"><b class="k1">4,1 %</b><b class="k2">kein Vergleich</b></div></div>
+        <div class="gs-sz-bahn"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z" transform="rotate(90 12 12)"/></svg></div>
+        <div class="gs-sz-wert gs-sz-loes"><span>Marktzinsen im Finanzierungs-Tab</span><b>mit Stand-Datum</b></div>
+      </div>
+    </div>
+    <div class="gs-inhalt"><div class="gs-tag">Live-Marktzinsen</div>
+    <blockquote>„Du sprichst mit deiner Hausbank über die Konditionen. Sie nennt dir 4,1 %. Klingt fair? Oder klingt nur fair, weil du keinen Vergleich hast?"</blockquote><p>DealPilot zeigt dir direkt im Finanzierungs-Tab die aktuellen Effektivzinsen für Wohnungsbaukredite — variabel, 1–5 Jahre, 5–10 Jahre, über 10 Jahre. Daten kommen aus der ECB-MFI-Statistik der Bundesbank, monatlich aktualisiert. Mit Stand-Datum, mit Quelle, ohne Hokuspokus.</p><p>Plus: Vergleichslinks zu Interhyp, Dr. Klein und Baufi24 — damit du deine eigene Konditionen-Anfrage direkt machen kannst und siehst, ob die 4,1 % deiner Hausbank am Markt liegen oder ob du nochmal verhandeln solltest.</p><p>Eine kleine Funktion. Aber eine, die dich pro Finanzierung mehrere hundert Euro pro Jahr kosten kann, wenn du sie nicht hast. Über zehn Jahre Zinsbindung summiert sich das schnell zu fünfstelligen Beträgen.</p><div class="gs-pay">✈ Live-Marktzinsen Bundesbank · ECB-MFI-Statistik</div></div>
+  </article>
+  <article class="gs-k" id="geschichte-09">
+    <div class="gs-szene" data-phase="3" aria-hidden="true">
+      <div class="gs-sz-kopf"><span class="gs-sz-flug">DP · 09</span><span class="gs-sz-phase"><b>DealPilot</b></span><span class="gs-ampel"><i></i><i></i><i></i></span></div>
+      <div class="gs-sz-problem">Der Steuerberater will die Werbungskosten aufgeschlüsselt.</div>
+      <div class="gs-sz-wechsel">
+        <div class="gs-sz-wert"><span>Eine Stunde Termin</span><div class="gs-sz-kipp"><b class="k1">60 Min.</b><b class="k2">30 Min. Belege suchen</b></div></div>
+        <div class="gs-sz-bahn"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z" transform="rotate(90 12 12)"/></svg></div>
+        <div class="gs-sz-wert gs-sz-loes"><span>Termin mit Werbungskosten-PDF</span><b data-ziel="40" data-nach=" Min. kürzer">40 Min. kürzer</b></div>
+      </div>
+    </div>
+    <div class="gs-inhalt"><div class="gs-tag">Das Steuergespräch</div>
+    <blockquote>„Mai. Du sitzt beim Steuerberater. Er fragt: ‚Können Sie mir die Werbungskosten für Ihr Mehrfamilienhaus aufschlüsseln? AfA, Schuldzinsen, Bewirtschaftung, Sanierung — alles?'"</blockquote><p>Du beginnst, in deinen Ordnern zu kramen. Belege suchen, Excel öffnen, Schuldzinsen aus dem Tilgungsplan abschreiben, AfA neu berechnen. Eine Stunde Termin, davon 30 Minuten mit dem Aktenkoffer beschäftigt.</p><p>DealPilot generiert dir auf Knopfdruck ein Werbungskosten-PDF: Alle Positionen, sortiert und summiert. AfA, Schuldzinsen, Bewirtschaftungskosten, Sanierungskosten, Möblierung, Fahrtkosten — über 15 Jahre projiziert. Mit Tabelle für das aktuelle Jahr, mit Verlaufsdiagramm für die Folgejahre.</p><p>Du legst das PDF auf den Tisch. Steuerberater scannt zwei Minuten durch. „Sehr gut. Den Rest übernehme ich." Dein Termin ist 40 Minuten kürzer — und die Beratungsrechnung entsprechend günstiger.</p><div class="gs-pay">✈ Werbungskosten-PDF · Belegübersicht für den Steuerberater</div></div>
+  </article>
+  <article class="gs-k" id="geschichte-10">
+    <div class="gs-szene" data-phase="3" aria-hidden="true">
+      <div class="gs-sz-kopf"><span class="gs-sz-flug">DP · 10</span><span class="gs-sz-phase"><b>DealPilot</b></span><span class="gs-ampel"><i></i><i></i><i></i></span></div>
+      <div class="gs-sz-problem">Tilgungsaussetzung mit Bausparvertrag. Niedrige Raten, aber reicht die Summe?</div>
+      <div class="gs-sz-wechsel">
+        <div class="gs-sz-wert"><span>Bausparsumme deckt das Darlehen</span><div class="gs-sz-kipp"><b class="k1">sicher?</b><b class="k2">Lücke nach 10 Jahren</b></div></div>
+        <div class="gs-sz-bahn"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z" transform="rotate(90 12 12)"/></svg></div>
+        <div class="gs-sz-wert gs-sz-loes"><span>DealPilot zeigt die Lücke</span><b>beim Eingeben</b></div>
+      </div>
+    </div>
+    <div class="gs-inhalt"><div class="gs-tag">Der Bausparvertrag</div>
+    <blockquote>„Du finanzierst dein nächstes Objekt mit Tilgungsaussetzung über Bausparvertrag. Klingt clever — niedrige Raten, Steuervorteil. Aber: Reicht die Bausparsumme am Ende wirklich, um das Tilgungsaussetzungsdarlehen abzulösen?"</blockquote><p>Das ist die kritische Lücke, die viele Investoren übersehen. Wer Tilgungsaussetzungs-Darlehen mit Bausparverträgen kombiniert, fährt einen Zeitstrahl mit zwei Bewegungen: Das Tilgungsaussetzungsdarlehen wächst nicht, der Bausparvertrag spart langsam an. Wenn die Mindest-Quote bei Zuteilung erreicht ist und die Bausparsumme das Hauptdarlehen exakt deckt — perfekt. Wenn nicht — Lücke. Eine Lücke, die du erst in zehn Jahren bemerkst.</p><p>DealPilot bildet den vollen Bausparvertrag-Lebenszyklus ab. Ansparphase, Zuteilungszeitpunkt, Darlehensphase mit dem zugesagten Sollzins. Während du die Werte eingibst, läuft eine Plausibilitätsprüfung im Hintergrund. Wenn die Bausparsumme nicht reicht, warnt die App.</p><p>Du gehst nicht mit einem Wunschdenken ins Bankgespräch. Du gehst mit einem durchgerechneten Konzept, das auch in zehn Jahren noch trägt.</p><div class="gs-pay">✈ Bausparvertrag-Lebenszyklus · Plausibilitätsprüfung</div></div>
+  </article>
+  <article class="gs-k" id="geschichte-11">
+    <div class="gs-szene" data-phase="3" aria-hidden="true">
+      <div class="gs-sz-kopf"><span class="gs-sz-flug">DP · 11</span><span class="gs-sz-phase"><b>DealPilot</b></span><span class="gs-ampel"><i></i><i></i><i></i></span></div>
+      <div class="gs-sz-problem">Zahlen und Score stehen. Was würde ein erfahrener Investment-Manager sagen?</div>
+      <div class="gs-sz-wechsel">
+        <div class="gs-sz-wert"><span>Zweite Meinung</span><div class="gs-sz-kipp"><b class="k1">höflich</b><b class="k2">fehlt</b></div></div>
+        <div class="gs-sz-bahn"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z" transform="rotate(90 12 12)"/></svg></div>
+        <div class="gs-sz-wert gs-sz-loes"><span>Worst Case gerechnet</span><b data-ziel="10" data-vor="Miete −" data-nach=" %">Miete −10 %</b></div>
+      </div>
+    </div>
+    <div class="gs-inhalt"><div class="gs-tag">Die KI-Investment-These</div>
+    <blockquote>„Du hast deine Zahlen. Du hast deinen Score. Aber: Was würde ein erfahrener Investment-Manager dazu sagen? Einer, der nicht müde wird, der nicht höflich ist, der dir alles sagt — auch das, was wehtut?"</blockquote><p>Mit einem Klick startet die KI-Investment-Analyse. Die KI nimmt alle deine Daten — alle Zahlen, alle Kennzahlen, alle Lage-Selbsteinschätzungen — und schickt sie zusammen mit einer Web-Recherche zur Lage an ChatGPT.</p><p>Was du zurückbekommst, ist strukturierte Investment-Bewertung mit echten Argumenten: Gesamtbewertung mit klarem Rating („Sehr attraktiv" bis „Ungeeignet"). Stärken und Risiken jeweils 4–5 nummerierte Punkte, ausführlich begründet mit Bezug auf deine echten Zahlen. Risikoanalyse für Finanzierung, Cashflow-Stabilität, Annahmen-Abhängigkeit. Szenario-Analyse Worst Case (Miete −10 %, Zins +1 %) und Best Case durchgerechnet. Investor-Fit-Einschätzung. Klare Empfehlung „Kaufen" / „Prüfen" / „Nicht kaufen" — mit Begründung.</p><p>Plus: eine konkrete Verhandlungsempfehlung mit Erstangebot, Zielpreis, Schmerzgrenze — jeweils mit Euro-Betrag. Plus eine fertige Kaufpreis-Offerte als kopierbarer Text. Plus fünf bis sieben Argumente für die Bank. Ein Berater, der in zwei Minuten liefert, wofür du sonst eine Woche Recherche bräuchtest.</p><div class="gs-pay">✈ KI-Analyse · 9 Output-Sektionen · 1 Credit = 2 Analysen</div></div>
+  </article>
+  <article class="gs-k" id="geschichte-12">
+    <div class="gs-szene" data-phase="3" aria-hidden="true">
+      <div class="gs-sz-kopf"><span class="gs-sz-flug">DP · 12</span><span class="gs-sz-phase"><b>DealPilot</b></span><span class="gs-ampel"><i></i><i></i><i></i></span></div>
+      <div class="gs-sz-problem">Neu vermietet zu 7,80 € je m². Lässt du gerade Geld liegen?</div>
+      <div class="gs-sz-wechsel">
+        <div class="gs-sz-wert"><span>Miete je m²</span><div class="gs-sz-kipp"><b class="k1">7,80 €</b><b class="k2">Markt 9,00 €</b></div></div>
+        <div class="gs-sz-bahn"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z" transform="rotate(90 12 12)"/></svg></div>
+        <div class="gs-sz-wert gs-sz-loes"><span>Mehr Jahresmiete bei 84 m²</span><b data-ziel="1200" data-vor="+" data-nach=" €">+1.200 €</b></div>
+      </div>
+    </div>
+    <div class="gs-inhalt"><div class="gs-tag">Das Mieter-Gespräch</div>
+    <blockquote>„Du hast eine Wohnung neu vermietet. 7,80 € pro Quadratmeter. Klingt vernünftig. Aber: Würde der Markt mehr hergeben? Lässt du gerade Geld liegen?"</blockquote><p>Die Mietpreis-Analyse zeigt dir, wie sich deine Miete in € pro Quadratmeter zur lokalen Marktmiete verhält. Sind die 7,80 €/m² in einer Stadt mit Mietspiegel 9,20 €/m² ein Schnäppchen für den Mieter, also Mietsteigerungs-Potenzial? Oder einfach zu niedrig kalkuliert?</p><p>Im Investor- und Pro-Plan kommt die KI-Marktmieten-Recherche dazu: Die KI sucht im Web nach aktuellen Vergleichsangeboten in deiner Lage, schätzt eine plausible Mietbandbreite und nennt dir Quellen. So weißt du nicht nur, was der Mietspiegel sagt — sondern was Vermieter tatsächlich aktuell verlangen.</p><p>Bei 84 m² und einer realistischen Marktmiete von 9,00 statt 7,80 €/m² sind das 1.200 € mehr Jahresmiete pro Jahr. Über zehn Jahre 12.000 € — bei verkaufsorientierter Bewertung sogar mehr. Aus „klingt vernünftig" wird „auf dem Tisch."</p><div class="gs-pay">✈ Mietpreis-Analyse · KI-Marktmieten-Recherche</div></div>
+  </article>
+  <article class="gs-k" id="geschichte-13">
+    <div class="gs-szene" data-phase="3" aria-hidden="true">
+      <div class="gs-sz-kopf"><span class="gs-sz-flug">DP · 13</span><span class="gs-sz-phase"><b>DealPilot</b></span><span class="gs-ampel"><i></i><i></i><i></i></span></div>
+      <div class="gs-sz-problem">Drei Tabs offen, Mietspiegel googeln, AfA per Hand.</div>
+      <div class="gs-sz-wechsel">
+        <div class="gs-sz-wert"><span>Excel-Datei nach</span><div class="gs-sz-kipp"><b class="k1">3 Std.</b><b class="k2">nicht ganz vertraut</b></div></div>
+        <div class="gs-sz-bahn"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z" transform="rotate(90 12 12)"/></svg></div>
+        <div class="gs-sz-wert gs-sz-loes"><span>Module verknüpft</span><b data-ziel="7">7</b></div>
+      </div>
+    </div>
+    <div class="gs-inhalt"><div class="gs-tag">Power-Pitch · Excel vs. DealPilot</div>
+    <blockquote>„Schluss mit Excel-Voodoo."</blockquote><p>Vor DealPilot: Drei Tabs offen. Mietspiegel googeln. AfA per Hand. Schuldzinsen aus dem Tilgungsplan abschreiben. Hausgeld vergessen, korrigieren. Mietausfall? Vergessen. Drei Stunden später hast du eine Excel-Datei, der du nicht ganz traust.</p><p>Mit DealPilot: PDF reinziehen. Sechs Felder prüfen. Übernehmen. Cashflow steht. Score steht. Investment-Case steht. In der Zeit, in der du vorher den Mietspiegel gegoogelt hast, bist du fertig.</p><p>Eine Plattform. Sieben Module. Null Bauchgefühl. Das ist der Unterschied zwischen Hobby und Profi.</p><div class="gs-pay">✈ 7 Module verknüpft · keine Excel-Vorlagen mehr</div></div>
+  </article>
+  <article class="gs-k" id="geschichte-14">
+    <div class="gs-szene" data-phase="3" aria-hidden="true">
+      <div class="gs-sz-kopf"><span class="gs-sz-flug">DP · 14</span><span class="gs-sz-phase"><b>DealPilot</b></span><span class="gs-ampel"><i></i><i></i><i></i></span></div>
+      <div class="gs-sz-problem">Ein Samstagnachmittag, das siebte Mehrfamilienhaus von Hand.</div>
+      <div class="gs-sz-wechsel">
+        <div class="gs-sz-wert"><span>Für ein Objekt</span><div class="gs-sz-kipp"><b class="k1">6 Std.</b><b class="k2">nicht gekauft</b></div></div>
+        <div class="gs-sz-bahn"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z" transform="rotate(90 12 12)"/></svg></div>
+        <div class="gs-sz-wert gs-sz-loes"><span>Daraus entstanden</span><b>DealPilot</b></div>
+      </div>
+    </div>
+    <div class="gs-inhalt"><div class="gs-tag">Founder-Voice · Warum wir DealPilot gebaut haben</div>
+    <blockquote>„Vor drei Jahren saß ich an einem Samstagnachmittag in meinem Büro und rechnete mein siebtes Mehrfamilienhaus durch. Sechs Stunden. Für ein Objekt, das ich am Ende nicht gekauft habe."</blockquote><p>Ich bin Immobilien-Sachverständiger. Ich kenne die Zahlen, die zählen. Ich kenne die Stolperfallen. Aber jedes Mal aufs Neue im Excel anfangen, jedes Mal wieder die gleichen Formeln tippen — das ist Zeitverschwendung auf hohem Niveau.</p><p>Also habe ich mir mein eigenes Tool gebaut. Erst nur für mich. Dann für meine Beratungskunden. Irgendwann wurde mir klar: andere Investoren brauchen das auch. So entstand DealPilot.</p><p>Was du in der App siehst, ist kein theoretisches Modell. Es sind die Module, mit denen ich heute selbst arbeite — und mit denen ich Kunden bei Junker Immobilien durch ihre Investments begleite.</p><div class="gs-pay">✈ — Marcel Junker · Junker Immobilien</div></div>
+  </article>
+  <article class="gs-k" id="geschichte-15">
+    <div class="gs-szene" data-phase="3" aria-hidden="true">
+      <div class="gs-sz-kopf"><span class="gs-sz-flug">DP · 15</span><span class="gs-sz-phase"><b>DealPilot</b></span><span class="gs-ampel"><i></i><i></i><i></i></span></div>
+      <div class="gs-sz-problem">Kaufpreis, Wohnfläche, Miete, Eigenkapital, Zins, Tilgung.</div>
+      <div class="gs-sz-wechsel">
+        <div class="gs-sz-wert"><span>Lohnt das Weiterrechnen?</span><div class="gs-sz-kipp"><b class="k1">6 Zahlen</b><b class="k2">Zeitfresser?</b></div></div>
+        <div class="gs-sz-bahn"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z" transform="rotate(90 12 12)"/></svg></div>
+        <div class="gs-sz-wert gs-sz-loes"><span>Ampel steht nach</span><b data-ziel="30" data-nach=" s">30 s</b></div>
+      </div>
+    </div>
+    <div class="gs-inhalt"><div class="gs-tag">Power-Pitch · 30 Sekunden zur Wahrheit</div>
+    <blockquote>„Sechs Zahlen. Eine Wahrheit."</blockquote><p>Kaufpreis. Wohnfläche. Miete. Eigenkapital. Zins. Tilgung. Mehr brauchst du nicht.</p><p>Bruttomietrendite, Faktor, monatliche Rate, Cashflow, LTV, Kaufpreis pro Quadratmeter — live, während du tippst. Keine „Berechnen"-Buttons. Kein Warten. Eine Ampel sagt dir auf den ersten Blick: lohnenswert oder Zeitfresser.</p><p>Was passt? Übernimm es mit einem Klick in die Vollberechnung. Was nicht passt? Nächstes Exposé. Schlechte Deals in 30 Sekunden aussortieren — das ist der einzige Weg, mit dem du als Privatinvestor je in die Nähe eines Profi-Workflows kommst.</p><div class="gs-pay">✈ Boarding · Live-Berechnung · 30 Sekunden</div></div>
+  </article>
+  <article class="gs-k" id="geschichte-16">
+    <div class="gs-szene" data-phase="3" aria-hidden="true">
+      <div class="gs-sz-kopf"><span class="gs-sz-flug">DP · 16</span><span class="gs-sz-phase"><b>DealPilot</b></span><span class="gs-ampel"><i></i><i></i><i></i></span></div>
+      <div class="gs-sz-problem">2019, das erste Jahr nach dem Kauf: 64.000 € für Dach, Heizung, drei Bäder.</div>
+      <div class="gs-sz-wechsel">
+        <div class="gs-sz-wert"><span>Sofort absetzbar</span><div class="gs-sz-kipp"><b class="k1">64.000 €</b><b class="k2">über 40 Jahre</b></div></div>
+        <div class="gs-sz-bahn"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z" transform="rotate(90 12 12)"/></svg></div>
+        <div class="gs-sz-wert gs-sz-loes"><span>Live-Balken warnt an der Grenze</span><b data-ziel="15" data-nach=" %">15 %</b></div>
+      </div>
+    </div>
+    <div class="gs-inhalt"><div class="gs-tag">Founder-Voice · Die 15-%-Lektion</div>
+    <blockquote>„2019 habe ich mit meinem Steuerberater eine sehr unangenehme Stunde verbracht. Ich hatte gerade ein Objekt gekauft und im ersten Jahr 64.000 € in Sanierung gesteckt — Dach, Heizung, drei Bäder."</blockquote><p>Mein Steuerberater hat mich angeschaut und gesagt: „Marcel, Sie sind über der 15-%-Grenze. Wir müssen aktivieren." Aus 64.000 € sofortigem Werbungskosten-Abzug wurde eine Aktivierung über 40 Jahre. Im ersten Jahr ein Liquiditätsverlust im hohen vierstelligen Bereich.</p><p>An dem Abend habe ich beschlossen: Das passiert mir nie wieder. Und es passiert auch meinen Beratungskunden nicht. Im Investitionsmodul läuft seitdem ein Live-Balken, der dir bei jeder Sanierungsposition zeigt, wo du stehst. Wenn du über die Grenze gehst, springt die Anzeige auf Rot.</p><p>Das ist keine Feature-Erfindung. Das ist eine Lektion aus eigenem Schaden, gegossen in Code, damit niemand anders sie nochmal lernen muss.</p><div class="gs-pay">✈ — Aus eigener Erfahrung in Code gegossen</div></div>
+  </article>
+  </div>
 </div></section>
 </main>
 
@@ -229,16 +441,7 @@ section[id]{scroll-margin-top:70px}
   </div>
 </div></footer>
 
-<script src="dp2-daten.js?v=landing-module-2"></script>
 <script src="dp2.js?v=landing-zahlen-2"></script>
   <script src="assets/umgebung.js?v=v1644"></script><!-- v1644 · Landing zeigt auf DIE App, in der sie steht -->
-<script>/* landing-kern-2 · die Geschichten als Liste (Daten: dp2-daten.js) */
-(function () {
-  var g = document.getElementById('gsGrid'), S = window.DP_STORIES || [];
-  g.innerHTML = S.map(function (s) {
-    var b = (Array.isArray(s.body) ? s.body : [s.body]).map(function (p) { return '<p>' + p + '</p>'; }).join('');
-    return '<article class="gs-k"><div class="gs-tag">' + String(s.tag || '').replace(/^\/\/\s*/, '') + '</div>'
-      + '<blockquote>' + s.scene + '</blockquote>' + b + (s.pay ? '<div class="gs-pay">✈ ' + s.pay + '</div>' : '') + '</article>';
-  }).join('');
-})();</script>
+<script src="geschichten.js?v=landing-geschichten-1"></script><!-- landing-geschichten-1 · Szenen ablaufen lassen -->
 </body></html>
