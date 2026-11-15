@@ -41803,4 +41803,8 @@ html body #s3 #zaer_display { white-space: normal !important; overflow: visible 
    lag bei 1280 px UNTER der Pilot-Blase (#dp-blase-fab, z 10055, 56 x 89 ab x 1192) - elementFromPoint in der
    Knopfmitte traf die Blase, ein echter Klick haette den Hinweis nicht geschlossen. Der Hinweis ist kurzlebig
    und traegt sein eigenes X; er liegt jetzt darueber. */
-html body .upgrade-toast { z-index: 10060; }
+html body .upgrade-toast { z-index: 100050; }   /* v3410b: auch über dem Partner-Aufgabenband #dppk-band (z 100040), das bei 390 px das X verdeckte */
+/* v3410b · Bei 390 px lag das Partner-Aufgabenband (#dppk-band, z 100040) ueber dem Fuss des Erststart-Fensters
+   (#dp-onboarding, z 100000): elementFromPoint auf „Weiter"/„Fertig" (y 733) traf das Band. Solange die
+   Einrichtung offen ist, liegt das Band darunter - es kommt danach unveraendert wieder nach vorn. */
+html body:has(> #dp-onboarding) #dppk-band { z-index: 99990 !important; }
