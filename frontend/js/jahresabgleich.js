@@ -44,7 +44,7 @@
 (function (global) {
   'use strict';
   if (global.DpJahresabgleich) return;
-  var VERSION = 'v3430';
+  var VERSION = 'v3431';
   var GOLD = 'var(--wl-c9a84c, #C9A84C)';
   var SCHRITTE = [['miete', 'Miete'], ['steuer', 'Steuer'], ['wert', 'Wert'], ['haus', 'Haus']];
   var WORT = { ok: 'erledigt', teil: 'teilweise', offen: 'offen', laufend: 'läuft' };
@@ -278,7 +278,7 @@
       + genT
       + (ungenutzt > 0 && mp.ungenutzt_jahr > 0 && !lauf ? ' Nicht genutzt im Jahr: <b>' + eur(mp.ungenutzt_jahr) + '</b>.' : '')
       + (ungenutzt > 0 && mp.ungenutzt_jahr > 0 && lauf ? ' Bis Jahresende ohne Erhöhung: ' + eur(mp.ungenutzt_jahr) + ' weniger.' : '')
-      + (mp.ohne_vgl ? ' Ohne Vergleichsmiete rechnet nur die Kappungsgrenze.' : '')
+      + (mp.ohne_vgl ? ' Für ' + (mp.wohnungen.length > 1 ? 'einen Teil der Wohnungen' : 'die Wohnung') + ' ist keine Vergleichsmiete bekannt, dort rechnet § 558 nicht (Mietspiegel im Reiter Miete eintragen).' : '')
       + (mp.sperre ? ' Die Erhöhung davor ist nicht eingetragen, die Sperrfrist ist nicht geprüft.' : '')
       + (ungenutzt <= 0 && !gen.length ? ' ' + esc((mp.wohnungen[0] && mp.wohnungen[0].grund) || 'Die Miete liegt an der zulässigen Grenze.') : '');
     /* im Jahr genutzt: die Erhöhung ist eingetragen und es blieb (fast) nichts liegen */
@@ -324,6 +324,7 @@
   function html() {
     if (!verfuegbar()) return '';
     stil();
+    _mp.key = null;   /* je Zeichnen neu: Vergleichsmiete und Kappung laden nach (Mietspiegel-Register, Kappungsliste) */
     var Z = JB().zeilen().slice().sort(function (a, b) { return b.jahr - a.jahr; });
     if (!Z.length) return '';
     var weg = mitWeg(), key = global._currentObjKey, L = null;
@@ -482,7 +483,7 @@
   if (global.addEventListener) {
     global.addEventListener('dp:object-ready', function () { mountAll._mb = null; _mp.key = null; setTimeout(mountAll, 950); });
     global.addEventListener('dp:erhoehungen', function () { _mp.key = null; setTimeout(mountAll, 120); });
-    global.addEventListener('dp:potenzial', function () { _mp.key = null; });
+    global.addEventListener('dp:potenzial', function () { _mp.key = null; var d = doc(); if (d && d.querySelector && d.querySelector('[data-dp-ja-host] .dp-ja')) { clearTimeout(mountAll._p); mountAll._p = setTimeout(mountAll, 200); } });
   }
 
   global.DpJahresabgleich = { VERSION: VERSION, stand: stand, hausStand: hausStand, hausJahr: hausJahr, erinnerung: erinnerung, mbAbrufen: mbAbrufen,
