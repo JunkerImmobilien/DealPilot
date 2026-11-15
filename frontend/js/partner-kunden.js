@@ -139,8 +139,8 @@
       '#dppk-tabzeile .dppk-zurueck svg{transform:scaleX(-1)}',
       '#dppk-tabzeile .dppk-trenner{flex:0 0 1px;align-self:center;height:18px;background:currentColor;opacity:.2;margin:0 6px}',
       '#dppk-tabzeile .pk-zahl{display:inline-block;min-width:17px;height:17px;line-height:17px;border-radius:9px;background:#B8625C;color:#fff;font:600 10px Inter,sans-serif;text-align:center;padding:0 5px}',
-      '#dppk-ab{display:block;padding:22px 26px 40px;font-family:Inter,system-ui,sans-serif}',
-      '#dppk-ab .pk-box{width:auto;box-shadow:none;background:#FDFCFA;border:1px solid #EDE2C6;border-radius:14px;max-width:1180px;margin:0 auto;color:#2A2727;overflow:hidden}',
+      '#dppk-ab{display:block;padding:14px 0 20px;font-family:Inter,system-ui,sans-serif}',
+      '#dppk-ab .pk-box{width:auto;box-shadow:none;background:#FDFCFA;border:1px solid #EDE2C6;border-radius:14px;margin:0;color:#2A2727;overflow:hidden}',
       '#dppk-ab .pk-kopf{background:transparent;color:#2A2727;border-bottom-color:#EDE6D6;display:flex;align-items:flex-end;gap:12px;padding:18px 22px 14px;border-bottom:1px solid #EDE6D6;flex-wrap:wrap}',
       '#dppk-ab .pk-kopf h2{margin:0;flex:1 1 240px;min-width:0;font:600 22px "Space Grotesk",Inter,sans-serif;color:#2A2727}',
       '#dppk-ab .pk-kopf .pk-sub{display:block;font:500 10.5px "JetBrains Mono",monospace;letter-spacing:.08em;text-transform:uppercase;color:' + G + ';margin-bottom:3px}',
@@ -156,7 +156,7 @@
       '#dppk-ab .pk-verw .rp-bar,#dppk-ab .pk-verw .rp-foot,#dppk-ab .pk-verw .rp-hero{display:none !important}',
       '#dppk-ab .pk-verw .rp-body{min-height:520px}',
       '#dppk-ab .pk-verw .rp-work{overflow:visible}',
-      '@media (max-width:640px){#dppk-ab{padding:10px 0 30px}#dppk-ab .pk-box{border-radius:0;border-left:0;border-right:0}#dppk-ab .pk-kopf{padding:14px 14px 10px}#dppk-ab .pk-kopf h2{font-size:19px}#dppk-ab .pk-inhalt{padding:14px}#dppk-ab .pk-spalten{grid-template-columns:1fr}#dppk-ab .pk-verw .rp-body{min-height:0}}'
+      '@media (max-width:640px){#dppk-ab{padding:6px 0 20px}#dppk-ab .pk-box{border-radius:10px}#dppk-ab .pk-kopf{padding:14px 14px 10px}#dppk-ab .pk-kopf h2{font-size:19px}#dppk-ab .pk-inhalt{padding:14px}#dppk-ab .pk-spalten{grid-template-columns:1fr}#dppk-ab .pk-verw .rp-body{min-height:0}}'
     ]).join('\n');
     document.head.appendChild(s);
   }
@@ -271,7 +271,8 @@
   }
   function abSektion() {
     var s = document.getElementById('dppk-ab'); if (s) return s;
-    var mc = document.querySelector('.main-col'); if (!mc) return null;
+    /* v3391 · in .body (der Behaelter der .sec, 1320 px, eigener Rand) - direkt in .main-col blieb .body als 90 px hohe Leerflaeche darueber stehen */
+    var mc = document.querySelector('.main-col > .body') || document.querySelector('.main-col'); if (!mc) return null;
     s = document.createElement('section'); s.id = 'dppk-ab'; s.setAttribute('aria-label', 'Partner-Cockpit');
     s.innerHTML = '<div class="pk-box"><div class="pk-kopf"><h2><span class="pk-sub">Partner-Cockpit</span><span class="pk-titel"></span></h2><span class="pk-titel2"></span></div><div class="pk-inhalt"></div></div>';
     mc.appendChild(s);
