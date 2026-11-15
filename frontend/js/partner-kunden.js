@@ -141,6 +141,12 @@
       /* v3450 · Marcel 15.11.: „Im Partner-Cockpit steht immer die Pille Ist · heute | Soll · Ankauf-Stand …“ - alles, was zum
          geladenen Objekt gehoert, steht hinter dem Cockpit nicht (nach „← Objekte“ wieder da, die Regel haengt nur am Attribut) */
       'html[data-pk-offen] #ank-ansicht-host,html[data-pk-offen] #dppk-ks,html[data-pk-offen] #dppk-anm-liste,html[data-pk-offen] #dppk-anm-layer{display:none !important}',
+      /* gemessen 15.11. bei offenem Cockpit (1280 px, Objekt mit Ankauf-Stand): im Kopf standen weiter Objektnummer, Anschrift,
+         „Gespeichert …“, „Ziel 8 %“ und „21 / 24 Felder“ des zuletzt geladenen Objekts. Das Kontingent bleibt, es gehoert zum Konto. */
+      'html[data-pk-offen] #hdr-obj-num,html[data-pk-offen] .hdr-v61-row1 > .hdr-sep,html[data-pk-offen] #hdr-obj,html[data-pk-offen] #hdr-autosave,html[data-pk-offen] .hdr-ziel-mini,html[data-pk-offen] #hdr-completeness,html[data-pk-offen] .tabs-status-badge,html[data-pk-offen] #hdr-toggle-btn,html[data-pk-offen] header.hdr [class*="score"]{display:none !important}',
+      'html:not([data-pk-offen]) #dppk-hdr-titel{display:none !important}',
+      '#dppk-hdr-titel{font:600 15px "Space Grotesk",Inter,sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}',
+      '#dppk-hdr-titel small{font:500 10.5px "JetBrains Mono",monospace;letter-spacing:.08em;text-transform:uppercase;opacity:.7;margin-right:8px}',
       'html:not([data-pk-offen]) #dppk-tabzeile{display:none !important}',
       '#dppk-tabzeile{display:flex;align-items:stretch;flex:0 0 auto;min-width:0}',
       '#dppk-tabzeile .dppk-tab{display:flex;align-items:center;gap:6px;border:0;border-bottom:1px solid transparent;background:transparent;cursor:pointer;white-space:nowrap;flex:0 0 auto;font-family:Inter,sans-serif}',
@@ -357,6 +363,11 @@
       if (nav) nav.style.display = '';   /* der Schliesser von 'single' blendet nav.tabs aus - hier bleibt sie, mit anderen Reitern */
       var alt = document.getElementById('dppk-ov'); if (alt) alt.remove();
       document.documentElement.setAttribute('data-pk-offen', '1');
+      try {   /* v3450 · im Kopf statt Objektnummer und Anschrift der Name des Cockpits */
+        var zeile = document.querySelector('header.hdr .hdr-v61-row1'), ht = document.getElementById('dppk-hdr-titel');
+        if (zeile && !ht) { ht = document.createElement('span'); ht.id = 'dppk-hdr-titel'; var vor = zeile.querySelector('#hdr-obj-num'); zeile.insertBefore(ht, vor || zeile.firstChild); }
+        if (ht) ht.innerHTML = '<small>Partner-Cockpit</small>' + esc(c.partner && c.partner.name || '');
+      } catch (e) {}
       PK.offen = true;
       var s = abSektion(); if (s) s.style.display = '';
       reiterWahl(startReiter && TITEL[startReiter] ? startReiter : (PK.aktiv || 'uebersicht'));

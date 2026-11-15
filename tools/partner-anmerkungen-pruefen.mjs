@@ -71,7 +71,7 @@ if (process.argv.includes('--live')) {
   const SERVER = 'root@116.203.214.11';
   const live = path.join(WURZEL, 'tools/partner-anmerkungen-live.js');
   try {
-    const aus = execSync(`scp -q "${live}" ${SERVER}:/tmp/pal.js && ssh ${SERVER} "docker cp /tmp/pal.js dealpilot-backend:/app/partner-anmerkungen-live.js && docker exec dealpilot-backend node /app/partner-anmerkungen-live.js; R=\\$?; docker exec dealpilot-backend rm -f /app/partner-anmerkungen-live.js; rm -f /tmp/pal.js; exit \\$R"`, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
+    const aus = execSync(`scp -q "${live}" ${SERVER}:/tmp/pal.js && ssh ${SERVER} "docker cp /tmp/pal.js dealpilot-backend:/app/partner-anmerkungen-live.js && docker exec dealpilot-backend node /app/partner-anmerkungen-live.js; docker exec dealpilot-backend rm -f /app/partner-anmerkungen-live.js; rm -f /tmp/pal.js"`, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });   /* RC kommt ueber die Zeile „LIVE … rot“ (die Shell unter Windows reicht $? nicht durch) */
     process.stdout.write(aus);
     const m = aus.match(/LIVE (\d+) Punkte, (\d+) rot/);
     ok('Live-Lauf vollstaendig', !!m && m[2] === '0', m && m[0]);
