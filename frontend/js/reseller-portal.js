@@ -187,19 +187,37 @@ if (!window._pdfGold) {
   }
   window._rpTinte = _rpTinte;
 
-  function openResellerPortal() {
-    if (_st.open) return;
+  /* v3390 · Eingebettet ins Partner-Cockpit (partner-kunden.js, Reiter „Verwaltung“): DIESELBE Oberflaeche, nur ohne
+     Overlay. Das Geruest traegt weiter id="rp-overlay" und #rp-work - go() und alle load*() greifen ueber diese IDs,
+     deshalb ist es dieselbe Code-Strecke und keine Kopie. „Mandanten“ entfaellt dort: das Cockpit fuehrt Kunden und
+     Plaetze selbst (Reiter „Kunden & Plätze“). Bar, Hero und Fuss blendet das Cockpit per CSS aus. */
+  function einbetten(ziel, sec) {
+    if (!ziel) return;
+    if (_st.open && !_st.eingebettet) closePortal();
+    ausbetten();
     injectCss();
     _rpTinte();
-    var ov = document.createElement('div'); ov.className = 'rp-ov'; ov.id = 'rp-overlay';
-    ov.innerHTML =
-      '<div class="rp-modal" role="dialog" aria-modal="true">' +
+    var w = document.createElement('div'); w.className = 'rp-eingebettet'; w.id = 'rp-overlay';
+    w.innerHTML = geruest(true);
+    ziel.appendChild(w);
+    _st.open = true; _st.eingebettet = true;
+    w.querySelectorAll('.rp-nav').forEach(function (b) { b.addEventListener('click', function () { go(b.getAttribute('data-s')); }); });
+    var s = sec || _st.sec || 'ueber'; if (s === 'mand') s = 'ueber';
+    go(s);
+  }
+  function ausbetten() {
+    if (!_st.eingebettet) return;
+    var w = $('rp-overlay'); if (w) w.remove();
+    _st.open = false; _st.eingebettet = false;
+  }
+  function geruest(eingebettet) {
+    return '<div class="rp-modal"' + (eingebettet ? '' : ' role="dialog" aria-modal="true"') + '>' +
         '<div class="rp-bar"><span class="rp-logo">Deal<b>Pilot</b></span><span class="rp-ctx">Partner-Portal</span><button class="rp-x" id="rp-close">✕</button></div>' +
         '<div class="rp-hero"><h1 id="rp-htitle">Übersicht &amp; Lizenz-Pool</h1><p id="rp-hsub">Seats kaufen und an deine Mandanten verteilen.</p></div>' +
         '<div class="rp-body">' +
           '<div class="rp-side">' +
             nav('ueber', 'Übersicht', 'Lizenz-Pool, Seats', '<rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>') +
-            nav('mand', 'Mandanten', 'Kunden, Seat-Zuweisung', '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>') +
+            (eingebettet ? '' : nav('mand', 'Mandanten', 'Kunden, Seat-Zuweisung', '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>')) +
             nav('frei', 'Freigaben', 'Objekte prüfen', '<path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/>') +
             nav('ueberg', 'Übergeben', 'Objekt an Kunden', '<path d="M4 12h13M12 6l6 6-6 6"/><path d="M20 4v16"/>') +   /* v3317 */
             nav('brand', 'Branding', 'Whitelabel, Logo', '<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.9 4.9l2 2M17 17l2 2M2 12h3M19 12h3"/>') +
@@ -209,6 +227,18 @@ if (!window._pdfGold) {
         '</div>' +
         '<div class="rp-foot"><span class="st"><span class="d"></span>Partner-Plan aktiv</span><button class="close" id="rp-close2">Schließen</button></div>' +
       '</div>';
+  }
+  function openResellerPortal() {
+    /* v3390 · gibt es das Partner-Cockpit, oeffnet das Portal dort im Reiter „Verwaltung“ statt als Fenster */
+    if (window.DpPartnerKunden && typeof DpPartnerKunden.reiterWahl === 'function' && window.DealPilotAnsichten && DpPartnerKunden._state && DpPartnerKunden._state.partner) {
+      try { if (typeof window.closeSettings === 'function') window.closeSettings(); } catch (e) {}
+      DpPartnerKunden.reiterWahl('verwaltung'); return;
+    }
+    if (_st.open) return;
+    injectCss();
+    _rpTinte();
+    var ov = document.createElement('div'); ov.className = 'rp-ov'; ov.id = 'rp-overlay';
+    ov.innerHTML = geruest(false);
     document.body.appendChild(ov);
     _st.open = true;
 
@@ -225,6 +255,7 @@ if (!window._pdfGold) {
   }
   function escClose(e) { if (e.key === 'Escape') closePortal(); }
   function closePortal() {
+    if (_st.eingebettet) return;   /* v3390 · eingebettet schliesst das Cockpit (ausbetten) */
     var ov = $('rp-overlay'); if (ov) ov.remove();
     document.removeEventListener('keydown', escClose);
     _st.open = false;
@@ -766,7 +797,7 @@ if (!window._pdfGold) {
     var btn = src.cloneNode(true);
     btn.setAttribute('data-rp', '1'); btn.removeAttribute('data-tab'); btn.removeAttribute('onclick'); btn.classList.remove('active'); btn.classList.remove('help-sidebar-item-active');
     var t = btn.querySelector('.help-sidebar-item-title'); if (t) t.textContent = 'Partner-Portal'; else btn.textContent = 'Partner-Portal';
-    var d = btn.querySelector('.help-sidebar-item-desc'); if (d) d.textContent = 'Lizenzen, Mandanten, Freigaben';
+    var d = btn.querySelector('.help-sidebar-item-desc'); if (d) d.textContent = 'Im Partner-Cockpit unter Verwaltung';   /* v3390 */
     btn.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); openResellerPortal(); });
     src.parentNode.insertBefore(btn, src.nextSibling);
   }
@@ -1424,7 +1455,7 @@ if (!window._pdfGold) {
   })(0);
 
   window.openResellerPortal = openResellerPortal;
-  window.DealPilotResellerPortal = { boot: boot, open: openResellerPortal,
+  window.DealPilotResellerPortal = { boot: boot, open: openResellerPortal, einbetten: einbetten, ausbetten: ausbetten,   /* v3390 */
     /* v3317 · direkt in "Übergeben" öffnen, optional mit vorgewähltem Objekt */
-    uebergeben: function (objectId) { if (objectId) _st.uebObj = objectId; _st.sec = 'ueberg'; if (_st.open) go('ueberg'); else openResellerPortal(); } };
+    uebergeben: function (objectId) { if (objectId) _st.uebObj = objectId; _st.sec = 'ueberg'; if (_st.open) go('ueberg'); else openResellerPortal(); } };   /* v3390: openResellerPortal fuehrt ins Cockpit, Verwaltung oeffnet _st.sec */
 })();

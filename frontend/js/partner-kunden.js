@@ -1,5 +1,14 @@
 /* partner-kunden.js · v3357 — Partner-Cockpit und „Mein Partner“ (Konzept Dateien/Mandantenkonzept/Mandantenkonzept-Partner-2026-11-13.md)
  *
+ * v3390 · Das Partner-Cockpit ist kein Fenster mehr, sondern eine Hauptansicht im Arbeitsbereich (Marcel 15.11.2026:
+ *   „im Arbeitsbereich angezeigt … nicht die Tabbar von Objekt bis Deal-Aktion, sondern nur das Partner-Cockpit“).
+ *   Die Reiterleiste nav.tabs schwenkt um: ihre .tab-Knoepfe werden per html[data-pk-offen] ausgeblendet, davor steht
+ *   #dppk-tabzeile mit den Cockpit-Reitern (Klasse dppk-tab, NIE .tab - ui.js/main.js/pdf.js zaehlen .tab nach Index).
+ *   Die Optik der Reiter wird beim Oeffnen von einem echten .tab abgelesen (getComputedStyle), damit sie in jedem
+ *   Skin und jeder Layout-Variante gleich aussieht. Angemeldet im Register DealPilotAnsichten als 'partner'.
+ *   Reiter „Verwaltung“ haengt das bestehende Partner-Portal ein (reseller-portal.js einbetten(), keine Kopie).
+ *   „Mein Partner“ (Kundenseite) bleibt ein Fenster.
+ *
  * Backend: /api/v1/partner/* (Partnerseite), /api/v1/mein-partner/* (Kundenseite), services/partnerKunden.js.
  *
  *   - Zwei Eintraege unter „Aktionen“ (index.html, .sb-act-partner / .sb-act-meinpartner), sichtbar nur mit Klasse dp-frei
@@ -28,7 +37,7 @@
   function stil() {
     if (document.getElementById('dppk-stil')) return;
     var s = document.createElement('style'); s.id = 'dppk-stil';
-    s.textContent = [
+    var R = [
       '.sb-act-partner:not(.dp-frei),.sb-act-meinpartner:not(.dp-frei){display:none !important}',
       '.sb-act-item .sb-act-punkt{display:none}',
       '.sb-act-item.dp-punkt .sb-act-punkt{display:inline-block;width:7px;height:7px;border-radius:50%;background:#B8625C;margin-left:auto;flex:0 0 7px}',
@@ -115,7 +124,40 @@
       'body.dppk-aus-markt [data-act="marktbericht"],body.dppk-aus-markt [onclick*="dpMbAbruf"]{display:none !important}',
       'body.dppk-aus-e_darstellung .st-tab[data-tab="darstellung"],body.dppk-aus-e_steuer .st-tab[data-tab="standardwerte"],body.dppk-aus-schluessel .st-tab[data-tab="api"]{display:none !important}',
       '@media (max-width:640px){#dppk-ov{padding:0}#dppk-ov .pk-box{border-radius:0;min-height:100vh}#dppk-ov .pk-inhalt{padding:14px}#dppk-ov .pk-reiter{padding:8px 14px 0;overflow-x:auto;flex-wrap:nowrap}#dppk-ov .pk-reiter button{white-space:nowrap}}'
-    ].join('\n');
+    ];
+    /* v3390 · Arbeitsbereich: dieselben Bausteine wie im Fenster, nur unter #dppk-ab (eine Liste, zwei Anker) */
+    var ab = R.filter(function (x) { return x.indexOf('#dppk-ov .') === 0 || x.indexOf('#dppk-ov label') === 0; })
+      .map(function (x) { return x.split('#dppk-ov').join('#dppk-ab'); });
+    s.textContent = R.concat(ab, [
+      'html:not([data-pk-offen]) #dppk-ab{display:none !important}',
+      'html[data-pk-offen] nav.tabs > :not(#dppk-tabzeile){display:none !important}',
+      'html:not([data-pk-offen]) #dppk-tabzeile{display:none !important}',
+      '#dppk-tabzeile{display:flex;align-items:stretch;flex:0 0 auto;min-width:0}',
+      '#dppk-tabzeile .dppk-tab{display:flex;align-items:center;gap:6px;border:0;border-bottom:1px solid transparent;background:transparent;cursor:pointer;white-space:nowrap;flex:0 0 auto;font-family:Inter,sans-serif}',
+      '#dppk-tabzeile .dppk-tab svg{flex:0 0 auto}',
+      '#dppk-tabzeile .dppk-zurueck{opacity:.8}',
+      '#dppk-tabzeile .dppk-zurueck svg{transform:scaleX(-1)}',
+      '#dppk-tabzeile .dppk-trenner{flex:0 0 1px;align-self:center;height:18px;background:currentColor;opacity:.2;margin:0 6px}',
+      '#dppk-tabzeile .pk-zahl{display:inline-block;min-width:17px;height:17px;line-height:17px;border-radius:9px;background:#B8625C;color:#fff;font:600 10px Inter,sans-serif;text-align:center;padding:0 5px}',
+      '#dppk-ab{display:block;padding:22px 26px 40px;font-family:Inter,system-ui,sans-serif}',
+      '#dppk-ab .pk-box{width:auto;box-shadow:none;background:#FDFCFA;border:1px solid #EDE2C6;border-radius:14px;max-width:1180px;margin:0 auto;color:#2A2727;overflow:hidden}',
+      '#dppk-ab .pk-kopf{background:transparent;color:#2A2727;border-bottom-color:#EDE6D6;display:flex;align-items:flex-end;gap:12px;padding:18px 22px 14px;border-bottom:1px solid #EDE6D6;flex-wrap:wrap}',
+      '#dppk-ab .pk-kopf h2{margin:0;flex:1 1 240px;min-width:0;font:600 22px "Space Grotesk",Inter,sans-serif;color:#2A2727}',
+      '#dppk-ab .pk-kopf .pk-sub{display:block;font:500 10.5px "JetBrains Mono",monospace;letter-spacing:.08em;text-transform:uppercase;color:' + G + ';margin-bottom:3px}',
+      '#dppk-ab .pk-kopf .pk-titel2{font:500 13px Inter,sans-serif;color:#7A7370}',
+      '#dppk-ab .pk-inhalt{padding:20px 22px 24px}',
+      '#dppk-ab .pk-spalten{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px}',
+      '#dppk-ab .pk-karte{border:1px solid #EDE6D6;border-radius:12px;background:#fff;padding:14px 16px}',
+      '#dppk-ab .pk-karte h3{margin:0 0 10px;font:600 15px "Space Grotesk",Inter,sans-serif;color:#2A2727}',
+      '#dppk-ab .pk-karte .pk-zeile{border-color:#F0EADC}',
+      '#dppk-ab .pk-mehr{border:0;background:none;color:#7A6020;font:600 12.5px Inter,sans-serif;cursor:pointer;padding:4px 0}',
+      '#dppk-ab .pk-fuss{display:flex;gap:8px;justify-content:flex-end;margin-top:6px;flex-wrap:wrap}',
+      '#dppk-ab .pk-verw .rp-modal{max-width:none !important;max-height:none !important;box-shadow:none !important;border:1px solid #EDE6D6 !important;border-radius:12px !important}',
+      '#dppk-ab .pk-verw .rp-bar,#dppk-ab .pk-verw .rp-foot,#dppk-ab .pk-verw .rp-hero{display:none !important}',
+      '#dppk-ab .pk-verw .rp-body{min-height:520px}',
+      '#dppk-ab .pk-verw .rp-work{overflow:visible}',
+      '@media (max-width:640px){#dppk-ab{padding:10px 0 30px}#dppk-ab .pk-box{border-radius:0;border-left:0;border-right:0}#dppk-ab .pk-kopf{padding:14px 14px 10px}#dppk-ab .pk-kopf h2{font-size:19px}#dppk-ab .pk-inhalt{padding:14px}#dppk-ab .pk-spalten{grid-template-columns:1fr}#dppk-ab .pk-verw .rp-body{min-height:0}}'
+    ]).join('\n');
     document.head.appendChild(s);
   }
 
@@ -182,31 +224,199 @@
     ['e_darstellung', 'Einstellungen: Darstellung', '']
   ];
 
+  /* ════ v3390 · PARTNER-COCKPIT IM ARBEITSBEREICH ═════════════════════════
+     Muster wie vermoegen.js (v3217): eigene Sektion in .main-col, sichtbar nur mit html[data-pk-offen],
+     Geschwister schliesst das Register DealPilotAnsichten (ui.js v1905). Anders als dort bleibt nav.tabs
+     stehen und zeigt die Cockpit-Reiter. */
+  var PK = { offen: false, aktiv: 'uebersicht' };
+  var REITER_ICO = { uebersicht: 'layout', kunden: 'user', einladen: 'mail', staende: 'folderOpen', aufgaben: 'clipboard', meldungen: 'info', verwaltung: 'settings' };
+  function ico(n, g) { try { return window.Icons && Icons[n] ? Icons[n]({ size: g || 15 }) : ''; } catch (e) { return ''; } }
+  function reiterListe() {
+    var c = S.partner || { kunden: [], anfragen: [] };
+    var neu = (c.kunden || []).reduce(function (a, k) { return a + (k.neu || 0); }, 0);
+    var l = [{ k: 'uebersicht', t: 'Übersicht' }, { k: 'kunden', t: 'Kunden & Plätze', zahl: (c.anfragen || []).length || 0 }, { k: 'einladen', t: 'Einladen' },
+      { k: 'staende', t: 'Freigegeben', zahl: neu }, { k: 'aufgaben', t: 'Aufgaben' }, { k: 'meldungen', t: 'Meldungen', zahl: c.meldungen_ungelesen || 0 }];
+    if (window.DealPilotResellerPortal && typeof DealPilotResellerPortal.einbetten === 'function') l.push({ k: 'verwaltung', t: 'Verwaltung' });
+    return l;
+  }
+  /* Optik der Reiter vom echten .tab ablesen (Skin, Layout-Variante, hell/dunkel) - nicht nachbauen */
+  function tabStilAblesen(nav) {
+    var n = nav.querySelector('.tab:not(.active)'), a = nav.querySelector('.tab.active') || n;
+    if (!n) return;
+    var P = ['color', 'font-family', 'font-size', 'font-weight', 'letter-spacing', 'text-transform', 'padding-top', 'padding-right', 'padding-bottom', 'padding-left',
+      'min-height', 'border-bottom-width', 'border-bottom-style', 'background-color', 'border-top-left-radius', 'border-top-right-radius'];
+    var A = ['color', 'font-weight', 'border-bottom-color', 'background-color', 'background-image', 'box-shadow'];
+    function regeln(el, liste) { var cs = getComputedStyle(el); return liste.map(function (p) { var v = cs.getPropertyValue(p); return v ? p + ':' + v + ' !important' : ''; }).filter(Boolean).join(';'); }
+    var t = '#dppk-tabzeile .dppk-tab{' + regeln(n, P) + ';border-bottom-color:transparent !important}' +
+      '#dppk-tabzeile .dppk-tab.an{' + regeln(a, A) + '}' +
+      '#dppk-tabzeile .dppk-tab:hover{color:' + getComputedStyle(a).getPropertyValue('color') + ' !important}';
+    var st = document.getElementById('dppk-tabstil');
+    if (!st) { st = document.createElement('style'); st.id = 'dppk-tabstil'; document.head.appendChild(st); }
+    st.textContent = t;
+  }
+  function tabzeile() {
+    var nav = document.querySelector('nav.tabs'); if (!nav) return;
+    var z = document.getElementById('dppk-tabzeile');
+    if (!z) { z = document.createElement('div'); z.id = 'dppk-tabzeile'; z.setAttribute('role', 'tablist'); z.setAttribute('aria-label', 'Partner-Cockpit'); }
+    if (z.parentNode !== nav) nav.insertBefore(z, nav.firstChild);
+    z.innerHTML = '<button type="button" class="dppk-tab dppk-zurueck" data-pk-zurueck="1" title="Zurück zu den Objekten">' + ico('arrowRight', 14) + '<span>Objekte</span></button><span class="dppk-trenner" aria-hidden="true"></span>' +
+      reiterListe().map(function (x) {
+        return '<button type="button" role="tab" class="dppk-tab' + (x.k === PK.aktiv ? ' an' : '') + '" data-pk-reiter="' + x.k + '" aria-selected="' + (x.k === PK.aktiv) + '">' + ico(REITER_ICO[x.k]) +
+          '<span>' + esc(x.t) + '</span>' + (x.zahl ? '<span class="pk-zahl">' + x.zahl + '</span>' : '') + '</button>';
+      }).join('');
+    z.querySelector('[data-pk-zurueck]').onclick = function () { zurueckZuObjekten(); };
+    [].forEach.call(z.querySelectorAll('[data-pk-reiter]'), function (b) { b.onclick = function () { reiterWahl(b.getAttribute('data-pk-reiter')); }; });
+    var an = z.querySelector('.dppk-tab.an');
+    if (an && nav.scrollWidth > nav.clientWidth) { try { var r = an.getBoundingClientRect(), rn = nav.getBoundingClientRect(); if (r.right > rn.right || r.left < rn.left) nav.scrollLeft += r.left - rn.left - 40; } catch (e) {} }
+  }
+  function abSektion() {
+    var s = document.getElementById('dppk-ab'); if (s) return s;
+    var mc = document.querySelector('.main-col'); if (!mc) return null;
+    s = document.createElement('section'); s.id = 'dppk-ab'; s.setAttribute('aria-label', 'Partner-Cockpit');
+    s.innerHTML = '<div class="pk-box"><div class="pk-kopf"><h2><span class="pk-sub">Partner-Cockpit</span><span class="pk-titel"></span></h2><span class="pk-titel2"></span></div><div class="pk-inhalt"></div></div>';
+    mc.appendChild(s);
+    return s;
+  }
+  var TITEL = { uebersicht: ['Übersicht', 'Was heute ansteht'], kunden: ['Kunden & Plätze', 'Verbindungen, Stufe und Rechte'], einladen: ['Kunden einladen', 'Per E-Mail oder Verbindungscode'],
+    staende: ['Von Kunden freigegeben', 'Nur lesen, Übernehmen legt eine eigene Kopie an'], aufgaben: ['Aufgaben', 'Bitten an deine Kunden'], meldungen: ['Meldungen', ''],
+    verwaltung: ['Verwaltung', 'Plätze, Objekte übergeben, Marke und Abo'] };
+  function zeichnen() {
+    var s = abSektion(); if (!s) return;
+    var t = TITEL[PK.aktiv] || ['', ''];
+    s.querySelector('.pk-titel').textContent = t[0];
+    s.querySelector('.pk-titel2').textContent = (S.partner && S.partner.partner && S.partner.partner.name ? S.partner.partner.name + (t[1] ? ' · ' : '') : '') + t[1];
+    var el = s.querySelector('.pk-inhalt');
+    if (PK.aktiv !== 'verwaltung') verwaltungAus();
+    el.innerHTML = '<div class="pk-leer">Lädt …</div>';
+    var k = PK.aktiv;
+    if (k === 'uebersicht') return uebersichtZeichnen(el);
+    if (k === 'kunden') return kundenZeichnen(el);
+    if (k === 'einladen') return einladenZeichnen(el);
+    if (k === 'staende') return staendeZeichnen(el);
+    if (k === 'aufgaben') return aufgabenZeichnen(el);
+    if (k === 'meldungen') return meldungenZeichnen(el);
+    if (k === 'verwaltung') return verwaltungZeichnen(el);
+  }
+  function reiterWahl(k) {
+    PK.aktiv = k || 'uebersicht';
+    tabzeile(); zeichnen();
+    try { var mc = document.querySelector('.main-col'); if (mc) mc.scrollTop = 0; window.scrollTo(0, 0); } catch (e) {}
+  }
   function cockpitOeffnen(startReiter) {
     return api('/partner/cockpit').then(function (c) {
       S.partner = c; menuePflegen();
-      var reiter = [{ k: 'kunden', t: 'Kunden und Plätze', zahl: c.anfragen.length || 0 }, { k: 'staende', t: 'Von Kunden freigegeben', zahl: c.kunden.reduce(function (a, k) { return a + (k.neu || 0); }, 0) },
-        { k: 'aufgaben', t: 'Aufgaben' }, { k: 'meldungen', t: 'Meldungen', zahl: c.meldungen_ungelesen || 0 }];
-      if (startReiter) reiter.sort(function (a) { return a.k === startReiter ? -1 : 0; });
-      ansichtOeffnen('Partner-Cockpit', c.partner.name, reiter, function (k, el, neu) {
-        if (k === 'kunden') return kundenZeichnen(el, neu);
-        if (k === 'staende') return staendeZeichnen(el);
-        if (k === 'aufgaben') return aufgabenZeichnen(el);
-        if (k === 'meldungen') return meldungenZeichnen(el, neu);
-      });
+      try { if (window._currentObjKey && typeof window.saveObj === 'function') window.saveObj({ silent: true }); } catch (e) {}
+      try { if (document.body.classList.contains('qc-standalone-active') && typeof window.exitQuickCheckMode === 'function') window.exitQuickCheckMode(); } catch (e) {}
+      try { if (typeof window.closeSettings === 'function' && document.querySelector('.settings-overlay.open, #settings-overlay.open')) window.closeSettings(); } catch (e) {}
+      var nav = document.querySelector('nav.tabs');
+      if (nav) tabStilAblesen(nav);   /* VOR dem Ausblenden der .tab ablesen */
+      if (window.DealPilotAnsichten) window.DealPilotAnsichten.abraeumen('partner');
+      if (nav) nav.style.display = '';   /* der Schliesser von 'single' blendet nav.tabs aus - hier bleibt sie, mit anderen Reitern */
+      var alt = document.getElementById('dppk-ov'); if (alt) alt.remove();
+      document.documentElement.setAttribute('data-pk-offen', '1');
+      PK.offen = true;
+      var s = abSektion(); if (s) s.style.display = '';
+      reiterWahl(startReiter && TITEL[startReiter] ? startReiter : (PK.aktiv || 'uebersicht'));
     }, function (e) { toast(e && e.status === 403 ? 'Das Partner-Cockpit gibt es mit dem Partner-Plan.' : fehlerText(e)); });
   }
-  function neuLaden(el) { return api('/partner/cockpit').then(function (c) { S.partner = c; menuePflegen(); kundenZeichnen(el); }); }
+  function cockpitSchliessen() {
+    if (!PK.offen) return;
+    PK.offen = false;
+    document.documentElement.removeAttribute('data-pk-offen');
+    verwaltungAus();
+  }
+  function zurueckZuObjekten() {
+    cockpitSchliessen();
+    if (typeof window.setMainView === 'function') window.setMainView('single');
+  }
+  var NUR_FENSTER = ['partner-cockpit', 'mein-partner', 'settings', 'help', 'feedback', 'hub-import', 'hub-export', 'pdf', 'csv', 'export-csv', 'import-excel', 'import-json', 'export-json'];   /* wie ui.js sbActionsAction _nurFenster */
+  if (window.DealPilotAnsichten) window.DealPilotAnsichten.melde('partner', cockpitSchliessen);
+  window.addEventListener('dp:object-ready', function () { if (PK.offen) zurueckZuObjekten(); });
+  document.addEventListener('click', function (e) {
+    if (!PK.offen) return;
+    var t = e.target && e.target.closest ? e.target.closest('.sb-card, .sb-act-item') : null;
+    if (!t) return;
+    /* Fenster (Einstellungen, Hilfe, Import …) lassen das Cockpit stehen; alles, was die Ansicht wechselt, geht
+       ueber die Objektansicht - dann findet jede Folgeansicht (Quick-Check, Track Record …) den Normalzustand vor */
+    if (!t.classList.contains('sb-card')) {
+      var m = /sbActionsAction\('([^']+)'\)/.exec(t.getAttribute('onclick') || ''), act = t.getAttribute('data-act') || (m && m[1]) || '';
+      if (!act || NUR_FENSTER.indexOf(act) >= 0) return;   /* ohne erkennbare Aktion (Wünsche, Tour): stehen lassen */
+    }
+    zurueckZuObjekten();
+  }, true);
 
-  function kundenZeichnen(el) {
-    var c = S.partner, pool = c.pool || {};
+  function neuLaden(el) {
+    return api('/partner/cockpit').then(function (c) {
+      S.partner = c; menuePflegen();
+      if (PK.offen) { tabzeile(); zeichnen(); } else if (el) kundenZeichnen(el);
+    });
+  }
+
+  function kachelnHtml(c) {
+    var pool = c.pool || {};
     var belegt = c.kunden.filter(function (k) { return k.hat_platz; }).length;
     var verb = c.kunden.filter(function (k) { return !k.getrennt_am; }).length;
-    var h = '<div class="pk-kacheln">' +
+    return '<div class="pk-kacheln">' +
       '<div class="pk-kachel"><span>Plätze belegt</span><b>' + belegt + ' / ' + (pool.total != null ? pool.total : (pool.gesamt != null ? pool.gesamt : '–')) + '</b></div>' +
       '<div class="pk-kachel"><span>Kunden verbunden</span><b>' + verb + '</b></div>' +
       '<div class="pk-kachel"><span>Kundenstände</span><b>' + c.kunden.reduce(function (a, k) { return a + (k.sendungen || 0); }, 0) + '</b></div>' +
-      '<div class="pk-kachel"><span>Offene Anfragen</span><b>' + c.anfragen.length + '</b></div></div>' +
+      '<div class="pk-kachel"><span>Offene Anfragen</span><b>' + c.anfragen.length + '</b></div></div>';
+  }
+
+  function uebersichtZeichnen(el) {
+    var c = S.partner;
+    var wartet = c.anfragen.map(function (a) { return { n: a.anzeige_name || a.email, s: (a.quelle === 'code' ? 'per Code' : 'per Einladung') + ' · seit ' + datum(a.erstellt_am) }; })
+      .concat((c.einladungen || []).map(function (i) { return { n: i.display_name, s: 'Einladung an neue Adresse · bis ' + datum(i.expires_at) }; }));
+    var neuJe = c.kunden.filter(function (k) { return k.neu; });
+    var h = kachelnHtml(c) +
+      '<div class="pk-leiste"><button type="button" class="pk-btn gold" data-geh="einladen">Kunden einladen</button><button type="button" class="pk-btn" data-geh="aufgaben">Aufgabe stellen</button><button type="button" class="pk-btn" data-geh="verwaltung">Plätze und Marke verwalten</button></div>' +
+      '<div class="pk-spalten">' +
+      '<div class="pk-karte"><h3>Wartet auf Bestätigung</h3>' + (wartet.length ? wartet.slice(0, 5).map(function (w) { return '<div class="pk-zeile"><div class="pk-name"><b>' + esc(w.n) + '</b><small>' + esc(w.s) + '</small></div></div>'; }).join('') +
+        (wartet.length > 5 ? '<button type="button" class="pk-mehr" data-geh="kunden">Alle ' + wartet.length + ' ansehen</button>' : '') : '<div class="pk-leer">Nichts offen.</div>') + '</div>' +
+      '<div class="pk-karte"><h3>Neu von Kunden</h3>' + (neuJe.length ? neuJe.map(function (k) { return '<div class="pk-zeile"><div class="pk-name"><b>' + esc(k.display_name) + '</b><small>' + k.neu + (k.neu === 1 ? ' neuer Stand' : ' neue Stände') + '</small></div></div>'; }).join('') +
+        '<button type="button" class="pk-mehr" data-geh="staende">Zu den freigegebenen Objekten</button>' : '<div class="pk-leer">Keine neuen Stände.</div>') + '</div>' +
+      '<div class="pk-karte" data-pk-meld><h3>Letzte Meldungen</h3><div class="pk-leer">Lädt …</div></div>' +
+      '</div>';
+    el.innerHTML = h;
+    [].forEach.call(el.querySelectorAll('[data-geh]'), function (b) { b.onclick = function () { reiterWahl(b.getAttribute('data-geh')); }; });
+    /* nur lesen - als gelesen markiert erst der Reiter Meldungen */
+    api('/partner/meldungen').then(function (r) {
+      var k = el.querySelector('[data-pk-meld]'); if (!k) return;
+      var l = (r.meldungen || []).slice(0, 4);
+      k.innerHTML = '<h3>Letzte Meldungen</h3>' + (l.length ? l.map(function (m) {
+        return '<div class="pk-zeile"><div class="pk-name"><b>' + esc(m.text || m.art) + '</b><small>' + datum(m.erstellt_am) + '</small></div>' + (m.gelesen_am ? '' : '<span class="pk-chip gruen">neu</span>') + '</div>';
+      }).join('') + '<button type="button" class="pk-mehr">Alle Meldungen</button>' : '<div class="pk-leer">Keine Meldungen.</div>');
+      var m = k.querySelector('.pk-mehr'); if (m) m.onclick = function () { reiterWahl('meldungen'); };
+    }, function () { var k = el.querySelector('[data-pk-meld]'); if (k) k.querySelector('.pk-leer').textContent = 'Meldungen nicht erreichbar.'; });
+  }
+
+  function einladenZeichnen(el) {
+    el.innerHTML = '<div class="pk-spalten">' +
+      '<div class="pk-karte" data-form="mail"><h3>Per E-Mail einladen</h3>' + EINLADEN_HTML + '<div class="pk-fuss"><button type="button" class="pk-btn gold">Einladen</button></div></div>' +
+      '<div class="pk-karte" data-form="code"><h3>Verbindungscode eingeben</h3>' + CODE_HTML + '<div class="pk-fuss"><button type="button" class="pk-btn gold">Anfrage senden</button></div></div></div>';
+    [['mail', einladenSenden], ['code', codeSenden]].forEach(function (p) {
+      var f = el.querySelector('[data-form="' + p[0] + '"]'), b = f.querySelector('.pk-fuss .pk-btn');
+      b.onclick = function () {
+        b.disabled = true;
+        Promise.resolve(p[1](f, null)).then(function (r) { b.disabled = false; if (r !== false) PK.offen && reiterWahl('kunden'); }, function (e) { b.disabled = false; toast(fehlerText(e)); });
+      };
+    });
+  }
+
+  /* Verwaltung: das bestehende Partner-Portal (reseller-portal.js) eingehaengt, nicht kopiert */
+  function verwaltungZeichnen(el) {
+    var rp = window.DealPilotResellerPortal;
+    el.innerHTML = '<div class="pk-verw"></div>';
+    if (!rp || typeof rp.einbetten !== 'function') { el.innerHTML = '<div class="pk-leer">Die Verwaltung ist gerade nicht geladen. Bitte die Seite neu laden.</div>'; return; }
+    rp.einbetten(el.querySelector('.pk-verw'), null);   /* null: der zuletzt gewaehlte Abschnitt (z. B. Übergeben aus dem Objekt) */
+  }
+  function verwaltungAus() {
+    try { if (window.DealPilotResellerPortal && typeof DealPilotResellerPortal.ausbetten === 'function') DealPilotResellerPortal.ausbetten(); } catch (e) {}
+  }
+
+  function kundenZeichnen(el) {
+    var c = S.partner;
+    var h = kachelnHtml(c) +
       '<div class="pk-leiste"><button type="button" class="pk-btn gold" data-a="einladen">Kunden einladen</button><button type="button" class="pk-btn" data-a="code">Verbindungscode eingeben</button></div>';
     if (c.anfragen.length || (c.einladungen || []).length) {
       h += '<div class="pk-gruppe">Wartet auf Bestätigung des Kunden</div>';
@@ -230,8 +440,8 @@
       return '<div class="pk-zeile"><div class="pk-name"><b>' + esc(k.display_name) + '</b><small>' + esc(k.email) + ' · ' + esc(info) + (k.sendungen ? ' · ' + k.sendungen + (k.sendungen === 1 ? ' Objekt gesendet' : ' Objekte gesendet') : '') + (k.neu ? ', ' + k.neu + ' neu' : '') + '</small></div>' + zug + status + knoepfe + '</div>';
     }).join('');
     el.innerHTML = h;
-    el.querySelector('[data-a="einladen"]').onclick = function () { einladenDialog(el); };
-    el.querySelector('[data-a="code"]').onclick = function () { codeDialog(el); };
+    el.querySelector('[data-a="einladen"]').onclick = function () { if (PK.offen) return reiterWahl('einladen'); einladenDialog(el); };
+    el.querySelector('[data-a="code"]').onclick = function () { if (PK.offen) return reiterWahl('einladen'); codeDialog(el); };
     [].forEach.call(el.querySelectorAll('[data-zz]'), function (b) { b.onclick = function () { api('/partner/anfragen/' + b.getAttribute('data-zz') + '/zurueckziehen', { method: 'POST' }).then(function () { neuLaden(el); }); }; });
     [].forEach.call(el.querySelectorAll('[data-ein]'), function (b) { b.onclick = function () { kundeDialog(el, b.getAttribute('data-ein')); }; });
     [].forEach.call(el.querySelectorAll('[data-platz]'), function (b) { b.onclick = function () { api('/partner/kunden/' + b.getAttribute('data-platz') + '/platz', { method: 'POST' }).then(function () { toast('Platz zugewiesen.'); neuLaden(el); }, function (e) { toast(fehlerText(e)); }); }; });
@@ -244,31 +454,30 @@
     });
   }
 
-  function einladenDialog(el) {
-    dialog('Kunden einladen',
-      '<div class="pk-hinweis">Hat die Adresse schon ein DealPilot-Konto, bekommt der Kunde eine Anfrage in seiner App und bestätigt sie dort. Sonst geht eine Einladung per E-Mail raus.</div>' +
-      '<label class="pk-feld">Name des Kunden<input type="text" id="pk-e-name" maxlength="120"></label>' +
-      '<label class="pk-feld">E-Mail<input type="email" id="pk-e-mail" maxlength="200"></label>' +
-      '<label class="pk-wahl"><input type="radio" name="pk-e-art" value="platz" checked><span><b>Mit Partnerplatz</b>Du bezahlst seinen Zugang und bestimmst Stufe, Rechte und Marke. Hat er ein eigenes Abo, wird er ohne Platz verbunden.</span></label>' +
-      '<label class="pk-wahl"><input type="radio" name="pk-e-art" value="eigen"><span><b>Ohne Platz</b>Der Kunde nutzt seinen eigenen Plan und schickt dir nur, was er freigibt.</span></label>',
-      [{ t: 'Abbrechen' }, { t: 'Einladen', c: 'gold', fn: function (d) {
-        var name = wert(d, '#pk-e-name'), mail = wert(d, '#pk-e-mail');
-        if (!String(name).trim() || !/@/.test(String(mail))) { toast('Bitte Name und E-Mail eintragen.'); return false; }
-        var art = (d.querySelector('input[name="pk-e-art"]:checked') || {}).value;
-        return api('/partner/einladen', { method: 'POST', body: { name: name, email: mail, platz_mitgeben: art !== 'eigen' } }).then(function () { toast('Einladung gesendet.'); neuLaden(el); });
-      } }]);
+  var EINLADEN_HTML = '<div class="pk-hinweis">Hat die Adresse schon ein DealPilot-Konto, bekommt der Kunde eine Anfrage in seiner App und bestätigt sie dort. Sonst geht eine Einladung per E-Mail raus.</div>' +
+    '<label class="pk-feld">Name des Kunden<input type="text" id="pk-e-name" maxlength="120"></label>' +
+    '<label class="pk-feld">E-Mail<input type="email" id="pk-e-mail" maxlength="200"></label>' +
+    '<label class="pk-wahl"><input type="radio" name="pk-e-art" value="platz" checked><span><b>Mit Partnerplatz</b>Du bezahlst seinen Zugang und bestimmst Stufe, Rechte und Marke. Hat er ein eigenes Abo, wird er ohne Platz verbunden.</span></label>' +
+    '<label class="pk-wahl"><input type="radio" name="pk-e-art" value="eigen"><span><b>Ohne Platz</b>Der Kunde nutzt seinen eigenen Plan und schickt dir nur, was er freigibt.</span></label>';
+  var CODE_HTML = '<div class="pk-hinweis">Den Code erzeugt dein Kunde in DealPilot unter „Mein Partner“ bzw. in den Einstellungen. Er gilt 24 Stunden und nur einmal. Danach bestätigt der Kunde die Verbindung in seiner App.</div>' +
+    '<label class="pk-feld">Code<input type="text" id="pk-c-code" maxlength="12" placeholder="XXXX-XXXX" style="text-transform:uppercase;font-family:&quot;JetBrains Mono&quot;,monospace;letter-spacing:.1em"></label>' +
+    '<label class="pk-feld">Name des Kunden (für deine Liste)<input type="text" id="pk-c-name" maxlength="120"></label>' +
+    '<label class="pk-wahl"><input type="checkbox" id="pk-c-platz" checked><span><b>Partnerplatz mitgeben</b>Nur wenn der Kunde kein eigenes Abo hat.</span></label>';
+  function einladenSenden(d, el) {
+    var name = wert(d, '#pk-e-name'), mail = wert(d, '#pk-e-mail');
+    if (!String(name).trim() || !/@/.test(String(mail))) { toast('Bitte Name und E-Mail eintragen.'); return false; }
+    var art = (d.querySelector('input[name="pk-e-art"]:checked') || {}).value;
+    return api('/partner/einladen', { method: 'POST', body: { name: name, email: mail, platz_mitgeben: art !== 'eigen' } }).then(function () { toast('Einladung gesendet.'); return neuLaden(el); });
   }
-
+  function codeSenden(d, el) {
+    return api('/partner/code', { method: 'POST', body: { code: wert(d, '#pk-c-code'), name: wert(d, '#pk-c-name'), platz_mitgeben: wert(d, '#pk-c-platz') } })
+      .then(function () { toast('Anfrage gesendet. Der Kunde bestätigt sie in seiner App.'); return neuLaden(el); });
+  }
+  function einladenDialog(el) {
+    dialog('Kunden einladen', EINLADEN_HTML, [{ t: 'Abbrechen' }, { t: 'Einladen', c: 'gold', fn: function (d) { return einladenSenden(d, el); } }]);
+  }
   function codeDialog(el) {
-    dialog('Verbindungscode eingeben',
-      '<div class="pk-hinweis">Den Code erzeugt dein Kunde in DealPilot unter „Mein Partner“ bzw. in den Einstellungen. Er gilt 24 Stunden und nur einmal. Danach bestätigt der Kunde die Verbindung in seiner App.</div>' +
-      '<label class="pk-feld">Code<input type="text" id="pk-c-code" maxlength="12" placeholder="XXXX-XXXX" style="text-transform:uppercase;font-family:\'JetBrains Mono\',monospace;letter-spacing:.1em"></label>' +
-      '<label class="pk-feld">Name des Kunden (für deine Liste)<input type="text" id="pk-c-name" maxlength="120"></label>' +
-      '<label class="pk-wahl"><input type="checkbox" id="pk-c-platz" checked><span><b>Partnerplatz mitgeben</b>Nur wenn der Kunde kein eigenes Abo hat.</span></label>',
-      [{ t: 'Abbrechen' }, { t: 'Anfrage senden', c: 'gold', fn: function (d) {
-        return api('/partner/code', { method: 'POST', body: { code: wert(d, '#pk-c-code'), name: wert(d, '#pk-c-name'), platz_mitgeben: wert(d, '#pk-c-platz') } })
-          .then(function () { toast('Anfrage gesendet. Der Kunde bestätigt sie in seiner App.'); neuLaden(el); });
-      } }]);
+    dialog('Verbindungscode eingeben', CODE_HTML, [{ t: 'Abbrechen' }, { t: 'Anfrage senden', c: 'gold', fn: function (d) { return codeSenden(d, el); } }]);
   }
 
   function kundeDialog(el, id) {
@@ -596,6 +805,7 @@
       k.classList.toggle('dp-frei', !!(m && m.verbunden));
       k.classList.toggle('dp-punkt', offen);
     }
+    if (PK.offen && document.getElementById('dppk-tabzeile')) tabzeile();   /* v3390 · Zahlen an den Reitern */
   }
 
   /* ── Rechte des Partnerplatzes in der App ────────────────────────────── */
@@ -766,6 +976,6 @@
   document.addEventListener('dp:plan-ready', start);
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { setTimeout(warteAufAnmeldung, 800); }); else setTimeout(warteAufAnmeldung, 800);
 
-  window.DpPartnerKunden = { cockpitOeffnen: cockpitOeffnen, meinPartnerOeffnen: meinPartnerOeffnen, einladungFragen: einladungFragen, darf: darf, _state: S };
+  window.DpPartnerKunden = { cockpitOeffnen: cockpitOeffnen, cockpitSchliessen: cockpitSchliessen, reiterWahl: function (k) { if (PK.offen) reiterWahl(k); else cockpitOeffnen(k); }, meinPartnerOeffnen: meinPartnerOeffnen, einladungFragen: einladungFragen, darf: darf, _state: S };
   window.DpMeinPartner = { einladungFragen: einladungFragen };
 })();
