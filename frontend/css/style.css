@@ -41798,3 +41798,9 @@ html body #s3 #d1t_field .dp-mz-knopf-zeile > .btn.dp-mz-uebernehmen {
    bei 239 von 335 px mit … ab. Das Anzeigefeld bricht jetzt um, statt zu kuerzen. */
 html body #s3 #zaer_display { white-space: normal !important; overflow: visible !important; text-overflow: clip !important;
   height: auto !important; min-height: 38px; line-height: 1.3 !important; padding-top: 5px !important; padding-bottom: 5px !important; }
+
+/* v3410a · Messkabine Runde 3: der Schliessen-Knopf des Upgrade-Hinweises (#upgrade-toast, z 9000, unten rechts)
+   lag bei 1280 px UNTER der Pilot-Blase (#dp-blase-fab, z 10055, 56 x 89 ab x 1192) - elementFromPoint in der
+   Knopfmitte traf die Blase, ein echter Klick haette den Hinweis nicht geschlossen. Der Hinweis ist kurzlebig
+   und traegt sein eigenes X; er liegt jetzt darueber. */
+html body .upgrade-toast { z-index: 10060; }

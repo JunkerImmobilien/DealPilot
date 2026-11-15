@@ -478,7 +478,7 @@
            OBERHALB 768 px aendert sich dadurch nichts: gemessen setzt dort
            KEINE Regel min-height, der Wert ist ohnehin 0. Die Zeile wirkte
            ausschliesslich auf dem Handy — und dort genau falsch herum. */
-        b.style.setProperty('border-radius', '99px', 'important');
+        b.style.setProperty('border-radius', '8px', 'important');   /* v3410: Knopf, Ecken wie in den Reitern (vorher 99 px) */
       });
     } catch (e) {}
     var pill = document.getElementById('dab-ready-pill');

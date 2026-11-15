@@ -358,11 +358,12 @@ html body #s0 .oe-vw select { border-radius: 2px; }
    Nur der Radius - Hoehe, Schrift und Farbe bleiben je Fenster. Drei :not(#…) heben auf (3,1,x) und schlagen
    damit jede Fenster-Regel mit ein oder zwei IDs (#help-modal …, #bmfOverlay #p-ak …).
    Bewusst NICHT: Felder in den Reitern (.body .sec, dort gilt Abschnitt 2), Seitenleiste und Kopf (Suche),
-   das innere Mengenfeld eines Steppers (.pm-menge-n, Radius 0 im verbundenen Bedienelement - die Kanten traegt
-   der Rahmen drumherum), Inline-Stile mit !important. Quick-Check ist ein eigenes Dokument (quickcheck-app.html). */
+   das innere Mengenfeld eines Steppers (.pm-menge-n) und das Suchfeld der Seitenleiste (.sb-search-box, liegt
+   in .dpl-schiene, nicht in aside) - beide Radius 0 im verbundenen Bedienelement, die Kanten traegt
+   der Rahmen drumherum -, Inline-Stile mit !important. Quick-Check ist ein eigenes Dokument (quickcheck-app.html). */
 html:not(#dp-nie):not(#dp-nie-2):not(#dp-nie-3) body
   :is(input[type=text], input[type=number], input[type=date], input[type=month], input[type=datetime-local],
       input[type=time], input[type=email], input[type=password], input[type=search], input[type=tel],
-      input[type=url], input:not([type]), select, textarea):not(.body .sec *):not(aside *):not(header *):not(.pm-menge-n) {
+      input[type=url], input:not([type]), select, textarea):not(.body .sec *):not(aside *):not(header *):not(.pm-menge-n):not(.sb-search-box *) {
   border-radius: 2px !important;
 }
