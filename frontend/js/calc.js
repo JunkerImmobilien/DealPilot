@@ -2836,6 +2836,41 @@ function _calcImmediate(){
       if (_vg && _vg.ok) { _exitErloes -= _vg.steuer; State._exitSteuerGes = _vg; }
     }
   } catch (_eVg) {}
+  /* v3401 · Steuer-Audit 14.11.2026 (Abschnitt 6), Marcel 15.11.2026 „anpassen, wenn es reinpasst":
+     Privat und GbR floss der Verkaufserloes IMMER steuerfrei in den IRR - auch wenn der Verkauf
+     (Ende von Jahr btj = 31.12. des Jahres Basisjahr + btj − 1) noch in der Zehnjahresfrist liegt
+     (§ 23 Abs. 1 Satz 1 Nr. 1 EStG, Frist ab Kaufvertrag, H 23 EStH). Jetzt aus EINEM Kern
+     (ueberfuehrung-kern.js frist23/paragraph23/steuer23, wie der Ueberfuehrungsrechner):
+     Gewinn = Verkaufspreis − (Kaufpreis + Nebenkosten − AfA der btj Jahre, § 23 Abs. 3 Satz 4),
+     Freigrenze 1.000 € (§ 23 Abs. 3 Satz 5), Steuer = Last mit und ohne Gewinn beim zvE des
+     Verkaufsjahres (Tax.steuerLast: ESt, Soli, KiSt), ohne zvE mit dem Grenzsteuersatz.
+     Fehlt das Kaufdatum, gilt der 01.01. des Basisjahres: frueher kann der Vertrag nicht liegen,
+     die Fristfrage (btj ≤ 10 steuerpflichtig, ab 11 frei) ist damit fuer jeden Kauftag dieselbe.
+     Verkaufskosten sind wie beim GmbH-Zweig nicht erfasst. */
+  State._exitSteuer23 = null;
+  try {
+    if (!_mandParams && _gesK && _gesK.paragraph23 && _gesK.steuer23 && exit_vkp > 0) {
+      var _kv23 = String(g('kaufdat') || '').slice(0, 10);
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(_kv23)) _kv23 = _calYearBase + '-01-01';
+      var _vkJahr23 = _calYearBase + btj - 1;
+      var _afa23 = 0;
+      for (var _y23 = 1; _y23 <= btj; _y23++) _afa23 += _afaJahr(_y23);
+      var _p23 = _gesK.paragraph23({ kaufdat: _kv23, stichtag: _vkJahr23 + '-12-31', art: 'kauf',
+        kaufpreis: exit_vkp, verkehrswert: exit_vkp, akPrivat: kp + nk, afaBisher: _afa23, werbungskosten: 0 });
+      var _st23 = { betrag: 0, methode: 'steuerfrei' };
+      if (_p23 && _p23.steuerpflichtig) {
+        var _zve23 = _zveJahr(_vkJahr23);
+        _st23 = _gesK.steuer23(_p23.gewinn, {
+          steuerLast: (typeof Tax !== 'undefined' && Tax && typeof Tax.steuerLast === 'function')
+            ? function (z) { return Tax.steuerLast(z, _vkJahr23).gesamt; } : null,
+          zve: _zve23, grenzPct: grenz * 100 });
+        if (_st23 && _st23.betrag > 0) _exitErloes -= _st23.betrag;
+      }
+      State._exitSteuer23 = { frist: _p23 && _p23.frist, kaufvertrag: _kv23, verkauf: _vkJahr23 + '-12-31',
+        gewinn: _p23 ? _p23.gewinn : null, steuerpflichtig: !!(_p23 && _p23.steuerpflichtig),
+        steuer: (_st23 && _st23.betrag) || 0, methode: _st23 && _st23.methode };
+    }
+  } catch (_e23) {}
   var irr = null, be = { cf: null, kum: null, kumEk: null };
   try {
     if (window.IrrEngine && _cfReihe.length) {

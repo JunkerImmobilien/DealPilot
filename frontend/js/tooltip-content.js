@@ -287,7 +287,7 @@
     },
     'tab3.btj': {
       title: 'Betrachtungszeitraum',
-      body: 'Über wie viele Jahre sollen Cashflow, Rendite und Vermögensaufbau berechnet werden? 10 Jahre = Spekulationsfrist nach § 23 EStG (steuerfreier Verkauf möglich). 15-20 Jahre = langfristige Investorenrechnung. 30+ Jahre = vollständige Tilgung.',
+      body: 'Über wie viele Jahre sollen Cashflow, Rendite und Vermögensaufbau berechnet werden? Verkauft wird rechnerisch am Ende des letzten Jahres. Liegt das noch in der Zehnjahresfrist ab Kaufvertrag (§ 23 EStG), zieht der IRR die Steuer auf den Veräußerungsgewinn ab, bei 10 Jahren also immer. Steuerfrei ist der private Verkauf erst ab 11 Jahren. 15-20 Jahre = langfristige Investorenrechnung. 30+ Jahre = vollständige Tilgung.',
       paragraph: '§ 23 EStG',
       severity: 'beginner'
     },

@@ -387,7 +387,9 @@ window.DealPilotDealAction = (function() {
         grenzsteuersatz: grenz,
         standardAfaSatz: afaSatzPct / 100,
         gutachterkosten: 1000,
-        abzinsung: 0.03
+        abzinsung: 0.03,
+        haltedauer: (window.State && State.btj > 0) ? State.btj : undefined,   /* v3402: Vorteil bis zum Verkauf (Betrachtungszeitraum) */
+        verkaufSteuerpflichtig: (window.DealPilotMandanten && DealPilotMandanten.steuerParameter && DealPilotMandanten.steuerParameter()) ? true : undefined
       });
     } catch (e) { return ''; }
 
@@ -421,7 +423,7 @@ window.DealPilotDealAction = (function() {
       '    <span style="font-size:12px;color:#7A7370">Springt zur Anfrage-Maske mit RND-Gutachten vorausgewählt.</span>',
       '  </div>',
       '  <div style="margin-top:10px;font-size:11px;color:#7A7370;line-height:1.5">',
-      '    <strong>Berechnungs­basis:</strong> §7 Abs. 4 Satz 2 EStG. Baujahr ' + baujahr + ' (Alter ' + alter + ' J.), berechnete RND ' + Math.round(rndJahre) + ' J., neuer AfA-Satz ' + rndCmp.afa_kurz.satz_pct.toFixed(2).replace('.', ',') + ' % statt Standard ' + rndCmp.afa_standard.satz_pct.toFixed(2).replace('.', ',') + ' %. Annahme Grenzsteuersatz ' + Math.round(grenz * 100) + ' %.',
+      '    <strong>Berechnungs­basis:</strong> §7 Abs. 4 Satz 2 EStG. Baujahr ' + baujahr + ' (Alter ' + alter + ' J.), berechnete RND ' + Math.round(rndJahre) + ' J., neuer AfA-Satz ' + rndCmp.afa_kurz.satz_pct.toFixed(2).replace('.', ',') + ' % statt Standard ' + rndCmp.afa_standard.satz_pct.toFixed(2).replace('.', ',') + ' %. Annahme Grenzsteuersatz ' + Math.round(grenz * 100) + ' %. Barwert der vorgezogenen AfA bis ' + (rndCmp.haltedauer_vorgabe ? 'zum Ende beider Abschreibungen' : 'zum Verkauf nach ' + rndCmp.haltedauer + ' Jahren') + (rndCmp.verkauf_steuerpflichtig ? ', abzüglich der Steuer auf die Mehr-AfA beim steuerpflichtigen Verkauf' : '') + ' (3 % Abzinsung).',
       '  </div>',
       '</div>'
     ].join('');
@@ -2047,7 +2049,9 @@ window.DealPilotDealAction = (function() {
           grenzsteuersatz: grenz,
           standardAfaSatz: standardAfa,
           gutachterkosten: 1500,
-          abzinsung: 0.03
+          abzinsung: 0.03,
+          haltedauer: (window.State && State.btj > 0) ? State.btj : undefined,   /* v3402: Vorteil bis zum Verkauf (Betrachtungszeitraum) */
+          verkaufSteuerpflichtig: (window.DealPilotMandanten && DealPilotMandanten.steuerParameter && DealPilotMandanten.steuerParameter()) ? true : undefined
         });
       }
     } catch (e) { console.warn('[RND] AfA-Vergleich nicht möglich:', e); }

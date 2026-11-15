@@ -940,12 +940,40 @@
     const mehrAfaJahr = afaKurzJahr - afaStandardJahr;
     const steuerErsparnisJahr = mehrAfaJahr * grenz;
 
-    let barwert;
-    if (i > 0) {
-      barwert = steuerErsparnisJahr * (1 - Math.pow(1 + i, -rnd)) / i;
-    } else {
-      barwert = steuerErsparnisJahr * rnd;
+    /* ── v3402 · DER VORTEIL IST EINE VERSCHIEBUNG, KEIN GESCHENK ─────────
+       Steuer-Audit 14.11.2026 (Abschnitt 7), Marcel 15.11.2026 „anpassen, wenn es
+       reinpasst". Bis v3401 stand hier die Mehr-AfA × Grenzsatz als Rente ueber die
+       ganze RND. Verrechnet war nicht, dass die Standard-AfA nach der RND weiterliefe:
+       die Summe der AfA bleibt dieselbe (die AHK), nur der Zeitpunkt aendert sich.
+       Beispiel Gebaeude 300.000 €, RND 25, 42 %, 3 %: bis v3401 43.881 €, als Barwert
+       der Verschiebung 22.923 €, bei steuerfreiem Verkauf nach 10 Jahren 21.496 €.
+
+       Jetzt Jahr fuer Jahr bis zur Haltedauer H:
+         Vorteil = Σ (AfA kurz_t − AfA Standard_t) × Grenzsatz / (1+i)^t
+       AfA kurz laeuft rnd Jahre, die Standard-AfA 1/Satz Jahre (das letzte Jahr anteilig).
+       Ohne Haltedauer: bis beide Reihen ausgelaufen sind (Halten auf Dauer).
+       Verkauf innerhalb der Zehnjahresfrist (§ 23 EStG, privat; Vorgabe H ≤ 10): die
+       hoehere AfA mindert die fortgefuehrten AK (§ 23 Abs. 3 Satz 4) und kommt beim
+       Verkauf als Gewinn zurueck, abgezinst auf das Verkaufsjahr. Der Kern liest keine
+       Einstellungen: Haltedauer und Steuerpflicht kommen als Parameter. */
+    const _hEin = Number(input.haltedauer);
+    const _tStd = standardSatz > 0 ? 1 / standardSatz : rnd;
+    const _voll = Math.ceil(Math.max(rnd, _tStd) - 1e-9);
+    const haltedauer = (_hEin > 0) ? Math.round(_hEin) : _voll;
+    const verkaufStpfl = (_hEin > 0)
+      ? (typeof input.verkaufSteuerpflichtig === 'boolean' ? input.verkaufSteuerpflichtig : haltedauer <= 10)
+      : false;
+    const _anteil = (t, dauer) => Math.max(0, Math.min(1, dauer - (t - 1)));
+    let barwert = 0, mehrAfaSumme = 0;
+    for (let t = 1; t <= haltedauer; t++) {
+      const d = afaKurzJahr * _anteil(t, rnd) - afaStandardJahr * _anteil(t, _tStd);
+      mehrAfaSumme += d;
+      barwert += d * grenz / Math.pow(1 + i, t);
     }
+    const rueckholung = verkaufStpfl ? Math.max(0, mehrAfaSumme) * grenz / Math.pow(1 + i, haltedauer) : 0;
+    barwert -= rueckholung;
+    /* die alte Lesart nur noch zum Vergleich (Rente ueber die RND, ohne Ausgleich) */
+    const barwertAlt = i > 0 ? steuerErsparnisJahr * (1 - Math.pow(1 + i, -rnd)) / i : steuerErsparnisJahr * rnd;
 
     const netto = barwert - gutachterkosten;
     const roi = gutachterkosten > 0 ? (netto / gutachterkosten) : 0;
@@ -987,6 +1015,13 @@
       mehr_afa_jahr: round2(mehrAfaJahr),
       steuerersparnis_jahr: round2(steuerErsparnisJahr),
       steuerersparnis_barwert: round2(barwert),
+      /* v3402 */
+      haltedauer: haltedauer,
+      haltedauer_vorgabe: !(_hEin > 0),
+      verkauf_steuerpflichtig: verkaufStpfl,
+      mehr_afa_bis_verkauf: round2(mehrAfaSumme),
+      rueckholung_23: round2(rueckholung),
+      barwert_rente_rnd_alt: round2(barwertAlt),
       gutachterkosten: gutachterkosten,
       netto_vorteil: round2(netto),
       roi_factor: round2(roi),

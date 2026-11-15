@@ -178,7 +178,11 @@ router.post('/rnd', async function (req, res) {
           grenzsteuersatz: Number(a.grenzsteuersatz) || 0.42,
           standardAfaSatz: Number(a.standardAfaSatz) || 0.02,
           gutachterkosten: Number(a.gutachterkosten) || 1500,
-          abzinsung: Number(a.abzinsung) || 0.03
+          abzinsung: Number(a.abzinsung) || 0.03,
+          /* v3402 · Haltedauer (Jahre) und Steuerpflicht des Verkaufs optional; ohne
+             Haltedauer der Barwert der Verschiebung bei Halten auf Dauer */
+          ...(Number(a.haltedauer) > 0 ? { haltedauer: Number(a.haltedauer) } : {}),
+          ...(typeof a.verkaufSteuerpflichtig === 'boolean' ? { verkaufSteuerpflichtig: a.verkaufSteuerpflichtig } : {})
         });
       }
     }
