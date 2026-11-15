@@ -15,7 +15,8 @@
 
   NICHT aufgenommen: /dp2.html (Weiterleitung), /alt-original.html
   (Archiv), /api-docs.html (noindex), Entwuerfe und Demoseiten (noindex,
-  robots.txt sperrt /entwurf- und /demo-), /reseller.html (alte
+  robots.txt sperrt /entwurf- und /demo-). /reseller.html ist seit
+  landing-seo-4 geloescht und leitet per 301 auf /preise.html#partner-plan (alte
   Partnerseite, von keiner Landing-Seite verlinkt).
 
   lastmod ist der Stand der Seite: Landing-Seiten 15.11.2026 (Titel,
