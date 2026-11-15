@@ -37,7 +37,8 @@ const DOKUMENTE = [
   'frontend/marktbericht-app/index.html',
   'frontend/messkabine.html',
   'frontend/landing/index.html',
-  'frontend/messe-studio.html'   /* v2235 · Messe-Studio laedt whitelabel-override */
+  'frontend/messe-studio.html'   /* v2235 · Messe-Studio laedt whitelabel-override */,
+  'frontend/landing/rechner-kern.js'   /* landing-seo-2 · Rechner-Seiten laden deal-kpis/dscr-engine aus der App */
 ].filter(function (p) { return fs.existsSync(path.join(process.cwd(), p)); });
 
 /* Je Dokument: welche js-Datei mit welchem Buster? */
