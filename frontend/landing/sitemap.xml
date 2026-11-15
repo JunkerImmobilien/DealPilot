@@ -1,122 +1,45 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  sitemap.xml · dealpilot.immo · v1596
+  sitemap.xml · dealpilot.immo · landing-seo-1 (15.11.2026)
 
-  NUR SEITEN, DIE ES AUF PRODUKTION WIRKLICH GIBT.
+  NUR SEITEN, DIE ES AUF PRODUKTION WIRKLICH GIBT - jede mit EIGENER
+  Groesse gemessen, nicht mit der der Startseite (der catch-all des
+  Webservers liefert fuer jede unbekannte Adresse die Startseite mit 200).
+  Geschichte: v1568 nahm api/fragen/sicherheit heraus, solange sie auf
+  Prod die Startseite lieferten. v1596 nahm sie zurueck.
 
-  v1568 (23.09.2026) hatte /api.html, /fragen.html und /sicherheit.html
-  herausgenommen: sie lieferten auf Produktion allesamt 1.156.881 Byte -
-  also die Startseite, durchgereicht vom catch-all des Webservers. Eine
-  Sitemap, die auf Seiten zeigt, die es nicht gibt, schadet mehr als eine
-  kurze. Dort stand: "Sobald der Landing-Umbau live ist, kommen sie
-  zurueck."
+  landing-seo-1 · neu: /loesungen.html (Pos. 4,7 in der Search Console,
+  fehlte hier), /videothek.html und /prozesskarte-detail.html (beide
+  verlinkt, beide mit eigenem Inhalt). Die drei Rechner-Seiten
+  (landing-seo-2) kommen erst dazu, wenn sie auf Prod liegen.
 
-  Er ist live (v1594: die neue Landing IST die Startseite), also kommen
-  sie zurueck. Nachgemessen wird nach dem Rollout Adresse fuer Adresse -
-  erst wenn jede ihre EIGENE Groesse liefert und nicht mehr die der
-  Startseite, stimmt diese Datei.
+  NICHT aufgenommen: /dp2.html (Weiterleitung), /alt-original.html
+  (Archiv), /api-docs.html (noindex), Entwuerfe und Demoseiten (noindex,
+  robots.txt sperrt /entwurf- und /demo-), /reseller.html (alte
+  Partnerseite, von keiner Landing-Seite verlinkt).
 
-  /agb.html kommt neu dazu: die alte Startseite verlinkte sie nicht, die
-  neue tut es, und die Datei antwortet auf beiden Domaenen mit 27.490
-  Byte eigenem Inhalt (gemessen 24.09.2026).
-
-  NICHT aufgenommen: /dp2.html (nur noch eine Weiterleitung),
-  /alt-original.html (Archiv), die Entwuerfe und die Demoseiten. Alle
-  tragen noindex, und robots.txt sperrt /entwurf- und /demo- zusaetzlich.
-
-  Die Datumsangaben sind der Stand der jeweiligen Seite, nicht das
-  heutige Datum fuer alle: eine Sitemap, in der alles "heute" geaendert
-  wurde, wird von Suchmaschinen ignoriert.
+  lastmod ist der Stand der Seite: Landing-Seiten 15.11.2026 (Titel,
+  Beschreibung, Ueberschriften neu), Rechtstexte ihr eigenes
+  „Stand:"-Datum. Eine Sitemap, in der alles „heute" geaendert wurde,
+  wird von Suchmaschinen ignoriert. changefreq und priority werten
+  Google nicht aus - sie stehen hier nicht mehr.
 -->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-
-  <url>
-    <loc>https://dealpilot.immo/</loc>
-    <lastmod>2026-11-11</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>1.0</priority>
-  </url>
-
-  <!-- landing-kern-1 · Preis-Details von der Startseite -->
-  <url>
-    <loc>https://dealpilot.immo/preise.html</loc>
-    <lastmod>2026-11-11</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
-  </url>
-
-  <url>
-    <loc>https://dealpilot.immo/geschichten.html</loc>
-    <lastmod>2026-11-11</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-
-  <url>
-    <loc>https://dealpilot.immo/leistungsumfang.html</loc>
-    <lastmod>2026-09-24</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
-  </url>
-
-  <url>
-    <loc>https://dealpilot.immo/forschung.html</loc>
-    <lastmod>2026-10-14</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-
-  <url>
-    <loc>https://dealpilot.immo/prozesskarte.html</loc>
-    <lastmod>2026-10-14</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-
-  <url>
-    <loc>https://dealpilot.immo/fragen.html</loc>
-    <lastmod>2026-09-24</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-
-  <url>
-    <loc>https://dealpilot.immo/api.html</loc>
-    <lastmod>2026-09-24</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-
-  <url>
-    <loc>https://dealpilot.immo/sicherheit.html</loc>
-    <lastmod>2026-09-24</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
-  </url>
-
-  <url>
-    <loc>https://dealpilot.immo/methodik.html</loc>
-    <lastmod>2026-11-11</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-
-  <url>
-    <loc>https://dealpilot.immo/agb.html</loc>
-    <changefreq>yearly</changefreq>
-    <priority>0.2</priority>
-  </url>
-
-  <url>
-    <loc>https://dealpilot.immo/impressum.html</loc>
-    <changefreq>yearly</changefreq>
-    <priority>0.2</priority>
-  </url>
-
-  <url>
-    <loc>https://dealpilot.immo/datenschutz.html</loc>
-    <changefreq>yearly</changefreq>
-    <priority>0.2</priority>
-  </url>
-
+  <url><loc>https://dealpilot.immo/</loc><lastmod>2026-11-15</lastmod></url>
+  <url><loc>https://dealpilot.immo/leistungsumfang.html</loc><lastmod>2026-11-15</lastmod></url>
+  <url><loc>https://dealpilot.immo/preise.html</loc><lastmod>2026-11-15</lastmod></url>
+  <url><loc>https://dealpilot.immo/methodik.html</loc><lastmod>2026-11-15</lastmod></url>
+  <url><loc>https://dealpilot.immo/loesungen.html</loc><lastmod>2026-11-15</lastmod></url>
+  <url><loc>https://dealpilot.immo/fragen.html</loc><lastmod>2026-11-15</lastmod></url>
+  <url><loc>https://dealpilot.immo/geschichten.html</loc><lastmod>2026-11-15</lastmod></url>
+  <url><loc>https://dealpilot.immo/videothek.html</loc><lastmod>2026-11-15</lastmod></url>
+  <url><loc>https://dealpilot.immo/forschung.html</loc><lastmod>2026-11-15</lastmod></url>
+  <url><loc>https://dealpilot.immo/prozesskarte.html</loc><lastmod>2026-11-15</lastmod></url>
+  <url><loc>https://dealpilot.immo/prozesskarte-detail.html</loc><lastmod>2026-11-15</lastmod></url>
+  <url><loc>https://dealpilot.immo/api.html</loc><lastmod>2026-11-15</lastmod></url>
+  <url><loc>https://dealpilot.immo/sicherheit.html</loc><lastmod>2026-11-15</lastmod></url>
+  <url><loc>https://dealpilot.immo/agb.html</loc><lastmod>2026-05-24</lastmod></url>
+  <url><loc>https://dealpilot.immo/impressum.html</loc><lastmod>2026-10-23</lastmod></url>
+  <url><loc>https://dealpilot.immo/datenschutz.html</loc><lastmod>2026-11-08</lastmod></url>
+  <!-- landing-seo-2:rechner -->
 </urlset>

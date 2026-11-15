@@ -3,10 +3,10 @@
 <meta charset="utf-8">
 <meta name="google-site-verification" content="sjsXb3XudmYE75JCus789-lKn_IIX5jOySZx50Iy4i0">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Datenbasis und Prüfung · Woher die Zahlen kommen · DealPilot</title>
-<meta name="description" content="Über 1 Million amtliche Datenpunkte: Gutachterausschüsse, Bodenrichtwerte, Zensus 2022, Statistische Ämter und Bundesbank – laufend abgeglichen, mit Herkunft je Wert und geprüft vor jeder Auslieferung.">
+<title>Immobilienbewertung nach ImmoWertV: Datenbasis · DealPilot</title>
+<meta name="description" content="Immobilienbewertung nach ImmoWertV mit amtlichen Daten: Liegenschaftszins, Sachwertfaktor, Rohertragsfaktor, Vergleichswert und Beleihungswert erklärt.">
 <link rel="canonical" href="https://dealpilot.immo/methodik.html">
-<meta property="og:title" content="Datenbasis und Prüfung · DealPilot"><meta property="og:image" content="https://dealpilot.immo/assets/og-dealpilot.jpg">
+<meta property="og:title" content="Immobilienbewertung nach ImmoWertV: Datenbasis · DealPilot"><meta property="og:image" content="https://dealpilot.immo/assets/og-dealpilot.jpg">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="stylesheet" href="/fonts/dp-fonts.css">
 <link rel="stylesheet" href="dp2.css?v=v2971b">
@@ -190,7 +190,7 @@ section[id]{scroll-margin-top:70px}
      Rechenweg, keine Formel, kein Verfahrensdetail. Die Langfassung liegt in git (vor landing-kern-1) und
      intern als Methodik-Dokument; assets/dealpilot-methodik.pdf ist nicht mehr verlinkt. -->
 <div class="sk"><div class="raster"></div><div class="w">
-  <div class="kick">Datenbasis und Prüfung</div>
+  <div class="kick">Immobilienbewertung nach ImmoWertV · Datenbasis und Prüfung</div>
   <h1>Woher unsere <em>Zahlen kommen.</em></h1>
   <p>DealPilot rechnet mit den Daten der Behörden – und sagt bei jeder Zahl, woher sie stammt. Hier steht, welche
     Daten das sind, wie wir sie aktuell halten, wie wir prüfen und wo die Grenzen liegen.</p>
@@ -211,7 +211,54 @@ section[id]{scroll-margin-top:70px}
 </div>
 </div></section>
 
-<section class="sec-creme" id="umfang"><div class="w-schmal">
+<!-- landing-seo-1 · Marcel 15.11.2026: Abschnitte zu den Suchbegriffen, die Google der Seite schon zuordnet
+     (Vergleichswertrichtlinie, Rohertragsfaktor, Beleihungswertermittlung). Nur Begriffe und Rechtsrahmen,
+     kein Rechenweg von DealPilot (Marcel 11.11.: „nicht zeigen, WIE wir rechnen“). Belege im Code:
+     § 20 ImmoWertV Vergleichsfaktoren und Rohertragsfaktoren im Register (ausschuss_register.js, PotenzialService.js),
+     VW-RL seit ImmoWertV 2021 kein Ersatz (Register-Vermerke, CLAUDE.md UK-Regeln), BelWertV-Zahlen aus
+     marktbericht/backend/src/lib/beleihungswert.js (§ 11 Abs. 2 15 %, § 14 PfandBG 60 %), Bankexport-Check v2630. -->
+<section class="sec-creme" id="immowertv"><div class="w-schmal">
+<div class="kz"><div class="kick">Immobilienbewertung nach ImmoWertV</div><h2>Die Begriffe, mit denen ein Wert begründet wird</h2></div>
+<div class="m-text">
+<p>Die Immobilienwertermittlungsverordnung (ImmoWertV 2021, in Kraft seit dem 1. Januar 2022) regelt, wie in Deutschland
+  ein Verkehrswert ermittelt wird. Sie kennt drei Verfahren: das <b>Vergleichswertverfahren</b> aus Kaufpreisen ähnlicher
+  Objekte, das <b>Ertragswertverfahren</b> aus der Miete und dem Liegenschaftszinssatz und das <b>Sachwertverfahren</b> aus
+  Bodenwert, Herstellungskosten und Sachwertfaktor. Welches Verfahren führt, hängt von der Objektart und den verfügbaren
+  Daten ab. DealPilot ordnet jede Wertindikation in diese Systematik ein und nennt, welche Daten des zuständigen
+  Gutachterausschusses dahinterstehen.</p>
+
+<h3 id="vergleichswertrichtlinie">Vergleichswertverfahren und Vergleichswertrichtlinie</h3>
+<p>Im Vergleichswertverfahren wird der Wert aus Kaufpreisen vergleichbarer Grundstücke abgeleitet oder aus
+  Vergleichsfaktoren, die der Gutachterausschuss veröffentlicht (§ 20 ImmoWertV), etwa in Euro je Quadratmeter Wohnfläche.
+  Weicht das Objekt vom Vergleichsobjekt ab, etwa in der Grundstücksgröße, gleichen Umrechnungskoeffizienten den Unterschied aus.</p>
+<p>Die <b>Vergleichswertrichtlinie (VW-RL)</b> aus dem Jahr 2014 hat dieses Verfahren für die ImmoWertV 2010 erläutert und
+  in ihren Anlagen bundesweite Umrechnungskoeffizienten und Rechenbeispiele enthalten. Seit der ImmoWertV 2021 stehen die
+  Regeln in der Verordnung selbst und in den Muster-Anwendungshinweisen (ImmoWertA). Die bundesweiten Tabellen der VW-RL sind
+  damit kein Ersatz mehr für örtliche Werte. DealPilot rechnet deshalb mit den Vergleichsfaktoren und Umrechnungskoeffizienten
+  der Gutachterausschüsse. Wo ein Ausschuss keine veröffentlicht, steht das im Bericht.</p>
+
+<h3 id="rohertragsfaktor">Rohertragsfaktor</h3>
+<p>Der <b>Rohertragsfaktor</b> ist ein Vergleichsfaktor nach § 20 ImmoWertV: der Kaufpreis geteilt durch den jährlichen
+  Rohertrag, also die marktüblich erzielbare Jahresnettokaltmiete. Ein Faktor von 20 heißt, dass der Kaufpreis dem
+  Zwanzigfachen der Jahresmiete entspricht. Gutachterausschüsse leiten ihn aus tatsächlichen Kaufpreisen ab und
+  veröffentlichen ihn in ihren Grundstücksmarktberichten, meist für Eigentumswohnungen und Mehrfamilienhäuser.</p>
+<p>Am Markt heißt dieselbe Rechnung mit der vereinbarten Miete meist <b>Kaufpreisfaktor</b>. DealPilot zeigt ihn bei jedem
+  Objekt. Wo ein Gutachterausschuss Rohertragsfaktoren veröffentlicht, liegen sie mit Fundstelle im Register von DealPilot
+  und dienen als Gegenprobe zur Wertindikation.</p>
+
+<h3 id="beleihungswertermittlung">Beleihungswertermittlung</h3>
+<p>Banken, die Darlehen über Pfandbriefe refinanzieren, ermitteln den <b>Beleihungswert</b> nach der
+  Beleihungswertermittlungsverordnung (BelWertV). Er soll den Wert beschreiben, der sich unabhängig von vorübergehenden
+  Schwankungen am Markt dauerhaft erzielen lässt, und liegt deshalb in der Regel unter dem Verkehrswert. Die Verordnung
+  setzt Mindestansätze, etwa Bewirtschaftungskosten von mindestens 15 Prozent des Rohertrags, einen Mindestkapitalisierungszins
+  und Sicherheitsabschläge. Mit Pfandbriefen gedeckt werden darf ein Darlehen bis zu 60 Prozent des Beleihungswerts (§ 14 PfandBG).</p>
+<p>DealPilot zeigt im Bankexport einen <b>indikativen Beleihungswert-Check</b> nach diesen Regeln, klar getrennt vom
+  Verkehrswert. So weißt du vor dem Bankgespräch, wo die Bank ungefähr landen wird. Eine Beleihungswertermittlung der Bank
+  ersetzt er nicht.</p>
+</div>
+</div></section>
+
+<section id="umfang"><div class="w-schmal"><!-- landing-seo-1 · ohne sec-creme, damit der Wechsel hell/creme bleibt -->
 <div class="kz"><div class="kick">Umfang</div><h2><span data-umfang="amtlich_rund_gross">Über 1 Million</span> amtliche Datenpunkte</h2></div>
 <div class="m-text">
 <p>DealPilot hält die amtlichen Daten in eigenen Datenbanken und gleicht sie regelmäßig mit den Quellen ab. Gezählt wird nur, was von einer Behörde stammt.</p>

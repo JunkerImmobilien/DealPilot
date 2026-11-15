@@ -1,0 +1,13 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   seo.css · landing-seo-1 (15.11.2026)
+   Bausteine für die Inhalte aus der SEO-Runde: der Textabschnitt der
+   Startseite (#software) und, ab landing-seo-2, die Rechner-Seiten.
+   Farben nur über die Tokens aus dp2.css, Gold nur als var(--wl-…).
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* Startseite · Abschnitt „Immobilien-Investment-Software" unter „Was DealPilot macht" */
+.seo-abschnitt{margin-top:64px}
+.seo-abschnitt .head{max-width:860px;margin-left:auto;margin-right:auto}
+.seo-abschnitt .blatt h3.kt{font-size:17px;line-height:1.3}
+.seo-abschnitt .kb{font-size:14.5px;line-height:1.62}
+@media (max-width:760px){.seo-abschnitt{margin-top:44px}.seo-abschnitt .blatt > *{padding:24px 20px}}

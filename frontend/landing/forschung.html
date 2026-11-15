@@ -3,11 +3,11 @@
 <meta charset="utf-8">
 <meta name="google-site-verification" content="sjsXb3XudmYE75JCus789-lKn_IIX5jOySZx50Iy4i0">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Forschung &amp; Entwicklung · DealPilot</title>
-<meta name="description" content="Bescheinigtes Forschungsvorhaben 2026–2028: ein Verfahren, das den ganzen Immobilienbestand auf einmal betrachtet – in Zusammenarbeit mit Steuerkanzleien.">
+<title>Forschung: Immobilienportfolio optimieren · DealPilot</title>
+<meta name="description" content="Bescheinigtes Forschungsvorhaben 2026 bis 2028: ein Verfahren, das den ganzen Immobilienbestand auf einmal betrachtet, begleitet von Steuerkanzleien.">
 <link rel="canonical" href="https://dealpilot.immo/forschung.html"><!-- landing-kern-1 -->
 <meta property="og:type" content="website"><meta property="og:site_name" content="DealPilot">
-<meta property="og:title" content="Forschung &amp; Entwicklung · DealPilot"><meta property="og:description" content="Bescheinigtes Forschungsvorhaben 2026–2028: ein Verfahren, das den ganzen Immobilienbestand auf einmal betrachtet – in Zusammenarbeit mit Steuerkanzleien.">
+<meta property="og:title" content="Forschung: Immobilienportfolio optimieren · DealPilot"><meta property="og:description" content="Bescheinigtes Forschungsvorhaben 2026–2028: ein Verfahren, das den ganzen Immobilienbestand auf einmal betrachtet – in Zusammenarbeit mit Steuerkanzleien.">
 <meta property="og:image" content="https://dealpilot.immo/assets/og-dealpilot.jpg"><meta name="twitter:card" content="summary_large_image">
 <link rel="stylesheet" href="/fonts/dp-fonts.css">
 <link rel="stylesheet" href="dp2.css?v=v2971b">
@@ -76,7 +76,7 @@ hr.rws{height:4px;border:0;background:var(--runway);margin:0;position:relative;z
 .lu-phase .lu-item{border-top-color:var(--cream-line)}
 .lu-featsec .lu-sub{color:var(--gdi)}
 .lu-hero{max-width:920px}
-.lu-hero h2{font-family:'Space Grotesk',sans-serif;font-size:40px;font-weight:700;line-height:1.08;letter-spacing:-.015em;margin:12px 0 14px;color:#fff}
+.lu-hero :is(h1,h2){font-family:'Space Grotesk',sans-serif;font-size:40px;font-weight:700;line-height:1.08;letter-spacing:-.015em;margin:12px 0 14px;color:#fff}
 .lu-hero-lead{max-width:660px;color:rgba(255,255,255,.72);font-size:16px;line-height:1.65;margin:0}
 .lu-hero-stats{display:flex;flex-wrap:wrap;gap:12px;margin:26px 0 4px}
 .lhs{background:rgba(255,255,255,.03);border:1px solid rgba(201,168,76,.28);border-radius:12px;padding:12px 18px;min-width:112px}
@@ -146,7 +146,7 @@ hr.rws{height:4px;border:0;background:var(--runway);margin:0;position:relative;z
 }
 @media(max-width:480px){
 .lu-toc-grid{grid-template-columns:1fr}
-.lu-hero h2{font-size:30px}
+.lu-hero :is(h1,h2){font-size:30px}
 }
 
 /* v1559 · Gewicht je Score-Bereich und der Plan-Hinweis am Kapitelende. */
@@ -246,7 +246,7 @@ hr.rws{height:4px;border:0;background:var(--runway);margin:0;position:relative;z
       <div class="fe2-grid" style="grid-template-columns:minmax(0,1.45fr) minmax(0,1fr)">
         <div class="lu-hero">
           <span class="eye">Forschung &amp; Entwicklung · 2026 bis 2028</span>
-          <h2>Nicht das einzelne Objekt. <span class="ac">Der ganze Bestand.</span></h2>
+          <h1>Nicht das einzelne Objekt. <span class="ac">Der ganze Bestand.</span></h1><!-- landing-seo-1 · genau ein h1 je Seite -->
           <p class="lu-hero-lead">
             DealPilot rechnet heute jedes Objekt vollständig durch. In unserem Forschungsvorhaben gehen wir den
             nächsten Schritt: Wir erforschen, ob sich ein <strong>ganzer Immobilienbestand gemeinsam</strong>
@@ -441,7 +441,8 @@ hr.rws{height:4px;border:0;background:var(--runway);margin:0;position:relative;z
     @media (max-width:560px){ .fe-ap{grid-template-columns:1fr;gap:2px} }
 
     /* landing-videothek-1 · neue Bausteine der F&E-Seite */
-    #fe-hero .lu-hero h2{font-size:clamp(30px,4.6vw,48px)}
+    #fe-hero .lu-hero :is(h1,h2){font-size:clamp(30px,4.6vw,48px)}
+    #fe-hero .lu-hero h1 .ac{color:var(--gdh)} /* landing-seo-1 · dp2-live.css nennt nur h2 */
     .fe-siegel-zeile{margin:34px 0 0;padding-top:18px;border-top:1px solid var(--line);font-size:13.5px;color:var(--mdk);max-width:80ch}
     .fe-weg{display:grid;gap:0;margin-top:26px;border-left:2px solid var(--line);margin-left:6px}
     .fe-station{position:relative;padding:0 0 30px 30px}
