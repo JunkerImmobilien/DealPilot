@@ -173,6 +173,7 @@
       if (z.hausgeld_plan_monat != null) z.wirtschaftsplan = true;
       if (z.hausgeld_ist_jahr != null || z.abrechnungsergebnis != null) z.abrechnung = true;
       (Array.isArray(x.beschluesse) ? x.beschluesse : []).forEach(function (b) { plusB(z, b); });
+      if (z.beschluesse.length) z._bJ = true;
       if (x.verwalter && String(x.verwalter).trim()) z.verwalter = String(x.verwalter).trim();
       plusQ(z, x.quelle);
     });
@@ -193,7 +194,8 @@
       if (!c || typeof c !== 'object') return;
       var dt = datumAus(c.datum), z = get(dt ? dt.jahr : c.jahr); if (!z) return;
       var art = String(c.art || '').toLowerCase();
-      if (art === 'beschluss' || (c.status === 'beschlossen' && art !== 'sonderumlage')) plusB(z, c.titel || c.text);
+      /* Beschlüsse der Chronik nur, wenn weg.jahre für das Jahr keine nennt (sonst zweimal derselbe Beschluss in anderen Worten) */
+      if ((art === 'beschluss' || (c.status === 'beschlossen' && art !== 'sonderumlage')) && !z._bJ) plusB(z, c.titel || c.text);
       if (art === 'verwaltung' && !z.verwalter) z.verwalter = String(c.titel || c.text || '').trim() || null;
       if (art === 'sonderumlage' && zahl(c.betrag_eur) != null && z.su_gesamt == null && c.status !== 'abgelehnt' && c.status !== 'vertagt') z.su_gesamt = zahl(c.betrag_eur);
     });
@@ -212,6 +214,7 @@
       if (z.su_anteil == null && z.su_gesamt != null && !opt.etw) z.su_anteil = z.su_gesamt;
       if (z.su_anteil == null && z.su_gesamt != null && opt.etw && mea > 0) z.su_anteil = Math.round(z.su_gesamt * mea / 100);
       z.erledigt = !!(z.protokoll && (z.abrechnung || z.wirtschaftsplan));
+      delete z._bJ;
     });
     return aus;
   }
@@ -276,6 +279,7 @@
       '.dp-hv-kpi{padding:11px 14px;border-right:1px solid #EFE8D6;min-width:0}.dp-hv-kpi:last-child{border-right:none}',
       '.dp-hv-kpi small{display:block;font:500 10px "JetBrains Mono",monospace;letter-spacing:.08em;text-transform:uppercase;color:#6B645A}',
       '.dp-hv-kpi b{display:block;font:600 19px "Space Grotesk",Inter,sans-serif;color:#2A2727;margin-top:2px;overflow-wrap:anywhere}',
+      '.dp-hv-kpi b.txt{font:600 14.5px/1.3 Inter,sans-serif}',
       '.dp-hv-kpi span{display:block;font:400 11.5px Inter,sans-serif;color:#7A7370;margin-top:1px}',
       '.dp-hv-abs{display:flex;align-items:baseline;gap:12px;margin:22px 0 8px}',
       '.dp-hv-abs h4{margin:0;font:600 14.5px "Space Grotesk",Inter,sans-serif;color:#2A2727}',
@@ -342,8 +346,8 @@
     k.push(['Sonderumlagen', suN ? eur(suS) : 'keine', (kj ? 'seit dem Kauf ' + kj : 'in den Unterlagen') + (suN ? ' · in ' + suN + (suN === 1 ? ' Jahr' : ' Jahren') + (istEtw() ? ', dein Anteil' : '') : '')]);
     var vw = J.filter(function (z) { return z.verwalter; }), vwL = vw[vw.length - 1];
     var wechsel = (L.liste || []).filter(function (e) { return e.art === 'verwaltung' && /wechsel|neu bestellt|neue verwaltung|neuer verwalter/i.test((e.titel || '') + ' ' + (e.text || '')); });
-    k.push(['Verwaltung', vwL ? esc(String(vwL.verwalter).slice(0, 40)) : (w.verwaltung ? esc(String(w.verwaltung).split(/[.;]/)[0].slice(0, 40)) : '–'), wechsel.length ? 'Wechsel ' + (wechsel[wechsel.length - 1].jahr || '') : (vw.length > 1 ? 'seit ' + vw[0].jahr + ' genannt' : 'kein Wechsel genannt')]);
-    return '<div class="dp-hv-kpis">' + k.map(function (x) { return '<div class="dp-hv-kpi"><small>' + esc(x[0]) + '</small><b>' + x[1] + '</b><span>' + esc(x[2]) + '</span></div>'; }).join('') + '</div>';
+    k.push(['Verwaltung', vwL ? esc(String(vwL.verwalter).slice(0, 40)) : (w.verwaltung ? esc(String(w.verwaltung).split(/[.;]/)[0].slice(0, 40)) : '–'), wechsel.length ? 'Wechsel ' + (wechsel[wechsel.length - 1].jahr || '') : (vw.length > 1 ? 'seit ' + vw[0].jahr + ' genannt' : 'kein Wechsel genannt'), true]);
+    return '<div class="dp-hv-kpis">' + k.map(function (x) { return '<div class="dp-hv-kpi"><small>' + esc(x[0]) + '</small><b' + (x[3] ? ' class="txt"' : '') + '>' + x[1] + '</b><span>' + esc(x[2]) + '</span></div>'; }).join('') + '</div>';
   }
   function tabelle(J) {
     if (!J.length) return '';
@@ -450,6 +454,6 @@
     if (card) Array.prototype.forEach.call(card.querySelectorAll('[data-dp-hv-e="' + art + '"]'), function (e) { e.style.display = an ? '' : 'none'; });
   });
 
-  g.DpHausverlauf = { VERSION: 'v3430', ereignisse: ereignisse, wegJahre: wegJahre, urteil: urteil, artDok: artDok, html: html, kurz: kurz, lesen: lesen, jahrDaten: jahrDaten, grafikSpec: grafikSpec, mountGrafik: mountGrafik, ARTEN: ARTEN };
+  g.DpHausverlauf = { VERSION: 'v3432', ereignisse: ereignisse, wegJahre: wegJahre, urteil: urteil, artDok: artDok, html: html, kurz: kurz, lesen: lesen, jahrDaten: jahrDaten, grafikSpec: grafikSpec, mountGrafik: mountGrafik, ARTEN: ARTEN };
   if (typeof module !== 'undefined' && module.exports) module.exports = g.DpHausverlauf;
 })(typeof window !== 'undefined' ? window : globalThis);

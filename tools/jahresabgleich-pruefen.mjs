@@ -99,6 +99,8 @@ const K = c.DpMietpotenzial, E = c.DpErhoehungen, JA = c.DpJahresabgleich, HV = 
   ok(j(2023).erledigt && j(2024).erledigt && !j(2025).erledigt, 'W erledigt = Protokoll + Wirtschaftsplan oder Abrechnung (2025 ohne Protokoll offen)');
   ok(j(2025).verwalter === 'Neue Verwaltung bestellt' && j(2023).verwalter === 'Muster Hausverwaltung GmbH', 'W Verwalter je Jahr (aus weg.jahre, sonst aus der Chronik)');
   ok(j(2023).beschluesse[0] === 'Dachsanierung beschlossen', 'W Beschlüsse je Jahr');
+  const dop = HV.wegJahre({ weg: { jahre: [{ jahr: 2023, beschluesse: ['Dach, Sonderumlage 18.000 €'] }], chronik: [{ jahr: 2023, art: 'beschluss', titel: 'Dachsanierung beschlossen' }, { jahr: 2022, art: 'beschluss', titel: 'Treppenhaus' }] } }, [], []);
+  ok(dop[1].beschluesse.length === 1 && dop[0].beschluesse[0] === 'Treppenhaus', 'W Beschluss nicht doppelt: weg.jahre geht vor, die Chronik füllt nur Jahre ohne');
   /* alte Auswertung ohne weg.jahre: Dokumente mit Art und Jahr (seit v3430 gespeichert) und Protokolldatum */
   const alt = HV.wegJahre({ weg: { chronik: [{ datum: '18.06.2022', art: 'beschluss', titel: 'Treppenhaus 2023' }] } }, [],
     [{ typ: 'weg_protokoll', label: 'WEG-Protokoll', datum: '18.06.2022' }, { typ: 'hausgeld', label: 'Wirtschaftsplan / Hausgeldabrechnung', art: 'Jahresabrechnung', jahr: 2022 },

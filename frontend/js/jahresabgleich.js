@@ -44,7 +44,7 @@
 (function (global) {
   'use strict';
   if (global.DpJahresabgleich) return;
-  var VERSION = 'v3431';
+  var VERSION = 'v3432';
   var GOLD = 'var(--wl-c9a84c, #C9A84C)';
   var SCHRITTE = [['miete', 'Miete'], ['steuer', 'Steuer'], ['wert', 'Wert'], ['haus', 'Haus']];
   var WORT = { ok: 'erledigt', teil: 'teilweise', offen: 'offen', laufend: 'läuft' };
@@ -233,7 +233,7 @@
       '.dp-ja-abs h4{margin:0;font:600 15px "Space Grotesk",Inter,sans-serif;color:' + T + '}',
       '.dp-ja-abs .dp-ja-eti{margin-left:auto;color:' + LE + '}',
       '.dp-ja-tab{overflow-x:auto;-webkit-overflow-scrolling:touch;border:1px solid ' + LI + ';border-radius:10px;background:#fff}',
-      '.dp-ja-tab table{width:100%;border-collapse:collapse;font:400 12.5px Inter,sans-serif;color:' + T + ';min-width:860px}',
+      '.dp-ja-tab table{width:100%;border-collapse:collapse;font:400 12.5px Inter,sans-serif;color:' + T + ';min-width:780px}',
       '.dp-ja-tab th,.dp-ja-tab td{text-align:right;padding:8px 10px;border-bottom:1px solid #F1EBDD;font-variant-numeric:tabular-nums;white-space:nowrap;vertical-align:top}',
       '.dp-ja-tab tbody tr:last-child td{border-bottom:none}',
       '.dp-ja-tab th:first-child,.dp-ja-tab td:first-child{text-align:left}',
@@ -244,7 +244,7 @@
       '.dp-ja-tab tbody tr.an td{background:color-mix(in srgb, ' + GOLD + ' 11%, #fff)}',
       '.dp-ja-tab .dp-ja-stp{display:inline-block;margin-top:2px;padding:0 6px;border-radius:9px;font-size:10.5px;border:1px solid rgba(128,128,128,.35);color:' + M + '}',
       '.dp-ja-tab .dp-ja-stp.erklaert{border-color:' + GOLD + '}.dp-ja-tab .dp-ja-stp.bescheid{border-color:#3FA56C;color:#2f7d52}',
-      '.dp-pa-wrap .dp-ja-tab button{font:500 11.5px Inter,sans-serif !important;padding:3px 8px !important;min-height:0 !important}',
+      '.dp-pa-wrap .dp-ja-tab button.dp-ja-ein{display:block;margin-top:3px;font:500 11px Inter,sans-serif !important;padding:0 !important;min-height:0 !important;border:none !important;background:none !important;box-shadow:none !important;color:#8a6d1f !important;text-decoration:underline;text-underline-offset:2px;cursor:pointer}',
       '.dp-ja-notiz{border-left:2px solid ' + GOLD + ';padding:8px 12px;background:color-mix(in srgb, ' + GOLD + ' 8%, #fff);font-size:12.5px;margin:10px 0 0;border-radius:0 8px 8px 0}',
       '.dp-ja-notiz.ok{border-left-color:#3FA56C}',
       '.dp-ja-fuss{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:10px;font-size:12px;color:' + LE + '}',
@@ -294,18 +294,18 @@
 
   function tabelleHtml(Z, weg, L) {
     var J = global.DpJahresstaende;
-    var kopf = '<tr><th>Jahr</th><th>Kaltmiete<br>Plan</th><th>Kaltmiete<br>Ist</th><th>zulässig<br>§ 558</th><th>Cashflow v. St.<br>Plan · Ist</th><th>Ergebnis<br>V+V</th><th>Wert</th><th>Rest&shy;schuld</th><th>DSCR</th><th>Score</th><th>Abgleich</th><th></th></tr>';
+    var kopf = '<tr><th>Jahr</th><th>Kaltmiete<br>Plan</th><th>Kaltmiete<br>Ist</th><th>zulässig<br>§ 558</th><th>Cashflow v. St.<br>Plan · Ist</th><th>Ergebnis<br>V+V</th><th>Wert</th><th>Rest&shy;schuld</th><th>DSCR</th><th>Score</th><th>Abgleich</th></tr>';
     var body = Z.map(function (z) {
       var sx = stand(z, weg, L), lauf = z.jahr >= heuteJahr(), pl = planZeile(z.jahr), mp = mpJahr(z.jahr);
       var st = J && J.standJahr ? J.standJahr(z.jahr) : null, kz = (st && st.kz) || {};
       var dscr = zahl(kz._kpis_dscr), score = zahl(kz._ds2_score);
       var planM = istZahl(z.miete_plan) ? eur(z.miete_plan) : (istZahl(z.miete_proj) ? '<span style="color:#9A9285">' + eur(z.miete_proj) + '</span><small>Projektion</small>' : '–');
-      var gen = mp && mp.n && !lauf && mp.genutzt.length && mp.ungenutzt_jahr <= Math.max(5, (mp.zul - mp.ist) * 1.2);
+      var gen = mp && mp.n && !lauf && mp.genutzt.length && mp.zul > mp.ist + 0.5 && mp.ungenutzt_jahr <= Math.max(5, (mp.zul - mp.ist) * 1.2);
       var ung = mp && mp.n ? (gen ? '<small class="dp-ja-gut">genutzt</small>' : mp.ungenutzt_jahr > 0 ? '<small class="dp-ja-schlecht">' + vz(-mp.ungenutzt_jahr) + ' ungenutzt</small>' : (mp.zul > mp.ist + 0.5 ? '<small>ab ' + mmjj(mp.wirksam_ab) + '</small>' : '<small class="dp-ja-gut">ausgeschöpft</small>')) : '';
       var cfP = istZahl(z.cf_plan) ? z.cf_plan : z.cf_proj, cfI = istZahl(z.cf_stand) ? z.cf_stand : null;
       var rs = istZahl(z.rs_ist) ? z.rs_ist : z.rs_proj;
       return '<tr data-ja-jahr="' + z.jahr + '" class="' + (z.jahr === _gewaehlt ? 'an' : '') + '" title="Jahr ' + z.jahr + ' wählen">'
-        + '<td><b>' + z.jahr + '</b>' + (lauf ? '<small>läuft</small>' : '') + '</td>'
+        + '<td><b>' + z.jahr + '</b>' + (lauf ? '<small>läuft</small>' : '') + '<button type="button" class="btn-clean dp-ja-ein" data-ja-aktion="eintragen" data-ja-j="' + z.jahr + '" title="Steuerstand, Restschuld laut Kontoauszug, Leerstand und Notiz für ' + z.jahr + '">eintragen</button></td>'
         + '<td>' + planM + '</td>'
         + '<td>' + (istZahl(z.miete_ist) ? eur(z.miete_ist) : '–') + '<small>' + (lauf ? 'Projektion' : abw(z.miete_basis, z.miete_ist, true)) + '</small></td>'
         + '<td>' + (mp && mp.n ? eur(mp.zul * 12) + ung : '–') + '</td>'
@@ -315,8 +315,7 @@
         + '<td>' + eur(rs) + '<small>' + (istZahl(z.rs_ist) ? 'Kontoauszug' : 'Projektion') + '</small></td>'
         + '<td>' + (dscr != null ? z2(dscr) : '–') + '</td>'
         + '<td>' + (score != null ? String(Math.round(score)) : '–') + '</td>'
-        + '<td><span class="dp-ja-pkt dp-ja-' + pktKlasse(sx, lauf) + '"></span> ' + (lauf ? '–' : sx.n + '/4') + '</td>'
-        + '<td>' + knopf('eintragen', 'eintragen', false, z.jahr) + '</td></tr>';
+        + '<td><span class="dp-ja-pkt dp-ja-' + pktKlasse(sx, lauf) + '"></span> ' + (lauf ? '–' : sx.n + '/4') + '</td></tr>';
     }).join('');
     return '<div class="dp-ja-tab"><table><thead>' + kopf + '</thead><tbody>' + body + '</tbody></table></div>';
   }

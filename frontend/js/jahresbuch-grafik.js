@@ -29,10 +29,10 @@
 (function (global) {
   'use strict';
   if (global.DpJahresbuchGrafik) return;
-  var VERSION = 'v3430';
+  var VERSION = 'v3432';
   var GOLD = 'var(--wl-c9a84c, #C9A84C)', GRAU = '#8A8278', TINTE = '#5B544C', ROT = '#B8625C';
   var FLAECHE = 'var(--jbg-flaeche, #FDFCFA)';
-  var W = 720, L = 60, R = 54, OBEN = 26, LUECKE = 46;
+  var W = 720, L = 60, R = 54, OBEN = 26, LUECKE = 56;
 
   function istZahl(v) { return typeof v === 'number' && isFinite(v); }
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
