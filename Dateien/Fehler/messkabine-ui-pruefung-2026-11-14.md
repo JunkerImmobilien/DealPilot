@@ -275,3 +275,82 @@ genau auf der Basislinie), `buster-ebenen-pruefen` sauber, `deploy-staging.ps1` 
 **Zählung:** 18 Befunde behoben (v3370: 17, v3370a: 1), 9 offen mit Grund. Für Marcel zu entscheiden:
 **Haus-Radius der Felder** (C4, Vorschlag 2 px wie in den Reitern), **Pillen oder Ecken** für `.dpm-btn` und die
 Chips, **Schließen-Knopf im Erststart-Fenster**.
+
+---
+
+## Runde 3 · 15.11.2026 · Optik einheitlich (v3410, v3410a, v3410b)
+
+Marcel zu den offenen Optikpunkten aus Runde 2: „das soll einheitlich aussehen". Gemessen auf Staging in
+einer **eigenen Headless-Chrome-Instanz** (eigenes Profil, Port 9333, Breite per Geräte-Emulation 1280 und 390 px),
+nicht im Chrome der anderen Sitzungen: dort lief eine Messe-Aufnahme, und eine An-/Abmeldung im gemeinsamen
+`localStorage` hätte sie gestört. Testkonten aus `Dateien/Testunterlagen/staging-partner-testkonten.md`
+(Partnerplatz-Kunde, für das PDF der Durchlauf-Kunde). Beim PDF waren Schreibaufrufe im Browser gesperrt
+(`fetch`/XHR außer GET, `saveObj`): geblockt wurden 2 × `tax-snapshots`, 1 × `track-usage`, 9 × `saveObj`. Am Ende
+abgemeldet (Token null), Profil gelöscht. Werkzeug: `getComputedStyle`, `getBoundingClientRect`, `elementFromPoint`,
+Regel-Leser über alle Stylesheets.
+
+**Maßstab, gemessen in allen neun Reitern (1280 px):** Felder 43 × Radius **2 px**; Knöpfe `.btn`, `.btn-ghost`,
+`.cf-mode-btn`, `.oe-btn`, `.v235-next-btn`, `.dab-doc-btn` … Radius **8 px**, 38 px hoch.
+
+| Punkt | vorher | nachher (1280 / 390) | Version |
+|---|---|---|---|
+| C4 Felder in Fenstern | BMF `.trl`/`.tr` 8 px (16), Beta 6 px (3) + 8 px (1), Feedback 8, Vermögen 8 (3), Umsetzungswünsche 9 (4), Cockpit-Notiz `.dp-pp-in` 9, Co-Pilot `.dp-cp-in` 9, Modellwahl `.dp-cpp-sel` 999, Tower `.frage` 10, Alle-Objekte-Suche 6, Erststart 9 (11) + 8 (4), Quick-Check-Schlüsselfeld 6 | **2 px** in 16 Fenstern + Einstellungen (9 Unterreiter) auf beiden Breiten, 0 Abweichler | v3410 (`einheitlich.css`), QC in `quickcheck-app.html` |
+| C4 Ausnahmen | Stepper-Feld `.pm-menge-n` 0 px, Seitenleisten-Suche `#sb-search-input` 0 px | bleiben 0 – inneres Feld eines verbundenen Bedienelements, die Kante trägt der Rahmen | v3410 / v3410a |
+| `.dpm-btn` Track Record, Bankexport | 999 px (309 × 38, 162/168/142 × 38) | **8 px** | v3410 |
+| `.dab-chip` Deal-Aktion (Sprung zum fehlenden Feld) | 99 px – zweimal gesetzt, CSS **und** inline mit `!important` (`deal-action-boarding.js:481`) | **8 px**, 22 / 44 px hoch | v3410 + v3410a |
+| `.oe-chip` Objekt (anklickbar, `role=button`) | 999 px | **8 px** | v3410 |
+| Filter Umsetzungswünsche | 20 px | **8 px** | v3410 |
+| Cockpit „mehr“ `.ke2-mehr` | 999 px | **8 px** | v3410 |
+| Preisfenster Monatlich/Jährlich | 999 px | Knopf **8 px**, Rahmen 10 px | v3410 |
+| Erststart-Knöpfe `.dpo-b` / `.dpo-r-btn` | 10 / 9 px | **8 px** | v3410 |
+| Erststart Schließen | fehlte | **32 × 32 / 44 × 44, Radius 9**, dunkle Fläche mit Goldkante wie `.bi-x`, oben rechts im Goldkopf, nicht verdeckt | v3410 |
+
+**Knopf oder Statusanzeige – was Pille bleibt:** Knopf ist, was etwas auslöst (`<button>`, `role=button`, Klick-Handler);
+das bekommt die Ecken der Reiter. Pille bleibt, was nur einen Zustand **zeigt**: Score-/Status-Chip `.dpsh-chip`
+(„Standby“, Stufe, 20 px), „Bereit für die Bank“ `.dab-pill`, Status der Wünsche `.dpw-pille`, Plan-Pille der Seitenleiste
+`.sb-user-plan-pill`, Stufenpunkte `.dp-pf-pille` (runde Zahl 18 px), Badges im Preisfenster und in der Deal-Aktion
+(`.dab-bp-ver`, `.dab-bp-adbadge`). Die Form sagt damit etwas: rund = Anzeige, eckig = drückbar.
+
+**Schließen im Erststart, Verhalten (gemessen 1280 und 390):** Klick → Fenster weg, `__dpOnboardingAktiv` false,
+`istFertig()` **false**, Merker `dp_onboarding_done_v1` **nicht** gesetzt (also auch nicht im Konto-Abgleich
+`konto-stammdaten.js`), `dp_onboarding_step` bleibt (6 = „Hilfe“), kein Rundgang. Neu geladen: Erststart wieder da,
+am selben Schritt. Kein Escape-Weg (ein Tippfehler im Feld soll die Einrichtung nicht schließen).
+
+**Die 14 nur erfassten Schließen-Knöpfe aus Runde 2 – jetzt im Browser geöffnet** (Größe, Radius, `elementFromPoint`
+in der Knopfmitte, schließt der Klick):
+
+| Knopf | Fenster | 1280 | 390 | oben / schließt |
+|---|---|---|---|---|
+| `.wizard-close` | Workflow-Assistent | 32 r9 | 44 r9 | ja / ja |
+| `.dp-legal-close` | Rechtlicher Hinweis | 32 r9 | 44 r9 | ja / ja |
+| `.rnd-wiz-close` | RND-Assistent | 32 r9 | 44 r9 | ja / ja |
+| `.bi-x` | Beleg-Import | 32 r9 | 44 r9 | ja / ja |
+| `.dpdi-close` | Dokument-Import | 32 r9 | 44 r9 | ja / ja |
+| `.bb-zu` | Bordbuch | 32 r9 | 44 r9 | ja / ja |
+| `.dpes-x` | Erststart-Karte | 32 r9 | 44 r9 | ja / ja |
+| `.rp-x` | Partner-Portal | 32 r9 | 44 r9 | ja / ja |
+| `.upgrade-close` | Upgrade-Hinweis | 32 r9 | 44 r9 | **nein → behoben**: 1280 lag die Pilot-Blase `#dp-blase-fab` (z 10055) darüber, 390 das Partner-Aufgabenband `#dppk-band` (z 100040). Hinweis jetzt z 100050 (v3410a/b), nachgemessen: Mitte trifft das X |
+| `.hh-x` | Handy-Hinweis | – | – | nicht geöffnet: erscheint nur nach abgeschlossener Einrichtung auf dem Handy |
+| `.da-modal-close` | Deal-Aktion Bank/Gutachten/Beratung | – | – | nicht geöffnet: das Testobjekt hat keine Adresse/Kaufpreis, `openBank()` meldet per `alert` (im ersten Lauf hängte das die Headless-Seite; danach `alert`/`confirm` abgefangen) |
+| `.tax-bestand-overlay-close` | Steuer › Bestand | – | – | nicht geöffnet: Overlay erscheint nur mit Bestandsobjekten |
+| `.dpnq-x` | Neues Objekt › Quellen | – | – | nicht geöffnet: `DealPilotNeuesObjekt` ist auf der Seite nicht geladen |
+| `.dpuew-x` | Überführung GmbH | – | – | nicht geöffnet: braucht einen GmbH-Mandanten |
+
+**Neuer Befund beim Nachmessen, behoben (v3410b):** bei 390 px lag das Partner-Aufgabenband (z 100040) über dem Fuß des
+Erststart-Fensters (z 100000) – `elementFromPoint` auf „Fertig — los geht's“ (y 733) traf das Band. Solange die
+Einrichtung offen ist, liegt das Band jetzt darunter (z 99990); nachgemessen trifft die Mitte den Knopf.
+
+**Investment-PDF auf Staging erzeugt** (Durchlauf-Kunde, Objekt „Testweg 1“, Miete 900 € und Eigenkapital 230.000 €
+nur im Browser eingetragen, gespeichert wurde nichts; 832 KB). Die drei Diagramme (`bc-equity` 1200 × 380,
+`bc-cockpit` 540 × 100, `bc-waterfall` 1100 × 380) als Bild angesehen: Achsen, Beschriftungen und Werte in **Sans**
+(Helvetica/Arial-Ersatz für Inter); Serif nur dort, wo das Diagramm Cormorant setzt (Wasserzeichen „EQUITY“, Summe
+„+169 T€“, → Georgia). Kein Rückfall auf Times mehr – v3370 wirkt. Beim Partnerplatz-Kunden kam kein PDF: sein Partner
+hat das Recht `pdf` ausgeschaltet (`partner-kunden.js` umhüllt `exportPDF`) – gewollt, kein Fehler.
+
+**Prüfer:** `buster-ebenen-pruefen` sauber, `gold-audit.py` auf Staging RC 0 (366, genau auf der Basislinie),
+`deploy-staging.ps1` dreimal mit allen Prüfern grün. Commits `3ae542c0`, `22cde7ce`, `0cb063a4`, `82b07a4e`,
+`71a3de1c` (v3410b) und Prüfsumme `0ec2b6ee`.
+
+**Offen:** die vier nicht geöffneten Fenster oben (brauchen passende Testdaten); Feldhöhen C5 (Umsetzungswünsche
+39,2/38, Stepper 26 px) und die Erststart-Knopfhöhe 42 px gegen 38 in den Reitern – gemessen, nicht Teil der
+Entscheidung „einheitlich“ (die betraf Radius und Form); Track-Record-Escape aus Runde 2 nicht nachgestellt.
