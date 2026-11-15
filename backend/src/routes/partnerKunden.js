@@ -10,6 +10,7 @@ const { authenticate } = require('../middleware/auth');
 const { requireFeature } = require('../middleware/planLimits');
 const reseller = require('../services/resellerService');
 const pk = require('../services/partnerKunden');
+const anm = require('../services/partnerAnmerkungen');   /* v3450 · Anmerkungen am Kundenstand, Rueckmeldung */
 
 function antwort(res, next) {
   return function (e) {
@@ -41,6 +42,12 @@ partner.post('/anfragen/:id/zurueckziehen', fn((req) => pk.anfrageZurueckziehen(
 partner.get('/kundenstaende', fn(async (req) => ({ kundenstaende: await pk.kundenstaende(req.reseller) })));
 partner.post('/kundenstaende/:id/geoeffnet', fn((req) => pk.kundenstandGeoeffnet(req.reseller, req.user.id, req.params.id)));
 partner.post('/kundenstaende/:id/uebernehmen', fn((req) => pk.kundenstandUebernehmen(req.reseller, req.user.id, req.params.id)));
+/* v3450 · Anmerkungen am Kundenstand und „Zurueck an Kunden“ */
+partner.get('/kundenstaende/:id/anmerkungen', fn(async (req) => ({ anmerkungen: await anm.liste(req.reseller, req.params.id) })));
+partner.post('/kundenstaende/:id/anmerkungen', fn((req) => anm.anlegen(req.reseller, req.user.id, req.params.id, req.body)));
+partner.post('/kundenstaende/:id/zurueck', fn((req) => anm.zurueckgeben(req.reseller, req.user.id, req.params.id, req.body)));
+partner.put('/anmerkungen/:id', fn((req) => anm.aendern(req.reseller, req.params.id, req.body)));
+partner.delete('/anmerkungen/:id', fn((req) => anm.loeschen(req.reseller, req.params.id)));
 partner.get('/aufgaben', fn(async (req) => ({ aufgaben: await pk.aufgabenListe(req.reseller) })));
 partner.post('/aufgaben', fn((req) => pk.aufgabeAnlegen(req.reseller, req.user.id, req.body)));
 partner.post('/aufgaben/:id/erinnern', fn((req) => pk.aufgabeErinnern(req.reseller, req.params.id, req.body && req.body.client_id)));
@@ -58,6 +65,8 @@ kunde.delete('/code', fn((req) => pk.codeWiderrufen(req.user.id)));
 kunde.post('/senden', fn((req) => pk.senden(req.user, req.body)));
 kunde.post('/sendungen/:id/zurueckziehen', fn((req) => pk.zurueckziehen(req.user, req.params.id)));
 kunde.post('/aufgaben/:id', fn((req) => pk.aufgabeKunde(req.user, req.params.id, req.body && req.body.status, req.body && req.body.grund)));
+kunde.get('/aufgaben/:id/anmerkungen', fn((req) => anm.kundeListe(req.user, req.params.id)));   /* v3450 */
+kunde.post('/anmerkungen/:id', fn((req) => anm.kundeSetzen(req.user, req.params.id, req.body)));   /* v3450 */
 kunde.post('/trennen', fn((req) => pk.kundeTrennt(req.user)));
 kunde.put('/marke', fn((req) => pk.markeWaehlen(req.user, req.body && req.body.marke)));
 

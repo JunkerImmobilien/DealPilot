@@ -115,6 +115,12 @@
       '#dppk-band .pk-btn.leer{background:transparent;color:#FDFCFA;border-color:rgba(253,252,250,.3)}',
       '#dppk-ks{position:sticky;top:0;z-index:50;background:#FBF6E9;border:1px solid ' + G + ';border-radius:10px;margin:8px 12px;padding:9px 12px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;font:400 13px Inter,sans-serif;color:#2A2727}',
       '#dppk-ks b{font-weight:600}',
+      '#dppk-ks .dppk-ks-text{flex:1 1 260px;min-width:0}',
+      '#dppk-ks .dppk-ks-knoepfe,#dppk-ks .dppk-anm-knoepfe{display:flex;gap:6px;flex-wrap:wrap;align-items:center}',
+      '#dppk-ks .pk-btn2{border:1px solid #D9CFB8;background:#fff;color:#2A2727;border-radius:8px;padding:6px 10px;font:600 12px Inter,sans-serif;cursor:pointer;white-space:nowrap}',
+      '#dppk-ks .pk-btn2.gold{background:' + G + ';border-color:' + G + ';color:#fff}',
+      '#dppk-ks .pk-btn2[disabled]{opacity:.5;cursor:default}',
+      '@media (max-width:640px){#dppk-ks{margin:6px 8px;padding:8px 10px}#dppk-ks .pk-btn{margin-left:0}#dppk-ks .pk-btn2,#dppk-ks .pk-btn{min-height:36px}}',
       '#dppk-ks .pk-btn{border:1px solid ' + G + ';background:' + G + ';color:#fff;border-radius:8px;padding:6px 11px;font:600 12px Inter,sans-serif;cursor:pointer;margin-left:auto}',
       '.dab-partnerzeile{display:flex;gap:10px;align-items:center;margin-top:8px;padding:10px 12px;border:1px dashed ' + G + ';border-radius:10px;cursor:pointer;font:400 13px Inter,sans-serif}',
       '.dab-partnerzeile b{font-weight:600}',
@@ -132,6 +138,9 @@
     s.textContent = R.concat(ab, [
       'html:not([data-pk-offen]) #dppk-ab{display:none !important}',
       'html[data-pk-offen] nav.tabs > :not(#dppk-tabzeile){display:none !important}',
+      /* v3450 · Marcel 15.11.: „Im Partner-Cockpit steht immer die Pille Ist · heute | Soll · Ankauf-Stand …“ - alles, was zum
+         geladenen Objekt gehoert, steht hinter dem Cockpit nicht (nach „← Objekte“ wieder da, die Regel haengt nur am Attribut) */
+      'html[data-pk-offen] #ank-ansicht-host,html[data-pk-offen] #dppk-ks,html[data-pk-offen] #dppk-anm-liste,html[data-pk-offen] #dppk-anm-layer{display:none !important}',
       'html:not([data-pk-offen]) #dppk-tabzeile{display:none !important}',
       '#dppk-tabzeile{display:flex;align-items:stretch;flex:0 0 auto;min-width:0}',
       '#dppk-tabzeile .dppk-tab{display:flex;align-items:center;gap:6px;border:0;border-bottom:1px solid transparent;background:transparent;cursor:pointer;white-space:nowrap;flex:0 0 auto;font-family:Inter,sans-serif}',
@@ -628,6 +637,8 @@
             var stand = x.stand_nr > 1 ? 'Stand ' + x.stand_nr + ', aktualisiert' : 'erster Stand';
             return '<div class="pk-zeile"><div class="pk-name"><b>' + esc(adresse(x)) + '</b><small>' + esc([art, stand, 'freigegeben am ' + datum(x.stand_am)].join(' · '))   /* seq_no der Kopie (K-…) sagt dem Partner nichts */ + '</small></div>' +
               (x.gelesen_am ? '' : '<span class="pk-chip gruen">neu</span>') +
+              (x.anm_offen ? '<span class="pk-chip">' + x.anm_offen + ' Anmerkung' + (x.anm_offen === 1 ? '' : 'en') + ' beim Kunden</span>' : '') +
+              (x.anm_entwurf ? '<span class="pk-chip grau">' + x.anm_entwurf + ' Entwurf' + (x.anm_entwurf === 1 ? '' : 'e') + '</span>' : '') +
               '<button type="button" class="pk-btn klein gold" data-laden="' + x.kopie_object_id + '" data-s="' + x.share_id + '">Ansehen</button>' +
               '<button type="button" class="pk-btn klein" data-ueb="' + x.share_id + '">Als eigenes Objekt übernehmen</button></div>';
           }).join('') + '</div>';
@@ -637,6 +648,7 @@
       [].forEach.call(el.querySelectorAll('[data-laden]'), function (b) {
         b.onclick = function () {
           api('/partner/kundenstaende/' + b.getAttribute('data-s') + '/geoeffnet', { method: 'POST' }).catch(function () {});
+          PK.herkunft = PK.offen ? PK.aktiv : 'staende';   /* v3450 · fuer „Zurück zum Partner-Cockpit“ */
           var ov = document.getElementById('dppk-ov'); if (ov) ov.remove();
           try { if (typeof setMainView === 'function') setMainView('single'); } catch (e) {}
           if (typeof window.loadSaved === 'function') window.loadSaved(b.getAttribute('data-laden'));
@@ -777,6 +789,11 @@
     var l = S.kunde.aufgaben || [];
     el.innerHTML = l.length ? l.map(function (a) {
       var s = AUFG_STATUS[a.status] || [a.status, 'grau'];
+      /* v3450 · Rückmeldung des Partners zu einem gesendeten Objekt: Anmerkungen am eigenen Objekt ansehen */
+      if (a.art === 'rueckmeldung') return '<div class="pk-zeile" style="display:block"><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><div class="pk-name"><b>' + esc(a.titel) + '</b><small>' +
+          (a.anmerkungen || 0) + (a.anmerkungen === 1 ? ' Anmerkung' : ' Anmerkungen') + (a.anmerkungen_offen ? ', ' + a.anmerkungen_offen + ' offen' : ', alle erledigt') + (a.stand_nr ? ' · zu Stand ' + a.stand_nr : '') + '</small></div><span class="pk-chip ' + s[1] + '">' + s[0] + '</span></div>' +
+        (a.text ? '<p style="margin:8px 0;font-size:13px;line-height:1.5">' + esc(a.text) + '</p>' : '') +
+        '<div class="pk-leiste" style="margin:8px 0 0"><button type="button" class="pk-btn klein gold" data-rm="' + a.id + '">Im Objekt ansehen</button></div></div>';
       return '<div class="pk-zeile" style="display:block"><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><div class="pk-name"><b>' + esc(a.titel) + '</b><small>' + (a.faellig_am ? 'fällig ' + datum(a.faellig_am) : 'ohne Frist') + '</small></div><span class="pk-chip ' + s[1] + '">' + s[0] + '</span></div>' +
         (a.text ? '<p style="margin:8px 0;font-size:13px;line-height:1.5">' + esc(a.text) + '</p>' : '') +
         (a.status === 'erledigt' || a.status === 'abgelehnt' ? '' : '<div class="pk-leiste" style="margin:8px 0 0">' +
@@ -786,6 +803,7 @@
           '<button type="button" class="pk-btn klein rot" data-ab="' + a.id + '">Ablehnen</button></div>') + '</div>';
     }).join('') : '<div class="pk-leer">Keine Aufgaben von deinem Partner.</div>';
     l.forEach(function (a) { if (a.status === 'offen') api('/mein-partner/aufgaben/' + a.id, { method: 'POST', body: { status: 'gesehen' } }).catch(function () {}); });
+    [].forEach.call(el.querySelectorAll('[data-rm]'), function (b) { b.onclick = function () { if (window.DpAnmerkungen) DpAnmerkungen.kundeOeffnen(b.getAttribute('data-rm')); }; });
     [].forEach.call(el.querySelectorAll('[data-st]'), function (b) { b.onclick = function () { api('/mein-partner/aufgaben/' + b.getAttribute('data-id'), { method: 'POST', body: { status: b.getAttribute('data-st') } }).then(function () { meinPartnerOeffnen('aufgaben'); }); }; });
     [].forEach.call(el.querySelectorAll('[data-ab]'), function (b) {
       b.onclick = function () {
@@ -945,18 +963,37 @@
     var ks = d && d._kundenstand;
     window._dppkKundenstand = ks || null;
     var alt = document.getElementById('dppk-ks');
-    if (!ks) { if (alt) alt.remove(); return; }
+    if (!ks) { if (alt) alt.remove(); try { if (window.DpAnmerkungen && DpAnmerkungen._zustand.modus === 'partner') DpAnmerkungen.ende(); } catch (e) {} return; }
     stil();
+    if (alt && alt.getAttribute('data-share') === String(ks.share_id) && alt.getAttribute('data-stand') === String(ks.stand_nr)) return;   /* v3450 · nicht bei jedem Takt neu bauen */
     if (!alt) {
       alt = document.createElement('div'); alt.id = 'dppk-ks';
       var ziel = document.querySelector('.main-col .body') || document.querySelector('.main-col') || document.body;
       ziel.insertBefore(alt, ziel.firstChild);
     }
-    alt.innerHTML = '<span><b>Kundenstand von ' + esc(ks.kunde || 'Kunde') + '</b>, Stand ' + esc(ks.stand_nr) + ' vom ' + datum(ks.stand_am) + '. Nur lesen, Änderungen werden nicht gespeichert.</span>' +
+    /* v3450 · Marcel 15.11.: Zurück ins Cockpit, Anmerkungen (partner-anmerkungen.js), Übernehmen */
+    alt.setAttribute('data-share', ks.share_id); alt.setAttribute('data-stand', ks.stand_nr);
+    alt.innerHTML = '<span class="dppk-ks-text"><b>Kundenstand von ' + esc(ks.kunde || 'Kunde') + '</b>, Stand ' + esc(ks.stand_nr) + ' vom ' + datum(ks.stand_am) + '. Nur lesen, Änderungen werden nicht gespeichert.</span>' +
+      '<span class="dppk-ks-knoepfe"><button type="button" class="pk-btn2" data-ks-a="zurueck">← Zurück zum Partner-Cockpit</button></span>' +
       '<button type="button" class="pk-btn">Als eigenes Objekt übernehmen</button>';
+    alt.querySelector('[data-ks-a="zurueck"]').onclick = function () { kundenstandVerlassen(ks); };
+    try { if (window.DpAnmerkungen && S.partner) DpAnmerkungen.partnerBanner(alt.querySelector('.dppk-ks-knoepfe'), ks); } catch (e) {}
     alt.querySelector('.pk-btn').onclick = function () {
       api('/partner/kundenstaende/' + ks.share_id + '/uebernehmen', { method: 'POST' }).then(function (r) { toast('Übernommen als ' + (r.seq_no || 'neues Objekt') + '.'); if (typeof window.loadSaved === 'function') window.loadSaved(r.object_id); try { if (typeof renderSaved === 'function') renderSaved(); } catch (e) {} }, function (e) { toast(fehlerText(e)); });
     };
+  }
+  /* v3450 · „← Zurück zum Partner-Cockpit“: Kundenkopie verlassen ohne Speichern (saveObj ist fuer Kundenstaende
+     ohnehin gesperrt), Entwuerfe bleiben auf dem Server. Das zuletzt geladene EIGENE Objekt wird wieder geladen, damit
+     hinter dem Cockpit keine Kundenkopie liegt; danach das Cockpit im Herkunftsreiter, in Freigegeben beim Kunden. */
+  function kundenstandVerlassen(ks) {
+    var reiter = PK.herkunft && TITEL[PK.herkunft] ? PK.herkunft : 'staende';
+    if (reiter === 'staende' && ks && ks.client_id) PK.filter = ks.client_id;
+    try { if (window.DpAnmerkungen) DpAnmerkungen.ende(); } catch (e) {}
+    var weiter = function () { cockpitOeffnen(reiter); };
+    var ziel = PK.letztesEigenes;
+    if (ziel && ziel !== window._currentObjKey && typeof window.loadSaved === 'function') {
+      Promise.resolve(window.loadSaved(ziel)).then(function () { setTimeout(weiter, 700); }, weiter);
+    } else weiter();
   }
   function speichernSperren() {
     if (typeof window.saveObj !== 'function' || window.saveObj._dppk) return false;
@@ -968,7 +1005,10 @@
   function ladenBeobachten() {
     if (typeof window.loadSaved !== 'function' || window.loadSaved._dppk) return false;
     var alt = window.loadSaved;
-    var neu = function () { var r = alt.apply(this, arguments); Promise.resolve(r).then(function () { setTimeout(kundenstandPruefen, 50); }); return r; };
+    var neu = function () {
+      try { if (!window._dppkKundenstand && window._currentObjKey) PK.letztesEigenes = window._currentObjKey; } catch (e) {}   /* v3450 */
+      var r = alt.apply(this, arguments); Promise.resolve(r).then(function () { setTimeout(kundenstandPruefen, 50); }); return r;
+    };
     neu._dppk = true; window.loadSaved = neu; return true;
   }
 
@@ -1036,6 +1076,7 @@
       [].forEach.call(alt.querySelectorAll('[data-ks]'), function (b) {
         b.onclick = function () {
           api('/partner/kundenstaende/' + b.getAttribute('data-s') + '/geoeffnet', { method: 'POST' }).then(function () { _ksZeit = 0; }).catch(function () {});
+          PK.herkunft = 'staende';   /* v3450 · aus der Seitenleiste: zurueck in Freigegeben */
           try { if (typeof setMainView === 'function') setMainView('single'); } catch (e) {}
           if (typeof window.loadSaved === 'function') window.loadSaved(b.getAttribute('data-ks'));
         };
@@ -1072,6 +1113,6 @@
   document.addEventListener('dp:plan-ready', start);
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { setTimeout(warteAufAnmeldung, 800); }); else setTimeout(warteAufAnmeldung, 800);
 
-  window.DpPartnerKunden = { cockpitOeffnen: cockpitOeffnen, cockpitSchliessen: cockpitSchliessen, reiterWahl: function (k) { if (PK.offen) reiterWahl(k); else cockpitOeffnen(k); }, meinPartnerOeffnen: meinPartnerOeffnen, einladungFragen: einladungFragen, darf: darf, _state: S };
+  window.DpPartnerKunden = { cockpitOeffnen: cockpitOeffnen, cockpitSchliessen: cockpitSchliessen, sendenDialog: sendenDialog, kundenstandVerlassen: kundenstandVerlassen, reiterWahl: function (k) { if (PK.offen) reiterWahl(k); else cockpitOeffnen(k); }, meinPartnerOeffnen: meinPartnerOeffnen, einladungFragen: einladungFragen, darf: darf, _state: S };
   window.DpMeinPartner = { einladungFragen: einladungFragen };
 })();

@@ -190,6 +190,8 @@ async function kundenstaende(rs) {
             c.display_name AS kunde, c.getrennt_am, c.platz_art AS kunde_platz_art, u.email AS kunde_email,
             o.name, o.seq_no, o.ort, o.kaufpreis, o.dscr, o.cf_ns, o.bmy,
             o.data::jsonb->>'str' AS str, o.data::jsonb->>'hnr' AS hnr, o.data::jsonb->>'plz' AS plz, o.data::jsonb->>'objart' AS objart,
+            (SELECT count(*)::int FROM partner_anmerkungen n WHERE n.share_id = s.id AND n.status = 'entwurf') AS anm_entwurf,
+            (SELECT count(*)::int FROM partner_anmerkungen n WHERE n.share_id = s.id AND n.status = 'offen') AS anm_offen,
             COALESCE((o.data::jsonb->>'_deal_won')::boolean, false) AS deal_won,
             (o.data::jsonb->>'_dealpilot_score')::int AS score
        FROM object_shares s
@@ -351,7 +353,9 @@ async function meinPartner(userId) {
       WHERE s.client_id = $1 AND s.kopie_object_id IS NOT NULL AND s.status <> 'widerrufen' ORDER BY s.stand_am DESC`, [v.id])).rows;
   sendungen.forEach((s) => { s.seitdem_geaendert = s.objekt_geaendert && s.stand_am && new Date(s.objekt_geaendert) > new Date(s.stand_am); });
   const aufgaben = (await query(
-    `SELECT a.id, a.titel, a.text, a.art, a.steuerjahr, a.objektfilter, a.faellig_am, a.erstellt_am, ak.status, ak.erledigt_am, ak.abgelehnt_grund, ak.letzte_erinnerung_am
+    `SELECT a.id, a.titel, a.text, a.art, a.steuerjahr, a.objektfilter, a.faellig_am, a.erstellt_am, ak.status, ak.erledigt_am, ak.abgelehnt_grund, ak.letzte_erinnerung_am,
+            a.stand_nr, (SELECT count(*)::int FROM partner_anmerkungen n WHERE n.aufgabe_id = a.id AND n.status <> 'entwurf') AS anmerkungen,
+            (SELECT count(*)::int FROM partner_anmerkungen n WHERE n.aufgabe_id = a.id AND n.status = 'offen') AS anmerkungen_offen
        FROM partner_aufgaben_kunden ak JOIN partner_aufgaben a ON a.id = ak.aufgabe_id
       WHERE ak.client_id = $1 AND a.status = 'aktiv' ORDER BY a.faellig_am NULLS LAST, a.erstellt_am DESC`, [v.id])).rows;
   return {
@@ -552,5 +556,5 @@ module.exports = {
   kundenstaende, kundenstandGeoeffnet, kundenstandUebernehmen, platzEntziehen, trennen, fristenAbarbeiten,
   aufgabenListe, aufgabeAnlegen, aufgabeErinnern, aufgabeAbschliessen, meldungen, meldungenGelesen,
   meinPartner, anfrageBeantworten, codeErzeugen, codeWiderrufen, senden, zurueckziehen, aufgabeKunde, kundeTrennt, markeWaehlen, rechteFuer,
-  _codeNorm: codeNorm, _sha: sha, CODE_ZEICHEN
+  _codeNorm: codeNorm, _sha: sha, CODE_ZEICHEN, _meldung: meldung
 };
