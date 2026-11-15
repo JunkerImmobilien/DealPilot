@@ -3758,10 +3758,8 @@ try { window._buildAIPayload = _buildAIPayload; } catch (e) {}
         if (wrap) wrap.style.display = '';
         if (hist.length < 1) { body.innerHTML = abHtml; return; }
         if (hist.length === 1) {
-          var h1 = hist[0], mw = Number(h1.market_value);
-          body.innerHTML = '<p class="dp-pa-p"><b>Ein Marktbericht vom ' + _dpVDate(h1.created_at) + '</b> — Marktwert '
-            + (isFinite(mw) ? '<b>' + Math.round(mw).toLocaleString('de-DE') + ' €</b>' : '–') + '.</p>'
-            + '<p class="dp-pa-p" style="color:#8b8678">Ein Verlauf mit Wertentwicklung entsteht ab dem zweiten Bericht zu diesem Objekt.</p>' + abHtml;
+          /* v3444 · der eine Bericht steht schon in „Alle Berichte" darüber - hier nur noch die Abrufe (sonst stand er zweimal da) */
+          if (abHtml) body.innerHTML = abHtml; else if (wrap) wrap.style.display = 'none';
           return;
         }
         body.innerHTML = window._dpVerlaufHtml(hist) + abHtml;

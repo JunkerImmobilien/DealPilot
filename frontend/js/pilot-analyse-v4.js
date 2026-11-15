@@ -972,13 +972,15 @@
       var ohne = zahl(h.mpi_ohne_abschlag) && Number(h.mpi_ohne_abschlag) !== w ? '<small>ohne Abschlag ' + eur(h.mpi_ohne_abschlag) + '</small>' : '';
       var lg = [zahl(h.micro_score) ? 'Mikro ' + Math.round(h.micro_score) : '', zahl(h.macro_score) ? 'Makro ' + Math.round(h.macro_score) : ''].filter(Boolean).join(' · ');
       var rid = parseInt(h.report_id, 10);
-      var pdf = pdfDa && rid > 0 ? '<button type="button" class="btn-clean dp-pa4-btn" style="padding:4px 10px;font-size:12px" onclick="try{DealActionBoarding.downloadReport(' + rid + ')}catch(e){}">PDF</button>' : '';
-      return { z: [isNaN(d) ? '–' : d.toLocaleDateString('de-DE'), p != null ? eur(p) : '', w != null ? eur(w) + ohne : '',
-          ab == null ? '' : (ab > 0 ? '+' : ab < 0 ? '−' : '±') + de(Math.abs(ab), 1) + ' %', zahl(h.ertragswert_eur) ? eur(h.ertragswert_eur) : '', lg, pdf],
+      /* v3444 · der PDF-Knopf steht in der Datumszelle: am Handy macht tabellen-karten.js ab der 5. Spalte „aufklappen" -
+         als 7. Spalte war er dort versteckt (gemessen 390 px) */
+      var pdf = pdfDa && rid > 0 ? ' <button type="button" class="btn-clean dp-pa4-btn" style="padding:2px 9px;font-size:11.5px;margin-left:6px" title="Bericht als PDF" onclick="try{DealActionBoarding.downloadReport(' + rid + ')}catch(e){}">PDF</button>' : '';
+      return { z: [(isNaN(d) ? '–' : d.toLocaleDateString('de-DE')) + pdf, p != null ? eur(p) : '', w != null ? eur(w) + ohne : '',
+          ab == null ? '' : (ab > 0 ? '+' : ab < 0 ? '−' : '±') + de(Math.abs(ab), 1) + ' %', zahl(h.ertragswert_eur) ? eur(h.ertragswert_eur) : '', lg],
         zk: [null, null, null, ab == null ? null : (ab >= 0 ? 'gut' : 'schlecht')] };
     });
     return abKopf('Alle Berichte zu diesem Objekt', zeilen.length + (zeilen.length === 1 ? ' Bericht' : ' Berichte') + ' · gegen deinen Plan-Wert')
-      + tabelle(['Datum', 'Plan-Wert', 'Marktpreis Ø', 'gegen Plan', 'Ertragswert', 'Lage', ''], zeilen);
+      + tabelle(['Datum', 'Plan-Wert', 'Marktpreis Ø', 'gegen Plan', 'Ertragswert', 'Lage'], zeilen);
   }
   function berichteAlle(hist) {
     var h = ''; try { h = berichteHtml(hist); } catch (e) { h = ''; }
@@ -1627,6 +1629,6 @@
     }
   });
 
-  window.DpPilotV4 = { VERSION: 'v3443', unterZeigen: unterZeigen, siZeichnen: siZeichnen, siTabelle: siTabelle, wegNeu: wegNeu, scoreSicht: scoreSicht, sichtbarerScore: sichtbarerScore, leisteMessen: leisteMessen, huelle: huelle, uebersicht: uebersicht, risiko: risiko, steuer: steuer, gesamtstatement: gesamtstatement,
+  window.DpPilotV4 = { VERSION: 'v3444', unterZeigen: unterZeigen, siZeichnen: siZeichnen, siTabelle: siTabelle, wegNeu: wegNeu, scoreSicht: scoreSicht, sichtbarerScore: sichtbarerScore, leisteMessen: leisteMessen, huelle: huelle, uebersicht: uebersicht, risiko: risiko, steuer: steuer, gesamtstatement: gesamtstatement,
     wertverlauf: wertverlauf, indexVerlauf: indexVerlauf, linien: linien, modus: modus, setzeModus: setzeModus, neuZeichnen: neuZeichnen, saetze: saetze, steuerTabelle: steuerTabelle };
 })();
