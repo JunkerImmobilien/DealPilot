@@ -1,0 +1,18 @@
+# robots.txt · App-Domain (app.dealpilot.immo, app.dealpilot.junker-immobilien.io, app.staging…)
+# landing-seo-1 · 15.11.2026
+#
+# Gemessen am 15.11.2026: /robots.txt lieferte hier die App-HTML (catch-all
+# try_files … /index.html), es gab weder X-Robots-Tag noch meta robots. Die App
+# konnte also in den Index.
+#
+# Die App gehoert nicht in die Suche: sie steht hinter der Anmeldung. Gesperrt
+# wird sie mit dem Kopf "X-Robots-Tag: noindex, nofollow", den der Webserver
+# (Caddyfile, Block APP_DOMAIN) an jede Antwort haengt. Das Crawlen bleibt
+# deshalb ERLAUBT: eine per robots.txt gesperrte Adresse liest Google nicht,
+# sieht das noindex nie und kann sie trotzdem als blossen Link listen.
+# Die oeffentliche Seite ist https://dealpilot.immo/ (eigene robots.txt und Sitemap
+# in frontend/landing/).
+
+User-agent: *
+Allow: /
+Disallow: /api/

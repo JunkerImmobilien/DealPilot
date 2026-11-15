@@ -3,8 +3,8 @@
 <meta charset="utf-8">
 <meta name="google-site-verification" content="sjsXb3XudmYE75JCus789-lKn_IIX5jOySZx50Iy4i0">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>DealPilot · Immobilien-Investment-Software: Rendite, Cashflow, Steuer &amp; Wert</title>
-<meta name="description" content="Immobilien-Investments prüfen: Cashflow, Rendite, Steuer und ein amtlich begründeter Wert – mit bankfertiger Unterlage. 4 Wochen Pro kostenlos, ohne Zahlungsdaten.">
+<title>Immobilien-Investment-Software: Rendite &amp; Wert · DealPilot</title>
+<meta name="description" content="Immobilien-Investment-Software für Kapitalanleger: Rendite und Cashflow berechnen, Steuer planen, Wert nach ImmoWertV prüfen. 4 Wochen Pro kostenlos.">
 <link rel="canonical" href="https://dealpilot.immo/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="DealPilot">
@@ -25,13 +25,26 @@
  "applicationCategory":"BusinessApplication","operatingSystem":"Web",
  "url":"https://dealpilot.immo/","image":"https://dealpilot.immo/assets/og-dealpilot.jpg",
  "description":"Software für die Analyse von Immobilien-Investments: Finanzierung, Cashflow, Steuer, Deal Score und Wertindikation nach ImmoWertV mit amtlichen Daten der Gutachterausschüsse, Export für die Bank.",
- "inLanguage":"de","publisher":{"@type":"Organization","name":"Junker Solution","url":"https://dealpilot.immo/"},
+ "inLanguage":"de","publisher":{"@id":"https://dealpilot.immo/#organisation"},"provider":{"@id":"https://dealpilot.immo/#organisation"},
+ "featureList":["Rendite und Cashflow berechnen","Finanzierung und DSCR","Steuer mit AfA und Kaufpreisaufteilung","Investor Deal Score aus 24 Kennzahlen","Wertindikation nach ImmoWertV","Restnutzungsdauer nach Anlage 2 ImmoWertV","Exposé-Import","Bankexport"],
  "offers":[
   {"@type":"Offer","name":"Free","price":"0","priceCurrency":"EUR","description":"1 Objekt, die ersten 4 Wochen mit vollem Pro-Umfang"},
   {"@type":"Offer","name":"Starter","price":"19.99","priceCurrency":"EUR","priceSpecification":{"@type":"UnitPriceSpecification","price":"19.99","priceCurrency":"EUR","unitCode":"MON"}},
   {"@type":"Offer","name":"Investor","price":"34.99","priceCurrency":"EUR","priceSpecification":{"@type":"UnitPriceSpecification","price":"34.99","priceCurrency":"EUR","unitCode":"MON"}},
   {"@type":"Offer","name":"Pro","price":"49.99","priceCurrency":"EUR","priceSpecification":{"@type":"UnitPriceSpecification","price":"49.99","priceCurrency":"EUR","unitCode":"MON"}}
  ]}
+</script>
+<!-- landing-seo-1 · Betreiber wie im Impressum: Junker Solution, Einzelunternehmen von Marcel Junker, keine Gesellschaft. Keine Bewertungen (es gibt keine erhobenen). -->
+<script type="application/ld+json">
+{"@context":"https://schema.org","@graph":[
+ {"@type":"Organization","@id":"https://dealpilot.immo/#organisation","name":"Junker Solution","legalName":"Junker Solution",
+  "description":"Einzelunternehmen von Marcel Junker. DealPilot, Junker Immobilien und Junker Digital sind Marken von Junker Solution.",
+  "url":"https://dealpilot.immo/","logo":"https://dealpilot.immo/assets/dealpilot-logo.png","email":"info@dealpilot.immo",
+  "founder":{"@type":"Person","name":"Marcel Junker"},
+  "address":{"@type":"PostalAddress","streetAddress":"Hermannstr. 9","postalCode":"32609","addressLocality":"Hüllhorst","addressCountry":"DE"},
+  "brand":{"@type":"Brand","name":"DealPilot"}},
+ {"@type":"WebSite","@id":"https://dealpilot.immo/#website","url":"https://dealpilot.immo/","name":"DealPilot","inLanguage":"de","publisher":{"@id":"https://dealpilot.immo/#organisation"}}
+]}
 </script>
 <link rel="stylesheet" href="/fonts/dp-fonts.css">
 <script>/* landing-makler-hub-2 · der Makler-Hub steht unter „Für Partner" (loesungen.html); die QR-Codes der Messe-Tafeln zeigen auf /#makler-hub */
@@ -51,6 +64,7 @@ if (location.hash === '#forschung') location.replace('forschung.html');</script>
 <link rel="stylesheet" href="dp2-module.css?v=landing-module-2">
 <link rel="stylesheet" href="dp2-kern.css?v=landing-kern-2c">
 <link rel="stylesheet" href="dp2-dealcheck.css?v=landing-dealcheck-9">
+<link rel="stylesheet" href="seo.css?v=landing-seo-1">
 </head><body>
 
 <svg style="display:none" aria-hidden="true">
@@ -434,11 +448,54 @@ if (location.hash === '#forschung') location.replace('forschung.html');</script>
        Was DealPilot macht kann raus." Platzhalter, demo-wechsel.css und .js entfernt
        (die Einzelseite demo-wechsel.html bleibt). -->
 
+  <!-- landing-seo-1 · Marcel 15.11.2026 („setz für die Seite bitte alles um, was geht“): ein textlich starker
+       Abschnitt für Suchmaschinen und Leser, im Quelltext statt per JS. Jede Aussage hat Code:
+       Kennzahlen aus deal-kpis.js (bmy, nmy, cf_m, cf_ns_m, ekr, dscr, ltv, fak), Deal Score aus
+       dealscore2.js (24 Kennzahlen: Rendite 4, Finanzierung 5, Risiko 6, Lage 5, Potenzial 4),
+       Wertermittlung im Marktbericht (Vergleichs-, Ertrags-, Sachwert, Register der Ausschüsse),
+       BMF-Arbeitshilfe und Anlage 2 ImmoWertV (Ticker oben), Investment-Case-PDF und Bankexport
+       (leistungsumfang.html Kapitel 13). Kundentext ohne Gedankenstrich und Semikolon. -->
+  <div class="seo-abschnitt" id="software">
+    <div class="head ctr rv"><div class="eye ctr">Immobilien-Investment-Software</div>
+      <h2>Eine Software für die ganze <span class="ac">Investitionsentscheidung.</span></h2>
+      <p>DealPilot ist eine Immobilien-Investment-Software für Kapitalanleger, Makler und Berater. Sie rechnet
+        eine Wohnung oder ein Mehrfamilienhaus so durch, wie es eine Bank und ein Sachverständiger tun würden.
+        Mit denselben Zahlen in jedem Modul, vom Exposé bis zur Unterlage für das Bankgespräch.</p></div>
+    <div class="blatt g3 rv">
+      <div class="zieh"><div class="mlbl">Rendite</div><h3 class="kt" style="margin-top:9px">Rendite einer Immobilie berechnen</h3>
+        <p class="kb">Bruttomietrendite, Nettomietrendite, Eigenkapitalrendite und Kaufpreisfaktor stehen nach wenigen Angaben fest.
+          Kaufnebenkosten, Sanierung und nicht umlagefähige Kosten rechnen mit, damit die Rendite nicht schöner aussieht, als sie ist.</p></div>
+      <div class="zieh"><div class="mlbl">Cashflow</div><h3 class="kt" style="margin-top:9px">Cashflow vor und nach Steuer</h3>
+        <p class="kb">DealPilot zieht von der Miete die Bewirtschaftung, die Zinsen und die Tilgung ab und zeigt den Cashflow im Monat.
+          Mit deinem Grenzsteuersatz und der AfA folgt der Cashflow nach Steuer. Die Finanzierung prüft der DSCR, die Beleihung der LTV.</p></div>
+      <div class="zieh"><div class="mlbl">Investment-Score</div><h3 class="kt" style="margin-top:9px">Investor Deal Score aus 24 Kennzahlen</h3>
+        <p class="kb">Der Score fasst 24 Kennzahlen in fünf Bereichen zusammen: Rendite, Finanzierung, Risiko, Lage und Potenzial.
+          Am Ende steht eine Zahl von 0 bis 100 mit Stufe, und du siehst, welche Kennzahl ihn trägt und welche ihn drückt.</p></div>
+      <div class="zieh"><div class="mlbl">Wert</div><h3 class="kt" style="margin-top:9px">Immobilienbewertung nach ImmoWertV</h3>
+        <p class="kb">Den Wert begründet DealPilot nach der Immobilienwertermittlungsverordnung, mit Bodenrichtwerten,
+          Liegenschaftszinssätzen und Sachwertfaktoren der Gutachterausschüsse. Jede Zahl nennt ihre Herkunft.
+          Fehlt eine amtliche Zahl, wird keine erfunden.</p></div>
+      <div class="zieh"><div class="mlbl">Steuer</div><h3 class="kt" style="margin-top:9px">AfA, Kaufpreisaufteilung und Restnutzungsdauer</h3>
+        <p class="kb">Den Gebäudeanteil teilt DealPilot nach der Arbeitshilfe des Bundesfinanzministeriums auf.
+          Die Restnutzungsdauer folgt Anlage 2 ImmoWertV. Daraus ergibt sich die AfA, die in den Cashflow nach Steuer eingeht.</p></div>
+      <div class="zieh"><div class="mlbl">Bank</div><h3 class="kt" style="margin-top:9px">Eine Bankunterlage, die besteht</h3>
+        <p class="kb">Aus dem gerechneten Objekt entsteht der Investment-Case als PDF, mit Fotos, Finanzierung, Cashflow und Wert.
+          Dazu kommen der Track-Record über deinen Bestand und der Bankexport mit 25 Spalten je Objekt. So gehst du mit Zahlen statt mit Bauchgefühl ins Gespräch.</p></div>
+    </div>
+    <p class="btn-reihe seo-links">
+      <a class="btn-l" href="leistungsumfang.html">Alle Funktionen der Immobilienanalyse-Software
+        <svg class="ico" style="width:14px;height:14px"><use href="#i-pfeil"/></svg></a>
+      <a class="btn-l" href="methodik.html">Immobilienbewertung nach ImmoWertV, Datenbasis und Prüfung
+        <svg class="ico" style="width:14px;height:14px"><use href="#i-pfeil"/></svg></a>
+      <!-- landing-seo-2:rechner -->
+    </p>
+  </div>
+
 </div></section>
 
 <!-- ══ MODULE ════════════════════════════════════════════════════════ -->
 <section class="sec sec-dark mit-bild" id="features">
-  <img class="sec-bild schwach" src="assets/bild/bank.jpg" alt="" loading="lazy">
+  <img class="sec-bild schwach" src="assets/bild/bank.jpg" alt="" width="1600" height="900" loading="lazy" decoding="async">
   <div class="wrap">
   <div class="head rv"><div class="eye">Funktionsumfang</div>
     <h2><span data-modulwort>Neunzehn</span> Module — <span class="ac">ein Datenbestand.</span></h2>
@@ -546,15 +603,15 @@ if (location.hash === '#forschung') location.replace('forschung.html');</script>
   <div class="pmarq rv"><div class="pmarq-track">
     <!-- v2285 · Anbieter-Neutralitaet (CLAUDE.md): die beiden Bewertungspartner
          nie namentlich nach aussen - Logos aus dem Laufband genommen. -->
-    <div class="plogo"><img src="assets/partner/immometrica.png" alt="ImmoMetrica"></div>
-    <div class="plogo"><img src="assets/partner/realestatepilot.png" alt="RealEstatePilot"></div>
-    <div class="plogo"><img src="assets/partner/onevoice.png" alt="OneVoice"></div>
-    <div class="plogo"><img src="assets/partner/sauerland-finanzen.png" alt="Sauerland Finanzen"></div>
-    <div class="plogo"><img src="assets/partner/funck-it.png" alt="Funck IT"></div>
-    <div class="plogo"><img src="assets/partner/christian-sperling.png" alt="Christian Sperling"></div>
-    <div class="plogo"><img src="assets/partner/junker-immobilien.png" alt="Junker Immobilien"></div>
+    <div class="plogo"><img src="assets/partner/immometrica.png" width="227" height="54" decoding="async" alt="ImmoMetrica"></div>
+    <div class="plogo"><img src="assets/partner/realestatepilot.png" width="326" height="75" decoding="async" alt="RealEstatePilot"></div>
+    <div class="plogo"><img src="assets/partner/onevoice.png" width="259" height="119" decoding="async" alt="OneVoice"></div>
+    <div class="plogo"><img src="assets/partner/sauerland-finanzen.png" width="295" height="140" decoding="async" alt="Sauerland Finanzen"></div>
+    <div class="plogo"><img src="assets/partner/funck-it.png" width="276" height="140" decoding="async" alt="Funck IT"></div>
+    <div class="plogo"><img src="assets/partner/christian-sperling.png" width="433" height="124" decoding="async" alt="Christian Sperling"></div>
+    <div class="plogo"><img src="assets/partner/junker-immobilien.png" width="219" height="136" decoding="async" alt="Junker Immobilien"></div>
     <!-- landing-videothek-1 · Logo von der Website der Kanzlei (sp-steuerberatung.de/img/logo.png) -->
-    <div class="plogo"><img src="assets/partner/schmidt-und-partner.png" alt="Schmidt &amp; Partner Steuerberatungsgesellschaft PartG mbB"></div>
+    <div class="plogo"><img src="assets/partner/schmidt-und-partner.png" width="300" height="59" decoding="async" alt="Schmidt &amp; Partner Steuerberatungsgesellschaft PartG mbB"></div>
   </div></div>
   <!-- landing-videos-1 · Kanzlei-Zeile (Schmidt & Partner) unter dem Laufband entfernt, Marcel 27.10.2026; das Logo bleibt im Laufband -->
   <!-- landing-kern-1 · Bildzeile und die vier AMTLICH-Kacheln entfallen: die Datenquellen stehen jetzt ausführlich in #daten -->
