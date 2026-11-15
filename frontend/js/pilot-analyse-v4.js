@@ -166,7 +166,10 @@
     '.dp-pa5-tab th:first-child,.dp-pa5-tab td:first-child{text-align:left;white-space:normal;min-width:140px}',
     '.dp-pa5-tab thead th{font:500 10.5px/1.35 "JetBrains Mono",monospace;letter-spacing:.07em;text-transform:uppercase;color:#6B645A;border-bottom-color:#E6DCC2;vertical-align:bottom;background:#fff}',
     '.dp-pa5-tab thead th small{display:block;text-transform:none;letter-spacing:0;font:400 11px Inter,sans-serif;color:#9A9285}',
-    '.dp-pa5-tab td small{display:block;color:#9A9285;font-size:11px;font-weight:400}',
+    '.dp-pa5-tab td small{display:block;color:#9A9285;font-size:11px;font-weight:400;white-space:normal;min-width:96px}',
+    '@media (min-width:900px){.dp-pa5-tab th:first-child,.dp-pa5-tab td:first-child{min-width:190px}}',
+    /* v3442 · gemessen bei 390 px: Kennzahl-Spalte 140 px plus Werte mit Unterzeile ohne Umbruch - nur die erste Wertspalte war zu sehen */
+    '@media (max-width:640px){.dp-pa5-tab table{font-size:12.5px}.dp-pa5-tab th,.dp-pa5-tab td{padding:7px 7px}.dp-pa5-tab th:first-child,.dp-pa5-tab td:first-child{min-width:0;max-width:128px}.dp-pa5-tab td small{min-width:0}.dp-pa5-tab thead th{font-size:9.5px;letter-spacing:.04em}}',
     '.dp-pa5-tab tr.gr td{font:500 10.5px/1.3 "JetBrains Mono",monospace;letter-spacing:.07em;text-transform:uppercase;color:#6B645A;padding-top:14px;background:none}',
     '.dp-pa5-tab tr.su td{font-weight:600;border-top:1px solid #E6DCC2}',
     '.dp-pa5-tab tbody tr:not(.gr):hover td{background:#FAF8F3}',
@@ -187,6 +190,8 @@
     /* zwei Spalten (Übersicht) */
     '.dp-pa5-zwei{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(0,1fr);gap:12px 28px;margin:0 0 6px}',
     '@media (max-width:720px){.dp-pa5-zwei{grid-template-columns:1fr}}',
+    /* v3442 · im Detail stehen links die ganzen Texte - eine Spalte, sonst wird die schmale Spalte lang (gemessen 1.715 px) */
+    '.dp-pa-wrap[data-dp-pa-modus="detail"] .dp-pa5-zwei{grid-template-columns:1fr}',
     '.dp-pa5-zwei > div{min-width:0}',
     /* Zielerreichung */
     '.dp-pa5-ziel{display:grid;grid-template-columns:minmax(96px,170px) minmax(0,1fr) 52px;gap:4px 12px;align-items:center}',
@@ -200,6 +205,12 @@
     /* Detail-Hülle der DpPotenzial-Karte: ihre eigene Kennzahlen-Tafel ist durch die Kennzahlen-Tabelle ersetzt */
     '.dp-pa-wrap[data-dp-pa-v4] [data-dp-pa5-pot] .dp-pot > .dp-pot-scroll:not([style]){display:none}',
     '.dp-pa-wrap[data-dp-pa-v4] [data-dp-pa5-pot] .dp-pa-sec{display:none}',
+    '.dp-pa5-mehr{margin:26px 0 0;border-top:1px solid #EFEAE0;padding-top:12px}',
+    '.dp-pa5-mehr > summary{cursor:pointer;display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;font:600 15px/1.3 "Space Grotesk",Inter,sans-serif;color:#2A2727;list-style:none}',
+    '.dp-pa5-mehr > summary::-webkit-details-marker{display:none}',
+    '.dp-pa5-mehr > summary::before{content:"+";font:500 15px "JetBrains Mono",monospace;color:#9A9285;width:12px}',
+    '.dp-pa5-mehr[open] > summary::before{content:"–"}',
+    '.dp-pa5-mehr[open] > summary{margin-bottom:12px}',
     /* Grafiken: Raster als Haarlinie, Werte in Textfarbe (dataviz: Text trägt nie die Reihenfarbe) */
     '.dp-pa-wrap[data-dp-pa-v4] .dp-pa4-ch .gl{stroke:#F1ECE1}.dp-pa-wrap[data-dp-pa-v4] .dp-pa4-ch .nl{stroke:#9A9285;stroke-width:1}',
     '.dp-pa-wrap[data-dp-pa-v4] .dp-pa4-ch .wz,.dp-pa-wrap[data-dp-pa-v4] .dp-pa4-ch .wz-l{fill:#2A2727}',
@@ -911,7 +922,8 @@
     s += lab;
     s += '<line class="kreuz" x1="0" x2="0" y1="' + T + '" y2="' + (H - U) + '"/>';
     for (var i = 0; i < n; i++) s += '<rect class="hit" data-i="' + i + '" x="' + (L + i * gap).toFixed(1) + '" y="' + T + '" width="' + gap.toFixed(1) + '" height="' + (H - U - T) + '" tabindex="-1"/>';
-    var leg = '<div class="dp-pa4-leg">' + cfg.reihen.map(function (r) {
+    /* v3442 · Legende nur für Reihen mit Werten (gemessen: „Marktpreis Ø laut Bericht“ stand ohne einen einzigen Bericht da) */
+    var leg = '<div class="dp-pa4-leg">' + cfg.reihen.filter(function (r) { return cfg.chips || r.werte.some(zahl); }).map(function (r) {
       var cl = r.art === 'linie' ? 'l' : r.art === 'gestrichelt' ? 'd' : r.art === 'raute' ? 'r' : r.art === 'balken' ? 'b' : 'p';
       return '<span style="color:' + r.farbe + '"><i class="' + cl + '" style="' + (cl === 'r' || cl === 'p' || cl === 'b' ? 'background:' + (r.hohl ? '#fff;border:2px solid ' + r.farbe : r.farbe) : '') + '"></i><span style="color:#6B645A">' + esc(r.name) + '</span></span>'
         + (cl === 'b' && r.farbeNeg ? '<span><i class="b" style="background:' + r.farbeNeg + '"></i><span style="color:#6B645A">' + esc(r.nameNeg || 'negativ') + '</span></span>' : '');
@@ -1324,7 +1336,7 @@
         { u: Z && Z.lzs && Z.lzs.pct != null ? 'Liegenschaftszins ' + de(Z.lzs.pct, 2) + ' %' + (Z.lzs.stufe ? ' · Stufe ' + esc(Z.lzs.stufe) : '') : '' }),
       ewGesperrt ? null : zeile('Marktpreisindikation', function (k) { var st = S[k]; return st && st.marktpreisindikation != null ? sub(eur(st.marktpreisindikation), st.mpi_ohne_abschlag != null ? 'ohne Abschlag ' + eur(st.mpi_ohne_abschlag) : '') : null; },
         { d: true, u: S.bestand && S.bestand.mpi_abschlag_pct > 0 ? 'Angebote am Ort, nach ' + de(S.bestand.mpi_abschlag_pct, 1) + ' % Abschlag' : 'Angebote am Ort' }),
-      T ? zeile('Aufteilerwert', function (k) { return k === 'aufteilung' ? sub('<b>' + eur(T.wert) + (T.vollstaendig ? '' : '*') + '</b>', esc(T.bezeichnung || 'Vergleichswert') + ' führend') : null; }, { u: 'Wohnungen einzeln, nach Aufteilungskosten' }) : null,
+      T ? zeile('Wert nach Aufteilung', function (k) { return k === 'aufteilung' ? sub('<b>' + eur(T.wert) + (T.vollstaendig ? '' : '*') + '</b>', esc(T.bezeichnung || 'Vergleichswert') + ' führend') : null; }, { u: 'Wohnungen einzeln, nach Aufteilungskosten' }) : null,
       ewGesperrt ? null : zeile('Wertzuwachs nach Kosten', function (k) {
         if (k === 'aufteilung') return T && zahl(T.potenzial) ? (T.potenzial < 0 ? { h: 'kein Potenzial', kl: 'schlecht' } : { h: '+' + eur(T.potenzial), kl: 'gut' }) : null;
         var v = Z && Z.wertzuwachs_nach_kosten ? Z.wertzuwachs_nach_kosten[k] : null; return v == null ? null : { h: sEur(v), kl: v >= 0 ? 'gut' : 'schlecht' }; },
@@ -1400,7 +1412,8 @@
     if (teile.sollIst) h += '<div class="dp-pa-e">' + abKopf('Kauf gegen heute, alle Kennzahlen', 'im Detail') + hinweis('Alle Kennzahlen des Ankauf-Stands gegen heute, mit Abweichung, und was der Pilot beim Kauf gesagt hat. '
         + '<button type="button" class="btn-clean dp-pa4-link" data-dp-pa-modus-setzen="detail">Im Detail zeigen</button>') + '</div>'
       + '<div class="dp-pa-d">' + abKopf('Kauf gegen heute, alle Kennzahlen', 'Ertrag · Kosten · Finanzierung · Steuer') + teile.sollIst + '</div>';
-    if (teile.pot) h += '<div class="dp-pa-d" data-dp-pa5-pot="1">' + abKopf('Rechenweg, Marktpreise und Aufteilung', 'aus dem Reiter Bewertung') + teile.pot + '</div>';
+    /* v3442 · gemessen v3441: mit der offenen DpPotenzial-Karte war das Detail 3.691 px lang (v3420: 3.156) - jetzt zugeklappt */
+    if (teile.pot) h += '<details class="dp-pa-d dp-pa5-mehr" data-dp-pa5-pot="1"><summary>Rechenweg, Marktpreise und Aufteilung<span class="dp-pa5-eti">aus dem Reiter Bewertung</span></summary>' + teile.pot + '</details>';
     return h;
   }
   var _siTeile = {};
@@ -1584,6 +1597,6 @@
     }
   });
 
-  window.DpPilotV4 = { VERSION: 'v3441', unterZeigen: unterZeigen, siZeichnen: siZeichnen, siTabelle: siTabelle, wegNeu: wegNeu, scoreSicht: scoreSicht, sichtbarerScore: sichtbarerScore, leisteMessen: leisteMessen, huelle: huelle, uebersicht: uebersicht, risiko: risiko, steuer: steuer, gesamtstatement: gesamtstatement,
+  window.DpPilotV4 = { VERSION: 'v3442', unterZeigen: unterZeigen, siZeichnen: siZeichnen, siTabelle: siTabelle, wegNeu: wegNeu, scoreSicht: scoreSicht, sichtbarerScore: sichtbarerScore, leisteMessen: leisteMessen, huelle: huelle, uebersicht: uebersicht, risiko: risiko, steuer: steuer, gesamtstatement: gesamtstatement,
     wertverlauf: wertverlauf, indexVerlauf: indexVerlauf, linien: linien, modus: modus, setzeModus: setzeModus, neuZeichnen: neuZeichnen, saetze: saetze, steuerTabelle: steuerTabelle };
 })();
