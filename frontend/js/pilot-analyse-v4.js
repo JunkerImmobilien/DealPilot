@@ -185,7 +185,7 @@
     '.dp-pa-wrap[data-dp-pa-v4] .dp-pa5-zu{display:none !important}',
     '.dp-pa-wrap[data-dp-pa-v4] [data-dp-pa5-teil]{margin-top:0 !important}',
     /* zwei Spalten (Übersicht) */
-    '.dp-pa5-zwei{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 28px;margin:0 0 6px}',
+    '.dp-pa5-zwei{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(0,1fr);gap:12px 28px;margin:0 0 6px}',
     '@media (max-width:720px){.dp-pa5-zwei{grid-template-columns:1fr}}',
     '.dp-pa5-zwei > div{min-width:0}',
     /* Zielerreichung */
@@ -547,7 +547,7 @@
       .filter(function (r) { return has(r[1]); });
     if (!z.length) return '';
     return abschnitt('Zu welchem Anleger der Kauf passt', '<div class="dp-pa4-fit">' + z.map(function (r) {
-      return '<div><span class="l">' + r[0] + '</span>' + pill(r[1]) + '<p>' + txt(grund(r[1])) + '</p></div>';
+      return '<div><span class="l">' + r[0] + '</span>' + pill(r[1]) + '<p class="dp-pa-d">' + txt(grund(r[1])) + '</p></div>';
     }).join('') + '</div>');
   }
 
@@ -599,7 +599,7 @@
     var gb = a.gesamtbewertung || a.fazit_kurz;
     /* v3440 · Demo Fassung 2: oben EIN Ergebnissatz, rechts Urteil (nur Ankauf, v3099e: im Bestand kein „Halten")
        und Score. Der Satz ist der erste ganze Satz der Gesamtbewertung - nichts wird dazugeschrieben. */
-    var satz = saetze(bestand ? gb : (a.empfehlung_begruendung || gb), 1) || saetze(gb, 1);
+    var satz = saetze(gb, 1) || saetze(a.empfehlung_begruendung, 1);
     var stufe = sc && window.ScoreTier && window.ScoreTier.stufe ? window.ScoreTier.stufe(sc.wert).wort : '';
     var rechts = (!bestand || sc) ? '<div class="dp-pa4-urteil">' + (bestand ? '' : '<span class="dp-pa-empf" style="background:' + st.farbe + '">' + esc(st.label) + '</span>')
       + (sc ? '<span class="z">' + sc.wert + '</span><span class="u">' + (stufe ? '<b>' + esc(stufe) + '</b>' : '') + esc(sc.name) + '</span>' : '') + '</div>' : '';
@@ -641,7 +641,10 @@
     var ra = a.risikoanalyse && typeof a.risikoanalyse === 'object' ? a.risikoanalyse : null, sz = a.szenarien && typeof a.szenarien === 'object' ? a.szenarien : {};
     /* v3099e · Einfach: drei Punkte mit je einem Satz; Detail: alle, ganz */
     var lst = function (arr) { return Array.isArray(arr) && arr.length ? '<ul class="dp-pa4-liste">' + arr.map(function (x, i) { return (i < 3 ? '<li class="dp-pa-e">' + txt(kurz(x, 140)) + '</li>' : '') + '<li class="dp-pa-d">' + txt(x) + '</li>'; }).join('') + '</ul>' : '<em class="dp-pa-empty">—</em>'; };
-    var h = '<div class="dp-pa-cols">'
+    /* v3441 · Ergebnissatz des Abschnitts (Demo Fassung 2): Zahl der Stärken und Risiken, das erste Risiko in einem Satz */
+    var nR = Array.isArray(a.risiken) ? a.risiken.length : 0, nS = Array.isArray(a.staerken) ? a.staerken.length : 0;
+    var h = (nR || nS) ? ergebnis('<b>' + nS + (nS === 1 ? ' Stärke' : ' Stärken') + ', ' + nR + (nR === 1 ? ' Risiko' : ' Risiken') + '.</b>' + (nR ? ' Zuerst: ' + txt(saetze(a.risiken[0], 1)) : '')) : '';
+    h += '<div class="dp-pa-cols">'
       + karte('<div class="dp-pa-sec good"><span class="dp-pa-bar"></span><span class="dp-pa-lbl">STÄRKEN</span><span class="dp-pa-rule"></span></div>' + lst(a.staerken))
       + karte('<div class="dp-pa-sec bad"><span class="dp-pa-bar"></span><span class="dp-pa-lbl">RISIKEN</span><span class="dp-pa-rule"></span></div>' + lst(a.risiken))
       + '</div>';
@@ -1293,10 +1296,10 @@
     /* Wert einer Kennzahl je Spalte; die Spalte Heute nimmt die Stufe Bestand, ohne Zielbild-Modell den Abgleich */
     var w = function (feld, k) {
       if (k === 'aufteilung') return null;
-      if (k === 'ankauf') return { miete_jahr: A('_kpis_miete_j'), miete_qm: A('_nkm_qm'), bmy: A('_kpis_bmy'), cf_monat: A('_kpis_cf_vs') != null ? A('_kpis_cf_vs') / 12 : null, dscr: A('_kpis_dscr') }[feld];
+      if (k === 'ankauf') return { miete_jahr: A('_kpis_miete_j') != null ? A('_kpis_miete_j') : (A('nkm') != null ? A('nkm') * 12 : null), miete_qm: A('_nkm_qm'), bmy: A('_kpis_bmy'), cf_monat: A('_kpis_cf_vs') != null ? A('_kpis_cf_vs') / 12 : null, dscr: A('_kpis_dscr') }[feld];
       var st = S[k];
       if (st && st[feld] != null) return st[feld];
-      if (k === 'bestand' && hatAnkauf) return { miete_jahr: H('_kpis_miete_j'), miete_qm: H('_nkm_qm'), bmy: H('_kpis_bmy'), cf_monat: H('_kpis_cf_vs') != null ? H('_kpis_cf_vs') / 12 : null, dscr: H('_kpis_dscr') }[feld];
+      if (k === 'bestand' && hatAnkauf) return { miete_jahr: H('_kpis_miete_j') != null ? H('_kpis_miete_j') : (H('nkm') != null ? H('nkm') * 12 : null), miete_qm: H('_nkm_qm'), bmy: H('_kpis_bmy'), cf_monat: H('_kpis_cf_vs') != null ? H('_kpis_cf_vs') / 12 : null, dscr: H('_kpis_dscr') }[feld];
       return null;
     };
     var kopf = [{ t: 'Kennzahl' }].concat(sp.map(function (c) { return { t: c.t, u: c.u, kl: c.kl }; }));
@@ -1344,7 +1347,8 @@
     var mehr = Z && Z.mehrertrag_jahr ? Z.mehrertrag_jahr.mieterhoehung : null;
     if (zahl(mehr) && mehr > 0) satz.push((satz.length ? 'mit der nächsten Mieterhöhung kommen ' : 'Mit der Mieterhöhung kommen ') + '<b>' + sEur(mehr) + '</b> im Jahr dazu');
     var zw = Z && Z.wertzuwachs_nach_kosten ? Z.wertzuwachs_nach_kosten.zielbild : null;
-    if (zahl(zw) && !ewGesperrt) satz.push((satz.length ? 'das Zielbild bringt nach ' : 'Das Zielbild bringt nach ') + eur((S.zielbild && S.zielbild.kosten) || 0) + ' Kosten <b>' + sEur(zw) + ' Wert</b>');
+    var zk = (S.zielbild && S.zielbild.kosten) || 0;
+    if (zahl(zw) && !ewGesperrt) satz.push((satz.length ? 'das Zielbild bringt ' : 'Das Zielbild bringt ') + (zk > 0 ? 'nach ' + eur(zk) + ' Kosten ' : 'ohne Maßnahmenkosten ') + '<b>' + sEur(zw) + ' Wert</b>');
     if (T && zahl(T.potenzial) && T.potenzial > 0) satz.push((satz.length ? 'die Aufteilung ' : 'Die Aufteilung bringt ') + '<b>+' + eur(T.potenzial) + '</b>' + (satz.length ? '' : ' Wert'));
     var s = satz.length ? satz.join(', ').replace(/^(.)/, function (c) { return c.toUpperCase(); }) + '.' : (hatAnkauf ? 'Der Ankauf-Stand vom ' + datumDe(d.ab.stichtag) + ' gegen heute, Kennzahl für Kennzahl.' : 'Was in dem Objekt steckt: heute, nach Mieterhöhung und im Zielbild.');
     var hin = [];
@@ -1391,7 +1395,11 @@
     teile = teile || {};
     _siTeile[bestand ? 'b' : 'a'] = { leer: teile.leer || '', steuerText: analyse && has(analyse.soll_ist_steuer) ? analyse.soll_ist_steuer : '' };
     var h = (teile.zbf || '') + '<div data-dp-pa5-si="' + (bestand ? 'b' : 'a') + '">' + siInhalt(bestand, _siTeile[bestand ? 'b' : 'a']) + '</div>';
-    if (teile.sollIst) h += abKopf('Kauf gegen heute, alle Kennzahlen', 'Ertrag · Kosten · Finanzierung · Steuer') + teile.sollIst;
+    /* v3441 · gemessen v3440 (Bestands-MFH, 1280 px): mit „Kauf gegen heute“ und „Pilot beim Ankauf“ auch im Einfach war der
+       Reiter 2.302 px lang (v3420: 938). Einfach zeigt den Weg dorthin, Detail die ganze Tafel. */
+    if (teile.sollIst) h += '<div class="dp-pa-e">' + abKopf('Kauf gegen heute, alle Kennzahlen', 'im Detail') + hinweis('Alle Kennzahlen des Ankauf-Stands gegen heute, mit Abweichung, und was der Pilot beim Kauf gesagt hat. '
+        + '<button type="button" class="btn-clean dp-pa4-link" data-dp-pa-modus-setzen="detail">Im Detail zeigen</button>') + '</div>'
+      + '<div class="dp-pa-d">' + abKopf('Kauf gegen heute, alle Kennzahlen', 'Ertrag · Kosten · Finanzierung · Steuer') + teile.sollIst + '</div>';
     if (teile.pot) h += '<div class="dp-pa-d" data-dp-pa5-pot="1">' + abKopf('Rechenweg, Marktpreise und Aufteilung', 'aus dem Reiter Bewertung') + teile.pot + '</div>';
     return h;
   }
@@ -1576,6 +1584,6 @@
     }
   });
 
-  window.DpPilotV4 = { VERSION: 'v3440', unterZeigen: unterZeigen, siZeichnen: siZeichnen, siTabelle: siTabelle, wegNeu: wegNeu, scoreSicht: scoreSicht, sichtbarerScore: sichtbarerScore, leisteMessen: leisteMessen, huelle: huelle, uebersicht: uebersicht, risiko: risiko, steuer: steuer, gesamtstatement: gesamtstatement,
+  window.DpPilotV4 = { VERSION: 'v3441', unterZeigen: unterZeigen, siZeichnen: siZeichnen, siTabelle: siTabelle, wegNeu: wegNeu, scoreSicht: scoreSicht, sichtbarerScore: sichtbarerScore, leisteMessen: leisteMessen, huelle: huelle, uebersicht: uebersicht, risiko: risiko, steuer: steuer, gesamtstatement: gesamtstatement,
     wertverlauf: wertverlauf, indexVerlauf: indexVerlauf, linien: linien, modus: modus, setzeModus: setzeModus, neuZeichnen: neuZeichnen, saetze: saetze, steuerTabelle: steuerTabelle };
 })();

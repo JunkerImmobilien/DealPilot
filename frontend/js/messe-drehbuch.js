@@ -3552,6 +3552,8 @@
         try { if (_r14.merker === undefined) _r14.merker = localStorage.getItem('dp_pa_si_ansicht'); } catch (e) {}
         var gk = r11Panel() && r11Panel().querySelector('.dp-si-um [data-dp-si-knopf="genau"]');
         if (gk && gk.getAttribute('aria-pressed') !== 'true') { gk.click(); await warte(700); }
+        /* v3441 · „Kauf gegen heute“ steht nur noch im Detail der Pilot-Analyse (der Umschalter Einfach | Genau des Reiters ist gefallen) */
+        if (!gk && window.DpPilotV4 && DpPilotV4.modus && DpPilotV4.modus() !== 'detail') { DpPilotV4.setzeModus('detail'); await warte(900); }
         var ah = function () { var x = r11Panel(); return x && x.querySelector('.abw-tafel-host'); };
         var sx = scroller(ah()); if (sx && ah()) { sx.scrollTop += rect(ah()).top - 120; await warte(500); }
         var p = r11Panel(), t = r6Inner(p);
@@ -9248,6 +9250,8 @@
         try { if (_qg.paSi === undefined) _qg.paSi = localStorage.getItem('dp_pa_si_ansicht'); } catch (e) {}
         var gk = r11Panel() && r11Panel().querySelector('.dp-si-um [data-dp-si-knopf="genau"]');
         if (gk && gk.getAttribute('aria-pressed') !== 'true') { gk.click(); await warte(700); }
+        /* v3441 · „Kauf gegen heute“ steht nur noch im Detail der Pilot-Analyse (der Umschalter Einfach | Genau des Reiters ist gefallen) */
+        if (!gk && window.DpPilotV4 && DpPilotV4.modus && DpPilotV4.modus() !== 'detail') { DpPilotV4.setzeModus('detail'); await warte(900); }
         var ah = function () { var x = r11Panel(); return x && (x.querySelector('.abw-tafel-host') || x.querySelector('.abw-tafel')); };
         var sx = ah() && scroller(ah()); if (sx && ah()) { sx.scrollTop += rect(ah()).top - 120; await warte(500); }
         var t = r6Inner(r11Panel()), vg = /Von (\d+) vergleichbaren Kennzahlen stehen (\d+) besser und (\d+) schlechter/.exec(t);
@@ -9434,6 +9438,8 @@
         await r11PaTab(/Ankauf · Bestand/);
         var gk = r11Panel() && r11Panel().querySelector('.dp-si-um [data-dp-si-knopf="genau"]');
         if (gk && gk.getAttribute('aria-pressed') !== 'true') { gk.click(); await warte(700); }
+        /* v3441 · „Kauf gegen heute“ steht nur noch im Detail der Pilot-Analyse (der Umschalter Einfach | Genau des Reiters ist gefallen) */
+        if (!gk && window.DpPilotV4 && DpPilotV4.modus && DpPilotV4.modus() !== 'detail') { DpPilotV4.setzeModus('detail'); await warte(900); }
         var km = qgbZeileTab(/^Kaltmiete (p\. a\.|im Jahr)/), ew = qgbZeileTab(/^Ertragswert/), wz = qgbZeileTab(/^Wertzuwachs nach Kosten/);
         await warteAuf(km, 6000);
         var k0 = km(); if (k0) { var sx = scroller(k0); if (sx) { sx.scrollTop += rect(k0).top - 200; await warte(500); } }
