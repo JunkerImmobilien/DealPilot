@@ -57,7 +57,7 @@
 @media (max-width:420px){
   .gs-szene{padding:12px 14px 14px}
   .gs-sz-wechsel{grid-template-columns:minmax(0,1fr) 30px minmax(0,1fr)}
-  .gs-sz-wert b,.gs-sz-kipp{font-size:19px}
+  .gs-sz-wert b,.gs-sz-kipp{font-size:18px}
 }
 @media (prefers-reduced-motion:reduce){
   .gs-szene *,.gs-szene *::after{transition:none!important}
