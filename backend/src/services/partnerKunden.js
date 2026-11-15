@@ -182,15 +182,19 @@ async function anfrageZurueckziehen(rs, id) {
 }
 
 /** Kundenstaende beim Partner, je Kunde */
+/* v3392 · Marcel 15.11.: „Unter Freigegeben fehlt mir, von welchem Kunden was freigegeben wurde.“ Dazu E-Mail und Art
+   des Kunden sowie Anschrift und Objektart des Objekts (nur lesend). */
 async function kundenstaende(rs) {
   const r = await query(
     `SELECT s.id AS share_id, s.client_id, s.kopie_object_id, s.stand_nr, s.stand_am, s.ueber_bestand, s.gelesen_am, s.status,
-            c.display_name AS kunde, c.getrennt_am,
+            c.display_name AS kunde, c.getrennt_am, c.platz_art AS kunde_platz_art, u.email AS kunde_email,
             o.name, o.seq_no, o.ort, o.kaufpreis, o.dscr, o.cf_ns, o.bmy,
+            o.data::jsonb->>'str' AS str, o.data::jsonb->>'hnr' AS hnr, o.data::jsonb->>'plz' AS plz, o.data::jsonb->>'objart' AS objart,
             COALESCE((o.data::jsonb->>'_deal_won')::boolean, false) AS deal_won,
             (o.data::jsonb->>'_dealpilot_score')::int AS score
        FROM object_shares s
        JOIN reseller_clients c ON c.id = s.client_id
+       LEFT JOIN users u ON u.id = c.user_id
        JOIN objects o ON o.id = s.kopie_object_id
       WHERE s.reseller_id = $1 AND s.kopie_object_id IS NOT NULL AND s.status <> 'widerrufen'
       ORDER BY c.display_name, s.stand_am DESC`, [rs.id]);

@@ -6,7 +6,8 @@
  *   #dppk-tabzeile mit den Cockpit-Reitern (Klasse dppk-tab, NIE .tab - ui.js/main.js/pdf.js zaehlen .tab nach Index).
  *   Die Optik der Reiter wird beim Oeffnen von einem echten .tab abgelesen (getComputedStyle), damit sie in jedem
  *   Skin und jeder Layout-Variante gleich aussieht. Angemeldet im Register DealPilotAnsichten als 'partner'.
- *   Reiter „Verwaltung“ haengt das bestehende Partner-Portal ein (reseller-portal.js einbetten(), keine Kopie).
+ *   Reiter „Verwaltung“ (v3392): eigene Oberflaeche fuer Plaetze, Marke, Abrechnung; die Logik (Pool, Staffel, Stripe-Kauf,
+ *   Marken-Formular und Speichern) kommt aus reseller-portal.js. Uebersicht, Freigaben, Übergeben stehen dort NICHT.
  *   „Mein Partner“ (Kundenseite) bleibt ein Fenster.
  *
  * Backend: /api/v1/partner/* (Partnerseite), /api/v1/mein-partner/* (Kundenseite), services/partnerKunden.js.
@@ -152,11 +153,44 @@
       '#dppk-ab .pk-karte .pk-zeile{border-color:#F0EADC}',
       '#dppk-ab .pk-mehr{border:0;background:none;color:#7A6020;font:600 12.5px Inter,sans-serif;cursor:pointer;padding:4px 0}',
       '#dppk-ab .pk-fuss{display:flex;gap:8px;justify-content:flex-end;margin-top:6px;flex-wrap:wrap}',
-      '#dppk-ab .pk-verw .rp-modal{max-width:none !important;max-height:none !important;box-shadow:none !important;border:1px solid #EDE6D6 !important;border-radius:12px !important}',
-      '#dppk-ab .pk-verw .rp-bar,#dppk-ab .pk-verw .rp-foot,#dppk-ab .pk-verw .rp-hero{display:none !important}',
-      '#dppk-ab .pk-verw .rp-body{min-height:520px}',
-      '#dppk-ab .pk-verw .rp-work{overflow:visible}',
-      '@media (max-width:640px){#dppk-ab{padding:6px 0 20px}#dppk-ab .pk-box{border-radius:10px}#dppk-ab .pk-kopf{padding:14px 14px 10px}#dppk-ab .pk-kopf h2{font-size:19px}#dppk-ab .pk-inhalt{padding:14px}#dppk-ab .pk-spalten{grid-template-columns:1fr}#dppk-ab .pk-verw .rp-body{min-height:0}}'
+      '#dppk-ab .pk-spalten + .pk-karte,#dppk-ab .pk-karte + .pk-karte.pk-marke{margin-top:16px}',
+      '#dppk-ab .pk-kachel-knopf{text-align:left;cursor:pointer;font:inherit;color:inherit;width:100%}',
+      '#dppk-ab .pk-kachel-knopf:hover{border-color:' + G + '}',
+      '#dppk-ab .pk-ansteht{display:flex;align-items:center;gap:10px;width:100%;text-align:left;border:1px solid #EDE6D6;border-radius:10px;background:#fff;padding:11px 12px;margin-bottom:8px;font:500 13.5px Inter,sans-serif;color:#2A2727;cursor:pointer}',
+      '#dppk-ab .pk-ansteht span{flex:1;min-width:0}',
+      '#dppk-ab .pk-ansteht i{font-style:normal;font-size:18px;color:#7A6020}',
+      '#dppk-ab .pk-ansteht:hover{border-color:' + G + '}',
+      '#dppk-ab .pk-hinweis .pk-mehr{padding:0;font-size:13px}',
+      '#dppk-ab .pk-drei{grid-template-columns:repeat(3,1fr);margin-bottom:10px}',
+      '#dppk-ab .pk-balken{height:8px;border-radius:5px;background:#EFE9DC;overflow:hidden}',
+      '#dppk-ab .pk-balken i{display:block;height:100%;background:#3FA56C}',
+      '#dppk-ab .pk-klein{font-size:12px;line-height:1.5;color:#7A7370;margin:8px 0}',
+      '#dppk-ab .pk-kauf{display:flex;align-items:center;gap:12px;flex-wrap:wrap}',
+      '#dppk-ab .pk-seg{display:inline-flex;border:1px solid #D9CFB8;border-radius:8px;overflow:hidden}',
+      '#dppk-ab .pk-seg button{border:0;background:#fff;padding:8px 12px;font:600 12.5px Inter,sans-serif;color:#6B6460;cursor:pointer}',
+      '#dppk-ab .pk-seg button.an{background:' + G + ';color:#fff}',
+      '#dppk-ab .pk-stepper{display:inline-flex;border:1px solid #D9CFB8;border-radius:8px;overflow:hidden}',
+      '#dppk-ab .pk-stepper button{width:34px;border:0;background:#FBF8F1;font:600 16px Inter,sans-serif;color:#2A2727;cursor:pointer}',
+      '#dppk-ab .pk-stepper input{width:56px;border:0;text-align:center;font:600 14px "JetBrains Mono",monospace;padding:7px 0;-moz-appearance:textfield}',
+      '#dppk-ab .pk-preis{margin-left:auto;text-align:right;font:400 12.5px Inter,sans-serif;color:#7A7370}',
+      '#dppk-ab .pk-preis b{display:block;font:600 18px "Space Grotesk",Inter,sans-serif;color:#2A2727}',
+      '#dppk-ab .pk-preis small{display:block}',
+      '#dppk-ab .pk-filter{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}',
+      '#dppk-ab .pk-filter button{border:1px solid #D9CFB8;background:#fff;border-radius:16px;padding:5px 11px;font:600 12px Inter,sans-serif;color:#4A4440;cursor:pointer}',
+      '#dppk-ab .pk-filter button.an{background:#2A2727;border-color:#2A2727;color:#FDFCFA}',
+      '#dppk-ab .pk-kundenkopf{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin:0 0 10px}',
+      '#dppk-ab .pk-kundenkopf b{font:600 15px "Space Grotesk",Inter,sans-serif}',
+      '#dppk-ab .pk-kundenkopf small{color:#7A7370;font-size:12px}',
+      /* Marken-Formular aus reseller-portal.js (loadBranding) in Cockpit-Optik */
+      '#dppk-ab .pk-marke .rp-intro{font-style:normal;font-size:13px;color:#7A7370;margin:0 0 12px}',
+      '#dppk-ab .pk-marke .rp-panel{border:1px solid #EDE6D6;border-radius:10px;padding:14px 16px;margin-top:12px;background:#FDFCFA}',
+      '#dppk-ab .pk-marke .rp-label{font:600 11px "JetBrains Mono",monospace;letter-spacing:.08em;text-transform:uppercase;color:#7A7370;margin:18px 0 6px}',
+      '#dppk-ab .pk-marke .rp-fl{font:600 12px Inter,sans-serif;letter-spacing:0;text-transform:none;color:#4A4440;margin-bottom:6px}',
+      '#dppk-ab .pk-marke .rp-checkout{background:' + G + ';color:#fff;border:1px solid ' + G + ';border-radius:8px;padding:9px 16px;font:600 13px Inter,sans-serif;cursor:pointer}',
+      '#dppk-ab .pk-marke .rp-act{border:1px solid #D9CFB8;background:#fff;border-radius:8px;padding:6px 10px;font:600 12px Inter,sans-serif;cursor:pointer}',
+      '#dppk-ab .pk-marke .rp-act.remove{color:#B8625C;border-color:#E3C2BF}',
+      '#dppk-ab .pk-marke input[type=file]{max-width:100%}',
+      '@media (max-width:640px){#dppk-ab{padding:6px 0 20px}#dppk-ab .pk-box{border-radius:10px}#dppk-ab .pk-kopf{padding:14px 14px 10px}#dppk-ab .pk-kopf h2{font-size:19px}#dppk-ab .pk-inhalt{padding:14px}#dppk-ab .pk-spalten{grid-template-columns:1fr}#dppk-ab .pk-preis{margin-left:0;text-align:left}#dppk-ab .pk-marke .rp-panel > div[style*="display:flex"]{flex-wrap:wrap}#dppk-ab .pk-marke .rp-panel > div[style*="display:flex"] > div{flex:1 1 100% !important;width:auto !important}#dppk-ab .pk-marke #rp-b-logo-prev{flex-wrap:wrap}}'
     ]).join('\n');
     document.head.appendChild(s);
   }
@@ -236,7 +270,7 @@
     var neu = (c.kunden || []).reduce(function (a, k) { return a + (k.neu || 0); }, 0);
     var l = [{ k: 'uebersicht', t: 'Übersicht' }, { k: 'kunden', t: 'Kunden & Plätze', zahl: (c.anfragen || []).length || 0 }, { k: 'einladen', t: 'Einladen' },
       { k: 'staende', t: 'Freigegeben', zahl: neu }, { k: 'aufgaben', t: 'Aufgaben' }, { k: 'meldungen', t: 'Meldungen', zahl: c.meldungen_ungelesen || 0 }];
-    if (window.DealPilotResellerPortal && typeof DealPilotResellerPortal.einbetten === 'function') l.push({ k: 'verwaltung', t: 'Verwaltung' });
+    if (window.DealPilotResellerPortal && typeof DealPilotResellerPortal.markeZeichnen === 'function') l.push({ k: 'verwaltung', t: 'Verwaltung' });
     return l;
   }
   /* Optik der Reiter vom echten .tab ablesen (Skin, Layout-Variante, hell/dunkel) - nicht nachbauen */
@@ -280,14 +314,13 @@
   }
   var TITEL = { uebersicht: ['Übersicht', 'Was heute ansteht'], kunden: ['Kunden & Plätze', 'Verbindungen, Stufe und Rechte'], einladen: ['Kunden einladen', 'Per E-Mail oder Verbindungscode'],
     staende: ['Von Kunden freigegeben', 'Nur lesen, Übernehmen legt eine eigene Kopie an'], aufgaben: ['Aufgaben', 'Bitten an deine Kunden'], meldungen: ['Meldungen', ''],
-    verwaltung: ['Verwaltung', 'Plätze, Objekte übergeben, Marke und Abo'] };
+    verwaltung: ['Verwaltung', 'Plätze, Marke und Abrechnung'] };
   function zeichnen() {
     var s = abSektion(); if (!s) return;
     var t = TITEL[PK.aktiv] || ['', ''];
     s.querySelector('.pk-titel').textContent = t[0];
     s.querySelector('.pk-titel2').textContent = (S.partner && S.partner.partner && S.partner.partner.name ? S.partner.partner.name + (t[1] ? ' · ' : '') : '') + t[1];
     var el = s.querySelector('.pk-inhalt');
-    if (PK.aktiv !== 'verwaltung') verwaltungAus();
     el.innerHTML = '<div class="pk-leer">Lädt …</div>';
     var k = PK.aktiv;
     if (k === 'uebersicht') return uebersichtZeichnen(el);
@@ -324,7 +357,6 @@
     if (!PK.offen) return;
     PK.offen = false;
     document.documentElement.removeAttribute('data-pk-offen');
-    verwaltungAus();
   }
   function zurueckZuObjekten() {
     cockpitSchliessen();
@@ -353,42 +385,38 @@
     });
   }
 
-  function kachelnHtml(c) {
-    var pool = c.pool || {};
-    var belegt = c.kunden.filter(function (k) { return k.hat_platz; }).length;
-    var verb = c.kunden.filter(function (k) { return !k.getrennt_am; }).length;
-    return '<div class="pk-kacheln">' +
-      '<div class="pk-kachel"><span>Plätze belegt</span><b>' + belegt + ' / ' + (pool.total != null ? pool.total : (pool.gesamt != null ? pool.gesamt : '–')) + '</b></div>' +
-      '<div class="pk-kachel"><span>Kunden verbunden</span><b>' + verb + '</b></div>' +
-      '<div class="pk-kachel"><span>Kundenstände</span><b>' + c.kunden.reduce(function (a, k) { return a + (k.sendungen || 0); }, 0) + '</b></div>' +
-      '<div class="pk-kachel"><span>Offene Anfragen</span><b>' + c.anfragen.length + '</b></div></div>';
+  /* v3392 · Marcel 15.11.: „etwas doppelt … Der Flow muss einfach sein.“ Ein Weg je Aufgabe:
+     Übersicht zeigt nur Zahlen und was ansteht (jede Zeile fuehrt in ihren Reiter), keine Listen, keine Knoepfe.
+     Einladen nur im Reiter Einladen, Plaetze/Marke/Abo nur im Reiter Verwaltung. */
+  function platzZahlen(c) {
+    var p = c.pool || {};
+    var gekauft = p.gekauft != null ? p.gekauft : null;
+    var belegt = p.zugewiesen != null ? p.zugewiesen + (p.reserviert || 0) : c.kunden.filter(function (k) { return k.hat_platz; }).length;
+    return { gekauft: gekauft, belegt: belegt, frei: p.frei != null ? p.frei : (gekauft != null ? Math.max(0, gekauft - belegt) : null) };
   }
-
   function uebersichtZeichnen(el) {
-    var c = S.partner;
-    var wartet = c.anfragen.map(function (a) { return { n: a.anzeige_name || a.email, s: (a.quelle === 'code' ? 'per Code' : 'per Einladung') + ' · seit ' + datum(a.erstellt_am) }; })
-      .concat((c.einladungen || []).map(function (i) { return { n: i.display_name, s: 'Einladung an neue Adresse · bis ' + datum(i.expires_at) }; }));
-    var neuJe = c.kunden.filter(function (k) { return k.neu; });
-    var h = kachelnHtml(c) +
-      '<div class="pk-leiste"><button type="button" class="pk-btn gold" data-geh="einladen">Kunden einladen</button><button type="button" class="pk-btn" data-geh="aufgaben">Aufgabe stellen</button><button type="button" class="pk-btn" data-geh="verwaltung">Plätze und Marke verwalten</button></div>' +
-      '<div class="pk-spalten">' +
-      '<div class="pk-karte"><h3>Wartet auf Bestätigung</h3>' + (wartet.length ? wartet.slice(0, 5).map(function (w) { return '<div class="pk-zeile"><div class="pk-name"><b>' + esc(w.n) + '</b><small>' + esc(w.s) + '</small></div></div>'; }).join('') +
-        (wartet.length > 5 ? '<button type="button" class="pk-mehr" data-geh="kunden">Alle ' + wartet.length + ' ansehen</button>' : '') : '<div class="pk-leer">Nichts offen.</div>') + '</div>' +
-      '<div class="pk-karte"><h3>Neu von Kunden</h3>' + (neuJe.length ? neuJe.map(function (k) { return '<div class="pk-zeile"><div class="pk-name"><b>' + esc(k.display_name) + '</b><small>' + k.neu + (k.neu === 1 ? ' neuer Stand' : ' neue Stände') + '</small></div></div>'; }).join('') +
-        '<button type="button" class="pk-mehr" data-geh="staende">Zu den freigegebenen Objekten</button>' : '<div class="pk-leer">Keine neuen Stände.</div>') + '</div>' +
-      '<div class="pk-karte" data-pk-meld><h3>Letzte Meldungen</h3><div class="pk-leer">Lädt …</div></div>' +
-      '</div>';
+    var c = S.partner, pz = platzZahlen(c);
+    var verb = c.kunden.filter(function (k) { return !k.getrennt_am; }).length;
+    var neu = c.kunden.reduce(function (a, k) { return a + (k.neu || 0); }, 0);
+    var wartet = c.anfragen.length + (c.einladungen || []).length;
+    var ohnePlatz = c.kunden.filter(function (k) { return !k.getrennt_am && k.platz_art === 'platz' && !k.hat_platz && !k.entzug_frist_bis; }).length;
+    function kachel(z, t, ziel) { return '<button type="button" class="pk-kachel pk-kachel-knopf" data-geh="' + ziel + '"><span>' + t + '</span><b>' + z + '</b></button>'; }
+    var h = '<div class="pk-kacheln">' +
+      kachel(pz.belegt + ' / ' + (pz.gekauft != null ? pz.gekauft : '–'), 'Plätze belegt', 'verwaltung') +
+      kachel(verb, 'Kunden verbunden', 'kunden') +
+      kachel(neu, 'Neue Kundenstände', 'staende') +
+      kachel(c.meldungen_ungelesen || 0, 'Ungelesene Meldungen', 'meldungen') + '</div>';
+    var an = [];
+    if (wartet) an.push(['kunden', wartet + (wartet === 1 ? ' Anfrage wartet' : ' Anfragen warten') + ' auf Bestätigung des Kunden']);
+    c.kunden.filter(function (k) { return k.neu; }).forEach(function (k) { an.push(['staende', k.neu + (k.neu === 1 ? ' neuer Stand' : ' neue Stände') + ' von ' + k.display_name]); });
+    if (ohnePlatz) an.push([pz.frei ? 'kunden' : 'verwaltung', ohnePlatz + (ohnePlatz === 1 ? ' Kunde wartet' : ' Kunden warten') + ' auf einen Platz' + (pz.frei ? '' : ', es ist keiner frei')]);
+    if (c.meldungen_ungelesen) an.push(['meldungen', c.meldungen_ungelesen + (c.meldungen_ungelesen === 1 ? ' ungelesene Meldung' : ' ungelesene Meldungen')]);
+    if (!verb && !wartet) an.push(['einladen', 'Noch keine Kunden. Lade deinen ersten Kunden ein']);
+    h += '<div class="pk-karte"><h3>Was ansteht</h3>' + (an.length ? an.map(function (x) {
+      return '<button type="button" class="pk-ansteht" data-geh="' + x[0] + '"><span>' + esc(x[1]) + '</span><i aria-hidden="true">›</i></button>';
+    }).join('') : '<div class="pk-leer">Alles erledigt.</div>') + '</div>';
     el.innerHTML = h;
     [].forEach.call(el.querySelectorAll('[data-geh]'), function (b) { b.onclick = function () { reiterWahl(b.getAttribute('data-geh')); }; });
-    /* nur lesen - als gelesen markiert erst der Reiter Meldungen */
-    api('/partner/meldungen').then(function (r) {
-      var k = el.querySelector('[data-pk-meld]'); if (!k) return;
-      var l = (r.meldungen || []).slice(0, 4);
-      k.innerHTML = '<h3>Letzte Meldungen</h3>' + (l.length ? l.map(function (m) {
-        return '<div class="pk-zeile"><div class="pk-name"><b>' + esc(m.text || m.art) + '</b><small>' + datum(m.erstellt_am) + '</small></div>' + (m.gelesen_am ? '' : '<span class="pk-chip gruen">neu</span>') + '</div>';
-      }).join('') + '<button type="button" class="pk-mehr">Alle Meldungen</button>' : '<div class="pk-leer">Keine Meldungen.</div>');
-      var m = k.querySelector('.pk-mehr'); if (m) m.onclick = function () { reiterWahl('meldungen'); };
-    }, function () { var k = el.querySelector('[data-pk-meld]'); if (k) k.querySelector('.pk-leer').textContent = 'Meldungen nicht erreichbar.'; });
   }
 
   function einladenZeichnen(el) {
@@ -404,21 +432,73 @@
     });
   }
 
-  /* Verwaltung: das bestehende Partner-Portal (reseller-portal.js) eingehaengt, nicht kopiert */
+  /* ── Verwaltung (v3392): Plaetze, Marke, Abrechnung - eigene Oberflaeche, Logik aus reseller-portal.js ── */
+  var VERW = { iv: 'monthly', qty: 5 };
   function verwaltungZeichnen(el) {
     var rp = window.DealPilotResellerPortal;
-    el.innerHTML = '<div class="pk-verw"></div>';
-    if (!rp || typeof rp.einbetten !== 'function') { el.innerHTML = '<div class="pk-leer">Die Verwaltung ist gerade nicht geladen. Bitte die Seite neu laden.</div>'; return; }
-    rp.einbetten(el.querySelector('.pk-verw'), null);   /* null: der zuletzt gewaehlte Abschnitt (z. B. Übergeben aus dem Objekt) */
+    if (!rp || typeof rp.markeZeichnen !== 'function') { el.innerHTML = '<div class="pk-leer">Die Verwaltung ist gerade nicht geladen. Bitte die Seite neu laden.</div>'; return; }
+    el.innerHTML = '<div class="pk-spalten">' +
+      '<div class="pk-karte" data-v="plaetze"><h3>Plätze</h3><div class="pk-leer">Lädt …</div></div>' +
+      '<div class="pk-karte" data-v="abo"><h3>Abrechnung</h3><div class="pk-leer">Lädt …</div></div></div>' +
+      '<div class="pk-karte pk-marke" data-v="marke"><h3>Marke</h3><div class="pk-marke-form"><div class="pk-leer">Lädt …</div></div></div>';
+    plaetzeZeichnen(el.querySelector('[data-v="plaetze"]'));
+    aboZeichnen(el.querySelector('[data-v="abo"]'));
+    try { rp.markeZeichnen(el.querySelector('.pk-marke-form')); } catch (e) { el.querySelector('.pk-marke-form').innerHTML = '<div class="pk-leer">' + esc(fehlerText(e)) + '</div>'; }
   }
-  function verwaltungAus() {
-    try { if (window.DealPilotResellerPortal && typeof DealPilotResellerPortal.ausbetten === 'function') DealPilotResellerPortal.ausbetten(); } catch (e) {}
+  function portalOeffnen() {
+    if (window.Sub && typeof Sub.openPortal === 'function') return Sub.openPortal().catch(function (e) { toast(fehlerText(e)); });
+    toast('Das Abo-Portal ist gerade nicht erreichbar.');
+  }
+  function plaetzeZeichnen(k) {
+    var rp = window.DealPilotResellerPortal;
+    rp.poolHolen().then(function (p) {
+      var belegt = (p.zugewiesen || 0) + (p.reserviert || 0), tot = p.gekauft || 0, anteil = tot ? Math.round(belegt / tot * 100) : 0;
+      k.innerHTML = '<h3>Plätze</h3>' +
+        '<div class="pk-kacheln pk-drei"><div class="pk-kachel"><span>Gekauft</span><b>' + tot + '</b></div><div class="pk-kachel"><span>Belegt</span><b>' + belegt + '</b></div><div class="pk-kachel"><span>Frei</span><b>' + (p.frei || 0) + '</b></div></div>' +
+        '<div class="pk-balken" aria-hidden="true"><i style="width:' + anteil + '%"></i></div>' +
+        (p.reserviert ? '<p class="pk-klein">' + p.reserviert + ' davon für eine Objekt-Übergabe vorgemerkt.</p>' : '') +
+        '<div class="pk-gruppe">Plätze dazukaufen</div>' +
+        '<div class="pk-kauf"><div class="pk-seg" role="group"><button type="button" data-iv="monthly">Monatlich</button><button type="button" data-iv="yearly">Jährlich</button></div>' +
+        '<div class="pk-stepper"><button type="button" data-d="-1" aria-label="weniger">−</button><input type="number" min="1" max="500" value="' + VERW.qty + '" aria-label="Anzahl Plätze"><button type="button" data-d="1" aria-label="mehr">+</button></div>' +
+        '<div class="pk-preis"></div></div>' +
+        '<p class="pk-klein">' + rp.staffelText() + '. Der Stückpreis gilt für alle Plätze. Im Partner-Paket ist kein Platz enthalten.</p>' +
+        '<div class="pk-fuss"><button type="button" class="pk-btn" data-a="portal">Plätze reduzieren</button><button type="button" class="pk-btn gold" data-a="kasse">Zur Kasse</button></div>';
+      var inp = k.querySelector('.pk-stepper input');
+      function preis() {
+        VERW.qty = Math.max(1, Math.min(500, parseInt(inp.value, 10) || 1)); inp.value = VERW.qty;
+        var satz = rp.staffelSatz(VERW.qty, VERW.iv), ein = VERW.iv === 'yearly' ? 'Jahr' : 'Monat';
+        k.querySelector('.pk-preis').innerHTML = '<b>' + (satz * VERW.qty).toLocaleString('de-DE') + ' €</b> je ' + ein + '<small>' + satz + ' € je Platz</small>';
+        [].forEach.call(k.querySelectorAll('.pk-seg button'), function (b) { b.classList.toggle('an', b.getAttribute('data-iv') === VERW.iv); });
+      }
+      [].forEach.call(k.querySelectorAll('.pk-seg button'), function (b) { b.onclick = function () { VERW.iv = b.getAttribute('data-iv'); preis(); }; });
+      [].forEach.call(k.querySelectorAll('.pk-stepper button'), function (b) { b.onclick = function () { inp.value = (parseInt(inp.value, 10) || 1) + Number(b.getAttribute('data-d')); preis(); }; });
+      inp.oninput = function () { if (inp.value !== '') preis(); };
+      k.querySelector('[data-a="kasse"]').onclick = function () { rp.seatsKaufen(VERW.qty, VERW.iv); };
+      k.querySelector('[data-a="portal"]').onclick = portalOeffnen;
+      preis();
+    }, function (e) { k.innerHTML = '<h3>Plätze</h3><div class="pk-leer">' + esc(fehlerText(e)) + '</div>'; });
+  }
+  function aboZeichnen(k) {
+    var holen = window.Sub && typeof Sub.getCurrent === 'function' ? Sub.getCurrent() : Promise.resolve(null);
+    Promise.resolve(holen).then(function (s) {
+      s = s || {};
+      var plan = String(s.plan_id || '').toLowerCase() === 'partner' ? 'Partner' : (s.plan_label || s.plan_id || 'Partner');
+      var bis = s.current_period_end || s.period_end || null;
+      var iv = s.billing_interval || s.interval || '';
+      k.innerHTML = '<h3>Abrechnung</h3>' +
+        '<div class="pk-zeile"><div class="pk-name"><b>' + esc(plan) + '-Plan</b><small>' + (iv === 'yearly' ? 'jährlich' : iv === 'monthly' ? 'monatlich' : 'aktiv') + (bis ? ', läuft bis ' + datum(bis) : '') + '</small></div><span class="pk-chip gruen">aktiv</span></div>' +
+        '<p class="pk-klein">Rechnungen, Zahlungsart und Kündigung für Partner-Plan und Plätze stehen im Abo-Portal.</p>' +
+        '<div class="pk-fuss"><button type="button" class="pk-btn gold" data-a="portal">Abo und Rechnungen</button></div>';
+      k.querySelector('[data-a="portal"]').onclick = portalOeffnen;
+    }, function (e) { k.innerHTML = '<h3>Abrechnung</h3><div class="pk-leer">' + esc(fehlerText(e)) + '</div>'; });
   }
 
   function kundenZeichnen(el) {
-    var c = S.partner;
-    var h = kachelnHtml(c) +
-      '<div class="pk-leiste"><button type="button" class="pk-btn gold" data-a="einladen">Kunden einladen</button><button type="button" class="pk-btn" data-a="code">Verbindungscode eingeben</button></div>';
+    var c = S.partner, pz = platzZahlen(c);
+    /* v3392 · keine Kacheln (stehen in der Übersicht), Einladen nur im Reiter Einladen; im Fenster bleiben die Knoepfe */
+    var h = PK.offen
+      ? '<div class="pk-hinweis">Plätze: ' + pz.belegt + ' von ' + (pz.gekauft != null ? pz.gekauft : '–') + ' belegt, ' + (pz.frei != null ? pz.frei : '–') + ' frei. <button type="button" class="pk-mehr" data-geh="verwaltung">Plätze verwalten</button> · <button type="button" class="pk-mehr" data-geh="einladen">Kunden einladen</button></div>'
+      : '<div class="pk-leiste"><button type="button" class="pk-btn gold" data-a="einladen">Kunden einladen</button><button type="button" class="pk-btn" data-a="code">Verbindungscode eingeben</button></div>';
     if (c.anfragen.length || (c.einladungen || []).length) {
       h += '<div class="pk-gruppe">Wartet auf Bestätigung des Kunden</div>';
       h += c.anfragen.map(function (a) {
@@ -429,7 +509,7 @@
       }).join('');
     }
     h += '<div class="pk-gruppe">Kunden</div>';
-    if (!c.kunden.length) h += '<div class="pk-leer">Noch keine Kunden. Lade einen Kunden ein oder lass dir seinen Verbindungscode geben.</div>';
+    if (!c.kunden.length) h += '<div class="pk-leer">Noch keine Kunden. Lade einen Kunden ein oder lass dir seinen Verbindungscode geben (Reiter Einladen).</div>';
     h += c.kunden.map(function (k) {
       var getrennt = !!k.getrennt_am;
       var status = getrennt ? '<span class="pk-chip grau">getrennt</span>' : k.entzug_frist_bis ? '<span class="pk-chip rot">Frist bis ' + datum(k.entzug_frist_bis) + '</span>' : '<span class="pk-chip gruen">verbunden</span>';
@@ -441,8 +521,10 @@
       return '<div class="pk-zeile"><div class="pk-name"><b>' + esc(k.display_name) + '</b><small>' + esc(k.email) + ' · ' + esc(info) + (k.sendungen ? ' · ' + k.sendungen + (k.sendungen === 1 ? ' Objekt gesendet' : ' Objekte gesendet') : '') + (k.neu ? ', ' + k.neu + ' neu' : '') + '</small></div>' + zug + status + knoepfe + '</div>';
     }).join('');
     el.innerHTML = h;
-    el.querySelector('[data-a="einladen"]').onclick = function () { if (PK.offen) return reiterWahl('einladen'); einladenDialog(el); };
-    el.querySelector('[data-a="code"]').onclick = function () { if (PK.offen) return reiterWahl('einladen'); codeDialog(el); };
+    var _e = el.querySelector('[data-a="einladen"]'), _c = el.querySelector('[data-a="code"]');
+    if (_e) _e.onclick = function () { einladenDialog(el); };
+    if (_c) _c.onclick = function () { codeDialog(el); };
+    [].forEach.call(el.querySelectorAll('[data-geh]'), function (b) { b.onclick = function () { reiterWahl(b.getAttribute('data-geh')); }; });
     [].forEach.call(el.querySelectorAll('[data-zz]'), function (b) { b.onclick = function () { api('/partner/anfragen/' + b.getAttribute('data-zz') + '/zurueckziehen', { method: 'POST' }).then(function () { neuLaden(el); }); }; });
     [].forEach.call(el.querySelectorAll('[data-ein]'), function (b) { b.onclick = function () { kundeDialog(el, b.getAttribute('data-ein')); }; });
     [].forEach.call(el.querySelectorAll('[data-platz]'), function (b) { b.onclick = function () { api('/partner/kunden/' + b.getAttribute('data-platz') + '/platz', { method: 'POST' }).then(function () { toast('Platz zugewiesen.'); neuLaden(el); }, function (e) { toast(fehlerText(e)); }); }; });
@@ -530,15 +612,28 @@
     api('/partner/kundenstaende').then(function (r) {
       var l = r.kundenstaende || [];
       if (!l.length) { el.innerHTML = '<div class="pk-leer">Noch keine Kundenstände. Sobald ein Kunde Objekte sendet, stehen sie hier, getrennt nach Kunde. In deiner Objektliste tauchen sie nicht auf.</div>'; return; }
-      var g = {}; l.forEach(function (x) { (g[x.kunde] = g[x.kunde] || []).push(x); });
-      el.innerHTML = Object.keys(g).map(function (kn) {
-        return '<div class="pk-gruppe">Von Kunden freigegeben › ' + esc(kn) + '</div>' + g[kn].map(function (x) {
-          return '<div class="pk-zeile"><div class="pk-name"><b>' + esc(x.name || x.seq_no || 'Objekt') + '</b><small>' + esc([x.seq_no, x.ort].filter(Boolean).join(' · ')) + ' · Stand ' + x.stand_nr + ' vom ' + datum(x.stand_am) + (x.ueber_bestand ? ' · als Bestand gesendet' : '') + (x.getrennt_am ? ' · nicht mehr verbunden' : '') + '</small></div>' +
-            (x.gelesen_am ? '' : '<span class="pk-chip gruen">neu</span>') + (x.deal_won ? '<span class="pk-chip">Bestand</span>' : '<span class="pk-chip grau">Ankauf</span>') +
-            '<button type="button" class="pk-btn klein gold" data-laden="' + x.kopie_object_id + '" data-s="' + x.share_id + '">Laden</button>' +
-            '<button type="button" class="pk-btn klein" data-ueb="' + x.share_id + '">Als eigenes Objekt übernehmen</button></div>';
-        }).join('');
+      /* v3392 · Marcel 15.11.: „Unter Freigegeben fehlt mir, von welchem Kunden was freigegeben wurde.“
+         Je Kunde ein Kopf (Name, E-Mail, Art des Zugangs), je Stand Objekt mit Anschrift, Art und Datum; Kundenfilter. */
+      var g = {}, reihe = [];
+      l.forEach(function (x) { var s = x.client_id || x.kunde; if (!g[s]) { g[s] = []; reihe.push(s); } g[s].push(x); });
+      if (PK.filter && !g[PK.filter]) PK.filter = null;
+      function adresse(x) { var a = [[x.str, x.hnr].filter(Boolean).join(' '), [x.plz, x.ort].filter(Boolean).join(' ')].filter(Boolean).join(', '); return a || x.name || x.seq_no || 'Objekt'; }
+      var h = reihe.length > 1 ? '<div class="pk-filter" role="group" aria-label="Kunde"><button type="button" data-f=""' + (PK.filter ? '' : ' class="an"') + '>Alle Kunden</button>' +
+        reihe.map(function (s) { var neu = g[s].filter(function (x) { return !x.gelesen_am; }).length; return '<button type="button" data-f="' + esc(s) + '"' + (PK.filter === s ? ' class="an"' : '') + '>' + esc(g[s][0].kunde || g[s][0].kunde_email) + (neu ? ' · ' + neu + ' neu' : '') + '</button>'; }).join('') + '</div>' : '';
+      h += reihe.filter(function (s) { return !PK.filter || PK.filter === s; }).map(function (s) {
+        var e = g[s], k = e[0];
+        return '<div class="pk-karte" style="margin-bottom:14px"><div class="pk-kundenkopf"><b>' + esc(k.kunde || k.kunde_email) + '</b><small>' + esc([k.kunde ? k.kunde_email : '', k.kunde_platz_art === 'platz' ? 'Partnerplatz' : 'eigener Plan', e.length + (e.length === 1 ? ' Objekt freigegeben' : ' Objekte freigegeben'), k.getrennt_am ? 'getrennt' : ''].filter(Boolean).join(' · ')) + '</small></div>' +
+          e.map(function (x) {
+            var art = (x.ueber_bestand || x.deal_won ? 'Bestand' : 'Ankauf') + (x.objart ? ', ' + x.objart : '');
+            var stand = x.stand_nr > 1 ? 'Stand ' + x.stand_nr + ', aktualisiert' : 'erster Stand';
+            return '<div class="pk-zeile"><div class="pk-name"><b>' + esc(adresse(x)) + '</b><small>' + esc([x.seq_no, art, stand, 'freigegeben am ' + datum(x.stand_am)].filter(Boolean).join(' · ')) + '</small></div>' +
+              (x.gelesen_am ? '' : '<span class="pk-chip gruen">neu</span>') +
+              '<button type="button" class="pk-btn klein gold" data-laden="' + x.kopie_object_id + '" data-s="' + x.share_id + '">Ansehen</button>' +
+              '<button type="button" class="pk-btn klein" data-ueb="' + x.share_id + '">Als eigenes Objekt übernehmen</button></div>';
+          }).join('') + '</div>';
       }).join('');
+      el.innerHTML = h;
+      [].forEach.call(el.querySelectorAll('[data-f]'), function (b) { b.onclick = function () { PK.filter = b.getAttribute('data-f') || null; staendeZeichnen(el); }; });
       [].forEach.call(el.querySelectorAll('[data-laden]'), function (b) {
         b.onclick = function () {
           api('/partner/kundenstaende/' + b.getAttribute('data-s') + '/geoeffnet', { method: 'POST' }).catch(function () {});
