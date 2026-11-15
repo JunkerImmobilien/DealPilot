@@ -59,7 +59,7 @@
       '.dpw-bildknopf{align-self:flex-start;border:1px solid #E3D9C4;background:#fff;border-radius:8px;padding:5px 10px;font:500 12.5px Inter,sans-serif;cursor:pointer;color:#2A2727}',
       '.dpw-bilder a{display:block;border:1px solid #E3D9C4;border-radius:8px;overflow:hidden;line-height:0}',
       '.dpw-bilder img{width:100%;height:auto}',
-      '.dpw-filter button{border:1px solid #E3D9C4;background:#fff;border-radius:20px;padding:4px 11px;font:500 12px Inter,sans-serif;cursor:pointer;color:#2A2727}',
+      '.dpw-filter button{border:1px solid #E3D9C4;background:#fff;border-radius:8px;/* v3410 */ padding:4px 11px;font:500 12px Inter,sans-serif;cursor:pointer;color:#2A2727}',
       '.dpw-filter button.an{background:#2A2727;color:#FDFCFA;border-color:#2A2727}',
       '@media (max-width:600px){.dpw-hg{padding:12px 8px}.dpw-reihe,.dpw-w-pflege{grid-template-columns:1fr}.dpw-kopf,.dpw-inhalt{padding-left:16px;padding-right:16px}}'
     ].join('\n');

@@ -191,14 +191,14 @@
   display: inline-flex;
   background: var(--dp-card);
   border: 1px solid var(--dp-line);
-  border-radius: 999px;
+  border-radius: 10px; /* v3410: Umschalter mit Ecken wie die Knoepfe in den Reitern */
   padding: 4px;
   gap: 4px;
 }
 .dp-toggle-btn {
   background: transparent;
   border: 0;
-  border-radius: 999px;
+  border-radius: 8px; /* v3410 */
   padding: 11px 22px;
   font-size: 14px;
   font-weight: 600;

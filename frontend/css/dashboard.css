@@ -1542,7 +1542,7 @@ body.dp-theme-dark #dashboard-main .dp-pp-chip:hover{
 #dashboard-main .ke2-h{display:flex;align-items:center;gap:9px;margin-bottom:12px}
 #dashboard-main .ke2-nr{flex:0 0 22px;width:22px;height:22px;border-radius:6px;background:#2A2727;color:var(--wl-e8cc7a, #E8CC7A);font:700 11px/22px 'JetBrains Mono',monospace;text-align:center}
 #dashboard-main .ke2-t{font:600 15px/1.2 'Space Grotesk',sans-serif;color:var(--c-ink)}
-#dashboard-main .ke2-mehr{margin-left:auto;border:1px solid var(--border,#E0DBD3);background:none;border-radius:999px;padding:4px 11px;font:600 11px Inter,system-ui,sans-serif;color:var(--c-accd-txt);cursor:pointer}
+#dashboard-main .ke2-mehr{margin-left:auto;border:1px solid var(--border,#E0DBD3);background:none;border-radius:8px;/* v3410: Knopf wie in den Reitern */padding:4px 11px;font:600 11px Inter,system-ui,sans-serif;color:var(--c-accd-txt);cursor:pointer}
 #dashboard-main .ke2-mehr:hover{border-color:var(--wl-c9a84c, #C9A84C)}
 #dashboard-main .ke2-row{display:grid;gap:10px}
 #dashboard-main .ke2-4{grid-template-columns:repeat(4,minmax(0,1fr))}

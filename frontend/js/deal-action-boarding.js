@@ -427,7 +427,7 @@
     var chips;
     if (d.missing && d.missing.length) {
       // v856: kompakte Chips mit INLINE-Style (CSS-KOMMT-NICHT-AN-Garantie)
-      var chipStyle = 'font-family:var(--dab-fs),sans-serif;font-size:10px;font-weight:600;padding:3px 10px;border-radius:99px;cursor:pointer;display:inline-flex;align-items:center;gap:5px;color:#6fd6a0;background:rgba(111,214,160,.12);border:1px solid rgba(111,214,160,.45);line-height:1.4';
+      var chipStyle = 'font-family:var(--dab-fs),sans-serif;font-size:10px;font-weight:600;padding:3px 10px;border-radius:8px;cursor:pointer;display:inline-flex;align-items:center;gap:5px;color:#6fd6a0;background:rgba(111,214,160,.12);border:1px solid rgba(111,214,160,.45);line-height:1.4';
       chips = '<div class="dab-chips"><span class="dab-chips-lbl">Fehlt (Grundfeld):</span>' +
         d.missing.map(function (m) {
           return '<button type="button" class="dab-chip" style="' + chipStyle + '" onclick="DealPilotReadyCheck.jump(\'' + esc(m.key) + '\')"><span style="width:5px;height:5px;border-radius:50%;background:currentColor;box-shadow:0 0 4px currentColor;flex-shrink:0"></span>' + esc(m.name) + '</button>';
@@ -1507,7 +1507,7 @@
     '#s8 .dab-cap{font-size:11.5px;color:rgba(255,255,255,.45);line-height:1.5;margin-top:16px;padding-top:13px;border-top:1px solid rgba(255,255,255,.07)}#s8 .dab-cap b{color:rgba(255,255,255,.72)}',
     '#s8 .dab-chips{display:flex;gap:7px;flex-wrap:wrap;align-items:center;margin-top:10px}',
     '#s8 .dab-chips-lbl{font-family:var(--dab-fs);font-size:9.5px;letter-spacing:1.2px;text-transform:uppercase;color:rgba(255,255,255,.4)}',
-    '#s8 .dab-chip{font-family:var(--dab-fs);font-size:11px;font-weight:600;padding:5px 12px;border-radius:99px;cursor:pointer;transition:.16s;display:inline-flex;align-items:center;gap:6px;color:var(--dab-m2);background:rgba(111,214,160,.1);border:1px solid rgba(111,214,160,.4)}',
+    '#s8 .dab-chip{font-family:var(--dab-fs);font-size:11px;font-weight:600;padding:5px 12px;border-radius:8px;/* v3410: Knopf, Ecken wie in den Reitern */ cursor:pointer;transition:.16s;display:inline-flex;align-items:center;gap:6px;color:var(--dab-m2);background:rgba(111,214,160,.1);border:1px solid rgba(111,214,160,.4)}',
     '#s8 .dab-chip:hover{background:rgba(111,214,160,.22)}#s8 .dab-chip .x{width:6px;height:6px;border-radius:50%;background:currentColor;box-shadow:0 0 5px currentColor}',
     '#s8 .dab-allset{font-family:var(--dab-fs);font-size:12.5px;font-weight:600;color:var(--dab-m2);margin-top:10px}',
     '#s8 #dab-uew-slot .da-stage{margin-top:6px}',

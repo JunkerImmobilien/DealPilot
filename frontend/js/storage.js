@@ -3534,7 +3534,7 @@ function _dpModalCss(){
     '.dpm-shell .bank-sum-card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--dp-runway)}',
     '.dpm-shell .bank-sum-label{font-family:\'JetBrains Mono\',monospace;font-size:9.5px;letter-spacing:1.3px;text-transform:uppercase;color:var(--dp-ink-soft);margin-bottom:7px}',
     '.dpm-shell .bank-sum-val{font-family:\'Space Grotesk\',sans-serif;font-weight:700;font-size:21px;color:var(--dp-accent-lo)}',
-    '.dpm-btn{display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:10px 17px;font-weight:600;font-size:13px;cursor:pointer;border:1px solid var(--dp-line);background:#fff;color:var(--dp-ink)}.dpm-btn svg{width:15px;height:15px}.dpm-btn:hover{border-color:var(--dp-accent)}',
+    '.dpm-btn{display:inline-flex;align-items:center;gap:8px;border-radius:8px;/* v3410: Ecken wie .btn in den Reitern (8 px), vorher Pille 999 px */ padding:10px 17px;font-weight:600;font-size:13px;cursor:pointer;border:1px solid var(--dp-line);background:#fff;color:var(--dp-ink)}.dpm-btn svg{width:15px;height:15px}.dpm-btn:hover{border-color:var(--dp-accent)}',
     '.dpm-btn.primary{background:var(--dp-runway);color:#1a1508;border-color:transparent}',
     '.dpm-shell .bank-table-full thead th{background:var(--dp-obsidian);color:var(--dp-accent-hi);font-family:\'JetBrains Mono\',monospace;font-size:9px;letter-spacing:.5px;text-transform:uppercase}',
     '.dpm-shell .trackrec-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:14px 0}',

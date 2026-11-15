@@ -998,6 +998,11 @@ window.DealPilotOnboarding = (function () {
       '<div class="dpo-kasten" role="dialog" aria-modal="true" aria-labelledby="dpo-titel">'
       + '<div class="dpo-kopf">'
       +   '<div class="dpo-marke">DealPilot</div>'
+      /* v3410 · Schliessen-Knopf wie in allen Fenstern (Marcel 15.11.2026: „das soll einheitlich
+         aussehen"). Schliessen heisst „spaeter weiter", nicht „erledigt" - siehe _schliessen(). */
+      +   '<button type="button" class="dpo-zu" id="dpo-zu" aria-label="Schließen" title="Schließen – beim nächsten Start geht es hier weiter">'
+      +     '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>'
+      +   '</button>'
       +   '<div class="dpo-schritte" id="dpo-schritte"></div>'
       + '</div>'
       + '<div class="dpo-leib">'
@@ -1109,6 +1114,7 @@ window.DealPilotOnboarding = (function () {
       if (ev.target.id === 'dpo-weiter') { _sichern(); _vor(); return; }
       if (ev.target.id === 'dpo-zurueck') { _sichern(); _zurueck(); return; }
       if (ev.target.id === 'dpo-ueberspringen') { _vor(); return; }
+      if (ev.target.closest && ev.target.closest('#dpo-zu')) { _schliessen(); return; }
     });
   }
 
@@ -1420,6 +1426,17 @@ window.DealPilotOnboarding = (function () {
     } catch (e) { window._dpEmptyCardSaving = false; }
   }
 
+  /* v3410 · Schliessen ohne Abschluss. Der FERTIG-Merker bleibt UNGESETZT (lokal und damit auch
+     im Konto-Abgleich konto-stammdaten.js, der nur onboarding_fertig hochlaedt): beim naechsten
+     Laden oder Anmelden kommt die Einrichtung wieder, und zwar am gemerkten Schritt. Nichts wird
+     gesichert, was nicht schon „Weiter" gesichert hat - wie „Diesen Schritt überspringen".
+     Der Rundgang startet nicht (tour-engine.js wartet auf istFertig()). */
+  function _schliessen() {
+    _lsSet(_schrittKey(), String(_schritt));
+    try { window.__dpOnboardingAktiv = false; } catch (e) {}
+    if (_ov) { _ov.remove(); _ov = null; }
+  }
+
   function _abschliessen() {
     /* v2249: der Haken im letzten Schritt entscheidet ueber den Rundgang.
        Gelesen, BEVOR das Fenster verschwindet. Fehlt er (alter Stand),
@@ -1458,6 +1475,15 @@ window.DealPilotOnboarding = (function () {
       '.dpo-kopf{background:linear-gradient(110deg,var(--wl-e8cc7a,#E8CC7A),var(--wl-c9a84c,#C9A84C) 55%,var(--wl-b8932f,#b8932f));padding:13px 20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}',
       '.dpo-marke{font-family:"Space Grotesk",Inter,sans-serif;font-weight:700;font-size:15px;color:#1a1508;letter-spacing:.2px}',
       '.dpo-schritte{display:flex;gap:12px;flex-wrap:wrap;margin-left:auto}',
+      /* v3410 · Schliessen wie der Haus-Knopf (v3358/v3370, .dp-band-close in Einstellungen und Hilfe):
+         quadratisch 32 px, Radius 9 px, dunkle Flaeche mit Goldkante; auf dem Handy 44 px.
+         Steht im DOM VOR den Schritten, damit er auf dem Handy oben rechts bleibt, wenn die Schritte
+         auf eine eigene Zeile brechen; am Rechner rueckt er per order ans Ende. */
+      '#dp-onboarding .dpo-zu{order:3;flex:0 0 32px;width:32px;height:32px;padding:0;margin:0;box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center;'
+        + 'background:#17130d;border:1.5px solid var(--wl-e8cc7a,rgba(232,204,122,.8));color:var(--gold-hi,var(--wl-e8cc7a,#E8CC7A));border-radius:9px;box-shadow:0 2px 8px rgba(0,0,0,.35);cursor:pointer;line-height:1}',
+      '#dp-onboarding .dpo-zu svg{width:15px;height:15px;pointer-events:none}',
+      '#dp-onboarding .dpo-zu:hover{background:var(--gold,var(--wl-c9a84c,#C9A84C));border-color:var(--gold-hi,var(--wl-e8cc7a,#E8CC7A));color:#1a1508}',
+      '#dp-onboarding .dpo-zu:focus-visible{outline:2px solid #1a1508;outline-offset:2px}',
       '.dpo-pkt{display:flex;align-items:center;gap:5px;font-family:"JetBrains Mono",monospace;font-size:9.5px;letter-spacing:.6px;text-transform:uppercase;color:rgba(26,21,8,.5)}',
       '.dpo-pkt i{width:7px;height:7px;border-radius:50%;background:rgba(26,21,8,.25);display:block}',
       '.dpo-pkt.an{color:#1a1508;font-weight:700}.dpo-pkt.an i{background:#1a1508}',
@@ -1589,13 +1615,14 @@ window.DealPilotOnboarding = (function () {
       '.dpo-eh{position:absolute;right:10px;font-family:"JetBrains Mono",monospace;font-size:10px;color:#9a948a;pointer-events:none;background:#fff;padding-left:5px}',
       '.dpo-rechner{margin-top:18px;background:#F6F2E6;border:1px solid #E8E1CE;border-radius:11px;padding:14px}',
       '.dpo-r-kopf{font-weight:600;font-size:13px;margin-bottom:10px;color:#1b1815}',
-      '.dpo-r-btn{border:1.5px solid var(--wl-c9a84c,#C9A84C);background:#fff;color:#1b1815;border-radius:9px;padding:9px 14px;font:inherit;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap}',
+      '.dpo-r-btn{border:1.5px solid var(--wl-c9a84c,#C9A84C);background:#fff;color:#1b1815;border-radius:8px;padding:9px 14px;font:inherit;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap}',
       '.dpo-r-erg{margin-top:10px;font-size:13.5px;color:#1b1815;display:flex;align-items:center;gap:10px;flex-wrap:wrap}',
       '.dpo-r-uebernehmen{border:none;background:var(--wl-c9a84c,#C9A84C);color:#1a1508;border-radius:7px;padding:5px 11px;font:inherit;font-size:12px;font-weight:700;cursor:pointer}',
       '.dpo-r-fehl{color:#B8625C}.dpo-r-ok{color:#3FA56C;font-weight:600}',
       '.dpo-fuss-leiste{border-top:1px solid #EDE8DC;padding:13px 20px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:#fff}',
       '.dpo-fuss-r{margin-left:auto;display:flex;gap:9px}',
-      '.dpo-b{border-radius:10px;padding:10px 18px;font:inherit;font-size:13.5px;font-weight:600;cursor:pointer;border:1.5px solid transparent}',
+      /* v3410: Knoepfe 8 px wie .btn in den Reitern (vorher 10 / 9 px) */
+      '.dpo-b{border-radius:8px;padding:10px 18px;font:inherit;font-size:13.5px;font-weight:600;cursor:pointer;border:1.5px solid transparent}',
       '.dpo-b-still{background:transparent;color:#7A7370;border-color:#E7E2D6}',
       '.dpo-b-still:hover{color:#1b1815;border-color:#C9C3B6}',
       '.dpo-b-gold{background:linear-gradient(110deg,var(--wl-e8cc7a,#E8CC7A),var(--wl-c9a84c,#C9A84C) 55%,var(--wl-b8932f,#b8932f));color:#1a1508;border:none}',
@@ -1657,7 +1684,8 @@ window.DealPilotOnboarding = (function () {
       '  .dpo-ov{padding:0;align-items:stretch}',
       '  .dpo-kasten{border-radius:0;max-height:100vh;width:100%}',
       '  .dpo-kacheln,.dpo-kacheln-3,.dpo-raster,.dpo-raster-2,.dpo-raster-3{grid-template-columns:1fr;max-width:none}',
-      '  .dpo-schritte{margin-left:0;width:100%;gap:8px}',
+      '  .dpo-schritte{margin-left:0;width:100%;gap:8px;order:4}',
+      '  #dp-onboarding .dpo-zu{order:2;margin-left:auto}',   /* v3410 */
       '  .dpo-pkt{font-size:8.5px}',
       '  .dpo-leib{padding:16px}',
       '  .dpo-leib h2{font-size:18px}',
@@ -1665,7 +1693,9 @@ window.DealPilotOnboarding = (function () {
       '  .dpo-fuss-r{margin-left:0;width:100%}',
       '  .dpo-b{flex:1;padding:12px 14px;text-align:center}',
       '  .dpo-b-still#dpo-ueberspringen{width:100%;order:9}',
-      '}'
+      '}',
+      /* v3410 · Handy-Grenze des Haus-Knopfs ist 640 px (style.css v3370), nicht die 680 des Kastens */
+      '@media(max-width:640px){#dp-onboarding .dpo-zu{flex:0 0 44px;width:44px;height:44px}}'
     ].join('\n');
     document.head.appendChild(s);
   }
