@@ -949,32 +949,38 @@
     var panel = function (id, inner, aktiv, extra) { return '<section class="dp-pa-panel' + (aktiv ? ' active' : '') + '" id="dp-pa-' + id + '"' + (extra || '') + '>' + inner + '</section>'; };
     var reiter = [], inhalt = [];
     var add = function (id, lbl, inner, opt) { opt = opt || {}; if (!inner && !opt.leer) return; reiter.push(tab(id, lbl, !reiter.length, opt.tabExtra)); inhalt.push(panel(id, inner, inhalt.length === 0)); };
+    /* v3420 · Marcel 15.11.2026 („ja Jahresabgleich zuerst"): im Bestand 7 statt 11 Unterreiter, der Jahresabgleich
+       vorn; im Ankauf 8 statt 10. Zusammengelegt wird nur die Hülle: jeder bisherige Teil steht mit seiner alten
+       Kennung (#dp-pa-loc, #dp-pa-pot, #dp-pa-risk …) als Abschnitt im neuen Reiter, damit pa-potenzial.js,
+       ui.js (_dpVerlaufLocLine) und Wegweiser-Karten ihn weiter finden. Vorlage: design/Vorschläge/pilot-analyse-demo.html */
+    var teil = function (id, inner, erst) { return inner ? '<div id="dp-pa-' + id + '"' + (erst ? '' : ' class="dp-pa4-mt" style="margin-top:18px"') + '>' + inner + '</div>' : ''; };
+    if (bestand && o.jahre) {
+      add('jahr', 'Jahresabgleich', '<div data-dp-ja-host="1"></div><div style="margin-top:18px"></div>' + o.jahre);
+      try { setTimeout(function () { if (window.DpJahresabgleich) window.DpJahresabgleich.mountAll(); if (window.DpJahresbuch) window.DpJahresbuch.mountAll(); }, 0); } catch (eJ) {}
+    }
     add('uebersicht', 'Übersicht', o.uebersicht);
-    add('si', bestand ? 'Ankauf · Bestand · Soll · Zielbild' : 'Ankauf · Soll · Zielbild', o.si ? '<div class="dp-pa-e dp-pa4-mini" data-dp-pa4-mini="abz"></div>' + o.si : o.si);
-    /* v3363 · E2: Unterreiter „Jahre" (jahresbuch.js), nur im Bestand - gefüllt beim Öffnen (_dpPaTab) */
-    if (bestand && o.jahre) { add('jahre', 'Jahre', o.jahre); try { setTimeout(function () { if (window.DpJahresbuch) window.DpJahresbuch.mountAll(); }, 0); } catch (eJ) {} }
-    /* Wert & Verlauf erscheint wie bisher erst mit einem Bericht oder Abruf (_dpLoadVerlauf) */
-    reiter.push('<button type="button" class="btn-clean dp-pa-tab" id="dp-pa-tab-wert" style="display:none" onclick="_dpPaTab(\'wert\',this)">Wert &amp; Verlauf</button>');
-    inhalt.push(panel('wert', o.wert, false));
-    add('loc', 'Lage &amp; Markt', o.lage ? '<div class="dp-pa-e dp-pa4-mini" data-dp-pa4-mini="lage"></div>' + kuerzen(o.lage) : o.lage);
-    /* v3323 · zwei neue Reiter: Potenzialanalyse (pa-potenzial.js) und Hausverlauf (hausverlauf.js) */
+    add('si', bestand ? 'Ankauf · Bestand · Zielbild' : 'Ankauf · Soll · Zielbild', o.si ? '<div class="dp-pa-e dp-pa4-mini" data-dp-pa4-mini="abz"></div>' + o.si : o.si);
+    /* Wert & Lage ist immer da (v3420): ohne Bericht mit dem Weg zur KI-Bewertung, darunter Lage & Markt */
+    var mbWeg = '<div class="dp-pa-card"><div class="dp-pa-sec"><span class="dp-pa-bar"></span><span class="dp-pa-lbl">' + (bestand ? 'Wert im Jahresabgleich' : 'Was ist das Objekt wert?') + '</span><span class="dp-pa-rule"></span></div>'
+      + '<p class="dp-pa-p">' + (bestand ? 'Ein Marktbericht im Jahr reicht für den Jahresabgleich. Jeder Bericht bleibt gespeichert und steht unten im Verlauf gegen deinen Plan-Wert.'
+        : 'Der Marktbericht bewertet das Objekt aus amtlichen Daten (Bodenrichtwert, Liegenschaftszins, Sachwertfaktor des Gutachterausschusses) und den Mieten und Angeboten vor Ort.') + '</p>'
+      + '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px"><button type="button" class="btn-clean dp-pa4-btn" onclick="try{if(window.DpJahresabgleich)DpJahresabgleich.mbAbrufen()}catch(e){}">' + (bestand ? 'Neuen Marktbericht abrufen' : 'Objekt mit KI bewerten') + '</button></div></div>';
+    reiter.push('<button type="button" class="btn-clean dp-pa-tab" id="dp-pa-tab-wert" data-dp-pa-immer="1" onclick="_dpPaTab(\'wert\',this)">Wert &amp; Lage</button>');
+    inhalt.push(panel('wert', mbWeg + '<div style="margin-top:14px"></div>' + (o.wert || '') + teil('loc', o.lage ? '<div class="dp-pa-e dp-pa4-mini" data-dp-pa4-mini="lage"></div>' + kuerzen(o.lage) : ''), false));
+    /* v3323 · Potenzialanalyse (pa-potenzial.js) und Hausverlauf (hausverlauf.js) */
     var potH = ''; try { potH = window.DpPaPotenzial ? window.DpPaPotenzial.html(o.analyse || {}, bestand) : ''; } catch (eP) { potH = ''; }
     var hausH = ''; try { hausH = window.DpHausverlauf ? window.DpHausverlauf.html() : ''; } catch (eH) { hausH = ''; }
+    var hausUl = teil('hausv', hausH, true) + teil('unterlagen', unterlagenPanel(o.unterlagen), !hausH);
     if (bestand) {
-      add('pot', 'Potenzialanalyse', potH);
       add('steuer', 'Steuer', o.steuer);
-      add('risk', 'Risiken &amp; Szenarien', o.risiko);
-      add('haus', 'Hausverlauf', hausH);
-      add('unterlagen', 'Unterlagen &amp; WEG', unterlagenPanel(o.unterlagen));
-      add('anschluss', 'Anschluss &amp; Exit', kuerzen(o.anschlussExit));
+      add('haus', 'Haus &amp; Unterlagen', hausUl);
+      add('potx', 'Potenzial &amp; Exit', teil('pot', potH, true) + teil('risk', o.risiko, !potH) + teil('anschluss', kuerzen(o.anschlussExit), !potH && !o.risiko));
     } else {
-      add('risk', 'Risiken &amp; Szenarien', o.risiko);
-      add('pot', 'Potenzialanalyse', potH);
       add('verh', 'Kaufpreis &amp; Offerte', kuerzen(o.verhandlung));
       add('bank', 'Finanzierung &amp; Bank', kuerzen(o.bank));
       add('steuer', 'Steuer', o.steuer);
-      add('haus', 'Hausverlauf', hausH);
-      add('unterlagen', 'Unterlagen &amp; WEG', unterlagenPanel(o.unterlagen));
+      add('haus', 'Haus &amp; Unterlagen', hausUl);
+      add('potx', 'Potenzial &amp; Risiken', teil('pot', potH, true) + teil('risk', o.risiko, !potH));
     }
     var phase = bestand ? 'Bestand' : 'Ankauf', info = '', seit = '';
     try {
@@ -1057,7 +1063,12 @@
     if (gh) {
       ev.preventDefault();
       var wr = gh.closest('.dp-pa-wrap'), id = gh.getAttribute('data-dp-pa4-geh');
-      var tb = wr && [].filter.call(wr.querySelectorAll('.dp-pa-rail .dp-pa-tab'), function (b) { return (b.getAttribute('onclick') || '').indexOf("'" + id + "'") >= 0; })[0];
+      var such = function (k) { return wr && [].filter.call(wr.querySelectorAll('.dp-pa-rail .dp-pa-tab'), function (b) { return (b.getAttribute('onclick') || '').indexOf("'" + k + "'") >= 0; })[0]; };
+      /* v3420 · zusammengelegte Reiter: alte Kennung → neuer Reiter, danach zum Abschnitt rollen */
+      var ALIAS = { loc: 'wert', unterlagen: 'haus', hausv: 'haus', pot: 'potx', risk: 'potx', anschluss: 'potx', jahre: 'jahr' };
+      var tb = such(id), ab = null;
+      if (!tb && ALIAS[id]) { tb = such(ALIAS[id]); ab = id; }
+      if (tb && ab) setTimeout(function () { var z = wr.querySelector('.dp-pa-panel.active #dp-pa-' + ab); if (z) try { z.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (e) {} }, 60);
       if (tb) { tb.click(); try { tb.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' }); wr.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (e) {} }
       return;
     }

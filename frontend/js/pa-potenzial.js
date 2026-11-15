@@ -215,7 +215,7 @@
   ['dp:potenzial', 'dp:potenzial-markt'].forEach(function (ev) { window.addEventListener(ev, function () { setTimeout(neuZeichnen, 0); }); });
   document.addEventListener('click', function (ev) {
     var t = ev.target && ev.target.closest ? ev.target.closest('.dp-pa-wrap[data-dp-pa-v4] .dp-pa-rail .dp-pa-tab') : null;
-    if (t && (t.getAttribute('onclick') || '').indexOf("'pot'") >= 0) setTimeout(neuZeichnen, 0);
+    if (t && (t.getAttribute('onclick') || '').indexOf("'pot") >= 0) setTimeout(neuZeichnen, 0);
   });
 
   window.DpPaPotenzial = { VERSION: 'v3323', html: html, kurz: kurz, daten: daten, neuZeichnen: neuZeichnen };

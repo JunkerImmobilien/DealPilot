@@ -3133,7 +3133,7 @@
         await b2oZeile(s, 'Wer rechnet hier?', 'Die Tabelle rechnet DealPilot. „Neu rechnen“ und „Marktpreise abrufen“ holen frische Werte — das zeigen wir in Modul 26.');
       },
       async function (s) {   /* 6 · Lage & Markt */
-        await r11PaTab(/^Lage/);
+        await r11PaTab(/Lage/);
         var k1 = function () { var p = r11Panel(); return p && p.querySelector('.dp-pa-card'); };
         await zeige(k1, 8);
         if (!r11VerbotenImBild()) await b2oZeile(s, 'Lage und Markt', 'Makro- und Mikrolage recherchiert: Einwohner, Arbeitsmarkt, Nachfrage, Umfeld der Straße.');
@@ -3144,7 +3144,7 @@
         }
       },
       async function (s) {   /* 7 · Risiken & Szenarien */
-        await r11PaTab(/^Risiken/);
+        await r11PaTab(/Risiken/);
         await zeige(r11PanelSel('.dp-pa-cols'), 8);
         await b2oZeile(s, 'Stärken und Risiken', 'Links die Stärken, rechts die Risiken — jeweils kurz begründet, nebeneinander zum Abwägen.');
         var sz = r11Karte(/^Szenarien/i);
@@ -3181,7 +3181,7 @@
         await b2oZeile(s, 'Steuer', (ab ? 'Steuerlich dauerhaft positiv ab <b>' + ab[1] + '</b>. ' : '') + 'Darunter Zusammenfassung, Belege und die Werbungskosten je Jahr. Keine Steuerberatung — der Pilot sagt das auch dazu.');
       },
       async function (s) {   /* 11 · Unterlagen & WEG */
-        await r11PaTab(/^Unterlagen/);
+        await r11PaTab(/Unterlagen/);
         await zeige(function () { var p = r11Panel(); return p && p.querySelector('.dp-pa-card, .dp-pa-d') || p; }, 8);
         await b2oZeile(s, 'Unterlagen & WEG', 'Liegen Wirtschaftsplan, Protokolle oder Mietverträge vor, wertet der Pilot sie hier aus. Wie das Einlesen geht, zeigt Modul 28.');
       },
@@ -7776,7 +7776,7 @@
         await warte(900);
         reiter('s5'); await warte(1200);
         await warteAuf(function () { return q('#ai-content .dp-pa-tab'); }, 8000);
-        await r11PaTab(/^Unterlagen/);
+        await r11PaTab(/Unterlagen/);
         var einf = function () { var p = r11Panel(); return p && p.querySelector('.dpu-umschalter button[data-art="einfach"]'); };
         if (einf()) { einf().click(); await warte(500); }
         await zeige(function () { var p = r11Panel(); return p && p.querySelector('.dpu-umschalter'); }, 8);
@@ -8077,7 +8077,7 @@
     await warteAuf(function () { return [].some.call(document.querySelectorAll('#ai-content .dp-pa-tab'), function (b) { return b.offsetWidth; }); }, kuMit() ? 300000 : 60000);
     var rest = soll - (Date.now() - t0); if (rest > 300) await warte(rest >= 600 * TEMPO ? rest / TEMPO : rest);
     await kmPause(LU_NACH);
-    var ok = await r11PaTab(/^Unterlagen/);
+    var ok = await r11PaTab(/Unterlagen/);
     DPM_KU.messung.paReiter = ok;
     if (!ok) { await kmSag(s, 'Pilot-Analyse', 'Der Reiter „Unterlagen & WEG“ fehlt.', null, 1000); return; }
     var einf = function () { var p = r11Panel(); return p && p.querySelector('.dpu-umschalter button[data-art="einfach"]'); };
@@ -8145,7 +8145,7 @@
     DPM_KU.messung.hgNulVorher = wert('hg_nul');
     reiter('s5'); await warte(900);
     var nb = function () { var p = r11Panel(); return p && p.querySelector('.dpu-nach-btn'); };
-    if (!nb()) { await r11PaTab(/^Unterlagen/); }
+    if (!nb()) { await r11PaTab(/Unterlagen/); }
     if (!nb()) { DPM_KU.messung.nachreichen = 'kein Knopf'; return; }
     var m0 = q('.main-col'); if (m0) m0.scrollTop = 0;
     await luZeige(function () { var p = r11Panel(); return p && (p.querySelector('.dpu-nach') || nb()); }, 8);
@@ -8207,7 +8207,7 @@
     }
     /* der Reiter liest #_dok_auswertung beim Zeichnen - gemessen wird, ob die Änderungen ankommen */
     reiter('s5'); await warte(900);
-    await r11PaTab(/^Unterlagen/);
+    await r11PaTab(/Unterlagen/);
     var aend = function () { var p = r11Panel(); return p && p.querySelector('.dpu-aend'); };
     DPM_KU.messung.aenderungen = aend() ? [].map.call(aend().querySelectorAll('li'), r6Text) : null;
     DPM_KU.messung.aenderungenGespeichert = ((kuUnterlagen() || {}).aenderungen || []).length;
@@ -9399,7 +9399,7 @@
         kegelHoch(false);
         reiter('s5'); await warte(1200);
         await warteAuf(function () { return q('#ai-content .dp-pa-tab'); }, 8000);
-        await r11PaTab(/Potenzialanalyse/);
+        await r11PaTab(/Potenzial/);
         var r1 = await qgbRechnen();
         DPM_QGB.mit = r1 && r1.haus ? { bestand: r1.haus.bestand && r1.haus.bestand.wert, ziel: r1.haus.zielbild && r1.haus.zielbild.wert, rnd: r1.haus.zielbild && r1.haus.zielbild.rnd } : null;
         await warteAuf(function () { var z = qgbZiel(); return z && /Ertragswert/.test(r6Text(z)) && /Maßnahmen/.test(r6Text(z)); }, 8000);
@@ -9442,7 +9442,7 @@
       /* ── B4 · Wert & Verlauf: jeder Marktbericht gegen den Plan-Wert ── */
       async function (s) {
         var t1 = Date.now();
-        await r11PaTab(/Wert & Verlauf/);
+        await r11PaTab(/Wert & (Verlauf|Lage)/);
         var za = function () { var p = r11Panel(); return p && p.querySelector('.dp-pa4-zahlen'); };
         await warteAuf(za, 6000);
         await zeige(za, 8);
@@ -9539,7 +9539,7 @@
       /* ── B6 · Beleihungsspielraum (Exit-Strategien) ── */
       async function (s) {
         var t1 = Date.now();
-        await r11PaTab(/Anschluss/);
+        await r11PaTab(/Anschluss|Exit/);
         var ex = function () { var e = q('#ai-content [data-dp-bestand="exit"]'); return e && e.offsetWidth ? e : null; };
         await warteAuf(function () { return ex() && /Beleihungsspielraum/.test(r6Text(ex())); }, 6000);
         var zl = function (re) { return function () { var e = ex(); return e ? [].filter.call(e.querySelectorAll('tr'), function (tr) { return re.test(r6Text(tr)); })[0] || null : null; }; };

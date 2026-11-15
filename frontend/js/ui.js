@@ -1914,10 +1914,11 @@ window._dpPaTab = function (id, btn) {
        zeigte 15 Kennzahlen und Steuerwirkung -130 €, Einfach 16 und 0 €. Beim Oeffnen
        eines Unterreiters wird beides aus dem heutigen Stand neu gebaut. */
     try { if (window.DpSteuerVerlauf) window.DpSteuerVerlauf.mountAll(); } catch (e2) {}
-    if ((id === 'anschluss' || id === 'exit') && window.DpBestand) { try { window.DpBestand.mountAll(); } catch (e3) {} }   /* v2985 */
+    if ((id === 'anschluss' || id === 'exit' || id === 'potx') && window.DpBestand) { try { window.DpBestand.mountAll(); } catch (e3) {} }   /* v2985 */
     if (window.DpPilotV4 && (id === 'wert' || id === 'steuer')) { try { window.DpPilotV4.neuZeichnen(); } catch (e7) {} }   /* v3099 */
     if (id === 'si' && window.DpJahresstaende) { try { window.DpJahresstaende.mount(); } catch (e4) {} }   /* v2989 */
-    if (id === 'jahre' && window.DpJahresbuch) { try { window.DpJahresbuch.mountAll(); } catch (e8) {} }   /* v3363 */
+    if ((id === 'jahre' || id === 'jahr') && window.DpJahresbuch) { try { window.DpJahresbuch.mountAll(); } catch (e8) {} }   /* v3363 */
+    if (id === 'jahr' && window.DpJahresabgleich) { try { window.DpJahresabgleich.mountAll(); } catch (e9) {} }   /* v3420 */
     if (id === 'si' && typeof window._dpPaSollIstNeu === 'function') {
       var altH = wrap.querySelector('.abw-tafel-host');
       if (altH) {
@@ -3722,7 +3723,7 @@ try { window._buildAIPayload = _buildAIPayload; } catch (e) {}
     if (!body) return;
     _dpVerlaufCss();
     var objKey = (typeof window._currentObjKey === 'string' && window._currentObjKey) ? window._currentObjKey : null;
-    if (!objKey || typeof Auth === 'undefined' || !Auth.apiCall) { if (tabBtn) tabBtn.style.display = 'none'; return; }
+    if (!objKey || typeof Auth === 'undefined' || !Auth.apiCall) { if (tabBtn && !tabBtn.hasAttribute('data-dp-pa-immer')) tabBtn.style.display = 'none'; return; }   /* v3420 · Wert & Lage bleibt stehen */
     /* v2556c · Marcel 21.10.2026: „wenn wir mehr Abrufe machen, dann auch die
        Marktberichte abgelegt werden." Die Abrufe „Marktpreise" (mb.potenzial_abrufe)
        stehen hier mit Datum und Kennzahlen neben den Marktberichten. */
@@ -3750,7 +3751,7 @@ try { window._buildAIPayload = _buildAIPayload; } catch (e) {}
         /* v2217 · Marcel 14.10.2026: „Marktbericht auch erst, wenn wir schon
            einen Report haben." Bis hier erschien der Reiter erst ab ZWEI
            Berichten - mit einem war er unsichtbar, obwohl es einen gab. */
-        if (hist.length < 1 && !abrufe.length) { if (tabBtn) tabBtn.style.display = 'none'; if (wrap) wrap.style.display = 'none'; return; }
+        if (hist.length < 1 && !abrufe.length) { if (tabBtn && !tabBtn.hasAttribute('data-dp-pa-immer')) tabBtn.style.display = 'none'; if (wrap) wrap.style.display = 'none'; return; }
         if (tabBtn) tabBtn.style.display = '';   /* v2842 · erscheint, sobald Bericht ODER Abruf vorliegt */
         if (wrap) wrap.style.display = '';
         if (hist.length < 1) { body.innerHTML = abHtml; return; }
