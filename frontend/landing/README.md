@@ -95,3 +95,14 @@ landing/
 - Pro 99 € / 990 € · ∞ Objekte · 40 KI-Credits/Mo
 
 KI-Credits: 5/2 € · 15/5 € · 40/12 € BELIEBT · 100/25 €
+
+---
+
+## SEO · landing-seo-1 / -2 (15.11.2026)
+
+- Jede indexierbare Seite: eigener `<title>` (≤ 60 Zeichen), `<meta name="description">` (≤ 155, ohne „–“ und „;“), `<link rel="canonical">` auf sich selbst, genau ein `<h1>`.
+- `sitemap.xml` führt nur Seiten, die auf Prod mit EIGENER Größe antworten (der catch-all liefert sonst die Startseite mit 200). lastmod = echter Stand.
+- Neue Seite → Title, Description, canonical, h1, Sitemap. FAQ mit `<details class="fq">` → `node tools/faq-schema.mjs`.
+- Webserver (Caddyfile, nicht im Repo): `…junker-immobilien.io` und `/index.html` leiten per 301 auf `https://dealpilot.immo/…` um, interne Links deshalb auf `/` und `/#anker`, nie `index.html`.
+- `seo.css`: Abschnitt `#software` der Startseite und die Rechner-Seiten.
+- Rechner-Seiten (`*-berechnen.html`): `rechner-kern.js` lädt die App-Kerne mit den Bustern von `index.html`, `rechner.js` bildet nur ab. Seit landing-seo-2 nur auf Staging.
