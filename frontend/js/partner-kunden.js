@@ -380,6 +380,7 @@
     document.documentElement.removeAttribute('data-pk-offen');
   }
   function zurueckZuObjekten() {
+    PK.zurueckMarke = 0;   /* v3452a · der Nutzer will ins Objekt, nicht wieder ins Cockpit */
     cockpitSchliessen();
     if (typeof window.setMainView === 'function') window.setMainView('single');
   }
@@ -387,6 +388,7 @@
   if (window.DealPilotAnsichten) window.DealPilotAnsichten.melde('partner', cockpitSchliessen);
   window.addEventListener('dp:object-ready', function () { if (PK.offen && !PK.hintergrund) zurueckZuObjekten(); });
   document.addEventListener('click', function (e) {
+    try { if (PK.hintergrund && e.target && e.target.closest && e.target.closest('.sb-card, .sb-act-item, nav.tabs .tab, #dppk-tabzeile [data-pk-zurueck]')) PK.zurueckMarke = 0; } catch (x) {}
     if (!PK.offen) return;
     var t = e.target && e.target.closest ? e.target.closest('.sb-card, .sb-act-item') : null;
     if (!t) return;
@@ -1004,11 +1006,18 @@
     /* v3452 · gemessen 15.11.: wer erst lud und dann das Cockpit oeffnete, wartete bis zu 8 s (loadSaved sichert
        vorher) und bekam das Cockpit danach von dp:object-ready wieder zugeklappt. Jetzt: Cockpit sofort, das eigene
        Objekt laedt dahinter; solange gilt dp:object-ready nicht als Wechsel ins Objekt. */
-    var ziel = PK.letztesEigenes;
+    /* v3452a · gemessen: loadSaved stellt beim Laden selbst auf die Objektansicht um (setMainView) und schliesst so das
+       Cockpit. Darum: ist es nach dem Laden zu und hat der Nutzer seitdem nichts anderes angeklickt, wieder oeffnen. */
+    var ziel = PK.letztesEigenes, marke = PK.zurueckMarke = Date.now();
     cockpitOeffnen(reiter);
     if (ziel && ziel !== window._currentObjKey && typeof window.loadSaved === 'function') {
       PK.hintergrund = true;
-      var frei = function () { setTimeout(function () { PK.hintergrund = false; }, 2500); };
+      var frei = function () {
+        setTimeout(function () {
+          PK.hintergrund = false;
+          if (PK.zurueckMarke === marke && !PK.offen) cockpitOeffnen(reiter);
+        }, 900);
+      };
       Promise.resolve(window.loadSaved(ziel)).then(frei, frei);
     }
   }

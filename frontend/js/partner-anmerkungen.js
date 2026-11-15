@@ -99,6 +99,8 @@
       var u = el.querySelector('h1, h2, h3, h4, legend, .title, .card-title, .kpi-label, strong, b');
       var ut = u && (u.textContent || '').trim().replace(/\s+/g, ' ');
       if (ut) return ut.slice(0, 120);
+      var erste = ((el.innerText || '').split(/[\r\n]+/).map(function (s) { return s.trim(); }).filter(Boolean)[0] || '').replace(/\u00ad/g, '');
+      if (erste) return erste.slice(0, 80);
     }
     if (el.id) { var l = document.querySelector('label[for="' + cssEsc(el.id) + '"]'); if (l && l.textContent.trim()) return l.textContent.trim().replace(/\s+/g, ' ').slice(0, 120); }
     var c = el.closest('label, .field, .form-group, .fg, .inp-row, .row, .kpi, .card, fieldset, section');
