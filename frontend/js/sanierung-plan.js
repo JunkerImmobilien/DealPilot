@@ -55,6 +55,28 @@
   /* v3530: Bezeichnungen, die als eigenes Wirtschaftsgut vorgeschlagen werden (Nutzer kann umstellen) */
   var WG_BEZ = /k(ü|ue)che|m(ö|oe)bel|m(ö|oe)blierung|inventar|ger(ä|ae)t|herd|k(ü|ue)hlschrank|sp(ü|ue)lmaschine|waschmaschine|trockner|einrichtung/i;
   var ND_VORGABE = 10, GWG_NETTO = 800;
+  /* v3560 · Marcel 16.11.2026 „ja automatisch umstellen, wenn das richtig ist“: nur EINDEUTIGE Bezeichnungen
+     (die ganze Bezeichnung ist eine bewegliche Sache, optional mit „neue/neuer/neues“) - „Küche Fliesen“,
+     „Küchenrenovierung“, „Küche und Bad“ passen nicht. WG_BEZ oben bleibt der weite Filter für den Hinweis. */
+  var WG_EINDEUTIG = /^(neue[rs]?\s+)?(einbauk(ü|ue)che|k(ü|ue)che|k(ü|ue)chenzeile|m(ö|oe)bel|m(ö|oe)blierung|herd|backofen|k(ü|ue)hlschrank|gefrierschrank|k(ü|ue)hl-?\s?gefrier-?\s?kombination|sp(ü|ue)lmaschine|geschirrsp(ü|ue)ler|geschirrsp(ü|ue)lmaschine|waschmaschine|(w(ä|ae)sche)?trockner|mikrowelle|dunstabzug(shaube)?|kochfeld|ceranfeld)$/i;
+  function eindeutigWG(bez) { return WG_EINDEUTIG.test(String(bez || '').trim().replace(/[.!]+$/, '').replace(/\s+/g, ' ')); }
+  /* v3560 · bestehende Einträge umstellen: nur art 'erhaltung', Art nie von Hand gesetzt (artGesetzt fehlt -
+     vor v3530 gab es das Merkmal nicht, 'erhaltung' war die Vorgabe des Knopfes „+“), Verteilung automatisch
+     (wer 2-5 Jahre gewählt hat, hat sich mit der Erhaltung befasst -> im Zweifel nicht). Danach artGesetzt,
+     damit ein Zurückstellen auf Erhaltung bleibt. Rückgabe: Liste der umgestellten Einträge. */
+  function umstellenAlt(l) {
+    var um = [];
+    (Array.isArray(l) ? l : []).forEach(function (e) {
+      if (!e || e.art !== 'erhaltung' || e.artGesetzt) return;
+      if (e.vert != null && e.vert !== '' && String(e.vert) !== 'auto') return;
+      if (!eindeutigWG(e.bez)) return;
+      e.art = 'wirtschaftsgut'; if (!(zahl(e.nd) > 0)) e.nd = ND_VORGABE;
+      e.artGesetzt = true; e.umgestellt = 'v3560';
+      um.push(e);
+    });
+    return um;
+  }
+  var _gesehen = null, _meldung = null;
 
   function el(id) { return document.getElementById(id); }
   function zahl(v) {
@@ -167,13 +189,30 @@
 
   /* ── Anbindung an das Formular ─────────────────────────────────────────── */
 
+  /* v3560 · Ein Wert, den nicht speichern() geschrieben hat (Laden eines Objekts, storage.js loadData/Reset),
+     wird einmal auf alte Küchen-Einträge geprüft (umstellenAlt). Die Umstellung steht danach im Feld, OHNE
+     input-Ereignis: kein „Änderungen erkannt“, kein eigener Speicherweg. Gespeichert wird sie mit dem nächsten
+     Speichern dieses Objekts (Knopf oder Reiterwechsel, storage.js dpTabSwitchSave) - nie in ein anderes Objekt,
+     denn das Feld gehört dem geöffneten Objekt und loadData/Reset setzen es beim Wechsel neu. */
   function liste() {
-    var f = el(FELD); if (!f || !f.value) return [];
-    try { var l = JSON.parse(f.value); return Array.isArray(l) ? l.filter(function (x) { return x && typeof x === 'object'; }) : []; } catch (e) { return []; }
+    var f = el(FELD); if (!f) return [];
+    if (!f.value) { _gesehen = f.value; _meldung = null; return []; }
+    var l;
+    try { l = JSON.parse(f.value); } catch (e) { return []; }
+    if (!Array.isArray(l)) return [];
+    l = l.filter(function (x) { return x && typeof x === 'object'; });
+    if (f.value !== _gesehen) {
+      var um = umstellenAlt(l);
+      _meldung = um.length ? um : null;
+      if (um.length) f.value = JSON.stringify(l);
+      _gesehen = f.value;
+    }
+    return l;
   }
   function speichern(l, neuZeichnen) {
     var f = el(FELD); if (!f) return;
     f.value = l.length ? JSON.stringify(l) : '';
+    _gesehen = f.value;
     if (!neuZeichnen) _gerendert = f.value;
     try { f.dispatchEvent(new Event('input', { bubbles: true })); } catch (e) {}   /* storage.js: als geändert markieren */
     if (typeof window.calc === 'function') { try { window.calc(); } catch (e) {} }
@@ -270,6 +309,9 @@
           + '</div>';
       }).join('');
       host.innerHTML = '<datalist id="sp-bez-liste">' + BEZ.map(function (b) { return '<option value="' + b + '">'; }).join('') + '</datalist>'
+        + (_meldung ? '<div class="sp-meldung" role="status" style="display:block;margin:6px 0;padding:8px 10px;border-left:3px solid #3FA56C;background:rgba(63,165,108,.10);font-size:12.5px;line-height:1.45">'
+            + _meldung.map(function (e) { return '<b>' + esc(e.bez) + '</b> (' + esc(e.jahr) + ', ' + eur(zahl(e.betrag)) + ')'; }).join(', ')
+            + ' als eigenes Wirtschaftsgut eingeordnet (AfA über ' + ND_VORGABE + ' Jahre), ' + (_meldung.length > 1 ? 'zählen' : 'zählt') + ' nicht mehr zur 15-%-Grenze. Rückgängig: Art wieder auf „Erhaltung“ stellen.</div>' : '')
         + h + '<div class="hint sp-summe" style="display:block;margin-top:6px"></div>'
         + '<button type="button" class="btn btn-sm sp-btn" data-sp-neu="1" style="margin-top:8px">+ Weitere Sanierung hinzufügen</button>';
     }
@@ -338,7 +380,7 @@
   /** v3530: Art-Vorschlag aus der Bezeichnung; null = nichts zu ändern */
   function vorschlagArt(e) {
     if (!e || e.artGesetzt) return null;
-    var wg = WG_BEZ.test(String(e.bez || ''));
+    var wg = eindeutigWG(e.bez);   /* v3560: dieselbe eindeutige Erkennung wie die Umstellung */
     if (wg && e.art !== 'wirtschaftsgut') return 'wirtschaftsgut';
     if (!wg && e.art === 'wirtschaftsgut') return 'erhaltung';   /* Vorschlag zurücknehmen, wenn die Bezeichnung nicht mehr passt */
     return null;
@@ -360,5 +402,5 @@
   }
 
   window.DpSanierungPlan = { liste: liste, jeJahr: jeJahr, steuerJahr: steuerJahr, fensterNetto: fensterNetto, render: render, einmaligText: einmaligText,
-    kern: { jeJahrAus: jeJahrAus, steuerAus: steuerAus, vorschlagArt: vorschlagArt } };   /* kern: für tools/sanierung-pruefen.mjs */
+    kern: { jeJahrAus: jeJahrAus, steuerAus: steuerAus, vorschlagArt: vorschlagArt, eindeutigWG: eindeutigWG, umstellenAlt: umstellenAlt } };   /* kern: für tools/sanierung-pruefen.mjs */
 })();

@@ -15,6 +15,7 @@
      D  15-%-Grenze ueberschritten (Sanierung + Erhaltung im Fenster)
      E  Verdrahtung: storage.js speichert/leert san_plan, calc.js zieht san_y
         im Cashflow ab und nicht in gi, index.html laedt das Modul
+     H  v3560: Altbestand Kueche/Moebel/Geraete wird beim Laden umgestellt, nur eindeutige Bezeichnungen
      G  v3530: eigenes Wirtschaftsgut (Kueche, Moebel, Geraete) - nicht in der
         15-%-Grenze, AfA bewegliche WG ueber die Nutzungsdauer, GWG sofort
 
@@ -121,17 +122,17 @@ for (const [san, txt] of [['', 'ohne Sanierung'], ['20000', 'Sanierung 20.000 un
   const U = umgebung(true);
   U.felder.san.value = '20000';
   melde(nahe(U.jahr(0).erhaltungsaufwand, 20000) && nahe(U.jahr(0).anschaffungsnah, 0), 'D vorher: #san 20.000 allein unter der Grenze -> sofort', [U.jahr(0).erhaltungsaufwand, U.jahr(0).anschaffungsnah]);
-  U.felder.san_plan.value = JSON.stringify([{ bez: 'Kueche', jahr: 2027, betrag: 20000, art: 'erhaltung', vert: 'auto' }]);
+  U.felder.san_plan.value = JSON.stringify([{ bez: 'Bad', jahr: 2027, betrag: 20000, art: 'erhaltung', vert: 'auto' }]);
   melde(nahe(U.jahr(0).erhaltungsaufwand, 0) && nahe(U.jahr(0).anschaffungsnah, 400), 'D #san wird anschaffungsnah: 2026 AfA 400 statt 20.000 sofort', [U.jahr(0).erhaltungsaufwand, U.jahr(0).anschaffungsnah]);
-  melde(nahe(U.jahr(1).anschaffungsnah, 800) && nahe(U.jahr(1).erhaltungsaufwand, 0), 'D 2027: #san 400 + Kueche 400 anschaffungsnah, kein Erhaltungsaufwand', [U.jahr(1).anschaffungsnah, U.jahr(1).erhaltungsaufwand]);
+  melde(nahe(U.jahr(1).anschaffungsnah, 800) && nahe(U.jahr(1).erhaltungsaufwand, 0), 'D 2027: #san 400 + Bad 400 anschaffungsnah, kein Erhaltungsaufwand', [U.jahr(1).anschaffungsnah, U.jahr(1).erhaltungsaufwand]);
   const r = U.sb.DpSanierungPlan.kern.steuerAus(JSON.parse(U.felder.san_plan.value), { A: 2026, grenze: 29700, sanNetto: 20000 / 1.19, ust: 'brutto', afaSatz: 2 });
   melde(r.ueber === true && nahe(r.summeNetto, 40000 / 1.19, 0.5), 'D Kern: ueber = true, Summe 33.613 netto', r);
   /* feste Verteilung bleibt die Wahl des Nutzers - mit Warnung */
-  U.felder.san_plan.value = JSON.stringify([{ bez: 'Kueche', jahr: 2027, betrag: 20000, art: 'erhaltung', vert: '1' }]);
+  U.felder.san_plan.value = JSON.stringify([{ bez: 'Bad', jahr: 2027, betrag: 20000, art: 'erhaltung', vert: '1' }]);
   const r1 = U.sb.DpSanierungPlan.kern.steuerAus(JSON.parse(U.felder.san_plan.value), { A: 2026, grenze: 29700, sanNetto: 20000 / 1.19, ust: 'brutto', afaSatz: 2 });
   melde(r1.behandlung[0].art === 'erhaltung' && r1.behandlung[0].warnung === true, 'D Verteilung "1 Jahr": bleibt Erhaltung, mit Warnung', r1.behandlung[0]);
   /* ausserhalb des Fensters (2030 > 2026 + 3) zaehlt nicht */
-  U.felder.san_plan.value = JSON.stringify([{ bez: 'Kueche', jahr: 2030, betrag: 20000, art: 'erhaltung', vert: 'auto' }]);
+  U.felder.san_plan.value = JSON.stringify([{ bez: 'Bad', jahr: 2030, betrag: 20000, art: 'erhaltung', vert: 'auto' }]);
   melde(nahe(U.jahr(0).erhaltungsaufwand, 20000) && nahe(U.jahr(4).erhaltungsaufwand, 20000), 'D Eintrag 2030 ausserhalb der drei Jahre: zaehlt nicht zur Grenze, sofort 2030', [U.jahr(0).erhaltungsaufwand, U.jahr(4).erhaltungsaufwand]);
   /* Herstellung zaehlt nicht zur Grenze */
   U.felder.san_plan.value = JSON.stringify([{ bez: 'Anbau', jahr: 2027, betrag: 50000, art: 'herstellung' }]);
@@ -192,8 +193,14 @@ for (const [san, txt] of [['', 'ohne Sanierung'], ['20000', 'Sanierung 20.000 un
   const U = umgebung(true), basis = umgebung(false);
   U.felder.san.value = '25000'; basis.felder.san.value = '25000';
   /* vorher: #san 25.000 brutto (21.008 netto) + Kueche 12.000 brutto als Erhaltung 2027 (10.084 netto) = 31.092 > 29.700 */
-  U.felder.san_plan.value = JSON.stringify([{ bez: 'Kueche', jahr: 2027, betrag: 12000, art: 'erhaltung', vert: 'auto' }]);
-  melde(nahe(U.jahr(0).anschaffungsnah, 500) && nahe(U.jahr(0).erhaltungsaufwand, 0), 'G vorher: Kueche 12.000 als Erhaltung reisst die Grenze, #san 25.000 nur 500 AfA statt sofort', [U.jahr(0).anschaffungsnah, U.jahr(0).erhaltungsaufwand]);
+  /* artGesetzt: der Nutzer hat Erhaltung bewusst gewaehlt -> bleibt (v3560), rechnet wie bis v3529 */
+  U.felder.san_plan.value = JSON.stringify([{ bez: 'Küche', jahr: 2027, betrag: 12000, art: 'erhaltung', vert: 'auto', artGesetzt: true }]);
+  melde(nahe(U.jahr(0).anschaffungsnah, 500) && nahe(U.jahr(0).erhaltungsaufwand, 0), 'G vorher (bzw. von Hand Erhaltung): Kueche 12.000 reisst die Grenze, #san 25.000 nur 500 AfA statt sofort', [U.jahr(0).anschaffungsnah, U.jahr(0).erhaltungsaufwand]);
+  /* v3560: derselbe Eintrag OHNE Merkmal (Altbestand) wird beim Laden umgestellt -> Grenze nicht gerissen */
+  U.felder.san_plan.value = JSON.stringify([{ bez: 'Küche', jahr: 2027, betrag: 12000, art: 'erhaltung', vert: 'auto' }]);
+  melde(nahe(U.jahr(0).erhaltungsaufwand, 25000) && nahe(U.jahr(0).anschaffungsnah, 0) && nahe(U.jahr(1).sonst_bewegl_wg - basis.jahr(1).sonst_bewegl_wg, 1200), 'G nach Umstellung (v3560): Altbestand Kueche 12.000 Erhaltung -> WG, #san 25.000 sofort, 2027 AfA bewegl. WG 1.200', [U.jahr(0).erhaltungsaufwand, U.jahr(0).anschaffungsnah, U.jahr(1).sonst_bewegl_wg]);
+  const nachUm = JSON.parse(U.felder.san_plan.value)[0];
+  melde(nachUm.art === 'wirtschaftsgut' && nachUm.nd === 10 && nachUm.artGesetzt === true, 'G Umstellung steht im Feld: art wirtschaftsgut, nd 10, artGesetzt', nachUm);
   U.felder.san_plan.value = JSON.stringify([{ bez: 'Einbaukueche', jahr: 2027, betrag: 12000, art: 'wirtschaftsgut', nd: 10 }]);
   melde(nahe(U.jahr(0).erhaltungsaufwand, 25000) && nahe(U.jahr(0).anschaffungsnah, 0), 'G als Wirtschaftsgut: Grenze nicht gerissen, #san 25.000 sofort', [U.jahr(0).erhaltungsaufwand, U.jahr(0).anschaffungsnah]);
   melde(nahe(U.jahr(1).sonst_bewegl_wg - basis.jahr(1).sonst_bewegl_wg, 1200) && nahe(U.jahr(1).afa, basis.jahr(1).afa) && nahe(U.jahr(1).erhaltungsaufwand, 0), 'G 2027: AfA bewegl. WG + 1.200, Gebaeude-AfA und Erhaltung unveraendert', [U.jahr(1).sonst_bewegl_wg, U.jahr(1).afa, U.jahr(1).erhaltungsaufwand]);
@@ -221,6 +228,36 @@ for (const [san, txt] of [['', 'ohne Sanierung'], ['20000', 'Sanierung 20.000 un
   /* Vorschlag aus der Bezeichnung */
   melde(K.vorschlagArt({ bez: 'Küche', art: 'erhaltung' }) === 'wirtschaftsgut' && K.vorschlagArt({ bez: 'Möbel', art: 'erhaltung' }) === 'wirtschaftsgut' && K.vorschlagArt({ bez: 'Einbauküche', art: '' }) === 'wirtschaftsgut', 'G Vorschlag: Kueche/Moebel/Einbaukueche -> Wirtschaftsgut', null);
   melde(K.vorschlagArt({ bez: 'Küche', art: 'erhaltung', artGesetzt: true }) === null && K.vorschlagArt({ bez: 'Dach', art: 'erhaltung' }) === null, 'G Vorschlag: von Hand gesetzte Art bleibt, Dach bleibt Erhaltung', null);
+}
+
+/* H · v3560 (Marcel 16.11.2026 „ja automatisch umstellen, wenn das richtig ist“): Altbestand nur bei eindeutiger Bezeichnung */
+{
+  const U = umgebung(true), K = U.sb.DpSanierungPlan.kern;
+  const um = (bez, extra) => { const e = Object.assign({ bez, jahr: 2027, betrag: 12000, art: 'erhaltung', vert: 'auto' }, extra || {}); return K.umstellenAlt([e]).length === 1; };
+  const ja = ['Küche', 'Einbauküche', 'Kueche', 'Küchenzeile', 'Möbel', 'Möblierung', 'Herd', 'Backofen', 'Kühlschrank', 'Spülmaschine', 'Geschirrspüler', 'Waschmaschine', 'Trockner', 'neue Einbauküche', ' küche ', 'Küche.'];
+  const nein = ['Küche Fliesen', 'Küchenrenovierung', 'Küche Leitungen', 'Küche Elektrik', 'Küche Wasser', 'Küche und Bad', 'Küche, Bad', 'Bad', 'Dach', 'Fenster', 'Küchenfliesen', 'Herd und Kühlschrank', 'Elektrik Küche', 'Kachelofen', ''];
+  const jaFehl = ja.filter((b) => !um(b)), neinFehl = nein.filter((b) => um(b));
+  melde(!jaFehl.length, 'H umgestellt: ' + ja.length + ' eindeutige Bezeichnungen (Küche, Einbauküche, Küchenzeile, Möbel, Geräte …)', jaFehl);
+  melde(!neinFehl.length, 'H nicht umgestellt: ' + nein.length + ' Arbeiten am Gebäude / Mehrfachbegriffe (Küche Fliesen, Küchenrenovierung, Küche und Bad …)', neinFehl);
+  melde(!um('Küche', { artGesetzt: true }) && !um('Küche', { vert: '3' }) && !um('Küche', { art: 'herstellung' }) && !um('Küche', { art: '' }), 'H nicht umgestellt: von Hand gesetzt, Verteilung 3 Jahre, Herstellung, ohne Art', null);
+  /* Ablauf im Feld: einmal beim Laden, kein input-Ereignis, zweiter Lauf aendert nichts */
+  let ereignisse = 0; U.felder.san_plan.dispatchEvent = () => { ereignisse++; };
+  const alt = JSON.stringify([{ bez: 'Einbauküche', jahr: 2027, betrag: 12000, art: 'erhaltung', vert: 'auto' }, { bez: 'Küche Fliesen', jahr: 2027, betrag: 3000, art: 'erhaltung', vert: 'auto' }]);
+  U.felder.san_plan.value = alt;
+  const l1 = U.sb.DpSanierungPlan.liste();
+  melde(l1[0].art === 'wirtschaftsgut' && l1[1].art === 'erhaltung' && ereignisse === 0, 'H Laden: Einbaukueche umgestellt, Kueche Fliesen bleibt Erhaltung, kein input-Ereignis (kein Dirty)', { l1, ereignisse });
+  const w1 = U.felder.san_plan.value; U.sb.DpSanierungPlan.liste();
+  melde(U.felder.san_plan.value === w1, 'H zweiter Aufruf: Feld unveraendert', null);
+  /* Nutzer stellt zurueck auf Erhaltung (artGesetzt bleibt) -> neues Laden stellt NICHT wieder um */
+  const zur = JSON.parse(w1); zur[0].art = 'erhaltung'; U.felder.san_plan.value = JSON.stringify(zur);
+  melde(U.sb.DpSanierungPlan.liste()[0].art === 'erhaltung', 'H zurueckgestellt auf Erhaltung: bleibt beim naechsten Laden', U.felder.san_plan.value);
+  /* Bitgleich: Liste ohne eindeutige Eintraege -> Feldwert byte-gleich, Steuer wie ohne Umstellung */
+  const ohne = JSON.stringify([{ bez: 'Küche Fliesen', jahr: 2027, betrag: 3000, art: 'erhaltung', vert: 'auto' }, { bez: 'Dach', jahr: 2028, betrag: 30000, art: 'herstellung' }]);
+  U.felder.san_plan.value = ohne; U.sb.DpSanierungPlan.liste();
+  melde(U.felder.san_plan.value === ohne, 'H ohne eindeutige Eintraege: Feldwert byte-gleich (nichts umgeschrieben)', U.felder.san_plan.value);
+  /* storage.js: Speichern nur ueber Knopf/Reiterwechsel, input-Tracking markiert dirty - Vertrag, auf den sich die stille Umstellung stuetzt */
+  const st = lies('frontend/js/storage.js');
+  melde(/V47: Auto-Save IST AUS/.test(st) && /window\.dpTabSwitchSave = function/.test(st), 'H storage.js: kein Auto-Save beim Laden, Speichern per Knopf/Reiterwechsel', null);
 }
 
 console.log((fehler ? 'ROT' : 'GRUEN') + ': ' + (geprueft - fehler) + '/' + geprueft + ' Pruefungen bestanden');
