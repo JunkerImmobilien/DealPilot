@@ -26,6 +26,14 @@ if (!/staging/i.test(process.env.APP_URL || process.env.FRONTEND_URL || '')) {
 }
 const QUELLE = 'info@junker-immobilien.io';
 const EMAIL = 'app-bilder@landing-bilder.dealpilot.test';
+/* landing-bilder-1a · die Analyse traegt die Kennung ihres Objekts (_fuer.objekt_id, v2263) - an der Kopie hiesse es sonst
+   „gehoert zu einem anderen Objekt“. Wie messe-drehbuch.js: Kennung entfernen, die App prueft dann nur den Zahlenabdruck. */
+function ohneKennung(ai) {
+  if (!ai) return ai;
+  try { const istText = typeof ai === 'string'; const aj = istText ? JSON.parse(ai) : JSON.parse(JSON.stringify(ai));
+    if (aj && aj._fuer && aj._fuer.objekt_id) { delete aj._fuer.objekt_id; return istText ? JSON.stringify(aj) : aj; } } catch (e) {}
+  return ai;
+}
 const WEG = /^(_ueberf_link|ueberf_ende|ueberf_daten|ueberf_preis|ueberf_restschuld|ueberf_rest_zins|verkehrswert_ueberf|_thumb|_deal_lost.*|paket_.*|kunden_.*|_freigabe.*|partner_.*)$/;
 
 (async () => {
@@ -49,9 +57,19 @@ const WEG = /^(_ueberf_link|ueberf_ende|ueberf_daten|ueberf_preis|ueberf_restsch
     if (vorhanden) { da++; continue; }
     const d = {};
     Object.keys(s).forEach((k) => { if (!WEG.test(k)) d[k] = s[k]; });
-    await objectService.create(u.id, { data: d, aiAnalysis: src.ai_analysis || null, photos: [] });
+    await objectService.create(u.id, { data: d, aiAnalysis: ohneKennung(src.ai_analysis) || null, photos: [] });
     neu++;
   }
+
+  /* Reparatur fuer schon kopierte Objekte (Lauf vor 1a) */
+  let repariert = 0;
+  for (const z of (await query('SELECT id, ai_analysis FROM objects WHERE user_id = $1 AND ai_analysis IS NOT NULL', [u.id])).rows) {
+    const neuAi = ohneKennung(z.ai_analysis);
+    if (JSON.stringify(neuAi) !== JSON.stringify(z.ai_analysis)) {
+      await query('UPDATE objects SET ai_analysis = $2 WHERE id = $1', [z.id, typeof neuAi === 'string' ? neuAi : JSON.stringify(neuAi)]); repariert++;
+    }
+  }
+  console.log('Analyse-Kennung entfernt: ' + repariert);
 
   const tp = (await query('SELECT count(*)::int AS n FROM tax_periods WHERE user_id = $1', [u.id])).rows[0].n;
   if (!tp) {
