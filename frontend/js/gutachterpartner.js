@@ -1,5 +1,5 @@
 /* ════════════════════════════════════════════════════════════════════
-   v3540 · RESTNUTZUNGSDAUER BEIM UNABHAENGIGEN GUTACHTERPARTNER
+   v3540 (v3541: Schliessen-Knopf sichtbar, Auswahl ohne Optionen als Freitext) · RESTNUTZUNGSDAUER BEIM UNABHAENGIGEN GUTACHTERPARTNER
    ════════════════════════════════════════════════════════════════════
    Marcel 16.11.2026. Reiter Steuer › AfA-Satz „Eigenen Satz / Restnutzungsdauer
    eingeben …“ › Box mit den RND-Knoepfen (js/afa-eigen.js). Dort zwei Wege:
@@ -85,7 +85,7 @@
     o.innerHTML = '<div id="gp-fenster" role="dialog" aria-modal="true" style="background:var(--surface,#FDFCFA);color:var(--text,#2A2727);width:min(760px,100%);border-radius:12px;box-shadow:0 18px 60px rgba(0,0,0,.35);padding:18px 20px 16px;font-size:13.5px;line-height:1.45">'
       + '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px"><div><div style="font-weight:700;font-size:17px">' + esc(titel) + '</div>'
       + '<div style="font-size:12px;color:var(--muted,#7A7370)">über unseren unabhängigen Gutachterpartner</div></div>'
-      + '<button type="button" class="btn btn-ghost btn-sm" id="gp-zu" aria-label="Schließen">✕</button></div>'
+      + '<button type="button" id="gp-zu" aria-label="Schließen" style="border:1px solid var(--line,#E6E0D3);background:transparent;color:inherit;border-radius:8px;width:32px;height:32px;font-size:16px;line-height:1;cursor:pointer">✕</button></div>'
       + '<div id="gp-inhalt" style="margin-top:12px">lädt …</div></div>';
     document.body.appendChild(o);
     o.addEventListener('click', function (e) { if (e.target === o) schliessen(); });
@@ -141,7 +141,8 @@
     var hilfe = f.helpText ? '<div style="font-size:11.5px;color:var(--muted,#7A7370);margin-top:2px">' + N(f.helpText) + '</div>' : '';
     var ph = f.placeholder ? ' placeholder="' + N(f.placeholder) + '"' : '';
     var eing;
-    if (f.inputType === 'select' || (opts.length && /^(text|number)$/.test(f.inputType) === false && f.inputType !== 'radio' && f.inputType !== 'multiselect' && f.inputType !== 'checkbox' && f.inputType !== 'file' && f.inputType !== 'array' && f.inputType !== 'textarea')) {
+    /* Auswahl ohne Optionen (weder im Feld noch im Schema): Freitext statt leerer Liste - sonst geht die Vorbelegung verloren */
+    if (f.inputType === 'select' && opts.length) {
       eing = '<select id="' + id + '" style="width:100%"><option value="">– bitte wählen –</option>' + opts.map(function (o) { return '<option value="' + esc(o.value) + '">' + N(o.label) + '</option>'; }).join('') + '</select>';
     } else if (f.inputType === 'radio') {
       eing = '<div id="' + id + '" style="display:flex;gap:14px;flex-wrap:wrap">' + opts.map(function (o, k) { return '<label style="font-weight:400"><input type="radio" name="' + id + '" value="' + esc(o.value) + '" id="' + id + '-' + k + '"> ' + N(o.label) + '</label>'; }).join('') + '</div>';
