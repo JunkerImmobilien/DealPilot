@@ -1,0 +1,56 @@
+{
+  "status": "success",
+  "data": {
+    "requestId": "7ad6322f-8a26-4f3a-a449-27ad2d40d31e",
+    "requestNumber": "EO-2026-000123",
+    "form": {
+      "type": "remaining-useful-life-lite",
+      "version": 1
+    },
+    "status": "initialAssessment",
+    "allowedActions": ["view", "viewResult"],
+    "data": {
+      "requester": {
+        "firstName": "Max",
+        "lastName": "Mustermann",
+        "email": "max.mustermann@example.com",
+        "phoneNumber": "+491701234567"
+      },
+      "property": {
+        "type": "apartment",
+        "address": {
+          "street": "Beispielweg",
+          "streetNumber": "8A",
+          "postalCode": "10115",
+          "city": "Hamburg",
+          "country": "DE"
+        },
+        "constructionYear": 1984
+      },
+      "renovation": {
+        "hasRenovations": true,
+        "year": 2018
+      }
+    },
+    "result": {
+      "status": "available",
+      "finalAverageRUL": 30,
+      "annualDepreciation": 3.33
+    },
+    "attachments": [
+      {
+        "fileId": "file_01HZEXAMPLE",
+        "filename": "grundbuchauszug.pdf",
+        "contentType": "application/pdf",
+        "sizeBytes": 245760,
+        "checksumSha256": "b5f3f7f5e2a4f01df5b1cfbd95d5b2b3c1e9a9bb8ef85f64fb567b3278f0b6b4",
+        "uploadStatus": "accepted",
+        "fieldId": "documents.landRegister",
+        "documentCategory": "Grundbuchauszug",
+        "createdAt": "2026-08-04T12:08:00.000Z"
+      }
+    ],
+    "createdAt": "2026-08-04T12:00:00.000Z",
+    "updatedAt": "2026-08-04T12:10:00.000Z"
+  }
+}

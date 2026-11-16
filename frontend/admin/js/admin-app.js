@@ -921,6 +921,16 @@
               </div>
             </div>
 
+            <div class="action-section" id="zusatz-gp">
+              <h4>Zusatz: Gutachterpartner (Evalion)</h4>
+              <p style="font-size:0.85em;color:var(--text-muted);margin:0 0 8px 0;">Reiter Steuer › Eigener Satz: Ersteinschätzung der Restnutzungsdauer und Gutachtenanfrage beim Partner (Partner Form API). Admins sehen es immer. Preis offen.</p>
+              <div id="zusatz-gp-stand" style="font-size:0.85em;margin:0 0 8px 0;">lädt …</div>
+              <div class="action-row">
+                <button class="btn btn-primary btn-sm" data-action="zusatz-gp-an">Freischalten</button>
+                <button class="btn btn-sm" data-action="zusatz-gp-aus">Abschalten</button>
+              </div>
+            </div>
+
             <div class="action-section" id="zusatz-ep">
               <h4>Zusatz: Backlog-User (Bordbuch)</h4>
               <p style="font-size:0.85em;color:var(--text-muted);margin:0 0 8px 0;">Sieht in der App den Mechaniker neben dem Piloten (Alt+B): Fehler, Wünsche und Ideen mit Screenshot, Markierung und Diktat ins Backlog. Dazu System › Umsetzungswünsche mit der gemeinsamen Liste.</p>
@@ -978,6 +988,8 @@
       $$('[data-action="delete-dsgvo"]')[0].addEventListener('click', () => handleDeleteDsgvo(id, u.email));
       $$('[data-action="zusatz-rk-an"]')[0].addEventListener('click', () => handleZusatzRk(id, true));
       $$('[data-action="zusatz-rk-aus"]')[0].addEventListener('click', () => handleZusatzRk(id, false));
+      $$('[data-action="zusatz-gp-an"]')[0].addEventListener('click', () => handleZusatzGp(id, true));   /* v3540 */
+      $$('[data-action="zusatz-gp-aus"]')[0].addEventListener('click', () => handleZusatzGp(id, false));
       $$('[data-action="zusatz-ep-an"]')[0].addEventListener('click', () => handleZusatzEp(id, true));
       $$('[data-action="zusatz-ep-aus"]')[0].addEventListener('click', () => handleZusatzEp(id, false));
       $$('[data-action="zusatz-flow-an"]')[0].addEventListener('click', () => handleZusatzFlow(id, true));   /* v3289 */
@@ -1056,6 +1068,9 @@
       if (epEl) epEl.innerHTML = (ep && ep.aktiv ? '<span class="pill pill-active">Freigeschaltet</span>' : '<span class="pill pill-plan">Nicht freigeschaltet</span>')
         + (ep && ep.updated_at ? ' <span style="color:var(--text-muted)">geändert ' + fmtDate(ep.updated_at) + (ep.geaendert_von ? ' von ' + escapeHtml(ep.geaendert_von) : '') + '</span>' : '');
       flowZeigen(r.flow, r.flow_linien);   /* v3289 */
+      const gp = r.gutachterpartner, gpEl = $('#zusatz-gp-stand');   /* v3540 */
+      if (gpEl) gpEl.innerHTML = (gp && gp.aktiv ? '<span class="pill pill-active">Freigeschaltet</span>' : '<span class="pill pill-plan">Nicht freigeschaltet</span>')
+        + (gp && gp.updated_at ? ' <span style="color:var(--text-muted)">geändert ' + fmtDate(gp.updated_at) + (gp.geaendert_von ? ' von ' + escapeHtml(gp.geaendert_von) : '') + '</span>' : '');
       const kg = (v) => (v == null ? 'ohne Grenze' : v);
       if (z) {
         if (z.kontingent_rnd != null) $('#zusatz-rk-rnd').value = z.kontingent_rnd;
@@ -1095,6 +1110,17 @@
     try {
       await API.setZusatzFlow(id, { aktiv: aktiv, linien: linien });
       toast(aktiv ? '✓ Flow-Linien gespeichert' : '✓ Flow-Zusatz abgeschaltet', 'success');
+      ladeZusatzRk(id);
+    } catch (err) {
+      toast('Fehler: ' + (err.message || 'unbekannt'), 'error');
+    }
+  }
+
+  /* v3540 · Zusatz Gutachterpartner */
+  async function handleZusatzGp(id, aktiv) {
+    try {
+      await API.setZusatzGutachter(id, aktiv);
+      toast(aktiv ? '✓ Gutachterpartner freigeschaltet' : '✓ Gutachterpartner abgeschaltet', 'success');
       ladeZusatzRk(id);
     } catch (err) {
       toast('Fehler: ' + (err.message || 'unbekannt'), 'error');

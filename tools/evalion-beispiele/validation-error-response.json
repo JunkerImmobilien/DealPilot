@@ -1,0 +1,15 @@
+{
+  "status": "error",
+  "code": "validation_failed",
+  "message": "Die übermittelten Daten konnten nicht validiert werden.",
+  "errors": [
+    {
+      "path": "property.constructionYear",
+      "message": "Das Baujahr muss zwischen 1800 und 2100 liegen."
+    },
+    {
+      "path": "requester.email",
+      "message": "Bitte geben Sie eine gültige E-Mail-Adresse ein."
+    }
+  ]
+}

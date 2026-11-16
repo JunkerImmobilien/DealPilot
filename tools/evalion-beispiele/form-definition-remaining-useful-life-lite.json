@@ -1,0 +1,70 @@
+{
+  "status": "success",
+  "data": {
+    "metadata": {
+      "formType": "remaining-useful-life-lite",
+      "schemaVersion": 1,
+      "revision": "2026-08-05.2",
+      "publishedAt": "2026-08-05T00:00:00.000Z",
+      "locale": "de",
+      "capabilities": ["partialUpdates", "files", "submit", "resultView", "synchronousInitialAssessmentResult"],
+      "submission": {
+        "resultMode": "synchronous",
+        "resultType": "remaining-useful-life-initial-assessment"
+      }
+    },
+    "schema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["requester", "property", "modernizations", "renovation"],
+      "properties": {
+        "requester": { "type": "object", "additionalProperties": false, "required": ["title", "firstName", "lastName", "address", "phoneNumber", "email", "leadSource", "acceptPrivacy"], "properties": { "address": { "type": "object", "properties": { "country": { "type": "string", "enum": ["AL", "AD", "AM", "AT", "AZ", "BY", "BE", "BA", "BG", "HR", "CY", "CZ", "DK", "EE", "FI", "FR", "GE", "DE", "GR", "HU", "IS", "IE", "IT", "KZ", "XK", "LV", "LI", "LT", "LU", "MT", "MD", "MC", "ME", "NL", "MK", "NO", "PL", "PT", "RO", "RU", "SM", "RS", "SK", "SI", "ES", "SE", "CH", "TR", "UA", "GB", "VA"] } } } } },
+        "property": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type", "address", "constructionYear"],
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": ["apartment", "singleFamilyHouse", "apartmentBuilding", "residentialAndCommercialProperty", "commercialProperty", "other"]
+            },
+            "description": { "type": "string" },
+            "address": { "type": "object", "properties": { "country": { "type": "string", "enum": ["AL", "AD", "AM", "AT", "AZ", "BY", "BE", "BA", "BG", "HR", "CY", "CZ", "DK", "EE", "FI", "FR", "GE", "DE", "GR", "HU", "IS", "IE", "IT", "KZ", "XK", "LV", "LI", "LT", "LU", "MT", "MD", "MC", "ME", "NL", "MK", "NO", "PL", "PT", "RO", "RU", "SM", "RS", "SK", "SI", "ES", "SE", "CH", "TR", "UA", "GB", "VA"] } } },
+            "constructionYear": { "type": "integer", "minimum": 1800, "maximum": 2026 }
+          },
+          "allOf": [
+            {
+              "if": { "required": ["type"], "properties": { "type": { "const": "apartment" } } },
+              "then": { "required": ["description"], "properties": { "description": { "type": "string", "minLength": 1 } } }
+            },
+            {
+              "if": { "required": ["type"], "properties": { "type": { "enum": ["commercialProperty", "other"] } } },
+              "then": {
+                "required": ["description"],
+                "properties": {
+                  "description": {
+                    "type": "string",
+                    "enum": ["Büro / Bank / Praxis", "Laden / Geschäftshaus", "Hotel / Gastronomie / Pension", "Lager / Produktion / Werkstatt", "Supermarkt / Autohaus", "Parkhaus / Tiefgarage", "Schule / Kita / Pflegeheim", "Krankenhaus / Klinik", "Sporthalle / Freizeitbad / Heilbad", "Gemeindezentrum / Saalbau / Veranstaltungsgebäude", "Landwirtschaft", "Sonstiges"]
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "modernizations": { "type": "object", "additionalProperties": false, "required": ["roof", "outsideInsulation", "windowsAndExternalDoors", "heatingSystem", "interior", "bathroom", "technicalEquipment", "floorPlan"] },
+        "renovation": { "type": "object", "additionalProperties": false, "required": ["hasRenovations"], "properties": { "hasRenovations": { "type": "string", "enum": ["yes", "no"] }, "year": { "type": "integer", "minimum": 1800, "maximum": 2026 }, "description": { "type": "string" } } }
+      }
+    },
+    "ui": {
+      "groups": [
+        { "id": "propertyType", "order": 1, "label": "Objektart", "fields": [{ "id": "property.type", "path": "/property/type", "order": 1, "label": "Objektart", "inputType": "select", "options": [{ "value": "apartment", "label": "apartment" }, { "value": "singleFamilyHouse", "label": "singleFamilyHouse" }, { "value": "apartmentBuilding", "label": "apartmentBuilding" }, { "value": "residentialAndCommercialProperty", "label": "residentialAndCommercialProperty" }, { "value": "commercialProperty", "label": "commercialProperty" }, { "value": "other", "label": "other" }] }, { "id": "property.description", "path": "/property/description", "order": 2, "label": "Objektbeschreibung", "inputType": "text", "visibleWhen": { "==": [{ "var": "property.type" }, "apartment"] } }, { "id": "property.description", "path": "/property/description", "order": 3, "label": "Objektbeschreibung", "inputType": "select", "options": [{ "value": "Büro / Bank / Praxis", "label": "Büro / Bank / Praxis" }, { "value": "Laden / Geschäftshaus", "label": "Laden / Geschäftshaus" }, { "value": "Hotel / Gastronomie / Pension", "label": "Hotel / Gastronomie / Pension" }, { "value": "Lager / Produktion / Werkstatt", "label": "Lager / Produktion / Werkstatt" }, { "value": "Supermarkt / Autohaus", "label": "Supermarkt / Autohaus" }, { "value": "Parkhaus / Tiefgarage", "label": "Parkhaus / Tiefgarage" }, { "value": "Schule / Kita / Pflegeheim", "label": "Schule / Kita / Pflegeheim" }, { "value": "Krankenhaus / Klinik", "label": "Krankenhaus / Klinik" }, { "value": "Sporthalle / Freizeitbad / Heilbad", "label": "Sporthalle / Freizeitbad / Heilbad" }, { "value": "Gemeindezentrum / Saalbau / Veranstaltungsgebäude", "label": "Gemeindezentrum / Saalbau / Veranstaltungsgebäude" }, { "value": "Landwirtschaft", "label": "Landwirtschaft" }, { "value": "Sonstiges", "label": "Sonstiges" }], "visibleWhen": { "in": [{ "var": "property.type" }, ["commercialProperty", "other"]] } }] },
+        { "id": "constructionYear", "order": 2, "label": "Baujahr", "fields": [{ "id": "property.constructionYear", "path": "/property/constructionYear", "order": 1, "label": "Baujahr", "inputType": "number" }] },
+        { "id": "modernizations", "order": 3, "label": "Modernisierungen", "fields": [{ "id": "modernizations.roof", "path": "/modernizations/roof", "order": 1, "label": "Dach", "inputType": "select" }, { "id": "modernizations.floorPlan.scopeOfChanges", "path": "/modernizations/floorPlan/scopeOfChanges", "order": 9, "label": "Umfang der Grundrissänderung", "inputType": "select" }] },
+        { "id": "renovation", "order": 4, "label": "Kernsanierung", "fields": [{ "id": "renovation.hasRenovations", "path": "/renovation/hasRenovations", "order": 1, "label": "Wurde das Objekt kernsaniert?", "inputType": "radio" }, { "id": "renovation.year", "path": "/renovation/year", "order": 2, "label": "Jahr der Kernsanierung", "inputType": "number", "visibleWhen": { "==": [{ "var": "renovation.hasRenovations" }, "yes"] } }, { "id": "renovation.description", "path": "/renovation/description", "order": 3, "label": "Beschreibung der Kernsanierung", "inputType": "textarea" }] },
+        { "id": "propertyAddress", "order": 5, "label": "Objektadresse", "fields": [{ "id": "property.address.streetName", "path": "/property/address/streetName", "order": 1, "label": "Straße", "inputType": "text" }, { "id": "property.address.city", "path": "/property/address/city", "order": 4, "label": "Ort", "inputType": "text" }] },
+        { "id": "requester", "order": 6, "label": "Kontaktdaten", "fields": [{ "id": "requester.firstName", "path": "/requester/firstName", "order": 3, "label": "Vorname", "inputType": "text" }, { "id": "requester.email", "path": "/requester/email", "order": 11, "label": "E-Mail-Adresse", "inputType": "email" }, { "id": "requester.leadSourceDetails", "path": "/requester/leadSourceDetails", "order": 12, "label": "Details zur Herkunft", "inputType": "text", "visibleWhen": { "==": [{ "var": "requester.leadSource" }, "other"] } }, { "id": "requester.acceptPrivacy", "path": "/requester/acceptPrivacy", "order": 13, "label": "Datenschutz akzeptieren", "inputType": "checkbox" }, { "id": "requester.acceptTerms", "path": "/requester/acceptTerms", "order": 14, "label": "AGB akzeptieren", "inputType": "checkbox" } ] }
+      ]
+    }
+  }
+}

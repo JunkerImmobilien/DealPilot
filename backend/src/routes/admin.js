@@ -1987,6 +1987,7 @@ router.get('/users/:id/zusaetze', requireAdmin, async (req, res) => {
     res.json({
       rechenkerne: await _zusatzService.holen(req.params.id, _zusatzService.RECHENKERNE),
       entwicklungspartner: await _zusatzService.holen(req.params.id, _zusatzService.PARTNER),
+      gutachterpartner: await _zusatzService.holen(req.params.id, _zusatzService.GUTACHTER).catch(() => null),   /* v3540 */
       monat: await _zusatzService.monatsZaehlung(req.params.id),
       /* v3289 · DealPilot Flow: Zusatz je Konto + wirksame Linien (Plan-Merkmal und Zusatz) */
       flow: await _zusatzService.holen(req.params.id, _zusatzService.FLOW).catch(() => null),
@@ -2023,6 +2024,19 @@ router.post('/users/:id/zusaetze/flow', requireAdmin, requireRole('owner', 'supp
       z.aktiv ? 'user.zusatz_flow_an' : 'user.zusatz_flow_aus', 'user', req.params.id,
       { linien: z.linien }, req.ip, req.headers['user-agent']);
     res.json({ success: true, flow: z, flow_linien: await _zusatzService.flowLinienHerkunft(req.params.id) });
+  } catch (e) { res.status(400).json({ error: e.message }); }
+});
+
+/* v3540 · Zusatz „Gutachterpartner“ (Evalion, Partner Form API): darf im Reiter Steuer eine Ersteinschaetzung
+   der Restnutzungsdauer und ein Gutachten beim Partner anfragen. Preis und Freigabe offen (Marcel 16.11.2026). */
+router.post('/users/:id/zusaetze/gutachterpartner', requireAdmin, requireRole('owner', 'support'), async (req, res) => {
+  const db = req.app.get('db');
+  try {
+    const b = req.body || {};
+    const z = await _zusatzService.setzen(req.params.id, _zusatzService.GUTACHTER, { aktiv: b.aktiv !== false }, req.adminUser.email);
+    await audit(db, req.adminUser.id, req.adminUser.email,
+      z.aktiv ? 'user.zusatz_gutachter_an' : 'user.zusatz_gutachter_aus', 'user', req.params.id, {}, req.ip, req.headers['user-agent']);
+    res.json({ success: true, gutachterpartner: z });
   } catch (e) { res.status(400).json({ error: e.message }); }
 });
 

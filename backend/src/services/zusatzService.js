@@ -19,7 +19,10 @@ const PARTNER = 'entwicklungspartner';   /* v3097 · Umsetzungswünsche (routes/
    eigenes Produkt, Preis offen - freigeschaltet wird per Plan-Merkmal `flow_linien` ODER hier je Konto. */
 const FLOW = 'flow';
 const FLOW_LINIEN = ['makler', 'privat', 'investor'];
-const BEKANNT = [RECHENKERNE, PARTNER, FLOW];
+/* v3540 · Restnutzungsdauer beim unabhaengigen Gutachterpartner anfragen (routes/gutachterpartner.js).
+   Marcel 16.11.2026: Preis und Freigabe offen - bis dahin nur Admin oder dieser Zusatz je Konto. */
+const GUTACHTER = 'gutachterpartner';
+const BEKANNT = [RECHENKERNE, PARTNER, FLOW, GUTACHTER];
 const KERN_SPALTE = { rnd: 'kontingent_rnd', verkehrswert: 'kontingent_vw' };
 
 async function holen(userId, zusatz) {
@@ -153,5 +156,5 @@ async function setzen(userId, zusatz, werte, von) {
   return r.rows[0];
 }
 
-module.exports = { RECHENKERNE, PARTNER, FLOW, FLOW_LINIEN, BEKANNT, holen, monatsZaehlung, darfRechnen, aufrufZaehlen, setzen,
+module.exports = { RECHENKERNE, PARTNER, FLOW, GUTACHTER, FLOW_LINIEN, BEKANNT, holen, monatsZaehlung, darfRechnen, aufrufZaehlen, setzen,
   flowLinien, flowLinienHerkunft, linienSaeubern };   /* v3289 */
