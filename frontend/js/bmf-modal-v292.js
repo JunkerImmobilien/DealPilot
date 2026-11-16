@@ -171,7 +171,15 @@
       mod_waermedaemmung: _v('mod_daemm') || 'nein',
       mod_baeder:         _v('mod_bad')   || 'nein',
       mod_innenausbau:    _v('mod_innen') || 'nein',
-      mod_grundriss:      _v('mod_grdr')  || 'nein'
+      mod_grundriss:      _v('mod_grdr')  || 'nein',
+      /* v3510 · GARAGEN UND WOHNEINHEITEN FEHLTEN IN DER PIPELINE. v3345 hat sie in runBmf
+         (/bmf/aufteilung, KPA G13/G42) nachgezogen, die Pipeline (/bmf/pipeline, Reiter 3/4,
+         Varianten, Vertragstext) blieb ohne. Gemessen 16.11.2026 am echten Kern, MFH Bj 1973,
+         339,91 m2, 6 WE, 6 Garagen, Miete 2.329 EUR, Kauf 12.11.2026: Vorlage Juni 2023
+         ohne beide 60,27 %, mit beiden 57,61 %; Vorlage Maerz 2026 61,25 % gegen 58,45 %.
+         Dieselben zwei Felder wie runBmf, damit beide Laeufe dieselbe Zahl liefern. */
+      garagen:    parseInt(_v('garagen'), 10) > 0 ? parseInt(_v('garagen'), 10) : 0,
+      einheiten:  parseInt(_v('einheiten'), 10) > 0 ? parseInt(_v('einheiten'), 10) : 0
     };
 
     // Miete (Tab Miete)

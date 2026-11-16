@@ -241,6 +241,17 @@ async function _phase4_bmf(inputs, phase3) {
        der Reiter 3 zeigte einen anderen Gebaeudeanteil als der Reiter
        Bodenabschlag (Ravensberger Weg 38: 74,57 statt 74,82 %). Fehlt ein
        Feld, gilt wie bisher der Vorgabewert der Arbeitshilfe. */
+    /* v3510 · Garagen (KPA G13) und Wohneinheiten (KPA G42) wie runBmf (v3345). Ohne sie
+       rechnete die Pipeline ein MFH ohne Verwaltungs-/Instandhaltungskosten je Einheit und
+       ohne Garagen - Andersenweg 3 (6 WE, 6 Garagen): 61,25 statt 58,45 % (Vorlage Maerz 2026).
+       Wohneinheiten nur bei MFH / gemischt genutzt; bei WE und EFH fuellt die Vorlage selbst. */
+    ...(parseInt(objekt.garagen, 10) > 0 ? { garagen: parseInt(objekt.garagen, 10) } : {}),
+    ...((function () {
+      const art = String(objekt.objart_bmf || '');
+      const n = parseInt(objekt.einheiten, 10);
+      return (/Mietwohngrundst|gemischt genutzt/.test(art) && !/^Teileigentum/.test(art) && n > 0)
+        ? { wohneinheiten: n } : {};
+    })()),
     ...['mod_dach', 'mod_fenster', 'mod_leitungen', 'mod_heizung', 'mod_waermedaemmung',
         'mod_baeder', 'mod_innenausbau', 'mod_grundriss'].reduce((o, k) => {
       if (objekt[k]) o[k] = String(objekt[k]);

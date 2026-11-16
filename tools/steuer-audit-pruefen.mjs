@@ -471,5 +471,42 @@ if (process.argv.includes('--live')) {
   ok(/Abschreibung je Aufteilung/.test(dok) && /linearNachFertigstellung\(o\.bj\)\) \|\| \{ satz: 2 \}/.test(dok), 'M neues PDF: Abschreibung je Aufteilung mit Spanne, Pauschale nach Fertigstellung');
 }
 
+/* ── N · v3510 Garagen und Wohneinheiten erreichen BEIDE Laeufe der Arbeitshilfe ──
+   v3345 hat KPA G13 (Garagen) und G42 (Wohneinheiten) in runBmf (/bmf/aufteilung) verdrahtet, die
+   Pipeline (/bmf/pipeline: Reiter 3/4, Varianten, Vertragstext) blieb ohne. Messung 16.11.2026 am
+   echten Kern, MFH Andersenweg (Bj 1973, 339,91 m2, 1.232 m2 x 135, Miete 2.329, Kauf 12.11.2026):
+   Juni 2023 mit 6 WE + 6 Garagen 57,61 % / Ertragswert 392.339 (= PDF 12.11. und Gutachten-Kontrolle),
+   ohne beide 60,27 %; Maerz 2026 58,45 % / 400.280 gegen 61,25 % / 429.147. --live rechnet den Fall
+   durch calculateKpa UND runPipeline im Staging-Container. */
+{
+  const pip = fs.readFileSync(path.join(ROOT, 'backend/src/services/bmfPipelineService.js'), 'utf8');
+  const v292 = js('bmf-modal-v292.js'), bm = js('bmf-modal.js');
+  ok(/garagen: parseInt\(objekt\.garagen, 10\)/.test(pip) && /\{ wohneinheiten: n \}/.test(pip), 'N Pipeline (_phase4_bmf) gibt Garagen und Wohneinheiten an die Arbeitshilfe');
+  ok(/garagen:\s+parseInt\(_v\('garagen'\)/.test(v292) && /einheiten:\s+parseInt\(_v\('einheiten'\)/.test(v292), 'N Fenster-Pipeline (bmf-modal-v292.js) sammelt Garagen und Wohneinheiten');
+  ok((bm.match(/garagen: \(parseInt/g) || []).length >= 2 && (bm.match(/wohneinheiten: \(function/g) || []).length >= 2, 'N runBmf und XLSX-Lauf (bmf-modal.js) schicken beide Felder (v3345)');
+  const rx = /Mietwohngrundst\|gemischt genutzt\/\.test\(art\) && !\/\^Teileigentum\/\.test\(art\)/;
+  ok(rx.test(pip) && rx.test(bm), 'N Wohneinheiten in Pipeline und runBmf nach derselben Regel (nur MFH / gemischt, nie Teileigentum)');
+  if (process.argv.includes('--live')) {
+    const { execFileSync } = createRequire(import.meta.url)('node:child_process');
+    const fall = { lage: 'Andersenweg 3, 32429 Minden', grundstuecksart: 'Mietwohngrundstücke (Mehrfamilienhäuser)', kaufdatum: '2026-11-12',
+      kaufpreis: 419406, baujahr: 1973, wohnflaeche: 339.91, mea_zaehler: 1000, mea_nenner: 1000, grundstuecksgroesse: 1232, bodenrichtwert: 135,
+      miete_bekannt: 'Ja', miete_monatlich: 2329, sachwertfaktor: 1, regionalfaktor: 1, vergleichsfaktor_vorhanden: 'Nein', garagen: 6, wohneinheiten: 6 };
+    const pipe = { objekt: { str: 'Andersenweg', hnr: '3', plz: '32429', ort: 'Minden', objart_bmf: fall.grundstuecksart, wfl: 339.91, baujahr: 1973,
+      gsfl: 1232, brw: 135, garagen: 6, einheiten: 6 }, investition: { kaufdat: '2026-11-12', kp_brutto: 390000, gest_e: 25350, notar_e: 2886, gba_e: 1170 },
+      inventar: {}, renovierung: {}, miete: { nkm: 2329 }, gaa: {} };
+    const skript = "const s=require('/app/src/services/bmfService.js'),p=require('/app/src/services/bmfPipelineService.js');(async()=>{"
+      + "const r=await s.calculateKpa(" + JSON.stringify(fall) + ",{includeFile:false});const q=await p.runPipeline(" + JSON.stringify(pipe) + ");"
+      + "console.log(JSON.stringify({p:r.results.gebaeudeanteil_prozent.value,e:r.results.ertragswert.value,q:q.phase4_bmf&&q.phase4_bmf.gebaeudeanteil_prozent}))})()";
+    let roh = null;
+    try { roh = execFileSync('ssh', ['-o', 'BatchMode=yes', 'root@116.203.214.11', 'docker exec -i dealpilot-backend node -'], { input: skript, encoding: 'utf8', timeout: 240000 }); }
+    catch (e) { ok(false, 'N live: Staging-Backend nicht erreichbar (' + e.message.split('\n')[0] + ')'); }
+    if (roh) {
+      const r = JSON.parse(roh.trim().split('\n').pop());
+      ok(nah(r.p, 58.45) && Math.abs(r.e - 400280.24) < 0.5, 'N live Andersenweg, Vorlage Maerz 2026, 6 WE + 6 Garagen: ' + r.p + ' % / Ertragswert ' + r.e + ' (Soll 58,45 / 400.280,24)');
+      ok(nah(Number(r.q), 58.45), 'N live Pipeline rechnet denselben Gebaeudeanteil wie runBmf: ' + r.q + ' % (Soll 58,45)');
+    }
+  }
+}
+
 console.log('steuer-audit-pruefen: ' + gruen + ' gruen, ' + rot + ' rot');
 process.exit(rot ? 1 : 0);
