@@ -282,12 +282,14 @@
      Geschwister schliesst das Register DealPilotAnsichten (ui.js v1905). Anders als dort bleibt nav.tabs
      stehen und zeigt die Cockpit-Reiter. */
   var PK = { offen: false, aktiv: 'uebersicht' };
-  var REITER_ICO = { uebersicht: 'layout', kunden: 'user', einladen: 'mail', staende: 'folderOpen', aufgaben: 'clipboard', meldungen: 'info', verwaltung: 'settings' };
+  var REITER_ICO = { uebersicht: 'layout', kunden: 'user', einladen: 'mail', staende: 'folderOpen', aufgaben: 'clipboard', meldungen: 'info', verwaltung: 'settings', uebergeben: 'handshake' };
   function ico(n, g) { try { return window.Icons && Icons[n] ? Icons[n]({ size: g || 15 }) : ''; } catch (e) { return ''; } }
   function reiterListe() {
     var c = S.partner || { kunden: [], anfragen: [] };
     var neu = (c.kunden || []).reduce(function (a, k) { return a + (k.neu || 0); }, 0);
     var l = [{ k: 'uebersicht', t: 'Übersicht' }, { k: 'kunden', t: 'Kunden & Plätze', zahl: (c.anfragen || []).length || 0 }, { k: 'einladen', t: 'Einladen' },
+      /* v3500 · Marcel 16.11.2026: „Objekt an Kunden übergeben“ wieder erreichbar (seit v3392 ohne Einstieg) */
+      { k: 'uebergeben', t: 'Übergeben' },
       { k: 'staende', t: 'Freigegeben', zahl: neu }, { k: 'aufgaben', t: 'Aufgaben' }, { k: 'meldungen', t: 'Meldungen', zahl: c.meldungen_ungelesen || 0 }];
     if (window.DealPilotResellerPortal && typeof DealPilotResellerPortal.markeZeichnen === 'function') l.push({ k: 'verwaltung', t: 'Verwaltung' });
     return l;
@@ -333,7 +335,7 @@
   }
   var TITEL = { uebersicht: ['Übersicht', 'Was heute ansteht'], kunden: ['Kunden & Plätze', 'Verbindungen, Stufe und Rechte'], einladen: ['Kunden einladen', 'Per E-Mail oder Verbindungscode'],
     staende: ['Von Kunden freigegeben', 'Nur lesen, Übernehmen legt eine eigene Kopie an'], aufgaben: ['Aufgaben', 'Bitten an deine Kunden'], meldungen: ['Meldungen', ''],
-    verwaltung: ['Verwaltung', 'Plätze, Marke und Abrechnung'] };
+    verwaltung: ['Verwaltung', 'Plätze, Marke und Abrechnung'], uebergeben: ['Objekt an Kunden übergeben', 'Dein durchgerechnetes Objekt per E-Mail, der Kunde bekommt eine Kopie'] };
   function zeichnen() {
     var s = abSektion(); if (!s) return;
     var t = TITEL[PK.aktiv] || ['', ''];
@@ -349,6 +351,7 @@
     if (k === 'aufgaben') return aufgabenZeichnen(el);
     if (k === 'meldungen') return meldungenZeichnen(el);
     if (k === 'verwaltung') return verwaltungZeichnen(el);
+    if (k === 'uebergeben') return uebergebenZeichnen(el);
   }
   function reiterWahl(k) {
     PK.aktiv = k || 'uebersicht';
@@ -470,6 +473,13 @@
     plaetzeZeichnen(el.querySelector('[data-v="plaetze"]'));
     aboZeichnen(el.querySelector('[data-v="abo"]'));
     try { rp.markeZeichnen(el.querySelector('.pk-marke-form')); } catch (e) { el.querySelector('.pk-marke-form').innerHTML = '<div class="pk-leer">' + esc(fehlerText(e)) + '</div>'; }
+  }
+  /* v3500 · Übergeben: Oberfläche und Logik aus reseller-portal.js (loadUebergaben/uebSenden/uebVorpruefung, v3317), hier nur das Ziel */
+  function uebergebenZeichnen(el) {
+    var rp = window.DealPilotResellerPortal;
+    if (!rp || typeof rp.uebergabeZeichnen !== 'function') { el.innerHTML = '<div class="pk-leer">Übergeben ist gerade nicht geladen. Bitte die Seite neu laden.</div>'; return; }
+    el.innerHTML = '<div class="pk-karte pk-ueberg"><div class="pk-ueberg-form"><div class="pk-leer">Lädt …</div></div></div>';
+    try { rp.uebergabeZeichnen(el.querySelector('.pk-ueberg-form')); } catch (e) { el.querySelector('.pk-ueberg-form').innerHTML = '<div class="pk-leer">' + esc(fehlerText(e)) + '</div>'; }
   }
   function portalOeffnen() {
     if (window.Sub && typeof Sub.openPortal === 'function') return Sub.openPortal().catch(function (e) { toast(fehlerText(e)); });

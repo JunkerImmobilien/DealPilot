@@ -193,6 +193,8 @@ if (!window._pdfGold) {
      Die v3390-Einbettung des ganzen Portals ist damit entfallen. */
   async function poolHolen() { var r = await api('/pool?refresh=1'); _st.pool = r.pool || { gekauft: 0, zugewiesen: 0, frei: 0 }; return _st.pool; }
   function seatsKaufen(qty, iv) { _st.qty = Math.max(1, parseInt(qty, 10) || 1); _st.iv = iv === 'yearly' ? 'yearly' : 'monthly'; return doCheckout(); }
+  /* v3500 · Übergeben im Partner-Cockpit (Reiter Übergeben): dieselbe Strecke, fremdes Ziel */
+  function uebergabeZeichnen(ziel) { if (!ziel) return; injectCss(); _rpTinte(); _st.uebZiel = ziel; return loadUebergaben(); }
   function markeZeichnen(ziel) { if (!ziel) return; injectCss(); _rpTinte(); _st.markeZiel = ziel; return loadBranding(); }
   function geruest() {
     return '<div class="rp-modal" role="dialog" aria-modal="true">' +
@@ -467,7 +469,7 @@ if (!window._pdfGold) {
   function _uebDatum(s) { try { return new Date(s).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' }); } catch (e) { return ''; } }
   var _uebVp = null;
   async function loadUebergaben() {
-    var w = $('rp-work'); if (!w) return; w.innerHTML = '<p class="rp-ph">Lade Übergaben…</p>';
+    var w = (_st.uebZiel && _st.uebZiel.isConnected) ? _st.uebZiel : $('rp-work'); if (!w) return; w.innerHTML = '<p class="rp-ph">Lade Übergaben…</p>';   /* v3500 · Ziel aus dem Partner-Cockpit (Reiter Übergeben) */
     try {
       var r = await api('/uebergaben');
       var or = await Auth.apiCall('/objects?limit=200');
@@ -515,7 +517,10 @@ if (!window._pdfGold) {
       var em = $('rp-ub-email'); if (em) em.addEventListener('input', function () { clearTimeout(_uebVp); _uebVp = setTimeout(uebVorpruefung, 450); });
       var sb = $('rp-ub-send'); if (sb) sb.addEventListener('click', uebSenden);
       /* v3317b · kein Platz: Verweis auf den vorhandenen Platz-Kauf (Übersicht › Seats kaufen) */
-      var k2 = $('rp-ub-kauf2'); if (k2) k2.addEventListener('click', function () { go('ueber'); setTimeout(function () { try { toggleBuy(); } catch (e) {} }, 400); });
+      var k2 = $('rp-ub-kauf2'); if (k2) k2.addEventListener('click', function () {
+        /* v3500 · im Cockpit liegt der Platz-Kauf unter Verwaltung */
+        if (_st.uebZiel && _st.uebZiel.isConnected && window.DpPartnerKunden) { DpPartnerKunden.reiterWahl('verwaltung'); return; }
+        go('ueber'); setTimeout(function () { try { toggleBuy(); } catch (e) {} }, 400); });
     } catch (e) { w.innerHTML = '<p class="rp-ph">Übergaben konnten nicht geladen werden.</p>'; }
   }
   var _uebPlatzFuer = null;   /* v3317b · für welche Adresse das Häkchen vorbelegt wurde */
@@ -1439,8 +1444,8 @@ if (!window._pdfGold) {
   })(0);
 
   window.openResellerPortal = openResellerPortal;
-  window.DealPilotResellerPortal = { boot: boot, open: openResellerPortal, poolHolen: poolHolen, seatsKaufen: seatsKaufen, markeZeichnen: markeZeichnen, markeSpeichern: function () { return saveBranding(); },   /* v3392 */
+  window.DealPilotResellerPortal = { boot: boot, open: openResellerPortal, poolHolen: poolHolen, seatsKaufen: seatsKaufen, markeZeichnen: markeZeichnen, uebergabeZeichnen: uebergabeZeichnen, markeSpeichern: function () { return saveBranding(); },   /* v3392 */
     staffelSatz: staffelSatz, staffelText: staffelText,
     /* v3317 · direkt in "Übergeben" öffnen, optional mit vorgewähltem Objekt */
-    uebergeben: function (objectId) { if (objectId) _st.uebObj = objectId; _st.sec = 'ueberg'; if (_st.open) go('ueberg'); else openResellerPortal(true); } };   /* v3390: openResellerPortal fuehrt ins Cockpit, Verwaltung oeffnet _st.sec */
+    uebergeben: function (objectId) { if (objectId) _st.uebObj = objectId; if (window.DpPartnerKunden) { DpPartnerKunden.reiterWahl('uebergeben'); return; } _st.sec = 'ueberg'; if (_st.open) go('ueberg'); else openResellerPortal(true); } };   /* v3500 · führt in den Cockpit-Reiter Übergeben */   /* v3390: openResellerPortal fuehrt ins Cockpit, Verwaltung oeffnet _st.sec */
 })();
