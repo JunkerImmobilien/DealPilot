@@ -20,6 +20,12 @@
 .pt-rahmen img{display:block;width:100%;height:auto;aspect-ratio:16/10;object-fit:cover;object-position:left top}
 .pt-bu{margin:12px 0 0;font:500 11.5px/1.5 var(--mono);color:var(--ddk);letter-spacing:.02em}
 
+/* landing-partner-2 · Preis-Hinweis im Einstieg, Sprungziel #preis */
+.pt-preis-kurz{margin:22px 0 0;font-size:15px;color:var(--mdk)}
+.pt-preis-kurz b{color:#fff;font-weight:700}
+.pt-preis-kurz a{color:var(--gdh);margin-left:6px;text-decoration:none;border-bottom:1px solid var(--line)}
+#preis{scroll-margin-top:90px}
+
 /* ── Was Partner können (Karten) ─────────────────────────────────────── */
 .pt-karten{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
 .pt-k{background:#fff;border:1px solid var(--cream-line);padding:26px 24px 24px;display:flex;flex-direction:column;gap:8px}

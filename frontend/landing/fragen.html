@@ -61,6 +61,7 @@
 </head><body>
 
 <svg style="display:none" aria-hidden="true">
+<symbol id="i-pokal" viewBox="0 0 24 24"><path d="M7 3h10v6a5 5 0 0 1-10 0V3Z"/><path d="M7 5H4v2a3 3 0 0 0 3 3M17 5h3v2a3 3 0 0 1-3 3M9 21h6M12 14v7"/></symbol>
 <symbol id="i-haus" viewBox="0 0 24 24"><path d="M3 21V10l9-7 9 7v11"/><path d="M9 21v-6h6v6"/><path d="M3 21h18"/></symbol>
 <symbol id="i-blitz" viewBox="0 0 24 24"><path d="M13 2 4 14h7l-1 8 9-12h-7l1-8Z"/></symbol>
 <symbol id="i-buch" viewBox="0 0 24 24"><path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v18H6.5A2.5 2.5 0 0 0 4 22.5V4.5Z"/><path d="M8 7h8M8 11h6"/></symbol>
@@ -83,16 +84,43 @@
   </div>
 </div></div>
 
+<!-- landing-partner-2 · Navigation wie loesungen.html (vorher dp2.html-Links) -->
 <nav class="nav"><div class="wrap">
   <a class="mark mark-gross" href="/"><span class="wort">Deal<b>Pilot</b></span></a>
   <button class="burger" aria-label="Menü"><span></span><span></span><span></span></button>
   <ul>
-    <li><a href="dp2.html#workflow">So funktioniert's</a></li>
-    <li><a href="dp2.html#features">Funktionen</a></li>
-    <li><a href="leistungsumfang.html">Leistungsumfang</a></li>
-    <li><a href="dp2.html#pricing">Preise</a></li>
-    <li><a href="api.html">API</a></li>
-    <li><a href="fragen.html" class="hier">Fragen</a></li>
+    <li><a href="/#workflow">So funktioniert's</a></li>
+    <li><a href="/#features">Funktionen<i class="kar"></i></a>
+      <ul class="sub">
+        <li><a href="/#features"><svg class="ico si"><use href="#i-blitz"/></svg><span><b>Die 19 Module</b><span>Von Boarding über Deal Score bis Bankexport</span></span></a></li>
+        <li><a href="leistungsumfang.html"><svg class="ico si"><use href="#i-buch"/></svg><span><b>Leistungsumfang</b><span>Alle 22 Kapitel ausführlich — was jedes Modul kann</span></span></a></li>
+        <li><a href="preise.html#feature-matrix"><svg class="ico si"><use href="#i-ziel"/></svg><span><b>Cockpit-Matrix</b><span>Jede Funktion, jeder Tarif — im Vergleich</span></span></a></li>
+        <li><a href="api.html"><svg class="ico si"><use href="#i-code"/></svg><span><b>API</b><span>REST-Schnittstelle, voller CRUD — im Pro-Plan</span></span></a></li>
+        <li><a href="forschung.html"><svg class="ico si"><use href="#i-ziel"/></svg><span><b>Forschung &amp; Entwicklung</b><span>Bescheinigtes Vorhaben: das ganze Portfolio im Blick</span></span></a></li>
+      </ul></li>
+    <li><a href="geschichten.html">Geschichten</a></li>
+    <li><a href="videothek.html">Videothek</a></li>
+    <li><a href="/#pricing">Preise<i class="kar"></i></a>
+      <ul class="sub">
+        <li><a href="preise.html"><svg class="ico si"><use href="#i-bank"/></svg><span><b>Alle Preise</b><span>Vier Pakete von kostenlos bis Pro, im Detail</span></span></a></li>
+        <li><a href="preise.html#partner-plan"><svg class="ico si"><use href="#i-ebenen"/></svg><span><b>Partner &amp; Whitelabel</b><span>Deine Mandanten unter deiner Marke</span></span></a></li>
+        <li><a href="preise.html#feature-matrix"><svg class="ico si"><use href="#i-ziel"/></svg><span><b>Alles im Vergleich</b><span>Die vollständige Matrix</span></span></a></li>
+        <li><a href="preise.html#nachkauf"><svg class="ico si"><use href="#i-blitz"/></svg><span><b>Kontingent nachlegen</b><span>Bewertungen einzeln oder im Paket</span></span></a></li>
+      </ul></li>
+    <li><a href="partner.html">Für Partner<i class="kar"></i></a>
+      <ul class="sub"><!-- landing-loesungen-1 -->
+        <li><a href="loesungen.html"><svg class="ico si"><use href="#i-ziel"/></svg><span><b>Individuelle Lösungen</b><span>Prozesse, Automatisierung, Homepage &amp; iFrame</span></span></a></li>
+        <li><a href="partner.html"><svg class="ico si"><use href="#i-ebenen"/></svg><span><b>Partner-Programm</b><span>Cockpit, eigene Marke und der Ablauf</span></span></a></li><!-- landing-partner-1 -->
+        <li><a href="preise.html#module"><svg class="ico si"><use href="#i-code"/></svg><span><b>Module &amp; Schnittstellen</b><span>Rechenkerne als Schnittstelle, auf Anfrage</span></span></a></li>
+        <li><a href="#makler-hub"><svg class="ico si"><use href="#i-haus"/></svg><span><b>Makler-Hub</b><span>Der Maklerprozess bis zum Notar · für Makler</span></span></a></li>
+        <li><a href="/#partner"><svg class="ico si"><use href="#i-pokal"/></svg><span><b>Unsere Partner</b><span>Wer mit uns zusammenarbeitet</span></span></a></li>
+      </ul></li>
+    <li><a href="sicherheit.html" class="hier">Sicherheit<i class="kar"></i></a>
+      <ul class="sub">
+        <li><a href="sicherheit.html"><svg class="ico si"><use href="#i-schild"/></svg><span><b>Daten &amp; Server</b><span>Hetzner, DSGVO, was gespeichert wird</span></span></a></li>
+        <li><a href="fragen.html"><svg class="ico si"><use href="#i-frage"/></svg><span><b>Häufige Fragen</b><span>Die Antworten, die wir sonst am Telefon geben</span></span></a></li>
+        <li><a href="methodik.html"><svg class="ico si"><use href="#i-buch"/></svg><span><b>Datenbasis &amp; Prüfung</b><span>Amtliche Daten, Herkunft je Wert, Prüfung</span></span></a></li><!-- landing-methodik-1 -->
+      </ul></li>
   </ul>
   <a class="b-log" href="https://app.dealpilot.immo/">Anmelden</a>
   <a class="b-cta" href="https://app.dealpilot.immo/?register=1"><span class="b-cta-voll">Kostenlos starten</span><span class="b-cta-kurz">Starten</span></a>
