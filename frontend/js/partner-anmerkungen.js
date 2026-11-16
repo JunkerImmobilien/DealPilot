@@ -360,7 +360,9 @@
     if (!entw.length) return;
     stil(); fensterZu();
     var d = document.createElement('div'); d.id = 'dppk-anm-fenster';
-    d.innerHTML = '<h4>Zurück an ' + esc(Z.ks && Z.ks.kunde || 'den Kunden') + '</h4><div class="af-ort">' + entw.length + (entw.length === 1 ? ' Anmerkung geht' : ' Anmerkungen gehen') + ' als Aufgabe an den Kunden. Er sieht sie an seinem eigenen Objekt.</div>' +
+    d.innerHTML = '<h4>Zurück an ' + esc(Z.ks && Z.ks.kunde || 'den Kunden') + '</h4><div class="af-ort">' + entw.length + (entw.length === 1 ? ' Anmerkung geht' : ' Anmerkungen gehen') + ' als Aufgabe an den Kunden. Er sieht sie an seinem eigenen Objekt.' +
+      /* v3460 · Mail je Kunde (Partner-Cockpit › Kunden › Stufe und Rechte bzw. Notiz und E-Mail) */
+      (Z.ks && Z.ks.kunde_mail_rueckmeldung === false ? ' Eine E-Mail geht nicht mit, sie ist für diesen Kunden ausgeschaltet.' : ' Dazu bekommt er eine E-Mail mit Objekt, Zahl der Anmerkungen und deinem Begleittext.') + '</div>' +
       '<textarea id="dppk-anm-text" maxlength="2000" placeholder="Kurzer Begleittext (optional)"></textarea>' +
       '<div class="af-fuss"><button type="button" class="al-btn" data-x="zu">Abbrechen</button><button type="button" class="al-btn gold" data-x="ok">Zurückgeben</button></div>';
     document.body.appendChild(d);
@@ -370,7 +372,9 @@
     d.querySelector('[data-x="ok"]').onclick = function () {
       this.disabled = true; var self = this;
       api('/partner/kundenstaende/' + Z.share + '/zurueck', { method: 'POST', body: { text: d.querySelector('textarea').value } })
-        .then(function (r) { fensterZu(); toast((r.anzahl === 1 ? '1 Anmerkung' : r.anzahl + ' Anmerkungen') + ' an ' + (Z.ks && Z.ks.kunde || 'den Kunden') + ' zurückgegeben.'); return laden(); },
+        .then(function (r) {
+          var ms = r.mail && r.mail.status, mt = ms === 'gesendet' || ms === 'dry_run' ? ' E-Mail ist raus.' : ms === 'testadresse' ? ' Testadresse, keine E-Mail verschickt.' : ms === 'fehler' ? ' Die E-Mail ging nicht raus, die Aufgabe steht trotzdem.' : '';
+          fensterZu(); toast((r.anzahl === 1 ? '1 Anmerkung' : r.anzahl + ' Anmerkungen') + ' an ' + (Z.ks && Z.ks.kunde || 'den Kunden') + ' zurückgegeben.' + mt); return laden(); },
           function (e) { self.disabled = false; toast(fehlerText(e)); });
     };
   }

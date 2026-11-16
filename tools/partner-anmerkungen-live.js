@@ -121,6 +121,35 @@ const nutzer = async (e) => (await query('SELECT id, email FROM users WHERE emai
   const akw = (await query('SELECT status FROM partner_aufgaben_kunden WHERE aufgabe_id = $1', [z.j.aufgabe_id])).rows[0];
   ok('wieder offen -> Aufgabe wieder in Arbeit', wo.j.offen === 1 && akw.status === 'in_arbeit', [wo.j, akw]);
 
+  /* v3460 · E-Mail bei Rueckmeldung: Schalter je Kunde, echte Route, echte DB. Kunde A hat eine .test-Adresse:
+     an -> 'testadresse' (nie ueber SMTP), aus -> 'aus'. Der Schalter wird am Ende auf den Ausgangswert gesetzt. */
+  const vorher = (await query('SELECT mail_rueckmeldung FROM reseller_clients WHERE id = $1', [ks.client_id])).rows[0];
+  ok('Spalte mail_rueckmeldung da, Vorgabe an', vorher && vorher.mail_rueckmeldung === true, vorher);
+  const ck = await http(tP, 'GET', '/partner/cockpit');
+  const kz = (ck.j.kunden || []).filter((x) => x.id === ks.client_id)[0];
+  ok('Cockpit liefert den Schalter je Kunde', kz && kz.mail_rueckmeldung === true, kz && kz.mail_rueckmeldung);
+  const aus = await http(tP, 'PUT', '/partner/kunden/' + ks.client_id, { mail_rueckmeldung: false });
+  ok('Partner schaltet die Mail fuer Kunde A aus', aus.status === 200 && aus.j.mail_rueckmeldung === false, aus.j && aus.j.mail_rueckmeldung);
+  const ksAus = ((await http(tP, 'GET', '/partner/kundenstaende')).j.kundenstaende || []).filter((x) => x.share_id === ks.share_id)[0];
+  ok('Kundenstand traegt den Schalter (Zurueck-Fenster)', ksAus && ksAus.kunde_mail_rueckmeldung === false, ksAus && ksAus.kunde_mail_rueckmeldung);
+  const m1 = await http(tP, 'POST', '/partner/kundenstaende/' + ks.share_id + '/anmerkungen', { art: 'hinweis', text: 'Mailtest aus (Test)' });
+  if (m1.j && m1.j.id) neu.anm.push(m1.j.id);
+  const zAus = await http(tP, 'POST', '/partner/kundenstaende/' + ks.share_id + '/zurueck', { text: 'Ohne Mail (Test)' });
+  if (zAus.j && zAus.j.aufgabe_id) neu.aufg.push(zAus.j.aufgabe_id);
+  ok('Schalter aus: Zurueck gelingt, mail.status aus', zAus.status === 200 && zAus.j.mail && zAus.j.mail.status === 'aus', zAus.j);
+  const an = await http(tP, 'PUT', '/partner/kunden/' + ks.client_id, { mail_rueckmeldung: true });
+  ok('Partner schaltet sie wieder an', an.status === 200 && an.j.mail_rueckmeldung === true);
+  const m2 = await http(tP, 'POST', '/partner/kundenstaende/' + ks.share_id + '/anmerkungen', { art: 'hinweis', text: 'Mailtest an (Test)' });
+  if (m2.j && m2.j.id) neu.anm.push(m2.j.id);
+  const zAn = await http(tP, 'POST', '/partner/kundenstaende/' + ks.share_id + '/zurueck', { text: 'Mit Mail (Test)' });
+  if (zAn.j && zAn.j.aufgabe_id) neu.aufg.push(zAn.j.aufgabe_id);
+  ok('Schalter an, Testadresse: Zurueck gelingt, keine Mail ueber SMTP (testadresse)', zAn.status === 200 && zAn.j.mail && zAn.j.mail.status === 'testadresse', zAn.j);
+  const au = (await query(`SELECT meta FROM share_audit WHERE share_id = $1 AND action = 'rueckmeldung' AND meta->>'aufgabe_id' = ANY($2::text[])`, [ks.share_id, [zAus.j.aufgabe_id, zAn.j.aufgabe_id]])).rows.map((x) => x.meta.mail).sort();
+  ok('share_audit fuehrt den Mailstatus', au.join(',') === 'aus,testadresse', au);
+  const fremd = await http(tP2, 'PUT', '/partner/kunden/' + ks.client_id, { mail_rueckmeldung: false });
+  ok('fremder Partner schaltet nicht (404)', fremd.status === 404, fremd.status);
+  await query('UPDATE reseller_clients SET mail_rueckmeldung = $2 WHERE id = $1', [ks.client_id, vorher ? vorher.mail_rueckmeldung : true]);
+
   /* Aufraeumen: nur was dieser Lauf angelegt hat */
   await query(`DELETE FROM partner_meldungen WHERE aufgabe_id = ANY($1::uuid[])`, [neu.aufg]);
   await query(`DELETE FROM partner_anmerkungen WHERE id = ANY($1::uuid[]) OR aufgabe_id = ANY($2::uuid[])`, [neu.anm, neu.aufg]);

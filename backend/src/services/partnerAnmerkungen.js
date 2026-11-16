@@ -13,6 +13,15 @@
  * (kopie vorhanden, nicht widerrufen), Entwurf aendern/loeschen nur solange nicht zurueckgegeben.
  * Kunde nur an Anmerkungen, deren Kunde er ist (reseller_clients.user_id), nie an Entwuerfen.
  * Fremde Objekte werden nur gelesen (Name/Anschrift fuer den Titel).
+ *
+ * v3460 · E-Mail an den Kunden bei „Zurueck an Kunden“ (Marcel 16.11.2026: „E-Mail an den Kunden kann man im
+ * Portal-Cockpit auswählen, wo man die Einstellungen für den Kunden macht.“). Schalter je Kunde:
+ * reseller_clients.mail_rueckmeldung (Migration 107, Vorgabe an), gesetzt im Partner-Cockpit › Kunden › Kunde
+ * (Stufe und Rechte bzw. Notiz). Die Mail traegt den Rahmen der Einladungs-Mail (resellerInviteMail marke/rahmen/knopf/
+ * senden): Partnermarke vorn, DealPilot nur als „Plattform“ im Fuss. Inhalt: Objekt, Zahl der Anmerkungen, Begleittext,
+ * Knopf in die App (?dp_partner=aufgaben oeffnet Mein Partner › Aufgaben). Die Anmerkungen selbst stehen NICHT darin.
+ * Testadressen (objektUebergabe.istTestadresse) gehen nie ueber SMTP. Ein Mailfehler bricht das Zurueckgeben nicht ab:
+ * die Aufgabe steht trotzdem, die Antwort meldet mail.status 'fehler'. Der Status steht im share_audit (meta.mail).
  */
 const { query } = require('../db/pool');
 const pk = require('./partnerKunden');
@@ -46,6 +55,71 @@ async function kundenstand(rs, shareId, auchGetrennt) {
   if (s.getrennt_am && !auchGetrennt) throw fehler('kunde_getrennt', 409, 'Der Kunde ist nicht mehr verbunden.');
   return s;
 }
+
+// ── E-Mail bei Rueckmeldung (v3460) ───────────────────────────────────────
+
+/** Link in die App: oeffnet beim Kunden Mein Partner › Aufgaben (partner-kunden.js liest dp_partner). */
+function appLink(basis) { return String(basis || '').replace(/\/+$/, '') + '/?dp_partner=aufgaben'; }
+
+/**
+ * Die Mail, rein (fuer den Pruefer ohne DB).
+ * @param p { reseller (siehe resellerInviteMail.marke), anzeigeName, objName, anzahl, begleit, link }
+ */
+function rueckmeldungMailBauen(p) {
+  const pm = require('./resellerInviteMail');
+  const m = pm.marke(p.reseller);
+  const esc = pm.esc;
+  const n = p.anzahl === 1 ? '1 Anmerkung' : (p.anzahl + ' Anmerkungen');
+  const hallo = p.anzeigeName ? 'Hallo ' + p.anzeigeName + ',' : 'Hallo,';
+  const subject = m.brandName + ': Rückmeldung zu ' + p.objName;
+  const innen =
+    '<p style="font-size:15px;line-height:1.6;margin:0 0 14px">' + esc(hallo) + '</p>' +
+    '<p style="font-size:15px;line-height:1.6;margin:0 0 14px"><b>' + esc(m.brandName) + '</b> hat sich dein Objekt angesehen und dir ' +
+      '<b>' + esc(n) + '</b> zurückgegeben.</p>' +
+    '<div style="border:1px solid #e6e0d4;border-radius:10px;padding:12px 16px;margin:0 0 16px;background:#fbf8f1">' +
+      '<div style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#8a8473;margin-bottom:4px">Objekt</div>' +
+      '<div style="font-size:15px;font-weight:700">' + esc(p.objName) + '</div></div>' +
+    (p.begleit ? '<div style="border-left:3px solid ' + esc(m.accent) + ';padding:4px 0 4px 14px;margin:0 0 16px;font-size:14px;line-height:1.6;color:#3a3630;white-space:pre-line">' + esc(p.begleit) + '</div>' : '') +
+    '<p style="text-align:center;margin:24px 0">' + pm.knopf(m, 'In der App ansehen', p.link) + '</p>' +
+    '<p style="font-size:12.5px;color:#8a8473;line-height:1.6;margin:0">Du findest die Rückmeldung unter Mein Partner › Aufgaben. ' +
+      'Dort springst du zu jeder Stelle im Objekt und kannst sie erledigen oder beantworten.</p>';
+  const t = [hallo, '', m.brandName + ' hat sich dein Objekt angesehen und dir ' + n + ' zurückgegeben.', '', 'Objekt: ' + p.objName];
+  if (p.begleit) t.push('', p.begleit);
+  t.push('', 'In der App ansehen:', p.link, '', 'Du findest die Rückmeldung unter Mein Partner › Aufgaben.');
+  return { subject, text: t.join('\n') + m.textFuss, html: pm.rahmen(m, innen), marke: m };
+}
+
+/**
+ * Versand. Gibt den Status zurueck und wirft nie:
+ *   'aus' (Schalter aus) · 'ohne_adresse' · 'testadresse' (nie ueber SMTP) · 'gesendet' · 'dry_run' · 'fehler'
+ * @param o { schalter, email, mail (aus rueckmeldungMailBauen) }   senden: Versand (Vorgabe resellerInviteMail.senden)
+ */
+async function rueckmeldungMailSenden(o, senden) {
+  try {
+    if (!o || o.schalter === false) return 'aus';
+    const email = String(o.email || '').trim();
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return 'ohne_adresse';
+    if (require('./objektUebergabe').istTestadresse(email)) {
+      console.log('[partner-anmerkungen] Testadresse, keine Mail ueber SMTP:', email, '·', o.mail.subject);
+      return 'testadresse';
+    }
+    const r = await (senden || require('./resellerInviteMail').senden)(o.mail.marke, { to: email, subject: o.mail.subject, text: o.mail.text, html: o.mail.html });
+    return r && r.dryRun ? 'dry_run' : 'gesendet';
+  } catch (e) { console.error('[partner-anmerkungen] Mail:', e && e.message); return 'fehler'; }
+}
+
+/* Marke des Partners fuer die Mail - dieselben Felder wie objektUebergabe._markeLaden */
+async function markeLaden(resellerId, basis) {
+  const b = (await query(
+    `SELECT id, name, brand_name, brand_logo_b64, brand_accent, brand_mail_accent, whitelabel_enabled,
+            brand_email, brand_website, brand_company,
+            (brand_logo_auf_dunkel IS NOT NULL) AS hat_variante,
+            extract(epoch from updated_at)::bigint AS stand
+       FROM resellers WHERE id = $1`, [resellerId])).rows[0] || {};
+  b.basis = basis;
+  return b;
+}
+function basisUrl(basis) { return process.env.FRONTEND_BASE_URL || process.env.APP_URL || process.env.FRONTEND_URL || basis || ''; }
 
 async function liste(rs, shareId) {
   await kundenstand(rs, shareId, true);
@@ -83,7 +157,7 @@ async function loeschen(rs, id) {
 }
 
 /** „Zurueck an Kunden“: alle Entwuerfe dieses Kundenstands als EINE Aufgabe an genau diesen Kunden */
-async function zurueckgeben(rs, actor, shareId, b) {
+async function zurueckgeben(rs, actor, shareId, b, opt) {
   const s = await kundenstand(rs, shareId);
   const e = (await query(`SELECT id FROM partner_anmerkungen WHERE share_id = $1 AND status = 'entwurf' ORDER BY nr`, [s.id])).rows;
   if (!e.length) throw fehler('keine_anmerkungen', 409, 'Erst eine Anmerkung anlegen.');
@@ -96,8 +170,19 @@ async function zurueckgeben(rs, actor, shareId, b) {
     [rs.id, ('Rückmeldung zu ' + objName).slice(0, 200), begleit, actor, s.id, s.object_id, s.stand_nr])).rows[0];
   await query(`INSERT INTO partner_aufgaben_kunden (aufgabe_id, client_id) VALUES ($1,$2) ON CONFLICT DO NOTHING`, [a.id, s.client_id]);
   await query(`UPDATE partner_anmerkungen SET aufgabe_id = $2, status = 'offen' WHERE id = ANY($1::uuid[])`, [e.map((x) => x.id), a.id]);
-  try { await query(`INSERT INTO share_audit (share_id, actor_user_id, action, meta) VALUES ($1,$2,'rueckmeldung',$3::jsonb)`, [s.id, actor, JSON.stringify({ aufgabe_id: a.id, anzahl: e.length })]); } catch (x) {}
-  return { ok: true, aufgabe_id: a.id, anzahl: e.length, titel: a.titel };
+  /* v3460 · Mail an den Kunden, wenn der Partner sie fuer diesen Kunden eingeschaltet hat. Bricht nie ab. */
+  let mailStatus = 'fehler';
+  try {
+    const k = (await query(`SELECT c.mail_rueckmeldung, c.display_name, u.email FROM reseller_clients c JOIN users u ON u.id = c.user_id WHERE c.id = $1`, [s.client_id])).rows[0] || {};
+    if (k.mail_rueckmeldung === false) mailStatus = 'aus';
+    else {
+      const basis = basisUrl(opt && opt.basis);
+      const mail = rueckmeldungMailBauen({ reseller: await markeLaden(rs.id, basis), anzeigeName: k.display_name, objName, anzahl: e.length, begleit, link: appLink(basis) });
+      mailStatus = await rueckmeldungMailSenden({ schalter: true, email: k.email, mail }, opt && opt.senden);
+    }
+  } catch (x) { console.error('[partner-anmerkungen] Mail vorbereiten:', x && x.message); mailStatus = 'fehler'; }
+  try { await query(`INSERT INTO share_audit (share_id, actor_user_id, action, meta) VALUES ($1,$2,'rueckmeldung',$3::jsonb)`, [s.id, actor, JSON.stringify({ aufgabe_id: a.id, anzahl: e.length, mail: mailStatus })]); } catch (x) {}
+  return { ok: true, aufgabe_id: a.id, anzahl: e.length, titel: a.titel, mail: { status: mailStatus } };
 }
 
 // ── Kundenseite ────────────────────────────────────────────────────────────
@@ -137,4 +222,6 @@ async function kundeSetzen(user, id, b) {
   return { ok: true, offen: rest, alle_erledigt: !rest };
 }
 
-module.exports = { ARTEN, ART_TEXT, liste, anlegen, aendern, loeschen, zurueckgeben, kundeListe, kundeSetzen, _sauber: sauber };
+module.exports = { ARTEN, ART_TEXT, liste, anlegen, aendern, loeschen, zurueckgeben, kundeListe, kundeSetzen, _sauber: sauber,
+  /* rein, fuer den Pruefer (v3460) */
+  rueckmeldungMailBauen, rueckmeldungMailSenden, appLink };

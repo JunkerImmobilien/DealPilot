@@ -18,6 +18,9 @@
  *   - Bestaetigung jeder Verbindung durch den Kunden (Band + Fenster), auch fuer Einladungslinks bestehender Konten
  *   - Rechte des Partnerplatzes wirken in der App (Knoepfe weg, Funktionen gesperrt), Stufe begrenzt den Detailgrad
  *   - Kundenstand beim Partner: Band „nur lesen“, Speichern ausgesetzt
+ *
+ * v3460 · Schalter „E-Mail an den Kunden bei Rückmeldung“ im Kundendialog (beide Zugangsarten, reseller_clients.mail_rueckmeldung,
+ *   Vorgabe an). Link aus der Mail: ?dp_partner=aufgaben oeffnet nach der Anmeldung Mein Partner › Aufgaben.
  *   - Partnerzeile in der Status-Tafel (deal-action-boarding.js), setzt keinen Status
  * Kundentexte: nur Punkt und Komma.
  */
@@ -540,7 +543,7 @@
       var info = k.platz_art === 'platz' ? (STUFEN[k.stufe] || 'Fortgeschritten') + ', ' + (k.marke === 'dealpilot' ? 'Marke DealPilot' : 'deine Marke') : 'Stufe und Rechte wählt der Kunde';
       var knoepfe = getrennt ? '' : (k.platz_art === 'platz'
         ? '<button type="button" class="pk-btn klein" data-ein="' + k.id + '">Stufe und Rechte</button>' + (k.hat_platz || k.entzug_frist_bis ? '' : '<button type="button" class="pk-btn klein" data-platz="' + k.id + '">Platz zuweisen</button>')
-        : '<button type="button" class="pk-btn klein" data-ein="' + k.id + '">Notiz</button><button type="button" class="pk-btn klein rot" data-trenn="' + k.id + '">Trennen</button>');
+        : '<button type="button" class="pk-btn klein" data-ein="' + k.id + '">Notiz und E-Mail</button><button type="button" class="pk-btn klein rot" data-trenn="' + k.id + '">Trennen</button>');
       return '<div class="pk-zeile"><div class="pk-name"><b>' + esc(k.display_name) + '</b><small>' + esc(k.email) + ' · ' + esc(info) + (k.sendungen ? ' · ' + k.sendungen + (k.sendungen === 1 ? ' Objekt gesendet' : ' Objekte gesendet') : '') + (k.neu ? ', ' + k.neu + ' neu' : '') + '</small></div>' + zug + status + knoepfe + '</div>';
     }).join('');
     el.innerHTML = h;
@@ -586,12 +589,18 @@
     dialog('Verbindungscode eingeben', CODE_HTML, [{ t: 'Abbrechen' }, { t: 'Anfrage senden', c: 'gold', fn: function (d) { return codeSenden(d, el); } }]);
   }
 
+  /* v3460 · Mail bei Rueckmeldung - je Kunde, Vorgabe an (NULL/undefined aus aelterem Stand = an) */
+  function mailSchalter(k) {
+    return '<div class="pk-gruppe">Benachrichtigung</div>' +
+      '<label class="pk-schalter"><span>E-Mail an den Kunden bei Rückmeldung<small>Wenn du Anmerkungen mit „Zurück an Kunden“ zurückgibst, bekommt er eine E-Mail in deiner Marke mit Objekt, Zahl der Anmerkungen und deinem Begleittext. Vorgabe an.</small></span>' +
+      '<input type="checkbox" id="pk-k-mailrm"' + (k.mail_rueckmeldung !== false ? ' checked' : '') + '></label>';
+  }
   function kundeDialog(el, id) {
     var k = S.partner.kunden.filter(function (x) { return x.id === id; })[0]; if (!k) return;
     if (k.platz_art !== 'platz') {
-      return dialog('Notiz zu ' + k.display_name, '<div class="pk-hinweis">Der Kunde hat einen eigenen Plan. Stufe, Rechte und Marke bestimmt er selbst. Die Notiz sieht nur dein Team.</div>' +
-        '<label class="pk-feld">Notiz<textarea id="pk-k-notiz" maxlength="2000">' + esc(k.notiz || '') + '</textarea></label>',
-        [{ t: 'Abbrechen' }, { t: 'Speichern', c: 'gold', fn: function (d) { return api('/partner/kunden/' + id, { method: 'PUT', body: { notiz: wert(d, '#pk-k-notiz') } }).then(function () { neuLaden(el); }); } }]);
+      return dialog('Notiz und E-Mail zu ' + k.display_name, '<div class="pk-hinweis">Der Kunde hat einen eigenen Plan. Stufe, Rechte und Marke bestimmt er selbst. Die Notiz sieht nur dein Team.</div>' +
+        '<label class="pk-feld">Notiz<textarea id="pk-k-notiz" maxlength="2000">' + esc(k.notiz || '') + '</textarea></label>' + mailSchalter(k),
+        [{ t: 'Abbrechen' }, { t: 'Speichern', c: 'gold', fn: function (d) { return api('/partner/kunden/' + id, { method: 'PUT', body: { notiz: wert(d, '#pk-k-notiz'), mail_rueckmeldung: wert(d, '#pk-k-mailrm') } }).then(function () { toast('Gespeichert.'); neuLaden(el); }); } }]);
     }
     var r = k.rechte_wirksam || {};
     var html = '<div class="pk-gruppe">Stufe</div>' + [1, 2, 3].map(function (s) {
@@ -606,6 +615,7 @@
       '<label class="pk-schalter"><span>Partnernetzwerk zeigen<small>Vorgabe aus.</small></span><input type="checkbox" id="pk-k-netz"' + (k.netzwerk ? ' checked' : '') + '></label>' +
       '<label class="pk-feld" style="margin-top:12px">Marktberichte je Monat (höchstens 10, leer = wie Investor)<input type="number" id="pk-k-mb" min="0" max="10" value="' + (k.kontingent && k.kontingent.marktbericht != null ? k.kontingent.marktbericht : '') + '"></label>' +
       '<label class="pk-feld">Notiz (nur dein Team)<textarea id="pk-k-notiz" maxlength="2000">' + esc(k.notiz || '') + '</textarea></label>' +
+      mailSchalter(k) +
       '<div class="pk-gruppe">Platz</div><div class="pk-hinweis rot">Platz entziehen: der Kunde bekommt 30 Tage Frist zum Export oder für ein eigenes Abo. Danach werden seine Verbindungen getrennt und sein Konto gelöscht.</div>';
     dialog('Stufe und Rechte für ' + k.display_name, html, [
       { t: 'Platz entziehen', c: '', fn: function () { entzugDialog(el, k); } },
@@ -615,7 +625,7 @@
         var mb = wert(d, '#pk-k-mb');
         return api('/partner/kunden/' + id, { method: 'PUT', body: {
           stufe: (d.querySelector('input[name="pk-k-stufe"]:checked') || {}).value, marke: (d.querySelector('input[name="pk-k-marke"]:checked') || {}).value,
-          rechte: rechte, netzwerk: wert(d, '#pk-k-netz'), kontingent: mb === '' ? {} : { marktbericht: Number(mb) }, notiz: wert(d, '#pk-k-notiz') } })
+          rechte: rechte, netzwerk: wert(d, '#pk-k-netz'), kontingent: mb === '' ? {} : { marktbericht: Number(mb) }, notiz: wert(d, '#pk-k-notiz'), mail_rueckmeldung: wert(d, '#pk-k-mailrm') } })
           .then(function () { toast('Gespeichert.'); neuLaden(el); });
       } }]);
   }
@@ -1118,6 +1128,18 @@
   }
 
   /* ── Start ───────────────────────────────────────────────────────────── */
+  /* v3460 · ?dp_partner=aufgaben (Link aus der Rueckmeldungs-Mail). Sofort gemerkt und aus der Adresse genommen,
+     damit die Anmeldung ihn nicht verliert; eingeloest, sobald /mein-partner geladen ist. */
+  (function () {
+    try {
+      var q = new URLSearchParams(location.search), w = q.get('dp_partner');
+      if (w === 'aufgaben') { sessionStorage.setItem('dppk_ziel', w); q.delete('dp_partner'); history.replaceState(history.state, '', location.pathname + (q.toString() ? '?' + q.toString() : '') + location.hash); }
+    } catch (e) {}
+  })();
+  function zielEinloesen(m) {
+    var z = null; try { z = sessionStorage.getItem('dppk_ziel'); sessionStorage.removeItem('dppk_ziel'); } catch (e) {}
+    if (z === 'aufgaben' && m && m.verbunden) setTimeout(function () { meinPartnerOeffnen('aufgaben'); }, 600);
+  }
   var _gestartet = false;
   function start() {
     if (_gestartet) return;
@@ -1125,7 +1147,7 @@
     if (!t || !window.Auth || !Auth.apiCall) return;
     _gestartet = true;
     stil();
-    api('/mein-partner').then(function (m) { S.kunde = m; menuePflegen(); rechteAnwenden(); bandPflegen(); partnerzeile(); }).catch(function () {});
+    api('/mein-partner').then(function (m) { S.kunde = m; menuePflegen(); rechteAnwenden(); bandPflegen(); partnerzeile(); zielEinloesen(m); }).catch(function () {});
     api('/partner/cockpit').then(function (c) { S.partner = c; menuePflegen(); sbGruppe(); }).catch(function () { S.partner = null; menuePflegen(); });
     var n = 0, iv = setInterval(function () { var a = speichernSperren(), b = ladenBeobachten(); renderBeobachten(); if ((a || window.saveObj && window.saveObj._dppk) && (b || window.loadSaved && window.loadSaved._dppk) || ++n > 40) clearInterval(iv); }, 500);
     new MutationObserver(function () {

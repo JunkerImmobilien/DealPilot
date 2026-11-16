@@ -71,7 +71,7 @@ async function aktiveVerbindung(userId) {
 async function cockpit(rs) {
   const pool = await reseller.getPool(rs.id).catch(() => null);
   const kunden = (await query(
-    `SELECT c.id, c.user_id, c.display_name, c.platz_art, c.stufe, c.rechte, c.kontingent, c.marke, c.netzwerk, c.herkunft,
+    `SELECT c.id, c.user_id, c.display_name, c.platz_art, c.stufe, c.rechte, c.kontingent, c.marke, c.netzwerk, c.mail_rueckmeldung, c.herkunft,
             c.verbunden_am, c.getrennt_am, c.getrennt_von, c.entzug_am, c.entzug_frist_bis, c.notiz, c.created_at,
             u.email,
             EXISTS (SELECT 1 FROM licenses l WHERE l.client_id = c.id AND l.status = 'zugewiesen') AS hat_platz,
@@ -98,12 +98,14 @@ async function kundeLaden(rs, clientId) {
   return r.rows[0];
 }
 
-/** Stufe, Rechte, Kontingent, Marke, Netzwerk, Notiz. Bei 'eigen' nur Notiz (das Konto gehoert dem Kunden). */
+/** Stufe, Rechte, Kontingent, Marke, Netzwerk, Notiz, Mail bei Rueckmeldung (v3460). Bei 'eigen' nur Notiz und Mail (das Konto gehoert dem Kunden). */
 async function kundeEinstellen(rs, clientId, b) {
   const c = await kundeLaden(rs, clientId);
   b = b || {};
   if (c.platz_art !== 'platz') {
     if (b.notiz !== undefined) await query(`UPDATE reseller_clients SET notiz = $2 WHERE id = $1`, [clientId, String(b.notiz || '').slice(0, 2000)]);
+    /* v3460 · Mail bei Rueckmeldung ist eine Einstellung des Partners ueber SEINE Nachrichten, kein Recht am Konto: auch bei 'eigen' */
+    if (b.mail_rueckmeldung !== undefined) await query(`UPDATE reseller_clients SET mail_rueckmeldung = $2 WHERE id = $1`, [clientId, b.mail_rueckmeldung !== false]);
     if (['stufe', 'rechte', 'kontingent', 'marke', 'netzwerk'].some((k) => b[k] !== undefined)) throw fehler('eigener_plan', 409, 'Der Kunde hat einen eigenen Plan, Stufe und Rechte bestimmt er selbst.');
     return kundeLaden(rs, clientId);
   }
@@ -121,6 +123,7 @@ async function kundeEinstellen(rs, clientId, b) {
   }
   if (b.marke !== undefined) setze('marke', b.marke === 'dealpilot' ? 'dealpilot' : 'partner');
   if (b.netzwerk !== undefined) setze('netzwerk', !!b.netzwerk);
+  if (b.mail_rueckmeldung !== undefined) setze('mail_rueckmeldung', b.mail_rueckmeldung !== false);   /* v3460 */
   if (b.notiz !== undefined) setze('notiz', String(b.notiz || '').slice(0, 2000));
   if (b.display_name !== undefined && String(b.display_name).trim()) setze('display_name', String(b.display_name).trim().slice(0, 120));
   if (sets.length) await query(`UPDATE reseller_clients SET ${sets.join(', ')} WHERE id = $1`, p);
@@ -187,7 +190,7 @@ async function anfrageZurueckziehen(rs, id) {
 async function kundenstaende(rs) {
   const r = await query(
     `SELECT s.id AS share_id, s.client_id, s.kopie_object_id, s.stand_nr, s.stand_am, s.ueber_bestand, s.gelesen_am, s.status,
-            c.display_name AS kunde, c.getrennt_am, c.platz_art AS kunde_platz_art, u.email AS kunde_email,
+            c.display_name AS kunde, c.getrennt_am, c.platz_art AS kunde_platz_art, u.email AS kunde_email, c.mail_rueckmeldung AS kunde_mail_rueckmeldung,
             o.name, o.seq_no, o.ort, o.kaufpreis, o.dscr, o.cf_ns, o.bmy,
             o.data::jsonb->>'str' AS str, o.data::jsonb->>'hnr' AS hnr, o.data::jsonb->>'plz' AS plz, o.data::jsonb->>'objart' AS objart,
             (SELECT count(*)::int FROM partner_anmerkungen n WHERE n.share_id = s.id AND n.status = 'entwurf') AS anm_entwurf,

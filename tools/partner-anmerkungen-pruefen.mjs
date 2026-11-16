@@ -10,8 +10,11 @@
  *     ungueltiger Selektor -> frei ohne Ausnahme; ohne Feldbezug -> frei; anderer Abschnitt -> frei.
  *     Eingaben (backend/src/services/partnerAnmerkungen.js _sauber): Art-Rueckfall, Laengendeckel, leerer Text.
  *     Routen: jede neue Route steht in routes/partnerKunden.js hinter dem Partner- bzw. Kunden-Router.
+ *     v3460 E-Mail bei Rueckmeldung: echtes zurueckgeben() mit nachgebauter DB - Schalter aus = keine Mail, an/Vorgabe =
+ *     genau eine Mail im Partner-Rahmen, Testadressen nie ueber SMTP, SMTP- und Vorbereitungsfehler brechen nicht ab.
  * B · tools/partner-anmerkungen-live.js: Rechte (fremder Partner, fremder Kunde, Entwurf unsichtbar), Lebenszyklus
- *     (Entwurf -> zurueckgegeben -> erledigt, Aufgabe erledigt, Meldung beim Partner), Feldbezug ueberlebt einen neuen Stand.
+ *     (Entwurf -> zurueckgegeben -> erledigt, Aufgabe erledigt, Meldung beim Partner), Feldbezug ueberlebt einen neuen Stand;
+ *     v3460 Schalter je Kunde ueber die echte Route (aus -> 'aus', an -> 'testadresse'), share_audit, fremder Partner 404.
  * RC 0 = sauber.
  */
 import fs from 'node:fs';
@@ -65,6 +68,94 @@ const routen = fs.readFileSync(path.join(WURZEL, 'backend/src/routes/partnerKund
 ok('Partner-Router verlangt das Merkmal reseller', /partner\.use\(requireFeature\('reseller'\)\)/.test(routen));
 const mig = fs.readFileSync(path.join(WURZEL, 'backend/migrations/106_partner_anmerkungen.sql'), 'utf8');
 ok('Migration: Anmerkung haengt am Kundenstand (CASCADE) und am Original (SET NULL)', /share_id\s+uuid NOT NULL REFERENCES public\.object_shares\(id\) ON DELETE CASCADE/.test(mig) && /objekt_id\s+uuid REFERENCES public\.objects\(id\) ON DELETE SET NULL/.test(mig));
+
+/* ── v3460 · E-Mail an den Kunden bei Rueckmeldung ─────────────────────────
+   Das ECHTE Modul (services/partnerAnmerkungen.js) mit dem ECHTEN Mail-Rahmen (resellerInviteMail.js) und der ECHTEN
+   Testadressen-Pruefung (objektUebergabe.istTestadresse); ersetzt sind nur db/pool (Antworten je SQL), mailerService
+   (zaehlt statt zu senden) und die Module ohne Bezug. zurueckgeben() laeuft vollstaendig durch. */
+console.log('A · E-Mail bei Rueckmeldung (v3460)');
+{
+  const SRC = path.join(WURZEL, 'backend', 'src');
+  const gesendet = [];
+  let mailerFehler = false;
+  const db = { k: {}, audit: [], aufgaben: 0 };
+  let antworte = async () => ({ rows: [] });
+  const stub = (rel, exp) => { const f = require.resolve(path.join(SRC, rel)); require.cache[f] = { id: f, filename: f, loaded: true, exports: exp }; };
+  stub('db/pool.js', { query: (sql, p) => antworte(sql, p), pool: {} });
+  stub('services/planService.js', {});
+  stub('services/partnerKunden.js', {});
+  stub('services/objectService.js', {});
+  stub('services/objektFotos.js', {});
+  stub('services/mailerService.js', { sendMail: async (o) => { if (mailerFehler) throw new Error('SMTP weg (Test)'); gesendet.push(o); return { dryRun: false, to: o.to }; } });
+  const logoUrl = (basis, id, art, v) => (!basis || !id) ? null : String(basis).replace(/\/+$/, '') + '/api/v1/public/partner-logo/' + id + '/' + art + '.png' + (v ? '?v=' + v : '');
+  stub('routes/partnerLogo.js', Object.assign(() => {}, { logoUrl }));
+  const A = require(path.join(SRC, 'services', 'partnerAnmerkungen.js'));
+  const S = '11111111-1111-4111-8111-111111111111';
+  antworte = async (sql, p) => {
+    if (/FROM object_shares s JOIN reseller_clients/.test(sql)) return { rows: [{ id: S, reseller_id: 'r1', client_id: 'c1', object_id: 'o1', kopie_object_id: 'k1', stand_nr: 1, status: 'gesendet' }] };
+    if (/SELECT id FROM partner_anmerkungen/.test(sql)) return { rows: [{ id: 'a1' }, { id: 'a2' }, { id: 'a3' }] };
+    if (/FROM objects WHERE id/.test(sql)) return { rows: [{ name: 'Objekt', str: 'Musterweg', hnr: '5', ort: 'Musterstadt' }] };
+    if (/INSERT INTO partner_aufgaben \(/.test(sql)) { db.aufgaben++; return { rows: [{ id: 'auf' + db.aufgaben, titel: p[1] }] }; }
+    if (/SELECT c\.mail_rueckmeldung/.test(sql)) return { rows: [db.k] };
+    if (/FROM resellers WHERE id/.test(sql)) return { rows: [{ id: 'r1', name: 'Testpartner', brand_name: 'Muster Immobilien', whitelabel_enabled: true, brand_accent: '#2266AA', brand_email: 'kontakt@muster-immobilien.test', brand_company: 'Muster Immobilien GmbH', stand: 1 }] };
+    if (/INSERT INTO share_audit/.test(sql)) { db.audit.push(JSON.parse(p[2])); return { rows: [] }; }
+    return { rows: [] };
+  };
+  const rs = { id: 'r1' };
+  const lauf = async (k, opt) => { db.k = k; gesendet.length = 0; db.audit.length = 0; return A.zurueckgeben(rs, 'u1', S, { text: 'Bitte die zwei Punkte ansehen.' }, Object.assign({ basis: 'https://app.beispiel.invalid' }, opt || {})); };
+  const altEnv = { a: process.env.FRONTEND_BASE_URL, b: process.env.APP_URL, c: process.env.FRONTEND_URL };
+  delete process.env.FRONTEND_BASE_URL; delete process.env.APP_URL; delete process.env.FRONTEND_URL;
+
+  let r = await lauf({ mail_rueckmeldung: false, display_name: 'Kundin Muster', email: 'kundin@muster-kunde.de' });
+  ok('Schalter aus: Aufgabe steht, keine Mail, Status aus', r.ok && r.aufgabe_id && r.anzahl === 3 && r.mail.status === 'aus' && gesendet.length === 0, [r.mail, gesendet.length]);
+  ok('Schalter aus: Status steht im share_audit', db.audit[0] && db.audit[0].mail === 'aus', db.audit);
+  r = await lauf({ mail_rueckmeldung: true, display_name: 'Kundin Muster', email: 'kundin@muster-kunde.de' });
+  const g = gesendet[0] || {};
+  ok('Schalter an: genau eine Mail an den Kunden', r.mail.status === 'gesendet' && gesendet.length === 1 && g.to === 'kundin@muster-kunde.de', [r.mail, gesendet.length, g.to]);
+  ok('Vorgabe an: Spalte fehlt (NULL/undefined) -> Mail', (await lauf({ display_name: 'Kundin Muster', email: 'kundin@muster-kunde.de' })).mail.status === 'gesendet' && gesendet.length === 1);
+  ok('Betreff: Partnermarke vorn, Objekt', /^Muster Immobilien: Rückmeldung zu Musterweg 5, Musterstadt$/.test(g.subject || ''), g.subject);
+  ok('Absender und Antwortadresse des Partners', g.fromName === 'Muster Immobilien' && g.replyTo === 'kontakt@muster-immobilien.test', [g.fromName, g.replyTo]);
+  const html = g.html || '', text = g.text || '';
+  ok('Inhalt: Zahl der Anmerkungen, Begleittext, Objekt', /3 Anmerkungen/.test(html) && /Bitte die zwei Punkte ansehen\./.test(html) && /Musterweg 5, Musterstadt/.test(html) && /3 Anmerkungen/.test(text) && /Bitte die zwei Punkte ansehen\./.test(text));
+  ok('Knopf in die App: ?dp_partner=aufgaben', html.includes('href="https://app.beispiel.invalid/?dp_partner=aufgaben"') && text.includes('https://app.beispiel.invalid/?dp_partner=aufgaben'));
+  ok('DealPilot nur als Plattform', (html.match(/DealPilot/g) || []).length === 1 && /Plattform: DealPilot/.test(html) && /Plattform: DealPilot/.test(text) && !/DealPilot/.test(g.subject), (html.match(/DealPilot/g) || []).length);
+  ok('Rahmen der Einladungs-Mail (marke/rahmen, Akzent des Partners), kein data:-Bild', html.startsWith('<div style="max-width:560px') && html.includes('#2266AA') && !/data:image/.test(html));
+  ok('Anmerkungstexte stehen nicht in der Mail (nur die Zahl)', !/Bitte prüfen|Bitte nachreichen|Kaufpreis/.test(html));
+  const xss = A.rueckmeldungMailBauen({ reseller: {}, anzeigeName: '<b>x</b>', objName: '<script>', anzahl: 1, begleit: '<img src=x onerror=1>', link: 'https://a.invalid/?dp_partner=aufgaben' });
+  ok('Eingaben werden maskiert, 1 Anmerkung im Singular', !/<script>|<img src=x/.test(xss.html) && /1 Anmerkung</.test(xss.html) && /Plattform/.test(xss.html) === false, xss.html.slice(0, 120));
+  for (const adr of ['kunde-a@partner-pruefung.dealpilot.test', 'x@foo.invalid', 'x@example.com', 'x@sub.example.org', 'x@ort.example']) {
+    r = await lauf({ mail_rueckmeldung: true, display_name: 'Testkunde', email: adr });
+    ok('Testadresse ' + adr.split('@')[1] + ' nie ueber SMTP', r.mail.status === 'testadresse' && gesendet.length === 0, [r.mail, gesendet.length]);
+  }
+  r = await lauf({ mail_rueckmeldung: true, display_name: 'Testkunde', email: '' });
+  ok('ohne Adresse: kein Versand, Aufgabe steht', r.ok && r.mail.status === 'ohne_adresse' && gesendet.length === 0, r.mail);
+  mailerFehler = true;
+  r = await lauf({ mail_rueckmeldung: true, display_name: 'Kundin Muster', email: 'kundin@muster-kunde.de' });
+  ok('SMTP-Fehler bricht das Zurueckgeben nicht ab (ok, Aufgabe, Status fehler, Audit)', r.ok && r.aufgabe_id && r.mail.status === 'fehler' && db.audit[0] && db.audit[0].mail === 'fehler', r);
+  mailerFehler = false;
+  const altAntw = antworte;
+  antworte = async (sql, p) => { if (/FROM resellers WHERE id/.test(sql)) throw new Error('DB weg (Test)'); return altAntw(sql, p); };
+  r = await lauf({ mail_rueckmeldung: true, display_name: 'Kundin Muster', email: 'kundin@muster-kunde.de' });
+  ok('Fehler beim Vorbereiten (Marke) bricht nicht ab', r.ok && r.aufgabe_id && r.mail.status === 'fehler', r);
+  antworte = altAntw;
+  process.env.APP_URL = 'https://staging.beispiel.invalid';
+  r = await lauf({ mail_rueckmeldung: true, display_name: 'Kundin Muster', email: 'kundin@muster-kunde.de' });
+  ok('.env-Adresse geht vor dem Host der Anfrage', (gesendet[0] || {}).text && gesendet[0].text.includes('https://staging.beispiel.invalid/?dp_partner=aufgaben'));
+  if (altEnv.a !== undefined) process.env.FRONTEND_BASE_URL = altEnv.a;
+  if (altEnv.b !== undefined) process.env.APP_URL = altEnv.b; else delete process.env.APP_URL;
+  if (altEnv.c !== undefined) process.env.FRONTEND_URL = altEnv.c;
+
+  /* Schalter im Partner-Cockpit und Einstellung im Backend */
+  const pkq = fs.readFileSync(path.join(WURZEL, 'frontend/js/partner-kunden.js'), 'utf8');
+  ok('Cockpit: Schalter im Kundendialog beider Zugangsarten, gespeichert als mail_rueckmeldung', (pkq.match(/(\+ |\n\s+)mailSchalter\(k\)/g) || []).length === 2 && (pkq.match(/mail_rueckmeldung: wert\(d, '#pk-k-mailrm'\)/g) || []).length === 2);
+  ok('Cockpit: Vorgabe an (nur false schaltet aus)', /k\.mail_rueckmeldung !== false \? ' checked'/.test(pkq));
+  ok('Cockpit: Link ?dp_partner=aufgaben wird eingeloest', /get\('dp_partner'\)/.test(pkq) && /meinPartnerOeffnen\('aufgaben'\)/.test(pkq));
+  const pks = fs.readFileSync(path.join(SRC, 'services/partnerKunden.js'), 'utf8');
+  ok('Backend: kundeEinstellen setzt mail_rueckmeldung auch bei eigenem Plan', /if \(b\.mail_rueckmeldung !== undefined\) await query\(`UPDATE reseller_clients SET mail_rueckmeldung/.test(pks) && /setze\('mail_rueckmeldung'/.test(pks));
+  ok('Backend: Cockpit und Kundenstaende liefern den Schalter', /c\.mail_rueckmeldung, c\.herkunft/.test(pks) && /c\.mail_rueckmeldung AS kunde_mail_rueckmeldung/.test(pks));
+  const m107 = fs.readFileSync(path.join(WURZEL, 'backend/migrations/107_partner_mail_rueckmeldung.sql'), 'utf8');
+  ok('Migration 107: mail_rueckmeldung boolean NOT NULL DEFAULT true, idempotent', /ADD COLUMN IF NOT EXISTS mail_rueckmeldung boolean NOT NULL DEFAULT true/.test(m107));
+}
 
 if (process.argv.includes('--live')) {
   console.log('B · live auf Staging');

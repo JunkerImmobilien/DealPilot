@@ -45,7 +45,7 @@ partner.post('/kundenstaende/:id/uebernehmen', fn((req) => pk.kundenstandUeberne
 /* v3450 · Anmerkungen am Kundenstand und „Zurueck an Kunden“ */
 partner.get('/kundenstaende/:id/anmerkungen', fn(async (req) => ({ anmerkungen: await anm.liste(req.reseller, req.params.id) })));
 partner.post('/kundenstaende/:id/anmerkungen', fn((req) => anm.anlegen(req.reseller, req.user.id, req.params.id, req.body)));
-partner.post('/kundenstaende/:id/zurueck', fn((req) => anm.zurueckgeben(req.reseller, req.user.id, req.params.id, req.body)));
+partner.post('/kundenstaende/:id/zurueck', fn((req) => anm.zurueckgeben(req.reseller, req.user.id, req.params.id, req.body, { basis: 'https://' + req.headers.host })));   /* v3460 · basis nur Rueckfall, die .env-Adresse geht vor */
 partner.put('/anmerkungen/:id', fn((req) => anm.aendern(req.reseller, req.params.id, req.body)));
 partner.delete('/anmerkungen/:id', fn((req) => anm.loeschen(req.reseller, req.params.id)));
 partner.get('/aufgaben', fn(async (req) => ({ aufgaben: await pk.aufgabenListe(req.reseller) })));
