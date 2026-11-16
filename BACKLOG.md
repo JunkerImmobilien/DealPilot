@@ -36,6 +36,13 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
+### N168 · Partner-Videos und Pilot-Analyse-Videos (Marcel 16.11.2026) — **vier Partner-Videos aufgenommen (stumm, v3490/v3491/v3497 auf Staging), Rest offen**
+- Fertig: Demo-Partner „Nordlicht Immobilienberatung“ (erfunden, `tools/partner-demo-anlegen.js`, bleibt dauerhaft stehen, stellt bei jedem Lauf den Aufnahme-Zustand her), Drehbücher `partner-cockpit`, `partner-kunden`, `partner-senden`, `partner-anmerkungen`, Studio `?modul=p1…p4`, Videos und `videos.json` in `Dateien/Messe/Videos/Partner/`.
+- Offen (Frage an Marcel): Vertonung. Bisher Sprecher onyx (OpenAI-TTS, kostet je Video wenige Cent) bzw. Marcels Stimmklon (ElevenLabs/Higgsfield, kostet Guthaben). Zeitmarken je Zeile liegen bei (`zeitmarken-p1…p4.json`).
+- Offen (Frage an Marcel): „Objekt an Kunden übergeben“ (v3317) hat seit dem Cockpit (v3392) keinen Knopf mehr – `DealPilotResellerPortal.uebergeben` ruft niemand auf. Wieder einbauen (z. B. Aktionen im eigenen Objekt) oder fallen lassen?
+- Offen: Videos mit Pilot-Analyse neu aufnehmen (alle vor v3420 aufgenommen, Liste in Wissen 16.11.). Voraussetzung: Drehbücher finden ihre Objekte über die Anschrift statt über feste Kennungen, Lauf in einem Kopie-Konto (z. B. `app-bilder@landing-bilder.dealpilot.test`), nicht in info@.
+- Offen: Videothek eintragen (`node tools/partner-videos-eintragen.mjs --schreiben`, Landing-Agent).
+
 ### N167 · Partnerseite der Landing mit Strecke und Reihe „Für Partner“ in der Videothek (Marcel 16.11.2026) — **landing-partner-1/-1a (`53dc7e7e`, `5f920212`) und v3490 (`842de190`) auf Staging nachgemessen; Abnahme der Optik durch Marcel, dann Prod**
 - Ansehen: https://staging.dealpilot.immo/partner.html (Strecke unter „So läuft es ab“), Startseite Abschnitt „Für Partner“, https://staging.dealpilot.immo/videothek.html#reihe-partner.
 - Offen: Partner-Videos des Video-Agenten eintragen (`node tools/partner-videos-eintragen.mjs`, Quelle `Dateien/Messe/Videos/Partner/videos.json`), MP4s per scp, Buster ziehen.
