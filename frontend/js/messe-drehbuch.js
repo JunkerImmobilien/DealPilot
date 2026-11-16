@@ -9634,6 +9634,8 @@
     localStorage.setItem('ji_token', k.t);
     localStorage.setItem('ji_session', JSON.stringify({ mode: 'api', userId: k.id, email: k.email, name: k.name, role: 'user', token: k.t, createdAt: new Date().toISOString(), expires: Date.now() + 3 * 3600 * 1000 }));
     try { sessionStorage.removeItem('dppk_band_zu'); } catch (e) {}
+    /* v3498 · die Marke des vorigen Kontos nicht mitnehmen (gemessen: der nicht verbundene Kunde trug das Partnerlogo aus dp_wl_cache) */
+    try { localStorage.removeItem('dp_wl_cache'); localStorage.removeItem('dp_wl_preview'); } catch (e) {}
     var u = new URL(location.href); u.searchParams.set('ab', String(ab)); u.searchParams.set('_', String(Date.now())); u.hash = '';
     lauf = 0;
     location.replace(u.toString());
