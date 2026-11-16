@@ -43,7 +43,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 - ~~Offen (Fehler): Toast „kundenstand_schreibgeschuetzt“~~ **erledigt v3491 (`7dc6031b`)**, nachgemessen.
 - **erledigt landing-partner-2/-2a (`b9ce4ff7`, `06a924dc`):** Preise auf partner.html im Paketdesign, neue Navigation auf leistungsumfang/fragen/sicherheit/api, Kartentitel auf preise.html wieder sichtbar.
 - landing-partner-1b: Logo „Muster Finanzberatung“ (`design/logo/partner-demo/`) im Testkonto hinterlegt, Bilder neu.
-- Offen (Marcel 16.11.): echte Bilder der normalen App auf der Landing. Vorschlag 4 Stellen in `leistungsumfang.html` (heute nur Text): Finanzierung (#lu-finanzierung), Investor Deal Score/Pilot-Analyse (#lu-dealscore), Steuer (#lu-steuer), Portfolio-Cockpit (#lu-portfolio). Marcel hat das Kopieren der info@-Demo-Objekte (Staging, nur lesen) über die Koordination freigegeben. Die Berechtigungsprüfung lehnt das Lesen aber ab, deshalb muss er es in der Hauptsitzung selbst freigeben (oder eine Erlaubnisregel setzen).
+- **erledigt landing-app-bilder-1 (`d148a0a9`):** echte App-Bilder in leistungsumfang.html, Kapitel 09, 11, 14, 16. Offen: kopierte Pilot-Analysen im Testkonto zeigen „gehört zu einem anderen Objekt“.
 - Fragen an Marcel: Preis- und Freischalttext („wir schalten Partner persönlich frei“) noch gültig? Zielgruppen-Reihenfolge? Soll die Seite „Partner-Programm“ heißen?
 
 ### N166 · Kanzlei-Mappe: Rest nach v3480/v3481 (Marcel 16.11.2026) — **offen, nur nach Rückfrage**
