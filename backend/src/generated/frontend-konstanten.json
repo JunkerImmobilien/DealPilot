@@ -1,10 +1,10 @@
 {
- "erzeugt_am": "2026-11-16T10:09:42.423Z",
+ "erzeugt_am": "2026-11-16T10:20:27.663Z",
  "quellen": {
   "voice-import": "b85d1194e6f250e3",
   "objektart-felder": "f7d9212555982a97",
-  "storage": "5fbfaba2283487d7",
-  "index-html": "3ad118c0918a53af",
+  "storage": "312738ae61865f90",
+  "index-html": "22a3239f4b0a50e1",
   "grest": "81f3fb0a4de3a6cf"
  },
  "daten": {
@@ -641,6 +641,7 @@
    "_dok_auswertung",
    "_dok_eingang",
    "einheiten",
+   "kpa_kosten",
    "san_tax_active",
    "san_tax_years",
    "moebl_tax_active",
@@ -2061,6 +2062,11 @@
     "id": "einheiten",
     "kind": "text",
     "label": "Wohneinheiten im Gebäude"
+   },
+   {
+    "id": "kpa_kosten",
+    "kind": "text",
+    "label": "Kosten der Kaufpreisaufteilung / AfA-Ermittlung"
    },
    {
     "id": "san_tax_active",

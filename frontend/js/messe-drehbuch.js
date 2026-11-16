@@ -10169,6 +10169,17 @@
     ]
   };
 
+  /* v3502 · Marcel 16.11.2026: die Videoreihe läuft nicht mehr in info@, sondern in einem Konto mit Kopien der
+     Demo-Objekte (tools/videoreihe-konto-anlegen.js). Die festen Kennungen der Drehbücher zeigen auf die Originale;
+     liegt die Zuordnung Original → Kopie in localStorage dpm_kennungen (setzt nur das Aufnahmewerkzeug), werden sie
+     vor dem Lauf umgesetzt. Ohne Zuordnung bleibt alles wie bisher. */
+  function kennungenAufloesen() {
+    var m = null; try { m = JSON.parse(localStorage.getItem('dpm_kennungen') || 'null'); } catch (e) {}
+    if (!m || typeof m !== 'object') return;
+    var k = function (id) { return m[id] || id; };
+    R6_MFH = k(R6_MFH); R11_WESTERFELD = k(R11_WESTERFELD); R11_PARK = k(R11_PARK); R27_DT = k(R27_DT); R27_BI = k(R27_BI);
+    LU_ID = k(LU_ID); D3_IDS.park = k(D3_IDS.park); D3_IDS.km18 = k(D3_IDS.km18); D3_IDS.lh14 = k(D3_IDS.lh14); QG_A = k(QG_A); QG_B = k(QG_B);
+  }
   /* ── Ablauf ───────────────────────────────────────────────────── */
   var lauf = 0, _aktiv = null;
   function stopp() {
@@ -10183,7 +10194,7 @@
   function esc(e) { if (e.key === 'Escape') { e.stopPropagation(); stopp(); } }
   async function start(name, opts) {
     var D = DREHBUECHER[name]; if (!D) { console.warn('[messe] unbekanntes Drehbuch: ' + name); return; }
-    css(); stopp();
+    css(); stopp(); kennungenAufloesen();   /* v3502 */
     try { document.documentElement.classList.add('dpm-laeuft'); if (STUDIO) document.documentElement.classList.add('dpm-studio'); } catch (e) {}
     var g = lauf = Date.now(); _aktiv = D;
     var b = el('dpm-stopp', 'button'); b.type = 'button'; b.textContent = '■'; b.title = 'Drehbuch beenden (Esc)'; b.onclick = stopp;
