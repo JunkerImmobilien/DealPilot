@@ -34,6 +34,9 @@ const nutzer = async (e) => (await query('SELECT id, email FROM users WHERE emai
   let P2 = await nutzer('partner-test2@partner-pruefung.dealpilot.test');
   if (!P2) P2 = await userService.createUser({ email: 'partner-test2@partner-pruefung.dealpilot.test', plainPassword: crypto.randomBytes(12).toString('base64url'), name: 'Fremder Testpartner', newsletter: false });
   await planService.setUserPlanManual(P2.id, 'partner', 'yearly', 365);
+  /* v3460 · wie partner-testkonto-anlegen.js: ohne bestaetigte Adresse sperrt die Frist (VERIFY_EXPIRED, 403) nach einem Tag
+     jeden Aufruf - dann prueft „fremder Partner 404“ die Mailsperre statt der Rechte (gemessen 16.11.2026) */
+  await query('UPDATE users SET email_verified_at = COALESCE(email_verified_at, now()) WHERE id = $1', [P2.id]);
   await resellerService.ensureReseller(P2.id, { name: 'Fremder Testpartner' });
   const tP = tok(P), tA = tok(A), tB = tok(B), tP2 = tok(P2);
   const neu = { anm: [], aufg: [] };
