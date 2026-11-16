@@ -2773,7 +2773,7 @@ function _renderKlauselText(){ /* V293-E-klausel-no-pct: Prozente entfernt, nur 
       '<p>Diese Aufteilung wurde im Rahmen einer Wertermittlung nach BMF-Arbeitshilfe (Juni 2023, maßgebendes Verfahren nach der Arbeitshilfe) unter Heranziehung lagespezifischer Bodenrichtwerte, der tatsächlichen Restnutzungsdauer des Gebäudes sowie ggf. vorgenommener Modernisierungen erstellt. ' +
       '<strong>Sie hat verbindlichen Charakter</strong> und gilt insbesondere als wirtschaftlich angemessen i.S.d. BFH-Rechtsprechung (BFH IX R 26/19 v. 21.07.2020). ' +
       'Die Parteien sind sich einig, dass eine pauschale 80/20-Aufteilung im konkreten Fall nicht sachgerecht wäre. ' +
-      'Eine abweichende Wertfeststellung durch das Finanzamt setzt eine substantiierte Gegenbewertung voraus (vgl. § 199 BewG). Stand: ' + datum + '.</p>'
+      'Eine abweichende Wertfeststellung durch das Finanzamt setzt eine substantiierte Gegenbewertung voraus. Stand: ' + datum + '.</p>'
   };
 
   var el = document.getElementById('klauselText');

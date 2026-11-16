@@ -333,9 +333,7 @@
       'Gebäude einschließlich der wesentlichen Gebäudeteile entfallen ' + eur(gebNeu, 2) +
       (B.inv > 0 ? ' und auf das mitverkaufte Inventar entfallen ' + eur(B.inv, 2) : '') + '.\n' +
       /* v3188 · Marcel 05.11.2026: im Text für den Kaufvertrag „noch mal reinschreiben, dass das damit ermittelt wurde“ */
-      (W.id === 'jacoby' ? 'Die Aufteilung wurde nach der umgekehrten Ertragswertmethode (Jacoby) ermittelt.\n'
-        : W.ab > 0 ? 'Die Aufteilung wurde auf Grundlage der Arbeitshilfe des Bundesministeriums der Finanzen mit einem Abschlag von ' + pct(W.ab, 0) + ' auf den Bodenwert ermittelt.\n'
-        : 'Die Aufteilung wurde nach der Arbeitshilfe des Bundesministeriums der Finanzen ermittelt.\n');
+      (W.id === 'jacoby' ? 'Die Aufteilung wurde nach der umgekehrten Ertragswertmethode (Jacoby) ermittelt.\n' : '');   /* Hotfix v3481p · Marcel 16.11.2026: Satz zur Arbeitshilfe/zum Abschlag gehoert nicht in den Kaufvertrag (wie staging v3481) */
     var hinweis = 'Diese Aufteilung hat verbindlichen Charakter und ist wirtschaftlich angemessen im Sinne ' +
       'der Rechtsprechung des Bundesfinanzhofs (BFH, Urteil vom 21.07.2020, IX R 26/19).';
     /* Begründung je Auswahl - die Punkte werden fortlaufend nummeriert */
@@ -368,7 +366,7 @@
       'zugrunde zu legen, solange sie wirtschaftlich vernünftig ist und keine nennenswerten Zweifel an ihrer ' +
       'Angemessenheit bestehen (BFH, Urteil vom 16.09.2015, IX R 12/14). Eine pauschale Aufteilung im ' +
       'Verhältnis 80/20 wäre im konkreten Fall nicht sachgerecht; eine abweichende Wertfeststellung ' +
-      'durch das Finanzamt setzt eine substantiierte Gegenbewertung voraus (vgl. § 199 BewG).');
+      'durch das Finanzamt setzt eine substantiierte Gegenbewertung voraus.');
     if (rnd) P.push('Restnutzungsdauer. Für das Gebäude wurde eine Restnutzungsdauer von ' + Math.round(rnd) + ' Jahren ' +
       'ermittelt; die Abschreibung folgt § 7 Abs. 4 Satz 2 EStG. Die Herleitung liegt als gesonderte Berechnung bei.');
     var zusatz = 'Ergänzende Begründung der Aufteilung (auf Anforderung des Finanzamts)\n\n' +
