@@ -300,7 +300,7 @@
       var items = (A().schemaAn(st.def.schema, p) || {}).items; z.insertAdjacentHTML('beforeend', personHtml(z.children.length, items));
     });
     el('gp-zurueck').onclick = function () { reiterZeigen(st.reiter - 1); };
-    el('gp-weiter').onclick = function () { if (st.reiter < st.reiterListe.length - 1) reiterZeigen(st.reiter + 1); else senden(true); };
+    el('gp-weiter').onclick = function () { if (st.reiter < st.reiterListe.length - 1) reiterZeigen(st.reiter + 1); else if (st.fertig) schliessen(); else senden(true); };
     var be = el('gp-entwurf'); be.hidden = st.art !== 'voll'; be.onclick = function () { senden(false); };
     inhalt.querySelectorAll('[data-gp="stand"]').forEach(function (b) { b.onclick = function () { standAbrufen(b.closest('.gp-zeile').getAttribute('data-rid'), b); }; });
     inhalt.querySelectorAll('[data-gp="uebernehmen"]').forEach(function (b) { b.onclick = function () { uebernehmen(b.getAttribute('data-rnd'), b.getAttribute('data-datum')); }; });
@@ -329,7 +329,8 @@
     el('gp-balken').style.width = (max ? st.reiter / max * 100 : 100) + '%';
     el('gp-sub').textContent = 'Schritt ' + (st.reiter + 1) + ': ' + L[st.reiter].titel + ' · mit unserem Partner ' + MARKE;
     el('gp-zurueck').style.visibility = st.reiter > 0 ? 'visible' : 'hidden';
-    el('gp-weiter').textContent = st.reiter < max ? 'Weiter →' : (st.art === 'lite' ? 'Ersteinschätzung anfordern' : 'Kostenpflichtig beauftragen');
+    /* v3581 · nach dem Ergebnis heisst der Knopf „Schließen“ — ein zweiter Klick legte sonst eine zweite Anfrage an */
+    el('gp-weiter').textContent = st.reiter < max ? 'Weiter →' : (st.fertig ? 'Schließen' : (st.art === 'lite' ? 'Ersteinschätzung anfordern' : 'Kostenpflichtig beauftragen'));
     zaehlerSetzen(offen);
     var body = el('gp-inhalt'); if (body) body.scrollTop = 0;
   }
@@ -487,7 +488,7 @@
     }).catch(function (e) {
       if (e && e.data && e.data.request_id) st.rid = e.data.request_id;
       fehlerZeigen(e);
-    }).then(function () { [knopf, ent].forEach(function (b) { if (b) b.disabled = false; }); knopf.textContent = alt; });
+    }).then(function () { [knopf, ent].forEach(function (b) { if (b) b.disabled = false; }); knopf.textContent = st.fertig ? 'Schließen' : alt; });
   }
 
   /* Hauptzahl: unsere AfA (100 ÷ RND); die AfA von gutachten.org nur klein daneben (Marcel 16.11.2026) */
@@ -503,6 +504,7 @@
   }
   function ergebnisZeigen(a, abgesendet, ms) {
     var box = el('gp-ergebnis'); if (!box || !a) return;
+    if (abgesendet && a.status && a.status !== 'draft') st.fertig = true;
     reiterZeigen(st.reiterListe.length - 1);
     var r = a.result || {};
     if (st.art === 'lite') {
