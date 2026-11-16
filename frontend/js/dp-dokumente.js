@@ -727,16 +727,21 @@
         var ak = [['Kaufpreis (laut Notarvertrag)', zahlAus('ak_kp')], ['Herstellungskosten Gebäude (§ 255 Abs. 2 HGB, zu 100 % Gebäude)', zahlAus('bmf_hk')], ['Grunderwerbsteuer', zahlAus('ak_grest')],
           ['Notar- und Gerichtskosten', zahlAus('ak_notar')], ['Grundbuchamt', zahlAus('ak_gba')], ['Maklergebühr', zahlAus('ak_makler')], ['Sonstige Erwerbsnebenkosten', zahlAus('ak_ji')],
           ['Fahrtkosten', zahlAus('ak_fahrt')], ['Verpflegungsmehraufwand', zahlAus('ak_verpfl')], ['Unterkunft', zahlAus('ak_hotel')], ['Wertgutachten / Sachverständige', zahlAus('ak_gutachten')],
-          ['Anwaltskosten (Kaufvorgang)', zahlAus('ak_anwalt')], ['Sonstiges (Vermessung, Energieausweis)', zahlAus('ak_sonst')], ['Anschaffungsnahe Herstellkosten (§ 6 Abs. 1 Nr. 1a EStG)', zahlAus('ak_ahk')]];
+          ['Anwaltskosten (Kaufvorgang)', zahlAus('ak_anwalt')], ['Sonstiges (Vermessung, Energieausweis)', zahlAus('ak_sonst')],
+          /* v3511 · Kosten der Kaufpreisaufteilung als Anschaffungsnebenkosten (Vorgabe, kpa-kosten.js) */
+          [window.DpKpaKosten ? DpKpaKosten.TEXT_ANK : 'Gutachten zur Kaufpreisaufteilung', window.DpKpaKosten ? DpKpaKosten().ank : 0],
+          ['Anschaffungsnahe Herstellkosten (§ 6 Abs. 1 Nr. 1a EStG)', zahlAus('ak_ahk')]];
         var akZ = ak.filter(function (x, i) { return i === 0 || (x[1] && x[1] > 0); });
         var akSum = akZ.reduce(function (s, x) { return s + (x[1] || 0); }, 0);
         var akTab = akZ.length > 1 || akSum > 0 ? '<h3>Anschaffungskosten im Einzelnen</h3>' + B.liste(akZ.map(function (x, i) { return [x[0], B.eur(x[1] || 0, 2), i ? { art: 'ein' } : {}]; })
           .concat([[(zahlAus('bmf_hk') > 0 ? 'Anschaffungs- und Herstellungskosten gesamt' : 'Anschaffungskosten gesamt') + ' (Eingaben im Reiter Anschaffungskosten)', B.eur(akSum, 2), { art: 'summe' }]])) : '';
         /* v3510 · Marcel 16.11.2026: „wo ist das Gutachten drin in den Anschaffungskosten von 549 Euro?" Kosten,
            die erst die Abschreibung ermitteln (#kpa_kosten), stehen gesondert - nicht in den Anschaffungskosten. */
-        var kpaK = zahlAus('kpa_kosten');
-        if (kpaK > 0) akTab += '<h3>Gesondert, nicht in den Anschaffungskosten</h3>' + B.liste([['Kosten der Kaufpreisaufteilung / AfA-Ermittlung', B.eur(kpaK, 2), { art: 'ende' }]])
-          + '<p class="det">Angesetzt sind alle Anschaffungsnebenkosten des Erwerbs (Grunderwerbsteuer, Notar, Grundbuch, Makler, Fahrten zur Besichtigung, ein Wertgutachten zur Kaufentscheidung). Kosten, die erst die Abschreibung ermitteln, stehen gesondert und sind sofort abziehbar.</p>';
+        /* v3511 · nur „sofort abziehbar" steht gesondert; als Anschaffungsnebenkosten steht sie oben in der Liste */
+        var kpaO = window.DpKpaKosten ? DpKpaKosten() : { ank: 0, sofort: 0 };
+        if (kpaO.ank > 0) akTab += '<p class="det">Das Gutachten zur Kaufpreisaufteilung wurde vor dem Kauf beauftragt, sein Ergebnis geht in den Kaufvertrag ein. Es zählt deshalb zu den Anschaffungsnebenkosten und teilt sich wie diese auf Grund und Boden und Gebäude auf.</p>';
+        if (kpaO.sofort > 0) akTab += '<h3>Gesondert, nicht in den Anschaffungskosten</h3>' + B.liste([[DpKpaKosten.TEXT_SOFORT, B.eur(kpaO.sofort, 2), { art: 'ende' }]])
+          + '<p class="det">Angesetzt sind alle Anschaffungsnebenkosten des Erwerbs (Grunderwerbsteuer, Notar, Grundbuch, Makler, Fahrten zur Besichtigung, ein Wertgutachten zur Kaufentscheidung). Kosten, die erst nach dem Kauf die Abschreibung ermitteln, stehen gesondert und sind im Kaufjahr als Werbungskosten abziehbar.</p>';
         var vgw = w('vergleichswert'); if (!B.istZahl(vgw)) vgw = null;
         var sw = B.istZahl(w('sachwert_marktangepasst')) ? w('sachwert_marktangepasst') : w('sachwert_vorlaeufig'), ew = w('ertragswert'), vw = w('massgebender_verkehrswert');
         var nah = function (a, b2) { return B.istZahl(a) && B.istZahl(b2) && Math.abs(a - b2) < 1; };

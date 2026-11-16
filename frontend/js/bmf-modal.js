@@ -499,6 +499,9 @@ function calcAk(){
     var el = $(id); if(!el) return;
     total += parseDe(el.value);
   });
+  /* v3511 · Kosten der Kaufpreisaufteilung als Anschaffungsnebenkosten (Vorgabe) - die Summe traegt
+     _bmfAhk (AfA-Varianten, 15-%-Grenze) und die PDF-Anlage */
+  try { if (window.DpKpaKosten) total += DpKpaKosten().ank; } catch (e) {}
   /* v994-total: Leiste = AK(+HK), Rohwert ohne HK in dataset.raw fuer alle internen Leser */
   (function(){
     var _e = $('ak_total'); var _h = (typeof _bmfHk === 'function') ? _bmfHk() : 0;
@@ -662,7 +665,9 @@ function runBmf(){
          Bodenabschlag als eigener Posten. */
       var nkWeitere = (parseDe(_v('ak_fahrt')) || 0) + (parseDe(_v('ak_gutachten')) || 0)
                     + (parseDe(_v('ak_anwalt')) || 0) + (parseDe(_v('ak_sonst')) || 0);
-      return immoKp + nk + nkWeitere;
+      /* v3511 · Kosten der Kaufpreisaufteilung als Anschaffungsnebenkosten (Vorgabe, kpa-kosten.js) */
+      var kpaAnk = window.DpKpaKosten ? DpKpaKosten().ank : 0;
+      return immoKp + nk + nkWeitere + kpaAnk;
     })(),
     baujahr: parseInt(($('bmf_bj') || {}).value || _v('baujahr')) || 0,
     wohnflaeche: parseDe(($('bmf_wfl') || {}).value || _v('wfl')),

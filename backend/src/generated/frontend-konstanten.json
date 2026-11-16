@@ -1,10 +1,10 @@
 {
- "erzeugt_am": "2026-11-16T10:20:27.663Z",
+ "erzeugt_am": "2026-11-16T10:43:18.034Z",
  "quellen": {
   "voice-import": "b85d1194e6f250e3",
   "objektart-felder": "f7d9212555982a97",
-  "storage": "312738ae61865f90",
-  "index-html": "22a3239f4b0a50e1",
+  "storage": "615b22158c5ec659",
+  "index-html": "745f804b87dc3020",
   "grest": "81f3fb0a4de3a6cf"
  },
  "daten": {
@@ -642,6 +642,7 @@
    "_dok_eingang",
    "einheiten",
    "kpa_kosten",
+   "kpa_kosten_art",
    "san_tax_active",
    "san_tax_years",
    "moebl_tax_active",
@@ -2066,6 +2067,21 @@
    {
     "id": "kpa_kosten",
     "kind": "text",
+    "label": "Kosten der Kaufpreisaufteilung / AfA-Ermittlung"
+   },
+   {
+    "id": "kpa_kosten_art",
+    "kind": "select",
+    "optionen": [
+     {
+      "wert": "ank",
+      "text": "Anschaffungsnebenkosten (vor dem Kauf beauftragt, Aufteilung geht in den Kaufvertrag)"
+     },
+     {
+      "wert": "sofort",
+      "text": "gesondert, sofort abziehbar (nach dem Kauf nur zur AfA-Ermittlung)"
+     }
+    ],
     "label": "Kosten der Kaufpreisaufteilung / AfA-Ermittlung"
    },
    {

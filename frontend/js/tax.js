@@ -1718,7 +1718,18 @@ function _computeAutoForYear(yearIdx, year, teiljahr) {
     hausverwaltung: verwaltung,
     steuerber: 0,  /* v646: kein Auto-Vorschlag */
     porto: 0,      /* v1898: war 5 EUR ohne Quelle — siehe kontofuehrung */
-    verw_sonst: 0,
+    /* v3511 · Kosten der Kaufpreisaufteilung, wenn das Objekt sie als „sofort abziehbar" fuehrt
+       (kpa-kosten.js): Werbungskosten im Kaufjahr. Als Anschaffungsnebenkosten (Vorgabe) laufen sie
+       ueber die AfA-Basis (calc.js) und stehen hier nicht. */
+    verw_sonst: (function () {
+      try {
+        if (!window.DpKpaKosten) return 0;
+        var k = DpKpaKosten(); if (!(k.sofort > 0)) return 0;
+        var kd = String((document.getElementById('kaufdat') || {}).value || '');
+        var kj = /^\d{4}/.test(kd) ? parseInt(kd.slice(0, 4), 10) : (typeof _v269_getStartYear === 'function' ? _v269_getStartYear() : null);
+        return (kj && Number(year) === kj) ? k.sofort : 0;
+      } catch (e) { return 0; }
+    })(),
 
     // 4.0 Sonstige Kosten
     fahrtkosten: 0,

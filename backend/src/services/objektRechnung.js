@@ -210,7 +210,9 @@ function rechnen(daten, opt) {
     const gebAnt = dez(d.geb_ant), afaSatz = dez(d.afa_satz);
     const invB = Math.max(0, z(d.inv_kueche) || 0, z(d.moebl) || 0);
     const afa = (gebAnt != null && gebAnt > 0)
-      ? rk.gebaeudeAhk({ kp: kp, nk: summe, nkNurImmo: grest, gebAntPct: gebAnt, inventar: invB }).gebAhk
+      /* v3511 · Kosten der Kaufpreisaufteilung als Anschaffungsnebenkosten in die AfA-Basis, wie calc.js
+         (kpa_kosten_art leer oder „ank"; „sofort" nicht) - nicht in die Gesamtinvestition */
+      ? rk.gebaeudeAhk({ kp: kp, nk: summe + (d.kpa_kosten_art === 'sofort' ? 0 : (z(d.kpa_kosten) || 0)), nkNurImmo: grest, gebAntPct: gebAnt, inventar: invB }).gebAhk
         * ((afaSatz != null ? afaSatz : 2) / 100) : 0;
     /* v3006 · LTV-Basis wie die App: der Wert mit seiner Herkunft (wertangabe). */
     const wa = wertangabe(d);

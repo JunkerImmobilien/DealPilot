@@ -482,27 +482,53 @@ if (process.argv.includes('--live')) {
   const pip = fs.readFileSync(path.join(ROOT, 'backend/src/services/bmfPipelineService.js'), 'utf8');
   const v292 = js('bmf-modal-v292.js'), bm = js('bmf-modal.js');
   ok(/garagen: parseInt\(objekt\.garagen, 10\)/.test(pip) && /\{ wohneinheiten: n \}/.test(pip), 'N Pipeline (_phase4_bmf) gibt Garagen und Wohneinheiten an die Arbeitshilfe');
-  ok(/garagen:\s+parseInt\(_v\('garagen'\)/.test(v292) && /einheiten:\s+parseInt\(_v\('einheiten'\)/.test(v292), 'N Fenster-Pipeline (bmf-modal-v292.js) sammelt Garagen und Wohneinheiten');
+  const erg = js('bmf-pipeline-ergaenzung.js'), idx0 = fs.readFileSync(path.join(ROOT, 'frontend/index.html'), 'utf8');
+  ok(!/v3510|v3511|kpa_kosten|_dpErgaenzt/.test(v292), 'N bmf-modal-v292.js unberuehrt (Nicht anfassen, Marcel 16.11.: „lass es raus")');
+  ok(idx0.indexOf('js/bmf-pipeline-ergaenzung.js') > idx0.indexOf('js/bmf-modal-v292.js') && idx0.indexOf('js/bmf-modal-v292.js') > 0, 'N Huelle bmf-pipeline-ergaenzung.js laedt nach bmf-modal-v292.js');
+  {
+    /* Huelle am echten Code: Original-Sammler + DOM-Attrappe, Argumente durchgereicht */
+    const dom = { garagen: '6', einheiten: '6', kpa_kosten: '549,00', kpa_kosten_art: 'ank' };
+    const ctx = { document: { getElementById: (id) => (id in dom ? { value: dom[id] } : null) }, console };
+    ctx.window = ctx; vm.createContext(ctx);
+    let gesehen = null;
+    ctx._v292CollectInputs = function () { gesehen = [].slice.call(arguments); return { phase1_inputs: { objekt: { wfl: 1 }, investition: { kp_brutto: 1 } } }; };
+    vm.runInContext(js('kpa-kosten.js'), ctx); vm.runInContext(erg, ctx);
+    const r1 = ctx._v292CollectInputs('a', 2).phase1_inputs;
+    ok(r1.objekt.garagen === 6 && r1.objekt.einheiten === 6 && r1.investition.kpa_kosten_e === 549 && gesehen && gesehen.length === 2,
+      'N Huelle ergaenzt Garagen 6, Einheiten 6, KPA-Kosten 549 und reicht die Argumente weiter');
+    dom.kpa_kosten_art = 'sofort';
+    ok(ctx._v292CollectInputs().phase1_inputs.investition.kpa_kosten_e === 0, 'N „sofort abziehbar": KPA-Kosten nicht in die Pipeline-Nebenkosten');
+    dom.kpa_kosten_art = '';
+    const k = ctx.DpKpaKosten();
+    ok(k.ank === 549 && k.sofort === 0 && k.art === 'ank', 'N ohne Einordnung gilt „Anschaffungsnebenkosten" (Vorgabe, Marcel 16.11.)');
+    vm.runInContext(erg, ctx);
+    ok(ctx._v292CollectInputs._dpErgaenzt === true, 'N Huelle legt sich bei Doppel-Laden nicht doppelt');
+  }
   ok((bm.match(/garagen: \(parseInt/g) || []).length >= 2 && (bm.match(/wohneinheiten: \(function/g) || []).length >= 2, 'N runBmf und XLSX-Lauf (bmf-modal.js) schicken beide Felder (v3345)');
   const rx = /Mietwohngrundst\|gemischt genutzt\/\.test\(art\) && !\/\^Teileigentum\/\.test\(art\)/;
   ok(rx.test(pip) && rx.test(bm), 'N Wohneinheiten in Pipeline und runBmf nach derselben Regel (nur MFH / gemischt, nie Teileigentum)');
   /* v3510 · Kosten der Kaufpreisaufteilung (#kpa_kosten): gespeichert, in beiden PDFs gesondert, nie in der AfA-Basis */
   const idxN = fs.readFileSync(path.join(ROOT, 'frontend/index.html'), 'utf8'), sto = js('storage.js'), dokN = js('dp-dokumente.js'), kpaN = js('pdf-kaufpreisaufteilung.js');
-  ok(/id="kpa_kosten"/.test(idxN) && /'kpa_kosten'/.test(sto.slice(sto.indexOf('var FIELDS'), sto.indexOf('var FIELDS') + 20000)), 'N Feld kpa_kosten im Formular und in FIELDS (wird gespeichert)');
-  ok(/zahlAus\('kpa_kosten'\)/.test(dokN) && /num\('kpa_kosten'\)/.test(kpaN), 'N beide Kaufpreisaufteilungs-PDFs zeigen die Kosten gesondert');
+  ok(/id="kpa_kosten"/.test(idxN) && /id="kpa_kosten_art"[\s\S]{0,80}<option value="ank" selected>/.test(idxN) && /'kpa_kosten','kpa_kosten_art'/.test(sto.slice(sto.indexOf('var FIELDS'), sto.indexOf('var FIELDS') + 20000)), 'N Felder kpa_kosten und kpa_kosten_art (Vorgabe Anschaffungsnebenkosten) im Formular und in FIELDS');
+  ok(/DpKpaKosten\.TEXT_ANK/.test(dokN) && /DpKpaKosten\.TEXT_ANK/.test(kpaN) && /KPA\.sofort > 0\.005/.test(kpaN) && /kpaO\.sofort > 0/.test(dokN), 'N beide KPA-PDFs: Zeile unter den Anschaffungsnebenkosten, „gesondert" nur bei sofort abziehbar');
+  ok(!/Kosten, die erst die Abschreibung ermitteln, stehen gesondert und sind sofort abziehbar\.'\);/.test(kpaN), 'N PDF-Satz zur Einordnung ohne Widerspruch (gesondert nur, wenn sofort abziehbar)');
   ok(/if \(!\$\('bmf_art'\)\) \{ try \{ console\.warn\('\[bmf\] runBmf ohne Fenster/.test(bm) && bm.indexOf("if (!$('bmf_art'))") < bm.indexOf('var _fehlt = '), 'N runBmf rechnet nicht ohne Fenster (Grundstuecksart und Miete stehen nur dort)');
-  ok(!/kpa_kosten/.test(bm) && !/kpa_kosten/.test(js('bmf-bodenabschlag.js')) && !/kpa_kosten/.test(pip), 'N kpa_kosten geht nicht in die Summe der Arbeitshilfe (runBmf, Reiter 5, Pipeline)');
+  const calcN = js('calc.js'), taxN = js('tax.js'), orN = fs.readFileSync(path.join(ROOT, 'backend/src/services/objektRechnung.js'), 'utf8');
+  ok(/return immoKp \+ nk \+ nkWeitere \+ kpaAnk;/.test(bm) && /total \+= DpKpaKosten\(\)\.ank/.test(bm), 'N runBmf und Summe Anschaffungskosten (calcAk) nehmen die KPA-Kosten als Nebenkosten');
+  ok(/nk \+= DpKpaKosten\(\)\.ank/.test(js('bmf-bodenabschlag.js')) && /const nk_gesamt = grest \+ notar \+ gba \+ makler \+ ji_sonst \+ kpa;/.test(pip), 'N Reiter 5 und Pipeline (Phase 3) ebenso');
+  ok(/nkGesamt \+= _kpaAnk;/.test(calcN) && /kpa_kosten_art === 'sofort' \? 0 : \(z\(d\.kpa_kosten\)/.test(orN), 'N AfA-Basis Steuer-Reiter (calc.js) und Backend objektRechnung mit KPA-Kosten');
+  ok(/var k = DpKpaKosten\(\); if \(!\(k\.sofort > 0\)\) return 0;/.test(taxN), 'N „sofort abziehbar": Werbungskosten im Kaufjahr (tax.js verw_sonst)');
   if (process.argv.includes('--live')) {
     const { execFileSync } = createRequire(import.meta.url)('node:child_process');
     const fall = { lage: 'Andersenweg 3, 32429 Minden', grundstuecksart: 'Mietwohngrundstücke (Mehrfamilienhäuser)', kaufdatum: '2026-11-12',
       kaufpreis: 419406, baujahr: 1973, wohnflaeche: 339.91, mea_zaehler: 1000, mea_nenner: 1000, grundstuecksgroesse: 1232, bodenrichtwert: 135,
       miete_bekannt: 'Ja', miete_monatlich: 2329, sachwertfaktor: 1, regionalfaktor: 1, vergleichsfaktor_vorhanden: 'Nein', garagen: 6, wohneinheiten: 6 };
     const pipe = { objekt: { str: 'Andersenweg', hnr: '3', plz: '32429', ort: 'Minden', objart_bmf: fall.grundstuecksart, wfl: 339.91, baujahr: 1973,
-      gsfl: 1232, brw: 135, garagen: 6, einheiten: 6 }, investition: { kaufdat: '2026-11-12', kp_brutto: 390000, gest_e: 25350, notar_e: 2886, gba_e: 1170 },
+      gsfl: 1232, brw: 135, garagen: 6, einheiten: 6 }, investition: { kaufdat: '2026-11-12', kp_brutto: 390000, gest_e: 25350, notar_e: 2886, gba_e: 1170, kpa_kosten_e: 549 },
       inventar: {}, renovierung: {}, miete: { nkm: 2329 }, gaa: {} };
     const skript = "const s=require('/app/src/services/bmfService.js'),p=require('/app/src/services/bmfPipelineService.js');(async()=>{"
       + "const r=await s.calculateKpa(" + JSON.stringify(fall) + ",{includeFile:false});const q=await p.runPipeline(" + JSON.stringify(pipe) + ");"
-      + "console.log(JSON.stringify({p:r.results.gebaeudeanteil_prozent.value,e:r.results.ertragswert.value,q:q.phase4_bmf&&q.phase4_bmf.gebaeudeanteil_prozent}))})()";
+      + "console.log(JSON.stringify({p:r.results.gebaeudeanteil_prozent.value,e:r.results.ertragswert.value,q:q.phase4_bmf&&q.phase4_bmf.gebaeudeanteil_prozent,ak:q.phase3_prognose_ak&&q.phase3_prognose_ak.prognose_ak}))})()";
     let roh = null;
     try { roh = execFileSync('ssh', ['-o', 'BatchMode=yes', 'root@116.203.214.11', 'docker exec -i dealpilot-backend node -'], { input: skript, encoding: 'utf8', timeout: 240000 }); }
     catch (e) { ok(false, 'N live: Staging-Backend nicht erreichbar (' + e.message.split('\n')[0] + ')'); }
@@ -510,6 +536,7 @@ if (process.argv.includes('--live')) {
       const r = JSON.parse(roh.trim().split('\n').pop());
       ok(nah(r.p, 58.45) && Math.abs(r.e - 400280.24) < 0.5, 'N live Andersenweg, Vorlage Maerz 2026, 6 WE + 6 Garagen: ' + r.p + ' % / Ertragswert ' + r.e + ' (Soll 58,45 / 400.280,24)');
       ok(nah(Number(r.q), 58.45), 'N live Pipeline rechnet denselben Gebaeudeanteil wie runBmf: ' + r.q + ' % (Soll 58,45)');
+      ok(Math.abs(Number(r.ak) - 419955) < 0.5, 'N live Pipeline: Prognose-AK mit KPA-Kosten 390.000 + 29.406 + 549 = 419.955 (' + r.ak + ')');
     }
   }
 }

@@ -1047,6 +1047,13 @@ function _calcImmediate(){
   var gebOhneK = kpOhneK * gebAnt;
   var gebQuoteOhneK = gebAnt;
   var nkGesamt = nk; // Summe aller Nebenkosten aus Z.610 (m_e+n_e+g_e+ge_e+ji_e)
+  /* v3511 · Kosten der Kaufpreisaufteilung (#kpa_kosten) als Anschaffungsnebenkosten in die AfA-Basis, wenn
+     #kpa_kosten_art nicht „sofort" ist (Vorgabe; Marcel 16.11.2026: vor dem Kauf beauftragt, die Aufteilung
+     geht in den Kaufvertrag). Nur hier, nicht in die Gesamtinvestition (die Finanzierung rechnet ohne). */
+  var _kpaAnk = 0;
+  try { if (window.DpKpaKosten) _kpaAnk = DpKpaKosten().ank; } catch (_eKpa) {}
+  State.kpa_kosten_ank = _kpaAnk;
+  nkGesamt += _kpaAnk;
   /* ═══ v3006 · DIE GRUNDSCHULD IST KEINE ANSCHAFFUNGSKOSTE ═════════════════
      Notar- und Grundbuchkosten der Grundschuldbestellung sind Kosten der
      FINANZIERUNG, nicht des Erwerbs (§ 255 Abs. 1 HGB: Aufwendungen, um den

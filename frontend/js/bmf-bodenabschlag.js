@@ -90,6 +90,7 @@
     var nkFelder = ['ak_grest', 'ak_notar', 'ak_gba', 'ak_makler', 'ak_ji',
       'ak_fahrt', 'ak_gutachten', 'ak_anwalt', 'ak_sonst'];
     var nk = nkFelder.reduce(function (a, i) { return a + (zahl(el(i) && el(i).value) || 0); }, 0);
+    try { if (window.DpKpaKosten) nk += DpKpaKosten().ank; } catch (e) {}   /* v3511 · KPA-Kosten als Anschaffungsnebenkosten */
     return { kp: kp, inv: inv, immoKp: immoKp, nk: nk, gebPct: gebPct, boden: boden,
       gebAmtlich: immoKp * gebPct / 100, bodenAmtlich: immoKp * (100 - gebPct) / 100 };
   }

@@ -168,15 +168,19 @@ function _phase3_prognoseAk(inputs, phase2) {
   const gba      = Number(investition.gba_e) || 0;
   const makler   = Number(investition.makler_e) || 0;
   const ji_sonst = Number(investition.ji_sonst_e) || 0;
+  /* v3511 · Kosten der Kaufpreisaufteilung als Anschaffungsnebenkosten (Marcel 16.11.2026: „mit dem Kauf
+     verbundene Kosten ... die KPA kommt ja in den Kaufvertrag"). Kommt aus bmf-pipeline-ergaenzung.js,
+     ist 0, wenn das Objekt sie als sofort abziehbar fuehrt. */
+  const kpa = Number(investition.kpa_kosten_e) || 0;
 
-  const nk_gesamt = grest + notar + gba + makler + ji_sonst;
+  const nk_gesamt = grest + notar + gba + makler + ji_sonst + kpa;
   const prognose_ak = phase2.immobilien_kp + nk_gesamt;
 
   return {
     immobilien_kp: phase2.immobilien_kp,
     nk_gesamt,
     prognose_ak,
-    nk_aufschluesselung: { grest, notar, gba, makler, ji_sonst }
+    nk_aufschluesselung: { grest, notar, gba, makler, ji_sonst, kpa }
   };
 }
 

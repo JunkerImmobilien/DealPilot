@@ -297,6 +297,10 @@
       ak_fahrt: 1, ak_gutachten: 1, ak_anwalt: 1, ak_sonst: 1 };
     var nkSumme = nkFelder.reduce(function (a, f) { return a + (num(f[0]) || 0); }, 0);
     var nkInBmf = nkFelder.reduce(function (a, f) { return a + (IN_BMF[f[0]] ? (num(f[0]) || 0) : 0); }, 0);
+    /* v3511 · Kosten der Kaufpreisaufteilung (kpa-kosten.js): als Anschaffungsnebenkosten (Vorgabe) in
+       Summe und Aufteilung wie die uebrigen Nebenkosten, sonst gesondert und sofort abziehbar */
+    var KPA = window.DpKpaKosten ? DpKpaKosten() : { betrag: 0, ank: 0, sofort: 0 };
+    nkSumme += KPA.ank; nkInBmf += KPA.ank;
     var nkAussen = nkSumme - nkInBmf;
     var ak = (kp || 0) + nkSumme;
     var akBmf = (kp || 0) + nkInBmf;
@@ -367,6 +371,7 @@
       if (f[0] === 'ak_fahrt' && num('ak_fahrt_km')) zus = ' (' + new Intl.NumberFormat('de-DE').format(num('ak_fahrt_km')) + ' km × ' + eur(num('ak_fahrt_satz'), 2) + ')';
       zeile(f[1] + zus, eur(v, 2), { einzug: true, klein: true });
     });
+    if (KPA.ank > 0.005) zeile(DpKpaKosten.TEXT_ANK, eur(KPA.ank, 2), { einzug: true, klein: true });
     zeile('Anschaffungsnebenkosten' + (kp ? ' (' + pct(nkSumme / kp * 100, 2) + ' vom Kaufpreis)' : ''), eur(nkSumme, 2), { fett: true });
     zeile('Anschaffungskosten gesamt', eur(ak, 2), { summe: true });
     /* v3006d · was nicht in die Aufteilung Gebaeude/Boden geht, steht offen da */
@@ -375,12 +380,10 @@
     y += 1;
     zeile('davon in der amtlichen Aufteilung angesetzt', eur(akBmf, 2), { fett: true });
     if (nkAussen > 0.005) zeile('nicht angesetzt (Fahrt, Gutachten, Anwalt, Reise, Sonstiges)', eur(nkAussen, 2), { einzug: true, klein: true });
-    /* v3510 · Marcel 16.11.2026: „wo ist das Gutachten drin in den Anschaffungskosten von 549 Euro?" Der Satz
-       unten versprach seit v1482 „stehen gesondert", das Feld dazu fiel in v1495 weg. Jetzt #kpa_kosten
-       (Reiter Steuern, beim Gebaeudeanteil): eigene Zeile, NICHT in den Anschaffungskosten. */
-    var kpaKosten = num('kpa_kosten');
-    if (kpaKosten > 0.005) zeile('Gesondert: Kosten der Kaufpreisaufteilung / AfA-Ermittlung (nicht in den Anschaffungskosten)', eur(kpaKosten, 2), { fett: true });
-    einleitung('Die Arbeitshilfe teilt die Anschaffungskosten einschließlich Nebenkosten auf; die Nebenkosten folgen demselben Verhältnis wie der Kaufpreis. Angesetzt sind alle Anschaffungsnebenkosten des Erwerbs: Grunderwerbsteuer, Notar, Grundbuch, Makler und Vermittlung ebenso wie Fahrten zur Besichtigung und zum Notartermin, ein Wertgutachten zur Kaufentscheidung sowie Rechtsberatung des Erwerbs (BFH VIII R 195/77; BFH IX R 20/08). Kosten, die erst die Abschreibung ermitteln, stehen gesondert und sind sofort abziehbar.');
+    /* v3510/v3511 · nur wenn das Objekt die Kosten als sofort abziehbar fuehrt: eigene Zeile, NICHT in den
+       Anschaffungskosten */
+    if (KPA.sofort > 0.005) zeile('Gesondert: ' + DpKpaKosten.TEXT_SOFORT, eur(KPA.sofort, 2), { fett: true });
+    einleitung('Die Arbeitshilfe teilt die Anschaffungskosten einschließlich Nebenkosten auf; die Nebenkosten folgen demselben Verhältnis wie der Kaufpreis. Angesetzt sind alle Anschaffungsnebenkosten des Erwerbs: Grunderwerbsteuer, Notar, Grundbuch, Makler und Vermittlung ebenso wie Fahrten zur Besichtigung und zum Notartermin, ein Wertgutachten zur Kaufentscheidung sowie Rechtsberatung des Erwerbs (BFH VIII R 195/77; BFH IX R 20/08)' + (KPA.ank > 0.005 ? ', ebenso ein vor dem Kauf beauftragtes Gutachten zur Kaufpreisaufteilung, deren Ergebnis in den Kaufvertrag eingeht' : '') + '.' + (KPA.sofort > 0.005 ? ' Kosten, die erst nach dem Kauf die Abschreibung ermitteln, stehen gesondert und sind sofort abziehbar.' : ''));
 
     /* ── Herleitung der amtlichen Aufteilung ─────────────────────── */
     /* v3346 · Marcel 12.11.2026: Aufbau 1:1 wie die KPA Rinteln (4 Seiten) - die Herleitung steht

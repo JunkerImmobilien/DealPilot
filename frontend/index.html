@@ -2364,12 +2364,17 @@ label.dp-required.qc-required::after {
               <span class="hint">Rest = Grundstücksanteil</span>
               <div id="geb-ant-banner" class="geb-ant-banner"></div>
             </div>
-      <!-- v3510 · Kosten, die erst die AfA ermitteln (Kaufpreisaufteilung, RND-Gutachten). Stehen im PDF der
-           Kaufpreisaufteilung gesondert, nicht in den Anschaffungskosten (Text dort seit v1482). -->
+      <!-- v3510/v3511 · Kosten der Kaufpreisaufteilung. Marcel 16.11.2026: „Die 549 € müssen in die
+           Anschaffungskosten, weil das mit dem Kauf verbundene Kosten sind. Das Haus ist ja noch nicht gekauft
+           und die KPA kommt ja in den Kaufvertrag." Vorgabe deshalb Anschaffungsnebenkosten (anteilig Boden/
+           Gebäude); „sofort abziehbar" nur, wenn erst nach dem Kauf zur AfA-Ermittlung beauftragt. -->
       <div class="f">
               <label>Kosten der Kaufpreisaufteilung / AfA-Ermittlung</label>
-              <div class="iw"><input id="kpa_kosten" type="text" inputmode="decimal" placeholder="z. B. 549" class="tr"><span class="sfx">€</span></div>
-              <span class="hint">Gutachten zur Aufteilung oder Restnutzungsdauer; steht gesondert, nicht in der AfA-Basis</span>
+              <div class="iw"><input id="kpa_kosten" type="text" inputmode="decimal" placeholder="z. B. 549" class="tr" oninput="calc()"><span class="sfx">€</span></div>
+              <select id="kpa_kosten_art" onchange="calc()" style="margin-top:6px">
+                <option value="ank" selected>Anschaffungsnebenkosten (vor dem Kauf beauftragt, Aufteilung geht in den Kaufvertrag)</option>
+                <option value="sofort">gesondert, sofort abziehbar (nach dem Kauf nur zur AfA-Ermittlung)</option>
+              </select>
             </div>
     </div>
     <div class="f"><label>AfA / Jahr (berechnet) <span class="hint" id="afa_methode_label" style="font-size:11px;color:var(--muted)"></span></label><div class="cf" id="afa_kalk">—</div>
@@ -3915,11 +3920,13 @@ label.dp-required.qc-required::after {
 <script src="js/pdf-wert-zielbild.js?v=v3030"></script><!-- v2830 · Segment Wert & Zielbild in allen PDFs -->
 <script src="js/lagekarte.js?v=v3336"></script><!-- v3336 · Lagekarte (OSM) statt leerem Bildplatz im PDF -->
 <script src="js/pdf-investment-bank.js?v=v3337"></script>
-<script src="js/bmf-modal.js?v=v3510b"></script>
-<script src="js/bmf-modal-v292.js?v=v3510"></script>
-<script src="js/bmf-bodenabschlag.js?v=v3481"></script>
+<script src="js/kpa-kosten.js?v=v3511"></script><!-- v3511 · Kosten der Kaufpreisaufteilung: Betrag und Einordnung -->
+<script src="js/bmf-modal.js?v=v3511"></script>
+<script src="js/bmf-modal-v292.js?v=v3511"></script>
+<script src="js/bmf-pipeline-ergaenzung.js?v=v3511"></script><!-- v3511 · Huelle um _v292CollectInputs (Garagen, Einheiten, KPA-Kosten), v292 bleibt unberuehrt -->
+<script src="js/bmf-bodenabschlag.js?v=v3511"></script>
 <script src="js/bmf-ausgabe.js?v=v3184b"></script><!-- v3184 · alle Ausgaben des BMF-Rechners an einer Stelle -->
-<script src="js/pdf-kaufpreisaufteilung.js?v=v3510"></script><!-- v987-v292-restore -->
+<script src="js/pdf-kaufpreisaufteilung.js?v=v3511"></script><!-- v987-v292-restore -->
 <!-- V63.86: html2canvas für 1:1-Capture von Tab-Kennzahlen-Tabellen ins PDF -->
 <script src="/vendor/cdn/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="/vendor/cdn/jszip/3.10.1/jszip.min.js"></script>
@@ -3948,14 +3955,14 @@ label.dp-required.qc-required::after {
   <script src="js/anteilig-recalc.js?v=353"></script>
   <script src="js/finanzierung-validation.js?v=1"></script>
 <script src="js/data/foerderregister.js?v=v3072"></script>
-  <script src="js/calc.js?v=v3401"></script>
+  <script src="js/calc.js?v=v3511"></script>
   <script src="js/zahlenfelder.js?v=v3023"></script>
 <script src="js/d1-type-handler.js?v=161"></script>
 <script src="js/icons.js?v=166"></script>
 <script src="js/obj-numbering.js?v=166"></script>
 <script src="js/mietentwicklung.js?v=v3366"></script>
 <script src="/vendor/cdn/xlsx/0.18.5/xlsx.full.min.js"></script>
-<script src="js/tax.js?v=v3380"></script>
+<script src="js/tax.js?v=v3511"></script>
 <script src="js/steuer-verlauf.js?v=v3273a"></script>
 <script src="js/pa-potenzial.js?v=v3440"></script><!-- v3323 · Pilot-Analyse: Reiter Potenzialanalyse -->
 <script src="js/hausverlauf.js?v=v3432"></script><!-- v3323 · Pilot-Analyse: Reiter Hausverlauf (WEG-Unterlagen chronologisch) · v3430 Haus je Jahr -->
@@ -4010,7 +4017,7 @@ label.dp-required.qc-required::after {
 <script src="js/marktdaten-modal.js?v=v2247c"></script>
 <script src="js/ui.js?v=v3444"></script>
 <script src="js/sidebar-collapse.js?v=20260611174630"></script>
-<script src="js/storage.js?v=v3510"></script>
+<script src="js/storage.js?v=v3511"></script>
 <script src="js/nachrechnen.js?v=v3031"></script><!-- v3031: Kennzahlen/Scores gespeicherter Objekte neu rechnen (nur auf Aufruf) -->
 <!-- v845-newsearch-removed: sb-search.js entfernt (Kollision mit sidebar-search.js) -->
 <script src="js/inventar-sync.js?v=v3006c"></script><!-- V291-inv-sync-applied -->
@@ -4624,7 +4631,7 @@ document.addEventListener('DOMContentLoaded', function(){
     <link rel="stylesheet" href="css/einheitlich.css?v=v3410a"><!-- v3239 · Marcel 09.11.2026: Felder, Karten, Schrift in allen Reitern und Fenstern wie im Reiter Objekt; Handy-Felder nie unter 16 px (iOS-Zoom). Letztes Stylesheet. -->
     <script src="js/marktbericht-profi.js?v=v3338a"></script><!-- v3176 · Marktbericht Profi (HTML/A4) -->
     <script src="js/dp-dokument.js?v=v3223"></script><!-- v3179 · einheitliches Dokument-Design -->
-    <script src="js/dp-dokumente.js?v=v3510"></script><!-- v3179 · Dokumente im einheitlichen Design (Demo) -->
+    <script src="js/dp-dokumente.js?v=v3511"></script><!-- v3179 · Dokumente im einheitlichen Design (Demo) -->
     <script src="js/pdf-wahl.js?v=v3235"></script><!-- v1636 · Rueckfrage vor dem Export -->
     <script src="js/hub-anmelden.js?v=v3190a"></script><!-- v3190 · Makler-Hub: Verbinden-Ebene (/hub/anmelden) -->
     <script src="js/dok-weiche.js?v=v3480"></script><!-- v3181 · einheitliche Dokumente an allen Knoepfen, klassisch in den Einstellungen -->
