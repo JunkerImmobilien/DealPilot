@@ -408,7 +408,7 @@
       ],
       "spruch": "Der Co-Pilot hat gesprochen — entscheiden tust du.",
       "datei": "dealpilot-modul-11-pilot-analyse-v3502.mp4", "datei_ton": "dealpilot-modul-11-pilot-analyse-marcel-v3502.mp4",
-      "poster": "dealpilot-modul-11-pilot-analyse.webp",
+      "poster": "dealpilot-modul-11-pilot-analyse-v3502.webp",
       "youtube": { "titel": "DealPilot Modul 11 · Pilot-Analyse im Detail", "tags": ["DealPilot", "KI Immobilienanalyse", "Co-Pilot"], "youtube_id": null }
     },
     {
@@ -478,7 +478,7 @@
       ],
       "spruch": "Gelandet. Jetzt zählt der Reiseflug.",
       "datei": "dealpilot-modul-14-ankauf-in-den-bestand-v3502.mp4", "datei_ton": "dealpilot-modul-14-ankauf-in-den-bestand-marcel-v3502.mp4",
-      "poster": "dealpilot-modul-14-ankauf-in-den-bestand.webp",
+      "poster": "dealpilot-modul-14-ankauf-in-den-bestand-v3502.webp",
       "youtube": { "titel": "DealPilot Modul 14 · Vom Ankauf in den Bestand", "tags": ["DealPilot", "Bestandsimmobilie", "Soll-Ist-Vergleich"], "youtube_id": null }
     },
     {
@@ -776,7 +776,7 @@
       ],
      "spruch": "Ist, Soll und Zielbild — das Potenzial steht daneben.",
      "datei": "dealpilot-modul-26-mieterhoehung-und-zielbild-v3502.mp4", "datei_ton": "dealpilot-modul-26-mieterhoehung-und-zielbild-marcel-v3502.mp4",
-     "poster": "dealpilot-modul-26-mieterhoehung-und-zielbild.webp",
+     "poster": "dealpilot-modul-26-mieterhoehung-und-zielbild-v3502.webp",
      "youtube": {
       "titel": "DealPilot Modul 26 · Mieterhöhung und Zielbild",
       "tags": [
@@ -816,7 +816,7 @@
       ],
      "spruch": "Erst Erstattung, dann Steuer — der Wendepunkt ist dein Zeitpunkt.",
      "datei": "dealpilot-modul-27-steuerverlauf-mit-wendepunkt-v3502.mp4", "datei_ton": "dealpilot-modul-27-steuerverlauf-mit-wendepunkt-marcel-v3502.mp4",
-     "poster": "dealpilot-modul-27-steuerverlauf-mit-wendepunkt.webp",
+     "poster": "dealpilot-modul-27-steuerverlauf-mit-wendepunkt-v3502.webp",
      "youtube": {
       "titel": "DealPilot Modul 27 · Steuerverlauf mit Wendepunkt",
       "tags": [
@@ -865,6 +865,38 @@
        "Teilungserklärung",
        "Eigentümerversammlung",
        "Due Diligence"
+      ],
+      "youtube_id": null
+     }
+    },
+    {
+     "id": "modul-29-drei-objekte-drei-urteile",
+     "kategorie": "spezial",
+     "nr": "29",
+     "dauer": 263,
+     "titel": "Drei Objekte, drei Urteile",
+     "unterzeile": "Ein gutes, ein mittleres und ein schwaches Objekt: was der Pilot jeweils sagt.",
+     "story": "Drei Beispielobjekte, dieselbe Rechnung: ein Mehrfamilienhaus in Bad Oeynhausen, eine kleine Wohnung in Kabelsketal und ein Haus mit acht Wohnungen in Herford. Je Objekt das Gesamturteil, die beiden Teilwerte für die Immobilie und die Finanzierung, die wichtigsten Kennzahlen und die Empfehlung des Piloten. Am Ende stehen alle drei nebeneinander.",
+     "nutzen": "Du siehst, warum dieselbe Rechnung einmal zum Kaufen, einmal zum Verhandeln und einmal zur Absage führt.",
+     "kapitel": [
+        { "t": 0, "titel": "Einstieg", "stichworte": "Drei Objekte Urteile gutes mittleres schwaches Objekt Pilot jeweils sagt" },
+        { "t": 19, "titel": "Objekt 1 · Kaufempfehlung", "stichworte": "Objekt Kaufempfehlung Parkstr Oeynhausen Einheiten Baujahr Kaufpreis Gesamturteil Investor Deal Score Empfehlung Kaufen Zwei Teil-Scores Investment" },
+        { "t": 93, "titel": "Objekt 2 · Mit Bedingungen", "stichworte": "Objekt Bedingungen Markt Kabelsketal Baujahr Kaufpreis Gesamturteil Investor Deal Score Solide Empfehlung Verhandeln Zwei Teil-Scores Investment" },
+        { "t": 168, "titel": "Objekt 3 · Absage", "stichworte": "Objekt Absage Lindenallee Herford Einheiten Baujahr Kaufpreis Gesamturteil Investor Deal Score Kritisch Empfehlung nicht kaufen Zwei" },
+        { "t": 237, "titel": "Nebeneinander", "stichworte": "Nebeneinander Dieselbe Rechnung Objekt Solide Kritisch Gerechnet nicht geraten" }
+     ],
+     "spruch": "Gerechnet, nicht geraten.",
+     "datei": "dealpilot-modul-29-drei-objekte-drei-urteile-v3502.mp4",
+     "datei_ton": "dealpilot-modul-29-drei-objekte-drei-urteile-marcel-v3502.mp4",
+     "poster": "dealpilot-modul-29-drei-objekte-drei-urteile-v3502.webp",
+     "youtube": {
+      "titel": "DealPilot Modul 29 · Drei Objekte, drei Urteile",
+      "tags": [
+       "DealPilot",
+       "Immobilien",
+       "Kaufentscheidung",
+       "Investment",
+       "Finanzierung"
       ],
       "youtube_id": null
      }
