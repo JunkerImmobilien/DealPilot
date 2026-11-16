@@ -176,7 +176,7 @@
 
   /* Menüpunkt nur für freigeschaltete Konten */
   /* v3233 · Marcel 09.11.: am Handy auf Prod gesehen - versteckt jetzt per Klasse, nicht nur per Inline-Stil */
-  try { var st0 = document.createElement('style'); st0.textContent = '.sb-act-wuensche:not(.dpw-frei){display:none !important}'; (document.head || document.documentElement).appendChild(st0); } catch (e) {}
+  try { var st0 = document.createElement('style'); st0.textContent = '.sb-act-wuensche:not(.dpw-frei),aside.sidebar .sb-act-item.sb-act-wuensche:not(.dpw-frei),#sidebar .sb-act-item.sb-act-wuensche:not(.dpw-frei){display:none !important}';   /* v3495 · dieselbe Ursache wie vermoegen.js: aside.sidebar .sb-act-item{display:flex!important} war staerker */ (document.head || document.documentElement).appendChild(st0); } catch (e) {}
   function pruefeZugang() {
     try {
       if (!(window.Auth && Auth.isApiMode && Auth.isApiMode() && Auth.isLoggedIn())) return;
