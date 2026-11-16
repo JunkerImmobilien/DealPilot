@@ -440,8 +440,8 @@ app.use('/api/v1/admin-reseller', require('./routes/resellerAdminPanel'));  // r
    /api/v1/admin — dort haengt bereits admin.js mit eigenen :id-Routen,
    und ein spaeter ergaenztes /admin/:etwas koennte /admin/rabatte
    verschlucken. Dasselbe Muster wie admin-reseller. */
-app.use('/api/v1/admin-rabatte', require('./routes/adminRabatte'));
-app.use('/api/v1/admin-gutachtenauftraege', require('./routes/adminGutachtenAuftraege'));  // v3590 · Admin › Gutachtenaufträge  // v1423
+app.use('/api/v1/admin-rabatte', require('./routes/adminRabatte'));  // v1423
+app.use('/api/v1/admin-gutachtenauftraege', require('./routes/adminGutachtenAuftraege'));  // v3590 · Admin › Gutachtenaufträge
 app.set('db', pool);
 
 // API root info
