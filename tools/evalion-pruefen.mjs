@@ -68,6 +68,10 @@ pruefe('Secret nie im Log (kein console.* mit secret)', !/console\.[a-z]+\([^)]*
 pruefe('Frontend kennt kein Secret und keinen Anbieter-Host', !/EVALION|evalion\.net/i.test(fs.readFileSync(path.join(WURZEL, 'frontend/js/gutachterpartner.js'), 'utf8')));
 const f401 = ev.fehlerText({ status: 401, zeitabweichung_s: 412, body: { code: 'authentication_failed', message: 'Partner authentication failed.' } });
 pruefe('401 nennt Zeitabweichung und Schluessel als Ursache', /5 Minuten/.test(f401.error) && /412 s/.test(f401.error) && f401.code === 'authentication_failed');
+/* auth-401-handler.js haelt „401“ in der Meldung fuer eine abgelaufene DealPilot-Sitzung und meldet ab (gemessen 16.11.2026) */
+const h401 = fs.readFileSync(path.join(WURZEL, 'frontend/js/auth-401-handler.js'), 'utf8');
+pruefe('Fehlertext ohne „401“ (sonst meldet auth-401-handler.js den Nutzer ab)', /\\b401\\b/.test(h401) && !/\b401\b/.test(f401.error)
+  && !/\b401\b/.test(ev.fehlerText({ status: 400, body: { message: 'HTTP 401 upstream' } }).error), f401.error);
 const fNeutral = ev.fehlerText({ status: 400, body: { code: 'validation_failed', message: 'Evalion konnte das nicht prüfen', errors: [{ path: 'x', message: 'bei Evalion' }] } });
 pruefe('Fehlertexte ohne Anbieternamen, feldgenau', !/evalion/i.test(JSON.stringify(fNeutral)) && fNeutral.felder.length === 1 && fNeutral.felder[0].path === 'x');
 

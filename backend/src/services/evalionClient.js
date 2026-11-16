@@ -137,9 +137,12 @@ async function aufruf(methode, pfad, opts) {
 function fehlerText(r) {
   const b = (r && r.body) || {};
   const felder = Array.isArray(b.errors) ? b.errors.map((e) => ({ path: String(e.path || ''), message: neutral(e.message || '') })) : [];
-  let text = neutral(b.message || ('Fehler beim Gutachterpartner (HTTP ' + (r && r.status) + ')'));
+  let text = neutral(b.message || 'Fehler beim Gutachterpartner').replace(/\b401\b/g, '');
   if (r && r.status === 401) {
-    text = 'Anmeldung beim Gutachterpartner abgelehnt (401). Häufigste Ursachen: Serverzeit weicht mehr als 5 Minuten ab'
+    /* v3542 · KEINE Zahl 401 im Text: frontend/js/auth-401-handler.js erkennt „401“ in der MELDUNG als
+       abgelaufene DealPilot-Sitzung, loescht den Token und wartet auf Re-Login (gemessen 16.11.2026 im
+       Headless-Chrome: Auth.apiCall hing, danach war der Nutzer abgemeldet). Der Status geht als anbieter_status mit. */
+    text = 'Anmeldung beim Gutachterpartner abgelehnt. Häufigste Ursachen: Serverzeit weicht mehr als 5 Minuten ab'
       + (r.zeitabweichung_s != null ? ' (gemessen: ' + r.zeitabweichung_s + ' s)' : '') + ', oder Schlüssel-Kennung/Secret passen nicht zur Umgebung.';
   }
   if (r && r.status === 409 && b.code === 'concurrency_conflict') text = 'Die Anfrage wurde inzwischen geändert. Bitte erneut versuchen.';
