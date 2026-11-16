@@ -9730,7 +9730,11 @@
         /* v3491 · Preis und Stückpreis getrennt lesen (zusammen ergab es „95 € je Monat19 € je Platz“) */
         var pb = qs('.main-col [data-v="plaetze"] .pk-preis'), pk = pb && pb.querySelector('small');
         var pr = pb ? (pdText(pb).replace(pdText(pk), '').trim() + (pk ? ', ' + pdText(pk) : '')) : '';
-        await b2oZeile(s, 'Plätze dazukaufen', 'Monatlich oder jährlich, der Preis steht sofort daneben' + (pr ? ' (<b>' + pr + '</b>)' : '') + '. Bezahlt wird über die Kasse, nichts geht ohne deinen Klick.');
+        /* v3520 · Marcel 16.11.: „der richtige Partner-Preis ist 99 €“ - gemessen: die 95 € sind NICHT der Partner-Plan, sondern 5 Plätze
+           × 19 € (Staffel STAFFEL in reseller-portal.js, Stepper mit 5 vorbelegt; Landing: „Plätze 19/15/12 €, kein Platz im Grundpreis“).
+           Die Zeile nennt deshalb die Zahl der Plätze und sagt, dass Plätze zum Partner-Plan dazukommen. */
+        var pq = qs('.main-col [data-v="plaetze"] .pk-stepper input'), pn = pq ? parseInt(pq.value, 10) : 0;
+        await b2oZeile(s, 'Plätze dazukaufen', 'Der Preis steht sofort daneben' + (pr ? ', hier für <b>' + pn + (pn === 1 ? ' Platz' : ' Plätze') + ' ' + pr.replace(/, /, '</b> (') + ')' : '') + '. Plätze kommen zum Partner-Plan dazu und werden über die Kasse bezahlt.');
       },
       async function (s) {   /* 7 · Abrechnung */
         await zeige(function () { return qs('.main-col [data-v="abo"]'); }, 8);
