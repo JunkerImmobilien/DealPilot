@@ -701,7 +701,7 @@
       S.push(B.deckblatt(c, { bild: info.fotos[0] || info.karte || null, eyebrow: abw && T.wahl === 'jacoby' ? 'Kaufpreisaufteilung nach der umgekehrten Ertragswertmethode (Jacoby)' : 'Kaufpreisaufteilung nach BMF-Arbeitshilfe', titel: o.adresse, unter: o.art + (o.bj ? ' · Baujahr ' + B.jahr(o.bj) : ''),
         wertLabel: 'Gebäudeanteil', wert: B.pct(gebPctG, 2),
         wertNeben: abw ? (B.esc(T.name) + '<br>amtlich ' + B.pct(w('gebaeudeanteil_prozent'), 2)) : ('Grund und Boden ' + B.eur(w('kaufpreisanteil_grund')) + '<br>Gebäude ' + B.eur(w('kaufpreisanteil_gebaeude'))),
-        meta: [['Kaufpreis', B.eur(z.kp)], ['Stand', c.stand], ['Grundlage', abw ? 'BMF-Arbeitshilfe · ' + (T.wahl === 'jacoby' ? 'Jacoby' : 'Bodenabschlag') : 'BMF-Arbeitshilfe']] }));
+        meta: [['Kaufpreis', B.eur(z.kp)], ['Stand', c.stand], ['Grundlage', (abw ? 'BMF-Arbeitshilfe · ' + (T.wahl === 'jacoby' ? 'Jacoby' : 'Bodenabschlag') : 'BMF-Arbeitshilfe') + (r._vorlage ? ' (' + r._vorlage + ')' : '')]] }));   /* v3481 · Fassung der verwendeten Vorlage */
       S.push(B.seite(c, 'Herleitung', B.abschnitt('Abschnitt 1', 'Herleitung nach der Arbeitshilfe', 'Sach- und Ertragswert nach der Arbeitshilfe des Bundesministeriums der Finanzen; maßgeblich ist der höhere Bezug je Objektart.')
         + B.liste([['Bodenwert', B.eur(w('bodenwert'))], ['Vorläufiger Sachwert', B.eur(w('sachwert_vorlaeufig'))], ['Marktangepasster Sachwert', B.eur(w('sachwert_marktangepasst'))],
           ['Vorläufiger Ertragswert', B.eur(w('ertragswert'))], ['Maßgebender Verkehrswert', B.eur(w('massgebender_verkehrswert')), { art: 'summe' }],
@@ -780,13 +780,21 @@
                 + '<div class="hinweis">Die umgekehrte Ertragswertmethode ist für vermietete Objekte zulässig (BFH, Urteil vom 20.09.2022, IX R 12/21). Ihre Wahl muss sachlich begründet werden.' + (j.hinweis ? ' ' + B.esc(j.hinweis) : '') + '</div>';
             })() : '')
           + (T.grund ? '<h3>Begründung</h3><p>' + B.esc(T.grund) + '</p>' : '<div class="hinweis" style="border-left-color:var(--rot)">Für die Abweichung von der Arbeitshilfe ist noch keine Begründung eingetragen. Ohne sie kann das Finanzamt die Aufteilung der Arbeitshilfe ansetzen.</div>')
-          + (T.rndVon ? (function () {
-              var von = Math.round(T.rndVon), bis = Math.round(T.rndBis || T.rndVon), jj = [];
-              for (var n = Math.min(von, bis); n <= Math.max(von, bis) && jj.length < 12; n++) jj.push(n);
-              return '<h3>AfA bei nachgewiesener Restnutzungsdauer (§ 7 Abs. 4 Satz 2 EStG)</h3><table><thead><tr><th>Nutzungsdauer</th><th class="r">AfA-Satz</th><th class="r">AfA je Jahr</th></tr></thead><tbody>'
-                + jj.map(function (n, i) { return '<tr' + (i === jj.length - 1 ? ' class="ende"' : '') + '><td>' + n + ' Jahre</td><td class="r num">' + B.pct(100 / n, 2) + '</td><td class="r num">' + B.eur(T.basis / n) + '</td></tr>'; }).join('')
-                + '</tbody></table><div class="hinweis">Eine kürzere als die gesetzliche Nutzungsdauer setzt einen Nachweis voraus, in der Regel ein Gutachten zur Restnutzungsdauer.</div>';
-            })() : '')));
+          /* v3481 · Marcel 16.11.2026: „Abschreibung je Aufteilung“ wie in der klassischen Fassung (Wilhelm-Busch-Str.):
+             Pauschale 2 % und jedes Jahr der Spanne aus Schritt 5 („Restnutzungsdauer von / bis“), amtlich gegen gewählt.
+             Bis v3480 nur die gewählte Spalte und nur mit Spanne. */
+          + (function () {
+              var linP = (window.Afa && Afa.linearNachFertigstellung && Afa.linearNachFertigstellung(o.bj)) || { satz: 2 };   /* nach Fertigstellung, nicht fest 2 % */
+              var zeilen = [[linP.satz, 'gesetzliche Pauschale']];
+              var von = Math.round(Number(T.rndVon) || 0), bis = Math.round(Number(T.rndBis) || 0);
+              if (von && bis && bis > von && bis - von <= 25) { for (var n = von; n <= bis; n++) zeilen.push([100 / n, 'Restnutzungsdauer ' + n + ' Jahre']); }
+              else if (von) zeilen.push([100 / von, 'Restnutzungsdauer ' + von + ' Jahre']);
+              var dd = function (a, b) { var x = Math.round(b) - Math.round(a); return x === 0 ? '0 €' : (x > 0 ? '+' : '−') + B.zahl(Math.abs(x), 0) + ' €'; };
+              return '<h3>Abschreibung je Aufteilung</h3><table><thead><tr><th>AfA-Satz</th><th class="r">Arbeitshilfe</th><th class="r">Gewählt</th><th class="r">Unterschied</th></tr></thead><tbody>'
+                + zeilen.map(function (z) { return '<tr><td>' + B.pct(z[0], 2) + ' · ' + B.esc(z[1]) + '</td><td class="r num">' + B.eur(basisAlt * z[0] / 100) + '</td><td class="r num">' + B.eur(T.basis * z[0] / 100) + '</td><td class="r num">' + dd(basisAlt * z[0] / 100, T.basis * z[0] / 100) + '</td></tr>'; }).join('')
+                + '</tbody></table><p class="det">AfA je Jahr auf die jeweilige Bemessungsgrundlage. Die Pauschale von ' + B.pct(linP.satz, 2) + ' folgt § 7 Abs. 4 Satz 1 Nr. 2 EStG (nach dem Jahr der Fertigstellung)'
+                + (zeilen.length > 1 ? '; ein höherer Satz aus einer kürzeren Nutzungsdauer folgt § 7 Abs. 4 Satz 2 EStG und setzt deren Nachweis voraus, in der Regel ein Gutachten zur Restnutzungsdauer' : '') + '.</p>';
+            })()));
       }
       if (T && T.klausel) {
         S.push(B.seite(c, 'Vertragstext und Begründung', B.abschnitt('Abschnitt ' + (abw ? 3 : 2), 'Text für den Kaufvertrag', 'Wortlaut für die Urkunde; die Begründung darunter ist für Rückfragen des Finanzamts.')

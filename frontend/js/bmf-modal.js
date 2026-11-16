@@ -719,6 +719,7 @@ function runBmf(){
     }
     window._lastBmfResults = data.results;
     try { data.results._fuer = window._currentObjKey || null; } catch(e) {}   /* v3184: Ergebnis gehoert zu DIESEM Objekt (bmf-ausgabe.js) */
+    try { data.results._vorlage = (data.meta && data.meta.template_version) || null; } catch(e) {}   /* v3481: Fassung der verwendeten Arbeitshilfe */
     renderBmfResult(data.results, null);
     if(hint){ hint.textContent = '✓ Berechnung aktualisiert (' + new Date().toLocaleTimeString('de-DE') + ')'; }
     // Persistenz
@@ -2773,7 +2774,7 @@ function _renderKlauselText(){ /* V293-E-klausel-no-pct: Prozente entfernt, nur 
       '<p>Diese Aufteilung wurde im Rahmen einer Wertermittlung nach BMF-Arbeitshilfe (Stand März 2026, maßgebendes Verfahren nach der Arbeitshilfe) unter Heranziehung lagespezifischer Bodenrichtwerte, der tatsächlichen Restnutzungsdauer des Gebäudes sowie ggf. vorgenommener Modernisierungen erstellt. ' +
       '<strong>Sie hat verbindlichen Charakter</strong> und gilt insbesondere als wirtschaftlich angemessen i.S.d. BFH-Rechtsprechung (BFH IX R 26/19 v. 21.07.2020). ' +
       'Die Parteien sind sich einig, dass eine pauschale 80/20-Aufteilung im konkreten Fall nicht sachgerecht wäre. ' +
-      'Eine abweichende Wertfeststellung durch das Finanzamt setzt eine substantiierte Gegenbewertung voraus (vgl. § 199 BewG). Stand: ' + datum + '.</p>'
+      'Eine abweichende Wertfeststellung durch das Finanzamt setzt eine substantiierte Gegenbewertung voraus. Stand: ' + datum + '.</p>'   /* v3481: „vgl. § 199 BewG“ passte nicht (vereinfachtes Ertragswertverfahren, Unternehmensbewertung) */
   };
 
   var el = document.getElementById('klauselText');

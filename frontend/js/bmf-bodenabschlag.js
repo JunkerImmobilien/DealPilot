@@ -26,6 +26,28 @@
 
   var PANE = 'p-boden';
 
+  /* v3481 · Jede Restnutzungsdauer-Ermittlung (RND-Rechner, Wizard, Knopf hier, Reiter Steuer) schreibt
+     window._lastRndResult - an sechs Stellen, ohne Objektbezug. Statt alle sechs anzufassen, stempelt ein
+     Setzer beim Schreiben das gerade offene Objekt dazu; gelesen wird nur noch ueber rndDiesesObjekts(). */
+  (function () {
+    try {
+      var d = Object.getOwnPropertyDescriptor(window, '_lastRndResult');
+      if (d && d.set) return;
+      var wert = window._lastRndResult;
+      var stempel = function (v) { if (v && typeof v === 'object') { try { if (!('_obj' in v)) v._obj = window._currentObjKey || null; } catch (e) {} } return v; };
+      Object.defineProperty(window, '_lastRndResult', { configurable: true, enumerable: true,
+        get: function () { return wert; }, set: function (v) { wert = stempel(v); } });
+    } catch (e) {}
+  })();
+  function rndDiesesObjekts() {
+    try {
+      var r = window._lastRndResult;
+      if (!r || !r.result || !(r.result.final_rnd > 0)) return null;
+      if (!r._obj || String(r._obj) !== String(window._currentObjKey || '')) return null;
+      return r.result.final_rnd;
+    } catch (e) { return null; }
+  }
+
   function el(id) { return document.getElementById(id); }
   function zahl(v) {
     if (v == null || v === '') return null;
@@ -136,7 +158,7 @@
     /* Vorbelegung aus der ermittelten Restnutzungsdauer: der Wert selbst und
        vier Jahre darueber — die Bandbreite, die auch im Gutachten steht. */
     try {
-      var r0 = window._lastRndResult && window._lastRndResult.result && window._lastRndResult.result.final_rnd;
+      var r0 = rndDiesesObjekts();   /* v3481 · nur die des offenen Objekts */
       if (r0 && el('bmf-boden-rnd-von') && !el('bmf-boden-rnd-von').value) {
         el('bmf-boden-rnd-von').value = String(Math.round(r0));
         el('bmf-boden-rnd-bis').value = String(Math.round(r0) + 4);
@@ -332,15 +354,19 @@
       'Bewertung wie folgt: Auf den Grund und Boden entfallen ' + eur(bodenNeu, 2) + ', auf das ' +
       'Gebäude einschließlich der wesentlichen Gebäudeteile entfallen ' + eur(gebNeu, 2) +
       (B.inv > 0 ? ' und auf das mitverkaufte Inventar entfallen ' + eur(B.inv, 2) : '') + '.\n' +
-      /* v3188 · Marcel 05.11.2026: im Text für den Kaufvertrag „noch mal reinschreiben, dass das damit ermittelt wurde“ */
-      (W.id === 'jacoby' ? 'Die Aufteilung wurde nach der umgekehrten Ertragswertmethode (Jacoby) ermittelt.\n'
-        : W.ab > 0 ? 'Die Aufteilung wurde auf Grundlage der Arbeitshilfe des Bundesministeriums der Finanzen mit einem Abschlag von ' + pct(W.ab, 0) + ' auf den Bodenwert ermittelt.\n'
-        : 'Die Aufteilung wurde nach der Arbeitshilfe des Bundesministeriums der Finanzen ermittelt.\n');
+      /* v3188 · Marcel 05.11.2026: im Text für den Kaufvertrag „noch mal reinschreiben, dass das damit ermittelt wurde“ -
+         v3481 · Marcel 16.11.2026 zum Satz „… mit einem Abschlag von 20 % auf den Bodenwert ermittelt“: „das ist Quatsch“.
+         In die Urkunde gehoert nur die Aufteilung; wie sie ermittelt wurde, steht in der Begruendung fuer das Finanzamt.
+         Der Jacoby-Satz bleibt (ausdruecklicher Wunsch vom 05.11.) - Rueckfrage im Bericht. */
+      (W.id === 'jacoby' ? 'Die Aufteilung wurde nach der umgekehrten Ertragswertmethode (Jacoby) ermittelt.\n' : '');
     var hinweis = 'Diese Aufteilung hat verbindlichen Charakter und ist wirtschaftlich angemessen im Sinne ' +
       'der Rechtsprechung des Bundesfinanzhofs (BFH, Urteil vom 21.07.2020, IX R 26/19).';
     /* Begründung je Auswahl - die Punkte werden fortlaufend nummeriert */
     var P = [];
-    P.push('Verfahren. Die Aufteilung folgt der Arbeitshilfe des Bundesfinanzministeriums (Stand März 2026). ' +
+    /* v3481 · die Fassung aus der TATSAECHLICH verwendeten Vorlage (Antwort des Backends meta.template_version,
+       bmf-modal.js legt sie als _vorlage am Ergebnis ab). Marcels Andersenweg-PDF vom 12.11. nannte noch die Fassung von 2023. */
+    var fassung = (window._lastBmfResults && window._lastBmfResults._vorlage) || 'Stand März 2026';
+    P.push('Verfahren. Die Aufteilung folgt der Arbeitshilfe des Bundesfinanzministeriums (' + fassung + '). ' +
       'Maßgeblich ist das ' + (verfahren || 'dort vorgesehene Verfahren') + ', weil es der Grundstücksart entspricht. ' +
       'Der Bodenwert ergibt sich aus Grundstücksfläche und amtlichem Bodenrichtwert, der Gebäudeanteil als ' +
       'Differenz zum maßgebenden Verkehrswert' +
@@ -368,7 +394,15 @@
       'zugrunde zu legen, solange sie wirtschaftlich vernünftig ist und keine nennenswerten Zweifel an ihrer ' +
       'Angemessenheit bestehen (BFH, Urteil vom 16.09.2015, IX R 12/14). Eine pauschale Aufteilung im ' +
       'Verhältnis 80/20 wäre im konkreten Fall nicht sachgerecht; eine abweichende Wertfeststellung ' +
-      'durch das Finanzamt setzt eine substantiierte Gegenbewertung voraus (vgl. § 199 BewG).');
+      /* v3481 · „(vgl. § 199 BewG)“ gestrichen: § 199 BewG regelt den Kapitalisierungsfaktor im vereinfachten
+         Ertragswertverfahren fuer Unternehmensanteile (Erbschaft-/Schenkungsteuer) - mit der Kaufpreisaufteilung
+         fuer die AfA hat er nichts zu tun. Die Aussage selbst traegt BFH IX R 12/14 (oben). */
+      'durch das Finanzamt setzt eine substantiierte Gegenbewertung voraus.');
+    /* v3481 · Punkt 4 nur, wenn fuer DIESES Objekt eine Restnutzungsdauer ermittelt wurde (Rechner/Gutachten).
+       Gemessen 16.11.: _lastRndResult ist ein Fensterwert und blieb beim Objektwechsel stehen - am Andersenweg
+       (Bj 1973) stand „27 Jahre ermittelt“ (= 80 - 53); woher genau, ist ohne Marcels Sitzung nicht mehr
+       nachzumessen - ein Rechnerlauf an einem anderen Objekt kam so ebenso durch wie einer ohne Punkte. */
+    rnd = rndDiesesObjekts();
     if (rnd) P.push('Restnutzungsdauer. Für das Gebäude wurde eine Restnutzungsdauer von ' + Math.round(rnd) + ' Jahren ' +
       'ermittelt; die Abschreibung folgt § 7 Abs. 4 Satz 2 EStG. Die Herleitung liegt als gesonderte Berechnung bei.');
     var zusatz = 'Ergänzende Begründung der Aufteilung (auf Anforderung des Finanzamts)\n\n' +

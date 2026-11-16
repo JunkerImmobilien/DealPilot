@@ -460,5 +460,16 @@ if (process.argv.includes('--live')) {
   ok(/huelle\('exportAbschlussPDF'/.test(dw) && /huelle\('generateBmfPdfAnlage'/.test(dw) && /jahresabschluss: jahresabschluss/.test(dok), 'L Weiche: Jahresabschluss und BMF-Anlage im einheitlichen Dokument');
 }
 
+/* ── M · v3481 Kaufpreisaufteilung: Vertragstext, Restnutzungsdauer je Objekt, Fassung, § 199 BewG ── */
+{
+  const ba = js('bmf-bodenabschlag.js'), bm = js('bmf-modal.js'), dok = js('dp-dokumente.js'), kpa = js('pdf-kaufpreisaufteilung.js');
+  const code = (s) => s.replace(/\/\*[\s\S]*?\*\//g, '');
+  ok(!/Abschlag von ' \+ pct\(W\.ab, 0\) \+ ' auf den Bodenwert ermittelt/.test(code(ba)), 'M Vertragstext ohne „… mit einem Abschlag von x % auf den Bodenwert ermittelt" (Marcel: „Quatsch")');
+  ok(!/§ 199 BewG/.test(code(ba)) && !/§ 199 BewG/.test(code(bm)), 'M kein Verweis auf § 199 BewG (vereinfachtes Ertragswertverfahren, passt nicht)');
+  ok(/rnd = rndDiesesObjekts\(\);\s*\n\s*if \(rnd\) P\.push\(/.test(ba) && /_obj = window\._currentObjKey/.test(ba) && /_lastRndResult\._obj/.test(kpa), 'M Punkt 4 „Restnutzungsdauer ermittelt" nur mit RND dieses Objekts (beide PDF-Wege)');
+  ok(/_vorlage = \(data\.meta && data\.meta\.template_version\)/.test(bm) && /_lastBmfResults\._vorlage/.test(ba), 'M Fassung der Arbeitshilfe aus der verwendeten Vorlage');
+  ok(/Abschreibung je Aufteilung/.test(dok) && /linearNachFertigstellung\(o\.bj\)\) \|\| \{ satz: 2 \}/.test(dok), 'M neues PDF: Abschreibung je Aufteilung mit Spanne, Pauschale nach Fertigstellung');
+}
+
 console.log('steuer-audit-pruefen: ' + gruen + ' gruen, ' + rot + ' rot');
 process.exit(rot ? 1 : 0);

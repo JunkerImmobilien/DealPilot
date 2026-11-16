@@ -420,6 +420,8 @@
     /* ── AfA ─────────────────────────────────────────────────────── */
     var rnd = null;
     try { rnd = window._lastRndResult && window._lastRndResult.result && window._lastRndResult.result.final_rnd; } catch (e) {}
+    /* v3481 · nur die Restnutzungsdauer DIESES Objekts (Stempel _obj aus bmf-bodenabschlag.js) */
+    try { if (rnd && window._lastRndResult._obj !== undefined && String(window._lastRndResult._obj || '') !== String(window._currentObjKey || '')) rnd = null; } catch (e) {}
     /* v1477 · gemessen: die lange Beschriftung lief in die Zahlenspalte.
        Kurz in der Tabelle, die Fundstelle steht in der Fussnote. */
     /* v1479 · Marcel: „wenn eine Spanne rauskommt, die Tabelle erweitern
