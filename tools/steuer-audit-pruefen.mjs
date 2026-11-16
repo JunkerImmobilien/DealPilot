@@ -486,6 +486,11 @@ if (process.argv.includes('--live')) {
   ok((bm.match(/garagen: \(parseInt/g) || []).length >= 2 && (bm.match(/wohneinheiten: \(function/g) || []).length >= 2, 'N runBmf und XLSX-Lauf (bmf-modal.js) schicken beide Felder (v3345)');
   const rx = /Mietwohngrundst\|gemischt genutzt\/\.test\(art\) && !\/\^Teileigentum\/\.test\(art\)/;
   ok(rx.test(pip) && rx.test(bm), 'N Wohneinheiten in Pipeline und runBmf nach derselben Regel (nur MFH / gemischt, nie Teileigentum)');
+  /* v3510 · Kosten der Kaufpreisaufteilung (#kpa_kosten): gespeichert, in beiden PDFs gesondert, nie in der AfA-Basis */
+  const idxN = fs.readFileSync(path.join(ROOT, 'frontend/index.html'), 'utf8'), sto = js('storage.js'), dokN = js('dp-dokumente.js'), kpaN = js('pdf-kaufpreisaufteilung.js');
+  ok(/id="kpa_kosten"/.test(idxN) && /'kpa_kosten'/.test(sto.slice(sto.indexOf('var FIELDS'), sto.indexOf('var FIELDS') + 20000)), 'N Feld kpa_kosten im Formular und in FIELDS (wird gespeichert)');
+  ok(/zahlAus\('kpa_kosten'\)/.test(dokN) && /num\('kpa_kosten'\)/.test(kpaN), 'N beide Kaufpreisaufteilungs-PDFs zeigen die Kosten gesondert');
+  ok(!/kpa_kosten/.test(bm) && !/kpa_kosten/.test(js('bmf-bodenabschlag.js')) && !/kpa_kosten/.test(pip), 'N kpa_kosten geht nicht in die Summe der Arbeitshilfe (runBmf, Reiter 5, Pipeline)');
   if (process.argv.includes('--live')) {
     const { execFileSync } = createRequire(import.meta.url)('node:child_process');
     const fall = { lage: 'Andersenweg 3, 32429 Minden', grundstuecksart: 'Mietwohngrundstücke (Mehrfamilienhäuser)', kaufdatum: '2026-11-12',

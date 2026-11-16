@@ -185,7 +185,7 @@ var FIELDS = [
   'rate_kueche','rate_bad','rate_boden','rate_fenster',
   'qual_kueche','qual_bad','qual_boden','qual_fenster','zimmer','bad_anz','etage','etagen_ges','modernis',
   /* v1608 · Modernisierungsgrad nach Anlage 2 ImmoWertV */
-  'mod_dach', 'mod_fenster', 'mod_leitungen', 'mod_heizung', 'mod_aussenwand', 'mod_baeder', 'mod_innenausbau', 'mod_grundriss','garagen','stellpl_aussen','balkon_flae','_avm_state','_mb_state','_lage_herkunft','_dok_auswertung', '_dok_eingang' /* v3120 */,'einheiten',   /* v2515: _lage_herkunft */
+  'mod_dach', 'mod_fenster', 'mod_leitungen', 'mod_heizung', 'mod_aussenwand', 'mod_baeder', 'mod_innenausbau', 'mod_grundriss','garagen','stellpl_aussen','balkon_flae','_avm_state','_mb_state','_lage_herkunft','_dok_auswertung', '_dok_eingang' /* v3120 */,'einheiten','kpa_kosten' /* v3510 */,   /* v2515: _lage_herkunft */
   /* V292.6.5-fields-checkboxes: Werbungskosten-Übernahme Checkboxen + Select-Felder */
   'san_tax_active','san_tax_years','moebl_tax_active','moebl_tax_years',
   'san_ust',   /* v1261: brutto/netto fuer die 15%-Grenze */

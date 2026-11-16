@@ -375,6 +375,11 @@
     y += 1;
     zeile('davon in der amtlichen Aufteilung angesetzt', eur(akBmf, 2), { fett: true });
     if (nkAussen > 0.005) zeile('nicht angesetzt (Fahrt, Gutachten, Anwalt, Reise, Sonstiges)', eur(nkAussen, 2), { einzug: true, klein: true });
+    /* v3510 · Marcel 16.11.2026: „wo ist das Gutachten drin in den Anschaffungskosten von 549 Euro?" Der Satz
+       unten versprach seit v1482 „stehen gesondert", das Feld dazu fiel in v1495 weg. Jetzt #kpa_kosten
+       (Reiter Steuern, beim Gebaeudeanteil): eigene Zeile, NICHT in den Anschaffungskosten. */
+    var kpaKosten = num('kpa_kosten');
+    if (kpaKosten > 0.005) zeile('Gesondert: Kosten der Kaufpreisaufteilung / AfA-Ermittlung (nicht in den Anschaffungskosten)', eur(kpaKosten, 2), { fett: true });
     einleitung('Die Arbeitshilfe teilt die Anschaffungskosten einschließlich Nebenkosten auf; die Nebenkosten folgen demselben Verhältnis wie der Kaufpreis. Angesetzt sind alle Anschaffungsnebenkosten des Erwerbs: Grunderwerbsteuer, Notar, Grundbuch, Makler und Vermittlung ebenso wie Fahrten zur Besichtigung und zum Notartermin, ein Wertgutachten zur Kaufentscheidung sowie Rechtsberatung des Erwerbs (BFH VIII R 195/77; BFH IX R 20/08). Kosten, die erst die Abschreibung ermitteln, stehen gesondert und sind sofort abziehbar.');
 
     /* ── Herleitung der amtlichen Aufteilung ─────────────────────── */

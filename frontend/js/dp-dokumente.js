@@ -732,6 +732,11 @@
         var akSum = akZ.reduce(function (s, x) { return s + (x[1] || 0); }, 0);
         var akTab = akZ.length > 1 || akSum > 0 ? '<h3>Anschaffungskosten im Einzelnen</h3>' + B.liste(akZ.map(function (x, i) { return [x[0], B.eur(x[1] || 0, 2), i ? { art: 'ein' } : {}]; })
           .concat([[(zahlAus('bmf_hk') > 0 ? 'Anschaffungs- und Herstellungskosten gesamt' : 'Anschaffungskosten gesamt') + ' (Eingaben im Reiter Anschaffungskosten)', B.eur(akSum, 2), { art: 'summe' }]])) : '';
+        /* v3510 · Marcel 16.11.2026: „wo ist das Gutachten drin in den Anschaffungskosten von 549 Euro?" Kosten,
+           die erst die Abschreibung ermitteln (#kpa_kosten), stehen gesondert - nicht in den Anschaffungskosten. */
+        var kpaK = zahlAus('kpa_kosten');
+        if (kpaK > 0) akTab += '<h3>Gesondert, nicht in den Anschaffungskosten</h3>' + B.liste([['Kosten der Kaufpreisaufteilung / AfA-Ermittlung', B.eur(kpaK, 2), { art: 'ende' }]])
+          + '<p class="det">Angesetzt sind alle Anschaffungsnebenkosten des Erwerbs (Grunderwerbsteuer, Notar, Grundbuch, Makler, Fahrten zur Besichtigung, ein Wertgutachten zur Kaufentscheidung). Kosten, die erst die Abschreibung ermitteln, stehen gesondert und sind sofort abziehbar.</p>';
         var vgw = w('vergleichswert'); if (!B.istZahl(vgw)) vgw = null;
         var sw = B.istZahl(w('sachwert_marktangepasst')) ? w('sachwert_marktangepasst') : w('sachwert_vorlaeufig'), ew = w('ertragswert'), vw = w('massgebender_verkehrswert');
         var nah = function (a, b2) { return B.istZahl(a) && B.istZahl(b2) && Math.abs(a - b2) < 1; };
