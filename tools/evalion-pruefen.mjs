@@ -215,8 +215,50 @@ process.env.EVALION_LITE_WEG = 'formular'; const wegF = ev.liteWegDirekt(); dele
 pruefe('Direktweg ist Standard, EVALION_LITE_WEG=formular schaltet zurück', ev.liteWegDirekt() === true && wegF === false);
 pruefe('Route: Ersteinschätzung über den Direktweg, Datenschutz verlangt', /liteWegDirekt\(\)\) return liteDirekt/.test(route) && /acceptPrivacy !== true/.test(route));
 const ui = fs.readFileSync(path.join(WURZEL, 'frontend/js/gutachterpartner.js'), 'utf8');
-pruefe('UI: Fenster aus den Bausteinen der App (global-view-overlay, dpm-shell, DP_BAR, DP_HERO, dpm-btn)', /global-view-overlay/.test(ui) && /dpm-shell/.test(ui) && /DP_BAR/.test(ui) && /DP_HERO/.test(ui) && /dpm-btn primary/.test(ui));
+/* v3580 · Reiter wie der RND-Rechner (rnd-wizard.js): dieselben Klassen */
+const wiz = fs.readFileSync(path.join(WURZEL, 'frontend/js/rnd-wizard.js'), 'utf8');
+const BAUSTEINE = ['rnd-wiz-overlay rnd-hub', 'rnd-wiz-modal', 'rnd-wiz-header', 'rnd-wiz-close', 'rnd-wiz-steps rnd-hub-schritte', 'rnd-hub-balken', 'rnd-wiz-progress-bar',
+  'rnd-wiz-body', 'rnd-wiz-footer rnd-hub-nav', 'rnd-wiz-btn rnd-wiz-btn-sec rnd-hub-zurueck', 'rnd-wiz-counter', 'rnd-wiz-btn rnd-wiz-btn-pri rnd-hub-weiter', 'rnd-hub-nr', 'rnd-hub-kurz'];
+const fehltBau = BAUSTEINE.filter((k) => !(wiz.includes(k) && ui.includes(k)));
+pruefe('UI: Fenster aus den Bausteinen des RND-Rechners (' + BAUSTEINE.length + ' Klassen in beiden Dateien)', fehltBau.length === 0, fehltBau.join(', '));
+pruefe('UI: Karten und Felder wie im RND-Rechner (rnd-hub-karte, rnd-hub-h, rnd-wiz-field, rnd-hub-chip)', ['rnd-hub-karte', 'rnd-hub-h', 'rnd-wiz-grid rnd-hub-felder', 'rnd-wiz-field', 'rnd-hub-chip'].every((k) => ui.includes(k)));
+const reiterBlock = ui.slice(ui.indexOf('var REITER = {'), ui.indexOf('function reiterBauen'));
+for (const art of ['lite', 'voll']) {
+  const d = JSON.parse(fs.readFileSync(path.join(WURZEL, 'tools/evalion-beispiele/live-definition-' + art + '.json'), 'utf8')).data;
+  const teil = reiterBlock.slice(reiterBlock.indexOf(art + ': ['), art === 'lite' ? reiterBlock.indexOf('voll: [') : undefined);
+  const ohne = A.felder(d).map((g) => g.id).filter((g) => !teil.includes("'" + g + "'"));
+  const n = (teil.match(/kurz:/g) || []).length;
+  pruefe(art + ': jede Gruppe der Live-Definition hat ihren Reiter (' + n + ' Reiter)', ohne.length === 0 && n >= 3, ohne.join(' '));
+}
+pruefe('UI: offene Pflichtangaben je Reiter gezählt', /offeneJeReiter/.test(ui) && /data-offen/.test(ui));
+pruefe('UI: unsere AfA = 100 ÷ RND ist die Hauptzahl, die des Partners nur als Information',
+  ui.includes('function unsereAfa(rnd) { var n = Math.round(Number(rnd)); return n > 0 ? 100 / n : null; }') && ui.includes("' nennt ' + zahl(partner, 2)"));
+const afaE = fs.readFileSync(path.join(WURZEL, 'frontend/js/afa-eigen.js'), 'utf8');
+pruefe('Übernahme setzt 100 ÷ RND (afa-eigen.js setzen)', afaE.includes("el('afa_eigen').value = fmt(100 / n, 2)") && ui.includes('DpAfaEigen.setzen(n,'));
+pruefe('Marke gutachten.org nach außen, kein Firmenname im UI', ui.includes("var MARKE = 'gutachten.org'") && !/evalion/i.test(ui) && A.neutral('Evalion') === 'gutachten.org' && ev.neutral('Evalion') === 'gutachten.org');
+const logoDatei = path.join(WURZEL, 'frontend/img/partner/gutachten-org.svg');
+const logoText = fs.existsSync(logoDatei) ? fs.readFileSync(logoDatei, 'utf8') : '';
+pruefe('Logo: offizielles SVG abgelegt, Quelle im Code vermerkt, ohne Skript', /^<svg/.test(logoText) && !/<script|onload=/i.test(logoText) && ui.includes('gutachten.org/brand/logo/gutachten-org-ink.svg'));
+pruefe('Kosten: Ersteinschätzung kostenlos, Gutachten „stellt gutachten.org gesondert in Rechnung“, kein Betrag', ui.includes('kostenlos') && ui.includes('gesondert in Rechnung') && !/\d\s*(€|EUR|Euro)\b/.test(ui));
+pruefe('Freigabe: jedes angemeldete Konto (Zusatz nur zum Sperren)', route.includes('return !(z && z.aktiv === false)'));
+pruefe('Abgleich: Eingaben (ohne Person) und Kern zum selben Zeitpunkt gespeichert, Kern über rndAusObjekt',
+  route.includes('kernMessen(req.user.id, objekt)') && route.includes('kerne.rndAusObjekt(') && route.includes('kerne.rnd(eingabe)') && route.includes('delete d.requester') && route.includes('ergebnis, eingaben, kern)'));
+const mig109 = path.join(WURZEL, 'backend/migrations/109_gutachter_abgleich.sql');
+pruefe('Migration 109 (eingaben, kern)', fs.existsSync(mig109) && fs.readFileSync(mig109, 'utf8').includes('ADD COLUMN IF NOT EXISTS kern JSONB'));
 pruefe('UI: Optionen nur über optionText, Nachladen 3 × 5 s', /optionText\(p, o\)/.test(ui) && /versuch < 3/.test(ui) && /5000/.test(ui));
+
+const AB = await import('./rnd-partner-abgleich.mjs');
+const abRoh = [
+  { nr: 'T1', umgebung: 'test', ergebnis: { finalAverageRUL: 16, annualDepreciation: 7 }, eingaben: { property: { constructionYear: 1978 } }, kern: { final_rnd: 32, verfahren: 'punktraster', eingabe: { modPoints: 0 } } },
+  { nr: 'T2', umgebung: 'test', ergebnis: { finalAverageRUL: 10 }, eingaben: { property: { constructionYear: 1965 } }, kern: { fehlt: 'kein DealPilot-Objekt' } },
+  { nr: 'T3', umgebung: 'produktion', ergebnis: { finalAverageRUL: 40 }, eingaben: { property: { constructionYear: 1995 } }, kern: { final_rnd: 38, eingabe: { modPoints: 8 } } }
+];
+const abF = AB.faelleBauen(abRoh), abA = AB.auswerten(abF);
+pruefe('Abgleich-Werkzeug: Abweichung Kern − Partner je Fall, ohne Kernwert ausgewiesen', abF[0].diff === 16 && abF[1].diff === null && abF[1].kernFehlt && abF[2].diff === -2);
+pruefe('Abgleich-Werkzeug: Mittel/Median/Gruppen nach Baujahr und Modernisierungsgrad', abA.nMitKern === 2 && abA.mittel === 7 && abA.median === 7
+  && abA.nachBaujahr.some((g) => g.gruppe === '1970–1989') && abA.nachModernisierung.some((g) => /^mittlerer/.test(g.gruppe)) && abA.groesste[0].nr === 'T1');
+pruefe('Abgleich-Werkzeug: nur Vorschläge, liest nur (kein UPDATE/INSERT, keine Änderung am Kern)', AB.vorschlaege(abA).length >= 1
+  && !/\b(UPDATE|INSERT|DELETE)\b/.test(fs.readFileSync(path.join(WURZEL, 'tools/rnd-partner-abgleich.mjs'), 'utf8').replace(/\/\*[\s\S]*?\*\//, '')) && !/writeFileSync/.test(fs.readFileSync(path.join(WURZEL, 'tools/rnd-partner-abgleich.mjs'), 'utf8')));
 
 /* ── D Live gegen die TEST-Umgebung ─────────────────────────────────── */
 if (arg('live')) {

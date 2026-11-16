@@ -17,7 +17,7 @@
    DELETE /gutachterpartner/anfragen/:rid/dateien/:fileId
    POST   /gutachterpartner/anfragen/:rid/absenden  { kostenpflichtig_bestaetigt }
 
-   Freigabe: users.role = 'admin' ODER Zusatz 'gutachterpartner' (Admin-Portal), bis Marcel
+   Freigabe (v3580): jedes angemeldete Konto; Zusatz 'gutachterpartner' aktiv=false sperrt einzeln. Bis v3570:
    Preis und Freigabe entscheidet. Ohne EVALION_* in der Umgebung: 503 „nicht eingerichtet“.
    Jeder Aufruf beim Partner landet in gutachter_aufrufe (Aktion, Konto, Dauer, ok).
    Fehler des Partners kommen FELDGENAU zurueck ({ felder: [{path, message}] }), ohne Anbieternamen.
@@ -39,12 +39,36 @@ const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: MAX
 
 const bremse = rateLimit({ windowMs: 15 * 60 * 1000, max: 120, standardHeaders: true, legacyHeaders: false,
   keyGenerator: (req) => (req.user && req.user.id ? 'gp:' + req.user.id : req.ip),
-  message: { error: 'Zu viele Anfragen an den Gutachterpartner. Bitte kurz warten.' } });
+  message: { error: 'Zu viele Anfragen an gutachten.org. Bitte kurz warten.' } });
 
+/* v3580 · Marcel 16.11.2026: „Jeder darf anfragen.“ Jedes angemeldete Konto ist freigeschaltet;
+   Protokoll und Zaehlung (gutachter_aufrufe) bleiben. Ein Zusatz 'gutachterpartner' mit aktiv=false
+   sperrt ein einzelnes Konto weiterhin (Admin-Portal), ohne Zeile gilt: frei. */
 async function freigeschaltet(user) {
   if (!user || !user.id) return false;
   if (user.role === 'admin') return true;
-  try { const z = await zusatzService.holen(user.id, zusatzService.GUTACHTER); return !!(z && z.aktiv); } catch (e) { return false; }
+  try { const z = await zusatzService.holen(user.id, zusatzService.GUTACHTER); return !(z && z.aktiv === false); } catch (e) { return true; }
+}
+
+/* v3580 · Kern gegen Partner: die RND UNSERES Kerns zum selben Zeitpunkt (services/rechenkerne.js,
+   rndAusObjekt = mapDealPilotObject, derselbe Weg wie POST /rechenkerne/rnd - kein zweiter Kern). */
+async function kernMessen(userId, objektId) {
+  if (!objektId) return { fehlt: 'kein DealPilot-Objekt' };
+  try {
+    const o = await query('SELECT data FROM objects WHERE id=$1 AND user_id=$2', [objektId, userId]);
+    if (!o.rowCount) return { fehlt: 'Objekt nicht gefunden' };
+    const kerne = require('../services/rechenkerne');
+    const eingabe = kerne.rndAusObjekt(o.rows[0].data || {});
+    const r = kerne.rnd(eingabe);
+    const methoden = {};
+    Object.keys(r.methods || {}).forEach((k) => { const m = r.methods[k] || {}; methoden[k] = m.restnutzungsdauer != null ? m.restnutzungsdauer : (m.rnd != null ? m.rnd : null); });
+    return { final_rnd: r.final_rnd, verfahren: r.verfahren, quelle: r.final_source, methoden, eingabe: r.input || eingabe,
+      version: (kerne.herkunft && kerne.herkunft().version) || null, gemessen_am: new Date().toISOString() };
+  } catch (e) { return { fehlt: 'Kern nicht rechenbar: ' + e.message }; }
+}
+/* Die an den Partner gegebenen Objektangaben - ohne Personendaten (requester bleibt draussen). */
+function eingabenOhnePerson(data) {
+  const d = Object.assign({}, data || {}); delete d.requester; delete d.owner; delete d.agreement; return d;
 }
 
 async function protokoll(userId, aktion, r, requestId) {
@@ -117,10 +141,10 @@ router.get('/status', async (req, res) => {
 /* ab hier: freigeschaltet + konfiguriert */
 router.use(async (req, res, next) => {
   if (!(await freigeschaltet(req.user))) {
-    return res.status(403).json({ error: 'Die Anfrage beim Gutachterpartner ist für dieses Konto nicht freigeschaltet.', code: 'nicht_freigeschaltet' });
+    return res.status(403).json({ error: 'Die Anfrage bei gutachten.org ist für dieses Konto gesperrt.', code: 'nicht_freigeschaltet' });
   }
   if (!ev.konfig()) {
-    return res.status(503).json({ error: 'Die Anbindung an den Gutachterpartner ist noch nicht eingerichtet.', code: 'nicht_konfiguriert' });
+    return res.status(503).json({ error: 'Die Anbindung an gutachten.org ist noch nicht eingerichtet.', code: 'nicht_konfiguriert' });
   }
   next();
 });
@@ -162,6 +186,12 @@ async function absenden(req, res, zeile) {
   if (voll) await query('UPDATE gutachter_anfragen SET kostenpflichtig_bestaetigt_at=NOW() WHERE request_id=$1', [zeile.request_id]);
   const r = await mitFrischemEtag(req.user.id, zeile, 'absenden', (etag) => ev.api.absenden(zeile.request_id, etag, zeile.idem_submit));
   if (!r.ok) return fehler(res, r, zeile.request_id);
+  /* v3580 · auch auf dem Formularweg: Eingaben und Kern zum Zeitpunkt des Absendens */
+  try {
+    const dd = (r.body && r.body.data) || {};
+    await query('UPDATE gutachter_anfragen SET eingaben=COALESCE(eingaben,$2::jsonb), kern=COALESCE(kern,$3::jsonb) WHERE request_id=$1',
+      [zeile.request_id, JSON.stringify(eingabenOhnePerson(dd.data)), JSON.stringify(await kernMessen(req.user.id, zeile.objekt_id))]);
+  } catch (e) { /* Abgleich bricht das Absenden nicht */ }
   const neu = await zeileHolen(req.user.id, zeile.request_id);
   return res.json({ anfrage: sicht(r.body && r.body.data, neu) });
 }
@@ -184,10 +214,11 @@ async function liteDirekt(req, res, objekt, data) {
   }
   const k = ev.konfig();
   const ergebnis = Object.assign({}, d.result || {}, { weg: 'direkt', ms: r.ms });
-  await query('INSERT INTO gutachter_anfragen (user_id, objekt_id, formular, umgebung, request_id, request_number, status, etag, idem_submit, ergebnis) '
-    + 'VALUES ($1,$2,$3,$4,$5,$6,$7,NULL,$8,$9::jsonb) ON CONFLICT (request_id) DO NOTHING',
+  const kern = await kernMessen(req.user.id, objekt);   /* v3580 · Kern gegen Partner */
+  await query('INSERT INTO gutachter_anfragen (user_id, objekt_id, formular, umgebung, request_id, request_number, status, etag, idem_submit, ergebnis, eingaben, kern) '
+    + 'VALUES ($1,$2,$3,$4,$5,$6,$7,NULL,$8,$9::jsonb,$10::jsonb,$11::jsonb) ON CONFLICT (request_id) DO NOTHING',
     [req.user.id, objekt, ev.FORMULARE.lite, k.umgebung, d.evalionRequestId, d.evalionRequestNumber || null,
-     d.result ? 'initialAssessment' : 'received', idem, JSON.stringify(ergebnis)]);
+     d.result ? 'initialAssessment' : 'received', idem, JSON.stringify(ergebnis), JSON.stringify(eingabenOhnePerson(data)), JSON.stringify(kern)]);
   const zeile = await zeileHolen(req.user.id, d.evalionRequestId);
   return res.status(201).json({ anfrage: Object.assign(sicht({ requestId: d.evalionRequestId, requestNumber: d.evalionRequestNumber,
     form: { type: ev.FORMULARE.lite }, status: zeile && zeile.status, result: ergebnis }, zeile), { dauer_ms: r.ms }) });

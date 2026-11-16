@@ -923,10 +923,10 @@
 
             <div class="action-section" id="zusatz-gp">
               <h4>Zusatz: Gutachterpartner (Evalion)</h4>
-              <p style="font-size:0.85em;color:var(--text-muted);margin:0 0 8px 0;">Reiter Steuer › Eigener Satz: Ersteinschätzung der Restnutzungsdauer und Gutachtenanfrage beim Partner (Partner Form API). Admins sehen es immer. Preis offen.</p>
+              <p style="font-size:0.85em;color:var(--text-muted);margin:0 0 8px 0;">Reiter Steuer › Eigener Satz: Ersteinschätzung der Restnutzungsdauer (kostenlos) und Gutachten bei gutachten.org. Seit v3580 für jedes Konto frei (Marcel 16.11.2026); „Abschalten“ sperrt nur dieses Konto.</p>
               <div id="zusatz-gp-stand" style="font-size:0.85em;margin:0 0 8px 0;">lädt …</div>
               <div class="action-row">
-                <button class="btn btn-primary btn-sm" data-action="zusatz-gp-an">Freischalten</button>
+                <button class="btn btn-primary btn-sm" data-action="zusatz-gp-an">Freigeben</button>
                 <button class="btn btn-sm" data-action="zusatz-gp-aus">Abschalten</button>
               </div>
             </div>
@@ -1069,7 +1069,7 @@
         + (ep && ep.updated_at ? ' <span style="color:var(--text-muted)">geändert ' + fmtDate(ep.updated_at) + (ep.geaendert_von ? ' von ' + escapeHtml(ep.geaendert_von) : '') + '</span>' : '');
       flowZeigen(r.flow, r.flow_linien);   /* v3289 */
       const gp = r.gutachterpartner, gpEl = $('#zusatz-gp-stand');   /* v3540 */
-      if (gpEl) gpEl.innerHTML = (gp && gp.aktiv ? '<span class="pill pill-active">Freigeschaltet</span>' : '<span class="pill pill-plan">Nicht freigeschaltet</span>')
+      if (gpEl) gpEl.innerHTML = (gp && gp.aktiv === false ? '<span class="pill pill-plan">Für dieses Konto gesperrt</span>' : '<span class="pill pill-active">Frei' + (gp ? '' : ' (Standard)') + '</span>')
         + (gp && gp.updated_at ? ' <span style="color:var(--text-muted)">geändert ' + fmtDate(gp.updated_at) + (gp.geaendert_von ? ' von ' + escapeHtml(gp.geaendert_von) : '') + '</span>' : '');
       const kg = (v) => (v == null ? 'ohne Grenze' : v);
       if (z) {

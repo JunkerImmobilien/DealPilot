@@ -1,23 +1,28 @@
 /* ════════════════════════════════════════════════════════════════════
-   v3570 · RESTNUTZUNGSDAUER BEIM UNABHAENGIGEN GUTACHTERPARTNER
-   (v3540 Bau, v3541 Schliessen-Knopf, v3570 Marcels Rueckmeldung vom 16.11.2026)
+   v3580 · RESTNUTZUNGSDAUER BEI GUTACHTEN.ORG
+   (v3540 Bau, v3570 App-Fenster/Deutsch/Vorbelegung/Ergebnis sofort, v3580 Reiter wie der RND-Rechner)
    ════════════════════════════════════════════════════════════════════
    Reiter Steuer › AfA-Satz „Eigenen Satz / Restnutzungsdauer eingeben …“ ›
    Box mit den RND-Knoepfen (js/afa-eigen.js). Dort zwei Wege:
-     „Ersteinschätzung (Gutachterpartner)“       Lite, Ergebnis sofort (Direct-API, siehe Backend)
-     „Gutachten beauftragen (Gutachterpartner)“  voll, Entwurf, Unterlagen, kostenpflichtig nur nach Bestaetigung
-   v3570, Marcel nach dem Ausprobieren:
-     „Es öffnet sich ein komisches Modal.“  -> die Fenster-Bausteine der App (storage.js: global-view-overlay,
-        global-view-modal dpm-shell, DP_BAR, DP_HERO, dpm-body, dpm-btn) statt eines eigenen Kastens
-     „Auswahlfelder auf Englisch“            -> Optionen ueber DpGutachterAbbildung.optionText (deutsche Tabelle)
-     „mit all unseren Werten vorbelegen“    -> vorbelegenMitHerkunft: jedes Feld mit Herkunft, Fehlendes markiert
-     „Bekommen wir direkt einen Wert?“       -> ja (Direct-API, ~4 s); sonst Nachladen 3 × 5 s + „Ergebnis abrufen“
-   Sichtbar nur, wenn /status freigeschaltet meldet. Nach aussen nie der Anbietername.
+     „Ersteinschätzung (gutachten.org)“   kostenlos, Ergebnis sofort (Direct-API, Backend)
+     „Gutachten beauftragen (gutachten.org)“  Entwurf, Unterlagen, gesondert abgerechnet, nur nach Bestaetigung
+   v3580, Marcels Entscheidungen 16.11.2026:
+     - Der Partner wird genannt, als Marke „gutachten.org“ (nicht der Firmenname im Code). Logo:
+       img/partner/gutachten-org.svg = offizielles Logo von https://www.gutachten.org/brand/logo/gutachten-org-ink.svg
+       (abgerufen 16.11.2026, unveraendert).
+     - Jedes angemeldete Konto darf anfragen (Backend /status).
+     - Unsere AfA = 100 ÷ RND ist die Hauptzahl; die AfA des Partners steht klein daneben.
+     - Statt einer langen Seite Reiter — DIESELBEN Bausteine wie der RND-Rechner (rnd-wizard.js, v3258
+       „Stil des Makler Hub“): .rnd-wiz-overlay.rnd-hub, .rnd-wiz-modal, .rnd-wiz-header, Schrittleiste
+       .rnd-wiz-steps/.rnd-hub-schritt mit .rnd-hub-nr/.rnd-hub-kurz, Balken, .rnd-hub-karte, .rnd-wiz-field,
+       .rnd-hub-chip, Fuss .rnd-wiz-footer.rnd-hub-nav mit Zurueck / Zaehler / Weiter. Offene Pflichtangaben je Reiter.
    ════════════════════════════════════════════════════════════════════ */
 (function () {
   'use strict';
   var A = function () { return window.DpGutachterAbbildung; };
   var UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  var MARKE = 'gutachten.org';
+  var LOGO = 'img/partner/gutachten-org.svg?v=v3580';
   var _status = null, _statusLaeuft = null;
   var st = null;   /* Zustand des offenen Fensters */
 
@@ -43,8 +48,8 @@
     if (el('gp-lite')) return true;
     status().then(function (s) {
       if (!s || !s.freigeschaltet || el('gp-lite')) return;
-      var titel = s.konfiguriert ? '' : 'Die Anbindung an den Gutachterpartner ist noch nicht eingerichtet.';
-      [['gp-lite', 'Ersteinschätzung (Gutachterpartner)', 'lite'], ['gp-voll', 'Gutachten beauftragen (Gutachterpartner)', 'voll']].forEach(function (k) {
+      var titel = s.konfiguriert ? '' : 'Die Anbindung an ' + MARKE + ' ist noch nicht eingerichtet.';
+      [['gp-lite', 'Ersteinschätzung (' + MARKE + ')', 'lite'], ['gp-voll', 'Gutachten beauftragen (' + MARKE + ')', 'voll']].forEach(function (k) {
         var b = document.createElement('button');
         b.type = 'button'; b.className = 'btn btn-outline btn-sm'; b.id = k[0]; b.textContent = k[1];
         if (!s.konfiguriert) { b.disabled = true; b.title = titel; }
@@ -60,7 +65,6 @@
 
   /* ── Daten aus dem Objekt und den Einstellungen ─────────────────── */
   function wert(id) { var e = el(id); return e ? String(e.value || '').trim() : ''; }
-  /* Felder des Tabs Objekt, die die Abbildung liest (gutachterpartner-abbildung.js REGELN) */
   var OBJEKT_FELDER = ['objart', 'str', 'hnr', 'plz', 'ort', 'baujahr', 'wfl', 'einheiten', 'nhk_geschosse', 'nhk_dach', 'eq_floor', 'eq_windows', 'eq_roof',
     'eq_heating', 'eq_bath', 'eq_guest_wc', 'bad_anz', 'balkon_flae', 'inv_pv', 'ds2_energie', 'kaufdat', 'eig_struktur'];
   function objektDaten() {
@@ -83,56 +87,84 @@
   function merkenLesen() { try { return JSON.parse(localStorage.getItem(MERK) || '{}') || {}; } catch (e) { return {}; } }
   function merkenSchreiben(data) { try { if (data && data.requester) { var r = Object.assign({}, data.requester); delete r.acceptPrivacy; delete r.acceptTerms; localStorage.setItem(MERK, JSON.stringify({ requester: r })); } } catch (e) {} }
 
-  /* ── Fenster in den Bausteinen der App (storage.js) ─────────────── */
+  /* ── Reiter: Gruppen der Definition -> Reiter (wie die Schritte des RND-Rechners) ── */
+  var REITER = {
+    lite: [
+      { kurz: 'Objekt', titel: 'Objekt und Adresse', gruppen: ['propertyType', 'constructionYear', 'propertyAddress'] },
+      { kurz: 'Modernisierung', titel: 'Modernisierung und Kernsanierung', gruppen: ['modernizations', 'renovation'] },
+      { kurz: 'Anfrage', titel: 'Anfragende Person und Absenden', gruppen: ['requester'], letzter: true }
+    ],
+    voll: [
+      { kurz: 'Objekt', titel: 'Objekt, Stichtag und Objektdaten', gruppen: ['property', 'valuation', 'objectDetails'] },
+      { kurz: 'Bauweise', titel: 'Bauweise und Ausstattung', gruppen: ['construction'] },
+      { kurz: 'Modernisierung', titel: 'Modernisierungen', gruppen: ['modernizations'] },
+      { kurz: 'Auftraggeber', titel: 'Auftraggeber und Eigentümer', gruppen: ['owner'] },
+      { kurz: 'Absenden', titel: 'Vereinbarung und Absenden', gruppen: ['agreement'], letzter: true }
+    ]
+  };
+  /* Gruppen, die keine Zuordnung haben (neue Gruppe des Partners), kommen in den vorletzten Reiter */
+  function reiterBauen(art, gruppen) {
+    var r = REITER[art].map(function (x) { return Object.assign({}, x, { liste: [] }); });
+    gruppen.forEach(function (g) {
+      var z = r.filter(function (x) { return x.gruppen.indexOf(g.id) >= 0; })[0] || r[Math.max(0, r.length - 2)];
+      z.liste.push(g);
+    });
+    return r.filter(function (x) { return x.liste.length || x.letzter; });
+  }
+
+  /* ── Fenster in den Bausteinen des RND-Rechners ─────────────────── */
   function stilEinmal() {
     if (el('gp-stil')) return;
     var s = document.createElement('style'); s.id = 'gp-stil';
     s.textContent = [
-      '#gp-overlay .global-view-modal{max-width:900px}',
-      '#gp-overlay .dpm-body{color:var(--dp-ink,#1c1a14);font-size:13.5px;line-height:1.45}',
-      '#gp-overlay .gp-sek{border:1px solid var(--dp-line,#E6DFCE);border-radius:11px;background:#fff;padding:14px 16px 8px;margin:0 0 14px}',
-      '#gp-overlay .gp-sek-t{font-family:"JetBrains Mono",monospace;font-size:10.5px;letter-spacing:1.6px;text-transform:uppercase;color:var(--dp-ink-soft,#8a8473);font-weight:700;margin:0 0 6px}',
-      '#gp-overlay .gp-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:0 16px}',
-      '#gp-overlay .gp-feld{margin:7px 0}',
-      '#gp-overlay .gp-feld>label,#gp-overlay .gp-lab{display:block;font-size:12px;font-weight:600;color:var(--dp-ink,#1c1a14);margin:0 0 4px}',
-      '#gp-overlay .gp-feld input[type=text],#gp-overlay .gp-feld input[type=email],#gp-overlay .gp-feld input[type=tel],#gp-overlay .gp-feld input[type=date],#gp-overlay .gp-feld select,#gp-overlay .gp-feld textarea{width:100%;box-sizing:border-box;padding:9px 10px;border:1px solid var(--dp-line,#E6DFCE);border-radius:8px;background:#fff;color:var(--dp-ink,#1c1a14);font:inherit;font-size:13.5px}',
-      '#gp-overlay .gp-wahl{display:flex;flex-wrap:wrap;gap:6px 14px;padding:4px 0}',
-      '#gp-overlay .gp-wahl label,#gp-overlay .gp-check{font-weight:400;font-size:13px;color:var(--dp-ink,#1c1a14);display:inline-flex;align-items:center;gap:6px}',
-      '#gp-overlay .gp-herk{font-size:11px;color:var(--dp-ink-soft,#8a8473);margin-top:3px}',
-      '#gp-overlay .gp-feld.gp-fehlt input,#gp-overlay .gp-feld.gp-fehlt select,#gp-overlay .gp-feld.gp-fehlt textarea,#gp-overlay .gp-feld.gp-fehlt .gp-wahl{border:1px dashed #B8625C;border-radius:8px}',
+      '#gp-overlay [hidden]{display:none !important}',
+      '#gp-overlay .gp-logo{display:inline-flex;align-items:center;background:#fff;border-radius:8px;padding:6px 10px;margin:0 12px 0 0}',
+      '#gp-overlay .gp-logo img{height:16px;width:auto;display:block}',
+      '#gp-overlay .gp-kopf-rechts{display:flex;align-items:center}',
+      '#gp-overlay .gp-offen{display:inline-block;min-width:16px;padding:0 5px;margin-left:5px;border-radius:9px;background:#B8625C;color:#fff;font:600 10px/16px Inter,sans-serif;text-align:center}',
+      '#gp-overlay .gp-offen.gp-ok{background:#3FA56C}',
+      '#gp-overlay .gp-herk{font-size:11px;color:var(--hub-muted,#6B6660);margin-top:3px}',
+      '#gp-overlay .rnd-wiz-field.gp-fehlt :is(input,select,textarea){border:1px dashed #B8625C !important}',
+      '#gp-overlay .rnd-wiz-field.gp-fehlt .gp-wahl{outline:1px dashed #B8625C;outline-offset:3px;border-radius:8px}',
       '#gp-overlay .gp-fehlt-t{font-size:11px;color:#B8625C;margin-top:3px}',
       '#gp-overlay .gp-fehler{color:#B8625C;font-size:12px}',
-      '#gp-overlay .gp-hinweis{font-size:12.5px;color:var(--dp-ink-soft,#8a8473);margin:4px 0 10px}',
-      '#gp-overlay .gp-leiste{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end;align-items:center;position:sticky;bottom:0;background:var(--dp-surface,#fff);padding:12px 0 2px;border-top:1px solid var(--dp-line,#E6DFCE);margin-top:6px}',
-      '#gp-overlay .gp-erg{position:relative;border:1px solid var(--dp-line,#E6DFCE);border-radius:11px;background:var(--dp-surface-2,#FAF6EC);padding:14px 16px 14px 19px;margin:0 0 14px;overflow:hidden}',
-      '#gp-overlay .gp-erg::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--dp-runway)}',
-      '#gp-overlay .gp-zahl{font-family:"Space Grotesk",sans-serif;font-size:28px;font-weight:700;color:var(--dp-ink,#1c1a14);line-height:1.1}',
-      '#gp-overlay .gp-zeile{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;padding:8px 0;border-top:1px solid var(--dp-line,#E6DFCE)}',
-      '#gp-overlay .gp-kosten{display:block;margin:4px 0 12px;padding:11px 13px;border:1px solid #B8625C;border-radius:10px;background:rgba(184,98,92,.06);font-weight:400;color:var(--dp-ink,#1c1a14)}',
-      '#gp-overlay .gp-person{border:1px dashed var(--dp-line,#E6DFCE);border-radius:9px;padding:6px 10px;margin:6px 0}',
-      /* v3571 · 390 px gemessen: das Abzeichen im Kopf lag ueber dem Titel */
-      '@media (max-width:640px){#gp-overlay .dpm-hero-badge{display:none}#gp-overlay .dpm-hero{padding:18px 18px 20px}#gp-overlay .dpm-body{padding:14px 14px 18px}#gp-overlay .gp-leiste{justify-content:stretch}#gp-overlay .gp-leiste .dpm-btn{flex:1 1 100%;justify-content:center}}'
+      '#gp-overlay .gp-wahl{display:flex;flex-wrap:wrap;gap:6px}',
+      '#gp-overlay .gp-erg{position:relative;border:1px solid var(--hub-line,#E0DBD3);border-radius:12px;background:var(--hub-gold-bg,#FBF6E9);padding:14px 16px 14px 19px;overflow:hidden}',
+      '#gp-overlay .gp-erg::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--hub-runway)}',
+      '#gp-overlay .gp-zahl{font-family:var(--hub-display);font-size:28px;font-weight:700;color:var(--hub-ink,#1A1814);line-height:1.1}',
+      '#gp-overlay .gp-zeile{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;padding:8px 0;border-top:1px solid var(--hub-line-soft,#ECE7DE)}',
+      '#gp-overlay .gp-kosten{display:block;padding:11px 13px;border:1px solid var(--hub-line,#E0DBD3);border-radius:10px;background:var(--hub-surface,#fff);font-size:13px;color:var(--hub-ink,#1A1814)}',
+      '#gp-overlay .gp-kosten.gp-pflicht{border-color:#B8625C;background:rgba(184,98,92,.05)}',
+      '#gp-overlay .gp-person{border:1px dashed var(--hub-line,#E0DBD3);border-radius:9px;padding:6px 10px;margin:6px 0}',
+      '#gp-overlay .gp-knopf{border:1px solid var(--hub-line,#E0DBD3);background:var(--hub-surface,#fff);color:var(--hub-ink,#1A1814);border-radius:8px;padding:7px 12px;font:500 12.5px var(--hub-body);cursor:pointer}',
+      '#gp-overlay .gp-knopf.gp-primaer{background:var(--hub-runway);border-color:transparent;color:#1a1508;font-weight:600}',
+      '#gp-overlay .rnd-wiz-footer .gp-entwurf{margin-left:auto}',
+      '@media (max-width:640px){#gp-overlay .gp-logo{display:none}}'
     ].join('\n');
     document.head.appendChild(s);
   }
-  var ICO_RND = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V9l7-5 7 5v12"/><path d="M12 11v4l3 2"/></svg>';
 
   function fenster(art) {
     schliessen();
     stilEinmal();
-    try { if (typeof window._dpModalCss === 'function') window._dpModalCss(); } catch (e) {}
     var titel = art === 'lite' ? 'Ersteinschätzung der Restnutzungsdauer' : 'Restnutzungsdauer-Gutachten beauftragen';
-    var text = art === 'lite'
-      ? 'Unser unabhängiger Gutachterpartner schätzt die Restnutzungsdauer aus den Angaben zu deinem Objekt. Das Ergebnis kommt in wenigen Sekunden. Eine Ersteinschätzung ist kein Gutachten.'
-      : 'Unser unabhängiger Gutachterpartner erstellt ein Restnutzungsdauer-Gutachten als Nachweis für einen eigenen AfA-Satz (§ 7 Abs. 4 Satz 2 EStG). Alle Angaben, die DealPilot kennt, sind vorbelegt.';
-    var o = document.createElement('div'); o.id = 'gp-overlay'; o.className = 'global-view-overlay';
-    var bar = (typeof window.DP_BAR === 'function') ? window.DP_BAR('Restnutzungsdauer', 'gp-overlay') : '';
-    var hero = (typeof window.DP_HERO === 'function') ? window.DP_HERO('Steuer · Restnutzungsdauer', titel, text, ICO_RND)
-      : '<div style="padding:18px 22px"><h2 style="margin:0">' + esc(titel) + '</h2><p>' + esc(text) + '</p></div>';
-    o.innerHTML = '<div class="global-view-modal dpm-shell" role="dialog" aria-modal="true" aria-label="' + esc(titel) + '">' + bar + hero
-      + '<div class="dpm-body" id="gp-inhalt"><p class="gp-hinweis">Formular wird geladen …</p></div></div>';
+    var o = document.createElement('div'); o.id = 'gp-overlay'; o.className = 'rnd-wiz-overlay rnd-hub';
+    o.innerHTML = '<div class="rnd-wiz-modal" role="dialog" aria-modal="true" aria-label="' + esc(titel) + '">'
+      + '<div class="rnd-wiz-header"><div class="rnd-wiz-title"><h2 id="gp-titel">' + esc(titel) + '</h2><p class="rnd-wiz-sub" id="gp-sub">mit unserem Partner ' + MARKE + '</p></div>'
+      + '<div class="gp-kopf-rechts"><span class="gp-logo"><img src="' + LOGO + '" alt="' + MARKE + '"></span><button class="rnd-wiz-close" id="gp-zu" aria-label="Schließen">&times;</button></div></div>'
+      + '<div class="rnd-wiz-progress rnd-hub-leiste"><div class="rnd-wiz-steps rnd-hub-schritte" id="gp-schritte"></div>'
+      + '<div class="rnd-hub-balken"><div class="rnd-wiz-progress-bar" id="gp-balken"></div></div></div>'
+      + '<div class="rnd-wiz-body" id="gp-inhalt"><section class="rnd-hub-karte"><p class="gp-herk">Formular wird geladen …</p></section></div>'
+      + '<div class="rnd-wiz-footer rnd-hub-nav">'
+      + '<button type="button" class="rnd-wiz-btn rnd-wiz-btn-sec rnd-hub-zurueck" id="gp-zurueck">← Zurück</button>'
+      + '<div class="rnd-wiz-counter" id="gp-zaehler"></div>'
+      + '<button type="button" class="rnd-wiz-btn rnd-wiz-btn-sec gp-entwurf" id="gp-entwurf" hidden>Entwurf speichern</button>'
+      + '<button type="button" class="rnd-wiz-btn rnd-wiz-btn-pri rnd-hub-weiter" id="gp-weiter">Weiter →</button>'
+      + '</div></div>';
     document.body.appendChild(o);
-    o.addEventListener('click', function (e) { if (e.target === o) schliessen(); });
+    /* wie der RND-Rechner: ein Klick daneben schliesst NICHT (v1856), nur × oder Escape */
+    o.addEventListener('click', function (e) { if (e.target === o) e.stopPropagation(); });
+    el('gp-zu').onclick = schliessen;
     document.addEventListener('keydown', escZu);
     return el('gp-inhalt');
   }
@@ -143,11 +175,13 @@
   var HERK_TEXT = { objekt: 'aus dem Objekt', abgeleitet: 'aus dem Objekt abgeleitet – bitte prüfen', konto: 'aus deinen Einstellungen' };
   function datum(d) { try { return new Date(d).toLocaleDateString('de-DE'); } catch (e) { return ''; } }
   function zahl(n, d) { return Number(n).toLocaleString('de-DE', { minimumFractionDigits: d || 0, maximumFractionDigits: d || 0 }); }
+  /* Unsere AfA: 100 ÷ RND (Marcel 16.11.2026) — dieselbe Rechnung wie afa-eigen.js setzen() */
+  function unsereAfa(rnd) { var n = Math.round(Number(rnd)); return n > 0 ? 100 / n : null; }
 
   function oeffnen(art) {
     var inhalt = fenster(art);
     if (st && st.takt) clearTimeout(st.takt);
-    st = { art: art, def: null, rid: null, gesendet: {}, unterlagen: [] };
+    st = { art: art, def: null, rid: null, gesendet: {}, unterlagen: [], reiter: 0 };
     var oid = objektId();
     Promise.all([
       api('/formular/' + art),
@@ -156,60 +190,59 @@
     ]).then(function (r) {
       st.def = (r[0] && r[0].data) || null;
       st.unterlagen = (r[2] && r[2].dateien) || [];
-      if (!st.def || !st.def.ui) { inhalt.innerHTML = '<p class="gp-fehler">Das Formular des Gutachterpartners ist gerade nicht lesbar.</p>'; return; }
+      if (!st.def || !st.def.ui) { inhalt.innerHTML = '<section class="rnd-hub-karte"><p class="gp-fehler">Das Formular von ' + MARKE + ' ist gerade nicht lesbar.</p></section>'; return; }
       zeichnen(inhalt, (r[1] && r[1].anfragen || []).filter(function (a) { return !oid || a.objekt_id === oid; }));
     }).catch(function (e) {
-      inhalt.innerHTML = '<p class="gp-fehler">' + N((e && e.message) || 'Fehler') + '</p>';
+      inhalt.innerHTML = '<section class="rnd-hub-karte"><p class="gp-fehler">' + N((e && e.message) || 'Fehler') + '</p></section>';
     });
   }
 
   function listeHtml(liste) {
     if (!liste.length) return '';
-    return '<details class="gp-sek" id="gp-liste"><summary class="gp-sek-t" style="cursor:pointer">Bisherige Anfragen zu diesem Objekt (' + liste.length + ')</summary>'
+    return '<section class="rnd-hub-karte" id="gp-liste"><h3 class="rnd-hub-h">Bisherige Anfragen zu diesem Objekt (' + liste.length + ')</h3>'
       + liste.map(function (a) {
         var r = a.result || {};
         return '<div class="gp-zeile" data-rid="' + esc(a.request_id) + '">'
           + '<span>' + esc(datum(a.created_at)) + ' · ' + (a.art === 'lite' ? 'Ersteinschätzung' : 'Gutachten') + (a.request_number ? ' · Nr. ' + esc(a.request_number) : '') + '</span>'
           + '<span class="gp-herk" data-gp="stat">' + esc(STATUS_TEXT[a.status] || a.status || '') + (a.umgebung === 'test' ? ' · Testumgebung' : '') + '</span>'
-          + (r.finalAverageRUL ? '<b>' + zahl(r.finalAverageRUL) + ' Jahre · AfA ' + zahl(r.annualDepreciation, 2) + ' %</b>' : '')
+          + (r.finalAverageRUL ? '<b>' + zahl(r.finalAverageRUL) + ' Jahre · AfA ' + zahl(unsereAfa(r.finalAverageRUL), 2) + ' %</b>' : '')
           + '<span style="flex:1"></span>'
-          + '<button type="button" class="dpm-btn" data-gp="stand">Stand abrufen</button>'
-          + (r.finalAverageRUL ? '<button type="button" class="dpm-btn" data-gp="uebernehmen" data-rnd="' + esc(r.finalAverageRUL) + '" data-datum="' + esc(datum(a.created_at)) + '">Als RND übernehmen</button>' : '')
+          + '<button type="button" class="gp-knopf" data-gp="stand">Stand abrufen</button>'
+          + (r.finalAverageRUL ? '<button type="button" class="gp-knopf" data-gp="uebernehmen" data-rnd="' + esc(r.finalAverageRUL) + '" data-datum="' + esc(datum(a.created_at)) + '">Als RND übernehmen</button>' : '')
           + '</div>';
-      }).join('') + '</details>';
+      }).join('') + '</section>';
   }
 
   function optionenHtml(p, opts, leerText) {
     return (leerText ? '<option value="">' + esc(leerText) + '</option>' : '') + opts.map(function (o) { return '<option value="' + esc(o.value) + '">' + esc(A().optionText(p, o).text) + '</option>'; }).join('');
   }
-  /* Liste von Personen (Eigentuemerdaten): Unterfelder aus dem Schema, deutsche Beschriftung */
-  function personHtml(id, k, items) {
+  function personHtml(k, items) {
     var a = A(), props = (items && items.properties) || {};
-    return '<div class="gp-person" data-person="' + k + '"><div class="gp-grid">' + Object.keys(props).map(function (u) {
+    return '<div class="gp-person" data-person="' + k + '"><div class="rnd-wiz-grid rnd-hub-felder">' + Object.keys(props).map(function (u) {
       var e = props[u].enum, lab = a.UNTERFELD[u] || u;
       var ein = e ? '<select data-u="' + u + '">' + optionenHtml(u === 'title' ? 'owner.ownerDetailsData.title' : 'x.country', e.map(function (v) { return { value: v, label: v }; }), '– bitte wählen –') + '</select>'
         : '<input type="' + (u === 'email' ? 'email' : u === 'phoneNumber' ? 'tel' : 'text') + '" data-u="' + u + '">';
-      return '<div class="gp-feld"><span class="gp-lab">' + esc(lab) + '</span>' + ein + '</div>';
+      return '<div class="rnd-wiz-field"><label>' + esc(lab) + '</label>' + ein + '</div>';
     }).join('') + '</div></div>';
   }
 
   function feldHtml(f, i) {
     var a = A(), p = a.feldPfad(f), opts = a.optionen(f, st.def.schema), id = 'gp-f' + i;
-    var lab = '<label for="' + id + '">' + N(f.label) + '</label>';
     var unten = (f.helpText ? '<div class="gp-herk">' + N(f.helpText) + '</div>' : '') + '<div class="gp-herk" data-herk></div><div class="gp-fehlt-t" data-fehlt hidden>fehlt – bitte ergänzen</div><div class="gp-fehler"></div>';
     var ph = f.placeholder ? ' placeholder="' + N(f.placeholder) + '"' : '';
+    var breit = /^(multiselect|textarea|array|radio)$/.test(f.inputType) ? ' rnd-wiz-col-2' : '';
     var eing;
     if (f.inputType === 'select' && opts.length) {
       eing = '<select id="' + id + '">' + optionenHtml(p, opts, '– bitte wählen –') + '</select>';
-    } else if (f.inputType === 'radio' && opts.length) {
-      eing = '<div id="' + id + '" class="gp-wahl">' + opts.map(function (o, k) { return '<label><input type="radio" name="' + id + '" value="' + esc(o.value) + '"> ' + esc(a.optionText(p, o).text) + '</label>'; }).join('') + '</div>';
-    } else if (f.inputType === 'multiselect') {
-      eing = '<div id="' + id + '" class="gp-wahl">' + opts.map(function (o) { return '<label><input type="checkbox" value="' + esc(o.value) + '"> ' + esc(a.optionText(p, o).text) + '</label>'; }).join('') + '</div>';
+    } else if ((f.inputType === 'radio' || f.inputType === 'multiselect') && opts.length) {
+      var typ = f.inputType === 'radio' ? 'radio' : 'checkbox';
+      eing = '<div id="' + id + '" class="gp-wahl rnd-hub-chips" data-wahl="' + typ + '">' + opts.map(function (o) {
+        return '<label class="rnd-hub-chip"><input type="' + typ + '" name="' + id + '" value="' + esc(o.value) + '">' + esc(a.optionText(p, o).text) + '</label>'; }).join('') + '</div>';
     } else if (f.inputType === 'checkbox') {
-      return '<div class="gp-feld" data-i="' + i + '" data-pfad="' + esc(p) + '"><label class="gp-check"><input type="checkbox" id="' + id + '"> ' + N(f.label) + '</label>' + unten + '</div>';
+      return '<div class="rnd-wiz-field rnd-wiz-col-2" data-i="' + i + '" data-pfad="' + esc(p) + '"><label class="rnd-wiz-checkbox"><input type="checkbox" id="' + id + '"> ' + N(f.label) + '</label>' + unten + '</div>';
     } else if (f.inputType === 'array') {
       var items = (a.schemaAn(st.def.schema, p) || {}).items;
-      eing = '<div id="' + id + '" data-liste="1">' + personHtml(id, 0, items) + '</div><button type="button" class="dpm-btn" data-gp="person" data-ziel="' + id + '" style="margin-top:4px">weitere Person</button>';
+      eing = '<div id="' + id + '" data-liste="1">' + personHtml(0, items) + '</div><button type="button" class="gp-knopf" data-gp="person" data-ziel="' + id + '" style="margin-top:4px;align-self:flex-start">weitere Person</button>';
     } else if (f.inputType === 'textarea') {
       eing = '<textarea id="' + id + '" rows="2"' + ph + '></textarea>';
     } else if (f.inputType === 'file') {
@@ -217,36 +250,38 @@
         + st.unterlagen.map(function (d) { return '<option value="' + esc(d.id) + '">' + esc((d.ordner ? d.ordner + ' / ' : '') + d.name) + '</option>'; }).join('')
         + '</select><input type="file" id="' + id + '-datei" style="margin-top:6px;font-size:12px"><div class="gp-herk">aus den Objektunterlagen wählen oder vom Gerät hochladen</div>';
     } else {
-      var typ = f.inputType === 'email' ? 'email' : f.inputType === 'phone' ? 'tel' : f.inputType === 'date' ? 'date' : 'text';
-      eing = '<input id="' + id + '" type="' + typ + '"' + (f.inputType === 'number' ? ' inputmode="decimal"' : '') + ph + '>';
+      var t = f.inputType === 'email' ? 'email' : f.inputType === 'phone' ? 'tel' : f.inputType === 'date' ? 'date' : 'text';
+      eing = '<input id="' + id + '" type="' + t + '"' + (f.inputType === 'number' ? ' inputmode="decimal"' : '') + ph + '>';
     }
-    return '<div class="gp-feld" data-i="' + i + '" data-pfad="' + esc(p) + '">' + lab + eing + unten + '</div>';
+    return '<div class="rnd-wiz-field' + breit + '" data-i="' + i + '" data-pfad="' + esc(p) + '"><label for="' + id + '">' + N(f.label) + '</label>' + eing + unten + '</div>';
   }
 
   function zeichnen(inhalt, liste) {
-    var a = A(), gruppen = a.felder(st.def), alle = [];
-    var html = '<div id="gp-ergebnis"></div>' + listeHtml(liste) + '<div id="gp-formular">';
-    gruppen.forEach(function (g) {
-      html += '<section class="gp-sek"><div class="gp-sek-t">' + N(g.label) + '</div>'
-        + (g.description ? '<div class="gp-hinweis">' + N(g.description) + '</div>' : '') + '<div class="gp-grid">';
-      g.fields.forEach(function (f) { html += feldHtml(f, alle.length); alle.push(f); });
-      html += '</div></section>';
+    var a = A(), alle = [];
+    st.reiterListe = reiterBauen(st.art, a.felder(st.def));
+    var html = '';
+    st.reiterListe.forEach(function (r, ri) {
+      html += '<div class="gp-reiter" data-reiter="' + ri + '"' + (ri ? ' hidden' : '') + '>';
+      if (ri === 0) html += listeHtml(liste);
+      r.liste.forEach(function (g) {
+        html += '<section class="rnd-hub-karte"><h3 class="rnd-hub-h">' + N(g.label) + '</h3>'
+          + (g.description ? '<p class="gp-herk">' + N(g.description) + '</p>' : '') + '<div class="rnd-wiz-grid rnd-hub-felder">';
+        g.fields.forEach(function (f) { html += feldHtml(f, alle.length); alle.push(Object.assign(f, { _reiter: ri })); });
+        html += '</div></section>';
+      });
+      if (r.letzter) {
+        html += '<section class="rnd-hub-karte">'
+          + (st.art === 'lite'
+            ? '<div class="gp-kosten">Die Ersteinschätzung ist <b>kostenlos</b>. ' + MARKE + ' schickt das Ergebnis zusätzlich an die angegebene E-Mail-Adresse. Eine Ersteinschätzung ist kein Gutachten.</div>'
+            : '<label class="gp-kosten gp-pflicht" id="gp-kosten"><input type="checkbox" id="gp-kosten-ok"> <b>Kostenpflichtiger Auftrag.</b> Mit „Beauftragen“ beauftragst du bei ' + MARKE + ' ein Restnutzungsdauer-Gutachten. '
+              + 'Das Gutachten stellt ' + MARKE + ' gesondert in Rechnung. Ich habe das verstanden und möchte beauftragen.</label>')
+          + '<div id="gp-allgemein" class="gp-fehler" style="margin-top:8px"></div><div id="gp-ergebnis" style="margin-top:10px"></div></section>';
+      }
+      html += '</div>';
     });
-    html += '</div>';
-    if (st.art === 'voll') {
-      /* PLATZHALTER fuer Marcel: Preis und Bedingungen des Gutachtens (noch nicht entschieden, 16.11.2026) */
-      html += '<label class="gp-kosten" id="gp-kosten"><input type="checkbox" id="gp-kosten-ok"> <b>Kostenpflichtiger Auftrag.</b> Mit „Beauftragen“ entsteht beim unabhängigen Gutachterpartner ein kostenpflichtiger Auftrag für ein Restnutzungsdauer-Gutachten. '
-        + 'Preis und Bedingungen: <i>[Platzhalter – Text folgt]</i>. Ich habe das verstanden und möchte beauftragen.</label>';
-    }
-    html += '<div id="gp-allgemein" class="gp-fehler" style="margin:6px 0"></div>'
-      + '<div class="gp-leiste"><span class="gp-herk" id="gp-zaehler" style="margin-right:auto"></span>'
-      + '<button type="button" class="dpm-btn" id="gp-abbrechen">Abbrechen</button>'
-      + (st.art === 'voll' ? '<button type="button" class="dpm-btn" id="gp-entwurf">Entwurf speichern</button>' : '')
-      + '<button type="button" class="dpm-btn primary" id="gp-senden">' + (st.art === 'lite' ? 'Ersteinschätzung anfordern' : 'Kostenpflichtig beauftragen') + '</button></div>';
     inhalt.innerHTML = html;
     st.felder = alle;
 
-    /* vorbelegen: Objekt, Einstellungen, zuletzt gemerkte anfragende Person */
     var vor = a.vorbelegenMitHerkunft(st.def, objektDaten(), nutzerDaten());
     st.herkunft = vor.herkunft;
     var merk = merkenLesen();
@@ -254,29 +289,66 @@
       var p = a.feldPfad(f), w = a.holen(vor.data, p);
       if (w === undefined && /^requester\./.test(p) && !/accept/.test(p)) { w = a.holen(merk, p); if (w !== undefined) st.herkunft[p] = { quelle: 'zuletzt eingegeben', art: 'konto' }; }
       if (w !== undefined) eingabeSetzen(f, i, w);
-      var h = st.herkunft[p], box = document.querySelector('.gp-feld[data-i="' + i + '"] [data-herk]');
+      var h = st.herkunft[p], box = document.querySelector('#gp-overlay [data-i="' + i + '"] [data-herk]');
       if (h && box) box.textContent = HERK_TEXT[h.art] || '';
     });
     inhalt.addEventListener('input', aktualisieren);
     inhalt.addEventListener('change', aktualisieren);
     inhalt.addEventListener('click', function (e) {
       var b = e.target.closest && e.target.closest('[data-gp="person"]'); if (!b) return;
-      var z = el(b.getAttribute('data-ziel')); var p = z && z.closest('.gp-feld').getAttribute('data-pfad');
-      var items = (A().schemaAn(st.def.schema, p) || {}).items; z.insertAdjacentHTML('beforeend', personHtml(z.id, z.children.length, items));
+      var z = el(b.getAttribute('data-ziel')); var p = z && z.closest('[data-pfad]').getAttribute('data-pfad');
+      var items = (A().schemaAn(st.def.schema, p) || {}).items; z.insertAdjacentHTML('beforeend', personHtml(z.children.length, items));
     });
-    aktualisieren(); aktualisieren();
-    el('gp-abbrechen').onclick = schliessen;
-    var be = el('gp-entwurf'); if (be) be.onclick = function () { senden(false); };
-    el('gp-senden').onclick = function () { senden(true); };
+    el('gp-zurueck').onclick = function () { reiterZeigen(st.reiter - 1); };
+    el('gp-weiter').onclick = function () { if (st.reiter < st.reiterListe.length - 1) reiterZeigen(st.reiter + 1); else senden(true); };
+    var be = el('gp-entwurf'); be.hidden = st.art !== 'voll'; be.onclick = function () { senden(false); };
     inhalt.querySelectorAll('[data-gp="stand"]').forEach(function (b) { b.onclick = function () { standAbrufen(b.closest('.gp-zeile').getAttribute('data-rid'), b); }; });
     inhalt.querySelectorAll('[data-gp="uebernehmen"]').forEach(function (b) { b.onclick = function () { uebernehmen(b.getAttribute('data-rnd'), b.getAttribute('data-datum')); }; });
+    aktualisieren(); aktualisieren();
+    reiterZeigen(0);
+  }
+
+  /* Schrittleiste wie rnd-wizard.js renderCurrentStep(): Nummer im Kreis + Kurzname, Balken, Zaehler.
+     Anders als dort sind ALLE Reiter frei anklickbar (vorbelegt, nichts wird gerechnet). */
+  function reiterZeigen(n) {
+    var L = st.reiterListe, max = L.length - 1;
+    st.reiter = Math.max(0, Math.min(max, n));
+    document.querySelectorAll('#gp-overlay .gp-reiter').forEach(function (d) { d.hidden = +d.getAttribute('data-reiter') !== st.reiter; });
+    var leiste = el('gp-schritte'); leiste.innerHTML = '';
+    var offen = offeneJeReiter();
+    L.forEach(function (r, ri) {
+      var b = document.createElement('button'); b.type = 'button';
+      b.className = 'rnd-wiz-step rnd-hub-schritt' + (ri === st.reiter ? ' active' : '') + (ri < st.reiter ? ' done' : '');
+      b.innerHTML = '<span class="rnd-hub-nr">' + (ri + 1) + '</span><em class="rnd-hub-kurz">' + esc(r.kurz)
+        + '<span class="gp-offen' + (offen[ri] ? '' : ' gp-ok') + '" data-offen="' + ri + '">' + (offen[ri] || '✓') + '</span></em>';
+      b.title = r.titel + (offen[ri] ? ' · ' + offen[ri] + ' Pflichtangabe(n) offen' : ' · vollständig');
+      if (ri === st.reiter) b.setAttribute('aria-current', 'step');
+      b.onclick = function () { reiterZeigen(ri); };
+      leiste.appendChild(b);
+    });
+    el('gp-balken').style.width = (max ? st.reiter / max * 100 : 100) + '%';
+    el('gp-sub').textContent = 'Schritt ' + (st.reiter + 1) + ': ' + L[st.reiter].titel + ' · mit unserem Partner ' + MARKE;
+    el('gp-zurueck').style.visibility = st.reiter > 0 ? 'visible' : 'hidden';
+    el('gp-weiter').textContent = st.reiter < max ? 'Weiter →' : (st.art === 'lite' ? 'Ersteinschätzung anfordern' : 'Kostenpflichtig beauftragen');
+    zaehlerSetzen(offen);
+    var body = el('gp-inhalt'); if (body) body.scrollTop = 0;
+  }
+  function offeneJeReiter() {
+    var o = (st.reiterListe || []).map(function () { return 0; });
+    (st.felder || []).forEach(function (f, i) { var b = document.querySelector('#gp-overlay [data-i="' + i + '"]'); if (b && b.classList.contains('gp-fehlt')) o[f._reiter]++; });
+    return o;
+  }
+  function zaehlerSetzen(offen) {
+    var summe = offen.reduce(function (s, x) { return s + x; }, 0);
+    var z = el('gp-zaehler');
+    if (z) z.textContent = 'Schritt ' + (st.reiter + 1) + ' von ' + st.reiterListe.length + ' · ' + (summe ? summe + ' Pflichtangabe' + (summe === 1 ? '' : 'n') + ' offen' : 'alle Pflichtangaben gefüllt');
+    offen.forEach(function (n, ri) { var s = document.querySelector('#gp-overlay [data-offen="' + ri + '"]'); if (s) { s.textContent = n || '✓'; s.classList.toggle('gp-ok', !n); } });
   }
 
   function eingabeSetzen(f, i, w) {
     var id = 'gp-f' + i, e = el(id);
     if (!e) return;
-    if (f.inputType === 'radio' && e.classList.contains('gp-wahl')) { e.querySelectorAll('input').forEach(function (r) { r.checked = String(r.value) === String(w); }); return; }
-    if (f.inputType === 'multiselect') { var arr = Array.isArray(w) ? w.map(String) : [String(w)]; e.querySelectorAll('input').forEach(function (c) { c.checked = arr.indexOf(c.value) >= 0; }); return; }
+    if (e.getAttribute('data-wahl')) { var arr = Array.isArray(w) ? w.map(String) : [String(w)]; e.querySelectorAll('input').forEach(function (c) { c.checked = arr.indexOf(c.value) >= 0; }); return; }
     if (f.inputType === 'checkbox') { e.checked = !!w; return; }
     if (f.inputType === 'array') return;
     e.value = String(w);
@@ -284,8 +356,8 @@
   function eingabeLesen(f, i) {
     var id = 'gp-f' + i, e = el(id);
     if (!e) return undefined;
-    if (f.inputType === 'radio' && e.classList.contains('gp-wahl')) { var r = e.querySelector('input:checked'); return r ? r.value : ''; }
-    if (f.inputType === 'multiselect') return Array.prototype.map.call(e.querySelectorAll('input:checked'), function (c) { return c.value; });
+    if (e.getAttribute('data-wahl') === 'radio') { var r = e.querySelector('input:checked'); return r ? r.value : ''; }
+    if (e.getAttribute('data-wahl') === 'checkbox') return Array.prototype.map.call(e.querySelectorAll('input:checked'), function (c) { return c.value; });
     if (f.inputType === 'checkbox') return !!e.checked;
     if (f.inputType === 'array') {
       var liste = [];
@@ -298,12 +370,11 @@
     }
     return e.value;
   }
-  /* Daten aus den SICHTBAREN Feldern; Sichtbarkeit nach visibleWhen, fehlende Pflichtfelder markieren */
   function lesen() {
     var werte = {};
     st.felder.forEach(function (f, i) {
       if (f.inputType === 'file') return;
-      var box = document.querySelector('.gp-feld[data-i="' + i + '"]');
+      var box = document.querySelector('#gp-overlay [data-i="' + i + '"]');
       if (box && box.hidden) return;
       var v = eingabeLesen(f, i); if (v !== undefined) werte[A().feldPfad(f)] = v;
     });
@@ -311,22 +382,21 @@
   }
   function aktualisieren() {
     if (!st || !st.felder) return;
-    var data = lesen(), fehlt = 0;
+    var data = lesen();
     st.felder.forEach(function (f, i) {
-      var box = document.querySelector('.gp-feld[data-i="' + i + '"]'); if (!box) return;
+      var box = document.querySelector('#gp-overlay [data-i="' + i + '"]'); if (!box) return;
       box.hidden = !A().sichtbar(f, data);
       var p = A().feldPfad(f), w = A().holen(data, p);
       var leer = w === undefined || w === '' || w === false || (Array.isArray(w) && !w.length);
       var muss = !box.hidden && f.inputType !== 'file' && A().pflicht(st.def, p, data) && leer;
       box.classList.toggle('gp-fehlt', muss);
       var t = box.querySelector('[data-fehlt]'); if (t) { t.hidden = !muss; t.textContent = f.inputType === 'checkbox' ? 'bitte bestätigen' : 'fehlt – bitte ergänzen'; }
-      if (muss) fehlt++;
     });
-    var z = el('gp-zaehler'); if (z) z.textContent = fehlt ? fehlt + ' Pflichtangabe' + (fehlt === 1 ? '' : 'n') + ' offen' : 'Alle Pflichtangaben gefüllt';
+    if (st.reiterListe && el('gp-zaehler')) zaehlerSetzen(offeneJeReiter());
   }
 
   function fehlerZeigen(e) {
-    document.querySelectorAll('#gp-formular .gp-fehler').forEach(function (d) { d.textContent = ''; });
+    document.querySelectorAll('#gp-overlay .gp-fehler').forEach(function (d) { if (d.id !== 'gp-allgemein') d.textContent = ''; });
     var allg = el('gp-allgemein'); if (allg) allg.textContent = '';
     if (!e || !e.message) return;
     var d = (e && e.data) || {};
@@ -335,17 +405,17 @@
     Object.keys(z.jeFeld).forEach(function (p) {
       st.felder.forEach(function (f, i) {
         if (A().feldPfad(f) !== p && f.id !== p) return;
-        var box = document.querySelector('.gp-feld[data-i="' + i + '"]');
+        var box = document.querySelector('#gp-overlay [data-i="' + i + '"]');
         if (!box || box.hidden) return;
         box.querySelector('.gp-fehler').textContent = A().neutral(z.jeFeld[p].join(' · '));
-        if (!erstes) erstes = box;
+        if (!erstes) erstes = { box: box, reiter: f._reiter };
       });
     });
     if (allg) allg.textContent = [A().neutral(e.message)].concat(z.allgemein.map(A().neutral)).join(' · ');
-    if (erstes) erstes.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    /* Fehler am Feld: in seinen Reiter springen */
+    if (erstes) { reiterZeigen(erstes.reiter); erstes.box.scrollIntoView({ block: 'center', behavior: 'smooth' }); }
   }
 
-  /* Merge Patch: was zuletzt gesendet war und jetzt fehlt, wird ausdruecklich null */
   function mitNull(alt, neu) {
     var out = JSON.parse(JSON.stringify(neu || {}));
     (function lauf(a, n, o) {
@@ -362,7 +432,7 @@
     var auftraege = [];
     st.felder.forEach(function (f, i) {
       if (f.inputType !== 'file') return;
-      var box = document.querySelector('.gp-feld[data-i="' + i + '"]'); if (box && box.hidden) return;
+      var box = document.querySelector('#gp-overlay [data-i="' + i + '"]'); if (box && box.hidden) return;
       var sel = el('gp-f' + i), inp = el('gp-f' + i + '-datei');
       var schl = f.id + '|' + (sel && sel.value) + '|' + (inp && inp.files && inp.files[0] ? inp.files[0].name + inp.files[0].size : '');
       if (st.hochgeladen && st.hochgeladen[schl]) return;
@@ -385,8 +455,9 @@
   }
 
   function senden(absenden) {
-    var knopf = el('gp-senden'), ent = el('gp-entwurf');
+    var knopf = el('gp-weiter'), ent = el('gp-entwurf');
     if (absenden && st.art === 'voll' && !(el('gp-kosten-ok') && el('gp-kosten-ok').checked)) {
+      reiterZeigen(st.reiterListe.length - 1);
       fehlerZeigen({ message: 'Bitte zuerst bestätigen, dass ein kostenpflichtiger Auftrag entsteht.' }); return;
     }
     var data = lesen();
@@ -419,26 +490,29 @@
     }).then(function () { [knopf, ent].forEach(function (b) { if (b) b.disabled = false; }); knopf.textContent = alt; });
   }
 
+  /* Hauptzahl: unsere AfA (100 ÷ RND); die AfA von gutachten.org nur klein daneben (Marcel 16.11.2026) */
   function ergebnisKarte(a, ms) {
-    var r = a.result || {};
-    return '<div class="gp-erg"><div class="gp-sek-t">Ersteinschätzung' + (a.request_number ? ' · Nr. ' + esc(a.request_number) : '') + (a.umgebung === 'test' ? ' · Testumgebung' : '') + (ms ? ' · in ' + zahl(ms / 1000, 1) + ' s' : '') + '</div>'
-      + '<div style="display:flex;gap:32px;flex-wrap:wrap;margin:4px 0 8px"><div><div class="gp-zahl">' + zahl(r.finalAverageRUL) + ' Jahre</div><div class="gp-herk">voraussichtliche Restnutzungsdauer' + (r.finalRangeRUL ? ' (Spanne ' + esc(r.finalRangeRUL) + ' Jahre)' : '') + '</div></div>'
-      + (r.annualDepreciation ? '<div><div class="gp-zahl">' + zahl(r.annualDepreciation, 2) + ' %</div><div class="gp-herk">jährliche AfA</div></div>' : '') + '</div>'
-      + '<div class="gp-hinweis" style="margin:0 0 10px">Ersteinschätzung, kein Gutachten. Für einen eigenen AfA-Satz verlangt das Finanzamt ein Gutachten.</div>'
-      + '<button type="button" class="dpm-btn primary" id="gp-uebernehmen">Als Restnutzungsdauer übernehmen</button></div>';
+    var r = a.result || {}, unsere = unsereAfa(r.finalAverageRUL);
+    var partner = Number(r.annualDepreciation);
+    var abw = isFinite(partner) && unsere && Math.abs(partner - unsere) >= 0.005;
+    return '<div class="gp-erg"><div class="gp-herk" style="text-transform:uppercase;letter-spacing:1.4px;font-weight:600">Ersteinschätzung von ' + MARKE + (a.request_number ? ' · Nr. ' + esc(a.request_number) : '') + (a.umgebung === 'test' ? ' · Testumgebung' : '') + (ms ? ' · in ' + zahl(ms / 1000, 1) + ' s' : '') + '</div>'
+      + '<div style="display:flex;gap:32px;flex-wrap:wrap;margin:6px 0 8px"><div><div class="gp-zahl">' + zahl(r.finalAverageRUL) + ' Jahre</div><div class="gp-herk">voraussichtliche Restnutzungsdauer' + (r.finalRangeRUL ? ' (Spanne ' + esc(r.finalRangeRUL) + ' Jahre)' : '') + '</div></div>'
+      + (unsere ? '<div><div class="gp-zahl">' + zahl(unsere, 2) + ' %</div><div class="gp-herk">jährliche AfA (100 ÷ ' + zahl(Math.round(r.finalAverageRUL)) + ' Jahre)' + (abw ? ' · ' + MARKE + ' nennt ' + zahl(partner, 2) + ' %' : '') + '</div></div>' : '') + '</div>'
+      + '<p class="gp-herk" style="margin:0 0 10px">Ersteinschätzung, kein Gutachten. Für einen eigenen AfA-Satz verlangt das Finanzamt ein Gutachten.</p>'
+      + '<button type="button" class="gp-knopf gp-primaer" id="gp-uebernehmen">Als Restnutzungsdauer übernehmen</button></div>';
   }
   function ergebnisZeigen(a, abgesendet, ms) {
     var box = el('gp-ergebnis'); if (!box || !a) return;
+    reiterZeigen(st.reiterListe.length - 1);
     var r = a.result || {};
     if (st.art === 'lite') {
       if (r.finalAverageRUL) {
         box.innerHTML = ergebnisKarte(a, a.dauer_ms || ms);
         el('gp-uebernehmen').onclick = function () { uebernehmen(r.finalAverageRUL, datum(a.updated_at || new Date())); };
       } else {
-        /* Der Partner hat angenommen, das Ergebnis aber nicht mitgeschickt: nachladen (3 × 5 s), dann von Hand */
-        box.innerHTML = '<div class="gp-erg"><div class="gp-sek-t">Anfrage gestellt' + (a.request_number ? ' · Nr. ' + esc(a.request_number) : '') + '</div>'
-          + '<div id="gp-warte">Die Ersteinschätzung liegt beim Gutachterpartner bereit und wird abgerufen …</div>'
-          + '<button type="button" class="dpm-btn" id="gp-abrufen" style="margin-top:8px">Ergebnis abrufen</button></div>';
+        box.innerHTML = '<div class="gp-erg"><div class="gp-herk">Anfrage gestellt' + (a.request_number ? ' · Nr. ' + esc(a.request_number) : '') + '</div>'
+          + '<div id="gp-warte">Die Ersteinschätzung liegt bei ' + MARKE + ' bereit und wird abgerufen …</div>'
+          + '<button type="button" class="gp-knopf" id="gp-abrufen" style="margin-top:8px">Ergebnis abrufen</button></div>';
         var versuch = 0;
         var abrufen = function (vonHand) {
           api('/anfragen/' + encodeURIComponent(a.request_id || st.rid)).then(function (x) {
@@ -452,13 +526,13 @@
         el('gp-abrufen').onclick = function () { abrufen(true); };
         st.takt = setTimeout(function () { abrufen(false); }, 5000);
       }
-      box.scrollIntoView({ block: 'start', behavior: 'smooth' });
+      box.scrollIntoView({ block: 'center', behavior: 'smooth' });
       return;
     }
-    box.innerHTML = '<div class="gp-erg"><div class="gp-sek-t">' + (abgesendet ? 'Beauftragt' : 'Entwurf gespeichert') + (a.request_number ? ' · Nr. ' + esc(a.request_number) : '') + '</div>'
+    box.innerHTML = '<div class="gp-erg"><div class="gp-herk">' + (abgesendet ? 'Beauftragt' : 'Entwurf gespeichert') + (a.request_number ? ' · Nr. ' + esc(a.request_number) : '') + '</div>'
       + 'Stand: ' + esc(STATUS_TEXT[a.status] || a.status || '') + (a.umgebung === 'test' ? ' · Testumgebung' : '')
       + (a.attachments && a.attachments.length ? ' · ' + a.attachments.length + ' Unterlage(n)' : '') + '. Den Stand rufst du hier später über „Stand abrufen“ ab.</div>';
-    box.scrollIntoView({ block: 'start', behavior: 'smooth' });
+    box.scrollIntoView({ block: 'center', behavior: 'smooth' });
   }
 
   function standAbrufen(rid, knopf) {
@@ -469,7 +543,7 @@
       if (zeile) {
         var sp = zeile.querySelector('[data-gp="stat"]'); if (sp) sp.textContent = (STATUS_TEXT[a.status] || a.status || '') + (a.umgebung === 'test' ? ' · Testumgebung' : '');
         if (res.finalAverageRUL && !zeile.querySelector('[data-gp="uebernehmen"]')) {
-          var b = document.createElement('button'); b.type = 'button'; b.className = 'dpm-btn'; b.textContent = 'Als RND übernehmen';
+          var b = document.createElement('button'); b.type = 'button'; b.className = 'gp-knopf'; b.textContent = 'Als RND übernehmen';
           b.onclick = function () { uebernehmen(res.finalAverageRUL, datum(a.updated_at)); }; zeile.appendChild(b);
         }
       }
@@ -478,13 +552,13 @@
       .then(function () { if (knopf) knopf.disabled = false; });
   }
 
-  /* Nur auf Klick: Ersteinschaetzung als eigene RND im Reiter Steuer (js/afa-eigen.js setzen()) */
+  /* Nur auf Klick: Ersteinschaetzung als eigene RND im Reiter Steuer (js/afa-eigen.js setzen(): 100 ÷ RND) */
   function uebernehmen(rnd, dat) {
     var n = Math.round(Number(rnd));
     if (!(n >= 3 && n <= 200) || !window.DpAfaEigen || !DpAfaEigen.setzen) return;
-    var ok = DpAfaEigen.setzen(n, 'Ersteinschätzung unabhängiger Gutachterpartner' + (dat ? ' vom ' + dat : '') + ' (kein Gutachten)');
+    var ok = DpAfaEigen.setzen(n, 'Ersteinschätzung ' + MARKE + (dat ? ' vom ' + dat : '') + ' (kein Gutachten)');
     if (ok) { schliessen(); if (typeof window.toast === 'function') window.toast('Restnutzungsdauer ' + n + ' Jahre übernommen. Für das Finanzamt braucht es ein Gutachten.'); }
   }
 
-  window.DpGutachterpartner = { oeffnen: oeffnen, status: status, einbauen: einbauen, _mitNull: mitNull };
+  window.DpGutachterpartner = { oeffnen: oeffnen, status: status, einbauen: einbauen, _mitNull: mitNull, _unsereAfa: unsereAfa, _REITER: REITER };
 })();

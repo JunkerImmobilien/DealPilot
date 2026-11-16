@@ -182,6 +182,8 @@
   }
 
   /* ── Vorbelegung aus dem Objekt ─────────────────────────────────── */
+  /* „10 - 20 Jahre“ -> „vor 15–20 Jahren“: Marcel 16.11.2026 „mittlere Grenze nehmen (≈ vor 15 Jahren)“ — die
+     Partner-Stufe, die bei 15 beginnt, trifft diese Mitte; sie liegt auf der vorsichtigen (aelteren) Seite. */
   var MOD_STUFE = { 'Keine/Nie': 'none', '> 20 Jahre': 'moreThanTwentyYears', '10 - 20 Jahre': 'fifteenToTwentyYears',
     '5 - 10 Jahre': 'fiveToTenYears', '< 5 Jahre': 'fiveYears', 'Kernsanierung': 'fiveYears' };
   /* Bauteil beim Partner -> Feld in DealPilot (mod_*). Anlage 2: Leitungssysteme = technische Ausstattung. */
@@ -379,7 +381,8 @@
   }
 
   /* Der Anbietername bleibt draussen (CLAUDE.md, Anbieter-Neutralitaet). */
-  function neutral(t) { return t == null ? '' : String(t).replace(/evalion/gi, 'Gutachterpartner'); }
+  /* v3580 · nach aussen heisst der Partner gutachten.org (Marcel 16.11.2026), nie der Firmenname */
+  function neutral(t) { return t == null ? '' : String(t).replace(/evalion/gi, 'gutachten.org'); }
 
   var API = { logik: logik, sichtbar: sichtbar, holen: holen, setzen: setzen, zeigerZuPunkt: zeigerZuPunkt, feldPfad: feldPfad,
     schemaAn: schemaAn, optionen: optionen, felder: felder, vorbelegen: vorbelegen, vorbelegenMitHerkunft: vorbelegenMitHerkunft, optionText: optionText, pflicht: pflicht, UEBERSETZUNG: UEBERSETZUNG, LAENDER: LAENDER, UNTERFELD: UNTERFELD, REGELN: REGELN, nameTeilen: nameTeilen, strasseTeilen: strasseTeilen,

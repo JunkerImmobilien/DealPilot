@@ -4,7 +4,7 @@
    CLIENT DER „PARTNER FORM API“ DES GUTACHTERPARTNERS (Evalion)
 
    Marcel, 16.11.2026: Restnutzungsdauer-Gutachten aus DealPilot heraus anfragen.
-   Nach AUSSEN heisst der Anbieter „unabhaengiger Gutachterpartner“ (CLAUDE.md,
+   Nach AUSSEN heisst der Anbieter seit v3580 „gutachten.org“ (Marke; Marcel 16.11.2026, vorher (CLAUDE.md,
    Anbieter-Neutralitaet) — der Name steht nur hier im Code und im Admin.
 
    Vertrag: OpenAPI „Evalion Partner Form API“ 0.1.0-contract-preview,
@@ -89,7 +89,7 @@ function idemSchluessel(praefix) {
 
 /* Den Anbieternamen aus Texten nehmen, die bis zum Kunden durchgereicht werden. */
 function neutral(t) {
-  return t == null ? t : String(t).replace(/evalion/gi, 'Gutachterpartner');
+  return t == null ? t : String(t).replace(/evalion/gi, 'gutachten.org');   /* v3580: Marke nach aussen */
 }
 
 /**
@@ -99,7 +99,7 @@ function neutral(t) {
 async function aufruf(methode, pfad, opts) {
   opts = opts || {};
   const k = konfig();
-  if (!k) return { ok: false, status: 503, body: { code: 'nicht_konfiguriert', message: 'Gutachterpartner nicht konfiguriert' }, ms: 0 };
+  if (!k) return { ok: false, status: 503, body: { code: 'nicht_konfiguriert', message: 'gutachten.org nicht konfiguriert' }, ms: 0 };
   const url = k.base + pfad;
   const signPfad = new URL(url).pathname;   /* der Pfad, den der Server sieht (inkl. eventuellem Basis-Pfad) */
   let rumpf = Buffer.alloc(0), typ = null;
@@ -129,7 +129,7 @@ async function aufruf(methode, pfad, opts) {
     }
     return r;
   } catch (e) {
-    return { ok: false, status: 0, body: { code: e.name === 'AbortError' ? 'zeitueberschreitung' : 'netzfehler', message: e.name === 'AbortError' ? 'Der Gutachterpartner hat nicht rechtzeitig geantwortet.' : 'Gutachterpartner nicht erreichbar.' }, ms: Date.now() - t0 };
+    return { ok: false, status: 0, body: { code: e.name === 'AbortError' ? 'zeitueberschreitung' : 'netzfehler', message: e.name === 'AbortError' ? 'gutachten.org hat nicht rechtzeitig geantwortet.' : 'gutachten.org nicht erreichbar.' }, ms: Date.now() - t0 };
   } finally { clearTimeout(timer); }
 }
 
@@ -137,12 +137,12 @@ async function aufruf(methode, pfad, opts) {
 function fehlerText(r) {
   const b = (r && r.body) || {};
   const felder = Array.isArray(b.errors) ? b.errors.map((e) => ({ path: String(e.path || ''), message: neutral(e.message || '') })) : [];
-  let text = neutral(b.message || 'Fehler beim Gutachterpartner').replace(/\b401\b/g, '');
+  let text = neutral(b.message || 'Fehler bei gutachten.org').replace(/\b401\b/g, '');
   if (r && r.status === 401) {
     /* v3542 · KEINE Zahl 401 im Text: frontend/js/auth-401-handler.js erkennt „401“ in der MELDUNG als
        abgelaufene DealPilot-Sitzung, loescht den Token und wartet auf Re-Login (gemessen 16.11.2026 im
        Headless-Chrome: Auth.apiCall hing, danach war der Nutzer abgemeldet). Der Status geht als anbieter_status mit. */
-    text = 'Anmeldung beim Gutachterpartner abgelehnt. Häufigste Ursachen: Serverzeit weicht mehr als 5 Minuten ab'
+    text = 'Anmeldung bei gutachten.org abgelehnt. Häufigste Ursachen: Serverzeit weicht mehr als 5 Minuten ab'
       + (r.zeitabweichung_s != null ? ' (gemessen: ' + r.zeitabweichung_s + ' s)' : '') + ', oder Schlüssel-Kennung/Secret passen nicht zur Umgebung.';
   }
   if (r && r.status === 409 && b.code === 'concurrency_conflict') text = 'Die Anfrage wurde inzwischen geändert. Bitte erneut versuchen.';
