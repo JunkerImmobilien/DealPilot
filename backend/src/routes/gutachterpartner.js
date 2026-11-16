@@ -135,7 +135,8 @@ async function mitFrischemEtag(userId, zeile, aktion, fn) {
 router.get('/status', async (req, res) => {
   const frei = await freigeschaltet(req.user);
   const k = frei ? ev.konfig() : null;
-  res.json({ freigeschaltet: frei, konfiguriert: !!k, umgebung: k ? k.umgebung : null });
+  const a = frei ? require('../services/gutachtenAuftrag').auftraggeber() : null;
+  res.json({ freigeschaltet: frei, konfiguriert: !!(k && a), umgebung: k ? k.umgebung : null, beauftragt_ueber: a ? a.anzeige : null });
 });
 
 /* ab hier: freigeschaltet + konfiguriert */
@@ -143,7 +144,7 @@ router.use(async (req, res, next) => {
   if (!(await freigeschaltet(req.user))) {
     return res.status(403).json({ error: 'Die Anfrage bei gutachten.org ist für dieses Konto gesperrt.', code: 'nicht_freigeschaltet' });
   }
-  if (!ev.konfig()) {
+  if (!ev.konfig() || !require('../services/gutachtenAuftrag').auftraggeber()) {
     return res.status(503).json({ error: 'Die Anbindung an gutachten.org ist noch nicht eingerichtet.', code: 'nicht_konfiguriert' });
   }
   next();
@@ -180,6 +181,8 @@ async function absenden(req, res, zeile) {
   const voll = zeile.formular === ev.FORMULARE.voll;
   const b = req.body || {};
   /* Die vollstaendige Anfrage wird beim Partner ein kostenpflichtiger Auftrag - nur mit Bestaetigung. */
+  /* v3590 · das vollstaendige Gutachten wird nur ueber die Bestellung beauftragt (POST /auftraege: Preis, Kunde, Zustimmungen) */
+  if (voll) return res.status(400).json({ error: 'Das Gutachten wird über die Bestellung beauftragt.', code: 'ueber_bestellung', request_id: zeile.request_id });
   if (voll && b.kostenpflichtig_bestaetigt !== true) {
     return res.status(400).json({ error: 'Bitte bestätigen, dass mit dem Absenden ein kostenpflichtiger Auftrag entsteht.', code: 'bestaetigung_fehlt', request_id: zeile.request_id });
   }
@@ -199,11 +202,7 @@ async function absenden(req, res, zeile) {
 /* v3570 · Ersteinschaetzung ueber die Direct-RUL-IA-API: Ergebnis sofort (siehe services/evalionClient.js).
    Die Datenschutz-Zustimmung des Lite-Formulars traegt die Direct-API nicht - sie wird hier verlangt. */
 async function liteDirekt(req, res, objekt, data) {
-  const rq = data.requester || {};
-  if (rq.acceptPrivacy !== true) {
-    return res.status(400).json({ error: 'Bitte den Datenschutz akzeptieren.', code: 'validation_failed',
-      felder: [{ path: 'requester.acceptPrivacy', message: 'Bitte den Datenschutz akzeptieren.' }] });
-  }
+  /* v3590 · Anfragender ist Junker Solution (mitAuftraggeber); die Zustimmungen gibt DealPilot fuer die Firma ab */
   const idem = ev.idemSchluessel('dp-lite');
   const r = await ev.api.direkt(ev.liteZuDirekt(data, idem));
   const d = (r.body && r.body.data) || {};
@@ -224,6 +223,128 @@ async function liteDirekt(req, res, objekt, data) {
     form: { type: ev.FORMULARE.lite }, status: zeile && zeile.status, result: ergebnis }, zeile), { dauer_ms: r.ms }) });
 }
 
+/* ── v3590 · Gutachten ueber Junker Immobilien (services/gutachtenAuftrag.js) ─────────────
+   Beim Partner steht immer Junker Solution als Anfragender (aus der Umgebung), nie der Kunde.
+   Beim vollstaendigen Gutachten setzt DealPilot auch die Vereinbarung (Besichtigung, Zahlung). */
+const ga = require('../services/gutachtenAuftrag');
+function mitAuftraggeber(art, data, auswahl) {
+  const a = ga.auftraggeber();
+  const d = Object.assign({}, data || {});
+  if (!a) return d;
+  d.requester = ga.requesterFuerPartner(a, art);
+  if (art === 'voll') d.agreement = ga.vereinbarungFuerPartner(auswahl || {});
+  return d;
+}
+
+router.get('/preise', (req, res) => {
+  const a = ga.auftraggeber();
+  res.json({ preisliste: ga.preisliste(), beauftragt_ueber: a ? a.anzeige : null, beauftragung_aktiv: ga.beauftragungAktiv() });
+});
+router.post('/preis', (req, res) => {
+  res.json(ga.preisBerechnen(req.body || {}));
+});
+
+const EMAIL_RX = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+function kundePruefen(k) {
+  const f = [];
+  const s = (x) => String(x == null ? '' : x).trim();
+  if (!s(k.nachname) && !s(k.firma)) f.push({ path: 'kunde.nachname', message: 'Bitte Name oder Firma angeben.' });
+  if (!s(k.strasse)) f.push({ path: 'kunde.strasse', message: 'Bitte die Straße angeben.' });
+  if (!s(k.plz)) f.push({ path: 'kunde.plz', message: 'Bitte die Postleitzahl angeben.' });
+  if (!s(k.ort)) f.push({ path: 'kunde.ort', message: 'Bitte den Ort angeben.' });
+  if (!EMAIL_RX.test(s(k.email))) f.push({ path: 'kunde.email', message: 'Bitte eine gültige E-Mail-Adresse angeben.' });
+  return f;
+}
+const KUNDE_FELDER = ['firma', 'vorname', 'nachname', 'strasse', 'hnr', 'plz', 'ort', 'email', 'telefon'];
+
+/* POST /auftraege { objekt_id, data, kunde, auswahl:{besichtigung, express, rabattcode}, zustimmungen:{daten, widerruf, kosten},
+                     request_id?, beauftragen }
+   1. Kunde nur mit Zustimmung zur Weitergabe (sonst wird nichts gespeichert)
+   2. Preis wird HIER gerechnet (preisBerechnen), nie aus dem Browser uebernommen
+   3. Entwurf beim Partner anlegen bzw. aendern; mit beauftragen === true absenden
+   4. Auftrag speichern, beim Beauftragen Marcel benachrichtigen (Staging: keine echte Mail) */
+router.post('/auftraege', async (req, res, next) => {
+  try {
+    const b = req.body || {};
+    const z = b.zustimmungen || {};
+    const kunde = {}; KUNDE_FELDER.forEach((k) => { if (b.kunde && b.kunde[k] != null) kunde[k] = String(b.kunde[k]).trim().slice(0, 200); });
+    if (z.daten !== true) {
+      return res.status(400).json({ error: 'Ohne deine Zustimmung zur Übermittlung können wir den Auftrag nicht annehmen.', code: 'zustimmung_fehlt',
+        felder: [{ path: 'zustimmung.daten', message: 'Bitte der Übermittlung deiner Angaben zustimmen.' }] });
+    }
+    const kf = kundePruefen(kunde);
+    if (kf.length) return res.status(400).json({ error: 'Bitte deine Angaben für die Rechnung vervollständigen.', code: 'validation_failed', felder: kf });
+    if (b.beauftragen === true && (z.kosten !== true || z.widerruf !== true)) {
+      return res.status(400).json({ error: 'Bitte die kostenpflichtige Beauftragung und die Widerrufsbelehrung bestätigen.', code: 'bestaetigung_fehlt',
+        felder: [z.kosten !== true ? { path: 'zustimmung.kosten', message: 'Bitte bestätigen.' } : null, z.widerruf !== true ? { path: 'zustimmung.widerruf', message: 'Bitte bestätigen.' } : null].filter(Boolean) });
+    }
+    if (!ga.auftraggeber()) return res.status(503).json({ error: 'Der Auftraggeber für gutachten.org ist noch nicht eingerichtet.', code: 'auftraggeber_fehlt' });
+    let objekt = b.objekt_id && UUID.test(String(b.objekt_id)) ? String(b.objekt_id) : null;
+    let objektText = null;
+    if (objekt) {
+      const o = await query("SELECT data->>'str' AS str, data->>'hnr' AS hnr, data->>'plz' AS plz, data->>'ort' AS ort, data->>'wfl' AS wfl FROM objects WHERE id=$1 AND user_id=$2", [objekt, req.user.id]);
+      if (!o.rowCount) objekt = null; else objektText = [[o.rows[0].str, o.rows[0].hnr].filter(Boolean).join(' '), [o.rows[0].plz, o.rows[0].ort].filter(Boolean).join(' ')].filter(Boolean).join(', ');
+    }
+    const auswahl = { besichtigung: (b.auswahl && b.auswahl.besichtigung) || 'keine', express: !!(b.auswahl && b.auswahl.express === true),
+      rabattcode: String((b.auswahl && b.auswahl.rabattcode) || '').trim().slice(0, 40) };
+    const daten = b.data && typeof b.data === 'object' ? b.data : {};
+    const od = daten.objectDetails || {};
+    const preis = ga.preisBerechnen(Object.assign({ flaeche: od.propertyArea || od.propertyResidentialArea || b.flaeche }, auswahl));
+    if (preis.fehler) return res.status(400).json({ error: preis.text, code: preis.fehler, felder: [{ path: 'objectDetails.propertyArea', message: preis.text }] });
+    preis.quelle = ga.preisliste().quelle; preis.stand = ga.preisliste().stand; preis.vorlaeufig = !!ga.preisliste().vorlaeufig;
+    const partnerDaten = mitAuftraggeber('voll', daten, auswahl);
+
+    /* Entwurf beim Partner: vorhandener (eigener) oder neuer */
+    let zeile = b.request_id ? await zeileHolen(req.user.id, String(b.request_id)) : null;
+    let r;
+    if (zeile) {
+      r = await mitFrischemEtag(req.user.id, zeile, 'aendern', (etag) => ev.api.aendern(zeile.request_id, partnerDaten, etag));
+      if (!r.ok) return fehler(res, r, zeile.request_id);
+    } else {
+      r = await ev.api.anlegen(ev.FORMULARE.voll, partnerDaten, ev.idemSchluessel('dp-auftrag'));
+      await protokoll(req.user.id, 'anlegen', r, r.body && r.body.data && r.body.data.requestId);
+      if (!r.ok) return fehler(res, r);
+      const d = r.body.data, k = ev.konfig();
+      await query('INSERT INTO gutachter_anfragen (user_id, objekt_id, formular, umgebung, request_id, request_number, status, etag, idem_submit) '
+        + 'VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9) ON CONFLICT (request_id) DO NOTHING',
+        [req.user.id, objekt, ev.FORMULARE.voll, k.umgebung, d.requestId, d.requestNumber || null, d.status || 'draft', r.etag || null, ev.idemSchluessel('dp-absenden')]);
+      zeile = await zeileHolen(req.user.id, d.requestId);
+    }
+    /* v3590 · verbindlich an gutachten.org nur mit Schalter GUTACHTEN_BEAUFTRAGUNG_AKTIV=true; sonst „bestellt“ (Marcel sendet ab) */
+    const anPartner = b.beauftragen === true && ga.beauftragungAktiv();
+    if (b.beauftragen === true) await query('UPDATE gutachter_anfragen SET kostenpflichtig_bestaetigt_at=NOW() WHERE request_id=$1', [zeile.request_id]);
+    if (anPartner) {
+      r = await mitFrischemEtag(req.user.id, zeile, 'absenden', (etag) => ev.api.absenden(zeile.request_id, etag, zeile.idem_submit));
+      if (!r.ok) return fehler(res, r, zeile.request_id);
+    }
+    zeile = await zeileHolen(req.user.id, zeile.request_id);
+    const jetzt = new Date().toISOString();
+    const zust = { daten: jetzt, widerruf: z.widerruf === true ? jetzt : null, kosten: z.kosten === true ? jetzt : null };
+    const status = b.beauftragen === true ? (anPartner ? 'beauftragt' : 'bestellt') : 'entwurf';
+    const vorh = await query('SELECT id FROM gutachten_auftraege WHERE request_id=$1 AND user_id=$2', [zeile.request_id, req.user.id]);
+    let auftragId;
+    if (vorh.rowCount) {
+      auftragId = vorh.rows[0].id;
+      await query('UPDATE gutachten_auftraege SET kunde=$2::jsonb, zustimmungen=$3::jsonb, auswahl=$4::jsonb, preis=$5::jsonb, endpreis=$6, status=$7, '
+        + 'request_number=$8, beauftragt_at=CASE WHEN $7 IN (\'beauftragt\',\'bestellt\') THEN NOW() ELSE beauftragt_at END, updated_at=NOW() WHERE id=$1',
+        [auftragId, JSON.stringify(kunde), JSON.stringify(zust), JSON.stringify(auswahl), JSON.stringify(preis), preis.endpreis, status, zeile.request_number]);
+    } else {
+      const ins = await query('INSERT INTO gutachten_auftraege (user_id, objekt_id, objekt_text, request_id, request_number, status, kunde, zustimmungen, auswahl, preis, endpreis, umgebung, beauftragt_at) '
+        + 'VALUES ($1,$2,$3,$4,$5,$6,$7::jsonb,$8::jsonb,$9::jsonb,$10::jsonb,$11,$12, CASE WHEN $6 IN (\'beauftragt\',\'bestellt\') THEN NOW() ELSE NULL END) RETURNING id',
+        [req.user.id, objekt, objektText, zeile.request_id, zeile.request_number, status, JSON.stringify(kunde), JSON.stringify(zust), JSON.stringify(auswahl),
+         JSON.stringify(preis), preis.endpreis, zeile.umgebung]);
+      auftragId = ins.rows[0].id;
+    }
+    let benachrichtigung = null;
+    if (status === 'beauftragt' || status === 'bestellt') {
+      benachrichtigung = await ga.benachrichtigen({ status, kunde, auswahl, preis, objekt_text: objektText, request_number: zeile.request_number });
+      await query('UPDATE gutachten_auftraege SET benachrichtigung=$2::jsonb WHERE id=$1', [auftragId, JSON.stringify(Object.assign({ zeit: jetzt }, benachrichtigung))]);
+    }
+    res.status(201).json({ auftrag: { id: auftragId, status, preis, request_id: zeile.request_id, request_number: zeile.request_number, benachrichtigung: benachrichtigung && benachrichtigung.status },
+      anfrage: sicht(r.body && r.body.data, zeile) });
+  } catch (e) { next(e); }
+});
+
 router.post('/anfragen', async (req, res, next) => {
   try {
     const b = req.body || {};
@@ -234,7 +355,7 @@ router.post('/anfragen', async (req, res, next) => {
       const o = await query('SELECT 1 FROM objects WHERE id=$1 AND user_id=$2', [objekt, req.user.id]);
       if (!o.rowCount) objekt = null;
     }
-    const data = b.data && typeof b.data === 'object' && !Array.isArray(b.data) ? b.data : {};
+    const data = mitAuftraggeber(b.art, b.data && typeof b.data === 'object' && !Array.isArray(b.data) ? b.data : {}, b.auswahl);
     if (b.art === 'lite' && b.absenden === true && ev.liteWegDirekt()) return liteDirekt(req, res, objekt, data);
     const r = await ev.api.anlegen(formType, data, ev.idemSchluessel('dp-anlegen'));
     await protokoll(req.user.id, 'anlegen', r, r.body && r.body.data && r.body.data.requestId);
@@ -266,7 +387,7 @@ router.patch('/anfragen/:rid', async (req, res, next) => {
   try {
     const zeile = await zeileHolen(req.user.id, req.params.rid);
     if (!zeile) return res.status(404).json({ error: 'Anfrage nicht gefunden' });
-    const data = (req.body && req.body.data && typeof req.body.data === 'object') ? req.body.data : {};
+    const data = mitAuftraggeber(zeile.formular === ev.FORMULARE.lite ? 'lite' : 'voll', (req.body && req.body.data && typeof req.body.data === 'object') ? req.body.data : {}, req.body && req.body.auswahl);
     const r = await mitFrischemEtag(req.user.id, zeile, 'aendern', (etag) => ev.api.aendern(zeile.request_id, data, etag));
     if (!r.ok) return fehler(res, r, zeile.request_id);
     res.json({ anfrage: sicht(r.body.data, await zeileHolen(req.user.id, zeile.request_id)) });

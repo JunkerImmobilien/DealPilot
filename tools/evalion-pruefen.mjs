@@ -213,7 +213,7 @@ pruefe('Direktweg: Fehlerpfade zurück ins Formular', ev.pfadVonDirekt('requestD
 pruefe('Direktweg: alle zwölf Gewerbe-Beschreibungen haben einen Schlüssel', Object.keys(ev.GEWERBE_SCHLUESSEL).length === 12);
 process.env.EVALION_LITE_WEG = 'formular'; const wegF = ev.liteWegDirekt(); delete process.env.EVALION_LITE_WEG;
 pruefe('Direktweg ist Standard, EVALION_LITE_WEG=formular schaltet zurück', ev.liteWegDirekt() === true && wegF === false);
-pruefe('Route: Ersteinschätzung über den Direktweg, Datenschutz verlangt', /liteWegDirekt\(\)\) return liteDirekt/.test(route) && /acceptPrivacy !== true/.test(route));
+pruefe('Route: Ersteinschätzung über den Direktweg, Anfragender aus mitAuftraggeber', /liteWegDirekt\(\)\) return liteDirekt/.test(route) && route.includes("const data = mitAuftraggeber(b.art,"));
 const ui = fs.readFileSync(path.join(WURZEL, 'frontend/js/gutachterpartner.js'), 'utf8');
 /* v3580 · Reiter wie der RND-Rechner (rnd-wizard.js): dieselben Klassen */
 const wiz = fs.readFileSync(path.join(WURZEL, 'frontend/js/rnd-wizard.js'), 'utf8');
@@ -239,7 +239,7 @@ pruefe('Marke gutachten.org nach außen, kein Firmenname im UI', ui.includes("va
 const logoDatei = path.join(WURZEL, 'frontend/img/partner/gutachten-org.svg');
 const logoText = fs.existsSync(logoDatei) ? fs.readFileSync(logoDatei, 'utf8') : '';
 pruefe('Logo: offizielles SVG abgelegt, Quelle im Code vermerkt, ohne Skript', /^<svg/.test(logoText) && !/<script|onload=/i.test(logoText) && ui.includes('gutachten.org/brand/logo/gutachten-org-ink.svg'));
-pruefe('Kosten: Ersteinschätzung kostenlos, Gutachten „stellt gutachten.org gesondert in Rechnung“, kein Betrag', ui.includes('kostenlos') && ui.includes('gesondert in Rechnung') && !/\d\s*(€|EUR|Euro)\b/.test(ui));
+pruefe('Kosten: Ersteinschätzung kostenlos, kein Betrag im Frontend (Preise nur über GET /preise)', ui.includes('kostenlos') && !/\d\s*(€|EUR|Euro)\b/.test(ui) && !/\b(951|1070|1184|1541|2017|2612|199|499|299)\b/.test(ui) && ui.includes("api('/preise')"));
 pruefe('Freigabe: jedes angemeldete Konto (Zusatz nur zum Sperren)', route.includes('return !(z && z.aktiv === false)'));
 pruefe('Abgleich: Eingaben (ohne Person) und Kern zum selben Zeitpunkt gespeichert, Kern über rndAusObjekt',
   route.includes('kernMessen(req.user.id, objekt)') && route.includes('kerne.rndAusObjekt(') && route.includes('kerne.rnd(eingabe)') && route.includes('delete d.requester') && route.includes('ergebnis, eingaben, kern)'));
@@ -259,6 +259,52 @@ pruefe('Abgleich-Werkzeug: Mittel/Median/Gruppen nach Baujahr und Modernisierung
   && abA.nachBaujahr.some((g) => g.gruppe === '1970–1989') && abA.nachModernisierung.some((g) => /^mittlerer/.test(g.gruppe)) && abA.groesste[0].nr === 'T1');
 pruefe('Abgleich-Werkzeug: nur Vorschläge, liest nur (kein UPDATE/INSERT, keine Änderung am Kern)', AB.vorschlaege(abA).length >= 1
   && !/\b(UPDATE|INSERT|DELETE)\b/.test(fs.readFileSync(path.join(WURZEL, 'tools/rnd-partner-abgleich.mjs'), 'utf8').replace(/\/\*[\s\S]*?\*\//, '')) && !/writeFileSync/.test(fs.readFileSync(path.join(WURZEL, 'tools/rnd-partner-abgleich.mjs'), 'utf8')));
+
+
+/* ── F v3590 · Gutachten über Junker Immobilien: Preise, Rabatt, Anfragender, Kunde, Mail, Schalter ── */
+console.log('F  Bestellung über Junker Immobilien (services/gutachtenAuftrag.js, gutachtenPreise.js)');
+const GA = require(path.join(WURZEL, 'backend/src/services/gutachtenAuftrag.js'));
+const PL = GA.preisliste();
+pruefe('Preisliste: eine Stelle (gutachtenPreise.js), vorläufig markiert, Quelle und Stand', PL.vorlaeufig === true && PL.quelle === 'https://junker-immobilien.io/preise.html' && PL.stand === '2026-11-16'
+  && /wird ersetzt|werden ersetzt/.test(PL.hinweis_quelle) && !/\b951\b/.test(fs.readFileSync(path.join(WURZEL, 'backend/src/services/gutachtenAuftrag.js'), 'utf8')) && !/\b951\b/.test(route));
+const grenzen = [[150, 951], [151, 1070], [300, 1070], [301, 1184], [500, 1184], [501, 1541], [1000, 1541], [1001, 2017], [2500, 2017], [2501, 2612], [150.5, 1070], ['72,5', 951]];
+const falsch = grenzen.filter(([f, e]) => GA.preisBerechnen({ flaeche: f }).grundpreis !== e).map(([f, e]) => f + '→' + GA.preisBerechnen({ flaeche: f }).grundpreis + ' statt ' + e);
+pruefe('Preisstufen an allen Grenzen (150/151 … 2500/2501, Dezimalfläche)', falsch.length === 0, falsch.join(' · '));
+pruefe('Fläche fehlt → kein Preis', GA.preisBerechnen({}).fehler === 'flaeche_fehlt' && GA.preisBerechnen({ flaeche: 0 }).fehler === 'flaeche_fehlt');
+const z1 = GA.preisBerechnen({ flaeche: 120, besichtigung: 'aussen' }), z2 = GA.preisBerechnen({ flaeche: 120, besichtigung: 'innen_aussen', express: true });
+pruefe('Zubuchungen: Außen +199, Innen+Außen +499, Express +299', z1.endpreis === 1150 && z2.endpreis === 951 + 499 + 299 && GA.preisBerechnen({ flaeche: 120, besichtigung: 'quatsch' }).endpreis === 951, z1.endpreis + ' / ' + z2.endpreis);
+const j5 = GA.preisBerechnen({ flaeche: 200, besichtigung: 'aussen', rabattcode: ' junker5 ' });
+pruefe('Junker5: −5 % auf das Honorar (Groß-/Kleinschreibung egal)', j5.rabatt && j5.rabatt.pct === 5 && j5.rabatt.betrag === 63.45 && j5.endpreis === 1205.55, JSON.stringify(j5.rabatt) + ' ' + j5.endpreis);
+const uc = GA.preisBerechnen({ flaeche: 200, rabattcode: 'GRATIS100' });
+pruefe('ungültiger Code: freundliche Meldung, normaler Preis', uc.code_ungueltig === true && /nicht bekannt/.test(uc.code_text) && uc.endpreis === 1070 && !uc.rabatt);
+const mg = GA.preisBerechnen({ flaeche: 200, rabattcode: 'Junker5', anzahl: 10 });
+pruefe('Mengenrabatt ab 5/10/25 → 10/15/20 %, nicht kombiniert (höherer gilt)', mg.rabatt.art === 'menge' && mg.rabatt.pct === 15 && mg.code_nicht_kombiniert === true
+  && GA.preisBerechnen({ flaeche: 200, anzahl: 4 }).rabatt === null && GA.preisBerechnen({ flaeche: 200, anzahl: 25 }).rabatt.pct === 20);
+const envAlt = {}; const AG = { FIRMA: 'Muster Solution (Test)', VORNAME: 'Max', NACHNAME: 'Muster', STRASSE: 'Musterweg', HNR: '1', PLZ: '12345', ORT: 'Musterstadt', EMAIL: 'auftrag@muster.test', TELEFON: '+49 000 000' };
+Object.keys(AG).forEach((k) => { envAlt[k] = process.env['GUTACHTEN_AUFTRAGGEBER_' + k]; delete process.env['GUTACHTEN_AUFTRAGGEBER_' + k]; });
+pruefe('ohne GUTACHTEN_AUFTRAGGEBER_* kein Auftraggeber (Route meldet „nicht eingerichtet“)', GA.auftraggeber() === null && route.includes("!require('../services/gutachtenAuftrag').auftraggeber()"));
+Object.keys(AG).forEach((k) => { process.env['GUTACHTEN_AUFTRAGGEBER_' + k] = AG[k]; });
+const rqL = GA.requesterFuerPartner(GA.auftraggeber(), 'lite'), vb = GA.vereinbarungFuerPartner({ besichtigung: 'aussen', express: true });
+pruefe('Requester beim Partner = Auftraggeber (Firma), Zustimmungen für die Firma, Herkunft DealPilot', rqL.title === 'company' && rqL.companyName === AG.FIRMA && rqL.email === AG.EMAIL
+  && rqL.acceptPrivacy === true && rqL.leadSource === 'other' && rqL.leadSourceDetails === 'DealPilot' && rqL.address.city === AG.ORT);
+pruefe('Vereinbarung: noAssessment, postPay, Besichtigung → addonService, keine Kanzleiprüfung, Express nur vermerkt', vb.desiredProducts === 'noAssessment' && vb.paymentType === 'postPay'
+  && vb.addonService === 'onSiteInspection' && GA.vereinbarungFuerPartner({ besichtigung: 'innen_aussen' }).addonService === 'interiorExteriorOnSiteInspection'
+  && GA.vereinbarungFuerPartner({}).addonService === 'none' && vb.taxPlausibilityCheckService === 'none' && /Express/.test(vb.generalComments));
+Object.keys(AG).forEach((k) => { if (envAlt[k] === undefined) delete process.env['GUTACHTEN_AUFTRAGGEBER_' + k]; else process.env['GUTACHTEN_AUFTRAGGEBER_' + k] = envAlt[k]; });
+pruefe('Backend überschreibt requester/agreement (mitAuftraggeber) bei Anlegen, Ändern, Direktweg und Auftrag', (route.match(/mitAuftraggeber\(/g) || []).length >= 4 && route.includes("if (art === 'voll') d.agreement = ga.vereinbarungFuerPartner"));
+pruefe('Kundendaten nur mit Zustimmung, Pflichtangaben geprüft, Preis im Backend gerechnet', route.includes("if (z.daten !== true)") && route.includes('kundePruefen(kunde)') && route.includes('ga.preisBerechnen(Object.assign('));
+pruefe('UI: Kundenfelder statt requester-Feldern, requester/agreement vom Server', ui.includes('function vomServer(p)') && ui.includes('Meine Angaben dürfen zur Beauftragung an Junker Solution und den beauftragten Gutachter übermittelt werden'));
+const altApp = process.env.APP_URL, altMail = process.env.GUTACHTEN_AUFTRAG_MAIL;
+process.env.APP_URL = 'https://app.staging.dealpilot.immo'; delete process.env.GUTACHTEN_AUFTRAG_MAIL;
+const m1 = await GA.benachrichtigen({ status: 'bestellt', kunde: {}, preis: {} });
+process.env.GUTACHTEN_AUFTRAG_MAIL = 'marcel@pruefer.test';
+const m2 = await GA.benachrichtigen({ status: 'bestellt', kunde: {}, preis: {} });
+if (altApp === undefined) delete process.env.APP_URL; else process.env.APP_URL = altApp;
+if (altMail === undefined) delete process.env.GUTACHTEN_AUFTRAG_MAIL; else process.env.GUTACHTEN_AUFTRAG_MAIL = altMail;
+pruefe('keine echte Mail von Staging (info@ unterdrückt, Testadresse nie über SMTP)', m1.status === 'staging_unterdrueckt' && m2.status === 'testadresse_nicht_gesendet');
+delete process.env.GUTACHTEN_BEAUFTRAGUNG_AKTIV;
+pruefe('Schalter: verbindliches Absenden an gutachten.org Standard AUS (Status „bestellt“)', GA.beauftragungAktiv() === false && route.includes("const anPartner = b.beauftragen === true && ga.beauftragungAktiv();")
+  && route.includes("(anPartner ? 'beauftragt' : 'bestellt')"));
 
 /* ── D Live gegen die TEST-Umgebung ─────────────────────────────────── */
 if (arg('live')) {

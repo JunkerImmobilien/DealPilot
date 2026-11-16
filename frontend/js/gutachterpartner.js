@@ -1,5 +1,8 @@
 /* ════════════════════════════════════════════════════════════════════
-   v3580 · RESTNUTZUNGSDAUER BEI GUTACHTEN.ORG
+   v3580/v3590 · RESTNUTZUNGSDAUER BEI GUTACHTEN.ORG, BEAUFTRAGT UEBER JUNKER IMMOBILIEN
+   v3590 (Marcel 16.11.2026): Anfragender beim Partner ist Junker Solution (Backend, GUTACHTEN_AUFTRAGGEBER_*);
+   der Kunde gibt seine Rechnungsangaben nur mit Zustimmung; Bestellreiter mit Preis aus der Preisliste
+   (services/gutachtenAuftrag.js, junker-immobilien.io/preise.html, Stand 16.11.2026), Rabattcode, Zubuchungen.
    (v3540 Bau, v3570 App-Fenster/Deutsch/Vorbelegung/Ergebnis sofort, v3580 Reiter wie der RND-Rechner)
    ════════════════════════════════════════════════════════════════════
    Reiter Steuer › AfA-Satz „Eigenen Satz / Restnutzungsdauer eingeben …“ ›
@@ -92,14 +95,16 @@
     lite: [
       { kurz: 'Objekt', titel: 'Objekt und Adresse', gruppen: ['propertyType', 'constructionYear', 'propertyAddress'] },
       { kurz: 'Modernisierung', titel: 'Modernisierung und Kernsanierung', gruppen: ['modernizations', 'renovation'] },
-      { kurz: 'Anfrage', titel: 'Anfragende Person und Absenden', gruppen: ['requester'], letzter: true }
+      /* v3590: die anfragende Person beim Partner ist Junker Solution (Backend) - keine Felder fuer den Kunden */
+      { kurz: 'Absenden', titel: 'Ersteinschätzung anfordern', gruppen: ['requester'], letzter: true }
     ],
     voll: [
       { kurz: 'Objekt', titel: 'Objekt, Stichtag und Objektdaten', gruppen: ['property', 'valuation', 'objectDetails'] },
       { kurz: 'Bauweise', titel: 'Bauweise und Ausstattung', gruppen: ['construction'] },
       { kurz: 'Modernisierung', titel: 'Modernisierungen', gruppen: ['modernizations'] },
-      { kurz: 'Auftraggeber', titel: 'Auftraggeber und Eigentümer', gruppen: ['owner'] },
-      { kurz: 'Absenden', titel: 'Vereinbarung und Absenden', gruppen: ['agreement'], letzter: true }
+      { kurz: 'Eigentümer', titel: 'Eigentümer', gruppen: ['owner'] },
+      /* v3590: Bestellung bei Junker Immobilien (Preis, Kunde, Zustimmungen); die Vereinbarung beim Partner setzt das Backend */
+      { kurz: 'Bestellung', titel: 'Bestellung und Preis', gruppen: ['agreement'], letzter: true }
     ]
   };
   /* Gruppen, die keine Zuordnung haben (neue Gruppe des Partners), kommen in den vorletzten Reiter */
@@ -150,7 +155,7 @@
     var titel = art === 'lite' ? 'Ersteinschätzung der Restnutzungsdauer' : 'Restnutzungsdauer-Gutachten beauftragen';
     var o = document.createElement('div'); o.id = 'gp-overlay'; o.className = 'rnd-wiz-overlay rnd-hub';
     o.innerHTML = '<div class="rnd-wiz-modal" role="dialog" aria-modal="true" aria-label="' + esc(titel) + '">'
-      + '<div class="rnd-wiz-header"><div class="rnd-wiz-title"><h2 id="gp-titel">' + esc(titel) + '</h2><p class="rnd-wiz-sub" id="gp-sub">mit unserem Partner ' + MARKE + '</p></div>'
+      + '<div class="rnd-wiz-header"><div class="rnd-wiz-title"><h2 id="gp-titel">' + esc(titel) + '</h2><p class="rnd-wiz-sub" id="gp-sub">Gutachten durch ' + MARKE + '</p></div>'
       + '<div class="gp-kopf-rechts"><span class="gp-logo"><img src="' + LOGO + '" alt="' + MARKE + '"></span><button class="rnd-wiz-close" id="gp-zu" aria-label="Schließen">&times;</button></div></div>'
       + '<div class="rnd-wiz-progress rnd-hub-leiste"><div class="rnd-wiz-steps rnd-hub-schritte" id="gp-schritte"></div>'
       + '<div class="rnd-hub-balken"><div class="rnd-wiz-progress-bar" id="gp-balken"></div></div></div>'
@@ -178,16 +183,19 @@
   /* Unsere AfA: 100 ÷ RND (Marcel 16.11.2026) — dieselbe Rechnung wie afa-eigen.js setzen() */
   function unsereAfa(rnd) { var n = Math.round(Number(rnd)); return n > 0 ? 100 / n : null; }
 
-  function oeffnen(art) {
+  function oeffnen(art, opt) {
+    opt = opt || {};
     var inhalt = fenster(art);
     if (st && st.takt) clearTimeout(st.takt);
-    st = { art: art, def: null, rid: null, gesendet: {}, unterlagen: [], reiter: 0 };
+    st = { art: art, def: null, rid: null, gesendet: {}, unterlagen: [], reiter: 0, vorlage: opt.vorlage || null, ueber: (_status && _status.beauftragt_ueber) || 'Junker Immobilien' };
     var oid = objektId();
     Promise.all([
       api('/formular/' + art),
       api('/anfragen' + (oid ? '?objekt=' + oid : '')).catch(function () { return { anfragen: [] }; }),
-      (art === 'voll' && oid) ? window.Auth.apiCall('/dateien?objekt=' + oid).catch(function () { return { dateien: [] }; }) : Promise.resolve({ dateien: [] })
+      (art === 'voll' && oid) ? window.Auth.apiCall('/dateien?objekt=' + oid).catch(function () { return { dateien: [] }; }) : Promise.resolve({ dateien: [] }),
+      art === 'voll' ? api('/preise').catch(function () { return {}; }) : Promise.resolve({})
     ]).then(function (r) {
+      st.preisliste = (r[3] && r[3].preisliste) || null; if (r[3] && r[3].beauftragt_ueber) st.ueber = r[3].beauftragt_ueber;
       st.def = (r[0] && r[0].data) || null;
       st.unterlagen = (r[2] && r[2].dateien) || [];
       if (!st.def || !st.def.ui) { inhalt.innerHTML = '<section class="rnd-hub-karte"><p class="gp-fehler">Das Formular von ' + MARKE + ' ist gerade nicht lesbar.</p></section>'; return; }
@@ -256,6 +264,63 @@
     return '<div class="rnd-wiz-field' + breit + '" data-i="' + i + '" data-pfad="' + esc(p) + '"><label for="' + id + '">' + N(f.label) + '</label>' + eing + unten + '</div>';
   }
 
+  /* v3590 · diese Partnerfelder setzt das Backend (Junker Solution als Anfragender, Vereinbarung beim Gutachten) */
+  function vomServer(p) { return /^requester\./.test(p) || (st.art === 'voll' && /^agreement\./.test(p)); }
+
+  /* ── v3590 · Bestellung bei Junker Immobilien (Preise aus GET /preise, gerechnet von POST /preis) ── */
+  var KUNDE = [['firma', 'Firma (optional)', 'text'], ['vorname', 'Vorname', 'text'], ['nachname', 'Nachname', 'text'], ['strasse', 'Straße', 'text'], ['hnr', 'Hausnummer', 'text'],
+    ['plz', 'Postleitzahl', 'text'], ['ort', 'Ort', 'text'], ['email', 'E-Mail-Adresse', 'email'], ['telefon', 'Telefon (optional)', 'tel']];
+  var KUNDE_PFLICHT = { nachname: 1, strasse: 1, plz: 1, ort: 1, email: 1 };
+  var MERK_KUNDE = 'dp_gp_kunde';
+  function eurT(x) { return Number(x || 0).toLocaleString('de-DE', { minimumFractionDigits: 0, maximumFractionDigits: 2 }) + ' €'; }
+  function bestellungHtml() {
+    var pl = st.preisliste || {}, b = pl.besichtigung || {}, ex = pl.express || {};
+    var bes = ['keine', 'aussen', 'innen_aussen'].filter(function (k) { return b[k]; }).map(function (k) {
+      return '<label class="rnd-hub-chip"><input type="radio" name="gp-bes" value="' + k + '"' + (k === 'aussen' ? ' checked' : '') + '>' + esc(b[k].text) + (b[k].betrag ? ' +' + eurT(b[k].betrag) : '') + (b[k].empfohlen ? ' · empfohlen' : '') + '</label>'; }).join('');
+    return '<section class="rnd-hub-karte"><h3 class="rnd-hub-h">Leistung</h3>'
+      + '<p class="gp-herk" style="margin:0 0 8px">Gutachten durch ' + MARKE + ', beauftragt über ' + esc(st.ueber || 'Junker Immobilien') + '. Bearbeitungszeit ' + esc(pl.bearbeitung || '') + '.</p>'
+      + '<div class="rnd-wiz-grid rnd-hub-felder">'
+      + '<div class="rnd-wiz-field rnd-wiz-col-2"><label>Besichtigung</label><div class="gp-wahl rnd-hub-chips" id="gp-bes">' + bes + '</div></div>'
+      + '<div class="rnd-wiz-field rnd-wiz-col-2"><label class="rnd-wiz-checkbox"><input type="checkbox" id="gp-express"> ' + esc(ex.text || 'Expresszuschlag') + ' +' + eurT(ex.betrag) + ' (' + esc(ex.hinweis || '') + ')</label></div>'
+      + '<div class="rnd-wiz-field"><label for="gp-code">Rabattcode</label><input type="text" id="gp-code" autocomplete="off"><div class="gp-herk" id="gp-code-t"></div></div>'
+      + '</div></section>'
+      + '<section class="rnd-hub-karte"><h3 class="rnd-hub-h">Preis</h3><div id="gp-preis" class="gp-herk">wird berechnet …</div></section>'
+      + '<section class="rnd-hub-karte"><h3 class="rnd-hub-h">Deine Angaben für die Rechnung</h3><div class="rnd-wiz-grid rnd-hub-felder">'
+      + KUNDE.map(function (k) { return '<div class="rnd-wiz-field" data-kunde="' + k[0] + '"><label for="gp-k-' + k[0] + '">' + esc(k[1]) + '</label><input type="' + k[2] + '" id="gp-k-' + k[0] + '"><div class="gp-fehlt-t" data-fehlt hidden>fehlt – bitte ergänzen</div><div class="gp-fehler"></div></div>'; }).join('')
+      + '</div></section>'
+      + '<section class="rnd-hub-karte"><h3 class="rnd-hub-h">Bestätigen</h3>'
+      + '<div class="rnd-wiz-field rnd-wiz-col-2" data-zust="daten"><label class="rnd-wiz-checkbox"><input type="checkbox" id="gp-z-daten"> Meine Angaben dürfen zur Beauftragung an Junker Solution und den beauftragten Gutachter übermittelt werden. '
+      + '<a href="https://junker-immobilien.io/datenschutz.html" target="_blank" rel="noopener">Datenschutz</a></label><div class="gp-fehler"></div></div>'
+      /* PLATZHALTER fuer Marcel: eine eigene Widerrufsbelehrung gibt es auf junker-immobilien.io noch nicht (gemessen 16.11.2026) */
+      + '<div class="rnd-wiz-field rnd-wiz-col-2" data-zust="widerruf"><label class="rnd-wiz-checkbox"><input type="checkbox" id="gp-z-widerruf"> Ich habe die Widerrufsbelehrung zur Kenntnis genommen <i>[Platzhalter – Text von Junker Immobilien folgt]</i>.</label><div class="gp-fehler"></div></div>'
+      + '<div class="rnd-wiz-field rnd-wiz-col-2" data-zust="kosten"><label class="rnd-wiz-checkbox"><input type="checkbox" id="gp-z-kosten"> Ich beauftrage das Gutachten <b>kostenpflichtig</b> zum oben genannten Endpreis. ' + esc(pl.zahlung || '') + '</label><div class="gp-fehler"></div></div>'
+      + '<p class="gp-herk" style="margin:6px 0 0">' + esc(pl.steuer || '') + ' ' + esc(pl.skonto_vorkasse || '') + '</p>';
+  }
+  function kundeLesen() { var k = {}; KUNDE.forEach(function (x) { var e = el('gp-k-' + x[0]); if (e) k[x[0]] = String(e.value || '').trim(); }); return k; }
+  function auswahlLesen() { var b = document.querySelector('#gp-bes input:checked'); return { besichtigung: b ? b.value : 'keine', express: !!(el('gp-express') && el('gp-express').checked), rabattcode: el('gp-code') ? el('gp-code').value.trim() : '' }; }
+  function zustimmungenLesen() { var z = {}; ['daten', 'widerruf', 'kosten'].forEach(function (k) { var e = el('gp-z-' + k); z[k] = !!(e && e.checked); }); return z; }
+  var _preisTakt = null;
+  function preisRechnen() {
+    if (st.art !== 'voll' || !el('gp-preis')) return;
+    clearTimeout(_preisTakt);
+    _preisTakt = setTimeout(function () {
+      var d = lesen(), od = d.objectDetails || {};
+      api('/preis', { method: 'POST', body: Object.assign({ flaeche: od.propertyArea || od.propertyResidentialArea }, auswahlLesen()) }).then(function (p) {
+        st.preis = p;
+        var box = el('gp-preis'); if (!box) return;
+        var ct = el('gp-code-t'); if (ct) { ct.textContent = p.code_text || (p.rabatt && p.rabatt.art === 'code' ? p.rabatt.text + ': −' + p.rabatt.pct + ' % auf das Honorar' : ''); ct.style.color = p.code_ungueltig ? '#B8625C' : ''; }
+        if (p.fehler) { box.textContent = p.text; return; }
+        box.innerHTML = '<table style="width:100%;border-collapse:collapse;font-size:13px">' + p.posten.map(function (x) { return '<tr><td style="padding:3px 0">' + esc(x.text) + '</td><td style="text-align:right">' + eurT(x.betrag) + '</td></tr>'; }).join('')
+          + (p.rabatt ? '<tr><td style="padding:3px 0">' + esc(p.rabatt.text) + ' (−' + p.rabatt.pct + ' %)</td><td style="text-align:right">−' + eurT(p.rabatt.betrag) + '</td></tr>' : '')
+          + '<tr><td style="padding:8px 0 0;border-top:1px solid var(--hub-line,#E0DBD3)"><b>Endpreis</b> (Wohn-/Nutzfläche ' + zahl(p.flaeche) + ' m²)</td><td style="text-align:right;padding-top:8px;border-top:1px solid var(--hub-line,#E0DBD3)"><span class="gp-zahl" style="font-size:22px">' + eurT(p.endpreis) + '</span></td></tr></table>'
+          + ((st.preisliste || {}).vorlaeufig ? '<p class="gp-herk">Preise nach der Preisliste von Junker Immobilien (Stand ' + esc(((st.preisliste || {}).stand || '').split('-').reverse().join('.')) + ').</p>' : '')
+          + (p.individuell_moeglich ? '<p class="gp-herk">' + esc((st.preisliste || {}).hinweis_individuell || '') + '</p>' : '')
+          + (((st.preisliste || {}).mengenrabatt || []).length ? '<p class="gp-herk">Mengenrabatt bei mehreren Objekten in einem Auftrag: ' + st.preisliste.mengenrabatt.slice().reverse().map(function (m) { return 'ab ' + m.ab + ' → ' + m.pct + ' %'; }).join(', ')
+            + ' (Beauftragung binnen zwei Wochen) – bitte bei ' + esc(st.ueber || 'Junker Immobilien') + ' anfragen.</p>' : '');
+      }).catch(function (e) { var box = el('gp-preis'); if (box) box.textContent = A().neutral(e.message); });
+    }, 250);
+  }
+
   function zeichnen(inhalt, liste) {
     var a = A(), alle = [];
     st.reiterListe = reiterBauen(st.art, a.felder(st.def));
@@ -264,17 +329,17 @@
       html += '<div class="gp-reiter" data-reiter="' + ri + '"' + (ri ? ' hidden' : '') + '>';
       if (ri === 0) html += listeHtml(liste);
       r.liste.forEach(function (g) {
+        if (!g.fields.some(function (f) { return !vomServer(A().feldPfad(f)); })) return;
         html += '<section class="rnd-hub-karte"><h3 class="rnd-hub-h">' + N(g.label) + '</h3>'
           + (g.description ? '<p class="gp-herk">' + N(g.description) + '</p>' : '') + '<div class="rnd-wiz-grid rnd-hub-felder">';
-        g.fields.forEach(function (f) { html += feldHtml(f, alle.length); alle.push(Object.assign(f, { _reiter: ri })); });
+        g.fields.forEach(function (f) { if (vomServer(A().feldPfad(f))) return; html += feldHtml(f, alle.length); alle.push(Object.assign(f, { _reiter: ri })); });
         html += '</div></section>';
       });
       if (r.letzter) {
-        html += '<section class="rnd-hub-karte">'
-          + (st.art === 'lite'
-            ? '<div class="gp-kosten">Die Ersteinschätzung ist <b>kostenlos</b>. ' + MARKE + ' schickt das Ergebnis zusätzlich an die angegebene E-Mail-Adresse. Eine Ersteinschätzung ist kein Gutachten.</div>'
-            : '<label class="gp-kosten gp-pflicht" id="gp-kosten"><input type="checkbox" id="gp-kosten-ok"> <b>Kostenpflichtiger Auftrag.</b> Mit „Beauftragen“ beauftragst du bei ' + MARKE + ' ein Restnutzungsdauer-Gutachten. '
-              + 'Das Gutachten stellt ' + MARKE + ' gesondert in Rechnung. Ich habe das verstanden und möchte beauftragen.</label>')
+        html += (st.art === 'lite'
+          ? '<section class="rnd-hub-karte"><h3 class="rnd-hub-h">Ersteinschätzung</h3><div class="gp-kosten">Die Ersteinschätzung ist <b>kostenlos</b>. Sie wird über ' + esc(st.ueber || 'Junker Immobilien')
+            + ' bei ' + MARKE + ' angefragt; das Ergebnis erscheint hier in wenigen Sekunden. Eine Ersteinschätzung ist kein Gutachten.</div>'
+          : bestellungHtml())
           + '<div id="gp-allgemein" class="gp-fehler" style="margin-top:8px"></div><div id="gp-ergebnis" style="margin-top:10px"></div></section>';
       }
       html += '</div>';
@@ -284,10 +349,13 @@
 
     var vor = a.vorbelegenMitHerkunft(st.def, objektDaten(), nutzerDaten());
     st.herkunft = vor.herkunft;
-    var merk = merkenLesen();
+    var vorl = st.vorlage || {};
     alle.forEach(function (f, i) {
       var p = a.feldPfad(f), w = a.holen(vor.data, p);
-      if (w === undefined && /^requester\./.test(p) && !/accept/.test(p)) { w = a.holen(merk, p); if (w !== undefined) st.herkunft[p] = { quelle: 'zuletzt eingegeben', art: 'konto' }; }
+      /* v3590 · aus der Ersteinschaetzung uebernommen (dieselben Angaben, ggf. dort korrigiert) */
+      var pv = p === 'construction.hasRenovations' ? 'renovation.hasRenovations' : p === 'construction.renovationsYearOfRenovations' ? 'renovation.year' : p === 'construction.renovationsExplainRenovations' ? 'renovation.description' : p;
+      var wv = a.holen(vorl, pv);
+      if (wv !== undefined && wv !== '' && !(typeof wv === 'object' && !Array.isArray(wv))) { w = wv; st.herkunft[p] = { quelle: 'Ersteinschätzung', art: 'konto' }; }
       if (w !== undefined) eingabeSetzen(f, i, w);
       var h = st.herkunft[p], box = document.querySelector('#gp-overlay [data-i="' + i + '"] [data-herk]');
       if (h && box) box.textContent = HERK_TEXT[h.art] || '';
@@ -304,6 +372,14 @@
     var be = el('gp-entwurf'); be.hidden = st.art !== 'voll'; be.onclick = function () { senden(false); };
     inhalt.querySelectorAll('[data-gp="stand"]').forEach(function (b) { b.onclick = function () { standAbrufen(b.closest('.gp-zeile').getAttribute('data-rid'), b); }; });
     inhalt.querySelectorAll('[data-gp="uebernehmen"]').forEach(function (b) { b.onclick = function () { uebernehmen(b.getAttribute('data-rnd'), b.getAttribute('data-datum')); }; });
+    if (st.art === 'voll') {
+      var nu = nutzerDaten(), mk = {};
+      try { mk = JSON.parse(localStorage.getItem(MERK_KUNDE) || '{}') || {}; } catch (e) {}
+      var vorK = { firma: nu.firma, vorname: nu.vorname, nachname: nu.nachname, strasse: nu.str, hnr: nu.hnr, plz: nu.plz, ort: nu.ort, email: nu.email, telefon: nu.telefon };
+      KUNDE.forEach(function (k) { var e = el('gp-k-' + k[0]); if (e) e.value = mk[k[0]] || vorK[k[0]] || ''; });
+      ['gp-bes', 'gp-express', 'gp-code'].forEach(function (id) { var e = el(id); if (e) { e.addEventListener('change', preisRechnen); e.addEventListener('input', preisRechnen); } });
+      preisRechnen();
+    }
     aktualisieren(); aktualisieren();
     reiterZeigen(0);
   }
@@ -327,7 +403,7 @@
       leiste.appendChild(b);
     });
     el('gp-balken').style.width = (max ? st.reiter / max * 100 : 100) + '%';
-    el('gp-sub').textContent = 'Schritt ' + (st.reiter + 1) + ': ' + L[st.reiter].titel + ' · mit unserem Partner ' + MARKE;
+    el('gp-sub').textContent = 'Schritt ' + (st.reiter + 1) + ': ' + L[st.reiter].titel + ' · Gutachten durch ' + MARKE + ', beauftragt über ' + (st.ueber || 'Junker Immobilien');
     el('gp-zurueck').style.visibility = st.reiter > 0 ? 'visible' : 'hidden';
     /* v3581 · nach dem Ergebnis heisst der Knopf „Schließen“ — ein zweiter Klick legte sonst eine zweite Anfrage an */
     el('gp-weiter').textContent = st.reiter < max ? 'Weiter →' : (st.fertig ? 'Schließen' : (st.art === 'lite' ? 'Ersteinschätzung anfordern' : 'Kostenpflichtig beauftragen'));
@@ -337,6 +413,7 @@
   function offeneJeReiter() {
     var o = (st.reiterListe || []).map(function () { return 0; });
     (st.felder || []).forEach(function (f, i) { var b = document.querySelector('#gp-overlay [data-i="' + i + '"]'); if (b && b.classList.contains('gp-fehlt')) o[f._reiter]++; });
+    if (st.art === 'voll' && o.length) o[o.length - 1] += document.querySelectorAll('#gp-overlay [data-kunde].gp-fehlt, #gp-overlay [data-zust].gp-fehlt').length;
     return o;
   }
   function zaehlerSetzen(offen) {
@@ -393,6 +470,13 @@
       box.classList.toggle('gp-fehlt', muss);
       var t = box.querySelector('[data-fehlt]'); if (t) { t.hidden = !muss; t.textContent = f.inputType === 'checkbox' ? 'bitte bestätigen' : 'fehlt – bitte ergänzen'; }
     });
+    /* v3590 · Bestellung: Rechnungsangaben und Zustimmungen zaehlen im letzten Reiter */
+    if (st.art === 'voll') {
+      KUNDE.forEach(function (k) { var box = document.querySelector('#gp-overlay [data-kunde="' + k[0] + '"]'); if (!box) return; var leer = !String((el('gp-k-' + k[0]) || {}).value || '').trim();
+        var muss = !!KUNDE_PFLICHT[k[0]] && leer; box.classList.toggle('gp-fehlt', muss); var t = box.querySelector('[data-fehlt]'); if (t) t.hidden = !muss; });
+      ['daten', 'widerruf', 'kosten'].forEach(function (k) { var box = document.querySelector('#gp-overlay [data-zust="' + k + '"]'); if (box) box.classList.toggle('gp-fehlt', !(el('gp-z-' + k) || {}).checked); });
+      preisRechnen();
+    }
     if (st.reiterListe && el('gp-zaehler')) zaehlerSetzen(offeneJeReiter());
   }
 
@@ -455,14 +539,46 @@
     return auftraege.reduce(function (p, fn) { return p.then(fn); }, Promise.resolve());
   }
 
-  function senden(absenden) {
+  /* v3590 · Gutachten: Entwurf und Auftrag ueber POST /auftraege (Preis, Kunde, Zustimmungen); Dateien nach dem Entwurf */
+  function auftragSenden(beauftragen) {
     var knopf = el('gp-weiter'), ent = el('gp-entwurf');
-    if (absenden && st.art === 'voll' && !(el('gp-kosten-ok') && el('gp-kosten-ok').checked)) {
+    var z = zustimmungenLesen();
+    if (beauftragen && !(z.daten && z.widerruf && z.kosten)) { reiterZeigen(st.reiterListe.length - 1); fehlerZeigen({ message: 'Bitte unten die drei Bestätigungen setzen.' }); return; }
+    if (!z.daten) { reiterZeigen(st.reiterListe.length - 1); fehlerZeigen({ message: 'Ohne deine Zustimmung zur Übermittlung können wir den Auftrag nicht speichern.' }); return; }
+    var data = lesen(), kunde = kundeLesen();
+    try { localStorage.setItem(MERK_KUNDE, JSON.stringify(kunde)); } catch (e) {}
+    [knopf, ent].forEach(function (b) { if (b) b.disabled = true; });
+    var alt = knopf.textContent; knopf.textContent = beauftragen ? 'wird beauftragt …' : 'wird gespeichert …';
+    var hatDateien = st.felder.some(function (f) { var s = el('gp-f' + st.felder.indexOf(f)), d = el('gp-f' + st.felder.indexOf(f) + '-datei'); return f.inputType === 'file' && ((s && s.value) || (d && d.files && d.files[0])); });
+    var body = function (b) { return { objekt_id: objektId(), data: data, kunde: kunde, auswahl: auswahlLesen(), zustimmungen: z, request_id: st.rid, beauftragen: b }; };
+    var schritt1 = (hatDateien || !beauftragen) ? api('/auftraege', { method: 'POST', body: body(false) }) : null;
+    var p = schritt1 ? schritt1.then(function (r) { st.rid = r.auftrag.request_id; return beauftragen ? dateienHochladen().then(function () { return api('/auftraege', { method: 'POST', body: body(true) }); }) : r; })
+      : api('/auftraege', { method: 'POST', body: body(true) });
+    p.then(function (r) {
+      st.rid = r.auftrag.request_id;
+      fehlerZeigen(null);
+      var a = r.auftrag || {};
+      if (a.status === 'beauftragt' || a.status === 'bestellt') st.fertig = true;
       reiterZeigen(st.reiterListe.length - 1);
-      fehlerZeigen({ message: 'Bitte zuerst bestätigen, dass ein kostenpflichtiger Auftrag entsteht.' }); return;
-    }
+      el('gp-ergebnis').innerHTML = '<div class="gp-erg"><div class="gp-herk" style="text-transform:uppercase;letter-spacing:1.4px;font-weight:600">' + ({ beauftragt: 'Beauftragt', bestellt: 'Bestellt' }[a.status] || 'Entwurf gespeichert')
+        + (a.request_number ? ' · Nr. ' + esc(a.request_number) : '') + '</div><div class="gp-zahl" style="font-size:22px;margin:4px 0">' + eurT(a.preis && a.preis.endpreis) + '</div>'
+        + '<p class="gp-herk" style="margin:0">' + (a.status === 'beauftragt' || a.status === 'bestellt' ? 'Junker Immobilien hat deine Bestellung erhalten und gibt sie an ' + MARKE + ' weiter. Die Rechnung kommt nach Erhalt des Gutachtens.' : 'Du kannst den Entwurf später beauftragen.') + '</p></div>';
+      el('gp-ergebnis').scrollIntoView({ block: 'center', behavior: 'smooth' });
+    }).catch(function (e) {
+      if (e && e.data && e.data.request_id) st.rid = e.data.request_id;
+      fehlerZeigen(e);
+      (e && e.data && e.data.felder || []).forEach(function (x) {
+        var m = /^kunde\.(\w+)$/.exec(x.path) || /^zustimmung\.(\w+)$/.exec(x.path);
+        var box = m && document.querySelector('#gp-overlay [data-kunde="' + m[1] + '"], #gp-overlay [data-zust="' + m[1] + '"]');
+        if (box) { box.querySelector('.gp-fehler').textContent = x.message; reiterZeigen(st.reiterListe.length - 1); }
+      });
+    }).then(function () { [knopf, ent].forEach(function (b) { if (b) b.disabled = false; }); knopf.textContent = st.fertig ? 'Schließen' : alt; });
+  }
+
+  function senden(absenden) {
+    if (st.art === 'voll') return auftragSenden(absenden);
+    var knopf = el('gp-weiter'), ent = el('gp-entwurf');
     var data = lesen();
-    merkenSchreiben(data);
     [knopf, ent].forEach(function (b) { if (b) b.disabled = true; });
     var alt = knopf.textContent; knopf.textContent = st.art === 'lite' ? 'wird eingeschätzt …' : 'wird gesendet …';
     var t0 = Date.now();
@@ -484,6 +600,7 @@
       });
     }).then(function (r) {
       fehlerZeigen(null);
+      st.gesendet = data;
       ergebnisZeigen(r && r.anfrage, absenden, Date.now() - t0);
     }).catch(function (e) {
       if (e && e.data && e.data.request_id) st.rid = e.data.request_id;
@@ -500,7 +617,9 @@
       + '<div style="display:flex;gap:32px;flex-wrap:wrap;margin:6px 0 8px"><div><div class="gp-zahl">' + zahl(r.finalAverageRUL) + ' Jahre</div><div class="gp-herk">voraussichtliche Restnutzungsdauer' + (r.finalRangeRUL ? ' (Spanne ' + esc(r.finalRangeRUL) + ' Jahre)' : '') + '</div></div>'
       + (unsere ? '<div><div class="gp-zahl">' + zahl(unsere, 2) + ' %</div><div class="gp-herk">jährliche AfA (100 ÷ ' + zahl(Math.round(r.finalAverageRUL)) + ' Jahre)' + (abw ? ' · ' + MARKE + ' nennt ' + zahl(partner, 2) + ' %' : '') + '</div></div>' : '') + '</div>'
       + '<p class="gp-herk" style="margin:0 0 10px">Ersteinschätzung, kein Gutachten. Für einen eigenen AfA-Satz verlangt das Finanzamt ein Gutachten.</p>'
-      + '<button type="button" class="gp-knopf gp-primaer" id="gp-uebernehmen">Als Restnutzungsdauer übernehmen</button></div>';
+      + '<div style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="gp-knopf" id="gp-uebernehmen">Als Restnutzungsdauer übernehmen</button>'
+      + '<button type="button" class="gp-knopf gp-primaer" id="gp-zum-gutachten">Gutachten beauftragen →</button></div>'
+      + '<p class="gp-herk" style="margin:8px 0 0">Das Gutachten erstellt ' + MARKE + ', beauftragt über ' + esc(st.ueber || 'Junker Immobilien') + ' – Festpreis nach Wohnfläche, Preis vor dem Absenden.</p></div>';
   }
   function ergebnisZeigen(a, abgesendet, ms) {
     var box = el('gp-ergebnis'); if (!box || !a) return;
@@ -511,6 +630,7 @@
       if (r.finalAverageRUL) {
         box.innerHTML = ergebnisKarte(a, a.dauer_ms || ms);
         el('gp-uebernehmen').onclick = function () { uebernehmen(r.finalAverageRUL, datum(a.updated_at || new Date())); };
+        el('gp-zum-gutachten').onclick = function () { oeffnen('voll', { vorlage: st.gesendet || {} }); };
       } else {
         box.innerHTML = '<div class="gp-erg"><div class="gp-herk">Anfrage gestellt' + (a.request_number ? ' · Nr. ' + esc(a.request_number) : '') + '</div>'
           + '<div id="gp-warte">Die Ersteinschätzung liegt bei ' + MARKE + ' bereit und wird abgerufen …</div>'
