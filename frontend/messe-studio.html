@@ -212,7 +212,9 @@ body.mit-tafel #tafel{display:flex;flex-direction:column;gap:18px}
   REIHE.p3 = Object.assign({}, PR, { nr: '3', messe: 'partner-senden', titel: 'Objekte senden und übernehmen', unter: 'Vom Kunden ins Cockpit, und als eigenes Objekt weiter.',
             spruch: 'Fracht übergeben —', spruch2: 'sicher gelandet.', weiter: 'Partner 4 · Anmerkungen und Rückmeldung' });
   REIHE.p4 = Object.assign({}, PR, { nr: '4', messe: 'partner-anmerkungen', titel: 'Anmerkungen und Rückmeldung', unter: 'Felder markieren, zurückgeben, und was der Kunde sieht.',
-            spruch: 'Funkspruch angekommen —', spruch2: 'gemeinsam auf Kurs.', weiter: '' });
+            spruch: 'Funkspruch angekommen —', spruch2: 'gemeinsam auf Kurs.', weiter: 'Partner 5 · Objekt an Kunden übergeben' });
+  REIHE.p5 = Object.assign({}, PR, { nr: '5', messe: 'partner-uebergeben', titel: 'Objekt an Kunden übergeben', unter: 'Dein durchgerechnetes Objekt per E-Mail, der Kunde bekommt eine Kopie.',
+            spruch: 'Übergabe an den Kunden —', spruch2: 'sein Objekt, deine Marke.', weiter: '' });   /* v3500 */
   REIHE.ue1 = REIHE['01'];   /* v2370 · Alias */
   var MODUL = P.get('modul'), M = null;
   if (MODUL && REIHE[MODUL]) M = REIHE[MODUL];

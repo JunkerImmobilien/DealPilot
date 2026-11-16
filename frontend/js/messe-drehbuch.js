@@ -9613,7 +9613,7 @@
     }
     /* der Testadressen-Hinweis im Toast gehört zur Demo, nicht zum Ablauf */
     if (typeof window.toast === 'function' && !window.toast._pd) {
-      var alt = window.toast, neu = function (t) { return alt.call(this, String(t == null ? '' : t).replace(/\s*Testadresse, keine E-Mail verschickt\./, '')); };
+      var alt = window.toast, neu = function (t) { return alt.call(this, String(t == null ? '' : t).replace(/\s*Testadresse, keine E-Mail verschickt\./, '').replace(/\s*\(Testadresse - keine Mail\)/, '')); };   /* v3500 · auch bei der Übergabe */
       neu._pd = true; neu._alt = alt; window.toast = neu;
     }
   }
@@ -10100,6 +10100,71 @@
         await zeige(z, 6);
         var st = (/Stand (\d+)/.exec(pdText(z())) || [])[1];
         await b2oZeile(s, 'Der Kreis schließt sich', 'Unter Freigegeben liegt ' + (st ? '<b>Stand ' + st + '</b>' : 'der neue Stand') + '. Prüfen, anmerken, zurückgeben, bis es passt.');
+      }
+    ]
+  };
+
+  /* ── P5 · Objekt an Kunden übergeben (v3500, Marcel 16.11.2026: Knopf wieder einbauen und Video) ──
+     Die Übergabe geht ECHT an eine Testadresse (.test, nie SMTP) und reserviert einen Platz;
+     tools/partner-demo-anlegen.js räumt offene Übergaben und Reservierungen beim nächsten Lauf ab. */
+  DREHBUECHER['partner-uebergeben'] = {
+    titel: 'Objekt an Kunden übergeben', unterzeile: 'Dein durchgerechnetes Objekt per E-Mail, der Kunde bekommt eine Kopie', objekt: null,
+    abspann: [{ ms: 6200, html: ABSPANN_LOGO }],
+    aufraeumen: function () { pdAufraeumen(); },
+    szenen: [
+      async function (s) {   /* 1 · das eigene Objekt */
+        await pdPruefen(s);
+        try { if (document.documentElement.hasAttribute('data-pk-offen')) DpPartnerKunden.cockpitSchliessen(); } catch (e) {}
+        await pdObjektLaden(/Gohliser/);
+        await zeige(function () { return q('#hdr-obj') || qs('header.hdr'); }, 8);
+        await b2oZeile(s, 'Dein Objekt', 'Du hast <b>' + (wert('str') ? wert('str') + ' ' + wert('hnr') + ', ' + wert('ort') : 'ein Objekt') + '</b> für einen Interessenten durchgerechnet. Jetzt soll er es selbst ansehen können.');
+      },
+      async function (s) {   /* 2 · Reiter Übergeben */
+        await pdCockpit('uebersicht');
+        await pdReiterKlick('uebergeben');
+        await warteAuf(function () { return q('#rp-ub-obj'); }, 9000); await warte(600);
+        await zeige(function () { return pdReiter('uebergeben'); }, 6);
+        await b2oZeile(s, 'Übergeben', 'Im Partner-Cockpit gibt es dafür den Reiter <b>Übergeben</b>.');
+        var ob = function () { var e = q('#rp-ub-obj'); return e && (e.closest('.rp-panel') || e); };
+        await zeige(function () { var e = q('#rp-ub-obj'); return e; }, 8);
+        var o = q('#rp-ub-obj'), t = o && o.options[o.selectedIndex] ? o.options[o.selectedIndex].textContent : '';
+        await b2oZeile(s, 'Welches Objekt', 'Vorgewählt ist das geöffnete Objekt' + (t ? ': <b>' + t.replace(/\s*\(gerade geöffnet\)/, '') + '</b>' : '') + '. Jedes eigene Objekt geht.');
+      },
+      async function (s) {   /* 3 · Adresse, Name, Satz */
+        var em = q('#rp-ub-email');
+        await zeige(function () { var e = q('#rp-ub-email'); return e && e.closest('.rp-row'); }, 8);
+        await pdTippe(em, 'markus.lehmann@nordlicht-demo.dealpilot.test', 30);
+        await pdTippe(q('#rp-ub-name'), 'Markus Lehmann', 45);
+        await b2oZeile(s, 'An wen', 'E-Mail-Adresse und Name für die Anrede. DealPilot prüft sofort, ob das schon dein Kunde ist.');
+        await warteAuf(function () { var v = q('#rp-ub-vp'); return v && /\S/.test(pdText(v)) ? v : null; }, 6000); await warte(500);
+        await zeige(function () { var v = q('#rp-ub-vp'); var p = q('#rp-ub-platz-wrap'); return (p && p.offsetWidth ? p.parentElement : v); }, 8);
+        var vp = pdText(q('#rp-ub-vp')).replace(/^●\s*/, '');
+        var mitPlatz = q('#rp-ub-platz-wrap') && q('#rp-ub-platz-wrap').offsetWidth;
+        await b2oZeile(s, 'Die Vorprüfung', (vp ? '<b>' + vp + '</b> ' : '') + (mitPlatz ? 'Mit <b>Kundenplatz mitschicken</b> ist sein Zugang sofort frei. Der Platz wird beim Senden reserviert.' : ''));
+        await zeige(function () { return q('#rp-ub-satz'); }, 8);
+        await pdTippe(q('#rp-ub-satz'), 'Wie besprochen, schau dir die Zahlen in Ruhe an. Viele Grüße, Lena', 32);
+        await b2oZeile(s, 'Ein persönlicher Satz', 'Er steht in der E-Mail, die in deiner Marke ankommt, mit Score und den wichtigsten Kennzahlen des Objekts.');
+      },
+      async function (s) {   /* 4 · senden */
+        var sb = function () { return q('#rp-ub-send'); };
+        await zeige(sb, 8); await warte(500);
+        if (sb()) sb().click();
+        await warteAuf(function () { var w = qs('.main-col .pk-ueberg-form'); return w && /markus\.lehmann/i.test(pdText(w)) && q('#rp-ub-obj') ? w : null; }, 12000);
+        await warte(1200);
+        var z = function () { var w = qs('.main-col .pk-ueberg-form'); return w && [].filter.call(w.querySelectorAll('.rp-share'), function (x) { return /markus\.lehmann/i.test(pdText(x)); })[0]; };
+        var z0 = z(); if (z0) { var sx = scroller(z0); if (sx && sx !== document.scrollingElement) { sx.scrollTop += rect(z0).top - 300; await warte(500); } }
+        await zeige(z, 8);
+        var st = z() ? pdText(z().querySelector('.rp-bg:last-of-type')) : '';
+        await b2oZeile(s, 'Unterwegs', 'Die Übergabe steht in der Liste' + (st ? ' mit Status <b>' + st.toLowerCase() + '</b>' : '') + (z() && /RESERVIERT/i.test(pdText(z())) ? ', ein Platz ist für ihn reserviert' : '') + '. Hier siehst du später, ob er sie geöffnet und übernommen hat.');
+      },
+      async function (s) {   /* 5 · was der Kunde bekommt */
+        var z = function () { var w = qs('.main-col .pk-ueberg-form'); return w && [].filter.call(w.querySelectorAll('.rp-share'), function (x) { return /markus\.lehmann/i.test(pdText(x)); })[0]; };
+        await zeige(z, 8);
+        await b2oZeile(s, 'Beim Kunden', 'Markus öffnet den Link aus der E-Mail, legt sein Konto an und findet eine <b>Kopie</b> des Objekts in seinem DealPilot. Dein Original bleibt bei dir.');
+        var wd = function () { var x = z(); return x && x.querySelector('[data-uw]'); };
+        if (wd()) { await zeige(wd, 10); await b2oZeile(s, 'Widerrufen', 'Bis er übernimmt, kannst du die Übergabe widerrufen. Der Link gilt 30 Tage und nur einmal, der Platz wird dann wieder frei.'); }
+        await zeige(function () { return qs('#dppk-tabzeile'); }, 6);
+        await b2oZeile(s, 'Gute Reise', 'So wird aus deiner Beratung ein Objekt im Konto deines Kunden, in deiner Marke.');
       }
     ]
   };
