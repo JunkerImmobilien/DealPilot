@@ -157,6 +157,29 @@ console.log('A · E-Mail bei Rueckmeldung (v3460)');
   ok('Migration 107: mail_rueckmeldung boolean NOT NULL DEFAULT true, idempotent', /ADD COLUMN IF NOT EXISTS mail_rueckmeldung boolean NOT NULL DEFAULT true/.test(m107));
 }
 
+/* ── v3491 · Kundenstand beim Partner: jeder Speicherweg still gesperrt ──────────────────────────────
+   Gemessen 16.11.2026: beim Oeffnen eines Kundenstands zeigte die App „Fehler beim Speichern:
+   kundenstand_schreibgeschuetzt“. Das Sofort-Speichern beim Laden lief, bevor partner-kunden.js die
+   Sperre (_dppkKundenstand) setzte. Geprueft wird die ECHTE Funktion aus storage.js. */
+{
+  console.log('A · v3491 Kundenstand still schreibgeschuetzt');
+  const st = fs.readFileSync(path.join(WURZEL, 'frontend/js/storage.js'), 'utf8').replace(/\r\n/g, '\n');
+  const fn = st.slice(st.indexOf('function _dpIstKundenstand()'), st.indexOf('window._dpIstKundenstand = _dpIstKundenstand;'));
+  const fall = (win) => { const c = { window: win }; vm.runInNewContext(fn + '\nthis.r = _dpIstKundenstand();', c); return c.r; };
+  ok('Kundenstand am Datenblob (Sperre noch nicht gesetzt, Laden) → gesperrt', fall({ _currentObjData: { _kundenstand: { share_id: 's1' } } }) === true);
+  ok('Sperre gesetzt (_dppkKundenstand) → gesperrt', fall({ _dppkKundenstand: { share_id: 's1' }, _currentObjData: {} }) === true);
+  ok('eigenes Objekt → nicht gesperrt', fall({ _currentObjData: { str: 'Musterweg' } }) === false);
+  ok('kein Objekt geladen → nicht gesperrt', fall({}) === false);
+  const kopf = st.slice(st.indexOf('async function saveObj(opts) {'), st.indexOf('async function saveObj(opts) {') + 160);
+  ok('saveObj prueft die Sperre als erstes, ohne Meldung', /opts = opts \|\| \{\};\n  if \(_dpIstKundenstand\(\)\) return null;/.test(kopf));
+  const i = st.indexOf("toast('⚠ Fehler beim Speichern: ' + err.message);");
+  ok('409 kundenstand_schreibgeschuetzt wird nie als Fehler gezeigt', i > 0 && /kundenstand_schreibgeschuetzt\/\.test\([^\n]*\)\) return null;[^\n]*\n\s*$/.test(st.slice(i - 400, i)));
+  const an = fs.readFileSync(path.join(WURZEL, 'frontend/js/ankauf-ansicht.js'), 'utf8');
+  ok('Ankauf-Stand speichern: Kundenstand still uebersprungen, keine Erfolgsmeldung', /if \(d\._kundenstand\) return false;/.test(an) && /if \(r === false\) return false;/.test(an));
+  const idx = fs.readFileSync(path.join(WURZEL, 'frontend/index.html'), 'utf8');
+  ok('Buster storage.js und ankauf-ansicht.js auf v3491', /js\/storage\.js\?v=v3491"/.test(idx) && /js\/ankauf-ansicht\.js\?v=v3491"/.test(idx));
+}
+
 if (process.argv.includes('--live')) {
   console.log('B · live auf Staging');
   const SERVER = 'root@116.203.214.11';

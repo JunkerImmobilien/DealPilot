@@ -124,11 +124,13 @@
     _sollLaeuft = Auth.apiCall('/objects/' + key, { method: 'GET' })
       .then(function (obj) {
         var d = (obj && obj.data) || {};
+        if (d._kundenstand) return false;   /* v3491 · Kundenstand beim Partner: still nicht speichern */
         d._ankauf = a;
         return Auth.apiCall('/objects/' + key, { method: 'PUT',
           body: { data: d, aiAnalysis: obj.ai_analysis || null, photos: obj.photos || [] } });
       })
-      .then(function () {
+      .then(function (r) {
+        if (r === false) return false;   /* v3491 · Kundenstand */
         if (typeof toast === 'function') toast('✓ Ankauf-Stand gespeichert — Korrektur mit Nachweis. Das Ist ist unverändert.');
         return true;
       })

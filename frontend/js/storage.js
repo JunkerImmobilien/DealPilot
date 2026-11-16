@@ -1037,8 +1037,18 @@ function _dpKonfliktZeigen(k) {
   } catch (e) {}
 }
 
+/* v3491 · Kundenstand (Kopie eines Kundenobjekts beim Partner) ist schreibgeschuetzt: der Server antwortet
+   409 kundenstand_schreibgeschuetzt. partner-kunden.js setzt _dppkKundenstand erst NACH dem Laden; das
+   Sofort-Speichern beim Laden lief vorher durch und zeigte „Fehler beim Speichern“ (gemessen 16.11.2026).
+   Deshalb hier am Datenblob selbst pruefen - gilt fuer jeden Weg, der saveObj ruft. */
+function _dpIstKundenstand() {
+  try { var d = window._currentObjData; return !!(window._dppkKundenstand || (d && d._kundenstand)); } catch (e) { return false; }
+}
+window._dpIstKundenstand = _dpIstKundenstand;
+
 async function saveObj(opts) {
   opts = opts || {};
+  if (_dpIstKundenstand()) return null;   /* v3491 · Kundenstand: still nichts speichern */
   /* v1268-kontext: Mit welchem Objekt hat dieser Save angefangen? Zwischen
      hier und collectData() liegt mindestens ein await (_checkObjIdConflict
      holt die Objektliste vom Server). In dieser Luecke kann newObj den
@@ -1358,6 +1368,7 @@ async function saveObj(opts) {
       invalidateRenderCache();
       await renderSaved({forceFresh: true, _immediate: true}); if(typeof updateSidebarPortfolio==='function') updateSidebarPortfolio();
     } catch (err) {
+      if (err && /kundenstand_schreibgeschuetzt/.test(String(err.message || '') + ' ' + String(err.data && (err.data.error || err.data.message) || ''))) return null;   /* v3491 · nie als Fehler zeigen */
       toast('⚠ Fehler beim Speichern: ' + err.message);
     }
   } else {
