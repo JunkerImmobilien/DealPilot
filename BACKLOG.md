@@ -36,12 +36,13 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
-### N168 · Partner-Videos und Pilot-Analyse-Videos (Marcel 16.11.2026) — **vier Partner-Videos aufgenommen (stumm, v3490/v3491/v3497 auf Staging), Rest offen**
-- Fertig: Demo-Partner „Nordlicht Immobilienberatung“ (erfunden, `tools/partner-demo-anlegen.js`, bleibt dauerhaft stehen, stellt bei jedem Lauf den Aufnahme-Zustand her), Drehbücher `partner-cockpit`, `partner-kunden`, `partner-senden`, `partner-anmerkungen`, Studio `?modul=p1…p4`, Videos und `videos.json` in `Dateien/Messe/Videos/Partner/`.
-- Offen (Frage an Marcel): Vertonung. Bisher Sprecher onyx (OpenAI-TTS, kostet je Video wenige Cent) bzw. Marcels Stimmklon (ElevenLabs/Higgsfield, kostet Guthaben). Zeitmarken je Zeile liegen bei (`zeitmarken-p1…p4.json`).
-- Offen (Frage an Marcel): „Objekt an Kunden übergeben“ (v3317) hat seit dem Cockpit (v3392) keinen Knopf mehr – `DealPilotResellerPortal.uebergeben` ruft niemand auf. Wieder einbauen (z. B. Aktionen im eigenen Objekt) oder fallen lassen?
-- Offen: Videos mit Pilot-Analyse neu aufnehmen (alle vor v3420 aufgenommen, Liste in Wissen 16.11.). Voraussetzung: Drehbücher finden ihre Objekte über die Anschrift statt über feste Kennungen, Lauf in einem Kopie-Konto (z. B. `app-bilder@landing-bilder.dealpilot.test`), nicht in info@.
-- Offen: Videothek eintragen (`node tools/partner-videos-eintragen.mjs --schreiben`, Landing-Agent).
+### N168 · Partner-Videos und Pilot-Analyse-Videos (Marcel 16.11.2026) — **fünf Partner-Videos, Übergeben-Reiter (v3500), Videoreihe-Konto (v3502), Module 11/14/26/27/29 und Parkstraße neu aufgenommen; Rest offen**
+- Fertig: Demo-Partner Nordlicht (`tools/partner-demo-anlegen.js`), Partner-Videos 1–5 (stumm, onyx, Marcel 2–5), Videothek Reihe „Für Partner“ (Marcel-Fassung 2–5, 1 noch onyx der früheren Aufnahme), Reiter Übergeben im Cockpit, `tools/videoreihe-konto-anlegen.js`, Neuaufnahmen 11/14/26/27/29 mit onyx, Parkstraße.
+- Offen: Partner-Video 1 Zeile 07 mit Marcels Stimme neu sprechen (Text in `texte-marcel-p1.json`, Nr. 07: „… hier für 5 Plätze 95 € je Monat (19 € je Platz). Plätze kommen zum Partner-Plan dazu …“). Die gelieferte 07 sagt 99 € und passt nicht zum Bild (95 € = 5 Plätze × 19 €, der Partner-Plan 99 € ist ein anderer Preis). Danach `node marcel-mischen.mjs p1`, Videothek P1 auf Marcel.
+- Offen: Marcel-Fassungen der Neuaufnahmen 11/14/26/27/29 (Texte bereit: `Dateien/Messe/Videos/Videoreihe-Marcel/TEXTE-BEREIT-v3502.md`), danach Videothek-Dateien dieser Module tauschen.
+- Offen: Spots „Das Haus hab ich.“ A/B und Webinar Lindenallee im Kopie-Konto nicht sauber (Marktberichte hängen am Original, heutige Lindenallee ohne Pilot-Analyse) – alte Fassungen bleiben. Entscheidung: Berichte in der mb-DB mitkopieren oder je Objekt einmal echt abrufen (Kosten).
+- Offen: Bank-PDF Seite Wertpotenzial (Fortsetzung) zeigt Ertragswert je Stufe als Striche im Videoreihe-Konto – Ursache messen (Bericht Stufe 3 fehlt an der Kopie?).
+- Offen: Komplettbeispiel MFH (Überblick 3) – Neuaufnahme läuft/geprüft siehe Journal.
 
 ### N167 · Partnerseite der Landing mit Strecke und Reihe „Für Partner“ in der Videothek (Marcel 16.11.2026) — **landing-partner-1/-1a (`53dc7e7e`, `5f920212`) und v3490 (`842de190`) auf Staging nachgemessen; Abnahme der Optik durch Marcel, dann Prod**
 - Ansehen: https://staging.dealpilot.immo/partner.html (Strecke unter „So läuft es ab“), Startseite Abschnitt „Für Partner“, https://staging.dealpilot.immo/videothek.html#reihe-partner.
