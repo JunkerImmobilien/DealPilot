@@ -545,6 +545,13 @@
     var z = zustimmungenLesen();
     if (beauftragen && !(z.daten && z.widerruf && z.kosten)) { reiterZeigen(st.reiterListe.length - 1); fehlerZeigen({ message: 'Bitte unten die drei Bestätigungen setzen.' }); return; }
     if (!z.daten) { reiterZeigen(st.reiterListe.length - 1); fehlerZeigen({ message: 'Ohne deine Zustimmung zur Übermittlung können wir den Auftrag nicht speichern.' }); return; }
+    /* v3591 · gemessen: ein Auftrag mit 13 offenen Pflichtangaben ging als „bestellt“ durch - der Entwurf beim
+       Partner nimmt Luecken an, das Absenden dort scheitert spaeter. Beauftragen erst, wenn alles gefuellt ist. */
+    if (beauftragen) {
+      var offen = offeneJeReiter(), erster = offen.findIndex(function (n) { return n > 0; });
+      if (erster >= 0) { reiterZeigen(erster); fehlerZeigen(null); var al = el('gp-allgemein'); if (al) al.textContent = ''; 
+        var zz = el('gp-zaehler'); if (zz) zz.textContent = 'Bitte zuerst alle Pflichtangaben füllen (' + offen.reduce(function (x, y) { return x + y; }, 0) + ' offen) – „Entwurf speichern“ geht jederzeit.'; return; }
+    }
     var data = lesen(), kunde = kundeLesen();
     try { localStorage.setItem(MERK_KUNDE, JSON.stringify(kunde)); } catch (e) {}
     [knopf, ent].forEach(function (b) { if (b) b.disabled = true; });

@@ -293,6 +293,7 @@ pruefe('Vereinbarung: noAssessment, postPay, Besichtigung → addonService, kein
 Object.keys(AG).forEach((k) => { if (envAlt[k] === undefined) delete process.env['GUTACHTEN_AUFTRAGGEBER_' + k]; else process.env['GUTACHTEN_AUFTRAGGEBER_' + k] = envAlt[k]; });
 pruefe('Backend überschreibt requester/agreement (mitAuftraggeber) bei Anlegen, Ändern, Direktweg und Auftrag', (route.match(/mitAuftraggeber\(/g) || []).length >= 4 && route.includes("if (art === 'voll') d.agreement = ga.vereinbarungFuerPartner"));
 pruefe('Kundendaten nur mit Zustimmung, Pflichtangaben geprüft, Preis im Backend gerechnet', route.includes("if (z.daten !== true)") && route.includes('kundePruefen(kunde)') && route.includes('ga.preisBerechnen(Object.assign('));
+pruefe('UI: Beauftragen erst ohne offene Pflichtangaben (Entwurf jederzeit)', ui.includes('Bitte zuerst alle Pflichtangaben füllen') && ui.includes('var offen = offeneJeReiter(), erster'));
 pruefe('UI: Kundenfelder statt requester-Feldern, requester/agreement vom Server', ui.includes('function vomServer(p)') && ui.includes('Meine Angaben dürfen zur Beauftragung an Junker Solution und den beauftragten Gutachter übermittelt werden'));
 const altApp = process.env.APP_URL, altMail = process.env.GUTACHTEN_AUFTRAG_MAIL;
 process.env.APP_URL = 'https://app.staging.dealpilot.immo'; delete process.env.GUTACHTEN_AUFTRAG_MAIL;
