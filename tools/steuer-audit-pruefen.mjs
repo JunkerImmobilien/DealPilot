@@ -490,6 +490,7 @@ if (process.argv.includes('--live')) {
   const idxN = fs.readFileSync(path.join(ROOT, 'frontend/index.html'), 'utf8'), sto = js('storage.js'), dokN = js('dp-dokumente.js'), kpaN = js('pdf-kaufpreisaufteilung.js');
   ok(/id="kpa_kosten"/.test(idxN) && /'kpa_kosten'/.test(sto.slice(sto.indexOf('var FIELDS'), sto.indexOf('var FIELDS') + 20000)), 'N Feld kpa_kosten im Formular und in FIELDS (wird gespeichert)');
   ok(/zahlAus\('kpa_kosten'\)/.test(dokN) && /num\('kpa_kosten'\)/.test(kpaN), 'N beide Kaufpreisaufteilungs-PDFs zeigen die Kosten gesondert');
+  ok(/if \(!\$\('bmf_art'\)\) \{ try \{ console\.warn\('\[bmf\] runBmf ohne Fenster/.test(bm) && bm.indexOf("if (!$('bmf_art'))") < bm.indexOf('var _fehlt = '), 'N runBmf rechnet nicht ohne Fenster (Grundstuecksart und Miete stehen nur dort)');
   ok(!/kpa_kosten/.test(bm) && !/kpa_kosten/.test(js('bmf-bodenabschlag.js')) && !/kpa_kosten/.test(pip), 'N kpa_kosten geht nicht in die Summe der Arbeitshilfe (runBmf, Reiter 5, Pipeline)');
   if (process.argv.includes('--live')) {
     const { execFileSync } = createRequire(import.meta.url)('node:child_process');

@@ -592,6 +592,11 @@ function loadDemo(key){
 }
 
 function runBmf(){
+  /* v3510 · OHNE FENSTER KEIN LAUF. Gemessen 16.11.2026 (Andersenweg, Fenster nie geladen, weil der Plan
+     noch nicht da war): runBmf rechnete trotzdem - Grundstuecksart fiel auf „Wohnungseigentum [WE]",
+     Miete 0, Ertragswert -42.676 EUR, Gebaeudeanteil 64,53 % statt 58,45 %, und das PDF druckte es.
+     Grundstuecksart und Miete stehen NUR im Fenster; fehlt es, rechnet das Verfahren halb. */
+  if (!$('bmf_art')) { try { console.warn('[bmf] runBmf ohne Fenster - kein Lauf'); } catch (e) {} return; }
   // V289.2: Echter Backend-Call statt Mock
   // V289.2.5 Issue #5/6: Lage aus echten DealPilot-Feldern (plz/ort/str/hnr) statt ak_plz/etc.
   //                       + _lastBmfInputs persistieren für XLSX-Download
