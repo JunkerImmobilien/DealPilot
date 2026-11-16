@@ -482,27 +482,26 @@ if (process.argv.includes('--live')) {
   const pip = fs.readFileSync(path.join(ROOT, 'backend/src/services/bmfPipelineService.js'), 'utf8');
   const v292 = js('bmf-modal-v292.js'), bm = js('bmf-modal.js');
   ok(/garagen: parseInt\(objekt\.garagen, 10\)/.test(pip) && /\{ wohneinheiten: n \}/.test(pip), 'N Pipeline (_phase4_bmf) gibt Garagen und Wohneinheiten an die Arbeitshilfe');
-  const erg = js('bmf-pipeline-ergaenzung.js'), idx0 = fs.readFileSync(path.join(ROOT, 'frontend/index.html'), 'utf8');
-  ok(!/v3510|v3511|kpa_kosten|_dpErgaenzt/.test(v292), 'N bmf-modal-v292.js unberuehrt (Nicht anfassen, Marcel 16.11.: „lass es raus")');
-  ok(idx0.indexOf('js/bmf-pipeline-ergaenzung.js') > idx0.indexOf('js/bmf-modal-v292.js') && idx0.indexOf('js/bmf-modal-v292.js') > 0, 'N Huelle bmf-pipeline-ergaenzung.js laedt nach bmf-modal-v292.js');
+  const idx0 = fs.readFileSync(path.join(ROOT, 'frontend/index.html'), 'utf8');
+  ok(v292.length > 40000 && /window\._v292CollectInputs = function\(\)\{/.test(v292) && /js\/bmf-modal-v292\.js\?v=/.test(idx0) && !/bmf-pipeline-ergaenzung/.test(idx0) && !fs.existsSync(path.join(ROOT, 'frontend/js/bmf-pipeline-ergaenzung.js')),
+    'N bmf-modal-v292.js vorhanden und geladen, keine Huelle mehr (v3512, Freigabe Marcel)');
   {
-    /* Huelle am echten Code: Original-Sammler + DOM-Attrappe, Argumente durchgereicht */
-    const dom = { garagen: '6', einheiten: '6', kpa_kosten: '549,00', kpa_kosten_art: 'ank' };
-    const ctx = { document: { getElementById: (id) => (id in dom ? { value: dom[id] } : null) }, console };
+    /* Sammelfunktion am echten Code: DOM-Attrappe, liefert garagen/einheiten/kpa_kosten_e */
+    const dom = { garagen: '6', einheiten: '6', kpa_kosten: '549,00', kpa_kosten_art: 'ank', kp: '390.000', wfl: '339,91', baujahr: '1973', plz: '32429', ort: 'Minden', str: 'Andersenweg', hnr: '3' };
+    const leer = { value: '', checked: false, textContent: '', style: {}, classList: { add() {}, remove() {}, contains() { return false; } }, addEventListener() {}, querySelector() { return null; }, querySelectorAll() { return []; }, appendChild() {}, setAttribute() {} };
+    const doc = { getElementById: (id) => (id in dom ? Object.assign({}, leer, { value: dom[id] }) : null), querySelector: () => null, querySelectorAll: () => [], addEventListener() {}, createElement: () => Object.assign({}, leer), body: Object.assign({}, leer), readyState: 'complete' };
+    const ctx = { document: doc, console: { log() {}, warn() {}, error() {} }, setTimeout: () => 0, clearTimeout() {}, fetch: () => new Promise(() => {}), localStorage: { getItem: () => null, setItem() {} } };
     ctx.window = ctx; vm.createContext(ctx);
-    let gesehen = null;
-    ctx._v292CollectInputs = function () { gesehen = [].slice.call(arguments); return { phase1_inputs: { objekt: { wfl: 1 }, investition: { kp_brutto: 1 } } }; };
-    vm.runInContext(js('kpa-kosten.js'), ctx); vm.runInContext(erg, ctx);
-    const r1 = ctx._v292CollectInputs('a', 2).phase1_inputs;
-    ok(r1.objekt.garagen === 6 && r1.objekt.einheiten === 6 && r1.investition.kpa_kosten_e === 549 && gesehen && gesehen.length === 2,
-      'N Huelle ergaenzt Garagen 6, Einheiten 6, KPA-Kosten 549 und reicht die Argumente weiter');
+    vm.runInContext(js('kpa-kosten.js'), ctx);
+    let r1 = null;
+    try { vm.runInContext(v292, ctx); r1 = ctx._v292CollectInputs().phase1_inputs; } catch (e) { r1 = { fehler: e.message }; }
+    ok(r1 && r1.objekt && r1.objekt.garagen === 6 && r1.objekt.einheiten === 6 && r1.investition.kpa_kosten_e === 549,
+      'N Sammelfunktion (bmf-modal-v292.js) liefert Garagen 6, Einheiten 6, KPA-Kosten 549' + (r1 && r1.fehler ? ' (' + r1.fehler + ')' : ''));
     dom.kpa_kosten_art = 'sofort';
     ok(ctx._v292CollectInputs().phase1_inputs.investition.kpa_kosten_e === 0, 'N „sofort abziehbar": KPA-Kosten nicht in die Pipeline-Nebenkosten');
     dom.kpa_kosten_art = '';
     const k = ctx.DpKpaKosten();
     ok(k.ank === 549 && k.sofort === 0 && k.art === 'ank', 'N ohne Einordnung gilt „Anschaffungsnebenkosten" (Vorgabe, Marcel 16.11.)');
-    vm.runInContext(erg, ctx);
-    ok(ctx._v292CollectInputs._dpErgaenzt === true, 'N Huelle legt sich bei Doppel-Laden nicht doppelt');
   }
   ok((bm.match(/garagen: \(parseInt/g) || []).length >= 2 && (bm.match(/wohneinheiten: \(function/g) || []).length >= 2, 'N runBmf und XLSX-Lauf (bmf-modal.js) schicken beide Felder (v3345)');
   const rx = /Mietwohngrundst\|gemischt genutzt\/\.test\(art\) && !\/\^Teileigentum\/\.test\(art\)/;

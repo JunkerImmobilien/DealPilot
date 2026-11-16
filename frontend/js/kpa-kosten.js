@@ -9,7 +9,7 @@
  *   sofort gesondert, sofort abziehbar (nach dem Kauf nur zur AfA-Ermittlung beauftragt): Werbungskosten
  *          im Kaufjahr (tax.js verw_sonst), nicht in den Anschaffungskosten
  * Leser: calc.js (AfA-Basis), bmf-modal.js (runBmf, Summe Anschaffungskosten), bmf-bodenabschlag.js,
- * bmf-pipeline-ergaenzung.js (Pipeline), tax.js (Kaufjahr), beide Kaufpreisaufteilungs-PDFs. */
+ * bmf-modal-v292.js (Pipeline, investition.kpa_kosten_e), tax.js (Kaufjahr), beide Kaufpreisaufteilungs-PDFs. */
 (function () {
   'use strict';
   function wert(id) { var e = document.getElementById(id); return e ? String(e.value == null ? '' : e.value).trim() : ''; }

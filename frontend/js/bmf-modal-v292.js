@@ -119,7 +119,10 @@
       makler_e:   _parseDe(_v('makler_e')),
       ji_sonst_e: _parseDe(_v('ji_e')),
       gs_kosten_ak: (window.State && State.gs_kosten_ak) || 0,   /* v3006d: Grundschuld aus der Pipeline-AfA-Basis (calc.js v3006) */
-      kaufdat:    _v('kaufdat')
+      kaufdat:    _v('kaufdat'),
+      /* v3512 · Kosten der Kaufpreisaufteilung als Anschaffungsnebenkosten (js/kpa-kosten.js; 0 bei „sofort
+         abziehbar"). Marcel 16.11.2026: „mit dem Kauf verbundene Kosten ... die KPA kommt ja in den Kaufvertrag" */
+      kpa_kosten_e: window.DpKpaKosten ? DpKpaKosten().ank : 0
     };
 
     // Objekt (Tab Objekt)
@@ -171,7 +174,14 @@
       mod_waermedaemmung: _v('mod_daemm') || 'nein',
       mod_baeder:         _v('mod_bad')   || 'nein',
       mod_innenausbau:    _v('mod_innen') || 'nein',
-      mod_grundriss:      _v('mod_grdr')  || 'nein'
+      mod_grundriss:      _v('mod_grdr')  || 'nein',
+      /* v3512 · GARAGEN UND WOHNEINHEITEN FEHLTEN IN DER PIPELINE (Freigabe Marcel 16.11.2026: „setz das um
+         wie es muss" - zwei Eingabefelder, kein Umbau). v3345 hatte sie nur in runBmf (/bmf/aufteilung, KPA
+         G13/G42). Gemessen 16.11.2026, Andersenweg 3 (MFH, 6 WE, 6 Garagen), Vorlage Maerz 2026: ohne beide
+         61,25 %, mit beiden 58,45 % - zwei Aufteilungen im selben Fenster. Wohneinheiten filtert das Backend
+         (_phase4_bmf) nach Objektart wie runBmf. */
+      garagen:    parseInt(_v('garagen'), 10) > 0 ? parseInt(_v('garagen'), 10) : 0,
+      einheiten:  parseInt(_v('einheiten'), 10) > 0 ? parseInt(_v('einheiten'), 10) : 0
     };
 
     // Miete (Tab Miete)

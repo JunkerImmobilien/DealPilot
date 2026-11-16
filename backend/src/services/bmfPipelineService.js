@@ -169,7 +169,7 @@ function _phase3_prognoseAk(inputs, phase2) {
   const makler   = Number(investition.makler_e) || 0;
   const ji_sonst = Number(investition.ji_sonst_e) || 0;
   /* v3511 · Kosten der Kaufpreisaufteilung als Anschaffungsnebenkosten (Marcel 16.11.2026: „mit dem Kauf
-     verbundene Kosten ... die KPA kommt ja in den Kaufvertrag"). Kommt aus bmf-pipeline-ergaenzung.js,
+     verbundene Kosten ... die KPA kommt ja in den Kaufvertrag"). Kommt aus bmf-modal-v292.js (investition.kpa_kosten_e),
      ist 0, wenn das Objekt sie als sofort abziehbar fuehrt. */
   const kpa = Number(investition.kpa_kosten_e) || 0;
 
