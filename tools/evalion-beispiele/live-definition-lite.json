@@ -1,0 +1,1685 @@
+{
+ "status": "success",
+ "data": {
+  "metadata": {
+   "formType": "remaining-useful-life-lite",
+   "schemaVersion": 1,
+   "revision": "2026-10-14.1",
+   "publishedAt": "2026-10-14T00:00:00.000Z",
+   "locale": "de",
+   "capabilities": [
+    "partialUpdates",
+    "files",
+    "submit",
+    "resultView",
+    "synchronousInitialAssessmentResult"
+   ],
+   "submission": {
+    "resultMode": "synchronous",
+    "resultType": "remaining-useful-life-initial-assessment"
+   }
+  },
+  "schema": {
+   "$schema": "https://json-schema.org/draft/2020-12/schema",
+   "type": "object",
+   "additionalProperties": false,
+   "required": [
+    "requester",
+    "property",
+    "modernizations",
+    "renovation"
+   ],
+   "properties": {
+    "requester": {
+     "type": "object",
+     "additionalProperties": false,
+     "required": [
+      "title",
+      "firstName",
+      "lastName",
+      "address",
+      "phoneNumber",
+      "email",
+      "leadSource",
+      "acceptPrivacy"
+     ],
+     "properties": {
+      "title": {
+       "type": "string",
+       "enum": [
+        "mr",
+        "miss",
+        "company",
+        "other"
+       ]
+      },
+      "companyName": {
+       "type": "string"
+      },
+      "firstName": {
+       "type": "string",
+       "minLength": 1
+      },
+      "lastName": {
+       "type": "string",
+       "minLength": 1
+      },
+      "address": {
+       "type": "object",
+       "additionalProperties": false,
+       "required": [
+        "streetName",
+        "streetNumber",
+        "postalCode",
+        "city",
+        "country"
+       ],
+       "properties": {
+        "streetName": {
+         "type": "string",
+         "minLength": 1
+        },
+        "streetNumber": {
+         "type": "string",
+         "minLength": 1
+        },
+        "postalCode": {
+         "type": "string",
+         "minLength": 1
+        },
+        "city": {
+         "type": "string",
+         "minLength": 1
+        },
+        "country": {
+         "type": "string",
+         "enum": [
+          "AL",
+          "AD",
+          "AM",
+          "AT",
+          "AZ",
+          "BY",
+          "BE",
+          "BA",
+          "BG",
+          "HR",
+          "CY",
+          "CZ",
+          "DK",
+          "EE",
+          "FI",
+          "FR",
+          "GE",
+          "DE",
+          "GR",
+          "HU",
+          "IS",
+          "IE",
+          "IT",
+          "KZ",
+          "XK",
+          "LV",
+          "LI",
+          "LT",
+          "LU",
+          "MT",
+          "MD",
+          "MC",
+          "ME",
+          "NL",
+          "MK",
+          "NO",
+          "PL",
+          "PT",
+          "RO",
+          "RU",
+          "SM",
+          "RS",
+          "SK",
+          "SI",
+          "ES",
+          "SE",
+          "CH",
+          "TR",
+          "UA",
+          "GB",
+          "VA"
+         ]
+        },
+        "latitude": {
+         "type": "number"
+        },
+        "longitude": {
+         "type": "number"
+        },
+        "formattedAddress": {
+         "type": "string"
+        },
+        "geocodingProvider": {
+         "type": "string"
+        },
+        "geocodingProviderId": {
+         "type": "string"
+        },
+        "geocodingMetadata": {
+         "type": "object",
+         "additionalProperties": true
+        },
+        "coordinatesVerifiedAt": {
+         "type": "string"
+        },
+        "locationEntryMode": {
+         "type": "string"
+        }
+       }
+      },
+      "phoneNumber": {
+       "type": "string",
+       "minLength": 1
+      },
+      "email": {
+       "type": "string",
+       "format": "email"
+      },
+      "leadSource": {
+       "type": "string",
+       "enum": [
+        "none",
+        "personalRecommendation",
+        "immocation",
+        "faz",
+        "linkedIn",
+        "socialMedia",
+        "internetSearch",
+        "artificialIntelligence",
+        "other"
+       ]
+      },
+      "leadSourceDetails": {
+       "type": "string"
+      },
+      "acceptPrivacy": {
+       "type": "boolean"
+      },
+      "acceptTerms": {
+       "type": "boolean"
+      }
+     }
+    },
+    "property": {
+     "type": "object",
+     "additionalProperties": false,
+     "required": [
+      "type",
+      "address",
+      "constructionYear"
+     ],
+     "properties": {
+      "type": {
+       "type": "string",
+       "enum": [
+        "apartment",
+        "singleFamilyHouse",
+        "apartmentBuilding",
+        "residentialAndCommercialProperty",
+        "commercialProperty",
+        "other"
+       ]
+      },
+      "description": {
+       "type": "string"
+      },
+      "address": {
+       "type": "object",
+       "additionalProperties": false,
+       "required": [
+        "streetName",
+        "streetNumber",
+        "postalCode",
+        "city",
+        "country"
+       ],
+       "properties": {
+        "streetName": {
+         "type": "string",
+         "minLength": 1
+        },
+        "streetNumber": {
+         "type": "string",
+         "minLength": 1
+        },
+        "postalCode": {
+         "type": "string",
+         "minLength": 1
+        },
+        "city": {
+         "type": "string",
+         "minLength": 1
+        },
+        "country": {
+         "type": "string",
+         "enum": [
+          "AL",
+          "AD",
+          "AM",
+          "AT",
+          "AZ",
+          "BY",
+          "BE",
+          "BA",
+          "BG",
+          "HR",
+          "CY",
+          "CZ",
+          "DK",
+          "EE",
+          "FI",
+          "FR",
+          "GE",
+          "DE",
+          "GR",
+          "HU",
+          "IS",
+          "IE",
+          "IT",
+          "KZ",
+          "XK",
+          "LV",
+          "LI",
+          "LT",
+          "LU",
+          "MT",
+          "MD",
+          "MC",
+          "ME",
+          "NL",
+          "MK",
+          "NO",
+          "PL",
+          "PT",
+          "RO",
+          "RU",
+          "SM",
+          "RS",
+          "SK",
+          "SI",
+          "ES",
+          "SE",
+          "CH",
+          "TR",
+          "UA",
+          "GB",
+          "VA"
+         ]
+        },
+        "latitude": {
+         "type": "number"
+        },
+        "longitude": {
+         "type": "number"
+        },
+        "formattedAddress": {
+         "type": "string"
+        },
+        "geocodingProvider": {
+         "type": "string"
+        },
+        "geocodingProviderId": {
+         "type": "string"
+        },
+        "geocodingMetadata": {
+         "type": "object",
+         "additionalProperties": true
+        },
+        "coordinatesVerifiedAt": {
+         "type": "string"
+        },
+        "locationEntryMode": {
+         "type": "string"
+        }
+       }
+      },
+      "constructionYear": {
+       "type": "integer",
+       "minimum": 1800,
+       "maximum": 2026
+      }
+     },
+     "allOf": [
+      {
+       "if": {
+        "required": [
+         "type"
+        ],
+        "properties": {
+         "type": {
+          "const": "apartment"
+         }
+        }
+       },
+       "then": {
+        "required": [
+         "description"
+        ],
+        "properties": {
+         "description": {
+          "type": "string",
+          "minLength": 1
+         }
+        }
+       }
+      },
+      {
+       "if": {
+        "required": [
+         "type"
+        ],
+        "properties": {
+         "type": {
+          "enum": [
+           "commercialProperty",
+           "other"
+          ]
+         }
+        }
+       },
+       "then": {
+        "required": [
+         "description"
+        ],
+        "properties": {
+         "description": {
+          "type": "string",
+          "enum": [
+           "Büro / Bank / Praxis",
+           "Laden / Geschäftshaus",
+           "Hotel / Gastronomie / Pension",
+           "Lager / Produktion / Werkstatt",
+           "Supermarkt / Autohaus",
+           "Parkhaus / Tiefgarage",
+           "Schule / Kita / Pflegeheim",
+           "Krankenhaus / Klinik",
+           "Sporthalle / Freizeitbad / Heilbad",
+           "Gemeindezentrum / Saalbau / Veranstaltungsgebäude",
+           "Landwirtschaft",
+           "Sonstiges"
+          ]
+         }
+        }
+       }
+      }
+     ]
+    },
+    "modernizations": {
+     "type": "object",
+     "additionalProperties": false,
+     "required": [
+      "roof",
+      "outsideInsulation",
+      "windowsAndExternalDoors",
+      "heatingSystem",
+      "interior",
+      "bathroom",
+      "technicalEquipment",
+      "floorPlan"
+     ],
+     "properties": {
+      "roof": {
+       "type": "string",
+       "enum": [
+        "fiveYears",
+        "fiveToTenYears",
+        "tenToFifteenYears",
+        "fifteenToTwentyYears",
+        "moreThanTwentyYears",
+        "none"
+       ]
+      },
+      "outsideInsulation": {
+       "type": "string",
+       "enum": [
+        "fiveYears",
+        "fiveToTenYears",
+        "tenToFifteenYears",
+        "fifteenToTwentyYears",
+        "moreThanTwentyYears",
+        "none"
+       ]
+      },
+      "windowsAndExternalDoors": {
+       "type": "string",
+       "enum": [
+        "fiveYears",
+        "fiveToTenYears",
+        "tenToFifteenYears",
+        "fifteenToTwentyYears",
+        "moreThanTwentyYears",
+        "none"
+       ]
+      },
+      "heatingSystem": {
+       "type": "string",
+       "enum": [
+        "fiveYears",
+        "fiveToTenYears",
+        "tenToFifteenYears",
+        "fifteenToTwentyYears",
+        "moreThanTwentyYears",
+        "none"
+       ]
+      },
+      "interior": {
+       "type": "string",
+       "enum": [
+        "fiveYears",
+        "fiveToTenYears",
+        "tenToFifteenYears",
+        "fifteenToTwentyYears",
+        "moreThanTwentyYears",
+        "none"
+       ]
+      },
+      "bathroom": {
+       "type": "string",
+       "enum": [
+        "fiveYears",
+        "fiveToTenYears",
+        "tenToFifteenYears",
+        "fifteenToTwentyYears",
+        "moreThanTwentyYears",
+        "none"
+       ]
+      },
+      "technicalEquipment": {
+       "type": "string",
+       "enum": [
+        "fiveYears",
+        "fiveToTenYears",
+        "tenToFifteenYears",
+        "fifteenToTwentyYears",
+        "moreThanTwentyYears",
+        "none"
+       ]
+      },
+      "floorPlan": {
+       "type": "object",
+       "additionalProperties": false,
+       "required": [
+        "age"
+       ],
+       "properties": {
+        "age": {
+         "type": "string",
+         "enum": [
+          "fiveYears",
+          "fiveToTenYears",
+          "tenToFifteenYears",
+          "fifteenToTwentyYears",
+          "moreThanTwentyYears",
+          "none"
+         ]
+        },
+        "scopeOfChanges": {
+         "type": "string",
+         "enum": [
+          "fully",
+          "partly"
+         ]
+        }
+       }
+      },
+      "remarks": {
+       "type": "string"
+      }
+     }
+    },
+    "renovation": {
+     "type": "object",
+     "additionalProperties": false,
+     "required": [
+      "hasRenovations"
+     ],
+     "properties": {
+      "hasRenovations": {
+       "type": "string",
+       "enum": [
+        "yes",
+        "no"
+       ]
+      },
+      "year": {
+       "type": "integer",
+       "minimum": 1800,
+       "maximum": 2026
+      },
+      "description": {
+       "type": "string"
+      }
+     }
+    }
+   }
+  },
+  "ui": {
+   "groups": [
+    {
+     "id": "propertyType",
+     "order": 1,
+     "label": "Objektart",
+     "fields": [
+      {
+       "id": "property.type",
+       "path": "/property/type",
+       "order": 1,
+       "label": "Objektart",
+       "inputType": "select",
+       "options": [
+        {
+         "value": "apartment",
+         "label": "apartment"
+        },
+        {
+         "value": "singleFamilyHouse",
+         "label": "singleFamilyHouse"
+        },
+        {
+         "value": "apartmentBuilding",
+         "label": "apartmentBuilding"
+        },
+        {
+         "value": "residentialAndCommercialProperty",
+         "label": "residentialAndCommercialProperty"
+        },
+        {
+         "value": "commercialProperty",
+         "label": "commercialProperty"
+        },
+        {
+         "value": "other",
+         "label": "other"
+        }
+       ]
+      },
+      {
+       "id": "property.description",
+       "path": "/property/description",
+       "order": 2,
+       "label": "Objektbeschreibung",
+       "inputType": "text",
+       "visibleWhen": {
+        "==": [
+         {
+          "var": "property.type"
+         },
+         "apartment"
+        ]
+       }
+      },
+      {
+       "id": "property.description",
+       "path": "/property/description",
+       "order": 3,
+       "label": "Objektbeschreibung",
+       "inputType": "select",
+       "options": [
+        {
+         "value": "Büro / Bank / Praxis",
+         "label": "Büro / Bank / Praxis"
+        },
+        {
+         "value": "Laden / Geschäftshaus",
+         "label": "Laden / Geschäftshaus"
+        },
+        {
+         "value": "Hotel / Gastronomie / Pension",
+         "label": "Hotel / Gastronomie / Pension"
+        },
+        {
+         "value": "Lager / Produktion / Werkstatt",
+         "label": "Lager / Produktion / Werkstatt"
+        },
+        {
+         "value": "Supermarkt / Autohaus",
+         "label": "Supermarkt / Autohaus"
+        },
+        {
+         "value": "Parkhaus / Tiefgarage",
+         "label": "Parkhaus / Tiefgarage"
+        },
+        {
+         "value": "Schule / Kita / Pflegeheim",
+         "label": "Schule / Kita / Pflegeheim"
+        },
+        {
+         "value": "Krankenhaus / Klinik",
+         "label": "Krankenhaus / Klinik"
+        },
+        {
+         "value": "Sporthalle / Freizeitbad / Heilbad",
+         "label": "Sporthalle / Freizeitbad / Heilbad"
+        },
+        {
+         "value": "Gemeindezentrum / Saalbau / Veranstaltungsgebäude",
+         "label": "Gemeindezentrum / Saalbau / Veranstaltungsgebäude"
+        },
+        {
+         "value": "Landwirtschaft",
+         "label": "Landwirtschaft"
+        },
+        {
+         "value": "Sonstiges",
+         "label": "Sonstiges"
+        }
+       ],
+       "visibleWhen": {
+        "in": [
+         {
+          "var": "property.type"
+         },
+         [
+          "commercialProperty",
+          "other"
+         ]
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "id": "constructionYear",
+     "order": 2,
+     "label": "Baujahr",
+     "fields": [
+      {
+       "id": "property.constructionYear",
+       "path": "/property/constructionYear",
+       "order": 1,
+       "label": "Baujahr",
+       "inputType": "number"
+      }
+     ]
+    },
+    {
+     "id": "modernizations",
+     "order": 3,
+     "label": "Modernisierungen",
+     "fields": [
+      {
+       "id": "modernizations.roof",
+       "path": "/modernizations/roof",
+       "order": 1,
+       "label": "Dach",
+       "inputType": "select",
+       "options": [
+        {
+         "value": "fiveYears",
+         "label": "fiveYears"
+        },
+        {
+         "value": "fiveToTenYears",
+         "label": "fiveToTenYears"
+        },
+        {
+         "value": "tenToFifteenYears",
+         "label": "tenToFifteenYears"
+        },
+        {
+         "value": "fifteenToTwentyYears",
+         "label": "fifteenToTwentyYears"
+        },
+        {
+         "value": "moreThanTwentyYears",
+         "label": "moreThanTwentyYears"
+        },
+        {
+         "value": "none",
+         "label": "none"
+        }
+       ]
+      },
+      {
+       "id": "modernizations.outsideInsulation",
+       "path": "/modernizations/outsideInsulation",
+       "order": 2,
+       "label": "Außendämmung",
+       "inputType": "select",
+       "options": [
+        {
+         "value": "fiveYears",
+         "label": "fiveYears"
+        },
+        {
+         "value": "fiveToTenYears",
+         "label": "fiveToTenYears"
+        },
+        {
+         "value": "tenToFifteenYears",
+         "label": "tenToFifteenYears"
+        },
+        {
+         "value": "fifteenToTwentyYears",
+         "label": "fifteenToTwentyYears"
+        },
+        {
+         "value": "moreThanTwentyYears",
+         "label": "moreThanTwentyYears"
+        },
+        {
+         "value": "none",
+         "label": "none"
+        }
+       ]
+      },
+      {
+       "id": "modernizations.windowsAndExternalDoors",
+       "path": "/modernizations/windowsAndExternalDoors",
+       "order": 3,
+       "label": "Fenster und Außentüren",
+       "inputType": "select",
+       "options": [
+        {
+         "value": "fiveYears",
+         "label": "fiveYears"
+        },
+        {
+         "value": "fiveToTenYears",
+         "label": "fiveToTenYears"
+        },
+        {
+         "value": "tenToFifteenYears",
+         "label": "tenToFifteenYears"
+        },
+        {
+         "value": "fifteenToTwentyYears",
+         "label": "fifteenToTwentyYears"
+        },
+        {
+         "value": "moreThanTwentyYears",
+         "label": "moreThanTwentyYears"
+        },
+        {
+         "value": "none",
+         "label": "none"
+        }
+       ]
+      },
+      {
+       "id": "modernizations.heatingSystem",
+       "path": "/modernizations/heatingSystem",
+       "order": 4,
+       "label": "Heizung",
+       "inputType": "select",
+       "options": [
+        {
+         "value": "fiveYears",
+         "label": "fiveYears"
+        },
+        {
+         "value": "fiveToTenYears",
+         "label": "fiveToTenYears"
+        },
+        {
+         "value": "tenToFifteenYears",
+         "label": "tenToFifteenYears"
+        },
+        {
+         "value": "fifteenToTwentyYears",
+         "label": "fifteenToTwentyYears"
+        },
+        {
+         "value": "moreThanTwentyYears",
+         "label": "moreThanTwentyYears"
+        },
+        {
+         "value": "none",
+         "label": "none"
+        }
+       ]
+      },
+      {
+       "id": "modernizations.interior",
+       "path": "/modernizations/interior",
+       "order": 5,
+       "label": "Innenausbau",
+       "inputType": "select",
+       "options": [
+        {
+         "value": "fiveYears",
+         "label": "fiveYears"
+        },
+        {
+         "value": "fiveToTenYears",
+         "label": "fiveToTenYears"
+        },
+        {
+         "value": "tenToFifteenYears",
+         "label": "tenToFifteenYears"
+        },
+        {
+         "value": "fifteenToTwentyYears",
+         "label": "fifteenToTwentyYears"
+        },
+        {
+         "value": "moreThanTwentyYears",
+         "label": "moreThanTwentyYears"
+        },
+        {
+         "value": "none",
+         "label": "none"
+        }
+       ]
+      },
+      {
+       "id": "modernizations.bathroom",
+       "path": "/modernizations/bathroom",
+       "order": 6,
+       "label": "Bäder",
+       "inputType": "select",
+       "options": [
+        {
+         "value": "fiveYears",
+         "label": "fiveYears"
+        },
+        {
+         "value": "fiveToTenYears",
+         "label": "fiveToTenYears"
+        },
+        {
+         "value": "tenToFifteenYears",
+         "label": "tenToFifteenYears"
+        },
+        {
+         "value": "fifteenToTwentyYears",
+         "label": "fifteenToTwentyYears"
+        },
+        {
+         "value": "moreThanTwentyYears",
+         "label": "moreThanTwentyYears"
+        },
+        {
+         "value": "none",
+         "label": "none"
+        }
+       ]
+      },
+      {
+       "id": "modernizations.technicalEquipment",
+       "path": "/modernizations/technicalEquipment",
+       "order": 7,
+       "label": "Leitungen",
+       "inputType": "select",
+       "options": [
+        {
+         "value": "fiveYears",
+         "label": "fiveYears"
+        },
+        {
+         "value": "fiveToTenYears",
+         "label": "fiveToTenYears"
+        },
+        {
+         "value": "tenToFifteenYears",
+         "label": "tenToFifteenYears"
+        },
+        {
+         "value": "fifteenToTwentyYears",
+         "label": "fifteenToTwentyYears"
+        },
+        {
+         "value": "moreThanTwentyYears",
+         "label": "moreThanTwentyYears"
+        },
+        {
+         "value": "none",
+         "label": "none"
+        }
+       ]
+      },
+      {
+       "id": "modernizations.floorPlan.age",
+       "path": "/modernizations/floorPlan/age",
+       "order": 8,
+       "label": "Grundriss",
+       "inputType": "select",
+       "options": [
+        {
+         "value": "fiveYears",
+         "label": "fiveYears"
+        },
+        {
+         "value": "fiveToTenYears",
+         "label": "fiveToTenYears"
+        },
+        {
+         "value": "tenToFifteenYears",
+         "label": "tenToFifteenYears"
+        },
+        {
+         "value": "fifteenToTwentyYears",
+         "label": "fifteenToTwentyYears"
+        },
+        {
+         "value": "moreThanTwentyYears",
+         "label": "moreThanTwentyYears"
+        },
+        {
+         "value": "none",
+         "label": "none"
+        }
+       ]
+      },
+      {
+       "id": "modernizations.floorPlan.scopeOfChanges",
+       "path": "/modernizations/floorPlan/scopeOfChanges",
+       "order": 9,
+       "label": "Umfang der Grundrissänderung",
+       "inputType": "select",
+       "options": [
+        {
+         "value": "fully",
+         "label": "fully"
+        },
+        {
+         "value": "partly",
+         "label": "partly"
+        }
+       ],
+       "visibleWhen": {
+        "!=": [
+         {
+          "var": "modernizations.floorPlan.age"
+         },
+         "none"
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "id": "renovation",
+     "order": 4,
+     "label": "Kernsanierung",
+     "fields": [
+      {
+       "id": "renovation.hasRenovations",
+       "path": "/renovation/hasRenovations",
+       "order": 1,
+       "label": "Wurde das Objekt kernsaniert?",
+       "inputType": "radio",
+       "options": [
+        {
+         "value": "yes",
+         "label": "yes"
+        },
+        {
+         "value": "no",
+         "label": "no"
+        }
+       ]
+      },
+      {
+       "id": "renovation.year",
+       "path": "/renovation/year",
+       "order": 2,
+       "label": "Jahr der Kernsanierung",
+       "inputType": "number",
+       "visibleWhen": {
+        "==": [
+         {
+          "var": "renovation.hasRenovations"
+         },
+         "yes"
+        ]
+       }
+      },
+      {
+       "id": "renovation.description",
+       "path": "/renovation/description",
+       "order": 3,
+       "label": "Beschreibung der Kernsanierung",
+       "inputType": "textarea"
+      }
+     ]
+    },
+    {
+     "id": "propertyAddress",
+     "order": 5,
+     "label": "Objektadresse",
+     "fields": [
+      {
+       "id": "property.address.streetName",
+       "path": "/property/address/streetName",
+       "order": 1,
+       "label": "Straße",
+       "inputType": "text"
+      },
+      {
+       "id": "property.address.streetNumber",
+       "path": "/property/address/streetNumber",
+       "order": 2,
+       "label": "Hausnummer",
+       "inputType": "text"
+      },
+      {
+       "id": "property.address.postalCode",
+       "path": "/property/address/postalCode",
+       "order": 3,
+       "label": "Postleitzahl",
+       "inputType": "text"
+      },
+      {
+       "id": "property.address.city",
+       "path": "/property/address/city",
+       "order": 4,
+       "label": "Ort",
+       "inputType": "text"
+      },
+      {
+       "id": "property.address.country",
+       "path": "/property/address/country",
+       "order": 5,
+       "label": "Land",
+       "inputType": "select",
+       "options": [
+        {
+         "value": "AL",
+         "label": "AL"
+        },
+        {
+         "value": "AD",
+         "label": "AD"
+        },
+        {
+         "value": "AM",
+         "label": "AM"
+        },
+        {
+         "value": "AT",
+         "label": "AT"
+        },
+        {
+         "value": "AZ",
+         "label": "AZ"
+        },
+        {
+         "value": "BY",
+         "label": "BY"
+        },
+        {
+         "value": "BE",
+         "label": "BE"
+        },
+        {
+         "value": "BA",
+         "label": "BA"
+        },
+        {
+         "value": "BG",
+         "label": "BG"
+        },
+        {
+         "value": "HR",
+         "label": "HR"
+        },
+        {
+         "value": "CY",
+         "label": "CY"
+        },
+        {
+         "value": "CZ",
+         "label": "CZ"
+        },
+        {
+         "value": "DK",
+         "label": "DK"
+        },
+        {
+         "value": "EE",
+         "label": "EE"
+        },
+        {
+         "value": "FI",
+         "label": "FI"
+        },
+        {
+         "value": "FR",
+         "label": "FR"
+        },
+        {
+         "value": "GE",
+         "label": "GE"
+        },
+        {
+         "value": "DE",
+         "label": "DE"
+        },
+        {
+         "value": "GR",
+         "label": "GR"
+        },
+        {
+         "value": "HU",
+         "label": "HU"
+        },
+        {
+         "value": "IS",
+         "label": "IS"
+        },
+        {
+         "value": "IE",
+         "label": "IE"
+        },
+        {
+         "value": "IT",
+         "label": "IT"
+        },
+        {
+         "value": "KZ",
+         "label": "KZ"
+        },
+        {
+         "value": "XK",
+         "label": "XK"
+        },
+        {
+         "value": "LV",
+         "label": "LV"
+        },
+        {
+         "value": "LI",
+         "label": "LI"
+        },
+        {
+         "value": "LT",
+         "label": "LT"
+        },
+        {
+         "value": "LU",
+         "label": "LU"
+        },
+        {
+         "value": "MT",
+         "label": "MT"
+        },
+        {
+         "value": "MD",
+         "label": "MD"
+        },
+        {
+         "value": "MC",
+         "label": "MC"
+        },
+        {
+         "value": "ME",
+         "label": "ME"
+        },
+        {
+         "value": "NL",
+         "label": "NL"
+        },
+        {
+         "value": "MK",
+         "label": "MK"
+        },
+        {
+         "value": "NO",
+         "label": "NO"
+        },
+        {
+         "value": "PL",
+         "label": "PL"
+        },
+        {
+         "value": "PT",
+         "label": "PT"
+        },
+        {
+         "value": "RO",
+         "label": "RO"
+        },
+        {
+         "value": "RU",
+         "label": "RU"
+        },
+        {
+         "value": "SM",
+         "label": "SM"
+        },
+        {
+         "value": "RS",
+         "label": "RS"
+        },
+        {
+         "value": "SK",
+         "label": "SK"
+        },
+        {
+         "value": "SI",
+         "label": "SI"
+        },
+        {
+         "value": "ES",
+         "label": "ES"
+        },
+        {
+         "value": "SE",
+         "label": "SE"
+        },
+        {
+         "value": "CH",
+         "label": "CH"
+        },
+        {
+         "value": "TR",
+         "label": "TR"
+        },
+        {
+         "value": "UA",
+         "label": "UA"
+        },
+        {
+         "value": "GB",
+         "label": "GB"
+        },
+        {
+         "value": "VA",
+         "label": "VA"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "id": "requester",
+     "order": 6,
+     "label": "Kontaktdaten",
+     "fields": [
+      {
+       "id": "requester.title",
+       "path": "/requester/title",
+       "order": 1,
+       "label": "Anrede",
+       "inputType": "select",
+       "options": [
+        {
+         "value": "mr",
+         "label": "mr"
+        },
+        {
+         "value": "miss",
+         "label": "miss"
+        },
+        {
+         "value": "company",
+         "label": "company"
+        },
+        {
+         "value": "other",
+         "label": "other"
+        }
+       ]
+      },
+      {
+       "id": "requester.companyName",
+       "path": "/requester/companyName",
+       "order": 2,
+       "label": "Firmenname",
+       "inputType": "text",
+       "visibleWhen": {
+        "==": [
+         {
+          "var": "requester.title"
+         },
+         "company"
+        ]
+       }
+      },
+      {
+       "id": "requester.firstName",
+       "path": "/requester/firstName",
+       "order": 3,
+       "label": "Vorname",
+       "inputType": "text"
+      },
+      {
+       "id": "requester.lastName",
+       "path": "/requester/lastName",
+       "order": 4,
+       "label": "Nachname",
+       "inputType": "text"
+      },
+      {
+       "id": "requester.address.streetName",
+       "path": "/requester/address/streetName",
+       "order": 5,
+       "label": "Straße",
+       "inputType": "text"
+      },
+      {
+       "id": "requester.address.streetNumber",
+       "path": "/requester/address/streetNumber",
+       "order": 6,
+       "label": "Hausnummer",
+       "inputType": "text"
+      },
+      {
+       "id": "requester.address.postalCode",
+       "path": "/requester/address/postalCode",
+       "order": 7,
+       "label": "Postleitzahl",
+       "inputType": "text"
+      },
+      {
+       "id": "requester.address.city",
+       "path": "/requester/address/city",
+       "order": 8,
+       "label": "Ort",
+       "inputType": "text"
+      },
+      {
+       "id": "requester.address.country",
+       "path": "/requester/address/country",
+       "order": 9,
+       "label": "Land",
+       "inputType": "select",
+       "options": [
+        {
+         "value": "AL",
+         "label": "AL"
+        },
+        {
+         "value": "AD",
+         "label": "AD"
+        },
+        {
+         "value": "AM",
+         "label": "AM"
+        },
+        {
+         "value": "AT",
+         "label": "AT"
+        },
+        {
+         "value": "AZ",
+         "label": "AZ"
+        },
+        {
+         "value": "BY",
+         "label": "BY"
+        },
+        {
+         "value": "BE",
+         "label": "BE"
+        },
+        {
+         "value": "BA",
+         "label": "BA"
+        },
+        {
+         "value": "BG",
+         "label": "BG"
+        },
+        {
+         "value": "HR",
+         "label": "HR"
+        },
+        {
+         "value": "CY",
+         "label": "CY"
+        },
+        {
+         "value": "CZ",
+         "label": "CZ"
+        },
+        {
+         "value": "DK",
+         "label": "DK"
+        },
+        {
+         "value": "EE",
+         "label": "EE"
+        },
+        {
+         "value": "FI",
+         "label": "FI"
+        },
+        {
+         "value": "FR",
+         "label": "FR"
+        },
+        {
+         "value": "GE",
+         "label": "GE"
+        },
+        {
+         "value": "DE",
+         "label": "DE"
+        },
+        {
+         "value": "GR",
+         "label": "GR"
+        },
+        {
+         "value": "HU",
+         "label": "HU"
+        },
+        {
+         "value": "IS",
+         "label": "IS"
+        },
+        {
+         "value": "IE",
+         "label": "IE"
+        },
+        {
+         "value": "IT",
+         "label": "IT"
+        },
+        {
+         "value": "KZ",
+         "label": "KZ"
+        },
+        {
+         "value": "XK",
+         "label": "XK"
+        },
+        {
+         "value": "LV",
+         "label": "LV"
+        },
+        {
+         "value": "LI",
+         "label": "LI"
+        },
+        {
+         "value": "LT",
+         "label": "LT"
+        },
+        {
+         "value": "LU",
+         "label": "LU"
+        },
+        {
+         "value": "MT",
+         "label": "MT"
+        },
+        {
+         "value": "MD",
+         "label": "MD"
+        },
+        {
+         "value": "MC",
+         "label": "MC"
+        },
+        {
+         "value": "ME",
+         "label": "ME"
+        },
+        {
+         "value": "NL",
+         "label": "NL"
+        },
+        {
+         "value": "MK",
+         "label": "MK"
+        },
+        {
+         "value": "NO",
+         "label": "NO"
+        },
+        {
+         "value": "PL",
+         "label": "PL"
+        },
+        {
+         "value": "PT",
+         "label": "PT"
+        },
+        {
+         "value": "RO",
+         "label": "RO"
+        },
+        {
+         "value": "RU",
+         "label": "RU"
+        },
+        {
+         "value": "SM",
+         "label": "SM"
+        },
+        {
+         "value": "RS",
+         "label": "RS"
+        },
+        {
+         "value": "SK",
+         "label": "SK"
+        },
+        {
+         "value": "SI",
+         "label": "SI"
+        },
+        {
+         "value": "ES",
+         "label": "ES"
+        },
+        {
+         "value": "SE",
+         "label": "SE"
+        },
+        {
+         "value": "CH",
+         "label": "CH"
+        },
+        {
+         "value": "TR",
+         "label": "TR"
+        },
+        {
+         "value": "UA",
+         "label": "UA"
+        },
+        {
+         "value": "GB",
+         "label": "GB"
+        },
+        {
+         "value": "VA",
+         "label": "VA"
+        }
+       ]
+      },
+      {
+       "id": "requester.phoneNumber",
+       "path": "/requester/phoneNumber",
+       "order": 10,
+       "label": "Telefonnummer",
+       "inputType": "phone"
+      },
+      {
+       "id": "requester.email",
+       "path": "/requester/email",
+       "order": 11,
+       "label": "E-Mail-Adresse",
+       "inputType": "email"
+      },
+      {
+       "id": "requester.leadSource",
+       "path": "/requester/leadSource",
+       "order": 12,
+       "label": "Wie sind Sie auf uns aufmerksam geworden?",
+       "inputType": "select",
+       "options": [
+        {
+         "value": "none",
+         "label": "none"
+        },
+        {
+         "value": "personalRecommendation",
+         "label": "personalRecommendation"
+        },
+        {
+         "value": "immocation",
+         "label": "immocation"
+        },
+        {
+         "value": "faz",
+         "label": "faz"
+        },
+        {
+         "value": "linkedIn",
+         "label": "linkedIn"
+        },
+        {
+         "value": "socialMedia",
+         "label": "socialMedia"
+        },
+        {
+         "value": "internetSearch",
+         "label": "internetSearch"
+        },
+        {
+         "value": "artificialIntelligence",
+         "label": "artificialIntelligence"
+        },
+        {
+         "value": "other",
+         "label": "other"
+        }
+       ]
+      },
+      {
+       "id": "requester.leadSourceDetails",
+       "path": "/requester/leadSourceDetails",
+       "order": 13,
+       "label": "Details zur Herkunft",
+       "inputType": "text",
+       "visibleWhen": {
+        "==": [
+         {
+          "var": "requester.leadSource"
+         },
+         "other"
+        ]
+       }
+      },
+      {
+       "id": "requester.acceptPrivacy",
+       "path": "/requester/acceptPrivacy",
+       "order": 14,
+       "label": "Datenschutz akzeptieren",
+       "inputType": "checkbox"
+      },
+      {
+       "id": "requester.acceptTerms",
+       "path": "/requester/acceptTerms",
+       "order": 15,
+       "label": "AGB akzeptieren",
+       "inputType": "checkbox"
+      }
+     ]
+    }
+   ]
+  }
+ }
+}

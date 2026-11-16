@@ -166,6 +166,33 @@ async function absenden(req, res, zeile) {
   return res.json({ anfrage: sicht(r.body && r.body.data, neu) });
 }
 
+/* v3570 · Ersteinschaetzung ueber die Direct-RUL-IA-API: Ergebnis sofort (siehe services/evalionClient.js).
+   Die Datenschutz-Zustimmung des Lite-Formulars traegt die Direct-API nicht - sie wird hier verlangt. */
+async function liteDirekt(req, res, objekt, data) {
+  const rq = data.requester || {};
+  if (rq.acceptPrivacy !== true) {
+    return res.status(400).json({ error: 'Bitte den Datenschutz akzeptieren.', code: 'validation_failed',
+      felder: [{ path: 'requester.acceptPrivacy', message: 'Bitte den Datenschutz akzeptieren.' }] });
+  }
+  const idem = ev.idemSchluessel('dp-lite');
+  const r = await ev.api.direkt(ev.liteZuDirekt(data, idem));
+  const d = (r.body && r.body.data) || {};
+  await protokoll(req.user.id, 'direkt', r, d.evalionRequestId);
+  if (!r.ok) {
+    if (r.body && Array.isArray(r.body.errors)) r.body.errors = r.body.errors.map((e) => Object.assign({}, e, { path: ev.pfadVonDirekt(e.path) }));
+    return fehler(res, r);
+  }
+  const k = ev.konfig();
+  const ergebnis = Object.assign({}, d.result || {}, { weg: 'direkt', ms: r.ms });
+  await query('INSERT INTO gutachter_anfragen (user_id, objekt_id, formular, umgebung, request_id, request_number, status, etag, idem_submit, ergebnis) '
+    + 'VALUES ($1,$2,$3,$4,$5,$6,$7,NULL,$8,$9::jsonb) ON CONFLICT (request_id) DO NOTHING',
+    [req.user.id, objekt, ev.FORMULARE.lite, k.umgebung, d.evalionRequestId, d.evalionRequestNumber || null,
+     d.result ? 'initialAssessment' : 'received', idem, JSON.stringify(ergebnis)]);
+  const zeile = await zeileHolen(req.user.id, d.evalionRequestId);
+  return res.status(201).json({ anfrage: Object.assign(sicht({ requestId: d.evalionRequestId, requestNumber: d.evalionRequestNumber,
+    form: { type: ev.FORMULARE.lite }, status: zeile && zeile.status, result: ergebnis }, zeile), { dauer_ms: r.ms }) });
+}
+
 router.post('/anfragen', async (req, res, next) => {
   try {
     const b = req.body || {};
@@ -177,6 +204,7 @@ router.post('/anfragen', async (req, res, next) => {
       if (!o.rowCount) objekt = null;
     }
     const data = b.data && typeof b.data === 'object' && !Array.isArray(b.data) ? b.data : {};
+    if (b.art === 'lite' && b.absenden === true && ev.liteWegDirekt()) return liteDirekt(req, res, objekt, data);
     const r = await ev.api.anlegen(formType, data, ev.idemSchluessel('dp-anlegen'));
     await protokoll(req.user.id, 'anlegen', r, r.body && r.body.data && r.body.data.requestId);
     if (!r.ok) return fehler(res, r);

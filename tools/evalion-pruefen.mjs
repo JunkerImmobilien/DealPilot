@@ -10,7 +10,7 @@
  *      Modernisierungen, visibleWhen, nur sichtbare Felder werden gesendet, Fehler feldgenau.
  *   C  Ohne Konfiguration: konfig() null, Aufruf 503 „nicht_konfiguriert“, die Route prueft
  *      Freigabe und Konfiguration VOR jedem Aufruf beim Partner.
- *   D  --live [--env=Datei] [--anzahl=3] [--voll-absenden]: NUR gegen die TEST-Umgebung
+ *   D  --live [--env=Datei] [--anzahl=1..3] [--formularweg] [--voll-entwurf [--voll-absenden]]: NUR gegen die TEST-Umgebung
  *      (Host mit „staging“): Formular lite + voll abrufen, N Ersteinschaetzungen anlegen und
  *      absenden, einen vollstaendigen Entwurf anlegen (ohne Absenden, ausser --voll-absenden).
  *      Anfragende Person „DealPilot Test“, Testadresse aus dem Demo-Objekt, Mail @example.com.
@@ -138,6 +138,86 @@ pruefe('index.js montiert /api/v1/gutachterpartner', /app\.use\('\/api\/v1\/guta
 const mig = fs.readdirSync(path.join(WURZEL, 'backend/migrations')).filter((f) => /gutachterpartner/.test(f));
 pruefe('Migration gutachter_anfragen/gutachter_aufrufe vorhanden', mig.length === 1 && /gutachter_aufrufe/.test(fs.readFileSync(path.join(WURZEL, 'backend/migrations', mig[0]), 'utf8')));
 
+/* ── E Live-Definitionen (abgelegt 16.11.2026): Deutsch, Vorbelegung, Direktweg ── */
+console.log('E  Live-Definitionen lite + voll (tools/evalion-beispiele/live-definition-*.json)');
+/* Felder, die DealPilot bewusst NICHT vorbelegt — mit Grund. Jedes andere Feld braucht eine Regel. */
+const BEWUSST_LEER = {
+  'property.description': 'nur ETW/Gewerbe, Regel vorhanden (sichtbar je Objektart)',
+  'modernizations.floorPlan.scopeOfChanges': 'Umfang kennt DealPilot nicht',
+  'modernizations.remarks': 'Freitext', 'renovation.year': 'Jahr der Kernsanierung kennt DealPilot nicht', 'renovation.description': 'Freitext',
+  'construction.renovationsYearOfRenovations': 'Jahr kennt DealPilot nicht', 'construction.renovationsExplainRenovations': 'Freitext',
+  'valuation.valuationDateComments': 'Freitext', 'objectDetails.propertyCommercialArea': 'Gewerbefläche führt DealPilot nicht',
+  'objectDetails.propertyMonument': 'Denkmalschutz führt DealPilot nicht (N162)', 'objectDetails.propertyDefectRemarks': 'Freitext',
+  'objectDetails.propertyFeaturesRemarks': 'Freitext', 'objectDetails.propertyDataNotes': 'Freitext',
+  'construction.constructionType': 'Bauweise führt DealPilot nicht', 'construction.innerWalls': 'nicht im Objekt', 'construction.constructionCeilingType': 'nicht im Objekt',
+  'construction.stairs': 'nicht im Objekt', 'construction.constructionWindowFrameType': 'Rahmen nicht im Objekt', 'construction.electricity': 'nicht im Objekt',
+  'construction.energyCertificateFile': 'Datei wählt der Nutzer', 'construction.constructionRemarks': 'Freitext',
+  'owner.ownerDetailsData': 'Personendaten Dritter nie vorbelegt', 'agreement.paymentType': 'Entscheidung des Nutzers',
+  'agreement.addonService': 'Entscheidung des Nutzers (kostet)', 'agreement.taxPlausibilityCheckService': 'Entscheidung des Nutzers (kostet)',
+  'agreement.acceptInitialAssessmentPrivacy': 'Zustimmung nur durch den Nutzer', 'agreement.acceptPrivacy': 'Zustimmung nur durch den Nutzer',
+  'agreement.acceptTerms': 'Zustimmung nur durch den Nutzer', 'agreement.acceptServiceWithdrawalTerms': 'Zustimmung nur durch den Nutzer',
+  'agreement.generalComments': 'Freitext', 'requester.acceptPrivacy': 'Zustimmung nur durch den Nutzer', 'requester.acceptTerms': 'Zustimmung nur durch den Nutzer'
+};
+const OBJ_TEST = { objart: 'MFH', str: 'Ravensberger Weg', hnr: '38', plz: '33719', ort: 'Bielefeld', baujahr: '1978', wfl: '606', einheiten: '8', nhk_geschosse: '1',
+  nhk_dach: '3', eq_floor: 'TEPPICH_LAMINAT', eq_windows: 'ZWEIFACHVERGLASUNG', eq_roof: 'DACHPFANNEN', eq_heating: 'ZENTRALHEIZUNG', eq_bath: 'MIT_FENSTER',
+  eq_guest_wc: 'GAESTE_WC', bad_anz: '8', balkon_flae: '24', inv_pv: '9000', ds2_energie: 'A+', kaufdat: '2020-04-01', eig_struktur: 'allein',
+  mod: { dach: 'Keine/Nie', fenster: '10 - 20 Jahre', leitungen: 'Keine/Nie', heizung: '5 - 10 Jahre', aussenwand: 'Keine/Nie', baeder: '> 20 Jahre', innenausbau: 'Keine/Nie', grundriss: 'Keine/Nie' } };
+const NUTZER_TEST = { vorname: 'DealPilot', nachname: 'Test', email: 'dealpilot-test@example.com', telefon: '+491700000000', firma: 'DealPilot Test', str: 'Musterstraße', hnr: '1', plz: '33602', ort: 'Bielefeld' };
+for (const art of ['lite', 'voll']) {
+  const datei = path.join(WURZEL, 'tools/evalion-beispiele/live-definition-' + art + '.json');
+  if (!fs.existsSync(datei)) { pruefe('Live-Definition ' + art + ' abgelegt', false, datei); continue; }
+  const d = JSON.parse(fs.readFileSync(datei, 'utf8')).data;
+  const engl = [], unbek = [], ohneRegel = [];
+  A.felder(d).forEach((g) => g.fields.forEach((f) => {
+    const p = A.feldPfad(f);
+    A.optionen(f, d.schema).forEach((o) => { const t = A.optionText(p, o); if (t.unbekannt) unbek.push(p + ':' + o.value); if (/^[a-z]+[A-Z][A-Za-z]*$/.test(t.text) || (/^[a-z]+$/.test(t.text) && t.text === o.value)) engl.push(p + ':' + t.text); });
+    if (!BEWUSST_LEER[p] && !A.REGELN.some((r) => r[0].test(p))) ohneRegel.push(p);
+  }));
+  /* Unterfelder der Liste (Eigentuemer) */
+  const items = (A.schemaAn(d.schema, 'owner.ownerDetailsData') || {}).items;
+  if (items) Object.keys(items.properties || {}).forEach((u) => { if (!A.UNTERFELD[u]) ohneRegel.push('owner.ownerDetailsData.' + u + ' (Beschriftung)'); });
+  pruefe(art + ': jede Option hat einen deutschen Text (keine unbekannte)', unbek.length === 0, unbek.join(' '));
+  pruefe(art + ': keine englische Option im UI', engl.length === 0, engl.slice(0, 8).join(' '));
+  pruefe(art + ': jedes Feld hat eine Vorbelege-Regel oder einen Grund, leer zu bleiben', ohneRegel.length === 0, ohneRegel.join(' '));
+  const v = A.vorbelegenMitHerkunft(d, OBJ_TEST, NUTZER_TEST);
+  const erw = { 'property.type': 'apartmentBuilding', 'property.constructionYear': 1978, 'modernizations.windowsAndExternalDoors': 'fifteenToTwentyYears',
+    'modernizations.heatingSystem': 'fiveToTenYears', 'modernizations.bathroom': 'moreThanTwentyYears', 'property.address.postalCode': '33719',
+    'requester.companyName': 'DealPilot Test', 'requester.address.city': 'Bielefeld' };
+  if (art === 'voll') Object.assign(erw, { 'valuation.valuationDate': '2020-04-01', 'objectDetails.propertyArea': 606, 'objectDetails.propertyNumberOfUnits': 8,
+    'objectDetails.propertyNumberOfBathrooms': 8, 'objectDetails.propertyNumberOfFullFloors': 2, 'objectDetails.propertyBasement': 'fullBasement',
+    'construction.constructionGlazingType': ['twoWay'], 'construction.constructionRoofShape': 'flatRoof', 'construction.constructionRoofCovering': 'clayBricks',
+    'construction.constructionHeatingType': 'gasCentral', 'construction.sanitary': ['guestToilet'], 'construction.balcony': 'available',
+    'construction.renewableEnergies': 'photovoltaics', 'construction.energyCertificate': 'available', 'construction.energyEfficiencyClass': 'A',
+    'construction.hasRenovations': 'no', 'owner.ownershipType': 'soleOwner', 'agreement.desiredProducts': 'noAssessment', 'agreement.leadSource': 'other' });
+  else Object.assign(erw, { 'renovation.hasRenovations': 'no', 'requester.leadSource': 'other', 'requester.leadSourceDetails': 'DealPilot' });
+  const ab = Object.keys(erw).filter((p) => JSON.stringify(A.holen(v.data, p)) !== JSON.stringify(erw[p])).map((p) => p + '=' + JSON.stringify(A.holen(v.data, p)) + ' statt ' + JSON.stringify(erw[p]));
+  pruefe(art + ': Vorbelegung aus dem Testobjekt (' + Object.keys(erw).length + ' Felder)', ab.length === 0, ab.join(' · '));
+  pruefe(art + ': Zustimmungen nie vorbelegt', !JSON.stringify(v.data).includes('accept'));
+  pruefe(art + ': jede Vorbelegung trägt ihre Herkunft', Object.keys(v.herkunft).length > 0 && Object.values(v.herkunft).every((h) => h.quelle && /^(objekt|abgeleitet|konto)$/.test(h.art)));
+  const ges = A.sammeln(d, (() => { const w = {}; A.felder(d).forEach((g) => g.fields.forEach((f) => { const p = A.feldPfad(f); const x = A.holen(v.data, p); if (x !== undefined) w[p] = x; })); return w; })());
+  pruefe(art + ': Vorbelegung übersteht sammeln() (Typen, Sichtbarkeit)', ges.property && ges.property.constructionYear === 1978 && (art === 'lite' || (ges.objectDetails && ges.objectDetails.propertyNumberOfUnits === 8)));
+}
+pruefe('Modernisierung: alle sechs Stufen deutsch', ['fiveYears', 'fiveToTenYears', 'tenToFifteenYears', 'fifteenToTwentyYears', 'moreThanTwentyYears', 'none']
+  .every((x) => /^(vor|nie)/.test(A.optionText('modernizations.roof', { value: x, label: x }).text)));
+pruefe('echte deutsche Beschriftung des Partners gewinnt', A.optionText('property.type', { value: 'apartment', label: 'Wohnung' }).text === 'Wohnung');
+pruefe('unbekannter Schlüssel: lesbar, als „weitere Angabe“ markiert', A.optionText('x.y', { value: 'newThing', label: 'newThing' }).text === 'weitere Angabe (new thing)');
+pruefe('Pflichtfeld nach Bedingung (Energieklasse nur mit Ausweis)', (() => { const d = JSON.parse(fs.readFileSync(path.join(WURZEL, 'tools/evalion-beispiele/live-definition-voll.json'), 'utf8')).data;
+  return A.pflicht(d, 'construction.energyEfficiencyClass', { construction: { energyCertificate: 'available' } }) && A.pflicht(d, 'objectDetails.propertyMonument', {}) && !A.pflicht(d, 'valuation.valuationDateComments', {}); })());
+const dir = ev.liteZuDirekt({ property: { type: 'commercialProperty', description: 'Büro / Bank / Praxis', constructionYear: 1984, address: { streetName: 'A', streetNumber: '1', postalCode: '10115', city: 'Berlin', country: 'DE' } },
+  modernizations: { roof: 'none' }, renovation: { hasRenovations: 'no' }, requester: { title: 'company', companyName: 'X', firstName: 'a', lastName: 'b', email: 'e@example.com', phoneNumber: '1', acceptPrivacy: true, leadSource: 'other', address: { city: 'Berlin' } } }, 'k1');
+pruefe('Direktweg: Rumpf nach Direct-API (Adresse flach, requestDetails, Gewerbe-Schlüssel, ohne Formular-Zusätze)', dir.idempotencyKey === 'k1' && dir.property.streetName === 'A' && !dir.property.address
+  && dir.property.description === 'officeBankPractice' && dir.requestDetails.constructionYear === 1984 && dir.requestDetails.modernizations.roof === 'none'
+  && dir.requester.leadSource === undefined && dir.requester.acceptPrivacy === undefined && dir.requester.address.city === 'Berlin', JSON.stringify(dir));
+pruefe('Direktweg: Fehlerpfade zurück ins Formular', ev.pfadVonDirekt('requestDetails.constructionYear') === 'property.constructionYear' && ev.pfadVonDirekt('property.postalCode') === 'property.address.postalCode'
+  && ev.pfadVonDirekt('requestDetails.modernizations.roof') === 'modernizations.roof' && ev.pfadVonDirekt('requester.email') === 'requester.email');
+pruefe('Direktweg: alle zwölf Gewerbe-Beschreibungen haben einen Schlüssel', Object.keys(ev.GEWERBE_SCHLUESSEL).length === 12);
+process.env.EVALION_LITE_WEG = 'formular'; const wegF = ev.liteWegDirekt(); delete process.env.EVALION_LITE_WEG;
+pruefe('Direktweg ist Standard, EVALION_LITE_WEG=formular schaltet zurück', ev.liteWegDirekt() === true && wegF === false);
+pruefe('Route: Ersteinschätzung über den Direktweg, Datenschutz verlangt', /liteWegDirekt\(\)\) return liteDirekt/.test(route) && /acceptPrivacy !== true/.test(route));
+const ui = fs.readFileSync(path.join(WURZEL, 'frontend/js/gutachterpartner.js'), 'utf8');
+pruefe('UI: Fenster aus den Bausteinen der App (global-view-overlay, dpm-shell, DP_BAR, DP_HERO, dpm-btn)', /global-view-overlay/.test(ui) && /dpm-shell/.test(ui) && /DP_BAR/.test(ui) && /DP_HERO/.test(ui) && /dpm-btn primary/.test(ui));
+pruefe('UI: Optionen nur über optionText, Nachladen 3 × 5 s', /optionText\(p, o\)/.test(ui) && /versuch < 3/.test(ui) && /5000/.test(ui));
+
 /* ── D Live gegen die TEST-Umgebung ─────────────────────────────────── */
 if (arg('live')) {
   console.log('D  Live (nur Testumgebung)');
@@ -185,8 +265,20 @@ if (arg('live')) {
       }));
       return data;
     };
-    const n = Math.max(1, Math.min(5, parseInt(arg('anzahl'), 10) || 3));
-    for (let i = 0; i < n; i++) {
+    /* v3570: Standard 1 Anfrage (Testumgebung schonen), ueber den Direktweg wie die App; --formularweg = Form-API */
+    const n = Math.max(1, Math.min(3, parseInt(arg('anzahl'), 10) || 1));
+    for (let i = 0; i < n && !arg('formularweg'); i++) {
+      const fall = faelle[i % faelle.length];
+      const data = ergaenzen(d, A.vorbelegen(d, fall, anfrager));
+      A.setzen(data, 'requester.acceptPrivacy', true);
+      const t0 = Date.now();
+      const r = await ev.api.direkt(ev.liteZuDirekt(data, ev.idemSchluessel('dp-pruef-lite')));
+      const dd = (r.body && r.body.data) || {}, res = dd.result;
+      pruefe('Lite ' + (i + 1) + ' (Direktweg): 201 mit Ergebnis sofort', r.status === 201 && res && res.finalAverageRUL > 0, r.status + ' ' + JSON.stringify(r.body).slice(0, 400));
+      ids.push({ art: 'lite direkt', fall: fall.objart + ' ' + fall.str + ' ' + fall.hnr + ', ' + fall.ort + ', Bj ' + fall.baujahr, requestId: dd.evalionRequestId, nummer: dd.evalionRequestNumber,
+        status: 'Ergebnis nach ' + (Date.now() - t0) + ' ms', rnd: res && res.finalAverageRUL, afa: res && res.annualDepreciation, spanne: res && res.finalRangeRUL });
+    }
+    for (let i = 0; i < n && arg('formularweg'); i++) {
       const fall = faelle[i % faelle.length];
       let data = A.vorbelegen(d, fall, anfrager);
       /* Lite: Adresse und Personendaten vollstaendig (das Doku-Beispiel ist gekuerzt) */
@@ -204,7 +296,7 @@ if (arg('live')) {
       const l = await ev.api.lesen(rid);
       pruefe('Lite ' + (i + 1) + ': Stand lesen (200)', l.ok && l.body.data.requestId === rid, l.status);
     }
-    if (defV.ok) {
+    if (defV.ok && arg('voll-entwurf')) {
       const dv = defV.body.data;
       let data = ergaenzen(dv, A.vorbelegen(dv, faelle[0], anfrager));
       const c = await ev.api.anlegen(ev.FORMULARE.voll, data, ev.idemSchluessel('dp-pruef-voll'));

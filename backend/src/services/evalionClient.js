@@ -149,6 +149,46 @@ function fehlerText(r) {
   return { error: text, code: b.code || null, felder, anbieter_status: r ? r.status : null, anbieter_request: b.requestId || null };
 }
 
+/* ── v3570 · Ersteinschaetzung ueber die Direct-RUL-IA-API ────────────────
+   Gemessen 16.11.2026 an der Testumgebung: die Form-API nimmt die Lite-Anfrage an (submit 200,
+   status initialAssessment, customerStatus initialAssessmentAvailable, allowedActions viewResult),
+   liefert aber das Feld `result` WEDER im Submit NOCH im GET (4 Abrufe ueber 22 s, 26DP04052) —
+   einen eigenen Ergebnis-Endpunkt gibt es nicht (…/result, …/results, …/initial-assessment: 401 der
+   Nutzer-Anmeldung, also keine Partner-Route). Die Schwester-API
+   POST /api/v1/remaining-useful-life/initial-assessment-requests liefert das Ergebnis SOFORT
+   (201 nach 4,1 s, 26DP04053: finalAverageRUL, annualDepreciation, finalRangeRUL, …), und die Form-API
+   liest diese Anfrage danach unter derselben Kennung. Deshalb geht die Ersteinschaetzung (nur sie) diesen
+   Weg; das Formular kommt weiter aus der Form-API. EVALION_LITE_WEG=formular schaltet zurueck. */
+const GEWERBE_SCHLUESSEL = { 'Büro / Bank / Praxis': 'officeBankPractice', 'Laden / Geschäftshaus': 'retailStoreCommercialBuilding',
+  'Hotel / Gastronomie / Pension': 'hotelRestaurantGuesthouse', 'Lager / Produktion / Werkstatt': 'warehouseProductionWorkshop',
+  'Supermarkt / Autohaus': 'supermarketCarDealership', 'Parkhaus / Tiefgarage': 'parkingGarageUndergroundGarage',
+  'Schule / Kita / Pflegeheim': 'schoolDaycareNursingHome', 'Krankenhaus / Klinik': 'hospitalClinic',
+  'Sporthalle / Freizeitbad / Heilbad': 'sportsHallLeisurePoolSpa', 'Gemeindezentrum / Saalbau / Veranstaltungsgebäude': 'communityCenterHallEventBuilding',
+  'Landwirtschaft': 'agriculture', 'Sonstiges': 'other' };
+function liteWegDirekt() { return String(process.env.EVALION_LITE_WEG || 'direkt').trim().toLowerCase() !== 'formular'; }
+/** Daten des Lite-Formulars (Form-API-Form) -> Rumpf der Direct-RUL-IA-API */
+function liteZuDirekt(data, idem) {
+  const d = data || {}, r = d.requester || {}, p = d.property || {}, a = p.address || {};
+  const rq = {};
+  ['title', 'firstName', 'lastName', 'companyName', 'email', 'phoneNumber'].forEach((k) => { if (r[k] != null && r[k] !== '') rq[k] = r[k]; });
+  if (r.address) rq.address = r.address;
+  const pr = { type: p.type };
+  if (p.description != null && p.description !== '') pr.description = (p.type === 'commercialProperty' || p.type === 'other') ? (GEWERBE_SCHLUESSEL[p.description] || p.description) : p.description;
+  ['streetName', 'streetNumber', 'postalCode', 'city', 'country', 'latitude', 'longitude'].forEach((k) => { if (a[k] != null && a[k] !== '') pr[k] = a[k]; });
+  const det = { constructionYear: p.constructionYear };
+  if (d.modernizations) det.modernizations = d.modernizations;
+  if (d.renovation) det.renovation = d.renovation;
+  return { idempotencyKey: idem, requester: rq, property: pr, requestDetails: det };
+}
+/** Fehlerpfad der Direct-API -> Pfad im Lite-Formular */
+function pfadVonDirekt(p) {
+  p = String(p || '');
+  if (p === 'requestDetails.constructionYear') return 'property.constructionYear';
+  let m = p.match(/^requestDetails\.(modernizations|renovation)(\..*)?$/); if (m) return m[1] + (m[2] || '');
+  m = p.match(/^property\.(streetName|streetNumber|postalCode|city|country|latitude|longitude)$/); if (m) return 'property.address.' + m[1];
+  return p;
+}
+
 /* ── die Aufrufe des Vertrags ─────────────────────────────────────────── */
 const P = '/api/v1/partner';
 const enc = encodeURIComponent;
@@ -161,8 +201,9 @@ const api = {
   dateiHochladen: (id, etag, felder, datei, idem) => aufruf('POST', P + '/requests/' + enc(id) + '/files',
     { multipart: { felder, datei }, ifMatch: etag, idempotencyKey: idem }),
   dateiLoeschen: (id, fileId, etag) => aufruf('DELETE', P + '/requests/' + enc(id) + '/files/' + enc(fileId), { ifMatch: etag }),
-  absenden: (id, etag, idem) => aufruf('POST', P + '/requests/' + enc(id) + '/submit', { ifMatch: etag, idempotencyKey: idem })
+  absenden: (id, etag, idem) => aufruf('POST', P + '/requests/' + enc(id) + '/submit', { ifMatch: etag, idempotencyKey: idem }),
+  direkt: (rumpf) => aufruf('POST', '/api/v1/remaining-useful-life/initial-assessment-requests', { json: rumpf })   /* v3570 */
 };
 
 module.exports = { konfig, FORMULARE, LEER_SHA256, sha256Hex, kanonisch, signieren, signaturKoepfe, multipart, idemSchluessel,
-  neutral, fehlerText, aufruf, api };
+  neutral, fehlerText, aufruf, api, liteWegDirekt, liteZuDirekt, pfadVonDirekt, GEWERBE_SCHLUESSEL };
