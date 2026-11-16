@@ -9725,8 +9725,10 @@
         var w = function (re) { var k = [].filter.call(document.querySelectorAll('.main-col [data-v="plaetze"] .pk-kachel'), function (x) { return re.test(pdText(x)); })[0]; return k ? pdText(k.querySelector('b')) : '–'; };
         await b2oZeile(s, 'Plätze', 'Ein Platz ist ein DealPilot-Zugang, den du für einen Kunden bezahlst. Gekauft <b>' + w(/Gekauft/) + '</b>, belegt <b>' + w(/Belegt/) + '</b>, frei <b>' + w(/Frei/) + '</b>.');
         await zeige(function () { return qs('.main-col [data-v="plaetze"] .pk-kauf'); }, 8);
-        var pr = pdText(qs('.main-col [data-v="plaetze"] .pk-preis'));
-        await b2oZeile(s, 'Plätze dazukaufen', 'Monatlich oder jährlich, der Preis steht sofort daneben' + (pr ? ' (<b>' + pr.replace(/(€) (je \w+)/, '$1 $2').replace(/ €/, ' €') + '</b>)' : '') + '. Bezahlt wird über die Kasse, nichts geht ohne deinen Klick.');
+        /* v3491 · Preis und Stückpreis getrennt lesen (zusammen ergab es „95 € je Monat19 € je Platz“) */
+        var pb = qs('.main-col [data-v="plaetze"] .pk-preis'), pk = pb && pb.querySelector('small');
+        var pr = pb ? (pdText(pb).replace(pdText(pk), '').trim() + (pk ? ', ' + pdText(pk) : '')) : '';
+        await b2oZeile(s, 'Plätze dazukaufen', 'Monatlich oder jährlich, der Preis steht sofort daneben' + (pr ? ' (<b>' + pr + '</b>)' : '') + '. Bezahlt wird über die Kasse, nichts geht ohne deinen Klick.');
       },
       async function (s) {   /* 7 · Abrechnung */
         await zeige(function () { return qs('.main-col [data-v="abo"]'); }, 8);
