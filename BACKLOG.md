@@ -36,6 +36,14 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
+### N167 · Partnerseite der Landing mit Strecke und Reihe „Für Partner“ in der Videothek (Marcel 16.11.2026) — **landing-partner-1/-1a (`53dc7e7e`, `5f920212`) und v3490 (`842de190`) auf Staging nachgemessen; Abnahme der Optik durch Marcel, dann Prod**
+- Ansehen: https://staging.dealpilot.immo/partner.html (Strecke unter „So läuft es ab“), Startseite Abschnitt „Für Partner“, https://staging.dealpilot.immo/videothek.html#reihe-partner.
+- Offen: Partner-Videos des Video-Agenten eintragen (`node tools/partner-videos-eintragen.mjs`, Quelle `Dateien/Messe/Videos/Partner/videos.json`), MP4s per scp, Buster ziehen.
+- Offen: Sitemap-Eintrag `partner.html` erst nach Prod (Marker `landing-partner-1:partner`). Prod per Cherry-Pick der Landing-Commits (wie landing-seo), v3490 kommt mit dem nächsten App-Rollout.
+- Offen (Fehler): Toast „Fehler beim Speichern: kundenstand_schreibgeschuetzt“ beim Ansehen eines Kundenstands, ein Speicherweg umgeht `speichernSperren()`.
+- Offen: alte Navigation (`dp2.html`-Links) auf leistungsumfang, fragen, sicherheit, api.
+- Fragen an Marcel: Preis- und Freischalttext („wir schalten Partner persönlich frei“) noch gültig? Zielgruppen-Reihenfolge? Soll die Seite „Partner-Programm“ heißen?
+
 ### N166 · Kanzlei-Mappe: Rest nach v3480/v3481 (Marcel 16.11.2026) — **offen, nur nach Rückfrage**
 - § 23 bei Überführung ohne anschaffungsnahe Sanierung in den fortgeführten AK (P-25/G-18/N-03) – Abgrenzung Erhaltungsaufwand / nachträgliche HK, Vorschlag im Bericht v3480.
 - Eigentumsanteile (`eig_anteil_*`) werden gespeichert, aber nirgends gerechnet (N-02); verbilligte Vermietung (§ 21 Abs. 2) wird gewarnt, nicht eingerechnet.
