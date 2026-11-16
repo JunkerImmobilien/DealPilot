@@ -180,6 +180,8 @@
 .pcard .tag{font:700 9px/1 var(--mono);letter-spacing:.13em;text-transform:uppercase;
   color:var(--mut);margin-bottom:11px}
 .pcard h3{font-size:27px;margin-bottom:12px}
+/* landing-partner-2 · .sec-dark h3 (dp2.css) machte den Kartentitel weiss auf weiss, gemessen auf preise.html und partner.html */
+.sec-dark .pcard h3{color:var(--ink)}
 .pcard .lead{font:500 17px/1.55 var(--ser);color:var(--inkm);margin:0 0 20px}
 .pcard .pr{font:700 40px/1 var(--disp);margin-bottom:3px;font-variant-numeric:tabular-nums}
 .pcard .pr small{font-size:14px;color:var(--mut);font-weight:400}
