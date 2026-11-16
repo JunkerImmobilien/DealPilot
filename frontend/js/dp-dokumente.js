@@ -1026,7 +1026,14 @@
           tab.push([e.corp ? 'Beitrag zum Ergebnis der Gesellschaft (vor Steuern)' : 'Einkünfte aus Vermietung und Verpachtung', B.eurS(e.erg, 2), { art: 'ende', farbe: 1 }]);
           if (!e.corp) {
             if (vl) tab.push(['Veranlagung ' + jahr, vl.kurz, { det: vl.art + ' · ' + vl.kist + ' · ' + vl.quelle }]);   /* v3480 */
-            if (e.s.base_income != null) tab.push(['Zu versteuerndes Einkommen ohne dieses Objekt (Steuerzeitraum ' + jahr + (vl && /Zusammen/.test(vl.kurz) ? ', gemeinsam' : '') + ')', B.eur(num(e.s.base_income), 0)]);
+            if (e.s.base_income != null) {
+              /* v3481 · gespeicherter Satz gegen den HEUTIGEN Steuerzeitraum: wurde Veranlagung oder zvE danach
+                 geaendert, rechnet der Satz mit dem alten Stand - das sagen, statt still zu mischen */
+              var _zq = null; try { _zq = window._dpZveFuerJahr ? window._dpZveFuerJahr(jahr) : null; } catch (eZ) {}
+              var _abw = _zq && _zq.quelle !== 'ersatz' && _zq.zve > 0 && Math.abs(_zq.zve - num(e.s.base_income)) > 1;
+              tab.push(['Zu versteuerndes Einkommen ohne dieses Objekt (Steuerzeitraum ' + jahr + (vl && /Zusammen/.test(vl.kurz) ? ', gemeinsam' : '') + ')', B.eur(num(e.s.base_income), 0),
+                _abw ? { det: 'Der Steuerzeitraum ' + jahr + ' führt heute ' + B.eur(_zq.zve, 0) + '. Der Jahreswert wurde vorher gespeichert – Objekt öffnen und speichern, dann rechnen Steuerwirkung und Grenzsteuersatz mit dem heutigen Stand.' } : {}]);
+            }
             if (e.s.marginal_tax_rate != null) tab.push(['Grenzsteuersatz', B.pct(num(e.s.marginal_tax_rate) * 100, 2)]);
           }
           /* v3480 · Gesellschaft: ein Verlust ist keine Erstattung (N-04) */
@@ -1411,7 +1418,7 @@
     return TYPEN[typ](opt || {});
   }
   window.DpDokumente = {
-    VERSION: 'v3480', TYPEN: Object.keys(TYPEN), dokument: dokument,
+    VERSION: 'v3481a', TYPEN: Object.keys(TYPEN), dokument: dokument,
     oeffnen: function (typ, opt) { return dokument(typ, opt).then(function (h) { D().vorschau(h, typ); }); }
   };
 })();
