@@ -355,3 +355,11 @@
 
 /* landing-loesungen-1 · Sprungziele unter der festen Navigation */
 #partner-plan,#module{scroll-margin-top:96px}
+
+/* landing-partner-1 · Videothek: Platzhalter fuer noch nicht fertige Videos (Reihe „Für Partner“) */
+.vt-geplant{cursor:default;opacity:.92}
+.vt-geplant:hover{transform:none;box-shadow:none;border-color:rgba(255,255,255,.09)}
+.vt-folgt{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:repeating-linear-gradient(135deg,rgba(255,255,255,.035) 0 14px,rgba(255,255,255,0) 14px 28px),#0d0c0a;border-bottom:1px solid rgba(255,255,255,.06)}
+.vt-folgt b{font:700 13px/1 var(--disp);background:var(--runway);color:#14100a;padding:6px 10px}
+.vt-folgt span{font:700 10px/1 var(--mono);letter-spacing:.18em;text-transform:uppercase;color:var(--gdh)}
+#reihe-partner{scroll-margin-top:110px}

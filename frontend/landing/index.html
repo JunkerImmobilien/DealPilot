@@ -60,7 +60,8 @@ if (location.hash === '#forschung') location.replace('forschung.html');</script>
 <link rel="stylesheet" href="dp2-buehne.css?v=v1570">
 <!-- v1588: der Wechselschritt loest den bisherigen Ablauf ab -->
 <!-- landing-videothek-1 · DealPilot live, F&E, Kanzlei-Zeile -->
-<link rel="stylesheet" href="dp2-live.css?v=landing-makler-hub-3">
+<link rel="stylesheet" href="dp2-live.css?v=landing-partner-1">
+<link rel="stylesheet" href="partner.css?v=landing-partner-1"><!-- landing-partner-1 · Abschnitt #fuer-partner -->
 <link rel="stylesheet" href="dp2-module.css?v=landing-module-2">
 <link rel="stylesheet" href="dp2-kern.css?v=landing-kern-2c">
 <link rel="stylesheet" href="dp2-dealcheck.css?v=landing-seo-3">
@@ -128,10 +129,10 @@ if (location.hash === '#forschung') location.replace('forschung.html');</script>
         <li><a href="preise.html#feature-matrix"><svg class="ico si"><use href="#i-ziel"/></svg><span><b>Alles im Vergleich</b><span>Die vollständige Matrix</span></span></a></li>
         <li><a href="preise.html#nachkauf"><svg class="ico si"><use href="#i-blitz"/></svg><span><b>Kontingent nachlegen</b><span>Bewertungen einzeln oder im Paket</span></span></a></li>
       </ul></li>
-    <li><a href="loesungen.html">Für Partner<i class="kar"></i></a>
+    <li><a href="partner.html">Für Partner<i class="kar"></i></a>
       <ul class="sub"><!-- landing-loesungen-1 -->
         <li><a href="loesungen.html"><svg class="ico si"><use href="#i-ziel"/></svg><span><b>Individuelle Lösungen</b><span>Prozesse, Automatisierung, Homepage &amp; iFrame</span></span></a></li>
-        <li><a href="preise.html#partner-plan"><svg class="ico si"><use href="#i-ebenen"/></svg><span><b>Partner &amp; Whitelabel</b><span>DealPilot unter deiner Marke</span></span></a></li>
+        <li><a href="partner.html"><svg class="ico si"><use href="#i-ebenen"/></svg><span><b>Partner-Programm</b><span>Cockpit, eigene Marke und der Ablauf</span></span></a></li><!-- landing-partner-1 -->
         <li><a href="preise.html#module"><svg class="ico si"><use href="#i-code"/></svg><span><b>Module &amp; Schnittstellen</b><span>Rechenkerne als Schnittstelle, auf Anfrage</span></span></a></li>
         <li><a href="loesungen.html#makler-hub"><svg class="ico si"><use href="#i-haus"/></svg><span><b>Makler-Hub</b><span>Der Maklerprozess bis zum Notar · für Makler</span></span></a></li>
         <li><a href="#partner"><svg class="ico si"><use href="#i-pokal"/></svg><span><b>Unsere Partner</b><span>Wer mit uns zusammenarbeitet</span></span></a></li>
@@ -559,6 +560,29 @@ if (location.hash === '#forschung') location.replace('forschung.html');</script>
   <a class="btn-l" href="forschung.html">Das Vorhaben <svg class="ico" style="width:14px;height:14px"><use href="#i-pfeil"/></svg></a>
 </div></div></section>
 
+<!-- ══ FÜR PARTNER ═══════════════════════════════════════════════════
+     landing-partner-1 · Marcel 16.11.2026: „den Partnerteil komplett überarbeiten … was Partner machen
+     können, wie die Strecke ist“. Kurzfassung hier, die ganze Strecke mit Bildern auf partner.html.
+     #partner darunter bleibt das Laufband der Wegbegleiter (Sprungziel aus Navigation und Fuß). -->
+<section class="sec sec-dark" id="fuer-partner"><div class="wrap"><div class="pt-start">
+  <div class="rv">
+    <div class="eye">Für Partner · Berater und Kanzleien</div>
+    <h2>Deine Kunden rechnen. <span class="ac">Du behältst den Überblick.</span></h2>
+    <p>Mit dem Partner-Cockpit begleitest du Kapitalanleger unter deiner eigenen Marke. So läuft es:</p>
+    <ol class="pt-mini">
+      <li><span><b>Einladen.</b> Per E-Mail oder Verbindungscode, mit Partnerplatz oder eigenem Abo.</span></li>
+      <li><span><b>Freigeben lassen.</b> Dein Kunde schickt dir Objekte oder seinen Bestand als Kopie.</span></li>
+      <li><span><b>Anmerken.</b> Feld markieren, Hinweis schreiben, Wert vorschlagen.</span></li>
+      <li><span><b>Zurückgeben.</b> Eine Rückmeldung mit Begleittext, auf Wunsch per E-Mail in deiner Marke.</span></li>
+    </ol>
+    <div class="lz-btns" style="display:flex;gap:14px;flex-wrap:wrap"><a class="btn-p" href="partner.html">Die ganze Strecke ansehen →</a><a class="btn-l" href="preise.html#partner-plan">Preise für Partner</a></div>
+  </div>
+  <figure class="rv" style="margin:0">
+    <div class="pt-rahmen"><img src="assets/partner-strecke/05-feld-markieren.webp" width="1920" height="1200" loading="lazy" decoding="async" alt="Partner-Cockpit: Anmerkung direkt am Feld Wohnfläche mit Vorschlagswert"></div>
+    <figcaption class="pt-bu">Anmerkung direkt am Feld. Echte Aufnahme, Beispieldaten.</figcaption>
+  </figure>
+</div></div></section>
+
 <!-- ══ PARTNER & DATENQUELLEN ════════════════════════════════════════ -->
 <section class="sec sec-paper" id="partner"><div class="wrap">
   <div class="head ctr rv"><div class="eye ctr">An Bord integriert</div>
@@ -609,10 +633,10 @@ if (location.hash === '#forschung') location.replace('forschung.html');</script>
     <div><h4>Produkt</h4>
       <a href="#workflow">So funktioniert's</a><a href="#features">Funktionen</a>
       <a href="leistungsumfang.html">Leistungsumfang</a><a href="preise.html">Preise</a>
-      <a href="api.html">API</a><a href="videothek.html">Videothek</a><a href="forschung.html">Forschung &amp; Entwicklung</a></div>
+      <a href="api.html">API</a><a href="videothek.html">Videothek</a><a href="partner.html">Für Partner</a><a href="forschung.html">Forschung &amp; Entwicklung</a></div>
     <div><h4>Vertrauen</h4>
       <a href="sicherheit.html">Sicherheit &amp; Server</a><a href="fragen.html">Häufige Fragen</a>
-      <a href="#daten">Datenbasis</a><a href="#partner">Partner</a><a href="preise.html#feature-matrix">Cockpit-Matrix</a></div>
+      <a href="#daten">Datenbasis</a><a href="#partner">Wegbegleiter</a><a href="preise.html#feature-matrix">Cockpit-Matrix</a></div>
     <div><h4>Junker Immobilien</h4>
       <a href="https://junker-immobilien.io" target="_blank" rel="noopener">Sachverständigenbüro</a>
       <a href="https://junker-immobilien.io" target="_blank" rel="noopener">Kapitalanlage</a>
@@ -640,7 +664,7 @@ if (location.hash === '#forschung') location.replace('forschung.html');</script>
      (tools/buster-ebenen-pruefen.mjs liest die Zeilen unten). Die App-Domain folgt umgebung.js:
      staging.dealpilot.immo -> app.staging.dealpilot.immo, sonst app.dealpilot.immo. -->
 <script src="dealcheck-laden.js?v=landing-seo-3"></script><!-- landing-seo-3 · Kerne + Deal-Check, Buster dort (buster-ebenen-pruefen liest die Datei) -->
-<script src="dp2-live.js?v=landing-videothek-10"></script><!-- landing-videothek-1 -->
+<script src="dp2-live.js?v=landing-partner-1"></script><!-- landing-videothek-1, landing-partner-1 -->
 <!-- v1588: Zwei Funktionen, die der alten Landing schon gehoerten und
      hier gefehlt haben. Beide betreffen Geld, deshalb standen sie ganz
      oben auf der Abgleichsliste:

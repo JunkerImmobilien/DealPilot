@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════════════════
-   dp2-live.js · landing-videothek-6 · DealPilot live und die Videothek
+   dp2-live.js · landing-partner-1 · DealPilot live und die Videothek (Reihe „Für Partner“ mit Platzhaltern)
    ───────────────────────────────────────────────────────────────────────
    Eine Quelle: assets/videothek/videos.json. Daraus baut dieses Skript
      · auf der Landing (#dplRoot) den Abschnitt "DealPilot live": ein
@@ -21,7 +21,7 @@
    ═══════════════════════════════════════════════════════════════════════ */
 (function () {
   'use strict';
-  var QUELLE = 'assets/videothek/videos.json?v=landing-videothek-10';   /* landing-videothek-10: Werbespot 'Das Haus hab ich.' als erstes Video (Marcel 12.11.2026); landing-videothek-9: Modul 26 neu (v3291); landing-videothek-8: 20 Videos neu (N145, v3285); landing-videothek-7: Ue3, Modul 28 */
+  var QUELLE = 'assets/videothek/videos.json?v=landing-partner-1';   /* landing-partner-1: Reihe „Für Partner“ */   /* landing-videothek-10: Werbespot 'Das Haus hab ich.' als erstes Video (Marcel 12.11.2026); landing-videothek-9: Modul 26 neu (v3291); landing-videothek-8: 20 Videos neu (N145, v3285); landing-videothek-7: Ue3, Modul 28 */
   /* landing-videothek-4 · Jedes Video gibt es mit und ohne Sprecher (Marcel 19.10.2026:
      „die Videos muss es vertont und unvertont geben"). videos.json traegt je Eintrag
      `datei_ton`; die Wahl merkt sich der Browser, Standard: mit Sprecher. */
@@ -262,8 +262,19 @@
      braucht." Je Video Kapitelmarken mit Zeit (aus den Zeitmarken der Vertonung), die Suche
      geht ueber Titel, Story, Kapitel und Stichworte und springt an die Stelle im Video.
      Deeplink: videothek.html?v=<id>&t=<sek> (alt: #<id>). */
+  /* landing-partner-1 · Marcel 16.11.2026: „Im Videothekenbereich einen eigenen Bereich für Partner“.
+     Eintraege mit "geplant": true (oder ohne datei) sind Platzhalter: sie stehen als Karte „Video folgt“
+     in ihrer Reihe, zaehlen nicht mit, sind nicht anklickbar und erscheinen nicht in „DealPilot live“.
+     Ist ein Video fertig: datei, dauer, poster eintragen und "geplant" loeschen
+     (node tools/partner-videos-eintragen.mjs liest Dateien/Messe/Videos/Partner/videos.json). */
+  function geplantKarte(v) {
+    return '<div class="vt-k vt-geplant" aria-disabled="true">' +
+      '<span class="vt-kb"><span class="vt-folgt"><b>' + esc(v.nr || '') + '</b><span>Video folgt</span></span></span>' +
+      '<span class="vt-kt"><b>' + esc(v.titel) + '</b><span class="vt-u">' + esc(v.unterzeile || '') + '</span>' + (v.story ? '<span class="vt-s">' + esc(v.story) + '</span>' : '') + '</span>' +
+    '</div>';
+  }
   function thek(root, D) {
-    var V = D.videos || [], K = D.kategorien || [];
+    var V = D.videos || [], K = D.kategorien || [], G = D.geplant || [];
     var summe = V.reduce(function (a, v) { return a + (v.dauer || 0); }, 0);
     var nKap = V.reduce(function (a, v) { return a + kapListe(v).filter(function (c) { return c.t != null; }).length; }, 0);
     var z = document.getElementById('vtZahlen');
@@ -288,8 +299,9 @@
       '<div class="dpl-tabs" role="tablist" aria-label="Reihe filtern">' +
         '<button class="dpl-tab" data-kat="alle" aria-selected="true">Alle<small>' + V.length + '</small></button>' +
         K.map(function (k) {
+          var n = V.filter(function (v) { return v.kategorie === k.id; }).length;
           return '<button class="dpl-tab" data-kat="' + esc(k.id) + '" aria-selected="false">' + esc(k.name) +
-            '<small>' + V.filter(function (v) { return v.kategorie === k.id; }).length + '</small></button>';
+            '<small>' + (n || (G.some(function (v) { return v.kategorie === k.id; }) ? 'bald' : 0)) + '</small></button>';
         }).join('') +
       '</div><label class="vt-suchfeld"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/></svg>' +
       '<input class="vt-suche" id="vtSuche" type="search" autocomplete="off" spellcheck="false" placeholder="In allen Videos suchen: AfA, Bank-PDF, Grunderwerbsteuer …" aria-label="In allen Videos und Kapiteln suchen" aria-controls="vtTreffer"></label>';
@@ -297,6 +309,8 @@
     root.innerHTML = '<div class="vt-treffer" id="vtTreffer" aria-live="polite" hidden></div>' +
       K.map(function (k) {
       var vs = V.filter(function (v) { return v.kategorie === k.id; });
+      var gs = G.filter(function (v) { return v.kategorie === k.id; });
+      if (!vs.length && !gs.length) return '';
       return '<section class="vt-gruppe" data-kat="' + esc(k.id) + '" id="reihe-' + esc(k.id) + '">' +
         '<div class="vt-gk"><span>' + esc(k.kurz) + '</span><h2>' + esc(k.name) + '</h2><p>' + esc(k.text) + '</p></div>' +
         '<div class="vt-raster">' + vs.map(function (v) {
@@ -306,7 +320,7 @@
               '<span class="vt-nr">' + esc(v.nr) + '</span><span class="vt-d">' + mmss(v.dauer) + (nk ? ' · ' + nk + ' Kapitel' : '') + '</span><span class="vt-play">' + PLAY + '</span></span>' +
             '<span class="vt-kt"><b>' + esc(v.titel) + '</b><span class="vt-u">' + esc(v.unterzeile) + '</span><span class="vt-s">' + esc(v.story) + '</span></span>' +
           '</button>';
-        }).join('') + '</div></section>';
+        }).join('') + gs.map(geplantKarte).join('') + '</div></section>';
     }).join('') + '<p class="vt-leer" id="vtLeer" hidden>Kein Video passt zur Suche.</p>';
 
     var filter = 'alle';
@@ -616,14 +630,28 @@
     var P = new URLSearchParams(location.search);
     if (P.get('q')) { var f = document.getElementById('vtSuche'); if (f) { f.value = P.get('q'); anwenden(); } }
     var hid = P.get('v') || decodeURIComponent((location.hash || '').slice(1));
-    if (hid) oeffne(hid, true, Math.max(0, parseInt(P.get('t'), 10) || 0));
+    if (/^reihe-/.test(hid)) {   /* landing-partner-1 · Sprung aus partner.html auf die Reihe */
+      var rb = leiste && leiste.querySelector('.dpl-tab[data-kat="' + hid.slice(6).replace(/[^a-z0-9-]/gi, '') + '"]');
+      if (rb) rb.click();
+      var rg = document.getElementById(hid); if (rg) setTimeout(function () { rg.scrollIntoView({ block: 'start' }); }, 60);
+    } else if (hid) oeffne(hid, true, Math.max(0, parseInt(P.get('t'), 10) || 0));
   }
 
   var lr = document.getElementById('dplRoot'), tr = document.getElementById('vtRoot');
   if (!lr && !tr) return;
   laden().then(function (D) {
-    if (lr) live(lr, D);
-    if (tr) thek(tr, D);
+    /* landing-partner-1 · fertige und geplante Videos trennen (siehe geplantKarte) */
+    var alle = D.videos || [];
+    var istGeplant = function (v) { return !!(v.geplant || !v.datei); };
+    var echt = alle.filter(function (v) { return !istGeplant(v); });
+    var Dl = {}; Object.keys(D).forEach(function (k) { Dl[k] = D[k]; });
+    Dl.videos = echt; Dl.geplant = alle.filter(istGeplant);
+    if (lr) {   /* „DealPilot live“: nur Reihen mit mindestens einem fertigen Video */
+      var Dv = {}; Object.keys(Dl).forEach(function (k) { Dv[k] = Dl[k]; });
+      Dv.kategorien = (D.kategorien || []).filter(function (k) { return echt.some(function (v) { return v.kategorie === k.id; }); });
+      live(lr, Dv);
+    }
+    if (tr) thek(tr, Dl);
   }).catch(function () {
     /* Ohne Liste kein Abschnitt - lieber nichts als ein leerer Rahmen. */
     if (lr) { var s = lr.closest('section'); if (s) s.hidden = true; }

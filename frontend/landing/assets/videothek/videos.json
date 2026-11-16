@@ -1,12 +1,13 @@
 {
-  "_hinweis": "landing-videothek-3b · EINE Quelle fuer den Abschnitt 'DealPilot live' (index.html) und die Videothek (videothek.html). Ein Video mehr = ein Eintrag mehr. Die MP4s liegen NICHT im Git (frontend/landing/medien/ ist ignoriert) - sie kommen per scp auf den Server. Das Feld youtube ist fuer den spaeteren Upload: Titel, Beschreibung und Schlagworte dort pflegen, die youtube_id nach dem Upload eintragen. Keine Anbieternamen ausser ImmoMetrica, keine Adressen.",
+  "_hinweis": "landing-partner-1 · Reihe „partner“: Einträge mit \"geplant\": true sind Platzhalter („Video folgt“), fertige Partner-Videos trägt tools/partner-videos-eintragen.mjs aus Dateien/Messe/Videos/Partner/videos.json ein. landing-videothek-3b · EINE Quelle fuer den Abschnitt 'DealPilot live' (index.html) und die Videothek (videothek.html). Ein Video mehr = ein Eintrag mehr. Die MP4s liegen NICHT im Git (frontend/landing/medien/ ist ignoriert) - sie kommen per scp auf den Server. Das Feld youtube ist fuer den spaeteren Upload: Titel, Beschreibung und Schlagworte dort pflegen, die youtube_id nach dem Upload eintragen. Keine Anbieternamen ausser ImmoMetrica, keine Adressen.",
   "stand": "2026-11-11",
   "basis_medien": "medien/videothek/",
   "basis_bilder": "assets/videothek/",
   "kategorien": [
     { "id": "ueberblick", "name": "Überblick", "kurz": "Der ganze Weg am Stück", "text": "Für den ersten Eindruck: von der ersten Prüfung bis zum fertigen Investment-PDF, ohne Umweg." },
     { "id": "basis", "name": "Basis", "kurz": "Jeder Bereich der App", "text": "Die Basismodule 02 bis 10: ein Objekt anlegen, Daten aufnehmen, bewerten, rechnen. Für neue Piloten." },
-    { "id": "spezial", "name": "Erweitert", "kurz": "Tiefer ins Detail", "text": "Die Spezialmodule ab 11: Analyse, Scores, Bankunterlagen, Bestand, Steuer, Wertermittlung und Portfolio." }
+    { "id": "spezial", "name": "Erweitert", "kurz": "Tiefer ins Detail", "text": "Die Spezialmodule ab 11: Analyse, Scores, Bankunterlagen, Bestand, Steuer, Wertermittlung und Portfolio." },
+    { "id": "partner", "name": "Für Partner", "kurz": "Für Berater und Kanzleien", "text": "Das Partner-Cockpit von der Einladung bis zur Rückmeldung an deinen Kunden. Für Steuerberater, Finanzberater, Makler und Sachverständige, die ihre Kunden mit DealPilot begleiten." }
   ],
   "videos": [
     {
@@ -869,6 +870,54 @@
       ],
       "youtube_id": null
      }
+    },
+    {
+     "id": "partner-1-cockpit",
+     "kategorie": "partner",
+     "nr": "P1",
+     "geplant": true,
+     "titel": "Das Partner-Cockpit",
+     "unterzeile": "Alle Kunden, Plätze und Rückmeldungen an einem Ort."
+    },
+    {
+     "id": "partner-2-einladen",
+     "kategorie": "partner",
+     "nr": "P2",
+     "geplant": true,
+     "titel": "Kunden einladen und verbinden",
+     "unterzeile": "Per E-Mail oder Verbindungscode, mit Partnerplatz oder eigenem Abo."
+    },
+    {
+     "id": "partner-3-freigegeben",
+     "kategorie": "partner",
+     "nr": "P3",
+     "geplant": true,
+     "titel": "Freigegebene Objekte ansehen",
+     "unterzeile": "Was dein Kunde dir schickt, als eigener Stand mit Datum."
+    },
+    {
+     "id": "partner-4-anmerkungen",
+     "kategorie": "partner",
+     "nr": "P4",
+     "geplant": true,
+     "titel": "Feld markieren und zurück an den Kunden",
+     "unterzeile": "Anmerkungen direkt am Feld, mit Vorschlag und Begleittext."
+    },
+    {
+     "id": "partner-5-aufgaben",
+     "kategorie": "partner",
+     "nr": "P5",
+     "geplant": true,
+     "titel": "Aufgaben an viele Kunden",
+     "unterzeile": "Zum Beispiel das Steuerjahr fertigstellen, mit Frist und Erinnerung."
+    },
+    {
+     "id": "partner-6-marke",
+     "kategorie": "partner",
+     "nr": "P6",
+     "geplant": true,
+     "titel": "Deine Marke und deine Plätze",
+     "unterzeile": "Logo, Farbe und Name einstellen, Plätze dazubuchen."
     }
   ]
 }

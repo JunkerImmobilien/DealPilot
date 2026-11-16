@@ -1,0 +1,137 @@
+/* ══════════════════════════════════════════════════════════════════════
+   partner.css · landing-partner-1 (16.11.2026)
+   Seite „Für Partner“ (partner.html) und der Partner-Abschnitt der
+   Startseite (#fuer-partner). Marcel 16.11.2026: „den Partnerteil komplett
+   überarbeiten … gut aufbereitet, was Partner machen können, wie die
+   Strecke ist … mit einem Aufzug“.
+   Aufzug = die Strecke: links steht der Bildschirm still (sticky), rechts
+   fährt man Etappe für Etappe hoch, eine Schiene zeigt, wo man ist.
+   Unter 981 px kein Aufzug: jede Etappe trägt ihr eigenes Bild.
+   Nur Tokens aus dp2.css (--gd, --gdh, --runway …), kein hartes Gold.
+   ══════════════════════════════════════════════════════════════════════ */
+
+/* ── Hero ─────────────────────────────────────────────────────────────── */
+.pt-hero .lz-hero-g{grid-template-columns:1fr 1.05fr}
+.pt-hero h1{font-size:clamp(34px,4.8vw,60px)}
+.pt-rahmen{position:relative;border:1px solid rgba(255,255,255,.12);background:#0d0c0a;box-shadow:0 40px 80px -40px rgba(0,0,0,.8);
+  border-radius:10px;overflow:hidden}
+.pt-rahmen::before{content:'';display:block;height:26px;border-bottom:1px solid rgba(255,255,255,.08);
+  background:radial-gradient(circle at 14px 13px,#3a3a3a 4px,transparent 5px),radial-gradient(circle at 30px 13px,#3a3a3a 4px,transparent 5px),radial-gradient(circle at 46px 13px,#3a3a3a 4px,transparent 5px),#151412}
+.pt-rahmen img{display:block;width:100%;height:auto;aspect-ratio:16/10;object-fit:cover;object-position:left top}
+.pt-bu{margin:12px 0 0;font:500 11.5px/1.5 var(--mono);color:var(--ddk);letter-spacing:.02em}
+
+/* ── Was Partner können (Karten) ─────────────────────────────────────── */
+.pt-karten{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.pt-k{background:#fff;border:1px solid var(--cream-line);padding:26px 24px 24px;display:flex;flex-direction:column;gap:8px}
+.pt-k .pt-ki{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  background:var(--ob);color:var(--gdh);margin-bottom:6px}
+.pt-k .pt-ki svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.pt-k h3{font:600 19px/1.25 var(--disp);color:var(--ink);margin:0}
+.pt-k p{font-size:14.5px;line-height:1.65;color:var(--mut);margin:0}
+
+/* ── Die Strecke mit Aufzug ──────────────────────────────────────────── */
+.pt-strecke{scroll-margin-top:80px}
+.pt-aufzug{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,.9fr);gap:56px;align-items:start}
+.pt-schacht{position:sticky;top:96px}
+.pt-schirm{position:relative;aspect-ratio:16/10;background:#0d0c0a}
+.pt-schirm img{position:absolute;inset:26px 0 0 0;width:100%;height:calc(100% - 26px);object-fit:cover;object-position:left top;
+  opacity:0;transition:opacity .45s var(--e-weich,ease)}
+.pt-schirm img.an{opacity:1}
+.pt-anzeige{display:flex;align-items:center;gap:14px;margin-top:16px;color:var(--mdk);font:600 11px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase}
+.pt-anzeige b{color:var(--gdh);font:700 22px/1 var(--disp);letter-spacing:0}
+.pt-anzeige .pt-wer{margin-left:auto;padding:6px 10px;border:1px solid var(--line);color:var(--gdh)}
+.pt-schritte{margin:0;padding:0 0 0 34px;position:relative}
+.pt-liste{list-style:none;margin:0;padding:0}
+.pt-schritte::before{content:'';position:absolute;left:9px;top:8px;bottom:8px;width:2px;background:rgba(255,255,255,.1)}
+.pt-schiene{position:absolute;left:9px;top:8px;width:2px;height:0;background:var(--runway);transition:height .35s var(--e-weich,ease)}
+.pt-kabine{position:absolute;left:2px;top:8px;width:16px;height:16px;border-radius:3px;background:var(--gdh);
+  box-shadow:0 0 0 4px rgba(0,0,0,.6),0 0 22px color-mix(in srgb,var(--gdh) 60%,transparent);transition:top .35s var(--e-weich,ease)}
+.pt-s{min-height:62vh;padding:6px 0 48px;opacity:.38;transition:opacity .35s}
+.pt-s:last-child{min-height:40vh}
+.pt-s.an{opacity:1}
+.pt-s .pt-nr{font:700 11px/1 var(--mono);letter-spacing:.18em;color:var(--gdh);text-transform:uppercase}
+.pt-s h3{font:600 clamp(22px,2.4vw,30px)/1.2 var(--disp);color:#fff;margin:12px 0 12px}
+.pt-s p{font-size:16px;line-height:1.7;color:var(--mdk);margin:0 0 14px}
+.pt-chips{display:flex;flex-wrap:wrap;gap:6px}
+.pt-chips span{font:600 10px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--gdh);border:1px solid var(--line);padding:7px 9px}
+.pt-s .pt-handy{display:none}
+
+/* ── Zwei Wege ───────────────────────────────────────────────────────── */
+.pt-wege{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;max-width:980px;margin:0 auto}
+.pt-w{background:#fff;border:1px solid var(--cream-line);padding:30px 28px}
+.pt-w.gold{border:2px solid var(--gd)}
+.pt-w .tag{font:700 9.5px/1 var(--mono);letter-spacing:.14em;color:var(--gdi,var(--gd));text-transform:uppercase}
+.pt-w h3{font:600 23px/1.2 var(--disp);color:var(--ink);margin:12px 0 14px}
+.pt-w ul{margin:0;padding:0;list-style:none}
+.pt-w li{position:relative;padding:0 0 10px 22px;font-size:14.5px;line-height:1.6;color:var(--inkm)}
+.pt-w li::before{content:'◆';position:absolute;left:0;top:1px;font-size:9px;color:var(--gd)}
+
+/* ── Stufen und Rechte ───────────────────────────────────────────────── */
+.pt-stufen{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:28px}
+.pt-stufe{border:1px solid var(--line);padding:22px 20px}
+.pt-stufe b{display:block;font:600 19px/1.2 var(--disp);color:#fff;margin-bottom:8px}
+.pt-stufe span{font-size:14.5px;line-height:1.6;color:var(--mdk)}
+.pt-rechte{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.pt-rechte span{font-size:13.5px;color:var(--txtd);border:1px solid var(--line);padding:9px 12px;background:rgba(255,255,255,.025)}
+.pt-hinweis{max-width:760px;margin:26px auto 0;text-align:center;font-size:14.5px;line-height:1.65;color:var(--mdk)}
+
+/* ── Hoheit des Kunden ───────────────────────────────────────────────── */
+.pt-hoheit{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.pt-hoheit div{background:#fff;border:1px solid var(--cream-line);padding:22px 20px}
+.pt-hoheit b{display:block;font:600 17px/1.3 var(--disp);color:var(--ink);margin-bottom:8px}
+.pt-hoheit span{font-size:14px;line-height:1.6;color:var(--mut)}
+
+/* ── Preis ───────────────────────────────────────────────────────────── */
+.pt-preis{display:grid;grid-template-columns:1fr 1.2fr;gap:18px;max-width:980px;margin:0 auto}
+.pt-p{background:#fff;border:1px solid var(--cream-line);padding:30px 28px}
+.pt-p .tag{font:700 9.5px/1 var(--mono);letter-spacing:.14em;color:var(--gdi,var(--gd));text-transform:uppercase}
+.pt-p .gross{font:700 40px/1 var(--disp);color:var(--ink);margin:14px 0 6px}
+.pt-p .gross small{font:500 15px/1 var(--body);color:var(--mut)}
+.pt-p p{font-size:14.5px;line-height:1.65;color:var(--mut);margin:8px 0 0}
+.pt-staffel{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}
+.pt-staffel div{border:1px solid var(--cream-line);padding:14px 12px;text-align:center}
+.pt-staffel .st{font:700 9.5px/1.3 var(--mono);letter-spacing:.1em;color:var(--mut);text-transform:uppercase}
+.pt-staffel .pv{font:700 20px/1.2 var(--disp);color:var(--ink);margin-top:6px}
+.pt-preis-f{text-align:center;margin-top:22px}
+.pt-preis-f a{color:var(--gdi,var(--gd));font-weight:600}
+
+/* ── Videos ──────────────────────────────────────────────────────────── */
+.pt-video{display:grid;grid-template-columns:auto 1fr auto;gap:24px;align-items:center;border:1px solid var(--line);padding:26px 28px;max-width:980px;margin:0 auto}
+.pt-video .pt-play{width:58px;height:58px;border-radius:50%;background:var(--runway);display:flex;align-items:center;justify-content:center}
+.pt-video .pt-play svg{width:20px;height:20px;fill:#14100a;margin-left:3px}
+.pt-video h3{font:600 21px/1.25 var(--disp);color:#fff;margin:0 0 6px}
+.pt-video p{margin:0;color:var(--mdk);font-size:14.5px;line-height:1.6}
+
+/* ── Startseite: #fuer-partner ───────────────────────────────────────── */
+.pt-start{display:grid;grid-template-columns:minmax(0,.95fr) minmax(0,1.15fr);gap:52px;align-items:center}
+.pt-start h2{font:600 clamp(28px,3.6vw,44px)/1.12 var(--disp);letter-spacing:-.015em;color:#fff;margin:16px 0 14px}
+.pt-start h2 .ac{color:var(--gdh)}
+.pt-start > div > p{font-size:16.5px;line-height:1.65;color:var(--mdk);margin:0 0 22px}
+.pt-mini{list-style:none;margin:0 0 28px;padding:0;display:grid;gap:10px;counter-reset:pt}
+.pt-mini li{counter-increment:pt;display:grid;grid-template-columns:34px 1fr;gap:12px;align-items:start;color:var(--txtd);font-size:15px;line-height:1.55}
+.pt-mini li::before{content:counter(pt,decimal-leading-zero);font:700 11px/1 var(--mono);color:#14100a;background:var(--runway);padding:6px 0;text-align:center;margin-top:2px}
+.pt-mini li b{color:#fff;font-weight:600}
+
+/* ── Handy ───────────────────────────────────────────────────────────── */
+@media(max-width:980px){
+  .pt-hero .lz-hero-g,.pt-start{grid-template-columns:1fr}
+  .pt-karten{grid-template-columns:1fr 1fr}
+  .pt-aufzug{grid-template-columns:1fr;gap:0}
+  .pt-schacht{display:none}
+  .pt-schritte{padding-left:28px}
+  .pt-s{min-height:0;opacity:1;padding-bottom:44px}
+  .pt-s .pt-handy{display:block;margin-top:16px}
+  .pt-kabine,.pt-schiene{display:none}
+  .pt-schritte::before{background:var(--line)}
+  .pt-hoheit{grid-template-columns:1fr 1fr}
+  .pt-preis,.pt-wege{grid-template-columns:1fr}
+  .pt-stufen{grid-template-columns:1fr}
+}
+@media(max-width:640px){
+  .pt-karten,.pt-hoheit{grid-template-columns:1fr}
+  .pt-video{grid-template-columns:1fr;text-align:left}
+  .pt-staffel{grid-template-columns:1fr}
+}
+@media(prefers-reduced-motion:reduce){
+  .pt-schirm img,.pt-s,.pt-kabine,.pt-schiene{transition:none}
+}
