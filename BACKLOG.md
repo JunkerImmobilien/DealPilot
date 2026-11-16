@@ -40,10 +40,10 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 - Ansehen: https://staging.dealpilot.immo/partner.html (Strecke unter „So läuft es ab“), Startseite Abschnitt „Für Partner“, https://staging.dealpilot.immo/videothek.html#reihe-partner.
 - Offen: Partner-Videos des Video-Agenten eintragen (`node tools/partner-videos-eintragen.mjs`, Quelle `Dateien/Messe/Videos/Partner/videos.json`), MP4s per scp, Buster ziehen.
 - Offen: Sitemap-Eintrag `partner.html` erst nach Prod (Marker `landing-partner-1:partner`). Prod per Cherry-Pick der Landing-Commits (wie landing-seo), v3490 kommt mit dem nächsten App-Rollout.
-- Offen (Fehler): Toast „Fehler beim Speichern: kundenstand_schreibgeschuetzt“ beim Ansehen eines Kundenstands, ein Speicherweg umgeht `speichernSperren()`.
-- Offen: alte Navigation (`dp2.html`-Links) auf leistungsumfang, fragen, sicherheit, api.
+- ~~Offen (Fehler): Toast „kundenstand_schreibgeschuetzt“~~ **erledigt v3491 (`7dc6031b`)**, nachgemessen.
+- **erledigt landing-partner-2/-2a (`b9ce4ff7`, `06a924dc`):** Preise auf partner.html im Paketdesign, neue Navigation auf leistungsumfang/fragen/sicherheit/api, Kartentitel auf preise.html wieder sichtbar.
 - landing-partner-1b: Logo „Muster Finanzberatung“ (`design/logo/partner-demo/`) im Testkonto hinterlegt, Bilder neu.
-- Offen (Marcel 16.11.): echte Bilder der normalen App auf der Landing. Vorschlag 4 Stellen in `leistungsumfang.html` (heute nur Text): Finanzierung (#lu-finanzierung), Investor Deal Score/Pilot-Analyse (#lu-dealscore), Steuer (#lu-steuer), Portfolio-Cockpit (#lu-portfolio). Braucht ein eigenes Demo-Konto mit gefüllten, erfundenen Objekten (nicht info@, nicht Nordlicht) oder Marcels Freigabe, Demo-Objekte von info@ in ein Testkonto zu kopieren.
+- Offen (Marcel 16.11.): echte Bilder der normalen App auf der Landing. Vorschlag 4 Stellen in `leistungsumfang.html` (heute nur Text): Finanzierung (#lu-finanzierung), Investor Deal Score/Pilot-Analyse (#lu-dealscore), Steuer (#lu-steuer), Portfolio-Cockpit (#lu-portfolio). Marcel hat das Kopieren der info@-Demo-Objekte (Staging, nur lesen) über die Koordination freigegeben. Die Berechtigungsprüfung lehnt das Lesen aber ab, deshalb muss er es in der Hauptsitzung selbst freigeben (oder eine Erlaubnisregel setzen).
 - Fragen an Marcel: Preis- und Freischalttext („wir schalten Partner persönlich frei“) noch gültig? Zielgruppen-Reihenfolge? Soll die Seite „Partner-Programm“ heißen?
 
 ### N166 · Kanzlei-Mappe: Rest nach v3480/v3481 (Marcel 16.11.2026) — **offen, nur nach Rückfrage**
