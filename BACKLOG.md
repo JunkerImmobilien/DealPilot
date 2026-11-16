@@ -42,7 +42,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 - Offen: Marcel-Fassungen der Neuaufnahmen 11/14/26/27/29 (Texte bereit: `Dateien/Messe/Videos/Videoreihe-Marcel/TEXTE-BEREIT-v3502.md`), danach Videothek-Dateien dieser Module tauschen.
 - Offen: Spots „Das Haus hab ich.“ A/B und Webinar Lindenallee im Kopie-Konto nicht sauber (Marktberichte hängen am Original, heutige Lindenallee ohne Pilot-Analyse) – alte Fassungen bleiben. Entscheidung: Berichte in der mb-DB mitkopieren oder je Objekt einmal echt abrufen (Kosten).
 - Offen: Bank-PDF Seite Wertpotenzial (Fortsetzung) zeigt Ertragswert je Stufe als Striche im Videoreihe-Konto – Ursache messen (Bericht Stufe 3 fehlt an der Kopie?).
-- Offen: Komplettbeispiel MFH (Überblick 3) – Neuaufnahme läuft/geprüft siehe Journal.
+- Offen: Komplettbeispiel MFH (Überblick 3) im Kopie-Konto aufgenommen (35 Min.), aber Kapitel 10 zeigt „Deal Score – · –“ und das Drehbuch wirft bei Zeile 8135 (zielEl, nextElementSibling von null) – nicht ersetzt, Drehbuch nachziehen.
 
 ### N167 · Partnerseite der Landing mit Strecke und Reihe „Für Partner“ in der Videothek (Marcel 16.11.2026) — **landing-partner-1/-1a (`53dc7e7e`, `5f920212`) und v3490 (`842de190`) auf Staging nachgemessen; Abnahme der Optik durch Marcel, dann Prod**
 - Ansehen: https://staging.dealpilot.immo/partner.html (Strecke unter „So läuft es ab“), Startseite Abschnitt „Für Partner“, https://staging.dealpilot.immo/videothek.html#reihe-partner.
