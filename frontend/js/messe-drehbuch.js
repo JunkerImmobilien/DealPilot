@@ -6222,11 +6222,11 @@
         await r19Seite(bank, _r26.seite || 1);
         await b2oZeile(s, 'Seite Wertpotenzial', 'Oben die Wohnungen: Ist, Mieterhöhung mit Termin, Zielmiete und Maßnahmen.');
         await r19Seite(bank, _r26.seite || 1, 330);   /* v2481g · gemessen: ab 330 px die ganze Wertbrücke (v2543: Wertüberleitung - Lage im Stichbild nachmessen) */
-        await b2oZeile(s, 'Die Wertüberleitung', 'Auch im PDF: vom Bestand über Mieterhöhung und Zielbild, minus Maßnahmen — bis zum Potenzial netto.');
+        /* v3505 · gemessen im Bank-PDF vom 16.11.: bei 330 px stehen die Wohnungen und die Kennzahlen je Stufe, eine Wertüberleitung steht auf der Seite nicht (mehr) */
+        await b2oZeile(s, 'Kennzahlen je Stufe', 'Darunter je Stufe Kaltmiete, Bruttomietrendite, DSCR und Maßnahmenkosten — gekennzeichnet als Potenzialwert, keine Verkehrswertermittlung.');
         /* v2481o · GEMESSEN im Video v2481n: bei 720 px auf der Seite stand nur noch der leere Seitenfuß -
            seit der Wertüberleitung (v2543) stehen die Kennzahlen je Stufe auf der Fortsetzungsseite */
-        if (_r26.seiteN && _r26.seiteN > (_r26.seite || 1)) await r19Seite(bank, _r26.seiteN, 0); else await r19Seite(bank, _r26.seite || 1, 720);
-        await b2oZeile(s, 'Kennzahlen je Stufe', 'Miete, Rendite, DSCR, Miete im Ertragswert und Ertragswert je Stufe — gekennzeichnet als Potenzialwert, keine Verkehrswertermittlung.', 1500);
+        /* v3505 · die Fortsetzungsseite zeigte am 16.11. beim Ertragswert je Stufe nur Striche (Bank-PDF, im Backlog N168) - im Video nicht mehr gezeigt */
         var o = q('#dpm-pdf'); if (o && o.parentNode) o.parentNode.removeChild(o);
         kegelHoch(false);
       },
