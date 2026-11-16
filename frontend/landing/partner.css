@@ -120,7 +120,7 @@
   .pt-schacht{display:none}
   .pt-schritte{padding-left:28px}
   .pt-s{min-height:0;opacity:1;padding-bottom:44px}
-  .pt-s .pt-handy{display:block;margin-top:16px}
+  .pt-s .pt-handy{display:block;margin-top:16px;width:100%;height:auto;aspect-ratio:16/10;object-fit:cover;object-position:left top}
   .pt-kabine,.pt-schiene{display:none}
   .pt-schritte::before{background:var(--line)}
   .pt-hoheit{grid-template-columns:1fr 1fr}
