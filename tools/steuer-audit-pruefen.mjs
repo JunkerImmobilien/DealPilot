@@ -540,5 +540,46 @@ if (process.argv.includes('--live')) {
   }
 }
 
+/* ── O · v3550 Kaufpreisaufteilung druckt das Datum, mit dem die Arbeitshilfe gerechnet hat ──
+   Messung 16.11.2026: das KPA-PDF (beide Wege) rechnete mit dem Kaufdatum (KPA G9 „Datum des Kaufvertrages“),
+   druckte es aber nirgends - oben nur „Stand <Erstellungsdatum>“, in der klassischen Fassung ein leeres Feld
+   „Stichtag“. Jetzt: eine Quelle (_dpKpaStichtag in bmf-bodenabschlag.js = _lastBmfInputs.kaufdatum), Zeile
+   nach dem Objektfeld benannt, ohne Datum keine Zeile, Text 1 der Begruendung „… zum Stichtag TT.MM.JJJJ“. */
+{
+  const ba = js('bmf-bodenabschlag.js'), dok = js('dp-dokumente.js'), kpa = js('pdf-kaufpreisaufteilung.js');
+  const dom = {};
+  const leer = { value: '', checked: false, textContent: '', innerHTML: '', style: {}, dataset: {}, classList: { add() {}, remove() {}, contains() { return false; } }, addEventListener() {}, querySelector() { return null; }, querySelectorAll() { return []; }, appendChild() {}, setAttribute() {}, closest() { return null; } };
+  const doc = { getElementById: (id) => (id in dom ? Object.assign({}, leer, { value: dom[id] }) : null), querySelector: () => null, querySelectorAll: () => [], addEventListener() {}, createElement: () => Object.assign({}, leer), body: Object.assign({}, leer), readyState: 'complete' };
+  const ctx = { document: doc, console: { log() {}, warn() {}, error() {} }, setTimeout: () => 0, clearTimeout() {}, MutationObserver: function () { this.observe = () => {}; }, fetch: () => new Promise(() => {}), localStorage: { getItem: () => null, setItem() {} } };
+  ctx.window = ctx; vm.createContext(ctx);
+  let fehler = null;
+  try { vm.runInContext(ba, ctx); } catch (e) { fehler = e.message; }
+  const f = ctx._dpKpaStichtag;
+  ok(typeof f === 'function', 'O bmf-bodenabschlag.js stellt _dpKpaStichtag bereit' + (fehler ? ' (' + fehler + ')' : ''));
+  if (typeof f === 'function') {
+    const fall = (ein, felder, fuer) => {
+      Object.keys(dom).forEach((k) => delete dom[k]); Object.assign(dom, felder || {});
+      ctx._currentObjKey = 'obj-a'; ctx._lastBmfInputs = ein; ctx._lastBmfResults = ein ? { gebaeudeanteil_prozent: { value: 58.45 }, _fuer: fuer } : null;
+      return f();
+    };
+    const a = fall({ kaufdatum: '2027-01-01' }, { kaufdat: '2027-01-01', wirtschaftlicher_uebergang: '2027-01-01' }, 'obj-a');
+    ok(a && a.text === '01.01.2027' && a.label === 'Kaufdatum und Übergang von Nutzen und Lasten', 'O Andersenweg (Kauf = Übergang 01.01.2027): ' + JSON.stringify(a));
+    const b = fall({ kaufdatum: '2026-11-12' }, { kaufdat: '2026-11-12', wirtschaftlicher_uebergang: '2027-01-01' }, 'obj-a');
+    ok(b && b.text === '12.11.2026' && b.label === 'Kaufdatum', 'O Übergang später als Kauf: gedruckt wird das Datum der Arbeitshilfe als „Kaufdatum“ (' + JSON.stringify(b) + ')');
+    const c = fall({ kaufdatum: '2027-01-01' }, { kaufdat: '2026-11-12', wirtschaftlicher_uebergang: '2027-01-01' }, 'obj-a');
+    ok(c && c.label === 'Übergang von Nutzen und Lasten', 'O Datum der Arbeitshilfe = Übergang: so bezeichnet');
+    ok(fall({ kaufdatum: '' }, { kaufdat: '' }, 'obj-a') === null, 'O ohne Datum: keine Zeile (null)');
+    ok(fall(null, {}, null) === null, 'O ohne Lauf der Arbeitshilfe: null');
+    ok(fall({ kaufdatum: '2027-01-01' }, { kaufdat: '2027-01-01' }, 'obj-b') === null, 'O Lauf eines anderen Objekts: null (kein fremdes Datum)');
+    const d = fall({ kaufdatum: '1.7.2023' }, { kaufdat: '2023-07-01' }, 'obj-a');
+    ok(d && d.text === '01.07.2023' && d.label === 'Kaufdatum', 'O deutsches Datum 1.7.2023 -> 01.07.2023');
+  }
+  const code = (s) => s.replace(/\/\*[\s\S]*?\*\//g, '');
+  ok(!/zeile\('Stichtag', ''\)/.test(code(kpa)) && /var ST = \(typeof window\._dpKpaStichtag === 'function'\) \? window\._dpKpaStichtag\(\) : null;\s*\n\s*if \(ST\) zeile\(ST\.label, ST\.text\);/.test(kpa), 'O klassisches PDF: kein leeres Feld „Stichtag“, Zeile nur mit Datum (Objekt und Grundlagen)');
+  ok(/concat\(ST \? \[\[ST\.label, ST\.text\]\] : \[\]\)/.test(dok) && /B\.liste\(\(ST \? \[\[ST\.label \+ ' \(Datum der Arbeitshilfe\)', ST\.text\]\] : \[\]\)/.test(dok), 'O einheitliches PDF: Datum auf dem Deckblatt und als erste Zeile der Herleitung');
+  ok(/\(stTag \? ' zum Stichtag ' \+ stTag\.text : ''\)/.test(ba) && ba.indexOf("var stTag = kpaStichtag();") < ba.indexOf("P.push('Verfahren."), 'O Text 1 der Begründung: „… zum Stichtag TT.MM.JJJJ“ aus derselben Quelle');
+  ok(/kaufdatum: \(\$\('bmf_datum'\) \|\| \{\}\)\.value \|\| _v\('kaufdat'\) \|\| ''/.test(js('bmf-modal.js')), 'O runBmf gibt der Arbeitshilfe #bmf_datum (aus #kaufdat) - das ist die gedruckte Quelle');
+}
+
 console.log('steuer-audit-pruefen: ' + gruen + ' gruen, ' + rot + ' rot');
 process.exit(rot ? 1 : 0);

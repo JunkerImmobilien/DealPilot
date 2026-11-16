@@ -697,16 +697,19 @@
       var T = window._dpKpaTexte || null;
       var abw = !!(T && T.wahl && T.wahl !== 'amtlich' && isFinite(T.gebPct));
       var gebPctG = abw ? T.gebPct : Number(w('gebaeudeanteil_prozent'));
+      /* v3550 · das Datum, mit dem die Arbeitshilfe gerechnet hat (bmf-bodenabschlag.js _dpKpaStichtag: _lastBmfInputs.kaufdatum),
+         auf dem Deckblatt und als erste Zeile der Herleitung; ohne Datum keine Zeile, nie ein leeres Feld „Stichtag“ (v1495/v1497). */
+      var ST = (typeof window._dpKpaStichtag === 'function') ? window._dpKpaStichtag() : null;
       var S = [];
       S.push(B.deckblatt(c, { bild: info.fotos[0] || info.karte || null, eyebrow: abw && T.wahl === 'jacoby' ? 'Kaufpreisaufteilung nach der umgekehrten Ertragswertmethode (Jacoby)' : 'Kaufpreisaufteilung nach BMF-Arbeitshilfe', titel: o.adresse, unter: o.art + (o.bj ? ' · Baujahr ' + B.jahr(o.bj) : ''),
         wertLabel: 'Gebäudeanteil', wert: B.pct(gebPctG, 2),
         wertNeben: abw ? (B.esc(T.name) + '<br>amtlich ' + B.pct(w('gebaeudeanteil_prozent'), 2)) : ('Grund und Boden ' + B.eur(w('kaufpreisanteil_grund')) + '<br>Gebäude ' + B.eur(w('kaufpreisanteil_gebaeude'))),
-        meta: [['Kaufpreis', B.eur(z.kp)], ['Stand', c.stand], ['Grundlage', (abw ? 'BMF-Arbeitshilfe · ' + (T.wahl === 'jacoby' ? 'Jacoby' : 'Bodenabschlag') : 'BMF-Arbeitshilfe') + (r._vorlage ? ' (' + r._vorlage + ')' : '')]] }));   /* v3481 · Fassung der verwendeten Vorlage */
+        meta: [['Kaufpreis', B.eur(z.kp)]].concat(ST ? [[ST.label, ST.text]] : []).concat([['Stand', c.stand], ['Grundlage', (abw ? 'BMF-Arbeitshilfe · ' + (T.wahl === 'jacoby' ? 'Jacoby' : 'Bodenabschlag') : 'BMF-Arbeitshilfe') + (r._vorlage ? ' (' + r._vorlage + ')' : '')]]) }));   /* v3481 · Fassung der verwendeten Vorlage */
       S.push(B.seite(c, 'Herleitung', B.abschnitt('Abschnitt 1', 'Herleitung nach der Arbeitshilfe', 'Sach- und Ertragswert nach der Arbeitshilfe des Bundesministeriums der Finanzen; maßgeblich ist der höhere Bezug je Objektart.')
-        + B.liste([['Bodenwert', B.eur(w('bodenwert'))], ['Vorläufiger Sachwert', B.eur(w('sachwert_vorlaeufig'))], ['Marktangepasster Sachwert', B.eur(w('sachwert_marktangepasst'))],
+        + B.liste((ST ? [[ST.label + ' (Datum der Arbeitshilfe)', ST.text]] : []).concat([['Bodenwert', B.eur(w('bodenwert'))], ['Vorläufiger Sachwert', B.eur(w('sachwert_vorlaeufig'))], ['Marktangepasster Sachwert', B.eur(w('sachwert_marktangepasst'))],
           ['Vorläufiger Ertragswert', B.eur(w('ertragswert'))], ['Maßgebender Verkehrswert', B.eur(w('massgebender_verkehrswert')), { art: 'summe' }],
           ['Grund und Boden (Einzelwert)', B.eur(w('grund_boden_wert')), { art: 'ein' }], ['Gebäude (Einzelwert)', B.eur(w('gebaeude_wert')), { art: 'ein' }],
-          ['Gebäudeanteil', B.pct(w('gebaeudeanteil_prozent'), 2), { art: 'ende' }]])
+          ['Gebäudeanteil', B.pct(w('gebaeudeanteil_prozent'), 2), { art: 'ende' }]]))
         /* v3179b · kaufpreisanteil_* der BMF-Rechnung stehen auf den ANSCHAFFUNGSKOSTEN (Kaufpreis Immobilie +
            Erwerbsnebenkosten), nicht auf dem Kaufpreis. */
         + (function () {

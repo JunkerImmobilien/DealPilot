@@ -65,6 +65,32 @@
   }
   function wert(o) { return (o && typeof o === 'object' && 'value' in o) ? o.value : o; }
 
+  /* v3550 · Marcel/Messung 16.11.2026: die Kaufpreisaufteilung rechnet mit einem Datum, druckte es aber nirgends
+     (oben nur „Stand <Erstellungsdatum>“). Gedruckt wird GENAU das Datum, das die Arbeitshilfe im letzten Lauf
+     bekommen hat (_lastBmfInputs.kaufdatum, Zelle KPA G9 „Datum des Kaufvertrages“; bmf-modal.js runBmf füllt es
+     aus #bmf_datum, das readonly aus #kaufdat kommt) - keine zweite Quelle. Die Bezeichnung sagt, welches Objektfeld
+     das ist. Ohne Datum (oder Lauf eines anderen Objekts): null, die Zeile entfällt. Weiter KEIN leeres Feld
+     „Stichtag“ (v1495/v1497: ein Vorbelegungsdatum hätte einen Vertrag behauptet). Gelesen von beiden PDF-Wegen
+     (pdf-kaufpreisaufteilung.js, dp-dokumente.js) und von Text 1 der Begründung (klausel()). */
+  function kpaStichtag() {
+    var R = window._lastBmfResults, I = window._lastBmfInputs;
+    if (!R || !I) return null;
+    if (R._fuer && window._currentObjKey && String(R._fuer) !== String(window._currentObjKey)) return null;
+    var iso = function (s) {
+      s = String(s == null ? '' : s).trim();
+      var m = s.match(/^(\d{4})-(\d{2})-(\d{2})/); if (m) return m[1] + '-' + m[2] + '-' + m[3];
+      m = s.match(/^(\d{1,2})\.(\d{1,2})\.(\d{4})$/); if (m) return m[3] + '-' + ('0' + m[2]).slice(-2) + '-' + ('0' + m[1]).slice(-2);
+      return '';
+    };
+    var d = iso(I.kaufdatum); if (!d) return null;
+    var feld = function (id) { var e = el(id); return e ? iso(e.value) : ''; };
+    var kd = feld('kaufdat'), wu = feld('wirtschaftlicher_uebergang');
+    var label = (d === kd && d === wu) ? 'Kaufdatum und Übergang von Nutzen und Lasten'
+      : (d === wu && d !== kd) ? 'Übergang von Nutzen und Lasten' : 'Kaufdatum';
+    return { iso: d, text: d.slice(8, 10) + '.' + d.slice(5, 7) + '.' + d.slice(0, 4), label: label };
+  }
+  window._dpKpaStichtag = kpaStichtag;
+
   /* ── Daten aus dem amtlichen Lauf und aus den Anschaffungskosten ──── */
   function basis() {
     var r = window._lastBmfResults;
@@ -367,7 +393,9 @@
     /* v3481 · die Fassung aus der TATSAECHLICH verwendeten Vorlage (Antwort des Backends meta.template_version,
        bmf-modal.js legt sie als _vorlage am Ergebnis ab). Marcels Andersenweg-PDF vom 12.11. nannte noch die Fassung von 2023. */
     var fassung = (window._lastBmfResults && window._lastBmfResults._vorlage) || 'Stand März 2026';
-    P.push('Verfahren. Die Aufteilung folgt der Arbeitshilfe des Bundesfinanzministeriums (' + fassung + '). ' +
+    var stTag = kpaStichtag();   /* v3550 · das Datum des Laufs, sonst ohne Stichtag-Zusatz */
+    P.push('Verfahren. Die Aufteilung folgt der Arbeitshilfe des Bundesfinanzministeriums (' + fassung + ')' +
+      (stTag ? ' zum Stichtag ' + stTag.text : '') + '. ' +
       'Maßgeblich ist das ' + (verfahren || 'dort vorgesehene Verfahren') + ', weil es der Grundstücksart entspricht. ' +
       'Der Bodenwert ergibt sich aus Grundstücksfläche und amtlichem Bodenrichtwert, der Gebäudeanteil als ' +
       'Differenz zum maßgebenden Verkehrswert' +

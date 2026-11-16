@@ -346,7 +346,11 @@
        14.09.2026 - das ist das Datum der Anlage, nicht das eines Kaufvertrags;
        zu dieser Anfrage gibt es noch keinen. Ein gedrucktes Datum haette
        einen Vertrag behauptet. Die Zeile bleibt als Platz zum Eintragen. */
-    zeile('Stichtag', '');
+    /* v3550 · 16.11.2026: das leere Feld „Stichtag“ entfällt. Gedruckt wird das Datum, mit dem die Arbeitshilfe
+       gerechnet hat (window._dpKpaStichtag, bmf-bodenabschlag.js: _lastBmfInputs.kaufdatum), bezeichnet nach dem
+       Objektfeld (Kaufdatum bzw. Übergang von Nutzen und Lasten). Ohne Datum keine Zeile. */
+    var ST = (typeof window._dpKpaStichtag === 'function') ? window._dpKpaStichtag() : null;
+    if (ST) zeile(ST.label, ST.text);
     y += 2;
 
     platz(60);

@@ -152,6 +152,15 @@ for (const [san, txt] of [['', 'ohne Sanierung'], ['20000', 'Sanierung 20.000 un
   melde(/<input type="hidden" id="san_plan"/.test(idx) && /id="san-plan-box"/.test(idx), 'E index.html: Feld #san_plan und Liste #san-plan-box', null);
   melde(/<script src="js\/sanierung-plan\.js\?v=/.test(idx), 'E index.html laedt sanierung-plan.js', null);
   melde(/DpSanierungPlan\.jeJahr\(\)/.test(calcSrc) && /san_y:san_y/.test(calcSrc) && /cfop_y -= san_y; cfns_y -= san_y;/.test(calcSrc), 'E calc.js: Cashflow je Jahr zieht san_y ab und fuehrt es in cfRows', null);
+  /* v3550 · Befund aus v3530 („san_y nach _computeAutoForYear 0“) war eine Messfalle: calc() rechnet einen zweiten
+     Aufruf binnen 1,5 s erst nach 300 ms (Entprellung) - wer sofort liest, sieht die vorige cfRows. Gemessen
+     16.11. am Andersenweg: nach 500 ms bzw. calcNow() steht san_y 12.000, Tabelle, Investment- und Bank-PDF
+     zeigen 565 + 12.000. Hier: jede Stelle, die die Spalte Bewirtschaftung je Jahr selbst zusammensetzt, nimmt san_y mit. */
+  for (const [d, re] of [['frontend/js/calc.js', /sumBwk\s*\+=[^;]*r\.san_y/], ['frontend/js/dp-dokumente.js', /r\.su_y \|\| 0\) \+ \(r\.san_y \|\| 0\)/],
+    ['frontend/js/pdf-investment-bank.js', /r\.su_y \|\| 0\) \+ \(r\.san_y \|\| 0\)/], ['frontend/js/pdf.js', /cumBwk \+=[^;]*r\.san_y/]]) {
+    melde(re.test(lies(d)), 'E ' + d.replace('frontend/js/', '') + ': Spalte Bewirtschaftung je Jahr enthaelt san_y', null);
+  }
+  melde(/_calcDebounceTimer = setTimeout\(function\(\) \{[\s\S]{0,120}_calcImmediate\(\);[\s\S]{0,60}\}, 300\);/.test(calcSrc), 'E calc.js: zweiter calc() binnen 1,5 s rechnet erst nach 300 ms (Messfalle: cfRows dann noch alt, calcNow() rechnet sofort)', null);
   melde(/var gi=kp\+nk\+v\('san'\);/.test(calcSrc) && !/gi=kp\+nk\+v\('san'\)\s*\+/.test(calcSrc), 'E calc.js: Gesamtinvestition bleibt kp + nk + san (Liste nicht darin)', null);
 }
 
