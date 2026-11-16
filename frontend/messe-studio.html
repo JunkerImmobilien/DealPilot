@@ -203,6 +203,16 @@ body.mit-tafel #tafel{display:flex;flex-direction:column;gap:18px}
   REIHE.lindenallee = { reihe: 'DealPilot Webinar', art: 'Unterlagen', nr: 'WEG', tafel: true, hinweis: 'Vorführung · neues Objekt, nichts gespeichert · Unterlagen live ausgelesen · Demo-Objekt nur gelesen', messe: 'lindenallee-unterlagen',
             titel: 'Lindenallee 14 — Unterlagen einlesen', unter: 'Sieben PDFs, eine Auswertung — Risiken, WEG und Investitionsthese.',
             spruch: 'Das Exposé verkauft —', spruch2: 'die Protokolle erzählen.', weiter: '' };
+  /* v3490 · Partner-Reihe (Marcel 16.11.2026): erfundener Demo-Partner, Aufruf ?modul=p1 … p4 */
+  var PR = { reihe: 'DealPilot für Partner', art: 'Partner', hinweis: 'Vorführung · erfundener Demo-Partner und erfundene Kunden' };
+  REIHE.p1 = Object.assign({}, PR, { nr: '1', messe: 'partner-cockpit', titel: 'Partner-Cockpit und Marke', unter: 'Dein Arbeitsplatz für Kunden, Plätze und deine Marke.',
+            spruch: 'Cockpit eingerichtet —', spruch2: 'deine Marke an Bord.', weiter: 'Partner 2 · Kunden hinzufügen' });
+  REIHE.p2 = Object.assign({}, PR, { nr: '2', messe: 'partner-kunden', titel: 'Kunden hinzufügen', unter: 'Mit Partnerplatz oder eigenem Abo, per Einladung oder Code.',
+            spruch: 'Passagiere eingecheckt —', spruch2: 'jeder mit seinem Ticket.', weiter: 'Partner 3 · Objekte senden und übernehmen' });
+  REIHE.p3 = Object.assign({}, PR, { nr: '3', messe: 'partner-senden', titel: 'Objekte senden und übernehmen', unter: 'Vom Kunden ins Cockpit, und als eigenes Objekt weiter.',
+            spruch: 'Fracht übergeben —', spruch2: 'sicher gelandet.', weiter: 'Partner 4 · Anmerkungen und Rückmeldung' });
+  REIHE.p4 = Object.assign({}, PR, { nr: '4', messe: 'partner-anmerkungen', titel: 'Anmerkungen und Rückmeldung', unter: 'Felder markieren, zurückgeben, und was der Kunde sieht.',
+            spruch: 'Funkspruch angekommen —', spruch2: 'gemeinsam auf Kurs.', weiter: '' });
   REIHE.ue1 = REIHE['01'];   /* v2370 · Alias */
   var MODUL = P.get('modul'), M = null;
   if (MODUL && REIHE[MODUL]) M = REIHE[MODUL];

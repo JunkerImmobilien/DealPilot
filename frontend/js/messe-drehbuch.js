@@ -473,9 +473,11 @@
         },
         async function (s) {
           await zeige(null); reiter('s5'); await warte(1200);
-          var tab = await warteAuf(function () { return [].filter.call(document.querySelectorAll('#ai-content .dp-pa-tab'), function (b) { return /Soll\/Ist/.test(b.textContent) && b.getBoundingClientRect().width > 0; })[0]; });
+          var tab = await warteAuf(function () { return [].filter.call(document.querySelectorAll('#ai-content .dp-pa-tab'), function (b) { return /Soll\/Ist|Ankauf · (Bestand|Soll)/.test(b.textContent) && b.getBoundingClientRect().width > 0; })[0]; });   /* v3490 · der Reiter heißt seit v3420 „Ankauf · Bestand · Zielbild“ */
           if (tab) tab.click();
           await warte(600);
+          /* v3490 · „Kauf gegen heute“ steht seit v3441 nur im Detail */
+          if (window.DpPilotV4 && DpPilotV4.modus && DpPilotV4.modus() !== 'detail') { DpPilotV4.setzeModus('detail'); await warte(900); }
           var a = null; try { a = DealPilotAnkauf.abweichung(); } catch (e) {}
           function z(wort) { return a && a.zeilen.filter(function (x) { return x.wort === wort; })[0]; }
           var teile = [], d = z('DSCR'), c = z('Cashflow n. Steuer'), sc = z('DealScore');
@@ -7824,7 +7826,8 @@
             'Umgeschaltet auf Genau: jetzt steht alles da — jedes Risiko, die Eigentümergemeinschaft' + (nm ? ' mit ' + nm + ' Maßnahmen' : '') + ', jede mit Status, Jahr und Kosten, dazu die Fragen an Verwalter oder Verkäufer.', LU_NACH,
             { was: 'Die Ansicht „Genau“.', warum: 'Vor dem Kauf zählt jedes Detail.', folge: 'Daraus werden die Fragen an den Verkäufer.' });
         }
-        await r11PaTab(/^Stärken/);
+        /* v3490 · den Reiter „Stärken“ gibt es seit v3420 nicht mehr: Risiken stehen unter „Potenzial & Risiken“ › Risiken */
+        if (!(await r11PaTab(/^Stärken/))) { await r11PaTab(/Potenzial & Risiken|Risiken/); await r11Unter('risk'); }
         var sr = function () { var p = r11Panel(); var li = p && [].filter.call(p.querySelectorAll('li'), function (x) { return x.offsetWidth && /Dach|Sonderumlage/i.test(r6Text(x)); })[0]; return li || (p && p.querySelector('.dp-pa-cols')); };
         if (sr()) {
           await zeige(sr, 8);
@@ -9577,6 +9580,524 @@
     ]
   };
 
+  /* ═══ v3490 · PARTNER-REIHE (Marcel 16.11.2026) ═════════════════════
+     „Ein komplettes Erklärvideo für Partner zum Partnerablauf, mit einem eigenen Demo-Partnerkonto.“
+     Vier Drehbücher: partner-cockpit (Cockpit und Marke), partner-kunden (Kunden hinzufügen),
+     partner-senden (Kunde sendet, Partner sieht und übernimmt), partner-anmerkungen (Anmerkungen,
+     Zurück an Kunden, Rückmeldung beim Kunden, neu senden).
+     Konto: NUR der Demo-Partner „Nordlicht Immobilienberatung“ (tools/partner-demo-anlegen.js, Staging).
+     Läuft das Drehbuch in einem anderen Konto, bricht es ab (pdPruefen) - nie in info@.
+     Die Drehbücher SCHREIBEN echt in die Demo-Konten (Senden, Anmerkung, Zurück an Kunden, Übernehmen).
+     Vor jeder Aufnahme stellt tools/partner-demo-anlegen.js den Aufnahme-Zustand wieder her.
+     Kein KI-, Marktbericht- oder Sprachabruf; Schreibwege an Objekte fängt die Nachsperre ab.
+     Kontowechsel (Partner ↔ Kunde): pdWechsel() schreibt die Sitzung des anderen Demo-Kontos
+     (localStorage dpm_demo_konten, nur vom Aufnahmewerkzeug gesetzt) und lädt die App mit &ab=<Szene>
+     neu; das Studio deckt den Wechsel mit einem Zwischentitel. */
+  var PD_DOMAIN = /@nordlicht-demo\.dealpilot\.test$/i;
+  function pdKonten() { try { return JSON.parse(localStorage.getItem('dpm_demo_konten') || 'null'); } catch (e) { return null; } }
+  function pdEmail() { try { var s = Auth.getSession && Auth.getSession(); return (s && s.email) || ''; } catch (e) { return ''; } }
+  function pdStil() {
+    if (q('#dpm-pd-css')) return;
+    var st = document.createElement('style'); st.id = 'dpm-pd-css';
+    /* Kegel über den Fenstern des Cockpits (#dppk-ov 100050, #dppk-dlg 100060, Anmerkungsfenster 100070) */
+    st.textContent = 'html.dpm-laeuft #dpm-kegel{z-index:100080!important}html.dpm-laeuft #dpm-zeile,html.dpm-laeuft #dpm-linie{z-index:100082!important}' +
+      'html.dpm-laeuft #dppk-band{display:none!important}';
+    document.head.appendChild(st);
+  }
+  /* Sicherung: nur im Demo-Partner und seinen Kunden */
+  async function pdPruefen(s) {
+    pdStil();
+    if (!PD_DOMAIN.test(pdEmail())) {
+      if (!STUDIO) karte('<h1>Nur im Demo-Partner</h1><p>Dieses Drehbuch läuft nur in den Demo-Konten von tools/partner-demo-anlegen.js.</p>');
+      await warte(4000); throw 'stopp';
+    }
+    /* der Testadressen-Hinweis im Toast gehört zur Demo, nicht zum Ablauf */
+    if (typeof window.toast === 'function' && !window.toast._pd) {
+      var alt = window.toast, neu = function (t) { return alt.call(this, String(t == null ? '' : t).replace(/\s*Testadresse, keine E-Mail verschickt\./, '')); };
+      neu._pd = true; neu._alt = alt; window.toast = neu;
+    }
+  }
+  function pdAufraeumen() {
+    try { if (window.toast && window.toast._pd) window.toast = window.toast._alt; } catch (e) {}
+    try { var d = q('#dppk-dlg'); if (d) d.remove(); } catch (e) {}
+    try { if (window.DpAnmerkungen && typeof DpAnmerkungen.ende === 'function' && DpAnmerkungen._zustand && DpAnmerkungen._zustand.modus === 'partner') {} } catch (e) {}
+  }
+  /* Kontowechsel: Zwischentitel, Sitzung des anderen Kontos, Neustart der App ab Szene `ab` */
+  async function pdWechsel(wer, ab, nr, titel, unter) {
+    var T = pdKonten(), k = T && T[wer];
+    if (!k || !PD_DOMAIN.test(k.email || '')) { console.warn('[messe] Demo-Konto fehlt: ' + wer); throw 'stopp'; }
+    _ziel = null; kegel(null); zeileWeg();
+    if (STUDIO) anStudio({ type: 'zwischentitel', nr: nr, titel: titel, unter: unter });
+    else karte('<div class="k">DealPilot · Partner</div><h1>' + titel + '</h1><p>' + unter + '</p>');
+    await warte(2200);
+    try { sessionStorage.setItem('dpm_fort', JSON.stringify({ zeilen: window.DPM_ZEILEN || [], t0: _zt0 })); } catch (e) {}
+    localStorage.setItem('ji_token', k.t);
+    localStorage.setItem('ji_session', JSON.stringify({ mode: 'api', userId: k.id, email: k.email, name: k.name, role: 'user', token: k.t, createdAt: new Date().toISOString(), expires: Date.now() + 3 * 3600 * 1000 }));
+    try { sessionStorage.removeItem('dppk_band_zu'); } catch (e) {}
+    var u = new URL(location.href); u.searchParams.set('ab', String(ab)); u.searchParams.set('_', String(Date.now())); u.hash = '';
+    lauf = 0;
+    location.replace(u.toString());
+    await new Promise(function () {});
+  }
+  /* nach dem Neustart: Zwischentitel weg, sobald die App steht */
+  async function pdAngekommen(ms) {
+    await warte(ms || 1500);
+    if (STUDIO) anStudio({ type: 'zwischentitel-weg' }); else karte(null);
+    await warte(900);
+  }
+  async function pdTippe(e, text, ms) {
+    if (!e) return; var w = e.ownerDocument.defaultView;
+    e.focus && e.focus(); e.value = '';
+    for (var i = 0; i < text.length; i++) { e.value = text.slice(0, i + 1); e.dispatchEvent(new w.Event('input', { bubbles: true })); await warte(ms || 55); }
+    e.dispatchEvent(new w.Event('change', { bubbles: true }));
+  }
+  function pdText(e) { return e ? String(e.textContent || '').replace(/[\s ]+/g, ' ').trim() : ''; }
+  function pdKnopf(wurzel, re) { var w = typeof wurzel === 'string' ? q(wurzel) : wurzel; if (!w) return null; return [].filter.call(w.querySelectorAll('button'), function (b) { return b.offsetWidth && re.test(pdText(b)); })[0] || null; }
+  function pdReiter(k) { return qs('#dppk-tabzeile .dppk-tab[data-pk-reiter="' + k + '"]'); }
+  function pdInhalt() { return qs('.pk-ansicht .pk-inhalt, #dppk-cockpit .pk-inhalt') || (function () { var t = q('#dppk-tabzeile'); return t ? qs('.main-col .pk-inhalt') : null; })(); }
+  async function pdCockpit(reiterK) {
+    if (!document.documentElement.hasAttribute('data-pk-offen')) { DpPartnerKunden.cockpitOeffnen(reiterK || 'uebersicht'); }
+    else DpPartnerKunden.reiterWahl(reiterK || 'uebersicht');
+    await warteAuf(function () { var i = qs('.main-col .pk-inhalt'); return i && !/Lädt/.test(pdText(i).slice(0, 12)) ? i : null; }, 9000);
+    await warte(700);
+  }
+  async function pdReiterKlick(k) {
+    var b = pdReiter(k); if (!b) return pdCockpit(k);
+    await zeige(function () { return pdReiter(k); }, 4); await warte(500);
+    b.click();
+    await warteAuf(function () { var i = qs('.main-col .pk-inhalt'); return i && !/^Lädt/.test(pdText(i)) ? i : null; }, 9000);
+    await warte(800);
+  }
+  function pdIn(sel) { return function () { var i = qs('.main-col .pk-inhalt'); return i ? [].filter.call(i.querySelectorAll(sel), function (e) { return e.offsetWidth; })[0] || null : null; }; }
+  function pdZeileMit(re, wurzelSel) { return function () { var w = qs(wurzelSel || '.main-col .pk-inhalt'); return w ? [].filter.call(w.querySelectorAll('.pk-zeile'), function (z) { return z.offsetWidth && re.test(pdText(z)); })[0] || null : null; }; }
+  function pdKachel(re) { return function () { return [].filter.call(document.querySelectorAll('.main-col .pk-kachel'), function (k) { return k.offsetWidth && re.test(pdText(k)); })[0] || null; }; }
+  function pdKachelWert(re) { var k = pdKachel(re)(); var b = k && k.querySelector('b'); return b ? pdText(b) : null; }
+  function pdDlg() { var d = q('#dppk-dlg .pk-box'); return d && d.offsetWidth ? d : null; }
+  function pdOv() { var d = q('#dppk-ov .pk-box'); return d && d.offsetWidth ? d : null; }
+  async function pdObjektLaden(re) {
+    var id = await objektFinden(re);
+    if (id && window._currentObjKey !== id && typeof window.loadSaved === 'function') { await window.loadSaved(id); await warte(1500); }
+    try { if (typeof setMainView === 'function') setMainView('single'); } catch (e) {}
+    reiter('s0'); return id;
+  }
+  function pdName() { var T = pdKonten(); var e = pdEmail(); var k = T && Object.keys(T).map(function (x) { return T[x]; }).filter(function (x) { return x.email === e; })[0]; return k ? k.name : ''; }
+  function pdKurz(n) { return String(n || '').replace(/\s*\(Demo\)\s*$/, ''); }
+
+  /* ── P1 · Partner-Cockpit und Marke ── */
+  DREHBUECHER['partner-cockpit'] = {
+    titel: 'Partner-Cockpit und Marke', unterzeile: 'Dein Arbeitsplatz für Kunden, Plätze und Marke', objekt: null,
+    abspann: [{ ms: 6200, html: ABSPANN_LOGO }],
+    aufraeumen: function () { pdAufraeumen(); try { DpPartnerKunden.reiterWahl('uebersicht'); } catch (e) {} },
+    szenen: [
+      async function (s) {   /* 1 · deine Marke */
+        await pdPruefen(s);
+        try { if (window.DpPartnerKunden && document.documentElement.hasAttribute('data-pk-offen')) DpPartnerKunden.cockpitSchliessen(); } catch (e) {}
+        await pdObjektLaden(/Gohliser/);
+        await zeige(function () { return qs('.dpl-marke') || qs('aside.sidebar .sb-brand, aside.sidebar img'); }, 8);
+        await b2oZeile(s, 'Deine Marke', 'DealPilot trägt das Logo und die Farbe deines Unternehmens. Im Beispiel die erfundene <b>Nordlicht Immobilienberatung</b>.');
+      },
+      async function (s) {   /* 2 · wo das Cockpit sitzt */
+        await zeige(function () { return qs('.sb-act-partner'); }, 6);
+        await b2oZeile(s, 'Das Partner-Cockpit', 'Unter <b>Aktionen</b> öffnest du das Partner-Cockpit. Dort steuerst du deine Kunden.');
+        var b = qs('.sb-act-partner'); if (b) b.click(); else DpPartnerKunden.cockpitOeffnen('uebersicht');
+        await warteAuf(function () { return pdKachel(/Plätze belegt/)(); }, 9000); await warte(900);
+      },
+      async function (s) {   /* 3 · Übersicht: vier Kacheln */
+        await zeige(function () { return qs('.main-col .pk-kacheln'); }, 8);
+        var pl = pdKachelWert(/Plätze belegt/), kv = pdKachelWert(/Kunden verbunden/), ns = pdKachelWert(/Neue Kundenstände/);
+        await b2oZeile(s, 'Auf einen Blick', 'Plätze belegt <b>' + (pl || '–') + '</b>, Kunden verbunden <b>' + (kv || '–') + '</b>, neue Kundenstände <b>' + (ns || '–') + '</b>. Jede Kachel führt in ihren Reiter.');
+      },
+      async function (s) {   /* 4 · Was ansteht */
+        var n = [].filter.call(document.querySelectorAll('.main-col .pk-ansteht'), function (e) { return e.offsetWidth; }).length;
+        await zeige(function () { var a = qs('.main-col .pk-ansteht'); return a && a.closest('.pk-karte'); }, 8);
+        await b2oZeile(s, 'Was ansteht', (n ? '<b>' + n + (n === 1 ? ' Punkt' : ' Punkte') + '</b> warten auf dich' : 'Hier steht, was auf dich wartet') + ': offene Anfragen, neue Stände deiner Kunden, Meldungen. Ein Klick, und du bist dort.');
+      },
+      async function (s) {   /* 5 · die Reiter */
+        await zeige(function () { return qs('#dppk-tabzeile'); }, 6);
+        await b2oZeile(s, 'Die Reiter', 'Statt Objekt bis Deal-Aktion stehen oben jetzt die Reiter des Cockpits: <b>Kunden & Plätze, Einladen, Freigegeben, Aufgaben, Meldungen, Verwaltung</b>.');
+        await zeige(function () { return qs('#dppk-tabzeile .dppk-zurueck'); }, 6);
+        await b2oZeile(s, 'Zurück zu den Objekten', 'Mit <b>Objekte</b> kommst du jederzeit zurück zu deinen eigenen Objekten.');
+      },
+      async function (s) {   /* 6 · Verwaltung: Plätze */
+        await pdReiterKlick('verwaltung');
+        await warteAuf(function () { var k = qs('.main-col [data-v="plaetze"] .pk-kachel b'); return k; }, 9000); await warte(600);
+        await zeige(function () { return qs('.main-col [data-v="plaetze"]'); }, 8);
+        var w = function (re) { var k = [].filter.call(document.querySelectorAll('.main-col [data-v="plaetze"] .pk-kachel'), function (x) { return re.test(pdText(x)); })[0]; return k ? pdText(k.querySelector('b')) : '–'; };
+        await b2oZeile(s, 'Plätze', 'Ein Platz ist ein DealPilot-Zugang, den du für einen Kunden bezahlst. Gekauft <b>' + w(/Gekauft/) + '</b>, belegt <b>' + w(/Belegt/) + '</b>, frei <b>' + w(/Frei/) + '</b>.');
+        await zeige(function () { return qs('.main-col [data-v="plaetze"] .pk-kauf'); }, 8);
+        var pr = pdText(qs('.main-col [data-v="plaetze"] .pk-preis'));
+        await b2oZeile(s, 'Plätze dazukaufen', 'Monatlich oder jährlich, der Preis steht sofort daneben' + (pr ? ' (<b>' + pr.replace(/(€) (je \w+)/, '$1 $2').replace(/ €/, ' €') + '</b>)' : '') + '. Bezahlt wird über die Kasse, nichts geht ohne deinen Klick.');
+      },
+      async function (s) {   /* 7 · Abrechnung */
+        await zeige(function () { return qs('.main-col [data-v="abo"]'); }, 8);
+        await b2oZeile(s, 'Abrechnung', 'Dein Partner-Plan, Rechnungen, Zahlungsart und Kündigung findest du im Abo-Portal.');
+      },
+      async function (s) {   /* 8 · Marke */
+        await warteAuf(function () { var m = qs('.main-col .pk-marke-form'); return m && !/Lädt|Lade/.test(pdText(m).slice(0, 20)) ? m : null; }, 9000); await warte(600);
+        var mk = function () { return qs('.main-col [data-v="marke"]'); };
+        var m0 = mk(); if (m0) { var sx = scroller(m0); if (sx && sx !== document.scrollingElement) { sx.scrollTop += rect(m0).top - 120; await warte(500); } }
+        await zeige(mk, 8);
+        await b2oZeile(s, 'Marke', 'Name, Logo und Akzentfarbe deines Unternehmens. Dazu Anschrift und Kontakt für PDFs und E-Mails an deine Kunden.');
+        var lg = function () { var m = mk(); return m && [].filter.call(m.querySelectorAll('img'), function (i) { return i.offsetWidth > 30; })[0]; };
+        if (lg()) { await zeige(lg, 10); await b2oZeile(s, 'Dein Logo', 'Einmal hochladen. DealPilot rechnet es für helle und dunkle Flächen selbst passend.'); }
+        var fa = function () { var m = mk(); return m && [].filter.call(m.querySelectorAll('input[type="color"]'), function (i) { return i.offsetWidth; })[0]; };
+        if (fa()) { var f0 = fa(); await zeige(function () { var f = fa(); return f && (f.closest('label,.rp-row,.rp-fl,div') || f); }, 10); await b2oZeile(s, 'Deine Farbe', 'Die Akzentfarbe ersetzt das DealPilot-Gold: Knöpfe, Linien, Reiter. Hier <b>' + String(f0.value || '').toUpperCase() + '</b>.'); }
+        await zeige(mk, 8);
+        await b2oZeile(s, 'Für deine Kunden', 'Kunden mit deinem Platz sehen DealPilot in deiner Marke. Kunden mit eigenem Abo wählen selbst, ob sie deine Marke nutzen.');
+      },
+      async function (s) {   /* 9 · Ausblick */
+        await pdReiterKlick('uebersicht');
+        await zeige(function () { return qs('#dppk-tabzeile'); }, 6);
+        await b2oZeile(s, 'Startklar', 'Das Cockpit steht. Im nächsten Video: <b>Kunden hinzufügen</b>, mit Partnerplatz oder mit eigenem Abo.');
+      }
+    ]
+  };
+
+  /* ── P2 · Kunden hinzufügen ── */
+  DREHBUECHER['partner-kunden'] = {
+    titel: 'Kunden hinzufügen', unterzeile: 'Mit Partnerplatz, mit eigenem Abo, per Einladung oder Code', objekt: null,
+    abspann: [{ ms: 6200, html: ABSPANN_LOGO }],
+    aufraeumen: function () { pdAufraeumen(); try { var o = q('#dppk-ov'); if (o) o.remove(); } catch (e) {} },
+    szenen: [
+      async function (s) {   /* 1 · Kunden & Plätze */
+        await pdPruefen(s);
+        await pdCockpit('kunden');
+        await zeige(function () { return qs('.main-col .pk-inhalt'); }, 8);
+        await b2oZeile(s, 'Kunden & Plätze', 'Hier stehen alle Kunden, die mit dir verbunden sind, und alle, die noch zusagen müssen.');
+      },
+      async function (s) {   /* 2 · Partnerplatz */
+        var z = pdZeileMit(/Partnerplatz/);
+        var n = z() ? pdText(z().querySelector('.pk-name b')) : '';
+        await zeige(z, 6);
+        await b2oZeile(s, 'Mit Partnerplatz', '<b>' + pdKurz(n) + '</b> nutzt einen Platz von dir. Du bezahlst seinen Zugang und bestimmst Stufe, Rechte und Marke.');
+      },
+      async function (s) {   /* 3 · eigener Plan */
+        var z = pdZeileMit(/eigener Plan/i);
+        var n = z() ? pdText(z().querySelector('.pk-name b')) : '';
+        await zeige(z, 6);
+        await b2oZeile(s, 'Mit eigenem Abo', '<b>' + pdKurz(n) + '</b> hat DealPilot schon selbst gebucht. Sie verbindet sich mit dir und behält ihren Plan. Ein Platz wird dafür nicht gebraucht.');
+      },
+      async function (s) {   /* 4 · wartet */
+        var z = pdZeileMit(/per Einladung|per Code/);
+        var n = z() ? pdText(z().querySelector('.pk-name b')) : '';
+        await zeige(z, 6);
+        await b2oZeile(s, 'Wartet auf Zusage', '<b>' + pdKurz(n) + '</b> ist eingeladen und hat noch nicht bestätigt. Ohne seine Zusage entsteht keine Verbindung.');
+      },
+      async function (s) {   /* 5 · Stufe und Rechte */
+        var b = function () { var z = pdZeileMit(/Partnerplatz/)(); return z && z.querySelector('[data-ein]'); };
+        await zeige(b, 6); await warte(400);
+        if (b()) b().click();
+        await warteAuf(pdDlg, 5000); await warte(500);
+        await zeige(pdDlg, 6);
+        await b2oZeile(s, 'Stufe und Rechte', 'Beim Platz legst du fest, wie viel dein Kunde sieht: <b>Einsteiger, Fortgeschritten oder Experte</b>, deine Marke oder DealPilot.');
+        var re = function () { var d = pdDlg(); return d && [].filter.call(d.querySelectorAll('.pk-gruppe'), function (g) { return /Rechte des Platzes/.test(pdText(g)); })[0]; };
+        var r0 = re(); if (r0) { var sc = q('#dppk-dlg'); if (sc) { sc.scrollTop += rect(r0).top - 140; await warte(500); } }
+        await zeige(function () { var g = re(); return g && g.parentElement; }, 6);
+        await b2oZeile(s, 'Einzelne Teile abschalten', 'Mit den Schaltern nimmst du einzelne Funktionen aus dem Platz, zum Beispiel PDFs oder die Steuer.');
+        var ms = function () { var e = q('#pk-k-mailrm'); return e && e.closest('label'); };
+        var m0 = ms(); if (m0) { var sc2 = q('#dppk-dlg'); if (sc2) { sc2.scrollTop += rect(m0).top - 260; await warte(500); } }
+        await zeige(ms, 8);
+        await b2oZeile(s, 'E-Mail bei Rückmeldung', 'Gibst du einem Kunden Anmerkungen zurück, bekommt er eine E-Mail in deiner Marke. Hier je Kunde an- oder abschaltbar.');
+        var ab = pdKnopf('#dppk-dlg', /^Abbrechen$/); if (ab) ab.click();
+        await warte(700);
+      },
+      async function (s) {   /* 6 · Einladen per E-Mail */
+        await pdReiterKlick('einladen');
+        var f = pdIn('[data-form="mail"]');
+        await zeige(f, 8);
+        await b2oZeile(s, 'Per E-Mail einladen', 'Name und Adresse eintragen. Hat die Adresse schon ein DealPilot-Konto, bekommt der Kunde eine Anfrage in seiner App, sonst eine Einladung per E-Mail.');
+        await pdTippe(q('#pk-e-name'), 'Neue Kundin (Beispiel)', 45);
+        await pdTippe(q('#pk-e-mail'), 'kundin@beispiel.example', 40);
+        await warte(500);
+        await zeige(function () { var w = q('[data-form="mail"] input[name="pk-e-art"]'); return w && w.closest('label') && w.closest('label').parentElement; }, 8);
+        await b2oZeile(s, 'Mit oder ohne Platz', '<b>Mit Partnerplatz</b> bezahlst du den Zugang. <b>Ohne Platz</b> nutzt der Kunde seinen eigenen Plan. Hat er schon ein Abo, wird er automatisch ohne Platz verbunden.');
+        await zeige(function () { var x = f(); return x && x.querySelector('.pk-fuss .pk-btn'); }, 8);
+        await b2oZeile(s, 'Einladen', 'Ein Klick auf <b>Einladen</b> schickt die Einladung los. Im Video lassen wir das Beispiel stehen.');
+        q('#pk-e-name').value = ''; q('#pk-e-mail').value = '';
+      },
+      async function (s) {   /* 7 · Verbindungscode */
+        var f = pdIn('[data-form="code"]');
+        await zeige(f, 8);
+        await b2oZeile(s, 'Verbindungscode', 'Kunden mit eigenem Abo erzeugen in DealPilot einen Code und geben ihn dir, etwa im Termin. Du trägst ihn hier ein, der Kunde bestätigt.');
+        await zeige(function () { var e = q('#pk-c-platz'); return e && e.closest('label'); }, 8);
+        await b2oZeile(s, 'Platz nur bei Bedarf', 'Den Haken <b>Partnerplatz mitgeben</b> nimmst du raus, wenn der Kunde sein eigenes Abo behält.');
+      },
+      async function (s) {   /* 8 · Wechsel zum Kunden */
+        await pdWechsel('C', 8, '2', 'Beim Kunden', 'So sieht die Einladung beim Kunden aus.');
+      },
+      async function (s) {   /* 9 · Anfrage beim Kunden */
+        await pdAngekommen(1800);
+        await pdPruefen(s);
+        var nm = pdKurz(pdName());
+        try { await DpPartnerKunden.meinPartnerOeffnen(); } catch (e) {}
+        await warteAuf(pdOv, 8000); await warte(700);
+        await zeige(function () { return pdOv() && pdOv().querySelector('.pk-inhalt'); }, 8);
+        await b2oZeile(s, 'Mein Partner', (nm ? '<b>' + nm + '</b>' : 'Der Kunde') + ' findet die Anfrage unter <b>Aktionen › Mein Partner</b>. Oben in der App erscheint dazu ein Hinweis.');
+        var an = function () { var o = pdOv(); return o && o.querySelector('[data-anf]'); };
+        if (an()) {
+          await zeige(an, 6); await warte(400); an().click();
+          await warteAuf(pdDlg, 5000); await warte(600);
+          await zeige(pdDlg, 6);
+          await b2oZeile(s, 'Er entscheidet', 'Der Kunde sieht, wer sich verbinden will und was das heißt. Mit Platz bezahlst du seinen Zugang. <b>Erst seine Bestätigung</b> verbindet euch.');
+          await b2oZeile(s, 'Was du siehst', 'Du siehst nur Objekte, die er dir ausdrücklich sendet, als Kopie. Trennen kann er jederzeit.');
+          var zu = function () { var d = q('#dppk-dlg .pk-zu'); return d; };
+          if (zu()) zu().click();
+          await warte(700);
+        }
+        var cd = function () { var o = pdOv(); return o && pdKnopf(o, /Code erzeugen/); };
+        if (cd()) {
+          await zeige(cd, 8);
+          await b2oZeile(s, 'Der Code für dich', 'Hier erzeugt der Kunde den <b>Verbindungscode</b>, wenn er sich selbst mit dir verbinden möchte. Er gilt 24 Stunden und nur einmal.');
+        }
+        var ov = q('#dppk-ov'); if (ov) ov.remove();
+        await warte(600);
+        await zeige(function () { return qs('.dpl-schiene') || qs('aside.sidebar'); }, 6);
+        await b2oZeile(s, 'Weiter geht’s', 'Sobald er bestätigt, steht er bei dir unter Kunden & Plätze. Im nächsten Video: <b>Objekte senden</b>.');
+      }
+    ]
+  };
+
+  /* ── P3 · Kunde sendet, Partner sieht ── */
+  DREHBUECHER['partner-senden'] = {
+    titel: 'Objekte an den Partner senden', unterzeile: 'Vom Kunden ins Cockpit — und als eigenes Objekt übernehmen', objekt: null,
+    abspann: [{ ms: 6200, html: ABSPANN_LOGO }],
+    aufraeumen: function () { pdAufraeumen(); try { var o = q('#dppk-ov'); if (o) o.remove(); } catch (e) {} },
+    szenen: [
+      async function (s) {   /* 1 · Partner: kurz der Stand */
+        await pdPruefen(s);
+        await pdCockpit('staende');
+        await zeige(function () { return qs('.main-col .pk-inhalt'); }, 8);
+        var n = [].filter.call(document.querySelectorAll('.main-col .pk-inhalt .pk-zeile'), function (z) { return z.offsetWidth; }).length;
+        await b2oZeile(s, 'Freigegeben', 'Unter <b>Freigegeben</b> stehen alle Objekte, die deine Kunden dir gesendet haben. Gerade sind es <b>' + n + '</b>.');
+      },
+      async function (s) {   /* 2 · Wechsel zur Kundin */
+        await pdWechsel('B', 2, '1', 'Bei der Kundin', 'Sabine sendet dir ein neues Objekt.');
+      },
+      async function (s) {   /* 3 · Objekt der Kundin */
+        await pdAngekommen(1800);
+        await pdPruefen(s);
+        await pdObjektLaden(/Musterweg/);
+        await zeige(function () { return q('#hdr-obj') || qs('header.hdr'); }, 8);
+        await b2oZeile(s, 'Ein neues Objekt', '<b>' + pdKurz(pdName()) + '</b> rechnet gerade ' + (wert('str') ? '<b>' + wert('str') + ' ' + wert('hnr') + ', ' + wert('ort') + '</b>' : 'ein neues Objekt') + '. Sie möchte deine Meinung dazu.');
+      },
+      async function (s) {   /* 4 · Aktionen › Mein Partner */
+        var mp = function () { return qs('.sb-act-meinpartner'); };
+        await zeige(mp, 6);
+        await b2oZeile(s, 'Mein Partner', 'Unter <b>Aktionen › Mein Partner</b> sendet sie Objekte an dich.');
+        if (mp()) mp().click(); else DpPartnerKunden.meinPartnerOeffnen();
+        await warteAuf(function () { var o = pdOv(); return o && o.querySelector('[data-obj]'); }, 9000); await warte(700);
+        await zeige(function () { return pdOv() && pdOv().querySelector('.pk-hinweis'); }, 6);
+        await b2oZeile(s, 'Nur eine Kopie', 'Gesendet wird eine <b>Kopie</b>. Du siehst nur, was sie dir sendet, nie ihre übrigen Objekte. Ihr Original bleibt bei ihr.');
+      },
+      async function (s) {   /* 5 · auswählen und senden */
+        var id = window._currentObjKey;
+        var cb = function () { var o = pdOv(); return o && o.querySelector('[data-obj="' + id + '"]'); };
+        var zl = function () { var c = cb(); return c && c.closest('label'); };
+        await zeige(zl, 6); await warte(500);
+        if (cb() && !cb().checked) cb().click();
+        await b2oZeile(s, 'Auswählen', 'Haken setzen. Mehrere Objekte gehen auf einmal, mit <b>Gesamter Bestand</b> auch alle.');
+        var sb = function () { var o = pdOv(); return o && o.querySelector('[data-a="senden"]'); };
+        await zeige(sb, 8); await warte(400);
+        if (sb()) sb().click();
+        await warteAuf(pdDlg, 5000); await warte(500);
+        await zeige(pdDlg, 6);
+        await b2oZeile(s, 'An Partner senden', 'Noch einmal klar gesagt, was passiert. Dann <b>Senden</b>.');
+        var se = pdKnopf('#dppk-dlg', /^Senden$/); if (se) se.click();
+        await warteAuf(function () { var o = pdOv(); return o && /Stand \d+ vom/.test(pdText(o.querySelector('.pk-inhalt'))) && /Meine Sendungen/.test(pdText(o.querySelector('.pk-reiter button.an'))) ? o : null; }, 9000);
+        await warte(700);
+        await zeige(function () { var o = pdOv(); return o && o.querySelector('.pk-inhalt'); }, 6);
+        await b2oZeile(s, 'Meine Sendungen', 'Sie sieht, welcher Stand bei dir liegt und ob du ihn schon geöffnet hast. Ändert sie das Objekt, sendet sie einfach einen <b>neuen Stand</b>.');
+        var ov = q('#dppk-ov'); if (ov) ov.remove();
+      },
+      async function (s) {   /* 6 · Wechsel zum Partner */
+        await pdWechsel('P', 6, '2', 'Im Partner-Cockpit', 'Das Objekt ist angekommen.');
+      },
+      async function (s) {   /* 7 · Übersicht beim Partner */
+        await pdAngekommen(1800);
+        await pdPruefen(s);
+        await pdCockpit('uebersicht');
+        var zs = function () { return [].filter.call(document.querySelectorAll('.main-col .pk-ansteht'), function (e) { return e.offsetWidth && /Sabine/.test(pdText(e)); })[0] || qs('.main-col .pk-ansteht'); };
+        await zeige(zs, 8);
+        await b2oZeile(s, 'Was ansteht', 'In der Übersicht steht es sofort: <b>' + pdText(zs()).replace(/\s*›$/, '') + '</b>. Dazu eine Meldung.');
+      },
+      async function (s) {   /* 8 · Freigegeben, nach Kunde */
+        await pdReiterKlick('staende');
+        var fk = function () { return [].filter.call(document.querySelectorAll('.main-col .pk-filter button'), function (b) { return /Sabine/.test(pdText(b)); })[0]; };
+        if (fk()) { await zeige(fk, 6); await warte(400); fk().click(); await warte(900); }
+        var z = pdZeileMit(/Musterweg/);
+        await zeige(z, 6);
+        await b2oZeile(s, 'Je Kunde', 'Jeder Kunde hat seine Karte. Am Objekt steht Ankauf oder Bestand, welcher Stand und wann. <b>Neu</b> heißt: noch nicht geöffnet.');
+        var fa = fk(); if (fa) { var al = [].filter.call(document.querySelectorAll('.main-col .pk-filter button'), function (b) { return /Alle Kunden/.test(pdText(b)); })[0]; if (al) { al.click(); await warte(900); } }
+        var j = pdZeileMit(/Lindenallee/);
+        if (j()) {
+          await zeige(j, 6);
+          await b2oZeile(s, 'Stand 2', 'Bei Jonas siehst du <b>' + (/Stand (\d+)/.exec(pdText(j())) ? 'Stand ' + /Stand (\d+)/.exec(pdText(j()))[1] : 'den neuesten Stand') + '</b>. Jeder neue Stand ersetzt den alten, du arbeitest immer am aktuellen.');
+        }
+      },
+      async function (s) {   /* 9 · Ansehen */
+        var b = function () { var z = pdZeileMit(/Musterweg/)(); return z && z.querySelector('[data-laden]'); };
+        await zeige(b, 8); await warte(400);
+        if (b()) b().click();
+        await warteAuf(function () { return q('#dppk-ks'); }, 12000); await warte(1500);
+        await zeige(function () { return q('#dppk-ks'); }, 6);
+        await b2oZeile(s, 'Nur lesen', 'Du siehst das Objekt mit allen Zahlen, Reitern und Unterlagen, so wie Sabine es gerechnet hat. Ändern kannst du hier nichts.');
+        reiter('s6'); await warte(1800);
+        await zeige(function () { return qs('#s6 .card') || qs('#s6') || qs('.main-col .body'); }, 8);
+        await b2oZeile(s, 'Alles da', 'Kennzahlen, Score und Bewertung stehen wie bei deinen eigenen Objekten. Rechnen und PDFs erstellen geht auch.');
+        reiter('s0'); await warte(800);
+      },
+      async function (s) {   /* 10 · übernehmen */
+        var ub = function () { var k = q('#dppk-ks'); return k && pdKnopf(k, /Als eigenes Objekt übernehmen/); };
+        await zeige(ub, 8);
+        await b2oZeile(s, 'Als eigenes Objekt übernehmen', 'Willst du damit weiterarbeiten, übernimmst du es. DealPilot legt eine <b>eigene Kopie</b> bei dir an. Sie bleibt, auch wenn Sabine ihren Stand zurückzieht.');
+        var vor = window._currentObjKey;
+        if (ub()) ub().click();
+        await warteAuf(function () { return window._currentObjKey && window._currentObjKey !== vor && !q('#dppk-ks'); }, 12000); await warte(1500);
+        await zeige(function () { return q('#hdr-obj-num') || qs('header.hdr'); }, 8);
+        await b2oZeile(s, 'Dein Objekt', 'Jetzt ist es dein Objekt mit eigener Nummer <b>' + pdText(q('#hdr-obj-num')).replace(/\s*✎\s*$/, '') + '</b>. Du kannst es frei bearbeiten.');
+        await zeige(function () { return qs('.dpl-schiene .sb-card') || qs('.dpl-schiene') || qs('aside.sidebar'); }, 6);
+        await b2oZeile(s, 'Weiter geht’s', 'Im nächsten Video: <b>Anmerkungen</b> an den Kundenstand schreiben und zurückgeben.');
+      }
+    ]
+  };
+
+  /* ── P4 · Anmerkungen, Zurück an Kunden, Rückmeldung ── */
+  DREHBUECHER['partner-anmerkungen'] = {
+    titel: 'Anmerkungen und Rückmeldung', unterzeile: 'Felder markieren, zurückgeben, und was der Kunde sieht', objekt: null,
+    abspann: [{ ms: 6200, html: ABSPANN_LOGO }],
+    aufraeumen: function () { pdAufraeumen(); try { var o = q('#dppk-ov'); if (o) o.remove(); var f = q('#dppk-anm-fenster'); if (f) f.remove(); } catch (e) {} },
+    szenen: [
+      async function (s) {   /* 1 · Freigegeben: Lindenallee */
+        await pdPruefen(s);
+        await pdCockpit('staende');
+        var z = pdZeileMit(/Lindenallee/);
+        await zeige(z, 6);
+        await b2oZeile(s, 'Ein Kundenstand', 'Jonas hat die <b>Lindenallee 14</b> gesendet. Er will sie bald der Bank zeigen. Wir prüfen sie vorher.');
+        var b = function () { var x = z(); return x && x.querySelector('[data-laden]'); };
+        await zeige(b, 8); await warte(400); if (b()) b().click();
+        await warteAuf(function () { return q('#dppk-ks [data-anm="markieren"]'); }, 12000); await warte(1800);
+      },
+      async function (s) {   /* 2 · die Leiste und die Liste */
+        await zeige(function () { return q('#dppk-ks'); }, 6);
+        await b2oZeile(s, 'Die Werkzeuge', '<b>Feld markieren</b>, <b>Anmerkung</b>, die Liste und <b>Zurück an Kunden</b>. Alles, was du schreibst, bleibt Entwurf, bis du zurückgibst.');
+        var l = function () { var x = q('#dppk-anm-liste'); return x && !x.classList.contains('zu') && x.offsetWidth ? x : null; };
+        if (!l()) { var lb = q('#dppk-ks [data-anm="liste"]'); if (lb) lb.click(); await warte(900); }
+        await zeige(function () { return l() && l().querySelector('.al-inhalt'); }, 6);
+        var e = l() ? [].filter.call(l().querySelectorAll('.al-eintrag'), function (x) { return /ENTWURF|Entwurf/.test(pdText(x)); }).length : 0;
+        var er = l() ? [].filter.call(l().querySelectorAll('.al-eintrag'), function (x) { return /erledigt/i.test(pdText(x.querySelector('.al-chip'))); })[0] : null;
+        await b2oZeile(s, 'Die Liste', 'Rechts steht jede Anmerkung mit Nummer. Frühere Punkte zeigen, was der Kunde schon erledigt oder beantwortet hat' + (e ? ', dazu <b>' + e + ' Entwurf</b> von dir' : '') + '.');
+        if (er) { await zeige(function () { return er; }, 6); await b2oZeile(s, 'Antwort des Kunden', 'Jonas hat geantwortet: <b>' + pdText(er.querySelector('.al-ort:last-of-type')).replace(/^Antwort des Kunden:\s*/, '') + '</b>'); }
+      },
+      async function (s) {   /* 3 · Feld markieren */
+        reiter('s1'); await warte(1200);
+        var mk = function () { return q('#dppk-ks [data-anm="markieren"]'); };
+        await zeige(mk, 6); await warte(300);
+        if (mk()) mk().click(); await warte(600);
+        await zeige(function () { return q('#dppk-anm-hinweis'); }, 6);
+        await b2oZeile(s, 'Feld markieren', 'Jetzt tippst du auf ein Feld, eine Kachel oder einen Abschnitt, in jedem Reiter.');
+        var fd = function () { var e = document.getElementById('san'); return e && (e.closest('.f,.field,.fg,.form-group') || e.parentElement); };
+        var f0 = fd(); if (f0) { holen(f0); await warte(600); }
+        await zeige(fd, 8); await warte(500);
+        var ziel = document.getElementById('san');
+        if (ziel) { ziel.dispatchEvent(new MouseEvent('mouseover', { bubbles: true })); await warte(500); ziel.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true })); }
+        await warteAuf(function () { return q('#dppk-anm-fenster'); }, 4000); await warte(600);
+        await zeige(function () { return q('#dppk-anm-fenster'); }, 6);
+        await b2oZeile(s, 'Anmerkung zum Feld', 'Das Fenster steht direkt am Feld. Oben, welches Feld und was gerade drinsteht.');
+        await pdTippe(q('#dppk-anm-text'), 'Für Baujahr 1996 bitte eine Rücklage für die Instandsetzung einplanen.', 38);
+        var pr = q('#dppk-anm-fenster input[name="dppk-anm-art"][value="pruefen"]'); if (pr) { pr.click(); }
+        await warte(400);
+        await pdTippe(q('#dppk-anm-vorschlag'), '25000', 120);
+        await b2oZeile(s, 'Art und Vorschlag', 'Hinweis, <b>Bitte prüfen</b> oder Bitte nachreichen. Bei Eingabefeldern kannst du einen Wert vorschlagen. Diktieren geht auch.');
+        var sp = function () { return q('#dppk-anm-fenster [data-x="ok"]'); };
+        await zeige(sp, 8); await warte(300); if (sp()) sp().click();
+        await warteAuf(function () { return !q('#dppk-anm-fenster'); }, 6000); await warte(1200);
+        var rh = function () { return qs('.dppk-anm-rahmen') || qs('#dppk-anm-layer .dppk-anm-rahmen, #dppk-anm-layer > *'); };
+        await zeige(function () { return fd(); }, 14);
+        await b2oZeile(s, 'Markiert', 'Das Feld bekommt einen Rahmen mit Nummer, in der Liste steht der neue Entwurf.');
+      },
+      async function (s) {   /* 4 · zurück an Kunden */
+        var zb = function () { return q('#dppk-ks [data-anm="zurueck"]'); };
+        await zeige(zb, 6);
+        var n = (/\((\d+)\)/.exec(pdText(zb())) || [])[1];
+        await b2oZeile(s, 'Zurück an Kunden', 'Alle Entwürfe gehen gebündelt zurück' + (n ? ', hier <b>' + n + '</b>' : '') + '. Als eine Aufgabe an genau diesen Kunden.');
+        if (zb()) zb().click();
+        await warteAuf(function () { return q('#dppk-anm-fenster textarea'); }, 4000); await warte(500);
+        await zeige(function () { return q('#dppk-anm-fenster'); }, 6);
+        await pdTippe(q('#dppk-anm-fenster textarea'), 'Hallo Jonas, zwei Punkte vor dem Bankgespräch. Viele Grüße, Lena', 36);
+        var mailSatz = /E-Mail/.test(pdText(q('#dppk-anm-fenster .af-ort'))) && !/ausgeschaltet/.test(pdText(q('#dppk-anm-fenster .af-ort')));
+        await b2oZeile(s, 'Mit Begleittext', mailSatz ? 'Dazu bekommt Jonas eine <b>E-Mail in deiner Marke</b> mit Objekt, Zahl der Anmerkungen und deinem Text. Die Anmerkungen selbst stehen nur in der App.' : 'Ein kurzer Begleittext. Die Anmerkungen stehen in der App.');
+        var ok = function () { return q('#dppk-anm-fenster [data-x="ok"]'); };
+        await zeige(ok, 8); await warte(300); if (ok()) ok().click();
+        await warteAuf(function () { return !q('#dppk-anm-fenster'); }, 8000); await warte(1500);
+        await zeige(function () { return q('#dppk-anm-liste .al-inhalt') || q('#dppk-ks'); }, 6);
+        await b2oZeile(s, 'Zurückgegeben', 'Die Entwürfe stehen jetzt beim Kunden als <b>offen</b>. Ändern kannst du sie nicht mehr.');
+      },
+      async function (s) {   /* 5 · Wechsel zum Kunden */
+        await pdWechsel('A', 5, '2', 'Beim Kunden', 'Was Jonas jetzt sieht.');
+      },
+      async function (s) {   /* 6 · Aufgabe beim Kunden */
+        await pdAngekommen(1800);
+        await pdPruefen(s);
+        await pdObjektLaden(/Musterstraße/);
+        var mp = function () { return qs('.sb-act-meinpartner'); };
+        await zeige(mp, 6);
+        await b2oZeile(s, 'Neue Aufgabe', 'Jonas sieht einen Punkt an <b>Mein Partner</b>. Mit E-Mail kommt er direkt über den Link hierher.');
+        try { await DpPartnerKunden.meinPartnerOeffnen('aufgaben'); } catch (e) {}
+        await warteAuf(function () { var o = pdOv(); return o && o.querySelector('[data-rm]'); }, 9000); await warte(700);
+        var a = function () { var o = pdOv(); var b = o && o.querySelector('[data-rm]'); return b && b.closest('.pk-zeile'); };
+        await zeige(a, 6);
+        await b2oZeile(s, 'Rückmeldung zu …', 'Die Aufgabe nennt Objekt, Zahl der Anmerkungen und den Stand. Darunter dein Begleittext.');
+        var b = function () { var o = pdOv(); return o && o.querySelector('[data-rm]'); };
+        await zeige(b, 8); await warte(400); if (b()) b().click();
+        await warteAuf(function () { var l = q('#dppk-anm-liste'); return l && l.offsetWidth && l.querySelector('.al-eintrag') && /Lindenallee/.test(wert('str')) ? l : null; }, 12000); await warte(1600);
+      },
+      async function (s) {   /* 7 · am eigenen Objekt */
+        await zeige(function () { var e = document.getElementById('san'); return e && (e.closest('.f,.field,.fg,.form-group') || e.parentElement); }, 14);
+        await b2oZeile(s, 'Am eigenen Objekt', 'Jonas landet in <b>seinem</b> Objekt, an der markierten Stelle. Dieselben Rahmen, dieselbe Liste.');
+        var e1 = function () { var l = q('#dppk-anm-liste'); return l && [].filter.call(l.querySelectorAll('.al-eintrag'), function (x) { return x.querySelector('[data-a="vorschlag"]'); })[0]; };
+        await zeige(e1, 6);
+        await b2oZeile(s, 'Erledigt, Antworten, Vorschlag', 'Je Anmerkung: <b>Erledigt</b>, <b>Antworten</b> und bei einem Vorschlag <b>Vorschlag übernehmen</b>. Übernommen wird nur auf seinen Klick.');
+        var vb = function () { var x = e1(); return x && x.querySelector('[data-a="vorschlag"]'); };
+        await zeige(vb, 8); await warte(400); if (vb()) vb().click(); await warte(1500);
+        await zeige(function () { var e = document.getElementById('san'); return e && (e.closest('.f,.field,.fg,.form-group') || e.parentElement); }, 14);
+        await b2oZeile(s, 'Übernommen', 'Der Wert steht im Feld: <b>' + (wert('san') ? de(Number(String(wert('san')).replace(/\./g, '').replace(',', '.'))) + ' €' : '') + '</b>. Die Rechnung läuft sofort mit.');
+        var eb = function () { var l = q('#dppk-anm-liste'); return l && l.querySelector('.al-eintrag [data-a="erledigt"]'); };
+        var zahl0 = function () { var l = q('#dppk-anm-liste'); return l ? l.querySelectorAll('.al-eintrag [data-a="erledigt"]').length : 0; };
+        var schutz = 0;
+        while (eb() && schutz++ < 4) { await zeige(eb, 8); await warte(500); var n0 = zahl0(); eb().click(); await warteAuf(function () { return zahl0() < n0; }, 5000); await warte(900); }
+        var fu = function () { var l = q('#dppk-anm-liste'); return l && l.querySelector('.al-fuss'); };
+        await zeige(fu, 8);
+        await b2oZeile(s, 'Alles erledigt', 'Ist alles erledigt, sagt DealPilot es und bietet <b>Erneut senden</b> an. Dein Partner bekommt eine Meldung.');
+      },
+      async function (s) {   /* 8 · erneut senden */
+        var es = function () { var l = q('#dppk-anm-liste'); return l && l.querySelector('[data-f="senden"]'); };
+        await zeige(es, 8); await warte(400);
+        if (es()) es().click();
+        await warteAuf(pdDlg, 5000); await warte(500);
+        await zeige(pdDlg, 6);
+        await b2oZeile(s, 'Neuer Stand', 'Ein Klick, und der neue Stand liegt bei seinem Partner.');
+        var se = pdKnopf('#dppk-dlg', /^Senden$/); if (se) se.click();
+        await warteAuf(function () { return !pdDlg(); }, 8000); await warte(1500);
+      },
+      async function (s) {   /* 9 · zurück beim Partner */
+        await pdWechsel('P', 9, '3', 'Beim Partner', 'Meldungen und neuer Stand.');
+      },
+      async function (s) {   /* 10 · Meldungen */
+        await pdAngekommen(1800);
+        await pdPruefen(s);
+        await pdCockpit('meldungen');
+        await zeige(function () { return qs('.main-col .pk-inhalt'); }, 8);
+        var t = [].filter.call(document.querySelectorAll('.main-col .pk-inhalt .pk-zeile, .main-col .pk-inhalt li, .main-col .pk-inhalt > div'), function (e) { return e.offsetWidth && /erledigt|gesendet|Stand/.test(pdText(e)); })[0];
+        await b2oZeile(s, 'Meldungen', 'Unter <b>Meldungen</b> steht, was Jonas getan hat' + (t ? ': <b>' + pdText(t).slice(0, 90) + '</b>' : '') + '.');
+        await pdReiterKlick('staende');
+        var z = pdZeileMit(/Lindenallee/);
+        await zeige(z, 6);
+        var st = (/Stand (\d+)/.exec(pdText(z())) || [])[1];
+        await b2oZeile(s, 'Der Kreis schließt sich', 'Unter Freigegeben liegt ' + (st ? '<b>Stand ' + st + '</b>' : 'der neue Stand') + '. Prüfen, anmerken, zurückgeben, bis es passt.');
+      }
+    ]
+  };
+
   /* ── Ablauf ───────────────────────────────────────────────────── */
   var lauf = 0, _aktiv = null;
   function stopp() {
@@ -9597,8 +10118,22 @@
     var b = el('dpm-stopp', 'button'); b.type = 'button'; b.textContent = '■'; b.title = 'Drehbuch beenden (Esc)'; b.onclick = stopp;
     document.addEventListener('keydown', esc, true);
     var n = D.szenen.length;
+    /* v3490 · Fortsetzung nach einem Kontowechsel (pdWechsel): &ab=<Szene> startet dort, ohne Titelkarte und
+       ohne auf das Studio zu warten; die Zeitmarken der Zeilen laufen weiter (sessionStorage dpm_fort) */
+    var AB = 0; try { AB = Math.max(0, Math.min(n - 1, parseInt(new URLSearchParams(location.search).get('ab'), 10) || 0)); } catch (e) {}
     try {
       do {
+        if (AB) {
+          try { var fo = JSON.parse(sessionStorage.getItem('dpm_fort') || 'null'); if (fo) { _zt0 = fo.t0 || Date.now(); window.DPM_ZEILEN = fo.zeilen || []; } } catch (e) { _zt0 = Date.now(); }
+          window.DPM_ZEILEN_META = { drehbuch: name, start_abs: _zt0, ende_ms: null, tempo: TEMPO, studio: STUDIO, fortsetzung: AB };
+          for (var fi = AB; fi < n; fi++) { var fj = fi; await D.szenen[fi]({ zeile: function (k, t) { zeile(k, t, fj, n); } }); }
+          try { window.DPM_ZEILEN_META.ende_ms = Date.now() - _zt0; sessionStorage.removeItem('dpm_fort'); } catch (e) {}
+          if (STUDIO) { anStudio({ type: 'ende' }); await warte(1400); }
+          _ziel = null; kegel(null); zeileWeg();
+          if (D.aufraeumen) D.aufraeumen();
+          if (!STUDIO) { karte(ABSPANN_LOGO); await warte(5000); karte(null); }
+          break;
+        }
         if (!STUDIO) karte('<div class="k">DealPilot · Geschichte</div><h1>' + D.titel + '</h1><p>' + D.unterzeile + '</p>');
         if (D.objekt) {   /* v2221: der Quick-Check braucht kein Objekt */
           var id = await objektFinden(D.objekt);
