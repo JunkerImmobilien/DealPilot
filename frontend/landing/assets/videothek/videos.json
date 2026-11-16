@@ -872,52 +872,449 @@
      }
     },
     {
-     "id": "partner-1-cockpit",
+     "id": "partner-1",
      "kategorie": "partner",
-     "nr": "P1",
-     "geplant": true,
-     "titel": "Das Partner-Cockpit",
-     "unterzeile": "Alle Kunden, Plätze und Rückmeldungen an einem Ort."
+     "nr": 1,
+     "dauer": 202,
+     "titel": "Partner-Cockpit und Marke",
+     "unterzeile": "Dein Arbeitsplatz für Kunden, Plätze und deine Marke.",
+     "story": "Wo das Partner-Cockpit sitzt, was die Übersicht zeigt, wie Plätze und Abrechnung funktionieren und wie Logo und Farbe deines Unternehmens in DealPilot kommen.",
+     "datei": "dealpilot-partner-1-partner-cockpit-und-marke.mp4",
+     "datei_ton": "dealpilot-partner-1-partner-cockpit-und-marke-sprecher.mp4",
+     "poster": "dealpilot-partner-1-vorschau.webp",
+     "kapitel": [
+      {
+       "t": 15,
+       "titel": "Deine Marke",
+       "stichworte": "DealPilot trägt das Logo und die Farbe deines Unternehmens. Im Beispiel die erfundene Nordlicht Immobilienberatung."
+      },
+      {
+       "t": 28,
+       "titel": "Das Partner-Cockpit",
+       "stichworte": "Unter Aktionen öffnest du das Partner-Cockpit. Dort steuerst du deine Kunden."
+      },
+      {
+       "t": 42,
+       "titel": "Auf einen Blick",
+       "stichworte": "Plätze belegt 1 / 5, Kunden verbunden 2, neue Kundenstände 3. Jede Kachel führt in ihren Reiter."
+      },
+      {
+       "t": 54,
+       "titel": "Was ansteht",
+       "stichworte": "4 Punkte warten auf dich: offene Anfragen, neue Stände deiner Kunden, Meldungen. Ein Klick, und du bist dort."
+      },
+      {
+       "t": 67,
+       "titel": "Die Reiter",
+       "stichworte": "Statt Objekt bis Deal-Aktion stehen oben jetzt die Reiter des Cockpits: Kunden & Plätze, Einladen, Freigegeben, Aufgaben, Meldungen, Verwalt"
+      },
+      {
+       "t": 82,
+       "titel": "Zurück zu den Objekten",
+       "stichworte": "Mit Objekte kommst du jederzeit zurück zu deinen eigenen Objekten."
+      },
+      {
+       "t": 97,
+       "titel": "Plätze",
+       "stichworte": "Ein Platz ist ein DealPilot-Zugang, den du für einen Kunden bezahlst. Gekauft 5, belegt 1, frei 4."
+      },
+      {
+       "t": 109,
+       "titel": "Plätze dazukaufen",
+       "stichworte": "Monatlich oder jährlich, der Preis steht sofort daneben (95 € je Monat, 19 € je Platz). Bezahlt wird über die Kasse, nichts geht ohne deinen"
+      },
+      {
+       "t": 125,
+       "titel": "Abrechnung",
+       "stichworte": "Dein Partner-Plan, Rechnungen, Zahlungsart und Kündigung findest du im Abo-Portal."
+      },
+      {
+       "t": 138,
+       "titel": "Marke",
+       "stichworte": "Name, Logo und Akzentfarbe deines Unternehmens. Dazu Anschrift und Kontakt für PDFs und E-Mails an deine Kunden."
+      },
+      {
+       "t": 150,
+       "titel": "Dein Logo",
+       "stichworte": "Einmal hochladen. DealPilot rechnet es für helle und dunkle Flächen selbst passend."
+      },
+      {
+       "t": 162,
+       "titel": "Für deine Kunden",
+       "stichworte": "Kunden mit deinem Platz sehen DealPilot in deiner Marke. Kunden mit eigenem Abo wählen selbst, ob sie deine Marke nutzen."
+      },
+      {
+       "t": 179,
+       "titel": "Startklar",
+       "stichworte": "Das Cockpit steht. Im nächsten Video: Kunden hinzufügen, mit Partnerplatz oder mit eigenem Abo."
+      }
+     ]
     },
     {
-     "id": "partner-2-einladen",
+     "id": "partner-2",
      "kategorie": "partner",
-     "nr": "P2",
-     "geplant": true,
-     "titel": "Kunden einladen und verbinden",
-     "unterzeile": "Per E-Mail oder Verbindungscode, mit Partnerplatz oder eigenem Abo."
+     "nr": 2,
+     "dauer": 288,
+     "titel": "Kunden hinzufügen",
+     "unterzeile": "Mit Partnerplatz oder eigenem Abo, per Einladung oder Code.",
+     "story": "Kunden mit Partnerplatz, Kunden mit eigenem Abo und offene Einladungen. Stufe und Rechte, E-Mail bei Rückmeldung, Einladung per E-Mail oder Verbindungscode und wie der Kunde die Anfrage bestätigt.",
+     "datei": "dealpilot-partner-2-kunden-hinzufuegen.mp4",
+     "datei_ton": "dealpilot-partner-2-kunden-hinzufuegen-sprecher.mp4",
+     "poster": "dealpilot-partner-2-vorschau.webp",
+     "kapitel": [
+      {
+       "t": 15,
+       "titel": "Kunden & Plätze",
+       "stichworte": "Hier stehen alle Kunden, die mit dir verbunden sind, und alle, die noch zusagen müssen."
+      },
+      {
+       "t": 26,
+       "titel": "Mit Partnerplatz",
+       "stichworte": "Jonas Berger nutzt einen Platz von dir. Du bezahlst seinen Zugang und bestimmst Stufe, Rechte und Marke."
+      },
+      {
+       "t": 39,
+       "titel": "Mit eigenem Abo",
+       "stichworte": "Sabine Kraus hat DealPilot schon selbst gebucht. Sie verbindet sich mit dir und behält ihren Plan. Ein Platz wird dafür nicht gebraucht."
+      },
+      {
+       "t": 55,
+       "titel": "Wartet auf Zusage",
+       "stichworte": "Thomas Weber ist eingeladen und hat noch nicht bestätigt. Ohne seine Zusage entsteht keine Verbindung."
+      },
+      {
+       "t": 70,
+       "titel": "Stufe und Rechte",
+       "stichworte": "Beim Platz legst du fest, wie viel dein Kunde sieht: Einsteiger, Fortgeschritten oder Experte, deine Marke oder DealPilot."
+      },
+      {
+       "t": 84,
+       "titel": "Einzelne Teile abschalten",
+       "stichworte": "Mit den Schaltern nimmst du einzelne Funktionen aus dem Platz, zum Beispiel PDFs oder die Steuer."
+      },
+      {
+       "t": 98,
+       "titel": "E-Mail bei Rückmeldung",
+       "stichworte": "Gibst du einem Kunden Anmerkungen zurück, bekommt er eine E-Mail in deiner Marke. Hier je Kunde an- oder abschaltbar."
+      },
+      {
+       "t": 116,
+       "titel": "Per E-Mail einladen",
+       "stichworte": "Name und Adresse eintragen. Hat die Adresse schon ein DealPilot-Konto, bekommt der Kunde eine Anfrage in seiner App, sonst eine Einladung pe"
+      },
+      {
+       "t": 135,
+       "titel": "Mit oder ohne Platz",
+       "stichworte": "Mit Partnerplatz bezahlst du den Zugang. Ohne Platz nutzt der Kunde seinen eigenen Plan. Hat er schon ein Abo, wird er automatisch ohne Plat"
+      },
+      {
+       "t": 152,
+       "titel": "Einladen",
+       "stichworte": "Ein Klick auf Einladen schickt die Einladung los. Im Video lassen wir das Beispiel stehen."
+      },
+      {
+       "t": 163,
+       "titel": "Verbindungscode",
+       "stichworte": "Kunden mit eigenem Abo erzeugen in DealPilot einen Code und geben ihn dir, etwa im Termin. Du trägst ihn hier ein, der Kunde bestätigt."
+      },
+      {
+       "t": 178,
+       "titel": "Platz nur bei Bedarf",
+       "stichworte": "Den Haken Partnerplatz mitgeben nimmst du raus, wenn der Kunde sein eigenes Abo behält."
+      },
+      {
+       "t": 207,
+       "titel": "Mein Partner",
+       "stichworte": "Thomas Weber findet die Anfrage unter Aktionen › Mein Partner. Oben in der App erscheint dazu ein Hinweis."
+      },
+      {
+       "t": 222,
+       "titel": "Er entscheidet",
+       "stichworte": "Der Kunde sieht, wer sich verbinden will und was das heißt. Mit Platz bezahlst du seinen Zugang. Erst seine Bestätigung verbindet euch."
+      },
+      {
+       "t": 236,
+       "titel": "Was du siehst",
+       "stichworte": "Du siehst nur Objekte, die er dir ausdrücklich sendet, als Kopie. Trennen kann er jederzeit."
+      },
+      {
+       "t": 249,
+       "titel": "Der Code für dich",
+       "stichworte": "Hier erzeugt der Kunde den Verbindungscode, wenn er sich selbst mit dir verbinden möchte. Er gilt 24 Stunden und nur einmal."
+      },
+      {
+       "t": 265,
+       "titel": "Weiter geht’s",
+       "stichworte": "Sobald er bestätigt, steht er bei dir unter Kunden & Plätze. Im nächsten Video: Objekte senden."
+      }
+     ]
     },
     {
-     "id": "partner-3-freigegeben",
+     "id": "partner-3",
      "kategorie": "partner",
-     "nr": "P3",
-     "geplant": true,
-     "titel": "Freigegebene Objekte ansehen",
-     "unterzeile": "Was dein Kunde dir schickt, als eigener Stand mit Datum."
+     "nr": 3,
+     "dauer": 261,
+     "titel": "Objekte senden und übernehmen",
+     "unterzeile": "Vom Kunden ins Cockpit, und als eigenes Objekt weiter.",
+     "story": "Die Kundin sendet ein Objekt über Mein Partner. Der Partner sieht es unter Freigegeben, je Kunde und Stand, öffnet es nur lesend und übernimmt es als eigenes Objekt.",
+     "datei": "dealpilot-partner-3-objekte-senden-und-uebernehmen.mp4",
+     "datei_ton": "dealpilot-partner-3-objekte-senden-und-uebernehmen-sprecher.mp4",
+     "poster": "dealpilot-partner-3-vorschau.webp",
+     "kapitel": [
+      {
+       "t": 12,
+       "titel": "Freigegeben",
+       "stichworte": "Unter Freigegeben stehen alle Objekte, die deine Kunden dir gesendet haben. Gerade sind es 3."
+      },
+      {
+       "t": 37,
+       "titel": "Ein neues Objekt",
+       "stichworte": "Sabine Kraus rechnet gerade Musterweg 3, Bielefeld. Sie möchte deine Meinung dazu."
+      },
+      {
+       "t": 49,
+       "titel": "Mein Partner",
+       "stichworte": "Unter Aktionen › Mein Partner sendet sie Objekte an dich."
+      },
+      {
+       "t": 60,
+       "titel": "Nur eine Kopie",
+       "stichworte": "Gesendet wird eine Kopie. Du siehst nur, was sie dir sendet, nie ihre übrigen Objekte. Ihr Original bleibt bei ihr."
+      },
+      {
+       "t": 74,
+       "titel": "Auswählen",
+       "stichworte": "Haken setzen. Mehrere Objekte gehen auf einmal, mit Gesamter Bestand auch alle."
+      },
+      {
+       "t": 87,
+       "titel": "An Partner senden",
+       "stichworte": "Noch einmal klar gesagt, was passiert. Dann Senden."
+      },
+      {
+       "t": 98,
+       "titel": "Meine Sendungen",
+       "stichworte": "Sie sieht, welcher Stand bei dir liegt und ob du ihn schon geöffnet hast. Ändert sie das Objekt, sendet sie einfach einen neuen Stand."
+      },
+      {
+       "t": 125,
+       "titel": "Was ansteht",
+       "stichworte": "In der Übersicht steht es sofort: 2 neue Stände von Sabine Kraus (Demo). Dazu eine Meldung."
+      },
+      {
+       "t": 143,
+       "titel": "Je Kunde",
+       "stichworte": "Jeder Kunde hat seine Karte. Am Objekt steht Ankauf oder Bestand, welcher Stand und wann. Neu heißt: noch nicht geöffnet."
+      },
+      {
+       "t": 158,
+       "titel": "Stand 2",
+       "stichworte": "Bei Jonas siehst du Stand 2. Jeder neue Stand ersetzt den alten, du arbeitest immer am aktuellen."
+      },
+      {
+       "t": 175,
+       "titel": "Nur lesen",
+       "stichworte": "Du siehst das Objekt mit allen Zahlen, Reitern und Unterlagen, so wie Sabine es gerechnet hat. Ändern kannst du hier nichts."
+      },
+      {
+       "t": 192,
+       "titel": "Alles da",
+       "stichworte": "Kennzahlen, Score und Bewertung stehen wie bei deinen eigenen Objekten. Rechnen und PDFs erstellen geht auch."
+      },
+      {
+       "t": 206,
+       "titel": "Als eigenes Objekt übernehmen",
+       "stichworte": "Willst du damit weiterarbeiten, übernimmst du es. DealPilot legt eine eigene Kopie bei dir an. Sie bleibt, auch wenn Sabine ihren Stand zurü"
+      },
+      {
+       "t": 227,
+       "titel": "Dein Objekt",
+       "stichworte": "Jetzt ist es dein Objekt mit eigener Nummer 2026-002. Du kannst es frei bearbeiten."
+      },
+      {
+       "t": 238,
+       "titel": "Weiter geht’s",
+       "stichworte": "Im nächsten Video: Anmerkungen an den Kundenstand schreiben und zurückgeben."
+      }
+     ]
     },
     {
-     "id": "partner-4-anmerkungen",
+     "id": "partner-4",
      "kategorie": "partner",
-     "nr": "P4",
-     "geplant": true,
-     "titel": "Feld markieren und zurück an den Kunden",
-     "unterzeile": "Anmerkungen direkt am Feld, mit Vorschlag und Begleittext."
+     "nr": 4,
+     "dauer": 361,
+     "titel": "Anmerkungen und Rückmeldung",
+     "unterzeile": "Felder markieren, zurückgeben, und was der Kunde sieht.",
+     "story": "Der Partner markiert ein Feld, schreibt eine Anmerkung mit Vorschlag und gibt sie zurück. Der Kunde sieht die Rückmeldung an seinem Objekt, übernimmt den Vorschlag, erledigt alles und sendet einen neuen Stand.",
+     "datei": "dealpilot-partner-4-anmerkungen-und-rueckmeldung.mp4",
+     "datei_ton": "dealpilot-partner-4-anmerkungen-und-rueckmeldung-sprecher.mp4",
+     "poster": "dealpilot-partner-4-vorschau.webp",
+     "kapitel": [
+      {
+       "t": 15,
+       "titel": "Ein Kundenstand",
+       "stichworte": "Jonas hat die Lindenallee 14 gesendet. Er will sie bald der Bank zeigen. Wir prüfen sie vorher."
+      },
+      {
+       "t": 34,
+       "titel": "Die Werkzeuge",
+       "stichworte": "Feld markieren, Anmerkung, die Liste und Zurück an Kunden. Alles, was du schreibst, bleibt Entwurf, bis du zurückgibst."
+      },
+      {
+       "t": 48,
+       "titel": "Die Liste",
+       "stichworte": "Rechts steht jede Anmerkung mit Nummer. Frühere Punkte zeigen, was der Kunde schon erledigt oder beantwortet hat, dazu 1 Entwurf von dir."
+      },
+      {
+       "t": 63,
+       "titel": "Antwort des Kunden",
+       "stichworte": "Jonas hat geantwortet: Abgeglichen, die Mieten stimmen mit den Verträgen überein."
+      },
+      {
+       "t": 78,
+       "titel": "Feld markieren",
+       "stichworte": "Jetzt tippst du auf ein Feld, eine Kachel oder einen Abschnitt, in jedem Reiter."
+      },
+      {
+       "t": 93,
+       "titel": "Anmerkung zum Feld",
+       "stichworte": "Das Fenster steht direkt am Feld. Oben, welches Feld und was gerade drinsteht."
+      },
+      {
+       "t": 110,
+       "titel": "Art und Vorschlag",
+       "stichworte": "Hinweis, Bitte prüfen oder Bitte nachreichen. Bei Eingabefeldern kannst du einen Wert vorschlagen. Diktieren geht auch."
+      },
+      {
+       "t": 128,
+       "titel": "Markiert",
+       "stichworte": "Das Feld bekommt einen Rahmen mit Nummer, in der Liste steht der neue Entwurf."
+      },
+      {
+       "t": 138,
+       "titel": "Zurück an Kunden",
+       "stichworte": "Alle Entwürfe gehen gebündelt zurück, hier 2. Als eine Aufgabe an genau diesen Kunden."
+      },
+      {
+       "t": 155,
+       "titel": "Mit Begleittext",
+       "stichworte": "Dazu bekommt Jonas eine E-Mail in deiner Marke mit Objekt, Zahl der Anmerkungen und deinem Text. Die Anmerkungen selbst stehen nur in der Ap"
+      },
+      {
+       "t": 174,
+       "titel": "Zurückgegeben",
+       "stichworte": "Die Entwürfe stehen jetzt beim Kunden als offen. Ändern kannst du sie nicht mehr."
+      },
+      {
+       "t": 204,
+       "titel": "Neue Aufgabe",
+       "stichworte": "Jonas sieht einen Punkt an Mein Partner. Mit E-Mail kommt er direkt über den Link hierher."
+      },
+      {
+       "t": 217,
+       "titel": "Rückmeldung zu …",
+       "stichworte": "Die Aufgabe nennt Objekt, Zahl der Anmerkungen und den Stand. Darunter dein Begleittext."
+      },
+      {
+       "t": 236,
+       "titel": "Am eigenen Objekt",
+       "stichworte": "Jonas landet in seinem Objekt, an der markierten Stelle. Dieselben Rahmen, dieselbe Liste."
+      },
+      {
+       "t": 248,
+       "titel": "Erledigt, Antworten, Vorschlag",
+       "stichworte": "Je Anmerkung: Erledigt, Antworten und bei einem Vorschlag Vorschlag übernehmen. Übernommen wird nur auf seinen Klick."
+      },
+      {
+       "t": 267,
+       "titel": "Übernommen",
+       "stichworte": "Der Wert steht im Feld: 25.000 €. Die Rechnung läuft sofort mit."
+      },
+      {
+       "t": 283,
+       "titel": "Alles erledigt",
+       "stichworte": "Ist alles erledigt, sagt DealPilot es und bietet Erneut senden an. Dein Partner bekommt eine Meldung."
+      },
+      {
+       "t": 298,
+       "titel": "Neuer Stand",
+       "stichworte": "Ein Klick, und der neue Stand liegt bei seinem Partner."
+      },
+      {
+       "t": 322,
+       "titel": "Meldungen",
+       "stichworte": "Unter Meldungen steht, was Jonas getan hat: Jonas Berger (Demo) hat erledigt: Rückmeldung zu Lindenallee 14, Herford."
+      },
+      {
+       "t": 339,
+       "titel": "Der Kreis schließt sich",
+       "stichworte": "Unter Freigegeben liegt Stand 3. Prüfen, anmerken, zurückgeben, bis es passt."
+      }
+     ]
     },
     {
-     "id": "partner-5-aufgaben",
+     "id": "partner-5",
      "kategorie": "partner",
-     "nr": "P5",
-     "geplant": true,
-     "titel": "Aufgaben an viele Kunden",
-     "unterzeile": "Zum Beispiel das Steuerjahr fertigstellen, mit Frist und Erinnerung."
-    },
-    {
-     "id": "partner-6-marke",
-     "kategorie": "partner",
-     "nr": "P6",
-     "geplant": true,
-     "titel": "Deine Marke und deine Plätze",
-     "unterzeile": "Logo, Farbe und Name einstellen, Plätze dazubuchen."
+     "nr": 5,
+     "dauer": 174,
+     "titel": "Objekt an Kunden übergeben",
+     "unterzeile": "Dein durchgerechnetes Objekt per E-Mail, der Kunde bekommt eine Kopie.",
+     "story": "Im Partner-Cockpit unter Übergeben ein eigenes Objekt an einen Kunden schicken. Mit Vorprüfung, Kundenplatz, persönlichem Satz, Status und Widerruf.",
+     "datei": "dealpilot-partner-5-objekt-an-kunden-uebergeben.mp4",
+     "datei_ton": "dealpilot-partner-5-objekt-an-kunden-uebergeben-sprecher.mp4",
+     "poster": "dealpilot-partner-5-vorschau.webp",
+     "kapitel": [
+      {
+       "t": 15,
+       "titel": "Dein Objekt",
+       "stichworte": "Du hast Gohliser Str. 42, Leipzig für einen Interessenten durchgerechnet. Jetzt soll er es selbst ansehen können."
+      },
+      {
+       "t": 33,
+       "titel": "Übergeben",
+       "stichworte": "Im Partner-Cockpit gibt es dafür den Reiter Übergeben."
+      },
+      {
+       "t": 42,
+       "titel": "Welches Objekt",
+       "stichworte": "Vorgewählt ist das geöffnete Objekt: 2026-001 · Gohliser Str. 42 Leipzig · Score 76. Jedes eigene Objekt geht."
+      },
+      {
+       "t": 59,
+       "titel": "An wen",
+       "stichworte": "E-Mail-Adresse und Name für die Anrede. DealPilot prüft sofort, ob das schon dein Kunde ist."
+      },
+      {
+       "t": 71,
+       "titel": "Die Vorprüfung",
+       "stichworte": "Neuer Kunde: legt ein Konto an. Frei: 4 Plätze. Mit Kundenplatz mitschicken ist sein Zugang sofort frei. Der Platz wird beim Senden reservie"
+      },
+      {
+       "t": 90,
+       "titel": "Ein persönlicher Satz",
+       "stichworte": "Er steht in der E-Mail, die in deiner Marke ankommt, mit Score und den wichtigsten Kennzahlen des Objekts."
+      },
+      {
+       "t": 108,
+       "titel": "Unterwegs",
+       "stichworte": "Die Übergabe steht in der Liste mit Status gesendet, ein Platz ist für ihn reserviert. Hier siehst du später, ob er sie geöffnet und übernom"
+      },
+      {
+       "t": 123,
+       "titel": "Beim Kunden",
+       "stichworte": "Markus öffnet den Link aus der E-Mail, legt sein Konto an und findet eine Kopie des Objekts in seinem DealPilot. Dein Original bleibt bei di"
+      },
+      {
+       "t": 138,
+       "titel": "Widerrufen",
+       "stichworte": "Bis er übernimmt, kannst du die Übergabe widerrufen. Der Link gilt 30 Tage und nur einmal, der Platz wird dann wieder frei."
+      },
+      {
+       "t": 152,
+       "titel": "Gute Reise",
+       "stichworte": "So wird aus deiner Beratung ein Objekt im Konto deines Kunden, in deiner Marke."
+      }
+     ]
     }
   ]
 }
