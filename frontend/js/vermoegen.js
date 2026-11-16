@@ -626,7 +626,7 @@
      Jetzt umgekehrt: gesperrt ueberall ausser Staging und lokal. */
   var gesperrt = PROD_GESPERRT && !/staging|localhost|127\.0\.0\.1|\.test$/i.test(location.hostname);
   if (gesperrt) {
-    try { var st = document.createElement('style'); st.textContent = '[data-act="vermoegen"]{display:none !important}'; (document.head || document.documentElement).appendChild(st); } catch (e) {}
+    try { var st = document.createElement('style'); st.textContent = '[data-act="vermoegen"],aside.sidebar .sb-act-item[data-act="vermoegen"],#sidebar .sb-act-item[data-act="vermoegen"]{display:none !important}';   /* v3495 · Marcel 16.11.: am Handy auf Prod sichtbar - aside.sidebar .sb-act-item{display:flex!important} (0,2,1) schlug die Sperre (0,1,0); gemessen mit CSS.getMatchedStylesForNode */ (document.head || document.documentElement).appendChild(st); } catch (e) {}
     oeffnen = function () {};
     window.DpVermoegen.oeffnen = oeffnen; window.DpVermoegen.pdf = function () {};
   }
