@@ -293,6 +293,38 @@
     return { satz: 2.0, buchst: 'b', jahre: '50', wert: '2.0' };
   }
 
+  /* v3480 · Marcel 16.11.2026 (Kanzlei-Frage N-05: „soll die App warnen?" – „ja"):
+     Fertigstellung vor dem 01.01.1925, gewaehlt 2,0 % statt 2,5 % (§ 7 Abs. 4 Satz 1 Nr. 2
+     Buchst. c EStG). NUR eine Warnung, nie eine Korrektur - das Demo-Objekt Bismarckstr. 27
+     (Bj 1908) steht bewusst auf 2,0 %.
+     Kein Fehlalarm, wenn
+       · ein eigener Satz nach § 7 Abs. 4 Satz 2 EStG gilt (Restnutzungsdauer per Gutachten,
+         afa-eigen.js; Option mit data-eigen bzw. gespeichertes Feld afa_eigen),
+       · nicht linear abgeschrieben wird oder ein anderer Satz gewaehlt ist,
+       · das Baujahr fehlt.
+     Auch im Betriebsvermoegen einer GmbH gilt fuer das Gebaeude § 7 Abs. 4 Satz 1 Nr. 2
+     (ueber § 8 Abs. 1 KStG); die 3 % der Nr. 1 setzen einen Bauantrag nach dem 31.03.1985
+     voraus und kommen vor 1925 nie in Frage. Deshalb warnt sie dort mit eigenem Satz statt
+     zu schweigen. Wer den Satz selbst setzt (ueberfuehrung-kern afaSatzGesellschaft), setzt
+     2,5 % - dort entsteht die Warnung gar nicht erst.
+     p: { baujahr, afaSatz (Wert der Auswahl #afa_satz), eigen (bool), basis (AfA-Basis EUR), gesellschaft (bool) }
+     @returns {{warnen:boolean, soll?:number, ist?:number, mehrJahr?:number|null, titel?:string, text?:string}} */
+  function pruefeSatzFertigstellung(p) {
+    p = p || {};
+    var soll = linearNachFertigstellung(p.baujahr);
+    if (!soll || soll.buchst !== 'c' || p.eigen) return { warnen: false };
+    var v = String(p.afaSatz == null ? '' : p.afaSatz).trim().replace(',', '.');
+    if (!/^\d+(\.\d+)?$/.test(v) || Math.abs(parseFloat(v) - 2.0) > 1e-9) return { warnen: false };
+    var basis = Number(p.basis);
+    var mehr = (isFinite(basis) && basis > 0) ? Math.round(basis * 0.005) : null;
+    var bj = parseInt(p.baujahr, 10);
+    var text = 'Das Gebäude ist laut Baujahr ' + bj + ' vor dem 01.01.1925 fertiggestellt. Dafür sieht § 7 Abs. 4 Satz 1 Nr. 2 Buchst. c EStG 2,5 % linear vor (40 Jahre); gewählt sind 2,0 % (50 Jahre).'
+      + (mehr ? ' Mit 2,5 % wären es rund ' + mehr.toLocaleString('de-DE') + ' € AfA im Jahr mehr.' : '')
+      + (p.gesellschaft ? ' Das gilt auch im Betriebsvermögen der Gesellschaft.' : '')
+      + ' Weist ein Gutachten eine kürzere Restnutzungsdauer nach (§ 7 Abs. 4 Satz 2 EStG), gilt der eigene Satz – dann entfällt dieser Hinweis.';
+    return { warnen: true, soll: 2.5, ist: 2.0, mehrJahr: mehr, titel: 'AfA-Satz prüfen: Fertigstellung vor 1925', text: text };
+  }
+
   /**
    * Mapping von Select-Value zu computeSeries-Methode.
    */
@@ -366,6 +398,7 @@
     combine: combineSeries,
     checkDegressivEligibility: checkDegressivEligibility,
     linearNachFertigstellung: linearNachFertigstellung,   /* v3006 */
+    pruefeSatzFertigstellung: pruefeSatzFertigstellung,   /* v3480 */
     parseSelectValue: parseAfaSelectValue,
     sonder7bBasis: sonder7bBasis,
     sonder7bBaukosten: sonder7bBaukosten,   /* v1260 */

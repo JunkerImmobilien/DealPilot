@@ -36,6 +36,9 @@
       wfl: zahlAus('wfl'), bj: zahlAus('baujahr'), gs: zahlAus('gsfl'), seq: (window.State && State._obj_seq) || feld('_obj_seq') || '' };
   }
   function api(p) { return window.Auth.apiCall(p); }
+  /* v3480 · ein Fehler, der dem Nutzer etwas sagt (kein Objekt, kein Steuersatz): die Weiche zeigt ihn als
+     Hinweis, statt still auf den PDF-Dienst und die Vorschau auszuweichen (die denselben Fehler nur wiederholen) */
+  function nutzerFehler(t) { var e = new Error(t); e.dpNutzer = true; return e; }
   /* Objektinfo: Fotos, Nummer; ohne Foto die Lagekarte aus dem neuesten Marktbericht (das Objekt selbst fuehrt keine Koordinaten) */
   function objektInfo(key, adresse) {
     if (!key) return Promise.resolve({ fotos: [], seq: '', kuerzel: '', karte: null });
@@ -716,6 +719,43 @@
             + (abw ? '' : '<h3>Aufteilung des Kaufpreises für den Kaufvertrag</h3>' + B.liste([['Grund und Boden', B.eur(vBod)], ['Gebäude', B.eur(vGeb)], ['Kaufpreis Immobilie', B.eur(kpI), { art: 'ende' }]])
               + '<div class="hinweis">Formulierungsvorschlag: „Vom Kaufpreis entfallen ' + B.eur(vGeb) + ' auf das Gebäude und ' + B.eur(vBod) + ' auf Grund und Boden' + (z.inventar ? '; ' + B.eur(z.inventar) + ' entfallen auf mitverkauftes Inventar' : '') + '." Die Aufteilung folgt der Arbeitshilfe des Bundesministeriums der Finanzen; keine Steuerberatung.</div>');
         })()));
+      /* v3480 · Inhalt der frueheren „Anlage zur Steuererklaerung" (pdf-anlage-bmf.js, jsPDF): Anschaffungskosten
+         im Einzelnen, Verprobung aller drei Verfahren, lineare AfA nach § 7 Abs. 4 EStG. Seit v3018d war dieses
+         Dokument nur noch ueber _exportBmfPdfAlt erreichbar (ohne Aufrufer); die Weiche leitet generateBmfPdfAnlage
+         jetzt hierher. Gerechnet wird nichts neu: Felder ak_*, Ergebnis der Arbeitshilfe, Afa.linearNachFertigstellung. */
+      S.push((function () {
+        var ak = [['Kaufpreis (laut Notarvertrag)', zahlAus('ak_kp')], ['Herstellungskosten Gebäude (§ 255 Abs. 2 HGB, zu 100 % Gebäude)', zahlAus('bmf_hk')], ['Grunderwerbsteuer', zahlAus('ak_grest')],
+          ['Notar- und Gerichtskosten', zahlAus('ak_notar')], ['Grundbuchamt', zahlAus('ak_gba')], ['Maklergebühr', zahlAus('ak_makler')], ['Sonstige Erwerbsnebenkosten', zahlAus('ak_ji')],
+          ['Fahrtkosten', zahlAus('ak_fahrt')], ['Verpflegungsmehraufwand', zahlAus('ak_verpfl')], ['Unterkunft', zahlAus('ak_hotel')], ['Wertgutachten / Sachverständige', zahlAus('ak_gutachten')],
+          ['Anwaltskosten (Kaufvorgang)', zahlAus('ak_anwalt')], ['Sonstiges (Vermessung, Energieausweis)', zahlAus('ak_sonst')], ['Anschaffungsnahe Herstellkosten (§ 6 Abs. 1 Nr. 1a EStG)', zahlAus('ak_ahk')]];
+        var akZ = ak.filter(function (x, i) { return i === 0 || (x[1] && x[1] > 0); });
+        var akSum = akZ.reduce(function (s, x) { return s + (x[1] || 0); }, 0);
+        var akTab = akZ.length > 1 || akSum > 0 ? '<h3>Anschaffungskosten im Einzelnen</h3>' + B.liste(akZ.map(function (x, i) { return [x[0], B.eur(x[1] || 0, 2), i ? { art: 'ein' } : {}]; })
+          .concat([[(zahlAus('bmf_hk') > 0 ? 'Anschaffungs- und Herstellungskosten gesamt' : 'Anschaffungskosten gesamt') + ' (Eingaben im Reiter Anschaffungskosten)', B.eur(akSum, 2), { art: 'summe' }]])) : '';
+        var vgw = w('vergleichswert'); if (!B.istZahl(vgw)) vgw = null;
+        var sw = B.istZahl(w('sachwert_marktangepasst')) ? w('sachwert_marktangepasst') : w('sachwert_vorlaeufig'), ew = w('ertragswert'), vw = w('massgebender_verkehrswert');
+        var nah = function (a, b2) { return B.istZahl(a) && B.istZahl(b2) && Math.abs(a - b2) < 1; };
+        var mass = nah(vw, ew) ? 'ew' : nah(vw, vgw) ? 'vgw' : nah(vw, sw) ? 'sw' : '';
+        var verp = '<h3>Bewertungsverfahren (Verprobung)</h3>' + B.liste([
+          ['Ertragswertverfahren' + (mass === 'ew' ? ' · maßgebend' : ''), B.eur(ew, 2), mass === 'ew' ? { art: 'summe' } : {}],
+          ['Sachwertverfahren (marktangepasst)' + (mass === 'sw' ? ' · maßgebend' : ''), B.eur(sw, 2), mass === 'sw' ? { art: 'summe' } : {}],
+          ['Vergleichswertverfahren' + (mass === 'vgw' ? ' · maßgebend' : ''), vgw != null ? B.eur(vgw, 2) : 'nicht angewandt', mass === 'vgw' ? { art: 'summe' } : { det: vgw != null ? '' : 'kein Vergleichsfaktor' }]])
+          + '<p class="det">Alle drei Verfahren rechnet die Arbeitshilfe; maßgebend ist das nach ihrer Logik gewählte (bekannte Miete: Ertragswert, Vergleichsfaktor: Vergleichswert, sonst Sachwert).</p>';
+        var lin = (window.Afa && Afa.linearNachFertigstellung) ? Afa.linearNachFertigstellung(o.bj) : null;
+        var hk = zahlAus('bmf_hk') || 0, basisG = (Number(w('kaufpreisanteil_gebaeude')) || 0) + hk;
+        var afaT = '';
+        if (lin && basisG > 0) {
+          var sel = document.getElementById('afa_satz'), opt = sel && sel.selectedIndex >= 0 ? sel.options[sel.selectedIndex] : null;
+          var gew = sel ? window.Afa.parseSelectValue(sel.value) : null, eig = !!(opt && opt.hasAttribute('data-eigen'));
+          afaT = '<h3>Lineare AfA (§ 7 Abs. 4 EStG)</h3>' + B.liste([
+            ['AfA-Bemessungsgrundlage Gebäude' + (hk > 0 ? ' (einschließlich Herstellungskosten)' : ''), B.eur(basisG, 2), { art: 'summe' }],
+            ['Satz nach Fertigstellung', B.pct(lin.satz, 1), { det: (lin.buchst === 'a' ? 'Fertigstellung nach 2022' : lin.buchst === 'c' ? 'Fertigstellung vor 1925' : 'Fertigstellung 1925 bis 2022') + ' · § 7 Abs. 4 Satz 1 Nr. 2 Buchst. ' + lin.buchst + ' EStG · ' + lin.jahre + ' Jahre' }],
+            ['Jährliche AfA nach Fertigstellung', B.eur(basisG * lin.satz / 100, 2), { art: 'ende' }]]
+            .concat(gew && gew.methode === 'linear' && Math.abs(gew.satzPct - lin.satz) > 1e-9 ? [['Im Objekt gewählt' + (eig ? ' (eigener Satz, § 7 Abs. 4 Satz 2 EStG)' : ''), B.pct(gew.satzPct, 2), { det: 'jährlich ' + B.eur(basisG * gew.satzPct / 100, 2) }]] : []))
+            + afa1925(B, { baujahr: o.bj, afa_satz: sel ? sel.value : '', afa_eigen: eig ? '1' : '', _kpis_afa_geb_basis: basisG }, false).replace(' Die Beträge dieses Blatts sind mit 2,0 % gerechnet.', '');
+        }
+        return B.seite(c, 'Anschaffungskosten und AfA', B.abschnitt('Anlage zur Steuererklärung', 'Anschaffungskosten, Verprobung und AfA', 'Nachvollziehbarkeit gegenüber dem Finanzamt; keine Steuerberatung.') + akTab + verp + afaT);
+      })());
       if (abw) {
         var d = function (a, b) { var x = b - a; return Math.abs(x) < 0.5 ? '' : (x > 0 ? '+ ' : '− ') + B.eur(Math.abs(x)); };
         var basisAlt = T.gebAmtlich + (T.basis - T.geb) * (T.gebPctAmtlich / (T.gebPct || 1));
@@ -774,6 +814,36 @@
     ['6. Anschaffungsnahe Herstellungskosten / Erhaltung', [['anschaffungsnah', 'Anschaffungsnah (§ 6 Abs. 1 Nr. 1a EStG)'], ['erhaltungsaufwand', 'Erhaltungsaufwand']]]];
   var WK_NAME = {}; WK.forEach(function (g) { g[1].forEach(function (f) { WK_NAME[f[0]] = f[1]; }); });
   WK_NAME.einnahmen_km = 'Mieteinnahmen (kalt)'; WK_NAME.einnahmen_nk = 'Umlagen / Nebenkosten';
+
+  /* v3480 · Veranlagungsart des Jahres - derselbe Weg wie die Steuerrechnung (Tax.optionen: der
+     Steuerzeitraum des Jahres vor dem Investmentprofil). Fehlte bis v3472 in jedem Steuer-PDF. */
+  function veranlagung(jahr) {
+    try {
+      var T = (typeof Tax !== 'undefined') ? Tax : window.Tax;
+      if (!T || typeof T.optionen !== 'function') return null;
+      var o = T.optionen(null, jahr) || {};
+      var k = Number(o.kist) > 0 ? 'Kirchensteuer ' + String(Math.round(Number(o.kist) * 100)) + ' %' : 'ohne Kirchensteuer';
+      return { art: o.splitting ? 'Zusammenveranlagung (Splitting, § 32a Abs. 5 EStG)' : 'Einzelveranlagung', kurz: o.splitting ? 'Zusammenveranlagung' : 'Einzelveranlagung',
+               kist: k, quelle: o.quelle === 'zeitraum' ? 'laut Steuerzeitraum ' + jahr : 'laut Investmentprofil' };
+    } catch (e) { return null; }
+  }
+  /* v3480 · Warnung AfA-Satz vor 1925 im Dokument - Regel in afa-engine.js. d = Objektdaten (gespeichert). */
+  function afa1925(B, d, corp) {
+    try {
+      if (!window.Afa || typeof Afa.pruefeSatzFertigstellung !== 'function') return '';
+      var r = Afa.pruefeSatzFertigstellung({ baujahr: d.baujahr, afaSatz: d.afa_satz, eigen: !!String(d.afa_eigen || '').trim(), basis: Number(d._kpis_afa_geb_basis) || null, gesellschaft: !!corp });
+      return r.warnen ? '<div class="hinweis" style="border-left-color:var(--rot);background:#FAF0EC"><b>' + B.esc(r.titel) + '.</b> ' + B.esc(r.text) + ' Die Beträge dieses Blatts sind mit 2,0 % gerechnet.</div>' : '';
+    } catch (e) { return ''; }
+  }
+  /* v3480 · Ertragsteuer einer Gesellschaft je Objekt (Kanzlei N-04, Marcel 16.11.2026): ein Verlust
+     bringt KEINE Erstattung - er wird mit Gewinnen der Gesellschaft verrechnet oder vorgetragen.
+     Bis v3472 stand dort „+ x €“ unter „Belastung −“, also eine Erstattung. */
+  function steuerZeileGes(B, steuer, ergebnis) {
+    var s = Number(steuer) || 0, e = Number(ergebnis) || 0;
+    if (s > 0.5) return ['Ertragsteuer der Gesellschaft auf dieses Objekt (KSt, Soli, GewSt)', B.eurS(-s, 0), { farbe: 1 }];
+    if (e < 0) return ['Ertragsteuer der Gesellschaft auf dieses Objekt', '0 €', { det: 'Verlust ' + B.eur(-e, 2) + ' – keine Erstattung: er mindert das Ergebnis der Gesellschaft und wird mit ihren Gewinnen verrechnet, sonst als Verlustvortrag fortgeführt (§ 8 Abs. 1 KStG i. V. m. § 10d EStG, § 10a GewStG).' }];
+    return ['Ertragsteuer der Gesellschaft auf dieses Objekt', '0 €'];
+  }
 
   function anlageVQuelle(jahr) {
     var t = function (j) { var x = window['AnlageV' + j]; return x && x.zeilen && x.felder ? x : null; };
@@ -840,8 +910,13 @@
     return Promise.all([basis(name), objektInfo(window._currentObjKey, o.adresse)]).then(function (zz) {
       var c = zz[0], info = zz[1]; c.zeile = o.adresse;
       var S = [], ges = [];
+      var _sel = document.getElementById('afa_satz'), _opt = _sel && _sel.selectedIndex >= 0 ? _sel.options[_sel.selectedIndex] : null;
+      var _afaH = afa1925(B, { baujahr: feld('baujahr'), afa_satz: feld('afa_satz'), afa_eigen: (_opt && _opt.hasAttribute('data-eigen')) ? '1' : '',
+        _kpis_afa_geb_basis: (State._afaStempel && State._afaStempel.geb) || null }, bg.corp);   /* v3480 */
+      var _vl0 = bg.corp ? null : veranlagung(rows.length ? rows[0].cal : new Date().getFullYear());
       S.push(B.deckblatt(c, { bild: info.fotos[0] || info.karte || null, eyebrow: bg.corp ? 'Aufstellung Betriebsausgaben · Objekt in der Gesellschaft' : ('Aufstellung Werbungskosten' + (mitAnlageV ? ' mit Zuordnung zur Anlage V' : ' · Anlage V')), titel: o.adresse, unter: o.art + ' · vermietet',
-        meta: [['Veranlagungsjahre', rows.map(function (r) { return r.cal; }).join(', ')], ['Stand', c.stand], ['Eigentümer', _hName || (_hId && _hId !== 'privat' ? _hId : (c.marke.name || c.marke.company || ''))]] }));
+        meta: [['Veranlagungsjahre', rows.map(function (r) { return r.cal; }).join(', ')], ['Stand', c.stand], ['Eigentümer', _hName || (_hId && _hId !== 'privat' ? _hId : (c.marke.name || c.marke.company || ''))]]
+          .concat(_vl0 ? [['Veranlagung', _vl0.kurz + (rows.length > 1 ? ' (' + rows[0].cal + ')' : '')]] : []) }));
       rows.forEach(function (row, i) {
         var t = _computeYearTotal(row.cal, i + idx0) || {}, v = t.values || {};
         var ein = (Number(v.einnahmen_km) || 0) + (Number(v.einnahmen_nk) || 0);
@@ -855,7 +930,13 @@
         });
         tab.push(['Summe ' + bg.wort + ' ' + row.cal, B.eur(summe, 2), { art: 'summe' }]);
         tab.push([bg.corp ? 'Beitrag zum Ergebnis der Gesellschaft (vor Steuern)' : 'Einkünfte aus Vermietung und Verpachtung', B.eurS(ein - summe, 2), { art: 'ende', farbe: 1 }]);
-        tab.push([bg.corp ? 'Ertragsteuer der Gesellschaft (KSt + Soli + GewSt, Belastung −)' : 'Steuerwirkung (Erstattung +, Belastung −)', B.eurS(-(row.tax_y || 0), 0), { farbe: 1 }]);
+        /* v3480 · Gesellschaft: kein „Erstattung +“ bei Verlust (N-04); privat: Veranlagungsart des Jahres */
+        if (bg.corp) tab.push(steuerZeileGes(B, row.tax_y, ein - summe));
+        else {
+          tab.push(['Steuerwirkung (Erstattung +, Belastung −)', B.eurS(-(row.tax_y || 0), 0), { farbe: 1 }]);
+          var _vl = veranlagung(row.cal);
+          if (_vl) tab.push(['Veranlagung ' + row.cal, _vl.kurz, { det: _vl.art + ' · ' + _vl.kist + ' · ' + _vl.quelle }]);
+        }
         ges.push([String(row.cal), B.eur(ein, 2), B.eur(summe, 2), B.eurS(ein - summe, 2)]);
         /* v3268 · GbR: gesonderte und einheitliche Feststellung § 180 AO */
         var _fs = (!bg.corp && window._dpGbrFeststellung) ? window._dpGbrFeststellung(row.cal, ein - summe) : null;
@@ -865,7 +946,7 @@
           + '</tbody></table><p class="det">In die Einkommensteuer des Nutzers geht nur sein Anteil (' + B.eurS(_fs.eigenerBetrag, 2) + ').'
           + (_fs.vollstaendig ? '' : ' Die Anteile ergeben zusammen ' + String(Math.round(_fs.summePct * 100) / 100).replace('.', ',') + ' % — bitte die weiteren Gesellschafter im Mandanten ergänzen.')
           + ' Sonderwerbungskosten und Ergänzungsbilanzen einzelner Gesellschafter sind nicht abgebildet. Keine Steuerberatung.</p>' : '';
-        S.push(B.seite(c, 'Jahr ' + row.cal, B.abschnitt('Veranlagungsjahr ' + row.cal, (bg.corp ? 'Betriebseinnahmen und Betriebsausgaben ' : 'Einnahmen und Werbungskosten ') + row.cal, o.adresse) + B.liste(tab) + _fsHtml
+        S.push(B.seite(c, 'Jahr ' + row.cal, B.abschnitt('Veranlagungsjahr ' + row.cal, (bg.corp ? 'Betriebseinnahmen und Betriebsausgaben ' : 'Einnahmen und Werbungskosten ') + row.cal, o.adresse) + _afaH + B.liste(tab) + _fsHtml
           + (bg.corp ? '<p class="det" style="margin-top:3mm">Die Kosten der Gesellschaft selbst (Buchführung, Jahresabschluss, IHK, Kontoführung) stehen nicht hier, sondern im Jahresabschluss der Gesellschaft. Eine Anlage V gibt es für eine GmbH/UG nicht. '
             + ((window.DealPilotUeberfuehrungKern && DealPilotUeberfuehrungKern.HINWEIS_VERKAUF_GES) || '') + '</p>' : '')));
         if (mitAnlageV) { var av = anlageVBlatt(B, row.cal, t); if (av) S.push(B.seite(c, 'Anlage V ' + row.cal, B.abschnitt('Anlage V · Zuordnung', 'Veranlagungsjahr ' + row.cal, 'Dieselben Zahlen, sortiert nach den Zeilen des amtlichen Formulars') + av)); }
@@ -895,7 +976,7 @@
     return Promise.all([basis('Steuer-Mappe ' + jahr), api('/tax-records?from=' + jahr + '&to=' + jahr)]).then(function (zz) {
       var c = zz[0], saetze = ((zz[1] && zz[1].records) || []).filter(function (s) { return Number(s.year) === jahr; });
       if (Array.isArray(opt.ids) && opt.ids.length) saetze = saetze.filter(function (s) { return opt.ids.indexOf(s.object_id) >= 0; });
-      if (!saetze.length) throw new Error('Für ' + jahr + ' sind keine Steuersätze gespeichert.');
+      if (!saetze.length) throw nutzerFehler('Für ' + jahr + ' sind keine Steuersätze gespeichert.');
       return Promise.all(saetze.map(function (s) { return api('/objects/' + encodeURIComponent(s.object_id)).catch(function () { return null; }); })).then(function (objs) {
         var eintr = saetze.map(function (s, i) {
           var o = objs[i] && (objs[i].object || objs[i]), d = (o && o.data) || {};
@@ -916,10 +997,11 @@
                    })() };
         }).sort(function (a, b) { return String(a.kauf || '9999').localeCompare(String(b.kauf || '9999')) || a.adr.localeCompare(b.adr); });
         var priv = eintr.filter(function (e) { return !e.corp; }), ges = eintr.filter(function (e) { return e.corp; });
+        var vl = priv.length ? veranlagung(jahr) : null;   /* v3480 */
         var S = [];
         S.push(B.deckblatt(c, { bild: null, eyebrow: 'Steuer-Mappe · Veranlagungsjahr ' + jahr, titel: 'Steuer-Mappe ' + jahr,
           unter: priv.length && ges.length ? 'Vermietung und Verpachtung (Anlage V) und Objekte in Gesellschaften' : (ges.length ? 'Objekte in Gesellschaften · Betriebsausgaben' : 'Vermietung und Verpachtung · Anlage V · § 21 EStG'),
-          meta: [['Veranlagungsjahr', String(jahr)], ['Objekte', String(eintr.length)], ['Stand', c.stand]] }));
+          meta: [['Veranlagungsjahr', String(jahr)], ['Objekte', String(eintr.length)], ['Stand', c.stand]].concat(vl ? [['Veranlagung', vl.kurz], ['Kirchensteuer', vl.kist.replace('Kirchensteuer ', '')]] : []) }));
         /* Inhalt */
         S.push(B.seite(c, 'Inhalt', B.abschnitt('Steuer-Mappe ' + jahr, 'Enthaltene Objekte', 'In der Reihenfolge des Kaufs')
           + '<table><thead><tr><th>Nr.</th><th>Objekt</th><th>Halter</th><th>Kauf</th><th class="r">Einnahmen</th><th class="r">' + (ges.length && !priv.length ? 'Betriebsausgaben' : 'Kosten') + '</th><th class="r">Ergebnis</th></tr></thead><tbody>'
@@ -935,13 +1017,15 @@
           tab.push(['Summe ' + (e.corp ? 'Betriebsausgaben' : 'Werbungskosten') + ' ' + jahr, B.eur(e.wk, 2), { art: 'summe' }]);
           tab.push([e.corp ? 'Beitrag zum Ergebnis der Gesellschaft (vor Steuern)' : 'Einkünfte aus Vermietung und Verpachtung', B.eurS(e.erg, 2), { art: 'ende', farbe: 1 }]);
           if (!e.corp) {
-            if (e.s.base_income != null) tab.push(['Zu versteuerndes Einkommen ohne dieses Objekt (Steuerzeitraum ' + jahr + ')', B.eur(num(e.s.base_income), 0)]);
+            if (vl) tab.push(['Veranlagung ' + jahr, vl.kurz, { det: vl.art + ' · ' + vl.kist + ' · ' + vl.quelle }]);   /* v3480 */
+            if (e.s.base_income != null) tab.push(['Zu versteuerndes Einkommen ohne dieses Objekt (Steuerzeitraum ' + jahr + (vl && /Zusammen/.test(vl.kurz) ? ', gemeinsam' : '') + ')', B.eur(num(e.s.base_income), 0)]);
             if (e.s.marginal_tax_rate != null) tab.push(['Grenzsteuersatz', B.pct(num(e.s.marginal_tax_rate) * 100, 2)]);
           }
-          if (e.s.tax_delta != null) tab.push([e.corp ? 'Ertragsteuer der Gesellschaft auf dieses Objekt (Belastung −)' : 'Steuerwirkung (Erstattung +, Belastung −)', B.eurS(-num(e.s.tax_delta), 0), { farbe: 1 }]);
+          /* v3480 · Gesellschaft: ein Verlust ist keine Erstattung (N-04) */
+          if (e.s.tax_delta != null) tab.push(e.corp ? steuerZeileGes(B, num(e.s.tax_delta), e.erg) : ['Steuerwirkung (Erstattung +, Belastung −)', B.eurS(-num(e.s.tax_delta), 0), { farbe: 1 }]);
           if (Math.abs(num(e.s.immo_result) - e.erg) > 1) tab.push(['Gespeichertes Ergebnis des Steuersatzes (weicht ab – Satz neu speichern)', B.eurS(num(e.s.immo_result), 2)]);
           S.push(B.seite(c, 'Objekt ' + (i + 1) + ' · ' + jahr, B.abschnitt('Objekt ' + (i + 1) + ' · ' + e.halter + (e.corp ? ' · Betriebsvermögen' : ' · Privatvermögen'), (e.corp ? 'Betriebseinnahmen und Betriebsausgaben ' : 'Einnahmen und Werbungskosten ') + jahr, e.adr)
-            + (e.vermerk ? '<div class="hinweis">' + B.esc(e.vermerk) + '</div>' : '') + B.liste(tab)
+            + (e.vermerk ? '<div class="hinweis">' + B.esc(e.vermerk) + '</div>' : '') + afa1925(B, e.d, e.corp) + B.liste(tab)
             + (e.corp ? '<p class="det" style="margin-top:3mm">Eine Anlage V gibt es für eine GmbH/UG nicht (Einkünfte aus Gewerbebetrieb, § 8 Abs. 2 KStG). Die Kosten der Gesellschaft selbst stehen im Jahresabschluss der Gesellschaft.</p>' : '')));
           if (mitAV && !e.corp) {
             var tot = { values: e.v, einnahmen: e.ein, werbungskosten: e.wk, ergebnis: e.erg,
@@ -950,18 +1034,124 @@
             if (av) S.push(B.seite(c, 'Anlage V · Objekt ' + (i + 1), B.abschnitt('Anlage V · Zuordnung · Objekt ' + (i + 1), 'Veranlagungsjahr ' + jahr, e.adr) + av));
           }
         });
-        var summe = function (L, wort) {
+        /* v3480 · Gesellschaft: Spalte „Ertragsteuer“, ein Verlust zeigt 0 € statt einer Erstattung (N-04) */
+        var summe = function (L, wort, gesSpalte) {
           if (!L.length) return '';
-          var a = L.reduce(function (x, e) { return [x[0] + e.ein, x[1] + e.wk, x[2] + e.erg, x[3] + num(e.s.tax_delta)]; }, [0, 0, 0, 0]);
-          return '<h3>' + wort + '</h3><table><thead><tr><th>Objekt</th><th class="r">Einnahmen</th><th class="r">Kosten</th><th class="r">Ergebnis</th><th class="r">Steuerwirkung</th></tr></thead><tbody>'
-            + L.map(function (e) { return '<tr><td>' + B.esc(e.adr) + '</td><td class="r num">' + B.eur(e.ein, 2) + '</td><td class="r num">' + B.eur(e.wk, 2) + '</td><td class="r num">' + B.eurS(e.erg, 2) + '</td><td class="r num">' + B.eurS(-num(e.s.tax_delta), 0) + '</td></tr>'; }).join('')
-            + '<tr class="summe"><td>Summe (' + L.length + ')</td><td class="r num">' + B.eur(a[0], 2) + '</td><td class="r num">' + B.eur(a[1], 2) + '</td><td class="r num">' + B.eurS(a[2], 2) + '</td><td class="r num">' + B.eurS(-a[3], 0) + '</td></tr></tbody></table>';
+          var st = function (e) { return gesSpalte ? Math.max(0, num(e.s.tax_delta)) : num(e.s.tax_delta); };
+          var a = L.reduce(function (x, e) { return [x[0] + e.ein, x[1] + e.wk, x[2] + e.erg, x[3] + st(e)]; }, [0, 0, 0, 0]);
+          return '<h3>' + wort + '</h3><table><thead><tr><th>Objekt</th><th class="r">Einnahmen</th><th class="r">Kosten</th><th class="r">Ergebnis</th><th class="r">' + (gesSpalte ? 'Ertragsteuer' : 'Steuerwirkung') + '</th></tr></thead><tbody>'
+            + L.map(function (e) { return '<tr><td>' + B.esc(e.adr) + '</td><td class="r num">' + B.eur(e.ein, 2) + '</td><td class="r num">' + B.eur(e.wk, 2) + '</td><td class="r num">' + B.eurS(e.erg, 2) + '</td><td class="r num">' + (gesSpalte && !(st(e) > 0.5) ? '0 €' : B.eurS(-st(e), 0)) + '</td></tr>'; }).join('')
+            + '<tr class="summe"><td>Summe (' + L.length + ')</td><td class="r num">' + B.eur(a[0], 2) + '</td><td class="r num">' + B.eur(a[1], 2) + '</td><td class="r num">' + B.eurS(a[2], 2) + '</td><td class="r num">' + (gesSpalte && !(a[3] > 0.5) ? '0 €' : B.eurS(-a[3], 0)) + '</td></tr></tbody></table>'
+            + (gesSpalte && L.some(function (e) { return e.erg < 0; }) ? '<p class="det">Ein Verlust eines Objekts begründet keine Erstattung: er wird in der Gesellschaft mit Gewinnen verrechnet, sonst als Verlustvortrag fortgeführt (§ 8 Abs. 1 KStG i. V. m. § 10d EStG, § 10a GewStG). Die Steuer der Gesellschaft insgesamt steht im Jahresabschluss.</p>' : '');
         };
         S.push(B.seite(c, 'Zusammenfassung', B.abschnitt('Zusammenfassung', 'Veranlagungsjahr ' + jahr)
-          + summe(priv, 'Privatvermögen · Einkünfte aus Vermietung und Verpachtung') + summe(ges, 'Gesellschaften · Ergebnis vor Steuern je Objekt')
+          + summe(priv, 'Privatvermögen · Einkünfte aus Vermietung und Verpachtung') + (vl ? '<p class="det">Veranlagung ' + jahr + ': ' + B.esc(vl.art) + ', ' + B.esc(vl.kist) + ' (' + B.esc(vl.quelle) + ').</p>' : '') + summe(ges, 'Gesellschaften · Ergebnis vor Steuern je Objekt', true)
           + '<p class="det" style="margin-top:3mm">Die Steuerwirkung ist je Objekt gerechnet (Steuer mit und ohne dieses Objekt beim zu versteuernden Einkommen des Steuerzeitraums). Die Summe ist deshalb eine Näherung: die Progression mehrerer Objekte zusammen weicht davon ab. '
           + (ges.length ? 'Privatvermögen und Gesellschaften sind getrennte Steuersubjekte und werden nicht zusammengezählt. ' : '') + 'Keine Steuererklärung und keine Steuerberatung.</p>'));
         return B.dokument('Steuer-Mappe ' + jahr, S);
+      });
+    });
+  }
+
+  /* ── 5c · Jahresabschluss einer Gesellschaft (v3480, Backlog N165) ──
+     Bis v3472 nur jsPDF (gesellschaft-abschluss.js exportAbschlussPDF), die Weiche umging ihn.
+     Gerechnet wird NICHTS neu: _gaDaten() und _gaRechnen() sind dieselben Funktionen wie im alten
+     PDF (Restschuld, Vortrag, Steuer ueber den Kern der Ueberfuehrung); die Erlaeuterungstexte kommen
+     aus _gaSteuerHinweis / _gaAusgleichText. opt: { halter, jahr } */
+  function jahresabschluss(opt) {
+    opt = opt || {};
+    var halter = String(opt.halter || ''), jahr = parseInt(opt.jahr, 10) || (new Date().getFullYear() - 1);
+    var B = D();
+    if (typeof window._gaDaten !== 'function' || typeof window._gaRechnen !== 'function' || typeof window._computeYearTotal !== 'function') return Promise.reject(nutzerFehler('Abschluss-Modul nicht geladen – Seite neu laden.'));
+    var reg = null; try { reg = (typeof _steuerRegime === 'function') ? _steuerRegime(halter) : null; } catch (e) {}
+    if (reg && reg.anlageV) return Promise.reject(nutzerFehler('Jahresabschluss gibt es nur für Gesellschaften — ' + reg.name + ' ist ' + reg.art));
+    return window._gaDaten(halter, jahr).then(function (daten) {
+      if (!daten.objekte.length) throw nutzerFehler('Dieser Gesellschaft ist kein Objekt zugeordnet.');
+      var rech = window._gaRechnen(halter, jahr, daten);
+      var name = (rech.mandant && rech.mandant.name) || 'Gesellschaft';
+      return basis('Jahresabschluss ' + jahr).then(function (c) {
+        c.zeile = name + ' · Geschäftsjahr ' + jahr;
+        var g = rech.guv, b = rech.bilanz, ident = (rech.mandant && rech.mandant.ident) || {}, S = [];
+        var e0 = function (v) { return B.eur(Math.round(Number(v) || 0), 0); };
+        var s0 = function (v) { return B.eurS(Math.round(Number(v) || 0), 0); };
+        var fehl = function (v) { return v ? String(v) : 'nicht hinterlegt'; };
+        var rf = (rech.mandant && window.DealPilotMandanten && DealPilotMandanten.rfLabel) ? DealPilotMandanten.rfLabel(rech.mandant.rechtsform) : '–';
+        var satzTxt = B.zahl(rech.steuersatz * 100, 3) + ' %' + (rech.erwStatus && rech.erwStatus.aktiv ? ' · erweiterte Kürzung § 9 GewStG' : (rech.regime && rech.regime.erw_kuerzung === true ? ' · erweiterte Kürzung beantragt, Prüfpunkte offen' : ''));
+        S.push(B.deckblatt(c, { bild: null, eyebrow: 'Jahresabschluss · Geschäftsjahr ' + jahr, titel: name, unter: 'Bilanz und Gewinn- und Verlustrechnung · Einkünfte aus Gewerbebetrieb (§ 8 Abs. 2 KStG)',
+          wertLabel: g.jahresueberschuss < 0 ? 'Jahresfehlbetrag ' + jahr : 'Jahresüberschuss ' + jahr, wert: s0(g.jahresueberschuss),
+          wertNeben: 'Ergebnis vor Steuern ' + B.esc(s0(g.ergebnisVorSteuern)) + '<br>Bilanzsumme ' + B.esc(e0(b.summeAktiva)) + '<br>' + daten.objekte.length + ' Objekt' + (daten.objekte.length === 1 ? '' : 'e'),
+          meta: [['Rechtsform', rf], ['Geschäftsjahr', '01.01.–31.12.' + jahr], ['Stand', c.stand]],
+          zitat: 'Diese Auswertung fasst zusammen, was DealPilot über die Objekte dieser Gesellschaft führt, und stellt es in der Gliederung des HGB dar. Sie ist kein aufgestellter Jahresabschluss im Sinne der §§ 242 ff. HGB und ersetzt weder die Buchführung noch die Beratung: sie kennt nur die Geschäftsvorfälle, die in DealPilot erfasst sind. Was darüber hinaus über das Konto der Gesellschaft läuft, steht als „Verrechnungskonto Gesellschafter“ in der Bilanz.' }));
+        /* Gesellschaft und Objekte */
+        S.push(B.seite(c, 'Gesellschaft', B.abschnitt('Abschnitt 1', 'Gesellschaft und Objekte', 'Stammdaten aus Einstellungen › Mandanten')
+          + B.liste([['Name', name], ['Rechtsform', rf], ['Steuernummer', fehl(ident.steuernummer)], ['Finanzamt', fehl(ident.finanzamt)], ['Handelsregister', fehl(ident.handelsregister)],
+            ['USt-IdNr.', fehl(ident.ustid)], ['Anschrift', fehl([ident.strasse, ident.ort].filter(Boolean).join(', '))], ['Steuersatz', satzTxt, { umbruch: 1 }]])
+          + '<h3>Objekte der Gesellschaft (' + daten.objekte.length + ')</h3><table><thead><tr><th>Nr.</th><th>Objekt</th><th class="r">Buchwert 31.12.</th></tr></thead><tbody>'
+          + daten.objekte.map(function (o, i) {
+              return '<tr><td class="num">' + (i + 1) + '</td><td>' + B.esc(o.name) + (o.basisIstVerkehrswert ? '<div class="det">aus dem Privatbestand überführt</div>' : '') + '</td><td class="r num">'
+                + (o.satz ? e0(Math.max(0, o.akGebaeude - o.kumAfaGebaeude) + o.akGrund) : 'kein Steuersatz für ' + jahr) + '</td></tr>';
+            }).join('') + '</tbody></table>'));
+        /* GuV */
+        var guvZ = [['1. Umsatzerlöse', e0(g.umsatz), { det: 'Kaltmieten und umgelegte Nebenkosten aller Objekte' }],
+          ['5. Grundstücksaufwendungen', s0(-g.grundstueck), { det: 'Betriebskosten und Erhaltungsaufwand' }],
+          ['6. Personalaufwand', s0(-g.personal), { det: 'Geschäftsführergehalt aus den Kosten der Gesellschaft' }],
+          ['7. Abschreibungen', s0(-g.afa), { det: 'Gebäude linear und § 7b, bewegliche Wirtschaftsgüter, anschaffungsnahe Herstellkosten' }],
+          ['8. Sonstige betriebliche Aufwendungen', s0(-g.sonstige), { det: 'Verwaltung der Objekte, dazu die Kosten der Gesellschaft ohne Personal' }],
+          ['13. Zinsen und ähnliche Aufwendungen', s0(-g.zinsen), { det: 'Zinsen und Finanzierungsnebenkosten' }],
+          ['Ergebnis vor Steuern', s0(g.ergebnisVorSteuern), { art: 'summe', farbe: 1 }],
+          ['14. Steuern vom Einkommen und vom Ertrag', s0(-g.steuern), { det: (window._gaSteuerHinweis ? _gaSteuerHinweis(rech) : '') }],
+          [g.jahresueberschuss < 0 ? 'Jahresfehlbetrag' : 'Jahresüberschuss', s0(g.jahresueberschuss), { art: 'ende', farbe: 1 }]];
+        var kostenH = rech.befunde.kostenFehlen
+          ? '<div class="hinweis" style="border-left-color:var(--rot);background:#FAF0EC"><b>Kosten der Gesellschaft fehlen.</b> Für ' + jahr + ' sind keine Kosten der Gesellschaft erfasst. Steuerberatung für den Jahresabschluss, Kammerbeiträge, Kontoführung und ein etwaiges Geschäftsführergehalt fehlen damit vollständig. Der Jahresüberschuss oben ist deshalb zu hoch, und die Bilanz geht in gleicher Höhe nicht auf. Nachzutragen unter Einstellungen › Mandanten.</div>'
+          : '<h3>Darin enthalten: Kosten der Gesellschaft</h3>' + B.liste((rech.kosten.arten || []).filter(function (a) { return a.betrag; }).map(function (a) { return [a.t, e0(a.betrag)]; }).concat([['Summe', e0(rech.kosten.summe), { art: 'summe' }]]));
+        var ohneH = rech.befunde.ohneSatz.length ? '<div class="hinweis" style="border-left-color:var(--rot);background:#FAF0EC">Für ' + rech.befunde.ohneSatz.length + ' Objekt' + (rech.befunde.ohneSatz.length === 1 ? '' : 'e') + ' liegt für ' + jahr + ' kein Steuersatz vor: ' + B.esc(rech.befunde.ohneSatz.join(', ')) + '. Diese Objekte sind in der GuV mit null enthalten, stehen in der Bilanz aber mit ihrem Buchwert — die Rechnung ist deshalb unvollständig.</div>' : '';
+        S.push(B.seite(c, 'Gewinn- und Verlustrechnung', B.abschnitt('Abschnitt 2', 'Gewinn- und Verlustrechnung', 'Gesamtkostenverfahren · § 275 Abs. 2 HGB · 01.01.–31.12.' + jahr) + B.liste(guvZ, ['Position', 'Betrag']) + kostenH + ohneH));
+        /* Bilanz */
+        var seiteT = function (titel, z) { return '<div><table><thead><tr><th>' + B.esc(titel) + '</th><th class="r">Betrag</th></tr></thead><tbody>' + z.map(function (x) {
+          return '<tr class="' + (x[2] || '') + '"><td>' + B.esc(x[0]) + (x[3] ? '<div class="det">' + B.esc(x[3]) + '</div>' : '') + '</td><td class="r num">' + (x[1] == null ? '' : B.esc(x[1])) + '</td></tr>'; }).join('') + '</tbody></table></div>'; };
+        var vd = b.vortragDetails, nV = vd && vd.jahre ? vd.jahre.length : 0;
+        var vTxt = !nV ? 'Anfangsbestand aus den Stammdaten — kein Vorjahr erfasst' : 'Anfangsbestand aus den Stammdaten + Ergebnisse ' + vd.jahre[0].jahr + (vd.jahre[nV - 1].jahr !== vd.jahre[0].jahr ? '–' + vd.jahre[nV - 1].jahr : '') + ' (' + e0(b.vortragAusVorjahren) + ')' + (vd.gekappt ? ' · nur die letzten 15 Jahre' : '');
+        var akt = [['A. Anlagevermögen', null, 'summe'], ['I. Grundstücke', e0(b.akGrund), '', 'Anschaffungskosten, nicht abgeschrieben'],
+          ['II. Gebäude', e0(b.bwGebaeude), '', 'AK ' + e0(b.akGebaeude) + ' abzüglich kumulierter AfA ' + e0(b.kumAfaGebaeude)]];
+        if (b.akBwg > 0) akt.push(['III. Betriebs- und Geschäftsausstattung', e0(b.bwBwg), '', 'AK ' + e0(b.akBwg) + ' abzüglich ' + e0(b.kumAfaBwg)]);
+        akt.push(['B. Umlaufvermögen', null, 'summe'], ['Guthaben bei Kreditinstituten', e0(b.bank), '', 'Eröffnungsbestand aus den Stammdaten — die laufenden Zahlungen des Jahres sind DealPilot nicht bekannt']);
+        if (b.ausgleich < 0) akt.push(['Forderungen gegen Gesellschafter', e0(-b.ausgleich), '', 'Ausgleichsposten — siehe Erläuterung unten']);
+        akt.push(['Summe Aktiva', e0(b.summeAktiva), 'ende']);
+        var pas = [['A. Eigenkapital', null, 'summe'], ['I. Gezeichnetes Kapital', e0(b.stammkapital)], [b.gewinnvortrag < 0 ? 'II. Verlustvortrag' : 'II. Gewinnvortrag', s0(b.gewinnvortrag), '', vTxt],
+          [b.jahresueberschuss < 0 ? 'III. Jahresfehlbetrag' : 'III. Jahresüberschuss', s0(b.jahresueberschuss)],
+          ['B. Rückstellungen', null, 'summe'], ['Steuerrückstellung', e0(b.steuerrueckstellung), '', 'Ertragsteuern des Jahres, in voller Höhe als noch nicht gezahlt angesetzt — Vorauszahlungen sind nicht bekannt'],
+          ['C. Verbindlichkeiten', null, 'summe'], ['gegenüber Kreditinstituten', e0(b.darlehen), '', 'Restschuld zum 31.12. aus den Darlehensangaben der Objekte'], ['Gesellschafterdarlehen', e0(b.gesdar)]];
+        if (b.ausgleich > 0) pas.push(['Verrechnungskonto Gesellschafter', e0(b.ausgleich), '', 'Ausgleichsposten — siehe Erläuterung unten']);
+        pas.push(['Summe Passiva', e0(b.summePassiva), 'ende']);
+        var ist = Math.abs(b.summeAktiva - b.summePassiva) < 1, aus = window._gaAusgleichText ? _gaAusgleichText(b) : { text: '', fehlt: [] };
+        S.push(B.seite(c, 'Bilanz', B.abschnitt('Abschnitt 3', 'Bilanz zum 31.12.' + jahr, 'Gliederung nach § 266 HGB, verkürzt')
+          + '<div class="zwei">' + seiteT('Aktiva', akt) + seiteT('Passiva', pas) + '</div>'
+          + '<div class="hinweis"' + (aus.fehlt.length ? ' style="border-left-color:var(--rot);background:#FAF0EC"' : '') + '><b>Warum ein Verrechnungskonto und keine stille Korrektur.</b> ' + B.esc(aus.text) + '</div>'
+          + (ist ? '' : '<div class="hinweis" style="border-left-color:var(--rot);background:#FAF0EC"><b>Achtung:</b> Die Summen weichen um ' + e0(b.summeAktiva - b.summePassiva) + ' voneinander ab. Das ist ein Fehler in der Rechnung, kein Datenmangel.</div>')));
+        /* Anlagenspiegel */
+        var sAk = 0, sKum = 0, sBw = 0, sRs = 0;
+        var zeilenA = daten.objekte.map(function (o) {
+          var bw = Math.max(0, o.akGebaeude - o.kumAfaGebaeude); sAk += o.akGebaeude; sKum += o.kumAfaGebaeude; sBw += bw; sRs += o.restschuld.summe;
+          var fu = [];
+          if (o.basisIstVerkehrswert) fu.push('AfA-Bemessungsgrundlage ist der Verkehrswert bei Überführung');
+          if (o.akAktiviert) fu.push('einschließlich aktivierter anschaffungsnaher Herstellkosten ' + e0(o.akAktiviert));
+          if (o.jahreErfasst.length) fu.push('AfA kumuliert aus den Jahren ' + o.jahreErfasst[0] + '–' + o.jahreErfasst[o.jahreErfasst.length - 1]);
+          if (o.restschuld.vorbehalt.length) fu.push(o.restschuld.vorbehalt.join('; '));
+          var a25 = ''; try { var r25 = window.Afa && Afa.pruefeSatzFertigstellung ? Afa.pruefeSatzFertigstellung({ baujahr: o.data.baujahr, afaSatz: o.data.afa_satz, eigen: !!String(o.data.afa_eigen || '').trim(), gesellschaft: true }) : null; if (r25 && r25.warnen) a25 = 'AfA-Satz prüfen: Fertigstellung vor 1925, gewählt 2,0 % statt 2,5 % (§ 7 Abs. 4 Satz 1 Nr. 2 Buchst. c EStG)'; } catch (eA) {}   /* v3480 */
+          if (a25) fu.push(a25);
+          return '<tr><td>' + B.esc(o.name) + (fu.length ? '<div class="det">' + B.esc(fu.join(' · ')) + '</div>' : '') + '</td><td class="r num">' + e0(o.akGebaeude) + '</td><td class="r num">' + e0(o.kumAfaGebaeude) + '</td><td class="r num">' + e0(bw) + '</td><td class="r num">' + (o.restschuld.bekannt ? e0(o.restschuld.summe) : 'kein Darlehen') + '</td></tr>';
+        });
+        var p = rech.befunde.probe;
+        var pt = 'Der gespeicherte Steuersatz eines Objekts führt die Restschuld nicht. Sie wird deshalb hier aus den Darlehensangaben des Objekts gerechnet: Annuitätendarlehen mit monatlicher Zahlung, Beginn laut Darlehensvertrag. Nicht enthalten sind Sondertilgungen, tilgungsfreie Anlaufzeiten und eine Anschlussfinanzierung zu anderen Konditionen.'
+          + (p ? ' Gegenprobe am geöffneten Objekt gegen den Rechenkern der App: ' + e0(p.eigen) + ' hier, ' + e0(p.kern) + ' dort — Abweichung ' + B.zahl(p.abweichung * 100, 2) + ' %' + (p.ok ? '. Die Rechnung stimmt mit dem Rechenkern überein.' : '. Das ist zu viel: die Restschuld in dieser Bilanz ist nicht belegt.')
+               : ' Eine Gegenprobe gegen den Rechenkern war nicht möglich, weil für ' + jahr + ' kein geöffnetes Objekt mit Cashflow-Reihe vorlag. Die Restschuld ist damit gerechnet, aber nicht geprüft.');
+        S.push(B.seite(c, 'Anlagenspiegel', B.abschnitt('Abschnitt 4', 'Anlagenspiegel und Nachweise', 'Je Objekt · § 268 Abs. 2 HGB · zum 31.12.' + jahr)
+          + '<table><thead><tr><th>Objekt</th><th class="r">AK Gebäude</th><th class="r">Kum. AfA</th><th class="r">Buchwert</th><th class="r">Restschuld</th></tr></thead><tbody>' + zeilenA.join('')
+          + '<tr class="summe"><td>Summe</td><td class="r num">' + e0(sAk) + '</td><td class="r num">' + e0(sKum) + '</td><td class="r num">' + e0(sBw) + '</td><td class="r num">' + e0(sRs) + '</td></tr></tbody></table>'
+          + '<h3>Worauf die Restschuld beruht</h3><p>' + B.esc(pt) + '</p>'
+          + (rech.befunde.restUnbekannt.length ? '<div class="hinweis" style="border-left-color:var(--rot);background:#FAF0EC">Ohne Darlehensangaben und deshalb mit null angesetzt: ' + B.esc(rech.befunde.restUnbekannt.join(', ')) + '. Ist eines dieser Objekte finanziert, fehlt die Verbindlichkeit in der Bilanz und der Ausgleichsposten ist entsprechend zu hoch.</div>' : '')
+          + '<p class="det" style="margin-top:3mm">Keine Steuerberatung und kein aufgestellter Jahresabschluss nach §§ 242 ff. HGB.</p>'));
+        return B.dokument('Jahresabschluss ' + jahr + ' · ' + name, S);
       });
     });
   }
@@ -1204,6 +1394,7 @@
     investment: function () { return investment('voll'); }, bank: function () { return investment('bank'); }, kurz: function () { return investment('kurz'); },
     kaufpreisaufteilung: kaufpreisaufteilung, finanzamt: function (o) { return finanzamt(3, false, o); }, finanzamt_anlagev: function (o) { return finanzamt(3, true, o); }, trackrecord: trackRecord, bankexport: bankexport, selbstauskunft: selbstauskunft,
     steuermappe: steuermappe,   /* v3471 · Steuer-Mappe im einheitlichen Design */
+    jahresabschluss: jahresabschluss,   /* v3480 · Jahresabschluss der Gesellschaft */
     vermoegen: vermoegenDok   /* v3226 · Vermögen & Haushalt */
   };
   function dokument(typ, opt) {
@@ -1212,7 +1403,7 @@
     return TYPEN[typ](opt || {});
   }
   window.DpDokumente = {
-    VERSION: 'v3471', TYPEN: Object.keys(TYPEN), dokument: dokument,
+    VERSION: 'v3480', TYPEN: Object.keys(TYPEN), dokument: dokument,
     oeffnen: function (typ, opt) { return dokument(typ, opt).then(function (h) { D().vorschau(h, typ); }); }
   };
 })();

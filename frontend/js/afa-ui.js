@@ -41,7 +41,46 @@
    * Prüft Eligibility und zeigt/versteckt den Neubau-Hinweis.
    * Wird von calc.js bei jedem calc() aufgerufen.
    */
+  /* v3480 · Warnung „Fertigstellung vor 1925, 2,0 % statt 2,5 %" unter der Auswahl des AfA-Satzes.
+     Die Regel steht in afa-engine.js (Afa.pruefeSatzFertigstellung) - hier nur die Anzeige.
+     Ein eigener Satz (Option data-eigen aus afa-eigen.js) ist nie ein Fehlalarm. Laeuft bei jedem
+     calc() (ueber afaCheckNeubauHint) und bei jeder Aenderung der Auswahl. */
+  function afaCheck1925() {
+    var sel = $('afa_satz');
+    if (!sel || !window.Afa || typeof window.Afa.pruefeSatzFertigstellung !== 'function') return;
+    var box = $('afa-1925-hint');
+    var opt = sel.options && sel.selectedIndex >= 0 ? sel.options[sel.selectedIndex] : null;
+    var eigen = !!(opt && opt.hasAttribute && opt.hasAttribute('data-eigen'));
+    var corp = false;
+    try { corp = !!(window._dpBegriff && window._dpBegriff().corp); } catch (e) {}
+    var st = window.State && window.State._afaStempel;
+    var r = window.Afa.pruefeSatzFertigstellung({
+      baujahr: ($('baujahr') || {}).value || '', afaSatz: sel.value, eigen: eigen,
+      basis: st && isFinite(st.geb) ? st.geb : null, gesellschaft: corp });
+    if (!r.warnen) { if (box) box.hidden = true; return; }
+    if (!box) {
+      box = document.createElement('div');
+      box.id = 'afa-1925-hint';
+      box.setAttribute('role', 'note');
+      box.style.cssText = 'margin-top:8px;padding:9px 12px;border-left:3px solid #B8625C;background:#FAF0EC;border-radius:6px;font-size:12px;line-height:1.5;color:#3a2a28';
+      var f = sel.closest ? sel.closest('.f') : null;
+      var nach = $('v234-neubau-afa-banner');
+      if (nach && nach.parentNode === f) f.insertBefore(box, nach); else (f || sel.parentNode).appendChild(box);
+      box.addEventListener('click', function (e) {
+        var b = e.target && e.target.closest && e.target.closest('[data-afa1925]');
+        if (!b) return;
+        sel.value = '2.5';
+        sel.dispatchEvent(new Event('change', { bubbles: true }));
+      });
+    }
+    box.innerHTML = '<div style="font-weight:600;color:#8a3f39;margin-bottom:2px">' + r.titel + '</div><div>' + r.text + '</div>'
+      + '<button type="button" class="btn btn-outline btn-sm" data-afa1925="1" style="margin-top:6px">Auf 2,5 % umstellen</button>';
+    box.hidden = false;
+  }
+  window.afaCheck1925 = afaCheck1925;
+
   window.afaCheckNeubauHint = function () {
+    try { afaCheck1925(); } catch (e) {}   /* v3480 · vor dem Ausblende-Ausstieg darunter */
     var hint = $('afa-neubau-hint');
     if (!hint) return;
 

@@ -162,7 +162,9 @@ window.AnlageV2025 = {
   /* Was DealPilot nicht getrennt fuehrt und deshalb in der Ansicht benannt
      statt weggelassen wird. */
   nicht_erfasst: [
-    { zeile: 38, text: 'Sonderabschreibung nach § 7b EStG — DealPilot rechnet sie und weist sie getrennt aus. Seit v1258 gilt das auch für GESPEICHERTE Steuersätze: `tax_records` führt die Aufteilung in `afa_linear` und `afa_sonder_7b` neben der Summe `afa`. Sätze, die vor v1258 gespeichert wurden, tragen dort NULL — bei ihnen ist die Aufteilung nicht erhoben, und dann gilt weiter: steht auf dem Blatt keine Zeile 38, obwohl Ihre AfA einen § 7b-Anteil enthält, gehört dieser Teil laut Formular NICHT in Zeile 35, sondern hierher.' },
+    /* v3480 · Kundentext ohne interne Begriffe. Bis v3472 stand hier, wie die Datenbank die Aufteilung
+       speichert (Tabelle tax_records, Felder afa_linear/afa_sonder_7b, „seit v1258“) - das stand so im PDF. */
+    { zeile: 38, text: 'Sonderabschreibung nach § 7b EStG — DealPilot rechnet sie und weist sie getrennt aus, sobald das Objekt eine Sonderabschreibung führt. Bei älteren gespeicherten Jahreswerten ist die Aufteilung nicht bekannt: steht auf diesem Blatt keine Zeile 38, obwohl die AfA einen § 7b-Anteil enthält, gehört dieser Teil laut Formular nicht in Zeile 35, sondern in Zeile 38.' },
     { zeile: 41, text: 'Erhöhte Absetzungen nach §§ 7h, 7i EStG oder Schutzbaugesetz — nicht getrennt erfasst; sie stecken gegebenenfalls in der AfA laut Zeile 35.' },
     { zeile: 19, text: 'Einnahmen für an Angehörige vermietete Wohnungen — DealPilot unterscheidet nicht nach Mieterkreis.' },
     { zeile: 25, text: 'Mieten für frühere Jahre, Mietkautionen, Mietvorauszahlungen — nicht erfasst.' },
@@ -171,6 +173,6 @@ window.AnlageV2025 = {
     { zeile: 28, text: 'Vom Finanzamt erstattete Umsatzsteuer — nicht erfasst.' },
     { zeile: 29, text: 'Öffentliche Zuschüsse, Guthabenzinsen — nicht erfasst.' },
     { zeile: 79, text: 'An das Finanzamt gezahlte Umsatzsteuer — nur bei umsatzsteuerpflichtiger Vermietung; DealPilot rechnet ohne.' },
-    { zeile: 87, text: 'Kürzung wegen verbilligter Vermietung — DealPilot warnt seit v1216 vor der 66-%-Grenze, trägt die Kürzung aber nicht ein.' }
+    { zeile: 87, text: 'Kürzung wegen verbilligter Vermietung — DealPilot warnt vor der 66-%-Grenze (§ 21 Abs. 2 EStG), trägt die Kürzung aber nicht ein.' }
   ]
 };

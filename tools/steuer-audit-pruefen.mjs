@@ -410,5 +410,55 @@ if (process.argv.includes('--live')) {
   }
 }
 
+/* ── K · v3480 Warnung „Fertigstellung vor 1925 mit 2,0 % statt 2,5 %" (Marcel 16.11.2026, Kanzlei N-05) ──
+   § 7 Abs. 4 Satz 1 Nr. 2 Buchst. c EStG: fertiggestellt vor dem 01.01.1925 -> 2,5 %. Warnung, keine
+   Korrektur; kein Fehlalarm bei eigenem Satz (§ 7 Abs. 4 Satz 2), anderem Satz, degressiv, ohne Baujahr. */
+{
+  const A = lade().Afa;
+  const P = (p) => A.pruefeSatzFertigstellung(p);
+  ok(P({ baujahr: 1908, afaSatz: '2.0' }).warnen === true, 'K Bj 1908, 2,0 % -> Warnung (Bismarckstr. 27)');
+  ok(P({ baujahr: '1924', afaSatz: '2,0' }).warnen === true, 'K Bj 1924 (Text), 2,0 % mit Komma -> Warnung');
+  ok(P({ baujahr: 1925, afaSatz: '2.0' }).warnen === false, 'K Bj 1925, 2,0 % -> keine Warnung (Buchst. b)');
+  ok(P({ baujahr: 1908, afaSatz: '2.5' }).warnen === false, 'K Bj 1908, 2,5 % -> keine Warnung');
+  ok(P({ baujahr: 1908, afaSatz: '2.0', eigen: true }).warnen === false, 'K eigener Satz (Gutachten, § 7 Abs. 4 Satz 2) -> kein Fehlalarm');
+  ok(P({ baujahr: 1908, afaSatz: '2.94' }).warnen === false, 'K eigener Satz 2,94 % (RND 34) -> kein Fehlalarm');
+  ok(P({ baujahr: 1908, afaSatz: '5.0_deg_wechsel' }).warnen === false && P({ baujahr: 1908, afaSatz: '3.0' }).warnen === false, 'K degressiv / 3 % -> keine Warnung dieser Art');
+  ok(P({ baujahr: '', afaSatz: '2.0' }).warnen === false && P({ baujahr: 1908, afaSatz: '' }).warnen === false, 'K ohne Baujahr oder ohne Satz -> still');
+  const w = P({ baujahr: 1908, afaSatz: '2.0', basis: 400000, gesellschaft: true });
+  ok(w.soll === 2.5 && w.mehrJahr === 2000 && /Buchst\. c/.test(w.text) && /Betriebsvermögen/.test(w.text) && /§ 7 Abs\. 4 Satz 2/.test(w.text),
+    'K Wortlaut: Buchst. c, 0,5 % von 400.000 = 2.000 EUR mehr, GmbH-Satz, Weg Gutachten');
+  ok(!/Betriebsvermögen/.test(P({ baujahr: 1908, afaSatz: '2.0' }).text), 'K privat: kein Satz zum Betriebsvermoegen');
+  /* Die Gesellschaft setzt selbst 2,5 % (ueberfuehrung-kern) - dort entsteht keine Warnung */
+  const c2 = { console: { log() {} }, window: {} }; c2.window = c2; vm.createContext(c2); vm.runInContext(js('ueberfuehrung-kern.js'), c2);
+  const gs = c2.DealPilotUeberfuehrungKern.afaSatzGesellschaft({ baujahr: 1908, wohnzwecke: true });
+  ok(gs.satzPct === 2.5 && P({ baujahr: 1908, afaSatz: gs.satzPct.toFixed(1) }).warnen === false, 'K Ueberfuehrung: Gesellschaft schreibt 1908 mit 2,5 % ab, keine Warnung');
+  /* Verdrahtung: alle Anzeigestellen lesen DIESELBE Regel */
+  const ui = js('afa-ui.js'), dok = js('dp-dokumente.js'), uw = js('ueberfuehrung-wizard.js');
+  ok(/Afa\.pruefeSatzFertigstellung/.test(ui) && /data-eigen/.test(ui) && /afaCheck1925\(\); \} catch \(e\) \{\}   \/\* v3480 · vor dem Ausblende/.test(ui),
+    'K Steuer-Reiter (afa-ui.js): Regel aus afa-engine, eigener Satz erkannt, Pruefung vor dem Ausblende-Ausstieg');
+  ok((dok.match(/afa1925\(B,/g) || []).length >= 3 && /Afa\.pruefeSatzFertigstellung/.test(dok), 'K Dokumente: Steuer-Mappe, Werbungskosten, Kaufpreisaufteilung zeigen den Hinweis');
+  ok(/Afa\.pruefeSatzFertigstellung/.test(uw) && /§ 23 Abs\. 3 Satz 4/.test(uw), 'K Ueberfuehrung: Hinweis mit tatsaechlich abgezogener AfA (§ 23 Abs. 3 Satz 4)');
+  const idx = fs.readFileSync(path.join(ROOT, 'frontend/index.html'), 'utf8');
+  ok(idx.indexOf('js/afa-engine.js') >= 0 && idx.indexOf('js/afa-engine.js') < idx.indexOf('js/afa-ui.js'), 'K index.html laedt afa-engine.js vor afa-ui.js');
+}
+
+/* ── L · v3480 Steuer-PDFs: Kundentext, Veranlagung, Gesellschaft ohne „Erstattung" ── */
+{
+  const av = js('anlage-v-2025.js'), dok = js('dp-dokumente.js'), dw = js('dok-weiche.js');
+  const ne = ((av.match(/nicht_erfasst:\s*\[([\s\S]*?)\n  \]/) || [])[1] || '').replace(/\/\*[\s\S]*?\*\//g, '');   /* nur Kundentext, ohne Kommentare */
+  ok(ne && !/tax_records|afa_linear|afa_sonder_7b|v\d{3,4}|`/.test(ne), 'L Anlage V „nicht erfasst": keine internen Begriffe (tax_records, Feldnamen, Versionsnummern)');
+  ok(/function veranlagung\(jahr\)/.test(dok) && (dok.match(/veranlagung\(/g) || []).length >= 4, 'L Veranlagungsart in Werbungskosten-PDF und Steuer-Mappe');
+  ok(/function steuerZeileGes/.test(dok) && !/'Ertragsteuer der Gesellschaft auf dieses Objekt \(Belastung −\)'/.test(dok), 'L Gesellschaft: Ertragsteuer je Objekt ohne „Erstattung" bei Verlust');
+  /* steuerZeileGes am echten Code: Verlust -> 0 EUR, nie „+“ */
+  const ctx = { window: {}, console: { log() {} } }; ctx.window = ctx; ctx.document = { getElementById: () => null };
+  vm.createContext(ctx); vm.runInContext(js('dp-dokument.js'), ctx);
+  const f = dok.match(/function steuerZeileGes\(B, steuer, ergebnis\) \{[\s\S]*?\n  \}/);
+  const z = f ? vm.runInContext('(' + f[0].replace('function steuerZeileGes', 'function') + ')', ctx) : null;
+  const zv = z ? z(ctx.DpDokument, -1234, -5000) : null, zg = z ? z(ctx.DpDokument, 800, 5000) : null;
+  ok(zv && zv[1] === '0 €' && /keine Erstattung/.test(zv[2].det) && /§ 10d EStG/.test(zv[2].det), 'L Verlust 5.000 / Steuer −1.234: 0 €, „keine Erstattung", Verlustvortrag');
+  ok(zg && /^−800 €$/.test(zg[1]), 'L Gewinn: Ertragsteuer −800 € als Belastung');
+  ok(/huelle\('exportAbschlussPDF'/.test(dw) && /huelle\('generateBmfPdfAnlage'/.test(dw) && /jahresabschluss: jahresabschluss/.test(dok), 'L Weiche: Jahresabschluss und BMF-Anlage im einheitlichen Dokument');
+}
+
 console.log('steuer-audit-pruefen: ' + gruen + ' gruen, ' + rot + ' rot');
 process.exit(rot ? 1 : 0);

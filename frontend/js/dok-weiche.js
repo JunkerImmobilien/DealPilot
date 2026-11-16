@@ -33,7 +33,7 @@
 
   var NAMEN = { investment: 'Investment Case', bank: 'Investment Case', selbstauskunft: 'Selbstauskunft', kurz: 'Kurzfassung', kaufpreisaufteilung: 'Kaufpreisaufteilung',
     finanzamt: 'Werbungskosten', finanzamt_anlagev: 'Werbungskosten mit Anlage V', trackrecord: 'Track Record', bankexport: 'Bankexport',
-    vermoegen: 'Vermögen & Haushalt', steuermappe: 'Steuer-Mappe' };   /* v3471 */   /* v3226 */
+    vermoegen: 'Vermögen & Haushalt', steuermappe: 'Steuer-Mappe', jahresabschluss: 'Jahresabschluss' };   /* v3480 */   /* v3471 */   /* v3226 */
 
   function design() {
     try { var v = window.DealPilotPdfWahl && DealPilotPdfWahl.vorgabe(); return v && v.design === 'klassisch' ? 'klassisch' : 'neu'; } catch (e) { return 'neu'; }
@@ -85,7 +85,8 @@
     var key = window._currentObjKey;
     if (objekt && !key) { hinweis('Bitte zuerst ein Objekt öffnen.'); return; }
     hinweis((NAMEN[art] || 'Dokument') + ' wird erstellt …');
-    try { if (await schnell(art, opt)) { hinweis('✓ ' + (NAMEN[art] || 'Dokument') + ' erstellt'); return; } } catch (e) {}
+    try { if (await schnell(art, opt)) { hinweis('✓ ' + (NAMEN[art] || 'Dokument') + ' erstellt'); return; } }
+    catch (e) { if (e && e.dpNutzer) { hinweis(e.message); return; } }   /* v3480 · „kein Objekt“, „kein Steuersatz“: PDF-Dienst und Vorschau wuerden nur dasselbe sagen */
     if (objekt) { try { if (typeof window.saveObj === 'function') await window.saveObj({ silent: true }); } catch (e) {} }
     var name = NAMEN[art] || 'Dokument';
     if (!objekt || istUuid(key)) {
@@ -147,6 +148,20 @@
       opt = opt || {};
       return erzeugen('steuermappe', { jahr: parseInt(jahr, 10) || (new Date().getFullYear() - 1), anlageV: opt.anlageV !== false, ids: opt.objectIds || null }, false);
     }) ? 1 : 0;
+    /* v3480 · Jahresabschluss der GmbH/UG (Knopf an der Mandantenkarte, mandanten.js openJahresabschluss).
+       Bis v3472 immer jsPDF (gesellschaft-abschluss.js). Sperren wie dort; gerechnet wird mit denselben
+       _gaDaten/_gaRechnen. „klassisch“ und Wasserzeichen nehmen den alten Weg (aktiv()). */
+    n += huelle('exportAbschlussPDF', function (halterId, jahr) {
+      if (typeof Plan !== 'undefined' && Plan.can && !Plan.can('werbungskosten_pdf')) return alt.exportAbschlussPDF.apply(this, arguments);   /* die alte Funktion zeigt die Sperre */
+      if (typeof Paywall !== 'undefined' && !Paywall.gate('exports')) return;
+      return erzeugen('jahresabschluss', { halter: halterId, jahr: parseInt(jahr, 10) || (new Date().getFullYear() - 1) }, false);
+    }) ? 1 : 0;
+    /* v3480 · die fruehere „Anlage zur Steuererklaerung“ des BMF-Rechners (pdf-anlage-bmf.js). Ihr Inhalt
+       steht seit v3480 in der Kaufpreisaufteilung (Seite „Anschaffungskosten und AfA“) - EIN Dokument. */
+    n += huelle('generateBmfPdfAnlage', function () {
+      if (!tor('kaufpreisaufteilung', 'Kaufpreisaufteilung')) return;
+      return erzeugen('kaufpreisaufteilung', {}, true);
+    }) ? 1 : 0;
     n += huelle('exportTrackRecordPDF', function (objects) {
       if (typeof Plan !== 'undefined' && Plan.key && Plan.key() === 'starter') return alt.exportTrackRecordPDF.apply(this, arguments);   /* Sperre der alten Funktion */
       if (!objects || !objects.length) return;
@@ -162,7 +177,7 @@
     return n;
   }
   var versuche = 0;
-  (function warten() { if (umhuellen() < 5 && versuche++ < 40) setTimeout(warten, 250); })();
+  (function warten() { if (umhuellen() < 7 && versuche++ < 40) setTimeout(warten, 250); })();   /* v3480: 7 Funktionen */
 
   window.DpDokWeiche = {
     aktiv: aktiv, design: design, erzeugen: erzeugen,

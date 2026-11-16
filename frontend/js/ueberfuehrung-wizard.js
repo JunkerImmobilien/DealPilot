@@ -344,6 +344,12 @@
       r.st23 = k.steuer23(r.p23.gewinn, { zve: zv, steuerLast: last, grenzPct: _num(b.grenz) });
     }
     if ((_num(b.san) || 0) > 0) r.warn.push('Sanierungskosten des Privatobjekts (' + _eur(_num(b.san)) + ') sind im § 23-Gewinn nicht berücksichtigt (anschaffungsnahe Herstellungskosten erhöhen die AK, mindern sich aber um ihre AfA) und werden <b>nicht</b> ins Gesellschaftsobjekt übernommen.');
+    /* v3480 · Privat 2,0 % bei Fertigstellung vor 1925 (Regel in afa-engine.js). § 23 rechnet richtig mit der
+       TATSAECHLICH abgezogenen AfA (§ 23 Abs. 3 Satz 4 EStG) - der Hinweis sagt nur, dass sie zu niedrig war. */
+    try {
+      var _a25 = (window.Afa && Afa.pruefeSatzFertigstellung) ? Afa.pruefeSatzFertigstellung({ baujahr: b.baujahr, afaSatz: b.afa_satz, eigen: (_num(b.afa_eigen) || 0) > 0 }) : null;
+      if (_a25 && _a25.warnen) r.warn.push('Privat lief die AfA mit 2,0 %, obwohl das Gebäude vor 1925 fertiggestellt ist (Baujahr ' + esc(String(b.baujahr)) + '; 2,5 % nach § 7 Abs. 4 Satz 1 Nr. 2 Buchst. c EStG). Der § 23-Gewinn rechnet mit der tatsächlich abgezogenen AfA (§ 23 Abs. 3 Satz 4 EStG). Offene Jahre lassen sich gegebenenfalls noch berichtigen – bitte mit der Steuerberatung klären. Die Gesellschaft schreibt mit ' + (r.ak && r.ak.ok && r.ak.afaSatzPct ? _pct(r.ak.afaSatzPct, 1) : '2,5') + ' % ab.');
+    } catch (_e25) {}
     if ((_num(b.makler_p) || 0) > 0) r.warn.push('Der private Makler (' + _pct(_num(b.makler_p), 2) + ' %) zählt zu den privaten AK, nicht zu denen der Gesellschaft.');
     if (b.afa_sonder7b_aktiv === true || /deg/.test(String(b.afa_satz || ''))) r.warn.push('Privat war degressive AfA oder § 7b gewählt. Für die Gesellschaft ausgeschlossen (§ 7 Abs. 5a, § 7b EStG: Anschaffung nur bis Ende des Fertigstellungsjahres) — sie schreibt linear ab.');
     if (r.ak.ok && r.ak.wert.vga > 0) r.warn.push('Der Kaufpreis liegt ' + _eur(r.ak.wert.vga) + ' über dem Verkehrswert: der Mehrbetrag ist eine <b>verdeckte Gewinnausschüttung</b> (§ 8 Abs. 3 S. 2 KStG) und beim Gesellschafter Kapitalertrag.');

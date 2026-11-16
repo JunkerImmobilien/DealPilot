@@ -641,6 +641,53 @@ async function exportAbschlussPDF(halterId, jahr) {
   }
 }
 
+/* v3480 · Texte, die jsPDF-Fassung und einheitliches Dokument (dp-dokumente.js jahresabschluss)
+   GEMEINSAM drucken - herausgeloest aus _gaGuvSeite/_gaBilanzSeite, Wortlaut unveraendert. */
+function _gaSteuerHinweis(rech) {
+  return (rech.steuerDetail
+        ? 'Körperschaftsteuer + Soli ' + _gaEur(rech.steuerDetail.kst) + ', Gewerbesteuer ' + _gaEur(rech.steuerDetail.gewst)
+          + (rech.erwStatus && rech.erwStatus.aktiv ? ' (erweiterte Kürzung § 9 Nr. 1 S. 2 GewStG)'
+              : (rech.steuerDetail.kuerzungFehlt ? ' (ohne Kürzung § 9 Nr. 1 S. 1 GewStG: ' + rech.steuerDetail.kuerzungFehlt + ' fehlt' + (rech._ohneGrundsteuerwert && rech._ohneGrundsteuerwert.length ? ' bei ' + rech._ohneGrundsteuerwert.join(', ') : '') + ', abgerundet)'
+                : ' (nach Kürzung 0,11 % des Grundsteuerwerts § 9 Nr. 1 S. 1 GewStG, abgerundet)'))
+          /* v3268 · Hinzurechnung § 8 Nr. 1 GewStG */
+          + (!(rech.erwStatus && rech.erwStatus.aktiv)
+              ? (rech.steuerDetail.hinzurechnung > 0
+                  ? '; Hinzurechnung § 8 Nr. 1 GewStG ' + _gaEur(rech.steuerDetail.hinzurechnung) + ' (25 % der Zinsen ' + _gaEur(rech.steuerDetail.entgelte) + ' über dem Freibetrag; nur Zinsen erfasst, Mieten/Pachten nicht)'
+                  : (rech.steuerDetail.entgelte > 0 ? '; Zinsen ' + _gaEur(rech.steuerDetail.entgelte) + ' unter dem Freibetrag des § 8 Nr. 1 GewStG, keine Hinzurechnung' : ''))
+              : '')
+          + (rech.steuerDetail.genutzt > 0 ? '; Verlustvortrag verrechnet ' + _gaEur(rech.steuerDetail.genutzt) : '')
+          + (rech.steuerDetail.vortragNach > 0 ? '; verbleibender Verlustvortrag ' + _gaEur(rech.steuerDetail.vortragNach) : '')
+          + (rech.ugRuecklage > 0 ? '. UG: gesetzliche Rücklage 25 % des um einen Verlustvortrag geminderten Jahresüberschusses = ' + _gaEur(rech.ugRuecklage) + ' (§ 5a Abs. 3 GmbHG)' : '') + '.'
+        : 'Satz ' + (rech.steuersatz * 100).toFixed(3).replace('.', ',') + ' % — Körperschaftsteuer und Soli'
+          + (rech.erwStatus && rech.erwStatus.aktiv ? ', Gewerbesteuer wegen erweiterter Kürzung mit 0 angesetzt' : ', einschließlich Gewerbesteuer') + '.');
+}
+function _gaAusgleichText(b) {
+  var _fehlt = [];
+  if (!(b.stammkapital > 0)) _fehlt.push('das gezeichnete Kapital');
+  if (!(b.bank > 0)) _fehlt.push('der Eröffnungsbestand der Bank');
+  if (!(b.gesdar > 0)) _fehlt.push('ein etwaiges Gesellschafterdarlehen');
+  var _basis = 'Die Bilanz geht auf, weil die Differenz zwischen dem, was '
+    + 'DealPilot kennt, und dem, was tatsächlich über das Konto der Gesellschaft lief, '
+    + 'als eigene Zeile ausgewiesen wird — nicht, weil sie null wäre. In diesem Posten '
+    + 'stecken alle Vorgänge, die DealPilot nicht führt: Einlagen und Entnahmen, private '
+    + 'Zahlungen für die Gesellschaft, Mietkautionen, der Zeitpunkt von Steuerzahlungen, '
+    + 'sowie die laufenden Bankbewegungen des Jahres. Bei kleinen Immobiliengesellschaften '
+    + 'läuft vieles davon ohnehin über das Verrechnungskonto des Gesellschafters.';
+  if (_fehlt.length) {
+    _basis += '  IN DIESEM ABSCHLUSS FEHLT: ' + _fehlt.join(', ') + '. '
+      + 'Solange diese Angaben in den Stammdaten der Gesellschaft auf null stehen, '
+      + 'trägt der Ausgleichsposten sie mit — er ist dann zwangsläufig zu hoch. '
+      + 'Nachzutragen unter Einstellungen / Mandanten.';
+  } else {
+    _basis += '  Die Stammdaten der Gesellschaft sind vollständig hinterlegt. '
+      + 'Ein Betrag in ungewöhnlicher Höhe deutet dann auf Zahlungen hin, die außerhalb '
+      + 'von DealPilot gelaufen sind.';
+  }
+  return { text: _basis, fehlt: _fehlt };
+}
+window._gaSteuerHinweis = _gaSteuerHinweis;
+window._gaAusgleichText = _gaAusgleichText;
+
 /* ── gemeinsame Bausteine ── */
 function _gaEur(n) {
   var v = Math.round(Number(n) || 0);
@@ -786,23 +833,7 @@ function _gaGuvSeite(doc, jahr, name, rech, W, H, M, CW) {
   pos('13.', 'Zinsen und ähnliche Aufwendungen', -g.zinsen, { hinweis: 'Zinsen und Finanzierungsnebenkosten' });
   strich(true);
   pos('', 'Ergebnis vor Steuern', g.ergebnisVorSteuern, { fett: true, rot: g.ergebnisVorSteuern < 0 });
-  pos('14.', 'Steuern vom Einkommen und vom Ertrag', -g.steuern,
-    { hinweis: (rech.steuerDetail
-        ? 'Körperschaftsteuer + Soli ' + _gaEur(rech.steuerDetail.kst) + ', Gewerbesteuer ' + _gaEur(rech.steuerDetail.gewst)
-          + (rech.erwStatus && rech.erwStatus.aktiv ? ' (erweiterte Kürzung § 9 Nr. 1 S. 2 GewStG)'
-              : (rech.steuerDetail.kuerzungFehlt ? ' (ohne Kürzung § 9 Nr. 1 S. 1 GewStG: ' + rech.steuerDetail.kuerzungFehlt + ' fehlt' + (rech._ohneGrundsteuerwert && rech._ohneGrundsteuerwert.length ? ' bei ' + rech._ohneGrundsteuerwert.join(', ') : '') + ', abgerundet)'
-                : ' (nach Kürzung 0,11 % des Grundsteuerwerts § 9 Nr. 1 S. 1 GewStG, abgerundet)'))
-          /* v3268 · Hinzurechnung § 8 Nr. 1 GewStG */
-          + (!(rech.erwStatus && rech.erwStatus.aktiv)
-              ? (rech.steuerDetail.hinzurechnung > 0
-                  ? '; Hinzurechnung § 8 Nr. 1 GewStG ' + _gaEur(rech.steuerDetail.hinzurechnung) + ' (25 % der Zinsen ' + _gaEur(rech.steuerDetail.entgelte) + ' über dem Freibetrag; nur Zinsen erfasst, Mieten/Pachten nicht)'
-                  : (rech.steuerDetail.entgelte > 0 ? '; Zinsen ' + _gaEur(rech.steuerDetail.entgelte) + ' unter dem Freibetrag des § 8 Nr. 1 GewStG, keine Hinzurechnung' : ''))
-              : '')
-          + (rech.steuerDetail.genutzt > 0 ? '; Verlustvortrag verrechnet ' + _gaEur(rech.steuerDetail.genutzt) : '')
-          + (rech.steuerDetail.vortragNach > 0 ? '; verbleibender Verlustvortrag ' + _gaEur(rech.steuerDetail.vortragNach) : '')
-          + (rech.ugRuecklage > 0 ? '. UG: gesetzliche Rücklage 25 % des um einen Verlustvortrag geminderten Jahresüberschusses = ' + _gaEur(rech.ugRuecklage) + ' (§ 5a Abs. 3 GmbHG)' : '') + '.'
-        : 'Satz ' + (rech.steuersatz * 100).toFixed(3).replace('.', ',') + ' % — Körperschaftsteuer und Soli'
-          + (rech.erwStatus && rech.erwStatus.aktiv ? ', Gewerbesteuer wegen erweiterter Kürzung mit 0 angesetzt' : ', einschließlich Gewerbesteuer') + '.') });
+  pos('14.', 'Steuern vom Einkommen und vom Ertrag', -g.steuern, { hinweis: _gaSteuerHinweis(rech) });
   strich(true);
   /* v1227c: bei negativem Ergebnis heisst die Zeile handelsrechtlich
      JahresFEHLBETRAG. "Jahresueberschuss: -21.078 EUR" ist kein Schoenheitsfehler,
@@ -990,27 +1021,7 @@ function _gaBilanzSeite(doc, jahr, name, rech, W, H, M, CW) {
      mit diesen drei Angaben fiel es auf 77.180 EUR. Der Posten ist also
      ein MESSGERAET fuer fehlende Stammdaten — dann soll er auch sagen,
      welche fehlen, statt den Leser raten zu lassen. */
-  var _fehlt = [];
-  if (!(b.stammkapital > 0)) _fehlt.push('das gezeichnete Kapital');
-  if (!(b.bank > 0)) _fehlt.push('der Eröffnungsbestand der Bank');
-  if (!(b.gesdar > 0)) _fehlt.push('ein etwaiges Gesellschafterdarlehen');
-  var _basis = 'Die Bilanz geht auf, weil die Differenz zwischen dem, was '
-    + 'DealPilot kennt, und dem, was tatsächlich über das Konto der Gesellschaft lief, '
-    + 'als eigene Zeile ausgewiesen wird — nicht, weil sie null wäre. In diesem Posten '
-    + 'stecken alle Vorgänge, die DealPilot nicht führt: Einlagen und Entnahmen, private '
-    + 'Zahlungen für die Gesellschaft, Mietkautionen, der Zeitpunkt von Steuerzahlungen, '
-    + 'sowie die laufenden Bankbewegungen des Jahres. Bei kleinen Immobiliengesellschaften '
-    + 'läuft vieles davon ohnehin über das Verrechnungskonto des Gesellschafters.';
-  if (_fehlt.length) {
-    _basis += '  IN DIESEM ABSCHLUSS FEHLT: ' + _fehlt.join(', ') + '. '
-      + 'Solange diese Angaben in den Stammdaten der Gesellschaft auf null stehen, '
-      + 'trägt der Ausgleichsposten sie mit — er ist dann zwangsläufig zu hoch. '
-      + 'Nachzutragen unter Einstellungen / Mandanten.';
-  } else {
-    _basis += '  Die Stammdaten der Gesellschaft sind vollständig hinterlegt. '
-      + 'Ein Betrag in ungewöhnlicher Höhe deutet dann auf Zahlungen hin, die außerhalb '
-      + 'von DealPilot gelaufen sind.';
-  }
+  var _basis = _gaAusgleichText(b).text;   /* v3480 · gemeinsam mit dem einheitlichen Dokument */
   var et = doc.splitTextToSize(_basis, CW - 8);
   var eh = et.length * 3.6 + 11;
   doc.rect(M, cy, CW, eh, 'FD');

@@ -24,6 +24,9 @@ if (!window._pdfGold) {
    Generiert eine 2-seitige PDF-Anlage mit:
    - Adresse, Eckdaten, AK-Aufstellung
    - BMF-Berechnungs-Ergebnisse (3 Verfahren)
+   v3480 · Nur noch Rueckfall (Design „klassisch“ oder Wasserzeichen): dok-weiche.js umhuellt
+   generateBmfPdfAnlage, der Inhalt steht im einheitlichen Dokument Kaufpreisaufteilung
+   (dp-dokumente.js, Seite „Anschaffungskosten und AfA“). „Stand M00e4rz“ (kaputtes Escape) behoben.
    ════════════════════════════════════════════════════════════════ */
 (function(){
 'use strict';
@@ -133,7 +136,7 @@ window.generateBmfPdfAnlage = function(state){
   doc.text('Anlage zur Steuererkl\u00e4rung: Kaufpreisaufteilung', marginL, y); y += 5.5;
   doc.setFontSize(9); doc.setFont('helvetica','normal'); doc.setTextColor(110);
   var _t = new Date();
-  doc.text('nach BMF-Arbeitshilfe \u00b7 Stand M00e4rz 2026 \u00b7 erstellt am ' + ('0'+_t.getDate()).slice(-2) + '.' + ('0'+(_t.getMonth()+1)).slice(-2) + '.' + _t.getFullYear(), marginL, y);
+  doc.text('nach BMF-Arbeitshilfe \u00b7 Stand März 2026 \u00b7 erstellt am ' + ('0'+_t.getDate()).slice(-2) + '.' + ('0'+(_t.getMonth()+1)).slice(-2) + '.' + _t.getFullYear(), marginL, y);
   doc.setTextColor(0); y += 10;
 
   // Demo-Helfer: Sektions-Header + Key/Value-Zeilen
@@ -306,7 +309,7 @@ window.generateBmfPdfAnlage = function(state){
 
   // Hinweis-Kasten (Demo-note: heller Kasten mit Gold-Balken links)
   if(y > 238){ doc.addPage(); y = marginT; }
-  var noteTxt = 'Die Aufteilung folgt der amtlichen Arbeitshilfe des Bundesministeriums der Finanzen (Stand M00e4rz 2026). Die Anschaffungskosten (Bemessungsgrundlage) werden mit dem Geb\u00e4udeanteil multipliziert und ergeben die AfA-Bemessungsgrundlage' + (hk > 0 ? ' \u2014 zuz\u00fcglich Herstellungskosten (\u00a7 255 Abs. 2 HGB), die zu 100 % dem Geb\u00e4ude zugerechnet werden' : '') + '. Alle drei Verfahren werden berechnet; ma\u00dfgebend ist das nach BMF-Logik gew\u00e4hlte (bekannte Miete -> Ertragswert, Vergleichsfaktor -> Vergleichswert, sonst Sachwert). Diese Anlage dient der Nachvollziehbarkeit gegen\u00fcber dem Finanzamt und ersetzt keine steuerliche Beratung.';
+  var noteTxt = 'Die Aufteilung folgt der amtlichen Arbeitshilfe des Bundesministeriums der Finanzen (Stand März 2026). Die Anschaffungskosten (Bemessungsgrundlage) werden mit dem Geb\u00e4udeanteil multipliziert und ergeben die AfA-Bemessungsgrundlage' + (hk > 0 ? ' \u2014 zuz\u00fcglich Herstellungskosten (\u00a7 255 Abs. 2 HGB), die zu 100 % dem Geb\u00e4ude zugerechnet werden' : '') + '. Alle drei Verfahren werden berechnet; ma\u00dfgebend ist das nach BMF-Logik gew\u00e4hlte (bekannte Miete -> Ertragswert, Vergleichsfaktor -> Vergleichswert, sonst Sachwert). Diese Anlage dient der Nachvollziehbarkeit gegen\u00fcber dem Finanzamt und ersetzt keine steuerliche Beratung.';
   var noteLines = doc.splitTextToSize(noteTxt, contentW - 12);
   var nH = noteLines.length * 3.5 + 6;
   doc.setFillColor(250,247,240); doc.rect(marginL, y, contentW, nH, 'F');
@@ -360,7 +363,7 @@ window.generateBmfPdfAnlage = function(state){
     /* v1633 \u00b7 Ohne Absender stand hier " \u00b7 Kaufpreisaufteilung ..." - ein
        Trennpunkt ohne etwas davor. Der Trenner gehoert zum ABSENDER,
        nicht zum Dokumenttitel. Folgefehler aus v1632. */
-    doc.text((_footTxt ? _footTxt + ' \u00b7 ' : '') + 'Kaufpreisaufteilung nach BMF-Arbeitshilfe Stand M00e4rz 2026', marginL, footerY);
+    doc.text((_footTxt ? _footTxt + ' \u00b7 ' : '') + 'Kaufpreisaufteilung nach BMF-Arbeitshilfe Stand März 2026', marginL, footerY);
     doc.text('Seite ' + i + ' / ' + pageCount, pageW - marginR, footerY, { align: 'right' });
     doc.setTextColor(0);
   }
