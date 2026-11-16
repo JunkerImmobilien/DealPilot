@@ -9828,8 +9828,10 @@
         await pdWechsel('C', 8, '2', 'Beim Kunden', 'So sieht die Einladung beim Kunden aus.');
       },
       async function (s) {   /* 9 · Anfrage beim Kunden */
-        await pdAngekommen(1800);
+        /* v3497 · erst sein Objekt laden: Thomas sah sonst eine leere Eingabemaske hinter dem Fenster */
         await pdPruefen(s);
+        await pdObjektLaden(/Musterallee/);
+        await pdAngekommen(1200);
         var nm = pdKurz(pdName());
         try { await DpPartnerKunden.meinPartnerOeffnen(); } catch (e) {}
         await warteAuf(pdOv, 8000); await warte(700);
@@ -9876,9 +9878,9 @@
         await pdWechsel('B', 2, '1', 'Bei der Kundin', 'Sabine sendet dir ein neues Objekt.');
       },
       async function (s) {   /* 3 · Objekt der Kundin */
-        await pdAngekommen(1800);
         await pdPruefen(s);
         await pdObjektLaden(/Musterweg/);
+        await pdAngekommen(1200);
         await zeige(function () { return q('#hdr-obj') || qs('header.hdr'); }, 8);
         await b2oZeile(s, 'Ein neues Objekt', '<b>' + pdKurz(pdName()) + '</b> rechnet gerade ' + (wert('str') ? '<b>' + wert('str') + ' ' + wert('hnr') + ', ' + wert('ort') + '</b>' : 'ein neues Objekt') + '. Sie möchte deine Meinung dazu.');
       },
@@ -10038,9 +10040,9 @@
         await pdWechsel('A', 5, '2', 'Beim Kunden', 'Was Jonas jetzt sieht.');
       },
       async function (s) {   /* 6 · Aufgabe beim Kunden */
-        await pdAngekommen(1800);
         await pdPruefen(s);
         await pdObjektLaden(/Musterstraße/);
+        await pdAngekommen(1200);
         var mp = function () { return qs('.sb-act-meinpartner'); };
         await zeige(mp, 6);
         await b2oZeile(s, 'Neue Aufgabe', 'Jonas sieht einen Punkt an <b>Mein Partner</b>. Mit E-Mail kommt er direkt über den Link hierher.');
@@ -10090,7 +10092,7 @@
         await pdCockpit('meldungen');
         await zeige(function () { return qs('.main-col .pk-inhalt'); }, 8);
         var t = [].filter.call(document.querySelectorAll('.main-col .pk-inhalt .pk-zeile, .main-col .pk-inhalt li, .main-col .pk-inhalt > div'), function (e) { return e.offsetWidth && /erledigt|gesendet|Stand/.test(pdText(e)); })[0];
-        await b2oZeile(s, 'Meldungen', 'Unter <b>Meldungen</b> steht, was Jonas getan hat' + (t ? ': <b>' + pdText(t).slice(0, 90) + '</b>' : '') + '.');
+        await b2oZeile(s, 'Meldungen', 'Unter <b>Meldungen</b> steht, was Jonas getan hat' + (t ? ': <b>' + pdText(t).replace(/\s*\d{2}\.\d{2}\.\d{4}.*$/, '').slice(0, 90) + '</b>' : '')   /* v3497 · ohne angehängtes Datum */ + '.');
         await pdReiterKlick('staende');
         var z = pdZeileMit(/Lindenallee/);
         await zeige(z, 6);
