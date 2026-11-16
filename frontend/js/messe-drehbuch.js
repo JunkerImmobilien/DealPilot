@@ -3582,18 +3582,17 @@
         await b2oZeile(s, 'Kennzahl für Kennzahl', 'Ertrag, Kosten, Finanzierung, Steuer, Ergebnis — z. B. Nettokaltmiete <b>' + (nk ? nk[1] + ' → ' + nk[2] : '–') + '</b>' + (mq ? ', je m² ' + mq[1] + ' → ' + mq[2] : '') + '. Was nicht vorlag, wird nicht geschätzt.');
       },
       async function (s) {   /* 9 · Entwicklung in der Pilot-Analyse */
-        var k = function () { var x = rhIm('#ai-content', /^PILOT-ANALYSE: ANKAUF GEGEN HEUTE$/); return x && x.closest('.dp-pa-card'); };
-        await zeige(k, 8);
-        /* v2968 · seit 26.10.2026 trägt die Parkstr. 9 ZWEI Analysen (Ankauf-Stand und heute, beide
-           mit KP 395.000 €). Empfehlung und empfohlener Kaufpreis werden aus der Tabelle der Karte
-           gelesen (Zeilen „Empfehlung“, „Empfohlener Kaufpreis“: td Wort | Beim Ankauf | Heute).
-           Zeigt die Karte noch dieselbe Analyse in beiden Spalten, bleibt der alte Satz. */
-        var t = r6Inner(k()), gleich = /beide Spalten zeigen dieselbe/i.test(t);
-        function pz(re) { var c = k(), tr = c ? [].filter.call(c.querySelectorAll('tr'), function (r) { var w = r.querySelector('td.abw-wort'); return w && re.test(r6Text(w)); })[0] : null, td = tr ? tr.querySelectorAll('td') : []; return td.length > 2 ? [r6Text(td[1]), r6Text(td[2])] : null; }
-        var em = pz(/^Empfehlung$/), kp = pz(/^Empfohlener Kaufpreis$/);
-        function sp(i) { return '<b>' + em[i] + '</b>' + (kp && kp[i] && kp[i] !== '–' ? ', empfohlener Kaufpreis <b>' + kp[i] + '</b>' : ''); }
-        if (gleich || !em) await b2oZeile(s, 'Die Pilot-Analyse: damals und heute', 'Zwei Spalten: was der Pilot beim Ankauf sagte und was er heute sagt.' + (gleich ? ' Seit dem Festschreiben kein neuer Abruf — DealPilot sagt das dazu.' : '') + ' Ein neuer Abruf füllt die Spalte „Heute“.', 600);
-        else await b2oZeile(s, 'Die Pilot-Analyse: damals und heute', 'Beim Ankauf: ' + sp(0) + '. Heute: ' + sp(1) + '. Beide Analysen bleiben nebeneinander stehen.', 600);
+        /* v3503 · die Karte „Pilot-Analyse: Ankauf gegen heute“ gibt es seit v3323 nicht mehr (keine Empfehlung im
+           Bestand); seit v3420 beginnt die Pilot-Analyse im Bestand mit dem Jahresabgleich. Der Satz liest dessen
+           Marke am Reiter (z. B. „2026 · 2/4“) und den Ergebnissatz oben. */
+        var m0 = q('.main-col'); if (m0) m0.scrollTop = 0;
+        await r11PaTab(/^Jahresabgleich/);
+        await warte(900);
+        var tab = [].filter.call(document.querySelectorAll('#ai-content .dp-pa-tab'), function (b) { return b.offsetWidth && /^Jahresabgleich/.test(r6Text(b)); })[0];
+        var marke = tab ? r6Text(tab).replace(/^Jahresabgleich\s*/, '') : '';
+        var kopf = function () { var p = r11Panel(); return p && (p.querySelector('[data-dp-ja-host] > *') || p.querySelector('[data-dp-ja-host]') || p); };
+        await zeige(kopf, 8);
+        await b2oZeile(s, 'Im Bestand: der Jahresabgleich', 'Die Pilot-Analyse beginnt im Bestand mit dem <b>Jahresabgleich</b>' + (marke ? ' (<b>' + marke + '</b>)' : '') + ': je Jahr Plan gegen Ist, Schritt für Schritt — Miete, Hausgeld, Wert und Steuer.', 600);
       }
     ]
   };
@@ -6472,7 +6471,8 @@
         r27Oben(r27Host(), 110); await warte(500);
         var R = r27Reihe() || [], A = DpSteuerVerlauf.auswerten(R), z0 = r27ZahlW(0);
         await zeige(r27Zahl(0), 8);
-        await b2oZeile(s, 'Positiv ab ' + z0.w, z0.u.charAt(0).toUpperCase() + z0.u.slice(1) + ': kein Verlustjahr' + (R[0] && R[0].steuer < 0 ? ', Steuer ' + R[0].jahr + ' <b>' + eur(-R[0].steuer) + '</b>' : '') + '.');
+        /* v3503 · gemessen 16.11.: die Westerfeldstr. trägt heute 7 Verlustjahre - „Nach 7 Verlustjahren: kein Verlustjahr“ widersprach sich. Nur ohne Verlustjahr den Zusatz. */
+        await b2oZeile(s, 'Positiv ab ' + z0.w, z0.u.charAt(0).toUpperCase() + z0.u.slice(1) + (/verlust/i.test(z0.u) ? '' : ': kein Verlustjahr') + (R[0] && R[0].steuer < 0 ? ', Steuer ' + R[0].jahr + ' <b>' + eur(-R[0].steuer) + '</b>' : '') + '.');
         /* der Knick: Jahre NACH dem Wendepunkt, in denen erstattet wird (zusammenhängend, das erste Band) */
         var k0 = -1, k1 = -1;
         for (var i = Math.max(A.wende, 0) + 1; i < R.length; i++) { if (R[i].steuer > 0) { if (k0 < 0) k0 = i; k1 = i; } else if (k0 >= 0) break; }

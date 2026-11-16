@@ -102,7 +102,7 @@ async function objektKopie(u, q, o) {
   if (da) {
     if (da.seq) d._obj_seq = da.seq;
     await query(`UPDATE objects SET data = $2::jsonb, ai_analysis = $3, version = version + 1, updated_at = now() WHERE id = $1`,
-      [da.id, JSON.stringify(d), src.ai_analysis ? JSON.stringify(src.ai_analysis) : null]);
+      [da.id, JSON.stringify(d), src.ai_analysis == null ? null : (typeof src.ai_analysis === 'string' ? src.ai_analysis : JSON.stringify(src.ai_analysis))]);   /* v3503 · TEXT-Spalte, nicht doppelt kodieren */
     return da.id;
   }
   let fotos = src.photos; if (typeof fotos === 'string') { try { fotos = JSON.parse(fotos); } catch (e) { fotos = []; } }

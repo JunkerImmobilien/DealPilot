@@ -32,6 +32,8 @@ const EMAIL = 'videoreihe@video-demo.dealpilot.test';
 const NAME = 'Demo Investor (Video)';
 const WEG = /^(_ueberf_link|_obj_seq|seq_no|_thumb|paket_.*|kunden_.*|_freigabe.*|partner_.*|_kundenstand|_von_kunde|_demo_quelle)$/;
 const EINSTELLUNGEN = ['bwk_profil', 'browser_vorgaben', 'lage_profil', 'mandanten', 'portfolio_analyse', 'pdf_vorgabe', 'hinweise', 'bot_vorgaben'];
+/* ai_analysis ist eine TEXT-Spalte: Text bleibt Text, ein Objekt wird einmal kodiert (v3503: vorher doppelt kodiert) */
+function alsText(ai) { return ai == null ? null : (typeof ai === 'string' ? ai : JSON.stringify(ai)); }
 function ohneKennung(ai) {
   if (!ai) return ai;
   try { const istText = typeof ai === 'string'; const aj = istText ? JSON.parse(ai) : JSON.parse(JSON.stringify(ai));
@@ -71,7 +73,7 @@ function ohneKennung(ai) {
     if (da) {
       if (da.seq) d._obj_seq = da.seq;
       await query('UPDATE objects SET data = $2::jsonb, ai_analysis = $3, version = version + 1, updated_at = now() WHERE id = $1',
-        [da.id, JSON.stringify(d), src.ai_analysis ? JSON.stringify(ohneKennung(src.ai_analysis)) : null]);
+        [da.id, JSON.stringify(d), alsText(ohneKennung(src.ai_analysis))]);
       karte[id] = da.id; zurueck++;
     } else {
       let fotos = src.photos; if (typeof fotos === 'string') { try { fotos = JSON.parse(fotos); } catch (e) { fotos = []; } }
