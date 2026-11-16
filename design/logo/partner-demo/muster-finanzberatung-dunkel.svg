@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 150" width="600" height="150">
+  <!-- Muster Finanzberatung · erfundene Demo-Marke des Partner-Testkontos (landing-partner-1, 16.11.2026).
+       Für dunklen Grund (Menüleiste, Mail-Kopf, dunkle PDF-Deckblätter). -->
+  <rect x="10" y="15" width="120" height="120" rx="26" fill="#1E6A84"/>
+  <rect x="36" y="78" width="16" height="34" rx="3" fill="#7FC4D6"/>
+  <rect x="62" y="60" width="16" height="52" rx="3" fill="#B5E0EA"/>
+  <rect x="88" y="40" width="16" height="72" rx="3" fill="#FFFFFF"/>
+  <path d="M34 66 L66 44 L82 54 L108 32" fill="none" stroke="#9EE2C6" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="108" cy="32" r="5.5" fill="#9EE2C6"/>
+  <text x="156" y="82" font-family="'Segoe UI','Helvetica Neue',Arial,sans-serif" font-weight="700" font-size="56" letter-spacing="-1" fill="#FFFFFF">Muster</text>
+  <text x="158" y="118" font-family="'Segoe UI','Helvetica Neue',Arial,sans-serif" font-weight="600" font-size="21" letter-spacing="5.2" fill="#8CCBDC">FINANZBERATUNG</text>
+</svg>

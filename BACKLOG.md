@@ -42,6 +42,8 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 - Offen: Sitemap-Eintrag `partner.html` erst nach Prod (Marker `landing-partner-1:partner`). Prod per Cherry-Pick der Landing-Commits (wie landing-seo), v3490 kommt mit dem nächsten App-Rollout.
 - Offen (Fehler): Toast „Fehler beim Speichern: kundenstand_schreibgeschuetzt“ beim Ansehen eines Kundenstands, ein Speicherweg umgeht `speichernSperren()`.
 - Offen: alte Navigation (`dp2.html`-Links) auf leistungsumfang, fragen, sicherheit, api.
+- landing-partner-1b: Logo „Muster Finanzberatung“ (`design/logo/partner-demo/`) im Testkonto hinterlegt, Bilder neu.
+- Offen (Marcel 16.11.): echte Bilder der normalen App auf der Landing. Vorschlag 4 Stellen in `leistungsumfang.html` (heute nur Text): Finanzierung (#lu-finanzierung), Investor Deal Score/Pilot-Analyse (#lu-dealscore), Steuer (#lu-steuer), Portfolio-Cockpit (#lu-portfolio). Braucht ein eigenes Demo-Konto mit gefüllten, erfundenen Objekten (nicht info@, nicht Nordlicht) oder Marcels Freigabe, Demo-Objekte von info@ in ein Testkonto zu kopieren.
 - Fragen an Marcel: Preis- und Freischalttext („wir schalten Partner persönlich frei“) noch gültig? Zielgruppen-Reihenfolge? Soll die Seite „Partner-Programm“ heißen?
 
 ### N166 · Kanzlei-Mappe: Rest nach v3480/v3481 (Marcel 16.11.2026) — **offen, nur nach Rückfrage**
