@@ -33,7 +33,7 @@
 
   var NAMEN = { investment: 'Investment Case', bank: 'Investment Case', selbstauskunft: 'Selbstauskunft', kurz: 'Kurzfassung', kaufpreisaufteilung: 'Kaufpreisaufteilung',
     finanzamt: 'Werbungskosten', finanzamt_anlagev: 'Werbungskosten mit Anlage V', trackrecord: 'Track Record', bankexport: 'Bankexport',
-    vermoegen: 'Vermögen & Haushalt' };   /* v3226 */
+    vermoegen: 'Vermögen & Haushalt', steuermappe: 'Steuer-Mappe' };   /* v3471 */   /* v3226 */
 
   function design() {
     try { var v = window.DealPilotPdfWahl && DealPilotPdfWahl.vorgabe(); return v && v.design === 'klassisch' ? 'klassisch' : 'neu'; } catch (e) { return 'neu'; }
@@ -138,6 +138,15 @@
       var av = document.getElementById('fa-pdf-anlagev');
       return erzeugen(av && av.checked ? 'finanzamt_anlagev' : 'finanzamt', opt, true);
     }) ? 1 : 0;
+    /* v3471 · Steuer-Mappe im Portfolio-Cockpit (dashboard.js steuerMappe). Bis v3470 lief sie IMMER
+       ueber die jsPDF-Fassung in werbungskosten-pdf.js - Marcel 16.11.2026: „du hast da die alten
+       Vorlagen genommen“. Sperren wie die alte Funktion; „klassisch“ und Wasserzeichen nehmen den alten Weg (aktiv()). */
+    n += huelle('exportSteuerMappePDF', function (jahr, opt) {
+      if (typeof Plan !== 'undefined' && Plan.can && !Plan.can('werbungskosten_pdf')) return alt.exportSteuerMappePDF.apply(this, arguments);
+      if (typeof Paywall !== 'undefined' && !Paywall.gate('exports')) return;
+      opt = opt || {};
+      return erzeugen('steuermappe', { jahr: parseInt(jahr, 10) || (new Date().getFullYear() - 1), anlageV: opt.anlageV !== false, ids: opt.objectIds || null }, false);
+    }) ? 1 : 0;
     n += huelle('exportTrackRecordPDF', function (objects) {
       if (typeof Plan !== 'undefined' && Plan.key && Plan.key() === 'starter') return alt.exportTrackRecordPDF.apply(this, arguments);   /* Sperre der alten Funktion */
       if (!objects || !objects.length) return;
@@ -153,7 +162,7 @@
     return n;
   }
   var versuche = 0;
-  (function warten() { if (umhuellen() < 4 && versuche++ < 40) setTimeout(warten, 250); })();
+  (function warten() { if (umhuellen() < 5 && versuche++ < 40) setTimeout(warten, 250); })();
 
   window.DpDokWeiche = {
     aktiv: aktiv, design: design, erzeugen: erzeugen,

@@ -877,6 +877,95 @@
     });
   }
 
+  /* ── 5b · Steuer-Mappe (v3471, Portfolio: mehrere Objekte, ein Veranlagungsjahr) ──
+     Marcel 16.11.2026: „du hast da die alten Vorlagen genommen. Das darf gar nicht sein.“
+     Gemessen: der Knopf „Steuer-Mappe erstellen“ im Portfolio-Cockpit (dashboard.js steuerMappe)
+     rief exportSteuerMappePDF (werbungskosten-pdf.js, jsPDF) — dok-weiche.js umhuellte sie nicht.
+     Jetzt dasselbe Dokument im einheitlichen Design. Quelle sind die GESPEICHERTEN Steuersaetze des
+     Jahres (GET /tax-records), nicht das gerade geoeffnete Objekt: eine Mappe ueber mehrere Objekte
+     darf keines in den Editor laden. Die Spalten von tax_records heissen wie die Felder der WK-Liste,
+     die Zuordnung zur Anlage V ist dieselbe Funktion wie im Einzel-PDF (anlageVBlatt).
+     opt: { jahr, anlageV (Vorgabe an), ids: [object_id …] (Vorgabe: alle mit Satz im Jahr) } */
+  function steuermappe(opt) {
+    opt = opt || {};
+    var jahr = parseInt(opt.jahr, 10) || (new Date().getFullYear() - 1);
+    var mitAV = opt.anlageV !== false;
+    var B = D(), num = function (x) { var n = Number(x); return isFinite(n) ? n : 0; };
+    var deIso = function (iso) { return /^\d{4}-\d{2}-\d{2}$/.test(String(iso || '')) ? String(iso).slice(8, 10) + '.' + String(iso).slice(5, 7) + '.' + String(iso).slice(0, 4) : ''; };
+    return Promise.all([basis('Steuer-Mappe ' + jahr), api('/tax-records?from=' + jahr + '&to=' + jahr)]).then(function (zz) {
+      var c = zz[0], saetze = ((zz[1] && zz[1].records) || []).filter(function (s) { return Number(s.year) === jahr; });
+      if (Array.isArray(opt.ids) && opt.ids.length) saetze = saetze.filter(function (s) { return opt.ids.indexOf(s.object_id) >= 0; });
+      if (!saetze.length) throw new Error('Für ' + jahr + ' sind keine Steuersätze gespeichert.');
+      return Promise.all(saetze.map(function (s) { return api('/objects/' + encodeURIComponent(s.object_id)).catch(function () { return null; }); })).then(function (objs) {
+        var eintr = saetze.map(function (s, i) {
+          var o = objs[i] && (objs[i].object || objs[i]), d = (o && o.data) || {};
+          var adr = [[d.str, d.hnr].filter(Boolean).join(' '), [d.plz, d.ort].filter(Boolean).join(' ')].filter(Boolean).join(', ') || (o && o.name) || 'Objekt';
+          var hId = String(d.halter || 'privat'), m = null;
+          try { m = (hId !== 'privat' && window.DealPilotMandanten) ? DealPilotMandanten.get(hId) : null; if (m && m.id !== hId) m = null; } catch (e) { m = null; }
+          var corp = !!(m && window.DealPilotMandanten && DealPilotMandanten.isCorp && DealPilotMandanten.isCorp(m.rechtsform));
+          var v = {}; Object.keys(WK_NAME).forEach(function (f) { v[f] = num(s[f]); });
+          var ein = v.einnahmen_km + v.einnahmen_nk, wk = 0;
+          WK.forEach(function (g) { g[1].forEach(function (f) { wk += v[f[0]]; }); });
+          return { s: s, d: d, adr: adr, art: OBJART[d.objart] || d.objart || 'Immobilie', halter: m ? m.name : 'Privat', corp: corp, v: v, ein: ein, wk: wk, erg: ein - wk,
+                   kauf: d.kaufdat || '', vermerk: (function () {
+                     if (String(d.obj_herkunft || '') === 'ueberfuehrung') return 'Aus dem Privatbestand überführt zum ' + deIso(d.halter_seit || d.kaufdat) + '. Anschaffungskosten und AfA der Gesellschaft gelten ab diesem Stichtag.'
+                       + (String(d.halter_seit || d.kaufdat || '').slice(0, 4) === String(jahr) ? ' ' + jahr + ' ist das Jahr des Wechsels: die Beträge decken nur die Monate ab dem Stichtag.' : '');
+                     if (d.ueberf_ende) return 'In eine Gesellschaft überführt zum ' + deIso(d.ueberf_ende) + '; privat zählen nur die Monate davor.'
+                       + (String(d.ueberf_ende).slice(0, 4) === String(jahr) ? ' ' + jahr + ' ist das Jahr des Wechsels.' : '');
+                     return '';
+                   })() };
+        }).sort(function (a, b) { return String(a.kauf || '9999').localeCompare(String(b.kauf || '9999')) || a.adr.localeCompare(b.adr); });
+        var priv = eintr.filter(function (e) { return !e.corp; }), ges = eintr.filter(function (e) { return e.corp; });
+        var S = [];
+        S.push(B.deckblatt(c, { bild: null, eyebrow: 'Steuer-Mappe · Veranlagungsjahr ' + jahr, titel: 'Steuer-Mappe ' + jahr,
+          unter: priv.length && ges.length ? 'Vermietung und Verpachtung (Anlage V) und Objekte in Gesellschaften' : (ges.length ? 'Objekte in Gesellschaften · Betriebsausgaben' : 'Vermietung und Verpachtung · Anlage V · § 21 EStG'),
+          meta: [['Veranlagungsjahr', String(jahr)], ['Objekte', String(eintr.length)], ['Stand', c.stand]] }));
+        /* Inhalt */
+        S.push(B.seite(c, 'Inhalt', B.abschnitt('Steuer-Mappe ' + jahr, 'Enthaltene Objekte', 'In der Reihenfolge des Kaufs')
+          + '<table><thead><tr><th>Nr.</th><th>Objekt</th><th>Halter</th><th>Kauf</th><th class="r">Einnahmen</th><th class="r">' + (ges.length && !priv.length ? 'Betriebsausgaben' : 'Kosten') + '</th><th class="r">Ergebnis</th></tr></thead><tbody>'
+          + eintr.map(function (e, i) { return '<tr><td class="num">' + (i + 1) + '</td><td>' + B.esc(e.adr) + '<div class="det">' + B.esc(e.art) + '</div></td><td>' + B.esc(e.halter) + '</td><td class="num">' + B.esc(deIso(e.kauf)) + '</td><td class="r num">' + B.eur(e.ein, 2) + '</td><td class="r num">' + B.eur(e.wk, 2) + '</td><td class="r num">' + B.eurS(e.erg, 2) + '</td></tr>'; }).join('')
+          + '</tbody></table><p class="det" style="margin-top:3mm">Je Objekt folgen die Aufstellung' + (mitAV && priv.length ? ' und für Objekte im Privatvermögen die Zuordnung zu den Zeilen der Anlage V' : '') + '. Quelle sind die je Objekt und Jahr gespeicherten Steuersätze. Keine Steuererklärung und keine Steuerberatung.</p>'));
+        eintr.forEach(function (e, i) {
+          var tab = [['Mieteinnahmen (kalt)', B.eur(e.v.einnahmen_km, 2)], ['Umlagen / Nebenkosten', B.eur(e.v.einnahmen_nk, 2)], ['Einnahmen gesamt', B.eur(e.ein, 2), { art: 'summe' }]];
+          WK.forEach(function (g) {
+            var sum = g[1].reduce(function (a, f) { return a + e.v[f[0]]; }, 0); if (!sum) return;
+            tab.push([g[0], B.eur(sum, 2), { art: 'summe' }]);
+            g[1].forEach(function (f) { if (e.v[f[0]]) tab.push([f[1], B.eur(e.v[f[0]], 2), { art: 'ein' }]); });
+          });
+          tab.push(['Summe ' + (e.corp ? 'Betriebsausgaben' : 'Werbungskosten') + ' ' + jahr, B.eur(e.wk, 2), { art: 'summe' }]);
+          tab.push([e.corp ? 'Beitrag zum Ergebnis der Gesellschaft (vor Steuern)' : 'Einkünfte aus Vermietung und Verpachtung', B.eurS(e.erg, 2), { art: 'ende', farbe: 1 }]);
+          if (!e.corp) {
+            if (e.s.base_income != null) tab.push(['Zu versteuerndes Einkommen ohne dieses Objekt (Steuerzeitraum ' + jahr + ')', B.eur(num(e.s.base_income), 0)]);
+            if (e.s.marginal_tax_rate != null) tab.push(['Grenzsteuersatz', B.pct(num(e.s.marginal_tax_rate) * 100, 2)]);
+          }
+          if (e.s.tax_delta != null) tab.push([e.corp ? 'Ertragsteuer der Gesellschaft auf dieses Objekt (Belastung −)' : 'Steuerwirkung (Erstattung +, Belastung −)', B.eurS(-num(e.s.tax_delta), 0), { farbe: 1 }]);
+          if (Math.abs(num(e.s.immo_result) - e.erg) > 1) tab.push(['Gespeichertes Ergebnis des Steuersatzes (weicht ab – Satz neu speichern)', B.eurS(num(e.s.immo_result), 2)]);
+          S.push(B.seite(c, 'Objekt ' + (i + 1) + ' · ' + jahr, B.abschnitt('Objekt ' + (i + 1) + ' · ' + e.halter + (e.corp ? ' · Betriebsvermögen' : ' · Privatvermögen'), (e.corp ? 'Betriebseinnahmen und Betriebsausgaben ' : 'Einnahmen und Werbungskosten ') + jahr, e.adr)
+            + (e.vermerk ? '<div class="hinweis">' + B.esc(e.vermerk) + '</div>' : '') + B.liste(tab)
+            + (e.corp ? '<p class="det" style="margin-top:3mm">Eine Anlage V gibt es für eine GmbH/UG nicht (Einkünfte aus Gewerbebetrieb, § 8 Abs. 2 KStG). Die Kosten der Gesellschaft selbst stehen im Jahresabschluss der Gesellschaft.</p>' : '')));
+          if (mitAV && !e.corp) {
+            var tot = { values: e.v, einnahmen: e.ein, werbungskosten: e.wk, ergebnis: e.erg,
+                        afaLinear: e.s.afa_linear != null ? num(e.s.afa_linear) : null, afaSonder7b: e.s.afa_sonder_7b != null ? num(e.s.afa_sonder_7b) : null, auto: { afa: e.v.afa } };
+            var av = anlageVBlatt(B, jahr, tot);
+            if (av) S.push(B.seite(c, 'Anlage V · Objekt ' + (i + 1), B.abschnitt('Anlage V · Zuordnung · Objekt ' + (i + 1), 'Veranlagungsjahr ' + jahr, e.adr) + av));
+          }
+        });
+        var summe = function (L, wort) {
+          if (!L.length) return '';
+          var a = L.reduce(function (x, e) { return [x[0] + e.ein, x[1] + e.wk, x[2] + e.erg, x[3] + num(e.s.tax_delta)]; }, [0, 0, 0, 0]);
+          return '<h3>' + wort + '</h3><table><thead><tr><th>Objekt</th><th class="r">Einnahmen</th><th class="r">Kosten</th><th class="r">Ergebnis</th><th class="r">Steuerwirkung</th></tr></thead><tbody>'
+            + L.map(function (e) { return '<tr><td>' + B.esc(e.adr) + '</td><td class="r num">' + B.eur(e.ein, 2) + '</td><td class="r num">' + B.eur(e.wk, 2) + '</td><td class="r num">' + B.eurS(e.erg, 2) + '</td><td class="r num">' + B.eurS(-num(e.s.tax_delta), 0) + '</td></tr>'; }).join('')
+            + '<tr class="summe"><td>Summe (' + L.length + ')</td><td class="r num">' + B.eur(a[0], 2) + '</td><td class="r num">' + B.eur(a[1], 2) + '</td><td class="r num">' + B.eurS(a[2], 2) + '</td><td class="r num">' + B.eurS(-a[3], 0) + '</td></tr></tbody></table>';
+        };
+        S.push(B.seite(c, 'Zusammenfassung', B.abschnitt('Zusammenfassung', 'Veranlagungsjahr ' + jahr)
+          + summe(priv, 'Privatvermögen · Einkünfte aus Vermietung und Verpachtung') + summe(ges, 'Gesellschaften · Ergebnis vor Steuern je Objekt')
+          + '<p class="det" style="margin-top:3mm">Die Steuerwirkung ist je Objekt gerechnet (Steuer mit und ohne dieses Objekt beim zu versteuernden Einkommen des Steuerzeitraums). Die Summe ist deshalb eine Näherung: die Progression mehrerer Objekte zusammen weicht davon ab. '
+          + (ges.length ? 'Privatvermögen und Gesellschaften sind getrennte Steuersubjekte und werden nicht zusammengezählt. ' : '') + 'Keine Steuererklärung und keine Steuerberatung.</p>'));
+        return B.dokument('Steuer-Mappe ' + jahr, S);
+      });
+    });
+  }
+
   /* ── 6 · Track Record (Portfolio) ────────────────────────────────── */
   function nachIds(objs, opt, nurGewonnen) {
     var ids = opt && Array.isArray(opt.ids) && opt.ids.length ? opt.ids : null;
@@ -1114,6 +1203,7 @@
   var TYPEN = {
     investment: function () { return investment('voll'); }, bank: function () { return investment('bank'); }, kurz: function () { return investment('kurz'); },
     kaufpreisaufteilung: kaufpreisaufteilung, finanzamt: function (o) { return finanzamt(3, false, o); }, finanzamt_anlagev: function (o) { return finanzamt(3, true, o); }, trackrecord: trackRecord, bankexport: bankexport, selbstauskunft: selbstauskunft,
+    steuermappe: steuermappe,   /* v3471 · Steuer-Mappe im einheitlichen Design */
     vermoegen: vermoegenDok   /* v3226 · Vermögen & Haushalt */
   };
   function dokument(typ, opt) {
@@ -1122,7 +1212,7 @@
     return TYPEN[typ](opt || {});
   }
   window.DpDokumente = {
-    VERSION: 'v3184', TYPEN: Object.keys(TYPEN), dokument: dokument,
+    VERSION: 'v3471', TYPEN: Object.keys(TYPEN), dokument: dokument,
     oeffnen: function (typ, opt) { return dokument(typ, opt).then(function (h) { D().vorschau(h, typ); }); }
   };
 })();
