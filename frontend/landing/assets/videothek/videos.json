@@ -875,76 +875,76 @@
      "id": "partner-1",
      "kategorie": "partner",
      "nr": 1,
-     "dauer": 202,
+     "dauer": 209,
      "titel": "Partner-Cockpit und Marke",
      "unterzeile": "Dein Arbeitsplatz für Kunden, Plätze und deine Marke.",
      "story": "Wo das Partner-Cockpit sitzt, was die Übersicht zeigt, wie Plätze und Abrechnung funktionieren und wie Logo und Farbe deines Unternehmens in DealPilot kommen.",
      "datei": "dealpilot-partner-1-partner-cockpit-und-marke.mp4",
-     "datei_ton": "dealpilot-partner-1-partner-cockpit-und-marke-sprecher.mp4",
+     "datei_ton": "dealpilot-partner-1-partner-cockpit-und-marke-marcel.mp4",
      "poster": "dealpilot-partner-1-vorschau.webp",
      "kapitel": [
       {
-       "t": 15,
+       "t": 17,
        "titel": "Deine Marke",
        "stichworte": "DealPilot trägt das Logo und die Farbe deines Unternehmens. Im Beispiel die erfundene Nordlicht Immobilienberatung."
       },
       {
-       "t": 28,
+       "t": 31,
        "titel": "Das Partner-Cockpit",
        "stichworte": "Unter Aktionen öffnest du das Partner-Cockpit. Dort steuerst du deine Kunden."
       },
       {
-       "t": 42,
+       "t": 44,
        "titel": "Auf einen Blick",
        "stichworte": "Plätze belegt 1 / 5, Kunden verbunden 2, neue Kundenstände 3. Jede Kachel führt in ihren Reiter."
       },
       {
-       "t": 54,
+       "t": 56,
        "titel": "Was ansteht",
        "stichworte": "4 Punkte warten auf dich: offene Anfragen, neue Stände deiner Kunden, Meldungen. Ein Klick, und du bist dort."
       },
       {
-       "t": 67,
+       "t": 70,
        "titel": "Die Reiter",
        "stichworte": "Statt Objekt bis Deal-Aktion stehen oben jetzt die Reiter des Cockpits: Kunden & Plätze, Einladen, Freigegeben, Aufgaben, Meldungen, Verwalt"
       },
       {
-       "t": 82,
+       "t": 85,
        "titel": "Zurück zu den Objekten",
        "stichworte": "Mit Objekte kommst du jederzeit zurück zu deinen eigenen Objekten."
       },
       {
-       "t": 97,
+       "t": 99,
        "titel": "Plätze",
        "stichworte": "Ein Platz ist ein DealPilot-Zugang, den du für einen Kunden bezahlst. Gekauft 5, belegt 1, frei 4."
       },
       {
-       "t": 109,
+       "t": 111,
        "titel": "Plätze dazukaufen",
-       "stichworte": "Monatlich oder jährlich, der Preis steht sofort daneben (95 € je Monat, 19 € je Platz). Bezahlt wird über die Kasse, nichts geht ohne deinen"
+       "stichworte": "Der Preis steht sofort daneben, hier für 5 Plätze 95 € je Monat (19 € je Platz). Plätze kommen zum Partner-Plan dazu und werden über die Kas"
       },
       {
-       "t": 125,
+       "t": 128,
        "titel": "Abrechnung",
        "stichworte": "Dein Partner-Plan, Rechnungen, Zahlungsart und Kündigung findest du im Abo-Portal."
       },
       {
-       "t": 138,
+       "t": 140,
        "titel": "Marke",
        "stichworte": "Name, Logo und Akzentfarbe deines Unternehmens. Dazu Anschrift und Kontakt für PDFs und E-Mails an deine Kunden."
       },
       {
-       "t": 150,
+       "t": 153,
        "titel": "Dein Logo",
        "stichworte": "Einmal hochladen. DealPilot rechnet es für helle und dunkle Flächen selbst passend."
       },
       {
-       "t": 162,
+       "t": 164,
        "titel": "Für deine Kunden",
        "stichworte": "Kunden mit deinem Platz sehen DealPilot in deiner Marke. Kunden mit eigenem Abo wählen selbst, ob sie deine Marke nutzen."
       },
       {
-       "t": 179,
+       "t": 181,
        "titel": "Startklar",
        "stichworte": "Das Cockpit steht. Im nächsten Video: Kunden hinzufügen, mit Partnerplatz oder mit eigenem Abo."
       }
