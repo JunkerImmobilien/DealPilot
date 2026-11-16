@@ -313,6 +313,7 @@ soll('AfA im Kaufjahr (Kauf 03/2026, Stichtag 07/2026)', K.afaBisStichtag({ seri
   soll('Assistent traegt Ergebnis ein', /DealPilotMandanten\.uewPlanErledigt\(c\._halterId, _privatKey/.test(wizSrc), true);
   soll('Assistent rechnet weiter nur im Kern (paragraph23 unveraendert gerufen)', /k\.paragraph23\(\{ art: w\.art/.test(wizSrc), true);
   soll('Aufheben setzt Plan zurueck (zwei Wege)', (mandSrc.match(/try \{ uewPlanZurueck\(privatKey\)/g) || []).length, 2);
+  soll('v3472: Privatobjekt wird vor dem Speichern neu gerechnet (Steuersaetze nach dem Einfrieren)', /if \(typeof calc === 'function'\) calc\(\); \} catch \(e\) \{\}\s*if \(typeof saveObj === 'function'\) await saveObj/.test(wizSrc), true);
   soll('Gesellschaftskarte: Objekte ueberfuehren', /openUeberfuehrung\(\\'' \+ esc\(m\.id\) \+ '\\'\)/.test(mandSrc), true);
 }
 

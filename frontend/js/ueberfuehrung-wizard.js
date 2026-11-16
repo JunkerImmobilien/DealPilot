@@ -531,6 +531,11 @@
       if (_ueEl) _ueEl.value = c._stichtag;
       var _udEl = document.getElementById('ueberf_daten'); if (_udEl) _udEl.value = _datPriv;
       var _linkEl = document.getElementById('_ueberf_link'); if (_linkEl) _linkEl.value = '';
+      /* v3472 · erst rechnen, dann speichern. Gemessen 16.11.2026: ohne calc() schrieb das Speichern die
+         Steuersaetze des Privatobjekts mit dem Stand VOR dem Einfrieren (20 Jahre, volles Stichtagsjahr) -
+         die Steuer-Mappe 2026 zeigte das ueberfuehrte Objekt privat mit voller Jahresmiete, bis es jemand
+         erneut oeffnete und speicherte. */
+      try { if (typeof calc === 'function') calc(); } catch (e) {}
       if (typeof saveObj === 'function') await saveObj({ silent: true });
 
       /* 2) Gesellschaftsobjekt — eigene Anschaffungskosten statt Kopie der privaten */
@@ -617,7 +622,10 @@
       } catch (e) { try { console.warn('[v3470] Gruppe nicht fortgeschrieben', e); } catch (e2) {} }
       close();
       if (typeof toast === 'function') toast('✓ Überführt — Gesellschaftsobjekt angelegt, Privatobjekt eingefroren.');
-      if (_naechster) _naechstesAnbieten(_naechster, c._halterName);
+      /* v3472: Name ohne den Rechtsform-Zusatz der Auswahlliste („… GmbH (Test) (GmbH)") */
+      var _corpName = c._halterName;
+      try { var _cm = DealPilotMandanten.get(c._halterId); if (_cm && _cm.id === c._halterId) _corpName = _cm.name; } catch (e) {}
+      if (_naechster) _naechstesAnbieten(_naechster, _corpName);
       if (typeof renderSaved === 'function') renderSaved({ _immediate: true });
       if (typeof calc === 'function') calc();
       if (typeof updateSidebarPortfolio === 'function') updateSidebarPortfolio();
