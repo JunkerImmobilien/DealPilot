@@ -458,8 +458,116 @@
       regel: tarif === null ? 'Beteiligungsquote fehlt' : (tarif ? 'Tarif (§ 32d Abs. 2 Nr. 1 S. 1 Buchst. b EStG), Werbungskosten abziehbar' : 'Abgeltungsteuer 25 % + Soli') };
   }
 
+  /* ── v3470 · Gruppe von Objekten, schrittweise uebertragen ───────────────
+     Marcel 16.11.2026: „bei der Überführung in die GmbH auch andere Objekte
+     hinzufügen … eine Gruppe von Objekten aus dem Bestand, die nach und nach
+     übertragen werden, und wenn die GmbH schon existiert, weitere mit
+     hinübertragen.“
+
+     Jedes Objekt behaelt SEINE Rechnung (akGesellschaft, paragraph23 oben,
+     unveraendert) und seinen eigenen Stichtag. Die Gruppe fuegt nur hinzu, was
+     ueber ein Objekt hinausgeht:
+
+       1. Freigrenze § 23 Abs. 3 S. 5 EStG: 1.000 € auf den GESAMTgewinn aller
+          privaten Veraeusserungsgeschaefte eines Kalenderjahres. Uebertraegt
+          jemand zwei Objekte im selben Jahr, zaehlt der Gewinn des einen als
+          „weitere Gewinne" des anderen. weitereGewinne() liefert genau den Wert,
+          den paragraph23() als p.weitereGewinne erwartet — aus den schon
+          gerechneten Eintraegen derselben Gruppe. Ein geplanter Eintrag ohne
+          Rechnung zaehlt als „offen" (nicht als 0), damit die Freigrenze nie
+          still zu guenstig ausfaellt.
+       2. Drei-Objekt-Grenze (gewerblicher Grundstueckshandel, BMF 26.03.2004,
+          BStBl I 434, Tz. 5 ff.): mehr als drei Objekte, die innerhalb von fuenf
+          Jahren nach der Anschaffung und innerhalb eines Zeitraums von fuenf
+          Jahren veraeussert werden. Die Uebertragung auf die eigene GmbH ist
+          eine Veraeusserung (§ 23 Abs. 1 S. 5 Nr. 2 EStG fuer die verdeckte
+          Einlage; Kauf und Sacheinlage ohnehin). DealPilot ZAEHLT nur und
+          warnt — ob ein Gewerbebetrieb vorliegt, entscheidet das Gesamtbild
+          (Fremdveraeusserungen, die DealPilot nicht kennt, zaehlen mit).
+     Rein, ohne DOM: Eintraege kommen als Parameter (Plan am Mandanten,
+     mandanten.js uew_plan). */
+  var PLAN_STATUS = { geplant: 'geplant', ueberfuehrt: 'überführt' };
+  function _jahr(iso) { var s = _iso(iso); return s ? +s.slice(0, 4) : null; }
+  function _tageZwischen(a, b) {
+    var x = _iso(a), y = _iso(b); if (!x || !y) return null;
+    return Math.round((Date.UTC(+y.slice(0, 4), +y.slice(5, 7) - 1, +y.slice(8, 10)) - Date.UTC(+x.slice(0, 4), +x.slice(5, 7) - 1, +x.slice(8, 10))) / 86400000);
+  }
+  /* Plan ordnen und pruefen. Eintrag: { key, label, kaufdat, stichtag, status,
+     gesellschaftKey?, gewinn23?, steuer23?, steuerfrei23?, grest?, ak? } */
+  function planOrdnen(plan) {
+    var fehler = [], gesehen = {};
+    var zeilen = (plan || []).filter(function (e) { return e && e.key; }).map(function (e) {
+      var z = {}; for (var k in e) if (Object.prototype.hasOwnProperty.call(e, k)) z[k] = e[k];
+      z.status = PLAN_STATUS[e.status] ? e.status : 'geplant';
+      if (gesehen[e.key]) fehler.push((e.label || e.key) + ': doppelt in der Gruppe');
+      gesehen[e.key] = 1;
+      if (!_iso(e.stichtag)) fehler.push((e.label || e.key) + ': Stichtag fehlt');
+      else if (_iso(e.kaufdat) && e.stichtag <= e.kaufdat) fehler.push((e.label || e.key) + ': Stichtag liegt nicht nach dem Kauf (' + _de(e.kaufdat) + ')');
+      return z;
+    });
+    zeilen.sort(function (a, b) { return String(a.stichtag || '9999').localeCompare(String(b.stichtag || '9999')) || String(a.label || '').localeCompare(String(b.label || '')); });
+    return { zeilen: zeilen, fehler: fehler };
+  }
+  /* Summe der § 23-Gewinne der ANDEREN Eintraege im Kalenderjahr des Stichtags.
+     Nur steuerbare Eintraege (Frist laeuft) mit gerechnetem Gewinn zaehlen;
+     steuerfreie (Frist abgelaufen) tragen nichts bei. */
+  function weitereGewinne(plan, key, stichtag) {
+    var j = _jahr(stichtag), summe = 0, offen = [];
+    if (j == null) return { betrag: null, offen: [], jahr: null };
+    (plan || []).forEach(function (e) {
+      if (!e || e.key === key || _jahr(e.stichtag) !== j) return;
+      if (e.steuerfrei23 === true) return;
+      var g = _n(e.gewinn23);
+      if (e.status === 'ueberfuehrt' && g != null) summe += g;
+      else offen.push(e.label || e.key);
+    });
+    return { betrag: _r2(summe), offen: offen, jahr: j };
+  }
+  function dreiObjektGrenze(plan) {
+    /* Veraeusserungen mit Haltedauer bis fuenf Jahre */
+    var kurz = (plan || []).filter(function (e) {
+      var t = _tageZwischen(e && e.kaufdat, e && e.stichtag);
+      return t != null && t >= 0 && _iso(e.stichtag) <= _plusJahre(e.kaufdat, 5);
+    }).sort(function (a, b) { return String(a.stichtag).localeCompare(String(b.stichtag)); });
+    /* groesste Zahl in einem Fuenfjahresfenster der Veraeusserungen */
+    var max = 0, fenster = [];
+    for (var i = 0; i < kurz.length; i++) {
+      var ende = _plusJahre(kurz[i].stichtag, 5), drin = [];
+      for (var j = i; j < kurz.length; j++) if (kurz[j].stichtag < ende) drin.push(kurz[j]);
+      if (drin.length > max) { max = drin.length; fenster = drin; }
+    }
+    return { anzahl: max, ueberGrenze: max > 3, objekte: fenster.map(function (e) { return e.label || e.key; }),
+             kurzGehalten: kurz.length,
+             text: max > 3 ? 'Mehr als drei Objekte innerhalb von fünf Jahren nach Anschaffung übertragen — gewerblicher Grundstückshandel droht (BMF 26.03.2004, Tz. 5 ff.). Vor der Übertragung prüfen lassen.'
+                           : (max > 0 ? max + ' von höchstens drei Objekten mit Haltedauer bis fünf Jahre in fünf Jahren übertragen (Drei-Objekt-Grenze, BMF 26.03.2004). Veräußerungen außerhalb von DealPilot zählen mit.' : '') };
+  }
+  /* Uebersicht der Gruppe: je Jahr Summe § 23 (bekannt/offen), Freigrenze, GrESt. */
+  function gruppeAuswerten(plan) {
+    var o = planOrdnen(plan), jahre = {};
+    o.zeilen.forEach(function (e) {
+      var j = _jahr(e.stichtag); if (j == null) return;
+      var J = jahre[j] || (jahre[j] = { jahr: j, anzahl: 0, ueberfuehrt: 0, gewinn23: 0, steuer23: 0, grest: 0, offen: 0 });
+      J.anzahl++;
+      if (e.status === 'ueberfuehrt') {
+        J.ueberfuehrt++;
+        if (e.steuerfrei23 !== true && _n(e.gewinn23) != null) J.gewinn23 += _n(e.gewinn23);
+        if (_n(e.steuer23) != null) J.steuer23 += _n(e.steuer23);
+        if (_n(e.grest) != null) J.grest += _n(e.grest);
+      } else J.offen++;
+    });
+    Object.keys(jahre).forEach(function (j) {
+      var J = jahre[j];
+      J.unterFreigrenze = J.offen === 0 ? (J.gewinn23 < 1000) : null;   /* offen -> noch nicht entscheidbar */
+    });
+    return { zeilen: o.zeilen, fehler: o.fehler, jahre: Object.keys(jahre).sort().map(function (j) { return jahre[j]; }),
+             dreiObjekt: dreiObjektGrenze(o.zeilen),
+             naechster: o.zeilen.filter(function (e) { return e.status === 'geplant'; })[0] || null };
+  }
+
   root.DealPilotUeberfuehrungKern = {
-    version: 'v3268',
+    version: 'v3470',
+    PLAN_STATUS: PLAN_STATUS, planOrdnen: planOrdnen, weitereGewinne: weitereGewinne,
+    dreiObjektGrenze: dreiObjektGrenze, gruppeAuswerten: gruppeAuswerten,
     HINZURECHNUNG_8_1: HINZURECHNUNG_8_1, hinzurechnung: hinzurechnung,
     KST_SATZ: KST_SATZ, kstSatzPct: kstSatzPct, kstSoliPct: kstSoliPct,
     KUERZUNG_9_1: KUERZUNG_9_1, einfacheKuerzung: einfacheKuerzung, ugRuecklage: ugRuecklage,

@@ -733,6 +733,7 @@
         } catch (e) {}
       }
       if (gmbhKey) { await Auth.apiCall('/objects/' + gmbhKey, { method: 'DELETE' }); }
+      try { uewPlanZurueck(privatKey); } catch (e) {}   /* v3470: Gruppe - Eintrag wieder „geplant" */
       if (typeof toast === 'function') toast('\u2713 \u00dcberf\u00fchrung aufgehoben \u2014 Gesellschafts-Objekt gelöscht, Privat-Objekt aufgetaut.');
       if (privatKey && typeof loadSaved === 'function') { try { await loadSaved(privatKey); } catch (e) {} }
       try { if (typeof renderSaved === 'function') renderSaved({ _immediate: true }); } catch (e) {}
@@ -780,6 +781,7 @@
       var ueEl = document.getElementById('ueberf_ende'); if (ueEl) ueEl.value = '';
       if (linkEl) linkEl.value = '';
       if (typeof saveObj === 'function') await saveObj({ silent: true });
+      try { uewPlanZurueck(privatKey); } catch (e) {}   /* v3470 */
       if (typeof toast === 'function') {
         toast(geloescht
           ? '✓ Überführung aufgehoben — Gesellschafts-Objekt gelöscht, Privat-Objekt aufgetaut.'
@@ -966,6 +968,7 @@
         + (m.id === 'privat' ? '<button type="button" class="btn btn-gold btn-sm" onclick="DealPilotMandanten.openUeberfuehrung()" title="Privatobjekte in eine Gesellschaft überführen">In Gesellschaft überführen</button>' : '')   /* v3191 */
         /* v3228 · Marcel 08.11.2026: „Jahresabschluss bitte unter Mandanten zu der jeweiligen Gesellschaft.“
            Bis v3227 stand er als Abschnitt 09 im Portfolio-Cockpit mit eigener Gesellschaftsauswahl. */
+        + (isCorp(m.rechtsform) ? '<button type="button" class="btn btn-sm" onclick="DealPilotMandanten.openUeberfuehrung(\'' + esc(m.id) + '\')" title="Weitere Privatobjekte in diese Gesellschaft übertragen, einzeln oder als Gruppe">Objekte überführen</button>' : '')   /* v3470 */
         + (isCorp(m.rechtsform) ? '<button type="button" class="btn btn-gold btn-sm" onclick="DealPilotMandanten.openJahresabschluss(\'' + esc(m.id) + '\')" title="Bilanz und GuV über alle Objekte dieser Gesellschaft">Jahresabschluss</button>' : '')
         + '<button type="button" class="btn btn-outline btn-sm" onclick="DealPilotMandanten.uiEdit(\'' + m.id + '\')">Bearbeiten</button>'
         + (canDel ? '<button type="button" class="btn btn-outline btn-sm" style="color:#B86250;border-color:#e6cbc5" onclick="DealPilotMandanten.uiDelete(\'' + m.id + '\')">L\u00f6schen</button>' : '')
@@ -1554,20 +1557,115 @@
     });
   }
 
-  function openUeberfuehrung() {
+  /* ── v3470 · Überführung als Gruppe, schrittweise, in eine bestehende Gesellschaft ──
+     Marcel 16.11.2026: „bei der Überführung in die GmbH auch andere Objekte hinzufügen …
+     eine Gruppe von Objekten aus dem Bestand, die nach und nach übertragen werden, und wenn
+     die GmbH schon existiert, weitere mit hinübertragen.“
+
+     Der Plan liegt AM MANDANTEN (m.uew_plan, mit dem Konto synchronisiert wie alle Mandanten):
+       [{ key, label, kaufdat, stichtag, status: 'geplant'|'ueberfuehrt', gesellschaftKey,
+          gewinn23, steuer23, steuerfrei23, grest, ak, art, am }]
+     Jedes Objekt wird weiter EINZELN mit dem erprobten Assistenten übertragen (eigener
+     Stichtag, eigene Werte, eigene Rechnung im Kern) — die Gruppe merkt sich nur Reihenfolge
+     und Ergebnis und gibt dem nächsten Objekt die Gewinne des Jahres für die Freigrenze
+     § 23 Abs. 3 S. 5 EStG mit (Kern weitereGewinne()). */
+  function uewPlan(corpId) {
+    var m = _state.list.filter(function (x) { return x.id === corpId; })[0];
+    return (m && Array.isArray(m.uew_plan)) ? m.uew_plan.slice() : [];
+  }
+  function _uewPlanSetzen(corpId, plan) {
+    var m = _state.list.filter(function (x) { return x.id === corpId; })[0];
+    if (!m) return false;
+    m.uew_plan = plan;
+    upsert(m);
+    return true;
+  }
+  /* Ein Objekt gehört höchstens EINER Gruppe. */
+  function uewPlanFuer(objKey) {
+    var k = String(objKey || '');
+    for (var i = 0; i < _state.list.length; i++) {
+      var m = _state.list[i];
+      if (!isCorp(m.rechtsform) || !Array.isArray(m.uew_plan)) continue;
+      for (var j = 0; j < m.uew_plan.length; j++) {
+        if (String(m.uew_plan[j].key) === k) return { corpId: m.id, corpName: m.name, rechtsform: m.rechtsform, eintrag: m.uew_plan[j], plan: m.uew_plan.slice() };
+      }
+    }
+    return null;
+  }
+  function uewPlanHinzu(corpId, eintraege) {
+    var plan = uewPlan(corpId), neu = 0;
+    (eintraege || []).forEach(function (e) {
+      if (!e || !e.key) return;
+      var schon = uewPlanFuer(e.key);
+      if (schon && schon.corpId !== corpId) return;   /* gehört schon einer anderen Gruppe */
+      var vorh = plan.filter(function (x) { return String(x.key) === String(e.key); })[0];
+      if (vorh) { if (vorh.status !== 'ueberfuehrt') { vorh.stichtag = e.stichtag || vorh.stichtag; } return; }
+      plan.push({ key: String(e.key), label: e.label || '', kaufdat: e.kaufdat || '', stichtag: e.stichtag || '', status: 'geplant' });
+      neu++;
+    });
+    _uewPlanSetzen(corpId, plan);
+    return neu;
+  }
+  function uewPlanEntfernen(corpId, objKey) {
+    var plan = uewPlan(corpId).filter(function (x) { return !(String(x.key) === String(objKey) && x.status !== 'ueberfuehrt'); });
+    _uewPlanSetzen(corpId, plan);
+  }
+  /* Nach dem Übertragen: Eintrag auf „überführt" mit Ergebnis — fehlt er, wird er angelegt
+     (Einzelübertragung in eine Gesellschaft, die schon Objekte hat). */
+  function uewPlanErledigt(corpId, objKey, erg) {
+    var plan = uewPlan(corpId), e = plan.filter(function (x) { return String(x.key) === String(objKey); })[0];
+    if (!e) { e = { key: String(objKey) }; plan.push(e); }
+    erg = erg || {};
+    Object.keys(erg).forEach(function (k) { e[k] = erg[k]; });
+    e.status = 'ueberfuehrt';
+    e.am = new Date().toISOString().slice(0, 10);
+    _uewPlanSetzen(corpId, plan);
+    return plan;
+  }
+  function uewPlanZurueck(privatKey) {
+    var f = uewPlanFuer(privatKey);
+    if (!f) return;
+    var plan = f.plan.map(function (x) {
+      if (String(x.key) !== String(privatKey)) return x;
+      return { key: x.key, label: x.label, kaufdat: x.kaufdat, stichtag: x.stichtag, status: 'geplant' };
+    });
+    _uewPlanSetzen(f.corpId, plan);
+  }
+  function _uewNaechsterMonatserster() {
+    var d = new Date(); var y = d.getFullYear(), m = d.getMonth() + 2;
+    if (m > 12) { m = 1; y++; }
+    return y + '-' + (m < 10 ? '0' : '') + m + '-01';
+  }
+  function _uewLabel(o) {
+    var d = o.data || o;
+    return [[d.str, d.hnr].filter(Boolean).join(' '), [d.plz, d.ort || o.ort].filter(Boolean).join(' ')].filter(Boolean).join(', ') || o.name || ('Objekt ' + o.id);
+  }
+  function _uewDe(iso) { return /^\d{4}-\d{2}-\d{2}$/.test(String(iso || '')) ? iso.slice(8, 10) + '.' + iso.slice(5, 7) + '.' + iso.slice(0, 4) : '–'; }
+  function _uewEur(n) { return (n == null || n === '' || !isFinite(Number(n))) ? '–' : Math.round(Number(n)).toLocaleString('de-DE') + ' €'; }
+
+  function openUeberfuehrung(vorwahl) {
     if (_expertePflicht('Die Überführung in eine Gesellschaft')) return;   /* v3270 */
     var corps = (_state.list || []).filter(function (m) { return isCorp(m.rechtsform); });
     var alt = document.getElementById('mand-uew-ov'); if (alt) alt.remove();
     var ov = document.createElement('div');
     ov.id = 'mand-uew-ov';
     ov.style.cssText = 'position:fixed;inset:0;z-index:100050;background:rgba(10,10,12,.55);display:flex;align-items:center;justify-content:center;padding:16px';
-    ov.innerHTML = '<div role="dialog" aria-modal="true" style="width:100%;max-width:560px;max-height:86vh;display:flex;flex-direction:column;background:#fff;border-radius:14px;box-shadow:0 20px 60px rgba(0,0,0,.3);overflow:hidden;font-family:Inter,sans-serif">'
+    var corpId = (vorwahl && corps.some(function (m) { return m.id === vorwahl; })) ? vorwahl : (corps[0] && corps[0].id);
+    ov.innerHTML = '<div role="dialog" aria-modal="true" style="width:100%;max-width:640px;max-height:88vh;display:flex;flex-direction:column;background:#fff;border-radius:14px;box-shadow:0 20px 60px rgba(0,0,0,.3);overflow:hidden;font-family:Inter,sans-serif">'
       + '<div style="padding:16px 18px;border-bottom:1px solid #E6E0D3;display:flex;align-items:center;gap:10px"><div style="flex:1"><div style="font:600 17px \'Space Grotesk\',sans-serif;color:#1a1814">In Gesellschaft überführen</div>'
-      + '<div style="font-size:12px;color:#6B6356;margin-top:2px">Das Privatobjekt wird eingefroren, ein neues Objekt der Gesellschaft wird angelegt (Werte, Fotos, KI-Text übernommen).</div></div>'
+      + '<div style="font-size:12px;color:#6B6356;margin-top:2px">Ein Objekt oder eine Gruppe, jedes mit eigenem Stichtag. Das Privatobjekt wird eingefroren, die Gesellschaft bekommt ein eigenes Objekt mit eigenen Anschaffungskosten.</div></div>'
       + '<button type="button" id="mand-uew-zu" aria-label="Schließen" style="border:0;background:none;font-size:22px;line-height:1;cursor:pointer;color:#6B6356">×</button></div>'
       + (corps.length
-        ? '<div style="padding:12px 18px 0"><input id="mand-uew-such" type="search" placeholder="Objekt suchen (Straße, Ort, Nummer)" style="width:100%;padding:9px 12px;border:1px solid #E6E0D3;border-radius:8px;font:13.5px Inter,sans-serif"></div>'
-          + '<div id="mand-uew-liste" style="padding:12px 18px 16px;overflow:auto;display:grid;grid-template-columns:minmax(0,1fr);gap:8px"><div style="color:#6B6356;font-size:13px">Objekte laden …</div></div>'
+        ? '<div style="padding:12px 18px 0;display:grid;gap:8px">'
+          + (corps.length > 1 ? '<label style="font-size:12px;font-weight:600;color:#3a352b">Gesellschaft <select id="mand-uew-corp" style="width:100%;margin-top:4px;padding:8px 10px;border:1px solid #E6E0D3;border-radius:2px;font:13.5px Inter,sans-serif">'
+            + corps.map(function (m) { return '<option value="' + esc(m.id) + '"' + (m.id === corpId ? ' selected' : '') + '>' + esc(m.name) + ' (' + _kurzRf(m.rechtsform) + ')</option>'; }).join('') + '</select></label>' : '')
+          + '</div>'
+          + '<div id="mand-uew-gruppe" style="padding:10px 18px 0"></div>'
+          + '<div style="padding:10px 18px 0;font:600 10.5px \'JetBrains Mono\',monospace;letter-spacing:.08em;text-transform:uppercase;color:#6B6356">Objekte aus dem Privatbestand</div>'
+          + '<div style="padding:6px 18px 0"><input id="mand-uew-such" type="search" placeholder="Objekt suchen (Straße, Ort, Nummer)" style="width:100%;padding:9px 12px;border:1px solid #E6E0D3;border-radius:2px;font:13.5px Inter,sans-serif"></div>'
+          + '<div id="mand-uew-liste" style="padding:10px 18px 8px;overflow:auto;display:grid;grid-template-columns:minmax(0,1fr);gap:8px;flex:1 1 auto"><div style="color:#6B6356;font-size:13px">Objekte laden …</div></div>'
+          + '<div style="padding:10px 18px 14px;border-top:1px solid #E6E0D3;display:flex;gap:10px;align-items:center;flex-wrap:wrap"><span id="mand-uew-wahl" style="flex:1;font-size:12px;color:#6B6356">Mehrere Objekte anhaken, Stichtag je Objekt setzen, dann zur Gruppe hinzufügen.</span>'
+          + '<button type="button" id="mand-uew-hinzu" class="btn btn-gold btn-sm" disabled>Zur Gruppe hinzufügen</button></div>'
         : '<div style="padding:18px;font-size:13.5px;color:#3a352b;line-height:1.55">Es gibt noch keine Gesellschaft. Lege zuerst unter „Neuer Mandant" eine GmbH oder UG an – dann lassen sich Privatobjekte dorthin überführen.</div>')
       + '</div>';
     document.body.appendChild(ov);
@@ -1581,38 +1679,126 @@
     ov.addEventListener('click', function (e) { if (e.target === ov) zu(); });
     if (!corps.length) return;
     var liste = document.getElementById('mand-uew-liste'), such = document.getElementById('mand-uew-such');
+    var grEl = document.getElementById('mand-uew-gruppe'), hinzuBtn = document.getElementById('mand-uew-hinzu'), wahlEl = document.getElementById('mand-uew-wahl');
+    var corpSel = document.getElementById('mand-uew-corp');
     if (!window.Auth || typeof window.Auth.apiCall !== 'function') { liste.innerHTML = '<div style="color:#B86250;font-size:13px">Bitte neu anmelden.</div>'; return; }
+    var K = window.DealPilotUeberfuehrungKern;
     window.Auth.apiCall('/objects', { method: 'GET' }).then(function (r) {
       var alle = (r && (r.objects || r.items)) || [];
-      var items = alle.filter(_ueberfuehrbar);
+      var gewaehlt = {};
+      function corpName() { var m = get(corpId); return (m && m.id === corpId) ? m.name : 'Gesellschaft'; }
+      /* Die Gruppe: was schon in der Gesellschaft ist (Objekte mit diesem Halter) und was geplant ist */
+      function gruppeZeichnen() {
+        var plan = uewPlan(corpId);
+        var imBesitz = alle.filter(function (o) { var d = o.data || o; return String(d.halter || o.halter || '') === corpId && !(o.deal_lost === true); });
+        var verkn = {}; plan.forEach(function (e) { if (e.gesellschaftKey) verkn[String(e.gesellschaftKey)] = 1; });
+        var ausw = K && K.gruppeAuswerten ? K.gruppeAuswerten(plan) : { zeilen: plan, jahre: [], dreiObjekt: { text: '' }, fehler: [] };
+        var Z = 'display:flex;gap:10px;align-items:center;padding:7px 10px;border:1px solid #EDE7DA;border-radius:8px;background:#FBF8F0;font-size:12.5px';
+        var h = '<div style="font:600 10.5px \'JetBrains Mono\',monospace;letter-spacing:.08em;text-transform:uppercase;color:#6B6356;margin-bottom:6px">Gruppe · ' + esc(corpName()) + '</div>';
+        var zeilen = ausw.zeilen.map(function (e) {
+          var rechts = e.status === 'ueberfuehrt'
+            ? '<span style="color:#3FA56C;font-weight:600">überführt</span>'
+              + (e.steuerfrei23 ? ' · § 23 frei' : (e.gewinn23 != null ? ' · § 23 ' + _uewEur(e.gewinn23) : ''))
+              + (e.grest != null ? ' · GrESt ' + _uewEur(e.grest) : '')
+            : '<button type="button" data-uew-jetzt="' + esc(e.key) + '" class="btn btn-gold btn-sm">Jetzt überführen</button>'
+              + ' <button type="button" data-uew-weg="' + esc(e.key) + '" class="btn btn-sm" title="Aus der Gruppe nehmen">Entfernen</button>';
+          return '<div style="' + Z + '"><span style="min-width:74px;font:600 11px \'JetBrains Mono\',monospace;color:#6B6356">' + _uewDe(e.stichtag) + '</span>'
+            + '<span style="flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"><b>' + esc(e.label || e.key) + '</b></span>'
+            + '<span style="flex-shrink:0;display:flex;gap:6px;align-items:center">' + rechts + '</span></div>';
+        });
+        /* Objekte der Gesellschaft ohne Planeintrag (gekauft oder vor v3470 überführt) */
+        imBesitz.filter(function (o) { return !verkn[String(o.id)]; }).forEach(function (o) {
+          var herk = String((o.data || o).obj_herkunft || '') === 'ueberfuehrung' ? 'überführt (vor der Gruppe)' : 'von der Gesellschaft gekauft';
+          zeilen.push('<div style="' + Z + '"><span style="min-width:74px;font:600 11px \'JetBrains Mono\',monospace;color:#6B6356">' + _uewDe((o.data || o).kaufdat) + '</span>'
+            + '<span style="flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"><b>' + esc(_uewLabel(o)) + '</b></span><span style="flex-shrink:0;color:#6B6356">' + herk + '</span></div>');
+        });
+        h += zeilen.length ? '<div style="display:grid;grid-template-columns:minmax(0,1fr);gap:6px">' + zeilen.join('') + '</div>'
+                           : '<div style="font-size:12.5px;color:#6B6356">Noch keine Objekte in dieser Gesellschaft. Unten anhaken und hinzufügen.</div>';
+        var jahre = (ausw.jahre || []).map(function (J) {
+          return J.jahr + ': ' + J.anzahl + ' Objekt' + (J.anzahl === 1 ? '' : 'e') + (J.offen ? ' (' + J.offen + ' geplant)' : '')
+            + ', § 23-Gewinne ' + _uewEur(J.gewinn23) + (J.unterFreigrenze === true ? ' — unter der Freigrenze 1.000 €' : J.unterFreigrenze === null ? ' bisher' : '')
+            + (J.grest ? ', GrESt ' + _uewEur(J.grest) : '');
+        });
+        if (jahre.length || (ausw.dreiObjekt && ausw.dreiObjekt.text) || (ausw.fehler || []).length) {
+          h += '<div style="margin-top:8px;font-size:12px;line-height:1.5;color:#5f594f">' + jahre.map(esc).join('<br>')
+            + (ausw.dreiObjekt && ausw.dreiObjekt.text ? '<div style="margin-top:4px;color:' + (ausw.dreiObjekt.ueberGrenze ? '#B8625C' : '#5f594f') + '">' + esc(ausw.dreiObjekt.text) + '</div>' : '')
+            + ((ausw.fehler || []).length ? '<div style="margin-top:4px;color:#B8625C">' + ausw.fehler.map(esc).join('<br>') + '</div>' : '')
+            + '</div>';
+        }
+        grEl.innerHTML = h;
+        [].forEach.call(grEl.querySelectorAll('[data-uew-jetzt]'), function (b) {
+          b.addEventListener('click', function () { zu(); _uewPick(b.getAttribute('data-uew-jetzt'), null); });
+        });
+        [].forEach.call(grEl.querySelectorAll('[data-uew-weg]'), function (b) {
+          b.addEventListener('click', function () { uewPlanEntfernen(corpId, b.getAttribute('data-uew-weg')); gruppeZeichnen(); zeichnen(); });
+        });
+      }
       function zeichnen() {
+        var plan = uewPlan(corpId), imPlan = {};
+        _state.list.forEach(function (m) { (m.uew_plan || []).forEach(function (e) { imPlan[String(e.key)] = m.id; }); });
+        var items = alle.filter(_ueberfuehrbar).filter(function (o) { return !imPlan[String(o.id)]; });
         var q = String(such && such.value || '').toLowerCase().trim();
         var treffer = items.filter(function (o) {
           if (!q) return true;
           var d = o.data || o;
           return [d.str, d.hnr, d.plz, d.ort, o.seq_no, o.name].join(' ').toLowerCase().indexOf(q) >= 0;
         });
-        if (!items.length) { liste.innerHTML = '<div style="color:#6B6356;font-size:13px;line-height:1.5">Kein Objekt lässt sich überführen. Überführbar sind Objekte mit Halter „Privat“, die nicht schon überführt oder als verloren markiert sind.</div>'; return; }
+        if (!items.length) { liste.innerHTML = '<div style="color:#6B6356;font-size:13px;line-height:1.5">Kein weiteres Objekt lässt sich überführen. Überführbar sind Objekte mit Halter „Privat“, die nicht schon überführt, verplant oder als verloren markiert sind.</div>'; return; }
         if (!treffer.length) { liste.innerHTML = '<div style="color:#6B6356;font-size:13px">Kein Treffer.</div>'; return; }
         liste.innerHTML = treffer.map(function (o) {
-          var d = o.data || o;
-          var label = [d.str, d.hnr].filter(Boolean).join(' ') || o.name || ('Objekt ' + o.id);
-          var ort = [d.plz, d.ort].filter(Boolean).join(' ');
+          var d = o.data || o, id = String(o.id);
           var status = (o.deal_won === true || d._deal_won === true || d._deal_won === 'true') ? 'Bestand' : 'Ankauf';
-          return '<button type="button" data-uew="' + esc(String(o.id)) + '" style="display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:10px 12px;border:1px solid #E6E0D3;border-radius:10px;background:#fff;cursor:pointer;font-family:inherit">'
-            + '<span style="font:600 10.5px \'JetBrains Mono\',monospace;color:#6B6356;min-width:68px">' + esc(o.seq_no || '') + '</span>'
-            + '<span style="flex:1;min-width:0"><b style="display:block;font:600 14px/1.25 Inter,sans-serif;color:#1a1814;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + esc(label) + '</b>'
-            + '<span style="font-size:12px;color:#6B6356">' + esc(ort) + ' · ' + status + '</span></span>'
-            + '<span style="font:600 12.5px Inter,sans-serif;color:var(--wl-9a7f33,#9a7f33);flex-shrink:0">Überführen</span></button>';
+          var g = gewaehlt[id];
+          return '<div style="display:flex;align-items:center;gap:10px;width:100%;padding:9px 12px;border:1px solid ' + (g ? 'var(--wl-c9a84c,#C9A84C)' : '#E6E0D3') + ';border-radius:10px;background:#fff">'
+            + '<input type="checkbox" data-uew-ck="' + esc(id) + '"' + (g ? ' checked' : '') + ' aria-label="Zur Gruppe" style="width:18px;height:18px;flex-shrink:0">'
+            + '<span style="flex:1;min-width:0"><b style="display:block;font:600 13.5px/1.25 Inter,sans-serif;color:#1a1814;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + esc(_uewLabel(o)) + '</b>'
+            + '<span style="font-size:11.5px;color:#6B6356">' + esc(o.seq_no || '') + ' · ' + status + ' · gekauft ' + _uewDe(d.kaufdat) + '</span></span>'
+            + '<input type="date" data-uew-dt="' + esc(id) + '" value="' + esc(g ? g.stichtag : _uewNaechsterMonatserster()) + '" title="Stichtag (Übergang von Nutzen und Lasten)" style="flex-shrink:0;width:140px;padding:6px 8px;border:1px solid #E6E0D3;border-radius:2px;font:12.5px Inter,sans-serif">'
+            + '<button type="button" data-uew="' + esc(id) + '" class="btn btn-sm" style="flex-shrink:0" title="Nur dieses Objekt, sofort">Einzeln</button></div>';
         }).join('');
         [].forEach.call(liste.querySelectorAll('[data-uew]'), function (b) {
-          b.addEventListener('click', function () { zu(); _uewPick(b.getAttribute('data-uew'), null); });
+          b.addEventListener('click', function () {
+            var id = b.getAttribute('data-uew'), dt = liste.querySelector('[data-uew-dt="' + id + '"]');
+            var o = alle.filter(function (x) { return String(x.id) === id; })[0];
+            /* Einzeln = Gruppe mit einem Objekt: der Assistent startet mit Stichtag und Gesellschaft */
+            uewPlanHinzu(corpId, [{ key: id, label: o ? _uewLabel(o) : id, kaufdat: o ? (o.data || o).kaufdat : '', stichtag: dt ? dt.value : '' }]);
+            zu(); _uewPick(id, null);
+          });
+        });
+        [].forEach.call(liste.querySelectorAll('[data-uew-ck],[data-uew-dt]'), function (el) {
+          el.addEventListener('change', function () {
+            var id = el.getAttribute('data-uew-ck') || el.getAttribute('data-uew-dt');
+            var ck = liste.querySelector('[data-uew-ck="' + id + '"]'), dt = liste.querySelector('[data-uew-dt="' + id + '"]');
+            if (ck && ck.checked) gewaehlt[id] = { stichtag: dt ? dt.value : '' }; else delete gewaehlt[id];
+            wahlAnzeigen();
+            if (el.hasAttribute('data-uew-ck')) zeichnen();
+          });
         });
       }
+      function wahlAnzeigen() {
+        var n = Object.keys(gewaehlt).length;
+        hinzuBtn.disabled = !n;
+        wahlEl.textContent = n ? n + ' Objekt' + (n === 1 ? '' : 'e') + ' gewählt — jedes wird mit seinem Stichtag einzeln übertragen, das erste startet danach.' : 'Mehrere Objekte anhaken, Stichtag je Objekt setzen, dann zur Gruppe hinzufügen.';
+      }
+      hinzuBtn.addEventListener('click', function () {
+        var ein = Object.keys(gewaehlt).map(function (id) {
+          var o = alle.filter(function (x) { return String(x.id) === id; })[0];
+          return { key: id, label: o ? _uewLabel(o) : id, kaufdat: o ? (o.data || o).kaufdat : '', stichtag: gewaehlt[id].stichtag };
+        });
+        var fehlt = ein.filter(function (e) { return !/^\d{4}-\d{2}-\d{2}$/.test(e.stichtag || ''); });
+        if (fehlt.length) { if (typeof toast === 'function') toast('Bitte für jedes gewählte Objekt einen Stichtag setzen.'); return; }
+        var n = uewPlanHinzu(corpId, ein);
+        gewaehlt = {}; wahlAnzeigen();
+        if (typeof toast === 'function') toast('✓ ' + n + ' Objekt' + (n === 1 ? '' : 'e') + ' zur Gruppe ' + corpName() + ' hinzugefügt. „Jetzt überführen“ startet den Assistenten je Objekt.');
+        gruppeZeichnen(); zeichnen();
+      });
+      if (corpSel) corpSel.addEventListener('change', function () { corpId = corpSel.value; gewaehlt = {}; wahlAnzeigen(); gruppeZeichnen(); zeichnen(); });
+      gruppeZeichnen();
       zeichnen();
-      if (such) { such.addEventListener('input', zeichnen); setTimeout(function () { try { such.focus(); } catch (e) {} }, 50); }
+      if (such) { such.addEventListener('input', zeichnen); }
     }).catch(function () { liste.innerHTML = '<div style="color:#B86250;font-size:13px">Objekte konnten nicht geladen werden.</div>'; });
   }
+
   function _uewPick(objId, btn) {
     if (btn) { btn.disabled = true; btn.style.opacity = '.6'; }
     var open = function () {
@@ -1669,6 +1855,7 @@
 
   window.DealPilotMandanten = {
     openUeberfuehrung: openUeberfuehrung, _uewPick: _uewPick,  /* v856-uew */
+    uewPlan: uewPlan, uewPlanFuer: uewPlanFuer, uewPlanHinzu: uewPlanHinzu, uewPlanEntfernen: uewPlanEntfernen, uewPlanErledigt: uewPlanErledigt, uewPlanZurueck: uewPlanZurueck,  /* v3470: Gruppe */
     openJahresabschluss: openJahresabschluss,  /* v3228 */
     gesellschaftenSichtbar: gesellschaftenSichtbar, hinweisHtml: hinweisHtml, steuerHinweis: steuerHinweis,  /* v3270: Gesellschaften nur bei Detailgrad Experte */
     getList: getList, get: get, upsert: upsert, remove: remove, rfLabel: rfLabel, isCorp: isCorp,

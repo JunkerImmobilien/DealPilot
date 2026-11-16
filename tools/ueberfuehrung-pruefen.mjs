@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /* ══════════════════════════════════════════════════════════════════════
-   DealPilot · tools/ueberfuehrung-pruefen.mjs · v2984
+   DealPilot · tools/ueberfuehrung-pruefen.mjs · v2984, Gruppe v3470
 
    Prueft die Ueberfuehrung Privat -> Kapitalgesellschaft und die Steuer der
    Gesellschaft an den ECHTEN Dateien (per new Function geladen, nichts
@@ -235,6 +235,85 @@ soll('AfA im Kaufjahr (Kauf 03/2026, Stichtag 07/2026)', K.afaBisStichtag({ seri
   soll('Sanierung nicht uebernommen', /_g\.san = '0'/.test(wizSrc), true);
   soll('kein § 7b in der Gesellschaft', /_g\.afa_sonder7b_aktiv = false/.test(wizSrc), true);
   soll('kein BFH-2023-Zitat', /BFH 2023/.test(wizSrc), false);
+}
+
+/* ── v3470 · Gruppe: mehrere Objekte, je eigener Stichtag, bestehende Gesellschaft ──
+   Handgerechnet. Fall G: drei Privatobjekte in die Muster Immobilien GmbH.
+     G1 gekauft 01.04.2020, uebertragen 01.01.2026 (Frist laeuft bis 01.04.2030), Gewinn 600 €
+     G2 gekauft 01.07.2023, uebertragen 01.07.2026, Gewinn 700 €
+     G3 gekauft 01.02.2015, uebertragen 01.01.2027 (Frist abgelaufen)
+   Einzeln laegen G1 und G2 unter der Freigrenze; zusammen 1.300 € >= 1.000 €
+   -> beide steuerpflichtig (§ 23 Abs. 3 S. 5 EStG: Gesamtgewinn des Kalenderjahres). */
+{
+  const G1 = { key: 'g1', label: 'G1', kaufdat: '2020-04-01', stichtag: '2026-01-01', status: 'ueberfuehrt', gewinn23: 600, steuer23: 0, grest: 19500, steuerfrei23: false };
+  const G2 = { key: 'g2', label: 'G2', kaufdat: '2023-07-01', stichtag: '2026-07-01', status: 'geplant' };
+  const G3 = { key: 'g3', label: 'G3', kaufdat: '2015-02-01', stichtag: '2027-01-01', status: 'geplant' };
+  const plan = [G3, G2, G1];
+  const w2 = K.weitereGewinne(plan, 'g2', '2026-07-01');
+  soll('Gruppe: weitere Gewinne fuer G2 aus G1', w2.betrag, 600);
+  soll('Gruppe: G2 sieht kein offenes Objekt im Jahr', w2.offen.length, 0);
+  const w1 = K.weitereGewinne(plan, 'g1', '2026-01-01');
+  soll('Gruppe: G1 sieht G2 als offen (nicht als 0)', w1.offen.join(','), 'G2');
+  soll('Gruppe: anderes Jahr zaehlt nicht', K.weitereGewinne(plan, 'g3', '2027-01-01').betrag, 0);
+  /* Kette in den unveraenderten Kern: G2 allein 700 € waere frei, mit G1 steuerpflichtig */
+  const p2allein = K.paragraph23({ art: 'kauf', kaufpreis: 100700, verkehrswert: 100700, kaufdat: '2023-07-01', stichtag: '2026-07-01', akPrivat: 100000, afaBisher: 0 });
+  soll('Kette: G2 allein unter Freigrenze', p2allein.unterFreigrenze, true);
+  const p2 = K.paragraph23({ art: 'kauf', kaufpreis: 100700, verkehrswert: 100700, kaufdat: '2023-07-01', stichtag: '2026-07-01', akPrivat: 100000, afaBisher: 0, weitereGewinne: w2.betrag });
+  soll('Kette: G2 mit G1 Gesamtgewinn', p2.gesamtgewinnJahr, 1300);
+  soll('Kette: G2 mit G1 steuerpflichtig', p2.steuerpflichtig, true);
+  const ord = K.planOrdnen(plan);
+  soll('Gruppe: nach Stichtag geordnet', ord.zeilen.map((e) => e.key).join(','), 'g1,g2,g3');
+  soll('Gruppe: keine Fehler', ord.fehler.length, 0);
+  soll('Gruppe: Stichtag vor Kauf ist Fehler', K.planOrdnen([{ key: 'x', label: 'X', kaufdat: '2026-05-01', stichtag: '2026-01-01' }]).fehler.length, 1);
+  soll('Gruppe: doppeltes Objekt ist Fehler', K.planOrdnen([{ key: 'x', stichtag: '2026-01-01' }, { key: 'x', stichtag: '2027-01-01' }]).fehler.length, 1);
+  const ausw = K.gruppeAuswerten(plan);
+  soll('Gruppe: naechstes Objekt = fruehester geplanter Stichtag', ausw.naechster && ausw.naechster.key, 'g2');
+  soll('Gruppe: Jahr 2026 zwei Objekte', ausw.jahre[0].anzahl, 2);
+  soll('Gruppe: Jahr 2026 Freigrenze offen solange G2 geplant', ausw.jahre[0].unterFreigrenze, null);
+  soll('Gruppe: GrESt 2026', ausw.jahre[0].grest, 19500);
+  const fertig = K.gruppeAuswerten([G1, Object.assign({}, G2, { status: 'ueberfuehrt', gewinn23: 700 })]);
+  soll('Gruppe: 2026 fertig, 1.300 € nicht unter Freigrenze', fertig.jahre[0].unterFreigrenze, false);
+  soll('Gruppe: steuerfreies Objekt traegt nichts bei', K.weitereGewinne([{ key: 'a', stichtag: '2026-03-01', status: 'ueberfuehrt', gewinn23: null, steuerfrei23: true }], 'b', '2026-09-01').betrag, 0);
+  /* Drei-Objekt-Grenze: nur Haltedauer <= 5 Jahre, Fenster 5 Jahre */
+  soll('Drei-Objekt: G2 einziges kurz gehaltenes', K.dreiObjektGrenze(plan).anzahl, 1);
+  const vier = [1, 2, 3, 4].map((i) => ({ key: 'k' + i, kaufdat: '2024-0' + i + '-01', stichtag: '2026-0' + i + '-01' }));
+  soll('Drei-Objekt: vier in fuenf Jahren -> ueber der Grenze', K.dreiObjektGrenze(vier).ueberGrenze, true);
+  soll('Drei-Objekt: drei -> nicht ueber der Grenze', K.dreiObjektGrenze(vier.slice(0, 3)).ueberGrenze, false);
+  const gestreckt = vier.map((e, i) => ({ key: e.key, kaufdat: (2020 + 2 * i) + '-01-01', stichtag: (2021 + 2 * i) + '-01-01' }));
+  soll('Drei-Objekt: ueber sieben Jahre gestreckt -> hoechstens drei im Fenster', K.dreiObjektGrenze(gestreckt).anzahl, 3);
+
+  /* Plan am Mandanten (mandanten.js, echte Funktionen) */
+  const body = mandSrc.match(/  function uewPlan\(corpId\) \{[\s\S]*?\n  function _uewNaechsterMonatserster/);
+  if (!body) { console.error('KAPUTT: Plan-Funktionen in mandanten.js nicht gefunden'); process.exit(2); }
+  const st = { list: [{ id: 'privat', rechtsform: 'privat' }, { id: 'm1', name: 'Muster Immobilien GmbH', rechtsform: 'gmbh' }, { id: 'm2', name: 'Zweite UG', rechtsform: 'ug' }] };
+  let gespeichert = 0;
+  const P = new Function('_state', 'upsert', 'isCorp', body[0].replace(/\n  function _uewNaechsterMonatserster$/, '') +
+    '\nreturn { uewPlan, uewPlanFuer, uewPlanHinzu, uewPlanEntfernen, uewPlanErledigt, uewPlanZurueck };')(
+    st, () => { gespeichert++; }, (rf) => rf === 'gmbh' || rf === 'ug');
+  soll('Plan: zwei hinzugefuegt', P.uewPlanHinzu('m1', [{ key: 'o1', label: 'O1', stichtag: '2026-01-01' }, { key: 'o2', label: 'O2', stichtag: '2027-01-01' }]), 2);
+  soll('Plan: gespeichert (Konto-Sync ueber upsert)', gespeichert > 0, true);
+  soll('Plan: Objekt gehoert nur einer Gruppe', P.uewPlanHinzu('m2', [{ key: 'o1', stichtag: '2026-02-01' }]), 0);
+  soll('Plan: Fundstelle', P.uewPlanFuer('o2').corpId, 'm1');
+  P.uewPlanErledigt('m1', 'o1', { gewinn23: 500, gesellschaftKey: 'gm1' });
+  soll('Plan: erledigt', P.uewPlanFuer('o1').eintrag.status, 'ueberfuehrt');
+  soll('Plan: Ergebnis gespeichert', P.uewPlanFuer('o1').eintrag.gewinn23, 500);
+  P.uewPlanErledigt('m1', 'o9', { label: 'O9 einzeln' });
+  soll('Plan: Einzeluebertragung in bestehende GmbH wird Teil der Gruppe', P.uewPlan('m1').length, 3);
+  P.uewPlanEntfernen('m1', 'o1');
+  soll('Plan: Ueberfuehrtes laesst sich nicht entfernen', P.uewPlan('m1').length, 3);
+  P.uewPlanEntfernen('m1', 'o2');
+  soll('Plan: Geplantes entfernt', P.uewPlan('m1').length, 2);
+  P.uewPlanZurueck('o1');
+  soll('Plan: Aufheben setzt auf geplant', P.uewPlanFuer('o1').eintrag.status, 'geplant');
+  soll('Plan: Aufheben loescht das Ergebnis', P.uewPlanFuer('o1').eintrag.gewinn23, undefined);
+
+  /* Verdrahtung */
+  soll('Assistent liest den Plan', /DealPilotMandanten\.uewPlanFuer\(_ck\)/.test(wizSrc), true);
+  soll('Assistent gibt weitere Gewinne aus der Gruppe', /K\(\)\.weitereGewinne\(_plan\(\), _ctx\.privatKey, _ctx\._stichtag\)/.test(wizSrc), true);
+  soll('Assistent traegt Ergebnis ein', /DealPilotMandanten\.uewPlanErledigt\(c\._halterId, _privatKey/.test(wizSrc), true);
+  soll('Assistent rechnet weiter nur im Kern (paragraph23 unveraendert gerufen)', /k\.paragraph23\(\{ art: w\.art/.test(wizSrc), true);
+  soll('Aufheben setzt Plan zurueck (zwei Wege)', (mandSrc.match(/try \{ uewPlanZurueck\(privatKey\)/g) || []).length, 2);
+  soll('Gesellschaftskarte: Objekte ueberfuehren', /openUeberfuehrung\(\\'' \+ esc\(m\.id\) \+ '\\'\)/.test(mandSrc), true);
 }
 
 console.log((rot ? 'ROT' : 'GRUEN') + ' · ' + gruen + ' gruen, ' + rot + ' rot');

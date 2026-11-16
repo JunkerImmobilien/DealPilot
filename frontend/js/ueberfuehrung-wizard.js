@@ -14,6 +14,11 @@
  *     Grundbuch, kein Makler), Boden/Gebaeude zum Stichtag, AfA nur linear § 7 Abs. 4,
  *     kein § 7b, keine degressive AfA, Sanierung des Privatobjekts NICHT uebernommen,
  *     Darlehen = Restschuld zum Stichtag, Zins ungerundet, ueberf_ende NICHT geerbt.
+ * v3470 · Gruppe: Steht das Objekt im Plan einer Gesellschaft (mandanten.js uew_plan),
+ *   startet der Assistent mit Stichtag und Gesellschaft aus dem Plan, gibt die § 23-Gewinne
+ *   der schon uebertragenen Objekte desselben Jahres als „weitere Gewinne" an die Freigrenze
+ *   (Kern weitereGewinne), zaehlt die Drei-Objekt-Grenze (Kern dreiObjektGrenze), traegt das
+ *   Ergebnis in den Plan ein und bietet danach das naechste Objekt der Gruppe an.
  * Gerechnet wird ausschliesslich im Kern ueberfuehrung-kern.js. */
 (function () {
   'use strict';
@@ -95,8 +100,43 @@
       w: {}   /* Eingaben Schritt 2 */
     };
     _vorbelegen();
+    /* v3470 · Gruppe: Stichtag und Gesellschaft aus dem Plan */
+    try {
+      var _pl = window.DealPilotMandanten && DealPilotMandanten.uewPlanFuer ? DealPilotMandanten.uewPlanFuer(_ck) : null;
+      if (_pl && _pl.eintrag && _pl.eintrag.status !== 'ueberfuehrt' && corps.some(function (m) { return m.id === _pl.corpId; })) {
+        _ctx.gruppe = _pl;
+        _ctx._halterId = _pl.corpId; _ctx._halterName = _pl.corpName;
+        if (/^\d{4}-\d{2}-\d{2}$/.test(String(_pl.eintrag.stichtag || ''))) _ctx._stichtag = _pl.eintrag.stichtag;
+      }
+    } catch (e) {}
     _cur = 1;
     _render();
+  }
+
+  /* v3470 · Plan der gewaehlten Gesellschaft (nur lesen) */
+  function _plan() {
+    try { return (window.DealPilotMandanten && DealPilotMandanten.uewPlan && _ctx._halterId) ? DealPilotMandanten.uewPlan(_ctx._halterId) : []; } catch (e) { return []; }
+  }
+  function _label() {
+    var b = _ctx.privatBlob || {};
+    return [[b.str, b.hnr].filter(Boolean).join(' '), [b.plz, b.ort].filter(Boolean).join(' ')].filter(Boolean).join(', ');
+  }
+  /* Weitere § 23-Gewinne des Jahres aus der Gruppe, solange nichts von Hand eingetragen ist */
+  function _w23Sync() {
+    var w = _ctx.w;
+    if (w._w23manuell || !_ctx._stichtag || !K().weitereGewinne) return w._w23auto || null;
+    var a = K().weitereGewinne(_plan(), _ctx.privatKey, _ctx._stichtag);
+    w.weitere23 = (a && a.betrag > 0) ? a.betrag : null;
+    w._w23auto = a;
+    return a;
+  }
+  function _gruppeInfo() {
+    var plan = _plan(); if (!plan.length || !K().gruppeAuswerten) return '';
+    var ausw = K().gruppeAuswerten(plan), n = ausw.zeilen.length, fertig = ausw.zeilen.filter(function (e) { return e.status === 'ueberfuehrt'; }).length;
+    var idx = 0; ausw.zeilen.forEach(function (e, i) { if (String(e.key) === String(_ctx.privatKey)) idx = i + 1; });
+    return '<div id="dpuew-gruppe" style="margin-top:10px;background:#FBF8F0;border:1px solid #EDE7DA;border-radius:9px;padding:10px 12px;font-size:12.5px;color:#5f594f;line-height:1.5"><b>Gruppe ' + esc(_ctx._halterName || '') + '</b>: '
+      + (idx ? 'dieses Objekt ist Nr. ' + idx + ' von ' + n : n + ' Objekt' + (n === 1 ? '' : 'e') + ' in der Gruppe, dieses kommt hinzu') + ', ' + fertig + ' bereits übertragen.'
+      + (_ctx.gruppe ? ' Stichtag aus der Gruppe.' : '') + '</div>';
   }
 
   /* ── Vorbelegung: nur aus vorhandenen Angaben, nie erfunden ───────────── */
@@ -226,9 +266,10 @@
         '<p style="color:#7A7370;font-size:13px;margin:0 0 16px">Tag des &Uuml;bergangs von Nutzen und Lasten. Ab diesem Tag geh&ouml;ren Mieten, Kosten und Abschreibung der Gesellschaft.</p>' +
         '<div style="margin-bottom:13px"><label style="' + LAB + '">Stichtag &middot; Privat &rarr; Gesellschaft</label>' +
         '<input type="date" id="dpuew-stichtag" style="' + INP + '"></div>' +
-        '<div id="dpuew-cut-info" style="background:rgba(184,98,80,.07);border:1px solid rgba(184,98,80,.25);border-radius:9px;padding:10px 12px;font-size:12.5px;color:#8a4a3c;line-height:1.5"></div>';
+        '<div id="dpuew-cut-info" style="background:rgba(184,98,80,.07);border:1px solid rgba(184,98,80,.25);border-radius:9px;padding:10px 12px;font-size:12.5px;color:#8a4a3c;line-height:1.5"></div>' + _gruppeInfo();
     }
     if (_cur === 2) {
+      _w23Sync();   /* v3470 */
       var corpOpts = c.corps.map(function (m) { return '<option value="' + esc(m.id) + '"' + (m.id === c._halterId ? ' selected' : '') + '>' + esc(m.name) + ' (' + (m.rechtsform === 'ug' ? 'UG' : 'GmbH') + ')</option>'; }).join('');
       var ug = _rf() === 'ug';
       var artOpts = Object.keys(K().ARTEN).map(function (k) {
@@ -262,7 +303,7 @@
         '</div>' +
         '<div style="' + g2 + '">' +
           _feld('dpuew-quote', 'Deine Beteiligung %', _pct(w.quote, 2), 'für § 32d Abs. 2 EStG') +
-          _feld('dpuew-w23', 'Weitere § 23-Gewinne im Jahr €', _de0(w.weitere23), 'für die Freigrenze von 1.000 €') +
+          _feld('dpuew-w23', 'Weitere § 23-Gewinne im Jahr €', _de0(w.weitere23), (w._w23auto && !w._w23manuell && w._w23auto.betrag > 0) ? 'aus der Gruppe (schon übertragene Objekte ' + w._w23auto.jahr + ') — für die Freigrenze von 1.000 €' : 'für die Freigrenze von 1.000 €') +
         '</div>' +
         '<div id="dpuew-live" style="margin-top:14px"></div>';
     }
@@ -288,6 +329,7 @@
     r.ak = k.akGesellschaft(p);
     if (!r.ak.ok) r.fehlt = r.fehlt.concat(r.ak.fehlt || []);
     /* § 23 */
+    var _ga = _w23Sync();   /* v3470: Freigrenze ueber die Gruppe */
     var kp0 = _num(b.kp) || 0;
     var nkPct = ['makler_p', 'notar_p', 'gba_p', 'gest_p', 'ji_p'].reduce(function (s, f) { return s + (_num(b[f]) || 0); }, 0);
     var akPriv = kp0 > 0 ? kp0 * (1 + nkPct / 100) : null;
@@ -314,6 +356,14 @@
     if (w.zins === '' && w.rs > 0) r.fehlt.push('Zins des Darlehens');
     r.gd = k.gesellschafterdarlehen({ betrag: w.gd, zinsPct: w.gdZins, beteiligungPct: w.quote });
     if (_rf() === 'ug') r.warn.push('UG: 25 % des Jahresüberschusses (nach Verlustvortrag) gehen in die gesetzliche Rücklage, bis das Stammkapital auf 25.000 € erhöht ist (§ 5a Abs. 3 GmbHG).');
+    /* v3470 · Gruppe: offene Objekte desselben Jahres, Drei-Objekt-Grenze */
+    if (_ga && _ga.offen && _ga.offen.length && !w._w23manuell) r.warn.push('Im selben Jahr sind weitere Objekte der Gruppe geplant (' + _ga.offen.map(esc).join(', ') + '). Ihr § 23-Gewinn zählt für die Freigrenze von 1.000 € mit und ist hier noch nicht enthalten.');
+    if (K().dreiObjektGrenze && c._stichtag) {
+      var _pl3 = _plan().filter(function (e) { return String(e.key) !== String(c.privatKey); }).concat([{ key: c.privatKey, label: _label() || 'dieses Objekt', kaufdat: b.kaufdat, stichtag: c._stichtag }]);
+      var _d3 = K().dreiObjektGrenze(_pl3);
+      if (_d3.text) r.warn.push((_d3.ueberGrenze ? '<b style="color:#B8625C">' : '') + esc(_d3.text) + (_d3.ueberGrenze ? '</b>' : ''));
+      r.dreiObjekt = _d3;
+    }
     r.warn.push('Die Bank muss der Übernahme des Darlehens zustimmen (§§ 414, 415 BGB). Prüfe außerdem die Drei-Objekt-Grenze (gewerblicher Grundstückshandel — die Übertragung zählt als Veräußerung) und bei Mitgesellschaftern die Schenkungsteuer (§ 7 Abs. 8 ErbStG).');
     return r;
   }
@@ -362,7 +412,7 @@
   function _lesen() {
     var w = _ctx.w, g = function (id) { var e = document.getElementById(id); return e ? e.value : null; };
     var h = document.getElementById('dpuew-halter');
-    if (h) { _ctx._halterId = h.value; _ctx._halterName = h.options[h.selectedIndex] ? h.options[h.selectedIndex].text : ''; }
+    if (h) { if (_ctx._halterId && _ctx._halterId !== h.value) _ctx.w._w23manuell = false; _ctx._halterId = h.value; _ctx._halterName = h.options[h.selectedIndex] ? h.options[h.selectedIndex].text : ''; }
     var a = document.querySelector('input[name="dpuew-art"]:checked'); if (a) w.art = a.value;
     if (g('dpuew-vw') != null) w.vw = _num(g('dpuew-vw'));
     if (g('dpuew-kp') != null) w.kp = _num(g('dpuew-kp'));
@@ -375,7 +425,11 @@
     if (g('dpuew-gd') != null) w.gd = _num(g('dpuew-gd'));
     if (g('dpuew-gdz') != null) w.gdZins = _num(g('dpuew-gdz'));
     if (g('dpuew-quote') != null) w.quote = _num(g('dpuew-quote'));
-    if (g('dpuew-w23') != null) w.weitere23 = _num(g('dpuew-w23'));
+    if (g('dpuew-w23') != null) {
+      var _v23 = _num(g('dpuew-w23'));
+      if (!w._w23manuell && _v23 !== (w.weitere23 == null ? null : Math.round(w.weitere23))) w._w23manuell = true;   /* v3470 */
+      if (w._w23manuell) w.weitere23 = _v23;
+    }
     if (w.art === 'sacheinlage' && _rf() === 'ug') w.art = 'verdeckt';
   }
 
@@ -548,8 +602,22 @@
         }
       } catch (e) { /* Rueck-Link non-fatal */ }
 
+      /* v3470 · Ergebnis in die Gruppe, naechstes Objekt anbieten */
+      var _naechster = null;
+      try {
+        if (window.DealPilotMandanten && DealPilotMandanten.uewPlanErledigt) {
+          var _p23 = r.p23 || {};
+          var _plan2 = DealPilotMandanten.uewPlanErledigt(c._halterId, _privatKey, {
+            label: _label(), kaufdat: c.privatBlob.kaufdat || '', stichtag: c._stichtag, gesellschaftKey: _gmbhKey || null, art: w.art,
+            steuerfrei23: !!_p23.steuerfrei, gewinn23: (_p23.gewinn != null ? _p23.gewinn : null),
+            steuer23: r.st23 ? r.st23.betrag : (_p23.steuerfrei || _p23.unterFreigrenze ? 0 : null),
+            grest: a.grest.betrag, ak: a.ak });
+          _naechster = K().gruppeAuswerten ? K().gruppeAuswerten(_plan2).naechster : null;
+        }
+      } catch (e) { try { console.warn('[v3470] Gruppe nicht fortgeschrieben', e); } catch (e2) {} }
       close();
       if (typeof toast === 'function') toast('✓ Überführt — Gesellschaftsobjekt angelegt, Privatobjekt eingefroren.');
+      if (_naechster) _naechstesAnbieten(_naechster, c._halterName);
       if (typeof renderSaved === 'function') renderSaved({ _immediate: true });
       if (typeof calc === 'function') calc();
       if (typeof updateSidebarPortfolio === 'function') updateSidebarPortfolio();
@@ -563,6 +631,28 @@
     }
   }
 
-  window.DealPilotUeberfuehrung = { open: open, close: close, _go: _go,
+  /* v3470 · Nach dem Uebertragen: das naechste Objekt der Gruppe (fruehester Stichtag) */
+  function _naechstesAnbieten(e, corpName) {
+    var alt = document.getElementById('dpuew-next-ov'); if (alt) alt.remove();
+    var ov = document.createElement('div');
+    ov.id = 'dpuew-next-ov';
+    ov.style.cssText = 'position:fixed;inset:0;background:rgba(10,10,10,.5);z-index:99999;display:flex;align-items:center;justify-content:center;padding:16px';
+    var d = String(e.stichtag || '');
+    ov.innerHTML = '<div role="dialog" aria-modal="true" style="background:#FDFCFA;border-radius:14px;max-width:440px;width:100%;padding:18px 20px;font-family:Inter,system-ui,sans-serif;box-shadow:0 20px 60px rgba(0,0,0,.35)">'
+      + '<div style="font:600 16px \'Space Grotesk\',sans-serif;margin-bottom:6px">Nächstes Objekt der Gruppe</div>'
+      + '<div style="font-size:13px;color:#5f594f;line-height:1.5;margin-bottom:14px"><b>' + esc(e.label || e.key) + '</b><br>Stichtag ' + esc(_datDe(d) || '–') + ' · ' + esc(corpName || 'Gesellschaft') + '</div>'
+      + '<div style="display:flex;gap:10px;justify-content:flex-end"><button type="button" id="dpuew-next-spaeter" class="btn btn-sm">Später</button>'
+      + '<button type="button" id="dpuew-next-los" class="btn btn-gold btn-sm">Jetzt überführen</button></div></div>';
+    document.body.appendChild(ov);
+    var zu = function () { ov.remove(); };
+    document.getElementById('dpuew-next-spaeter').onclick = zu;
+    ov.addEventListener('click', function (ev) { if (ev.target === ov) zu(); });
+    document.getElementById('dpuew-next-los').onclick = function () {
+      zu();
+      if (window.DealPilotMandanten && DealPilotMandanten._uewPick) DealPilotMandanten._uewPick(String(e.key), null);
+    };
+  }
+
+  window.DealPilotUeberfuehrung = { open: open, close: close, _go: _go, _naechstesAnbieten: _naechstesAnbieten,
     /* fuer tools/ueberfuehrung-pruefen.mjs */ _num: _num };
 })();
