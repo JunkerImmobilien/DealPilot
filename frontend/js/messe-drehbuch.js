@@ -10178,7 +10178,11 @@
     if (!m || typeof m !== 'object') return;
     var k = function (id) { return m[id] || id; };
     R6_MFH = k(R6_MFH); R11_WESTERFELD = k(R11_WESTERFELD); R11_PARK = k(R11_PARK); R27_DT = k(R27_DT); R27_BI = k(R27_BI);
-    LU_ID = k(LU_ID); D3_IDS.park = k(D3_IDS.park); D3_IDS.km18 = k(D3_IDS.km18); D3_IDS.lh14 = k(D3_IDS.lh14); QG_A = k(QG_A); QG_B = k(QG_B);
+    /* die frühere Lindenallee 14 (LU_ID, D3_IDS.lh14) gibt es im Demo-Konto nicht mehr; ihre Nachfolgerin (2026-1167) steht dafür */
+    var LH = m['8f4208ea-d762-4ac8-b46d-f2cf5030b877'];
+    if (LH && !m[LU_ID] && !/^[0-9a-f-]{36}$/.test(String(m[LU_ID] || ''))) LU_ID = LH; else LU_ID = k(LU_ID);
+    if (LH && !m[D3_IDS.lh14]) D3_IDS.lh14 = LH; else D3_IDS.lh14 = k(D3_IDS.lh14);
+    D3_IDS.park = k(D3_IDS.park); D3_IDS.km18 = k(D3_IDS.km18); QG_A = k(QG_A); QG_B = k(QG_B);
   }
   /* ── Ablauf ───────────────────────────────────────────────────── */
   var lauf = 0, _aktiv = null;
