@@ -15,6 +15,7 @@
  * Feldbezug: feld_id (id des Eingabefelds) vor selektor (Pfad ab dem naechsten Vorfahren mit id). Findet sich keins
  * von beiden (neuer Stand, anderer Detailgrad), bleibt die Anmerkung als freie in der Liste - nie ein falsches Feld.
  * Kundentexte: nur Punkt und Komma.
+ * v3490 · Feldbeschriftung: Feldcontainer .f vor .row/section (Wohnfläche hiess „Straße“).
  */
 (function () {
   'use strict';
@@ -103,7 +104,9 @@
       if (erste) return erste.slice(0, 80);
     }
     if (el.id) { var l = document.querySelector('label[for="' + cssEsc(el.id) + '"]'); if (l && l.textContent.trim()) return l.textContent.trim().replace(/\s+/g, ' ').slice(0, 120); }
-    var c = el.closest('label, .field, .form-group, .fg, .inp-row, .row, .kpi, .card, fieldset, section');
+    /* v3490 · .f zuerst: die Felder der App stehen als <div class="f"><label>…</label><div class="iw"><input></div></div>.
+       Ohne .f griff erst .row/section, und dort steht als erstes Label „Straße“ - gemessen: Wohnfläche und Baujahr hiessen „Straße“. */
+    var c = el.closest('label, .f, .field, .form-group, .fg, .inp-row, .row, .kpi, .card, fieldset, section');
     if (c) {
       var h = c.querySelector('label, legend, h2, h3, h4, .label, .lbl, .title, .kpi-label, .card-title');
       var t = (h && h !== el ? h.textContent : c.textContent) || '';
