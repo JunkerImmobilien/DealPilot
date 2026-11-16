@@ -1729,6 +1729,8 @@ label.dp-required.qc-required::after {
             <label>Sanierungskosten</label>
             <div class="iw"><span class="pfx">€</span><input id="san" type="text" inputmode="decimal" placeholder="" class="trl" oninput="syncSanTaxOnSanInput(); calc(); _v292_6_toggle15pct();"></div>
             <span class="hint" id="san_limit_hint">Grenze wird berechnet...</span>
+            <!-- v3530 · Marcel 16.11.2026: Kueche, Moebel, Geraete sind eigene Wirtschaftsgueter, nicht Teil der 15-%-Grenze -->
+            <span class="hint" id="san_wg_hint" style="display:block">Nur Arbeiten am Gebäude. Küche, Möbel und Geräte nicht hier: beim Kauf mitgekauft ins Inventar, später angeschafft in „Weitere Sanierungen“ als eigenes Wirtschaftsgut. Sie zählen nicht zur 15-%-Grenze.</span>
             <!-- v2988: Kann-Feld - wann ist die Sanierung ausgefuehrt? Mapper sanStatus (bOM im Marktbericht) -->
             <div class="f" style="margin-top:8px">
               <label for="san_ausgefuehrt">Sanierung ausgeführt am <span class="hint" style="font-weight:400">— optional</span></label>
@@ -3961,7 +3963,7 @@ label.dp-required.qc-required::after {
 <script src="js/obj-numbering.js?v=166"></script>
 <script src="js/mietentwicklung.js?v=v3366"></script>
 <script src="/vendor/cdn/xlsx/0.18.5/xlsx.full.min.js"></script>
-<script src="js/tax.js?v=v3511"></script>
+<script src="js/tax.js?v=v3530"></script>
 <script src="js/steuer-verlauf.js?v=v3273a"></script>
 <script src="js/pa-potenzial.js?v=v3440"></script><!-- v3323 · Pilot-Analyse: Reiter Potenzialanalyse -->
 <script src="js/hausverlauf.js?v=v3432"></script><!-- v3323 · Pilot-Analyse: Reiter Hausverlauf (WEG-Unterlagen chronologisch) · v3430 Haus je Jahr -->
@@ -4048,7 +4050,7 @@ label.dp-required.qc-required::after {
 <script src="js/dokument-import.js?v=v3279"></script>
 <script src="js/unterlagen.js?v=v3352"></script>
 <script src="js/sonderumlage.js?v=v3221"></script>
-<script src="js/sanierung-plan.js?v=v3268"></script><!-- v3214 · N137 · W-15: weitere Sanierungen in spaeteren Jahren -->
+<script src="js/sanierung-plan.js?v=v3530"></script><!-- v3214 · N137 · W-15: weitere Sanierungen in spaeteren Jahren -->
 <script src="js/darlehen-weitere-ui.js?v=v3261"></script><!-- v3215 · W-17: Liste Weitere Darlehen (Reiter Finanzierung) -->
 
 <script src="js/beleg-import.js?v=v3166"></script>

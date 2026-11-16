@@ -15,6 +15,8 @@
      D  15-%-Grenze ueberschritten (Sanierung + Erhaltung im Fenster)
      E  Verdrahtung: storage.js speichert/leert san_plan, calc.js zieht san_y
         im Cashflow ab und nicht in gi, index.html laedt das Modul
+     G  v3530: eigenes Wirtschaftsgut (Kueche, Moebel, Geraete) - nicht in der
+        15-%-Grenze, AfA bewegliche WG ueber die Nutzungsdauer, GWG sofort
 
    Aufruf aus dem Repo-Wurzelverzeichnis:  node tools/sanierung-pruefen.mjs [--laut]
    RC=0 ist sauber.
@@ -173,6 +175,43 @@ for (const [san, txt] of [['', 'ohne Sanierung'], ['20000', 'Sanierung 20.000 un
   melde(nahe(hs, 12000) && h.behandlung[0].anteilig === true, 'F Summe bleibt 12.000, als anteilig markiert', hs);
   const h2 = K.steuerAus([{ jahr: 2028, betrag: 12000, art: 'herstellung' }], ctx(7, 1));
   melde(nahe(h2.jahre[2028].afa, 240) && h2.behandlung[0].anteilig === false, 'F Herstellung nach dem Kaufjahr: volles Jahr (R 7.4 Abs. 9 EStR)', h2.jahre[2028]);
+}
+
+/* G · v3530 (Marcel 16.11.2026): eigenes Wirtschaftsgut (Kueche, Moebel, Geraete) - nicht in der 15-%-Grenze,
+       nicht in Erhaltung/Gebaeude-AfA, sondern AfA bewegliche WG (sonst_bewegl_wg) ueber die Nutzungsdauer */
+{
+  const U = umgebung(true), basis = umgebung(false);
+  U.felder.san.value = '25000'; basis.felder.san.value = '25000';
+  /* vorher: #san 25.000 brutto (21.008 netto) + Kueche 12.000 brutto als Erhaltung 2027 (10.084 netto) = 31.092 > 29.700 */
+  U.felder.san_plan.value = JSON.stringify([{ bez: 'Kueche', jahr: 2027, betrag: 12000, art: 'erhaltung', vert: 'auto' }]);
+  melde(nahe(U.jahr(0).anschaffungsnah, 500) && nahe(U.jahr(0).erhaltungsaufwand, 0), 'G vorher: Kueche 12.000 als Erhaltung reisst die Grenze, #san 25.000 nur 500 AfA statt sofort', [U.jahr(0).anschaffungsnah, U.jahr(0).erhaltungsaufwand]);
+  U.felder.san_plan.value = JSON.stringify([{ bez: 'Einbaukueche', jahr: 2027, betrag: 12000, art: 'wirtschaftsgut', nd: 10 }]);
+  melde(nahe(U.jahr(0).erhaltungsaufwand, 25000) && nahe(U.jahr(0).anschaffungsnah, 0), 'G als Wirtschaftsgut: Grenze nicht gerissen, #san 25.000 sofort', [U.jahr(0).erhaltungsaufwand, U.jahr(0).anschaffungsnah]);
+  melde(nahe(U.jahr(1).sonst_bewegl_wg - basis.jahr(1).sonst_bewegl_wg, 1200) && nahe(U.jahr(1).afa, basis.jahr(1).afa) && nahe(U.jahr(1).erhaltungsaufwand, 0), 'G 2027: AfA bewegl. WG + 1.200, Gebaeude-AfA und Erhaltung unveraendert', [U.jahr(1).sonst_bewegl_wg, U.jahr(1).afa, U.jahr(1).erhaltungsaufwand]);
+  melde(JSON.stringify(U.sb.DpSanierungPlan.jeJahr()) === '{"2027":12000}', 'G Cashflow: 12.000 einmalig 2027', U.sb.DpSanierungPlan.jeJahr());
+  const K = U.sb.DpSanierungPlan.kern;
+  const k12 = K.steuerAus([{ jahr: 2027, betrag: 12000, art: 'wirtschaftsgut', nd: 10 }], { A: 2026, grenze: 29700, sanNetto: 0, ust: 'brutto', afaSatz: 2 });
+  const jw = [2026, 2027, 2028, 2036, 2037].map((j) => (k12.jahre[j] || {}).wg || 0);
+  melde(nahe(k12.fensterNetto, 0) && !k12.ueber && jw[0] === 0 && nahe(jw[1], 1200) && nahe(jw[2], 1200) && nahe(jw[3], 1200) && jw[4] === 0, 'G Kueche 12.000: nicht im Fenster, 2027-2036 je 1.200, 2037 nichts', jw);
+  melde(Object.values(k12.jahre).every((j) => j.erh === 0 && j.anah === 0 && j.afa === 0), 'G Kueche 12.000: nichts in erh/anah/afa', k12.jahre);
+  const km = K.steuerAus([{ jahr: 2027, monat: 10, betrag: 12000, art: 'wirtschaftsgut', nd: 10 }], { A: 2026, afaSatz: 2 });
+  const sm = Object.values(km.jahre).reduce((a, j) => a + j.wg, 0);
+  melde(nahe(km.jahre[2027].wg, 300) && nahe(km.jahre[2028].wg, 1200) && nahe(km.jahre[2037].wg, 900) && nahe(sm, 12000), 'G mit Monat Oktober: 2027 3/12 = 300, 2028 1.200, 2037 Rest 900, Summe 12.000', [km.jahre[2027], km.jahre[2037], sm]);
+  const kn = K.steuerAus([{ jahr: 2027, betrag: 12000, art: 'wirtschaftsgut', nd: 8 }], { A: 2026 });
+  melde(nahe(kn.jahre[2027].wg, 1500) && nahe(kn.jahre[2034].wg, 1500) && !kn.jahre[2035], 'G Nutzungsdauer 8: je 1.500 bis 2034', kn.jahre[2027]);
+  const g1 = K.steuerAus([{ jahr: 2027, betrag: 700, art: 'wirtschaftsgut' }], { A: 2026, ust: 'netto' });
+  melde(nahe(g1.jahre[2027].wg, 700) && !g1.jahre[2028] && g1.behandlung[0].gwg === true, 'G GWG 700 netto: sofort 2027', g1.jahre);
+  const g2 = K.steuerAus([{ jahr: 2027, betrag: 952, art: 'wirtschaftsgut' }], { A: 2026, ust: 'brutto' });
+  melde(nahe(g2.jahre[2027].wg, 952) && g2.behandlung[0].gwg === true, 'G GWG 952 brutto (800 netto): sofort, Grenze eingeschlossen', g2.jahre);
+  const g3 = K.steuerAus([{ jahr: 2027, betrag: 1000, art: 'wirtschaftsgut' }], { A: 2026, ust: 'brutto' });
+  melde(g3.behandlung[0].gwg === false && nahe(g3.jahre[2027].wg, 100), 'G 1.000 brutto (840 netto): kein GWG, 100 im Jahr', g3.jahre[2027]);
+  /* Werbungskosten-PDF / Anlage V: das Feld sonst_bewegl_wg traegt den Betrag, die Ausgabe nennt es */
+  const wk = lies('frontend/js/werbungskosten-pdf.js'), av = lies('frontend/js/anlage-v-2025.js');
+  melde(/\['AfA bewegliche Wirtschaftsgüter', v\.sonst_bewegl_wg/.test(wk), 'G Werbungskosten-PDF druckt sonst_bewegl_wg als AfA bewegliche Wirtschaftsgueter', null);
+  melde(/sonst_bewegl_wg:\s*\{ zeile: \d+, art: 'wk'/.test(av), 'G Anlage V fuehrt sonst_bewegl_wg als Werbungskosten-Zeile', null);
+  /* Vorschlag aus der Bezeichnung */
+  melde(K.vorschlagArt({ bez: 'Küche', art: 'erhaltung' }) === 'wirtschaftsgut' && K.vorschlagArt({ bez: 'Möbel', art: 'erhaltung' }) === 'wirtschaftsgut' && K.vorschlagArt({ bez: 'Einbauküche', art: '' }) === 'wirtschaftsgut', 'G Vorschlag: Kueche/Moebel/Einbaukueche -> Wirtschaftsgut', null);
+  melde(K.vorschlagArt({ bez: 'Küche', art: 'erhaltung', artGesetzt: true }) === null && K.vorschlagArt({ bez: 'Dach', art: 'erhaltung' }) === null, 'G Vorschlag: von Hand gesetzte Art bleibt, Dach bleibt Erhaltung', null);
 }
 
 console.log((fehler ? 'ROT' : 'GRUEN') + ': ' + (geprueft - fehler) + '/' + geprueft + ' Pruefungen bestanden');

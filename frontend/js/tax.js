@@ -1545,7 +1545,7 @@ function _computeAutoForYear(yearIdx, year, teiljahr) {
      ohne Wirkung: steuerJahr() liefert 0, fensterNetto 0 - die Rechnung bleibt bitgleich. */
   var _spCtx = { grenze: sanGrenze15, sanNetto: san_netto, ust: _sanUstT, afaSatz: afa_satz_eff, ohne82b: _ohne82b };   /* v3268 */
   var _sp = (window.DpSanierungPlan && typeof DpSanierungPlan.steuerJahr === 'function')
-    ? DpSanierungPlan.steuerJahr(year, _spCtx) : { erh: 0, anah: 0, afa: 0, fensterNetto: 0 };
+    ? DpSanierungPlan.steuerJahr(year, _spCtx) : { erh: 0, anah: 0, afa: 0, wg: 0, fensterNetto: 0 };
   var sanAnschaffungsnah, sanLaufzeit, sanAfaJaehrlich;
 
   if (!sanActive) {
@@ -1758,7 +1758,10 @@ function _computeAutoForYear(yearIdx, year, teiljahr) {
     // 6.0 AfA bewegliche Wirtschaftsgüter
     // V31: Möblierung → 10 Jahre AfA
     // V112: + Küche-AfA (vorher fälschlich in afa-Feld → Doppelung)
-    sonst_bewegl_wg: moeblThisYear + afaKueche,
+    /* v3530 · Marcel 16.11.2026: + eigene Wirtschaftsgüter aus „Weitere Sanierungen“ (Küche, Möbel,
+       Geräte nach dem Kauf; sanierung-plan.js art 'wirtschaftsgut'): AfA über ihre Nutzungsdauer bzw.
+       GWG sofort. Nicht in der 15-%-Grenze, nicht in afa (Gebäude). Ohne solche Einträge + 0. */
+    sonst_bewegl_wg: moeblThisYear + afaKueche + (_sp.wg || 0),
 
     // 6.5 Anschaffungsnahe Herstellkosten / Erhaltungsaufwand
     // V31: Sanierung → je nach 15%-Grenze entweder als anschaffungsnah (AfA) oder als Erhaltungsaufwand (5 Jahre)
@@ -2349,7 +2352,7 @@ function _renderDetailForm(years) {
     telefon: 'Telefon-/Internetkosten anteilig für die Vermietungstätigkeit.',
     sonst_kosten: 'Sonstige Kosten (z. B. Strom- und Gaskosten bei Leerstand). Reparaturen gehören in den Erhaltungsaufwand.',   /* v3380: „Reparaturen unter 4.000 €" war die Vereinfachungsregel R 21.1 Abs. 2 EStR und gehoerte nicht in diese Zeile */
     afa: 'Jährliche Abschreibung des Gebäudes (i.d.R. 2% linear vom Gebäudeanteil der Anschaffungskosten).',
-    sonst_bewegl_wg: 'Bewegliche Wirtschaftsgüter (Einbauküche, Möbel) abschreibbar über 10 Jahre.',
+    sonst_bewegl_wg: 'Bewegliche Wirtschaftsgüter (Einbauküche, Möbel, Geräte) linear über ihre Nutzungsdauer (Einbauküche typisch 10 Jahre), bis 800 € netto sofort (GWG). Eigene Wirtschaftsgüter, nicht Teil der 15-%-Grenze.',   /* v3530 */
     anschaffungsnah: 'Instandsetzung und Modernisierung in den ersten 3 Jahren nach der Anschaffung. Übersteigen sie ohne Umsatzsteuer 15 % der Anschaffungskosten des Gebäudes, sind es Herstellungskosten. Sie laufen dann mit dem AfA-Satz des Gebäudes und sind nicht sofort absetzbar. § 6 Abs. 1 Nr. 1a EStG.',
     erhaltungsaufwand: 'Reparaturen und Erhaltungsmaßnahmen, die keine anschaffungsnahen Herstellungskosten sind (auch in den ersten 3 Jahren, solange die 15-%-Grenze nicht überschritten ist). Absetzbar im Jahr der Zahlung, auf Antrag verteilt auf 2 bis 5 Jahre (§ 82b EStDV).',
     einnahmen_km: 'Kaltmiete (= Nettokaltmiete + zus. Einnahmen wie Stellplatz). Wird automatisch aus Tab "Miete & Steuern" übernommen.',

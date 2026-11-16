@@ -30,8 +30,18 @@
    beiden Stellen stünde doppelt; die Liste zeigt dann beide Summen und den
    Hinweis (wie potenzial.js herkunftAus() für #san).
 
+   v3530 · Marcel 16.11.2026 („Küchen etc. fallen nicht dazu, weil es ja eigene
+   Wirtschaftsgüter sind“): dritte Art 'wirtschaftsgut' - Einbauküche (BFH
+   03.08.2016, IX R 14/15), Möbel, Geräte. Zählt NICHT ins 15-%-Fenster, nicht
+   in die Erhaltung und nicht in die Gebäude-AfA, sondern wird linear über die
+   eigene Nutzungsdauer (Feld nd, Vorgabe 10 Jahre) abgeschrieben, § 7 Abs. 1
+   EStG: im Anschaffungsjahr monatsgenau, wenn der Monat eingetragen ist
+   (§ 7 Abs. 1 Satz 4), sonst volles Jahr. Bis 800 € netto: GWG, sofort im Jahr
+   (§ 6 Abs. 2 EStG). Steuer im Feld „sonst_bewegl_wg“ (AfA bewegliche WG,
+   dieselbe Stelle wie das Inventar), Cashflow wie alle Einträge im Jahr.
+
    Gespeichert im versteckten Feld #san_plan (JSON, storage.js FIELDS + Reset):
-     [{ bez, jahr, betrag, art: 'erhaltung'|'herstellung', vert: 'auto'|'1'..'5' }]
+     [{ bez, jahr, monat?, betrag, art: 'erhaltung'|'herstellung'|'wirtschaftsgut', vert: 'auto'|'1'..'5', nd?, artGesetzt? }]
    Beträge wie #san: so, wie #san_ust sie ausweist (Vorgabe brutto) - Kosten
    für den Cashflow und die Werbungskosten; netto nur für die 15-%-Prüfung.
    Ein Objekt ohne Liste rechnet bitgleich wie vorher (tools/sanierung-pruefen.mjs).
@@ -40,8 +50,11 @@
   'use strict';
 
   var FELD = 'san_plan';
-  var BEZ = ['Küche', 'Bad', 'Dach', 'Fenster', 'Heizung', 'Fassade', 'Elektrik', 'Bodenbeläge', 'Malerarbeiten'];
+  var BEZ = ['Einbauküche', 'Küche', 'Möbel', 'Bad', 'Dach', 'Fenster', 'Heizung', 'Fassade', 'Elektrik', 'Bodenbeläge', 'Malerarbeiten'];
   var _gerendert = null;
+  /* v3530: Bezeichnungen, die als eigenes Wirtschaftsgut vorgeschlagen werden (Nutzer kann umstellen) */
+  var WG_BEZ = /k(ü|ue)che|m(ö|oe)bel|m(ö|oe)blierung|inventar|ger(ä|ae)t|herd|k(ü|ue)hlschrank|sp(ü|ue)lmaschine|waschmaschine|trockner|einrichtung/i;
+  var ND_VORGABE = 10, GWG_NETTO = 800;
 
   function el(id) { return document.getElementById(id); }
   function zahl(v) {
@@ -110,7 +123,7 @@
     var summe = (zahl(ctx.sanNetto) || 0) + fenster;
     var ueber = grenze > 0 && fenster > 0 && summe > grenze;
     var jahre = {};
-    var add = function (J, k, b) { if (!(b > 0)) return; jahre[J] = jahre[J] || { erh: 0, anah: 0, afa: 0 }; jahre[J][k] += b; };
+    var add = function (J, k, b) { if (!(b > 0)) return; jahre[J] = jahre[J] || { erh: 0, anah: 0, afa: 0, wg: 0 }; jahre[J][k] += b; };
     /* Abschreibung mit dem Gebaeudesatz, das letzte Jahr nimmt den Rest (wie tax.js v3006b).
        v3223 · Marcel 08.11.2026 „so, dass es richtig ist“: nachtraegliche und anschaffungsnahe
        Herstellungskosten werden im Jahr ihres Anfalls so behandelt, als waeren sie zu Beginn des
@@ -128,6 +141,15 @@
     var behandlung = (Array.isArray(l) ? l : []).map(function (e) {
       if (!e || !(zahl(e.jahr) > 0) || !(zahl(e.betrag) > 0)) return { art: 'leer' };
       var J = zahl(e.jahr), b = zahl(e.betrag);
+      if (e.art === 'wirtschaftsgut') {
+        /* v3530 · eigenes Wirtschaftsgut: GWG bis 800 € netto sofort, sonst linear über nd Jahre,
+           im Anschaffungsjahr ab dem Monat (§ 7 Abs. 1 Satz 4 EStG), das letzte Jahr nimmt den Rest */
+        if (netto(b) <= GWG_NETTO + 1e-9) { add(J, 'wg', b); return { art: 'wirtschaftsgut', gwg: true, jahre: 1, jaehrlich: b, ab: J }; }
+        var nd = Math.max(1, Math.min(50, Math.round(zahl(e.nd)) || ND_VORGABE));
+        var mw = monatOk(e.monat), jw = b / nd, rw = b, iw = 0;
+        while (rw > 0.005 && iw < 60) { var xw = Math.min(iw === 0 && mw ? jw * (13 - mw) / 12 : jw, rw); add(J + iw, 'wg', xw); rw -= xw; iw++; }
+        return { art: 'wirtschaftsgut', gwg: false, nd: nd, jahre: iw, jaehrlich: jw, ab: J, anteilig: !!(mw && mw > 1), ohneMonat: !mw };
+      }
       if (e.art === 'herstellung') return { art: 'herstellung', jahre: abschreiben(J, b, 'afa'), jaehrlich: b * satz / 100, ab: J, anteilig: !!(A && Am && J === A && Am > 1) };
       if (e.art !== 'erhaltung') return { art: 'offen' };
       var vert = String(e.vert || 'auto');
@@ -187,12 +209,12 @@
       ohne82b: p.ohne82b != null ? !!p.ohne82b : (function () { try { return !!(window.DealPilotMandanten && DealPilotMandanten.istKoerperschaft && DealPilotMandanten.istKoerperschaft((el('halter') || {}).value || 'privat')); } catch (e) { return false; } })() };
   }
 
-  var LEER = { erh: 0, anah: 0, afa: 0 };
-  /** Für tax.js: Steueranteile dieses Kalenderjahres; ohne Liste immer 0 */
+  var LEER = { erh: 0, anah: 0, afa: 0, wg: 0 };
+  /** Für tax.js: Steueranteile dieses Kalenderjahres; ohne Liste immer 0. wg (v3530) = AfA/GWG eigener Wirtschaftsgüter */
   function steuerJahr(jahr, p) {
-    var l = liste(); if (!l.length) return { erh: 0, anah: 0, afa: 0, fensterNetto: 0 };
+    var l = liste(); if (!l.length) return { erh: 0, anah: 0, afa: 0, wg: 0, fensterNetto: 0 };
     var r = steuerAus(l, ctxAusFormular(p)), j = r.jahre[jahr] || LEER;
-    return { erh: j.erh, anah: j.anah, afa: j.afa, fensterNetto: r.fensterNetto };
+    return { erh: j.erh, anah: j.anah, afa: j.afa, wg: j.wg || 0, fensterNetto: r.fensterNetto };
   }
   /** Netto-Erhaltung im 3-Jahres-Fenster - für die Entscheidung über #san in tax.js */
   function fensterNetto(p) { var l = liste(); return l.length ? steuerAus(l, ctxAusFormular(p)).fensterNetto : 0; }
@@ -205,13 +227,20 @@
     var t = 'Cashflow: −' + eur(betrag) + ' einmalig im Jahr ' + J + ' (nicht in der Gesamtinvestition). Steuer: ';
     var mf = b.monatFehlt ? ' <span style="color:#B8625C;font-weight:600">Monat eintragen:</span> ' + J + ' ist das Grenzjahr der 3-Jahres-Frist, ohne Monat zählt der Betrag vorsichtshalber mit.' : '';
     var ant = b.anteilig ? ' Im Kaufjahr anteilig ab dem Monat des Übergangs, danach volle Jahre.' : ' Im Jahr der Maßnahme volles Jahr (R 7.4 Abs. 9 EStR).';
-    if (b.art === 'herstellung') return t + 'Herstellungskosten, AfA ab ' + J + ' rund ' + eur(b.jaehrlich) + ' im Jahr über ' + b.jahre + ' Jahre.' + ant;
-    if (b.art === 'anschaffungsnah') return t + '<span style="color:#B8625C;font-weight:600">anschaffungsnahe Herstellungskosten</span> (15-%-Grenze überschritten), AfA ab ' + J + ' rund ' + eur(b.jaehrlich) + ' im Jahr über ' + b.jahre + ' Jahre.' + ant + mf;
+    if (b.art === 'wirtschaftsgut') {
+      if (b.gwg) return t + 'eigenes Wirtschaftsgut, geringwertig (bis 800 € netto, § 6 Abs. 2 EStG): sofort ' + J + ' als AfA bewegliche Wirtschaftsgüter. Zählt nicht zur 15-%-Grenze.';
+      return t + 'eigenes Wirtschaftsgut (nicht Gebäude): AfA bewegliche Wirtschaftsgüter rund ' + eur(b.jaehrlich) + ' im Jahr über ' + b.nd + ' Jahre ab ' + J + '. Zählt nicht zur 15-%-Grenze und nicht zur Gebäude-AfA.'
+        + (b.anteilig ? ' Im Jahr der Anschaffung anteilig ab dem Monat.' : (b.ohneMonat ? ' Mit Monat rechnet das erste Jahr monatsgenau (§ 7 Abs. 1 Satz 4 EStG).' : ''));
+    }
+    var wgTipp = (WG_BEZ.test(String(e.bez || '')) && (b.art === 'erhaltung' || b.art === 'anschaffungsnah' || b.art === 'herstellung'))
+      ? ' <span style="color:#B8625C;font-weight:600">Neue Küche, Möbel oder Geräte?</span> Das sind eigene Wirtschaftsgüter: Art „eigenes Wirtschaftsgut“ wählen, dann zählen sie nicht zur 15-%-Grenze.' : '';
+    if (b.art === 'herstellung') return t + 'Herstellungskosten, AfA ab ' + J + ' rund ' + eur(b.jaehrlich) + ' im Jahr über ' + b.jahre + ' Jahre.' + ant + wgTipp;
+    if (b.art === 'anschaffungsnah') return t + '<span style="color:#B8625C;font-weight:600">anschaffungsnahe Herstellungskosten</span> (15-%-Grenze überschritten), AfA ab ' + J + ' rund ' + eur(b.jaehrlich) + ' im Jahr über ' + b.jahre + ' Jahre.' + ant + mf + wgTipp;
     if (b.art === 'erhaltung') {
       if (b.ohne82b) t += 'Betriebsausgabe sofort ' + J + ' - eine Verteilung nach § 82b EStDV gibt es nur im Privatvermögen, nicht in der GmbH/UG. ';
       else t += b.jahre > 1 ? 'Erhaltungsaufwand verteilt auf ' + b.jahre + ' Jahre (' + J + '–' + (J + b.jahre - 1) + '), je ' + eur(b.jaehrlich) + '.' : 'Erhaltungsaufwand, sofort absetzbar ' + J + '.';
       if (b.warnung) t += ' <span style="color:#B8625C;font-weight:600">Achtung:</span> im 3-Jahres-Fenster ist die 15-%-Grenze überschritten - steuerlich wären es anschaffungsnahe Herstellungskosten (Verteilung „automatisch“ rechnet das).';
-      return t + mf;
+      return t + mf + wgTipp;
     }
     return t + 'wähle die Art - ohne Art geht der Betrag nur in den Cashflow.';
   }
@@ -229,9 +258,10 @@
           + '<div class="g2">'
           + '<div class="f"><label for="' + id + 'bez">Bezeichnung</label><input id="' + id + 'bez" data-sp="bez" type="text" list="sp-bez-liste" placeholder="z. B. Küche, Dach, Bad" value="' + esc(e.bez) + '"></div>'
           + '<div class="f"><label for="' + id + 'jahr">Jahr</label><input id="' + id + 'jahr" data-sp="jahr" data-zf-aus="1" type="text" inputmode="numeric" value="' + esc(e.jahr || '') + '"></div>'
-          + '<div class="f"><label for="' + id + 'monat">Monat <span class="dp-tip" data-tip="Nur nötig im Grenzjahr der 3-Jahres-Frist (15-%-Regel): dort entscheidet der Monat, ob die Erhaltung mitzählt.">ⓘ</span></label><select id="' + id + 'monat" data-sp="monat">' + opt('', '–', String(e.monat || '')) + ['Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez'].map(function (n, k) { return opt(String(k + 1), n, String(e.monat || '')); }).join('') + '</select></div>'
+          + '<div class="f"><label for="' + id + 'monat">Monat <span class="dp-tip" data-tip="Nur nötig im Grenzjahr der 3-Jahres-Frist (15-%-Regel): dort entscheidet der Monat, ob die Erhaltung mitzählt. Bei eigenen Wirtschaftsgütern: AfA im ersten Jahr ab dem Monat.">ⓘ</span></label><select id="' + id + 'monat" data-sp="monat">' + opt('', '–', String(e.monat || '')) + ['Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez'].map(function (n, k) { return opt(String(k + 1), n, String(e.monat || '')); }).join('') + '</select></div>'
           + '<div class="f"><label for="' + id + 'betrag">Betrag</label><div class="iw"><span class="pfx">€</span><input id="' + id + 'betrag" data-sp="betrag" type="text" inputmode="decimal" class="trl" value="' + esc(e.betrag != null ? Math.round(e.betrag) : '') + '"></div></div>'
-          + '<div class="f"><label for="' + id + 'art">Art</label><select id="' + id + 'art" data-sp="art">' + opt('', '– bitte wählen –', e.art || '') + opt('erhaltung', 'Erhaltung (Werbungskosten)', e.art) + opt('herstellung', 'Herstellung (über die AfA)', e.art) + '</select></div>'
+          + '<div class="f"><label for="' + id + 'art">Art</label><select id="' + id + 'art" data-sp="art">' + opt('', '– bitte wählen –', e.art || '') + opt('erhaltung', 'Erhaltung (Werbungskosten)', e.art) + opt('herstellung', 'Herstellung (über die AfA)', e.art) + opt('wirtschaftsgut', 'Eigenes Wirtschaftsgut (Küche, Möbel, Geräte)', e.art) + '</select></div>'
+          + (e.art === 'wirtschaftsgut' ? '<div class="f"><label for="' + id + 'nd">Nutzungsdauer <span class="dp-tip" data-tip="Eigenes Wirtschaftsgut, nicht Teil des Gebäudes: Einbauküche (BFH IX R 14/15), Möbel, Geräte. Linear über die Nutzungsdauer (Einbauküche typisch 10 Jahre), bis 800 € netto sofort (§ 6 Abs. 2 EStG). Zählt nicht zur 15-%-Grenze.">ⓘ</span></label><div class="iw"><input id="' + id + 'nd" data-sp="nd" type="text" inputmode="numeric" class="trl" value="' + esc(e.nd || ND_VORGABE) + '"><span class="sfx">Jahre</span></div></div>' : '')
           + (e.art === 'erhaltung' ? '<div class="f"><label for="' + id + 'vert">Als Werbungskosten verteilt über</label><select id="' + id + 'vert" data-sp="vert">'
               + opt('auto', 'Automatisch (sofort; 15-%-Regel in den ersten 3 Jahren)', vert) + opt('1', '1 Jahr (sofort)', vert) + opt('2', '2 Jahre', vert) + opt('3', '3 Jahre', vert) + opt('4', '4 Jahre', vert) + opt('5', '5 Jahre (§ 82b EStDV)', vert) + '</select></div>' : '')
           + '</div>'
@@ -269,8 +299,9 @@
     var box = t.closest('.sp-eintrag'); if (!box) return;
     var l = liste(), e = l[+box.getAttribute('data-i')]; if (!e) return;
     var k = t.getAttribute('data-sp'), v = String(t.value || '').trim();
-    if (k === 'betrag' || k === 'jahr' || k === 'monat') e[k] = zahl(v);
+    if (k === 'betrag' || k === 'jahr' || k === 'monat' || k === 'nd') e[k] = zahl(v);
     else e[k] = v;
+    if (k === 'art') e.artGesetzt = true;   /* v3530: von Hand gewählt - der Vorschlag aus der Bezeichnung greift nicht mehr */
     speichern(l, k === 'art');   /* die Art blendet „verteilt über“ ein oder aus → neu zeichnen */
   });
   document.addEventListener('change', function (ev) {
@@ -279,7 +310,19 @@
     var l = liste(), e = l[+box.getAttribute('data-i')]; if (!e) return;
     var k = t.getAttribute('data-sp');
     if (String(e[k] == null ? '' : e[k]) === t.value) return;   /* schon über input gekommen */
-    e[k] = k === 'monat' ? zahl(t.value) : t.value; speichern(l, k === 'art');
+    e[k] = k === 'monat' ? zahl(t.value) : t.value;
+    if (k === 'art') e.artGesetzt = true;
+    speichern(l, k === 'art');
+  });
+  /* v3530 · Vorschlag aus der Bezeichnung, wenn sie fertig ist (change = verlassen oder aus der Liste gewählt):
+     „Küche“, „Einbauküche“, „Möbel“, Geräte -> eigenes Wirtschaftsgut. Nur solange die Art nicht von Hand gesetzt ist. */
+  document.addEventListener('change', function (ev) {
+    var t = ev.target; if (!t || !t.getAttribute || t.getAttribute('data-sp') !== 'bez') return;
+    var box = t.closest('.sp-eintrag'); if (!box) return;
+    var l = liste(), e = l[+box.getAttribute('data-i')]; if (!e) return;
+    var neu = vorschlagArt(e); if (!neu) return;
+    e.art = neu; if (neu === 'wirtschaftsgut' && !(zahl(e.nd) > 0)) e.nd = ND_VORGABE;
+    speichern(l, true);
   });
   document.addEventListener('click', function (ev) {
     var t = ev.target && ev.target.closest ? ev.target.closest('.sp-btn') : null; if (!t) return;
@@ -291,6 +334,15 @@
     }
     if (t.hasAttribute('data-sp-weg')) { var i = +t.getAttribute('data-sp-weg'); if (l[i]) { l.splice(i, 1); speichern(l, true); } }
   });
+
+  /** v3530: Art-Vorschlag aus der Bezeichnung; null = nichts zu ändern */
+  function vorschlagArt(e) {
+    if (!e || e.artGesetzt) return null;
+    var wg = WG_BEZ.test(String(e.bez || ''));
+    if (wg && e.art !== 'wirtschaftsgut') return 'wirtschaftsgut';
+    if (!wg && e.art === 'wirtschaftsgut') return 'erhaltung';   /* Vorschlag zurücknehmen, wenn die Bezeichnung nicht mehr passt */
+    return null;
+  }
 
   /** Für die PDFs unter der Jahrestabelle: welche Einmalzahlungen in „Bewirtschaftung“ und CF stecken.
       Nur ASCII-Bindestriche (jsPDF helvetica). Leer, wenn es keine gibt. */
@@ -308,5 +360,5 @@
   }
 
   window.DpSanierungPlan = { liste: liste, jeJahr: jeJahr, steuerJahr: steuerJahr, fensterNetto: fensterNetto, render: render, einmaligText: einmaligText,
-    kern: { jeJahrAus: jeJahrAus, steuerAus: steuerAus } };   /* kern: für tools/sanierung-pruefen.mjs */
+    kern: { jeJahrAus: jeJahrAus, steuerAus: steuerAus, vorschlagArt: vorschlagArt } };   /* kern: für tools/sanierung-pruefen.mjs */
 })();
