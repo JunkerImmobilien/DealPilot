@@ -110,7 +110,8 @@
       '#gp-overlay .gp-zeile{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;padding:8px 0;border-top:1px solid var(--dp-line,#E6DFCE)}',
       '#gp-overlay .gp-kosten{display:block;margin:4px 0 12px;padding:11px 13px;border:1px solid #B8625C;border-radius:10px;background:rgba(184,98,92,.06);font-weight:400;color:var(--dp-ink,#1c1a14)}',
       '#gp-overlay .gp-person{border:1px dashed var(--dp-line,#E6DFCE);border-radius:9px;padding:6px 10px;margin:6px 0}',
-      '@media (max-width:640px){#gp-overlay .dpm-body{padding:14px 14px 18px}#gp-overlay .gp-leiste{justify-content:stretch}#gp-overlay .gp-leiste .dpm-btn{flex:1 1 100%;justify-content:center}}'
+      /* v3571 · 390 px gemessen: das Abzeichen im Kopf lag ueber dem Titel */
+      '@media (max-width:640px){#gp-overlay .dpm-hero-badge{display:none}#gp-overlay .dpm-hero{padding:18px 18px 20px}#gp-overlay .dpm-body{padding:14px 14px 18px}#gp-overlay .gp-leiste{justify-content:stretch}#gp-overlay .gp-leiste .dpm-btn{flex:1 1 100%;justify-content:center}}'
     ].join('\n');
     document.head.appendChild(s);
   }
