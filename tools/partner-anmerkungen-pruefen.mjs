@@ -147,8 +147,9 @@ console.log('A · E-Mail bei Rueckmeldung (v3460)');
 
   /* Schalter im Partner-Cockpit und Einstellung im Backend */
   const pkq = fs.readFileSync(path.join(WURZEL, 'frontend/js/partner-kunden.js'), 'utf8');
-  ok('Cockpit: Schalter im Kundendialog beider Zugangsarten, gespeichert als mail_rueckmeldung', (pkq.match(/(\+ |\n\s+)mailSchalter\(k\)/g) || []).length === 2 && (pkq.match(/mail_rueckmeldung: wert\(d, '#pk-k-mailrm'\)/g) || []).length === 2);
-  ok('Cockpit: Vorgabe an (nur false schaltet aus)', /k\.mail_rueckmeldung !== false \? ' checked'/.test(pkq));
+  /* v3640c · Kundendialog im RND-Stil: der Reiter „Kunde“ (kundeReiter) steht fuer BEIDE Zugangsarten vorn */
+  ok('Cockpit: Schalter im Kundendialog beider Zugangsarten, gespeichert als mail_rueckmeldung', /var reiter = \[kundeReiter\(k\)\];/.test(pkq) && /hubChips\('pk-k-mailrm'/.test(pkq) && (pkq.match(/mail_rueckmeldung: chipWert\(b, 'pk-k-mailrm'\) !== 'aus'/g) || []).length === 1);
+  ok('Cockpit: Vorgabe an (nur false schaltet aus)', /k\.mail_rueckmeldung !== false \? 'an' : 'aus'/.test(pkq));
   ok('Cockpit: Link ?dp_partner=aufgaben wird eingeloest', /get\('dp_partner'\)/.test(pkq) && /meinPartnerOeffnen\('aufgaben'\)/.test(pkq));
   const pks = fs.readFileSync(path.join(SRC, 'services/partnerKunden.js'), 'utf8');
   ok('Backend: kundeEinstellen setzt mail_rueckmeldung auch bei eigenem Plan', /if \(b\.mail_rueckmeldung !== undefined\) await query\(`UPDATE reseller_clients SET mail_rueckmeldung/.test(pks) && /setze\('mail_rueckmeldung'/.test(pks));

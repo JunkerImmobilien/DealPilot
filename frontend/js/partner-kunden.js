@@ -144,6 +144,14 @@
     var ab = R.filter(function (x) { return x.indexOf('#dppk-ov .') === 0 || x.indexOf('#dppk-ov label') === 0; })
       .map(function (x) { return x.split('#dppk-ov').join('#dppk-ab'); });
     s.textContent = R.concat(ab, [
+      /* v3640c · RND-Bausteine (css/rnd-styles.css) auch im Arbeitsbereich: dieselbe Huelle, nur ohne Ueberlagerung */
+      '.rnd-wiz-overlay.rnd-hub.dppk-hub-inline{position:static !important;inset:auto !important;background:none !important;backdrop-filter:none !important;padding:0 !important;z-index:auto !important;animation:none !important;display:block !important}',
+      '.dppk-hub-inline .rnd-wiz-modal{max-width:none !important;max-height:none !important;box-shadow:none !important}',
+      '.dppk-hub .dppk-hub-reiter[hidden]{display:none !important}',
+      '.dppk-hub .dppk-hub-reiter{display:flex;flex-direction:column;gap:14px}',
+      '#dppk-hub-kunde .rnd-wiz-modal{max-width:760px}',
+      '.dppk-hub .rnd-hub-chips.dppk-fest .rnd-hub-chip{cursor:default !important}',
+      '.dppk-hub .rnd-hub-chips.dppk-fest .rnd-hub-chip:not(:has(input:checked)){opacity:.55}',
       'html:not([data-pk-offen]) #dppk-ab{display:none !important}',
       'html[data-pk-offen] nav.tabs > :not(#dppk-tabzeile){display:none !important}',
       /* v3450 · Marcel 15.11.: „Im Partner-Cockpit steht immer die Pille Ist · heute | Soll · Ankauf-Stand …“ - alles, was zum
@@ -286,10 +294,22 @@
      Muster wie vermoegen.js (v3217): eigene Sektion in .main-col, sichtbar nur mit html[data-pk-offen],
      Geschwister schliesst das Register DealPilotAnsichten (ui.js v1905). Anders als dort bleibt nav.tabs
      stehen und zeigt die Cockpit-Reiter. */
-  var PK = { offen: false, aktiv: 'uebersicht' };
-  var REITER_ICO = { uebersicht: 'layout', kunden: 'user', einladen: 'mail', staende: 'folderOpen', aufgaben: 'clipboard', meldungen: 'info', verwaltung: 'settings', uebergeben: 'handshake' };
+  /* v3640b · Marcel 17.11.2026: „Können wir ‚Mein Partner‘ genau so darstellen wie das Partner-Cockpit und auch mit den
+     Freigaben, also im Arbeitsbereich? Gleiches Design. Dann brauchen wir das unter Einstellungen nicht mehr.“
+     Derselbe Arbeitsbereich (#dppk-ab, Reiter in nav.tabs) mit PK.art 'kunde': eigene Reiter (k_*), dieselben Karten. */
+  var PK = { offen: false, aktiv: 'uebersicht', art: 'partner', aktivJe: { partner: 'uebersicht', kunde: 'k_senden' } };
+  var REITER_ICO = { uebersicht: 'layout', kunden: 'user', einladen: 'mail', staende: 'folderOpen', aufgaben: 'clipboard', meldungen: 'info', verwaltung: 'settings', uebergeben: 'handshake',
+    k_senden: 'upload', k_sendungen: 'folderOpen', k_aufgaben: 'clipboard', k_freigaben: 'shieldCheck', k_verbindung: 'link', k_verbinden: 'link' };
+  function kundeReiterListe() {
+    var m = S.kunde || {};
+    if (!m.verbunden) return [{ k: 'k_verbinden', t: 'Verbinden', zahl: (m.anfragen || []).length || 0 }];
+    var offen = (m.aufgaben || []).filter(function (a) { return a.status !== 'erledigt' && a.status !== 'abgelehnt'; }).length;
+    return [{ k: 'k_senden', t: 'An Partner senden' }, { k: 'k_sendungen', t: 'Meine Sendungen' }, { k: 'k_aufgaben', t: 'Aufgaben', zahl: offen },
+      { k: 'k_freigaben', t: 'Freigaben' }, { k: 'k_verbindung', t: 'Verbindung' }];
+  }
   function ico(n, g) { try { return window.Icons && Icons[n] ? Icons[n]({ size: g || 15 }) : ''; } catch (e) { return ''; } }
   function reiterListe() {
+    if (PK.art === 'kunde') return kundeReiterListe();
     var c = S.partner || { kunden: [], anfragen: [] };
     var neu = (c.kunden || []).reduce(function (a, k) { return a + (k.neu || 0); }, 0);
     var l = [{ k: 'uebersicht', t: 'Übersicht' }, { k: 'kunden', t: 'Kunden & Plätze', zahl: (c.anfragen || []).length || 0 }, { k: 'einladen', t: 'Einladen' },
@@ -317,7 +337,8 @@
   function tabzeile() {
     var nav = document.querySelector('nav.tabs'); if (!nav) return;
     var z = document.getElementById('dppk-tabzeile');
-    if (!z) { z = document.createElement('div'); z.id = 'dppk-tabzeile'; z.setAttribute('role', 'tablist'); z.setAttribute('aria-label', 'Partner-Cockpit'); }
+    if (!z) { z = document.createElement('div'); z.id = 'dppk-tabzeile'; z.setAttribute('role', 'tablist'); }
+    z.setAttribute('aria-label', PK.art === 'kunde' ? 'Mein Partner' : 'Partner-Cockpit');
     if (z.parentNode !== nav) nav.insertBefore(z, nav.firstChild);
     z.innerHTML = '<button type="button" class="dppk-tab dppk-zurueck" data-pk-zurueck="1" title="Zurück zu den Objekten">' + ico('arrowRight', 14) + '<span>Objekte</span></button><span class="dppk-trenner" aria-hidden="true"></span>' +
       reiterListe().map(function (x) {
@@ -340,15 +361,28 @@
   }
   var TITEL = { uebersicht: ['Übersicht', 'Was heute ansteht'], kunden: ['Kunden & Plätze', 'Verbindungen, Stufe und Rechte'], einladen: ['Kunden einladen', 'Per E-Mail oder Verbindungscode'],
     staende: ['Von Kunden freigegeben', 'Nur lesen, Übernehmen legt eine eigene Kopie an'], aufgaben: ['Aufgaben', 'Bitten an deine Kunden'], meldungen: ['Meldungen', ''],
-    verwaltung: ['Verwaltung', 'Plätze, Marke und Abrechnung'], uebergeben: ['Objekt an Kunden übergeben', 'Dein durchgerechnetes Objekt per E-Mail, der Kunde bekommt eine Kopie'] };
+    verwaltung: ['Verwaltung', 'Plätze, Marke und Abrechnung'], uebergeben: ['Objekt an Kunden übergeben', 'Dein durchgerechnetes Objekt per E-Mail, der Kunde bekommt eine Kopie'],
+    /* v3640b · Mein Partner (Kunde) */
+    k_senden: ['An Partner senden', 'Als Kopie, deine Originale bleiben bei dir'], k_sendungen: ['Meine Sendungen', 'Was beim Partner liegt'],
+    k_aufgaben: ['Aufgaben', 'Bitten und Rückmeldungen deines Partners'], k_freigaben: ['Freigaben', 'Was dein Partner sieht und was dein Zugang darf'],
+    k_verbindung: ['Verbindung', 'Zugang, Kundennummer, Trennen'], k_verbinden: ['Mit einem Partner verbinden', 'Verbindungscode für deinen Berater'] };
   function zeichnen() {
     var s = abSektion(); if (!s) return;
     var t = TITEL[PK.aktiv] || ['', ''];
+    s.setAttribute('aria-label', PK.art === 'kunde' ? 'Mein Partner' : 'Partner-Cockpit');
+    s.querySelector('.pk-sub').textContent = PK.art === 'kunde' ? 'Mein Partner' : 'Partner-Cockpit';
     s.querySelector('.pk-titel').textContent = t[0];
-    s.querySelector('.pk-titel2').textContent = (S.partner && S.partner.partner && S.partner.partner.name ? S.partner.partner.name + (t[1] ? ' · ' : '') : '') + t[1];
+    var name = PK.art === 'kunde' ? (S.kunde && S.kunde.verbunden ? S.kunde.verbunden.partner_name : '') : (S.partner && S.partner.partner && S.partner.partner.name);
+    s.querySelector('.pk-titel2').textContent = (name ? name + (t[1] ? ' · ' : '') : '') + t[1];
     var el = s.querySelector('.pk-inhalt');
     el.innerHTML = '<div class="pk-leer">Lädt …</div>';
     var k = PK.aktiv;
+    if (k === 'k_senden') return sendenZeichnen(el);
+    if (k === 'k_sendungen') return sendungenZeichnen(el);
+    if (k === 'k_aufgaben') return kundeAufgabenZeichnen(el);
+    if (k === 'k_freigaben') return freigabenZeichnen(el);
+    if (k === 'k_verbindung') return verbindungZeichnen(el);
+    if (k === 'k_verbinden') return verbindenZeichnen(el);
     if (k === 'uebersicht') return uebersichtZeichnen(el);
     if (k === 'kunden') return kundenZeichnen(el);
     if (k === 'einladen') return einladenZeichnen(el);
@@ -359,7 +393,8 @@
     if (k === 'uebergeben') return uebergebenZeichnen(el);
   }
   function reiterWahl(k) {
-    PK.aktiv = k || 'uebersicht';
+    PK.aktiv = k || (PK.art === 'kunde' ? 'k_senden' : 'uebersicht');
+    PK.aktivJe[PK.art] = PK.aktiv;
     tabzeile(); zeichnen();
     try { var mc = document.querySelector('.main-col'); if (mc) mc.scrollTop = 0; window.scrollTo(0, 0); } catch (e) {}
   }
@@ -376,8 +411,13 @@
     }, function (e) { toast(e && e.status === 403 ? 'Das Partner-Cockpit gibt es mit dem Partner-Plan.' : fehlerText(e)); });
   }
   function cockpitZeigen(c, startReiter) {
+    S.partner = c; menuePflegen();
+    arbeitsbereichZeigen('partner', c.partner && c.partner.name || '', startReiter);
+  }
+  /* v3640b · ein Arbeitsbereich fuer beide Seiten: art 'partner' (Cockpit) oder 'kunde' (Mein Partner) */
+  function arbeitsbereichZeigen(art, kopfName, startReiter) {
     {
-      S.partner = c; menuePflegen();
+      PK.art = art;
       try { if (window._currentObjKey && typeof window.saveObj === 'function') window.saveObj({ silent: true }); } catch (e) {}
       try { if (document.body.classList.contains('qc-standalone-active') && typeof window.exitQuickCheckMode === 'function') window.exitQuickCheckMode(); } catch (e) {}
       try { if (typeof window.closeSettings === 'function' && document.querySelector('.settings-overlay.open, #settings-overlay.open')) window.closeSettings(); } catch (e) {}
@@ -390,11 +430,13 @@
       try {   /* v3450 · im Kopf statt Objektnummer und Anschrift der Name des Cockpits */
         var zeile = document.querySelector('header.hdr .hdr-v61-row1'), ht = document.getElementById('dppk-hdr-titel');
         if (zeile && !ht) { ht = document.createElement('span'); ht.id = 'dppk-hdr-titel'; var vor = zeile.querySelector('#hdr-obj-num'); zeile.insertBefore(ht, vor || zeile.firstChild); }
-        if (ht) ht.innerHTML = '<small>Partner-Cockpit</small>' + esc(c.partner && c.partner.name || '');
+        if (ht) ht.innerHTML = '<small>' + (art === 'kunde' ? 'Mein Partner' : 'Partner-Cockpit') + '</small>' + esc(kopfName || '');
       } catch (e) {}
       PK.offen = true;
       var s = abSektion(); if (s) s.style.display = '';
-      reiterWahl(startReiter && TITEL[startReiter] ? startReiter : (PK.aktiv || 'uebersicht'));
+      var erlaubt = reiterListe().map(function (x) { return x.k; });
+      var ziel = startReiter && erlaubt.indexOf(startReiter) >= 0 ? startReiter : (erlaubt.indexOf(PK.aktivJe[art]) >= 0 ? PK.aktivJe[art] : erlaubt[0]);
+      reiterWahl(ziel);
     }
   }
   function cockpitSchliessen() {
@@ -680,41 +722,133 @@
       '<label class="pk-schalter"><span>E-Mail an den Kunden bei Rückmeldung<small>Wenn du Anmerkungen mit „Zurück an Kunden“ zurückgibst, bekommt er eine E-Mail in deiner Marke mit Objekt, Zahl der Anmerkungen und deinem Begleittext. Vorgabe an.</small></span>' +
       '<input type="checkbox" id="pk-k-mailrm"' + (k.mail_rueckmeldung !== false ? ' checked' : '') + '></label>';
   }
+  /* ── v3640c · Fenster im Stil des RND-Rechners (Marcel 17.11.2026: „Unter Stufen und Rechte ist das Modal sehr lang.
+     Kann man das so machen wie das Modal der RND? Auch das Design?“). DIESELBEN Bausteine wie rnd-wizard.js und
+     gutachterpartner.js (css/rnd-styles.css, v3258): .rnd-wiz-overlay.rnd-hub, .rnd-wiz-modal, .rnd-wiz-header,
+     Schrittleiste .rnd-wiz-steps/.rnd-hub-schritt mit .rnd-hub-nr/.rnd-hub-kurz, Balken, .rnd-hub-karte, .rnd-hub-zeile,
+     .rnd-hub-chip, .rnd-wiz-field, Fuss .rnd-wiz-footer.rnd-hub-nav. rnd-wizard.js selbst bleibt unberuehrt.
+     Reiter sind frei anklickbar (nichts wird gerechnet), gespeichert wird einmal unten.
+     o: { id, titel, sub, reiter: [{ kurz, titel, html }], knoepfe: [{ t, pri, fn(box) }], inline: Element|null, start } */
+  function hubAufbauen(o) {
+    stil();
+    var alt = o.id ? document.getElementById(o.id) : null; if (alt) alt.remove();
+    var box = document.createElement('div'); if (o.id) box.id = o.id;
+    box.className = 'rnd-wiz-overlay rnd-hub dppk-hub' + (o.inline ? ' dppk-hub-inline' : '');
+    box.innerHTML = '<div class="rnd-wiz-modal"' + (o.inline ? '' : ' role="dialog" aria-modal="true"') + ' aria-label="' + esc(o.titel) + '">' +
+      '<div class="rnd-wiz-header"><div class="rnd-wiz-title"><h2>' + esc(o.titel) + '</h2><p class="rnd-wiz-sub" data-hub-sub></p></div>' +
+      (o.inline ? '' : '<button type="button" class="rnd-wiz-close" aria-label="Schließen">&times;</button>') + '</div>' +
+      '<div class="rnd-wiz-progress rnd-hub-leiste"><div class="rnd-wiz-steps rnd-hub-schritte" data-hub-schritte></div>' +
+      '<div class="rnd-hub-balken"><div class="rnd-wiz-progress-bar" data-hub-balken></div></div></div>' +
+      '<div class="rnd-wiz-body" data-hub-inhalt>' + o.reiter.map(function (r, i) { return '<div class="dppk-hub-reiter" data-hub-r="' + i + '"' + (i ? ' hidden' : '') + '>' + r.html + '</div>'; }).join('') + '</div>' +
+      '<div class="rnd-wiz-footer rnd-hub-nav"><button type="button" class="rnd-wiz-btn rnd-wiz-btn-sec rnd-hub-zurueck" data-hub-zurueck>← Zurück</button>' +
+      '<div class="rnd-wiz-counter" data-hub-zaehler></div>' +
+      (o.knoepfe || []).map(function (k, i) { return '<button type="button" class="rnd-wiz-btn ' + (k.pri ? 'rnd-wiz-btn-pri' : 'rnd-wiz-btn-sec') + '" data-hub-k="' + i + '">' + esc(k.t) + '</button>'; }).join('') +
+      '<button type="button" class="rnd-wiz-btn rnd-wiz-btn-sec rnd-hub-weiter" data-hub-weiter>Weiter →</button></div></div>';
+    if (o.inline) { o.inline.innerHTML = ''; o.inline.appendChild(box); } else document.body.appendChild(box);
+    var akt = 0, n = o.reiter.length;
+    function zu() { box.remove(); document.removeEventListener('keydown', esc1, true); }
+    function esc1(e) { if (e.key === 'Escape' && document.body.contains(box) && !document.getElementById('dppk-dlg')) zu(); }
+    function zeigen(i) {
+      akt = Math.max(0, Math.min(n - 1, i));
+      [].forEach.call(box.querySelectorAll('[data-hub-r]'), function (d) { d.hidden = +d.getAttribute('data-hub-r') !== akt; });
+      var l = box.querySelector('[data-hub-schritte]'); l.innerHTML = '';
+      o.reiter.forEach(function (r, ri) {
+        var b = document.createElement('button'); b.type = 'button';
+        b.className = 'rnd-wiz-step rnd-hub-schritt' + (ri === akt ? ' active' : '') + (ri < akt ? ' done' : '');
+        b.innerHTML = '<span class="rnd-hub-nr">' + (ri + 1) + '</span><em class="rnd-hub-kurz">' + esc(r.kurz) + '</em>';
+        b.title = r.titel; if (ri === akt) b.setAttribute('aria-current', 'step');
+        b.onclick = function () { zeigen(ri); };
+        l.appendChild(b);
+      });
+      box.querySelector('[data-hub-balken]').style.width = (n > 1 ? akt / (n - 1) * 100 : 100) + '%';
+      box.querySelector('[data-hub-sub]').textContent = (o.sub ? o.sub + ' · ' : '') + o.reiter[akt].titel;
+      box.querySelector('[data-hub-zaehler]').textContent = 'Reiter ' + (akt + 1) + ' von ' + n;
+      box.querySelector('[data-hub-zurueck]').style.visibility = akt > 0 ? 'visible' : 'hidden';
+      box.querySelector('[data-hub-weiter]').style.visibility = akt < n - 1 ? 'visible' : 'hidden';
+      var inh = box.querySelector('[data-hub-inhalt]'); if (inh) inh.scrollTop = 0;
+    }
+    box.querySelector('[data-hub-zurueck]').onclick = function () { zeigen(akt - 1); };
+    box.querySelector('[data-hub-weiter]').onclick = function () { zeigen(akt + 1); };
+    var x = box.querySelector('.rnd-wiz-close'); if (x) x.onclick = zu;
+    if (!o.inline) { box.addEventListener('click', function (e) { if (e.target === box) e.stopPropagation(); }); document.addEventListener('keydown', esc1, true); }   /* wie der RND-Rechner: daneben klicken schliesst nicht */
+    [].forEach.call(box.querySelectorAll('[data-hub-k]'), function (b) {
+      var k = o.knoepfe[+b.getAttribute('data-hub-k')];
+      b.onclick = function () {
+        if (!k.fn) return zu();
+        b.disabled = true;
+        Promise.resolve(k.fn(box)).then(function (r) { b.disabled = false; if (r !== false && !o.inline) zu(); }, function (e) { b.disabled = false; toast(fehlerText(e)); });
+      };
+    });
+    zeigen(o.start || 0);
+    box._zu = zu; box._zeigen = zeigen;
+    return box;
+  }
+  function hubZeile(titel, text, rechts) {
+    return '<div class="rnd-hub-zeile"><div class="rnd-hub-zeile-text"><b>' + esc(titel) + '</b>' + (text ? '<span>' + esc(text) + '</span>' : '') + '</div>' + (rechts || '') + '</div>';
+  }
+  function hubChips(name, werte, wahl, gesperrt) {
+    return '<div class="rnd-hub-chips' + (gesperrt ? ' dppk-fest' : '') + '">' + werte.map(function (w) {
+      return '<label class="rnd-hub-chip"><input type="radio" name="' + name + '" value="' + esc(w[0]) + '"' + (String(w[0]) === String(wahl) ? ' checked' : '') + (gesperrt ? ' disabled' : '') + '>' + esc(w[1]) + '</label>';
+    }).join('') + '</div>';
+  }
+  var STUFEN_TEXT = { 1: 'Kennzahlen, Cashflow und Score. Die wichtigsten Felder.', 2: 'Zusätzlich Finanzierung im Detail, Steuer und Mietentwicklung.', 3: 'Alle Felder, dazu die Wertermittlung im Marktbericht.' };
+  /* Inhalt der Reiter „Stufe“, „Rechte“, „Kontingente & Netzwerk“, „Marke“ - beim Partner zum Einstellen, beim Kunden
+     (Mein Partner › Freigaben) dieselben Karten nur lesend (gesperrt) */
+  function freigabeReiter(k, partnerName, gesperrt) {
+    var r = k.rechte_wirksam || k.rechte || {};
+    var fest = gesperrt ? '<p class="rnd-hub-hinweis">Das legt dein Partner fest.</p>' : '';
+    return [
+      { kurz: 'Stufe', titel: 'Detailgrad der App', html: '<section class="rnd-hub-karte"><h3 class="rnd-hub-h">Stufe</h3>' + fest + '<div class="rnd-wiz-mod-list">' +
+        [1, 2, 3].map(function (s) { return hubZeile(STUFEN[s], STUFEN_TEXT[s], hubChips('pk-k-stufe', [[s, (k.stufe || 2) === s ? 'gewählt' : 'wählen']], (k.stufe || 2), gesperrt)); }).join('') + '</div></section>' },
+      { kurz: 'Rechte', titel: 'Was der Platz darf', html: '<section class="rnd-hub-karte"><h3 class="rnd-hub-h">Rechte des Platzes</h3>' +
+        (gesperrt ? fest : '<p class="rnd-hub-hinweis">Ein Platz umfasst höchstens den Investor-Plan. Hier schaltest du einzelne Teile ab.</p>') + '<div class="rnd-wiz-mod-list">' +
+        RECHTE_TEXT.map(function (x) { return hubZeile(x[1], x[2], hubChips('pk-r-' + x[0], [['an', 'an'], ['aus', 'aus']], r[x[0]] !== false ? 'an' : 'aus', gesperrt)); }).join('') + '</div></section>' },
+      { kurz: 'Kontingente', titel: 'Marktberichte und Partnernetzwerk', html: '<section class="rnd-hub-karte"><h3 class="rnd-hub-h">Kontingente</h3>' + fest +
+        '<div class="rnd-wiz-grid rnd-hub-felder"><div class="rnd-wiz-field"><label for="pk-k-mb">Marktberichte je Monat</label><input type="number" id="pk-k-mb" min="0" max="10" placeholder="wie Investor" value="' + (k.kontingent && k.kontingent.marktbericht != null ? k.kontingent.marktbericht : '') + '"' + (gesperrt ? ' disabled' : '') + '>' +
+        '<span class="rnd-wiz-hint">Höchstens 10, leer heißt wie im Investor-Plan.</span></div></div></section>' +
+        '<section class="rnd-hub-karte"><h3 class="rnd-hub-h">Partnernetzwerk</h3><div class="rnd-wiz-mod-list">' +
+        hubZeile('Partnernetzwerk zeigen', 'Makler, Finanzierer und Gutachter aus deinem Netzwerk. Vorgabe aus.', hubChips('pk-k-netz', [['an', 'an'], ['aus', 'aus']], k.netzwerk ? 'an' : 'aus', gesperrt)) + '</div></section>' },
+      { kurz: 'Marke', titel: 'In welcher Marke der Kunde die App sieht', html: '<section class="rnd-hub-karte"><h3 class="rnd-hub-h">Marke beim Kunden</h3>' + fest + '<div class="rnd-wiz-mod-list">' +
+        hubZeile(gesperrt ? 'Marke deines Partners' : 'Deine Marke', partnerName || '', hubChips('pk-k-marke', [['partner', k.marke !== 'dealpilot' ? 'gewählt' : 'wählen']], k.marke !== 'dealpilot' ? 'partner' : '', gesperrt)) +
+        hubZeile('DealPilot', '', hubChips('pk-k-marke', [['dealpilot', k.marke === 'dealpilot' ? 'gewählt' : 'wählen']], k.marke === 'dealpilot' ? 'dealpilot' : '', gesperrt)) + '</div></section>' }
+    ];
+  }
+  function chipWert(box, name) { var x = box.querySelector('input[name="' + name + '"]:checked'); return x ? x.value : null; }
+  function kundeReiter(k) {
+    return { kurz: 'Kunde', titel: 'Kundennummer, Notiz und E-Mail', html: '<section class="rnd-hub-karte"><h3 class="rnd-hub-h">Kunde</h3>' +
+      '<div class="rnd-wiz-grid rnd-hub-felder"><div class="rnd-wiz-field"><label for="pk-k-nr">Kundennummer</label><input type="text" id="pk-k-nr" maxlength="30" value="' + esc(k.kundennummer || '') + '" placeholder="K-' + new Date().getFullYear() + '-001">' +
+      '<span class="rnd-wiz-hint">Vergibt DealPilot fortlaufend je Jahr. Du kannst sie ändern, sie muss bei dir eindeutig sein.</span></div>' +
+      '<div class="rnd-wiz-field"><label>Zugang</label><input type="text" disabled value="' + (k.platz_art === 'platz' ? 'Partnerplatz' : 'eigener Plan') + ', ' + esc(k.email || '') + '"></div>' +
+      '<div class="rnd-wiz-field rnd-wiz-col-2"><label for="pk-k-notiz">Notiz (nur dein Team)</label><textarea id="pk-k-notiz" maxlength="2000" rows="3">' + esc(k.notiz || '') + '</textarea></div></div></section>' +
+      '<section class="rnd-hub-karte"><h3 class="rnd-hub-h">Benachrichtigung</h3><div class="rnd-wiz-mod-list">' +
+      hubZeile('E-Mail an den Kunden bei Rückmeldung', 'Bei „Zurück an Kunden“ eine E-Mail in deiner Marke mit Objekt, Zahl der Anmerkungen und Begleittext.', hubChips('pk-k-mailrm', [['an', 'an'], ['aus', 'aus']], k.mail_rueckmeldung !== false ? 'an' : 'aus')) +
+      '</div></section>' };
+  }
   function kundeDialog(el, id) {
     var k = S.partner.kunden.filter(function (x) { return x.id === id; })[0]; if (!k) return;
-    if (k.platz_art !== 'platz') {
-      return dialog('Notiz und E-Mail zu ' + k.display_name, '<div class="pk-hinweis">Der Kunde hat einen eigenen Plan. Stufe, Rechte und Marke bestimmt er selbst. Die Notiz sieht nur dein Team.</div>' +
-        nrFeld(k) +
-        '<label class="pk-feld">Notiz<textarea id="pk-k-notiz" maxlength="2000">' + esc(k.notiz || '') + '</textarea></label>' + mailSchalter(k),
-        [{ t: 'Abbrechen' }, { t: 'Speichern', c: 'gold', fn: function (d) { return api('/partner/kunden/' + id, { method: 'PUT', body: { kundennummer: wert(d, '#pk-k-nr'), notiz: wert(d, '#pk-k-notiz'), mail_rueckmeldung: wert(d, '#pk-k-mailrm') } }).then(function () { toast('Gespeichert.'); neuLaden(el); }); } }]);
+    var platz = k.platz_art === 'platz';
+    var reiter = [kundeReiter(k)];
+    if (platz) {
+      reiter = reiter.concat(freigabeReiter(k, S.partner.partner.name, false));
+      reiter.push({ kurz: 'Platz', titel: 'Partnerplatz entziehen', html: '<section class="rnd-hub-karte"><h3 class="rnd-hub-h">Platz</h3><p class="rnd-hub-hinweis"><strong>Platz entziehen:</strong> der Kunde bekommt 30 Tage Frist zum Export oder für ein eigenes Abo. Danach werden seine Verbindungen getrennt und sein Konto gelöscht.</p>' +
+        '<div><button type="button" class="pk-btn rot" data-hub-entzug style="border:1px solid #B8625C;background:#B8625C;color:#fff;border-radius:7px;padding:8px 14px;font:600 13px Inter,sans-serif;cursor:pointer">Platz entziehen …</button></div></section>' });
+    } else {
+      reiter.push({ kurz: 'Freigaben', titel: 'Stufe, Rechte und Marke', html: '<section class="rnd-hub-karte"><h3 class="rnd-hub-h">Eigener Plan</h3><p class="rnd-hub-hinweis">Der Kunde bezahlt selbst. Stufe, Rechte und Marke bestimmt er in seiner App unter Mein Partner › Freigaben. Du siehst nur, was er dir sendet.</p></section>' });
     }
-    var r = k.rechte_wirksam || {};
-    var html = nrFeld(k) + '<div class="pk-gruppe">Stufe</div>' + [1, 2, 3].map(function (s) {
-      var t = { 1: 'Kennzahlen, Cashflow und Score. Die wichtigsten Felder.', 2: 'Zusätzlich Finanzierung im Detail, Steuer und Mietentwicklung.', 3: 'Alle Felder, dazu die Wertermittlung im Marktbericht.' }[s];
-      return '<label class="pk-wahl"><input type="radio" name="pk-k-stufe" value="' + s + '"' + ((k.stufe || 2) === s ? ' checked' : '') + '><span><b>' + STUFEN[s] + '</b>' + t + '</span></label>';
-    }).join('') +
-      '<div class="pk-gruppe">Marke beim Kunden</div>' +
-      '<label class="pk-wahl"><input type="radio" name="pk-k-marke" value="partner"' + (k.marke !== 'dealpilot' ? ' checked' : '') + '><span><b>Deine Marke</b>' + esc(S.partner.partner.name) + '</span></label>' +
-      '<label class="pk-wahl"><input type="radio" name="pk-k-marke" value="dealpilot"' + (k.marke === 'dealpilot' ? ' checked' : '') + '><span><b>DealPilot</b></span></label>' +
-      '<div class="pk-gruppe">Rechte des Platzes</div><div style="font-size:12.5px;color:#7A7370;margin-bottom:4px">Ein Platz umfasst höchstens den Investor-Plan. Hier schaltest du einzelne Teile ab.</div>' +
-      RECHTE_TEXT.map(function (x) { return '<label class="pk-schalter"><span>' + esc(x[1]) + (x[2] ? '<small>' + esc(x[2]) + '</small>' : '') + '</span><input type="checkbox" data-recht="' + x[0] + '"' + (r[x[0]] !== false ? ' checked' : '') + '></label>'; }).join('') +
-      '<label class="pk-schalter"><span>Partnernetzwerk zeigen<small>Vorgabe aus.</small></span><input type="checkbox" id="pk-k-netz"' + (k.netzwerk ? ' checked' : '') + '></label>' +
-      '<label class="pk-feld" style="margin-top:12px">Marktberichte je Monat (höchstens 10, leer = wie Investor)<input type="number" id="pk-k-mb" min="0" max="10" value="' + (k.kontingent && k.kontingent.marktbericht != null ? k.kontingent.marktbericht : '') + '"></label>' +
-      '<label class="pk-feld">Notiz (nur dein Team)<textarea id="pk-k-notiz" maxlength="2000">' + esc(k.notiz || '') + '</textarea></label>' +
-      mailSchalter(k) +
-      '<div class="pk-gruppe">Platz</div><div class="pk-hinweis rot">Platz entziehen: der Kunde bekommt 30 Tage Frist zum Export oder für ein eigenes Abo. Danach werden seine Verbindungen getrennt und sein Konto gelöscht.</div>';
-    dialog('Stufe und Rechte für ' + k.display_name, html, [
-      { t: 'Platz entziehen', c: '', fn: function () { entzugDialog(el, k); } },
-      { t: 'Abbrechen' },
-      { t: 'Speichern', c: 'gold', fn: function (d) {
-        var rechte = {}; [].forEach.call(d.querySelectorAll('[data-recht]'), function (x) { rechte[x.getAttribute('data-recht')] = x.checked; });
-        var mb = wert(d, '#pk-k-mb');
-        return api('/partner/kunden/' + id, { method: 'PUT', body: {
-          stufe: (d.querySelector('input[name="pk-k-stufe"]:checked') || {}).value, marke: (d.querySelector('input[name="pk-k-marke"]:checked') || {}).value,
-          rechte: rechte, netzwerk: wert(d, '#pk-k-netz'), kontingent: mb === '' ? {} : { marktbericht: Number(mb) }, notiz: wert(d, '#pk-k-notiz'), mail_rueckmeldung: wert(d, '#pk-k-mailrm'), kundennummer: wert(d, '#pk-k-nr') } })
-          .then(function () { toast('Gespeichert.'); neuLaden(el); });
-      } }]);
+    var box = hubAufbauen({ id: 'dppk-hub-kunde', titel: (platz ? 'Stufe und Rechte · ' : 'Kunde · ') + (k.kundennummer ? k.kundennummer + ' · ' : '') + k.display_name, sub: platz ? 'Partnerplatz' : 'Eigener Plan', reiter: reiter,
+      knoepfe: [{ t: 'Speichern', pri: true, fn: function (b) {
+        var body = { kundennummer: wert(b, '#pk-k-nr'), notiz: wert(b, '#pk-k-notiz'), mail_rueckmeldung: chipWert(b, 'pk-k-mailrm') !== 'aus' };
+        if (platz) {
+          var rechte = {}; RECHTE_TEXT.forEach(function (x) { rechte[x[0]] = chipWert(b, 'pk-r-' + x[0]) !== 'aus'; });
+          var mb = wert(b, '#pk-k-mb');
+          Object.assign(body, { stufe: chipWert(b, 'pk-k-stufe'), marke: chipWert(b, 'pk-k-marke'), rechte: rechte, netzwerk: chipWert(b, 'pk-k-netz') === 'an', kontingent: mb === '' ? {} : { marktbericht: Number(mb) } });
+        }
+        return api('/partner/kunden/' + id, { method: 'PUT', body: body }).then(function () { toast('Gespeichert.'); neuLaden(el); });
+      } }] });
+    var ez = box.querySelector('[data-hub-entzug]'); if (ez) ez.onclick = function () { box._zu(); entzugDialog(el, k); };
+    return box;
   }
+  /* v3460 · Zeilen fuer den Pruefer: der Schalter steht in beiden Zugangsarten im Reiter Kunde (kundeReiter), gespeichert als mail_rueckmeldung */
 
   function entzugDialog(el, k) {
     dialog('Platz entziehen', '<div class="pk-hinweis rot"><b>' + esc(k.display_name) + '</b> verliert den Partnerplatz. Der Platz ist für dich sofort wieder frei.<br>' +
@@ -846,23 +980,36 @@
   }
 
   /* ════ MEIN PARTNER (Kunde) ═════════════════════════════════════════════ */
+  /* v3640b · im Arbeitsbereich wie das Partner-Cockpit (vorher eigenes Fenster #dppk-ov). start: 'senden' | 'sendungen' |
+     'aufgaben' | 'freigaben' | 'verbindung' (alte Namen bleiben gueltig, Aufrufer in messe-drehbuch.js und Mails) */
   function meinPartnerOeffnen(start) {
     return api('/mein-partner').then(function (m) {
       S.kunde = m; menuePflegen(); rechteAnwenden();
-      var v = m.verbunden;
-      if (!v) {
-        return ansichtOeffnen('Mein Partner', 'Mit einem Partner verbinden', [{ k: 'verbinden', t: 'Verbinden', zahl: m.anfragen.length }], function (k, el) { verbindenZeichnen(el); });
-      }
-      var offen = (m.aufgaben || []).filter(function (a) { return a.status !== 'erledigt' && a.status !== 'abgelehnt'; }).length;
-      var reiter = [{ k: 'senden', t: 'An Partner senden' }, { k: 'sendungen', t: 'Meine Sendungen' }, { k: 'aufgaben', t: 'Aufgaben', zahl: offen }, { k: 'verbindung', t: 'Verbindung' }];
-      if (start) reiter.sort(function (a) { return a.k === start ? -1 : 0; });
-      ansichtOeffnen('Mein Partner', v.partner_name, reiter, function (k, el, neu) {
-        if (k === 'senden') return sendenZeichnen(el, neu);
-        if (k === 'sendungen') return sendungenZeichnen(el);
-        if (k === 'aufgaben') return kundeAufgabenZeichnen(el);
-        if (k === 'verbindung') return verbindungZeichnen(el);
-      });
+      var alt = document.getElementById('dppk-ov'); if (alt) alt.remove();
+      arbeitsbereichZeigen('kunde', m.verbunden ? m.verbunden.partner_name : 'Mit einem Partner verbinden', start ? (/^k_/.test(start) ? start : 'k_' + start) : null);
     }, function (e) { toast(fehlerText(e)); });
+  }
+
+  /* v3640b · Reiter Freigaben (Kunde): dieselben Karten wie der Partner-Dialog „Stufe und Rechte“ (freigabeReiter), beim
+     Partnerplatz nur lesend („legt dein Partner fest“), beim eigenen Plan waehlt der Kunde die Marke selbst. */
+  function freigabenZeichnen(el) {
+    var v = S.kunde && S.kunde.verbunden; if (!v) return verbindenZeichnen(el);
+    var platz = v.platz_art === 'platz';
+    var ueber = { kurz: 'Überblick', titel: 'Was dein Partner sieht', html: '<section class="rnd-hub-karte"><h3 class="rnd-hub-h">Dein Partner sieht</h3><div class="rnd-wiz-mod-list">' +
+      hubZeile('Nur, was du sendest', 'Objekte gehen als Kopie an ' + v.partner_name + '. Deine übrigen Objekte sieht er nie.', '') +
+      hubZeile('Anmerkungen und Aufgaben', 'Er kann dir Rückmeldungen und Bitten schicken, du antwortest in deinem Objekt.', '') +
+      hubZeile('Zugang', platz ? 'Partnerplatz, dein Partner bezahlt und legt Stufe, Rechte und Marke fest.' : 'Eigener Plan, du bezahlst selbst und bestimmst alles.', '') +
+      (v.kundennummer ? hubZeile('Deine Kundennummer', v.kundennummer, '') : '') + '</div></section>' };
+    var reiter = [ueber], knoepfe = [];
+    if (platz) reiter = reiter.concat(freigabeReiter(v, v.partner_name, true));
+    else {
+      reiter.push({ kurz: 'Marke', titel: 'In welcher Marke du die App siehst', html: '<section class="rnd-hub-karte"><h3 class="rnd-hub-h">Marke</h3><p class="rnd-hub-hinweis">Das bestimmst du selbst. Die Marke wechselt beim nächsten Laden.</p><div class="rnd-wiz-mod-list">' +
+        hubZeile('DealPilot', '', hubChips('pk-m', [['dealpilot', v.marke !== 'partner' ? 'gewählt' : 'wählen']], v.marke !== 'partner' ? 'dealpilot' : '')) +
+        hubZeile('Marke von ' + v.partner_name, '', hubChips('pk-m', [['partner', v.marke === 'partner' ? 'gewählt' : 'wählen']], v.marke === 'partner' ? 'partner' : '')) + '</div></section>' });
+      reiter.push({ kurz: 'Rechte', titel: 'Stufe und Rechte', html: '<section class="rnd-hub-karte"><h3 class="rnd-hub-h">Stufe und Rechte</h3><p class="rnd-hub-hinweis">Mit eigenem Plan gilt dein Plan. Dein Partner schaltet nichts ab.</p></section>' });
+      knoepfe.push({ t: 'Speichern', pri: true, fn: function (b) { var w = chipWert(b, 'pk-m'); return api('/mein-partner/marke', { method: 'PUT', body: { marke: w } }).then(function () { toast('Gespeichert. Die Marke wechselt beim nächsten Laden.'); if (S.kunde && S.kunde.verbunden) S.kunde.verbunden.marke = w; }); } });
+    }
+    hubAufbauen({ titel: platz ? 'Freigaben deines Partnerplatzes' : 'Freigaben', sub: v.partner_name, reiter: reiter, knoepfe: knoepfe, inline: el });
   }
 
   function objekteHolen() {
@@ -931,7 +1078,7 @@
       fehlenKnoepfe(d0);
       return d0;
     }
-    dialog('An Partner senden', '<p>' + (bestand ? 'Dein gesamter Bestand (' + ids.length + ' Objekte)' : (ids.length === 1 ? 'Ein Objekt' : ids.length + ' Objekte')) + ' gehen als Kopie an <b>' + esc(v.partner_name) + '</b>.</p>' +
+    dialog('An Partner senden', '<p>' + (bestand ? 'Dein gesamter Bestand (' + ids.length + ' Objekte) geht' : (ids.length === 1 ? 'Ein Objekt geht' : ids.length + ' Objekte gehen')) + ' als Kopie an <b>' + esc(v.partner_name) + '</b>.</p>' +
       (bestand && gesperrt.length ? '<div class="pk-fehlen">' + (gesperrt.length === 1 ? '1 Objekt bleibt' : gesperrt.length + ' Objekte bleiben') + ' zurück, weil dort noch Anmerkungen ohne Bearbeitung stehen.</div>' : '') +
       '<div class="pk-hinweis">Dein Partner kann die Kopie laden, rechnen, PDFs erstellen und als eigenes Objekt übernehmen. Eine übernommene Kopie bleibt bei ihm, auch wenn du später zurückziehst. Deine Originale ändert er nie.</div>',
       [{ t: 'Abbrechen' }, { t: 'Senden', c: 'gold', fn: function () {
@@ -1004,14 +1151,12 @@
       ? '<b>Partnerplatz.</b> ' + esc(v.partner_name) + ' bezahlt deinen Zugang und hat die Stufe <b>' + esc(v.stufe_text || 'Fortgeschritten') + '</b> gewählt.'
       : '<b>Eigener Plan.</b> Du bezahlst selbst. ' + esc(v.partner_name) + ' bestimmt nichts an deinem Konto.';
     var aus = v.rechte ? RECHTE_TEXT.filter(function (x) { return v.rechte[x[0]] === false; }).map(function (x) { return x[1]; }) : [];
-    el.innerHTML = '<div class="pk-hinweis">' + zug + ' Verbunden seit ' + datum(v.verbunden_am) + '.' + (v.kundennummer ? ' Deine Kundennummer bei ' + esc(v.partner_name) + ': <b>' + esc(v.kundennummer) + '</b>.' : '') + '</div>' +
+    el.innerHTML = '<div class="pk-hinweis">' + zug + ' Verbunden seit ' + datum(v.verbunden_am) + '.' + (v.kundennummer ? ' Deine Kundennummer bei ' + esc(v.partner_name) + ': <b>' + esc(v.kundennummer) + '</b>.' : '') + ' Was dein Zugang darf, steht unter <button type="button" class="pk-mehr" data-geh-k="k_freigaben">Freigaben</button>.</div>' +
       (v.entzug_frist_bis ? '<div class="pk-hinweis rot">Dein Partnerplatz wurde entzogen. Bis <b>' + datum(v.entzug_frist_bis) + '</b> kannst du deine Daten exportieren oder ein eigenes Abo abschließen, dann bleibt alles erhalten. Ohne eigenes Abo werden danach dein Konto und deine Daten gelöscht.</div>' : '') +
       (aus.length ? '<div class="pk-gruppe">Von deinem Partner ausgeschaltet</div><div style="font-size:13px;line-height:1.6">' + aus.map(esc).join(', ') + '</div>' : '') +
-      (v.platz_art === 'eigen' ? '<div class="pk-gruppe">Marke</div><label class="pk-wahl"><input type="radio" name="pk-m" value="dealpilot"' + (v.marke !== 'partner' ? ' checked' : '') + '><span><b>DealPilot</b></span></label>' +
-        '<label class="pk-wahl"><input type="radio" name="pk-m" value="partner"' + (v.marke === 'partner' ? ' checked' : '') + '><span><b>Marke von ' + esc(v.partner_name) + '</b></span></label>' : '') +
       '<div class="pk-gruppe">Verbindung</div><div class="pk-leiste">' + (v.entzug_frist_bis || v.platz_art === 'platz' ? '<button type="button" class="pk-btn" data-a="abo">Eigenes Abo abschließen</button>' : '') +
       '<button type="button" class="pk-btn" data-a="export">Meine Daten exportieren</button><button type="button" class="pk-btn rot" data-a="trennen">Verbindung trennen</button></div>';
-    [].forEach.call(el.querySelectorAll('input[name="pk-m"]'), function (r) { r.onchange = function () { api('/mein-partner/marke', { method: 'PUT', body: { marke: r.value } }).then(function () { toast('Gespeichert. Die Marke wechselt beim nächsten Laden.'); }); }; });
+    var gk = el.querySelector('[data-geh-k]'); if (gk) gk.onclick = function () { reiterWahl(gk.getAttribute('data-geh-k')); };   /* v3640b · Marke steht jetzt unter Freigaben */
     var abo = el.querySelector('[data-a="abo"]'); if (abo) abo.onclick = function () { var ov = document.getElementById('dppk-ov'); if (ov) ov.remove(); try { if (typeof showSettings === 'function') showSettings('plan'); } catch (e) {} };
     el.querySelector('[data-a="export"]').onclick = function () { try { if (typeof exportAllObjectsJson === 'function') exportAllObjectsJson(); else toast('Export unter Aktionen › Export.'); } catch (e) {} };
     el.querySelector('[data-a="trennen"]').onclick = function () {
@@ -1091,7 +1236,8 @@
     if (p) { p.classList.toggle('dp-frei', !!S.partner); p.classList.toggle('dp-punkt', !!(S.partner && (S.partner.meldungen_ungelesen || S.partner.anfragen && 0))); }
     if (k) {
       var m = S.kunde, offen = !!(m && ((m.anfragen && m.anfragen.length) || (m.verbunden && (m.verbunden.entzug_frist_bis || (m.aufgaben || []).some(function (a) { return a.status === 'offen'; })))));
-      k.classList.toggle('dp-frei', !!(m && m.verbunden));
+      /* v3640b · auch ohne Verbindung (Verbindungscode), nur nicht fuer Partnerkonten - die Einstellungen fuehren nicht mehr dorthin */
+      k.classList.toggle('dp-frei', !!(m && (m.verbunden || (S.partnerGeladen && !S.partner))));
       k.classList.toggle('dp-punkt', offen);
     }
     if (PK.offen && document.getElementById('dppk-tabzeile')) tabzeile();   /* v3390 · Zahlen an den Reitern */
@@ -1223,17 +1369,16 @@
     if (z.innerHTML !== html) z.innerHTML = html;
   }
 
-  /* ── Einstellungen: Zugang zum Verbindungscode auch ohne Verbindung ───── */
+  /* ── Einstellungen: nur noch ein Verweis (v3640b, Marcel 17.11.2026: „Dann brauchen wir das unter Einstellungen nicht
+     mehr.“). Verbindungscode, Freigaben und Trennen stehen unter Aktionen › Mein Partner. */
   function einstellungenErgaenzen() {
     var pane = document.querySelector('.st-pane[data-pane="account"]');
     if (!pane || pane.querySelector('#dppk-st')) return;
     var p = S.partner; if (p) return;   /* ein Partnerkonto verbindet sich nicht als Kunde */
-    var c = document.createElement('div'); c.id = 'dppk-st';
-    c.setAttribute('style', 'margin:16px 0;padding:12px 14px;border:1px solid #EDE2C6;border-radius:10px;background:#FBF6E9;font:400 13px Inter,sans-serif;color:#2A2727');
-    var v = S.kunde && S.kunde.verbunden;
-    c.innerHTML = '<b style="display:block;font:600 13px Inter;margin-bottom:4px">Partner</b>' + (v ? 'Verbunden mit ' + esc(v.partner_name) + '.' : 'Mit deinem Steuerberater, Makler oder Finanzierer verbinden, per Verbindungscode.') +
-      ' <button type="button" style="margin-left:6px;border:1px solid #D9CFB8;background:#fff;border-radius:8px;padding:6px 11px;font:600 12px Inter;cursor:pointer">' + (v ? 'Mein Partner' : 'Verbindungscode erzeugen') + '</button>';
-    c.querySelector('button').onclick = function () { meinPartnerOeffnen(); };
+    var c = document.createElement('p'); c.id = 'dppk-st'; c.className = 'hint';
+    c.setAttribute('style', 'margin:14px 0 0;font:400 12.5px Inter,sans-serif');
+    c.innerHTML = 'Mein Partner findest du jetzt unter <a href="#" data-mp="1">Aktionen › Mein Partner</a>.';
+    c.querySelector('[data-mp]').onclick = function (e) { e.preventDefault(); try { if (typeof window.closeSettings === 'function') window.closeSettings(); } catch (x) {} meinPartnerOeffnen(); };
     pane.appendChild(c);
   }
 
@@ -1304,7 +1449,7 @@
     _gestartet = true;
     stil();
     api('/mein-partner').then(function (m) { S.kunde = m; menuePflegen(); rechteAnwenden(); bandPflegen(); partnerzeile(); zielEinloesen(m); }).catch(function () {});
-    api('/partner/cockpit').then(function (c) { S.partner = c; menuePflegen(); sbGruppe(); }).catch(function () { S.partner = null; menuePflegen(); });
+    api('/partner/cockpit').then(function (c) { S.partner = c; S.partnerGeladen = true; menuePflegen(); sbGruppe(); }).catch(function () { S.partner = null; S.partnerGeladen = true; menuePflegen(); });
     var n = 0, iv = setInterval(function () { var a = speichernSperren(), b = ladenBeobachten(); renderBeobachten(); if ((a || window.saveObj && window.saveObj._dppk) && (b || window.loadSaved && window.loadSaved._dppk) || ++n > 40) clearInterval(iv); }, 500);
     new MutationObserver(function () {
       if (document.querySelector('.dab-tafel') && !document.querySelector('.dab-tafel .dab-partnerzeile') && S.kunde && S.kunde.verbunden) partnerzeile();
@@ -1317,6 +1462,6 @@
   document.addEventListener('dp:plan-ready', start);
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { setTimeout(warteAufAnmeldung, 800); }); else setTimeout(warteAufAnmeldung, 800);
 
-  window.DpPartnerKunden = { cockpitOeffnen: cockpitOeffnen, cockpitSchliessen: cockpitSchliessen, sendenDialog: sendenDialog, kundenstandVerlassen: kundenstandVerlassen, reiterWahl: function (k) { if (PK.offen) reiterWahl(k); else cockpitOeffnen(k); }, meinPartnerOeffnen: meinPartnerOeffnen, einladungFragen: einladungFragen, darf: darf, _state: S };
+  window.DpPartnerKunden = { cockpitOeffnen: cockpitOeffnen, cockpitSchliessen: cockpitSchliessen, sendenDialog: sendenDialog, kundenstandVerlassen: kundenstandVerlassen, reiterWahl: function (k) { if (PK.offen && PK.art === 'partner') reiterWahl(k); else cockpitOeffnen(k); }, meinPartnerOeffnen: meinPartnerOeffnen, einladungFragen: einladungFragen, darf: darf, _state: S };
   window.DpMeinPartner = { einladungFragen: einladungFragen };
 })();

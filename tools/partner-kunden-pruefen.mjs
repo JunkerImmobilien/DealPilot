@@ -201,7 +201,14 @@ ok('C', 'Marke nur bei aktiver Verbindung und Wahl Partner', /getrennt_am IS NUL
     /var _SB_MODI = \['recent', 'id', 'kaufdat', 'lage', 'kunde'\]/.test(st) && /h\.textContent = k \? \('Kunde ' \+ k\) : 'Eigene Objekte'/.test(st) && /data-kunde="/.test(st) && /o\.kunde_client_id \? 'Kunde ' \+ _sbKundeVon\(o\)/.test(st));
   const pkf = lies('frontend/js/partner-kunden.js');
   ok('D', 'Cockpit: Kundennummer in Kundenliste, Kundenstaenden, Meldungen, Aufgaben; aenderbar in beiden Kundendialogen',
-    /nrEtikett\(k\.kundennummer\)/.test(pkf) && /nrEtikett\(k\.kunde_nr\)/.test(pkf) && /m\.kunde_nr/.test(pkf) && /k\.kundennummer \? k\.kundennummer/.test(pkf) && (pkf.match(/kundennummer: wert\(d, '#pk-k-nr'\)/g) || []).length === 2);
+    /nrEtikett\(k\.kundennummer\)/.test(pkf) && /nrEtikett\(k\.kunde_nr\)/.test(pkf) && /m\.kunde_nr/.test(pkf) && /k\.kundennummer \? k\.kundennummer/.test(pkf) && /kundennummer: wert\(b, '#pk-k-nr'\)/.test(pkf) && /var reiter = \[kundeReiter\(k\)\];/.test(pkf));
+  /* v3640b/c · Mein Partner im Arbeitsbereich, Freigaben, Kundendialog im RND-Stil (dieselben Bausteine, rnd-wizard.js unberuehrt) */
+  ok('D', 'Kundendialog: Bausteine des RND-Rechners (rnd-wiz-overlay rnd-hub, Schrittleiste, Karten, Fuss), Reiter Kunde/Stufe/Rechte/Kontingente/Marke/Platz',
+    /className = 'rnd-wiz-overlay rnd-hub dppk-hub'/.test(pkf) && /rnd-wiz-steps rnd-hub-schritte/.test(pkf) && /rnd-wiz-footer rnd-hub-nav/.test(pkf) && /kurz: 'Stufe'/.test(pkf) && /kurz: 'Rechte'/.test(pkf) && /kurz: 'Kontingente'/.test(pkf) && /kurz: 'Marke'/.test(pkf) && /kurz: 'Platz'/.test(pkf));
+  ok('D', 'Mein Partner im Arbeitsbereich (arbeitsbereichZeigen kunde), Reiter Freigaben nutzt dieselben Karten nur lesend beim Platz',
+    /arbeitsbereichZeigen\('kunde'/.test(pkf) && /k_freigaben: 'shieldCheck'/.test(pkf) && /freigabeReiter\(v, v\.partner_name, true\)/.test(pkf) && !/return ansichtOeffnen\('Mein Partner'/.test(pkf));
+  ok('D', 'Einstellungen: nur noch ein Verweis auf Aktionen › Mein Partner, kein Verbindungscode dort', /Mein Partner findest du jetzt unter/.test(pkf) && !/'Verbindungscode erzeugen'\) \+ '<\/button>'/.test(pkf));
+  ok('D', 'rnd-wizard.js nicht angefasst von v3640 (keine dppk-Bezuege)', !/dppk/.test(lies('frontend/js/rnd-wizard.js')));
   ok('D', 'Cockpit: Rueckfrage eigener Chip, Uebernehmen mit Rueckfrage aktualisieren/neu', /pk-chip frage/.test(pkf) && /los\('neu'\)/.test(pkf) && /'Bestehendes aktualisieren'/.test(pkf));
   ok('D', 'Kunde: Senden-Dialog prueft frisch und sperrt sichtbar (fehlenJeObjekt), Sendungen-Knopf aus', /function sendenDialog[\s\S]{0,200}api\('\/mein-partner'\)/.test(pkf) && /disabled data-gesperrt="1"/.test(pkf) && /data-neu="' \+ s\.object_id \+ '"' \+ \(f \? ' disabled/.test(pkf));
   ok('D', 'Kunde-Liste: Erneut senden ausgegraut mit Zahl und Sprung', /data-f="naechste"/.test(vmq) && /data-f="senden" disabled/.test(vmq));
