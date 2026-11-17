@@ -44951,3 +44951,7 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Commit:** `9c6c11a4` auf main. Sicherungen `/root/backups/haupt-20261117-0754-vor-v3610p.sql.gz` (7,0 MB) und `mb-20261117-0754-vor-v3610p.sql.gz` (31 MB), Kopf geprüft.
 - **Nachweis:** Backend neu gebaut, healthy, Marker im Container; 0 von 2 aktiven Stripe-Abos mit leerem Laufzeitende → keine Reparatur nötig.
 - **Rest:** main trägt v3610p, staging das gleichwertige v3610c, beim nächsten Gesamt-Rollout zusammenführen.
+
+### v3620e · 17.11.2026 (nur Staging) · AVV ohne Nextcloud
+- **Was/Commit/Nachweis:** v3620e (`cb81a14b`): Nextcloud aus AVV und Datenschutzerklärung entfernt (Marcel 17.11.: nicht genutzt), damit keine [offen]-Stelle mehr. AVV bleibt Version 1.1 (gemessen: noch kein Konto hat 1.1 abgeschlossen, nur info@ die 1.0). `nextcloudService.js` bleibt im Code (aus `routes/dealAction.js` gerufen), sendet aber nichts: `_enabled()` verlangt NEXTCLOUD_BASE_URL, USERNAME und APP_PASSWORD, auf Staging alle leer. PDF neu. avv-pruefen A grün, Staging-Seite ohne Nextcloud und ohne [offen].
+- **Rest:** Mailversand-Anbieter (Alfahosting-Wechsel), rechtliche Prüfung, Prod.
