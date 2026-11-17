@@ -1153,7 +1153,7 @@ if (!window._pdfGold) {
     var seite = 'position:relative;width:' + Math.round(210 * k) + 'px;max-width:100%;overflow:hidden;border:1px solid #e6e0d4;border-radius:6px;box-shadow:0 2px 8px rgba(0,0,0,.06)';
     host.innerHTML =
       '<div style="flex:none;max-width:100%"><div style="font:600 10px/1 \'JetBrains Mono\',monospace;letter-spacing:.08em;text-transform:uppercase;color:#8a8473;margin-bottom:5px">Deckblatt</div>' +
-        '<div style="' + seite + ';height:' + Math.round(70 * k) + 'px;background:' + grund + '">' +
+        '<div style="' + seite + ';height:' + Math.round(76 * k) + 'px;background:' + grund + '">' +
           '<div style="position:absolute;left:0;right:0;top:' + (14 * k).toFixed(1) + 'px;height:' + (40 * k).toFixed(1) + 'px;display:flex;justify-content:center;align-items:flex-start">' +
             '<div style="position:relative;width:' + (cb.b * k).toFixed(1) + 'px;height:' + (cb.h * k).toFixed(1) + 'px;display:flex;justify-content:center">' + bild(cb, 'top:0') + '</div></div>' +
           '<div style="position:absolute;left:0;right:0;top:' + (56 * k).toFixed(1) + 'px;height:1px;background:' + esc(acc || '#888') + '"></div>' +
