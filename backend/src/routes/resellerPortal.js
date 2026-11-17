@@ -417,7 +417,7 @@ router.put('/branding', async (req, res, next) => {
     }
     if (b.brand_logo_darstellung !== undefined) {
       dst = b.brand_logo_darstellung === null ? null : String(b.brand_logo_darstellung);
-      if (dst !== null && !['auto', 'weiss', 'gold', 'gold-dunkel'].includes(dst)) {
+      if (dst !== null && !['auto', 'hell', 'weiss', 'gold', 'gold-dunkel'].includes(dst)) {
         return res.status(400).json({ error: 'darstellung_invalid', message: 'Unbekannte Darstellung.' });
       }
     }
