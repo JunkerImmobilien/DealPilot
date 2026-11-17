@@ -44961,3 +44961,9 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Commit:** `748c759f` v3630, `2ec2e852` v3630b, `13c85961` v3630c, `0649f690` v3630d. Migrationen 112, 114 (Staging angewandt, Sicherungen haupt-20261117-1224/1242).
 - **Nachweis:** eigener Headless-Chrome (CDP), Partner-Testkonto: Sidebar je Variante 1440 und 390 px, 160 % ohne Überlauf (Schiene 900, Marke 126), gerendertes Investment-PDF bei 150 % (Deckblatt-Logo Unterkante 54,0 mm vor Goldlinie 56, Kopf 21,0 vor Balkenende 22), Mail-Logo-Route liefert das Rahmen-PNG, Farbe live (`--gold` #2f6f8f → #b33d29, Zurücksetzen zurück), buster-ebenen sauber. Bilder `Dateien/Partner-Logo-Nachweis-2026-11-17/`.
 - **Rest:** Kartenreihenfolge in `partner-kunden.js` nachziehen, Track-Record-Deckblatt, Rechte-Sperre um `exportPDF` beim Partner-Testkonto, Prod.
+
+### v3630e · 17.11.2026 (nur Staging) · Logo mittig, Akzent-Auswahl mit Standard
+- **Was:** Ausrichtung Links (Standard) / Mittig in der Menüleiste (`brand_logo_ausrichtung`, Migration 115, `data-wl-logo-mitte`). Akzent-Schnellwahl: Standard (DealPilot-Gold mit festen Abstufungen) plus 18 Töne, jeder ≥ 3 : 1 auf #0A0A0C und Weiß. Knöpfe „Standard“ bei Darstellung, Größe, Ausrichtung, PDF-Größe. hi/lo werden mitgespeichert.
+- **Commit:** `e286c7bb`. Sicherung haupt-20261117-1303-v3630e.
+- **Nachweis:** Headless-CDP, Partner-Testkonto: mittig bei 100/160/60 % links = rechts im Markenfeld (80/54/98 px), Schublade 390 mittig (x 153/137/163 in 358), nach Neuladen gleich; `--gold` Kupfer/Standard live, Zurücksetzen. Bilder `30-*`, `31-*`.
+- **Rest:** PDF-Ausrichtung bewusst nicht angeboten (Seitentitel mittig im Kopf), gold-audit-Basislinie reseller-portal 4 → 3 senken, Prod.

@@ -36,7 +36,8 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
-### N175 · Partnerlogo: zuschneiden, Darstellung auf dunklem Grund, Größe in App und PDF, Verwaltung einfacher (Marcel 17.11.2026) — **v3630–v3630d (`748c759f`, `2ec2e852`, `13c85961`, `0649f690`) auf Staging nachgemessen; Prod NICHT ausgerollt**
+### N175 · Partnerlogo: zuschneiden, Darstellung auf dunklem Grund, Größe in App und PDF, Verwaltung einfacher, Logo mittig, Akzent-Auswahl mit Standard (Marcel 17.11.2026) — **v3630–v3630e (`748c759f`, `2ec2e852`, `13c85961`, `0649f690`, `e286c7bb`) auf Staging nachgemessen; Prod NICHT ausgerollt**
+- v3630e (`e286c7bb`): Ausrichtung Links/Mittig (Migration 115, nur Menüleiste, PDF-Seitenkopf bleibt links wegen des mittigen Seitentitels), Akzent-Schnellwahl mit Standard (DealPilot-Gold) und 18 gemessenen Tönen (≥ 3 : 1 auf Obsidian und Weiß, ohne Statusfarben), Knöpfe „Standard“.
 - Zuschnitt beim Hochladen (Rand aus den Ecken, Flutfüllung, Farbe-zu-Alpha), vier Darstellungen auf dunklem Grund als fertiges PNG (`brand_logo_auf_dunkel`), Rahmen in der Akzentfarbe der Marke, Logogröße App 60–160 % und PDF 60–150 % (Grenzen je Stelle), Migrationen 112 und 114.
 - Verwaltung: Marke · Logo · Farben · Dokumente, Farben direkt und live, Zurücksetzen, Vorschau Deckblatt/Seitenkopf. DealPilot-Chip im Boarding Pass bleibt DealPilot. Fehler seit v3299 behoben (Kontaktdaten-Speichern warf wegen `var _v`).
 - Nachweis: `Dateien/Partner-Logo-Nachweis-2026-11-17/`, Einzelheiten `wissen/2026-11-17.md`.
