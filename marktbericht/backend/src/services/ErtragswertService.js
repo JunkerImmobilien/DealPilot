@@ -318,8 +318,9 @@ export const ErtragswertService = {
        Stellplatzanteil rechnen Anzahl × Miete UND der sonstige Rest. */
     const _spE = stellplatzErtrag(ein);
     const stellplatz = round0(_spE.jahr);
-    if (_spE.ersetzt && _spE.stueck_jahr > 0 && Math.abs(_spE.stueck_jahr - zusatz) >= 1) out.hinweise.push(
-      'Stellplatzmiete aus den Zusätzlichen Einnahmen (' + deZahl(round2(zusatz / 12)) + ' €/Monat) angesetzt, nicht zusätzlich '
+    const _spTeil = ein.zusatz_aufgeteilt === true ? (pos(ein.zusatz_stellplatz_jahr) || 0) : zusatz;   /* geteilt: nur der Stellplatzanteil */
+    if (_spE.ersetzt && _spE.stueck_jahr > 0 && Math.abs(_spE.stueck_jahr - _spTeil) >= 1) out.hinweise.push(
+      'Stellplatzmiete aus den Zusätzlichen Einnahmen (' + deZahl(round2(_spTeil / 12)) + ' €/Monat' + (ein.zusatz_aufgeteilt === true ? ', Teil Stellplatz/Garage' : '') + ') angesetzt, nicht zusätzlich '
       + spAnz + ' × ' + deZahl(spMiete) + ' €/Monat aus dem Reiter Objekt. Beides beschreibt dieselben Plätze und wäre doppelt gezählt.');
     if (zusatz > 0 && ein.zusatz_aufgeteilt !== true) out.hinweise.push('Die Zusätzlichen Einnahmen ('
       + deZahl(round2(zusatz / 12)) + ' €/Monat) sind nicht aufgeteilt und gehen als Stellplatz-Regelfall ganz in den Rohertrag. '

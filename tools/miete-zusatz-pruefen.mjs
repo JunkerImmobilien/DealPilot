@@ -211,6 +211,7 @@ pruefe('C', 'Doppelzaehlung: ze ersetzt 2 × 40 €, nicht dazu', roh(kDop) === 
 pruefe('C', 'Doppelzaehlung: der Bericht sagt es', (kDop.hinweise || []).some((h) => /nicht zusätzlich 2 × 40 €\/Monat/.test(h) && /doppelt/.test(h)));
 const kGet = ew({ zusatz_jahr: 840, zusatz_aufgeteilt: true, zusatz_stellplatz_jahr: 600, zusatz_sonst_jahr: 240, zusatz_kueche_jahr: 360, sonstige_jahr: 360, stellplatz_anz: 1, stellplatz_miete_monat: 40 });
 pruefe('C', 'geteilt: 840 im Rohertrag (Stellplatz 50 ersetzt 1 × 40), Kueche nicht', roh(kGet) === roh(kOhne) + 840, roh(kGet) - roh(kOhne));
+pruefe('C', 'geteilt: Hinweis nennt den Stellplatzanteil (50 €), nicht Stellplatz + Sonstiges', (kGet.hinweise || []).some((h) => h.indexOf('(50 €/Monat, Teil Stellplatz/Garage) angesetzt, nicht zusätzlich 1 × 40') >= 0), kGet.hinweise);
 pruefe('C', 'geteilt: Kueche als sonstiger Ertrag mit eigener Dauer (15 J.)', kGet.sonstige_ertraege && kGet.sonstige_ertraege.jahr === 360 && kGet.sonstige_ertraege.dauer_jahre === 15, kGet.sonstige_ertraege);
 pruefe('C', 'geteilt: Zeile nennt Kueche/Moeblierung', (kGet.staffel || []).some((s) => /sonstige Erträge \(davon Küche\/Möblierung 360 €/.test(s.pos)));
 const kNull = ew({ zusatz_jahr: 240, zusatz_aufgeteilt: true, zusatz_stellplatz_jahr: 0, zusatz_sonst_jahr: 240, stellplatz_anz: 2, stellplatz_miete_monat: 40 });
