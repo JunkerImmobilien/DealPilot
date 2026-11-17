@@ -28,7 +28,8 @@
  *
  * Objekte werden aus dem Demo-Konto info@ KOPIERT (nur gelesen, nie geaendert, nie verschoben).
  * Gibt nie ein Passwort aus. Kurz-Tokens (3 h) fuer Messung und Aufnahme stehen in /tmp/partner-demo-tokens.json im Container.
- * Optionen: --nur-tokens (nur Tokens neu schreiben)
+ * Optionen: --nur-tokens (nur Tokens neu schreiben), --kunde (v3650: Zustand fuer das Kunden-Video, Musterstraße mit
+ *   zurueckgegebenen Anmerkungen; Kunde C eingeladen, Kunde D „Mia Hoffmann (Demo)“ eigener Plan, nicht verbunden)
  */
 const fs = require('fs');
 const path = require('path');
@@ -49,19 +50,22 @@ const QUELLE = 'info@junker-immobilien.io';
 const DOMAIN = '@nordlicht-demo.dealpilot.test';
 const PLAETZE = 5;
 const NUR_TOKENS = process.argv.includes('--nur-tokens');
+const KUNDE = process.argv.includes('--kunde');   /* v3650 · Zustand fuer das Kunden-Video */
 const LOGO_DIR = fs.existsSync('/app/partner-demo') ? '/app/partner-demo' : path.join(__dirname, 'partner-demo');
 
 const KONTEN = {
   P: { email: 'partner-demo' + DOMAIN, name: 'Lena Nordmann (Demo)' },
   A: { email: 'jonas.berger' + DOMAIN, name: 'Jonas Berger (Demo)' },
   B: { email: 'sabine.kraus' + DOMAIN, name: 'Sabine Kraus (Demo)' },
-  C: { email: 'thomas.weber' + DOMAIN, name: 'Thomas Weber (Demo)' }
+  C: { email: 'thomas.weber' + DOMAIN, name: 'Thomas Weber (Demo)' },
+  D: { email: 'mia.hoffmann' + DOMAIN, name: 'Mia Hoffmann (Demo)' }   /* v3650 · Kunden-Video: eigener Plan, verbindet sich per Code */
 };
 /* Quelle im Demo-Konto: Strasse, Hausnummer, Ort (gemessen 16.11.2026) */
 const OBJEKTE = {
   A: [{ str: 'Lindenallee', hnr: '14', ort: 'Herford' }, { str: 'Musterstraße', hnr: '12', ort: 'Leipzig' }],
   B: [{ str: 'Parkstr.', hnr: '9', ort: 'Bad Oeynhausen' }, { str: 'Musterweg', hnr: '3', ort: 'Bielefeld' }],
   C: [{ str: 'Musterallee', hnr: '7a', ort: 'Konstanz' }],
+  D: [{ str: 'Musterweg', hnr: '3', ort: 'Bielefeld' }],
   P: [{ str: 'Gohliser Str.', hnr: '42', ort: 'Leipzig' }]
 };
 const MARKE = {
@@ -138,11 +142,12 @@ async function partnerZuruecksetzen(rs, P) {
 }
 
 (async () => {
-  const P = await konto(KONTEN.P), A = await konto(KONTEN.A), B = await konto(KONTEN.B), C = await konto(KONTEN.C);
+  const P = await konto(KONTEN.P), A = await konto(KONTEN.A), B = await konto(KONTEN.B), C = await konto(KONTEN.C), D = await konto(KONTEN.D);
   const tokens = () => fs.writeFileSync('/tmp/partner-demo-tokens.json', JSON.stringify({
     erzeugt: new Date().toISOString(),
     P: { t: tokenFuer(P, '3h'), id: P.id, email: P.email, name: P.name }, A: { t: tokenFuer(A, '3h'), id: A.id, email: A.email, name: A.name },
-    B: { t: tokenFuer(B, '3h'), id: B.id, email: B.email, name: B.name }, C: { t: tokenFuer(C, '3h'), id: C.id, email: C.email, name: C.name } }));
+    B: { t: tokenFuer(B, '3h'), id: B.id, email: B.email, name: B.name }, C: { t: tokenFuer(C, '3h'), id: C.id, email: C.email, name: C.name },
+    D: { t: tokenFuer(D, '3h'), id: D.id, email: D.email, name: D.name } }));
   if (NUR_TOKENS) { tokens(); console.log('Tokens in /tmp/partner-demo-tokens.json'); process.exit(0); }
   const q = (await query('SELECT id FROM users WHERE email = $1', [QUELLE])).rows[0];
   if (!q) { console.error('Demo-Konto fehlt'); process.exit(1); }
@@ -150,6 +155,7 @@ async function partnerZuruecksetzen(rs, P) {
   /* Plaene */
   await planService.setUserPlanManual(P.id, 'partner', 'yearly', 365);
   await planService.setUserPlanManual(B.id, 'pro', 'yearly', 365);
+  await planService.setUserPlanManual(D.id, 'pro', 'yearly', 365);
 
   /* Partner: Marke, Kontakt, Logo, Plaetze */
   const rs = await resellerService.ensureReseller(P.id, { name: MARKE.name });
@@ -168,14 +174,14 @@ async function partnerZuruecksetzen(rs, P) {
                ON CONFLICT (user_id, schluessel) DO UPDATE SET wert = EXCLUDED.wert, updated_at = now()`, [u.id, JSON.stringify({ nutzer: u.id, settings, onboarding_fertig: FERTIG })]);
   await stammSetzen(P, { user_name: KONTEN.P.name, user_company: k.brand_company, pdf_address: k.brand_address, pdf_plz: k.brand_plz,
     pdf_city: k.brand_city, pdf_email: k.brand_email, pdf_phone: k.brand_phone, pdf_website: k.brand_website });
-  for (const w of ['A', 'B', 'C']) {
-    const u = { A, B, C }[w];
+  for (const w of ['A', 'B', 'C', 'D']) {
+    const u = { A, B, C, D }[w];
     await stammSetzen(u, { user_name: KONTEN[w].name, user_company: '', pdf_address: '', pdf_plz: '', pdf_city: '', pdf_email: u.email, pdf_phone: '', pdf_website: '' });
   }
 
   /* Objekte (Kopien aus dem Demo-Konto) */
   const ids = {};
-  for (const [wer, u] of [['P', P], ['A', A], ['B', B], ['C', C]]) {
+  for (const [wer, u] of [['P', P], ['A', A], ['B', B], ['C', C], ['D', D]]) {
     await einstellungenWieDemo(u, q);
     ids[wer] = [];
     for (const o of OBJEKTE[wer]) ids[wer].push(await objektKopie(u, q, o));
@@ -183,7 +189,20 @@ async function partnerZuruecksetzen(rs, P) {
   console.log('Objekte', JSON.stringify(Object.fromEntries(Object.entries(ids).map(([w, l]) => [w, l.length]))));
 
   await partnerZuruecksetzen(rs, P);
-  const tP = tokenFuer(P), tA = tokenFuer(A), tB = tokenFuer(B), tC = tokenFuer(C);
+  const tP = tokenFuer(P), tA = tokenFuer(A), tB = tokenFuer(B), tC = tokenFuer(C), tD = tokenFuer(D);
+
+  /* v3650 · AVV (v3620): ohne Abschluss steht das Fenster ueber jeder Aufnahme im Cockpit */
+  const avv = await http(tP, 'GET', '/consent/avv');
+  if (avv.j && !avv.j.aktuell) await http(tP, 'POST', '/consent/avv', { zugestimmt: true, version: avv.j.version, weg: 'partner-demo' });
+
+  /* v3650 · Kunde C und D verbinden sich im Kunden-Video selbst (Einladung annehmen, Code). Jeder Lauf stellt sie
+     zurueck: Verbindung, Anfragen und Codes weg (reseller_clients haengt an licenses/uebergaben mit SET NULL) */
+  for (const u of [C, D]) {
+    const alt = (await query(`SELECT id FROM reseller_clients WHERE reseller_id = $1 AND user_id = $2`, [rs.id, u.id])).rows;
+    for (const x of alt) { try { await resellerService.unassignSeat(rs.id, x.id); } catch (e) {} await query(`DELETE FROM reseller_clients WHERE id = $1`, [x.id]); }
+    await query(`DELETE FROM partner_anfragen WHERE user_id = $1`, [u.id]);
+    await query(`UPDATE verbindungs_codes SET widerrufen_am = now() WHERE user_id = $1 AND eingeloest_am IS NULL AND widerrufen_am IS NULL`, [u.id]);
+  }
 
   /* Kunde A: Einladung mit Platz, annehmen */
   let c = await http(tP, 'GET', '/partner/cockpit');
@@ -233,8 +252,12 @@ async function partnerZuruecksetzen(rs, P) {
   await http(tP, 'POST', '/partner/kundenstaende/' + ksL.share_id + '/anmerkungen', { art: 'nachreichen', text: 'Bitte das Protokoll der Eigentümerversammlung 2023 nachreichen.' });
   const zr = await http(tP, 'POST', '/partner/kundenstaende/' + ksL.share_id + '/zurueck', { text: 'Hallo Jonas, drei Punkte vor dem Bankgespräch. Viele Grüße, Lena Nordmann (Demo)' });
   console.log('Zurueck an Kunden', zr.status, zr.j && zr.j.mail && zr.j.mail.status);
-  /* Kunde A beantwortet die zweite, die anderen bleiben offen; dann sendet er Stand 2 */
+  /* Kunde A bearbeitet alle drei (seit v3640 sendet er erst, wenn jede erledigt oder beantwortet ist): die erste als
+     Rueckfrage (offen mit Antwort, beim Partner blau), die zweite und dritte erledigt; dann sendet er Stand 2 */
+  if (an1.j && an1.j.id) await http(tA, 'POST', '/mein-partner/anmerkungen/' + an1.j.id, { status: 'offen', antwort: 'Der Verkäufer bleibt beim Preis. Wie weit sollte ich mit dem Angebot runtergehen?' });
   if (an2.j && an2.j.id) await http(tA, 'POST', '/mein-partner/anmerkungen/' + an2.j.id, { status: 'erledigt', antwort: 'Abgeglichen, die Mieten stimmen mit den Verträgen überein.' });
+  const nr3 = (await query(`SELECT id FROM partner_anmerkungen WHERE reseller_id = $1 AND share_id = $2 AND art = 'nachreichen' AND status = 'offen'`, [rs.id, ksL.share_id])).rows[0];
+  if (nr3) await http(tA, 'POST', '/mein-partner/anmerkungen/' + nr3.id, { status: 'erledigt', antwort: 'Liegt jetzt bei den Unterlagen.' });
   await http(tA, 'POST', '/mein-partner/senden', { object_ids: [aLinden] });
   /* Entwurf des Partners am Stand 2 (noch nicht zurueckgegeben) */
   await http(tP, 'POST', '/partner/kundenstaende/' + ksL.share_id + '/anmerkungen', { art: 'hinweis', sec: 's3', reiter: 'Finanzierung',
@@ -243,6 +266,24 @@ async function partnerZuruecksetzen(rs, P) {
   /* Aufgabe an alle: Steuerjahr */
   await http(tP, 'POST', '/partner/aufgaben', { titel: 'Unterlagen für das Steuerjahr 2025', art: 'steuerjahr', steuerjahr: 2025, objektfilter: 'bestand',
     text: 'Bitte die Bestandsobjekte mit den Zahlen für 2025 senden.', kunden: 'alle' });
+
+  /* v3650 · --kunde: Zustand fuer das Kunden-Video. Die Partnerin hat die Musterstraße 12 (Stand 1) angesehen, zwei
+     Anmerkungen geschrieben (eine mit Bildausschnitt, tools/partner-demo/anmerkung-bild.webp, im echten Werkzeug
+     aufgenommen) und zurueckgegeben. Jonas sieht sie offen und kann erst nach der Bearbeitung neu senden. */
+  if (KUNDE) {
+    const ksM = st.find((x) => x.kunde_email === A.email && x.str === 'Musterstraße');
+    if (!ksM) { console.error('Kundenstand Musterstraße fehlt'); process.exit(1); }
+    await http(tP, 'POST', '/partner/kundenstaende/' + ksM.share_id + '/geoeffnet');
+    const mw = (await query(`SELECT data->>'nkm' AS nkm FROM objects WHERE id = $1`, [aMuster])).rows[0];
+    const bildDatei = path.join(LOGO_DIR, 'anmerkung-bild.webp');
+    const bild = fs.existsSync(bildDatei) ? 'data:image/webp;base64,' + fs.readFileSync(bildDatei).toString('base64') : undefined;
+    if (!bild) console.warn('  Bild fehlt: ' + bildDatei);
+    await http(tP, 'POST', '/partner/kundenstaende/' + ksM.share_id + '/anmerkungen', { art: 'pruefen', sec: 's2', reiter: 'Miete', feld_id: 'nkm', feld_label: 'Nettokaltmiete',
+      wert_damals: mw.nkm, bild, text: 'Die Miete liegt unter dem Mietspiegel, siehe markierte Stelle. Bitte prüfen, ob eine Anpassung möglich ist.' });
+    await http(tP, 'POST', '/partner/kundenstaende/' + ksM.share_id + '/anmerkungen', { art: 'nachreichen', text: 'Bitte die Hausgeldabrechnung 2025 nachreichen.' });
+    const zm = await http(tP, 'POST', '/partner/kundenstaende/' + ksM.share_id + '/zurueck', { text: 'Hallo Jonas, zwei Punkte zur Musterstraße. Viele Grüße, Lena Nordmann (Demo)' });
+    console.log('Kunden-Video: Musterstraße zurueck', zm.status, bild ? 'mit Bild' : 'ohne Bild');
+  }
 
   /* Ein wenig Zeit zwischen den Schritten, damit die Liste wie ein echter Verlauf aussieht */
   await query(`UPDATE object_shares SET submitted_at = submitted_at - interval '2 days' WHERE reseller_id = $1 AND client_id = $2`, [rs.id, kB.id]);

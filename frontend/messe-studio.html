@@ -215,6 +215,10 @@ body.mit-tafel #tafel{display:flex;flex-direction:column;gap:18px}
             spruch: 'Funkspruch angekommen —', spruch2: 'gemeinsam auf Kurs.', weiter: 'Partner 5 · Objekt an Kunden übergeben' });
   REIHE.p5 = Object.assign({}, PR, { nr: '5', messe: 'partner-uebergeben', titel: 'Objekt an Kunden übergeben', unter: 'Dein durchgerechnetes Objekt per E-Mail, der Kunde bekommt eine Kopie.',
             spruch: 'Übergabe an den Kunden —', spruch2: 'sein Objekt, deine Marke.', weiter: '' });   /* v3500 */
+  /* v3650 · Kunden-Video (Marcel 17.11.2026): Sicht des Kunden, Aufruf ?modul=k1 */
+  REIHE.k1 = { reihe: 'DealPilot mit deinem Partner', art: 'Kunde', nr: '1', hinweis: 'Vorführung · erfundener Demo-Partner und erfundene Kunden', messe: 'partner-kunde',
+            titel: 'Mit deinem Partner arbeiten', unter: 'Verbinden, Objekte senden, Anmerkungen bearbeiten.',
+            spruch: 'Gemeinsam an Bord.', spruch2: 'Du behältst das Steuer.', weiter: '' };
   REIHE.ue1 = REIHE['01'];   /* v2370 · Alias */
   var MODUL = P.get('modul'), M = null;
   if (MODUL && REIHE[MODUL]) M = REIHE[MODUL];
