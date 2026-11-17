@@ -17,7 +17,8 @@
   function stand() { return api('/consent/avv'); }
 
   function haekchenHtml(st) {
-    return 'Ich schließe den <a href="' + esc(st.link) + '" target="_blank" rel="noopener">Auftragsverarbeitungsvertrag</a> (Version ' +
+    /* v3620b · Linkfarbe ausdruecklich: im Fenster kam sonst das Browser-Blau an (gemessen im Screenshot) */
+    return 'Ich schließe den <a href="' + esc(st.link) + '" target="_blank" rel="noopener" style="color:var(--wl-b8932f, #b8932f);text-decoration:underline">Auftragsverarbeitungsvertrag</a> (Version ' +
       esc(st.version) + ' vom ' + esc(datum(st.stand)) + ') mit Junker Solution ab.';
   }
 
