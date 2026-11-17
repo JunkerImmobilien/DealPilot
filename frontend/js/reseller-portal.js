@@ -1185,8 +1185,9 @@ if (!window._pdfGold) {
     } catch (e) { w.innerHTML = '<p class="rp-ph">Branding konnte nicht geladen werden.</p>'; }
   }
   /* W22-logoprev · v3630: Vorschau in Groesse der echten Menueleiste, Auswahl der Darstellung */
-  var DARST_TITEL = { 'auto': 'Automatisch (Standard)', 'weiss': 'Weiße Fläche', 'gold': 'Rahmen, innen hell', 'gold-dunkel': 'Rahmen, innen dunkel' };
-  var DARST_TEXT = { 'auto': 'eingefärbt oder auf Platte, nur wenn der Kontrast nicht reicht',
+  var DARST_TITEL = { 'auto': 'Automatisch (Standard)', 'hell': 'Hell eingefärbt, ohne Fläche', 'weiss': 'Weiße Fläche', 'gold': 'Rahmen, innen hell', 'gold-dunkel': 'Rahmen, innen dunkel' };
+  var DARST_TEXT = { 'auto': 'passt sich an, nur wenn der Kontrast nicht reicht',
+                     'hell': 'dunkle Teile werden hell, Farbiges bleibt, kein Kasten',   /* v3630f */
                      'weiss': 'Logo auf weißem, abgerundetem Kasten',
                      'gold': 'dünner Rahmen in deiner Akzentfarbe, innen weiß',
                      'gold-dunkel': 'Rahmen in Akzentfarbe, innen dunkel, dunkle Teile hell' };
@@ -1298,13 +1299,13 @@ if (!window._pdfGold) {
         if (!amp) return;
         var ART = { 'unveraendert': 'unverändert', 'weiss': 'weiß eingefärbt', 'dunkel': 'dunkel eingefärbt',
                     'platte-hell': 'auf heller Platte', 'platte-dunkel': 'auf dunkler Platte', 'eigenes Logo': 'eigenes Logo für dunklen Grund',
-                    'rahmen-hell': 'Rahmen, innen hell', 'rahmen-dunkel': 'Rahmen, innen dunkel' };
+                    'rahmen-hell': 'Rahmen, innen hell', 'rahmen-dunkel': 'Rahmen, innen dunkel', 'hell-gedreht': 'hell eingefärbt, ohne Fläche' };
         var zeile = function (titel, e) {
           if (!e) return '';
           /* v3630 · gewaehlte Darstellung: eigene Flaeche, kein Kontrastwert gegen den Grund */
-          if (e.art === 'rahmen-hell' || e.art === 'rahmen-dunkel' || (e.grund || '').indexOf('Darstellung:') === 0) {
+          if (e.art === 'rahmen-hell' || e.art === 'rahmen-dunkel' || e.art === 'hell-gedreht' || (e.grund || '').indexOf('Darstellung:') === 0) {
             return '<span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:#3FA56C;margin-right:6px;vertical-align:0"></span>' +
-              '<b style="color:#3a352c">' + titel + ':</b> eigene Fläche, ' + esc(ART[e.art] || DARST_TITEL[_brandState.darstellung] || e.art) + '<br>';
+              '<b style="color:#3a352c">' + titel + ':</b> ' + esc(ART[e.art] || DARST_TITEL[_brandState.darstellung] || e.art) + (e.anteil_lesbar != null ? ', ' + Math.round(e.anteil_lesbar * 100) + ' % der Logopunkte gut lesbar' : '') + '<br>';   /* v3630f */
           }
           var ok = e.k_nachher == null || e.k_nachher >= 3;
           var k = function (x) { return x == null ? 'eigene Fläche' : String(x).replace('.', ',') + ' : 1'; };
