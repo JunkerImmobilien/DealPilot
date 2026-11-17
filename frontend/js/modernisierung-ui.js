@@ -43,6 +43,8 @@
     var D = M(); if (!D || !r || r.punkte == null) return;
     var q = val('ds2_zustand_quelle');
     if (val('ds2_zustand') && q !== 'bilder' && q !== 'text') return;
+    /* v3660f · Marcel: „Wenn Zustand im Text, dann den nehmen" - Bilder ueberschreiben keinen Zustand aus dem Exposé */
+    if (val('ds2_zustand') && q === 'text' && quelle === 'bilder') return;
     setze('ds2_zustand_quelle', quelle);
     setze('ds2_zustand', D.zustandAusPunkten(r.punkte));
   }
@@ -95,7 +97,15 @@
     if (zh) {
       var q = val('ds2_zustand_quelle'), r = roh();
       var _abg = val('ds2_zustand') && (q === 'bilder' || q === 'text');
-      zh.textContent = _abg ? ((q === 'bilder' ? 'aus Bildern abgeleitet' : 'aus dem Exposé abgeleitet') + ' · jederzeit änderbar') : '';
+      var _t1 = _abg ? ((q === 'bilder' ? 'aus Bildern abgeleitet' : 'aus dem Exposé abgeleitet') + ' · jederzeit änderbar') : '';
+      /* v3660f · Detailstufe 1: dort ist der Block Sach- und Ertragswert ausgeblendet. Die Grundlage der
+         Restnutzungsdauer steht deshalb auch hier, kurz, mit dem Zustand als Weg zum Genauer-Machen. */
+      var _b1 = bestimmen(), _t2 = '';
+      if (_b1 && _b1.herkunft !== 'eigene' && _b1.herkunft !== 'zustand' && _b1.herkunft !== 'jung') {
+        _t2 = 'Restnutzungsdauer: ' + (_b1.herkunft === 'abgeleitet' ? _b1.kurz : (_b1.grad + ' angenommen, keine Angabe' + (_b1.herkunft === 'rueckfall_energie' ? ' (nach Energieklasse)' : '')))
+          + ' (' + _b1.punkte + ' Punkte). Mit dem Zustand hier oder je Gewerk genauer.';
+      }
+      zh.textContent = [_t1, _t2].filter(Boolean).join(' ');
       /* v3660d · Begruendung dezent im Tooltip (Bildbeschreibung bzw. belegte Gewerke), keine laute Flaeche */
       var _tip = '';
       if (_abg && r && r.gewerke) _tip = GEW.map(function (k) { var g = r.gewerke[k]; return g && g.quelle !== 'angenommen' ? LAB[k] + ': ' + (g.beleg || g.wie || '') : null; }).filter(Boolean).join(' · ');
@@ -202,7 +212,7 @@
   var _t = null;
   function vielleichtAuto() {
     if (/messe|drehbuch|aufnahme|nokiauto/i.test(location.search + location.hash)) return;
-    if (!window._currentObjKey || !fotosQuelle().length) return;
+    if (!fotosQuelle().length) return;   /* v3660f: auch am neuen Objekt (Exposé-Bilder vor dem ersten Speichern) */
     if (window._dpPaketLaeuft) return;
     clearTimeout(_t); _t = setTimeout(function () { ausBildern(false); }, 4000);
   }

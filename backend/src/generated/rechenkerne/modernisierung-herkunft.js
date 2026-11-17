@@ -161,7 +161,7 @@
     var p = Math.min(20, Math.round(summe));
     var satz;
     if (rf.jung) {
-      satz = 'Modernisierung: 0 Punkte angesetzt — das Gebäude ist jünger als ' + ALTER_MIN
+      satz = 'Modernisierung: 0 Punkte angesetzt, das Gebäude ist jünger als ' + ALTER_MIN
         + ' Jahre, die Bauteile entsprechen dem Baujahr (Anlage 2 ImmoWertV rechnet hier ohnehin linear).';
     } else if (rf.energie && rf.energie !== 'mittel') {
       satz = 'Modernisierung angenommen: ' + grad(p) + ' (' + p + ' Punkte), keine Angaben je Gewerk; '
@@ -318,7 +318,7 @@
         if (foto) {
           var fp = r1(g.max * F_FOTO[foto.stufe]);
           if ((best.t.richtung === 'positiv' && foto.stufe === 'veraltet') || (best.t.richtung === 'negativ' && foto.stufe === 'neuwertig')) {
-            e.widerspruch = 'Bild: ' + (foto.beschreibung || foto.stufe) + ' — die konkrete Textaussage gilt.';
+            e.widerspruch = 'Bild: ' + (foto.beschreibung || foto.stufe) + '. Die konkrete Textaussage gilt.';
             wid.push(g.text + ': Text und Bild widersprechen sich, die konkrete Textaussage gilt.');
           } else if (fp > e.punkte && best.t.richtung === 'positiv' && !best.t.jahr) {
             e.bild = foto.beschreibung || null;
@@ -431,7 +431,7 @@
   }
 
   var api = {
-    version: 'v3660a',
+    version: 'v3660f',
     GEWERKE: GEWERKE, GRADE: GRADE, ZUSTAND: ZUSTAND, ALTER_MIN: ALTER_MIN,
     grad: grad, zustandAusPunkten: zustandAusPunkten, rueckfall: rueckfall,
     ausText: ausText, normListe: normListe, normFotos: normFotos,

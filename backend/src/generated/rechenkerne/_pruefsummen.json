@@ -1,5 +1,5 @@
 {
- "erzeugt_am": "2026-11-17T16:31:32.060Z",
+ "erzeugt_am": "2026-11-17T19:12:23.223Z",
  "hinweis": "Woertliche Spiegelung von frontend/js/ — NICHT hier bearbeiten. Quelle aendern, dann: node tools/rechenkerne-spiegeln.mjs",
  "reihenfolge": [
   "dscr-engine.js",
@@ -19,7 +19,7 @@
   "score-tiers.js": "840322fdd10bec5859d2854a89f7f432bbb4c203f2582d79d1bc02ca99c04bd5",
   "dealscore.js": "f1b44c828311c3164448c393debb7887ff83c6393d5b78f29b5cd50051081ed6",
   "qc-heuristik.js": "60e207571011287e285282239e0a5a575d7fdbf616dbd3d65e26053dfc909204",
-  "modernisierung-herkunft.js": "a391a2a189225c90b0cf3b064ee7c2457afda626dbe9af84ed9fe2d3d71ec80a",
+  "modernisierung-herkunft.js": "6be7edbddd5a926bdab775c7daa762c15cfa1c43dbcaa39bf503e13d01fae258",
   "rnd-gnd-table.js": "ed1df0eab13887a1c971f26e129924063b2665e0d33d249843c11f9cac206fb0",
   "rnd-calc.js": "c193a0026ef24f4b8d7424a2d52a5d2af34286ff4acdeb48dbf9fb2352d19d40"
  }

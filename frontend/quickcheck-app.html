@@ -6082,13 +6082,20 @@ const QcApp = (function() {
       const DM = window.DpModernisierung;
       if (DM) {
         const fv = id => { const x = document.getElementById(id); return x ? String(x.value || '').trim() : ''; };
-        const mb = DM.bestimmen({ zustand: fv('qc_zustand') || null, zustand_quelle: 'eigene', baujahr: fv('qc_bj'), energieklasse: fv('qc_energieklasse') });
+        /* v3660f · Zustand aus Bildern (js/qc-zustand-bilder.js) zaehlt nicht als eigene Angabe; die Ableitung je Gewerk gilt */
+        let abl = null; try { abl = fv('qc_mod_ableitung') ? JSON.parse(fv('qc_mod_ableitung')) : null; } catch (_) {}
+        const mb = DM.bestimmen({ zustand: fv('qc_zustand') || null, zustand_quelle: fv('qc_zustand_quelle') || 'eigene',
+          ableitung: abl && abl.punkte != null ? abl : null, baujahr: fv('qc_bj'), energieklasse: fv('qc_energieklasse') });
         let rnd = null;
         try { const st = JSON.parse((document.getElementById('_mb_state') || {}).value || 'null'); rnd = st && st.card && st.card.rnd ? st.card.rnd : null; } catch (_) {}
-        const bez = mb.herkunft === 'zustand' ? 'abgeschätzt aus Zustand „' + mb.zustand + '"'
-          : (mb.herkunft === 'jung' ? 'Gebäude jünger als 30 Jahre' : 'angenommen, da kein Zustand angegeben' + (mb.herkunft === 'rueckfall_energie' ? ' (nach Energieklasse)' : ''));
+        const bez = mb.herkunft === 'zustand' ? 'Abgeschätzt aus Zustand „' + mb.zustand + '“: ' + mb.grad
+          : mb.herkunft === 'abgeleitet' ? 'Aus den Bildern abgeleitet: ' + mb.grad
+          : mb.herkunft === 'jung' ? 'Gebäude jünger als 30 Jahre: ' + mb.grad
+          : 'Angenommen, da kein Zustand angegeben: ' + mb.grad + (mb.herkunft === 'rueckfall_energie' ? ' (nach Energieklasse)' : '');
+        /* Marcel 17.11.2026: die Annahme steht immer sichtbar, mit dem Weg zum Genauer-Machen */
+        const ann = mb.annahme_satz ? ' ' + mb.annahme_satz.replace(/ ?Den Zustand kannst du je Gewerk einstellen\.$/, '') : '';
         p += pz('', rnd && rnd.jahre != null ? 'Restnutzungsdauer ' + String(rnd.jahre).replace('.', ',') + ' Jahre' : 'Zustand und Modernisierung',
-          bez + ': ' + mb.grad + ' (Anlage 2 ImmoWertV, ' + mb.punkte + ' Punkte). Eine Angabe je Gewerk im Objekt ist genauer.',
+          esc(bez + ' (Anlage 2 ImmoWertV, ' + mb.punkte + ' Punkte).' + ann + ' Genauer mit dem Feld Zustand oben oder je Gewerk im Objekt.'),
           mb.punkte + ' Pkt.', 'Modernisierung');
       }
     } catch (_) {}
@@ -8000,7 +8007,8 @@ document.addEventListener('DOMContentLoaded', () => QcApp.init());
        Urteil mit eigener Schwellenkette — die fuenfte Stelle im Haus. -->
   <script src="js/qc-heuristik.js?v=v3085"></script>
   <!-- v3660 · Rangfolge der Modernisierungspunkte: worauf sich der Zustand im Ergebnis stuetzt -->
-  <script src="js/modernisierung-herkunft.js?v=v3660a"></script>
+  <script src="js/modernisierung-herkunft.js?v=v3660f"></script>
+  <script src="js/qc-zustand-bilder.js?v=v3660f"></script><!-- v3660f · Zustand aus den Fotos, Hinweis unter dem Feld Zustand -->
   <script src="js/dealscore.js?v=v3289"></script>
   <!-- v3075 · die zulaessige Miete (Kappung, Vergleichsmiete, Sperrfrist) - derselbe Kern wie potenzial.js -->
   <script src="js/mietpotenzial-kern.js?v=v3356"></script>
