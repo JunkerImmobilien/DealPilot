@@ -521,6 +521,39 @@
     }
     return letzt;
   }
+  /* v3640 · html2canvas 1.4.1 kennt color(srgb …), oklab() und oklch() nicht und bricht den GANZEN Ausschnitt ab
+     („unsupported color function color“, gemessen 17.11.2026: 2.738 Werte auf der Objektseite, aus color-mix im CSS).
+     In der KOPIE, die html2canvas zeichnet, werden sie in rgba() umgerechnet - die Seite selbst bleibt unberuehrt. */
+  function kanal(x) { x = Math.max(0, Math.min(1, x)); x = x <= 0.0031308 ? 12.92 * x : 1.055 * Math.pow(x, 1 / 2.4) - 0.055; return Math.round(Math.max(0, Math.min(1, x)) * 255); }
+  function oklabRgb(L, a, b) {
+    var l = Math.pow(L + 0.3963377774 * a + 0.2158037573 * b, 3), m = Math.pow(L - 0.1055613458 * a - 0.0638541728 * b, 3), s = Math.pow(L - 0.0894841775 * a - 1.2914855480 * b, 3);
+    return [kanal(4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s), kanal(-1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s), kanal(-0.0041960863 * l - 0.7034186147 * m + 1.7076147010 * s)];
+  }
+  /** Rein (Pruefer): ersetzt color(srgb …), oklab(), oklch() in einem berechneten CSS-Wert durch rgba() */
+  function farbeUmrechnen(v) {
+    if (!v || !/(color|oklab|oklch)\(/.test(v)) return v;
+    function z(s) { s = String(s).trim(); return /%$/.test(s) ? parseFloat(s) / 100 : parseFloat(s); }
+    function al(s) { return s == null ? 1 : z(s); }
+    return v.replace(/color\(srgb\s+([-\d.e%]+)\s+([-\d.e%]+)\s+([-\d.e%]+)(?:\s*\/\s*([-\d.e%]+))?\)/g, function (_, r, g, b, a) {
+      return 'rgba(' + Math.round(Math.max(0, Math.min(1, z(r))) * 255) + ', ' + Math.round(Math.max(0, Math.min(1, z(g))) * 255) + ', ' + Math.round(Math.max(0, Math.min(1, z(b))) * 255) + ', ' + al(a) + ')';
+    }).replace(/oklab\(([-\d.e%]+)\s+([-\d.e%]+)\s+([-\d.e%]+)(?:\s*\/\s*([-\d.e%]+))?\)/g, function (_, L, a, b, A) {
+      var c = oklabRgb(z(L), parseFloat(a), parseFloat(b)); return 'rgba(' + c.join(', ') + ', ' + al(A) + ')';
+    }).replace(/oklch\(([-\d.e%]+)\s+([-\d.e%]+)\s+([-\d.e]+)(?:deg)?(?:\s*\/\s*([-\d.e%]+))?\)/g, function (_, L, C, H, A) {
+      var h = parseFloat(H) * Math.PI / 180, c = oklabRgb(z(L), parseFloat(C) * Math.cos(h), parseFloat(C) * Math.sin(h)); return 'rgba(' + c.join(', ') + ', ' + al(A) + ')';
+    }).replace(/color\([^()]*\)/g, 'rgba(0, 0, 0, 0)');   /* andere Farbraeume: lieber durchsichtig als gar kein Bild */
+  }
+  var FARB_EIGENSCHAFTEN = ['color', 'background-color', 'background-image', 'border-top-color', 'border-right-color', 'border-bottom-color', 'border-left-color',
+    'outline-color', 'box-shadow', 'text-shadow', 'text-decoration-color', 'caret-color', 'column-rule-color', 'fill', 'stroke'];
+  function farbenRetten(doc) {
+    var w = doc.defaultView || window, alle = doc.querySelectorAll('*');
+    for (var i = 0; i < alle.length; i++) {
+      var cs; try { cs = w.getComputedStyle(alle[i]); } catch (e) { continue; }
+      for (var k = 0; k < FARB_EIGENSCHAFTEN.length; k++) {
+        var v = cs.getPropertyValue(FARB_EIGENSCHAFTEN[k]);
+        if (v && /(color|oklab|oklch)\(/.test(v)) { try { alle[i].style.setProperty(FARB_EIGENSCHAFTEN[k], farbeUmrechnen(v), 'important'); } catch (e) {} }
+      }
+    }
+  }
   function unsereFlaechen(el) { return !!(el && el.id && /^dppk-(anm-|bild-)/.test(el.id)); }
   /** Bereich der Ansicht aufziehen -> Leinwand (html2canvas) oder null */
   function ausschnitt() {
@@ -546,7 +579,7 @@
             x: rect.x + sx, y: rect.y + sy, width: rect.w, height: rect.h,
             scrollX: -sx, scrollY: -sy, windowWidth: document.documentElement.clientWidth, windowHeight: document.documentElement.clientHeight,
             scale: Math.min(window.devicePixelRatio || 1, 2), useCORS: true, logging: false, backgroundColor: '#ffffff',
-            ignoreElements: unsereFlaechen
+            ignoreElements: unsereFlaechen, onclone: farbenRetten
           }).then(function (cv) { zurueck(); fertig(cv); }, function (e) { zurueck(); try { console.warn('[anmerkungen] Ausschnitt', e); } catch (x) {} toast('Der Ausschnitt ging nicht. Füge ein Bildschirmfoto mit „Bild einfügen“ ein.'); fertig(null); });
         }, 60);
       }
@@ -664,5 +697,5 @@
   }
 
   window.DpAnmerkungen = { partnerBanner: partnerBanner, kundeOeffnen: kundeOeffnen, ende: ende, zuordnen: zuordnen, _zustand: Z, _feldBeschreiben: feldBeschreiben, _pfad: pfad,
-    /* v3640 */ ohneBearbeitung: ohneBearbeitung, istRueckfrage: istRueckfrage, _zielMass: zielMass, _bytesVon: bytesVon, BILD_ZIEL: BILD_ZIEL, _ausschnitt: ausschnitt, _bearbeiten: bearbeiten, _grossZeigen: grossZeigen };
+    /* v3640 */ ohneBearbeitung: ohneBearbeitung, _farbeUmrechnen: farbeUmrechnen, istRueckfrage: istRueckfrage, _zielMass: zielMass, _bytesVon: bytesVon, BILD_ZIEL: BILD_ZIEL, _ausschnitt: ausschnitt, _bearbeiten: bearbeiten, _grossZeigen: grossZeigen };
 })();

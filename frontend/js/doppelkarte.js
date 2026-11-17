@@ -531,6 +531,16 @@
       kk.classList.toggle('dk-weg', !zeigen);
       if (zeigen) sichtbar++;
     }
+    /* v3640a · Gruppenkoepfe (Lage, Kunde) ohne sichtbare Karte darunter ausblenden - gemessen 17.11.2026: im Bestand
+       stand „Kunde K-2026-001 …“ ueber einer Ankauf-Karte, die hier weg ist */
+    var koepfe = liste.querySelectorAll('.sb-lage-kopf:not(.sb-kunde-filter)');
+    for (var h = 0; h < koepfe.length; h++) {
+      var hat = false;
+      for (var n = koepfe[h].nextElementSibling; n && !n.classList.contains('sb-lage-kopf'); n = n.nextElementSibling) {
+        if (n.classList.contains('sb-card') && !n.classList.contains('dk-weg')) { hat = true; break; }
+      }
+      koepfe[h].style.display = hat ? '' : 'none';
+    }
     /* Leere Phase: sagen, warum die Liste leer ist - eine leere Liste
        saehe aus wie „keine Objekte". */
     var leer = liste.querySelector('.dk-leer');

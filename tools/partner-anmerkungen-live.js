@@ -124,8 +124,14 @@ const nutzer = async (e) => (await query('SELECT id, email FROM users WHERE emai
   const pa2 = (pa.j.anmerkungen || []).filter((x) => x.id === a2.j.id)[0] || {};
   ok('Partner sieht das Bild zur Antwort', pa2.bild_antwort === PNG);
 
+  /* Fremde offene Anmerkungen aus frueheren Klicktests am selben Objekt sperren sonst weiter: fuer diesen Lauf
+     voruebergehend als beantwortet markieren, am Ende zuruecksetzen (gemessen 17.11.2026: Nr. 5 aus einem Klicktest) */
+  const fremdOffen = (gesp2.j && gesp2.j.fehlen || []).filter((x) => !neu.anm.includes(x.id)).map((x) => x.id);
+  if (fremdOffen.length) await query(`UPDATE partner_anmerkungen SET antwort = '(Pruefer, voruebergehend)' WHERE id = ANY($1::uuid[]) AND antwort IS NULL`, [fremdOffen]);
+
   /* Feldbezug ueberlebt einen neuen Stand (jetzt frei: alles bearbeitet) */
   const s2 = await http(tA, 'POST', '/mein-partner/senden', { object_ids: [orig.object_id] });
+  if (fremdOffen.length) await query(`UPDATE partner_anmerkungen SET antwort = NULL WHERE id = ANY($1::uuid[]) AND antwort = '(Pruefer, voruebergehend)'`, [fremdOffen]);
   ok('Kunde sendet Stand ' + (orig.stand_nr + 1), s2.status === 200 && s2.j.ergebnis[0].stand_nr === orig.stand_nr + 1, s2.j);
   const kl2 = await http(tA, 'GET', '/mein-partner/aufgaben/' + z.j.aufgabe_id + '/anmerkungen');
   ok('nach neuem Stand: Anmerkungen mit Feldbezug und altem Stand weiter da', kl2.j.anmerkungen.length === kl.j.anmerkungen.length && kl2.j.anmerkungen.some((x) => x.feld_id === 'kp' && x.stand_nr === orig.stand_nr));
