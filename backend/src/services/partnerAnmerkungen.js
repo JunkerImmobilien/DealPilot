@@ -33,6 +33,19 @@ function fehler(code, status, detail) { const e = new Error(code); e.status = st
 function kurz(v, n) { if (v == null) return null; const s = String(v).trim(); return s ? s.slice(0, n) : null; }
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 function idPruefen(id) { if (!UUID.test(String(id || ''))) throw fehler('nicht_gefunden', 404); }
+/* v3640 · Bildausschnitt mit Markierungen (Marcel 17.11.2026: „Besteht die Moeglichkeit bei den Anmerkungen auch
+   Bildausschnitte mitzuschicken und Sachen zu markieren?“). data:-URL, nur WebP/PNG/JPEG, Deckel BILD_MAX Zeichen
+   (rund 400 KB Bild; das Frontend verkleinert vorher). undefined = unveraendert, null/'' = entfernen. */
+const BILD_MAX = 560000;
+const BILD_MUSTER = /^data:image\/(webp|png|jpeg);base64,[A-Za-z0-9+/]+=*$/;
+function bildSauber(v) {
+  if (v === undefined) return undefined;
+  if (v === null || v === '') return null;
+  const s = String(v);
+  if (s.length > BILD_MAX) { const e = new Error('bild_zu_gross'); e.status = 413; e.detail = 'Das Bild ist zu groß (höchstens rund 400 KB).'; throw e; }
+  if (!BILD_MUSTER.test(s)) { const e = new Error('bild_ungueltig'); e.status = 400; e.detail = 'Das Bild muss ein WebP, PNG oder JPEG sein.'; throw e; }
+  return s;
+}
 
 function sauber(b) {
   b = b || {};
@@ -40,7 +53,8 @@ function sauber(b) {
     art: ARTEN.indexOf(b.art) >= 0 ? b.art : 'hinweis',
     text: kurz(b.text, 2000),
     sec: kurz(b.sec, 40), reiter: kurz(b.reiter, 80), feld_id: kurz(b.feld_id, 120), selektor: kurz(b.selektor, 400),
-    feld_label: kurz(b.feld_label, 200), wert_damals: kurz(b.wert_damals, 500), vorschlag: kurz(b.vorschlag, 500)
+    feld_label: kurz(b.feld_label, 200), wert_damals: kurz(b.wert_damals, 500), vorschlag: kurz(b.vorschlag, 500),
+    bild: typeof bildSauber === 'function' ? bildSauber(b.bild) : undefined
   };
 }
 
@@ -48,7 +62,7 @@ function sauber(b) {
 async function kundenstand(rs, shareId, auchGetrennt) {
   idPruefen(shareId);
   const s = (await query(
-    `SELECT s.*, c.getrennt_am, c.display_name AS kunde
+    `SELECT s.*, c.getrennt_am, c.display_name AS kunde, c.kundennummer AS kunde_nr
        FROM object_shares s JOIN reseller_clients c ON c.id = s.client_id AND c.reseller_id = s.reseller_id
       WHERE s.id = $1 AND s.reseller_id = $2`, [shareId, rs.id])).rows[0];
   if (!s || s.status === 'widerrufen' || !s.kopie_object_id) throw fehler('kundenstand_nicht_gefunden', 404, 'Diesen Kundenstand gibt es nicht mehr.');
@@ -132,9 +146,9 @@ async function anlegen(rs, actor, shareId, b) {
   if (!x.text) throw fehler('text_fehlt', 400, 'Bitte einen Text eintragen.');
   const nr = (await query(`SELECT COALESCE(MAX(nr), 0) + 1 AS n FROM partner_anmerkungen WHERE share_id = $1`, [s.id])).rows[0].n;
   return (await query(
-    `INSERT INTO partner_anmerkungen (reseller_id, client_id, share_id, objekt_id, stand_nr, nr, art, text, sec, reiter, feld_id, selektor, feld_label, wert_damals, vorschlag, erstellt_von)
-     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16) RETURNING *`,
-    [rs.id, s.client_id, s.id, s.object_id, s.stand_nr, nr, x.art, x.text, x.sec, x.reiter, x.feld_id, x.selektor, x.feld_label, x.wert_damals, x.vorschlag, actor])).rows[0];
+    `INSERT INTO partner_anmerkungen (reseller_id, client_id, share_id, objekt_id, stand_nr, nr, art, text, sec, reiter, feld_id, selektor, feld_label, wert_damals, vorschlag, erstellt_von, bild)
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17) RETURNING *`,
+    [rs.id, s.client_id, s.id, s.object_id, s.stand_nr, nr, x.art, x.text, x.sec, x.reiter, x.feld_id, x.selektor, x.feld_label, x.wert_damals, x.vorschlag, actor, x.bild || null])).rows[0];
 }
 
 async function entwurf(rs, id) {
@@ -148,7 +162,7 @@ async function aendern(rs, id, b) {
   const a = await entwurf(rs, id);
   const x = sauber(Object.assign({}, a, b || {}));
   if (!x.text) throw fehler('text_fehlt', 400, 'Bitte einen Text eintragen.');
-  return (await query(`UPDATE partner_anmerkungen SET art = $2, text = $3, vorschlag = $4 WHERE id = $1 RETURNING *`, [a.id, x.art, x.text, x.vorschlag])).rows[0];
+  return (await query(`UPDATE partner_anmerkungen SET art = $2, text = $3, vorschlag = $4, bild = $5 WHERE id = $1 RETURNING *`, [a.id, x.art, x.text, x.vorschlag, x.bild || null])).rows[0];
 }
 async function loeschen(rs, id) {
   const a = await entwurf(rs, id);
@@ -196,7 +210,8 @@ async function kundeListe(user, aufgabeId) {
       WHERE a.id = $1 AND c.user_id = $2 AND a.art = 'rueckmeldung'`, [aufgabeId, user.id])).rows[0];
   if (!a) throw fehler('aufgabe_nicht_gefunden', 404);
   const l = (await query(
-    `SELECT n.id, n.nr, n.art, n.text, n.sec, n.reiter, n.feld_id, n.selektor, n.feld_label, n.wert_damals, n.vorschlag, n.status, n.antwort, n.antwort_am, n.erledigt_am, n.stand_nr
+    `SELECT n.id, n.nr, n.art, n.text, n.sec, n.reiter, n.feld_id, n.selektor, n.feld_label, n.wert_damals, n.vorschlag, n.status, n.antwort, n.antwort_am, n.erledigt_am, n.stand_nr,
+            n.bild, n.bild_antwort
        FROM partner_anmerkungen n JOIN reseller_clients c ON c.id = n.client_id
       WHERE n.aufgabe_id = $1 AND c.user_id = $2 AND n.status <> 'entwurf' ORDER BY n.nr`, [aufgabeId, user.id])).rows;
   return { aufgabe: Object.assign(a, { objekt_id: a.objekt_eigen ? a.objekt_id : null }), anmerkungen: l };
@@ -205,15 +220,21 @@ async function kundeListe(user, aufgabeId) {
 async function kundeSetzen(user, id, b) {
   idPruefen(id);
   const n = (await query(
-    `SELECT n.*, c.display_name, a.titel FROM partner_anmerkungen n JOIN reseller_clients c ON c.id = n.client_id
+    `SELECT n.*, c.display_name, c.kundennummer, a.titel FROM partner_anmerkungen n JOIN reseller_clients c ON c.id = n.client_id
        JOIN partner_aufgaben a ON a.id = n.aufgabe_id WHERE n.id = $1 AND c.user_id = $2 AND n.status <> 'entwurf'`, [id, user.id])).rows[0];
   if (!n) throw fehler('anmerkung_nicht_gefunden', 404);
   const status = b && b.status === 'offen' ? 'offen' : (b && b.status === 'erledigt' ? 'erledigt' : n.status);
   const antwort = b && b.antwort != null ? kurz(b.antwort, 2000) : n.antwort;
+  /* v3640 · Bild zur Antwort (optional), gleicher Deckel wie beim Partner */
+  const bildNeu = bildSauber(b && b.bild_antwort);
+  const bildAntwort = bildNeu === undefined ? n.bild_antwort : bildNeu;
   await query(
-    `UPDATE partner_anmerkungen SET status = $2, antwort = $3, antwort_am = CASE WHEN $3 IS DISTINCT FROM antwort THEN now() ELSE antwort_am END,
-            erledigt_am = CASE WHEN $2 = 'erledigt' THEN COALESCE(erledigt_am, now()) ELSE NULL END WHERE id = $1`, [n.id, status, antwort]);
-  if (antwort && antwort !== n.antwort) await pk._meldung(n.reseller_id, n.client_id, 'anmerkung_antwort', n.display_name + ' hat auf Anmerkung ' + n.nr + ' geantwortet: ' + antwort.slice(0, 120), { aufgabe_id: n.aufgabe_id, share_id: n.share_id });
+    `UPDATE partner_anmerkungen SET status = $2, antwort = $3, antwort_am = CASE WHEN $3 IS DISTINCT FROM antwort OR $4 IS DISTINCT FROM bild_antwort THEN now() ELSE antwort_am END,
+            bild_antwort = $4,
+            erledigt_am = CASE WHEN $2 = 'erledigt' THEN COALESCE(erledigt_am, now()) ELSE NULL END WHERE id = $1`, [n.id, status, antwort, bildAntwort || null]);
+  const wort = (status === 'offen' && (antwort || bildAntwort)) ? ' eine Rückfrage zu Anmerkung ' : ' eine Antwort zu Anmerkung ';
+  if (antwort && antwort !== n.antwort) await pk._meldung(n.reseller_id, n.client_id, 'anmerkung_antwort', n.display_name + (n.kundennummer ? ' (' + n.kundennummer + ')' : '') + ' hat' + wort + n.nr + ' geschrieben: ' + antwort.slice(0, 120), { aufgabe_id: n.aufgabe_id, share_id: n.share_id });
+  else if (bildAntwort && bildAntwort !== n.bild_antwort) await pk._meldung(n.reseller_id, n.client_id, 'anmerkung_antwort', n.display_name + (n.kundennummer ? ' (' + n.kundennummer + ')' : '') + ' hat zu Anmerkung ' + n.nr + ' ein Bild geschickt', { aufgabe_id: n.aufgabe_id, share_id: n.share_id });
   const rest = (await query(`SELECT count(*)::int AS n FROM partner_anmerkungen WHERE aufgabe_id = $1 AND status = 'offen'`, [n.aufgabe_id])).rows[0].n;
   const ak = (await query(`SELECT status FROM partner_aufgaben_kunden WHERE aufgabe_id = $1 AND client_id = $2`, [n.aufgabe_id, n.client_id])).rows[0] || {};
   if (!rest && ak.status !== 'erledigt') await pk.aufgabeKunde(user, n.aufgabe_id, 'erledigt');
@@ -223,5 +244,6 @@ async function kundeSetzen(user, id, b) {
 }
 
 module.exports = { ARTEN, ART_TEXT, liste, anlegen, aendern, loeschen, zurueckgeben, kundeListe, kundeSetzen, _sauber: sauber,
+  /* v3640 */ _bildSauber: bildSauber, BILD_MAX,
   /* rein, fuer den Pruefer (v3460) */
   rueckmeldungMailBauen, rueckmeldungMailSenden, appLink };

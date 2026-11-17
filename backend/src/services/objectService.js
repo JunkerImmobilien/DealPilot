@@ -51,6 +51,10 @@ async function listForUser(userId, { limit = 100, offset = 0 } = {}) {
             data::jsonb->>'str' AS str, data::jsonb->>'hnr' AS hnr, data::jsonb->>'plz' AS plz,
             data::jsonb->>'kaufdat' AS kaufdat,  -- v844-kaufdat: Kaufdatum auf Sidebar-Card
             data::jsonb->>'lageklasse' AS lageklasse,  -- v1982: Sortierung nach A/B/C-Lage
+            -- v3640: vom Kunden uebernommen (partnerKunden.kundenstandUebernehmen) - Kundenhinweis, Sortierung und Filter nach Kunde
+            data::jsonb->'_von_kunde'->>'client_id' AS kunde_client_id,
+            data::jsonb->'_von_kunde'->>'kunde' AS kunde_name,
+            data::jsonb->'_von_kunde'->>'kundennummer' AS kunde_nr,
             -- v2030: Ankauf-Stand. NUR die Kurzfassung (neun Zahlen) und der
             -- Stichtag - der eingefrorene Datensatz bleibt im Blob. Ohne diese
             -- beiden Spalten haette die Rueckseite der Doppelkarte nichts zu

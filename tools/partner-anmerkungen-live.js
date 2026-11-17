@@ -52,8 +52,9 @@ const nutzer = async (e) => (await query('SELECT id, email FROM users WHERE emai
   const a1 = await http(tP, 'POST', '/partner/kundenstaende/' + ks.share_id + '/anmerkungen', { art: 'pruefen', text: 'Kaufpreis bitte prüfen (Test)', sec: 's1', reiter: 'Investition', feld_id: 'kp', feld_label: 'Kaufpreis', wert_damals: '245000', vorschlag: '239000' });
   ok('Partner legt Feld-Anmerkung an (Entwurf)', a1.status === 200 && a1.j.status === 'entwurf' && a1.j.objekt_id === orig.object_id, a1.j);
   if (a1.j && a1.j.id) neu.anm.push(a1.j.id);
-  const a2 = await http(tP, 'POST', '/partner/kundenstaende/' + ks.share_id + '/anmerkungen', { art: 'nachreichen', text: 'Bitte Teilungserklärung nachreichen (Test)' });
-  ok('Partner legt freie Anmerkung an', a2.status === 200 && !a2.j.feld_id, a2.j);
+  const a2 = await http(tP, 'POST', '/partner/kundenstaende/' + ks.share_id + '/anmerkungen', { art: 'nachreichen', text: 'Bitte Teilungserklärung nachreichen (Test)',
+    bild: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==' });   /* v3640 · mit Bildausschnitt */
+  ok('Partner legt freie Anmerkung mit Bild an', a2.status === 200 && !a2.j.feld_id && /^data:image\/png;base64,/.test(a2.j.bild || ''), a2.j && a2.j.id);
   if (a2.j && a2.j.id) neu.anm.push(a2.j.id);
   const leer = await http(tP, 'POST', '/partner/kundenstaende/' + ks.share_id + '/anmerkungen', { text: '   ' });
   ok('leerer Text abgewiesen', leer.status === 400, leer.status);
@@ -99,7 +100,31 @@ const nutzer = async (e) => (await query('SELECT id, email FROM users WHERE emai
   const fb2 = await http(tB, 'POST', '/mein-partner/anmerkungen/' + a1.j.id, { status: 'erledigt' });
   ok('anderer Kunde liest/setzt nicht (404)', fb.status === 404 && fb2.status === 404, [fb.status, fb2.status]);
 
-  /* Feldbezug ueberlebt einen neuen Stand */
+  /* v3640 · Senden erst, wenn jede Anmerkung bearbeitet ist (erledigt oder Antwort/Rueckfrage) */
+  const gesp = await http(tA, 'POST', '/mein-partner/senden', { object_ids: [orig.object_id] });
+  const unsere = (gesp.j && gesp.j.fehlen || []).filter((x) => neu.anm.includes(x.id)).length;
+  ok('Senden mit 2 unbearbeiteten Anmerkungen gesperrt (409, fehlen nennt beide, Text „Noch …“)', gesp.status === 409 && gesp.j.error === 'anmerkungen_offen' && unsere === 2 && /^Noch \d+ Anmerkung/.test(gesp.j.detail || ''), gesp.j);
+  const mp1 = await http(tA, 'GET', '/mein-partner');
+  ok('Mein Partner nennt das Objekt in anmerkungen_fehlen', (mp1.j.anmerkungen_fehlen || []).some((x) => x.objekt_id === orig.object_id && x.n >= 2), mp1.j.anmerkungen_fehlen);
+  const rf = await http(tA, 'POST', '/mein-partner/anmerkungen/' + a1.j.id, { antwort: 'Rückfrage: Welcher Notar ist gemeint? (Test)' });
+  ok('Kunde stellt eine Rueckfrage (bleibt offen)', rf.status === 200 && rf.j.offen >= 2, rf.j);
+  const gesp2 = await http(tA, 'POST', '/mein-partner/senden', { object_ids: [orig.object_id] });
+  ok('eine Rueckfrage, eine unbearbeitet: weiter gesperrt (fehlen 1)', gesp2.status === 409 && (gesp2.j.fehlen || []).filter((x) => neu.anm.includes(x.id)).length === 1, gesp2.j);
+  const PNG = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==';
+  const rb = await http(tA, 'POST', '/mein-partner/anmerkungen/' + a2.j.id, { bild_antwort: PNG });
+  ok('Kunde antwortet nur mit einem Bild (zaehlt als bearbeitet)', rb.status === 200, rb.j);
+  const zuGross = await http(tA, 'POST', '/mein-partner/anmerkungen/' + a2.j.id, { bild_antwort: 'data:image/png;base64,' + 'A'.repeat(600000) });
+  ok('Bild ueber dem Deckel abgewiesen (413)', zuGross.status === 413, zuGross.status);
+  const svg = await http(tA, 'POST', '/mein-partner/anmerkungen/' + a2.j.id, { bild_antwort: 'data:image/svg+xml;base64,PHN2Zz4=' });
+  ok('SVG als Bild abgewiesen (400)', svg.status === 400, svg.status);
+  const pr = await http(tP, 'GET', '/partner/kundenstaende');
+  const prz = (pr.j.kundenstaende || []).filter((x) => x.share_id === ks.share_id)[0] || {};
+  ok('Partner sieht Rueckfragen getrennt von erledigt (anm_rueckfrage >= 2)', prz.anm_rueckfrage >= 2, [prz.anm_offen, prz.anm_rueckfrage, prz.anm_erledigt]);
+  const pa = await http(tP, 'GET', '/partner/kundenstaende/' + ks.share_id + '/anmerkungen');
+  const pa2 = (pa.j.anmerkungen || []).filter((x) => x.id === a2.j.id)[0] || {};
+  ok('Partner sieht das Bild zur Antwort', pa2.bild_antwort === PNG);
+
+  /* Feldbezug ueberlebt einen neuen Stand (jetzt frei: alles bearbeitet) */
   const s2 = await http(tA, 'POST', '/mein-partner/senden', { object_ids: [orig.object_id] });
   ok('Kunde sendet Stand ' + (orig.stand_nr + 1), s2.status === 200 && s2.j.ergebnis[0].stand_nr === orig.stand_nr + 1, s2.j);
   const kl2 = await http(tA, 'GET', '/mein-partner/aufgaben/' + z.j.aufgabe_id + '/anmerkungen');

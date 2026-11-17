@@ -2132,7 +2132,7 @@ async function renderSaved(opts) {
       /* v1982: die Paare fuer die Gruppenkoepfe, aus DEMSELBEN Array wie die
          Karten - sonst zeigt ein Kopf auf eine Karte, die woanders steht. */
       _sbLagePaare = items.map(function(o) {
-        return { key: o.id, klasse: _sbLageVon(o) };
+        return { key: o.id, klasse: sortMode === 'kunde' ? _sbKundeVon(o) : _sbLageVon(o) };   /* v3640 · Gruppenkopf je Kunde */
       });
 
       // V63.25: Duplikat-Detection — Set aller seq_no und markieren welche doppelt vorkommen
@@ -2149,7 +2149,15 @@ async function renderSaved(opts) {
       /* v815-sb-filter: Mandanten-Switch rendern + Liste nach aktivem Mandanten filtern */
       try { if (window.DealPilotMandanten) { if (DealPilotMandanten.renderSidebarChips) DealPilotMandanten.renderSidebarChips(); if (DealPilotMandanten.filterByHalter) items = DealPilotMandanten.filterByHalter(items); } } catch (_e) {}
       if (!items.length) { list.innerHTML = _addNewBtn() + '<div class="sb-empty">Keine Objekte f\u00fcr diesen<br>Mandanten.</div>'; return; }
-      list.innerHTML = _addNewBtn() + items.map(function(o) {
+      /* v3640 · Filter nach Kunde (Partner, uebernommene Kundenobjekte). Steht der gewaehlte Kunde in der Liste nicht
+         mehr, faellt der Filter weg statt eine leere Liste zu zeigen. */
+      var _kf = _sbKundeFilter(), _kfBand = '';
+      if (_kf) {
+        var _kfItems = items.filter(function (o) { return o.kunde_client_id === _kf; });
+        if (_kfItems.length) { items = _kfItems; _kfBand = _sbKundeFilterBand(_sbKundeVon(_kfItems[0]), _kfItems.length); }
+        else _sbKundeFilterSetzen(null, true);
+      }
+      list.innerHTML = _addNewBtn() + _kfBand + items.map(function(o) {
         // V63.26: KONSISTENTER Score-Pfad
         // Plan-Gate für Investor-Sternchen
         var hasDs2Feature = false;
@@ -2263,9 +2271,12 @@ async function renderSaved(opts) {
           /* v844-card-kaufdat: Karte zeigt Kaufdatum; updated_at nur noch als Filter-Attribut */
           date: o.kaufdat ? _fmtKaufdat(o.kaufdat) : '',
           dateUpdated: o.updated_at ? new Date(o.updated_at).toLocaleDateString('de-DE') : '',
-          halter: [_halterName(o.halter), o.paket_name ? 'Paket ' + o.paket_name + (o.paket_nr ? ' · ' + o.paket_nr + '/' + (o.paket_anzahl || '?') : '') : ''].filter(Boolean).join(' · ') || null   /* v3202 */
+          halter: [_halterName(o.halter), o.paket_name ? 'Paket ' + o.paket_name + (o.paket_nr ? ' · ' + o.paket_nr + '/' + (o.paket_anzahl || '?') : '') : '',
+                   /* v3640 · dezenter Kundenhinweis auf der Karte, in der Halterzeile (alle Kartenvarianten stylen sie schon) */
+                   o.kunde_client_id ? 'Kunde ' + _sbKundeVon(o) : ''].filter(Boolean).join(' · ') || null   /* v3202 */
         });
       }).join('');   /* v1512: der Knopf steht jetzt OBEN */
+      try { var _kfx = list.querySelector('[data-sb-kunde-aus]'); if (_kfx) _kfx.onclick = function (e) { e.stopPropagation(); _sbKundeFilterSetzen(null); }; } catch (_e) {}
       _sbLageKoepfeEinsetzen(list);   /* v1982 */
       list.querySelectorAll('.sb-card').forEach(function(el) {
         el.addEventListener('click', function() {
@@ -5085,14 +5096,45 @@ window._toggleSbcDscr = function(card) {
    deutsches „14.08.2026" sortiert als Text falsch, deshalb wird es
    normalisiert. `Number(null)` ist 0 und besteht `Number.isFinite` -
    also erst auf Abwesenheit pruefen, dann vergleichen. */
-var _SB_MODI = ['recent', 'id', 'kaufdat', 'lage'];
+/* v3640 · fuenfter Modus `kunde` (Marcel 17.11.2026: „als Sortierung dann den Kunden zu haben“): uebernommene
+   Kundenobjekte des Partners nach Kundennummer, mit Gruppenkopf je Kunde, eigene Objekte dahinter. Im Menue erscheint
+   er nur, wenn die Liste ein Kundenobjekt enthaelt (oder er schon gewaehlt ist). Dazu ein Filter „Kunde zeigen“
+   (dp_sb_kunde) im selben Menue. Wie bei `lage` steht das aktive Objekt nicht zwingend oben. */
+var _SB_MODI = ['recent', 'id', 'kaufdat', 'lage', 'kunde'];
 var _SB_MODI_TEXT = {
   recent:  { wort: 'Zuletzt bearbeitet', icon: 'i-clock' },
   id:      { wort: 'Objekt-ID',          icon: 'i-hash' },
   kaufdat: { wort: 'Kaufdatum',          icon: 'i-calendar' },
-  lage:    { wort: 'Lage (A/B/C)',       icon: 'i-pin' }
+  lage:    { wort: 'Lage (A/B/C)',       icon: 'i-pin' },
+  kunde:   { wort: 'Kunde',              icon: 'i-user' }
 };
 var _sbLagePaare = [];
+
+/* v3640 · Kunde eines Listeneintrags: „K-2026-003 · Name“ oder "" (eigenes Objekt) */
+function _sbKundeVon(o) {
+  if (!o || !o.kunde_client_id) return "";
+  return (o.kunde_nr ? o.kunde_nr + ' · ' : '') + (o.kunde_name || 'Kunde');
+}
+function _sbKundeFilter() {
+  try { return localStorage.getItem('dp_sb_kunde') || null; } catch (e) { return null; }
+}
+function _sbKundeFilterSetzen(id, still) {
+  try { if (id) localStorage.setItem('dp_sb_kunde', id); else localStorage.removeItem('dp_sb_kunde'); } catch (e) {}
+  if (!still && typeof renderSaved === 'function') renderSaved();
+}
+window._sbKundeFilterSetzen = _sbKundeFilterSetzen;
+function _sbKundeFilterBand(text, n) {
+  var e = function (s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
+  return '<div class="sb-lage-kopf sb-kunde-filter" data-lage="kunde-filter" style="display:flex;align-items:center;gap:6px">' +
+    '<span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Nur Kunde ' + e(text) + ' (' + n + ')</span>' +
+    '<button type="button" data-sb-kunde-aus="1" title="Filter aufheben" aria-label="Kundenfilter aufheben" style="border:0;background:none;color:inherit;cursor:pointer;font:600 13px/1 Inter,sans-serif;padding:0 2px">×</button></div>';
+}
+function _sbKundenInListe() {
+  var l = (_renderCache && _renderCache.items) || [], seen = {}, out = [];
+  l.forEach(function (o) { if (o.kunde_client_id && !seen[o.kunde_client_id]) { seen[o.kunde_client_id] = 1; out.push({ id: o.kunde_client_id, text: _sbKundeVon(o), nr: o.kunde_nr || '' }); } });
+  out.sort(function (a, b) { return String(a.nr || a.text).localeCompare(String(b.nr || b.text), 'de', { numeric: true, sensitivity: 'base' }); });
+  return out;
+}
 
 function _sbSortModus() {
   var m = null;
@@ -5129,8 +5171,8 @@ function _sbKaufdatZahl(o) {
 
 function _sbVergleich(modus) {
   return function (a, b) {
-    /* Aktives Objekt zuerst - ausser im Lage-Modus, siehe Kommentar oben */
-    if (modus !== 'lage') {
+    /* Aktives Objekt zuerst - ausser im Lage- und Kunden-Modus, siehe Kommentar oben */
+    if (modus !== 'lage' && modus !== 'kunde') {
       if (a.id === _currentObjKey && b.id !== _currentObjKey) return -1;
       if (b.id === _currentObjKey && a.id !== _currentObjKey) return 1;
     }
@@ -5158,6 +5200,14 @@ function _sbVergleich(modus) {
       if (kb == null) return -1;
       return kb - ka;
     }
+    if (modus === 'kunde') {
+      /* v3640 · Kundenobjekte nach Kundennummer (zahlenbewusst), eigene Objekte dahinter; je Kunde zuletzt bearbeitet zuerst */
+      var kaa = _sbKundeVon(a), kbb = _sbKundeVon(b);
+      if (kaa && !kbb) return -1;
+      if (!kaa && kbb) return 1;
+      if (kaa !== kbb) return kaa.localeCompare(kbb, 'de', { numeric: true, sensitivity: 'base' });
+      return new Date(b.updated_at || b._at || 0) - new Date(a.updated_at || a._at || 0);
+    }
     if (modus === 'lage') {
       var ra = { A: 0, B: 1, C: 2 }, la = _sbLageVon(a), lb = _sbLageVon(b);
       var pa = (la in ra) ? ra[la] : 3, pb = (lb in ra) ? ra[lb] : 3;
@@ -5174,7 +5224,8 @@ function _sbVergleich(modus) {
    die Karte baut `_renderRichCard()`, und die an zwei Stellen zu
    erweitern hiesse, denselben Eingriff doppelt zu fuehren. */
 function _sbLageKoepfeEinsetzen(list) {
-  if (_sbSortModus() !== 'lage') return 0;
+  var _modus = _sbSortModus();
+  if (_modus !== 'lage' && _modus !== 'kunde') return 0;
   if (!list || !_sbLagePaare.length) return 0;
   var map = {};
   _sbLagePaare.forEach(function (p) { map[p.key] = p.klasse; });
@@ -5186,6 +5237,14 @@ function _sbLageKoepfeEinsetzen(list) {
     if (letzte !== null && k === letzte) continue;
     letzte = k;
     var h = document.createElement('div');
+    if (_modus === 'kunde') {   /* v3640 */
+      h.className = 'sb-lage-kopf sb-kunde-kopf' + (k ? '' : ' sb-lage-kopf-ohne');
+      h.setAttribute('data-kunde', k || 'ohne');
+      h.textContent = k ? ('Kunde ' + k) : 'Eigene Objekte';
+      karten[i].parentNode.insertBefore(h, karten[i]);
+      gesetzt++;
+      continue;
+    }
     h.className = 'sb-lage-kopf' + (k ? ' sb-lage-kopf-' + k.toLowerCase() : ' sb-lage-kopf-ohne');
     h.setAttribute('data-lage', k || 'ohne');
     h.textContent = k ? (k + '-Lage') : 'ohne Lageklasse';
@@ -5217,7 +5276,9 @@ function toggleSidebarSortMenu(ev) {
   m.className = 'sb-sort-menu';
   m.setAttribute('role', 'menu');
   var html = '<div class="sb-sort-menu-kopf">Sortieren nach</div>';
+  var _kunden = _sbKundenInListe();   /* v3640 */
   _SB_MODI.forEach(function (k) {
+    if (k === 'kunde' && !_kunden.length && aktiv !== 'kunde') return;
     var d = _SB_MODI_TEXT[k];
     html += '<button type="button" class="sb-sort-opt' + (k === aktiv ? ' aktiv' : '')
       + '" data-sort="' + k + '" role="menuitem">'
@@ -5226,6 +5287,20 @@ function toggleSidebarSortMenu(ev) {
       + (k === aktiv ? '<svg class="sb-sort-haken" width="13" height="13"><use href="#i-check"/></svg>' : '')
       + '</button>';
   });
+  /* v3640 · Filter nach Kunde */
+  if (_kunden.length) {
+    var _kfa = _sbKundeFilter();
+    var _e3640 = function (s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
+    html += '<div class="sb-sort-menu-kopf">Kunde zeigen</div>';
+    [{ id: '', text: 'Alle Objekte' }].concat(_kunden).forEach(function (x) {
+      var an = (x.id || null) === (_kfa || null);
+      html += '<button type="button" class="sb-sort-opt' + (an ? ' aktiv' : '') + '" data-kunde="' + _e3640(x.id) + '" role="menuitem">'
+        + '<svg width="13" height="13" aria-hidden="true"><use href="#i-user"/></svg>'
+        + '<span>' + _e3640(x.text) + '</span>'
+        + (an ? '<svg class="sb-sort-haken" width="13" height="13"><use href="#i-check"/></svg>' : '')
+        + '</button>';
+    });
+  }
   m.innerHTML = html;
   document.body.appendChild(m);
   /* Lage erst NACH dem Anhaengen rechnen - vorher hat das Menue keine
@@ -5241,6 +5316,7 @@ function toggleSidebarSortMenu(ev) {
     var b = e.target.closest ? e.target.closest('.sb-sort-opt') : null;
     if (!b) return;
     e.stopPropagation();
+    if (b.hasAttribute('data-kunde')) { _sbMenueZu(); _sbKundeFilterSetzen(b.getAttribute('data-kunde') || null); return; }   /* v3640 */
     setSidebarSort(b.getAttribute('data-sort'));
     _sbMenueZu();
   });

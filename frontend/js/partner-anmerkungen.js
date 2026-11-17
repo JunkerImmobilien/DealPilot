@@ -16,6 +16,16 @@
  * von beiden (neuer Stand, anderer Detailgrad), bleibt die Anmerkung als freie in der Liste - nie ein falsches Feld.
  * Kundentexte: nur Punkt und Komma.
  * v3490 · Feldbeschriftung: Feldcontainer .f vor .row/section (Wohnfläche hiess „Straße“).
+ * v3640 · Marcel 17.11.2026: „Besteht die Möglichkeit bei den Anmerkungen auch Bildausschnitte mitzuschicken und Sachen zu
+ *   markieren? Das Zurückschicken zur Kanzlei sollte auch nur möglich sein, wenn alle Anmerkungen bearbeitet oder erledigt
+ *   sind. Es kann auch eine Rückfrage dazu sein, aber man muss was gemacht haben.“
+ *   Bild: im Anmerkungsfenster „Bildausschnitt“ (Bereich der Ansicht aufziehen, html2canvas liegt schon im Projekt fuer
+ *   pdf.js) oder „Bild einfügen“ (Zwischenablage oder Datei, Rueckfall). Markieren im Bildfenster: Rechteck, Pfeil,
+ *   Freihand in Rot, Rückgängig. Gespeichert als WebP (sonst PNG/JPEG) bis rund 400 KB an der Anmerkung (bild), der Kunde
+ *   sieht es gross aufklappbar und kann zur Antwort selbst ein Bild anhaengen (bild_antwort).
+ *   Senden: ohneBearbeitung() = offen ohne Antwort/Rueckfrage. Solange eine solche steht, ist „Erneut senden“ aus, mit
+ *   Hinweis und Sprung zur naechsten. Dieselbe Regel sperrt im Backend (partnerKunden.senden, 409 anmerkungen_offen).
+ *   Rueckfrage (offen mit Antwort) ist beim Partner ein eigener blauer Chip, erledigt gruen.
  */
 (function () {
   'use strict';
@@ -30,6 +40,11 @@
   function toast(t) { try { if (typeof window.toast === 'function') return window.toast(t); } catch (e) {} }
   function fehlerText(e) { return (e && e.data && (e.data.detail || e.data.message)) || (e && e.message) || 'Das hat nicht geklappt.'; }
   function klein() { return window.innerWidth < 700; }
+  /** v3640 · offen und weder Antwort noch Bild zur Antwort: so eine Anmerkung sperrt das Senden (Backend dieselbe Regel) */
+  function ohneBearbeitung(liste) {
+    return (liste || []).filter(function (a) { return a && a.status === 'offen' && !(a.antwort && String(a.antwort).trim()) && !a.bild_antwort && !a.hat_bild_antwort; });
+  }
+  function istRueckfrage(a) { return a && a.status === 'offen' && ((a.antwort && String(a.antwort).trim()) || a.bild_antwort); }
 
   function stil() {
     if (document.getElementById('dppk-anm-stil')) return;
@@ -55,6 +70,26 @@
       '#dppk-anm-liste .al-text{white-space:pre-wrap;line-height:1.45}',
       '#dppk-anm-liste .al-chip{display:inline-block;font:600 10px "JetBrains Mono",monospace;letter-spacing:.04em;text-transform:uppercase;border:1px solid #E2D7BE;border-radius:5px;padding:1px 6px;margin-left:4px;color:#6B5A2A;background:#FBF6E9}',
       '#dppk-anm-liste .al-chip.gruen{color:#2C7A4E;background:#EAF5EE;border-color:#BFE0CB}',
+      '#dppk-anm-liste .al-chip.frage{color:#2F5D8A;background:#EAF1F8;border-color:#BCD0E6}',
+      '#dppk-anm-liste .al-chip.rot{color:#94433E;background:#F8ECEB;border-color:#E3C2BF}',
+      /* v3640 · Bild an der Anmerkung, Bildwerkzeug, Grossansicht */
+      '.al-bild{display:block;margin:7px 0 2px;max-width:100%;max-height:140px;border:1px solid #E2D7BE;border-radius:8px;cursor:zoom-in;background:#fff}',
+      '.al-bild-zeile{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin:8px 0 2px}',
+      '.al-bild-zeile img{max-width:120px;max-height:80px;border:1px solid #E2D7BE;border-radius:6px;cursor:zoom-in}',
+      '.al-hinweis-rot{font-size:12px;color:#94433E;line-height:1.45}',
+      '#dppk-bild-auswahl{position:fixed;inset:0;z-index:100090;cursor:crosshair;background:rgba(5,5,5,.18);touch-action:none}',
+      '#dppk-bild-auswahl .ba-rahmen{position:absolute;border:2px solid #D8564C;background:rgba(216,86,76,.08);box-shadow:0 0 0 9999px rgba(5,5,5,.25)}',
+      '#dppk-bild-auswahl .ba-hinweis{position:fixed;left:50%;top:12px;transform:translateX(-50%);background:#050505;color:#FDFCFA;border:1px solid ' + G + ';border-radius:10px;padding:8px 12px;font:500 13px Inter,sans-serif;pointer-events:none;max-width:calc(100vw - 24px)}',
+      '#dppk-bild-ed{position:fixed;inset:0;z-index:100095;background:rgba(5,5,5,.72);display:flex;align-items:center;justify-content:center;padding:16px;font:400 13px Inter,sans-serif}',
+      '#dppk-bild-ed .be-box{background:#FDFCFA;border-radius:12px;max-width:min(1100px,100%);max-height:100%;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 26px 70px rgba(0,0,0,.45)}',
+      '#dppk-bild-ed .be-leiste{display:flex;gap:6px;flex-wrap:wrap;align-items:center;padding:10px 12px;border-bottom:1px solid #EDE6D6}',
+      '#dppk-bild-ed .be-leiste .al-btn.an{border-color:#D8564C;color:#B8433A;background:#FBEDEB}',
+      '#dppk-bild-ed .be-flaeche{overflow:auto;padding:10px;background:#EEE9DE;display:flex;align-items:flex-start;justify-content:center;min-height:120px}',
+      '#dppk-bild-ed canvas{max-width:100%;height:auto;background:#fff;box-shadow:0 2px 10px rgba(0,0,0,.2);touch-action:none;cursor:crosshair}',
+      '#dppk-bild-ed .be-leer{padding:30px 20px;text-align:center;color:#6B6460;max-width:420px;line-height:1.5}',
+      '#dppk-bild-ed .be-fuss{display:flex;gap:6px;justify-content:flex-end;flex-wrap:wrap;align-items:center;padding:10px 12px;border-top:1px solid #EDE6D6}',
+      '#dppk-bild-gross{position:fixed;inset:0;z-index:100100;background:rgba(5,5,5,.82);display:flex;align-items:center;justify-content:center;padding:20px;cursor:zoom-out}',
+      '#dppk-bild-gross img{max-width:100%;max-height:100%;border-radius:8px;box-shadow:0 18px 60px rgba(0,0,0,.6);background:#fff}',
       '#dppk-anm-liste .al-knoepfe{display:flex;gap:6px;flex-wrap:wrap;margin-top:7px}',
       '#dppk-anm-liste .al-fuss{padding:10px 12px;border-top:1px solid #EDE6D6;display:flex;gap:6px;flex-wrap:wrap}',
       '.al-btn{border:1px solid #D9CFB8;background:#fff;color:#2A2727;border-radius:8px;padding:6px 10px;font:600 12px Inter,sans-serif;cursor:pointer}',
@@ -75,7 +110,7 @@
       '#dppk-anm-fenster .af-fuss{display:flex;gap:6px;justify-content:flex-end;margin-top:10px}',
       '#dppk-anm-hinweis{position:fixed;left:50%;transform:translateX(-50%);top:12px;z-index:100065;background:#050505;color:#FDFCFA;border:1px solid ' + G + ';border-radius:10px;padding:8px 12px;font:500 13px Inter,sans-serif;display:flex;gap:10px;align-items:center;max-width:calc(100vw - 24px)}',
       '@media (max-width:699px){#dppk-anm-liste{left:0;right:0;top:auto;bottom:0;width:auto;max-height:62vh;border-radius:14px 14px 0 0}#dppk-anm-fenster{left:12px !important;right:12px;top:auto !important;bottom:12px;width:auto}}',
-      '@media print{#dppk-anm-liste,#dppk-anm-layer,#dppk-anm-fenster{display:none !important}}'
+      '@media print{#dppk-anm-liste,#dppk-anm-layer,#dppk-anm-fenster,#dppk-bild-ed,#dppk-bild-gross{display:none !important}}'
     ].join('\n');
     document.head.appendChild(s);
   }
@@ -191,10 +226,12 @@
     var entw = Z.liste.filter(function (a) { return a.status === 'entwurf'; }).length;
     var offen = Z.liste.filter(function (a) { return a.status === 'offen'; }).length;
     var titel = partner ? 'Anmerkungen' : 'Rückmeldung deines Partners';
+    var ohne = ohneBearbeitung(Z.liste);   /* v3640 */
     l.innerHTML = '<div class="al-kopf"><b>' + titel + '</b><button type="button" class="al-zu" aria-label="Liste schließen">×</button></div><div class="al-inhalt">' +
       (Z.liste.length ? Z.liste.map(function (a) {
         var ort = a.feld_id || a.selektor ? (a._frei ? 'Feld nicht mehr vorhanden, gilt allgemein' : [a.reiter, a.feld_label].filter(Boolean).join(' › ')) : 'allgemein';
-        var st = a.status === 'entwurf' ? '<span class="al-chip">Entwurf</span>' : a.status === 'erledigt' ? '<span class="al-chip gruen">erledigt</span>' : '<span class="al-chip">offen</span>';
+        var st = a.status === 'entwurf' ? '<span class="al-chip">Entwurf</span>' : a.status === 'erledigt' ? '<span class="al-chip gruen">erledigt</span>'
+          : istRueckfrage(a) ? '<span class="al-chip frage">' + (partner ? 'Rückfrage' : 'beantwortet') + '</span>' : '<span class="al-chip' + (partner ? '' : ' rot') + '">offen</span>';   /* v3640 */
         var kn = '';
         if (partner && a.status === 'entwurf') kn = '<button type="button" class="al-btn" data-a="bearbeiten">Ändern</button><button type="button" class="al-btn rot" data-a="loeschen">Löschen</button>';
         if (!partner) kn = (a.status !== 'erledigt' ? '<button type="button" class="al-btn gold" data-a="erledigt">Erledigt</button>' : '<button type="button" class="al-btn" data-a="offen">Wieder offen</button>') +
@@ -204,17 +241,25 @@
           '<div class="al-ort">' + esc(ort) + (a.wert_damals ? ' · damals: ' + esc(a.wert_damals) : '') + '</div>' +
           '<div class="al-text">' + esc(a.text) + '</div>' +
           (a.vorschlag ? '<div class="al-ort">Vorschlag: <b>' + esc(a.vorschlag) + '</b></div>' : '') +
-          (a.antwort ? '<div class="al-ort">Antwort' + (partner ? ' des Kunden' : '') + ': ' + esc(a.antwort) + '</div>' : '') +
+          (a.bild ? '<img class="al-bild" data-gross="bild" alt="Bildausschnitt zur Anmerkung ' + a.nr + '" src="' + esc(a.bild) + '">' : '') +
+          (a.antwort ? '<div class="al-ort">' + (istRueckfrage(a) && partner ? 'Rückfrage des Kunden' : 'Antwort' + (partner ? ' des Kunden' : '')) + ': ' + esc(a.antwort) + '</div>' : '') +
+          (a.bild_antwort ? '<img class="al-bild" data-gross="bild_antwort" alt="Bild zur Antwort" src="' + esc(a.bild_antwort) + '">' : '') +
           (kn ? '<div class="al-knoepfe">' + kn + '</div>' : '') + '</div>';
       }).join('') : '<div class="al-ort">' + (partner ? 'Noch keine Anmerkungen. Mit „Feld markieren“ eine Stelle wählen oder mit „Anmerkung“ etwas Allgemeines schreiben.' : 'Keine Anmerkungen.') + '</div>') +
       '</div><div class="al-fuss">' +
       (partner ? '<button type="button" class="al-btn" data-f="markieren">Feld markieren</button><button type="button" class="al-btn" data-f="frei">Anmerkung</button><button type="button" class="al-btn gold" data-f="zurueck"' + (entw ? '' : ' disabled') + '>Zurück an Kunden (' + entw + ')</button>'
-        : (offen ? '<span class="al-ort">' + offen + ' von ' + Z.liste.length + ' offen</span>' : '<span class="al-ort">Alles erledigt. Du kannst das Objekt jetzt erneut senden.</span><button type="button" class="al-btn gold" data-f="senden">Erneut senden</button>') +
+        /* v3640 · Senden erst, wenn jede Anmerkung erledigt ist oder eine Antwort/Rückfrage traegt */
+        : (ohne.length
+            ? '<span class="al-hinweis-rot">' + (ohne.length === 1 ? 'Noch 1 Anmerkung ohne Bearbeitung' : 'Noch ' + ohne.length + ' Anmerkungen ohne Bearbeitung') + '. Erledige sie oder schreib eine Antwort oder Rückfrage.</span>' +
+              '<button type="button" class="al-btn" data-f="naechste">Zur nächsten (' + ohne[0].nr + ')</button><button type="button" class="al-btn gold" data-f="senden" disabled title="Erst alle Anmerkungen bearbeiten">Erneut senden</button>'
+            : '<span class="al-ort">' + (offen ? 'Alle bearbeitet, ' + offen + ' mit Rückfrage. ' : 'Alles erledigt. ') + 'Du kannst das Objekt jetzt erneut senden.</span><button type="button" class="al-btn gold" data-f="senden">Erneut senden</button>') +
           '<button type="button" class="al-btn" data-f="ende">Schließen</button>') + '</div>';
     l.querySelector('.al-zu').onclick = listeZu;
     [].forEach.call(l.querySelectorAll('.al-eintrag'), function (e) {
       var a = Z.liste.filter(function (x) { return x.id === e.getAttribute('data-id'); })[0];
       e.onclick = function (ev) {
+        var gb = ev.target.closest('[data-gross]');
+        if (gb) { ev.stopPropagation(); return grossZeigen(gb.getAttribute('src')); }   /* v3640 */
         var k = ev.target.closest('[data-a]');
         if (!k) return hinspringen(a);
         ev.stopPropagation(); aktion(k.getAttribute('data-a'), a);
@@ -225,6 +270,7 @@
         var f = b.getAttribute('data-f');
         if (f === 'markieren') markierenStart(); else if (f === 'frei') fenster(null); else if (f === 'zurueck') zurueckDialog();
         else if (f === 'ende') ende(); else if (f === 'senden') erneutSenden();
+        else if (f === 'naechste') { var n0 = ohneBearbeitung(Z.liste)[0]; if (n0) { var x0 = document.querySelector('#dppk-anm-liste [data-id="' + n0.id + '"]'); if (x0) { x0.scrollIntoView({ block: 'nearest' }); x0.classList.add('dppk-anm-blitz'); setTimeout(function () { x0.classList.remove('dppk-anm-blitz'); }, 2600); } hinspringen(n0); } }
       };
     });
     rahmenZeichnen();
@@ -318,8 +364,11 @@
       '<div class="af-zeile"><textarea id="dppk-anm-text" maxlength="2000" placeholder="Was soll der Kunde wissen oder tun?">' + esc(alt ? alt.text : '') + '</textarea></div>' +
       '<div class="af-arten" role="radiogroup">' + Object.keys(ART).map(function (k) { return '<label><input type="radio" name="dppk-anm-art" value="' + k + '"' + (k === art ? ' checked' : '') + '><span>' + ART[k] + '</span></label>'; }).join('') + '</div>' +
       (f._eingabe ? '<input type="text" id="dppk-anm-vorschlag" maxlength="500" placeholder="Vorschlag für den Wert (optional)" value="' + esc(alt && alt.vorschlag || '') + '">' : '') +
+      '<div class="al-bild-zeile" data-bildzeile></div>' +
       '<div class="af-fuss"><button type="button" class="al-btn" data-x="zu">Abbrechen</button><button type="button" class="al-btn gold" data-x="ok">Speichern</button></div>';
     document.body.appendChild(d);
+    var bild = { wert: alt ? (alt.bild || null) : null };   /* v3640 */
+    bildZeile(d.querySelector('[data-bildzeile]'), bild, d);
     if (el && !klein()) {
       var r = el.getBoundingClientRect(), w = d.offsetWidth, h = d.offsetHeight;
       var x = Math.min(Math.max(12, r.left), window.innerWidth - w - 12), y = r.bottom + 8;
@@ -333,6 +382,7 @@
       var text = ta.value.trim(); if (!text) return toast('Bitte einen Text eintragen.');
       var body = { text: text, art: (d.querySelector('input[name="dppk-anm-art"]:checked') || {}).value || 'hinweis' };
       var v = d.querySelector('#dppk-anm-vorschlag'); if (v) body.vorschlag = v.value.trim();
+      if (alt) body.bild = bild.wert || null; else if (bild.wert) body.bild = bild.wert;   /* v3640 */
       var p;
       if (alt) p = api('/partner/anmerkungen/' + alt.id, { method: 'PUT', body: body });
       else { ['sec', 'reiter', 'feld_id', 'selektor', 'feld_label', 'wert_damals'].forEach(function (k) { if (f[k]) body[k] = String(f[k]); }); p = api('/partner/kundenstaende/' + Z.share + '/anmerkungen', { method: 'POST', body: body }); }
@@ -343,14 +393,21 @@
   function antwortFenster(a) {
     stil(); fensterZu();
     var d = document.createElement('div'); d.id = 'dppk-anm-fenster';
-    d.innerHTML = '<h4>Antwort zu Anmerkung ' + a.nr + '</h4><div class="af-ort">' + esc(a.text) + '</div><textarea id="dppk-anm-text" maxlength="2000">' + esc(a.antwort || '') + '</textarea>' +
-      '<div class="af-fuss"><button type="button" class="al-btn" data-x="zu">Abbrechen</button><button type="button" class="al-btn" data-x="nur">Antwort senden</button><button type="button" class="al-btn gold" data-x="erl">Antworten und erledigt</button></div>';
+    d.innerHTML = '<h4>Antwort zu Anmerkung ' + a.nr + '</h4><div class="af-ort">' + esc(a.text) + '</div><textarea id="dppk-anm-text" maxlength="2000" placeholder="Antwort oder Rückfrage an deinen Partner">' + esc(a.antwort || '') + '</textarea>' +
+      '<div class="al-bild-zeile" data-bildzeile></div>' +
+      '<div class="af-fuss"><button type="button" class="al-btn" data-x="zu">Abbrechen</button><button type="button" class="al-btn" data-x="nur">Als Rückfrage senden</button><button type="button" class="al-btn gold" data-x="erl">Antworten und erledigt</button></div>';
     document.body.appendChild(d);
     if (!klein()) { d.style.left = Math.round((window.innerWidth - d.offsetWidth) / 2) + 'px'; d.style.top = '120px'; }
     try { if (window.DealPilotDiktat) DealPilotDiktat.knopfAn('dppk-anm-text'); } catch (e) {}
+    var bild = { wert: a.bild_antwort || null };   /* v3640 · Bild zur Antwort */
+    bildZeile(d.querySelector('[data-bildzeile]'), bild, d);
+    function body(extra) { var b = { antwort: d.querySelector('textarea').value }; if ((bild.wert || null) !== (a.bild_antwort || null)) b.bild_antwort = bild.wert || null; return Object.assign(b, extra || {}); }
     d.querySelector('[data-x="zu"]').onclick = fensterZu;
-    d.querySelector('[data-x="nur"]').onclick = function () { kundeSetzen(a, { antwort: d.querySelector('textarea').value }).then(fensterZu); };
-    d.querySelector('[data-x="erl"]').onclick = function () { kundeSetzen(a, { antwort: d.querySelector('textarea').value, status: 'erledigt' }).then(fensterZu); };
+    d.querySelector('[data-x="nur"]').onclick = function () {
+      var b = body(); if (!String(b.antwort || '').trim() && !bild.wert) return toast('Bitte eine Antwort oder Rückfrage schreiben.');
+      kundeSetzen(a, b).then(fensterZu);
+    };
+    d.querySelector('[data-x="erl"]').onclick = function () { kundeSetzen(a, body({ status: 'erledigt' })).then(fensterZu); };
   }
   function kundeSetzen(a, body) {
     return api('/mein-partner/anmerkungen/' + a.id, { method: 'POST', body: body }).then(function (r) {
@@ -441,5 +498,171 @@
     if (Z.takt) { clearInterval(Z.takt); Z.takt = null; }
   }
 
-  window.DpAnmerkungen = { partnerBanner: partnerBanner, kundeOeffnen: kundeOeffnen, ende: ende, zuordnen: zuordnen, _zustand: Z, _feldBeschreiben: feldBeschreiben, _pfad: pfad };
+  /* ── v3640 · Bild: Ausschnitt aufziehen, markieren, verkleinern ───────────────────────────────────── */
+  var BILD_ZIEL = 400 * 1024;   /* Bytes; Backend-Deckel BILD_MAX 560000 Zeichen data:-URL */
+  var ROT = '#D8564C';
+  function bytesVon(url) { var i = String(url || '').indexOf(','); return i < 0 ? 0 : Math.floor((url.length - i - 1) * 3 / 4); }
+  /** Rein (Pruefer): groesste Seite hoechstens max, Seitenverhaeltnis bleibt */
+  function zielMass(w, h, max) { var f = Math.min(1, max / Math.max(w, h, 1)); return { w: Math.max(1, Math.round(w * f)), h: Math.max(1, Math.round(h * f)) }; }
+  /** Leinwand -> data:-URL unter BILD_ZIEL: WebP mit sinkender Qualitaet, dann kleiner; ohne WebP (Safari alt) JPEG */
+  function verkleinern(cv) {
+    var groessen = [1600, 1280, 1024, 800, 640], quali = [0.86, 0.72, 0.58, 0.45];
+    var letzt = null;
+    for (var gi = 0; gi < groessen.length; gi++) {
+      var m = zielMass(cv.width, cv.height, groessen[gi]);
+      var c2 = document.createElement('canvas'); c2.width = m.w; c2.height = m.h;
+      var x = c2.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, m.w, m.h); x.drawImage(cv, 0, 0, m.w, m.h);
+      for (var qi = 0; qi < quali.length; qi++) {
+        var u = c2.toDataURL('image/webp', quali[qi]);
+        if (u.indexOf('data:image/webp') !== 0) u = c2.toDataURL('image/jpeg', quali[qi]);
+        letzt = u;
+        if (bytesVon(u) <= BILD_ZIEL) return u;
+      }
+    }
+    return letzt;
+  }
+  function unsereFlaechen(el) { return !!(el && el.id && /^dppk-(anm-|bild-)/.test(el.id)); }
+  /** Bereich der Ansicht aufziehen -> Leinwand (html2canvas) oder null */
+  function ausschnitt() {
+    return new Promise(function (fertig) {
+      stil();
+      var weg = [].filter.call(document.querySelectorAll('#dppk-anm-fenster,#dppk-anm-liste,#dppk-anm-layer'), function (e) { return e; });
+      weg.forEach(function (e) { e.setAttribute('data-sicht', e.style.visibility || ''); e.style.visibility = 'hidden'; });
+      var zurueck = function () { weg.forEach(function (e) { e.style.visibility = e.getAttribute('data-sicht') || ''; e.removeAttribute('data-sicht'); }); };
+      var o = document.createElement('div'); o.id = 'dppk-bild-auswahl';
+      o.innerHTML = '<div class="ba-hinweis">Bereich aufziehen, den du zeigen willst. Esc bricht ab.</div>';
+      document.body.appendChild(o);
+      var r = null, start = null;
+      function taste(ev) { if (ev.key === 'Escape') { ende(null); } }
+      function ende(rect) {
+        document.removeEventListener('keydown', taste, true);
+        o.remove();
+        if (!rect || rect.w < 8 || rect.h < 8) { zurueck(); return fertig(null); }
+        if (typeof window.html2canvas !== 'function') { zurueck(); toast('Bildausschnitt geht hier nicht. Füge ein Bildschirmfoto mit „Bild einfügen“ ein.'); return fertig(null); }
+        /* kurz warten, bis die Auswahlflaeche wirklich weg ist */
+        setTimeout(function () {
+          var sx = window.scrollX || window.pageXOffset || 0, sy = window.scrollY || window.pageYOffset || 0;
+          window.html2canvas(document.body, {
+            x: rect.x + sx, y: rect.y + sy, width: rect.w, height: rect.h,
+            scrollX: -sx, scrollY: -sy, windowWidth: document.documentElement.clientWidth, windowHeight: document.documentElement.clientHeight,
+            scale: Math.min(window.devicePixelRatio || 1, 2), useCORS: true, logging: false, backgroundColor: '#ffffff',
+            ignoreElements: unsereFlaechen
+          }).then(function (cv) { zurueck(); fertig(cv); }, function (e) { zurueck(); try { console.warn('[anmerkungen] Ausschnitt', e); } catch (x) {} toast('Der Ausschnitt ging nicht. Füge ein Bildschirmfoto mit „Bild einfügen“ ein.'); fertig(null); });
+        }, 60);
+      }
+      o.addEventListener('pointerdown', function (ev) {
+        ev.preventDefault(); start = { x: ev.clientX, y: ev.clientY };
+        r = document.createElement('div'); r.className = 'ba-rahmen'; o.appendChild(r);
+        try { o.setPointerCapture(ev.pointerId); } catch (e) {}
+      });
+      o.addEventListener('pointermove', function (ev) {
+        if (!start || !r) return;
+        var x = Math.min(start.x, ev.clientX), y = Math.min(start.y, ev.clientY), w = Math.abs(ev.clientX - start.x), h = Math.abs(ev.clientY - start.y);
+        r.style.left = x + 'px'; r.style.top = y + 'px'; r.style.width = w + 'px'; r.style.height = h + 'px';
+      });
+      o.addEventListener('pointerup', function (ev) {
+        if (!start) return;
+        var x = Math.min(start.x, ev.clientX), y = Math.min(start.y, ev.clientY), w = Math.abs(ev.clientX - start.x), h = Math.abs(ev.clientY - start.y);
+        start = null; ende({ x: Math.round(x), y: Math.round(y), w: Math.round(w), h: Math.round(h) });
+      });
+      document.addEventListener('keydown', taste, true);
+    });
+  }
+  function bildLaden(src) { return new Promise(function (ok, nein) { var i = new Image(); i.onload = function () { ok(i); }; i.onerror = nein; i.src = src; }); }
+  function dateiLesen(f) { return new Promise(function (ok, nein) { var r = new FileReader(); r.onload = function () { ok(r.result); }; r.onerror = nein; r.readAsDataURL(f); }); }
+  /** Bildfenster: Grundbild (Leinwand oder Bild) + Rechteck/Pfeil/Freihand in Rot, Rueckgaengig; Ergebnis data:-URL oder null */
+  function bearbeiten(grund) {
+    return new Promise(function (fertig) {
+      stil();
+      var basis = null, striche = [], werkzeug = 'rechteck', zieht = null;
+      var ed = document.createElement('div'); ed.id = 'dppk-bild-ed';
+      ed.innerHTML = '<div class="be-box" role="dialog" aria-label="Bild markieren"><div class="be-leiste">' +
+        '<b style="font:600 14px \'Space Grotesk\',Inter,sans-serif;margin-right:6px">Markieren</b>' +
+        '<button type="button" class="al-btn an" data-w="rechteck">Rechteck</button><button type="button" class="al-btn" data-w="pfeil">Pfeil</button><button type="button" class="al-btn" data-w="frei">Freihand</button>' +
+        '<button type="button" class="al-btn" data-b="undo">Rückgängig</button><span style="flex:1"></span>' +
+        '<label class="al-btn" style="display:inline-block">Bild einfügen<input type="file" accept="image/png,image/jpeg,image/webp" hidden></label></div>' +
+        '<div class="be-flaeche"></div><div class="be-fuss"><span class="al-ort" style="flex:1" data-groesse></span>' +
+        '<button type="button" class="al-btn" data-b="abbr">Abbrechen</button><button type="button" class="al-btn gold" data-b="ok">Übernehmen</button></div></div>';
+      document.body.appendChild(ed);
+      var fl = ed.querySelector('.be-flaeche'), cv = document.createElement('canvas'), cx = cv.getContext('2d');
+      function leer() { fl.innerHTML = '<div class="be-leer">Füge ein Bildschirmfoto ein (Strg+V) oder wähle oben eine Datei.</div>'; }
+      function setzeGrund(src) {
+        basis = src; striche = [];
+        cv.width = src.width || src.naturalWidth; cv.height = src.height || src.naturalHeight;
+        fl.innerHTML = ''; fl.appendChild(cv); zeichnen();
+      }
+      function linie() { return Math.max(3, Math.round(Math.max(cv.width, cv.height) / 260)); }
+      function strich(s) {
+        cx.save(); cx.strokeStyle = ROT; cx.fillStyle = ROT; cx.lineWidth = s.lw; cx.lineCap = 'round'; cx.lineJoin = 'round';
+        if (s.art === 'rechteck') cx.strokeRect(Math.min(s.a.x, s.b.x), Math.min(s.a.y, s.b.y), Math.abs(s.b.x - s.a.x), Math.abs(s.b.y - s.a.y));
+        else if (s.art === 'pfeil') {
+          var w = Math.atan2(s.b.y - s.a.y, s.b.x - s.a.x), k = s.lw * 4.5;
+          cx.beginPath(); cx.moveTo(s.a.x, s.a.y); cx.lineTo(s.b.x, s.b.y); cx.stroke();
+          cx.beginPath(); cx.moveTo(s.b.x, s.b.y); cx.lineTo(s.b.x - k * Math.cos(w - 0.45), s.b.y - k * Math.sin(w - 0.45)); cx.lineTo(s.b.x - k * Math.cos(w + 0.45), s.b.y - k * Math.sin(w + 0.45)); cx.closePath(); cx.fill();
+        } else if (s.art === 'frei' && s.p.length) { cx.beginPath(); cx.moveTo(s.p[0].x, s.p[0].y); s.p.forEach(function (q) { cx.lineTo(q.x, q.y); }); cx.stroke(); }
+        cx.restore();
+      }
+      function zeichnen() {
+        if (!basis) return;
+        cx.fillStyle = '#fff'; cx.fillRect(0, 0, cv.width, cv.height); cx.drawImage(basis, 0, 0, cv.width, cv.height);
+        striche.forEach(strich); if (zieht) strich(zieht);
+        var g = ed.querySelector('[data-groesse]'); if (g) g.textContent = cv.width + ' × ' + cv.height + ' px' + (striche.length ? ', ' + striche.length + (striche.length === 1 ? ' Markierung' : ' Markierungen') : '');
+      }
+      function punkt(ev) { var b = cv.getBoundingClientRect(); return { x: (ev.clientX - b.left) * cv.width / b.width, y: (ev.clientY - b.top) * cv.height / b.height }; }
+      cv.addEventListener('pointerdown', function (ev) { if (!basis) return; ev.preventDefault(); var p = punkt(ev); zieht = { art: werkzeug, a: p, b: p, p: [p], lw: linie() }; try { cv.setPointerCapture(ev.pointerId); } catch (e) {} });
+      cv.addEventListener('pointermove', function (ev) { if (!zieht) return; var p = punkt(ev); zieht.b = p; if (zieht.art === 'frei') zieht.p.push(p); zeichnen(); });
+      cv.addEventListener('pointerup', function () { if (!zieht) return; var s = zieht; zieht = null; if (s.art === 'frei' ? s.p.length > 1 : (Math.abs(s.b.x - s.a.x) + Math.abs(s.b.y - s.a.y) > 4)) striche.push(s); zeichnen(); });
+      [].forEach.call(ed.querySelectorAll('[data-w]'), function (b) { b.onclick = function () { werkzeug = b.getAttribute('data-w'); [].forEach.call(ed.querySelectorAll('[data-w]'), function (x) { x.classList.toggle('an', x === b); }); }; });
+      ed.querySelector('[data-b="undo"]').onclick = function () { striche.pop(); zeichnen(); };
+      function einsetzen(url) { return bildLaden(url).then(setzeGrund, function () { toast('Das Bild ließ sich nicht lesen.'); }); }
+      ed.querySelector('input[type=file]').onchange = function (ev) { var f = ev.target.files && ev.target.files[0]; if (f) dateiLesen(f).then(einsetzen); };
+      function einfuegen(ev) {
+        var it = ev.clipboardData && ev.clipboardData.items; if (!it) return;
+        for (var i = 0; i < it.length; i++) if (it[i].type && it[i].type.indexOf('image/') === 0) { ev.preventDefault(); dateiLesen(it[i].getAsFile()).then(einsetzen); return; }
+      }
+      document.addEventListener('paste', einfuegen, true);
+      function schluss(w) { document.removeEventListener('paste', einfuegen, true); ed.remove(); fertig(w); }
+      ed.querySelector('[data-b="abbr"]').onclick = function () { schluss(null); };
+      ed.querySelector('[data-b="ok"]').onclick = function () {
+        if (!basis) return toast('Erst ein Bild aufnehmen oder einfügen.');
+        striche.forEach(function () {}); zieht = null; zeichnen();
+        var u = verkleinern(cv);
+        if (!u || bytesVon(u) > BILD_ZIEL * 1.05) return toast('Das Bild ist zu groß, bitte einen kleineren Ausschnitt wählen.');
+        schluss(u);
+      };
+      if (grund && typeof grund === 'string') einsetzen(grund); else if (grund) setzeGrund(grund); else leer();
+    });
+  }
+  /** Bildzeile im Anmerkungs- bzw. Antwortfenster: Ausschnitt, Einfügen, Vorschau, Ändern, Entfernen */
+  function bildZeile(z, bild, fensterEl) {
+    if (!z) return;
+    function neu() {
+      z.innerHTML = bild.wert
+        ? '<img alt="Bild zur Anmerkung" src="' + esc(bild.wert) + '" data-g="1"><button type="button" class="al-btn" data-bb="aendern">Markieren</button><button type="button" class="al-btn rot" data-bb="weg">Bild entfernen</button><span class="al-ort">' + Math.round(bytesVon(bild.wert) / 1024) + ' KB</span>'
+        : '<button type="button" class="al-btn" data-bb="ausschnitt">Bildausschnitt</button><button type="button" class="al-btn" data-bb="einfuegen">Bild einfügen</button>';
+      var g = z.querySelector('[data-g]'); if (g) g.onclick = function () { grossZeigen(bild.wert); };
+      [].forEach.call(z.querySelectorAll('[data-bb]'), function (b) {
+        b.onclick = function () {
+          var w = b.getAttribute('data-bb');
+          if (w === 'weg') { bild.wert = null; return neu(); }
+          var p = w === 'ausschnitt' ? ausschnitt().then(function (cv) { return cv ? bearbeiten(cv) : null; })
+            : w === 'aendern' ? bearbeiten(bild.wert) : bearbeiten(null);
+          if (fensterEl) fensterEl.style.visibility = 'hidden';
+          p.then(function (u) { if (fensterEl) fensterEl.style.visibility = ''; if (u) { bild.wert = u; neu(); } }, function () { if (fensterEl) fensterEl.style.visibility = ''; });
+        };
+      });
+    }
+    neu();
+  }
+  function grossZeigen(src) {
+    if (!src) return; stil();
+    var g = document.createElement('div'); g.id = 'dppk-bild-gross'; g.setAttribute('role', 'dialog'); g.setAttribute('aria-label', 'Bild groß');
+    g.innerHTML = '<img alt="Bild groß" src="' + esc(src) + '">';
+    g.onclick = function () { g.remove(); };
+    document.addEventListener('keydown', function k(ev) { if (ev.key === 'Escape') { g.remove(); document.removeEventListener('keydown', k, true); } }, true);
+    document.body.appendChild(g);
+  }
+
+  window.DpAnmerkungen = { partnerBanner: partnerBanner, kundeOeffnen: kundeOeffnen, ende: ende, zuordnen: zuordnen, _zustand: Z, _feldBeschreiben: feldBeschreiben, _pfad: pfad,
+    /* v3640 */ ohneBearbeitung: ohneBearbeitung, istRueckfrage: istRueckfrage, _zielMass: zielMass, _bytesVon: bytesVon, BILD_ZIEL: BILD_ZIEL, _ausschnitt: ausschnitt, _bearbeiten: bearbeiten, _grossZeigen: grossZeigen };
 })();

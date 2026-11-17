@@ -157,6 +157,39 @@ console.log('A · E-Mail bei Rueckmeldung (v3460)');
   ok('Migration 107: mail_rueckmeldung boolean NOT NULL DEFAULT true, idempotent', /ADD COLUMN IF NOT EXISTS mail_rueckmeldung boolean NOT NULL DEFAULT true/.test(m107));
 }
 
+/* ── v3640 · Bildausschnitt an der Anmerkung, Rueckfrage, Sperre beim Senden ────────────────────────
+   Marcel 17.11.2026: Bilder mit Markierungen an Anmerkungen; Zuruecksenden erst, wenn jede bearbeitet ist. */
+{
+  console.log('A · v3640 Bild, Rueckfrage, Senden');
+  const A = require(path.join(WURZEL, 'backend', 'src', 'services', 'partnerAnmerkungen.js'));
+  const bs = A._bildSauber;
+  const png = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==';
+  ok('Bild: gueltiges PNG/WebP/JPEG bleibt', bs(png) === png && bs('data:image/webp;base64,UklGRg==') && bs('data:image/jpeg;base64,/9j/4A=='));
+  ok('Bild: undefined = unveraendert, null/leer = entfernen', bs(undefined) === undefined && bs(null) === null && bs('') === null);
+  const wirft = (v) => { try { bs(v); return null; } catch (e) { return e; } };
+  const g = wirft('data:image/png;base64,' + 'A'.repeat(A.BILD_MAX));
+  ok('Bild: ueber dem Deckel -> 413 bild_zu_gross', g && g.status === 413 && g.message === 'bild_zu_gross', g && g.message);
+  ok('Bild: Deckel rund 400 KB (560000 Zeichen data:-URL) und unter dem DB-Netz 600000', A.BILD_MAX === 560000);
+  const t = ['data:image/svg+xml;base64,PHN2Zz4=', 'data:text/html;base64,PGI+', 'javascript:alert(1)', 'data:image/png;base64,<script>', 'https://x.invalid/a.png'].map(wirft);
+  ok('Bild: SVG, HTML, Skript, fremde Adresse -> 400 bild_ungueltig', t.every((e) => e && e.status === 400 && e.message === 'bild_ungueltig'), t.map((e) => e && e.message));
+  ok('Bild: _sauber nimmt es mit', A._sauber({ text: 'x', bild: png }).bild === png && A._sauber({ text: 'x' }).bild === undefined);
+  const src = fs.readFileSync(modulPfad, 'utf8');
+  ok('Bild: anlegen speichert, aendern ersetzt/entfernt, Kunde liest beide Bilder', /erstellt_von, bild\)/.test(src) && /bild = \$5 WHERE id = \$1/.test(src) && /n\.bild, n\.bild_antwort/.test(src) && /bild_antwort = \$4/.test(src));
+  ok('Rueckfrage: Meldung an den Partner nennt sie und die Kundennummer', /' eine Rückfrage zu Anmerkung '/.test(src) && /n\.kundennummer \? ' \(' \+ n\.kundennummer/.test(src));
+  const fe = {};
+  vm.runInNewContext(fs.readFileSync(path.join(WURZEL, 'frontend/js/partner-anmerkungen.js'), 'utf8'), { window: fe, document: {}, setTimeout, clearTimeout, setInterval, clearInterval, console });
+  const D = fe.DpAnmerkungen;
+  ok('Frontend: Rueckfrage = offen mit Antwort oder Bild, erledigt nicht', !!D.istRueckfrage({ status: 'offen', antwort: 'Welcher Notar?' }) && !!D.istRueckfrage({ status: 'offen', bild_antwort: png }) && !D.istRueckfrage({ status: 'erledigt', antwort: 'ja' }) && !D.istRueckfrage({ status: 'offen', antwort: ' ' }));
+  const m = D._zielMass(3200, 1000, 1600), m2 = D._zielMass(400, 300, 1600);
+  ok('Frontend: Verkleinern haelt das Seitenverhaeltnis, vergroessert nie', m.w === 1600 && m.h === 500 && m2.w === 400 && m2.h === 300, [m, m2]);
+  ok('Frontend: Groesse aus data:-URL (Ziel 400 KB)', D._bytesVon('data:image/png;base64,AAAA') === 3 && D.BILD_ZIEL === 409600);
+  const fq = fs.readFileSync(path.join(WURZEL, 'frontend/js/partner-anmerkungen.js'), 'utf8');
+  ok('Frontend: Ausschnitt ueber das vorhandene html2canvas, Rueckfall Einfuegen/Datei, Markieren rot mit Rueckgaengig',
+    /window\.html2canvas\(document\.body/.test(fq) && /clipboardData/.test(fq) && /type="file" accept="image\/png,image\/jpeg,image\/webp"/.test(fq) && /var ROT = '#D8564C'/.test(fq) && /data-b="undo"/.test(fq) && /data-w="pfeil"/.test(fq) && /data-w="frei"/.test(fq) && /data-w="rechteck"/.test(fq));
+  const idx = fs.readFileSync(path.join(WURZEL, 'frontend/index.html'), 'utf8');
+  ok('index.html laedt html2canvas', /vendor\/cdn\/html2canvas\/1\.4\.1\/html2canvas\.min\.js/.test(idx));
+}
+
 /* ── v3491 · Kundenstand beim Partner: jeder Speicherweg still gesperrt ──────────────────────────────
    Gemessen 16.11.2026: beim Oeffnen eines Kundenstands zeigte die App „Fehler beim Speichern:
    kundenstand_schreibgeschuetzt“. Das Sofort-Speichern beim Laden lief, bevor partner-kunden.js die
@@ -177,7 +210,9 @@ console.log('A · E-Mail bei Rueckmeldung (v3460)');
   const an = fs.readFileSync(path.join(WURZEL, 'frontend/js/ankauf-ansicht.js'), 'utf8');
   ok('Ankauf-Stand speichern: Kundenstand still uebersprungen, keine Erfolgsmeldung', /if \(d\._kundenstand\) return false;/.test(an) && /if \(r === false\) return false;/.test(an));
   const idx = fs.readFileSync(path.join(WURZEL, 'frontend/index.html'), 'utf8');
-  ok('Buster storage.js und ankauf-ansicht.js auf v3491', /js\/storage\.js\?v=v3491"/.test(idx) && /js\/ankauf-ansicht\.js\?v=v3491"/.test(idx));
+  /* v3640 · „mindestens v3491“: jeder spaetere Stand traegt die Sperre mit (hier stand bis v3640 genau v3491, rot seit v3511) */
+  const bv = (d) => { const i = idx.indexOf('js/' + d + '?v=v'); return i < 0 ? 0 : parseInt(idx.slice(i + d.length + 7), 10) || 0; };
+  ok('Buster storage.js und ankauf-ansicht.js mindestens v3491', bv('storage.js') >= 3491 && bv('ankauf-ansicht.js') >= 3491, [bv('storage.js'), bv('ankauf-ansicht.js')]);
 }
 
 if (process.argv.includes('--live')) {

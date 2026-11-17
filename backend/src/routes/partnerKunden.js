@@ -14,7 +14,7 @@ const anm = require('../services/partnerAnmerkungen');   /* v3450 · Anmerkungen
 
 function antwort(res, next) {
   return function (e) {
-    if (e && e.status) return res.status(e.status).json({ error: e.message, detail: e.detail || null });
+    if (e && e.status) return res.status(e.status).json(Object.assign({}, e.extra || {}, { error: e.message, detail: e.detail || null }));   /* v3640 · extra: z. B. fehlen[] beim gesperrten Senden */
     next(e);
   };
 }
@@ -43,7 +43,7 @@ partner.post('/code', fn((req) => pk.codeEinloesen(req.reseller, req.user.id, re
 partner.post('/anfragen/:id/zurueckziehen', fn((req) => pk.anfrageZurueckziehen(req.reseller, req.params.id)));
 partner.get('/kundenstaende', fn(async (req) => ({ kundenstaende: await pk.kundenstaende(req.reseller) })));
 partner.post('/kundenstaende/:id/geoeffnet', fn((req) => pk.kundenstandGeoeffnet(req.reseller, req.user.id, req.params.id)));
-partner.post('/kundenstaende/:id/uebernehmen', fn((req) => pk.kundenstandUebernehmen(req.reseller, req.user.id, req.params.id)));
+partner.post('/kundenstaende/:id/uebernehmen', fn((req) => pk.kundenstandUebernehmen(req.reseller, req.user.id, req.params.id, req.body)));   /* v3640 · body.modus 'aktualisieren' (Vorgabe) | 'neu' */
 /* v3450 · Anmerkungen am Kundenstand und „Zurueck an Kunden“ */
 partner.get('/kundenstaende/:id/anmerkungen', fn(async (req) => ({ anmerkungen: await anm.liste(req.reseller, req.params.id) })));
 partner.post('/kundenstaende/:id/anmerkungen', fn((req) => anm.anlegen(req.reseller, req.user.id, req.params.id, req.body)));
