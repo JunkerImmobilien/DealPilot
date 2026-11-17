@@ -1102,7 +1102,7 @@ function showDs2KpiBreakdown() {
       if (b.key === 'baujahr') {
         var _zq = (document.getElementById('ds2_zustand_quelle') || {}).value || '';
         var _zv = (document.getElementById('ds2_zustand') || {}).value || '';
-        if (_zv && (_zq === 'bilder' || _zq === 'text')) label += ' <span class="ds2-kpi-herkunft" style="font-size:10.5px;color:var(--muted)">· Zustand abgeleitet aus ' + (_zq === 'bilder' ? 'Bildern' : 'dem Exposé-Text')
+        if (_zv && (_zq === 'bilder' || _zq === 'text')) label += ' <span class="cf-hint ds2-kpi-herkunft">· Zustand abgeleitet aus ' + (_zq === 'bilder' ? 'Bildern' : 'dem Exposé-Text')
           + ' · <a href="#" onclick="return window._dpZustandEinstellen ? window._dpZustandEinstellen(event) : false">einstellen</a></span>';
       }
       var weight = Math.round((b.weight || 0) * 100);

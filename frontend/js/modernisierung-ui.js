@@ -94,9 +94,13 @@
     var zh = $('ds2_zustand_herkunft');
     if (zh) {
       var q = val('ds2_zustand_quelle'), r = roh();
-      zh.textContent = (val('ds2_zustand') && (q === 'bilder' || q === 'text'))
-        ? ((q === 'bilder' ? 'aus Bildern abgeleitet' : 'aus dem Exposé-Text abgeleitet') + (r && r.roh && r.roh.fotos_text ? ': ' + r.roh.fotos_text : '') + ' · jederzeit änderbar')
-        : '';
+      var _abg = val('ds2_zustand') && (q === 'bilder' || q === 'text');
+      zh.textContent = _abg ? ((q === 'bilder' ? 'aus Bildern abgeleitet' : 'aus dem Exposé abgeleitet') + ' · jederzeit änderbar') : '';
+      /* v3660d · Begruendung dezent im Tooltip (Bildbeschreibung bzw. belegte Gewerke), keine laute Flaeche */
+      var _tip = '';
+      if (_abg && r && r.gewerke) _tip = GEW.map(function (k) { var g = r.gewerke[k]; return g && g.quelle !== 'angenommen' ? LAB[k] + ': ' + (g.beleg || g.wie || '') : null; }).filter(Boolean).join(' · ');
+      if (_abg && r && r.roh && r.roh.fotos_text) _tip = r.roh.fotos_text + (_tip ? ' · ' + _tip : '');
+      zh.title = _tip;
     }
   }
 
