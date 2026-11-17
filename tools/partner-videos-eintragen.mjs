@@ -56,6 +56,7 @@ const neu = liste.map((v, i) => {
   e.titel = titel;
   e.unterzeile = nimm(v, 'unterzeile', 'subtitle') || (beschr.split(/(?<=\.)\s/)[0] || '');
   if (beschr) e.story = beschr;
+  const nutzen = nimm(v, 'nutzen', 'gewinn', 'benefit'); if (nutzen) e.nutzen = nutzen;   /* v3650 · Feld „Dein Gewinn“ der Videothek */
   if (datei) e.datei = path.basename(datei);
   const ton = nimm(v, 'datei_ton', 'file_voice'); if (ton) e.datei_ton = path.basename(ton);
   if (bild) {
@@ -65,7 +66,7 @@ const neu = liste.map((v, i) => {
     kopien.push([b, path.join(BILDER, zielName)]);
   } else if (datei) meldungen.push(titel + ': kein Vorschaubild, die Karte bliebe leer');
   const kap = nimm(v, 'kapitel', 'chapters'); if (Array.isArray(kap)) e.kapitel = kap;
-  for (const t of [e.titel, e.unterzeile, e.story || '']) for (const r of VERBOTEN) if (r.test(t)) meldungen.push(titel + ': Text enthält ' + r);
+  for (const t of [e.titel, e.unterzeile, e.story || '', e.nutzen || '']) for (const r of VERBOTEN) if (r.test(t)) meldungen.push(titel + ': Text enthält ' + r);
   for (const f of [datei, ton].filter(Boolean)) {
     const lokal = path.isAbsolute(f) ? f : path.join(quellOrdner, f);
     scp.push('scp "' + lokal + '" root@116.203.214.11:/opt/dealpilot/frontend/landing/medien/videothek/' + path.basename(f));

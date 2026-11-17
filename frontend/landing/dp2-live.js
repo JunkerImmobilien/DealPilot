@@ -21,7 +21,7 @@
    ═══════════════════════════════════════════════════════════════════════ */
 (function () {
   'use strict';
-  var QUELLE = 'assets/videothek/videos.json?v=landing-videothek-13';   /* landing-videothek-13: Partner 1-4 neu und Kunden-Video K1 (v3650, 17.11.2026) */   /* landing-videothek-12: Modul 29 neu, Vorschaubilder v3502 (16.11.2026) */   /* landing-videothek-11: Modul 11, 14, 26, 27 neu aufgenommen mit Marcels Stimme (v3502, 16.11.2026) */   /* landing-partner-videos-1: fünf Partner-Videos mit Sprecher (16.11.2026) */   /* landing-partner-1: Reihe „Für Partner“ */   /* landing-videothek-10: Werbespot 'Das Haus hab ich.' als erstes Video (Marcel 12.11.2026); landing-videothek-9: Modul 26 neu (v3291); landing-videothek-8: 20 Videos neu (N145, v3285); landing-videothek-7: Ue3, Modul 28 */
+  var QUELLE = 'assets/videothek/videos.json?v=landing-videothek-14';   /* landing-videothek-14: Dein Gewinn für K1, leerer Kasten ausgeblendet */   /* landing-videothek-13: Partner 1-4 neu und Kunden-Video K1 (v3650, 17.11.2026) */   /* landing-videothek-12: Modul 29 neu, Vorschaubilder v3502 (16.11.2026) */   /* landing-videothek-11: Modul 11, 14, 26, 27 neu aufgenommen mit Marcels Stimme (v3502, 16.11.2026) */   /* landing-partner-videos-1: fünf Partner-Videos mit Sprecher (16.11.2026) */   /* landing-partner-1: Reihe „Für Partner“ */   /* landing-videothek-10: Werbespot 'Das Haus hab ich.' als erstes Video (Marcel 12.11.2026); landing-videothek-9: Modul 26 neu (v3291); landing-videothek-8: 20 Videos neu (N145, v3285); landing-videothek-7: Ue3, Modul 28 */
   /* landing-videothek-4 · Jedes Video gibt es mit und ohne Sprecher (Marcel 19.10.2026:
      „die Videos muss es vertont und unvertont geben"). videos.json traegt je Eintrag
      `datei_ton`; die Wahl merkt sich der Browser, Standard: mit Sprecher. */
@@ -140,7 +140,7 @@
         '<h3>' + esc(v.titel) + '</h3>' +
         '<p class="dpl-unter">' + esc(v.unterzeile) + '</p>' +
         '<p class="dpl-story">' + esc(v.story) + '</p>' +
-        '<div class="dpl-gewinn"><b>Dein Gewinn</b><span>' + esc(v.nutzen) + '</span></div>' +
+        (v.nutzen ? '<div class="dpl-gewinn"><b>Dein Gewinn</b><span>' + esc(v.nutzen) + '</span></div>' : '') +   /* v3650 · leer = kein Kasten */
         '<div class="dpl-kapitel">' + kapListe(v).filter(function (c) { return c.t !== 0; }).slice(0, 7).map(function (c) { return '<span>' + esc(c.titel) + '</span>'; }).join('') + '</div>' +
         '<div class="dpl-spruch">„' + esc(v.spruch) + '“</div>' +
         '<div class="dpl-aktion"><a class="btn-l" href="videothek.html#' + esc(v.id) + '">In der Videothek ansehen →</a></div>';
@@ -564,8 +564,8 @@
               }).join('') + '</ol>'
             : '<div class="dpl-kapitel">' + kapAkt.map(function (c) { return '<span>' + esc(c.titel) + '</span>'; }).join('') + '</div>') +
           '<p>' + esc(v.story) + '</p>' +
-          '<div class="dpl-gewinn"><b>Dein Gewinn</b><span>' + esc(v.nutzen) + '</span></div>' +
-          '<div class="dpl-spruch">„' + esc(v.spruch) + '“</div>';
+          (v.nutzen ? '<div class="dpl-gewinn"><b>Dein Gewinn</b><span>' + esc(v.nutzen) + '</span></div>' : '') +   /* v3650 · leer = kein Kasten */
+          (v.spruch ? '<div class="dpl-spruch">„' + esc(v.spruch) + '“</div>' : '');
         kino.classList.add('auf');
         document.documentElement.style.overflow = 'hidden';
         kino.querySelector('.vt-kino-t').scrollTop = 0;
