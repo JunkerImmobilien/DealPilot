@@ -544,14 +544,34 @@
   }
   var FARB_EIGENSCHAFTEN = ['color', 'background-color', 'background-image', 'border-top-color', 'border-right-color', 'border-bottom-color', 'border-left-color',
     'outline-color', 'box-shadow', 'text-shadow', 'text-decoration-color', 'caret-color', 'column-rule-color', 'fill', 'stroke'];
-  function farbenRetten(doc) {
-    var w = doc.defaultView || window, alle = doc.querySelectorAll('*');
+  /* Gelesen wird in der ECHTEN Seite (Stil fertig berechnet, nur lesen = schnell), markiert mit data-dp-h2c; geschrieben
+     wird nur in der Kopie. Gemessen 17.11.2026: Lesen und Schreiben abwechselnd in der Kopie fror den Reiter ein. */
+  var _farbAuftrag = null;
+  function farbenVormerken() {
+    var alle = document.body.querySelectorAll('*'), auftrag = [], markiert = [];
     for (var i = 0; i < alle.length; i++) {
-      var cs; try { cs = w.getComputedStyle(alle[i]); } catch (e) { continue; }
+      var el = alle[i]; if (unsereFlaechen(el)) continue;
+      var cs = window.getComputedStyle(el), satz = null;
       for (var k = 0; k < FARB_EIGENSCHAFTEN.length; k++) {
         var v = cs.getPropertyValue(FARB_EIGENSCHAFTEN[k]);
-        if (v && /(color|oklab|oklch)\(/.test(v)) { try { alle[i].style.setProperty(FARB_EIGENSCHAFTEN[k], farbeUmrechnen(v), 'important'); } catch (e) {} }
+        if (v && /(color|oklab|oklch)\(/.test(v)) (satz || (satz = [])).push([FARB_EIGENSCHAFTEN[k], farbeUmrechnen(v)]);
       }
+      if (satz) { auftrag.push(satz); markiert.push(el); }
+    }
+    for (var j = 0; j < markiert.length; j++) markiert[j].setAttribute('data-dp-h2c', String(j));   /* erst nach dem Lesen */
+    _farbAuftrag = auftrag;
+    return auftrag.length;
+  }
+  function farbenAufraeumen() {
+    [].forEach.call(document.querySelectorAll('[data-dp-h2c]'), function (e) { e.removeAttribute('data-dp-h2c'); });
+    _farbAuftrag = null;
+  }
+  function farbenRetten(doc) {
+    if (!_farbAuftrag) return;
+    var ziele = doc.querySelectorAll('[data-dp-h2c]');
+    for (var i = 0; i < ziele.length; i++) {
+      var satz = _farbAuftrag[Number(ziele[i].getAttribute('data-dp-h2c'))]; if (!satz) continue;
+      for (var k = 0; k < satz.length; k++) { try { ziele[i].style.setProperty(satz[k][0], satz[k][1], 'important'); } catch (e) {} }
     }
   }
   function unsereFlaechen(el) { return !!(el && el.id && /^dppk-(anm-|bild-)/.test(el.id)); }
@@ -575,12 +595,13 @@
         /* kurz warten, bis die Auswahlflaeche wirklich weg ist */
         setTimeout(function () {
           var sx = window.scrollX || window.pageXOffset || 0, sy = window.scrollY || window.pageYOffset || 0;
+          try { farbenVormerken(); } catch (e) { farbenAufraeumen(); }
           window.html2canvas(document.body, {
             x: rect.x + sx, y: rect.y + sy, width: rect.w, height: rect.h,
             scrollX: -sx, scrollY: -sy, windowWidth: document.documentElement.clientWidth, windowHeight: document.documentElement.clientHeight,
             scale: Math.min(window.devicePixelRatio || 1, 2), useCORS: true, logging: false, backgroundColor: '#ffffff',
             ignoreElements: unsereFlaechen, onclone: farbenRetten
-          }).then(function (cv) { zurueck(); fertig(cv); }, function (e) { zurueck(); try { console.warn('[anmerkungen] Ausschnitt', e); } catch (x) {} toast('Der Ausschnitt ging nicht. Füge ein Bildschirmfoto mit „Bild einfügen“ ein.'); fertig(null); });
+          }).then(function (cv) { farbenAufraeumen(); zurueck(); fertig(cv); }, function (e) { farbenAufraeumen(); zurueck(); try { console.warn('[anmerkungen] Ausschnitt', e); } catch (x) {} toast('Der Ausschnitt ging nicht. Füge ein Bildschirmfoto mit „Bild einfügen“ ein.'); fertig(null); });
         }, 60);
       }
       o.addEventListener('pointerdown', function (ev) {
