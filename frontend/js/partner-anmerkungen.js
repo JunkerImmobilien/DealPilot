@@ -624,7 +624,10 @@
           var wurzel = wurzelFuer(rect);
           wurzel.setAttribute('data-dp-wurzel', '1');
           var wr = wurzel.getBoundingClientRect();
-          toast('Ausschnitt wird aufgenommen …');
+          /* v3640a6 · eigener Hinweis statt toast: der toast wurde mit aufgenommen (gemessen 17.11.2026); dppk-bild-* ignoriert html2canvas */
+          var warten = document.createElement('div'); warten.id = 'dppk-bild-warten'; warten.className = 'ba-hinweis'; warten.textContent = 'Ausschnitt wird aufgenommen …';
+          warten.style.cssText = 'position:fixed;left:50%;top:12px;transform:translateX(-50%);z-index:100090;background:#050505;color:#FDFCFA;border-radius:10px;padding:8px 12px;font:500 13px Inter,sans-serif';
+          document.body.appendChild(warten);
           window.html2canvas(wurzel, {
             /* v3640a5 · gemessen: mit einem Element als Wurzel zaehlt html2canvas x/y AB dessen Ecke (Bild lag um die Lage
                der Wurzel versetzt, 17.11.2026) */
@@ -632,7 +635,7 @@
             scrollX: -sx, scrollY: -sy, windowWidth: document.documentElement.clientWidth, windowHeight: document.documentElement.clientHeight,
             scale: Math.min(window.devicePixelRatio || 1, 2), useCORS: true, logging: false, backgroundColor: '#ffffff', imageTimeout: 2500,
             ignoreElements: function (el) { return unsereFlaechen(el) || (el.tagName === 'IFRAME' && !el.contains(wurzel)); }, onclone: farbenRetten
-          }).then(function (cv) { wurzel.removeAttribute('data-dp-wurzel'); zurueck(); fertig(cv); }, function (e) { wurzel.removeAttribute('data-dp-wurzel'); zurueck(); try { console.warn('[anmerkungen] Ausschnitt', e); } catch (x) {} toast('Der Ausschnitt ging nicht. Füge ein Bildschirmfoto mit „Bild einfügen“ ein.'); fertig(null); });
+          }).then(function (cv) { warten.remove(); wurzel.removeAttribute('data-dp-wurzel'); zurueck(); fertig(cv); }, function (e) { warten.remove(); wurzel.removeAttribute('data-dp-wurzel'); zurueck(); try { console.warn('[anmerkungen] Ausschnitt', e); } catch (x) {} toast('Der Ausschnitt ging nicht. Füge ein Bildschirmfoto mit „Bild einfügen“ ein.'); fertig(null); });
         }, 60);
       }
       o.addEventListener('pointerdown', function (ev) {
