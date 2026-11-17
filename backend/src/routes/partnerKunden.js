@@ -27,7 +27,9 @@ partner.use(requireFeature('reseller'));
 partner.use(async (req, res, next) => {
   try { req.reseller = await reseller.ensureReseller(req.user.id, { name: req.user.name }); next(); } catch (e) { next(e); }
 });
-partner.get('/cockpit', fn((req) => pk.cockpit(req.reseller)));
+/* v3620 · avv: Stand des Auftragsverarbeitungsvertrags des angemeldeten Partners - das Cockpit fragt einmal, wenn nicht aktuell */
+partner.get('/cockpit', fn(async (req) => Object.assign(await pk.cockpit(req.reseller),
+  { avv: await require('../services/avvService').stand(req.user.id).catch(() => null) })));
 partner.put('/kunden/:id', fn((req) => pk.kundeEinstellen(req.reseller, req.params.id, req.body)));
 partner.post('/kunden/:id/platz', fn(async (req) => {
   const c = await pk.kundeEinstellen(req.reseller, req.params.id, {});

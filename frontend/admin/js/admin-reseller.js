@@ -52,8 +52,13 @@
           (x.status === 'gesperrt'
             ? '<button class="btn btn-sm" data-act="aktiv" data-id="' + x.id + '">Entsperren</button>'
             : '<button class="btn btn-sm" data-act="gesperrt" data-id="' + x.id + '" style="color:#B86250;">Sperren</button>');
+        /* v3620 \u00b7 AVV: Version und Datum der letzten Zustimmung des Inhabers, rot ohne, gold bei alter Version */
+        var avvAkt = rr.avv_version_aktuell || '';
+        var avv = x.avv_version
+          ? '<span style="color:' + (x.avv_version === avvAkt ? '#3FA56C' : '#b8932f') + ';" title="' + (x.avv_version === avvAkt ? 'aktuell' : 'alte Version, Partner stimmt beim n\u00e4chsten \u00d6ffnen des Cockpits neu zu') + '">' + _esc(x.avv_version) + ' \u00b7 ' + _esc(new Date(x.avv_am).toLocaleDateString('de-DE')) + '</span>'
+          : '<span style="color:#B86250;">fehlt</span>';
         return '<tr><td><strong>' + _esc(x.name) + '</strong>' + wl + '</td><td>' + _esc(x.role) + '</td><td>' + _esc(x.owner_email || '\u2013') + '</td>' +
-          '<td style="font-family:monospace;">' + pool + '</td><td>' + badge + '</td><td style="text-align:right;">' + act + '</td></tr>';
+          '<td style="font-family:monospace;">' + pool + '</td><td data-avv>' + avv + '</td><td>' + badge + '</td><td style="text-align:right;">' + act + '</td></tr>';
       }).join('');
 
       var inqHtml = inqs.length ? inqs.map(function (i) {
@@ -80,8 +85,8 @@
             '<button class="btn btn-primary" id="rav-create" style="margin-top:12px;">Anlegen &amp; Partner-Plan zuweisen</button>' +
         '</div>' +
         '<div class="card" style="padding:18px;margin-bottom:16px;"><h3 style="margin:0 0 12px;">Partner</h3>' +
-          '<table class="data-table"><thead><tr><th>Name</th><th>Rolle</th><th>Owner</th><th>Pool</th><th>Status</th><th></th></tr></thead><tbody>' +
-          (rows || '<tr><td colspan="6" style="color:#999;">Noch keine Reseller.</td></tr>') + '</tbody></table></div>' +
+          '<table class="data-table"><thead><tr><th>Name</th><th>Rolle</th><th>Owner</th><th>Pool</th><th>AVV</th><th>Status</th><th></th></tr></thead><tbody>' +
+          (rows || '<tr><td colspan="7" style="color:#999;">Noch keine Reseller.</td></tr>') + '</tbody></table></div>' +
         '<div class="card" style="padding:18px;"><h3 style="margin:0 0 12px;">Offene Partner-Anfragen</h3>' + inqHtml + '</div>';
 
       var cb = document.getElementById('rav-create'); if (cb) cb.addEventListener('click', _create);

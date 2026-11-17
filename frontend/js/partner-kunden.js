@@ -360,6 +360,18 @@
   }
   function cockpitOeffnen(startReiter) {
     return api('/partner/cockpit').then(function (c) {
+      /* v3620 · Auftragsverarbeitungsvertrag: ohne aktuelle Zustimmung einmal fragen, ohne Abschluss kein Cockpit */
+      if (c && c.avv && c.avv.aktuell === false && window.DpAvv && typeof DpAvv.einholen === 'function') {
+        return DpAvv.einholen(c.avv).then(function (ok) {
+          if (!ok) { toast('Das Partner-Cockpit öffnet sich, sobald der Auftragsverarbeitungsvertrag abgeschlossen ist.'); return; }
+          c.avv.aktuell = true; cockpitZeigen(c, startReiter);
+        });
+      }
+      cockpitZeigen(c, startReiter);
+    }, function (e) { toast(e && e.status === 403 ? 'Das Partner-Cockpit gibt es mit dem Partner-Plan.' : fehlerText(e)); });
+  }
+  function cockpitZeigen(c, startReiter) {
+    {
       S.partner = c; menuePflegen();
       try { if (window._currentObjKey && typeof window.saveObj === 'function') window.saveObj({ silent: true }); } catch (e) {}
       try { if (document.body.classList.contains('qc-standalone-active') && typeof window.exitQuickCheckMode === 'function') window.exitQuickCheckMode(); } catch (e) {}
@@ -378,7 +390,7 @@
       PK.offen = true;
       var s = abSektion(); if (s) s.style.display = '';
       reiterWahl(startReiter && TITEL[startReiter] ? startReiter : (PK.aktiv || 'uebersicht'));
-    }, function (e) { toast(e && e.status === 403 ? 'Das Partner-Cockpit gibt es mit dem Partner-Plan.' : fehlerText(e)); });
+    }
   }
   function cockpitSchliessen() {
     if (!PK.offen) return;

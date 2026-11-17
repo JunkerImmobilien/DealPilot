@@ -183,7 +183,10 @@
   var WIDERRUF_TEXT = 'Ich verlange ausdrücklich, dass DealPilot vor Ablauf der Widerrufsfrist mit der '
     + 'Ausführung des Vertrags beginnt. Mir ist bekannt, dass mein Widerrufsrecht mit vollständiger '
     + 'Vertragserfüllung bzw. bei digitalen Inhalten mit Beginn der Ausführung erlischt (§ 356 Abs. 4 und 5 BGB).';
-  function widerrufEinholen(was) {
+  /* v3620 · opts.zusatz = [{ id, html }]: weitere Pflicht-Haekchen im selben Fenster (Partner-Plan: AVV).
+     Weiter geht es erst, wenn ALLE Haekchen gesetzt sind; das Ergebnis traegt zusatz: { id: true }. */
+  function widerrufEinholen(was, opts) {
+    var zusatz = (opts && Array.isArray(opts.zusatz)) ? opts.zusatz.filter(function (z) { return z && z.id && z.html; }) : [];
     return new Promise(function (fertig) {
       var alt = document.getElementById('dp-widerruf'); if (alt) alt.remove();
       var w = document.createElement('div');
@@ -191,9 +194,14 @@
       w.setAttribute('role', 'dialog'); w.setAttribute('aria-modal', 'true');
       w.style.cssText = 'position:fixed;inset:0;z-index:2147483000;display:flex;align-items:center;justify-content:center;background:rgba(5,5,5,.72);padding:16px';
       w.innerHTML =
-        '<div style="max-width:520px;width:100%;background:#FDFCFA;color:#1a1a1a;border-radius:14px;border-top:4px solid var(--wl-c9a84c, #C9A84C);padding:22px 22px 18px;font:14px/1.5 Inter,system-ui,sans-serif;box-shadow:0 20px 60px rgba(0,0,0,.4)">'
+        '<div style="max-width:520px;width:100%;max-height:calc(100vh - 32px);overflow:auto;background:#FDFCFA;color:#1a1a1a;border-radius:14px;border-top:4px solid var(--wl-c9a84c, #C9A84C);padding:22px 22px 18px;font:14px/1.5 Inter,system-ui,sans-serif;box-shadow:0 20px 60px rgba(0,0,0,.4)">'
         + '<div style="font:600 11px/1 \'JetBrains Mono\',monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--wl-b8932f, #b8932f);margin-bottom:8px">Vor dem Kauf</div>'
         + '<div style="font:700 18px/1.3 \'Space Grotesk\',Inter,sans-serif;margin-bottom:12px">' + (was || 'Kauf bestätigen') + '</div>'
+        + zusatz.map(function (z) {
+            return '<label style="display:flex;gap:10px;align-items:flex-start;cursor:pointer;margin-bottom:12px">'
+              + '<input type="checkbox" class="dp-widerruf-zusatz" data-zusatz="' + String(z.id).replace(/[^a-z0-9_-]/gi, '') + '" style="margin-top:3px;width:18px;height:18px;flex:0 0 auto;accent-color:var(--wl-c9a84c, #C9A84C)">'
+              + '<span>' + z.html + '</span></label>';
+          }).join('')
         + '<label style="display:flex;gap:10px;align-items:flex-start;cursor:pointer">'
         + '<input type="checkbox" id="dp-widerruf-cb" style="margin-top:3px;width:18px;height:18px;flex:0 0 auto;accent-color:var(--wl-c9a84c, #C9A84C)">'
         + '<span>' + WIDERRUF_TEXT + '</span></label>'
@@ -204,11 +212,20 @@
         + '</div></div>';
       document.body.appendChild(w);
       var cb = w.querySelector('#dp-widerruf-cb'), ja = w.querySelector('#dp-widerruf-ja');
-      cb.addEventListener('change', function () { ja.disabled = !cb.checked; ja.style.opacity = cb.checked ? '1' : '.5'; });
+      var zcb = [].slice.call(w.querySelectorAll('.dp-widerruf-zusatz'));
+      function alleGesetzt() { return cb.checked && zcb.every(function (x) { return x.checked; }); }
+      function pruefen() { var ok = alleGesetzt(); ja.disabled = !ok; ja.style.opacity = ok ? '1' : '.5'; }
+      cb.addEventListener('change', pruefen);
+      zcb.forEach(function (x) { x.addEventListener('change', pruefen); });
       function zu(erg) { w.remove(); fertig(erg); }
       w.querySelector('#dp-widerruf-nein').addEventListener('click', function () { zu(null); });
       w.addEventListener('click', function (e) { if (e.target === w) zu(null); });
-      ja.addEventListener('click', function () { if (cb.checked) zu({ widerruf_verzicht: true, widerruf_version: WIDERRUF_VERSION }); });
+      ja.addEventListener('click', function () {
+        if (!alleGesetzt()) return;
+        var erg = { widerruf_verzicht: true, widerruf_version: WIDERRUF_VERSION };
+        if (zcb.length) { erg.zusatz = {}; zcb.forEach(function (x) { erg.zusatz[x.getAttribute('data-zusatz')] = true; }); }
+        zu(erg);
+      });
     });
   }
   global.DpWiderruf = { einholen: widerrufEinholen, version: WIDERRUF_VERSION, text: WIDERRUF_TEXT };

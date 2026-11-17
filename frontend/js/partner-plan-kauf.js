@@ -154,7 +154,11 @@
   }
 
   async function kaufen(knopf) {
-    var _wv = (window.DpWiderruf && typeof DpWiderruf.einholen === 'function') ? await DpWiderruf.einholen('Partner-Plan buchen') : null;
+    /* v3620 · AVV-Haekchen im selben Fenster wie der Widerrufsverzicht (Pflicht, der Server prueft avv_zustimmung + avv_version) */
+    var _avv = null;
+    try { _avv = window.DpAvv ? await DpAvv.stand() : null; } catch (e) { _avv = null; }
+    var _zusatz = (_avv && window.DpAvv) ? [{ id: 'avv', html: DpAvv.haekchenHtml(_avv) }] : [];
+    var _wv = (window.DpWiderruf && typeof DpWiderruf.einholen === 'function') ? await DpWiderruf.einholen('Partner-Plan buchen', { zusatz: _zusatz }) : null;
     if (!_wv) return;
     if (knopf) { knopf.disabled = true; knopf.textContent = 'Weiterleitung …'; }
     try {
@@ -162,7 +166,8 @@
         billingInterval: S.iv, plaetze: S.plaetze,
         successUrl: location.origin + location.pathname + '?subscription=success&partner=1&session_id={CHECKOUT_SESSION_ID}',
         cancelUrl: location.origin + location.pathname + '?subscription=cancel',
-        widerruf_verzicht: true, widerruf_version: _wv.widerruf_version } });
+        widerruf_verzicht: true, widerruf_version: _wv.widerruf_version,
+        avv_zustimmung: !!(_wv.zusatz && _wv.zusatz.avv), avv_version: _avv ? _avv.version : undefined } });
       if (r && r.url) { location.href = r.url; return; }
       meldung('Der Kauf konnte nicht gestartet werden.');
     } catch (e) { meldung(fehlerText(e)); }

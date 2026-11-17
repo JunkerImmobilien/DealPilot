@@ -221,11 +221,20 @@ const partnerCheckoutSchema = z.object({
   successUrl: z.string().url().optional(),
   cancelUrl: z.string().url().optional(),
   widerruf_verzicht: z.boolean().optional(),
-  widerruf_version: z.string().max(40).optional()
+  widerruf_version: z.string().max(40).optional(),
+  avv_zustimmung: z.boolean().optional(),   /* v3620 · Pflicht, geprueft in avvService.pruefen (400 / 409) */
+  avv_version: z.string().max(40).optional()
 }).strict();   /* strict: ein mitgeschicktes promo/trial wird abgewiesen, nicht still verworfen */
 router.post('/partner/checkout', validate({ body: partnerCheckoutSchema }), async (req, res, next) => {
   try {
     if (!stripeService.isConfigured()) throw new HttpError(503, 'Payment system is not configured');
+    /* v3620 · ohne AVV-Haekchen kein Kauf (Art. 28 DSGVO) - vor dem Widerrufsverzicht, damit ohne AVV nichts protokolliert wird */
+    try {
+      await require('../services/avvService').pruefen(req, { weg: 'kauf', intervall: req.body.billingInterval, plaetze: req.body.plaetze });
+    } catch (e) {
+      if (e.code === 'avv_fehlt' || e.code === 'avv_version_veraltet') return res.status(e.status).json({ error: e.code, message: e.message });
+      throw e;
+    }
     try {
       await require('../services/consentService').widerrufVerzichtPruefen(req, { kauf: 'abo', plan: 'partner', intervall: req.body.billingInterval, plaetze: req.body.plaetze });
     } catch (e) {

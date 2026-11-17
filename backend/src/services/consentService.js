@@ -9,7 +9,8 @@
 const { query } = require('../db/pool');
 
 const ARTEN = ['hinweise', 'widerruf_verzicht', 'agb', 'datenschutz', 'newsletter',
-  'erinnerung_mieterhoehung' /* v3218 · W-12b, kontext { an: true|false } - routes/erinnerungen.js */];
+  'erinnerung_mieterhoehung' /* v3218 · W-12b, kontext { an: true|false } - routes/erinnerungen.js */,
+  'avv' /* v3620 · Auftragsverarbeitungsvertrag der Partner - services/avvService.js */];
 
 /* Der Wortlaut, dem beim Kauf zugestimmt wird. Aendert er sich, steigt die
    Version - das Protokoll sagt dann, welcher Satz galt. Derselbe Text steht
@@ -56,9 +57,11 @@ async function widerrufVerzichtPruefen(req, kontext) {
   });
 }
 
-/* Aufbewahrung 3 Jahre (Datenschutzerklaerung) */
+/* Aufbewahrung 3 Jahre (Datenschutzerklaerung). v3620 · Ausnahme AVV: der Nachweis des Vertragsabschlusses
+   bleibt, solange das Konto besteht (sonst waere ein laufender Vertrag nach 3 Jahren ohne Nachweis), danach
+   gilt auch fuer ihn die 3-Jahres-Frist ab Abschluss (user_id wird beim Loeschen des Kontos NULL). */
 async function aufraeumen() {
-  const r = await query(`DELETE FROM consent_log WHERE accepted_at < now() - interval '3 years'`);
+  const r = await query(`DELETE FROM consent_log WHERE accepted_at < now() - interval '3 years' AND (art <> 'avv' OR user_id IS NULL)`);
   return r.rowCount;
 }
 

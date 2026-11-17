@@ -18,14 +18,18 @@ router.get('/resellers', async (req, res) => {
       `SELECT r.id, r.name, r.role, r.status, r.is_master, r.whitelabel_enabled,
               u.email AS owner_email,
               COUNT(l.id) FILTER (WHERE l.kind='client')                          AS pool_gekauft,
-              COUNT(l.id) FILTER (WHERE l.kind='client' AND l.status='zugewiesen') AS pool_zugewiesen
+              COUNT(l.id) FILTER (WHERE l.kind='client' AND l.status='zugewiesen') AS pool_zugewiesen,
+              avv.version AS avv_version, avv.accepted_at AS avv_am   /* v3620 · letzte AVV-Zustimmung des Inhabers */
          FROM resellers r
          LEFT JOIN users u    ON u.id = r.owner_user_id
          LEFT JOIN licenses l ON l.reseller_id = r.id
-        GROUP BY r.id, u.email
+         LEFT JOIN LATERAL (SELECT c.version, c.accepted_at FROM consent_log c
+                             WHERE c.user_id = r.owner_user_id AND c.art = 'avv'
+                             ORDER BY c.accepted_at DESC LIMIT 1) avv ON true
+        GROUP BY r.id, u.email, avv.version, avv.accepted_at
         ORDER BY r.is_master DESC, r.created_at ASC`
     );
-    res.json({ resellers: r.rows });
+    res.json({ resellers: r.rows, avv_version_aktuell: require('../services/avvService').AVV_VERSION });
   } catch (e) { res.status(500).json({ error: 'server_error', message: e.message }); }
 });
 
