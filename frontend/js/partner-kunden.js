@@ -150,6 +150,7 @@
       '.dppk-hub .dppk-hub-reiter[hidden]{display:none !important}',
       '.dppk-hub .dppk-hub-reiter{display:flex;flex-direction:column;gap:14px}',
       '#dppk-hub-kunde .rnd-wiz-modal{max-width:760px}',
+      'html:not(#rnd-nie) .rnd-wiz-overlay.rnd-hub.dppk-hub .rnd-hub-zeile{padding:8px 0 !important}',
       '.dppk-hub .rnd-hub-chips.dppk-fest .rnd-hub-chip{cursor:default !important}',
       '.dppk-hub .rnd-hub-chips.dppk-fest .rnd-hub-chip:not(:has(input:checked)){opacity:.55}',
       'html:not([data-pk-offen]) #dppk-ab{display:none !important}',
@@ -801,8 +802,12 @@
       { kurz: 'Stufe', titel: 'Detailgrad der App', html: '<section class="rnd-hub-karte"><h3 class="rnd-hub-h">Stufe</h3>' + fest + '<div class="rnd-wiz-mod-list">' +
         [1, 2, 3].map(function (s) { return hubZeile(STUFEN[s], STUFEN_TEXT[s], hubChips('pk-k-stufe', [[s, (k.stufe || 2) === s ? 'gewählt' : 'wählen']], (k.stufe || 2), gesperrt)); }).join('') + '</div></section>' },
       { kurz: 'Rechte', titel: 'Was der Platz darf', html: '<section class="rnd-hub-karte"><h3 class="rnd-hub-h">Rechte des Platzes</h3>' +
-        (gesperrt ? fest : '<p class="rnd-hub-hinweis">Ein Platz umfasst höchstens den Investor-Plan. Hier schaltest du einzelne Teile ab.</p>') + '<div class="rnd-wiz-mod-list">' +
-        RECHTE_TEXT.map(function (x) { return hubZeile(x[1], x[2], hubChips('pk-r-' + x[0], [['an', 'an'], ['aus', 'aus']], r[x[0]] !== false ? 'an' : 'aus', gesperrt)); }).join('') + '</div></section>' },
+        (gesperrt ? fest : '<p class="rnd-hub-hinweis">Ein Platz umfasst höchstens den Investor-Plan. Hier schaltest du Teile ab.</p>') + '<div class="rnd-wiz-mod-list">' +
+        RECHTE_TEXT.filter(function (x) { return !/^e_/.test(x[0]); }).map(function (x) { return hubZeile(x[1], x[2], hubChips('pk-r-' + x[0], [['an', 'an'], ['aus', 'aus']], r[x[0]] !== false ? 'an' : 'aus', gesperrt)); }).join('') + '</div></section>' },
+      /* gemessen 17.11.2026 bei 1582 x 832: zehn Rechte in einem Reiter brauchten 710 px bei 553 px Platz - die drei
+         Einstellungs-Rechte stehen deshalb im eigenen Reiter */
+      { kurz: 'Einstellungen', titel: 'Was der Kunde in den Einstellungen ändern darf', html: '<section class="rnd-hub-karte"><h3 class="rnd-hub-h">Einstellungen</h3>' + fest + '<div class="rnd-wiz-mod-list">' +
+        RECHTE_TEXT.filter(function (x) { return /^e_/.test(x[0]); }).map(function (x) { return hubZeile(x[1], x[2], hubChips('pk-r-' + x[0], [['an', 'an'], ['aus', 'aus']], r[x[0]] !== false ? 'an' : 'aus', gesperrt)); }).join('') + '</div></section>' },
       { kurz: 'Kontingente', titel: 'Marktberichte und Partnernetzwerk', html: '<section class="rnd-hub-karte"><h3 class="rnd-hub-h">Kontingente</h3>' + fest +
         '<div class="rnd-wiz-grid rnd-hub-felder"><div class="rnd-wiz-field"><label for="pk-k-mb">Marktberichte je Monat</label><input type="number" id="pk-k-mb" min="0" max="10" placeholder="wie Investor" value="' + (k.kontingent && k.kontingent.marktbericht != null ? k.kontingent.marktbericht : '') + '"' + (gesperrt ? ' disabled' : '') + '>' +
         '<span class="rnd-wiz-hint">Höchstens 10, leer heißt wie im Investor-Plan.</span></div></div></section>' +
