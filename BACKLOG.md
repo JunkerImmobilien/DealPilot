@@ -36,6 +36,15 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
+### N176 · Partner und Kunden: Kundennummer, Übernehmen mit Kundenbezug, Bild an Anmerkungen, Senden erst nach Bearbeitung, Mein Partner im Arbeitsbereich, Stufe und Rechte im RND-Stil (Marcel 17.11.2026) — **v3640–v3640d (`a83a3129`, `0bbce828`, `aa0d6479`, `ed49ef22`, `2dc6ca69`, `b1ead60f`, `20632d13`, `ad53ffad`, `50d825ae`, `46e79a03`) auf Staging nachgemessen; Prod NICHT ausgerollt (Migration 113)**
+- Kundennummer K-JJJJ-NNN je Partner und Jahr (Trigger bei jeder neuen Verbindung, Altbestand nachgezogen), änderbar im Kundendialog, sichtbar in Kundenliste, Freigegeben, Banner, Meldungen, Aufgaben und beim Kunden (Verbindung, Freigaben).
+- Übernehmen: Objekt trägt den Kunden, erneut = „Bestehendes aktualisieren“ (Vorgabe, Nummer/Halter/Deal-Status bleiben) oder „Neue Kopie“; Objektliste Sortierung „Kunde“ mit Gruppenköpfen, Filter „Kunde zeigen“, Hinweis auf der Karte.
+- Anmerkungen: Bildausschnitt (html2canvas) oder Bild einfügen, markieren rot (Rechteck, Pfeil, Freihand, Rückgängig), WebP bis 400 KB; Kunde sieht es groß, kann zur Antwort ein Bild anhängen. Senden gesperrt, solange eine Anmerkung offen ohne Antwort/Rückfrage ist (409 mit Liste, Knopf ausgegraut, Sprung). Rückfrage beim Partner eigener blauer Chip.
+- Mein Partner im Arbeitsbereich wie das Cockpit, Reiter Freigaben (Platz nur lesend), Einstellungen nur noch Verweis. „Stufe und Rechte“ als Fenster mit Reitern aus den RND-Bausteinen.
+- Nebenbei behoben: zehnter Stand eines Kundenobjekts scheiterte mit 500 (seq_no varchar 12, seit v3357).
+- Nachweis: `Dateien/Partner-Kunden-Nachweis-2026-11-17/`, Einzelheiten `wissen/2026-11-17.md`.
+- Offen: Bildausschnitt braucht 15–26 s (html2canvas klont die ganze Seite), Messe-Drehbuch „Mein Partner“ greift noch auf `#dppk-ov` (Videos neu), Portfolio/Track Record ohne Kundenbezug, Prod.
+
 ### N175 · Partnerlogo: zuschneiden, Darstellung auf dunklem Grund, Größe in App und PDF, Verwaltung einfacher, Logo mittig, Akzent-Auswahl mit Standard (Marcel 17.11.2026) — **v3630–v3630e (`748c759f`, `2ec2e852`, `13c85961`, `0649f690`, `e286c7bb`) auf Staging nachgemessen; Prod NICHT ausgerollt**
 - v3630e (`e286c7bb`): Ausrichtung Links/Mittig (Migration 115, nur Menüleiste, PDF-Seitenkopf bleibt links wegen des mittigen Seitentitels), Akzent-Schnellwahl mit Standard (DealPilot-Gold) und 18 gemessenen Tönen (≥ 3 : 1 auf Obsidian und Weiß, ohne Statusfarben), Knöpfe „Standard“.
 - Zuschnitt beim Hochladen (Rand aus den Ecken, Flutfüllung, Farbe-zu-Alpha), vier Darstellungen auf dunklem Grund als fertiges PNG (`brand_logo_auf_dunkel`), Rahmen in der Akzentfarbe der Marke, Logogröße App 60–160 % und PDF 60–150 % (Grenzen je Stelle), Migrationen 112 und 114.
