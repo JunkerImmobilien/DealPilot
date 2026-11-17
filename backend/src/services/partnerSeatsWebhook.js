@@ -57,7 +57,8 @@ async function abgleichen(deps, resellerId, sub, menge, abo) {
     interval: intervallAus(item),
     stripeSubscriptionId: abo ? sub.id : undefined,
     stripeSubscriptionItemId: item && item.id,
-    currentPeriodEnd: sub.current_period_end ? new Date(sub.current_period_end * 1000) : null
+    /* v3610p · neuere API-Fassung der Ereignisse (2026-04-22.dahlia): Zeitraum an der Position */
+    currentPeriodEnd: (sub.current_period_end || (item && item.current_period_end)) ? new Date((sub.current_period_end || item.current_period_end) * 1000) : null
   });
 }
 

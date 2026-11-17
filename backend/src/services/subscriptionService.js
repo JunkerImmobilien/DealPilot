@@ -159,6 +159,17 @@ async function getEffectivePlan(userId) {
  * `stripeSubscription` is the Stripe subscription object.
  */
 async function upsertFromStripe({ userId, stripeSubscription, planId, billingInterval }) {
+  /* v3610p · gemessen 17.11.2026 auf Staging: die Webhook-Ereignisse kommen in einer neueren API-Fassung,
+     dort steht der Zeitraum NICHT mehr am Abo, sondern an der Position (items.data[].current_period_*).
+     Jedes customer.subscription.updated schrieb so current_period_end = NULL (die SDK-Abfrage mit
+     2024-12-18.acacia liefert ihn noch am Abo). Rueckfall auf die erste Position. */
+  const _pos = stripeSubscription.items && stripeSubscription.items.data && stripeSubscription.items.data[0];
+  if (!stripeSubscription.current_period_end && _pos && _pos.current_period_end) {
+    stripeSubscription = Object.assign({}, stripeSubscription, {
+      current_period_end: _pos.current_period_end,
+      current_period_start: stripeSubscription.current_period_start || _pos.current_period_start
+    });
+  }
   const data = {
     user_id: userId,
     plan_id: planId,
