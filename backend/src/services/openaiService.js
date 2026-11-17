@@ -3369,6 +3369,11 @@ async function zustandAusBildern(fotos, opts) {
     'Stufe je Bauteil: "neuwertig" (sichtbar in den letzten rund 10 Jahren erneuert), "zeitgemaess" (gepflegt, funktional, nicht neu),',
     '"veraltet" (bauzeitlich, abgenutzt, erneuerungsbeduerftig). Ist ein Bauteil auf keinem Bild zu sehen: WEGLASSEN.',
     'Leitungen und Grundriss sind fast nie zu beurteilen - dann weglassen. Nichts erfinden, keine Vermutung ueber Unsichtbares.',
+    /* v3660a · gemessen am ersten Live-Lauf: „Fassade frisch gestrichen" kam als Aussenwand neuwertig. Anlage 2 meint
+       die WAERMEDAEMMUNG der Aussenwand und beim Dach die Erneuerung MIT Daemmung - ein Anstrich ist keine Modernisierung. */
+    'aussenwand = Waermedaemmung der Aussenwaende: "neuwertig" nur, wenn eine Daemmung erkennbar ist (WDVS, tiefe Fensterlaibungen, abgesetzter Sockel);',
+    'ein frischer Anstrich oder sauberer Putz allein ist KEINE Daemmung - dann "zeitgemaess" mit Sicherheit "niedrig" oder weglassen.',
+    'dach = Dacherneuerung einschliesslich Waermedaemmung: eine neue Eindeckung ohne erkennbare Daemmung hoechstens "zeitgemaess".',
     'Antwort STRIKT als JSON, kein Markdown:',
     '{ "gewerke": { "<bauteil>": { "stufe": "neuwertig|zeitgemaess|veraltet", "sicherheit": "hoch|mittel|niedrig",',
     '    "beschreibung": "ein kurzer Satz, was zu sehen ist (z. B. Kunststofffenster mit Isolierverglasung)" } },',
