@@ -2014,8 +2014,9 @@ label.dp-required.qc-required::after {
         </details></div>
       <div class="f"><label>Umlagefähige Kosten / Monat <button type="button" class="dp-tip" data-tip-id="tab3.umlagefaehig" tabindex="-1" aria-label="Hilfe zu tab3.umlagefaehig"></button></label><div class="iw"><span class="pfx">€</span><input id="umlagef" type="text" inputmode="decimal" placeholder="144" class="trl" oninput="calc()"></div></div>
       <hr class="dvd">
-      <div class="f"><label>= Warmmiete / Monat</label><div class="cf" id="wm_m">—</div></div>
-      <div class="f"><label>= Warmmiete / Jahr</label><div class="cf" id="wm_j">—</div></div>
+      <!-- v3671 · Warmmiete einschließlich der zusätzlichen Einnahmen (calc.js), Aufschlüsselung darunter -->
+      <div class="f"><label id="wm_m_lbl">= Warmmiete inkl. zusätzlicher Einnahmen / Monat</label><div class="cf" id="wm_m">—</div></div>
+      <div class="f"><label id="wm_j_lbl">= Warmmiete inkl. zusätzlicher Einnahmen / Jahr</label><div class="cf" id="wm_j">—</div><span class="hint" id="wm_teile"></span></div>
       <div class="f"><label>= Nettokaltmiete / Jahr</label><div class="cf" id="nkm_j_out">—</div></div>
     </div>
       <div class="card" style="margin-top:14px"><div class="ct ct-pro"><span class="ct-ico"><svg width="22" height="22"><use href="#i-bar"/></svg></span>Mietpreis-Analyse</div>
@@ -3971,7 +3972,7 @@ label.dp-required.qc-required::after {
   <script src="js/anteilig-recalc.js?v=353"></script>
   <script src="js/finanzierung-validation.js?v=1"></script>
 <script src="js/data/foerderregister.js?v=v3072"></script>
-  <script src="js/calc.js?v=v3511"></script>
+  <script src="js/calc.js?v=v3671"></script>
   <script src="js/zahlenfelder.js?v=v3023"></script>
 <script src="js/d1-type-handler.js?v=161"></script>
 <script src="js/icons.js?v=166"></script>
@@ -4066,7 +4067,7 @@ label.dp-required.qc-required::after {
 <script src="js/star-rating.js?v=v1851"></script>
 <script src="js/pdf-import.js?v=v3660c"></script>
 <script src="js/dokument-import.js?v=v3670"></script>
-<script src="js/unterlagen.js?v=v3352"></script>
+<script src="js/unterlagen.js?v=v3671"></script>
 <script src="js/sonderumlage.js?v=v3221"></script>
 <script src="js/sanierung-plan.js?v=v3560"></script><!-- v3214 · N137 · W-15: weitere Sanierungen in spaeteren Jahren -->
 <script src="js/darlehen-weitere-ui.js?v=v3261"></script><!-- v3215 · W-17: Liste Weitere Darlehen (Reiter Finanzierung) -->
@@ -4188,7 +4189,7 @@ label.dp-required.qc-required::after {
 <script src="js/main.js?v=v3280"></script>
   <!-- v372-autocomplete-removed: <script src="js/autocomplete.js?v=160" defer></script> -->
   <script src="js/session-expired-banner.js?v=500"></script><!-- v500-session-banner -->
-  <script src="js/object-actions.js?v=v3670"></script>
+  <script src="js/object-actions.js?v=v3671"></script>
   <script src="js/unterlagen-eingang.js?v=v3670"></script><!-- v3120 · ein Eingang fuer Belege, Unterlagen, Rechnungen -->
   <script src="js/ze-aufteilung.js?v=v3670b"></script><!-- v3670 · Zusatzeinnahmen aufteilen (Reiter Miete) -->
   <script src="js/dpsh-score-hero.js?v=v3370"></script><!-- dpsh-score-hero -->

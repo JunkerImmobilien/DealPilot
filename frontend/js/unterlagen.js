@@ -115,11 +115,17 @@
     aus.stellplatzMiete = 0; aus.stellplatzAnzahl = 0;
     /* v3352 · Marcel 13.11.2026: Stellplätze und Küchen als eigene Mietposten (Quick-Check: Felder Stellplatz und Küche) */
     aus.kuecheMiete = 0; aus.kuecheAnzahl = 0; aus.garagenAnzahl = 0;
+    aus.sonstMiete = 0; aus.sonstAnzahl = 0;   /* v3671 · Keller u. a. */
     liste.forEach(function (w, i) {
       if (!w) return;
       var art = String(w.nutzung || w.art || '').toLowerCase();
       if (/stellplatz|garage|keller/.test(art)) {
-        if (typ === 'mietaufstellung' && zahl(w.kaltmiete_eur) > 0 && String(w.status || '').toLowerCase() !== 'leer') { aus.stellplatzMiete += zahl(w.kaltmiete_eur); aus.stellplatzAnzahl++; if (/garage/.test(art)) aus.garagenAnzahl++; }
+        /* v3671 · ein Keller ist kein Stellplatz: seine Miete geht unter Sonstiges und zaehlt nicht als Stellplatz
+           (sonst setzte der Marktbericht fuer ihn die Bewirtschaftungskosten je Garage an) */
+        if (typ === 'mietaufstellung' && zahl(w.kaltmiete_eur) > 0 && String(w.status || '').toLowerCase() !== 'leer') {
+          if (/stellplatz|garage/.test(art)) { aus.stellplatzMiete += zahl(w.kaltmiete_eur); aus.stellplatzAnzahl++; if (/garage/.test(art)) aus.garagenAnzahl++; }
+          else { aus.sonstMiete += zahl(w.kaltmiete_eur); aus.sonstAnzahl++; }
+        }
         return;
       }
       var e = { nr: String(w.nr || (i + 1)).replace(/^(we|wohnung|nr\.?)\s*/i, ''), lage: w.lage || '' };

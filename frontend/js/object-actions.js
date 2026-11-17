@@ -2261,11 +2261,12 @@
       var miete = we.reduce(function (s, e) { return s + (numDe(e.ist) || 0); }, 0);
       var stp = numDe(we.stellplatzMiete) || 0;
       var kue = numDe(we.kuecheMiete) || 0;   /* v3352 · Küchen- bzw. Möblierungsmiete der Liste */
+      var son = numDe(we.sonstMiete) || 0;    /* v3671 · Keller u. a. (vorher als Stellplatz gezaehlt) */
       /* v3029-import · Abgleich mit der Summe, die die Liste selbst nennt (Wohnen/Gewerbe + Stellplätze) */
       var herl = 'öffnet nach dem Übernehmen das Fenster „Einheiten erfassen“ — dort prüfen und übernehmen' + (_mvRein.length ? ' · Mietverträge eingearbeitet: ' + _mvRein.join(', ') : '');
       var sl = we._summeListe;
       if (sl > 0) {
-        var diff = Math.round((miete + stp + kue - sl) * 100) / 100;
+        var diff = Math.round((miete + stp + kue + son - sl) * 100) / 100;
         if (Math.abs(diff) >= 1 && kue > 0 && Math.abs(miete + stp - sl) < 1) diff = 0;   /* Liste summiert ohne Küchen */
         herl += Math.abs(diff) < 1 ? ' · Summe stimmt mit der Liste überein (' + fmt0(sl) + ' €/Monat)'
           : ' · ACHTUNG: Einheiten + Stellplätze ergeben ' + (miete + stp).toLocaleString('de-DE', { maximumFractionDigits: 2 }) + ' €/Monat, die Liste nennt ' + sl.toLocaleString('de-DE', { maximumFractionDigits: 2 }) + ' € - bitte im Fenster prüfen';
@@ -2293,10 +2294,19 @@
       if (_qcMode) {
         if (stp > 0) _merged.ze_stp = { label: 'Miete Stellplätze / Monat', value: _de2(stp), raw: _r2(stp), source: 'Mieterliste', kind: 'input', herleitung: _stpText };
         if (kue > 0) _merged.ze_kueche = { label: 'Miete Küchen / Monat', value: _de2(kue), raw: _r2(kue), source: 'Mieterliste', kind: 'input', herleitung: (we.kuecheAnzahl || 0) + ' Einheiten mit Küchenmiete aus der Mieterliste' };
-      } else if (stp + kue > 0) {
-        /* v3670 · im Objekt mit Aufteilung (ze_teile): Stellplatz und Kueche getrennt, ze = Summe */
-        _merged.ze = { label: 'Zusätzliche Einnahmen / Monat (' + (stp > 0 && kue > 0 ? 'Stellplätze und Küchen' : stp > 0 ? 'Stellplätze' : 'Küchen') + ')', value: _de2(stp + kue), raw: _r2(stp + kue), source: 'Mieterliste', kind: 'ze_teile', teile: { stp: stp, kueche: kue, sonst: 0 },
-          herleitung: (stp > 0 ? _stpText + ' ' + _de2(stp) : '') + (stp > 0 && kue > 0 ? ' · ' : '') + (kue > 0 ? (we.kuecheAnzahl || 0) + ' Küchen ' + _de2(kue) : '') };
+        if (son > 0) _merged.ze_sonst = { label: 'Sonstige Einnahmen / Monat', value: _de2(son), raw: _r2(son), source: 'Mieterliste', kind: 'input', herleitung: (we.sonstAnzahl || 0) + ' Keller u. a. aus der Mieterliste' };   /* v3671 */
+      } else if (stp + kue + son > 0) {
+        /* v3670 · im Objekt mit Aufteilung (ze_teile): Stellplatz und Kueche getrennt, ze = Summe · v3671: Keller unter Sonstiges */
+        _merged.ze = { label: 'Zusätzliche Einnahmen / Monat (' + [stp > 0 ? 'Stellplätze' : '', kue > 0 ? 'Küchen' : '', son > 0 ? 'Sonstiges' : ''].filter(Boolean).join(', ') + ')', value: _de2(stp + kue + son), raw: _r2(stp + kue + son), source: 'Mieterliste', kind: 'ze_teile', teile: { stp: stp, kueche: kue, sonst: son },
+          herleitung: [stp > 0 ? _stpText + ' ' + _de2(stp) : '', kue > 0 ? (we.kuecheAnzahl || 0) + ' Küchen ' + _de2(kue) : '', son > 0 ? (we.sonstAnzahl || 0) + ' Keller u. a. ' + _de2(son) : ''].filter(Boolean).join(' · ') };
+      }
+      /* v3671 · Marcel 17.11.2026 („ja los“): die ANZAHL der vermieteten Garagen und Stellplätze der Liste geht ins Objekt,
+         damit der Marktbericht ihre Bewirtschaftungskosten je Stück ansetzt (Anlage 3 ImmoWertV). Gezählt sind nur vermietete
+         Plätze mit Miete - ein Stellplatz ohne Miete bekommt keine Kosten (v2541). Im Quick-Check gibt es kein Feld dafür. */
+      if (!_qcMode && stp > 0) {
+        var _gar = we.garagenAnzahl || 0, _aus = Math.max(0, (we.stellplatzAnzahl || 0) - _gar);
+        if (_gar > 0) addRow('garagen', 'Garagen (vermietet, Mieterliste)', String(_gar), String(_gar), 'Mieterliste', 'input');
+        if (_aus > 0) addRow('stellpl_aussen', 'Außenstellplätze (vermietet, Mieterliste)', String(_aus), String(_aus), 'Mieterliste', 'input');
       }
     }
   }

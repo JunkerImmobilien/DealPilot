@@ -330,7 +330,10 @@ export const ErtragswertService = {
        Stellplaetze - wo die Quelle endet, endet die Rechnung. Bis v2540 standen
        Verwaltung und Instandhaltung im Abzug, der Ertrag fehlte (Westerfeld: 2
        Stellplaetze, 312 EUR/Jahr Kosten ohne Ertrag, rund -6.900 EUR Ertragswert). */
-    const _spOhneErtrag = spAnz > 0 && !(stellplatz > 0);
+    /* v3671 · Ertrag DER STELLPLAETZE, nicht der ganzen Zusatzeinnahmen: aufgeteilt mit Stellplatzanteil 0 und ohne
+       Stellplatzmiete im Objekt traegt nur Sonstiges (Keller u. a.) - die Plaetze bleiben dann ohne Kosten (v2541). */
+    const _spErtrag = _spE.ersetzt ? (ein.zusatz_aufgeteilt === true ? (pos(ein.zusatz_stellplatz_jahr) || 0) : zusatz) : _spE.stueck_jahr;
+    const _spOhneErtrag = spAnz > 0 && !(_spErtrag > 0);
     const spKosten = _spOhneErtrag ? 0 : spAnz;
     if (_spOhneErtrag) out.hinweise.push(spAnz + ' Stellpl' + (spAnz === 1 ? 'atz' : 'ätze') + ' ohne eingetragene Miete: '
       + 'weder Ertrag noch Bewirtschaftungskosten angesetzt. Die Stellplatzmiete (€/Monat) im Reiter Objekt eintragen, dann rechnet der Ertragswert beides.');

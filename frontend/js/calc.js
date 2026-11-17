@@ -1380,7 +1380,10 @@ function _calcImmediate(){
      fuer App und beide PDFs; wm_j bleibt als interne Summe (Steuerverlauf
      tax.js, Projektion) unveraendert - dort zaehlen die Zusatzeinnahmen mit. */
   var warm_m=nkm+uf,warm_j=warm_m*12;
-  /* v3023: Cent nur, wenn es welche gibt - daneben stand „43.920 €" und „43.920,00 €" */ var _ct=function(x){return Math.abs(x-Math.round(x))<0.005?0:2;}; st('wm_m',fE(warm_m,_ct(warm_m)));st('wm_j',fE(warm_j,_ct(warm_j)));st('nkm_j_out',fE(nkm_j));
+  /* v3023: Cent nur, wenn es welche gibt - daneben stand „43.920 €" und „43.920,00 €" */ var _ct=function(x){return Math.abs(x-Math.round(x))<0.005?0:2;}; /* v3671 · Marcel 17.11.2026 („ja los“): die Anzeige im Reiter Miete zaehlt die zusaetzlichen Einnahmen mit und sagt es in der
+     Beschriftung (#wm_m_lbl/#wm_j_lbl, Aufschluesselung #wm_teile). Die Warmmiete der PDFs bleibt warm_j (v2484, ohne ze). */
+  st('wm_m',fE(wm_m,_ct(wm_m)));st('wm_j',fE(wm_j,_ct(wm_j)));st('nkm_j_out',fE(nkm_j));
+  try { var _wt=el('wm_teile'); if(_wt) _wt.textContent = ze>0 ? 'Kaltmiete '+fE(nkm,_ct(nkm))+' + zusätzliche Einnahmen '+fE(ze,_ct(ze))+' + Umlagen '+fE(uf,_ct(uf))+'. Ohne zusätzliche Einnahmen: '+fE(warm_m,_ct(warm_m))+' im Monat.' : ''; } catch(_e){}
   // V227: AfA mit linear ODER degressiv ODER degressiv-mit-Wechsel, optional + § 7b
   var afaSelVal = (el('afa_satz') || {}).value || '2.0';
   var afaParsed = (window.Afa && Afa.parseSelectValue) ? Afa.parseSelectValue(afaSelVal) : { methode: 'linear', satzPct: parseDe(afaSelVal) || 2 };

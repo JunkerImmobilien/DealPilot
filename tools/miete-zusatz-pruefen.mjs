@@ -223,6 +223,39 @@ pruefe('C', 'CrossCheck: BWK-Bezugsgroesse mit derselben Regel (stellplatzErtrag
 pruefe('C', 'CrossCheck: Gewerbezweig traegt ze (zusatz_jahr im einG)', /\/\* v3670 · `ze` fehlte im Gewerbezweig ganz/.test(ccs));
 pruefe('C', 'Orchestrator reicht die Aufteilung durch', /zusatz_aufgeteilt: input\.zusatz_aufgeteilt === true/.test(lies('marktbericht/backend/src/services/ReportOrchestrator.js')));
 
+/* ═══ E · v3671 · Stellplatz-Anzahl und Kosten, Keller, Warmmiete ══════════════════════════════════ */
+console.log('E · v3671 Stellplatz-Anzahl, Keller, Warmmiete');
+{
+  const vw = (k) => ((k.staffel || []).find((s) => /^Verwaltungskosten/.test(s.pos)) || {}).pos || '';
+  const kA = ew({ zusatz_jahr: 1200, zusatz_aufgeteilt: false, stellplatz_anz: 2 });
+  pruefe('E', 'Anzahl aus der Mieterliste + ze: Kosten je Stellplatz angesetzt (2 Stellpl.)', vw(kA).includes('2 Stellpl.'), vw(kA));
+  const kB = ew({ zusatz_jahr: 240, zusatz_aufgeteilt: true, zusatz_stellplatz_jahr: 0, zusatz_sonst_jahr: 240, stellplatz_anz: 2 });
+  pruefe('E', 'Stellplatzanteil 0, keine Stellplatzmiete: keine Kosten fuer die Plaetze (v2541)', !vw(kB).includes('Stellpl.') && (kB.hinweise || []).some((h) => /ohne eingetragene Miete/.test(h)), vw(kB));
+  const kC = ew({ stellplatz_anz: 2 });
+  pruefe('E', 'Stellplaetze ganz ohne Miete: keine Kosten (unveraendert)', !vw(kC).includes('Stellpl.'), vw(kC));
+  /* Mieterliste: echte unterlagen.js */
+  const uctx = { console, Math, JSON, String, Number, parseFloat, isFinite, setTimeout, document: { getElementById: () => null, querySelectorAll: () => [], createElement: () => ({}), head: { appendChild() {} } } };
+  uctx.window = uctx; vm.createContext(uctx);
+  try { vm.runInContext(fs.readFileSync(F('frontend/js/unterlagen.js'), 'utf8'), uctx, { filename: 'unterlagen.js' }); } catch (e) { pruefe('E', 'unterlagen.js laedt', false, e.message); }
+  const U = uctx.DpUnterlagen;
+  const l = U && U.einheitenAus('mietaufstellung', { einheiten: [
+    { nr: 'WE 1', nutzung: 'wohnen', wfl_m2: 60, kaltmiete_eur: 600, status: 'vermietet' },
+    { nr: 'WE 2', nutzung: 'wohnen', wfl_m2: 62, kaltmiete_eur: 620, kueche_miete_eur: 25, status: 'vermietet' },
+    { nr: 'G 1', nutzung: 'garage', kaltmiete_eur: 45, status: 'vermietet' },
+    { nr: 'S 2', nutzung: 'stellplatz', kaltmiete_eur: 30, status: 'vermietet' },
+    { nr: 'S 3', nutzung: 'stellplatz', kaltmiete_eur: 30, status: 'leer' },
+    { nr: 'K 1', nutzung: 'keller', kaltmiete_eur: 15, status: 'vermietet' } ] });
+  pruefe('E', 'Mieterliste: 2 vermietete Plaetze (1 Garage), 75 €; leerer Platz nicht gezaehlt', l && l.stellplatzAnzahl === 2 && l.garagenAnzahl === 1 && l.stellplatzMiete === 75, l && [l.stellplatzAnzahl, l.garagenAnzahl, l.stellplatzMiete]);
+  pruefe('E', 'Mieterliste: Keller unter Sonstiges (15 €), kein Stellplatz', l && l.sonstMiete === 15 && l.sonstAnzahl === 1, l && [l.sonstMiete, l.sonstAnzahl]);
+  const oa = lies('frontend/js/object-actions.js');
+  pruefe('E', 'Uebernahme setzt Garagen und Aussenstellplaetze (nur vermietete)', oa.includes("addRow('garagen', 'Garagen (vermietet, Mieterliste)'") && oa.includes("addRow('stellpl_aussen', 'Außenstellplätze (vermietet, Mieterliste)'"));
+  pruefe('E', 'Uebernahme: Keller als Teil Sonstiges', oa.includes('teile: { stp: stp, kueche: kue, sonst: son }'));
+  const calc = lies('frontend/js/calc.js'), idx = lies('frontend/index.html');
+  pruefe('E', 'Warmmiete im Reiter: nkm + ze + Umlagen (wm_m)', calc.includes("st('wm_m',fE(wm_m,_ct(wm_m)))") && calc.includes('var wm_m=nkm+ze+uf'));
+  pruefe('E', 'Warmmiete beschriftet „inkl. zusätzlicher Einnahmen“ und aufgeschluesselt', idx.includes('= Warmmiete inkl. zusätzlicher Einnahmen / Monat') && idx.includes('id="wm_teile"'));
+  pruefe('E', 'PDF-Warmmiete bleibt ohne ze (warm_m = nkm + uf, v2484)', calc.includes('var warm_m=nkm+uf'));
+}
+
 /* ═══ D · Verdrahtung ══════════════════════════════════════════════════════════════════════════ */
 function ebeneD(Q, tag) {
   const has = (f, re, name) => pruefe('D', tag + name, re.test(Q[f]));
