@@ -44973,3 +44973,9 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Commit:** `a83a3129` v3640, `0bbce828` v3640a, `aa0d6479` a2, `ed49ef22` a3, `2dc6ca69` a4, `b1ead60f` a5, `20632d13` a6, `ad53ffad` v3640b, `50d825ae` v3640c, `46e79a03` v3640d. Backend auf Staging neu gebaut, Migration 113 angewandt.
 - **Nachweis:** `partner-kunden-pruefen --live` 55/55 (inkl. Gegenprobe: Sperrzeile entfernt → Punkt rot), `partner-anmerkungen-pruefen --live` 71/71, buster-ebenen sauber, gold-audit RC 0 (Server). Browser (Testkonten, Staging): Partner übernimmt, erneut → Rückfrage, Aktualisieren ohne zweite Kopie; Anmerkung mit Ausschnitt und drei Markierungen (13 KB WebP), zurück an Kunden; Kunde: Senden gesperrt („Noch 6 …“), Bild groß, Rückfrage → „Alle bearbeitet“, Senden gelingt; Partner sieht „6 Rückfragen“. Kundendialog je Reiter ohne Scrollen bei 1582 × 832 (Rechte 526/526), 390 px ohne Querscrollen. Bilder `Dateien/Partner-Kunden-Nachweis-2026-11-17/`.
 - **Rest:** Ausschnitt 15–26 s, Messe-Drehbuch Mein Partner (`#dppk-ov`), Portfolio/Track Record, Prod.
+
+### v3630f–v3630h · 17.11.2026 (nur Staging) · Partnerlogo mit Marcels Upload, Verwaltung in Reitern
+- **Was:** Dunkelfassung repariert (deckend weiße Innenräume im Upload, Automatisch nach Mittelwert), neue Darstellung „Hell eingefärbt, ohne Fläche“, Raster 400 px, Logogröße bis 250 % mit voller Breite, Verwaltung als RND-Reiter mit fester Speicher-Leiste, Darstellung wirkt live in der Leiste.
+- **Commit:** `00dbb590`, `991c1377`, `88623999`, `1b79bef6`, `468f3e15`. Migrationen 116, 117.
+- **Nachweis:** Marcels Datei im Partner-Testkonto: helle Fassung 100 % lesbar, 1.921 Innenweiß-Punkte entfernt; 250 % mittig 231 × 142 px (1440), 146 × 90 (390); Menüblock rollt 28 px; Speicher-Leiste fest unten (1440 sticky, 390 fixed). Bilder `40-*`, `41-*`, `42-*`.
+- **Rest:** Marcel speichert die neue Darstellung in seinem Konto, doppelter Titel „Verwaltung“, Prod.
