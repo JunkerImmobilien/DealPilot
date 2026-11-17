@@ -45021,3 +45021,9 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Commit:** `0008f377`. Buster index.html und quickcheck-app.html, qc-bridge IFRAME_SRC.
 - **Nachweis:** Headless mit Testkonto (Bilder 8–10), buster-ebenen SAUBER, Modernisierungsprüfer 77/77.
 - **Rest:** Prod.
+
+### v3671–v3671a · 17.11.2026 (nur Staging) · Stellplatz-Anzahl, Keller, Warmmiete
+- **Was:** Mieterliste übergibt Anzahl vermieteter Garagen/Außenstellplätze (`object-actions.js`), Keller eigene Nutzung `keller` (Schema `mietaufstellung`) unter Sonstiges (`unterlagen.js`); Ertragswert setzt Stellplatzkosten nur bei Stellplatzertrag (`ErtragswertService.js`); Reiter Miete „Warmmiete inkl. zusätzlicher Einnahmen“ mit Aufschlüsselung (`calc.js`, `index.html`), PDF-Warmmiete unverändert.
+- **Commit:** `db53ba62`, `cd8f666b`. Backend und mb-Backend neu gebaut.
+- **Nachweis:** `miete-zusatz-pruefen` 86/86, wertermittlung/mietpotenzial/objekt-mapper/flow-berechnen/buster grün; Browser Staging (Testkonto): Mieterliste → nkm 1.830, ze 115 (75/25/15), Garagen 1, Außenstellplätze 1; Warmmiete 2.130 €.
+- **Rest:** Marktbericht Stufe 3 im Browser; Prod.
