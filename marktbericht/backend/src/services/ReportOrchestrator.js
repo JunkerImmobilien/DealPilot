@@ -301,6 +301,11 @@ export const ReportOrchestrator = {
       /* v1057-WSON-6 */
       sonstige_jahr: input.sonstige_jahr ? Number(input.sonstige_jahr) : null,
       zusatz_ertrag_jahr: input.zusatz_ertrag_jahr ? Number(input.zusatz_ertrag_jahr) : null,   /* v2382 · ze */
+      /* v3670 · Aufteilung von `ze` (lib/zusatz_einnahmen.js): Stellplatzanteil entscheidet ueber Anzahl × Miete */
+      zusatz_aufgeteilt: input.zusatz_aufgeteilt === true,
+      zusatz_stellplatz_jahr: input.zusatz_stellplatz_jahr != null ? Number(input.zusatz_stellplatz_jahr) : null,
+      zusatz_kueche_jahr: input.zusatz_kueche_jahr != null ? Number(input.zusatz_kueche_jahr) : null,
+      zusatz_sonst_jahr: input.zusatz_sonst_jahr != null ? Number(input.zusatz_sonst_jahr) : null,
       sonstige_dauer_jahre: input.sonstige_dauer_jahre ? Number(input.sonstige_dauer_jahre) : null,
       mod_punkte: input.mod_punkte != null && input.mod_punkte !== ''
         ? Number(input.mod_punkte) : null,
@@ -1503,7 +1508,7 @@ export const ReportOrchestrator = {
           /* v1055-WSPL-1 · Hinweis, wenn Stellplaetze da sind und kein
            * Ertrag dafuer angesetzt wurde. */
           stellplatz_ertrag_fehlt: ((Number(ref.garages) || 0) + (Number(ref.outdoor_parking) || 0)) > 0
-            && !(Number(ref.stellplatz_miete_monat) > 0),
+            && !(Number(ref.stellplatz_miete_monat) > 0) && !(Number(ref.zusatz_ertrag_jahr) > 0),   /* v3670 · ze traegt die Stellplatzmiete */
           irw: _irw,           /* v1053-WIRW-3 */
           amtliche_miete: _amtMiete,   /* v1059-WMIET-3 */
           amtlicher_vergleichsfaktor: _amtVf,

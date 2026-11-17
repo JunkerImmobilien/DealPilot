@@ -18,6 +18,7 @@ import {
   GEW_INST_PCT, gewerbeInstandhaltungQm,   /* v2790 */
 } from '../lib/immowertv.js';
 import { ABZUG as MP_ABZUG } from '../lib/modellpruefung.js';   /* v2595 */
+import { stellplatzErtrag } from '../lib/zusatz_einnahmen.js';   /* v3670 */
 
 /* FIX-NUM: Number(null) ist 0, nicht NaN. Ohne diese Wache lieferte
  * num(null) ?? Default die 0 und kippte die gesamten Bewirtschaftungs-
@@ -312,7 +313,17 @@ export const ErtragswertService = {
     /* v2382 · Zusatzeinnahmen aus der Haupt-App (`ze`: Stellplatz, Garage etc.) sind Rohertrag.
        Liegen sie vor, ersetzen sie die Stueckrechnung Anzahl x Miete - beides waere doppelt. */
     const zusatz = pos(ein.zusatz_jahr) || 0;
-    const stellplatz = zusatz > 0 ? round0(zusatz) : round0(spAnz * spMiete * 12);
+    /* v3670 · Regel in lib/zusatz_einnahmen.js: nicht aufgeteilt oder mit Stellplatzanteil ersetzt
+       `ze` die Stueckrechnung (dieselben Plaetze, die eingetragene Miete gilt). Aufgeteilt OHNE
+       Stellplatzanteil rechnen Anzahl × Miete UND der sonstige Rest. */
+    const _spE = stellplatzErtrag(ein);
+    const stellplatz = round0(_spE.jahr);
+    if (_spE.ersetzt && _spE.stueck_jahr > 0 && Math.abs(_spE.stueck_jahr - zusatz) >= 1) out.hinweise.push(
+      'Stellplatzmiete aus den Zusätzlichen Einnahmen (' + deZahl(round2(zusatz / 12)) + ' €/Monat) angesetzt, nicht zusätzlich '
+      + spAnz + ' × ' + deZahl(spMiete) + ' €/Monat aus dem Reiter Objekt. Beides beschreibt dieselben Plätze und wäre doppelt gezählt.');
+    if (zusatz > 0 && ein.zusatz_aufgeteilt !== true) out.hinweise.push('Die Zusätzlichen Einnahmen ('
+      + deZahl(round2(zusatz / 12)) + ' €/Monat) sind nicht aufgeteilt und gehen als Stellplatz-Regelfall ganz in den Rohertrag. '
+      + 'Ein gesondert vereinbarter Küchen- oder Möblierungszuschlag läuft kürzer als das Gebäude. Ihn im Reiter Miete unter „aufteilen“ eintragen, dann rechnet er mit eigener Dauer.');
     /* v2541 · STELLPLAETZE OHNE MIETE (Marcel 20.10.2026): ohne eingetragene
        Stellplatzmiete und ohne Zusatzeinnahmen weder Ertrag noch Kosten fuer die
        Stellplaetze - wo die Quelle endet, endet die Rechnung. Bis v2540 standen
@@ -361,9 +372,17 @@ export const ErtragswertService = {
     if (mieteMarkt || !gewerbe) out.staffel.push(Object.assign({ pos: 'Rohertrag Wohnen (marktüblich erzielbar)', wert: round0(mieteMarkt) },
       _aufDetail ? { detail: _aufDetail } : {}));
     if (gewerbe) out.staffel.push({ pos: 'Rohertrag Gewerbe', wert: round0(gewerbe) });
-    if (stellplatz) out.staffel.push({ pos: zusatz > 0
-      ? `Stellplätze/Garagen u. a. (Zusatzeinnahmen ${deZahl(round2(zusatz / 12))} €/Monat)`
-      : `Stellplätze (${spAnz} × ${spMiete} €/Monat)`, wert: stellplatz });
+    /* v3670 · Beschriftung nach Aufteilung (ein.zusatz_aufgeteilt) */
+    if (stellplatz) {
+      const _m = (j) => deZahl(round2((pos(j) || 0) / 12));
+      if (zusatz > 0 && ein.zusatz_aufgeteilt !== true) out.staffel.push({ pos: `Zusätzliche Einnahmen (Stellplatz, Küche, Sonstiges) ${_m(zusatz)} €/Monat`, wert: stellplatz });
+      else if (zusatz > 0 && _spE.ersetzt) out.staffel.push({ pos: `Stellplätze/Garagen ${_m(ein.zusatz_stellplatz_jahr)} €/Monat`
+        + (pos(ein.zusatz_sonst_jahr) ? ` und sonstige Zusatzeinnahmen ${_m(ein.zusatz_sonst_jahr)} €/Monat` : ''), wert: stellplatz });
+      else {
+        if (_spE.stueck_jahr) out.staffel.push({ pos: `Stellplätze (${spAnz} × ${spMiete} €/Monat)`, wert: round0(_spE.stueck_jahr) });
+        if (zusatz > 0) out.staffel.push({ pos: `Sonstige Zusatzeinnahmen ${_m(zusatz)} €/Monat`, wert: round0(zusatz) });
+      }
+    }
     /* v1057-WSON-2 · Diese Zeile stand im Rohertrag und wurde damit ueber
      * die volle Restnutzungsdauer kapitalisiert. Der Ansatz steht jetzt
      * weiter unten mit eigener Laufzeit. */
@@ -760,7 +779,8 @@ export const ErtragswertService = {
       const _dauer = Math.min(pos(ein.sonstige_dauer_jahre) || 15, R);
       const _vS = barwertfaktor(lzs, _dauer);
       sonstigeBarwert = round0(sonstige * _vS);
-      out.staffel.push({ pos: '+ sonstige Erträge (' + round0(sonstige).toLocaleString('de-DE')
+      out.staffel.push({ pos: '+ sonstige Erträge (' + (pos(ein.zusatz_kueche_jahr) ? 'davon Küche/Möblierung ' + round0(ein.zusatz_kueche_jahr).toLocaleString('de-DE') + ' €, ' : '')   /* v3670 */
+        + round0(sonstige).toLocaleString('de-DE')
         + ' € × Barwertfaktor ' + _vS.toFixed(2).replace('.', ',') + ' für ' + _dauer + ' Jahre)',
         wert: sonstigeBarwert });
       out.hinweise.push('Sonstige Erträge (z. B. Küche, Möblierung) sind mit einer eigenen '

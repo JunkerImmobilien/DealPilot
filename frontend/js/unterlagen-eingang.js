@@ -202,6 +202,8 @@
     try {
       var M = window.DpMfhEinheiten, s = M && M._summe ? M._summe(E) : null, nk = el('nkm');
       if (s && s.ist > 0 && nk) { nk.value = String(Math.round(s.ist * 100) / 100).replace('.', ','); nk.dispatchEvent(new Event('input', { bubbles: true })); }
+      /* v3670 · Stellplatzmiete aus dem Vertrag in die Zusatzeinnahmen (Teil Stellplatz), angehoben, nie doppelt */
+      if (M && typeof M.stellplatzNachziehen === 'function') M.stellplatzNachziehen(E);
     } catch (x) {}
     txMerk({ t: 'einheit', i: i, label: 'Mietvertrag → ' + einheitName(e, i), vor: alt, nach: JSON.parse(JSON.stringify(e)) });
     var nkE = el('nkm');

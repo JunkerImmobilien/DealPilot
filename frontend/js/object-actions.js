@@ -56,6 +56,8 @@
   var OBJ2QC = { str:'qc_str', hnr:'qc_hnr', plz:'qc_plz', ort:'qc_ort', wfl:'qc_wfl', baujahr:'qc_bj', zimmer:'qc_zimmer', objart:'qc_objektart', kp:'qc_kp', nkm:'qc_nkm', hg_ul:'qc_hg', ek:'qc_ek', ds2_energie:'qc_energieklasse', stellpl_aussen:'qc_stellplatz', lageklasse:'qc_lageklasse' /* v2159 */,
     /* v506-obj2qc: Finanzierung + Mieten-Einzelposten (Sprachaufzeichnung) */
     d1z:'qc_zins', d1t:'qc_tilg', ze_stp:'qc_nkm_stp', ze_kueche:'qc_nkm_kueche', ze_sonst:'qc_nkm_sonst',
+    /* v3670 · die Teile der Zusatzeinnahmen im Objekt (js/ze-aufteilung.js) */
+    ze_stp_monat:'qc_nkm_stp', ze_kueche_monat:'qc_nkm_kueche', ze_sonst_monat:'qc_nkm_sonst',
     /* v3339 · Stellplaetze/Garagen der Mieterliste (_merged.ze, v3029-import) gingen nur ans spaetere Objekt,
        der Quick-Check rechnete ohne sie: Am Quittengarten 12 zeigte dort 4.240 statt 4.480 EUR/Monat,
        DSCR 1,16 statt 1,21. Als Mieten-Einzelposten kommen sie in die Summe qc_nkm (mieteAddUp) und
@@ -1957,6 +1959,22 @@
     var _nkmE = numDe(d.nettokaltmiete);
     addRow('nkm', 'Nettokaltmiete / Monat', _nkmE ? _nkmE.toLocaleString('de-DE', { maximumFractionDigits: 2 }) + ' €' : null, _nkmE, S, 'input');
     if (d.nettokaltmiete_hinweis && _merged.nkm && _merged.nkm.source === S) _merged.nkm.herleitung = String(d.nettokaltmiete_hinweis);
+    /* v3670 · Stellplatz-, Kuechen- und sonstige Miete des Exposés (openaiService.extractExpose) gehen in die
+       Zusatzeinnahmen und ihre Aufteilung, die Wohnungsmiete bleibt in nkm. Bis v3669 las das Exposé sie nicht. */
+    (function () {
+      var t = { stp: numDe(d.stellplatz_miete_monat) || 0, kueche: numDe(d.kueche_miete_monat) || 0, sonst: numDe(d.zusatz_miete_monat) || 0 };
+      var sum = t.stp + t.kueche + t.sonst; if (!(sum > 0)) return;
+      var _e2 = function (n) { return n.toLocaleString('de-DE', { maximumFractionDigits: 2 }) + ' €'; };
+      var teile = [t.stp > 0 ? 'Stellplatz ' + _e2(t.stp) : '', t.kueche > 0 ? 'Küche ' + _e2(t.kueche) : '', t.sonst > 0 ? 'Sonstiges ' + _e2(t.sonst) : ''].filter(Boolean);
+      if (_qcMode) {
+        if (t.stp > 0) addRow('ze_stp_monat', 'Miete Stellplatz / Monat', _e2(t.stp), String(t.stp), S, 'input');
+        if (t.kueche > 0) addRow('ze_kueche_monat', 'Miete Küche / Monat', _e2(t.kueche), String(t.kueche), S, 'input');
+        if (t.sonst > 0) addRow('ze_sonst_monat', 'Sonstige Einnahmen / Monat', _e2(t.sonst), String(t.sonst), S, 'input');
+        return;
+      }
+      addRow('ze', 'Zusätzliche Einnahmen / Monat (' + teile.join(', ') + ')', _e2(sum), String(Math.round(sum * 100) / 100), S, 'input');
+      if (_merged.ze && _merged.ze.source === S) { _merged.ze.kind = 'ze_teile'; _merged.ze.teile = t; _merged.ze.herleitung = 'aus dem Exposé, aufgeteilt in ' + teile.join(', '); }
+    })();
     /* v3029-import · Das Exposé nennt das Hausgeld je MONAT und als GESAMTSUMME. hg_ul ist
        „Hausgeld (umlagefähig) / Jahr" - bis v3028 stand das Monatsgeld dort (320 €/Monat →
        320 €/Jahr) und der nicht umlagefähige Teil fehlte ganz. Jetzt ×12 und aufgeteilt nach
@@ -2066,7 +2084,7 @@
        bis v3028 Objektmiete, Wohnfläche und Zimmer (MFH mit 8 WE → nkm 520 €, wfl 65 m²,
        vorgehakt). Dort gehört er in „Einheiten erfassen". */
     if (/mfh|mehrfam|wgh|wohn.*gesch|zfh|zweifam/i.test(_art)) {
-      var _wegMv = ['nkm', 'wfl', 'zimmer', 'ze'].filter(function (k) { return _merged[k] && _merged[k].typ === 'mietvertrag'; });
+      var _wegMv = ['nkm', 'wfl', 'zimmer', 'ze', 'ze_stp_monat', 'ze_kueche_monat' /* v3670 */].filter(function (k) { return _merged[k] && _merged[k].typ === 'mietvertrag'; });
       _wegMv.forEach(function (k) { delete _merged[k]; });
       if (_wegMv.length) _importHinweise.push('Der Mietvertrag gilt für EINE Einheit - Miete und Fläche des Hauses wurden daraus nicht gesetzt. Trag die Einheit unter „Einheiten erfassen" ein.');
     }
@@ -2276,7 +2294,8 @@
         if (stp > 0) _merged.ze_stp = { label: 'Miete Stellplätze / Monat', value: _de2(stp), raw: _r2(stp), source: 'Mieterliste', kind: 'input', herleitung: _stpText };
         if (kue > 0) _merged.ze_kueche = { label: 'Miete Küchen / Monat', value: _de2(kue), raw: _r2(kue), source: 'Mieterliste', kind: 'input', herleitung: (we.kuecheAnzahl || 0) + ' Einheiten mit Küchenmiete aus der Mieterliste' };
       } else if (stp + kue > 0) {
-        _merged.ze = { label: 'Zusätzliche Einnahmen / Monat (' + (stp > 0 && kue > 0 ? 'Stellplätze und Küchen' : stp > 0 ? 'Stellplätze' : 'Küchen') + ')', value: _de2(stp + kue), raw: _r2(stp + kue), source: 'Mieterliste', kind: 'input',
+        /* v3670 · im Objekt mit Aufteilung (ze_teile): Stellplatz und Kueche getrennt, ze = Summe */
+        _merged.ze = { label: 'Zusätzliche Einnahmen / Monat (' + (stp > 0 && kue > 0 ? 'Stellplätze und Küchen' : stp > 0 ? 'Stellplätze' : 'Küchen') + ')', value: _de2(stp + kue), raw: _r2(stp + kue), source: 'Mieterliste', kind: 'ze_teile', teile: { stp: stp, kueche: kue, sonst: 0 },
           herleitung: (stp > 0 ? _stpText + ' ' + _de2(stp) : '') + (stp > 0 && kue > 0 ? ' · ' : '') + (kue > 0 ? (we.kuecheAnzahl || 0) + ' Küchen ' + _de2(kue) : '') };
       }
     }
@@ -3056,6 +3075,12 @@
       var _sl = document.querySelector('#oabi-ov select[data-mv="' + id + '"]');
       if (!_sl || _sl.value === '' || !window.DpEingang) { _importHinweise.push('Mietvertrag nicht übernommen: keine Einheit gewählt.'); return null; }
       return window.DpEingang.mvUebernehmen(parseInt(_sl.value, 10), it.raw, it.source) ? 'text' : null;
+    }
+    /* v3670 · Zusatzeinnahmen mit Aufteilung: die Teile setzen, ze wird ihre Summe (js/ze-aufteilung.js).
+       Ohne das Modul (anderes Dokument) bleibt es bei der Summe in ze. */
+    if (it.kind === 'ze_teile') {
+      if (window.DpZeAufteilung && it.teile && document.getElementById('ze_stp_monat')) { window.DpZeAufteilung.setzen(it.teile); return 'text'; }
+      setInput('ze', String(it.raw)); return 'text';
     }
     if (it.kind === 'sonderumlage') {   /* v3092 · N100 */
       return (window.DpSonderumlage && window.DpSonderumlage.uebernehmen(it.su)) ? 'text' : null;

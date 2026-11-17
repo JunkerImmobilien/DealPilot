@@ -151,6 +151,11 @@
           }
         } catch (x) {}
         var mj = mieteJahr(o); if (mj > 0) setze('nkm', String(Math.round(mj / 12 * 100) / 100).replace('.', ','));
+        /* v3670 · Garagen/Stellplaetze: Anzahl und Miete. Bis v3669 las das Paket sie, legte sie aber nirgends ab -
+           die Miete fehlte im Objekt. Sie geht in die Zusatzeinnahmen, Teil Stellplatz (js/ze-aufteilung.js). */
+        if (o.garagen > 0) setze('garagen', o.garagen);
+        if (o.stellplaetze > 0) setze('stellpl_aussen', o.stellplaetze);
+        if (o.stellplatz_miete_monat > 0) setze('ze_stp_monat', String(Math.round(o.stellplatz_miete_monat * 100) / 100).replace('.', ','));
         if (o.einheiten && o.einheiten.length) {
           window._dpMfh = { einheiten: o.einheiten.map(function (e, k) {
             return { nr: String(k + 1), lage: e.lage || '', art: e.art === 'gewerbe' ? 'gewerbe' : 'wohnen', wfl: e.wfl != null ? String(e.wfl) : '',
@@ -185,9 +190,9 @@
 
   /* ── v3203 · Paket als Ganzes im Quick-Check ─────────────────────────── */
   async function imQuickCheck(wahl, name) {
-    var S = { kp: 0, wfl: 0, nkm: 0, we: 0, bjW: 0, bjF: 0 };
+    var S = { kp: 0, wfl: 0, nkm: 0, we: 0, bjW: 0, bjF: 0, stp: 0 };
     wahl.forEach(function (o) {
-      S.kp += o.kaufpreis || 0; S.wfl += o.wohnflaeche || 0; S.nkm += mieteJahr(o) / 12;
+      S.kp += o.kaufpreis || 0; S.wfl += o.wohnflaeche || 0; S.nkm += mieteJahr(o) / 12; S.stp += o.stellplatz_miete_monat || 0;   /* v3670 */
       S.we += o.wohneinheiten || o.einheiten.filter(function (e) { return e.art !== 'gewerbe'; }).length || 0;
       if (o.baujahr && o.wohnflaeche) { S.bjW += o.baujahr * o.wohnflaeche; S.bjF += o.wohnflaeche; }
     });
@@ -204,6 +209,7 @@
     setz('qc_objektart', 'MFH'); setz('qc_kp', Math.round(S.kp)); setz('qc_wfl', String(Math.round(S.wfl * 100) / 100).replace('.', ','));
     setz('qc_bj', bj); setz('qc_einheiten', S.we);
     setz('qc_nkm_grund', String(Math.round(S.nkm * 100) / 100).replace('.', ','));
+    if (S.stp > 0) setz('qc_nkm_stp', String(Math.round(S.stp * 100) / 100).replace('.', ','));   /* v3670 */
     try { w.eval('(typeof QcApp!=="undefined")&&(QcApp.mieteAddUp&&QcApp.mieteAddUp(),QcApp.scheduleUpdate&&QcApp.scheduleUpdate())'); } catch (x) {}
     try { window.toast && window.toast('Paket „' + name + '" mit ' + wahl.length + ' Häusern im Quick-Check (Summen, Baujahr flächengewichtet). Einzeln anlegen: Paket-Fenster erneut öffnen.'); } catch (x) {}
     var pil = el('dp-paket-pille'); if (pil) pil.remove();

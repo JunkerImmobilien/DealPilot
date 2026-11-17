@@ -498,11 +498,12 @@ const SCHEMATA = {
       '  "vertragsart": "unbefristet"|"staffel"|"index"|"zeitmiete"|"gewerbe"|"moebliert",',
       '  "befristet_bis": string DD.MM.JJJJ,',
       '  "kuendigungsverzicht_bis": string DD.MM.JJJJ,',
-      '  "kaltmiete_eur": number (Nettokaltmiete je Monat),',
+      '  "kaltmiete_eur": number (Nettokaltmiete der Wohnung je Monat, OHNE Stellplatz und OHNE gesonderten Kuechen-/Moeblierungszuschlag),',
       '  "nebenkosten_vorauszahlung_eur": number,',
       '  "heizkosten_vorauszahlung_eur": number,',
       '  "kaution_eur": number,',
-      '  "stellplatz_miete_eur": number,',
+      '  "stellplatz_miete_eur": number (Stellplatz-/Garagenmiete je Monat, nur falls im Vertrag genannt),',
+      '  "kueche_miete_eur": number (gesondert vereinbarter Kuechen- oder Moeblierungszuschlag je Monat, nur falls genannt),',
       '  "wohnflaeche_m2": number, "zimmer": number,',
       '  "lage_einheit": string (z. B. "EG links", "Whg. 3"),',
       '  "adresse": string (Anschrift des MIETOBJEKTS),',
@@ -512,7 +513,7 @@ const SCHEMATA = {
       '  "risiken": [{"titel": string (kurz), "beschreibung": string (1-2 Saetze: was steht da, was folgt daraus fuer einen Kaeufer/Investor), "schwere": "hoch"|"mittel"|"niedrig", "kosten_eur": number|null, "jahr": number|null, "fundstelle": string (Seite/TOP/Abteilung)}] (z. B. langer Kuendigungsverzicht, unwirksame Klauseln, Indexmiete, Befristung)',
       '}'
     ],
-    zahlen: { kaltmiete_eur: [0, 1e6], nebenkosten_vorauszahlung_eur: [0, 1e5], heizkosten_vorauszahlung_eur: [0, 1e5], kaution_eur: [0, 1e6], stellplatz_miete_eur: [0, 1e4], wohnflaeche_m2: [1, 1e5], zimmer: [0, 100] }
+    zahlen: { kaltmiete_eur: [0, 1e6], nebenkosten_vorauszahlung_eur: [0, 1e5], heizkosten_vorauszahlung_eur: [0, 1e5], kaution_eur: [0, 1e6], stellplatz_miete_eur: [0, 1e4], kueche_miete_eur: [0, 1e4] /* v3670 */, wohnflaeche_m2: [1, 1e5], zimmer: [0, 100] }
   },
 
   mietaufstellung: {

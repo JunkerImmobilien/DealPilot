@@ -9,6 +9,7 @@ import { quelleFuer, quellenSatz } from '../lib/quellen_links.js';
 /* WKERN-1 · Ertragswert wird nicht mehr hier gerechnet, sondern im gemeinsamen
  * Kern. Zwei Ertragswerte im selben Bericht waeren zwei Wahrheiten. */
 import { ErtragswertService } from './ErtragswertService.js';
+import { stellplatzErtrag } from '../lib/zusatz_einnahmen.js';   /* v3670 */
 /* WNHK-4 */
 import { sachwert as nhkSachwert, NHK_2010 } from '../lib/nhk2010.js';
 import { pruefeModell, mieteModellkonform, modellDurchschnitte } from '../lib/modellpruefung.js';   /* v2595, v2600 */
@@ -1795,6 +1796,8 @@ export const CrossCheckService = {
         /* v1057-WSON-7 */
         sonstige_jahr: _num(ref.sonstige_jahr),
         zusatz_jahr: _num(ref.zusatz_ertrag_jahr),   /* v2382 · Stellplatz/Garage aus `ze`, IM Rohertrag */
+        zusatz_aufgeteilt: ref.zusatz_aufgeteilt === true, zusatz_stellplatz_jahr: _num(ref.zusatz_stellplatz_jahr),   /* v3670 */
+        zusatz_kueche_jahr: _num(ref.zusatz_kueche_jahr), zusatz_sonst_jahr: _num(ref.zusatz_sonst_jahr),
         sonstige_dauer_jahre: _num(ref.sonstige_dauer_jahre),
         mod_punkte: _num(ref.mod_punkte),
         /* v1052-WA2-2 · Kernsanierung nur, wenn die Punkte sie auch tragen.
@@ -1891,8 +1894,10 @@ export const CrossCheckService = {
          * Nebengebaeude wie Garagen' enthaelt — Stellplaetze gehoeren also
          * in die Bezugsgroesse. */
         /* v2382 · `ze` (Stellplatz/Garage etc.) ersetzt die Stueckrechnung - beides waere doppelt. */
-        const _spEinnahme = _num(ref.zusatz_ertrag_jahr) || ((_num(p.stellplatz_miete_monat) || 0)
-          * ((_num(ref.garages) || 0) + (_num(ref.outdoor_parking) || 0)) * 12);
+        /* v3670 · dieselbe Regel wie im Ertragswertdienst (lib/zusatz_einnahmen.js stellplatzErtrag) */
+        const _spEinnahme = stellplatzErtrag({ stellplatz_anz: (_num(ref.garages) || 0) + (_num(ref.outdoor_parking) || 0),
+          stellplatz_miete_monat: _num(p.stellplatz_miete_monat), zusatz_jahr: _num(ref.zusatz_ertrag_jahr),
+          zusatz_aufgeteilt: ref.zusatz_aufgeteilt === true, zusatz_stellplatz_jahr: _num(ref.zusatz_stellplatz_jahr) }).jahr;
         ein.bwk_gesamt_jahr = Math.round((rohertrag + _spEinnahme) * _quote / 100);
         ein.bwk_bezugsgroesse_jahr = Math.round(rohertrag + _spEinnahme);
         ein.bwk_quote_herkunft = p.bwk_quote_quelle || null;
@@ -2439,6 +2444,9 @@ export const CrossCheckService = {
           modellversion: p.modellversion || null,
           gnd_jahre: _gndG, rnd_jahre: _rndG,
           sonstige_jahr: _num(ref.sonstige_jahr), sonstige_dauer_jahre: _num(ref.sonstige_dauer_jahre),
+          /* v3670 · `ze` fehlte im Gewerbezweig ganz - beim reinen Gewerbeobjekt fiel die Stellplatzmiete still weg */
+          zusatz_jahr: _num(ref.zusatz_ertrag_jahr), zusatz_aufgeteilt: ref.zusatz_aufgeteilt === true, zusatz_stellplatz_jahr: _num(ref.zusatz_stellplatz_jahr),
+          zusatz_kueche_jahr: _num(ref.zusatz_kueche_jahr), zusatz_sonst_jahr: _num(ref.zusatz_sonst_jahr),
           lzs_pct: _lzsG, lzs_quelle: p.lzs_quelle || 'register', lzs_stufe: p.lzs_stufe || null,
           lzs_herabgestuft: !!p.lzs_herabgestuft,
           lzs_streuung_pp: p.lzs_streuung_pp != null ? p.lzs_streuung_pp : null,

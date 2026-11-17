@@ -6,6 +6,7 @@
 //   - dealpilot:   vorhandener DealScore + (geparste) KI-Investmentanalyse
 // So fliessen die in DealPilot bereits erfassten Einschaetzungen direkt in den Bericht.
 import { gewerbeArt } from '../lib/marktsegment.js';   /* v2241 */
+import { zusatzAufteilen } from '../lib/zusatz_einnahmen.js';   /* v3670 */
 
 function dataOf(obj) {
   if (obj && typeof obj === 'object' && obj.data && typeof obj.data === 'object') return obj.data;
@@ -654,11 +655,16 @@ export const DealPilotObjectMapper = {
       stellplatz_miete_monat: num(pick(d, ['stellplatz_miete_monat'])),
       /* v1877 · Zusatzeinnahmen aus dem Reiter Miete (`ze`, je Monat) kamen auf diesem Weg gar nicht
          an - der Rohertrag fehlte um 90 EUR/Monat (Parkstr. 9). Der Bericht kennt sie als sonstige_jahr. */
-      sonstige_jahr: num(pick(d, ['sonstige_jahr'])),
+      /* v3670 · Kuechenanteil aus der Aufteilung von `ze` kommt hinzu (lib/zusatz_einnahmen.js) */
+      sonstige_jahr: zusatzAufteilen(d).sonstige_jahr,
       /* v2382 · `ze` heisst in der Haupt-App „Zusaetzliche Einnahmen / Monat - Stellplatz, Garage etc.,
          fliesst in Nettokaltmiete". Das ist Rohertrag (§ 31 ImmoWertV), keine Kueche/Moeblierung mit
          15 Jahren Laufzeit. Bis v2381 kam es als sonstige_jahr an (W: 1.080 €/Jahr ausserhalb des Rohertrags). */
-      zusatz_ertrag_jahr: (function () { const ze = num(pick(d, ['ze'])); return ze ? Math.round(ze * 12) : null; })(),
+      /* v3670 · `ze` darf im Reiter Miete aufgeteilt sein (ze_stp_monat, ze_kueche_monat, Rest = Sonstiges):
+         Stellplatz + Sonstiges kapitalisiert, Kueche als sonstiger Ertrag mit eigener Dauer (oben).
+         Nicht aufgeteilt wie bisher: ganz als kapitalisierter Zusatzertrag. */
+      ...(function () { const z = zusatzAufteilen(d); return { zusatz_ertrag_jahr: z.zusatz_ertrag_jahr, zusatz_aufgeteilt: z.zusatz_aufgeteilt,
+        zusatz_stellplatz_jahr: z.zusatz_stellplatz_jahr, zusatz_kueche_jahr: z.zusatz_kueche_jahr, zusatz_sonst_jahr: z.zusatz_sonst_jahr }; })(),
     };
   },
 

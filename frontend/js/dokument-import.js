@@ -138,14 +138,17 @@
        doppelt (der zweite Eintrag überschrieb den ersten - gleicher Inhalt, entfernt). */
     anzahl_wohnungen: ['einheiten', 'Wohneinheiten im Gebäude', 'zahl'],
     einheiten_anzahl: ['einheiten', 'Wohneinheiten im Gebäude', 'zahl'],
-    stellplatz_miete_eur: ['ze', 'Zusätzliche Einnahmen / Monat (Stellplatz)', 'eur']
+    /* v3670 · in die Aufteilung der Zusatzeinnahmen (js/ze-aufteilung.js): der Stellplatz ersetzt nicht mehr
+       die ganze Summe ze (eine Kuechenmiete darin ging verloren), ze wird Summe der Teile */
+    stellplatz_miete_eur: ['ze_stp_monat', 'Zusätzliche Einnahmen: Stellplatz / Monat', 'eur'],
+    kueche_miete_eur: ['ze_kueche_monat', 'Zusätzliche Einnahmen: Küche / Möblierung / Monat', 'eur']
   };
   /* v3016 · nur aus diesen Arten - eine Kaltmiete aus der Mieterliste eines MFH ist
      die Summe vieler Wohnungen und geht über die Einheiten, nicht in ein Feld */
   /* v3029-import · die Wohnfläche des Verkehrswertgutachtens (objekt.wohnflaeche_m2) fiel bis v3028 mit
      unter diese Sperre und kam nie an. Beim Haus mit mehreren Einheiten entfernt object-actions.js
      Miete/Fläche/Zimmer/Stellplatz eines Mietvertrags wieder (eine Einheit ist nicht das Haus). */
-  var NUR_AUS = { kaltmiete_eur: { mietvertrag: 1 }, wohnflaeche_m2: { mietvertrag: 1, vwg_vorgutachten: 1 }, zimmer: { mietvertrag: 1 }, stellplatz_miete_eur: { mietvertrag: 1 } };
+  var NUR_AUS = { kaltmiete_eur: { mietvertrag: 1 }, wohnflaeche_m2: { mietvertrag: 1, vwg_vorgutachten: 1 }, zimmer: { mietvertrag: 1 }, stellplatz_miete_eur: { mietvertrag: 1 }, kueche_miete_eur: { mietvertrag: 1 } };
   /* Klartext statt Schluessel fuer die uebrigen Angaben */
   var NAMEN = {
     notar: 'Notar', ur_nr: 'Urkundennummer', nebenkosten_eur: 'Nebenkosten', verkaeufer_anzahl: 'Verkäufer (Anzahl)', kaeufer_anzahl: 'Käufer (Anzahl)',

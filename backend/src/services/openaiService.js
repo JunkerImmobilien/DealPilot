@@ -3414,6 +3414,11 @@ async function extractExpose(text, opts) {
     '  - objektart: einer von: "Wohnung", "Eigentumswohnung", "Einfamilienhaus", "Mehrfamilienhaus", "Reihenhaus", "Doppelhaushälfte", "Gewerbe"',
     '  - zimmer: Zahl (z.B. 3 oder 3.5)',
     '  - nettokaltmiete: Zahl in Euro/MONAT (falls vermietet oder Mieteinnahmen erwähnt). Nennt das Exposé nur eine JAHRES-Miete (z. B. "Mieteinnahmen p.a.", "Jahresnettokaltmiete", "IST-Miete/Jahr"), teile sie durch 12',
+    /* v3670 · Wohnungsmiete getrennt von Stellplatz/Garage und Kuechenzuschlag: der Mietvergleich je m² gilt nur fuer die Wohnung */
+    '    nettokaltmiete ist NUR die Miete der Wohnung(en), OHNE Stellplatz-, Garagen- und gesonderten Küchen-/Möblierungszuschlag. Nennt das Exposé eine Gesamtmiete und den Anteil dafür, ziehe ihn ab und trage ihn unten ein.',
+    '  - stellplatz_miete_monat: Zahl in Euro/MONAT (Miete für Stellplatz/Garage/Tiefgarage, nur falls genannt)',
+    '  - kueche_miete_monat: Zahl in Euro/MONAT (gesondert vereinbarte Küchen- oder Möblierungsmiete, nur falls genannt; eine Einbauküche ohne eigenen Betrag ist KEINE)',
+    '  - zusatz_miete_monat: Zahl in Euro/MONAT (sonstige Zusatzeinnahmen neben der Wohnungsmiete, z. B. Werbefläche, Keller, nur falls genannt)',
     '  - wohneinheiten: Anzahl der Wohneinheiten im Gebäude (Zahl; beim Mehrfamilienhaus die Zahl der Wohnungen, bei einer Eigentumswohnung die Wohnungen der Anlage, falls genannt)',
     '  - kaeuferprovision_pct: Maklerprovision des KÄUFERS in Prozent inkl. MwSt (z. B. 3.57); 0, wenn "provisionsfrei" oder "keine Käuferprovision"; weglassen, wenn nichts dazu steht',
     '  - nebenkosten: Zahl in Euro/Monat (Nebenkosten, BK)',
@@ -3485,7 +3490,8 @@ async function extractExpose(text, opts) {
   ['kaufpreis', 'wohnflaeche', 'grundstuecksflaeche', 'baujahr', 'sanierungsjahr',
    'zimmer', 'nettokaltmiete', 'nebenkosten', 'hausgeld', 'heizkosten', 'energieverbrauch',
    'instandhaltung', 'verwaltung', 'eigenkapital', 'kaufnebenkosten',
-   'marktmiete_qm', 'marktmiete_monat', 'wohneinheiten', 'kaeuferprovision_pct'].forEach(k => {
+   'marktmiete_qm', 'marktmiete_monat', 'wohneinheiten', 'kaeuferprovision_pct',
+   'stellplatz_miete_monat', 'kueche_miete_monat', 'zusatz_miete_monat' /* v3670 */].forEach(k => {
     const v = ext[k];
     if (v == null || v === '') return;
     const n = _zahlDe(v);
@@ -3493,6 +3499,7 @@ async function extractExpose(text, opts) {
   });
   if (cleaned.wohneinheiten != null && !(cleaned.wohneinheiten >= 1 && cleaned.wohneinheiten <= 500)) delete cleaned.wohneinheiten;
   if (cleaned.kaeuferprovision_pct != null && !(cleaned.kaeuferprovision_pct >= 0 && cleaned.kaeuferprovision_pct < 10)) delete cleaned.kaeuferprovision_pct;
+  ['stellplatz_miete_monat', 'kueche_miete_monat', 'zusatz_miete_monat'].forEach(k => { if (cleaned[k] != null && !(cleaned[k] > 0 && cleaned[k] < 1e5)) delete cleaned[k]; });   /* v3670 */
   /* v3029-import · Faktor Kaufpreis : Jahresmiete unter 3 gibt es nicht - dann hat die KI eine
      Jahresmiete als Monatsmiete geliefert. Durch 12, mit Hinweis fuer die Uebernahme. */
   if (cleaned.nettokaltmiete > 0 && cleaned.kaufpreis > 0 && cleaned.kaufpreis / (cleaned.nettokaltmiete * 12) < 3) {
@@ -3527,7 +3534,7 @@ async function extractPaket(text, opts) {
     '  "objekte": [ { "strasse": "...", "hausnummer": "...", "plz": "21073", "ort": "Hamburg",',
     '      "objektart": "Mehrfamilienhaus" | "Wohn- und Geschäftshaus" | ..., "baujahr": 1966, "kaufpreis": 1010000,',
     '      "wohnflaeche": 429.47, "gewerbeflaeche": null, "grundstuecksflaeche": 365, "wohneinheiten": 6, "gewerbeeinheiten": 0,',
-    '      "garagen": 2, "stellplaetze": 0, "miete_soll_jahr": 52148.64, "miete_ist_jahr": 40464, "energieklasse": "F",',
+    '      "garagen": 2, "stellplaetze": 0, "stellplatz_miete_monat": 80, "miete_soll_jahr": 52148.64, "miete_ist_jahr": 40464, "energieklasse": "F",',
     '      "energiewert": 171, "heizungsart": "Öl-Brennwert",',
     '      "modernisierungen": [ { "gewerk": "aussenwand", "art": "konkret", "richtung": "positiv", "umfang": "vollstaendig", "jahr": null, "zitat": "Fassade mit WDVS gedämmt" } ],',
     '      "einheiten": [ { "lage": "EG links", "art": "wohnen" | "gewerbe", "wfl": 70.37, "miete_monat": 670, "status": "vermietet" | "leer" } ] } ] }',
@@ -3535,6 +3542,7 @@ async function extractPaket(text, opts) {
     'REGELN:',
     '  - Zahlen als Number (deutsche Schreibweise richtig lesen: 1.010.000 = 1010000, 429,47 = 429.47); plz als String mit 5 Ziffern.',
     '  - einheiten: jede Zeile der Mieterliste des Objekts; Garagen/Stellplätze NICHT als Einheit, sondern als garagen/stellplaetze zählen.',
+    '  - stellplatz_miete_monat (v3670): Summe der Mieten aller vermieteten Garagen/Stellplätze des Objekts je Monat, nur falls genannt, sonst null.',
     '  - miete_monat: Nettokaltmiete der Einheit pro Monat; status "leer", wenn frei/leerstehend/frei übergeben.',
     '  - share_deal: true, wenn das Exposé einen Share Deal (Anteilskauf) nennt.',
     '  - modernisierungen (v3660): je Bauteil des Objekts, zu dem der Text etwas sagt; gewerk einer von dach, fenster, leitungen, heizung, aussenwand, baeder, innenausbau, grundriss;',
@@ -3556,7 +3564,7 @@ async function extractPaket(text, opts) {
     return { strasse: t(o.strasse), hausnummer: t(o.hausnummer), plz, ort: t(o.ort), objektart: t(o.objektart),
       baujahr: z(o.baujahr), kaufpreis: z(o.kaufpreis), wohnflaeche: z(o.wohnflaeche), gewerbeflaeche: z(o.gewerbeflaeche),
       grundstuecksflaeche: z(o.grundstuecksflaeche), wohneinheiten: z(o.wohneinheiten), gewerbeeinheiten: z(o.gewerbeeinheiten),
-      garagen: z(o.garagen), stellplaetze: z(o.stellplaetze), miete_soll_jahr: z(o.miete_soll_jahr), miete_ist_jahr: z(o.miete_ist_jahr),
+      garagen: z(o.garagen), stellplaetze: z(o.stellplaetze), stellplatz_miete_monat: z(o.stellplatz_miete_monat) > 0 ? z(o.stellplatz_miete_monat) : null /* v3670 */, miete_soll_jahr: z(o.miete_soll_jahr), miete_ist_jahr: z(o.miete_ist_jahr),
       energieklasse: t(o.energieklasse), energiewert: z(o.energiewert), heizungsart: t(o.heizungsart),
       modernisierungen: _modernisierungenNorm(o.modernisierungen, text),   /* v3660 */
       einheiten: (Array.isArray(o.einheiten) ? o.einheiten : []).filter((e) => e && z(e.wfl) > 0).map((e) => ({

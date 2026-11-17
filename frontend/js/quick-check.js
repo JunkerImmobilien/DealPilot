@@ -224,7 +224,9 @@
       var plz = String(v('qc_plz') || '').trim(), land = null;
       if (plz.length === 5 && window.DealPilotGrest && DealPilotGrest.forPlz) { var g = DealPilotGrest.forPlz(plz); land = (g && g.bundesland) || null; }
       var kapp = K.kappungAus(D, { land: land, ort: v('qc_ort') }, { eigen_pct: n('qc_kappung') });
-      var grund = n('qc_nkm_grund') > 0 ? Math.min(n('qc_nkm_grund'), nkm) : nkm;
+      /* v3670 · Wohnungsmiete ohne Stellplatz/Kueche/Sonstiges, auch ohne eingetragene Grundmiete (wie _qcMietpotenzial) */
+      var _zt = (n('qc_nkm_stp') || 0) + (n('qc_nkm_garage') || 0) + (n('qc_nkm_kueche') || 0) + (n('qc_nkm_sonst') || 0);
+      var grund = n('qc_nkm_grund') > 0 ? Math.min(n('qc_nkm_grund'), nkm) : (nkm - _zt > 0 ? nkm - _zt : nkm);
       var lz = String(v('qc_mv_letzte') || '').trim(), m = /^(\d{1,2})[.\/](\d{4})$/.exec(lz) || null;
       var z = K.zulaessig({ ist: grund, wfl: n('qc_wfl'), vgl_qm: n('qc_vgl_qm') || null, kappung_pct: kapp.pct,
         letzte: m ? m[2] + '-' + String(+m[1]).padStart(2, '0') : (/^\d{4}-\d{2}/.test(lz) ? lz.slice(0, 7) : null) });
@@ -1939,13 +1941,24 @@
     // Sonst (Legacy) Gesamtbetrag in nkm und ze auf 0.
     var qcZusatz = (snapshot.nkm_stp || 0) + (snapshot.nkm_garage || 0) +
                    (snapshot.nkm_kueche || 0) + (snapshot.nkm_sonst || 0);
-    if (snapshot.nkm_grund > 0) {
-      set('nkm', String(Math.round(snapshot.nkm_grund)));
-      if (qcZusatz > 0) set('ze', String(Math.round(qcZusatz)));
+    /* v3670 · auf den Cent (Math.round machte aus 812,50 € Grundmiete 813 €) und mit Aufteilung:
+       Stellplatz/Garage, Kueche, Sonstiges gehen in die Teile von ze (js/ze-aufteilung.js), ze = Summe.
+       Ohne Grundmiete, aber mit Teilen: Wohnung = Gesamtmiete - Teile (bis v3669 stand dann die
+       Gesamtmiete in nkm und ze blieb auf dem Wert des vorigen Objekts). */
+    var _c2 = function (x) { return String(Math.round(x * 100) / 100).replace('.', ','); };
+    var _qcStp = (snapshot.nkm_stp || 0) + (snapshot.nkm_garage || 0), _qcKue = snapshot.nkm_kueche || 0, _qcSon = snapshot.nkm_sonst || 0;
+    var _qcWohn = snapshot.nkm_grund > 0 ? snapshot.nkm_grund : (qcZusatz > 0 && snapshot.nkm > qcZusatz ? snapshot.nkm - qcZusatz : null);
+    if (_qcWohn > 0) {
+      set('nkm', _c2(_qcWohn));
+      if (qcZusatz > 0) set('ze', _c2(qcZusatz));
     } else {
       // Legacy: User hat nur Gesamtbetrag im qc_nkm
       set('nkm', String(snapshot.nkm));
     }
+    set('ze_stp_monat', _qcWohn > 0 && _qcStp > 0 ? _c2(_qcStp) : '');
+    set('ze_kueche_monat', _qcWohn > 0 && _qcKue > 0 ? _c2(_qcKue) : '');
+    set('ze_sonst_monat', _qcWohn > 0 && _qcSon > 0 ? _c2(_qcSon) : '');
+    try { if (window.DpZeAufteilung) window.DpZeAufteilung.zeichnen(); } catch (e) {}
     if (snapshot.wfl)  set('wfl', String(snapshot.wfl));
     if (snapshot.bj)   set('baujahr', String(snapshot.bj));
     if (snapshot.zimmer) set('zimmer', String(snapshot.zimmer));   /* v1877a: der Snapshot trug die Zimmer, zurueckgeschrieben wurden sie nie (gemessen 05.10.2026) */
@@ -2162,6 +2175,8 @@
     // V63.32: ze (Zusatzeinnahmen) auf 0 wenn keine Komponenten — sonst Demo-Wert ze=90
     if (!qcZusatz) {
       set('ze', '0');
+      ['ze_stp_monat', 'ze_kueche_monat', 'ze_sonst_monat'].forEach(function (k) { set(k, ''); });   /* v3670 */
+      try { if (window.DpZeAufteilung) window.DpZeAufteilung.zeichnen(); } catch (e) {}
     }
     // V63.31: BWK-Modus auf 'detail' setzen damit hg_ul/hg_nul tatsächlich genutzt werden.
     // Wenn vorher ein Objekt im 'percent'-Modus war, bleibt window._bwkMode='percent' → hg_ul/hg_nul werden ignoriert!

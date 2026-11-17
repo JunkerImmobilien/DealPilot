@@ -245,7 +245,7 @@
     },
     'tab3.ze': {
       title: 'Zusätzliche Einnahmen',
-      body: 'Mieteinnahmen aus Stellplatz, Garage, Keller, Garten oder anderen Nebenflächen. Fließen in die Nettokaltmiete der Steuerberechnung ein. Wichtig: getrennt vom NKM ausweisen, damit die Miete pro m² korrekt berechnet wird.',
+      body: 'Mieteinnahmen neben der Wohnungsmiete: Stellplatz, Garage, ein gesondert vereinbarter Küchen- oder Möblierungszuschlag, Keller oder andere Nebenflächen. Sie zählen zur Kaltmiete und in die Steuerberechnung. Getrennt von der Nettokaltmiete eintragen, damit die Miete pro m² nur die Wohnung misst. Unter „aufteilen“ lässt sich die Summe in Stellplatz, Küche und Sonstiges trennen. Das braucht der Marktbericht, weil ein Küchenzuschlag kürzer läuft als das Gebäude.',   /* v3670 */
       severity: 'beginner'
     },
     'tab3.umlagefaehig': {

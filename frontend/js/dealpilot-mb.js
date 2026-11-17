@@ -166,6 +166,9 @@ if (!window._wlc) {
     'ausst_aussenwaende', 'ausst_dach', 'ausst_fenster', 'ausst_innenwaende', 'ausst_decken', 'ausst_fussboeden', 'ausst_sanitaer', 'ausst_heizung', 'ausst_technik',
     'bes_bauteile', 'btl_gauben', 'btl_balkone', 'btl_vordach', 'btl_terrassen', 'btl_sonstige',
     'lzs_pct', 'brw_anpassung_pct', 'brw_anpassung_grund', 'stellplatz_miete_monat',
+    /* v3670 · Zusatzeinnahmen (Reiter Miete) und ihre Aufteilung. Der Mapper las `ze` seit v2382, die
+       Karte schickte es nie - Stellplatz- und Kuechenmiete fehlten im Ertragswert (lib/zusatz_einnahmen.js). */
+    'ze', 'ze_stp_monat', 'ze_kueche_monat', 'ze_sonst_monat',
     'wertermittlungsstichtag' /* v3010 · leer = heute; der Mapper laesst nur JJJJ-MM-TT durch */,
     'mikrolage', 'makrolage', 'ds2_bevoelkerung', 'ds2_nachfrage', 'ds2_entwicklung', 'ds2_wertsteigerung', 'ds2_mietausfall',
     /* v2241 · Die acht Bauteile der Anlage 2. Ohne sie zaehlte der Mapper

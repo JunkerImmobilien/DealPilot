@@ -1821,6 +1821,21 @@
     return n;
   }
 
+  /* v3670 · Die Stellplatzmiete je Wohnung (Mietvertrag, Feld stellplatz_miete) rechnete nirgends mit -
+     „Übernehmen" setzte nur nkm. Sie gehoert in die Zusatzeinnahmen, Teil Stellplatz (js/ze-aufteilung.js).
+     Regel gegen Doppelzaehlung: der Stellplatzanteil wird auf die Summe der Wohnungen ANGEHOBEN, nie
+     dazugezaehlt - stehen dieselben Plaetze schon dort (Mieterliste, Exposé), bleibt es bei einer Zahl.
+     Ungeteilt gilt ein bisheriger Betrag als Stellplatz (Regelfall, wie im Marktbericht). */
+  function stellplatzNachziehen(list) {
+    var sum = (list || []).reduce(function (a, e) { return a + (e && e.status !== 'leer' ? (zahl(e.stellplatz_miete) || 0) : 0); }, 0);
+    sum = Math.round(sum * 100) / 100;
+    var Z = window.DpZeAufteilung;
+    if (!(sum > 0) || !Z || !el('ze_stp_monat')) return '';
+    var bisher = Z.aufgeteilt() ? (zahl(el('ze_stp_monat').value) || 0) : (zahl(el('ze') && el('ze').value) || 0);
+    if (bisher >= sum - 0.005) return '';
+    Z.setzen({ stp: sum });
+    return 'Stellplatzmiete der Wohnungen ' + eur(sum) + ' in die Zusätzlichen Einnahmen';
+  }
   function uebernehmen() {
     if (window.DpPotenzial) _arbeit.forEach(function (e) { if (Array.isArray(e.massnahmen) || e.massnahme || e.kosten) window.DpPotenzial.massnahmenSpiegeln(e); });   /* v2430 */
     var list = _arbeit.filter(function (e) { return zahl(e.wfl) > 0 || zahl(e.ist) > 0 || String(e.lage || '').trim(); });
@@ -1838,6 +1853,7 @@
       else if (s.flaeche > 0) meldung += ' · Wohnfläche NICHT übernommen: ' + ohneFl + ' von ' + list.length + ' Einheiten ohne m²';
       setzen('einheiten', s.wohnen);
       if (s.ist > 0) setzen('nkm', s.ist);
+      try { var _stpT = stellplatzNachziehen(list); if (_stpT) meldung += ' · ' + _stpT; } catch (x) {}   /* v3670 */
       /* v3029-import · wie nach einer Eingabe von Hand: Mietausfall-Vorgabe in ein leeres Feld */
       try { if (s.ist > 0 && window.dpImportFolgen) window.dpImportFolgen(['nkm']); } catch (x) {}
       /* v3001b · Marcel 27.10.2026: „wenn man Einheiten anlegt, muss sich der Vermietungsstand
@@ -2055,7 +2071,7 @@
     vermstandPruefen: vermstandPruefen /* v3001b */, vertragAblegen: vertragAblegen /* v3160 */, vorbelegen: vorbelegen /* v3016 */,
     oeffnen: oeffnen, knopf: knopf,
     /* v3027 · eine Einheit gezielt öffnen (Absprung aus der Vertragsübersicht im Reiter Miete) */
-    einheitOeffnen: function (i) { oeffnen(1); setTimeout(function () { wohnungOeffnen(i); }, 0); }, istSoll: istSoll, berichtDaten: berichtDaten, artMitEinheiten: artMitEinheiten, hausPunkte: hausPunkte /* v2483 */, modQuelle: modQuelle, hatEinheiten: hatEinheiten /* v2540 */, _summe: summe, _punkte: punkteEinheit, _ergebnis: ergebnisDaten,
+    einheitOeffnen: function (i) { oeffnen(1); setTimeout(function () { wohnungOeffnen(i); }, 0); }, istSoll: istSoll, berichtDaten: berichtDaten, artMitEinheiten: artMitEinheiten, hausPunkte: hausPunkte /* v2483 */, modQuelle: modQuelle, hatEinheiten: hatEinheiten /* v2540 */, _summe: summe, stellplatzNachziehen: stellplatzNachziehen /* v3670 */, _punkte: punkteEinheit, _ergebnis: ergebnisDaten,
     /* v2087: die elf Vertragsformen mitexportiert. Der Reiter Miete
        braucht dieselbe Liste fuer die Objektebene (Backlog N60.8-alt) -
        eine zweite Liste dort waere der Anfang der Abweichung. */
