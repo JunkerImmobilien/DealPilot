@@ -101,6 +101,40 @@
   }
 
   /* ── Exposé ─────────────────────────────────────────────────────────── */
+  /* v3660a · nur berechnen (fuer die Uebernahme mit Haken), nichts schreiben */
+  function ausExposeBerechnen(text, extracted) {
+    var D = M(); if (!D) return null;
+    var sj = stichtagJahr();
+    var ki = D.normListe((extracted && extracted.modernisierungen) || [], text);
+    var muster = D.ausText(text || '', { stichtag_jahr: sj });
+    var hat = {}; ki.forEach(function (t) { hat[t.gewerk + '|' + t.art] = 1; });
+    var liste = ki.concat(muster.filter(function (t) { return !hat[t.gewerk + '|' + t.art]; }));
+    var bj = (extracted && extracted.baujahr) || val('baujahr'), ek = (extracted && extracted.energieklasse) || val('ds2_energie');
+    var k = D.kombinieren({ text: liste, baujahr: bj, stichtag_jahr: sj, energieklasse: ek });
+    if (!k) return null;
+    k.roh = { text: liste };
+    return k;
+  }
+  /* v3660a · aus der Uebernahme: Ableitung ins Objekt (Text-Befunde, Bild-Befunde bleiben erhalten) */
+  function uebernehmen(k, zustandMit) {
+    if (!k || !k.roh) return false;
+    var r = roh() || { roh: {} }; r.roh = r.roh || {};
+    r.roh.text = k.roh.text || [];
+    r = neuKombinieren(r);
+    speichern(r);
+    if (zustandMit && r.punkte != null) zustandVorbelegen(r, 'text');
+    anzeigen();
+    return true;
+  }
+  function zustandUebernehmen(wert, quelle) {
+    if (!wert) return false;
+    var q = val('ds2_zustand_quelle');
+    if (val('ds2_zustand') && q !== 'bilder' && q !== 'text' && q !== '') return false;   /* eigene Auswahl bleibt */
+    setze('ds2_zustand_quelle', quelle || 'text');
+    setze('ds2_zustand', wert);
+    anzeigen();
+    return true;
+  }
   function ausExpose(text, extracted) {
     var D = M(); if (!D) return null;
     var sj = stichtagJahr();
@@ -193,6 +227,6 @@
     var z = $('ds2_zustand'); if (z) { z.scrollIntoView({ block: 'center' }); try { z.focus(); } catch (x) {} }
     return false;
   };
-  window.DpModUI = { anzeigen: anzeigen, ausExpose: ausExpose, ausBildern: ausBildern, bestimmen: bestimmen, eigeneHerkunft: eigeneHerkunft };
+  window.DpModUI = { anzeigen: anzeigen, ausExpose: ausExpose, ausExposeBerechnen: ausExposeBerechnen, uebernehmen: uebernehmen, zustandUebernehmen: zustandUebernehmen, ausBildern: ausBildern, bestimmen: bestimmen, eigeneHerkunft: eigeneHerkunft };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();

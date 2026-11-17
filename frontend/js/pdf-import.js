@@ -765,8 +765,8 @@
     }
     /* v3058: success:false kommt mit HTTP 200 — bis hier wurde daraus stumm ein leeres Ergebnis */
     if (data.success === false) throw new Error(data.error || 'Die KI-Antwort konnte nicht ausgewertet werden.');
-    /* v3660 · Modernisierungen je Gewerk mit Beleg ins Objekt (Grundlage der Restnutzungsdauer) */
-    try { if (window.DpModUI && typeof window.DpModUI.ausExpose === 'function') window.DpModUI.ausExpose(text, data.extracted || {}); } catch (e) {}
+    /* v3660a · nur berechnen und anhaengen - geschrieben wird erst mit Haken (object-actions.js) */
+    try { if (window.DpModUI && typeof window.DpModUI.ausExposeBerechnen === 'function' && data.extracted) { var _mz = window.DpModUI.ausExposeBerechnen(text, data.extracted); if (_mz) data.extracted._modernisierung = _mz; } } catch (e) {}
     return data.extracted || {};
   }
 

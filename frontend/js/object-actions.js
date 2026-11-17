@@ -1727,8 +1727,9 @@
     /* v3349d · gemessen 13.11.2026: eine 429 („Zu viele Dokument-Auswertungen“) kam hier als leeres Ergebnis
        zurück, jede Datei stand als „Exposé · nichts gelesen“ da, ohne den Grund */
     if (!res.ok) { var _err = new Error((j && j.error) || ('Status ' + res.status)); _err.status = res.status; throw _err; }
-    /* v3660 · Modernisierungen je Gewerk mit Beleg ins Objekt (Grundlage der Restnutzungsdauer) */
-    if (!isMarket) { try { if (window.DpModUI && typeof window.DpModUI.ausExpose === 'function') window.DpModUI.ausExpose(text, (j && j.extracted) || {}); } catch (e) {} }
+    /* v3660a · Modernisierungen je Gewerk mit Beleg: NUR berechnen, nicht schreiben - sie stehen als eigene Zeilen
+       mit Haken in der Uebernahme (Marcel 17.11.2026: „Wenn es aus dem Exposé kommt, kann ich ja den Haken rausnehmen") */
+    if (!isMarket) { try { if (window.DpModUI && typeof window.DpModUI.ausExposeBerechnen === 'function' && j && j.extracted) { var _mz = window.DpModUI.ausExposeBerechnen(text, j.extracted); if (_mz) j.extracted._modernisierung = _mz; } } catch (e) {} }
     return (j && j.extracted) ? j.extracted : (j || {});
   }
   var LIMIT_TEXT = 'Stundenlimit der KI-Auswertung erreicht, in einer Stunde erneut einlesen';
@@ -1984,6 +1985,21 @@
     var _mm = (_mmq != null) ? _mmq : ((_mmm != null && _wflE) ? _mmm / _wflE : null);
     if (_mm != null && _mm > 0) addRow('ds2_marktmiete', 'Marktmiete (€/m²)', _mm.toFixed(2).replace('.', ',') + ' €/m²', _mm.toFixed(2).replace('.', ','), S, 'input');
     if (d.energieklasse) addRow('ds2_energie', 'Energieklasse', String(d.energieklasse).toUpperCase(), String(d.energieklasse).toUpperCase(), S, 'select', false);
+    /* v3660a · Modernisierung (Anlage 2) und Zustand aus dem Exposé: zwei Zeilen mit Haken, standardmaessig an.
+       Abgewaehlt = nichts uebernommen, die Restnutzungsdauer rechnet dann mit „mittel angenommen" (mit Hinweis). */
+    try {
+      var _mz2 = d._modernisierung, _DM = window.DpModernisierung;
+      if (!_qcMode && _mz2 && _mz2.punkte != null && _DM) {
+        addRow('mod_ableitung', 'Modernisierung (Anlage 2)', _mz2.grad + ' · ' + _mz2.punkte + ' Punkte', _mz2, S, 'modernisierung');
+        if (_merged.mod_ableitung && _merged.mod_ableitung.source === S) _merged.mod_ableitung.herleitung = 'aus dem Exposé abgeleitet, ' + _mz2.belegt + ' von 8 Gewerken belegt'
+          + (_mz2.belegt < 8 ? ', übrige mittel angenommen' : '') + ' · im Reiter Objekt je Gewerk einstellbar';
+        var _zw = _DM.zustandAusPunkten(_mz2.punkte);
+        if (!_merged.ds2_zustand) {
+          addRow('ds2_zustand', 'Zustand', _optWort('ds2_zustand', _zw) || _zw, _zw, S, 'zustand_abgeleitet', true);
+          if (_merged.ds2_zustand && _merged.ds2_zustand.source === S) _merged.ds2_zustand.herleitung = 'aus dem Exposé abgeleitet (' + _mz2.grad + ')';
+        }
+      }
+    } catch (e) {}
     if (d.sanierungsjahr) addRow('modernis', 'Modernisierungsjahr', d.sanierungsjahr, d.sanierungsjahr, S, 'input');
     if (d.stellplatz) { var _sp = String(d.stellplatz).toLowerCase(); if (_sp.indexOf('kein') < 0) { if (/tiefgarage|garage|duplex/.test(_sp)) addRow('garagen', 'Garagenpl\u00e4tze', '1', '1', S, 'input'); else if (/stellplatz|stellpl\u00e4tz|au\u00dfen|aussen|parkplatz|carport|freiplatz/.test(_sp)) { /* v3349 \u00b7 \u201e8 Au\u00dfenstellpl\u00e4tze\u201c ergab bis hier 1 */ var _spN = parseInt((_sp.match(/(\d{1,3})/) || [])[1], 10); _spN = (_spN > 0 && _spN < 500) ? String(_spN) : '1'; addRow('stellpl_aussen', 'Au\u00dfenstellpl\u00e4tze', _spN, _spN, S, 'input'); } } }
   }
@@ -2338,7 +2354,7 @@
   function _abweichungen(keys) {
     var out = {};
     keys.forEach(function (id) {
-      var it = _merged[id]; if (!it || it.kind === 'bool' || it.kind === 'anhaengen' || it.kind === 'merken' || it.kind === 'einheiten') return;   /* v3016 */
+      var it = _merged[id]; if (!it || it.kind === 'bool' || it.kind === 'anhaengen' || it.kind === 'merken' || it.kind === 'einheiten' || it.kind === 'modernisierung') return;   /* v3016, v3660a */
       var ist = _istText(id); if (ist === '') return;
       /* v3029-import · Sterne: bis v3028 ganz ausgenommen - eine eigene Bewertung (z. B. Bad
          „Modernisiert") wurde vom Marktbericht vorgehakt überschrieben. 0 heißt unbewertet. */
@@ -3021,6 +3037,9 @@
    * braucht sie, um markSvwertAvm() weiterhin NUR im Textfall zu rufen.
    * null heisst: nichts geschrieben, also auch nicht zaehlen. */
   function _wertSchreiben(id, it) {
+    /* v3660a · Modernisierung und Zustand aus dem Exposé (modernisierung-ui.js schreibt mit Herkunft) */
+    if (it.kind === 'modernisierung') return (window.DpModUI && window.DpModUI.uebernehmen(it.raw, false)) ? 'text' : null;
+    if (it.kind === 'zustand_abgeleitet') return (window.DpModUI && window.DpModUI.zustandUebernehmen(it.raw, 'text')) ? 'select' : null;
     /* v3016 · Unterlagen */
     if (it.kind === 'anhaengen') {
       var ta = document.getElementById(id); if (!ta) return null;
