@@ -993,7 +993,7 @@ if (!window._pdfGold) {
           '<button type="button" id="rp-b-aufdp" style="padding:9px 14px;border:1px solid #e6e0d4;border-radius:9px;background:#fff;cursor:pointer;font:600 13px Inter;color:#3a352c">Auf DealPilot zurücksetzen</button>' +
         '</div>' +
         /* W6-preview / v3301: Haken nur fuer Admins mit Test-Reseller */
-        '<div class="rp-panel" style="margin-top:18px' + (_partnerSiehtMarke() ? ';display:none' : '') + '">' +
+        '<div class="rp-panel" style="margin-top:18px' + ((_istAdmin() && !_partnerSiehtMarke()) ? '' : ';display:none') + '">'   /* v3630i · nur Admins (gemessen: Partner mit Marke AUS sah den Haken) */ +
           '<label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:13.5px">' +
             '<input type="checkbox" id="rp-b-prev" style="width:18px;height:18px;accent-color:var(--gold,#C9A84C)">' +
             '<span><b>Ansicht meiner Kunden</b>. Die App in meiner Marke anzeigen</span></label>' +
@@ -1423,6 +1423,7 @@ if (!window._pdfGold) {
   /* W7-livepreview: las vorher das beim Tab-Oeffnen geladene Objekt -> ein
      Farbwechsel im Waehler kam nie an (W6-Bug). Jetzt LIVE aus dem Formular. */
   /* v3301 · Partner sieht seine Marke selbst (mandant-branding.js, rolle 'partner') */
+  function _istAdmin() { try { var se = window.Auth && Auth.getSession && Auth.getSession(); return !!(se && se.role === 'admin'); } catch (e) { return false; } }   /* v3630i */
   function _partnerSiehtMarke() {
     try { return !!(window.DealPilotMandantBranding && DealPilotMandantBranding.rolle &&
                     DealPilotMandantBranding.rolle() === 'partner'); } catch (e) { return false; }
@@ -1430,7 +1431,7 @@ if (!window._pdfGold) {
   function _previewOn() {
     var el = $('rp-b-prev');
     /* v3301 · beim Partner laeuft die Live-Vorschau immer, solange Whitelabel an ist */
-    if (_partnerSiehtMarke()) { var wl = $('rp-b-wl'); return !!(wl && wl.checked); }
+    if (_partnerSiehtMarke() || !_istAdmin()) {   /* v3630i · auch bei Marke AUS (dann liefert my-branding keine Rolle) */  var wl = $('rp-b-wl'); return !!(wl && wl.checked); }
     return !!(el && el.checked);
   }
   /* v1114: reichte NUR accent und obsidian durch — von fuenf Werten zwei.
