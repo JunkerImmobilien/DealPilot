@@ -28,3 +28,9 @@
 .rr-mehr a{display:block;background:#fff;border:1px solid var(--cream-line);border-top:3px solid var(--gd);padding:14px 16px;color:var(--ink);font:600 15px/1.35 var(--disp)}
 .rr-mehr a:hover{background:var(--cream)}
 @media (max-width:760px){.rr-mehr{grid-template-columns:1fr}}
+
+/* landing-seo-5 · Marcel 17.11.2026: die Verweise unter #software waren auf Creme kaum lesbar
+   (.btn-l ist für dunklen Grund gebaut: helle Schrift, heller Rand). Auf hellem Grund dunkel. */
+.sec-cream .seo-links .btn-l{color:var(--ink);border-color:var(--cream-line);background:#fff}
+.sec-cream .seo-links .btn-l .ico{color:var(--gdi,var(--gd))}
+.sec-cream .seo-links .btn-l:hover{border-color:var(--gd);background:#fff}

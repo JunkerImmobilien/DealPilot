@@ -67,7 +67,8 @@
 /* ── landing-strecke-1 · dieselbe Strecke für DealPilot selbst (index-vorschau.html #workflow) ──
    Bilder sind Standbilder der Videothek (960×512) mit einem Band unten. Der Schirm ist hier breiter
    (2:1), das Bild deckt in voller Breite ab, oben ausgerichtet: das Band fällt unten heraus. */
-.dp-strecke .pt-schirm{aspect-ratio:2/1}
+/* landing-strecke-2 · eigene Aufnahmen 16:9 (assets/dp-strecke), Schirm = 26 px Leiste + Bild */
+.dp-strecke .pt-schirm{aspect-ratio:16/9.6}
 .dp-strecke .pt-schirm img{object-position:center top}
 .dp-strecke .pt-aufzug{grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:48px}
 .dp-strecke .pt-s p{font-size:15px;line-height:1.6}

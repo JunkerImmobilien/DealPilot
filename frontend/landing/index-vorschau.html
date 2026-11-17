@@ -62,11 +62,11 @@ if (location.hash === '#forschung') location.replace('forschung.html');</script>
 <!-- v1588: der Wechselschritt loest den bisherigen Ablauf ab -->
 <!-- landing-videothek-1 · DealPilot live, F&E, Kanzlei-Zeile -->
 <link rel="stylesheet" href="dp2-live.css?v=landing-partner-1">
-<link rel="stylesheet" href="partner.css?v=landing-partner-3"><!-- landing-partner-1 · Abschnitt #fuer-partner -->
+<link rel="stylesheet" href="partner.css?v=landing-partner-4"><!-- landing-partner-1 · Abschnitt #fuer-partner -->
 <link rel="stylesheet" href="dp2-module.css?v=landing-module-2">
 <link rel="stylesheet" href="dp2-kern.css?v=landing-kern-2c">
 <link rel="stylesheet" href="dp2-dealcheck.css?v=landing-seo-3">
-<link rel="stylesheet" href="seo.css?v=landing-seo-1">
+<link rel="stylesheet" href="seo.css?v=landing-seo-5">
 </head><body>
 
 <svg style="display:none" aria-hidden="true">
@@ -376,8 +376,8 @@ if (location.hash === '#forschung') location.replace('forschung.html');</script>
      Ersetzt hier drei Abschnitte der Startseite: „Was DealPilot macht“ samt SEO-Karten (#workflow,
      #software), „Willkommen an Bord“ und „Neunzehn Module“ (#features). Die Texte der sechs SEO-Karten
      (landing-seo-1) stehen jetzt in den Etappen 2, 4, 5, 6 und 8, weiter im Quelltext, nicht per JS.
-     Bilder: Standbilder der Videothek (assets/videothek/*.webp, echte Aufnahmen aus der App mit
-     Beispieldaten), das Band unten im Bild schneidet .dp-strecke ab. Jede Aussage steht in Video,
+     Bilder (landing-strecke-2): echte Aufnahmen im aktuellen Design auf Staging, Testkonto app-bilder@ (Kopie der
+     Demo-Objekte), assets/dp-strecke/, 1600×900. Anschrift in den Dateinamen der Unterlagen ersetzt. Jede Aussage steht in Video,
      Leistungsumfang oder der bisherigen Startseite. Technik: partner.css/partner.js (derselbe Aufzug
      wie partner.html#strecke). Kundentext ohne Gedankenstrich und Semikolon. -->
 <section class="sec sec-dark pt-strecke dp-strecke" id="workflow"><div class="wrap">
@@ -388,17 +388,17 @@ if (location.hash === '#forschung') location.replace('forschung.html');</script>
   <div class="pt-aufzug">
     <div class="pt-schacht" aria-hidden="true">
       <div class="pt-rahmen pt-schirm">
-        <img data-bild="1" class="an" src="assets/videothek/dealpilot-modul-03-datenaufnahme-vier-wege.webp" width="960" height="512" alt="" loading="lazy">
-        <img data-bild="2" src="assets/videothek/dealpilot-modul-12-bewertung-und-kpis.webp" width="960" height="512" alt="" loading="lazy">
-        <img data-bild="3" src="assets/videothek/dealpilot-modul-28-unterlagen-einlesen.webp" width="960" height="512" alt="" loading="lazy">
-        <img data-bild="4" src="assets/videothek/dealpilot-modul-08-finanzierung.webp" width="960" height="512" alt="" loading="lazy">
-        <img data-bild="5" src="assets/videothek/dealpilot-modul-27-steuerverlauf-mit-wendepunkt-v3502.webp" width="960" height="512" alt="" loading="lazy">
-        <img data-bild="6" src="assets/videothek/dealpilot-modul-18-der-marktbericht.webp" width="960" height="512" alt="" loading="lazy">
-        <img data-bild="7" src="assets/videothek/dealpilot-modul-26-mieterhoehung-und-zielbild-v3502.webp" width="960" height="512" alt="" loading="lazy">
-        <img data-bild="8" src="assets/videothek/dealpilot-modul-14-ankauf-in-den-bestand-v3502.webp" width="960" height="512" alt="" loading="lazy">
+        <img data-bild="1" class="an" src="assets/dp-strecke/01-objekt-erfassen.webp?v=landing-strecke-2" width="1600" height="900" alt="" loading="lazy">
+        <img data-bild="2" src="assets/dp-strecke/02-score.webp?v=landing-strecke-2" width="1600" height="900" alt="" loading="lazy">
+        <img data-bild="3" src="assets/dp-strecke/03-unterlagen.webp?v=landing-strecke-2" width="1600" height="900" alt="" loading="lazy">
+        <img data-bild="4" src="assets/dp-strecke/04-finanzierung.webp?v=landing-strecke-2" width="1600" height="900" alt="" loading="lazy">
+        <img data-bild="5" src="assets/dp-strecke/05-steuer.webp?v=landing-strecke-2" width="1600" height="900" alt="" loading="lazy">
+        <img data-bild="6" src="assets/dp-strecke/06-wertermittlung.webp?v=landing-strecke-2" width="1600" height="900" alt="" loading="lazy">
+        <img data-bild="7" src="assets/dp-strecke/07-zielbild.webp?v=landing-strecke-2" width="1600" height="900" alt="" loading="lazy">
+        <img data-bild="8" src="assets/dp-strecke/08-bestand.webp?v=landing-strecke-2" width="1600" height="900" alt="" loading="lazy">
       </div>
       <div class="pt-anzeige">Etappe <b id="ptZahl">1</b> von 8<span class="pt-wer" id="ptWer">Erfassen</span></div>
-      <p class="pt-bu">Standbilder aus der Videothek, echte Aufnahmen aus DealPilot mit Beispieldaten.</p>
+      <p class="pt-bu">Echte Bildschirmaufnahmen aus DealPilot. Beispieldaten.</p>
     </div>
     <div class="pt-schritte"><span class="pt-schiene" aria-hidden="true"></span><span class="pt-kabine" aria-hidden="true"></span>
     <ol class="pt-liste">
@@ -414,8 +414,8 @@ if (location.hash === '#forschung') location.replace('forschung.html');</script>
         <h3>Rendite und Investor Deal Score</h3>
         <p>Bruttomietrendite, Nettomietrendite, Eigenkapitalrendite und Kaufpreisfaktor stehen nach wenigen Angaben fest.
           Der Score fasst 24 Kennzahlen in fünf Bereichen zusammen: Rendite, Finanzierung, Risiko, Lage und Potenzial.
-          Am Ende steht eine Zahl von 0 bis 100 mit Stufe, und du siehst, welche Kennzahl ihn trägt und welche ihn drückt.</p>
-        <div class="pt-chips"><span>Rendite</span><span>Kaufpreisfaktor</span><span>24 Kennzahlen</span><span>Empfehlung</span><a class="dp-video" href="videothek.html?v=modul-12-bewertung-und-kpis">Video ansehen →</a></div>
+          Getrennt nach Investment und Finanzierung steht am Ende eine Zahl von 0 bis 100 mit Stufe und Empfehlung, und du siehst, welche Kennzahl ihn trägt und welche ihn drückt.</p>
+        <div class="pt-chips"><span>Rendite</span><span>Investment-Score</span><span>Finanzierungs-Score</span><span>Empfehlung</span><a class="dp-video" href="videothek.html?v=modul-12-bewertung-und-kpis">Video ansehen →</a></div>
       </li>
       <li class="pt-s" data-bild="3" data-wer="Prüfen">
         <span class="pt-nr">Etappe 03 · Prüfen</span>
@@ -438,7 +438,7 @@ if (location.hash === '#forschung') location.replace('forschung.html');</script>
         <h3>Steuer, AfA und Restnutzungsdauer</h3>
         <p>Den Gebäudeanteil teilt DealPilot nach der Arbeitshilfe des Bundesfinanzministeriums auf, die
           Restnutzungsdauer folgt Anlage 2 ImmoWertV. Mit deinem Grenzsteuersatz folgt der Cashflow nach Steuer,
-          und der Steuerverlauf zeigt, ab welchem Jahr das Objekt Steuern kostet.</p>
+          und der Steuerverlauf zeigt, wie lange das Objekt Steuern erstattet und ab welchem Jahr es Steuern kostet.</p>
         <div class="pt-chips"><span>Kaufpreisaufteilung</span><span>AfA</span><span>Cashflow nach Steuer</span><span>Wendepunkt</span><a class="dp-video" href="videothek.html?v=modul-27-steuerverlauf-mit-wendepunkt">Video ansehen →</a></div>
       </li>
       <li class="pt-s" data-bild="6" data-wer="Bewerten">
@@ -453,8 +453,8 @@ if (location.hash === '#forschung') location.replace('forschung.html');</script>
         <span class="pt-nr">Etappe 07 · Planen</span>
         <h3>Mieterhöhung und Zielbild</h3>
         <p>Wohnung für Wohnung: was der laufende Vertrag hergibt, was nach Mietspiegel und Kappungsgrenze verlangbar
-          ist und was erst nach Umbau oder Mieterwechsel geht. Ist, Soll und Zielbild stehen nebeneinander, bis zum Wertpotenzial.</p>
-        <div class="pt-chips"><span>Ist</span><span>Soll</span><span>Zielbild</span><span>Wertpotenzial</span><a class="dp-video" href="videothek.html?v=modul-26-mieterhoehung-und-zielbild">Video ansehen →</a></div>
+          ist und was erst nach Umbau oder Mieterwechsel geht. Ankauf, heute, nach Mieterhöhung und Zielbild stehen in einer Tabelle nebeneinander, bis zum Wertzuwachs nach Kosten.</p>
+        <div class="pt-chips"><span>Ankauf</span><span>Heute</span><span>Nach Mieterhöhung</span><span>Zielbild</span><a class="dp-video" href="videothek.html?v=modul-26-mieterhoehung-und-zielbild">Video ansehen →</a></div>
       </li>
       <li class="pt-s" data-bild="8" data-wer="Halten">
         <span class="pt-nr">Etappe 08 · Halten</span>
