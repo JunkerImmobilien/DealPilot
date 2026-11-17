@@ -42,7 +42,10 @@ ok(M.bestimmen({ baujahr: 1956, stichtag_jahr: 2026, energieklasse: 'E' }).punkt
 ok(M.bestimmen({ baujahr: 1956, stichtag_jahr: 2026, energieklasse: 'G' }).punkte === 6, 'A8 Klasse G -> 6');
 ok(M.bestimmen({ baujahr: 1995, stichtag_jahr: 2026, energieklasse: 'G' }).punkte === 8, 'A9 Baujahr 1995: Klasse sagt nichts -> 8');
 ok(/angenommen/.test(M.bestimmen({ baujahr: 1956, stichtag_jahr: 2026 }).satz), 'A10 Satz sagt „angenommen"');
-ok(/genauer/.test(M.bestimmen({ baujahr: 1956, stichtag_jahr: 2026 }).satz), 'A11 Satz verweist auf eigene Angaben');
+ok(/je Gewerk einstellen/.test(M.bestimmen({ baujahr: 1956, stichtag_jahr: 2026 }).satz), 'A11 Satz verweist auf das Einstellen je Gewerk');
+ok(M.bestimmen({ baujahr: 1956, stichtag_jahr: 2026 }).angenommen_gewerke.length === 8, 'A13 Rueckfall: alle acht Gewerke als Annahme gelistet');
+ok(/Nach Energieklasse C angesetzt/.test(M.bestimmen({ baujahr: 1956, stichtag_jahr: 2026, energieklasse: 'C' }).annahme_satz), 'A14 Energieklasse: energetische Gewerke getrennt genannt');
+ok(M.bestimmen({ baujahr: 2010, stichtag_jahr: 2026 }).annahme_satz === '', 'A15 junges Gebaeude: keine Annahme-Zeile');
 ok(M.bestimmen({}).punkte === 8, 'A12 ohne Baujahr -> 8 (Alter unbekannt, Modernisierung typisch nicht ausschliessbar)');
 
 kopf('B  Rangfolge');
@@ -104,12 +107,16 @@ ok(M.kombinieren({ text: M.ausText('Gepflegtes Haus in ruhiger Lage.', {}), bauj
 const k4 = M.kombinieren({ text: [], fotos: M.normFotos({ baeder: { stufe: 'neuwertig', sicherheit: 'mittel', beschreibung: 'Bad mit neuen Fliesen' } }), baujahr: 1956 });
 ok(k4 && /Bildern/.test(k4.kurz) && k4.gewerke.baeder.beleg === 'Bad mit neuen Fliesen', 'D13 nur Bilder -> „aus Bildern abgeleitet" mit Beschreibung');
 
+{ const bA = M.bestimmen({ baujahr: 1956, stichtag_jahr: 2026, ableitung: k1ohne });
+  ok(bA.angenommen_gewerke.indexOf('Leitungen') >= 0 && bA.angenommen_gewerke.indexOf('Außenwand') < 0, 'D14 Ableitung: nur die Gewerke ohne Aussage stehen als Annahme', bA.angenommen_gewerke);
+  ok(/Angenommen \(mittlerer Stand, keine Angabe\): .*Leitungen/.test(bA.satz) && /je Gewerk einstellen/.test(bA.satz), 'D15 Annahme-Satz steht am Ende des Satzes (Bericht/PDF)'); }
+
 kopf('E  Kette mb-Backend (lib/rnd-einheitlich.js)');
 const E = await import(pathToFileURL(path.join(WURZEL, 'marktbericht/backend/src/lib/rnd-einheitlich.js')).href);
 const ST = { wertermittlungsstichtag: '2026-11-17' };
 const e1 = E.restnutzungsdauerEinheitlich({ build_year: 1956, ...ST }, 80);
 ok(e1.quelle === 'anlage2' && e1.modernisierung && e1.modernisierung.punkte === 8, 'E1 ohne Angabe: Anlage 2 mit 8 Punkten', e1);
-ok(/angenommen/.test(e1.hinweis) && /aus 8 Modernisierungspunkten/.test(e1.hinweis), 'E2 Hinweis nennt 8 Punkte und „angenommen"');
+ok(/angenommen/.test(e1.hinweis) && /aus 8 Modernisierungspunkten/.test(e1.hinweis) && /Angenommen \(mittlerer Stand/.test(e1.hinweis), 'E2 Hinweis nennt 8 Punkte, „angenommen" und die Annahme-Liste');
 const e0 = E.restnutzungsdauerEinheitlich({ build_year: 1956, mod_punkte: 0, mod_punkte_herkunft: 'eigene_angabe', ...ST }, 80);
 ok(e0.modernisierung === null && /aus 0 Modernisierungspunkten/.test(e0.hinweis), 'E3 eigene 0 bleibt 0');
 const eA = E.restnutzungsdauerEinheitlich({ build_year: 1956, mod_punkte: null, mod_angaben: 3, ...ST }, 80);

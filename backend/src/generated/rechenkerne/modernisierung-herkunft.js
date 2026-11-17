@@ -365,6 +365,24 @@
    *   zustand, zustand_quelle ('eigene'|'bilder'|'text'|null), ableitung ({punkte, gewerke, kurz, …} aus kombinieren()),
    *   baujahr, stichtag_jahr, energieklasse }
    */
+  /* v3660a · Marcel 17.11.2026: „übrige Gewerke als mittel angenommen - ABER immer sichtbar als
+     Annahme unten in der Bewertung". Welche Gewerke angenommen sind, als Liste und als Satz. */
+  var EINSTELLEN = 'Den Zustand kannst du je Gewerk einstellen.';
+  function annahme(gew, rf) {
+    var mittel = [], energie = [];
+    GEWERKE.forEach(function (g) {
+      var x = gew && gew[g.id];
+      if (!x || x.quelle !== 'angenommen') return;
+      if (g.energie && rf && rf.energie && !rf.jung) energie.push(g.text); else mittel.push(g.text);
+    });
+    if (rf && rf.jung) return { liste: [], satz: '' };
+    var t = [];
+    if (mittel.length) t.push('Angenommen (mittlerer Stand, keine Angabe): ' + mittel.join(', ') + '.');
+    if (energie.length) t.push('Nach Energieklasse ' + rf.klasse + ' angesetzt (keine Angabe): ' + energie.join(', ') + '.');
+    if (t.length) t.push(EINSTELLEN);
+    return { liste: mittel.concat(energie), mittel: mittel, energie: energie, satz: t.join(' ') };
+  }
+
   function bestimmen(e) {
     e = e || {};
     var mp = zahl(e.mod_punkte), her = String(e.mod_punkte_herkunft || '');
@@ -385,33 +403,39 @@
     var z = ZUSTAND[String(e.zustand || '').trim()];
     if (z && zq === 'eigene') {
       var pz = rf.jung ? 0 : z.punkte;
+      var az = rf.jung ? '' : 'Abgeschätzt aus dem Zustand, nicht je Gewerk: alle acht Gewerke. ' + EINSTELLEN;
       return { punkte: pz, herkunft: 'zustand', stufe: 1, angenommen: true, grad: grad(pz), zustand: z.text,
+               angenommen_gewerke: rf.jung ? [] : GEWERKE.map(function (g) { return g.text; }), annahme_satz: az,
                kurz: 'abgeschätzt aus Zustand „' + z.text + '"',
                satz: 'Modernisierung abgeschätzt aus Zustand „' + z.text + '": ' + grad(pz) + ' (' + pz + ' Punkte'
-                 + (rf.jung ? ', Gebäude jünger als ' + ALTER_MIN + ' Jahre' : '') + '). ' + EIGEN };
+                 + (rf.jung ? ', Gebäude jünger als ' + ALTER_MIN + ' Jahre' : '') + ').' + (az ? ' ' + az : '') };
     }
     /* 2 · abgeleitet aus Exposé-Text und Bildern */
     var ab = e.ableitung;
     if (ab && typeof ab === 'object' && zahl(ab.punkte) != null && ab.gewerke) {
       var pa = Math.min(20, Math.max(0, Math.round(zahl(ab.punkte))));
+      var aa = annahme(ab.gewerke, rf);
       return { punkte: pa, herkunft: 'abgeleitet', stufe: 2, angenommen: true, grad: grad(pa), gewerke: ab.gewerke,
                quellen: ab.quellen || [], widersprueche: ab.widersprueche || [], kurz: ab.kurz || 'abgeleitet',
-               satz: (ab.satz || ('Modernisierung abgeleitet: ' + grad(pa) + ' (' + pa + ' Punkte).')) + ' ' + EIGEN };
+               angenommen_gewerke: aa.liste, annahme_satz: aa.satz,
+               satz: (ab.satz || ('Modernisierung abgeleitet: ' + grad(pa) + ' (' + pa + ' Punkte).')) + ' ' + (aa.satz || EIGEN) };
     }
     /* 3 · Rueckfall */
     var r = rueckfall(e);
     r.kurz = r.herkunft === 'jung' ? '0 Punkte, Gebäude jünger als ' + ALTER_MIN + ' Jahre'
       : (r.herkunft === 'rueckfall_energie' ? 'angenommen (' + r.grad + ', nach Energieklasse)' : 'angenommen (mittel, keine Angaben)');
-    if (r.angenommen) r.satz += ' ' + EIGEN;
+    var ar = annahme(r.gewerke, rf);
+    r.angenommen_gewerke = ar.liste; r.annahme_satz = ar.satz;
+    if (r.angenommen) r.satz += ' ' + (ar.satz || EIGEN);
     return r;
   }
 
   var api = {
-    version: 'v3660',
+    version: 'v3660a',
     GEWERKE: GEWERKE, GRADE: GRADE, ZUSTAND: ZUSTAND, ALTER_MIN: ALTER_MIN,
     grad: grad, zustandAusPunkten: zustandAusPunkten, rueckfall: rueckfall,
     ausText: ausText, normListe: normListe, normFotos: normFotos,
-    kombinieren: kombinieren, bestimmen: bestimmen
+    kombinieren: kombinieren, bestimmen: bestimmen, EINSTELLEN: EINSTELLEN
   };
   root.DpModernisierung = api;
   if (typeof module === 'object' && module && module.exports) module.exports = api;

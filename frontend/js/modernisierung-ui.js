@@ -70,7 +70,9 @@
     if (b.herkunft === 'eigene') {
       html = '<span>Grundlage der Restnutzungsdauer: eigene Angabe (' + esc(b.punkte) + ' Punkte).</span>';
     } else {
-      html = '<span><b>Grundlage der Restnutzungsdauer:</b> ' + esc(b.satz) + '</span>';
+      var _ann = b.annahme_satz || '';
+      var _haupt = _ann ? String(b.satz).replace(' ' + _ann, '') : b.satz;
+      html = '<span><b>Grundlage der Restnutzungsdauer:</b> ' + esc(_haupt) + '</span>';
       if (b.gewerke && b.herkunft === 'abgeleitet') {
         html += '<details style="margin-top:3px"><summary style="cursor:pointer">Gewerke ansehen</summary><ul style="margin:4px 0 0 16px;padding:0">'
           + GEW.map(function (k) { var g = b.gewerke[k]; if (!g) return '';
@@ -79,12 +81,16 @@
                 + (g.beleg ? '<br><i>' + esc(g.beleg) + '</i>' : '') + (g.widerspruch ? '<br><b>Widerspruch:</b> ' + esc(g.widerspruch) : '') + '</li>'; }).join('')
           + '</ul></details>';
       }
-      html += '<span style="display:block;margin-top:2px">Genauer: die acht Gewerke oben eintragen oder den Grad hier wählen.</span>';
+      /* v3660a · Marcel: die Annahme steht immer sichtbar UNTEN, mit Sprung zum Einstellen je Gewerk */
+      if (_ann) html += '<span id="mod_annahme" style="display:block;margin-top:4px">' + esc(_ann.replace(/ ?Den Zustand kannst du je Gewerk einstellen\.$/, ''))
+        + ' <a href="#" id="mod_einstellen">Zustand je Gewerk einstellen</a></span>';
+      else html += '<span style="display:block;margin-top:2px">Genauer: die acht Gewerke oben eintragen oder den Grad hier wählen.</span>';
     }
     var hatFotos = fotosQuelle().length > 0;
     if (hatFotos) html += '<button type="button" id="mod_bilder_knopf" class="btn-ghost" style="margin-top:4px;font-size:11px;padding:2px 8px">Zustand aus Bildern ' + (roh() && roh().roh && roh().roh.fotos_hash ? 'neu ' : '') + 'ableiten</button>';
     box.innerHTML = html;
     var kn = $('mod_bilder_knopf'); if (kn) kn.onclick = function () { ausBildern(true); };
+    var ke = $('mod_einstellen'); if (ke) ke.onclick = function (ev) { ev.preventDefault(); var f = $('mod_dach'); if (f) { f.scrollIntoView({ block: 'center' }); try { f.focus(); } catch (x) {} } };
     var zh = $('ds2_zustand_herkunft');
     if (zh) {
       var q = val('ds2_zustand_quelle'), r = roh();
@@ -168,7 +174,10 @@
     ['mod_punkte', 'baujahr', 'ds2_energie', 'ds2_zustand', 'wertermittlungsstichtag'].concat(GEW.map(function (k) { return 'mod_' + k; })).forEach(function (id) {
       var e = $(id); if (!e) return;
       e.addEventListener('change', function (ev) {
-        if (id === 'ds2_zustand' && ev.isTrusted) setze('ds2_zustand_quelle', 'eigene');
+        if (id === 'ds2_zustand' && ev.isTrusted) {
+          setze('ds2_zustand_quelle', 'eigene');
+          try { if (typeof window.renderDealScore2 === 'function') window.renderDealScore2(); } catch (x) {}   /* v3660a: Kennzeichnung sofort weg */
+        }
         if ((id === 'baujahr' || id === 'ds2_energie') && roh()) speichern(neuKombinieren(roh()));
         anzeigen();
       });
@@ -178,6 +187,12 @@
     if (grid && window.MutationObserver) new MutationObserver(function () { anzeigen(); vielleichtAuto(); }).observe(grid, { childList: true });
     anzeigen();
   }
+  /* v3660a · Sprung zum Feld Zustand (aus dem Deal-Score-2-Kriterium „Bausubstanz") */
+  window._dpZustandEinstellen = function (ev) {
+    try { if (ev) { ev.preventDefault(); ev.stopPropagation(); } } catch (x) {}
+    var z = $('ds2_zustand'); if (z) { z.scrollIntoView({ block: 'center' }); try { z.focus(); } catch (x) {} }
+    return false;
+  };
   window.DpModUI = { anzeigen: anzeigen, ausExpose: ausExpose, ausBildern: ausBildern, bestimmen: bestimmen, eigeneHerkunft: eigeneHerkunft };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();
