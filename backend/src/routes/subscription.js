@@ -92,6 +92,9 @@ router.get('/', async (req, res, next) => {
   try {
     const sub = await subscriptionService.getEffectivePlan(req.user.id);
     const usage = await usageService.getCurrentMonthUsage(req.user.id);
+    /* v3642 · ohne Stripe-Abo (manuell freigeschaltet, Testkonto) gibt es kein Kundenportal - das Frontend sagt es statt still zu scheitern */
+    let ueberStripe = false;
+    try { const q = await require('../db/pool').query('SELECT 1 FROM subscriptions WHERE user_id = $1 AND stripe_subscription_id IS NOT NULL LIMIT 1', [req.user.id]); ueberStripe = q.rows.length > 0; } catch (e) {}
     res.json({
       subscription: {
         plan_id: sub.plan_id,
@@ -113,6 +116,7 @@ router.get('/', async (req, res, next) => {
         is_active: subscriptionService.isActive(sub),
         synthetic: sub.synthetic || false,
         downgraded: sub.downgraded || false,
+        ueber_stripe: ueberStripe,
         limits: {
           max_objects: sub.max_objects,
           max_users: sub.max_users,

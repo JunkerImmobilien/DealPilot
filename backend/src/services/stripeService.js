@@ -158,7 +158,10 @@ async function createPortalSession({ userId, returnUrl }) {
   const subscriptionService = require('./subscriptionService');
   const customerId = await subscriptionService.getStripeCustomerId(userId);
   if (!customerId) {
-    throw new HttpError(400, 'No Stripe customer linked to this account');
+    /* v3642 · deutsche Meldung, Code fuer das Frontend */
+    const e = new HttpError(409, 'Dein Plan ist ohne Zahlung freigeschaltet. Es gibt deshalb kein Abo, das du verwalten kannst.');
+    e.code = 'kein_stripe_abo';
+    throw e;
   }
   const session = await stripe.billingPortal.sessions.create({
     customer: customerId,

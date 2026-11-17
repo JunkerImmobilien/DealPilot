@@ -2027,7 +2027,11 @@ function _v234_1RenderPlanStatusHeader() {
         '</div>' +
       '</div>';
 
-  if (isPaid) {
+  /* v3642 · Plan ohne Stripe-Abo (manuell freigeschaltet): Hinweis statt Knoepfe, die nur scheitern */
+  var _ohneStripe = isPaid && typeof Sub !== 'undefined' && Sub.ueberStripe && !Sub.ueberStripe();
+  if (_ohneStripe) {
+    html += '<div class="v234-status-actions"><div style="font:400 12.5px/1.5 Inter;color:#6B6356">Dein Plan ist ohne Zahlung freigeschaltet. Es gibt deshalb kein Abo, das du verwalten oder kündigen kannst.</div></div>';
+  } else if (isPaid) {
     html +=
       '<div class="v234-status-actions">' +
         '<button class="v234-btn v234-btn-primary" onclick="if(typeof Sub!==\'undefined\'&&Sub.openPortal)Sub.openPortal();return false">' +

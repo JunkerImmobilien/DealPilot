@@ -112,8 +112,11 @@
     } else if (cur === 'partner') {
       rechts = '<div class="dppp-r"><div class="dppp-preis"><b>' + eur(plan) + '</b><span>/ ' + ein + '</span></div>' +
         '<p class="dppp-klein">✓ Das ist dein aktueller Plan. Plätze änderst du im Partner-Cockpit unter Verwaltung.</p>' +
-        '<div class="dppp-knoepfe"><button type="button" class="dppp-cta" data-a="cockpit">Plätze verwalten</button>' +
-        '<button type="button" class="dppp-cta zweit" data-a="kuendigen">Partner-Plan kündigen</button></div></div>';
+        /* v3642 · ohne Stripe-Abo (manuell freigeschaltet) gibt es nichts zu kuendigen */
+        ((window.Sub && Sub.ueberStripe && !Sub.ueberStripe())
+          ? '<p class="dppp-klein">Dein Partner-Plan ist ohne Zahlung freigeschaltet. Es gibt deshalb kein Abo zu kündigen.</p><div class="dppp-knoepfe"><button type="button" class="dppp-cta" data-a="cockpit">Plätze verwalten</button></div></div>'
+          : '<div class="dppp-knoepfe"><button type="button" class="dppp-cta" data-a="cockpit">Plätze verwalten</button>' +
+            '<button type="button" class="dppp-cta zweit" data-a="kuendigen">Partner-Plan kündigen</button></div></div>');
     } else {
       rechts = '<div class="dppp-r"><div class="dppp-preis"><b>' + eur(plan) + '</b><span>/ ' + ein + '</span></div>' +
         '<div class="dppp-k">Kundenplätze</div>' +
@@ -144,6 +147,8 @@
     var el = document.getElementById('dppp-karte');
     if (!el) { el = document.createElement('div'); el.id = 'dppp-karte'; el.className = 'dppp'; nach.parentNode.insertBefore(el, nach.nextSibling); }
     karteZeichnen(el);
+    /* v3642 · hat der Nutzer den Partner-Plan, steht seine Karte unter den vier Plaenen ausser Sicht: hinscrollen und markieren */
+    if (aktuellerPlan() === 'partner') { el.classList.add('dppp-aktuell'); el.style.outline = '2px solid var(--wl-c9a84c, #C9A84C)'; el.style.outlineOffset = '3px'; el.style.borderRadius = '14px'; setTimeout(function () { try { el.scrollIntoView({ block: 'center', behavior: 'smooth' }); } catch (e) {} }, 350); }
     angebotHolen().then(function () { karteZeichnen(el); }, function (e) {
       el.innerHTML = '<div class="dppp-l"><div class="dppp-name">Partner-Plan</div></div><div class="dppp-r"><p class="dppp-klein">' + esc(fehlerText(e)) + '</p></div>';
     });

@@ -221,12 +221,25 @@ var Sub = (function() {
    */
   async function openPortal() {
     if (!isApiMode()) throw new Error('Backend erforderlich');
-    var resp = await Auth.apiCall('/subscription/portal', {
-      method: 'POST',
-      body: { returnUrl: location.href }
-    });
-    location.href = resp.url;
+    /* v3642 · ohne Stripe-Abo (manuell freigeschaltet) gibt es kein Portal: erklaeren statt still scheitern */
+    if (_cache && _cache.ueber_stripe === false && _cache.plan_id && _cache.plan_id !== 'free') { ohnePortalHinweis(); return; }
+    try {
+      var resp = await Auth.apiCall('/subscription/portal', {
+        method: 'POST',
+        body: { returnUrl: location.href }
+      });
+      location.href = resp.url;
+    } catch (e) {
+      if (e && (e.status === 409 || e.status === 400)) { ohnePortalHinweis(); return; }
+      if (typeof toast === 'function') toast('Die Aboverwaltung ist gerade nicht erreichbar. Bitte versuche es gleich noch einmal.');
+    }
   }
+  function ohnePortalHinweis() {
+    var bis = _cache && _cache.current_period_end ? new Date(_cache.current_period_end).toLocaleDateString('de-DE') : '';
+    var t = 'Dein Plan ist ohne Zahlung freigeschaltet' + (bis ? ', gültig bis ' + bis : '') + '. Es gibt deshalb kein Abo, das du verwalten oder kündigen kannst.';
+    if (typeof toast === 'function') toast(t); else alert(t);
+  }
+  function ueberStripe() { return !(_cache && _cache.ueber_stripe === false); }
 
   /**
    * Track usage of a metered action.
@@ -407,7 +420,7 @@ var Sub = (function() {
     invalidateCache: invalidateCache,
     listPlans: listPlans,
     startCheckout: startCheckout,
-    openPortal: openPortal,
+    openPortal: openPortal, ueberStripe: ueberStripe,
     trackUsage: trackUsage,
     canDo: canDo,
     hasFeature: hasFeature,
