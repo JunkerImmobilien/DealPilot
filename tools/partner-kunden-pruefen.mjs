@@ -98,6 +98,10 @@ ok('C', 'Marke nur bei aktiver Verbindung und Wahl Partner', /getrennt_am IS NUL
 
 // ── D · v3640 ─────────────────────────────────────────────────────────────
 {
+  /* v3640d · seq_no ist varchar(12): der zehnte Stand scheiterte mit 500 */
+  const SID = 'abcdef12-3456-4789-8abc-def012345678';
+  const kk = [1, 9, 10, 99, 999, 9999].map((s) => pk.kopieKennung(SID, s));
+  ok('D', 'Kennung der Kundenkopie hoechstens 12 Zeichen (seq_no varchar 12) bis Stand 9999, bis Stand 9 wie bisher', kk.every((x) => x.length <= 12) && kk[0] === 'K-abcdef12-1' && new Set(kk).size === kk.length, kk);
   ok('D', 'erste Nummer im Jahr', pk.kundennummerNaechste([], 2026) === 'K-2026-001', pk.kundennummerNaechste([], 2026));
   ok('D', 'naechste nach der hoechsten desselben Jahres, Freitext und anderes Jahr zaehlen nicht',
     pk.kundennummerNaechste(['K-2026-001', 'K-2026-007', 'K-2025-012', 'Mustermann-01', null], 2026) === 'K-2026-008');

@@ -500,6 +500,12 @@ async function codeWiderrufen(userId) {
 }
 
 const NICHT_IN_KOPIE = ['_obj_seq', 'halter', '_kundenstand', '_uebergabe'];
+/* v3640d · objects.seq_no ist varchar(12). 'K-' + 8 Zeichen + '-' + Stand passt nur bis Stand 9 - gemessen 17.11.2026:
+   der zehnte Stand scheiterte mit 500 („value too long for type character varying(12)“). Ab Stand 10 kuerzer. */
+function kopieKennung(shareId, standNr) {
+  const lang = 'K-' + String(shareId).slice(0, 8) + '-' + standNr;
+  return lang.length <= 12 ? lang : ('K' + String(shareId).slice(0, 6) + '-' + standNr).slice(0, 12);
+}
 
 /** Senden als Kopie: objectIds oder bestand=true. Erneut senden ersetzt die Kopie. */
 async function senden(user, b) {
@@ -530,7 +536,7 @@ async function senden(user, b) {
     const standNr = (s.status === 'widerrufen' ? 0 : (s.stand_nr || 0)) + 1;
     const d = typeof orig.data === 'string' ? JSON.parse(orig.data) : JSON.parse(JSON.stringify(orig.data || {}));
     NICHT_IN_KOPIE.forEach((k) => { delete d[k]; });
-    d._obj_seq = 'K-' + String(s.id).slice(0, 8) + '-' + standNr;   /* eigene Kennung: belegt keine Nummer des Partners, kollidiert nicht beim erneuten Senden */
+    d._obj_seq = kopieKennung(s.id, standNr);   /* eigene Kennung: belegt keine Nummer des Partners, kollidiert nicht beim erneuten Senden */
     d._kundenstand = { share_id: s.id, client_id: v.id, kunde: v.display_name, stand_nr: standNr, stand_am: new Date().toISOString(), seq_kunde: orig.data && orig.data._obj_seq || null };
     let fotos = orig.photos; if (typeof fotos === 'string') { try { fotos = JSON.parse(fotos); } catch (e) { fotos = []; } }
     const kopie = await objectService.create(pn.owner_user_id, { data: d, aiAnalysis: orig.ai_analysis || null, photos: Array.isArray(fotos) ? fotos : [] });
@@ -664,5 +670,5 @@ module.exports = {
   aufgabenListe, aufgabeAnlegen, aufgabeErinnern, aufgabeAbschliessen, meldungen, meldungenGelesen,
   meinPartner, anfrageBeantworten, codeErzeugen, codeWiderrufen, senden, zurueckziehen, aufgabeKunde, kundeTrennt, markeWaehlen, rechteFuer,
   _codeNorm: codeNorm, _sha: sha, CODE_ZEICHEN, _meldung: meldung,
-  /* v3640 */ kundennummerNaechste, kundennummerSauber, ohneBearbeitung, sendenSperre, KUNDENNUMMER_MUSTER
+  /* v3640 */ kopieKennung, kundennummerNaechste, kundennummerSauber, ohneBearbeitung, sendenSperre, KUNDENNUMMER_MUSTER
 };
