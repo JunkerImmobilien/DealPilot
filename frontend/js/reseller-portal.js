@@ -1127,7 +1127,8 @@ if (!window._pdfGold) {
     var el = $('rp-b-stand'); if (!el) return;
     var g = _brandState.gespeichert || {}, an = [];
     if (_brandState.logo !== undefined || _brandState.logoDark !== undefined) an.push('Logo');
-    if (_v('rp-b-accent') !== g.accent || _v('rp-b-obsidian') !== g.obsidian || _v('rp-b-mail') !== g.mail) an.push('Farben');
+    var gl = function (x) { return String(x || '').toLowerCase(); };   /* type=color liefert Kleinbuchstaben */
+    if (gl(_v('rp-b-accent')) !== gl(g.accent) || gl(_v('rp-b-obsidian')) !== gl(g.obsidian) || gl(_v('rp-b-mail')) !== gl(g.mail)) an.push('Farben');
     if (_brandState.darstellung !== g.darstellung || _brandState.groesse !== g.groesse) an.push('Logo in der App');
     if ((_v('rp-b-pdflight') === '1') !== !!g.pdflight || _brandState.pdfGroesse !== g.pdfGroesse) an.push('Dokumente');
     el.innerHTML = an.length ? 'Geändert: ' + an.join(', ') + '. <b style="color:#3a352c">Noch nicht gespeichert.</b>' : 'Alles gespeichert.';
@@ -1198,13 +1199,13 @@ if (!window._pdfGold) {
           /* v3630 · gewaehlte Darstellung: eigene Flaeche, kein Kontrastwert gegen den Grund */
           if (e.art === 'rahmen-hell' || e.art === 'rahmen-dunkel' || (e.grund || '').indexOf('Darstellung:') === 0) {
             return '<span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:#3FA56C;margin-right:6px;vertical-align:0"></span>' +
-              '<b style="color:#3a352c">' + titel + ':</b> eigene Fläche – ' + esc(ART[e.art] || DARST_TITEL[_brandState.darstellung] || e.art) + '<br>';
+              '<b style="color:#3a352c">' + titel + ':</b> eigene Fläche, ' + esc(ART[e.art] || DARST_TITEL[_brandState.darstellung] || e.art) + '<br>';
           }
           var ok = e.k_nachher == null || e.k_nachher >= 3;
           var k = function (x) { return x == null ? 'eigene Fläche' : String(x).replace('.', ',') + ' : 1'; };
           return '<span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:' + (ok ? '#3FA56C' : '#B8625C') +
             ';margin-right:6px;vertical-align:0"></span><b style="color:#3a352c">' + titel + ':</b> ' +
-            (e.k == null ? 'eigene Fläche, unverändert' : 'Kontrast ' + k(e.k) + (e.art !== 'unveraendert' ? ' → ' + esc(ART[e.art] || e.art) + ', jetzt ' + k(e.k_nachher) : ' – reicht')) + '<br>';
+            (e.k == null ? 'eigene Fläche, unverändert' : 'Kontrast ' + k(e.k) + (e.art !== 'unveraendert' ? ' → ' + esc(ART[e.art] || e.art) + ', jetzt ' + k(e.k_nachher) : ', reicht')) + '<br>';
         };
         amp.innerHTML = zeile('Dunkler Grund', v.messung.dunkel) + zeile('Heller Grund', v.messung.hell);
         /* Live in der App, wenn der Partner seine Marke sieht */
@@ -1294,12 +1295,12 @@ if (!window._pdfGold) {
     var comp = _v('rp-b-company') || _v('rp-b-name') || 'Deine Kanzlei';
     var line2 = [_v('rp-b-address'), [_v('rp-b-plz'), _v('rp-b-city')].filter(Boolean).join(' ')].filter(Boolean).join(' · ');
     var line3 = [_v('rp-b-phone'), _v('rp-b-email'), _v('rp-b-website')].filter(Boolean).join(' · ');
-    host.innerHTML = '<b style="color:#3a352c">So sieht der PDF-Footer beim Mandanten aus:</b><br>' +
+    host.innerHTML = '<b style="color:#3a352c">So sieht der Fuß im PDF deiner Kunden aus:</b><br>' +
       '<span style="color:#2a2727;font-weight:600">' + esc(comp) + '</span>' +
       (_v('rp-b-tagline') ? '<br>' + esc(_v('rp-b-tagline')) : '') +
       (line2 ? '<br>' + esc(line2) : '') +
       (line3 ? '<br>' + esc(line3) : '') +
-      (!line2 && !line3 ? '<br><i style="color:#b8625c">Noch keine Kontaktdaten — der Footer bleibt leer.</i>' : '');
+      (!line2 && !line3 ? '<br><i style="color:#b8625c">Noch keine Kontaktdaten. Der Fuß bleibt leer.</i>' : '');
   }
   /* W7-livepreview: las vorher das beim Tab-Oeffnen geladene Objekt -> ein
      Farbwechsel im Waehler kam nie an (W6-Bug). Jetzt LIVE aus dem Formular. */
