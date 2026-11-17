@@ -122,8 +122,8 @@
         '<div class="dppp-zeile"><span>' + n + (n === 1 ? ' Platz' : ' Plätze') + (n > 0 ? ' à ' + eur(platzSatz(a.platz[iv].stufen, n)) : '') + '</span><span>' + eur(ps) + '</span></div>' +
         '<div class="dppp-zeile dppp-summe"><span>Zusammen je ' + ein + '</span><span>' + eur(plan + ps) + '</span></div>' +
         '<p class="dppp-klein">' + esc(stufenText(a, iv)) + '. Im Partner-Plan ist kein Platz enthalten. Keine Testphase, die Abrechnung beginnt mit dem Kauf. Kündigung jederzeit zum Ende der Laufzeit.</p>' +
-        (cur !== 'free' ? '<p class="dppp-klein"><b>Du hast bereits ein Abo.</b> Kündige es zuerst zum Laufzeitende, danach kannst du den Partner-Plan buchen.</p>' : '') +
-        '<button type="button" class="dppp-cta" data-a="kaufen"' + (cur !== 'free' ? ' disabled' : '') + '>Partner-Plan kaufen</button></div>';
+        (a.darf_kaufen === false ? '<p class="dppp-klein"><b>Du hast bereits ein Abo.</b> Kündige es zuerst zum Laufzeitende, danach kannst du den Partner-Plan buchen.</p>' : '') +
+        '<button type="button" class="dppp-cta" data-a="kaufen"' + (a.darf_kaufen === false ? ' disabled' : '') + '>Partner-Plan kaufen</button></div>';
     }
     el.innerHTML = links + rechts;
     var inp = el.querySelector('.dppp-step input');

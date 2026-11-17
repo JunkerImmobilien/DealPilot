@@ -209,7 +209,10 @@ function _partnerFehler(res, next, e) {
 router.get('/partner/angebot', async (req, res, next) => {
   try {
     if (!stripeService.isConfigured()) throw new HttpError(503, 'Payment system is not configured');
-    res.json(await partnerKauf.angebot());
+    const a = await partnerKauf.angebot();
+    /* darf DIESER Nutzer kaufen? Eine Testphase (plan_trials) ist kein Abo und sperrt nicht; ein bezahltes Abo schon */
+    const bezahlt = await require('../services/resellerService').hatBezahltesAbo(req.user.id);
+    res.json(Object.assign(a, { darf_kaufen: !bezahlt, grund: bezahlt ? 'bezahltes_abo_vorhanden' : null }));
   } catch (e) { _partnerFehler(res, next, e); }
 });
 const partnerCheckoutSchema = z.object({
