@@ -115,6 +115,7 @@ function seite() {
   ctx.window = ctx;
   let geladen = 0;
   ctx.loadData = function (d) { geladen++; Object.keys(d || {}).forEach((k) => { if (els[k]) els[k].value = d[k]; }); };
+  ctx._newObjLeeren = function () { ['ze', 'ze_stp_monat', 'ze_kueche_monat', 'ze_sonst_monat'].forEach((k) => { els[k].value = ''; }); };
   vm.createContext(ctx);
   return { ctx, els, tippe(id, v) { els[id].value = v; els[id].dispatchEvent(new ctx.Event('input')); },
     oeffne() { els['ze-auft'].open = true; els['ze-auft'].dispatchEvent(new ctx.Event('toggle')); }, geladen: () => geladen };
@@ -160,6 +161,8 @@ function ebeneB(quelle, tag) {
   pruefe('B', tag + '9 loadData: gespeicherte Werte bleiben (ze 75), ze gesperrt', s.els.ze.value === '75' && s.els.ze.readOnly === true && s.geladen() === 1, [s.els.ze.value, s.els.ze.readOnly]);
   s.ctx.loadData({ ze: '40', ze_stp_monat: '', ze_kueche_monat: '', ze_sonst_monat: '' });
   pruefe('B', tag + '9 naechstes Objekt ohne Teile: ze frei', s.els.ze.value === '40' && s.els.ze.readOnly === false);
+  s.ctx.loadData({ ze: '75', ze_stp_monat: '50', ze_kueche_monat: '25' }); s.ctx._newObjLeeren();
+  pruefe('B', tag + '10 neues Objekt nach geteiltem: ze frei', s.els.ze.readOnly === false && s.els.ze.value === '');
 }
 console.log('B · Reiter Miete (ze-aufteilung.js)');
 const zeQuelle = lies('frontend/js/ze-aufteilung.js');
@@ -220,7 +223,7 @@ function ebeneD(Q, tag) {
   has('storage', /'ze','ze_stp_monat','ze_kueche_monat','ze_sonst_monat'/, 'storage.js FIELDS speichert die Teile');
   has('storage', /'ze_stp_monat', 'ze_kueche_monat', 'ze_sonst_monat',\s+\/\/ v3670/, 'storage.js Reset (Objekt B erbt keine Teile von A)');
   has('index', /<input id="ze_stp_monat"[^>]*>[\s\S]*<input id="ze_kueche_monat"[^>]*>[\s\S]*<input id="ze_sonst_monat"/, 'index.html Felder im Aufklapper');
-  has('index', /<script src="js\/ze-aufteilung\.js\?v=v3670"><\/script>/, 'index.html laedt ze-aufteilung.js');
+  has('index', /<script src="js\/ze-aufteilung\.js\?v=v3670[a-z]?"><\/script>/, 'index.html laedt ze-aufteilung.js');
   has('mb', /'ze', 'ze_stp_monat', 'ze_kueche_monat', 'ze_sonst_monat',/, 'Karte (dealpilot-mb.js) schickt ze und Teile');
   has('dok', /stellplatz_miete_eur: \['ze_stp_monat'/, 'Mietvertrag: Stellplatz -> Teil Stellplatz (nicht mehr ganz ze)');
   has('dok', /kueche_miete_eur: \['ze_kueche_monat'/, 'Mietvertrag: Kuechenzuschlag -> Teil Kueche');

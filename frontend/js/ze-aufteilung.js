@@ -113,6 +113,12 @@
     window.loadData = function () { var r = _orig.apply(this, arguments); try { zeichnen(); } catch (e) {} return r; };
     window.loadData._zeAuft = true;
   }
+  /* neues Objekt: _newObjLeeren (storage.js) leert die Felder ohne Ereignis - die Sperre von ze muss mit */
+  if (typeof window._newObjLeeren === 'function' && !window._newObjLeeren._zeAuft) {
+    var _origN = window._newObjLeeren;
+    window._newObjLeeren = function () { var r = _origN.apply(this, arguments); try { zeichnen(); } catch (e) {} return r; };
+    window._newObjLeeren._zeAuft = true;
+  }
   function stil() {
     if (el('ze-auft-stil')) return;
     var s = document.createElement('style'); s.id = 'ze-auft-stil';
