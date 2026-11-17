@@ -543,10 +543,15 @@
     }).replace(/color\([^()]*\)/g, 'rgba(0, 0, 0, 0)');   /* andere Farbraeume: lieber durchsichtig als gar kein Bild */
   }
   var FARB_EIGENSCHAFTEN = ['color', 'background-color', 'background-image', 'border-top-color', 'border-right-color', 'border-bottom-color', 'border-left-color',
-    'outline-color', 'box-shadow', 'text-shadow', 'text-decoration-color', 'caret-color', 'column-rule-color', 'fill', 'stroke'];
-  /* Gelesen wird in der ECHTEN Seite (Stil fertig berechnet, nur lesen = schnell), markiert mit data-dp-h2c; geschrieben
-     wird nur in der Kopie. Gemessen 17.11.2026: Lesen und Schreiben abwechselnd in der Kopie fror den Reiter ein. */
-  var _farbAuftrag = null, _farbPseudo = '';
+    'outline-color', 'box-shadow', 'text-shadow', 'text-decoration-color', 'caret-color', 'column-rule-color', 'fill', 'stroke',
+    /* v3640a4 · gemessen: auch hier steht color()/oklab(), html2canvas liest sie mit */
+    'text-decoration', '-webkit-text-fill-color', '-webkit-text-stroke-color', 'text-emphasis-color', '-webkit-tap-highlight-color'];
+  /* v3640a4 · Alles passiert in der KOPIE, die html2canvas zeichnet (die Seite bleibt unberuehrt). Gemessen 17.11.2026:
+     - color()/oklab() auch in ::before/::after (91) und in text-decoration, -webkit-text-*-color
+     - eine gesetzte Farbe loest in der Kopie eine Transition aus, deren Zwischenwert wieder oklab ist -> erst
+       transition/animation aus, dann lesen, dann schreiben; Kinder mit color-mix(currentColor) aendern sich danach -> bis
+       zu drei Durchgaenge, jeder erst lesen, dann schreiben (abwechselnd fror der Reiter ein)
+     - Verlauf auf einem Element ohne Flaeche bricht html2canvas mit createPattern ab -> background-image none */
   function farbSatz(cs) {
     var satz = null;
     for (var k = 0; k < FARB_EIGENSCHAFTEN.length; k++) {
@@ -555,39 +560,37 @@
     }
     return satz;
   }
-  /* Nur im gezeichneten Teilbaum (wurzel), dazu ::before/::after - gemessen: 91 Pseudoelemente mit color() */
-  function farbenVormerken(wurzel) {
-    var alle = [wurzel].concat([].slice.call(wurzel.querySelectorAll('*'))), auftrag = [], markiert = [], pseudo = [];
-    for (var i = 0; i < alle.length; i++) {
-      var el = alle[i]; if (unsereFlaechen(el)) continue;
-      var satz = farbSatz(window.getComputedStyle(el)), ps = [];
-      ['::before', '::after'].forEach(function (p) {
-        var c = window.getComputedStyle(el, p);
-        if (c.content === 'none' || c.content === 'normal') return;
-        var x = farbSatz(c); if (x) ps.push([p, x]);
-      });
-      if (satz || ps.length) { auftrag.push(satz || []); markiert.push(el); pseudo.push(ps); }
-    }
-    var css = [];
-    for (var j = 0; j < markiert.length; j++) {
-      markiert[j].setAttribute('data-dp-h2c', String(j));   /* erst nach dem Lesen */
-      pseudo[j].forEach(function (q) { css.push('[data-dp-h2c="' + j + '"]' + q[0] + '{' + q[1].map(function (x) { return x[0] + ':' + x[1] + ' !important'; }).join(';') + '}'); });
-    }
-    _farbAuftrag = auftrag; _farbPseudo = css.join(' ');
-    return auftrag.length;
-  }
-  function farbenAufraeumen() {
-    [].forEach.call(document.querySelectorAll('[data-dp-h2c]'), function (e) { e.removeAttribute('data-dp-h2c'); });
-    _farbAuftrag = null; _farbPseudo = '';
-  }
   function farbenRetten(doc) {
-    if (!_farbAuftrag) return;
-    var ziele = doc.querySelectorAll('[data-dp-h2c]');
-    for (var i = 0; i < ziele.length; i++) {
-      var satz = _farbAuftrag[Number(ziele[i].getAttribute('data-dp-h2c'))]; if (!satz) continue;
-      for (var k = 0; k < satz.length; k++) { try { ziele[i].style.setProperty(satz[k][0], satz[k][1], 'important'); } catch (e) {} }
+    var win = doc.defaultView || window, r = doc.querySelector('[data-dp-wurzel]');
+    if (!r) return;
+    var liste = [r], e = r;
+    while (e.parentElement) { e = e.parentElement; liste.push(e); }
+    liste = liste.concat([].slice.call(r.querySelectorAll('*')));
+    liste.forEach(function (el) { if (el.style) { el.style.setProperty('transition', 'none', 'important'); el.style.setProperty('animation', 'none', 'important'); } });
+    var st = doc.createElement('style'); (doc.head || doc.documentElement).appendChild(st);
+    var regeln = [];
+    for (var lauf = 0; lauf < 3; lauf++) {
+      var auftrag = [], neuePseudo = 0;
+      liste.forEach(function (el, j) {
+        var cs = win.getComputedStyle(el), s = farbSatz(cs);
+        if (lauf === 0 && cs.backgroundImage !== 'none') { var rr = el.getBoundingClientRect(); if (rr.width < 1 || rr.height < 1) (s || (s = [])).push(['background-image', 'none']); }
+        if (s) auftrag.push([el, s]);
+        ['::before', '::after'].forEach(function (p) {
+          var c = win.getComputedStyle(el, p);
+          if (c.content === 'none' || c.content === 'normal') return;
+          var x = farbSatz(c);
+          if (lauf === 0 && c.backgroundImage !== 'none' && (parseFloat(c.width) < 1 || parseFloat(c.height) < 1)) (x || (x = [])).push(['background-image', 'none']);
+          if (!x) return;
+          neuePseudo++;
+          var a = 'data-dp-p' + p.slice(2, 3);
+          el.setAttribute(a, String(j));
+          regeln.push('[' + a + '="' + j + '"]' + p + '{' + x.map(function (q) { return q[0] + ':' + q[1] + ' !important'; }).join(';') + '}');
+        });
+      });
+      if (!auftrag.length && !neuePseudo) break;
+      auftrag.forEach(function (a) { a[1].forEach(function (q) { try { a[0].style.setProperty(q[0], q[1], 'important'); } catch (x) {} }); });
+      st.textContent = regeln.join(' ');
     }
-    if (_farbPseudo) { var st = doc.createElement('style'); st.textContent = _farbPseudo; (doc.head || doc.documentElement).appendChild(st); }
   }
   /* Kleinster Vorfahr, der den ganzen Ausschnitt enthaelt: html2canvas zeichnet dann nur diesen Teilbaum
      (gemessen 17.11.2026: document.body mit 9.540 Elementen brauchte 25 s) */
@@ -619,13 +622,14 @@
         setTimeout(function () {
           var sx = window.scrollX || window.pageXOffset || 0, sy = window.scrollY || window.pageYOffset || 0;
           var wurzel = wurzelFuer(rect);
-          try { farbenVormerken(wurzel); } catch (e) { farbenAufraeumen(); }
+          wurzel.setAttribute('data-dp-wurzel', '1');
+          toast('Ausschnitt wird aufgenommen …');
           window.html2canvas(wurzel, {
             x: rect.x + sx, y: rect.y + sy, width: rect.w, height: rect.h,
             scrollX: -sx, scrollY: -sy, windowWidth: document.documentElement.clientWidth, windowHeight: document.documentElement.clientHeight,
-            scale: Math.min(window.devicePixelRatio || 1, 2), useCORS: true, logging: false, backgroundColor: '#ffffff',
+            scale: Math.min(window.devicePixelRatio || 1, 2), useCORS: true, logging: false, backgroundColor: '#ffffff', imageTimeout: 2500,
             ignoreElements: function (el) { return unsereFlaechen(el) || (el.tagName === 'IFRAME' && !el.contains(wurzel)); }, onclone: farbenRetten
-          }).then(function (cv) { farbenAufraeumen(); zurueck(); fertig(cv); }, function (e) { farbenAufraeumen(); zurueck(); try { console.warn('[anmerkungen] Ausschnitt', e); } catch (x) {} toast('Der Ausschnitt ging nicht. Füge ein Bildschirmfoto mit „Bild einfügen“ ein.'); fertig(null); });
+          }).then(function (cv) { wurzel.removeAttribute('data-dp-wurzel'); zurueck(); fertig(cv); }, function (e) { wurzel.removeAttribute('data-dp-wurzel'); zurueck(); try { console.warn('[anmerkungen] Ausschnitt', e); } catch (x) {} toast('Der Ausschnitt ging nicht. Füge ein Bildschirmfoto mit „Bild einfügen“ ein.'); fertig(null); });
         }, 60);
       }
       o.addEventListener('pointerdown', function (ev) {
