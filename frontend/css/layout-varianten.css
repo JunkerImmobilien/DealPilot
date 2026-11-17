@@ -9652,3 +9652,16 @@ html[data-dp-layout][data-wl-logo-skala] .dpl-schiene .dpl-marke{
     max-width:100% !important;
   }
 }
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   v3630e · LOGO MITTIG (Marcel 17.11.2026: „Vielleicht sollten wir auch die
+   Moeglichkeit geben, das Logo zu zentrieren.")
+   whitelabel-override.js setzt data-wl-logo-mitte am <html>, wenn der Partner
+   in der Verwaltung „Mittig" waehlt. Ohne Attribut bleibt alles links.
+   ══════════════════════════════════════════════════════════════════════════════ */
+html[data-dp-layout][data-wl-logo-mitte] .dpl-schiene .dpl-marke{
+  justify-content:center !important;
+}
+html[data-dp-layout][data-dp-layout][data-wl-logo-mitte] body aside.sidebar#sidebar .dpl-marke-handy{
+  justify-content:center !important;
+}

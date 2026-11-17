@@ -505,6 +505,7 @@
        '--wl-obs-hi','--wl-obs-lo', '--wl-logo-skala']                         /* v1114, v3630 */
         .forEach(function (v) { r.removeProperty(v); });
       document.documentElement.removeAttribute('data-wl-logo-skala');   /* v3630 */
+      document.documentElement.removeAttribute('data-wl-logo-mitte');   /* v3630e */
       clearWlTokens(r);
     } catch (e) {}
     /* Marker loeschen, damit der naechste Sweep dieselben Knoten wieder anfasst */
@@ -577,6 +578,7 @@
     if (b.logoDunkel) _logoDunkel = b.logoDunkel;
     if (b.logoHell) _logoHell = b.logoHell;
     if (b.logoGroesse !== undefined) _setzeLogoGroesse(b.logoGroesse);   /* v3630 */
+    if (b.logoAusrichtung !== undefined) _setzeLogoAusrichtung(b.logoAusrichtung);   /* v3630e */
     _variantenNachrechnen();
     if (!_ok(b.accent)) { if (_label || _logo) { _active = true; sweepWordmark(); sweepLogoImgs(); sweepTexte(); _watch(); return true; } return false; }
     _acc = b.accent;
@@ -633,6 +635,12 @@
     r.setAttribute('data-wl-logo-skala', String(n));
     r.style.setProperty('--wl-logo-skala', String(n / 100));
   }
+  /* v3630e · Ausrichtung des Logos in der Menueleiste: 'links' (kein Attribut) | 'mitte'.
+     Die Regel steht in layout-varianten.css (Abschnitt v3630e). */
+  function _setzeLogoAusrichtung(a) {
+    var r = document.documentElement;
+    if (a === 'mitte') r.setAttribute('data-wl-logo-mitte', '1'); else r.removeAttribute('data-wl-logo-mitte');
+  }
   function _variantenNachrechnen() {
     if (!_logo || (_logoDunkel && _logoHell) || _varRechnet) return;
     var K = window.DealPilotLogoKontrast;
@@ -670,6 +678,7 @@
     accent: function () { return _acc; },
     label: function () { return _label; },              /* v3299 */
     logoGroesse: _setzeLogoGroesse,   /* v3630 · Live-Vorschau im Portal */
+    logoAusrichtung: _setzeLogoAusrichtung,   /* v3630e */
     logoFuer: function (dunkel) { return (dunkel ? _logoDunkel : _logoHell) || _logo; }   /* v3299 */
   };
 })();

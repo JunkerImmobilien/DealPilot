@@ -845,7 +845,7 @@ if (!window._pdfGold) {
     var s = document.createElement('style'); s.id = 'rp-pill-css';
     s.textContent = [
       '.sb-user-plan-pill.plan-partner,.sb-user-name .plan-partner{',
-      'background:linear-gradient(135deg,#E8C964,#9a7f33)!important;',
+      'background:linear-gradient(135deg,var(--wl-e8c964, #E8C964),var(--wl-9a7f33, #9a7f33))!important;',   /* v3630e Whitelabel-Pflicht */
       'color:#2A2727!important;font-weight:800!important;letter-spacing:.4px!important;',
       'border-color:transparent!important;}'
     ].join('');
@@ -853,6 +853,43 @@ if (!window._pdfGold) {
   }
 
   // ── Whitelabel-Branding ─────────────────────────────────────
+  /* v3630e · Standard-Akzent (DealPilot-Gold) und Akzent-Auswahl.
+     Gemessen 17.11.2026, Kontrast (WCAG) auf Obsidian #0A0A0C / auf Weiss:
+       Messing #A8862E 5,76/3,43 · Altgold #9C7A2A 4,93/4,01 · Bronze #8F7335 4,40/4,50
+       Stahlblau #2F6F8F 3,57/5,54 · Koenigsblau #1D5FA8 3,07/6,45 · Himmelblau #2B6CB0 3,65/5,42 · Indigo #3E63A8 3,35/5,91
+       Petrol #1F7A7A 3,88/5,09 · Tiefsee #2A6F77 3,43/5,77
+       Bordeaux #9E4256 3,17/6,24 · Weinrot #B03A52 3,37/5,88
+       Violett #7A55A8 3,48/5,69 · Blauviolett #5F5BA8 3,34/5,92
+       Anthrazit #5E6670 3,40/5,82 · Schiefer #707782 4,38/4,52
+       Kupfer #B0632E 4,40/4,50 · Rost #A65A2A 3,88/5,10 · Cognac #9A5B34 3,69/5,36
+     Ausgeschieden (< 3 : 1 auf einem Grund): #8E2C3C, #A3354A, #7B2D3B, #6A4C9C, #5B4A8A,
+     #3A5BA0. Keine Gruentoene und kein Hellrot - die Statusfarben #3FA56C und
+     #B8625C/#D8564C muessen unterscheidbar bleiben. Der Standard selbst liegt auf Weiss
+     bei 2,29 : 1 - er ist die Marke DealPilot und bleibt trotzdem die erste Wahl. */
+  var STANDARD_AKZENT = { a: '#C9A84C', hi: '#E8CC7A', lo: '#b8932f' };
+  var AKZENT_GRUPPEN = [
+    ['Gold und Messing', [['#A8862E', 'Messing'], ['#9C7A2A', 'Altgold'], ['#8F7335', 'Bronze']]],
+    ['Blau', [['#2F6F8F', 'Stahlblau'], ['#1D5FA8', 'Königsblau'], ['#2B6CB0', 'Himmelblau'], ['#3E63A8', 'Indigo']]],
+    ['Petrol', [['#1F7A7A', 'Petrol'], ['#2A6F77', 'Tiefsee']]],
+    ['Rot und Bordeaux', [['#9E4256', 'Bordeaux'], ['#B03A52', 'Weinrot']]],
+    ['Violett', [['#7A55A8', 'Violett'], ['#5F5BA8', 'Blauviolett']]],
+    ['Grau', [['#5E6670', 'Anthrazit'], ['#707782', 'Schiefer']]],
+    ['Orange und Kupfer', [['#B0632E', 'Kupfer'], ['#A65A2A', 'Rost'], ['#9A5B34', 'Cognac']]]
+  ];
+  function _kontrastText(hex) {
+    var K = window.DealPilotLogoKontrast; if (!K || !K.kontrast) return '';
+    var n = parseInt(hex.slice(1), 16), c = [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+    var f = function (x) { return (Math.round(x * 100) / 100).toFixed(2).replace('.', ','); };
+    return f(K.kontrast(c, [10, 10, 12])) + ' : 1 auf dunkel, ' + f(K.kontrast(c, [255, 255, 255])) + ' : 1 auf hell';
+  }
+  /* Abstufungen wie DealPilotWhitelabel.apply (hell +22 %, dunkel -16 %); fuer den
+     Standard die festen Toene. Wird mitgespeichert, damit keine alte Abstufung bleibt. */
+  function _akzentStufen(hex) {
+    if (String(hex).toLowerCase() === STANDARD_AKZENT.a.toLowerCase()) return { hi: STANDARD_AKZENT.hi, lo: STANDARD_AKZENT.lo };
+    var n = parseInt(String(hex).slice(1), 16), c = [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+    var h = function (a) { return '#' + a.map(function (x) { x = Math.max(0, Math.min(255, Math.round(x))); return ('0' + x.toString(16)).slice(-2); }).join(''); };
+    return { hi: h(c.map(function (x) { return x + (255 - x) * 0.22; })), lo: h(c.map(function (x) { return x * 0.84; })) };
+  }
   var _brandState = { logo: undefined, current_logo: '', logoDark: undefined, current_logo_dark: '', vari: null }; // logo undefined = unverändert, '' = entfernt
   function _currentLogo() { return _brandState.logo !== undefined ? _brandState.logo : (_brandState.current_logo || ''); }
   /* v3299 · zweites, optionales Logo fuer dunklen Grund (Vorrang dort) */
@@ -893,7 +930,8 @@ if (!window._pdfGold) {
                       darstellung: b.brand_logo_darstellung || 'auto', darstellung_gespeichert: b.brand_logo_darstellung || 'auto',
                       groesse: b.brand_logo_groesse == null ? 100 : b.brand_logo_groesse,
                       groesse_gespeichert: b.brand_logo_groesse == null ? 100 : b.brand_logo_groesse,
-                      zuschnitt: null, dvari: null };
+                      zuschnitt: null, dvari: null,
+                      ausrichtung: b.brand_logo_ausrichtung === 'mitte' ? 'mitte' : 'links' };   /* v3630e */
       /* v3299 · Branding vor v3299 gespeichert: Varianten einmal nachrechnen und
          ablegen - sonst fehlen sie in Mails (oeffentliche Logo-Route) und beim
          Kunden muss jeder Browser selbst rechnen. Aendert am Logo nichts. */
@@ -904,7 +942,7 @@ if (!window._pdfGold) {
             .catch(function () {});
         });
       }
-      var accent = b.brand_accent || '#C9A84C';
+      var accent = b.brand_accent || STANDARD_AKZENT.a;
       var obsidian = b.brand_obsidian || '#0b0b0a';
       var inp = 'width:100%;padding:9px 11px;border:1px solid #e6e0d4;border-radius:8px;font:400 13px Inter;outline:none';
       var pick = 'width:100%;height:38px;border:1px solid #e6e0d4;border-radius:8px;background:#fff;cursor:pointer';
@@ -917,7 +955,7 @@ if (!window._pdfGold) {
       var mailAcc = b.brand_mail_accent || accent;
       _brandState.pdfGroesse = b.brand_logo_pdf_groesse == null ? 100 : b.brand_logo_pdf_groesse;
       _brandState.gespeichert = { accent: accent, obsidian: obsidian, mail: mailAcc, pdflight: !!b.brand_pdf_light,
-        darstellung: _brandState.darstellung, groesse: _brandState.groesse, pdfGroesse: _brandState.pdfGroesse };
+        darstellung: _brandState.darstellung, groesse: _brandState.groesse, pdfGroesse: _brandState.pdfGroesse, ausrichtung: _brandState.ausrichtung };
       var abschnitt = function (titel, satz) {
         return '<div style="display:flex;align-items:baseline;gap:10px;margin:24px 0 6px">' +
           '<span style="font:700 15px \'Space Grotesk\',Inter,sans-serif;color:#2a2727">' + titel + '</span></div>' +
@@ -928,6 +966,10 @@ if (!window._pdfGold) {
           '<input type="color" id="' + id + '" value="' + esc(wert) + '" style="width:38px;height:30px;border:0;padding:0;background:none;cursor:pointer;flex:none">' +
           '<span style="min-width:0"><b style="display:block;font:600 12.5px Inter;color:#3a352c">' + titel + '</b>' +
           '<span style="font:400 11px/1.4 Inter;color:#8a8473">' + satz + '</span></span></label>';
+      };
+      /* v3630e · kleiner Knopf „Standard" neben jeder Einstellung, die einen hat */
+      var stdKnopf = function (was) {
+        return ' <button type="button" class="rp-b-std" data-std="' + was + '" style="margin-left:8px;padding:2px 9px;border:1px solid #e6e0d4;border-radius:999px;background:#fff;cursor:pointer;font:500 11px Inter;color:#6b6558;vertical-align:1px">Standard</button>';
       };
       var mini = 'font:600 10px/1 \'JetBrains Mono\',monospace;letter-spacing:.08em;text-transform:uppercase;color:#8a8473;margin-bottom:5px';
       w.innerHTML =
@@ -953,12 +995,18 @@ if (!window._pdfGold) {
           '<div id="rp-b-logo-ampel" style="font:400 11.5px/1.55 Inter;color:#6b6558;margin-bottom:9px"></div>' +
           '<input type="file" id="rp-b-logo" accept="image/*" style="font:400 12px Inter;max-width:100%">' +
           '<button class="rp-act remove" id="rp-b-logo-x" type="button" style="margin-left:8px">Logo entfernen</button>' +
-          '<div class="rp-fl" style="margin-top:16px">Logo auf dunklem Grund</div>' +
+          '<div class="rp-fl" style="margin-top:16px">Logo auf dunklem Grund' + stdKnopf('darst') + '</div>' +
           '<div style="font:400 11.5px Inter;color:#8a8473;margin-bottom:7px">So steht dein Logo in der Menüleiste, im Kopf der Mails und auf dunklen PDF-Deckblättern. Der Rahmen nimmt deine Akzentfarbe.</div>' +
           '<div id="rp-b-darst" role="radiogroup" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px"></div>' +
-          '<div class="rp-fl" style="margin-top:16px">Größe in der Menüleiste <b id="rp-b-gr-wert" style="color:#3a352c">' + _brandState.groesse + ' %</b></div>' +
+          '<div class="rp-fl" style="margin-top:16px">Größe in der Menüleiste <b id="rp-b-gr-wert" style="color:#3a352c">' + _brandState.groesse + ' %</b>' + stdKnopf('gr') + '</div>' +
           '<input type="range" id="rp-b-gr" min="60" max="160" step="5" value="' + _brandState.groesse + '" style="width:100%;max-width:420px;accent-color:var(--wl-c9a84c, #C9A84C)">' +
           '<div style="font:400 11.5px/1.5 Inter;color:#8a8473;margin-top:3px">Ein breites Logo füllt die Leiste schon bei 100 % aus. Größer wird es dann nur noch in der Höhe, soweit die Breite reicht.</div>' +
+          /* v3630e · Ausrichtung in der Menueleiste (Marcel 17.11.2026) */
+          '<div class="rp-fl" style="margin-top:16px">Ausrichtung in der Menüleiste' + stdKnopf('aus') + '</div>' +
+          '<div id="rp-b-aus" style="display:inline-flex;border:1px solid #e6e0d4;border-radius:9px;overflow:hidden">' +
+            '<button type="button" data-aus="links" style="padding:7px 14px;border:0;cursor:pointer;font:600 12px Inter">Links (Standard)</button>' +
+            '<button type="button" data-aus="mitte" style="padding:7px 14px;border:0;cursor:pointer;font:600 12px Inter">Mittig</button></div>' +
+          '<div style="font:400 11.5px/1.5 Inter;color:#8a8473;margin-top:3px">Gilt für die Menüleiste. Auf dem Deckblatt und im Mail-Kopf steht das Logo ohnehin mittig. Im Seitenkopf der PDFs bleibt es links, weil dort mittig der Seitentitel steht.</div>' +
           '<details style="margin-top:14px"><summary style="cursor:pointer;font:600 12.5px Inter;color:#3a352c">Eigenes Logo für dunklen Grund (selten nötig)</summary>' +
             '<div style="font:400 11.5px Inter;color:#8a8473;margin:7px 0">Hast du eine helle Fassung deines Logos, lade sie hier hoch. Sie steht dann überall auf dunklem Grund.</div>' +
             '<input type="file" id="rp-b-logo-dark" accept="image/*" style="font:400 12px Inter;max-width:100%">' +
@@ -972,11 +1020,21 @@ if (!window._pdfGold) {
             farbe('rp-b-obsidian', 'Menü und Kopfleiste', obsidian, 'die dunkle Fläche links und oben') +
             farbe('rp-b-mail', 'Farbe der Mails', mailAcc, 'Knopf und Linie in Einladungs-Mails') +
           '</div>' +
-          '<div class="rp-fl" style="margin-top:12px">Schnell wählen</div>' +
-          '<div id="rp-b-pre" style="display:flex;flex-wrap:wrap;gap:6px">' +
-            [['#b33d29', '#141210', 'Kanzlei-Rot'], ['#1d5fa8', '#0b1018', 'Makler-Blau'], ['#2c7a5b', '#0a1210', 'Finanz-Grün'], ['#5b4a8a', '#0f0c16', 'Violett']].map(function (p) {
-              return '<button type="button" data-p="' + p[0] + '|' + p[1] + '" style="display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border:1px solid #e6e0d4;border-radius:999px;background:#fff;cursor:pointer;font:500 12px Inter;color:#3a352c">' +
-                '<i style="width:12px;height:12px;border-radius:50%;background:' + p[0] + ';display:inline-block"></i>' + p[2] + '</button>';
+          /* v3630e · Marcel: „Bitte noch mehr Akzent-Auswahl angeben. Und immer den Standard."
+             Erste Kachel Standard (DealPilot-Gold), dann Toene in Gruppen. Jeder Ton ist
+             gemessen >= 3 : 1 auf Obsidian #0A0A0C UND auf Weiss (AKZENT_TOENE, Werte im
+             Kommentar dort). Gruen und Hellrot fehlen bewusst: Statusfarben. */
+          '<div class="rp-fl" style="margin-top:12px">Akzent schnell wählen</div>' +
+          '<div id="rp-b-pre">' +
+            '<button type="button" data-p="std" style="display:inline-flex;align-items:center;gap:8px;padding:7px 12px;border:2px solid ' + STANDARD_AKZENT.a + ';border-radius:999px;background:#fff;cursor:pointer;font:600 12px Inter;color:#3a352c;margin-bottom:8px">' +
+              '<i style="width:14px;height:14px;border-radius:50%;background:linear-gradient(135deg,' + STANDARD_AKZENT.hi + ',' + STANDARD_AKZENT.a + ' 55%,' + STANDARD_AKZENT.lo + ');display:inline-block"></i>Standard (DealPilot-Gold)</button>' +
+            AKZENT_GRUPPEN.map(function (g) {
+              return '<div style="display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:6px">' +
+                '<span style="font:600 10px/1 \'JetBrains Mono\',monospace;letter-spacing:.06em;text-transform:uppercase;color:#8a8473;width:110px;flex:none">' + g[0] + '</span>' +
+                g[1].map(function (t) {
+                  return '<button type="button" data-p="' + t[0] + '" title="' + t[1] + ', Kontrast ' + _kontrastText(t[0]) + '" style="display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border:1px solid #e6e0d4;border-radius:999px;background:#fff;cursor:pointer;font:500 12px Inter;color:#3a352c">' +
+                    '<i style="width:12px;height:12px;border-radius:50%;background:' + t[0] + ';display:inline-block"></i>' + t[1] + '</button>';
+                }).join('') + '</div>';
             }).join('') +
           '</div>' +
         '</div>' +
@@ -986,9 +1044,9 @@ if (!window._pdfGold) {
           '<input type="hidden" id="rp-b-pdflight" value="' + (b.brand_pdf_light ? '1' : '0') + '">' +
           '<div class="rp-fl">Deckblatt</div>' +
           '<div id="rp-b-pdfart" style="display:inline-flex;border:1px solid #e6e0d4;border-radius:9px;overflow:hidden;margin-bottom:12px">' +
-            '<button type="button" data-hell="0" style="padding:7px 14px;border:0;cursor:pointer;font:600 12px Inter">Dunkel</button>' +
+            '<button type="button" data-hell="0" style="padding:7px 14px;border:0;cursor:pointer;font:600 12px Inter">Dunkel (Standard)</button>' +
             '<button type="button" data-hell="1" style="padding:7px 14px;border:0;cursor:pointer;font:600 12px Inter">Hell</button></div>' +
-          '<div class="rp-fl">Logogröße in den Dokumenten <b id="rp-b-pdfgr-wert" style="color:#3a352c">' + _brandState.pdfGroesse + ' %</b></div>' +
+          '<div class="rp-fl">Logogröße in den Dokumenten <b id="rp-b-pdfgr-wert" style="color:#3a352c">' + _brandState.pdfGroesse + ' %</b>' + stdKnopf('pdfgr') + '</div>' +
           '<input type="range" id="rp-b-pdfgr" min="60" max="150" step="5" value="' + _brandState.pdfGroesse + '" style="width:100%;max-width:420px;accent-color:var(--wl-c9a84c, #C9A84C)">' +
           '<div style="font:400 11.5px/1.5 Inter;color:#8a8473;margin:3px 0 10px">Größer geht nur, solange das Logo nicht in Text oder Linien läuft. Steht es an dieser Grenze, wächst es nicht weiter.</div>' +
           '<div id="rp-b-pdfprev" style="display:flex;flex-wrap:wrap;gap:12px"></div>' +
@@ -1031,9 +1089,28 @@ if (!window._pdfGold) {
       });
       $('rp-b-pre').addEventListener('click', function (e) {
         var bt = e.target && e.target.closest ? e.target.closest('[data-p]') : null; if (!bt) return;
-        var p = bt.getAttribute('data-p').split('|');
-        $('rp-b-accent').value = p[0]; $('rp-b-obsidian').value = p[1]; $('rp-b-mail').value = p[0];
-        _brandState.vari = null; _brandState.dvari = null; _standZeigen(); upd(); _pdfPrev();
+        /* v3630e · Standard setzt Akzent UND Mail auf DealPilot-Gold, die Menueflaeche bleibt */
+        var p = bt.getAttribute('data-p'), a = p === 'std' ? STANDARD_AKZENT.a : p;
+        $('rp-b-accent').value = a; $('rp-b-mail').value = a;
+        _brandState.vari = null; _brandState.dvari = null; _standZeigen(); upd(); _pdfPrev(); _wahlMarkieren();
+      });
+      /* v3630e · Ausrichtung */
+      $('rp-b-aus').addEventListener('click', function (e) {
+        var bt = e.target && e.target.closest ? e.target.closest('[data-aus]') : null; if (!bt) return;
+        _brandState.ausrichtung = bt.getAttribute('data-aus');
+        _logoPrevGroesse(); _standZeigen(); _wahlMarkieren();
+        try { if (_previewOn() && window.DealPilotWhitelabel && DealPilotWhitelabel.logoAusrichtung) DealPilotWhitelabel.logoAusrichtung(_brandState.ausrichtung); } catch (e2) {}
+      });
+      /* v3630e · Knoepfe „Standard" */
+      [].forEach.call(w.querySelectorAll('.rp-b-std'), function (bt) {
+        bt.addEventListener('click', function () {
+          var was = bt.getAttribute('data-std');
+          if (was === 'gr') { var g1 = $('rp-b-gr'); g1.value = '100'; g1.dispatchEvent(new Event('input', { bubbles: true })); }
+          else if (was === 'pdfgr') { var g2 = $('rp-b-pdfgr'); g2.value = '100'; g2.dispatchEvent(new Event('input', { bubbles: true })); }
+          else if (was === 'aus') { var k1 = w.querySelector('#rp-b-aus [data-aus="links"]'); if (k1) k1.click(); }
+          else if (was === 'darst') { _brandState.darstellung = 'auto'; upd(); }
+          _wahlMarkieren();
+        });
       });
       $('rp-b-pdfart').addEventListener('click', function (e) {
         var bt = e.target && e.target.closest ? e.target.closest('[data-hell]') : null; if (!bt) return;
@@ -1049,11 +1126,13 @@ if (!window._pdfGold) {
         $('rp-b-accent').value = g.accent; $('rp-b-obsidian').value = g.obsidian; $('rp-b-mail').value = g.mail;
         $('rp-b-pdflight').value = g.pdflight ? '1' : '0';
         _brandState.darstellung = g.darstellung || 'auto';
+        _brandState.ausrichtung = g.ausrichtung || 'links';   /* v3630e */
+        try { if (window.DealPilotWhitelabel && DealPilotWhitelabel.logoAusrichtung) DealPilotWhitelabel.logoAusrichtung(_brandState.ausrichtung); } catch (e3) {}
         _brandState.groesse = g.groesse || 100; $('rp-b-gr').value = _brandState.groesse; $('rp-b-gr-wert').textContent = _brandState.groesse + ' %';
         _brandState.pdfGroesse = g.pdfGroesse || 100; $('rp-b-pdfgr').value = _brandState.pdfGroesse; $('rp-b-pdfgr-wert').textContent = _brandState.pdfGroesse + ' %';
         _brandState.logo = undefined; _brandState.logoDark = undefined; _brandState.vari = null; _brandState.dvari = null;
         try { if (window.DealPilotWhitelabel && DealPilotWhitelabel.logoGroesse) DealPilotWhitelabel.logoGroesse(_brandState.groesse); } catch (e2) {}
-        upd(); _pdfPrev(); _standZeigen();
+        upd(); _pdfPrev(); _standZeigen(); _wahlMarkieren(); _logoPrevGroesse();
         toast('Gespeicherter Stand wiederhergestellt');
       });
       $('rp-b-logo').addEventListener('change', function (e) { _brandLogoPick(e, upd); });
@@ -1070,7 +1149,7 @@ if (!window._pdfGold) {
       $('rp-b-gr').addEventListener('input', function () {
         _brandState.groesse = parseInt(this.value, 10) || 100;
         var w = $('rp-b-gr-wert'); if (w) w.textContent = _brandState.groesse + ' %';
-        _logoPrevGroesse();
+        _logoPrevGroesse(); _standZeigen();
         try { if (_previewOn() && window.DealPilotWhitelabel && DealPilotWhitelabel.logoGroesse) DealPilotWhitelabel.logoGroesse(_brandState.groesse); } catch (e2) {}
       });
       ['rp-b-company','rp-b-address','rp-b-plz','rp-b-city','rp-b-phone','rp-b-email','rp-b-website','rp-b-tagline']
@@ -1091,6 +1170,7 @@ if (!window._pdfGold) {
       $('rp-b-save').addEventListener('click', saveBranding);
       _brandPreview(); _logoPrev();   /*W22-logoprev*/
       _pdfPrev(); _standZeigen();     /* v3630b */
+      _wahlMarkieren();               /* v3630e */
       /* v3630b · Marcel: Reihenfolge Marke · Logo · Farben · Dokumente · Plaetze/Abo.
          Die Karten baut partner-kunden.js verwaltungZeichnen() (Plaetze, Abrechnung,
          Marke). Die Datei bearbeitete am 17.11. parallel ein anderer Strang, deshalb
@@ -1106,7 +1186,7 @@ if (!window._pdfGold) {
     } catch (e) { w.innerHTML = '<p class="rp-ph">Branding konnte nicht geladen werden.</p>'; }
   }
   /* W22-logoprev · v3630: Vorschau in Groesse der echten Menueleiste, Auswahl der Darstellung */
-  var DARST_TITEL = { 'auto': 'Automatisch', 'weiss': 'Weiße Fläche', 'gold': 'Rahmen, innen hell', 'gold-dunkel': 'Rahmen, innen dunkel' };
+  var DARST_TITEL = { 'auto': 'Automatisch (Standard)', 'weiss': 'Weiße Fläche', 'gold': 'Rahmen, innen hell', 'gold-dunkel': 'Rahmen, innen dunkel' };
   var DARST_TEXT = { 'auto': 'eingefärbt oder auf Platte, nur wenn der Kontrast nicht reicht',
                      'weiss': 'Logo auf weißem, abgerundetem Kasten',
                      'gold': 'dünner Rahmen in deiner Akzentfarbe, innen weiß',
@@ -1120,6 +1200,29 @@ if (!window._pdfGold) {
       img.style.maxHeight = Math.round(60 * s) + 'px';
       img.style.maxWidth = Math.round(Math.min(216 * s, 216)) + 'px';
       box.style.minHeight = Math.max(100, Math.round(60 * s + 30)) + 'px';
+      box.style.justifyContent = _brandState.ausrichtung === 'mitte' ? 'center' : 'flex-start';   /* v3630e */
+    });
+  }
+  /* v3630e · gewaehlte Knoepfe und Kacheln markieren, Knopf „Standard" nur aktiv, wenn abweichend */
+  function _wahlMarkieren() {
+    var paar = function (sel, attr, wert) {
+      [].forEach.call(document.querySelectorAll(sel), function (bt) {
+        var an = bt.getAttribute(attr) === wert;
+        bt.style.background = an ? '#2a2727' : '#fff'; bt.style.color = an ? '#fff' : '#3a352c';
+      });
+    };
+    paar('#rp-b-aus [data-aus]', 'data-aus', _brandState.ausrichtung || 'links');
+    var acc = String(_v('rp-b-accent')).toLowerCase();
+    [].forEach.call(document.querySelectorAll('#rp-b-pre [data-p]'), function (bt) {
+      var p = bt.getAttribute('data-p'), hex = (p === 'std' ? STANDARD_AKZENT.a : p).toLowerCase();
+      bt.style.boxShadow = hex === acc ? '0 0 0 2px #2a2727' : 'none';
+    });
+    var abw = { gr: (_brandState.groesse || 100) !== 100, pdfgr: (_brandState.pdfGroesse || 100) !== 100,
+                aus: (_brandState.ausrichtung || 'links') !== 'links', darst: (_brandState.darstellung || 'auto') !== 'auto' };
+    [].forEach.call(document.querySelectorAll('.rp-b-std'), function (bt) {
+      var an = !!abw[bt.getAttribute('data-std')];
+      bt.disabled = !an; bt.style.opacity = an ? 1 : 0.45; bt.style.cursor = an ? 'pointer' : 'default';
+      bt.title = an ? 'Auf den Standard zurücksetzen' : 'Steht auf dem Standard';
     });
   }
   /* v3630b · Stand: was ist geaendert und noch nicht gespeichert */
@@ -1129,8 +1232,9 @@ if (!window._pdfGold) {
     if (_brandState.logo !== undefined || _brandState.logoDark !== undefined) an.push('Logo');
     var gl = function (x) { return String(x || '').toLowerCase(); };   /* type=color liefert Kleinbuchstaben */
     if (gl(_v('rp-b-accent')) !== gl(g.accent) || gl(_v('rp-b-obsidian')) !== gl(g.obsidian) || gl(_v('rp-b-mail')) !== gl(g.mail)) an.push('Farben');
-    if (_brandState.darstellung !== g.darstellung || _brandState.groesse !== g.groesse) an.push('Logo in der App');
+    if (_brandState.darstellung !== g.darstellung || _brandState.groesse !== g.groesse || _brandState.ausrichtung !== g.ausrichtung) an.push('Logo in der App');
     if ((_v('rp-b-pdflight') === '1') !== !!g.pdflight || _brandState.pdfGroesse !== g.pdfGroesse) an.push('Dokumente');
+    try { _wahlMarkieren(); } catch (e9) {}   /* v3630e */
     el.innerHTML = an.length ? 'Geändert: ' + an.join(', ') + '. <b style="color:#3a352c">Noch nicht gespeichert.</b>' : 'Alles gespeichert.';
   }
   /* v3630b · Vorschau der Dokumente in echten Massen (1 mm = 1,15 px): Deckblatt
@@ -1273,7 +1377,7 @@ if (!window._pdfGold) {
     var wl = $('rp-b-wl') && $('rp-b-wl').checked;
     var name = ($('rp-b-name') || {}).value || 'Deine Kanzlei';
     /* v3630b · die Mail nimmt die Mail-Farbe (brand_mail_accent), nicht den App-Akzent */
-    var accent = ($('rp-b-mail') || {}).value || ($('rp-b-accent') || {}).value || '#C9A84C';
+    var accent = ($('rp-b-mail') || {}).value || ($('rp-b-accent') || {}).value || STANDARD_AKZENT.a;
     var obsidian = ($('rp-b-obsidian') || {}).value || '#0b0b0a';
     var logo = _currentLogo();
     /* v3299 · im Mail-Kopf (dunkel) steht die Variante fuer dunklen Grund */
@@ -1332,15 +1436,17 @@ if (!window._pdfGold) {
       var acc = _v('rp-b-accent');
       if (!/^#[0-9a-fA-F]{6}$/.test(acc)) return;
       var obs = _v('rp-b-obsidian');
+      var _stp = _akzentStufen(acc);   /* v3630e · Standard mit den festen Gold-Toenen */
       window.DealPilotWhitelabel.apply({
-        accent: acc,
+        accent: acc, accentHi: _stp.hi, accentLo: _stp.lo,
         obsidian: /^#[0-9a-fA-F]{6}$/.test(obs) ? obs : null,
         name: _v('rp-b-name') || '',
         logo: _currentLogo() || '',
         /* v3630 · gewaehlte Darstellung und Groesse live in der App */
         logoDunkel: (_brandState.vari && _brandState.vari.v && _brandState.vari.v.auf_dunkel) || '',
         logoHell: (_brandState.vari && _brandState.vari.v && _brandState.vari.v.auf_hell) || '',
-        logoGroesse: _brandState.groesse || 100
+        logoGroesse: _brandState.groesse || 100,
+        logoAusrichtung: _brandState.ausrichtung || 'links'   /* v3630e */
       });
       _rpTinte();   /* v3301 · Hero-Text folgt der Vorschaufarbe */
     } catch (e) {}
@@ -1357,6 +1463,9 @@ if (!window._pdfGold) {
     body.brand_logo_darstellung = _brandState.darstellung || 'auto';   /* v3630 */
     body.brand_logo_groesse = _brandState.groesse || 100;              /* v3630 */
     body.brand_logo_pdf_groesse = _brandState.pdfGroesse || 100;       /* v3630b */
+    body.brand_logo_ausrichtung = _brandState.ausrichtung || 'links';  /* v3630e */
+    /* v3630e · Abstufungen zum Akzent mitspeichern (Standard: die festen Gold-Toene) */
+    if (/^#[0-9a-fA-F]{6}$/.test(body.brand_accent)) { var _st3 = _akzentStufen(body.brand_accent); body.brand_accent_hi = _st3.hi; body.brand_accent_lo = _st3.lo; }
     /* v3299 · Logo-Kontrast: Varianten je Grund mitschicken (PNG, auch fuer SVG-Logos) */
     try {
       if (_currentLogo()) {
@@ -1386,12 +1495,12 @@ if (!window._pdfGold) {
       _brandState.darstellung_gespeichert = _brandState.darstellung; _brandState.groesse_gespeichert = _brandState.groesse;   /* v3630 */
       /* v3630b · gespeicherter Stand fuer Zuruecksetzen, und sofort in den Markensatz (PDFs) */
       _brandState.gespeichert = { accent: _v('rp-b-accent'), obsidian: _v('rp-b-obsidian'), mail: _v('rp-b-mail'),
-        pdflight: _v('rp-b-pdflight') === '1', darstellung: _brandState.darstellung, groesse: _brandState.groesse, pdfGroesse: _brandState.pdfGroesse };
+        pdflight: _v('rp-b-pdflight') === '1', darstellung: _brandState.darstellung, groesse: _brandState.groesse, pdfGroesse: _brandState.pdfGroesse, ausrichtung: _brandState.ausrichtung };
       try {
         if (window.DealPilotMandantBranding && DealPilotMandantBranding.merke) {
           var mf = { brand_logo_pdf_groesse: _brandState.pdfGroesse, brand_pdf_light: _v('rp-b-pdflight') === '1',
-                     brand_logo_groesse: _brandState.groesse, brand_logo_darstellung: _brandState.darstellung,
-                     brand_accent: body.brand_accent, brand_obsidian: body.brand_obsidian, brand_mail_accent: _v('rp-b-mail') };
+                     brand_logo_groesse: _brandState.groesse, brand_logo_darstellung: _brandState.darstellung, brand_logo_ausrichtung: _brandState.ausrichtung,
+                     brand_accent: body.brand_accent, brand_accent_hi: body.brand_accent_hi, brand_accent_lo: body.brand_accent_lo, brand_obsidian: body.brand_obsidian, brand_mail_accent: _v('rp-b-mail') };
           if (body.brand_logo_b64 !== undefined) mf.brand_logo_b64 = body.brand_logo_b64 || null;
           if (body.brand_logo_varianten) { mf.brand_logo_auf_dunkel = body.brand_logo_varianten.auf_dunkel; mf.brand_logo_auf_hell = body.brand_logo_varianten.auf_hell; }
           DealPilotMandantBranding.merke(mf);
@@ -1673,7 +1782,8 @@ if (!window._pdfGold) {
         accent: b.brand_accent, accentHi: b.brand_accent_hi, accentLo: b.brand_accent_lo,
         obsidian: b.brand_obsidian, name: b.brand_name, logo: b.brand_logo_b64,
         logoDunkel: b.brand_logo_auf_dunkel || '', logoHell: b.brand_logo_auf_hell || '',   /* v3299 */
-        logoGroesse: b.brand_logo_groesse == null ? 100 : b.brand_logo_groesse   /* v3630 */
+        logoGroesse: b.brand_logo_groesse == null ? 100 : b.brand_logo_groesse,   /* v3630 */
+        logoAusrichtung: b.brand_logo_ausrichtung || 'links'   /* v3630e */
       });
     }).catch(function () { /* kein Partner / kein Branding -> normal weiter */ });
   })(0);

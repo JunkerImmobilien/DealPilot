@@ -66,7 +66,8 @@
         name: _b.brand_name || '', logo: _b.brand_logo_b64 || '',
         /* v3299 · Logo-Kontrast: fertige Varianten je Grund */
         logoDunkel: _b.brand_logo_auf_dunkel || '', logoHell: _b.brand_logo_auf_hell || '',
-        logoGroesse: _b.brand_logo_groesse == null ? 100 : _b.brand_logo_groesse   /* v3630 */
+        logoGroesse: _b.brand_logo_groesse == null ? 100 : _b.brand_logo_groesse,   /* v3630 */
+        logoAusrichtung: _b.brand_logo_ausrichtung || 'links'   /* v3630e */
       })) return;   // Override hat die Tokens schon gesetzt
     } catch (e) {}
     var r = document.documentElement.style;
@@ -295,7 +296,8 @@
             accent: c.brand_accent, accentHi: c.brand_accent_hi, accentLo: c.brand_accent_lo,
             obsidian: c.brand_obsidian, name: c.brand_name, logo: c.brand_logo_b64,
             logoDunkel: c.brand_logo_auf_dunkel || '', logoHell: c.brand_logo_auf_hell || '',   /* v3299 */
-            logoGroesse: c.brand_logo_groesse == null ? 100 : c.brand_logo_groesse   /* v3630 */
+            logoGroesse: c.brand_logo_groesse == null ? 100 : c.brand_logo_groesse,   /* v3630 */
+            logoAusrichtung: c.brand_logo_ausrichtung || 'links'   /* v3630e */
           });
         } catch (e) {}
       };
