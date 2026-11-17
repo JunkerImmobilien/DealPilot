@@ -765,6 +765,8 @@
     }
     /* v3058: success:false kommt mit HTTP 200 — bis hier wurde daraus stumm ein leeres Ergebnis */
     if (data.success === false) throw new Error(data.error || 'Die KI-Antwort konnte nicht ausgewertet werden.');
+    /* v3660 · Modernisierungen je Gewerk mit Beleg ins Objekt (Grundlage der Restnutzungsdauer) */
+    try { if (window.DpModUI && typeof window.DpModUI.ausExpose === 'function') window.DpModUI.ausExpose(text, data.extracted || {}); } catch (e) {}
     return data.extracted || {};
   }
 

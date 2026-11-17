@@ -3330,6 +3330,68 @@ async function suggestQcFields(group, context, opts) {
 /**
  * V38: Strukturierte Datenextraktion aus PDF-Exposé-Text.
  */
+/* v3660 · Modernisierungen aus dem Exposé: nur die acht Gewerke der Anlage 2, nur mit einem
+   Zitat, das wirklich im (geschwaerzten) Text steht. Normalisieren, nicht bewerten. */
+const _GEWERKE_A2 = ['dach', 'fenster', 'leitungen', 'heizung', 'aussenwand', 'baeder', 'innenausbau', 'grundriss'];
+function _modernisierungenNorm(liste, text) {
+  if (!Array.isArray(liste)) return [];
+  const hay = String(text || '').replace(/\s+/g, ' ').toLowerCase();
+  return liste.map(function (x) {
+    if (!x || typeof x !== 'object') return null;
+    let g = String(x.gewerk || '').toLowerCase().trim();
+    if (g === 'daemmung' || g === 'außenwand' || g === 'fassade') g = 'aussenwand';
+    if (g === 'bad' || g === 'bäder') g = 'baeder';
+    if (_GEWERKE_A2.indexOf(g) < 0) return null;
+    const zitat = String(x.zitat || '').replace(/\s+/g, ' ').trim();
+    if (zitat.length < 4 || hay.indexOf(zitat.toLowerCase().slice(0, 40)) < 0) return null;
+    const j = Number(x.jahr);
+    return { gewerk: g, art: x.art === 'allgemein' ? 'allgemein' : 'konkret',
+             richtung: x.richtung === 'negativ' ? 'negativ' : 'positiv',
+             umfang: /teil/.test(String(x.umfang || '')) ? 'teilweise' : (/ueberwieg|überwieg/.test(String(x.umfang || '')) ? 'ueberwiegend' : 'vollstaendig'),
+             jahr: Number.isFinite(j) && j > 1900 && j <= new Date().getFullYear() ? j : null, zitat: zitat.slice(0, 220) };
+  }).filter(Boolean).slice(0, 24);
+}
+
+/* ══ v3660 · ZUSTAND AUS DEN BILDERN ═══════════════════════════════════════════
+   Marcel 17.11.2026: „Er soll aus den Bildern den Zustand ableiten und setzen, bitte mit Text
+   daneben." Je SICHTBAREM Gewerk der Anlage 2 eine Stufe mit Sicherheit und einem Satz, was
+   zu sehen ist. Keine Punkte - die vergibt modernisierung-herkunft.js (normFotos/kombinieren).
+   Bis 8 Bilder, verkleinert im Browser (ui.js _dpResizeDataUrl), ein Aufruf je Bildsatz; das
+   Ergebnis speichert das Objekt (mod_ableitung), es wird nicht bei jedem Oeffnen neu gefragt. */
+async function zustandAusBildern(fotos, opts) {
+  const o = opts || {};
+  const bilder = (Array.isArray(fotos) ? fotos : []).filter(function (f) { return typeof f === 'string' && f.indexOf('data:image') === 0; }).slice(0, 8);
+  if (!bilder.length) return { success: false, error: 'Keine Bilder.' };
+  const prompt = [
+    'Du siehst Fotos einer Immobilie in Deutschland' + (o.baujahr ? ' (Baujahr ' + o.baujahr + ')' : '') + '.',
+    'Beurteile NUR, was auf den Bildern wirklich zu sehen ist, je Bauteil der Anlage 2 ImmoWertV:',
+    'dach, fenster, leitungen, heizung, aussenwand, baeder, innenausbau, grundriss.',
+    'Stufe je Bauteil: "neuwertig" (sichtbar in den letzten rund 10 Jahren erneuert), "zeitgemaess" (gepflegt, funktional, nicht neu),',
+    '"veraltet" (bauzeitlich, abgenutzt, erneuerungsbeduerftig). Ist ein Bauteil auf keinem Bild zu sehen: WEGLASSEN.',
+    'Leitungen und Grundriss sind fast nie zu beurteilen - dann weglassen. Nichts erfinden, keine Vermutung ueber Unsichtbares.',
+    'Antwort STRIKT als JSON, kein Markdown:',
+    '{ "gewerke": { "<bauteil>": { "stufe": "neuwertig|zeitgemaess|veraltet", "sicherheit": "hoch|mittel|niedrig",',
+    '    "beschreibung": "ein kurzer Satz, was zu sehen ist (z. B. Kunststofffenster mit Isolierverglasung)" } },',
+    '  "gesamteindruck": "ein Satz zum sichtbaren Zustand" }'
+  ].join('\n');
+  const teile = [{ type: 'input_text', text: prompt }].concat(bilder.map(function (f) { return { type: 'input_image', image_url: f }; }));
+  const r = await _callOpenAIVision(teile, { userApiKey: o.userApiKey, model: o.model, maxTokens: 1500, temperature: 0, kiFunktion: 'zustand-bilder' });
+  const j = extractJson(r.text);
+  if (!j || typeof j !== 'object') return { success: false, error: 'KI-Antwort konnte nicht ausgewertet werden.' };
+  const aus = {};
+  const g = (j.gewerke && typeof j.gewerke === 'object') ? j.gewerke : {};
+  Object.keys(g).forEach(function (k) {
+    let id = String(k).toLowerCase(); if (id === 'daemmung' || id === 'fassade') id = 'aussenwand'; if (id === 'bad') id = 'baeder';
+    const x = g[k];
+    if (_GEWERKE_A2.indexOf(id) < 0 || !x || typeof x !== 'object') return;
+    const st = String(x.stufe || '').toLowerCase();
+    if (['neuwertig', 'zeitgemaess', 'veraltet'].indexOf(st) < 0) return;
+    aus[id] = { stufe: st, sicherheit: /hoch|mittel|niedrig/.test(String(x.sicherheit || '')) ? String(x.sicherheit).toLowerCase() : 'mittel',
+                beschreibung: String(x.beschreibung || '').trim().slice(0, 200) };
+  });
+  return { success: true, model: r.model, gewerke: aus, gesamteindruck: String(j.gesamteindruck || '').trim().slice(0, 300), bilder: bilder.length };
+}
+
 async function extractExpose(text, opts) {
   const prompt = [
     'Du bekommst den Text eines deutschen Immobilien-Exposés (ImmoScout, Kleinanzeigen, Maklerbroschüre etc.).',
@@ -3364,6 +3426,14 @@ async function extractExpose(text, opts) {
     '  - keller: true/false',
     '  - aufzug: true/false',
     '  - zustand: einer von "Neubau", "Erstbezug", "saniert", "renoviert", "modernisiert", "renovierungsbedürftig"',
+    '',
+    'MODERNISIERUNGEN (v3660 - fuer die Restnutzungsdauer nach Anlage 2 ImmoWertV): je Bauteil, zu dem der Text etwas SAGT, ein Eintrag.',
+    '  - modernisierungen: Liste von { "gewerk": einer von "dach","fenster","leitungen","heizung","aussenwand","baeder","innenausbau","grundriss",',
+    '      "art": "konkret" (Aussage zu genau diesem Bauteil) oder "allgemein" (Satz ueber das ganze Haus/alle Wohnungen),',
+    '      "richtung": "positiv" (modernisiert/erneuert) oder "negativ" (veraltet, erneuerungsbeduerftig, Stau),',
+    '      "umfang": "vollstaendig" | "teilweise" | "ueberwiegend", "jahr": Jahreszahl oder null,',
+    '      "zitat": WOERTLICHER Satzteil aus dem Exposé als Beleg (unveraendert kopieren) }',
+    '    Nur was dasteht: "gepflegt" oder "solide Substanz" ist KEINE Modernisierung. Ohne Aussage: leere Liste.',
     '',
     'MIETE (NUR falls der Bericht Mietdaten enthaelt, z.B. Sprengnetter-Mietgutachten; sonst weglassen/null — NICHTS erfinden):',
     '  - marktmiete_qm: Marktmiete (Nettokaltmiete) pro m² in Euro (Zahl)',
@@ -3429,6 +3499,10 @@ async function extractExpose(text, opts) {
   ['balkon', 'keller', 'aufzug'].forEach(k => {
     if (ext[k] != null) cleaned[k] = Boolean(ext[k]);
   });
+  /* v3660 · Modernisierungen je Gewerk mit woertlichem Beleg. Ein Zitat, das im Text nicht
+     steht, faellt weg (Beleg muss die Seite lesen); die Punkte vergibt NICHT die KI, sondern
+     frontend/js/modernisierung-herkunft.js aus diesen Belegen. */
+  cleaned.modernisierungen = _modernisierungenNorm(ext.modernisierungen, text);
 
   return { success: true, model: r.model, extracted: cleaned };
 }
@@ -3450,6 +3524,7 @@ async function extractPaket(text, opts) {
     '      "wohnflaeche": 429.47, "gewerbeflaeche": null, "grundstuecksflaeche": 365, "wohneinheiten": 6, "gewerbeeinheiten": 0,',
     '      "garagen": 2, "stellplaetze": 0, "miete_soll_jahr": 52148.64, "miete_ist_jahr": 40464, "energieklasse": "F",',
     '      "energiewert": 171, "heizungsart": "Öl-Brennwert",',
+    '      "modernisierungen": [ { "gewerk": "aussenwand", "art": "konkret", "richtung": "positiv", "umfang": "vollstaendig", "jahr": null, "zitat": "Fassade mit WDVS gedämmt" } ],',
     '      "einheiten": [ { "lage": "EG links", "art": "wohnen" | "gewerbe", "wfl": 70.37, "miete_monat": 670, "status": "vermietet" | "leer" } ] } ] }',
     '',
     'REGELN:',
@@ -3457,6 +3532,9 @@ async function extractPaket(text, opts) {
     '  - einheiten: jede Zeile der Mieterliste des Objekts; Garagen/Stellplätze NICHT als Einheit, sondern als garagen/stellplaetze zählen.',
     '  - miete_monat: Nettokaltmiete der Einheit pro Monat; status "leer", wenn frei/leerstehend/frei übergeben.',
     '  - share_deal: true, wenn das Exposé einen Share Deal (Anteilskauf) nennt.',
+    '  - modernisierungen (v3660): je Bauteil des Objekts, zu dem der Text etwas sagt; gewerk einer von dach, fenster, leitungen, heizung, aussenwand, baeder, innenausbau, grundriss;',
+    '    art "konkret" (genau dieses Bauteil) oder "allgemein" (ganzes Haus / alle Wohnungen); richtung "positiv" oder "negativ" (veraltet, erneuerungsbeduerftig);',
+    '    zitat WOERTLICH aus dem Exposé. Gilt ein Satz fuer alle Objekte des Pakets, bei jedem Objekt eintragen. "gepflegt" ist keine Modernisierung.',
     '',
     '─── EXPOSE-TEXT ───',
     text
@@ -3475,6 +3553,7 @@ async function extractPaket(text, opts) {
       grundstuecksflaeche: z(o.grundstuecksflaeche), wohneinheiten: z(o.wohneinheiten), gewerbeeinheiten: z(o.gewerbeeinheiten),
       garagen: z(o.garagen), stellplaetze: z(o.stellplaetze), miete_soll_jahr: z(o.miete_soll_jahr), miete_ist_jahr: z(o.miete_ist_jahr),
       energieklasse: t(o.energieklasse), energiewert: z(o.energiewert), heizungsart: t(o.heizungsart),
+      modernisierungen: _modernisierungenNorm(o.modernisierungen, text),   /* v3660 */
       einheiten: (Array.isArray(o.einheiten) ? o.einheiten : []).filter((e) => e && z(e.wfl) > 0).map((e) => ({
         lage: t(e.lage), art: /gewerbe|laden|büro|praxis/i.test(String(e.art || '')) ? 'gewerbe' : 'wohnen',
         wfl: z(e.wfl), miete_monat: z(e.miete_monat), status: /leer|frei/i.test(String(e.status || '')) ? 'leer' : 'vermietet' })) };
@@ -4707,6 +4786,8 @@ module.exports = {
   suggestQcFields,
   extractExpose,
   extractPaket,   /* v3202 */
+  zustandAusBildern,   /* v3660 */
+  _modernisierungenNorm,   /* v3660 · fuer den Pruefer */
   extractMarketData,
   enrichMarketFields,
   buildPrompt,

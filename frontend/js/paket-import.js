@@ -140,6 +140,16 @@
         setze('gsfl', o.grundstuecksflaeche);
         setze('einheiten', o.wohneinheiten || o.einheiten.filter(function (e) { return e.art !== 'gewerbe'; }).length || null);
         setze('ds2_energie', o.energieklasse);
+        /* v3660 · Modernisierungen dieses Hauses aus dem Exposé (je Gewerk mit Zitat): Grundlage der
+           Restnutzungsdauer nach Anlage 2 - ohne sie rechnete das Paket mit 0 Punkten (17.11.2026) */
+        try {
+          var _D = window.DpModernisierung;
+          if (_D && Array.isArray(o.modernisierungen) && o.modernisierungen.length) {
+            var _k = _D.kombinieren({ text: _D.normListe(o.modernisierungen, null), baujahr: o.baujahr, energieklasse: o.energieklasse });
+            if (_k) { _k.roh = { text: _D.normListe(o.modernisierungen, null) }; setze('mod_ableitung', JSON.stringify(_k));
+              setze('ds2_zustand_quelle', 'text'); setze('ds2_zustand', _D.zustandAusPunkten(_k.punkte)); }
+          }
+        } catch (x) {}
         var mj = mieteJahr(o); if (mj > 0) setze('nkm', String(Math.round(mj / 12 * 100) / 100).replace('.', ','));
         if (o.einheiten && o.einheiten.length) {
           window._dpMfh = { einheiten: o.einheiten.map(function (e, k) {

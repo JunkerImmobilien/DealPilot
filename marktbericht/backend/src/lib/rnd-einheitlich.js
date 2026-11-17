@@ -25,6 +25,10 @@
  */
 import { stichtagJahr } from './stichtag.js';   /* v3010 */
 import { restnutzungsdauer as anlage2Rnd } from './anlage2.js';
+import { createRequire } from 'node:module';
+/* v3660 · Rangfolge der Modernisierungspunkte - woertliche Kopie von
+   frontend/js/modernisierung-herkunft.js (tools/rechenkerne-spiegeln.mjs). */
+const DpModernisierung = createRequire(import.meta.url)('./generated/modernisierung-herkunft.cjs');
 
 export const GND_JAHRE_STANDARD = 80;   /* Wohngebäude, Anlage 1 ImmoWertV */
 export const RND_MIN = 10;
@@ -68,8 +72,9 @@ const SCHAETZUNG_TEXT = 'Restnutzungsdauer geschätzt (Gesamtnutzungsdauer '
 export function restnutzungsdauerEinheitlich(ref = {}, gnd = GND_JAHRE_STANDARD) {
   const GND = Number(gnd) > 0 ? Number(gnd) : GND_JAHRE_STANDARD;
   const fallback = schaetzung(ref, GND);
+  let _modErg = null;   /* v3660 · Herkunft der Punkte reist am Ergebnis mit */
   const erg = (quelle, grund, rnd, hinweis) =>
-    ({ rnd, quelle, grund, gnd_jahre: GND, hinweis });
+    ({ rnd, quelle, grund, gnd_jahre: GND, hinweis, modernisierung: _modErg });
 
   /* ══ v1973 · DREI FAELLE, NICHT EINER ════════════════════════════════
 
@@ -112,13 +117,30 @@ export function restnutzungsdauerEinheitlich(ref = {}, gnd = GND_JAHRE_STANDARD)
      sind mit der nach Anlage 2 bestimmten RND abgeleitet - § 10 Modellkonformitaet.
      Entscheidung: ohne Angabe gilt Anlage 2 mit 0 Punkten, in JEDER Stufe und
      jedem Verfahren, mit Hinweis, dass Punkte die RND erhoehen koennen. */
-  const _ohnePunkte = _mpAngabe == null || (_angaben === 0 && _mpAngabe === 0);
-  const mp = _ohnePunkte ? 0 : _mpAngabe;
+  /* v3660 · Eine 0 mit der Kennung „eigene Angabe" (Auswahlfeld „nicht modernisiert") ist eine
+     Antwort; ohne Kennung und ohne beantwortete Gewerke ist sie die alte Vorbelegung. */
+  const _herk = String(ref.mod_punkte_herkunft || '');
+  const _nullEigen = _mpAngabe === 0 && /^(eigene_angabe|gewerke|mfh)$/.test(_herk);
+  const _ohnePunkte = _mpAngabe == null || (_angaben === 0 && _mpAngabe === 0 && !_nullEigen);
+  /* ══ v3660 · OHNE PUNKTE: DIE RANGFOLGE STATT 0 (Marcel 17.11.2026) ═══════
+     v2541 setzte ohne Angabe 0 Punkte („nicht modernisiert"). Gemessen am
+     17.11.2026 an einem Paket aus Haeusern der 1950er mit WDVS, Dachdaemmung
+     und Brennwertheizung im Exposé: RND 12 bis 14 Jahre, Ertragswert 4,87 statt
+     rund 7,05 Mio. EUR - und der Hamburger Liegenschaftszins gilt erst ab RND 30.
+     Jetzt: Zustand (eigene Angabe) > Ableitung aus Exposé-Text und Bildern >
+     Rueckfall (mittel = 8 Punkte ab 30 Jahren, abgestuft nach Energieklasse).
+     Der Grund aus v2541 bleibt erfuellt: es ist weiter Anlage 2 in JEDER Stufe
+     und jedem Verfahren, und das Wertpotenzial baut auf derselben Zahl auf
+     (PotenzialService fragt modernisierungFuerRnd()). Die Faelle „Gewerke
+     beantwortet, Punkte fehlen" behalten 0 - dort liegt eine Antwort vor. */
+  const _mod = _ohnePunkte && !(_mpAngabe == null && _angaben > 0) ? modernisierungFuerRnd(ref) : null;
+  const mp = _ohnePunkte ? (_mod ? _mod.punkte : 0) : _mpAngabe;
   const _ohneText = !_ohnePunkte ? ''
     : (_mpAngabe == null && _angaben > 0
       ? ' Für ' + _angaben + ' der acht Bauteile liegt eine Angabe vor, die Modernisierungspunkte sind aber nicht hinterlegt (Objekt im Reiter Objekt öffnen und speichern); angesetzt sind 0 Punkte („nicht modernisiert").'
-      : ' Es wurde kein Modernisierungsgrad erfasst; angesetzt sind 0 Punkte („nicht modernisiert"). Mit eingetragenen Modernisierungen fällt die Restnutzungsdauer höher aus.');
-  const kern = /kernsaniert/i.test(String(ref.modernization || '')) && mp >= 18;
+      : (_mod ? ' ' + _mod.satz : ' Es wurde kein Modernisierungsgrad erfasst; angesetzt sind 0 Punkte („nicht modernisiert").'));
+  _modErg = _mod || null;
+  const kern = /kernsaniert/i.test(String(ref.modernization || '')) && mp >= 18 && !_mod;
   const bj = kern && _num(ref.modernization_year) > 1500
     ? _num(ref.modernization_year) : _num(ref.build_year);
   if (!(bj > 1500)) {
@@ -182,7 +204,7 @@ export function restnutzungsdauerEinheitlich(ref = {}, gnd = GND_JAHRE_STANDARD)
      > ist. Dieselbe Klammer fuehrt `schaetzung()`. */
   const _mitBoden = Math.min(GND - RND_MIN, Math.max(a2.rnd, RND_MIN));
   const _gebodet = Math.abs(_mitBoden - a2.rnd) > 1e-9;
-  return erg('anlage2', _ohnePunkte ? 'ohne_punkte_null' : null, _mitBoden,
+  return erg('anlage2', _ohnePunkte ? (_mod ? 'modernisierung_' + _mod.herkunft : 'ohne_punkte_null') : null, _mitBoden,
     'Restnutzungsdauer nach Anlage 2 ImmoWertV bei einer Gesamtnutzungsdauer von '
     + GND + ' Jahren, aus ' + mp + ' Modernisierungspunkten'
     + (kern ? ' (Kernsanierung)' : '') + '.' + _ohneText
@@ -190,4 +212,25 @@ export function restnutzungsdauerEinheitlich(ref = {}, gnd = GND_JAHRE_STANDARD)
         + 'Untergrenze von ' + RND_MIN + ' Jahren.' : ''));
 }
 
-export default { restnutzungsdauerEinheitlich, schaetzung, GND_JAHRE_STANDARD, RND_MIN };
+/**
+ * v3660 · Die Modernisierungspunkte, mit denen die RND rechnet, wenn KEINE Punkte
+ * eingetragen sind - mit Herkunft und Satz fuer den Bericht. Liegen Punkte vor,
+ * null (dann gilt die Angabe). Felder am ref: mod_zustand (+ mod_zustand_quelle),
+ * mod_ableitung (Ergebnis von DpModernisierung.kombinieren), energy_class, build_year.
+ */
+export function modernisierungFuerRnd(ref = {}) {
+  const _r = ref.mod_punkte, _n = Number(_r);
+  const _da = !(_r === null || _r === undefined || _r === '') && Number.isFinite(_n) && _n >= 0;
+  if (_da && (_n > 0 || /^(eigene_angabe|gewerke|mfh)$/.test(String(ref.mod_punkte_herkunft || '')))) return null;
+  if ((Number(ref.mod_angaben) || 0) > 0) return null;   /* Gewerke beantwortet: dort gilt die Antwort */
+  let ab = ref.mod_ableitung;
+  if (typeof ab === 'string') { try { ab = ab ? JSON.parse(ab) : null; } catch (e) { ab = null; } }
+  try {
+    return DpModernisierung.bestimmen({
+      zustand: ref.mod_zustand || ref.condition || null, zustand_quelle: ref.mod_zustand_quelle || 'eigene',
+      ableitung: ab, baujahr: ref.build_year, stichtag_jahr: stichtagJahr(ref),
+      energieklasse: ref.energy_class || null });
+  } catch (e) { return null; }
+}
+
+export default { restnutzungsdauerEinheitlich, modernisierungFuerRnd, schaetzung, GND_JAHRE_STANDARD, RND_MIN };

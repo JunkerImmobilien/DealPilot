@@ -1428,9 +1428,14 @@
     });
     var gespeichertePunkte = parseInt(d.mod_punkte, 10);
     var punkteObj = punkteAusMod(mod);
-    var modPoints = (!isNaN(gespeichertePunkte) && gespeichertePunkte > 0)
+    /* v3660 · Eine gespeicherte 0 ist eine ANTWORT („nicht modernisiert" im Auswahlfeld
+       oder acht Mal „Keine/Nie") - sie zaehlt wie jede andere Punktzahl. Nur ein LEERES
+       Feld ohne Gewerke-Angaben geht an die Rangfolge (modernisierung-herkunft.js). */
+    var punkteEigen = !isNaN(gespeichertePunkte) && gespeichertePunkte >= 0
+      && String(d.mod_punkte).trim() !== '';
+    var modPoints = (punkteEigen && gespeichertePunkte > 0)
       ? Math.min(20, gespeichertePunkte)
-      : (modHatAngaben ? punkteObj.total : 0);
+      : (modHatAngaben ? punkteObj.total : (punkteEigen ? 0 : null));
 
     /* ── v2073 · Der Stichtag ist eine FESTLEGUNG, keine Nebenwirkung ───
        Marcel am 10.10.2026: „Maßgeblich ist der explizit festgelegte
@@ -1470,6 +1475,28 @@
     var gndGesetzt = opt && opt.gnd != null && Number(opt.gnd) > 0;
     var gnd = gndGesetzt ? Number(opt.gnd) : gndAusObjektTyp(d.objart);
 
+    /* ══ v3660 · KEIN STILLES 0 MEHR ═══════════════════════════════════════
+       Hier stand `: 0` - ein Objekt ohne jede Modernisierungsangabe rechnete
+       die Anlage 2 mit „nicht modernisiert". Gemessen 17.11.2026 an einem
+       Paket von Haeusern der 1950er mit WDVS, Dachdaemmung und Brennwert-
+       heizung im Exposé: RND 12 bis 14 Jahre. Die Rangfolge (eigene Angabe,
+       Zustand, Exposé/Bilder, Rueckfall nach Alter und Energieklasse) liegt
+       in modernisierung-herkunft.js; dieser Kern bekommt nur die Zahl. */
+    var modHerkunft = null;
+    var DpM = (typeof window !== 'undefined' && window.DpModernisierung) || null;
+    if (modPoints == null) {
+      if (DpM && typeof DpM.bestimmen === 'function') {
+        var _ab = d.mod_ableitung;
+        if (typeof _ab === 'string') { try { _ab = _ab ? JSON.parse(_ab) : null; } catch (e) { _ab = null; } }
+        var _sj = parseInt(String(stichtag || '').slice(0, 4), 10) || new Date().getFullYear();
+        try {
+          modHerkunft = DpM.bestimmen({ zustand: d.ds2_zustand, zustand_quelle: d.ds2_zustand_quelle || 'eigene',
+            ableitung: _ab, baujahr: d.baujahr, stichtag_jahr: _sj, energieklasse: d.ds2_energie });
+        } catch (e) { modHerkunft = null; }
+      }
+      modPoints = modHerkunft ? modHerkunft.punkte : 0;
+    }
+
     return {
       baujahr: parseInt(d.baujahr, 10) || null,
       stichtag: stichtag,
@@ -1482,9 +1509,12 @@
         ? 'ausdruecklich gesetzt'
         : 'Anlage 1 ImmoWertV, abgeleitet aus der Objektart "' + (d.objart || 'unbekannt') + '"',
       modPoints: modPoints,
-      modPoints_herkunft: (!isNaN(gespeichertePunkte) && gespeichertePunkte > 0)
-        ? 'Feld mod_punkte im Objekt'
-        : (modHatAngaben ? 'gerechnet aus den acht mod_*-Angaben' : 'keine Modernisierungsangaben'),
+      modPoints_herkunft: modHerkunft ? modHerkunft.kurz
+        : ((punkteEigen && gespeichertePunkte > 0) ? 'Feld mod_punkte im Objekt'
+        : (modHatAngaben ? 'gerechnet aus den acht mod_*-Angaben'
+        : (punkteEigen ? 'Feld mod_punkte im Objekt' : 'keine Modernisierungsangaben'))),
+      /* v3660 · Herkunft samt Satz und Gewerken, wenn die Punkte nicht eingetragen sind */
+      modernisierung: modHerkunft,
       modPoints_elemente: punkteObj.elemente,
       kernsaniert: istKernsaniert(mod),
       gewerkeBewertung: gewerkeBewertung,

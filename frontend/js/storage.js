@@ -51,6 +51,7 @@ if (!window._pdfGold) {
  * die 828 m2 Hinterland von Objekt A beim Speichern an Objekt B kleben. */
 var WM_FIELDS = [
   'baustatus','bgf','standardstufe','grundriss','mod_punkte','mod_quelle',   /* v2540: mod_quelle */
+  'mod_ableitung','ds2_zustand_quelle',   /* v3660: Ableitung aus Exposé/Bildern, Herkunft des Zustands */
   'sachwertfaktor','uk_flaeche','wgfz_objekt','stellplatz_miete_monat','sonstige_jahr',   /* v2282: uk_flaeche, v2361: wgfz_objekt */
   'vgf_wohnlage','vgf_ausstattung',   /* v3008: Klassen des Gutachterausschusses (Vergleichsfaktor) */
   'nhk_haus','nhk_geschosse','nhk_dach',

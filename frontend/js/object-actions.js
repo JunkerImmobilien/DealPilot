@@ -1727,6 +1727,8 @@
     /* v3349d · gemessen 13.11.2026: eine 429 („Zu viele Dokument-Auswertungen“) kam hier als leeres Ergebnis
        zurück, jede Datei stand als „Exposé · nichts gelesen“ da, ohne den Grund */
     if (!res.ok) { var _err = new Error((j && j.error) || ('Status ' + res.status)); _err.status = res.status; throw _err; }
+    /* v3660 · Modernisierungen je Gewerk mit Beleg ins Objekt (Grundlage der Restnutzungsdauer) */
+    if (!isMarket) { try { if (window.DpModUI && typeof window.DpModUI.ausExpose === 'function') window.DpModUI.ausExpose(text, (j && j.extracted) || {}); } catch (e) {} }
     return (j && j.extracted) ? j.extracted : (j || {});
   }
   var LIMIT_TEXT = 'Stundenlimit der KI-Auswertung erreicht, in einer Stunde erneut einlesen';

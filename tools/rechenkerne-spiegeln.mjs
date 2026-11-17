@@ -99,11 +99,23 @@ const KERNE = [
      Die Reihenfolge zaehlt: `rnd-gnd-table.js` stellt
      `DealPilotRND_GND` und wird von `calcAll` fuer die
      Gesamtnutzungsdauer gelesen - erst die Tabelle, dann der Rechner. */
+  /* v3660 · Rangfolge der Modernisierungspunkte (eigene Angabe, Exposé/Bilder,
+     Rueckfall nach Alter/Energieklasse) - VOR rnd-calc.js, dessen
+     mapDealPilotObject() sie fragt. Zusaetzlich ins mb-Backend (MB_SPIEGEL). */
+  { datei: 'modernisierung-herkunft.js', global: 'DpModernisierung' },
   { datei: 'rnd-gnd-table.js', global: 'DealPilotRND_GND' },
   { datei: 'rnd-calc.js', global: 'DealPilotRND' }
 ];
 
 const nurPruefen = process.argv.includes('--pruefen');
+
+/* v3660 · Das mb-Backend-Image enthaelt weder frontend/ noch backend/ - es bekommt die
+   Rangfolge der Modernisierungspunkte als woertliche .cjs-Kopie (ESM-Paket, require ueber
+   createRequire in lib/rnd-einheitlich.js). Dieselbe Pruefsumme wie die Quelle. */
+const MB_SPIEGEL = [
+  { datei: 'modernisierung-herkunft.js',
+    ziel: path.join(WURZEL, 'marktbericht', 'backend', 'src', 'lib', 'generated', 'modernisierung-herkunft.cjs') }
+];
 
 function summe(datei) {
   return crypto.createHash('sha256').update(fs.readFileSync(datei)).digest('hex');
@@ -248,6 +260,12 @@ if (nurPruefen) {
       abweichung++;
     }
   }
+  for (const m of MB_SPIEGEL) {
+    if (!fs.existsSync(m.ziel) || summe(m.ziel) !== summe(path.join(FE, m.datei))) {
+      console.error('ABWEICHUNG mb-Backend ' + path.relative(WURZEL, m.ziel) + ': passt nicht zu frontend/js/' + m.datei);
+      abweichung++;
+    }
+  }
   /* Eine Datei im Manifest, die gar kein Kern mehr ist, waere eine Leiche
      im Image — und eine, die FEHLT, ist der eigentliche Fall: wer einen
      Kern dazunimmt und nicht spiegelt, soll es hier erfahren. */
@@ -270,6 +288,11 @@ if (nurPruefen) {
 
 fs.mkdirSync(ZIEL, { recursive: true });
 for (const k of KERNE) fs.writeFileSync(path.join(ZIEL, k.datei), quellen[k.datei], 'utf8');
+for (const m of MB_SPIEGEL) {
+  fs.mkdirSync(path.dirname(m.ziel), { recursive: true });
+  fs.writeFileSync(m.ziel, quellen[m.datei], 'utf8');
+  console.log('Gespiegelt ins mb-Backend: ' + path.relative(WURZEL, m.ziel));
+}
 fs.writeFileSync(MANIFEST, JSON.stringify({
   erzeugt_am: new Date().toISOString(),
   hinweis: 'Woertliche Spiegelung von frontend/js/ — NICHT hier bearbeiten. '

@@ -161,7 +161,7 @@ if (!window._wlc) {
        mea und das Erbbaurecht, die der Mapper schon immer las und die die
        Karte nie schickte. */
     'nkm', 'brw', 'mea', 'erbpacht', 'erbbauzins', 'erb_restlz', 'nutzungsart', 'garagen', 'stellpl_aussen', 'balkon_flae', 'bad_anz',
-    'baustatus', 'bgf', 'standardstufe', 'grundriss', 'mod_punkte', 'sachwertfaktor', 'uk_flaeche' /* v2282 */, 'wgfz_objekt' /* v2361 */, 'vgf_wohnlage', 'vgf_ausstattung' /* v3008 */, 'nhk_haus', 'nhk_geschosse', 'nhk_dach',
+    'baustatus', 'bgf', 'standardstufe', 'grundriss', 'mod_punkte', 'mod_ableitung', 'ds2_zustand_quelle' /* v3660 */, 'sachwertfaktor', 'uk_flaeche' /* v2282 */, 'wgfz_objekt' /* v2361 */, 'vgf_wohnlage', 'vgf_ausstattung' /* v3008 */, 'nhk_haus', 'nhk_geschosse', 'nhk_dach',
     'hinterland_qm', 'hinterland_eur_qm', 'hinterland_rentierlich', 'garagen_bgf_qm', 'garagen_stufe', 'garagen_baujahr' /* v3043 */, 'aussenanlagen_pct', 'aussenanlagen',
     'ausst_aussenwaende', 'ausst_dach', 'ausst_fenster', 'ausst_innenwaende', 'ausst_decken', 'ausst_fussboeden', 'ausst_sanitaer', 'ausst_heizung', 'ausst_technik',
     'bes_bauteile', 'btl_gauben', 'btl_balkone', 'btl_vordach', 'btl_terrassen', 'btl_sonstige',
@@ -225,6 +225,9 @@ if (!window._wlc) {
     try {
       var _hp = (window.DpMfhEinheiten && typeof window.DpMfhEinheiten.hausPunkte === 'function') ? window.DpMfhEinheiten.hausPunkte() : null;
       if (_hp && _hp.punkte != null) o.mod_punkte = String(_hp.punkte);
+      /* v3660 · Herkunft der Punkte: eine 0 aus dem Auswahlfeld ist eine Antwort, keine Vorbelegung */
+      if (_hp && _hp.punkte != null) o.mod_punkte_herkunft = 'mfh';
+      else if (window.DpModUI && o.mod_punkte != null && o.mod_punkte !== '') o.mod_punkte_herkunft = window.DpModUI.eigeneHerkunft().mod_punkte_herkunft;
     } catch (e) {}
     /* v2367 · eigener Abschlag auf Angebotspreise (Investmentprofil) - nur wenn gesetzt;
        sonst waehlt der Marktbericht selbst (oertliche Kauffaelle oder Marktdurchschnitt). */

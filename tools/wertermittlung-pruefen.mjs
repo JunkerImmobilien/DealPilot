@@ -339,10 +339,15 @@ const satzFuer = (p) => {
   return h.length === 1 && h[0].modellansaetze && typeof h[0].modellansaetze === 'object' ? h[0].modellansaetze : null;
 };
 const mitSatz = (a) => { if (a[4] && a[4].lzs_modellansaetze === undefined) a[4].lzs_modellansaetze = satzFuer(a[4]); return a; };
+/* v3660 · Die Demo-Objekte sind mit „ohne Punkte = 0 Punkte" (v2541) eingefroren. Seit v3660 rechnet
+   ohne Angabe die Rangfolge der Modernisierungspunkte (Rueckfall mittel = 8). Bis Marcel neu einfriert,
+   rechnet Ebene C mit dem Stand der Einfrierung (ausdruecklich 0 Punkte) und C3 unten stellt den neuen
+   Wert als „Entscheidung offen" daneben - nicht still neu eingefroren. */
+const altPunkte = (a) => { const r = a && a[0]; if (r && (r.mod_punkte == null || r.mod_punkte === '') && !(Number(r.mod_angaben) > 0)) { r.mod_punkte = 0; r.mod_punkte_herkunft = 'eigene_angabe'; } return a; };
 const ccFall = (name, aendern, opt = {}) => {
   const fall = C.faelle[name];
   if (!fall) return null;
-  const a = klon(fall.argumente);
+  const a = altPunkte(klon(fall.argumente));
   if (!opt.ohneSatz) mitSatz(a);
   if (aendern) aendern(a);
   return compute(...a);
@@ -1430,7 +1435,9 @@ fallB('B62', () => {
   wert('B', 'B59', 'Baupreisindex 01.06.2024 (Februar 2024: 128,5 / 70,8)', am('2024-06-01'), 1.81, 0);
   pruefe('B', 'B59', 'Stichtag in der Zukunft verworfen, heute', ST.stichtagAus('2099-01-01').eigen === false && ST.stichtagAus('2099-01-01').verworfen === '2099-01-01', JSON.stringify(ST.stichtagAus('2099-01-01').verworfen));
   const ref = { property_type: 'efh', property_subtype: 'efh', living_area: 140, build_year: 1990, plot_area: 600,
-    ags: '05711000', standardstufe: 3, nhk_typ: '1.21', bgf: 225, gemeinde: 'Bielefeld' };
+    ags: '05711000', standardstufe: 3, nhk_typ: '1.21', bgf: 225, gemeinde: 'Bielefeld',
+    /* v3660 · B59 misst den STICHTAG: ausdruecklich 0 Punkte (eigene Angabe), sonst rechnet der Rueckfall (8 Punkte) die Anlage 2 statt linear */
+    mod_punkte: 0, mod_punkte_herkunft: 'eigene_angabe' };
   const par = (x) => Object.assign({ ags: '05711000', brw_sqm: 300, standardstufe: 3, bgf_direkt: 225 }, x || {});
   const lv = { available: true, value_sqm: 300 };
   const h = (compute(ref, lv, null, null, par()) || {}).sachwert || {};
@@ -1714,7 +1721,7 @@ if (EINFRIEREN) {
 for (const [name, fall] of Object.entries(C.faelle || {})) {
   E.C.faelle++;
   try {
-    const ist = auszug(compute(...mitSatz(klon(fall.argumente))));
+    const ist = auszug(compute(...mitSatz(altPunkte(klon(fall.argumente)))));
     for (const [k, soll] of Object.entries(fall.soll)) {
       const tol = (k === 'lzs_pct' || k === 'rnd_jahre' || k === 'vervielfaeltiger') ? 0.0001 : 0;
       wert('C', name, k, ist[k] ?? null, soll, tol);
@@ -1756,7 +1763,7 @@ try {
   const MA = await lade('lib/mietanker.js'), MW = await lade('lib/mietspiegel/werte.js'), MN = await lade('lib/mietspiegel/naeherung.js'), MK = await lade('lib/kappung.js');
   const ZZ = JSON.parse(fs.readFileSync(path.join(WURZEL, 'tools/mietanker-zensus.json'), 'utf8'));
   for (const [name, fall] of Object.entries(C.faelle || {})) {
-    const a = mitSatz(klon(fall.argumente)), ref = a[0], ags = String(ref.ags || '');
+    const a = mitSatz(altPunkte(klon(fall.argumente))), ref = a[0], ags = String(ref.ags || '');
     let w = MW.werteFuer(ags); if (w && w.freigabe === 'gesperrt') w = null;
     a[4].vergleichsmiete_kontext = { ags, werte: w, naeherung_param: w ? null : MN.naeherungParameter(), zensus_zeilen: w ? null : (ZZ.gemeinden[ags] || null), baujahr: ref.build_year,
       signale: MA.signaleAus({ standardstufe: ref.standardstufe, mikrolage: ref.mikrolage, mod_punkte: ref.mod_punkte, baujahr: ref.build_year, zustand: ref.condition }, 2026),
@@ -1766,6 +1773,18 @@ try {
     if (alt !== neu.ertragswert) offen('C', 'C2-' + name, 'Ertragswert ' + alt + ' → ' + neu.ertragswert + ' (Anker Vergleichsmiete der Wohnung, v3343; Rohertrag ' + fall.soll.rohertrag + ' → ' + neu.rohertrag + ')');
   }
 } catch (e) { hinweise.push('C2 nicht gelaufen: ' + e.message); }
+
+/* ══ v3660 · C3 · MODERNISIERUNG OHNE ANGABE: 0 PUNKTE → RANGFOLGE (Entscheidung offen, bis Marcel neu einfriert) ══ */
+try {
+  for (const [name, fall] of Object.entries(C.faelle || {})) {
+    const r0 = fall.argumente && fall.argumente[0];
+    if (!r0 || !(r0.mod_punkte == null || r0.mod_punkte === '')) continue;
+    const neu = auszug(compute(...mitSatz(klon(fall.argumente)))), alt = fall.soll;
+    if (alt.rnd_jahre !== neu.rnd_jahre || alt.ertragswert !== neu.ertragswert || alt.sachwert !== neu.sachwert)
+      offen('C', 'C3-' + name, 'ohne Modernisierungsangabe: RND ' + alt.rnd_jahre + ' → ' + neu.rnd_jahre + ', Ertragswert ' + alt.ertragswert + ' → ' + neu.ertragswert
+        + (alt.sachwert != null ? ', Sachwert ' + alt.sachwert + ' → ' + neu.sachwert : '') + ' (Rangfolge v3660, Rueckfall statt 0 Punkte)');
+  }
+} catch (e) { hinweise.push('C3 nicht gelaufen: ' + e.message); }
 
 /* ══ AUSGABE ═════════════════════════════════════════════════════════ */
 if (ALLE) detail.forEach((z) => console.log(z));

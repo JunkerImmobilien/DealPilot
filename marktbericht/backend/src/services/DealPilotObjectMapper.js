@@ -575,6 +575,16 @@ export const DealPilotObjectMapper = {
          die Punktevergabe bleibt dort, wo sie hingehoert (Anlage 2,
          Tabelle 1), und wird hier nicht nachgebaut. */
       mod_punkte: num(pick(d, ['mod_punkte'])),
+      /* v3660 · Herkunft der Punkte und Grundlagen der Rangfolge (lib/rnd-einheitlich.js
+         modernisierungFuerRnd): eine 0 mit 'eigene_angabe' ist eine Antwort; Zustand mit
+         Quelle (eigene / bilder / text); Ableitung aus Exposé-Text und Bildern als JSON. */
+      /* Ein im Objekt GESPEICHERTES Feld mod_punkte (auch „0" = „nicht modernisiert") ist eine Antwort -
+         so liest es auch rnd-calc.js mapDealPilotObject(); nur API-Aufrufe ohne Kennung kennen die alte Vorbelegung. */
+      mod_punkte_herkunft: pick(d, ['mod_punkte_herkunft'])
+        || (d.mod_punkte != null && String(d.mod_punkte).trim() !== '' ? 'eigene_angabe' : null),
+      mod_zustand_quelle: pick(d, ['ds2_zustand_quelle', 'zustand_quelle']) || null,
+      mod_ableitung: (function () { const a = pick(d, ['mod_ableitung']); if (!a) return null;
+        if (typeof a === 'object') return a; try { return JSON.parse(String(a)); } catch (e) { return null; } })(),
       mod_angaben: (function () {
         const felder = ['mod_dach', 'mod_fenster', 'mod_leitungen', 'mod_heizung',
                         'mod_aussenwand', 'mod_baeder', 'mod_innenausbau', 'mod_grundriss'];

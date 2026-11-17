@@ -179,6 +179,10 @@ if (!window._wlc) {
      „gepflegt" an (DealPilotObjectMapper), sondern weist ihn als fehlend aus. */
   function inputs() {
     var o = { plz: vIn('qc_plz'), ort: vIn('qc_ort'), str: vIn('qc_str'), hnr: vIn('qc_hnr'), objektart: vIn('qc_objektart'), wfl: numDe(vIn('qc_wfl')), baujahr: numDe(vIn('qc_bj') || vIn('qc_baujahr')), kp: numDe(vIn('qc_kp')) };
+    /* v3660 · Zustand und Energieklasse reisen mit: die Restnutzungsdauer stuetzt sich ohne
+       Gewerke-Angaben auf sie (lib/rnd-einheitlich.js), der Bericht sagt, worauf. */
+    if (vIn('qc_zustand')) { o.zustand = vIn('qc_zustand'); o.zustand_quelle = 'eigene'; }
+    if (vIn('qc_energieklasse')) o.energieklasse = vIn('qc_energieklasse');
     /* v2490 · eigener Angebotsabschlag aus den Einstellungen - wie im Reiter Objekt
        (dealpilot-mb.js). Fehlte bis v2489: der Quick-Check rechnete trotz eigenem
        Wert mit dem oertlichen Satz oder dem Marktdurchschnitt. */
@@ -225,6 +229,9 @@ if (!window._wlc) {
     var lv = d.land_value || {};
     out.brw = (lv.available && lv.value_sqm != null) ? { wert: lv.value_sqm, quelle: lv.source || 'BORIS', stichtag: lv.stichtag || null } : null;
     out.makroGemessen = (d.macro && d.macro.gemessen != null) ? d.macro.gemessen : null;
+    /* v3660 · Restnutzungsdauer und worauf sich die Modernisierung stuetzt */
+    try { var _rh = d.cross_check && d.cross_check.sachwert && d.cross_check.sachwert.restnutzungsdauer_herkunft;
+      if (_rh && _rh.rnd_jahre != null) out.rnd = { jahre: _rh.rnd_jahre, modernisierung: _rh.modernisierung || null }; } catch (e) {}
     if (mv.estimated != null) {
       out.mw = { low: mv.low != null ? mv.low : Math.round(mv.estimated * 0.9), med: mv.estimated, high: mv.high != null ? mv.high : Math.round(mv.estimated * 1.1), sqm: (mv.basis_median_sqm != null) ? (deNum(mv.basis_median_sqm, 0) + ' €/m²') : (area ? (deNum(Math.round(mv.estimated / area), 0) + ' €/m²') : '') }; /* v892-sqm */
     }

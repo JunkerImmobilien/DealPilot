@@ -116,6 +116,7 @@ const GEBRAUCHT = [
   ['QcHeuristik', 'bewerten'],
   /* v2071 — der RND-Kern. `DealPilotRND_GND` stellt die
      Gesamtnutzungsdauer-Tabelle und muss VOR `DealPilotRND` stehen. */
+  ['DpModernisierung', 'bestimmen'],   /* v3660 · vor rnd-calc.js */
   ['DealPilotRND_GND', 'getDefault'],
   ['DealPilotRND', 'calcAll'],
 ];
@@ -172,6 +173,7 @@ function _laden() {
          der Weitergabe. Eine Liste, die an zwei Stellen gefuehrt wird,
          laeuft genau so auseinander. */
       DealPilotRND: ctx.DealPilotRND, DealPilotRND_GND: ctx.DealPilotRND_GND,
+      DpModernisierung: ctx.DpModernisierung,   /* v3660 */
       manifest: manifest
     };
   } catch (e) {

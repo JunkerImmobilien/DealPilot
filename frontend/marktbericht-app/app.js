@@ -4730,6 +4730,11 @@ async function exportPdf(out) {
           + ((sw.restnutzungsdauer_herkunft
               && sw.restnutzungsdauer_herkunft.quelle === 'geschaetzt')
               ? ' \u00b7 gesch\u00e4tzt' : '')
+          /* v3660 \u00b7 woher die Modernisierungspunkte kommen, wenn sie nicht eingetragen sind */
+          + ((sw.restnutzungsdauer_herkunft && sw.restnutzungsdauer_herkunft.modernisierung
+              && sw.restnutzungsdauer_herkunft.modernisierung.herkunft !== 'eigene'
+              && sw.restnutzungsdauer_herkunft.modernisierung.kurz)
+              ? ' \u00b7 Modernisierung ' + sw.restnutzungsdauer_herkunft.modernisierung.kurz : '')
         : null,
       /* v1083b-WPDF-2 · Warum kein Sachwertfaktor angesetzt wurde. "Ohne
        * Sachwertfaktor" ist eine Feststellung, keine Begruendung — bei einer
@@ -5112,7 +5117,8 @@ async function exportPdf(out) {
      * Jede Zahl traegt ihre Herkunft — das gilt auch fuer eine, die aus
      * einem Rueckfall stammt. */
     var _rh = _swx.restnutzungsdauer_herkunft;
-    if (_rh && _rh.quelle === 'geschaetzt' && _rh.hinweis) {
+    /* v3660 · auch wenn die Modernisierungspunkte angenommen oder abgeleitet sind */
+    if (_rh && _rh.hinweis && (_rh.quelle === 'geschaetzt' || (_rh.modernisierung && _rh.modernisierung.herkunft !== 'eigene'))) {
       doc.setFontSize(7); doc.setTextColor(150, 120, 60);
       var _rz = doc.splitTextToSize(_rh.hinweis, blockW);
       need(_rz.length * 3.4 + 4); doc.text(_rz, M, y); y += _rz.length * 3.4 + 3;

@@ -583,6 +583,7 @@ export const CrossCheckService = {
       const e = rndEinheitlich(_wst.eigen ? { ...ref, wertermittlungsstichtag: _wst.iso } : ref,   /* v3010 */
         Number(gndArg) > 0 ? Number(gndArg) : GND_JAHRE);
       _rndHerkunft.gnd_jahre = e.gnd_jahre;
+      _rndHerkunft.modernisierung = e.modernisierung || null;   /* v3660 · woher die Punkte kommen */
       /* Der Rückfall des Moduls rechnet dieselbe Schätzung; stimmt sie
          nicht mit der hier gebildeten überein, gilt die hier gebildete —
          sie ist die, mit der die übrigen Verfahren dieses Laufs rechnen. */

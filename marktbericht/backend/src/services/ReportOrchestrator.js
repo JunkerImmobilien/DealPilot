@@ -310,6 +310,10 @@ export const ReportOrchestrator = {
          die aus acht Antworten „Keine/Nie". Gemessen am 15.10.2026: im
          ganzen Dienst las nur rnd-einheitlich.js das Feld, gesetzt hat es
          auf dem Weg dorthin niemand. */
+      /* v3660 · Rangfolge der Modernisierungspunkte (lib/rnd-einheitlich.js) */
+      mod_punkte_herkunft: input.mod_punkte_herkunft ? String(input.mod_punkte_herkunft) : null,
+      mod_zustand_quelle: input.mod_zustand_quelle ? String(input.mod_zustand_quelle) : null,
+      mod_ableitung: input.mod_ableitung && typeof input.mod_ableitung === 'object' ? input.mod_ableitung : null,
       mod_angaben: input.mod_angaben != null && input.mod_angaben !== ''
         && Number.isFinite(Number(input.mod_angaben)) ? Number(input.mod_angaben) : null,
       bgf: input.bgf ? Number(input.bgf) : null,

@@ -916,6 +916,27 @@ router.post('/extract-expose', authenticate, extractLimiter, async (req, res, ne
   }
 });
 
+/* v3660 · POST /api/v1/ai/extract-zustand-bilder — Zustand je Gewerk aus Objektfotos (bis 8,
+   im Browser verkleinert). Kein Credit wie die Exposé-Auslese, aber im KI-Monatsdeckel
+   (Gruppe Dokument-Auswertungen, services/kiVerbrauch.js). */
+router.post('/extract-zustand-bilder', authenticate, extractLimiter, async (req, res, next) => {
+  try {
+    const { fotos, baujahr, userApiKey: rawUserKey } = req.body || {};
+    const userApiKey = typeof rawUserKey === 'string' && rawUserKey.startsWith('sk-') ? rawUserKey : null;
+    if (!config.openai.apiKey && !userApiKey) return res.status(503).json({ error: 'Kein OpenAI-API-Key verfügbar.', needs_user_key: true });
+    const liste = Array.isArray(fotos) ? fotos.filter((f) => typeof f === 'string' && f.indexOf('data:image') === 0 && f.length < 1500000).slice(0, 8) : [];
+    if (!liste.length) return res.status(400).json({ error: 'Body muss "fotos" (data:image…) enthalten.' });
+    const result = await openaiService.zustandAusBildern(liste, { userApiKey, baujahr: Number(baujahr) > 1500 ? Number(baujahr) : null });
+    try { if (aiCreditsService && typeof aiCreditsService.logExtract === 'function') await aiCreditsService.logExtract(req.user.id, 'extract-zustand-bilder'); } catch (e) {}
+    res.json(result);
+  } catch (err) {
+    if (err.code === 'KI_KONTINGENT') return res.status(429).json({ error: err.message, code: 'KI_KONTINGENT' });
+    if (err.code === 'NO_API_KEY') return res.status(503).json({ error: err.message, needs_user_key: true });
+    if (err.status) return res.status(502).json({ error: 'OpenAI-Fehler: ' + err.message });
+    next(err);
+  }
+});
+
 /* v3202 · POST /api/v1/ai/extract-paket — Exposé mit mehreren Objekten (Portfolio/Paket), je Objekt
    mit Einheiten. Kein Credit (Extraktion), Text geschwärzt wie extract-expose. */
 router.post('/extract-paket', authenticate, extractLimiter, async (req, res, next) => {

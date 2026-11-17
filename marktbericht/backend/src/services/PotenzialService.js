@@ -24,7 +24,7 @@
 // Bericht, kein Eintrag in mb.reports/mb.properties, kein KI-Aufruf.
 import { ErtragswertService } from './ErtragswertService.js';
 import { WertParameterService } from './WertParameterService.js';
-import { restnutzungsdauerEinheitlich as rndEinheitlich } from '../lib/rnd-einheitlich.js';
+import { restnutzungsdauerEinheitlich as rndEinheitlich, modernisierungFuerRnd } from '../lib/rnd-einheitlich.js';
 import { mieteNachBand, herkunftNachBand, differenzZumErtragswert } from './CrossCheckService.js';   /* v2488 · dieselbe Bandregel wie der Bestand; v2595 · dieselbe Differenz */
 import { ValuationService } from './ValuationService.js';         /* v2541 */
 import { MarketAnalysisService } from './MarketAnalysisService.js';   /* v2541 */
@@ -104,7 +104,10 @@ function bwkNachziehen(ein, neuMieteJahr) {
  *  den Punkten nach der Maßnahme. Eine Maßnahme verlängert, verkürzt nie. */
 function rndEinstellen(ein, ref, basisKern, plusPunkte) {
   const plus = Number(plusPunkte) > 0 ? Number(plusPunkte) : 0;
-  const basisP = zahl(ein.mod_punkte);
+  /* v3660 · ohne eingetragene Punkte baut die Massnahme auf DEN Punkten auf, mit denen der
+     Bestand rechnet (Rangfolge), nicht auf 0 - sonst entstuende Potenzial aus dem Methodenwechsel */
+  let basisP = zahl(ein.mod_punkte);
+  if (basisP == null) { const _m = modernisierungFuerRnd(ref || {}); if (_m) basisP = _m.punkte; }
   const neuP = Math.min(20, (basisP != null ? basisP : 0) + plus);
   const info = { mod_punkte_vorher: basisP, mod_punkte: plus > 0 ? neuP : basisP, plus };
   if (plus <= 0) return info;
