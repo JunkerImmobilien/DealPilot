@@ -623,9 +623,12 @@
           var sx = window.scrollX || window.pageXOffset || 0, sy = window.scrollY || window.pageYOffset || 0;
           var wurzel = wurzelFuer(rect);
           wurzel.setAttribute('data-dp-wurzel', '1');
+          var wr = wurzel.getBoundingClientRect();
           toast('Ausschnitt wird aufgenommen …');
           window.html2canvas(wurzel, {
-            x: rect.x + sx, y: rect.y + sy, width: rect.w, height: rect.h,
+            /* v3640a5 · gemessen: mit einem Element als Wurzel zaehlt html2canvas x/y AB dessen Ecke (Bild lag um die Lage
+               der Wurzel versetzt, 17.11.2026) */
+            x: rect.x - wr.left, y: rect.y - wr.top, width: rect.w, height: rect.h,
             scrollX: -sx, scrollY: -sy, windowWidth: document.documentElement.clientWidth, windowHeight: document.documentElement.clientHeight,
             scale: Math.min(window.devicePixelRatio || 1, 2), useCORS: true, logging: false, backgroundColor: '#ffffff', imageTimeout: 2500,
             ignoreElements: function (el) { return unsereFlaechen(el) || (el.tagName === 'IFRAME' && !el.contains(wurzel)); }, onclone: farbenRetten
