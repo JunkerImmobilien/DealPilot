@@ -453,7 +453,7 @@ window.DealPilotOnboarding = (function () {
       +   _feld('dpo_name',    'Name',            name,              'Vor- und Nachname')
       +   _feld('dpo_firma',   'Firma (optional)',s.user_company || '', 'z. B. Muster Immobilien GmbH')
       +   _feld('dpo_strasse', 'Straße + Nr.',    s.pdf_address  || '', 'Musterstraße 12')
-      +   _feld('dpo_plz',     'PLZ',             s.pdf_plz      || '', '32609')
+      +   _feld('dpo_plz',     'PLZ',             s.pdf_plz      || '', '12345')
       +   _feld('dpo_ort',     'Ort',             s.pdf_city     || '', 'Musterstadt')
       +   _feld('dpo_tel',     'Telefon',         s.pdf_phone    || '', '+49 …')
       +   _feld('dpo_mail',    'E-Mail',          mail,              'name@firma.de')

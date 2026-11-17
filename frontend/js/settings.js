@@ -405,7 +405,7 @@ function showSettings(initialTab) {
 
         '<div class="f"><label>Straße + Hausnummer</label><input id="set_pdf_address" type="text" value="' + _esc(view.pdf_address) + '" placeholder="z.B. Musterstraße 12"></div>' +
         '<div class="g2">' +
-          '<div class="f"><label>PLZ</label><input id="set_pdf_plz" type="text" value="' + _esc(view.pdf_plz) + '" placeholder="32609"></div>' +
+          '<div class="f"><label>PLZ</label><input id="set_pdf_plz" type="text" value="' + _esc(view.pdf_plz) + '" placeholder="12345"></div>' +
           '<div class="f"><label>Ort</label><input id="set_pdf_city" type="text" value="' + _esc(view.pdf_city) + '" placeholder="z.B. Musterstadt"></div>' +
         '</div>' +
         '<div class="g2">' +

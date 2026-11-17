@@ -16,6 +16,12 @@
  */
 (function (global) {
   'use strict';
+  /* v3641 · Sachverstaendigen-Vorgabe aus den EIGENEN Einstellungen (nie fest Marcels Daten) */
+  function _svProfil() {
+    var s = {}; try { s = (global.Settings && global.Settings.get) ? (global.Settings.get() || {}) : {}; } catch (e) {}
+    var plzOrt = [s.pdf_plz || '', s.pdf_city || ''].join(' ').trim();
+    return { name: s.user_name || '', firma: s.user_company || '', z1: s.pdf_address || '', z2: plzOrt, email: s.pdf_email || '', ort: s.pdf_city || '' };
+  }
 
   /* v2993 · gesetzlicher AfA-Satz nach Fertigstellungsjahr (§ 7 Abs. 4 Satz 1 Nr. 2 EStG) */
   function _gesetzAfaSatz(bj) {
@@ -225,13 +231,14 @@
       applyAbschlag: false,
 
       // Step 8: Sachverständiger
-      sv_name: 'Marcel Junker',
-      sv_titel: 'Immobilienberater',
-      sv_unternehmen: 'Junker Immobilien',
-      sv_adresse_z1: 'Hermannstraße 9',
-      sv_adresse_z2: '32609 Hüllhorst',
-      sv_email: '',
-      erstellungsort: 'Hüllhorst',
+      /* v3641 · keine echten Namen/Adressen als Vorgabe: Sachverstaendigen-Daten aus den eigenen Einstellungen, sonst leer */
+      sv_name: _svProfil().name,
+      sv_titel: '',
+      sv_unternehmen: _svProfil().firma,
+      sv_adresse_z1: _svProfil().z1,
+      sv_adresse_z2: _svProfil().z2,
+      sv_email: _svProfil().email,
+      erstellungsort: _svProfil().ort,
       erstellungsdatum: dateStrDE
     };
 
@@ -1254,7 +1261,7 @@
       <div class="rnd-wiz-grid">
         <div class="rnd-wiz-field rnd-wiz-col-2">
           <label>Name Sachverständiger</label>
-          <input type="text" data-state="sv_name" placeholder="Marcel Junker">
+          <input type="text" data-state="sv_name" placeholder="Max Mustermann">
         </div>
         <div class="rnd-wiz-field rnd-wiz-col-2">
           <label>Titel / Qualifikation</label>
@@ -1262,19 +1269,19 @@
         </div>
         <div class="rnd-wiz-field rnd-wiz-col-2">
           <label>Firma</label>
-          <input type="text" data-state="sv_unternehmen" placeholder="Junker Immobilien">
+          <input type="text" data-state="sv_unternehmen" placeholder="Muster Immobilien GmbH">
         </div>
         <div class="rnd-wiz-field rnd-wiz-col-2">
           <label>Adresse Zeile 1</label>
-          <input type="text" data-state="sv_adresse_z1" placeholder="Hermannstraße 9">
+          <input type="text" data-state="sv_adresse_z1" placeholder="Musterstraße 1">
         </div>
         <div class="rnd-wiz-field rnd-wiz-col-2">
           <label>Adresse Zeile 2</label>
-          <input type="text" data-state="sv_adresse_z2" placeholder="32609 Hüllhorst">
+          <input type="text" data-state="sv_adresse_z2" placeholder="12345 Musterstadt">
         </div>
         <div class="rnd-wiz-field rnd-wiz-col-2">
           <label>E-Mail <span class="rnd-wiz-hint">(erforderlich für den Versand des Gutachtens)</span></label>
-          <input type="email" data-state="sv_email" placeholder="kontakt@junker-immobilien.de">
+          <input type="email" data-state="sv_email" placeholder="kontakt@beispiel.de">
         </div>
         <div class="rnd-wiz-field">
           <label>Erstellungsort</label>

@@ -74,7 +74,7 @@
     "    <label class=\"dk-f dk-zins-eigen\" id=\"dkZinsEigen\" hidden><span>Zins selbst eintragen</span><input id=\"dcZins\" inputmode=\"decimal\" placeholder=\"z. B. 4,1\" aria-label=\"Sollzins in Prozent\"><i>%</i></label>",
     "    <small class=\"dk-stand\" id=\"dkStand\">Zins wird geladen …</small>",
     "  </fieldset>",
-    "  <label class=\"dk-f dk-plz\"><span>PLZ <em>optional · Lage &amp; Markt</em></span><input id=\"dcPlz\" inputmode=\"numeric\" maxlength=\"5\" placeholder=\"z. B. 32049\" aria-label=\"Postleitzahl, optional\"></label>",
+    "  <label class=\"dk-f dk-plz\"><span>PLZ <em>optional · Lage &amp; Markt</em></span><input id=\"dcPlz\" inputmode=\"numeric\" maxlength=\"5\" placeholder=\"z. B. 12345\" aria-label=\"Postleitzahl, optional\"></label>",
     "  <div class=\"dk-zwei\" id=\"dkObj\"><label class=\"dk-f\"><span>Baujahr <em>optional</em></span><input id=\"dcBj\" inputmode=\"numeric\" maxlength=\"4\" placeholder=\"z. B. 1975\" aria-label=\"Baujahr, optional\"></label>",
     "    <label class=\"dk-f\"><span>Wohnfläche <em>optional</em></span><input id=\"dcWfl\" inputmode=\"decimal\" maxlength=\"5\" placeholder=\"z. B. 70\" aria-label=\"Wohnfläche in Quadratmetern, optional\"><i>m²</i></label></div>",
     "  <button type=\"submit\" class=\"btn-p dk-los\" id=\"dkDreh\">Deal prüfen <span aria-hidden=\"true\">↻</span></button>",
