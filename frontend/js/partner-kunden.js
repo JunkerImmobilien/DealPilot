@@ -594,7 +594,9 @@
       '#dppk-hub-verwaltung .dppk-verw-leiste .rp-checkout{padding:9px 18px}',
       '#dppk-hub-verwaltung .dppk-verw-leiste #rp-b-reset{padding:9px 14px !important}',
       '#dppk-hub-verwaltung [data-v-ziel] > [data-marke-teil] > div:first-child{margin-top:0 !important}',
-      '@media (max-width:640px){#dppk-hub-verwaltung .rnd-wiz-counter{display:none}#dppk-hub-verwaltung .dppk-verw-leiste{order:-1;width:100%;margin:0}#dppk-hub-verwaltung #rp-b-stand{flex:1 1 100%}}'
+      /* gemessen 390 px: dort ist .body selbst kein Rollbereich mit fester Hoehe (h = Inhalt), sticky greift nie.
+         Am Handy steht deshalb nur die Speicher-Leiste FEST am unteren Rand, Zurueck/Weiter bleiben im Fluss. */
+      '@media (max-width:640px){#dppk-hub-verwaltung .rnd-wiz-counter{display:none}#dppk-hub-verwaltung .rnd-hub-nav{position:static;box-shadow:none}#dppk-hub-verwaltung{padding-bottom:96px}#dppk-hub-verwaltung .dppk-verw-leiste{position:fixed;left:0;right:0;bottom:0;z-index:60;margin:0;padding:10px 14px calc(10px + env(safe-area-inset-bottom));background:#fff;box-shadow:0 -6px 16px rgba(0,0,0,.12)}#dppk-hub-verwaltung #rp-b-stand{flex:1 1 100%}}'
     ].join('');
     document.head.appendChild(s);
   }
