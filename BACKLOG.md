@@ -36,6 +36,11 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
+### N179 · Angesetzte Miete ohne Stellplatz, Küche, Sonstiges; Zusatzeinnahmen aufteilen, Importe und Marktbericht (Marcel 17.11.2026: „Wir haben im Tab Miete ein Feld dafür, das heißt zusätzliche Einnahmen … darunter zum Ausklappen auch trennen, aber nur wenn erforderlich“) — **v3670–v3670c (`d775d270`, `af4e6316`, `662d9563`, `38d1ced0`) auf Staging nachgemessen; Prod NICHT ausgerollt**
+- Quick-Check vergleicht die Wohnungsmiete (12,00 statt 13,54 €/m² im Beispiel), Box zeigt Wohnung + Zusatz; Reiter Miete „aufteilen“ (ze_stp_monat/ze_kueche_monat/ze_sonst_monat); Marktbericht bekommt ze erstmals (Küche mit eigener Dauer, keine Doppelzählung mit Anzahl × Stellplatzmiete); Exposé, Mietvertrag, Mieterliste, MFH, Paket, QC → Objekt geprüft und repariert. Einzelheiten und Vorher/Nachher in wissen/2026-11-17.md.
+- Verschiebung: Ertragswert der 103 Staging-Objekte mit ze steigt (Beispiel ETW +24.000 bis +28.000 €), QC-Score +0 bis +1.
+- Offen: Marktbericht Stufe 3 im Browser ansehen; Anzahl Garagen/Stellplätze aus der Mieterliste ins Objekt; Warmmiete im Reiter Miete ohne ze (vorbestehend); Prod.
+
 ### N177 · Modernisierungspunkte ohne Angabe: kein stilles 0 mehr (Marcel 17.11.2026: „Das müssen wir auch für andere Objekte berücksichtigen … aus den Bildern ableiten … wenn nicht, dann mittel annehmen") — **v3660–v3660d (`74580f8d`, `8828d27e`, `0bc61e9b`, `c18fb8ab`, `cdd73e8a`) auf Staging; Entscheidungen 1–4 umgesetzt; Prod NICHT ausgerollt**
 - Rangfolge eigene Angabe > Zustand > Exposé-Text/Bilder je Gewerk > Rückfall (mittel 8 ab 30 J., Energieklasse) — Regeln in wissen/2026-11-17.md.
 - **Entschieden 17.11.2026 und umgesetzt (v3660a–d):** Ebene C neu eingefroren; Rückfallwerte bleiben; übrige Gewerke mittel angenommen, immer sichtbar unten mit Weg zum Einstellen; abgeleiteter Zustand darf DS2 bewegen, gekennzeichnet; Übernahme mit Haken.
