@@ -36,6 +36,12 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
+### N172 · Vorschau-Funktionen: Unfertiges auf Prod nur für uns (Marcel 17.11.2026) — **v3600/v3600a (`04adcfa6`, `d3b389e8`) auf Staging nachgemessen; Prod offen (geht mit dem nächsten Rollout mit)**
+- Erledigt: eine Liste `backend/src/services/vorschau-funktionen.json` (gutachten_org, vermoegen, umsetzungswuensche), `services/vorschau.js`, `GET /api/v1/vorschau`, `js/vorschau.js`, Routen 403, Admin › System › Vorschau (für wen, „für alle“, Freigabeliste), `claude/vorschau-funktionen.md`, `tools/vorschau-pruefen.mjs` in deploy-staging und rollout-prod (Gegenprobe 10/10 rot). Messung: wissen/2026-11-17.md.
+- Vor dem Prod-Rollout: auf Prod nachsehen, welche Konten `role = admin` haben (Admin › Vorschau zeigt es) – nur die sehen gutachten.org und Vermögen; sonst Konto auf die Freigabeliste.
+- Staging-Abnahme durch Marcel: Admin › Vorschau im Browser (nicht gemessen – kein Admin-Token ohne Marcels Anmeldung).
+- Offen bei Marcel: welche weiteren Staging-Funktionen (149 Commits vor main: Partner-Plan-Kauf v3610, Jahresabgleich, Pilot …) als unfertig auf die Liste gehören. Der alte gutachten.org-Weg aus dem RND-Wizard (`gutachten-org.js`, v1447, Mail/Formular) ist seit September auf Prod und nicht gesperrt – so lassen?
+
 ### N171 · Partnerkonzept geprüft, Partner-Aufzug kompakter, Vorschau Startseite mit DealPilot-Strecke (Marcel 17.11.2026) — **landing-partner-3 / landing-strecke-1 (`3a756995`) auf Staging nachgemessen; Optik der Vorschau entscheidet Marcel, dann Prod**
 - Erledigt: `partner.html` Strecke 4.719 → 2.992 px (1280) und 4.991 → 3.200 px (390), am Handy jetzt auch Aufzug (Schirm sticky). Fünf Fragen vor dem Kauf ergänzt (Abo-Ende und Kunden, was Kunden von DealPilot sehen, Objekt übergeben, Team-Konto, AVV), Video-Hinweis auf die echten fünf Folgen. Einzelheiten `wissen/2026-11-17.md`.
 - Ansehen: https://staging.dealpilot.immo/index-vorschau.html (Strecke „Vom Exposé bis in den Bestand“), https://staging.dealpilot.immo/partner.html#strecke
