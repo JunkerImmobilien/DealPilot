@@ -65,10 +65,20 @@
   /* Uebergang ungeteilt -> geteilt durch ein Skript (Import schreibt einen Teil): der bisherige
      Betrag geht nicht verloren, sein Rest steht unter Sonstiges. Wer selbst aufklappt, hat den
      Betrag schon im Feld Stellplatz/Garage (beimOeffnen) und kommt hier nicht hin. */
-  function teilGeaendert() {
+  /* Ein Import schreibt mehrere Teile nacheinander (Mietvertrag: Stellplatz, dann Kueche). Der Rest unter
+     Sonstiges wird deshalb gegen den Betrag VOR dem ersten Teil (_basis) nachgefuehrt, solange niemand
+     Sonstiges selbst geaendert hat - sonst zaehlte ein Kuechenanteil, der schon in ze steckte, doppelt. */
+  var _basis = null;
+  function teilGeaendert(id) {
+    var so = el('ze_sonst_monat');
     if (!_warAufgeteilt && !_imSetzen) {
-      var z = el('ze'), v = z ? (zahl(z.value) || 0) : 0, s = summe(), so = el('ze_sonst_monat');
-      if (so && v - s > 0.005) so.value = de((zahl(so.value) || 0) + v - s);
+      var z = el('ze'), v = z ? (zahl(z.value) || 0) : 0;
+      _basis = v > 0 && id !== 'ze_sonst_monat' ? v : null;
+    } else if (id === 'ze_sonst_monat' || _imSetzen) _basis = null;
+    if (_basis != null && so) {
+      var stp = zahl((el('ze_stp_monat') || {}).value) || 0, kue = zahl((el('ze_kueche_monat') || {}).value) || 0;
+      var rest = Math.round((_basis - stp - kue) * 100) / 100;
+      so.value = rest > 0.005 ? de(rest) : '';
     }
     zeSchreiben(summe()); zeichnen();
   }
@@ -102,7 +112,8 @@
 
   document.addEventListener('input', function (e) {
     var id = e.target && e.target.id;
-    if (TEILE.indexOf(id) >= 0) { if (!_leeren) teilGeaendert(); }
+    /* eine echte Eingabe (isTrusted) beendet die Nachfuehrung des Rests: wer selbst tippt, bestimmt die Summe */
+    if (TEILE.indexOf(id) >= 0) { if (e.isTrusted) _basis = null; if (!_leeren) teilGeaendert(id); }
     else if (id === 'ze') zeGeaendert();
   }, true);
   document.addEventListener('toggle', function (e) { if (e.target && e.target.id === 'ze-auft') beimOeffnen(); }, true);
@@ -110,13 +121,13 @@
   /* Nach dem Laden eines Objekts nur zeichnen (gespeicherte Werte bleiben, wie sie sind). */
   if (typeof window.loadData === 'function' && !window.loadData._zeAuft) {
     var _orig = window.loadData;
-    window.loadData = function () { var r = _orig.apply(this, arguments); try { zeichnen(); } catch (e) {} return r; };
+    window.loadData = function () { var r = _orig.apply(this, arguments); _basis = null; try { zeichnen(); } catch (e) {} return r; };
     window.loadData._zeAuft = true;
   }
   /* neues Objekt: _newObjLeeren (storage.js) leert die Felder ohne Ereignis - die Sperre von ze muss mit */
   if (typeof window._newObjLeeren === 'function' && !window._newObjLeeren._zeAuft) {
     var _origN = window._newObjLeeren;
-    window._newObjLeeren = function () { var r = _origN.apply(this, arguments); try { zeichnen(); } catch (e) {} return r; };
+    window._newObjLeeren = function () { var r = _origN.apply(this, arguments); _basis = null; try { zeichnen(); } catch (e) {} return r; };
     window._newObjLeeren._zeAuft = true;
   }
   function stil() {

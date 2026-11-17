@@ -144,6 +144,11 @@ function ebeneB(quelle, tag) {
   /* 5 · Import schreibt NUR den Stellplatz, ze hatte 80 (ungeteilt) -> Rest unter Sonstiges, nichts verloren */
   s = S(); s.tippe('ze', '80'); s.tippe('ze_stp_monat', '50');
   pruefe('B', tag + '5 Import eines Teils: ze bleibt 80, Rest 30 unter Sonstiges', s.els.ze.value === '80' && s.els.ze_sonst_monat.value === '30', [s.els.ze.value, s.els.ze_sonst_monat.value]);
+  /* 5b · Import schreibt zwei Teile nacheinander (Mietvertrag): Stellplatz 50, dann Kueche 30, ze hatte 80 */
+  s = S(); s.tippe('ze', '80'); s.tippe('ze_stp_monat', '50'); s.tippe('ze_kueche_monat', '30');
+  pruefe('B', tag + '5b zwei Teile nacheinander: ze bleibt 80, Sonstiges leer (Kueche nicht doppelt)', s.els.ze.value === '80' && s.els.ze_sonst_monat.value === '', [s.els.ze.value, s.els.ze_sonst_monat.value]);
+  s = S(); s.tippe('ze', '80'); s.tippe('ze_stp_monat', '50'); s.tippe('ze_kueche_monat', '60');
+  pruefe('B', tag + '5c Teile groesser als bisher: ze 110 = 50 + 60', s.els.ze.value === '110' && s.els.ze_sonst_monat.value === '', [s.els.ze.value, s.els.ze_sonst_monat.value]);
   /* 6 · derselbe Stellplatz wie in ze -> kein Rest, nicht doppelt */
   s = S(); s.tippe('ze', '50'); s.tippe('ze_stp_monat', '50');
   pruefe('B', tag + '6 gleicher Betrag: ze 50, Sonstiges leer (nicht doppelt)', s.els.ze.value === '50' && s.els.ze_sonst_monat.value === '', [s.els.ze.value, s.els.ze_sonst_monat.value]);
@@ -253,7 +258,7 @@ const still = (fn) => { const r0 = rot, g0 = gruen, l = console.log; console.log
 const gegen = [
   ['QC liest Teile nicht mehr (alte grund-Zeile)', () => ebeneA(qcHtml.replace(/var grund = _t\('nkm_grund'\)>0 \? Math\.min\(_t\('nkm_grund'\), nkm\) : \(nkm - _zt > 0 \? nkm - _zt : nkm\)/, "var grund = n(i.nkm_grund)>0 ? Math.min(n(i.nkm_grund), nkm) : nkm"), 'g ')],
   ['Box vergleicht wieder die Gesamtmiete', () => ebeneA(qcHtml.replace('else if (wohn > mp.markt_monat * 1.03)', 'else if (nkm > mp.markt_monat * 1.03)'), 'g ')],
-  ['Rest-Regel im Reiter entfernt', () => ebeneB(zeQuelle.replace('if (so && v - s > 0.005)', 'if (false)'), 'g ')],
+  ['Rest-Regel im Reiter entfernt', () => ebeneB(zeQuelle.replace('if (_basis != null && so) {', 'if (false) {'), 'g ')],
   ['Skript-Schreiben von ze ohne Wirkung', () => ebeneB(zeQuelle.replace("else if (id === 'ze') zeGeaendert();", ''), 'g ')],
   ['Karte schickt ze nicht', () => ebeneD(Object.assign({}, Q, { mb: Q.mb.replace("'ze', 'ze_stp_monat', 'ze_kueche_monat', 'ze_sonst_monat',", '') }), 'g ')],
   ['Mietvertrag-Stellplatz wieder auf ze', () => ebeneD(Object.assign({}, Q, { dok: Q.dok.replace("stellplatz_miete_eur: ['ze_stp_monat'", "stellplatz_miete_eur: ['ze'") }), 'g ')],
