@@ -63,9 +63,9 @@ function teilA() {
   pflicht.forEach(([n, re]) => ok(re.test(text), 'Pflichtinhalt: ' + n));
   ok(!/[–—]/.test(text), 'Kundentext ohne Gedankenstrich', String((text.match(/[–—]/g) || []).length));
   ok(!/;/.test(text), 'Kundentext ohne Semikolon', String((text.match(/;/g) || []).length));
-  /* v3620d · nach Marcels Antworten vom 17.11. bewusst offen nur noch: Nextcloud (Betreiber/Ort im Produktivbetrieb) */
+  /* v3620d/e · nach Marcels Antworten vom 17.11. ist keine Stelle mehr offen */
   const offenListe = (text.match(/\[offen:[^\]]*\]/g) || []);
-  const bewusst = [/Nextcloud|Ablage im Produktivbetrieb/];
+  const bewusst = [];   /* v3620e · Nextcloud raus (Marcel 17.11.: nicht genutzt), keine offene Stelle mehr */
   const unbewusst = offenListe.filter((o) => !bewusst.some((re) => re.test(o)));
   ok(unbewusst.length === 0, 'keine [offen]-Stelle ausser den bewusst offenen', unbewusst.join(' | ').slice(0, 200));
   if (offenListe.length) hinweis(offenListe.length + ' bewusst offene Stelle(n): ' + offenListe.map((o) => o.slice(0, 60)).join(' | '));
@@ -84,6 +84,7 @@ function teilA() {
   ok(!/inputs\.(name|halter|eigentuemer|email|mail|telefon|mieter|kunde|vorname|nachname)\b/i.test(avm), 'Bewertungs-Clients lesen keine Personenfelder (nur Anschrift und Objektmerkmale)');
   const ds = lies('frontend/datenschutz.html');
   ok(/gutachten\.org verarbeitet sie als eigener Verantwortlicher/.test(ds), 'Datenschutzerklaerung nennt gutachten.org als eigenen Verantwortlichen');
+  ok(!/Nextcloud/i.test(text) && !/Nextcloud/i.test(ds.replace(/<!--[\s\S]*?-->/g, '')), 'Nextcloud weder im AVV noch in der Datenschutzerklaerung (nicht genutzt, Marcel 17.11.)');
 
   const sich = lies('frontend/landing/sicherheit.html'), part = lies('frontend/landing/partner.html'), fr = lies('frontend/landing/fragen.html');
   ok(/href="avv\.html"/.test(sich) && /href="avv\.html"/.test(part) && /href="avv\.html"/.test(fr), 'sicherheit, partner, fragen verlinken avv.html');
