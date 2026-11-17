@@ -63,8 +63,27 @@ function teilA() {
   pflicht.forEach(([n, re]) => ok(re.test(text), 'Pflichtinhalt: ' + n));
   ok(!/[–—]/.test(text), 'Kundentext ohne Gedankenstrich', String((text.match(/[–—]/g) || []).length));
   ok(!/;/.test(text), 'Kundentext ohne Semikolon', String((text.match(/;/g) || []).length));
-  const offen = (html.match(/\[offen:/g) || []).length;
-  if (offen) hinweis(offen + ' Stellen [offen: …] im Vertrag, vor einem Prod-Rollout mit Marcel klaeren');
+  /* v3620d · nach Marcels Antworten vom 17.11. bewusst offen nur noch: Nextcloud (Betreiber/Ort im Produktivbetrieb) */
+  const offenListe = (text.match(/\[offen:[^\]]*\]/g) || []);
+  const bewusst = [/Nextcloud|Ablage im Produktivbetrieb/];
+  const unbewusst = offenListe.filter((o) => !bewusst.some((re) => re.test(o)));
+  ok(unbewusst.length === 0, 'keine [offen]-Stelle ausser den bewusst offenen', unbewusst.join(' | ').slice(0, 200));
+  if (offenListe.length) hinweis(offenListe.length + ' bewusst offene Stelle(n): ' + offenListe.map((o) => o.slice(0, 60)).join(' | '));
+  /* Marcels Antworten 17.11.2026 */
+  const t3 = text.slice(text.indexOf('Anlage 3 · Unterauftragsverarbeiter'));
+  const teilAusgenommen = t3.indexOf('Dienste, die nur Objektangaben erhalten');
+  ok(teilAusgenommen > 0 && !/gutachten\.org/.test(t3.slice(0, teilAusgenommen)), 'gutachten.org nicht in der Liste der Unterauftragsverarbeiter');
+  ok(/gutachten\.org[^.]*eigener Verantwortlicher/.test(t3), 'gutachten.org als eigener Verantwortlicher, nur auf Bestellung');
+  ok(!/Sprengnetter|PriceHubble|GeoMap|geomap/i.test(text), 'Bewertungspartner und Marktdatenquelle nicht namentlich (Anbieter-Neutralitaet)');
+  ok(/keine Namen oder Kontaktdaten/.test(t3), 'Objektdaten-Dienste: ausdruecklich ohne Namen oder Kontaktdaten');
+  ok(!/Firewall|nur mit Schl|nur per Schl/.test(text), 'TOM behauptet weder Firewall noch SSH nur mit Schluessel (nicht belegt)');
+  ok(/außer dem Inhaber niemand/.test(text), 'Vertraulichkeit: nur der Inhaber');
+  ok(/Mailversand wird in Kürze auf einen anderen Anbieter umgestellt/.test(t3), 'Alfahosting mit Hinweis auf den Wechsel');
+  /* Bewertungspartner: gemessen, dass keine Personenangaben in die Anfrage gehen */
+  const avm = ['backend/src/services/sprengnetter-client.js', 'backend/src/services/pricehubble-client.js'].map(lies).join('\n');
+  ok(!/inputs\.(name|halter|eigentuemer|email|mail|telefon|mieter|kunde|vorname|nachname)\b/i.test(avm), 'Bewertungs-Clients lesen keine Personenfelder (nur Anschrift und Objektmerkmale)');
+  const ds = lies('frontend/datenschutz.html');
+  ok(/gutachten\.org verarbeitet sie als eigener Verantwortlicher/.test(ds), 'Datenschutzerklaerung nennt gutachten.org als eigenen Verantwortlichen');
 
   const sich = lies('frontend/landing/sicherheit.html'), part = lies('frontend/landing/partner.html'), fr = lies('frontend/landing/fragen.html');
   ok(/href="avv\.html"/.test(sich) && /href="avv\.html"/.test(part) && /href="avv\.html"/.test(fr), 'sicherheit, partner, fragen verlinken avv.html');

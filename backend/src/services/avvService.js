@@ -21,7 +21,7 @@
 const consent = require('./consentService');
 const { query } = require('../db/pool');
 
-const AVV_VERSION = '1.0';
+const AVV_VERSION = '1.1';   /* v3620d · 1.1: Marcels Antworten 17.11. (1.0 hatte auf Staging bereits ein echtes Konto abgeschlossen) */
 const AVV_STAND = '2026-11-17';
 const AVV_LINK = '/avv.html';   /* Landing-Domain: frontend/landing/avv.html. App-Domain: frontend/avv.html leitet auf /landing/avv.html */
 
