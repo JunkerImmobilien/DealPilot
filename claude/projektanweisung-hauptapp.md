@@ -44985,3 +44985,9 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Commit:** `03ec11d6`, `faf2d36e`.
 - **Nachweis:** nach „Nur ausschalten“ und „Alles auf Standard“ sofort und nach erneutem Neuladen `--gold` #C9A84C, keine `--wl-`-Tokens, Markenfeld „DealPilot“, PDF ohne Partnerlogo, Mail-Logo-Route 404. Bilder `50-*`.
 - **Rest:** Prod.
+
+### v3630k–v3630m · 17.11.2026 (nur Staging) · Verwaltung im DealPilot-Standard, Vorschauen
+- **Was:** Felder, Karten, Köpfe, Beschriftungen, Hinweise und Knöpfe der Verwaltung wie im Reiter Objekt (gemessen, Tabelle in wissen/2026-11-17.md), #dppk-verw in allen :is()-Listen von einheitlich.css. Ablagefläche für Logos. Liste links mit Mini-Vorschauen, Kopfkarte im Bereich Marke.
+- **Commit:** `66624ce6`, `8d497fd4`, `b4fc056f`.
+- **Nachweis:** Nachmessung aller Werte gleich dem Reiter Objekt (Hauptknopf-Schrift folgt der Marke). Co-Pilot ohne Überlapp (elementFromPoint, 1440 und 390). Bilder `60-*`.
+- **Rest:** Logo vor dem Speichern nicht live in der Leiste, wenn vorher keins gespeichert war; Prod.
