@@ -905,76 +905,111 @@
      "id": "partner-1",
      "kategorie": "partner",
      "nr": 1,
-     "dauer": 209,
+     "dauer": 320,
      "titel": "Partner-Cockpit und Marke",
      "unterzeile": "Dein Arbeitsplatz für Kunden, Plätze und deine Marke.",
-     "story": "Wo das Partner-Cockpit sitzt, was die Übersicht zeigt, wie Plätze und Abrechnung funktionieren und wie Logo und Farbe deines Unternehmens in DealPilot kommen.",
-     "datei": "dealpilot-partner-1-partner-cockpit-und-marke.mp4",
-     "datei_ton": "dealpilot-partner-1-partner-cockpit-und-marke-marcel.mp4",
-     "poster": "dealpilot-partner-1-vorschau.webp",
+     "story": "Wo das Partner-Cockpit sitzt, was die Übersicht zeigt, wie du in der Verwaltung Logo, Farbe und PDFs einstellst und wie Plätze und Abrechnung funktionieren.",
+     "datei": "dealpilot-partner-1-partner-cockpit-und-marke-v3650.mp4",
+     "datei_ton": "dealpilot-partner-1-partner-cockpit-und-marke-v3650-sprecher.mp4",
+     "poster": "dealpilot-partner-1-vorschau-v3650.webp",
      "kapitel": [
       {
-       "t": 17,
+       "t": 15,
        "titel": "Deine Marke",
        "stichworte": "DealPilot trägt das Logo und die Farbe deines Unternehmens. Im Beispiel die erfundene Nordlicht Immobilienberatung."
       },
       {
-       "t": 31,
+       "t": 29,
        "titel": "Das Partner-Cockpit",
        "stichworte": "Unter Aktionen öffnest du das Partner-Cockpit. Dort steuerst du deine Kunden."
       },
       {
-       "t": 44,
+       "t": 42,
        "titel": "Auf einen Blick",
        "stichworte": "Plätze belegt 1 / 5, Kunden verbunden 2, neue Kundenstände 3. Jede Kachel führt in ihren Reiter."
       },
       {
-       "t": 56,
+       "t": 54,
        "titel": "Was ansteht",
        "stichworte": "4 Punkte warten auf dich: offene Anfragen, neue Stände deiner Kunden, Meldungen. Ein Klick, und du bist dort."
       },
       {
-       "t": 70,
+       "t": 67,
        "titel": "Die Reiter",
-       "stichworte": "Statt Objekt bis Deal-Aktion stehen oben jetzt die Reiter des Cockpits: Kunden & Plätze, Einladen, Freigegeben, Aufgaben, Meldungen, Verwalt"
+       "stichworte": "Oben stehen die Reiter des Cockpits: Kunden & Plätze, Einladen, Übergeben, Freigegeben, Aufgaben, Meldungen, Verwaltung."
       },
       {
-       "t": 85,
+       "t": 81,
        "titel": "Zurück zu den Objekten",
        "stichworte": "Mit Objekte kommst du jederzeit zurück zu deinen eigenen Objekten."
       },
       {
-       "t": 99,
+       "t": 97,
+       "titel": "Verwaltung",
+       "stichworte": "Links die Bereiche Marke, Logo, Farben, Dokumente, Plätze & Abo, darunter jeweils, was gerade gilt. Rechts der Inhalt."
+      },
+      {
+       "t": 111,
+       "titel": "Einmal speichern",
+       "stichworte": "Alles, was du änderst, siehst du sofort. Dauerhaft wird es mit Speichern, verwerfen geht jederzeit."
+      },
+      {
+       "t": 126,
+       "titel": "Dein Logo",
+       "stichworte": "Einmal hochladen. Ein einfarbiger Rand wird abgeschnitten, die Vorschau zeigt Menüleiste und hellen Grund."
+      },
+      {
+       "t": 139,
+       "titel": "Auf dunklem Grund",
+       "stichworte": "5 Darstellungen für die dunkle Menüleiste: automatisch, hell eingefärbt ohne Fläche, weiße Fläche oder Rahmen in deiner Farbe."
+      },
+      {
+       "t": 157,
+       "titel": "Sofort sichtbar",
+       "stichworte": "Ein Klick auf Weiße Fläche, und die Menüleiste zeigt es sofort. Noch nichts gespeichert."
+      },
+      {
+       "t": 170,
+       "titel": "Größe und Lage",
+       "stichworte": "Die Größe stellst du bis 250 % ein, dazu links oder mittig. Auch das wirkt sofort in der Leiste."
+      },
+      {
+       "t": 187,
+       "titel": "Deine Farbe",
+       "stichworte": "18 Akzentfarben zur Auswahl, alle gut lesbar auf Dunkel und Weiß. Dazu Standard, das DealPilot-Gold."
+      },
+      {
+       "t": 203,
+       "titel": "Live in der App",
+       "stichworte": "Ein Klick auf Kupfer, und Knöpfe, Reiter und Linien wechseln sofort. Mit Änderungen verwerfen ist alles wie vorher."
+      },
+      {
+       "t": 222,
+       "titel": "Deine PDFs",
+       "stichworte": "Deckblatt dunkel oder hell, die Logogröße in den PDFs mit Vorschau von Deckblatt und Seitenkopf. Dazu der Absender im Fuß."
+      },
+      {
+       "t": 239,
        "titel": "Plätze",
        "stichworte": "Ein Platz ist ein DealPilot-Zugang, den du für einen Kunden bezahlst. Gekauft 5, belegt 1, frei 4."
       },
       {
-       "t": 111,
+       "t": 251,
        "titel": "Plätze dazukaufen",
        "stichworte": "Der Preis steht sofort daneben, hier für 5 Plätze 95 € je Monat (19 € je Platz). Plätze kommen zum Partner-Plan dazu und werden über die Kas"
       },
       {
-       "t": 128,
+       "t": 268,
        "titel": "Abrechnung",
        "stichworte": "Dein Partner-Plan, Rechnungen, Zahlungsart und Kündigung findest du im Abo-Portal."
       },
       {
-       "t": 140,
-       "titel": "Marke",
-       "stichworte": "Name, Logo und Akzentfarbe deines Unternehmens. Dazu Anschrift und Kontakt für PDFs und E-Mails an deine Kunden."
-      },
-      {
-       "t": 153,
-       "titel": "Dein Logo",
-       "stichworte": "Einmal hochladen. DealPilot rechnet es für helle und dunkle Flächen selbst passend."
-      },
-      {
-       "t": 164,
+       "t": 279,
        "titel": "Für deine Kunden",
        "stichworte": "Kunden mit deinem Platz sehen DealPilot in deiner Marke. Kunden mit eigenem Abo wählen selbst, ob sie deine Marke nutzen."
       },
       {
-       "t": 181,
+       "t": 296,
        "titel": "Startklar",
        "stichworte": "Das Cockpit steht. Im nächsten Video: Kunden hinzufügen, mit Partnerplatz oder mit eigenem Abo."
       }
@@ -984,96 +1019,116 @@
      "id": "partner-2",
      "kategorie": "partner",
      "nr": 2,
-     "dauer": 288,
+     "dauer": 331,
      "titel": "Kunden hinzufügen",
      "unterzeile": "Mit Partnerplatz oder eigenem Abo, per Einladung oder Code.",
-     "story": "Kunden mit Partnerplatz, Kunden mit eigenem Abo und offene Einladungen. Stufe und Rechte, E-Mail bei Rückmeldung, Einladung per E-Mail oder Verbindungscode und wie der Kunde die Anfrage bestätigt.",
-     "datei": "dealpilot-partner-2-kunden-hinzufuegen.mp4",
-     "datei_ton": "dealpilot-partner-2-kunden-hinzufuegen-marcel.mp4",
-     "poster": "dealpilot-partner-2-vorschau.webp",
+     "story": "Kunden mit Partnerplatz, Kunden mit eigenem Abo und offene Einladungen. Kundennummer, Stufe und Rechte im Fenster mit Reitern, Einladung per E-Mail oder Verbindungscode und wie der Kunde die Anfrage bestätigt.",
+     "datei": "dealpilot-partner-2-kunden-hinzufuegen-v3650.mp4",
+     "datei_ton": "dealpilot-partner-2-kunden-hinzufuegen-v3650-sprecher.mp4",
+     "poster": "dealpilot-partner-2-vorschau-v3650.webp",
      "kapitel": [
       {
-       "t": 15,
+       "t": 12,
        "titel": "Kunden & Plätze",
        "stichworte": "Hier stehen alle Kunden, die mit dir verbunden sind, und alle, die noch zusagen müssen."
       },
       {
-       "t": 26,
+       "t": 23,
        "titel": "Mit Partnerplatz",
        "stichworte": "Jonas Berger nutzt einen Platz von dir. Du bezahlst seinen Zugang und bestimmst Stufe, Rechte und Marke."
       },
       {
-       "t": 39,
+       "t": 35,
+       "titel": "Kundennummer",
+       "stichworte": "Jeder verbundene Kunde bekommt eine Nummer, hier K-2026-001. Sie zählt je Jahr fortlaufend, du kannst sie ändern."
+      },
+      {
+       "t": 49,
        "titel": "Mit eigenem Abo",
        "stichworte": "Sabine Kraus hat DealPilot schon selbst gebucht. Sie verbindet sich mit dir und behält ihren Plan. Ein Platz wird dafür nicht gebraucht."
       },
       {
-       "t": 55,
+       "t": 64,
        "titel": "Wartet auf Zusage",
        "stichworte": "Thomas Weber ist eingeladen und hat noch nicht bestätigt. Ohne seine Zusage entsteht keine Verbindung."
       },
       {
-       "t": 70,
+       "t": 79,
        "titel": "Stufe und Rechte",
-       "stichworte": "Beim Platz legst du fest, wie viel dein Kunde sieht: Einsteiger, Fortgeschritten oder Experte, deine Marke oder DealPilot."
+       "stichworte": "Ein Fenster mit Reitern wie der Restnutzungsdauer-Rechner: Kunde, Stufe, Rechte, Einstellungen, Kontingente, Marke, Platz."
       },
       {
-       "t": 84,
-       "titel": "Einzelne Teile abschalten",
-       "stichworte": "Mit den Schaltern nimmst du einzelne Funktionen aus dem Platz, zum Beispiel PDFs oder die Steuer."
+       "t": 94,
+       "titel": "Kunde",
+       "stichworte": "Kundennummer, eine Notiz nur für dein Team und die E-Mail bei Rückmeldung, je Kunde an- oder abschaltbar."
       },
       {
-       "t": 98,
-       "titel": "E-Mail bei Rückmeldung",
-       "stichworte": "Gibst du einem Kunden Anmerkungen zurück, bekommt er eine E-Mail in deiner Marke. Hier je Kunde an- oder abschaltbar."
+       "t": 109,
+       "titel": "Stufe",
+       "stichworte": "Wie viel dein Kunde sieht: Einsteiger, Fortgeschritten oder Experte."
       },
       {
-       "t": 116,
+       "t": 121,
+       "titel": "Rechte",
+       "stichworte": "Mit an und aus nimmst du einzelne Funktionen aus dem Platz, zum Beispiel PDFs, Marktbericht oder KI."
+      },
+      {
+       "t": 136,
+       "titel": "Marke",
+       "stichworte": "Deine Marke oder DealPilot. Gespeichert wird einmal unten."
+      },
+      {
+       "t": 149,
        "titel": "Per E-Mail einladen",
        "stichworte": "Name und Adresse eintragen. Hat die Adresse schon ein DealPilot-Konto, bekommt der Kunde eine Anfrage in seiner App, sonst eine Einladung pe"
       },
       {
-       "t": 135,
+       "t": 168,
        "titel": "Mit oder ohne Platz",
        "stichworte": "Mit Partnerplatz bezahlst du den Zugang. Ohne Platz nutzt der Kunde seinen eigenen Plan. Hat er schon ein Abo, wird er automatisch ohne Plat"
       },
       {
-       "t": 152,
+       "t": 185,
        "titel": "Einladen",
        "stichworte": "Ein Klick auf Einladen schickt die Einladung los. Im Video lassen wir das Beispiel stehen."
       },
       {
-       "t": 163,
+       "t": 196,
        "titel": "Verbindungscode",
        "stichworte": "Kunden mit eigenem Abo erzeugen in DealPilot einen Code und geben ihn dir, etwa im Termin. Du trägst ihn hier ein, der Kunde bestätigt."
       },
       {
-       "t": 178,
+       "t": 211,
        "titel": "Platz nur bei Bedarf",
        "stichworte": "Den Haken Partnerplatz mitgeben nimmst du raus, wenn der Kunde sein eigenes Abo behält."
       },
       {
-       "t": 207,
+       "t": 237,
        "titel": "Mein Partner",
-       "stichworte": "Thomas Weber findet die Anfrage unter Aktionen › Mein Partner. Oben in der App erscheint dazu ein Hinweis."
+       "stichworte": "Thomas Weber findet die Anfrage unter Mein Partner in der linken Leiste. Unten in der App erscheint dazu ein Hinweis."
       },
       {
-       "t": 222,
+       "t": 252,
+       "titel": "Die Anfrage",
+       "stichworte": "Mein Partner öffnet sich wie dein Cockpit, mit eigenen Reitern. Oben steht die Anfrage."
+      },
+      {
+       "t": 266,
        "titel": "Er entscheidet",
        "stichworte": "Der Kunde sieht, wer sich verbinden will und was das heißt. Mit Platz bezahlst du seinen Zugang. Erst seine Bestätigung verbindet euch."
       },
       {
-       "t": 236,
+       "t": 280,
        "titel": "Was du siehst",
        "stichworte": "Du siehst nur Objekte, die er dir ausdrücklich sendet, als Kopie. Trennen kann er jederzeit."
       },
       {
-       "t": 249,
+       "t": 293,
        "titel": "Der Code für dich",
        "stichworte": "Hier erzeugt der Kunde den Verbindungscode, wenn er sich selbst mit dir verbinden möchte. Er gilt 24 Stunden und nur einmal."
       },
       {
-       "t": 265,
+       "t": 307,
        "titel": "Weiter geht’s",
        "stichworte": "Sobald er bestätigt, steht er bei dir unter Kunden & Plätze. Im nächsten Video: Objekte senden."
       }
@@ -1083,13 +1138,13 @@
      "id": "partner-3",
      "kategorie": "partner",
      "nr": 3,
-     "dauer": 261,
+     "dauer": 302,
      "titel": "Objekte senden und übernehmen",
      "unterzeile": "Vom Kunden ins Cockpit, und als eigenes Objekt weiter.",
-     "story": "Die Kundin sendet ein Objekt über Mein Partner. Der Partner sieht es unter Freigegeben, je Kunde und Stand, öffnet es nur lesend und übernimmt es als eigenes Objekt.",
-     "datei": "dealpilot-partner-3-objekte-senden-und-uebernehmen.mp4",
-     "datei_ton": "dealpilot-partner-3-objekte-senden-und-uebernehmen-marcel.mp4",
-     "poster": "dealpilot-partner-3-vorschau.webp",
+     "story": "Die Kundin sendet ein Objekt über Mein Partner. Der Partner sieht es unter Freigegeben, je Kunde und Stand, öffnet es nur lesend und übernimmt es mit Kundenbezug als eigenes Objekt. Die Objektliste sortiert nach Kunde.",
+     "datei": "dealpilot-partner-3-objekte-senden-und-uebernehmen-v3650.mp4",
+     "datei_ton": "dealpilot-partner-3-objekte-senden-und-uebernehmen-v3650-sprecher.mp4",
+     "poster": "dealpilot-partner-3-vorschau-v3650.webp",
      "kapitel": [
       {
        "t": 12,
@@ -1097,72 +1152,87 @@
        "stichworte": "Unter Freigegeben stehen alle Objekte, die deine Kunden dir gesendet haben. Gerade sind es 3."
       },
       {
-       "t": 37,
+       "t": 35,
        "titel": "Ein neues Objekt",
        "stichworte": "Sabine Kraus rechnet gerade Musterweg 3, Bielefeld. Sie möchte deine Meinung dazu."
       },
       {
-       "t": 49,
+       "t": 47,
        "titel": "Mein Partner",
-       "stichworte": "Unter Aktionen › Mein Partner sendet sie Objekte an dich."
+       "stichworte": "Unter Mein Partner sendet sie Objekte an dich."
       },
       {
-       "t": 60,
+       "t": 57,
        "titel": "Nur eine Kopie",
        "stichworte": "Gesendet wird eine Kopie. Du siehst nur, was sie dir sendet, nie ihre übrigen Objekte. Ihr Original bleibt bei ihr."
       },
       {
-       "t": 74,
+       "t": 71,
        "titel": "Auswählen",
        "stichworte": "Haken setzen. Mehrere Objekte gehen auf einmal, mit Gesamter Bestand auch alle."
       },
       {
-       "t": 87,
+       "t": 84,
        "titel": "An Partner senden",
        "stichworte": "Noch einmal klar gesagt, was passiert. Dann Senden."
       },
       {
-       "t": 98,
+       "t": 95,
        "titel": "Meine Sendungen",
        "stichworte": "Sie sieht, welcher Stand bei dir liegt und ob du ihn schon geöffnet hast. Ändert sie das Objekt, sendet sie einfach einen neuen Stand."
       },
       {
-       "t": 125,
+       "t": 122,
        "titel": "Was ansteht",
        "stichworte": "In der Übersicht steht es sofort: 2 neue Stände von Sabine Kraus (Demo). Dazu eine Meldung."
       },
       {
-       "t": 143,
+       "t": 140,
        "titel": "Je Kunde",
-       "stichworte": "Jeder Kunde hat seine Karte. Am Objekt steht Ankauf oder Bestand, welcher Stand und wann. Neu heißt: noch nicht geöffnet."
+       "stichworte": "Gefiltert nach Kunde K-2026-002. Am Objekt steht Ankauf oder Bestand, welcher Stand und wann. Neu heißt: noch nicht geöffnet."
       },
       {
-       "t": 158,
+       "t": 155,
        "titel": "Stand 2",
-       "stichworte": "Bei Jonas siehst du Stand 2. Jeder neue Stand ersetzt den alten, du arbeitest immer am aktuellen."
+       "stichworte": "Bei Jonas siehst du Stand 2. Jeder neue Stand ersetzt den alten, dazu 1 Rückfrage zu deinen Anmerkungen."
       },
       {
-       "t": 175,
+       "t": 173,
        "titel": "Nur lesen",
        "stichworte": "Du siehst das Objekt mit allen Zahlen, Reitern und Unterlagen, so wie Sabine es gerechnet hat. Ändern kannst du hier nichts."
       },
       {
-       "t": 192,
+       "t": 190,
        "titel": "Alles da",
        "stichworte": "Kennzahlen, Score und Bewertung stehen wie bei deinen eigenen Objekten. Rechnen und PDFs erstellen geht auch."
       },
       {
-       "t": 206,
+       "t": 204,
        "titel": "Als eigenes Objekt übernehmen",
-       "stichworte": "Willst du damit weiterarbeiten, übernimmst du es. DealPilot legt eine eigene Kopie bei dir an. Sie bleibt, auch wenn Sabine ihren Stand zurü"
+       "stichworte": "Willst du damit weiterarbeiten, übernimmst du es. DealPilot legt eine eigene Kopie bei dir an."
       },
       {
-       "t": 227,
+       "t": 218,
+       "titel": "Mit Kundenbezug",
+       "stichworte": "Die Kopie trägt den Kunden K-2026-002 · Sabine Kraus. Sie bleibt bei dir, auch wenn Sabine ihren Stand zurückzieht."
+      },
+      {
+       "t": 235,
        "titel": "Dein Objekt",
        "stichworte": "Jetzt ist es dein Objekt mit eigener Nummer 2026-002. Du kannst es frei bearbeiten."
       },
       {
-       "t": 238,
+       "t": 252,
+       "titel": "Sortieren nach Kunde",
+       "stichworte": "In der Objektliste sortierst du nach Kunde oder zeigst nur die Objekte eines Kunden."
+      },
+      {
+       "t": 266,
+       "titel": "Je Kunde gruppiert",
+       "stichworte": "Übernimmst du einen späteren Stand noch einmal, fragt DealPilot: Bestehendes aktualisieren oder neue Kopie."
+      },
+      {
+       "t": 280,
        "titel": "Weiter geht’s",
        "stichworte": "Im nächsten Video: Anmerkungen an den Kundenstand schreiben und zurückgeben."
       }
@@ -1172,113 +1242,143 @@
      "id": "partner-4",
      "kategorie": "partner",
      "nr": 4,
-     "dauer": 361,
+     "dauer": 447,
      "titel": "Anmerkungen und Rückmeldung",
-     "unterzeile": "Felder markieren, zurückgeben, und was der Kunde sieht.",
-     "story": "Der Partner markiert ein Feld, schreibt eine Anmerkung mit Vorschlag und gibt sie zurück. Der Kunde sieht die Rückmeldung an seinem Objekt, übernimmt den Vorschlag, erledigt alles und sendet einen neuen Stand.",
-     "datei": "dealpilot-partner-4-anmerkungen-und-rueckmeldung.mp4",
-     "datei_ton": "dealpilot-partner-4-anmerkungen-und-rueckmeldung-marcel.mp4",
-     "poster": "dealpilot-partner-4-vorschau.webp",
+     "unterzeile": "Felder markieren, Bild zeigen, zurückgeben, und was der Kunde tut.",
+     "story": "Der Partner markiert ein Feld, schreibt eine Anmerkung mit Vorschlag und Bildausschnitt und gibt sie zurück. Der Kunde sieht das Bild groß, übernimmt den Vorschlag, erledigt oder fragt zurück und sendet erst dann einen neuen Stand.",
+     "datei": "dealpilot-partner-4-anmerkungen-und-rueckmeldung-v3650.mp4",
+     "datei_ton": "dealpilot-partner-4-anmerkungen-und-rueckmeldung-v3650-sprecher.mp4",
+     "poster": "dealpilot-partner-4-vorschau-v3650.webp",
      "kapitel": [
       {
-       "t": 15,
+       "t": 12,
        "titel": "Ein Kundenstand",
        "stichworte": "Jonas hat die Lindenallee 14 gesendet. Er will sie bald der Bank zeigen. Wir prüfen sie vorher."
       },
       {
-       "t": 34,
+       "t": 31,
        "titel": "Die Werkzeuge",
        "stichworte": "Feld markieren, Anmerkung, die Liste und Zurück an Kunden. Alles, was du schreibst, bleibt Entwurf, bis du zurückgibst."
       },
       {
-       "t": 48,
+       "t": 45,
        "titel": "Die Liste",
-       "stichworte": "Rechts steht jede Anmerkung mit Nummer. Frühere Punkte zeigen, was der Kunde schon erledigt oder beantwortet hat, dazu 1 Entwurf von dir."
+       "stichworte": "Rechts steht jede Anmerkung mit Nummer: 2 erledigt (grün), 1 Rückfrage (blau), 1 Entwurf von dir."
       },
       {
-       "t": 63,
-       "titel": "Antwort des Kunden",
-       "stichworte": "Jonas hat geantwortet: Abgeglichen, die Mieten stimmen mit den Verträgen überein."
+       "t": 57,
+       "titel": "Rückfrage des Kunden",
+       "stichworte": "Jonas hat zurückgefragt: Der Verkäufer bleibt beim Preis. Wie weit sollte ich mit dem Angebot runtergehen? Eine Rückfrage zählt als bearbeit"
       },
       {
-       "t": 78,
+       "t": 77,
        "titel": "Feld markieren",
        "stichworte": "Jetzt tippst du auf ein Feld, eine Kachel oder einen Abschnitt, in jedem Reiter."
       },
       {
-       "t": 93,
+       "t": 92,
        "titel": "Anmerkung zum Feld",
        "stichworte": "Das Fenster steht direkt am Feld. Oben, welches Feld und was gerade drinsteht."
       },
       {
-       "t": 110,
+       "t": 108,
        "titel": "Art und Vorschlag",
        "stichworte": "Hinweis, Bitte prüfen oder Bitte nachreichen. Bei Eingabefeldern kannst du einen Wert vorschlagen. Diktieren geht auch."
       },
       {
-       "t": 128,
+       "t": 122,
+       "titel": "Bildausschnitt",
+       "stichworte": "Mit Bildausschnitt zeigst du genau die Stelle. Du ziehst einen Rahmen über die Ansicht."
+      },
+      {
+       "t": 140,
+       "titel": "Markieren",
+       "stichworte": "Im Bild markierst du mit Rechteck, Pfeil oder Freihand in Rot. Einen Fehlgriff nimmt Rückgängig zurück."
+      },
+      {
+       "t": 154,
+       "titel": "Am Anmerkungsfenster",
+       "stichworte": "Das Bild hängt jetzt an der Anmerkung. Ein Klick öffnet es groß."
+      },
+      {
+       "t": 167,
        "titel": "Markiert",
        "stichworte": "Das Feld bekommt einen Rahmen mit Nummer, in der Liste steht der neue Entwurf."
       },
       {
-       "t": 138,
+       "t": 178,
        "titel": "Zurück an Kunden",
        "stichworte": "Alle Entwürfe gehen gebündelt zurück, hier 2. Als eine Aufgabe an genau diesen Kunden."
       },
       {
-       "t": 155,
+       "t": 195,
        "titel": "Mit Begleittext",
        "stichworte": "Dazu bekommt Jonas eine E-Mail in deiner Marke mit Objekt, Zahl der Anmerkungen und deinem Text. Die Anmerkungen selbst stehen nur in der Ap"
       },
       {
-       "t": 174,
+       "t": 214,
        "titel": "Zurückgegeben",
        "stichworte": "Die Entwürfe stehen jetzt beim Kunden als offen. Ändern kannst du sie nicht mehr."
       },
       {
-       "t": 204,
+       "t": 244,
        "titel": "Neue Aufgabe",
        "stichworte": "Jonas sieht einen Punkt an Mein Partner. Mit E-Mail kommt er direkt über den Link hierher."
       },
       {
-       "t": 217,
+       "t": 257,
        "titel": "Rückmeldung zu …",
        "stichworte": "Die Aufgabe nennt Objekt, Zahl der Anmerkungen und den Stand. Darunter dein Begleittext."
       },
       {
-       "t": 236,
+       "t": 277,
        "titel": "Am eigenen Objekt",
        "stichworte": "Jonas landet in seinem Objekt, an der markierten Stelle. Dieselben Rahmen, dieselbe Liste."
       },
       {
-       "t": 248,
-       "titel": "Erledigt, Antworten, Vorschlag",
-       "stichworte": "Je Anmerkung: Erledigt, Antworten und bei einem Vorschlag Vorschlag übernehmen. Übernommen wird nur auf seinen Klick."
+       "t": 289,
+       "titel": "Mit Bild",
+       "stichworte": "Dein Bildausschnitt hängt an der Anmerkung. Ein Klick, und Jonas sieht ihn groß."
       },
       {
-       "t": 267,
-       "titel": "Übernommen",
-       "stichworte": "Der Wert steht im Feld: 25.000 €. Die Rechnung läuft sofort mit."
+       "t": 307,
+       "titel": "Erst bearbeiten",
+       "stichworte": "Senden geht erst, wenn jede Anmerkung erledigt oder beantwortet ist. Noch 2 offen, der Knopf ist aus."
       },
       {
-       "t": 283,
-       "titel": "Alles erledigt",
-       "stichworte": "Ist alles erledigt, sagt DealPilot es und bietet Erneut senden an. Dein Partner bekommt eine Meldung."
+       "t": 324,
+       "titel": "Vorschlag übernommen",
+       "stichworte": "Der Wert steht im Feld: 25.000 €. Übernommen wird nur auf seinen Klick."
       },
       {
-       "t": 298,
+       "t": 337,
+       "titel": "Erledigt",
+       "stichworte": "Ein Klick auf Erledigt, und die Anmerkung wird grün."
+      },
+      {
+       "t": 352,
+       "titel": "Oder eine Rückfrage",
+       "stichworte": "Passt etwas nicht, schreibt Jonas zurück. Als Rückfrage senden zählt auch als bearbeitet."
+      },
+      {
+       "t": 366,
+       "titel": "Alles bearbeitet",
+       "stichworte": "Jetzt ist Erneut senden frei. Dein Partner sieht erledigt in Grün und Rückfragen in Blau."
+      },
+      {
+       "t": 380,
        "titel": "Neuer Stand",
        "stichworte": "Ein Klick, und der neue Stand liegt bei seinem Partner."
       },
       {
-       "t": 322,
+       "t": 405,
        "titel": "Meldungen",
-       "stichworte": "Unter Meldungen steht, was Jonas getan hat: Jonas Berger (Demo) hat erledigt: Rückmeldung zu Lindenallee 14, Herford."
+       "stichworte": "Unter Meldungen steht, was Jonas getan hat: Jonas Berger (Demo) hat erledigt: Rückmeldung zu Lindenallee 14, HerfordK-2026-001 ·."
       },
       {
-       "t": 339,
+       "t": 423,
        "titel": "Der Kreis schließt sich",
-       "stichworte": "Unter Freigegeben liegt Stand 3. Prüfen, anmerken, zurückgeben, bis es passt."
+       "stichworte": "Unter Freigegeben liegt Stand 3 mit 2 Rückfragen. Prüfen, anmerken, zurückgeben, bis es passt."
       }
      ]
     },
@@ -1343,6 +1443,80 @@
        "t": 152,
        "titel": "Gute Reise",
        "stichworte": "So wird aus deiner Beratung ein Objekt im Konto deines Kunden, in deiner Marke."
+      }
+     ]
+    },
+    {
+     "id": "partner-kunde-1",
+     "kategorie": "partner",
+     "nr": "K1",
+     "dauer": 284,
+     "titel": "Mit deinem Partner arbeiten",
+     "unterzeile": "Für Kunden: verbinden, Objekte senden, Anmerkungen bearbeiten.",
+     "story": "Für Kunden eines Partners. Einladung annehmen oder per Verbindungscode verbinden, ein Objekt senden, Anmerkungen mit Bildausschnitt ansehen, erledigen oder zurückfragen, erneut senden und unter Freigaben sehen, was dein Partner sieht.",
+     "datei": "dealpilot-kunde-1-mit-deinem-partner-arbeiten-v3650.mp4",
+     "datei_ton": "dealpilot-kunde-1-mit-deinem-partner-arbeiten-v3650-sprecher.mp4",
+     "poster": "dealpilot-kunde-1-vorschau-v3650.webp",
+     "kapitel": [
+      {
+       "t": 17,
+       "titel": "Einladung annehmen",
+       "stichworte": "Lädt dich dein Berater ein, steht seine Anfrage unter Mein Partner. Ein Klick auf Ansehen."
+      },
+      {
+       "t": 32,
+       "titel": "Du entscheidest",
+       "stichworte": "Du siehst, wer sich verbinden will und was das heißt. Erst deine Bestätigung verbindet euch."
+      },
+      {
+       "t": 57,
+       "titel": "Verbunden",
+       "stichworte": "Jetzt in der Marke deines Partners, mit deinen Reitern: An Partner senden, Meine Sendungen, Aufgaben, Freigaben."
+      },
+      {
+       "t": 88,
+       "titel": "Code erzeugen",
+       "stichworte": "Mit eigenem Abo erzeugst du einen Verbindungscode und gibst ihn deinem Berater. Er gilt 24 Stunden und nur einmal."
+      },
+      {
+       "t": 110,
+       "titel": "Bestätigen",
+       "stichworte": "Die Anfrage ist da. Bestätigst du, seid ihr verbunden. Dein Plan und deine Einstellungen bleiben."
+      },
+      {
+       "t": 142,
+       "titel": "Objekt senden",
+       "stichworte": "Haken setzen und An Partner senden. Dein Berater bekommt eine Kopie, dein Original bleibt bei dir."
+      },
+      {
+       "t": 162,
+       "titel": "Erst bearbeiten",
+       "stichworte": "Die Musterstraße ist gesperrt: 2 Anmerkungen deines Beraters sind offen. Senden geht erst, wenn jede erledigt oder beantwortet ist."
+      },
+      {
+       "t": 183,
+       "titel": "Mit Bildausschnitt",
+       "stichworte": "Du landest in deinem Objekt, rechts die Anmerkungen. Dein Berater hat die Stelle markiert, ein Klick öffnet das Bild groß."
+      },
+      {
+       "t": 209,
+       "titel": "Rückfrage",
+       "stichworte": "Passt etwas nicht, fragst du zurück. Als Rückfrage senden zählt auch als bearbeitet."
+      },
+      {
+       "t": 225,
+       "titel": "Erledigt",
+       "stichworte": "Hast du es erledigt, ein Klick auf Erledigt. Dein Berater sieht erledigt in Grün und Rückfragen in Blau."
+      },
+      {
+       "t": 237,
+       "titel": "Erneut senden",
+       "stichworte": "Alles bearbeitet, also ist Erneut senden frei. Dein Berater bekommt den neuen Stand und eine Meldung."
+      },
+      {
+       "t": 257,
+       "titel": "Freigaben",
+       "stichworte": "Hier steht, was dein Berater sieht und was dein Zugang darf, dazu deine Kundennummer K-2026-001. Trennen kannst du jederzeit unter Verbindun"
       }
      ]
     }
