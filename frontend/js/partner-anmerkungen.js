@@ -546,25 +546,39 @@
     'outline-color', 'box-shadow', 'text-shadow', 'text-decoration-color', 'caret-color', 'column-rule-color', 'fill', 'stroke'];
   /* Gelesen wird in der ECHTEN Seite (Stil fertig berechnet, nur lesen = schnell), markiert mit data-dp-h2c; geschrieben
      wird nur in der Kopie. Gemessen 17.11.2026: Lesen und Schreiben abwechselnd in der Kopie fror den Reiter ein. */
-  var _farbAuftrag = null;
-  function farbenVormerken() {
-    var alle = document.body.querySelectorAll('*'), auftrag = [], markiert = [];
+  var _farbAuftrag = null, _farbPseudo = '';
+  function farbSatz(cs) {
+    var satz = null;
+    for (var k = 0; k < FARB_EIGENSCHAFTEN.length; k++) {
+      var v = cs.getPropertyValue(FARB_EIGENSCHAFTEN[k]);
+      if (v && /(color|oklab|oklch)\(/.test(v)) (satz || (satz = [])).push([FARB_EIGENSCHAFTEN[k], farbeUmrechnen(v)]);
+    }
+    return satz;
+  }
+  /* Nur im gezeichneten Teilbaum (wurzel), dazu ::before/::after - gemessen: 91 Pseudoelemente mit color() */
+  function farbenVormerken(wurzel) {
+    var alle = [wurzel].concat([].slice.call(wurzel.querySelectorAll('*'))), auftrag = [], markiert = [], pseudo = [];
     for (var i = 0; i < alle.length; i++) {
       var el = alle[i]; if (unsereFlaechen(el)) continue;
-      var cs = window.getComputedStyle(el), satz = null;
-      for (var k = 0; k < FARB_EIGENSCHAFTEN.length; k++) {
-        var v = cs.getPropertyValue(FARB_EIGENSCHAFTEN[k]);
-        if (v && /(color|oklab|oklch)\(/.test(v)) (satz || (satz = [])).push([FARB_EIGENSCHAFTEN[k], farbeUmrechnen(v)]);
-      }
-      if (satz) { auftrag.push(satz); markiert.push(el); }
+      var satz = farbSatz(window.getComputedStyle(el)), ps = [];
+      ['::before', '::after'].forEach(function (p) {
+        var c = window.getComputedStyle(el, p);
+        if (c.content === 'none' || c.content === 'normal') return;
+        var x = farbSatz(c); if (x) ps.push([p, x]);
+      });
+      if (satz || ps.length) { auftrag.push(satz || []); markiert.push(el); pseudo.push(ps); }
     }
-    for (var j = 0; j < markiert.length; j++) markiert[j].setAttribute('data-dp-h2c', String(j));   /* erst nach dem Lesen */
-    _farbAuftrag = auftrag;
+    var css = [];
+    for (var j = 0; j < markiert.length; j++) {
+      markiert[j].setAttribute('data-dp-h2c', String(j));   /* erst nach dem Lesen */
+      pseudo[j].forEach(function (q) { css.push('[data-dp-h2c="' + j + '"]' + q[0] + '{' + q[1].map(function (x) { return x[0] + ':' + x[1] + ' !important'; }).join(';') + '}'); });
+    }
+    _farbAuftrag = auftrag; _farbPseudo = css.join(' ');
     return auftrag.length;
   }
   function farbenAufraeumen() {
     [].forEach.call(document.querySelectorAll('[data-dp-h2c]'), function (e) { e.removeAttribute('data-dp-h2c'); });
-    _farbAuftrag = null;
+    _farbAuftrag = null; _farbPseudo = '';
   }
   function farbenRetten(doc) {
     if (!_farbAuftrag) return;
@@ -573,6 +587,15 @@
       var satz = _farbAuftrag[Number(ziele[i].getAttribute('data-dp-h2c'))]; if (!satz) continue;
       for (var k = 0; k < satz.length; k++) { try { ziele[i].style.setProperty(satz[k][0], satz[k][1], 'important'); } catch (e) {} }
     }
+    if (_farbPseudo) { var st = doc.createElement('style'); st.textContent = _farbPseudo; (doc.head || doc.documentElement).appendChild(st); }
+  }
+  /* Kleinster Vorfahr, der den ganzen Ausschnitt enthaelt: html2canvas zeichnet dann nur diesen Teilbaum
+     (gemessen 17.11.2026: document.body mit 9.540 Elementen brauchte 25 s) */
+  function wurzelFuer(rect) {
+    var a = document.elementFromPoint(rect.x + 2, rect.y + 2), b = document.elementFromPoint(rect.x + rect.w - 2, rect.y + rect.h - 2);
+    var w = a;
+    while (w && w !== document.body && !(w.contains(b) && (function (r) { return r.left <= rect.x + 1 && r.top <= rect.y + 1 && r.right >= rect.x + rect.w - 1 && r.bottom >= rect.y + rect.h - 1; })(w.getBoundingClientRect()))) w = w.parentElement;
+    return w || document.body;
   }
   function unsereFlaechen(el) { return !!(el && el.id && /^dppk-(anm-|bild-)/.test(el.id)); }
   /** Bereich der Ansicht aufziehen -> Leinwand (html2canvas) oder null */
@@ -595,12 +618,13 @@
         /* kurz warten, bis die Auswahlflaeche wirklich weg ist */
         setTimeout(function () {
           var sx = window.scrollX || window.pageXOffset || 0, sy = window.scrollY || window.pageYOffset || 0;
-          try { farbenVormerken(); } catch (e) { farbenAufraeumen(); }
-          window.html2canvas(document.body, {
+          var wurzel = wurzelFuer(rect);
+          try { farbenVormerken(wurzel); } catch (e) { farbenAufraeumen(); }
+          window.html2canvas(wurzel, {
             x: rect.x + sx, y: rect.y + sy, width: rect.w, height: rect.h,
             scrollX: -sx, scrollY: -sy, windowWidth: document.documentElement.clientWidth, windowHeight: document.documentElement.clientHeight,
             scale: Math.min(window.devicePixelRatio || 1, 2), useCORS: true, logging: false, backgroundColor: '#ffffff',
-            ignoreElements: unsereFlaechen, onclone: farbenRetten
+            ignoreElements: function (el) { return unsereFlaechen(el) || (el.tagName === 'IFRAME' && !el.contains(wurzel)); }, onclone: farbenRetten
           }).then(function (cv) { farbenAufraeumen(); zurueck(); fertig(cv); }, function (e) { farbenAufraeumen(); zurueck(); try { console.warn('[anmerkungen] Ausschnitt', e); } catch (x) {} toast('Der Ausschnitt ging nicht. Füge ein Bildschirmfoto mit „Bild einfügen“ ein.'); fertig(null); });
         }, 60);
       }

@@ -191,9 +191,9 @@ console.log('A · E-Mail bei Rueckmeldung (v3460)');
   ok('Farbumrechnung: oklab/oklch -> rgba, nichts Unbekanntes bleibt', !/(color|oklab|oklch)\(/.test(f3 + f4) && /^rgba\(\d+, \d+, \d+, 0\.35\) 0px 0px 14px, rgba\(0, 0, 0, 0\)/.test(f3), [f3, f4]);
   ok('Farbumrechnung: rgb bleibt unberuehrt', fu('rgb(1, 2, 3)') === 'rgb(1, 2, 3)' && fu('') === '');
   const fq = fs.readFileSync(path.join(WURZEL, 'frontend/js/partner-anmerkungen.js'), 'utf8');
-  ok('Ausschnitt: Farben in der Seite nur LESEN, in der Kopie schreiben (onclone), danach Marken weg', /farbenVormerken\(\)/.test(fq) && /onclone: farbenRetten/.test(fq) && (fq.match(/farbenAufraeumen\(\); zurueck\(\)/g) || []).length === 2);
+  ok('Ausschnitt: Farben in der Seite nur LESEN, in der Kopie schreiben (onclone), danach Marken weg', /farbenVormerken\(wurzel\)/.test(fq) && /'::before', '::after'/.test(fq) && /onclone: farbenRetten/.test(fq) && (fq.match(/farbenAufraeumen\(\); zurueck\(\)/g) || []).length === 2);
   ok('Frontend: Ausschnitt ueber das vorhandene html2canvas, Rueckfall Einfuegen/Datei, Markieren rot mit Rueckgaengig',
-    /window\.html2canvas\(document\.body/.test(fq) && /clipboardData/.test(fq) && /type="file" accept="image\/png,image\/jpeg,image\/webp"/.test(fq) && /var ROT = '#D8564C'/.test(fq) && /data-b="undo"/.test(fq) && /data-w="pfeil"/.test(fq) && /data-w="frei"/.test(fq) && /data-w="rechteck"/.test(fq));
+    /window\.html2canvas\(wurzel, \{/.test(fq) && /function wurzelFuer\(rect\)/.test(fq) && /clipboardData/.test(fq) && /type="file" accept="image\/png,image\/jpeg,image\/webp"/.test(fq) && /var ROT = '#D8564C'/.test(fq) && /data-b="undo"/.test(fq) && /data-w="pfeil"/.test(fq) && /data-w="frei"/.test(fq) && /data-w="rechteck"/.test(fq));
   const idx = fs.readFileSync(path.join(WURZEL, 'frontend/index.html'), 'utf8');
   ok('index.html laedt html2canvas', /vendor\/cdn\/html2canvas\/1\.4\.1\/html2canvas\.min\.js/.test(idx));
 }
