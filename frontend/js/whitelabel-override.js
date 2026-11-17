@@ -497,8 +497,9 @@
       var r = document.documentElement.style;
       ['--gold','--gold-hi','--gold-lo','--gold-l','--gold-2','--gold-3','--gold-bg','--gold-d','--gold-soft','--obsidian',
        '--uv-sc-ink','--uv-sc-mut','--uv-sc-ok','--uv-sc-txt','--uv-sc-akz',   /* v1113 */
-       '--wl-obs-hi','--wl-obs-lo']                                            /* v1114 */
+       '--wl-obs-hi','--wl-obs-lo', '--wl-logo-skala']                         /* v1114, v3630 */
         .forEach(function (v) { r.removeProperty(v); });
+      document.documentElement.removeAttribute('data-wl-logo-skala');   /* v3630 */
       clearWlTokens(r);
     } catch (e) {}
     /* Marker loeschen, damit der naechste Sweep dieselben Knoten wieder anfasst */
@@ -570,6 +571,7 @@
     /* v3299 · Logo-Kontrast: fertige Varianten aus dem Branding, sonst einmal nachrechnen. */
     if (b.logoDunkel) _logoDunkel = b.logoDunkel;
     if (b.logoHell) _logoHell = b.logoHell;
+    if (b.logoGroesse !== undefined) _setzeLogoGroesse(b.logoGroesse);   /* v3630 */
     _variantenNachrechnen();
     if (!_ok(b.accent)) { if (_label || _logo) { _active = true; sweepWordmark(); sweepLogoImgs(); sweepTexte(); _watch(); return true; } return false; }
     _acc = b.accent;
@@ -615,6 +617,17 @@
     _watch();
     return true;
   }
+  /* v3630 · Logogroesse des Partners (Regler 60-160 %, Marcel 17.11.2026).
+     Gesetzt wird nur ein Faktor am <html>; die Grenzen stehen in
+     layout-varianten.css (Abschnitt v3630), damit nichts ueber die Schiene
+     hinauswaechst. 100 % = kein Attribut = Auslieferungszustand. */
+  function _setzeLogoGroesse(p) {
+    var n = parseInt(p, 10), r = document.documentElement;
+    if (!isFinite(n) || n === 100) { r.removeAttribute('data-wl-logo-skala'); r.style.removeProperty('--wl-logo-skala'); return; }
+    n = Math.max(60, Math.min(160, n));
+    r.setAttribute('data-wl-logo-skala', String(n));
+    r.style.setProperty('--wl-logo-skala', String(n / 100));
+  }
   function _variantenNachrechnen() {
     if (!_logo || (_logoDunkel && _logoHell) || _varRechnet) return;
     var K = window.DealPilotLogoKontrast;
@@ -651,6 +664,7 @@
     sweepLogoImgs: sweepLogoImgs,
     accent: function () { return _acc; },
     label: function () { return _label; },              /* v3299 */
+    logoGroesse: _setzeLogoGroesse,   /* v3630 · Live-Vorschau im Portal */
     logoFuer: function (dunkel) { return (dunkel ? _logoDunkel : _logoHell) || _logo; }   /* v3299 */
   };
 })();

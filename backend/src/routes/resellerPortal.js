@@ -367,7 +367,8 @@ router.get('/branding', async (req, res, next) => {
       `SELECT brand_name, whitelabel_enabled, brand_logo_b64, brand_accent, brand_accent_hi, brand_accent_lo, brand_obsidian,
               brand_company, brand_address, brand_plz, brand_city, brand_phone, brand_email, brand_website, brand_tagline,
               brand_mail_accent, brand_pdf_light, brand_display /*W8 W12 W20-display*/,
-              brand_logo_dark_b64, brand_logo_auf_dunkel, brand_logo_auf_hell, brand_logo_messung /*v3299*/
+              brand_logo_dark_b64, brand_logo_auf_dunkel, brand_logo_auf_hell, brand_logo_messung /*v3299*/,
+              brand_logo_darstellung, brand_logo_groesse /*v3630*/
          FROM resellers WHERE id=$1`, [req.reseller.id]);
     res.json({ branding: r.rows[0] || {} });
   } catch (e) { next(e); }
@@ -400,6 +401,20 @@ router.put('/branding', async (req, res, next) => {
     let vari;
     try { vari = _varianten(b.brand_logo_varianten); }
     catch (e) { return res.status(e.status || 400).json({ error: 'varianten_invalid', message: e.message }); }
+    /* v3630 · vor jedem Schreiben pruefen - ein 400 soll nichts halb gespeichert hinterlassen */
+    let dst, gr;
+    if (b.brand_logo_darstellung !== undefined) {
+      dst = b.brand_logo_darstellung === null ? null : String(b.brand_logo_darstellung);
+      if (dst !== null && !['auto', 'weiss', 'gold', 'gold-dunkel'].includes(dst)) {
+        return res.status(400).json({ error: 'darstellung_invalid', message: 'Unbekannte Darstellung.' });
+      }
+    }
+    if (b.brand_logo_groesse !== undefined) {
+      gr = b.brand_logo_groesse === null ? null : Math.round(Number(b.brand_logo_groesse));
+      if (gr !== null && !(gr >= 60 && gr <= 160)) {
+        return res.status(400).json({ error: 'groesse_invalid', message: 'Logogröße zwischen 60 und 160 %.' });
+      }
+    }
 
     await query(
       `UPDATE resellers SET
@@ -414,6 +429,14 @@ router.put('/branding', async (req, res, next) => {
          updated_at = now()
        WHERE id = $1`,
       [req.reseller.id, name, wl, accent, accentHi, accentLo, (logo === undefined ? null : logo), obsidian]);
+    /* v3630 · Darstellung auf dunklem Grund und Logogroesse. Nicht mitgeschickt = unveraendert,
+       ungueltig = 400 (die Spalten haben CHECK-Regeln, Migration 112). */
+    if (dst !== undefined) {
+      await query(`UPDATE resellers SET brand_logo_darstellung = $2, updated_at = now() WHERE id = $1`, [req.reseller.id, dst]);
+    }
+    if (gr !== undefined) {
+      await query(`UPDATE resellers SET brand_logo_groesse = $2, updated_at = now() WHERE id = $1`, [req.reseller.id, gr]);
+    }
     /* v3299 */
     if (logoDark !== undefined) {
       await query(`UPDATE resellers SET brand_logo_dark_b64 = $2, updated_at = now() WHERE id = $1`,

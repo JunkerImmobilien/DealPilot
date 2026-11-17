@@ -9609,3 +9609,46 @@ html[data-dp-layout] .dpl-portfolio-regler .dpl-sw-a,
 html[data-dp-layout] .dpl-portfolio-regler .dpl-sw-p{ color:#BFB7A9; }
 html[data-dp-layout]:not([data-dpl-portfolio="auf"]) .dpl-portfolio-regler .dpl-sw-a,
 html[data-dp-layout][data-dpl-portfolio="auf"] .dpl-portfolio-regler .dpl-sw-p{ color:#F5EFE2; }
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   v3630 · LOGOGROESSE DES PARTNERS (Marcel 17.11.2026)
+
+   Der Partner stellt im Partner-Cockpit › Marke einen Regler 60-160 % ein;
+   whitelabel-override.js setzt dann am <html> data-wl-logo-skala und den
+   Faktor --wl-logo-skala (100 % = kein Attribut = alles wie vorher).
+
+   Vorher gemessen (Staging, Partner-Testkonto, 1440 px): .dpl-marke 247 x 100,
+   padding 0 14px, Logo 216 x 54 bei max 60 x 216 (Logo 4 : 1, also die Breite
+   am Anschlag). 390 px: Schublade, .dpl-marke-handy 358 x 72, Logo 144 x 36.
+
+   Grenzen: die Breite waechst NIE ueber die der Schiene hinaus (216 / 210 px,
+   Handy 100 %) - ein breites Logo steht bei 100 % schon am Anschlag und
+   kann nur kleiner werden. Die Hoehe waechst bis 160 % mit, und die
+   Markenflaeche waechst mit ihr, damit nichts ueberlaeuft.
+   ══════════════════════════════════════════════════════════════════════════════ */
+html[data-dp-layout][data-wl-logo-skala] .dpl-schiene .dpl-logo{
+  max-height:calc(54px * var(--wl-logo-skala, 1)) !important;
+  max-width:min(calc(210px * var(--wl-logo-skala, 1)), 210px) !important;
+}
+html[data-dp-layout][data-wl-logo-skala] .dpl-schiene .dpl-marke{
+  min-height:max(78px, calc(54px * var(--wl-logo-skala, 1) + 24px)) !important;
+}
+@media (min-width: 901px){
+  html[data-dp-layout][data-wl-logo-skala] .dpl-schiene .dpl-logo{
+    max-height:calc(60px * var(--wl-logo-skala, 1)) !important;
+    max-width:min(calc(216px * var(--wl-logo-skala, 1)), 216px) !important;
+  }
+  html[data-dp-layout][data-wl-logo-skala] .dpl-schiene .dpl-marke{
+    min-height:max(100px, calc(60px * var(--wl-logo-skala, 1) + 30px)) !important;
+  }
+}
+@media (max-width: 900px){
+  html[data-dp-layout][data-dp-layout][data-wl-logo-skala] body aside.sidebar#sidebar .dpl-marke-handy{
+    height:auto !important;
+    min-height:max(72px, calc(36px * var(--wl-logo-skala, 1) + 26px)) !important;
+  }
+  html[data-dp-layout][data-dp-layout][data-wl-logo-skala] body aside.sidebar#sidebar .dpl-marke-handy .dpl-logo{
+    max-height:calc(36px * var(--wl-logo-skala, 1)) !important;
+    max-width:100% !important;
+  }
+}
