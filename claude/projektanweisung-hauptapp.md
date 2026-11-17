@@ -45015,3 +45015,9 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Commit:** `d775d270`, `af4e6316`, `662d9563`, `38d1ced0`. Backend und mb-Backend neu gebaut (von Hand, deploy-staging.ps1 brach an fremder `videos.json` ab).
 - **Nachweis:** `miete-zusatz-pruefen` 76/76 mit Gegenprobe; mietpotenzial, flow-berechnen, wertermittlung (Ebene C unverändert, Lauf mit/ohne v3670 gleich), objekt-mapper, prompt-lecks, score-ketten, ki-deckel, vorschau, buster-ebenen grün; gold-audit auf Staging RC=0. Browser (eigener Headless-Chrome, Testkonto landing-bilder): QC-Fälle A/B/D, Reiter, alle Importe mit echtem KI-Lauf; Bilder `Dateien/Miete-Zusatz-Nachweis-2026-11-17/`. Im mb-Container: Rohertrag +840, Küche 360 × 11,94, Hinweis mit Stellplatzanteil.
 - **Rest:** Marktbericht Stufe 3 im Browser; Garagen-/Stellplatzanzahl aus der Mieterliste; Prod.
+
+### v3660f · 17.11.2026 (nur Staging) · Quick-Check: Zustand aus Fotos, Annahme im Prüfstein, Grundlage auf Detailstufe 1
+- **Was:** `js/qc-zustand-bilder.js` (QC-Fotos und Exposé-Bilder → Zustand mit Hinweis), Prüfstein mit Rangfolge und Annahme-Satz, Text vor Bild im Objekt, Bildauswertung am ungespeicherten Objekt, Grundlage unter dem Feld Zustand.
+- **Commit:** `0008f377`. Buster index.html und quickcheck-app.html, qc-bridge IFRAME_SRC.
+- **Nachweis:** Headless mit Testkonto (Bilder 8–10), buster-ebenen SAUBER, Modernisierungsprüfer 77/77.
+- **Rest:** Prod.
