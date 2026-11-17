@@ -633,14 +633,16 @@
          Unterzeile wie .sec-desc, Karte wie .card (1 px Gold 22 %, Radius 2, Innen 20, kein Schatten), Kopf .ct.ct-pro
          (JetBrains Mono 10/700, 1,2 px, #6B645A), Beschriftung .f > label (Inter 11/500, rgba(42,39,39,.85), 4 px),
          Felder kommen aus style.css + einheitlich.css (#dppk-verw steht dort in jeder Liste). */
-      '#dppk-verw .dp-verw-titel{position:relative;margin:0;padding:0 0 0 14px;font:700 24px/36px "Space Grotesk",system-ui,sans-serif;letter-spacing:-.3px;color:#2A2727}',
+      '#dppk-verw .dp-verw-titel{position:relative;margin:0;padding:0 0 0 14px;font:700 24px/36px "Space Grotesk",system-ui,sans-serif;letter-spacing:-.3px !important;color:#2A2727}',
       '#dppk-verw .dp-verw-titel::before{content:"";position:absolute;left:0;top:6px;width:3px;height:24px;border-radius:2px;background:linear-gradient(180deg,var(--wl-e8cc7a, #E8CC7A),var(--wl-9a7f33, #9a7f33))}',
       '#dppk-verw .dp-verw-desc{margin:3px 0 18px;font:400 12px/1.5 Inter,system-ui,sans-serif;color:#625C59}',
-      '#dppk-verw .card.dp-verw-karte{background:#fff;border:1px solid color-mix(in srgb,var(--wl-c9a84c, #C9A84C) 22%,transparent);border-radius:2px;box-shadow:none;padding:20px;margin:0 0 16px}',
-      '#dppk-verw .ct.ct-pro.dp-verw-ct{display:flex;align-items:center;gap:8px;font:700 10px "JetBrains Mono",ui-monospace,monospace;letter-spacing:1.2px;text-transform:uppercase;color:#6B645A;padding:0 0 10px;margin:16px 0 12px;border-bottom:1px solid #EDE6D6}',
+      /* gemessen nach v3630k: eine spaetere Kartenregel setzte #E6E1D6 - deshalb !important */
+      '#dppk-verw .card.dp-verw-karte{background:#fff !important;border:1px solid color-mix(in srgb,var(--wl-c9a84c, #C9A84C) 22%,transparent) !important;border-radius:2px !important;box-shadow:none !important;padding:20px !important;margin:0 0 16px}',
+      '#dppk-verw .ct.ct-pro.dp-verw-ct{display:flex;align-items:center;gap:8px;font:700 10px "JetBrains Mono",ui-monospace,monospace;letter-spacing:1.2px;text-transform:uppercase;color:#6B645A !important;padding:0 0 10px;margin:16px 0 12px;border-bottom:1px solid #EDE6D6}',
       '#dppk-verw .card > .ct.ct-pro.dp-verw-ct:first-child{margin-top:0}',
       '#dppk-verw .ct.ct-pro.dp-verw-ct .rp-b-std{margin-left:auto !important;text-transform:none;letter-spacing:0;font:500 11px Inter,sans-serif}',
       '#dppk-verw .ct.ct-pro.dp-verw-ct b{font-family:Inter,sans-serif;letter-spacing:0;text-transform:none;color:#2A2727}',
+      '#dppk-verw input[type=text],#dppk-verw input[type=email]{padding:0 11px !important}',
       '#dppk-verw .dp-verw-lbl{display:block;margin:0 0 4px;font:500 11px/20px Inter,system-ui,sans-serif;color:rgba(42,39,39,.85)}',
       '#dppk-verw .dp-verw-hint{font:italic 400 10.5px/1.5 Inter,system-ui,sans-serif;color:rgba(42,39,39,.68)}',
       '#dppk-verw .dp-verw-hint b{font-style:normal}',

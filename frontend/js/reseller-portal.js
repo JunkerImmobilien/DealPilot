@@ -1314,7 +1314,7 @@ if (!window._pdfGold) {
     if (l) {
       if (!box.querySelector('img')) box.innerHTML = bild(_currentLogoDark() || l);
       if (boxH && !boxH.querySelector('img')) boxH.innerHTML = bild(l);
-      box.style.borderStyle = 'solid';
+      box.style.borderStyle = 'solid'; var lx1 = $('rp-b-logo-x'); if (lx1) lx1.style.display = '';
       _logoPrevGroesse();
       /* v3299 · Vorschau mit den Varianten, die Mandanten wirklich sehen, und Ampel */
       if (amp) amp.textContent = 'Kontrast wird gemessen …';
@@ -1382,7 +1382,7 @@ if (!window._pdfGold) {
       if (boxH) boxH.innerHTML = '';
       if (amp) amp.textContent = '';
       if (wahl) wahl.innerHTML = '<div style="font:400 11.5px Inter;color:#8a8473">Erst ein Logo hochladen.</div>';
-      box.style.borderStyle = 'dashed';
+      box.style.borderStyle = 'dashed'; var lx0 = $('rp-b-logo-x'); if (lx0) lx0.style.display = 'none';   /* v3630l · ohne Logo kein Entfernen-Knopf */
       if (txt) txt.textContent = 'Ohne Logo erscheint dein Marken-/Kanzleiname als Schriftzug.';
     }
   }
