@@ -1,0 +1,61 @@
+{
+  "_kopf": "v3600 · DIE EINE LISTE DER VORSCHAU-FUNKTIONEN (Marcel 17.11.2026: was noch nicht fertig ist, sieht auf Prod kein Kunde). Eine Vorschau-Funktion ist nur frei fuer die Gruppen in frei_fuer: 'admin' = users.role admin, 'vorschau' = Freigabeliste im Admin (Zusatz 'vorschau' je Konto), 'zusatz:<name>' = ein bestehender Zusatz je Konto. Fuer alle frei: Schalter im Admin › Vorschau (Tabelle vorschau_freigaben) oder Eintrag hier entfernen (neue Version) UND die Sperren im Code entfernen. Gelesen von services/vorschau.js (Backend, Routen 403), GET /api/v1/vorschau (Frontend, js/vorschau.js), Admin › Vorschau und tools/vorschau-pruefen.mjs (Rollout-Sperre). Feldbeschreibung: claude/vorschau-funktionen.md.",
+  "funktionen": [
+    {
+      "schluessel": "gutachten_org",
+      "bezeichnung": "gutachten.org: Ersteinschätzung und Gutachten beauftragen",
+      "seit": "v3540",
+      "beschreibung": "Reiter Steuer › eigene Restnutzungsdauer: Knöpfe „Ersteinschätzung (gutachten.org)“ und „Gutachten beauftragen (gutachten.org)“, Fenster, Anfragen, Bestellung mit Preis und Rabattcode über Junker Immobilien (v3540–v3591). Admin › Gutachtenaufträge ist ohnehin nur im Admin.",
+      "frei_fuer": [
+        "admin",
+        "vorschau"
+      ],
+      "frontend_erkennung": "[\"'`]/gutachterpartner|/api/v1/gutachterpartner|gp-lite|gp-voll",
+      "frontend_ausgenommen": {},
+      "routen": [
+        "/api/v1/gutachterpartner"
+      ],
+      "backend_stellen": [],
+      "backend_erkennung": "evalionClient|gutachter_anfragen|gutachten_auftraege"
+    },
+    {
+      "schluessel": "vermoegen",
+      "bezeichnung": "Vermögen & Haushalt",
+      "seit": "v3217",
+      "beschreibung": "Seitenleiste › Ansichten › „Vermögen & Haushalt“ (Vermögensaufstellung, Haushaltsrechnung, Verlauf, PDF). Bis v3591 per Rechnername gesperrt (v3231/v3495). Die Daten liegen in user_settings 'vermoegen' zusammen mit dem Profilfoto – dieser Speicherweg bleibt offen, gesperrt sind Ansicht, Dokument und PDF.",
+      "frei_fuer": [
+        "admin",
+        "vorschau"
+      ],
+      "frontend_erkennung": "openVermoegen|DpVermoegen.oeffnen|data-act=\"vermoegen\"",
+      "frontend_ausgenommen": {
+        "frontend/js/ui.js": "nur der Verteiler sbActionsAction/bsheetAction, ruft window.openVermoegen – das ist bei Sperre eine leere Funktion (vermoegen.js)",
+        "frontend/js/messe-drehbuch.js": "blendet den Eintrag in Videos selbst aus"
+      },
+      "routen": [],
+      "backend_stellen": [
+        {
+          "datei": "backend/src/services/telegramPdfService.js",
+          "grund": "PDF dok_vermoegen (App über /rechenkerne/dok-pdf und Telegram-Bot)"
+        }
+      ],
+      "backend_erkennung": "dok_vermoegen"
+    },
+    {
+      "schluessel": "umsetzungswuensche",
+      "bezeichnung": "Umsetzungswünsche und Bordbuch",
+      "seit": "v3097",
+      "beschreibung": "Seitenleiste › „Umsetzungswünsche“ und der Bordbuch-Mechaniker (Alt+B) für Entwicklungspartner. Bewusst nur mit Zusatz „Entwicklungspartner“ (wie seit v3097), nicht für Admin oder die Vorschau-Liste.",
+      "frei_fuer": [
+        "zusatz:entwicklungspartner"
+      ],
+      "frontend_erkennung": "[\"'`]/wuensche|sb-act-wuensche|DpWuensche.oeffnen",
+      "frontend_ausgenommen": {},
+      "routen": [
+        "/api/v1/wuensche"
+      ],
+      "backend_stellen": [],
+      "backend_erkennung": "umsetzungswuensche"
+    }
+  ]
+}

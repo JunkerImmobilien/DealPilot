@@ -76,6 +76,12 @@ async function erzeugen(userId, art, objektId, reportId, optionen) {
     throw Object.assign(new Error('Der PDF-Dienst ist hier nicht eingerichtet.'), { fachlich: true, kein_dienst: true });
   }
   const s = await _sitzung(userId);
+  /* v3600 · Vorschau-Funktion 'vermoegen' (services/vorschau-funktionen.json): das PDF Vermögen & Haushalt
+     nur fuer Konten, die die Funktion sehen - App (/rechenkerne/dok-pdf) und Telegram laufen beide hier durch. */
+  const vorschau = require('./vorschau');
+  if (art === 'dok_vermoegen' && !(await vorschau.darf({ id: s.userId, role: s.role }, 'vermoegen'))) {
+    throw Object.assign(new Error('Vermögen & Haushalt ist für dieses Konto noch nicht freigegeben.'), { fachlich: true, status: 403 });
+  }
   /* Dieselbe Nutzlast wie beim Login (auth.js sessionFromUser), nur kurz. */
   const token = jwtUtil.signKurz({ userId: s.userId, email: s.email, name: s.name, role: s.role }, '5m');
   const sitzung = Object.assign({}, s, { mode: 'api', expires: Date.now() + 5 * 60 * 1000 });

@@ -68,6 +68,8 @@
         <a href="#" data-view="marktzinsen" class="nav-link">Marktzinsen</a>
         <!-- v2591 -->
         <a href="#" data-view="register" class="nav-link">Register &amp; Ernte</a>
+        <span class="nav-grp">System</span>
+        <a href="#" data-view="vorschau" class="nav-link">Vorschau</a><!-- v3600 · was in der App noch ausgeblendet ist -->
       </nav>
     </div>
     <div class="topbar-right">
@@ -396,6 +398,11 @@
       <div id="lp-body"><div class="lp-empty">…</div></div>
     </section>
     <!-- WADM-7 -->
+    <!-- v3600 · Vorschau-Funktionen: gebaut, aber noch nicht für Kunden freigegeben (admin-vorschau.js) -->
+    <section id="view-vorschau" class="view" style="display:none;">
+      <div class="view-header"><h2>Vorschau – derzeit ausgeblendet</h2></div>
+      <div id="vs-body"><p style="color:#7a7468">…</p></div>
+    </section>
     <!-- v3590 · RND-Gutachten über Junker Immobilien (gutachten.org) -->
     <section id="view-gutachtenauftraege" class="view" style="display:none;">
       <div class="view-header"><h2>Gutachtenaufträge</h2></div>
@@ -546,6 +553,7 @@
   <!-- WADM-8 -->
   <script src="js/admin-rabatte.js?v=v1423"></script>
   <script src="js/admin-gutachtenauftraege.js?v=v3590"></script>
+  <script src="js/admin-vorschau.js?v=v3600"></script>
   <script src="js/admin-marktzinsen.js?v=1024"></script>
   <script src="js/admin-register.js?v=v3000"></script>
   <script src="js/admin-anfragen.js?v=v3020"></script>

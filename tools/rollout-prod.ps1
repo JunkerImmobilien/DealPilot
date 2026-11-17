@@ -153,6 +153,19 @@ if (($audit -join "`n") -notmatch 'AUDIT_RC=0') {
 }
 Gut "Gold-Audit auf der Basislinie"
 
+# ---- 3b. Vorschau-Funktionen (v3600) ----------------------------------
+Schritt "Vorschau-Funktionen gesperrt (tools/vorschau-pruefen.mjs)"
+# Marcel 17.11.2026: was noch nicht fertig ist, sieht auf Prod kein Kunde.
+# Rot = ein Knopf oder eine Route aus backend/src/services/vorschau-funktionen.json
+# steht ohne Sperre. Kein Rollout.
+$vp = node tools/vorschau-pruefen.mjs --still 2>&1
+if ($LASTEXITCODE -ne 0) {
+  $vp | Select-String "ROT" | ForEach-Object { Write-Host "     $_" }
+  Schlecht "Vorschau-Pruefer rot - Rollout abgebrochen."
+  exit 1
+}
+Gut (($vp | Select-Object -Last 1) -as [string])
+
 # ---- 4. Nachfrage -----------------------------------------------------
 Schritt "Freigabe"
 Write-Host ""

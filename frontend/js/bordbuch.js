@@ -477,8 +477,10 @@
   function pruefeZugang() {
     try {
       if (!(window.Auth && Auth.isApiMode && Auth.isApiMode() && Auth.isLoggedIn())) return;
-      Auth.apiCall('/wuensche/zugang').then(function (r) {
-        zugang = !!(r && r.ok);
+      /* v3600 · Vorschau-Funktion 'umsetzungswuensche' (js/vorschau.js) statt /wuensche/zugang */
+      if (!window.DpVorschau) return;
+      window.DpVorschau.frei('umsetzungswuensche').then(function (ok) {
+        zugang = !!ok;
         fabBauen();
         var f = document.getElementById('dp-bb-fab'); if (f) f.classList.toggle('an', zugang && !istAus());
         if (zugang) holeVersion();

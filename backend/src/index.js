@@ -415,6 +415,8 @@ app.use('/api/v1/rechenkerne', require('./routes/rechenkerne'));
 /* v3540 · Restnutzungsdauer beim unabhaengigen Gutachterpartner (Partner Form API, services/evalionClient.js).
    Nur Admin oder Zusatz 'gutachterpartner'; ohne EVALION_* in der Umgebung meldet die Route „nicht eingerichtet“. */
 app.use('/api/v1/gutachterpartner', require('./routes/gutachterpartner'));
+/* v3600 · Vorschau-Funktionen: welche dieses Konto sieht (services/vorschau.js, Liste vorschau-funktionen.json) */
+app.use('/api/v1/vorschau', require('./routes/vorschau'));
 /* v1792 · DIE REIHENFOLGE DIESER ZWEI ZEILEN IST SICHERHEITSRELEVANT.
    routes/telegram.js beginnt mit router.use(authenticate). Stuende der
    Webhook dahinter, liefe er durch dieselbe Pruefung — und Telegram hat
@@ -442,6 +444,7 @@ app.use('/api/v1/admin-reseller', require('./routes/resellerAdminPanel'));  // r
    verschlucken. Dasselbe Muster wie admin-reseller. */
 app.use('/api/v1/admin-rabatte', require('./routes/adminRabatte'));  // v1423
 app.use('/api/v1/admin-gutachtenauftraege', require('./routes/adminGutachtenAuftraege'));  // v3590 · Admin › Gutachtenaufträge
+app.use('/api/v1/admin-vorschau', require('./routes/adminVorschau'));  // v3600 · Admin › Vorschau
 app.set('db', pool);
 
 // API root info

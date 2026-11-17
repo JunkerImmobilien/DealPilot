@@ -390,6 +390,7 @@ router.post('/dok-pdf', async function (req, res) {
     res.set('Content-Disposition', "attachment; filename*=UTF-8''" + encodeURIComponent(x.dateiname || ('DealPilot-' + art + '.pdf')));
     res.send(x.pdf);
   } catch (e) {
+    if (e && e.status === 403) return res.status(403).json({ error: 'vorschau', code: 'vorschau', message: e.message });   /* v3600 · Vorschau-Sperre aus telegramPdfService.erzeugen */
     res.status(422).json({ error: 'kein_pdf', message: String(e && e.message || e) });
   }
 });

@@ -13,6 +13,12 @@ const router = express.Router();
 const { authenticate } = require('../middleware/auth');
 const { query } = require('../db/pool');
 const zusatz = require('../services/zusatzService');
+const vorschau = require('../services/vorschau');
+
+/* v3600 · Vorschau-Funktion 'umsetzungswuensche' (services/vorschau-funktionen.json, frei_fuer: Zusatz
+   entwicklungspartner - dieselbe Regel wie seit v3097). Jede Route hier, auch /zugang, sonst 403. */
+router.use(authenticate);
+router.use(vorschau.sperre('umsetzungswuensche'));
 
 const BEREICHE = ['quickcheck', 'objekt', 'steuer', 'finanzierung', 'marktbericht', 'unterlagen', 'admin', 'design', 'sonstiges'];
 const DRINGLICH = ['spaeter', 'normal', 'dringend'];
@@ -50,7 +56,7 @@ async function nurPartner(req, res, next) {
 const text = (v, max) => String(v == null ? '' : v).trim().slice(0, max);
 
 router.get('/zugang', authenticate, async (req, res) => {
-  try { res.json({ ok: await istPartner(req.user.id) }); }
+  try { res.json({ ok: await vorschau.darf(req.user, 'umsetzungswuensche') }); }
   catch (e) { res.json({ ok: false }); }
 });
 

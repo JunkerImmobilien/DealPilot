@@ -179,6 +179,23 @@ if (Test-Path "tools\frontend-konstanten.mjs") {
     Write-Host "   [ok] Frontend-Konstanten aktuell"
 }
 
+# --- v3600 - Vorschau-Funktionen hinter Frontend- UND Routen-Sperre ---
+# Marcel 17.11.2026: was noch nicht fertig ist, sieht auf Prod kein Kunde.
+# Liste: backend/src/services/vorschau-funktionen.json. Rot heisst: eine
+# Funktion der Liste waere ohne Sperre erreichbar (Knopf oder Route).
+if (Test-Path "tools\vorschau-pruefen.mjs") {
+    $null = node tools/vorschau-pruefen.mjs --still 2>&1
+    if ($LASTEXITCODE -ne 0) {
+        node tools/vorschau-pruefen.mjs --still | Select-String "ROT"
+        Write-Host ""
+        Write-Host "ABBRUCH: eine Vorschau-Funktion steht ohne Sperre." -ForegroundColor Red
+        Write-Host "         node tools/vorschau-pruefen.mjs   (alle Punkte)" -ForegroundColor Yellow
+        Write-Host ""
+        exit 1
+    }
+    Write-Host "   [ok] Vorschau-Funktionen gesperrt (tools/vorschau-pruefen.mjs)"
+}
+
 # --- 3b) v2176 - Register-Pflichtfelder gegen die Basislinie ----------
 # Marcel am 13.10.2026: "sicherstellen, dass wir immer die notwendigen
 # Felder ausfuellen und auch mit Quellen". Jeder Registersatz (Zins,

@@ -180,8 +180,10 @@
   function pruefeZugang() {
     try {
       if (!(window.Auth && Auth.isApiMode && Auth.isApiMode() && Auth.isLoggedIn())) return;
-      Auth.apiCall('/wuensche/zugang').then(function (r) {
-        document.querySelectorAll('.sb-act-wuensche').forEach(function (el) { el.style.display = (r && r.ok) ? '' : 'none'; el.classList.toggle('dpw-frei', !!(r && r.ok)); });
+      /* v3600 · Vorschau-Funktion 'umsetzungswuensche' (js/vorschau.js, GET /vorschau) statt /wuensche/zugang */
+      if (!window.DpVorschau) return;
+      window.DpVorschau.frei('umsetzungswuensche').then(function (ok) {
+        document.querySelectorAll('.sb-act-wuensche').forEach(function (el) { el.style.display = ok ? '' : 'none'; el.classList.toggle('dpw-frei', !!ok); el.classList.toggle('dpv-frei', !!ok); });
       }).catch(function () {});
     } catch (e) { /* still */ }
   }

@@ -8,6 +8,8 @@
  * (Demo-Konto der Messe) unberuehrt bleibt:
  *   gutachter@gutachter-pruefer.dealpilot.test  „DealPilot Test“, Plan pro (manuell, 30 Tage),
  *   Zusatz 'gutachterpartner' aktiv (mit --ohne-zusatz: abgeschaltet, fuer die Gegenprobe),
+ *   v3600: Zusatz 'vorschau' aktiv (Freigabeliste der Vorschau-Funktionen, sonst 403 auf /gutachterpartner;
+ *   mit --ohne-vorschau: abgeschaltet - das Konto sieht dann, was ein Kunde sieht),
  * und kopiert EIN Demo-Objekt (Ravensberger Weg 38, Bielefeld) ohne Fotos und Verknuepfungen.
  * Gibt nie ein Passwort aus. Kurz-Token (2 h) nach /tmp/gutachter-token.txt im Container.
  */
@@ -36,6 +38,7 @@ const WEG = /^(_ueberf_link|ueberf_.*|verkehrswert_ueberf|_obj_seq|seq_no|_thumb
   await query('UPDATE users SET email_verified_at = COALESCE(email_verified_at, now()) WHERE id = $1', [u.id]);
   await planService.setUserPlanManual(u.id, 'pro', 'monthly', 30);
   await zusatzService.setzen(u.id, zusatzService.GUTACHTER, { aktiv: !process.argv.includes('--ohne-zusatz') }, 'gutachterpartner-testkonto.js');
+  await zusatzService.setzen(u.id, zusatzService.VORSCHAU, { aktiv: !process.argv.includes('--ohne-vorschau') }, 'gutachterpartner-testkonto.js');   /* v3600 */
   let oid = (await query(`SELECT id FROM objects WHERE user_id = $1 AND data->>'str' = 'Ravensberger Weg' AND data->>'hnr' = '38'`, [u.id])).rows[0];
   if (!oid) {
     const q = (await query('SELECT id FROM users WHERE email = $1', [QUELLE])).rows[0];

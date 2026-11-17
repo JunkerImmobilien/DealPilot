@@ -497,6 +497,8 @@ label.dp-required.qc-required::after {
 <!-- V292.6.8-cache-applied -->
   <link rel="stylesheet" href="css/dashboard.css?v=v3410">
 <!--v922-fonts-->
+<!-- v3600 · Vorschau-Funktionen (js/vorschau.js, Liste backend/src/services/vorschau-funktionen.json): ausgeblendet ab dem ersten Bild, nicht erst nach dem Skript -->
+<style id="dp-vorschau-grund">[data-vorschau]:not(.dpv-frei),aside.sidebar .sb-act-item[data-vorschau]:not(.dpv-frei),html body #sidebar [data-vorschau]:not(.dpv-frei){display:none !important}</style>
 </head>
 <body>
 <!-- V257-06: Hintergrund-Modus (Bootstrap, kein Flash) -->
@@ -760,7 +762,7 @@ label.dp-required.qc-required::after {
            Die Eintraege unter „Ansichten“ stehen hier statisch im Markup (gemessen 08.11.2026:
            kein Modul baut sie; ui.js _sbActionsRenderIcons setzt nur das Symbol nach data-icon,
            sidebar-collapse.js den Tooltip). -->
-      <button class="sb-act-item" type="button" data-act="vermoegen" onclick="sbActionsAction('vermoegen')">
+      <button class="sb-act-item" type="button" data-act="vermoegen" data-vorschau="vermoegen" onclick="sbActionsAction('vermoegen')">
         <span class="sb-act-ico" data-icon="vermoegen"></span><span class="sb-act-l">Vermögen &amp; Haushalt</span>
       </button>
       <!-- v3357 · Partner und Kunden (Konzept 13.11.2026, Abschnitt 4). Sichtbar nur per Klasse dp-frei
@@ -858,8 +860,8 @@ label.dp-required.qc-required::after {
       <button class="sb-act-item sb-act-feedback" type="button" onclick="sbActionsAction('feedback')">
         <span class="sb-act-ico" data-icon="feedback"></span><span class="sb-act-l">Feedback &amp; Support</span>
       </button>
-      <!-- v3097 · nur fuer Entwicklungspartner (js/umsetzungswuensche.js blendet ein) -->
-      <button class="sb-act-item sb-act-wuensche" type="button" style="display:none" onclick="if(window.DpWuensche)DpWuensche.oeffnen()">
+      <!-- v3097 · nur fuer Entwicklungspartner; v3600 · Vorschau-Funktion umsetzungswuensche (js/vorschau.js blendet ein) -->
+      <button class="sb-act-item sb-act-wuensche" type="button" data-vorschau="umsetzungswuensche" onclick="if(window.DpWuensche)DpWuensche.oeffnen()">
         <span class="sb-act-ico" data-icon="feedback"></span><span class="sb-act-l">Umsetzungswünsche</span>
       </button>
     </div>
@@ -3997,9 +3999,9 @@ label.dp-required.qc-required::after {
   <script src="js/telegram-panel.js?v=v2421"></script>
   <script src="js/unterlagen-modal.js?v=v3370"></script>
   <script src="js/standardwerte-karten.js?v=v3223c"></script>
-  <script src="js/settings.js?v=v3235"></script>
+  <script src="js/settings.js?v=v3610"></script>
   <script src="js/einstellungen-schlank.js?v=v3270"></script>
-<script src="js/pricing-modal.js?v=v2966e"></script>
+<script src="js/pricing-modal.js?v=v3610"></script>
   <script src="js/flyer-code.js?v=v1421c"></script>
   <script src="js/promo-erstflug.js?v=v1421c"></script>
 <script src="js/stripe-success.js?v=183"></script>
@@ -4027,18 +4029,20 @@ label.dp-required.qc-required::after {
 <script src="js/pdf.js?v=v3370"></script>
 <script src="js/pdf-pruefung.js?v=v3029"></script><!-- v3018d · EIN Tor vor jedem PDF -->
 <script src="js/auth.js?v=v3275"></script>
+<script src="js/vorschau.js?v=v3600"></script><!-- v3600 · Vorschau-Funktionen: nur fuer Admin und Freigabeliste (GET /vorschau) -->
   <script src="js/auth-401-handler.js?v=v2180" defer></script>
   <!-- v1370 (B5): nach dem 401-Handler, damit beide dieselbe Auth.apiCall umschliessen -->
   <script src="js/rate-limit-handler.js?v=v1370" defer></script>
   <!-- v1374 (B21): vermittelt die KI-Anfrage des Quick-Checks; eigene Datei,
        damit qc-bridge.js (Nicht-anfassen-Liste) unberuehrt bleibt -->
   <script src="js/qc-ai-bridge.js?v=v2237" defer></script>
-<script src="js/subscription.js?v=v3337"></script>
+<script src="js/subscription.js?v=v3610"></script>
+<script src="js/partner-plan-kauf.js?v=v3610"></script><!-- v3610 · Partner-Plan kaufen und kuendigen (Preis-Fenster, Einstellungen, Cockpit) -->
 <!-- V311-A1-bmfui-removed: bmf-ui.js (V35-Modal) toter Code, durch V292-Modal abgeloest -->
 <script src="js/dealscore2.js?v=v3254"></script>
 <script src="js/aktivitaet.js?v=v3095"></script>
-<script src="js/umsetzungswuensche.js?v=v3495"></script><!-- v3097 · Umsetzungswuensche der Entwicklungspartner (routes/wuensche.js) -->
-<script src="js/bordbuch.js?v=v3111"></script><!-- v3110 · Bordbuch: Mechaniker neben dem Piloten, Screenshot, Markierung, Diktat (Alt+B) --><!-- v3095 · Online-Dauer, ein Puls pro Minute (routes/aktivitaet.js) -->
+<script src="js/umsetzungswuensche.js?v=v3600"></script><!-- v3097 · Umsetzungswuensche der Entwicklungspartner (routes/wuensche.js) -->
+<script src="js/bordbuch.js?v=v3600"></script><!-- v3110 · Bordbuch: Mechaniker neben dem Piloten, Screenshot, Markierung, Diktat (Alt+B) --><!-- v3095 · Online-Dauer, ein Puls pro Minute (routes/aktivitaet.js) -->
 <script src="js/vorgaben-sync.js?v=v3292"></script><!-- v3024 · Bewertungs-Vorgaben am Konto (user_settings browser_vorgaben) -->
 <script src="js/konto-stammdaten.js?v=v3217"></script><!-- v3040 · Stammdaten und Ersteinrichtung am Konto (user_settings stammdaten) -->
 <script src="js/dealscore2-ui.js?v=v3279"></script>
@@ -4122,7 +4126,7 @@ label.dp-required.qc-required::after {
 <script src="js/gutachten-org.js?v=v1448b"></script>
 <script src="js/afa-eigen.js?v=v3196"></script>
 <script src="js/gutachterpartner-abbildung.js?v=v3590"></script>
-<script src="js/gutachterpartner.js?v=v3591"></script>
+<script src="js/gutachterpartner.js?v=v3600"></script>
 <script src="js/deal-action-readycheck.js?v=v3073"></script>
 <script src="js/deal-action-boarding.js?v=v3410a"></script>
 <script src="js/deal-action-pilot.js?v=v3224"></script>
@@ -4159,7 +4163,7 @@ label.dp-required.qc-required::after {
 <script src="js/bwk-profil.js?v=v3091"></script>
 <script src="js/dashboard.js?v=v3370"></script>
 <script src="js/portfolio-strategie.js?v=v3380"></script><!-- v1880 · Modul hinter Feature-Schluessel -->
-<script src="js/vermoegen.js?v=v3495"></script><!-- v3217 · W-11 Vermögen & Haushalt, W-5 Profilfoto (user_settings vermoegen) -->
+<script src="js/vermoegen.js?v=v3600"></script><!-- v3217 · W-11 Vermögen & Haushalt, W-5 Profilfoto (user_settings vermoegen) -->
 <script src="js/portfolio-spiegel.js?v=v1802"></script><!-- v1793: liest portfolioPayload() und legt es fuer den Bot ab - rechnet NICHTS -->
 
 <!-- v1704 � Portfolio-Pilot: haengt sich ans Cockpit, sobald dessen Markup steht -->
@@ -4608,7 +4612,7 @@ document.addEventListener('DOMContentLoaded', function(){
 <script src="js/copilot-aenderungen.js?v=v1875a"></script><!-- v1760 · der Co-Pilot versteht Aenderungen -->
 <script src="js/pilot-berichte.js?v=v2947"></script><!-- v1769 · beide Piloten holen die Marktberichte (V6) -->
     <script src="js/rp-pdf-engine.js?v=W27"></script>
-    <script src="js/partner-kunden.js?v=v3500"></script><!-- v3357 · Partner-Cockpit und Mein Partner (vor reseller-portal.js: Einladungen bestehender Konten werden erst bestaetigt) -->
+    <script src="js/partner-kunden.js?v=v3610"></script><!-- v3357 · Partner-Cockpit und Mein Partner (vor reseller-portal.js: Einladungen bestehender Konten werden erst bestaetigt) -->
     <script src="js/partner-anmerkungen.js?v=v3490"></script><!-- v3450 · Anmerkungen am Kundenstand, Rückmeldung an den Kunden -->
     <script src="js/reseller-portal.js?v=v3500"></script><!-- v1112b-rp-mobile · v3390 Verwaltung im Partner-Cockpit -->
     <script src="js/logo-kontrast.js?v=v3299a"></script><!-- v3299 · Logo-Kontrast, VOR whitelabel-override -->

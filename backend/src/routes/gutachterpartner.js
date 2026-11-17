@@ -29,9 +29,13 @@ const { query } = require('../db/pool');
 const { authenticate } = require('../middleware/auth');
 const zusatzService = require('../services/zusatzService');
 const ev = require('../services/evalionClient');
+const vorschau = require('../services/vorschau');
 
 const router = express.Router();
 router.use(authenticate);
+/* v3600 · Vorschau (Marcel 17.11.2026): bis zur Freigabe nur Admin und Freigabeliste - alle Routen 403,
+   auch /status (die Knoepfe erscheinen dann nicht). Liste: services/vorschau-funktionen.json */
+router.use(vorschau.sperre('gutachten_org'));
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const MAX_DATEI = 20 * 1024 * 1024;

@@ -617,19 +617,27 @@
     foto: foto, checkliste: checkliste, standAlt: standAlt, betrag: betrag, katName: katName,
     KAT_V: KAT_V, KAT_S: KAT_S, KAT_E: KAT_E, KAT_A: KAT_A
   };
-  /* v3231 · Marcel 08.11.2026: „Vermögen & Haushalt auf Prod erstmal ausblenden, das möchte ich extra freigeben.“
-     Auf der Produktion (app.dealpilot.immo) kein Eintrag und kein Aufruf; Staging unverändert.
-     FREIGABE: die Zeile PROD_GESPERRT auf false setzen (neue Version, Buster). Profilfoto und Track Record bleiben. */
-  var PROD_GESPERRT = true;
-  /* v3233 · Marcel 09.11.: am Handy trotzdem sichtbar. Prod laeuft unter ZWEI Adressen (APP_DOMAIN:
-     app.dealpilot.immo und app.dealpilot.junker-immobilien.io), die Sperre kannte nur die erste.
-     Jetzt umgekehrt: gesperrt ueberall ausser Staging und lokal. */
-  var gesperrt = PROD_GESPERRT && !/staging|localhost|127\.0\.0\.1|\.test$/i.test(location.hostname);
-  if (gesperrt) {
-    try { var st = document.createElement('style'); st.textContent = '[data-act="vermoegen"],aside.sidebar .sb-act-item[data-act="vermoegen"],#sidebar .sb-act-item[data-act="vermoegen"]{display:none !important}';   /* v3495 · Marcel 16.11.: am Handy auf Prod sichtbar - aside.sidebar .sb-act-item{display:flex!important} (0,2,1) schlug die Sperre (0,1,0); gemessen mit CSS.getMatchedStylesForNode */ (document.head || document.documentElement).appendChild(st); } catch (e) {}
-    oeffnen = function () {};
-    window.DpVermoegen.oeffnen = oeffnen; window.DpVermoegen.pdf = function () {};
-  }
+  /* v3600 · VORSCHAU-FUNKTION 'vermoegen' (Marcel 17.11.2026) statt der Rechnername-Sperre v3231/v3233/v3495.
+     Frei nur, wenn GET /vorschau es fuer dieses Konto sagt (js/vorschau.js, Liste backend/src/services/vorschau-funktionen.json):
+     Admin und Freigabeliste im Admin › Vorschau - auf Staging und Prod gleich. Der Eintrag in der Seitenleiste traegt
+     data-vorschau="vermoegen" (index.html); die Regel hier ist die zweite Sicherung, falls vorschau.js fehlt.
+     Gesperrt: kein Fenster, kein PDF, im Track Record keine Vermoegensseite (Foto und Name bleiben).
+     Das PDF dok_vermoegen sperrt zusaetzlich das Backend (services/telegramPdfService.js).
+     FREIGABE fuer alle: Admin › Vorschau › „für alle“ - kein Code. */
+  function vorschauFrei() { return !!(window.DpVorschau && window.DpVorschau.istFrei('vermoegen') === true); }
+  try { var st = document.createElement('style'); st.textContent = '[data-act="vermoegen"]:not(.dpv-frei),aside.sidebar .sb-act-item[data-act="vermoegen"]:not(.dpv-frei),#sidebar .sb-act-item[data-act="vermoegen"]:not(.dpv-frei){display:none !important}';   /* v3495: aside.sidebar .sb-act-item{display:flex!important} (0,2,1) schlug die Sperre (0,1,0) */ (document.head || document.documentElement).appendChild(st); } catch (e) {}
+  var _oeffnenFrei = oeffnen, _pdfFrei = pdfAbrufen, _dokFrei = fuerDokument;
+  oeffnen = function () {
+    if (!window.DpVorschau) return;
+    window.DpVorschau.frei('vermoegen').then(function (f) { if (f) _oeffnenFrei(); });
+  };
+  window.DpVermoegen.oeffnen = oeffnen;
+  window.DpVermoegen.pdf = function () { if (vorschauFrei()) return _pdfFrei(); };
+  var _erinnernFrei = erinnern;
+  erinnern = function () { if (window.DpVorschau) window.DpVorschau.frei('vermoegen').then(function (f) { if (f) _erinnernFrei(); }); };
+  window.DpVermoegen.fuerDokument = function () {
+    return _dokFrei().then(function (v) { if (!vorschauFrei() && v) { v = Object.assign({}, v, { hatDaten: false }); } return v; });
+  };
   window.openVermoegen = oeffnen;
 
   /* Einhängen: Einstellungen (Mein Profil), Laden nach Anmeldung, Erinnerung */

@@ -49,12 +49,15 @@
     var reihe = document.querySelector('#afa-eigen-box .afa-rnd-knoepfe');
     if (!reihe) return false;
     if (el('gp-lite')) return true;
-    status().then(function (s) {
+    /* v3600 · Vorschau-Funktion 'gutachten_org' (js/vorschau.js, Liste backend/src/services/vorschau-funktionen.json):
+       ohne Freigabe keine Knoepfe - die Routen antworten dann ohnehin 403. */
+    if (!window.DpVorschau) return true;
+    window.DpVorschau.frei('gutachten_org').then(function (frei) { return frei ? status() : null; }).then(function (s) {
       if (!s || !s.freigeschaltet || el('gp-lite')) return;
       var titel = s.konfiguriert ? '' : 'Die Anbindung an ' + MARKE + ' ist noch nicht eingerichtet.';
       [['gp-lite', 'Ersteinschätzung (' + MARKE + ')', 'lite'], ['gp-voll', 'Gutachten beauftragen (' + MARKE + ')', 'voll']].forEach(function (k) {
         var b = document.createElement('button');
-        b.type = 'button'; b.className = 'btn btn-outline btn-sm'; b.id = k[0]; b.textContent = k[1];
+        b.type = 'button'; b.className = 'btn btn-outline btn-sm dpv-frei'; b.id = k[0]; b.textContent = k[1]; b.setAttribute('data-vorschau', 'gutachten_org');
         if (!s.konfiguriert) { b.disabled = true; b.title = titel; }
         b.onclick = function () { oeffnen(k[2]); };
         reihe.appendChild(b);
