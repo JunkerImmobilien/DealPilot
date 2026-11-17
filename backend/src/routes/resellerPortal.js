@@ -98,7 +98,7 @@ router.get('/pool', async (req, res, next) => {
         const sub = await stripe.subscriptions.retrieve(req.reseller.stripe_subscription_id, {
           expand: ['items.data.price']
         });
-        const item = sub.items && sub.items.data && sub.items.data[0];
+        const item = require('../services/partnerPlanKauf').seatPosition(sub);   /* v3610 · im Partner-Plan-Abo nicht item[0] (das ist der Plan) */
         await reseller.syncPoolQuantity(req.reseller.id, item ? item.quantity : 0, {
           interval: item && item.price && item.price.recurring && item.price.recurring.interval === 'year' ? 'yearly' : 'monthly',
           stripeSubscriptionId: sub.id,
@@ -144,6 +144,41 @@ router.post('/seats/checkout', async (req, res, next) => {
   } catch (e) { next(e); }
 });
 
+/* v3610 · POST /reseller/plaetze { anzahl } - Plaetze im laufenden Abo aendern (nachkaufen / reduzieren).
+   Untergrenze: zugewiesene + fuer eine Uebergabe reservierte Plaetze (FREI_SQL); 409 mit Klartext darunter.
+   Ohne Stripe-Abo (z. B. von Hand freigeschalteter Partner) antwortet die Route 409 kein_abo,
+   das Cockpit nimmt dann den Platz-Kauf (POST /seats/checkout). */
+router.post('/plaetze', async (req, res, next) => {
+  try {
+    if (!stripe) return res.status(503).json({ error: 'stripe_not_configured' });
+    const n = parseInt(req.body && req.body.anzahl, 10);
+    if (!Number.isFinite(n) || n < 0) return res.status(400).json({ error: 'anzahl_ungueltig', message: 'Bitte eine Zahl ab 0 angeben.' });
+    res.json(await require('../services/partnerPlanKauf').plaetzeAendern(req.reseller.id, n));
+  } catch (e) {
+    if (e.status && !e.statusCode) return res.status(e.status).json({ error: e.message, message: e.detail || e.message });
+    next(e);
+  }
+});
+/* v3610 · fuer die Anzeige: laeuft ein Stripe-Abo, und ist es gekuendigt? (ohne Betraege) */
+router.get('/abo', async (req, res, next) => {
+  try {
+    const kauf = require('../services/partnerPlanKauf');
+    let abo = null;
+    if (stripe && req.reseller.stripe_subscription_id) {
+      try {
+        const sub = await stripe.subscriptions.retrieve(req.reseller.stripe_subscription_id, { expand: ['items.data.price'] });
+        const pos = kauf.seatPosition(sub);
+        abo = { status: sub.status, gekuendigt: !!sub.cancel_at_period_end,
+                periodenende: sub.current_period_end ? new Date(sub.current_period_end * 1000).toISOString() : null,
+                plaetze: pos ? (pos.quantity || 0) : 0, mit_plan: !!kauf.planPosition(sub),
+                intervall: (kauf.planPosition(sub) || pos || { price: {} }).price.recurring && (kauf.planPosition(sub) || pos).price.recurring.interval === 'year' ? 'yearly' : 'monthly' };
+      } catch (e) { abo = null; }
+    }
+    const pool = await reseller.getPool(req.reseller.id);
+    res.json({ abo, pool, mindest: kauf.mindestPlaetze(pool), folgen: await kauf.kuendigungsFolgen(req.reseller.id) });
+  } catch (e) { next(e); }
+});
+
 // POST /reseller/pool/confirm  { sessionId }  — nach Checkout-Return
 router.post('/pool/confirm', async (req, res, next) => {
   try {
@@ -159,7 +194,7 @@ router.post('/pool/confirm', async (req, res, next) => {
     if (!subId) return res.status(400).json({ error: 'no_subscription_yet' });
     // Subscription EXPLIZIT holen -> items/quantity sind zuverlässig vorhanden
     const sub = await stripe.subscriptions.retrieve(subId, { expand: ['items.data.price'] });
-    const item = sub.items && sub.items.data && sub.items.data[0];
+    const item = require('../services/partnerPlanKauf').seatPosition(sub);   /* v3610 · im Partner-Plan-Abo nicht item[0] (das ist der Plan) */
     const pool = await reseller.syncPoolQuantity(req.reseller.id, item ? item.quantity : 0, {
       interval: item && item.price && item.price.recurring && item.price.recurring.interval === 'year' ? 'yearly' : 'monthly',
       stripeSubscriptionId: sub && sub.id,

@@ -485,7 +485,52 @@
     if (window.Sub && typeof Sub.openPortal === 'function') return Sub.openPortal().catch(function (e) { toast(fehlerText(e)); });
     toast('Das Abo-Portal ist gerade nicht erreichbar.');
   }
+  /* v3610 · laeuft ein Stripe-Abo (Partner-Plan mit Plaetzen), werden die Plaetze DORT geaendert:
+     eine Zielzahl, nach unten begrenzt auf belegt + reserviert (POST /reseller/plaetze). Ohne Abo bleibt der Platz-Kauf. */
   function plaetzeZeichnen(k) {
+    api('/reseller/abo').then(function (r) {
+      if (r && r.abo && ['active', 'trialing', 'past_due'].indexOf(r.abo.status) >= 0) return plaetzeImAbo(k, r);
+      plaetzeKaufen(k);
+    }, function () { plaetzeKaufen(k); });
+  }
+  function plaetzeImAbo(k, r) {
+    var p = r.pool || {}, abo = r.abo, min = r.mindest || 0, iv = abo.intervall === 'yearly' ? 'yearly' : 'monthly';
+    var belegt = (p.zugewiesen || 0) + (p.reserviert || 0), tot = p.gekauft || 0, anteil = tot ? Math.round(belegt / tot * 100) : 0;
+    var ziel = abo.plaetze, PP = window.DpPartnerPlan, ein = iv === 'yearly' ? 'Jahr' : 'Monat';
+    k.innerHTML = '<h3>Plätze</h3>' +
+      '<div class="pk-kacheln pk-drei"><div class="pk-kachel"><span>Gebucht</span><b>' + tot + '</b></div><div class="pk-kachel"><span>Belegt</span><b>' + belegt + '</b></div><div class="pk-kachel"><span>Frei</span><b>' + (p.frei || 0) + '</b></div></div>' +
+      '<div class="pk-balken" aria-hidden="true"><i style="width:' + anteil + '%"></i></div>' +
+      (p.reserviert ? '<p class="pk-klein">' + p.reserviert + ' davon für eine Objekt-Übergabe vorgemerkt.</p>' : '') +
+      '<div class="pk-gruppe">Plätze ändern</div>' +
+      '<div class="pk-kauf"><div class="pk-stepper"><button type="button" data-d="-1" aria-label="weniger">−</button><input type="number" min="' + min + '" max="500" value="' + ziel + '" aria-label="Anzahl Plätze"><button type="button" data-d="1" aria-label="mehr">+</button></div>' +
+      '<div class="pk-preis"></div></div>' +
+      '<p class="pk-klein" data-v="hinweis"></p>' +
+      '<p class="pk-klein">Weniger als ' + min + ' geht nicht: so viele Plätze sind belegt oder für eine Übergabe vorgemerkt. Mehr Plätze werden sofort anteilig berechnet, weniger als Gutschrift auf die nächste Rechnung.</p>' +
+      (abo.gekuendigt ? '<p class="pk-klein"><b>Dein Abo ist zum ' + datum(abo.periodenende) + ' gekündigt.</b> Plätze lassen sich erst nach einer Wiederaufnahme im Abo-Portal ändern.</p>' : '') +
+      '<div class="pk-fuss"><button type="button" class="pk-btn gold" data-a="uebernehmen"' + (abo.gekuendigt ? ' disabled' : '') + '>Plätze übernehmen</button></div>';
+    var inp = k.querySelector('.pk-stepper input'), knopf = k.querySelector('[data-a="uebernehmen"]');
+    function preis() {
+      ziel = Math.max(min, Math.min(500, parseInt(inp.value, 10) || 0)); inp.value = ziel;
+      var aenderung = ziel - abo.plaetze;
+      k.querySelector('[data-v="hinweis"]').textContent = aenderung === 0 ? 'Unverändert ' + ziel + ' Plätze.' : (aenderung > 0 ? '+' + aenderung : String(aenderung)) + ' gegenüber heute (' + abo.plaetze + ').';
+      knopf.disabled = !!abo.gekuendigt || aenderung === 0;
+      if (PP && typeof PP.angebotHolen === 'function') PP.angebotHolen().then(function (a) {
+        var sum = PP.platzSumme(a, iv, ziel), satz = ziel ? PP.platzSatz(a.platz[iv].stufen, ziel) : 0;
+        k.querySelector('.pk-preis').innerHTML = '<b>' + PP.eur(sum) + '</b> je ' + ein + '<small>' + (ziel ? PP.eur(satz) + ' je Platz' : 'keine Plätze') + '</small>';
+      }, function () {});
+    }
+    [].forEach.call(k.querySelectorAll('.pk-stepper button'), function (b) { b.onclick = function () { inp.value = (parseInt(inp.value, 10) || 0) + Number(b.getAttribute('data-d')); preis(); }; });
+    inp.oninput = function () { if (inp.value !== '') preis(); };
+    knopf.onclick = function () {
+      knopf.disabled = true;
+      api('/reseller/plaetze', { method: 'POST', body: { anzahl: ziel } }).then(function (x) {
+        toast('Plätze geändert: ' + (x && x.pool ? x.pool.gekauft : ziel) + ' gebucht.');
+        plaetzeZeichnen(k);
+      }, function (e) { knopf.disabled = false; toast(fehlerText(e)); });
+    };
+    preis();
+  }
+  function plaetzeKaufen(k) {
     var rp = window.DealPilotResellerPortal;
     rp.poolHolen().then(function (p) {
       var belegt = (p.zugewiesen || 0) + (p.reserviert || 0), tot = p.gekauft || 0, anteil = tot ? Math.round(belegt / tot * 100) : 0;
@@ -523,9 +568,12 @@
       var iv = s.billing_interval || s.interval || '';
       k.innerHTML = '<h3>Abrechnung</h3>' +
         '<div class="pk-zeile"><div class="pk-name"><b>' + esc(plan) + '-Plan</b><small>' + (iv === 'yearly' ? 'jährlich' : iv === 'monthly' ? 'monatlich' : 'aktiv') + (bis ? ', läuft bis ' + datum(bis) : '') + '</small></div><span class="pk-chip gruen">aktiv</span></div>' +
-        '<p class="pk-klein">Rechnungen, Zahlungsart und Kündigung für Partner-Plan und Plätze stehen im Abo-Portal.</p>' +
-        '<div class="pk-fuss"><button type="button" class="pk-btn gold" data-a="portal">Abo und Rechnungen</button></div>';
+        (s.cancel_at_period_end ? '<p class="pk-klein"><b>Gekündigt zum ' + datum(bis) + '.</b> Danach laufen deine Kunden mit Partnerplatz in die Frist.</p>' : '') +
+        '<p class="pk-klein">Rechnungen und Zahlungsart stehen im Abo-Portal.</p>' +
+        /* v3610 · eigener Knopf mit den Folgen fuer die Kunden (partner-plan-kauf.js) */
+        '<div class="pk-fuss"><button type="button" class="pk-btn" data-a="kuendigen">Partner-Plan kündigen</button><button type="button" class="pk-btn gold" data-a="portal">Abo und Rechnungen</button></div>';
       k.querySelector('[data-a="portal"]').onclick = portalOeffnen;
+      k.querySelector('[data-a="kuendigen"]').onclick = function () { if (window.DpPartnerPlan) DpPartnerPlan.kuendigenDialog(); else portalOeffnen(); };
     }, function (e) { k.innerHTML = '<h3>Abrechnung</h3><div class="pk-leer">' + esc(fehlerText(e)) + '</div>'; });
   }
 

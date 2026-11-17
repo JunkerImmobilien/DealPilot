@@ -141,6 +141,8 @@ router.post('/checkout', validate({ body: checkoutSchema }), async (req, res, ne
     const plan = await planService.getPlan(req.body.planId);
     if (!plan) throw new HttpError(404, 'Plan not found');
     if (plan.id === 'free') throw new HttpError(400, 'Cannot subscribe to free plan');
+    /* v3610 · der Partner-Plan hat einen eigenen Kauf (mit Plaetzen, ohne Rabattcode-Feld): POST /subscription/partner/checkout */
+    if (plan.id === 'partner') throw new HttpError(400, 'Der Partner-Plan wird über den Partner-Kauf gebucht.');
 
     const priceId = req.body.billingInterval === 'yearly'
       ? plan.stripe_price_yearly_id
@@ -190,6 +192,71 @@ router.post('/portal', validate({ body: portalSchema }), async (req, res, next) 
     });
     res.json({ url: session.url });
   } catch (err) { next(err); }
+});
+
+/* ── v3610 · Partner-Plan kaufen, kuendigen (services/partnerPlanKauf.js) ───────────────────────────────
+   GET  /subscription/partner/angebot     Preise und Platzstaffel, so wie Stripe sie abrechnet
+   POST /subscription/partner/checkout    { billingInterval, plaetze, widerruf_verzicht, widerruf_version }
+   GET  /subscription/partner/folgen      was eine Kuendigung fuer die Kunden bedeutet
+   POST /subscription/partner/kuendigen   { returnUrl } -> Kuendigungs-Ablauf im Stripe-Kundenportal
+   Keine Testphase und kein Rabattcode: der Kauf ist ein direkter Kauf. */
+const partnerKauf = require('../services/partnerPlanKauf');
+function _partnerFehler(res, next, e) {
+  /* Fehler aus partnerPlanKauf tragen .status (+ .detail als Klartext), HttpError traegt .statusCode - der geht an den zentralen Handler */
+  if (e && e.status && !e.statusCode) return res.status(e.status).json({ error: e.message, message: e.detail || e.message });
+  next(e);
+}
+router.get('/partner/angebot', async (req, res, next) => {
+  try {
+    if (!stripeService.isConfigured()) throw new HttpError(503, 'Payment system is not configured');
+    res.json(await partnerKauf.angebot());
+  } catch (e) { _partnerFehler(res, next, e); }
+});
+const partnerCheckoutSchema = z.object({
+  billingInterval: z.enum(['monthly', 'yearly']),
+  plaetze: z.number().int().min(0).max(partnerKauf.MAX_PLAETZE),
+  successUrl: z.string().url().optional(),
+  cancelUrl: z.string().url().optional(),
+  widerruf_verzicht: z.boolean().optional(),
+  widerruf_version: z.string().max(40).optional()
+}).strict();   /* strict: ein mitgeschicktes promo/trial wird abgewiesen, nicht still verworfen */
+router.post('/partner/checkout', validate({ body: partnerCheckoutSchema }), async (req, res, next) => {
+  try {
+    if (!stripeService.isConfigured()) throw new HttpError(503, 'Payment system is not configured');
+    try {
+      await require('../services/consentService').widerrufVerzichtPruefen(req, { kauf: 'abo', plan: 'partner', intervall: req.body.billingInterval, plaetze: req.body.plaetze });
+    } catch (e) {
+      if (e.code === 'widerruf_verzicht_fehlt') throw new HttpError(400, e.message);
+      throw e;
+    }
+    const base = getFrontendBase(req);
+    const r = await partnerKauf.checkoutAnlegen({
+      user: req.user, interval: req.body.billingInterval, plaetze: req.body.plaetze,
+      successUrl: req.body.successUrl || `${base}/?subscription=success&partner=1&session_id={CHECKOUT_SESSION_ID}`,
+      cancelUrl: req.body.cancelUrl || `${base}/?subscription=cancel`
+    });
+    res.json(r);
+  } catch (e) { _partnerFehler(res, next, e); }
+});
+router.post('/partner/bestaetigen', async (req, res, next) => {
+  try {
+    if (!stripeService.isConfigured()) throw new HttpError(503, 'Payment system is not configured');
+    res.json(await partnerKauf.bestaetigen({ userId: req.user.id, sessionId: req.body && req.body.sessionId }));
+  } catch (e) { _partnerFehler(res, next, e); }
+});
+router.get('/partner/folgen', async (req, res, next) => {
+  try {
+    const rs = await require('../services/resellerService').getResellerForUser(req.user.id);
+    const f = rs ? await partnerKauf.kuendigungsFolgen(rs.id) : { frist_tage: require('../services/partnerKunden').ENTZUG_FRIST_TAGE, kunden_platz: 0, kunden_eigen: 0, zum: 'periodenende' };
+    res.json(f);
+  } catch (e) { _partnerFehler(res, next, e); }
+});
+router.post('/partner/kuendigen', validate({ body: portalSchema }), async (req, res, next) => {
+  try {
+    if (!stripeService.isConfigured()) throw new HttpError(503, 'Payment system is not configured');
+    const rs = await require('../services/resellerService').getResellerForUser(req.user.id);
+    res.json(await partnerKauf.kuendigenLink({ userId: req.user.id, resellerId: rs && rs.id, returnUrl: req.body.returnUrl || `${getFrontendBase(req)}/` }));
+  } catch (e) { _partnerFehler(res, next, e); }
 });
 
 function getFrontendBase(req) {

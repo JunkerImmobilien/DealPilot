@@ -34,8 +34,16 @@
 const BEZAHLT = new Set(['active', 'trialing', 'past_due']);
 const BEENDET = new Set(['canceled', 'unpaid', 'incomplete_expired']);
 
+/* v3610 · 'partner_plan' = Partner-Plan + Plaetze in EINEM Abo (services/partnerPlanKauf.js) */
 function istPartnerSeats(obj) {
-  return !!(obj && obj.metadata && obj.metadata.kind === 'partner_seats' && obj.metadata.reseller_id);
+  return !!(obj && obj.metadata && (obj.metadata.kind === 'partner_seats' || obj.metadata.kind === 'partner_plan') && obj.metadata.reseller_id);
+}
+function istPartnerPlan(obj) { return !!(obj && obj.metadata && obj.metadata.kind === 'partner_plan'); }
+
+/* v3610 · Menge der PLATZ-Position: im Partner-Plan-Abo steht der Plan daneben (Menge 1), item[0] waere falsch */
+function platzMenge(sub) {
+  const pos = require('./partnerPlanKauf').seatPosition(sub);
+  return pos ? (pos.quantity || 0) : 0;
 }
 
 function intervallAus(item) {
@@ -53,7 +61,7 @@ function standardDeps() {
 }
 
 async function abgleichen(deps, resellerId, sub, menge, abo) {
-  const item = sub.items && sub.items.data && sub.items.data[0];
+  const item = require('./partnerPlanKauf').seatPosition(sub) || (sub.items && sub.items.data && sub.items.data[0]);
   return deps.syncPoolQuantity(resellerId, menge, {
     interval: intervallAus(item),
     stripeSubscriptionId: abo ? sub.id : undefined,
@@ -72,6 +80,12 @@ async function handlePartnerSeatsEvent(event, deps) {
   const obj = event && event.data && event.data.object;
   if (!istPartnerSeats(obj)) return { handled: false };
   const resellerId = obj.metadata.reseller_id;
+  /* v3610 · beim Partner-Plan laeuft danach der normale Plan-Zweig (subscriptions) weiter */
+  const r0 = await _seats(deps, typ, obj, resellerId);
+  return istPartnerPlan(obj) ? Object.assign(r0, { weiter: r0.handled !== false }) : r0;
+}
+
+async function _seats(deps, typ, obj, resellerId) {
 
   const r = await deps.query('SELECT id, stripe_subscription_id FROM resellers WHERE id = $1', [resellerId]);
   const reseller = r.rows && r.rows[0];
@@ -86,8 +100,7 @@ async function handlePartnerSeatsEvent(event, deps) {
     if (!sub || !BEZAHLT.has(sub.status)) {
       return { handled: true, aktion: 'uebersprungen', grund: 'status_' + (sub && sub.status) };
     }
-    const item = sub.items && sub.items.data && sub.items.data[0];
-    const menge = item ? (item.quantity || 0) : 0;
+    const menge = platzMenge(sub);
     const pool = await abgleichen(deps, resellerId, sub, menge, true);
     return { handled: true, aktion: 'abgeglichen', menge, pool };
   }
@@ -101,15 +114,19 @@ async function handlePartnerSeatsEvent(event, deps) {
     let menge;
     if (typ === 'customer.subscription.deleted' || BEENDET.has(sub.status)) menge = 0;
     else if (BEZAHLT.has(sub.status)) {
-      const item = sub.items && sub.items.data && sub.items.data[0];
-      menge = item ? (item.quantity || 0) : 0;
+      menge = platzMenge(sub);
     } else {
       return { handled: true, aktion: 'uebersprungen', grund: 'status_' + sub.status };
     }
     /* v3357 · erst die Frist (gibt die Plaetze in den Pool), dann abgleichen - so baut der Abgleich sie ab */
     let ende = null;
-    if (menge === 0 && typeof deps.aboEnde === 'function') { try { ende = await deps.aboEnde(resellerId); } catch (e) { ende = { fehler: e.message }; } }
-    const pool = await abgleichen(deps, resellerId, sub, menge, menge > 0);
+    /* v3610 · im Partner-Plan-Abo heisst Menge 0 nur „keine Plaetze gebucht", nicht „Abo zu Ende" -
+       die Frist laeuft dort nur, wenn das Abo wirklich endet */
+    const endet = typ === 'customer.subscription.deleted' || BEENDET.has(sub.status);
+    if ((istPartnerPlan(sub) ? endet : menge === 0) && typeof deps.aboEnde === 'function') { try { ende = await deps.aboEnde(resellerId); } catch (e) { ende = { fehler: e.message }; } }
+    /* v3610 · im Partner-Plan-Abo bleibt die Abo-ID am Reseller auch bei 0 Plaetzen, solange es laeuft */
+    const aboBleibt = menge > 0 || (istPartnerPlan(sub) && BEZAHLT.has(sub.status) && typ !== 'customer.subscription.deleted');
+    const pool = await abgleichen(deps, resellerId, sub, menge, aboBleibt);
     /* v3357 · Ende des Partner-Abos: zugewiesene Plaetze laufen in die Frist (wie ein Platzentzug), statt
        10 Jahre Investor zu behalten (Luecke aus dem Konzept 13.11.2026, Abschnitt 1.2) */
     return { handled: true, aktion: 'abgeglichen', menge, pool, abo_ende: ende };
@@ -118,4 +135,4 @@ async function handlePartnerSeatsEvent(event, deps) {
   return { handled: false };
 }
 
-module.exports = { handlePartnerSeatsEvent, istPartnerSeats };
+module.exports = { handlePartnerSeatsEvent, istPartnerSeats, istPartnerPlan, platzMenge };

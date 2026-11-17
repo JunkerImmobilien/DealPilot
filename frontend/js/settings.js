@@ -2033,9 +2033,12 @@ function _v234_1RenderPlanStatusHeader() {
         '<button class="v234-btn v234-btn-primary" onclick="if(typeof Sub!==\'undefined\'&&Sub.openPortal)Sub.openPortal();return false">' +
           '<span class="v234-btn-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px" aria-hidden="true"><use href="#i-settings"/></svg></span> Abo verwalten' + /* v838-wrench-svg */
         '</button>' +
-        '<button class="v234-btn v234-btn-secondary" onclick="closeSettings();if(typeof openPricingModal===\'function\')openPricingModal();return false">' +
-          'Plan wechseln →' +
-        '</button>' +
+        /* v3610 · Partner-Plan: Kuendigen mit den Folgen fuer die Kunden (partner-plan-kauf.js), statt Plan wechseln */
+        (planKey === 'partner'
+          ? '<button class="v234-btn v234-btn-secondary" onclick="if(window.DpPartnerPlan)DpPartnerPlan.kuendigenDialog();return false">Partner-Plan kündigen</button>'
+          : '<button class="v234-btn v234-btn-secondary" onclick="closeSettings();if(typeof openPricingModal===\'function\')openPricingModal();return false">' +
+              'Plan wechseln →' +
+            '</button>') +
       '</div>' +
       '<div class="v234-status-hint">' +
         '<strong>Im Stripe-Kundenportal:</strong> Plan ändern, Abo kündigen, Zahlungsmethode anpassen, Rechnungen herunterladen.' +

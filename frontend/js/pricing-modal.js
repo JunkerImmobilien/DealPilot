@@ -823,6 +823,7 @@
 
   function _updatePpgPrices(period){
     var host=document.getElementById('pricing-plugin-host'); if(!host)return;
+    try{ if(window.DpPartnerPlan) DpPartnerPlan.periode(period); }catch(e){}   /* v3610 */
     Array.prototype.forEach.call(host.querySelectorAll('.ppg .tk-price'),function(pr){
       var m=pr.getAttribute('data-m'),y=pr.getAttribute('data-y');
       var b=pr.querySelector('b'),per=pr.querySelector('.per');
@@ -838,6 +839,8 @@
     var tl=host.querySelector('.dp-timeline'); if(tl){var tc=tl.closest('.dp-container'); if(tc)tc.style.display='none';}
     var card=host.querySelector('.dp-card'); var target=card?card.closest('.dp-container'):null; if(!target)return;
     target.innerHTML=_planCardsHtml();
+    /* v3610 · Partner-Plan als eigene Karte unter den vier Plaenen (partner-plan-kauf.js) */
+    try{ if(window.DpPartnerPlan) DpPartnerPlan.einhaengen(target,(typeof STATE!=='undefined'&&STATE.period)||'monthly'); }catch(e){}
     Array.prototype.forEach.call(host.querySelectorAll('.ppg .tk-cta'),function(a){
       a.addEventListener('click',function(e){e.preventDefault();_onPlanSelect(a.getAttribute('data-plan'),(typeof STATE!=='undefined'&&STATE.period)||'monthly');});
     });
@@ -1452,6 +1455,11 @@
     var _cur = (DealPilotConfig.pricing.currentKey ? DealPilotConfig.pricing.currentKey() : 'free') || 'free';
     if (planKey === _cur) {
       if (typeof toast === 'function') toast('Das ist bereits dein aktueller Plan.');
+      return;
+    }
+    /* v3610 · im Partner-Abo stehen Plan und Plaetze zusammen - das Portal kann es nicht in einen anderen Plan umbauen */
+    if (_cur === 'partner') {
+      if (typeof toast === 'function') toast('Du hast den Partner-Plan. Für einen anderen Plan kündige ihn zum Laufzeitende (Karte Partner-Plan unten).');
       return;
     }
     if (_cur !== 'free' && typeof Sub !== 'undefined' && typeof Sub.openPortal === 'function') {

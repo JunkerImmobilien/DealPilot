@@ -793,6 +793,8 @@ async function renderSubscriptionBadge() {
 (function handleStripeReturn() {
   var params = new URLSearchParams(location.search);
   if (params.get('subscription') === 'success') {
+    /* v3610 · Partner-Plan: die Sitzung fuer den Rueckweg merken (partner-plan-kauf.js bestaetigt sie), bevor die Adresse geraeumt wird */
+    if (params.get('partner') === '1' && params.get('session_id')) window._dpPartnerSitzung = params.get('session_id');
     if (typeof toast === 'function') {
       setTimeout(function(){ toast('✓ Abo erfolgreich aktiviert!'); }, 500);
     }

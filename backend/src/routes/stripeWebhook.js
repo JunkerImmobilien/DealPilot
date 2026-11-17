@@ -73,6 +73,19 @@ router.post('/', express.raw({ type: 'application/json' }), async (req, res) => 
   }
 });
 
+/* v3610 · die erste Position, deren Preis ein Plan ist. Ein Plan-Abo mit einer Position rechnet wie bisher;
+   im Partner-Plan-Abo steht daneben die Platz-Position (dp_seat_*), die kein Plan ist. */
+async function planAusAbo(sub) {
+  const items = (sub && sub.items && sub.items.data) || [];
+  for (const it of items) {
+    const id = it && it.price && it.price.id;
+    if (!id) continue;
+    const m = await stripeService.resolvePlanFromPriceId(id);
+    if (m) return { priceId: id, planMap: m };
+  }
+  return { priceId: items[0] && items[0].price && items[0].price.id, planMap: null };
+}
+
 async function handleEvent(event) {
   /* v3303: Mandanten-Plaetze (metadata.kind = 'partner_seats') gleicht der
      Webhook jetzt selbst ab - bisher nur Checkout-Ruecksprung und
@@ -84,9 +97,11 @@ async function handleEvent(event) {
     const { handlePartnerSeatsEvent } = require('../services/partnerSeatsWebhook');
     const r = await handlePartnerSeatsEvent(event);
     if (r.handled) {
-      console.log('[stripe-webhook] partner_seats ' + event.type + ': ' + r.aktion
+      console.log('[stripe-webhook] ' + (r.weiter ? 'partner_plan' : 'partner_seats') + ' ' + event.type + ': ' + r.aktion
         + (r.menge != null ? ' menge=' + r.menge : '') + (r.grund ? ' (' + r.grund + ')' : ''));
-      return;
+      /* v3610 · Partner-Plan: die Plaetze sind abgeglichen, der Plan selbst laeuft unten durch denselben
+         Zweig wie jeder andere Plan (subscriptions, Willkommens-Mail, Kuendigung) */
+      if (!r.weiter) return;
     }
   }
   switch (event.type) {
@@ -130,8 +145,7 @@ async function handleEvent(event) {
 
       // Fetch the full subscription from Stripe to get all details
       const sub = await stripeService.getSubscription(session.subscription);
-      const priceId = sub.items.data[0]?.price?.id;
-      const planMap = await stripeService.resolvePlanFromPriceId(priceId);
+      const { priceId, planMap } = await planAusAbo(sub);   /* v3610 */
       if (!planMap) {
         console.warn('Could not resolve plan for price:', priceId);
         return;
@@ -183,8 +197,7 @@ async function handleEvent(event) {
         return;
       }
 
-      const priceId = sub.items.data[0]?.price?.id;
-      const planMap = await stripeService.resolvePlanFromPriceId(priceId);
+      const { priceId, planMap } = await planAusAbo(sub);   /* v3610 */
       if (!planMap) {
         console.warn(`Could not resolve plan for price ${priceId}`);
         return;
