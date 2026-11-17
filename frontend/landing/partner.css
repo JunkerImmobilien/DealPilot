@@ -52,15 +52,43 @@
 .pt-schiene{position:absolute;left:9px;top:8px;width:2px;height:0;background:var(--runway);transition:height .35s var(--e-weich,ease)}
 .pt-kabine{position:absolute;left:2px;top:8px;width:16px;height:16px;border-radius:3px;background:var(--gdh);
   box-shadow:0 0 0 4px rgba(0,0,0,.6),0 0 22px color-mix(in srgb,var(--gdh) 60%,transparent);transition:top .35s var(--e-weich,ease)}
-.pt-s{min-height:62vh;padding:6px 0 48px;opacity:.38;transition:opacity .35s}
-.pt-s:last-child{min-height:40vh}
+/* landing-partner-3 · Marcel 17.11.2026: „beim Runterscrollen kompakter, gleiche Wirkung“. Etappe 62vh → 36vh,
+   letzte 40vh → 26vh; der Schirm bleibt stehen wie vorher, nur der Weg je Etappe ist kürzer. */
+.pt-s{min-height:36vh;padding:4px 0 26px;opacity:.38;transition:opacity .35s}
+.pt-s:last-child{min-height:26vh}
 .pt-s.an{opacity:1}
 .pt-s .pt-nr{font:700 11px/1 var(--mono);letter-spacing:.18em;color:var(--gdh);text-transform:uppercase}
-.pt-s h3{font:600 clamp(22px,2.4vw,30px)/1.2 var(--disp);color:#fff;margin:12px 0 12px}
-.pt-s p{font-size:16px;line-height:1.7;color:var(--mdk);margin:0 0 14px}
+.pt-s h3{font:600 clamp(21px,2.2vw,28px)/1.2 var(--disp);color:#fff;margin:10px 0 8px}
+.pt-s p{font-size:15.5px;line-height:1.62;color:var(--mdk);margin:0 0 10px}
 .pt-chips{display:flex;flex-wrap:wrap;gap:6px}
 .pt-chips span{font:600 10px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--gdh);border:1px solid var(--line);padding:7px 9px}
 .pt-s .pt-handy{display:none}
+
+/* ── landing-strecke-1 · dieselbe Strecke für DealPilot selbst (index-vorschau.html #workflow) ──
+   Bilder sind Standbilder der Videothek (960×512) mit einem Band unten. Der Schirm ist hier breiter
+   (2:1), das Bild deckt in voller Breite ab, oben ausgerichtet: das Band fällt unten heraus. */
+.dp-strecke .pt-schirm{aspect-ratio:2/1}
+.dp-strecke .pt-schirm img{object-position:center top}
+.dp-strecke .pt-aufzug{grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:48px}
+.dp-strecke .pt-s p{font-size:15px;line-height:1.6}
+.dp-strecke .pt-chips .dp-video{align-self:center;margin-left:6px;font:600 10px/1 var(--mono);letter-spacing:.12em;
+  text-transform:uppercase;color:#fff;text-decoration:none;border-bottom:1px solid var(--gdh);padding-bottom:3px}
+.dp-strecke .pt-s{min-height:30vh}
+.dp-strecke .pt-s:last-child{min-height:22vh}
+.dp-strecke-fuss{margin-top:36px;border-top:1px solid var(--line);padding-top:28px}
+.dp-links{display:flex;flex-wrap:wrap;gap:8px 22px;justify-content:center;margin:0}
+.dp-links a{font-size:14px;color:var(--txtd);text-decoration:none;border-bottom:1px solid var(--line);padding-bottom:2px}
+.dp-links a:hover{color:var(--gdh);border-color:var(--gdh)}
+.dp-strecke-cta{display:flex;flex-direction:column;align-items:center;gap:12px;margin-top:30px;text-align:center}
+.dp-strecke-cta span{font:500 11.5px/1.5 var(--mono);color:var(--mdk);letter-spacing:.04em}
+/* Vorschau: Quellenkarten der Datenbasis (#daten) zum Aufklappen */
+.dt-mehr{margin-top:22px}
+.dt-mehr > summary{list-style:none;cursor:pointer;display:block;width:max-content;max-width:100%;margin:0 auto;padding:12px 18px;
+  border:1px solid var(--cream-line);background:#fff;font:600 12px/1.3 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--ink)}
+.dt-mehr > summary::-webkit-details-marker{display:none}
+.dt-mehr > summary::after{content:' ＋';color:var(--gd)}
+.dt-mehr[open] > summary::after{content:' −'}
+.dt-mehr[open] > summary{margin-bottom:22px}
 
 /* ── Zwei Wege ───────────────────────────────────────────────────────── */
 .pt-wege{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;max-width:980px;margin:0 auto}
@@ -122,18 +150,29 @@
 @media(max-width:980px){
   .pt-hero .lz-hero-g,.pt-start{grid-template-columns:1fr}
   .pt-karten{grid-template-columns:1fr 1fr}
+  /* landing-partner-3 · auch am Handy ein Aufzug: der Schirm steht klein unter der Navigation still (sticky),
+     die Etappen fahren darunter durch. Vorher trug jede Etappe ihr eigenes Bild (8 × 194 px Bild). */
   .pt-aufzug{grid-template-columns:1fr;gap:0}
-  .pt-schacht{display:none}
+  .pt-schacht{position:sticky;top:var(--pt-oben,80px);z-index:3;background:var(--ob);padding:10px 0 8px;margin:0 auto 10px;width:100%;max-width:560px}
+  .pt-schacht .pt-bu{display:none}
+  .dp-strecke .pt-aufzug{grid-template-columns:1fr;gap:0}
+  .pt-schacht::after{content:'';position:absolute;left:0;right:0;top:100%;height:18px;background:linear-gradient(var(--ob),transparent);pointer-events:none}
+  .pt-anzeige{margin-top:8px;font-size:10px}
+  .pt-anzeige b{font-size:17px}
+  .pt-anzeige .pt-wer{padding:4px 8px}
   .pt-schritte{padding-left:28px}
-  .pt-s{min-height:0;opacity:1;padding-bottom:44px}
-  .pt-s .pt-handy{display:block;margin-top:16px;width:100%;height:auto;aspect-ratio:16/10;object-fit:cover;object-position:left top}
-  .pt-kabine,.pt-schiene{display:none}
+  .pt-s{min-height:34vh;padding-bottom:22px}
+  .pt-s:last-child{min-height:30vh}
+  .pt-s .pt-handy{display:none}
   .pt-schritte::before{background:var(--line)}
   .pt-hoheit{grid-template-columns:1fr 1fr}
   .pt-preis,.pt-wege{grid-template-columns:1fr}
   .pt-stufen{grid-template-columns:1fr}
 }
 @media(max-width:640px){
+  /* landing-strecke-1 · am Handy ohne Stichwort-Chips, der Text sagt dasselbe; der Video-Verweis bleibt */
+  .dp-strecke .pt-chips span{display:none}
+  .dp-strecke .pt-chips .dp-video{margin-left:0}
   .pt-karten,.pt-hoheit{grid-template-columns:1fr}
   .pt-video{grid-template-columns:1fr;text-align:left}
   .pt-staffel{grid-template-columns:1fr}

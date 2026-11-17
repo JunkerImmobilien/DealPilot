@@ -14,7 +14,7 @@
 <link rel="stylesheet" href="dp2-teile.css?v=landing-partner-2">
 <link rel="stylesheet" href="dp2-live.css?v=landing-partner-1">
 <link rel="stylesheet" href="dp2-loesungen.css?v=landing-loesungen-1c">
-<link rel="stylesheet" href="partner.css?v=landing-partner-2">
+<link rel="stylesheet" href="partner.css?v=landing-partner-3">
 </head><body class="lz-body">
 
 <svg style="display:none" aria-hidden="true">
@@ -204,7 +204,7 @@
 <section class="lz-sec lz-dunkel pt-strecke" id="strecke"><div class="wrap">
   <div class="lz-kopf rv"><div class="eye ctr">Die Strecke</div>
     <h2>Vom ersten Kunden bis zur Rückmeldung. <span class="ac">In acht Etappen.</span></h2>
-    <p>Scroll einfach weiter. Links siehst du bei jeder Etappe den echten Bildschirm, rechts, wer gerade dran ist und was passiert.</p></div>
+    <p>Scroll einfach weiter. Bei jeder Etappe siehst du den echten Bildschirm, dazu wer gerade dran ist und was passiert.</p></div>
   <div class="pt-aufzug">
     <div class="pt-schacht" aria-hidden="true">
       <div class="pt-rahmen pt-schirm">
@@ -332,7 +332,7 @@
   <div class="pt-video rv">
     <span class="pt-play" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 4v16l13-8z"/></svg></span>
     <div><h3>Lieber zusehen? Die Partner-Videos.</h3>
-      <p>In der Videothek gibt es eine eigene Reihe für Partner: Cockpit, Einladen, Freigaben, Anmerkungen, Aufgaben und Verwaltung. Echte Aufnahmen aus der App.</p></div>
+      <p>In der Videothek gibt es eine eigene Reihe für Partner in fünf Folgen: Cockpit und Marke, Kunden hinzufügen, Objekte senden und übernehmen, Anmerkungen und Rückmeldung, Objekt an Kunden übergeben. Echte Aufnahmen aus der App.</p></div><!-- landing-partner-3 · Liste wie assets/videothek/videos.json, Reihe „partner“ (vorher Aufgaben und Verwaltung genannt, die keine eigene Folge haben) -->
     <a class="btn-l" href="videothek.html#reihe-partner">Zur Reihe „Für Partner“ →</a>
   </div>
 </div></section>
@@ -353,6 +353,22 @@
       <p>Dein Kunde bekommt 30 Tage Zeit für einen Export oder ein eigenes Abo. Danach wird die Verbindung getrennt und sein Konto gelöscht.</p></details>
     <details><summary>Kann ich meinen Kunden DealPilot statt meiner Marke zeigen?</summary>
       <p>Ja. Beim Partnerplatz wählst du je Kunde deine Marke oder DealPilot.</p></details>
+    <!-- landing-partner-3 · Marcel 17.11.2026 „ist das Partnerkonzept rund?“: fünf Fragen, die vor dem Kauf offen waren.
+         Belege: partnerKunden.aboEnde() und fristenAbarbeiten() (Frist 30 Tage, ENTZUG_FRIST_TAGE), objektUebergabe.js
+         (GUELTIG_TAGE 30, einmal übernehmbar, Kopie, Platz für neue Mandanten), resellerInviteMail.js (Absendername
+         und Reply-To des Partners, Adresse bleibt DealPilot, Fuß „Plattform: DealPilot“), fragen.html (Team-Konto
+         noch nicht gebaut, Vertrag zur Auftragsverarbeitung). Wie gekündigt wird, steht hier bewusst nicht:
+         das baut v3610 (partnerPlanKauf.js), der Text folgt mit der Direktbuchung. -->
+    <details><summary>Was passiert mit meinen Kunden, wenn mein Partner-Abo endet?</summary>
+      <p>Kunden mit Partnerplatz bekommen dieselbe Frist wie beim Entziehen eines Platzes: 30 Tage, in denen sie ihre Objekte ansehen, exportieren oder ein eigenes Abo abschließen können. Schließen sie eines ab, behalten sie Konto und Objekte. Sonst wird die Verbindung danach getrennt und das Konto gelöscht. Kunden mit eigenem Abo behalten ihr Konto, ihren Plan und ihre Objekte.</p></details>
+    <details><summary>Was sehen meine Kunden von DealPilot?</summary>
+      <p>Mit deiner Marke stehen dein Name, dein Logo und deine Farbe in der App, in den E-Mails an deine Kunden und auf ihren PDFs. Die E-Mails tragen deinen Namen als Absender, Antworten gehen an deine Adresse. Die Adresse der App und die technische Absenderadresse bleiben die von DealPilot, im Fuß der E-Mails steht „Plattform: DealPilot“.</p></details>
+    <details><summary>Kann ich ein fertig gerechnetes Objekt an einen Interessenten schicken?</summary>
+      <p>Ja, im Partner-Cockpit unter Übergeben. Dein Interessent bekommt eine E-Mail in deiner Marke mit einem Link, der 30 Tage gilt und sich einmal übernehmen lässt. Er bekommt eine Kopie des Objekts, dein Original bleibt bei dir. Ist er noch nicht dein Kunde, belegt er dabei einen freien Platz.</p></details>
+    <details><summary>Können mehrere Kollegen mit einem Partner-Konto arbeiten?</summary>
+      <p>Heute nicht mit getrennten Zugängen. Der Partner-Plan enthält einen Zugang für dich und das Partner-Cockpit. Ein Team-Konto mit eigenem Login je Berater ist noch nicht gebaut. Wenn du es brauchst, schreib uns.</p></details>
+    <details><summary>Brauche ich einen Vertrag zur Auftragsverarbeitung?</summary>
+      <p>Wenn du DealPilot beruflich für Kunden nutzt, ja, nach Art. 28 DSGVO. Den Vertrag stellen wir bereit, eine kurze E-Mail genügt. Die Server stehen in Deutschland, mehr dazu unter <a href="sicherheit.html" style="color:var(--gdh)">Sicherheit</a>.</p></details>
   </div>
 </div></section>
 
@@ -394,6 +410,6 @@
 
 
 <script src="dp2.js?v=landing-zahlen-2"></script>
-<script src="partner.js?v=landing-partner-1"></script>
+<script src="partner.js?v=landing-partner-3"></script>
   <script src="assets/umgebung.js?v=v1644"></script><!-- v1644 · Landing zeigt auf DIE App, in der sie steht -->
 </body></html>

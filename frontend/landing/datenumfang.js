@@ -1,11 +1,11 @@
-/* datenumfang-messen.mjs · erzeugt 2026-11-11T14:16:52.028Z — NICHT von Hand ändern.
+/* datenumfang-messen.mjs · erzeugt 2026-11-17T07:00:35.937Z — NICHT von Hand ändern.
    Neu erzeugen: node tools/datenumfang-messen.mjs */
 window.DPS_UMFANG = {
- "stand": "2026-11-11",
- "db_gemessen": "2026-11-11T14:07:09.163Z",
+ "stand": "2026-11-17",
+ "db_gemessen": "2026-11-17T07:00:35.937Z",
  "quelle": "tools/datenumfang-messen.mjs · Staging nur lesend (SELECT count) · BorisRegistry.status() · Takt-Konstanten im Code · register-stand.js",
  "db": {
-  "indizes": 299,
+  "indizes": 301,
   "portale": 118,
   "portale_erreichbar": 118,
   "portale_laender": 13,
@@ -15,28 +15,28 @@ window.DPS_UMFANG = {
   "bau": 56128,
   "register_db": 6187,
   "bau_tabellen": 5,
-  "regional": 108137,
+  "regional": 108676,
   "regional_gebiete": 11644,
   "regional_tabellen": 6,
   "zensus": 894880,
   "zensus_tabellen": 10,
   "zensus_gebiete": 11186,
-  "zins_tage": 1356,
-  "zins_werte": 2708,
+  "zins_tage": 1372,
+  "zins_werte": 2740,
   "zins_monat_werte": 56,
   "zins_seit": "2025-07-14",
   "host": "116.203.214.11",
-  "gemessen": "2026-11-11T14:07:09.163Z"
+  "gemessen": "2026-11-17T07:00:35.937Z"
  },
  "teile": {
   "zensus": 894880,
-  "regional": 108137,
+  "regional": 108676,
   "bau": 56128,
   "akoga": 28827,
   "register": 6187,
   "kennzahlen_gaa": 2557,
-  "indizes": 299,
-  "zinsen": 2764
+  "indizes": 301,
+  "zinsen": 2796
  },
  "takte": {
   "zinsen": "täglich",
@@ -61,24 +61,24 @@ window.DPS_UMFANG = {
   "BORIS-D (bundesweit)"
  ],
  "kopf": {
-  "amtlich_gesamt": 1099779,
-  "amtlich_rund": "über 1 Million",
-  "amtlich_rund_gross": "Über 1 Million",
+  "amtlich_gesamt": 1100352,
+  "amtlich_rund": "über 1,1 Millionen",
+  "amtlich_rund_gross": "Über 1,1 Millionen",
   "register_werte": 6187,
   "ausschuesse": 201,
   "zensus": 894880,
   "zensus_tabellen": 10,
   "zensus_gebiete": 11186,
-  "regional": 108137,
+  "regional": 108676,
   "regional_tabellen": 6,
   "regional_gebiete": 11644,
   "bau": 56128,
   "bau_tabellen": 5,
   "akoga": 28827,
   "kennzahlen_gaa": 2557,
-  "indizes": 299,
+  "indizes": 301,
   "indizes_reihen": 3,
-  "zins_tage": 1356,
+  "zins_tage": 1372,
   "portale": 118,
   "portale_laender": 13,
   "boris_dienste": 10,
