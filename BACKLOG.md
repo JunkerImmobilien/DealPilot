@@ -36,10 +36,14 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
-### N177 · Modernisierungspunkte ohne Angabe: kein stilles 0 mehr (Marcel 17.11.2026: „Das müssen wir auch für andere Objekte berücksichtigen … aus den Bildern ableiten … wenn nicht, dann mittel annehmen") — **v3660 (`74580f8d`) auf Staging; Prod NICHT ausgerollt**
+### N177 · Modernisierungspunkte ohne Angabe: kein stilles 0 mehr (Marcel 17.11.2026: „Das müssen wir auch für andere Objekte berücksichtigen … aus den Bildern ableiten … wenn nicht, dann mittel annehmen") — **v3660–v3660d (`74580f8d`, `8828d27e`, `0bc61e9b`, `c18fb8ab`, `cdd73e8a`) auf Staging; Entscheidungen 1–4 umgesetzt; Prod NICHT ausgerollt**
 - Rangfolge eigene Angabe > Zustand > Exposé-Text/Bilder je Gewerk > Rückfall (mittel 8 ab 30 J., Energieklasse) — Regeln in wissen/2026-11-17.md.
-- **Offen, Entscheidung Marcel:** (1) Ebene C neu einfrieren (Demo-MFH RND 18 → 35,2 J., Ertragswert +22 %); (2) Rückfall-Werte bestätigen (8 / 12 / 6, Zustand gut = 14, sanierungsbedürftig = 0); (3) nennt das Exposé nur ein Gewerk, gelten die übrigen als „mittel angenommen" — oder als nicht modernisiert?; (4) Zustand aus Bildern setzt `ds2_zustand` und bewegt damit den Deal-Score 2.
-- **Offen, Arbeit:** Bildableitung im Quick-Check (eigene Fotos im iframe) und aus Exposé-PDF-Bildern; Grundlage auf Detailstufe 1 sichtbar machen; Marktbericht-Vorschau im Browser nachmessen.
+- **Entschieden 17.11.2026 und umgesetzt (v3660a–d):** Ebene C neu eingefroren; Rückfallwerte bleiben; übrige Gewerke mittel angenommen, immer sichtbar unten mit Weg zum Einstellen; abgeleiteter Zustand darf DS2 bewegen, gekennzeichnet; Übernahme mit Haken.
+- **Offen, nach „QC frei":** Quick-Check (Buster nachziehen, Bildableitung aus den QC-Fotos, Annahme-Satz im Prüfstein); Exposé-PDF-Bilder in der Übernahme (laufen heute über die Fotos des Objekts, dann automatisch); Grundlage auf Detailstufe 1 sichtbar machen; Marktbericht-Ansicht im Browser.
+
+### N177 · Partner-Videos an die Oberfläche vom 17.11. und Kunden-Video (Marcel 17.11.2026) — **v3650–v3650b (`d151af65`, `c352167b`, `e18eea32`), landing-partner-videos-3 (`ec66480d`) auf Staging; Videos stumm + Sprecher in `Dateien/Messe/Videos/Partner/`, Videothek Staging**
+- Partner 1–4 neu aufgenommen (5:20, 5:31, 5:02, 7:27), Partner 5 geprüft und unverändert, neu Kunde 1 „Mit deinem Partner arbeiten“ (4:44). Alte Fassungen in `Partner/alt-vor-v3640/`.
+- Offen: Fassung mit Marcels Stimmklon (Texte `texte-marcel-p1…p4.json`, `texte-marcel-k1.json` bereit), erst nach Marcels Freigabe der Credits. K1 ist länger als die gewünschten 2–3 min. Einladungs-Mail: Link `videothek.html?v=partner-kunde-1` einbauen (nach Prod). Prod.
 
 ### N176 · Partner und Kunden: Kundennummer, Übernehmen mit Kundenbezug, Bild an Anmerkungen, Senden erst nach Bearbeitung, Mein Partner im Arbeitsbereich, Stufe und Rechte im RND-Stil (Marcel 17.11.2026) — **v3640–v3640d (`a83a3129`, `0bbce828`, `aa0d6479`, `ed49ef22`, `2dc6ca69`, `b1ead60f`, `20632d13`, `ad53ffad`, `50d825ae`, `46e79a03`) auf Staging nachgemessen; Prod NICHT ausgerollt (Migration 113)**
 - Kundennummer K-JJJJ-NNN je Partner und Jahr (Trigger bei jeder neuen Verbindung, Altbestand nachgezogen), änderbar im Kundendialog, sichtbar in Kundenliste, Freigegeben, Banner, Meldungen, Aufgaben und beim Kunden (Verbindung, Freigaben).

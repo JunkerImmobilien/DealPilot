@@ -44997,3 +44997,15 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Commit:** `74580f8d`. Backend und mb-Backend neu gebaut.
 - **Nachweis:** `modernisierung-ableiten-pruefen` 72/72, übrige Prüfer grün (mfh-rnd-eingabe vorbestehend rot); Staging-Objekte: 33/169 RND +2,6…+16,1 J.; Browser Objekt/QC (Bilder in `Dateien/Modernisierung-Nachweis-2026-11-17/`).
 - **Rest:** Ebene C neu einfrieren nach Marcels Okay (Demo-MFH 18 → 35,2 J.); Bildableitung im Quick-Check (QC hat Fotos); Marktbericht-Vorschau im Browser nicht gemessen (nur Kern/Prüfer); Prod.
+
+### v3650–v3650b, landing-partner-videos-3 · 17.11.2026 (nur Staging) · Partner-Videos 1–4 neu, Kunden-Video K1
+- **Was:** Drehbücher partner-cockpit/-kunden/-senden/-anmerkungen an die Oberfläche vom 17.11. (Verwaltung als Bereichsliste, Reiter-Fenster Stufe und Rechte, Mein Partner im Arbeitsbereich, Kundennummer, Übernehmen mit Kundenbezug, Bildausschnitt als Mitschnitt, Sendesperre). Neu `partner-kunde` (Studio `?modul=k1`, Sicht des Kunden). `partner-demo-anlegen.js`: AVV, Stand 2 trotz Sendesperre, Kundin D, `--kunde`. Videos stumm + Sprecher onyx, Videothek Reihe „partner“ mit K1.
+- **Commit:** `d151af65` (v3650), `c352167b` (v3650a), `e18eea32` (v3650b), `ec66480d` (landing-partner-videos-3).
+- **Nachweis:** Prüfläufe mit Protokoll im eigenen Headless-Chrome (nur @nordlicht-demo): alle Zeilen mit Kegel, kein KI-/Sprach-/Kontingent-Abruf, Nachsperre fängt Objekt-/Steuer-Schreibwege. Kunden-Video in der DB nachgeprüft (Rückfrage offen, zweite erledigt, Stand 2 gesendet). Partner 5 läuft unverändert. Videothek auf Staging: `videos.json?v=landing-videothek-13` mit 6 Partner-Einträgen, MP4 206 per Range, Deeplink `videothek.html?v=partner-kunde-1` öffnet K1.
+- **Rest:** Fassung mit Marcels Stimme (Texte `texte-marcel-*.json` bereit, Credits erst nach Marcels Freigabe), K1 4:44 statt 2–3 min, Prod.
+
+### v3660a–d · 17.11.2026 (nur Staging) · Modernisierung: Entscheidungen Marcel umgesetzt
+- **Was:** Ebene C neu eingefroren (Demo-MFH RND 35,2, begründet durch den Rückfall statt 0 Punkten); Annahme-Liste je Gewerk unten in Objekt/Bericht/PDF mit Sprung zum Einstellen; DS2-Kriterium Bausubstanz kennzeichnet abgeleiteten Zustand; Übernahme mit Haken (Modernisierung, Zustand); Hinweise im Stil `.cf-hint`; Bildprompt: Außenwand nur mit erkennbarer Dämmung.
+- **Commit:** `8828d27e`, `0bc61e9b`, `c18fb8ab`, `cdd73e8a`. Backend und mb-Backend neu gebaut.
+- **Nachweis:** Prüfer grün (77/77 Modernisierung); Bildroute live 0,0035 € je Aufruf; Bericht Stufe 3 im Testkonto mit Annahme-Satz; DS2 der 33 Objekte unverändert (Begründung in wissen/2026-11-17.md).
+- **Rest:** Quick-Check (Buster `modernisierung-herkunft.js` dort noch v3660, Bildableitung im QC) nach „QC frei"; Marktbericht-Ansicht im Browser; Prod.

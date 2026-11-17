@@ -461,6 +461,12 @@
           : '')
       + 'Die Punkte entstehen aus der Spalte „modernisiert" der Gewerke-Tabelle (Anlage 2 ImmoWertV) und tragen die Restnutzungsdauer. Klick springt zum Feld:'
       + '<br>' + mpChips;
+    /* v3660e · ohne eigene Punkte und ohne Gewerke stand hier rot „Angaben fehlen" - gerechnet wird aber mit der
+       Rangfolge (Zustand, Exposé/Bilder, Rueckfall mittel). Die Kachel sagt jetzt, womit und woher. */
+    var _mb = null;
+    if (!(mp && mp.total > 0) && !_mpGef && !(mp && mp.mfh) && window.DpModUI) { try { _mb = window.DpModUI.bestimmen(); } catch (e) { _mb = null; } }
+    if (_mb && _mb.herkunft !== 'eigene') mpQ = st('n', _mb.herkunft === 'abgeleitet' ? 'abgeleitet' : (_mb.herkunft === 'jung' ? '0 Punkte' : (_mb.herkunft === 'zustand' ? 'aus Zustand' : 'angenommen')))
+      + esc(_mb.satz) + '<br>' + mpChips;
     if (mp && mp.mfh) mpQ = st('a', 'Anlage 2 greift') + 'Aus den ' + mp.mfh.einheiten + ' Einheiten des MFH-Konfigurators, flächengewichtet ('
       + deNum(mp.mfh.gewichtet, 1) + ' Punkte, angesetzt ' + mp.total + '). Dieselbe Zahl rechnen Marktbericht, Ertragswert und Wertpotenzial.';   /* v2483 */
     /* v2540 · Marcel 20.10.2026: „konfigurierbar machen" - beim MFH mit Einheiten
@@ -473,7 +479,7 @@
         + '<span class="oe-chip' + (_q === 'einheiten' ? ' gewaehlt' : '') + '" data-oe-modquelle="" role="button" aria-pressed="' + (_q === 'einheiten') + '">den Einheiten (Konfigurator)</span>'
         + '<span class="oe-chip' + (_q === 'felder' ? ' gewaehlt' : '') + '" data-oe-modquelle="felder" role="button" aria-pressed="' + (_q === 'felder') + '">den acht Feldern</span></span>';
     }
-    var mpZeile = zeile('Modernisierungspunkte', mp ? mp.total + ' von 20' : '—', mpQ, '');
+    var mpZeile = zeile('Modernisierungspunkte', mp ? mp.total + ' von 20' : (_mb && _mb.herkunft !== 'eigene' ? _mb.punkte + ' von 20' : '—'), mpQ, '');
     if (!o.plz) {
       kachelnSetzen(box, brwZeile() + zeile('Liegenschaftszins', '—', 'PLZ eintragen — dann holt DealPilot den amtlichen Satz', '')
         + zeile('Sachwertfaktor', '—', 'PLZ eintragen', '') + zeile('GND / RND', '—', 'Baujahr und Objektart eintragen', '') + mpZeile);   /* v3237 */
@@ -1502,7 +1508,7 @@
       el.addEventListener('input', function () { spaeter(function () { zielAnwenden(); stufen(); fehlendeNachziehen(); }, 400); });
       el.addEventListener('change', function () { spaeter(function () { zielAnwenden(); stufen(); fehlendeNachziehen(); }, 150); });
     });
-    ['plz', 'ort', 'objart', 'baujahr', 'einheiten', 'nutzungsart', 'brw', 'brw_stichtag', 'lzs_pct', 'sachwertfaktor', 'brw_manuell', 'uk_flaeche', 'wgfz_objekt', 'gsfl'].forEach(function (id) {
+    ['plz', 'ort', 'objart', 'baujahr', 'einheiten', 'nutzungsart', 'brw', 'brw_stichtag', 'lzs_pct', 'sachwertfaktor', 'brw_manuell', 'uk_flaeche', 'wgfz_objekt', 'gsfl', 'mod_ableitung', 'ds2_zustand', 'ds2_energie' /* v3660e: Kachel Modernisierungspunkte */].forEach(function (id) {
       var el = $(id); if (!el) return;
       el.addEventListener('change', function () { spaeter(automatik); });
       el.addEventListener('input', function () { spaeter(automatik, 700); });
