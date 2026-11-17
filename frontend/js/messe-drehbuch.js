@@ -9758,7 +9758,7 @@
     window.__pdH2c = null;
   }
   function pdSidebarZurueck() {
-    try { var m = window.__pdSort; if (m) { window.__pdSort = null; if (typeof window.setSidebarSort === 'function') window.setSidebarSort(m.sort); if (m.portfolio !== document.documentElement.hasAttribute('data-dpl-portfolio')) { var pb = q('.dpl-portfolio'); if (pb) pb.click(); } } } catch (e) {}
+    try { var m = window.__pdSort; if (m) { window.__pdSort = null; if (typeof window.setSidebarSort === 'function') window.setSidebarSort(m.sort); if (m.portfolio !== (document.documentElement.getAttribute('data-dpl-portfolio') === 'auf')) { var pb = q('.dpl-portfolio'); if (pb) pb.click(); } } } catch (e) {}
     try { var sm = q('#sb-sort-menu'); if (sm) sm.remove(); } catch (e) {}
   }
 
@@ -10097,8 +10097,10 @@
         await b2oZeile(s, 'Dein Objekt', 'Jetzt ist es dein Objekt mit eigener Nummer <b>' + pdText(q('#hdr-obj-num')).replace(/\s*✎\s*$/, '') + '</b>. Du kannst es frei bearbeiten.');
       },
       async function (s) {   /* 11 · Objektliste nach Kunde */
-        window.__pdSort = { sort: (function () { try { return localStorage.getItem('dp_sb_sort') || 'recent'; } catch (e) { return 'recent'; } })(), portfolio: document.documentElement.hasAttribute('data-dpl-portfolio') };
-        var pb = q('.dpl-portfolio'); if (pb && !document.documentElement.hasAttribute('data-dpl-portfolio')) { await zeige(function () { return q('.dpl-portfolio'); }, 4); await warte(400); pb.click(); await warte(1000); }
+        window.__pdSort = { sort: (function () { try { return localStorage.getItem('dp_sb_sort') || 'recent'; } catch (e) { return 'recent'; } })(), portfolio: document.documentElement.getAttribute('data-dpl-portfolio') === 'auf' };
+        var pb = q('.dpl-portfolio'); if (pb && document.documentElement.getAttribute('data-dpl-portfolio') !== 'auf') { await zeige(function () { return q('.dpl-portfolio'); }, 4); await warte(400); pb.click(); await warte(1000); }
+        /* v3650 · die Liste kennt das übernommene Objekt erst nach dem Neuzeichnen (Kunde erscheint im Menü nur mit Kundenobjekt) */
+        try { if (typeof window.renderSaved === 'function') await window.renderSaved(); } catch (e) {} await warte(900);
         if (typeof window.toggleSidebarSortMenu === 'function') { window.toggleSidebarSortMenu(); await warte(700); }
         var ko = function () { return qs('#sb-sort-menu [data-sort="kunde"]'); };
         await zeige(function () { return qs('#sb-sort-menu') || qs('#sb-sort-trigger'); }, 6);

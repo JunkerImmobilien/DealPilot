@@ -1,10 +1,10 @@
 {
- "erzeugt_am": "2026-11-17T15:46:19.528Z",
+ "erzeugt_am": "2026-11-17T16:24:04.913Z",
  "quellen": {
   "voice-import": "b85d1194e6f250e3",
   "objektart-felder": "f7d9212555982a97",
-  "storage": "9936358f688cd38e",
-  "index-html": "145745979ada4f0d",
+  "storage": "f7bf274607aa990d",
+  "index-html": "9571b46c8bf09a01",
   "grest": "81f3fb0a4de3a6cf"
  },
  "daten": {
@@ -700,6 +700,8 @@
    "grundriss",
    "mod_punkte",
    "mod_quelle",
+   "mod_ableitung",
+   "ds2_zustand_quelle",
    "sachwertfaktor",
    "uk_flaeche",
    "wgfz_objekt",
@@ -5498,6 +5500,8 @@
     "standardstufe",
     "grundriss",
     "mod_punkte",
+    "mod_ableitung",
+    "ds2_zustand_quelle",
     "sachwertfaktor",
     "uk_flaeche",
     "wgfz_objekt",
@@ -5592,6 +5596,6 @@
  },
  "inhalt": {
   "hilfe": "409743077f820db2",
-  "bewertung": "f427bd734c0570c3"
+  "bewertung": "a2be4e6da5778e8d"
  }
 }
