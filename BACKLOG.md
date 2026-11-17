@@ -36,6 +36,11 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
+### N177 · Modernisierungspunkte ohne Angabe: kein stilles 0 mehr (Marcel 17.11.2026: „Das müssen wir auch für andere Objekte berücksichtigen … aus den Bildern ableiten … wenn nicht, dann mittel annehmen") — **v3660 (`74580f8d`) auf Staging; Prod NICHT ausgerollt**
+- Rangfolge eigene Angabe > Zustand > Exposé-Text/Bilder je Gewerk > Rückfall (mittel 8 ab 30 J., Energieklasse) — Regeln in wissen/2026-11-17.md.
+- **Offen, Entscheidung Marcel:** (1) Ebene C neu einfrieren (Demo-MFH RND 18 → 35,2 J., Ertragswert +22 %); (2) Rückfall-Werte bestätigen (8 / 12 / 6, Zustand gut = 14, sanierungsbedürftig = 0); (3) nennt das Exposé nur ein Gewerk, gelten die übrigen als „mittel angenommen" — oder als nicht modernisiert?; (4) Zustand aus Bildern setzt `ds2_zustand` und bewegt damit den Deal-Score 2.
+- **Offen, Arbeit:** Bildableitung im Quick-Check (eigene Fotos im iframe) und aus Exposé-PDF-Bildern; Grundlage auf Detailstufe 1 sichtbar machen; Marktbericht-Vorschau im Browser nachmessen.
+
 ### N176 · Partner und Kunden: Kundennummer, Übernehmen mit Kundenbezug, Bild an Anmerkungen, Senden erst nach Bearbeitung, Mein Partner im Arbeitsbereich, Stufe und Rechte im RND-Stil (Marcel 17.11.2026) — **v3640–v3640d (`a83a3129`, `0bbce828`, `aa0d6479`, `ed49ef22`, `2dc6ca69`, `b1ead60f`, `20632d13`, `ad53ffad`, `50d825ae`, `46e79a03`) auf Staging nachgemessen; Prod NICHT ausgerollt (Migration 113)**
 - Kundennummer K-JJJJ-NNN je Partner und Jahr (Trigger bei jeder neuen Verbindung, Altbestand nachgezogen), änderbar im Kundendialog, sichtbar in Kundenliste, Freigegeben, Banner, Meldungen, Aufgaben und beim Kunden (Verbindung, Freigaben).
 - Übernehmen: Objekt trägt den Kunden, erneut = „Bestehendes aktualisieren“ (Vorgabe, Nummer/Halter/Deal-Status bleiben) oder „Neue Kopie“; Objektliste Sortierung „Kunde“ mit Gruppenköpfen, Filter „Kunde zeigen“, Hinweis auf der Karte.

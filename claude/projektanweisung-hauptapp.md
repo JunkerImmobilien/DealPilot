@@ -44991,3 +44991,9 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Commit:** `66624ce6`, `8d497fd4`, `b4fc056f`.
 - **Nachweis:** Nachmessung aller Werte gleich dem Reiter Objekt (Hauptknopf-Schrift folgt der Marke). Co-Pilot ohne Überlapp (elementFromPoint, 1440 und 390). Bilder `60-*`.
 - **Rest:** Logo vor dem Speichern nicht live in der Leiste, wenn vorher keins gespeichert war; Prod.
+
+### v3660 · 17.11.2026 (nur Staging) · Modernisierungspunkte ohne Angabe: Rangfolge statt stillem 0
+- **Was:** `js/modernisierung-herkunft.js` (eigene Angabe > Zustand > Ableitung aus Exposé-Text/Bildern je Gewerk > Rückfall mittel 8 ab 30 J., Energieklasse 12/8/6), gespiegelt in Backend und mb-Backend; rnd-calc `mapDealPilotObject`, `rnd-einheitlich`, PotenzialService fragen sie; KI-Feld `modernisierungen` (Exposé, Paket), `POST /ai/extract-zustand-bilder`; Anzeige Objekt/QC/PDF.
+- **Commit:** `74580f8d`. Backend und mb-Backend neu gebaut.
+- **Nachweis:** `modernisierung-ableiten-pruefen` 72/72, übrige Prüfer grün (mfh-rnd-eingabe vorbestehend rot); Staging-Objekte: 33/169 RND +2,6…+16,1 J.; Browser Objekt/QC (Bilder in `Dateien/Modernisierung-Nachweis-2026-11-17/`).
+- **Rest:** Ebene C neu einfrieren nach Marcels Okay (Demo-MFH 18 → 35,2 J.); Bildableitung im Quick-Check (QC hat Fotos); Marktbericht-Vorschau im Browser nicht gemessen (nur Kern/Prüfer); Prod.
