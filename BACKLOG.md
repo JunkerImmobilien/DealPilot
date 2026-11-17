@@ -41,7 +41,7 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 - **Entschieden 17.11.2026 und umgesetzt (v3660a–d):** Ebene C neu eingefroren; Rückfallwerte bleiben; übrige Gewerke mittel angenommen, immer sichtbar unten mit Weg zum Einstellen; abgeleiteter Zustand darf DS2 bewegen, gekennzeichnet; Übernahme mit Haken.
 - **Offen, nach „QC frei":** Quick-Check (Buster nachziehen, Bildableitung aus den QC-Fotos, Annahme-Satz im Prüfstein); Exposé-PDF-Bilder in der Übernahme (laufen heute über die Fotos des Objekts, dann automatisch); Grundlage auf Detailstufe 1 sichtbar machen; Marktbericht-Ansicht im Browser.
 
-### N177 · Partner-Videos an die Oberfläche vom 17.11. und Kunden-Video (Marcel 17.11.2026) — **v3650–v3650b (`d151af65`, `c352167b`, `e18eea32`), landing-partner-videos-3 (`ec66480d`) auf Staging; Videos stumm + Sprecher in `Dateien/Messe/Videos/Partner/`, Videothek Staging**
+### N178 · Partner-Videos an die Oberfläche vom 17.11. und Kunden-Video (Marcel 17.11.2026) — **v3650–v3650b (`d151af65`, `c352167b`, `e18eea32`), landing-partner-videos-3 (`ec66480d`) auf Staging; Videos stumm + Sprecher in `Dateien/Messe/Videos/Partner/`, Videothek Staging**
 - Partner 1–4 neu aufgenommen (5:20, 5:31, 5:02, 7:27), Partner 5 geprüft und unverändert, neu Kunde 1 „Mit deinem Partner arbeiten“ (4:44). Alte Fassungen in `Partner/alt-vor-v3640/`.
 - Offen: Fassung mit Marcels Stimmklon (Texte `texte-marcel-p1…p4.json`, `texte-marcel-k1.json` bereit), erst nach Marcels Freigabe der Credits. K1 ist länger als die gewünschten 2–3 min. Einladungs-Mail: Link `videothek.html?v=partner-kunde-1` einbauen (nach Prod). Prod.
 
