@@ -931,7 +931,8 @@ if (!window._pdfGold) {
                       groesse: b.brand_logo_groesse == null ? 100 : b.brand_logo_groesse,
                       groesse_gespeichert: b.brand_logo_groesse == null ? 100 : b.brand_logo_groesse,
                       zuschnitt: null, dvari: null,
-                      ausrichtung: b.brand_logo_ausrichtung === 'mitte' ? 'mitte' : 'links' };   /* v3630e */
+                      ausrichtung: b.brand_logo_ausrichtung === 'mitte' ? 'mitte' : 'links',   /* v3630e */
+                      wlGespeichert: !!b.whitelabel_enabled };   /* v3630i */
       /* v3299 · Branding vor v3299 gespeichert: Varianten einmal nachrechnen und
          ablegen - sonst fehlen sie in Mails (oeffentliche Logo-Route) und beim
          Kunden muss jeder Browser selbst rechnen. Aendert am Logo nichts. */
@@ -983,7 +984,13 @@ if (!window._pdfGold) {
           '<label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:13.5px">' +
             '<input type="checkbox" id="rp-b-wl"' + (b.whitelabel_enabled ? ' checked' : '') + ' style="width:18px;height:18px;accent-color:var(--wl-c9a84c, #C9A84C)">' +
             '<span>Eigene Marke statt DealPilot zeigen</span></label>' +
+          '<div style="font:400 11.5px/1.5 Inter;color:#8a8473;margin:5px 0 0 28px">Einschalten siehst du sofort. Ausschalten wird mit Speichern wirksam, die App lädt dann einmal neu.</div>' +
           '<div style="margin-top:14px;max-width:420px"><div class="rp-fl">Name der Marke oder Kanzlei</div><input id="rp-b-name" value="' + esc(b.brand_name || '') + '" style="' + inp + '"></div>' +
+        '</div>' +
+        /* v3630i · gut auffindbar: zurueck auf DealPilot */
+        '<div class="rp-panel" style="margin-top:12px;display:flex;flex-wrap:wrap;align-items:center;gap:12px">' +
+          '<div style="flex:1 1 240px;font:400 12.5px/1.5 Inter;color:#6b6558"><b style="color:#3a352c">Zurück zu DealPilot</b><br>Wirkt auf die ganze App, Mails und PDFs. Du wählst danach, ob deine Einstellungen gespeichert bleiben.</div>' +
+          '<button type="button" id="rp-b-aufdp" style="padding:9px 14px;border:1px solid #e6e0d4;border-radius:9px;background:#fff;cursor:pointer;font:600 13px Inter;color:#3a352c">Auf DealPilot zurücksetzen</button>' +
         '</div>' +
         /* W6-preview / v3301: Haken nur fuer Admins mit Test-Reseller */
         '<div class="rp-panel" style="margin-top:18px' + (_partnerSiehtMarke() ? ';display:none' : '') + '">' +
@@ -1088,7 +1095,7 @@ if (!window._pdfGold) {
         '</div>' +
         '<div data-marke-teil="leiste" style="position:sticky;bottom:0;z-index:2;display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:18px;padding:12px 0;background:linear-gradient(transparent,#fbf8f1 30%)">' +
           '<button class="rp-checkout" id="rp-b-save">Speichern</button>' +
-          '<button type="button" id="rp-b-reset" style="padding:10px 16px;border:1px solid #e6e0d4;border-radius:9px;background:#fff;cursor:pointer;font:600 13px Inter;color:#3a352c">Zurücksetzen</button>' +
+          '<button type="button" id="rp-b-reset" style="padding:10px 16px;border:1px solid #e6e0d4;border-radius:9px;background:#fff;cursor:pointer;font:600 13px Inter;color:#3a352c">Änderungen verwerfen</button>' +
           '<span id="rp-b-stand" style="font:400 12px Inter;color:#8a8473"></span></div>';
       var upd = function () { _brandPreview(); _logoPrev(); try { if (_previewOn()) _applyPreview(); } catch (e) {} };  /*W7-livepreview W22-logoprev*/
       $('rp-b-wl').addEventListener('change', upd);
@@ -1131,6 +1138,9 @@ if (!window._pdfGold) {
         var x = $('rp-b-pdfgr-wert'); if (x) x.textContent = _brandState.pdfGroesse + ' %';
         _standZeigen(); _pdfPrev();
       });
+      $('rp-b-aufdp').addEventListener('click', _aufDealPilot);   /* v3630i */
+      $('rp-b-name').addEventListener('input', function () { try { window.dispatchEvent(new Event('dp:marke-stand')); } catch (e11) {} });
+      $('rp-b-wl').addEventListener('change', function () { try { _standZeigen(); } catch (e12) {} });
       $('rp-b-reset').addEventListener('click', function () {
         var g = _brandState.gespeichert || {};
         $('rp-b-accent').value = g.accent; $('rp-b-obsidian').value = g.obsidian; $('rp-b-mail').value = g.mail;
@@ -1143,7 +1153,7 @@ if (!window._pdfGold) {
         _brandState.logo = undefined; _brandState.logoDark = undefined; _brandState.vari = null; _brandState.dvari = null;
         try { if (window.DealPilotWhitelabel && DealPilotWhitelabel.logoGroesse) DealPilotWhitelabel.logoGroesse(_brandState.groesse); } catch (e2) {}
         upd(); _pdfPrev(); _standZeigen(); _wahlMarkieren(); _logoPrevGroesse();
-        toast('Gespeicherter Stand wiederhergestellt');
+        toast('Ungespeicherte Änderungen verworfen');
       });
       $('rp-b-logo').addEventListener('change', function (e) { _brandLogoPick(e, upd); });
       $('rp-b-logo-x').addEventListener('click', function () { _brandState.logo = ''; var f = $('rp-b-logo'); if (f) f.value = ''; upd(); });
@@ -1231,12 +1241,14 @@ if (!window._pdfGold) {
   function _standZeigen() {
     var el = $('rp-b-stand'); if (!el) return;
     var g = _brandState.gespeichert || {}, an = [];
+    if (!!($('rp-b-wl') && $('rp-b-wl').checked) !== !!_brandState.wlGespeichert) an.push('Marke an/aus');   /* v3630i */
     if (_brandState.logo !== undefined || _brandState.logoDark !== undefined) an.push('Logo');
     var gl = function (x) { return String(x || '').toLowerCase(); };   /* type=color liefert Kleinbuchstaben */
     if (gl(_v('rp-b-accent')) !== gl(g.accent) || gl(_v('rp-b-obsidian')) !== gl(g.obsidian) || gl(_v('rp-b-mail')) !== gl(g.mail)) an.push('Farben');
     if (_brandState.darstellung !== g.darstellung || _brandState.groesse !== g.groesse || _brandState.ausrichtung !== g.ausrichtung) an.push('Logo in der App');
     if ((_v('rp-b-pdflight') === '1') !== !!g.pdflight || _brandState.pdfGroesse !== g.pdfGroesse) an.push('Dokumente');
     try { _wahlMarkieren(); } catch (e9) {}   /* v3630e */
+    try { window.dispatchEvent(new Event('dp:marke-stand')); } catch (e10) {}   /* v3630i · Liste links in der Verwaltung */
     el.innerHTML = an.length ? 'Geändert: ' + an.join(', ') + '. <b style="color:#3a352c">Noch nicht gespeichert.</b>' : 'Alles gespeichert.';
   }
   /* v3630b · Vorschau der Dokumente in echten Massen (1 mm = 1,15 px): Deckblatt
@@ -1509,7 +1521,66 @@ if (!window._pdfGold) {
         }
       } catch (e8) {}
       try { _logoPrev(); } catch (e4) {}
-    } catch (e) { toast(e && e.status === 413 ? 'Logo zu groß (max ~300 KB)' : 'Speichern fehlgeschlagen'); }
+      /* v3630i · Marcel: „Zuruecksetzen geht nicht auf DealPilot." Gemessen am Partner-Testkonto:
+         Haken aus -> live nichts (die Vorschau laeuft nur, solange die Marke AN ist), nach dem
+         Speichern nichts, nach dem ersten Neuladen weiter die Marke (dp_wl_cache faerbt vor dem
+         Abruf, der Abruf liefert null und loescht nur den Merker), erst das zweite Neuladen
+         zeigt DealPilot. Logo im Markenfeld, Groesse und Ausrichtung baut die Seite beim Start -
+         sauber zurueck kommt sie nur mit einem Neustart. Deshalb: Marke an/aus gewechselt ->
+         Merker weg, einmal neu laden, danach die Verwaltung wieder oeffnen. */
+      var wlNeu = !!body.whitelabel_enabled;
+      if (wlNeu !== !!_brandState.wlGespeichert) {
+        _brandState.wlGespeichert = wlNeu;
+        try { localStorage.removeItem('dp_wl_cache'); localStorage.removeItem('dp_wl_preview'); sessionStorage.setItem('dp_verw_oeffnen', 'marke'); } catch (e9) {}
+        toast(wlNeu ? 'Deine Marke ist an. Die App lädt neu.' : 'DealPilot ist wieder aktiv. Die App lädt neu.');
+        setTimeout(function () { location.reload(); }, 900);
+      }
+      return true;
+    } catch (e) { toast(e && e.status === 413 ? 'Logo zu groß (max ~300 KB)' : 'Speichern fehlgeschlagen'); return false; }
+  }
+  /* v3630i · „Auf DealPilot zuruecksetzen" mit Bestaetigung: nur ausschalten oder alles auf Standard */
+  function _aufDealPilot() {
+    var alt = document.getElementById('rp-b-dp-dlg'); if (alt) alt.remove();
+    var d = document.createElement('div'); d.id = 'rp-b-dp-dlg';
+    d.style.cssText = 'position:fixed;inset:0;z-index:100002;background:rgba(10,10,12,.55);display:flex;align-items:center;justify-content:center;padding:16px';
+    var knopf = 'display:block;width:100%;text-align:left;padding:12px 14px;border:1px solid #e6e0d4;border-radius:10px;background:#fff;cursor:pointer;font:400 12.5px/1.45 Inter;color:#3a352c;margin-top:8px';
+    d.innerHTML = '<div role="dialog" aria-modal="true" style="max-width:460px;width:100%;background:#fff;border-radius:14px;padding:20px 20px 16px;box-shadow:0 20px 60px rgba(0,0,0,.35)">' +
+      '<div style="font:700 17px \'Space Grotesk\',Inter,sans-serif;color:#2a2727">Auf DealPilot zurücksetzen</div>' +
+      '<p style="font:400 13px/1.5 Inter;color:#6b6558;margin:8px 0 4px">Deine Kunden und du sehen danach wieder DealPilot: Logo, Gold und dunkles Menü. Die App lädt dafür einmal neu.</p>' +
+      '<button type="button" data-dp="aus" style="' + knopf + '"><b style="font-size:13.5px">Nur ausschalten</b><br>Eigene Marke aus. Logo, Farben und Einstellungen bleiben gespeichert, du kannst sie später wieder einschalten.</button>' +
+      '<button type="button" data-dp="alles" style="' + knopf + '"><b style="font-size:13.5px">Alles auf Standard</b><br>Eigene Marke aus, Logo entfernen, Farben auf DealPilot-Gold, Größe 100 %, links, Darstellung automatisch, Deckblatt dunkel, PDF-Logo 100 %. Name und Absender im PDF-Fuß bleiben.</button>' +
+      '<div style="text-align:right;margin-top:12px"><button type="button" data-dp="nein" style="padding:9px 14px;border:1px solid #e6e0d4;border-radius:9px;background:#fff;cursor:pointer;font:600 13px Inter;color:#3a352c">Abbrechen</button></div></div>';
+    document.body.appendChild(d);
+    d.addEventListener('click', function (e) {
+      var b = e.target && e.target.closest ? e.target.closest('[data-dp]') : null;
+      if (!b) { if (e.target === d) d.remove(); return; }
+      var was = b.getAttribute('data-dp'); d.remove();
+      if (was === 'nein') return;
+      var wl = $('rp-b-wl'); if (wl) wl.checked = false;
+      if (was === 'alles') {
+        _brandState.logo = ''; _brandState.logoDark = '';
+        $('rp-b-accent').value = STANDARD_AKZENT.a; $('rp-b-mail').value = STANDARD_AKZENT.a; $('rp-b-obsidian').value = '#0b0b0a';
+        $('rp-b-pdflight').value = '0';
+        _brandState.darstellung = 'auto'; _brandState.groesse = 100; _brandState.ausrichtung = 'links'; _brandState.pdfGroesse = 100;
+        $('rp-b-gr').value = '100'; $('rp-b-pdfgr').value = '100';
+      }
+      saveBranding();
+    });
+  }
+  /* v3630i · Stand je Bereich, eine Zeile fuer die Liste links in der Verwaltung */
+  function markeStand() {
+    var akz = String(_v('rp-b-accent') || '').toLowerCase(), name = '';
+    if (akz === STANDARD_AKZENT.a.toLowerCase()) name = 'Standard (DealPilot-Gold)';
+    else AKZENT_GRUPPEN.forEach(function (g) { g[1].forEach(function (t) { if (t[0].toLowerCase() === akz) name = t[1]; }); });
+    var wl = $('rp-b-wl') && $('rp-b-wl').checked;
+    var dst = { auto: 'Automatisch', hell: 'Hell eingefärbt', weiss: 'Weiße Fläche', gold: 'Rahmen hell', 'gold-dunkel': 'Rahmen dunkel' }[_brandState.darstellung || 'auto'];
+    return {
+      marke: (wl ? 'An' : 'Aus, DealPilot') + (_v('rp-b-name') ? ' · ' + _v('rp-b-name') : ''),
+      logo: (_currentLogo() ? dst + ' · ' + (_brandState.groesse || 100) + ' % · ' + ((_brandState.ausrichtung || 'links') === 'mitte' ? 'mittig' : 'links') : 'Kein Logo'),
+      farben: name || (akz ? 'Eigene Farbe ' + akz.toUpperCase() : 'Standard'),
+      dokumente: 'Deckblatt ' + (_v('rp-b-pdflight') === '1' ? 'hell' : 'dunkel') + ' · Logo ' + (_brandState.pdfGroesse || 100) + ' %',
+      plaetze: 'Plätze und Abrechnung'
+    };
   }
 
   // ── Einladung annehmen (läuft für ALLE User, auch Mandanten ohne Partner-Plan) ──
@@ -1791,7 +1862,20 @@ if (!window._pdfGold) {
   })(0);
 
   window.openResellerPortal = openResellerPortal;
-  window.DealPilotResellerPortal = { boot: boot, open: openResellerPortal, poolHolen: poolHolen, seatsKaufen: seatsKaufen, markeZeichnen: markeZeichnen, uebergabeZeichnen: uebergabeZeichnen, markeSpeichern: function () { return saveBranding(); },   /* v3392 */
+  /* v3630i · nach dem Neuladen (Marke an/aus) die Verwaltung wieder oeffnen */
+  (function verwNachNeuladen(n) {
+    var f = null; try { f = sessionStorage.getItem('dp_verw_oeffnen'); } catch (e) {}
+    if (!f) return;
+    if (!window.DpPartnerKunden || !DpPartnerKunden.cockpitOeffnen || !localStorage.getItem('ji_token')) {
+      if ((n || 0) > 40) return;
+      return setTimeout(function () { verwNachNeuladen((n || 0) + 1); }, 500);
+    }
+    try { sessionStorage.removeItem('dp_verw_oeffnen'); } catch (e) {}
+    setTimeout(function () {
+      try { DpPartnerKunden.cockpitOeffnen(); setTimeout(function () { DpPartnerKunden.reiterWahl('verwaltung'); }, 1500); } catch (e) {}
+    }, 2500);
+  })(0);
+  window.DealPilotResellerPortal = { boot: boot, open: openResellerPortal, poolHolen: poolHolen, seatsKaufen: seatsKaufen, markeZeichnen: markeZeichnen, markeStand: markeStand,   /* v3630i */ uebergabeZeichnen: uebergabeZeichnen, markeSpeichern: function () { return saveBranding(); },   /* v3392 */
     staffelSatz: staffelSatz, staffelText: staffelText,
     /* v3317 · direkt in "Übergeben" öffnen, optional mit vorgewähltem Objekt */
     uebergeben: function (objectId) { if (objectId) _st.uebObj = objectId; if (window.DpPartnerKunden) { DpPartnerKunden.reiterWahl('uebergeben'); return; } _st.sec = 'ueberg'; if (_st.open) go('ueberg'); else openResellerPortal(true); } };   /* v3500 · führt in den Cockpit-Reiter Übergeben */   /* v3390: openResellerPortal fuehrt ins Cockpit, Verwaltung oeffnet _st.sec */

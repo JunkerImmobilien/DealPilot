@@ -317,9 +317,22 @@
     try { if (!localStorage.getItem('ji_token')) { localStorage.removeItem('dp_wl_cache'); return; } } catch (e) { return; }
     // Wrap früh installieren (liest _b dynamisch)
     if (!overrideBranding()) setTimeout(overrideBranding, 1000);
+    var _hatteMerker = false;
+    try { _hatteMerker = !!localStorage.getItem('dp_wl_cache'); } catch (e) {}
     try {
       var r = await Auth.apiCall('/reseller-invite/my-branding');
       _b = r && r.branding;
+      /* v3630i · gemessen: Marke ausgeschaltet -> das erste Neuladen faerbte noch aus dem
+         Merker (siehe unten, laeuft VOR dem Abruf), der Abruf lieferte null und loeschte nur
+         den Merker. Die Marke blieb bis zum zweiten Neuladen stehen. Jetzt: Merker gab es,
+         Marke gibt es nicht mehr -> einmal neu laden (gegen Schleifen mit Zeitstempel). */
+      if (!_b && _hatteMerker) {
+        try {
+          localStorage.removeItem('dp_wl_cache');
+          var _t = +sessionStorage.getItem('dp_wl_neu') || 0;
+          if (Date.now() - _t > 20000) { sessionStorage.setItem('dp_wl_neu', String(Date.now())); location.reload(); return; }
+        } catch (e) {}
+      }
       /* W25-fouc: Branding merken, damit der naechste Login SOFORT faerbt statt
          erst nach dem Fetch. Ohne das sieht der Mandant ~1s DealPilot-Design und
          dann einen Umschlag — das wirkt wie ein Fehler, nicht wie seine Kanzlei. */

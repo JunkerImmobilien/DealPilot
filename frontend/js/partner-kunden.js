@@ -523,57 +523,75 @@
 
   /* ── Verwaltung (v3392): Plaetze, Marke, Abrechnung - eigene Oberflaeche, Logik aus reseller-portal.js ── */
   var VERW = { iv: 'monthly', qty: 5 };
-  /* v3630f · Marcel 17.11.2026: „Kann man das besser sortieren und angeben unter Verwaltung?"
-     Reiter im Stil des RND-Rechners (hubAufbauen, inline, wie Mein Partner): Marke · Logo ·
-     Farben · Dokumente · Plaetze & Abo. Die Marken-Teile baut reseller-portal.js loadBranding()
-     in Huellen [data-marke-teil]; hier werden sie in ihre Reiter gehaengt, die Speicher-Leiste
-     (Speichern, Zuruecksetzen, Stand) kommt fest in den Fuss und gilt fuer alle Reiter. */
-  var VERW_REITER = [
-    ['marke', 'Marke', 'Schalter und Name deiner Marke'],
-    ['logo', 'Logo', 'Logo, Darstellung auf dunklem Grund, Größe und Ausrichtung'],
-    ['farben', 'Farben', 'Akzent, Menüfläche und Mails'],
-    ['dokumente', 'Dokumente', 'Deckblatt, Logo in PDFs, Absender, Mail'],
-    ['plaetze', 'Plätze & Abo', 'Plätze für Kunden und Abrechnung']
+  /* v3630i · Marcel 17.11.2026: „Mir gefällt das mit der Strecke nicht." Eine Verwaltung ist
+     keine Abfolge. Deshalb keine Schrittleiste mehr (v3630f, hubAufbauen), sondern
+     Einstellungen: links eine feste Liste der Bereiche mit Symbol und einer Zeile Stand,
+     rechts der Inhalt. Kein Zurueck/Weiter, keine Nummern. Am Handy steht die Liste
+     oben (eine Spalte). Optik wie die Karten des Cockpits (.pk-karte: Rand #EDE6D6,
+     Radius 12, Titel Space Grotesk 15/600).
+     Die Marken-Teile baut reseller-portal.js loadBranding() in Huellen [data-marke-teil];
+     hier werden sie in ihre Bereiche gehaengt. Die Speicher-Leiste steht fest unten. */
+  var VERW_BEREICHE = [
+    ['marke', 'Marke', 'badge'],
+    ['logo', 'Logo', 'image'],
+    ['farben', 'Farben', 'sparkles'],
+    ['dokumente', 'Dokumente', 'fileText'],
+    ['plaetze', 'Plätze & Abo', 'creditCard']
   ];
   function verwaltungZeichnen(el) {
     var rp = window.DealPilotResellerPortal;
     if (!rp || typeof rp.markeZeichnen !== 'function') { el.innerHTML = '<div class="pk-leer">Die Verwaltung ist gerade nicht geladen. Bitte die Seite neu laden.</div>'; return; }
-    var reiter = VERW_REITER.map(function (r) {
-      var html = r[0] === 'plaetze'
-        ? '<div class="pk-spalten">' +
-            '<div class="pk-karte" data-v="plaetze"><h3>Plätze</h3><div class="pk-leer">Lädt …</div></div>' +
-            '<div class="pk-karte" data-v="abo"><h3>Abrechnung</h3><div class="pk-leer">Lädt …</div></div></div>'
-        : '<div class="pk-marke" data-v-ziel="' + r[0] + '"><div class="pk-leer">Lädt …</div></div>';
-      return { kurz: r[1], titel: r[2], html: html };
-    });
-    var box = hubAufbauen({ id: 'dppk-hub-verwaltung', titel: 'Verwaltung', sub: 'Deine Marke, Dokumente und Plätze', reiter: reiter, knoepfe: [], inline: el, start: PK.verwReiter || 0 });
-    /* gewaehlten Reiter merken, damit ein Neuzeichnen (z. B. nach dem Speichern) dort bleibt */
-    [].forEach.call(box.querySelectorAll('[data-hub-schritte], [data-hub-zurueck], [data-hub-weiter]'), function (x) {
-      x.addEventListener('click', function () { setTimeout(function () {
-        var akt = box.querySelector('.rnd-hub-schritt.active'); if (!akt) return;
-        PK.verwReiter = [].indexOf.call(akt.parentElement.children, akt);
-      }, 0); });
-    });
     verwStil();
+    var akt = PK.verwBereich || 'marke';
+    el.innerHTML = '<div class="pk-verw" id="dppk-verw">' +
+      '<nav class="pk-verw-liste" aria-label="Bereiche der Verwaltung">' + VERW_BEREICHE.map(function (b) {
+        return '<button type="button" class="pk-verw-punkt' + (b[0] === akt ? ' an' : '') + '" data-bereich="' + b[0] + '" aria-current="' + (b[0] === akt) + '">' +
+          '<span class="pk-verw-ico">' + ico(b[2], 17) + '</span><span class="pk-verw-txt"><b>' + esc(b[1]) + '</b><small data-stand="' + b[0] + '">…</small></span></button>';
+      }).join('') + '</nav>' +
+      '<div class="pk-verw-inhalt">' + VERW_BEREICHE.map(function (b) {
+        var inner = b[0] === 'plaetze'
+          ? '<div class="pk-spalten">' +
+              '<div class="pk-karte" data-v="plaetze"><h3>Plätze</h3><div class="pk-leer">Lädt …</div></div>' +
+              '<div class="pk-karte" data-v="abo"><h3>Abrechnung</h3><div class="pk-leer">Lädt …</div></div></div>'
+          : '<div class="pk-karte pk-marke" data-v-ziel="' + b[0] + '"><div class="pk-leer">Lädt …</div></div>';
+        return '<section class="pk-verw-bereich" data-bereich-inhalt="' + b[0] + '"' + (b[0] === akt ? '' : ' hidden') + '>' + inner + '</section>';
+      }).join('') + '</div></div>';
+    var box = el.querySelector('#dppk-verw');
+    var wahl = function (k) {
+      PK.verwBereich = k;
+      [].forEach.call(box.querySelectorAll('.pk-verw-punkt'), function (b) { var an = b.getAttribute('data-bereich') === k; b.classList.toggle('an', an); b.setAttribute('aria-current', String(an)); });
+      [].forEach.call(box.querySelectorAll('[data-bereich-inhalt]'), function (s) { s.hidden = s.getAttribute('data-bereich-inhalt') !== k; });
+      if (window.innerWidth <= 760) { try { box.querySelector('.pk-verw-inhalt').scrollIntoView({ block: 'start', behavior: 'smooth' }); } catch (e) {} }
+    };
+    [].forEach.call(box.querySelectorAll('.pk-verw-punkt'), function (b) { b.onclick = function () { wahl(b.getAttribute('data-bereich')); }; });
     plaetzeZeichnen(box.querySelector('[data-v="plaetze"]'));
     aboZeichnen(box.querySelector('[data-v="abo"]'));
     var lager = document.createElement('div'); lager.className = 'pk-marke'; lager.hidden = true; box.appendChild(lager);
+    var stand = function () {
+      try {
+        var z = rp.markeStand ? rp.markeStand() : null; if (!z) return;
+        Object.keys(z).forEach(function (k) { var s = box.querySelector('[data-stand="' + k + '"]'); if (s) s.textContent = z[k]; });
+      } catch (e) {}
+    };
     var verteilen = function () {
-      VERW_REITER.forEach(function (r) {
-        var ziel = box.querySelector('[data-v-ziel="' + r[0] + '"]'), teil = lager.querySelector('[data-marke-teil="' + r[0] + '"]');
+      VERW_BEREICHE.forEach(function (b) {
+        var ziel = box.querySelector('[data-v-ziel="' + b[0] + '"]'), teil = lager.querySelector('[data-marke-teil="' + b[0] + '"]');
         if (ziel && teil) { ziel.innerHTML = ''; ziel.appendChild(teil); }
       });
-      var leiste = lager.querySelector('[data-marke-teil="leiste"]'), fuss = box.querySelector('.rnd-hub-nav');
-      if (leiste && fuss) {
-        leiste.removeAttribute('style');
-        leiste.className = 'pk-marke dppk-verw-leiste';
-        fuss.insertBefore(leiste, fuss.querySelector('[data-hub-weiter]'));
+      var leiste = lager.querySelector('[data-marke-teil="leiste"]');
+      if (leiste) {
+        leiste.removeAttribute('style'); leiste.className = 'pk-marke dppk-verw-leiste'; box.appendChild(leiste);
+        /* links buendig mit der Inhaltsspalte (die Schiene ist je Darstellung verschieden breit) */
+        var links = function () { var mc = box.getBoundingClientRect(); var x = window.innerWidth > 900 ? Math.max(0, Math.round(box.closest('.main-col') ? box.closest('.main-col').getBoundingClientRect().left : 0)) : 0; document.documentElement.style.setProperty('--dppk-verw-links', x + 'px'); };
+        links(); if (!PK._verwLinks) { PK._verwLinks = true; window.addEventListener('resize', function () { if (document.getElementById('dppk-verw')) links(); }); }
       }
       if (!lager.querySelector('[data-marke-teil]') && lager.textContent.trim()) {
-        /* loadBranding meldete einen Fehler statt der Teile */
-        var z = box.querySelector('[data-v-ziel="marke"]'); if (z) { z.innerHTML = ''; z.appendChild(lager); lager.hidden = false; }
+        var z0 = box.querySelector('[data-v-ziel="marke"]'); if (z0) { z0.innerHTML = ''; z0.appendChild(lager); lager.hidden = false; }
       }
+      stand();
     };
+    /* Stand-Zeilen links folgen jeder Aenderung (reseller-portal.js meldet dp:marke-stand) */
+    if (!PK._verwStandHoerer) { PK._verwStandHoerer = true; window.addEventListener('dp:marke-stand', function () { var b = document.getElementById('dppk-verw'); if (b) { try { var z = rp.markeStand(); Object.keys(z).forEach(function (k) { var s = b.querySelector('[data-stand="' + k + '"]'); if (s) s.textContent = z[k]; }); } catch (e) {} } }); }
     try {
       Promise.resolve(rp.markeZeichnen(lager)).then(verteilen, function (e) {
         var z = box.querySelector('[data-v-ziel="marke"]'); if (z) z.innerHTML = '<div class="pk-leer">' + esc(fehlerText(e)) + '</div>';
@@ -586,17 +604,24 @@
     if (document.getElementById('dppk-verw-stil')) return;
     var s = document.createElement('style'); s.id = 'dppk-verw-stil';
     s.textContent = [
-      /* Speicher-Leiste fest unten im Arbeitsbereich, fuer alle Reiter */
-      /* gemessen 390 px: .rnd-wiz-modal und .pk-box tragen overflow:hidden - daran haengt sticky fest, die Leiste stand bei y 924 von 844 */
-      '#dppk-hub-verwaltung .rnd-wiz-modal,#dppk-ab .pk-box:has(#dppk-hub-verwaltung),#dppk-ov .pk-box:has(#dppk-hub-verwaltung){overflow:visible !important}',
-      '#dppk-hub-verwaltung .rnd-hub-nav{position:sticky;bottom:0;z-index:5;background:#fff;flex-wrap:wrap;gap:8px;box-shadow:0 -6px 14px rgba(0,0,0,.05)}',
-      '#dppk-hub-verwaltung .dppk-verw-leiste{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-left:auto;margin-right:8px}',
-      '#dppk-hub-verwaltung .dppk-verw-leiste .rp-checkout{padding:9px 18px}',
-      '#dppk-hub-verwaltung .dppk-verw-leiste #rp-b-reset{padding:9px 14px !important}',
-      '#dppk-hub-verwaltung [data-v-ziel] > [data-marke-teil] > div:first-child{margin-top:0 !important}',
-      /* gemessen 390 px: dort ist .body selbst kein Rollbereich mit fester Hoehe (h = Inhalt), sticky greift nie.
-         Am Handy steht deshalb nur die Speicher-Leiste FEST am unteren Rand, Zurueck/Weiter bleiben im Fluss. */
-      '@media (max-width:640px){#dppk-hub-verwaltung .rnd-wiz-counter{display:none}#dppk-hub-verwaltung .rnd-hub-nav{position:static;box-shadow:none}#dppk-hub-verwaltung{padding-bottom:96px}#dppk-hub-verwaltung .dppk-verw-leiste{position:fixed;left:0;right:0;bottom:0;z-index:60;margin:0;padding:10px 14px calc(10px + env(safe-area-inset-bottom));background:#fff;box-shadow:0 -6px 16px rgba(0,0,0,.12)}#dppk-hub-verwaltung #rp-b-stand{flex:1 1 100%}}'
+      '.pk-verw{display:grid;grid-template-columns:240px minmax(0,1fr);gap:18px;align-items:start;padding-bottom:84px}',
+      '.pk-verw-liste{position:sticky;top:12px;display:flex;flex-direction:column;gap:4px;border:1px solid #EDE6D6;border-radius:12px;background:#fff;padding:8px}',
+      '.pk-verw-punkt{display:flex;align-items:flex-start;gap:10px;width:100%;text-align:left;border:0;border-radius:9px;background:none;padding:10px 10px;cursor:pointer;color:#2A2727;font:inherit}',
+      '.pk-verw-punkt:hover{background:#FBF6E9}',
+      '.pk-verw-punkt.an{background:#F6F0E1;box-shadow:inset 3px 0 0 ' + G + '}',
+      '.pk-verw-ico{flex:none;width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;background:#F4EEDF;color:#4A4440}',
+      '.pk-verw-punkt.an .pk-verw-ico{background:' + G + ';color:#fff}',
+      '.pk-verw-txt{min-width:0;display:flex;flex-direction:column;gap:2px}',
+      '.pk-verw-txt b{font:600 14px "Space Grotesk",Inter,sans-serif}',
+      '.pk-verw-txt small{font:400 11.5px/1.35 Inter,sans-serif;color:#7A7370;white-space:normal}',
+      '.pk-verw-bereich[hidden]{display:none !important}',
+      '.pk-verw-inhalt .pk-karte.pk-marke{padding:16px 20px}',
+      '.pk-verw-inhalt [data-marke-teil] > div:first-child{margin-top:0 !important}',
+      /* Speicher-Leiste: fest am unteren Bildschirmrand, ueber der Inhaltsspalte */
+      '.dppk-verw-leiste{position:fixed;bottom:0;right:0;left:var(--dppk-verw-links,248px);z-index:60;display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:12px 24px calc(12px + env(safe-area-inset-bottom));background:#fff;border-top:1px solid #EDE6D6;box-shadow:0 -6px 16px rgba(0,0,0,.06)}',
+      '.dppk-verw-leiste #rp-b-stand{margin-left:6px}',
+      '@media (max-width:900px){.dppk-verw-leiste{left:0}}',
+      '@media (max-width:760px){.pk-verw{grid-template-columns:1fr;gap:12px}.pk-verw-liste{position:static;padding:6px}.pk-verw-punkt{padding:8px}.pk-verw-inhalt .pk-karte.pk-marke{padding:14px}.dppk-verw-leiste{padding:10px 14px calc(10px + env(safe-area-inset-bottom))}.dppk-verw-leiste #rp-b-stand{flex:1 1 100%;margin:0}}'
     ].join('');
     document.head.appendChild(s);
   }
