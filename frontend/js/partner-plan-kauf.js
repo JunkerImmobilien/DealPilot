@@ -232,6 +232,29 @@
     }
   })();
 
+  /* ── v3610d · von der Landing „Partner-Plan buchen“ (?register=1&partner_kauf=1) ──────────────────────
+     Merker im localStorage, damit er Registrierung, Mail-Bestaetigung und Anmeldung im selben Browser ueberlebt
+     (auth.js raeumt die Adresse beim Start, dieses Skript liest sie vorher). Ist jemand angemeldet, oeffnet sich
+     das Preis-Fenster an der Partner-Karte; der Merker wird dabei verbraucht. */
+  (function vonDerLanding() {
+    var K = 'dp_partner_kauf';
+    try { if (new URLSearchParams(location.search).get('partner_kauf') === '1') localStorage.setItem(K, String(Date.now())); } catch (e) {}
+    var versuche = 0;
+    function pruefen() {
+      var seit = 0; try { seit = parseInt(localStorage.getItem(K), 10) || 0; } catch (e) {}
+      if (!seit) return;
+      if (Date.now() - seit > 7 * 864e5) { try { localStorage.removeItem(K); } catch (e) {} return; }
+      var drin = window.Auth && typeof Auth.isLoggedIn === 'function' && Auth.isLoggedIn();
+      if (!drin || typeof window.openPricingModal !== 'function') { if (++versuche < 120) setTimeout(pruefen, 1000); return; }
+      try { localStorage.removeItem(K); } catch (e) {}
+      if (aktuellerPlan() === 'partner') { cockpitOeffnen(); return; }
+      window.openPricingModal();
+      setTimeout(function () { var k = document.getElementById('dppp-karte'); if (k) k.scrollIntoView({ block: 'center', behavior: 'smooth' }); }, 1200);
+    }
+    if (document.readyState === 'complete') setTimeout(pruefen, 1500); else window.addEventListener('load', function () { setTimeout(pruefen, 1500); });
+    window.addEventListener('dp:plan-ready', function () { versuche = 0; setTimeout(pruefen, 800); });   /* nach der Anmeldung */
+  })();
+
   window.DpPartnerPlan = { einhaengen: einhaengen, periode: periode, kuendigenDialog: kuendigenDialog, angebotHolen: angebotHolen,
     platzSumme: platzSumme, platzSatz: platzSatz, stufenText: stufenText, eur: eur, _state: S };
 })();
