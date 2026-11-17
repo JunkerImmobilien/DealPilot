@@ -876,6 +876,7 @@ if (!window._pdfGold) {
     ['Grau', [['#5E6670', 'Anthrazit'], ['#707782', 'Schiefer']]],
     ['Orange und Kupfer', [['#B0632E', 'Kupfer'], ['#A65A2A', 'Rost'], ['#9A5B34', 'Cognac']]]
   ];
+  function _ico(n, g) { try { return window.Icons && Icons[n] ? Icons[n]({ size: g || 16 }) : ''; } catch (e) { return ''; } }   /* v3630k */
   function _kontrastText(hex) {
     var K = window.DealPilotLogoKontrast; if (!K || !K.kontrast) return '';
     var n = parseInt(hex.slice(1), 16), c = [(n >> 16) & 255, (n >> 8) & 255, n & 255];
@@ -958,12 +959,12 @@ if (!window._pdfGold) {
       _brandState.gespeichert = { accent: accent, obsidian: obsidian, mail: mailAcc, pdflight: !!b.brand_pdf_light,
         darstellung: _brandState.darstellung, groesse: _brandState.groesse, pdfGroesse: _brandState.pdfGroesse, ausrichtung: _brandState.ausrichtung };
       var abschnitt = function (titel, satz) {
-        return '<div style="display:flex;align-items:baseline;gap:10px;margin:24px 0 6px">' +
-          '<span style="font:700 15px \'Space Grotesk\',Inter,sans-serif;color:#2a2727">' + titel + '</span></div>' +
-          '<p style="font:400 12.5px/1.5 Inter;color:#6b6558;margin:0 0 10px">' + satz + '</p>';
+        /* v3630k · wie h2.sec-title / p.sec-desc im Reiter Objekt (gemessen: Space Grotesk 24/700, -0,3 px,
+           #2A2727, Strich 3 px links; Unterzeile Inter 12, #625C59, 3 px oben, 18 px unten) */
+        return '<h2 class="dp-verw-titel">' + titel + '</h2><p class="dp-verw-desc">' + satz + '</p>';
       };
       var farbe = function (id, titel, wert, satz) {
-        return '<label style="display:flex;align-items:center;gap:10px;padding:8px 10px;border:1px solid #e6e0d4;border-radius:9px;background:#fff;cursor:pointer;min-width:0">' +
+        return '<label style="display:flex;align-items:center;gap:10px;padding:8px 10px;border:1px solid #E6E1D6;border-radius:2px;background:#fff;cursor:pointer;min-width:0">' +
           '<input type="color" id="' + id + '" value="' + esc(wert) + '" style="width:38px;height:30px;border:0;padding:0;background:none;cursor:pointer;flex:none">' +
           '<span style="min-width:0"><b style="display:block;font:600 12.5px Inter;color:#3a352c">' + titel + '</b>' +
           '<span style="font:400 11px/1.4 Inter;color:#8a8473">' + satz + '</span></span></label>';
@@ -980,62 +981,65 @@ if (!window._pdfGold) {
         '<p class="rp-intro">Deine Marke sehen deine Kunden in der App, in den Einladungs-Mails und in jedem PDF. Was du hier änderst, siehst du sofort in der App. Dauerhaft wird es mit Speichern.</p>' +
         /* ── 1 · Marke ── */
         abschnitt('Marke', 'Wirkt auf die ganze App deiner Kunden, auf Mails und PDFs. Schalte deine Marke ein und gib ihr einen Namen.') +
-        '<div class="rp-panel">' +
+        '<div class="card dp-verw-karte"><div class="ct ct-pro dp-verw-ct">So sieht es aus</div><div id="rp-b-kopf"></div></div>' +   /* v3630k · Kopfkarte */
+        '<div class="card dp-verw-karte">' +
           '<label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:13.5px">' +
             '<input type="checkbox" id="rp-b-wl"' + (b.whitelabel_enabled ? ' checked' : '') + ' style="width:18px;height:18px;accent-color:var(--wl-c9a84c, #C9A84C)">' +
             '<span>Eigene Marke statt DealPilot zeigen</span></label>' +
-          '<div style="font:400 11.5px/1.5 Inter;color:#8a8473;margin:5px 0 0 28px">Einschalten siehst du sofort. Ausschalten wird mit Speichern wirksam, die App lädt dann einmal neu.</div>' +
-          '<div style="margin-top:14px;max-width:420px"><div class="rp-fl">Name der Marke oder Kanzlei</div><input id="rp-b-name" value="' + esc(b.brand_name || '') + '" style="' + inp + '"></div>' +
+          '<div class="hint dp-verw-hint" style="margin:5px 0 0 28px">Einschalten siehst du sofort. Ausschalten wird mit Speichern wirksam, die App lädt dann einmal neu.</div>' +
+          '<div style="margin-top:14px;max-width:420px"><label class="dp-verw-lbl">Name der Marke oder Kanzlei</label><input type="text" id="rp-b-name" value="' + esc(b.brand_name || '') + '" style="' + inp + '"></div>' +
         '</div>' +
         /* v3630i · gut auffindbar: zurueck auf DealPilot */
-        '<div class="rp-panel" style="margin-top:12px;display:flex;flex-wrap:wrap;align-items:center;gap:12px">' +
+        '<div class="card dp-verw-karte" style="margin-top:12px;display:flex;flex-wrap:wrap;align-items:center;gap:12px">' +
           '<div style="flex:1 1 240px;font:400 12.5px/1.5 Inter;color:#6b6558"><b style="color:#3a352c">Zurück zu DealPilot</b><br>Wirkt auf die ganze App, Mails und PDFs. Du wählst danach, ob deine Einstellungen gespeichert bleiben.</div>' +
-          '<button type="button" id="rp-b-aufdp" style="padding:9px 14px;border:1px solid #e6e0d4;border-radius:9px;background:#fff;cursor:pointer;font:600 13px Inter;color:#3a352c">Auf DealPilot zurücksetzen</button>' +
+          '<button type="button" class="dp-verw-btn" id="rp-b-aufdp">Auf DealPilot zurücksetzen</button>' +
         '</div>' +
         /* W6-preview / v3301: Haken nur fuer Admins mit Test-Reseller */
-        '<div class="rp-panel" style="margin-top:18px' + ((_istAdmin() && !_partnerSiehtMarke()) ? '' : ';display:none') + '">'   /* v3630i · nur Admins (gemessen: Partner mit Marke AUS sah den Haken) */ +
+        '<div class="card dp-verw-karte" style="margin-top:18px' + ((_istAdmin() && !_partnerSiehtMarke()) ? '' : ';display:none') + '">'   /* v3630i · nur Admins (gemessen: Partner mit Marke AUS sah den Haken) */ +
           '<label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:13.5px">' +
             '<input type="checkbox" id="rp-b-prev" style="width:18px;height:18px;accent-color:var(--gold,#C9A84C)">' +
             '<span><b>Ansicht meiner Kunden</b>. Die App in meiner Marke anzeigen</span></label>' +
-          '<div style="font-size:11.5px;color:#8a8473;margin-top:7px;padding-left:28px">Nur für dich, nur in diesem Browser. Zum Zurücksetzen Haken entfernen.</div>' +
+          '<div class="hint dp-verw-hint" style="margin-top:7px;padding-left:28px">Nur für dich, nur in diesem Browser. Zum Zurücksetzen Haken entfernen.</div>' +
         '</div>' +
         '</div>' +
         /* ── 2 · Logo ── */
         '<div data-marke-teil="logo">' +
         abschnitt('Logo', 'Wirkt auf die Menüleiste oben links, den Kopf der Mails und die PDFs. Ein einfarbiger Rand wird beim Hochladen abgeschnitten und durchsichtig.') +
-        '<div class="rp-panel">' +
+        '<div class="card dp-verw-karte">' +
           '<div id="rp-b-logo-prev" style="display:flex;flex-wrap:wrap;align-items:flex-start;gap:12px;margin-bottom:9px">' +
             '<div style="flex:none;max-width:100%"><div style="' + mini + '">Menüleiste</div>' +
               '<div id="rp-b-logo-box" style="width:248px;max-width:100%;min-height:100px;box-sizing:border-box;padding:0 14px;border:1px dashed #ddd6c8;border-radius:8px;background:#0e0d0b;display:flex;align-items:center;justify-content:flex-start;overflow:hidden"></div></div>' +
             '<div style="flex:none;max-width:100%"><div style="' + mini + '">Heller Grund</div>' +
               '<div id="rp-b-logo-box-hell" style="width:248px;max-width:100%;min-height:100px;box-sizing:border-box;padding:0 14px;border:1px dashed #ddd6c8;border-radius:8px;background:#ffffff;display:flex;align-items:center;justify-content:flex-start;overflow:hidden"></div></div>' +
           '</div>' +
-          '<div id="rp-b-logo-txt" style="font:400 11.5px Inter;color:#8a8473;line-height:1.5;margin-bottom:6px"></div>' +
+          '<div id="rp-b-logo-txt" class="hint dp-verw-hint" style="margin-bottom:6px"></div>' +
           '<div id="rp-b-logo-ampel" style="font:400 11.5px/1.55 Inter;color:#6b6558;margin-bottom:9px"></div>' +
-          '<input type="file" id="rp-b-logo" accept="image/*" style="font:400 12px Inter;max-width:100%">' +
-          '<button class="rp-act remove" id="rp-b-logo-x" type="button" style="margin-left:8px">Logo entfernen</button>' +
-          '<div class="rp-fl" style="margin-top:16px">Logo auf dunklem Grund' + stdKnopf('darst') + '</div>' +
-          '<div style="font:400 11.5px Inter;color:#8a8473;margin-bottom:7px">Wirkt auf die Menüleiste, den Kopf der Mails und dunkle PDF-Deckblätter. Der Rahmen nimmt deine Akzentfarbe.</div>' +
+          '<label class="dp-verw-ablage" id="rp-b-logo-ablage" for="rp-b-logo"><span class="dp-verw-ablage-ico">' + _ico('upload', 20) + '</span><span><b>Logo hierher ziehen</b> oder klicken und Datei wählen<small>PNG, SVG oder JPG, höchstens 300 KB. Der Rand wird automatisch abgeschnitten.</small></span>' +
+            '<input type="file" id="rp-b-logo" accept="image/*" class="dp-verw-datei"></label>' +
+          '<button type="button" class="dp-verw-btn dp-verw-btn-weg" id="rp-b-logo-x">Logo entfernen</button>' +
+          '<div class="ct ct-pro dp-verw-ct" style="margin-top:16px">Logo auf dunklem Grund' + stdKnopf('darst') + '</div>' +
+          '<div class="hint dp-verw-hint" style="margin-bottom:7px">Wirkt auf die Menüleiste, den Kopf der Mails und dunkle PDF-Deckblätter. Der Rahmen nimmt deine Akzentfarbe.</div>' +
           '<div id="rp-b-darst" role="radiogroup" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px"></div>' +
-          '<div class="rp-fl" style="margin-top:16px">Größe in der Menüleiste <b id="rp-b-gr-wert" style="color:#3a352c">' + _brandState.groesse + ' %</b>' + stdKnopf('gr') + '</div>' +
+          '<div class="ct ct-pro dp-verw-ct" style="margin-top:16px">Größe in der Menüleiste <b id="rp-b-gr-wert" style="color:#3a352c">' + _brandState.groesse + ' %</b>' + stdKnopf('gr') + '</div>' +
           '<input type="range" id="rp-b-gr" min="60" max="250" step="5" value="' + _brandState.groesse + '" style="width:100%;max-width:420px;accent-color:var(--wl-c9a84c, #C9A84C)">' +
-          '<div style="font:400 11.5px/1.5 Inter;color:#8a8473;margin-top:3px">Wirkt auf die Menüleiste oben links, am Handy in der Schublade. Ab 165 % nutzt das Logo die volle Breite der Leiste, darüber wächst es nur noch in der Höhe bis 150 px.</div>' +
+          '<div class="hint dp-verw-hint" style="margin-top:3px">Wirkt auf die Menüleiste oben links, am Handy in der Schublade. Ab 165 % nutzt das Logo die volle Breite der Leiste, darüber wächst es nur noch in der Höhe bis 150 px.</div>' +
           /* v3630e · Ausrichtung in der Menueleiste (Marcel 17.11.2026) */
-          '<div class="rp-fl" style="margin-top:16px">Ausrichtung in der Menüleiste' + stdKnopf('aus') + '</div>' +
+          '<div class="ct ct-pro dp-verw-ct" style="margin-top:16px">Ausrichtung in der Menüleiste' + stdKnopf('aus') + '</div>' +
           '<div id="rp-b-aus" style="display:inline-flex;border:1px solid #e6e0d4;border-radius:9px;overflow:hidden">' +
             '<button type="button" data-aus="links" style="padding:7px 14px;border:0;cursor:pointer;font:600 12px Inter">Links (Standard)</button>' +
             '<button type="button" data-aus="mitte" style="padding:7px 14px;border:0;cursor:pointer;font:600 12px Inter">Mittig</button></div>' +
-          '<div style="font:400 11.5px/1.5 Inter;color:#8a8473;margin-top:3px">Wirkt auf die Menüleiste. Auf dem Deckblatt und im Mail-Kopf steht das Logo ohnehin mittig. Im Seitenkopf der PDFs bleibt es links, weil dort mittig der Seitentitel steht.</div>' +
+          '<div class="hint dp-verw-hint" style="margin-top:3px">Wirkt auf die Menüleiste. Auf dem Deckblatt und im Mail-Kopf steht das Logo ohnehin mittig. Im Seitenkopf der PDFs bleibt es links, weil dort mittig der Seitentitel steht.</div>' +
           '<details style="margin-top:14px"><summary style="cursor:pointer;font:600 12.5px Inter;color:#3a352c">Eigenes Logo für dunklen Grund (selten nötig)</summary>' +
-            '<div style="font:400 11.5px Inter;color:#8a8473;margin:7px 0">Hast du eine helle Fassung deines Logos, lade sie hier hoch. Sie steht dann überall auf dunklem Grund.</div>' +
-            '<input type="file" id="rp-b-logo-dark" accept="image/*" style="font:400 12px Inter;max-width:100%">' +
-            '<button class="rp-act remove" id="rp-b-logo-dark-x" type="button" style="margin-left:8px">entfernen</button></details>' +
+            '<div class="hint dp-verw-hint" style="margin:7px 0">Hast du eine helle Fassung deines Logos, lade sie hier hoch. Sie steht dann überall auf dunklem Grund.</div>' +
+            '<label class="dp-verw-ablage dp-verw-ablage-klein" id="rp-b-logo-dark-ablage" for="rp-b-logo-dark"><span class="dp-verw-ablage-ico">' + _ico('upload', 18) + '</span><span><b>Helle Fassung hierher ziehen</b> oder klicken</span>' +
+            '<input type="file" id="rp-b-logo-dark" accept="image/*" class="dp-verw-datei"></label>' +
+            '<button type="button" class="dp-verw-btn dp-verw-btn-weg" id="rp-b-logo-dark-x">entfernen</button></details>' +
         '</div>' +
         '</div>' +
         /* ── 3 · Farben ── */
         '<div data-marke-teil="farben">' +
         abschnitt('Farben', 'Wirkt auf Knöpfe, Linien und Werte in der App, auf den Logorahmen und die Mails. Jede Farbe siehst du sofort in der App.') +
-        '<div class="rp-panel">' +
+        '<div class="card dp-verw-karte">' +
           '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px">' +
             farbe('rp-b-accent', 'Akzentfarbe', accent, 'Knöpfe, Linien, Werte und der Logorahmen') +
             farbe('rp-b-obsidian', 'Menü und Kopfleiste', obsidian, 'die dunkle Fläche links und oben') +
@@ -1045,7 +1049,7 @@ if (!window._pdfGold) {
              Erste Kachel Standard (DealPilot-Gold), dann Toene in Gruppen. Jeder Ton ist
              gemessen >= 3 : 1 auf Obsidian #0A0A0C UND auf Weiss (AKZENT_TOENE, Werte im
              Kommentar dort). Gruen und Hellrot fehlen bewusst: Statusfarben. */
-          '<div class="rp-fl" style="margin-top:12px">Akzent schnell wählen</div>' +
+          '<div class="ct ct-pro dp-verw-ct" style="margin-top:12px">Akzent schnell wählen</div>' +
           '<div id="rp-b-pre">' +
             '<button type="button" data-p="std" style="display:inline-flex;align-items:center;gap:8px;padding:7px 12px;border:2px solid ' + STANDARD_AKZENT.a + ';border-radius:999px;background:#fff;cursor:pointer;font:600 12px Inter;color:#3a352c;margin-bottom:8px">' +
               '<i style="width:14px;height:14px;border-radius:50%;background:linear-gradient(135deg,' + STANDARD_AKZENT.hi + ',' + STANDARD_AKZENT.a + ' 55%,' + STANDARD_AKZENT.lo + ');display:inline-block"></i>Standard (DealPilot-Gold)</button>' +
@@ -1063,39 +1067,39 @@ if (!window._pdfGold) {
         /* ── 4 · Dokumente ── */
         '<div data-marke-teil="dokumente">' +
         abschnitt('Dokumente', 'Wirkt auf jedes PDF deiner Kunden und auf die Einladungs-Mail. Die Vorschau zeigt Deckblatt und Seitenkopf.') +
-        '<div class="rp-panel">' +
+        '<div class="card dp-verw-karte">' +
           '<input type="hidden" id="rp-b-pdflight" value="' + (b.brand_pdf_light ? '1' : '0') + '">' +
-          '<div class="rp-fl">Deckblatt</div><div style="font:400 11.5px Inter;color:#8a8473;margin-bottom:6px">Wirkt auf das Deckblatt und die Seitenköpfe aller PDFs.</div>' +
+          '<div class="ct ct-pro dp-verw-ct">Deckblatt</div><div class="hint dp-verw-hint" style="margin-bottom:6px">Wirkt auf das Deckblatt und die Seitenköpfe aller PDFs.</div>' +
           '<div id="rp-b-pdfart" style="display:inline-flex;border:1px solid #e6e0d4;border-radius:9px;overflow:hidden;margin-bottom:12px">' +
             '<button type="button" data-hell="0" style="padding:7px 14px;border:0;cursor:pointer;font:600 12px Inter">Dunkel (Standard)</button>' +
             '<button type="button" data-hell="1" style="padding:7px 14px;border:0;cursor:pointer;font:600 12px Inter">Hell</button></div>' +
-          '<div class="rp-fl">Logogröße in den Dokumenten <b id="rp-b-pdfgr-wert" style="color:#3a352c">' + _brandState.pdfGroesse + ' %</b>' + stdKnopf('pdfgr') + '</div>' +
+          '<div class="ct ct-pro dp-verw-ct">Logogröße in den Dokumenten <b id="rp-b-pdfgr-wert" style="color:#3a352c">' + _brandState.pdfGroesse + ' %</b>' + stdKnopf('pdfgr') + '</div>' +
           '<input type="range" id="rp-b-pdfgr" min="60" max="150" step="5" value="' + _brandState.pdfGroesse + '" style="width:100%;max-width:420px;accent-color:var(--wl-c9a84c, #C9A84C)">' +
-          '<div style="font:400 11.5px/1.5 Inter;color:#8a8473;margin:3px 0 10px">Wirkt auf Deckblatt und Seitenkopf. Größer geht nur, solange das Logo nicht in Text oder Linien läuft. Steht es an dieser Grenze, wächst es nicht weiter.</div>' +
+          '<div class="hint dp-verw-hint" style="margin:3px 0 10px">Wirkt auf Deckblatt und Seitenkopf. Größer geht nur, solange das Logo nicht in Text oder Linien läuft. Steht es an dieser Grenze, wächst es nicht weiter.</div>' +
           '<div id="rp-b-pdfprev" style="display:flex;flex-wrap:wrap;gap:12px"></div>' +
-          '<div class="rp-fl" style="margin-top:16px">Absender im Fuß jedes PDFs</div>' +
-          '<div style="font:400 11.5px Inter;color:#8a8473;margin-bottom:8px">Wirkt auf den Fuß jedes PDFs. Leere Felder bleiben leer, DealPilot setzt nichts ein.</div>' +
+          '<div class="ct ct-pro dp-verw-ct" style="margin-top:16px">Absender im Fuß jedes PDFs</div>' +
+          '<div class="hint dp-verw-hint" style="margin-bottom:8px">Wirkt auf den Fuß jedes PDFs. Leere Felder bleiben leer, DealPilot setzt nichts ein.</div>' +
           '<div style="display:flex;flex-wrap:wrap;gap:12px">' +
-            '<div style="flex:2 1 200px"><div class="rp-fl">Firma (falls anders als die Marke)</div><input id="rp-b-company" value="' + esc(b.brand_company || '') + '" placeholder="' + esc(b.brand_name || 'Kanzlei Muster GmbH') + '" style="' + inp + '"></div>' +
-            '<div style="flex:2 1 200px"><div class="rp-fl">Untertitel</div><input id="rp-b-tagline" value="' + esc(b.brand_tagline || '') + '" placeholder="Ihre Kanzlei für Immobilien" style="' + inp + '"></div>' +
+            '<div style="flex:2 1 200px"><label class="dp-verw-lbl">Firma (falls anders als die Marke)</label><input type="text" id="rp-b-company" value="' + esc(b.brand_company || '') + '" placeholder="' + esc(b.brand_name || 'Kanzlei Muster GmbH') + '" style="' + inp + '"></div>' +
+            '<div style="flex:2 1 200px"><label class="dp-verw-lbl">Untertitel</label><input type="text" id="rp-b-tagline" value="' + esc(b.brand_tagline || '') + '" placeholder="Ihre Kanzlei für Immobilien" style="' + inp + '"></div>' +
           '</div>' +
           '<div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:12px">' +
-            '<div style="flex:3 1 200px"><div class="rp-fl">Straße und Hausnummer</div><input id="rp-b-address" value="' + esc(b.brand_address || '') + '" style="' + inp + '"></div>' +
-            '<div style="flex:0 1 96px"><div class="rp-fl">PLZ</div><input id="rp-b-plz" value="' + esc(b.brand_plz || '') + '" style="' + inp + '"></div>' +
-            '<div style="flex:2 1 140px"><div class="rp-fl">Ort</div><input id="rp-b-city" value="' + esc(b.brand_city || '') + '" style="' + inp + '"></div>' +
+            '<div style="flex:3 1 200px"><label class="dp-verw-lbl">Straße und Hausnummer</label><input type="text" id="rp-b-address" value="' + esc(b.brand_address || '') + '" style="' + inp + '"></div>' +
+            '<div style="flex:0 1 96px"><label class="dp-verw-lbl">PLZ</label><input type="text" id="rp-b-plz" value="' + esc(b.brand_plz || '') + '" style="' + inp + '"></div>' +
+            '<div style="flex:2 1 140px"><label class="dp-verw-lbl">Ort</label><input type="text" id="rp-b-city" value="' + esc(b.brand_city || '') + '" style="' + inp + '"></div>' +
           '</div>' +
           '<div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:12px">' +
-            '<div style="flex:1 1 150px"><div class="rp-fl">Telefon</div><input id="rp-b-phone" value="' + esc(b.brand_phone || '') + '" style="' + inp + '"></div>' +
-            '<div style="flex:1 1 150px"><div class="rp-fl">E-Mail</div><input id="rp-b-email" type="email" value="' + esc(b.brand_email || '') + '" style="' + inp + '"></div>' +
-            '<div style="flex:1 1 150px"><div class="rp-fl">Website</div><input id="rp-b-website" value="' + esc(b.brand_website || '') + '" style="' + inp + '"></div>' +
+            '<div style="flex:1 1 150px"><label class="dp-verw-lbl">Telefon</label><input type="text" id="rp-b-phone" value="' + esc(b.brand_phone || '') + '" style="' + inp + '"></div>' +
+            '<div style="flex:1 1 150px"><label class="dp-verw-lbl">E-Mail</label><input id="rp-b-email" type="email" value="' + esc(b.brand_email || '') + '" style="' + inp + '"></div>' +
+            '<div style="flex:1 1 150px"><label class="dp-verw-lbl">Website</label><input type="text" id="rp-b-website" value="' + esc(b.brand_website || '') + '" style="' + inp + '"></div>' +
           '</div>' +
           '<div id="rp-b-foot" style="margin-top:14px;padding:11px 13px;background:#faf8f3;border:1px dashed #ddd6c8;border-radius:8px;font:400 11.5px/1.6 Inter;color:#6b6558"></div>' +
-          '<div class="rp-fl" style="margin-top:16px">Einladungs-Mail</div><div id="rp-b-preview"></div>' +
+          '<div class="ct ct-pro dp-verw-ct" style="margin-top:16px">Einladungs-Mail</div><div id="rp-b-preview"></div>' +
         '</div>' +
         '</div>' +
         '<div data-marke-teil="leiste" style="position:sticky;bottom:0;z-index:2;display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:18px;padding:12px 0;background:linear-gradient(transparent,#fbf8f1 30%)">' +
-          '<button class="rp-checkout" id="rp-b-save">Speichern</button>' +
-          '<button type="button" id="rp-b-reset" style="padding:10px 16px;border:1px solid #e6e0d4;border-radius:9px;background:#fff;cursor:pointer;font:600 13px Inter;color:#3a352c">Änderungen verwerfen</button>' +
+          '<button type="button" class="dp-verw-btn dp-verw-btn-haupt" id="rp-b-save">Speichern</button>' +
+          '<button type="button" class="dp-verw-btn" id="rp-b-reset">Änderungen verwerfen</button>' +
           '<span id="rp-b-stand" style="font:400 12px Inter;color:#8a8473"></span></div>';
       var upd = function () { _brandPreview(); _logoPrev(); try { if (_previewOn()) _applyPreview(); } catch (e) {} };  /*W7-livepreview W22-logoprev*/
       $('rp-b-wl').addEventListener('change', upd);
@@ -1156,6 +1160,17 @@ if (!window._pdfGold) {
         toast('Ungespeicherte Änderungen verworfen');
       });
       $('rp-b-logo').addEventListener('change', function (e) { _brandLogoPick(e, upd); });
+      /* v3630k · Ablageflaeche: Datei hineinziehen statt nacktem Browser-Knopf */
+      ['rp-b-logo', 'rp-b-logo-dark'].forEach(function (id) {
+        var feld = $(id), zone = $(id + '-ablage'); if (!feld || !zone) return;
+        ['dragenter', 'dragover'].forEach(function (t) { zone.addEventListener(t, function (ev) { ev.preventDefault(); zone.classList.add('ueber'); }); });
+        ['dragleave', 'drop'].forEach(function (t) { zone.addEventListener(t, function (ev) { ev.preventDefault(); zone.classList.remove('ueber'); }); });
+        zone.addEventListener('drop', function (ev) {
+          var f = ev.dataTransfer && ev.dataTransfer.files; if (!f || !f.length) return;
+          try { feld.files = f; } catch (e15) {}
+          feld.dispatchEvent(new Event('change', { bubbles: true }));
+        });
+      });
       $('rp-b-logo-x').addEventListener('click', function () { _brandState.logo = ''; var f = $('rp-b-logo'); if (f) f.value = ''; upd(); });
       /* v3299 · zweites Logo fuer dunklen Grund */
       $('rp-b-logo-dark').addEventListener('change', function (e) { _brandLogoPick(e, upd, 'logoDark'); });
@@ -1248,6 +1263,7 @@ if (!window._pdfGold) {
     if (_brandState.darstellung !== g.darstellung || _brandState.groesse !== g.groesse || _brandState.ausrichtung !== g.ausrichtung) an.push('Logo in der App');
     if ((_v('rp-b-pdflight') === '1') !== !!g.pdflight || _brandState.pdfGroesse !== g.pdfGroesse) an.push('Dokumente');
     try { _wahlMarkieren(); } catch (e9) {}   /* v3630e */
+    try { _kopfZeigen(); } catch (e13) {}   /* v3630k */
     try { window.dispatchEvent(new Event('dp:marke-stand')); } catch (e10) {}   /* v3630i · Liste links in der Verwaltung */
     el.innerHTML = an.length ? 'Geändert: ' + an.join(', ') + '. <b style="color:#3a352c">Noch nicht gespeichert.</b>' : 'Alles gespeichert.';
   }
@@ -1308,6 +1324,7 @@ if (!window._pdfGold) {
         if (boxH) boxH.innerHTML = bild(v.auf_hell);
         _logoPrevGroesse();
         try { _pdfPrev(); } catch (e6) {}   /* v3630b · Dokumente zeigen dieselbe Variante */
+        try { _kopfZeigen(); window.dispatchEvent(new Event('dp:marke-stand')); } catch (e14) {}   /* v3630k · Vorschauen mit der neuen Variante */
         if (!amp) return;
         var ART = { 'unveraendert': 'unverändert', 'weiss': 'weiß eingefärbt', 'dunkel': 'dunkel eingefärbt',
                     'platte-hell': 'auf heller Platte', 'platte-dunkel': 'auf dunkler Platte', 'eigenes Logo': 'eigenes Logo für dunklen Grund',
@@ -1567,6 +1584,64 @@ if (!window._pdfGold) {
       }
       saveBranding();
     });
+  }
+  /* v3630k · Marcel: „Koennen wir die einzelnen Reiter ... noch cooler darstellen, unter Marke
+     vielleicht mit Bild?" Kleine, lebendige Vorschauen aus dem AKTUELLEN Formularstand (nicht dem
+     gespeicherten): Liste links (markeVorschau) und Kopfkarte im Bereich Marke (_kopfZeigen). */
+  function _vorschauDaten() {
+    var v = _brandState.vari && _brandState.vari.v;
+    var l = _currentLogo();
+    return {
+      wl: !!($('rp-b-wl') && $('rp-b-wl').checked),
+      name: _v('rp-b-name') || 'Deine Marke',
+      akz: _v('rp-b-accent') || STANDARD_AKZENT.a, obs: _v('rp-b-obsidian') || '#0b0b0a', mail: _v('rp-b-mail') || _v('rp-b-accent') || STANDARD_AKZENT.a,
+      dunkel: l ? ((v && v.auf_dunkel) || _currentLogoDark() || l) : '', hell: l ? ((v && v.auf_hell) || l) : '',
+      pdfHell: _v('rp-b-pdflight') === '1', mitte: _brandState.ausrichtung === 'mitte'
+    };
+  }
+  function markeVorschau() {
+    var d = _vorschauDaten(), dpAkz = STANDARD_AKZENT.a;
+    var akz = d.wl ? d.akz : dpAkz, obs = d.wl ? d.obs : '#0b0b0a';
+    var bild = function (src, mh, mw) { return '<img src="' + esc(src) + '" alt="" style="display:block;max-height:' + mh + 'px;max-width:' + mw + 'px">'; };
+    var wort = function (gr) { return '<span style="font:700 ' + gr + 'px \'Space Grotesk\',sans-serif;color:#F2EDE3;white-space:nowrap">Deal<i style="font-style:normal;color:' + dpAkz + '">Pilot</i></span>'; };
+    var markeMini = (d.wl && d.dunkel) ? bild(d.dunkel, 18, 54) : (d.wl ? '<span style="font:700 9px Inter;color:#F2EDE3;white-space:nowrap;overflow:hidden;max-width:54px;display:block;text-overflow:ellipsis">' + esc(d.name) + '</span>' : wort(10));
+    return {
+      marke: '<span style="display:flex;align-items:center;justify-content:' + (d.mitte ? 'center' : 'flex-start') + ';width:66px;height:30px;padding:0 6px;box-sizing:border-box;border-radius:4px;background:' + esc(obs) + ';box-shadow:inset 0 -2px 0 ' + esc(akz) + '">' + markeMini + '</span>',
+      logo: d.dunkel
+        ? '<span style="display:flex;gap:3px"><span style="width:31px;height:30px;border-radius:4px;background:#0e0d0b;display:flex;align-items:center;justify-content:center;padding:3px;box-sizing:border-box">' + bild(d.dunkel, 22, 25) + '</span>' +
+          '<span style="width:31px;height:30px;border-radius:4px;background:#fff;border:1px solid #E6E1D6;display:flex;align-items:center;justify-content:center;padding:3px;box-sizing:border-box">' + bild(d.hell, 22, 25) + '</span></span>'
+        : '<span style="width:66px;height:30px;border-radius:4px;border:1px dashed #D9CFB8;display:flex;align-items:center;justify-content:center;font:500 9px Inter;color:#7A7370">kein Logo</span>',
+      farben: '<span style="display:flex;gap:3px">' + [akz, obs, d.wl ? d.mail : dpAkz].map(function (f) { return '<i style="display:block;width:20px;height:30px;border-radius:4px;background:' + esc(f) + ';border:1px solid rgba(0,0,0,.08)"></i>'; }).join('') + '</span>',
+      dokumente: '<span style="position:relative;display:block;width:24px;height:32px;margin-left:21px;border-radius:2px;background:' + (d.pdfHell ? '#fff' : '#2A2727') + ';border:1px solid #E6E1D6;overflow:hidden">' +
+        (d.wl && (d.pdfHell ? d.hell : d.dunkel) ? '<img src="' + esc(d.pdfHell ? d.hell : d.dunkel) + '" alt="" style="position:absolute;left:3px;right:3px;top:4px;margin:auto;max-width:18px;max-height:9px">' : '') +
+        '<i style="position:absolute;left:0;right:0;top:17px;height:1px;background:' + esc(akz) + '"></i><i style="position:absolute;left:5px;right:5px;top:21px;height:2px;background:' + (d.pdfHell ? '#2A2727' : '#fff') + ';opacity:.5"></i></span>'
+    };
+  }
+  /* Kopfkarte im Bereich Marke: so sieht die App mit deiner Marke aus (Menueleiste, Kopf, eine Karte) */
+  function _kopfZeigen() {
+    var host = $('rp-b-kopf'); if (!host) return;
+    var d = _vorschauDaten(), dpAkz = STANDARD_AKZENT.a;
+    var akz = d.wl ? d.akz : dpAkz, obs = d.wl ? d.obs : '#0b0b0a';
+    var marke = (d.wl && d.dunkel) ? '<img src="' + esc(d.dunkel) + '" alt="" style="display:block;max-width:100%;max-height:' + Math.round(34 * Math.min(1.6, (_brandState.groesse || 100) / 100)) + 'px">'
+      : (d.wl ? '<span style="font:700 13px \'Space Grotesk\',sans-serif;color:#F2EDE3">' + esc(d.name) + '</span>'
+              : '<span style="font:700 18px \'Space Grotesk\',sans-serif;color:#F2EDE3">Deal<i style="font-style:normal;color:' + dpAkz + '">Pilot</i></span>');
+    var zeile = function (t, an) { return '<div style="display:flex;align-items:center;gap:7px;padding:5px 8px;border-radius:4px;font:500 10.5px Inter;color:' + (an ? '#fff' : 'rgba(242,237,227,.62)') + ';background:' + (an ? 'rgba(255,255,255,.07)' : 'none') + (an ? ';box-shadow:inset 2px 0 0 ' + esc(akz) : '') + '">' + t + '</div>'; };
+    host.innerHTML =
+      '<div style="display:grid;grid-template-columns:150px 1fr;height:196px;border-radius:6px;overflow:hidden;border:1px solid #E6E1D6;background:#F4F2ED">' +
+        '<div style="background:' + esc(obs) + ';padding:10px 8px;display:flex;flex-direction:column;gap:3px">' +
+          '<div style="height:48px;display:flex;align-items:center;justify-content:' + (d.mitte ? 'center' : 'flex-start') + ';padding:0 4px;margin-bottom:6px">' + marke + '</div>' +
+          '<div style="font:700 8px \'JetBrains Mono\',monospace;letter-spacing:1px;color:' + esc(akz) + ';padding:0 8px 3px">ANSICHTEN</div>' +
+          zeile('Einzelobjekt', true) + zeile('Portfolio-Cockpit') + zeile('Partner-Cockpit') + '</div>' +
+        '<div style="display:flex;flex-direction:column;min-width:0">' +
+          '<div style="height:34px;background:' + esc(obs) + ';border-bottom:2px solid ' + esc(akz) + ';display:flex;align-items:center;gap:12px;padding:0 12px;font:600 10.5px Inter;color:#F2EDE3">Objekt<span style="opacity:.55;font-weight:500">Investition</span><span style="opacity:.55;font-weight:500">Miete</span></div>' +
+          '<div style="padding:12px;flex:1;min-width:0">' +
+            '<div style="background:#fff;border:1px solid color-mix(in srgb,' + esc(akz) + ' 22%,transparent);border-radius:2px;padding:10px 12px;display:flex;align-items:center;gap:12px">' +
+              '<span style="flex:none;width:44px;height:44px;border-radius:50%;background:conic-gradient(' + esc(akz) + ' 0 74%,#EDE6D6 0);display:flex;align-items:center;justify-content:center"><span style="width:34px;height:34px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;font:700 12px \'Space Grotesk\',sans-serif;color:#2A2727">74</span></span>' +
+              '<span style="min-width:0"><span style="display:block;font:700 9px \'JetBrains Mono\',monospace;letter-spacing:1.2px;color:#6B645A">OBJEKTDATEN</span>' +
+              '<span style="display:block;font:600 12px Inter;color:#2A2727;margin-top:2px">Musterstraße 1, Musterstadt</span>' +
+              '<span style="display:inline-block;margin-top:6px;padding:4px 9px;border-radius:8px;background:' + esc(akz) + ';color:#fff;font:600 10px Inter">Bericht abrufen</span></span>' +
+            '</div></div></div></div>' +
+      '<div class="hint dp-verw-hint" style="margin-top:6px">' + (d.wl ? 'So sehen deine Kunden die App mit deiner Marke. Stand des Formulars, gespeichert wird mit Speichern.' : 'Deine Marke ist aus. Deine Kunden sehen DealPilot.') + '</div>';
   }
   /* v3630i · Stand je Bereich, eine Zeile fuer die Liste links in der Verwaltung */
   function markeStand() {
@@ -1876,7 +1951,7 @@ if (!window._pdfGold) {
       try { DpPartnerKunden.cockpitOeffnen(); setTimeout(function () { DpPartnerKunden.reiterWahl('verwaltung'); }, 1500); } catch (e) {}
     }, 2500);
   })(0);
-  window.DealPilotResellerPortal = { boot: boot, open: openResellerPortal, poolHolen: poolHolen, seatsKaufen: seatsKaufen, markeZeichnen: markeZeichnen, markeStand: markeStand,   /* v3630i */ uebergabeZeichnen: uebergabeZeichnen, markeSpeichern: function () { return saveBranding(); },   /* v3392 */
+  window.DealPilotResellerPortal = { boot: boot, open: openResellerPortal, poolHolen: poolHolen, seatsKaufen: seatsKaufen, markeZeichnen: markeZeichnen, markeStand: markeStand, markeVorschau: markeVorschau,   /* v3630i, v3630k */ uebergabeZeichnen: uebergabeZeichnen, markeSpeichern: function () { return saveBranding(); },   /* v3392 */
     staffelSatz: staffelSatz, staffelText: staffelText,
     /* v3317 · direkt in "Übergeben" öffnen, optional mit vorgewähltem Objekt */
     uebergeben: function (objectId) { if (objectId) _st.uebObj = objectId; if (window.DpPartnerKunden) { DpPartnerKunden.reiterWahl('uebergeben'); return; } _st.sec = 'ueberg'; if (_st.open) go('ueberg'); else openResellerPortal(true); } };   /* v3500 · führt in den Cockpit-Reiter Übergeben */   /* v3390: openResellerPortal fuehrt ins Cockpit, Verwaltung oeffnet _st.sec */

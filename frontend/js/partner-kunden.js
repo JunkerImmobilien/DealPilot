@@ -546,14 +546,15 @@
     el.innerHTML = '<div class="pk-verw" id="dppk-verw">' +
       '<nav class="pk-verw-liste" aria-label="Bereiche der Verwaltung">' + VERW_BEREICHE.map(function (b) {
         return '<button type="button" class="pk-verw-punkt' + (b[0] === akt ? ' an' : '') + '" data-bereich="' + b[0] + '" aria-current="' + (b[0] === akt) + '">' +
-          '<span class="pk-verw-ico">' + ico(b[2], 17) + '</span><span class="pk-verw-txt"><b>' + esc(b[1]) + '</b><small data-stand="' + b[0] + '">…</small></span></button>';
+          '<span class="pk-verw-ico">' + ico(b[2], 17) + '</span><span class="pk-verw-txt"><b>' + esc(b[1]) + '</b><small data-stand="' + b[0] + '">…</small></span>' +
+          '<span class="pk-verw-mini" data-mini="' + b[0] + '" aria-hidden="true"></span></button>';   /* v3630k · kleine Vorschau je Bereich */
       }).join('') + '</nav>' +
       '<div class="pk-verw-inhalt">' + VERW_BEREICHE.map(function (b) {
         var inner = b[0] === 'plaetze'
           ? '<div class="pk-spalten">' +
               '<div class="pk-karte" data-v="plaetze"><h3>Plätze</h3><div class="pk-leer">Lädt …</div></div>' +
               '<div class="pk-karte" data-v="abo"><h3>Abrechnung</h3><div class="pk-leer">Lädt …</div></div></div>'
-          : '<div class="pk-karte pk-marke" data-v-ziel="' + b[0] + '"><div class="pk-leer">Lädt …</div></div>';
+          : '<div class="pk-marke" data-v-ziel="' + b[0] + '"><div class="pk-leer">Lädt …</div></div>';
         return '<section class="pk-verw-bereich" data-bereich-inhalt="' + b[0] + '"' + (b[0] === akt ? '' : ' hidden') + '>' + inner + '</section>';
       }).join('') + '</div></div>';
     var box = el.querySelector('#dppk-verw');
@@ -567,12 +568,16 @@
     plaetzeZeichnen(box.querySelector('[data-v="plaetze"]'));
     aboZeichnen(box.querySelector('[data-v="abo"]'));
     var lager = document.createElement('div'); lager.className = 'pk-marke'; lager.hidden = true; box.appendChild(lager);
-    var stand = function () {
-      try {
-        var z = rp.markeStand ? rp.markeStand() : null; if (!z) return;
-        Object.keys(z).forEach(function (k) { var s = box.querySelector('[data-stand="' + k + '"]'); if (s) s.textContent = z[k]; });
-      } catch (e) {}
-    };
+    var stand = function () { verwListeAktualisieren(box); };
+    /* v3630k · Plaetze-Vorschau: Balken belegt/frei aus dem Pool */
+    try {
+      if (rp.poolHolen) rp.poolHolen().then(function (pl) {
+        var m = box.querySelector('[data-mini="plaetze"]'), st = box.querySelector('[data-stand="plaetze"]');
+        var ges = pl.gekauft || 0, bel = (pl.zugewiesen || 0) + (pl.reserviert || 0), ant = ges ? Math.min(100, Math.round(bel / ges * 100)) : 0;
+        if (st) st.textContent = ges ? bel + ' von ' + ges + ' Plätzen belegt' : 'Noch keine Plätze';
+        if (m) m.innerHTML = '<span class="pk-verw-balken"><i style="width:' + ant + '%"></i></span><span class="pk-verw-zahl">' + bel + '/' + ges + '</span>';
+      }, function () {});
+    } catch (e) {}
     var verteilen = function () {
       VERW_BEREICHE.forEach(function (b) {
         var ziel = box.querySelector('[data-v-ziel="' + b[0] + '"]'), teil = lager.querySelector('[data-marke-teil="' + b[0] + '"]');
@@ -591,7 +596,7 @@
       stand();
     };
     /* Stand-Zeilen links folgen jeder Aenderung (reseller-portal.js meldet dp:marke-stand) */
-    if (!PK._verwStandHoerer) { PK._verwStandHoerer = true; window.addEventListener('dp:marke-stand', function () { var b = document.getElementById('dppk-verw'); if (b) { try { var z = rp.markeStand(); Object.keys(z).forEach(function (k) { var s = b.querySelector('[data-stand="' + k + '"]'); if (s) s.textContent = z[k]; }); } catch (e) {} } }); }
+    if (!PK._verwStandHoerer) { PK._verwStandHoerer = true; window.addEventListener('dp:marke-stand', function () { var b = document.getElementById('dppk-verw'); if (b) verwListeAktualisieren(b); }); }
     try {
       Promise.resolve(rp.markeZeichnen(lager)).then(verteilen, function (e) {
         var z = box.querySelector('[data-v-ziel="marke"]'); if (z) z.innerHTML = '<div class="pk-leer">' + esc(fehlerText(e)) + '</div>';
@@ -600,11 +605,20 @@
       var z = box.querySelector('[data-v-ziel="marke"]'); if (z) z.innerHTML = '<div class="pk-leer">' + esc(fehlerText(e)) + '</div>';
     }
   }
+  function verwListeAktualisieren(box) {
+    var rp = window.DealPilotResellerPortal; if (!rp || !box) return;
+    try {
+      var z = rp.markeStand ? rp.markeStand() : null;
+      if (z) Object.keys(z).forEach(function (k) { if (k === 'plaetze') return; var s = box.querySelector('[data-stand="' + k + '"]'); if (s) s.textContent = z[k]; });
+      var v = rp.markeVorschau ? rp.markeVorschau() : null;
+      if (v) Object.keys(v).forEach(function (k) { var m = box.querySelector('[data-mini="' + k + '"]'); if (m && m.innerHTML !== v[k]) m.innerHTML = v[k]; });
+    } catch (e) {}
+  }
   function verwStil() {
     if (document.getElementById('dppk-verw-stil')) return;
     var s = document.createElement('style'); s.id = 'dppk-verw-stil';
     s.textContent = [
-      '.pk-verw{display:grid;grid-template-columns:240px minmax(0,1fr);gap:18px;align-items:start;padding-bottom:84px}',
+      '.pk-verw{display:grid;grid-template-columns:300px minmax(0,1fr);gap:18px;align-items:start;padding-bottom:84px}',
       '.pk-verw-liste{position:sticky;top:12px;display:flex;flex-direction:column;gap:4px;border:1px solid #EDE6D6;border-radius:12px;background:#fff;padding:8px}',
       '.pk-verw-punkt{display:flex;align-items:flex-start;gap:10px;width:100%;text-align:left;border:0;border-radius:9px;background:none;padding:10px 10px;cursor:pointer;color:#2A2727;font:inherit}',
       '.pk-verw-punkt:hover{background:#FBF6E9}',
@@ -615,6 +629,42 @@
       '.pk-verw-txt b{font:600 14px "Space Grotesk",Inter,sans-serif}',
       '.pk-verw-txt small{font:400 11.5px/1.35 Inter,sans-serif;color:#7A7370;white-space:normal}',
       '.pk-verw-bereich[hidden]{display:none !important}',
+      /* v3630k · Werte des Reiters Objekt, gemessen mit getComputedStyle (1440 px): Titel wie #s0 > h2.sec-title,
+         Unterzeile wie .sec-desc, Karte wie .card (1 px Gold 22 %, Radius 2, Innen 20, kein Schatten), Kopf .ct.ct-pro
+         (JetBrains Mono 10/700, 1,2 px, #6B645A), Beschriftung .f > label (Inter 11/500, rgba(42,39,39,.85), 4 px),
+         Felder kommen aus style.css + einheitlich.css (#dppk-verw steht dort in jeder Liste). */
+      '#dppk-verw .dp-verw-titel{position:relative;margin:0;padding:0 0 0 14px;font:700 24px/36px "Space Grotesk",system-ui,sans-serif;letter-spacing:-.3px;color:#2A2727}',
+      '#dppk-verw .dp-verw-titel::before{content:"";position:absolute;left:0;top:6px;width:3px;height:24px;border-radius:2px;background:linear-gradient(180deg,var(--wl-e8cc7a, #E8CC7A),var(--wl-9a7f33, #9a7f33))}',
+      '#dppk-verw .dp-verw-desc{margin:3px 0 18px;font:400 12px/1.5 Inter,system-ui,sans-serif;color:#625C59}',
+      '#dppk-verw .card.dp-verw-karte{background:#fff;border:1px solid color-mix(in srgb,var(--wl-c9a84c, #C9A84C) 22%,transparent);border-radius:2px;box-shadow:none;padding:20px;margin:0 0 16px}',
+      '#dppk-verw .ct.ct-pro.dp-verw-ct{display:flex;align-items:center;gap:8px;font:700 10px "JetBrains Mono",ui-monospace,monospace;letter-spacing:1.2px;text-transform:uppercase;color:#6B645A;padding:0 0 10px;margin:16px 0 12px;border-bottom:1px solid #EDE6D6}',
+      '#dppk-verw .card > .ct.ct-pro.dp-verw-ct:first-child{margin-top:0}',
+      '#dppk-verw .ct.ct-pro.dp-verw-ct .rp-b-std{margin-left:auto !important;text-transform:none;letter-spacing:0;font:500 11px Inter,sans-serif}',
+      '#dppk-verw .ct.ct-pro.dp-verw-ct b{font-family:Inter,sans-serif;letter-spacing:0;text-transform:none;color:#2A2727}',
+      '#dppk-verw .dp-verw-lbl{display:block;margin:0 0 4px;font:500 11px/20px Inter,system-ui,sans-serif;color:rgba(42,39,39,.85)}',
+      '#dppk-verw .dp-verw-hint{font:italic 400 10.5px/1.5 Inter,system-ui,sans-serif;color:rgba(42,39,39,.68)}',
+      '#dppk-verw .dp-verw-hint b{font-style:normal}',
+      /* Knoepfe: Inter 13/500, 38 px, Radius 8 (einheitlich.css .btn); Hauptknopf wie .oab-act im Boarding Pass */
+      '.pk-marke .dp-verw-btn{display:inline-flex;align-items:center;gap:6px;min-height:38px;padding:0 16px;border:1px solid color-mix(in srgb,var(--wl-c9a84c, #C9A84C) 30%,transparent);border-radius:8px;background:#fff;color:#2A2727;font:500 13px Inter,system-ui,sans-serif;cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.03)}',
+      '.pk-marke .dp-verw-btn:hover{border-color:color-mix(in srgb,var(--wl-c9a84c, #C9A84C) 60%,transparent)}',
+      '.pk-marke .dp-verw-btn-haupt{background:#0A0A0A;border-color:#0A0A0A;color:var(--wl-e8cc7a, #E8CC7A);font-weight:600}',
+      '.pk-marke .dp-verw-btn-haupt:hover{background:#1c1a17;border-color:#1c1a17}',
+      '.pk-marke .dp-verw-btn-weg{color:#B8625C;border-color:rgba(184,98,92,.35);margin-left:8px}',
+      /* Ablageflaeche statt nacktem Datei-Knopf */
+      '#dppk-verw .dp-verw-ablage{display:flex;align-items:center;gap:12px;padding:14px 16px;margin:6px 0 10px;border:1.5px dashed color-mix(in srgb,var(--wl-c9a84c, #C9A84C) 45%,transparent);border-radius:2px;background:#FBF9F4;cursor:pointer;font:400 12.5px/1.45 Inter,sans-serif;color:#2A2727;transition:background .15s,border-color .15s}',
+      '#dppk-verw .dp-verw-ablage:hover,#dppk-verw .dp-verw-ablage.ueber{background:color-mix(in srgb,var(--wl-c9a84c, #C9A84C) 8%,#fff);border-color:var(--wl-c9a84c, #C9A84C)}',
+      '#dppk-verw .dp-verw-ablage small{display:block;font:italic 400 10.5px/1.5 Inter,sans-serif;color:rgba(42,39,39,.68)}',
+      '#dppk-verw .dp-verw-ablage-ico{flex:none;width:38px;height:38px;border-radius:8px;display:flex;align-items:center;justify-content:center;border:1px solid color-mix(in srgb,var(--wl-c9a84c, #C9A84C) 40%,transparent);color:var(--wl-b8932f, #b8932f);background:#fff}',
+      '#dppk-verw .dp-verw-ablage-klein{padding:10px 12px}',
+      '#dppk-verw .dp-verw-datei{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}',
+      '#dppk-verw #rp-b-logo-x{margin-left:0}',
+      /* Liste links: Vorschau rechts im Eintrag */
+      '.pk-verw-punkt{align-items:center}',
+      '.pk-verw-mini{flex:none;margin-left:auto;display:flex;align-items:center;gap:4px;min-width:66px;justify-content:flex-end}',
+      '.pk-verw-mini img{image-rendering:auto}',
+      '.pk-verw-balken{display:block;width:40px;height:6px;border-radius:3px;background:#EDE6D6;overflow:hidden}',
+      '.pk-verw-balken i{display:block;height:100%;background:#3FA56C}',
+      '.pk-verw-zahl{font:600 10px "JetBrains Mono",monospace;color:#6B645A}',
       '.pk-verw-inhalt .pk-karte.pk-marke{padding:16px 20px}',
       '.pk-verw-inhalt [data-marke-teil] > div:first-child{margin-top:0 !important}',
       /* Speicher-Leiste: fest am unteren Bildschirmrand, ueber der Inhaltsspalte */

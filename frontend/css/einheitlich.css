@@ -37,6 +37,11 @@
    |                      |  Sperrung 1,2 px, #6B645A              |                             |
    | Knopf .btn           | Inter 13 px / 500, Radius 8 px, 38 px  | gleich                      |
 
+   v3630k · Marcel 17.11.2026 („Passen Farben, Texte, Schriftart … und
+   Eingabefelder zu unserem DealPilot-Standard? So wie im Tab Objekt?"):
+   die Verwaltung des Partner-Cockpits (#dppk-verw, partner-kunden.js) steht
+   in jeder :is()-Liste unten mit drin - dieselben Regeln statt Nachbau.
+
    ── GELTUNGSBEREICH ────────────────────────────────────────────────────
    * Nur `html[data-dp-layout]` — der Auslieferungszustand ohne Layout
      („Heute", Obsidian) hat ein eigenes, gewachsenes Bild und bleibt, wie
@@ -95,15 +100,15 @@
    - Investition › Sanierung (#san_tax_years, #inv_tax_years): 12 px → 13 px
    - Deal-Aktion › Finanzamt-PDF (#dab-fa-year): 12,5 px / 600 → 13 px / 400
    - Steuer › Finanzamt-PDF (#fa-pdf-year, inline 13 px, Radius 8 px, Polster 7 px) → 38 px hoch, Radius 2 px */
-html[data-dp-layout] body .body :is(#s1,#s2,#s3,#s3-tax,#s4,#s5,#s6,#s7,#s8)
+html[data-dp-layout] body .body :is(#s1,#s2,#s3,#s3-tax,#s4,#s5,#s6,#s7,#s8,#dppk-verw)
   :is(input[type=text], input[type=number], input[type=date], input[type=month],
       input[type=email], input[type=tel], input[type=url], input:not([type]), select, textarea):not(td *):not(.fesh-cost *):not(.ds-metric-input):not(.ds2-metric-input):not(.ds-row-input):not([readonly]):not([disabled]),
-html[data-dp-layout] body .body :is(#s1,#s2,#s3,#s3-tax,#s4,#s5,#s6,#s7,#s8)
+html[data-dp-layout] body .body :is(#s1,#s2,#s3,#s3-tax,#s4,#s5,#s6,#s7,#s8,#dppk-verw)
   :is(input[type=text], input[type=number], input[type=date], input[type=month],
       input[type=email], input[type=tel], input[type=url], input:not([type]), select, textarea):not(td *):not(.fesh-cost *):not(.ds-metric-input):not(.ds2-metric-input):not(.ds-row-input):not([readonly]):not([disabled])::placeholder {
   font-family: var(--dpl-body, 'Inter', system-ui, sans-serif) !important;
 }
-html[data-dp-layout] body .body :is(#s1,#s2,#s3,#s3-tax,#s4,#s5,#s6,#s7,#s8)
+html[data-dp-layout] body .body :is(#s1,#s2,#s3,#s3-tax,#s4,#s5,#s6,#s7,#s8,#dppk-verw)
   :is(input[type=text], input[type=number], input[type=date], input[type=month],
       input[type=email], input[type=tel], input[type=url], input:not([type]), select, textarea):not(td *):not(.fesh-cost *):not(.ds-metric-input):not(.ds2-metric-input):not(.ds-row-input):not([readonly]):not([disabled]) {
   font-size: 13px !important;
@@ -114,21 +119,21 @@ html[data-dp-layout] body .body :is(#s1,#s2,#s3,#s3-tax,#s4,#s5,#s6,#s7,#s8)
   border-style: solid !important;
   border-radius: 2px !important;
 }
-html[data-dp-layout] body .body :is(#s1,#s2,#s3,#s3-tax,#s4,#s5,#s6,#s7,#s8)
+html[data-dp-layout] body .body :is(#s1,#s2,#s3,#s3-tax,#s4,#s5,#s6,#s7,#s8,#dppk-verw)
   :is(input[type=text], input[type=number], input[type=date], input[type=month],
       input[type=email], input[type=tel], input[type=url], input:not([type]), select):not(td *):not(.fesh-cost *):not(.ds-metric-input):not(.ds2-metric-input):not(.ds-row-input):not([readonly]):not([disabled]) {
   height: 38px !important;
   min-height: 38px !important;
   box-sizing: border-box !important;
 }
-html[data-dp-layout] body .body :is(#s1,#s2,#s3,#s3-tax,#s4,#s5,#s6,#s7,#s8)
+html[data-dp-layout] body .body :is(#s1,#s2,#s3,#s3-tax,#s4,#s5,#s6,#s7,#s8,#dppk-verw)
   :is(input, select, textarea)::placeholder {
   color: rgba(42, 39, 39, .40) !important;
   font-style: normal !important;
   opacity: 1 !important;
 }
 /* Fokus wie im Reiter Objekt — auch für die Felder mit Inline-Rahmen (#tp-*, #zve-*) */
-html[data-dp-layout] body .body :is(#s1,#s2,#s3,#s3-tax,#s4,#s5,#s6,#s7,#s8)
+html[data-dp-layout] body .body :is(#s1,#s2,#s3,#s3-tax,#s4,#s5,#s6,#s7,#s8,#dppk-verw)
   :is(input[type=text], input[type=number], input[type=date], input[type=month],
       input[type=email], input:not([type]), select, textarea):focus {
   outline: none !important;
@@ -140,25 +145,25 @@ html[data-dp-layout] body .body :is(#s1,#s2,#s3,#s3-tax,#s4,#s5,#s6,#s7,#s8)
    Darlehen 1 › Art) stand bei 38 px, weil `#d1_type{min-height:38px}` aus
    select-fix.css mit ID-Spezifität die 44 px aus style.css schlug. */
 @media (max-width: 640px) {
-  html[data-dp-layout] body .body :is(#s1,#s2,#s3,#s3-tax,#s4,#s5,#s6,#s7,#s8)
+  html[data-dp-layout] body .body :is(#s1,#s2,#s3,#s3-tax,#s4,#s5,#s6,#s7,#s8,#dppk-verw)
     :is(input[type=text], input[type=number], input[type=date], input[type=month],
         input[type=email], input[type=tel], input[type=url], input:not([type]), select):not(td *):not(.fesh-cost *):not(.ds-metric-input):not(.ds2-metric-input):not(.ds-row-input):not([readonly]):not([disabled]) {
     height: 44px !important;
     min-height: 44px !important;
     font-size: 16px !important;
   }
-  html[data-dp-layout] body .body :is(#s1,#s2,#s3,#s3-tax,#s4,#s5,#s6,#s7,#s8)
+  html[data-dp-layout] body .body :is(#s1,#s2,#s3,#s3-tax,#s4,#s5,#s6,#s7,#s8,#dppk-verw)
     textarea:not(td *):not([readonly]):not([disabled]) {
     font-size: 16px !important;
   }
 }
 @media (min-width: 641px) and (max-width: 768px) {
-  html[data-dp-layout] body .body :is(#s1,#s2,#s3,#s3-tax,#s4,#s5,#s6,#s7,#s8)
+  html[data-dp-layout] body .body :is(#s1,#s2,#s3,#s3-tax,#s4,#s5,#s6,#s7,#s8,#dppk-verw)
     :is(input[type=text], input[type=number], input[type=date], input[type=month],
         input[type=email], input[type=tel], input[type=url], input:not([type]), select, textarea):not(td *):not(.fesh-cost *):not(.ds-metric-input):not(.ds2-metric-input):not(.ds-row-input):not([readonly]):not([disabled]) {
     font-size: 16px !important;
   }
-  html[data-dp-layout] body .body :is(#s1,#s2,#s3,#s3-tax,#s4,#s5,#s6,#s7,#s8)
+  html[data-dp-layout] body .body :is(#s1,#s2,#s3,#s3-tax,#s4,#s5,#s6,#s7,#s8,#dppk-verw)
     :is(input[type=text], input[type=number], input[type=date], input[type=month],
         input[type=email], input[type=tel], input[type=url], input:not([type]), select):not(td *):not(.fesh-cost *):not(.ds-metric-input):not(.ds2-metric-input):not(.ds-row-input):not([readonly]):not([disabled]) {
     height: 40px !important;
@@ -176,19 +181,19 @@ html[data-dp-layout] body .body :is(#s1,#s2,#s3,#s3-tax,#s4,#s5,#s6,#s7,#s8)
    - Kennzahlen › Deal-Score (.dealscore-card, .ds2-card): Verlauf weiß→#F8F6F1 → weiß
    - Kennzahlen › KI-Kurzfazit (.ai-mini-card): Goldschleier 4 % → weiß
    Die Kartenränder (1 px Gold 22 %, Radius 2 px) waren schon überall gleich. */
-html[data-dp-layout] body .body :is(#s1,#s2,#s3,#s3-tax,#s4,#s5,#s6,#s7,#s8)
+html[data-dp-layout] body .body :is(#s1,#s2,#s3,#s3-tax,#s4,#s5,#s6,#s7,#s8,#dppk-verw)
   .card:is(.market-rates-card, .mr-ctx-card, .mr-v209-card, .mr-pf-card, .v10-zins-compact,
            .tax-module-card, .tax-timeline-card, .dealscore-card, .ds2-card, .ai-mini-card) {
   background: var(--dpl-flaeche, #FFFFFF) !important;
 }
 @media (min-width: 641px) {
-  html[data-dp-layout] body .body :is(#s1,#s2,#s3,#s3-tax,#s4,#s5,#s6,#s7,#s8) .card.v10-zins-compact {
+  html[data-dp-layout] body .body :is(#s1,#s2,#s3,#s3-tax,#s4,#s5,#s6,#s7,#s8,#dppk-verw) .card.v10-zins-compact {
     padding: 20px !important;
   }
 }
 
 /* Kartenkopf: Steuer › „.ct" ohne .ct-pro stand mit 600 statt 700. */
-html[data-dp-layout] body .body :is(#s1,#s2,#s3,#s3-tax,#s4,#s5,#s6,#s7,#s8) .card > .ct {
+html[data-dp-layout] body .body :is(#s1,#s2,#s3,#s3-tax,#s4,#s5,#s6,#s7,#s8,#dppk-verw) .card > .ct {
   font-weight: 700 !important;
 }
 
@@ -196,7 +201,7 @@ html[data-dp-layout] body .body :is(#s1,#s2,#s3,#s3-tax,#s4,#s5,#s6,#s7,#s8) .ca
    Kennzahlen) → 10,5 px, rgba(42,39,39,.68), kursiv wie im Reiter Objekt.
    Ausgenommen: Hinweise, die inline als Versal-Zwischenüberschrift
    gesetzt sind (Investition › Sanierung) — das ist eine andere Rolle. */
-html[data-dp-layout] body .body :is(#s1,#s2,#s3,#s3-tax,#s4,#s5,#s6,#s7,#s8)
+html[data-dp-layout] body .body :is(#s1,#s2,#s3,#s3-tax,#s4,#s5,#s6,#s7,#s8,#dppk-verw)
   .hint:not([style*="uppercase"]) {
   font-family: var(--dpl-body, 'Inter', system-ui, sans-serif) !important;
   font-size: 10.5px !important;
@@ -207,7 +212,7 @@ html[data-dp-layout] body .body :is(#s1,#s2,#s3,#s3-tax,#s4,#s5,#s6,#s7,#s8)
 /* Feldbeschriftung: in s1 … s8 gemessen schon gleich (Inter 11 / 500,
    rgba .85; Handy 10,5). Festgeschrieben, damit nachgeladene Module
    (Finanzierung-Tranchen, Steuer-Zeiträume) nicht abweichen. */
-html[data-dp-layout] body .body :is(#s1,#s2,#s3,#s3-tax,#s4,#s5,#s6,#s7,#s8) .f > label {
+html[data-dp-layout] body .body :is(#s1,#s2,#s3,#s3-tax,#s4,#s5,#s6,#s7,#s8,#dppk-verw) .f > label {
   font-family: var(--dpl-body, 'Inter', system-ui, sans-serif) !important;
   font-weight: 500 !important;
   text-transform: none !important;
@@ -216,7 +221,7 @@ html[data-dp-layout] body .body :is(#s1,#s2,#s3,#s3-tax,#s4,#s5,#s6,#s7,#s8) .f 
 
 /* Knöpfe: Steuer › „.btn.btn-sm" 12 px / 34 px gegen 13 px / 38 px in
    Investition und Finanzierung. */
-html[data-dp-layout] body .body :is(#s1,#s2,#s3,#s3-tax,#s4,#s5,#s6,#s7,#s8) .btn.btn-sm {
+html[data-dp-layout] body .body :is(#s1,#s2,#s3,#s3-tax,#s4,#s5,#s6,#s7,#s8,#dppk-verw) .btn.btn-sm {
   font-size: 13px !important;
   min-height: 38px !important;
 }
@@ -337,10 +342,10 @@ html[data-dp-layout] body #settings-modal .pane-wrap :is(.f, .field) > label {
      andere .ct. Nur Kinder OHNE Klasse; Hinweise (.oe-ct-hint, .v213-card-sub) und Marken
      (.info-tag, .ds2-tag) bleiben Inter.
    - Investition › Preis je m² (.qm-price-val) 12,5/700 → 13/600 wie die übrigen Werte (.cf). */
-html[data-dp-layout] body .body :is(#s1,#s2,#s3,#s3-tax,#s4,#s5,#s6,#s7,#s8) .card > .ct > span:not([class]) {
+html[data-dp-layout] body .body :is(#s1,#s2,#s3,#s3-tax,#s4,#s5,#s6,#s7,#s8,#dppk-verw) .card > .ct > span:not([class]) {
   font-family: var(--dpl-mono, 'JetBrains Mono', ui-monospace, monospace) !important;
 }
-html[data-dp-layout] body .body :is(#s1,#s2,#s3,#s3-tax,#s4,#s5,#s6,#s7,#s8) .qm-price-val {
+html[data-dp-layout] body .body :is(#s1,#s2,#s3,#s3-tax,#s4,#s5,#s6,#s7,#s8,#dppk-verw) .qm-price-val {
   font-size: 13px !important;
   font-weight: 600 !important;
 }
