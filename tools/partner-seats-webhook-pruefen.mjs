@@ -233,5 +233,9 @@ ok(/const ENTZUG_FRIST_TAGE = 30;/.test(qPk) && /require\('\.\/partnerKunden'\)[
 const qWh = text('backend/src/routes/stripeWebhook.js');
 ok(/if \(!r\.weiter\) return;/.test(qWh) && /planAusAbo\(sub\)/.test(qWh), 'stripeWebhook: Partner-Plan laeuft nach den Plaetzen in den Plan-Zweig, Plan-Preis aus allen Positionen');
 
+// 11f · Ereignisse in neuerer API-Fassung (gemessen: 2026-04-22.dahlia) tragen den Zeitraum an der Position
+const qSs = text('backend/src/services/subscriptionService.js');
+ok(/_pos\.current_period_end/.test(qSs), 'upsertFromStripe: Laufzeitende aus items.data[0], wenn das Abo keins traegt (sonst NULL nach jedem Webhook)');
+
 console.log((fehler ? 'ROT' : 'SAUBER') + ': ' + (n - fehler) + '/' + n + ' Punkte');
 process.exit(fehler ? 1 : 0);
