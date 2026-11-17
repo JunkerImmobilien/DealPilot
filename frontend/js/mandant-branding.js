@@ -102,6 +102,8 @@
              Kopfbalken des klassischen Investment-PDFs, Layout-Schiene). */
           if (_b.brand_logo_b64) b.logo_b64 = _b.brand_logo_auf_hell || _b.brand_logo_b64;
           if (_b.brand_logo_b64) b.logo_b64_dunkel = _b.brand_logo_auf_dunkel || _b.brand_logo_b64;
+          /* v3630b · Logogroesse in den PDFs (pdf-logo.js box/kopf) */
+          b.logo_pdf_skala = _b.brand_logo_pdf_groesse == null ? 1 : _b.brand_logo_pdf_groesse / 100;
           if (_b.brand_tagline) b.tagline = _b.brand_tagline;
           if (_b.brand_address) b.address = _b.brand_address;
           if (_b.brand_plz)     b.plz     = _b.brand_plz;
@@ -378,6 +380,17 @@
     /* v3301 · Partner: Zuruecksetzen setzt den Akzent auf Gold - die Marke
        gleich wieder anlegen (beim Mandanten erledigt das brand_display). */
     try { if (_b && _b.rolle === 'partner') { applyAccent(); replaceWordmark(); } } catch (e) {}
+  };
+  /* v3630b · nach "Speichern" im Partner-Cockpit: die neuen Werte sofort in den
+     Markensatz, damit das naechste PDF sie schon nimmt (Logogroesse, Deckblatt,
+     Logo-Varianten) und nicht erst nach dem Neuladen. Nur fuer den Partner selbst. */
+  window.DealPilotMandantBranding.merke = function (f) {
+    try {
+      if (!_b || _b.rolle !== 'partner' || !f) return false;
+      Object.keys(f).forEach(function (k) { if (f[k] !== undefined) _b[k] = f[k]; });
+      if (typeof window._dpPdfSetLight === 'function' && f.brand_pdf_light !== undefined) window._dpPdfSetLight(!!f.brand_pdf_light);
+      return true;
+    } catch (e) { return false; }
   };
   /* v3301 · 'mandant' | 'partner' | null - fuer das Partner-Portal */
   window.DealPilotMandantBranding.rolle = function () { return (_b && _b.rolle) || null; };

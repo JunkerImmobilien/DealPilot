@@ -368,7 +368,7 @@ router.get('/branding', async (req, res, next) => {
               brand_company, brand_address, brand_plz, brand_city, brand_phone, brand_email, brand_website, brand_tagline,
               brand_mail_accent, brand_pdf_light, brand_display /*W8 W12 W20-display*/,
               brand_logo_dark_b64, brand_logo_auf_dunkel, brand_logo_auf_hell, brand_logo_messung /*v3299*/,
-              brand_logo_darstellung, brand_logo_groesse /*v3630*/
+              brand_logo_darstellung, brand_logo_groesse /*v3630*/, brand_logo_pdf_groesse /*v3630b*/
          FROM resellers WHERE id=$1`, [req.reseller.id]);
     res.json({ branding: r.rows[0] || {} });
   } catch (e) { next(e); }
@@ -402,7 +402,13 @@ router.put('/branding', async (req, res, next) => {
     try { vari = _varianten(b.brand_logo_varianten); }
     catch (e) { return res.status(e.status || 400).json({ error: 'varianten_invalid', message: e.message }); }
     /* v3630 · vor jedem Schreiben pruefen - ein 400 soll nichts halb gespeichert hinterlassen */
-    let dst, gr;
+    let dst, gr, pgr;
+    if (b.brand_logo_pdf_groesse !== undefined) {   /* v3630b */
+      pgr = b.brand_logo_pdf_groesse === null ? null : Math.round(Number(b.brand_logo_pdf_groesse));
+      if (pgr !== null && !(pgr >= 60 && pgr <= 150)) {
+        return res.status(400).json({ error: 'pdf_groesse_invalid', message: 'Logogröße in Dokumenten zwischen 60 und 150 %.' });
+      }
+    }
     if (b.brand_logo_darstellung !== undefined) {
       dst = b.brand_logo_darstellung === null ? null : String(b.brand_logo_darstellung);
       if (dst !== null && !['auto', 'weiss', 'gold', 'gold-dunkel'].includes(dst)) {
@@ -433,6 +439,9 @@ router.put('/branding', async (req, res, next) => {
        ungueltig = 400 (die Spalten haben CHECK-Regeln, Migration 112). */
     if (dst !== undefined) {
       await query(`UPDATE resellers SET brand_logo_darstellung = $2, updated_at = now() WHERE id = $1`, [req.reseller.id, dst]);
+    }
+    if (pgr !== undefined) {   /* v3630b */
+      await query(`UPDATE resellers SET brand_logo_pdf_groesse = $2, updated_at = now() WHERE id = $1`, [req.reseller.id, pgr]);
     }
     if (gr !== undefined) {
       await query(`UPDATE resellers SET brand_logo_groesse = $2, updated_at = now() WHERE id = $1`, [req.reseller.id, gr]);

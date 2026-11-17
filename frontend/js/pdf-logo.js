@@ -146,9 +146,43 @@
      sie danach am GERENDERTEN Blatt nachmessen, nicht im Code. */
   var KOPF = { b: 27, h: 8.5, dy: -7.6 };
 
+  /* v3630b · Logogroesse in den Dokumenten (Marcel 17.11.2026, Partner-Cockpit ›
+     Verwaltung › Dokumente). Der Partner stellt 60-150 % ein (resellers.
+     brand_logo_pdf_groesse -> branding.get().logo_pdf_skala, mandant-branding.js).
+     Skaliert wird der RAHMEN, in den das Logo passt - und zwar nur bis zu einer
+     harten Grenze je Stelle, die aus den gemessenen Abstaenden oben kommt:
+
+       Kopf (diese Datei)   27 x 8,5 mm ab y-7,6 -> hoechstens 40 x 10 mm,
+                            Unterkante y+2,4 bleibt vor der Unterzeile (y+3,0)
+       Kopfbalken pdf.js    50 x 17 mm ab y 3 in 22 mm Balken -> hoechstens 65 x 18
+       Deckblatt pdf.js     76 x 36 mm ab y 14, Goldlinie bei 56 -> hoechstens 120 x 40
+
+     Groesser als die Grenze wird nichts - ein Logo, das schon an ihr steht,
+     waechst nicht weiter. Kleiner geht immer. */
+  function skala() {
+    try {
+      var b = window.DealPilotConfig && DealPilotConfig.branding && DealPilotConfig.branding.get && DealPilotConfig.branding.get();
+      var s = b && Number(b.logo_pdf_skala);
+      if (s && isFinite(s)) return Math.max(0.6, Math.min(1.5, s));
+    } catch (e) {}
+    return 1;
+  }
+  /** Rahmen fuer das Logo: Grundmass x Skala, gedeckelt auf die Grenze. */
+  function box(maxB, maxH, grenzeB, grenzeH, s) {
+    if (s == null) s = skala();
+    return { b: Math.min(maxB * s, grenzeB || maxB * s), h: Math.min(maxH * s, grenzeH || maxH * s) };
+  }
+  var GRENZE = { kopf: [40, 10], balken: [65, 18], deckblatt: [120, 40] };
+
   window.DealPilotPdfLogo = {
     pfad: PFAD,
-    kopf: KOPF,
+    /* v3630b · Getter: die drei Kopf-Bausteine lesen kopf.b/kopf.h beim Drucken -
+       so wirkt die Logogroesse dort, ohne die Bausteine anzufassen. */
+    get kopf() { var x = box(KOPF.b, KOPF.h, GRENZE.kopf[0], GRENZE.kopf[1]); return { b: x.b, h: x.h, dy: KOPF.dy }; },
+    kopfGrund: KOPF,
+    skala: skala,
+    box: box,
+    GRENZE: GRENZE,
     dealpilot: dealpilotLogo,
     fuerMarke: fuerMarke,
     ausSpeicher: ausSpeicher,

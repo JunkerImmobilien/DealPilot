@@ -355,6 +355,11 @@
     try { nodes = (root || document).querySelectorAll(WM_SEL); } catch (e) { return; }
     Array.prototype.forEach.call(nodes, function (el) {
       if (el.getAttribute('data-wlw') === '1') return;
+      /* v3630b · Marcel 17.11.2026: der Chip "DealPilot" unter MARKTBEWERTUNG im
+         Boarding Pass (object-actions.js, .dp-pf-logo.dp) ist der NAME des
+         Bewertungsverfahrens neben PriceHubble und Sprengnetter, keine Wortmarke
+         der App. Gemessen: dort stand das Partnerlogo (66 x 17 px). Bleibt DealPilot. */
+      if (el.classList && el.classList.contains('dp-pf-logo')) return;
       /* NUR echte Wortmarken: der Text muss GENAU "DealPilot" sein.
          Sonst wuerden Ueberschriften wie "DealPilot Markteinschaetzung" oder
          "Co-Pilot" mit ersetzt. */

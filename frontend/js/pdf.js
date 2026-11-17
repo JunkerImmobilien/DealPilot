@@ -848,7 +848,9 @@ function pageTpl(doc, num, subtitle, W, M) {
   // Branding-Logo (Custom oder DealPilot), proportional skaliert
   var _brandImg = _getBrandingLogo(!window._dpPdfLight);   /* v3299 · Kopfbalken C.CH = dunkel */
   if (_brandImg) {
-    var _ls = _getLogoSize(_brandImg, 50, 17);
+    /* v3630b · Logogroesse des Partners, gedeckelt auf den Balken (pdf-logo.js GRENZE) */
+    var _lb = (window.DealPilotPdfLogo && DealPilotPdfLogo.box) ? DealPilotPdfLogo.box(50, 17, 65, 18) : { b: 50, h: 17 };
+    var _ls = _getLogoSize(_brandImg, _lb.b, _lb.h);
     try { doc.addImage(_brandImg, 'PNG', M, 3, _ls.w, _ls.h); } catch(e) {}
   } else {
     // Fallback: Text-Branding (neutral, ohne Sachverständigen-/Projektentwicklungs-Tagline)
@@ -1409,7 +1411,9 @@ async function _exportPDFInner() {
   // Logo direkt auf dem Deckblatt-Hintergrund (charcoal) - keine weiße Box
   var _coverLogo = _getBrandingLogo(!window._dpPdfLight);   /* v3299 · Deckblatt C.CH = dunkel */
   if (_coverLogo) {
-    var _csz = _getLogoSize(_coverLogo, 76, 36);
+    /* v3630b · Logogroesse des Partners, gedeckelt vor der Goldlinie bei 56 mm */
+    var _cb = (window.DealPilotPdfLogo && DealPilotPdfLogo.box) ? DealPilotPdfLogo.box(76, 36, 120, 40) : { b: 76, h: 36 };
+    var _csz = _getLogoSize(_coverLogo, _cb.b, _cb.h);
     try { doc.addImage(_coverLogo, 'PNG', W / 2 - _csz.w / 2, 14, _csz.w, _csz.h); } catch(e) {}
   }
 

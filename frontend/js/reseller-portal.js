@@ -908,119 +908,153 @@ if (!window._pdfGold) {
       var obsidian = b.brand_obsidian || '#0b0b0a';
       var inp = 'width:100%;padding:9px 11px;border:1px solid #e6e0d4;border-radius:8px;font:400 13px Inter;outline:none';
       var pick = 'width:100%;height:38px;border:1px solid #e6e0d4;border-radius:8px;background:#fff;cursor:pointer';
+      /* v3630b · Marcel 17.11.2026: Verwaltung einfacher, klare Abschnitte (Marke · Logo ·
+         Farben · Dokumente), kurze Saetze, sofort sichtbare Wirkung. Farben stehen jetzt
+         direkt hier statt im Fenster (DealPilotBrandingEditor): jede Aenderung geht ueber
+         _applyPreview() -> DealPilotWhitelabel.apply() sofort in die App, dauerhaft erst
+         mit Speichern, Zuruecksetzen holt den gespeicherten Stand. Kundentext ohne
+         Gedankenstrich und ohne Semikolon. */
+      var mailAcc = b.brand_mail_accent || accent;
+      _brandState.pdfGroesse = b.brand_logo_pdf_groesse == null ? 100 : b.brand_logo_pdf_groesse;
+      _brandState.gespeichert = { accent: accent, obsidian: obsidian, mail: mailAcc, pdflight: !!b.brand_pdf_light,
+        darstellung: _brandState.darstellung, groesse: _brandState.groesse, pdfGroesse: _brandState.pdfGroesse };
+      var abschnitt = function (titel, satz) {
+        return '<div style="display:flex;align-items:baseline;gap:10px;margin:24px 0 6px">' +
+          '<span style="font:700 15px \'Space Grotesk\',Inter,sans-serif;color:#2a2727">' + titel + '</span></div>' +
+          '<p style="font:400 12.5px/1.5 Inter;color:#6b6558;margin:0 0 10px">' + satz + '</p>';
+      };
+      var farbe = function (id, titel, wert, satz) {
+        return '<label style="display:flex;align-items:center;gap:10px;padding:8px 10px;border:1px solid #e6e0d4;border-radius:9px;background:#fff;cursor:pointer;min-width:0">' +
+          '<input type="color" id="' + id + '" value="' + esc(wert) + '" style="width:38px;height:30px;border:0;padding:0;background:none;cursor:pointer;flex:none">' +
+          '<span style="min-width:0"><b style="display:block;font:600 12.5px Inter;color:#3a352c">' + titel + '</b>' +
+          '<span style="font:400 11px/1.4 Inter;color:#8a8473">' + satz + '</span></span></label>';
+      };
+      var mini = 'font:600 10px/1 \'JetBrains Mono\',monospace;letter-spacing:.08em;text-transform:uppercase;color:#8a8473;margin-bottom:5px';
       w.innerHTML =
-        '<p class="rp-intro">Dein Whitelabel — Logo, Akzentfarbe und Kontaktdaten erben deine Mandanten: in der App, in den Einladungs-Mails und im Fuß jedes PDFs.</p>' +
+        '<p class="rp-intro">Deine Marke sehen deine Kunden in der App, in den Einladungs-Mails und in jedem PDF. Was du hier änderst, siehst du sofort in der App. Dauerhaft wird es mit Speichern.</p>' +
+        /* ── 1 · Marke ── */
+        abschnitt('Marke', 'Schalte deine Marke ein und gib ihr einen Namen.') +
         '<div class="rp-panel">' +
           '<label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:13.5px">' +
             '<input type="checkbox" id="rp-b-wl"' + (b.whitelabel_enabled ? ' checked' : '') + ' style="width:18px;height:18px;accent-color:var(--wl-c9a84c, #C9A84C)">' +
-            '<span>Whitelabel aktiv — eigenes Branding statt DealPilot</span></label>' +
-          '<div style="display:flex;gap:12px;margin-top:16px">' +
-            '<div style="flex:1"><div class="rp-fl">Marken-/Kanzleiname</div><input id="rp-b-name" value="' + esc(b.brand_name || '') + '" style="' + inp + '"></div>' +
-            /* W8-editor: Farbwaehler sassen hier, wo man das Ergebnis NICHT sieht.
-               Jetzt: Knopf -> Editor mit Live-Vorschau. Die IDs bleiben als
-               Hidden-Felder erhalten, damit saveBranding() unveraendert weiterlaeuft. */
-            '<div style="flex:1"><div class="rp-fl">Farben &amp; Darstellung</div>' +
-              '<button type="button" id="rp-b-disp" style="width:100%;text-align:left;padding:9px 11px;border:1px solid #e6e0d4;border-radius:8px;background:#fff;cursor:pointer;font:400 13px Inter;color:#3a352c">' +
-                '<span id="rp-b-dot" style="display:inline-block;width:13px;height:13px;border-radius:3px;background:' + esc(accent) + ';vertical-align:-2px;margin-right:8px;border:1px solid rgba(0,0,0,.14)"></span>' +
-                'Darstellung öffnen — live einstellen →</button></div>' +
-          '</div>' +
-          '<input type="hidden" id="rp-b-accent" value="' + esc(accent) + '">' +
-          '<input type="hidden" id="rp-b-obsidian" value="' + esc(obsidian) + '">' +
-          '<input type="hidden" id="rp-b-mail" value="' + esc(b.brand_mail_accent || accent) + '">' +
-          '<input type="hidden" id="rp-b-pdflight" value="' + (b.brand_pdf_light ? '1' : '0') + '">' +   /*W12-portallight*/
-          /* W22-logoprev: Hier stand NUR ein <input type="file"> — das zeigt nach dem
-             Neuoeffnen immer "Keine Datei ausgewaehlt". Das Logo lag laengst in der DB
-             und wurde in der App auch angezeigt, aber im Tab sah es aus, als waere es
-             weg. Jetzt: echte Vorschau des gespeicherten Logos. */
-          '<div style="margin-top:14px"><div class="rp-fl">Logo (PNG/SVG/JPG, max ~300 KB)</div>' +
-            '<div style="font:400 11.5px/1.5 Inter;color:#8a8473;margin-bottom:8px">Beim Hochladen wird das Logo automatisch zugeschnitten: ein einfarbiger Rand (z. B. Weiß) wird transparent, soweit er von außen zusammenhängt. Weiße Flächen im Logo bleiben.</div>' +
-            /* v3630 · Live-Vorschau: Menueleiste (dunkel, Masse der echten Schiene:
-               248 px breit, Markenfeld padding 0 14px, Logo max 60 x 216 px x Groesse)
-               und heller Grund. Gemessen am Partner-Testkonto, 1440 px. */
-            '<div id="rp-b-logo-prev" style="display:flex;flex-wrap:wrap;align-items:flex-start;gap:12px;margin-bottom:9px">' +
-              '<div style="flex:none;max-width:100%"><div style="font:600 10px/1 \'JetBrains Mono\',monospace;letter-spacing:.08em;text-transform:uppercase;color:#8a8473;margin-bottom:5px">Menüleiste (dunkel)</div>' +
-                '<div id="rp-b-logo-box" style="width:248px;max-width:100%;min-height:100px;box-sizing:border-box;padding:0 14px;border:1px dashed #ddd6c8;border-radius:8px;background:#0e0d0b;display:flex;align-items:center;justify-content:flex-start;overflow:hidden"></div></div>' +
-              '<div style="flex:none;max-width:100%"><div style="font:600 10px/1 \'JetBrains Mono\',monospace;letter-spacing:.08em;text-transform:uppercase;color:#8a8473;margin-bottom:5px">Heller Grund (PDF)</div>' +
-                '<div id="rp-b-logo-box-hell" style="width:248px;max-width:100%;min-height:100px;box-sizing:border-box;padding:0 14px;border:1px dashed #ddd6c8;border-radius:8px;background:#ffffff;display:flex;align-items:center;justify-content:flex-start;overflow:hidden"></div></div>' +
-            '</div>' +
-            '<div id="rp-b-logo-txt" style="font:400 11.5px Inter;color:#8a8473;line-height:1.5;margin-bottom:6px"></div>' +
-            '<div id="rp-b-logo-ampel" style="font:400 11.5px/1.55 Inter;color:#6b6558;margin-bottom:9px"></div>' +
-            '<input type="file" id="rp-b-logo" accept="image/*" style="font:400 12px Inter;max-width:100%">' +
-            '<button class="rp-act remove" id="rp-b-logo-x" type="button" style="margin-left:8px">entfernen</button>' +
-            /* v3630 · Darstellung auf dunklem Grund */
-            '<div class="rp-fl" style="margin-top:14px">Darstellung auf dunklem Grund</div>' +
-            '<div style="font:400 11.5px Inter;color:#8a8473;margin-bottom:7px">Gilt für Menüleiste, Mail-Kopf und dunkle PDF-Deckblätter. Der Rahmen nimmt deine Akzentfarbe.</div>' +
-            '<div id="rp-b-darst" role="radiogroup" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px"></div>' +
-            /* v3630 · Logogroesse */
-            '<div class="rp-fl" style="margin-top:14px">Logogröße in der Menüleiste <b id="rp-b-gr-wert" style="color:#3a352c">' + (_brandState.groesse) + ' %</b></div>' +
-            '<input type="range" id="rp-b-gr" min="60" max="160" step="5" value="' + (_brandState.groesse) + '" style="width:100%;max-width:420px;accent-color:var(--wl-c9a84c, #C9A84C)">' +
-            '<div style="font:400 11.5px/1.5 Inter;color:#8a8473;margin-top:3px">Ein breites Logo füllt die Leiste schon bei 100 % in der Breite aus; größer wird dann nur noch, was in die Breite passt.</div>' +
-            '<div class="rp-fl" style="margin-top:12px">Logo für dunklen Grund (optional, hat dort Vorrang)</div>' +
-            '<div style="font:400 11.5px Inter;color:#8a8473;margin-bottom:6px">Für Menüleiste, Mail-Kopf und dunkle PDF-Deckblätter. Ohne eigenes Bild wird das Logo dort automatisch hell eingefärbt oder auf eine Platte gesetzt, wenn der Kontrast unter 3 : 1 liegt.</div>' +
-            '<input type="file" id="rp-b-logo-dark" accept="image/*" style="font:400 12px Inter">' +
-            '<button class="rp-act remove" id="rp-b-logo-dark-x" type="button" style="margin-left:8px">entfernen</button></div>' +
+            '<span>Eigene Marke statt DealPilot zeigen</span></label>' +
+          '<div style="margin-top:14px;max-width:420px"><div class="rp-fl">Name der Marke oder Kanzlei</div><input id="rp-b-name" value="' + esc(b.brand_name || '') + '" style="' + inp + '"></div>' +
         '</div>' +
-        /* W1b-contact-ui: Kontaktdaten fuer den PDF-Footer der Mandanten.
-           Ohne die faellt config.js auf JUNKER_DEFAULTS zurueck. */
-        '<p class="rp-label" style="margin-top:22px">Impressum / PDF-Footer</p>' +
-        '<p class="rp-intro" style="margin-top:4px">Diese Angaben stehen im Fuß jedes PDFs, das deine Mandanten erzeugen. Leer gelassene Felder bleiben leer — es wird nichts von DealPilot eingesetzt.</p>' +
+        /* ── 2 · Logo ── */
+        abschnitt('Logo', 'Lade dein Logo hoch. Ein einfarbiger Rand wird dabei abgeschnitten und durchsichtig, weiße Flächen im Logo bleiben.') +
         '<div class="rp-panel">' +
-          '<div style="display:flex;gap:12px">' +
-            '<div style="flex:2"><div class="rp-fl">Firma (rechtlich, falls abweichend)</div><input id="rp-b-company" value="' + esc(b.brand_company || '') + '" placeholder="' + esc(b.brand_name || 'Kanzlei Muster GmbH') + '" style="' + inp + '"></div>' +
-            '<div style="flex:2"><div class="rp-fl">Claim / Untertitel</div><input id="rp-b-tagline" value="' + esc(b.brand_tagline || '') + '" placeholder="Ihre Kanzlei für Immobilien" style="' + inp + '"></div>' +
+          '<div id="rp-b-logo-prev" style="display:flex;flex-wrap:wrap;align-items:flex-start;gap:12px;margin-bottom:9px">' +
+            '<div style="flex:none;max-width:100%"><div style="' + mini + '">Menüleiste</div>' +
+              '<div id="rp-b-logo-box" style="width:248px;max-width:100%;min-height:100px;box-sizing:border-box;padding:0 14px;border:1px dashed #ddd6c8;border-radius:8px;background:#0e0d0b;display:flex;align-items:center;justify-content:flex-start;overflow:hidden"></div></div>' +
+            '<div style="flex:none;max-width:100%"><div style="' + mini + '">Heller Grund</div>' +
+              '<div id="rp-b-logo-box-hell" style="width:248px;max-width:100%;min-height:100px;box-sizing:border-box;padding:0 14px;border:1px dashed #ddd6c8;border-radius:8px;background:#ffffff;display:flex;align-items:center;justify-content:flex-start;overflow:hidden"></div></div>' +
           '</div>' +
-          '<div style="display:flex;gap:12px;margin-top:12px">' +
-            '<div style="flex:3"><div class="rp-fl">Straße &amp; Hausnummer</div><input id="rp-b-address" value="' + esc(b.brand_address || '') + '" style="' + inp + '"></div>' +
-            '<div style="width:96px"><div class="rp-fl">PLZ</div><input id="rp-b-plz" value="' + esc(b.brand_plz || '') + '" style="' + inp + '"></div>' +
-            '<div style="flex:2"><div class="rp-fl">Ort</div><input id="rp-b-city" value="' + esc(b.brand_city || '') + '" style="' + inp + '"></div>' +
+          '<div id="rp-b-logo-txt" style="font:400 11.5px Inter;color:#8a8473;line-height:1.5;margin-bottom:6px"></div>' +
+          '<div id="rp-b-logo-ampel" style="font:400 11.5px/1.55 Inter;color:#6b6558;margin-bottom:9px"></div>' +
+          '<input type="file" id="rp-b-logo" accept="image/*" style="font:400 12px Inter;max-width:100%">' +
+          '<button class="rp-act remove" id="rp-b-logo-x" type="button" style="margin-left:8px">Logo entfernen</button>' +
+          '<div class="rp-fl" style="margin-top:16px">Logo auf dunklem Grund</div>' +
+          '<div style="font:400 11.5px Inter;color:#8a8473;margin-bottom:7px">So steht dein Logo in der Menüleiste, im Kopf der Mails und auf dunklen PDF-Deckblättern. Der Rahmen nimmt deine Akzentfarbe.</div>' +
+          '<div id="rp-b-darst" role="radiogroup" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px"></div>' +
+          '<div class="rp-fl" style="margin-top:16px">Größe in der Menüleiste <b id="rp-b-gr-wert" style="color:#3a352c">' + _brandState.groesse + ' %</b></div>' +
+          '<input type="range" id="rp-b-gr" min="60" max="160" step="5" value="' + _brandState.groesse + '" style="width:100%;max-width:420px;accent-color:var(--wl-c9a84c, #C9A84C)">' +
+          '<div style="font:400 11.5px/1.5 Inter;color:#8a8473;margin-top:3px">Ein breites Logo füllt die Leiste schon bei 100 % aus. Größer wird es dann nur noch in der Höhe, soweit die Breite reicht.</div>' +
+          '<details style="margin-top:14px"><summary style="cursor:pointer;font:600 12.5px Inter;color:#3a352c">Eigenes Logo für dunklen Grund (selten nötig)</summary>' +
+            '<div style="font:400 11.5px Inter;color:#8a8473;margin:7px 0">Hast du eine helle Fassung deines Logos, lade sie hier hoch. Sie steht dann überall auf dunklem Grund.</div>' +
+            '<input type="file" id="rp-b-logo-dark" accept="image/*" style="font:400 12px Inter;max-width:100%">' +
+            '<button class="rp-act remove" id="rp-b-logo-dark-x" type="button" style="margin-left:8px">entfernen</button></details>' +
+        '</div>' +
+        /* ── 3 · Farben ── */
+        abschnitt('Farben', 'Jede Farbe siehst du sofort in der App. Gefällt sie nicht, setzt Zurücksetzen den gespeicherten Stand zurück.') +
+        '<div class="rp-panel">' +
+          '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px">' +
+            farbe('rp-b-accent', 'Akzentfarbe', accent, 'Knöpfe, Linien, Werte und der Logorahmen') +
+            farbe('rp-b-obsidian', 'Menü und Kopfleiste', obsidian, 'die dunkle Fläche links und oben') +
+            farbe('rp-b-mail', 'Farbe der Mails', mailAcc, 'Knopf und Linie in Einladungs-Mails') +
           '</div>' +
-          '<div style="display:flex;gap:12px;margin-top:12px">' +
-            '<div style="flex:1"><div class="rp-fl">Telefon</div><input id="rp-b-phone" value="' + esc(b.brand_phone || '') + '" style="' + inp + '"></div>' +
-            '<div style="flex:1"><div class="rp-fl">E-Mail</div><input id="rp-b-email" type="email" value="' + esc(b.brand_email || '') + '" style="' + inp + '"></div>' +
-            '<div style="flex:1"><div class="rp-fl">Website</div><input id="rp-b-website" value="' + esc(b.brand_website || '') + '" style="' + inp + '"></div>' +
+          '<div class="rp-fl" style="margin-top:12px">Schnell wählen</div>' +
+          '<div id="rp-b-pre" style="display:flex;flex-wrap:wrap;gap:6px">' +
+            [['#b33d29', '#141210', 'Kanzlei-Rot'], ['#1d5fa8', '#0b1018', 'Makler-Blau'], ['#2c7a5b', '#0a1210', 'Finanz-Grün'], ['#5b4a8a', '#0f0c16', 'Violett']].map(function (p) {
+              return '<button type="button" data-p="' + p[0] + '|' + p[1] + '" style="display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border:1px solid #e6e0d4;border-radius:999px;background:#fff;cursor:pointer;font:500 12px Inter;color:#3a352c">' +
+                '<i style="width:12px;height:12px;border-radius:50%;background:' + p[0] + ';display:inline-block"></i>' + p[2] + '</button>';
+            }).join('') +
+          '</div>' +
+        '</div>' +
+        /* ── 4 · Dokumente ── */
+        abschnitt('Dokumente', 'So erscheint deine Marke in den PDFs deiner Kunden. Die Vorschau zeigt Deckblatt und Seitenkopf.') +
+        '<div class="rp-panel">' +
+          '<input type="hidden" id="rp-b-pdflight" value="' + (b.brand_pdf_light ? '1' : '0') + '">' +
+          '<div class="rp-fl">Deckblatt</div>' +
+          '<div id="rp-b-pdfart" style="display:inline-flex;border:1px solid #e6e0d4;border-radius:9px;overflow:hidden;margin-bottom:12px">' +
+            '<button type="button" data-hell="0" style="padding:7px 14px;border:0;cursor:pointer;font:600 12px Inter">Dunkel</button>' +
+            '<button type="button" data-hell="1" style="padding:7px 14px;border:0;cursor:pointer;font:600 12px Inter">Hell</button></div>' +
+          '<div class="rp-fl">Logogröße in den Dokumenten <b id="rp-b-pdfgr-wert" style="color:#3a352c">' + _brandState.pdfGroesse + ' %</b></div>' +
+          '<input type="range" id="rp-b-pdfgr" min="60" max="150" step="5" value="' + _brandState.pdfGroesse + '" style="width:100%;max-width:420px;accent-color:var(--wl-c9a84c, #C9A84C)">' +
+          '<div style="font:400 11.5px/1.5 Inter;color:#8a8473;margin:3px 0 10px">Größer geht nur, solange das Logo nicht in Text oder Linien läuft. Steht es an dieser Grenze, wächst es nicht weiter.</div>' +
+          '<div id="rp-b-pdfprev" style="display:flex;flex-wrap:wrap;gap:12px"></div>' +
+          '<div class="rp-fl" style="margin-top:16px">Absender im Fuß jedes PDFs</div>' +
+          '<div style="font:400 11.5px Inter;color:#8a8473;margin-bottom:8px">Leere Felder bleiben leer. DealPilot setzt nichts ein.</div>' +
+          '<div style="display:flex;flex-wrap:wrap;gap:12px">' +
+            '<div style="flex:2 1 200px"><div class="rp-fl">Firma (falls anders als die Marke)</div><input id="rp-b-company" value="' + esc(b.brand_company || '') + '" placeholder="' + esc(b.brand_name || 'Kanzlei Muster GmbH') + '" style="' + inp + '"></div>' +
+            '<div style="flex:2 1 200px"><div class="rp-fl">Untertitel</div><input id="rp-b-tagline" value="' + esc(b.brand_tagline || '') + '" placeholder="Ihre Kanzlei für Immobilien" style="' + inp + '"></div>' +
+          '</div>' +
+          '<div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:12px">' +
+            '<div style="flex:3 1 200px"><div class="rp-fl">Straße und Hausnummer</div><input id="rp-b-address" value="' + esc(b.brand_address || '') + '" style="' + inp + '"></div>' +
+            '<div style="flex:0 1 96px"><div class="rp-fl">PLZ</div><input id="rp-b-plz" value="' + esc(b.brand_plz || '') + '" style="' + inp + '"></div>' +
+            '<div style="flex:2 1 140px"><div class="rp-fl">Ort</div><input id="rp-b-city" value="' + esc(b.brand_city || '') + '" style="' + inp + '"></div>' +
+          '</div>' +
+          '<div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:12px">' +
+            '<div style="flex:1 1 150px"><div class="rp-fl">Telefon</div><input id="rp-b-phone" value="' + esc(b.brand_phone || '') + '" style="' + inp + '"></div>' +
+            '<div style="flex:1 1 150px"><div class="rp-fl">E-Mail</div><input id="rp-b-email" type="email" value="' + esc(b.brand_email || '') + '" style="' + inp + '"></div>' +
+            '<div style="flex:1 1 150px"><div class="rp-fl">Website</div><input id="rp-b-website" value="' + esc(b.brand_website || '') + '" style="' + inp + '"></div>' +
           '</div>' +
           '<div id="rp-b-foot" style="margin-top:14px;padding:11px 13px;background:#faf8f3;border:1px dashed #ddd6c8;border-radius:8px;font:400 11.5px/1.6 Inter;color:#6b6558"></div>' +
+          '<div class="rp-fl" style="margin-top:16px">Einladungs-Mail</div><div id="rp-b-preview"></div>' +
         '</div>' +
-        '<p class="rp-label" style="margin-top:22px">Vorschau (Einladungs-Mail)</p><div id="rp-b-preview"></div>' +
-        /* W6-preview: Der Owner sieht sein eigenes Whitelabel sonst NIE — /my-branding
-           liefert nur fuer reseller_clients etwas. Ohne das muesste er sich als Mandant
-           einloggen, um sein eigenes Branding zu pruefen.
-           v3301: das gilt nicht mehr - /my-branding liefert die Marke jetzt auch dem
-           Partner selbst (rolle 'partner', Marcel 11.11.2026). Der Haken bleibt nur
-           fuer Admins mit Test-Reseller; beim Partner steht stattdessen ein Hinweis. */
-        (_partnerSiehtMarke()
-          ? '<div class="rp-panel" style="margin-top:18px;font-size:13px;line-height:1.55">' +
-              '<b>Deine App zeigt deine Marke.</b> Sobald Whitelabel aktiv ist, siehst du Logo, Farben, ' +
-              'PDFs, Quick-Check und Marktbericht genauso wie deine Mandanten — auch, wenn du den ' +
-              'Bildschirm zum Kunden drehst.</div>'
-          : '') +
+        /* W6-preview / v3301: Haken nur fuer Admins mit Test-Reseller */
         '<div class="rp-panel" style="margin-top:18px' + (_partnerSiehtMarke() ? ';display:none' : '') + '">' +
           '<label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:13.5px">' +
             '<input type="checkbox" id="rp-b-prev" style="width:18px;height:18px;accent-color:var(--gold,#C9A84C)">' +
-            '<span><b>Ansicht meiner Mandanten</b> — die App in meinem Branding anzeigen</span></label>' +
+            '<span><b>Ansicht meiner Kunden</b>. Die App in meiner Marke anzeigen</span></label>' +
           '<div style="font-size:11.5px;color:#8a8473;margin-top:7px;padding-left:28px">Nur für dich, nur in diesem Browser. Zum Zurücksetzen Haken entfernen.</div>' +
         '</div>' +
-        '<div style="margin-top:18px"><button class="rp-checkout" id="rp-b-save">Branding speichern</button></div>';
+        '<div style="position:sticky;bottom:0;z-index:2;display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:18px;padding:12px 0;background:linear-gradient(transparent,#fbf8f1 30%)">' +
+          '<button class="rp-checkout" id="rp-b-save">Speichern</button>' +
+          '<button type="button" id="rp-b-reset" style="padding:10px 16px;border:1px solid #e6e0d4;border-radius:9px;background:#fff;cursor:pointer;font:600 13px Inter;color:#3a352c">Zurücksetzen</button>' +
+          '<span id="rp-b-stand" style="font:400 12px Inter;color:#8a8473"></span></div>';
       var upd = function () { _brandPreview(); _logoPrev(); try { if (_previewOn()) _applyPreview(); } catch (e) {} };  /*W7-livepreview W22-logoprev*/
       $('rp-b-wl').addEventListener('change', upd);
       $('rp-b-name').addEventListener('input', upd);
-      /* W8-editor: die Farb-Inputs sind jetzt hidden -> kein 'input'-Event. */
-      $('rp-b-disp').addEventListener('click', function () {
-        if (!window.DealPilotBrandingEditor) { toast('Editor konnte nicht geladen werden'); return; }
-        window.DealPilotBrandingEditor.open({
-          accent: _v('rp-b-accent'), obsidian: _v('rp-b-obsidian'), mail: _v('rp-b-mail'),
-          name: _v('rp-b-name') || 'Deine Kanzlei', logo: _currentLogo(),
-          pdfLight: _v('rp-b-pdflight') === '1'   /*W12-portallight*/
-        }, function (res) {
-          if (!res) return;
-          $('rp-b-accent').value = res.accent;
-          $('rp-b-obsidian').value = res.obsidian;
-          $('rp-b-mail').value = res.mail;
-          $('rp-b-pdflight').value = res.pdfLight ? '1' : '0';
-          var dot = $('rp-b-dot'); if (dot) dot.style.background = res.accent;
-          upd();
-          toast('Übernommen — jetzt noch „Branding speichern"');
-        });
+      /* v3630b · Farben direkt hier, live in der App (vorher Fenster DealPilotBrandingEditor) */
+      ['rp-b-accent', 'rp-b-obsidian', 'rp-b-mail'].forEach(function (id) {
+        $(id).addEventListener('input', function () { _brandState.vari = null; _brandState.dvari = null; _standZeigen(); upd(); _pdfPrev(); });
+      });
+      $('rp-b-pre').addEventListener('click', function (e) {
+        var bt = e.target && e.target.closest ? e.target.closest('[data-p]') : null; if (!bt) return;
+        var p = bt.getAttribute('data-p').split('|');
+        $('rp-b-accent').value = p[0]; $('rp-b-obsidian').value = p[1]; $('rp-b-mail').value = p[0];
+        _brandState.vari = null; _brandState.dvari = null; _standZeigen(); upd(); _pdfPrev();
+      });
+      $('rp-b-pdfart').addEventListener('click', function (e) {
+        var bt = e.target && e.target.closest ? e.target.closest('[data-hell]') : null; if (!bt) return;
+        $('rp-b-pdflight').value = bt.getAttribute('data-hell'); _standZeigen(); _pdfPrev();
+      });
+      $('rp-b-pdfgr').addEventListener('input', function () {
+        _brandState.pdfGroesse = parseInt(this.value, 10) || 100;
+        var x = $('rp-b-pdfgr-wert'); if (x) x.textContent = _brandState.pdfGroesse + ' %';
+        _standZeigen(); _pdfPrev();
+      });
+      $('rp-b-reset').addEventListener('click', function () {
+        var g = _brandState.gespeichert || {};
+        $('rp-b-accent').value = g.accent; $('rp-b-obsidian').value = g.obsidian; $('rp-b-mail').value = g.mail;
+        $('rp-b-pdflight').value = g.pdflight ? '1' : '0';
+        _brandState.darstellung = g.darstellung || 'auto';
+        _brandState.groesse = g.groesse || 100; $('rp-b-gr').value = _brandState.groesse; $('rp-b-gr-wert').textContent = _brandState.groesse + ' %';
+        _brandState.pdfGroesse = g.pdfGroesse || 100; $('rp-b-pdfgr').value = _brandState.pdfGroesse; $('rp-b-pdfgr-wert').textContent = _brandState.pdfGroesse + ' %';
+        _brandState.logo = undefined; _brandState.logoDark = undefined; _brandState.vari = null; _brandState.dvari = null;
+        try { if (window.DealPilotWhitelabel && DealPilotWhitelabel.logoGroesse) DealPilotWhitelabel.logoGroesse(_brandState.groesse); } catch (e2) {}
+        upd(); _pdfPrev(); _standZeigen();
+        toast('Gespeicherter Stand wiederhergestellt');
       });
       $('rp-b-logo').addEventListener('change', function (e) { _brandLogoPick(e, upd); });
       $('rp-b-logo-x').addEventListener('click', function () { _brandState.logo = ''; var f = $('rp-b-logo'); if (f) f.value = ''; upd(); });
@@ -1056,6 +1090,19 @@ if (!window._pdfGold) {
       })();
       $('rp-b-save').addEventListener('click', saveBranding);
       _brandPreview(); _logoPrev();   /*W22-logoprev*/
+      _pdfPrev(); _standZeigen();     /* v3630b */
+      /* v3630b · Marcel: Reihenfolge Marke · Logo · Farben · Dokumente · Plaetze/Abo.
+         Die Karten baut partner-kunden.js verwaltungZeichnen() (Plaetze, Abrechnung,
+         Marke). Die Datei bearbeitete am 17.11. parallel ein anderer Strang, deshalb
+         wird hier nur die Marken-Karte nach vorn gestellt. Gehoert bei naechster
+         Gelegenheit in verwaltungZeichnen() selbst. */
+      try {
+        var karte = w.closest ? w.closest('.pk-marke') : null;
+        if (karte && karte.parentElement && karte.parentElement.firstElementChild !== karte) {
+          karte.parentElement.insertBefore(karte, karte.parentElement.firstElementChild);
+        }
+        var kh = karte && karte.querySelector('h3'); if (kh) kh.style.display = 'none';   /* eigene Abschnittsueberschriften */
+      } catch (e7) {}
     } catch (e) { w.innerHTML = '<p class="rp-ph">Branding konnte nicht geladen werden.</p>'; }
   }
   /* W22-logoprev · v3630: Vorschau in Groesse der echten Menueleiste, Auswahl der Darstellung */
@@ -1075,6 +1122,55 @@ if (!window._pdfGold) {
       box.style.minHeight = Math.max(100, Math.round(60 * s + 30)) + 'px';
     });
   }
+  /* v3630b · Stand: was ist geaendert und noch nicht gespeichert */
+  function _standZeigen() {
+    var el = $('rp-b-stand'); if (!el) return;
+    var g = _brandState.gespeichert || {}, an = [];
+    if (_brandState.logo !== undefined || _brandState.logoDark !== undefined) an.push('Logo');
+    if (_v('rp-b-accent') !== g.accent || _v('rp-b-obsidian') !== g.obsidian || _v('rp-b-mail') !== g.mail) an.push('Farben');
+    if (_brandState.darstellung !== g.darstellung || _brandState.groesse !== g.groesse) an.push('Logo in der App');
+    if ((_v('rp-b-pdflight') === '1') !== !!g.pdflight || _brandState.pdfGroesse !== g.pdfGroesse) an.push('Dokumente');
+    el.innerHTML = an.length ? 'Geändert: ' + an.join(', ') + '. <b style="color:#3a352c">Noch nicht gespeichert.</b>' : 'Alles gespeichert.';
+  }
+  /* v3630b · Vorschau der Dokumente in echten Massen (1 mm = 1,15 px): Deckblatt
+     (Logo ab 14 mm, Goldlinie bei 56 mm, Rahmen 76 x 36 mm, Grenze 120 x 40) und
+     Seitenkopf (Balken 22 mm, Logo ab 15/3 mm, Rahmen 50 x 17 mm, Grenze 65 x 18).
+     Die Rahmen rechnet DealPilotPdfLogo.box - dieselbe Funktion wie pdf.js. */
+  function _pdfPrev() {
+    var host = $('rp-b-pdfprev'); if (!host) return;
+    var k = 1.15, hell = _v('rp-b-pdflight') === '1', s = (_brandState.pdfGroesse || 100) / 100;
+    var acc = _v('rp-b-accent') || '', L = window.DealPilotPdfLogo;
+    var box = function (b, h, gb, gh) { return (L && L.box) ? L.box(b, h, gb, gh, s) : { b: b, h: h }; };
+    var v = _brandState.vari && _brandState.vari.v;
+    var logo = _currentLogo() ? (v ? (hell ? v.auf_hell : v.auf_dunkel) : _currentLogo()) : '';
+    var grund = hell ? '#ffffff' : '#2A2727', schrift = hell ? '#2A2727' : '#ffffff';
+    var cb = box(76, 36, 120, 40), kb = box(50, 17, 65, 18);
+    var bild = function (bb, stil) {
+      return logo ? '<img src="' + esc(logo) + '" alt="" style="position:absolute;' + stil + ';max-width:' + (bb.b * k).toFixed(1) + 'px;max-height:' + (bb.h * k).toFixed(1) + 'px">'
+                  : '<span style="position:absolute;' + stil + ';font:700 12px Inter;color:' + (hell ? '#2A2727' : '#fff') + '">' + esc(_v('rp-b-name') || 'Deine Marke') + '</span>';
+    };
+    var seite = 'position:relative;width:' + Math.round(210 * k) + 'px;max-width:100%;overflow:hidden;border:1px solid #e6e0d4;border-radius:6px;box-shadow:0 2px 8px rgba(0,0,0,.06)';
+    host.innerHTML =
+      '<div style="flex:none;max-width:100%"><div style="font:600 10px/1 \'JetBrains Mono\',monospace;letter-spacing:.08em;text-transform:uppercase;color:#8a8473;margin-bottom:5px">Deckblatt</div>' +
+        '<div style="' + seite + ';height:' + Math.round(70 * k) + 'px;background:' + grund + '">' +
+          '<div style="position:absolute;left:0;right:0;top:' + (14 * k).toFixed(1) + 'px;height:' + (40 * k).toFixed(1) + 'px;display:flex;justify-content:center;align-items:flex-start">' +
+            '<div style="position:relative;width:' + (cb.b * k).toFixed(1) + 'px;height:' + (cb.h * k).toFixed(1) + 'px;display:flex;justify-content:center">' + bild(cb, 'top:0') + '</div></div>' +
+          '<div style="position:absolute;left:0;right:0;top:' + (56 * k).toFixed(1) + 'px;height:1px;background:' + esc(acc || '#888') + '"></div>' +
+          '<div style="position:absolute;left:0;right:0;top:' + (61 * k).toFixed(1) + 'px;text-align:center;font:700 8px Inter;letter-spacing:.3em;color:' + esc(acc || '#888') + '">INVESTMENT CASE</div>' +
+        '</div></div>' +
+      '<div style="flex:none;max-width:100%"><div style="font:600 10px/1 \'JetBrains Mono\',monospace;letter-spacing:.08em;text-transform:uppercase;color:#8a8473;margin-bottom:5px">Seitenkopf</div>' +
+        '<div style="' + seite + ';height:' + Math.round(34 * k) + 'px;background:#fff">' +
+          '<div style="position:absolute;left:0;right:0;top:0;height:' + (22 * k).toFixed(1) + 'px;background:' + (hell ? '#F4F1EA' : '#2A2727') + '">' +
+            bild(kb, 'left:' + (15 * k).toFixed(1) + 'px;top:' + (3 * k).toFixed(1) + 'px') +
+            '<span style="position:absolute;left:50%;transform:translateX(-50%);top:' + (11 * k).toFixed(1) + 'px;font:700 8px Inter;color:' + schrift + '">OBJEKT</span></div>' +
+          '<div style="position:absolute;left:0;right:0;top:' + (22 * k).toFixed(1) + 'px;height:1px;background:' + esc(acc || '#888') + '"></div>' +
+        '</div></div>';
+    /* Knopf Dunkel/Hell markieren */
+    [].forEach.call(document.querySelectorAll('#rp-b-pdfart [data-hell]'), function (bt) {
+      var an = bt.getAttribute('data-hell') === (hell ? '1' : '0');
+      bt.style.background = an ? '#2a2727' : '#fff'; bt.style.color = an ? '#fff' : '#3a352c';
+    });
+  }
   function _logoPrev() {
     var box = $('rp-b-logo-box'), txt = $('rp-b-logo-txt'); if (!box) return;
     var boxH = $('rp-b-logo-box-hell'), amp = $('rp-b-logo-ampel'), wahl = $('rp-b-darst');
@@ -1092,6 +1188,7 @@ if (!window._pdfGold) {
         box.innerHTML = bild(v.auf_dunkel);
         if (boxH) boxH.innerHTML = bild(v.auf_hell);
         _logoPrevGroesse();
+        try { _pdfPrev(); } catch (e6) {}   /* v3630b · Dokumente zeigen dieselbe Variante */
         if (!amp) return;
         var ART = { 'unveraendert': 'unverändert', 'weiss': 'weiß eingefärbt', 'dunkel': 'dunkel eingefärbt',
                     'platte-hell': 'auf heller Platte', 'platte-dunkel': 'auf dunkler Platte', 'eigenes Logo': 'eigenes Logo für dunklen Grund',
@@ -1138,12 +1235,12 @@ if (!window._pdfGold) {
           zt = ' Zugeschnitten: ' + z.info.vorher[0] + ' × ' + z.info.vorher[1] + ' → ' + z.info.nachher[0] + ' × ' + z.info.nachher[1] + ' px' +
             (z.info.randFarbe ? ', Rand rgb(' + z.info.randFarbe.join(', ') + ') transparent gemacht.' : ', Rand war schon transparent.');
         }
+        /* v3630b · ohne Gedankenstrich, der Stand steht unten neben Speichern */
         txt.innerHTML = (_brandState.logo !== undefined
-          ? '<b style="color:#3FA56C">Neu gewählt</b> — noch nicht gespeichert.' + esc(zt)
-          : 'Gespeichert. Neue Datei wählen ersetzt es.') +
-          ((_brandState.darstellung !== _brandState.darstellung_gespeichert || _brandState.groesse !== _brandState.groesse_gespeichert)
-            ? ' <b style="color:#3FA56C">Darstellung geändert</b> — noch nicht gespeichert.' : '');
+          ? '<b style="color:#3FA56C">Neues Logo.</b> Noch nicht gespeichert.' + esc(zt)
+          : 'Dein gespeichertes Logo. Eine neue Datei ersetzt es.');
       }
+      try { _standZeigen(); } catch (e5) {}
     } else {
       box.innerHTML = '<span style="font:400 10px Inter;color:#6f6a60">kein Logo</span>';
       if (boxH) boxH.innerHTML = '';
@@ -1174,7 +1271,8 @@ if (!window._pdfGold) {
     var host = $('rp-b-preview'); if (!host) return;
     var wl = $('rp-b-wl') && $('rp-b-wl').checked;
     var name = ($('rp-b-name') || {}).value || 'Deine Kanzlei';
-    var accent = ($('rp-b-accent') || {}).value || '#C9A84C';
+    /* v3630b · die Mail nimmt die Mail-Farbe (brand_mail_accent), nicht den App-Akzent */
+    var accent = ($('rp-b-mail') || {}).value || ($('rp-b-accent') || {}).value || '#C9A84C';
     var obsidian = ($('rp-b-obsidian') || {}).value || '#0b0b0a';
     var logo = _currentLogo();
     /* v3299 · im Mail-Kopf (dunkel) steht die Variante fuer dunklen Grund */
@@ -1257,6 +1355,7 @@ if (!window._pdfGold) {
     if (_brandState.logoDark !== undefined) body.brand_logo_dark_b64 = _brandState.logoDark;   /* v3299 */
     body.brand_logo_darstellung = _brandState.darstellung || 'auto';   /* v3630 */
     body.brand_logo_groesse = _brandState.groesse || 100;              /* v3630 */
+    body.brand_logo_pdf_groesse = _brandState.pdfGroesse || 100;       /* v3630b */
     /* v3299 · Logo-Kontrast: Varianten je Grund mitschicken (PNG, auch fuer SVG-Logos) */
     try {
       if (_currentLogo()) {
@@ -1284,6 +1383,19 @@ if (!window._pdfGold) {
       if (_brandState.logo !== undefined) { _brandState.current_logo = _brandState.logo; _brandState.logo = undefined; }
       if (_brandState.logoDark !== undefined) { _brandState.current_logo_dark = _brandState.logoDark; _brandState.logoDark = undefined; }   /* v3299 */
       _brandState.darstellung_gespeichert = _brandState.darstellung; _brandState.groesse_gespeichert = _brandState.groesse;   /* v3630 */
+      /* v3630b · gespeicherter Stand fuer Zuruecksetzen, und sofort in den Markensatz (PDFs) */
+      _brandState.gespeichert = { accent: _v('rp-b-accent'), obsidian: _v('rp-b-obsidian'), mail: _v('rp-b-mail'),
+        pdflight: _v('rp-b-pdflight') === '1', darstellung: _brandState.darstellung, groesse: _brandState.groesse, pdfGroesse: _brandState.pdfGroesse };
+      try {
+        if (window.DealPilotMandantBranding && DealPilotMandantBranding.merke) {
+          var mf = { brand_logo_pdf_groesse: _brandState.pdfGroesse, brand_pdf_light: _v('rp-b-pdflight') === '1',
+                     brand_logo_groesse: _brandState.groesse, brand_logo_darstellung: _brandState.darstellung,
+                     brand_accent: body.brand_accent, brand_obsidian: body.brand_obsidian, brand_mail_accent: _v('rp-b-mail') };
+          if (body.brand_logo_b64 !== undefined) mf.brand_logo_b64 = body.brand_logo_b64 || null;
+          if (body.brand_logo_varianten) { mf.brand_logo_auf_dunkel = body.brand_logo_varianten.auf_dunkel; mf.brand_logo_auf_hell = body.brand_logo_varianten.auf_hell; }
+          DealPilotMandantBranding.merke(mf);
+        }
+      } catch (e8) {}
       try { _logoPrev(); } catch (e4) {}
     } catch (e) { toast(e && e.status === 413 ? 'Logo zu groß (max ~300 KB)' : 'Speichern fehlgeschlagen'); }
   }

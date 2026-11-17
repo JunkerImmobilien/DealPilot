@@ -28,7 +28,7 @@ const BRANDING_SPALTEN = `rs.whitelabel_enabled, rs.brand_name, rs.brand_logo_b6
               rs.brand_phone, rs.brand_email, rs.brand_website, rs.brand_tagline,
               rs.brand_pdf_light, rs.brand_display,
               rs.brand_logo_dark_b64, rs.brand_logo_auf_dunkel, rs.brand_logo_auf_hell,
-              rs.brand_logo_darstellung, rs.brand_logo_groesse`;   /* v3630 */
+              rs.brand_logo_darstellung, rs.brand_logo_groesse, rs.brand_logo_pdf_groesse`;   /* v3630 */
 router.get('/my-branding', authenticate, async (req, res, next) => {
   try {
     const { query } = require('../db/pool');
