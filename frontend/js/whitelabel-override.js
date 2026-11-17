@@ -384,7 +384,11 @@
     /* v3299 · schon gesetzte Logos auf die passende Variante nachziehen
        (die Varianten koennen spaeter kommen als das erste Fegen). */
     try {
-      Array.prototype.forEach.call((root || document).querySelectorAll('img[data-wl-logo="1"]'), function (img) {
+      /* v3630f · auch das Logo im Markenfeld der Schiene: layout-varianten.js baut es
+         selbst als <img class="dpl-logo"> aus branding.get().logo_b64_dunkel, OHNE
+         data-wl-logo. Gemessen: ein Wechsel der Darstellung im Portal kam in der
+         Vorschau an, in der Menueleiste aber erst nach dem Neuladen. */
+      Array.prototype.forEach.call((root || document).querySelectorAll('img[data-wl-logo="1"], .dpl-marke img.dpl-logo'), function (img) {
         var soll = _logoFuer(img.parentElement || img);
         if (soll && img.getAttribute('src') !== soll) img.setAttribute('src', soll);
       });

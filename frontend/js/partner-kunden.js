@@ -587,6 +587,8 @@
     var s = document.createElement('style'); s.id = 'dppk-verw-stil';
     s.textContent = [
       /* Speicher-Leiste fest unten im Arbeitsbereich, fuer alle Reiter */
+      /* gemessen 390 px: .rnd-wiz-modal und .pk-box tragen overflow:hidden - daran haengt sticky fest, die Leiste stand bei y 924 von 844 */
+      '#dppk-hub-verwaltung .rnd-wiz-modal,#dppk-ab .pk-box:has(#dppk-hub-verwaltung),#dppk-ov .pk-box:has(#dppk-hub-verwaltung){overflow:visible !important}',
       '#dppk-hub-verwaltung .rnd-hub-nav{position:sticky;bottom:0;z-index:5;background:#fff;flex-wrap:wrap;gap:8px;box-shadow:0 -6px 14px rgba(0,0,0,.05)}',
       '#dppk-hub-verwaltung .dppk-verw-leiste{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-left:auto;margin-right:8px}',
       '#dppk-hub-verwaltung .dppk-verw-leiste .rp-checkout{padding:9px 18px}',
