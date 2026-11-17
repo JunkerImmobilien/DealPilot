@@ -523,16 +523,78 @@
 
   /* ── Verwaltung (v3392): Plaetze, Marke, Abrechnung - eigene Oberflaeche, Logik aus reseller-portal.js ── */
   var VERW = { iv: 'monthly', qty: 5 };
+  /* v3630f · Marcel 17.11.2026: „Kann man das besser sortieren und angeben unter Verwaltung?"
+     Reiter im Stil des RND-Rechners (hubAufbauen, inline, wie Mein Partner): Marke · Logo ·
+     Farben · Dokumente · Plaetze & Abo. Die Marken-Teile baut reseller-portal.js loadBranding()
+     in Huellen [data-marke-teil]; hier werden sie in ihre Reiter gehaengt, die Speicher-Leiste
+     (Speichern, Zuruecksetzen, Stand) kommt fest in den Fuss und gilt fuer alle Reiter. */
+  var VERW_REITER = [
+    ['marke', 'Marke', 'Schalter und Name deiner Marke'],
+    ['logo', 'Logo', 'Logo, Darstellung auf dunklem Grund, Größe und Ausrichtung'],
+    ['farben', 'Farben', 'Akzent, Menüfläche und Mails'],
+    ['dokumente', 'Dokumente', 'Deckblatt, Logo in PDFs, Absender, Mail'],
+    ['plaetze', 'Plätze & Abo', 'Plätze für Kunden und Abrechnung']
+  ];
   function verwaltungZeichnen(el) {
     var rp = window.DealPilotResellerPortal;
     if (!rp || typeof rp.markeZeichnen !== 'function') { el.innerHTML = '<div class="pk-leer">Die Verwaltung ist gerade nicht geladen. Bitte die Seite neu laden.</div>'; return; }
-    el.innerHTML = '<div class="pk-spalten">' +
-      '<div class="pk-karte" data-v="plaetze"><h3>Plätze</h3><div class="pk-leer">Lädt …</div></div>' +
-      '<div class="pk-karte" data-v="abo"><h3>Abrechnung</h3><div class="pk-leer">Lädt …</div></div></div>' +
-      '<div class="pk-karte pk-marke" data-v="marke"><h3>Marke</h3><div class="pk-marke-form"><div class="pk-leer">Lädt …</div></div></div>';
-    plaetzeZeichnen(el.querySelector('[data-v="plaetze"]'));
-    aboZeichnen(el.querySelector('[data-v="abo"]'));
-    try { rp.markeZeichnen(el.querySelector('.pk-marke-form')); } catch (e) { el.querySelector('.pk-marke-form').innerHTML = '<div class="pk-leer">' + esc(fehlerText(e)) + '</div>'; }
+    var reiter = VERW_REITER.map(function (r) {
+      var html = r[0] === 'plaetze'
+        ? '<div class="pk-spalten">' +
+            '<div class="pk-karte" data-v="plaetze"><h3>Plätze</h3><div class="pk-leer">Lädt …</div></div>' +
+            '<div class="pk-karte" data-v="abo"><h3>Abrechnung</h3><div class="pk-leer">Lädt …</div></div></div>'
+        : '<div class="pk-marke" data-v-ziel="' + r[0] + '"><div class="pk-leer">Lädt …</div></div>';
+      return { kurz: r[1], titel: r[2], html: html };
+    });
+    var box = hubAufbauen({ id: 'dppk-hub-verwaltung', titel: 'Verwaltung', sub: 'Deine Marke, Dokumente und Plätze', reiter: reiter, knoepfe: [], inline: el, start: PK.verwReiter || 0 });
+    /* gewaehlten Reiter merken, damit ein Neuzeichnen (z. B. nach dem Speichern) dort bleibt */
+    [].forEach.call(box.querySelectorAll('[data-hub-schritte], [data-hub-zurueck], [data-hub-weiter]'), function (x) {
+      x.addEventListener('click', function () { setTimeout(function () {
+        var akt = box.querySelector('.rnd-hub-schritt.active'); if (!akt) return;
+        PK.verwReiter = [].indexOf.call(akt.parentElement.children, akt);
+      }, 0); });
+    });
+    verwStil();
+    plaetzeZeichnen(box.querySelector('[data-v="plaetze"]'));
+    aboZeichnen(box.querySelector('[data-v="abo"]'));
+    var lager = document.createElement('div'); lager.className = 'pk-marke'; lager.hidden = true; box.appendChild(lager);
+    var verteilen = function () {
+      VERW_REITER.forEach(function (r) {
+        var ziel = box.querySelector('[data-v-ziel="' + r[0] + '"]'), teil = lager.querySelector('[data-marke-teil="' + r[0] + '"]');
+        if (ziel && teil) { ziel.innerHTML = ''; ziel.appendChild(teil); }
+      });
+      var leiste = lager.querySelector('[data-marke-teil="leiste"]'), fuss = box.querySelector('.rnd-hub-nav');
+      if (leiste && fuss) {
+        leiste.removeAttribute('style');
+        leiste.className = 'pk-marke dppk-verw-leiste';
+        fuss.insertBefore(leiste, fuss.querySelector('[data-hub-weiter]'));
+      }
+      if (!lager.querySelector('[data-marke-teil]') && lager.textContent.trim()) {
+        /* loadBranding meldete einen Fehler statt der Teile */
+        var z = box.querySelector('[data-v-ziel="marke"]'); if (z) { z.innerHTML = ''; z.appendChild(lager); lager.hidden = false; }
+      }
+    };
+    try {
+      Promise.resolve(rp.markeZeichnen(lager)).then(verteilen, function (e) {
+        var z = box.querySelector('[data-v-ziel="marke"]'); if (z) z.innerHTML = '<div class="pk-leer">' + esc(fehlerText(e)) + '</div>';
+      });
+    } catch (e) {
+      var z = box.querySelector('[data-v-ziel="marke"]'); if (z) z.innerHTML = '<div class="pk-leer">' + esc(fehlerText(e)) + '</div>';
+    }
+  }
+  function verwStil() {
+    if (document.getElementById('dppk-verw-stil')) return;
+    var s = document.createElement('style'); s.id = 'dppk-verw-stil';
+    s.textContent = [
+      /* Speicher-Leiste fest unten im Arbeitsbereich, fuer alle Reiter */
+      '#dppk-hub-verwaltung .rnd-hub-nav{position:sticky;bottom:0;z-index:5;background:#fff;flex-wrap:wrap;gap:8px;box-shadow:0 -6px 14px rgba(0,0,0,.05)}',
+      '#dppk-hub-verwaltung .dppk-verw-leiste{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-left:auto;margin-right:8px}',
+      '#dppk-hub-verwaltung .dppk-verw-leiste .rp-checkout{padding:9px 18px}',
+      '#dppk-hub-verwaltung .dppk-verw-leiste #rp-b-reset{padding:9px 14px !important}',
+      '#dppk-hub-verwaltung [data-v-ziel] > [data-marke-teil] > div:first-child{margin-top:0 !important}',
+      '@media (max-width:640px){#dppk-hub-verwaltung .rnd-wiz-counter{display:none}#dppk-hub-verwaltung .dppk-verw-leiste{order:-1;width:100%;margin:0}#dppk-hub-verwaltung #rp-b-stand{flex:1 1 100%}}'
+    ].join('');
+    document.head.appendChild(s);
   }
   /* v3500 · Übergeben: Oberfläche und Logik aus reseller-portal.js (loadUebergaben/uebSenden/uebVorpruefung, v3317), hier nur das Ziel */
   function uebergebenZeichnen(el) {

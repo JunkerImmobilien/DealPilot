@@ -506,6 +506,7 @@
         .forEach(function (v) { r.removeProperty(v); });
       document.documentElement.removeAttribute('data-wl-logo-skala');   /* v3630 */
       document.documentElement.removeAttribute('data-wl-logo-mitte');   /* v3630e */
+      document.documentElement.removeAttribute('data-wl-logo-gross');   /* v3630f */
       clearWlTokens(r);
     } catch (e) {}
     /* Marker loeschen, damit der naechste Sweep dieselben Knoten wieder anfasst */
@@ -630,9 +631,11 @@
      hinauswaechst. 100 % = kein Attribut = Auslieferungszustand. */
   function _setzeLogoGroesse(p) {
     var n = parseInt(p, 10), r = document.documentElement;
-    if (!isFinite(n) || n === 100) { r.removeAttribute('data-wl-logo-skala'); r.style.removeProperty('--wl-logo-skala'); return; }
-    n = Math.max(60, Math.min(160, n));
+    if (!isFinite(n) || n === 100) { r.removeAttribute('data-wl-logo-skala'); r.removeAttribute('data-wl-logo-gross'); r.style.removeProperty('--wl-logo-skala'); return; }
+    n = Math.max(60, Math.min(250, n));   /* v3630f · bis 250 % (Migration 116) */
     r.setAttribute('data-wl-logo-skala', String(n));
+    /* v3630f · ueber 160 % darf das Logo die volle Breite des Markenfelds nutzen */
+    if (n > 160) r.setAttribute('data-wl-logo-gross', '1'); else r.removeAttribute('data-wl-logo-gross');
     r.style.setProperty('--wl-logo-skala', String(n / 100));
   }
   /* v3630e · Ausrichtung des Logos in der Menueleiste: 'links' (kein Attribut) | 'mitte'.

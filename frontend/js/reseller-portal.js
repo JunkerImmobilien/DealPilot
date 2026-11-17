@@ -973,17 +973,29 @@ if (!window._pdfGold) {
       };
       var mini = 'font:600 10px/1 \'JetBrains Mono\',monospace;letter-spacing:.08em;text-transform:uppercase;color:#8a8473;margin-bottom:5px';
       w.innerHTML =
+        /* v3630f · jeder Abschnitt in einer eigenen Huelle (data-marke-teil): das
+           Partner-Cockpit verteilt sie auf Reiter (partner-kunden.js verwaltungZeichnen) */
+        '<div data-marke-teil="marke">' +
         '<p class="rp-intro">Deine Marke sehen deine Kunden in der App, in den Einladungs-Mails und in jedem PDF. Was du hier änderst, siehst du sofort in der App. Dauerhaft wird es mit Speichern.</p>' +
         /* ── 1 · Marke ── */
-        abschnitt('Marke', 'Schalte deine Marke ein und gib ihr einen Namen.') +
+        abschnitt('Marke', 'Wirkt auf die ganze App deiner Kunden, auf Mails und PDFs. Schalte deine Marke ein und gib ihr einen Namen.') +
         '<div class="rp-panel">' +
           '<label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:13.5px">' +
             '<input type="checkbox" id="rp-b-wl"' + (b.whitelabel_enabled ? ' checked' : '') + ' style="width:18px;height:18px;accent-color:var(--wl-c9a84c, #C9A84C)">' +
             '<span>Eigene Marke statt DealPilot zeigen</span></label>' +
           '<div style="margin-top:14px;max-width:420px"><div class="rp-fl">Name der Marke oder Kanzlei</div><input id="rp-b-name" value="' + esc(b.brand_name || '') + '" style="' + inp + '"></div>' +
         '</div>' +
+        /* W6-preview / v3301: Haken nur fuer Admins mit Test-Reseller */
+        '<div class="rp-panel" style="margin-top:18px' + (_partnerSiehtMarke() ? ';display:none' : '') + '">' +
+          '<label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:13.5px">' +
+            '<input type="checkbox" id="rp-b-prev" style="width:18px;height:18px;accent-color:var(--gold,#C9A84C)">' +
+            '<span><b>Ansicht meiner Kunden</b>. Die App in meiner Marke anzeigen</span></label>' +
+          '<div style="font-size:11.5px;color:#8a8473;margin-top:7px;padding-left:28px">Nur für dich, nur in diesem Browser. Zum Zurücksetzen Haken entfernen.</div>' +
+        '</div>' +
+        '</div>' +
         /* ── 2 · Logo ── */
-        abschnitt('Logo', 'Lade dein Logo hoch. Ein einfarbiger Rand wird dabei abgeschnitten und durchsichtig, weiße Flächen im Logo bleiben.') +
+        '<div data-marke-teil="logo">' +
+        abschnitt('Logo', 'Wirkt auf die Menüleiste oben links, den Kopf der Mails und die PDFs. Ein einfarbiger Rand wird beim Hochladen abgeschnitten und durchsichtig.') +
         '<div class="rp-panel">' +
           '<div id="rp-b-logo-prev" style="display:flex;flex-wrap:wrap;align-items:flex-start;gap:12px;margin-bottom:9px">' +
             '<div style="flex:none;max-width:100%"><div style="' + mini + '">Menüleiste</div>' +
@@ -996,24 +1008,26 @@ if (!window._pdfGold) {
           '<input type="file" id="rp-b-logo" accept="image/*" style="font:400 12px Inter;max-width:100%">' +
           '<button class="rp-act remove" id="rp-b-logo-x" type="button" style="margin-left:8px">Logo entfernen</button>' +
           '<div class="rp-fl" style="margin-top:16px">Logo auf dunklem Grund' + stdKnopf('darst') + '</div>' +
-          '<div style="font:400 11.5px Inter;color:#8a8473;margin-bottom:7px">So steht dein Logo in der Menüleiste, im Kopf der Mails und auf dunklen PDF-Deckblättern. Der Rahmen nimmt deine Akzentfarbe.</div>' +
+          '<div style="font:400 11.5px Inter;color:#8a8473;margin-bottom:7px">Wirkt auf die Menüleiste, den Kopf der Mails und dunkle PDF-Deckblätter. Der Rahmen nimmt deine Akzentfarbe.</div>' +
           '<div id="rp-b-darst" role="radiogroup" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px"></div>' +
           '<div class="rp-fl" style="margin-top:16px">Größe in der Menüleiste <b id="rp-b-gr-wert" style="color:#3a352c">' + _brandState.groesse + ' %</b>' + stdKnopf('gr') + '</div>' +
-          '<input type="range" id="rp-b-gr" min="60" max="160" step="5" value="' + _brandState.groesse + '" style="width:100%;max-width:420px;accent-color:var(--wl-c9a84c, #C9A84C)">' +
-          '<div style="font:400 11.5px/1.5 Inter;color:#8a8473;margin-top:3px">Ein breites Logo füllt die Leiste schon bei 100 % aus. Größer wird es dann nur noch in der Höhe, soweit die Breite reicht.</div>' +
+          '<input type="range" id="rp-b-gr" min="60" max="250" step="5" value="' + _brandState.groesse + '" style="width:100%;max-width:420px;accent-color:var(--wl-c9a84c, #C9A84C)">' +
+          '<div style="font:400 11.5px/1.5 Inter;color:#8a8473;margin-top:3px">Wirkt auf die Menüleiste oben links, am Handy in der Schublade. Ab 165 % nutzt das Logo die volle Breite der Leiste, darüber wächst es nur noch in der Höhe bis 150 px.</div>' +
           /* v3630e · Ausrichtung in der Menueleiste (Marcel 17.11.2026) */
           '<div class="rp-fl" style="margin-top:16px">Ausrichtung in der Menüleiste' + stdKnopf('aus') + '</div>' +
           '<div id="rp-b-aus" style="display:inline-flex;border:1px solid #e6e0d4;border-radius:9px;overflow:hidden">' +
             '<button type="button" data-aus="links" style="padding:7px 14px;border:0;cursor:pointer;font:600 12px Inter">Links (Standard)</button>' +
             '<button type="button" data-aus="mitte" style="padding:7px 14px;border:0;cursor:pointer;font:600 12px Inter">Mittig</button></div>' +
-          '<div style="font:400 11.5px/1.5 Inter;color:#8a8473;margin-top:3px">Gilt für die Menüleiste. Auf dem Deckblatt und im Mail-Kopf steht das Logo ohnehin mittig. Im Seitenkopf der PDFs bleibt es links, weil dort mittig der Seitentitel steht.</div>' +
+          '<div style="font:400 11.5px/1.5 Inter;color:#8a8473;margin-top:3px">Wirkt auf die Menüleiste. Auf dem Deckblatt und im Mail-Kopf steht das Logo ohnehin mittig. Im Seitenkopf der PDFs bleibt es links, weil dort mittig der Seitentitel steht.</div>' +
           '<details style="margin-top:14px"><summary style="cursor:pointer;font:600 12.5px Inter;color:#3a352c">Eigenes Logo für dunklen Grund (selten nötig)</summary>' +
             '<div style="font:400 11.5px Inter;color:#8a8473;margin:7px 0">Hast du eine helle Fassung deines Logos, lade sie hier hoch. Sie steht dann überall auf dunklem Grund.</div>' +
             '<input type="file" id="rp-b-logo-dark" accept="image/*" style="font:400 12px Inter;max-width:100%">' +
             '<button class="rp-act remove" id="rp-b-logo-dark-x" type="button" style="margin-left:8px">entfernen</button></details>' +
         '</div>' +
+        '</div>' +
         /* ── 3 · Farben ── */
-        abschnitt('Farben', 'Jede Farbe siehst du sofort in der App. Gefällt sie nicht, setzt Zurücksetzen den gespeicherten Stand zurück.') +
+        '<div data-marke-teil="farben">' +
+        abschnitt('Farben', 'Wirkt auf Knöpfe, Linien und Werte in der App, auf den Logorahmen und die Mails. Jede Farbe siehst du sofort in der App.') +
         '<div class="rp-panel">' +
           '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px">' +
             farbe('rp-b-accent', 'Akzentfarbe', accent, 'Knöpfe, Linien, Werte und der Logorahmen') +
@@ -1038,20 +1052,22 @@ if (!window._pdfGold) {
             }).join('') +
           '</div>' +
         '</div>' +
+        '</div>' +
         /* ── 4 · Dokumente ── */
-        abschnitt('Dokumente', 'So erscheint deine Marke in den PDFs deiner Kunden. Die Vorschau zeigt Deckblatt und Seitenkopf.') +
+        '<div data-marke-teil="dokumente">' +
+        abschnitt('Dokumente', 'Wirkt auf jedes PDF deiner Kunden und auf die Einladungs-Mail. Die Vorschau zeigt Deckblatt und Seitenkopf.') +
         '<div class="rp-panel">' +
           '<input type="hidden" id="rp-b-pdflight" value="' + (b.brand_pdf_light ? '1' : '0') + '">' +
-          '<div class="rp-fl">Deckblatt</div>' +
+          '<div class="rp-fl">Deckblatt</div><div style="font:400 11.5px Inter;color:#8a8473;margin-bottom:6px">Wirkt auf das Deckblatt und die Seitenköpfe aller PDFs.</div>' +
           '<div id="rp-b-pdfart" style="display:inline-flex;border:1px solid #e6e0d4;border-radius:9px;overflow:hidden;margin-bottom:12px">' +
             '<button type="button" data-hell="0" style="padding:7px 14px;border:0;cursor:pointer;font:600 12px Inter">Dunkel (Standard)</button>' +
             '<button type="button" data-hell="1" style="padding:7px 14px;border:0;cursor:pointer;font:600 12px Inter">Hell</button></div>' +
           '<div class="rp-fl">Logogröße in den Dokumenten <b id="rp-b-pdfgr-wert" style="color:#3a352c">' + _brandState.pdfGroesse + ' %</b>' + stdKnopf('pdfgr') + '</div>' +
           '<input type="range" id="rp-b-pdfgr" min="60" max="150" step="5" value="' + _brandState.pdfGroesse + '" style="width:100%;max-width:420px;accent-color:var(--wl-c9a84c, #C9A84C)">' +
-          '<div style="font:400 11.5px/1.5 Inter;color:#8a8473;margin:3px 0 10px">Größer geht nur, solange das Logo nicht in Text oder Linien läuft. Steht es an dieser Grenze, wächst es nicht weiter.</div>' +
+          '<div style="font:400 11.5px/1.5 Inter;color:#8a8473;margin:3px 0 10px">Wirkt auf Deckblatt und Seitenkopf. Größer geht nur, solange das Logo nicht in Text oder Linien läuft. Steht es an dieser Grenze, wächst es nicht weiter.</div>' +
           '<div id="rp-b-pdfprev" style="display:flex;flex-wrap:wrap;gap:12px"></div>' +
           '<div class="rp-fl" style="margin-top:16px">Absender im Fuß jedes PDFs</div>' +
-          '<div style="font:400 11.5px Inter;color:#8a8473;margin-bottom:8px">Leere Felder bleiben leer. DealPilot setzt nichts ein.</div>' +
+          '<div style="font:400 11.5px Inter;color:#8a8473;margin-bottom:8px">Wirkt auf den Fuß jedes PDFs. Leere Felder bleiben leer, DealPilot setzt nichts ein.</div>' +
           '<div style="display:flex;flex-wrap:wrap;gap:12px">' +
             '<div style="flex:2 1 200px"><div class="rp-fl">Firma (falls anders als die Marke)</div><input id="rp-b-company" value="' + esc(b.brand_company || '') + '" placeholder="' + esc(b.brand_name || 'Kanzlei Muster GmbH') + '" style="' + inp + '"></div>' +
             '<div style="flex:2 1 200px"><div class="rp-fl">Untertitel</div><input id="rp-b-tagline" value="' + esc(b.brand_tagline || '') + '" placeholder="Ihre Kanzlei für Immobilien" style="' + inp + '"></div>' +
@@ -1069,14 +1085,8 @@ if (!window._pdfGold) {
           '<div id="rp-b-foot" style="margin-top:14px;padding:11px 13px;background:#faf8f3;border:1px dashed #ddd6c8;border-radius:8px;font:400 11.5px/1.6 Inter;color:#6b6558"></div>' +
           '<div class="rp-fl" style="margin-top:16px">Einladungs-Mail</div><div id="rp-b-preview"></div>' +
         '</div>' +
-        /* W6-preview / v3301: Haken nur fuer Admins mit Test-Reseller */
-        '<div class="rp-panel" style="margin-top:18px' + (_partnerSiehtMarke() ? ';display:none' : '') + '">' +
-          '<label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:13.5px">' +
-            '<input type="checkbox" id="rp-b-prev" style="width:18px;height:18px;accent-color:var(--gold,#C9A84C)">' +
-            '<span><b>Ansicht meiner Kunden</b>. Die App in meiner Marke anzeigen</span></label>' +
-          '<div style="font-size:11.5px;color:#8a8473;margin-top:7px;padding-left:28px">Nur für dich, nur in diesem Browser. Zum Zurücksetzen Haken entfernen.</div>' +
         '</div>' +
-        '<div style="position:sticky;bottom:0;z-index:2;display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:18px;padding:12px 0;background:linear-gradient(transparent,#fbf8f1 30%)">' +
+        '<div data-marke-teil="leiste" style="position:sticky;bottom:0;z-index:2;display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:18px;padding:12px 0;background:linear-gradient(transparent,#fbf8f1 30%)">' +
           '<button class="rp-checkout" id="rp-b-save">Speichern</button>' +
           '<button type="button" id="rp-b-reset" style="padding:10px 16px;border:1px solid #e6e0d4;border-radius:9px;background:#fff;cursor:pointer;font:600 13px Inter;color:#3a352c">Zurücksetzen</button>' +
           '<span id="rp-b-stand" style="font:400 12px Inter;color:#8a8473"></span></div>';
@@ -1171,18 +1181,7 @@ if (!window._pdfGold) {
       _brandPreview(); _logoPrev();   /*W22-logoprev*/
       _pdfPrev(); _standZeigen();     /* v3630b */
       _wahlMarkieren();               /* v3630e */
-      /* v3630b · Marcel: Reihenfolge Marke · Logo · Farben · Dokumente · Plaetze/Abo.
-         Die Karten baut partner-kunden.js verwaltungZeichnen() (Plaetze, Abrechnung,
-         Marke). Die Datei bearbeitete am 17.11. parallel ein anderer Strang, deshalb
-         wird hier nur die Marken-Karte nach vorn gestellt. Gehoert bei naechster
-         Gelegenheit in verwaltungZeichnen() selbst. */
-      try {
-        var karte = w.closest ? w.closest('.pk-marke') : null;
-        if (karte && karte.parentElement && karte.parentElement.firstElementChild !== karte) {
-          karte.parentElement.insertBefore(karte, karte.parentElement.firstElementChild);
-        }
-        var kh = karte && karte.querySelector('h3'); if (kh) kh.style.display = 'none';   /* eigene Abschnittsueberschriften */
-      } catch (e7) {}
+      /* v3630f · Reihenfolge und Reiter baut jetzt partner-kunden.js verwaltungZeichnen() (data-marke-teil) */
     } catch (e) { w.innerHTML = '<p class="rp-ph">Branding konnte nicht geladen werden.</p>'; }
   }
   /* W22-logoprev · v3630: Vorschau in Groesse der echten Menueleiste, Auswahl der Darstellung */
@@ -1198,7 +1197,9 @@ if (!window._pdfGold) {
       var box = $(id); if (!box) return;
       var img = box.querySelector('img'); if (!img) return;
       img.style.maxHeight = Math.round(60 * s) + 'px';
-      img.style.maxWidth = Math.round(Math.min(216 * s, 216)) + 'px';
+      var gross = s > 1.6;   /* v3630f · wie layout-varianten.css: ueber 160 % volle Innenbreite (231 px, Rand 8 px) */
+      box.style.paddingLeft = box.style.paddingRight = gross ? '8px' : '14px';
+      img.style.maxWidth = gross ? '100%' : Math.round(Math.min(216 * s, 216)) + 'px';
       box.style.minHeight = Math.max(100, Math.round(60 * s + 30)) + 'px';
       box.style.justifyContent = _brandState.ausrichtung === 'mitte' ? 'center' : 'flex-start';   /* v3630e */
     });

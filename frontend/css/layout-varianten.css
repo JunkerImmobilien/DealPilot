@@ -9665,3 +9665,24 @@ html[data-dp-layout][data-wl-logo-mitte] .dpl-schiene .dpl-marke{
 html[data-dp-layout][data-dp-layout][data-wl-logo-mitte] body aside.sidebar#sidebar .dpl-marke-handy{
   justify-content:center !important;
 }
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   v3630f · LOGO BIS 250 % UND VOLLE BREITE (Marcel 17.11.2026: „passend breiter
+   machen ... oder noch groesser")
+   Gemessen an seinem Logo (958 x 589, Verhaeltnis 1,6) bei 160 %: 138 x 96 px im
+   Markenfeld 247 x 126, padding 0 14px. Ueber 160 % setzt whitelabel-override.js
+   data-wl-logo-gross: das Markenfeld nimmt nur noch 8 px Rand und das Logo darf
+   die volle Innenbreite (231 px) nutzen. Die Hoehe waechst bis 60 x 2,5 = 150 px,
+   das Markenfeld waechst mit (Regel v3630: 60 px x Faktor + 30 px).
+   ══════════════════════════════════════════════════════════════════════════════ */
+html[data-dp-layout][data-wl-logo-gross] .dpl-schiene .dpl-marke{
+  padding-left:8px !important; padding-right:8px !important;
+}
+html[data-dp-layout][data-wl-logo-gross] .dpl-schiene .dpl-logo{
+  max-width:100% !important;
+}
+@media (max-width: 900px){
+  html[data-dp-layout][data-dp-layout][data-wl-logo-gross] body aside.sidebar#sidebar .dpl-marke-handy{
+    padding-left:8px !important; padding-right:8px !important;
+  }
+}

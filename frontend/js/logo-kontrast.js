@@ -41,7 +41,23 @@
   var PLATTE_HELL = [255, 255, 255];
   var PLATTE_DUNKEL = [10, 10, 12];
   var TINTE_DUNKEL = [20, 20, 22];
-  var ZIEL_H = 240;            /* Rasterhoehe der Varianten in px (PDF 36 mm ~ 170 dpi) */
+  /* v3630f · 240 -> 400: Marcels Logo (958 x 589) wurde auf 390 x 240 gerechnet,
+     in der Menueleiste stehen bei voller Breite 216 x 133 px, am Retina-Schirm
+     also 266 Bildpunkte Hoehe - mehr als 240, das Bild wurde hochgezogen. */
+  var ZIEL_H = 400;            /* Rasterhoehe der Varianten in px */
+  var MAX_ZEICHEN = 560000;    /* Backend nimmt je Variante hoechstens 600.000 Zeichen */
+  /* PNG als Data-URL, notfalls verkleinert, bis es ins Backend passt. */
+  function png(c) {
+    var u = c.toDataURL('image/png'), f = 1;
+    while (u.length > MAX_ZEICHEN && f > 0.3) {
+      f *= 0.8;
+      var o = document.createElement('canvas');
+      o.width = Math.max(1, Math.round(c.width * f)); o.height = Math.max(1, Math.round(c.height * f));
+      var x = o.getContext('2d'); x.imageSmoothingQuality = 'high'; x.drawImage(c, 0, 0, o.width, o.height);
+      u = o.toDataURL('image/png');
+    }
+    return u;
+  }
 
   function lum(c) {
     function f(x) { x /= 255; return x <= 0.03928 ? x / 12.92 : Math.pow((x + 0.055) / 1.055, 2.4); }
@@ -99,10 +115,24 @@
     var ix = Math.round(c.width * 0.06), iy = Math.round(c.height * 0.12);
     var ecken = [[ix, iy], [c.width - 1 - ix, iy], [ix, c.height - 1 - iy], [c.width - 1 - ix, c.height - 1 - iy]]
       .filter(function (q) { return d[(q[1] * c.width + q[0]) * 4 + 3] > 200; }).length;
+    /* v3630f · transparenter Grund? (Ecken durchsichtig) */
+    var tr = [[0, 0], [c.width - 1, 0], [0, c.height - 1], [c.width - 1, c.height - 1]]
+      .filter(function (q) { return d[(q[1] * c.width + q[0]) * 4 + 3] < 16; }).length;
     return {
       mittel: mt.map(Math.round), streuung: Math.round(st * 10) / 10,
-      eigeneFlaeche: ecken >= 3, deckend: Math.round(n / (c.width * c.height) * 100) / 100
+      eigeneFlaeche: ecken >= 3, deckend: Math.round(n / (c.width * c.height) * 100) / 100,
+      transparent: tr >= 3, _px: px
     };
+  }
+  /* v3630f · Anteil der Logopunkte, die gegen ALLE Gruende 3 : 1 erreichen.
+     Der Mittelwert allein taeuscht: Marcels Logo (Gold + Dunkelgrau) hatte im
+     Mittel 3,9 : 1 auf Obsidian - die dunkelgrauen Daecher und die Unterzeile
+     (#4a4a4a, 2,1 : 1) gingen trotzdem unter, und "Automatisch" liess es so. */
+  function anteilLesbar(px, gruende) {
+    if (!px || !px.length) return 1;
+    var gut = 0;
+    px.forEach(function (p) { if (Math.min.apply(null, gruende.map(function (g) { return kontrast(p, g); })) >= MINDEST) gut++; });
+    return gut / px.length;
   }
 
   /* Entscheidung fuer einen Satz Gruende (der schlechteste zaehlt). */
@@ -110,7 +140,13 @@
     var hell = lum(gruende[0]) > 0.5;
     var k = Math.min.apply(null, gruende.map(function (g) { return kontrast(m.mittel, g); }));
     if (m.eigeneFlaeche) return { art: 'unveraendert', k: null, k_nachher: null, k_mittel: rund(k), grund: 'eigene Flaeche' };   /* der Mittelwert misst hier die Flaeche, nicht das Zeichen */
-    if (k >= MINDEST) return { art: 'unveraendert', k: rund(k), k_nachher: rund(k), grund: 'Kontrast reicht' };
+    var al = anteilLesbar(m._px, gruende);
+    if (k >= MINDEST && (hell || al >= 0.9)) return { art: 'unveraendert', k: rund(k), k_nachher: rund(k), anteil_lesbar: rund(al), grund: 'Kontrast reicht' };
+    /* v3630f · mehrfarbig auf dunklem Grund: erst die helle Fassung ohne Flaeche
+       (dunkle neutrale Teile hell, Farbe bleibt), nur wenn die nicht reicht die Platte */
+    if (!hell && m.streuung >= 45 && m._hellAnteil != null && m._hellAnteil >= 0.9) {
+      return { art: 'hell-gedreht', k: rund(k), k_nachher: null, anteil_lesbar: rund(al), anteil_nachher: rund(m._hellAnteil), grund: 'mehrfarbig, dunkle Teile hell gedreht' };
+    }
     if (m.streuung < 45) {
       var tinte = hell ? TINTE_DUNKEL : [255, 255, 255];
       var kn = Math.min.apply(null, gruende.map(function (g) { return kontrast(tinte, g); }));
@@ -122,6 +158,7 @@
   }
 
   function variante(c, e) {
+    if (e.art === 'hell-gedreht') return png(hellFassung(c).c);   /* v3630f */
     var o = document.createElement('canvas');
     if (e.art === 'platte-hell' || e.art === 'platte-dunkel') {
       var pad = Math.round(c.height * 0.18), rad = Math.round(c.height * 0.14);
@@ -133,7 +170,7 @@
       if (x.roundRect) x.roundRect(0, 0, o.width, o.height, rad); else x.rect(0, 0, o.width, o.height);
       x.fill();
       x.drawImage(c, pad, pad);
-      return o.toDataURL('image/png');
+      return png(o);
     }
     o.width = c.width; o.height = c.height;
     var y = o.getContext('2d');
@@ -144,7 +181,7 @@
       for (var i = 0; i < d.length; i += 4) { d[i] = t[0]; d[i + 1] = t[1]; d[i + 2] = t[2]; }
       y.putImageData(id, 0, 0);
     }
-    return o.toDataURL('image/png');
+    return png(o);
   }
 
   /* ── v3630 · Darstellung auf dunklem Grund, vom Partner gewaehlt ─────────
@@ -163,7 +200,10 @@
                     Logos hell gedreht, Farbiges bleibt. Wird nur angeboten,
                     wenn danach >= 90 % der Logo-Pixel 3 : 1 gegen die dunkle
                     Innenflaeche erreichen (sonst ok:false). */
-  var DARSTELLUNGEN = ['auto', 'weiss', 'gold', 'gold-dunkel'];
+  /* v3630f · 'hell' = hell eingefaerbt, ohne Flaeche (Marcel 17.11.2026: "eine echte
+     helle Fassung des Logos fuer dunklen Grund ohne Kasten"). Nur angeboten, wenn
+     danach >= 90 % der Logopunkte 3 : 1 auf allen dunklen Gruenden erreichen. */
+  var DARSTELLUNGEN = ['auto', 'hell', 'weiss', 'gold', 'gold-dunkel'];
   var INNEN_DUNKEL = [11, 11, 10];
   function hexRgb(h) {
     var m = /^#?([0-9a-f]{6})$/i.exec(String(h || ''));
@@ -191,6 +231,68 @@
     x.drawImage(c, pad, pad);
     return o;
   }
+  /* v3630f · WEISSE INNENFLAECHEN. Gemessen an Marcels Upload (958 x 589, Grund
+     transparent): die Innenraeume von O, D, B, R, P, & und der Punkt im A sind
+     DECKEND WEISS - Reste eines Freistellers. Auf Weiss unsichtbar, auf dunklem
+     Grund stehen weisse Kleckse in jedem Buchstaben. Das war "die dunkle Version
+     wird nicht richtig erstellt": die Kontrastlogik zaehlte Weiss auf Dunkel
+     sogar als gut lesbar.
+     Regel: nur fuer Fassungen OHNE helle Flaeche dahinter. Zusammenhaengende
+     fast weisse Flaechen (alle Kanaele >= 225, kaum Farbe), die NICHT an den
+     transparenten Grund grenzen, werden herausgerechnet (Farbe zu Alpha gegen
+     Weiss, wie beim Zuschnitt - kein Saum). Weisse Schrift, die frei auf dem
+     transparenten Grund steht, grenzt an ihn und bleibt. */
+  function innenWeissWeg(c) {
+    var W = c.width, H = c.height;
+    var o = document.createElement('canvas'); o.width = W; o.height = H;
+    var x = o.getContext('2d'); x.drawImage(c, 0, 0);
+    var id = x.getImageData(0, 0, W, H), d = id.data, n = W * H;
+    var weiss = new Uint8Array(n), komp = new Int32Array(n), q = new Int32Array(n), weg = 0;
+    for (var i = 0; i < n; i++) {
+      var p = i * 4, r = d[p], g = d[p + 1], b = d[p + 2];
+      if (d[p + 3] >= 200 && r >= 225 && g >= 225 && b >= 225 && Math.max(r, g, b) - Math.min(r, g, b) < 24) weiss[i] = 1;
+    }
+    var nr = 0;
+    for (var s0 = 0; s0 < n; s0++) {
+      if (!weiss[s0] || komp[s0]) continue;
+      nr++; var kopf = 0, fuss = 0, randOffen = false; komp[s0] = nr; q[fuss++] = s0;
+      while (kopf < fuss) {
+        var j = q[kopf++], px = j % W, py = (j - px) / W;
+        var nb = [px > 0 ? j - 1 : -1, px < W - 1 ? j + 1 : -1, py > 0 ? j - W : -1, py < H - 1 ? j + W : -1];
+        if (px === 0 || py === 0 || px === W - 1 || py === H - 1) randOffen = true;
+        for (var t = 0; t < 4; t++) {
+          var k = nb[t]; if (k < 0) continue;
+          if (d[k * 4 + 3] < 16) randOffen = true;
+          if (weiss[k] && !komp[k]) { komp[k] = nr; q[fuss++] = k; }
+        }
+      }
+      if (randOffen) continue;
+      /* Komponente samt 1-px-Kantensaum herausrechnen */
+      for (var z = 0; z < fuss; z++) {
+        var m0 = q[z];
+        [m0, m0 - 1, m0 + 1, m0 - W, m0 + W].forEach(function (k2) {
+          if (k2 < 0 || k2 >= n) return;
+          var p2 = k2 * 4;
+          if (d[p2 + 3] === 0) return;
+          var a = Math.max(255 - d[p2], 255 - d[p2 + 1], 255 - d[p2 + 2]) / 255;
+          if (a < 0.06) { d[p2 + 3] = 0; return; }
+          if (!weiss[k2] && a > 0.5) return;   /* echter Logopunkt am Rand: bleibt */
+          for (var c3 = 0; c3 < 3; c3++) d[p2 + c3] = Math.max(0, Math.min(255, Math.round(255 + (d[p2 + c3] - 255) / a)));
+          d[p2 + 3] = Math.round(d[p2 + 3] * a);
+        });
+        weg++;
+      }
+    }
+    x.putImageData(id, 0, 0);
+    return { c: o, weg: weg };
+  }
+  /* Helle Fassung fuer dunklen Grund: Innenweiss weg, dann dunkle neutrale Teile hell. */
+  function hellFassung(c) {
+    var w0 = innenWeissWeg(c);
+    var h = hellGedreht(w0.c, GRUENDE_DUNKEL);
+    h.innenWeiss = w0.weg;
+    return h;
+  }
   /* Neutrale, dunkle Pixel hell drehen (Helligkeit gespiegelt), farbige
      bleiben. Liefert die Kopie und den Anteil lesbarer Pixel. */
   function hellGedreht(c, grund) {
@@ -205,19 +307,28 @@
         var l = (mx + mn) / 2;
         if (l < 150) { var ziel = 255 - l; var dl = ziel - l; d[i] = Math.min(255, r + dl); d[i + 1] = Math.min(255, g + dl); d[i + 2] = Math.min(255, b + dl); }
       }
-      if (d[i + 3] >= 128) { n++; if (kontrast([d[i], d[i + 1], d[i + 2]], grund) >= MINDEST) gut++; }
+      if (d[i + 3] >= 128) {
+        n++;
+        var gl = (grund && grund[0] && grund[0].length) ? grund : [grund];   /* v3630f · ein Grund oder eine Liste */
+        if (Math.min.apply(null, gl.map(function (gg) { return kontrast([d[i], d[i + 1], d[i + 2]], gg); })) >= MINDEST) gut++;
+      }
     }
     x.putImageData(id, 0, 0);
     return { c: o, anteil: n ? gut / n : 0 };
   }
   function nachDarstellung(c, art, akzent, eAuto) {
-    if (art === 'weiss') return { src: kasten(c, PLATTE_HELL, null).toDataURL('image/png'), ok: true,
+    if (art === 'hell') {   /* v3630f */
+      var hf = hellFassung(c);
+      return { src: png(hf.c), ok: hf.anteil >= 0.9, anteil: Math.round(hf.anteil * 100) / 100,
+        e: { art: 'hell-gedreht', k: null, k_nachher: null, anteil_lesbar: Math.round(hf.anteil * 100) / 100, innen_weiss_px: hf.innenWeiss, grund: 'Darstellung: hell eingefaerbt, ohne Flaeche' } };
+    }
+    if (art === 'weiss') return { src: png(kasten(c, PLATTE_HELL, null)), ok: true,
       e: { art: 'platte-hell', k: null, k_nachher: rund(kontrast(vermessen(c).mittel, PLATTE_HELL)), grund: 'Darstellung: weisse Flaeche' } };
-    if (art === 'gold') return { src: kasten(c, PLATTE_HELL, hexRgb(akzent)).toDataURL('image/png'), ok: true,
+    if (art === 'gold') return { src: png(kasten(c, PLATTE_HELL, hexRgb(akzent))), ok: true,
       e: { art: 'rahmen-hell', k: null, k_nachher: rund(kontrast(vermessen(c).mittel, PLATTE_HELL)), grund: 'Darstellung: Rahmen in Akzentfarbe, innen hell' } };
     if (art === 'gold-dunkel') {
-      var h = hellGedreht(c, INNEN_DUNKEL);
-      return { src: kasten(h.c, INNEN_DUNKEL, hexRgb(akzent)).toDataURL('image/png'), ok: h.anteil >= 0.9, anteil: Math.round(h.anteil * 100) / 100,
+      var h = hellFassung(c);   /* v3630f · auch hier ohne weisse Innenflaechen */
+      return { src: png(kasten(h.c, INNEN_DUNKEL, hexRgb(akzent))), ok: h.anteil >= 0.9, anteil: Math.round(h.anteil * 100) / 100,
         e: { art: 'rahmen-dunkel', k: null, k_nachher: null, anteil_lesbar: Math.round(h.anteil * 100) / 100, grund: 'Darstellung: Rahmen in Akzentfarbe, innen dunkel, Logo hell gedreht' } };
     }
     return { src: variante(c, eAuto), ok: true, e: eAuto };
@@ -227,15 +338,17 @@
    *  @returns {Promise<{auto,weiss,gold,'gold-dunkel'}>} je {src, ok, e} */
   function darstellungen(src, srcDunkel, akzent) {
     return laden(src).then(function (img) {
-      var c = raster(img), m = vermessen(c), ed = entscheidung(m, GRUENDE_DUNKEL), aus = {};
+      var c = raster(img), m = vermessen(c);
+      m._hellAnteil = hellFassung(c).anteil;   /* v3630f */
+      var ed = entscheidung(m, GRUENDE_DUNKEL), aus = {};
       DARSTELLUNGEN.forEach(function (a) { aus[a] = nachDarstellung(c, a, akzent, ed); });
       if (!srcDunkel) return aus;
       return laden(srcDunkel).then(function (i2) {
         var c2 = raster(i2);
-        aus.auto = { src: c2.toDataURL('image/png'), ok: true, e: { art: 'eigenes Logo' } };
+        aus.auto = { src: png(c2), ok: true, e: { art: 'eigenes Logo' } };
         var gd = nachDarstellung(c2, 'gold-dunkel', akzent, ed);
         /* eigenes dunkles Logo: unveraendert in den dunklen Rahmen */
-        aus['gold-dunkel'] = { src: kasten(c2, INNEN_DUNKEL, hexRgb(akzent)).toDataURL('image/png'), ok: true, e: gd.e };
+        aus['gold-dunkel'] = { src: png(kasten(c2, INNEN_DUNKEL, hexRgb(akzent))), ok: true, e: gd.e };
         return aus;
       }, function () { return aus; });
     });
@@ -346,6 +459,7 @@
     return laden(src).then(function (img) {
       var c = raster(img);
       var m = vermessen(c);
+      m._hellAnteil = hellFassung(c).anteil;   /* v3630f */
       var eh = entscheidung(m, [GRUND_HELL]);
       var ed = entscheidung(m, GRUENDE_DUNKEL);
       var hell = variante(c, eh);
@@ -353,7 +467,7 @@
         return {
           auf_dunkel: dunkel, auf_hell: hell,
           messung: {
-            fassung: 'v3630', mittel: m.mittel, streuung: m.streuung, eigeneFlaeche: m.eigeneFlaeche,
+            fassung: 'v3630f', mittel: m.mittel, streuung: m.streuung, eigeneFlaeche: m.eigeneFlaeche,
             darstellung: art,
             hell: eh, dunkel: eDunkel, logo_dunkel: mDunkel || null, gemessen: new Date().toISOString()
           }
@@ -364,7 +478,7 @@
         if (art === 'gold-dunkel' && srcDunkel) {
           return laden(srcDunkel).then(function (i2) {
             var c2 = raster(i2);
-            return fertig(kasten(c2, INNEN_DUNKEL, hexRgb(opt.akzent)).toDataURL('image/png'),
+            return fertig(png(kasten(c2, INNEN_DUNKEL, hexRgb(opt.akzent))),
               { art: 'rahmen-dunkel', k: null, k_nachher: null, grund: 'Darstellung: Rahmen, eigenes Logo fuer dunklen Grund' }, null);
           }, function () { var g = nachDarstellung(c, art, opt.akzent, ed); return fertig(g.src, g.e, null); });
         }
@@ -379,7 +493,7 @@
         var k2 = Math.min.apply(null, GRUENDE_DUNKEL.map(function (g) { return kontrast(m2.mittel, g); }));
         var e2 = { art: 'eigenes Logo', k: rund(m2.eigeneFlaeche ? null : k2), k_nachher: rund(m2.eigeneFlaeche ? null : k2),
                    grund: m2.eigeneFlaeche ? 'eigene Flaeche' : 'eigenes Logo fuer dunklen Grund' };
-        return fertig(c2.toDataURL('image/png'), e2, { mittel: m2.mittel, streuung: m2.streuung, eigeneFlaeche: m2.eigeneFlaeche });
+        return fertig(png(c2), e2, { mittel: m2.mittel, streuung: m2.streuung, eigeneFlaeche: m2.eigeneFlaeche });
       }, function () { return fertig(variante(c, ed), ed, null); });
     });
   }

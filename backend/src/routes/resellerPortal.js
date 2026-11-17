@@ -423,8 +423,8 @@ router.put('/branding', async (req, res, next) => {
     }
     if (b.brand_logo_groesse !== undefined) {
       gr = b.brand_logo_groesse === null ? null : Math.round(Number(b.brand_logo_groesse));
-      if (gr !== null && !(gr >= 60 && gr <= 160)) {
-        return res.status(400).json({ error: 'groesse_invalid', message: 'Logogröße zwischen 60 und 160 %.' });
+      if (gr !== null && !(gr >= 60 && gr <= 250)) {
+        return res.status(400).json({ error: 'groesse_invalid', message: 'Logogröße zwischen 60 und 250 %.' });
       }
     }
 
