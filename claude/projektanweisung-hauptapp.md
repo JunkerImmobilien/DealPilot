@@ -44979,3 +44979,9 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Commit:** `00dbb590`, `991c1377`, `88623999`, `1b79bef6`, `468f3e15`. Migrationen 116, 117.
 - **Nachweis:** Marcels Datei im Partner-Testkonto: helle Fassung 100 % lesbar, 1.921 Innenweiß-Punkte entfernt; 250 % mittig 231 × 142 px (1440), 146 × 90 (390); Menüblock rollt 28 px; Speicher-Leiste fest unten (1440 sticky, 390 fixed). Bilder `40-*`, `41-*`, `42-*`.
 - **Rest:** Marcel speichert die neue Darstellung in seinem Konto, doppelter Titel „Verwaltung“, Prod.
+
+### v3630i–v3630j · 17.11.2026 (nur Staging) · Verwaltung zweispaltig, Auf DealPilot zurücksetzen
+- **Was:** Liste der Bereiche mit Stand links, Inhalt rechts, keine Schrittleiste. Leiste Speichern · Änderungen verwerfen. Knopf „Auf DealPilot zurücksetzen“ (nur ausschalten / alles auf Standard). Marke an/aus → Merker weg, einmal neu laden. mandant-branding lädt einmal neu, wenn der Merker gefärbt hat und die Marke weg ist.
+- **Commit:** `03ec11d6`, `faf2d36e`.
+- **Nachweis:** nach „Nur ausschalten“ und „Alles auf Standard“ sofort und nach erneutem Neuladen `--gold` #C9A84C, keine `--wl-`-Tokens, Markenfeld „DealPilot“, PDF ohne Partnerlogo, Mail-Logo-Route 404. Bilder `50-*`.
+- **Rest:** Prod.
