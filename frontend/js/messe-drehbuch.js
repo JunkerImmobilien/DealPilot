@@ -10262,8 +10262,10 @@
         var o1 = (e1() && e1().querySelector('[data-a="erledigt"]')) ? e1() : offen()[0];
         if (o1) {
           var eb = o1.querySelector('[data-a="erledigt"]');
-          await zeige(function () { return eb; }, 8); await warte(400); var n0 = offen().length; eb.click();
+          await zeige(function () { return eb; }, 8); await warte(400); var n0 = offen().length, id0 = o1.getAttribute('data-id'); eb.click();
           await warteAuf(function () { return offen().length < n0; }, 5000); await warte(900);
+          /* v3650b · die Liste wird neu gezeichnet, der alte Knopf hängt nicht mehr im Dokument: Kegel auf den neuen Eintrag */
+          await zeige(function () { var l = li(); return l && l.querySelector('.al-eintrag[data-id="' + id0 + '"]'); }, 8);
           await b2oZeile(s, 'Erledigt', 'Ein Klick auf <b>Erledigt</b>, und die Anmerkung wird grün.');
         }
         var o2 = offen().filter(function (x) { return x !== o1 && !(o1 && x.getAttribute('data-id') === o1.getAttribute('data-id')); })[0];
@@ -10508,8 +10510,10 @@
         var o2 = offen().filter(function (x) { return !o1 || x.getAttribute('data-id') !== o1.getAttribute('data-id'); })[0];
         if (o2) {
           var eb = o2.querySelector('[data-a="erledigt"]');
-          await zeige(function () { return eb; }, 8); await warte(400); var n2 = offen().length; eb.click();
+          await zeige(function () { return eb; }, 8); await warte(400); var n2 = offen().length, id2 = o2.getAttribute('data-id'); eb.click();
           await warteAuf(function () { return offen().length < n2; }, 5000); await warte(900);
+          /* v3650b · neu gezeichnete Liste: Kegel auf den neuen Eintrag */
+          await zeige(function () { var l = li(); return l && l.querySelector('.al-eintrag[data-id="' + id2 + '"]'); }, 8);
           await b2oZeile(s, 'Erledigt', 'Hast du es erledigt, ein Klick auf <b>Erledigt</b>. Dein Berater sieht erledigt in Grün und Rückfragen in Blau.');
         }
       },
