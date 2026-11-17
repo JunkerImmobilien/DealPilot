@@ -1627,7 +1627,7 @@ if (!window._pdfGold) {
               : '<span style="font:700 18px \'Space Grotesk\',sans-serif;color:#F2EDE3">Deal<i style="font-style:normal;color:' + dpAkz + '">Pilot</i></span>');
     var zeile = function (t, an) { return '<div style="display:flex;align-items:center;gap:7px;padding:5px 8px;border-radius:4px;font:500 10.5px Inter;color:' + (an ? '#fff' : 'rgba(242,237,227,.62)') + ';background:' + (an ? 'rgba(255,255,255,.07)' : 'none') + (an ? ';box-shadow:inset 2px 0 0 ' + esc(akz) : '') + '">' + t + '</div>'; };
     host.innerHTML =
-      '<div style="display:grid;grid-template-columns:150px 1fr;height:196px;border-radius:6px;overflow:hidden;border:1px solid #E6E1D6;background:#F4F2ED">' +
+      '<div style="display:grid;grid-template-columns:minmax(96px,150px) minmax(0,1fr);height:196px;border-radius:6px;overflow:hidden;border:1px solid #E6E1D6;background:#F4F2ED">' +
         '<div style="background:' + esc(obs) + ';padding:10px 8px;display:flex;flex-direction:column;gap:3px">' +
           '<div style="height:48px;display:flex;align-items:center;justify-content:' + (d.mitte ? 'center' : 'flex-start') + ';padding:0 4px;margin-bottom:6px">' + marke + '</div>' +
           '<div style="font:700 8px \'JetBrains Mono\',monospace;letter-spacing:1px;color:' + esc(akz) + ';padding:0 8px 3px">ANSICHTEN</div>' +
@@ -1636,10 +1636,10 @@ if (!window._pdfGold) {
           '<div style="height:34px;background:' + esc(obs) + ';border-bottom:2px solid ' + esc(akz) + ';display:flex;align-items:center;gap:12px;padding:0 12px;font:600 10.5px Inter;color:#F2EDE3">Objekt<span style="opacity:.55;font-weight:500">Investition</span><span style="opacity:.55;font-weight:500">Miete</span></div>' +
           '<div style="padding:12px;flex:1;min-width:0">' +
             '<div style="background:#fff;border:1px solid color-mix(in srgb,' + esc(akz) + ' 22%,transparent);border-radius:2px;padding:10px 12px;display:flex;align-items:center;gap:12px">' +
-              '<span style="flex:none;width:44px;height:44px;border-radius:50%;background:conic-gradient(' + esc(akz) + ' 0 74%,#EDE6D6 0);display:flex;align-items:center;justify-content:center"><span style="width:34px;height:34px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;font:700 12px \'Space Grotesk\',sans-serif;color:#2A2727">74</span></span>' +
-              '<span style="min-width:0"><span style="display:block;font:700 9px \'JetBrains Mono\',monospace;letter-spacing:1.2px;color:#6B645A">OBJEKTDATEN</span>' +
-              '<span style="display:block;font:600 12px Inter;color:#2A2727;margin-top:2px">Musterstraße 1, Musterstadt</span>' +
-              '<span style="display:inline-block;margin-top:6px;padding:4px 9px;border-radius:8px;background:' + esc(akz) + ';color:#fff;font:600 10px Inter">Bericht abrufen</span></span>' +
+              '<span class="dp-verw-ring" style="flex:none;width:44px;height:44px;border-radius:50%;background:conic-gradient(' + esc(akz) + ' 0 74%,#EDE6D6 0);display:flex;align-items:center;justify-content:center"><span style="width:34px;height:34px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;font:700 12px \'Space Grotesk\',sans-serif;color:#2A2727">74</span></span>' +
+              '<span style="min-width:0;overflow:hidden"><span style="display:block;white-space:nowrap;font:700 9px \'JetBrains Mono\',monospace;letter-spacing:1.2px;color:#6B645A">OBJEKTDATEN</span>' +
+              '<span style="display:block;font:600 12px Inter;color:#2A2727;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Musterstraße 1, Musterstadt</span>' +
+              '<span style="display:inline-block;white-space:nowrap;margin-top:6px;padding:4px 9px;border-radius:8px;background:' + esc(akz) + ';color:#fff;font:600 10px Inter">Bericht abrufen</span></span>' +
             '</div></div></div></div>' +
       '<div class="hint dp-verw-hint" style="margin-top:6px">' + (d.wl ? 'So sehen deine Kunden die App mit deiner Marke. Stand des Formulars, gespeichert wird mit Speichern.' : 'Deine Marke ist aus. Deine Kunden sehen DealPilot.') + '</div>';
   }

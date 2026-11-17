@@ -666,6 +666,7 @@
       '.pk-verw-mini img{image-rendering:auto}',
       '.pk-verw-balken{display:block;width:40px;height:6px;border-radius:3px;background:#EDE6D6;overflow:hidden}',
       '.pk-verw-balken i{display:block;height:100%;background:#3FA56C}',
+      '@media (max-width:760px){#dppk-verw .dp-verw-ring{display:none !important}}',   /* v3630l · 390 px: Kopfkarte ohne Ring, sonst schneidet die Adresse ab */
       '.pk-verw-zahl{font:600 10px "JetBrains Mono",monospace;color:#6B645A}',
       '.pk-verw-inhalt .pk-karte.pk-marke{padding:16px 20px}',
       '.pk-verw-inhalt [data-marke-teil] > div:first-child{margin-top:0 !important}',
