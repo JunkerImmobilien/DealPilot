@@ -6331,7 +6331,9 @@
     deal.mietausfallRisiko = _rfFeld('ds2_mietausfall') || null;
     if (wfl != null && wfl > 0 && Z.nkm > 0) deal.istMieteEurQm = Z.nkm / wfl;   /* v3279 · ohne Zuschläge, wie dealscore2-ui.js */
     deal.marktmieteEurQm = _rfNum(_rfFeld('ds2_marktmiete'));
-    if (deal.marktmieteEurQm == null && _rf && _rf.markt && _rf.markt.mietSqm) deal.marktmieteEurQm = _rf.markt.mietSqm;
+    /* v3740a · der Rückfall auf die Indikation nur, wo das Feld im Detailgrad sichtbar ist - sonst zeigte der
+       Zwischenstand in Einsteiger einen anderen Investor Deal Score als die App nach dem Speichern */
+    if (deal.marktmieteEurQm == null && _rf && _rf.markt && _rf.markt.mietSqm && _rfMarktErlaubt('ds2_marktmiete')) deal.marktmieteEurQm = _rf.markt.mietSqm;
     deal.mietwachstumPct = _rfNum(_rfFeld('mietstg'));
     deal.bevoelkerung = _rfFeld('ds2_bevoelkerung') || null;
     deal.nachfrage    = _rfFeld('ds2_nachfrage') || null;
