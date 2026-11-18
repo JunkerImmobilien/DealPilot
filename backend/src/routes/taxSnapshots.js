@@ -31,6 +31,7 @@ router.get('/', async (req, res, next) => {
        JOIN objects o ON o.id = ts.object_id
        WHERE ts.user_id = $1
          AND COALESCE((o.data->>'_deal_won')::boolean, false) = true  -- V281-won-filter: nur Bestandsobjekte
+         AND o.kunden_freigabe_id IS NULL  -- v3683: Kundenstaende (Kopie beim Partner) zaehlen nicht zur eigenen Steuer
        ORDER BY o.created_at ASC`,
       [req.user.id]
     );
@@ -55,7 +56,7 @@ router.post('/:id',
     try {
       // Ownership-Check: object_id muss dem User gehoeren
       const own = await query(
-        'SELECT user_id FROM objects WHERE id = $1',
+        'SELECT user_id, kunden_freigabe_id FROM objects WHERE id = $1',
         [req.params.id]
       );
       if (own.rowCount === 0) {
@@ -63,6 +64,12 @@ router.post('/:id',
       }
       if (own.rows[0].user_id !== req.user.id) {
         return res.status(403).json({ error: 'Not authorized' });
+      }
+      /* v3683 · Ein Kundenstand gehoert dem Partner nur als Kopie. Bis v3682 schrieb das Oeffnen eines
+         Bestands-Kundenstands dessen Jahresergebnisse in die Verlustverrechnung des PARTNERS (Konzept
+         Anfordern-und-Freigeben 18.11.2026, P0). Nichts schreiben, kein Fehler fuer den Browser. */
+      if (own.rows[0].kunden_freigabe_id) {
+        return res.json({ ok: true, uebersprungen: 'kundenstand', object_id: req.params.id });
       }
 
       const r = await query(

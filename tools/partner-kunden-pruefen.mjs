@@ -62,6 +62,7 @@ const AUSNAHMEN = {
   'services/immometricaFlow.js': 'Suche nach ImmoMetrica-ID, Kopien tragen keine',
   'routes/network.js': 'Suche nach einem Objekt per Kennung',
   'services/agentWerkzeuge.js#1539': 'Suche nach Name',
+  'services/resellerService.js#374': 'Kundenseite: listet die eigenen Freigaben des Kunden (Originale), keine Kopien',
   'services/objectService.js#118': 'Nummernvergabe (Kundenstaende tragen K-Nummern und stoeren sie nicht)',
 };
 const dateien = [];
@@ -71,7 +72,7 @@ for (const p of dateien) {
   const rel = path.relative(path.join(WURZEL, 'backend/src'), p).replace(/\\/g, '/');
   const txt = fs.readFileSync(p, 'utf8').split(/\r?\n/);
   txt.forEach((zeile, i) => {
-    if (!/FROM objects\b/.test(zeile)) return;
+    if (!/(FROM|JOIN) objects\b/.test(zeile)) return;   /* v3683 · JOIN fehlte: tax-snapshots rechnete Kundenstaende mit */
     const block = txt.slice(i, i + 4).join(' ');
     if (!/user_id\s*=\s*\$1/.test(block)) return;            /* nicht je Nutzer */
     if (/\bid\s*=\s*\$1\b|WHERE id\s*=|AND id\s*=|id\s*=\s*ANY|id::text\s*=/.test(block)) return;   /* eine bestimmte ID */

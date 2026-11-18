@@ -154,7 +154,8 @@ async function listForUser(userId, fromYear, toYear) {
     SELECT tr.*, o.name AS object_name
     FROM tax_records tr
     JOIN objects o ON o.id = tr.object_id
-    WHERE tr.user_id = $1`;
+    WHERE tr.user_id = $1
+      AND o.kunden_freigabe_id IS NULL`;   /* v3683 · Kundenstaende zaehlen nicht zur eigenen Steuer */
   const params = [userId];
   if (fromYear != null) { sql += ' AND tr.year >= $' + (params.length + 1); params.push(fromYear); }
   if (toYear != null) { sql += ' AND tr.year <= $' + (params.length + 1); params.push(toYear); }

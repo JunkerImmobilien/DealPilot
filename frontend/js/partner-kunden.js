@@ -1444,7 +1444,7 @@
     /* v3450 · Marcel 15.11.: Zurück ins Cockpit, Anmerkungen (partner-anmerkungen.js), Übernehmen */
     alt.setAttribute('data-share', ks.share_id); alt.setAttribute('data-stand', ks.stand_nr);
     var ksNr = kundeNrVon(ks.client_id);   /* v3640 */
-    alt.innerHTML = '<span class="dppk-ks-text"><b>Kundenstand von ' + (ksNr ? esc(ksNr) + ' · ' : '') + esc(ks.kunde || 'Kunde') + '</b>, Stand ' + esc(ks.stand_nr) + ' vom ' + datum(ks.stand_am) + '. Nur lesen, Änderungen werden nicht gespeichert.</span>' +
+    alt.innerHTML = '<span class="dppk-ks-text"><b>Kundenstand von ' + (ksNr ? esc(ksNr) + ' · ' : '') + esc(ks.kunde || 'Kunde') + '</b>, Stand ' + esc(ks.stand_nr) + ' vom ' + datum(ks.stand_am) + '. Nur lesen, Änderungen werden nicht gespeichert. Die Steuer rechnet mit deinen eigenen Steuerdaten, nicht mit denen des Kunden.</span>' +   /* v3683 · P0, bis die Steuerdaten mit Freigabe mitreisen (P2) */
       '<span class="dppk-ks-knoepfe"><button type="button" class="pk-btn2" data-ks-a="zurueck">← Zurück zum Partner-Cockpit</button></span>' +
       '<button type="button" class="pk-btn">Als eigenes Objekt übernehmen</button>';
     alt.querySelector('[data-ks-a="zurueck"]').onclick = function () { kundenstandVerlassen(ks); };
