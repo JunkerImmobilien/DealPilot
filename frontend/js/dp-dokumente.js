@@ -1006,6 +1006,14 @@
       if (!saetze.length) throw nutzerFehler('Für ' + jahr + ' sind keine Steuersätze gespeichert.');
       return Promise.all(saetze.map(function (s) { return api('/objects/' + encodeURIComponent(s.object_id)).catch(function () { return null; }); })).then(function (objs) {
         var gesSt = {};   /* v3701 · G-05: Steuerreihe je Gesellschaft (halterId -> DpGesSteuer.reihe), vor bauen() geholt */
+        /* v3702 · opt.halter: Steuer-Mappe EINER Gesellschaft (Marcel 18.11.2026: „ein Dokument, wo dann alles zusammen draufsteht“) */
+        var gesMappe = (opt.halter && opt.halter !== 'privat') ? String(opt.halter) : null, gesName = null;
+        if (gesMappe) {
+          var _ix = []; objs.forEach(function (oo, i) { var dd = (oo && (oo.object || oo) && (oo.object || oo).data) || {}; if (String(dd.halter || 'privat') === gesMappe) _ix.push(i); });
+          if (!_ix.length) throw nutzerFehler('Für ' + jahr + ' gibt es keine gespeicherten Jahreswerte von Objekten dieser Gesellschaft. Objekte der Gesellschaft öffnen und speichern, dann erneut erstellen.');
+          saetze = _ix.map(function (i) { return saetze[i]; }); objs = _ix.map(function (i) { return objs[i]; });
+          try { var _gm = DealPilotMandanten.get(gesMappe); gesName = _gm && _gm.name; } catch (eG) {}
+        }
         var bauen = function () {   /* v3700 · synchron, damit der Kontext des Kunden genau diesen Lauf umfasst */
         var eintr = saetze.map(function (s, i) {
           var o = objs[i] && (objs[i].object || objs[i]), d = (o && o.data) || {};
@@ -1028,7 +1036,7 @@
         var priv = eintr.filter(function (e) { return !e.corp; }), ges = eintr.filter(function (e) { return e.corp; });
         var vl = priv.length ? veranlagung(jahr) : null;   /* v3480 */
         var S = [];
-        S.push(B.deckblatt(c, { bild: null, eyebrow: 'Steuer-Mappe · Veranlagungsjahr ' + jahr, titel: 'Steuer-Mappe ' + jahr,
+        S.push(B.deckblatt(c, { bild: null, eyebrow: gesMappe ? 'Steuer-Mappe der Gesellschaft · Geschäftsjahr ' + jahr : 'Steuer-Mappe · Veranlagungsjahr ' + jahr, titel: gesMappe ? 'Steuer-Mappe ' + (gesName || 'der Gesellschaft') + ' ' + jahr : 'Steuer-Mappe ' + jahr,
           unter: priv.length && ges.length ? 'Vermietung und Verpachtung (Anlage V) und Objekte in Gesellschaften' : (ges.length ? 'Objekte in Gesellschaften · Betriebsausgaben' : 'Vermietung und Verpachtung · Anlage V · § 21 EStG'),
           meta: [['Veranlagungsjahr', String(jahr)], ['Objekte', String(eintr.length)], ['Stand', c.stand]].concat(vl ? [['Veranlagung', vl.kurz], ['Kirchensteuer', vl.kist.replace('Kirchensteuer ', '')]] : []) }));
         /* Inhalt */
@@ -1093,7 +1101,11 @@
                   var m = null; try { m = DealPilotMandanten.get(h); } catch (eM) {}
                   return '<tr><td>' + B.esc((m && m.name) || h) + '<div class="det">' + z.objekte + ' Objekte, Kosten der Gesellschaft enthalten</div></td><td class="r num">' + B.eurS(z.erg, 2) + '</td><td class="r num">' + B.eur(z.kst, 0) + '</td><td class="r num">' + B.eur(z.gewst, 0) + '</td><td class="r num">' + (z.steuer > 0.5 ? B.eurS(-z.steuer, 0) : '0 €') + '</td><td class="r num">' + B.eur(z.vortragNach, 0) + '</td></tr>';
                 }).join('')
-              + '</tbody></table><p class="det">Die Gesellschaft wird als Ganzes besteuert (§ 8 Abs. 1 KStG, § 7 GewStG). Ergebnis vor Steuern ist die Summe der Beiträge aller ihrer Objekte abzüglich der Kosten der Gesellschaft, die Steuer gilt nach Verlustvortrag (§ 10d EStG, § 10a GewStG). Dieselbe Rechnung steht im Jahresabschluss.</p>';
+              + '</tbody></table>'
+              + (gesMappe && gesSt[gesMappe] ? '<h3>Entwicklung Ergebnis, Steuer und Verlustvortrag</h3><table><thead><tr><th>Geschäftsjahr</th><th class="r">Ergebnis vor Steuern</th><th class="r">KSt + Soli</th><th class="r">GewSt</th><th class="r">Steuer</th><th class="r">Verlustvortrag danach</th></tr></thead><tbody>'
+                  + gesSt[gesMappe].filter(function (x) { return x.jahr <= jahr; }).map(function (x) { return '<tr' + (x.jahr === jahr ? ' class="summe"' : '') + '><td>' + x.jahr + '</td><td class="r num">' + B.eurS(x.erg, 2) + '</td><td class="r num">' + B.eur(x.kst, 0) + '</td><td class="r num">' + B.eur(x.gewst, 0) + '</td><td class="r num">' + (x.steuer > 0.5 ? B.eurS(-x.steuer, 0) : '0 €') + '</td><td class="r num">' + B.eur(x.vortragNach, 0) + '</td></tr>'; }).join('')
+                  + '</tbody></table>' : '')
+              + '<p class="det">Die Gesellschaft wird als Ganzes besteuert (§ 8 Abs. 1 KStG, § 7 GewStG). Ergebnis vor Steuern ist die Summe der Beiträge aller ihrer Objekte abzüglich der Kosten der Gesellschaft, die Steuer gilt nach Verlustvortrag (§ 10d EStG, § 10a GewStG). Dieselbe Rechnung steht im Jahresabschluss.</p>';
           })()
           + '<p class="det" style="margin-top:3mm">Die Steuerwirkung ist je Objekt gerechnet (Steuer mit und ohne dieses Objekt beim zu versteuernden Einkommen des Steuerzeitraums). Die Summe ist deshalb eine Näherung: die Progression mehrerer Objekte zusammen weicht davon ab. '
           + (ges.length ? 'Privatvermögen und Gesellschaften sind getrennte Steuersubjekte und werden nicht zusammengezählt. ' : '') + 'Keine Steuererklärung und keine Steuerberatung.</p>'));

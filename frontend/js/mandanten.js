@@ -1512,6 +1512,7 @@
       +   '<div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center">'
       +     '<select id="mand-ja-jahr" style="flex:1 1 160px;min-width:0;padding:8px 10px;border:1px solid #E6E0D3;border-radius:8px;font:13.5px Inter,sans-serif"><option value="">lädt …</option></select>'
       +     '<button type="button" id="mand-ja-los" class="btn btn-gold btn-sm">Jahresabschluss erstellen</button>'
+      +     '<button type="button" id="mand-ja-steuer" class="btn btn-outline btn-sm" title="Alle Objekte der Gesellschaft mit Betriebseinnahmen, Betriebsausgaben und Beitrag, dazu die Steuer der Gesellschaft und der Verlustvortrag">Steuer-Mappe der Gesellschaft</button>'   /* v3702 */
       +   '</div>'
       +   '<div style="margin-top:12px;font-size:12px;color:#6B6356;line-height:1.5">Kein aufgestellter Jahresabschluss nach §§ 242 ff. HGB, sondern die Zahlen dafür in der Gliederung des HGB. Was DealPilot nicht kennt — Einlagen, Kautionen, laufende Bankbewegungen — steht als <b>Verrechnungskonto Gesellschafter</b> in der Bilanz, damit sie aufgeht, <b>ohne dass die Lücke verschwindet</b>. Die <b>Kosten der Gesellschaft</b> trägst du unter „Bearbeiten“ dieser Gesellschaft ein; fehlen sie, sagt das PDF es auf der GuV-Seite.</div>'
       + '</div></div>';
@@ -1525,6 +1526,17 @@
     var jSel = document.getElementById('mand-ja-jahr');
     var btn = document.getElementById('mand-ja-los');
     btn.disabled = true;
+    /* v3702 · Steuer-Mappe der Gesellschaft (dp-dokumente.js steuermappe mit opt.halter), dieselbe Jahreswahl */
+    var btnSt = document.getElementById('mand-ja-steuer');
+    if (btnSt) btnSt.onclick = function () {
+      var jahr = jSel.value ? parseInt(jSel.value, 10) : 0;
+      if (!jahr) { if (typeof toast === 'function') toast('Bitte ein Geschäftsjahr wählen.'); return; }
+      if (!window.DpDokWeiche || typeof DpDokWeiche.erzeugen !== 'function') { if (typeof toast === 'function') toast('✗ Dokument-Modul nicht geladen — Seite neu laden.'); return; }
+      var t2 = btnSt.textContent; btnSt.disabled = true; btnSt.textContent = 'erstelle …';
+      Promise.resolve().then(function () { return DpDokWeiche.erzeugen('steuermappe', { jahr: jahr, halter: m.id, anlageV: false }, false); })
+        .catch(function (e) { if (typeof toast === 'function') toast('✗ ' + ((e && e.message) || e)); })
+        .then(function () { btnSt.disabled = false; btnSt.textContent = t2; });
+    };
     btn.onclick = function () {
       var jahr = jSel.value ? parseInt(jSel.value, 10) : 0;
       if (!jahr) { if (typeof toast === 'function') toast('Bitte ein Geschäftsjahr wählen.'); return; }
