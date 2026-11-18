@@ -5056,14 +5056,23 @@
   DREHBUECHER['reihe-cockpit'] = {
     titel: 'Portfolio-Cockpit und Pilot', unterzeile: 'Alle Objekte auf einer Seite — und ein Pilot, der sie kennt', objekt: null,
     abspann: [{ ms: 6200, html: ABSPANN_LOGO }],
-    aufraeumen: function () { r21Zu(); rhAufraeumen(); },
+    /* v3730 · gemessen 18.11.: das Cockpit hat einen Umschalter Einfach | Genau (v2951, Merker dp_cockpit_ansicht, Vorgabe
+       Einfach). In Einfach fehlen die Abschnitte Kennzahlen, Zielbild und Steuer - Szenen 4-6 standen ohne Kegel und mit „–“.
+       Das Drehbuch zeigt Genau und stellt den Merker danach zurück. */
+    aufraeumen: function () {
+      r21Zu();
+      try { if (window.__r21Ans !== undefined) { if (window.__r21Ans === null) localStorage.removeItem('dp_cockpit_ansicht'); else localStorage.setItem('dp_cockpit_ansicht', window.__r21Ans); window.__r21Ans = undefined; } } catch (e) {}
+      rhAufraeumen();
+    },
     szenen: [
       async function (s) {   /* 1 · Einstieg */
         await rhNurStart();
         await zeige(function () { return qs('.sb-act-item[onclick*="cockpit"]'); }, 10);
         await b2oZeile(s, 'Das Portfolio-Cockpit', 'Links unter den Aktionen. Hier steht nicht ein Objekt, sondern <b>alle</b>.');
+        try { window.__r21Ans = localStorage.getItem('dp_cockpit_ansicht'); } catch (e) { window.__r21Ans = null; }
         try { sbActionsAction('cockpit'); } catch (e) {}
         await warteAuf(function () { return r21('#dp-pscore-hero .hbody') || r21('#dp-pscore-hero .dpz'); }, 10000);   /* v3254: oder die Zwei-Score-Ansicht */
+        try { if (window.DealPilotDashboard && DealPilotDashboard.ansicht) DealPilotDashboard.ansicht('genau'); } catch (e) {}
         await warte(1200);
       },
       async function (s) {   /* 2 · der Portfolio-Score */
