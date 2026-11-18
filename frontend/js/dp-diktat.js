@@ -159,6 +159,10 @@
       '.dp-dik{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;'
         + 'flex:0 0 auto;border:1px solid var(--wl-c9a84c,#C9A84C);border-radius:6px;'
         + 'background:transparent;color:var(--wl-c9a84c,#C9A84C);cursor:pointer;padding:0}',
+      /* v3681 · Messkabine 390 px 18.11.2026: style.css setzt unter 768 px '.btn, button{padding:8px 14px !important}'.
+         Der 30 px breite Knopf behielt dann 2 px Inhalt, das Mikrofon hatte 0 px Breite und der Knopf war leer.
+         button.dp-dik ist spezifischer als 'button' und '.btn', deshalb gewinnt es auch gegen !important. */
+      'button.dp-dik{padding:0 !important;min-width:30px}',
       '.dp-dik:hover{background:var(--wl-c9a84c,#C9A84C);color:#0A0A09}',
       /* Rot ist hier Statusfarbe (Aufnahme laeuft) und bleibt deshalb in
          jeder Marke rot - Statusfarben werden nicht tokenisiert. */

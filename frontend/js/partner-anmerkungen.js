@@ -238,7 +238,7 @@
           '<button type="button" class="al-btn" data-a="antwort">' + (a.antwort ? 'Antwort ändern' : 'Antworten') + '</button>' +
           (a.vorschlag && a.status !== 'erledigt' && !a._frei && (a.feld_id || a.selektor) ? '<button type="button" class="al-btn" data-a="vorschlag">Vorschlag übernehmen</button>' : '');
         return '<div class="al-eintrag" data-id="' + a.id + '"><div><span class="al-nr">' + a.nr + '</span><b>' + esc(ART[a.art] || 'Hinweis') + '</b>' + st + '</div>' +
-          '<div class="al-ort">' + esc(ort) + (a.wert_damals ? ' · damals: ' + esc(a.wert_damals) : '') + '</div>' +
+          '<div class="al-ort">' + esc(ort) + (a.wert_damals ? ' · damals: ' + esc(String(a.wert_damals).length > 80 ? String(a.wert_damals).slice(0, 78) + ' …' : a.wert_damals) : '')   /* v3681 · aeltere Eintraege trugen ganze Bloecke */ + '</div>' +
           '<div class="al-text">' + esc(a.text) + '</div>' +
           (a.vorschlag ? '<div class="al-ort">Vorschlag: <b>' + esc(a.vorschlag) + '</b></div>' : '') +
           (a.bild ? '<img class="al-bild" data-gross="bild" alt="Bildausschnitt zur Anmerkung ' + a.nr + '" src="' + esc(a.bild) + '">' : '') +

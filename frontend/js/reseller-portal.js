@@ -1630,7 +1630,7 @@ if (!window._pdfGold) {
       '<div style="display:grid;grid-template-columns:minmax(96px,150px) minmax(0,1fr);height:196px;border-radius:6px;overflow:hidden;border:1px solid #E6E1D6;background:#F4F2ED">' +
         '<div style="background:' + esc(obs) + ';padding:10px 8px;display:flex;flex-direction:column;gap:3px">' +
           '<div style="height:48px;display:flex;align-items:center;justify-content:' + (d.mitte ? 'center' : 'flex-start') + ';padding:0 4px;margin-bottom:6px">' + marke + '</div>' +
-          '<div style="font:700 8px \'JetBrains Mono\',monospace;letter-spacing:1px;color:' + esc(akz) + ';padding:0 8px 3px">ANSICHTEN</div>' +
+          '<div style="font:700 8.5px \'JetBrains Mono\',monospace;letter-spacing:1px;color:' + esc(akz) + ';padding:0 8px 3px">ANSICHTEN</div>' +   /* v3681 · Hausuntergrenze 8,5 px */
           zeile('Einzelobjekt', true) + zeile('Portfolio-Cockpit') + zeile('Partner-Cockpit') + '</div>' +
         '<div style="display:flex;flex-direction:column;min-width:0">' +
           '<div style="height:34px;background:' + esc(obs) + ';border-bottom:2px solid ' + esc(akz) + ';display:flex;align-items:center;gap:12px;padding:0 12px;font:600 10.5px Inter;color:#F2EDE3">Objekt<span style="opacity:.55;font-weight:500">Investition</span><span style="opacity:.55;font-weight:500">Miete</span></div>' +
