@@ -1958,6 +1958,8 @@
   document.addEventListener('dp:plan-ready', start);
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { setTimeout(warteAufAnmeldung, 800); }); else setTimeout(warteAufAnmeldung, 800);
 
-  window.DpPartnerKunden = { cockpitOeffnen: cockpitOeffnen, cockpitSchliessen: cockpitSchliessen, sendenDialog: sendenDialog, kundenstandVerlassen: kundenstandVerlassen, reiterWahl: function (k) { if (PK.offen && PK.art === 'partner') reiterWahl(k); else cockpitOeffnen(k); }, meinPartnerOeffnen: meinPartnerOeffnen, einladungFragen: einladungFragen, darf: darf, _state: S };
+  window.DpPartnerKunden = { cockpitOeffnen: cockpitOeffnen, cockpitSchliessen: cockpitSchliessen, sendenDialog: sendenDialog, kundenstandVerlassen: kundenstandVerlassen, reiterWahl: function (k) { if (PK.offen && PK.art === 'partner') reiterWahl(k); else cockpitOeffnen(k); }, meinPartnerOeffnen: meinPartnerOeffnen, einladungFragen: einladungFragen, darf: darf, _state: S,
+    /* v3700 · fuer Pruefer und Messkabine */
+    _uebernehmenDialog: uebernehmenDialog, _kundeDialog: function (id) { return api('/partner/cockpit').then(function (c) { S.partner = c; return kundeDialog(null, id); }); } };
   window.DpMeinPartner = { einladungFragen: einladungFragen };
 })();
