@@ -2029,6 +2029,32 @@ function _dpGesJahr(year) {
   return null;
 }
 window._dpGesJahr = _dpGesJahr;
+/* v3704 · Marcel 18.11.2026 (Bismarckstr. 27 privat, BMF-Rechner): „Müsste das dann oben nicht auch mit auf die
+   Anschaffungskosten drauf?“ Gemessen: Reiter Steuer wertet die 72.000 EUR Sanierung als anschaffungsnah (Grenze
+   15 % der Gebaeude-AK aus dem Objekt, 38,30 % -> 55.400 EUR, netto 60.504 EUR darueber), der BMF-Rechner pruefte
+   mit dem Gebaeudeanteil SEINER Variante (amtlich 43,07 % -> 62.300 EUR, darunter) und liess die Kosten aus der
+   Basis fuer AfA. EINE Entscheidung, dieselbe wie _computeYearTotal (Grenze State._ahk.sanLimit, netto, plus
+   Erhaltung im Drei-Jahres-Fenster, Wahl san_tax_years). */
+function _dpAnschaffungsnah() {
+  var g = function (id) { return document.getElementById(id); };
+  var pd = function (x) { var s = String(x == null ? '' : x).replace(/[^\d,.\-]/g, ''); if (s.indexOf(',') >= 0) s = s.replace(/\./g, '').replace(',', '.'); var n = parseFloat(s); return isFinite(n) ? n : 0; };
+  var san = pd((g('san') || {}).value);
+  var aktiv = (g('san_tax_active') || {}).checked !== false;
+  var wahl = (g('san_tax_years') || {}).value || 'auto';
+  var ust = (g('san_ust') || {}).value || 'brutto';
+  var netto = ust === 'netto' ? san : san / 1.19;
+  var grenze = (window.State && State._ahk && isFinite(State._ahk.sanLimit) && State._ahk.sanLimit > 0) ? State._ahk.sanLimit : pd((g('kp') || {}).value) * 0.15;
+  var fenster = 0;
+  try { if (window.DpSanierungPlan && typeof DpSanierungPlan.fensterNetto === 'function') fenster = Number(DpSanierungPlan.fensterNetto()) || 0; } catch (e) {}
+  var an = false, grund = '';
+  if (!aktiv || !(san > 0)) { an = false; grund = 'keine Sanierung übernommen'; }
+  else if (wahl === '50') { an = true; grund = 'als anschaffungsnah gewählt'; }
+  else if (wahl === 'auto') { an = (netto + fenster) > grenze; grund = an ? '15-%-Grenze überschritten' : 'unter der 15-%-Grenze'; }
+  else { an = false; grund = 'als Erhaltungsaufwand gewählt'; }
+  var gebPct = null; try { gebPct = pd((g('geb_ant') || {}).value) || null; } catch (e) {}
+  return { an: an, betrag: an ? san : 0, san: san, netto: netto, fenster: fenster, grenze: grenze, wahl: wahl, grund: grund, gebPct: gebPct };
+}
+window._dpAnschaffungsnah = _dpAnschaffungsnah;
 function _ytfSteuerAnzeige(year, totals) {
   if (_dpBegriff().corp) {
     var gz = _dpGesJahr(year);   /* v3701 · G-05: Steuer der Gesellschaft auf alle Objekte */
