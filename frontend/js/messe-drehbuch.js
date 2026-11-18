@@ -2841,6 +2841,12 @@
   async function r6WizWeiter() {
     var w = r6Wiz(); if (!w) return false;
     [].forEach.call(w.querySelectorAll('select'), function (x) { if (x.offsetWidth && !x.value && x.options.length > 1) { x.selectedIndex = 1; x.dispatchEvent(new Event('change', { bubbles: true })); } });
+    /* v3730 · Schritt 2 verlangt die Anschrift des Auftraggebers (sonst „Bitte ergänzen“, der Rechner bleibt stehen).
+       Im Videokonto ist keine hinterlegt: erfundene Musteranschrift, nur wenn das Feld leer ist. */
+    [['auftraggeber_strasse', 'Musterweg 5'], ['auftraggeber_plz', '32052'], ['auftraggeber_ort', 'Herford']].forEach(function (p) {
+      var x = w.querySelector('input[data-state="' + p[0] + '"]');
+      if (x && x.offsetWidth && !String(x.value || '').trim()) { x.value = p[1]; x.dispatchEvent(new Event('input', { bubbles: true })); x.dispatchEvent(new Event('change', { bubbles: true })); }
+    });
     var b = [].filter.call(w.querySelectorAll('button'), function (x) { return x.offsetWidth && /Weiter|Berechnen/.test(x.textContent); }).slice(-1)[0];
     if (!b) return false;
     b.click(); await warte(500); return true;
