@@ -913,7 +913,10 @@ function syncCostEur(prefix) {
   var eur = parseDe(eFld.value) || 0;
   if (kp > 0) {
     var pct = (eur / kp) * 100;
-    pFld.value = pct.toFixed(2);
+    /* v3689a · Bis hier toFixed(2): calc() rechnet den Euro-Betrag aus dem Prozentwert zurueck (_setCostEur), und
+       0,01 % sind bei 390.000 EUR Kaufpreis 39 EUR - 549 EUR „Sonstige" wurden zu 546 EUR (gemessen 18.11.2026,
+       Andersenweg). Fuenf Stellen halten den eingetippten Betrag auf den Euro, nachgestellte Nullen fallen weg. */
+    pFld.value = String(parseFloat(pct.toFixed(5)));
   }
   calc();
 }
