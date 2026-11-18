@@ -1429,6 +1429,21 @@ function _calcImmediate(){
   /* v3198 · AfA-Grundlage fuer den Stempel am Objekt (Portfolio-Export: Buchwert je Objekt) - dieselbe Zahl wie im Reiter Steuer */
   if (window.State) State._afaStempel = { geb: afa_geb_basis, satz: afa_r, methode: afaParsed.methode };
   var sonder7bGueltig = (typeof window.afaSonder7bIsValid === 'function') ? window.afaSonder7bIsValid() : false;
+  /* v3687 · Pruefbericht 18.11.2026 T23/P-17, Marcel „ja“: ueber der Baukostenobergrenze (§ 7b Abs. 2
+     Satz 2 Nr. 2 EStG, 5.200 EUR/m2) entfaellt die Sonder-AfA GANZ. Bis v3686 zeigte die App das nur an
+     und rechnete weiter (v1260: Entscheidung beim Nutzer). Jetzt rechnet sie ohne Sonder-AfA, ausser der
+     Nutzer bestaetigt ausdruecklich, dass die massgeblichen Baukosten abweichen (Herstellungskosten statt
+     Kaufpreis, nur der Wohnteil) - Feld afa_sonder7b_bk_abw. Die 4.000-EUR-Bemessungsgrenze (V227.1,
+     sonder7bBasis) bleibt unberuehrt. */
+  var sonder7bBaukostenSperre = false;
+  try {
+    if (sonder7bGueltig && window.Afa && Afa.sonder7bBaukosten) {
+      var _bk7b = Afa.sonder7bBaukosten(afa_geb_basis, v('wfl'));
+      var _bkAbw = !!(document.getElementById('afa_sonder7b_bk_abw') || {}).checked;
+      if (_bk7b && _bk7b.pruefbar && !_bk7b.ok && !_bkAbw) { sonder7bGueltig = false; sonder7bBaukostenSperre = true; }
+    }
+  } catch (_e7b) {}
+  if (window.State) State._sonder7bBaukostenSperre = sonder7bBaukostenSperre;
   var sonder7bBasis = 0;
   if (sonder7bGueltig && window.Afa && Afa.sonder7bBasis) {
     sonder7bBasis = Afa.sonder7bBasis(afa_geb_basis, v('wfl'));

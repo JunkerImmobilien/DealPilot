@@ -239,7 +239,9 @@
     if (bkWarn) {
       var bk = info.baukosten;
       var bestaetigt = ($('afa_sonder7b_baukosten') || {}).checked || false;
-      var zeigen = !!(aktiv && bestaetigt && bk && bk.pruefbar && !bk.ok);
+      /* v3687: auch ohne Haken zeigen, wenn die Rechnung die Grenze reisst - die Sonder-AfA ist dann gesperrt */
+      var zeigen = !!(aktiv && bk && bk.pruefbar && !bk.ok);
+      var abwEl = $('afa_sonder7b_bk_abw_row'); if (abwEl) abwEl.style.display = zeigen ? '' : 'none';
       bkWarn.style.display = zeigen ? 'block' : 'none';
       if (zeigen) {
         var pq = $('afa_sonder7b_proqm');

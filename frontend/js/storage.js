@@ -145,7 +145,7 @@ var FIELDS = [
    * hat ihn nach dem Laden wieder an — und die Automatik ueberschreibt
    * seinen Wert. Deshalb nimmt das Leeren jetzt `defaultChecked`. */
   'afa_sonder7b_aktiv', 'afa_sonder7b_neubau', 'afa_sonder7b_vermietung',
-  'afa_sonder7b_eh40', 'afa_sonder7b_baukosten',
+  'afa_sonder7b_eh40', 'afa_sonder7b_baukosten', 'afa_sonder7b_bk_abw' /* v3687 */,
   'fesh_b', 'fesh_b_cost', 'fesh_d', 'fesh_d_cost', 'fesh_e', 'fesh_e_cost',
   'fesh_f', 'fesh_f_cost', 'fesh_h', 'fesh_h_cost', 'fesh_k', 'fesh_k_cost',
   'fesh_o', 'fesh_o_cost', 'fesh_s', 'fesh_s_cost',

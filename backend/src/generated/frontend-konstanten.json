@@ -1,10 +1,10 @@
 {
- "erzeugt_am": "2026-11-18T07:58:51.446Z",
+ "erzeugt_am": "2026-11-18T08:56:06.525Z",
  "quellen": {
   "voice-import": "b85d1194e6f250e3",
   "objektart-felder": "f7d9212555982a97",
-  "storage": "100c3884cdbaa598",
-  "index-html": "894888c60ec6b109",
+  "storage": "e8dc2d8c59462966",
+  "index-html": "386553993b902123",
   "grest": "81f3fb0a4de3a6cf"
  },
  "daten": {
@@ -540,6 +540,7 @@
    "afa_sonder7b_vermietung",
    "afa_sonder7b_eh40",
    "afa_sonder7b_baukosten",
+   "afa_sonder7b_bk_abw",
    "fesh_b",
    "fesh_b_cost",
    "fesh_d",
@@ -1455,6 +1456,10 @@
     "id": "afa_sonder7b_baukosten",
     "kind": "bool",
     "label": "Effizienzhaus 40 NH (QNG-Siegel)"
+   },
+   {
+    "id": "afa_sonder7b_bk_abw",
+    "kind": "bool"
    },
    {
     "id": "fesh_b",
