@@ -186,14 +186,19 @@ function rechne(alt, felder) {
   ctx.calcNow();
   return JSON.parse(JSON.stringify({ kpis: ctx.State.kpis, rows: ctx.State.cfRows, rs: ctx.State.rs, phase: ctx.State.phaseTable || null }));
 }
-function vergleiche(name, a, b) {
+/* v3760 (Rechen-Audit 18.11.2026): mit Darlehen II aendern sich GEWOLLT der IRR samt Vermoegens-
+   Kennzahlen (die IRR-Schleife kannte Darlehen II nicht) und die Phase „Anschluss" (Darlehen II im Jahr
+   bindj+1 nach seiner eigenen Bindung, Monat fuer Monat). Die Projektion bleibt bitgleich.
+   Nachgerechnet in tools/rechen-audit-pruefen.mjs. */
+const V3760_D2 = ['irr', 'be_cf', 'be_kum', 'be_kum_ek', 'em', 'em_pe', 'cf_op_an', 'cf_ns_an', 'zins_an', 'tilg_an', 'ster_an', 'rate_an_m'];
+function vergleiche(name, a, b, ohne) {
   const diff = [];
-  Object.keys(a.kpis).forEach((k) => { if (JSON.stringify(a.kpis[k]) !== JSON.stringify(b.kpis[k])) diff.push('kpis.' + k); });
+  Object.keys(a.kpis).forEach((k) => { if ((ohne || []).indexOf(k) < 0 && JSON.stringify(a.kpis[k]) !== JSON.stringify(b.kpis[k])) diff.push('kpis.' + k); });
   melde(a.rows.length === b.rows.length && a.rows.length > 0, name + ': ' + a.rows.length + ' Projektionsjahre', b.rows.length);
   a.rows.forEach((r, j) => Object.keys(r).forEach((k) => { if (JSON.stringify(r[k]) !== JSON.stringify((b.rows[j] || {})[k])) diff.push('cfRows[' + j + '].' + k); }));
   if (JSON.stringify(a.rs) !== JSON.stringify(b.rs)) diff.push('State.rs');
-  if (JSON.stringify(a.phase) !== JSON.stringify(b.phase)) diff.push('State.phaseTable (heute/EZB/Anschluss)');
-  melde(diff.length === 0, name + ': ' + Object.keys(a.kpis).length + ' Kennzahlen und jede Projektionszeile bitgleich', diff.slice(0, 8));
+  if (!ohne && JSON.stringify(a.phase) !== JSON.stringify(b.phase)) diff.push('State.phaseTable (heute/EZB/Anschluss)');
+  melde(diff.length === 0, name + ': ' + Object.keys(a.kpis).length + ' Kennzahlen' + (ohne ? ' (ohne IRR-/Anschluss-Kennzahlen, v3760)' : '') + ' und jede Projektionszeile bitgleich', diff.slice(0, 8));
 }
 const FAELLE = [
   ['nur Darlehen I', {}],
@@ -204,7 +209,12 @@ let basis = null;
 FAELLE.forEach(([name, f]) => {
   let a, b;
   try { a = rechne(true, f); b = rechne(false, f); } catch (e) { melde(false, name + ': Rechenlauf', e.message); return; }
-  vergleiche(name, a, b);
+  vergleiche(name, a, b, f.d2_enable ? V3760_D2 : null);
+  if (f.d2_enable) {
+    /* v3760: Phase „Anschluss" ~ Jahr 11 der Projektion. Darlehen II rechnet dort jetzt Monat fuer
+       Monat; Darlehen I in der Phase weiter jahresweise auf die Restschuld (rund 1 % hoeher, offen). */
+    melde(nah(b.kpis.zins_an + b.kpis.tilg_an, b.rows[10].zy + b.rows[10].ty, 0.015 * (b.rows[10].zy + b.rows[10].ty)), name + ': Rate der Phase Anschluss = Jahr 11 der Projektion (± 1,5 %)', [b.kpis.zins_an + b.kpis.tilg_an, b.rows[10].zy + b.rows[10].ty]);
+  }
   if (!basis) basis = b;
 });
 

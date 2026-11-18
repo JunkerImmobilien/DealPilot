@@ -1856,6 +1856,30 @@ function _calcImmediate(){
   var _d2IsAussetzung = (d2_type === 'tilgungsaussetzung');
   State.d2_bindj = d2_bindj; State.d2_anschl_enable = d2_anschl_enable;
   State.d2_az = d2_az; State.d2_at = d2_at;
+  /* v3760 · Rechen-Audit 18.11.2026 · DARLEHEN II JAHR FUER JAHR, EINE REGEL fuer IRR,
+     Phase „Anschluss" und Anschlussrate. Bis v3759 kannte die IRR-Schleife nur Darlehen I
+     (Zins, Tilgung, Restschuld beim Verkauf) - mit Darlehen II oder weiteren Darlehen lag
+     der IRR deutlich zu hoch (gemessen: 10,84 statt 6,60 %, tools/rechen-audit-pruefen.mjs F2).
+     Die Phase „Anschluss" setzte die Anschlusskonditionen von Darlehen II schon am Ende der
+     Bindung von Darlehen I an, auch wenn Darlehen II laenger gebunden ist.
+     Regel wie die Projektion: Tilgungsaussetzung = nur Zins; in der eigenen Bindung (d2_bindj)
+     die Annuitaet; danach mit eigener Anschlussfinanzierung eine FESTE Rate aus der Restschuld
+     am Ende der Bindung × (Anschlusszins + Anschlusstilgung), sonst die alte Rate weiter.
+     Volle Jahre ab Kauf (wie die IRR-Schleife fuer Darlehen I). */
+  function _d2PlanJahre(n) {
+    var out = [], r = (d2_enabled && d2 > 0) ? d2 : 0, rateAn = null;
+    for (var _y2 = 1; _y2 <= n; _y2++) {
+      if (!(r > 0)) { out.push({ zy: 0, ty: 0, rs: 0 }); continue; }
+      if (_d2IsAussetzung) { out.push({ zy: r * d2z, ty: 0, rs: r }); continue; }
+      var _jm2;
+      if (_y2 <= d2_bindj) _jm2 = _jahrMonatlich(r, d2z, d2_rate_m);
+      else if (d2_anschl_enable) { if (rateAn == null) rateAn = r * (d2_az + d2_at); _jm2 = _jahrMonatlich(r, d2_az, rateAn / 12); }
+      else _jm2 = _jahrMonatlich(r, d2z, d2_rate_m);
+      r = _jm2.rs;
+      out.push({ zy: _jm2.zy, ty: _jm2.ty, rs: r });
+    }
+    return out;
+  }
   // V354: D2-Aussetzung ohne Tilgungstraeger -> Hinweis (kein BSV-Nachbau fuer D2)
   var _d2tadHint = el('d2_tad_box');
   if (_d2tadHint && d2_enabled && _d2IsAussetzung) {
@@ -2108,9 +2132,11 @@ function _calcImmediate(){
   // V357-d1anschl: r-anschl = D1-Anschlussrate + D2-Anschlussrate (bisher nur D1)
   var _ar_d2_m = 0;
   if (d2_enabled && d2 > 0) {
-    var _rs2_now = (typeof State.rs2 === 'number' ? State.rs2 : d2);
+    /* v3760: Rate von Darlehen II im ersten Anschlussjahr von Darlehen I nach SEINER Bindung
+       (_d2PlanJahre) - bis v3759 galten seine Anschlusskonditionen schon dort, auch wenn es laenger gebunden ist */
     if (_d2IsAussetzung) { _ar_d2_m = (d2 * d2z) / 12; }
-    else if (d2_anschl_enable) { _ar_d2_m = (_rs2_now * (d2_az + d2_at)) / 12; }
+    else if (bindj < d2_bindj) { _ar_d2_m = d2_rate_m; }
+    else if (d2_anschl_enable) { _ar_d2_m = (_d2PlanJahre(d2_bindj)[d2_bindj - 1] || { rs: 0 }).rs * (d2_az + d2_at) / 12; }
     else { _ar_d2_m = d2_rate_m; }
   }
   /* v3215: weitere Darlehen laufen durchfinanziert weiter - ihre Rate im ersten Anschlussjahr */
@@ -2662,6 +2688,8 @@ function _calcImmediate(){
   var _spJahr = {};
   try { if (window.DpSanierungPlan && typeof DpSanierungPlan.jeJahr === 'function') _spJahr = DpSanierungPlan.jeJahr() || {}; } catch (_spE) { _spJahr = {}; }
   var rs_loop = d1, cfkum = 0;
+  var _d2PlanV = _d2PlanJahre(btj);   /* v3760 · Darlehen II in der IRR-Schleife */
+  var _tilgWKum = 0;                  /* v3760 · Tilgung von Darlehen II und weiteren Darlehen */
   /* v1260: Die Jahres-Cashflows MITSCHREIBEN. Die Schleife unten rechnet
      `cf_y_ns` für jedes Jahr und addiert es sofort in `cfkum` — der einzelne
      Wert war danach weg. Genau den brauchen IRR und Break-Even: der IRR muss
@@ -2746,6 +2774,11 @@ function _calcImmediate(){
         zy = 0; ty = 0;
       }
     }
+    /* v3760 · Darlehen II und weitere Darlehen: ihr Zins mindert Cashflow und Steuer, ihre
+       Tilgung den Cashflow (unten), ihre Restschuld den Verkaufserloes. Darlehen I bleibt in rs_loop. */
+    var _d2yV = _d2PlanV[y - 1] || { zy: 0, ty: 0 }, _dwyV = _dwAktiv ? _dwJahr(y) : { zins: 0, tilg: 0 };
+    zy += _d2yV.zy + (_dwyV.zins || 0);
+    var _tyW = _d2yV.ty + (_dwyV.tilg || 0);
     /* v816-ef-zins: Zins + AfA im letzten Jahr anteilig (Privatier zahlt nur bis Stichtag). */
     var _zy_eff = zy * _ef, _afa_eff = afa * _ef;
     var cf_y_op=nkm_y-bwk_cf_y-_zy_eff;
@@ -2784,7 +2817,8 @@ function _calcImmediate(){
 
        `_ef` ist der Anteilsfaktor des letzten Jahres (v816) und gehört an
        die Tilgung genauso wie an Zins und AfA. */
-    _cfReihe.push(cf_y_ns - ty * _ef);   /* v1260c */
+    _cfReihe.push(cf_y_ns - (ty + _tyW) * _ef);   /* v1260c · v3760: + Tilgung Darlehen II / weitere */
+    _tilgWKum += _tyW * _ef;
     bspar_kum += bspar_y_loop;
     rs_loop=Math.max(0,rs_loop-ty*_ef);  /* v816-ef-tilg: Tilgung im letzten Jahr anteilig */
     miete_kum += nkm_y;
@@ -2793,7 +2827,8 @@ function _calcImmediate(){
     tax_kum   += tax_y_loop;
   }
   // Tilgung kumuliert nach btj Jahren = Differenz Anfangsdarlehen zu rs_loop
-  var tilgung_kum_btj = d1 - rs_loop;
+  var tilgung_kum_btj = d1 - rs_loop + _tilgWKum;   /* v3760: + Tilgung Darlehen II / weitere */
+  var _rsWExit = ((_d2PlanV[btj - 1] || { rs: 0 }).rs || 0) + (_dwAktiv ? ((_dwJahr(btj) || {}).rs_ende || 0) : 0);   /* v3760 */
   // V63.41: Wertsteigerung Excel-konform — IMMER über die Wertsteigerungsannahme (wstg).
   // V63.65: Endwert basiert auf wert_basis (svw > bankval > kp), Wertsteigerung relativ dazu.
   var wert_endjahr  = wert_basis * Math.pow(1+wstg, btj);
@@ -2845,7 +2880,7 @@ function _calcImmediate(){
      Betrachtungszeitraums. (Die vorhandene Größe `net_exit` mischt genau
      das — sie ist mit „nicht in Card verwendet" gekennzeichnet und wird
      hier bewusst nicht benutzt.) */
-  var _exitErloes = exit_vkp - Math.max(0, rs_loop) + Math.max(0, bspar_guth);
+  var _exitErloes = exit_vkp - Math.max(0, rs_loop) - Math.max(0, _rsWExit) + Math.max(0, bspar_guth);   /* v3760: - Restschuld Darlehen II / weitere */
   /* v3268 · GmbH/UG: der Verkauf nach btj Jahren ist IMMER steuerpflichtig —
      die Zehnjahresfrist (§ 23 EStG) gilt nur im Privatvermoegen. Bis v3267
      floss der Erloes auch bei einem Gesellschaftsobjekt steuerfrei in den IRR.
@@ -2927,7 +2962,7 @@ function _calcImmediate(){
          entsteht. Kostet nichts und ist die einzige Art, den IRR zu prüfen. */
       State._irrReihe = {
         ek: ekv, cf: _cfReihe.slice(), exit: _exitErloes,
-        exit_vkp: exit_vkp, rs_ende: rs_loop, bspar_guth: bspar_guth,
+        exit_vkp: exit_vkp, rs_ende: rs_loop + Math.max(0, _rsWExit), rs_ende_d1: rs_loop, bspar_guth: bspar_guth,   /* v3760: Restschuld aller Darlehen */
         reihe: _reihe.slice(), irr: irr
       };
     }
@@ -3079,16 +3114,12 @@ function _calcImmediate(){
   // V63.40: CF v.St. = nach Tilgung
   // V354b-d2-phasen: Darlehen 2 zur Anschluss-Phase addieren (State.rs2 als Basis)
   if (typeof d2_enabled !== 'undefined' && d2_enabled && d2 > 0 && typeof _d2IsAussetzung !== 'undefined') {
-    var _rs2_an = (typeof State.rs2 === 'number' ? State.rs2 : d2);
-    if (_d2IsAussetzung) {
-      zins_an += d2 * d2z;                       // reines Zinsdarlehen, keine Tilgung
-    } else if (d2_anschl_enable) {
-      zins_an += _rs2_an * d2_az;                // eigene D2-Anschlusskonditionen
-      tilg_an += Math.max(0, _rs2_an * (d2_az + d2_at) - _rs2_an * d2_az);
-    } else {
-      zins_an += _rs2_an * d2z;                  // läuft mit eigener Annuität weiter
-      tilg_an += Math.max(0, d2_rate_m * 12 - _rs2_an * d2z);
-    }
+    /* v3760: Jahr bindj+1 aus _d2PlanJahre - in SEINER Bindung die alte Annuitaet, danach die
+       feste Anschlussrate. Bis v3759 galten die Anschlusskonditionen von Darlehen II hier immer
+       (auch wenn es laenger gebunden ist), jahresweise auf die Restschuld gerechnet. */
+    var _d2AnJ = _d2PlanJahre(bindj + 1)[bindj] || { zy: 0, ty: 0 };
+    zins_an += _d2AnJ.zy;
+    tilg_an += _d2AnJ.ty;
   }
   /* v3215 · W-17: weitere Darlehen im ersten Anschlussjahr (bindj + 1) */
   if (_dwAktiv) { zins_an += _dwJahr(bindj + 1).zins; tilg_an += _dwJahr(bindj + 1).tilg; }
@@ -3576,6 +3607,7 @@ function _calcImmediate(){
   State.cfRows=[];var rs3=d1;
   State._zbEzbIdx = null; State._zbAnIdx = null; State._zbRsEzbProj = null;   /* v2852: je Lauf neu, nie vom Vorgaenger */
   var rs3_d2 = (typeof d2_enabled !== 'undefined' && d2_enabled && d2 > 0) ? d2 : 0;  // V354-rs3d2-init: D2-Restschuld-Strang
+  var _d2RateAnProj = null;   /* v3760 · feste Anschlussrate Darlehen II (aus der Restschuld am Ende seiner Bindung) */
   var rs3_dw = 0;   /* v3215 · W-17: Restschuld der weiteren Darlehen (aus _dwPlan je Jahr) */
   // V268-06: Anzeige-Basisjahr aus Kaufjahr (WU/kaufdat), Fallback heute
   var _v268_baseYear = (function(){
@@ -3880,7 +3912,11 @@ function _calcImmediate(){
         zy2_d2 = _d2Jm.zy; ty2_d2 = _d2Jm.ty;
       } else if (d2_anschl_enable) {
         // Eigene Anschlussfinanzierung (Checkbox)
-        var _rate_d2_an = rs3_d2 * (d2_az + d2_at);
+        /* v3760: die Rate steht EINMAL fest (Restschuld am Ende der Bindung × Anschlusszins + -tilgung),
+           wie bei Darlehen I (State.rs1). Bis v3759 wurde sie jedes Jahr neu auf die schon getilgte
+           Restschuld gerechnet - die Rate sank Jahr fuer Jahr und Darlehen II wurde kaum getilgt. */
+        if (_d2RateAnProj == null) _d2RateAnProj = rs3_d2 * (d2_az + d2_at);
+        var _rate_d2_an = _d2RateAnProj;
         var _d2JmA = _jahrMonatlich(rs3_d2, d2_az, _rate_d2_an / 12);   /* v3029-rechnen */
         zy2_d2 = _d2JmA.zy; ty2_d2 = _d2JmA.ty;
       } else {
@@ -3960,7 +3996,11 @@ function _calcImmediate(){
     var san_y = (_spJahr[cal] > 0) ? _spJahr[cal] : 0;   /* v3214 · N137: geplante Sanierung, Einmalzahlung */
     if (san_y) { cfop_y -= san_y; cfns_y -= san_y; }
     var _rs_push = rs3 + (typeof rs3_d2 === 'number' ? rs3_d2 : 0) + rs3_dw;  // V354: kombinierte RS fuer Anzeige · v3215: + weitere
-    var eff_rs = Math.max(0, _rs_push - bspar_kum_proj);
+    /* v3760 · Rechen-Audit 18.11.2026: das Bausparguthaben mindert die WIRTSCHAFTLICHE Restschuld nur, solange es
+       noch NICHT verrechnet ist. Ab dem Zuteilungsjahr ist rs3 schon um das Guthaben gekuerzt (Abloesung, oben) -
+       bis v3759 zog eff_rs es ein zweites Mal ab (gemessen: 135.729 statt 183.729 € im Zuteilungsjahr, Bank-PDF
+       „Effektive Restschuld am Bindungsende", Restschuld-Grafik und LTV der Bank-Charts). */
+    var eff_rs = Math.max(0, _rs_push - ((typeof bsv_zuteil_jahr === 'number' && y >= bsv_zuteil_jahr) ? 0 : bspar_kum_proj));
     State.cfRows.push({y:y,cal:cal,nkm_m:nkm_y2/12,wm_m:(wm_j>0?wm_y2*warm_j/wm_j:0)/12 /* v2484: Anzeige Warmmiete ohne Zusatzeinnahmen */,nkm_y:nkm_y2,bwk_y:bwk_y2,bwk_cf_y:bwk_cf_y2,bwk_st_y:bwk_st_y2,su_y:su_y,zy:zy2,ty:ty2,bspar_y:bspar_y2,bspar_kum:bspar_kum_proj,eff_rs:eff_rs,cfop_y:cfop_y,cfns_y:cfns_y,wm_y:wm_y2,rs:_rs_push,wert_y:wert_y,eq_y:eq_y,ltv_y:ltv_y,tax_y:taxEffect_y,afa_y:_afaPush,zve_y:zve_op_y-_afaPush,rs_d1:rs3,rs_d2:(typeof rs3_d2==='number'?rs3_d2:null),rs_dw:(_dwAktiv?rs3_dw:null),zy_dw:(_dw_y?_dw_y.zins:null),ty_dw:(_dw_y?_dw_y.tilg:null),san_y:san_y});  /* v2989: Restschuld je Darlehen fuer die Jahresstaende (jahresstaende.js) - nur mitgefuehrt, nichts neu gerechnet */  /* v2166: AfA und steuerliches Ergebnis je Jahr - fuer die Pilot-Analyse (Werbungskosten, Jahr der Wende) */
   }
   /* v1898 · WOHER DAS zvE JE JAHR KAM — die Herkunft ist ausweisbar, statt
