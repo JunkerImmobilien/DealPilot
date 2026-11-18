@@ -171,7 +171,7 @@
     s.textContent = R.concat(ab, [
       /* v3640c · RND-Bausteine (css/rnd-styles.css) auch im Arbeitsbereich: dieselbe Huelle, nur ohne Ueberlagerung */
       '.rnd-wiz-overlay.rnd-hub.dppk-hub-inline{position:static !important;inset:auto !important;background:none !important;backdrop-filter:none !important;padding:0 !important;z-index:auto !important;animation:none !important;display:block !important}',
-      '.dppk-hub-inline .rnd-wiz-modal{max-width:none !important;max-height:none !important;box-shadow:none !important}',
+      '.dppk-hub-inline .rnd-wiz-modal{max-width:none !important;max-height:none !important;box-shadow:none !important;width:100% !important;box-sizing:border-box}',   /* v3690c · rnd-styles.css:1277 width:min(1143px,100vw - 48px) !important ragte bei 1440 14 px ueber den Kasten */
       '.dppk-hub .dppk-hub-reiter[hidden]{display:none !important}',
       '.dppk-hub .dppk-hub-reiter{display:flex;flex-direction:column;gap:14px}',
       '#dppk-hub-kunde .rnd-wiz-modal{max-width:760px}',
