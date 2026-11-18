@@ -299,20 +299,25 @@
   }
   function kstSoliPct(jahr) { return Math.round(kstSatzPct(jahr) * 1.055 * 1e6) / 1e6; }
 
-  /* ── v3268 · Einfache Kuerzung § 9 Nr. 1 S. 1 GewStG ────────────────────
-     Ab EZ 2025 (JStG 2024): 0,11 % des Grundsteuerwerts des zum
-     Betriebsvermoegen gehoerenden Grundbesitzes; bis EZ 2024: 1,2 % von
-     140 % des Einheitswerts. Bis v3267 kuerzte DealPilot um den
-     Grundsteuer-BETRAG - das kennt das Gesetz nicht. Der Grundsteuerwert
-     steht im Grundsteuerwertbescheid (Feld `grundsteuerwert` am Objekt);
-     fehlt er, gibt es KEINE Kuerzung (nicht geraten) und einen Hinweis. */
-  var KUERZUNG_9_1 = { satzAb2025: 0.0011, satzBis2024: 0.012, ewFaktor: 1.4 };
-  function einfacheKuerzung(jahr, grundsteuerwert, einheitswert) {
+  /* ── Einfache Kuerzung § 9 Nr. 1 S. 1 GewStG ─────────────────────────────
+     v3684 · Ab EZ 2025 kuerzt das Gesetz um „die im Erhebungszeitraum als
+     Betriebsausgabe erfasste Grundsteuer fuer zum Betriebsvermoegen des
+     Unternehmers gehoerenden Grundbesitz“ (Fassung Art. 9 Gesetz vom
+     02.12.2024, BGBl. 2024 I Nr. 387, erstmals EZ 2025 nach § 36 Abs. 4b
+     GewStG; gelesen auf gesetze-im-internet.de am 18.11.2026). Die 0,11 % des
+     Grundsteuerwerts aus dem Grundsteuerreform-Umsetzungsgesetz sind damit
+     NIE in Kraft getreten. v3268 hatte genau darauf umgestellt - zurueckgenommen
+     (eigener Fehler, gefunden ueber den Pruefbericht vom 18.11.2026, G-02).
+     Grundlage ist der Grundsteuer-BETRAG je Jahr (Feld `grundsteuer` am Objekt).
+     Fehlt er, gibt es KEINE Kuerzung (nicht geraten) und einen Hinweis.
+     Bis EZ 2024: 1,2 % von 140 % des Einheitswerts. */
+  var KUERZUNG_9_1 = { satzBis2024: 0.012, ewFaktor: 1.4 };
+  function einfacheKuerzung(jahr, grundsteuerwert, einheitswert, grundsteuer) {
     var j = Number(jahr) || 0;
     if (j >= 2025) {
-      var g = _n(grundsteuerwert);
-      return (g != null && g > 0) ? { betrag: g * KUERZUNG_9_1.satzAb2025, basis: 'grundsteuerwert', fehlt: false }
-                                  : { betrag: 0, basis: null, fehlt: 'Grundsteuerwert' };
+      var g = _n(grundsteuer);
+      return (g != null && g > 0) ? { betrag: g, basis: 'grundsteuer', fehlt: false }
+                                  : { betrag: 0, basis: null, fehlt: 'Grundsteuer' };
     }
     var e = _n(einheitswert);
     return (e != null && e > 0) ? { betrag: e * KUERZUNG_9_1.ewFaktor * KUERZUNG_9_1.satzBis2024, basis: 'einheitswert', fehlt: false }
@@ -398,8 +403,8 @@
       var kuerz = 0, ge = 0, gG = 0, bemG = 0, gewst = 0, hz = 0, kuerzFehlt = false;
       if (p.erwKuerzung) { kuerz = Math.max(0, erg); ge = Math.min(0, erg); }
       else {
-        /* v3268: einfache Kuerzung aus dem Grundsteuerwert (nicht mehr der Grundsteuerbetrag) */
-        var ek = einfacheKuerzung(jahr, r.grundsteuerwert, r.einheitswert);
+        /* v3684: einfache Kuerzung um die als Betriebsausgabe erfasste Grundsteuer (ab EZ 2025) */
+        var ek = einfacheKuerzung(jahr, r.grundsteuerwert, r.einheitswert, r.grundsteuer);
         kuerz = ek.betrag; kuerzFehlt = ek.fehlt;
         /* v3268: Hinzurechnung § 8 Nr. 1 GewStG (nur ohne erweiterte Kuerzung) */
         if (Number(r.entgelte) > 0) hz = hinzurechnung(r.entgelte, p).betrag;
@@ -421,11 +426,11 @@
   function tracker(p) {
     var hist = [];
     return {
-      steuer: function (erg, jahr, grundsteuerwert, entgelte) {
+      steuer: function (erg, jahr, grundsteuer, entgelte) {   /* v3684: 3. Parameter = Grundsteuer-Betrag je Jahr */
         var last = hist.length ? hist[hist.length - 1].jahr : null;
         if (last !== null && jahr === last) hist.pop();          /* dasselbe Jahr neu gerechnet (calc.js V353) */
         else if (last !== null && jahr < last) hist = [];        /* neue Schleife */
-        hist.push({ jahr: jahr, erg: erg, grundsteuerwert: grundsteuerwert, entgelte: entgelte });
+        hist.push({ jahr: jahr, erg: erg, grundsteuer: grundsteuer, entgelte: entgelte });
         var r = steuerReihe(hist, p);
         return r[r.length - 1];
       },

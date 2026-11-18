@@ -2361,7 +2361,7 @@ function _calcImmediate(){
   /* v3268 · einfache Kuerzung § 9 Nr. 1 S. 1 GewStG aus dem GRUNDSTEUERWERT (ab EZ 2025
      0,11 %), nicht mehr aus dem Grundsteuerbetrag (der hier zudem mit × 12 lief, obwohl
      #grundsteuer ein Jahresbetrag ist). Leer = keine Kuerzung (Kern meldet es). */
-  var _gesGrundsteuerJ = v('grundsteuerwert');
+  var _gesGrundsteuerJ = v('grundsteuer');   /* v3684: Grundsteuer-Betrag je Jahr (§ 9 Nr. 1 S. 1 GewStG ab EZ 2025), v3268 nahm faelschlich den Grundsteuerwert */
   var _gesGdZins = (function(){
     try {
       var _ud = JSON.parse(g('ueberf_daten') || 'null');

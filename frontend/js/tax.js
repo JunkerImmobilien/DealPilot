@@ -1848,7 +1848,7 @@ function _gesDetailHtml(j) {
           ? (P.hebesatz > 0 ? fE(j.gewst || 0, 0) + ' bis zur Bestätigung (ohne erweiterte K&uuml;rzung, Hebesatz ' + String(P.hebesatz).replace('.', ',') + ' %)' : 'bis zur Best&auml;tigung nicht rechenbar')
             + ' &middot; <b style="color:var(--red)">erweiterte K&uuml;rzung beantragt &mdash; ' + ((st.offen && st.offen.length) || 'die') + ' Pr&uuml;fpunkte im Mandanten best&auml;tigen, dann 0 &euro;</b>'
           : (P.hebesatz > 0
-              ? fE(j.gewst || 0, 0) + ' (Gewerbeertrag ' + fE(j.gewerbeertrag || 0, 0) + (j.kuerzungFehlt ? ' ohne K&uuml;rzung &sect; 9 Nr. 1 S. 1 GewStG &mdash; <b>' + j.kuerzungFehlt + ' eintragen</b> (Reiter Steuer, Halter &amp; Eigentum)' : ' nach K&uuml;rzung 0,11 % des Grundsteuerwerts ' + fE(j.gewKuerzung || 0, 0))
+              ? fE(j.gewst || 0, 0) + ' (Gewerbeertrag ' + fE(j.gewerbeertrag || 0, 0) + (j.kuerzungFehlt ? ' ohne K&uuml;rzung &sect; 9 Nr. 1 S. 1 GewStG, <b>' + j.kuerzungFehlt + ' eintragen</b> (Reiter Bewirtschaftung)' : ' nach K&uuml;rzung um die Grundsteuer ' + fE(j.gewKuerzung || 0, 0))
                 + (j.hinzurechnung > 0 ? ' und Hinzurechnung &sect; 8 Nr. 1 GewStG ' + fE(j.hinzurechnung, 0) : '') + ', &times; 3,5 % &times; ' + String(P.hebesatz).replace('.', ',') + ' %)'
                 + _hinzHinweis(j)
               : 'nicht rechenbar &middot; <b style="color:var(--red)">Hebesatz fehlt &mdash; bitte im Mandanten erg&auml;nzen</b>'));
@@ -1887,10 +1887,11 @@ function _kstMitVortrag(reihe, rate, opt) {
   if (K && P) {
     opt = opt || {};
     /* v3268: Grundsteuerwert lt. Bescheid fuer die einfache Kuerzung § 9 Nr. 1 S. 1 GewStG (nicht der Grundsteuerbetrag) */
-    var gs = (opt.grundsteuerwert != null) ? opt.grundsteuerwert : (parseDe((document.getElementById('grundsteuerwert') || {}).value) || 0);
+    /* v3684: Grundsteuer-Betrag je Jahr (§ 9 Nr. 1 S. 1 GewStG ab EZ 2025), nicht der Grundsteuerwert */
+    var gs = (opt.grundsteuer != null) ? opt.grundsteuer : (parseDe((document.getElementById('grundsteuer') || {}).value) || 0);
     var gd = (opt.gdZins != null) ? opt.gdZins : ((window.State && State._gesGdZins) || 0);
     /* v3268: Entgelte fuer Schulden (§ 8 Nr. 1 GewStG) = Schuldzinsen der Zeile + Gesellschafterdarlehen */
-    return K.steuerReihe((reihe || []).map(function (r) { return { jahr: r.jahr, erg: (Number(r.erg) || 0) - gd, grundsteuerwert: gs, entgelte: (Number(r.entgelte) || 0) + gd }; }), P)
+    return K.steuerReihe((reihe || []).map(function (r) { return { jahr: r.jahr, erg: (Number(r.erg) || 0) - gd, grundsteuer: gs, entgelte: (Number(r.entgelte) || 0) + gd }; }), P)
       .map(function (x) { return { jahr: x.jahr, erg: x.erg, genutzt: x.genutzt, bemessung: x.bemessung, kst: x.steuer, kstSoli: x.kst, gewst: x.gewst,
         gewKuerzung: x.gewKuerzung, kuerzungFehlt: x.kuerzungFehlt, kstSoliPct: x.kstSoliPct, hinzurechnung: x.hinzurechnung, entgelte: x.entgelte, gewerbeertrag: x.gewerbeertrag, vortragNach: x.vortragNach, vortragGewNach: x.vortragGewNach, gdZins: gd }; });
   }

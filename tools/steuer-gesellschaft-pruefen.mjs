@@ -106,10 +106,11 @@ try {
 
 /* ── 2 · GmbH ohne Kuerzung, Zinsen 300.000 € ───────────────────────────
    Hinzurechnung § 8 Nr. 1 GewStG: 25 % × (300.000 − 200.000) = 25.000 €.
-   Ohne Grundsteuerwert: Gewerbeertrag 50.000 + 25.000 = 75.000 €,
+   Ohne Grundsteuer: Gewerbeertrag 50.000 + 25.000 = 75.000 €,
    GewSt 75.000 × 3,5 % × 400 % = 10.500 €. KSt unveraendert 7.912,50 €.
-   Mit Grundsteuerwert 200.000 €: Kuerzung 0,11 % = 220 € -> 74.780 ->
-   abgerundet 74.700 -> GewSt 10.458 €.
+   v3684: mit Grundsteuer 220 € (als Betriebsausgabe erfasst, § 9 Nr. 1 S. 1
+   GewStG ab EZ 2025): Kuerzung 220 € -> 74.780 -> abgerundet 74.700 -> GewSt 10.458 €.
+   Ein Grundsteuerwert allein kuerzt nichts (0,11 % ist nie in Kraft getreten).
    Gegenprobe Freibetrag: Zinsen 200.000 -> Hinzurechnung 0. */
 {
   const P = { kstSoliPct: 15.825, hebesatz: 400, erwKuerzung: false };
@@ -120,10 +121,11 @@ try {
   const r = K.steuerReihe([{ jahr: 2026, erg: 50000, entgelte: 300000 }], P)[0];
   soll('2 Gewerbeertrag 75.000', r.gewerbeertrag, 75000);
   soll('2 GewSt 10.500', r.gewst, 10500);
-  soll('2 Kuerzung fehlt ohne Grundsteuerwert', r.kuerzungFehlt, 'Grundsteuerwert');
+  soll('2 Kuerzung fehlt ohne Grundsteuer', r.kuerzungFehlt, 'Grundsteuer');
   soll('2 KSt 7.912,50', r.kst, 7912.5);
-  const r2 = K.steuerReihe([{ jahr: 2026, erg: 50000, entgelte: 300000, grundsteuerwert: 200000 }], P)[0];
-  soll('2 Kuerzung 0,11 % × 200.000 = 220', r2.gewKuerzung, 220);
+  const r2 = K.steuerReihe([{ jahr: 2026, erg: 50000, entgelte: 300000, grundsteuer: 220 }], P)[0];
+  soll('2 Kuerzung = Grundsteuer 220 (v3684)', r2.gewKuerzung, 220);
+  soll('2 Grundsteuerwert allein kuerzt nicht (v3684)', K.steuerReihe([{ jahr: 2026, erg: 50000, entgelte: 300000, grundsteuerwert: 200000 }], P)[0].gewKuerzung, 0);
   soll('2 GewSt mit Kuerzung 10.458', r2.gewst, 10458);
   /* bis EZ 2024: 1,2 % von 140 % des Einheitswerts 50.000 = 840 € */
   soll('2 Kuerzung 2024 aus Einheitswert 50.000 = 840', K.einfacheKuerzung(2024, null, 50000).betrag, 840);

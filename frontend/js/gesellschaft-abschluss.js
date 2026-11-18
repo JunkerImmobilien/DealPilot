@@ -323,8 +323,8 @@ async function _gaDaten(halterId, jahr, _ohneVortrag) {
       kumAfaGebaeude: kumGeb,
       kumAfaBwg: kumBwg,
       basisIstVerkehrswert: (basis !== kp),
-      /* v3268: Grundsteuerwert lt. Bescheid (einfache Kuerzung § 9 Nr. 1 S. 1 GewStG, 0,11 %) */
-      grundsteuerwert: _gaNum(d.grundsteuerwert),
+      /* v3684: Grundsteuer-Betrag je Jahr (einfache Kuerzung § 9 Nr. 1 S. 1 GewStG ab EZ 2025) */
+      grundsteuer: _gaNum(d.grundsteuer),
       gdZins: (_udA && _udA.gd && _gaNum(_udA.gd.betrag) > 0) ? _gaNum(_udA.gd.betrag) * _gaNum(_udA.gd.zinsPct) / 100 : 0,
       restschuld: _gaRestschuld(d, jahr)
     });
@@ -404,7 +404,7 @@ async function _gaVortrag(halterId, jahr, objekte) {
     var e = (r && r.guv && isFinite(r.guv.jahresueberschuss)) ? r.guv.jahresueberschuss : 0;
     var ev = (r && r.guv && isFinite(r.guv.ergebnisVorSteuern)) ? r.guv.ergebnisVorSteuern : 0;
     summe += e;
-    details.push({ jahr: y, ergebnis: e, vorSteuern: ev, grundsteuerwert: (r && r._grundsteuerwert) || 0, entgelte: (r && r._entgelte) || 0 });   /* v3268 */
+    details.push({ jahr: y, ergebnis: e, vorSteuern: ev, grundsteuer: (r && r._grundsteuer) || 0, entgelte: (r && r._entgelte) || 0 });   /* v3684 */
   }
   return { summe: summe, jahre: details, gekappt: gekappt, start: start };
 }
@@ -456,8 +456,8 @@ function _gaRechnen(halterId, jahr, daten) {
   guv.sonstige += (kosten.summe - gfGehalt);
 
   /* v2984 · Zins eines Gesellschafterdarlehens ist Aufwand der Gesellschaft */
-  var gdZinsSumme = 0, grundsteuerwertSumme = 0, ohneGsw = [];
-  daten.objekte.forEach(function (o) { gdZinsSumme += o.gdZins || 0; grundsteuerwertSumme += o.grundsteuerwert || 0; if (!(o.grundsteuerwert > 0)) ohneGsw.push(o.name); });
+  var gdZinsSumme = 0, grundsteuerSumme = 0, ohneGsw = [];   /* v3684: Grundsteuer-Betrag statt Grundsteuerwert */
+  daten.objekte.forEach(function (o) { gdZinsSumme += o.gdZins || 0; grundsteuerSumme += o.grundsteuer || 0; if (!(o.grundsteuer > 0)) ohneGsw.push(o.name); });
   guv.zinsen += gdZinsSumme;
   entgelteSchulden += gdZinsSumme;
   var ergebnisVorSteuern = guv.umsatz - guv.grundstueck - guv.personal
@@ -486,8 +486,8 @@ function _gaRechnen(halterId, jahr, daten) {
     var _P = (window.DealPilotMandanten && DealPilotMandanten.steuerParameter) ? DealPilotMandanten.steuerParameter(halterId) : null;
     if (_K && _P) {
       var _vj = (daten && daten.vortrag && daten.vortrag.jahre) || [];
-      var _reihe = _vj.map(function (x) { return { jahr: x.jahr, erg: x.vorSteuern || 0, grundsteuerwert: x.grundsteuerwert || 0, entgelte: x.entgelte || 0 }; });
-      _reihe.push({ jahr: jahr, erg: ergebnisVorSteuern, grundsteuerwert: grundsteuerwertSumme, entgelte: entgelteSchulden });
+      var _reihe = _vj.map(function (x) { return { jahr: x.jahr, erg: x.vorSteuern || 0, grundsteuer: x.grundsteuer || 0, entgelte: x.entgelte || 0 }; });
+      _reihe.push({ jahr: jahr, erg: ergebnisVorSteuern, grundsteuer: grundsteuerSumme, entgelte: entgelteSchulden });
       var _sr = _K.steuerReihe(_reihe, _P);
       steuerDetail = _sr[_sr.length - 1];
       steuern = steuerDetail.steuer;
@@ -550,7 +550,7 @@ function _gaRechnen(halterId, jahr, daten) {
     steuersatz: satz, steuerDetail: steuerDetail, vortragSteuerlich: vortragSteuerlich,
     ugRuecklage: ugRuecklage, gdZins: gdZinsSumme,
     erwStatus: (window.DealPilotUeberfuehrungKern ? DealPilotUeberfuehrungKern.erwKuerzungStatus(reg) : { aktiv: false }),
-    _grundsteuerwert: grundsteuerwertSumme, _ohneGrundsteuerwert: ohneGsw,
+    _grundsteuer: grundsteuerSumme, _ohneGrundsteuer: ohneGsw,
     _entgelte: entgelteSchulden,    /* v3268: Entgelte fuer Schulden, Summe aller Objekte */
     guv: {
       umsatz: guv.umsatz, grundstueck: guv.grundstueck, personal: guv.personal,
@@ -647,8 +647,8 @@ function _gaSteuerHinweis(rech) {
   return (rech.steuerDetail
         ? 'Körperschaftsteuer + Soli ' + _gaEur(rech.steuerDetail.kst) + ', Gewerbesteuer ' + _gaEur(rech.steuerDetail.gewst)
           + (rech.erwStatus && rech.erwStatus.aktiv ? ' (erweiterte Kürzung § 9 Nr. 1 S. 2 GewStG)'
-              : (rech.steuerDetail.kuerzungFehlt ? ' (ohne Kürzung § 9 Nr. 1 S. 1 GewStG: ' + rech.steuerDetail.kuerzungFehlt + ' fehlt' + (rech._ohneGrundsteuerwert && rech._ohneGrundsteuerwert.length ? ' bei ' + rech._ohneGrundsteuerwert.join(', ') : '') + ', abgerundet)'
-                : ' (nach Kürzung 0,11 % des Grundsteuerwerts § 9 Nr. 1 S. 1 GewStG, abgerundet)'))
+              : (rech.steuerDetail.kuerzungFehlt ? ' (ohne Kürzung § 9 Nr. 1 S. 1 GewStG: ' + rech.steuerDetail.kuerzungFehlt + ' fehlt' + (rech._ohneGrundsteuer && rech._ohneGrundsteuer.length ? ' bei ' + rech._ohneGrundsteuer.join(', ') : '') + ', abgerundet)'
+                : ' (nach Kürzung um die Grundsteuer § 9 Nr. 1 S. 1 GewStG, abgerundet)'))
           /* v3268 · Hinzurechnung § 8 Nr. 1 GewStG */
           + (!(rech.erwStatus && rech.erwStatus.aktiv)
               ? (rech.steuerDetail.hinzurechnung > 0
