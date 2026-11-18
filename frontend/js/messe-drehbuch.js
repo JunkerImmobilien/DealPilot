@@ -2982,6 +2982,9 @@
         await zeige(r6Gruppe('san'), 10);
         var zb = r6Beginn(s, 'Angenommen: eine Sanierung', 'In den ersten drei Jahren sollen 87.000 € in das Haus fließen.');
         await tippeH('san', '87000', 90);
+        /* v3730 · gemessen 18.11.: die Kopie trägt san_tax_active = false - dann gilt die Sanierung als „nicht übernommen“,
+           und der BMF-Rechner zeigt in Schritt 3 keine Einordnung je Variante (v3705). Haken in der Kopie setzen. */
+        var sta = q('#san_tax_active'); if (sta && !sta.checked) sta.click();
         await warte(1400);
         await r6Ende(zb);
         _r6Vorher = r6San15();
@@ -10186,7 +10189,7 @@
         await pdCockpit('uebersicht');
         var zs = function () { return [].filter.call(document.querySelectorAll('.main-col .pk-ansteht'), function (e) { return e.offsetWidth && /Sabine/.test(pdText(e)); })[0] || qs('.main-col .pk-ansteht'); };
         await zeige(zs, 8);
-        await b2oZeile(s, 'Was ansteht', 'In der Übersicht steht es sofort: <b>' + pdText(zs()).replace(/\s*›$/, '') + '</b>. Dazu eine Meldung.');
+        await b2oZeile(s, 'Was ansteht', 'In der Übersicht steht es sofort: <b>' + pdText(zs()).replace(/\s*›$/, '').replace(/\s*\(Demo\)/g, '') + '</b>. Dazu eine Meldung.');   /* v3730: ohne „(Demo)“ */
       },
       async function (s) {   /* 8 · Freigegeben, nach Kunde */
         await pdReiterKlick('staende');
