@@ -1266,6 +1266,15 @@ function renderTaxTimeline() {
     var sumKst = 0;
     /* v2891: KSt je Jahr nach Verlustvortrag aus den Vorjahren */
     var _kstTl = _kstMitVortrag(timeline.map(function (t) { return { jahr: t.year, erg: t.immoResult, entgelte: t.zinsen }; }), _tlRate);
+    /* v3685 · Pruefbericht 18.11.2026 (7.4/7.5, G-05, T29): GESPEICHERT wurde je Jahr weiter die
+       private ESt-Differenz aus _computeYearTotal (Tax.calcImmoTaxImpact) - die Steuer-Mappe druckte sie
+       als „Ertragsteuer der Gesellschaft“ (Ravensberger 2026: -4.083 € bei 47 % statt KSt 0 und
+       Verlustvortrag). Jetzt traegt die gespeicherte Reihe (State.taxTimeline, ganze Haltedauer)
+       dieselbe Steuer wie diese Anzeige: KSt + Soli + GewSt nach Verlustvortrag, nie eine Erstattung. */
+    try {
+      var _kstVoll = _kstMitVortrag(timelineVoll.map(function (t) { return { jahr: t.year, erg: t.immoResult, entgelte: t.zinsen }; }), _tlRate);
+      timelineVoll.forEach(function (t, _vi) { if (_kstVoll[_vi]) { t.taxDelta = _kstVoll[_vi].kst; t.refund = 0; t.gesellschaft = true; } });
+    } catch (_eV) {}
     timeline.forEach(function(t, _ti){
       var kst = _kstTl[_ti].kst;
       sumKst += kst;
