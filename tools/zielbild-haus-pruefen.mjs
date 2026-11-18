@@ -40,7 +40,9 @@ const m2 = P.modell({ einheiten: E(), gebaeude: { dach: 'h' }, haus_massnahmen: 
 ist('Dach schon halb modernisiert: WE3 nur 2 + 2', m2.wohnungen[2].plus_ziel, 4);
 // bewohnt: Mieterhoehung bekommt Kosten und Punkte
 const m3 = P.modell({ einheiten: E(), gebaeude: {}, haus_massnahmen: [{ id: 'heizung', t: 'Heizung', k: 20000, bewohnt: true }] });
-ist('bewohnt: Kosten Mieterhoehung = Hausanteil der bewohnten', m3.stufen.mieterhoehung ? m3.stufen.mieterhoehung.kosten : -1, 20000);
+/* v3150 (Wissen 18.11.): Umlage § 559 geplanter Massnahmen gehoert ins Zielbild, die Stufe Mieterhoehung ist nur § 558 + Vertrag und traegt keine Kosten. Bis 18.11. erwartete dieser Punkt die Kosten bei der Mieterhoehung (veraltet seit v3150). */
+ist('bewohnt: keine Kosten in der Stufe Mieterhoehung', m3.stufen.mieterhoehung ? m3.stufen.mieterhoehung.kosten : 0, 0);
+ist('bewohnt: Hauskosten im Zielbild (15.000 + 20.000)', m3.stufen.zielbild.kosten, 35000);
 // Wohnungsmassnahmen zeigen nur die eigenen
 ist('WE1 Liste nur eigene Massnahmen', m1.wohnungen[0].massnahmen.length, 1);
 // nicht-Haus-Katalog wird ignoriert (Bad am Haus)
