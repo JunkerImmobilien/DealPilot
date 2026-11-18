@@ -598,14 +598,7 @@
         "felder": []
       },
       "experte": {
-        "karten": [
-          {
-            "titel": "In Gesellschaft überführen",
-            "selektor": "#dpuew-stage",
-            "art": "block",
-            "js": "deal-action.js"
-          }
-        ]
+        "karten": []
       }
     }
   }

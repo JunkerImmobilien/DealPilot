@@ -481,6 +481,7 @@
       '.dp-wz-klar{font:400 13px/1.6 Inter,system-ui,sans-serif;color:#2A2727;margin:0 0 10px;max-width:80ch}',
       '.dp-wz-klar b.dp-wz-pos{color:#2f7d55}.dp-wz-klar b.dp-wz-neg{color:#B8625C}',
       /* v2944 · Brücke zum Vermögenszuwachs */
+      'body.dp-dg-1 #s6:has(#card-vermoegen-zuwachs:is([data-dp-dg="2"],[data-dp-dg="3"])) .dp-wz-vzb,body.dp-dg-2 #s6:has(#card-vermoegen-zuwachs[data-dp-dg="3"]) .dp-wz-vzb{display:none !important}',   /* v3720 */
       '.dp-wz-bruecke{border-left:3px solid var(--wl-c9a84c, #C9A84C);background:#FBF6E9;border-radius:0 8px 8px 0;padding:10px 14px;margin:0 0 4px}',
       '.dp-wz-bruecke p{font:400 13px/1.6 Inter,system-ui,sans-serif;color:#2A2727;margin:0 0 6px;max-width:90ch}.dp-wz-bruecke p:last-child{margin:0}',
       '.dp-wz-mehr{font:600 12px Inter,sans-serif;border:1px solid #E6DCC2;border-radius:8px;background:#fff;color:#2A2727;padding:6px 12px;cursor:pointer}',
@@ -731,7 +732,10 @@
     var anker = { verkehrswert: 'dem Verkehrswert aus dem Reiter Objekt', marktbericht: 'dem ' + (S.wert_basis_text || 'Wert aus dem Marktbericht'),
       bankbewertung: 'der Bankbewertung', kaufpreis: 'dem Kaufpreis' }[S.wert_basis_quelle] || 'dem Wert von heute';
     var jahre = zahl(VZ.btj);
-    var t = '<div class="dp-wz-h">Und der Vermögenszuwachs?</div><div class="dp-wz-bruecke">'
+    /* v3720 · Die Brücke verweist auf die Karte Vermögenszuwachs „direkt darunter“. Die ist ab
+       Fortgeschritten (Detailgrad); in Einsteiger stand hier ein Verweis ins Leere. Der Wrapper
+       .dp-wz-vzb fällt per Regel (unten im Stil) mit der Karte - es zählt deren Marke, keine Liste. */
+    var t = '<div class="dp-wz-vzb"><div class="dp-wz-h">Und der Vermögenszuwachs?</div><div class="dp-wz-bruecke">'
       + '<p><b>Zwei Fragen, zwei Rechnungen.</b> Diese Karte fragt: <i>Was ist das Objekt heute wert, und was nach den Maßnahmen?</i> '
       + 'Der Vermögenszuwachs direkt darunter fragt: <i>Was baust du in ' + esc(jahre != null ? jahre : '') + ' Jahren auf?</i> '
       + 'Er beginnt bei ' + esc(anker) + ' (' + esc(eur(basis)) + '), schreibt ihn mit ' + esc(dez(wstg != null ? wstg * 100 : null, 1)) + ' % im Jahr fort '
@@ -745,7 +749,7 @@
       t += '<p><b>Anderer Ausgangswert.</b> Der Ertragswert hier (' + esc(eur(ew)) + ') liegt ' + esc(dez(Math.abs(d), 1)) + ' % ' + (d > 0 ? 'über' : 'unter') + ' dem Ausgangswert des Vermögenszuwachses. '
         + (S.wert_basis_quelle === 'verkehrswert' ? 'Ein eingetragener Verkehrswert im Reiter Objekt hat Vorrang vor dem Marktbericht.' : '') + '</p>';
     }
-    return t + '</div>';
+    return t + '</div></div>';
   }
   /* v2945 · Zielbild als Plan-Zeile im Vermögenszuwachs (Marcel 25.10.2026: „ja, wenn das
      Sinn macht"). Die Summe aus calc.js (State._vz.verm_zuwachs) bleibt UNVERÄNDERT - an ihr

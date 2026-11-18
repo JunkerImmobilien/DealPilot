@@ -2973,7 +2973,11 @@
        `nurArt` trennt Objekt (ETW/EFH) und Wohnungsliste (MFH). */
     { et: 4, ids: ['zb_soll_qm', 'zb_ziel_qm', 'zb_ziel_wann'], rang: 15, nurArt: 'einzel',
       frage: 'Freiwillig: Siehst du Mietpotenzial? Was zahlt der Mieter nach einer normalen Mieterhöhung (Euro je m²), was wäre nach Umbau oder Neuvermietung drin, und wann? „Weiß ich nicht“ geht auch.' },
-    { et: 4, ids: ['mfh_wohnungen'], rang: 15, nurArt: 'mfh',
+    /* v3720 · `dgIds`: mfh_wohnungen ist kein Formularfeld - ohne Feld galt der Block in JEDEM
+       Detailgrad als sichtbar, Einsteiger und Fortgeschritten wurden nach Soll- und Zielmiete je
+       Wohnung gefragt. Die Karte „Mieterhöhung und Zielbild“ ist seit v3710 Experte (Reiter Miete);
+       der Block folgt ihrem Haken zb_aktiv, wie der Einzelblock darüber seinen zb_-Feldern. */
+    { et: 4, ids: ['mfh_wohnungen'], dgIds: ['zb_aktiv'], rang: 15, nurArt: 'mfh',
       frage: 'Freiwillig, je Wohnung: Nummer oder Lage, Fläche, Ist-Kaltmiete, Soll-Miete nach normaler Erhöhung, Zielmiete nach Umbau (Euro je m²) und wann zuletzt erhöht wurde. „Weiß ich nicht“ geht auch.' },
     { et: 4, ids: ['kaufdat', 'wirtschaftlicher_uebergang'], rang: 10,
       frage: 'Wann wird gekauft, und ab wann gehören dir Mieten und Kosten?' },
@@ -3433,7 +3437,7 @@
     return RFRAGEN.map(_rfZuschnitt)
       .map(function (e) { return _rfNachArt(e, fields); })
       .filter(Boolean)
-      .filter(function (e) { return _rfImDetailgrad(e.ids); });   /* v3073 */
+      .filter(function (e) { return _rfImDetailgrad(e.dgIds || e.ids); });   /* v3073 · v3720 dgIds */
   }
 
   function _rfLuecken(fields) {

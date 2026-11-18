@@ -1,10 +1,10 @@
 {
- "erzeugt_am": "2026-11-18T12:53:55.003Z",
+ "erzeugt_am": "2026-11-18T13:16:35.127Z",
  "quellen": {
-  "voice-import": "b85d1194e6f250e3",
+  "voice-import": "7c4b19e456c9c5f3",
   "objektart-felder": "f7d9212555982a97",
   "storage": "be4c02d529c9eb53",
-  "index-html": "b1cfc858020a67c2",
+  "index-html": "9dea36ddfdbef6d6",
   "grest": "81f3fb0a4de3a6cf"
  },
  "daten": {
@@ -384,6 +384,9 @@
     "et": 4,
     "ids": [
      "mfh_wohnungen"
+    ],
+    "dgIds": [
+     "zb_aktiv"
     ],
     "rang": 15,
     "nurArt": "mfh",
@@ -4391,7 +4394,7 @@
      },
      {
       "h": "Die schlanke Fassung und der Detailgrad",
-      "text": "Die Einstellungen stehen in der schlanken Fassung — gelöscht ist nichts, gespeicherte Werte bleiben. Die frühere volle Fassung öffnest du mit ?einstellungen=voll hinter der Adresse (gilt für diesen Browser-Tab), dauerhaft mit ?einstellungen=voll&merken, zurück mit ?einstellungen=schlank.\n\n• Mein Profil (bisher Standardwerte) steht direkt nach Account. Ganz oben der Detailgrad der Eingabe, darunter Strategie und Risikoneigung.\n• Deal Score steht direkt dahinter: ein oder zwei Scores, Gewichtung und Bewertungsprofil.\n• Marktphase und Verkäuferbereitschaft gibt es nicht mehr als Einstellung, und sie gehen nicht in die Pilot-Analyse.\n• Datenraum erscheint, wenn du ihn nutzt oder ab Investor, Mandanten ab Pro oder sobald du eine Gesellschaft angelegt hast — und nur bei Detailgrad Experte.\n\nDetailgrad der Eingabe — wie viele Felder die Reiter zeigen, für alle Objekte:\n• Einsteiger — die wichtigsten Felder je Reiter, der Rest rechnet mit Vorgaben.\n• Fortgeschritten — dazu Gewerke, Sanierung, Zielbild, Mietvertrag, Darlehen II.\n• Experte — alle Felder, dazu Bauteile und Sach- und Ertragswert. Gesellschaften (GmbH, UG, GbR) gibt es ab Experte: Reiter Mandanten, Halter, Überführung, Jahresabschluss und Halter-Filter. Ein Objekt, das schon einer Gesellschaft gehört, rechnet in jeder Stufe mit ihrer Steuer; darunter sagt eine Karte im Reiter Steuer, wem es gehört.\nAusgeblendete Felder behalten ihre Werte und rechnen weiter. Der Detailgrad gibt außerdem frei, welche Marktbericht-Stufen du im Reiter Objekt wählen kannst: Einsteiger Stufe 1, Fortgeschritten Stufe 1 und 2, Experte alle drei. Welche davon du abrufst, wählst du dort selbst — die Stufe ändert den Detailgrad nicht."
+      "text": "Die Einstellungen stehen in der schlanken Fassung — gelöscht ist nichts, gespeicherte Werte bleiben. Die frühere volle Fassung öffnest du mit ?einstellungen=voll hinter der Adresse (gilt für diesen Browser-Tab), dauerhaft mit ?einstellungen=voll&merken, zurück mit ?einstellungen=schlank.\n\n• Mein Profil (bisher Standardwerte) steht direkt nach Account. Ganz oben der Detailgrad der Eingabe, darunter Strategie und Risikoneigung.\n• Deal Score steht direkt dahinter: ein oder zwei Scores, Gewichtung und Bewertungsprofil.\n• Marktphase und Verkäuferbereitschaft gibt es nicht mehr als Einstellung, und sie gehen nicht in die Pilot-Analyse.\n• Datenraum erscheint, wenn du ihn nutzt oder ab Investor, Mandanten ab Pro oder sobald du eine Gesellschaft angelegt hast — und nur bei Detailgrad Experte.\n\nDetailgrad der Eingabe — wie viele Felder die Reiter zeigen, für alle Objekte:\n• Einsteiger — die wichtigsten Felder je Reiter, der Rest rechnet mit Vorgaben.\n• Fortgeschritten — dazu Gewerke, Sanierung, Zielbild, Mietvertrag, Darlehen II.\n• Experte — alle Felder, dazu Mieterhöhung und Zielbild, Bauteile und Sach- und Ertragswert. Gesellschaften (GmbH, UG, GbR) gibt es ab Experte: Reiter Mandanten, Halter, Überführung, Jahresabschluss und Halter-Filter. Ein Objekt, das schon einer Gesellschaft gehört, rechnet in jeder Stufe mit ihrer Steuer; darunter sagt eine Karte im Reiter Steuer, wem es gehört.\nAusgeblendete Felder behalten ihre Werte und rechnen weiter. Der Detailgrad gibt außerdem frei, welche Marktbericht-Stufen du im Reiter Objekt wählen kannst: Einsteiger Stufe 1, Fortgeschritten Stufe 1 und 2, Experte alle drei. Welche davon du abrufst, wählst du dort selbst — die Stufe ändert den Detailgrad nicht."
      },
      {
       "h": "Kontakt & Logo",
@@ -5627,7 +5630,7 @@
   }
  },
  "inhalt": {
-  "hilfe": "7e45e40f7303310d",
+  "hilfe": "15dba1d4e19c8cf9",
   "bewertung": "ce4f5980fbae015d"
  }
 }

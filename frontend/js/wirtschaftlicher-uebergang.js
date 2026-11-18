@@ -72,7 +72,10 @@
         '<span class="dp-wu-warning-icon">⚠</span>' +
         '<div style="flex:1">' +
           '<strong>Kein wirtschaftlicher Übergang hinterlegt.</strong> Für die Steuerberechnung wird das <strong>Kaufdatum</strong> verwendet. ' +
-          '<a href="#" onclick="document.getElementById(\'wirtschaftlicher_uebergang\').focus();return false">Jetzt eintragen →</a>' +
+          /* v3720 · data-oe-feld: objekt-reiter.js abweichend() wechselt in den Reiter Objekt, hebt den
+             Detailgrad bis zum Feld (Experte) und fokussiert. Vorher focus() auf ein Feld in einem
+             anderen Reiter - in Einsteiger/Fortgeschritten zudem ausgeblendet, es geschah nichts. */
+          '<a href="#" data-oe-feld="wirtschaftlicher_uebergang" onclick="return false">Jetzt eintragen →</a>' +
         '</div>';
       
       // Vor das ZVE-Feld einfuegen (Steuer-Tab)

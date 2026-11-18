@@ -591,14 +591,7 @@ window.DpDetailgradZuordnung = {
     "felder": []
    },
    "3": {
-    "karten": [
-     {
-      "s": "#dpuew-stage",
-      "art": "block",
-      "js": "deal-action.js",
-      "titel": "In Gesellschaft überführen"
-     }
-    ],
+    "karten": [],
     "felder": []
    }
   }

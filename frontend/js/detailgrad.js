@@ -1,5 +1,5 @@
 /* ══════════════════════════════════════════════════════════════════════
- * frontend/js/detailgrad.js — v3073
+ * frontend/js/detailgrad.js — v3073 · v3720
  *
  * DETAILGRAD DES ARBEITSBEREICHS: Einsteiger · Fortgeschritten · Experte
  *
@@ -80,6 +80,13 @@
   /* Was in einem Reiter als „Karte" zählt, wenn es keine .card ist: die
      Deal-Aktion baut Tafeln (.dab-panel) und Bühnen (.da-stage). */
   var UNIVERSUM = { s8: '.dab-panel, .da-stage' };
+  /* v3720 · Felder ohne Zuordnung sind Experte - ausser in der Deal-Aktion. Dort stehen keine
+     Eingabefelder in der Zuordnung (der Reiter entsteht zur Laufzeit), nur Tafeln. Gemessen
+     18.11.2026: die Jahreswahl der Kachel „Finanzamt-PDF“ (#dab-fa-year) galt als Experte, ihre
+     Hülle .dab-doc-act (Jahreswahl UND Knopf „PDF“) trug data-dp-dg="3" - sichtbar blieb sie nur,
+     weil eine Kachelregel (html body #s8.sec .dab-kachel .dab-doc-act, display:flex !important)
+     die Ausblendung überstimmte. Ein Steuerelement der Deal-Aktion folgt deshalb seiner Tafel. */
+  var FELD_FOLGT_BEHAELTER = { s8: 1 };
   var FELD_SEL = 'input:not([type="hidden"]), select, textarea';
   /* nie markieren: eigene Bausteine und die Datenaufnahme-Leiste (v3077) */
   var NIE = '.dp-dg-weiter, [data-dp-detailgrad], #obj-action-bar';
@@ -192,7 +199,7 @@
         if (!expl.has(el) || L < expl.get(el)) expl.set(el, L);
       });
     });
-    var lvl = function (f) { return (f.id && feldStufe[f.id]) || 3; };
+    var lvl = function (f) { return (f.id && feldStufe[f.id]) || FELD_FOLGT_BEHAELTER[id] || 3; };
     var felder = [].slice.call(sec.querySelectorAll(FELD_SEL)).filter(function (f) { return !f.closest(NIE); });
 
     /* Behälter: jede Karte (und was im Reiter als Karte gilt) plus die

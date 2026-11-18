@@ -862,9 +862,9 @@ window.DealPilotOnboarding = (function () {
     { n: 1, name: 'Einsteiger', unter: 'Marktbericht Stufe 1 · Marktpreisindikation',
       fuer: 'Nur die wichtigsten Felder je Reiter (rund 45). Der Rest rechnet mit deinen Standardwerten.' },
     { n: 2, name: 'Fortgeschritten', unter: 'Marktbericht Stufe 2 · erweiterte Indikation',
-      fuer: 'Dazu Gewerke, Sanierung, Zielbild, Mietvertrag und zweites Darlehen (rund 150 Felder).' },
+      fuer: 'Dazu Gewerke, Sanierung, Mietvertrag und zweites Darlehen (rund 150 Felder).' },
     { n: 3, name: 'Experte', unter: 'Marktbericht Stufe 3 · Wertermittlung nach ImmoWertV',
-      fuer: 'Alle Felder, mit Bauteilen und Sach- und Ertragswert — wie ein Gutachten.' }
+      fuer: 'Alle Felder, mit Mieterhöhung und Zielbild, Bauteilen und Sach- und Ertragswert — wie ein Gutachten.' }
   ];
   function _dgVorgabe() {
     try { var n = parseInt(localStorage.getItem('dp_detailgrad_zuletzt'), 10); return (n >= 1 && n <= 3) ? n : 1; } catch (e) { return 1; }

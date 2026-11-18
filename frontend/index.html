@@ -1821,7 +1821,7 @@ label.dp-required.qc-required::after {
               gelten diese als <b>anschaffungsnahe Herstellkosten</b> und müssen über <span id="san_nd_jahre">50</span> Jahre abgeschrieben werden (statt sofort als Werbungskosten).
             </div><!-- v1898: die Jahreszahl kommt aus dem AfA-Satz (calc.js `_sanNd`), nicht fest 50 -->
             <div class="hint" style="margin-top:6px;padding:8px 10px;background:rgba(70,130,180,0.08);border-left:3px solid #4682B4;border-radius:4px">
-              <b>ℹ Gebäudeanteil:</b> Standardmäßig wird 80&nbsp;% Gebäudeanteil angenommen. Im Tab <b>Steuer-Details</b> kannst du den exakten Gebäudeanteil über den BMF-Rechner ermitteln — das wirkt sich rückwirkend auf die 15&nbsp;%-Grenze aus.
+              <b>ℹ Gebäudeanteil:</b> Standardmäßig wird 80&nbsp;% Gebäudeanteil angenommen. Im Reiter <b>Steuer</b> kannst du den exakten Gebäudeanteil über den BMF-Rechner ermitteln (ab Detailgrad Fortgeschritten) — das wirkt sich rückwirkend auf die 15&nbsp;%-Grenze aus.
               Wenn du eine Küche im Kaufpreis ausweist, gilt sie als <b>separates Wirtschaftsgut</b> mit eigener AfA über 10 Jahre und zählt nicht zum Gebäude.
             </div>
             <!-- v1898: die Fußzeile des Kastens — beantwortet die Frage, die der
@@ -3989,7 +3989,7 @@ label.dp-required.qc-required::after {
   <script src="js/all-objects-views.js?v=v2422"></script>
   <script src="js/tour-sidebar.js?v=v1696"></script>
   <script src="js/anteilig.js?v=v3314"></script>
-  <script src="js/wirtschaftlicher-uebergang.js?v=3"></script>
+  <script src="js/wirtschaftlicher-uebergang.js?v=v3720"></script>
   <script src="js/anteilig-recalc.js?v=353"></script>
   <script src="js/finanzierung-validation.js?v=1"></script>
 <script src="js/data/foerderregister.js?v=v3072"></script>
@@ -4035,7 +4035,7 @@ label.dp-required.qc-required::after {
   <script src="js/unterlagen-modal.js?v=v3370"></script>
   <script src="js/standardwerte-karten.js?v=v3223c"></script>
   <script src="js/settings.js?v=v3642"></script>
-  <script src="js/einstellungen-schlank.js?v=v3270"></script>
+  <script src="js/einstellungen-schlank.js?v=v3720"></script>
 <script src="js/pricing-modal.js?v=v3610"></script>
   <script src="js/flyer-code.js?v=v1421c"></script>
   <script src="js/promo-erstflug.js?v=v1421c"></script>
@@ -4107,9 +4107,9 @@ label.dp-required.qc-required::after {
 <script src="js/objektart-felder.js?v=v2824"></script>
 <script src="js/vgf-merkmale.js?v=v3008"></script>
 <!-- v3073: Detailgrad Einsteiger · Fortgeschritten · Experte - Zuordnung (erzeugt aus design/Vorschläge/arbeitsbereich-detailgrad-zuordnung.json) und Modul -->
-<script src="js/data/detailgrad-zuordnung.js?v=v3710"></script>
-<script src="js/detailgrad.js?v=v3243"></script>
-<script src="js/objekt-reiter.js?v=v3681a"></script>
+<script src="js/data/detailgrad-zuordnung.js?v=v3720"></script>
+<script src="js/detailgrad.js?v=v3720"></script>
+<script src="js/objekt-reiter.js?v=v3720"></script>
 <script src="js/paket-import.js?v=v3670"></script><!-- v3202 · Portfolio/Paket aus mehreren Objekten -->
 <script src="js/objekt-bloecke.js?v=v3034"></script><!-- v3034 -->
 <script src="js/feld-hilfe.js?v=v3073"></script>
@@ -4132,7 +4132,7 @@ label.dp-required.qc-required::after {
 <!-- V63.63: V25-Bank-Charts (4 SVG-basierte Charts: Equity-Aufbau, Cockpit, Waterfall, Stress) -->
 <script src="js/bank-charts.js?v=v3358"></script>
 <!-- V63.70: User-Hilfe-System mit Suche + KI-Assistent -->
-<script src="js/help.js?v=v3710"></script>
+<script src="js/help.js?v=v3720"></script>
 <script src="js/modal-handy.js?v=v2201"></script>
 <script src="js/pilot-figur.js?v=v2189"></script>
 <script src="js/prozess-atlas.js?v=v3710"></script>
@@ -4145,7 +4145,7 @@ label.dp-required.qc-required::after {
   <script src="js/tour-engine.js?v=v3045"></script>
   <script src="js/tour-content.js?v=v3231"></script>
   <!-- v1740 � Grund-Setup VOR dem Rundgang (Aussehen, Stammdaten, Rechenwerte) -->
-  <script src="js/onboarding.js?v=v3641"></script>
+  <script src="js/onboarding.js?v=v3720"></script>
 <!-- V63.73: Feedback & Support Modal -->
 <script src="js/feedback-modal.js?v=777e"></script>
   <script src="js/email-change.js?v=774"></script><!-- v774-change-email -->
@@ -4182,7 +4182,7 @@ label.dp-required.qc-required::after {
 <script src="js/jahresbuch.js?v=v3710"></script><!-- v3363 · Jahr für Jahr: Plan gegen Ist im Bestand (_jahre) -->
 <script src="js/jahresbuch-grafik.js?v=v3433"></script><!-- v3364 · Verlaufsgrafik Plan gegen Ist · v3430 Engine für Jahresabgleich und Haus -->
 <script src="js/jahresabgleich.js?v=v3434"></script><!-- v3420 · Jahresabgleich im Bestand: erster Unterreiter der Pilot-Analyse (Miete, Steuer, Wert, Haus) · v3430 Demo Fassung 2 -->
-<script src="js/wert-zielbild.js?v=v3710"></script><!-- v2840 · Tab Bewertung: Segment „Wert &amp; Zielbild"; Pilot-Analyse: Einfach | Genau -->
+<script src="js/wert-zielbild.js?v=v3720"></script><!-- v2840 · Tab Bewertung: Segment „Wert &amp; Zielbild"; Pilot-Analyse: Einfach | Genau -->
 <script src="js/dealpilot-mb.js?v=v3670"></script>
 <script src="js/mb-abgleich.js?v=v3343"></script><!-- v3002 · Abgleich mit dem Marktbericht in den Reitern Objekt und Miete -->
 <script src="js/mb-auftrag.js?v=v3253"></script>
@@ -4215,7 +4215,7 @@ label.dp-required.qc-required::after {
   <script src="js/ze-aufteilung.js?v=v3670b"></script><!-- v3670 · Zusatzeinnahmen aufteilen (Reiter Miete) -->
   <script src="js/dpsh-score-hero.js?v=v3370"></script><!-- dpsh-score-hero -->
   <script src="js/quick-boarding-share.js?v=v3370"></script>
-  <script src="js/voice-import.js?v=v3370"></script>
+  <script src="js/voice-import.js?v=v3720"></script>
   <!-- v1895: der sichtbare Vermerk an jedem pauschal angesetzten
        Bewirtschaftungsposten. Liest nur `_dp_herkunft`, rechnet nichts. -->
   <script src="js/bwk-vermerk.js?v=v1895b"></script>
