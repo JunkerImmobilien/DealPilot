@@ -1284,6 +1284,7 @@ function renderTaxTimeline() {
     } catch (_eV) {}
     timeline.forEach(function(t, _ti){
       var kst = _kstTl[_ti].kst;
+      var _gzT = _dpGesJahr(t.year); if (_gzT) kst = _gzT.steuer;   /* v3701 · G-05 */
       sumKst += kst;
       var hasKst = kst > 0.5;
       var color = hasKst ? 'var(--red)' : 'var(--green)';
@@ -1999,8 +2000,39 @@ function _ytfGesSteuer(year) {
   } catch (e) {}
   return null;
 }
+/* v3701 · G-05: Steuer der GANZEN Gesellschaft je Jahr (gesellschaft-abschluss.js DpGesSteuer.reihe, dieselbe Rechnung
+   wie der Jahresabschluss). Laedt einmal je Gesellschaft und Zeitraum asynchron und zeichnet danach neu. Nicht im
+   Kundenkontext des Partners (dort liegen die Daten der Gesellschaft des Kunden noch nicht vor). */
+function _dpGesReihe() {
+  try {
+    if (!_dpBegriff().corp || !window.DpGesSteuer) return null;
+    if (window.DpSteuerKontext && typeof DpSteuerKontext.aktiv === 'function' && DpSteuerKontext.aktiv()) return null;
+    var h = String((document.getElementById('halter') || {}).value || '');
+    var rows = (window.State && State.cfRows) || [];
+    if (!h || h === 'privat' || !rows.length) return null;
+    var bis = rows[Math.min(rows.length, 15) - 1].cal, k = h + '|' + bis, c = window._dpGesReiheCache;
+    if (c && c.k === k && (c.r || Date.now() - c.t < 20000)) return c.r;
+    window._dpGesReiheCache = { k: k, r: null, t: Date.now() };
+    DpGesSteuer.reihe(h, bis).then(function (r) {
+      var cc = window._dpGesReiheCache; if (!cc || cc.k !== k) return;
+      cc.r = r || null;
+      if (r) { try { renderYearlyTaxForm(); } catch (e1) {} try { if (typeof renderTaxTimeline === 'function') renderTaxTimeline(); } catch (e2) {} }
+    }).catch(function () {});
+  } catch (e) {}
+  return null;
+}
+function _dpGesJahr(year) {
+  var r = _dpGesReihe(); if (!r) return null;
+  for (var i = 0; i < r.length; i++) if (r[i].jahr === year) return r[i];
+  return null;
+}
+window._dpGesJahr = _dpGesJahr;
 function _ytfSteuerAnzeige(year, totals) {
   if (_dpBegriff().corp) {
+    var gz = _dpGesJahr(year);   /* v3701 · G-05: Steuer der Gesellschaft auf alle Objekte */
+    if (gz) return gz.steuer > 0.5
+      ? { text: '−' + Math.round(gz.steuer).toLocaleString('de-DE') + ' €', color: 'var(--red)', title: 'Steuer der Gesellschaft ' + year + ' auf alle ' + gz.objekte + ' Objekte (Ergebnis ' + Math.round(gz.erg).toLocaleString('de-DE') + ' €), nach Kosten der Gesellschaft und Verlustvortrag' }
+      : { text: '0 €', color: 'var(--green)', title: 'Die Gesellschaft zahlt ' + year + ' keine Ertragsteuer (alle ' + gz.objekte + ' Objekte zusammen, Ergebnis ' + Math.round(gz.erg).toLocaleString('de-DE') + ' €, nach Verlustvortrag).' };
     var g = _ytfGesSteuer(year);
     if (g == null) return { text: '–', color: 'var(--muted)', title: 'Die Ertragsteuer rechnet die Gesellschaft (Körperschaftsteuer-Verlauf oben).' };
     return g > 0.5
@@ -2334,7 +2366,7 @@ function _renderQuickForm(years) {
        (6.5), hier fehlte sie: Westerfeldstr. 2028 erklärten die Spalten 39.976 von 69.242 € Werbungskosten. */
     '<th class="num" title="Erhaltungsaufwand und anschaffungsnahe Herstellungskosten des Jahres (im Detail-Modus unter 6.5)">Erhaltung / Sanierung</th>' +
     '<th class="num ytf-result">' + (_corp ? '= Ergebnis vor Steuern' : '= Verlust/Überschuss') + '</th>' +
-    '<th class="num ytf-result">' + (_corp ? 'Ertragsteuer' : 'Steuer-Effekt') + '</th>' +
+    '<th class="num ytf-result"' + (_corp ? ' title="Körperschaftsteuer, Soli und Gewerbesteuer der Gesellschaft auf alle ihre Objekte, nach Verlustvortrag (wie im Jahresabschluss)"' : '') + '>' + (_corp ? 'Steuer der GmbH (alle Objekte)' : 'Steuer-Effekt') + '</th>' +
     (window.DpJahresbuch ? '<th title="geplant, erklärt oder Bescheid. Ein Bescheid sperrt nichts, beim Ändern fragt DealPilot nach.">Status</th>' : '') +   /* v3363 · E6 */
     '</tr></thead><tbody>';
 
@@ -2592,7 +2624,7 @@ function _renderDetailForm(years) {
       Math.round(totals.einnahmen).toLocaleString('de-DE') + ' €</span></div>' +
     '<div class="ytf-sum-row ytf-sum-result"><span><b>' + (_corpD ? 'Ergebnis vor Steuern' : 'Verlust/Überschuss V+V') + ':</b></span><span class="num"><b>' +
       (totals.ergebnis >= 0 ? '+' : '') + Math.round(totals.ergebnis).toLocaleString('de-DE') + ' €</b></span></div>' +
-    '<div class="ytf-sum-row" style="color:' + _stD.color + '"' + (_stD.title ? ' title="' + _stD.title + '"' : '') + '><span><b>' + (_corpD ? 'Ertragsteuer der Gesellschaft (KSt, Soli, GewSt)' : 'Steuer-Effekt') + ':</b></span><span class="num"><b>' +
+    '<div class="ytf-sum-row" style="color:' + _stD.color + '"' + (_stD.title ? ' title="' + _stD.title + '"' : '') + '><span><b>' + (_corpD ? 'Steuer der Gesellschaft (alle Objekte, KSt, Soli, GewSt)' : 'Steuer-Effekt') + ':</b></span><span class="num"><b>' +
       _stD.text + '</b></span></div>' +
     '</div>';
 

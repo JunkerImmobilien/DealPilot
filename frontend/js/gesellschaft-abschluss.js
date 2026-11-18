@@ -688,6 +688,32 @@ function _gaAusgleichText(b) {
 window._gaSteuerHinweis = _gaSteuerHinweis;
 window._gaAusgleichText = _gaAusgleichText;
 
+/* v3701 · Pruefbericht G-05 / 7.5, Marcel 18.11.2026 („das können wir auch für morgen anpassen“): eine GmbH wird
+   als EINE Einheit besteuert, die Objekte liefern nur ihr Ergebnis. Bis v3700 zeigten Reiter Steuer und Steuer-Mappe
+   je Objekt eine eigene KSt (Bismarckstr. 2027: -431 EUR, obwohl die Gesellschaft mit Ravensberger und dem
+   Verlustvortrag 2026 keine Steuer zahlt). Hier die Reihe der Gesellschaft je Jahr mit GENAU der Rechnung des
+   Jahresabschlusses (_gaDaten/_gaRechnen: alle Objekte, Kosten der Gesellschaft, Gesellschafterdarlehen, dann
+   steuerReihe mit Verlustvortrag). Ergebnis: [{ jahr, erg, steuer, kst, gewst, vortragNach, objekte }]. */
+var _gaGesStCache = {};
+async function _gaGesSteuerReihe(halterId, bisJahr) {
+  var key = halterId + '|' + bisJahr, c = _gaGesStCache[key];
+  if (c && Date.now() - c.t < 30000) return c.r;
+  var d = await _gaDaten(halterId, bisJahr);
+  var r = _gaRechnen(halterId, bisJahr, d);
+  var K = window.DealPilotUeberfuehrungKern;
+  var P = (window.DealPilotMandanten && DealPilotMandanten.steuerParameter) ? DealPilotMandanten.steuerParameter(halterId) : null;
+  if (!K || !P || !r || !r.guv) return null;
+  var vj = (d && d.vortrag && d.vortrag.jahre) || [];
+  var reihe = vj.map(function (x) { return { jahr: x.jahr, erg: x.vorSteuern || 0, grundsteuer: x.grundsteuer || 0, entgelte: x.entgelte || 0 }; });
+  reihe.push({ jahr: bisJahr, erg: r.guv.ergebnisVorSteuern || 0, grundsteuer: r._grundsteuer || 0, entgelte: r._entgelte || 0 });
+  var sr = K.steuerReihe(reihe, P);
+  var out = sr.map(function (x, i) { return { jahr: x.jahr, erg: reihe[i].erg, steuer: x.steuer, kst: x.kst, gewst: x.gewst, vortragNach: x.vortragNach,
+    objekte: (d.objekte || []).length }; });
+  _gaGesStCache[key] = { t: Date.now(), r: out };
+  return out;
+}
+window.DpGesSteuer = { reihe: _gaGesSteuerReihe, leeren: function () { _gaGesStCache = {}; } };
+
 /* ── gemeinsame Bausteine ── */
 function _gaEur(n) {
   var v = Math.round(Number(n) || 0);

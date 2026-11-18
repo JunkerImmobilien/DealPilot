@@ -1005,6 +1005,7 @@
       if (Array.isArray(opt.ids) && opt.ids.length) saetze = saetze.filter(function (s) { return opt.ids.indexOf(s.object_id) >= 0; });
       if (!saetze.length) throw nutzerFehler('Für ' + jahr + ' sind keine Steuersätze gespeichert.');
       return Promise.all(saetze.map(function (s) { return api('/objects/' + encodeURIComponent(s.object_id)).catch(function () { return null; }); })).then(function (objs) {
+        var gesSt = {};   /* v3701 · G-05: Steuerreihe je Gesellschaft (halterId -> DpGesSteuer.reihe), vor bauen() geholt */
         var bauen = function () {   /* v3700 · synchron, damit der Kontext des Kunden genau diesen Lauf umfasst */
         var eintr = saetze.map(function (s, i) {
           var o = objs[i] && (objs[i].object || objs[i]), d = (o && o.data) || {};
@@ -1057,7 +1058,9 @@
             if (e.s.marginal_tax_rate != null) tab.push(['Grenzsteuersatz', B.pct(num(e.s.marginal_tax_rate) * 100, 2)]);
           }
           /* v3480 · Gesellschaft: ein Verlust ist keine Erstattung (N-04) */
-          if (e.s.tax_delta != null) tab.push(e.corp ? steuerZeileGes(B, num(e.s.tax_delta), e.erg) : ['Steuerwirkung (Erstattung +, Belastung −)', B.eurS(-num(e.s.tax_delta), 0), { farbe: 1 }]);
+          /* v3701 · G-05: die Steuer zahlt die Gesellschaft auf alle ihre Objekte zusammen - je Objekt nur der Beitrag */
+          if (e.corp && gesSt[String(e.d.halter)]) tab.push(['Ertragsteuer', 'in der Gesellschaft', { det: 'Die Gesellschaft zahlt Körperschaftsteuer, Soli und Gewerbesteuer auf das Ergebnis aller ihrer Objekte zusammen, nach Kosten der Gesellschaft und Verlustvortrag. Siehe Zusammenfassung „Gesellschaften“.' }]);
+          else if (e.s.tax_delta != null) tab.push(e.corp ? steuerZeileGes(B, num(e.s.tax_delta), e.erg) : ['Steuerwirkung (Erstattung +, Belastung −)', B.eurS(-num(e.s.tax_delta), 0), { farbe: 1 }]);
           if (Math.abs(num(e.s.immo_result) - e.erg) > 1) tab.push(['Gespeichertes Ergebnis des Steuersatzes (weicht ab – Satz neu speichern)', B.eurS(num(e.s.immo_result), 2)]);
           S.push(B.seite(c, 'Objekt ' + (i + 1) + ' · ' + jahr, B.abschnitt('Objekt ' + (i + 1) + ' · ' + e.halter + (e.corp ? ' · Betriebsvermögen' : ' · Privatvermögen'), (e.corp ? 'Betriebseinnahmen und Betriebsausgaben ' : 'Einnahmen und Werbungskosten ') + jahr, e.adr)
             + (e.vermerk ? '<div class="hinweis">' + B.esc(e.vermerk) + '</div>' : '') + afa1925(B, e.d, e.corp) + B.liste(tab)
@@ -1073,18 +1076,37 @@
         var summe = function (L, wort, gesSpalte) {
           if (!L.length) return '';
           var st = function (e) { return gesSpalte ? Math.max(0, num(e.s.tax_delta)) : num(e.s.tax_delta); };
+          var _gemeinsam = !!(gesSpalte && Object.keys(gesSt).length);   /* v3701 · G-05: Steuer steht je Gesellschaft darunter */
           var a = L.reduce(function (x, e) { return [x[0] + e.ein, x[1] + e.wk, x[2] + e.erg, x[3] + st(e)]; }, [0, 0, 0, 0]);
           return '<h3>' + wort + '</h3><table><thead><tr><th>Objekt</th><th class="r">Einnahmen</th><th class="r">Kosten</th><th class="r">Ergebnis</th><th class="r">' + (gesSpalte ? 'Ertragsteuer' : 'Steuerwirkung') + '</th></tr></thead><tbody>'
-            + L.map(function (e) { return '<tr><td>' + B.esc(e.adr) + '</td><td class="r num">' + B.eur(e.ein, 2) + '</td><td class="r num">' + B.eur(e.wk, 2) + '</td><td class="r num">' + B.eurS(e.erg, 2) + '</td><td class="r num">' + (gesSpalte && !(st(e) > 0.5) ? '0 €' : B.eurS(-st(e), 0)) + '</td></tr>'; }).join('')
-            + '<tr class="summe"><td>Summe (' + L.length + ')</td><td class="r num">' + B.eur(a[0], 2) + '</td><td class="r num">' + B.eur(a[1], 2) + '</td><td class="r num">' + B.eurS(a[2], 2) + '</td><td class="r num">' + (gesSpalte && !(a[3] > 0.5) ? '0 €' : B.eurS(-a[3], 0)) + '</td></tr></tbody></table>'
+            + L.map(function (e) { return '<tr><td>' + B.esc(e.adr) + '</td><td class="r num">' + B.eur(e.ein, 2) + '</td><td class="r num">' + B.eur(e.wk, 2) + '</td><td class="r num">' + B.eurS(e.erg, 2) + '</td><td class="r num">' + (_gemeinsam ? '–' : (gesSpalte && !(st(e) > 0.5) ? '0 €' : B.eurS(-st(e), 0))) + '</td></tr>'; }).join('')
+            + '<tr class="summe"><td>Summe (' + L.length + ')</td><td class="r num">' + B.eur(a[0], 2) + '</td><td class="r num">' + B.eur(a[1], 2) + '</td><td class="r num">' + B.eurS(a[2], 2) + '</td><td class="r num">' + (_gemeinsam ? '–' : (gesSpalte && !(a[3] > 0.5) ? '0 €' : B.eurS(-a[3], 0))) + '</td></tr></tbody></table>'
             + (gesSpalte && L.some(function (e) { return e.erg < 0; }) ? '<p class="det">Ein Verlust eines Objekts begründet keine Erstattung: er wird in der Gesellschaft mit Gewinnen verrechnet, sonst als Verlustvortrag fortgeführt (§ 8 Abs. 1 KStG i. V. m. § 10d EStG, § 10a GewStG). Die Steuer der Gesellschaft insgesamt steht im Jahresabschluss.</p>' : '');
         };
         S.push(B.seite(c, 'Zusammenfassung', B.abschnitt('Zusammenfassung', 'Veranlagungsjahr ' + jahr)
           + summe(priv, 'Privatvermögen · Einkünfte aus Vermietung und Verpachtung') + (vl ? '<p class="det">Veranlagung ' + jahr + ': ' + B.esc(vl.art) + ', ' + B.esc(vl.kist) + ' (' + B.esc(vl.quelle) + ').</p>' : '') + summe(ges, 'Gesellschaften · Ergebnis vor Steuern je Objekt', true)
+          + (function () {   /* v3701 · G-05: Steuer je Gesellschaft, dieselbe Rechnung wie der Jahresabschluss */
+            var ids = Object.keys(gesSt); if (!ids.length) return '';
+            return '<h3>Gesellschaften · Steuer ' + jahr + ' (alle Objekte der Gesellschaft)</h3><table><thead><tr><th>Gesellschaft</th><th class="r">Ergebnis vor Steuern</th><th class="r">KSt + Soli</th><th class="r">GewSt</th><th class="r">Steuer</th><th class="r">Verlustvortrag danach</th></tr></thead><tbody>'
+              + ids.map(function (h) {
+                  var z = (gesSt[h] || []).filter(function (x) { return x.jahr === jahr; })[0]; if (!z) return '';
+                  var m = null; try { m = DealPilotMandanten.get(h); } catch (eM) {}
+                  return '<tr><td>' + B.esc((m && m.name) || h) + '<div class="det">' + z.objekte + ' Objekte, Kosten der Gesellschaft enthalten</div></td><td class="r num">' + B.eurS(z.erg, 2) + '</td><td class="r num">' + B.eur(z.kst, 0) + '</td><td class="r num">' + B.eur(z.gewst, 0) + '</td><td class="r num">' + (z.steuer > 0.5 ? B.eurS(-z.steuer, 0) : '0 €') + '</td><td class="r num">' + B.eur(z.vortragNach, 0) + '</td></tr>';
+                }).join('')
+              + '</tbody></table><p class="det">Die Gesellschaft wird als Ganzes besteuert (§ 8 Abs. 1 KStG, § 7 GewStG). Ergebnis vor Steuern ist die Summe der Beiträge aller ihrer Objekte abzüglich der Kosten der Gesellschaft, die Steuer gilt nach Verlustvortrag (§ 10d EStG, § 10a GewStG). Dieselbe Rechnung steht im Jahresabschluss.</p>';
+          })()
           + '<p class="det" style="margin-top:3mm">Die Steuerwirkung ist je Objekt gerechnet (Steuer mit und ohne dieses Objekt beim zu versteuernden Einkommen des Steuerzeitraums). Die Summe ist deshalb eine Näherung: die Progression mehrerer Objekte zusammen weicht davon ab. '
           + (ges.length ? 'Privatvermögen und Gesellschaften sind getrennte Steuersubjekte und werden nicht zusammengezählt. ' : '') + 'Keine Steuererklärung und keine Steuerberatung.</p>'));
         return B.dokument('Steuer-Mappe ' + jahr, S);
         };
+        /* v3701 · G-05: vor dem Bau die Steuerreihe je Gesellschaft holen (nicht im Kundenkontext: dort fehlen die Daten der
+           Gesellschaft des Kunden noch, dann bleibt die bisherige Anzeige je Objekt) */
+        var _gesH = [];
+        if (!kunde && window.DpGesSteuer) objs.forEach(function (oo) {
+          var dd = (oo && (oo.object || oo) && (oo.object || oo).data) || {}, h = String(dd.halter || 'privat');
+          try { var mm = h !== 'privat' && window.DealPilotMandanten ? DealPilotMandanten.get(h) : null; if (mm && mm.id === h && DealPilotMandanten.isCorp(mm.rechtsform) && _gesH.indexOf(h) < 0) _gesH.push(h); } catch (eH) {}
+        });
+        if (_gesH.length) return Promise.all(_gesH.map(function (h) { return DpGesSteuer.reihe(h, jahr).then(function (r) { if (r) gesSt[h] = r; }).catch(function () {}); })).then(function () { return bauen(); });
         return (kunde && window.DpSteuerKontext) ? DpSteuerKontext.mit(prof, bauen, { kunde: sp.kunde, kundennummer: sp.kundennummer, client_id: kunde, profil_id: sp.aktuell.id, fassung: sp.aktuell.fassung, stand_am: sp.aktuell.zuletzt_am }) : bauen();
       });
     });
