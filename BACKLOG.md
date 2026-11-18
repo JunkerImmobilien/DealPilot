@@ -36,6 +36,14 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
+### N180 · Anfordern und Freigeben zwischen Partner und Kunde (Marcel 18.11.2026, Konzept `Dateien/Mandantenkonzept/Anfordern-und-Freigeben-2026-11-18.md`) — **P0 v3683 und P1 v3690–v3690c (`aeeaf939`, `4c357f61`, `f10f7eac`) auf Staging nachgemessen; P1 Prod NICHT ausgerollt (Migration 118)**
+- [x] P0 Kundenstand rechnet nicht in der Steuer des Partners (v3683, Prod 1.0.114), v3688 `_von_kunde` nicht in der Verlustverrechnung (Prod 1.0.116).
+- [x] P1 Freigabe bei der Kopplung: Dialog in allen drei Wegen, Reiter Freigabe, Widerruf, Fassungen, Steuerdaten nur mit Freigabe (18.11.2026).
+- [ ] P2 Steuerdaten reisen mit (`_steuerbasis` im Browser des Kunden gebaut), Partner rechnet damit, Band aus P0 entfällt.
+- [ ] P3 Steuerjahr als Paket (Checkliste im Server, Status „bereit“, Matrix, Anforderung außerhalb der Dauerfreigabe als einmalige Zustimmung, Schalter „automatisch übermitteln“ Vorgabe aus).
+- [ ] P4 Unterlagen anfordern, Belege als Verweis, „Alles herunterladen“. P5 Ankauf, Finanzierung, Marktbericht. P6 Kanzlei-Paket.
+- [ ] Offen aus P1: Freigabe schon beim Erzeugen des Codes festlegen (Konzept 4.1, nicht gebaut, die Abfrage kommt bei der Annahme). Datenschutzberatung zur Kirchensteuer (Art. 9 DSGVO) vor Prod.
+
 ### N179 · Angesetzte Miete ohne Stellplatz, Küche, Sonstiges; Zusatzeinnahmen aufteilen, Importe und Marktbericht (Marcel 17.11.2026: „Wir haben im Tab Miete ein Feld dafür, das heißt zusätzliche Einnahmen … darunter zum Ausklappen auch trennen, aber nur wenn erforderlich“) — **v3670–v3670c (`d775d270`, `af4e6316`, `662d9563`, `38d1ced0`) auf Staging nachgemessen; Prod NICHT ausgerollt**
 - Quick-Check vergleicht die Wohnungsmiete (12,00 statt 13,54 €/m² im Beispiel), Box zeigt Wohnung + Zusatz; Reiter Miete „aufteilen“ (ze_stp_monat/ze_kueche_monat/ze_sonst_monat); Marktbericht bekommt ze erstmals (Küche mit eigener Dauer, keine Doppelzählung mit Anzahl × Stellplatzmiete); Exposé, Mietvertrag, Mieterliste, MFH, Paket, QC → Objekt geprüft und repariert. Einzelheiten und Vorher/Nachher in wissen/2026-11-17.md.
 - Verschiebung: Ertragswert der 103 Staging-Objekte mit ze steigt (Beispiel ETW +24.000 bis +28.000 €), QC-Score +0 bis +1.
