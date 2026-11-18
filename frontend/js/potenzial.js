@@ -1293,7 +1293,9 @@
       if (!w || w.art === 'gewerbe' || w.ziel_qm > 0 || !(w.wfl > 0)) return;
       var v = null; try { v = vorschlagFuer(out, j); } catch (e) { v = null; }
       if (!v || !(v.qm > 0) || !v.spanne) return;
-      var zM = Math.max(w.ist || 0, v.qm * w.wfl);
+      /* v3750 · nie unter der Stufe Mieterhöhung: gemessen Bismarckstr. Whg. 3 (Staffel, eigene Soll 1.120 €) -
+         der Vorschlag 7,20 €/m² lag unter der Ist-Miete, das Zielbild stand mit 1.020 € unter der Mieterhöhung */
+      var zM = Math.max(w.ist || 0, (w.soll && w.soll.miete > (w.ist || 0)) ? w.soll.miete : 0, v.qm * w.wfl);
       w.ziel = zM; w.ziel_qm = Math.round(zM / w.wfl * 100) / 100; w.ziel_auto = true; w.ziel_vorschlag = v;
       if (!w.ziel_wann) w.ziel_wann = 'bei Mieterwechsel';
       out.hat_ziel = true;
@@ -2896,11 +2898,35 @@
   }
 
   /* ── Mietentwicklung: Soll je Wohnung und ihr Startjahr ─────────────── */
+  /* v3750 · DIESELBE Soll-Miete wie die Stufe Mieterhöhung (Karte, Pilot-Analyse, PDF): aus modell() - mit der
+     Mietspiegel-Zelle der Wohnung (v3255) und ohne die Umlage § 559 geplanter Maßnahmen (die gehören seit v3150
+     ins Zielbild, ihre Kosten stehen nicht im Cashflow). Bis hier rechnete die Mietentwicklung eine eigene
+     Soll-Miete mit dem Objektwert der Vergleichsmiete und mit § 559. Ein Modell je Rechenlauf (Zwischenspeicher
+     bis zum nächsten Takt), sonst rechnete jede Wohnung in jedem Jahr das ganze Haus neu. */
+  var _meModell = null;
+  function meModell() {
+    if (_meModell) return _meModell;
+    _meModell = modell({ ohneVorschlag: true });
+    setTimeout(function () { _meModell = null; }, 0);
+    return _meModell;
+  }
   function sollFuerMietentwicklung(e, basisJahr) {
     if (!e || e.status === 'leer') return null;
-    var vg = objektVgl();
-    var s = sollFuer(e, { kapp: kappung(agsJetzt()), vgl_qm: vg.qm });
-    if (s.miete == null || !(s.miete > zahl(e.ist))) return null;
+    var D0 = window._dpMfh || {}, idx0 = Array.isArray(D0.einheiten) ? D0.einheiten.indexOf(e) : -1;
+    var w0 = null, s;
+    if (idx0 >= 0) { try { w0 = meModell().wohnungen.filter(function (w) { return w.i === idx0; })[0] || null; } catch (x) { w0 = null; } }
+    if (w0) {
+      s = w0.soll || {};
+      var mh = mhMiete(w0);
+      if (!(mh > zahl(e.ist) + 0.005)) return null;
+      s = Object.assign({}, s, { miete: Math.round(mh * 100) / 100 });
+    } else {
+      var vg = objektVgl();
+      s = sollFuer(e, { kapp: kappung(agsJetzt()), vgl_qm: vg.qm });
+      if (s.miete == null) return null;
+      s = Object.assign({}, s, { miete: K.teil558(s, e.ist) + ((sollVertrag({ soll: s, ist: zahl(e.ist) }) || {}).plus || 0) });
+      if (!(s.miete > zahl(e.ist) + 0.005)) return null;
+    }
     var idx = null;
     var D = window._dpMfh || {};
     var jEig = /^\d{4}-\d{2}/.test(e.soll_ab || '') ? +String(e.soll_ab).slice(0, 4) : null;
@@ -3069,7 +3095,12 @@
     try { if (window.DpZielbildFassungen) window.DpZielbildFassungen.mount(); } catch (e) {}   /* v3361 · Fassungen über der Karte */
     /* v2430b · die Gemeinde gleich holen (Leseroute, kein Kontingent) - sonst
        stand bis zum ersten Rechnen „20 %, Gemeinde noch nicht ermittelt". */
-    if (!agsJetzt() && wert('plz')) agsHolen().then(function (a) { if (a) { try { msRegisterHolen(); } catch (e) {} try { objektSumme(); } catch (e) {} try { mietrechtKarte(); } catch (e) {} } });
+    /* v3750 · gemessen Bismarckstr. (MFH) beim ersten Laden: „Ist gegen Soll" (Reiter Bewertung) blieb bei der
+       Soll-Miete VOR der Gemeinde (4.045 statt 3.770 €/Monat), und die MFH-Summe dieser Karte wurde nicht neu
+       gezeichnet (objektSumme schreibt nur die Einzelkarte). Nach der Gemeinde beides neu. */
+    if (!agsJetzt() && wert('plz')) agsHolen().then(function (a) { if (a) { try { msRegisterHolen(); } catch (e) {}
+      try { if (artMitEinheiten() && window._dpMfh && Array.isArray(window._dpMfh.einheiten) && window._dpMfh.einheiten.length) objektKarte(); else objektSumme(); } catch (e) {}
+      try { mietrechtKarte(); } catch (e) {} try { if (M().istSoll) M().istSoll(); } catch (e) {} } });
     else try { msRegisterHolen(); } catch (e) {}   /* v3250 · Mietspiegel-Verzeichnis der Gemeinde */
     var mfh = artMitEinheiten() && window._dpMfh && Array.isArray(window._dpMfh.einheiten) && window._dpMfh.einheiten.length;
     var sumHost = el('zb-mfh-summe'), einzel = el('zb-einzel');
@@ -3089,6 +3120,7 @@
       }
       try { feshBinden(); } catch (e) {}   /* v3064 */
       try { mietrechtKarte(); } catch (e) { console.warn('[mietrecht]', e); }   /* v3062 */
+      try { if (M().istSoll) M().istSoll(); } catch (e) {}   /* v3750 · „Ist gegen Soll" mit derselben Summe */
       return;
     }
     if (sumHost) sumHost.style.display = 'none';

@@ -188,8 +188,12 @@
     try {
       var P = window.DpPotenzial && typeof window.DpPotenzial.modell === 'function' ? window.DpPotenzial.modell({ einheiten: list }) : null;
       if (P && P.art === 'mfh' && Array.isArray(P.wohnungen) && P.wohnungen.length) {
-        s.soll = P.wohnungen.reduce(function (a, w) { return a + ((w.soll && w.soll.miete != null && w.soll.miete > w.ist) ? w.soll.miete : w.ist); }, 0);
-        s.hatSoll = s.hatSollEigen || !!P.hat_soll;
+        /* v3750 · genau die Stufe Mieterhöhung (§ 558 plus vertragliche Erhöhung, ohne Umlage § 559 geplanter
+           Maßnahmen, Leerstand bleibt leer) - dieselbe Zahl wie Zielbild-Karte, Pilot-Analyse und PDF. Bis hier
+           stand die Umlage § 559 mit drin, und „Ist gegen Soll" wich von der Pilot-Analyse ab. */
+        var _mh = P.stufen && P.stufen.mieterhoehung;
+        s.soll = _mh ? _mh.miete_m : (P.stufen && P.stufen.bestand ? P.stufen.bestand.miete_m : s.ist);
+        s.hatSoll = s.hatSollEigen || !!_mh;
         s.sollQuelle = 'DpPotenzial';
       }
     } catch (x) {}
@@ -1998,8 +2002,8 @@
       z('Bruttomietrendite', p(K.bmy) + '<div style="font-size:10.5px;color:var(--muted,#8A8272)">auf Kaufpreis</div>', p(bmySoll) + '<div style="font-size:10.5px;font-weight:400;color:var(--muted,#8A8272)">auf Kaufpreis</div>') +
       z('DSCR', f(K.dscr), f(dscrSoll)) +
       z('Leerstand', s.leer ? s.leer + ' WE' : '—', '—') +
-      (s.kosten ? z('Maßnahmen', '', eur(s.kosten)) : '') +
-      '</table><div class="cf-hint" style="margin-top:4px">Soll = vereinbarte Soll-Mieten aller Einheiten nach den Maßnahmen, gleiche Finanzierung und Kosten. '
+      /* v3750 · die Zeile „Maßnahmen" ist raus: Maßnahmen und ihre Umlage gehören ins Zielbild, nicht in diese Spalte */
+      '</table><div class="cf-hint" style="margin-top:4px">Soll = Mieterhöhung nach § 558 BGB und vertragliche Erhöhungen, die Mieter bleiben, Leerstand bleibt leer (dieselbe Stufe wie in der Pilot-Analyse). Gleiche Finanzierung und Kosten. Zielmiete und Maßnahmen stehen im Zielbild. '
       + (d.sollAbJahr > 0 ? 'Ab Jahr ' + d.sollAbJahr + ' rechnet die Mietentwicklung mit der Soll-Miete.' : 'Die Rechnung oben bleibt beim Ist — ein Jahr für den Sprung steht im Konfigurator, Schritt 4.') + '</div>';
   }
   function anhaengen() {

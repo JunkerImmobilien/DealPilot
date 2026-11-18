@@ -147,7 +147,10 @@ window.MietEntwicklung = (function() {
     var _P = window.DpPotenzial, _sp = (!leer && _P && _P.sollFuerMietentwicklung) ? _P.sollFuerMietentwicklung(e, _basisJahr()) : null;
     var sj = (_sp && _sp.jahrIndex != null) ? _sp.jahrIndex : sollJahr();
     if (sj != null && y >= sj) {
-      var soll = (_sp && _sp.miete) || _zahl(e.soll) || (leer ? _zahl(e.ist) : 0);
+      /* v3750 · mit DpPotenzial gilt NUR dessen Soll (Stufe Mieterhöhung). Der Rückfall auf die eigene Soll-Miete
+         brachte genau die Werte zurück, die DpPotenzial auf die Vergleichsmiete begrenzt hat (Bismarckstr. Whg. 1:
+         eigene 1.010 €, zulässig 912 €), und vermietete leere Wohnungen zur eigenen Soll-Miete. */
+      var soll = (_P && _P.sollFuerMietentwicklung) ? ((_sp && _sp.miete) || 0) : (_zahl(e.soll) || (leer ? _zahl(e.ist) : 0));
       /* v2422 · Marcel 19.10.2026: ist die Soll-Miete erreicht, laeuft
          danach die normale Prognose-Steigerung (`mietstg`) weiter - sonst
          bliebe die Wohnung ab dem Soll-Jahr fuer immer flach. */
@@ -246,7 +249,14 @@ window.MietEntwicklung = (function() {
     if (!(jahr > 0)) return null;
     function z(v) { if (v == null || String(v).trim() === '') return 0; var n = (typeof window.parseDe === 'function') ? window.parseDe(String(v)) : parseFloat(String(v).replace(/\./g, '').replace(',', '.')); return isFinite(n) ? n : 0; }
     var ist = 0, soll = 0;
-    d.einheiten.forEach(function (e) {
+    /* v3750 · der Sprung ist die Stufe Mieterhöhung (DpPotenzial über summe(), dieselbe Zahl wie „Ist gegen Soll",
+       Zielbild-Karte und Pilot-Analyse). Gemessen Bismarckstr. 27 (MFH, 6 WE, 2 leer): hier zählten die EIGENEN
+       Soll-Mieten ungekappt und die leeren Wohnungen mit - Faktor 1,595 (45.120 → 71.340 €/J. ab 2027), während
+       die Karte darüber 3.770 €/Monat (Faktor 1,027) nannte. Leerstand und Zielmiete gehören ins Zielbild. */
+    var Mf = window.DpMfhEinheiten, sP = null;
+    try { sP = Mf && Mf._summe ? Mf._summe(d.einheiten) : null; } catch (e) { sP = null; }
+    if (sP && sP.sollQuelle === 'DpPotenzial') { ist = sP.ist; soll = sP.soll; }
+    else d.einheiten.forEach(function (e) {
       if (e.status !== 'leer') ist += z(e.ist);
       soll += z(e.soll) || z(e.ist);
     });
