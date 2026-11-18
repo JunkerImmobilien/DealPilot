@@ -10451,7 +10451,7 @@
         await pdCockpit('meldungen');
         await zeige(function () { return qs('.main-col .pk-inhalt'); }, 8);
         var t = [].filter.call(document.querySelectorAll('.main-col .pk-inhalt .pk-zeile, .main-col .pk-inhalt li, .main-col .pk-inhalt > div'), function (e) { return e.offsetWidth && /Rückfrage|erledigt|gesendet|Stand/.test(pdText(e)); })[0];
-        await b2oZeile(s, 'Meldungen', 'Unter <b>Meldungen</b> steht, was Jonas getan hat' + (t ? ': <b>' + pdText(t).replace(/\s*\d{2}\.\d{2}\.\d{4}.*$/, '').slice(0, 90) + '</b>' : '') + '.');
+        await b2oZeile(s, 'Meldungen', 'Unter <b>Meldungen</b> steht, was Jonas getan hat' + (t ? ': <b>' + pdText(t.querySelector('.pk-name b') || t).replace(/\s*\d{2}\.\d{2}\.\d{4}.*$/, '').replace(/\s*\(Demo\)/g, '').replace(/[\s,]+$/, '').slice(0, 90) + '</b>' : '') + '.');   /* v3730: nur die Meldung, ohne Kundennummer/Datum und „(Demo)“ */
         await pdReiterKlick('staende');
         var z = pdZeileMit(/Lindenallee/);
         await zeige(z, 6);
@@ -10548,7 +10548,8 @@
     var bb = function () { var x = pdDlg(); var b = x && x.querySelector('.pk-fg-ber'); return b && b.offsetHeight ? b : null; };
     var nm = pdText(w() && w().querySelector('b')).replace(/vom Partner vorgeschlagen/, '').trim();
     if (bb()) { var sx = scroller(bb()); if (sx) { sx.scrollTop += rect(bb()).top - rect(sx).top - 40; await warte(400); } await zeigeGruppe(w, bb, 6); }
-    await b2oZeile(s, 'Was darf er sehen?', 'Im selben Fenster legst du die Freigabe fest, hier <b>' + (nm || art) + '</b>' + (ber.length && art !== 'keine' ? ' für ' + ber.join(', ') : '') + '. Was er vorgeschlagen hat, ist vorausgewählt. Du kannst weniger wählen.');
+    var vorg = !!(pdDlg() && pdDlg().querySelector('em.pk-fg-vs:not(.grau)'));   /* Vorschlag des Partners nur nennen, wenn es einen gibt */
+    await b2oZeile(s, 'Die Freigabe', 'Im selben Fenster legst du fest, was dein Berater anfordern darf, hier <b>' + (nm || art) + '</b>' + (ber.length && art !== 'keine' ? ' für ' + ber.join(', ') : '') + '.' + (vorg ? ' Sein Vorschlag ist vorausgewählt, du kannst weniger wählen.' : ' Ändern oder widerrufen geht später unter Freigaben.'));
     return true;
   }
   async function pdCodeAlsPartner(code, name) {
