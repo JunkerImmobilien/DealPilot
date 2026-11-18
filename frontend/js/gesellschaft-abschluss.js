@@ -719,6 +719,10 @@ async function _gaGesSteuerReihe(halterId, bisJahr) {
   var sr = K.steuerReihe(reihe, P);
   var out = sr.map(function (x, i) { return { jahr: x.jahr, erg: reihe[i].erg, steuer: x.steuer, kst: x.kst, gewst: x.gewst, vortragNach: x.vortragNach,
     objekte: (d.objekte || []).length }; });
+  /* v3702a · Ueberleitung fuer das letzte Jahr: Summe der Objektbeitraege - Kosten der Gesellschaft - Zinsen Gesellschafterdarlehen
+     = Ergebnis vor Steuern (gemessen 2027 Testkonto: +479 - 3.930 - 4.500 = -7.951) */
+  var _l = out[out.length - 1];
+  if (_l) { _l.kosten = Number(r.kosten) || 0; _l.gdZins = Number(r.gdZins) || 0; _l.summeObjekte = _l.erg + _l.kosten + _l.gdZins; }
   _gaGesStCache[key] = { t: Date.now(), r: out };
   return out;
 }

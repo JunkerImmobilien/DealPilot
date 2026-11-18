@@ -1091,7 +1091,7 @@
             + '<tr class="summe"><td>Summe (' + L.length + ')</td><td class="r num">' + B.eur(a[0], 2) + '</td><td class="r num">' + B.eur(a[1], 2) + '</td><td class="r num">' + B.eurS(a[2], 2) + '</td><td class="r num">' + (_gemeinsam ? '–' : (gesSpalte && !(a[3] > 0.5) ? '0 €' : B.eurS(-a[3], 0))) + '</td></tr></tbody></table>'
             + (gesSpalte && L.some(function (e) { return e.erg < 0; }) ? '<p class="det">Ein Verlust eines Objekts begründet keine Erstattung: er wird in der Gesellschaft mit Gewinnen verrechnet, sonst als Verlustvortrag fortgeführt (§ 8 Abs. 1 KStG i. V. m. § 10d EStG, § 10a GewStG). Die Steuer der Gesellschaft insgesamt steht im Jahresabschluss.</p>' : '');
         };
-        S.push(B.seite(c, 'Zusammenfassung', B.abschnitt('Zusammenfassung', 'Veranlagungsjahr ' + jahr)
+        S.push(B.seite(c, 'Zusammenfassung', B.abschnitt('Zusammenfassung', (gesMappe ? 'Geschäftsjahr ' : 'Veranlagungsjahr ') + jahr)
           + summe(priv, 'Privatvermögen · Einkünfte aus Vermietung und Verpachtung') + (vl ? '<p class="det">Veranlagung ' + jahr + ': ' + B.esc(vl.art) + ', ' + B.esc(vl.kist) + ' (' + B.esc(vl.quelle) + ').</p>' : '') + summe(ges, 'Gesellschaften · Ergebnis vor Steuern je Objekt', true)
           + (function () {   /* v3701 · G-05: Steuer je Gesellschaft, dieselbe Rechnung wie der Jahresabschluss */
             var ids = Object.keys(gesSt); if (!ids.length) return '';
@@ -1102,6 +1102,17 @@
                   return '<tr><td>' + B.esc((m && m.name) || h) + '<div class="det">' + z.objekte + ' Objekte, Kosten der Gesellschaft enthalten</div></td><td class="r num">' + B.eurS(z.erg, 2) + '</td><td class="r num">' + B.eur(z.kst, 0) + '</td><td class="r num">' + B.eur(z.gewst, 0) + '</td><td class="r num">' + (z.steuer > 0.5 ? B.eurS(-z.steuer, 0) : '0 €') + '</td><td class="r num">' + B.eur(z.vortragNach, 0) + '</td></tr>';
                 }).join('')
               + '</tbody></table>'
+              + ids.map(function (h) {   /* v3702a · Ueberleitung Objekte -> Gesellschaft */
+                  var z = (gesSt[h] || []).filter(function (x) { return x.jahr === jahr; })[0];
+                  if (!z || z.summeObjekte == null) return '';
+                  var m = null; try { m = DealPilotMandanten.get(h); } catch (eM) {}
+                  return '<h3>Überleitung ' + jahr + (ids.length > 1 ? ' · ' + B.esc((m && m.name) || h) : '') + '</h3><table><tbody>'
+                    + '<tr><td>Summe der Beiträge aller Objekte</td><td class="r num">' + B.eurS(z.summeObjekte, 2) + '</td></tr>'
+                    + '<tr><td>− Kosten der Gesellschaft (Buchführung, Abschluss, Beiträge)</td><td class="r num">' + B.eurS(-z.kosten, 2) + '</td></tr>'
+                    + (z.gdZins ? '<tr><td>− Zinsen auf Gesellschafterdarlehen</td><td class="r num">' + B.eurS(-z.gdZins, 2) + '</td></tr>' : '')
+                    + '<tr class="summe"><td>= Ergebnis vor Steuern der Gesellschaft</td><td class="r num">' + B.eurS(z.erg, 2) + '</td></tr></tbody></table>'
+                    + (z.gdZins ? '<p class="det">Die Zinsen auf das Gesellschafterdarlehen sind Betriebsausgabe der Gesellschaft und beim Gesellschafter Einkünfte aus Kapitalvermögen (§ 20 Abs. 1 Nr. 7 EStG). Sie stehen deshalb nicht bei einem einzelnen Objekt. Für die Gewerbesteuer wird ein Viertel der Entgelte für Schulden über dem Freibetrag hinzugerechnet (§ 8 Nr. 1 GewStG).</p>' : '');
+                }).join('')
               + (gesMappe && gesSt[gesMappe] ? '<h3>Entwicklung Ergebnis, Steuer und Verlustvortrag</h3><table><thead><tr><th>Geschäftsjahr</th><th class="r">Ergebnis vor Steuern</th><th class="r">KSt + Soli</th><th class="r">GewSt</th><th class="r">Steuer</th><th class="r">Verlustvortrag danach</th></tr></thead><tbody>'
                   + gesSt[gesMappe].filter(function (x) { return x.jahr <= jahr; }).map(function (x) { return '<tr' + (x.jahr === jahr ? ' class="summe"' : '') + '><td>' + x.jahr + '</td><td class="r num">' + B.eurS(x.erg, 2) + '</td><td class="r num">' + B.eur(x.kst, 0) + '</td><td class="r num">' + B.eur(x.gewst, 0) + '</td><td class="r num">' + (x.steuer > 0.5 ? B.eurS(-x.steuer, 0) : '0 €') + '</td><td class="r num">' + B.eur(x.vortragNach, 0) + '</td></tr>'; }).join('')
                   + '</tbody></table>' : '')
@@ -1109,7 +1120,7 @@
           })()
           + '<p class="det" style="margin-top:3mm">Die Steuerwirkung ist je Objekt gerechnet (Steuer mit und ohne dieses Objekt beim zu versteuernden Einkommen des Steuerzeitraums). Die Summe ist deshalb eine Näherung: die Progression mehrerer Objekte zusammen weicht davon ab. '
           + (ges.length ? 'Privatvermögen und Gesellschaften sind getrennte Steuersubjekte und werden nicht zusammengezählt. ' : '') + 'Keine Steuererklärung und keine Steuerberatung.</p>'));
-        return B.dokument('Steuer-Mappe ' + jahr, S);
+        return B.dokument(gesMappe ? 'Steuer-Mappe ' + (gesName || 'Gesellschaft') + ' ' + jahr : 'Steuer-Mappe ' + jahr, S);
         };
         /* v3701 · G-05: vor dem Bau die Steuerreihe je Gesellschaft holen (nicht im Kundenkontext: dort fehlen die Daten der
            Gesellschaft des Kunden noch, dann bleibt die bisherige Anzeige je Objekt) */
