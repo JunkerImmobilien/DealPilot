@@ -2529,11 +2529,15 @@
       async function (s) {   /* 8b · v3730: Karte „Mieterhöhung und Zielbild“ (v3710: erst per Haken offen) - nur zeigen, nichts ändern */
         var zk = function () { var k = q('#zb-karte'); return k && k.offsetHeight ? k : null; };
         if (zk()) {
+          /* eingeklappte Karte (collapsible-cards.js) nur für die Szene öffnen - ohne _toggle, das den Zustand speichert */
+          var zu0 = zk().classList.contains('v212-collapsed'); if (zu0) zk().classList.remove('v212-collapsed');
+          await warte(300);
           var kk = zk(); var sx = scroller(kk); if (sx) { sx.scrollTop += rect(kk).top - 160; await warte(500); }
-          var ha = function () { var c = q('#zb_aktiv'); return c && (c.closest('label') || c); };
+          var ha = function () { var c = q('#zb_aktiv'); var l = c && (c.closest('label') || c); return l && l.offsetWidth ? l : null; };
           await zeige(function () { return ha() || zk(); }, 8);
           var an = !!(q('#zb_aktiv') && q('#zb_aktiv').checked);
           await b2oZeile(s, 'Mieterhöhung und Zielbild', 'Optional: mit dem Haken <b>Zielbild festlegen</b> öffnet sich die Karte für Soll-Miete, Zielmiete, Maßnahmen und Mietspiegel.' + (an ? ' Hier ist er schon gesetzt.' : ' Kann, nicht muss.') + ' Mehr dazu in Modul 26.');
+          if (zu0 && zk()) zk().classList.add('v212-collapsed');
         }
       },
       async function (s) {   /* 9 · Prognose-Annahmen */
@@ -7458,6 +7462,7 @@
         /* v3730 · die Karte gehört zur Stufe Experte, und ihr Inhalt öffnet sich erst mit dem Haken „Zielbild festlegen“ (v3710).
            Die Wohnungen tragen hier schon ein Zielbild, dann setzt die App den Haken selbst; sonst setzt ihn das Drehbuch (eigenes Objekt des Laufs). */
         rhExperte(); await kmPause(500);
+        try { var zk0 = q('#zb-karte'); if (zk0) zk0.classList.remove('v212-collapsed'); } catch (e) {}   /* eingeklappt (collapsible-cards.js): nur öffnen, nicht speichern */
         var zbh = q('#zb_aktiv');
         if (zbh && !zbh.checked) {
           var zk8 = q('#zb-karte'); if (zk8) { var sc8 = scroller(zk8); if (sc8) sc8.scrollTop += rect(zk8).top - 160; }
