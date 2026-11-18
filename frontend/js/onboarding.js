@@ -872,8 +872,8 @@ window.DealPilotOnboarding = (function () {
   function sDetailgrad() {
     var akt = _wahl.detailgrad || _dgVorgabe();
     return '<p class="dpo-vor">Wie viele Felder möchtest du bei einem Objekt sehen? '
-      + 'Das lässt sich <b>jederzeit umschalten</b> — über jedem Reiter, '
-      + 'für jedes Objekt einzeln. <b>Nichts geht verloren:</b> ausgeblendete Felder behalten '
+      + 'Das lässt sich <b>jederzeit umschalten</b> — in den Einstellungen unter Mein Profil, '   /* v3720: seit v3077 je Nutzer, nicht mehr über den Reitern */
+      + 'für alle Objekte. <b>Nichts geht verloren:</b> ausgeblendete Felder behalten '
       + 'ihre Werte und rechnen weiter.</p>'
       + '<div class="dpo-kacheln dpo-kacheln-3">'
       + DETAILGRAD.map(function (d) {

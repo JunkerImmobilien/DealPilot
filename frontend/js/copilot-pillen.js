@@ -149,7 +149,7 @@
       t.push('Offen sind noch ' + d.missing.length + '.');
       if (d.stufe && d.stufe < 3) {
         t.push('Für eine Wertermittlung nach ImmoWertV braucht es den Detailgrad Experte (Stufe 3) — '
-          + 'der Schalter steht über jedem Reiter.');
+          + 'der Schalter steht in den Einstellungen unter Mein Profil.');   /* v3720: seit v3077 nicht mehr über den Reitern */
       }
     }
     return t.join(' ');

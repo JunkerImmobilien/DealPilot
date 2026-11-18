@@ -10037,9 +10037,11 @@
     for (var j = 0; j < _rf.i && j < _rf.offen.length; j++) {
       var b = _rf.offen[j], o = b && (b._orig || b);
       if (!o || !o.nachArt || o.ids.indexOf('objart') < 0) continue;
-      var k = _rfNachArt(_rfZuschnitt(o), f);
+      var k = _rfNachArt(_rfNachDetailgrad(_rfZuschnitt(o)), f);
       if (!k) continue;
-      var rest = k.ids.filter(function (id) { return id !== 'objart' && !gesagt(id) && !fieldHasValue(id); });
+      /* v3720 · nur, was im Detailgrad sichtbar ist (gemessen 18.11.: Einsteiger, ETW -
+         „Und noch zum Objekt: Zimmer und Vollgeschosse?", Vollgeschosse ab Fortgeschritten) */
+      var rest = k.ids.filter(function (id) { return id !== 'objart' && !gesagt(id) && !fieldHasValue(id) && _rfFeldImDg(id); });
       if (!rest.length) continue;
       var NAME = { wfl: /^(BUERO|GESCH|HOTEL|GEW|GAR)$/.test(art) ? 'Fläche' : 'Wohnfläche', zimmer: 'Zimmer',
                    einheiten: 'Zahl der Wohneinheiten', etagen_ges: 'Vollgeschosse' };
@@ -10051,7 +10053,8 @@
     var weiter = _rf.offen.slice(_rf.i).map(function (b) {
       var o = b && (b._orig || b);
       if (!o || !o.nachArt) return b;
-      return _rfNachArt(_rfZuschnitt(o), f);
+      var k = _rfNachArt(_rfNachDetailgrad(_rfZuschnitt(o)), f);   /* v3720 */
+      return (k && _rfImDetailgrad(k.dgIds || k.ids)) ? _rfOhneErbbau(k) : null;
     }).filter(Boolean);
     var neu = nach.concat(weiter);
     _rfKatalogErgaenzen(neu);
@@ -10495,7 +10498,7 @@
        Detailgrad Experte — hier steht dazu ein Satz, keine Frage. Die
        frühere Aktion „Ja, Wertermittlung" ist ausgebaut. */
     _rfBlase('co', '<span style="opacity:.8">Die <b>Wertermittlung nach ImmoWertV</b> (Stufe 3) gehört zum '
-      + 'Detailgrad <b>Experte</b> — umschalten kannst du über jedem Reiter. Ich bleibe bei deinem Detailgrad.</span>');
+      + 'Detailgrad <b>Experte</b> — umschalten kannst du in den Einstellungen unter Mein Profil. Ich bleibe bei deinem Detailgrad.</span>');
     return false;
   }
 
