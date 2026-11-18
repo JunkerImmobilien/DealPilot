@@ -2385,8 +2385,11 @@ label.dp-required.qc-required::after {
       <!-- v3510/v3511 · Kosten der Kaufpreisaufteilung. Marcel 16.11.2026: „Die 549 € müssen in die
            Anschaffungskosten, weil das mit dem Kauf verbundene Kosten sind. Das Haus ist ja noch nicht gekauft
            und die KPA kommt ja in den Kaufvertrag." Vorgabe deshalb Anschaffungsnebenkosten (anteilig Boden/
-           Gebäude); „sofort abziehbar" nur, wenn erst nach dem Kauf zur AfA-Ermittlung beauftragt. -->
-      <div class="f">
+           Gebäude); „sofort abziehbar" nur, wenn erst nach dem Kauf zur AfA-Ermittlung beauftragt.
+           v3689a · Marcel 18.11.2026: das Feld braucht es nicht, die Kosten gehören unter Investition › Sonstige (€).
+           kpa-kosten.js zieht vorhandene Beträge beim Laden dorthin um; der Block erscheint nur noch für
+           „sofort abziehbar“ (gehört nicht in die Anschaffungskosten). -->
+      <div class="f" id="kpa_kosten_block" style="display:none">
               <label>Kosten der Kaufpreisaufteilung / AfA-Ermittlung</label>
               <div class="iw"><input id="kpa_kosten" type="text" inputmode="decimal" placeholder="z. B. 549" class="tr" oninput="calc()"><span class="sfx">€</span></div>
               <select id="kpa_kosten_art" onchange="calc()" style="margin-top:6px">
@@ -3939,7 +3942,7 @@ label.dp-required.qc-required::after {
 <script src="js/pdf-wert-zielbild.js?v=v3030"></script><!-- v2830 · Segment Wert & Zielbild in allen PDFs -->
 <script src="js/lagekarte.js?v=v3336"></script><!-- v3336 · Lagekarte (OSM) statt leerem Bildplatz im PDF -->
 <script src="js/pdf-investment-bank.js?v=v3337"></script>
-<script src="js/kpa-kosten.js?v=v3512"></script><!-- v3511 · Kosten der Kaufpreisaufteilung: Betrag und Einordnung -->
+<script src="js/kpa-kosten.js?v=v3689a"></script><!-- v3511 · Kosten der Kaufpreisaufteilung: Betrag und Einordnung -->
 <script src="js/bmf-modal.js?v=v3686"></script>
 <script src="js/bmf-modal-v292.js?v=v3512"></script>
 <script src="js/bmf-bodenabschlag.js?v=v3550"></script>
@@ -4631,9 +4634,9 @@ document.addEventListener('DOMContentLoaded', function(){
 <script src="js/copilot-aenderungen.js?v=v1875a"></script><!-- v1760 · der Co-Pilot versteht Aenderungen -->
 <script src="js/pilot-berichte.js?v=v2947"></script><!-- v1769 · beide Piloten holen die Marktberichte (V6) -->
     <script src="js/rp-pdf-engine.js?v=W27"></script>
-    <script src="js/partner-kunden.js?v=v3683"></script><!-- v3357 · Partner-Cockpit und Mein Partner (vor reseller-portal.js: Einladungen bestehender Konten werden erst bestaetigt) -->
+    <script src="js/partner-kunden.js?v=v3690"></script><!-- v3357 · Partner-Cockpit und Mein Partner (vor reseller-portal.js: Einladungen bestehender Konten werden erst bestaetigt) -->
     <script src="js/partner-anmerkungen.js?v=v3681"></script><!-- v3450 · Anmerkungen am Kundenstand, Rückmeldung an den Kunden -->
-    <script src="js/reseller-portal.js?v=v3681"></script><!-- v1112b-rp-mobile · v3390 Verwaltung im Partner-Cockpit -->
+    <script src="js/reseller-portal.js?v=v3690"></script><!-- v1112b-rp-mobile · v3390 Verwaltung im Partner-Cockpit -->
     <script src="js/sprung.js?v=v3689"></script><!-- v3682 · Absprung von außen an eine Stelle der App (?zu=1&obj=&reiter=&feld=) -->
     <script src="js/logo-kontrast.js?v=v3630f"></script><!-- v3299 · Logo-Kontrast, VOR whitelabel-override -->
     <script src="js/whitelabel-override.js?v=v3630g"></script>

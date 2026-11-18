@@ -23,6 +23,27 @@
     var b = betrag(), sofort = wert('kpa_kosten_art') === 'sofort';
     return { betrag: b, art: sofort ? 'sofort' : 'ank', ank: sofort ? 0 : b, sofort: sofort ? b : 0 };
   };
+  /* v3689a · Marcel 18.11.2026: „Eigentlich brauchen wir dieses Feld ja gar nicht, weil wir können die ja unter
+     Investition sonstige Kosten hinzufügen.“ Beim Laden eines Objekts zieht ein Betrag als Anschaffungsnebenkosten
+     (art leer/ank) EINMAL nach #ji_e um (Sonstige €, geht dort in die Nebenkosten und die AfA-Basis), das Feld wird
+     geleert, ein Hinweis sagt es. „sofort abziehbar“ bleibt hier (gehört nicht in die AK) und nur dann ist der Block
+     sichtbar. Nichts geht still verloren. */
+  function umziehen() {
+    var blk = document.getElementById('kpa_kosten_block');
+    var b = betrag(), sofort = wert('kpa_kosten_art') === 'sofort';
+    if (blk) blk.style.display = (b > 0 && sofort) ? '' : 'none';
+    if (!(b > 0) || sofort) return;
+    var je = document.getElementById('ji_e'), kk = document.getElementById('kpa_kosten');
+    if (!je || !kk) return;
+    var alt = parseFloat(String(je.value || '').replace(/\./g, '').replace(',', '.')) || 0;
+    je.value = String(Math.round((alt + b) * 100) / 100).replace('.', ',');
+    kk.value = '';
+    try { je.dispatchEvent(new Event('input', { bubbles: true })); } catch (e) {}
+    try { kk.dispatchEvent(new Event('input', { bubbles: true })); } catch (e) {}
+    try { if (typeof window.toast === 'function') window.toast('Kosten der Kaufpreisaufteilung (' + b.toLocaleString('de-DE') + ' €) stehen jetzt unter Investition › Sonstige (€).'); } catch (e) {}
+  }
+  window.addEventListener('dp:object-ready', function () { setTimeout(umziehen, 400); });
+  window.DpKpaKosten.umziehen = umziehen;
   window.DpKpaKosten.TEXT_ANK = 'Gutachten zur Kaufpreisaufteilung (vor dem Kauf, für den Kaufvertrag)';
   window.DpKpaKosten.TEXT_SOFORT = 'Kosten der Kaufpreisaufteilung / AfA-Ermittlung (nach dem Kauf, sofort abziehbar)';
 })();
