@@ -78,9 +78,9 @@ router.post('/accept', authenticate, async (req, res, next) => {
   try {
     const token = req.body && req.body.token;
     if (!token) return res.status(400).json({ error: 'token_required' });
-    const r = await reseller.acceptInvite(token, req.user.id);
+    const r = await reseller.acceptInvite(token, req.user.id, req.body.freigabe);   /* v3690 · Freigabe bei der Kopplung */
     res.json(r);
-  } catch (e) { if (e.status) return res.status(e.status).json({ error: e.message }); next(e); }
+  } catch (e) { if (e.status) return res.status(e.status).json({ error: e.message, detail: e.detail || null }); next(e); }
 });
 
 // ── Mandanten-Freigaben (eigene Objekte an den Reseller freigeben) ──

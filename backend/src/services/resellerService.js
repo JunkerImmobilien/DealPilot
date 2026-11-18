@@ -479,7 +479,7 @@ async function revokeInvite(resellerId, inviteId) {
 // Öffentliche Info für die Einladungs-Landeseite (kein Auth)
 async function getInviteInfo(token) {
   const r = await query(
-    `SELECT i.email, i.display_name, i.status, i.expires_at,
+    `SELECT i.email, i.display_name, i.status, i.expires_at, i.vorschlag,
             COALESCE(NULLIF(r.brand_name,''), r.name) AS brand_name
        FROM reseller_invites i JOIN resellers r ON r.id = i.reseller_id
       WHERE i.token = $1 LIMIT 1`,
@@ -488,16 +488,20 @@ async function getInviteInfo(token) {
   const row = r.rows[0];
   if (!row) return null;
   const valid = row.status === 'pending' && new Date(row.expires_at) > new Date();
-  return { email: row.email, display_name: row.display_name, brand_name: row.brand_name, valid: valid, status: row.status };
+  return { email: row.email, display_name: row.display_name, brand_name: row.brand_name, valid: valid, status: row.status, vorschlag: row.vorschlag || null };   /* v3690 */
 }
 
 // Annahme durch den eingeloggten Mandanten (userId aus Auth)
-async function acceptInvite(token, userId) {
+async function acceptInvite(token, userId, freigabeRoh) {
   const inv = await query(`SELECT * FROM reseller_invites WHERE token=$1 LIMIT 1`, [token]);
   const invite = inv.rows[0];
   if (!invite) { const e = new Error('invite_not_found'); e.status = 404; throw e; }
   if (invite.status !== 'pending') { const e = new Error('invite_already_used'); e.status = 409; throw e; }
   if (new Date(invite.expires_at) <= new Date()) { const e = new Error('invite_expired'); e.status = 410; throw e; }
+  /* v3690 · Freigabe bei der Kopplung, VOR jeder Aenderung geprueft (ungueltig = 400, nichts verbunden).
+     Fehlt sie (alter Stand im Browser), entsteht keine Fassung: es gilt „noch keine Freigabe“ (nur Objekt). */
+  const F = require('./partnerFreigaben');
+  const fw = freigabeRoh != null ? F.freigabeSauber(freigabeRoh) : null;
 
   // Client anlegen (bzw. vorhandenen wiederverwenden)
   const client = await createClient(invite.reseller_id, { userId: userId, displayName: invite.display_name });
@@ -514,14 +518,15 @@ async function acceptInvite(token, userId) {
                       stufe = COALESCE(stufe, 2) WHERE id = $1`, [client.id, art]);
   var seatAssigned = false;
   if (art === 'platz') { try { await assignSeat(invite.reseller_id, client.id); seatAssigned = true; } catch (e) { /* kein freier Seat -> Partner weist später zu */ } }
+  const fg = fw ? await F.setzen(client.id, userId, fw, 'einladung') : null;
   try { await query(`INSERT INTO partner_meldungen (reseller_id, client_id, art, text) VALUES ($1,$2,'verbindung_angenommen',$3)`,
-    [invite.reseller_id, client.id, invite.display_name + ' hat die Einladung angenommen' + (art === 'eigen' ? ' (eigener Plan)' : '')]); } catch (e) {}
+    [invite.reseller_id, client.id, invite.display_name + ' hat die Einladung angenommen' + (art === 'eigen' ? ' (eigener Plan)' : '') + '. ' + F.kurztext(fg)]); } catch (e) {}
 
   const rname = await query(
     `SELECT COALESCE(NULLIF(brand_name,''), name) AS brand_name FROM resellers WHERE id=$1`,
     [invite.reseller_id]
   );
-  return { ok: true, brand_name: rname.rows[0] ? rname.rows[0].brand_name : 'DealPilot', client_id: client.id, seat_assigned: seatAssigned };
+  return { ok: true, brand_name: rname.rows[0] ? rname.rows[0].brand_name : 'DealPilot', client_id: client.id, seat_assigned: seatAssigned, freigabe: fg ? { art: fg.art, bereiche: fg.bereiche } : null };
 }
 
 async function deleteClient(resellerId, clientId) {

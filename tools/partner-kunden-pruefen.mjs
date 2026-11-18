@@ -14,6 +14,12 @@
  *      fehlen[], Antwort/Rueckfrage oder erledigt -> frei, Bestand ueberspringt nur das Objekt) mit GEGENPROBE (Sperre
  *      aus dem Quelltext entfernt -> der Punkt muss rot werden), Frontend-Regel = Backend-Regel, Objektliste und Karte.
  *
+ *   F  v3690 P1 Freigabe bei der Kopplung (Konzept Anfordern-und-Freigeben-2026-11-18.md): Regeln am ECHTEN
+ *      partnerFreigaben.js, alle drei Kopplungswege (anfrageBeantworten bei Anfrage und Code, acceptInvite bei Einladung)
+ *      speichern die Freigabe und pruefen sie VOR jeder Aenderung, Fassungen statt Ueberschreiben, senden() ohne
+ *      Steuerdaten ohne zve/grenz, ohne Steuer ohne Anlage V/Jahresbuch, einmal wird verbraucht, Widerruf sperrt
+ *      Anfordern und die beendete Aufgabe. GEGENPROBEN: Filterzeile bzw. Widerrufsperre entfernt -> rot.
+ *
  *   node tools/partner-kunden-pruefen.mjs          RC 0 = sauber
  *   node tools/partner-kunden-pruefen.mjs --live   dazu E: NUR Staging im Backend-Container (tools/partner-kunden-live.js)
  */
@@ -219,6 +225,200 @@ ok('C', 'Marke nur bei aktiver Verbindung und Wahl Partner', /getrennt_am IS NUL
   ok('D', 'Kunde-Liste: Erneut senden ausgegraut mit Zahl und Sprung', /data-f="naechste"/.test(vmq) && /data-f="senden" disabled/.test(vmq));
 }
 
+// ── F · v3690 P1 Freigabe bei der Kopplung ────────────────────────────────
+{
+  const Fpfad = path.join(WURZEL, 'backend/src/services/partnerFreigaben.js');
+  const F = require(Fpfad);
+  const Module = (await import('node:module')).default;
+  function frisch(pfad, quelle) {   /* Datei neu laden, auf Wunsch mit veraendertem Quelltext (Gegenprobe) */
+    const m = new Module(pfad, null); m.filename = pfad; m.paths = Module._nodeModulePaths(path.dirname(pfad));
+    m._compile(quelle == null ? fs.readFileSync(pfad, 'utf8') : quelle, pfad); return m.exports;
+  }
+
+  /* F1 · Regeln, rein */
+  const b0 = F.bereicheSauber({ steuerdaten: true, finanzierung: true, fremd: true });
+  ok('F', 'Bereiche: Objekt immer, Steuerdaten nur mit Steuer, unbekannte Schluessel fallen weg', b0.objekt === true && b0.steuerdaten === false && b0.finanzierung === true && !('fremd' in b0) && Object.keys(b0).length === 6, b0);
+  const k0 = F.freigabeSauber({ art: 'keine', bereiche: { steuer: true, steuerdaten: true } });
+  ok('F', 'Art „keine“: nur Objekt, auch wenn Bereiche mitkommen', k0.art === 'keine' && F.BEREICHE.every((k) => k0.bereiche[k] === (k === 'objekt')));
+  let e0 = null; try { F.freigabeSauber({ art: 'immer' }); } catch (e) { e0 = e; }
+  let e00 = null; try { F.freigabeSauber(null); } catch (e) { e00 = e; }
+  ok('F', 'unbekannte oder fehlende Art -> 400', e0 && e0.status === 400 && e00 && e00.status === 400);
+  ok('F', 'Vorschlag: nur dauer/einmal, sonst null (kein Fehler)', F.vorschlagSauber({ art: 'keine' }) === null && F.vorschlagSauber(null) === null && F.vorschlagSauber({ art: 'einmal', bereiche: { steuer: true } }).bereiche.steuer === true);
+  ok('F', 'ohne aktive Fassung, bei „keine“: wirksam nur Objekt', [null, { art: 'keine', bereiche: { steuer: true } }].every((x) => { const w = F.bereicheWirksam(x); return w.objekt && !w.steuer && !w.steuerdaten; }));
+  const ganz = () => ({ str: 'Musterweg', zve: 68000, grenz: 42, _kpis_cf_ns: -120, _kpis_steuerjahr: 2026, _steuer_vorlaeufig: true, _steuerbasis: { jahr: 2026 }, _tax_overrides: { 2025: { e: 1 } }, _jahre: { 2025: {} }, steuer_snapshot: { wk_per_year: {} }, kp: 200000 });
+  let d1 = ganz(); const w1 = F.kopieFiltern(d1, { steuer: true });
+  ok('F', 'kopieFiltern ohne Steuerdaten: zve, grenz, cf_ns, Steuerbasis weg, Anlage V und Jahresbuch bleiben', !('zve' in d1) && !('grenz' in d1) && !('_kpis_cf_ns' in d1) && !('_steuerbasis' in d1) && !('_steuer_vorlaeufig' in d1) && d1._tax_overrides && d1._jahre && d1.kp === 200000, w1);
+  let d2 = ganz(); F.kopieFiltern(d2, {});
+  ok('F', 'kopieFiltern ohne Steuer: zusaetzlich Anlage V, Jahresbuch, Snapshot weg', !d2._tax_overrides && !d2._jahre && !d2.steuer_snapshot && !('zve' in d2) && d2.str === 'Musterweg');
+  let d3 = ganz(); const w3 = F.kopieFiltern(d3, { steuer: true, steuerdaten: true });
+  ok('F', 'kopieFiltern mit Steuer und Steuerdaten: nichts entfernt', w3.length === 0 && d3.zve === 68000 && d3.grenz === 42);
+  ok('F', 'Zustand: aktiv = Art, sonst widerrufen / verbraucht / ohne', F.zustand({ art: 'dauer' }, null) === 'dauer' && F.zustand(null, { widerrufen_am: 'x' }) === 'widerrufen' && F.zustand(null, { verbraucht_am: 'x' }) === 'verbraucht' && F.zustand(null, null) === 'ohne');
+  ok('F', 'Meldungstext ganze Saetze ohne Semikolon und Gedankenstrich', /^Freigabe dauerhaft für Objekte, Steuer, Steuerdaten\.$/.test(F.kurztext({ art: 'dauer', bereiche: { steuer: true, steuerdaten: true } })) && F.kurztext(null) === 'Noch keine Freigabe.');
+
+  /* In-Speicher-Tabelle partner_freigaben + alles, was senden/anfrageBeantworten/acceptInvite fragen */
+  const KL = 'dddddddd-dddd-4ddd-8ddd-dddddddddddd', OB = '44444444-4444-4444-8444-444444444444', SH = '55555555-5555-4555-8555-555555555555', AUF = '66666666-6666-4666-8666-666666666666';
+  const T = { fg: [], log: [], ak: {}, kopie: [], invite: null, anfrage: null, akStatus: null };
+  let uhr = 0; const jetzt = () => new Date(Date.UTC(2026, 10, 18, 10, 0, uhr++)).toISOString();
+  const aktivFg = () => T.fg.filter((x) => !x.ersetzt_am && !x.widerrufen_am && !x.verbraucht_am);
+  const fake = async (sql, p) => {
+    T.log.push(sql.replace(/\s+/g, ' ').trim().slice(0, 90));
+    if (/FROM partner_freigaben WHERE client_id = \$1 AND ersetzt_am IS NULL/.test(sql) && /^\s*SELECT/.test(sql)) return { rows: aktivFg().slice(0, 1) };
+    if (/UPDATE partner_freigaben SET ersetzt_am = now\(\)/.test(sql)) { const a = aktivFg(); a.forEach((x) => { x.ersetzt_am = jetzt(); }); return { rows: a, rowCount: a.length }; }
+    if (/INSERT INTO partner_freigaben/.test(sql)) { const r = { id: 'fg' + (T.fg.length + 1), client_id: p[0], art: p[1], bereiche: JSON.parse(p[2]), umfang: p[3], text_version: p[4], quelle: p[5], erteilt_von: p[6], erteilt_am: jetzt() }; T.fg.push(r); return { rows: [r], rowCount: 1 }; }
+    if (/UPDATE partner_freigaben SET widerrufen_am = now\(\)/.test(sql)) { const a = aktivFg(); a.forEach((x) => { x.widerrufen_am = jetzt(); }); return { rows: a, rowCount: a.length }; }
+    if (/UPDATE partner_freigaben SET verbraucht_am = now\(\) WHERE id = \$1 AND art = 'einmal'/.test(sql)) { const a = aktivFg().filter((x) => x.id === p[0] && x.art === 'einmal'); a.forEach((x) => { x.verbraucht_am = jetzt(); }); return { rows: a, rowCount: a.length }; }
+    if (/UPDATE partner_freigaben SET staende_zurueckgezogen/.test(sql)) return { rows: [], rowCount: 1 };
+    if (/SELECT widerrufen_am FROM partner_freigaben WHERE client_id = \$1 ORDER BY erteilt_am DESC LIMIT 1/.test(sql)) { const l = T.fg.filter((x) => x.client_id === p[0]).slice(-1); return { rows: l }; }
+    if (/FROM partner_freigaben WHERE client_id = \$1 ORDER BY erteilt_am DESC, id/.test(sql)) return { rows: T.fg.slice().reverse() };
+    if (/FROM reseller_clients c JOIN resellers rs/.test(sql)) return { rows: T.verbunden === false ? [] : [{ id: KL, reseller_id: 'r1', platz_art: 'eigen', display_name: 'Kundin Muster', partner_name: 'Muster Immobilien' }] };
+    if (/FROM resellers WHERE id/.test(sql)) return { rows: [{ n: 'Muster Immobilien', owner_user_id: 'pu1', brand_name: 'Muster Immobilien' }] };
+    if (/SELECT \* FROM partner_anfragen WHERE id = \$1 AND user_id = \$2/.test(sql)) return { rows: T.anfrage ? [T.anfrage] : [] };
+    if (/SELECT \* FROM reseller_clients WHERE reseller_id = \$1 AND user_id = \$2/.test(sql)) return { rows: [{ id: KL }] };
+    if (/SELECT \* FROM reseller_invites WHERE token/.test(sql)) return { rows: T.invite ? [T.invite] : [] };
+    if (/INSERT INTO reseller_clients/.test(sql)) return { rows: [{ id: KL }] };
+    if (/SELECT status FROM partner_aufgaben_kunden WHERE aufgabe_id = \$1 AND client_id = \$2/.test(sql)) return { rows: T.akStatus ? [{ status: T.akStatus }] : [] };
+    if (/UPDATE partner_aufgaben_kunden SET status = 'widerrufen'/.test(sql)) return { rows: [{ aufgabe_id: AUF }], rowCount: 1 };
+    if (/SELECT \* FROM object_shares WHERE object_id = \$1 AND reseller_id = \$2/.test(sql)) return { rows: [{ id: SH, status: 'eingereicht', stand_nr: 1, kopie_object_id: null }] };
+    if (/SELECT 1 FROM reseller_clients WHERE id = \$1 AND reseller_id = \$2 AND getrennt_am IS NULL/.test(sql)) return { rows: [{}], rowCount: 1 };
+    if (/INSERT INTO partner_aufgaben \(/.test(sql)) return { rows: [{ id: AUF }] };
+    return { rows: [], rowCount: 0 };
+  };
+  antworte = fake;
+  OS.getById = async (uid, id) => id === OB ? { id, data: Object.assign(ganz(), { _obj_seq: '2026-007' }), photos: [], ai_analysis: null } : null;
+  OS.create = async (uid, o) => { T.kopie.push(o.data); return { id: 'kopie' + T.kopie.length }; };
+  const pkF = frisch(path.join(WURZEL, 'backend/src/services/partnerKunden.js'));
+  const quelleR = fs.readFileSync(path.join(WURZEL, 'backend/src/services/resellerService.js'), 'utf8');
+  const rsEcht = frisch(path.join(WURZEL, 'backend/src/services/resellerService.js'), quelleR);
+  const U = { id: 'u1', name: 'Kundin Muster' };
+  const aktiv = () => aktivFg()[0] || null;
+
+  /* F2 · alle drei Kopplungswege speichern die Freigabe */
+  T.anfrage = { id: 'an1', reseller_id: 'r1', quelle: 'einladung', platz_mitgeben: false, anzeige_name: 'Kundin Muster' };
+  T.verbunden = false;
+  const a1 = await pkF.anfrageBeantworten(U, 'an1', true, { art: 'dauer', bereiche: { steuer: true, steuerdaten: true } });
+  ok('F', 'Weg Anfrage (bestehendes Konto): Freigabe dauerhaft gespeichert, Quelle anfrage, Antwort traegt sie', a1.freigabe && a1.freigabe.art === 'dauer' && aktiv() && aktiv().quelle === 'anfrage' && aktiv().bereiche.steuerdaten === true && aktiv().text_version === F.TEXT_VERSION, [a1.freigabe, aktiv()]);
+  T.anfrage = { id: 'an2', reseller_id: 'r1', quelle: 'code', platz_mitgeben: false, anzeige_name: 'Kundin Muster' };
+  const a2 = await pkF.anfrageBeantworten(U, 'an2', true, { art: 'einmal', bereiche: { steuer: true } });
+  ok('F', 'Weg Verbindungscode: Freigabe einmalig, Quelle code', a2.freigabe.art === 'einmal' && aktiv().quelle === 'code' && aktiv().bereiche.steuerdaten === false);
+  T.invite = { id: 'inv1', reseller_id: 'r1', status: 'pending', expires_at: '2099-01-01T00:00:00Z', display_name: 'Kundin Muster', platz_mitgeben: false };
+  const a3 = await rsEcht.acceptInvite('tok', 'u1', { art: 'dauer', bereiche: { steuer: true, steuerdaten: false, marktbericht: true } });
+  ok('F', 'Weg Einladung an neue Adresse (acceptInvite): Freigabe gespeichert, Quelle einladung', a3.freigabe && a3.freigabe.art === 'dauer' && aktiv().quelle === 'einladung' && aktiv().bereiche.marktbericht === true, [a3.freigabe, aktiv()]);
+  T.log = [];
+  T.anfrage = { id: 'an3', reseller_id: 'r1', quelle: 'einladung', platz_mitgeben: false };
+  let e5 = null; try { await pkF.anfrageBeantworten(U, 'an3', true, { art: 'alles' }); } catch (e) { e5 = e; }
+  ok('F', 'ungueltige Freigabe bei der Annahme: 400, VOR jeder Aenderung (kein UPDATE)', e5 && e5.status === 400 && !T.log.some((x) => /^UPDATE|^INSERT/.test(x)), [e5 && e5.message, T.log]);
+  T.log = [];
+  let e6 = null; try { await rsEcht.acceptInvite('tok', 'u1', { art: 'alles' }); } catch (e) { e6 = e; }
+  ok('F', 'ungueltige Freigabe bei der Einladung: 400, nichts verbunden', e6 && e6.status === 400 && !T.log.some((x) => /^UPDATE|^INSERT/.test(x)), [e6 && e6.message, T.log]);
+  const davor = T.fg.length;
+  T.anfrage = { id: 'an4', reseller_id: 'r1', quelle: 'einladung', platz_mitgeben: false };
+  await pkF.anfrageBeantworten(U, 'an4', true, undefined);
+  ok('F', 'ohne Freigabe im Body (alter Browserstand): keine neue Fassung', T.fg.length === davor);
+
+  /* F3 · Fassungen statt Ueberschreiben */
+  T.verbunden = true;
+  const n0 = T.fg.length;
+  await pkF.freigabeSetzen(U, { art: 'dauer', bereiche: { steuer: true } });
+  await pkF.freigabeSetzen(U, { art: 'dauer', bereiche: { steuer: true, steuerdaten: true } });
+  ok('F', 'Aendern = neue Zeile, die alte bekommt ersetzt_am, genau eine aktiv', T.fg.length === n0 + 2 && aktivFg().length === 1 && T.fg[n0].ersetzt_am && !T.fg[n0 + 1].ersetzt_am && T.fg[n0].bereiche.steuerdaten === false && aktiv().quelle === 'mein_partner', T.fg.map((x) => [x.art, !!x.ersetzt_am]));
+  const ueb = await F.uebersicht(KL);
+  ok('F', 'Verlauf liefert alle Fassungen, neueste zuerst', ueb.verlauf.length === T.fg.length && ueb.verlauf[0].id === aktiv().id && ueb.zustand === 'dauer');
+
+  /* F4 · senden() mit und ohne Steuerdaten */
+  T.kopie = [];
+  let s1 = await pkF.senden(U, { object_ids: [OB] });
+  const k1 = T.kopie[0] || {};
+  ok('F', 'Dauerfreigabe mit Steuerdaten: zve und grenz in der Kopie, Band-Angabe steuerdaten an', k1.zve === 68000 && k1.grenz === 42 && k1._tax_overrides && k1._kundenstand.freigabe.steuerdaten === true && s1.freigabe_art === 'dauer', s1);
+  await pkF.freigabeSetzen(U, { art: 'dauer', bereiche: { steuer: true, steuerdaten: false } });
+  async function sendenOhneSteuerdaten(modul) {
+    T.kopie = [];
+    await modul.senden(U, { object_ids: [OB] });
+    const k = T.kopie[0] || {};
+    return !('zve' in k) && !('grenz' in k) && !('_kpis_cf_ns' in k) && !!k._tax_overrides && !!k._jahre && k._kundenstand && k._kundenstand.freigabe.steuerdaten === false;
+  }
+  ok('F', 'senden() ohne Bereich Steuerdaten: kein zve, kein grenz, kein Cashflow nach Steuern, Anlage V bleibt', await sendenOhneSteuerdaten(pkF));
+  const shUpd = T.log.filter((x) => /^UPDATE object_shares SET kopie_object_id/.test(x)).length;
+  ok('F', 'Stand traegt Bereiche und Fassung (object_shares.bereiche, freigabe_id)', shUpd >= 1 && /bereiche = \$7::jsonb, freigabe_id = \$8/.test(fs.readFileSync(path.join(WURZEL, 'backend/src/services/partnerKunden.js'), 'utf8')));
+  await pkF.freigabeSetzen(U, { art: 'keine' });
+  T.kopie = []; await pkF.senden(U, { object_ids: [OB] });
+  const k3 = T.kopie[0] || {};
+  ok('F', 'Freigabe „noch nicht“: Kopie nur Objekt (ohne Anlage V, Jahresbuch, zve, grenz)', !k3._tax_overrides && !k3._jahre && !('zve' in k3) && k3.str === 'Musterweg');
+
+  /* F5 · einmalig wird verbraucht */
+  await pkF.freigabeSetzen(U, { art: 'einmal', bereiche: { steuer: true, steuerdaten: true } });
+  const einmalId = aktiv().id;
+  T.kopie = []; const s5 = await pkF.senden(U, { object_ids: [OB] });
+  ok('F', 'einmalig: erste Sendung mit Steuerdaten, danach verbraucht', T.kopie[0].zve === 68000 && s5.freigabe_verbraucht === true && T.fg.filter((x) => x.id === einmalId)[0].verbraucht_am && !aktiv(), s5);
+  T.kopie = []; const s6 = await pkF.senden(U, { object_ids: [OB] });
+  ok('F', 'zweite Sendung nach dem Verbrauch: nur Objekt, Zustand verbraucht', !('zve' in T.kopie[0]) && !T.kopie[0]._tax_overrides && s6.freigabe_art === 'keine' && (await F.uebersicht(KL)).zustand === 'verbraucht', s6);
+
+  /* F6 · Widerruf sperrt */
+  await pkF.freigabeSetzen(U, { art: 'dauer', bereiche: { steuer: true, steuerdaten: true } });
+  T.log = [];
+  const wr = await pkF.freigabeWiderrufen(U, { staende_zurueckziehen: false });
+  ok('F', 'Widerruf: keine aktive Fassung, offene Aufgaben auf widerrufen, Staende bleiben (ohne Wahl)', !aktiv() && wr.aufgaben_beendet === 1 && wr.staende_zurueckgezogen === 0 && T.log.some((x) => /^UPDATE partner_aufgaben_kunden SET status = 'widerrufen'/.test(x)) && !T.log.some((x) => /^DELETE FROM objects/.test(x)), wr);
+  let e7 = null; try { await pkF.freigabeWiderrufen(U, {}); } catch (e) { e7 = e; }
+  ok('F', 'zweiter Widerruf ohne aktive Fassung -> 409 keine_freigabe', e7 && e7.status === 409 && e7.message === 'keine_freigabe');
+  async function anfordernGesperrt(modul) {
+    let e = null; try { await modul.aufgabeAnlegen({ id: 'r1' }, 'pu1', { titel: 'Steuerjahr 2025', art: 'steuerjahr', kunden: [KL] }); } catch (x) { e = x; }
+    return !!(e && e.status === 403 && e.message === 'freigabe_widerrufen');
+  }
+  ok('F', 'nach Widerruf: Partner kann nichts anfordern (Aufgabe an diesen Kunden -> 403)', await anfordernGesperrt(pkF));
+  T.akStatus = 'widerrufen';
+  let e8 = null; try { await pkF.senden(U, { object_ids: [OB], aufgabe_id: AUF }); } catch (e) { e8 = e; }
+  ok('F', 'nach Widerruf: die beendete Aufgabe laesst sich nicht mehr erfuellen (409)', e8 && e8.status === 409 && e8.message === 'freigabe_widerrufen');
+  T.akStatus = null;
+  T.kopie = []; await pkF.senden(U, { object_ids: [OB] });
+  ok('F', 'nach Widerruf: selbst senden geht, aber nur das Objekt', T.kopie.length === 1 && !('zve' in T.kopie[0]) && !T.kopie[0]._tax_overrides);
+  await pkF.freigabeSetzen(U, { art: 'dauer', bereiche: { steuer: true } });
+  let e9 = null; try { await pkF.aufgabeAnlegen({ id: 'r1' }, 'pu1', { titel: 'Steuerjahr 2025', art: 'steuerjahr', kunden: [KL] }); } catch (e) { e9 = e; }
+  ok('F', 'neue Freigabe nach dem Widerruf oeffnet das Anfordern wieder', !e9, e9 && e9.message);
+  const wr2 = await pkF.freigabeWiderrufen(U, { staende_zurueckziehen: true });
+  ok('F', 'Widerruf mit „auch zurueckziehen“: Antwort zaehlt, Quelltext loescht die Kopien', wr2.ok && /staende_zurueckziehen === true[\s\S]{0,400}DELETE FROM objects WHERE id = \$1 AND kunden_freigabe_id = \$2/.test(fs.readFileSync(path.join(WURZEL, 'backend/src/services/partnerKunden.js'), 'utf8')));
+  ok('F', 'Trennen beendet die Freigabe', /async function trennen[\s\S]{0,700}F\.widerrufen\(clientId\)/.test(fs.readFileSync(path.join(WURZEL, 'backend/src/services/partnerKunden.js'), 'utf8')));
+
+  /* F7 · GEGENPROBEN: Sperrzeile entfernt -> der Punkt muss rot werden */
+  const pkPfad = path.join(WURZEL, 'backend/src/services/partnerKunden.js');
+  const q = fs.readFileSync(pkPfad, 'utf8');
+  const zFilter = '    const entfernt = F.kopieFiltern(d, bereiche);   /* v3690 */';
+  const zSperre = '    if (z && z.widerrufen_am) { ohneFreigabe++; continue; }';
+  ok('F', 'Gegenprobe: Filterzeile und Widerrufsperre je genau einmal im Quelltext', q.split(zFilter).length === 2 && q.split(zSperre).length === 2);
+  await pkF.freigabeSetzen(U, { art: 'dauer', bereiche: { steuer: true, steuerdaten: false } });
+  const ohneFilter = frisch(pkPfad, q.replace(zFilter, '    const entfernt = [];   /* Gegenprobe */'));
+  ok('F', 'Gegenprobe: ohne kopieFiltern gehen zve/grenz ungefragt mit (Pruefer erkennt es)', (await sendenOhneSteuerdaten(ohneFilter)) === false);
+  await pkF.freigabeWiderrufen(U, {});
+  const ohneSperre = frisch(pkPfad, q.replace(zSperre, '    /* Gegenprobe: Sperre entfernt */'));
+  ok('F', 'Gegenprobe: ohne Widerrufsperre kann der Partner wieder anfordern (Pruefer erkennt es)', (await anfordernGesperrt(ohneSperre)) === false);
+
+  /* F8 · Migration, Routen, Frontend */
+  const m118 = fs.readFileSync(path.join(WURZEL, 'backend/migrations/118_partner_freigaben.sql'), 'utf8');
+  ok('F', 'Migration 118: Tabelle mit art-Pruefung, Fassungsspalten, eine aktive je Verbindung, Vorschlag, Stand-Spalten',
+    /CREATE TABLE IF NOT EXISTS public\.partner_freigaben/.test(m118) && /CHECK \(art IN \('dauer','einmal','keine'\)\)/.test(m118) && /ersetzt_am\s+timestamptz/.test(m118) && /verbraucht_am timestamptz/.test(m118) &&
+    /CREATE UNIQUE INDEX IF NOT EXISTS uq_partner_freigaben_aktiv/.test(m118) && /partner_anfragen ADD COLUMN IF NOT EXISTS vorschlag jsonb/.test(m118) && /reseller_invites ADD COLUMN IF NOT EXISTS vorschlag jsonb/.test(m118) && /ADD COLUMN IF NOT EXISTS freigabe_id uuid/.test(m118));
+  const rt = lies('backend/src/routes/partnerKunden.js'), ri = lies('backend/src/routes/resellerInvite.js');
+  ok('F', 'Routen: Anfrage mit freigabe, GET/PUT /freigabe, POST /freigabe/widerrufen, Partner liest, Einladung mit freigabe',
+    /annehmen\), req\.body && req\.body\.freigabe\)/.test(rt) && /kunde\.get\('\/freigabe'/.test(rt) && /kunde\.put\('\/freigabe'/.test(rt) && /kunde\.post\('\/freigabe\/widerrufen'/.test(rt) && /partner\.get\('\/kunden\/:id\/freigabe'/.test(rt) && /acceptInvite\(token, req\.user\.id, req\.body\.freigabe\)/.test(ri));
+  const pkf = lies('frontend/js/partner-kunden.js'), rp = lies('frontend/js/reseller-portal.js');
+  ok('F', 'Frontend: Zustimmungsdialog bei Anfrage, Code und Einladung (bestehendes und neues Konto)',
+    /function anfrageDialog[\s\S]{0,400}fgDialog\(/.test(pkf) && /function einladungFragen[\s\S]{0,500}fgDialog\(/.test(pkf) && /body: \{ annehmen: true, freigabe: f \}/.test(pkf) && /body: \{ token: token, freigabe: f \}/.test(pkf) &&
+    /function startAcceptWatcher[\s\S]{0,1400}DpMeinPartner\.einladungFragen\(token, inf\)/.test(rp));
+  ok('F', 'Frontend: Reiter Freigabe in Mein Partner (Verlauf, Aendern, Widerrufen mit „auch zurueckziehen“)',
+    /kurz: 'Freigabe', titel: 'Was dein Partner anfordern darf'/.test(pkf) && /\/mein-partner\/freigabe', \{ method: 'PUT'/.test(pkf) && /\/mein-partner\/freigabe\/widerrufen'/.test(pkf) && /staende_zurueckziehen: !!wert\(dd, '#pk-fg-mitz'\)/.test(pkf));
+  ok('F', 'Kirchensteuer steht ausdruecklich im Zustimmungstext (Art. 9 DSGVO)', /Die Kirchensteuer zeigt, ob du einer Kirche angehörst\./.test(pkf));
+  const texte = (pkf.match(/var FG_BEREICHE = \[[\s\S]*?\];/) || [''])[0] + (pkf.match(/var FG_ARTEN = \{[\s\S]*?\};/) || [''])[0] + (pkf.match(/var FG_FUSS = '[^']*'/) || [''])[0];
+  ok('F', 'Kundentext der Freigabe: kein Semikolon im Text, kein Gedankenstrich', texte.length > 800 && !/[–—]/.test(texte) && !/[a-zäöüß] ?; ?[a-zäöüß]/i.test(texte.replace(/'\],?\s*\[/g, '')), texte.length);
+  /* dieselbe Regel im Browser wie im Server: fgSauber aus partner-kunden.js gegen bereicheSauber ueber alle 64 Kombinationen */
+  const fgQ = (pkf.match(/function fgSauber\(b\) \{[^\n]*\}/) || [''])[0];
+  const vm = await import('node:vm');
+  const ctx = { FG_BEREICHE: F.BEREICHE.map((k) => [k, k, '', k === 'objekt']) }; vm.runInNewContext(fgQ + '; this.fgSauber = fgSauber;', ctx);
+  let gleich = !!ctx.fgSauber;
+  for (let m = 0; m < 64 && gleich; m++) { const b = {}; F.BEREICHE.forEach((k, i) => { b[k] = !!(m & (1 << i)); }); gleich = JSON.stringify(ctx.fgSauber(b)) === JSON.stringify(F.bereicheSauber(b)); }
+  ok('F', 'Frontend-Regel fgSauber = Backend-Regel bereicheSauber (64 Kombinationen)', gleich);
+  ok('F', 'Partner: Vorschlag in Einladung und Code, Chip je Kunde, „Steuerdaten nicht freigegeben“ in Freigegeben und im Band',
+    /vorschlag: vorschlagLesen\(d, 'e'\)/.test(pkf) && /vorschlag: vorschlagLesen\(d, 'c'\)/.test(pkf) && /fgChipPartner\(k\.freigabe\)/.test(pkf) && /'Steuerdaten nicht freigegeben'/.test(pkf) && /fgBandText\(ks\.freigabe\)/.test(pkf));
+  antworte = async () => ({ rows: [], rowCount: 0 });
+}
+
 /* ── E · live (NUR Staging) ─────────────────────────────────────────────── */
 if (process.argv.includes('--live')) {
   const { execSync } = await import('node:child_process');
@@ -232,5 +432,5 @@ if (process.argv.includes('--live')) {
   } catch (e) { process.stdout.write(String(e.stdout || '')); ok('E', 'Live-Lauf', false, String(e.stderr || e.message).slice(0, 300)); }
 }
 
-console.log('\npartner-kunden-pruefen v3640 · ' + n + ' Punkte, ' + (n - rot) + ' gruen, ' + rot + ' rot');
+console.log('\npartner-kunden-pruefen v3690 · ' + n + ' Punkte, ' + (n - rot) + ' gruen, ' + rot + ' rot');
 process.exit(rot ? 1 : 0);

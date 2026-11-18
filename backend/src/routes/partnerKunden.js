@@ -37,6 +37,7 @@ partner.post('/kunden/:id/platz', fn(async (req) => {
   return { ok: true, lizenz: await reseller.assignSeat(req.reseller.id, req.params.id) };
 }));
 partner.post('/kunden/:id/entzug', fn((req) => pk.platzEntziehen(req.reseller, req.user.id, req.params.id, req.body)));
+partner.get('/kunden/:id/freigabe', fn((req) => pk.freigabeLesen(req.reseller, req.params.id)));   /* v3690 · nur lesend */
 partner.post('/kunden/:id/trennen', fn((req) => pk.trennen(req.reseller.id, req.params.id, 'partner')));
 partner.post('/einladen', fn((req) => pk.einladen(req.reseller, req.user.id, req.body, require('../services/resellerInviteMail').basisAus(req))));
 partner.post('/code', fn((req) => pk.codeEinloesen(req.reseller, req.user.id, req.body)));
@@ -61,7 +62,11 @@ partner.post('/meldungen/gelesen', fn((req) => pk.meldungenGelesen(req.reseller)
 const kunde = express.Router();
 kunde.use(authenticate);
 kunde.get('/', fn((req) => pk.meinPartner(req.user.id)));
-kunde.post('/anfragen/:id', fn((req) => pk.anfrageBeantworten(req.user, req.params.id, !!(req.body && req.body.annehmen))));
+kunde.post('/anfragen/:id', fn((req) => pk.anfrageBeantworten(req.user, req.params.id, !!(req.body && req.body.annehmen), req.body && req.body.freigabe)));   /* v3690 · body.freigabe { art, bereiche } */
+/* v3690 · P1 Freigabe an den Partner: lesen, neue Fassung, widerrufen (body.staende_zurueckziehen) */
+kunde.get('/freigabe', fn(async (req) => { const v = await pk.aktiveVerbindung(req.user.id); if (!v) { const e = new Error('nicht_verbunden'); e.status = 409; throw e; } return require('../services/partnerFreigaben').uebersicht(v.id); }));
+kunde.put('/freigabe', fn((req) => pk.freigabeSetzen(req.user, req.body)));
+kunde.post('/freigabe/widerrufen', fn((req) => pk.freigabeWiderrufen(req.user, req.body)));
 kunde.post('/code', fn((req) => pk.codeErzeugen(req.user.id)));
 kunde.delete('/code', fn((req) => pk.codeWiderrufen(req.user.id)));
 kunde.post('/senden', fn((req) => pk.senden(req.user, req.body)));

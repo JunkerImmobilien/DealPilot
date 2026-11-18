@@ -1753,6 +1753,14 @@ if (!window._pdfGold) {
       var loggedIn = false; try { loggedIn = !!localStorage.getItem('ji_token'); } catch (e) {}
       if (loggedIn) {
         clearInterval(_acceptWatch); _acceptWatch = null;
+        /* v3690 · P1: auch das NEUE Konto bestaetigt die Verbindung im Dialog mit der Freigabe (mein-partner, partner-kunden.js),
+           vorher wurde hier still angenommen und nie gefragt, was der Partner sehen darf */
+        if (window.DpMeinPartner && typeof window.DpMeinPartner.einladungFragen === 'function') {
+          var bn0 = document.getElementById('rp-invite-banner'); if (bn0) bn0.remove();
+          fetch('/api/v1/reseller-invite/info?token=' + encodeURIComponent(token)).then(function (x) { return x.ok ? x.json() : null; })
+            .then(function (inf) { if (inf && inf.valid) window.DpMeinPartner.einladungFragen(token, inf); }).catch(function () {});
+          return;
+        }
         Auth.apiCall('/reseller-invite/accept', { method: 'POST', body: { token: token } }).then(function (r) {
           try { localStorage.removeItem('rp_invite_token'); } catch (e) {}
           var bn = document.getElementById('rp-invite-banner'); if (bn) bn.remove();

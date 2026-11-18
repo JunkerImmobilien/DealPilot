@@ -19,6 +19,7 @@ const { query } = require('../db/pool');
 const reseller = require('./resellerService');
 const objectService = require('./objectService');
 const planService = require('./planService');
+const F = require('./partnerFreigaben');   /* v3690 · P1 Freigabe bei der Kopplung */
 
 function fehler(code, status, detail, extra) { const e = new Error(code); e.status = status || 400; if (detail) e.detail = detail; if (extra) e.extra = extra; return e; }
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -99,13 +100,21 @@ async function cockpit(rs) {
             EXISTS (SELECT 1 FROM licenses l WHERE l.client_id = c.id AND l.status = 'zugewiesen') AS hat_platz,
             (SELECT COUNT(*) FROM object_shares s WHERE s.client_id = c.id AND s.kopie_object_id IS NOT NULL AND s.status <> 'widerrufen')::int AS sendungen,
             (SELECT MAX(s.stand_am) FROM object_shares s WHERE s.client_id = c.id AND s.status <> 'widerrufen') AS letzte_sendung,
-            (SELECT COUNT(*) FROM object_shares s WHERE s.client_id = c.id AND s.kopie_object_id IS NOT NULL AND s.status <> 'widerrufen' AND s.gelesen_am IS NULL)::int AS neu
+            (SELECT COUNT(*) FROM object_shares s WHERE s.client_id = c.id AND s.kopie_object_id IS NOT NULL AND s.status <> 'widerrufen' AND s.gelesen_am IS NULL)::int AS neu,
+            (SELECT json_build_object('art', f.art, 'bereiche', f.bereiche, 'erteilt_am', f.erteilt_am, 'ersetzt_am', f.ersetzt_am, 'widerrufen_am', f.widerrufen_am, 'verbraucht_am', f.verbraucht_am)
+               FROM partner_freigaben f WHERE f.client_id = c.id ORDER BY f.erteilt_am DESC LIMIT 1) AS freigabe_letzte
        FROM reseller_clients c JOIN users u ON u.id = c.user_id
       WHERE c.reseller_id = $1
       ORDER BY (c.getrennt_am IS NULL) DESC, c.display_name ASC`, [rs.id])).rows;
-  kunden.forEach((k) => { k.rechte_wirksam = rechteAus(k); k.stufe_text = STUFEN[k.stufe] || null; });
+  kunden.forEach((k) => {
+    k.rechte_wirksam = rechteAus(k); k.stufe_text = STUFEN[k.stufe] || null;
+    /* v3690 · Freigabe des Kunden (letzte Fassung): dauer | einmal | keine | widerrufen | verbraucht | ohne */
+    const l = k.freigabe_letzte, aktiv = l && !l.ersetzt_am && !l.widerrufen_am && !l.verbraucht_am ? l : null;
+    k.freigabe = { zustand: F.zustand(aktiv, l), bereiche: F.bereicheWirksam(aktiv), erteilt_am: l ? l.erteilt_am : null, widerrufen_am: l ? l.widerrufen_am : null };
+    delete k.freigabe_letzte;
+  });
   const anfragen = (await query(
-    `SELECT a.id, a.quelle, a.platz_mitgeben, a.anzeige_name, a.status, a.erstellt_am, u.email
+    `SELECT a.id, a.quelle, a.platz_mitgeben, a.anzeige_name, a.status, a.erstellt_am, a.vorschlag, u.email
        FROM partner_anfragen a JOIN users u ON u.id = a.user_id
       WHERE a.reseller_id = $1 AND a.status = 'offen' ORDER BY a.erstellt_am DESC`, [rs.id])).rows;
   const einladungen = await reseller.listInvites(rs.id).catch(() => []);
@@ -208,12 +217,16 @@ async function einladenOhneMail(rs, actor, b) {
   if (!email || !name) throw fehler('email_und_name');
   const u = (await query(`SELECT id, role FROM users WHERE lower(email) = $1 AND deleted_at IS NULL LIMIT 1`, [email])).rows[0];
   if (u) {
-    const anfrage = await anfrageAnlegen(rs, u.id, { quelle: 'einladung', platz_mitgeben: platz, name, actor });
+    const anfrage = await anfrageAnlegen(rs, u.id, { quelle: 'einladung', platz_mitgeben: platz, name, actor, vorschlag: b && b.vorschlag });
     /* Antwort verraet nicht, ob es das Konto gibt: beide Wege sagen „Einladung gesendet“ */
     return { ok: true, art: 'anfrage', anfrage_id: anfrage.id };
   }
   const inv = await reseller.createInvite(rs.id, { email, displayName: name, invitedBy: actor });
   try { await query(`UPDATE reseller_invites SET art = 'neu', platz_mitgeben = $2 WHERE id = $1`, [inv.id, platz]); } catch (e) {}
+  /* v3690 · Vorschlag des Partners (Art, Bereiche), beim Kunden vorausgewaehlt und abwaehlbar. Eigene Abfrage, damit ein
+     Fehler hier nicht platz_mitgeben mitnimmt. */
+  const vs = F.vorschlagSauber(b && b.vorschlag);
+  if (vs) { try { await query(`UPDATE reseller_invites SET vorschlag = $2::jsonb WHERE id = $1`, [inv.id, JSON.stringify(vs)]); } catch (e) { console.error('[partner] vorschlag einladung:', e.message); } }
   return { ok: true, art: 'einladung', invite: inv };
 }
 
@@ -225,11 +238,15 @@ async function anfrageAnlegen(rs, userId, o) {
   const v = await aktiveVerbindung(userId);
   if (v && v.reseller_id !== rs.id) throw fehler('anderer_partner', 409, 'Der Kunde ist schon mit einem anderen Partner verbunden.');
   if (v && v.reseller_id === rs.id) throw fehler('schon_verbunden', 409, 'Der Kunde ist schon mit dir verbunden.');
+  const vs = F.vorschlagSauber(o.vorschlag);   /* v3690 */
   const ex = await query(`SELECT * FROM partner_anfragen WHERE reseller_id = $1 AND user_id = $2 AND status = 'offen'`, [rs.id, userId]);
-  if (ex.rowCount) return ex.rows[0];
+  if (ex.rowCount) {
+    if (vs) await query(`UPDATE partner_anfragen SET vorschlag = $2::jsonb WHERE id = $1`, [ex.rows[0].id, JSON.stringify(vs)]);
+    return ex.rows[0];
+  }
   const r = await query(
-    `INSERT INTO partner_anfragen (reseller_id, user_id, quelle, platz_mitgeben, anzeige_name, erstellt_von) VALUES ($1,$2,$3,$4,$5,$6) RETURNING *`,
-    [rs.id, userId, o.quelle, !!o.platz_mitgeben, o.name || null, o.actor || null]);
+    `INSERT INTO partner_anfragen (reseller_id, user_id, quelle, platz_mitgeben, anzeige_name, erstellt_von, vorschlag) VALUES ($1,$2,$3,$4,$5,$6,$7::jsonb) RETURNING *`,
+    [rs.id, userId, o.quelle, !!o.platz_mitgeben, o.name || null, o.actor || null, vs ? JSON.stringify(vs) : null]);
   return r.rows[0];
 }
 
@@ -244,7 +261,7 @@ async function codeEinloesen(rs, actor, b) {
     await query(`INSERT INTO verbindungs_code_versuche (reseller_id) VALUES ($1)`, [rs.id]);
     throw fehler('code_ungueltig', 404, 'Der Code ist falsch oder abgelaufen.');
   }
-  const anfrage = await anfrageAnlegen(rs, z.user_id, { quelle: 'code', platz_mitgeben: b && b.platz_mitgeben !== false, name: b && b.name, actor });
+  const anfrage = await anfrageAnlegen(rs, z.user_id, { quelle: 'code', platz_mitgeben: b && b.platz_mitgeben !== false, name: b && b.name, actor, vorschlag: b && b.vorschlag });
   await query(`UPDATE verbindungs_codes SET eingeloest_von = $2, eingeloest_am = now() WHERE id = $1`, [z.id, rs.id]);
   return { ok: true, anfrage_id: anfrage.id };
 }
@@ -259,7 +276,7 @@ async function anfrageZurueckziehen(rs, id) {
    des Kunden sowie Anschrift und Objektart des Objekts (nur lesend). */
 async function kundenstaende(rs) {
   const r = await query(
-    `SELECT s.id AS share_id, s.client_id, s.kopie_object_id, s.stand_nr, s.stand_am, s.ueber_bestand, s.gelesen_am, s.status,
+    `SELECT s.id AS share_id, s.client_id, s.kopie_object_id, s.stand_nr, s.stand_am, s.ueber_bestand, s.gelesen_am, s.status, s.bereiche,
             c.display_name AS kunde, c.getrennt_am, c.platz_art AS kunde_platz_art, u.email AS kunde_email, c.mail_rueckmeldung AS kunde_mail_rueckmeldung,
             c.kundennummer AS kunde_nr,
             o.name, o.seq_no, o.ort, o.kaufpreis, o.dscr, o.cf_ns, o.bmy,
@@ -348,6 +365,8 @@ async function trennen(resellerId, clientId, von) {
   if (c.getrennt_am) return { ok: true };
   try { await reseller.unassignSeat(resellerId, clientId); } catch (e) {}
   await query(`UPDATE reseller_clients SET getrennt_am = now(), getrennt_von = $2 WHERE id = $1`, [clientId, von]);
+  /* v3690 · mit der Verbindung endet die Freigabe. Wer sich neu verbindet, entscheidet neu. */
+  try { await F.widerrufen(clientId); } catch (e) { console.error('[partner-kunden] Freigabe beim Trennen:', e.message); }
   await meldung(resellerId, clientId, 'getrennt', (von === 'kunde' ? 'Der Kunde hat die Verbindung getrennt' : 'Verbindung getrennt'));
   return { ok: true };
 }
@@ -397,19 +416,30 @@ async function aufgabeAnlegen(rs, actor, b) {
   const art = ['steuerjahr', 'bestand_senden', 'frei'].indexOf(b.art) >= 0 ? b.art : 'frei';
   const filt = ['alle', 'bestand', 'ankauf'].indexOf(b.objektfilter) >= 0 ? b.objektfilter : 'alle';
   const sj = art === 'steuerjahr' ? (parseInt(b.steuerjahr, 10) || (new Date().getFullYear() - 1)) : null;
+  let ids = Array.isArray(b.kunden) ? b.kunden : null;
+  if (!ids || b.kunden === 'alle') ids = (await query(`SELECT id FROM reseller_clients WHERE reseller_id = $1 AND getrennt_am IS NULL`, [rs.id])).rows.map((x) => x.id);
+  /* v3690 · Widerruf sperrt das Anfordern: Kunden, deren letzte Freigabe widerrufen ist, bekommen keine Aufgabe.
+     Erst eine neue Freigabe des Kunden (Mein Partner › Freigaben) oeffnet es wieder. */
+  const frei = [];
+  let ohneFreigabe = 0;
+  for (const id of ids) {
+    if (!UUID.test(String(id || ''))) continue;
+    const ok = await query(`SELECT 1 FROM reseller_clients WHERE id = $1 AND reseller_id = $2 AND getrennt_am IS NULL`, [id, rs.id]);
+    if (!ok.rowCount) continue;
+    const z = (await query(`SELECT widerrufen_am FROM partner_freigaben WHERE client_id = $1 ORDER BY erteilt_am DESC LIMIT 1`, [id])).rows[0];
+    if (z && z.widerrufen_am) { ohneFreigabe++; continue; }
+    frei.push(id);
+  }
+  if (!frei.length && ohneFreigabe) throw fehler('freigabe_widerrufen', 403, ohneFreigabe === 1 ? 'Der Kunde hat seine Freigabe widerrufen. Du kannst nichts anfordern, bis er wieder freigibt.' : 'Diese Kunden haben ihre Freigabe widerrufen. Du kannst nichts anfordern, bis sie wieder freigeben.');
   const a = (await query(
     `INSERT INTO partner_aufgaben (reseller_id, titel, text, art, steuerjahr, objektfilter, faellig_am, erstellt_von)
      VALUES ($1,$2,$3,$4,$5,$6,$7,$8) RETURNING *`,
     [rs.id, titel.slice(0, 200), String(b.text || '').slice(0, 4000) || null, art, sj, filt, b.faellig_am || null, actor])).rows[0];
-  let ids = Array.isArray(b.kunden) ? b.kunden : null;
-  if (!ids || b.kunden === 'alle') ids = (await query(`SELECT id FROM reseller_clients WHERE reseller_id = $1 AND getrennt_am IS NULL`, [rs.id])).rows.map((x) => x.id);
   let n = 0;
-  for (const id of ids) {
-    const ok = await query(`SELECT 1 FROM reseller_clients WHERE id = $1 AND reseller_id = $2 AND getrennt_am IS NULL`, [id, rs.id]);
-    if (!ok.rowCount) continue;
+  for (const id of frei) {
     await query(`INSERT INTO partner_aufgaben_kunden (aufgabe_id, client_id) VALUES ($1,$2) ON CONFLICT DO NOTHING`, [a.id, id]); n++;
   }
-  return Object.assign(a, { kunden_anzahl: n });
+  return Object.assign(a, { kunden_anzahl: n, ohne_freigabe: ohneFreigabe });
 }
 
 async function aufgabeErinnern(rs, aufgabeId, clientId) {
@@ -442,7 +472,7 @@ async function meldungenGelesen(rs) {
 async function meinPartner(userId) {
   const v = await aktiveVerbindung(userId);
   const anfragen = (await query(
-    `SELECT a.id, a.quelle, a.platz_mitgeben, a.erstellt_am, COALESCE(NULLIF(rs.brand_name,''), rs.name) AS partner_name, rs.role AS partner_rolle
+    `SELECT a.id, a.quelle, a.platz_mitgeben, a.erstellt_am, a.vorschlag, COALESCE(NULLIF(rs.brand_name,''), rs.name) AS partner_name, rs.role AS partner_rolle
        FROM partner_anfragen a JOIN resellers rs ON rs.id = a.reseller_id
       WHERE a.user_id = $1 AND a.status = 'offen' ORDER BY a.erstellt_am DESC`, [userId])).rows;
   const bezahlt = await reseller.hatBezahltesAbo(userId);
@@ -473,14 +503,18 @@ async function meinPartner(userId) {
       marke: v.marke, netzwerk: v.platz_art === 'platz' ? !!v.netzwerk : true,
       verbunden_am: v.verbunden_am, entzug_frist_bis: v.entzug_frist_bis, bezahltes_abo: bezahlt, kundennummer: v.kundennummer || null
     },
-    anfragen, sendungen, aufgaben, anmerkungen_fehlen: fehlen, code_gueltig_bis: code ? code.gueltig_bis : null
+    anfragen, sendungen, aufgaben, anmerkungen_fehlen: fehlen, code_gueltig_bis: code ? code.gueltig_bis : null,
+    freigabe: await F.uebersicht(v.id)   /* v3690 · aktive Fassung, Zustand, Verlauf */
   };
 }
 
 /** Kunde nimmt eine Anfrage an oder lehnt ab */
-async function anfrageBeantworten(user, anfrageId, annehmen) {
+async function anfrageBeantworten(user, anfrageId, annehmen, freigabeRoh) {
   const a = (await query(`SELECT * FROM partner_anfragen WHERE id = $1 AND user_id = $2 AND status = 'offen'`, [anfrageId, user.id])).rows[0];
   if (!a) throw fehler('anfrage_nicht_gefunden', 404);
+  /* v3690 · Freigabe bei der Kopplung: VOR jeder Aenderung pruefen, eine ungueltige Wahl verbindet nicht. Fehlt sie (alter
+     Stand im Browser), entsteht keine Fassung, und es gilt „noch keine Freigabe“ (nur Objekt). */
+  const fw = annehmen && freigabeRoh != null ? F.freigabeSauber(freigabeRoh) : null;
   const pn = await partnerName(a.reseller_id);
   if (!annehmen) {
     await query(`UPDATE partner_anfragen SET status = 'abgelehnt', beantwortet_am = now() WHERE id = $1`, [a.id]);
@@ -501,8 +535,10 @@ async function anfrageBeantworten(user, anfrageId, annehmen) {
   let platz = false;
   if (art === 'platz') { try { await reseller.assignSeat(a.reseller_id, c.id); platz = true; } catch (e) { /* kein freier Platz: Partner weist spaeter zu */ } }
   await query(`UPDATE partner_anfragen SET status = 'angenommen', beantwortet_am = now() WHERE id = $1`, [a.id]);
-  await meldung(a.reseller_id, c.id, 'verbindung_angenommen', (a.anzeige_name || user.name || 'Kunde') + ' hat die Verbindung bestätigt' + (art === 'eigen' ? ' (eigener Plan)' : platz ? ' (Partnerplatz)' : ' (Platz noch zuweisen)'));
-  return { ok: true, angenommen: true, partner_name: pn.n, platz_art: art, platz_zugewiesen: platz };
+  const fg = fw ? await F.setzen(c.id, user.id, fw, a.quelle === 'code' ? 'code' : 'anfrage') : null;
+  await meldung(a.reseller_id, c.id, 'verbindung_angenommen', (a.anzeige_name || user.name || 'Kunde') + ' hat die Verbindung bestätigt' + (art === 'eigen' ? ' (eigener Plan)' : platz ? ' (Partnerplatz)' : ' (Platz noch zuweisen)') +
+    '. ' + F.kurztext(fg));
+  return { ok: true, angenommen: true, partner_name: pn.n, platz_art: art, platz_zugewiesen: platz, freigabe: fg ? { art: fg.art, bereiche: fg.bereiche } : null };
 }
 
 /** Kunde erzeugt einen Verbindungscode (Klartext nur in dieser Antwort) */
@@ -545,6 +581,15 @@ async function senden(user, b) {
   const gesperrt = new Set(fehlen.map((x) => x.objekt_id));
   const pn = await partnerName(v.reseller_id);
   if (!pn.owner_user_id) throw fehler('partner_ohne_inhaber', 409);
+  /* v3690 · Eine Aufgabe, die mit dem Widerruf beendet wurde, laesst sich nicht mehr erfuellen */
+  if (b && b.aufgabe_id) {
+    const ak = (await query(`SELECT status FROM partner_aufgaben_kunden WHERE aufgabe_id = $1 AND client_id = $2`, [b.aufgabe_id, v.id])).rows[0];
+    if (ak && ak.status === 'widerrufen') throw fehler('freigabe_widerrufen', 409, 'Du hast die Freigabe widerrufen. Diese Anforderung ist damit beendet.');
+  }
+  /* v3690 · P1: was mitgeht, bestimmt die aktive Freigabe des Kunden. Ohne Bereich Steuerdaten fallen zvE, Grenzsteuersatz
+     und daraus Gerechnetes aus der Kopie, ohne Steuer Anlage V und Jahresbuch (partnerFreigaben.kopieFiltern). */
+  const fg = await F.aktive(v.id);
+  const bereiche = F.bereicheWirksam(fg);
   const ergebnis = [];
   for (const oid of ids) {
     if (gesperrt.has(oid)) { ergebnis.push({ object_id: oid, ok: false, grund: 'anmerkungen_offen' }); continue; }
@@ -557,25 +602,71 @@ async function senden(user, b) {
     const standNr = (s.status === 'widerrufen' ? 0 : (s.stand_nr || 0)) + 1;
     const d = typeof orig.data === 'string' ? JSON.parse(orig.data) : JSON.parse(JSON.stringify(orig.data || {}));
     NICHT_IN_KOPIE.forEach((k) => { delete d[k]; });
+    const entfernt = F.kopieFiltern(d, bereiche);   /* v3690 */
     d._obj_seq = kopieKennung(s.id, standNr);   /* eigene Kennung: belegt keine Nummer des Partners, kollidiert nicht beim erneuten Senden */
-    d._kundenstand = { share_id: s.id, client_id: v.id, kunde: v.display_name, stand_nr: standNr, stand_am: new Date().toISOString(), seq_kunde: orig.data && orig.data._obj_seq || null };
+    d._kundenstand = { share_id: s.id, client_id: v.id, kunde: v.display_name, stand_nr: standNr, stand_am: new Date().toISOString(), seq_kunde: orig.data && orig.data._obj_seq || null,
+      freigabe: { art: fg ? fg.art : 'keine', steuer: bereiche.steuer, steuerdaten: bereiche.steuerdaten } };   /* v3690 · Band beim Partner */
     let fotos = orig.photos; if (typeof fotos === 'string') { try { fotos = JSON.parse(fotos); } catch (e) { fotos = []; } }
     const kopie = await objectService.create(pn.owner_user_id, { data: d, aiAnalysis: orig.ai_analysis || null, photos: Array.isArray(fotos) ? fotos : [] });
     await query(`UPDATE objects SET kunden_freigabe_id = $2 WHERE id = $1`, [kopie.id, s.id]);
     const alt = s.status !== 'widerrufen' ? s.kopie_object_id : null;
     await query(
       `UPDATE object_shares SET kopie_object_id = $2, stand_nr = $3, stand_am = now(), ueber_bestand = $4, status = 'eingereicht',
-              submitted_at = now(), revoked_at = NULL, gelesen_am = NULL, updated_at = now(), aufgabe_id = COALESCE($5, aufgabe_id), client_id = $6 WHERE id = $1`,
-      [s.id, kopie.id, standNr, bestand, (b && b.aufgabe_id) || null, v.id]);
+              submitted_at = now(), revoked_at = NULL, gelesen_am = NULL, updated_at = now(), aufgabe_id = COALESCE($5, aufgabe_id), client_id = $6,
+              bereiche = $7::jsonb, freigabe_id = $8 WHERE id = $1`,
+      [s.id, kopie.id, standNr, bestand, (b && b.aufgabe_id) || null, v.id, JSON.stringify(bereiche), fg ? fg.id : null]);
     if (alt) { try { await query(`DELETE FROM objects WHERE id = $1 AND kunden_freigabe_id = $2`, [alt, s.id]); } catch (e) {} }
-    try { await query(`INSERT INTO share_audit (share_id, actor_user_id, action, meta) VALUES ($1,$2,'gesendet',$3::jsonb)`, [s.id, user.id, JSON.stringify({ stand_nr: standNr })]); } catch (e) {}
+    try { await query(`INSERT INTO share_audit (share_id, actor_user_id, action, meta) VALUES ($1,$2,'gesendet',$3::jsonb)`, [s.id, user.id, JSON.stringify({ stand_nr: standNr, freigabe_id: fg ? fg.id : null, art: fg ? fg.art : 'keine', bereiche, entfernt })]); } catch (e) {}
     ergebnis.push({ object_id: oid, ok: true, share_id: s.id, stand_nr: standNr });
   }
   const n = ergebnis.filter((x) => x.ok).length;
   if (n) await meldung(v.reseller_id, v.id, bestand ? 'bestand' : (ergebnis.some((x) => x.stand_nr > 1) ? 'neuer_stand' : 'gesendet'),
     v.display_name + (bestand ? ' hat den Bestand gesendet (' + n + ' Objekte)' : ' hat ' + n + (n === 1 ? ' Objekt' : ' Objekte') + ' gesendet'));
   if (b && b.aufgabe_id) await aufgabeKunde(user, b.aufgabe_id, 'erledigt');
-  return { ok: true, gesendet: n, ergebnis, uebersprungen: ergebnis.filter((x) => x.grund === 'anmerkungen_offen').length };
+  /* v3690 · eine einmalige Freigabe endet mit der Sendung */
+  const verbraucht = n && fg && fg.art === 'einmal' ? await F.verbrauchen(fg.id) : false;
+  return { ok: true, gesendet: n, ergebnis, uebersprungen: ergebnis.filter((x) => x.grund === 'anmerkungen_offen').length,
+    bereiche, freigabe_art: fg ? fg.art : 'keine', freigabe_verbraucht: verbraucht };
+}
+
+// ── v3690 · Freigabe an den Partner (Kunde) ─────────────────────────────────
+/** Neue Fassung aus Mein Partner › Freigaben */
+async function freigabeSetzen(user, roh) {
+  const v = await aktiveVerbindung(user.id);
+  if (!v) throw fehler('nicht_verbunden', 409, 'Du bist mit keinem Partner verbunden.');
+  const f = F.freigabeSauber(roh);
+  const neu = await F.setzen(v.id, user.id, f, 'mein_partner');
+  await meldung(v.reseller_id, v.id, 'freigabe_geaendert', v.display_name + ' hat die Freigabe geändert. ' + F.kurztext(neu));
+  return { ok: true, freigabe: await F.uebersicht(v.id) };
+}
+/** Widerruf: kein Anfordern mehr, offene Aufgaben enden, Verbindung bleibt. Auf Wunsch auch die gesendeten Staende zurueck. */
+async function freigabeWiderrufen(user, b) {
+  const v = await aktiveVerbindung(user.id);
+  if (!v) throw fehler('nicht_verbunden', 409, 'Du bist mit keinem Partner verbunden.');
+  const w = await F.widerrufen(v.id);
+  if (!w) throw fehler('keine_freigabe', 409, 'Es gibt keine Freigabe, die du widerrufen kannst.');
+  const auf = await query(`UPDATE partner_aufgaben_kunden SET status = 'widerrufen' WHERE client_id = $1 AND status IN ('offen','gesehen','in_arbeit') RETURNING aufgabe_id`, [v.id]);
+  let zurueck = 0;
+  if (b && b.staende_zurueckziehen === true) {
+    const l = (await query(`SELECT id, kopie_object_id FROM object_shares WHERE client_id = $1 AND kopie_object_id IS NOT NULL AND status <> 'widerrufen'`, [v.id])).rows;
+    for (const s of l) {
+      try { await query(`DELETE FROM objects WHERE id = $1 AND kunden_freigabe_id = $2`, [s.kopie_object_id, s.id]); } catch (e) {}
+      await query(`UPDATE object_shares SET status = 'widerrufen', revoked_at = now(), kopie_object_id = NULL, updated_at = now() WHERE id = $1`, [s.id]);
+      try { await query(`INSERT INTO share_audit (share_id, actor_user_id, action, meta) VALUES ($1,$2,'zurueckgezogen',$3::jsonb)`, [s.id, user.id, JSON.stringify({ mit_widerruf: w.id })]); } catch (e) {}
+      zurueck++;
+    }
+    await query(`UPDATE partner_freigaben SET staende_zurueckgezogen = $2 WHERE id = $1`, [w.id, zurueck]);
+  }
+  await meldung(v.reseller_id, v.id, 'freigabe_widerrufen', v.display_name + ' hat die Freigabe widerrufen.' +
+    (auf.rowCount ? ' ' + auf.rowCount + (auf.rowCount === 1 ? ' offene Aufgabe ist' : ' offene Aufgaben sind') + ' damit beendet.' : '') +
+    (zurueck ? ' ' + zurueck + (zurueck === 1 ? ' gesendeter Stand wurde' : ' gesendete Stände wurden') + ' zurückgezogen.' : ' Gesendete Stände bleiben bei dir.'));
+  return { ok: true, aufgaben_beendet: auf.rowCount, staende_zurueckgezogen: zurueck, freigabe: await F.uebersicht(v.id) };
+}
+/** Partner liest die Freigabe eines Kunden (nur lesend) */
+async function freigabeLesen(rs, clientId) {
+  if (!UUID.test(String(clientId || ''))) throw fehler('kunde_nicht_gefunden', 404);
+  const c = await kundeLaden(rs, clientId);
+  return F.uebersicht(c.id);
 }
 
 function sperrText(n) {
@@ -689,6 +780,7 @@ module.exports = {
   cockpit, kundeEinstellen, einladen, anfrageAnlegen, codeEinloesen, anfrageZurueckziehen,
   kundenstaende, kundenstandGeoeffnet, kundenstandUebernehmen, platzEntziehen, trennen, fristenAbarbeiten,
   aufgabenListe, aufgabeAnlegen, aufgabeErinnern, aufgabeAbschliessen, meldungen, meldungenGelesen,
+  /* v3690 */ freigabeSetzen, freigabeWiderrufen, freigabeLesen,
   meinPartner, anfrageBeantworten, codeErzeugen, codeWiderrufen, senden, zurueckziehen, aufgabeKunde, kundeTrennt, markeWaehlen, rechteFuer,
   _codeNorm: codeNorm, _sha: sha, CODE_ZEICHEN, _meldung: meldung,
   /* v3640 */ kopieKennung, kundennummerNaechste, kundennummerSauber, ohneBearbeitung, sendenSperre, KUNDENNUMMER_MUSTER

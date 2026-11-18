@@ -117,6 +117,31 @@
       '#dppk-dlg .pk-hinweis{background:#FBF6E9;border-left:3px solid ' + G + ';border-radius:8px;padding:10px 12px;font-size:13px;line-height:1.5;margin-bottom:12px}',
       '#dppk-dlg .pk-hinweis.rot{border-left-color:#B8625C;background:#FBF1F0}',
       '#dppk-dlg .pk-code{font:600 28px "JetBrains Mono",monospace;letter-spacing:.12em;text-align:center;padding:14px;border:1px dashed ' + G + ';border-radius:10px;background:#FBF6E9;margin:6px 0 12px}',
+      /* v3690 · Freigabe: Zustimmungsdialog (#dppk-dlg), Reiter Freigabe im Arbeitsbereich (#dppk-ab, aus #dppk-ov kopiert), Vorschlag des Partners */
+      '#dppk-dlg .pk-chip,#dppk-ov .pk-fg-chips .pk-chip{display:inline-block;border-radius:6px;padding:3px 8px;font:600 10.5px "JetBrains Mono",monospace;letter-spacing:.04em;text-transform:uppercase;border:1px solid #E2D7BE;background:#FBF6E9;color:#6B5A2A;white-space:nowrap}',
+      '#dppk-dlg .pk-fg-wer{margin:0 0 10px;font-size:14px;line-height:1.5}',
+      '#dppk-dlg .pk-fg-intro{font-size:13px;line-height:1.55;margin:0 0 4px}',
+      '#dppk-dlg .pk-fg-vs{display:inline-block;margin-left:8px;font:600 9.5px "JetBrains Mono",monospace;letter-spacing:.05em;text-transform:uppercase;font-style:normal;color:#7A6020;background:#FBF6E9;border:1px solid #E2D7BE;border-radius:5px;padding:1px 6px;vertical-align:1px}',
+      '#dppk-dlg .pk-fg-vs.grau{color:#6B6460;background:#F2F0EC;border-color:#E2DED6}',
+      '#dppk-dlg .pk-fg-nur{display:block;color:#7A7370;font-size:12px;margin-top:3px}',
+      '#dppk-dlg .pk-fg-fuss{font-size:12.5px;line-height:1.5;color:#6B6460;margin:10px 0 0}',
+      '#dppk-dlg .pk-wahl span{min-width:0;line-height:1.45}',
+      '#dppk-dlg .pk-wahl input:disabled + span{opacity:.62}',
+      '#dppk-dlg .pk-wahl input[type=checkbox],#dppk-dlg .pk-wahl input[type=radio]{width:17px;height:17px;flex:0 0 17px}',
+      '#dppk-dlg .pk-fg-senden{border:1px solid #EDE6D6;background:#fff;border-radius:8px;padding:9px 11px;font-size:12.5px;line-height:1.55;margin-top:4px}',
+      '#dppk-dlg .pk-mehr{border:0;background:none;color:#7A6020;font:600 12.5px Inter,sans-serif;cursor:pointer;padding:0;text-decoration:underline}',
+      '#dppk-ov .pk-fg-chips{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 2px}',
+      '#dppk-ov .pk-fg-knoepfe{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}',
+      '#dppk-ov .pk-fg-stand.rot{color:#94433E}',
+      '#dppk-ov .pk-fg-verlauf{list-style:none;margin:0;padding:0;font-size:13px;line-height:1.5}',
+      '#dppk-ov .pk-fg-verlauf li{padding:7px 0;border-bottom:1px solid #F0EADC;overflow-wrap:anywhere}',
+      '#dppk-ov .pk-fg-verlauf li span{color:#7A7370}',
+      '#dppk-ov .pk-fg-verlauf li.leer{color:#7A7370}',
+      '#dppk-ov .pk-vs,#dppk-dlg .pk-vs{border-top:1px solid #EDE6D6;margin-top:10px}',
+      '#dppk-ov .pk-vs-hinweis,#dppk-dlg .pk-vs-hinweis{font-size:12.5px;line-height:1.5;color:#6B6460;margin-bottom:8px}',
+      '#dppk-ov .pk-vs-art,#dppk-ov .pk-vs-ber,#dppk-dlg .pk-vs-art,#dppk-dlg .pk-vs-ber{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}',
+      '#dppk-ov .pk-vs label,#dppk-dlg .pk-vs label{display:inline-flex;align-items:center;gap:6px;border:1px solid #D9CFB8;background:#fff;border-radius:16px;padding:5px 11px;font:500 12.5px Inter,sans-serif;color:#2A2727;cursor:pointer}',
+      '#dppk-ov .pk-vs input,#dppk-dlg .pk-vs input{margin:0;accent-color:' + G + '}',
       '#dppk-band{position:fixed;left:50%;transform:translateX(-50%);bottom:18px;z-index:100040;max-width:min(720px,calc(100vw - 32px));width:max-content;background:#050505;color:#FDFCFA;border:1px solid ' + G + ';border-radius:12px;padding:12px 14px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;box-shadow:0 14px 40px rgba(0,0,0,.4);font:400 13px Inter,sans-serif}',
       '#dppk-band b{color:' + G + '}',
       '#dppk-band .pk-btn{border:1px solid ' + G + ';background:' + G + ';color:#fff;border-radius:8px;padding:7px 12px;font:600 12.5px Inter,sans-serif;cursor:pointer}',
@@ -304,7 +329,7 @@
   function kundeReiterListe() {
     var m = S.kunde || {};
     if (!m.verbunden) return [{ k: 'k_verbinden', t: 'Verbinden', zahl: (m.anfragen || []).length || 0 }];
-    var offen = (m.aufgaben || []).filter(function (a) { return a.status !== 'erledigt' && a.status !== 'abgelehnt'; }).length;
+    var offen = (m.aufgaben || []).filter(function (a) { return a.status !== 'erledigt' && a.status !== 'abgelehnt' && a.status !== 'widerrufen'; }).length;
     return [{ k: 'k_senden', t: 'An Partner senden' }, { k: 'k_sendungen', t: 'Meine Sendungen' }, { k: 'k_aufgaben', t: 'Aufgaben', zahl: offen },
       { k: 'k_freigaben', t: 'Freigaben' }, { k: 'k_verbindung', t: 'Verbindung' }];
   }
@@ -781,6 +806,13 @@
     }, function (e) { k.innerHTML = '<h3>Abrechnung</h3><div class="pk-leer">' + esc(fehlerText(e)) + '</div>'; });
   }
 
+  /* v3690 · Freigabe des Kunden beim Partner: Zustand als Chip, Bereiche im Titel */
+  function fgChipPartner(f) {
+    if (!f) return '';
+    var z = FG_ZUSTAND[f.zustand] || FG_ZUSTAND.ohne;
+    var t = (f.zustand === 'dauer' || f.zustand === 'einmal') ? 'Freigegeben: ' + fgBereicheText(f.bereiche) + (f.bereiche && f.bereiche.steuerdaten ? '' : '. Steuerdaten nicht freigegeben') + '.' : (f.zustand === 'widerrufen' ? 'Der Kunde hat die Freigabe widerrufen. Anfordern ist gesperrt.' : 'Der Kunde sendet nur selbst, ohne Steuer und Steuerdaten.');
+    return '<span class="pk-chip ' + z[1] + '" title="' + esc(t) + '">' + esc(f.zustand === 'dauer' || f.zustand === 'einmal' ? 'Freigabe ' + z[0].toLowerCase() : z[0]) + '</span>';
+  }
   function kundenZeichnen(el) {
     var c = S.partner, pz = platzZahlen(c);
     /* v3392 · keine Kacheln (stehen in der Übersicht), Einladen nur im Reiter Einladen; im Fenster bleiben die Knoepfe */
@@ -806,7 +838,7 @@
       var knoepfe = getrennt ? '' : (k.platz_art === 'platz'
         ? '<button type="button" class="pk-btn klein" data-ein="' + k.id + '">Stufe und Rechte</button>' + (k.hat_platz || k.entzug_frist_bis ? '' : '<button type="button" class="pk-btn klein" data-platz="' + k.id + '">Platz zuweisen</button>')
         : '<button type="button" class="pk-btn klein" data-ein="' + k.id + '">Notiz und E-Mail</button><button type="button" class="pk-btn klein rot" data-trenn="' + k.id + '">Trennen</button>');
-      return '<div class="pk-zeile"><div class="pk-name"><b>' + nrEtikett(k.kundennummer) + esc(k.display_name) + '</b><small>' + esc(k.email) + ' · ' + esc(info) + (k.sendungen ? ' · ' + k.sendungen + (k.sendungen === 1 ? ' Objekt gesendet' : ' Objekte gesendet') : '') + (k.neu ? ', ' + k.neu + ' neu' : '') + '</small></div>' + zug + status + knoepfe + '</div>';
+      return '<div class="pk-zeile"><div class="pk-name"><b>' + nrEtikett(k.kundennummer) + esc(k.display_name) + '</b><small>' + esc(k.email) + ' · ' + esc(info) + (k.sendungen ? ' · ' + k.sendungen + (k.sendungen === 1 ? ' Objekt gesendet' : ' Objekte gesendet') : '') + (k.neu ? ', ' + k.neu + ' neu' : '') + '</small></div>' + zug + (getrennt ? '' : fgChipPartner(k.freigabe)) + status + knoepfe + '</div>';
     }).join('');
     el.innerHTML = h;
     var _e = el.querySelector('[data-a="einladen"]'), _c = el.querySelector('[data-a="code"]');
@@ -825,23 +857,40 @@
     });
   }
 
+  /* v3690 · Vorschlag des Partners fuer die Freigabe (Konzept 4.1, Frage 4): Art und Bereiche, beim Kunden vorausgewaehlt
+     und abwaehlbar. Der Kunde entscheidet selbst. Gilt fuer Einladung und Code. */
+  var VS_BEREICHE = [['steuer', 'Steuer', 'Anlage V, Mieten und Status je Jahr'], ['steuerdaten', 'Steuerdaten des Kunden', 'zu versteuerndes Einkommen, Veranlagung, Kirchensteuer'],
+    ['finanzierung', 'Finanzierung', 'Selbstauskunft, Einkommen, Darlehen'], ['unterlagen', 'Unterlagen und Belege', ''], ['marktbericht', 'Marktbericht', '']];
+  function vorschlagHtml(p) {
+    return '<div class="pk-vs" data-vs="' + p + '"><div class="pk-gruppe">Freigabe vorschlagen</div><div class="pk-vs-hinweis">Der Kunde sieht deinen Vorschlag beim Bestätigen und entscheidet selbst. Er kann weniger wählen.</div>' +
+      '<div class="pk-vs-art" role="radiogroup" aria-label="Art">' + [['dauer', 'Dauerhaft'], ['einmal', 'Einmalig'], ['', 'Kein Vorschlag']].map(function (x, i) {
+        return '<label><input type="radio" name="pk-vs-art-' + p + '" value="' + x[0] + '"' + (i === 0 ? ' checked' : '') + '>' + x[1] + '</label>'; }).join('') + '</div>' +
+      '<div class="pk-vs-ber">' + VS_BEREICHE.map(function (x) { return '<label title="' + esc(x[2]) + '"><input type="checkbox" data-vs-b="' + x[0] + '"' + (x[0] === 'steuer' ? ' checked' : '') + '>' + esc(x[1]) + '</label>'; }).join('') + '</div></div>';
+  }
+  function vorschlagLesen(d, p) {
+    var box = d.querySelector('[data-vs="' + p + '"]'); if (!box) return null;
+    var a = box.querySelector('input[name="pk-vs-art-' + p + '"]:checked'); if (!a || !a.value) return null;
+    var b = { objekt: true }; [].forEach.call(box.querySelectorAll('[data-vs-b]'), function (c) { b[c.getAttribute('data-vs-b')] = !!c.checked; });
+    if (!b.steuer) b.steuerdaten = false;
+    return { art: a.value, bereiche: b };
+  }
   var EINLADEN_HTML = '<div class="pk-hinweis">Hat die Adresse schon ein DealPilot-Konto, bekommt der Kunde eine Anfrage in seiner App und bestätigt sie dort. Sonst geht eine Einladung per E-Mail raus.</div>' +
     '<label class="pk-feld">Name des Kunden<input type="text" id="pk-e-name" maxlength="120"></label>' +
     '<label class="pk-feld">E-Mail<input type="email" id="pk-e-mail" maxlength="200"></label>' +
     '<label class="pk-wahl"><input type="radio" name="pk-e-art" value="platz" checked><span><b>Mit Partnerplatz</b>Du bezahlst seinen Zugang und bestimmst Stufe, Rechte und Marke. Hat er ein eigenes Abo, wird er ohne Platz verbunden.</span></label>' +
-    '<label class="pk-wahl"><input type="radio" name="pk-e-art" value="eigen"><span><b>Ohne Platz</b>Der Kunde nutzt seinen eigenen Plan und schickt dir nur, was er freigibt.</span></label>';
+    '<label class="pk-wahl"><input type="radio" name="pk-e-art" value="eigen"><span><b>Ohne Platz</b>Der Kunde nutzt seinen eigenen Plan und schickt dir nur, was er freigibt.</span></label>' + vorschlagHtml('e');
   var CODE_HTML = '<div class="pk-hinweis">Den Code erzeugt dein Kunde in DealPilot unter „Mein Partner“ bzw. in den Einstellungen. Er gilt 24 Stunden und nur einmal. Danach bestätigt der Kunde die Verbindung in seiner App.</div>' +
     '<label class="pk-feld">Code<input type="text" id="pk-c-code" maxlength="12" placeholder="XXXX-XXXX" style="text-transform:uppercase;font-family:&quot;JetBrains Mono&quot;,monospace;letter-spacing:.1em"></label>' +
     '<label class="pk-feld">Name des Kunden (für deine Liste)<input type="text" id="pk-c-name" maxlength="120"></label>' +
-    '<label class="pk-wahl"><input type="checkbox" id="pk-c-platz" checked><span><b>Partnerplatz mitgeben</b>Nur wenn der Kunde kein eigenes Abo hat.</span></label>';
+    '<label class="pk-wahl"><input type="checkbox" id="pk-c-platz" checked><span><b>Partnerplatz mitgeben</b>Nur wenn der Kunde kein eigenes Abo hat.</span></label>' + vorschlagHtml('c');
   function einladenSenden(d, el) {
     var name = wert(d, '#pk-e-name'), mail = wert(d, '#pk-e-mail');
     if (!String(name).trim() || !/@/.test(String(mail))) { toast('Bitte Name und E-Mail eintragen.'); return false; }
     var art = (d.querySelector('input[name="pk-e-art"]:checked') || {}).value;
-    return api('/partner/einladen', { method: 'POST', body: { name: name, email: mail, platz_mitgeben: art !== 'eigen' } }).then(function () { toast('Einladung gesendet.'); return neuLaden(el); });
+    return api('/partner/einladen', { method: 'POST', body: { name: name, email: mail, platz_mitgeben: art !== 'eigen', vorschlag: vorschlagLesen(d, 'e') } }).then(function () { toast('Einladung gesendet.'); return neuLaden(el); });
   }
   function codeSenden(d, el) {
-    return api('/partner/code', { method: 'POST', body: { code: wert(d, '#pk-c-code'), name: wert(d, '#pk-c-name'), platz_mitgeben: wert(d, '#pk-c-platz') } })
+    return api('/partner/code', { method: 'POST', body: { code: wert(d, '#pk-c-code'), name: wert(d, '#pk-c-name'), platz_mitgeben: wert(d, '#pk-c-platz'), vorschlag: vorschlagLesen(d, 'c') } })
       .then(function () { toast('Anfrage gesendet. Der Kunde bestätigt sie in seiner App.'); return neuLaden(el); });
   }
   function einladenDialog(el) {
@@ -1030,6 +1079,7 @@
             var stand = x.stand_nr > 1 ? 'Stand ' + x.stand_nr + ', aktualisiert' : 'erster Stand';
             return '<div class="pk-zeile"><div class="pk-name"><b>' + esc(adresse(x)) + '</b><small>' + esc([art, stand, 'freigegeben am ' + datum(x.stand_am)].join(' · '))   /* seq_no der Kopie (K-…) sagt dem Partner nichts */ + '</small></div>' +
               (x.gelesen_am ? '' : '<span class="pk-chip gruen">neu</span>') +
+              (x.bereiche && !x.bereiche.steuerdaten ? '<span class="pk-chip grau" title="' + (x.bereiche.steuer ? 'Anlage V und Jahresbuch sind dabei, zvE und Grenzsteuersatz des Kunden nicht.' : 'Nur das Objekt, ohne Anlage V, Jahresbuch und Steuerdaten.') + '">' + (x.bereiche.steuer ? 'Steuerdaten nicht freigegeben' : 'Steuer nicht freigegeben') + '</span>' : '') +   /* v3690 */
               (x.anm_offen ? '<span class="pk-chip">' + x.anm_offen + ' Anmerkung' + (x.anm_offen === 1 ? '' : 'en') + ' beim Kunden</span>' : '') +
               /* v3640 · Rueckfrage (offen mit Antwort des Kunden) eigener Chip, erledigt gruen */
               (x.anm_rueckfrage ? '<span class="pk-chip frage">' + x.anm_rueckfrage + (x.anm_rueckfrage === 1 ? ' Rückfrage' : ' Rückfragen') + '</span>' : '') +
@@ -1081,7 +1131,7 @@
       [{ t: 'Abbrechen' }, { t: 'Übernehmen', c: 'gold', fn: function () { return los('aktualisieren'); } }]);
   }
 
-  var AUFG_STATUS = { offen: ['offen', 'grau'], gesehen: ['gesehen', 'grau'], in_arbeit: ['in Arbeit', ''], erledigt: ['erledigt', 'gruen'], abgelehnt: ['abgelehnt', 'rot'] };
+  var AUFG_STATUS = { offen: ['offen', 'grau'], gesehen: ['gesehen', 'grau'], in_arbeit: ['in Arbeit', ''], erledigt: ['erledigt', 'gruen'], abgelehnt: ['abgelehnt', 'rot'], widerrufen: ['Freigabe widerrufen', 'rot'] };   /* v3690 */
   function aufgabenZeichnen(el) {
     api('/partner/aufgaben').then(function (r) {
       var l = r.aufgaben || [];
@@ -1114,7 +1164,7 @@
         var ids = [].filter.call(d.querySelectorAll('[data-kunde]'), function (x) { return x.checked; }).map(function (x) { return x.getAttribute('data-kunde'); });
         if (!ids.length) { toast('Bitte mindestens einen Kunden wählen.'); return false; }
         return api('/partner/aufgaben', { method: 'POST', body: { art: wert(d, '#pk-a-art'), titel: wert(d, '#pk-a-titel'), text: wert(d, '#pk-a-text'), steuerjahr: wert(d, '#pk-a-jahr'),
-          faellig_am: wert(d, '#pk-a-faellig') || null, objektfilter: wert(d, '#pk-a-filter'), kunden: ids } }).then(function (r) { toast('Aufgabe an ' + r.kunden_anzahl + ' Kunden gesendet.'); aufgabenZeichnen(el); });
+          faellig_am: wert(d, '#pk-a-faellig') || null, objektfilter: wert(d, '#pk-a-filter'), kunden: ids } }).then(function (r) { toast('Aufgabe an ' + r.kunden_anzahl + ' Kunden gesendet.' + (r.ohne_freigabe ? ' ' + r.ohne_freigabe + (r.ohne_freigabe === 1 ? ' Kunde hat' : ' Kunden haben') + ' die Freigabe widerrufen und bekommt nichts.' : '')); aufgabenZeichnen(el); });   /* v3690 */
       } }]).querySelector('#pk-a-alle').onchange = function (e) { [].forEach.call(document.querySelectorAll('#dppk-dlg [data-kunde]'), function (x) { x.checked = e.target.checked; }); };
   }
 
@@ -1131,6 +1181,129 @@
   /* ════ MEIN PARTNER (Kunde) ═════════════════════════════════════════════ */
   /* v3640b · im Arbeitsbereich wie das Partner-Cockpit (vorher eigenes Fenster #dppk-ov). start: 'senden' | 'sendungen' |
      'aufgaben' | 'freigaben' | 'verbindung' (alte Namen bleiben gueltig, Aufrufer in messe-drehbuch.js und Mails) */
+  /* ════ v3690 · P1 FREIGABE AN DEN PARTNER ═════════════════════════════════
+     Konzept Dateien/Mandantenkonzept/Anfordern-und-Freigeben-2026-11-18.md, Abschnitt 4. Marcel 18.11.2026: dauerhaft
+     UND einmalig, Steuerdaten nur mit Freigabe, abgefragt bei der Kopplung, später unter Mein Partner › Freigaben.
+     Der Partner schlägt vor (Art, Bereiche), der Kunde hakt selbst an. Was der Partner nicht vorgeschlagen hat, ist
+     nicht angehakt. Kirchensteuer steht ausdrücklich im Text (Art. 9 DSGVO). Das Backend prüft dieselben Regeln
+     (services/partnerFreigaben.js freigabeSauber: objekt immer, steuerdaten nur mit steuer). */
+  var FG_BEREICHE = [
+    ['objekt', 'Objekte', 'Angaben, Fotos und Kennzahlen deiner Objekte.', true],
+    ['steuer', 'Steuer', 'Anlage V, Mieten und Status je Jahr.'],
+    ['steuerdaten', 'Meine Steuerdaten', 'Zu versteuerndes Einkommen, Veranlagung, Kirchensteuer und deine Steuerzeiträume. Die Kirchensteuer zeigt, ob du einer Kirche angehörst. Ohne diese Angaben kann dein Partner die Steuerwirkung nicht berechnen.'],
+    ['finanzierung', 'Finanzierung', 'Selbstauskunft, Einkommensnachweise und Darlehensunterlagen.'],
+    ['unterlagen', 'Unterlagen und Belege', 'Dateien, die zu einem Objekt und Jahr gehören.'],
+    ['marktbericht', 'Marktbericht', 'Gespeicherte Marktberichte deiner Objekte.']
+  ];
+  var FG_ARTEN = {
+    dauer: ['Dauerhaft', 'Dein Partner darf immer wieder anfordern, zum Beispiel jedes Steuerjahr. Du übermittelst jedes Mal mit einem Klick. Neue Objekte im Bestand gehören automatisch dazu.'],
+    einmal: ['Einmalig', 'Die Freigabe gilt nur für deine nächste Sendung an deinen Partner. Danach endet sie.'],
+    keine: ['Noch nicht', 'Ihr seid verbunden, und du sendest nur, wenn du selbst etwas auswählst. Dann gehen nur die Objekte mit, ohne Steuer und ohne deine Steuerdaten.']
+  };
+  var FG_ZUSTAND = { dauer: ['Dauerhaft', 'gruen'], einmal: ['Einmalig', ''], keine: ['Noch keine Freigabe', 'grau'], ohne: ['Noch keine Freigabe', 'grau'], widerrufen: ['Widerrufen', 'rot'], verbraucht: ['Einmalig, beendet', 'grau'] };
+  var FG_FUSS = 'Was du schon übermittelt hast, bleibt beim Partner, bis du es zurückziehst. Was er heruntergeladen hat, liegt in seiner Verantwortung.';
+  function fgBereicheText(b) { b = b || {}; return FG_BEREICHE.filter(function (x) { return b[x[0]] || x[3]; }).map(function (x) { return x[1]; }).join(', '); }
+  function fgSauber(b) { var r = {}; b = b || {}; FG_BEREICHE.forEach(function (x) { r[x[0]] = b[x[0]] === true; }); r.objekt = true; if (!r.steuer) r.steuerdaten = false; return r; }
+  /* Auswahl im Dialog. wahl = { art, bereiche } (art null = noch nicht gewählt), vorschlag = Vorschlag des Partners oder null */
+  function fgWahlHtml(wahl, vorschlag) {
+    var vb = vorschlag ? fgSauber(vorschlag.bereiche) : {};
+    var h = '<div class="pk-fg-intro">Du entscheidest, was dein Partner von dir anfordern darf. Er sieht nur, was du ihm übermittelst. Du kannst das jederzeit unter Mein Partner ändern oder widerrufen.</div>' +
+      '<div class="pk-gruppe">Art</div>' + ['dauer', 'einmal', 'keine'].map(function (k) {
+        return '<label class="pk-wahl"><input type="radio" name="pk-fg-art" value="' + k + '"' + (wahl.art === k ? ' checked' : '') + '><span><b>' + esc(FG_ARTEN[k][0]) +
+          (vorschlag && vorschlag.art === k ? '<em class="pk-fg-vs">vom Partner vorgeschlagen</em>' : '') + '</b>' + esc(FG_ARTEN[k][1]) + '</span></label>';
+      }).join('') +
+      '<div class="pk-fg-ber"' + (wahl.art === 'keine' || !wahl.art ? ' hidden' : '') + '><div class="pk-gruppe">Bereiche</div>' + FG_BEREICHE.map(function (x) {
+        var an = x[3] || !!(wahl.bereiche && wahl.bereiche[x[0]]), aus = x[3] || (x[0] === 'steuerdaten' && !(wahl.bereiche && wahl.bereiche.steuer));
+        return '<label class="pk-wahl"><input type="checkbox" data-fg-b="' + x[0] + '"' + (an ? ' checked' : '') + (aus ? ' disabled' : '') + '><span><b>' + esc(x[1]) +
+          (vb[x[0]] && !x[3] ? '<em class="pk-fg-vs">angefordert</em>' : '') + (x[3] ? '<em class="pk-fg-vs grau">immer</em>' : '') + '</b>' + esc(x[2]) +
+          (x[0] === 'steuerdaten' ? '<small class="pk-fg-nur">Geht nur zusammen mit Steuer.</small>' : '') + '</span></label>';
+      }).join('') + '</div>' +
+      '<p class="pk-fg-fuss">' + FG_FUSS + '</p>';
+    return h;
+  }
+  function fgWahlBinden(d) {
+    var ber = d.querySelector('.pk-fg-ber');
+    function steuerdatenNachziehen() {
+      var st = d.querySelector('[data-fg-b="steuer"]'), sd = d.querySelector('[data-fg-b="steuerdaten"]');
+      if (st && sd) { sd.disabled = !st.checked; if (!st.checked) sd.checked = false; }
+    }
+    [].forEach.call(d.querySelectorAll('input[name="pk-fg-art"]'), function (r) { r.onchange = function () { if (ber) ber.hidden = r.value === 'keine'; }; });
+    var st = d.querySelector('[data-fg-b="steuer"]'); if (st) st.addEventListener('change', steuerdatenNachziehen);
+  }
+  function fgWahlLesen(d) {
+    var a = d.querySelector('input[name="pk-fg-art"]:checked'); if (!a) return null;
+    var b = {}; [].forEach.call(d.querySelectorAll('[data-fg-b]'), function (c) { b[c.getAttribute('data-fg-b')] = !!c.checked; });
+    return { art: a.value, bereiche: a.value === 'keine' ? fgSauber({}) : fgSauber(b) };
+  }
+  /** Zustimmungsdialog. o = { titel, vorab (HTML über der Auswahl), vorschlag, basis, knopf, links: [{t, c, fn}], speichern(freigabe) -> Promise } */
+  function fgDialog(o) {
+    var basis = o.basis || (o.vorschlag ? { art: o.vorschlag.art, bereiche: o.vorschlag.bereiche } : { art: null, bereiche: {} });
+    var d = dialog(o.titel, (o.vorab || '') + fgWahlHtml({ art: basis.art, bereiche: fgSauber(basis.bereiche) }, o.vorschlag || null),
+      (o.links || [{ t: 'Abbrechen' }]).concat([{ t: o.knopf, c: 'gold', fn: function (dd) {
+        var f = fgWahlLesen(dd);
+        if (!f) { toast('Bitte wähle dauerhaft, einmalig oder noch nicht.'); return false; }
+        return o.speichern(f);
+      } }]));
+    d.classList.add('pk-fg-dlg');
+    fgWahlBinden(d);
+    return d;
+  }
+  /* Kopf der Verbindung im Kopplungsdialog (vorher eigener Dialog „Verbindung mit …“) */
+  function fgVerbindungKopf(name, platz) {
+    return '<div class="pk-hinweis">' + (platz === 'platz'
+      ? '<b>Partnerplatz.</b> ' + esc(name) + ' bezahlt deinen Zugang (Investor-Umfang) und legt Stufe, Rechte und Marke fest. Er kann den Platz später entziehen, dann hast du 30 Tage Zeit für einen Export oder ein eigenes Abo.'
+      : platz === 'eigen' ? '<b>Eigener Plan.</b> Du behältst deinen Plan und alle Einstellungen. ' + esc(name) + ' bestimmt nichts an deinem Konto.'
+      : 'Hast du ein eigenes bezahltes Abo, bleibt es unverändert. Sonst bekommst du einen Partnerplatz, den ' + esc(name) + ' bezahlt.') +
+      ' Du kannst die Verbindung jederzeit trennen.</div>';
+  }
+
+  /* Reiter „Freigabe“ in Mein Partner › Freigaben: aktuelle Fassung, Verlauf, Ändern, Widerrufen */
+  function fgReiterHtml(v, fr) {
+    fr = fr || { zustand: 'ohne', verlauf: [] };
+    var z = FG_ZUSTAND[fr.zustand] || FG_ZUSTAND.ohne, a = fr.aktiv;
+    var h = '<section class="rnd-hub-karte"><h3 class="rnd-hub-h">Was ' + esc(v.partner_name) + ' anfordern darf</h3>';
+    if (!a || a.art === 'keine') {
+      var w = fr.zustand === 'widerrufen' && fr.verlauf[0] ? 'Du hast die Freigabe am ' + datum(fr.verlauf[0].widerrufen_am) + ' widerrufen. Dein Partner kann nichts anfordern, bis du wieder freigibst.'
+        : fr.zustand === 'verbraucht' ? 'Deine einmalige Freigabe ist mit der Sendung beendet.' : 'Noch keine Freigabe. Ihr seid verbunden, und du sendest nur, wenn du selbst etwas auswählst. Dann gehen nur die Objekte mit.';
+      h += '<p class="rnd-hub-hinweis pk-fg-stand' + (fr.zustand === 'widerrufen' ? ' rot' : '') + '">' + esc(w) + '</p>' +
+        '<div class="pk-fg-knoepfe"><button type="button" class="pk-btn gold" data-fg="aendern">Freigabe erteilen</button></div>';
+    } else {
+      h += '<div class="rnd-wiz-mod-list">' + hubZeile('Art', FG_ARTEN[a.art][0] + '. ' + FG_ARTEN[a.art][1], '<span class="pk-chip ' + z[1] + '">' + esc(z[0]) + '</span>') + '</div>' +
+        '<div class="pk-fg-chips">' + FG_BEREICHE.map(function (x) { var an = x[3] || (a.bereiche && a.bereiche[x[0]]); return '<span class="pk-chip ' + (an ? 'gruen' : 'grau') + '">' + (an ? '✓ ' : '✕ ') + esc(x[1]) + '</span>'; }).join('') + '</div>' +
+        '<p class="rnd-hub-hinweis">Erteilt am ' + datum(a.erteilt_am) + ', Text Fassung ' + esc(String(a.text_version || '').replace(/^freigabe-/, '')) + '. ' + FG_FUSS + '</p>' +
+        '<div class="pk-fg-knoepfe"><button type="button" class="pk-btn" data-fg="aendern">Ändern</button><button type="button" class="pk-btn rot" data-fg="widerrufen">Freigabe widerrufen</button></div>';
+    }
+    h += '</section><section class="rnd-hub-karte"><h3 class="rnd-hub-h">Verlauf</h3><p class="rnd-hub-hinweis">Jede Fassung bleibt erhalten. So ist belegbar, was zu welchem Zeitpunkt galt.</p><ul class="pk-fg-verlauf">' +
+      ((fr.verlauf || []).length ? fr.verlauf.map(function (x) {
+        var ende = x.widerrufen_am ? 'widerrufen am ' + datum(x.widerrufen_am) + (x.staende_zurueckgezogen ? ', ' + x.staende_zurueckgezogen + (x.staende_zurueckgezogen === 1 ? ' Stand zurückgezogen' : ' Stände zurückgezogen') : '')
+          : x.verbraucht_am ? 'beendet mit der Sendung am ' + datum(x.verbraucht_am) : x.ersetzt_am ? 'ersetzt am ' + datum(x.ersetzt_am) : 'gilt';
+        return '<li><b>' + datum(x.erteilt_am) + '</b> ' + esc(FG_ARTEN[x.art] ? FG_ARTEN[x.art][0] : x.art) + (x.art !== 'keine' ? ', ' + esc(fgBereicheText(x.bereiche)) : '') + '. <span>' + esc(ende) + '.</span></li>';
+      }).join('') : '<li class="leer">Noch kein Eintrag.</li>') + '</ul></section>';
+    return h;
+  }
+  function fgReiterBinden(box) {
+    var v = S.kunde && S.kunde.verbunden, fr = S.kunde && S.kunde.freigabe;
+    [].forEach.call(box.querySelectorAll('[data-fg]'), function (b) {
+      b.onclick = function () {
+        if (b.getAttribute('data-fg') === 'aendern') {
+          var akt = fr && fr.aktiv && fr.aktiv.art !== 'keine' ? fr.aktiv : null;
+          fgDialog({ titel: akt ? 'Freigabe ändern' : 'Freigabe erteilen', basis: akt ? { art: akt.art, bereiche: akt.bereiche } : null, knopf: 'Speichern',
+            speichern: function (f) { return api('/mein-partner/freigabe', { method: 'PUT', body: f }).then(function () { toast('Neue Fassung gespeichert. Die alte bleibt im Verlauf.'); meinPartnerOeffnen('freigaben'); }); } });
+          return;
+        }
+        var d = dialog('Freigabe widerrufen?', '<p>' + esc(v.partner_name) + ' kann ab sofort nichts mehr anfordern. Ihr bleibt verbunden. Offene Aufgaben deines Partners sind damit beendet. Bereits übermittelte Stände bleiben, außer du ziehst sie hier mit zurück.</p>' +
+          '<label class="pk-wahl"><input type="checkbox" id="pk-fg-mitz"><span><b>Übermittelte Stände auch zurückziehen</b>Die Kopien beim Partner werden gelöscht. Was er heruntergeladen oder als eigenes Objekt übernommen hat, bleibt bei ihm.</span></label>',
+          [{ t: 'Abbrechen' }, { t: 'Widerrufen', c: 'rot', fn: function (dd) {
+            return api('/mein-partner/freigabe/widerrufen', { method: 'POST', body: { staende_zurueckziehen: !!wert(dd, '#pk-fg-mitz') } }).then(function (r) {
+              toast('Freigabe widerrufen.' + (r.staende_zurueckgezogen ? ' ' + r.staende_zurueckgezogen + (r.staende_zurueckgezogen === 1 ? ' Stand zurückgezogen.' : ' Stände zurückgezogen.') : ''));
+              meinPartnerOeffnen('freigaben');
+            });
+          } }]);
+        d.classList.add('pk-fg-dlg');
+      };
+    });
+  }
+
   function meinPartnerOeffnen(start) {
     return api('/mein-partner').then(function (m) {
       S.kunde = m; menuePflegen(); rechteAnwenden();
@@ -1149,7 +1322,7 @@
       hubZeile('Anmerkungen und Aufgaben', 'Er kann dir Rückmeldungen und Bitten schicken, du antwortest in deinem Objekt.', '') +
       hubZeile('Zugang', platz ? 'Partnerplatz, dein Partner bezahlt und legt Stufe, Rechte und Marke fest.' : 'Eigener Plan, du bezahlst selbst und bestimmst alles.', '') +
       (v.kundennummer ? hubZeile('Deine Kundennummer', v.kundennummer, '') : '') + '</div></section>' };
-    var reiter = [ueber], knoepfe = [];
+    var reiter = [{ kurz: 'Freigabe', titel: 'Was dein Partner anfordern darf', html: fgReiterHtml(v, S.kunde.freigabe) }, ueber], knoepfe = [];   /* v3690 */
     if (platz) reiter = reiter.concat(freigabeReiter(v, v.partner_name, true));
     else {
       reiter.push({ kurz: 'Marke', titel: 'In welcher Marke du die App siehst', html: '<section class="rnd-hub-karte"><h3 class="rnd-hub-h">Marke</h3><p class="rnd-hub-hinweis">Das bestimmst du selbst. Die Marke wechselt beim nächsten Laden.</p><div class="rnd-wiz-mod-list">' +
@@ -1158,7 +1331,8 @@
       reiter.push({ kurz: 'Rechte', titel: 'Stufe und Rechte', html: '<section class="rnd-hub-karte"><h3 class="rnd-hub-h">Stufe und Rechte</h3><p class="rnd-hub-hinweis">Mit eigenem Plan gilt dein Plan. Dein Partner schaltet nichts ab.</p></section>' });
       knoepfe.push({ t: 'Speichern', pri: true, fn: function (b) { var w = chipWert(b, 'pk-m'); return api('/mein-partner/marke', { method: 'PUT', body: { marke: w } }).then(function () { toast('Gespeichert. Die Marke wechselt beim nächsten Laden.'); if (S.kunde && S.kunde.verbunden) S.kunde.verbunden.marke = w; }); } });
     }
-    hubAufbauen({ titel: platz ? 'Freigaben deines Partnerplatzes' : 'Freigaben', sub: v.partner_name, reiter: reiter, knoepfe: knoepfe, inline: el });
+    var hb = hubAufbauen({ titel: platz ? 'Freigaben deines Partnerplatzes' : 'Freigaben', sub: v.partner_name, reiter: reiter, knoepfe: knoepfe, inline: el });
+    fgReiterBinden(hb);   /* v3690 */
   }
 
   function objekteHolen() {
@@ -1227,14 +1401,28 @@
       fehlenKnoepfe(d0);
       return d0;
     }
-    dialog('An Partner senden', '<p>' + (bestand ? 'Dein gesamter Bestand (' + ids.length + ' Objekte) geht' : (ids.length === 1 ? 'Ein Objekt geht' : ids.length + ' Objekte gehen')) + ' als Kopie an <b>' + esc(v.partner_name) + '</b>.</p>' +
+    var dS = dialog('An Partner senden', '<p>' + (bestand ? 'Dein gesamter Bestand (' + ids.length + ' Objekte) geht' : (ids.length === 1 ? 'Ein Objekt geht' : ids.length + ' Objekte gehen')) + ' als Kopie an <b>' + esc(v.partner_name) + '</b>.</p>' +
       (bestand && gesperrt.length ? '<div class="pk-fehlen">' + (gesperrt.length === 1 ? '1 Objekt bleibt' : gesperrt.length + ' Objekte bleiben') + ' zurück, weil dort noch Anmerkungen ohne Bearbeitung stehen.</div>' : '') +
-      '<div class="pk-hinweis">Dein Partner kann die Kopie laden, rechnen, PDFs erstellen und als eigenes Objekt übernehmen. Eine übernommene Kopie bleibt bei ihm, auch wenn du später zurückziehst. Deine Originale ändert er nie.</div>',
+      '<div class="pk-hinweis">Dein Partner kann die Kopie laden, rechnen, PDFs erstellen und als eigenes Objekt übernehmen. Eine übernommene Kopie bleibt bei ihm, auch wenn du später zurückziehst. Deine Originale ändert er nie.</div>' +
+      fgSendenHinweis(),
       [{ t: 'Abbrechen' }, { t: 'Senden', c: 'gold', fn: function () {
         return api('/mein-partner/senden', { method: 'POST', body: bestand ? { bestand: true, aufgabe_id: aufgabeId } : { object_ids: ids, aufgabe_id: aufgabeId } })
           .then(function (r) { toast(r.gesendet + (r.gesendet === 1 ? ' Objekt' : ' Objekte') + ' gesendet.' + (r.uebersprungen ? ' ' + r.uebersprungen + ' mit offenen Anmerkungen nicht.' : '')); if (danach) danach(); },
             function (e) { if (e && e.data && e.data.error === 'anmerkungen_offen') { api('/mein-partner').then(function (m) { S.kunde = m; }).catch(function () {}); } throw e; });
       } }]);
+    var fz = dS.querySelector('[data-fg-zu]'); if (fz) fz.onclick = function () { dS.remove(); meinPartnerOeffnen('freigaben'); };   /* v3690 */
+  }
+
+  /* v3690 · im Senden-Dialog: was nach der Freigabe mitgeht und was nicht (dieselbe Regel wie partnerFreigaben.kopieFiltern) */
+  function fgSendenHinweis() {
+    var fr = S.kunde && S.kunde.freigabe, a = fr && fr.aktiv && fr.aktiv.art !== 'keine' ? fr.aktiv : null;
+    var b = fgSauber(a ? a.bereiche : {});
+    var mit = ['Objekte'], ohne = [];
+    (b.steuer ? mit : ohne).push('Steuer (Anlage V, Jahresbuch)');
+    (b.steuerdaten ? mit : ohne).push('deine Steuerdaten (zu versteuerndes Einkommen, Grenzsteuersatz)');
+    return '<div class="pk-fg-senden"><b>Es geht mit:</b> ' + esc(mit.join(', ')) + '.' + (ohne.length ? ' <b>Nicht dabei:</b> ' + esc(ohne.join(', ')) + ', weil du sie nicht freigegeben hast.' : '') +
+      (a && a.art === 'einmal' ? ' Deine einmalige Freigabe endet mit dieser Sendung.' : '') +
+      ' <button type="button" class="pk-mehr" data-fg-zu="1">Freigabe ansehen</button></div>';
   }
 
   function sendungenZeichnen(el) {
@@ -1267,7 +1455,7 @@
         '<div class="pk-leiste" style="margin:8px 0 0"><button type="button" class="pk-btn klein gold" data-rm="' + a.id + '">Im Objekt ansehen</button></div></div>';
       return '<div class="pk-zeile" style="display:block"><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><div class="pk-name"><b>' + esc(a.titel) + '</b><small>' + (a.faellig_am ? 'fällig ' + datum(a.faellig_am) : 'ohne Frist') + '</small></div><span class="pk-chip ' + s[1] + '">' + s[0] + '</span></div>' +
         (a.text ? '<p style="margin:8px 0;font-size:13px;line-height:1.5">' + esc(a.text) + '</p>' : '') +
-        (a.status === 'erledigt' || a.status === 'abgelehnt' ? '' : '<div class="pk-leiste" style="margin:8px 0 0">' +
+        (a.status === 'erledigt' || a.status === 'abgelehnt' || a.status === 'widerrufen' ? '' : '<div class="pk-leiste" style="margin:8px 0 0">' +
           (a.status !== 'in_arbeit' ? '<button type="button" class="pk-btn klein" data-st="in_arbeit" data-id="' + a.id + '">Ich bin dran</button>' : '') +
           '<button type="button" class="pk-btn klein gold" data-send="' + a.id + '" data-f="' + esc(a.objektfilter) + '">Erledigt und senden</button>' +
           '<button type="button" class="pk-btn klein" data-st="erledigt" data-id="' + a.id + '">Erledigt ohne Senden</button>' +
@@ -1334,29 +1522,28 @@
 
   function anfrageDialog(a) {
     if (!a) return;
-    var platz = a.zugang === 'platz';
-    dialog('Verbindung mit ' + a.partner_name,
-      '<p><b>' + esc(a.partner_name) + '</b> möchte sich mit deinem DealPilot-Konto verbinden.</p>' +
-      '<div class="pk-hinweis">' + (platz
-        ? '<b>Partnerplatz.</b> Dein Partner bezahlt deinen Zugang (Investor-Umfang) und legt Stufe, Rechte und Marke fest. Er kann den Platz später entziehen, dann hast du 30 Tage Zeit für einen Export oder ein eigenes Abo.'
-        : '<b>Eigener Plan.</b> Du behältst deinen Plan und alle Einstellungen. Dein Partner bestimmt nichts an deinem Konto.') + '</div>' +
-      '<p style="font-size:13px;line-height:1.55">Dein Partner sieht <b>nur</b> Objekte, die du ihm ausdrücklich sendest, als Kopie. Er kann dir Aufgaben schicken. Du kannst die Verbindung jederzeit trennen.</p>',
-      [{ t: 'Ablehnen', fn: function () { return api('/mein-partner/anfragen/' + a.id, { method: 'POST', body: { annehmen: false } }).then(function () { toast('Abgelehnt.'); bandPflegen(); }); } },
-       { t: 'Verbindung bestätigen', c: 'gold', fn: function () { return api('/mein-partner/anfragen/' + a.id, { method: 'POST', body: { annehmen: true } }).then(function (r) { toast('Verbunden mit ' + r.partner_name + '.'); setTimeout(function () { location.reload(); }, 800); }); } }]);
+    /* v3690 · P1: derselbe Dialog fragt die Freigabe ab (Art, Bereiche), Vorschlag des Partners vorausgewählt und abwählbar */
+    fgDialog({ titel: 'Was darf ' + a.partner_name + ' sehen?',
+      vorab: '<p class="pk-fg-wer"><b>' + esc(a.partner_name) + '</b> möchte sich mit deinem DealPilot-Konto verbinden.</p>' + fgVerbindungKopf(a.partner_name, a.zugang),
+      vorschlag: a.vorschlag || null, knopf: 'Verbinden und speichern',
+      links: [{ t: 'Ablehnen', fn: function () { return api('/mein-partner/anfragen/' + a.id, { method: 'POST', body: { annehmen: false } }).then(function () { toast('Abgelehnt.'); bandPflegen(); }); } }],
+      speichern: function (f) { return api('/mein-partner/anfragen/' + a.id, { method: 'POST', body: { annehmen: true, freigabe: f } }).then(function (r) { toast('Verbunden mit ' + r.partner_name + '.'); setTimeout(function () { location.reload(); }, 800); }); } });
   }
 
   /** Einladungslink eines bestehenden Kontos (reseller-portal.js handleInvite): erst fragen */
   function einladungFragen(token, info) {
-    dialog('Einladung von ' + (info.brand_name || 'deinem Partner'),
-      '<p><b>' + esc(info.brand_name || 'Dein Partner') + '</b> lädt dich ein, dein DealPilot-Konto zu verbinden.</p>' +
-      '<div class="pk-hinweis">Dein Partner sieht nur Objekte, die du ihm ausdrücklich sendest, als Kopie. Hast du ein eigenes bezahltes Abo, bleibt es unverändert. Sonst bekommst du einen Partnerplatz, den dein Partner bezahlt. Du kannst die Verbindung jederzeit trennen.</div>',
-      [{ t: 'Ablehnen', fn: function () { try { localStorage.removeItem('rp_invite_token'); } catch (e) {} urlAufraeumen(); } },
-       { t: 'Verbindung bestätigen', c: 'gold', fn: function () {
-         return api('/reseller-invite/accept', { method: 'POST', body: { token: token } }).then(function (r) {
-           try { localStorage.removeItem('rp_invite_token'); } catch (e) {} urlAufraeumen();
-           toast('Verbunden mit ' + (r && r.brand_name ? r.brand_name : 'deinem Partner') + '.'); setTimeout(function () { location.reload(); }, 800);
-         });
-       } }]);
+    var name = info.brand_name || 'deinem Partner';
+    /* v3690 · P1: Freigabe in derselben Bestätigung (bestehendes Konto UND neues Konto nach dem Anlegen, reseller-portal.js) */
+    fgDialog({ titel: 'Was darf ' + (info.brand_name || 'dein Partner') + ' sehen?',
+      vorab: '<p class="pk-fg-wer"><b>' + esc(info.brand_name || 'Dein Partner') + '</b> lädt dich ein, dein DealPilot-Konto zu verbinden.</p>' + fgVerbindungKopf(info.brand_name || 'dein Partner', null),
+      vorschlag: info.vorschlag || null, knopf: 'Verbinden und speichern',
+      links: [{ t: 'Ablehnen', fn: function () { try { localStorage.removeItem('rp_invite_token'); } catch (e) {} urlAufraeumen(); } }],
+      speichern: function (f) {
+        return api('/reseller-invite/accept', { method: 'POST', body: { token: token, freigabe: f } }).then(function (r) {
+          try { localStorage.removeItem('rp_invite_token'); } catch (e) {} urlAufraeumen();
+          toast('Verbunden mit ' + (r && r.brand_name ? r.brand_name : name) + '.'); setTimeout(function () { location.reload(); }, 800);
+        });
+      } });
   }
   function urlAufraeumen() { try { var q = new URLSearchParams(location.search); q.delete('rp_invite'); history.replaceState({}, '', location.pathname + (q.toString() ? '?' + q.toString() : '')); } catch (e) {} }
 
@@ -1444,7 +1631,7 @@
     /* v3450 · Marcel 15.11.: Zurück ins Cockpit, Anmerkungen (partner-anmerkungen.js), Übernehmen */
     alt.setAttribute('data-share', ks.share_id); alt.setAttribute('data-stand', ks.stand_nr);
     var ksNr = kundeNrVon(ks.client_id);   /* v3640 */
-    alt.innerHTML = '<span class="dppk-ks-text"><b>Kundenstand von ' + (ksNr ? esc(ksNr) + ' · ' : '') + esc(ks.kunde || 'Kunde') + '</b>, Stand ' + esc(ks.stand_nr) + ' vom ' + datum(ks.stand_am) + '. Nur lesen, Änderungen werden nicht gespeichert. Die Steuer rechnet mit deinen eigenen Steuerdaten, nicht mit denen des Kunden.</span>' +   /* v3683 · P0, bis die Steuerdaten mit Freigabe mitreisen (P2) */
+    alt.innerHTML = '<span class="dppk-ks-text"><b>Kundenstand von ' + (ksNr ? esc(ksNr) + ' · ' : '') + esc(ks.kunde || 'Kunde') + '</b>, Stand ' + esc(ks.stand_nr) + ' vom ' + datum(ks.stand_am) + '. Nur lesen, Änderungen werden nicht gespeichert. ' + fgBandText(ks.freigabe) + '</span>' +   /* v3683 · P0, v3690 · P1 Freigabe */
       '<span class="dppk-ks-knoepfe"><button type="button" class="pk-btn2" data-ks-a="zurueck">← Zurück zum Partner-Cockpit</button></span>' +
       '<button type="button" class="pk-btn">Als eigenes Objekt übernehmen</button>';
     alt.querySelector('[data-ks-a="zurueck"]').onclick = function () { kundenstandVerlassen(ks); };
@@ -1460,6 +1647,13 @@
   /* v3450 · „← Zurück zum Partner-Cockpit“: Kundenkopie verlassen ohne Speichern (saveObj ist fuer Kundenstaende
      ohnehin gesperrt), Entwuerfe bleiben auf dem Server. Das zuletzt geladene EIGENE Objekt wird wieder geladen, damit
      hinter dem Cockpit keine Kundenkopie liegt; danach das Cockpit im Herkunftsreiter, in Freigegeben beim Kunden. */
+  /* v3690 · Satz im Band des Kundenstands. Ohne Angabe (Stand vor v3690) wie P0. Mit Steuerdaten rechnet die Kopie bis P2
+     trotzdem mit den Steuerzeitraeumen des Partners (calc.js _dpZveFuerJahr), deshalb bleibt der Hinweis. */
+  function fgBandText(f) {
+    if (f && !f.steuer) return 'Steuer und Steuerdaten hat der Kunde nicht freigegeben. Anlage V und Jahresbuch fehlen, die Steuer rechnet mit deinen eigenen Steuerdaten.';
+    if (f && !f.steuerdaten) return 'Steuerdaten nicht freigegeben. Die Steuer rechnet deshalb mit deinen eigenen Steuerdaten, nicht mit denen des Kunden.';
+    return 'Die Steuer rechnet mit deinen eigenen Steuerdaten, nicht mit denen des Kunden.';
+  }
   function kundenstandVerlassen(ks) {
     var reiter = PK.herkunft && TITEL[PK.herkunft] ? PK.herkunft : 'staende';
     if (reiter === 'staende' && ks && ks.client_id) PK.filter = ks.client_id;

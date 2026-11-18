@@ -106,6 +106,101 @@ const MUSTER = /^K-\d{4}-\d{3,}$/;
   const me = await http(tP, 'GET', '/partner/meldungen');
   ok('Meldungen liefern die Kundennummer', (me.j.meldungen || []).some((m) => m.client_id === kA.id ? m.kunde_nr === 'K-' + jahr + '-951' : false) || !(me.j.meldungen || []).some((m) => m.client_id === kA.id), (me.j.meldungen || []).slice(0, 2).map((m) => m.kunde_nr));
 
+  /* ── F · v3690 P1 Freigabe bei der Kopplung (eigene Testkunden, ohne Mail: einladen ohne basis) ── */
+  const pk = require('./src/services/partnerKunden');
+  const FG = 'fg-pruefer@partner-pruefung.dealpilot.test', FGN = 'fg-neu@partner-pruefung.dealpilot.test';
+  for (const e of [FG, FGN]) { const x = await nutzer(e); if (x) { await query('DELETE FROM reseller_clients WHERE user_id = $1', [x.id]); try { await userService.deleteUser(x.id); } catch (er) {} } }
+  await query(`DELETE FROM reseller_invites WHERE lower(email) = $1`, [FGN]);
+  const K = await userService.createUser({ email: FG, plainPassword: crypto.randomBytes(12).toString('base64url'), name: 'Freigabe Pruefer', newsletter: false });
+  await query('UPDATE users SET email_verified_at = now() WHERE id = $1', [K.id]);
+  const tK = tok(K);
+  const VS = { art: 'dauer', bereiche: { steuer: true, steuerdaten: true } };
+  /* Weg 1 · Verbindungscode */
+  const cd = await http(tK, 'POST', '/mein-partner/code');
+  const ce = await http(tP, 'POST', '/partner/code', { code: cd.j && cd.j.code, name: 'Freigabe Pruefer (Test)', platz_mitgeben: false, vorschlag: VS });
+  const mp0 = await http(tK, 'GET', '/mein-partner');
+  const an0 = (mp0.j.anfragen || [])[0];
+  ok('F Code: Anfrage beim Kunden traegt den Vorschlag des Partners', ce.status === 200 && an0 && an0.vorschlag && an0.vorschlag.art === 'dauer' && an0.vorschlag.bereiche.steuerdaten === true, [ce.status, an0]);
+  const bad = await http(tK, 'POST', '/mein-partner/anfragen/' + an0.id, { annehmen: true, freigabe: { art: 'alles' } });
+  const nochNicht = await http(tK, 'GET', '/mein-partner');
+  ok('F ungueltige Freigabe -> 400, keine Verbindung', bad.status === 400 && !nochNicht.j.verbunden && (nochNicht.j.anfragen || []).length === 1, [bad.status, bad.j, !!nochNicht.j.verbunden]);
+  const ja = await http(tK, 'POST', '/mein-partner/anfragen/' + an0.id, { annehmen: true, freigabe: { art: 'dauer', bereiche: { steuer: true, steuerdaten: false } } });
+  const f1 = await http(tK, 'GET', '/mein-partner/freigabe');
+  ok('F Code: verbunden, Freigabe dauerhaft ohne Steuerdaten (abgewaehlt), Quelle code', ja.status === 200 && f1.j.zustand === 'dauer' && f1.j.aktiv.quelle === 'code' && f1.j.aktiv.bereiche.steuer === true && f1.j.aktiv.bereiche.steuerdaten === false, [ja.j, f1.j && f1.j.aktiv]);
+  const cK = (await query('SELECT id FROM reseller_clients WHERE user_id = $1', [K.id])).rows[0];
+  const pf = await http(tP, 'GET', '/partner/kunden/' + cK.id + '/freigabe');
+  const pf2 = await http(tP2, 'GET', '/partner/kunden/' + cK.id + '/freigabe');
+  const ckF = await http(tP, 'GET', '/partner/cockpit');
+  const kF = (ckF.j.kunden || []).filter((k) => k.id === cK.id)[0];
+  ok('F Partner liest die Freigabe (Route und Cockpit), fremder Partner 404', pf.status === 200 && pf.j.zustand === 'dauer' && pf2.status === 404 && kF && kF.freigabe.zustand === 'dauer' && kF.freigabe.bereiche.steuerdaten === false, [pf.status, pf2.status, kF && kF.freigabe]);
+  /* Senden ohne Steuerdaten */
+  const ob = await objectService.create(K.id, { data: { str: 'Freigabeweg', hnr: '1', plz: '12345', ort: 'Musterstadt', kp: 150000, zve: 68000, grenz: 42, _kpis_cf_ns: -95, _tax_overrides: { 2025: { miete: 9000 } }, _jahre: { 2025: { nkm_j: 9000 } } }, aiAnalysis: null, photos: [] });
+  const se = await http(tK, 'POST', '/mein-partner/senden', { object_ids: [ob.id] });
+  const sh = (await query('SELECT * FROM object_shares WHERE object_id = $1', [ob.id])).rows[0];
+  const ko = sh && await objectService.getById(P.id, sh.kopie_object_id, { fotos: false });
+  const kd = ko && ko.data || {};
+  ok('F senden ohne Steuerdaten: Kopie ohne zve, grenz, cf_ns, mit Anlage V und Jahresbuch, Stand traegt Bereiche und Fassung',
+    se.status === 200 && ko && !('zve' in kd) && !('grenz' in kd) && !('_kpis_cf_ns' in kd) && kd._tax_overrides && kd._jahre && sh.bereiche && sh.bereiche.steuerdaten === false && sh.freigabe_id === f1.j.aktiv.id && kd._kundenstand.freigabe.steuerdaten === false,
+    [se.status, Object.keys(kd).filter((k) => /zve|grenz|_tax|_jahre|cf_ns/.test(k)), sh && sh.bereiche]);
+  const stF = await http(tP, 'GET', '/partner/kundenstaende');
+  const ksF = (stF.j.kundenstaende || []).filter((x) => x.share_id === sh.id)[0];
+  ok('F Freigegeben beim Partner liefert die Bereiche des Stands', ksF && ksF.bereiche && ksF.bereiche.steuerdaten === false, ksF && ksF.bereiche);
+  /* Fassungen */
+  const pu = await http(tK, 'PUT', '/mein-partner/freigabe', { art: 'dauer', bereiche: { steuer: true, steuerdaten: true } });
+  const fv = (await query('SELECT * FROM partner_freigaben WHERE client_id = $1 ORDER BY erteilt_am', [cK.id])).rows;
+  ok('F Aendern = neue Fassung, alte mit ersetzt_am, genau eine aktiv', pu.status === 200 && fv.length === 2 && fv[0].ersetzt_am && !fv[1].ersetzt_am && fv[1].quelle === 'mein_partner' && fv.filter((x) => !x.ersetzt_am && !x.widerrufen_am && !x.verbraucht_am).length === 1, fv.map((x) => [x.art, x.quelle, !!x.ersetzt_am]));
+  const se2 = await http(tK, 'POST', '/mein-partner/senden', { object_ids: [ob.id] });
+  const sh2 = (await query('SELECT * FROM object_shares WHERE object_id = $1', [ob.id])).rows[0];
+  const ko2 = await objectService.getById(P.id, sh2.kopie_object_id, { fotos: false });
+  ok('F mit Steuerdaten: neuer Stand traegt zve und grenz, alter Stand ersetzt', se2.status === 200 && ko2.data.zve === 68000 && ko2.data.grenz === 42 && sh2.stand_nr === 2 && !(await objectService.getById(P.id, sh.kopie_object_id, { fotos: false })), [ko2 && ko2.data.zve, sh2.stand_nr]);
+  /* Widerruf mit Zurueckziehen */
+  const wd = await http(tK, 'POST', '/mein-partner/freigabe/widerrufen', { staende_zurueckziehen: true });
+  const sh3 = (await query('SELECT status, kopie_object_id FROM object_shares WHERE id = $1', [sh2.id])).rows[0];
+  const ko3 = await objectService.getById(P.id, sh2.kopie_object_id, { fotos: false });
+  const f3 = await http(tK, 'GET', '/mein-partner/freigabe');
+  ok('F Widerruf mit „auch zurueckziehen“: Stand weg, Kopie geloescht, Zustand widerrufen, Verbindung bleibt', wd.status === 200 && wd.j.staende_zurueckgezogen === 1 && sh3.status === 'widerrufen' && !ko3 && f3.j.zustand === 'widerrufen' && (await http(tK, 'GET', '/mein-partner')).j.verbunden, [wd.j, sh3]);
+  const au = await http(tP, 'POST', '/partner/aufgaben', { titel: 'Steuerjahr 2025 (Test)', art: 'steuerjahr', kunden: [cK.id] });
+  ok('F nach Widerruf: Partner kann nichts anfordern (403 freigabe_widerrufen)', au.status === 403 && au.j.error === 'freigabe_widerrufen', [au.status, au.j]);
+  /* Einmalig wird verbraucht */
+  await http(tK, 'PUT', '/mein-partner/freigabe', { art: 'einmal', bereiche: { steuer: true, steuerdaten: true } });
+  const se4 = await http(tK, 'POST', '/mein-partner/senden', { object_ids: [ob.id] });
+  const sh4 = (await query('SELECT * FROM object_shares WHERE object_id = $1', [ob.id])).rows[0];
+  const ko4 = await objectService.getById(P.id, sh4.kopie_object_id, { fotos: false });
+  const f4 = await http(tK, 'GET', '/mein-partner/freigabe');
+  const se5 = await http(tK, 'POST', '/mein-partner/senden', { object_ids: [ob.id] });
+  const sh5 = (await query('SELECT * FROM object_shares WHERE object_id = $1', [ob.id])).rows[0];
+  const ko5 = await objectService.getById(P.id, sh5.kopie_object_id, { fotos: false });
+  ok('F einmalig: erste Sendung mit Steuerdaten, dann verbraucht, zweite nur Objekt', se4.j.freigabe_verbraucht === true && ko4.data.zve === 68000 && f4.j.zustand === 'verbraucht' && se5.j.freigabe_art === 'keine' && !('zve' in ko5.data) && !ko5.data._tax_overrides, [se4.j, f4.j.zustand, se5.j && se5.j.freigabe_art]);
+  /* Trennen beendet, Weg 2 · Anfrage an bestehendes Konto (einladen ohne Mail) */
+  await http(tK, 'PUT', '/mein-partner/freigabe', { art: 'dauer', bereiche: { steuer: true } });
+  await http(tK, 'POST', '/mein-partner/trennen');
+  const fT = (await query(`SELECT count(*)::int AS n FROM partner_freigaben WHERE client_id = $1 AND ersetzt_am IS NULL AND widerrufen_am IS NULL AND verbraucht_am IS NULL`, [cK.id])).rows[0].n;
+  ok('F Trennen beendet die aktive Freigabe', fT === 0, fT);
+  const ei = await pk.einladen({ id: rsP.id }, P.id, { email: FG, name: 'Freigabe Pruefer (Test)', platz_mitgeben: false, vorschlag: { art: 'einmal', bereiche: { steuer: true } } }, null);
+  const mp2 = await http(tK, 'GET', '/mein-partner');
+  const an2 = (mp2.j.anfragen || [])[0];
+  const ja2 = an2 && await http(tK, 'POST', '/mein-partner/anfragen/' + an2.id, { annehmen: true, freigabe: { art: 'keine' } });
+  const f5 = await http(tK, 'GET', '/mein-partner/freigabe');
+  ok('F Anfrage an bestehendes Konto: Vorschlag einmalig sichtbar, Kunde waehlt „noch nicht“, Quelle anfrage, keine Mail', ei.art === 'anfrage' && ei.mail_gesendet === false && an2 && an2.vorschlag.art === 'einmal' && ja2.status === 200 && f5.j.zustand === 'keine' && f5.j.aktiv.quelle === 'anfrage', [ei, an2 && an2.vorschlag, f5.j && f5.j.aktiv]);
+  /* Weg 3 · Einladung an neue Adresse */
+  const ein = await pk.einladen({ id: rsP.id }, P.id, { email: FGN, name: 'Neu Pruefer (Test)', platz_mitgeben: false, vorschlag: VS }, null);
+  const info = await fetch(BASIS + '/reseller-invite/info?token=' + encodeURIComponent(ein.invite && ein.invite.token)).then((r) => r.json());
+  const N = await userService.createUser({ email: FGN, plainPassword: crypto.randomBytes(12).toString('base64url'), name: 'Neu Pruefer', newsletter: false });
+  await query('UPDATE users SET email_verified_at = now() WHERE id = $1', [N.id]);
+  const acc = await http(tok(N), 'POST', '/reseller-invite/accept', { token: ein.invite.token, freigabe: { art: 'dauer', bereiche: { steuer: true, steuerdaten: true, unterlagen: true } } });
+  const f6 = await http(tok(N), 'GET', '/mein-partner/freigabe');
+  ok('F Einladung an neue Adresse: info traegt den Vorschlag, Annahme speichert die Freigabe, Quelle einladung', ein.art === 'einladung' && ein.mail_gesendet === false && info.vorschlag && info.vorschlag.art === 'dauer' && acc.status === 200 && acc.j.freigabe.art === 'dauer' && f6.j.zustand === 'dauer' && f6.j.aktiv.quelle === 'einladung' && f6.j.aktiv.bereiche.unterlagen === true, [info.vorschlag, acc.status, acc.j, f6.j && f6.j.aktiv]);
+  /* aufraeumen F */
+  for (const u of [K, N]) {
+    const cs = (await query('SELECT id FROM reseller_clients WHERE user_id = $1', [u.id])).rows.map((x) => x.id);
+    if (cs.length) await query(`DELETE FROM objects WHERE kunden_freigabe_id IN (SELECT id FROM object_shares WHERE client_id = ANY($1::uuid[]))`, [cs]);
+    await query('DELETE FROM reseller_clients WHERE user_id = $1', [u.id]);
+    try { await userService.deleteUser(u.id); } catch (er) { console.error('Testnutzer', er.message); }
+  }
+  await query(`DELETE FROM reseller_invites WHERE lower(email) = $1`, [FGN]);
+  const restF = (await query(`SELECT count(*)::int AS n FROM users WHERE email = ANY($1) AND deleted_at IS NULL`, [[FG, FGN]])).rows[0].n;
+  ok('F aufgeraeumt (Testkunden, Kopien, Einladung)', restF === 0, restF);
+
   /* ── Aufraeumen ── */
   for (const id of neuObj) { try { await objectService.deleteObject(P.id, id); } catch (e) { console.error('Objekt', id, e.message); } }
   await query('UPDATE reseller_clients SET kundennummer = $2 WHERE id = $1', [kA.id, vorA]);
