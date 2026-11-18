@@ -1,5 +1,5 @@
 {
-  "_hinweis": "v3740 (18.11.2026): Module 04, 16, 18 entfernt (abgelöst durch Modul 30, v3270b/v3271a). Modul 30 steht als \"geplant\" (Video folgt), bis die MP4 auf dem Server liegt. \"vorbereitet\" liest die Seite nicht: dort steht das neue Modul 28 (Drehbuch reihe-unterlagen); beim Hochladen nach videos verschieben und den Eintrag aus \"ersetzt\" (Lindenallee-Fassung vom 28.10.) im selben Zug entfernen, sonst steht Modul 28 doppelt da. landing-partner-1 · Reihe „partner“: Einträge mit \"geplant\": true sind Platzhalter („Video folgt“), fertige Partner-Videos trägt tools/partner-videos-eintragen.mjs aus Dateien/Messe/Videos/Partner/videos.json ein. landing-videothek-3b · EINE Quelle fuer den Abschnitt 'DealPilot live' (index.html) und die Videothek (videothek.html). Ein Video mehr = ein Eintrag mehr. Die MP4s liegen NICHT im Git (frontend/landing/medien/ ist ignoriert) - sie kommen per scp auf den Server. Das Feld youtube ist fuer den spaeteren Upload: Titel, Beschreibung und Schlagworte dort pflegen, die youtube_id nach dem Upload eintragen. Keine Anbieternamen ausser ImmoMetrica, keine Adressen.",
+  "_hinweis": "v3730 (18.11.2026): K1, P2, P3, 07, 08, 10a, 10b, 10c, 21 neu aufgenommen (Oberfläche Stand v3730, ohne Pilot und Mechaniker) und mit Marcels Stimmklon vertont; Dateien mit -v3730. v3740 (18.11.2026): Module 04, 16, 18 entfernt (abgelöst durch Modul 30, v3270b/v3271a). Modul 30 steht als \"geplant\" (Video folgt), bis die MP4 auf dem Server liegt. \"vorbereitet\" liest die Seite nicht: dort steht das neue Modul 28 (Drehbuch reihe-unterlagen); beim Hochladen nach videos verschieben und den Eintrag aus \"ersetzt\" (Lindenallee-Fassung vom 28.10.) im selben Zug entfernen, sonst steht Modul 28 doppelt da. landing-partner-1 · Reihe „partner“: Einträge mit \"geplant\": true sind Platzhalter („Video folgt“), fertige Partner-Videos trägt tools/partner-videos-eintragen.mjs aus Dateien/Messe/Videos/Partner/videos.json ein. landing-videothek-3b · EINE Quelle fuer den Abschnitt 'DealPilot live' (index.html) und die Videothek (videothek.html). Ein Video mehr = ein Eintrag mehr. Die MP4s liegen NICHT im Git (frontend/landing/medien/ ist ignoriert) - sie kommen per scp auf den Server. Das Feld youtube ist fuer den spaeteren Upload: Titel, Beschreibung und Schlagworte dort pflegen, die youtube_id nach dem Upload eintragen. Keine Anbieternamen ausser ImmoMetrica, keine Adressen.",
   "stand": "2026-11-11",
   "basis_medien": "medien/videothek/",
   "basis_bilder": "assets/videothek/",
@@ -247,51 +247,235 @@
       "youtube": { "titel": "DealPilot Modul 06 · Investition", "tags": ["DealPilot", "Kaufnebenkosten", "Grunderwerbsteuer", "15-Prozent-Grenze"], "youtube_id": null }
     },
     {
-      "id": "modul-07-miete-und-mietvertrag", "kategorie": "basis", "nr": "07", "dauer": 260,
+      "id": "modul-07-miete-und-mietvertrag",
+      "kategorie": "basis",
+      "nr": "07",
+      "dauer": 284,
       "titel": "Miete und Mietvertrag",
       "unterzeile": "Ist-Miete, Marktmiete, Vertragsart und Mietentwicklung.",
       "story": "Was zahlt der Mieter heute, was gibt der Markt her, wie hoch ist der Leerstand vor Ort? Danach Vertragsart, Indexmiete und eine Prognose, die du selbst einstellst.",
       "nutzen": "Du siehst, ob die Miete trägt — heute und in zehn Jahren.",
       "kapitel": [
-        { "t": 0, "titel": "Einstieg", "stichworte": "Miete Mietvertrag Ist-Miete Marktmiete Vertragsart Mietentwicklung" },
-        { "t": 12, "titel": "Das Beispiel", "stichworte": "Beispiel Wohnung Modulen Eigentumswohnung Baujahr Heute Reiter Miete" },
-        { "t": 29, "titel": "Die Ist-Miete", "stichworte": "Ist-Miete Mieter heute kalt zahlt eingetippt Kaltmiete Stellplatz Nebenkosten-Vorauszahlung Warmmiete Eigener Betrag Monat gehört nicht Wohnfläche" },
-        { "t": 65, "titel": "Pilot-Mietpreis-Analyse", "stichworte": "Pilot-Mietpreis-Analyse oben Reiter DealPilot recherchiert marktübliche Miete Adresse Fläche Vergleichswerten schätzt Mietausfall-Risiko" },
-        { "t": 81, "titel": "Die Marktmiete", "stichworte": "Marktmiete Neuvermietung heute bringt Marktbewertung Modul gegen Kaltmiete Stellplatz Abstand fließt Investor Deal Score" },
-        { "t": 106, "titel": "Leerstand statt Mietausfall", "stichworte": "Leerstand statt Mietausfall Jahr Standardwerten Daraus rechnet DealPilot Jahreskaltmiete einmal Cashflow Steuer" },
-        { "t": 123, "titel": "Der Mietvertrag", "stichworte": "Mietvertrag Vertragsart Beginn letzte Erhöhung Objektart Unbefristet Regelfall seit zuletzt erhöht Vertragsarten Auswahl Staffel- Indexmiete gilt" },
-        { "t": 148, "titel": "Mietrecht an dieser Adresse", "stichworte": "Mietrecht Adresse Kappungsgrenze Jahren Vergleichsmiete Mietspiegel-Zeile oberer Spannenwert Mietpreisbremse gilt nicht nächste Erhöhung begrenzt durch Verlangbar" },
-        { "t": 179, "titel": "Mietentwicklung", "stichworte": "Mietentwicklung Prognose Mietsteigerung Jahr vorbelegt Standardwerten bewusst vorsichtig" },
-        { "t": 193, "titel": "Oder im Detail", "stichworte": "Detail Einzelne Erhöhungen Vergleichsmiete Mietspiegel-Zeile höchstens Kappungsgrenze Jahre zusammen Ziel Kaltmiete liegt darunter Treppe Jahr Schritt" },
-        { "t": 235, "titel": "Prognose-Annahmen", "stichworte": "Prognose-Annahmen Wertsteigerung Leerstand Standardwerten Kostensteigerung Betrachtung Jahre" }
+        {
+          "t": 0,
+          "titel": "Einstieg",
+          "stichworte": "Miete Mietvertrag Ist-Miete Marktmiete Vertragsart Mietentwicklung"
+        },
+        {
+          "t": 15,
+          "titel": "Das Beispiel",
+          "stichworte": "Die Wohnung aus den Modulen 02–05: Sachsenstraße 18, 32052 Herford — Eigentumswohnung (ETW), 100 m², Baujahr 1998. Heute: der Reiter Miete."
+        },
+        {
+          "t": 31,
+          "titel": "Die Ist-Miete",
+          "stichworte": "Was der Mieter heute kalt zahlt — eingetippt. Kaltmiete 600 €, Stellplatz 40 €, Nebenkosten-Vorauszahlung 230 € — Warmmiete 870 €."
+        },
+        {
+          "t": 52,
+          "titel": "Der Stellplatz",
+          "stichworte": "Unter Zusätzliche Einnahmen › aufteilen: Stellplatz 40 € im Monat. Er gehört nicht zur Wohnfläche, beim Vergleich mit Mietspiegel und Marktmiete zählt nur die Kaltmiete."
+        },
+        {
+          "t": 69,
+          "titel": "Welche Miete kann ich ansetzen?",
+          "stichworte": "Ganz oben im Reiter: Mietpreis recherchieren. Ordnet deine Miete ein, gegen Marktdurchschnitt, marktübliches Band und amtliche Vergleichsmiete, mit dem Mietausfall-Risiko."
+        },
+        {
+          "t": 88,
+          "titel": "Die Marktmiete",
+          "stichworte": "Was eine Neuvermietung heute bringt — aus der Marktbewertung (Modul 30) oder von dir. Marktmiete 8,02 €/m² gegen deine 6,00 €/m² Kaltmiete, ohne Stellplatz — der Abstand fließt in den Investor Deal Score."
+        },
+        {
+          "t": 112,
+          "titel": "Leerstand statt Mietausfall",
+          "stichworte": "Leerstand 2 % im Jahr, aus deinen Standardwerten. Daraus rechnet DealPilot den Mietausfall — Jahreskaltmiete × Leerstand, einmal in Cashflow und Steuer."
+        },
+        {
+          "t": 129,
+          "titel": "Der Mietvertrag",
+          "stichworte": "Vertragsart, Beginn und letzte Erhöhung — für jede Objektart. Unbefristet (Regelfall) seit 04/2019, zuletzt erhöht 04/2024 — 10 Vertragsarten zur Auswahl. Bei Staffel- und Indexmiete gilt § 558 nicht."
+        },
+        {
+          "t": 154,
+          "titel": "Mietrecht an dieser Adresse",
+          "stichworte": "§ 558 BGB: Kappungsgrenze 20 % in 3 Jahren, Vergleichsmiete 7,80 €/m² aus der Mietspiegel-Zeile, oberer Spannenwert. Mietpreisbremse: gilt hier nicht."
+        },
+        {
+          "t": 171,
+          "titel": "Die nächste Erhöhung",
+          "stichworte": "Nach § 558: auf 720 €/Monat (7,20 €/m²) — begrenzt durch die Kappungsgrenze 20 %. Verlangbar ab sofort, wirksam ab 02/2027."
+        },
+        {
+          "t": 185,
+          "titel": "Mietentwicklung",
+          "stichworte": "Prognose: Mietsteigerung 1,5 % im Jahr — vorbelegt aus deinen Standardwerten, bewusst vorsichtig."
+        },
+        {
+          "t": 199,
+          "titel": "Oder im Detail",
+          "stichworte": "Einzelne Erhöhungen bis zur Vergleichsmiete der Mietspiegel-Zeile — höchstens bis zur Kappungsgrenze. 2 Erhöhungen alle 3 Jahre, zusammen 30,0 % — Ziel: Vergleichsmiete 7,80 €/m². Potenzial bis dorthin: +30,0 %."
+        },
+        {
+          "t": 224,
+          "titel": "Die Treppe",
+          "stichworte": "Jahr 3: 6,84 €/m², Jahr 6: 7,80 €/m² — jeder Schritt bleibt unter der Kappungsgrenze von 20 %, der letzte endet an der Vergleichsmiete."
+        },
+        {
+          "t": 241,
+          "titel": "Mieterhöhung und Zielbild",
+          "stichworte": "Optional: mit dem Haken Zielbild festlegen öffnet sich die Karte für Soll-Miete, Zielmiete, Maßnahmen und Mietspiegel. Kann, nicht muss. Mehr dazu in Modul 26."
+        },
+        {
+          "t": 259,
+          "titel": "Prognose-Annahmen",
+          "stichworte": "Wertsteigerung 1,5 %, Leerstand 2 % — aus den Standardwerten. Kostensteigerung 1 %, Betrachtung 15 Jahre."
+        }
       ],
       "spruch": "Die Miete trägt. Steigflug eingeplant.",
-      "datei": "dealpilot-modul-07-miete-und-mietvertrag.mp4", "datei_ton": "dealpilot-modul-07-miete-und-mietvertrag-sprecher.mp4",
+      "datei": "dealpilot-modul-07-miete-und-mietvertrag-v3730.mp4",
+      "datei_ton": "dealpilot-modul-07-miete-und-mietvertrag-v3730-sprecher.mp4",
       "poster": "dealpilot-modul-07-miete-und-mietvertrag.webp",
-      "youtube": { "titel": "DealPilot Modul 07 · Miete und Mietvertrag", "tags": ["DealPilot", "Marktmiete", "Indexmiete"], "youtube_id": null }
+      "youtube": {
+        "titel": "DealPilot Modul 07 · Miete und Mietvertrag",
+        "tags": [
+          "DealPilot",
+          "Marktmiete",
+          "Indexmiete"
+        ],
+        "youtube_id": null
+      }
     },
     {
-      "id": "modul-08-finanzierung", "kategorie": "basis", "nr": "08", "dauer": 322,
+      "id": "modul-08-finanzierung",
+      "kategorie": "basis",
+      "nr": "08",
+      "dauer": 353,
       "titel": "Finanzierung",
       "unterzeile": "Wie der Zins entsteht — und wo du die Standardwerte setzt.",
       "story": "Der Zins ist kein Bauchwert: Bundesanleihe plus Marktaufschlag plus Zuschlag nach Beleihung. Ein Klick auf 60, 80 oder 100 Prozent zeigt, wie sich die Kondition verschiebt — Rate, Restschuld und LTV rechnen mit.",
       "nutzen": "Eine Finanzierung, die du der Bank erklären kannst.",
       "kapitel": [
-        { "t": 0, "titel": "Einstieg", "stichworte": "Finanzierung Zins entsteht Standardwerte setzt" },
-        { "t": 13, "titel": "Das Beispiel", "stichworte": "Beispiel Wohnung Modulen Eigentumswohnung Baujahr Heute Reiter Finanzierung" },
-        { "t": 29, "titel": "Der indikative Zins", "stichworte": "indikative Zins Bauzinsen Zinsbindung täglich aktuell Jahre Beleihung Woraus besteht Bundesanleihe Marktaufschlag Stand" },
-        { "t": 51, "titel": "Zuschlag nach Beleihung", "stichworte": "Zuschlag Beleihung Bank finanziert desto höher Zins Knöpfe zeigen Jahre kommen Punkte dazu" },
-        { "t": 78, "titel": "Marktdaten ansehen", "stichworte": "Marktdaten ansehen Bundesanleihe Marktaufschlag Angebotsniveau Zuschlag Beleihung Verlauf Aufschlag Banken Monate zuletzt Punkte" },
-        { "t": 104, "titel": "Gruppen zum Aufklappen", "stichworte": "Gruppen Aufklappen Darunter vier Konditionen Anschlussfinanzierung Bankdaten Werkzeuge offen gerade brauchst Zins vorbelegt Marktzins Standardwerten Tilgung" },
-        { "t": 133, "titel": "Erst der Kaufpreis", "stichworte": "Erst Kaufpreis Reiter Investition Nebenkosten Gesamtinvestition Eigenkapital Darlehen Standardwerten rechnet sich selbst kommt zustande" },
-        { "t": 172, "titel": "Rate und Restschuld", "stichworte": "Rate Restschuld Monatliche Jahren stehen offen Beleihung Beleihungsauslauf passenden Zins dazu zeigt Konditionen-Karte oben Knopf Satz" },
-        { "t": 198, "titel": "Je Darlehen eine Karte", "stichworte": "Darlehen Karte Oben Kacheln Zins Tilgung Zinsbindung Jahre Rate Monat Werkzeuge Tilgungsplan Daten Bank-PDF importieren Plan" },
-        { "t": 282, "titel": "Deine Standardwerte", "stichworte": "Standardwerte Einstellungen Zinssatz Marktzins Tilgung Zinsbindung Jahre Eigenkapital ganzes Vorsichtig Renditeorientiert eigener Zins statt geht Gilt" }
+        {
+          "t": 0,
+          "titel": "Einstieg",
+          "stichworte": "Finanzierung Zins entsteht Standardwerte setzt"
+        },
+        {
+          "t": 15,
+          "titel": "Das Beispiel",
+          "stichworte": "Die Wohnung aus den Modulen 02–05: Sachsenstraße 18, 32052 Herford — Eigentumswohnung (ETW), 100 m², Baujahr 1998. Heute: der Reiter Finanzierung."
+        },
+        {
+          "t": 31,
+          "titel": "Der indikative Zins",
+          "stichworte": "Bauzinsen nach Zinsbindung, täglich aktuell — 10 Jahre: 4,21 % bei 80 % Beleihung."
+        },
+        {
+          "t": 43,
+          "titel": "Woraus er besteht",
+          "stichworte": "Bundesanleihe 3,42 % + Marktaufschlag 0,79 (Stand 09/2026)."
+        },
+        {
+          "t": 53,
+          "titel": "Zuschlag nach Beleihung",
+          "stichworte": "Je mehr die Bank finanziert, desto höher der Zins — die Knöpfe zeigen es. 10 Jahre: 60 % → 4,01 % · 90 % → 4,43 % · 100 % → 4,66 %. Bei 100 % kommen 0,45 Punkte dazu."
+        },
+        {
+          "t": 80,
+          "titel": "Marktdaten ansehen",
+          "stichworte": "4,21 % = Bundesanleihe 3,42 % + Marktaufschlag 0,38 + Angebotsniveau 0,41 ± Zuschlag nach Beleihung."
+        },
+        {
+          "t": 93,
+          "titel": "Der Verlauf",
+          "stichworte": "Der Aufschlag der Banken über 13 Monate — zuletzt 0,38 Punkte über der Bundesanleihe (Sep 26)."
+        },
+        {
+          "t": 106,
+          "titel": "Gruppen zum Aufklappen",
+          "stichworte": "Darunter vier Gruppen: Konditionen, Anschlussfinanzierung, Bankdaten und Werkzeuge — offen ist nur, was du gerade brauchst."
+        },
+        {
+          "t": 121,
+          "titel": "Die Konditionen",
+          "stichworte": "Zins 4,74 % — vorbelegt mit dem Marktzins aus deinen Standardwerten. Tilgung 1 %, Zinsbindung 10 Jahre."
+        },
+        {
+          "t": 135,
+          "titel": "Erst der Kaufpreis",
+          "stichworte": "Im Reiter Investition: 180.000 € — mit Nebenkosten die Gesamtinvestition."
+        },
+        {
+          "t": 148,
+          "titel": "Eigenkapital und Darlehen",
+          "stichworte": "Eigenkapital 18.000 € — 10 % vom Kaufpreis aus deinen Standardwerten. Das Darlehen rechnet sich selbst: 183.168 €."
+        },
+        {
+          "t": 162,
+          "titel": "So kommt es zustande",
+          "stichworte": "Kaufpreis 180.000 € + Nebenkosten 21.168 € − Eigenkapital 18.000 € = 183.168 €."
+        },
+        {
+          "t": 174,
+          "titel": "Rate und Restschuld",
+          "stichworte": "Monatliche Rate 876,15 €. Nach 10 Jahren stehen noch 159.793 € offen."
+        },
+        {
+          "t": 185,
+          "titel": "Die Beleihung",
+          "stichworte": "Beleihungsauslauf 101,8 %. Den passenden Zins zeigt die Konditionen-Karte oben. Den Satz im Darlehen bestimmst du."
+        },
+        {
+          "t": 199,
+          "titel": "Zwei Stufen aus dem Objekt",
+          "stichworte": "Objekt ist die Beleihung dieses Objekts, 100 % + NK heißt Kaufpreis und Nebenkosten finanziert. 10 Jahre: Objekt (LTV 102 %) → 4,75 % · 100 % + NK (LTV 112 %) → 5,16 %. Mit offenem Darlehen steht die Leiste auf Objekt."
+        },
+        {
+          "t": 228,
+          "titel": "Je Darlehen eine Karte",
+          "stichworte": "Oben die Kacheln: Darlehen 183.168 €, Zins 4,74 %, Tilgung 1,00 %, Zinsbindung 10 Jahre — Rate 876,15 € im Monat."
+        },
+        {
+          "t": 242,
+          "titel": "Werkzeuge",
+          "stichworte": "Tilgungsplan und Daten aus Bank-PDF importieren — der Plan öffnet sich mit einem Klick."
+        },
+        {
+          "t": 254,
+          "titel": "Der Tilgungsplan",
+          "stichworte": "144 Monatsraten — Datum, Rate, Zinsen, Tilgung, Restschuld. Weicht deine Bank ab, etwa mit Sondertilgungen, überschreibst du einzelne Werte."
+        },
+        {
+          "t": 270,
+          "titel": "Aus dem Bank-PDF",
+          "stichworte": "Liegt der Darlehensvertrag als PDF vor, liest DealPilot Summe, Zins, Tilgung und Bindung aus — im Video nicht, das ist ein Abruf."
+        },
+        {
+          "t": 285,
+          "titel": "Darlehen II",
+          "stichworte": "Ein zweites Darlehen, etwa von der KfW: „Hinzufügen“. Dieselben Felder, eigene Anschlussfinanzierung — und auch hier Tilgungsplan und Bank-PDF. Weitere Darlehen kommen darunter dazu."
+        },
+        {
+          "t": 311,
+          "titel": "Deine Standardwerte",
+          "stichworte": "Einstellungen › Standardwerte: Zinssatz Marktzins · 4,74 %, Tilgung 1 %, Zinsbindung 10 Jahre, Eigenkapital 10 % v. KP. Oder ein ganzes Set: Vorsichtig oder Renditeorientiert — eigener Zins statt Marktzins geht auch. Gil"
+        }
       ],
       "spruch": "Zins verstanden, Schub berechnet.",
-      "datei": "dealpilot-modul-08-finanzierung.mp4", "datei_ton": "dealpilot-modul-08-finanzierung-sprecher.mp4",
+      "datei": "dealpilot-modul-08-finanzierung-v3730.mp4",
+      "datei_ton": "dealpilot-modul-08-finanzierung-v3730-sprecher.mp4",
       "poster": "dealpilot-modul-08-finanzierung.webp",
-      "youtube": { "titel": "DealPilot Modul 08 · Finanzierung", "tags": ["DealPilot", "Baufinanzierung", "Zins", "Beleihung"], "youtube_id": null }
+      "youtube": {
+        "titel": "DealPilot Modul 08 · Finanzierung",
+        "tags": [
+          "DealPilot",
+          "Baufinanzierung",
+          "Zins",
+          "Beleihung"
+        ],
+        "youtube_id": null
+      }
     },
     {
       "id": "modul-09-bewirtschaftung", "kategorie": "basis", "nr": "09", "dauer": 207,
@@ -318,73 +502,283 @@
       "youtube": { "titel": "DealPilot Modul 09 · Bewirtschaftung", "tags": ["DealPilot", "Hausgeld", "Bewirtschaftungskosten"], "youtube_id": null }
     },
     {
-      "id": "modul-10a-steuer-afa-restnutzungsdauer", "kategorie": "basis", "nr": "10a", "dauer": 208,
+      "id": "modul-10a-steuer-afa-restnutzungsdauer",
+      "kategorie": "basis",
+      "nr": "10a",
+      "dauer": 215,
       "titel": "Steuer: AfA, Zeiträume, Restnutzungsdauer",
       "unterzeile": "Was ein Mehrfamilienhaus dir steuerlich bringt — und wann ein Gutachten lohnt.",
       "story": "Grenzsteuersatz, Gebäudeanteil, AfA-Satz — und die Frage, ob eine kürzere Restnutzungsdauer mehr Abschreibung bringt. Der Rechner nach Anlage 2 sagt es dir in neun Schritten, das Steuerergebnis läuft über 15 Jahre.",
       "nutzen": "Du weißt vorher, ob sich ein Restnutzungsdauer-Gutachten rechnet.",
       "kapitel": [
-        { "t": 0, "titel": "Einstieg", "stichworte": "Steuer Zeiträume Restnutzungsdauer Mehrfamilienhaus steuerlich bringt wann Gutachten lohnt" },
-        { "t": 11, "titel": "Das Beispiel", "stichworte": "Beispiel Mehrfamilienhaus Bestand Wohnungen Baujahr Kaufpreis Heute Reiter Steuer" },
-        { "t": 28, "titel": "Deine persönliche Steuer", "stichworte": "persönliche Steuer Grenzsteuersatz DealPilot rechnet selbst deinem versteuernden Einkommen" },
-        { "t": 46, "titel": "Steuerzeiträume", "stichworte": "Steuerzeiträume Einkommen Zeitraum Objekt bekommt automatisch passenden" },
-        { "t": 63, "titel": "Die Abschreibung", "stichworte": "Abschreibung AfA-Satz linear Standard Gebäudeanteil ergibt Jahr Baujahr rechnet Gesetz Jahren Nutzung Haus früher verbraucht gilt" },
-        { "t": 90, "titel": "Eigener Satz", "stichworte": "Eigener Satz Restnutzungsdauer Jahre viele bleiben schätzt DealPilot vorab ermitteln Acht Schritte Objektdaten Baujahr" },
-        { "t": 118, "titel": "Restnutzungsdauer ermitteln", "stichworte": "Restnutzungsdauer ermitteln Bauweise Technik Modernisierungen Zustand Gewerke Schäden vorbelegt Objekt Ergebnis Geschätzte Jahre statt Gutachten lohnt" },
-        { "t": 152, "titel": "Was das Gutachten bringt", "stichworte": "Gutachten bringt statt weniger Steuer Jahr Netto-Vorteil Restnutzungsdauer" },
-        { "t": 170, "titel": "Was im Jahr übrig bleibt", "stichworte": "Jahr übrig bleibt Mieteinnahmen Werbungskosten Zinsen Bewirtschaftung Ergebnis Vermietung Jahre Grün Erstattung Nachzahlung echter Progression Kaufpreisaufteilung" }
+        {
+          "t": 0,
+          "titel": "Einstieg",
+          "stichworte": "Steuer Zeiträume Restnutzungsdauer Mehrfamilienhaus steuerlich bringt wann Gutachten lohnt"
+        },
+        {
+          "t": 13,
+          "titel": "Das Beispiel",
+          "stichworte": "Ein Mehrfamilienhaus aus dem Bestand: Ravensberger Weg 38, Bielefeld — 8 Wohnungen, 606 m², Baujahr 1978, Kaufpreis 1.240.000 €. Heute: der Reiter Steuer."
+        },
+        {
+          "t": 31,
+          "titel": "Deine persönliche Steuer",
+          "stichworte": "Grenzsteuersatz 47,00 % — DealPilot rechnet ihn nach § 32a selbst aus deinem zu versteuernden Einkommen."
+        },
+        {
+          "t": 49,
+          "titel": "Steuerzeiträume",
+          "stichworte": "Dein Einkommen je Zeitraum — 01.01.2027–31.07.2027: 75.000 €, 01.01.2026–31.12.2026: 90.000 €. Jedes Objekt bekommt automatisch den passenden."
+        },
+        {
+          "t": 65,
+          "titel": "Die Abschreibung",
+          "stichworte": "AfA-Satz 2,0 % linear — Standard ab 1925, Gebäudeanteil 74,82 % — das ergibt 20.991,26 € im Jahr. Bei Baujahr 1978 rechnet das Gesetz mit 50 Jahren Nutzung. Ist das Haus früher verbraucht, gilt ein eigener Satz — mit Gut"
+        },
+        {
+          "t": 93,
+          "titel": "Eigener Satz",
+          "stichworte": "Aus der Restnutzungsdauer: 100 ÷ Jahre. Wie viele Jahre bleiben, schätzt DealPilot vorab."
+        },
+        {
+          "t": 109,
+          "titel": "Restnutzungsdauer ermitteln",
+          "stichworte": "Acht Schritte — die Objektdaten sind schon da: Ravensberger Weg 38, Baujahr 1978, 606 m². Bauweise, Technik, Modernisierungen, Zustand der Gewerke, Schäden — vorbelegt aus dem Objekt."
+        },
+        {
+          "t": 142,
+          "titel": "Das Ergebnis",
+          "stichworte": "Geschätzte Restnutzungsdauer 31–35 Jahre statt 50. „Gutachten lohnt sich klar — hohe Steuerersparnis erwartbar“."
+        },
+        {
+          "t": 155,
+          "titel": "Was das Gutachten bringt",
+          "stichworte": "AfA 3,03 % statt 2 %: +10.814 € AfA und 5.082 € weniger Steuer im Jahr. Netto-Vorteil über die Restnutzungsdauer: 82.106 €."
+        },
+        {
+          "t": 173,
+          "titel": "Was im Jahr übrig bleibt",
+          "stichworte": "Mieteinnahmen 68.913 €, Werbungskosten 68.893 € — Zinsen, Bewirtschaftung, AfA. Ergebnis aus Vermietung: +20 €."
+        },
+        {
+          "t": 188,
+          "titel": "Über 15 Jahre",
+          "stichworte": "Grün Erstattung, rot Nachzahlung — Jahr für Jahr, mit echter Progression. Summe: +7.610 €. Die Kaufpreisaufteilung zeigt Modul 10b."
+        }
       ],
       "spruch": "Abschreibung an Bord, Steuer im Steigflug.",
-      "datei": "dealpilot-modul-10a-steuer-afa-restnutzungsdauer.mp4", "datei_ton": "dealpilot-modul-10a-steuer-afa-restnutzungsdauer-sprecher.mp4",
+      "datei": "dealpilot-modul-10a-steuer-afa-restnutzungsdauer-v3730.mp4",
+      "datei_ton": "dealpilot-modul-10a-steuer-afa-restnutzungsdauer-v3730-sprecher.mp4",
       "poster": "dealpilot-modul-10a-steuer-afa-restnutzungsdauer.webp",
-      "youtube": { "titel": "DealPilot Modul 10a · Steuer: AfA, Zeiträume, Restnutzungsdauer", "tags": ["DealPilot", "AfA", "Restnutzungsdauer", "Anlage 2 ImmoWertV"], "youtube_id": null }
+      "youtube": {
+        "titel": "DealPilot Modul 10a · Steuer: AfA, Zeiträume, Restnutzungsdauer",
+        "tags": [
+          "DealPilot",
+          "AfA",
+          "Restnutzungsdauer",
+          "Anlage 2 ImmoWertV"
+        ],
+        "youtube_id": null
+      }
     },
     {
-      "id": "modul-10b-bmf-kaufpreisaufteilung", "kategorie": "basis", "nr": "10b", "dauer": 256,
+      "id": "modul-10b-bmf-kaufpreisaufteilung",
+      "kategorie": "basis",
+      "nr": "10b",
+      "dauer": 293,
       "titel": "BMF-Kaufpreisaufteilung",
       "unterzeile": "Gebäude und Boden — Bodenabschlag, Notarklausel, 15-%-Grenze.",
       "story": "Die amtliche Arbeitshilfe des Bundesfinanzministeriums, Schritt für Schritt: Anschaffungskosten, Aufteilung in Gebäude und Boden, vier Varianten, Bodenabschlag und die Klausel für den Notar. Danach siehst du, wie sich die 15-Prozent-Grenze verschiebt.",
       "nutzen": "Ein höherer Gebäudeanteil heißt mehr Abschreibung — sauber begründet.",
       "kapitel": [
-        { "t": 0, "titel": "Einstieg", "stichworte": "BMF-Kaufpreisaufteilung Gebäude Boden Bodenabschlag Notarklausel" },
-        { "t": 11, "titel": "Das Beispiel", "stichworte": "Beispiel Mehrfamilienhaus Bestand Wohnungen Baujahr Kaufpreis Angenommen Sanierung ersten drei Jahren sollen Haus fließen" },
-        { "t": 55, "titel": "Der BMF-Rechner", "stichworte": "BMF-Rechner Teilt Kaufpreis Gebäude Boden Arbeitshilfe Finanzministeriums abgeschrieben Schritt Anschaffungskosten Reiter Investition Nebenkosten Grunderwerbsteuer Notar Grundbuch" },
-        { "t": 94, "titel": "Schritt 2 · Die Aufteilung", "stichworte": "Schritt Aufteilung Grundstück Bodenrichtwert Anteil Objekt übernommen" },
-        { "t": 110, "titel": "Schritt 3 · Amtlich, zwei Abschläge und Jacoby", "stichworte": "Schritt Amtlich zwei Abschläge Jacoby Gebäude Boden −15/−20 umgekehrten Ertragswertmethode" },
-        { "t": 130, "titel": "Schritt 4 · Du wählst", "stichworte": "Schritt wählst Amtlich zwei Abschläge Jacoby Zeile Variante Gebäudeanteil Steuer Nachweis Optimiert Gebäude Jahr Abweichung Arbeitshilfe" },
-        { "t": 157, "titel": "Bodenabschlag 20 %", "stichworte": "Bodenabschlag amtliche Zahl bleibt stehen Szenario daneben Boden statt Jahr" },
-        { "t": 172, "titel": "Die Notarklausel", "stichworte": "Notarklausel Text Kaufvertrag steht fertig Boden Gebäude Kopieren Notar Begründung gehört hinein" },
-        { "t": 188, "titel": "Die Absprünge", "stichworte": "Absprünge Restnutzungsdauer berechnen öffnet Rechner Modul Dazu Aufteilung ausgefüllte BMF-Arbeitshilfe Original Excel" },
-        { "t": 204, "titel": "Übernehmen", "stichworte": "Übernehmen Gebäudeanteil gewählten Variante geht Reiter Steuer statt Abschreibung steigt Jahr" },
-        { "t": 228, "titel": "Die 15-%-Grenze zieht mit", "stichworte": "zieht Gebäude höhere Grenze statt Sanierung netto bleibt darunter Erhaltungsaufwand sofort abziehbar" }
+        {
+          "t": 0,
+          "titel": "Einstieg",
+          "stichworte": "BMF-Kaufpreisaufteilung Gebäude Boden Bodenabschlag Notarklausel"
+        },
+        {
+          "t": 13,
+          "titel": "Das Beispiel",
+          "stichworte": "Ein Mehrfamilienhaus aus dem Bestand: Ravensberger Weg 38, Bielefeld — 8 Wohnungen, 606 m², Baujahr 1978, Kaufpreis 1.240.000 €."
+        },
+        {
+          "t": 29,
+          "titel": "Angenommen: eine Sanierung",
+          "stichworte": "In den ersten drei Jahren sollen 87.000 € in das Haus fließen."
+        },
+        {
+          "t": 40,
+          "titel": "Die 15-%-Grenze",
+          "stichworte": "Bei 74,82 % Gebäudeanteil: höchstens 157.434 € netto in drei Jahren. 87.000 € brutto sind 73.109 € netto — Unter Grenze (46,4 %) – Erhaltungsaufwand sofort abziehbar."
+        },
+        {
+          "t": 58,
+          "titel": "Der BMF-Rechner",
+          "stichworte": "Teilt den Kaufpreis in Gebäude und Boden — nach der Arbeitshilfe des Finanzministeriums. Nur das Gebäude wird abgeschrieben."
+        },
+        {
+          "t": 74,
+          "titel": "Schritt 1 · Anschaffungskosten",
+          "stichworte": "Aus dem Reiter Investition: Kaufpreis 1.240.000 €, Nebenkosten 170.293 € — Grunderwerbsteuer, Notar, Grundbuch, Makler. Sie zählen anteilig zum Gebäude: für die AfA und die 15-%-Grenze."
+        },
+        {
+          "t": 93,
+          "titel": "Die Sanierung steht extra",
+          "stichworte": "Die 87.000 € Sanierung (netto 73.109 €) steht nicht in dieser Summe. Sie wird nicht aufgeteilt. Ob sie anschaffungsnah ist, zeigt Schritt 3 je Variante."
+        },
+        {
+          "t": 113,
+          "titel": "Schritt 2 · Die Aufteilung",
+          "stichworte": "Grundstück 820 m², Bodenrichtwert 390 €/m², Anteil 100 % — alles aus dem Objekt übernommen."
+        },
+        {
+          "t": 129,
+          "titel": "Schritt 3 · Amtlich, zwei Abschläge und Jacoby",
+          "stichworte": "Amtlich 74,82 % Gebäude — mit Boden −15/−20 % bis 79,86 %; nach der umgekehrten Ertragswertmethode (BFH IX R 12/21) 79,88 %."
+        },
+        {
+          "t": 146,
+          "titel": "Die Sanierung je Variante",
+          "stichworte": "In jeder Variante sofort abziehbar als Werbungskosten, einmalig 87.000 €. Sie bleibt unter der 15-%-Grenze."
+        },
+        {
+          "t": 164,
+          "titel": "Schritt 4 · Du wählst",
+          "stichworte": "Amtlich, zwei Abschläge und Jacoby — eine Zeile je Variante: Gebäudeanteil, AfA, Steuer, Nachweis."
+        },
+        {
+          "t": 177,
+          "titel": "Optimiert",
+          "stichworte": "Gebäude 79,9 %, AfA 22.420 € im Jahr. Die Abweichung von der Arbeitshilfe braucht eine Begründung."
+        },
+        {
+          "t": 190,
+          "titel": "Bodenabschlag 20 %",
+          "stichworte": "Die amtliche Zahl bleibt stehen, das Szenario daneben: Boden 248.376 € statt 310.469 €, AfA 22.412 € statt 20.999 € im Jahr."
+        },
+        {
+          "t": 205,
+          "titel": "Die Notarklausel",
+          "stichworte": "Der Text für den Kaufvertrag steht fertig da: Boden 248.375,52 €, Gebäude 984.624,48 € — zum Kopieren für den Notar. Die Begründung gehört hinein."
+        },
+        {
+          "t": 221,
+          "titel": "Die Absprünge",
+          "stichworte": "Restnutzungsdauer berechnen öffnet den Rechner aus Modul 10c. Dazu PDF der Aufteilung, die ausgefüllte BMF-Arbeitshilfe und das Original als Excel."
+        },
+        {
+          "t": 238,
+          "titel": "Übernehmen",
+          "stichworte": "Ein Klick — der Gebäudeanteil der gewählten Variante geht in den Reiter Steuer."
+        },
+        {
+          "t": 249,
+          "titel": "Im Reiter Steuer",
+          "stichworte": "Gebäudeanteil 79,86 % statt 74,82 % — die Abschreibung steigt auf 22.405,27 € im Jahr."
+        },
+        {
+          "t": 262,
+          "titel": "Die 15-%-Grenze zieht mit",
+          "stichworte": "Mehr Gebäude, höhere Grenze: 168.040 € statt 157.434 €. Die Sanierung (73.109 € netto) bleibt darunter — Unter Grenze (43,5 %) – Erhaltungsaufwand sofort abziehbar."
+        }
       ],
       "spruch": "Gebäude und Boden getrennt — sauber gelandet.",
-      "datei": "dealpilot-modul-10b-bmf-kaufpreisaufteilung.mp4", "datei_ton": "dealpilot-modul-10b-bmf-kaufpreisaufteilung-sprecher.mp4",
+      "datei": "dealpilot-modul-10b-bmf-kaufpreisaufteilung-v3730.mp4",
+      "datei_ton": "dealpilot-modul-10b-bmf-kaufpreisaufteilung-v3730-sprecher.mp4",
       "poster": "dealpilot-modul-10b-bmf-kaufpreisaufteilung.webp",
-      "youtube": { "titel": "DealPilot Modul 10b · BMF-Kaufpreisaufteilung", "tags": ["DealPilot", "Kaufpreisaufteilung", "BMF Arbeitshilfe", "Gebäudeanteil"], "youtube_id": null }
+      "youtube": {
+        "titel": "DealPilot Modul 10b · BMF-Kaufpreisaufteilung",
+        "tags": [
+          "DealPilot",
+          "Kaufpreisaufteilung",
+          "BMF Arbeitshilfe",
+          "Gebäudeanteil"
+        ],
+        "youtube_id": null
+      }
     },
     {
-      "id": "modul-10c-restnutzungsdauer-rechner", "kategorie": "basis", "nr": "10c", "dauer": 183,
+      "id": "modul-10c-restnutzungsdauer-rechner",
+      "kategorie": "basis",
+      "nr": "10c",
+      "dauer": 189,
       "titel": "Der Restnutzungsdauer-Rechner",
       "unterzeile": "Ganze Jahre, Spanne, übernehmen — und wo die Anlage 2 endet.",
       "story": "Das Gesetz unterstellt 50 Jahre Nutzungsdauer — ist das Haus früher verbraucht, gilt ein eigener AfA-Satz. Der Rechner im Reiter Steuer führt dich in neun vorbelegten Schritten zur Restnutzungsdauer nach Anlage 2: als Spanne in ganzen Jahren, mit einem Klick übernommen, und du siehst, was der höhere Satz im Jahr an Steuer spart. Beim Altbau zeigt er ehrlich, wo das Modell endet: dort muss ein Sachverständiger ran.",
       "nutzen": "In Minuten wissen, ob sich ein Restnutzungsdauer-Gutachten für dich lohnt.",
       "kapitel": [
-        { "t": 0, "titel": "Einstieg", "stichworte": "Restnutzungsdauer-Rechner Ganze Jahre Spanne übernehmen Anlage endet" },
-        { "t": 10, "titel": "Das Beispiel", "stichworte": "Beispiel Mehrfamilienhaus Bestand Wohnungen Baujahr Kaufpreis Heute Restnutzungsdauer-Rechner" },
-        { "t": 28, "titel": "Die gesetzliche AfA", "stichworte": "gesetzliche Baujahr linear Standard Gesetz unterstellt Jahre Haus früher verbraucht gilt eigener Satz" },
-        { "t": 50, "titel": "Den Rechner öffnen", "stichworte": "Rechner öffnen Reiter Steuer eigener Satz Restnutzungsdauer ermitteln Objektdaten eingetragen" },
-        { "t": 62, "titel": "Acht Schritte", "stichworte": "Acht Schritte Objekt Auftrag Technik Modernisierung Gewerke Mängel Ergebnis Schritt vorbelegt korrigierst" },
-        { "t": 84, "titel": "Das Ergebnis", "stichworte": "Ergebnis Jahre ganze Spanne Modellwert einzelne Zahl behauptete Genauigkeit Ersteinschätzung" },
-        { "t": 100, "titel": "Übernehmen", "stichworte": "Übernehmen Restnutzungsdauer eigener AfA-Satz Jahre Vorher nachher Jahr Steuer Erstattung Steuervorteil" },
-        { "t": 126, "titel": "Indikativ, kein Gutachten", "stichworte": "Indikativ kein Gutachten Ersteinschätzung Finanzamt erkennt kürzeren Satz Anfrage geht Video nicht" },
-        { "t": 144, "titel": "Im Reiter Steuer", "stichworte": "Reiter Steuer Eigener Satz Jahren Jahr Grundlage steht dabei RND-Ermittlung DealPilot Anlage ImmoWertV indikativ" },
-        { "t": 159, "titel": "Ersteinschätzung in Minuten", "stichworte": "Ersteinschätzung Minuten viele Jahre bleiben steuerlich bringt Steuererklärung zählt Gutachten" }
+        {
+          "t": 0,
+          "titel": "Einstieg",
+          "stichworte": "Restnutzungsdauer-Rechner Ganze Jahre Spanne übernehmen Anlage endet"
+        },
+        {
+          "t": 12,
+          "titel": "Das Beispiel",
+          "stichworte": "Ein Mehrfamilienhaus aus dem Bestand: Ravensberger Weg 38, Bielefeld — 8 Wohnungen, 606 m², Baujahr 1978, Kaufpreis 1.240.000 €. Heute: der Restnutzungsdauer-Rechner."
+        },
+        {
+          "t": 31,
+          "titel": "Die gesetzliche AfA",
+          "stichworte": "Baujahr 1978: 2,0 % linear — Standard ab 1925 — das Gesetz unterstellt 50 Jahre. Ist das Haus früher verbraucht, gilt ein eigener Satz."
+        },
+        {
+          "t": 52,
+          "titel": "Den Rechner öffnen",
+          "stichworte": "Reiter Steuer, „eigener Satz“, Restnutzungsdauer ermitteln. Die Objektdaten sind schon eingetragen."
+        },
+        {
+          "t": 64,
+          "titel": "Acht Schritte",
+          "stichworte": "Objekt, Auftrag, Bau, Technik, Modernisierung, Gewerke, Mängel, Ergebnis — jeder Schritt ist vorbelegt, du korrigierst nur."
+        },
+        {
+          "t": 87,
+          "titel": "Das Ergebnis",
+          "stichworte": "31–35 Jahre — ganze Jahre, als Spanne: Modellwert 33 Jahre, ± 2. Eine einzelne Zahl behauptete mehr Genauigkeit, als eine Ersteinschätzung hat."
+        },
+        {
+          "t": 103,
+          "titel": "Übernehmen",
+          "stichworte": "Ein Klick: die Restnutzungsdauer wird dein eigener AfA-Satz — 100 ÷ Jahre."
+        },
+        {
+          "t": 115,
+          "titel": "Vorher und nachher",
+          "stichworte": "AfA 3,03 %: 20.991 € → 31.802 € im Jahr, Steuer 961 € Erstattung → 4.771 € Erstattung — Steuervorteil 3.810 € im Jahr."
+        },
+        {
+          "t": 130,
+          "titel": "Indikativ, kein Gutachten",
+          "stichworte": "Eine Ersteinschätzung. Das Finanzamt erkennt den kürzeren Satz nur mit Gutachten an — die Anfrage geht von hier, im Video nicht."
+        },
+        {
+          "t": 147,
+          "titel": "Im Reiter Steuer",
+          "stichworte": "Eigener Satz aus 33 Jahren — AfA 31.801,76 € im Jahr. Die Grundlage steht dabei: RND-Ermittlung DealPilot (Anlage 2 ImmoWertV, indikativ)."
+        },
+        {
+          "t": 162,
+          "titel": "Ersteinschätzung in Minuten",
+          "stichworte": "Wie viele Jahre bleiben und was es steuerlich bringt. Für die Steuererklärung zählt das Gutachten."
+        }
       ],
       "spruch": "Restflugzeit geschätzt — das Gutachten landet.",
-      "datei": "dealpilot-modul-10c-restnutzungsdauer-rechner.mp4", "datei_ton": "dealpilot-modul-10c-restnutzungsdauer-rechner-sprecher.mp4",
+      "datei": "dealpilot-modul-10c-restnutzungsdauer-rechner-v3730.mp4",
+      "datei_ton": "dealpilot-modul-10c-restnutzungsdauer-rechner-v3730-sprecher.mp4",
       "poster": "dealpilot-modul-10c-restnutzungsdauer-rechner.webp",
-      "youtube": { "titel": "DealPilot Modul 10c · Der Restnutzungsdauer-Rechner – AfA nach Anlage 2", "tags": ["DealPilot", "Restnutzungsdauer", "AfA", "Anlage 2", "Steuer Immobilie"], "youtube_id": null }
+      "youtube": {
+        "titel": "DealPilot Modul 10c · Der Restnutzungsdauer-Rechner – AfA nach Anlage 2",
+        "tags": [
+          "DealPilot",
+          "Restnutzungsdauer",
+          "AfA",
+          "Anlage 2",
+          "Steuer Immobilie"
+        ],
+        "youtube_id": null
+      }
     },
     {
       "id": "modul-11-pilot-analyse", "kategorie": "spezial", "nr": "11", "dauer": 327,
@@ -574,28 +968,86 @@
       "youtube": { "titel": "DealPilot Modul 20 · Bankexport Portfolio – alle Darlehen für die Bank", "tags": ["DealPilot", "Bankexport", "Immobilienportfolio", "Finanzierung"], "youtube_id": null }
     },
     {
-      "id": "modul-21-portfolio-cockpit-und-pilot", "kategorie": "spezial", "nr": "21", "dauer": 172,
+      "id": "modul-21-portfolio-cockpit-und-pilot",
+      "kategorie": "spezial",
+      "nr": "21",
+      "dauer": 170,
       "titel": "Portfolio-Cockpit und Pilot",
       "unterzeile": "Alle Objekte auf einer Seite — und ein Pilot, der sie kennt.",
       "story": "Das Portfolio-Cockpit zeigt deinen ganzen Bestand: Portfolio-Score, Kennzahlen über alle Objekte, Steuer und die Projektion in die Zukunft. Dazu der Portfolio-Pilot — eine Analyse, gegliedert und mit Zahlen, die deine Objekte beim Namen nennt. Und danach fragst du einfach weiter.",
       "nutzen": "Du steuerst den Bestand als Ganzes statt Objekt für Objekt.",
       "kapitel": [
-        { "t": 0, "titel": "Einstieg", "stichworte": "Portfolio-Cockpit Pilot Objekte Seite kennt" },
-        { "t": 8, "titel": "Das Portfolio-Cockpit", "stichworte": "Portfolio-Cockpit Links Aktionen steht nicht Objekt sondern" },
-        { "t": 21, "titel": "Der Portfolio-Score", "stichworte": "Portfolio-Score Solide Objekte Volumen Cashflow Monat" },
-        { "t": 33, "titel": "Zwei Scores", "stichworte": "Zwei Scores Investment-Score Finanzierungs-Score dieselbe Aufteilung einzelnen Objekt Kaufpreis gewichtet Bestand" },
-        { "t": 48, "titel": "Kennzahlen über alles", "stichworte": "Kennzahlen Mieteinnahmen Monat Gesamtinvestition Restschuld wechselt zwischen Bestand Ankauf-Stand" },
-        { "t": 64, "titel": "Bestand · Soll · Zielbild", "stichworte": "Bestand Soll Zielbild Objekte nebeneinander Kaltmiete Jahr heute Mieterhöhung" },
-        { "t": 82, "titel": "Steuer über alle Objekte", "stichworte": "Steuer Objekte Einkommensteuer Progression privat Gesellschaft echten Objektdaten Objekt bringt sieht Ganzen" },
-        { "t": 98, "titel": "Die Projektion", "stichworte": "Projektion Restschuld Eigenkapital Cashflow Jahre vereinfachte Modellrechnung ganzen Bestand" },
-        { "t": 113, "titel": "Der Portfolio-Pilot", "stichworte": "Portfolio-Pilot kennt Vermögensbilanz Objekt darin letzte Analyse seitdem sich Bestand geändert sagt" },
-        { "t": 129, "titel": "Pilot fragen", "stichworte": "Pilot fragen Schnellfragen Gesamtauswertung meines Portfolios Bestand Zielbild ausführlich erklären Welches Objekt größte Mietpotenzial genügt" },
-        { "t": 146, "titel": "Oder eigene Fragen", "stichworte": "eigene Fragen Welches Objekt zieht Schnitt runter Pilot antwortet jedem Ganzen Video nicht Abruf" }
+        {
+          "t": 0,
+          "titel": "Einstieg",
+          "stichworte": "Portfolio-Cockpit Pilot Objekte Seite kennt"
+        },
+        {
+          "t": 10,
+          "titel": "Das Portfolio-Cockpit",
+          "stichworte": "Links unter den Aktionen. Hier steht nicht ein Objekt, sondern alle."
+        },
+        {
+          "t": 23,
+          "titel": "Der Portfolio-Score",
+          "stichworte": "70 · Gut über 12 Objekte, Volumen 6,81 Mio €, Cashflow +4.518 € im Monat."
+        },
+        {
+          "t": 35,
+          "titel": "Zwei Scores",
+          "stichworte": "Investment-Score 69, Finanzierungs-Score 71 — dieselbe Aufteilung wie im einzelnen Objekt, nach Kaufpreis gewichtet über den Bestand."
+        },
+        {
+          "t": 50,
+          "titel": "Kennzahlen über alles",
+          "stichworte": "Mieteinnahmen 35.810 € im Monat, Gesamtinvestition 7,87 Mio €, Restschuld 5,56 Mio €. Ein Klick wechselt zwischen Bestand und Ankauf-Stand."
+        },
+        {
+          "t": 66,
+          "titel": "Bestand · Soll · Zielbild",
+          "stichworte": "Über alle Objekte nebeneinander. 6 von 12 mit Zielbild."
+        },
+        {
+          "t": 77,
+          "titel": "Steuer über alle Objekte",
+          "stichworte": "Die Einkommensteuer mit Progression — privat und je Gesellschaft, aus den echten Objektdaten. Was ein Objekt mehr bringt, sieht man im Ganzen."
+        },
+        {
+          "t": 94,
+          "titel": "Die Projektion",
+          "stichworte": "Restschuld, Eigenkapital, Cashflow über 10, 20 oder 30 Jahre — eine vereinfachte Modellrechnung über den ganzen Bestand."
+        },
+        {
+          "t": 108,
+          "titel": "Der Portfolio-Pilot",
+          "stichworte": "Er kennt die Vermögensbilanz und jedes Objekt darin. Die letzte Analyse ist vom 19.10.2026 — seitdem hat sich der Bestand geändert, und das sagt er dir."
+        },
+        {
+          "t": 125,
+          "titel": "Pilot fragen",
+          "stichworte": "9 Schnellfragen: Gesamtauswertung meines Portfolios, Bestand & Zielbild ausführlich erklären, Welches Objekt hat das größte Mietpotenzial? … — aus der Liste wählen, fertig."
+        },
+        {
+          "t": 142,
+          "titel": "Oder eigene Fragen",
+          "stichworte": "„Welches Objekt zieht den Schnitt runter?“ — der Pilot antwortet zu jedem Objekt und zum Ganzen. Im Video fragen wir nicht: das ist ein Abruf."
+        }
       ],
       "spruch": "Die ganze Flotte im Blick — der Pilot fliegt mit.",
-      "datei": "dealpilot-modul-21-portfolio-cockpit-und-pilot.mp4", "datei_ton": "dealpilot-modul-21-portfolio-cockpit-und-pilot-sprecher.mp4",
+      "datei": "dealpilot-modul-21-portfolio-cockpit-und-pilot-v3730.mp4",
+      "datei_ton": "dealpilot-modul-21-portfolio-cockpit-und-pilot-v3730-sprecher.mp4",
       "poster": "dealpilot-modul-21-portfolio-cockpit-und-pilot.webp",
-      "youtube": { "titel": "DealPilot Modul 21 · Portfolio-Cockpit und Portfolio-Pilot", "tags": ["DealPilot", "Immobilienportfolio", "Portfolio-Analyse", "KI", "Cashflow"], "youtube_id": null }
+      "youtube": {
+        "titel": "DealPilot Modul 21 · Portfolio-Cockpit und Portfolio-Pilot",
+        "tags": [
+          "DealPilot",
+          "Immobilienportfolio",
+          "Portfolio-Analyse",
+          "KI",
+          "Cashflow"
+        ],
+        "youtube_id": null
+      }
     },
     {
       "id": "modul-22-telegram-bot", "kategorie": "spezial", "nr": "22", "dauer": 126,
@@ -971,231 +1423,458 @@
      ]
     },
     {
-     "id": "partner-2",
-     "kategorie": "partner",
-     "nr": 2,
-     "dauer": 331,
-     "titel": "Kunden hinzufügen",
-     "unterzeile": "Mit Partnerplatz oder eigenem Abo, per Einladung oder Code.",
-     "story": "Kunden mit Partnerplatz, Kunden mit eigenem Abo und offene Einladungen. Kundennummer, Stufe und Rechte im Fenster mit Reitern, Einladung per E-Mail oder Verbindungscode und wie der Kunde die Anfrage bestätigt.",
-     "datei": "dealpilot-partner-2-kunden-hinzufuegen-v3650.mp4",
-     "datei_ton": "dealpilot-partner-2-kunden-hinzufuegen-v3680-marcel.mp4",
-     "dauer_ton": 236,
-     "kapitel_ton": [{"t":12,"titel":"Kunden & Plätze","stichworte":"Hier stehen alle Kunden, die mit dir verbunden sind, und alle, die noch zusagen müssen."},{"t":20,"titel":"Mit Partnerplatz","stichworte":"Jonas Berger nutzt einen Platz von dir. Du bezahlst seinen Zugang und bestimmst Stufe, Rechte und Marke."},{"t":29,"titel":"Kundennummer","stichworte":"Jeder verbundene Kunde bekommt eine Nummer, hier K-2026-001. Sie zählt je Jahr fortlaufend, du kannst sie ändern."},{"t":43,"titel":"Mit eigenem Abo","stichworte":"Sabine Kraus hat DealPilot schon selbst gebucht. Sie verbindet sich mit dir und behält ihren Plan. Ein Platz wird dafür nicht gebraucht."},{"t":54,"titel":"Wartet auf Zusage","stichworte":"Thomas Weber ist eingeladen und hat noch nicht bestätigt. Ohne seine Zusage entsteht keine Verbindung."},{"t":64,"titel":"Stufe und Rechte","stichworte":"Ein Fenster mit Reitern wie der Restnutzungsdauer-Rechner: Kunde, Stufe, Rechte, Einstellungen, Kontingente, Marke, Platz."},{"t":78,"titel":"Kunde","stichworte":"Kundennummer, eine Notiz nur für dein Team und die E-Mail bei Rückmeldung, je Kunde an- oder abschaltbar."},{"t":88,"titel":"Stufe","stichworte":"Wie viel dein Kunde sieht: Einsteiger, Fortgeschritten oder Experte."},{"t":95,"titel":"Rechte","stichworte":"Mit an und aus nimmst du einzelne Funktionen aus dem Platz, zum Beispiel PDFs, Marktbericht oder KI."},{"t":105,"titel":"Marke","stichworte":"Deine Marke oder DealPilot. Gespeichert wird einmal unten."},{"t":112,"titel":"Per E-Mail einladen","stichworte":"Name und Adresse eintragen. Hat die Adresse schon ein DealPilot-Konto, bekommt der Kunde eine Anfrage in seiner App, sonst eine Einladung pe"},{"t":124,"titel":"Mit oder ohne Platz","stichworte":"Mit Partnerplatz bezahlst du den Zugang. Ohne Platz nutzt der Kunde seinen eigenen Plan. Hat er schon ein Abo, wird er automatisch ohne Plat"},{"t":137,"titel":"Einladen","stichworte":"Ein Klick auf Einladen schickt die Einladung los. Im Video lassen wir das Beispiel stehen."},{"t":144,"titel":"Verbindungscode","stichworte":"Kunden mit eigenem Abo erzeugen in DealPilot einen Code und geben ihn dir, etwa im Termin. Du trägst ihn hier ein, der Kunde bestätigt."},{"t":156,"titel":"Platz nur bei Bedarf","stichworte":"Den Haken Partnerplatz mitgeben nimmst du raus, wenn der Kunde sein eigenes Abo behält."},{"t":169,"titel":"Mein Partner","stichworte":"Thomas Weber findet die Anfrage unter Mein Partner in der linken Leiste. Unten in der App erscheint dazu ein Hinweis."},{"t":179,"titel":"Die Anfrage","stichworte":"Mein Partner öffnet sich wie dein Cockpit, mit eigenen Reitern. Oben steht die Anfrage."},{"t":188,"titel":"Er entscheidet","stichworte":"Der Kunde sieht, wer sich verbinden will und was das heißt. Mit Platz bezahlst du seinen Zugang. Erst seine Bestätigung verbindet euch."},{"t":200,"titel":"Was du siehst","stichworte":"Du siehst nur Objekte, die er dir ausdrücklich sendet, als Kopie. Trennen kann er jederzeit."},{"t":210,"titel":"Der Code für dich","stichworte":"Hier erzeugt der Kunde den Verbindungscode, wenn er sich selbst mit dir verbinden möchte. Er gilt 24 Stunden und nur einmal."},{"t":220,"titel":"Weiter geht’s","stichworte":"Sobald er bestätigt, steht er bei dir unter Kunden & Plätze. Im nächsten Video: Objekte senden."}],
-     "poster": "dealpilot-partner-2-vorschau-v3650.webp",
-     "kapitel": [
-      {
-       "t": 12,
-       "titel": "Kunden & Plätze",
-       "stichworte": "Hier stehen alle Kunden, die mit dir verbunden sind, und alle, die noch zusagen müssen."
-      },
-      {
-       "t": 23,
-       "titel": "Mit Partnerplatz",
-       "stichworte": "Jonas Berger nutzt einen Platz von dir. Du bezahlst seinen Zugang und bestimmst Stufe, Rechte und Marke."
-      },
-      {
-       "t": 35,
-       "titel": "Kundennummer",
-       "stichworte": "Jeder verbundene Kunde bekommt eine Nummer, hier K-2026-001. Sie zählt je Jahr fortlaufend, du kannst sie ändern."
-      },
-      {
-       "t": 49,
-       "titel": "Mit eigenem Abo",
-       "stichworte": "Sabine Kraus hat DealPilot schon selbst gebucht. Sie verbindet sich mit dir und behält ihren Plan. Ein Platz wird dafür nicht gebraucht."
-      },
-      {
-       "t": 64,
-       "titel": "Wartet auf Zusage",
-       "stichworte": "Thomas Weber ist eingeladen und hat noch nicht bestätigt. Ohne seine Zusage entsteht keine Verbindung."
-      },
-      {
-       "t": 79,
-       "titel": "Stufe und Rechte",
-       "stichworte": "Ein Fenster mit Reitern wie der Restnutzungsdauer-Rechner: Kunde, Stufe, Rechte, Einstellungen, Kontingente, Marke, Platz."
-      },
-      {
-       "t": 94,
-       "titel": "Kunde",
-       "stichworte": "Kundennummer, eine Notiz nur für dein Team und die E-Mail bei Rückmeldung, je Kunde an- oder abschaltbar."
-      },
-      {
-       "t": 109,
-       "titel": "Stufe",
-       "stichworte": "Wie viel dein Kunde sieht: Einsteiger, Fortgeschritten oder Experte."
-      },
-      {
-       "t": 121,
-       "titel": "Rechte",
-       "stichworte": "Mit an und aus nimmst du einzelne Funktionen aus dem Platz, zum Beispiel PDFs, Marktbericht oder KI."
-      },
-      {
-       "t": 136,
-       "titel": "Marke",
-       "stichworte": "Deine Marke oder DealPilot. Gespeichert wird einmal unten."
-      },
-      {
-       "t": 149,
-       "titel": "Per E-Mail einladen",
-       "stichworte": "Name und Adresse eintragen. Hat die Adresse schon ein DealPilot-Konto, bekommt der Kunde eine Anfrage in seiner App, sonst eine Einladung pe"
-      },
-      {
-       "t": 168,
-       "titel": "Mit oder ohne Platz",
-       "stichworte": "Mit Partnerplatz bezahlst du den Zugang. Ohne Platz nutzt der Kunde seinen eigenen Plan. Hat er schon ein Abo, wird er automatisch ohne Plat"
-      },
-      {
-       "t": 185,
-       "titel": "Einladen",
-       "stichworte": "Ein Klick auf Einladen schickt die Einladung los. Im Video lassen wir das Beispiel stehen."
-      },
-      {
-       "t": 196,
-       "titel": "Verbindungscode",
-       "stichworte": "Kunden mit eigenem Abo erzeugen in DealPilot einen Code und geben ihn dir, etwa im Termin. Du trägst ihn hier ein, der Kunde bestätigt."
-      },
-      {
-       "t": 211,
-       "titel": "Platz nur bei Bedarf",
-       "stichworte": "Den Haken Partnerplatz mitgeben nimmst du raus, wenn der Kunde sein eigenes Abo behält."
-      },
-      {
-       "t": 237,
-       "titel": "Mein Partner",
-       "stichworte": "Thomas Weber findet die Anfrage unter Mein Partner in der linken Leiste. Unten in der App erscheint dazu ein Hinweis."
-      },
-      {
-       "t": 252,
-       "titel": "Die Anfrage",
-       "stichworte": "Mein Partner öffnet sich wie dein Cockpit, mit eigenen Reitern. Oben steht die Anfrage."
-      },
-      {
-       "t": 266,
-       "titel": "Er entscheidet",
-       "stichworte": "Der Kunde sieht, wer sich verbinden will und was das heißt. Mit Platz bezahlst du seinen Zugang. Erst seine Bestätigung verbindet euch."
-      },
-      {
-       "t": 280,
-       "titel": "Was du siehst",
-       "stichworte": "Du siehst nur Objekte, die er dir ausdrücklich sendet, als Kopie. Trennen kann er jederzeit."
-      },
-      {
-       "t": 293,
-       "titel": "Der Code für dich",
-       "stichworte": "Hier erzeugt der Kunde den Verbindungscode, wenn er sich selbst mit dir verbinden möchte. Er gilt 24 Stunden und nur einmal."
-      },
-      {
-       "t": 307,
-       "titel": "Weiter geht’s",
-       "stichworte": "Sobald er bestätigt, steht er bei dir unter Kunden & Plätze. Im nächsten Video: Objekte senden."
-      }
-     ]
+      "id": "partner-2",
+      "kategorie": "partner",
+      "nr": 2,
+      "dauer": 361,
+      "titel": "Kunden hinzufügen",
+      "unterzeile": "Mit Partnerplatz oder eigenem Abo, per Einladung oder Code.",
+      "story": "Kunden mit Partnerplatz, Kunden mit eigenem Abo und offene Einladungen. Kundennummer, Stufe und Rechte im Fenster mit Reitern, Einladung per E-Mail oder Verbindungscode und wie der Kunde die Anfrage bestätigt.",
+      "datei": "dealpilot-partner-2-kunden-hinzufuegen-v3730.mp4",
+      "datei_ton": "dealpilot-partner-2-kunden-hinzufuegen-v3730-marcel.mp4",
+      "dauer_ton": 361,
+      "kapitel_ton": [
+        {
+          "t": 11,
+          "titel": "Kunden & Plätze",
+          "stichworte": "Hier stehen alle Kunden, die mit dir verbunden sind, und alle, die noch zusagen müssen."
+        },
+        {
+          "t": 23,
+          "titel": "Mit Partnerplatz",
+          "stichworte": "Jonas Berger nutzt einen Platz von dir. Du bezahlst seinen Zugang und bestimmst Stufe, Rechte und Marke."
+        },
+        {
+          "t": 35,
+          "titel": "Kundennummer",
+          "stichworte": "Jeder verbundene Kunde bekommt eine Nummer, hier K-2026-001. Sie zählt je Jahr fortlaufend, du kannst sie ändern."
+        },
+        {
+          "t": 48,
+          "titel": "Mit eigenem Abo",
+          "stichworte": "Sabine Kraus hat DealPilot schon selbst gebucht. Sie verbindet sich mit dir und behält ihren Plan. Ein Platz wird dafür nicht gebraucht."
+        },
+        {
+          "t": 63,
+          "titel": "Wartet auf Zusage",
+          "stichworte": "Thomas Weber ist eingeladen und hat noch nicht bestätigt. Ohne seine Zusage entsteht keine Verbindung."
+        },
+        {
+          "t": 79,
+          "titel": "Stufe und Rechte",
+          "stichworte": "Ein Fenster mit Reitern wie der Restnutzungsdauer-Rechner: Kunde, Stufe, Rechte, Einstellungen, Kontingente, Marke, Platz."
+        },
+        {
+          "t": 93,
+          "titel": "Kunde",
+          "stichworte": "Kundennummer, eine Notiz nur für dein Team und die E-Mail bei Rückmeldung, je Kunde an- oder abschaltbar."
+        },
+        {
+          "t": 108,
+          "titel": "Stufe",
+          "stichworte": "Wie viel dein Kunde sieht: Einsteiger, Fortgeschritten oder Experte."
+        },
+        {
+          "t": 121,
+          "titel": "Rechte",
+          "stichworte": "Mit an und aus nimmst du einzelne Funktionen aus dem Platz, zum Beispiel PDFs, Marktbericht oder KI."
+        },
+        {
+          "t": 135,
+          "titel": "Marke",
+          "stichworte": "Deine Marke oder DealPilot. Gespeichert wird einmal unten."
+        },
+        {
+          "t": 149,
+          "titel": "Per E-Mail einladen",
+          "stichworte": "Name und Adresse eintragen. Hat die Adresse schon ein DealPilot-Konto, bekommt der Kunde eine Anfrage in seiner App, sonst eine Einladung per E-Mail."
+        },
+        {
+          "t": 168,
+          "titel": "Mit oder ohne Platz",
+          "stichworte": "Mit Partnerplatz bezahlst du den Zugang. Ohne Platz nutzt der Kunde seinen eigenen Plan. Hat er schon ein Abo, wird er automatisch ohne Platz verbunden."
+        },
+        {
+          "t": 184,
+          "titel": "Freigabe vorschlagen",
+          "stichworte": "Du schlägst vor, was der Kunde freigibt, hier Dauerhaft mit Steuer. Er sieht den Vorschlag beim Bestätigen und entscheidet selbst."
+        },
+        {
+          "t": 199,
+          "titel": "Einladen",
+          "stichworte": "Ein Klick auf Einladen schickt die Einladung los. Im Video lassen wir das Beispiel stehen."
+        },
+        {
+          "t": 211,
+          "titel": "Verbindungscode",
+          "stichworte": "Kunden mit eigenem Abo erzeugen in DealPilot einen Code und geben ihn dir, etwa im Termin. Du trägst ihn hier ein, der Kunde bestätigt. Auch hier schlägst du die Freigabe vor."
+        },
+        {
+          "t": 229,
+          "titel": "Platz nur bei Bedarf",
+          "stichworte": "Den Haken Partnerplatz mitgeben nimmst du raus, wenn der Kunde sein eigenes Abo behält."
+        },
+        {
+          "t": 252,
+          "titel": "Mein Partner",
+          "stichworte": "Thomas Weber findet die Anfrage unter Mein Partner in der linken Leiste. Unten in der App erscheint dazu ein Hinweis."
+        },
+        {
+          "t": 267,
+          "titel": "Die Anfrage",
+          "stichworte": "Mein Partner öffnet sich wie dein Cockpit, mit eigenen Reitern. Oben steht die Anfrage."
+        },
+        {
+          "t": 281,
+          "titel": "Er entscheidet",
+          "stichworte": "Der Kunde sieht, wer sich verbinden will und was das heißt. Mit Platz bezahlst du seinen Zugang. Erst seine Bestätigung verbindet euch."
+        },
+        {
+          "t": 296,
+          "titel": "Die Freigabe",
+          "stichworte": "Im selben Fenster wählt er, was du anfordern darfst: Dauerhaft, Einmalig oder Noch nicht."
+        },
+        {
+          "t": 307,
+          "titel": "Was du siehst",
+          "stichworte": "Du siehst nur, was er dir ausdrücklich sendet, als Kopie. Freigabe ändern, widerrufen oder trennen kann er jederzeit."
+        },
+        {
+          "t": 321,
+          "titel": "Der Code für dich",
+          "stichworte": "Hier erzeugt der Kunde den Verbindungscode, wenn er sich selbst mit dir verbinden möchte. Er gilt 24 Stunden und nur einmal."
+        },
+        {
+          "t": 336,
+          "titel": "Weiter geht’s",
+          "stichworte": "Sobald er bestätigt, steht er bei dir unter Kunden & Plätze. Im nächsten Video: Objekte senden."
+        }
+      ],
+      "poster": "dealpilot-partner-2-vorschau-v3650.webp",
+      "kapitel": [
+        {
+          "t": 11,
+          "titel": "Kunden & Plätze",
+          "stichworte": "Hier stehen alle Kunden, die mit dir verbunden sind, und alle, die noch zusagen müssen."
+        },
+        {
+          "t": 23,
+          "titel": "Mit Partnerplatz",
+          "stichworte": "Jonas Berger nutzt einen Platz von dir. Du bezahlst seinen Zugang und bestimmst Stufe, Rechte und Marke."
+        },
+        {
+          "t": 35,
+          "titel": "Kundennummer",
+          "stichworte": "Jeder verbundene Kunde bekommt eine Nummer, hier K-2026-001. Sie zählt je Jahr fortlaufend, du kannst sie ändern."
+        },
+        {
+          "t": 48,
+          "titel": "Mit eigenem Abo",
+          "stichworte": "Sabine Kraus hat DealPilot schon selbst gebucht. Sie verbindet sich mit dir und behält ihren Plan. Ein Platz wird dafür nicht gebraucht."
+        },
+        {
+          "t": 63,
+          "titel": "Wartet auf Zusage",
+          "stichworte": "Thomas Weber ist eingeladen und hat noch nicht bestätigt. Ohne seine Zusage entsteht keine Verbindung."
+        },
+        {
+          "t": 79,
+          "titel": "Stufe und Rechte",
+          "stichworte": "Ein Fenster mit Reitern wie der Restnutzungsdauer-Rechner: Kunde, Stufe, Rechte, Einstellungen, Kontingente, Marke, Platz."
+        },
+        {
+          "t": 93,
+          "titel": "Kunde",
+          "stichworte": "Kundennummer, eine Notiz nur für dein Team und die E-Mail bei Rückmeldung, je Kunde an- oder abschaltbar."
+        },
+        {
+          "t": 108,
+          "titel": "Stufe",
+          "stichworte": "Wie viel dein Kunde sieht: Einsteiger, Fortgeschritten oder Experte."
+        },
+        {
+          "t": 121,
+          "titel": "Rechte",
+          "stichworte": "Mit an und aus nimmst du einzelne Funktionen aus dem Platz, zum Beispiel PDFs, Marktbericht oder KI."
+        },
+        {
+          "t": 135,
+          "titel": "Marke",
+          "stichworte": "Deine Marke oder DealPilot. Gespeichert wird einmal unten."
+        },
+        {
+          "t": 149,
+          "titel": "Per E-Mail einladen",
+          "stichworte": "Name und Adresse eintragen. Hat die Adresse schon ein DealPilot-Konto, bekommt der Kunde eine Anfrage in seiner App, sonst eine Einladung per E-Mail."
+        },
+        {
+          "t": 168,
+          "titel": "Mit oder ohne Platz",
+          "stichworte": "Mit Partnerplatz bezahlst du den Zugang. Ohne Platz nutzt der Kunde seinen eigenen Plan. Hat er schon ein Abo, wird er automatisch ohne Platz verbunden."
+        },
+        {
+          "t": 184,
+          "titel": "Freigabe vorschlagen",
+          "stichworte": "Du schlägst vor, was der Kunde freigibt, hier Dauerhaft mit Steuer. Er sieht den Vorschlag beim Bestätigen und entscheidet selbst."
+        },
+        {
+          "t": 199,
+          "titel": "Einladen",
+          "stichworte": "Ein Klick auf Einladen schickt die Einladung los. Im Video lassen wir das Beispiel stehen."
+        },
+        {
+          "t": 211,
+          "titel": "Verbindungscode",
+          "stichworte": "Kunden mit eigenem Abo erzeugen in DealPilot einen Code und geben ihn dir, etwa im Termin. Du trägst ihn hier ein, der Kunde bestätigt. Auch hier schlägst du die Freigabe vor."
+        },
+        {
+          "t": 229,
+          "titel": "Platz nur bei Bedarf",
+          "stichworte": "Den Haken Partnerplatz mitgeben nimmst du raus, wenn der Kunde sein eigenes Abo behält."
+        },
+        {
+          "t": 252,
+          "titel": "Mein Partner",
+          "stichworte": "Thomas Weber findet die Anfrage unter Mein Partner in der linken Leiste. Unten in der App erscheint dazu ein Hinweis."
+        },
+        {
+          "t": 267,
+          "titel": "Die Anfrage",
+          "stichworte": "Mein Partner öffnet sich wie dein Cockpit, mit eigenen Reitern. Oben steht die Anfrage."
+        },
+        {
+          "t": 281,
+          "titel": "Er entscheidet",
+          "stichworte": "Der Kunde sieht, wer sich verbinden will und was das heißt. Mit Platz bezahlst du seinen Zugang. Erst seine Bestätigung verbindet euch."
+        },
+        {
+          "t": 296,
+          "titel": "Die Freigabe",
+          "stichworte": "Im selben Fenster wählt er, was du anfordern darfst: Dauerhaft, Einmalig oder Noch nicht."
+        },
+        {
+          "t": 307,
+          "titel": "Was du siehst",
+          "stichworte": "Du siehst nur, was er dir ausdrücklich sendet, als Kopie. Freigabe ändern, widerrufen oder trennen kann er jederzeit."
+        },
+        {
+          "t": 321,
+          "titel": "Der Code für dich",
+          "stichworte": "Hier erzeugt der Kunde den Verbindungscode, wenn er sich selbst mit dir verbinden möchte. Er gilt 24 Stunden und nur einmal."
+        },
+        {
+          "t": 336,
+          "titel": "Weiter geht’s",
+          "stichworte": "Sobald er bestätigt, steht er bei dir unter Kunden & Plätze. Im nächsten Video: Objekte senden."
+        }
+      ]
     },
     {
-     "id": "partner-3",
-     "kategorie": "partner",
-     "nr": 3,
-     "dauer": 302,
-     "titel": "Objekte senden und übernehmen",
-     "unterzeile": "Vom Kunden ins Cockpit, und als eigenes Objekt weiter.",
-     "story": "Die Kundin sendet ein Objekt über Mein Partner. Der Partner sieht es unter Freigegeben, je Kunde und Stand, öffnet es nur lesend und übernimmt es mit Kundenbezug als eigenes Objekt. Die Objektliste sortiert nach Kunde.",
-     "datei": "dealpilot-partner-3-objekte-senden-und-uebernehmen-v3650.mp4",
-     "datei_ton": "dealpilot-partner-3-objekte-senden-und-uebernehmen-v3680-marcel.mp4",
-     "dauer_ton": 201,
-     "kapitel_ton": [{"t":12,"titel":"Freigegeben","stichworte":"Unter Freigegeben stehen alle Objekte, die deine Kunden dir gesendet haben. Gerade sind es 3."},{"t":27,"titel":"Ein neues Objekt","stichworte":"Sabine Kraus rechnet gerade Musterweg 3, Bielefeld. Sie möchte deine Meinung dazu."},{"t":36,"titel":"Mein Partner","stichworte":"Unter Mein Partner sendet sie Objekte an dich."},{"t":41,"titel":"Nur eine Kopie","stichworte":"Gesendet wird eine Kopie. Du siehst nur, was sie dir sendet, nie ihre übrigen Objekte. Ihr Original bleibt bei ihr."},{"t":51,"titel":"Auswählen","stichworte":"Haken setzen. Mehrere Objekte gehen auf einmal, mit Gesamter Bestand auch alle."},{"t":60,"titel":"An Partner senden","stichworte":"Noch einmal klar gesagt, was passiert. Dann Senden."},{"t":67,"titel":"Meine Sendungen","stichworte":"Sie sieht, welcher Stand bei dir liegt und ob du ihn schon geöffnet hast. Ändert sie das Objekt, sendet sie einfach einen neuen Stand."},{"t":82,"titel":"Was ansteht","stichworte":"In der Übersicht steht es sofort: 2 neue Stände von Sabine Kraus (Demo). Dazu eine Meldung."},{"t":91,"titel":"Je Kunde","stichworte":"Gefiltert nach Kunde K-2026-002. Am Objekt steht Ankauf oder Bestand, welcher Stand und wann. Neu heißt: noch nicht geöffnet."},{"t":106,"titel":"Stand 2","stichworte":"Bei Jonas siehst du Stand 2. Jeder neue Stand ersetzt den alten, dazu 1 Rückfrage zu deinen Anmerkungen."},{"t":117,"titel":"Nur lesen","stichworte":"Du siehst das Objekt mit allen Zahlen, Reitern und Unterlagen, so wie Sabine es gerechnet hat. Ändern kannst du hier nichts."},{"t":127,"titel":"Alles da","stichworte":"Kennzahlen, Score und Bewertung stehen wie bei deinen eigenen Objekten. Rechnen und PDFs erstellen geht auch."},{"t":136,"titel":"Als eigenes Objekt übernehmen","stichworte":"Willst du damit weiterarbeiten, übernimmst du es. DealPilot legt eine eigene Kopie bei dir an."},{"t":146,"titel":"Mit Kundenbezug","stichworte":"Die Kopie trägt den Kunden K-2026-002 · Sabine Kraus. Sie bleibt bei dir, auch wenn Sabine ihren Stand zurückzieht."},{"t":158,"titel":"Dein Objekt","stichworte":"Jetzt ist es dein Objekt mit eigener Nummer 2026-002. Du kannst es frei bearbeiten."},{"t":168,"titel":"Sortieren nach Kunde","stichworte":"In der Objektliste sortierst du nach Kunde oder zeigst nur die Objekte eines Kunden."},{"t":177,"titel":"Je Kunde gruppiert","stichworte":"Übernimmst du einen späteren Stand noch einmal, fragt DealPilot: Bestehendes aktualisieren oder neue Kopie."},{"t":187,"titel":"Weiter geht’s","stichworte":"Im nächsten Video: Anmerkungen an den Kundenstand schreiben und zurückgeben."}],
-     "poster": "dealpilot-partner-3-vorschau-v3650.webp",
-     "kapitel": [
-      {
-       "t": 12,
-       "titel": "Freigegeben",
-       "stichworte": "Unter Freigegeben stehen alle Objekte, die deine Kunden dir gesendet haben. Gerade sind es 3."
-      },
-      {
-       "t": 35,
-       "titel": "Ein neues Objekt",
-       "stichworte": "Sabine Kraus rechnet gerade Musterweg 3, Bielefeld. Sie möchte deine Meinung dazu."
-      },
-      {
-       "t": 47,
-       "titel": "Mein Partner",
-       "stichworte": "Unter Mein Partner sendet sie Objekte an dich."
-      },
-      {
-       "t": 57,
-       "titel": "Nur eine Kopie",
-       "stichworte": "Gesendet wird eine Kopie. Du siehst nur, was sie dir sendet, nie ihre übrigen Objekte. Ihr Original bleibt bei ihr."
-      },
-      {
-       "t": 71,
-       "titel": "Auswählen",
-       "stichworte": "Haken setzen. Mehrere Objekte gehen auf einmal, mit Gesamter Bestand auch alle."
-      },
-      {
-       "t": 84,
-       "titel": "An Partner senden",
-       "stichworte": "Noch einmal klar gesagt, was passiert. Dann Senden."
-      },
-      {
-       "t": 95,
-       "titel": "Meine Sendungen",
-       "stichworte": "Sie sieht, welcher Stand bei dir liegt und ob du ihn schon geöffnet hast. Ändert sie das Objekt, sendet sie einfach einen neuen Stand."
-      },
-      {
-       "t": 122,
-       "titel": "Was ansteht",
-       "stichworte": "In der Übersicht steht es sofort: 2 neue Stände von Sabine Kraus (Demo). Dazu eine Meldung."
-      },
-      {
-       "t": 140,
-       "titel": "Je Kunde",
-       "stichworte": "Gefiltert nach Kunde K-2026-002. Am Objekt steht Ankauf oder Bestand, welcher Stand und wann. Neu heißt: noch nicht geöffnet."
-      },
-      {
-       "t": 155,
-       "titel": "Stand 2",
-       "stichworte": "Bei Jonas siehst du Stand 2. Jeder neue Stand ersetzt den alten, dazu 1 Rückfrage zu deinen Anmerkungen."
-      },
-      {
-       "t": 173,
-       "titel": "Nur lesen",
-       "stichworte": "Du siehst das Objekt mit allen Zahlen, Reitern und Unterlagen, so wie Sabine es gerechnet hat. Ändern kannst du hier nichts."
-      },
-      {
-       "t": 190,
-       "titel": "Alles da",
-       "stichworte": "Kennzahlen, Score und Bewertung stehen wie bei deinen eigenen Objekten. Rechnen und PDFs erstellen geht auch."
-      },
-      {
-       "t": 204,
-       "titel": "Als eigenes Objekt übernehmen",
-       "stichworte": "Willst du damit weiterarbeiten, übernimmst du es. DealPilot legt eine eigene Kopie bei dir an."
-      },
-      {
-       "t": 218,
-       "titel": "Mit Kundenbezug",
-       "stichworte": "Die Kopie trägt den Kunden K-2026-002 · Sabine Kraus. Sie bleibt bei dir, auch wenn Sabine ihren Stand zurückzieht."
-      },
-      {
-       "t": 235,
-       "titel": "Dein Objekt",
-       "stichworte": "Jetzt ist es dein Objekt mit eigener Nummer 2026-002. Du kannst es frei bearbeiten."
-      },
-      {
-       "t": 252,
-       "titel": "Sortieren nach Kunde",
-       "stichworte": "In der Objektliste sortierst du nach Kunde oder zeigst nur die Objekte eines Kunden."
-      },
-      {
-       "t": 266,
-       "titel": "Je Kunde gruppiert",
-       "stichworte": "Übernimmst du einen späteren Stand noch einmal, fragt DealPilot: Bestehendes aktualisieren oder neue Kopie."
-      },
-      {
-       "t": 280,
-       "titel": "Weiter geht’s",
-       "stichworte": "Im nächsten Video: Anmerkungen an den Kundenstand schreiben und zurückgeben."
-      }
-     ]
+      "id": "partner-3",
+      "kategorie": "partner",
+      "nr": 3,
+      "dauer": 316,
+      "titel": "Objekte senden und übernehmen",
+      "unterzeile": "Vom Kunden ins Cockpit, und als eigenes Objekt weiter.",
+      "story": "Die Kundin sendet ein Objekt über Mein Partner. Der Partner sieht es unter Freigegeben, je Kunde und Stand, öffnet es nur lesend und übernimmt es mit Kundenbezug als eigenes Objekt. Die Objektliste sortiert nach Kunde.",
+      "datei": "dealpilot-partner-3-objekte-senden-und-uebernehmen-v3730.mp4",
+      "datei_ton": "dealpilot-partner-3-objekte-senden-und-uebernehmen-v3730-marcel.mp4",
+      "dauer_ton": 316,
+      "kapitel_ton": [
+        {
+          "t": 11,
+          "titel": "Freigegeben",
+          "stichworte": "Unter Freigegeben stehen alle Objekte, die deine Kunden dir gesendet haben. Gerade sind es 3."
+        },
+        {
+          "t": 34,
+          "titel": "Ein neues Objekt",
+          "stichworte": "Sabine Kraus rechnet gerade Musterweg 3, Bielefeld. Sie möchte deine Meinung dazu."
+        },
+        {
+          "t": 46,
+          "titel": "Mein Partner",
+          "stichworte": "Unter Mein Partner sendet sie Objekte an dich."
+        },
+        {
+          "t": 56,
+          "titel": "Nur eine Kopie",
+          "stichworte": "Gesendet wird eine Kopie. Du siehst nur, was sie dir sendet, nie ihre übrigen Objekte. Ihr Original bleibt bei ihr."
+        },
+        {
+          "t": 70,
+          "titel": "Auswählen",
+          "stichworte": "Haken setzen. Mehrere Objekte gehen auf einmal, mit Gesamter Bestand auch alle."
+        },
+        {
+          "t": 84,
+          "titel": "An Partner senden",
+          "stichworte": "Noch einmal klar gesagt, was passiert. Dann Senden."
+        },
+        {
+          "t": 94,
+          "titel": "Meine Sendungen",
+          "stichworte": "Sie sieht, welcher Stand bei dir liegt und ob du ihn schon geöffnet hast. Ändert sie das Objekt, sendet sie einfach einen neuen Stand."
+        },
+        {
+          "t": 120,
+          "titel": "Was ansteht",
+          "stichworte": "In der Übersicht steht es sofort: 2 neue Stände von Sabine Kraus. Dazu eine Meldung."
+        },
+        {
+          "t": 137,
+          "titel": "Je Kunde",
+          "stichworte": "Gefiltert nach Kunde K-2026-002. Am Objekt steht Ankauf oder Bestand, welcher Stand und wann. Neu heißt: noch nicht geöffnet."
+        },
+        {
+          "t": 152,
+          "titel": "Stand 2",
+          "stichworte": "Bei Jonas siehst du Stand 2. Jeder neue Stand ersetzt den alten, dazu 1 Rückfrage zu deinen Anmerkungen."
+        },
+        {
+          "t": 169,
+          "titel": "Nur lesen",
+          "stichworte": "Du siehst das Objekt mit allen Zahlen, Reitern und Unterlagen, so wie Sabine es gerechnet hat. Ändern kannst du hier nichts."
+        },
+        {
+          "t": 185,
+          "titel": "Alles da",
+          "stichworte": "Kennzahlen, Score und Bewertung stehen wie bei deinen eigenen Objekten. Rechnen und PDFs erstellen geht auch."
+        },
+        {
+          "t": 200,
+          "titel": "Als eigenes Objekt übernehmen",
+          "stichworte": "Willst du damit weiterarbeiten, übernimmst du es. DealPilot legt eine eigene Kopie bei dir an."
+        },
+        {
+          "t": 213,
+          "titel": "Mit Kundenbezug",
+          "stichworte": "Die Kopie trägt den Kunden K-2026-002 · Sabine Kraus. Sie bleibt bei dir, auch wenn Sabine ihren Stand zurückzieht."
+        },
+        {
+          "t": 227,
+          "titel": "Wofür?",
+          "stichworte": "Für den Kunden weiterführen oder In meinen eigenen Bestand. Für den Kunden rechnet es weiter mit seinem Steuerprofil und zählt nicht zu deinem Bestand."
+        },
+        {
+          "t": 246,
+          "titel": "Für den Kunden weitergeführt",
+          "stichworte": "Es liegt jetzt bei dir mit eigener Nummer 2026-002, für Sabine weitergeführt. Ein neuer Stand von ihr aktualisiert es."
+        },
+        {
+          "t": 266,
+          "titel": "Sortieren nach Kunde",
+          "stichworte": "In der Objektliste sortierst du nach Kunde oder zeigst nur die Objekte eines Kunden."
+        },
+        {
+          "t": 279,
+          "titel": "Je Kunde gruppiert",
+          "stichworte": "Übernimmst du einen späteren Stand noch einmal, fragt DealPilot: Bestehendes aktualisieren oder neue Kopie."
+        },
+        {
+          "t": 294,
+          "titel": "Weiter geht’s",
+          "stichworte": "Im nächsten Video: Anmerkungen an den Kundenstand schreiben und zurückgeben."
+        }
+      ],
+      "poster": "dealpilot-partner-3-vorschau-v3650.webp",
+      "kapitel": [
+        {
+          "t": 11,
+          "titel": "Freigegeben",
+          "stichworte": "Unter Freigegeben stehen alle Objekte, die deine Kunden dir gesendet haben. Gerade sind es 3."
+        },
+        {
+          "t": 34,
+          "titel": "Ein neues Objekt",
+          "stichworte": "Sabine Kraus rechnet gerade Musterweg 3, Bielefeld. Sie möchte deine Meinung dazu."
+        },
+        {
+          "t": 46,
+          "titel": "Mein Partner",
+          "stichworte": "Unter Mein Partner sendet sie Objekte an dich."
+        },
+        {
+          "t": 56,
+          "titel": "Nur eine Kopie",
+          "stichworte": "Gesendet wird eine Kopie. Du siehst nur, was sie dir sendet, nie ihre übrigen Objekte. Ihr Original bleibt bei ihr."
+        },
+        {
+          "t": 70,
+          "titel": "Auswählen",
+          "stichworte": "Haken setzen. Mehrere Objekte gehen auf einmal, mit Gesamter Bestand auch alle."
+        },
+        {
+          "t": 84,
+          "titel": "An Partner senden",
+          "stichworte": "Noch einmal klar gesagt, was passiert. Dann Senden."
+        },
+        {
+          "t": 94,
+          "titel": "Meine Sendungen",
+          "stichworte": "Sie sieht, welcher Stand bei dir liegt und ob du ihn schon geöffnet hast. Ändert sie das Objekt, sendet sie einfach einen neuen Stand."
+        },
+        {
+          "t": 120,
+          "titel": "Was ansteht",
+          "stichworte": "In der Übersicht steht es sofort: 2 neue Stände von Sabine Kraus. Dazu eine Meldung."
+        },
+        {
+          "t": 137,
+          "titel": "Je Kunde",
+          "stichworte": "Gefiltert nach Kunde K-2026-002. Am Objekt steht Ankauf oder Bestand, welcher Stand und wann. Neu heißt: noch nicht geöffnet."
+        },
+        {
+          "t": 152,
+          "titel": "Stand 2",
+          "stichworte": "Bei Jonas siehst du Stand 2. Jeder neue Stand ersetzt den alten, dazu 1 Rückfrage zu deinen Anmerkungen."
+        },
+        {
+          "t": 169,
+          "titel": "Nur lesen",
+          "stichworte": "Du siehst das Objekt mit allen Zahlen, Reitern und Unterlagen, so wie Sabine es gerechnet hat. Ändern kannst du hier nichts."
+        },
+        {
+          "t": 185,
+          "titel": "Alles da",
+          "stichworte": "Kennzahlen, Score und Bewertung stehen wie bei deinen eigenen Objekten. Rechnen und PDFs erstellen geht auch."
+        },
+        {
+          "t": 200,
+          "titel": "Als eigenes Objekt übernehmen",
+          "stichworte": "Willst du damit weiterarbeiten, übernimmst du es. DealPilot legt eine eigene Kopie bei dir an."
+        },
+        {
+          "t": 213,
+          "titel": "Mit Kundenbezug",
+          "stichworte": "Die Kopie trägt den Kunden K-2026-002 · Sabine Kraus. Sie bleibt bei dir, auch wenn Sabine ihren Stand zurückzieht."
+        },
+        {
+          "t": 227,
+          "titel": "Wofür?",
+          "stichworte": "Für den Kunden weiterführen oder In meinen eigenen Bestand. Für den Kunden rechnet es weiter mit seinem Steuerprofil und zählt nicht zu deinem Bestand."
+        },
+        {
+          "t": 246,
+          "titel": "Für den Kunden weitergeführt",
+          "stichworte": "Es liegt jetzt bei dir mit eigener Nummer 2026-002, für Sabine weitergeführt. Ein neuer Stand von ihr aktualisiert es."
+        },
+        {
+          "t": 266,
+          "titel": "Sortieren nach Kunde",
+          "stichworte": "In der Objektliste sortierst du nach Kunde oder zeigst nur die Objekte eines Kunden."
+        },
+        {
+          "t": 279,
+          "titel": "Je Kunde gruppiert",
+          "stichworte": "Übernimmst du einen späteren Stand noch einmal, fragt DealPilot: Bestehendes aktualisieren oder neue Kopie."
+        },
+        {
+          "t": 294,
+          "titel": "Weiter geht’s",
+          "stichworte": "Im nächsten Video: Anmerkungen an den Kundenstand schreiben und zurückgeben."
+        }
+      ]
     },
     {
      "id": "partner-4",
@@ -1408,81 +2087,172 @@
      ]
     },
     {
-     "id": "partner-kunde-1",
-     "kategorie": "partner",
-     "nr": "K1",
-     "dauer": 284,
-     "titel": "Mit deinem Partner arbeiten",
-     "unterzeile": "Für Kunden: verbinden, Objekte senden, Anmerkungen bearbeiten.",
-     "story": "Für Kunden eines Partners. Einladung annehmen oder per Verbindungscode verbinden, ein Objekt senden, Anmerkungen mit Bildausschnitt ansehen, erledigen oder zurückfragen, erneut senden und unter Freigaben sehen, was dein Partner sieht.",
-     "nutzen": "Du weißt danach, wie du dich mit deinem Berater verbindest, Objekte sendest und seine Anmerkungen bearbeitest. Du entscheidest, was er sieht.",
-     "datei": "dealpilot-kunde-1-mit-deinem-partner-arbeiten-v3650.mp4",
-     "datei_ton": "dealpilot-kunde-1-mit-deinem-partner-arbeiten-v3680-marcel.mp4",
-     "dauer_ton": 190,
-     "kapitel_ton": [{"t":11,"titel":"Einladung annehmen","stichworte":"Lädt dich dein Berater ein, steht seine Anfrage unter Mein Partner. Ein Klick auf Ansehen."},{"t":24,"titel":"Du entscheidest","stichworte":"Du siehst, wer sich verbinden will und was das heißt. Erst deine Bestätigung verbindet euch."},{"t":42,"titel":"Verbunden","stichworte":"Jetzt in der Marke deines Partners, mit deinen Reitern: An Partner senden, Meine Sendungen, Aufgaben, Freigaben."},{"t":61,"titel":"Code erzeugen","stichworte":"Mit eigenem Abo erzeugst du einen Verbindungscode und gibst ihn deinem Berater. Er gilt 24 Stunden und nur einmal."},{"t":81,"titel":"Bestätigen","stichworte":"Die Anfrage ist da. Bestätigst du, seid ihr verbunden. Dein Plan und deine Einstellungen bleiben."},{"t":100,"titel":"Objekt senden","stichworte":"Haken setzen und An Partner senden. Dein Berater bekommt eine Kopie, dein Original bleibt bei dir."},{"t":111,"titel":"Erst bearbeiten","stichworte":"Die Musterstraße ist gesperrt: 2 Anmerkungen deines Beraters sind offen. Senden geht erst, wenn jede erledigt oder beantwortet ist."},{"t":123,"titel":"Mit Bildausschnitt","stichworte":"Du landest in deinem Objekt, rechts die Anmerkungen. Dein Berater hat die Stelle markiert, ein Klick öffnet das Bild groß."},{"t":142,"titel":"Rückfrage","stichworte":"Passt etwas nicht, fragst du zurück. Als Rückfrage senden zählt auch als bearbeitet."},{"t":152,"titel":"Erledigt","stichworte":"Hast du es erledigt, ein Klick auf Erledigt. Dein Berater sieht erledigt in Grün und Rückfragen in Blau."},{"t":159,"titel":"Erneut senden","stichworte":"Alles bearbeitet, also ist Erneut senden frei. Dein Berater bekommt den neuen Stand und eine Meldung."},{"t":171,"titel":"Freigaben","stichworte":"Hier steht, was dein Berater sieht und was dein Zugang darf, dazu deine Kundennummer K-2026-001. Trennen kannst du jederzeit unter Verbindun"}],
-     "poster": "dealpilot-kunde-1-vorschau-v3650.webp",
-     "kapitel": [
-      {
-       "t": 17,
-       "titel": "Einladung annehmen",
-       "stichworte": "Lädt dich dein Berater ein, steht seine Anfrage unter Mein Partner. Ein Klick auf Ansehen."
-      },
-      {
-       "t": 32,
-       "titel": "Du entscheidest",
-       "stichworte": "Du siehst, wer sich verbinden will und was das heißt. Erst deine Bestätigung verbindet euch."
-      },
-      {
-       "t": 57,
-       "titel": "Verbunden",
-       "stichworte": "Jetzt in der Marke deines Partners, mit deinen Reitern: An Partner senden, Meine Sendungen, Aufgaben, Freigaben."
-      },
-      {
-       "t": 88,
-       "titel": "Code erzeugen",
-       "stichworte": "Mit eigenem Abo erzeugst du einen Verbindungscode und gibst ihn deinem Berater. Er gilt 24 Stunden und nur einmal."
-      },
-      {
-       "t": 110,
-       "titel": "Bestätigen",
-       "stichworte": "Die Anfrage ist da. Bestätigst du, seid ihr verbunden. Dein Plan und deine Einstellungen bleiben."
-      },
-      {
-       "t": 142,
-       "titel": "Objekt senden",
-       "stichworte": "Haken setzen und An Partner senden. Dein Berater bekommt eine Kopie, dein Original bleibt bei dir."
-      },
-      {
-       "t": 162,
-       "titel": "Erst bearbeiten",
-       "stichworte": "Die Musterstraße ist gesperrt: 2 Anmerkungen deines Beraters sind offen. Senden geht erst, wenn jede erledigt oder beantwortet ist."
-      },
-      {
-       "t": 183,
-       "titel": "Mit Bildausschnitt",
-       "stichworte": "Du landest in deinem Objekt, rechts die Anmerkungen. Dein Berater hat die Stelle markiert, ein Klick öffnet das Bild groß."
-      },
-      {
-       "t": 209,
-       "titel": "Rückfrage",
-       "stichworte": "Passt etwas nicht, fragst du zurück. Als Rückfrage senden zählt auch als bearbeitet."
-      },
-      {
-       "t": 225,
-       "titel": "Erledigt",
-       "stichworte": "Hast du es erledigt, ein Klick auf Erledigt. Dein Berater sieht erledigt in Grün und Rückfragen in Blau."
-      },
-      {
-       "t": 237,
-       "titel": "Erneut senden",
-       "stichworte": "Alles bearbeitet, also ist Erneut senden frei. Dein Berater bekommt den neuen Stand und eine Meldung."
-      },
-      {
-       "t": 257,
-       "titel": "Freigaben",
-       "stichworte": "Hier steht, was dein Berater sieht und was dein Zugang darf, dazu deine Kundennummer K-2026-001. Trennen kannst du jederzeit unter Verbindun"
-      }
-     ]
+      "id": "partner-kunde-1",
+      "kategorie": "partner",
+      "nr": "K1",
+      "dauer": 325,
+      "titel": "Mit deinem Partner arbeiten",
+      "unterzeile": "Für Kunden: verbinden, Objekte senden, Anmerkungen bearbeiten.",
+      "story": "Für Kunden eines Partners. Einladung annehmen oder per Verbindungscode verbinden, ein Objekt senden, Anmerkungen mit Bildausschnitt ansehen, erledigen oder zurückfragen, erneut senden und unter Freigaben sehen, was dein Partner sieht.",
+      "nutzen": "Du weißt danach, wie du dich mit deinem Berater verbindest, Objekte sendest und seine Anmerkungen bearbeitest. Du entscheidest, was er sieht.",
+      "datei": "dealpilot-kunde-1-mit-deinem-partner-arbeiten-v3730.mp4",
+      "datei_ton": "dealpilot-kunde-1-mit-deinem-partner-arbeiten-v3730-marcel.mp4",
+      "dauer_ton": 325,
+      "kapitel_ton": [
+        {
+          "t": 14,
+          "titel": "Einladung annehmen",
+          "stichworte": "Lädt dich dein Berater ein, steht seine Anfrage unter Mein Partner. Ein Klick auf Ansehen."
+        },
+        {
+          "t": 28,
+          "titel": "Du entscheidest",
+          "stichworte": "Du siehst, wer sich verbinden will und was das heißt. Erst deine Bestätigung verbindet euch."
+        },
+        {
+          "t": 43,
+          "titel": "Die Freigabe",
+          "stichworte": "Im selben Fenster legst du fest, was dein Berater anfordern darf, hier Dauerhaft für Objekte. Ändern oder widerrufen geht später unter Freigaben."
+        },
+        {
+          "t": 68,
+          "titel": "Verbunden",
+          "stichworte": "Jetzt in der Marke deines Partners, mit deinen Reitern: An Partner senden, Meine Sendungen, Aufgaben, Freigaben."
+        },
+        {
+          "t": 96,
+          "titel": "Code erzeugen",
+          "stichworte": "Mit eigenem Abo erzeugst du einen Verbindungscode und gibst ihn deinem Berater. Er gilt 24 Stunden und nur einmal."
+        },
+        {
+          "t": 118,
+          "titel": "Bestätigen",
+          "stichworte": "Die Anfrage ist da. Bestätigst du, seid ihr verbunden. Dein Plan und deine Einstellungen bleiben."
+        },
+        {
+          "t": 132,
+          "titel": "Die Freigabe",
+          "stichworte": "Im selben Fenster legst du fest, was dein Berater anfordern darf, hier Einmalig für Objekte. Ändern oder widerrufen geht später unter Freigaben."
+        },
+        {
+          "t": 166,
+          "titel": "Objekt senden",
+          "stichworte": "Haken setzen und An Partner senden. Dein Berater bekommt eine Kopie, dein Original bleibt bei dir."
+        },
+        {
+          "t": 186,
+          "titel": "Erst bearbeiten",
+          "stichworte": "Die Musterstraße ist gesperrt: 2 Anmerkungen deines Beraters sind offen. Senden geht erst, wenn jede erledigt oder beantwortet ist."
+        },
+        {
+          "t": 207,
+          "titel": "Mit Bildausschnitt",
+          "stichworte": "Du landest in deinem Objekt, rechts die Anmerkungen. Dein Berater hat die Stelle markiert, ein Klick öffnet das Bild groß."
+        },
+        {
+          "t": 233,
+          "titel": "Rückfrage",
+          "stichworte": "Passt etwas nicht, fragst du zurück. Als Rückfrage senden zählt auch als bearbeitet."
+        },
+        {
+          "t": 248,
+          "titel": "Erledigt",
+          "stichworte": "Hast du es erledigt, ein Klick auf Erledigt. Dein Berater sieht erledigt in Grün und Rückfragen in Blau."
+        },
+        {
+          "t": 261,
+          "titel": "Erneut senden",
+          "stichworte": "Alles bearbeitet, also ist Erneut senden frei. Dein Berater bekommt den neuen Stand und eine Meldung."
+        },
+        {
+          "t": 281,
+          "titel": "Freigaben",
+          "stichworte": "Hier steht, was dein Berater anfordern darf. Noch keine Freigabe. Ihr seid verbunden, und du sendest nur, wenn du selbst etwas auswählst. Dann gehen nur die Objekte mit. Mit Freigabe erteilen gibst du sie frei."
+        },
+        {
+          "t": 300,
+          "titel": "Verlauf",
+          "stichworte": "Jede Fassung bleibt erhalten, so ist belegbar, was wann galt. Trennen kannst du jederzeit unter Verbindung."
+        }
+      ],
+      "poster": "dealpilot-kunde-1-vorschau-v3650.webp",
+      "kapitel": [
+        {
+          "t": 14,
+          "titel": "Einladung annehmen",
+          "stichworte": "Lädt dich dein Berater ein, steht seine Anfrage unter Mein Partner. Ein Klick auf Ansehen."
+        },
+        {
+          "t": 28,
+          "titel": "Du entscheidest",
+          "stichworte": "Du siehst, wer sich verbinden will und was das heißt. Erst deine Bestätigung verbindet euch."
+        },
+        {
+          "t": 43,
+          "titel": "Die Freigabe",
+          "stichworte": "Im selben Fenster legst du fest, was dein Berater anfordern darf, hier Dauerhaft für Objekte. Ändern oder widerrufen geht später unter Freigaben."
+        },
+        {
+          "t": 68,
+          "titel": "Verbunden",
+          "stichworte": "Jetzt in der Marke deines Partners, mit deinen Reitern: An Partner senden, Meine Sendungen, Aufgaben, Freigaben."
+        },
+        {
+          "t": 96,
+          "titel": "Code erzeugen",
+          "stichworte": "Mit eigenem Abo erzeugst du einen Verbindungscode und gibst ihn deinem Berater. Er gilt 24 Stunden und nur einmal."
+        },
+        {
+          "t": 118,
+          "titel": "Bestätigen",
+          "stichworte": "Die Anfrage ist da. Bestätigst du, seid ihr verbunden. Dein Plan und deine Einstellungen bleiben."
+        },
+        {
+          "t": 132,
+          "titel": "Die Freigabe",
+          "stichworte": "Im selben Fenster legst du fest, was dein Berater anfordern darf, hier Einmalig für Objekte. Ändern oder widerrufen geht später unter Freigaben."
+        },
+        {
+          "t": 166,
+          "titel": "Objekt senden",
+          "stichworte": "Haken setzen und An Partner senden. Dein Berater bekommt eine Kopie, dein Original bleibt bei dir."
+        },
+        {
+          "t": 186,
+          "titel": "Erst bearbeiten",
+          "stichworte": "Die Musterstraße ist gesperrt: 2 Anmerkungen deines Beraters sind offen. Senden geht erst, wenn jede erledigt oder beantwortet ist."
+        },
+        {
+          "t": 207,
+          "titel": "Mit Bildausschnitt",
+          "stichworte": "Du landest in deinem Objekt, rechts die Anmerkungen. Dein Berater hat die Stelle markiert, ein Klick öffnet das Bild groß."
+        },
+        {
+          "t": 233,
+          "titel": "Rückfrage",
+          "stichworte": "Passt etwas nicht, fragst du zurück. Als Rückfrage senden zählt auch als bearbeitet."
+        },
+        {
+          "t": 248,
+          "titel": "Erledigt",
+          "stichworte": "Hast du es erledigt, ein Klick auf Erledigt. Dein Berater sieht erledigt in Grün und Rückfragen in Blau."
+        },
+        {
+          "t": 261,
+          "titel": "Erneut senden",
+          "stichworte": "Alles bearbeitet, also ist Erneut senden frei. Dein Berater bekommt den neuen Stand und eine Meldung."
+        },
+        {
+          "t": 281,
+          "titel": "Freigaben",
+          "stichworte": "Hier steht, was dein Berater anfordern darf. Noch keine Freigabe. Ihr seid verbunden, und du sendest nur, wenn du selbst etwas auswählst. Dann gehen nur die Objekte mit. Mit Freigabe erteilen gibst du sie frei."
+        },
+        {
+          "t": 300,
+          "titel": "Verlauf",
+          "stichworte": "Jede Fassung bleibt erhalten, so ist belegbar, was wann galt. Trennen kannst du jederzeit unter Verbindung."
+        }
+      ]
     }
   ],
   "vorbereitet": [
