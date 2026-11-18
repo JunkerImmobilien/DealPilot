@@ -41860,7 +41860,8 @@ html body:has(> #dp-onboarding) #dppk-band { z-index: 99990 !important; }
    - Geführte Eingabe (1440): Gruppennummern .vi-rf-gr-nr 8 px (Hausuntergrenze 8,5 px). */
 @media (max-width: 640px) {
   html body #me_table_wrap .me-ist-alle { min-height: 32px !important; display: inline-flex !important; align-items: center; }
-  html body #kd-btn-ek.btn, html body #kd-btn-d1.btn { min-height: 32px !important; height: auto !important; }
+  /* v3780a · finanzierung-raster.css setzt #s3 #kd-box .kd-knoepfe > .btn {min-height:0 !important} (2,1,0) - hier (2,1,2) */
+  html body #s3 #kd-box .kd-knoepfe > .btn { min-height: 32px !important; height: auto !important; }
   html body .dp-pa-wrap .dp-pa4-seg button.btn-clean,
   html body .dp-pa-wrap .dp-pa4-aktionen button.dp-pa4-akt,
   html body .dp-pa-wrap .dp-ja-jahre button.btn-clean { min-height: 32px !important; }
@@ -41869,4 +41870,7 @@ html body:has(> #dp-onboarding) #dppk-band { z-index: 99990 !important; }
 html body #s3-tax .ytf-table thead th { white-space: normal !important; vertical-align: bottom; }
 html body #s3-tax .ytf-table td.num { white-space: nowrap; }
 html body #bmfOverlay .v292-final-value { white-space: nowrap !important; }
+/* v3780a · dieselbe Umbruchstelle in „= Immobilien-KP 843.000 €“; Status-Auswahl der Steuertabelle zeigte nach dem Kopfumbruch nur „gepla“ */
+html body #bmfOverlay .v292-row-result > span:last-child { white-space: nowrap !important; }
+html body #s3-tax .ytf-table td select { min-width: 98px; }
 html body .vi-rf-gr-nr { font-size: 8.5px !important; }
