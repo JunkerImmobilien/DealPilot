@@ -44812,6 +44812,14 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Falle:** Prod-Hotfixes direkt auf `main` brechen den nächsten Rollout. Künftig jeden Hotfix sofort auch nach staging, oder vor dem Rollout `git log origin/main --not staging` prüfen.
 - **Rest:** Prod-Klickprobe der Absprünge am Demo-Konto (Fahrplan Kanzlei 19.11.) durch Marcel; Anmelden mit echten Konten auf Prod habe ich nicht gemacht.
 
+### Rollouts 1.0.115 / 1.0.116 · 18.11.2026 (Steuer-Prüfbericht, Startseite)
+- **1.0.115 (`b9f0e5a`, rollout-prod):** v3684 GewSt-Kürzung § 9 Nr. 1 S. 1 = Grundsteuer-Betrag ab EZ 2025 (v3268 zurückgenommen), Jahreswerte-Register.
+- **Zwischen 1.0.115 und 1.0.116 per Fast-Forward `staging:main` + `git pull` auf Prod (nur Frontend, kein Neubau, Version nicht gestempelt):** v3685 Steuer-Mappe speichert für GmbH die Gesellschaftssteuer statt der privaten ESt; v3685a Absprung wartet auf die Objektliste; v3686 aktivierte Sanierung in fortgeführten AK (§ 23, Überführung und Exit, Bismarckstr. −66.960 €); v3686a Klausel „Aggressiv“ entfernt; v3687 § 7b über 5.200 €/m² ohne Sonder-AfA (Ausnahmefeld); landing-strecke-3/-4 (Strecke als Startseite, Nutzerzahl eine Quelle, harte Zahlen, live hinter der Strecke, Score-Karte). Der erste dieser Pushes nahm landing-strecke-3 unbeabsichtigt mit (lag schon auf staging), von Marcel gewollt.
+- **1.0.116 (`43edca9`, rollout-prod, Sicherung 10:01):** v3688 übernommene Kundenobjekte (`_von_kunde`) zählen nicht zur Verlustverrechnung des Partners.
+- **Nachweis:** Staging Ravensberger GmbH 2026 tax_delta −4.083 → 0 nach Speichern; Bismarckstr. § 23-Gewinn 485.764 → 418.804; § 7b 8.000 €/m² → 0 €, mit Ausnahme 10.000 €/Jahr, unter Grenze 18.467 €; Prüfer steuer-gesellschaft 64, überführung 145, steuer-audit 126, steuerjahr 36, partner-kunden 54 grün. Prod 200, Backend healthy.
+- **Falle:** Feldwerte per JS für eine Messung zu setzen, speicherte trotz `window.saveObj`-Override (Steuer-Mappe-Testkonto, § 7b-Haken). Zurückgesetzt per jsonb-Update auf Staging, Objekt neu gespeichert.
+- **Rest:** Prüfbericht offen: verbilligte Vermietung < 50 % und Pauschal-Instandhaltung (Fragen an die Kanzlei 19.11.), Verlustvortrag GdE, Gesellschafterdarlehen privat, Verrechnungskonto Abschluss, G-05 Besteuerung je Gesellschaft. Mappen 14–16 bei Prod-Demo nach Öffnen/Speichern der GmbH-Objekte neu erzeugen.
+
 ### v3357–v3359 · 14.11.2026 (nur Staging) · Partner und Kunden, Messkabine
 - **Was:** Partnerkonzept vollständig (Migration 105, `services/partnerKunden.js`, Routen `/partner/*` und `/mein-partner/*`, `js/partner-kunden.js`, Plan-Schutz, Rechte im Backend, Kundenstände ausgeschlossen, Fristen-Takt, Abo-Ende). Messkabine: Schließen-Knöpfe, Schriften, Felder (v3358). Seitenleiste „Von Kunden freigegeben“ (v3359).
 - **Commit:** `32f39ada`, `1457633d`, `31b02e9a`, `519d0995`, `fa8054a9`, `74103560`. Staging-DB vorher gesichert (`/root/backups/haupt-vor3357-*`).
