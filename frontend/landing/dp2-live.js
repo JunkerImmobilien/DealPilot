@@ -21,13 +21,13 @@
    ═══════════════════════════════════════════════════════════════════════ */
 (function () {
   'use strict';
-  var QUELLE = 'assets/videothek/videos.json?v=landing-videothek-15';   /* landing-videothek-15: Partner 1-4 und Kunde 1 mit Marcels Stimme */   /* landing-videothek-14: Dein Gewinn für K1, leerer Kasten ausgeblendet */   /* landing-videothek-13: Partner 1-4 neu und Kunden-Video K1 (v3650, 17.11.2026) */   /* landing-videothek-12: Modul 29 neu, Vorschaubilder v3502 (16.11.2026) */   /* landing-videothek-11: Modul 11, 14, 26, 27 neu aufgenommen mit Marcels Stimme (v3502, 16.11.2026) */   /* landing-partner-videos-1: fünf Partner-Videos mit Sprecher (16.11.2026) */   /* landing-partner-1: Reihe „Für Partner“ */   /* landing-videothek-10: Werbespot 'Das Haus hab ich.' als erstes Video (Marcel 12.11.2026); landing-videothek-9: Modul 26 neu (v3291); landing-videothek-8: 20 Videos neu (N145, v3285); landing-videothek-7: Ue3, Modul 28 */
+  var QUELLE = 'assets/videothek/videos.json?v=landing-partner-videos-6';   /* landing-videothek-15: Partner 1-4 und Kunde 1 mit Marcels Stimme */   /* landing-videothek-14: Dein Gewinn für K1, leerer Kasten ausgeblendet */   /* landing-videothek-13: Partner 1-4 neu und Kunden-Video K1 (v3650, 17.11.2026) */   /* landing-videothek-12: Modul 29 neu, Vorschaubilder v3502 (16.11.2026) */   /* landing-videothek-11: Modul 11, 14, 26, 27 neu aufgenommen mit Marcels Stimme (v3502, 16.11.2026) */   /* landing-partner-videos-1: fünf Partner-Videos mit Sprecher (16.11.2026) */   /* landing-partner-1: Reihe „Für Partner“ */   /* landing-videothek-10: Werbespot 'Das Haus hab ich.' als erstes Video (Marcel 12.11.2026); landing-videothek-9: Modul 26 neu (v3291); landing-videothek-8: 20 Videos neu (N145, v3285); landing-videothek-7: Ue3, Modul 28 */
   /* landing-videothek-4 · Jedes Video gibt es mit und ohne Sprecher (Marcel 19.10.2026:
      „die Videos muss es vertont und unvertont geben"). videos.json traegt je Eintrag
      `datei_ton`; die Wahl merkt sich der Browser, Standard: mit Sprecher. */
   var TON = true;
   try { TON = localStorage.getItem('dp_vt_ton') !== '0'; } catch (e) {}
-  function datei(v) { return ((TON && v && v.datei_ton) ? v.datei_ton : v.datei) + '?v=v3650m'; }   /* v3291 · Modul 26 neu; v3285 · Videothek auf die Aufnahmen vom 09.–11.11.2026 (N145): neu laden statt aus dem Cache; v2967 · neue Stimme */
+  function datei(v) { return ((TON && v && v.datei_ton) ? v.datei_ton : v.datei) + '?v=v3680'; }   /* v3291 · Modul 26 neu; v3285 · Videothek auf die Aufnahmen vom 09.–11.11.2026 (N145): neu laden statt aus dem Cache; v2967 · neue Stimme */
   function bildUrl(v, D) { return D.basis_bilder + v.poster + '?v=v3650'; }   /* v3291 · Modul 26; v3285 · 20 Vorschaubilder aus den neuen Aufnahmen; v2968 · Modul 14/18 */
   function tonText() { return TON ? 'Mit Sprecher ✓' : 'Ohne Sprecher'; }
   var ruhig = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -48,8 +48,11 @@
   }
   /* landing-videothek-5 · Kapitel tragen seit 28.10.2026 eine Zeit: {t, titel, stichworte}.
      Alte Eintraege (nur Name) bleiben lesbar - dann ohne Sprungmarke (t null). */
+  /* landing-partner-videos-6 · die vertonte Fassung kann kuerzer geschnitten sein als die stumme
+     (Partner-Videos 18.11.2026): dann eigene dauer_ton und kapitel_ton. */
+  function dauerVon(v) { return (TON && v && v.datei_ton && v.dauer_ton) ? v.dauer_ton : (v && v.dauer); }
   function kapListe(v) {
-    return (v.kapitel || []).map(function (c) {
+    return (((TON && v.datei_ton && v.kapitel_ton) ? v.kapitel_ton : v.kapitel) || []).map(function (c) {
       return typeof c === 'string' ? { t: null, titel: c, stichworte: '' }
         : { t: (typeof c.t === 'number' && isFinite(c.t)) ? c.t : null, titel: c.titel || '', stichworte: c.stichworte || '' };
     });
@@ -127,7 +130,7 @@
         return '<button class="dpl-w" data-i="' + i + '" aria-label="' + esc(v.titel) + ' abspielen">' +
           '<span class="dpl-wp"></span>' +
           '<img src="' + esc(bildUrl(v, D)) + '" alt="" loading="lazy" width="212" height="119">' +
-          '<span class="dpl-wd">' + mmss(v.dauer) + '</span>' +
+          '<span class="dpl-wd">' + mmss(dauerVon(v)) + '</span>' +
           '<span class="dpl-wt"><span class="dpl-wn">' + esc(v.kategorie === 'ueberblick' ? 'ÜBERBLICK ' + String(v.nr).replace('Ü', '') : 'MODUL ' + v.nr) + '</span><b>' + esc(v.titel) + '</b></span>' +
         '</button>';
       }).join('');
@@ -136,7 +139,7 @@
 
     function karteFuellen(v) {
       inhalt.innerHTML =
-        '<div class="dpl-k-kick"><span>' + esc(nrLabel(v, D)) + '</span><span>' + mmss(v.dauer) + ' Min.</span></div>' +
+        '<div class="dpl-k-kick"><span>' + esc(nrLabel(v, D)) + '</span><span>' + mmss(dauerVon(v)) + ' Min.</span></div>' +
         '<h3>' + esc(v.titel) + '</h3>' +
         '<p class="dpl-unter">' + esc(v.unterzeile) + '</p>' +
         '<p class="dpl-story">' + esc(v.story) + '</p>' +
@@ -157,7 +160,7 @@
         vid.src = D.basis_medien + datei(v);
         karteFuellen(v);
         $('dplFlug').textContent = 'Flug DP-' + String(v.nr).replace('Ü', 'U');
-        $('dplZeit').textContent = '0:00 / ' + mmss(v.dauer);
+        $('dplZeit').textContent = '0:00 / ' + mmss(dauerVon(v));
         $('dplBahnI').style.width = '0%';
         bild.classList.remove('wechsel'); karte.classList.remove('wechsel');
         streifen.querySelectorAll('.dpl-w').forEach(function (b, j) {
@@ -184,7 +187,7 @@
     vid.addEventListener('play', knopfStand);
     vid.addEventListener('pause', knopfStand);
     vid.addEventListener('timeupdate', function () {
-      var d = vid.duration || liste[idx].dauer || 1, p = Math.min(100, vid.currentTime / d * 100);
+      var d = vid.duration || dauerVon(liste[idx]) || 1, p = Math.min(100, vid.currentTime / d * 100);
       $('dplBahnI').style.width = p + '%';
       $('dplZeit').textContent = mmss(vid.currentTime) + ' / ' + mmss(d);
       var akt = streifen.querySelector('.dpl-w.on');
@@ -275,7 +278,7 @@
   }
   function thek(root, D) {
     var V = D.videos || [], K = D.kategorien || [], G = D.geplant || [];
-    var summe = V.reduce(function (a, v) { return a + (v.dauer || 0); }, 0);
+    var summe = V.reduce(function (a, v) { return a + (dauerVon(v) || 0); }, 0);
     var nKap = V.reduce(function (a, v) { return a + kapListe(v).filter(function (c) { return c.t != null; }).length; }, 0);
     var z = document.getElementById('vtZahlen');
     if (z) z.innerHTML =
@@ -317,7 +320,7 @@
           var nk = kapListe(v).filter(function (c) { return c.t != null; }).length;
           return '<button class="vt-k" data-id="' + esc(v.id) + '">' +
             '<span class="vt-kb"><img src="' + esc(bildUrl(v, D)) + '" alt="" loading="lazy" width="480" height="256">' +
-              '<span class="vt-nr">' + esc(v.nr) + '</span><span class="vt-d">' + mmss(v.dauer) + (nk ? ' · ' + nk + ' Kapitel' : '') + '</span><span class="vt-play">' + PLAY + '</span></span>' +
+              '<span class="vt-nr">' + esc(v.nr) + '</span><span class="vt-d">' + mmss(dauerVon(v)) + (nk ? ' · ' + nk + ' Kapitel' : '') + '</span><span class="vt-play">' + PLAY + '</span></span>' +
             '<span class="vt-kt"><b>' + esc(v.titel) + '</b><span class="vt-u">' + esc(v.unterzeile) + '</span><span class="vt-s">' + esc(v.story) + '</span></span>' +
           '</button>';
         }).join('') + gs.map(geplantKarte).join('') + '</div></section>';
@@ -372,7 +375,7 @@
           return '<article class="vt-t">' +
             '<button class="vt-t-kopf" data-id="' + esc(v.id) + '" data-t="0">' +
               '<span class="vt-t-bild"><img src="' + esc(bildUrl(v, D)) + '" alt="" loading="lazy" width="480" height="256"><span class="vt-nr">' + esc(v.nr) + '</span></span>' +
-              '<span class="vt-t-text"><span class="vt-t-kick">' + esc(nrLabel(v, D)) + ' · ' + mmss(v.dauer) + ' Min.</span><b>' + esc(v.titel) + '</b><span class="vt-u">' + esc(v.unterzeile) + '</span></span>' +
+              '<span class="vt-t-text"><span class="vt-t-kick">' + esc(nrLabel(v, D)) + ' · ' + mmss(dauerVon(v)) + ' Min.</span><b>' + esc(v.titel) + '</b><span class="vt-u">' + esc(v.unterzeile) + '</span></span>' +
             '</button>' +
             (zeig.length ? '<div class="vt-t-kap">' + zeig.map(function (h) {
               var t = h.k.t;
@@ -472,7 +475,7 @@
     var zl = kino.querySelector('#vtZl'), zlBahn = zl.querySelector('.vt-zl-bahn'),
       zlFill = zl.querySelector('.vt-zl-fill'), zlKopf = zl.querySelector('.vt-zl-kopf'),
       zlMarken = zl.querySelector('.vt-zl-marken'), zlTip = zl.querySelector('.vt-zl-tip');
-    function dauerAkt() { return (isFinite(kv.duration) && kv.duration > 0) ? kv.duration : ((V[aktuell] || {}).dauer || 0); }
+    function dauerAkt() { return (isFinite(kv.duration) && kv.duration > 0) ? kv.duration : (dauerVon(V[aktuell] || {}) || 0); }
     function kapZeiten() { return kapAkt.filter(function (c) { return c.t != null; }); }
     function zlMarkenBauen() {
       var d = dauerAkt();
@@ -555,7 +558,7 @@
         zlMarkenBauen();
         var mitZeit = kapAkt.some(function (c) { return c.t != null; });
         kino.querySelector('#vtKinoText').innerHTML =
-          '<div class="dpl-k-kick"><span>' + esc(nrLabel(v, D)) + '</span><span>' + mmss(v.dauer) + ' Min.</span></div>' +
+          '<div class="dpl-k-kick"><span>' + esc(nrLabel(v, D)) + '</span><span>' + mmss(dauerVon(v)) + ' Min.</span></div>' +
           '<h3>' + esc(v.titel) + '</h3><div class="vt-u">' + esc(v.unterzeile) + '</div>' +
           (mitZeit
             ? '<div class="vt-kap-kopf">Kapitel · zum Springen antippen</div><ol class="vt-kap">' + kapAkt.map(function (c, j) {
