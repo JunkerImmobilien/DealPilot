@@ -44,6 +44,10 @@
   /* v2235d · Marcel: „den Pilot musst du ausblenden!" - im Studio ab dem
      ersten Laden, nicht erst ab start() (vorher stand er gemessen links unten) */
   if (STUDIO) { try { document.documentElement.classList.add('dpm-studio', 'dpm-laeuft'); var _ps = document.createElement('style'); _ps.textContent = 'html.dpm-studio #dp-pilot,html.dpm-studio #dp-tower,html.dpm-studio .dp-pilot-fab,html.dpm-studio #dp-blase-fab,html.dpm-studio #dp-bb-fab{display:none!important}html.dpm-studio .sb-user-email,html.dpm-studio .sb-user-name,html.dpm-studio .sb-user-avatar,html.dpm-studio .settings-modal .ms-foot .ml,html.dpm-studio .settings-modal .ms-foot .nm,html.dpm-studio .settings-modal .ms-foot .av{visibility:hidden!important}html.dpm-studio .sb-act-item[data-act="vermoegen"],html.dpm-studio #card-vermoegen-zuwachs{display:none!important}'; document.head.appendChild(_ps); } catch (e) {} }
+  /* v3730 · Marcel 18.11.2026: Pilot und Mechaniker sind in KEINEM Video zu sehen. Bisher erst ab start() (css(),
+     dpm-laeuft) bzw. im Studio; jetzt ab dem ersten Laden jeder Seite mit ?messe=, auch vor dem Start und nach
+     jedem Neuladen eines Kontowechsels (pdWechsel), dazu die offene Blase und das Bordbuch-Fenster. */
+  try { if (/[?&]messe=/.test(location.search)) { var _pf = document.createElement('style'); _pf.id = 'dpm-figuren-weg'; _pf.textContent = '#dp-pilot,#dp-tower,.dp-pilot-fab,#dp-blase-fab,#dp-blase,#dp-bb-fab{display:none!important}'; (document.head || document.documentElement).appendChild(_pf); } } catch (e) {}
   function anStudio(m) { try { m.source = 'dp-messe-studio'; window.parent.postMessage(m, location.origin); } catch (e) {} }
   var TEMPO = (function () { try { var t = parseFloat(new URLSearchParams(location.search).get('tempo')); return (t > 0.3 && t < 4) ? t : 1.4; } catch (e) { return 1.4; } })();
   function warte(ms) { if (ms >= 600) ms = Math.round(ms * TEMPO); return new Promise(function (r, x) { var l = lauf; setTimeout(function () { l === lauf ? r() : x('stopp'); }, ms); }); }
@@ -404,6 +408,23 @@
     e.value = v; e.dispatchEvent(new w.Event('input', { bubbles: true })); e.dispatchEvent(new w.Event('change', { bubbles: true }));
   }
   function qcSel(sel) { var d = qcDoc(); return d && d.querySelector(sel); }
+  /* v3730 · seit v3352 fragt der Quick-Check nach einem Spannen-Klick, wenn schon eine Miete (Unterlagen, eigene Eingabe)
+     vorliegt und abweicht: #qc-mm-frage „Marktmiete übernehmen“ / „Mit X weiterrechnen“. Nur wenn sie erscheint:
+     zeigen und die Marktmiete übernehmen (das Drehbuch rechnet mit der Spanne). s = null: ohne eigene Zeile. */
+  async function qcMmFrage(s) {
+    var f = function () { var e = qcEl('qc-mm-frage'); return e && e.offsetWidth && e.querySelector('button[data-a="markt"]') ? e : null; };
+    var t0 = Date.now(); while (!f() && Date.now() - t0 < 1500) await new Promise(function (r) { setTimeout(r, 150); });
+    if (!f()) return false;
+    if (s) {
+      await zeige(f, 8);
+      var mm = (/Marktmiete ([\d.]+ €)/.exec(qcText('qc-mm-frage')) || [])[1];
+      s.zeile('Erst fragen', 'Es liegt schon eine Miete vor. DealPilot fragt nach: <b>Marktmiete' + (mm ? ' ' + mm : '') + ' übernehmen</b> oder weiterrechnen.');
+      await warte(4200);
+    }
+    var b = f() && f().querySelector('button[data-a="markt"]'); if (b) b.click();
+    await warte(600);
+    return true;
+  }
   function qcScore() { return { n: qcText('sb-num'), stufe: qcText('sb-tier'), urteil: qcText('ai-verdict-headline') }; }
   function qcAufraeumen() {
     /* „Neuer Vorgang": löscht den Boarding-Pass, den der Quick-Check beim ersten
@@ -676,6 +697,7 @@
           s.zeile('Die Spanne', 'Ein Klick auf „Unten“ — die vorsichtige Marktmiete geht in die Rechnung …');
           await warte(1800);
           var t = qcSel('.avs-spanne [data-spanne="low"]'); if (t) t.click();
+          await qcMmFrage(s);   /* v3730 */
           await warte(700);
           await zeige(function () { return qcEl('score-block'); }, 4);
           await warte(900);
@@ -725,6 +747,7 @@
           s.zeile('Und wenn die Miete stimmt?', 'Marktmiete „Oben“ …');
           await warte(1500);
           var t = qcSel('.avs-spanne [data-spanne="high"]'); if (t) t.click();
+          await qcMmFrage(null);   /* v3730 */
           await warte(900);
           await zeige(function () { return qcEl('score-block'); }, 4);
           await warte(900);
@@ -844,6 +867,7 @@
             s.zeile('Die Spanne', '„' + stufen[k][1] + '“ — ' + stufen[k][2] + ' geht in die Rechnung …');
             await warte(1400);
             var t = qcSel('.avs-spanne [data-spanne="' + stufen[k][0] + '"]'); if (t) t.click();
+            await qcMmFrage(k === 0 ? s : null);   /* v3730 */
             await warte(700);
             await zeige(function () { return qcEl('score-block'); }, 4);
             await warte(900);
@@ -956,6 +980,7 @@
             s.zeile('Die Spanne', 'Marktmiete „' + stufen[k][1] + '“ statt deiner Schätzung …');
             await warte(1400);
             var t = qcSel('.avs-spanne [data-spanne="' + stufen[k][0] + '"]'); if (t) t.click();
+            await qcMmFrage(k === 0 ? s : null);   /* v3730 */
             await warte(700);
             await zeige(function () { return qcEl('score-block'); }, 4);
             await warte(900);
@@ -1136,6 +1161,8 @@
       async function (s) {   /* 10 · Miete Ø -> erste Einschätzung */
         await zeige(function () { return qcSel('.avs-spanne'); }, 8);
         var t = qcSel('.avs-spanne [data-spanne="mid"]'); if (t) t.click();
+        await qcMmFrage(s);   /* v3730 */
+        await zeige(function () { return qcSel('.avs-spanne'); }, 8);
         s.zeile('Die Miete', 'Für die Rechnung die mittlere Marktmiete: <b>' + eur(_mbAkt.mm.med) + '</b> kalt …');
         await warte(2600);
         await zeige(function () { return qcEl('score-block'); }, 4);
@@ -2389,22 +2416,31 @@
            Vergleichsmiete - so ist die Treppe zu sehen. */
         await tippeH('nkm', '600', 90);
         try { DealPilotInvestmentProfile.nachziehen('nkm'); } catch (e) {}
-        await tippeH('ze', '40', 90);
+        /* v3730 · seit v3670 steht der Stellplatz unter „aufteilen“ (ze_stp_monat), ze ist dann die gesperrte Summe */
+        var auf = q('#ze-auft'), stpId = auf && q('#ze_stp_monat') ? 'ze_stp_monat' : 'ze';
+        if (stpId === 'ze_stp_monat' && !auf.open) { auf.open = true; await warte(300); }
+        await tippeH(stpId, '40', 90);
         await tippeH('umlagef', '230', 90);
         await warte(1000);
         await r6Ende(zb);
         await zeigeGruppe(feldVon('nkm'), function () { return q('#wm_m') && q('#wm_m').closest('.f'); }, 8);
-        await b2oZeile(s, 'Die Ist-Miete', 'Kaltmiete <b>' + eur(zahl('nkm')) + '</b>, Stellplatz ' + eur(zahl('ze')) + ', Nebenkosten-Vorauszahlung ' + eur(zahl('umlagef')) + ' — Warmmiete <b>' + r6Id('wm_m') + '</b>.');
+        await b2oZeile(s, 'Die Ist-Miete', 'Kaltmiete <b>' + eur(zahl('nkm')) + '</b>, Stellplatz ' + eur(zahl(stpId)) + ', Nebenkosten-Vorauszahlung ' + eur(zahl('umlagef')) + ' — Warmmiete <b>' + r6Id('wm_m') + '</b>.');
         /* v3281 · der Stellplatz als eigener Betrag. NICHT #miete_qm zeigen: calc.js (Z. 4164) zählt dort
            den Stellplatz noch mit (gemessen 11.11.2026: 600 + 40 € auf 100 m² = 6,40 €/m²) - gemeldet. */
-        await zeige(r6Gruppe('ze'), 10);
-        await b2oZeile(s, 'Der Stellplatz', 'Eigener Betrag: <b>' + eur(zahl('ze')) + '</b> im Monat. Er gehört nicht zur Wohnfläche — beim Vergleich mit Mietspiegel und Marktmiete zählt nur die Kaltmiete der Wohnung.');
+        await zeige(stpId === 'ze_stp_monat' ? function () { return q('#ze-auft'); } : r6Gruppe('ze'), 10);
+        await b2oZeile(s, 'Der Stellplatz', stpId === 'ze_stp_monat'
+          ? 'Unter <b>Zusätzliche Einnahmen › aufteilen</b>: Stellplatz <b>' + eur(zahl('ze_stp_monat')) + '</b> im Monat. Er gehört nicht zur Wohnfläche, beim Vergleich mit Mietspiegel und Marktmiete zählt nur die Kaltmiete.'
+          : 'Eigener Betrag: <b>' + eur(zahl('ze')) + '</b> im Monat. Er gehört nicht zur Wohnfläche — beim Vergleich mit Mietspiegel und Marktmiete zählt nur die Kaltmiete der Wohnung.');
       },
       async function (s) {   /* 3 · Pilot-Mietpreis-Analyse (v2481h: der Zensus-Kasten ist seit v2500 raus) */
         var m = q('.main-col'); if (m) m.scrollTop = 0;
-        await zeige(function () { return q('#ki-miete-box'); }, 8);
+        /* v3730 · seit v3710 eigener Kopf: Knopf „Mietpreis recherchieren“ und ein Satz, was er tut */
+        var ks = function () { var b = q('#ki-miete-btn'); return b && b.offsetWidth ? (b.closest('.kmu-start') || b) : null; };
+        await zeige(function () { return ks() || q('#ki-miete-box'); }, 8);
         /* NICHT geklickt: die Recherche ist ein KI-Abruf (je Durchgang Geld) - ein Mitschnitt dafür fehlt noch */
-        await b2oZeile(s, 'Pilot-Mietpreis-Analyse', 'Ganz oben im Reiter: DealPilot recherchiert die <b>marktübliche Miete</b> für Adresse und Fläche, mit Vergleichswerten — und schätzt das <b>Mietausfall-Risiko</b>.');
+        var kbt = r6Text(q('#ki-miete-btn')) || 'Mietpreis recherchieren';
+        await b2oZeile(s, 'Welche Miete kann ich ansetzen?', ks() ? 'Ganz oben im Reiter: <b>' + kbt + '</b>. Ordnet deine Miete ein, gegen Marktdurchschnitt, marktübliches Band und amtliche Vergleichsmiete, mit dem <b>Mietausfall-Risiko</b>.'
+          : 'Ganz oben im Reiter: DealPilot recherchiert die <b>marktübliche Miete</b> für Adresse und Fläche, mit Vergleichswerten — und schätzt das <b>Mietausfall-Risiko</b>.');
       },
       async function (s) {   /* 4 · Marktmiete */
         await zeige(r6Gruppe('ds2_marktmiete'), 10);
@@ -2490,6 +2526,16 @@
         var p = q('#me-mode-prog'); if (p) p.click();
         await warte(700);
       },
+      async function (s) {   /* 8b · v3730: Karte „Mieterhöhung und Zielbild“ (v3710: erst per Haken offen) - nur zeigen, nichts ändern */
+        var zk = function () { var k = q('#zb-karte'); return k && k.offsetHeight ? k : null; };
+        if (zk()) {
+          var kk = zk(); var sx = scroller(kk); if (sx) { sx.scrollTop += rect(kk).top - 160; await warte(500); }
+          var ha = function () { var c = q('#zb_aktiv'); return c && (c.closest('label') || c); };
+          await zeige(function () { return ha() || zk(); }, 8);
+          var an = !!(q('#zb_aktiv') && q('#zb_aktiv').checked);
+          await b2oZeile(s, 'Mieterhöhung und Zielbild', 'Optional: mit dem Haken <b>Zielbild festlegen</b> öffnet sich die Karte für Soll-Miete, Zielmiete, Maßnahmen und Mietspiegel.' + (an ? ' Hier ist er schon gesetzt.' : ' Kann, nicht muss.') + ' Mehr dazu in Modul 26.');
+        }
+      },
       async function (s) {   /* 9 · Prognose-Annahmen */
         await zeigeGruppe(feldVon('wertstg'), feldVon('exit_bmy'), 8);
         await zeige(function () { var e = document.getElementById('wertstg'); return e && e.closest('.card'); }, 8);
@@ -2514,7 +2560,8 @@
         await warteAuf(function () { return /\d/.test(r6Id('mrpf-top-rate-10')); }, 6000);
         await zeige(function () { return q('#dpfk-band'); }, 8);
         var r = r6Rate10();
-        await b2oZeile(s, 'Der indikative Zins', 'Bauzinsen nach Zinsbindung, täglich aktuell — 10 Jahre: <b>' + r.zins + '</b> bei 80 % Beleihung.');
+        var lb = (/(\d+) %/.exec(r6Id('dpfk-ltvlabel')) || [])[1] || '80';   /* v3730 · die aktive Stufe lesen (ohne Darlehen 80 %) */
+        await b2oZeile(s, 'Der indikative Zins', 'Bauzinsen nach Zinsbindung, täglich aktuell — 10 Jahre: <b>' + r.zins + '</b> bei ' + lb + ' % Beleihung.');
         await zeige(function () { return q('#mrpf-top-detail-10') && q('#mrpf-top-detail-10').closest('.mrpf-top-tile'); }, 10);
         await b2oZeile(s, 'Woraus er besteht', r.weg.replace(/Bundesanleihe/, '<b>Bundesanleihe</b>').replace(/Marktaufschlag/, '<b>Marktaufschlag</b>') + '.');
       },
@@ -2573,7 +2620,23 @@
         await zeigeGruppe(function () { return q('#d1_rate') && q('#d1_rate').closest('.f'); }, function () { return q('#restschuld') && q('#restschuld').closest('.f'); }, 8);
         await b2oZeile(s, 'Rate und Restschuld', 'Monatliche Rate <b>' + r6Id('d1_rate') + '</b>. Nach ' + wert('d1_bindj') + ' Jahren stehen noch <b>' + r6Id('restschuld') + '</b> offen.');
         await zeige(function () { return q('#r-ltv') && q('#r-ltv').closest('.card'); }, 8);
-        await b2oZeile(s, 'Die Beleihung', 'Beleihungsauslauf <b>' + r6Id('r-ltv') + '</b> — den passenden Zins dazu zeigt die Konditionen-Karte oben (Knopf 100 %). Den Satz im Darlehen bestimmst du.');
+        /* v3730 · seit v3349e zwei Stufen aus dem Objekt: „Objekt“ (die echte Beleihung, vorgewählt, solange niemand selbst
+           wählt) und „100 % + NK“ (Kaufpreis und Nebenkosten finanziert). Erscheinen erst mit Kaufpreis und Darlehen. */
+        var ob = function () { var b = q('#dpfk-band .dpfk-ltv-btn[data-margin="objekt"]'); return b && b.offsetWidth ? b : null; };
+        var vn = function () { var b = q('#dpfk-band .dpfk-ltv-btn[data-margin="vollnk"]'); return b && b.offsetWidth ? b : null; };
+        if (ob()) {
+          await b2oZeile(s, 'Die Beleihung', 'Beleihungsauslauf <b>' + r6Id('r-ltv') + '</b>. Den passenden Zins zeigt die Konditionen-Karte oben. Den Satz im Darlehen bestimmst du.');
+          var mc = q('.main-col'); if (mc) mc.scrollTop = 0; await warte(500);
+          await zeige(function () { return q('#dpfk-band .dpfk-ltv'); }, 10);
+          var zo = r6Beginn(s, 'Zwei Stufen aus dem Objekt', '<b>Objekt</b> ist die Beleihung dieses Objekts, <b>100 % + NK</b> heißt Kaufpreis und Nebenkosten finanziert.');
+          await warte(1800);
+          var ro = await r6Ltv('objekt'); var lo = r6Id('dpfk-ltvlabel'); await warte(700);
+          var rv = vn() ? await r6Ltv('vollnk') : null; var lv = rv ? r6Id('dpfk-ltvlabel') : ''; await warte(700);
+          await r6Ltv('objekt');
+          await r6Ende(zo);
+          await zeige(function () { return q('#mrpf-top-detail-10') && q('#mrpf-top-detail-10').closest('.mrpf-top-tile'); }, 10);
+          await b2oZeile(s, 'Zwei Stufen aus dem Objekt', '10 Jahre: <b>Objekt</b> (' + (lo || '–') + ') → <b>' + ro.zins + '</b>' + (rv ? ' · <b>100 % + NK</b> (' + (lv || '–') + ') → <b>' + rv.zins + '</b>' : '') + '. Mit offenem Darlehen steht die Leiste auf Objekt.');
+        } else await b2oZeile(s, 'Die Beleihung', 'Beleihungsauslauf <b>' + r6Id('r-ltv') + '</b> — den passenden Zins dazu zeigt die Konditionen-Karte oben (Knopf 100 %). Den Satz im Darlehen bestimmst du.');
       },
       async function (s) {   /* 7b · v3272: Werkzeuge - Tilgungsplan, Bank-PDF; Darlehen II */
         var kd = function () { var k = q('#s3 .fz-kachel'); return k && k.closest('.card'); };
@@ -2878,8 +2941,9 @@
         var w = rhIm('#s3-tax', /Steuerverlauf/i);
         if (w) { (w.closest('.card') || w).scrollIntoView({ block: 'start' }); await warte(400); }
         await zeige(function () { var x = rhIm('#s3-tax', /Steuerverlauf/i); return x && (x.closest('.card') || x.parentElement); }, 8);
-        var sum = rhIm('#s3-tax', /^Summe über 15 Jahre:?$/);
-        await b2oZeile(s, 'Über 15 Jahre', 'Grün Erstattung, rot Nachzahlung — Jahr für Jahr, mit echter Progression' + (sum && sum.nextElementSibling ? '. Summe: <b>' + r6Text(sum.nextElementSibling) + '</b>' : '') + '. Die Kaufpreisaufteilung zeigt Modul 10b.', 600);
+        var sum = rhIm('#s3-tax', /^Summe (dieses Objekts )?über \d+ Jahre:?$/);   /* v3730 · heute „Summe dieses Objekts über 15 Jahre“ */
+        var sj = sum && (/über (\d+) Jahre/.exec(r6Text(sum)) || [])[1];
+        await b2oZeile(s, 'Über ' + (sj || 15) + ' Jahre', 'Grün Erstattung, rot Nachzahlung — Jahr für Jahr, mit echter Progression' + (sum && sum.nextElementSibling ? '. Summe: <b>' + r6Text(sum.nextElementSibling) + '</b>' : '') + '. Die Kaufpreisaufteilung zeigt Modul 10b.', 600);
       }
     ]
   };
@@ -2929,6 +2993,13 @@
         /* v2395 · „(in diesem Objekt nicht erfasst)" stand fest im Text - das Demo-Objekt trägt seit dem 16.10. Nebenkosten (170.748 €) */
         var nkNull = !nk || /^0 €$/.test(nk[1]);
         await b2oZeile(s, 'Schritt 1 · Anschaffungskosten', 'Aus dem Reiter Investition: Kaufpreis ' + (kp ? kp[1] : '–') + ', Nebenkosten ' + (nk ? nk[1] : '–') + (nkNull ? ' (in diesem Objekt nicht erfasst).' : ' — Grunderwerbsteuer, Notar, Grundbuch, Makler. Sie zählen anteilig zum Gebäude: für die AfA und die 15-%-Grenze.'));
+        /* v3730 · seit v3704/v3705: Hinweis unter der Summe, die Sanierung steht NICHT darin (Einordnung je Variante in Schritt 3) */
+        var anah = function () { var p = r6BmfPane(); return p && r6Sichtbar(p, '.v3704-anah-row'); };
+        if (anah()) {
+          await zeige(anah, 8);
+          var at = r6Text(anah()), sb = /^Sanierung ([\d.]+ €) \(netto ([\d.]+ €)\)/.exec(at);
+          await b2oZeile(s, 'Die Sanierung steht extra', (sb ? 'Die ' + sb[1] + ' Sanierung (netto ' + sb[2] + ')' : 'Die Sanierung') + ' steht <b>nicht</b> in dieser Summe. Sie wird nicht aufgeteilt. Ob sie anschaffungsnah ist, zeigt Schritt 3 je Variante.');
+        }
       },
       async function (s) {   /* 3 · Schritt 2: amtliche Aufteilung */
         await r6BmfWeiter();
@@ -2948,6 +3019,20 @@
         var g = /Gebäude %\s+([\d,]+ %)\s+([\d,]+ %)\s+([\d,]+ %)\s+([\d,]+ %)/.exec(tt), a = /AfA Gebäude\/Jahr\s+([\d.]+ €)\s+([\d.]+ €)\s+([\d.]+ €)\s+([\d.]+ €)/.exec(tt);
         var g3 = /Gebäude %\s+([\d,]+ %)\s+([\d,]+ %)\s+([\d,]+ %)/.exec(tt), jm = /Nach Jacoby[^:]*:\s*([\d,]+ %)/.exec(r6Text(q('#bmfJacobyZeile')));
         await b2oZeile(s, 'Schritt 3 · Amtlich, zwei Abschläge und Jacoby', 'Amtlich <b>' + (g3 ? g3[1] : '–') + '</b> Gebäude — mit Boden −15/−20 % bis ' + (g3 ? g3[3] : '–') + (jm ? '; nach der umgekehrten Ertragswertmethode (BFH IX R 12/21) <b>' + jm[1] + '</b>' : '') + '.');
+        /* v3730 · seit v3705 drei Zeilen zur Sanierung je Variante: anschaffungsnah oder sofort abziehbar, AfA darauf, Sofortabzug */
+        var szl = function (re) { return function () { var tb = r6Sichtbar(r6BmfPane(), 'table'); return tb ? [].filter.call(tb.querySelectorAll('tr'), function (tr) { return re.test(r6Text(tr.firstElementChild)); })[0] || null : null; }; };
+        var sz1 = szl(/^Sanierung [\d.]+ €/), sz2 = szl(/^davon AfA\/Jahr auf die Sanierung/), sz3 = szl(/^Sofort abziehbar \(einmalig\)/);
+        if (sz1()) {
+          var zw = function (f) { var tr = f(); return tr ? [].slice.call(tr.children, 1).map(function (x) { return r6Text(x); }) : []; };
+          var w1 = zw(sz1), w2 = zw(sz2), w3 = zw(sz3);
+          var an = w1.filter(function (x) { return /anschaffungsnah/.test(x); }).length, so = w1.filter(function (x) { return /sofort abziehbar/.test(x); }).length;
+          r6BmfOben(sz1()); await warte(400);
+          await zeigeGruppe(sz1, function () { return sz3() || sz2() || sz1(); }, 6);
+          var afaA = w2.filter(function (x) { return /€/.test(x); })[0], sofA = w3.filter(function (x) { return /€/.test(x); })[0];
+          await b2oZeile(s, 'Die Sanierung je Variante', (an && so ? 'Je nach Gebäudeanteil kippt sie: <b>' + an + '×</b> anschaffungsnah, <b>' + so + '×</b> sofort abziehbar.'
+            : an ? 'In jeder Variante <b>anschaffungsnah</b>: sie geht zu 100 % in die Gebäude-AfA.' : 'In jeder Variante <b>sofort abziehbar</b> als Werbungskosten.') +
+            (afaA ? ' AfA darauf ' + (/[\d.]+ €/.exec(afaA) || [''])[0] + ' im Jahr' : '') + (sofA ? (afaA ? ', sonst' : '') + ' einmalig ' + (/[\d.]+ €/.exec(sofA) || [''])[0] + ' sofort' : '') + '.');
+        }
       },
       async function (s) {   /* 5 · Schritt 4: Variante wählen - v3276: die Wahl-Tafel #bmf-wahl-tafel (die alten Karten sind verdeckt) */
         await r6BmfWeiter();
@@ -6753,6 +6838,7 @@
         try { document.documentElement.classList.add('dpm-km'); if (!q('#dpm-km-css')) { var kc = document.createElement('style'); kc.id = 'dpm-km-css'; kc.textContent = 'html.dpm-km #dp-mba-pille{display:none!important}'; document.head.appendChild(kc); } } catch (e) {}
         await kmLaden();
         await rhStart(0);
+        rhExperte();   /* v3730 · ohne Merker galt im Demo-Konto Einsteiger - die Reihe zeigt die volle Oberfläche */
         await kmKapitel(s, 1, 'Einführung', 'Ein Mehrfamilienhaus, von der ersten Eingabe bis zum Bank-PDF.',
           'Willkommen zum großen Komplettbeispiel. Wir nehmen uns heute Zeit und gehen mit einem einzigen Mehrfamilienhaus den ganzen Weg durch DealPilot: wir legen es an, erfassen jede Wohnung, die Miete, die Finanzierung und die Steuer, holen den Marktbericht mit der Wertermittlung, planen ein Zielbild und landen am Ende beim Ergebnis und beim PDF für die Bank.');
         var m = q('.main-col'); if (m) m.scrollTop = 0;
@@ -7012,8 +7098,9 @@
         }
         var stg = pz(wert('mietstg')) || '–';
         await kmEingabe(s, feldVon('ds2_mietausfall'), 'Mietausfall und Steigerung', 'Mietausfall-Risiko <b>mittel</b>, Mietsteigerung <b>' + stg + ' %</b> im Jahr.',
-          { was: 'Mietausfall-Risiko; die Steigerung kommt aus deinem Profil.', warum: 'Leerstand und Ausfall kosten Geld.', folge: 'Beides geht in Cashflow und Investor Deal Score ein.' },
-          'Zwei Annahmen noch: das Mietausfall-Risiko setzen wir auf mittel. Die jährliche Mietsteigerung von ' + stg + ' Prozent kommt aus deinem Investmentprofil — du setzt sie einmal in den Einstellungen, und jedes neue Objekt startet damit.',
+          /* v3730 · seit v3233 rechnet der Cashflow mit dem Leerstand (Standardwert), das Mietausfall-Risiko geht in den Investor Deal Score */
+          { was: 'Mietausfall-Risiko; die Steigerung kommt aus deinem Profil.', warum: 'Ein Ausfall ist ein Risiko von Lage und Mieter.', folge: 'Das Risiko geht in den Investor Deal Score, der Cashflow rechnet mit dem Leerstand.' },
+          'Zwei Annahmen noch: das Mietausfall-Risiko setzen wir auf mittel. Es geht in den Investor Deal Score ein, der Cashflow selbst rechnet mit dem Leerstand aus deinen Standardwerten. Die jährliche Mietsteigerung von ' + stg + ' Prozent kommt aus deinem Investmentprofil — du setzt sie einmal in den Einstellungen, und jedes neue Objekt startet damit.',
           async function () { await kmWahl('ds2_mietausfall', 'mittel'); });
         /* Bewirtschaftung - die Werte des Demo-Objekts, getippt */
         reiter('s4'); await kmPause(1300);
@@ -7362,6 +7449,16 @@
         kegelHoch(false);
         await kmPause(1500);
         reiter('s2'); await kmPause(1300);   /* v3710: die Karte Mieterhöhung und Zielbild steht im Reiter Miete */
+        /* v3730 · die Karte gehört zur Stufe Experte, und ihr Inhalt öffnet sich erst mit dem Haken „Zielbild festlegen“ (v3710).
+           Die Wohnungen tragen hier schon ein Zielbild, dann setzt die App den Haken selbst; sonst setzt ihn das Drehbuch (eigenes Objekt des Laufs). */
+        rhExperte(); await kmPause(500);
+        var zbh = q('#zb_aktiv');
+        if (zbh && !zbh.checked) {
+          var zk8 = q('#zb-karte'); if (zk8) { var sc8 = scroller(zk8); if (sc8) sc8.scrollTop += rect(zk8).top - 160; }
+          await zeige(function () { var c = q('#zb_aktiv'); return c && (c.closest('label') || c); }, 8); await kmPause(900);
+          zbh.click();
+        }
+        await warteAuf(function () { var z = q('#zb-inhalt'); return z && z.offsetHeight ? z : null; }, 4000);
         var zbf = function () { var e = document.getElementById('zb_soll_qm'); return e && e.offsetWidth ? (e.closest('.card') || e.closest('.f')) : null; };
         if (zbf()) {
           await zeigeGruppe(feldVon('zb_fertig_jahr'), feldVon('zb_ziel_wann'), 8);
@@ -7588,6 +7685,7 @@
         try { document.documentElement.classList.add('dpm-km'); if (!q('#dpm-km-css')) { var kc = document.createElement('style'); kc.id = 'dpm-km-css'; kc.textContent = 'html.dpm-km #dp-mba-pille{display:none!important}'; document.head.appendChild(kc); } } catch (e) {}
         _lu.schutz = false;
         await rhStart(0);
+        rhExperte();   /* v3730 · volle Oberfläche (im Demo-Konto ohne Merker Einsteiger) */
         _rh.luLive = true;
         await luKapitel(s, 1, 'Die Unterlagen', 'Lindenallee 14, Herford — ein Exposé und sechs Unterlagen.',
           'Lindenallee vierzehn in Herford: ein Mehrfamilienhaus mit acht Wohnungen, angeboten für eine Million neunzigtausend Euro. Dazu gibt es ein Exposé und sechs weitere Unterlagen. Wir lassen DealPilot alle sieben lesen — und schauen, was das Exposé nicht erzählt.');
@@ -7782,10 +7880,19 @@
         if (typeof window.loadSaved === 'function') await window.loadSaved(LU_ID);
         await warteAuf(function () { return window._currentObjKey === LU_ID && /\S/.test(wert('str')); }, 9000);
         if (wert('kuerzel') && wert('kuerzel') !== LU_KUERZEL) { DPM_LU.fehler = 'falsches Objekt: ' + wert('kuerzel'); }
+        rhExperte();   /* v3730 · das Laden setzt die flüchtige Stufe zurück */
         await warte(900);
         reiter('s5'); await warte(1200);
         await warteAuf(function () { return q('#ai-content .dp-pa-tab'); }, 8000);
-        await r11PaTab(/Unterlagen/);
+        /* v3730 · ohne gespeicherte Pilot-Analyse (Kopie im Videokonto ohne Analyse) keine halbe Szene: gleich der Schluss */
+        if (!q('#ai-content .dp-pa-tab') || !(await r11PaTab(/Unterlagen/))) {
+          DPM_LU.ohnePilot = true; console.warn('[messe] lindenallee-unterlagen: keine Pilot-Analyse mit Reiter „Unterlagen & WEG“ - Kapitel 4 übersprungen');
+          await zeige(function () { return q('#hdr-obj') || q('header.hdr'); }, 8);
+          await kmSag(s, 'Das Exposé verkauft', 'Die Protokolle erzählen — <b>und DealPilot liest sie für dich</b>.',
+            'Das Exposé verkauft — die Protokolle erzählen. Sieben Unterlagen, gelesen, ausgewertet und übernommen: Risiken mit Betrag und Quelle, eine Investitionsthese und die Lage der Eigentümergemeinschaft. Bevor du kaufst, nicht danach.', LU_NACH,
+            { was: 'Deine eigenen Unterlagen — genauso.', warum: 'Erst lesen, dann kaufen.', folge: 'dealpilot.immo' });
+          return;
+        }
         var einf = function () { var p = r11Panel(); return p && p.querySelector('.dpu-umschalter button[data-art="einfach"]'); };
         if (einf()) { einf().click(); await warte(500); }
         await zeige(function () { var p = r11Panel(); return p && p.querySelector('.dpu-umschalter'); }, 8);
@@ -7832,8 +7939,8 @@
         if (sr()) {
           await zeige(sr, 8);
           var st = r6Text(sr()).length < 300 ? luKurz(r6Text(sr()), 170) : '';
-          await kmSag(s, 'Stärken & Risiken', st ? '<b>' + st + '</b>' : 'Die Analyse greift Dachsanierung und Sonderumlage auf.',
-            'Und die Pilot-Analyse greift auf, was in den Unterlagen steht. Unter Stärken und Risiken: ' + (st || 'Dachsanierung und Sonderumlage') + '.', LU_NACH,
+          await kmSag(s, 'Potenzial & Risiken › Risiken', st ? '<b>' + st + '</b>' : 'Die Analyse greift Dachsanierung und Sonderumlage auf.',
+            'Und die Pilot-Analyse greift auf, was in den Unterlagen steht. Unter Potenzial und Risiken, bei den Risiken: ' + (st || 'Dachsanierung und Sonderumlage') + '.', LU_NACH,
             { was: 'Nichts.', warum: 'Die Analyse kennt jetzt auch die Unterlagen.', folge: 'Das Urteil rechnet mit dem, was wirklich ansteht.' });
         }
         await zeige(function () { return q('#hdr-obj') || q('header.hdr'); }, 8);
@@ -9946,6 +10053,15 @@
         await warte(500);
         await zeige(function () { var w = q('[data-form="mail"] input[name="pk-e-art"]'); return w && w.closest('label') && w.closest('label').parentElement; }, 8);
         await b2oZeile(s, 'Mit oder ohne Platz', '<b>Mit Partnerplatz</b> bezahlst du den Zugang. <b>Ohne Platz</b> nutzt der Kunde seinen eigenen Plan. Hat er schon ein Abo, wird er automatisch ohne Platz verbunden.');
+        /* v3730 · seit v3690 der Block „Freigabe vorschlagen“ (Art und Bereiche), beim Kunden vorausgewählt */
+        var vs = function () { var x = f(); var v = x && x.querySelector('.pk-vs'); return v && v.offsetWidth ? v : null; };
+        if (vs()) {
+          var vv = vs(); var sx = scroller(vv); if (sx) { var rv = rect(vv); if (rv.bottom > innerHeight - 220) { sx.scrollTop += rv.bottom - innerHeight + 260; await warte(400); } }
+          await zeige(vs, 8);
+          var art = vs().querySelector('.pk-vs-art input:checked'), artT = art ? pdText(art.closest('label')) : '';
+          var ber = [].filter.call(vs().querySelectorAll('.pk-vs-ber input'), function (c) { return c.checked; }).map(function (c) { return pdText(c.closest('label')); });
+          await b2oZeile(s, 'Freigabe vorschlagen', 'Du schlägst vor, was der Kunde freigibt' + (artT ? ', hier <b>' + artT + '</b>' : '') + (ber.length ? ' mit <b>' + ber.join(', ') + '</b>' : '') + '. Er sieht den Vorschlag beim Bestätigen und entscheidet selbst.');
+        }
         await zeige(function () { var x = f(); return x && x.querySelector('.pk-fuss .pk-btn'); }, 8);
         await b2oZeile(s, 'Einladen', 'Ein Klick auf <b>Einladen</b> schickt die Einladung los. Im Video lassen wir das Beispiel stehen.');
         q('#pk-e-name').value = ''; q('#pk-e-mail').value = '';
@@ -9953,7 +10069,7 @@
       async function (s) {   /* 7 · Verbindungscode */
         var f = pdIn('[data-form="code"]');
         await zeige(f, 8);
-        await b2oZeile(s, 'Verbindungscode', 'Kunden mit eigenem Abo erzeugen in DealPilot einen Code und geben ihn dir, etwa im Termin. Du trägst ihn hier ein, der Kunde bestätigt.');
+        await b2oZeile(s, 'Verbindungscode', 'Kunden mit eigenem Abo erzeugen in DealPilot einen Code und geben ihn dir, etwa im Termin. Du trägst ihn hier ein, der Kunde bestätigt.' + (f() && f().querySelector('.pk-vs') ? ' Auch hier schlägst du die Freigabe vor.' : ''));
         await zeige(function () { var e = q('#pk-c-platz'); return e && e.closest('label'); }, 8);
         await b2oZeile(s, 'Platz nur bei Bedarf', 'Den Haken <b>Partnerplatz mitgeben</b> nimmst du raus, wenn der Kunde sein eigenes Abo behält.');
       },
@@ -9976,7 +10092,15 @@
           await warteAuf(pdDlg, 5000); await warte(600);
           await zeige(pdDlg, 6);
           await b2oZeile(s, 'Er entscheidet', 'Der Kunde sieht, wer sich verbinden will und was das heißt. Mit Platz bezahlst du seinen Zugang. <b>Erst seine Bestätigung</b> verbindet euch.');
-          await b2oZeile(s, 'Was du siehst', 'Du siehst nur Objekte, die er dir ausdrücklich sendet, als Kopie. Trennen kann er jederzeit.');
+          /* v3730 · seit v3690 fragt dasselbe Fenster die Freigabe ab (dauerhaft, einmalig, noch nicht), dein Vorschlag vorausgewählt */
+          var fgW = function (i) { return function () { var d = pdDlg(); var l = d ? d.querySelectorAll('input[name="pk-fg-art"]') : []; var r = l[i < 0 ? l.length - 1 : i]; return r ? r.closest('.pk-wahl') : null; }; };
+          if (fgW(0)()) {
+            await zeigeGruppe(fgW(0), fgW(-1), 6);
+            var vsm = pdDlg() && pdDlg().querySelector('input[name="pk-fg-art"]:checked');
+            var vsT = vsm ? pdText(vsm.closest('.pk-wahl').querySelector('b')).replace(/vom Partner vorgeschlagen/, '').trim() : '';
+            await b2oZeile(s, 'Die Freigabe', 'Im selben Fenster wählt er, was du anfordern darfst: <b>Dauerhaft, Einmalig oder Noch nicht</b>' + (vsT ? '. Dein Vorschlag <b>' + vsT + '</b> ist vorausgewählt, er kann weniger wählen' : '') + '.');
+          }
+          await b2oZeile(s, 'Was du siehst', 'Du siehst nur, was er dir ausdrücklich sendet, als Kopie. Freigabe ändern, widerrufen oder trennen kann er jederzeit.');
           var zu = q('#dppk-dlg .pk-zu'); if (zu) zu.click();
           await warte(700);
         }
@@ -10091,10 +10215,23 @@
         var kd = (/K-\d{4}-\d+ · [^.,]+?(?=,| in der|\.|$)/.exec(pdText(pdDlg())) || [])[0];
         await zeige(pdDlg, 6);
         await b2oZeile(s, 'Mit Kundenbezug', 'Die Kopie trägt den Kunden' + (kd ? ' <b>' + pdKurz(kd) + '</b>' : '') + '. Sie bleibt bei dir, auch wenn Sabine ihren Stand zurückzieht.');
+        /* v3730 · seit v3700 fragt der Dialog, wofür: für den Kunden weiterführen (Vorgabe) oder in den eigenen Bestand.
+           Das Drehbuch bearbeitet danach nicht, also bleibt die Vorgabe „für den Kunden“. */
+        var zw = function () { var d = pdDlg(); return d && d.querySelector('.pk-ziel'); };
+        var zielT = '';
+        if (zw()) {
+          await zeige(zw, 6);
+          var zl = [].map.call(zw().querySelectorAll('.pk-ziel-wahl b'), pdText);
+          var kr = zw().querySelector('input[name="pk-ziel"][value="kunde"]'); if (kr && !kr.checked) kr.click();
+          zielT = (zl[0] || 'Für den Kunden weiterführen');
+          await b2oZeile(s, 'Wofür?', '<b>' + zielT + '</b>' + (zl[1] ? ' oder <b>' + zl[1] + '</b>' : '') + '. Für den Kunden rechnet es weiter mit seinem Steuerprofil und zählt nicht zu deinem Bestand.');
+        }
         var ok = pdKnopf('#dppk-dlg', /^Übernehmen$/); if (ok) ok.click();
         await warteAuf(function () { return window._currentObjKey && window._currentObjKey !== vor && !q('#dppk-ks'); }, 12000); await warte(1500);
         await zeige(function () { return q('#hdr-obj-num') || qs('header.hdr'); }, 8);
-        await b2oZeile(s, 'Dein Objekt', 'Jetzt ist es dein Objekt mit eigener Nummer <b>' + pdText(q('#hdr-obj-num')).replace(/\s*✎\s*$/, '') + '</b>. Du kannst es frei bearbeiten.');
+        await b2oZeile(s, zielT ? 'Für den Kunden weitergeführt' : 'Dein Objekt', zielT
+          ? 'Es liegt jetzt bei dir mit eigener Nummer <b>' + pdText(q('#hdr-obj-num')).replace(/\s*✎\s*$/, '') + '</b>, für Sabine weitergeführt. Ein neuer Stand von ihr aktualisiert es.'
+          : 'Jetzt ist es dein Objekt mit eigener Nummer <b>' + pdText(q('#hdr-obj-num')).replace(/\s*✎\s*$/, '') + '</b>. Du kannst es frei bearbeiten.');
       },
       async function (s) {   /* 11 · Objektliste nach Kunde */
         window.__pdSort = { sort: (function () { try { return localStorage.getItem('dp_sb_sort') || 'recent'; } catch (e) { return 'recent'; } })(), portfolio: document.documentElement.getAttribute('data-dpl-portfolio') === 'auf' };
@@ -10383,6 +10520,23 @@
      nur @nordlicht-demo). So bleibt das Video kurz und der Ablauf echt.
      Die Szenen schreiben in die Demo-Konten; vor jeder Aufnahme tools/partner-demo-anlegen.js --kunde laufen lassen.
      Kundentexte ohne Gedankenstrich und Semikolon. */
+  /* v3730 · seit v3690 ist Annehmen/Bestätigen ein Freigabe-Dialog (partner-kunden.js fgDialog): Pflichtwahl
+     dauerhaft / einmalig / noch nicht, Bereiche (Vorschlag des Partners vorausgewählt), Knopf „Verbinden und speichern“. */
+  var PD_JA = /Verbinden und speichern|bestätigen|Annehmen/i;
+  async function pdFreigabeWaehlen(s, art) {
+    var d = pdDlg(); if (!d || !d.querySelector('input[name="pk-fg-art"]')) return false;
+    var r = function () { var x = pdDlg(); return x && x.querySelector('input[name="pk-fg-art"][value="' + art + '"]'); };
+    var w = function () { var x = r(); return x && x.closest('.pk-wahl'); };
+    await zeige(w, 6); await warte(500);
+    if (r() && !r().checked) r().click();
+    await warte(500);
+    var ber = [].filter.call(pdDlg().querySelectorAll('[data-fg-b]'), function (c) { return c.checked; }).map(function (c) { var b = c.closest('.pk-wahl') && c.closest('.pk-wahl').querySelector('b'); return b ? pdText(b).replace(/(angefordert|immer)$/, '').replace(/(angefordert|immer)$/, '').trim() : ''; }).filter(Boolean);
+    var bb = function () { var x = pdDlg(); var b = x && x.querySelector('.pk-fg-ber'); return b && b.offsetHeight ? b : null; };
+    var nm = pdText(w() && w().querySelector('b')).replace(/vom Partner vorgeschlagen/, '').trim();
+    if (bb()) { var sx = scroller(bb()); if (sx) { sx.scrollTop += rect(bb()).top - rect(sx).top - 40; await warte(400); } await zeigeGruppe(w, bb, 6); }
+    await b2oZeile(s, 'Was darf er sehen?', 'Im selben Fenster legst du die Freigabe fest, hier <b>' + (nm || art) + '</b>' + (ber.length && art !== 'keine' ? ' für ' + ber.join(', ') : '') + '. Was er vorgeschlagen hat, ist vorausgewählt. Du kannst weniger wählen.');
+    return true;
+  }
   async function pdCodeAlsPartner(code, name) {
     var T = pdKonten(), k = T && T.P;
     if (!k || !PD_DOMAIN.test(k.email || '') || !code) return false;
@@ -10408,9 +10562,10 @@
         await warteAuf(pdDlg, 5000); await warte(600);
         await zeige(pdDlg, 6);
         await b2oZeile(s, 'Du entscheidest', 'Du siehst, wer sich verbinden will und was das heißt. Erst deine Bestätigung verbindet euch.');
-        var ja = pdKnopf('#dppk-dlg', /bestätigen|Annehmen/i);
-        if (ja) { await zeige(function () { return pdKnopf('#dppk-dlg', /bestätigen|Annehmen/i); }, 6); await warte(600); }
-        await pdNeuladenErwartet(1, '1', 'Verbunden', 'DealPilot lädt in der Marke deines Partners.', function () { var b = pdKnopf('#dppk-dlg', /bestätigen|Annehmen/i); if (b) b.click(); });
+        await pdFreigabeWaehlen(s, 'dauer');   /* v3730 · seit v3690 Pflichtwahl im selben Fenster */
+        var ja = pdKnopf('#dppk-dlg', PD_JA);
+        if (ja) { await zeige(function () { return pdKnopf('#dppk-dlg', PD_JA); }, 6); await warte(600); }
+        await pdNeuladenErwartet(1, '1', 'Verbunden', 'DealPilot lädt in der Marke deines Partners.', function () { var b = pdKnopf('#dppk-dlg', PD_JA); if (b) b.click(); });
       },
       async function (s) {   /* 1 · verbunden (nach dem Neuladen der App) */
         await pdPruefen(s);
@@ -10449,8 +10604,9 @@
         await warteAuf(pdDlg, 5000); await warte(600);
         await zeige(pdDlg, 6);
         await b2oZeile(s, 'Bestätigen', 'Die Anfrage ist da. Bestätigst du, seid ihr verbunden. Dein Plan und deine Einstellungen bleiben.');
-        var ja = pdKnopf('#dppk-dlg', /bestätigen/i); if (ja) { await zeige(function () { return pdKnopf('#dppk-dlg', /bestätigen/i); }, 6); await warte(600); }
-        await pdNeuladenErwartet(4, '4', 'Mit deinem Partner arbeiten', 'Objekte senden und Anmerkungen bearbeiten.', function () { var b = pdKnopf('#dppk-dlg', /bestätigen/i); if (b) b.click(); });
+        await pdFreigabeWaehlen(s, 'einmal');   /* v3730 */
+        var ja = pdKnopf('#dppk-dlg', PD_JA); if (ja) { await zeige(function () { return pdKnopf('#dppk-dlg', PD_JA); }, 6); await warte(600); }
+        await pdNeuladenErwartet(4, '4', 'Mit deinem Partner arbeiten', 'Objekte senden und Anmerkungen bearbeiten.', function () { var b = pdKnopf('#dppk-dlg', PD_JA); if (b) b.click(); });
       },
       async function (s) {   /* 4 · Wechsel zu Jonas */
         await pdWechsel('A', 5, '4', 'Mit deinem Partner arbeiten', 'Objekte senden und Anmerkungen bearbeiten.');
@@ -10526,12 +10682,22 @@
         var se = pdKnopf('#dppk-dlg', /^Senden$/); if (se) { await zeige(pdDlg, 6); await warte(900); se.click(); }
         await warteAuf(function () { return !pdDlg(); }, 8000); await warte(1000);
       },
-      async function (s) {   /* 9 · Freigaben */
+      async function (s) {   /* 9 · Freigaben (v3730: seit v3690 Art, Bereiche, Verlauf, Ändern und Widerrufen) */
         try { if (window.DpAnmerkungen) DpAnmerkungen.ende(); } catch (e) {}
         await pdMeinPartner('freigaben');
         var kn = (/K-\d{4}-\d+/.exec(pdText(pdKInhalt())) || [])[0];
-        await zeige(function () { return pdKIn('.rnd-hub-karte')() || pdKInhalt(); }, 8);
-        await b2oZeile(s, 'Freigaben', 'Hier steht, was dein Berater sieht und was dein Zugang darf' + (kn ? ', dazu deine Kundennummer <b>' + kn + '</b>' : '') + '. Trennen kannst du jederzeit unter <b>Verbindung</b>.');
+        var k1 = function () { var i = pdKInhalt(); return i ? [].filter.call(i.querySelectorAll('.rnd-hub-karte'), function (k) { return k.offsetWidth && /anfordern darf/.test(pdText(k.querySelector('h3'))); })[0] || null : null; };
+        await zeige(function () { return k1() || pdKIn('.rnd-hub-karte')() || pdKInhalt(); }, 8);
+        var kk = k1(), artC = kk && kk.querySelector('.rnd-wiz-mod-list .pk-chip'), stand = kk && kk.querySelector('.pk-fg-stand');
+        var ber = kk ? [].filter.call(kk.querySelectorAll('.pk-fg-chips .pk-chip.gruen'), function () { return true; }).map(function (c) { return pdText(c).replace(/^✓\s*/, ''); }) : [];
+        if (kk && artC) await b2oZeile(s, 'Freigaben', 'Hier steht, was dein Berater anfordern darf: <b>' + pdText(artC) + '</b>' + (ber.length ? ', ' + ber.join(', ') : '') + '. Ändern oder widerrufen kannst du jederzeit.');
+        else if (kk && stand) await b2oZeile(s, 'Freigaben', 'Hier steht, was dein Berater anfordern darf. ' + pdText(stand) + ' Mit <b>Freigabe erteilen</b> gibst du sie frei.');
+        else await b2oZeile(s, 'Freigaben', 'Hier steht, was dein Berater sieht und was dein Zugang darf' + (kn ? ', dazu deine Kundennummer <b>' + kn + '</b>' : '') + '.');
+        var vl = function () { var i = pdKInhalt(); return i ? [].filter.call(i.querySelectorAll('.rnd-hub-karte'), function (k) { return k.offsetWidth && /^Verlauf/.test(pdText(k.querySelector('h3'))); })[0] || null : null; };
+        if (vl()) {
+          await zeige(vl, 8);
+          await b2oZeile(s, 'Verlauf', 'Jede Fassung bleibt erhalten, so ist belegbar, was wann galt. Trennen kannst du jederzeit unter <b>Verbindung</b>.');
+        }
       }
     ]
   };
