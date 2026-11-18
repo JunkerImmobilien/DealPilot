@@ -11,6 +11,7 @@
            pilot · bewertung · deal (oder die Abschnitts-ID s0 … s8, s3-tax)
    feld    ID eines Elements im Reiter. Es wird hingescrollt und kurz markiert.
            Unbekannt → nur der Reiter, mit Hinweis (nie still).
+   stufe   1|2|3 setzt vorher den Detailgrad dieses Browsers (v3689).
    zu=einstellungen&tab=<data-tab> öffnet die Einstellungen auf dem Reiter
            (z. B. mandanten = Gesellschaften).
 
@@ -36,7 +37,7 @@
     var q = new URLSearchParams(location.search);
     if (q.has('zu')) {
       var s = {};
-      ['zu', 'obj', 'reiter', 'feld', 'tab'].forEach(function (k) { if (q.has(k)) { s[k] = q.get(k); q.delete(k); } });
+      ['zu', 'obj', 'reiter', 'feld', 'tab', 'stufe'].forEach(function (k) { if (q.has(k)) { s[k] = q.get(k); q.delete(k); } });
       sessionStorage.setItem(KEY, JSON.stringify(s));
       var rest = q.toString();
       history.replaceState(history.state, '', location.pathname + (rest ? '?' + rest : '') + location.hash);
@@ -83,6 +84,11 @@
     if (!s) return;
     sessionStorage.removeItem(KEY);
     try {
+      /* v3689 · &stufe=1|2|3 setzt den Detailgrad dieses Browsers vor dem Sprung (Fahrplan Kanzlei:
+         Experte, sonst blendet die App Karten aus). Der Detailgrad liegt nur im Browser (dp_detailgrad_zuletzt). */
+      if (/^[123]$/.test(String(s.stufe || '')) && window.DpDetailgrad && typeof DpDetailgrad.setzen === 'function') {
+        try { DpDetailgrad.setzen(+s.stufe); } catch (eS) {}
+      }
       if (s.zu === 'einstellungen') {
         if (typeof window.showSettings === 'function') window.showSettings(s.tab || undefined);
         return;
