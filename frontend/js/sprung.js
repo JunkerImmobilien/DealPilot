@@ -61,6 +61,13 @@
   function feldZeigen(id) {
     var el = document.getElementById(id);
     if (!el) { hinweis('Die Stelle „' + id + '“ gibt es hier nicht, du bist im richtigen Reiter.'); return false; }
+    if (el.offsetParent === null && getComputedStyle(el).position !== 'fixed') {
+      /* gemessen 18.11.: Detailstufe 1 blendet ganze Karten aus (z. B. AfA im Reiter Steuer) - nie still ins Leere */
+      var dg = (document.body.className.match(/dp-dg-(\d)/) || [])[1];
+      hinweis(dg && +dg < 3 ? 'Die Stelle ist in deiner Detailstufe ausgeblendet. Oben im Reiter Objekt auf „Experte“ stellen, dann ist sie sichtbar.'
+        : 'Die Stelle ist in dieser Ansicht gerade ausgeblendet.');
+      return false;
+    }
     /* eingeklappte Karten auf dem Weg öffnen */
     for (var p = el.parentElement; p; p = p.parentElement) { if (p.tagName === 'DETAILS' && !p.open) p.open = true; }
     try { el.scrollIntoView({ block: 'center', behavior: 'smooth' }); } catch (e) { el.scrollIntoView(); }
