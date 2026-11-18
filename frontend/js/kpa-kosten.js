@@ -42,7 +42,8 @@
     try { kk.dispatchEvent(new Event('input', { bubbles: true })); } catch (e) {}
     try { if (typeof window.toast === 'function') window.toast('Kosten der Kaufpreisaufteilung (' + b.toLocaleString('de-DE') + ' €) stehen jetzt unter Investition › Sonstige (€).'); } catch (e) {}
   }
-  window.addEventListener('dp:object-ready', function () { setTimeout(umziehen, 400); });
+  /* v3691 · ohne Browserfenster (Pruefer im vm-Kontext) kein Ereignis - steuer-audit-pruefen lief sonst rot */
+  if (typeof window.addEventListener === 'function') window.addEventListener('dp:object-ready', function () { setTimeout(umziehen, 400); });
   window.DpKpaKosten.umziehen = umziehen;
   window.DpKpaKosten.TEXT_ANK = 'Gutachten zur Kaufpreisaufteilung (vor dem Kauf, für den Kaufvertrag)';
   window.DpKpaKosten.TEXT_SOFORT = 'Kosten der Kaufpreisaufteilung / AfA-Ermittlung (nach dem Kauf, sofort abziehbar)';
