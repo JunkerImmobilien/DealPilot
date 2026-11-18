@@ -3299,6 +3299,20 @@
       }
     } catch (e) {}
     try { if (hat('baujahr')) { var a = window.dpAfaNachBaujahr && window.dpAfaNachBaujahr(); if (a) teile.push(a); } } catch (e) {}
+    /* v3720 · Mieterhöhung und Zielbild (Reiter Miete) steht seit v3710 hinter dem Haken
+       „Zielbild festlegen" (#zb_aktiv). Gemessen 18.11.2026: die geführte Eingabe (Experte)
+       übernahm Soll-, Zielmiete und „wann" - der Haken blieb aus, #zb-inhalt verborgen, die
+       Angaben rechneten unsichtbar. Beim Laden setzt potenzial.js zbSchalter() den Haken
+       ohnehin, sobald etwas erfasst ist; ein Import tut jetzt dasselbe sofort. */
+    try {
+      var zbNeu = (applied || []).some(function (id) { return /^(zb_|ms_)/.test(String(id)) && id !== 'zb_aktiv'; });
+      var zbCb = $('zb_aktiv');
+      if (zbNeu && zbCb && !zbCb.checked) {
+        zbCb.checked = true;
+        zbCb.dispatchEvent(new Event('change', { bubbles: true }));
+        teile.push('Zielbild eingeschaltet');
+      }
+    } catch (e) {}
     return teile.join(' · ');
   };
   /* Linearer AfA-Satz nach Fertigstellung (= Baujahr). Nur wenn der Satz nicht von Hand gewählt
