@@ -32,8 +32,9 @@
 
    Aufruf aus dem Repo-Wurzelverzeichnis:  node tools/rechen-audit-pruefen.mjs [--laut]
    RC=0 ist sauber. Bekannte, mit Marcel noch offene Modell-Entscheidungen
-   stehen als OFFEN (gelb) und machen den Pruefer nicht rot - sie sind im
-   Bericht Dateien/Rechen-Audit/ benannt.
+   stehen als OFFEN (gelb) und machen den Pruefer nicht rot - sie sind in
+   wissen/2026-11-18.md (Abschnitt Rechen-Audit) benannt.
+   Gegenprobe: --calc=<alte calc.js> (v3759: 8 Punkte rot).
    ══════════════════════════════════════════════════════════════════════ */
 import fs from 'fs';
 import vm from 'vm';

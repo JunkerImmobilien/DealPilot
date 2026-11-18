@@ -104,7 +104,7 @@ const obj2qc = (oa.match(/var OBJ2QC = \{[\s\S]*?\};/) || [''])[0];
 ok(/(^|[\s,{])ze:\s*'qc_nkm_sonst'/.test(obj2qc), "OBJ2QC fuehrt ze -> 'qc_nkm_sonst'");
 ok(/_merged\.ze = \{/.test(oa), 'object-actions.js legt _merged.ze aus der Mieterliste an (Quelle der Zeile)');
 const qcjs = lies(JS('quick-check.js'));
-ok(/qcZusatz = \(snapshot\.nkm_stp[\s\S]{0,140}snapshot\.nkm_sonst/.test(qcjs) && /set\('ze', String\(Math\.round\(qcZusatz\)\)\)/.test(qcjs), 'quick-check.js schreibt nkm_sonst beim Speichern als ze ins Objekt');
+ok(/qcZusatz = \(snapshot\.nkm_stp[\s\S]{0,140}snapshot\.nkm_sonst/.test(qcjs) && /set\('ze', (String\(Math\.round\(qcZusatz\)\)|_c2\(qcZusatz\))\)/.test(qcjs) /* v3670: auf den Cent (_c2) */, 'quick-check.js schreibt nkm_sonst beim Speichern als ze ins Objekt');
 
 /* ── C · Exposé-Seiten sind keine Fotos ───────────────────────────────── */
 console.log('C · Bildgewinnung aus PDFs (pdf-import.js)');
