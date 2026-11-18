@@ -562,11 +562,23 @@
        des Rechners (DpBmfWahlTafel.daten). Vorher rechnete Schritt 3 mit den 2,0 % der Pipeline - Westerfeldstr.:
        AfA 1.946 € in Schritt 3 gegen 6.083 € in Schritt 4 für dieselbe Variante. */
     var T = _tafelDaten(r), tz = function (n) { return T ? T.zeilen.filter(function (z) { return z.id === n; })[0] : null; };
-    var afaV = function (n) { var z = tz(n); return z && z.afa != null ? z.afa : p10[n].afa_jahr; };
     var satzV = function (n) { return T ? T.satz : p10[n].afa_satz_pct; };
+    /* v3705 · Marcel 18.11.2026: die 15-%-Grenze haengt am Gebaeudeanteil der Variante. Je Variante: ist die Sanierung
+       (netto, plus Erhaltung im Drei-Jahres-Fenster) ueber 15 % der Gebaeude-AK, kommt sie (brutto) zu 100 % auf die
+       Gebaeude-AfA, sonst ist sie sofort abziehbar. Eine feste Wahl im Reiter Investition (san_tax_years) gilt fuer alle. */
+    var SAN = (typeof window._dpAnschaffungsnah === 'function') ? window._dpAnschaffungsnah() : null;
+    var sanAn = function (max) {
+      if (!SAN || !(SAN.san > 0) || SAN.grund === 'keine Sanierung übernommen') return null;
+      if (SAN.wahl === '50') return true;
+      if (SAN.wahl !== 'auto') return false;
+      return (SAN.netto + (SAN.fenster || 0)) > max;
+    };
+    var sanAfa = function (max, satz) { return sanAn(max) === true ? SAN.san * (satz || 0) / 100 : 0; };
+    var afaV = function (n) { var z = tz(n); var a = z && z.afa != null ? z.afa : p10[n].afa_jahr; return a + sanAfa(p9[n].max, satzV(n)); };
     var grenzQ = T && T.grenz ? T.grenz / 100 : null;
     var steuerV = function (n) { return grenzQ != null ? (afaV(n) + (p10[n].inventar_afa_jahr || 0)) * grenzQ : p10[n].steuerersparnis_jahr; };
     var J = _jacobySpalte(r, T);
+    if (J && J.ok && typeof sanAfa === 'function') { var _jS = sanAfa(J.gebAk * 0.15, J.satz); if (_jS > 0) { J.afa += _jS; if (grenzQ != null && isFinite(J.steuer)) J.steuer += _jS * grenzQ; } }   /* v3705 */
 
     var html = '<div class="v292-pane3-header">' +
       '<div class="banner info"><strong>Amtlich, zwei Abschläge auf den Bodenwert und die umgekehrte Ertragswertmethode nach Jacoby.</strong> ' +
@@ -602,6 +614,15 @@
     html += _row('Boden im Vertrag', variants.map(function(n){ return _fmtEur(p5[n].boden_eur_vertrag); }), J.ok && _fmtEur(J.bodenVertrag));
     html += _row('Gebäude-AK (mit NK)', variants.map(function(n){ return _fmtEur(p8[n].gebaeude_ak); }), J.ok && _fmtEur(J.gebAk), { bold: true });
     html += _row('15-%-Grenze (max. Sanierung)', variants.map(function(n){ return _fmtEur(p9[n].max); }), J.ok && _fmtEur(J.gebAk * 0.15));
+    if (SAN && SAN.san > 0 && sanAn(0) !== null) {   /* v3705 */
+      var _sanTxt = function (an) { return an ? '<b style="color:#B8625C">anschaffungsnah</b><br><small>100 % Gebäude-AfA</small>' : '<b style="color:#2E8455">sofort abziehbar</b><br><small>Werbungskosten</small>'; };
+      html += _row('Sanierung ' + _fmtEur(SAN.san) + '<br><small>netto ' + _fmtEur(SAN.netto + (SAN.fenster || 0)) + (SAN.wahl !== 'auto' ? ', feste Wahl im Reiter Investition' : '') + '</small>',
+        variants.map(function(n){ return _sanTxt(sanAn(p9[n].max)); }), J.ok && _sanTxt(sanAn(J.gebAk * 0.15)));
+      html += _row('davon AfA/Jahr auf die Sanierung', variants.map(function(n){ return sanAn(p9[n].max) ? _fmtEur(sanAfa(p9[n].max, satzV(n))) : '–'; }), J.ok && (sanAn(J.gebAk * 0.15) ? _fmtEur(SAN.san * (J.satz || 0) / 100) : '–'));
+      html += _row('Sofort abziehbar (einmalig)' + (grenzQ != null ? '<br><small>Steuerwirkung bei ' + _fmtPct(T.grenz, 2) + '</small>' : ''),
+        variants.map(function(n){ return sanAn(p9[n].max) ? '–' : _fmtEur(SAN.san) + (grenzQ != null ? '<br><small>≈ ' + _fmtEur(SAN.san * grenzQ) + ' Steuer</small>' : ''); }),
+        J.ok && (sanAn(J.gebAk * 0.15) ? '–' : _fmtEur(SAN.san)));
+    }
     html += _row('AfA-Satz' + (T ? ' (Reiter Steuer)' : ''), variants.map(function(n){ return _fmtPct(satzV(n), 2); }), J.ok && _fmtPct(J.satz, 2));
     html += _row('AfA Gebäude/Jahr', variants.map(function(n){ return _fmtEur(afaV(n)); }), J.ok && _fmtEur(J.afa));
     html += _row('AfA Inventar/Jahr', variants.map(function(n){ return _fmtEur(p10[n].inventar_afa_jahr); }), J.ok && _fmtEur(J.inv));

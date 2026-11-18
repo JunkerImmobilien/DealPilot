@@ -1277,32 +1277,28 @@ function _dpInjectTreeHk(){  /* v992-tree2 */
     var _nk0 = _k0.nkImmo;
     var _san0 = parseDe(($('ak_ahk') || {}).value) || 0;
     var _g = (typeof window._bmfG15 === 'function') ? window._bmfG15() : null;
-    /* v3704 · dieselbe Entscheidung wie Reiter Steuer (tax.js _dpAnschaffungsnah: Gebaeudeanteil des Objekts,
-       Drei-Jahres-Fenster, eigene Wahl). Die Variante im Fenster entscheidet nur noch den Hinweis darunter. */
+    /* v3705 · NIMMT v3704 ZURUECK (Marcel 18.11.2026): Der Baum zeigt die Anschaffungskosten, die auf Boden und Gebaeude
+       AUFGETEILT werden - Kaufpreis ohne Inventar plus Nebenkosten. Anschaffungsnahe Herstellungskosten gehoeren nicht
+       hinein: sie werden nicht aufgeteilt, sondern kommen zu 100 % auf die Gebaeude-AfA, und OB sie anschaffungsnah sind,
+       haengt am Gebaeudeanteil der gewaehlten Variante (15 % der Gebaeude-AK). v3704 hatte sie mit dem Anteil des
+       Objekts in die Endzeile gerechnet - falsch, sobald eine andere Variante gewaehlt wird. Die Einordnung je Variante
+       steht jetzt in Schritt 3 (bmf-modal-v292.js, Zeilen „Sanierung“). */
     var _A = (typeof window._dpAnschaffungsnah === 'function') ? window._dpAnschaffungsnah() : null;
-    var _anschaffungsnah = _A ? _A.an : !!(_g && _g.max > 0 && _g.geplantNetto > _g.max);
-    if (_kp0 > 0) base = Math.max(0, _kp0 - _inv0) + (isFinite(_nk0) ? _nk0 : 0) + (_anschaffungsnah ? _san0 : 0);
+    if (_kp0 > 0) base = Math.max(0, _kp0 - _inv0) + (isFinite(_nk0) ? _nk0 : 0);
     Array.prototype.slice.call(box.querySelectorAll('.v3704-anah-row')).forEach(function (r) { r.remove(); });
     if (_san0 > 0) {
       var _r = document.createElement('div');
       _r.className = 'v292-row v3704-anah-row';
       _r.style.cssText = 'display:flex;justify-content:space-between;gap:10px;margin-top:2px;padding-top:4px;border-top:1px dashed var(--wl-c9a84c, #C9A84C)';
-      var _varAnders = !!(_A && _g && _g.max > 0 && ((_g.geplantNetto + (_A.fenster || 0)) > _g.max) !== _A.an && _A.wahl === 'auto');
-      _r.innerHTML = _anschaffungsnah
-        ? '<span><b>+ Anschaffungsnahe Herstellungskosten</b> <span class="v292-arrow">§ 6 Abs. 1 Nr. 1a EStG · 100 % Gebäude, nicht aufgeteilt</span></span><span><b>' + fmtEur(_san0, 0) + '</b></span>'
-        : '<span>Sanierung ' + fmtEur(_san0, 0) + ' <span class="v292-arrow">' + ((_A && _A.grund) || 'unter der 15-%-Grenze') + ' · nicht in den Anschaffungskosten, Werbungskosten</span></span><span>0 €</span>';
-      fin.insertAdjacentElement('beforebegin', _r);
-      if (_varAnders) {
-        var _h = document.createElement('div');
-        _h.className = 'v292-row v3704-anah-row';
-        _h.style.cssText = 'font-size:11.5px;line-height:1.45;color:var(--muted,#6B6356);margin:2px 0 4px';
-        _h.textContent = 'Hinweis: Die Prüfung nutzt den Gebäudeanteil des Objekts' + (_A.gebPct ? ' (' + String(_A.gebPct).replace('.', ',') + ' %)' : '') + ', Grenze ' + fmtEur(_A.grenze, 0) + '. Mit dem Gebäudeanteil der gewählten Variante läge die Grenze bei ' + fmtEur(_g.max, 0) + ' und die Sanierung (' + fmtEur(_g.geplantNetto + (_A.fenster || 0), 0) + ' netto) ' + (_A.an ? 'darunter, also sofort abziehbar' : 'darüber, also anschaffungsnah') + '. Wird die Variante übernommen, ändert sich die Einordnung.';
-        fin.insertAdjacentElement('beforebegin', _h);
-      }
+      _r.style.cssText = 'display:block;font-size:11.5px;line-height:1.45;color:var(--muted,#6B6356);margin:4px 0 2px';
+      _r.innerHTML = 'Sanierung ' + fmtEur(_san0, 0) + ' (netto ' + fmtEur((_A ? _A.netto + (_A.fenster || 0) : _san0 / 1.19), 0) + ') steht <b>nicht</b> in dieser Summe: sie wird nicht auf Boden und Gebäude aufgeteilt. '
+        + 'Liegt sie über 15 % der Gebäude-Anschaffungskosten, kommt sie zu 100 % auf die Gebäude-AfA (§ 6 Abs. 1 Nr. 1a EStG), sonst ist sie sofort abziehbar. '
+        + 'Die Grenze hängt am Gebäudeanteil, deshalb steht die Einordnung je Variante in Schritt 3.';
+      fin.insertAdjacentElement('afterend', _r);
     }
   } catch (e) {}
   var label = (hk > 0) ? '= Anschaffungs- & Herstellungskosten' : '= Anschaffungskosten';
-  fin.innerHTML = '<span><b>' + label + '</b> <span class="v292-arrow">\u2192 Basis f\u00fcr AfA</span></span><span class="v292-final-value"><b>' + fmtEur(base + hk, 0) + '</b></span>';
+  fin.innerHTML = '<span><b>' + label + '</b> <span class="v292-arrow">\u2192 Basis f\u00fcr Aufteilung und AfA</span></span><span class="v292-final-value"><b>' + fmtEur(base + hk, 0) + '</b></span>';
 }
 document.addEventListener('click', function(e){
   var t = e.target; if(t && t.closest && t.closest('.bmfmo-close-top')){ e.preventDefault(); try{ closeBMFModal(); }catch(_e){} }
