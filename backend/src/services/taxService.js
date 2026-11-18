@@ -155,7 +155,8 @@ async function listForUser(userId, fromYear, toYear) {
     FROM tax_records tr
     JOIN objects o ON o.id = tr.object_id
     WHERE tr.user_id = $1
-      AND o.kunden_freigabe_id IS NULL`;   /* v3683 · Kundenstaende zaehlen nicht zur eigenen Steuer */
+      AND o.kunden_freigabe_id IS NULL
+      AND (o.data::jsonb -> '_von_kunde') IS NULL`;   /* v3688: vom Kunden uebernommene Objekte zaehlen bis P2 nicht zur eigenen Steuer */   /* v3683 · Kundenstaende zaehlen nicht zur eigenen Steuer */
   const params = [userId];
   if (fromYear != null) { sql += ' AND tr.year >= $' + (params.length + 1); params.push(fromYear); }
   if (toYear != null) { sql += ' AND tr.year <= $' + (params.length + 1); params.push(toYear); }
