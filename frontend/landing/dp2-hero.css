@@ -89,7 +89,10 @@
 
 /* ══ Die Boarding-Pass-Score-Karte ══════════════════════════════════════ */
 .idscard{position:relative;background:#fff;overflow:hidden;color:var(--ink);
-  margin-right:-78px;
+  /* landing-strecke-4 · Marcel 18.11.2026: der Anschnitt nach rechts (bis 78 px) nur, wo rechts Platz ist.
+     Freier Rand = (Fenster - --max) / 2 + 26 px Innenabstand, davon 32 px ab (16 px Luft + Scrollleiste).
+     Zwischen 1181 und etwa 1400 px schnitt die feste -78 px das Cleared-Zeichen ab. */
+  margin-right:calc(-1 * clamp(0px, (100vw - var(--max)) / 2 - 6px, 78px));
   box-shadow:0 50px 96px -40px rgba(0,0,0,.8);border:1px solid rgba(255,255,255,.08);
   opacity:0;transform:translateY(26px);
   animation:rise 1s var(--e-hoch) .3s forwards}

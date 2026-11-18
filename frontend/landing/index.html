@@ -55,12 +55,12 @@ if (/^#(partner-plan|module|nachkauf|feature-matrix)$/.test(location.hash)) loca
 if (location.hash === '#stories') location.replace('geschichten.html');
 if (location.hash === '#forschung') location.replace('forschung.html');</script>
 <link rel="stylesheet" href="dp2.css?v=v2971b">
-<link rel="stylesheet" href="dp2-hero.css?v=landing-strecke-3">
+<link rel="stylesheet" href="dp2-hero.css?v=landing-strecke-4">
 <link rel="stylesheet" href="dp2-teile.css?v=landing-partner-2">
 <link rel="stylesheet" href="dp2-buehne.css?v=v1570">
 <!-- v1588: der Wechselschritt loest den bisherigen Ablauf ab -->
 <!-- landing-videothek-1 · DealPilot live, F&E, Kanzlei-Zeile -->
-<link rel="stylesheet" href="dp2-live.css?v=landing-partner-1">
+<link rel="stylesheet" href="dp2-live.css?v=landing-strecke-4">
 <link rel="stylesheet" href="partner.css?v=landing-partner-4"><!-- landing-partner-1 · Abschnitt #fuer-partner -->
 <link rel="stylesheet" href="dp2-module.css?v=landing-module-2">
 <link rel="stylesheet" href="dp2-kern.css?v=landing-strecke-3">
@@ -359,16 +359,6 @@ if (location.hash === '#forschung') location.replace('forschung.html');</script>
   <div class="dk-szene rv"><div class="dk-karte" id="dkKarte"><!-- landing-seo-3 · Inhalt baut dp2-dealcheck.js (eine Komponente für Startseite und Rechner-Seiten) --></div></div>
 </div></section>
 
-<!-- ══ DEALPILOT LIVE ════════════════════════════════════════════════
-     landing-videothek-1 · Marcel am 16.10.2026: "relativ weit oben, nicht
-     direkt am Header, vielleicht danach erst, wie es erklaert ist, und dann
-     DealPilot Live". Deshalb steht er HINTER "Was DealPilot macht".
-     Gebaut von dp2-live.js aus assets/videothek/videos.json - hier steht
-     nur der Platz. Die Videos selbst liegen nicht im Git (medien/). ═══ -->
-<section class="sec sec-dark dpl" id="live"><div class="wrap">
-  <div id="dplRoot" data-start="ueberblick"></div>
-</div></section>
-
 <!-- ══ DIE STRECKE (Aufzug) · landing-strecke-1 ════════════════════════
      Marcel 17.11.2026: „dieselbe grafische Art für die Hauptseite … eine Strecke, die den Ablauf von
      DealPilot zeigt, mit echten App-Auszügen“. Seit landing-strecke-3 (Marcel 18.11.2026) die Startseite.
@@ -478,6 +468,20 @@ if (location.hash === '#forschung') location.replace('forschung.html');</script>
     <div class="dp-strecke-cta"><a class="btn-p" href="https://app.dealpilot.immo/?register=1">Kostenlos einchecken →</a>
       <span>Keine Zahlungsdaten · 4 Wochen voller Pro-Umfang · danach automatisch Free, ohne Kündigung</span></div>
   </div>
+</div></section>
+
+<!-- ══ DEALPILOT LIVE ════════════════════════════════════════════════
+     landing-videothek-1 · Marcel am 16.10.2026: "relativ weit oben, nicht
+     direkt am Header, vielleicht danach erst, wie es erklaert ist, und dann
+     DealPilot Live". Deshalb steht er HINTER "Was DealPilot macht".
+     landing-strecke-4 · Marcel 18.11.2026 („ja beides machen“): HINTER der Strecke und kompakt. Ohne die
+     acht Modul-Videos, die die Etappen schon verlinken, nur Überblick/Spot und die Partner-Reihe,
+     Knopf zur Videothek.
+     Gebaut von dp2-live.js aus assets/videothek/videos.json - hier steht
+     nur der Platz. Die Videos selbst liegen nicht im Git (medien/). ═══ -->
+<section class="sec sec-dark dpl" id="live"><div class="wrap">
+  <div id="dplRoot" data-start="ueberblick" data-kompakt data-reihen="ueberblick,partner"
+       data-ohne="modul-03-datenaufnahme-vier-wege,modul-28-unterlagen-einlesen,modul-12-bewertung-und-kpis,modul-08-finanzierung,modul-27-steuerverlauf-mit-wendepunkt,modul-18-der-marktbericht,modul-26-mieterhoehung-und-zielbild,modul-14-ankauf-in-den-bestand"></div>
 </div></section>
 
 <!-- ══ DATENBASIS ════════════════════════════════════════════════════
@@ -663,7 +667,7 @@ if (location.hash === '#forschung') location.replace('forschung.html');</script>
      (tools/buster-ebenen-pruefen.mjs liest die Zeilen unten). Die App-Domain folgt umgebung.js:
      staging.dealpilot.immo -> app.staging.dealpilot.immo, sonst app.dealpilot.immo. -->
 <script src="dealcheck-laden.js?v=landing-platzhalter-1"></script><!-- landing-seo-3 · Kerne + Deal-Check, Buster dort (buster-ebenen-pruefen liest die Datei) -->
-<script src="dp2-live.js?v=landing-partner-videos-6"></script>
+<script src="dp2-live.js?v=landing-strecke-4"></script>
 <script src="partner.js?v=landing-partner-3"></script><!-- landing-strecke-1 · Aufzug der Strecke --><!-- landing-videothek-1, landing-partner-1 -->
 <!-- v1588: Zwei Funktionen, die der alten Landing schon gehoerten und
      hier gefehlt haben. Beide betreffen Geld, deshalb standen sie ganz

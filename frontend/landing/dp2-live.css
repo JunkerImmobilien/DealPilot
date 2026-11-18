@@ -363,3 +363,18 @@
 .vt-folgt b{font:700 13px/1 var(--disp);background:var(--runway);color:#14100a;padding:6px 10px}
 .vt-folgt span{font:700 10px/1 var(--mono);letter-spacing:.18em;text-transform:uppercase;color:var(--gdh)}
 #reihe-partner{scroll-margin-top:110px}
+
+/* ══ landing-strecke-4 · kompakt auf der Startseite (data-kompakt, Marcel 18.11.2026) ══════════
+   Ohne Bordkarte. Ab 1081 px steht der Streifen als Liste rechts neben dem Bildschirm und ist so hoch
+   wie der Bildschirm (height:0 + min-height:100%, die Zeile bestimmt der Bildschirm). Darunter ein Knopf. */
+.dpl-kompakt .dpl-karte{display:none}
+.dpl-kompakt .dpl-kopf{margin-bottom:22px}
+.dpl-kompakt .dpl-streifen{position:relative}
+.dpl-alle{margin:22px 0 0;text-align:center}
+@media(min-width:1081px){
+  .dpl-kompakt .dpl-buehne .dpl-streifen{align-self:stretch;flex-direction:column;overflow-x:hidden;overflow-y:auto;
+    scroll-snap-type:y mandatory;height:0;min-height:100%;margin:0;padding:0 6px 0 0;gap:10px}
+  .dpl-kompakt .dpl-w{flex:0 0 auto;display:grid;grid-template-columns:150px minmax(0,1fr);align-items:center}
+  .dpl-kompakt .dpl-w:hover{transform:none}
+  .dpl-kompakt .dpl-w .dpl-wd{right:auto;left:6px}
+}

@@ -82,12 +82,23 @@
     var V = D.videos || [], K = D.kategorien || [];
     var start = root.getAttribute('data-start') || 'ueberblick';
     var kat = start, liste = [], idx = 0, selbstAngehalten = false, imBlick = false, scharf = false;
+    /* landing-strecke-4 · Marcel 18.11.2026 („ja beides machen“): auf der Startseite steht „DealPilot live“
+       HINTER der Strecke und kompakt (data-kompakt). Die acht Modul-Videos der Strecke fehlen hier
+       (data-ohne, siehe Lader unten), es bleiben Überblick/Spot und die Partner-Reihe (data-reihen).
+       Keine Bordkarte, der Streifen steht als Liste neben dem Bildschirm, darunter der Knopf zur Videothek. */
+    var kompakt = root.hasAttribute('data-kompakt'), gesamt = D.gesamt || V.length;
+    if (kompakt) root.classList.add('dpl-kompakt');
 
     root.innerHTML =
       '<div class="dpl-kopf">' +
+      (kompakt ?
+        '<div class="head"><div class="eye">DealPilot in Aktion · echte Aufnahmen</div>' +
+          '<h2>Der ganze Weg im Film. <span class="ac">Und alles für Partner.</span></h2>' +
+          '<p>Der Spot und die Überblicke zeigen ein Objekt vom Exposé bis zum Kauf. Die Partner-Reihe zeigt, wie Berater ihre Kunden begleiten.</p></div>'
+      :
         /* landing-module-1 · Marcel 27.10.2026: „Nicht erklärt. Vorgeflogen.“ war ihm zu albern, Investoren brauchen eine deutliche Sprache */ '<div class="head"><div class="eye">DealPilot in Aktion · echte Aufnahmen</div>' +
           '<h2>Vom Exposé zur <span class="ac">belastbaren Entscheidung.</span></h2>' +
-          '<p>So rechnet DealPilot ein Objekt durch: Cashflow, Finanzierung, Steuer, Wert und Risiko, nachvollziehbar Schritt für Schritt. Starte mit dem Überblick oder geh direkt in das Modul, das dich interessiert.</p></div>' +
+          '<p>So rechnet DealPilot ein Objekt durch: Cashflow, Finanzierung, Steuer, Wert und Risiko, nachvollziehbar Schritt für Schritt. Starte mit dem Überblick oder geh direkt in das Modul, das dich interessiert.</p></div>') +
         '<div class="dpl-tabs" role="tablist" aria-label="Videoreihe wählen">' +
           K.map(function (k) {
             var n = V.filter(function (v) { return v.kategorie === k.id; }).length;
@@ -113,12 +124,15 @@
         '<div class="dpl-karte" id="dplKarte" aria-live="polite"><div class="dpl-inhalt" id="dplInhalt"></div></div>' +
       '</div>' +
       '<div class="dpl-streifen" id="dplStreifen"></div>' +
-      '<p class="dpl-hinweis">Die Videos laufen stumm und automatisch, solange du hier bist. Alle ' + V.length +
-        ' Videos mit Kapiteln findest du in der <a href="videothek.html">Videothek</a>.</p>';
+      (kompakt
+        ? '<p class="dpl-alle"><a class="btn-l" href="videothek.html">Alle ' + gesamt + ' Videos in der Videothek →</a></p>'
+        : '<p class="dpl-hinweis">Die Videos laufen stumm und automatisch, solange du hier bist. Alle ' + V.length +
+        ' Videos mit Kapiteln findest du in der <a href="videothek.html">Videothek</a>.</p>');
 
     var $ = function (id) { return root.querySelector('#' + id); };
     var vid = $('dplVideo'), bild = $('dplBild'), schirm = root.querySelector('.dpl-schirm');
     var karte = $('dplKarte'), inhalt = $('dplInhalt'), streifen = $('dplStreifen');
+    if (kompakt) root.querySelector('.dpl-buehne').appendChild(streifen);   /* Liste statt Bordkarte */
 
     function zeigeKat(k, ohneStart) {
       kat = k;
@@ -167,7 +181,7 @@
           b.classList.toggle('on', j === idx); b.style.removeProperty('--p');
         });
         var akt = streifen.querySelector('.dpl-w.on');
-        if (akt && imBlick) streifen.scrollTo({ left: akt.offsetLeft - 8, behavior: ruhig ? 'auto' : 'smooth' });
+        if (akt && imBlick) streifen.scrollTo({ left: akt.offsetLeft - 8, top: kompakt ? akt.offsetTop - 4 : 0, behavior: ruhig ? 'auto' : 'smooth' });
         if (!ohneStart) spielen();
       }, ruhig ? 0 : 260);
     }
@@ -651,7 +665,12 @@
     Dl.videos = echt; Dl.geplant = alle.filter(istGeplant);
     if (lr) {   /* „DealPilot live“: nur Reihen mit mindestens einem fertigen Video */
       var Dv = {}; Object.keys(Dl).forEach(function (k) { Dv[k] = Dl[k]; });
-      Dv.kategorien = (D.kategorien || []).filter(function (k) { return echt.some(function (v) { return v.kategorie === k.id; }); });
+      /* landing-strecke-4 · data-ohne: Videos, die schon in der Strecke verlinkt sind; data-reihen: nur diese Reihen */
+      var ohne = (lr.getAttribute('data-ohne') || '').split(/[\s,]+/).filter(Boolean);
+      var reihen = (lr.getAttribute('data-reihen') || '').split(/[\s,]+/).filter(Boolean);
+      Dv.gesamt = echt.length;
+      Dv.videos = echt.filter(function (v) { return ohne.indexOf(v.id) < 0 && (!reihen.length || reihen.indexOf(v.kategorie) >= 0); });
+      Dv.kategorien = (D.kategorien || []).filter(function (k) { return Dv.videos.some(function (v) { return v.kategorie === k.id; }); });
       live(lr, Dv);
     }
     if (tr) thek(tr, Dl);
