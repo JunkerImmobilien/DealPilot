@@ -105,7 +105,19 @@
   }
 
   var los = false;
-  function start() { if (los) return; los = true; setTimeout(ausfuehren, 800); }
+  /* v3685a · gemessen 18.11.2026 nach Anmeldung per Link: dp:plan-ready kam, der Sprung lud das
+     Objekt, und das Hochfahren der App (Liste, Startansicht) setzte danach wieder zurück -
+     _currentObjKey war leer. Jetzt erst springen, wenn die Objektliste gezeichnet ist (höchstens 15 s),
+     dann noch einen Moment Ruhe. */
+  async function bereit() {
+    var t0 = Date.now();
+    while (Date.now() - t0 < 15000) {
+      if (document.querySelector('.sb-card') && typeof window.loadSaved === 'function') break;
+      await warte(300);
+    }
+    await warte(1500);
+  }
+  function start() { if (los) return; los = true; bereit().then(ausfuehren); }
   window.addEventListener('dp:plan-ready', start);
   /* Fallback, falls dp:plan-ready vor diesem Skript feuerte: einmal nachsehen, ob Konto und loadSaved stehen */
   window.addEventListener('load', function () {
