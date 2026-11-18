@@ -1,5 +1,5 @@
 {
-  "_hinweis": "v3730 (18.11.2026): K1, P2, P3, 07, 08, 10a, 10b, 10c, 21 neu aufgenommen (Oberfläche Stand v3730, ohne Pilot und Mechaniker) und mit Marcels Stimmklon vertont; Dateien mit -v3730. v3740 (18.11.2026): Module 04, 16, 18 entfernt (abgelöst durch Modul 30, v3270b/v3271a). Modul 30 steht als \"geplant\" (Video folgt), bis die MP4 auf dem Server liegt. \"vorbereitet\" liest die Seite nicht: dort steht das neue Modul 28 (Drehbuch reihe-unterlagen); beim Hochladen nach videos verschieben und den Eintrag aus \"ersetzt\" (Lindenallee-Fassung vom 28.10.) im selben Zug entfernen, sonst steht Modul 28 doppelt da. landing-partner-1 · Reihe „partner“: Einträge mit \"geplant\": true sind Platzhalter („Video folgt“), fertige Partner-Videos trägt tools/partner-videos-eintragen.mjs aus Dateien/Messe/Videos/Partner/videos.json ein. landing-videothek-3b · EINE Quelle fuer den Abschnitt 'DealPilot live' (index.html) und die Videothek (videothek.html). Ein Video mehr = ein Eintrag mehr. Die MP4s liegen NICHT im Git (frontend/landing/medien/ ist ignoriert) - sie kommen per scp auf den Server. Das Feld youtube ist fuer den spaeteren Upload: Titel, Beschreibung und Schlagworte dort pflegen, die youtube_id nach dem Upload eintragen. Keine Anbieternamen ausser ImmoMetrica, keine Adressen.",
+  "_hinweis": "v3730b (18.11.2026): Ü1, Ü2, 19, 23, 28 neu aufgenommen; Modul 28 „Alle Unterlagen reinladen“ ersetzt „Unterlagen einlesen“ (Eintrag aus vorbereitet übernommen). Davor v3730: K1, P2, P3, 07, 08, 10a, 10b, 10c, 21 neu aufgenommen (Oberfläche Stand v3730, ohne Pilot und Mechaniker) und mit Marcels Stimmklon vertont; Dateien mit -v3730. v3730 (18.11.2026): K1, P2, P3, 07, 08, 10a, 10b, 10c, 21 neu aufgenommen (Oberfläche Stand v3730, ohne Pilot und Mechaniker) und mit Marcels Stimmklon vertont; Dateien mit -v3730. v3740 (18.11.2026): Module 04, 16, 18 entfernt (abgelöst durch Modul 30, v3270b/v3271a). Modul 30 steht als \"geplant\" (Video folgt), bis die MP4 auf dem Server liegt. \"vorbereitet\" liest die Seite nicht: dort steht das neue Modul 28 (Drehbuch reihe-unterlagen); beim Hochladen nach videos verschieben und den Eintrag aus \"ersetzt\" (Lindenallee-Fassung vom 28.10.) im selben Zug entfernen, sonst steht Modul 28 doppelt da. landing-partner-1 · Reihe „partner“: Einträge mit \"geplant\": true sind Platzhalter („Video folgt“), fertige Partner-Videos trägt tools/partner-videos-eintragen.mjs aus Dateien/Messe/Videos/Partner/videos.json ein. landing-videothek-3b · EINE Quelle fuer den Abschnitt 'DealPilot live' (index.html) und die Videothek (videothek.html). Ein Video mehr = ein Eintrag mehr. Die MP4s liegen NICHT im Git (frontend/landing/medien/ ist ignoriert) - sie kommen per scp auf den Server. Das Feld youtube ist fuer den spaeteren Upload: Titel, Beschreibung und Schlagworte dort pflegen, die youtube_id nach dem Upload eintragen. Keine Anbieternamen ausser ImmoMetrica, keine Adressen.",
   "stand": "2026-11-11",
   "basis_medien": "medien/videothek/",
   "basis_bilder": "assets/videothek/",
@@ -33,55 +33,238 @@
       "youtube": { "titel": "DealPilot · Das Haus hab ich. (Werbespot, 90 Sekunden)", "tags": ["DealPilot", "Immobilien", "Kapitalanlage", "Mehrfamilienhaus", "Werbespot"], "youtube_id": null }
     },
     {
-      "id": "ueberblick-1-quick-boarding", "kategorie": "ueberblick", "nr": "Ü1", "dauer": 221,
+      "id": "ueberblick-1-quick-boarding",
+      "kategorie": "ueberblick",
+      "nr": "Ü1",
+      "dauer": 224,
       "titel": "Quick-Check",
       "unterzeile": "Vom Exposé zum ersten Urteil — in wenigen Minuten.",
       "story": "Ein Exposé landet im Postfach. Statt Tabelle aufzumachen, gehst du in den Quick-Check: Daten aufnehmen, Marktwert und Spanne ablesen, Eigenkapital und Lage einstellen — und am Ende sagt dir der Co-Pilot, ob sich der zweite Blick lohnt.",
       "nutzen": "In Minuten entscheiden, ob ein Angebot deine Zeit wert ist.",
       "kapitel": [
-        { "t": 0, "titel": "Einstieg", "stichworte": "Quick Boarding Exposé ersten Urteil wenigen Minuten" },
-        { "t": 14, "titel": "Die Datenaufnahme", "stichworte": "Datenaufnahme Oben fünf Wege Objekt DealPilot kommt reicht" },
-        { "t": 21, "titel": "Exposé & Marktbericht", "stichworte": "Exposé Marktbericht PDFs hineinziehen Mietaufstellung DealPilot liest jeden Wert Quelle" },
-        { "t": 29, "titel": "Sprache", "stichworte": "Sprache Besichtigung einfach erzählen Fläche Miete Zustand DealPilot schreibt füllt Felder" },
-        { "t": 37, "titel": "ImmoMetrica", "stichworte": "ImmoMetrica Direkt Inserat gespeicherte Suche öffnen Objekt wählen übernehmen" },
-        { "t": 46, "titel": "DealPilot-Marktbewertung", "stichworte": "DealPilot-Marktbewertung Kein Exposé Hand Abrufen Marktwert Marktmiete Adresse DealPilots eigener Bewertung" },
-        { "t": 54, "titel": "Oder von Hand", "stichworte": "Hand einfach tippen Feld rechnet sofort Score Urteil laufen" },
-        { "t": 61, "titel": "Datenaufnahme", "stichworte": "Datenaufnahme Zwei PDFs Wohnung Exposé Makler Marktbericht Beide einmal eingelesen DealPilot erkennt selbst Adressen nennen verschiedene" },
-        { "t": 92, "titel": "Marktwertindikation", "stichworte": "Marktwertindikation Wohnung leer DealPilot schätzt Markt Marktwert Miete kalt" },
-        { "t": 100, "titel": "Achtung: Angebotspreise", "stichworte": "Achtung Angebotspreise Vergleichswerte Inseraten DealPilot zieht Abschlag aktuellen Marktdurchschnitt realistisch" },
-        { "t": 111, "titel": "Die Miete", "stichworte": "Miete Rechnung mittlere Marktmiete kalt Sofort Einschätzung Voll finanziert Score Kritisch Objekt passt Finanzierung prüfen Marktwert" },
-        { "t": 125, "titel": "Mehr Eigenkapital", "stichworte": "Eigenkapital statt Vollfinanzierung Score Solide Kauf möglich genauer prüfen Marktwert" },
-        { "t": 141, "titel": "Gegen deine Lage", "stichworte": "Gegen Lage B-Lage Kauf möglich genauer prüfen Marktwert Dieselbe Wohnung aber stufst Urteil kippt Nicht kaufen" },
-        { "t": 199, "titel": "Als Objekt speichern", "stichworte": "Objekt speichern Passt gespeichert allen Werten Quellen" }
+        {
+          "t": 0,
+          "titel": "Einstieg",
+          "stichworte": "Quick Boarding Exposé ersten Urteil wenigen Minuten"
+        },
+        {
+          "t": 11,
+          "titel": "Die Datenaufnahme",
+          "stichworte": "Oben die Datenaufnahme: fünf Wege, wie ein Objekt in DealPilot kommt — einer reicht."
+        },
+        {
+          "t": 19,
+          "titel": "Exposé & Marktbericht",
+          "stichworte": "PDFs hineinziehen — Exposé, Marktbericht, Mietaufstellung. DealPilot liest jeden Wert mit Quelle."
+        },
+        {
+          "t": 27,
+          "titel": "Sprache",
+          "stichworte": "Bei der Besichtigung einfach erzählen — Fläche, Miete, Zustand. DealPilot schreibt mit und füllt die Felder."
+        },
+        {
+          "t": 35,
+          "titel": "ImmoMetrica",
+          "stichworte": "Direkt aus dem Inserat: deine gespeicherte Suche öffnen, Objekt wählen, übernehmen."
+        },
+        {
+          "t": 43,
+          "titel": "DealPilot-Marktbewertung",
+          "stichworte": "Kein Exposé zur Hand? Abrufen — Marktwert und Marktmiete für die Adresse, aus DealPilots eigener Bewertung."
+        },
+        {
+          "t": 51,
+          "titel": "Oder von Hand",
+          "stichworte": "Oder einfach tippen — jedes Feld rechnet sofort mit, Score und Urteil laufen mit."
+        },
+        {
+          "t": 59,
+          "titel": "Datenaufnahme",
+          "stichworte": "Zwei PDFs zur Wohnung: das Exposé vom Makler und ein Marktbericht. Beide auf einmal eingelesen — DealPilot erkennt selbst, was Exposé und was Marktbericht ist."
+        },
+        {
+          "t": 71,
+          "titel": "Zwei Adressen?",
+          "stichworte": "Die PDFs nennen zwei verschiedene Adressen — DealPilot merkt es und fragt, welche gilt."
+        },
+        {
+          "t": 78,
+          "titel": "Jeder Wert mit Quelle",
+          "stichworte": "Das Exposé gilt — die Werte der anderen Wohnung bleiben draußen. Jeder Wert mit Quelle, ein Klick übernimmt."
+        },
+        {
+          "t": 90,
+          "titel": "Marktwertindikation",
+          "stichworte": "Die Wohnung ist leer — DealPilot schätzt den Markt: Marktwert 144.000 € – 261.000 €, Miete 597 € – 776 € kalt."
+        },
+        {
+          "t": 98,
+          "titel": "Achtung: Angebotspreise",
+          "stichworte": "Vergleichswerte aus Inseraten sind Angebotspreise. DealPilot zieht deinen Abschlag gleich ab: 5,8 %, den aktuellen Marktdurchschnitt — Ø 189.000 € → realistisch 178.000 €."
+        },
+        {
+          "t": 111,
+          "titel": "Die Miete",
+          "stichworte": "Für die Rechnung die mittlere Marktmiete: 683 € kalt …"
+        },
+        {
+          "t": 117,
+          "titel": "Sofort eine Einschätzung",
+          "stichworte": "Voll finanziert: Score 37 · Schwach — „Objekt passt — Finanzierung prüfen · 28 % unter Marktwert“."
+        },
+        {
+          "t": 125,
+          "titel": "Mehr Eigenkapital",
+          "stichworte": "20 % Eigenkapital statt Vollfinanzierung … Mit 20 % Eigenkapital: Score 64 · Solide — „Kauf möglich — genauer prüfen · 28 % unter Marktwert“."
+        },
+        {
+          "t": 141,
+          "titel": "Gegen deine Lage",
+          "stichworte": "In der B-Lage: „Kauf möglich — genauer prüfen · 28 % unter Marktwert“. Dieselbe Wohnung — aber du stufst die Lage als C ein …"
+        },
+        {
+          "t": 159,
+          "titel": "Das Urteil kippt",
+          "stichworte": "„Nicht kaufen — Rendite unter deinem Ziel für die C-Lage · trotz 28 % unter Marktwert“ — Für die C-Lage zu wenig Rendite: 5,9 % brutto statt deiner 7,0 % (deutlich unter deinem Ziel). Der Score bleibt, das Urteil nicht."
+        },
+        {
+          "t": 178,
+          "titel": "Und was es bräuchte",
+          "stichworte": "Deine Zielrendite erreicht er erst bei einem Kaufpreis von 117.000 € oder darunter. Rechnerisch trägt der Deal trotzdem: Score 64, Cashflow +99 €/Monat, DSCR 1,20 — er passt nur nicht zu deinem Maßstab für diese Lage."
+        },
+        {
+          "t": 199,
+          "titel": "Als Objekt speichern",
+          "stichworte": "Passt er zu dir? Ein Klick — als Objekt gespeichert, mit allen Werten und Quellen."
+        }
       ],
       "spruch": "Erst rechnen, dann boarden.",
-      "datei": "dealpilot-ueberblick-1-quick-boarding.mp4", "datei_ton": "dealpilot-ueberblick-1-quick-boarding-sprecher.mp4",
+      "datei": "dealpilot-ueberblick-1-quick-boarding-v3730.mp4",
+      "datei_ton": "dealpilot-ueberblick-1-quick-boarding-v3730-sprecher.mp4",
       "poster": "dealpilot-ueberblick-1-quick-boarding.webp",
-      "youtube": { "titel": "DealPilot Überblick 1 · Quick-Check – vom Exposé zum ersten Urteil", "tags": ["DealPilot", "Immobilien", "Kapitalanlage", "Quick Check", "Exposé prüfen"], "youtube_id": null }
+      "youtube": {
+        "titel": "DealPilot Überblick 1 · Quick-Check – vom Exposé zum ersten Urteil",
+        "tags": [
+          "DealPilot",
+          "Immobilien",
+          "Kapitalanlage",
+          "Quick Check",
+          "Exposé prüfen"
+        ],
+        "youtube_id": null
+      }
     },
     {
-      "id": "ueberblick-2-objekt-bis-investment-pdf", "kategorie": "ueberblick", "nr": "Ü2", "dauer": 299,
+      "id": "ueberblick-2-objekt-bis-investment-pdf",
+      "kategorie": "ueberblick",
+      "nr": "Ü2",
+      "dauer": 305,
       "titel": "Vom neuen Objekt zum DealScore und Investment-PDF",
       "unterzeile": "Der ganze Weg am Stück — in fünf Minuten.",
       "story": "Ein Mehrfamilienhaus mit vier Wohnungen, einmal komplett: anlegen, bewerten, Nebenkosten, Miete, Finanzierung, Bewirtschaftung und Steuer — dann leuchten die Ampeln, der DealScore steht, und das Investment-PDF ist fertig für die Bank.",
       "nutzen": "Der komplette Flugplan eines Ankaufs, ohne ein einziges Mal die Daten abzutippen.",
       "kapitel": [
-        { "t": 0, "titel": "Einstieg", "stichworte": "neuen Objekt DealScore Investment-PDF ganze Stück fünf Minuten" },
-        { "t": 11, "titel": "Ein neues Objekt", "stichworte": "neues Objekt Links übernimmst Ergebnis Quick Boarding Überblick Beispiel Mehrfamilienhaus Wohnungen Baujahr Kaufpreis Adresse" },
-        { "t": 42, "titel": "Marktbewertung · Stufe 2", "stichworte": "Marktbewertung Stufe Kaufpreis Miete bereit DealPilot holt Lage Vergleichspreise Mieten Standort Vergleichsdaten Bodenrichtwert Schritt Marktwert Marktwertindikation" },
-        { "t": 83, "titel": "Investition", "stichworte": "Investition Kaufpreis Nebenkosten kommen Standardwerten Makler Notar Grundbuch Grunderwerbsteuer Nordrhein-Westfalen zusammen" },
-        { "t": 110, "titel": "Miete", "stichworte": "Miete kalt Monat Marktbewertung sieht Abstand Potenzial" },
-        { "t": 124, "titel": "Kapitaldeckung", "stichworte": "Kapitaldeckung Eigenkapital Darlehen müssen Gesamtinvestition decken passt Finanzierung Marktzins Jahre liegt Rate Monat Beleihung" },
-        { "t": 160, "titel": "Bewirtschaftung", "stichworte": "Bewirtschaftung Laufende Kosten Jahr Kaltmiete umlagefähig nicht getrennt Rücklage" },
-        { "t": 175, "titel": "Steuer", "stichworte": "Steuer Gebäudeanteil eigener Satz Abschreibung Jahr Ergebnis Vermietung ersten deinem Grenzsteuersatz verrechnet" },
-        { "t": 200, "titel": "Kennzahlen mit Ampel", "stichworte": "Kennzahlen Ampel Cashflow knapp positiv DSCR Nettorendite erhöht" },
-        { "t": 213, "titel": "Das Urteil", "stichworte": "Urteil Investor Deal Score Solide Investment Finanzierung Modul zeigt entsteht" },
-        { "t": 227, "titel": "Das Investment-PDF", "stichworte": "Investment-PDF Business-Case Bank Kaufpreis Finanzierung Cashflow DSCR Stresstest Deckblatt Objekt Eckdaten deiner Marke neutrale Bankfassung Objektfotos" }
+        {
+          "t": 0,
+          "titel": "Einstieg",
+          "stichworte": "neuen Objekt DealScore Investment-PDF ganze Stück fünf Minuten"
+        },
+        {
+          "t": 13,
+          "titel": "Ein neues Objekt",
+          "stichworte": "Links „Neues Objekt“ — oder du übernimmst ein Ergebnis aus dem Quick Boarding (Überblick 1)."
+        },
+        {
+          "t": 25,
+          "titel": "Das Beispiel",
+          "stichworte": "Ein Mehrfamilienhaus: Westerfeldstr. 140, Bielefeld — 6 Wohnungen, 390 m², Baujahr 1967, Kaufpreis 545.000 €. Adresse, Objektart, Fläche, Baujahr — mehr braucht der Start nicht."
+        },
+        {
+          "t": 44,
+          "titel": "Marktbewertung · Stufe 2",
+          "stichworte": "Mit Kaufpreis und Miete: bereit. Ein Klick — DealPilot holt Lage, Vergleichspreise und Mieten. Standort, Vergleichsdaten, Bodenrichtwert — Schritt für Schritt."
+        },
+        {
+          "t": 69,
+          "titel": "Marktwert und Lage",
+          "stichworte": "Marktwertindikation 1.017.000 € — dein Preis: Deutlich unter Markt. Mikrolage Sehr gut · 8,4, Makrolage Durchschnittlich · 5,0."
+        },
+        {
+          "t": 85,
+          "titel": "Investition",
+          "stichworte": "Kaufpreis 545.000 € — die Nebenkosten kommen aus deinen Standardwerten. Kaufpreis 545.000 €. Nebenkosten: Makler 3,57 %, Notar 1 %, Grundbuch 0,5 %, Grunderwerbsteuer Nordrhein-Westfalen 6,5 % nach PLZ — zusammen 62.602 "
+        },
+        {
+          "t": 112,
+          "titel": "Miete",
+          "stichworte": "Ist: 3.195 € kalt im Monat, 8,19 €/m² — die Marktbewertung sieht 9,49 €/m². Der Abstand ist dein Potenzial."
+        },
+        {
+          "t": 126,
+          "titel": "Kapitaldeckung",
+          "stichworte": "Eigenkapital und Darlehen müssen die Gesamtinvestition decken — ein Klick passt das Darlehen an."
+        },
+        {
+          "t": 140,
+          "titel": "Finanzierung",
+          "stichworte": "Eigenkapital 74.592 €, Darlehen 543.010 € zu 4,0 % — der Marktzins für 10 Jahre liegt bei 4,65 %. Rate 2.262,54 € im Monat, Beleihung 99,6 %."
+        },
+        {
+          "t": 162,
+          "titel": "Bewirtschaftung",
+          "stichworte": "Laufende Kosten 23.334 € im Jahr, 59,2 % der Kaltmiete — umlagefähig und nicht umlagefähig getrennt, mit Rücklage."
+        },
+        {
+          "t": 177,
+          "titel": "Steuer",
+          "stichworte": "Gebäudeanteil 32,72 %, AfA 6,25 % eigener Satz — 12.227,70 € Abschreibung im Jahr. Ergebnis aus Vermietung: –7.030 € im ersten Jahr — mit deinem Grenzsteuersatz verrechnet."
+        },
+        {
+          "t": 202,
+          "titel": "Kennzahlen mit Ampel",
+          "stichworte": "Cashflow +92 € knapp positiv, DSCR 1,02 knapp, Nettorendite 4,50 % gut, LTV 99,6 % erhöht."
+        },
+        {
+          "t": 215,
+          "titel": "Das Urteil",
+          "stichworte": "Investor Deal Score 63 · Solide — Investment 65, Finanzierung 58. Modul 12 zeigt, wie es entsteht."
+        },
+        {
+          "t": 229,
+          "titel": "Das Investment-PDF",
+          "stichworte": "Ein Klick — der Business-Case für die Bank: Kaufpreis, Finanzierung, Cashflow, DSCR und LTV, Stresstest."
+        },
+        {
+          "t": 247,
+          "titel": "Deckblatt",
+          "stichworte": "Objekt, Kaufpreis, Eckdaten — in deiner Marke oder als neutrale Bankfassung."
+        },
+        {
+          "t": 262,
+          "titel": "Die Objektfotos",
+          "stichworte": "Gleich auf Seite 2: die Fotos des Objekts — die Bank sieht, was sie finanziert."
+        },
+        {
+          "t": 278,
+          "titel": "Objekt und Finanzierung",
+          "stichworte": "Kaufpreis und Nebenkosten neben Darlehen, Zins, Rate, Restschuld und Anschluss — das will die Bank sehen."
+        }
       ],
       "spruch": "Vom ersten Eintrag bis zur Bankmappe.",
-      "datei": "dealpilot-ueberblick-2-objekt-bis-investment-pdf.mp4", "datei_ton": "dealpilot-ueberblick-2-objekt-bis-investment-pdf-sprecher.mp4",
+      "datei": "dealpilot-ueberblick-2-objekt-bis-investment-pdf-v3730.mp4",
+      "datei_ton": "dealpilot-ueberblick-2-objekt-bis-investment-pdf-v3730-sprecher.mp4",
       "poster": "dealpilot-ueberblick-2-objekt-bis-investment-pdf.webp",
-      "youtube": { "titel": "DealPilot Überblick 2 · Vom neuen Objekt zum DealScore und Investment-PDF", "tags": ["DealPilot", "Mehrfamilienhaus", "DealScore", "Investment-PDF", "Immobilienanalyse"], "youtube_id": null }
+      "youtube": {
+        "titel": "DealPilot Überblick 2 · Vom neuen Objekt zum DealScore und Investment-PDF",
+        "tags": [
+          "DealPilot",
+          "Mehrfamilienhaus",
+          "DealScore",
+          "Investment-PDF",
+          "Immobilienanalyse"
+        ],
+        "youtube_id": null
+      }
     },
     {
      "id": "ueberblick-3-komplettbeispiel-mehrfamilienhaus",
@@ -926,27 +1109,100 @@
       "youtube": { "titel": "DealPilot Modul 17 · Objekt übertragen – die DealPilot-Sicherung", "tags": ["DealPilot", "Immobilie übertragen", "Sicherung", "Export", "Import"], "youtube_id": null }
     },
     {
-      "id": "modul-19-das-bank-pdf", "kategorie": "spezial", "nr": "19", "dauer": 250,
+      "id": "modul-19-das-bank-pdf",
+      "kategorie": "spezial",
+      "nr": "19",
+      "dauer": 254,
       "titel": "Das Bank-PDF",
       "unterzeile": "Deine Marke, die Bankfassung — und was die Bank als Investment Case bekommt.",
       "story": "Objekt und Finanzierung, Kennzahlen, Phasen, Exit, Belastungsprobe, Annahmen: das Bank-PDF erzählt dein Objekt so, wie eine Kreditabteilung es lesen will — auf Wunsch unter deiner eigenen Marke.",
       "nutzen": "Ein Investment Case, den die Bank nicht erst übersetzen muss.",
       "kapitel": [
-        { "t": 0, "titel": "Einstieg", "stichworte": "Bank-PDF Marke Bankfassung Bank Investment Case Mehrfamilienhaus Kaufpreis" },
-        { "t": 27, "titel": "Wo die PDFs entstehen", "stichworte": "Deal-Aktion Dokumente Daten Objekts Abtippen" },
-        { "t": 39, "titel": "Fassung wählen", "stichworte": "Fassungen Bankfassung Kurzfassung Erstkontakt Investment-PDF Miteigentümer Obsidian-Fassung Wesentliche Papier Block Tabelle Bank" },
-        { "t": 75, "titel": "Deine Marke", "stichworte": "Kopf Logo Whitelabel Objekt Foto" },
-        { "t": 92, "titel": "Objekt und Finanzierung", "stichworte": "Kaufpreis Nebenkostenzeile Gesamtinvestition Eigenkapital Darlehen Zins" },
-        { "t": 113, "titel": "Kennzahlen", "stichworte": "Bruttorendite Nettorendite DSCR Beleihung Cashflow Monat Rechnung Warmmiete Miete Bewirtschaftung Zinsen Tilgung Steuer Steuern" },
-        { "t": 150, "titel": "Phasen und Exit", "stichworte": "Cashflow Steuern Zinsbindung Anschlussfinanzierung Vermögensaufbau Restschuld Eigenkapital Wertsteigerung Verkauf" },
-        { "t": 190, "titel": "Belastungsprobe", "stichworte": "DSCR Zins Miete Bank" },
-        { "t": 209, "titel": "Annahmen", "stichworte": "Hinweise Strich Null" },
-        { "t": 223, "titel": "Der Investment Case", "stichworte": "Seiten Kreditanfrage Bank Bankexport Portfolio" }
+        {
+          "t": 0,
+          "titel": "Einstieg",
+          "stichworte": "Bank-PDF Marke Bankfassung Bank Investment Case Mehrfamilienhaus Kaufpreis"
+        },
+        {
+          "t": 13,
+          "titel": "Das Beispiel",
+          "stichworte": "Ein Mehrfamilienhaus: Westerfeldstr. 140, Bielefeld — 6 Wohnungen, 390 m², Baujahr 1967, Kaufpreis 545.000 €. Heute: was die Bank davon bekommt."
+        },
+        {
+          "t": 30,
+          "titel": "Deal-Aktion · Dokumente",
+          "stichworte": "Hier entstehen die PDFs — aus den Daten des Objekts, ohne Abtippen."
+        },
+        {
+          "t": 41,
+          "titel": "Vier Fassungen",
+          "stichworte": "Bankfassung (Bank), Kurzfassung (Erstkontakt), Investment-PDF · hell (Miteigentümer), Investment-PDF · Obsidian (Eigener Gebrauch). Die Kurzfassung bündelt das Wesentliche, die übrigen tragen den vollen Inhalt."
+        },
+        {
+          "t": 61,
+          "titel": "Die Bankfassung",
+          "stichworte": "Weißes Papier, alles aufgerollt: jeder Block als Tabelle, so wie eine Bank ihn prüft."
+        },
+        {
+          "t": 78,
+          "titel": "Oben: deine Marke",
+          "stichworte": "Kopf mit Logo — mit Whitelabel steht hier deins, nicht unseres. Darunter Objekt, Foto und Stand."
+        },
+        {
+          "t": 95,
+          "titel": "Seite 1 · Objekt und Finanzierung",
+          "stichworte": "Kaufpreis 545.000 € mit jeder Nebenkostenzeile, Gesamtinvestition 629.592 €. Eigenkapital 74.592 €, Darlehen 472.415 € zu 4,00 %."
+        },
+        {
+          "t": 115,
+          "titel": "Seite 2 · Kennzahlen",
+          "stichworte": "Bruttorendite 7,23 %, Nettorendite 4,42 %, DSCR 1,18, Beleihung 86,7 %, Cashflow 386 € im Monat."
+        },
+        {
+          "t": 133,
+          "titel": "Von der Warmmiete zum Cashflow",
+          "stichworte": "Darunter die Rechnung Zeile für Zeile: Miete, Bewirtschaftung, Zinsen, Tilgung, Steuer — am Ende 6.752 € nach Steuern im Jahr."
+        },
+        {
+          "t": 153,
+          "titel": "Heute, Zinsbindung, Anschluss",
+          "stichworte": "Cashflow nach Steuern im Jahr: heute 6.752 €, am Ende der Zinsbindung 7.593 €, in der Anschlussfinanzierung 8.456 €."
+        },
+        {
+          "t": 172,
+          "titel": "Vermögensaufbau und Exit",
+          "stichworte": "Wert, Restschuld und Eigenkapital über die Jahre, gerechnet mit 2,0 % Wertsteigerung im Jahr — und was beim Verkauf bliebe. Equity Multiple 7,4."
+        },
+        {
+          "t": 193,
+          "titel": "Die Belastungsprobe",
+          "stichworte": "Der DSCR, wenn der Zins steigt oder die Miete fällt — genau die Frage, die jede Bank stellt. Die Antwort steht schon drin."
+        },
+        {
+          "t": 212,
+          "titel": "Annahmen und Hinweise",
+          "stichworte": "Mietsteigerung, Kostensteigerung, Wertentwicklung: jede Annahme steht offen da. Was fehlt, ist ein Strich — keine Null."
+        },
+        {
+          "t": 226,
+          "titel": "Der Investment Case",
+          "stichworte": "Objekt, Finanzierung, Kennzahlen, Phasen, Belastungsprobe — 12 Seiten, die eine Kreditanfrage tragen. Ein Klick, jedes Mal aktuell."
+        }
       ],
       "spruch": "Flugplan eingereicht — die Bank fliegt mit.",
-      "datei": "dealpilot-modul-19-das-bank-pdf.mp4", "datei_ton": "dealpilot-modul-19-das-bank-pdf-sprecher.mp4",
+      "datei": "dealpilot-modul-19-das-bank-pdf-v3730.mp4",
+      "datei_ton": "dealpilot-modul-19-das-bank-pdf-v3730-sprecher.mp4",
       "poster": "dealpilot-modul-19-das-bank-pdf.webp",
-      "youtube": { "titel": "DealPilot Modul 19 · Das Bank-PDF", "tags": ["DealPilot", "Bankunterlagen", "Investment Case", "Finanzierung"], "youtube_id": null }
+      "youtube": {
+        "titel": "DealPilot Modul 19 · Das Bank-PDF",
+        "tags": [
+          "DealPilot",
+          "Bankunterlagen",
+          "Investment Case",
+          "Finanzierung"
+        ],
+        "youtube_id": null
+      }
     },
     {
       "id": "modul-20-bankexport-portfolio", "kategorie": "spezial", "nr": "20", "dauer": 99,
@@ -1069,26 +1325,101 @@
       "youtube": { "titel": "DealPilot Modul 22 · Der Telegram-Bot – Portfolio im Chat", "tags": ["DealPilot", "Telegram-Bot", "Immobilien Portfolio", "Soll-Ist"], "youtube_id": null }
     },
     {
-      "id": "modul-23-die-15-prozent-grenze", "kategorie": "spezial", "nr": "23", "dauer": 215,
+      "id": "modul-23-die-15-prozent-grenze",
+      "kategorie": "spezial",
+      "nr": "23",
+      "dauer": 225,
       "titel": "Die 15-%-Grenze",
       "unterzeile": "Anschaffungsnahe Herstellungskosten — Schwelle, netto, drei Jahre, Kaufpreisaufteilung.",
       "story": "Wer kurz nach dem Kauf saniert, kann die Kosten sofort absetzen — oder muss sie über Jahrzehnte abschreiben. DealPilot rechnet die Grenze für dein Objekt aus: 15 Prozent des Gebäudeanteils in drei Jahren, netto gerechnet, und zeigt, wie sich die Schwelle nach der Kaufpreisaufteilung verschiebt.",
       "nutzen": "Du planst die Sanierung so, dass sie steuerlich nicht kippt.",
       "kapitel": [
-        { "t": 0, "titel": "Einstieg", "stichworte": "Fünfzehn-Prozent-Grenze Anschaffungsnahe Herstellungskosten Schwelle Mehrfamilienhaus Bestand Kaufpreis Millionen" },
-        { "t": 28, "titel": "Eine Sanierung", "stichworte": "Dach Bäder Angebot Bruttobetrag Kauf Grenze" },
-        { "t": 53, "titel": "15 % in drei Jahren", "stichworte": "Kosten Anschaffungskosten AfA" },
-        { "t": 68, "titel": "So wird gerechnet", "stichworte": "Gebäudeanteil Kaufpreis Nebenkosten Gebäude-Anschaffungskosten Davon" },
-        { "t": 82, "titel": "Netto zählt", "stichworte": "Gesetz Umsatzsteuer Maßgeblich Grenze Nettobetrag Betrag Brutto Angabe" },
-        { "t": 122, "titel": "Über der Grenze", "stichworte": "Sanierung Herstellungskosten Abschreibung Gebäudes" },
-        { "t": 148, "titel": "Steuerliche Verteilung", "stichworte": "Fünfzehn-Prozent-Regel Grenze Nutzungsdauer" },
-        { "t": 163, "titel": "Der Gebäudeanteil", "stichworte": "Grenze Kaufpreisaufteilung" },
-        { "t": 176, "titel": "Vor und nach der Aufteilung", "stichworte": "Kaufpreisaufteilung Variante Gebäude Grenze Spielraum AfA Sanierung Bodenrichtwert Unterlagen" }
+        {
+          "t": 0,
+          "titel": "Einstieg",
+          "stichworte": "Fünfzehn-Prozent-Grenze Anschaffungsnahe Herstellungskosten Schwelle Mehrfamilienhaus Bestand Kaufpreis Millionen"
+        },
+        {
+          "t": 13,
+          "titel": "Das Beispiel",
+          "stichworte": "Ein Mehrfamilienhaus aus dem Bestand: Ravensberger Weg 38, Bielefeld — 8 Wohnungen, 606 m², Baujahr 1978, Kaufpreis 1.240.000 €. Heute: die 15-%-Grenze."
+        },
+        {
+          "t": 30,
+          "titel": "Angenommen: eine Sanierung",
+          "stichworte": "Dach, Fenster, Bäder in den ersten drei Jahren — 87.000 € laut Angebot, brutto."
+        },
+        {
+          "t": 41,
+          "titel": "Die Sanierung",
+          "stichworte": "87.000 € geplant, eingetragen brutto. In den ersten drei Jahren nach dem Kauf zählt das gegen eine Grenze."
+        },
+        {
+          "t": 55,
+          "titel": "15 % in drei Jahren",
+          "stichworte": "Höchstens 157.434 € netto (brutto 187.347 €). Mehr, und die Kosten werden Anschaffungskosten — nur noch über die AfA, nicht sofort."
+        },
+        {
+          "t": 70,
+          "titel": "So wird gerechnet",
+          "stichworte": "Gebäudeanteil 74,82 % vom Kaufpreis, plus anteilige Nebenkosten — die Gebäude-Anschaffungskosten. Davon 15 %: 157.434 €."
+        },
+        {
+          "t": 85,
+          "titel": "Netto zählt",
+          "stichworte": "Das Gesetz misst ohne Umsatzsteuer: 87.000 € − 13.891 € Umsatzsteuer = 73.109 € maßgeblich. Status: Unter Grenze (46,4 %) – Erhaltungsaufwand sofort abziehbar."
+        },
+        {
+          "t": 101,
+          "titel": "Angenommen: netto",
+          "stichworte": "Dieselbe Zahl, aber als Nettobetrag eingetragen … Jetzt zählt der volle Betrag: 87.000 €. Status: Unter Grenze (55,3 %) – Erhaltungsaufwand sofort abziehbar. Brutto oder netto — die Angabe entscheidet mit."
+        },
+        {
+          "t": 127,
+          "titel": "Angenommen: mehr Sanierung",
+          "stichworte": "180.000 € netto in den ersten drei Jahren …"
+        },
+        {
+          "t": 138,
+          "titel": "Über der Grenze",
+          "stichworte": "180.000 € gegen 157.434 €: Über 15 % (114,3 %) – anschaffungsnahe HK (50 Jahre AfA). Die Kosten gehen dann in die Abschreibung des Gebäudes."
+        },
+        {
+          "t": 153,
+          "titel": "Steuerlich verteilt",
+          "stichworte": "Die Verteilung steht auf Automatisch (15-%-Regel: sofort oder über die Nutzungsdauer) — DealPilot wählt nach der Grenze: sofort oder über die Nutzungsdauer."
+        },
+        {
+          "t": 171,
+          "titel": "Der Gebäudeanteil",
+          "stichworte": "Die Grenze hängt am Gebäudeanteil: hier 74,82 %. Die Kaufpreisaufteilung (Modul 10b) kann ihn begründet anheben."
+        },
+        {
+          "t": 184,
+          "titel": "Nach der Kaufpreisaufteilung",
+          "stichworte": "Variante „optimiert“ aus Modul 10b: 79,86 % Gebäude …"
+        },
+        {
+          "t": 196,
+          "titel": "Vor und nach der Aufteilung",
+          "stichworte": "Grenze 157.434 € → 168.040 €. Status: Über 15 % (107,1 %) – anschaffungsnahe HK (50 Jahre AfA). Mehr Gebäude heißt mehr Spielraum — und mehr AfA."
+        }
       ],
       "spruch": "Unter der Grenze geblieben — Steuer im Sinkflug.",
-      "datei": "dealpilot-modul-23-die-15-prozent-grenze.mp4", "datei_ton": "dealpilot-modul-23-die-15-prozent-grenze-sprecher.mp4",
+      "datei": "dealpilot-modul-23-die-15-prozent-grenze-v3730.mp4",
+      "datei_ton": "dealpilot-modul-23-die-15-prozent-grenze-v3730-sprecher.mp4",
       "poster": "dealpilot-modul-23-die-15-prozent-grenze.webp",
-      "youtube": { "titel": "DealPilot Modul 23 · Die 15-%-Grenze – anschaffungsnahe Herstellungskosten", "tags": ["DealPilot", "anschaffungsnahe Herstellungskosten", "15-Prozent-Grenze", "Sanierung", "Steuer Immobilie"], "youtube_id": null }
+      "youtube": {
+        "titel": "DealPilot Modul 23 · Die 15-%-Grenze – anschaffungsnahe Herstellungskosten",
+        "tags": [
+          "DealPilot",
+          "anschaffungsnahe Herstellungskosten",
+          "15-Prozent-Grenze",
+          "Sanierung",
+          "Steuer Immobilie"
+        ],
+        "youtube_id": null
+      }
     },
     {
       "id": "modul-24-bodenrichtwert-und-unterlagen", "kategorie": "spezial", "nr": "24", "dauer": 195,
@@ -1235,44 +1566,136 @@
      }
     },
     {
-     "id": "modul-28-unterlagen-einlesen",
-     "kategorie": "spezial",
-     "nr": "28",
-     "dauer": 553,
-     "titel": "Unterlagen einlesen",
-     "unterzeile": "Sieben PDFs auf einmal: gelesen, ausgewertet, übernommen.",
-     "story": "Ein Mehrfamilienhaus mit acht Wohnungen, ohne ein getipptes Feld. Exposé, Mietaufstellung, Grundbuchauszug, Teilungserklärung, Energieausweis und zwei Protokolle der Eigentümerversammlung gehen auf einmal hinein. DealPilot erkennt jede Unterlage, schwärzt Personendaten, liest nur, was wirklich darin steht, und wertet alles gemeinsam aus: Investitionsthese, Risiken mit Betrag und Quelle, die Wohnungen aus der Mieterliste. Die Pilot-Analyse zeigt danach, was absehbar Geld kostet.",
-     "nutzen": "Du siehst, was in den Unterlagen steht und im Exposé fehlt, bevor du ein Angebot machst.",
-     "kapitel": [
-        { "t": 0, "titel": "Einstieg", "stichworte": "Mehrfamilienhaus acht Wohnungen" },
-        { "t": 28, "titel": "Kein Feld getippt", "stichworte": "leeres Objekt Exposé Dokumente" },
-        { "t": 70, "titel": "Kapitel 2 · Lesen", "stichworte": "sieben PDFs Art erkennen" },
-        { "t": 140, "titel": "Personendaten geschwärzt", "stichworte": "Schwärzen Quelle" },
-        { "t": 196, "titel": "Gemeinsame Auswertung", "stichworte": "Auswertung Zusammenhang" },
-        { "t": 223, "titel": "Kapitel 3 · Auswerten und übernehmen", "stichworte": "Übernahme Reiter Quelle" },
-        { "t": 299, "titel": "These und Risiken", "stichworte": "Investitionsthese Risiken Dachsanierung" },
-        { "t": 364, "titel": "Übernehmen", "stichworte": "Wohnungen Mieterliste Bekannte Risiken" },
-        { "t": 421, "titel": "Kapitel 4 · Pilot-Analyse", "stichworte": "Unterlagen WEG Ampel" },
-        { "t": 463, "titel": "Was absehbar Geld kostet", "stichworte": "Kosten Sonderumlage Rücklage" },
-        { "t": 500, "titel": "Die genaue Ansicht", "stichworte": "Genau Risiken Stärken" },
-        { "t": 534, "titel": "Abschluss", "stichworte": "" }
-     ],
-     "spruch": "Das Exposé verkauft — die Protokolle erzählen.",
-     "datei": "dealpilot-modul-28-unterlagen-einlesen.mp4",
-     "datei_ton": "dealpilot-modul-28-unterlagen-einlesen-sprecher.mp4",
-     "poster": "dealpilot-modul-28-unterlagen-einlesen.webp",
-     "youtube": {
-      "titel": "DealPilot Modul 28 · Unterlagen einlesen",
-      "tags": [
-       "DealPilot",
-       "Immobilien",
-       "Exposé",
-       "Teilungserklärung",
-       "Eigentümerversammlung",
-       "Due Diligence"
+      "id": "modul-28-unterlagen-einlesen",
+      "kategorie": "spezial",
+      "nr": "28",
+      "dauer": 307,
+      "titel": "Alle Unterlagen reinladen",
+      "unterzeile": "Dreizehn PDFs, eine Übernahme — und was der Detailgrad damit macht.",
+      "story": "Ein leeres Objekt, kein getipptes Feld: Exposé, Mietaufstellung, Grundbuch, Teilungserklärung, Energieausweis, Protokolle, Wirtschaftsplan, Baulasten, Marktbericht und drei Mietverträge gehen auf einmal hinein. DealPilot erkennt jede Unterlage, schwärzt Personendaten, liest nur, was dasteht, und wertet alles gemeinsam aus. In Einsteiger wird nur übernommen, was du siehst; mit Experte und erneutem Einlesen kommen Einheitenliste und Mietverträge je Wohnung dazu.",
+      "nutzen": "Alle Papiere an Bord — jeder Wert mit Quelle, nichts ungefragt überschrieben.",
+      "kapitel": [
+        {
+          "t": 0,
+          "titel": "Einstieg",
+          "stichworte": "dreizehn PDFs leeres Objekt Einsteiger"
+        },
+        {
+          "t": 12,
+          "titel": "Ein leeres Objekt",
+          "stichworte": "Kein Feld getippt — alles, was gleich im Objekt steht, kommt aus den Unterlagen. Detailgrad: Einsteiger."
+        },
+        {
+          "t": 26,
+          "titel": "Exposé / Dokumente",
+          "stichworte": "In der Datenaufnahme die Kachel „Exposé / Dokumente“ — für jedes PDF eines Objekts."
+        },
+        {
+          "t": 37,
+          "titel": "Alles auf einmal",
+          "stichworte": "Hineinziehen oder auswählen — alle Unterlagen eines Objekts in einem Schritt."
+        },
+        {
+          "t": 49,
+          "titel": "13 Dateien",
+          "stichworte": "Exposé, Mietaufstellung, Grundbuch, Teilungserklärung, Energieausweis, zwei Protokolle, Wirtschaftsplan, Baulasten, Marktbericht und drei Mietverträge."
+        },
+        {
+          "t": 65,
+          "titel": "Jede Datei einzeln",
+          "stichworte": "DealPilot öffnet jede PDF und liest ihren Text — ist eine Seite nur ein Scan, Seite für Seite. · Auswertung läuft"
+        },
+        {
+          "t": 77,
+          "titel": "Die Art erkennen",
+          "stichworte": "Exposé, Mieterliste, Grundbuch, Teilungserklärung, Protokoll, Mietvertrag — erkannt am Kopf des Dokuments."
+        },
+        {
+          "t": 91,
+          "titel": "Personendaten geschwärzt",
+          "stichworte": "Namen von Mietern, Eigentümern und Ansprechpartnern werden vor der Auswertung entfernt."
+        },
+        {
+          "t": 103,
+          "titel": "Nur was dasteht",
+          "stichworte": "Jeder Wert trägt seine Quelle. Was in keinem Dokument steht, bleibt leer."
+        },
+        {
+          "t": 115,
+          "titel": "Alles zusammen",
+          "stichworte": "Zum Schluss werden alle Unterlagen gemeinsam ausgewertet: Risiken, Eigentümergemeinschaft, Investitionsthese."
+        },
+        {
+          "t": 128,
+          "titel": "Erkannt",
+          "stichworte": "Exposé · Mieterliste · Grundbuchauszug · Teilungserklärung · Energieausweis · WEG-Protokoll ×2 · Wirtschaftsplan / Hausgeldabrechnung · Baulastenauskunft · Marktbericht · Mietvertrag ×3."
+        },
+        {
+          "t": 147,
+          "titel": "Die Reiter",
+          "stichworte": "15 Reiter: die Übernahme, je Dokument einer, dazu die gemeinsame Auswertung."
+        },
+        {
+          "t": 158,
+          "titel": "Aus dem Exposé",
+          "stichworte": "Kaufpreis 1.090.000 € — Quelle: Exposé. Was du nicht willst, wählst du ab."
+        },
+        {
+          "t": 169,
+          "titel": "Erkannt, aber nicht übernommen",
+          "stichworte": "22 weitere Werte gehören zu Feldern, die Einsteiger nicht sehen — etwa die einzelnen Wohnungen. Detailgrad höher stellen und erneut einlesen."
+        },
+        {
+          "t": 189,
+          "titel": "Die Auswertung",
+          "stichworte": "9 Risiken mit Betrag und Quelle, die Lage der Eigentümergemeinschaft und eine Investitionsthese — aus allen Unterlagen zusammen."
+        },
+        {
+          "t": 203,
+          "titel": "Übernehmen",
+          "stichworte": "Ein Klick — die Werte gehen ins Objekt."
+        },
+        {
+          "t": 214,
+          "titel": "Im Objekt",
+          "stichworte": "Lindenallee 14, 32049 Herford, Baujahr 1996, 518 m² — gelesen, nicht getippt."
+        },
+        {
+          "t": 226,
+          "titel": "Detailgrad höher",
+          "stichworte": "Jetzt Experte — mehr Felder sichtbar, also mehr zu übernehmen."
+        },
+        {
+          "t": 236,
+          "titel": "Erneut einlesen",
+          "stichworte": "Dieselben 13 Dateien — jetzt mit Detailgrad Experte."
+        },
+        {
+          "t": 260,
+          "titel": "Jetzt auch die Wohnungen",
+          "stichworte": "Die Einheitenliste und die Mietverträge je Wohnung stehen jetzt in der Übernahme — gefüllt wird nur, was noch leer ist."
+        },
+        {
+          "t": 280,
+          "titel": "Fertig übertragen",
+          "stichworte": "8 Einheiten, Grundbuch, Energie, Hausgeld und Risiken — aus 13 Unterlagen, jeder Wert mit Quelle."
+        }
       ],
-      "youtube_id": null
-     }
+      "spruch": "Alle Papiere an Bord — gelesen, nicht getippt.",
+      "datei": "dealpilot-modul-28-alle-unterlagen-reinladen-v3730.mp4",
+      "datei_ton": "dealpilot-modul-28-alle-unterlagen-reinladen-v3730-sprecher.mp4",
+      "poster": "dealpilot-modul-28-alle-unterlagen-reinladen.webp",
+      "youtube": {
+        "titel": "DealPilot Modul 28 · Alle Unterlagen reinladen",
+        "tags": [
+          "DealPilot",
+          "Immobilien",
+          "Exposé",
+          "Unterlagen",
+          "Due Diligence"
+        ],
+        "youtube_id": null
+      }
     },
     {
      "id": "modul-29-drei-objekte-drei-urteile",
@@ -2255,29 +2678,5 @@
       ]
     }
   ],
-  "vorbereitet": [
-    {
-      "id": "modul-28-alle-unterlagen-reinladen", "ersetzt": "modul-28-unterlagen-einlesen", "kategorie": "spezial", "nr": "28", "dauer": null,
-      "titel": "Alle Unterlagen reinladen",
-      "unterzeile": "Dreizehn PDFs, eine Übernahme — und was der Detailgrad damit macht.",
-      "story": "Ein leeres Objekt, kein getipptes Feld: Exposé, Mietaufstellung, Grundbuch, Teilungserklärung, Energieausweis, Protokolle, Wirtschaftsplan, Baulasten, Marktbericht und drei Mietverträge gehen auf einmal hinein. DealPilot erkennt jede Unterlage, schwärzt Personendaten, liest nur, was dasteht, und wertet alles gemeinsam aus. In Einsteiger wird nur übernommen, was du siehst; mit Experte und erneutem Einlesen kommen Einheitenliste und Mietverträge je Wohnung dazu.",
-      "nutzen": "Alle Papiere an Bord — jeder Wert mit Quelle, nichts ungefragt überschrieben.",
-      "kapitel": [
-        { "t": 0, "titel": "Einstieg", "stichworte": "dreizehn PDFs leeres Objekt Einsteiger" },
-        { "t": 25, "titel": "Exposé und Dokumente", "stichworte": "Datenaufnahme Kachel hineinziehen" },
-        { "t": 64, "titel": "Lesen und erkennen", "stichworte": "Scan Art erkennen Mieterliste Grundbuch Protokoll Mietvertrag" },
-        { "t": 90, "titel": "Personendaten geschwärzt", "stichworte": "Schwärzen Quelle" },
-        { "t": 114, "titel": "Gemeinsame Auswertung", "stichworte": "Risiken Eigentümergemeinschaft Investitionsthese" },
-        { "t": 147, "titel": "Übernahme", "stichworte": "Reiter Kaufpreis Quelle abwählen" },
-        { "t": 169, "titel": "Was der Detailgrad zurückhält", "stichworte": "Detailgrad Einsteiger erneut einlesen" },
-        { "t": 225, "titel": "Experte und erneut einlesen", "stichworte": "Einheitenliste Mietverträge je Wohnung nur leere Felder" },
-        { "t": 279, "titel": "Abschluss", "stichworte": "acht Einheiten Grundbuch Energie Hausgeld Risiken" }
-      ],
-      "spruch": "Alle Papiere an Bord — gelesen, nicht getippt.",
-      "datei": "dealpilot-modul-28-alle-unterlagen-reinladen.mp4",
-      "datei_ton": "dealpilot-modul-28-alle-unterlagen-reinladen-sprecher.mp4",
-      "poster": "dealpilot-modul-28-alle-unterlagen-reinladen.webp",
-      "youtube": { "titel": "DealPilot Modul 28 · Alle Unterlagen reinladen", "tags": ["DealPilot","Immobilien","Exposé","Unterlagen","Due Diligence"], "youtube_id": null }
-    }
-  ]
+  "vorbereitet": []
 }
