@@ -3052,9 +3052,10 @@
           r6BmfOben(sz1()); await warte(400);
           await zeigeGruppe(sz1, function () { return sz3() || sz2() || sz1(); }, 6);
           var afaA = w2.filter(function (x) { return /€/.test(x); })[0], sofA = w3.filter(function (x) { return /€/.test(x); })[0];
-          await b2oZeile(s, 'Die Sanierung je Variante', (an && so ? 'Je nach Gebäudeanteil kippt sie: <b>' + an + '×</b> anschaffungsnah, <b>' + so + '×</b> sofort abziehbar.'
-            : an ? 'In jeder Variante <b>anschaffungsnah</b>: sie geht zu 100 % in die Gebäude-AfA.' : 'In jeder Variante <b>sofort abziehbar</b> als Werbungskosten.') +
-            (afaA ? ' AfA darauf ' + (/[\d.]+ €/.exec(afaA) || [''])[0] + ' im Jahr' : '') + (sofA ? (afaA ? ', sonst' : '') + ' einmalig ' + (/[\d.]+ €/.exec(sofA) || [''])[0] + ' sofort' : '') + '.');
+          var afaB = afaA && (/[\d.]+ €/.exec(afaA) || [])[0], sofB = sofA && (/[\d.]+ €/.exec(sofA) || [])[0];
+          await b2oZeile(s, 'Die Sanierung je Variante', an && so ? 'Je nach Gebäudeanteil kippt sie: <b>' + an + '×</b> anschaffungsnah' + (afaB ? ' (AfA darauf ' + afaB + ' im Jahr)' : '') + ', <b>' + so + '×</b> sofort abziehbar' + (sofB ? ' (einmalig ' + sofB + ')' : '') + '.'
+            : an ? 'In jeder Variante <b>anschaffungsnah</b>: sie geht zu 100 % in die Gebäude-AfA' + (afaB ? ', darauf ' + afaB + ' AfA im Jahr' : '') + '.'
+            : 'In jeder Variante <b>sofort abziehbar</b> als Werbungskosten' + (sofB ? ', einmalig <b>' + sofB + '</b>' : '') + (/feste Wahl/.test(r6Text(sz1() && sz1().firstElementChild)) ? '. Fest gewählt im Reiter Investition.' : '. Sie bleibt unter der 15-%-Grenze.'));
         }
       },
       async function (s) {   /* 5 · Schritt 4: Variante wählen - v3276: die Wahl-Tafel #bmf-wahl-tafel (die alten Karten sind verdeckt) */
