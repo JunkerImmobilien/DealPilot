@@ -37,7 +37,7 @@
     var q = new URLSearchParams(location.search);
     if (q.has('zu')) {
       var s = {};
-      ['zu', 'obj', 'reiter', 'feld', 'tab', 'stufe'].forEach(function (k) { if (q.has(k)) { s[k] = q.get(k); q.delete(k); } });
+      ['zu', 'obj', 'reiter', 'feld', 'tab', 'stufe', 'fenster', 'mandant'].forEach(function (k) { if (q.has(k)) { s[k] = q.get(k); q.delete(k); } });
       sessionStorage.setItem(KEY, JSON.stringify(s));
       var rest = q.toString();
       history.replaceState(history.state, '', location.pathname + (rest ? '?' + rest : '') + location.hash);
@@ -91,6 +91,10 @@
       }
       if (s.zu === 'einstellungen') {
         if (typeof window.showSettings === 'function') window.showSettings(s.tab || undefined);
+        /* v3703 · &fenster=jahresabschluss&mandant=<id>: oeffnet den Jahresabschluss-Dialog der Gesellschaft (dort auch die Steuer-Mappe der Gesellschaft) */
+        if (s.fenster === 'jahresabschluss' && s.mandant && window.DealPilotMandanten && typeof DealPilotMandanten.openJahresabschluss === 'function') {
+          setTimeout(function () { try { DealPilotMandanten.openJahresabschluss(s.mandant); } catch (eJ) {} }, 800);
+        }
         return;
       }
       if (s.obj) {
