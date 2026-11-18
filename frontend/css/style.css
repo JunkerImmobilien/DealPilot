@@ -41849,3 +41849,24 @@ html body .upgrade-toast { z-index: 100050; }   /* v3410b: auch über dem Partne
    (#dp-onboarding, z 100000): elementFromPoint auf „Weiter"/„Fertig" (y 733) traf das Band. Solange die
    Einrichtung offen ist, liegt das Band darunter - es kommt danach unveraendert wieder nach vorn. */
 html body:has(> #dp-onboarding) #dppk-band { z-index: 99990 !important; }
+/* v3780 · Messkabine 18.11. abends (Headless-Chrome, 390 und 1440 px, Detailstufen 1 bis 3), gemessen:
+   - Reiter Miete, Mietentwicklung (v3710): „alle Angaben je Jahr“ 108 x 18 px am Handy.
+   - Pilot-Analyse: Einfach/Detail 28 px, Aktionen 30 px, Jahre 27 px, Jahresabgleich „eintragen“ 50 x 14 px.
+   - Finanzierung: „Eigenkapital/Darlehen passend setzen“ 25 px.
+   - Reiter Steuer, Werbungskosten-Tabelle (v3701, Spalte „Steuer der GmbH (alle Objekte)“): Kopfzeilen ohne Umbruch,
+     Tabelle 1182 px in 1105 px (1440) bzw. 945 px (1280) - die GmbH-Spalte war angeschnitten, „Status“ nur per Querscrollen.
+     Mit Umbruch im Kopf: 1105/1105 und 945/945, Zahlen bleiben einzeilig.
+   - BMF-Rechner Schritt 1: „959.081 €“ - das € brach bei 390 px in eine eigene Zeile.
+   - Geführte Eingabe (1440): Gruppennummern .vi-rf-gr-nr 8 px (Hausuntergrenze 8,5 px). */
+@media (max-width: 640px) {
+  html body #me_table_wrap .me-ist-alle { min-height: 32px !important; display: inline-flex !important; align-items: center; }
+  html body #kd-btn-ek.btn, html body #kd-btn-d1.btn { min-height: 32px !important; height: auto !important; }
+  html body .dp-pa-wrap .dp-pa4-seg button.btn-clean,
+  html body .dp-pa-wrap .dp-pa4-aktionen button.dp-pa4-akt,
+  html body .dp-pa-wrap .dp-ja-jahre button.btn-clean { min-height: 32px !important; }
+  html body .dp-pa-wrap .dp-ja-tab button.dp-ja-ein { min-height: 32px !important; display: flex !important; align-items: center; }
+}
+html body #s3-tax .ytf-table thead th { white-space: normal !important; vertical-align: bottom; }
+html body #s3-tax .ytf-table td.num { white-space: nowrap; }
+html body #bmfOverlay .v292-final-value { white-space: nowrap !important; }
+html body .vi-rf-gr-nr { font-size: 8.5px !important; }
