@@ -66,6 +66,11 @@ window.DpDetailgradZuordnung = {
       "s": "#notizen",
       "art": "kind",
       "titel": "Sonstige Bemerkungen"
+     },
+     {
+      "s": "#erbpacht_body",
+      "art": "block",
+      "titel": "Erbbaurecht · Angaben (v3740, Marcel 18.11.2026: ab Fortgeschritten)"
      }
     ],
     "felder": [
@@ -103,7 +108,14 @@ window.DpDetailgradZuordnung = {
      "ausst_decken",
      "mod_leitungen",
      "ausst_technik",
-     "mod_grundriss"
+     "mod_grundriss",
+     "wirtschaftlicher_uebergang",
+     "erbpacht",
+     "erbbauzins",
+     "erb_restlz",
+     "erb_zs_ang",
+     "erb_entsch",
+     "erb_wert_ist_erb"
     ]
    },
    "3": {
@@ -235,6 +247,11 @@ window.DpDetailgradZuordnung = {
       "art": "karte",
       "js": "potenzial.js",
       "titel": "Mietrecht an dieser Adresse"
+     },
+     {
+      "s": "#ze-auft",
+      "art": "block",
+      "titel": "Aufteilung der Zusatzeinnahmen (v3670; v3740, Marcel 18.11.2026: ab Fortgeschritten)"
      }
     ],
     "felder": [
@@ -249,7 +266,10 @@ window.DpDetailgradZuordnung = {
      "mv_abw_jahre",
      "kostenstg",
      "btj",
-     "exit_bmy"
+     "exit_bmy",
+     "ze_stp_monat",
+     "ze_kueche_monat",
+     "ze_sonst_monat"
     ]
    },
    "3": {
@@ -418,7 +438,8 @@ window.DpDetailgradZuordnung = {
      }
     ],
     "felder": [
-     "grenz"
+     "grenz",
+     "zve"
     ]
    },
    "2": {
@@ -440,7 +461,6 @@ window.DpDetailgradZuordnung = {
      }
     ],
     "felder": [
-     "zve",
      "grenz_auto",
      "afa_satz",
      "geb_ant"

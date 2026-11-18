@@ -75,6 +75,11 @@
             "titel": "Sonstige Bemerkungen",
             "selektor": "#notizen",
             "art": "kind"
+          },
+          {
+            "titel": "Erbbaurecht · Angaben (v3740, Marcel 18.11.2026: ab Fortgeschritten)",
+            "selektor": "#erbpacht_body",
+            "art": "block"
           }
         ],
         "felder": [
@@ -112,7 +117,14 @@
           "ausst_decken",
           "mod_leitungen",
           "ausst_technik",
-          "mod_grundriss"
+          "mod_grundriss",
+          "wirtschaftlicher_uebergang",
+          "erbpacht",
+          "erbbauzins",
+          "erb_restlz",
+          "erb_zs_ang",
+          "erb_entsch",
+          "erb_wert_ist_erb"
         ]
       },
       "experte": {
@@ -243,6 +255,11 @@
             "selektor": "#dp-mietrecht-karte",
             "art": "karte",
             "js": "potenzial.js"
+          },
+          {
+            "titel": "Aufteilung der Zusatzeinnahmen (v3670; v3740, Marcel 18.11.2026: ab Fortgeschritten)",
+            "selektor": "#ze-auft",
+            "art": "block"
           }
         ],
         "felder": [
@@ -257,7 +274,10 @@
           "mv_abw_jahre",
           "kostenstg",
           "btj",
-          "exit_bmy"
+          "exit_bmy",
+          "ze_stp_monat",
+          "ze_kueche_monat",
+          "ze_sonst_monat"
         ]
       },
       "experte": {
@@ -427,7 +447,8 @@
           }
         ],
         "felder": [
-          "grenz"
+          "grenz",
+          "zve"
         ]
       },
       "fortgeschritten": {
@@ -449,7 +470,6 @@
           }
         ],
         "felder": [
-          "zve",
           "grenz_auto",
           "afa_satz",
           "geb_ant"

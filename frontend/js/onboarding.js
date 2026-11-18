@@ -860,9 +860,9 @@ window.DealPilotOnboarding = (function () {
      Gesetzt wird beim Klick auf die Kachel, wie bei der Tour-Wahl. */
   var DETAILGRAD = [
     { n: 1, name: 'Einsteiger', unter: 'Marktbericht Stufe 1 · Marktpreisindikation',
-      fuer: 'Nur die wichtigsten Felder je Reiter (rund 45). Der Rest rechnet mit deinen Standardwerten.' },
+      fuer: 'Nur die wichtigsten Felder je Reiter (rund 50). Der Rest rechnet mit deinen Standardwerten.' },
     { n: 2, name: 'Fortgeschritten', unter: 'Marktbericht Stufe 2 · erweiterte Indikation',
-      fuer: 'Dazu Gewerke, Sanierung, Mietvertrag und zweites Darlehen (rund 150 Felder).' },
+      fuer: 'Dazu Gewerke, Sanierung, Mietvertrag, zweites Darlehen und Erbbaurecht (rund 155 Felder).' },
     { n: 3, name: 'Experte', unter: 'Marktbericht Stufe 3 · Wertermittlung nach ImmoWertV',
       fuer: 'Alle Felder, mit Mieterhöhung und Zielbild, Bauteilen und Sach- und Ertragswert — wie ein Gutachten.' }
   ];

@@ -958,7 +958,7 @@
     var hint = $('oe-ziel-hint');
     /* v1868 · ein Satz je Stufe — Marcel: „ein bisschen schmaler, dass wir alles draufkriegen" */
     if (hint) hint.textContent = z === 1 ? 'Einsteiger: die wichtigsten Felder je Reiter, der Rest rechnet mit Vorgaben. Dazu Marktbericht Stufe 1 (Marktpreisindikation).'
-      : z === 2 ? 'Fortgeschritten: dazu Gewerke, Sanierung, Mietvertrag, Darlehen II. Dazu Marktbericht Stufe 2 (erweiterte Indikation).'
+      : z === 2 ? 'Fortgeschritten: dazu Gewerke, Sanierung, Mietvertrag, Darlehen II, wirtschaftlicher Übergang und Erbbaurecht. Dazu Marktbericht Stufe 2 (erweiterte Indikation).'
       : 'Experte: alle Felder, dazu Zielbild, Bauteile und Sach- und Ertragswert. Dazu Marktbericht Stufe 3 (Wertermittlung nach ImmoWertV).';
     /* v3073 · Ausblenden ist Sache von detailgrad.js (das alte Stufen-Attribut und
        der Haken „weitere Objektdetails" sind ausgebaut). Der Block Sach- und

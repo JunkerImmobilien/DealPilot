@@ -2117,6 +2117,20 @@ label.dp-required.qc-required::after {
            (dort stehen Vergleichsmiete, Mietrecht, Marktmiete). Davor: Reiter Objekt (v2430), Reiter Investition (v2969b). -->
       <!-- ═══ v2969b · Marcel 27.10.2026: „Zielbild in Tab Investition" — die Karte stand
            bis hierher im Reiter Objekt. Sie haengt nur an ihrer ID (potenzial.js), nicht am Reiter. -->
+      <div class="card" style="margin-top:14px"><div class="ct ct-pro"><span class="ct-ico"><svg width="22" height="22"><use href="#i-trend"/></svg></span>Prognose-Annahmen</div>
+        <div class="ass-row"><span class="ass-l">Wertsteigerung p.a.</span><div class="ass-inp"><input id="wertstg" type="text" inputmode="decimal" value="1.5" step="0.1" oninput="calc()"><span class="unit">%</span><span class="badge">Annahme</span></div></div>
+        <div class="ass-row"><span class="ass-l">Kostensteigerung p.a. <button type="button" class="dp-tip" data-tip-id="tab3.kostensteigerung" tabindex="-1" aria-label="Hilfe zu Kostensteigerung"></button></span><div class="ass-inp"><input id="kostenstg" type="text" inputmode="decimal" value="1.0" step="0.1" oninput="calc()"><span class="unit">%</span><span class="badge">Annahme</span></div></div>
+        <div class="ass-row"><span class="ass-l">Leerstand p.a. <button type="button" class="dp-tip" data-tip-id="tab3.leerstand" tabindex="-1" aria-label="Hilfe zu Leerstand"></button></span><div class="ass-inp"><input id="leerstand" type="text" inputmode="decimal" value="0.0" step="0.1" oninput="calc()"><span class="unit">%</span><span class="badge">Annahme</span><span class="cf-hint" id="r-leer-j" style="margin-left:6px;white-space:nowrap"></span><!-- v3030 --></div></div>
+        <div class="cf-hint" id="r-leer-alt" style="display:none;margin:-2px 0 8px;line-height:1.45"></div><!-- v3238: alter eigener Mietausfall, wenn Leerstand Vorrang bekam -->
+        <!-- v3238 · der kalkulatorische Mietausfall im Reiter Bewirtschaftung ist = Jahresnettokaltmiete x Leerstand (calc.js) -->
+        <div class="ass-row"><span class="ass-l">Betrachtungszeitraum <button type="button" class="dp-tip" data-tip-id="tab3.btj" tabindex="-1" aria-label="Hilfe zu Betrachtungszeitraum"></button></span><div class="ass-inp"><input id="btj" type="text" inputmode="decimal" value="15" min="5" max="50" step="1" oninput="calc()"><span class="unit">Jahre</span></div></div>
+        <div class="ass-row"><span class="ass-l">Exit-Rendite (Verkauf %) <button type="button" class="dp-tip" data-tip-id="tab3.exit_bmy" tabindex="-1" aria-label="Hilfe zu Exit-Rendite"></button></span><div class="ass-inp"><input id="exit_bmy" type="text" inputmode="decimal" value="5.0" step="0.1" oninput="calc()"><span class="unit">%</span></div></div>
+      </div>
+    </div>
+  </div>
+
+      <!-- v3740 · Marcel 18.11.2026: die Karte steht in voller Breite UNTER beiden Spalten des Reiters Miete
+           (vorher rechte Spalte unter der Mietentwicklung, links blieb Leerraum, wissen 18.11. v3710). -->
       <!-- ═══ v2430 · MIETERHÖHUNG UND ZIELBILD (optional) ═════════════════════
            Marcel 19.10.2026: je Wohnung bis zu drei Mieten — Ist, Soll-Miete
            (Mieter bleibt, normale Mieterhöhung) und Zielbild (nach Umbau oder
@@ -2173,19 +2187,6 @@ label.dp-required.qc-required::after {
         </div>
         </div><!-- /zb-inhalt -->
       </div>
-
-      <div class="card" style="margin-top:14px"><div class="ct ct-pro"><span class="ct-ico"><svg width="22" height="22"><use href="#i-trend"/></svg></span>Prognose-Annahmen</div>
-        <div class="ass-row"><span class="ass-l">Wertsteigerung p.a.</span><div class="ass-inp"><input id="wertstg" type="text" inputmode="decimal" value="1.5" step="0.1" oninput="calc()"><span class="unit">%</span><span class="badge">Annahme</span></div></div>
-        <div class="ass-row"><span class="ass-l">Kostensteigerung p.a. <button type="button" class="dp-tip" data-tip-id="tab3.kostensteigerung" tabindex="-1" aria-label="Hilfe zu Kostensteigerung"></button></span><div class="ass-inp"><input id="kostenstg" type="text" inputmode="decimal" value="1.0" step="0.1" oninput="calc()"><span class="unit">%</span><span class="badge">Annahme</span></div></div>
-        <div class="ass-row"><span class="ass-l">Leerstand p.a. <button type="button" class="dp-tip" data-tip-id="tab3.leerstand" tabindex="-1" aria-label="Hilfe zu Leerstand"></button></span><div class="ass-inp"><input id="leerstand" type="text" inputmode="decimal" value="0.0" step="0.1" oninput="calc()"><span class="unit">%</span><span class="badge">Annahme</span><span class="cf-hint" id="r-leer-j" style="margin-left:6px;white-space:nowrap"></span><!-- v3030 --></div></div>
-        <div class="cf-hint" id="r-leer-alt" style="display:none;margin:-2px 0 8px;line-height:1.45"></div><!-- v3238: alter eigener Mietausfall, wenn Leerstand Vorrang bekam -->
-        <!-- v3238 · der kalkulatorische Mietausfall im Reiter Bewirtschaftung ist = Jahresnettokaltmiete x Leerstand (calc.js) -->
-        <div class="ass-row"><span class="ass-l">Betrachtungszeitraum <button type="button" class="dp-tip" data-tip-id="tab3.btj" tabindex="-1" aria-label="Hilfe zu Betrachtungszeitraum"></button></span><div class="ass-inp"><input id="btj" type="text" inputmode="decimal" value="15" min="5" max="50" step="1" oninput="calc()"><span class="unit">Jahre</span></div></div>
-        <div class="ass-row"><span class="ass-l">Exit-Rendite (Verkauf %) <button type="button" class="dp-tip" data-tip-id="tab3.exit_bmy" tabindex="-1" aria-label="Hilfe zu Exit-Rendite"></button></span><div class="ass-inp"><input id="exit_bmy" type="text" inputmode="decimal" value="5.0" step="0.1" oninput="calc()"><span class="unit">%</span></div></div>
-      </div>
-    </div>
-  </div>
-
 
 
   <div class="v235-tab-nav-footer"><span class="v235-tab-nav-hint">Weiter zu: <strong>Finanzierung</strong></span><button type="button" class="v235-next-btn" onclick="window._v235GoToNextTab('s2');return false;">Weiter: Finanzierung<span class="v235-next-btn-arrow">→</span></button></div>
@@ -4035,7 +4036,7 @@ label.dp-required.qc-required::after {
   <script src="js/unterlagen-modal.js?v=v3370"></script>
   <script src="js/standardwerte-karten.js?v=v3223c"></script>
   <script src="js/settings.js?v=v3642"></script>
-  <script src="js/einstellungen-schlank.js?v=v3720"></script>
+  <script src="js/einstellungen-schlank.js?v=v3740"></script>
 <script src="js/pricing-modal.js?v=v3610"></script>
   <script src="js/flyer-code.js?v=v1421c"></script>
   <script src="js/promo-erstflug.js?v=v1421c"></script>
@@ -4107,9 +4108,9 @@ label.dp-required.qc-required::after {
 <script src="js/objektart-felder.js?v=v2824"></script>
 <script src="js/vgf-merkmale.js?v=v3008"></script>
 <!-- v3073: Detailgrad Einsteiger · Fortgeschritten · Experte - Zuordnung (erzeugt aus design/Vorschläge/arbeitsbereich-detailgrad-zuordnung.json) und Modul -->
-<script src="js/data/detailgrad-zuordnung.js?v=v3720"></script>
+<script src="js/data/detailgrad-zuordnung.js?v=v3740"></script>
 <script src="js/detailgrad.js?v=v3720d"></script>
-<script src="js/objekt-reiter.js?v=v3720"></script>
+<script src="js/objekt-reiter.js?v=v3740"></script>
 <script src="js/paket-import.js?v=v3670"></script><!-- v3202 · Portfolio/Paket aus mehreren Objekten -->
 <script src="js/objekt-bloecke.js?v=v3034"></script><!-- v3034 -->
 <script src="js/feld-hilfe.js?v=v3073"></script>
@@ -4132,7 +4133,7 @@ label.dp-required.qc-required::after {
 <!-- V63.63: V25-Bank-Charts (4 SVG-basierte Charts: Equity-Aufbau, Cockpit, Waterfall, Stress) -->
 <script src="js/bank-charts.js?v=v3358"></script>
 <!-- V63.70: User-Hilfe-System mit Suche + KI-Assistent -->
-<script src="js/help.js?v=v3720"></script>
+<script src="js/help.js?v=v3740"></script>
 <script src="js/modal-handy.js?v=v2201"></script>
 <script src="js/pilot-figur.js?v=v2189"></script>
 <script src="js/prozess-atlas.js?v=v3710"></script>
@@ -4145,7 +4146,7 @@ label.dp-required.qc-required::after {
   <script src="js/tour-engine.js?v=v3045"></script>
   <script src="js/tour-content.js?v=v3231"></script>
   <!-- v1740 � Grund-Setup VOR dem Rundgang (Aussehen, Stammdaten, Rechenwerte) -->
-  <script src="js/onboarding.js?v=v3720b"></script>
+  <script src="js/onboarding.js?v=v3740"></script>
 <!-- V63.73: Feedback & Support Modal -->
 <script src="js/feedback-modal.js?v=777e"></script>
   <script src="js/email-change.js?v=774"></script><!-- v774-change-email -->
@@ -4215,7 +4216,7 @@ label.dp-required.qc-required::after {
   <script src="js/ze-aufteilung.js?v=v3670b"></script><!-- v3670 · Zusatzeinnahmen aufteilen (Reiter Miete) -->
   <script src="js/dpsh-score-hero.js?v=v3370"></script><!-- dpsh-score-hero -->
   <script src="js/quick-boarding-share.js?v=v3370"></script>
-  <script src="js/voice-import.js?v=v3720b"></script>
+  <script src="js/voice-import.js?v=v3740"></script>
   <!-- v1895: der sichtbare Vermerk an jedem pauschal angesetzten
        Bewirtschaftungsposten. Liest nur `_dp_herkunft`, rechnet nichts. -->
   <script src="js/bwk-vermerk.js?v=v1895b"></script>

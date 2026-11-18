@@ -3461,6 +3461,17 @@
     },
     thesis: function () { return 'Was ist dir an diesem Objekt sonst noch wichtig?'; }
   };
+  /* v3740 · Marcel 18.11.2026: was die Marktpreisindikation mitbringt, wird nur in Felder
+     des gewählten Detailgrads übernommen - dieselbe Regel wie beim Import von Dokumenten
+     (detailgrad.js importErlaubt, v3236). Gemessen 18.11.: in Einsteiger landete die
+     Marktmiete (ds2_marktmiete, ab Fortgeschritten) unsichtbar im Objekt. Die Zahl bleibt
+     im Gespräch (_rf.markt.mietSqm) und steht in der Auswertung der Indikation; ins Feld
+     kommt sie erst, wenn der Nutzer die Stufe hebt und neu abruft. */
+  function _rfMarktErlaubt(id) {
+    var D = window.DpDetailgrad;
+    if (!D || typeof D.importErlaubt !== 'function') return true;
+    try { return D.importErlaubt(id); } catch (e) { return true; }
+  }
   function _rfFeldImDg(id) {
     var D = window.DpDetailgrad, el = document.getElementById(id);
     if (!D || !el) return true;
@@ -8469,6 +8480,7 @@
     }
     function setz(id, wert, woher) {
       if (!wert) return;
+      if (!_rfMarktErlaubt(id)) return;   /* v3740 · Import-Regel v3236 */
       var da = _rf.data.fields[id];
       if (da != null && String(da).trim() !== '') return;   /* selbst gesagt gewinnt */
       _rf.data.fields[id] = wert;
@@ -9483,7 +9495,8 @@
     var KNF = { konflikt: true };   /* v1376 (C7) */
     if (M.makro && _rfSetzen('makrolage', M.makro, Q, KNF)) eingetragen.push('Makrolage');
     if (M.mikro && _rfSetzen('mikrolage', M.mikro, Q, KNF)) eingetragen.push('Mikrolage');
-    if (M.mietSqm != null && _rfSetzen('ds2_marktmiete', String(Math.round(M.mietSqm * 100) / 100).replace('.', ','), Q, KNF)) eingetragen.push('Marktmiete');
+    /* v3740 · Marktmiete nur, wo das Feld im Detailgrad sichtbar ist (ab Fortgeschritten) */
+    if (M.mietSqm != null && _rfMarktErlaubt('ds2_marktmiete') && _rfSetzen('ds2_marktmiete', String(Math.round(M.mietSqm * 100) / 100).replace('.', ','), Q, KNF)) eingetragen.push('Marktmiete');
     if (M.mw != null && _rfSetzen('svwert', String(Math.round(M.mw)), Q, KNF)) eingetragen.push('Marktwert');
 
 
@@ -10534,6 +10547,10 @@
     /* Ohne Baujahr ist die Frage sinnlos: die Restnutzungsdauer wird aus
        Alter und Modernisierungsgrad gebildet. Kein Baujahr, kein Alter. */
     if (!_rfFeld('baujahr')) return false;
+    /* v3740 · Marcel 18.11.2026: die Strecke erst ab Fortgeschritten anbieten. Ihre
+       Antworten landen in den Modernisierungsfeldern (mod_*, Reiter Objekt › Gewerke),
+       und die sind ab Fortgeschritten - in Einsteiger wären es unsichtbare Angaben. */
+    if (!_rfFeldImDg('mod_dach')) return false;
     _rf.rndGefragt = 1;
     _rfAktion('rnd',
       'Soll ich die Restnutzungsdauer ermitteln? Acht kurze Fragen zum '
