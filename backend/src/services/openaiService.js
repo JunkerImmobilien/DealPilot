@@ -1559,7 +1559,18 @@ function buildPrompt(payload, opts) {
         if (abw < -8) {
           L.push('- BEWERTUNG: Die Ist-Miete liegt UNTER Marktniveau. Das ist ein ECHTER HEBEL:');
           L.push('  Mietsteigerungspotenzial bei Neuvermietung oder Anpassung im Bestand.');
-          L.push('  Beziffere es (Marktmiete × Flaeche gegen Ist), nenne die rechtlichen Grenzen');
+          /* v3770 · Marcel 18.11.2026 („die oberste Grenze nehmen plus den zehn Prozent … das nutzen wir fuer die
+             gesamte App"): liegt der Block MIETERHOEHUNG UND ZIELBILD vor, beziffert der Pilot das Potenzial NUR mit
+             dessen Zahlen (App-Regel: Bestand bis zum Oberwert der Vergleichsmiete in Schritten der Kappung,
+             Neuvermietung bis 110 % davon, wo die Mietpreisbremse gilt). „Marktmiete × Flaeche" ist die neutrale
+             marktuebliche Miete des Ertragswerts und waere eine zweite, niedrigere Soll-Miete daneben. */
+          if (_pz) {
+            L.push('  Beziffere es NUR mit den Zahlen aus dem Block MIETERHOEHUNG UND ZIELBILD (Stufe Mieterhoehung');
+            L.push('  und Zielbild, rechtlich zulaessiges Maximum) - rechne KEIN eigenes Potenzial aus Marktmiete × Flaeche;');
+            L.push('  die marktuebliche Miete oben ist nur der Ansatz im Ertragswert. Nenne die rechtlichen Grenzen');
+          } else {
+            L.push('  Beziffere es (Marktmiete × Flaeche gegen Ist), nenne die rechtlichen Grenzen');
+          }
           L.push('  (Kappungsgrenze, Mietspiegel, Mieterhoehung nur in Schritten) und ordne ein,');
           L.push('  wie schnell es realisierbar ist. Das gehoert in die Chancen.');
         } else if (abw > 15) {

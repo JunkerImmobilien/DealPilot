@@ -587,21 +587,35 @@ function _kmUebersicht(o) {
       var lnk = function (t, u) { return u ? '<a href="' + _kmEsc(u) + '" target="_blank" rel="noopener">' + _kmEsc(t) + '</a>' : _kmEsc(t); };
       var dat = function (x) { return x ? String(x).split('-').reverse().join('.') : ''; };
       var brWert, brText;
+      /* v3770 · Marcel 18.11.2026 („die oberste Grenze nehmen plus den zehn Prozent … das nutzen wir für die gesamte
+         App"): die Obergrenze bei Neuvermietung rechnet mit DERSELBEN Vergleichsmiete wie die Mietleiter
+         (DpPotenzial.objektVgl: eigene Angabe > Mietspiegel mit dem oberen Spannenwert > amtliche Mietpreisübersicht >
+         DealPilot-Näherung (oben) > Schätzung aus Angeboten). Bis v3769 stand hier die amtliche Mietpreisübersicht
+         × 1,10 - ein Mittelwert, der als „höchstens" neben der höheren Grenze der Mietleiter stand. */
+      var vgO = null; try { vgO = (window.DpPotenzial && DpPotenzial.objektVgl) ? DpPotenzial.objektVgl() : null; } catch (e) { vgO = null; }
+      var vgQ = vgO && Number(vgO.qm) > 0 ? Number(vgO.qm) : null;
+      var vgK = vgO && DpPotenzial.vglKurz ? DpPotenzial.vglKurz(vgO) : '';
+      var vgT = 'Vergleichsmiete ' + (vgQ ? _kmQmK(vgQ) : '') + (vgK ? ', ' + _kmEsc(vgK) : '');
+      var mfhT = (window.DpMfhEinheiten && DpMfhEinheiten.artMitEinheiten && DpMfhEinheiten.artMitEinheiten()) ? ' Je Wohnung steht die Grenze in der Mietleiter (Einheiten).' : '';
       if (br.gilt === true) {
         brWert = '<b style="color:#B8625C">gilt</b>' + (br.bis ? ' bis ' + dat(br.bis) : '');
-        if (a) { var og = Math.round(a.wert_qm * 1.1 * 100) / 100;
-          brText = 'Bei einer Neuvermietung höchstens <b>' + _kmQmK(og) + '</b> (amtliche Vergleichsmiete ' + _kmQmK(a.wert_qm) + ' + 10 %, § 556d BGB)'
-            + (wfl > 0 ? ' = ' + _kmEur(og * wfl) + ' im Monat' : '') + '.'; }
-        else brText = 'Bei einer Neuvermietung höchstens ortsübliche Vergleichsmiete + 10 % (§ 556d BGB). Maßgeblich ist der Mietspiegel der Gemeinde — einen amtlichen Wert dafür haben wir hier nicht, deshalb nennen wir keine Euro-Grenze. Der Marktdurchschnitt oben ist eine Angebotsmiete und liegt meist darüber.';
+        if (vgQ) { var og = Math.round(vgQ * 1.1 * 100) / 100;
+          brText = 'Bei einer Neuvermietung höchstens <b>' + _kmQmK(og) + '</b> (' + vgT + ' + 10 %, § 556d BGB)'
+            + (wfl > 0 && !mfhT ? ' = ' + _kmEur(og * wfl) + ' im Monat' : '') + '.' + mfhT; }
+        else brText = 'Bei einer Neuvermietung höchstens ortsübliche Vergleichsmiete + 10 % (§ 556d BGB). Maßgeblich ist der Mietspiegel der Gemeinde. Eine Vergleichsmiete liegt hier noch nicht vor, deshalb nennen wir keine Euro-Grenze. Der Marktdurchschnitt oben ist eine Angebotsmiete und liegt meist darüber.';
         brText += ' Ausnahmen: Neubau (erstmals ab Oktober 2014 vermietet), umfassend modernisiert, oder die Vormiete lag schon höher.';
       } else if (br.gilt === false) {
         brWert = '<b style="color:#2f7d55">gilt hier nicht</b>';
-        brText = 'Bei einer Neuvermietung ist die Miete frei vereinbar — Orientierung ist der Markt.';
+        /* v3770 · wie die Mietleiter (potenzial.js leiterZeilen, v3356 B3): unbedenklich bis rund 120 % der Vergleichsmiete */
+        brText = 'Bei einer Neuvermietung ist die Miete frei vereinbar' + (vgQ ? ', unbedenklich bis rund 120 % der Vergleichsmiete, ca. <b>' + _kmQmK(Math.round(vgQ * 1.2 * 100) / 100) + '</b> (' + vgT + ', § 5 WiStG), wenn Ausstattung, Lage und Zustand das tragen.' : '. Orientierung ist der Markt.') + mfhT;
       } else { brWert = 'bitte prüfen'; brText = _kmEsc(br.text || ''); }
       var quelleBr = br.verordnung ? ' · ' + lnk(br.verordnung, br.url) : '';
       var kpWert = (kp.pct ? kp.pct + ' % in 3 Jahren' : '—');
       var kpText = 'Im laufenden Mietverhältnis darf die Miete in drei Jahren um höchstens ' + (kp.pct || '–') + ' % steigen, und nie über die ortsübliche Vergleichsmiete (§ 558 BGB)'
-        + (ist && kp.pct ? ' — bei deiner Miete also auf höchstens ' + _kmQmK(ist * (1 + kp.pct / 100)) : '') + '.';
+        + (ist && kp.pct ? (vgQ && vgQ < ist * (1 + kp.pct / 100)
+            /* v3770 · die Grenze ist das Kleinere aus Kappung und Vergleichsmiete (dieselbe wie oben) */
+            ? (vgQ > ist + 0.005 ? ' — bei deiner Miete also auf höchstens ' + _kmQmK(vgQ) + ' (' + vgT + ')' : ' — deine Miete liegt schon an der ' + vgT)
+            : ' — bei deiner Miete also auf höchstens ' + _kmQmK(ist * (1 + kp.pct / 100))) : '') + '.';
       var quelleKp = kp.herkunft === 'verordnung' ? ' · ' + lnk(kp.verordnung || 'Landesverordnung', kp.url) : ' · gesetzliche Grenze (§ 558 Abs. 3 Satz 1 BGB)';
       /* v3086 · Marcel 02.11.2026: „die Mietrecht-Kachel zum Minimieren - nur das Wichtigste, die beiden
          Zeilen dann stehen lassen“. Zugeklappt (Vorgabe): zwei Zeilen; aufgeklappt: Erklaerung und Quelle. */

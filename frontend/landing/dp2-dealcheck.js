@@ -361,12 +361,16 @@
     var spanne = vg.quelle === 'mietspiegel' && vg.oben > 0, oben = spanne ? vg.oben : vg.qm * OBEN_TYPISCH, ca = spanne ? '' : 'ca. ';
     var eu = function (qm, mitCa) { return '<b>' + (mitCa ? ca : '') + dez(qm, 2) + ' €</b>' + (mitW ? ' (' + dez(Math.round(qm * wfl), 0) + ' € im Monat)' : ''); };
     var t = '<b>Was an Miete möglich ist, je m² nettokalt</b><br>';
-    t += '<b>Bestand:</b> bis zur Vergleichsmiete der Wohnung. Im Mittel sind das ' + eu(vg.qm) + ', am oberen Rand ' + eu(oben, true)
-      + ', wenn Ausstattung, Lage und Zustand das tragen. Erhöht werden darf um höchstens ' + kpct + ' % in 3 Jahren, frühestens 15 Monate nach der letzten Erhöhung (§ 558 BGB).<br>';
-    if (mb && mb.gilt === true) t += '<b>Neuvermietung:</b> hier gilt die Mietpreisbremse. Nach § 556d BGB sind höchstens 110 % der Vergleichsmiete erlaubt, also ' + eu(vg.qm * 1.1)
-      + ', am oberen Rand ' + eu(oben * 1.1, true) + '. Ausnahmen gibt es bei höherer Vormiete, Modernisierung in den letzten 3 Jahren und Erstbezug nach dem 01.10.2014.';
-    else if (mb && mb.gilt === false) t += '<b>Neuvermietung:</b> hier gilt keine Mietpreisbremse, die Miete ist frei vereinbar. Unbedenklich sind bis zu 120 % der Vergleichsmiete, also ' + eu(vg.qm * 1.2)
-      + ', am oberen Rand ' + eu(oben * 1.2, true) + ', wenn Ausstattung, Lage und Zustand das tragen. Wer darüber geht und dabei ein knappes Wohnungsangebot ausnutzt, riskiert ein Bußgeld wegen überhöhter Miete (§ 5 WiStG).';
+    /* landing-dealcheck-12 · v3770 · Marcel 18.11.2026 („die oberste Grenze nehmen plus den zehn Prozent … das nutzen wir
+       für die gesamte App"): wie die App (lib/mietanker.js zielMaximum) zuerst das Maximum am oberen Rand mit seiner
+       Bedingung, der Wert vom Mittel nur noch als sicherer Wert danach. Bis hier stand „höchstens 110 % …, also <Mittel>"
+       vorn, der Mittelwert las sich als Grenze. */
+    t += '<b>Bestand:</b> bis zur Vergleichsmiete der Wohnung, am oberen Rand ' + eu(oben, true)
+      + ', wenn Ausstattung, Lage und Zustand das tragen, sonst ' + eu(vg.qm) + ' im Mittel. Erhöht werden darf um höchstens ' + kpct + ' % in 3 Jahren, frühestens 15 Monate nach der letzten Erhöhung (§ 558 BGB).<br>';
+    if (mb && mb.gilt === true) t += '<b>Neuvermietung:</b> hier gilt die Mietpreisbremse. Nach § 556d BGB sind höchstens 110 % der Vergleichsmiete erlaubt, am oberen Rand also ' + eu(oben * 1.1, true)
+      + ', wenn Ausstattung, Lage und Zustand das tragen, sonst ' + eu(vg.qm * 1.1) + '. Ausnahmen gibt es bei höherer Vormiete, Modernisierung in den letzten 3 Jahren und Erstbezug nach dem 01.10.2014.';
+    else if (mb && mb.gilt === false) t += '<b>Neuvermietung:</b> hier gilt keine Mietpreisbremse, die Miete ist frei vereinbar. Unbedenklich sind bis zu 120 % der Vergleichsmiete, am oberen Rand also ' + eu(oben * 1.2, true)
+      + ', wenn Ausstattung, Lage und Zustand das tragen, sonst ' + eu(vg.qm * 1.2) + '. Wer darüber geht und dabei ein knappes Wohnungsangebot ausnutzt, riskiert ein Bußgeld wegen überhöhter Miete (§ 5 WiStG).';
     else t += '<b>Neuvermietung:</b> ob die Mietpreisbremse gilt, bitte prüfen.';
     if (mitW) {
       var ist = nkm / wfl, abw = (ist / vg.qm - 1) * 100;
