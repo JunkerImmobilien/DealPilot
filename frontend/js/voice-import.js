@@ -3433,11 +3433,70 @@
     }
     return !kennt;
   }
+  /* ══ v3720 · EIN BLOCK FRAGT NUR, WAS IM DETAILGRAD SICHTBAR IST ═════════
+     Marcel 18.11.2026: „Geht das in der geführten Eingabe auf?" Gemessen an einem
+     neuen Objekt in Einsteiger: ein Block wurde gefragt, sobald EINES seiner Felder
+     sichtbar war - und fragte dann auch nach den übrigen. „Zur Steuer — AfA-Satz,
+     Gebäudeanteil und dein Grenzsteuersatz" (AfA-Satz, Gebäudeanteil ab Fortgeschritten),
+     „ab wann gehören dir Mieten und Kosten" (wirtschaftlicher Übergang: Experte),
+     „Küche, Möbel" (ab Fortgeschritten), beim Grundstück „Fläche, Miteigentumsanteil"
+     (ab Fortgeschritten) und „Erbbaurecht" (Experte), in Fortgeschritten „Warum lohnt
+     sich das Objekt, was könnte schiefgehen" (These, Risiken: Experte). Die Antwort
+     landete in Feldern, die der Nutzer danach nicht sieht.
+     Jetzt: der Block behält nur die sichtbaren Felder; wo sich dadurch die Frage
+     ändert, steht hier der Satz dazu (Schlüssel = erstes Feld des Originalblocks).
+     Ohne sichtbares Feld bleibt der Block unverändert - _rfImDetailgrad lässt ihn fallen. */
+  var RF_DG_FRAGE = {
+    san: function () { return 'Muss etwas saniert werden? Wenn ja, mit welchen Kosten rechnest du?'; },
+    kaufdat: function () { return 'Wann wird gekauft?'; },
+    afa_satz: function (hat) {
+      if (hat('afa_satz') || hat('geb_ant')) return null;
+      return hat('zve')
+        ? 'Zur Steuer — wie hoch ist dein Grenzsteuersatz? Wenn du ihn nicht im Kopf hast: sag mir dein zu versteuerndes Einkommen, dann rechne ich ihn aus.'
+        : 'Zur Steuer — wie hoch ist dein Grenzsteuersatz?';
+    },
+    brw: function (hat) {
+      if (hat('gsfl') || hat('mea')) return null;   /* _rfNachArt formuliert */
+      return 'Kennst du den Bodenrichtwert? Ich kann ihn auch amtlich abholen.';
+    },
+    thesis: function () { return 'Was ist dir an diesem Objekt sonst noch wichtig?'; }
+  };
+  function _rfFeldImDg(id) {
+    var D = window.DpDetailgrad, el = document.getElementById(id);
+    if (!D || !el) return true;
+    try { return D.ebene(el) <= D.stufe(); } catch (e) { return true; }
+  }
+  function _rfNachDetailgrad(e) {
+    if (!e || !window.DpDetailgrad || e.dgIds) return e;
+    var vis = e.ids.filter(_rfFeldImDg);
+    if (!vis.length || vis.length === e.ids.length) return e;
+    var k = {}; for (var s in e) { if (Object.prototype.hasOwnProperty.call(e, s)) k[s] = e[s]; }
+    k._orig = e._orig || e;
+    k.ids = vis;
+    if (e.eins) k.eins = e.eins.filter(function (id) { return vis.indexOf(id) >= 0; });
+    if (k.eins && !k.eins.length) delete k.eins;
+    var f = RF_DG_FRAGE[(k._orig.ids || e.ids)[0]];
+    var t = f ? f(function (id) { return vis.indexOf(id) >= 0; }) : null;
+    if (t) { k.frage = t; delete k.frageWennAbruf; }
+    return k;
+  }
+  /* Erbbaurecht (#erbpacht) ist Experte: darunter fragt kein Satz mehr danach -
+     die Folgefrage (Erbbauzins, Restlaufzeit) fiele ohnehin weg. */
+  function _rfOhneErbbau(e) {
+    if (!e || !e.frage || _rfFeldImDg('erbpacht')) return e;
+    var t = String(e.frage).replace(/ Und: ist das Grundstück Erbbaurecht\?/, '');
+    if (t === e.frage) return e;
+    var k = {}; for (var s in e) { if (Object.prototype.hasOwnProperty.call(e, s)) k[s] = e[s]; }
+    k._orig = e._orig || e; k.frage = t;
+    return k;
+  }
   function _rfZugeschnitten(fields) {
     return RFRAGEN.map(_rfZuschnitt)
+      .map(_rfNachDetailgrad)                                   /* v3720 */
       .map(function (e) { return _rfNachArt(e, fields); })
       .filter(Boolean)
-      .filter(function (e) { return _rfImDetailgrad(e.dgIds || e.ids); });   /* v3073 · v3720 dgIds */
+      .filter(function (e) { return _rfImDetailgrad(e.dgIds || e.ids); })   /* v3073 · v3720 dgIds */
+      .map(_rfOhneErbbau);                                      /* v3720 */
   }
 
   function _rfLuecken(fields) {
