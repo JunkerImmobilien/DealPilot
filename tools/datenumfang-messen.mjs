@@ -139,6 +139,58 @@ const TAKTE = {
   bodenrichtwerte: 'live je Bericht',
 };
 
+/* ── 3b · Harte Zahlen (landing-strecke-3, Marcel 18.11.2026: „Schnittstellen … Hard Facts könnten wir
+   noch ein paar mehr angeben“). Jede aus EINER Quelle, gezählt, nie geschätzt. ──────────────────── */
+/* Nutzer: dieselbe öffentliche Route, die die Landing im Browser fragt (Prod, nur lesend, kein Token).
+   Regel wie dp2.js: auf Zehner abgerundet, davor steht „>“. */
+const NUTZER_URL = arg('nutzer-url') || 'https://app.dealpilot.immo/api/v1/public/stats';
+let nutzer = null, nutzerHerkunft = null;
+try {
+  const r = await fetch(NUTZER_URL, { signal: AbortSignal.timeout(15000), headers: { Origin: 'https://dealpilot.immo' } });
+  const j = r.ok ? await r.json() : null;
+  if (j && Number.isFinite(j.registrierte_nutzer)) { nutzer = j.registrierte_nutzer; nutzerHerkunft = j.herkunft || null; }
+} catch (e) { /* unten */ }
+if (nutzer == null) {
+  const alt = fs.existsSync(ZIEL) ? ladeSkript(ZIEL, 'DPS_UMFANG') : null;
+  if (alt && alt.kopf && Number.isFinite(alt.kopf.nutzer)) { nutzer = alt.kopf.nutzer; console.log('Nutzer: ' + NUTZER_URL + ' nicht erreichbar, letzte Messung ' + nutzer); }
+  else { console.error('Nutzer: ' + NUTZER_URL + ' nicht erreichbar, keine frühere Messung'); fehler++; }
+}
+/* API-Endpunkte: jede Route (Methode + Pfad je Datei) in Haupt-App und Marktbericht-Backend,
+   Kommentarzeilen nicht. Gemessen 18.11.2026: 443 + 74. */
+function jsDateien(d, o = []) {
+  for (const f of fs.readdirSync(d, { withFileTypes: true })) {
+    const q = join(d, f.name);
+    if (f.isDirectory()) { if (!/^(node_modules|generated|test|tests|__tests__)$/.test(f.name)) jsDateien(q, o); }
+    else if (/\.(m?js)$/.test(f.name)) o.push(q);
+  }
+  return o;
+}
+function endpunkte(basis) {
+  const s = new Set();
+  const re = /^\s*(?:router|app)\.(get|post|put|patch|delete|all)\(\s*(['"`])([^'"`]*)\2\s*,/;
+  for (const f of jsDateien(join(WURZEL, basis))) {
+    fs.readFileSync(f, 'utf8').split(/\r?\n/).forEach((z) => { const m = z.match(re); if (m) s.add(f + '|' + m[1] + '|' + m[3]); });
+  }
+  return s.size;
+}
+const api_haupt = endpunkte('backend/src'), api_mb = endpunkte('marktbericht/backend/src');
+/* Prüfstrecken: jedes Prüfwerkzeug unter tools/ (…-pruefen, …-test), auch in Unterordnern eine Ebene tief */
+const pruefDateien = [];
+for (const d of ['tools', ...fs.readdirSync(join(WURZEL, 'tools'), { withFileTypes: true }).filter((x) => x.isDirectory()).map((x) => 'tools/' + x.name)]) {
+  for (const f of fs.readdirSync(join(WURZEL, d))) if (/(-pruefen|-test)\.(mjs|js|py)$/.test(f)) pruefDateien.push(d + '/' + f);
+}
+/* Videothek: assets/videothek/videos.json */
+const VJ = JSON.parse(fs.readFileSync(join(LANDING, 'assets/videothek/videos.json'), 'utf8'));
+const videos = (VJ.videos || []).length;
+const videoSek = (VJ.videos || []).reduce((s, v) => s + (Number(v.dauer) || 0), 0);
+const FAKTEN = {
+  nutzer, nutzer_rund: nutzer == null ? null : Math.floor(nutzer / 10) * 10, nutzer_url: NUTZER_URL, nutzer_herkunft: nutzerHerkunft,
+  api_endpunkte: api_haupt + api_mb, api_haupt, api_mb,
+  register_saetze: REG.saetze, laender_mit_wert: REG.kopf.laender_mit_wert,
+  pruefstrecken: pruefDateien.length,
+  videos, video_stunden: Math.round(videoSek / 360) / 10,
+};
+
 /* ── 4 · Rechnen ────────────────────────────────────────────────────── */
 const register = REG.kopf.werte_gesamt;
 const teile = {
@@ -182,7 +234,13 @@ const U = {
     boris_dienste: boris.length,
     schnittstellen: schnitt_gesamt,
     statistik_tabellen: schnitt.statistik_tabellen,
+    /* landing-strecke-3 · harte Zahlen */
+    nutzer: FAKTEN.nutzer, nutzer_rund: FAKTEN.nutzer_rund,
+    api_endpunkte: FAKTEN.api_endpunkte, register_saetze: FAKTEN.register_saetze,
+    laender_mit_wert: FAKTEN.laender_mit_wert, pruefstrecken: FAKTEN.pruefstrecken,
+    videos: FAKTEN.videos, video_stunden: FAKTEN.video_stunden,
   },
+  fakten: FAKTEN,
 };
 
 const kopfText = '/* datenumfang-messen.mjs · erzeugt ' + new Date().toISOString() + ' — NICHT von Hand ändern.\n'
@@ -208,6 +266,7 @@ for (const f of fs.readdirSync(LANDING).filter((x) => x.endsWith('.html'))) {
 console.log('amtliche Datenpunkte: ' + fmt(amtlich) + ' (' + rund + ')');
 console.log('  ' + Object.entries(teile).map(([k, v]) => k + ' ' + fmt(v)).join(' · '));
 console.log('Schnittstellen: ' + schnitt_gesamt + ' (' + Object.entries(schnitt).map(([k, v]) => k + ' ' + v).join(', ') + ') · Portale ' + DB.portale + ' in ' + DB.portale_laender + ' Ländern');
+console.log('Harte Zahlen: Nutzer ' + FAKTEN.nutzer + ' (Anzeige > ' + FAKTEN.nutzer_rund + ', ' + FAKTEN.nutzer_url + ') · API-Endpunkte ' + FAKTEN.api_endpunkte + ' (Haupt-App ' + FAKTEN.api_haupt + ', Marktbericht ' + FAKTEN.api_mb + ') · Register-Sätze ' + fmt(FAKTEN.register_saetze) + ' · Länder mit Wert ' + FAKTEN.laender_mit_wert + ' · Prüfwerkzeuge ' + FAKTEN.pruefstrecken + ' · Videos ' + FAKTEN.videos + ' (' + fmt(FAKTEN.video_stunden) + ' h)');
 console.log('Takte: ' + JSON.stringify(TAKTE));
 console.log('geschrieben: frontend/landing/datenumfang.js · ' + geaendert + ' HTML-Datei(en) nachgezogen');
 process.exit(fehler ? 1 : 0);

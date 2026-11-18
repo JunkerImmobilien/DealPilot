@@ -40,6 +40,10 @@
 .dt-zahlen b{font:700 clamp(28px,3.2vw,40px)/1 var(--disp);color:var(--ink);letter-spacing:-.02em}
 .dt-zahlen span{font-size:13.5px;line-height:1.4;color:var(--inkm)}
 .dt-zahlen i{font-style:normal;font-weight:700;color:var(--ink)}
+/* landing-strecke-3 · zweite Reihe „harte Zahlen“, eine Stufe leiser als die vier großen */
+.daten .dt-fakten{margin-top:-14px}
+.dt-fakten > div{border-top-width:1px;padding-top:16px;padding-bottom:16px}
+.dt-fakten b{font-size:clamp(22px,2.4vw,30px)}
 .dt-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
 .dt-k{background:#fff;border:1px solid var(--cream-line);padding:18px 18px 16px;display:flex;flex-direction:column;gap:8px;min-width:0}
 .dt-k h4{font-size:17px;color:var(--ink)}

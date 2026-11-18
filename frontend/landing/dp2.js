@@ -129,14 +129,20 @@
     var z = parseInt(String(el.textContent).replace(/\D/g, ''), 10);
     return isFinite(z) ? z : null;
   }
+  /* landing-strecke-3 · Marcel 18.11.2026: „oben 870 Nutzer, im Hero 879“. Ursache: zwei Läufe auf
+     demselben Element. Der erste (0 bis 870 aus dem HTML, 1,6 s) lief weiter, als die frische Zahl
+     879 einen zweiten (0,9 s) startete, und schrieb am Ende seine 870 darüber. Jeder Lauf trägt
+     jetzt eine Nummer, nur der jüngste darf schreiben. */
   function hoch(el, ziel, dauer) {
     if (el.dataset.fertig) return;
     el.dataset.fertig = '1';
+    var laufNr = el._dpLauf = (el._dpLauf || 0) + 1;
     var ende = el.dataset.suffix || '';
-    function fertig() { el.textContent = ziel.toLocaleString('de-DE') + ende; }
+    function fertig() { if (el._dpLauf === laufNr) el.textContent = ziel.toLocaleString('de-DE') + ende; }
     if (ruhig || !sichtbar() || dauer === 0) { fertig(); return; }
     var start = null, d = dauer || 1600;
     requestAnimationFrame(function lauf(t) {
+      if (el._dpLauf !== laufNr) return;
       if (!start) start = t;
       var p = Math.min(1, (t - start) / d), e = 1 - Math.pow(1 - p, 3);
       el.textContent = Math.round(ziel * e).toLocaleString('de-DE') + ende;
@@ -257,7 +263,7 @@
   var zio = new IntersectionObserver(function (es) {
     es.forEach(function (e) {
       if (!e.isIntersecting) return;
-      var z = zahlAus(e.target);
+      var z = e.target.dataset.ziel != null ? parseInt(e.target.dataset.ziel, 10) : zahlAus(e.target);
       if (z != null) hoch(e.target, z);
       zio.unobserve(e.target);
     });
@@ -311,7 +317,9 @@
     .then(function (r) { return r.ok ? r.json() : null; })
     .then(function (d) {
       if (!d || !d.registrierte_nutzer) return;
-      var neu = d.registrierte_nutzer;
+      /* landing-strecke-3 · EINE Zahl, EINE Regel: auf Zehner abgerundet, davor steht „>“ (879 wird „> 870“).
+         Dieselbe Regel nutzt tools/datenumfang-messen.mjs für die Zahl im HTML (data-umfang="nutzer_rund"). */
+      var neu = Math.floor(d.registrierte_nutzer / 10) * 10;
       document.querySelectorAll('[data-nutzer]').forEach(function (e) {
         var alt = e.dataset.ziel != null ? parseInt(e.dataset.ziel, 10) : zahlAus(e);
         e.dataset.ziel = neu;
