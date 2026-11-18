@@ -994,11 +994,18 @@
     var mitAV = opt.anlageV !== false;
     var B = D(), num = function (x) { var n = Number(x); return isFinite(n) ? n : 0; };
     var deIso = function (iso) { return /^\d{4}-\d{2}-\d{2}$/.test(String(iso || '')) ? String(iso).slice(8, 10) + '.' + String(iso).slice(5, 7) + '.' + String(iso).slice(0, 4) : ''; };
-    return Promise.all([basis('Steuer-Mappe ' + jahr), api('/tax-records?from=' + jahr + '&to=' + jahr)]).then(function (zz) {
+    /* v3700 · P2: opt.kunde = client_id: Steuer-Mappe eines Kunden beim Partner, aus den fuer ihn weitergefuehrten Objekten,
+       gebaut mit SEINEM Steuerprofil (DpSteuerKontext.mit). Ohne Profil keine Mappe, nie mit den Daten des Partners. */
+    var kunde = /^[0-9a-f-]{36}$/i.test(String(opt.kunde || '')) ? String(opt.kunde) : null;
+    return Promise.all([basis('Steuer-Mappe ' + jahr), api('/tax-records?from=' + jahr + '&to=' + jahr + (kunde ? '&kunde=' + encodeURIComponent(kunde) : '')),
+      kunde ? api('/partner/kunden/' + encodeURIComponent(kunde) + '/steuerprofil') : null]).then(function (zz) {
+      var sp = zz[2], prof = sp && sp.aktuell && sp.aktuell.profil;
+      if (kunde && !prof) throw nutzerFehler('Für diesen Kunden liegt kein Steuerprofil vor. Ohne seine freigegebenen Steuerdaten erstellt DealPilot keine Steuer-Mappe.');
       var c = zz[0], saetze = ((zz[1] && zz[1].records) || []).filter(function (s) { return Number(s.year) === jahr; });
       if (Array.isArray(opt.ids) && opt.ids.length) saetze = saetze.filter(function (s) { return opt.ids.indexOf(s.object_id) >= 0; });
       if (!saetze.length) throw nutzerFehler('Für ' + jahr + ' sind keine Steuersätze gespeichert.');
       return Promise.all(saetze.map(function (s) { return api('/objects/' + encodeURIComponent(s.object_id)).catch(function () { return null; }); })).then(function (objs) {
+        var bauen = function () {   /* v3700 · synchron, damit der Kontext des Kunden genau diesen Lauf umfasst */
         var eintr = saetze.map(function (s, i) {
           var o = objs[i] && (objs[i].object || objs[i]), d = (o && o.data) || {};
           var adr = [[d.str, d.hnr].filter(Boolean).join(' '), [d.plz, d.ort].filter(Boolean).join(' ')].filter(Boolean).join(', ') || (o && o.name) || 'Objekt';
@@ -1077,6 +1084,8 @@
           + '<p class="det" style="margin-top:3mm">Die Steuerwirkung ist je Objekt gerechnet (Steuer mit und ohne dieses Objekt beim zu versteuernden Einkommen des Steuerzeitraums). Die Summe ist deshalb eine Näherung: die Progression mehrerer Objekte zusammen weicht davon ab. '
           + (ges.length ? 'Privatvermögen und Gesellschaften sind getrennte Steuersubjekte und werden nicht zusammengezählt. ' : '') + 'Keine Steuererklärung und keine Steuerberatung.</p>'));
         return B.dokument('Steuer-Mappe ' + jahr, S);
+        };
+        return (kunde && window.DpSteuerKontext) ? DpSteuerKontext.mit(prof, bauen, { kunde: sp.kunde, kundennummer: sp.kundennummer, client_id: kunde, profil_id: sp.aktuell.id, fassung: sp.aktuell.fassung, stand_am: sp.aktuell.zuletzt_am }) : bauen();
       });
     });
   }
@@ -1427,6 +1436,8 @@
   };
   function dokument(typ, opt) {
     if (!TYPEN[typ]) return Promise.reject(new Error('Unbekanntes Dokument: ' + typ));
+    /* v3700 · P2: Kundenstand ohne freigegebene Steuerdaten: kein Steuerdokument (es truege keine oder eine fremde Steuerzahl) */
+    try { if (/^(finanzamt|finanzamt_anlagev)$/.test(typ) && window.DpSteuerKontext && DpSteuerKontext.gesperrt()) return Promise.reject(nutzerFehler('Steuerdaten nicht freigegeben. Für diesen Kundenstand erstellt DealPilot kein Steuerdokument.')); } catch (e) {}
     try { if (typeof window.calcNow === 'function' && /investment|bank|kurz|finanzamt|kaufpreis/.test(typ)) window.calcNow(); } catch (e) {}
     return TYPEN[typ](opt || {});
   }

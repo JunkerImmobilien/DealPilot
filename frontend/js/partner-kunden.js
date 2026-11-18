@@ -116,6 +116,30 @@
       '#dppk-dlg .pk-gruppe{font:600 11px "JetBrains Mono",monospace;letter-spacing:.08em;text-transform:uppercase;color:#7A7370;margin:14px 0 6px}',
       '#dppk-dlg .pk-hinweis{background:#FBF6E9;border-left:3px solid ' + G + ';border-radius:8px;padding:10px 12px;font-size:13px;line-height:1.5;margin-bottom:12px}',
       '#dppk-dlg .pk-hinweis.rot{border-left-color:#B8625C;background:#FBF1F0}',
+      /* v3700 · Wahl beim Übernehmen */
+      '#dppk-dlg .pk-ziel{margin:12px 0}',
+      '#dppk-dlg .pk-ziel-wahl{display:flex;gap:10px;align-items:flex-start;border:1px solid #EDE6D6;border-radius:10px;padding:10px 12px;margin-bottom:8px;background:#fff;cursor:pointer;font:400 13px/1.45 Inter,sans-serif;color:#2A2727}',
+      '#dppk-dlg .pk-ziel-wahl input{margin-top:3px;flex:0 0 auto;accent-color:' + G + '}',
+      '#dppk-dlg .pk-ziel-wahl span{min-width:0}',
+      '#dppk-dlg .pk-ziel-wahl b{display:block;font-weight:600}',
+      '#dppk-dlg .pk-ziel-wahl small{display:block;color:#6B6460;font-size:12px;margin-top:2px}',
+      '#dppk-dlg .pk-ziel-wahl:has(input:checked){border-color:' + G + ';background:#FBF6E9}',
+      /* v3700 · Reiter Steuer im Kundenfenster */
+      '.dppk-hub .pk-st-tab{width:100%;border-collapse:collapse;font:400 12.5px Inter,sans-serif;color:#2A2727}',
+      '.dppk-hub .pk-st-tab th{text-align:left;font:600 10.5px "JetBrains Mono",monospace;letter-spacing:.04em;text-transform:uppercase;color:#7A7370;padding:6px 6px;border-bottom:1px solid #EDE6D6}',
+      '.dppk-hub .pk-st-tab td{padding:6px 6px;border-bottom:1px solid #F3EEE2;vertical-align:top}',
+      '.dppk-hub .pk-st-tab td.r,.dppk-hub .pk-st-tab th.r{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}',
+      '.dppk-hub .pk-st-wrap{overflow-x:auto;max-width:100%}',
+      '.dppk-hub .pk-st-leer{color:#6B6460;font:400 13px/1.5 Inter,sans-serif}',
+      '.dppk-hub .pk-st-ges{border:1px solid #EDE6D6;border-radius:10px;padding:10px 12px;margin-bottom:10px;background:#fff}',
+      '.dppk-hub .pk-st-ges h4{margin:0 0 6px;font:600 14px "Space Grotesk",Inter,sans-serif;color:#2A2727}',
+      '.dppk-hub .pk-st-kv{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:3px 12px;font:400 12.5px Inter,sans-serif}',
+      '.dppk-hub .pk-st-kv span:nth-child(even){text-align:right;font-variant-numeric:tabular-nums}',
+      '.dppk-hub .pk-st-mappe{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:6px}',
+      '.dppk-hub .pk-st-mappe select{height:34px;border:1px solid #D9CFB8;border-radius:8px;padding:0 8px;font:400 13px Inter,sans-serif;background:#fff}',
+      '.dppk-hub .pk-st-mappe button{height:34px;border:1px solid ' + G + ';background:' + G + ';color:#050505;border-radius:8px;padding:0 12px;font:600 13px Inter,sans-serif;cursor:pointer}',
+      '#dppk-wf{display:flex;gap:10px;align-items:center;flex-wrap:wrap;background:#FBF6E9;border:1px solid #E5DCC6;border-left:3px solid ' + G + ';border-radius:10px;padding:8px 12px;margin:0 0 10px;font:500 12.5px/1.45 Inter,sans-serif;color:#2A2727}',
+      '#dppk-wf b{font-weight:600}',
       '#dppk-dlg .pk-code{font:600 28px "JetBrains Mono",monospace;letter-spacing:.12em;text-align:center;padding:14px;border:1px dashed ' + G + ';border-radius:10px;background:#FBF6E9;margin:6px 0 12px}',
       /* v3690 · Freigabe: Zustimmungsdialog (#dppk-dlg), Reiter Freigabe im Arbeitsbereich (#dppk-ab, aus #dppk-ov kopiert), Vorschlag des Partners */
       '#dppk-dlg .pk-chip,#dppk-ov .pk-fg-chips .pk-chip{display:inline-block;border-radius:6px;padding:3px 8px;font:600 10.5px "JetBrains Mono",monospace;letter-spacing:.04em;text-transform:uppercase;border:1px solid #E2D7BE;background:#FBF6E9;color:#6B5A2A;white-space:nowrap}',
@@ -1022,10 +1046,91 @@
       hubZeile('E-Mail an den Kunden bei Rückmeldung', 'Bei „Zurück an Kunden“ eine E-Mail in deiner Marke mit Objekt, Zahl der Anmerkungen und Begleittext.', hubChips('pk-k-mailrm', [['an', 'an'], ['aus', 'aus']], k.mail_rueckmeldung !== false ? 'an' : 'aus')) +
       '</div></section>' };
   }
+  /* v3700 · P2 · Reiter „Steuer“ im Kundenfenster (Kunden & Plätze › Kunde): das Steuerprofil des Kunden, nur lesend.
+     Steuerzeiträume je Jahr, Veranlagung, Kirchensteuer, Gesellschaften mit Regime, Hebesatz, erweiterter Kürzung und
+     Prüfpunkten, Kosten, Verlustvortrag, Gesellschafterdarlehen, Überführungen und Gruppe, Fassungen mit Datum und Freigabe.
+     Nie mit den eigenen Daten des Partners vermischt: es kommt nur aus GET /partner/kunden/:id/steuerprofil. */
+  var ART_UEB = { kauf: 'Verkauf zum Verkehrswert', teilentgeltlich: 'teilentgeltlicher Verkauf', verdeckt: 'verdeckte Einlage', sacheinlage: 'Sacheinlage' };
+  var RF_TEXT = { gmbh: 'GmbH', ug: 'UG (haftungsbeschränkt)', gbr: 'GbR', privat: 'Privat', kg: 'KG', ohg: 'OHG', ek: 'Einzelunternehmen', sonst: 'Sonstige' };
+  function stEur(n) { var x = Number(n); return isFinite(x) ? Math.round(x).toLocaleString('de-DE') + ' €' : '–'; }
+  function stDatum(s) { var t = String(s || '').slice(0, 10).split('-'); return t.length === 3 ? t[2] + '.' + t[1] + '.' + t[0] : '–'; }
+  function steuerReiter() {
+    return { kurz: 'Steuer', titel: 'Steuerprofil des Kunden', html: '<section class="rnd-hub-karte"><h3 class="rnd-hub-h">Steuerprofil</h3><div data-pk-steuer><p class="pk-st-leer">Lädt …</p></div></section>' };
+  }
+  function steuerHtml(r) {
+    var a = r && r.aktuell, p = a && a.profil;
+    var fz = r && r.freigabe ? r.freigabe.zustand : 'ohne', fb = r && r.freigabe && r.freigabe.aktiv ? fgSauber(r.freigabe.aktiv.bereiche) : {};
+    var kopf = '<p class="rnd-hub-hinweis">' + (fz === 'dauer' || fz === 'einmal'
+      ? 'Freigabe ' + (fz === 'dauer' ? 'dauerhaft' : 'einmalig') + (fb.steuerdaten ? ', mit Steuerdaten.' : ', ohne Steuerdaten. Ein neues Steuerprofil kommt erst mit freigegebenen Steuerdaten.')
+      : (fz === 'widerrufen' ? 'Der Kunde hat die Freigabe widerrufen. Übermittelte Fassungen bleiben, bis er sie zurückzieht.' : 'Der Kunde hat noch keine Steuerdaten freigegeben.')) + ' Die Angaben gehören dem Kunden und bleiben getrennt von deinen eigenen.</p>';
+    if (!p) return kopf + '<p class="pk-st-leer">Noch kein Steuerprofil übermittelt. Es kommt mit, sobald der Kunde mit freigegebenen Steuerdaten sendet.</p>';
+    var h = kopf + '<p class="pk-st-leer"><b>Fassung ' + esc(a.fassung) + '</b>, übermittelt am ' + esc(stDatum(a.empfangen_am)) + (a.zuletzt_am && String(a.zuletzt_am).slice(0, 10) !== String(a.empfangen_am).slice(0, 10) ? ', zuletzt bestätigt am ' + esc(stDatum(a.zuletzt_am)) : '') + '.</p>';
+    var an = p.angaben || {};
+    h += '<div class="pk-st-kv"><span>Veranlagung (Investmentprofil)</span><span>' + (an.splitting ? 'Zusammenveranlagung' : 'Einzelveranlagung') + '</span><span>Kirchensteuer</span><span>' + (an.kirchensteuer ? an.kirchensteuer + ' %' : 'keine') + '</span></div>';
+    var zr = (p.zeitraeume || []);
+    h += '<h4 class="rnd-hub-h" style="margin-top:12px">Steuerzeiträume</h4>' + (zr.length ? '<div class="pk-st-wrap"><table class="pk-st-tab"><thead><tr><th>Von</th><th>Bis</th><th class="r">zvE</th><th>Veranlagung</th><th>Kirchensteuer</th></tr></thead><tbody>' +
+      zr.map(function (z) { return '<tr><td>' + esc(stDatum(z.valid_from)) + '</td><td>' + (z.valid_to ? esc(stDatum(z.valid_to)) : 'laufend') + '</td><td class="r">' + esc(stEur(z.zve)) + '</td><td>' + (z.splitting === true ? 'Zusammen' : z.splitting === false ? 'Einzel' : 'wie Profil') + '</td><td>' + (z.kirchensteuer === 8 || z.kirchensteuer === 9 ? z.kirchensteuer + ' %' : z.kirchensteuer === 0 ? 'keine' : 'wie Profil') + '</td></tr>'; }).join('') +
+      '</tbody></table></div>' : '<p class="pk-st-leer">Keine Steuerzeiträume. Gerechnet wird dann mit dem zvE am Objekt.</p>');
+    var jahre = {}; (p.bestand || []).forEach(function (o) { Object.keys(o.wk_per_year || {}).forEach(function (y) { jahre[y] = (jahre[y] || 0) + (Number(o.wk_per_year[y]) || 0); }); });
+    var jl = Object.keys(jahre).sort().filter(function (y) { return +y <= new Date().getFullYear() + 1; }).slice(-6);
+    h += '<h4 class="rnd-hub-h" style="margin-top:12px">Ergebnis der Objekte im Bestand</h4><p class="pk-st-leer">' + (p.bestand || []).length + ' Objekte mit gespeichertem Jahresergebnis. Daraus rechnet die Verlustverrechnung je Objekt.</p>' +
+      (jl.length ? '<div class="pk-st-wrap"><table class="pk-st-tab"><thead><tr>' + jl.map(function (y) { return '<th class="r">' + esc(y) + '</th>'; }).join('') + '</tr></thead><tbody><tr>' + jl.map(function (y) { return '<td class="r">' + esc(stEur(jahre[y])) + '</td>'; }).join('') + '</tr></tbody></table></div>' : '');
+    var ges = (p.mandanten || []).filter(function (m) { return m && m.id !== 'privat'; });
+    var ueb = p.ueberfuehrungen || [];
+    h += '<h4 class="rnd-hub-h" style="margin-top:12px">Gesellschaften</h4>';
+    if (!ges.length) h += '<p class="pk-st-leer">Keine Gesellschaften. Alle Objekte im Privatvermögen.</p>';
+    ges.forEach(function (m) {
+      var reg = m.regime || {}, bh = m.bh || {}, corp = m.rechtsform === 'gmbh' || m.rechtsform === 'ug';
+      var K = window.DealPilotUeberfuehrungKern, st = K && K.erwKuerzungStatus ? K.erwKuerzungStatus(reg) : { beantragt: reg.erw_kuerzung === true, aktiv: false, offen: [] };
+      var pp = (K && K.PRUEFPUNKTE) || [];
+      var kosten = m.kosten || {}, kj = Object.keys(kosten).filter(function (y) { return /^\d{4}$/.test(y); }).sort();
+      var plan = Array.isArray(m.uew_plan) ? m.uew_plan : [];
+      var u = ueb.filter(function (x) { return x.halter === m.id; });
+      h += '<div class="pk-st-ges"><h4>' + esc(m.name || m.id) + ' · ' + esc(RF_TEXT[m.rechtsform] || m.rechtsform || '') + '</h4>';
+      if (corp) {
+        var kst = reg.kst != null && isFinite(Number(reg.kst)) ? Number(reg.kst) : null;
+        h += '<div class="pk-st-kv"><span>Steuerregime</span><span>' + (kst == null || Math.abs(kst - 15.825) < 1e-6 ? 'KSt und Soli nach Jahr (§ 23 KStG)' : String(kst).replace('.', ',') + ' % fest') + '</span>' +
+          '<span>Hebesatz Gewerbesteuer</span><span>' + (reg.gewst != null ? esc(String(reg.gewst).replace('.', ',')) + ' %' : 'nicht angegeben') + '</span>' +
+          '<span>Erweiterte Kürzung</span><span>' + (st.aktiv ? 'aktiv' : st.beantragt ? 'beantragt, ' + st.offen.length + ' Prüfpunkte offen' : 'nein') + '</span>' +
+          '<span>Verlustvortrag</span><span>' + esc(stEur(bh.verlustvortrag || 0)) + '</span>' +
+          '<span>Gesellschafterdarlehen (Eröffnung)</span><span>' + esc(stEur(bh.eb_gesdar || 0)) + '</span>' +
+          '<span>Stammkapital</span><span>' + esc(stEur(bh.stammkapital || 0)) + '</span></div>';
+        if (st.beantragt && pp.length) h += '<p class="pk-st-leer" style="margin-top:6px">Prüfpunkte: ' + pp.map(function (x) { return (reg.erw_pruefung && reg.erw_pruefung[x.k] === true ? 'erfüllt' : 'offen') + ' (' + esc(x.k.replace(/_/g, ' ')) + ')'; }).join(', ') + '.</p>';
+        if (kj.length) h += '<div class="pk-st-wrap" style="margin-top:6px"><table class="pk-st-tab"><thead><tr><th>Kosten der Gesellschaft</th>' + kj.map(function (y) { return '<th class="r">' + esc(y) + '</th>'; }).join('') + '</tr></thead><tbody><tr><td>Summe</td>' +
+          kj.map(function (y) { var s = 0, o = kosten[y] || {}; Object.keys(o).forEach(function (k) { s += Number(o[k]) || 0; }); return '<td class="r">' + esc(stEur(s)) + '</td>'; }).join('') + '</tr></tbody></table></div>';
+      } else if (m.rechtsform === 'gbr') {
+        h += '<div class="pk-st-kv"><span>Anteil des Kunden</span><span>' + esc(String(m.quote != null ? m.quote : 100).replace('.', ',')) + ' %</span></div>';
+      }
+      h += u.length ? '<div class="pk-st-wrap" style="margin-top:6px"><table class="pk-st-tab"><thead><tr><th>Überführung</th><th>Stichtag</th><th>Art</th><th class="r">Verkehrswert</th><th class="r">Gesellschafterdarlehen</th><th>Gruppe</th></tr></thead><tbody>' +
+        u.map(function (x) { var inGr = plan.some(function (e) { return String(e && e.key) === String(x.privat_id) || String(e && e.key) === String(x.objekt_id); }); return '<tr><td>' + esc(x.adresse) + '</td><td>' + esc(stDatum(x.stichtag)) + '</td><td>' + esc(ART_UEB[x.art] || x.art || '–') + '</td><td class="r">' + esc(stEur(x.verkehrswert)) + '</td><td class="r">' + esc(stEur(x.gesellschafterdarlehen || 0)) + '</td><td>' + (inGr ? 'ja' : 'einzeln') + '</td></tr>'; }).join('') +
+        '</tbody></table></div>' : (corp ? '<p class="pk-st-leer" style="margin-top:6px">Keine Überführung in diese Gesellschaft.</p>' : '');
+      h += '</div>';
+    });
+    var fl = (r.fassungen || []);
+    h += '<h4 class="rnd-hub-h" style="margin-top:12px">Fassungen</h4><div class="pk-st-wrap"><table class="pk-st-tab"><thead><tr><th>Fassung</th><th>Übermittelt</th><th>Freigabe</th><th>Stand</th></tr></thead><tbody>' +
+      fl.map(function (f) { return '<tr><td>' + esc(f.fassung) + '</td><td>' + esc(stDatum(f.empfangen_am)) + '</td><td>' + esc(f.freigabe_art === 'dauer' ? 'dauerhaft' : f.freigabe_art === 'einmal' ? 'einmalig' : '–') + (f.freigabe_erteilt_am ? ' vom ' + esc(stDatum(f.freigabe_erteilt_am)) : '') + '</td><td>' + (f.ersetzt_am ? 'ersetzt am ' + esc(stDatum(f.ersetzt_am)) : 'gilt') + '</td></tr>'; }).join('') + '</tbody></table></div>';
+    var j0 = new Date().getFullYear() - 1;
+    h += '<h4 class="rnd-hub-h" style="margin-top:12px">Steuer-Mappe</h4><p class="pk-st-leer">Über die Objekte, die du für diesen Kunden weiterführst, mit seinem Steuerprofil.</p>' +
+      '<div class="pk-st-mappe"><select data-pk-st-jahr>' + [j0 + 1, j0, j0 - 1, j0 - 2].map(function (y) { return '<option value="' + y + '"' + (y === j0 ? ' selected' : '') + '>' + y + '</option>'; }).join('') + '</select><button type="button" data-pk-st-mappe>Steuer-Mappe erstellen</button></div>';
+    return h;
+  }
+  function steuerReiterLaden(box, k) {
+    var ziel = box && box.querySelector('[data-pk-steuer]'); if (!ziel) return;
+    api('/partner/kunden/' + k.id + '/steuerprofil').then(function (r) {
+      ziel.innerHTML = steuerHtml(r);
+      var b = ziel.querySelector('[data-pk-st-mappe]');
+      if (b) b.onclick = function () {
+        var j = parseInt((ziel.querySelector('[data-pk-st-jahr]') || {}).value, 10) || (new Date().getFullYear() - 1);
+        if (!window.DpDokumente || !DpDokumente.oeffnen) return toast('Die Dokumente sind noch nicht geladen.');
+        b.disabled = true;
+        Promise.resolve(DpDokumente.oeffnen('steuermappe', { jahr: j, kunde: k.id })).then(function () { b.disabled = false; }, function (e) { b.disabled = false; toast((e && e.message) || 'Die Steuer-Mappe ließ sich nicht erstellen.'); });
+      };
+    }, function (e) { ziel.innerHTML = '<p class="pk-st-leer">' + esc(fehlerText(e)) + '</p>'; });
+  }
   function kundeDialog(el, id) {
     var k = S.partner.kunden.filter(function (x) { return x.id === id; })[0]; if (!k) return;
     var platz = k.platz_art === 'platz';
-    var reiter = [kundeReiter(k)];
+    var reiter = [kundeReiter(k), steuerReiter()];   /* v3700 · Reiter Steuer */
     if (platz) {
       reiter = reiter.concat(freigabeReiter(k, S.partner.partner.name, false));
       reiter.push({ kurz: 'Platz', titel: 'Partnerplatz entziehen', html: '<section class="rnd-hub-karte"><h3 class="rnd-hub-h">Platz</h3><p class="rnd-hub-hinweis"><strong>Platz entziehen:</strong> der Kunde bekommt 30 Tage Frist zum Export oder für ein eigenes Abo. Danach werden seine Verbindungen getrennt und sein Konto gelöscht.</p>' +
@@ -1044,6 +1149,7 @@
         return api('/partner/kunden/' + id, { method: 'PUT', body: body }).then(function () { toast('Gespeichert.'); neuLaden(el); });
       } }] });
     var ez = box.querySelector('[data-hub-entzug]'); if (ez) ez.onclick = function () { box._zu(); entzugDialog(el, k); };
+    steuerReiterLaden(box, k);   /* v3700 */
     return box;
   }
   /* v3460 · Zeilen fuer den Pruefer: der Schalter steht in beiden Zugangsarten im Reiter Kunde (kundeReiter), gespeichert als mail_rueckmeldung */
@@ -1112,23 +1218,48 @@
 
   /* v3640 · Übernehmen mit Kundenbezug. Gibt es zu diesem Kundenstand schon ein übernommenes Objekt: Rückfrage,
      Vorgabe „Bestehendes aktualisieren“ (Nummer, Halter und Deal-Status bleiben), sonst neue Kopie. */
+  /* v3700 · P2 · Marcel 18.11.2026: Übernehmen fragt, wofür. Für den Kunden weiterführen (Kanzlei) oder in den eigenen
+     Bestand (Makler kauft). Halter im eigenen Bestand wählt der Partner, Vorgabe Privat. */
+  var ZIEL_TEXT = {
+    kunde: ['Für den Kunden weiterführen', 'Das Objekt rechnet weiter mit dem Steuerprofil des Kunden. Sein Halter steht nur lesend da, sein Deal-Status bleibt. Es zählt nicht zu deinem Bestand und nicht zu deiner Verlustverrechnung. Ein neuer Stand des Kunden aktualisiert Objekt und Steuerprofil.'],
+    eigen: ['In meinen eigenen Bestand', 'Das Objekt rechnet mit deinen eigenen Steuerdaten. Den Halter wählst du, der Deal-Status beginnt offen. Gewonnen zählt es zu deinem Bestand und zu deiner Verlustverrechnung.']
+  };
+  function zielHtml(vorwahl) {
+    var ml = []; try { ml = (window.DealPilotMandanten && DealPilotMandanten.getList) ? DealPilotMandanten.getList() : []; } catch (e) { ml = []; }
+    if (!ml.some(function (m) { return m && m.id === 'privat'; })) ml.unshift({ id: 'privat', name: 'Privat' });
+    return '<div class="pk-ziel">' + ['kunde', 'eigen'].map(function (z) {
+      return '<label class="pk-ziel-wahl"><input type="radio" name="pk-ziel" value="' + z + '"' + (z === (vorwahl || 'kunde') ? ' checked' : '') + '><span><b>' + esc(ZIEL_TEXT[z][0]) + '</b><small>' + esc(ZIEL_TEXT[z][1]) + '</small></span></label>';
+    }).join('') +
+      '<label class="pk-feld" data-pk-halter>Halter im eigenen Bestand<select id="pk-ziel-halter">' + ml.map(function (m) { return '<option value="' + esc(m.id) + '">' + esc(m.name || m.id) + '</option>'; }).join('') + '</select></label></div>';
+  }
+  function zielVerdrahten(d) {
+    var h = d.querySelector('[data-pk-halter]');
+    function sync() { var w = d.querySelector('input[name="pk-ziel"]:checked'); if (h) h.style.display = w && w.value === 'eigen' ? '' : 'none'; }
+    [].forEach.call(d.querySelectorAll('input[name="pk-ziel"]'), function (r) { r.onchange = sync; }); sync();
+  }
   function uebernehmenDialog(x, danach) {
     var kunde = (x.kunde_nr ? x.kunde_nr + ' · ' : '') + (x.kunde || 'Kunde');
+    var dlg = null;
     function los(modus) {
-      return api('/partner/kundenstaende/' + x.share_id + '/uebernehmen', { method: 'POST', body: { modus: modus } }).then(function (r) {
-        toast((r.modus === 'aktualisiert' ? 'Aktualisiert: ' : 'Übernommen als ') + (r.seq_no || 'neues Objekt') + ', Kunde ' + kunde + '.');
+      var w = dlg && dlg.querySelector('input[name="pk-ziel"]:checked'), ziel = w ? w.value : 'kunde';
+      var body = { modus: modus, ziel: ziel }; if (ziel === 'eigen') body.halter = (dlg.querySelector('#pk-ziel-halter') || {}).value || 'privat';
+      return api('/partner/kundenstaende/' + x.share_id + '/uebernehmen', { method: 'POST', body: body }).then(function (r) {
+        toast((r.modus === 'aktualisiert' ? 'Aktualisiert: ' : 'Übernommen als ') + (r.seq_no || 'neues Objekt') + ', Kunde ' + kunde + (r.ziel === 'eigen' ? ', in deinem eigenen Bestand.' : ', für den Kunden weitergeführt.'));
         try { if (typeof window.renderSaved === 'function') window.renderSaved({ forceFresh: true }); } catch (e) {}
         if (danach) danach(r);
         return r;
       });
     }
     if (x.uebernommen_id) {
-      return dialog('Erneut übernehmen', '<p>Diesen Kundenstand hast du schon übernommen, als <b>' + esc(x.uebernommen_seq || 'Objekt') + '</b>.</p>' +
-        '<div class="pk-hinweis"><b>Bestehendes Objekt aktualisieren</b> übernimmt den neuen Stand des Kunden in dein Objekt. Objektnummer, Halter und Deal-Status bleiben. <b>Neue Kopie</b> legt ein weiteres Objekt an.</div>',
+      dlg = dialog('Erneut übernehmen', '<p>Diesen Kundenstand hast du schon übernommen, als <b>' + esc(x.uebernommen_seq || 'Objekt') + '</b>' + (x.uebernommen_ziel === 'eigen' ? ', in deinen eigenen Bestand' : ', für den Kunden weitergeführt') + '.</p>' +
+        zielHtml(x.uebernommen_ziel) +
+        '<div class="pk-hinweis"><b>Bestehendes Objekt aktualisieren</b> übernimmt den neuen Stand des Kunden in dein Objekt, die Objektnummer bleibt. Im eigenen Bestand bleiben auch dein Halter und dein Deal-Status. <b>Neue Kopie</b> legt ein weiteres Objekt an.</div>',
         [{ t: 'Abbrechen' }, { t: 'Neue Kopie', fn: function () { return los('neu'); } }, { t: 'Bestehendes aktualisieren', c: 'gold', fn: function () { return los('aktualisieren'); } }]);
+      zielVerdrahten(dlg); return dlg;
     }
-    return dialog('Als eigenes Objekt übernehmen', '<p>DealPilot legt eine eigene, bearbeitbare Kopie unter deinen Objekten an. Sie trägt den Kunden <b>' + esc(kunde) + '</b>, in der Objektliste kannst du danach nach Kunde sortieren und filtern. Sie bleibt bei dir, auch wenn der Kunde seinen Stand zurückzieht.</p>',
+    dlg = dialog('Kundenstand übernehmen', '<p>DealPilot legt eine bearbeitbare Kopie unter deinen Objekten an. Sie trägt den Kunden <b>' + esc(kunde) + '</b>, in der Objektliste kannst du nach Kunde sortieren und filtern. Sie bleibt bei dir, auch wenn der Kunde seinen Stand zurückzieht.</p>' + zielHtml('kunde'),
       [{ t: 'Abbrechen' }, { t: 'Übernehmen', c: 'gold', fn: function () { return los('aktualisieren'); } }]);
+    zielVerdrahten(dlg); return dlg;
   }
 
   var AUFG_STATUS = { offen: ['offen', 'grau'], gesehen: ['gesehen', 'grau'], in_arbeit: ['in Arbeit', ''], erledigt: ['erledigt', 'gruen'], abgelehnt: ['abgelehnt', 'rot'], widerrufen: ['Freigabe widerrufen', 'rot'] };   /* v3690 */
@@ -1406,7 +1537,15 @@
       '<div class="pk-hinweis">Dein Partner kann die Kopie laden, rechnen, PDFs erstellen und als eigenes Objekt übernehmen. Eine übernommene Kopie bleibt bei ihm, auch wenn du später zurückziehst. Deine Originale ändert er nie.</div>' +
       fgSendenHinweis(),
       [{ t: 'Abbrechen' }, { t: 'Senden', c: 'gold', fn: function () {
-        return api('/mein-partner/senden', { method: 'POST', body: bestand ? { bestand: true, aufgabe_id: aufgabeId } : { object_ids: ids, aufgabe_id: aufgabeId } })
+        var body = bestand ? { bestand: true, aufgabe_id: aufgabeId } : { object_ids: ids, aufgabe_id: aufgabeId };
+        /* v3700 · P2: mit Bereich Steuerdaten geht das Steuerprofil mit (alle Steuerzeitraeume, Veranlagung, Kirchensteuer,
+           Gesellschaften, Saldo der uebrigen Objekte), eingesammelt hier im Browser, wo es auch rechnet */
+        var fr0 = S.kunde && S.kunde.freigabe, a0 = fr0 && fr0.aktiv && fr0.aktiv.art !== 'keine' ? fr0.aktiv : null;
+        var mitProfil = fgSauber(a0 ? a0.bereiche : {}).steuerdaten && window.DpSteuerKontext && DpSteuerKontext.einsammeln;
+        return Promise.resolve(mitProfil ? DpSteuerKontext.einsammeln().catch(function () { return null; }) : null).then(function (sp) {
+          if (sp) body.steuerprofil = sp;
+          return api('/mein-partner/senden', { method: 'POST', body: body });
+        })
           .then(function (r) { toast(r.gesendet + (r.gesendet === 1 ? ' Objekt' : ' Objekte') + ' gesendet.' + (r.uebersprungen ? ' ' + r.uebersprungen + ' mit offenen Anmerkungen nicht.' : '')); if (danach) danach(); },
             function (e) { if (e && e.data && e.data.error === 'anmerkungen_offen') { api('/mein-partner').then(function (m) { S.kunde = m; }).catch(function () {}); } throw e; });
       } }]);
@@ -1419,7 +1558,7 @@
     var b = fgSauber(a ? a.bereiche : {});
     var mit = ['Objekte'], ohne = [];
     (b.steuer ? mit : ohne).push('Steuer (Anlage V, Jahresbuch)');
-    (b.steuerdaten ? mit : ohne).push('deine Steuerdaten (zu versteuerndes Einkommen, Grenzsteuersatz)');
+    (b.steuerdaten ? mit : ohne).push('deine Steuerdaten (Steuerzeiträume aller Jahre, Veranlagung, Kirchensteuer, Gesellschaften und Überführungen, Ergebnis der übrigen Objekte)');   /* v3700 */
     return '<div class="pk-fg-senden"><b>Es geht mit:</b> ' + esc(mit.join(', ')) + '.' + (ohne.length ? ' <b>Nicht dabei:</b> ' + esc(ohne.join(', ')) + ', weil du sie nicht freigegeben hast.' : '') +
       (a && a.art === 'einmal' ? ' Deine einmalige Freigabe endet mit dieser Sendung.' : '') +
       ' <button type="button" class="pk-mehr" data-fg-zu="1">Freigabe ansehen</button></div>';
@@ -1619,6 +1758,7 @@
     try { d = window._currentObjData || null; } catch (e) {}
     var ks = d && d._kundenstand;
     window._dppkKundenstand = ks || null;
+    weitergefuehrtBand(d);   /* v3700 */
     var alt = document.getElementById('dppk-ks');
     if (!ks) { if (alt) alt.remove(); try { if (window.DpAnmerkungen && DpAnmerkungen._zustand.modus === 'partner') DpAnmerkungen.ende(); } catch (e) {} return; }
     stil();
@@ -1650,9 +1790,22 @@
   /* v3690 · Satz im Band des Kundenstands. Ohne Angabe (Stand vor v3690) wie P0. Mit Steuerdaten rechnet die Kopie bis P2
      trotzdem mit den Steuerzeitraeumen des Partners (calc.js _dpZveFuerJahr), deshalb bleibt der Hinweis. */
   function fgBandText(f) {
+    /* v3700 · P2: der Kundenstand rechnet mit dem Steuerprofil des Kunden oder zeigt keine Steuerzahl */
+    try { if (window.DpSteuerKontext && DpSteuerKontext.aktiv()) { var _bt = DpSteuerKontext.bandText(); if (f && !f.steuer) _bt = 'Steuer und Steuerdaten hat der Kunde nicht freigegeben. Anlage V und Jahresbuch fehlen. ' + _bt; return _bt; } } catch (e) {}
     if (f && !f.steuer) return 'Steuer und Steuerdaten hat der Kunde nicht freigegeben. Anlage V und Jahresbuch fehlen, die Steuer rechnet mit deinen eigenen Steuerdaten.';
     if (f && !f.steuerdaten) return 'Steuerdaten nicht freigegeben. Die Steuer rechnet deshalb mit deinen eigenen Steuerdaten, nicht mit denen des Kunden.';
     return 'Die Steuer rechnet mit deinen eigenen Steuerdaten, nicht mit denen des Kunden.';
+  }
+  /* v3700 · P2: ein fuer den Kunden weitergefuehrtes Objekt sagt, mit wessen Steuerprofil es rechnet */
+  function weitergefuehrtBand(d) {
+    var vk = d && d._von_kunde, an = !!(vk && !d._kundenstand && vk.modus !== 'eigen');
+    var alt = document.getElementById('dppk-wf');
+    if (!an) { if (alt) alt.remove(); return; }
+    stil();
+    if (!alt) { alt = document.createElement('div'); alt.id = 'dppk-wf'; var ziel = document.querySelector('.main-col .body') || document.querySelector('.main-col') || document.body; ziel.insertBefore(alt, ziel.firstChild); }
+    var t = '';
+    try { t = window.DpSteuerKontext ? DpSteuerKontext.bandText() : ''; } catch (e) { t = ''; }
+    alt.innerHTML = '<span><b>Für den Kunden weitergeführt: ' + esc((vk.kundennummer ? vk.kundennummer + ' · ' : '') + (vk.kunde || 'Kunde')) + '</b>. ' + esc(t) + ' Halter des Kunden, nur lesend.</span>';
   }
   function kundenstandVerlassen(ks) {
     var reiter = PK.herkunft && TITEL[PK.herkunft] ? PK.herkunft : 'staende';

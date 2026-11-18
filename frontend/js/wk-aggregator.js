@@ -138,15 +138,35 @@
     _status = 'offen';   /* v3314 */
   }
 
+  /* v3700 · P2 Rechenkontext (steuer-kontext.js): im Kundenstand oder bei einem fuer den Kunden weitergefuehrten Objekt
+     kommen die uebrigen Objekte AUS DEM STEUERPROFIL DES KUNDEN (sein Saldo), gesperrt keine. Der Cache des Partners
+     (_cache) bleibt unberuehrt, ein Snapshot des Kundenobjekts aendert ihn nicht. */
+  function _kontext() { try { var K = window.DpSteuerKontext; return (K && K.aktiv && K.aktiv()) ? K : null; } catch (e) { return null; } }
+  function kGetAll() { var K = _kontext(); return K ? K.bestand() : getAllObjectsWithWK(); }
+  function kOther(currentObjectId, year) {
+    var K = _kontext(); if (!K) return getWKForOtherObjects(currentObjectId, year);
+    return K.bestand(currentObjectId).reduce(function (s, o) { if (o.id === currentObjectId) return s; var w = o.wk_per_year && o.wk_per_year[String(year)]; return typeof w === 'number' ? s + w : s; }, 0);
+  }
+  function kTotal(year) {
+    var K = _kontext(); if (!K) return getTotalWK(year);
+    return K.bestand().reduce(function (s, o) { return s + (Number(o.wk_per_year && o.wk_per_year[String(year)]) || 0); }, 0);
+  }
+  function kSave(objectId, snapshot) {
+    if (_kontext()) { if (window._currentObjData && snapshot) window._currentObjData.steuer_snapshot = snapshot; return; }
+    return saveSnapshot(objectId, snapshot);
+  }
+  function kLoad(force) { var K = _kontext(); return K ? Promise.resolve({ objects: K.bestand(), kontext: true }) : loadAll(force); }
+
   window.DealPilotWKAggregator = {
-    loadAll: loadAll,
-    getWKForOtherObjects: getWKForOtherObjects,
-    getTotalWK: getTotalWK,
-    getAllObjectsWithWK: getAllObjectsWithWK,
-    saveSnapshot: saveSnapshot,
+    loadAll: kLoad,
+    getWKForOtherObjects: kOther,
+    getTotalWK: kTotal,
+    getAllObjectsWithWK: kGetAll,
+    saveSnapshot: kSave,
     clearCache: clearCache,
-    status: function () { return _status; },          /* v3314 · N157 */
-    fehler: function () { return _fehler; },
+    status: function () { return _kontext() ? 'geladen' : _status; },          /* v3314 · N157 */
+    fehler: function () { return _kontext() ? null : _fehler; },
+    _roh: { loadAll: loadAll, getAllObjectsWithWK: getAllObjectsWithWK },   /* v3700 */
     _meta: 'V258-05'
   };
 
@@ -173,7 +193,7 @@
     }
     function _teile() {
       var TP = window.DealPilotTaxPeriods;
-      return { zeitraeume: (TP && typeof TP.status === 'function') ? TP.status() : 'geladen', snapshots: _status };
+      return { zeitraeume: (TP && typeof TP.status === 'function') ? TP.status() : 'geladen', snapshots: _kontext() ? 'geladen' : _status };   /* v3700 · Kontext: alles liegt im Objekt */
     }
     var _fristAbgelaufen = false;
     function status() {

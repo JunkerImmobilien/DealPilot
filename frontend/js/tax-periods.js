@@ -485,13 +485,33 @@
     }
   }
 
+  /* v3700 · P2 Rechenkontext (steuer-kontext.js): ist ein Kundenstand oder ein fuer den Kunden weitergefuehrtes Objekt
+     offen, liefern die Leser die Steuerzeitraeume DES KUNDEN (aus dem Objekt, ohne Laden), gesperrt keine. Die eigenen
+     Zeitraeume des Partners (STATE) bleiben unberuehrt, und im Kontext wird nichts angelegt, geaendert oder geloescht. */
+  function _kontext() { try { var K = window.DpSteuerKontext; return (K && K.aktiv && K.aktiv()) ? K : null; } catch (e) { return null; } }
+  function _finde(liste, date) {
+    return liste.find(p => { if (!p.valid_from || p.valid_from > date) return false; if (p.valid_to && p.valid_to < date) return false; return true; }) || null;
+  }
+  function kGetForDateSync(date) { const K = _kontext(); if (!K) return getForDateSync(date); return date ? _finde(K.zeitraeume(), date) : null; }
+  async function kGetForDate(date) { return _kontext() ? kGetForDateSync(date) : getForDate(date); }
+  function kGetAllSync() { const K = _kontext(); return K ? K.zeitraeume() : getAllSync(); }
+  function kStatus() { return _kontext() ? 'geladen' : status(); }
+  async function kLoadAll(force) { const K = _kontext(); return K ? K.zeitraeume() : loadAll(force); }
+  function _nurEigen(fn) {
+    return async function () {
+      if (_kontext()) { try { if (typeof toast === 'function') toast('Im Kundenstand ändert DealPilot keine Steuerzeiträume, weder deine noch die des Kunden.'); } catch (e) {} throw new Error('kundenstand_steuer_schreibgeschuetzt'); }
+      return fn.apply(this, arguments);
+    };
+  }
+
   window.DealPilotTaxPeriods = {
-    loadAll, getForDate, getForDateSync, checkOverlap,
-    create, update, remove,
+    loadAll: kLoadAll, getForDate: kGetForDate, getForDateSync: kGetForDateSync, checkOverlap,
+    create: _nurEigen(create), update: _nurEigen(update), remove: _nurEigen(remove),
     openModal, closeModal, renderInline, refreshList, submitNew, /* v841-render-inline */
     forceCreate, cancelConflict, editPeriod, removePeriod,
-    setVeranlagung, getAllSync,   /* v2892 */
-    status, fehler: function () { return STATE.fehler; },   /* v3314 · N157 */
+    setVeranlagung: _nurEigen(setVeranlagung), getAllSync: kGetAllSync,   /* v2892 */
+    status: kStatus, fehler: function () { return _kontext() ? null : STATE.fehler; },   /* v3314 · N157 */
+    _roh: { loadAll, getForDateSync, getAllSync, status },   /* v3700 · eigene Zeitraeume ohne Kontext */
     _meta: 'V259-03'
   };
 

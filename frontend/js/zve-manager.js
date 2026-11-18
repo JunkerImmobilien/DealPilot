@@ -117,6 +117,7 @@
 
   /** Bi-Sync: User tippt im Objekt zvE-Feld → ins Profil schreiben. */
   function onObjectInput(value) {
+    try { if (window.DpSteuerKontext && DpSteuerKontext.aktiv()) return; } catch (e) {}   /* v3700 · zvE eines Kunden nie ins Profil des Partners */
     var amount = parseDe(value);
     if (amount > 0) setCurrent(amount);
   }

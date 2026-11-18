@@ -32,7 +32,7 @@ router.get('/', async (req, res, next) => {
        WHERE ts.user_id = $1
          AND COALESCE((o.data->>'_deal_won')::boolean, false) = true  -- V281-won-filter: nur Bestandsobjekte
          AND o.kunden_freigabe_id IS NULL  -- v3683: Kundenstaende (Kopie beim Partner) zaehlen nicht zur eigenen Steuer
-         AND (o.data::jsonb -> '_von_kunde') IS NULL  -- v3688: vom Kunden uebernommene Objekte ebenso (Sofortsicherung bis P2: Wahl Kunde/eigener Bestand)
+         AND ((o.data::jsonb -> '_von_kunde') IS NULL OR o.data::jsonb -> '_von_kunde' ->> 'modus' = 'eigen')  -- v3688/v3700: vom Kunden uebernommen zaehlt nur im eigenen Bestand (P2), fuer den Kunden weitergefuehrt nie
        ORDER BY o.created_at ASC`,
       [req.user.id]
     );

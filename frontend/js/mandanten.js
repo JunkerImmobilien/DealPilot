@@ -31,6 +31,8 @@
      gesperrt, Gesellschaftsobjekte fielen beim Speichern auf Privat zurueck. */
   var PRO_PLANS = ['pro', 'partner']; /* bei neuer Top-Stufe hier ergaenzen */
   function _isPro() {
+    /* v3700 · P2: im Kontext eines Kunden gilt SEIN Plan (sonst rechnete seine GmbH beim Partner anders als bei ihm) */
+    try { var _K = window.DpSteuerKontext; if (_K && _K.aktiv && _K.aktiv()) return _K.pro(); } catch (e) {}
     try {
       var cfg = window.DealPilotConfig;
       if (cfg && cfg.pricing && typeof cfg.pricing.currentKey === 'function') {
@@ -181,7 +183,12 @@
   function _fernSchreiben() {
     try { if (window.Auth && Auth.apiCall && Auth.isLoggedIn && Auth.isLoggedIn()) Auth.apiCall(FERN, { method: 'PUT', body: { wert: _state } }).catch(function () {}); } catch (e) {}
   }
-  function _save() { try { localStorage.setItem(LS_KEY, JSON.stringify(_state)); } catch (e) {} _fernSchreiben(); }
+  /* v3700 · P2 Rechenkontext (steuer-kontext.js): im Kundenstand oder bei einem fuer den Kunden weitergefuehrten Objekt
+     lesen alle Leser die Mandanten DES KUNDEN (aus seinem Steuerprofil). Die Liste des Partners (_state) bleibt
+     unberuehrt, gespeichert wird im Kontext nichts (weder Browser noch Konto). */
+  function _kontext() { try { var K = window.DpSteuerKontext; return (K && K.aktiv && K.aktiv()) ? K : null; } catch (e) { return null; } }
+  function _liste() { var K = _kontext(); return K ? K.mandanten() : _state.list; }
+  function _save() { if (_kontext()) return; try { localStorage.setItem(LS_KEY, JSON.stringify(_state)); } catch (e) {} _fernSchreiben(); }
   function _vomServer() {
     try {
       if (!window.Auth || !Auth.apiCall || !(Auth.isLoggedIn && Auth.isLoggedIn())) return;
@@ -204,15 +211,17 @@
   else setTimeout(_vomServer, 800);
   window.addEventListener('dp:plan-ready', function () { _vomServer(); });
 
-  function getList() { return _state.list.slice(); }
+  function getList() { return _liste().slice(); }
   function get(id) {
-    for (var i = 0; i < _state.list.length; i++) { if (_state.list[i].id === id) return _state.list[i]; }
-    return _state.list[0];
+    var _l = _liste();   /* v3700 */
+    for (var i = 0; i < _l.length; i++) { if (_l[i].id === id) return _l[i]; }
+    return _l[0];
   }
   function _genId() { return 'm' + Date.now().toString(36) + Math.floor(Math.random() * 1000).toString(36); }
   function rfLabel(v) { for (var i = 0; i < RF.length; i++) { if (RF[i].v === v) return RF[i].t; } return v; }
 
   function upsert(m) {
+    if (_kontext()) { try { if (typeof toast === 'function') toast('Im Kundenstand ändert DealPilot keine Gesellschaften.'); } catch (e) {} return; }   /* v3700 */
     if (!m.id) { m.id = _genId(); _state.list.push(m); }
     else {
       var found = false;
@@ -223,6 +232,7 @@
   }
   function remove(id) {
     if (id === 'privat') return;
+    if (_kontext()) return;   /* v3700 */
     _state.list = _state.list.filter(function (m) { return m.id !== id; });
     _save(); renderHalterOptions(); renderHalterChips();
   }
@@ -247,7 +257,7 @@
     if (!cur || cur === 'privat') {
       try { var _od = window._currentObjData; if (_od && _od.halter) cur = _od.halter; } catch (e) {}
     }
-    sel.innerHTML = _state.list.map(function (m) {
+    sel.innerHTML = _liste().map(function (m) {   /* v3700 */
       return '<option value="' + esc(m.id) + '">' + esc(m.name) + '</option>';
     }).join('');
     if (cur) { sel.value = cur; if (sel.value !== cur) sel.value = 'privat'; }
@@ -410,8 +420,9 @@
    *  privaten Sphaere — genau die Vermischung, die v1404 verhindern soll.
    *  Gefunden am 15.09.2026 von der Pruefstrecke, nicht beim Bauen. */
   function _getStreng(id) {
-    for (var i = 0; i < _state.list.length; i++) {
-      if (_state.list[i].id === id) return _state.list[i];
+    var _l = _liste();   /* v3700 */
+    for (var i = 0; i < _l.length; i++) {
+      if (_l[i].id === id) return _l[i];
     }
     return null;
   }
@@ -1858,6 +1869,7 @@
     uewPlan: uewPlan, uewPlanFuer: uewPlanFuer, uewPlanHinzu: uewPlanHinzu, uewPlanEntfernen: uewPlanEntfernen, uewPlanErledigt: uewPlanErledigt, uewPlanZurueck: uewPlanZurueck,  /* v3470: Gruppe */
     openJahresabschluss: openJahresabschluss,  /* v3228 */
     gesellschaftenSichtbar: gesellschaftenSichtbar, hinweisHtml: hinweisHtml, steuerHinweis: steuerHinweis,  /* v3270: Gesellschaften nur bei Detailgrad Experte */
+    _isPro: _isPro,   /* v3700 · Plan des Kunden fuer sein Steuerprofil */
     getList: getList, get: get, upsert: upsert, remove: remove, rfLabel: rfLabel, isCorp: isCorp,
     renderHalterOptions: renderHalterOptions, renderHalterChips: renderHalterChips,
     setFilter: setFilter, filterByHalter: filterByHalter, effRate: effRate, steuerParameter: steuerParameter, ueberfDaten: ueberfDaten, sphaere: sphaere, anteil: anteil, istKoerperschaft: istKoerperschaft, wireObjectFields: wireObjectFields,

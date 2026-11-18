@@ -156,13 +156,31 @@ async function listForUser(userId, fromYear, toYear) {
     JOIN objects o ON o.id = tr.object_id
     WHERE tr.user_id = $1
       AND o.kunden_freigabe_id IS NULL
-      AND (o.data::jsonb -> '_von_kunde') IS NULL`;   /* v3688: vom Kunden uebernommene Objekte zaehlen bis P2 nicht zur eigenen Steuer */   /* v3683 · Kundenstaende zaehlen nicht zur eigenen Steuer */
+      AND ((o.data::jsonb -> '_von_kunde') IS NULL OR o.data::jsonb -> '_von_kunde' ->> 'modus' = 'eigen')`;   /* v3700: fuer den Kunden weitergefuehrt zaehlt nie zur eigenen Steuer, eigener Bestand schon (v3688 Sofortsicherung) */   /* v3683 · Kundenstaende zaehlen nicht zur eigenen Steuer */
   const params = [userId];
   if (fromYear != null) { sql += ' AND tr.year >= $' + (params.length + 1); params.push(fromYear); }
   if (toYear != null) { sql += ' AND tr.year <= $' + (params.length + 1); params.push(toYear); }
   sql += ' ORDER BY tr.year ASC, o.name ASC';
   const r = await query(sql, params);
   return r.rows;
+}
+
+/** v3700 · P2: Steuersaetze der fuer EINEN Kunden weitergefuehrten Objekte (Steuer-Mappe des Kunden beim Partner).
+ *  Nur Objekte des angemeldeten Partners mit _von_kunde.client_id = clientId, Ziel kunde (oder ohne Ziel, vor P2). */
+async function listForKunde(userId, clientId, fromYear, toYear) {
+  let sql = `
+    SELECT tr.*, o.name AS object_name
+    FROM tax_records tr
+    JOIN objects o ON o.id = tr.object_id
+    WHERE tr.user_id = $1
+      AND o.kunden_freigabe_id IS NULL
+      AND o.data::jsonb -> '_von_kunde' ->> 'client_id' = $2
+      AND COALESCE(o.data::jsonb -> '_von_kunde' ->> 'modus', 'kunde') = 'kunde'`;
+  const params = [userId, String(clientId)];
+  if (fromYear != null) { sql += ' AND tr.year >= $' + (params.length + 1); params.push(fromYear); }
+  if (toYear != null) { sql += ' AND tr.year <= $' + (params.length + 1); params.push(toYear); }
+  sql += ' ORDER BY tr.year ASC, o.name ASC';
+  return (await query(sql, params)).rows;
 }
 
 /**
@@ -233,6 +251,7 @@ module.exports = {
   upsert,
   listForObject,
   listForUser,
+  listForKunde,   /* v3700 */
   replaceTimelineForObject,
   deleteRecord,
   upsertBemerkung,

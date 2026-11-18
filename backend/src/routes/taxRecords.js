@@ -77,7 +77,9 @@ router.get('/', async (req, res, next) => {
   try {
     const fromYear = req.query.from ? parseInt(req.query.from, 10) : undefined;
     const toYear = req.query.to ? parseInt(req.query.to, 10) : undefined;
-    const records = await taxService.listForUser(req.user.id, fromYear, toYear);
+    /* v3700 · ?kunde=<client_id>: die fuer diesen Kunden weitergefuehrten Objekte (nie zusammen mit den eigenen) */
+    const kunde = /^[0-9a-f-]{36}$/i.test(String(req.query.kunde || '')) ? String(req.query.kunde) : null;
+    const records = kunde ? await taxService.listForKunde(req.user.id, kunde, fromYear, toYear) : await taxService.listForUser(req.user.id, fromYear, toYear);
     res.json({ records });
   } catch (err) { next(err); }
 });

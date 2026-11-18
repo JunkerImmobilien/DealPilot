@@ -69,7 +69,7 @@ const AUSNAHMEN = {
   'routes/network.js': 'Suche nach einem Objekt per Kennung',
   'services/agentWerkzeuge.js#1539': 'Suche nach Name',
   'services/resellerService.js#374': 'Kundenseite: listet die eigenen Freigaben des Kunden (Originale), keine Kopien',
-  'services/objectService.js#118': 'Nummernvergabe (Kundenstaende tragen K-Nummern und stoeren sie nicht)',
+  'services/objectService.js#119': 'Nummernvergabe (Kundenstaende tragen K-Nummern und stoeren sie nicht)',   /* v3700: eine Zeile tiefer (kunde_ziel) */
 };
 const dateien = [];
 (function lauf(d) { for (const f of fs.readdirSync(d)) { const p = path.join(d, f); if (fs.statSync(p).isDirectory()) { if (f !== 'generated' && f !== 'node_modules') lauf(p); } else if (f.endsWith('.js')) dateien.push(p); } })(path.join(WURZEL, 'backend/src'));
@@ -177,7 +177,7 @@ ok('C', 'Marke nur bei aktiver Verbindung und Wahl Partner', /getrennt_am IS NUL
   const SH = '33333333-3333-4333-8333-333333333333';
   let vorh = null; const auf = { create: [], update: [] };
   OS.getById = async (uid, id) => id === 'kopie1' ? { id, data: { str: 'Musterweg', hnr: '5', _obj_seq: 'K-33333333-2', _kundenstand: { share_id: SH }, _deal_won: true }, photos: [], ai_analysis: null }
-    : id === 'eigen1' ? { id, data: { _obj_seq: '2026-041', halter: 'h1', _deal_lost: true, _deal_won: false, _von_kunde: { share_id: SH, am: '2026-11-01T00:00:00Z' } } } : null;
+    : id === 'eigen1' ? { id, data: { _obj_seq: '2026-041', halter: 'h1', _deal_lost: true, _deal_won: false, _von_kunde: { share_id: SH, am: '2026-11-01T00:00:00Z', modus: 'eigen' } } } : null;   /* v3700: im eigenen Bestand */
   OS.create = async (uid, o) => { auf.create.push(o); return { id: 'neu' + auf.create.length, seq_no: '2026-05' + auf.create.length }; };
   OS.update = async (uid, id, o) => { auf.update.push({ id, o }); return { id, seq_no: '2026-041' }; };
   antworte = async (sql) => {
@@ -193,10 +193,10 @@ ok('C', 'Marke nur bei aktiver Verbindung und Wahl Partner', /getrennt_am IS NUL
   ok('D', 'erstes Uebernehmen legt an, mit Kunde (client_id, Name, Kundennummer, Stand)', u.modus === 'neu' && vk && vk.client_id === KLIENT && vk.kunde === 'Kundin Muster' && vk.kundennummer === 'K-2026-003' && vk.stand_nr === 3, [u, vk]);
   ok('D', 'Kopie ohne Kundenstand-Kennung und ohne fremde Objektnummer', auf.create[0] && !auf.create[0].data._kundenstand && !auf.create[0].data._obj_seq);
   vorh = 'eigen1';
-  u = await pk.kundenstandUebernehmen(rs, 'pu1', SH, {});
+  u = await pk.kundenstandUebernehmen(rs, 'pu1', SH, { ziel: 'eigen' });   /* v3700: Halter und Deal-Status bleiben nur im eigenen Bestand (Marcel 18.11.) */
   const ud = auf.update[0] && auf.update[0].o.data;
   ok('D', 'erneut ohne Wahl -> aktualisiert das bestehende Objekt (Vorgabe)', u.modus === 'aktualisiert' && u.object_id === 'eigen1' && auf.create.length === 1 && ud, u);
-  ok('D', 'beim Aktualisieren bleiben Nummer, Halter und Deal-Status des Partners', ud && ud._obj_seq === '2026-041' && ud.halter === 'h1' && ud._deal_lost === true && ud._deal_won === false, ud && [ud._obj_seq, ud.halter, ud._deal_lost, ud._deal_won]);
+  ok('D', 'beim Aktualisieren (eigener Bestand) bleiben Nummer, Halter und Deal-Status des Partners', ud && ud._obj_seq === '2026-041' && ud.halter === 'h1' && ud._deal_lost === true && ud._deal_won === false, ud && [ud._obj_seq, ud.halter, ud._deal_lost, ud._deal_won]);
   ok('D', 'beim Aktualisieren: neue Daten des Kunden, erstes Uebernahmedatum bleibt', ud && ud.str === 'Musterweg' && ud._von_kunde.stand_nr === 3 && ud._von_kunde.erst_am === '2026-11-01T00:00:00Z');
   u = await pk.kundenstandUebernehmen(rs, 'pu1', SH, { modus: 'neu' });
   ok('D', 'modus neu -> bewusst weitere Kopie', u.modus === 'neu' && auf.create.length === 2 && auf.update.length === 1, u);
@@ -212,7 +212,7 @@ ok('C', 'Marke nur bei aktiver Verbindung und Wahl Partner', /getrennt_am IS NUL
     /var _SB_MODI = \['recent', 'id', 'kaufdat', 'lage', 'kunde'\]/.test(st) && /h\.textContent = k \? \('Kunde ' \+ k\) : 'Eigene Objekte'/.test(st) && /data-kunde="/.test(st) && /o\.kunde_client_id \? 'Kunde ' \+ _sbKundeVon\(o\)/.test(st));
   const pkf = lies('frontend/js/partner-kunden.js');
   ok('D', 'Cockpit: Kundennummer in Kundenliste, Kundenstaenden, Meldungen, Aufgaben; aenderbar in beiden Kundendialogen',
-    /nrEtikett\(k\.kundennummer\)/.test(pkf) && /nrEtikett\(k\.kunde_nr\)/.test(pkf) && /m\.kunde_nr/.test(pkf) && /k\.kundennummer \? k\.kundennummer/.test(pkf) && /kundennummer: wert\(b, '#pk-k-nr'\)/.test(pkf) && /var reiter = \[kundeReiter\(k\)\];/.test(pkf));
+    /nrEtikett\(k\.kundennummer\)/.test(pkf) && /nrEtikett\(k\.kunde_nr\)/.test(pkf) && /m\.kunde_nr/.test(pkf) && /k\.kundennummer \? k\.kundennummer/.test(pkf) && /kundennummer: wert\(b, '#pk-k-nr'\)/.test(pkf) && /var reiter = \[kundeReiter\(k\), steuerReiter\(\)\];/.test(pkf));
   /* v3640b/c · Mein Partner im Arbeitsbereich, Freigaben, Kundendialog im RND-Stil (dieselben Bausteine, rnd-wizard.js unberuehrt) */
   ok('D', 'Kundendialog: Bausteine des RND-Rechners (rnd-wiz-overlay rnd-hub, Schrittleiste, Karten, Fuss), Reiter Kunde/Stufe/Rechte/Kontingente/Marke/Platz',
     /className = 'rnd-wiz-overlay rnd-hub dppk-hub'/.test(pkf) && /rnd-wiz-steps rnd-hub-schritte/.test(pkf) && /rnd-wiz-footer rnd-hub-nav/.test(pkf) && /kurz: 'Stufe'/.test(pkf) && /kurz: 'Rechte'/.test(pkf) && /kurz: 'Kontingente'/.test(pkf) && /kurz: 'Marke'/.test(pkf) && /kurz: 'Platz'/.test(pkf));

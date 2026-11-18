@@ -20,6 +20,7 @@ const reseller = require('./resellerService');
 const objectService = require('./objectService');
 const planService = require('./planService');
 const F = require('./partnerFreigaben');   /* v3690 · P1 Freigabe bei der Kopplung */
+const SP = require('./partnerSteuerprofil');   /* v3700 · P2 Steuerprofil des Kunden beim Partner */
 
 function fehler(code, status, detail, extra) { const e = new Error(code); e.status = status || 400; if (detail) e.detail = detail; if (extra) e.extra = extra; return e; }
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -287,6 +288,8 @@ async function kundenstaende(rs) {
             (SELECT count(*)::int FROM partner_anmerkungen n WHERE n.share_id = s.id AND n.status = 'erledigt') AS anm_erledigt,
             (SELECT o2.id FROM objects o2 WHERE o2.user_id = o.user_id AND o2.kunden_freigabe_id IS NULL AND o2.data::jsonb->'_von_kunde'->>'share_id' = s.id::text ORDER BY o2.updated_at DESC LIMIT 1) AS uebernommen_id,
             (SELECT o2.seq_no FROM objects o2 WHERE o2.user_id = o.user_id AND o2.kunden_freigabe_id IS NULL AND o2.data::jsonb->'_von_kunde'->>'share_id' = s.id::text ORDER BY o2.updated_at DESC LIMIT 1) AS uebernommen_seq,
+            (SELECT COALESCE(o2.data::jsonb->'_von_kunde'->>'modus', 'kunde') FROM objects o2 WHERE o2.user_id = o.user_id AND o2.kunden_freigabe_id IS NULL AND o2.data::jsonb->'_von_kunde'->>'share_id' = s.id::text ORDER BY o2.updated_at DESC LIMIT 1) AS uebernommen_ziel,
+            (o.data::jsonb ? '_steuerbasis') AS mit_steuerprofil, s.steuerprofil_id,   /* v3700 */
             COALESCE((o.data::jsonb->>'_deal_won')::boolean, false) AS deal_won,
             (o.data::jsonb->>'_dealpilot_score')::int AS score
        FROM object_shares s
@@ -311,18 +314,41 @@ async function kundenstandGeoeffnet(rs, actor, shareId) {
  *  (Vorgabe) - b.modus 'neu' legt bewusst eine weitere Kopie an. Beim Aktualisieren bleiben Nummer, Halter und
  *  Deal-Status des Partners stehen, alles andere kommt aus dem neuen Kundenstand. */
 const BEIM_AKTUALISIEREN_BEHALTEN = ['_obj_seq', 'halter'];
+/* v3700 · P2 · Marcel 18.11.2026: Uebernehmen fragt, wofuer.
+ *   ziel 'kunde'  „Fuer den Kunden weiterfuehren“ (Kanzlei): das Objekt rechnet weiter mit dem Steuerprofil des Kunden
+ *                 (_steuerbasis aus dem Stand), Halter des Kunden nur lesend, zaehlt NICHT zur Verlustverrechnung und zum
+ *                 Bestand des Partners, Deal-Status des Kunden bleibt, ein neuer Stand zieht Objekt UND Profil nach
+ *                 (weitergefuehrtNachziehen in senden()).
+ *   ziel 'eigen'  „In meinen eigenen Bestand“ (Makler kauft): eigene Steuerdaten des Partners (zvE, Grenzsteuersatz und
+ *                 daraus Gerechnetes fallen weg, keine _steuerbasis), Halter waehlt der Partner (Vorgabe privat),
+ *                 zaehlt mit, Deal-Status auf offen.
+ * Ohne ziel (alter Browserstand): 'kunde', damit nichts ungefragt in die Steuer des Partners zaehlt. */
+const ZIELE = ['kunde', 'eigen'];
+function halterSauber(h) { const s = String(h == null ? '' : h).trim(); return s && s.length <= 60 && /^[A-Za-z0-9_\-]+$/.test(s) ? s : 'privat'; }
+/** Objekt-JSON des uebernommenen Objekts aus dem Kundenstand d (Kopie) nach Ziel. Rein, gibt ein neues Objekt zurueck. */
+function uebernahmeDaten(d, ziel, vk, halterEigen) {
+  const daten = JSON.parse(JSON.stringify(d || {})); delete daten._obj_seq; delete daten._kundenstand;
+  daten._von_kunde = Object.assign({}, vk, { modus: ziel });
+  if (ziel === 'eigen') {
+    F.STEUERDATEN_FELDER.forEach((k) => { delete daten[k]; });   /* zve, grenz, _steuerbasis, _kpis_cf_ns, … des Kunden */
+    Object.keys(daten).forEach((k) => { if (/^_deal_/.test(k)) delete daten[k]; });   /* Deal-Status offen */
+    daten.halter = halterSauber(halterEigen);
+  }
+  return daten;
+}
 async function kundenstandUebernehmen(rs, actor, shareId, b) {
   if (!UUID.test(String(shareId || ''))) throw fehler('kundenstand_nicht_gefunden', 404);
   const s = (await query(`SELECT * FROM object_shares WHERE id = $1 AND reseller_id = $2 AND kopie_object_id IS NOT NULL AND status <> 'widerrufen'`, [shareId, rs.id])).rows[0];
   if (!s) throw fehler('kundenstand_nicht_gefunden', 404);
+  const ziel = ZIELE.indexOf(b && b.ziel) >= 0 ? b.ziel : 'kunde';
   const kd = (await query(`SELECT id, display_name, kundennummer FROM reseller_clients WHERE id = $1`, [s.client_id])).rows[0] || {};
   const pn = await partnerName(rs.id);
   const orig = await objectService.getById(pn.owner_user_id, s.kopie_object_id);
   if (!orig) throw fehler('kundenstand_nicht_gefunden', 404);
   const d = typeof orig.data === 'string' ? JSON.parse(orig.data) : (orig.data || {});
-  const daten = JSON.parse(JSON.stringify(d)); delete daten._obj_seq; delete daten._kundenstand;
-  daten._von_kunde = { share_id: shareId, client_id: kd.id || s.client_id, kunde: kd.display_name || null, kundennummer: kd.kundennummer || null,
+  const vk = { share_id: shareId, client_id: kd.id || s.client_id, kunde: kd.display_name || null, kundennummer: kd.kundennummer || null,
     stand_nr: s.stand_nr, am: new Date().toISOString() };
+  const daten = uebernahmeDaten(d, ziel, vk, b && b.halter);
   let fotos = orig.photos; if (typeof fotos === 'string') { try { fotos = JSON.parse(fotos); } catch (e) { fotos = []; } }
   const modus = b && b.modus === 'neu' ? 'neu' : 'aktualisieren';
   const vorh = (await query(
@@ -331,17 +357,41 @@ async function kundenstandUebernehmen(rs, actor, shareId, b) {
   if (vorh && modus === 'aktualisieren') {
     const alt = await objectService.getById(pn.owner_user_id, vorh.id, { fotos: false });
     const ad = alt ? (typeof alt.data === 'string' ? JSON.parse(alt.data) : (alt.data || {})) : {};
-    BEIM_AKTUALISIEREN_BEHALTEN.forEach((k) => { if (ad[k] != null) daten[k] = ad[k]; else delete daten[k]; });
-    Object.keys(daten).forEach((k) => { if (/^_deal_/.test(k)) delete daten[k]; });
-    Object.keys(ad).forEach((k) => { if (/^_deal_/.test(k)) daten[k] = ad[k]; });
+    /* Nummer bleibt immer. Fuer den eigenen Bestand bleiben Halter und Deal-Status des Partners, wenn das Objekt schon
+       sein eigenes war, sonst gilt die Wahl von eben. Fuer den Kunden kommt alles aus dem Stand (Halter, Deal-Status). */
+    if (ad._obj_seq != null) daten._obj_seq = ad._obj_seq;
+    const warEigen = ad._von_kunde && ad._von_kunde.modus === 'eigen';
+    if (ziel === 'eigen' && warEigen) {
+      if (ad.halter != null && !(b && b.halter)) daten.halter = ad.halter;
+      Object.keys(ad).forEach((k) => { if (/^_deal_/.test(k)) daten[k] = ad[k]; });
+    }
     daten._von_kunde.erst_am = (ad._von_kunde && (ad._von_kunde.erst_am || ad._von_kunde.am)) || daten._von_kunde.am;
     const r = await objectService.update(pn.owner_user_id, vorh.id, { data: daten, aiAnalysis: orig.ai_analysis || null, photos: Array.isArray(fotos) ? fotos : [] });
-    try { await query(`INSERT INTO share_audit (share_id, actor_user_id, action, meta) VALUES ($1,$2,'uebernommen',$3::jsonb)`, [shareId, actor, JSON.stringify({ modus: 'aktualisiert', object_id: vorh.id, stand_nr: s.stand_nr })]); } catch (e) {}
-    return { ok: true, object_id: vorh.id, seq_no: r && r.seq_no, modus: 'aktualisiert' };
+    try { await query(`INSERT INTO share_audit (share_id, actor_user_id, action, meta) VALUES ($1,$2,'uebernommen',$3::jsonb)`, [shareId, actor, JSON.stringify({ modus: 'aktualisiert', ziel, object_id: vorh.id, stand_nr: s.stand_nr })]); } catch (e) {}
+    return { ok: true, object_id: vorh.id, seq_no: r && r.seq_no, modus: 'aktualisiert', ziel };
   }
   const neu = await objectService.create(pn.owner_user_id, { data: daten, aiAnalysis: orig.ai_analysis || null, photos: Array.isArray(fotos) ? fotos : [] });
-  try { await query(`INSERT INTO share_audit (share_id, actor_user_id, action, meta) VALUES ($1,$2,'uebernommen',$3::jsonb)`, [shareId, actor, JSON.stringify({ modus: 'neu', object_id: neu.id, stand_nr: s.stand_nr })]); } catch (e) {}
-  return { ok: true, object_id: neu.id, seq_no: neu.seq_no, modus: 'neu' };
+  try { await query(`INSERT INTO share_audit (share_id, actor_user_id, action, meta) VALUES ($1,$2,'uebernommen',$3::jsonb)`, [shareId, actor, JSON.stringify({ modus: 'neu', ziel, object_id: neu.id, stand_nr: s.stand_nr })]); } catch (e) {}
+  return { ok: true, object_id: neu.id, seq_no: neu.seq_no, modus: 'neu', ziel };
+}
+/** v3700 · Ein neuer Stand zieht die fuer den Kunden weitergefuehrten Objekte nach (Objekt UND Steuerprofil). Objekte im
+ *  eigenen Bestand des Partners bleiben unberuehrt. d = Objekt-JSON der neuen Kopie (schon gefiltert). */
+async function weitergefuehrtNachziehen(ownerId, shareId, d, standNr, profilZeile, fotos, ai) {
+  const l = (await query(
+    `SELECT id FROM objects WHERE user_id = $1 AND kunden_freigabe_id IS NULL AND data::jsonb->'_von_kunde'->>'share_id' = $2
+        AND COALESCE(data::jsonb->'_von_kunde'->>'modus', 'kunde') = 'kunde'`, [ownerId, String(shareId)])).rows;
+  for (const z of l) {
+    const alt = await objectService.getById(ownerId, z.id, { fotos: false });
+    if (!alt) continue;
+    const ad = typeof alt.data === 'string' ? JSON.parse(alt.data) : (alt.data || {});
+    const vk = Object.assign({}, ad._von_kunde || {}, { stand_nr: standNr, am: new Date().toISOString() });
+    const daten = uebernahmeDaten(d, 'kunde', vk, null);
+    if (ad._obj_seq != null) daten._obj_seq = ad._obj_seq;
+    if (!profilZeile) delete daten._steuerbasis;
+    await objectService.update(ownerId, z.id, { data: daten, aiAnalysis: ai || alt.ai_analysis || null, photos: Array.isArray(fotos) ? fotos : [] });
+    try { await query(`INSERT INTO share_audit (share_id, actor_user_id, action, meta) VALUES ($1,NULL,'uebernommen',$2::jsonb)`, [shareId, JSON.stringify({ modus: 'nachgezogen', ziel: 'kunde', object_id: z.id, stand_nr: standNr })]); } catch (e) {}
+  }
+  return l.length;
 }
 
 /** Platz entziehen: Frist 30 Tage, Platz sofort frei, Kunde behaelt in der Frist lesend Investor. */
@@ -590,6 +640,16 @@ async function senden(user, b) {
      und daraus Gerechnetes aus der Kopie, ohne Steuer Anlage V und Jahresbuch (partnerFreigaben.kopieFiltern). */
   const fg = await F.aktive(v.id);
   const bereiche = F.bereicheWirksam(fg);
+  /* v3700 · P2: mit Bereich Steuerdaten kommt das Steuerprofil des Kunden mit (im Browser des Kunden eingesammelt,
+     hier geprueft und als Fassung abgelegt). Ohne Freigabe wird es nicht einmal gelesen. Fehlt es (alter Browserstand),
+     gehen die Kopien ohne _steuerbasis: beim Partner steht dann „Steuerdaten nicht freigegeben“, nie seine Zahl. */
+  let profilZeile = null;
+  if (bereiche.steuerdaten && b && b.steuerprofil) {
+    const p = SP.profilSauber(b.steuerprofil);
+    p.ueberfuehrungen = SP.ueberfuehrungenAus((await query(
+      `SELECT id, name, data FROM objects WHERE user_id = $1 AND kunden_freigabe_id IS NULL AND data::jsonb->>'obj_herkunft' = 'ueberfuehrung' LIMIT 200`, [user.id])).rows);
+    profilZeile = await SP.speichern(v.id, v.reseller_id, p, fg);
+  }
   const ergebnis = [];
   for (const oid of ids) {
     if (gesperrt.has(oid)) { ergebnis.push({ object_id: oid, ok: false, grund: 'anmerkungen_offen' }); continue; }
@@ -601,8 +661,15 @@ async function senden(user, b) {
       [oid, v.id, v.reseller_id])).rows[0];
     const standNr = (s.status === 'widerrufen' ? 0 : (s.stand_nr || 0)) + 1;
     const d = typeof orig.data === 'string' ? JSON.parse(orig.data) : JSON.parse(JSON.stringify(orig.data || {}));
+    const halterRoh = d.halter;   /* v3700 */
     NICHT_IN_KOPIE.forEach((k) => { delete d[k]; });
     const entfernt = F.kopieFiltern(d, bereiche);   /* v3690 */
+    /* v3700 · P2: Halter des Kunden und sein Steuerprofil nur mit Steuerdaten. Ohne Freigabe Halter Privat und keine
+       _steuerbasis (kopieFiltern hat eine mitgebrachte schon entfernt). */
+    const halterKunde = halterRoh ? String(halterRoh).slice(0, 60) : 'privat';
+    d.halter = bereiche.steuerdaten ? halterKunde : 'privat';
+    if (bereiche.steuerdaten && profilZeile) d._steuerbasis = SP.basisFuer(profilZeile, oid, halterKunde);
+    else delete d._steuerbasis;
     d._obj_seq = kopieKennung(s.id, standNr);   /* eigene Kennung: belegt keine Nummer des Partners, kollidiert nicht beim erneuten Senden */
     d._kundenstand = { share_id: s.id, client_id: v.id, kunde: v.display_name, stand_nr: standNr, stand_am: new Date().toISOString(), seq_kunde: orig.data && orig.data._obj_seq || null,
       freigabe: { art: fg ? fg.art : 'keine', steuer: bereiche.steuer, steuerdaten: bereiche.steuerdaten } };   /* v3690 · Band beim Partner */
@@ -613,8 +680,10 @@ async function senden(user, b) {
     await query(
       `UPDATE object_shares SET kopie_object_id = $2, stand_nr = $3, stand_am = now(), ueber_bestand = $4, status = 'eingereicht',
               submitted_at = now(), revoked_at = NULL, gelesen_am = NULL, updated_at = now(), aufgabe_id = COALESCE($5, aufgabe_id), client_id = $6,
-              bereiche = $7::jsonb, freigabe_id = $8 WHERE id = $1`,
-      [s.id, kopie.id, standNr, bestand, (b && b.aufgabe_id) || null, v.id, JSON.stringify(bereiche), fg ? fg.id : null]);
+              bereiche = $7::jsonb, freigabe_id = $8, steuerprofil_id = $9 WHERE id = $1`,
+      [s.id, kopie.id, standNr, bestand, (b && b.aufgabe_id) || null, v.id, JSON.stringify(bereiche), fg ? fg.id : null, (bereiche.steuerdaten && profilZeile) ? profilZeile.id : null]);
+    /* v3700 · fuer den Kunden weitergefuehrte Objekte ziehen mit dem neuen Stand nach (Objekt UND Profil) */
+    try { await weitergefuehrtNachziehen(pn.owner_user_id, s.id, d, standNr, profilZeile && bereiche.steuerdaten ? profilZeile : null, fotos, orig.ai_analysis); } catch (e) { console.error('[v3700] weitergefuehrt nachziehen', e.message); }
     if (alt) { try { await query(`DELETE FROM objects WHERE id = $1 AND kunden_freigabe_id = $2`, [alt, s.id]); } catch (e) {} }
     try { await query(`INSERT INTO share_audit (share_id, actor_user_id, action, meta) VALUES ($1,$2,'gesendet',$3::jsonb)`, [s.id, user.id, JSON.stringify({ stand_nr: standNr, freigabe_id: fg ? fg.id : null, art: fg ? fg.art : 'keine', bereiche, entfernt })]); } catch (e) {}
     ergebnis.push({ object_id: oid, ok: true, share_id: s.id, stand_nr: standNr });
@@ -656,11 +725,19 @@ async function freigabeWiderrufen(user, b) {
       zurueck++;
     }
     await query(`UPDATE partner_freigaben SET staende_zurueckgezogen = $2 WHERE id = $1`, [w.id, zurueck]);
+    try { await SP.entfernen(v.id); } catch (e) {}   /* v3700 · die uebermittelten Steuerprofile gehen mit */
   }
   await meldung(v.reseller_id, v.id, 'freigabe_widerrufen', v.display_name + ' hat die Freigabe widerrufen.' +
     (auf.rowCount ? ' ' + auf.rowCount + (auf.rowCount === 1 ? ' offene Aufgabe ist' : ' offene Aufgaben sind') + ' damit beendet.' : '') +
     (zurueck ? ' ' + zurueck + (zurueck === 1 ? ' gesendeter Stand wurde' : ' gesendete Stände wurden') + ' zurückgezogen.' : ' Gesendete Stände bleiben bei dir.'));
   return { ok: true, aufgaben_beendet: auf.rowCount, staende_zurueckgezogen: zurueck, freigabe: await F.uebersicht(v.id) };
+}
+/** v3700 · Partner liest das Steuerprofil eines Kunden (geltende Fassung mit Inhalt, Liste der Fassungen) */
+async function steuerprofilLesen(rs, clientId, nr) {
+  if (!UUID.test(String(clientId || ''))) throw fehler('kunde_nicht_gefunden', 404);
+  const c = await kundeLaden(rs, clientId);
+  if (nr != null) { const f = await SP.fassung(c.id, nr); if (!f) throw fehler('fassung_nicht_gefunden', 404); return { fassung: f }; }
+  return Object.assign({ client_id: c.id, kunde: c.display_name, kundennummer: c.kundennummer || null, freigabe: await F.uebersicht(c.id) }, await SP.lesen(c.id));
 }
 /** Partner liest die Freigabe eines Kunden (nur lesend) */
 async function freigabeLesen(rs, clientId) {
@@ -778,6 +855,7 @@ module.exports = {
   marktberichtErlaubt, kiErlaubt, aboEnde,
   STUFEN, RECHTE, RECHTE_VORGABE, ENTZUG_FRIST_TAGE, rechteAus, aktiveVerbindung,
   cockpit, kundeEinstellen, einladen, anfrageAnlegen, codeEinloesen, anfrageZurueckziehen,
+  steuerprofilLesen, uebernahmeDaten, weitergefuehrtNachziehen,   /* v3700 */
   kundenstaende, kundenstandGeoeffnet, kundenstandUebernehmen, platzEntziehen, trennen, fristenAbarbeiten,
   aufgabenListe, aufgabeAnlegen, aufgabeErinnern, aufgabeAbschliessen, meldungen, meldungenGelesen,
   /* v3690 */ freigabeSetzen, freigabeWiderrufen, freigabeLesen,

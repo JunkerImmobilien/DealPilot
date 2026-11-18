@@ -34,6 +34,9 @@
        Cockpit, bis jemand zurueck auf Ist schaltet. Die Ansicht ist nur
        Anzeige; geschrieben wird nur das Ist. */
     try { if (window.DealPilotAnkaufAnsicht && DealPilotAnkaufAnsicht.aktiv()) return; } catch (e) {}
+    /* v3700 · P2: im Kontext eines Kunden (Kundenstand, fuer den Kunden weitergefuehrt) geht kein Snapshot an den
+       Server. Sein Ergebnis gehoert nie in die Verlustverrechnung des Partners. */
+    try { if (window.DpSteuerKontext && DpSteuerKontext.aktiv()) return; } catch (e) {}
     var key = window._currentObjKey;
     if (_timer && _pendingKey && _pendingKey !== key) {
       clearTimeout(_timer); _timer = null;
@@ -305,7 +308,9 @@ var Tax = (function() {
     }
     var p = {};
     try {
-      if (typeof window !== 'undefined' && window.DealPilotInvestmentProfile
+      /* v3700 · P2: im Kontext eines Kunden SEINE Veranlagung und Kirchensteuer (aus seinem Steuerprofil) */
+      if (typeof window !== 'undefined' && window.DpSteuerKontext && DpSteuerKontext.aktiv()) p = DpSteuerKontext.angaben();
+      else if (typeof window !== 'undefined' && window.DealPilotInvestmentProfile
           && typeof DealPilotInvestmentProfile.load === 'function') {
         p = DealPilotInvestmentProfile.load() || {};
       }
@@ -475,9 +480,10 @@ function _getZveForDateWithFallback(yearStr) {
     }
     // Versuch 2: alle Periods sammeln (mit Cache, 5 Sekunden TTL)
     var now = Date.now();
-    if (!_zveCache.periods || (now - _zveCache.ts) > 5000) {
+    var _skKey = (window.DpSteuerKontext && DpSteuerKontext.schluessel) ? DpSteuerKontext.schluessel() : 'eigen';   /* v3700 · Zwischenspeicher je Kontext */
+    if (!_zveCache.periods || (now - _zveCache.ts) > 5000 || _zveCache.k !== _skKey) {
       _zveCache.periods = _collectAllPeriodsViaScan();
-      _zveCache.ts = now;
+      _zveCache.ts = now; _zveCache.k = _skKey;
     }
     var allPeriods = _zveCache.periods || [];
     var match = null;
@@ -3021,6 +3027,9 @@ window._dpBestandAnzahl = function (jahr) {
  * unter null gibt es im Tarif nicht; sie wird auf 0 gesetzt. */
 window._dpZveFuerJahr = function (jahr) {
   var j = (typeof jahr === 'number' && jahr > 1900) ? jahr : new Date().getFullYear();
+  /* v3700 · P2: Kundenstand ohne freigegebene Steuerdaten rechnet mit NICHTS, auch nicht mit dem Feld eines vorher
+     geladenen eigenen Objekts. Die Anzeige zeigt dort keine Steuerzahl (steuer-kontext.js, „nicht freigegeben“). */
+  try { if (window.DpSteuerKontext && DpSteuerKontext.gesperrt()) return { zve: 0, source: 'Steuerdaten nicht freigegeben', quelle: 'gesperrt' }; } catch (_eK) {}
   /* v3188 · VORWÄRTS: JEDES JAHR SEIN EIGENES zvE (Jahressteuerprinzip, § 2 Abs. 7 und § 25 Abs. 1 EStG).
      Marcel 05.11.2026: „Wir machen ja eine Forward-Betrachtung … In welchem Jahr stehen wir? Gilt dieser
      Steuersatz noch?" Gemessen: Zeiträume 2023–2025 und 2026 je 68.000 €, 01–07/2027 75.000 €, Feld zvE
@@ -3057,6 +3066,7 @@ window._dpSteuerBasis = function (jahr) {
  * ueber die Immobilie. */
 window.DpSteuerAngaben = (function () {
   function _prof() {
+    try { if (window.DpSteuerKontext && DpSteuerKontext.aktiv()) return DpSteuerKontext.angaben(); } catch (e) {}   /* v3700 */
     try { return (window.DealPilotInvestmentProfile && DealPilotInvestmentProfile.load()) || {}; }
     catch (e) { return {}; }
   }
@@ -3094,6 +3104,7 @@ window.DpSteuerAngaben = (function () {
     el.textContent = 'Abweichend in deinen Steuerzeiträumen (gilt dort vor der Angabe oben): ' + teile.join(' · ') + '.';
   }
   function speichern(splitting, kist) {
+    try { if (window.DpSteuerKontext && DpSteuerKontext.aktiv()) return false; } catch (e) {}   /* v3700 · nie ins Profil des Partners */
     try {
       var P = window.DealPilotInvestmentProfile;
       if (!P || !P.load || !P.save) return false;
@@ -3104,6 +3115,7 @@ window.DpSteuerAngaben = (function () {
     } catch (e) { return false; }
   }
   function aendern() {
+    try { if (window.DpSteuerKontext && DpSteuerKontext.aktiv()) { if (typeof toast === 'function') toast('Veranlagung und Kirchensteuer kommen aus dem Steuerprofil des Kunden.'); zeigen(); return; } } catch (e) {}   /* v3700 */
     var a = document.getElementById('st_splitting');
     var b = document.getElementById('st_kist');
     speichern(a && a.value === '1', b ? (parseInt(b.value, 10) || 0) : 0);

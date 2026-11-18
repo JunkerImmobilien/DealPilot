@@ -38,13 +38,15 @@ partner.post('/kunden/:id/platz', fn(async (req) => {
 }));
 partner.post('/kunden/:id/entzug', fn((req) => pk.platzEntziehen(req.reseller, req.user.id, req.params.id, req.body)));
 partner.get('/kunden/:id/freigabe', fn((req) => pk.freigabeLesen(req.reseller, req.params.id)));   /* v3690 · nur lesend */
+partner.get('/kunden/:id/steuerprofil', fn((req) => pk.steuerprofilLesen(req.reseller, req.params.id)));   /* v3700 · P2 Steuerprofil des Kunden, nur lesend */
+partner.get('/kunden/:id/steuerprofil/:nr', fn((req) => pk.steuerprofilLesen(req.reseller, req.params.id, req.params.nr)));
 partner.post('/kunden/:id/trennen', fn((req) => pk.trennen(req.reseller.id, req.params.id, 'partner')));
 partner.post('/einladen', fn((req) => pk.einladen(req.reseller, req.user.id, req.body, require('../services/resellerInviteMail').basisAus(req))));
 partner.post('/code', fn((req) => pk.codeEinloesen(req.reseller, req.user.id, req.body)));
 partner.post('/anfragen/:id/zurueckziehen', fn((req) => pk.anfrageZurueckziehen(req.reseller, req.params.id)));
 partner.get('/kundenstaende', fn(async (req) => ({ kundenstaende: await pk.kundenstaende(req.reseller) })));
 partner.post('/kundenstaende/:id/geoeffnet', fn((req) => pk.kundenstandGeoeffnet(req.reseller, req.user.id, req.params.id)));
-partner.post('/kundenstaende/:id/uebernehmen', fn((req) => pk.kundenstandUebernehmen(req.reseller, req.user.id, req.params.id, req.body)));   /* v3640 · body.modus 'aktualisieren' (Vorgabe) | 'neu' */
+partner.post('/kundenstaende/:id/uebernehmen', fn((req) => pk.kundenstandUebernehmen(req.reseller, req.user.id, req.params.id, req.body)));   /* v3640 · body.modus 'aktualisieren' (Vorgabe) | 'neu' · v3700 body.ziel 'kunde' | 'eigen', body.halter */
 /* v3450 · Anmerkungen am Kundenstand und „Zurueck an Kunden“ */
 partner.get('/kundenstaende/:id/anmerkungen', fn(async (req) => ({ anmerkungen: await anm.liste(req.reseller, req.params.id) })));
 partner.post('/kundenstaende/:id/anmerkungen', fn((req) => anm.anlegen(req.reseller, req.user.id, req.params.id, req.body)));

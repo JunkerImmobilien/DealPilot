@@ -55,6 +55,7 @@ async function listForUser(userId, { limit = 100, offset = 0 } = {}) {
             data::jsonb->'_von_kunde'->>'client_id' AS kunde_client_id,
             data::jsonb->'_von_kunde'->>'kunde' AS kunde_name,
             data::jsonb->'_von_kunde'->>'kundennummer' AS kunde_nr,
+            CASE WHEN data::jsonb ? '_von_kunde' THEN COALESCE(data::jsonb->'_von_kunde'->>'modus', 'kunde') END AS kunde_ziel,  -- v3700: kunde = fuer den Kunden weitergefuehrt, eigen = eigener Bestand
             -- v2030: Ankauf-Stand. NUR die Kurzfassung (neun Zahlen) und der
             -- Stichtag - der eingefrorene Datensatz bleibt im Blob. Ohne diese
             -- beiden Spalten haette die Rueckseite der Doppelkarte nichts zu
