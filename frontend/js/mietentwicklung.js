@@ -348,7 +348,9 @@ window.MietEntwicklung = (function() {
        Ist-Miete", waehrend die Tabelle in Jahr 1 um 7,7 % sprang. Gezaehlt wird jetzt, was rechnet. */
     var _P = window.DpPotenzial, _bj = _basisJahr();
     var _sp = function (e) { return (e.status !== 'leer' && _P && _P.sollFuerMietentwicklung) ? _P.sollFuerMietentwicklung(e, _bj) : null; };
-    var soll = _einheiten().filter(function (e) { return _zahl(e.soll) > 0 || !!_sp(e); });   /* v2410, v2481 */
+    /* v3750 · mit DpPotenzial zählt nur, was rechnet (gemessen Bismarckstr.: Kopf „6 Wohnungen mit Soll-Miete",
+       gerechnet wurde eine - die eigenen Soll-Mieten der übrigen liegen auf oder über der Vergleichsmiete bzw. leer) */
+    var soll = _einheiten().filter(function (e) { return (_P && _P.sollFuerMietentwicklung) ? !!_sp(e) : _zahl(e.soll) > 0; });   /* v2410, v2481 */
     var termin = _einheiten().filter(function (e) { var x = _sp(e); return x && x.jahrIndex != null; });
     return { gesamt: alle.length, mit: mit.length, index: index.length,
              soll: soll.length, soll_termin: termin.length, soll_ab: sollJahr(), soll_roh: Math.round(Number(window._dpMfh && window._dpMfh.sollAbJahr) || 0),
