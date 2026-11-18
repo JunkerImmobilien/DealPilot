@@ -1,10 +1,10 @@
 {
- "erzeugt_am": "2026-11-17T16:25:14.490Z",
+ "erzeugt_am": "2026-11-18T06:41:37.973Z",
  "quellen": {
   "voice-import": "b85d1194e6f250e3",
   "objektart-felder": "f7d9212555982a97",
-  "storage": "f7bf274607aa990d",
-  "index-html": "928346cb5556af1d",
+  "storage": "100c3884cdbaa598",
+  "index-html": "921e59074e121e05",
   "grest": "81f3fb0a4de3a6cf"
  },
  "daten": {
@@ -477,6 +477,9 @@
    "exit_bmy",
    "nkm",
    "ze",
+   "ze_stp_monat",
+   "ze_kueche_monat",
+   "ze_sonst_monat",
    "umlagef",
    "afa_satz",
    "afa_eigen",
@@ -1127,6 +1130,21 @@
     "id": "ze",
     "kind": "text",
     "label": "Zusätzliche Einnahmen / Monat"
+   },
+   {
+    "id": "ze_stp_monat",
+    "kind": "text",
+    "label": "Stellplatz / Garage"
+   },
+   {
+    "id": "ze_kueche_monat",
+    "kind": "text",
+    "label": "Küche / Möblierung"
+   },
+   {
+    "id": "ze_sonst_monat",
+    "kind": "text",
+    "label": "Sonstiges"
    },
    {
     "id": "umlagef",
@@ -5537,6 +5555,10 @@
     "brw_anpassung_pct",
     "brw_anpassung_grund",
     "stellplatz_miete_monat",
+    "ze",
+    "ze_stp_monat",
+    "ze_kueche_monat",
+    "ze_sonst_monat",
     "wertermittlungsstichtag",
     "mikrolage",
     "makrolage",
@@ -5596,6 +5618,6 @@
  },
  "inhalt": {
   "hilfe": "409743077f820db2",
-  "bewertung": "a2be4e6da5778e8d"
+  "bewertung": "ce4f5980fbae015d"
  }
 }
