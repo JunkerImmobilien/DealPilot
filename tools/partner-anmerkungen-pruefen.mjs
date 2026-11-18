@@ -148,7 +148,7 @@ console.log('A · E-Mail bei Rueckmeldung (v3460)');
   /* Schalter im Partner-Cockpit und Einstellung im Backend */
   const pkq = fs.readFileSync(path.join(WURZEL, 'frontend/js/partner-kunden.js'), 'utf8');
   /* v3640c · Kundendialog im RND-Stil: der Reiter „Kunde“ (kundeReiter) steht fuer BEIDE Zugangsarten vorn */
-  ok('Cockpit: Schalter im Kundendialog beider Zugangsarten, gespeichert als mail_rueckmeldung', /var reiter = \[kundeReiter\(k\)\];/.test(pkq) && /hubChips\('pk-k-mailrm'/.test(pkq) && (pkq.match(/mail_rueckmeldung: chipWert\(b, 'pk-k-mailrm'\) !== 'aus'/g) || []).length === 1);
+  ok('Cockpit: Schalter im Kundendialog beider Zugangsarten, gespeichert als mail_rueckmeldung', /var reiter = \[kundeReiter\(k\), steuerReiter\(\)\];/.test(pkq)   /* v3700: Reiter Steuer dahinter */ && /hubChips\('pk-k-mailrm'/.test(pkq) && (pkq.match(/mail_rueckmeldung: chipWert\(b, 'pk-k-mailrm'\) !== 'aus'/g) || []).length === 1);
   ok('Cockpit: Vorgabe an (nur false schaltet aus)', /k\.mail_rueckmeldung !== false \? 'an' : 'aus'/.test(pkq));
   ok('Cockpit: Link ?dp_partner=aufgaben wird eingeloest', /get\('dp_partner'\)/.test(pkq) && /meinPartnerOeffnen\('aufgaben'\)/.test(pkq));
   const pks = fs.readFileSync(path.join(SRC, 'services/partnerKunden.js'), 'utf8');
