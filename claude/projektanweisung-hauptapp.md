@@ -45093,3 +45093,16 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
   - Rechen-Audit, offen zur Entscheidung: `_kpis_cf_ns` gegen Projektion, IRR aus `State.cfRows`, Sparrate im Zuteilungsjahr.
   - Messe-Schleife `videothek-liste.js` nicht neu erzeugt; Drehbücher 18, quickcheck (alt), komplett-mfh offen.
   - Staging-Testkonto: Ravensberger Weg GmbH rechnet mit v3750 2027 +53 € (Mappe 24 nennt den alten Stand).
+
+### Rollout 1.0.122 · 18.11.2026 abends (`a13d61d`; v3770, v3780, v3730j)
+- **Was:**
+  - v3770 Mieten aus Investorensicht: „Mietrecht an dieser Adresse“ (ki-miete.js) nimmt die Vergleichsmiete der Mietleiter statt Mietpreisübersicht × 1,10; Pilot-Auftrag (openaiService.js) beziffert das Mietniveau nur aus dem Block Mieterhöhung/Zielbild; Landing-Deal-Check `mieteSatz` nennt zuerst den Oberwert.
+  - v3780/a Messkabine: GmbH-Steuertabelle am Desktop (1182 → 1105 px), €-Umbruch im BMF-Rechner, Knöpfe ≥ 32 px am Handy (Finanzierung, Pilot-Analyse), Gruppennummern der geführten Eingabe 8,5 px.
+  - v3730j Videothek: Ü1, Ü2, 19, 23, 28 neu mit Marcels Stimmklon; Modul 28 „Alle Unterlagen reinladen“ ersetzt „Unterlagen einlesen“, Vorschaubild.
+- **Nachweis:**
+  - Prüfer grün: buster-ebenen, rechen-audit, zielbild-haus, detailgrad, mietpotenzial, prompt-lecks, score-ketten, vorschau, steuerjahr; Gold-Audit auf der Basislinie.
+  - Prod: Sicherungen `haupt-/mb-20261118-1927`, Serverstand a13d61d, Backend healthy (RestartCount 0), version.json 1.0.122; Videothek 14 Videos mit v3730, 28 von 28 MP4 mit 200.
+- **Rest:**
+  - Mieten, Fragen an Marcel: Mietpreisübersicht als Mittelwert vor der Näherung; Neuvermietung min(Markt, Oberwert × 1,1); ohne Bremse 120 % oder Marktmiete; Quick-Check ohne Mietspiegel; Landing-Kachel zeigt das Mittel groß.
+  - Videos offen: Ü3 (komplett-mfh), Spot, 18 (aus der Videothek genommen), quickcheck (alt).
+  - Messkabine offen: MFH-Fenster am Handy (Fuß 245 von 776 px), Umbruch nach „=“ in BMF Schritt 1 bei 390 px.
