@@ -419,6 +419,134 @@ ok('C', 'Marke nur bei aktiver Verbindung und Wahl Partner', /getrennt_am IS NUL
   antworte = async () => ({ rows: [], rowCount: 0 });
 }
 
+// ── G · v3700 P2 Steuerprofil des Kunden, Rechenkontext, Uebernehmen ──────
+{
+  const Module = (await import('node:module')).default;
+  const vm = await import('node:vm');
+  function frischG(pfad, quelle) { const m = new Module(pfad, null); m.filename = pfad; m.paths = Module._nodeModulePaths(path.dirname(pfad)); m._compile(quelle == null ? fs.readFileSync(pfad, 'utf8') : quelle, pfad); return m.exports; }
+  const SPpfad = path.join(WURZEL, 'backend/src/services/partnerSteuerprofil.js');
+  const SP = frischG(SPpfad);
+  const O1 = '11111111-1111-4111-8111-111111111111', O2 = '22222222-2222-4222-8222-222222222222';
+  const roh = { erzeugt_am: '2026-11-18T10:00:00Z',
+    zeitraeume: [{ valid_from: '2026-01-01', valid_to: null, zve: 140000, splitting: true, kirchensteuer: 0 }, { valid_from: '2020-01-01', valid_to: '2025-12-31', zve: '120000', splitting: true, kirchensteuer: 9 }, { valid_from: 'kaputt', zve: 1 }],
+    angaben: { splitting: 'ja', kirchensteuer: 9 },
+    mandanten: [{ id: 'm-gmbh', name: 'Muster GmbH', rechtsform: 'gmbh', regime: { kst: 15.825, gewst: 450, erw_kuerzung: true }, bh: { verlustvortrag: 5000 }, kosten: { 2026: { steuerber: 2400 } }, geheim: 'x' }],
+    bestand: [{ id: O1, address: 'Musterweg 1', purchase_date: '2020-04-01', wk_per_year: { 2025: -3000, 2026: '-2500', x: 5 }, halter: 'privat', rang: 0 }, { id: 'keine-uuid' }],
+    pro: true, fremd: 'weg' };
+  const p = SP.profilSauber(roh);
+  ok('G', 'profilSauber: Zeitraeume sortiert, kaputte verworfen, zvE als Zahl, Veranlagung je Zeitraum', p.zeitraeume.length === 2 && p.zeitraeume[0].valid_from === '2020-01-01' && p.zeitraeume[0].zve === 120000 && p.zeitraeume[0].kirchensteuer === 9 && p.zeitraeume[1].valid_to === null, JSON.stringify(p.zeitraeume));
+  ok('G', 'profilSauber: Angaben nur echte Werte (splitting nur true, KiSt 0/8/9), Privat ergaenzt, fremde Schluessel weg', p.angaben.splitting === false && p.angaben.kirchensteuer === 9 && p.mandanten[0].id === 'privat' && !('geheim' in p.mandanten[1]) && p.mandanten[1].regime.gewst === 450 && !('fremd' in p) && p.pro === true);
+  ok('G', 'profilSauber: Bestand nur mit UUID, Jahre nur vierstellig mit Zahl', p.bestand.length === 1 && p.bestand[0].wk_per_year['2026'] === -2500 && !('x' in p.bestand[0].wk_per_year));
+  let eG1 = null; try { SP.profilSauber('kaputt'); } catch (e) { eG1 = e; }
+  let eG2 = null; try { SP.profilSauber({ bestand: [{ id: O1, address: 'x'.repeat(1600000) }] }); } catch (e) { eG2 = e; }
+  ok('G', 'unbrauchbares Profil 400, zu grosses 413', eG1 && eG1.status === 400 && eG2 && eG2.status === 413);
+  ok('G', 'gleicher Inhalt = gleiche Pruefsumme (Erzeugungszeit zaehlt nicht), anderer Inhalt = andere', SP.inhaltHash(p) === SP.inhaltHash(Object.assign({}, p, { erzeugt_am: '2030-01-01T00:00:00Z' })) && SP.inhaltHash(p) !== SP.inhaltHash(Object.assign({}, p, { pro: false })));
+  const ue = SP.ueberfuehrungenAus([{ id: O2, data: { str: 'Bismarckstr.', hnr: '27', plz: '32756', ort: 'Detmold', obj_herkunft: 'ueberfuehrung', halter: 'm-gmbh', halter_seit: '2027-01-01', gesellschafterdarlehen: '50000', _ueberf_link: O1, ueberf_daten: JSON.stringify({ art: 'verdeckt', vw: 410000, gd: { betrag: 50000 } }) } }, { id: O1, data: { obj_herkunft: 'neukauf' } }]);
+  ok('G', 'Ueberfuehrungen aus den Objekten: Stichtag, Art, Verkehrswert, Gesellschafterdarlehen, Verweis aufs Privatobjekt', ue.length === 1 && ue[0].stichtag === '2027-01-01' && ue[0].art === 'verdeckt' && ue[0].verkehrswert === 410000 && ue[0].gesellschafterdarlehen === 50000 && ue[0].privat_id === O1, JSON.stringify(ue));
+  const bs = SP.basisFuer({ id: 'sp1', fassung: 3, zuletzt_am: new Date('2026-11-18T11:00:00Z'), profil: p }, O1, 'm-gmbh');
+  ok('G', '_steuerbasis fuer die Kopie: Profil, Fassung, Stand, Original-Kennung, Halter', bs.profil_id === 'sp1' && bs.fassung === 3 && bs.orig_id === O1 && bs.halter === 'm-gmbh' && bs.stand_am === '2026-11-18T11:00:00.000Z' && bs.profil === p);
+
+  /* senden() mit In-Speicher-DB: Profil nur mit Bereich Steuerdaten */
+  const KL = 'dddddddd-dddd-4ddd-8ddd-dddddddddddd', OB = '44444444-4444-4444-8444-444444444444', SH = '55555555-5555-4555-8555-555555555555';
+  const T = { fg: null, sp: [], kopie: [], log: [] };
+  antworte = async (sql, prm) => {
+    T.log.push(sql.replace(/\s+/g, ' ').trim().slice(0, 80));
+    if (/FROM reseller_clients c JOIN resellers rs/.test(sql)) return { rows: [{ id: KL, reseller_id: 'r1', platz_art: 'eigen', display_name: 'Kundin Muster', partner_name: 'Muster' }] };
+    if (/FROM resellers WHERE id/.test(sql)) return { rows: [{ n: 'Muster', owner_user_id: 'pu1' }] };
+    if (/FROM partner_freigaben WHERE client_id = \$1 AND ersetzt_am IS NULL/.test(sql)) return { rows: T.fg ? [T.fg] : [] };
+    if (/data::jsonb->>'obj_herkunft' = 'ueberfuehrung'/.test(sql)) return { rows: [] };
+    if (/FROM partner_steuerprofile WHERE client_id = \$1 AND ersetzt_am IS NULL/.test(sql)) return { rows: T.sp.filter((x) => !x.ersetzt_am).slice(-1) };
+    if (/MAX\(fassung\)/.test(sql)) return { rows: [{ m: T.sp.length }] };
+    if (/UPDATE partner_steuerprofile SET ersetzt_am/.test(sql)) { T.sp.forEach((x) => { if (x.id === prm[0]) x.ersetzt_am = 'jetzt'; }); return { rows: [], rowCount: 1 }; }
+    if (/UPDATE partner_steuerprofile SET zuletzt_am/.test(sql)) return { rows: T.sp.filter((x) => x.id === prm[0]), rowCount: 1 };
+    if (/INSERT INTO partner_steuerprofile/.test(sql)) { const r = { id: 'sp' + (T.sp.length + 1), client_id: prm[0], fassung: prm[2], profil: JSON.parse(prm[3]), inhalt_hash: prm[4], freigabe_id: prm[5], empfangen_am: new Date('2026-11-18T12:00:00Z') }; T.sp.push(r); return { rows: [r], rowCount: 1 }; }
+    if (/SELECT \* FROM object_shares WHERE object_id = \$1 AND reseller_id = \$2/.test(sql)) return { rows: [{ id: SH, status: 'eingereicht', stand_nr: 1, kopie_object_id: null }] };
+    return { rows: [], rowCount: 0 };
+  };
+  OS.getById = async (uid, oid) => oid === OB ? { id: oid, data: { str: 'Musterweg', halter: 'm-gmbh', zve: 90000, grenz: 42, _tax_overrides: { 2025: {} } }, photos: [], ai_analysis: null } : null;
+  OS.create = async (uid, o) => { T.kopie.push(o.data); return { id: 'kopie' + T.kopie.length }; };
+  const pkPfadG = path.join(WURZEL, 'backend/src/services/partnerKunden.js');
+  const qG = fs.readFileSync(pkPfadG, 'utf8');
+  const pkG = frischG(pkPfadG, qG);
+  const U = { id: 'u1', name: 'Kundin Muster' };
+  async function sendeMit(modul, bereiche) {
+    T.fg = { id: 'fg1', art: 'dauer', bereiche }; T.kopie = []; T.sp = [];
+    await modul.senden(U, { object_ids: [OB], steuerprofil: roh });
+    return { k: T.kopie[0] || {}, sp: T.sp.slice() };
+  }
+  const g1 = await sendeMit(pkG, { steuer: true, steuerdaten: true });
+  ok('G', 'mit Steuerdaten: Profil als Fassung 1 abgelegt, Kopie traegt _steuerbasis (Original, Halter des Kunden), Halter am Objekt', g1.sp.length === 1 && g1.sp[0].fassung === 1 && g1.k._steuerbasis && g1.k._steuerbasis.orig_id === OB && g1.k._steuerbasis.halter === 'm-gmbh' && g1.k.halter === 'm-gmbh' && g1.k._steuerbasis.profil.zeitraeume.length === 2, JSON.stringify({ sp: g1.sp.length, h: g1.k.halter }));
+  async function sendeOhne(modul) { const r = await sendeMit(modul, { steuer: true, steuerdaten: false }); return r.sp.length === 0 && !r.k._steuerbasis && r.k.halter === 'privat' && !('zve' in r.k); }
+  ok('G', 'ohne Steuerdaten: kein Profil gespeichert (auch wenn der Browser eins schickt), keine _steuerbasis, Halter privat', await sendeOhne(pkG));
+  T.fg = { id: 'fg1', art: 'dauer', bereiche: { steuer: true, steuerdaten: true } }; T.kopie = [];
+  await pkG.senden(U, { object_ids: [OB], steuerprofil: roh });   /* zweite Sendung, gleicher Inhalt (T.sp bleibt) */
+  const vorG = T.sp.length;
+  await pkG.senden(U, { object_ids: [OB], steuerprofil: Object.assign({}, roh, { erzeugt_am: '2026-11-19T08:00:00Z' }) });
+  const glG = T.sp.length === vorG;
+  await pkG.senden(U, { object_ids: [OB], steuerprofil: Object.assign({}, roh, { angaben: { splitting: true, kirchensteuer: 0 } }) });
+  ok('G', 'Fassungen: gleicher Inhalt keine neue, geaenderter Inhalt neue Fassung, die alte ersetzt', glG && T.sp.length === vorG + 1 && T.sp[T.sp.length - 1].fassung === vorG + 1 && T.sp[T.sp.length - 2].ersetzt_am, JSON.stringify(T.sp.map((x) => [x.fassung, !!x.ersetzt_am])));
+  /* Gegenprobe: ohne die Freigabe-Bedingung wuerde das Profil auch ohne Steuerdaten abgelegt */
+  const zG = '  if (bereiche.steuerdaten && b && b.steuerprofil) {';
+  ok('G', 'Gegenprobe: Bedingung genau einmal im Quelltext', qG.split(zG).length === 2);
+  const ohneBed = frischG(pkPfadG, qG.replace(zG, '  if (b && b.steuerprofil) {   /* Gegenprobe */'));
+  ok('G', 'Gegenprobe: ohne Freigabe-Bedingung landet das Profil ohne Steuerdaten beim Partner (Pruefer erkennt es)', (await sendeOhne(ohneBed)) === false);
+
+  /* Uebernehmen: Daten je Ziel */
+  const dK = { str: 'Musterweg', halter: 'm-gmbh', zve: 90000, grenz: 42, _steuerbasis: bs, _kpis_cf_ns: -100, _deal_won: true, _kundenstand: { share_id: SH }, _obj_seq: 'K-1' };
+  const uk = pkG.uebernahmeDaten(dK, 'kunde', { share_id: SH }, null);
+  ok('G', 'Uebernehmen fuer den Kunden: Profil, Halter, zvE und Deal-Status des Kunden bleiben, Ziel kunde', uk._steuerbasis === undefined ? false : (uk._steuerbasis.orig_id === O1 && uk.halter === 'm-gmbh' && uk.zve === 90000 && uk._deal_won === true && uk._von_kunde.modus === 'kunde' && !uk._kundenstand && !uk._obj_seq));
+  const ug = pkG.uebernahmeDaten(dK, 'eigen', { share_id: SH }, 'm-eigen');
+  ok('G', 'Uebernehmen in den eigenen Bestand: keine Steuerdaten des Kunden (zvE, grenz, Profil, cf_ns), Deal offen, Halter nach Wahl', !ug._steuerbasis && !('zve' in ug) && !('grenz' in ug) && !('_kpis_cf_ns' in ug) && !('_deal_won' in ug) && ug.halter === 'm-eigen' && ug._von_kunde.modus === 'eigen' && ug.str === 'Musterweg');
+  ok('G', 'Halter im eigenen Bestand: ungueltige Angabe wird privat', pkG.uebernahmeDaten(dK, 'eigen', {}, '<b>').halter === 'privat' && pkG.uebernahmeDaten(dK, 'eigen', {}, null).halter === 'privat');
+  ok('G', 'ohne Ziel (alter Browserstand) gilt kunde: zaehlt nie ungefragt zur Steuer des Partners', /const ziel = ZIELE\.indexOf\(b && b\.ziel\) >= 0 \? b\.ziel : 'kunde';/.test(qG));
+  ok('G', 'neuer Stand zieht weitergefuehrte Objekte nach (Objekt und Profil), eigener Bestand bleibt', /async function weitergefuehrtNachziehen[\s\S]{0,400}COALESCE\(data::jsonb->'_von_kunde'->>'modus', 'kunde'\) = 'kunde'/.test(qG) && /await weitergefuehrtNachziehen\(pn\.owner_user_id, s\.id, d, standNr/.test(qG));
+
+  /* Verlustverrechnung: Praedikat nachgebaut und gegen beide Abfragen gehalten */
+  const tsq = lies('backend/src/routes/taxSnapshots.js'), tsv = lies('backend/src/services/taxService.js');
+  const PRAED = "((o.data::jsonb -> '_von_kunde') IS NULL OR o.data::jsonb -> '_von_kunde' ->> 'modus' = 'eigen')";
+  const zaehlt = (d) => !d._von_kunde || d._von_kunde.modus === 'eigen';   /* dieselbe Regel in JS */
+  ok('G', 'Verlustverrechnung (GET /tax-snapshots) und eigene Steuersaetze: eigener Bestand zaehlt, fuer den Kunden weitergefuehrt nie', tsq.includes(PRAED) && tsv.includes(PRAED) && zaehlt({}) && zaehlt({ _von_kunde: { modus: 'eigen' } }) && !zaehlt({ _von_kunde: { modus: 'kunde' } }) && !zaehlt({ _von_kunde: {} }));
+  ok('G', 'Gegenprobe: der alte v3688-Filter (jedes _von_kunde ausgeschlossen) steht nicht mehr da', !/AND \(o\.data::jsonb -> '_von_kunde'\) IS NULL\s*(--|`)/.test(tsq + tsv));
+  ok('G', 'Steuersaetze je Kunde (Steuer-Mappe beim Partner): nur Ziel kunde, nur dieser Kunde, nur eigene Objekte', /async function listForKunde[\s\S]{0,500}tr\.user_id = \$1[\s\S]{0,200}'client_id' = \$2[\s\S]{0,120}'modus', 'kunde'\) = 'kunde'/.test(tsv) && /req\.query\.kunde/.test(lies('backend/src/routes/taxRecords.js')));
+
+  /* Frontend: der Rechenkontext an EINER Stelle, echte Datei im vm */
+  const skQ = lies('frontend/js/steuer-kontext.js');
+  function skLaden(d) {
+    const win = { _currentObjData: d, _currentObjKey: 'kopie-1', addEventListener() {}, setTimeout() {} };
+    const ctx = { window: win, document: { readyState: 'complete', addEventListener() {}, getElementById: () => null, body: null }, setTimeout() {}, clearTimeout() {}, console, Promise, JSON, Date };
+    win.window = win; vm.runInNewContext(skQ, ctx); return win.DpSteuerKontext;
+  }
+  const kd = { _kundenstand: { share_id: SH, kunde: 'Kundin Muster', stand_am: '2026-11-18T12:00:00Z' }, _steuerbasis: Object.assign({}, bs, { orig_id: O1 }) };
+  const K1 = skLaden(kd);
+  ok('G', 'Kontext im Kundenstand: Zeitraeume, Angaben, Mandanten und Plan des KUNDEN', K1.aktiv() && !K1.gesperrt() && K1.zeitraeume().length === 2 && K1.zeitraeume()[1].zve === 140000 && K1.angaben().kirchensteuer === 9 && K1.mandanten().some((m) => m.id === 'm-gmbh') && K1.pro() === true);
+  const bst = K1.bestand('kopie-1');
+  ok('G', 'Saldo-Grundlage: das Original traegt die Kennung des offenen Objekts (ueberspringt sich selbst wie beim Kunden)', bst.length === 1 && bst[0].id === 'kopie-1' && bst[0].wk_per_year['2025'] === -3000);
+  const K2 = skLaden({ _kundenstand: { share_id: SH } });
+  ok('G', 'Kundenstand ohne Profil: gesperrt, keine Zeitraeume, keine Gesellschaften, kein Bestand, neutral', K2.aktiv() && K2.gesperrt() && K2.zeitraeume().length === 0 && K2.mandanten().length === 1 && K2.bestand().length === 0 && K2.angaben().splitting === false && /Steuerdaten nicht freigegeben/.test(K2.bandText()));
+  ok('G', 'fuer den Kunden weitergefuehrt = Kontext, eigener Bestand und eigenes Objekt = kein Kontext', !!skLaden({ _von_kunde: { modus: 'kunde' }, _steuerbasis: bs }).aktiv() && !skLaden({ _von_kunde: { modus: 'eigen' }, _steuerbasis: bs }).aktiv() && !skLaden({ str: 'eigen' }).aktiv());
+  const bt = K1.bandText();
+  ok('G', 'Band: „Steuer mit den Angaben von …, Stand …“, ganze Saetze ohne Semikolon und Gedankenstrich', /^Steuer mit den Angaben von Kundin Muster, Stand 18\.11\.2026 \(Steuerprofil Fassung 3\)\./.test(bt) && !/[–—;]/.test(bt + K2.bandText()), bt);
+  const tp = lies('frontend/js/tax-periods.js'), wk = lies('frontend/js/wk-aggregator.js'), md = lies('frontend/js/mandanten.js'), tx = lies('frontend/js/tax.js'), zm = lies('frontend/js/zve-manager.js');
+  ok('G', 'Leser fragen den Kontext zuerst: Steuerzeitraeume (getForDateSync, getAllSync, status, loadAll)', /getForDateSync: kGetForDateSync/.test(tp) && /getAllSync: kGetAllSync/.test(tp) && /status: kStatus/.test(tp) && /loadAll: kLoadAll/.test(tp));
+  ok('G', 'Leser fragen den Kontext zuerst: uebrige Objekte (Aggregator) und Mandanten (Liste, Plan)', /getAllObjectsWithWK: kGetAll/.test(wk) && /getWKForOtherObjects: kOther/.test(wk) && /function _liste\(\) \{ var K = _kontext\(\); return K \? K\.mandanten\(\) : _state\.list; \}/.test(md) && /_K\.aktiv\(\)\) return _K\.pro\(\);/.test(md));
+  ok('G', 'Leser fragen den Kontext zuerst: Veranlagung (Tax.optionen, DpSteuerAngaben), zvE gesperrt', /DpSteuerKontext\.aktiv\(\)\) p = DpSteuerKontext\.angaben\(\);/.test(tx) && /DpSteuerKontext\.gesperrt\(\)\) return \{ zve: 0/.test(tx));
+  ok('G', 'im Kontext wird nichts des Partners geschrieben: Snapshot, Zeitraeume, Mandanten, Investmentprofil, zvE-Profil',
+    /DpSteuerKontext && DpSteuerKontext\.aktiv\(\)\) return; \} catch \(e\) \{\}\n?\s*var key = window\._currentObjKey;/.test(tx.replace(/\r/g, '')) && /create: _nurEigen\(create\)/.test(tp) && /function _save\(\) \{ if \(_kontext\(\)\) return;/.test(md) &&
+    /function speichern\(splitting, kist\) \{\s*try \{ if \(window\.DpSteuerKontext && DpSteuerKontext\.aktiv\(\)\) return false;/.test(tx) && /DpSteuerKontext\.aktiv\(\)\) return; \} catch \(e\) \{\}   \/\* v3700 · zvE eines Kunden/.test(zm) && /function kSave\(objectId, snapshot\) \{\s*if \(_kontext\(\)\)/.test(wk));
+  /* Gegenprobe Frontend: ohne den Kundenstand-Zweig waere der Kundenstand ohne Kontext */
+  const skOhne = skQ.replace("if (!ks && !(vk && vk.modus !== 'eigen')) return null;", "if (!(vk && vk.modus !== 'eigen')) return null;   /* Gegenprobe */");
+  ok('G', 'Gegenprobe: ohne den Kundenstand-Zweig rechnete der Kundenstand mit den Daten des Partners (Pruefer erkennt es)', skOhne !== skQ && (() => { const win = { _currentObjData: kd, addEventListener() {} }; vm.runInNewContext(skOhne, { window: win, document: { readyState: 'complete', addEventListener() {}, getElementById: () => null }, setTimeout() {}, console, Promise, JSON, Date }); return !win.DpSteuerKontext.aktiv(); })());
+  const pkf = lies('frontend/js/partner-kunden.js');
+  ok('G', 'Kunde sammelt das Profil beim Senden nur mit Bereich Steuerdaten ein', /var mitProfil = fgSauber\(a0 \? a0\.bereiche : \{\}\)\.steuerdaten && window\.DpSteuerKontext && DpSteuerKontext\.einsammeln;/.test(pkf) && /if \(sp\) body\.steuerprofil = sp;/.test(pkf));
+  ok('G', 'Partner: Wahl beim Uebernehmen (kunde / eigen mit Halter), Reiter Steuer, Band fuer weitergefuehrte Objekte', /var body = \{ modus: modus, ziel: ziel \};/.test(pkf) && /ZIEL_TEXT = \{/.test(pkf) && /kurz: 'Steuer', titel: 'Steuerprofil des Kunden'/.test(pkf) && /function weitergefuehrtBand\(d\)/.test(pkf) && /\/partner\/kunden\/' \+ k\.id \+ '\/steuerprofil'/.test(pkf));
+  const zt = (pkf.match(/var ZIEL_TEXT = \{[\s\S]*?\};/) || [''])[0] + (skQ.match(/function bandText[\s\S]*?\n  \}/) || [''])[0];
+  ok('G', 'Kundentext Uebernehmen und Band: kein Semikolon, kein Gedankenstrich', zt.length > 400 && !/[–—]/.test(zt) && !/[a-zäöüß] ?; ?[a-zäöüß]/i.test(zt.replace(/;\s*(\n|$)/g, '')), zt.length);
+  const m119 = lies('backend/migrations/119_partner_steuerprofile.sql');
+  ok('G', 'Migration 119: eigene Tabelle mit Fassung, Pruefsumme, Freigabe-Fassung, eine geltende je Verbindung, Stand-Spalte', /CREATE TABLE IF NOT EXISTS public\.partner_steuerprofile/.test(m119) && /UNIQUE \(client_id, fassung\)/.test(m119) && /inhalt_hash\s+text NOT NULL/.test(m119) && /freigabe_id\s+uuid REFERENCES public\.partner_freigaben/.test(m119) && /uq_partner_steuerprofile_aktiv/.test(m119) && /ADD COLUMN IF NOT EXISTS steuerprofil_id/.test(m119));
+  ok('G', 'Route: Partner liest das Steuerprofil nur lesend (GET), kein Schreibweg fuer den Partner', /partner\.get\('\/kunden\/:id\/steuerprofil'/.test(lies('backend/src/routes/partnerKunden.js')) && !/partner\.(put|post|delete)\('\/kunden\/:id\/steuerprofil/.test(lies('backend/src/routes/partnerKunden.js')));
+  antworte = async () => ({ rows: [], rowCount: 0 });
+}
+
 /* ── E · live (NUR Staging) ─────────────────────────────────────────────── */
 if (process.argv.includes('--live')) {
   const { execSync } = await import('node:child_process');
@@ -432,5 +560,5 @@ if (process.argv.includes('--live')) {
   } catch (e) { process.stdout.write(String(e.stdout || '')); ok('E', 'Live-Lauf', false, String(e.stderr || e.message).slice(0, 300)); }
 }
 
-console.log('\npartner-kunden-pruefen v3690 · ' + n + ' Punkte, ' + (n - rot) + ' gruen, ' + rot + ' rot');
+console.log('\npartner-kunden-pruefen v3700 · ' + n + ' Punkte, ' + (n - rot) + ' gruen, ' + rot + ' rot');
 process.exit(rot ? 1 : 0);

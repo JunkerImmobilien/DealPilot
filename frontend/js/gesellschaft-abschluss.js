@@ -266,8 +266,12 @@ function _gaHolen(url) {
   if (_gaMemo) { if (!_gaMemo[url]) _gaMemo[url] = Auth.apiCall(url); return _gaMemo[url]; }
   return Auth.apiCall(url);
 }
-async function _gaDaten(halterId, jahr, _ohneVortrag) {
-  var r = await _gaHolen(_gaMemo ? '/tax-records?from=1990&to=2100' : '/tax-records?from=1990&to=' + (jahr + 1));
+/* v3700 · P2: opt = { kunde: client_id, profil } = die Gesellschaft EINES KUNDEN beim Partner: nur seine fuer ihn
+   weitergefuehrten Objekte und ihre Steuersaetze (/tax-records?kunde=), gerechnet mit seinem Steuerprofil
+   (_gaRechnen ueber DpSteuerKontext.mit). Ohne opt: die eigenen Objekte, ohne die fuer Kunden weitergefuehrten. */
+async function _gaDaten(halterId, jahr, _ohneVortrag, opt) {
+  var _kq = opt && opt.kunde ? '&kunde=' + encodeURIComponent(opt.kunde) : '';
+  var r = await _gaHolen((_gaMemo ? '/tax-records?from=1990&to=2100' : '/tax-records?from=1990&to=' + (jahr + 1)) + _kq);
   var alle = (r && r.records) || [];
   if (_gaMemo) alle = alle.filter(function (x) { return Number(x.year) <= jahr + 1; });
 
@@ -278,6 +282,8 @@ async function _gaDaten(halterId, jahr, _ohneVortrag) {
   /* Welche Objekte gehoeren diesem Halter? Die Listenantwort traegt `halter`
      top-level — geprueft am 03.09.2026. */
   var meine = liste.filter(function (o) {
+    if (opt && opt.kunde) { if (String(o.kunde_client_id || '') !== String(opt.kunde) || o.kunde_ziel === 'eigen') return false; }   /* v3700 */
+    else if (o.kunde_ziel === 'kunde') return false;   /* v3700 · fuer einen Kunden weitergefuehrt: nicht die eigene Gesellschaft */
     return String(o.halter || 'privat') === String(halterId);
   }).map(function (o) { return o.id; });
 
@@ -371,17 +377,17 @@ async function _gaDaten(halterId, jahr, _ohneVortrag) {
      eigenen Vortrag mehr. */
   var vortrag = null;
   if (!_ohneVortrag) {
-    try { vortrag = await _gaVortrag(halterId, jahr, objekte); } catch (e) { vortrag = null; }
+    try { vortrag = await _gaVortrag(halterId, jahr, objekte, opt); } catch (e) { vortrag = null; }
   }
 
-  return { objekte: objekte, gesamtSaetze: alle.length, vortrag: vortrag };
+  return { objekte: objekte, gesamtSaetze: alle.length, vortrag: vortrag, _opt: opt || null };
 }
 
 /* Summe der Jahresergebnisse aller Jahre VOR dem Bilanzjahr.
    Startjahr = fruehestes erfasstes Steuerjahr der Objekte dieser Gesellschaft.
    Gedeckelt auf 15 Jahre: wer laenger zurueckreicht, bekommt einen ehrlichen
    Hinweis statt eines stillen Abschneidens. */
-async function _gaVortrag(halterId, jahr, objekte) {
+async function _gaVortrag(halterId, jahr, objekte, opt) {
   var jahre = [];
   objekte.forEach(function (o) { (o.jahreErfasst || []).forEach(function (y) { if (y < jahr) jahre.push(y); }); });
   /* v1235b · Ein Jahr, in dem die Gesellschaft nur KOSTEN hatte und noch kein
@@ -391,7 +397,7 @@ async function _gaVortrag(halterId, jahr, objekte) {
      Vortrag 2026 aber nicht auf, weil kein Objekt einen Satz fuer 2025 hatte.
      Deshalb zaehlen die Kostenjahre des Mandanten mit. */
   try {
-    var m = (window.DealPilotMandanten && DealPilotMandanten.get) ? DealPilotMandanten.get(halterId) : null;
+    var m = _gaImKontext(opt, function () { return (window.DealPilotMandanten && DealPilotMandanten.get) ? DealPilotMandanten.get(halterId) : null; });   /* v3700 */
     if (m && m.id === halterId && m.kosten) {
       Object.keys(m.kosten).forEach(function (k) {
         var y = parseInt(k, 10);
@@ -406,7 +412,7 @@ async function _gaVortrag(halterId, jahr, objekte) {
 
   var summe = 0, details = [];
   for (var y = start; y < jahr; y++) {
-    var d = await _gaDaten(halterId, y, true);          /* true = ohne eigenen Vortrag */
+    var d = await _gaDaten(halterId, y, true, opt);          /* true = ohne eigenen Vortrag */
     if (!d.objekte.length) continue;
     var r = _gaRechnen(halterId, y, d);
     var e = (r && r.guv && isFinite(r.guv.jahresueberschuss)) ? r.guv.jahresueberschuss : 0;
@@ -420,7 +426,14 @@ async function _gaVortrag(halterId, jahr, objekte) {
 /* ───────────────────────────────────────────────────────────────────────────
    4 · GuV UND BILANZ RECHNEN
    ─────────────────────────────────────────────────────────────────────────── */
+/* v3700 · P2: im Kundenkontext (daten._opt.profil) rechnet derselbe Weg synchron mit dem Steuerprofil des Kunden */
+function _gaImKontext(opt, fn) {
+  return (opt && opt.profil && window.DpSteuerKontext && DpSteuerKontext.mit) ? DpSteuerKontext.mit(opt.profil, fn) : fn();
+}
 function _gaRechnen(halterId, jahr, daten) {
+  return _gaImKontext(daten && daten._opt, function () { return _gaRechnenRoh(halterId, jahr, daten); });
+}
+function _gaRechnenRoh(halterId, jahr, daten) {
   var mand = null, reg = {}, bh = {};
   try {
     mand = window.DealPilotMandanten && DealPilotMandanten.get(halterId);
@@ -703,15 +716,15 @@ window._gaAusgleichText = _gaAusgleichText;
    Jahresabschlusses (_gaDaten/_gaRechnen: alle Objekte, Kosten der Gesellschaft, Gesellschafterdarlehen, dann
    steuerReihe mit Verlustvortrag). Ergebnis: [{ jahr, erg, steuer, kst, gewst, vortragNach, objekte }]. */
 var _gaGesStCache = {};
-async function _gaGesSteuerReihe(halterId, bisJahr) {
-  var key = halterId + '|' + bisJahr, c = _gaGesStCache[key];
+async function _gaGesSteuerReihe(halterId, bisJahr, opt) {
+  var key = halterId + '|' + bisJahr + '|' + ((opt && opt.kunde) || ''), c = _gaGesStCache[key];   /* v3700 · je Kunde */
   if (c && Date.now() - c.t < 30000) return c.r;
   var d, r;
   _gaMemo = {};
-  try { d = await _gaDaten(halterId, bisJahr); r = _gaRechnen(halterId, bisJahr, d); }
+  try { d = await _gaDaten(halterId, bisJahr, false, opt); r = _gaRechnen(halterId, bisJahr, d); }
   finally { _gaMemo = null; }
   var K = window.DealPilotUeberfuehrungKern;
-  var P = (window.DealPilotMandanten && DealPilotMandanten.steuerParameter) ? DealPilotMandanten.steuerParameter(halterId) : null;
+  var P = _gaImKontext(opt, function () { return (window.DealPilotMandanten && DealPilotMandanten.steuerParameter) ? DealPilotMandanten.steuerParameter(halterId) : null; });   /* v3700 */
   if (!K || !P || !r || !r.guv) return null;
   var vj = (d && d.vortrag && d.vortrag.jahre) || [];
   var reihe = vj.map(function (x) { return { jahr: x.jahr, erg: x.vorSteuern || 0, grundsteuer: x.grundsteuer || 0, entgelte: x.entgelte || 0 }; });

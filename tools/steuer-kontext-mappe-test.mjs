@@ -108,7 +108,7 @@ async function bild(name, w) {
   await breite(w, w < 600 ? 844 : 900); await schlaf(900);
   const m = await ev(`const d = document.documentElement; let klein = 99, raus = 0;
     document.querySelectorAll('body *').forEach(e => { const r = e.getBoundingClientRect(); if (!r.width || !r.height) return; const cs = getComputedStyle(e); if (cs.visibility === 'hidden' || cs.display === 'none') return;
-      if (e.childNodes.length && [...e.childNodes].some(c => c.nodeType === 3 && c.textContent.trim())) { const f = parseFloat(cs.fontSize); if (f < klein && r.right > 0 && r.left < innerWidth) klein = f; }
+      if (e.childNodes.length && [...e.childNodes].some(c => c.nodeType === 3 && c.textContent.trim())) { const f = parseFloat(cs.fontSize); if (f > 0 && f < klein && r.right > 0 && r.left < innerWidth) klein = f;   /* 0 px = bewusst ausgeblendeter Wert (nicht freigegeben) */ }
       if (r.right > innerWidth + 1 && cs.position !== 'fixed' && !e.closest('[style*="overflow"],.pk-st-wrap,.tl-scroll,table')) raus++; });
     return { sw: d.scrollWidth, cw: d.clientWidth, klein, raus };`);
   const s = await cdp('Page.captureScreenshot', { format: 'png' });
@@ -219,7 +219,7 @@ async function bild(name, w) {
     await ev(`const d = document.getElementById('dppk-dlg'); if (d) d.remove(); return 1;`);
     const hub = await ev(`if (!window.DpPartnerKunden || !DpPartnerKunden._kundeDialog) return 'kein Zugriff'; await DpPartnerKunden._kundeDialog(${JSON.stringify(T.client_id)}); await new Promise(r => setTimeout(r, 1500));
       const box = document.getElementById('dppk-hub-kunde'); if (!box) return 'kein Fenster'; box._zeigen(1); await new Promise(r => setTimeout(r, 300));
-      const t = box.querySelector('[data-pk-steuer]'); return t ? t.textContent.slice(0, 400) : 'kein Reiter';`);
+      const t = box.querySelector('[data-pk-steuer]'); return t ? t.textContent.slice(0, 4000) : 'kein Reiter';`);
     ok('Reiter Steuer im Kundenfenster zeigt Zeiträume, Gesellschaft, Überführungen und Fassungen', typeof hub === 'string' && /Steuerzeiträume/.test(hub) && /Muster Immobilien GmbH/.test(hub), hub);
     if (typeof hub === 'string' && /Steuerzeiträume/.test(hub)) for (const w of [1440, 390]) { const m = await bild('reiter-steuer', w); ok('Messkabine Reiter Steuer ' + w, m.sw <= m.cw + 1 && m.klein >= 8.5, m); }
   } catch (e) { ok('Lauf', false, e.message); }

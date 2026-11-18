@@ -1122,15 +1122,17 @@
           + (ges.length ? 'Privatvermögen und Gesellschaften sind getrennte Steuersubjekte und werden nicht zusammengezählt. ' : '') + 'Keine Steuererklärung und keine Steuerberatung.</p>'));
         return B.dokument(gesMappe ? 'Steuer-Mappe ' + (gesName || 'Gesellschaft') + ' ' + jahr : 'Steuer-Mappe ' + jahr, S);
         };
-        /* v3701 · G-05: vor dem Bau die Steuerreihe je Gesellschaft holen (nicht im Kundenkontext: dort fehlen die Daten der
-           Gesellschaft des Kunden noch, dann bleibt die bisherige Anzeige je Objekt) */
+        /* v3701 · G-05: vor dem Bau die Steuerreihe je Gesellschaft holen. v3700 · P2: im Kundenkontext die Gesellschaft DES
+           KUNDEN (seine weitergefuehrten Objekte, sein Steuerprofil), damit die Mappe beim Partner Zahl fuer Zahl der des Kunden gleicht */
         var _gesH = [];
-        if (!kunde && window.DpGesSteuer) objs.forEach(function (oo) {
+        var _imK = function (f) { return (kunde && window.DpSteuerKontext) ? DpSteuerKontext.mit(prof, f, { kunde: sp.kunde, kundennummer: sp.kundennummer, client_id: kunde, profil_id: sp.aktuell.id, fassung: sp.aktuell.fassung, stand_am: sp.aktuell.zuletzt_am }) : f(); };
+        if (window.DpGesSteuer) _imK(function () { objs.forEach(function (oo) {
           var dd = (oo && (oo.object || oo) && (oo.object || oo).data) || {}, h = String(dd.halter || 'privat');
           try { var mm = h !== 'privat' && window.DealPilotMandanten ? DealPilotMandanten.get(h) : null; if (mm && mm.id === h && DealPilotMandanten.isCorp(mm.rechtsform) && _gesH.indexOf(h) < 0) _gesH.push(h); } catch (eH) {}
-        });
-        if (_gesH.length) return Promise.all(_gesH.map(function (h) { return DpGesSteuer.reihe(h, jahr).then(function (r) { if (r) gesSt[h] = r; }).catch(function () {}); })).then(function () { return bauen(); });
-        return (kunde && window.DpSteuerKontext) ? DpSteuerKontext.mit(prof, bauen, { kunde: sp.kunde, kundennummer: sp.kundennummer, client_id: kunde, profil_id: sp.aktuell.id, fassung: sp.aktuell.fassung, stand_am: sp.aktuell.zuletzt_am }) : bauen();
+        }); });
+        var _gOpt = kunde ? { kunde: kunde, profil: prof } : undefined;
+        if (_gesH.length) return Promise.all(_gesH.map(function (h) { return DpGesSteuer.reihe(h, jahr, _gOpt).then(function (r) { if (r) gesSt[h] = r; }).catch(function () {}); })).then(function () { return _imK(bauen); });
+        return _imK(bauen);
       });
     });
   }
