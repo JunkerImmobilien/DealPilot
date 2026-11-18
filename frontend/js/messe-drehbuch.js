@@ -7361,12 +7361,12 @@
         await warteAuf(function () { return !q('#mfh-modal'); }, 5000);
         kegelHoch(false);
         await kmPause(1500);
-        reiter('s1'); await kmPause(1300);
+        reiter('s2'); await kmPause(1300);   /* v3710: die Karte Mieterhöhung und Zielbild steht im Reiter Miete */
         var zbf = function () { var e = document.getElementById('zb_soll_qm'); return e && e.offsetWidth ? (e.closest('.card') || e.closest('.f')) : null; };
         if (zbf()) {
           await zeigeGruppe(feldVon('zb_fertig_jahr'), feldVon('zb_ziel_wann'), 8);
-          await kmSag(s, 'Im Reiter Investition', 'Zielbild <b>' + (wert('zb_fertig_jahr') || KM.zbJahr) + '</b>: Soll-Miete ' + (wert('zb_soll_qm') || '–') + ' €/m², Zielmiete <b>' + (wert('zb_ziel_qm') || '–') + ' €/m²</b>.',
-            'Im Reiter Investition steht das Zielbild zusammengefasst: das Jahr ' + (wert('zb_fertig_jahr') || KM.zbJahr) + ', die Soll-Miete und die Zielmiete im Schnitt des Hauses.', null,
+          await kmSag(s, 'Im Reiter Miete', 'Zielbild <b>' + (wert('zb_fertig_jahr') || KM.zbJahr) + '</b>: Soll-Miete ' + (wert('zb_soll_qm') || '–') + ' €/m², Zielmiete <b>' + (wert('zb_ziel_qm') || '–') + ' €/m²</b>.',
+            'Im Reiter Miete steht das Zielbild zusammengefasst: das Jahr ' + (wert('zb_fertig_jahr') || KM.zbJahr) + ', die Soll-Miete und die Zielmiete im Schnitt des Hauses.', null,
             { was: 'Nichts — die Zusammenfassung aus den Wohnungen.', warum: 'Ein Blick auf den ganzen Plan.', folge: 'Pilot-Analyse und Bank-PDF zeigen Ist, Soll und Zielbild.' });
         }
       },

@@ -343,8 +343,15 @@ function felderAusHtml(html, ids) {
        eine Schleife sagt, was sie meint, ein Lookahead nicht. */
     const vor = html.slice(Math.max(0, m.index - 1200), m.index);
     const re2 = /<label[^>]*>([\s\S]*?)<\/label>/gi;
-    let lab = null, treffer;
-    while ((treffer = re2.exec(vor))) lab = treffer[1];
+    let lab = null, treffer, labEnde = -1;
+    while ((treffer = re2.exec(vor))) { lab = treffer[1]; labEnde = treffer.index + treffer[0].length; }
+    /* v3710 · steht NAEHER am Feld eine Zeile .ass-l (Prognose-Annahmen), gilt sie - sonst griff wertstg/kostenstg
+       das Label einer Karte darueber ab (gemessen: kostenstg hiess nach dem Umzug der Zielbild-Karte „Zielbild ab wann“). */
+    {
+      const re4 = /<span[^>]*class="[^"]*\bass-l\b[^"]*"[^>]*>/gi; let t4, spAnf = -1;
+      while ((t4 = re4.exec(vor))) spAnf = t4.index;
+      if (spAnf > labEnde && vor.length - spAnf <= 400) lab = null;
+    }
     if (lab) {
       const txt = lab.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
       if (txt) eintrag.label = txt;

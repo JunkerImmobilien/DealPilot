@@ -4657,6 +4657,27 @@ select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%
   color: var(--gold);
   background: color-mix(in srgb, var(--gold) 5%, transparent);
 }
+/* v3710 · Ist-Miete vergangener Jahre direkt in der Tabelle (mietentwicklung.js _bestandTabelle) */
+#me_table_wrap td .me-ist-in {
+  width: 8.5em; max-width: 100%; box-sizing: border-box;
+  font: inherit; text-align: right; padding: 3px 6px;
+  border: 1px solid rgba(128,128,128,.4); border-radius: 5px;
+  background: transparent; color: inherit;
+}
+#me_table_wrap td .me-ist-in::placeholder { color: var(--muted, #7A7370); opacity: .75; }
+#me_table_wrap td .me-ist-eur { margin-left: 4px; }
+#me_table_wrap .me-ist-link { text-align: right; margin-top: 6px; }
+#me_table_wrap .me-ist-alle {
+  background: none; border: 0; padding: 2px 0; cursor: pointer;
+  font: 500 11px/1.3 Inter, system-ui, sans-serif; color: var(--muted, #7A7370);
+  text-decoration: underline; text-underline-offset: 2px;
+}
+#me_table_wrap .me-ist-alle:hover { color: var(--wl-b8932f, #b8932f); }
+#zb-karte .zb-schalter {
+  display: flex; align-items: flex-start; gap: 8px; cursor: pointer;
+  margin: 2px 0 10px; font-size: 13px; line-height: 1.45;
+}
+#zb-karte .zb-schalter input { margin-top: 3px; flex: 0 0 auto; }
 
 /* ═══════════════════════════════════════════════════
    V23: NKM/zE Toggle in Mietentwicklung
@@ -17499,6 +17520,22 @@ html body.hdr-collapsed .tabs-workflow-bar {
 }
 #ki-miete-box .ki-lage-header {
   margin-bottom: 10px;
+}
+/* v3710 · Kopf der Pilot-Mietpreis-Analyse: Zeile 1 Titel | einklappen (klein rechts),
+   Zeile 2 Hauptknopf mit einem Satz daneben (bricht schmal darunter um). */
+#ki-miete-box .ki-lage-header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px 12px;
+}
+#ki-miete-box .ki-lage-header > .ki-lage-title { grid-column: 1; grid-row: 1; flex-wrap: wrap; min-width: 0; }
+#ki-miete-box .ki-lage-header > .kmu-klapp { grid-column: 2; grid-row: 1; align-self: center; }
+#ki-miete-box .ki-lage-header > .kmu-start { grid-column: 1 / -1; grid-row: 2; display: flex; align-items: center; gap: 8px 14px; flex-wrap: wrap; min-width: 0; }
+#ki-miete-box .kmu-start > #ki-miete-btn { flex: 0 0 auto; margin: 0; }
+#ki-miete-box .kmu-start-satz { flex: 1 1 260px; min-width: 0; font-size: 12px; line-height: 1.45; color: var(--muted, #7A7370); }
+@media (max-width: 640px) {
+  #ki-miete-box .kmu-start > #ki-miete-btn { flex: 1 1 100%; justify-content: center; }
 }
 #ki-miete-box .ki-lage-title {
   color: var(--ch, #2A2727);

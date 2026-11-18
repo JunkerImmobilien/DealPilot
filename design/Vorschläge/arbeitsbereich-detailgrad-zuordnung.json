@@ -1,5 +1,5 @@
 {
-  "stand": "2026-11-09",
+  "stand": "2026-11-18",
   "zweck": "Zuordnung Arbeitsbereich zu Detailstufen Einsteiger / Fortgeschritten / Experte. Was hier nicht steht, ist Experte. 'fortgeschritten' listet nur, was zu Einsteiger DAZUKOMMT.",
   "regeln": {
     "karte.art": {
@@ -171,17 +171,6 @@
             "titel": "Inventar",
             "selektor": "#moebl",
             "art": "kind"
-          },
-          {
-            "titel": "Mieterhöhung und Zielbild",
-            "selektor": "#zb-karte",
-            "art": "karte"
-          },
-          {
-            "titel": "Mietleiter ETW/EFH/ZFH (in der Zielbild-Karte)",
-            "selektor": "#zb-leiter",
-            "art": "block",
-            "js": "potenzial.js"
           }
         ],
         "felder": [
@@ -205,14 +194,7 @@
           "san_ausgefuehrt",
           "san_ust",
           "san_tax_years",
-          "moebl",
-          "zb_fertig_jahr",
-          "zb_markt_qm",
-          "zb_vgl_qm",
-          "zb_soll_qm",
-          "zb_soll_ab",
-          "zb_ziel_qm",
-          "zb_ziel_wann"
+          "moebl"
         ]
       }
     },
@@ -277,6 +259,22 @@
           "btj",
           "exit_bmy"
         ]
+      },
+      "experte": {
+        "karten": [
+          {
+            "titel": "Mieterhöhung und Zielbild (v3710: Reiter Miete, ab Experte; Marcel 18.11.2026: erst ab höherer Stufe)",
+            "selektor": "#zb-karte",
+            "art": "karte"
+          },
+          {
+            "titel": "Mietleiter ETW/EFH/ZFH (in der Zielbild-Karte)",
+            "selektor": "#zb-leiter",
+            "art": "block",
+            "js": "potenzial.js"
+          }
+        ],
+        "felder": []
       }
     },
     "s3": {

@@ -197,7 +197,7 @@
     return 'Ziel seit ' + (monatDe(a.gueltig_ab) || '–') + ': ' + aktivTitel() + ' (vorher ' + (vor.titel || 'Zielbild') + ').';
   }
 
-  /* ── Anzeige: Zielbild-Karte (Reiter Investition) ──────────────── */
+  /* ── Anzeige: Zielbild-Karte (Reiter Miete, seit v3710) ─────────── */
   function stil() {
     var d = doc(); if (!d || d.getElementById('dp-zbf-stil') || !d.head) return;
     var s = d.createElement('style'); s.id = 'dp-zbf-stil';
@@ -255,8 +255,10 @@
     stil();
     if (!host) {
       host = doc().createElement('div'); host.id = 'zb-fassungen-host'; host.className = 'dp-zbf';
-      var row = karte.querySelector('.ct-row');
-      if (row && row.parentNode === karte) karte.insertBefore(host, row.nextSibling); else karte.insertBefore(host, karte.firstChild);
+      /* v3710 · in #zb-inhalt, damit der Haken „Zielbild festlegen" die Fassungen mit auf- und zuklappt */
+      var inh = el('zb-inhalt'), row = karte.querySelector('.ct-row');
+      if (inh) inh.insertBefore(host, inh.firstChild);
+      else if (row && row.parentNode === karte) karte.insertBefore(host, row.nextSibling); else karte.insertBefore(host, karte.firstChild);
       host.addEventListener('click', klick);
       host.addEventListener('change', function (ev) {
         var s = ev.target && ev.target.getAttribute ? ev.target.getAttribute('data-zbf-status') : null;

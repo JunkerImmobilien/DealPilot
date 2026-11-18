@@ -35,7 +35,7 @@
 (function (global) {
   'use strict';
   if (global.DpJahresbuch) return;
-  var VERSION = 'v3430';
+  var VERSION = 'v3710';
   var STATUS = [['geplant', 'geplant'], ['erklaert', 'erklärt'], ['bescheid', 'Bescheid']];
 
   function doc() { return global.document || null; }
@@ -311,7 +311,7 @@
       var hin = '';
       if (z.abgleich && z.abgleich.art !== 'gleich') hin += '<div class="dp-jb-h">' + esc(z.abgleich.text) + (z.abgleich.art === 'vorschlag' ? ' <button type="button" class="dp-jb-knopf" data-jb-aktion="av" data-jb-jahr="' + z.jahr + '">übernehmen</button>' : '') + '</div>';
       if (z.ziel_erreicht && z.ziel_fassung && z.ziel_fassung.status !== 'erreicht') hin += '<div class="dp-jb-h dp-jb-ok">Die Ist-Miete ' + z.jahr + ' erreicht das Ziel von ' + esc(z.ziel_titel || 'Zielbild') + '. <button type="button" class="dp-jb-knopf" data-jb-aktion="erreicht" data-jb-fassung="' + esc(z.ziel_fassung.id) + '">als erreicht kennzeichnen</button></div>';
-      else if (z.ziel_erreicht && !z.ziel_fassung) hin += '<div class="dp-jb-h dp-jb-ok">Die Ist-Miete ' + z.jahr + ' erreicht das Ziel des aktiven Zielbilds. Ein neues Zielbild legst du im Reiter Investition an.</div>';
+      else if (z.ziel_erreicht && !z.ziel_fassung) hin += '<div class="dp-jb-h dp-jb-ok">Die Ist-Miete ' + z.jahr + ' erreicht das Ziel des aktiven Zielbilds. Ein neues Zielbild legst du im Reiter Miete an (Karte Mieterhöhung und Zielbild).</div>';
       var oP = function (planW, projW) { return istZahl(planW) ? eur(planW) : (istZahl(projW) ? '<span style="color:#6B645A">' + eur(projW) + '</span><small>Projektion heute</small>' : '–'); };
       var zeile = '<tr data-jb-jahr-zeile="' + z.jahr + '"><td><b>' + z.jahr + '</b>' + (z.jahr === heuteJahr() ? '<small>laufend</small>' : '') + '</td>'
         + '<td>' + oP(z.miete_plan, z.miete_proj) + '</td>'
@@ -430,20 +430,31 @@
     var ov = el('dp-jb-ov');
     if (ov && ov.parentNode) { ov.parentNode.removeChild(ov); speichern(); mountAll(); try { if (global.DpJahresabgleich) global.DpJahresabgleich.mountAll(); } catch (x) {} }
   }
-  /* Einstieg im Reiter Miete (eine Zeile oben), nur im Bestand */
+  /* v3710 · Marcel 18.11.2026: der Einstieg „Ist-Mieten je Jahr" oben im Reiter Miete ist weg. Die Ist-Miete
+     vergangener Jahre steht jetzt als Eingabe in der Tabelle der Mietentwicklung (mietentwicklung.js
+     _bestandTabelle -> istMieteSetzen, dasselbe Feld _jahre[J].nkm_j). Der Plan-Ist-Abgleich gehört in die
+     Pilot-Analyse (DpJahresabgleich). Ein noch stehender Einstieg aus einer offenen Sitzung wird abgeräumt. */
   function einstiege() {
-    var s2 = el('s2'); if (!s2) return;
     var h = el('dp-jb-einstieg-miete');
-    if (!verfuegbar()) { if (h) h.style.display = 'none'; return; }
-    stil();
-    if (!h) {
-      h = doc().createElement('div'); h.id = 'dp-jb-einstieg-miete'; h.className = 'dp-jb-einstieg';
-      h.innerHTML = '<span><b>Ist-Mieten je Jahr</b> · trag ein, was in jedem Jahr wirklich eingenommen wurde, und vergleiche mit dem Plan vom Ankauf.</span>'
-        + '<button type="button" class="btn btn-outline btn-sm" onclick="DpJahresbuch.oeffnen()">Jahre öffnen</button>';
-      s2.insertBefore(h, s2.firstChild);
-    }
-    h.style.display = '';
+    if (h && h.parentNode) h.parentNode.removeChild(h);
   }
+  /** v3710 · Ist-Kaltmiete eines vergangenen Jahres (Tabelle der Mietentwicklung). EINE Stelle: _jahre[J].nkm_j,
+      dasselbe Feld wie „Eigene Jahressumme" im Fenster Jahre. Leer löscht die eigene Angabe. Nur im Bestand und
+      nur für Jahre vor dem laufenden. Fragt bei „erklärt"/„Bescheid" nach (E6). */
+  function istMieteSetzen(jahr, wert) {
+    var y = parseInt(jahr, 10);
+    if (!verfuegbar() || !(y >= 1990) || y >= heuteJahr()) return false;
+    var v = wert === '' || wert == null ? null : zahl(wert);
+    if (v != null && !(v >= 0)) return false;
+    var alt = (jahreDaten()[String(y)] || {}).nkm_j;
+    if ((alt == null ? null : zahl(alt)) === v) return true;
+    if (!aenderungErlaubt(y)) return false;
+    schreiben(y, 'nkm_j', v == null ? '' : Math.round(v * 100) / 100);
+    mountAll();
+    try { if (global.DpJahresabgleich) global.DpJahresabgleich.mountAll(); } catch (x) {}
+    return true;
+  }
+  function istMiete(jahr) { var e = jahreDaten()[String(jahr)]; var v = e ? zahl(e.nkm_j) : null; return istZahl(v) ? v : null; }
   if (global.addEventListener) {
     global.addEventListener('dp:object-ready', function () { _offen = null; mountAll._mbFertig = null; setTimeout(mountAll, 900); });
     global.addEventListener('dp:erhoehungen', function () { setTimeout(mountAll, 100); });
@@ -454,6 +465,7 @@
     VERSION: VERSION, STATUS: STATUS,
     jahreVon: jahreVon, summeEinheiten: summeEinheiten, zeile: zeile, setzen: setzen, nachfragen: nachfragen,
     verfuegbar: verfuegbar, zeilen: zeilen, status: status, statusSetzen: statusSetzen, statusWort: statusWort, aenderungErlaubt: aenderungErlaubt,
+    istMieteSetzen: istMieteSetzen, istMiete: istMiete,   /* v3710 */
     html: html, mountAll: mountAll, oeffnen: oeffnen, schliessen: schliessen, vorbelegen: vorbelegen, mbLaden: mbLaden, aktion: aktion   /* v3430 */
   };
 })(typeof window !== 'undefined' ? window : globalThis);

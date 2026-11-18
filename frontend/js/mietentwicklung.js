@@ -464,21 +464,48 @@ window.MietEntwicklung = (function() {
     var fE = function (n) { return Math.round(n || 0).toLocaleString('de-DE') + ' €'; };
     var bis = Math.max(off + 3, Math.min(btj, off + 6));
     var zeilen = '';
+    /* v3710 · Marcel 18.11.2026: die Ist-Miete vergangener Jahre direkt hier eintragen statt über die Kopfzeile
+       „Ist-Mieten je Jahr". EIN Speicher: DpJahresbuch.istMieteSetzen -> _jahre[J].nkm_j (dasselbe Feld wie im
+       Fenster Jahre). Leer = Vorbelegung grau (die Rechnung aus den Mieterhöhungen). Nur im Bestand; die
+       Projektion rechnet weiter aus den Mieterhöhungen, die Angabe zählt im Jahresabgleich der Pilot-Analyse. */
+    var JB = window.DpJahresbuch, eintragbar = !!(JB && JB.istMieteSetzen && JB.verfuegbar && JB.verfuegbar());
+    var fW = function (n) { return Math.round(n).toLocaleString('de-DE'); };
     for (var i = 0; i < bis; i++) {
       var f = factor(i), cal = by + i, ist = cal < cy;
       var jahr = nkm_m * 12 * f + ze_m * 12 * (inc ? f : 1);   /* wie calc.js _nkmJYear */
       var erh = alle.filter(function (x) { return String(x.datum).slice(0, 4) === String(cal); });
+      var eig = (ist && eintragbar && JB.istMiete) ? JB.istMiete(cal) : null;
+      var zelle = ist && eintragbar
+        ? '<input class="me-ist-in" type="text" inputmode="decimal" data-me-ist-jahr="' + cal + '" value="' + (eig != null ? fW(eig) : '') + '" placeholder="' + fW(jahr) + '" aria-label="Kaltmiete ' + cal + ' laut Kontoauszug (€ im Jahr)" title="Tatsächlich eingenommene Kaltmiete ' + cal + '. Leer: gerechnet aus den Mieterhöhungen (grau)."><span class="me-ist-eur">€</span>'
+        : fE(jahr);
       zeilen += '<tr class="' + (ist ? 'me-row-ist' : (cal === cy ? 'me-row-heute' : 'me-row-plan')) + (erh.length ? ' me-row-hike' : '') + '">'
         + '<td>' + cal + (erh.length ? ' ⬆' : '') + '</td>'
-        + '<td>' + (ist ? 'Ist' : (cal === cy ? 'heute' : 'Plan')) + '</td>'
-        + '<td>' + fE(jahr) + '</td>'
-        + '<td>' + fE(nkm_m * f) + '</td></tr>';
+        + '<td>' + (ist ? (eig != null ? 'Ist · eingetragen' : 'Ist') : (cal === cy ? 'heute' : 'Plan')) + '</td>'
+        + '<td>' + zelle + '</td>'
+        + '<td>' + fE(eig != null ? eig / 12 : nkm_m * f) + '</td></tr>';
     }
     var nE = alle.length;
     wrap.innerHTML = '<div class="me-herkunft">Im Bestand: <b>bis ' + (cy - 1) + ' die echte Miete</b> aus den Mieterhöhungen'
       + (nE ? ' (' + nE + ' eingetragen)' : ' (noch keine eingetragen, gerechnet wird mit der heutigen Miete' + ((document.getElementById('mv_letzte_erhoehung') || {}).value ? ' und der letzten Erhöhung' : '') + ')')
-      + ', <b>ab ' + cy + '</b> die heutige Miete mit der Mietentwicklung fortgeschrieben. Eine Erhöhung trägst du in der Karte Mietvertrag ein.</div>'
-      + '<table><thead><tr><th>Jahr</th><th>Stand</th><th>Kaltmiete im Jahr</th><th>je Monat</th></tr></thead><tbody>' + zeilen + '</tbody></table>';
+      + ', <b>ab ' + cy + '</b> die heutige Miete mit der Mietentwicklung fortgeschrieben. Eine Erhöhung trägst du in der Karte Mietvertrag ein.'
+      + (eintragbar ? ' Was in einem vergangenen Jahr wirklich eingenommen wurde, trägst du direkt in der Tabelle ein; leer bleibt die gerechnete Miete (grau).' : '') + '</div>'
+      + '<table><thead><tr><th>Jahr</th><th>Stand</th><th>Kaltmiete im Jahr</th><th>je Monat</th></tr></thead><tbody>' + zeilen + '</tbody></table>'
+      + (eintragbar ? '<div class="me-ist-link"><button type="button" class="me-ist-alle" data-me-ist-alle="1">alle Angaben je Jahr</button></div>' : '');
+    if (eintragbar && !wrap._dpMeIst) {
+      wrap._dpMeIst = true;
+      wrap.addEventListener('change', function (ev) {
+        var inp = ev.target && ev.target.closest ? ev.target.closest('[data-me-ist-jahr]') : null; if (!inp) return;
+        var J = window.DpJahresbuch; if (!J || !J.istMieteSetzen) return;
+        var ok = J.istMieteSetzen(inp.getAttribute('data-me-ist-jahr'), String(inp.value || '').trim());
+        if (!ok && typeof window.toast === 'function') window.toast('ℹ Die Ist-Miete ' + inp.getAttribute('data-me-ist-jahr') + ' wurde nicht übernommen.');
+        try { _renderTable(); } catch (e) {}
+      });
+      wrap.addEventListener('click', function (ev) {
+        var b = ev.target && ev.target.closest ? ev.target.closest('[data-me-ist-alle]') : null; if (!b) return;
+        ev.preventDefault();
+        try { window.DpJahresbuch.oeffnen(); } catch (e) {}
+      });
+    }
   }
   function _renderTable() {
     var wrap = document.getElementById('me_table_wrap');

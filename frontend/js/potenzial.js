@@ -451,7 +451,7 @@
     ].join('');
     document.head.appendChild(s);
   }
-  /* ETW/EFH/ZFH: die Leiter oben in der Karte „Mieterhöhung und Zielbild" (Tab Investition). */
+  /* ETW/EFH/ZFH: die Leiter oben in der Karte „Mieterhöhung und Zielbild" (Tab Miete seit v3710). */
   function objektLeiter(m) {
     var einzel = el('zb-einzel'); if (!einzel) return;
     var host = el('zb-leiter');
@@ -480,7 +480,7 @@
   function qmDe(x) { return x.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
   function marktSaniert(m) {
     var eig = zahl(wert('zb_markt_qm'));
-    if (eig > 0) return { qm: Math.round(eig * 100) / 100, art: 'eigen', herkunft: 'eigene Angabe: marktübliche Miete nach Modernisierung (Tab Investition)' };
+    if (eig > 0) return { qm: Math.round(eig * 100) / 100, art: 'eigen', herkunft: 'eigene Angabe: marktübliche Miete nach Modernisierung (Tab Miete)' };
     var st = null; try { st = JSON.parse(wert('_mb_state') || 'null'); } catch (e) { st = null; }
     var c = st && st.card, key = window._currentObjKey || null;
     if (!c || !c.mm || (st.fuer && st.fuer.key && key && st.fuer.key !== key)) return null;   /* fremde Karte: kein Wert */
@@ -603,7 +603,7 @@
      Gemessen vorher: die Bremse stand in kappungsgrenzen.json (759 Gemeinden,
      je mit mietpreisbremse_gueltig_bis), aber KEIN Code las sie. Die Kappung
      und die Termine rechnete potenzial.js, sie standen aber nur in der
-     zugeklappten Zielbild-Karte im Tab Investition und im MFH-Fenster als
+     zugeklappten Zielbild-Karte im Tab Miete (seit v3710) und im MFH-Fenster als
      langer Satz — nicht dort, wo der Mietvertrag eingetragen wird.
      Rechnet NICHTS Neues zur Miete: Kappung, Termine und Soll kommen aus
      kappung()/sollFuer() über modell(). Neu ist nur die Bremse (§ 556d Abs. 1
@@ -662,7 +662,7 @@
       u: vglHer + (vBegr ? ' · ' + vBegr : '') + (vHwU.length ? ' · ' + vHwU.join(' · ') : ''),
       warn: vSchaetz || !!(vMs && (vMs.veraltet || vMs.art !== 'qualifiziert' || vMs.genutzt === 'oben')), lang: vHw.join(' · '),
       ms: vMs, quelle_art: vEig ? 'eigen' : (s.vgl_quelle_art || vgO.quelle_art || null) });
-    else z.push({ k: 'Vergleichsmiete', v: 'fehlt', u: 'Mietspiegel der Stadt eintragen (Tab Investition, Karte Mieterhöhung und Zielbild) oder eine belegte Vergleichsmiete', warn: true });
+    else z.push({ k: 'Vergleichsmiete', v: 'fehlt', u: 'Mietspiegel der Stadt eintragen (Tab Miete, Karte Mieterhöhung und Zielbild) oder eine belegte Vergleichsmiete', warn: true });
     /* 2 · Nächste Erhöhung (§ 558) — aus sollFuer, nichts nachgerechnet */
     if (w) {
       var ist = zahl(w.ist), wfl = zahl(w.wfl);
@@ -1134,7 +1134,7 @@
   }
   function objektVgl() {
     var v = zahl(wert('zb_vgl_qm'));
-    if (v > 0) return { qm: v, herkunft: 'eigene Angabe (Tab Investition)', art: 'eigen', quelle_art: 'eigen', hinweise: [] };
+    if (v > 0) return { qm: v, herkunft: 'eigene Angabe (Tab Miete)', art: 'eigen', quelle_art: 'eigen', hinweise: [] };
     var ms = mietspiegelObjekt(), mw = ms ? K.mietspiegelWert(ms, msWahl()) : null;
     if (mw && mw.qm > 0) return { qm: mw.qm, art: 'mietspiegel_' + mw.art, quelle_art: 'mietspiegel_' + mw.art, qualifiziert: mw.qualifiziert,
       mietspiegel: true, ms: mw, herkunft: mw.herkunft, werte: ms.werte || null,   /* v3255 */
@@ -2914,7 +2914,7 @@
     return { miete: s.miete, jahrIndex: Math.max(1, idx) };
   }
 
-  /* ── Tab Objekt: „Mieterhöhung und Zielbild (optional)" ──────────────── */
+  /* ── Tab Miete (v3710): „Mieterhöhung und Zielbild (optional)" ──────────────── */
   /* v3360 · nurWohnung (ETW): nur Gewerke der Wohnung, dazu was schon gewählt ist. Dach, Fassade, Heizung
      und Leitungen laufen bei einer Eigentumswohnung über die Gemeinschaft (Sonderumlage, sonderumlage.js). */
   function chipsHtml(liste, mitPunkte, e, geb, fuerEinheit, fuerHaus, nurWohnung) {
@@ -3006,9 +3006,66 @@
     return zeichne;
   }
 
+  /* v3710 · Marcel 18.11.2026: „Zielbild festlegen" erst per Haken (#zb_aktiv, storage.js FIELDS). Ohne Haken
+     ist von der Karte nur der Kopf mit dem Haken zu sehen; #zb-inhalt (Mietspiegel, Soll-Miete, Zielmiete,
+     Maßnahmen, beim MFH die Summe der Wohnungen, Fassungen) öffnet sich erst damit.
+     NICHTS DARF VERSCHWINDEN: beim Laden ist der Haken gesetzt, wenn er gespeichert ist ODER schon etwas erfasst
+     ist. Wird er bei erfassten Angaben abgewählt, bleiben die Angaben stehen und rechnen weiter - der Hinweis
+     sagt das. Ausblenden ist nur Anzeige (wie beim Detailgrad). */
+  var ZB_ERFASST = ['zb_soll_qm', 'zb_soll_ab', 'zb_vgl_qm', 'zb_ziel_qm', 'zb_ziel_wann', 'zb_massnahmen', 'zb_fertig_jahr', 'zb_markt_qm',
+    'zb_bremse_ausnahme', 'ms_art', 'ms_unten', 'ms_mittel', 'ms_oben', 'ms_stand', 'ms_url', 'ms_wahl'];
+  function zbErfasst() {
+    var ids = ZB_ERFASST.filter(function (id) {
+      var e = el(id); if (!e) return false;
+      if (e.type === 'checkbox') return !!e.checked;
+      var v = String(e.value == null ? '' : e.value).trim();
+      return v !== '' && v !== '[]';
+    });
+    var n = ids.length;
+    try {
+      var E = window._dpMfh && Array.isArray(window._dpMfh.einheiten) ? window._dpMfh.einheiten : [];
+      E.forEach(function (w) {
+        if (!w) return;
+        if (['soll', 'soll_ab', 'ziel_qm', 'ziel_wann', 'vgl_qm'].some(function (k) { return w[k] != null && String(w[k]).trim() !== ''; })
+          || (Array.isArray(w.massnahmen) && w.massnahmen.length)) n++;
+      });
+    } catch (e) {}
+    try { var d = window._currentObjData; if (d && ((Array.isArray(d._zielbilder) && d._zielbilder.length) || (d._zielbild_aktiv && d._zielbild_aktiv.titel))) n++; } catch (e) {}
+    return n;
+  }
+  function zbSchalter(laden) {
+    var cb = el('zb_aktiv'), inhalt = el('zb-inhalt'), hin = el('zb-aktiv-hinweis');
+    if (!cb || !inhalt) return true;
+    var n = zbErfasst();
+    if (laden) {
+      var d = window._currentObjData;
+      cb.checked = !!(d && (d.zb_aktiv === true || d.zb_aktiv === 'true')) || n > 0;
+    }
+    if (!cb._dpZb) {
+      cb._dpZb = true;
+      cb.addEventListener('change', function () {
+        zbSchalter(false);
+        if (cb.checked) { try { objektKarte(); } catch (e) {} }
+        try { if (window.DpSpeichernFolge) window.DpSpeichernFolge(); } catch (e) {}
+      });
+    }
+    inhalt.style.display = cb.checked ? '' : 'none';
+    if (hin) {
+      var zeigen = !cb.checked && n > 0;
+      hin.style.display = zeigen ? '' : 'none';
+      if (zeigen) hin.textContent = 'Eingetragene Angaben bleiben gespeichert und rechnen weiter. Soll das Zielbild nicht gelten, leere die Felder.';
+    }
+    return cb.checked;
+  }
+  window.addEventListener('dp:object-ready', function () {
+    setTimeout(function () { try { zbSchalter(true); } catch (e) {} }, 0);
+    setTimeout(function () { try { zbSchalter(true); } catch (e) {} }, 1200);   /* Wohnungen (_dpMfh) und Fassungen kommen nach */
+  });
+
   var _objListe = null;
   function objektKarte() {
     var karte = el('zb-karte'); if (!karte) return;
+    try { zbSchalter(false); } catch (e) {}   /* v3710 */
     try { if (window.DpZielbildFassungen) window.DpZielbildFassungen.mount(); } catch (e) {}   /* v3361 · Fassungen über der Karte */
     /* v2430b · die Gemeinde gleich holen (Leseroute, kein Kontingent) - sonst
        stand bis zum ersten Rechnen „20 %, Gemeinde noch nicht ermittelt". */
@@ -3320,7 +3377,7 @@
     modell: modell, rechnen: rechnen, ergebnis: ergebnis, ergebnisVeraltet: ergebnisVeraltet,
     wohnungErgebnis: wohnungErgebnis, kennzahlen: kennzahlen, tafelHtml: tafelHtml, pdfDaten: pdfDaten, pilotPayload: pilotPayload,
     brueckeDaten: brueckeDaten, brueckeAchse: brueckeAchse, ueberleitungZeilen: ueberleitungZeilen, STUFE_FARBE: STUFE_FARBE, bewertungKarte: bewertungKarte, bewertungHtml: bewertungHtml, stufenWerte: stufenWerte, KURZ_AUSBLICK: KURZ_AUSBLICK,
-    sollFuerMietentwicklung: sollFuerMietentwicklung, objektKarte: objektKarte,
+    sollFuerMietentwicklung: sollFuerMietentwicklung, objektKarte: objektKarte, zbSchalter: zbSchalter, zbErfasst: zbErfasst,   /* v3710 */
     herkunft: herkunft, herkunftAusDaten: herkunftAusDaten, herkunftHtml: herkunftHtml, leeren: leeren,   /* v2988 */
     indexmieteFuer: indexmieteFuer, indexmieteHtml: indexmieteHtml, indexmieteDaten: indexmieteDaten,   /* v3026 */
     mhTermine: mhTermine, wirksamNachZugang: wirksamNachZugang, TERMIN_REGEL: TERMIN_REGEL, mmjj: mmjj,   /* v3028 */

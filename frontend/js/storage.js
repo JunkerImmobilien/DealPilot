@@ -168,6 +168,7 @@ var FIELDS = [
   /* v2430 · Mieterhoehung und Zielbild am Objekt (ETW/EFH/ZFH; beim MFH je Wohnung in _mfh) */
   'zb_soll_qm','zb_soll_ab','zb_vgl_qm','zb_ziel_qm','zb_ziel_wann','zb_massnahmen','zb_fertig_jahr',   /* v2541 */
   'zb_markt_qm', 'san_ausgefuehrt',   /* v2988 · marktuebliche Miete nach Modernisierung; Sanierung ausgefuehrt am */
+  'zb_aktiv',   /* v3710 · Haken „Zielbild festlegen" (Karte jetzt im Reiter Miete); beim Laden setzt potenzial.js ihn auch, wenn schon etwas erfasst ist */
   'zb_ziel_bremse', 'zb_bremse_ausnahme',   /* v3312 - Zielmiete auf die Mietpreisbremse begrenzt (Merker ein|auf) und Ausnahme 556e/556f - Felder legt potenzial.js an */
   'ms_art', 'ms_unten', 'ms_mittel', 'ms_oben', 'ms_stand', 'ms_url', 'ms_wahl',   /* v3246 · Mietspiegel am Objekt (potenzial.js objektVgl) */
   /* v2087 · Mietvertrag auf OBJEKTEBENE (Backlog N60.8-alt).

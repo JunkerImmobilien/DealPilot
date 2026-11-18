@@ -1,10 +1,10 @@
 {
- "erzeugt_am": "2026-11-18T12:38:14.587Z",
+ "erzeugt_am": "2026-11-18T12:53:55.003Z",
  "quellen": {
   "voice-import": "b85d1194e6f250e3",
   "objektart-felder": "f7d9212555982a97",
-  "storage": "e8dc2d8c59462966",
-  "index-html": "5e738fa759ba9fe2",
+  "storage": "be4c02d529c9eb53",
+  "index-html": "b1cfc858020a67c2",
   "grest": "81f3fb0a4de3a6cf"
  },
  "daten": {
@@ -590,6 +590,7 @@
    "zb_fertig_jahr",
    "zb_markt_qm",
    "san_ausgefuehrt",
+   "zb_aktiv",
    "zb_ziel_bremse",
    "zb_bremse_ausnahme",
    "ms_art",
@@ -1095,12 +1096,12 @@
    {
     "id": "mietstg",
     "kind": "text",
-    "label": "Erhöhung gilt auch für zusätzliche Einnahmen Wenn aktiv, wachsen Stellplatz, Garage und sonstige zusätzliche Einnahmen im selben Verhältnis wie die Nettokaltmiete. Standardmäßig (deaktiviert) bleibt nur die NKM dynamisch — zusätzliche Einnahmen bleiben über alle Jahre konstant."
+    "label": "Mietsteigerung p.a."
    },
    {
     "id": "wertstg",
     "kind": "text",
-    "label": "Entwicklungs-Opportunität DS2"
+    "label": "Wertsteigerung p.a."
    },
    {
     "id": "kostenstg",
@@ -1703,6 +1704,10 @@
     "id": "san_ausgefuehrt",
     "kind": "text",
     "label": "Sanierung ausgeführt am — optional"
+   },
+   {
+    "id": "zb_aktiv",
+    "kind": "bool"
    },
    {
     "id": "ms_art",
@@ -4195,7 +4200,7 @@
      },
      {
       "h": "Die Mietleiter: was geht und wann",
-      "text": "Oben in der Karte Mieterhöhung und Zielbild (Reiter Investition; beim Mehrfamilienhaus je Wohnung unter „Einheiten erfassen“ › Details, Block „Miete — was geht und wann“) steht die Mietleiter, eine Zeile je Schritt:\n\n• Heute — die Ist-Miete, mit Beginn des Mietvertrags.\n• Mieterhöhung — die nächste zulässige Erhöhung mit Betrag, „verlangbar ab“ und „wirksam ab“ und der Grenze, die greift (Vergleichsmiete oder Kappungsgrenze). übernehmen trägt sie als Soll-Miete ein. Bei Staffel- oder Indexmiete steht „nach Vertrag“, ohne Spielraum „kein Spielraum“ mit Grund.\n• Bei Neuvermietung — wo die Mietpreisbremse gilt, die Obergrenze Vergleichsmiete + 10 % (als Zielmiete übernehmbar), sonst „frei“ oder „bitte prüfen“.\n• Zielbild — deine Zielmiete. Liegt sie über der Mietpreisbremse, setzt DealPilot sie auf die Obergrenze (Vergleichsmiete + 10 %) und sagt es in der Zeile: „eingetragen … → …“. Höher geht nur mit höherer Vormiete (§ 556e BGB) oder bei der ersten Vermietung nach umfassender Modernisierung (§ 556f BGB) — dann im Feld „Ausnahme Mietpreisbremse“ eintragen, und die Zielmiete bleibt stehen.\n\nDarüber zeigen Balken Ist, nach Mieterhöhung und Zielbild. Gerechnet wird nur, was das Mietrecht erlaubt — die Angebotsmiete ist nie die Bestandsmiete."
+      "text": "Oben in der Karte Mieterhöhung und Zielbild (Reiter Miete, unter der Mietentwicklung, Haken „Zielbild festlegen“; beim Mehrfamilienhaus je Wohnung unter „Einheiten erfassen“ › Details, Block „Miete — was geht und wann“) steht die Mietleiter, eine Zeile je Schritt:\n\n• Heute — die Ist-Miete, mit Beginn des Mietvertrags.\n• Mieterhöhung — die nächste zulässige Erhöhung mit Betrag, „verlangbar ab“ und „wirksam ab“ und der Grenze, die greift (Vergleichsmiete oder Kappungsgrenze). übernehmen trägt sie als Soll-Miete ein. Bei Staffel- oder Indexmiete steht „nach Vertrag“, ohne Spielraum „kein Spielraum“ mit Grund.\n• Bei Neuvermietung — wo die Mietpreisbremse gilt, die Obergrenze Vergleichsmiete + 10 % (als Zielmiete übernehmbar), sonst „frei“ oder „bitte prüfen“.\n• Zielbild — deine Zielmiete. Liegt sie über der Mietpreisbremse, setzt DealPilot sie auf die Obergrenze (Vergleichsmiete + 10 %) und sagt es in der Zeile: „eingetragen … → …“. Höher geht nur mit höherer Vormiete (§ 556e BGB) oder bei der ersten Vermietung nach umfassender Modernisierung (§ 556f BGB) — dann im Feld „Ausnahme Mietpreisbremse“ eintragen, und die Zielmiete bleibt stehen.\n\nDarüber zeigen Balken Ist, nach Mieterhöhung und Zielbild. Gerechnet wird nur, was das Mietrecht erlaubt — die Angebotsmiete ist nie die Bestandsmiete."
      },
      {
       "h": "Mietrecht an dieser Adresse",
@@ -4207,7 +4212,7 @@
      },
      {
       "h": "Schritt für Schritt: ein Zielbild anlegen",
-      "text": "So legst du bei Eigentumswohnung, Einfamilien-, Doppel- oder Reihenhaus ein Zielbild an. Beim Zwei- und Mehrfamilienhaus steht das Zielbild je Wohnung (Abschnitt darunter). Sind dort noch keine Einheiten erfasst, sagt es die Karte und führt mit Einheiten erfassen hin.\n\n1. Objekt öffnen, Reiter Investition, Karte Mieterhöhung und Zielbild (optional) aufklappen.\n2. Vergleichsmiete (€/m²) eintragen, wenn du den Mietspiegel kennst — leer nimmt DealPilot die Marktmiete aus dem Reiter Miete.\n3. Soll-Miete (Mieter bleibt, €/m²) leer lassen: Darunter steht „DealPilot rechnet vor: …“ mit Begründung. Eine eigene Zahl überschreibt den Vorschlag. Soll erreichbar ab ist ohne Angabe 15 Monate nach der letzten Erhöhung.\n4. Zielmiete (€/m²) eintragen — was nach Umbau oder bei einem neuen Mieter erzielbar ist — und unter Zielbild ab wann den Anlass, z. B. „bei Mieterwechsel“.\n5. Unter Maßnahmen die Chips anklicken, die du planst, und je Maßnahme die Kosten € eintragen. Bei einer Eigentumswohnung stehen nur die Gewerke der Wohnung zur Wahl. Dach, Fassade, Heizung und Leitungen gehören zum Gemeinschaftseigentum, deinen Anteil trägst du als Sonderumlage der WEG im Reiter Bewirtschaftung ein.\n6. Wird mit Mieter in der Wohnung modernisiert: Haken Mieter bleibt drin — Kosten auf die Miete umlegen und, falls ein Teil ohnehin fällige Reparatur ist, davon Erhaltung %.\n7. Zielbild fertig (Jahr) eintragen, damit Pilot-Analyse und PDF ein Jahr nennen (leer = offen).\n\nUnter der Karte steht sofort die Summe: Ist, Mieterhöhung und Zielbild je Monat, die Maßnahmenkosten und die gewonnenen Modernisierungspunkte. DealPilot speichert die Angaben mit dem Objekt."
+      "text": "So legst du bei Eigentumswohnung, Einfamilien-, Doppel- oder Reihenhaus ein Zielbild an. Beim Zwei- und Mehrfamilienhaus steht das Zielbild je Wohnung (Abschnitt darunter). Sind dort noch keine Einheiten erfasst, sagt es die Karte und führt mit Einheiten erfassen hin.\n\n1. Objekt öffnen, Reiter Miete, Karte Mieterhöhung und Zielbild (optional) (Detailgrad Experte) aufklappen und den Haken Zielbild festlegen setzen. Erst dann öffnet sich die Karte zur Eingabe; ist schon etwas erfasst, ist der Haken gesetzt.\n2. Vergleichsmiete (€/m²) eintragen, wenn du den Mietspiegel kennst — leer nimmt DealPilot die Marktmiete aus dem Reiter Miete.\n3. Soll-Miete (Mieter bleibt, €/m²) leer lassen: Darunter steht „DealPilot rechnet vor: …“ mit Begründung. Eine eigene Zahl überschreibt den Vorschlag. Soll erreichbar ab ist ohne Angabe 15 Monate nach der letzten Erhöhung.\n4. Zielmiete (€/m²) eintragen — was nach Umbau oder bei einem neuen Mieter erzielbar ist — und unter Zielbild ab wann den Anlass, z. B. „bei Mieterwechsel“.\n5. Unter Maßnahmen die Chips anklicken, die du planst, und je Maßnahme die Kosten € eintragen. Bei einer Eigentumswohnung stehen nur die Gewerke der Wohnung zur Wahl. Dach, Fassade, Heizung und Leitungen gehören zum Gemeinschaftseigentum, deinen Anteil trägst du als Sonderumlage der WEG im Reiter Bewirtschaftung ein.\n6. Wird mit Mieter in der Wohnung modernisiert: Haken Mieter bleibt drin — Kosten auf die Miete umlegen und, falls ein Teil ohnehin fällige Reparatur ist, davon Erhaltung %.\n7. Zielbild fertig (Jahr) eintragen, damit Pilot-Analyse und PDF ein Jahr nennen (leer = offen).\n\nUnter der Karte steht sofort die Summe: Ist, Mieterhöhung und Zielbild je Monat, die Maßnahmenkosten und die gewonnenen Modernisierungspunkte. DealPilot speichert die Angaben mit dem Objekt."
      },
      {
       "h": "Maßnahmen: Kosten und Modernisierungspunkte",
@@ -4215,7 +4220,7 @@
      },
      {
       "h": "Beim Zwei- und Mehrfamilienhaus: je Wohnung",
-      "text": "Beim Zwei- und Mehrfamilienhaus trägst du alles je Wohnung ein; die Karte im Reiter Investition zeigt dann nur die Summe aus den Wohnungen.\n\n1. Im Reiter Objekt unter der Wohnfläche Einheiten erfassen öffnen.\n2. Im Schritt Gebäude den Zustand von Dach, Außenwand, Leitungen und Heizung setzen — er gilt für das ganze Haus. Ist das Haus in Wohnungseigentum aufgeteilt (oder soll es aufgeteilt werden), setzt du im Schritt Einheiten unter der Liste den Haken In Wohnungseigentum aufgeteilt – erst dann erscheinen die Erklärung und das Feld Kosten der Aufteilung (Vorbelegung 1.800 € je Wohnung, schon aufgeteilt: 0). Dort steht auch Zielbild fertig (Jahr).\n3. Ebenfalls im Schritt Gebäude, unter Maßnahmen am ganzen Haus · Zielbild: Dach, Fassade/Dämmung, Fenster, Heizung oder Leitungen für das ganze Haus anklicken und die Kosten € eintragen (bei Modernisierung mit Mietern: Mieter bleibt drin — Kosten auf die Miete umlegen). Der Zustand darüber ist heute, die Maßnahme ist das Ziel. Die Kosten werden nach Wohnfläche auf die Wohnungen verteilt, die Modernisierungspunkte gelten für jede Wohnung — je Gewerk nur einmal, auch wenn eine Wohnung selbst schon etwas am selben Gewerk hat (z. B. Elektrik neben Leitungen). In den Details einer Wohnung steht der Anteil unter „davon Anteil Haus“.\n4. In der Liste bei jeder Wohnung Details: Mietvertrag, Soll-Miete, Zielbild · nach Umbau mit Zielmiete und den Maßnahmen dieser Wohnung (Bad, Fenster, Böden, Grundriss, Elektrik, Renovierung, Küche, Sonstiges) und der Ertragswert der Wohnung.\n5. Leer stehende Wohnungen oder Wohnungen ohne Ist-Miete bekommen keine Soll-Miete — sie gehen direkt ins Zielbild.\n6. Mit Übernehmen schließen."
+      "text": "Beim Zwei- und Mehrfamilienhaus trägst du alles je Wohnung ein; die Karte im Reiter Miete zeigt dann nur die Summe aus den Wohnungen.\n\n1. Im Reiter Objekt unter der Wohnfläche Einheiten erfassen öffnen.\n2. Im Schritt Gebäude den Zustand von Dach, Außenwand, Leitungen und Heizung setzen — er gilt für das ganze Haus. Ist das Haus in Wohnungseigentum aufgeteilt (oder soll es aufgeteilt werden), setzt du im Schritt Einheiten unter der Liste den Haken In Wohnungseigentum aufgeteilt – erst dann erscheinen die Erklärung und das Feld Kosten der Aufteilung (Vorbelegung 1.800 € je Wohnung, schon aufgeteilt: 0). Dort steht auch Zielbild fertig (Jahr).\n3. Ebenfalls im Schritt Gebäude, unter Maßnahmen am ganzen Haus · Zielbild: Dach, Fassade/Dämmung, Fenster, Heizung oder Leitungen für das ganze Haus anklicken und die Kosten € eintragen (bei Modernisierung mit Mietern: Mieter bleibt drin — Kosten auf die Miete umlegen). Der Zustand darüber ist heute, die Maßnahme ist das Ziel. Die Kosten werden nach Wohnfläche auf die Wohnungen verteilt, die Modernisierungspunkte gelten für jede Wohnung — je Gewerk nur einmal, auch wenn eine Wohnung selbst schon etwas am selben Gewerk hat (z. B. Elektrik neben Leitungen). In den Details einer Wohnung steht der Anteil unter „davon Anteil Haus“.\n4. In der Liste bei jeder Wohnung Details: Mietvertrag, Soll-Miete, Zielbild · nach Umbau mit Zielmiete und den Maßnahmen dieser Wohnung (Bad, Fenster, Böden, Grundriss, Elektrik, Renovierung, Küche, Sonstiges) und der Ertragswert der Wohnung.\n5. Leer stehende Wohnungen oder Wohnungen ohne Ist-Miete bekommen keine Soll-Miete — sie gehen direkt ins Zielbild.\n6. Mit Übernehmen schließen."
      },
      {
       "h": "Ertragswerte rechnen — kostenlos",
@@ -4231,7 +4236,7 @@
      },
      {
       "h": "Zielbild neu fassen: frühere Zielbilder bleiben",
-      "text": "Ein Zielbild ist kein einmaliger Entwurf. Im Reiter Investition steht über der Karte Mieterhöhung und Zielbild das aktive Zielbild mit dem Tag, seit dem es gilt.\n\n1. Neues Zielbild anklicken.\n2. Den Tag wählen, ab dem das neue Zielbild gilt (heute oder früher, nie in der Zukunft), und ihm einen Namen geben, zum Beispiel „Zielbild 2029“. Eine Notiz zur alten Fassung ist möglich.\n3. Ablegen und neues Zielbild beginnen. Das bisherige Zielbild liegt jetzt unter Frühere Fassungen, mit Zielmiete, Maßnahmen, Ertragswert und Zieljahr von damals. Die Felder bleiben stehen, du änderst sie für das neue Ziel.\n\nJede Fassung trägt einen Status: abgelöst, erreicht oder verworfen. Den setzt du selbst, DealPilot schlägt „erreicht“ im Jahresbuch vor, wenn die eingetragene Ist-Miete das Ziel erreicht. Auch Zielbild leeren legt das bisherige Zielbild vorher als Fassung ab.\n\nFrühere Fassungen werden nie nachgerechnet. In der Pilot-Analyse unter Ankauf · Bestand · Zielbild wählst du eine Fassung und siehst sie neben der aktiven. Die Zielerreichung misst gegen das aktive Zielbild, die Jahresstände und das Jahresbuch behalten das Ziel ihres Jahres."
+      "text": "Ein Zielbild ist kein einmaliger Entwurf. Im Reiter Miete steht oben in der Karte Mieterhöhung und Zielbild das aktive Zielbild mit dem Tag, seit dem es gilt.\n\n1. Neues Zielbild anklicken.\n2. Den Tag wählen, ab dem das neue Zielbild gilt (heute oder früher, nie in der Zukunft), und ihm einen Namen geben, zum Beispiel „Zielbild 2029“. Eine Notiz zur alten Fassung ist möglich.\n3. Ablegen und neues Zielbild beginnen. Das bisherige Zielbild liegt jetzt unter Frühere Fassungen, mit Zielmiete, Maßnahmen, Ertragswert und Zieljahr von damals. Die Felder bleiben stehen, du änderst sie für das neue Ziel.\n\nJede Fassung trägt einen Status: abgelöst, erreicht oder verworfen. Den setzt du selbst, DealPilot schlägt „erreicht“ im Jahresbuch vor, wenn die eingetragene Ist-Miete das Ziel erreicht. Auch Zielbild leeren legt das bisherige Zielbild vorher als Fassung ab.\n\nFrühere Fassungen werden nie nachgerechnet. In der Pilot-Analyse unter Ankauf · Bestand · Zielbild wählst du eine Fassung und siehst sie neben der aktiven. Die Zielerreichung misst gegen das aktive Zielbild, die Jahresstände und das Jahresbuch behalten das Ziel ihres Jahres."
      },
      {
       "h": "Mieterhöhungen als Liste",
@@ -4243,7 +4248,7 @@
      },
      {
       "h": "Wo du es einträgst",
-      "text": "Bei ETW, EFH, Doppel- und Reihenhaus im Reiter Investition, Karte „Mieterhöhung und Zielbild (optional)“. Beim Zwei- und Mehrfamilienhaus je Wohnung: „Einheiten erfassen“ → in der Liste Details → Blöcke Mietvertrag, Soll-Miete, Zielbild und Ertragswert. Die Karte im Reiter Objekt zeigt dann nur die Summe aus den Wohnungen. Eingetragen wird im laufenden Objekt (Bestand), nicht im eingefrorenen Ankauf-Stand. Auch die geführte Eingabe und die Spracheingabe fragen freiwillig danach."
+      "text": "Bei ETW, EFH, Doppel- und Reihenhaus im Reiter Miete, Karte „Mieterhöhung und Zielbild (optional)“, Haken „Zielbild festlegen“. Beim Zwei- und Mehrfamilienhaus je Wohnung: „Einheiten erfassen“ → in der Liste Details → Blöcke Mietvertrag, Soll-Miete, Zielbild und Ertragswert. Die Karte im Reiter Miete zeigt dann nur die Summe aus den Wohnungen. Eingetragen wird im laufenden Objekt (Bestand), nicht im eingefrorenen Ankauf-Stand. Auch die geführte Eingabe und die Spracheingabe fragen freiwillig danach."
      },
      {
       "h": "Wie DealPilot die Soll-Miete vorrechnet",
@@ -5622,7 +5627,7 @@
   }
  },
  "inhalt": {
-  "hilfe": "409743077f820db2",
+  "hilfe": "7e45e40f7303310d",
   "bewertung": "ce4f5980fbae015d"
  }
 }

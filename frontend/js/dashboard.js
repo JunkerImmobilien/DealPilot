@@ -1255,7 +1255,7 @@
       + '. <b>„neu rechnen ↻“</b> an jedem Objekt öffnet es, rechnet die Ertragswerte je Stufe <b>kostenlos</b> neu (kein Kontingent) und speichert; danach das Cockpit wieder öffnen. Dasselbe geschieht im Objekt unter <i>Bewertung › Wert &amp; Zielbild</i>. Kostenpflichtig (ein Kontingent) ist nur ein neuer Marktbericht.</p>';
     if (!nMit) {
       host.innerHTML = '<div class="cpk zb-card">' + kopf
-        + '<p class="zb-text">Für keines der ' + A.n + ' Objekte sind Mieterhöhung oder Zielbild erfasst. Eintragen lässt es sich im Objekt im Reiter Objekt, Karte „Mieterhöhung und Zielbild“.</p>'
+        + '<p class="zb-text">Für keines der ' + A.n + ' Objekte sind Mieterhöhung oder Zielbild erfasst. Eintragen lässt es sich im Objekt im Reiter Miete, Karte „Mieterhöhung und Zielbild“.</p>'
         + gruendeHtml + unvHtml + det('wie', 'Wie wird gerechnet?', neuSatz) + '</div>';
       return;
     }
@@ -1543,7 +1543,7 @@
         A.nZiel + ' von ' + A.n + ' Objekten mit Zielbild' + (A.nMh ? ', ' + A.nMh + ' nur mit Mieterhöhung' : '') + '.'
           + (A.ewN ? (A.zuw >= 0 ? ' Die Maßnahmen bringen mehr Wert, als sie kosten.' : ' Die Maßnahmen kosten mehr, als sie an Ertragswert bringen.') : '') + ' Ein Ausblick, kein Verkehrswert.');
     } else {
-      k3 = karte(3, 'Bestand → Zielbild', 'zielbild', '<div class="ke2-leer">Noch kein Zielbild erfasst.</div>', 'Mieterhöhung und Zielbild trägst du im Objekt unter Bewertung ein – dann steht hier, was dein Bestand kann.');
+      k3 = karte(3, 'Bestand → Zielbild', 'zielbild', '<div class="ke2-leer">Noch kein Zielbild erfasst.</div>', 'Mieterhöhung und Zielbild trägst du im Objekt im Reiter Miete ein – dann steht hier, was dein Bestand kann.');
     }
 
     /* 4 · Steuer & Ausblick */

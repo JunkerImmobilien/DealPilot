@@ -1,10 +1,10 @@
 /* frontend/js/data/detailgrad-zuordnung.js — ERZEUGT, nicht von Hand ändern.
-   Quelle: design/Vorschläge/arbeitsbereich-detailgrad-zuordnung.json (Stand 2026-11-09)
+   Quelle: design/Vorschläge/arbeitsbereich-detailgrad-zuordnung.json (Stand 2026-11-18)
    Neu erzeugen: node tools/detailgrad-pruefen.mjs --schreiben
    Je Reiter und Stufe (1 Einsteiger · 2 Fortgeschritten · 3 Experte): Karten/Bereiche und Feld-ids,
    die AB dieser Stufe erscheinen. Was nicht gelistet ist, ist Experte. Leser: js/detailgrad.js. */
 window.DpDetailgradZuordnung = {
- "stand": "2026-11-09",
+ "stand": "2026-11-18",
  "reiter": {
   "s0": {
    "1": {
@@ -163,17 +163,6 @@ window.DpDetailgradZuordnung = {
       "s": "#moebl",
       "art": "kind",
       "titel": "Inventar"
-     },
-     {
-      "s": "#zb-karte",
-      "art": "karte",
-      "titel": "Mieterhöhung und Zielbild"
-     },
-     {
-      "s": "#zb-leiter",
-      "art": "block",
-      "js": "potenzial.js",
-      "titel": "Mietleiter ETW/EFH/ZFH (in der Zielbild-Karte)"
      }
     ],
     "felder": [
@@ -197,14 +186,7 @@ window.DpDetailgradZuordnung = {
      "san_ausgefuehrt",
      "san_ust",
      "san_tax_years",
-     "moebl",
-     "zb_fertig_jahr",
-     "zb_markt_qm",
-     "zb_vgl_qm",
-     "zb_soll_qm",
-     "zb_soll_ab",
-     "zb_ziel_qm",
-     "zb_ziel_wann"
+     "moebl"
     ]
    }
   },
@@ -269,6 +251,22 @@ window.DpDetailgradZuordnung = {
      "btj",
      "exit_bmy"
     ]
+   },
+   "3": {
+    "karten": [
+     {
+      "s": "#zb-karte",
+      "art": "karte",
+      "titel": "Mieterhöhung und Zielbild (v3710: Reiter Miete, ab Experte; Marcel 18.11.2026: erst ab höherer Stufe)"
+     },
+     {
+      "s": "#zb-leiter",
+      "art": "block",
+      "js": "potenzial.js",
+      "titel": "Mietleiter ETW/EFH/ZFH (in der Zielbild-Karte)"
+     }
+    ],
+    "felder": []
    }
   },
   "s3": {

@@ -171,7 +171,7 @@
     if (!S) {
       var mfh = false; try { mfh = !!(window.DpMfhEinheiten && window.DpMfhEinheiten.artMitEinheiten && window.DpMfhEinheiten.artMitEinheiten()); } catch (e) {}
       h += karte(kopf('Noch kein Potenzial erfasst') + '<p class="dp-pa-p">Hier steht, was in dem Objekt steckt: die Miete nach Mieterhöhung, das Zielbild nach Modernisierung oder Neuvermietung und – bei einem Haus mit mehreren Wohnungen – die Aufteilung. '
-        + 'Dafür fehlen noch die Soll-Miete und das Zielbild. ' + (mfh ? 'Bei einem Haus mit Einheiten trägst du beides je Wohnung ein (Einheiten erfassen › Details).' : 'Trag sie im Reiter Objekt in der Karte „Mieterhöhung und Zielbild“ ein.') + '</p>'
+        + 'Dafür fehlen noch die Soll-Miete und das Zielbild. ' + (mfh ? 'Bei einem Haus mit Einheiten trägst du beides je Wohnung ein (Einheiten erfassen › Details).' : 'Trag sie im Reiter Miete in der Karte „Mieterhöhung und Zielbild“ ein.') + '</p>'
         + '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">'
         + (mfh ? '<button type="button" class="btn-clean dp-pa4-btn" onclick="try{DpMfhEinheiten.oeffnen(1)}catch(e){}">Einheiten erfassen öffnen</button>' : '')
         + '<button type="button" class="btn-clean dp-pa4-btn leise" onclick="try{switchTab(0)}catch(e){}">Zum Reiter Objekt</button></div>');

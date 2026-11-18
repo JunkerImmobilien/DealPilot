@@ -405,8 +405,8 @@
           '<div class="mfh-feldzeile"><label for="mfh-zbjahr">Zielbild fertig (Jahr)</label>'
           + '<input class="mfh-in mfh-md mfh-in-gross" id="mfh-zbjahr" inputmode="numeric" maxlength="4" style="width:96px" value="' + esc((el('zb_fertig_jahr') && el('zb_fertig_jahr').value) || '') + '" placeholder="z. B. 2028">'
           + '<span class="mfh-leise">für Pilot-Analyse und PDF · leer = offen</span></div>'
-          /* v3361 · Zielbild-Fassungen: abgelegt wird in der Karte im Reiter Investition (gespeicherter Stand, nicht der Arbeitsstand hier) */
-          + (window.DpZielbildFassungen ? '<p class="mfh-leise" style="margin:2px 0 8px">Ein neues Zielbild legst du im Reiter Investition in der Karte <b>Mieterhöhung und Zielbild</b> an. Das bisherige bleibt dann als Fassung lesbar.</p>' : '')
+          /* v3361 · Zielbild-Fassungen: abgelegt wird in der Karte im Reiter Miete (v3710; gespeicherter Stand, nicht der Arbeitsstand hier) */
+          + (window.DpZielbildFassungen ? '<p class="mfh-leise" style="margin:2px 0 8px">Ein neues Zielbild legst du im Reiter Miete in der Karte <b>Mieterhöhung und Zielbild</b> an. Das bisherige bleibt dann als Fassung lesbar.</p>' : '')
           + '<div class="mfh-haus-mass">'
           + intro('Maßnahmen für das ganze Haus (Dach, Fassade, Fenster, Heizung, Leitungen) mit Kosten.',
               'Die Kosten werden nach Wohnfläche auf die Wohnungen verteilt, die Modernisierungspunkte gelten für jede Wohnung. Was eine einzelne Wohnung bekommt (z. B. ihr Bad), steht unter Einheiten › Details.')
@@ -741,7 +741,7 @@
               /* v3244 · Staffel/Index/Gewerbe: die Soll-Miete ist die vertragliche Erhöhung, keine nach § 558 */
               + (so.vertrag ? '<p class="mfh-we-hint">Nach Vertrag (' + esc(P.sollVertrag({ soll: so, ist: ist }).norm) + ') — keine Erhöhung nach § 558 BGB. Die Soll-Miete zählt als vertragliche Erhöhung, nicht als Mieterhöhung bis zur Vergleichsmiete.</p>' : '')
               + (so.hinweise && so.hinweise.length ? '<p class="mfh-we-hint" style="color:#B8625C">Hinweis: ' + esc(so.hinweise.join(', ')) + '.</p>' : '')
-            : '<p class="mfh-we-hint">' + esc((so && so.grund) || 'Keine Soll-Miete.') + ' Eine Vergleichsmiete hier, der Mietspiegel (Tab Investition) oder die Marktmiete im Tab Miete lässt DealPilot vorrechnen.</p>')
+            : '<p class="mfh-we-hint">' + esc((so && so.grund) || 'Keine Soll-Miete.') + ' Eine Vergleichsmiete hier, der Mietspiegel oder die Marktmiete (beides im Tab Miete) lässt DealPilot vorrechnen.</p>')
           /* v3246 · woher die Vergleichsmiete stammt und was für sie gilt (Mietspiegel-Spanne, Vermutungswirkung, Schätzung) */
           + (so && so.vgl_qm > 0 ? '<p class="mfh-we-hint">Vergleichsmiete ' + esc(String(so.vgl_qm.toFixed(2)).replace('.', ',')) + ' €/m² — ' + esc(so.vgl_herkunft || '')
               + (so.vgl_hinweise && so.vgl_hinweise.length ? '<br><span style="color:#B8625C">' + esc(so.vgl_hinweise.join(' · ')) + '</span>' : '') + '</p>' : '')
