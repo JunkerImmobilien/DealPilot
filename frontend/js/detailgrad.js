@@ -199,7 +199,21 @@
         if (!expl.has(el) || L < expl.get(el)) expl.set(el, L);
       });
     });
-    var lvl = function (f) { return (f.id && feldStufe[f.id]) || FELD_FOLGT_BEHAELTER[id] || 3; };
+    /* v3720 · Ein Pflichtfeld einer Stufe ist in dieser Stufe sichtbar. objekt-reiter.js
+       pflichtFuer() kennt die Objektart; gemessen 18.11.2026: beim unbebauten Grundstück
+       (GRST) ist die Grundstücksfläche Pflicht für Stufe 1, stand aber erst ab
+       Fortgeschritten - in Einsteiger ein rotes „fehlt" ohne Feld. */
+    var pflichtStufe = {};
+    try {
+      var OR = window.DealPilotObjektReiter;
+      if (OR && typeof OR.pflichtFuer === 'function') [3, 2, 1].forEach(function (L) {
+        (OR.pflichtFuer(L) || []).forEach(function (pid) { pflichtStufe[pid] = L; });
+      });
+    } catch (e) {}
+    var lvl = function (f) {
+      var L = (f.id && feldStufe[f.id]) || FELD_FOLGT_BEHAELTER[id] || 3;
+      return (f.id && pflichtStufe[f.id] && pflichtStufe[f.id] < L) ? pflichtStufe[f.id] : L;
+    };
     var felder = [].slice.call(sec.querySelectorAll(FELD_SEL)).filter(function (f) { return !f.closest(NIE); });
 
     /* Behälter: jede Karte (und was im Reiter als Karte gilt) plus die
@@ -542,6 +556,10 @@
     if (!b) return;
     e.preventDefault(); e.stopPropagation();
     setzen(parseInt(b.getAttribute('data-dp-dg-setzen'), 10));
+  }, true);
+  /* v3720 · die Objektart ändert die Pflichtfelder (pflichtFuer) - neu markieren */
+  document.addEventListener('change', function (e) {
+    if (e.target && e.target.id === 'objart') spaeter();
   }, true);
   /* Reiterwechsel: frisch eingehängte Karten sofort erfassen */
   document.addEventListener('click', function (e) {
