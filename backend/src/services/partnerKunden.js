@@ -180,7 +180,28 @@ async function kundenbezugNachziehen(rs, clientId) {
 }
 
 /** Einladung: neue Adresse -> Einladungs-Mail (alter Weg); bestehendes Konto -> Anfrage, die der Kunde bestaetigt. */
-async function einladen(rs, actor, b) {
+async function einladen(rs, actor, b, basis) {
+  const r = await einladenOhneMail(rs, actor, b);
+  /* v3680 · Bis v3679 schickte dieser Weg KEINE Mail, weder an eine neue Adresse noch an ein bestehendes Konto,
+     und das Cockpit meldete trotzdem „Einladung gesendet“. Jetzt beide Mails in Partnermarke, mit Kunden-Video.
+     Ein Mailfehler bricht die Einladung nicht ab (sie steht, der Partner sieht sie offen). */
+  let gesendet = false;
+  if (basis) {
+    try {
+      const im = require('./resellerInviteMail');
+      const marke = await im.markeLaden(query, rs.id, basis);
+      const email = String(b.email).trim().toLowerCase(), name = String(b.name).trim(), video = im.videoLink(basis);
+      const app = String(basis).replace(/\/+$/, '');
+      const m = r.art === 'anfrage'
+        ? await im.sendAnfrage({ email, displayName: name, link: app + '/', reseller: marke, video })
+        : await im.sendInvite({ email, displayName: name, link: app + '/?rp_invite=' + encodeURIComponent(r.invite.token), reseller: marke, video });
+      gesendet = !!(m && !m.skipped);
+    } catch (e) { console.error('[partner] einladen-mail:', e.message); }
+  }
+  return Object.assign(r, { mail_gesendet: gesendet });
+}
+
+async function einladenOhneMail(rs, actor, b) {
   const email = String(b && b.email || '').trim().toLowerCase();
   const name = String(b && b.name || '').trim();
   const platz = b && b.platz_mitgeben !== false;

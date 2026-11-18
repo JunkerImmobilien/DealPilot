@@ -38,7 +38,7 @@ partner.post('/kunden/:id/platz', fn(async (req) => {
 }));
 partner.post('/kunden/:id/entzug', fn((req) => pk.platzEntziehen(req.reseller, req.user.id, req.params.id, req.body)));
 partner.post('/kunden/:id/trennen', fn((req) => pk.trennen(req.reseller.id, req.params.id, 'partner')));
-partner.post('/einladen', fn((req) => pk.einladen(req.reseller, req.user.id, req.body)));
+partner.post('/einladen', fn((req) => pk.einladen(req.reseller, req.user.id, req.body, require('../services/resellerInviteMail').basisAus(req))));
 partner.post('/code', fn((req) => pk.codeEinloesen(req.reseller, req.user.id, req.body)));
 partner.post('/anfragen/:id/zurueckziehen', fn((req) => pk.anfrageZurueckziehen(req.reseller, req.params.id)));
 partner.get('/kundenstaende', fn(async (req) => ({ kundenstaende: await pk.kundenstaende(req.reseller) })));
