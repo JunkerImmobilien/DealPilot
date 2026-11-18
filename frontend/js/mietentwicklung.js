@@ -481,7 +481,7 @@ window.MietEntwicklung = (function() {
       zeilen += '<tr class="' + (ist ? 'me-row-ist' : (cal === cy ? 'me-row-heute' : 'me-row-plan')) + (erh.length ? ' me-row-hike' : '') + '">'
         + '<td>' + cal + (erh.length ? ' ⬆' : '') + '</td>'
         + '<td>' + (ist ? (eig != null ? 'Ist · eingetragen' : 'Ist') : (cal === cy ? 'heute' : 'Plan')) + '</td>'
-        + '<td>' + zelle + '</td>'
+        + '<td' + (ist && eintragbar ? ' class="me-ist-td"' : '') + '>' + zelle + '</td>'
         + '<td>' + fE(eig != null ? eig / 12 : nkm_m * f) + '</td></tr>';
     }
     var nE = alle.length;

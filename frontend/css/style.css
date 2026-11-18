@@ -4667,6 +4667,8 @@ select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%
 }
 #me_table_wrap td .me-ist-in::placeholder { color: var(--muted, #7A7370); opacity: .75; }
 #me_table_wrap td .me-ist-eur { margin-left: 4px; }
+#me_table_wrap td.me-ist-td { white-space: nowrap; }
+@media (max-width: 640px) { #me_table_wrap td .me-ist-in { width: 6.2em; } }
 #me_table_wrap .me-ist-link { text-align: right; margin-top: 6px; }
 #me_table_wrap .me-ist-alle {
   background: none !important; border: 0 !important; box-shadow: none !important; padding: 2px 0 !important;
