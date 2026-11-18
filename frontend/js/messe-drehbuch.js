@@ -425,6 +425,9 @@
     await warte(600);
     return true;
   }
+  /* v3730 · gemessen 18.11.: bei „Nicht kaufen“ steht #ai-verdict auf display:none, das Urteil zeigt die Box
+     #qcb-host .qcb-urteil (h4). Kegel auf das, was sichtbar ist. */
+  function qcUrteil() { var v = qcEl('ai-verdict'); if (v && v.getBoundingClientRect().width > 0) return v; var b = qcSel('#qcb-host .qcb-urteil'); return b && b.getBoundingClientRect().width > 0 ? b : v; }
   function qcScore() { return { n: qcText('sb-num'), stufe: qcText('sb-tier'), urteil: qcText('ai-verdict-headline') }; }
   function qcAufraeumen() {
     /* „Neuer Vorgang": löscht den Boarding-Pass, den der Quick-Check beim ersten
@@ -719,10 +722,15 @@
           await warte(4600);
         },
         async function (s) {   /* 7 · Gegen deine Lage: B passt, C kippt das Urteil (v2226) */
-          function lagesatz() { return qcText('ai-opinion').match(/Bruttomietrendite von ([\d,]+ ?%) liegt ([^.]*?) deinem Ziel von ([\d,]+ ?%) für die ([ABC])-Lage/); }
+          /* v3730 · gemessen 18.11.: der Satz steht heute in Pro/Contra („Bruttomietrendite 5,9 % deutlich über deinem Ziel
+             (5,0 % für die B-Lage)“), ai-opinion ist leer. Gruppen wie vorher: 1 Rendite, 2 Lage zum Ziel, 3 Ziel, 4 Lageklasse. */
+          function lagesatz() {
+            var t = [qcText('ai-opinion'), qcText('ai-pros'), qcText('ai-cons')].join(' ');
+            return t.match(/Bruttomietrendite ([\d,]+ ?%) ([^(]*?) deinem Ziel \(([\d,]+ ?%) für die ([ABC])-Lage\)/) || t.match(/Bruttomietrendite von ([\d,]+ ?%) liegt ([^.]*?) deinem Ziel von ([\d,]+ ?%) für die ([ABC])-Lage/);
+          }
           qcSetze('qc_lageklasse', 'B');
           await warte(800);
-          await zeige(function () { return qcEl('ai-verdict'); }, 10);
+          await zeige(qcUrteil, 10);   /* v3730 */
           var lb = lagesatz();
           s.zeile('Gegen deine Lage', 'In der <b>B-Lage</b> verlangst du ' + (lb ? lb[3] : '–') + ' — die Wohnung bringt ' + (lb ? lb[1] : '–') + ': „' + qcText('ai-verdict-headline') + '“.');
           await warte(5200);
@@ -732,7 +740,7 @@
           await warte(1800);
           qcSetze('qc_lageklasse', 'C');
           await warte(1100);
-          await zeige(function () { return qcEl('ai-verdict'); }, 10);
+          await zeige(qcUrteil, 10);   /* v3730 */
           var lc = lagesatz();
           s.zeile('Gegen deine Lage', 'Ganz oben: <b>„' + qcText('ai-verdict-headline') + '“</b>' + (lc ? ' — ' + lc[1] + ' statt deiner ' + lc[3] : '') + '. Der Score bleibt, das Urteil nicht.');
           await warte(6500);
