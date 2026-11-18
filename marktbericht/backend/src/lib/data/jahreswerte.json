@@ -177,16 +177,16 @@
       "id": "gewst_kuerzung_9_1",
       "name": "Einfache Kuerzung § 9 Nr. 1 S. 1 GewStG (Grundbesitz im Betriebsvermoegen)",
       "gruppe": "steuer",
-      "stand": "ab EZ 2025: 0,11 % des Grundsteuerwerts; bis EZ 2024: 1,2 % von 140 % des Einheitswerts",
-      "erwartet": "0.0011,0.012,1.4",
-      "quelle": "§ 9 Nr. 1 S. 1 GewStG i. d. F. des Jahressteuergesetzes 2024; § 121a BewG (140 %)",
+      "stand": "ab EZ 2025: die als Betriebsausgabe erfasste Grundsteuer (Betrag); bis EZ 2024: 1,2 % von 140 % des Einheitswerts",
+      "erwartet": "0.012,1.4",
+      "quelle": "§ 9 Nr. 1 S. 1 GewStG i. d. F. Art. 9 Gesetz vom 02.12.2024 (BGBl. 2024 I Nr. 387), erstmals EZ 2025 nach § 36 Abs. 4b GewStG (gelesen gesetze-im-internet.de 18.11.2026); § 121a BewG (140 %)",
       "turnus": "bei Gesetzesaenderung",
       "faellig_am": "2027-10-01",
       "verfahren": "durchsicht",
       "orte": [
-        { "datei": "frontend/js/ueberfuehrung-kern.js", "bezeichner": "KUERZUNG_9_1", "muster": "KUERZUNG_9_1 = \\{ satzAb2025: ([\\d.]+), satzBis2024: ([\\d.]+), ewFaktor: ([\\d.]+) \\}" }
+        { "datei": "frontend/js/ueberfuehrung-kern.js", "bezeichner": "KUERZUNG_9_1", "muster": "KUERZUNG_9_1 = \\{ satzBis2024: ([\\d.]+), ewFaktor: ([\\d.]+) \\}" }
       ],
-      "hinweis": "v3268: Grundsteuerwert lt. Bescheid ist das Feld grundsteuerwert am Objekt; ohne ihn keine Kuerzung (keine Naeherung - Steuermesszahl und Grundsteuer-Hebesatz fuehrt DealPilot nicht)."
+      "hinweis": "v3684: ab EZ 2025 ist die Grundlage der Grundsteuer-Betrag je Jahr (Feld grundsteuer am Objekt, Reiter Bewirtschaftung); ohne ihn keine Kuerzung. v3268 rechnete faelschlich 0,11 % des Grundsteuerwerts (nie in Kraft getreten)."
     },
     {
       "id": "gewst_hinzurechnung_8_1",
