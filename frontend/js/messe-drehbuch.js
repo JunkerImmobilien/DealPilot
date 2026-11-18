@@ -427,7 +427,7 @@
   }
   /* v3730 · gemessen 18.11.: bei „Nicht kaufen“ steht #ai-verdict auf display:none, das Urteil zeigt die Box
      #qcb-host .qcb-urteil (h4). Kegel auf das, was sichtbar ist. */
-  function qcUrteil() { var v = qcEl('ai-verdict'); if (v && v.getBoundingClientRect().width > 0) return v; var b = qcSel('#qcb-host .qcb-urteil'); return b && b.getBoundingClientRect().width > 0 ? b : v; }
+  function qcUrteilEl() { var v = qcEl('ai-verdict'); if (v && v.getBoundingClientRect().width > 0) return v; var b = qcSel('#qcb-host .qcb-urteil'); return b && b.getBoundingClientRect().width > 0 ? b : v; }
   function qcScore() { return { n: qcText('sb-num'), stufe: qcText('sb-tier'), urteil: qcText('ai-verdict-headline') }; }
   function qcAufraeumen() {
     /* „Neuer Vorgang": löscht den Boarding-Pass, den der Quick-Check beim ersten
@@ -730,7 +730,7 @@
           }
           qcSetze('qc_lageklasse', 'B');
           await warte(800);
-          await zeige(qcUrteil, 10);   /* v3730 */
+          await zeige(qcUrteilEl, 10);   /* v3730 */
           var lb = lagesatz();
           s.zeile('Gegen deine Lage', 'In der <b>B-Lage</b> verlangst du ' + (lb ? lb[3] : '–') + ' — die Wohnung bringt ' + (lb ? lb[1] : '–') + ': „' + qcText('ai-verdict-headline') + '“.');
           await warte(5200);
@@ -740,7 +740,7 @@
           await warte(1800);
           qcSetze('qc_lageklasse', 'C');
           await warte(1100);
-          await zeige(qcUrteil, 10);   /* v3730 */
+          await zeige(qcUrteilEl, 10);   /* v3730 */
           var lc = lagesatz();
           s.zeile('Gegen deine Lage', 'Ganz oben: <b>„' + qcText('ai-verdict-headline') + '“</b>' + (lc ? ' — ' + lc[1] + ' statt deiner ' + lc[3] : '') + '. Der Score bleibt, das Urteil nicht.');
           await warte(6500);
@@ -760,7 +760,9 @@
           await zeige(function () { return qcEl('score-block'); }, 4);
           await warte(900);
           var sc = qcScore();
-          s.zeile('Und wenn die Miete stimmt?', 'Miete ' + eur(MB_KARTE.mm.high) + ': Score <b>' + sc.n + '</b> · ' + sc.stufe + ' — und auch in der C-Lage „' + sc.urteil + '“.');
+          /* v3730 · gemessen 18.11.: auch mit „Oben“ bleibt das Urteil in der C-Lage „Nicht kaufen“ - „und auch“ las sich wie ein Ja */
+          var cNein = /^Nicht kaufen/.test(sc.urteil);
+          s.zeile('Und wenn die Miete stimmt?', 'Miete ' + eur(MB_KARTE.mm.high) + ': Score <b>' + sc.n + '</b> · ' + sc.stufe + (cNein ? '. In der C-Lage bleibt es bei „' + sc.urteil + '“: die Rendite muss zu deinem Ziel passen.' : ' — und auch in der C-Lage „' + sc.urteil + '“.'));
           await warte(5600);
         },
         async function (s) {   /* 8 · Pilot-Analyse (Mitschnitt für genau diesen Stand) */
@@ -896,7 +898,7 @@
           var sc = qcScore();
           s.zeile('Mehr Eigenkapital', 'Score <b>' + sc.n + '</b> · ' + sc.stufe + ' — „' + sc.urteil + '“.');
           await warte(3800);
-          await zeige(function () { return qcEl('ai-verdict'); }, 10);
+          await zeige(qcUrteilEl, 10);   /* v3730 */
           s.zeile('Die Bewertung', 'Unten steht, warum: Rendite, Cashflow, DSCR — und was vor dem Kaufvertrag noch zu prüfen ist.');
           await warte(5200);
         }
