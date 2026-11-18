@@ -97,6 +97,19 @@
       /* Momentaufnahme des Privat-Rechenstands — vor dem Einfrieren */
       serie: (window.State && Array.isArray(State._afaSeries)) ? State._afaSeries.slice() : [],
       cfRows: (window.State && Array.isArray(State.cfRows)) ? State.cfRows.map(function (r) { return { cal: r.cal, rs: r.rs }; }) : [],
+      /* v3686 · Pruefbericht G-18/P-25: aktivierte Sanierung (anschaffungsnahe HK) und ihre AfA je Jahr,
+         Momentaufnahme wie serie - sie gehoeren in die fortgefuehrten AK beim § 23-Gewinn */
+      anah: (function () {
+        try {
+          if (typeof window._computeYearTotal !== 'function' || !window.State || !Array.isArray(State.cfRows)) return { ak: 0, serie: [] };
+          var ak = 0, serie = State.cfRows.map(function (r, i) {
+            var t = window._computeYearTotal(r.cal, i);
+            ak = Math.max(ak, Number(t && t.auto && t.auto._anahAk) || 0);
+            return Number(t && t.values && t.values.anschaffungsnah) || 0;
+          });
+          return { ak: ak, serie: serie };
+        } catch (e) { return { ak: 0, serie: [] }; }
+      })(),
       w: {}   /* Eingaben Schritt 2 */
     };
     _vorbelegen();
@@ -335,6 +348,15 @@
     var akPriv = kp0 > 0 ? kp0 * (1 + nkPct / 100) : null;
     var afaStart = b.wirtschaftlicher_uebergang || b.kaufdat;
     var afaBis = k.afaBisStichtag({ serie: c.serie, kaufdat: afaStart, stichtag: c._stichtag });
+    /* v3686 · G-18/P-25: fortgefuehrte AK = AK + aktivierte nachtraegliche HK - darauf abgezogene AfA
+       (§ 23 Abs. 3 Satz 1 und 4 EStG). Bis v3685 fehlte die aktivierte Sanierung: Bismarckstr. 27
+       (72.000 EUR, AfA 5.040 EUR bis Stichtag) -> Gewinn um 66.960 EUR zu hoch. */
+    var _anah = c.anah || { ak: 0, serie: [] }, _anahAfa = 0;
+    if (akPriv != null && _anah.ak > 0) {
+      _anahAfa = k.afaBisStichtag({ serie: _anah.serie, kaufdat: afaStart, stichtag: c._stichtag }) || 0;
+      akPriv += _anah.ak;
+      if (afaBis != null) afaBis += _anahAfa;
+    }
     r.p23 = k.paragraph23({ art: w.art, kaufpreis: w.kp, verkehrswert: w.vw, kaufdat: b.kaufdat, stichtag: c._stichtag,
                             akPrivat: akPriv, afaBisher: afaBis, weitereGewinne: w.weitere23 });
     if (r.p23.gewinn != null && r.p23.steuerpflichtig) {
@@ -343,7 +365,10 @@
       try { if (window.Tax && typeof Tax.steuerLast === 'function') last = function (z) { return Tax.steuerLast(z, jahr).gesamt; }; } catch (e) {}
       r.st23 = k.steuer23(r.p23.gewinn, { zve: zv, steuerLast: last, grenzPct: _num(b.grenz) });
     }
-    if ((_num(b.san) || 0) > 0) r.warn.push('Sanierungskosten des Privatobjekts (' + _eur(_num(b.san)) + ') sind im § 23-Gewinn nicht berücksichtigt (anschaffungsnahe Herstellungskosten erhöhen die AK, mindern sich aber um ihre AfA) und werden <b>nicht</b> ins Gesellschaftsobjekt übernommen.');
+    /* v3686 · aktivierte Sanierung steht jetzt in den fortgefuehrten AK (oben); Erhaltungsaufwand bleibt draussen */
+    if ((_num(b.san) || 0) > 0) r.warn.push((c.anah && c.anah.ak > 0)
+      ? 'Die aktivierte Sanierung des Privatobjekts (' + _eur(c.anah.ak) + ', anschaffungsnahe Herstellungskosten) steht im § 23-Gewinn in den fortgeführten Anschaffungskosten, abzüglich ihrer AfA. Ins Gesellschaftsobjekt wird sie <b>nicht</b> übernommen, dort gilt der Ansatz zum Stichtag.'
+      : 'Die Sanierungskosten des Privatobjekts (' + _eur(_num(b.san)) + ') waren sofort abziehbarer Erhaltungsaufwand. Sie erhöhen die Anschaffungskosten beim § 23-Gewinn nicht und werden <b>nicht</b> ins Gesellschaftsobjekt übernommen.');
     /* v3480 · Privat 2,0 % bei Fertigstellung vor 1925 (Regel in afa-engine.js). § 23 rechnet richtig mit der
        TATSAECHLICH abgezogenen AfA (§ 23 Abs. 3 Satz 4 EStG) - der Hinweis sagt nur, dass sie zu niedrig war. */
     try {

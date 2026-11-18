@@ -1776,6 +1776,9 @@ function _computeAutoForYear(yearIdx, year, teiljahr) {
     // V31: Sanierung → je nach 15%-Grenze entweder als anschaffungsnah (AfA) oder als Erhaltungsaufwand (5 Jahre)
     /* v3214 · N137: + geplante Sanierungen dieses Jahres (Erhaltung im Jahr bzw. verteilt; anschaffungsnah über die AfA) */
     anschaffungsnah:    (sanAnschaffungsnah ? sanThisYear : 0) + _sp.anah,
+    /* v3686 · aktivierter Betrag der Sanierung (#san, anschaffungsnahe HK) - Auskunft fuer die
+       fortgefuehrten AK beim § 23-Gewinn (Ueberfuehrung, Exit). Keine Eingabe, nicht in `fields`. */
+    _anahAk: sanAnschaffungsnah ? san_inp : 0,
     erhaltungsaufwand: (!sanAnschaffungsnah ? sanThisYear : 0) + _sp.erh,
 
     // 7.0 Einnahmen

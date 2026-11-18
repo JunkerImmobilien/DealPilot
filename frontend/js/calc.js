@@ -2865,8 +2865,21 @@ function _calcImmediate(){
       var _vkJahr23 = _calYearBase + btj - 1;
       var _afa23 = 0;
       for (var _y23 = 1; _y23 <= btj; _y23++) _afa23 += _afaJahr(_y23);
+      /* v3686 · G-18/P-25: aktivierte Sanierung (anschaffungsnahe HK) gehoert in die fortgefuehrten AK,
+         ihre AfA in die abgezogene AfA (§ 23 Abs. 3 EStG). _afaJahr fuehrt nur Gebaeude + Kueche. */
+      var _anahAk23 = 0, _anahAfa23 = 0;
+      try {
+        if (typeof window._computeYearTotal === 'function' && window.State && Array.isArray(State.cfRows)) {
+          for (var _ya = 1; _ya <= btj && _ya <= State.cfRows.length; _ya++) {
+            var _ta = window._computeYearTotal(State.cfRows[_ya - 1].cal, _ya - 1);
+            _anahAk23 = Math.max(_anahAk23, Number(_ta && _ta.auto && _ta.auto._anahAk) || 0);
+            _anahAfa23 += Number(_ta && _ta.values && _ta.values.anschaffungsnah) || 0;
+          }
+        }
+      } catch (_eA) {}
+      if (_anahAk23 > 0) _afa23 += _anahAfa23;   /* AfA nur mit ihrer Grundlage */
       var _p23 = _gesK.paragraph23({ kaufdat: _kv23, stichtag: _vkJahr23 + '-12-31', art: 'kauf',
-        kaufpreis: exit_vkp, verkehrswert: exit_vkp, akPrivat: kp + nk, afaBisher: _afa23, werbungskosten: 0 });
+        kaufpreis: exit_vkp, verkehrswert: exit_vkp, akPrivat: kp + nk + _anahAk23, afaBisher: _afa23, werbungskosten: 0 });
       var _st23 = { betrag: 0, methode: 'steuerfrei' };
       if (_p23 && _p23.steuerpflichtig) {
         var _zve23 = _zveJahr(_vkJahr23);
