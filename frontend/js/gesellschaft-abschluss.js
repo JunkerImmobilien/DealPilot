@@ -259,11 +259,19 @@ var _GA_GUV = [
    Anlagevermoegens ist die Summe aller Jahre bis einschliesslich des
    Bilanzjahres, und die steht nirgends sonst.
    ─────────────────────────────────────────────────────────────────────────── */
+/* v3701a · Waehrend einer Gesellschafts-Reihe (DpGesSteuer.reihe) laeuft _gaDaten fuer jedes Vorjahr erneut und holte
+   jedes Mal ALLE Steuersaetze und Objekte (bis zu 16-mal dasselbe, gemessen > 20 s). Innerhalb eines Laufs merken. */
+var _gaMemo = null;
+function _gaHolen(url) {
+  if (_gaMemo) { if (!_gaMemo[url]) _gaMemo[url] = Auth.apiCall(url); return _gaMemo[url]; }
+  return Auth.apiCall(url);
+}
 async function _gaDaten(halterId, jahr, _ohneVortrag) {
-  var r = await Auth.apiCall('/tax-records?from=1990&to=' + (jahr + 1));
+  var r = await _gaHolen(_gaMemo ? '/tax-records?from=1990&to=2100' : '/tax-records?from=1990&to=' + (jahr + 1));
   var alle = (r && r.records) || [];
+  if (_gaMemo) alle = alle.filter(function (x) { return Number(x.year) <= jahr + 1; });
 
-  var lo = await Auth.apiCall('/objects');
+  var lo = await _gaHolen('/objects');
   var liste = (lo && (lo.items || lo.objects || lo)) || [];
   if (!Array.isArray(liste)) liste = [];
 
@@ -698,8 +706,10 @@ var _gaGesStCache = {};
 async function _gaGesSteuerReihe(halterId, bisJahr) {
   var key = halterId + '|' + bisJahr, c = _gaGesStCache[key];
   if (c && Date.now() - c.t < 30000) return c.r;
-  var d = await _gaDaten(halterId, bisJahr);
-  var r = _gaRechnen(halterId, bisJahr, d);
+  var d, r;
+  _gaMemo = {};
+  try { d = await _gaDaten(halterId, bisJahr); r = _gaRechnen(halterId, bisJahr, d); }
+  finally { _gaMemo = null; }
   var K = window.DealPilotUeberfuehrungKern;
   var P = (window.DealPilotMandanten && DealPilotMandanten.steuerParameter) ? DealPilotMandanten.steuerParameter(halterId) : null;
   if (!K || !P || !r || !r.guv) return null;

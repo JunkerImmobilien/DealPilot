@@ -2010,7 +2010,9 @@ function _dpGesReihe() {
     var h = String((document.getElementById('halter') || {}).value || '');
     var rows = (window.State && State.cfRows) || [];
     if (!h || h === 'privat' || !rows.length) return null;
-    var bis = rows[Math.min(rows.length, 15) - 1].cal, k = h + '|' + bis, c = window._dpGesReiheCache;
+    /* v3701a · hoechstens 14 Jahre nach dem ersten Jahr: _gaVortrag kappt ab 15 Jahren das erste Jahr, dann fehlte
+       dessen Verlust im Vortrag (gemessen: bis 2041 ohne den Verlust 2025 von 8.430 EUR) */
+    var bis = Math.min(rows[Math.min(rows.length, 15) - 1].cal, (rows[0].cal || 0) + 13), k = h + '|' + bis, c = window._dpGesReiheCache;
     if (c && c.k === k && (c.r || Date.now() - c.t < 20000)) return c.r;
     window._dpGesReiheCache = { k: k, r: null, t: Date.now() };
     DpGesSteuer.reihe(h, bis).then(function (r) {
@@ -2030,6 +2032,9 @@ window._dpGesJahr = _dpGesJahr;
 function _ytfSteuerAnzeige(year, totals) {
   if (_dpBegriff().corp) {
     var gz = _dpGesJahr(year);   /* v3701 · G-05: Steuer der Gesellschaft auf alle Objekte */
+    var _gc = window._dpGesReiheCache;
+    if (!gz && _gc && _gc.r) return { text: '–', color: 'var(--muted)', title: 'Für dieses Jahr rechnet die Steuer der Gesellschaft nicht mehr voraus (höchstens 14 Jahre ab dem ersten Jahr).' };
+    if (!gz && _gc && !_gc.r) return { text: '…', color: 'var(--muted)', title: 'Die Steuer der Gesellschaft über alle Objekte wird berechnet.' };
     if (gz) return gz.steuer > 0.5
       ? { text: '−' + Math.round(gz.steuer).toLocaleString('de-DE') + ' €', color: 'var(--red)', title: 'Steuer der Gesellschaft ' + year + ' auf alle ' + gz.objekte + ' Objekte (Ergebnis ' + Math.round(gz.erg).toLocaleString('de-DE') + ' €), nach Kosten der Gesellschaft und Verlustvortrag' }
       : { text: '0 €', color: 'var(--green)', title: 'Die Gesellschaft zahlt ' + year + ' keine Ertragsteuer (alle ' + gz.objekte + ' Objekte zusammen, Ergebnis ' + Math.round(gz.erg).toLocaleString('de-DE') + ' €, nach Verlustvortrag).' };
