@@ -4660,7 +4660,8 @@ select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%
 /* v3710 · Ist-Miete vergangener Jahre direkt in der Tabelle (mietentwicklung.js _bestandTabelle) */
 #me_table_wrap td .me-ist-in {
   width: 8.5em; max-width: 100%; box-sizing: border-box;
-  font: inherit; text-align: right; padding: 3px 6px;
+  font: inherit; text-align: right; padding: 2px 6px !important;
+  height: 28px !important; min-height: 0 !important; line-height: 1.3;
   border: 1px solid rgba(128,128,128,.4); border-radius: 5px;
   background: transparent; color: inherit;
 }
@@ -4668,11 +4669,12 @@ select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%
 #me_table_wrap td .me-ist-eur { margin-left: 4px; }
 #me_table_wrap .me-ist-link { text-align: right; margin-top: 6px; }
 #me_table_wrap .me-ist-alle {
-  background: none; border: 0; padding: 2px 0; cursor: pointer;
-  font: 500 11px/1.3 Inter, system-ui, sans-serif; color: var(--muted, #7A7370);
+  background: none !important; border: 0 !important; box-shadow: none !important; padding: 2px 0 !important;
+  height: auto !important; min-height: 0 !important; cursor: pointer;
+  font: 500 11px/1.3 Inter, system-ui, sans-serif !important; color: var(--muted, #7A7370) !important;
   text-decoration: underline; text-underline-offset: 2px;
 }
-#me_table_wrap .me-ist-alle:hover { color: var(--wl-b8932f, #b8932f); }
+#me_table_wrap .me-ist-alle:hover { color: var(--wl-b8932f, #b8932f) !important; }
 #zb-karte .zb-schalter {
   display: flex; align-items: flex-start; gap: 8px; cursor: pointer;
   margin: 2px 0 10px; font-size: 13px; line-height: 1.45;
