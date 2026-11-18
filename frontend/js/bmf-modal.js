@@ -2774,17 +2774,11 @@ function _renderKlauselText(){ /* V293-E-klausel-no-pct: Prozente entfernt, nur 
       '<li>Gebäudesubstanz (abnutzbares Wirtschaftsgut): <strong>' + _eur(basisGeb) + '</strong></li></ul>' +
       '<p>Die Aufteilung berücksichtigt den nach BMF-Arbeitshilfe (Stand März 2026) ermittelten Sachwertanteil unter Beachtung von Baujahr, Wohnfläche, Bodenrichtwert und Lage. ' +
       'Die Vertragsparteien sind übereingekommen, dass diese Aufteilung der wirtschaftlichen Wertverteilung entspricht und der steuerlichen Behandlung — insbesondere der AfA-Berechnung — zugrunde gelegt wird. ' +
-      'Stand: ' + datum + '.</p>',
-
-    aggressiv:
-      '<p><strong>Kaufpreisaufteilung (Aggressiv — max. AfA)</strong></p>' +
-      '<p>Hiermit erklären die Vertragsparteien rechtsverbindlich: Der vereinbarte Gesamtkaufpreis in Höhe von <strong>' + _eur(kp) + '</strong> für das in der Vertragsurkunde näher bezeichnete Objekt <em>' + (addr || '[Objektadresse]') + '</em> entfällt nach übereinstimmender Bewertung wie folgt:</p>' +
-      '<ul style="margin:8px 0;padding-left:22px"><li>Grund und Boden: <strong>' + _eur(basisGrund) + '</strong></li>' +
-      '<li>Gebäude inkl. wesentlicher Gebäudeteile: <strong>' + _eur(basisGeb) + '</strong></li></ul>' +
-      '<p>Diese Aufteilung wurde im Rahmen einer Wertermittlung nach BMF-Arbeitshilfe (Stand März 2026, maßgebendes Verfahren nach der Arbeitshilfe) unter Heranziehung lagespezifischer Bodenrichtwerte, der tatsächlichen Restnutzungsdauer des Gebäudes sowie ggf. vorgenommener Modernisierungen erstellt. ' +
-      '<strong>Sie hat verbindlichen Charakter</strong> und gilt insbesondere als wirtschaftlich angemessen i.S.d. BFH-Rechtsprechung (BFH IX R 26/19 v. 21.07.2020). ' +
-      'Die Parteien sind sich einig, dass eine pauschale 80/20-Aufteilung im konkreten Fall nicht sachgerecht wäre. ' +
-      'Eine abweichende Wertfeststellung durch das Finanzamt setzt eine substantiierte Gegenbewertung voraus. Stand: ' + datum + '.</p>'   /* v3481: „vgl. § 199 BewG“ passte nicht (vereinfachtes Ertragswertverfahren, Unternehmensbewertung) */
+      'Stand: ' + datum + '.</p>'
+    /* v3686 · Pruefbericht 18.11.2026 P-11: die Klausel „Aggressiv“ („rechtsverbindlich“, „verbindlicher Charakter“,
+       BFH-Zitat als Anerkennungsversprechen) gehoert in keinen Kaufvertrag. Die Variante ist seit v3184
+       aus der Auswahl genommen, ihr Text stand noch hier. Wird sie doch gewaehlt, gilt der neutrale Text
+       der abweichenden Aufteilung (unten: texts.aggressiv = texts.moderat). */
   };
 
   var el = document.getElementById('klauselText');
@@ -2793,6 +2787,7 @@ function _renderKlauselText(){ /* V293-E-klausel-no-pct: Prozente entfernt, nur 
      abweichenden Aufteilung mit eigener Ueberschrift, nicht den amtlichen. */
   texts.konservativ = texts.moderat;
   texts.optimiert = texts.moderat;
+  texts.aggressiv = texts.moderat;   /* v3686 */
   /* Ohne Pipeline-Variante sind die Betraege die amtlichen (Rueckfall oben) -
      dann auch der amtliche Text. */
   var _textKey = (_p5 && _p5[_selVar]) ? _selVar : 'amtlich';
