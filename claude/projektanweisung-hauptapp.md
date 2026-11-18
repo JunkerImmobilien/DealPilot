@@ -45078,3 +45078,18 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
   - Gesperrter Kundenstand: Cashflow-Tabelle, Kennzahlen und jsPDF-Weg sind noch nicht ausgeblendet.
   - Dashboard-Summen zählen weitergeführte Kundenobjekte noch mit.
   - Datenschutzberatung zur Kirchensteuer (Art. 9 DSGVO) steht aus.
+
+### Rollout 1.0.121 · 18.11.2026 abends (`255fbba`; v3704–v3760, Videos v3730)
+- **Was:**
+  - BMF-Rechner: anschaffungsnahe HK je Variante in Schritt 3, nicht in der aufzuteilenden Summe (v3705).
+  - Reiter Miete: Kopf, Karte „Mieterhöhung und Zielbild“ mit Haken, Ist-Mieten in der Tabelle der Mietentwicklung (v3710).
+  - Detailgrad-Prüfung aller Reiter (v3720), Entscheidungen 1–10 (v3740), eine Soll-Miete für MFH in Mietentwicklung, Ist gegen Soll und Zielbild-Vorschlag (v3750).
+  - Rechen-Audit (v3760): IRR, Break-even und Vermögenszuwachs mit allen Darlehen, Anschluss Darlehen II mit fester Rate, Bausparvertrag ohne Doppelabzug.
+  - Drehbücher v3730 (Pilot und Mechaniker ausgeblendet); Videothek mit neun neuen Videos (K1, P2, P3, 07, 08, 10a, 10b, 10c, 21, Marcels Stimmklon), MP4 per `scp -3` von Staging.
+- **Nachweis:**
+  - Prüfer grün: buster-ebenen, rechen-audit 103/103, zielbild-haus, detailgrad, steuerjahr 36, mietpotenzial, score-ketten, vorschau; Gold-Audit auf der Basislinie.
+  - Prod: Sicherungen `haupt-/mb-20261118-1828`, Serverstand 255fbba, HTTP 200, version.json 1.0.121; videos.json 21× v3730, 18 von 18 MP4 mit 200.
+- **Rest:**
+  - Rechen-Audit, offen zur Entscheidung: `_kpis_cf_ns` gegen Projektion, IRR aus `State.cfRows`, Sparrate im Zuteilungsjahr.
+  - Messe-Schleife `videothek-liste.js` nicht neu erzeugt; Drehbücher 18, quickcheck (alt), komplett-mfh offen.
+  - Staging-Testkonto: Ravensberger Weg GmbH rechnet mit v3750 2027 +53 € (Mappe 24 nennt den alten Stand).
