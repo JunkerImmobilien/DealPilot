@@ -1,11 +1,11 @@
 {
-  "_hinweis": "landing-partner-1 · Reihe „partner“: Einträge mit \"geplant\": true sind Platzhalter („Video folgt“), fertige Partner-Videos trägt tools/partner-videos-eintragen.mjs aus Dateien/Messe/Videos/Partner/videos.json ein. landing-videothek-3b · EINE Quelle fuer den Abschnitt 'DealPilot live' (index.html) und die Videothek (videothek.html). Ein Video mehr = ein Eintrag mehr. Die MP4s liegen NICHT im Git (frontend/landing/medien/ ist ignoriert) - sie kommen per scp auf den Server. Das Feld youtube ist fuer den spaeteren Upload: Titel, Beschreibung und Schlagworte dort pflegen, die youtube_id nach dem Upload eintragen. Keine Anbieternamen ausser ImmoMetrica, keine Adressen.",
+  "_hinweis": "v3740 (18.11.2026): Module 04, 16, 18 entfernt (abgelöst durch Modul 30, v3270b/v3271a). Modul 30 steht als \"geplant\" (Video folgt), bis die MP4 auf dem Server liegt. \"vorbereitet\" liest die Seite nicht: dort steht das neue Modul 28 (Drehbuch reihe-unterlagen); beim Hochladen nach videos verschieben und den Eintrag aus \"ersetzt\" (Lindenallee-Fassung vom 28.10.) im selben Zug entfernen, sonst steht Modul 28 doppelt da. landing-partner-1 · Reihe „partner“: Einträge mit \"geplant\": true sind Platzhalter („Video folgt“), fertige Partner-Videos trägt tools/partner-videos-eintragen.mjs aus Dateien/Messe/Videos/Partner/videos.json ein. landing-videothek-3b · EINE Quelle fuer den Abschnitt 'DealPilot live' (index.html) und die Videothek (videothek.html). Ein Video mehr = ein Eintrag mehr. Die MP4s liegen NICHT im Git (frontend/landing/medien/ ist ignoriert) - sie kommen per scp auf den Server. Das Feld youtube ist fuer den spaeteren Upload: Titel, Beschreibung und Schlagworte dort pflegen, die youtube_id nach dem Upload eintragen. Keine Anbieternamen ausser ImmoMetrica, keine Adressen.",
   "stand": "2026-11-11",
   "basis_medien": "medien/videothek/",
   "basis_bilder": "assets/videothek/",
   "kategorien": [
     { "id": "ueberblick", "name": "Überblick", "kurz": "Der ganze Weg am Stück", "text": "Für den ersten Eindruck: von der ersten Prüfung bis zum fertigen Investment-PDF, ohne Umweg." },
-    { "id": "basis", "name": "Basis", "kurz": "Jeder Bereich der App", "text": "Die Basismodule 02 bis 10: ein Objekt anlegen, Daten aufnehmen, bewerten, rechnen. Für neue Piloten." },
+    { "id": "basis", "name": "Basis", "kurz": "Jeder Bereich der App", "text": "Die Basismodule 02 bis 10 und 30: ein Objekt anlegen, Daten aufnehmen, bewerten, rechnen. Für neue Piloten." },
     { "id": "spezial", "name": "Erweitert", "kurz": "Tiefer ins Detail", "text": "Die Spezialmodule ab 11: Analyse, Scores, Bankunterlagen, Bestand, Steuer, Wertermittlung und Portfolio." },
     { "id": "partner", "name": "Für Partner", "kurz": "Für Berater und Kanzleien", "text": "Das Partner-Cockpit von der Einladung bis zur Rückmeldung an deinen Kunden. Für Steuerberater, Finanzberater, Makler und Sachverständige, die ihre Kunden mit DealPilot begleiten." }
   ],
@@ -181,23 +181,25 @@
       "youtube": { "titel": "DealPilot Modul 03 · Datenaufnahme: vier Wege", "tags": ["DealPilot", "Exposé auslesen", "Spracheingabe", "ImmoMetrica"], "youtube_id": null }
     },
     {
-      "id": "modul-04-marktbewertung-drei-stufen", "kategorie": "basis", "nr": "04", "dauer": 267,
-      "titel": "Marktbewertung in drei Stufen",
-      "unterzeile": "Was jede Stufe braucht — und was sie liefert.",
-      "story": "Stufe 1 braucht wenige Angaben und liefert eine erste Marktwertindikation, Stufe 2 schärft sie nach, Stufe 3 rechnet amtlich nach ImmoWertV mit Ertrags- und Sachwert. Das Video zeigt, welche Felder jede Stufe will und was am Ende im Wertfeld steht.",
-      "nutzen": "So genau wie nötig — und immer klar, woher die Zahl kommt.",
+      "id": "modul-30-marktbewertung-im-reiter-objekt", "kategorie": "basis", "nr": "30", "geplant": true, "dauer": null,
+      "titel": "Marktbewertung im Reiter Objekt",
+      "unterzeile": "Drei Stufen, ein Ort — und danach das PDF.",
+      "story": "Stufe 1 braucht sechs Angaben und liefert eine Marktwertindikation aus Angebotspreisen, mit dem aktuellen Marktabschlag. Stufe 2 nimmt Kaufpreis, Miete, Zustand und Ausstattung dazu und gleicht deinen Preis mit dem Markt ab. Stufe 3 rechnet amtlich nach ImmoWertV mit Bodenwert, Liegenschaftszins und Restnutzungsdauer. Erstellt wird im Reiter Objekt, das PDF holst du in der Deal-Aktion ab.",
+      "nutzen": "So genau wie nötig — und immer klar, ob im Feld eine Indikation oder ein Verkehrswert steht.",
       "kapitel": [
-        { "t": 0, "titel": "Einstieg", "stichworte": "Marktbewertung Stufen" },
-        { "t": 11, "titel": "Pflichtfelder je Stufe", "stichworte": "Ergebnis Plan Bewertungen" },
-        { "t": 24, "titel": "Stufe 1", "stichworte": "Postleitzahl Ort Objektart Wohnfläche Baujahr Wohnung Marktpreisindikation Standort Vergleichspreise Mieten Lage Ergebnis Marktwert Marktmiete" },
-        { "t": 70, "titel": "Abschlag auf Angebotspreise", "stichworte": "Angebotspreisen Marktdurchschnitt Marktwertindikation Verkehrswert Sinne Baugesetzbuchs" },
-        { "t": 100, "titel": "Stufe 2", "stichworte": "Kaufpreis Nettokaltmiete Zustand Energieklasse Standardstufe Zimmer Etage Miete Kaltmiete Indikation Makrolage Abgleich Preis Ergebnis" },
-        { "t": 170, "titel": "Stufe 3 amtlich", "stichworte": "Wertermittlung Nutzungsart Grundstücksfläche Bruttogrundfläche Miteigentumsanteil Bodenrichtwert Nutzung Grundstück Anteil BGF ImmoWertV Bodenwert Liegenschaftszins Restnutzungsdauer" }
+        { "t": 0, "titel": "Einstieg", "stichworte": "Marktbewertung Reiter Objekt drei Stufen Marktbericht" },
+        { "t": 25, "titel": "Stufe 1", "stichworte": "PLZ Ort Straße Objektart Wohnfläche Baujahr Marktpreisindikation Marktwert Marktmiete" },
+        { "t": 74, "titel": "Abschlag auf Angebotspreise", "stichworte": "Angebotspreise Marktabschlag Marktwertindikation kein Verkehrswert" },
+        { "t": 104, "titel": "Stufe 2", "stichworte": "Kaufpreis Kaltmiete Zustand Energieklasse Standardstufe Zimmer Etage Makrolage Abgleich Preis" },
+        { "t": 175, "titel": "Stufe 3 amtlich", "stichworte": "Nutzungsart Grundstücksfläche Bruttogrundfläche Miteigentumsanteil Bodenrichtwert ImmoWertV Ertragswert Sachwert Verkehrswert Liegenschaftszins Restnutzungsdauer" },
+        { "t": 260, "titel": "Automatisch ermittelt", "stichworte": "Wert Quelle Stichtag Bodenrichtwert abrufen Lage-Bewertung" },
+        { "t": 287, "titel": "Das PDF in der Deal-Aktion", "stichworte": "Verlauf Berichte ansehen Deal-Aktion PDF abrufen" }
       ],
-      "spruch": "Drei Stufen Steigflug. Ab Stufe 3 amtlich.",
-      "datei": "dealpilot-modul-04-marktbewertung-drei-stufen.mp4", "datei_ton": "dealpilot-modul-04-marktbewertung-drei-stufen-sprecher.mp4",
-      "poster": "dealpilot-modul-04-marktbewertung-drei-stufen.webp",
-      "youtube": { "titel": "DealPilot Modul 04 · Marktbewertung in drei Stufen", "tags": ["DealPilot", "Marktwert", "ImmoWertV", "Verkehrswert"], "youtube_id": null }
+      "spruch": "Wetterbericht an Bord — direkt im Cockpit.",
+      "datei": "dealpilot-modul-30-marktbewertung-im-reiter-objekt.mp4",
+      "datei_ton": "dealpilot-modul-30-marktbewertung-im-reiter-objekt-sprecher.mp4",
+      "poster": "dealpilot-modul-30-marktbewertung-im-reiter-objekt.webp",
+      "youtube": { "titel": "DealPilot Modul 30 · Marktbewertung im Reiter Objekt", "tags": ["DealPilot","Marktwert","ImmoWertV","Verkehrswert","Marktbericht"], "youtube_id": null }
     },
     {
       "id": "modul-05-sprache-und-stufe-2", "kategorie": "basis", "nr": "05", "dauer": 205,
@@ -508,31 +510,6 @@
       "youtube": { "titel": "DealPilot Modul 15 · Steuer im Bestand", "tags": ["DealPilot", "Anlage V", "Vermietung Steuer", "Belege"], "youtube_id": null }
     },
     {
-      "id": "modul-16-stufe-3-genauer", "kategorie": "spezial", "nr": "16", "dauer": 329,
-      "titel": "Stufe 3 genauer",
-      "unterzeile": "Pflichtfelder, optionale Felder — und welche Zahl sich bewegt.",
-      "story": "Die amtliche Wertermittlung im Detail: Pflichtfelder, Liegenschaftszins vom Gutachterausschuss, Modernisierung und Restnutzungsdauer nach Anlage 2, Standardstufe, Grundriss — je Feld siehst du, welche Zahl sich bewegt. Am Ende Ertrags- und Sachwert mit Quellennachweis.",
-      "nutzen": "Je mehr du weißt, desto genauer der Wert — und jede Zahl mit Fundstelle.",
-      "kapitel": [
-        { "t": 0, "titel": "Einstieg", "stichworte": "Pflichtfelder Mehrfamilienhaus Wohnungen Baujahr" },
-        { "t": 24, "titel": "Pflichtfelder", "stichworte": "Nutzungsart Grundstücksfläche Bodenrichtwert Bruttogrundfläche Status Minimum Sach Ertragswert Ansatz ImmoWertV" },
-        { "t": 58, "titel": "Register des Gutachterausschusses", "stichworte": "Liegenschaftszins Nutzungsdauer Kosten Sachwertfaktor Ort Marktanpassung Mehrfamilienhaus Ertragswert" },
-        { "t": 87, "titel": "Modernisierung und RND", "stichworte": "Spalte Punkte Anlage Fassade Restnutzungsdauer Längere Restnutzung Ertragswert" },
-        { "t": 125, "titel": "Standardstufe", "stichworte": "Gewerk Dach Heizung Herstellungskosten" },
-        { "t": 139, "titel": "Grundrissart", "stichworte": "Vierspänner Wohnungen Faktor Herstellungskosten" },
-        { "t": 151, "titel": "Hinterland", "stichworte": "Gartenland Bodenwert Preis Baulands" },
-        { "t": 164, "titel": "Garagen", "stichworte": "Herstellungskosten Wohnhaus" },
-        { "t": 185, "titel": "Besonderheiten", "stichworte": "Reparaturen Dach Bericht Grundstücksmerkmal Marktanpassung" },
-        { "t": 211, "titel": "Wertermittlung Stufe 3", "stichworte": "Bodenwert Liegenschaftszins Ertrags Sachwert" },
-        { "t": 224, "titel": "Ertragswert und Sachwert", "stichworte": "Ergebnis Millionen Rechenweg Marktbericht Bodenwert Grundstück Bodenrichtwert Hinterland Reinertrag Liegenschaftszins Restnutzungsdauer Reparaturen Dach Plausibilität" },
-        { "t": 288, "titel": "Quellennachweis", "stichworte": "Liegenschaftszins Sachwertfaktor Ausschuss Angabe Pauschalansatz Objekt Bericht Grenzen Daten Landeanflug" }
-      ],
-      "spruch": "Mehr Daten an Bord — präziser Landeanflug.",
-      "datei": "dealpilot-modul-16-stufe-3-genauer.mp4", "datei_ton": "dealpilot-modul-16-stufe-3-genauer-sprecher.mp4",
-      "poster": "dealpilot-modul-16-stufe-3-genauer.webp",
-      "youtube": { "titel": "DealPilot Modul 16 · Stufe 3 genauer – Wertermittlung nach ImmoWertV", "tags": ["DealPilot", "Ertragswert", "Sachwert", "Liegenschaftszins", "ImmoWertV"], "youtube_id": null }
-    },
-    {
       "id": "modul-17-objekt-uebertragen", "kategorie": "spezial", "nr": "17", "dauer": 180,
       "titel": "Objekt übertragen",
       "unterzeile": "Die DealPilot-Sicherung — was mitgeht und was nicht.",
@@ -553,30 +530,6 @@
       "datei": "dealpilot-modul-17-objekt-uebertragen.mp4", "datei_ton": "dealpilot-modul-17-objekt-uebertragen-sprecher.mp4",
       "poster": "dealpilot-modul-17-objekt-uebertragen.webp",
       "youtube": { "titel": "DealPilot Modul 17 · Objekt übertragen – die DealPilot-Sicherung", "tags": ["DealPilot", "Immobilie übertragen", "Sicherung", "Export", "Import"], "youtube_id": null }
-    },
-    {
-      "id": "modul-18-der-marktbericht", "kategorie": "spezial", "nr": "18", "dauer": 237,
-      "titel": "Der Marktbericht",
-      "unterzeile": "Lage, Vergleichsdaten, Zensus, Wertermittlung, Quellen — und das PDF.",
-      "story": "Ein Bericht, der sich wie ein kleines Gutachten liest: Lage, Bodenrichtwert, Zensus, Marktentwicklung, Vergleichspreise und die Wertermittlung — jede Zahl mit Quelle, am Ende als PDF.",
-      "nutzen": "Der Markt rund um dein Objekt, auf einen Blick und belegbar.",
-      "kapitel": [
-        { "t": 0, "titel": "Einstieg", "stichworte": "Marktbericht Lage Vergleichsdaten Zensus Wertermittlung Quellen PDF Altbau Wohnungen Baujahr Objekt" },
-        { "t": 25, "titel": "Marktbericht öffnen", "stichworte": "Analyse Daten Objekts Berichte Liste" },
-        { "t": 43, "titel": "Score und Marktwert", "stichworte": "Ergebnis Deal-Score Sehr Bruttorendite Kaufpreisfaktor Abstand Marktwert-Indikation Angeboten Umgebung Indikation Gutachten" },
-        { "t": 72, "titel": "Lage", "stichworte": "Mikrolage Makrolage Nachfrage Entwicklung" },
-        { "t": 84, "titel": "Bodenrichtwert und Zensus", "stichworte": "Gutachterausschuss Durchschnittsmiete Leerstand Gemeinde" },
-        { "t": 99, "titel": "Marktentwicklung", "stichworte": "Preise Historie Prognose" },
-        { "t": 111, "titel": "Vergleichspreise", "stichworte": "Vergleichspreisen Verteilung Angebotspreise Kaufpreis" },
-        { "t": 123, "titel": "Wertermittlung", "stichworte": "Bodenwert Liegenschaftszins Sachwert Ertragswert Rechenweg Barwertfaktor Restnutzungsdauer" },
-        { "t": 151, "titel": "Quellennachweis", "stichworte": "Ausschuss Jahrgang Lizenz Link" },
-        { "t": 167, "titel": "Der Bericht in Worten", "stichworte": "Zusammenfassung Empfehlung Objekt Lage Markt Bewertung Ausblick" },
-        { "t": 184, "titel": "PDF", "stichworte": "Bericht Dokument Deckblatt Marktwert Eckdaten Seiten Bank Verkäufer Unterlagen Kapitel Bildschirm Rechenweg Quellennachweis Kurs" }
-      ],
-      "spruch": "Wetterbericht gelesen — Kurs bestätigt.",
-      "datei": "dealpilot-modul-18-der-marktbericht.mp4", "datei_ton": "dealpilot-modul-18-der-marktbericht-sprecher.mp4",
-      "poster": "dealpilot-modul-18-der-marktbericht.webp",
-      "youtube": { "titel": "DealPilot Modul 18 · Der Marktbericht", "tags": ["DealPilot", "Marktbericht", "Bodenrichtwert", "Zensus"], "youtube_id": null }
     },
     {
       "id": "modul-19-das-bank-pdf", "kategorie": "spezial", "nr": "19", "dauer": 250,
@@ -1530,6 +1483,31 @@
        "stichworte": "Hier steht, was dein Berater sieht und was dein Zugang darf, dazu deine Kundennummer K-2026-001. Trennen kannst du jederzeit unter Verbindun"
       }
      ]
+    }
+  ],
+  "vorbereitet": [
+    {
+      "id": "modul-28-alle-unterlagen-reinladen", "ersetzt": "modul-28-unterlagen-einlesen", "kategorie": "spezial", "nr": "28", "dauer": null,
+      "titel": "Alle Unterlagen reinladen",
+      "unterzeile": "Dreizehn PDFs, eine Übernahme — und was der Detailgrad damit macht.",
+      "story": "Ein leeres Objekt, kein getipptes Feld: Exposé, Mietaufstellung, Grundbuch, Teilungserklärung, Energieausweis, Protokolle, Wirtschaftsplan, Baulasten, Marktbericht und drei Mietverträge gehen auf einmal hinein. DealPilot erkennt jede Unterlage, schwärzt Personendaten, liest nur, was dasteht, und wertet alles gemeinsam aus. In Einsteiger wird nur übernommen, was du siehst; mit Experte und erneutem Einlesen kommen Einheitenliste und Mietverträge je Wohnung dazu.",
+      "nutzen": "Alle Papiere an Bord — jeder Wert mit Quelle, nichts ungefragt überschrieben.",
+      "kapitel": [
+        { "t": 0, "titel": "Einstieg", "stichworte": "dreizehn PDFs leeres Objekt Einsteiger" },
+        { "t": 25, "titel": "Exposé und Dokumente", "stichworte": "Datenaufnahme Kachel hineinziehen" },
+        { "t": 64, "titel": "Lesen und erkennen", "stichworte": "Scan Art erkennen Mieterliste Grundbuch Protokoll Mietvertrag" },
+        { "t": 90, "titel": "Personendaten geschwärzt", "stichworte": "Schwärzen Quelle" },
+        { "t": 114, "titel": "Gemeinsame Auswertung", "stichworte": "Risiken Eigentümergemeinschaft Investitionsthese" },
+        { "t": 147, "titel": "Übernahme", "stichworte": "Reiter Kaufpreis Quelle abwählen" },
+        { "t": 169, "titel": "Was der Detailgrad zurückhält", "stichworte": "Detailgrad Einsteiger erneut einlesen" },
+        { "t": 225, "titel": "Experte und erneut einlesen", "stichworte": "Einheitenliste Mietverträge je Wohnung nur leere Felder" },
+        { "t": 279, "titel": "Abschluss", "stichworte": "acht Einheiten Grundbuch Energie Hausgeld Risiken" }
+      ],
+      "spruch": "Alle Papiere an Bord — gelesen, nicht getippt.",
+      "datei": "dealpilot-modul-28-alle-unterlagen-reinladen.mp4",
+      "datei_ton": "dealpilot-modul-28-alle-unterlagen-reinladen-sprecher.mp4",
+      "poster": "dealpilot-modul-28-alle-unterlagen-reinladen.webp",
+      "youtube": { "titel": "DealPilot Modul 28 · Alle Unterlagen reinladen", "tags": ["DealPilot","Immobilien","Exposé","Unterlagen","Due Diligence"], "youtube_id": null }
     }
   ]
 }
