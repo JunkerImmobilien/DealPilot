@@ -406,6 +406,7 @@
           : '') +
         '<div class="v292-row v292-row-final"><span><b>= Prognose-AK</b> <span class="v292-arrow">→ Basis für AfA</span></span><span class="v292-final-value"><b>' + _fmtEur(p3.prognose_ak) + '</b></span></div>' +
       '</div>';
+    try { if (typeof window._dpInjectTreeHk === 'function') window._dpInjectTreeHk(); } catch (e3704) {}   /* v3704 · anschaffungsnahe HK und Basis fuer AfA nach jedem Neuaufbau */
 
     // Inventar-Aufschlüsselung anzeigen wenn > 0
     if (p2.inventar_gesamt > 0) {
@@ -1040,6 +1041,7 @@
         '</div>' +
         '<div class="v292-row v292-row-final"><span><b>= Prognose-AK</b> <span class="v292-arrow">→ Basis für AfA</span></span><span class="v292-final-value"><b>' + _fmtEur(ak) + '</b></span></div>' +
       '</div>';
+    try { if (typeof window._dpInjectTreeHk === 'function') window._dpInjectTreeHk(); } catch (e3704) {}   /* v3704 */
   }
   window._v292SofortSumme = _v292SofortSumme;
 
