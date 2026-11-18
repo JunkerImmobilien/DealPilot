@@ -45055,3 +45055,20 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Commit:** `db53ba62`, `cd8f666b`. Backend und mb-Backend neu gebaut.
 - **Nachweis:** `miete-zusatz-pruefen` 86/86, wertermittlung/mietpotenzial/objekt-mapper/flow-berechnen/buster grün; Browser Staging (Testkonto): Mieterliste → nkm 1.830, ze 115 (75/25/15), Garagen 1, Außenstellplätze 1; Warmmiete 2.130 €.
 - **Rest:** Marktbericht Stufe 3 im Browser; Prod.
+
+### Rollout 1.0.118 · 18.11.2026 nachmittags (`ddc87374`; v3700–v3703, Migration 119)
+- **Was:**
+  - P2: Steuerprofil des Kunden beim Partner, mit eigenem Rechenkontext (`DpSteuerKontext`). Beim Übernehmen stehen „Für den Kunden weiterführen“ und „In meinen eigenen Bestand“ zur Wahl.
+  - G-05: Die Steuer der GmbH rechnet über alle Objekte der Gesellschaft (`DpGesSteuer.reihe`, die Rechnung des Jahresabschlusses).
+  - Steuer-Mappe der Gesellschaft mit Überleitung (Objekte, Kosten der Gesellschaft, Zinsen Gesellschafterdarlehen, Ergebnis) und der Entwicklung des Verlustvortrags. Der Knopf sitzt im Jahresabschluss-Dialog.
+  - Absprung `fenster=jahresabschluss&mandant=`.
+- **Nachweis:**
+  - Prüfer grün: steuer-gesellschaft 64, steuer-audit 126, steuerjahr 36, ueberfuehrung 145, partner-kunden 132 (P2-Agent mit `--live` 133), objekt-uebergabe, score-ketten, vorschau, buster, jahreswerte.
+  - Mappen-Gleichheitstest P2: 35/35.
+  - Testkonto 2027: +478,97 − 3.930 − 4.500 = −7.951,03 €, Steuer 0, Verlustvortrag 33.497 €.
+  - Prod: Migration 119 angewendet, Backend healthy, RestartCount 0, Sicherungen `haupt-/mb-20261118-1229`.
+- **Rest:**
+  - Reiter Steuer lädt die Gesellschaftszahl etwa 18 s nach.
+  - Gesperrter Kundenstand: Cashflow-Tabelle, Kennzahlen und jsPDF-Weg sind noch nicht ausgeblendet.
+  - Dashboard-Summen zählen weitergeführte Kundenobjekte noch mit.
+  - Datenschutzberatung zur Kirchensteuer (Art. 9 DSGVO) steht aus.
