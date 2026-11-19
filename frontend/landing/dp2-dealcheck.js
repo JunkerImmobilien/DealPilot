@@ -319,7 +319,15 @@
              angeben, was da ist, und den Schnitt darunter". Gross steht der obere Rand der Vergleichsmiete (bis dorthin
              darf im Bestand nach § 558 erhoeht werden), darunter der Durchschnitt aller laufenden Vertraege (Zensus). */
           var vgB = d.vergleichsmiete, obB = vgB && vgB.qm > 0 ? (vgB.quelle === 'mietspiegel' && vgB.oben > 0 ? vgB.oben : vgB.qm * OBEN_TYPISCH) : null;
-          if (obB) k.push(kachel('Bestandsmiete bis', (vgB.quelle === 'mietspiegel' && vgB.oben > 0 ? '' : 'ca. ') + dez(obB, 2) + ' €/m²', 'Ø laufende Verträge ' + dez(d.miete.qm, 2) + ' €', null));
+          /* landing-dealcheck-13b · Marcel 19.11.2026 („ja nimm 1"): mit eigener Miete zeigt die Kachel, was im Bestand
+             in 3 Jahren erreichbar ist (Rand oder Kappung, was zuerst greift) bzw. „ausgereizt"; sonst den Rand. */
+          var nkmB = zahl(F.nkm), istB = wfl && nkmB > 0 ? nkmB / wfl : null, kpB = d.kappung && d.kappung.pct ? d.kappung.pct : 20;
+          if (obB && istB) {
+            var zB = Math.min(obB, istB * (1 + kpB / 100));
+            if (zB <= istB + 0.005) k.push(kachel('Bestand in 3 Jahren', 'ausgereizt', 'deine ' + dez(istB, 2) + ' € · Rand ' + dez(obB, 2) + ' €', null));
+            else k.push(kachel('Bestand in 3 Jahren', dez(zB, 2) + ' €/m²', '+' + dez(Math.round((zB - istB) * wfl), 0) + ' € im Monat · Ø Verträge ' + dez(d.miete.qm, 2) + ' €', null));
+          }
+          else if (obB) k.push(kachel('Bestandsmiete bis', (vgB.quelle === 'mietspiegel' && vgB.oben > 0 ? '' : 'ca. ') + dez(obB, 2) + ' €/m²', 'Ø laufende Verträge ' + dez(d.miete.qm, 2) + ' €', null));
           else k.push(kachel('Bestandsmiete Ø', dez(d.miete.qm, 2) + ' €/m²', 'alle laufenden Verträge', null));
         }
         /* landing-dealcheck-6 · Vergleichsmiete (Marcel 12.11.2026 „haben wir auch die Vergleichsmieten?"): Mietspiegel-Mittelwert
