@@ -122,7 +122,7 @@ table.t td{padding:7px 6px;border-top:1px solid var(--linie);vertical-align:top}
 <div class="kopf">
   <h1>Miete und <span>Einheiten</span></h1>
   <div class="schalter" aria-label="Objekt">
-    <button class="an" data-obj="mfh">MFH, 6 Wohnungen</button><button data-obj="etw">ETW</button>
+    <button class="an" data-obj="mfh">MFH mit Einheiten</button><button data-obj="mfh0">MFH ohne Einheiten</button><button data-obj="etw">ETW</button>
   </div>
   <div class="schalter" aria-label="Ansicht">
     <button class="an" data-ans="ueber">Überblick</button><button data-ans="miete">Reiter Miete</button><button data-ans="einh" data-nur="mfh">Fenster Einheiten</button>
@@ -177,9 +177,28 @@ table.t td{padding:7px 6px;border-top:1px solid var(--linie);vertical-align:top}
         <p class="was" data-t="was-heute"></p>
       </div>
 
+      <div class="karte"><details open>
+        <summary class="t">Mietstruktur, die Eingabe <span class="kz" data-t="kz-struktur"></span></summary>
+        <div class="reihe" style="margin-top:8px" data-t="struktur"></div>
+        <p class="was" data-t="was-struktur"></p>
+      </details></div>
+
       <div class="karte">
         <h2>Pilot-Mietpreis-Analyse <span class="kz kz-bleibt">BLEIBT</span></h2>
         <p class="satz">Welche Miete kann ich ansetzen? Die KI-Recherche bleibt oben im Reiter, direkt unter der Miete heute. Seit v1241 steht sie oben, damit man den Knopf ohne Scrollen sieht.</p>
+      </div>
+
+      <div class="karte" data-nur="mfh0">
+        <h2>Das Haus, ohne Einheiten <span class="kz kz-neu">NEU</span></h2>
+        <p class="satz">Ohne Einheiten rechnet DealPilot grob über die Gesamtfläche. Das reicht für den Ankauf. Je Wohnung wird es erst mit den Einheiten.</p>
+        <div class="reihe"><label class="feld">Wohnfläche gesamt (m²)<input value="390"></label><label class="feld">Miete heute im Schnitt (€/m²)<input readonly value="8,50"></label><label class="feld">Vergleichsmiete im Schnitt bis (€/m²)<input readonly value="8,43"></label></div>
+        <div class="hinw">Die Vergleichsmiete gilt für die mittlere Wohnungsgröße. Bei sehr unterschiedlichen Wohnungen lieber Einheiten anlegen.</div>
+        <div style="margin-top:12px" class="lbl">Mietentwicklung in Stufen</div>
+        <div class="scroll"><table class="t"><tr><th>ab</th><th>Miete im Schnitt</th><th>Kaltmiete im Jahr</th><th></th></tr>
+          <tr><td>heute</td><td>8,50 €/m²</td><td>39.780 €</td><td></td></tr>
+          <tr><td><input style="width:90px" value="01/2028"></td><td><input style="width:90px" value="8,90"></td><td>41.652 €</td><td><button class="knopf mini">entfernen</button></td></tr>
+          <tr><td colspan="4"><button class="knopf mini">+ Stufe</button> <span class="hinw">Oder ohne Stufen nur mit der Mietsteigerung aus den Prognose-Annahmen.</span></td></tr></table></div>
+        <div style="margin-top:10px"><button class="knopf">Einheiten anlegen</button> <span class="hinw">Dann rechnet alles je Wohnung, und das Fenster Einheiten übernimmt.</span></div>
       </div>
 
       <!-- 2 ETW: Cockpit der Wohnung im Reiter -->
@@ -203,11 +222,6 @@ table.t td{padding:7px 6px;border-top:1px solid var(--linie);vertical-align:top}
       <!-- MFH: Mietvertrag-Karte zieht um -->
       <div class="leer" data-nur="mfh"><span class="kz kz-umzug">ZIEHT UM</span> &nbsp;Die Karte <b>Mietvertrag der 6 Einheiten</b> steht nicht mehr im Reiter. Mietvertrag, Erhöhungen und Sperrfrist trägt man je Wohnung im Fenster Einheiten ein.</div>
 
-      <div class="karte"><details>
-        <summary class="t">Mietstruktur <span class="kz" data-t="kz-struktur"></span></summary>
-        <div class="reihe" style="margin-top:8px" data-t="struktur"></div>
-        <p class="was" data-t="was-struktur"></p>
-      </details></div>
 
       <div class="karte"><details>
         <summary class="t">Mietpreis-Analyse <span class="kz kz-geaendert">GEÄNDERT</span></summary>
@@ -285,6 +299,8 @@ table.t td{padding:7px 6px;border-top:1px solid var(--linie);vertical-align:top}
     mfh: { titel: 'Westerfeldstr. 146, Bielefeld', bremse: true, kapp: 15, unten: 6.18, mittel: 7.27, oben: 8.43, stand: 'Bielefelder Mietspiegel 2026, qualifiziert',
       etagen: [['DG', [['5', 'DG links', 55, 415], ['6', 'DG rechts', 55, 420]]], ['1. OG', [['3', '1. OG links', 70, 585], ['4', '1. OG rechts', 70, 585]]], ['EG', [['1', 'EG links', 70, 590], ['2', 'EG rechts', 70, 600]]]],
       jahre: [[2024, 37440, true], [2025, 37980, true], [2026, 38340, false], [2027, 39420, false]], ziel: { ist: 3195, soll: 3298, ziel: 3615, kosten: 62000 }, zusatz: 120 },
+    mfh0: { titel: 'Beispiel-MFH, 390 m², ohne Einheiten', bremse: true, kapp: 15, unten: 6.18, mittel: 7.27, oben: 8.43, stand: 'Bielefelder Mietspiegel 2026, qualifiziert',
+      etagen: [['', [['Haus', 'ganzes Haus', 390, 3315]]]], jahre: [[2024, 38400, false], [2025, 39780, false], [2026, 39780, false], [2027, 39780, false]], ziel: { ist: 3315, soll: 3315, ziel: 3615, kosten: 0 }, zusatz: 160 },
     etw: { titel: 'Hölderlinstr. 1, Bad Oeynhausen', bremse: false, kapp: 20, unten: 6.05, mittel: 6.89, oben: 7.93, stand: 'Mietspiegel 2026 Bad Oeynhausen, einfach',
       etagen: [['', [['1', 'Wohnung', 85, 660]]]], jahre: [[2024, 7680, true], [2025, 7920, true], [2026, 7920, false], [2027, 8160, false]], ziel: { ist: 660, soll: 674, ziel: 809, kosten: 18000 }, zusatz: 40 }
   };
@@ -354,7 +370,7 @@ table.t td{padding:7px 6px;border-top:1px solid var(--linie);vertical-align:top}
   }
   function zuordnung(mfh) {
     var R = [
-      ['Miete heute', 'Reiter Miete, Karte Mietvertrag', 'je Wohnung im Fenster Einheiten. Der Reiter zeigt die Summe.'],
+      ['Miete heute', 'Reiter Miete, Mietstruktur (Eingabe) und Karte Mietvertrag', 'je Wohnung im Fenster Einheiten. Der Reiter zeigt die Summe.'],
       ['Mietvertrag, Mieter seit, Vertragsart', 'Reiter Miete, neben der Wohnung', 'je Wohnung im Fenster Einheiten'],
       ['Mieterhöhung eintragen', 'Reiter Miete, drei Schritte', 'je Wohnung im Fenster Einheiten, drei Schritte'],
       ['Miete vergangener Jahre', 'Reiter Miete, Mietentwicklung', 'je Wohnung im Fenster Einheiten. Der Reiter zeigt die Jahre gesperrt.'],
@@ -367,42 +383,45 @@ table.t td{padding:7px 6px;border-top:1px solid var(--linie);vertical-align:top}
       ['Leerstand, Gewerbe', 'nicht nötig', 'je Wohnung im Fenster Einheiten'],
       ['Zustand, Modernisierung', 'Reiter Objekt', 'Fenster Einheiten, Schritt 1 und 3']
     ];
-    return '<tr><th>Angabe</th><th' + (mfh ? '' : ' style="color:var(--gold-lo)"') + '>ETW, EFH, DHH, RH</th><th' + (mfh ? ' style="color:var(--gold-lo)"' : '') + '>MFH, ZFH</th></tr>'
-      + R.map(function (r) { return '<tr><td><b>' + r[0] + '</b></td><td>' + r[1] + '</td><td>' + r[2] + '</td></tr>'; }).join('');
+    var O = { 'Miete heute': 'Reiter Miete, Mietstruktur, als Summe oder Schnitt je m²', 'Mietvertrag, Mieter seit, Vertragsart': 'nicht nötig', 'Mieterhöhung eintragen': 'Reiter Miete, als Stufe im Schnitt', 'Miete vergangener Jahre': 'Reiter Miete, Fenster Jahre', 'Spielraum, Mieterhöhung, Neuvermietung': 'Reiter Miete, grob für den Schnitt', 'Zielbild, Zielmiete, Maßnahmen': 'erst mit Einheiten', 'Leerstand, Gewerbe': 'Prognose-Annahmen' };
+    var spalte = function (k) { return z.o === 'etw' ? 1 : (z.o === 'mfh0' ? 3 : 2); };
+    var hd = function (t, k) { return '<th' + (spalte() === k ? ' style="color:var(--gold-lo)"' : '') + '>' + t + '</th>'; };
+    return '<tr><th>Angabe</th>' + hd('ETW, EFH, DHH, RH', 1) + hd('MFH mit Einheiten', 2) + hd('MFH ohne Einheiten', 3) + '</tr>'
+      + R.map(function (r) { return '<tr><td><b>' + r[0] + '</b></td><td>' + r[1] + '</td><td>' + r[2] + '</td><td>' + (O[r[0]] || r[2].replace(' für das ganze Haus', '')) + '</td></tr>'; }).join('');
   }
   function zeichnen() {
-    var o = D[z.o], mfh = z.o === 'mfh', W = wohnungen(o);
+    var o = D[z.o], mfh = z.o === 'mfh', ohne = z.o === 'mfh0', W = wohnungen(o);
     if (!mfh && z.ans === 'einh') z.ans = 'miete';
     if (z.sel >= W.length) z.sel = 0;
     var w = W[z.sel], sum = W.reduce(function (a, x) { return a + x.ist; }, 0), fl = W.reduce(function (a, x) { return a + x.wfl; }, 0);
     var sumSoll = W.reduce(function (a, x) { return a + bewerten(o, x).sollM; }, 0), sumNeu = W.reduce(function (a, x) { return a + bewerten(o, x).neuM; }, 0);
     ['ueber', 'miete', 'einh'].forEach(function (k) { document.getElementById('ans-' + k).classList.toggle('versteckt', z.ans !== k); });
     document.querySelectorAll('.kopf [data-ans]').forEach(function (b) { b.classList.toggle('an', b.getAttribute('data-ans') === z.ans); });
-    document.querySelectorAll('[data-nur]').forEach(function (e) { e.classList.toggle('versteckt', e.getAttribute('data-nur') !== z.o); });
+    document.querySelectorAll('[data-nur]').forEach(function (e) { e.classList.toggle('versteckt', e.getAttribute('data-nur').split(' ').indexOf(z.o) < 0); });
     document.getElementById('l-haus').classList.toggle('versteckt', z.l !== 'haus');
     document.getElementById('l-liste').classList.toggle('versteckt', z.l !== 'liste');
     document.querySelectorAll('[data-l]').forEach(function (b) { b.classList.toggle('an', b.getAttribute('data-l') === z.l); });
     var set = function (k, h) { document.querySelectorAll('[data-t="' + k + '"]').forEach(function (e) { e.innerHTML = h; }); };
-    set('regel-satz', mfh ? 'Beim Mehrfamilienhaus trägt man alles, was zu einer Wohnung gehört, im Fenster Einheiten ein. Der Reiter Miete zeigt das Haus als Summe und hält nur, was für das ganze Haus gilt.' : 'Bei der Eigentumswohnung gibt es eine Wohnung und einen Vertrag. Deshalb steht alles im Reiter Miete, auch das Cockpit aus Variante B. Ein Fenster Einheiten braucht es nicht.');
-    set('ue-miete', mfh ? '7 Karten' : '8 Karten'); set('ue-miete-s', mfh ? 'Summe des Hauses, Hausweites, Regeln' : 'Wohnung, Vertrag, Erhöhung, alles hier');
-    set('ue-einh', mfh ? '4 Schritte' : 'nicht nötig'); set('ue-einh-s', mfh ? 'Schritt 2 wird das Haus aus Variante B' : 'eine Wohnung, kein Fenster');
-    set('ue-auch', mfh ? 'ZFH' : 'EFH, DHH, RH'); set('ue-auch-s', mfh ? 'jedes Objekt mit mehreren Wohnungen' : 'jedes Objekt mit einer Wohnung');
+    set('regel-satz', ohne ? 'Ein Mehrfamilienhaus ohne Einheiten rechnet grob über die Gesamtfläche. Alle Eingaben stehen im Reiter Miete: Nettokaltmiete, Zusatzeinnahmen, umlagefähige Kosten und die Mietentwicklung in Stufen. Erst mit Einheiten wandert alles, was zu einer Wohnung gehört, ins Fenster Einheiten.' : mfh ? 'Beim Mehrfamilienhaus trägt man alles, was zu einer Wohnung gehört, im Fenster Einheiten ein. Der Reiter Miete zeigt das Haus als Summe und hält nur, was für das ganze Haus gilt.' : 'Bei der Eigentumswohnung gibt es eine Wohnung und einen Vertrag. Deshalb steht alles im Reiter Miete, auch das Cockpit aus Variante B. Ein Fenster Einheiten braucht es nicht.');
+    set('ue-miete', ohne ? '7 Karten' : (mfh ? '7 Karten' : '8 Karten')); set('ue-miete-s', ohne ? 'alles grob, mit Stufen im Schnitt' : mfh ? 'Summe des Hauses, Hausweites, Regeln' : 'Wohnung, Vertrag, Erhöhung, alles hier');
+    set('ue-einh', mfh ? '4 Schritte' : (ohne ? 'noch nicht angelegt' : 'nicht nötig')); set('ue-einh-s', ohne ? 'Knopf Einheiten anlegen, dann wie MFH mit Einheiten' : mfh ? 'Schritt 2 wird das Haus aus Variante B' : 'eine Wohnung, kein Fenster');
+    set('ue-auch', (mfh || ohne) ? 'ZFH' : 'EFH, DHH, RH'); set('ue-auch-s', ohne ? 'auch beim Einsteiger, der keine Einheiten sieht' : mfh ? 'jedes Objekt mit mehreren Wohnungen' : 'jedes Objekt mit einer Wohnung');
     set('zuordnung', zuordnung(mfh));
     set('heute-zahlen', '<div class="zahl"><small>Kaltmiete</small><b>' + eur(sum) + '</b><small>im Monat' + (mfh ? ', aus 6 Wohnungen' : '') + '</small></div><div class="zahl"><small>Kaltmiete</small><b>' + eur(sum * 12) + '</b><small>im Jahr</small></div><div class="zahl"><small>im Schnitt</small><b>' + qm(sum / fl) + '</b><small>Oberwert ' + qm(o.oben) + '</small></div>');
-    set('spielraum-satz', 'Spielraum ' + (mfh ? 'des Hauses' : 'der Wohnung') + ' im Monat: heute ' + eur(sum) + ', mit Mieterhöhungen ' + eur(sumSoll) + ', bei Neuvermietung bis ' + eur(sumNeu) + '.');
+    set('spielraum-satz', 'Spielraum ' + ((mfh || ohne) ? 'des Hauses' : 'der Wohnung') + ' im Monat: heute ' + eur(sum) + ', mit Mieterhöhungen ' + eur(sumSoll) + ', bei Neuvermietung bis ' + eur(sumNeu) + '.');
     set('spielraum', '<span style="width:' + (sum / sumNeu * 100).toFixed(1) + '%;background:var(--tinte)"></span><span style="width:' + ((sumSoll - sum) / sumNeu * 100).toFixed(1) + '%;background:var(--gruen)"></span><span style="width:' + ((sumNeu - sumSoll) / sumNeu * 100).toFixed(1) + '%;background:var(--gold)"></span>');
-    set('was-heute', mfh ? 'Neu ganz oben. Die Summe kommt aus den Wohnungen und ist hier nicht änderbar. Der Knopf öffnet das Fenster Einheiten, Schritt 2.' : 'Neu ganz oben. Darunter das Cockpit der Wohnung.');
+    set('was-heute', ohne ? 'Neu ganz oben. Die Summe kommt aus der Mietstruktur darunter.' : mfh ? 'Neu ganz oben. Die Summe kommt aus den Wohnungen und ist hier nicht änderbar. Der Knopf öffnet das Fenster Einheiten, Schritt 2.' : 'Neu ganz oben. Darunter das Cockpit der Wohnung.');
     set('etw-leiter', mfh ? '' : leiterHtml(o, w)); set('etw-zahlen', mfh ? '' : zweiZahlen(o, w));
     set('vertrag-etw', vertragHtml(w)); set('erh-etw', erhHtml(o, w, false));
     set('kz-struktur', mfh ? 'GEÄNDERT' : 'BLEIBT');
     document.querySelectorAll('[data-t="kz-struktur"]').forEach(function (e) { e.className = 'kz ' + (mfh ? 'kz-geaendert' : 'kz-bleibt'); });
     set('struktur', '<label class="feld">Nettokaltmiete im Monat<input ' + (mfh ? 'readonly ' : '') + 'value="' + sum + '"></label><label class="feld">Stellplatz, Garage<input value="' + o.zusatz + '"></label><label class="feld">Werbefläche, Antenne, Sonstiges<input value="0"></label><label class="feld">Umlagefähige Kosten im Monat<input value="' + Math.round(fl * 2.4) + '"></label>');
-    set('was-struktur', mfh ? 'Die Nettokaltmiete ist gesperrt, sie ist die Summe der Wohnungen. Zusatzeinnahmen für das ganze Haus bleiben hier.' : 'Wie heute. Die Garage zählt in der Anlage V in Zeile 26.');
+    set('was-struktur', mfh ? 'Die Eingabe bleibt hier, gleich oben. Die Nettokaltmiete ist gesperrt, sie ist die Summe der Wohnungen. Stellplatz, Garage, Werbefläche, Antenne und umlagefähige Kosten für das ganze Haus trägst du hier ein.' : ohne ? 'Die Eingabe bleibt hier, gleich oben, wie heute. Nettokaltmiete, Zusatzeinnahmen und umlagefähige Kosten frei eintragbar.' : 'Wie heute. Die Garage zählt in der Anlage V in Zeile 26.');
     set('analyse', '<div class="zahl"><small>Marktmiete</small><b>' + qm(o.mittel + 0.4) + '</b><small>aktueller Marktdurchschnitt</small></div><div class="zahl"><small>Mietausfall-Risiko</small><b>gering</b><small>DealScore</small></div>');
     set('regeln', regelnHtml(o));
     set('jahre', jahreHtml(o, mfh));
-    set('was-jahre', mfh ? 'Vergangene Jahre sind die Summe der Wohnungen und hier gesperrt. Der Knopf springt zur Wohnung.' : 'Vergangene Jahre direkt hier eintragen. Eine eingetragene Erhöhung füllt sie mit.');
-    set('ziel-satz', mfh ? 'Die Summe aus den Wohnungen. Zielmiete und Maßnahmen legt man je Wohnung im Fenster Einheiten fest.' : 'Zielmiete und Maßnahmen dieser Wohnung. Freiwillig, wie heute.');
+    set('was-jahre', ohne ? 'Die Stufen aus der Karte Das Haus und die Mietsteigerung der Prognose. Vergangene Jahre im Fenster Jahre.' : mfh ? 'Vergangene Jahre sind die Summe der Wohnungen und hier gesperrt. Der Knopf springt zur Wohnung.' : 'Vergangene Jahre direkt hier eintragen. Eine eingetragene Erhöhung füllt sie mit.');
+    set('ziel-satz', ohne ? 'Das Zielbild braucht die Wohnungen. Leg zuerst die Einheiten an.' : mfh ? 'Die Summe aus den Wohnungen. Zielmiete und Maßnahmen legt man je Wohnung im Fenster Einheiten fest.' : 'Zielmiete und Maßnahmen dieser Wohnung. Freiwillig, wie heute.');
     var zz = o.ziel;
     set('ziel-zahlen', '<div class="zahl"><small>Ist</small><b>' + eur(zz.ist) + '</b></div><div class="zahl"><small>nach Mieterhöhung</small><b style="color:var(--gruen)">' + eur(zz.soll) + '</b></div><div class="zahl"><small>Zielbild</small><b style="color:var(--gold-lo)">' + eur(zz.ziel) + '</b></div><div class="zahl"><small>Maßnahmen</small><b>' + eur(zz.kosten) + '</b></div>' + (mfh ? '<div><button class="knopf" data-ans="einh">In den Einheiten ändern</button></div>' : ''));
     set('haus', mfh ? hausHtml(o) : ''); set('panel', mfh ? panelHtml(o, w) : ''); set('liste', mfh ? listeHtml(o) : '');
