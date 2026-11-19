@@ -321,7 +321,9 @@
     var erh = z.erhoehungen.length ? z.erhoehungen.map(function (x) {
       return (x.einheit != null ? 'Wohnung ' + esc(x.nr) + ': ' : '') + esc(x.datum.split('-').reverse().join('.')) + ' auf ' + eur(zahl(x.auf));
     }).join(' · ') : 'keine eingetragen';
-    return '<tr class="dp-jb-edit" data-jb-edit="' + z.jahr + '"><td colspan="8">' + zus
+    /* v3840 · GEMESSEN 19.11.2026 (Westerfeldstr.-Kopie): die Eingabe je Wohnung (ein) wurde seit v3366 gebaut, aber nie
+       ausgegeben. Beim MFH gab es damit keinen Weg, die Miete eines vergangenen Jahres einzutragen. */
+    return '<tr class="dp-jb-edit" data-jb-edit="' + z.jahr + '"><td colspan="8">' + zus + (z.jahr < heuteJahr() ? ein : '')
       + '<div class="dp-jb-f">'
       + ((mfh && mfh.length) ? '' : (z.jahr < heuteJahr() ? f('nkm_j', 'Kaltmiete ' + z.jahr + ', wirklich eingenommen (€ im Jahr)', istZahl(z.miete_proj) ? String(z.miete_proj) : '') : ''))
       + f('leer_monate', 'Leerstand (Monate)', '0', 'numeric')

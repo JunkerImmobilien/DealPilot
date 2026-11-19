@@ -3331,7 +3331,8 @@
     det.querySelector('.dp-ms-eigen-satz').textContent = kennt
       ? 'DealPilot kennt den Mietspiegel dieser Gemeinde und setzt die Werte selbst ein. Du musst hier nichts eintragen. Ein eigener Wert geht vor.'
       : 'DealPilot kennt die Werte dieses Mietspiegels nicht. Trag aus dem Mietspiegel der Stadt die Spanne für diese Wohnung ein, also unteren Wert, Mittelwert und oberen Wert. Damit rechnet DealPilot, wie weit die Miete steigen darf.';
-    if (!det._dpGesetzt || eigen) { det.open = !kennt || eigen; det._dpGesetzt = true; }
+    /* erst festlegen, wenn das Verzeichnis geladen ist (sonst bliebe es nach dem ersten Zeichnen offen) */
+    if (!det._dpGesetzt || eigen) { det.open = !kennt || eigen; if (reg || eigen) det._dpGesetzt = true; }
   }
   function bindeObjektFelder() {
     /* v3246 · Mietspiegel am Objekt: neu zeichnen, auch beim MFH (Summe und Mietrecht-Karte) */
