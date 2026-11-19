@@ -368,7 +368,7 @@
   /* landing-dealcheck-10 · Marcel 13.11.2026: EIN Faktor mit der App (lib/mietanker.js NAEHERUNG_OBEN 1,14,
      477 Rasterpunkte). Die 1,186 oben stammt aus einer anderen Zählung (3.051 Felder) und lag höher. */
   var OBEN_TYPISCH = 1.14;
-  var OHNE_BREMSE = 1.10;   /* landing-dealcheck-13c */
+  var OHNE_BREMSE = 1.20;   /* landing-dealcheck-13d · Marcel 19.11.2026: doch 120 % */
   /* landing-dealcheck-8b · Marcel 12.11.2026: „bitte ohne ; oder – nur mit Punkt und Komma … Mietwucher anders
      ausdrücken". Kurze Sätze, kein Gedankenstrich, kein Semikolon, das Wort Mietwucher fällt weg. */
   function mieteSatz(vg, kp, mb, wfl) {
@@ -385,10 +385,10 @@
       + ', wenn Ausstattung, Lage und Zustand das tragen, sonst ' + eu(vg.qm) + ' im Mittel. Erhöht werden darf um höchstens ' + kpct + ' % in 3 Jahren, frühestens 15 Monate nach der letzten Erhöhung (§ 558 BGB).<br>';
     if (mb && mb.gilt === true) t += '<b>Neuvermietung:</b> hier gilt die Mietpreisbremse. Nach § 556d BGB sind höchstens 110 % der Vergleichsmiete erlaubt, am oberen Rand also ' + eu(oben * 1.1, true)
       + ', wenn Ausstattung, Lage und Zustand das tragen, sonst ' + eu(vg.qm * 1.1) + '. Ausnahmen gibt es bei höherer Vormiete, Modernisierung in den letzten 3 Jahren und Erstbezug nach dem 01.10.2014.';
-    /* landing-dealcheck-13c · Marcel 19.11.2026: ohne Mietpreisbremse rechnet DealPilot vorsichtig mit 110 % (in der App
-       einstellbar bis 120 %, der rechtlich unbedenklichen Grenze nach § 5 WiStG). */
-    else if (mb && mb.gilt === false) t += '<b>Neuvermietung:</b> hier gilt keine Mietpreisbremse, die Miete ist frei vereinbar. DealPilot rechnet vorsichtig mit 110 % der Vergleichsmiete, am oberen Rand also ' + eu(oben * OHNE_BREMSE, true)
-      + ', wenn Ausstattung, Lage und Zustand das tragen, sonst ' + eu(vg.qm * OHNE_BREMSE) + '. Rechtlich unbedenklich sind bis zu 120 %. Wer darüber geht und dabei ein knappes Wohnungsangebot ausnutzt, riskiert ein Bußgeld wegen überhöhter Miete (§ 5 WiStG).';
+    /* landing-dealcheck-13c · Marcel 19.11.2026: ohne Mietpreisbremse zuerst 110 %, dann (13d) doch 120 %, die rechtlich
+       unbedenkliche Grenze nach § 5 WiStG; in der App einstellbar. */
+    else if (mb && mb.gilt === false) t += '<b>Neuvermietung:</b> hier gilt keine Mietpreisbremse, die Miete ist frei vereinbar. DealPilot rechnet mit 120 % der Vergleichsmiete, am oberen Rand also ' + eu(oben * OHNE_BREMSE, true)
+      + ', wenn Ausstattung, Lage und Zustand das tragen, sonst ' + eu(vg.qm * OHNE_BREMSE) + '. Das ist die Grenze, bis zu der eine Miete rechtlich unbedenklich ist. Wer darüber geht und dabei ein knappes Wohnungsangebot ausnutzt, riskiert ein Bußgeld wegen überhöhter Miete (§ 5 WiStG).';
     else t += '<b>Neuvermietung:</b> ob die Mietpreisbremse gilt, bitte prüfen.';
     /* landing-dealcheck-13 · Marcel 19.11.2026: die eigene Miete am oberen Rand und an der Neuvermietung messen
        (Investorensicht), nicht am Mittel. Der Mittelwert steht nur noch als Einordnung dabei. */
