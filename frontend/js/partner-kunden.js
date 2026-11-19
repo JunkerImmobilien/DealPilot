@@ -1493,7 +1493,7 @@
       });
     }
     if (x.uebernommen_id) {
-      dlg = dialog('Erneut übernehmen', '<p>Diesen Kundenstand hast du schon übernommen, als <b>' + esc(x.uebernommen_seq || 'Objekt') + '</b>' + (x.uebernommen_ziel === 'eigen' ? ', in deinen eigenen Bestand' : ', für den Kunden weitergeführt') + '.</p>' +
+      dlg = dialog('Erneut übernehmen', '<p>Diesen Kundenstand hast du schon übernommen, als <b>' + esc(x.uebernommen_seq || 'Objekt') + '</b>' + (x.uebernommen_ziel === 'eigen' ? ', in deinen eigenen Bestand' : ', als Kundenobjekt von ' + esc(kunde) + ' weitergeführt') + '.</p>' +
         zielHtml(x.uebernommen_ziel) +
         '<div class="pk-hinweis"><b>Bestehendes Objekt aktualisieren</b> übernimmt den neuen Stand des Kunden in dein Objekt, die Objektnummer bleibt. Im eigenen Bestand bleiben auch dein Halter und dein Deal-Status. <b>Neue Kopie</b> legt ein weiteres Objekt an.</div>',
         [{ t: 'Abbrechen' }, { t: 'Neue Kopie', fn: function () { return los('neu'); } }, { t: 'Bestehendes aktualisieren', c: 'gold', fn: function () { return los('aktualisieren'); } }]);
