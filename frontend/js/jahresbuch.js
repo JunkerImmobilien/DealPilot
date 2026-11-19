@@ -463,7 +463,8 @@
   }
   function schliessen() {
     var ov = el('dp-jb-ov');
-    if (ov && ov.parentNode) { ov.parentNode.removeChild(ov); speichern(); mountAll(); try { if (global.DpJahresabgleich) global.DpJahresabgleich.mountAll(); } catch (x) {} }
+    if (ov && ov.parentNode) { ov.parentNode.removeChild(ov); speichern(); mountAll(); try { if (global.DpJahresabgleich) global.DpJahresabgleich.mountAll(); } catch (x) {}
+      try { global.dispatchEvent(new CustomEvent('dp:jahre-geaendert')); } catch (x) {} }   /* v3840d · Tabelle der Mietentwicklung neu */
   }
   /* v3710 · Marcel 18.11.2026: der Einstieg „Ist-Mieten je Jahr" oben im Reiter Miete ist weg. Die Ist-Miete
      vergangener Jahre steht jetzt als Eingabe in der Tabelle der Mietentwicklung (mietentwicklung.js

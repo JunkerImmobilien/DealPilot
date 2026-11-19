@@ -527,6 +527,8 @@ window.MietEntwicklung = (function() {
       });
     }
   }
+  /* v3840d · nach dem Fenster Jahre (Ist-Miete eingetragen) die Tabelle neu zeichnen */
+  try { window.addEventListener('dp:jahre-geaendert', function () { try { _renderTable(); } catch (e) {} }); } catch (e) {}
   function _renderTable() {
     var wrap = document.getElementById('me_table_wrap');
     if (!wrap) return;
