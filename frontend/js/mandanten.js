@@ -511,10 +511,14 @@
          nur, wo die ganze Gesellschaft gerechnet wird (gesellschaft-abschluss.js mitBescheid()),
          sonst zoege jedes Objekt fuer sich den vollen Vortrag ab. */
       vortragBescheid: (function () {
+        /* v3820: letztes Jahr "Stand laut Kanzlei" schlaegt die v3790-Felder; dort ist 0 eine Angabe */
+        var lj = _istLetztes(m);
+        if (lj != null) { var o = _iObj(m.ist[String(lj)]); return { kst: Math.max(0, o.vv_kst || 0), gewst: Math.max(0, o.vv_gewst || 0), jahr: lj, quelle: o.quelle || 'Stand laut Kanzlei' }; }
         var bh = m.bh || {}, k = Number(bh.verlustvortrag) || 0, g = Number(bh.verlustvortrag_gewst) || 0;
         if (!(k > 0) && !(g > 0)) return null;
         return { kst: Math.max(0, k), gewst: Math.max(0, g), jahr: Number(bh.verlustvortrag_jahr) || null };
-      })()
+      })(),
+      istJahre: (function () { var src = m.ist || {}, o = {}; Object.keys(src).forEach(function (y) { if (_iHat(src[y])) o[y] = _iObj(src[y]); }); return o; })()
     };
   }
 
@@ -1113,6 +1117,101 @@
     return out;
   }
 
+  /* ═══ v3820 · STAND LAUT KANZLEI — Ist-Werte je Jahr ═══════════════════════════
+     Marcel 19.11.2026 nach dem Kanzleitermin: keine Bilanz aus DealPilot, aber die Werte, die
+     die Kanzlei aus Abschluss und Bescheid zurueckgibt, muessen im Bestand eingetragen werden
+     koennen (spaeter per Schnittstelle aus ADDISON). Fuer ein Jahr mit Ist-Werten gilt das Ist,
+     danach rechnet die Einschaetzung weiter: der Verlustvortrag zum 31.12. des letzten Ist-Jahres
+     ersetzt den selbst gerechneten (Kern steuerReihe, vortragJahr). Gespeichert als m.ist[<Jahr>]. */
+  var ISTARTEN = [
+    { f: 'ergebnis', t: 'Jahresergebnis vor Steuern', h: 'Laut Jahresabschluss der Kanzlei (Ergebnis vor Ertragsteuern).', neg: true },
+    { f: 'kst', t: 'K\u00f6rperschaftsteuer + Soli festgesetzt', h: 'Laut K\u00f6rperschaftsteuerbescheid.' },
+    { f: 'gewst', t: 'Gewerbesteuer festgesetzt', h: 'Laut Gewerbesteuerbescheid der Gemeinde.' },
+    { f: 'vv_kst', t: 'Verlustvortrag K\u00f6rperschaftsteuer zum 31.12.', h: 'Feststellung nach \u00a7 10d Abs. 4 EStG, \u00a7 8 Abs. 1 KStG. 0 hei\u00dft: kein Vortrag.' },
+    { f: 'vv_gewst', t: 'Fehlbetrag Gewerbesteuer zum 31.12.', h: 'Feststellung nach \u00a7 10a GewStG.' },
+    { f: 'gewinnvortrag', t: 'Gewinnvortrag zum 31.12.', h: 'Noch nicht ausgesch\u00fctteter Gewinn laut Bilanz der Kanzlei.' },
+    { f: 'einlagekonto', t: 'Steuerliches Einlagekonto zum 31.12.', h: 'Bestand nach \u00a7 27 KStG laut Feststellung.' },
+    { f: 'gesdar', t: 'Gesellschafterdarlehen zum 31.12.', h: 'Stand laut Bilanz der Kanzlei.' }
+  ];
+  var _iDraft = {}, _iJahr = null;
+  function _iJahre() {
+    var j = {}, nun = new Date().getFullYear();
+    Object.keys(_iDraft).forEach(function (y) { j[y] = 1; });
+    [nun - 3, nun - 2, nun - 1].forEach(function (y) { j[y] = 1; });
+    return Object.keys(j).map(Number).sort(function (a, b) { return a - b; });
+  }
+  function _iObj(o) {   /* leer bleibt leer (null), 0 ist eine Angabe */
+    var r = {}; o = o || {};
+    ISTARTEN.forEach(function (k) { var v = o[k.f]; r[k.f] = (v === '' || v == null || !isFinite(Number(v))) ? null : Number(v); });
+    r.quelle = o.quelle || ''; r.erfasst_am = o.erfasst_am || null;
+    return r;
+  }
+  function _iHat(o) { return !!o && ISTARTEN.some(function (k) { return o[k.f] != null; }); }
+  function _iInit(m) {
+    _iDraft = {};
+    var src = (m && m.ist) || {};
+    Object.keys(src).forEach(function (y) { _iDraft[y] = _iObj(src[y]); });
+    /* Uebernahme aus v3790 (Verlustvortrag laut Bescheid mit Stand-Jahr) */
+    var bh = (m && m.bh) || {};
+    if (!Object.keys(_iDraft).length && Number(bh.verlustvortrag_jahr) > 1990 && (Number(bh.verlustvortrag) > 0 || Number(bh.verlustvortrag_gewst) > 0)) {
+      _iDraft[String(bh.verlustvortrag_jahr)] = _iObj({ vv_kst: Number(bh.verlustvortrag) || 0, vv_gewst: Number(bh.verlustvortrag_gewst) || 0, quelle: 'Bescheid' });
+    }
+    var js = _iJahre(), mit = Object.keys(_iDraft).filter(function (y) { return _iHat(_iDraft[y]); }).sort();
+    _iJahr = mit.length ? mit[mit.length - 1] : String(js[js.length - 1]);
+  }
+  function _ijOpts() {
+    return _iJahre().map(function (y) {
+      return '<option value="' + y + '"' + (String(y) === String(_iJahr) ? ' selected' : '') + '>' + y + (_iHat(_iDraft[y]) ? '  \u00b7  erfasst' : '') + '</option>';
+    }).join('');
+  }
+  function _iUebersicht() {
+    var mit = Object.keys(_iDraft).filter(function (y) { return _iHat(_iDraft[y]); }).sort();
+    return mit.length ? 'Erfasst: ' + mit.join(' \u00b7 ') + '. Ab ' + (Number(mit[mit.length - 1]) + 1) + ' rechnet DealPilot die Einsch\u00e4tzung.' : 'Noch kein Jahr erfasst. Bis dahin ist alles eine Einsch\u00e4tzung.';
+  }
+  function _iFelder() {
+    var w = _iObj(_iDraft[_iJahr]);
+    var q = ['', 'Jahresabschluss der Kanzlei', 'Steuerbescheid', 'ADDISON', 'DATEV', 'eigene Angabe'];
+    return ISTARTEN.map(function (k) {
+      return '<div class="f"><label>' + k.t + ' (\u20ac)</label>'
+        + '<input id="mand-i-' + k.f + '" type="text" inputmode="decimal" placeholder="leer = nicht bekannt" value="' + esc(w[k.f] == null ? '' : String(w[k.f]).replace('.', ',')) + '">'
+        + '<div class="mand-fhint" style="margin-top:5px;font-size:11.5px;color:#7A7370;line-height:1.45">' + k.h + '</div></div>';
+    }).join('')
+      + '<div class="f"><label>Quelle</label><select id="mand-i-quelle">' + q.map(function (x) { return '<option value="' + esc(x) + '"' + (x === w.quelle ? ' selected' : '') + '>' + (x || '\u2013') + '</option>'; }).join('') + '</select></div>';
+  }
+  function _iSync() {
+    if (_iJahr == null) return;
+    var o = {}, alt = _iDraft[_iJahr] || {};
+    ISTARTEN.forEach(function (k) { var v = String(_val('mand-i-' + k.f) || '').trim(); o[k.f] = v === '' ? null : _toN(v); });
+    o.quelle = _val('mand-i-quelle') || '';
+    o.erfasst_am = _iHat(o) ? (alt.erfasst_am || new Date().toISOString().slice(0, 10)) : null;
+    _iDraft[_iJahr] = o;
+  }
+  function istJahr(j) {
+    _iSync();
+    _iJahr = String(j);
+    var host = document.getElementById('mand-ist-felder'); if (host) host.innerHTML = _iFelder();
+    var ue = document.getElementById('mand-ist-uebersicht'); if (ue) ue.innerHTML = _iUebersicht();
+    var sel = document.getElementById('mand-f-ijahr'); if (sel) sel.innerHTML = _ijOpts();
+  }
+  function _iErnte() {
+    _iSync();
+    var out = {};
+    Object.keys(_iDraft).forEach(function (y) { if (_iHat(_iDraft[y])) out[y] = _iDraft[y]; });
+    return out;
+  }
+  /** Ist-Werte einer Gesellschaft: { jahr: {...} } oder fuer ein Jahr das Objekt bzw. null. */
+  function istFuer(halterId, jahr) {
+    var m = get(halterId); var src = (m && m.ist) || {};
+    if (jahr == null) return src;
+    var o = src[String(jahr)]; return _iHat(o) ? _iObj(o) : null;
+  }
+  /** Letztes Ist-Jahr mit Angaben, oder null. */
+  function _istLetztes(m) {
+    var src = (m && m.ist) || {};
+    var js = Object.keys(src).filter(function (y) { return _iHat(src[y]); }).map(Number).sort(function (a, b) { return a - b; });
+    return js.length ? js[js.length - 1] : null;
+  }
+
   /* v1226 · Auskunft nach aussen: was hat die Gesellschaft in diesem Jahr
      gekostet, aufgeschluesselt und als Summe. Die GuV braucht die
      Aufschluesselung, die Bilanz nur die Summe. Kein Jahr erfasst heisst
@@ -1189,6 +1288,7 @@
     var rf = m.rechtsform || 'gmbh';
     var corp = isCorp(rf);
     _kInit(m);   /* v1226: Kosten-Entwurf aus dem Mandanten laden */
+    _iInit(m);   /* v3820: Stand laut Kanzlei */
 
     function rfOpts() {
       var src = locked ? RF : RF.filter(function (r) { return RF_NEW.indexOf(r.v) >= 0; });
@@ -1271,14 +1371,17 @@
       +     '<input type="hidden" id="mand-f-gv" value="' + esc(bh.eb_gewinnvortrag || 0) + '">'
       +     '<input type="hidden" id="mand-f-einlage" value="' + esc(bh.einlagekonto || 0) + '">'
       +   '</div>'
-      /* v3790 \u00b7 Marcel 19.11.2026: Verlustvortrag rechnet jetzt mit (Kern steuerReihe, nur in der
-         Steuer der ganzen Gesellschaft). Bis v3789 wurde das Feld gespeichert und nie gelesen. */
-      +   '<h3 class="set-section-h" style="margin-top:14px">Verlustvortrag <span style="font-weight:400;color:#7A7370;font-size:12px">\u00b7 laut letztem Bescheid, rechnet in der Steuer der Gesellschaft</span></h3>'
-      +   '<div style="' + _fGrid() + '">'
-      +     fldH('K\u00f6rperschaftsteuer: verbleibender Verlustvortrag (\u20ac)', inp('mand-f-vv', bh.verlustvortrag || 0), 'Feststellung nach \u00a7 10d Abs. 4 EStG, \u00a7 8 Abs. 1 KStG.')
-      +     fldH('Gewerbesteuer: vortragsf\u00e4higer Fehlbetrag (\u20ac)', inp('mand-f-vvg', bh.verlustvortrag_gewst || 0), 'Feststellung nach \u00a7 10a GewStG. Bei erweiterter K\u00fcrzung meist 0.')
-      +     fldH('Stand zum 31.12. des Jahres', inp('mand-f-vvj', bh.verlustvortrag_jahr || '', 'z.B. 2025'), 'Jahr des Bescheids. Ab dem Folgejahr rechnet DealPilot mit diesen Betr\u00e4gen statt mit dem selbst gerechneten Vortrag; die Mindestbesteuerung (1 Mio. \u20ac Sockel) gilt.')
+      /* v3820 · Marcel 19.11.2026: "Stand laut Kanzlei" je Jahr ersetzt den v3790-Block Verlustvortrag
+         (die drei Felder wandern beim ersten Oeffnen als Ist-Jahr hierher, _iInit). */
+      +   '<hr class="dvd" style="margin:18px 0 6px">'
+      +   '<h3 class="set-section-h">Stand laut Kanzlei <span style="font-weight:400;color:#7A7370;font-size:12px">\u00b7 Ist-Werte je Jahr aus Abschluss und Bescheid</span></h3>'
+      +   '<div class="mand-fhint" style="margin:2px 0 12px;font-size:12px;color:#7A7370;line-height:1.5">Was deine Kanzlei f\u00fcr ein abgeschlossenes Jahr festgestellt hat. F\u00fcr diese Jahre zeigt DealPilot das <b>Ist</b>, ab dem Folgejahr rechnet die <b>Einsch\u00e4tzung</b> weiter, mit dem Verlustvortrag zum 31.12. des letzten Ist-Jahres. Sp\u00e4ter kommen diese Werte per Schnittstelle aus der Buchhaltung der Kanzlei. Leere Felder sind \u201enicht bekannt\u201c, 0 ist eine Angabe.</div>'
+      +   '<div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:10px">'
+      +     '<label style="font-size:12px;font-weight:600">Jahr</label>'
+      +     '<select id="mand-f-ijahr" onchange="DealPilotMandanten.istJahr(this.value)" style="padding:6px 10px;border:1px solid #E6E0D3;border-radius:8px">' + _ijOpts() + '</select>'
+      +     '<span id="mand-ist-uebersicht" style="font-size:12px;color:#7A7370">' + _iUebersicht() + '</span>'
       +   '</div>'
+      +   '<div id="mand-ist-felder" style="' + _fGrid() + '">' + _iFelder() + '</div>'
       /* ═══════════════════════════════════════════════════════════════════
          v1226 · DER AUFWAND, DER KEINEM OBJEKT GEHÖRT.
          ───────────────────────────────────────────────────────────────────
@@ -1436,11 +1539,13 @@
         eb_gesdar: _toN(_val('mand-f-gesdar')),
         eb_gewinnvortrag: _toN(_val('mand-f-gv')),
         einlagekonto: _toN(_val('mand-f-einlage')),   /* v3197 */
-        verlustvortrag: _toN(_val('mand-f-vv')),
-        verlustvortrag_gewst: _toN(_val('mand-f-vvg')),   /* v3790 */
-        verlustvortrag_jahr: (function () { var j = parseInt(_val('mand-f-vvj'), 10); return (j >= 1990 && j <= 2100) ? j : null; })()
+        /* v3790-Felder: seit v3820 aus dem letzten Jahr "Stand laut Kanzlei" (Formularfelder gibt es nicht mehr) */
+        verlustvortrag: (function () { var i = _iErnte(), j = Object.keys(i).sort().pop(); return j ? (i[j].vv_kst || 0) : 0; })(),
+        verlustvortrag_gewst: (function () { var i = _iErnte(), j = Object.keys(i).sort().pop(); return j ? (i[j].vv_gewst || 0) : 0; })(),
+        verlustvortrag_jahr: (function () { var j = Object.keys(_iErnte()).sort().pop(); return j ? Number(j) : null; })()
       };
       m.kosten = _kErnte();   /* v1226: Kosten der Gesellschaft, je Jahr */
+      m.ist = _iErnte();      /* v3820: Stand laut Kanzlei, je Jahr */
     } else {
       m.regime = {}; m.bh = {}; m.kosten = {};
     }
@@ -1918,6 +2023,7 @@
     uiSaveIfOpen: uiSaveIfOpen,   /* v826 (dedup) */
     kostenJahr: kostenJahr,        /* v1226: Jahreswechsel im Kostenblock */
     kostenFuer: kostenFuer,        /* v1226: Auskunft fuer GuV und Bilanz */
+    istFuer: istFuer, istJahr: istJahr,   /* v3820: Stand laut Kanzlei */
     kostenBegriff: kostenBegriff,  /* v3268: Werbungskosten (privat, GbR) oder Betriebsausgaben (GmbH/UG) */
     feststellung: feststellung,    /* v3268: § 180 AO - Einkuenfte der GbR je Gesellschafter */
     KOSTENARTEN: KOSTENARTEN,

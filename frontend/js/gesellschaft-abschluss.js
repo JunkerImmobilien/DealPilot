@@ -740,6 +740,19 @@ async function _gaGesSteuerReihe(halterId, bisJahr, opt) {
      = Ergebnis vor Steuern (gemessen 2027 Testkonto: +479 - 3.930 - 4.500 = -7.951) */
   var _l = out[out.length - 1];
   if (_l) { _l.kosten = Number(r.kosten && typeof r.kosten === "object" ? r.kosten.summe : r.kosten) || 0; _l.gdZins = Number(r.gdZins) || 0; _l.summeObjekte = _l.erg + _l.kosten + _l.gdZins; }
+  /* v3820 · Stand laut Kanzlei: fuer Jahre mit Ist-Werten gilt das Ist (Ergebnis, festgesetzte
+     KSt/GewSt, Vortrag zum 31.12.). Die Jahre danach bleiben Einschaetzung; ihr Vortrag startet
+     ueber _gaMitBescheid beim Ist des letzten Jahres. Nicht angegebene Felder bleiben gerechnet. */
+  var _ist = (P && P.istJahre) || {};
+  out.forEach(function (x) {
+    var o = _ist[String(x.jahr)]; if (!o) return;
+    x.ist = true; x.istQuelle = o.quelle || 'Stand laut Kanzlei';
+    if (o.ergebnis != null) x.erg = o.ergebnis;
+    if (o.kst != null) x.kst = o.kst;
+    if (o.gewst != null) x.gewst = o.gewst;
+    if (o.kst != null || o.gewst != null) x.steuer = (Number(x.kst) || 0) + (Number(x.gewst) || 0);
+    if (o.vv_kst != null) x.vortragNach = o.vv_kst;
+  });
   _gaGesStCache[key] = { t: Date.now(), r: out };
   return out;
 }
