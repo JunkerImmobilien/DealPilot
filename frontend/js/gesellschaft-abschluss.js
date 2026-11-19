@@ -605,6 +605,10 @@ function _gaRechnenRoh(halterId, jahr, daten) {
    5 · DAS PDF
    ─────────────────────────────────────────────────────────────────────────── */
 async function exportAbschlussPDF(halterId, jahr) {
+  /* v3810 · Marcel 19.11.2026 nach dem Kanzleitermin: keine Bilanz ausgeben. Gerechnet wird weiter
+     (_gaDaten/_gaRechnen tragen die Steuer der Gesellschaft), ausgegeben wird nichts. */
+  if (typeof toast === 'function') toast('Eine Bilanz oder einen Jahresabschluss gibt DealPilot nicht aus. Den erstellt deine Kanzlei. Die steuerliche Einschätzung der Gesellschaft steht in der Steuer-Mappe der Gesellschaft.');
+  return;
   if (typeof Plan !== 'undefined' && Plan.can && !Plan.can('werbungskosten_pdf')) {
     if (typeof toast === 'function') toast('🔒 Der Jahresabschluss ist im Investor-Plan enthalten');
     return;

@@ -91,7 +91,7 @@
       }
       if (s.zu === 'einstellungen') {
         if (typeof window.showSettings === 'function') window.showSettings(s.tab || undefined);
-        /* v3703 · &fenster=jahresabschluss&mandant=<id>: oeffnet den Jahresabschluss-Dialog der Gesellschaft (dort auch die Steuer-Mappe der Gesellschaft) */
+        /* v3703 · &fenster=jahresabschluss&mandant=<id>: oeffnet den Dialog der Gesellschaft; seit v3810 nur noch die Steuer-Mappe (keine Bilanz) */
         if (s.fenster === 'jahresabschluss' && s.mandant && window.DealPilotMandanten && typeof DealPilotMandanten.openJahresabschluss === 'function') {
           setTimeout(function () { try { DealPilotMandanten.openJahresabschluss(s.mandant); } catch (eJ) {} }, 800);
         }

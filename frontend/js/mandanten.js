@@ -988,7 +988,7 @@
         /* v3228 · Marcel 08.11.2026: „Jahresabschluss bitte unter Mandanten zu der jeweiligen Gesellschaft.“
            Bis v3227 stand er als Abschnitt 09 im Portfolio-Cockpit mit eigener Gesellschaftsauswahl. */
         + (isCorp(m.rechtsform) ? '<button type="button" class="btn btn-sm" onclick="DealPilotMandanten.openUeberfuehrung(\'' + esc(m.id) + '\')" title="Weitere Privatobjekte in diese Gesellschaft übertragen, einzeln oder als Gruppe">Objekte überführen</button>' : '')   /* v3470 */
-        + (isCorp(m.rechtsform) ? '<button type="button" class="btn btn-gold btn-sm" onclick="DealPilotMandanten.openJahresabschluss(\'' + esc(m.id) + '\')" title="Bilanz und GuV über alle Objekte dieser Gesellschaft">Jahresabschluss</button>' : '')
+        + (isCorp(m.rechtsform) ? '<button type="button" class="btn btn-gold btn-sm" onclick="DealPilotMandanten.openJahresabschluss(\'' + esc(m.id) + '\')" title="Alle Objekte der Gesellschaft mit Betriebseinnahmen, Betriebsausgaben und der steuerlichen Einschätzung der Gesellschaft">Steuer-Mappe</button>' : '')   /* v3810 · Marcel 19.11.2026 nach dem Kanzleitermin: keine Bilanz ausgeben */
         + '<button type="button" class="btn btn-outline btn-sm" onclick="DealPilotMandanten.uiEdit(\'' + m.id + '\')">Bearbeiten</button>'
         + (canDel ? '<button type="button" class="btn btn-outline btn-sm" style="color:#B86250;border-color:#e6cbc5" onclick="DealPilotMandanten.uiDelete(\'' + m.id + '\')">L\u00f6schen</button>' : '')
         + '</div>';
@@ -997,7 +997,7 @@
     return ''
       + '<h2 class="set-section-h2">Mandanten</h2>'
       + '<p class="hint">Lege fest, wer ein Objekt h\u00e4lt \u2014 Privat oder eine Gesellschaft (GmbH/UG). Jedes Objekt bekommt im Tab Steuer (Karte „Halter & Eigentum“, Detailgrad Experte) einen <b>Halter</b>. '   /* v3243: Ort nachgezogen */
-      + 'Privat l\u00e4uft \u00fcber dein zu versteuerndes Einkommen (Tab Steuer). Bei GmbH/UG gibst du das Steuerregime, die Buchhaltungs-Stammwerte und die Kosten der Gesellschaft an \u2014 der <b>Jahresabschluss</b> (Bilanz und GuV) steht als Knopf an der Karte der Gesellschaft. '
+      + 'Privat l\u00e4uft \u00fcber dein zu versteuerndes Einkommen (Tab Steuer). Bei GmbH/UG gibst du das Steuerregime, das Stammkapital, den Verlustvortrag und die Kosten der Gesellschaft an \u2014 die <b>Steuer-Mappe</b> der Gesellschaft (steuerliche Einschätzung, keine Bilanz) steht als Knopf an der Karte der Gesellschaft. '
       + 'Privat bleibt der Standard.</p>'
       + '<div style="display:grid;grid-template-columns:minmax(0,1fr);gap:11px;margin:16px 0">' + cards + '</div>'
       + '<button type="button" class="btn btn-gold" onclick="DealPilotMandanten.uiNew()"><span class="ic">+</span> Neuer Mandant</button>'
@@ -1257,18 +1257,19 @@
       +     '<div class="mand-fhint" style="margin-top:5px;font-size:11.5px;color:#7A7370;line-height:1.45">Die K\u00fcrzung greift nur, wenn alle vier Punkte das <b>ganze Jahr</b> zutreffen \u2014 dann ist die Gewerbesteuer auf die Vermietung 0. Sonst rechnet DealPilot mit Gewerbesteuer: Gewinn minus Grundsteuer (\u00a7 9 Nr. 1 S. 1 GewStG, ab 2025), auf volle 100 \u20ac abgerundet, \u00d7 3,5 % \u00d7 Hebesatz. ' + (function () { var s = _erwStatus(reg); return s.beantragt && !s.aktiv ? '<b style="color:#B8625C">Beantragt, aber Pr\u00fcfpunkte offen \u2014 gerechnet wird mit Gewerbesteuer.</b>' : ''; })() + (!(Number(reg.gewst) > 0) ? ' <b style="color:#B8625C">Hebesatz fehlt (gesetzlich mind. 200 %, \u00a7 16 Abs. 4 GewStG) \u2014 bitte erg\u00e4nzen.</b>' : '') + '</div>'
       +   '</div>'
       +   '<hr class="dvd" style="margin:18px 0 6px">'
-      +   '<h3 class="set-section-h">Buchhaltung <span style="font-weight:400;color:#7A7370;font-size:12px">\u00b7 f\u00fcr den Jahresabschluss (GuV und Bilanz)</span></h3>'   /* v2208: war "(Stufe 3)" - den Abschluss gibt es seit v1227 */
-      +   '<div class="mand-fhint" style="margin:2px 0 12px;font-size:12px;color:#7A7370;line-height:1.5">Diese Werte bilden die <b>Er\u00f6ffnungsbilanz</b> der Gesellschaft; der Jahresabschluss (GuV und Bilanz) rechnet mit ihnen. F\u00fcr die laufende Rendite- und Steuerrechnung sind sie nicht n\u00f6tig \u2014 nur f\u00fcrs Reporting. Im Zweifel mit dem Steuerberater abstimmen.</div>'
+      /* v3810 · Marcel 19.11.2026 nach dem Kanzleitermin: keine Bilanz. Der Block Buchhaltung
+         (Eroeffnungsbilanz: Wirtschaftsjahr, Bank, Gesellschafterdarlehen, Gewinnvortrag, Einlagekonto)
+         ist ausgeblendet; die Werte bleiben als verdeckte Felder stehen, damit uiSave sie nicht auf 0
+         setzt. Sichtbar bleibt das Stammkapital (UG-Ruecklage § 5a Abs. 3 GmbHG). Spaeter fuellt sie
+         der Rueckweg aus der Buchhaltung der Kanzlei (ADDISON/DATEV). */
+      +   '<h3 class="set-section-h">Stammdaten der Gesellschaft</h3>'
       +   '<div style="' + _fGrid() + '">'
-      /* v3790 \u00b7 Marcel 19.11.2026: Kontenrahmen raus, er wurde nirgends gelesen. Kommt mit der
-         DATEV-/Addison-Anbindung zurueck; der gespeicherte Wert bleibt erhalten (uiSave). */
-      +     fldH('Wirtschaftsjahr-Beginn (MM-TT)', inp('mand-f-wj', bh.wj_start || '01-01', '01-01'), 'Beginn des Gesch\u00e4ftsjahres. Meist 01-01 (Kalenderjahr). Abweichend nur, wenn im Gesellschaftsvertrag so festgelegt.')
-      +     fldH('Stammkapital (\u20ac)', inp('mand-f-sk', bh.stammkapital || 0), 'Gezeichnetes Kapital laut Gesellschaftsvertrag \u2014 GmbH mind. 25.000 \u20ac, UG ab 1 \u20ac. Steht als Eigenkapital in der Er\u00f6ffnungsbilanz.')
-      +     fldH('Er\u00f6ffnung Bank (\u20ac)', inp('mand-f-bank', bh.eb_bank || 0), 'Bankguthaben der Gesellschaft zum Start des Wirtschaftsjahres (Anfangsbestand des Bankkontos).')
-      +     fldH('Er\u00f6ffnung Gesellschafterdarlehen (\u20ac)', inp('mand-f-gesdar', bh.eb_gesdar || 0), 'Stand der Darlehen, die du der Gesellschaft als Gesellschafter gegeben hast \u2014 Fremdkapital der GmbH (deine Forderung). Tilgung mindert den Gewinn nicht, nur die Zinsen.')
-      +     fldH('Gewinnvortrag (\u20ac)', inp('mand-f-gv', bh.eb_gewinnvortrag || 0), 'Aufgelaufener, noch nicht ausgesch\u00fctteter Gewinn aus Vorjahren (Anfangsbestand). Bei einer neu gegr\u00fcndeten Gesellschaft 0.')
-      /* v3197 · Marcel 05.11.2026: GmbH-Interna fehlten der Portfoliostrategie (Einlagekonto, Verlustvortrag) */
-      +     fldH('Steuerliches Einlagekonto (\u20ac)', inp('mand-f-einlage', bh.einlagekonto || 0), 'Bestand nach \u00a7 27 KStG laut letzter Feststellung - Auszahlungen daraus sind steuerfrei.')
+      +     fldH('Stammkapital (€)', inp('mand-f-sk', bh.stammkapital || 0), 'Gezeichnetes Kapital laut Gesellschaftsvertrag — GmbH mind. 25.000 €, UG ab 1 €. Bei der UG rechnet DealPilot damit die gesetzliche Rücklage.')
+      +     '<input type="hidden" id="mand-f-wj" value="' + esc(bh.wj_start || '01-01') + '">'
+      +     '<input type="hidden" id="mand-f-bank" value="' + esc(bh.eb_bank || 0) + '">'
+      +     '<input type="hidden" id="mand-f-gesdar" value="' + esc(bh.eb_gesdar || 0) + '">'
+      +     '<input type="hidden" id="mand-f-gv" value="' + esc(bh.eb_gewinnvortrag || 0) + '">'
+      +     '<input type="hidden" id="mand-f-einlage" value="' + esc(bh.einlagekonto || 0) + '">'
       +   '</div>'
       /* v3790 \u00b7 Marcel 19.11.2026: Verlustvortrag rechnet jetzt mit (Kern steuerReihe, nur in der
          Steuer der ganzen Gesellschaft). Bis v3789 wurde das Feld gespeichert und nie gelesen. */
@@ -1518,10 +1519,10 @@
     return true;
   }
   function openJahresabschluss(id) {
-    if (_expertePflicht('Den Jahresabschluss')) return;   /* v3270 */
+    if (_expertePflicht('Die Steuer-Mappe der Gesellschaft')) return;   /* v3270 */
     var m = get(id);
     if (!m || !isCorp(m.rechtsform)) {
-      if (typeof toast === 'function') toast('Jahresabschluss gibt es nur für eine GmbH oder UG.');
+      if (typeof toast === 'function') toast('Die Steuer-Mappe der Gesellschaft gibt es nur für eine GmbH oder UG.');
       return;
     }
     var alt = document.getElementById('mand-ja-ov'); if (alt) alt.remove();
@@ -1529,17 +1530,19 @@
     ov.id = 'mand-ja-ov';
     ov.style.cssText = 'position:fixed;inset:0;z-index:100050;background:rgba(10,10,12,.55);display:flex;align-items:center;justify-content:center;padding:16px';
     ov.innerHTML = '<div role="dialog" aria-modal="true" style="width:100%;max-width:520px;max-height:86vh;display:flex;flex-direction:column;background:#fff;border-radius:14px;box-shadow:0 20px 60px rgba(0,0,0,.3);overflow:hidden;font-family:Inter,sans-serif">'
-      + '<div style="padding:16px 18px;border-bottom:1px solid #E6E0D3;display:flex;align-items:center;gap:10px"><div style="flex:1;min-width:0"><div style="font:600 17px \'Space Grotesk\',sans-serif;color:#1a1814">Jahresabschluss</div>'
-      + '<div style="font-size:12px;color:#6B6356;margin-top:2px">' + esc(m.name) + ' · ' + esc(rfLabel(m.rechtsform)) + ' · Bilanz, GuV und Anlagenspiegel über alle Objekte dieser Gesellschaft</div></div>'
+      + '<div style="padding:16px 18px;border-bottom:1px solid #E6E0D3;display:flex;align-items:center;gap:10px"><div style="flex:1;min-width:0"><div style="font:600 17px \'Space Grotesk\',sans-serif;color:#1a1814">Steuer-Mappe der Gesellschaft</div>'
+      + '<div style="font-size:12px;color:#6B6356;margin-top:2px">' + esc(m.name) + ' · ' + esc(rfLabel(m.rechtsform)) + ' · steuerliche Einschätzung über alle Objekte dieser Gesellschaft</div></div>'
       + '<button type="button" id="mand-ja-zu" aria-label="Schließen" style="border:0;background:none;font-size:22px;line-height:1;cursor:pointer;color:#6B6356">×</button></div>'
       + '<div style="padding:16px 18px;overflow:auto">'
       +   '<label for="mand-ja-jahr" style="display:block;font:600 12px Inter,sans-serif;color:#3a352b;margin-bottom:6px">Geschäftsjahr</label>'
       +   '<div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center">'
       +     '<select id="mand-ja-jahr" style="flex:1 1 160px;min-width:0;padding:8px 10px;border:1px solid #E6E0D3;border-radius:8px;font:13.5px Inter,sans-serif"><option value="">lädt …</option></select>'
-      +     '<button type="button" id="mand-ja-los" class="btn btn-gold btn-sm">Jahresabschluss erstellen</button>'
-      +     '<button type="button" id="mand-ja-steuer" class="btn btn-outline btn-sm" title="Alle Objekte der Gesellschaft mit Betriebseinnahmen, Betriebsausgaben und Beitrag, dazu die Steuer der Gesellschaft und der Verlustvortrag">Steuer-Mappe der Gesellschaft</button>'   /* v3702 */
+      /* v3810 · Marcel 19.11.2026 nach dem Kanzleitermin: DealPilot gibt KEINE Bilanz aus (der Abschluss
+         ist Sache der Kanzlei). Der Knopf bleibt unsichtbar stehen, damit der Code darunter nicht bricht. */
+      +     '<button type="button" id="mand-ja-los" class="btn btn-gold btn-sm" hidden style="display:none">Jahresabschluss erstellen</button>'
+      +     '<button type="button" id="mand-ja-steuer" class="btn btn-gold btn-sm" title="Alle Objekte der Gesellschaft mit Betriebseinnahmen, Betriebsausgaben und Beitrag, dazu die Steuer der Gesellschaft und der Verlustvortrag">Steuer-Mappe der Gesellschaft</button>'   /* v3702 */
       +   '</div>'
-      +   '<div style="margin-top:12px;font-size:12px;color:#6B6356;line-height:1.5">Kein aufgestellter Jahresabschluss nach §§ 242 ff. HGB, sondern die Zahlen dafür in der Gliederung des HGB. Was DealPilot nicht kennt — Einlagen, Kautionen, laufende Bankbewegungen — steht als <b>Verrechnungskonto Gesellschafter</b> in der Bilanz, damit sie aufgeht, <b>ohne dass die Lücke verschwindet</b>. Die <b>Kosten der Gesellschaft</b> trägst du unter „Bearbeiten“ dieser Gesellschaft ein; fehlen sie, sagt das PDF es auf der GuV-Seite.</div>'
+      +   '<div style="margin-top:12px;font-size:12px;color:#6B6356;line-height:1.5">Eine steuerliche Einschätzung: was jedes Objekt in der Gesellschaft bringt und wie die Gesellschaft es versteuert (Körperschaft- und Gewerbesteuer, Verlustvortrag). Keine Bilanz und kein Jahresabschluss, die erstellt deine Kanzlei. Die <b>Kosten der Gesellschaft</b> trägst du unter „Bearbeiten“ dieser Gesellschaft ein.</div>'
       + '</div></div>';
     document.body.appendChild(ov);
     function zu() { ov.remove(); document.removeEventListener('keydown', escZu); }

@@ -968,7 +968,7 @@
           + (_fs.vollstaendig ? '' : ' Die Anteile ergeben zusammen ' + String(Math.round(_fs.summePct * 100) / 100).replace('.', ',') + ' % — bitte die weiteren Gesellschafter im Mandanten ergänzen.')
           + ' Sonderwerbungskosten und Ergänzungsbilanzen einzelner Gesellschafter sind nicht abgebildet. Keine Steuerberatung.</p>' : '';
         S.push(B.seite(c, 'Jahr ' + row.cal, B.abschnitt('Veranlagungsjahr ' + row.cal, (bg.corp ? 'Betriebseinnahmen und Betriebsausgaben ' : 'Einnahmen und Werbungskosten ') + row.cal, o.adresse) + _afaH + B.liste(tab) + _fsHtml
-          + (bg.corp ? '<p class="det" style="margin-top:3mm">Die Kosten der Gesellschaft selbst (Buchführung, Jahresabschluss, IHK, Kontoführung) stehen nicht hier, sondern im Jahresabschluss der Gesellschaft. Eine Anlage V gibt es für eine GmbH/UG nicht. '
+          + (bg.corp ? '<p class="det" style="margin-top:3mm">Die Kosten der Gesellschaft selbst (Buchführung, Jahresabschluss, IHK, Kontoführung) stehen nicht hier, sondern in der Steuer der Gesellschaft (Einstellungen › Mandanten). Eine Anlage V gibt es für eine GmbH/UG nicht. '
             + ((window.DealPilotUeberfuehrungKern && DealPilotUeberfuehrungKern.HINWEIS_VERKAUF_GES) || '') + '</p>' : '')));
         if (mitAnlageV) { var av = anlageVBlatt(B, row.cal, t); if (av) S.push(B.seite(c, 'Anlage V ' + row.cal, B.abschnitt('Anlage V · Zuordnung', 'Veranlagungsjahr ' + row.cal, 'Dieselben Zahlen, sortiert nach den Zeilen des amtlichen Formulars') + av)); }
       });
@@ -1143,6 +1143,8 @@
      PDF (Restschuld, Vortrag, Steuer ueber den Kern der Ueberfuehrung); die Erlaeuterungstexte kommen
      aus _gaSteuerHinweis / _gaAusgleichText. opt: { halter, jahr } */
   function jahresabschluss(opt) {
+    /* v3810 · Marcel 19.11.2026 nach dem Kanzleitermin: auf keinen Fall eine Bilanz ausgeben. */
+    if (!opt || !opt._erlaubt) return Promise.reject(nutzerFehler('Eine Bilanz oder einen Jahresabschluss gibt DealPilot nicht aus. Den erstellt deine Kanzlei. Die steuerliche Einschätzung der Gesellschaft steht in der Steuer-Mappe der Gesellschaft.'));
     opt = opt || {};
     var halter = String(opt.halter || ''), jahr = parseInt(opt.jahr, 10) || (new Date().getFullYear() - 1);
     var B = D();
