@@ -315,13 +315,20 @@
           /* landing-dealcheck-5 · Marcel 12.11.2026 „die Miete ist sehr gering": es ist der Durchschnitt ALLER laufenden
              Mietverträge (Zensus, fortgeschrieben) - alte Verträge ziehen ihn nach unten, Neuvermietung liegt meist darüber.
              Das steht jetzt an der Kachel; bis hierhin stand dort die Art des Mietspiegels, als wäre es dessen Wert. */
-          k.push(kachel('Bestandsmiete Ø', dez(d.miete.qm, 2) + ' €/m²', 'alle laufenden Verträge', null));
+          /* landing-dealcheck-13 · Marcel 19.11.2026: „als Investor denken … Bestandsmieten maximal möglich, in der Karte
+             angeben, was da ist, und den Schnitt darunter". Gross steht der obere Rand der Vergleichsmiete (bis dorthin
+             darf im Bestand nach § 558 erhoeht werden), darunter der Durchschnitt aller laufenden Vertraege (Zensus). */
+          var vgB = d.vergleichsmiete, obB = vgB && vgB.qm > 0 ? (vgB.quelle === 'mietspiegel' && vgB.oben > 0 ? vgB.oben : vgB.qm * OBEN_TYPISCH) : null;
+          if (obB) k.push(kachel('Bestandsmiete bis', (vgB.quelle === 'mietspiegel' && vgB.oben > 0 ? '' : 'ca. ') + dez(obB, 2) + ' €/m²', 'Ø laufende Verträge ' + dez(d.miete.qm, 2) + ' €', null));
+          else k.push(kachel('Bestandsmiete Ø', dez(d.miete.qm, 2) + ' €/m²', 'alle laufenden Verträge', null));
         }
         /* landing-dealcheck-6 · Vergleichsmiete (Marcel 12.11.2026 „haben wir auch die Vergleichsmieten?"): Mietspiegel-Mittelwert
            der Gemeinde, wo wir die Werte führen dürfen, sonst DealPilot-Näherung (nie „Mietspiegel" genannt). */
         var vg = d.vergleichsmiete;
-        if (vg && vg.qm > 0) k.push(kachel('Vergleichsmiete', dez(vg.qm, 2) + ' €/m²',
-          (vg.quelle === 'mietspiegel' ? 'Mietspiegel' + (vg.unten && vg.oben ? ' ' + dez(vg.unten, 2) + ' bis ' + dez(vg.oben, 2) : '') : 'Näherung ±' + dez(vg.abweichung_pct || 7.5, 1).replace(',0', '') + ' %')
+        /* landing-dealcheck-13 · Marcel 19.11.2026: „bei Vergleichsmieten nicht den Mittelwert, sondern den obersten Wert,
+           darunter die Spanne". */
+        if (vg && vg.qm > 0) k.push(kachel('Vergleichsmiete bis', (vg.quelle === 'mietspiegel' && vg.oben > 0 ? dez(vg.oben, 2) : 'ca. ' + dez(vg.qm * OBEN_TYPISCH, 2)) + ' €/m²',
+          (vg.quelle === 'mietspiegel' ? (vg.unten && vg.oben ? 'Spanne ' + dez(vg.unten, 2) + ' bis ' + dez(vg.oben, 2) + ' · Mittel ' + dez(vg.qm, 2) : 'Mittel ' + dez(vg.qm, 2)) : 'Mittel ' + dez(vg.qm, 2) + ' · Näherung ±' + dez(vg.abweichung_pct || 7.5, 1).replace(',0', '') + ' %')
           + (vg.objekt && vg.objekt.norm ? ' · Bj. ' + vg.objekt.baujahr + ', ' + vg.objekt.wfl + ' m²' : ''), null));
         /* Kappungsgrenze und Mietpreisbremse in EINER Kachel (landing-dealcheck-5 hatte zwei) */
         var mb = d.mietpreisbremse, kp = d.kappung;
@@ -372,21 +379,23 @@
     else if (mb && mb.gilt === false) t += '<b>Neuvermietung:</b> hier gilt keine Mietpreisbremse, die Miete ist frei vereinbar. Unbedenklich sind bis zu 120 % der Vergleichsmiete, am oberen Rand also ' + eu(oben * 1.2, true)
       + ', wenn Ausstattung, Lage und Zustand das tragen, sonst ' + eu(vg.qm * 1.2) + '. Wer darüber geht und dabei ein knappes Wohnungsangebot ausnutzt, riskiert ein Bußgeld wegen überhöhter Miete (§ 5 WiStG).';
     else t += '<b>Neuvermietung:</b> ob die Mietpreisbremse gilt, bitte prüfen.';
+    /* landing-dealcheck-13 · Marcel 19.11.2026: die eigene Miete am oberen Rand und an der Neuvermietung messen
+       (Investorensicht), nicht am Mittel. Der Mittelwert steht nur noch als Einordnung dabei. */
+    var neuMax = mb && mb.gilt === true ? oben * 1.1 : mb && mb.gilt === false ? oben * 1.2 : null;
     if (mitW) {
-      var ist = nkm / wfl, abw = (ist / vg.qm - 1) * 100;
-      t += '<br><b>Deine Miete:</b> ' + dez(ist, 2) + ' € je m²';
-      if (abw < -3) {
-        var ziel = Math.min(oben, ist * (1 + kpct / 100));
-        t += ', das sind ' + dez(Math.abs(abw), 0) + ' % unter dem Mittel. In 3 Jahren sind bis zu <b>' + dez(ziel, 2) + ' €</b> möglich, also ' + dez(Math.round((ziel - ist) * wfl), 0) + ' € mehr im Monat.';
-      } else if (abw > 3) {
-        t += ', das sind ' + dez(abw, 0) + ' % über dem Mittel. '
-          + (ist > oben ? 'Sie liegt auch über dem oberen Rand. Sie darf so bleiben, eine weitere Erhöhung nach § 558 BGB ist aber voraussichtlich ausgeschöpft.'
-                        : 'Sie liegt noch in der Spanne. Eine weitere Erhöhung geht nur, wenn Ausstattung und Lage eine Einordnung weiter oben tragen.')
-          + ' Modernisierung, Index- oder Staffelmiete sind davon getrennt zu prüfen.';
-      } else {   /* landing-dealcheck-11 · Prüfung 13.11.2026 D5: auch beim Mittel den Spielraum bis zum Oberwert nennen */
-        var zielM = Math.min(oben, ist * (1 + kpct / 100));
-        t += ', das entspricht etwa dem Mittel.' + (zielM * wfl >= nkm + 1 ? ' In 3 Jahren sind bis zu <b>' + dez(zielM, 2) + ' €</b> möglich, also ' + dez(Math.round((zielM - ist) * wfl), 0) + ' € mehr im Monat, wenn Ausstattung und Lage den oberen Wert tragen.' : '');
+      var ist = nkm / wfl, bisOben = oben - ist, ziel = Math.min(oben, ist * (1 + kpct / 100));
+      var mtl = function (qm) { return dez(Math.round(qm * wfl), 0) + ' €'; };
+      t += '<br><b>Deine Miete:</b> ' + dez(ist, 2) + ' € je m² (Mittel ' + dez(vg.qm, 2) + ' €). ';
+      if (bisOben > 0.05) {
+        t += 'Bis zum oberen Rand fehlen ' + ca + dez(bisOben, 2) + ' €, das sind ' + mtl(bisOben) + ' im Monat. '
+          + (ziel < oben - 0.005 ? 'Wegen der Kappung sind in 3 Jahren davon bis <b>' + dez(ziel, 2) + ' €</b> erreichbar (' + mtl(ziel - ist) + ' mehr im Monat), der Rest in den Jahren danach. '
+                                 : 'Das ist in 3 Jahren erreichbar, also <b>' + mtl(bisOben) + ' mehr im Monat</b>. ')
+          + 'Voraussetzung: Ausstattung, Lage und Zustand tragen den oberen Wert.';
+      } else {
+        t += 'Sie liegt ' + (bisOben < -0.05 ? dez(-bisOben, 2) + ' € über dem' : 'am') + ' oberen Rand. Im Bestand ist sie ausgereizt, eine Erhöhung nach § 558 BGB geht voraussichtlich nicht mehr.';
       }
+      if (neuMax && neuMax > ist + 0.05) t += ' Bei einer Neuvermietung sind bis ' + ca + dez(neuMax, 2) + ' € möglich, also ' + mtl(neuMax - ist) + ' mehr im Monat.';
+      t += ' Modernisierung, Index- oder Staffelmiete sind getrennt zu prüfen.';
     }
     t += ' <small>Orientierung, keine Rechtsberatung.';
     if (!spanne) t += ' Die Vergleichsmiete ist eine DealPilot-Näherung (±' + dez(vg.abweichung_pct || 7.5, 1) + ' %). Für eine Mieterhöhung braucht es den Mietspiegel, drei Vergleichswohnungen oder ein Gutachten.';
