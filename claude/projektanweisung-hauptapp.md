@@ -45106,3 +45106,14 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
   - Mieten, Fragen an Marcel: Mietpreisübersicht als Mittelwert vor der Näherung; Neuvermietung min(Markt, Oberwert × 1,1); ohne Bremse 120 % oder Marktmiete; Quick-Check ohne Mietspiegel; Landing-Kachel zeigt das Mittel groß.
   - Videos offen: Ü3 (komplett-mfh), Spot, 18 (aus der Videothek genommen), quickcheck (alt).
   - Messkabine offen: MFH-Fenster am Handy (Fuß 245 von 776 px), Umbruch nach „=“ in BMF Schritt 1 bei 390 px.
+
+### Rollout 1.0.123 · 19.11.2026 mittags (`af285c2`; v3790, v3790b)
+- **Was:**
+  - v3790 Gesellschaft: Verlustvortrag laut Bescheid (KSt § 10d, GewSt § 10a, Stand 31.12.) rechnet in der Steuer der ganzen Gesellschaft (Kern steuerReihe, ab dem Folgejahr ersetzt er den selbst gerechneten Vortrag); Kontenrahmen ausgeblendet (gespeicherter Wert bleibt); `_toN` liest „25.000“ als 25.000 (vorher 25).
+  - v3790 Mail: `mailerService.sendMail` sendet an .test/.invalid/.example/.localhost/example.* nie über SMTP (Abpraller an Demo-Kunden der Partner-Videos).
+  - v3790b Drehbuch Ü3: „wirksam ab“ statt „erreichbar ab“.
+- **Nachweis:**
+  - Prüfer grün: rechen-audit 103/103, steuer-audit 126, steuer-gesellschaft 64, ueberfuehrung 145, objekt-uebergabe 44, buster-ebenen, vorschau; Gold-Audit auf der Basislinie.
+  - Staging headless (Testkonto kpa): Formular ohne Kontenrahmen, Block Verlustvortrag mit drei Feldern; „25.000“/„60.000“/„12.500,50“ korrekt gespeichert, SKR03 erhalten, `vortragBescheid` kommt an, Reihe 50.000 € zum 31.12.2025 → 2026 KSt 0, Rest 30.000 €.
+  - Prod: Sicherungen `haupt-/mb-20261119-1247`, Serverstand af285c2, Backend healthy (RestartCount 0), mandanten.js?v=v3790.
+- **Rest:** Wirtschaftsjahr-Beginn und Einlagekonto werden weiter nicht gelesen (Entscheidung offen). Ü3 aufgenommen, Vertonung offen; Spot offen.
