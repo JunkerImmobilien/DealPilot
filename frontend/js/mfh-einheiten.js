@@ -1100,7 +1100,11 @@
       var so = w.soll || {};
       return w.art !== 'gewerbe' && w.ist > 0 && so.miete != null && so.miete >= w.ist + 1 && !/^eigene Angabe/.test(so.herkunft || '')
         && !(zahl(_arbeit[w.i] && _arbeit[w.i].soll) >= Math.round(so.miete));
-    }).map(function (w) { return { i: w.i, nr: w.nr, ist: w.ist, miete: Math.round(w.soll.miete), ab: (w.soll.termine && w.soll.termine.wirksam_ab) || '' }; });
+    }).map(function (w) {
+      var ab = String((w.soll.termine && w.soll.termine.wirksam_ab) || ''), mm = /^(\d{4})-(\d{2})/.exec(ab);
+      return { i: w.i, nr: w.nr, ist: w.ist, miete: Math.round(w.soll.miete), ab: ab, abText: mm ? mm[2] + '/' + mm[1] : ab,
+        u559: (w.soll.umlage559 && w.soll.umlage559.monat > 0) ? Math.round(w.soll.umlage559.monat) : 0 };
+    });
   }
   function jahreZeichnen() {
     var h = el('mfh-jahre'); if (!h || !_jArbeit) return;
@@ -1123,7 +1127,7 @@
       + '<p class="mfh-leise">Trag die Monatsmiete ein, die im Jahr gezahlt wurde. Leer heißt: die heutige Miete. Die Summe geht in die Mietentwicklung und in den Jahresabgleich.</p>'
       + '<div class="mfh-scroll"><table class="mfh-jahre-tab"><thead>' + kopf + '</thead><tbody>' + zeilen + fuss + '</tbody></table></div>'
       + (erh.length
-        ? '<div class="mfh-jahre-erh"><b>Mögliche Mieterhöhungen</b><ul>' + erh.map(function (x) { return '<li>Wohnung ' + esc(x.nr || String(x.i + 1)) + ': von ' + eu(x.ist) + ' auf ' + eu(x.miete) + (x.ab ? ', wirksam ab ' + esc(x.ab) : '') + '</li>'; }).join('') + '</ul>'
+        ? '<div class="mfh-jahre-erh"><b>Mögliche Mieterhöhungen</b><ul>' + erh.map(function (x) { return '<li>Wohnung ' + esc(x.nr || String(x.i + 1)) + ': von ' + eu(x.ist) + ' auf ' + eu(x.miete) + (x.u559 ? ', darin ' + eu(x.u559) + ' Modernisierungsumlage (§ 559 BGB)' : '') + (x.ab ? ', wirksam ab ' + esc(x.abText) : '') + '</li>'; }).join('') + '</ul>'
           + '<button type="button" class="dp-ml-k" data-jw-erh="1">alle ' + erh.length + ' als geplante Erhöhung übernehmen ›</button><span class="mfh-leise"> Sie stehen dann bei der Wohnung als Soll-Miete und rechnen in der Mietentwicklung ab dem Datum.</span></div>'
         : '<p class="mfh-leise">Keine weitere Erhöhung möglich. Jede Wohnung liegt an der Vergleichsmiete oder an der Kappungsgrenze, oder die Erhöhung ist schon eingetragen.</p>')
       + '</details>';
