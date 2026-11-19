@@ -15,45 +15,47 @@
   'use strict';
   if (window.DpMieteDemo) return;
   var KEY = 'dp_miete_demo';
-  function aktiv() { try { return localStorage.getItem(KEY) === '1'; } catch (e) { return false; } }
-  function erlaubt() { return /staging|localhost|127\.0\.0\.1/.test(location.hostname); }
+  function aktiv() { try { return localStorage.getItem(KEY) !== '0'; } catch (e) { return true; } }   /* v3880b · Marcel: „so umsetzen“, neue Ansicht ist Standard */
+  function erlaubt() { return true; }   /* v3880b · nicht mehr nur Staging */
   function el(id) { return document.getElementById(id); }
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   function eur(x) { return Math.round(x).toLocaleString('de-DE') + ' €'; }
   function qm(x) { return (Math.round(x * 100) / 100).toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €/m²'; }
   var _sel = 0, _platz = {};
+  /* v3880b · Marcel: „optisch mehr an den DealPilot-Standard“. Echtes Karten-Markup (.card, .ct ct-pro, Symbolkasten) wie jede Karte im Reiter. */
+  function kopf(ico, t, hint) { return '<div class="ct ct-pro"><span class="ct-ico"><svg width="22" height="22"><use href="#i-' + ico + '"/></svg></span>' + t + (hint ? '<span class="oe-ct-hint">' + hint + '</span>' : '') + '</div>'; }
 
   function stil() {
     if (el('dp-md-stil')) return;
     var s = document.createElement('style'); s.id = 'dp-md-stil';
     s.textContent = [
-      '.dp-md-schalter{display:inline-flex;border:1px solid #E6E0D3;border-radius:999px;overflow:hidden;margin:0 0 12px;background:#fff}',
+      '.dp-md-schalter{display:inline-flex;border:1px solid color-mix(in srgb,var(--wl-c9a84c,#C9A84C) 30%,transparent);border-radius:2px;overflow:hidden;margin:0 0 12px;background:#fff}',
       '.dp-md-schalter button{border:0;background:transparent;padding:7px 14px;font:500 12.5px Inter,sans-serif;color:#6B6356;cursor:pointer;min-height:34px}',
       '.dp-md-schalter button.an{background:linear-gradient(110deg,var(--wl-e8cc7a,#E8CC7A),var(--wl-c9a84c,#C9A84C) 55%,var(--wl-b8932f,#b8932f));color:#1a1712;font-weight:600}',
       '.dp-md-schalter span{align-self:center;padding:0 12px;font:500 10px "JetBrains Mono",monospace;letter-spacing:.08em;color:#8A8272;text-transform:uppercase}',
       '#dp-md{min-width:0;max-width:100%;box-sizing:border-box}#dp-md *{box-sizing:border-box}',
-      '#dp-md .dp-md-k{min-width:0;overflow:hidden;background:#fff;border:1px solid #E6E0D3;border-radius:14px;padding:14px 16px;margin:0 0 14px}',
+      '#dp-md .dp-md-k{min-width:0;overflow:hidden;margin:0 0 14px}',
       '#dp-md h3{margin:0 0 4px;font:600 15px "Space Grotesk",sans-serif;color:#2A2727;display:flex;gap:8px;align-items:center;flex-wrap:wrap}',
       '#dp-md .lbl{font:500 10.5px "JetBrains Mono",monospace;letter-spacing:.08em;text-transform:uppercase;color:#7A7370}',
-      '#dp-md .satz{color:#6B6356;font-size:12.5px;margin:2px 0 10px;line-height:1.45}',
+      '#dp-md .satz{color:#625C59;font-size:11.5px;margin:-6px 0 12px;line-height:1.5}',
       '#dp-md .reihe{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px}',
-      '#dp-md .zahl{background:#FBF6E9;border-radius:10px;padding:9px 11px}#dp-md .zahl b{display:block;font:600 17px "Space Grotesk",sans-serif;color:#2A2727}#dp-md .zahl small{color:#7A7370;font-size:11px}',
-      '#dp-md .balken{display:flex;height:18px;border-radius:6px;overflow:hidden;margin:8px 0 4px}#dp-md .balken span{display:block}',
+      '#dp-md .zahl{background:#FBF6E9;border:1px solid color-mix(in srgb,var(--wl-c9a84c,#C9A84C) 18%,transparent);border-radius:2px;padding:10px 12px}#dp-md .zahl small{display:block;color:#6B645A;font-size:11px}#dp-md .zahl small:first-child{font:700 9.5px "JetBrains Mono",monospace;letter-spacing:1.1px;text-transform:uppercase;margin-bottom:3px}#dp-md .zahl b{display:block;font:600 19px "Space Grotesk",sans-serif;color:#2A2727}#dp-md .zahl b.gr{color:#3FA56C}#dp-md .zahl b.go{color:var(--wl-b8932f,#b8932f)}',
+      '#dp-md .balken{display:flex;height:14px;border-radius:2px;overflow:hidden;margin:8px 0 4px}#dp-md .balken span{display:block}',
       '#dp-md .leg{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:11.5px;color:#7A7370}#dp-md .leg i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}',
       '#dp-md .haus{display:grid;gap:6px;margin-top:8px}#dp-md .dach{height:26px;background:linear-gradient(110deg,var(--wl-e8cc7a,#E8CC7A),var(--wl-c9a84c,#C9A84C) 55%,var(--wl-b8932f,#b8932f));clip-path:polygon(6% 100%,50% 0,94% 100%);opacity:.9}',
       '#dp-md .etage{display:grid;gap:6px}',
-      '#dp-md .whg{display:block!important;width:100%;min-width:0;white-space:normal;height:auto;border-radius:10px;padding:8px 9px;border:1.5px solid #E6E0D3;background:#fff;cursor:pointer;text-align:left;font:inherit;color:#2A2727;min-height:78px;position:relative}',
+      '#dp-md .whg{display:block!important;width:100%;min-width:0;white-space:normal;height:auto;border-radius:2px;padding:8px 9px;border:1.5px solid #E6E0D3;background:#fff;cursor:pointer;text-align:left;font:inherit;color:#2A2727;min-height:78px;position:relative}',
       '#dp-md .whg.sel{outline:2px solid var(--wl-c9a84c,#C9A84C);outline-offset:1px}',
       '#dp-md .whg .n,#dp-md .whg .m,#dp-md .whg .q{display:block}#dp-md .whg .n{font:600 12px "Space Grotesk",sans-serif}#dp-md .whg .m{font:600 14.5px "Space Grotesk",sans-serif;margin-top:2px}#dp-md .whg .q{color:#7A7370;font-size:11px}',
-      '#dp-md .whg .st{display:inline-block;font:600 9px "JetBrains Mono",monospace;letter-spacing:.04em;padding:2px 6px;border-radius:999px;margin-bottom:3px}',
-      '#dp-md .s-pot{border-color:#9ED0B3}#dp-md .s-pot .st{background:#EAF5EE;color:#2f7d55}',
-      '#dp-md .s-aus{border-color:#E3D3A4}#dp-md .s-aus .st{background:#F7F0DC;color:#8a6d1f}',
-      '#dp-md .s-ueb{border-color:#DDB0AC}#dp-md .s-ueb .st{background:#F8EDEC;color:#B8625C}',
+      '#dp-md .whg .st{display:inline-block;font:700 8.5px "JetBrains Mono",monospace;letter-spacing:.08em;padding:2px 6px;border-radius:2px;margin-bottom:4px}',
+      '#dp-md .s-pot{border-color:#3FA56C;box-shadow:inset 3px 0 0 #3FA56C}#dp-md .s-pot .st{background:#3FA56C;color:#fff}',
+      '#dp-md .s-aus{border-color:var(--wl-c9a84c,#C9A84C);box-shadow:inset 3px 0 0 var(--wl-c9a84c,#C9A84C)}#dp-md .s-aus .st{background:var(--wl-c9a84c,#C9A84C);color:#1a1712}',
+      '#dp-md .s-ueb{border-color:#B8625C;box-shadow:inset 3px 0 0 #B8625C}#dp-md .s-ueb .st{background:#B8625C;color:#fff}',
       '#dp-md .boden{height:7px;border-radius:4px;background:#E6E0D3}',
-      '#dp-md .leiter{margin:8px 0 2px}#dp-md .bahn{position:relative;height:12px;border-radius:6px;background:#FBF6E9;border:1px solid #E6E0D3}',
+      '#dp-md .leiter{margin:8px 0 2px}#dp-md .bahn{position:relative;height:10px;border-radius:2px;background:#FBF6E9;border:1px solid #E6E0D3}',
       '#dp-md .bahn i{position:absolute;top:-3px;width:3px;height:16px;border-radius:2px}',
       '#dp-md .marken{display:flex;justify-content:space-between;gap:6px;flex-wrap:wrap;font-size:11px;color:#7A7370;margin-top:4px}',
-      '#dp-md .grund{font-size:12px;color:#5E5850;line-height:1.45;border-left:3px solid #E6E0D3;padding:4px 0 4px 10px;margin:8px 0}',
+      '#dp-md .grund{font-size:11.5px;color:#625C59;line-height:1.5;border-left:2px solid var(--wl-c9a84c,#C9A84C);padding:4px 0 4px 10px;margin:10px 0}',
       '#dp-md .knoepfe{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}',
       '#dp-md .regel{display:grid;grid-template-columns:120px 1fr;gap:2px 12px;padding:7px 0;border-top:1px solid #F1ECE1;font-size:12.5px}#dp-md .regel:first-of-type{border-top:0}',
       '#dp-md .regel p{margin:2px 0 0;color:#7A7370;font-size:11.5px}',
@@ -110,7 +112,7 @@
     var s = D.W.reduce(function (a, w) { return a + w.ist; }, 0), so = D.W.reduce(function (a, w) { return a + w.soll; }, 0), ne = D.W.reduce(function (a, w) { return a + Math.max(w.soll, w.neuM); }, 0);
     var fl = D.W.reduce(function (a, w) { return a + w.wfl; }, 0), vgl = D.W.filter(function (w) { return w.vgl > 0; })[0];
     var max = Math.max(ne, so, s) || 1;
-    return '<div class="dp-md-k"><h3>Miete heute und Spielraum</h3>'
+    return '<div class="card dp-md-k">' + kopf('euro', 'Miete heute und Spielraum')
       + '<div class="reihe"><div class="zahl"><small>Kaltmiete</small><b>' + eur(s) + '</b><small>im Monat' + (D.mfh ? ', aus ' + D.W.length + ' Wohnungen' : '') + '</small></div>'
       + '<div class="zahl"><small>Kaltmiete</small><b>' + eur(s * 12) + '</b><small>im Jahr</small></div>'
       + '<div class="zahl"><small>im Schnitt</small><b>' + (fl > 0 ? qm(s / fl) : '–') + '</b><small>' + (vgl ? 'Vergleichsmiete bis ' + qm(vgl.vgl) : 'ohne Vergleichsmiete') + '</small></div></div>'
@@ -125,7 +127,7 @@
     for (var i = 0; i < n; i += sp) rows.push(D.W.slice(i, i + sp));
     rows.reverse();
     var w = D.W[_sel];
-    return '<div class="dp-md-k"><h3>Das Haus</h3><div class="satz">Jede Kachel ist eine Wohnung. Die Farbe zeigt den Spielraum der Miete. Klick wählt die Wohnung.</div>'
+    return '<div class="card dp-md-k">' + kopf('building', 'Das Haus', D.W.length + ' Wohnungen') + '<div class="satz">Jede Kachel ist eine Wohnung. Die Farbe zeigt den Spielraum der Miete. Klick wählt die Wohnung.</div>'
       + '<div class="haus"><div class="dach"></div>' + rows.map(function (r) {
         return '<div class="etage" style="grid-template-columns:repeat(' + sp + ',minmax(0,1fr))">' + r.map(function (x) {
           var j = D.W.indexOf(x);
@@ -140,23 +142,23 @@
   }
   function karteWohnung(D) {
     var w = D.W[0];
-    return '<div class="dp-md-k"><h3>Die Wohnung</h3><div class="satz">' + Math.round(w.wfl) + ' m², heute ' + (w.ist ? eur(w.ist) + ' im Monat' : 'leer') + '. Wo die Miete steht und wie weit sie steigen darf.</div>'
+    return '<div class="card dp-md-k">' + kopf('door', 'Die Wohnung') + '<div class="satz">' + Math.round(w.wfl) + ' m², heute ' + (w.ist ? eur(w.ist) + ' im Monat' : 'leer') + '. Wo die Miete steht und wie weit sie steigen darf.</div>'
       + leiter(w) + zweiZahlen(w) + (w.grund ? '<div class="grund">' + esc(w.grund) + '</div>' : '')
       + '<details class="dp-md-auf" open data-md-platz="mv"><summary>Mietvertrag und Mieterhöhung</summary></details></div>';
   }
   function karteRegeln(D) {
     var m = D.m, k = m.kappung || {}, v = m.vgl || {}, w = D.W[0], br = w && w.bremse;
-    return '<div class="dp-md-k"><h3>Was hier gilt</h3>'
+    return '<div class="card dp-md-k">' + kopf('book', 'Was hier gilt')
       + '<div class="regel"><span class="lbl">Kappung</span><div><b>' + (k.pct || 20) + ' % in 3 Jahren</b><p>' + (k.herkunft === 'verordnung' ? 'Die Gemeinde steht in der Verordnung.' : 'Gesetzlich nach § 558 Abs. 3 BGB.') + '</p></div></div>'
       + '<div class="regel"><span class="lbl">Vergleichsmiete</span><div><b>bis ' + (v.qm ? qm(v.qm) : '–') + '</b><p>' + esc(v.ms && v.ms.wahl_text ? (v.qualifiziert ? 'qualifizierter' : 'einfacher') + ' Mietspiegel, ' + v.ms.wahl_text : (v.art || '')) + (D.mfh ? '. Je Wohnung nach ihrer Größe.' : '.') + '</p></div></div>'
       + '<div class="regel"><span class="lbl">Neuvermietung</span><div><b>' + (br ? 'Mietpreisbremse, höchstens 110 %' : 'ohne Bremse, DealPilot rechnet mit ' + (window.DpMieteRegel ? DpMieteRegel.pct() : 120) + ' %') + '</b></div></div>'
       + '<details class="dp-md-auf" data-md-platz="mr"><summary>Langfassung mit Quellen</summary></details></div>';
   }
   function karteZiel(D) {
-    var s = D.W.reduce(function (a, w) { return a + w.ist; }, 0), z = D.W.reduce(function (a, w) { return a + (w.ziel || w.soll); }, 0), ko = D.W.reduce(function (a, w) { return a + w.kosten; }, 0);
-    return '<div class="dp-md-k"><h3>Zielbild</h3>'
-      + '<div class="reihe"><div class="zahl"><small>heute</small><b>' + eur(s) + '</b></div><div class="zahl"><small>Zielbild</small><b>' + eur(z) + '</b><small>im Monat</small></div><div class="zahl"><small>Maßnahmen</small><b>' + eur(ko) + '</b></div></div>'
-      + (D.mfh ? '<div class="satz" style="margin-top:8px">Zielmiete, Zeitpunkt und Maßnahmen legst du je Wohnung fest.</div><div class="knoepfe"><button type="button" class="btn btn-outline btn-sm" data-md-einh="1">In den Einheiten ändern</button></div>'
+    var s = D.W.reduce(function (a, w) { return a + w.ist; }, 0), sb = D.W.reduce(function (a, w) { return a + w.soll; }, 0), z = D.W.reduce(function (a, w) { return a + Math.max(w.ziel || 0, w.soll); }, 0), ko = D.W.reduce(function (a, w) { return a + w.kosten; }, 0);
+    return '<div class="card dp-md-k">' + kopf('target', 'Zielbild')
+      + '<div class="reihe"><div class="zahl"><small>heute</small><b>' + eur(s) + '</b><small>im Monat</small></div>' + '<div class="zahl"><small>im Bestand möglich</small><b class="gr">' + eur(sb) + '</b><small>' + (sb > s ? '+' + eur(sb - s) + ', Mieterhöhung' : 'keine Erhöhung') + '</small></div>' + '<div class="zahl"><small>Zielbild</small><b class="go">' + eur(z) + '</b><small>' + (z > sb ? '+' + eur(z - sb) + ', Neuvermietung' : 'im Monat') + '</small></div>' + '<div class="zahl"><small>Maßnahmen</small><b>' + eur(ko) + '</b><small>Kosten</small></div></div>'
+      + (D.mfh ? '<div class="satz" style="margin-top:8px">Zielmiete, Zeitpunkt und Maßnahmen legst du je Wohnung fest.</div><div class="knoepfe"><button type="button" class="btn btn-outline btn-sm" data-md-einh="1">In den Einheiten ändern</button></div><details class="dp-md-auf" data-md-platz="zb"><summary>Mietspiegel, eigene Werte und Merkmale</summary></details>'
         : '<details class="dp-md-auf" data-md-platz="zb"><summary>Zielbild bearbeiten</summary></details>') + '</div>';
   }
 
@@ -176,7 +178,7 @@
     var b = el('dp-md-schalter');
     if (!b) {
       b = document.createElement('div'); b.id = 'dp-md-schalter'; b.className = 'dp-md-schalter';
-      b.innerHTML = '<span>Ansicht</span><button type="button" data-md-an="0">heute</button><button type="button" data-md-an="1">neu (Demo)</button>';
+      b.innerHTML = '<span>Ansicht</span><button type="button" data-md-an="1">neu</button><button type="button" data-md-an="0">bisher</button>';
       var d = sec.querySelector('.sec-desc'); if (d && d.nextSibling) sec.insertBefore(b, d.nextSibling); else sec.insertBefore(b, sec.firstChild);
       b.addEventListener('click', function (ev) {
         var t = ev.target.closest('[data-md-an]'); if (!t) return;
@@ -200,14 +202,13 @@
     var offenMr = aufMr ? aufMr.open : false, offenZb = aufZb ? aufZb.open : false;
     /* echte Karten vor dem Neuzeichnen in Sicherheit bringen, sonst löscht innerHTML sie */
     [mv, mr, zb].forEach(function (c) { if (c && box.contains(c)) document.body.appendChild(c); if (c) c.style.display = 'none'; });
-    box.innerHTML = '<div class="demo-hin">Demo des neuen Reiters, nur auf Staging. Rechnet mit den echten Werten dieses Objekts. Pilot-Mietpreis-Analyse, Mietstruktur und Mietpreis-Analyse bleiben wie heute.</div>'
-      + karteHeute(D) + (D.mfh ? karteHaus(D) : karteWohnung(D)) + karteRegeln(D) + karteZiel(D);
+    box.innerHTML = karteHeute(D) + (D.mfh ? karteHaus(D) : karteWohnung(D)) + karteRegeln(D) + karteZiel(D);
     var setze = function (key, c, offen) { var h = box.querySelector('[data-md-platz="' + key + '"]'); if (h && c) { h.appendChild(c); c.style.display = ''; if (offen != null) h.open = h.open || offen; } };
     if (!D.mfh) setze('mv', mv, null);
     setze('mr', mr, offenMr);
-    if (!D.mfh) setze('zb', zb, offenZb);
+    setze('zb', zb, offenZb);   /* v3880b · auch beim MFH: die Karte trägt Mietspiegel-Felder und Merkmale */
     /* beim MFH bleiben Mietvertrag-Liste und Zielbild-Karte unsichtbar: beides steht je Wohnung in den Einheiten */
-    if (D.mfh) { [mv, zb].forEach(function (c) { if (c && c.parentNode === document.body && _platz[c === mv ? 'mv' : 'zb']) { var mk = _platz[c === mv ? 'mv' : 'zb']; mk.parentNode.insertBefore(c, mk); c.style.display = 'none'; } }); }
+    if (D.mfh) { [mv].forEach(function (c) { if (c && c.parentNode === document.body && _platz[c === mv ? 'mv' : 'zb']) { var mk = _platz[c === mv ? 'mv' : 'zb']; mk.parentNode.insertBefore(c, mk); c.style.display = 'none'; } }); }
     if (!box._bind) {
       box._bind = true;
       box.addEventListener('click', function (ev) {
