@@ -215,7 +215,12 @@ soll('AfA im Kaufjahr (Kauf 03/2026, Stichtag 07/2026)', K.afaBisStichtag({ seri
   soll('erw. Kuerzung mit allen Pruefpunkten -> an', K.erwKuerzungStatus({ erw_kuerzung: true, erw_pruefung: alle }).aktiv, true);
   const body = mandSrc.match(/function effRate\(id\) \{[\s\S]*?\n  \}\n  function _erwStatus[\s\S]*?\n  \}\n  function _erwAktiv[^\n]*\n/);
   if (!body) { console.error('KAPUTT: effRate in mandanten.js nicht gefunden'); process.exit(2); }
-  const eff = (regime) => new Function('_isPro', 'get', 'isCorp', 'document', 'window', body[0] + '\nreturn effRate;')(
+  /* v3790c · effRate liest den Satz ueber _kstSatz() (Reparatur gespeicherter 15825 statt 15,825) - mitnehmen */
+  const kstM = mandSrc.match(/function _kstSatz\(reg\) \{[\s\S]*?\n  \}\n/);
+  if (!kstM) { console.error('KAPUTT: _kstSatz in mandanten.js nicht gefunden'); process.exit(2); }
+  soll('_kstSatz repariert 15825 -> 15,825', new Function(kstM[0] + '\nreturn _kstSatz;')()({ kst: 15825 }), 15.825, 1e-9);
+  soll('_kstSatz laesst 30 stehen', new Function(kstM[0] + '\nreturn _kstSatz;')()({ kst: 30 }), 30, 1e-9);
+  const eff = (regime) => new Function('_isPro', 'get', 'isCorp', 'document', 'window', kstM[0] + body[0] + '\nreturn effRate;')(
     () => true, () => ({ rechtsform: 'gmbh', regime }), (rf) => rf === 'gmbh' || rf === 'ug', { getElementById: () => null }, { DealPilotUeberfuehrungKern: K })('x');
   soll('effRate nie gespeichert, Hebesatz 450', eff({ gewst: 450 }), 0.31575, 1e-9);
   soll('effRate beantragt ohne Pruefung', eff({ gewst: 450, erw_kuerzung: true }), 0.31575, 1e-9);
