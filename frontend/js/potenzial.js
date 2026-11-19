@@ -593,7 +593,8 @@
       if (vg.unten > 0 || vg.mittel > 0 || ober > 0)
         mehr += '<div class="dp-zv-sp3"><span><small>unten</small>' + ca + qmDe(zahl(vg.unten)) + '</span><span><small>Mittelwert, konservativ</small>' + ca + qmDe(zahl(vg.mittel)) + '</span><span><small>Oberwert</small>' + ca + qmDe(ober) + '</span>'
           + (maxQ > 0 ? '<span><small>Neuvermietung höchstens</small>' + ca + qmDe(maxQ) + '</span>' : '') + '</div>';
-      mehr += '<p>Spanne für eine Wohnung mit ' + Math.round(z.wfl) + ' m²' + (vg.etikett ? ', ' + esc(vg.etikett) : '') + '. Quelle: ' + esc(vg.quelle || vg.herkunft || v.herkunft || 'Mietspiegel der Gemeinde') + '.</p>';
+      var quelleT = vg.etikett || (vg.herkunft && String(vg.herkunft).length > 14 ? vg.herkunft : '') || (vg.quelle === 'naeherung' ? 'DealPilot-Näherung aus amtlichen Mietdaten der Gemeinde' : 'Mietspiegel der Gemeinde');   /* v3860: nie das Kürzel aus vg.quelle */
+      mehr += '<p>Spanne für eine Wohnung mit ' + Math.round(z.wfl) + ' m². Quelle: ' + esc(quelleT) + '.</p>';
       if (sp && sp.bestand_max_qm) mehr += '<p>Im laufenden Mietvertrag bis ' + ca + qmDe(sp.bestand_max_qm) + ' €/m², in Schritten der Kappungsgrenze (§ 558 BGB).</p>';
       if (sp && sp.bedingung) mehr += '<p>Der Oberwert ' + esc(sp.bedingung) + '.</p>';
       if (v.groesse) mehr += '<p>' + esc(v.groesse) + '.</p>';
@@ -602,7 +603,7 @@
       mehr += '<div class="dp-zv-eig"><label>Eigene Zielmiete (€/m²)<input type="text" inputmode="decimal" data-zv-eigen="' + z.i + '" value="' + (z.ziel_qm != null && !z.ziel_auto ? esc(qmDe(z.ziel_qm)) : '') + '" placeholder="' + esc(qmDe(v.qm)) + '"></label>'
         + '<label>Ab wann<input type="text" data-zv-wann="' + z.i + '" value="' + esc(String(z.ziel_wann || '')) + '" placeholder="bei Mieterwechsel oder 2028"></label></div>';
       return '<div class="dp-zv-z"><span class="dp-zv-n">' + esc(name) + '<small>' + Math.round(z.wfl) + ' m²</small></span>'
-        + '<details class="dp-zv-v"><summary><b>' + esc(qmDe(v.qm)) + ' €/m²</b> · ' + esc(eur(v.monat)) + ' im Monat'
+        + '<details class="dp-zv-v"><summary title="' + esc('Quelle: ' + quelleT) + '"><b>' + esc(qmDe(v.qm)) + ' €/m²</b> · ' + esc(eur(v.monat)) + ' im Monat'
         + (v.gedeckelt ? ' <i class="dp-zv-deckel">Mietpreisbremse</i>' : v.ungeprueft ? ' <i class="dp-zv-pruef">Bremse prüfen</i>' : '')
         + '<small>' + esc(kurz) + '</small></summary><div class="dp-zv-mehr">' + mehr + '</div></details>'
         + '<span class="dp-zv-k">' + rechts + '</span></div>';
