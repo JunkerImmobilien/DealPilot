@@ -57,7 +57,7 @@ const ok = (ab, was, b, ist) => { n++; if (!b) rot++; console.log((b ? '  ok  ' 
   const e1 = { datum: gestern, art: '558', von: 650, auf: 700 };
   const a1 = E.ableiten([e1]);
   const t1 = E.rueckmeldung(e1, a1, 650, 'in der Mietentwicklung');
-  ok('E', 'vergangene Erhöhung: sagt wohin, bietet „Auf 700 € setzen"', /steht so in der Mietentwicklung/.test(t1) && /data-erh-heute="700"/.test(t1), t1);
+  ok('E', 'vergangene Erhöhung: sagt wohin, bietet „Auf 700 € setzen"', /Sie zählt in der Mietentwicklung/.test(t1) && /data-erh-heute="700"/.test(t1), t1);
   ok('E', 'gleiche heutige Miete: kein Knopf', !/data-erh-heute/.test(E.rueckmeldung(e1, a1, 700, 'x')));
   const t2 = E.rueckmeldung({ datum: morgen, art: '558', auf: 720 }, E.ableiten([{ datum: morgen, art: '558', auf: 720 }]), 700, 'x');
   ok('E', 'künftige Erhöhung: sagt, dass die Prognose weiterrechnet', /liegt in der Zukunft/.test(t2) && !/data-erh-heute/.test(t2), t2);

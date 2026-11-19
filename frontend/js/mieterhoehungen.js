@@ -194,9 +194,10 @@
   /** v3840 · Rückmeldung nach dem Eintragen: wohin der Eintrag geht. Rein bis auf eur/datumDe. */
   function rueckmeldung(e, a, heute, wohin) {
     var heuteIsoS = heuteIso(), auf = zahl(e.auf), t = 'Eingetragen. ';
+    wohin = wohin || 'für die Miete vergangener Jahre in der Mietentwicklung und für die Sperrfrist der nächsten Erhöhung';
     if (e.datum > heuteIsoS) t += 'Die Erhöhung gilt ab ' + datumDe(e.datum) + ' und liegt in der Zukunft. Die Mietentwicklung rechnet ab heute weiter mit ihrer Prognose. Steht die Erhöhung fest, trag sie dort im Modus Detail ein.';
     else {
-      t += 'Die Miete von ' + esc(eur(auf)) + ' gilt ab ' + datumDe(e.datum) + ' und steht so ' + esc(wohin) + '.';
+      t += 'Die Miete von ' + esc(eur(auf)) + ' gilt ab ' + datumDe(e.datum) + '. Sie zählt ' + esc(wohin) + '.';
       if (SPERRE_ARTEN[e.art] && a && a.letzte === e.datum) t += ' „Letzte Erhöhung“ ist jetzt der ' + datumDe(e.datum) + '.';
       if (istZahl(heute) && istZahl(auf) && Math.abs(heute - auf) >= 0.5 && a && a.miete_zuletzt === auf)
         t += ' Die heutige Miete steht noch auf ' + esc(eur(heute)) + '. <button type="button" class="btn btn-outline btn-sm" data-erh-heute="' + auf + '">Auf ' + esc(eur(auf)) + ' setzen</button>';
@@ -212,7 +213,7 @@
     function zeichne() { host.innerHTML = html(h.liste(), { vorbelegbar: !!(h.vorbelegen && h.vorbelegen(true)), wo: h.wo, meldung: meldung }); meldung = ''; }
     function fertig(l, neu) {
       h.setzen(l); var a = ableiten(l); if (h.geaendert) h.geaendert(a);
-      if (neu) meldung = rueckmeldung(neu, a, h.heute ? h.heute() : null, h.wohin || 'in der Mietentwicklung');
+      if (neu) meldung = rueckmeldung(neu, a, h.heute ? h.heute() : null, h.wohin || null);
       zeichne();
     }
     host.onclick = function (ev) {
@@ -294,7 +295,7 @@
     }
     binden(host, {
       wo: 'oben',
-      wohin: 'in der Mietentwicklung im Jahr ' + new Date().getFullYear() + ' und davor',
+      wohin: 'für die Miete vergangener Jahre in der Mietentwicklung und für die Sperrfrist der nächsten Erhöhung',
       heute: function () { return zahl((el('nkm') || {}).value); },
       heuteSetzen: function (v) { if (v > 0) setzeFeld('nkm', String(v).replace('.', ',')); try { if (typeof global.calc === 'function') global.calc(); } catch (e) {} try { global.DpSpeichernFolge(); } catch (e) {} },
       liste: objektListe,
@@ -317,7 +318,7 @@
     if (!Array.isArray(e.erhoehungen)) e.erhoehungen = [];
     binden(host, {
       wo: 'in dieser Wohnung',
-      wohin: 'bei dieser Wohnung. Die heutige Miete der Wohnung änderst du oben im Feld Ist-Miete',
+      wohin: 'für diese Wohnung, in der Mietentwicklung und für die Sperrfrist. Die heutige Miete der Wohnung änderst du oben im Feld Ist-Miete',
       liste: function () { return Array.isArray(e.erhoehungen) ? e.erhoehungen : []; },
       setzen: function (l) { e.erhoehungen = l; },
       vorbelegen: function (nurPruefen) { var x = ausVertrag(e.mv_letzte_erhoehung, e.mv_letzte_erhoehung_betrag, e.ist); return nurPruefen ? !!x : x; },
