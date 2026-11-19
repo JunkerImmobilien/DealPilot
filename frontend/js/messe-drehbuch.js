@@ -7509,24 +7509,25 @@
 
       /* ════ KAPITEL 10 · ERGEBNIS UND BANK-PDF ════ */
       async function (s) {
-        await kmKapitel(s, 10, 'Ergebnis und Bank-PDF', 'Deal Score, Investor Deal Score, Kennzahlen — und das PDF für die Bank.',
+        await kmKapitel(s, 10, 'Ergebnis und Bank-PDF', 'Investor Deal Score, Kennzahlen — und das PDF für die Bank.',
           'Kapitel zehn: das Ergebnis. Wir sehen, wie DealPilot das Haus bewertet, und erzeugen das PDF für das Gespräch mit der Bank.');
+        /* v3790f · Reiter Bewertung seit dem Umbau: EIN Gesamturteil (Investor Deal Score) oben, darunter Investment- und Finanzierungs-Score (d3Kopf/d3Teil wie Modul 12) */
         reiter('s6'); await kmPause(1500);
-        await warteAuf(function () { return r12Karte(1)() && r12Kopf(1).score; }, 8000);
+        await warteAuf(function () { return q('#s6 .dpz-kopf') && q('#s6 .dpz-score') && d3Kopf().score; }, 8000);
         await kmPause(800);
-        var ring = function (i) { return function () { var k = r12Karte(i)(); return k && (k.querySelector('.dpsh-colring') || k.querySelector('.dpsh-mainrow') || k.querySelector('.dpsh-headrow')); }; };
-        var a = r12Kopf(0), bb = r12Kopf(1);
-        DPM_KM.scores = { deal: a, investor: bb };
-        await zeige(ring(0), 10);
-        await kmSag(s, 'Der Deal Score', 'Deal Score <b>' + (a.score || '–') + ' · ' + r12Wort(a.wort) + '</b> — aus Cashflow, Rendite und weiteren Kennzahlen.',
-          'Im Reiter Bewertung: der Deal Score, ' + (a.score || '') + ' von hundert, Stufe ' + r12Wort(a.wort) + '. Er fasst die Kennzahlen des Objekts zusammen — Cashflow, Rendite, Finanzierung — gewichtet nach deinen Einstellungen.', null,
+        var K0 = d3Kopf(), kt0 = r12Kopftext(), g0 = /Gesamt aus Investment (\d+) \(([\d,]+ %)\) und Finanzierung (\d+) \(([\d,]+ %)\)/.exec(kt0);
+        var ti = d3Teil(0), tf = d3Teil(1);
+        DPM_KM.scores = { investor: K0, investment: ti, finanzierung: tf };
+        await zeige(function () { return q('#s6 .dpz-kopf'); }, 10);
+        await kmSag(s, 'Das Gesamturteil', 'Investor Deal Score <b>' + (K0.score || '–') + ' · ' + (K0.wort || '–') + '</b>' + (K0.empf ? ', Empfehlung <b>' + K0.empf.charAt(0) + K0.empf.slice(1).toLowerCase() + '</b>' : '') + '.',
+          'Im Reiter Bewertung steht ganz oben das Gesamturteil: der Investor Deal Score, ' + (K0.score || '') + ' von hundert, ' + (K0.wort || '') + '.' + (K0.empf ? ' Die Empfehlung: ' + K0.empf.charAt(0) + K0.empf.slice(1).toLowerCase() + '.' : '') + ' Er fasst alles zusammen, was wir eingegeben haben — Rendite, Risiko, Lage, Potenzial und die Finanzierung.', null,
           { was: 'Nichts — der Score rechnet sich aus allen Eingaben.', warum: 'Eine Zahl für den schnellen Vergleich von Objekten.', folge: 'Die Gewichte stellst du in den Einstellungen ein.' });
-        await zeige(ring(1), 10);
-        await kmSag(s, 'Der Investor Deal Score', 'Investor Deal Score <b>' + (bb.score || '–') + ' · ' + r12Wort(bb.wort) + '</b> — dazu Lage, Risiko und Potenzial.',
-          'Daneben der Investor Deal Score, ' + (bb.score || '') + ' von hundert, ' + r12Wort(bb.wort) + '. Er schaut zusätzlich auf Lage, Risiko und Upside — hier fließen die gemessene Mikrolage und die Angaben zum Markt am Ort ein.', null,
+        await zeige(function () { return q('#s6 .dpz-score'); }, 10);
+        await kmSag(s, 'Investment und Finanzierung', (ti ? 'Investment <b>' + ti.n + ' · ' + ti.wort + '</b>' : 'Investment') + (tf ? ', Finanzierung <b>' + tf.n + ' · ' + tf.wort + '</b>' : '') + (g0 ? ' — gewichtet ' + g0[2] + ' zu ' + g0[4] : '') + '.',
+          'Darunter die zwei Teile: der Investment-Score' + (ti ? ', ' + ti.n + ' von hundert,' : '') + ' fragt, wie gut die Immobilie ist, egal wie sie finanziert wird — hier fließen die gemessene Mikrolage und der Markt am Ort ein. Der Finanzierungs-Score' + (tf ? ', ' + tf.n + ',' : '') + ' fragt, ob die geplante Finanzierung das Objekt trägt.' + (g0 ? ' Gewichtet werden sie ' + g0[2].replace(',', ' Komma ').replace('%', 'Prozent') + ' zu ' + g0[4].replace(',', ' Komma ').replace('%', 'Prozent') + '.' : ''), null,
           { was: 'Nichts — die Lage aus dem Marktbericht ist schon drin.', warum: 'Rendite allein sagt nichts über das Risiko.', folge: 'Zwei Blickwinkel auf dasselbe Haus.' });
         var K = (window.State && State.kpis) || {};
-        var kb = function () { return q('#s6 .dpsh-statstrip') || q('#s6 .kpi-grid') || r12Karte(0)(); };
+        var kb = function () { return q('#s6 .dpsh-statstrip') || q('#s6 .kpi-grid') || q('#s6 .dpz-score') || r12Karte(0)(); };
         await zeige(kb, 8);
         DPM_KM.kpis = { bmy: K.bmy, dscr: K.dscr, cf_op: K.cf_op, cf_ns: K.cf_ns, ltv: K.ltv };
         await kmSag(s, 'Die Kennzahlen', 'Bruttomietrendite <b>' + (K.bmy != null ? de(K.bmy, 2) + ' %' : '–') + '</b>, DSCR <b>' + (K.dscr != null ? de(K.dscr, 2) : '–') + '</b>, Cashflow vor Steuern <b>' + (K.cf_op != null ? eur(K.cf_op) : '–') + '</b> im Jahr' + (K.cf_ns != null ? ', nach Steuern ' + eur(K.cf_ns) : '') + '.',
