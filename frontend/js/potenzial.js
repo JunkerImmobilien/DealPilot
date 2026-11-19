@@ -385,7 +385,17 @@
           + (so.termine && so.termine.letzte_fehlt ? ' · letzte Erhöhung nicht eingetragen' : ''),
         tag: eigenS ? 'eigene Angabe' : 'DealPilot rechnet vor',
         k: (eigenS || !f.sollSetzen) ? null : { lbl: 'übernehmen', fn: function () { f.sollSetzen(so.miete, wirk); } } });
-    } else z.push({ c: 'soll', t: 'Mieterhöhung', v: 'kein Spielraum', u: so.grund || ((so.miete != null && so.vgl_qm > 0) ? 'die Miete liegt schon an der Grenze' + (so.grenze ? ' (' + so.grenze + ')' : '') + ' · Vergleichsmiete ' + eur2(so.vgl_qm) + '/m²' + (vglKurz(so) ? ' (' + vglKurz(so) + ')' : '') : '') });
+    } else {
+      /* v3860 · Marcel 19.11.2026 (Westerfeldstr. Whg. 1): „Warum steht da kein Spielraum? ... Mir ist ganz wichtig, dass immer
+         hervorgeht, warum wir keinen Spielraum haben und auf was sich das bezieht." Grund + Ist + Vergleichsmiete + Quelle + Ausweg. */
+      var _ksIst = (ist > 0 && wfl > 0) ? ist / wfl : 0, _ksV = zahl(so.vgl_qm);
+      var _ksU = (so.grund || 'Die Miete liegt schon an der Vergleichsmiete.')
+        + (_ksIst > 0 ? ' Heute ' + eur2(_ksIst) + '/m²' : '')
+        + (_ksV > 0 ? (_ksIst > 0 ? ', ' : ' ') + 'Vergleichsmiete bis ' + eur2(_ksV) + '/m²' + (vglKurz(so) ? ' (' + vglKurz(so) + ')' : '') : '')
+        + (_ksIst > 0 || _ksV > 0 ? '.' : '')
+        + ' Eine Mieterhöhung nach § 558 BGB geht nur bis zur Vergleichsmiete. Mehr geht über eine Modernisierung (§ 559 BGB) oder bei Neuvermietung.';
+      z.push({ c: 'soll', t: 'Mieterhöhung', v: 'kein Spielraum', u: _ksU });
+    }
     var br = d.bremse, og = d.obergrenze;
     if (br && br.gilt === true && og) z.push({ c: 'neu', t: 'Bei Neuvermietung', v: 'höchstens ' + eur2(og) + '/m²',
       u: 'Mietpreisbremse gilt' + (br.bis ? ' bis ' + deDatum(br.bis) : '') + ' · Vergleichsmiete + 10 %',
@@ -543,47 +553,69 @@
   function zielVorschlaege(opts) {
     var m = modell(opts);
     return { markt: marktSaniert(m), bremse: mietpreisbremse(agsJetzt()), zeilen: m.wohnungen.map(function (w, j) {
-      return { i: w.i, nr: w.nr, lage: w.lage, art: w.art, wfl: w.wfl, ist: w.ist, status: w.status, ziel_qm: w.ziel_auto ? null : w.ziel_qm, ziel_auto: !!w.ziel_auto, v: vorschlagFuer(m, j) };
+      return { i: w.i, nr: w.nr, lage: w.lage, art: w.art, wfl: w.wfl, ist: w.ist, status: w.status, ziel_qm: w.ziel_auto ? null : w.ziel_qm, ziel_auto: !!w.ziel_auto, ziel_wann: w.ziel_wann || '', v: vorschlagFuer(m, j) };   /* v3860: Zielzeitpunkt */
     }) };
   }
   function zielVorschlagHtml(res) {
     zvStil();
     if (!res || !res.zeilen || !res.zeilen.length) return '';
-    var kopf = '<div class="dp-zv-kopf"><b>Zielmiete nach Sanierung · Vorschlag</b><span>nur ein Vorschlag — übernommen wird nur, was du anklickst</span></div>';
+    /* v3860 · Marcel 19.11.2026: „eine Karte, wo das angezeigt wird, und wenn man draufklickt, sieht man, wie sich das
+       zusammensetzt ... für jede Wohnung, weil unterschiedliche Größen einen anderen Mietspiegel haben". Je Wohnung EINE
+       Zeile: Wert, kurze Rechnung, Zielzeitpunkt. Aufklappen zeigt Spanne für DIESE Größe, Quelle, Bedingung, Prognose und
+       die eigene Eingabe. Die rechte Spalte hat eine feste Breite, damit nichts verrutscht, wenn „übernehmen" wechselt.
+       Der gemeinsame Regeltext steht nur noch einmal unten. Kundentext nur mit Punkt und Komma. */
+    var kopf = '<div class="dp-zv-kopf"><b>Zielmiete je Wohnung</b><span>Vorschlag. Übernommen wird nur, was du anklickst. Klick auf eine Zeile zeigt die Rechnung.</span></div>';
     var mitMax = res.zeilen.some(function (z) { return z.v && z.v.spanne; });   /* v3343 · Maximum geht auch ohne Marktbewertung */
     if (!res.markt && !mitMax) return '<div class="dp-zv">' + kopf + '<p class="dp-zv-fehlt">' + esc(VORSCHLAG_FEHLT) + '</p></div>';
-    var offen = 0;
+    var offen = 0, br = res.bremse || {};
     var zeilen = res.zeilen.map(function (z) {
-      var name = (z.nr ? 'Nr. ' + z.nr : '#' + (z.i + 1)) + (z.lage ? ' · ' + z.lage : '');
-      var v = z.v, rechts;
-      if (!v) rechts = '<span class="dp-zv-leer">' + (z.art === 'gewerbe' ? 'Gewerbe — kein Vorschlag' : 'Fläche fehlt') + '</span>';
-      else if (v.qm == null) rechts = '<span class="dp-zv-leer">—</span>';
+      var name = (z.nr ? 'Nr. ' + z.nr : '#' + (z.i + 1)) + (z.lage ? ', ' + z.lage : '');
+      var v = z.v, rechts, sp = v && v.spanne, vg = (v && v.vergleich) || {}, ca = sp && sp.ca ? 'ca. ' : '';
+      if (!v) rechts = '<span class="dp-zv-leer">' + (z.art === 'gewerbe' ? 'Gewerbe, kein Vorschlag' : 'Fläche fehlt') + '</span>';
+      else if (v.qm == null) rechts = '<span class="dp-zv-leer">kein Vorschlag</span>';
       else {
         var gleich = z.ziel_qm != null && Math.abs(z.ziel_qm - v.qm) < 0.005;
         if (!gleich) offen++;
         rechts = gleich ? '<span class="dp-zv-ok">übernommen</span>'
-          : (z.ziel_auto ? '<span class="dp-zv-ok" title="ohne eigene Eingabe rechnet das Zielbild mit diesem Maximum">im Zielbild angesetzt</span> ' : '')
-            + '<button type="button" class="dp-ml-k" data-zv="' + z.i + '" data-zv-qm="' + v.qm + '">übernehmen ›</button>';
+          : '<button type="button" class="dp-ml-k" data-zv="' + z.i + '" data-zv-qm="' + v.qm + '">übernehmen ›</button>'
+            + (z.ziel_auto ? '<small class="dp-zv-auto" title="Ohne eigene Eingabe rechnet das Zielbild schon mit diesem Wert.">im Zielbild angesetzt</small>' : '');
       }
-      var mitte = v && v.qm != null
-        ? '<b>' + esc(qmDe(v.qm)) + ' €/m²</b> · ' + esc(eur(v.monat)) + '/Monat'
-          + (v.gedeckelt ? ' <i class="dp-zv-deckel" title="' + esc(v.text) + '">Mietpreisbremse</i>' : v.ungeprueft ? ' <i class="dp-zv-pruef" title="' + esc(v.text) + '">Bremse prüfen</i>' : '')
-          + '<small>' + (z.ist > 0 && z.wfl > 0 ? 'heute ' + esc(qmDe(z.ist / z.wfl)) + ' €/m²' : 'leer') + (z.ziel_qm ? ' · eingetragen ' + esc(qmDe(z.ziel_qm)) + ' €/m²' : '')
-          + (v.groesse ? ' · ' + esc(v.groesse) : '') + '</small>'
-          + zvSpanneHtml(v)
-        : '';
-      return '<div class="dp-zv-z"><span class="dp-zv-n">' + esc(name) + '<small>' + (z.wfl ? Math.round(z.wfl) + ' m²' : '') + '</small></span>'
-        + '<span class="dp-zv-v">' + mitte + '</span><span class="dp-zv-k">' + rechts + '</span></div>';
+      if (!v || v.qm == null) return '<div class="dp-zv-z"><span class="dp-zv-n">' + esc(name) + '<small>' + (z.wfl ? Math.round(z.wfl) + ' m²' : '') + '</small></span><span class="dp-zv-v"></span><span class="dp-zv-k">' + rechts + '</span></div>';
+      var istQ = z.ist > 0 && z.wfl > 0 ? z.ist / z.wfl : 0;
+      var ober = zahl(vg.oben), maxQ = sp ? zahl(sp.maximum_qm) : 0, pct = ober > 0 && maxQ > 0 ? Math.round(maxQ / ober * 100) : 0;
+      var rechnung = (ober > 0 && pct > 0)
+        ? '= Oberwert ' + ca + qmDe(ober) + ' × ' + pct + ' %' + (v.bremse_gilt === false ? ', ohne Mietpreisbremse' : ', Mietpreisbremse')
+        : (v.herkunft || '');
+      if (v.markt_begrenzt) rechnung += ', begrenzt auf die Marktmiete';
+      var wann = String(z.ziel_wann || '').trim() || (z.ziel_auto ? 'bei Mieterwechsel' : '');
+      var kurz = rechnung + '. ' + (istQ > 0 ? 'Heute ' + qmDe(istQ) + ' €/m²' : 'Heute leer') + (z.ziel_qm != null && !z.ziel_auto ? ', eingetragen ' + qmDe(z.ziel_qm) + ' €/m²' : '') + (wann ? '. Ziel: ' + wann : '') + '.';
+      var mehr = '';
+      if (vg.unten > 0 || vg.mittel > 0 || ober > 0)
+        mehr += '<div class="dp-zv-sp3"><span><small>unten</small>' + ca + qmDe(zahl(vg.unten)) + '</span><span><small>Mittelwert, konservativ</small>' + ca + qmDe(zahl(vg.mittel)) + '</span><span><small>Oberwert</small>' + ca + qmDe(ober) + '</span>'
+          + (maxQ > 0 ? '<span><small>Neuvermietung höchstens</small>' + ca + qmDe(maxQ) + '</span>' : '') + '</div>';
+      mehr += '<p>Spanne für eine Wohnung mit ' + Math.round(z.wfl) + ' m²' + (vg.etikett ? ', ' + esc(vg.etikett) : '') + '. Quelle: ' + esc(vg.quelle || vg.herkunft || v.herkunft || 'Mietspiegel der Gemeinde') + '.</p>';
+      if (sp && sp.bestand_max_qm) mehr += '<p>Im laufenden Mietvertrag bis ' + ca + qmDe(sp.bestand_max_qm) + ' €/m², in Schritten der Kappungsgrenze (§ 558 BGB).</p>';
+      if (sp && sp.bedingung) mehr += '<p>Der Oberwert ' + esc(sp.bedingung) + '.</p>';
+      if (v.groesse) mehr += '<p>' + esc(v.groesse) + '.</p>';
+      if (v.ohne_markt) mehr += '<p>Ohne Marktbewertung gerechnet. Am Markt prüfen.</p>';
+      if (v.prognose && v.prognose.ziel_maximum) mehr += '<p>Im Jahr ' + v.prognose.jahr + ' ' + ca + qmDe(v.prognose.ziel_maximum.neu_max_qm) + ' €/m², fortgeschrieben mit ' + String(v.prognose.rate.pct).replace('.', ',') + ' % im Jahr.</p>';
+      mehr += '<div class="dp-zv-eig"><label>Eigene Zielmiete (€/m²)<input type="text" inputmode="decimal" data-zv-eigen="' + z.i + '" value="' + (z.ziel_qm != null && !z.ziel_auto ? esc(qmDe(z.ziel_qm)) : '') + '" placeholder="' + esc(qmDe(v.qm)) + '"></label>'
+        + '<label>Ab wann<input type="text" data-zv-wann="' + z.i + '" value="' + esc(String(z.ziel_wann || '')) + '" placeholder="bei Mieterwechsel oder 2028"></label></div>';
+      return '<div class="dp-zv-z"><span class="dp-zv-n">' + esc(name) + '<small>' + Math.round(z.wfl) + ' m²</small></span>'
+        + '<details class="dp-zv-v"><summary><b>' + esc(qmDe(v.qm)) + ' €/m²</b> · ' + esc(eur(v.monat)) + ' im Monat'
+        + (v.gedeckelt ? ' <i class="dp-zv-deckel">Mietpreisbremse</i>' : v.ungeprueft ? ' <i class="dp-zv-pruef">Bremse prüfen</i>' : '')
+        + '<small>' + esc(kurz) + '</small></summary><div class="dp-zv-mehr">' + mehr + '</div></details>'
+        + '<span class="dp-zv-k">' + rechts + '</span></div>';
     }).join('');
-    var br = res.bremse || {};
     return '<div class="dp-zv">' + kopf
-      + '<p class="dp-zv-her">Grundlage: ' + esc(res.markt ? res.markt.herkunft : 'rechtliches Maximum der Wohnung (Mietspiegel bzw. DealPilot-Näherung), ohne Marktbewertung') + '.</p>'   /* v3356 · B4: ohne Marktbewertung brach der Vorschlag still ab */
       + '<div class="dp-zv-liste">' + zeilen + '</div>'
       + (offen > 1 ? '<div class="dp-zv-alle"><button type="button" class="dp-ml-k" data-zv-alle="1">alle ' + offen + ' übernehmen ›</button></div>' : '')
-      + '<p class="dp-zv-fuss">' + esc(br.gilt === true ? 'Mietpreisbremse gilt hier: bei Neuvermietung höchstens ortsübliche Vergleichsmiete + 10 % (§ 556d BGB); ausgenommen die erste Vermietung nach umfassender Modernisierung (§ 556f BGB).'
-          : br.gilt === false ? 'Keine Mietpreisbremse an dieser Adresse.' : 'Mietpreisbremse bitte prüfen — wo sie gilt, höchstens Vergleichsmiete + 10 % (§ 556d BGB).')
-        + ' Laufende Mietverträge: bis zur Neuvermietung gilt die zulässige Miete (Kappungsgrenze, § 558 BGB); mehr nur über die Modernisierungsumlage (§ 559 BGB). Die Zielmiete geht nur in Zielbild, Pilot-Analyse und PDF, nicht in die Mietentwicklung.</p></div>';
+      + '<details class="dp-zv-fuss"><summary>Was hier gilt</summary><p>Grundlage: ' + esc(res.markt ? res.markt.herkunft : 'rechtliches Maximum je Wohnung aus dem Mietspiegel oder der DealPilot-Näherung, ohne Marktbewertung') + '. '
+      + esc(br.gilt === true ? 'Die Mietpreisbremse gilt hier. Bei Neuvermietung höchstens Vergleichsmiete plus 10 % (§ 556d BGB). Ausgenommen ist die erste Vermietung nach umfassender Modernisierung (§ 556f BGB).'
+          : br.gilt === false ? 'Keine Mietpreisbremse an dieser Adresse.' : 'Mietpreisbremse bitte prüfen. Wo sie gilt, höchstens Vergleichsmiete plus 10 % (§ 556d BGB).')
+        + ' Im laufenden Mietvertrag gilt bis zur Neuvermietung die Kappungsgrenze (§ 558 BGB), mehr nur über eine Modernisierung (§ 559 BGB). Die Zielmiete zählt in Zielbild, Pilot-Analyse und PDF, nicht in der Mietentwicklung. Orientierung, keine Rechtsberatung.</p></details></div>';
   }
+
   /* v3343 · die Spanne je Wohnung: konservativ, Maximum, darüber. Kundentext nur mit Punkt und Komma. */
   function zvSpanneHtml(v) {
     var sp = v && v.spanne; if (!sp) return '';
@@ -609,7 +641,19 @@
       '.dp-zv-her,.dp-zv-fuss,.dp-zv-fehlt{font-size:11.5px;color:#7A7370;line-height:1.45;margin:6px 0}',
       '.dp-zv-fehlt{color:#2A2727}',
       '.dp-zv-sp{display:block;margin-top:3px;font-size:11px;line-height:1.4;color:#7A7370}',
-      '.dp-zv-z{display:grid;grid-template-columns:minmax(90px,1.1fr) 2.4fr auto;gap:6px 12px;align-items:center;padding:7px 0;border-top:1px solid #F1ECE1}',
+      '.dp-zv-z{display:grid;grid-template-columns:minmax(90px,1fr) minmax(0,2.6fr) 150px;gap:6px 12px;align-items:start;padding:8px 0;border-top:1px solid #F1ECE1}',   /* v3860 · feste rechte Spalte */
+      '.dp-zv-v>summary{cursor:pointer;list-style:none}.dp-zv-v>summary::-webkit-details-marker{display:none}',
+      '.dp-zv-v>summary::after{content:"Rechnung zeigen";display:inline-block;margin-top:3px;font-size:11px;color:#2f7d55;text-decoration:underline}',
+      '.dp-zv-v[open]>summary::after{content:"Rechnung ausblenden"}',
+      '.dp-zv-mehr{margin-top:8px;padding:8px 10px;background:#FAF8F3;border-radius:8px;font-size:11.5px;color:#5E5850;line-height:1.45}',
+      '.dp-zv-mehr p{margin:4px 0}',
+      '.dp-zv-sp3{display:grid;grid-template-columns:repeat(auto-fit,minmax(90px,1fr));gap:6px;margin-bottom:6px}',
+      '.dp-zv-sp3 span{background:#fff;border:1px solid #EFE7D6;border-radius:6px;padding:5px 7px;font:600 12.5px "Space Grotesk",sans-serif;color:#2A2727}',
+      '.dp-zv-sp3 small{display:block;font:400 10.5px Inter,sans-serif;color:#8A8272}',
+      '.dp-zv-eig{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}.dp-zv-eig label{display:flex;flex-direction:column;gap:3px;font-size:11px;color:#7A7370;flex:1 1 140px}',
+      '.dp-zv-eig input{font:inherit;font-size:12.5px;color:#2A2727;border:1px solid #E6E0D3;border-radius:6px;padding:6px 8px;min-height:34px}',
+      '.dp-zv-k{text-align:right}.dp-zv-auto{display:block;margin-top:4px;font-size:10.5px;color:#2f7d55}',
+      'details.dp-zv-fuss>summary{cursor:pointer;font-size:11.5px;color:#7A7370}',
       '.dp-zv-n{font-size:12.5px;color:#2A2727;min-width:0}.dp-zv-n small{display:block;color:#8A8272;font-size:11px}',
       '.dp-zv-v{font-size:12.5px;color:#2A2727;min-width:0}.dp-zv-v b{font:600 13.5px "Space Grotesk",sans-serif}',
       '.dp-zv-v small{display:block;color:#8A8272;font-size:11px;line-height:1.35}',
@@ -617,7 +661,7 @@
       '.dp-zv-deckel{background:#EAF3EE;color:#2f7d55}.dp-zv-pruef{background:#F8EDEC;color:#B8625C}',
       '.dp-zv-ok{font-size:11.5px;color:#2f7d55;white-space:nowrap}.dp-zv-leer{font-size:11.5px;color:#8A8272}',
       '.dp-zv-alle{text-align:right;padding-top:6px;border-top:1px solid #F1ECE1}',
-      '@media (max-width:560px){.dp-zv-z{grid-template-columns:1fr auto}.dp-zv-v{grid-column:1/-1;grid-row:2}}'
+      '@media (max-width:560px){.dp-zv-z{grid-template-columns:1fr 130px}.dp-zv-v{grid-column:1/-1;grid-row:2}}'
     ].join('');
     document.head.appendChild(s);
   }

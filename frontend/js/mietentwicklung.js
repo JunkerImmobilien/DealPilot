@@ -492,9 +492,10 @@ window.MietEntwicklung = (function() {
          Jetzt steht dort der Wert (grau = gerechnet, schwarz = eingetragen) und ein Knopf „eintragen". Er öffnet das
          Jahr im Fenster Jahre, dort steht, wie sich der Wert zusammensetzt. Beim MFH kommt die Summe aus den Wohnungen
          und wird nur dort je Wohnung eingetragen (DpJahresbuch). Derselbe Speicher _jahre[J].nkm_j wie bisher. */
-      var zelle = ist && eintragbar
-        ? '<span class="me-ist-wert' + (eig != null ? ' me-ist-eigen' : '') + '">' + fE(eig != null ? eig : jahr) + '</span> <button type="button" class="me-ist-knopf" data-me-ist-jahr="' + cal + '" title="' + (mfh ? 'Miete ' + cal + ' je Wohnung eintragen' : 'Tatsächlich eingenommene Kaltmiete ' + cal + ' eintragen') + '">' + (eig != null ? 'ändern' : 'eintragen') + '</button>'
-        : fE(jahr);
+      /* v3860 · Marcel 19.11.2026: „Warum steht neben 2025 eintragen? Der macht dasselbe wie alle Jahre im Überblick."
+         Kein Knopf je Jahr mehr. Grau gerechnet, schwarz eingetragen. Eingetragen wird an EINER Stelle: beim MFH je Wohnung
+         im Fenster Einheiten (Miete je Wohnung und Jahr), sonst im Fenster Jahre (Knopf unter der Tabelle). */
+      var zelle = ist && eintragbar ? '<span class="me-ist-wert' + (eig != null ? ' me-ist-eigen' : '') + '">' + fE(eig != null ? eig : jahr) + '</span>' : fE(jahr);
       zeilen += '<tr class="' + (ist ? 'me-row-ist' : (cal === cy ? 'me-row-heute' : 'me-row-plan')) + (erh.length ? ' me-row-hike' : '') + '">'
         + '<td>' + cal + (erh.length ? ' ⬆' : '') + '</td>'
         + '<td>' + (ist ? (eig != null ? 'Ist · eingetragen' : 'Ist') : (cal === cy ? 'heute' : 'Plan')) + '</td>'
@@ -503,12 +504,10 @@ window.MietEntwicklung = (function() {
     }
     var nE = alle.length;
     /* v3840 · kurze Sätze, nur Punkt und Komma (Marcel 19.11.2026) */
-    wrap.innerHTML = '<div class="me-herkunft"><b>Bis ' + (cy - 1) + '</b> steht die Miete, die gezahlt wurde. DealPilot rechnet sie aus den Mieterhöhungen'
-      + (nE ? ' (' + nE + ' eingetragen).' : '. Es ist noch keine eingetragen, deshalb gilt die heutige Miete' + ((document.getElementById('mv_letzte_erhoehung') || {}).value ? ' mit der letzten Erhöhung' : '') + '.')
-      + ' <b>Ab ' + cy + '</b> schreibt DealPilot die heutige Miete mit der Mietentwicklung fort. Eine Mieterhöhung trägst du ' + (mfh ? 'bei der Wohnung in den Einheiten' : 'in der Karte Mietvertrag') + ' ein.'
-      + (eintragbar ? ' Weicht die echte Miete eines Jahres ab, zum Beispiel wegen Leerstand, klick bei dem Jahr auf „eintragen“.' + (mfh ? ' Beim Mehrfamilienhaus trägst du sie je Wohnung ein.' : '') + ' Grau ist gerechnet, schwarz ist eingetragen.' : '') + '</div>'
+    wrap.innerHTML = '<div class="me-herkunft">Vergangene Jahre zeigen die gezahlte Miete' + (nE ? ', gerechnet aus ' + nE + ' eingetragenen Mieterhöhungen' : '') + '. Ab ' + cy + ' schreibt DealPilot die heutige Miete fort.'
+      + (eintragbar ? ' Grau ist gerechnet, schwarz ist eingetragen.' : '') + '</div>'
       + '<table><thead><tr><th>Jahr</th><th>Stand</th><th>Kaltmiete im Jahr</th><th>je Monat</th></tr></thead><tbody>' + zeilen + '</tbody></table>'
-      + (eintragbar ? '<div class="me-ist-link"><button type="button" class="me-ist-alle" data-me-ist-alle="1">Alle Jahre im Überblick</button></div>' : '');
+      + (eintragbar ? '<div class="me-ist-link">' + (mfh ? '<button type="button" class="me-ist-alle" data-me-einh-jahre="1">Miete je Wohnung und Jahr</button>' : '<button type="button" class="me-ist-alle" data-me-ist-alle="1">Alle Jahre im Überblick</button>') + '</div>' : '');
     if (eintragbar && !wrap._dpMeIst) {
       wrap._dpMeIst = true;
       wrap.addEventListener('change', function (ev) {
@@ -519,8 +518,8 @@ window.MietEntwicklung = (function() {
         try { _renderTable(); } catch (e) {}
       });
       wrap.addEventListener('click', function (ev) {
-        var k = ev.target && ev.target.closest ? ev.target.closest('.me-ist-knopf[data-me-ist-jahr]') : null;
-        if (k) { ev.preventDefault(); try { window.DpJahresbuch.oeffnen(+k.getAttribute('data-me-ist-jahr')); } catch (e) {} return; }   /* v3840 */
+        var k = ev.target && ev.target.closest ? ev.target.closest('[data-me-einh-jahre]') : null;
+        if (k) { ev.preventDefault(); try { window.DpMfhEinheiten.jahreOeffnen(); } catch (e) {} return; }   /* v3860 */
         var b = ev.target && ev.target.closest ? ev.target.closest('[data-me-ist-alle]') : null; if (!b) return;
         ev.preventDefault();
         try { window.DpJahresbuch.oeffnen(); } catch (e) {}

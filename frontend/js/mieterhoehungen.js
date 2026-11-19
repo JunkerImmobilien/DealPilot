@@ -280,11 +280,11 @@
     if (Mf && Mf.artMitEinheiten && Mf.artMitEinheiten() && M0 && Array.isArray(M0.einheiten) && M0.einheiten.length) {
       stil(); host.classList.add('dp-erh'); host.onclick = null;
       var we = alle().filter(function (x) { return x.einheit != null; }).reverse(), alt = objektListe();
-      host.innerHTML = '<div class="dp-erh-t">Mieterhöhungen <span>Beim Mehrfamilienhaus trägst du eine Erhöhung bei der Wohnung ein. Dort zählt sie für die Mietentwicklung, die Sperrfrist und die Kappungsgrenze dieser Wohnung.</span></div>'
+      host.innerHTML = '<div class="dp-erh-t">Mieterhöhungen <span>Beim Mehrfamilienhaus trägst du eine Erhöhung bei der Wohnung ein. Dort zählt sie für die Mietentwicklung, die Sperrfrist und die Kappungsgrenze dieser Wohnung. Unten in dieser Karte über „Einheiten bearbeiten“.</span></div>'
         + (we.length ? we.map(function (x) { return '<div class="dp-erh-z"><b>' + datumDe(x.datum) + '</b><span>Wohnung ' + esc(x.nr) + ', ' + esc(artWort(x.art)) + ': auf <b>' + eur(zahl(x.auf)) + '</b></span><span></span></div>'; }).join('')
           : '<div style="color:#6B645A">In den Wohnungen ist noch keine Erhöhung eingetragen.</div>')
         + (alt.length ? '<div class="cf-hint" style="margin-top:6px">Am Haus stehen noch ' + alt.length + ' ältere Einträge. Sie rechnen nicht mit, weil die Miete aus den Wohnungen kommt. Trag sie bei der Wohnung ein und entferne sie hier. ' + alt.map(function (x) { return datumDe(x.datum) + ' auf ' + eur(zahl(x.auf)) + ' <button type="button" class="dp-erh-x" data-erh-alt-weg="' + esc(x.id) + '" aria-label="Eintrag entfernen">✕</button>'; }).join(' ') + '</div>' : '')
-        + '<button type="button" class="btn btn-outline btn-sm" data-erh-einheiten="1" style="margin-top:8px">In den Einheiten eintragen</button>';
+        + '';   /* v3860 · Marcel 19.11.2026: zwei Knoepfe zur selben Stelle. Es bleibt „Einheiten bearbeiten“ unten in der Karte (mietvertrag-objekt.js). */
       host.onclick = function (ev) {
         var t = ev.target && ev.target.closest ? ev.target : null; if (!t) return;
         if (t.closest('[data-erh-einheiten]')) { ev.preventDefault(); try { Mf.oeffnen(1); } catch (e) {} return; }

@@ -81,7 +81,7 @@ var FIELDS = [
   'brw','mea','gsfl','mietstg','wertstg','kostenstg','leerstand',
   'btj','exit_bmy','nkm','ze','ze_stp_monat','ze_kueche_monat','ze_sonst_monat','ze_werb_monat','ze_funk_monat' /* v3670: Aufteilung von ze, v3800: + Werbeflaeche, Antenne */,'av7h_art','av7h_basis','av7h_jahr' /* v3800b: §§ 7h, 7i */,'umlagef','afa_satz','afa_eigen','afa_eigen_grundlage','afa_rnd_jahre','geb_ant','zve','grenz',
   'ek','d1','d1z','d1t','d1_bindj','anschl_z','anschl_t','anschl_bj',
-  'hg_ul','grundsteuer','grundsteuerwert' /* v3268: § 9 Nr. 1 S. 1 GewStG */,'ul_sonst','hg_nul','weg_r','weg_su' /* v3092 N100: Sonderumlagen, JSON */,'san_plan' /* v3214 N137: weitere Sanierungen, JSON */,'eigen_r',
+  'hg_ul','grundsteuer','grundsteuerwert' /* v3268: § 9 Nr. 1 S. 1 GewStG */,'ul_sonst','hg_nul','weg_r','weg_su' /* v3092 N100: Sonderumlagen, JSON */,'hg_pos' /* v3860: Positionen des Wirtschaftsplans, JSON */,'san_plan' /* v3214 N137: weitere Sanierungen, JSON */,'eigen_r',
   'mietausfall','mietausfall_alt' /* v3238: alter eigener Mietausfall (Euro), wenn Leerstand Vorrang bekam */,'nul_sonst','kp1','kp1l','kp2','kp2l','kp3','kp3l','kp4','kp4l',
   'bank_inst',   /* v3059: ai_strat/ai_verk/ai_risk/ai_markt raus - kein Eingabefeld mehr, die Werte stehen im Investmentprofil */
   'd2','d2z','d2t','d2_bindj','d2_inst','d2_type','bwk_ul_pct','bwk_nul_pct','bwk_kp_pct',
@@ -660,6 +660,7 @@ function loadData(d) {
     'eigen_r', 'mietausfall', 'mietausfall_alt' /* v3238 */, 'nul_sonst',        // BWK nul (calc.js Z.546)
     'weg_r',                                      // WEG-Rücklage (Info)
     'weg_su',                                     // v3092 N100: Sonderumlagen der WEG (sonst erbt Objekt B die Umlage von A)
+    'hg_pos',                                     // v3860: Positionen des Wirtschaftsplans (sonst erbt Objekt B die Liste von A)
     'san_plan',                                   // v3214 N137: weitere Sanierungen (sonst erbt Objekt B die Liste von A)
     'darlehen_weitere',                           // v3215 W-17: weitere Darlehen (sonst erbt Objekt B die Darlehen von A)
     'kp1', 'kp2', 'kp3', 'kp4',                   // Sonderkosten (calc.js Z.545)

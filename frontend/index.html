@@ -3412,6 +3412,8 @@ label.dp-required.qc-required::after {
       </div>
     </div>
     <div>
+      <!-- v3860 · Zusammensetzung des Hausgelds aus dem eingelesenen Wirtschaftsplan (hausgeld-positionen.js) -->
+      <input type="hidden" id="hg_pos" value=""><div id="hg-pos-box"></div>
       <!-- v3092 · N100: Sonderumlagen der WEG - Cashflow im Faelligkeitsjahr, Steuer nur als Vorschlag (sonderumlage.js) -->
       <div class="card" id="weg-su-card"><div class="ct ct-pro"><span class="ct-ico"><svg width="22" height="22"><use href="#i-arrow-down"/></svg></span>Sonderumlagen der WEG</div>
         <input type="hidden" id="weg_su" value="">
@@ -4011,7 +4013,7 @@ label.dp-required.qc-required::after {
 <script src="js/d1-type-handler.js?v=161"></script>
 <script src="js/icons.js?v=166"></script>
 <script src="js/obj-numbering.js?v=166"></script>
-<script src="js/mietentwicklung.js?v=v3840d"></script>
+<script src="js/mietentwicklung.js?v=v3860"></script>
 <script src="/vendor/cdn/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="js/tax.js?v=v3820a"></script>
 <script src="js/steuer-verlauf.js?v=v3273a"></script>
@@ -4069,7 +4071,7 @@ label.dp-required.qc-required::after {
 <script src="js/marktdaten-modal.js?v=v2247c"></script>
 <script src="js/ui.js?v=v3444"></script>
 <script src="js/sidebar-collapse.js?v=20260611174630"></script>
-<script src="js/storage.js?v=v3830"></script>
+<script src="js/storage.js?v=v3860"></script>
 <script src="js/nachrechnen.js?v=v3031"></script><!-- v3031: Kennzahlen/Scores gespeicherter Objekte neu rechnen (nur auf Aufruf) -->
 <!-- v845-newsearch-removed: sb-search.js entfernt (Kollision mit sidebar-search.js) -->
 <script src="js/inventar-sync.js?v=v3006c"></script><!-- V291-inv-sync-applied -->
@@ -4101,9 +4103,9 @@ label.dp-required.qc-required::after {
 <script src="js/ki-miete.js?v=v3845"></script>
 <script src="js/star-rating.js?v=v1851"></script>
 <script src="js/pdf-import.js?v=v3660c"></script>
-<script src="js/dokument-import.js?v=v3670"></script>
+<script src="js/dokument-import.js?v=v3860"></script>
 <script src="js/unterlagen.js?v=v3671"></script>
-<script src="js/sonderumlage.js?v=v3221"></script>
+<script src="js/sonderumlage.js?v=v3221"></script><script src="js/hausgeld-positionen.js?v=v3860"></script><!-- v3860 · Zusammensetzung des Hausgelds -->
 <script src="js/sanierung-plan.js?v=v3800"></script><!-- v3214 · N137 · W-15: weitere Sanierungen in spaeteren Jahren -->
 <script src="js/darlehen-weitere-ui.js?v=v3261"></script><!-- v3215 · W-17: Liste Weitere Darlehen (Reiter Finanzierung) -->
 
@@ -4128,16 +4130,16 @@ label.dp-required.qc-required::after {
 <script src="js/objekt-bloecke.js?v=v3034"></script><!-- v3034 -->
 <script src="js/feld-hilfe.js?v=v3073"></script>
 <script src="js/bgf-herleitung.js?v=v1446"></script>
-<script src="js/mfh-einheiten.js?v=v3750"></script>
+<script src="js/mfh-einheiten.js?v=v3860"></script>
 <script src="js/mfh-felder.js?v=v3840b"></script><!-- v3003 · Objekt mit Einheiten: Erklaerkasten, Felder aus den Einheiten, Zustand des Gebaeudes -->
 <script src="js/wertangabe.js?v=v3003b"></script><!-- v3003a · eine Wertangabe: Marktwert/Verkehrswert + Herkunft statt Bankbewertung -->
 <script src="js/indexreihen.js?v=v3026"></script><!-- v3026 · VPI/Nettokaltmieten aus dem Server-Cache -->
 <script src="js/indexmiete.js?v=v3026"></script><!-- v3026 · Indexmiete § 557b BGB -->
 <script src="js/mietpotenzial-kern.js?v=v3840b"></script><!-- v3075 · Kappung, Bremse, Termine, Soll-Miete: der reine Kern, vor potenzial.js -->
 <script src="js/miete-regel.js?v=v3845"></script><!-- v3845 · Neuvermietung ohne Mietpreisbremse 110/115/120 % (Einstellung, Vorgabe 120 %) -->
-<script src="js/potenzial.js?v=v3840g"></script>
+<script src="js/potenzial.js?v=v3860"></script>
 <script src="js/mietvertrag-objekt.js?v=v3840b"></script>
-<script src="js/mieterhoehungen.js?v=v3840e"></script><!-- v3362 · Mieterhöhungen als Liste (_erhoehungen, je Wohnung e.erhoehungen) -->
+<script src="js/mieterhoehungen.js?v=v3860"></script><!-- v3362 · Mieterhöhungen als Liste (_erhoehungen, je Wohnung e.erhoehungen) -->
 <script src="js/hell-varianten.js?v=v1653e"></script>
 <script src="js/hybrid-aktionen.js?v=v3253"></script>
 <script src="js/adress-autocomplete.js?v=v1271"></script><!-- v1270: PLZ->Ort, Strassenliste -->

@@ -241,6 +241,20 @@
       var ist = _feldWert(z[0]), neu = String(z[2]);
       zeilen.push({ feld: z[0], wort: z[1], neu: neu, anzeige: _fmt(z[2]) + ' € / Jahr' + (ext.jahr ? ' (' + (ext.art || 'Wirtschaftsplan') + ' ' + ext.jahr + ')' : ''), ist: ist, einheit: '€ / Jahr', ort: 'Bewirtschaftung', status: ist === '' ? 'neu' : (_gleich(ist, neu, 'eur') ? 'gleich' : 'abweichung'), herleitung: (ext.art || 'Wirtschaftsplan') + (ext.jahr ? ' ' + ext.jahr : '') + ' · ' + b.wie + (z[0] === 'hg_nul' && teileNul.length > 1 ? ' · darin: ' + teileNul.join(' + ') : '') });
     });
+    /* v3860 · Marcel 19.11.2026 (Steuerberater): umlagefähige und nicht umlagefähige Kosten aufgliedern. Die Positionen
+       des Plans gehen als JSON in hg_pos (hausgeld-positionen.js zeigt sie aufklappbar im Reiter Bewirtschaftung).
+       Betrag je Position: Einzelplan direkt, sonst Gesamtplan × Faktor (wie die Summen oben). */
+    var pos = Array.isArray(ext.positionen) ? ext.positionen.map(function (p) {
+      var bz = String((p && p.bezeichnung) || '').trim(); if (!bz) return null;
+      var be = _zahl(p.betrag_einheit_eur), bg = _zahl(p.betrag_gesamt_eur);
+      var betr = (b.w === ext.einzel && be != null) ? be : (bg != null ? bg * f : (be != null ? be : null));
+      return betr == null ? null : { b: bz.slice(0, 80), e: Math.round(betr), u: p.umlagefaehig === true ? 1 : (p.umlagefaehig === false ? 0 : null) };
+    }).filter(Boolean) : [];
+    if (pos.length && document.getElementById('hg_pos')) {
+      var pj = JSON.stringify({ jahr: _zahl(ext.jahr) || null, art: ext.art || 'Wirtschaftsplan', wie: b.wie, p: pos });
+      var istP = _feldWert('hg_pos');
+      zeilen.push({ feld: 'hg_pos', wort: 'Aufstellung des Hausgelds', neu: pj, anzeige: pos.length + ' Positionen' + (ext.jahr ? ' (' + (ext.art || 'Wirtschaftsplan') + ' ' + ext.jahr + ')' : ''), ist: istP ? 'andere Aufstellung' : '', einheit: '', ort: 'Bewirtschaftung', status: istP === '' ? 'neu' : (istP === pj ? 'gleich' : 'abweichung'), herleitung: (ext.art || 'Wirtschaftsplan') + (ext.jahr ? ' ' + ext.jahr : '') + ' · ' + b.wie });
+    }
     return zeilen;
   }
   /* Vorschläge für den Steuer-Reiter: Verwaltung, übrige nicht umlagefähige Kosten (OHNE Rücklage -

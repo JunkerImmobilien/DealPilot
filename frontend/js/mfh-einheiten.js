@@ -1043,7 +1043,8 @@
             'optional');
         })()
       /* v3130 · N115 · Zielmiete nach Sanierung je Wohnung - Vorschlag mit „übernehmen" (potenzial.js zielVorschlagHtml) */
-      + '<div id="mfh-zv"></div>';
+      + '<div id="mfh-zv"></div>'
+      + '<div id="mfh-jahre"></div>';   /* v3860 · Miete je Wohnung und Jahr */
   }
   var WEG_TIPP = 'Haken setzen, wenn für das Haus eine Teilungserklärung nach WEG besteht (oder du mit Aufteilung rechnen willst). '
     + 'Dann: 1) erscheint das Feld „Kosten der Aufteilung“ (leer = 1.800 € je Wohnung, schon aufgeteilt: 0); '
@@ -1060,6 +1061,103 @@
     try { h.innerHTML = P.zielVorschlagHtml(P.zielVorschlaege({ einheiten: _arbeit, gebaeude: _geb, aufgeteilt: _weg, aufteilungskosten: _auftK, haus_massnahmen: _hausM })); }
     catch (x) { h.innerHTML = ''; try { console.warn('[v3130] Zielmiete-Vorschlag', x); } catch (y) {} }
   }
+  /* ═══ v3860 · MIETE JE WOHNUNG UND JAHR (Marcel 19.11.2026) ═══════════════════════════════════════════
+     „Beim Mehrfamilienhaus kommt das in die Mietentwicklung ins Fenster Einheiten, eine Jahresübersicht, mit Absprung
+     aus Miete ... vorbelegt ... duplizieren ... die möglichen Mieterhöhungen gleich mit übernehmen ... wichtig, dass das
+     mit dem Jahresabgleich der Pilot-Analyse funktioniert." EIN Speicher wie das Fenster Jahre: _jahre[J].einheiten[i].miete_m,
+     die Jahressumme _jahre[J].nkm_j folgt den Wohnungen (DpJahresbuch.summeWohnungen, dieselbe Rechnung wie dort).
+     Gearbeitet wird auf einer Kopie (_jArbeit), geschrieben erst mit „Übernehmen“ wie jede Eingabe im Fenster. */
+  var _jArbeit = null, _jGeaendert = false;
+  function jahreStart() {
+    _jArbeit = JSON.parse(JSON.stringify((window._currentObjData && window._currentObjData._jahre) || {})); _jGeaendert = false;
+  }
+  function jahreListe() {
+    var JB = window.DpJahresbuch, cy = new Date().getFullYear();
+    if (!JB || !JB.verfuegbar || !JB.verfuegbar() || !JB.zeilen) return null;
+    var y = JB.zeilen().map(function (z) { return z.jahr; }).filter(function (j) { return j < cy; });
+    return y.slice(-6);
+  }
+  function jZahl(v) {
+    var s = String(v == null ? '' : v).trim().replace(/\s|€/g, ''); if (!s) return null;
+    s = s.replace(/\./g, '').replace(',', '.'); var n = Number(s); return isFinite(n) ? n : null;
+  }
+  function jWert(y, i) { var e = ((_jArbeit[String(y)] || {}).einheiten || {})[String(i)] || {}; return jZahl(e.miete_m); }
+  function jSetzen(y, i, v) {
+    var k = String(y), J = _jArbeit[k] = _jArbeit[k] || {}, E = J.einheiten = Object.assign({}, J.einheiten || {});
+    var x = Object.assign({}, E[String(i)] || {}); if (v == null) delete x.miete_m; else x.miete_m = v;
+    if (Object.keys(x).length) E[String(i)] = x; else delete E[String(i)];
+    if (!Object.keys(E).length) delete J.einheiten;
+    var sw = window.DpJahresbuch && window.DpJahresbuch.summeWohnungen ? window.DpJahresbuch.summeWohnungen(J.einheiten || null, _arbeit) : null;
+    if (sw) J.nkm_j = sw.summe; else delete J.nkm_j;
+    J.geaendert_am = new Date().toISOString();
+    if (!Object.keys(J).filter(function (q) { return q !== 'geaendert_am'; }).length) delete _jArbeit[k];
+    _jGeaendert = true;
+  }
+  function jErhoehungen() {   /* mögliche Erhöhungen je Wohnung aus dem Kern (dieselbe Leiter wie im Wohnungsfenster) */
+    var P = window.DpPotenzial, m = null; if (!P || !P.modell) return [];
+    try { m = P.modell({ einheiten: _arbeit, gebaeude: _geb, ohneVorschlag: true }); } catch (x) { return []; }
+    return ((m && m.wohnungen) || []).filter(function (w) {
+      var so = w.soll || {};
+      return w.art !== 'gewerbe' && w.ist > 0 && so.miete != null && so.miete >= w.ist + 1 && !/^eigene Angabe/.test(so.herkunft || '')
+        && !(zahl(_arbeit[w.i] && _arbeit[w.i].soll) >= Math.round(so.miete));
+    }).map(function (w) { return { i: w.i, nr: w.nr, ist: w.ist, miete: Math.round(w.soll.miete), ab: (w.soll.termine && w.soll.termine.wirksam_ab) || '' }; });
+  }
+  function jahreZeichnen() {
+    var h = el('mfh-jahre'); if (!h || !_jArbeit) return;
+    var Y = jahreListe(), eu = function (x) { return Math.round(x).toLocaleString('de-DE') + ' €'; };
+    var alt = h.querySelector('details'), auf = alt ? alt.open : false;
+    if (!Y || !Y.length) { h.innerHTML = '<details class="mfh-jahre" id="mfh-jahre-det"><summary>Miete je Wohnung und Jahr</summary><p class="mfh-leise">Gibt es im Bestand, wenn das Objekt gewonnen ist und einen Ankauf-Stand hat. Vorher rechnet DealPilot mit der heutigen Miete.</p></details>'; return; }
+    var erh = jErhoehungen(), sum = {};
+    Y.forEach(function (y) { sum[y] = 0; });
+    var kopf = '<tr><th>Wohnung</th>' + Y.map(function (y) { return '<th>' + y + '<button type="button" class="mfh-jahre-vj" data-jw-vorjahr="' + y + '" title="Leere Felder mit dem Vorjahr füllen">wie Vorjahr</button></th>'; }).join('') + '<th>heute</th></tr>';
+    var zeilen = _arbeit.map(function (e, i) {
+      var ist = zahl(e.ist) || 0;
+      return '<tr><td><b>' + esc(e.nr || String(i + 1)) + '</b> <small>' + esc(e.lage || '') + '</small></td>' + Y.map(function (y) {
+        var v = jWert(y, i); sum[y] += (v != null ? v : (e.status === 'leer' ? 0 : ist)) * 12;
+        return '<td><input class="mfh-in" inputmode="decimal" data-jw-i="' + i + '" data-jw-y="' + y + '" value="' + (v != null ? esc(String(v).replace('.', ',')) : '') + '" placeholder="' + (ist ? Math.round(ist) : '') + '"></td>';
+      }).join('') + '<td class="mfh-jahre-heute">' + (ist ? eu(ist) : 'leer') + '</td></tr>';
+    }).join('');
+    var heuteSumme = _arbeit.reduce(function (a, e) { return a + (zahl(e.ist) || 0); }, 0) * 12;
+    var fuss = '<tr class="mfh-jahre-sum"><td>Summe im Jahr</td>' + Y.map(function (y) { return '<td>' + eu(sum[y]) + '</td>'; }).join('') + '<td>' + eu(heuteSumme) + '</td></tr>';
+    h.innerHTML = '<details class="mfh-jahre" id="mfh-jahre-det"' + (auf ? ' open' : '') + '><summary>Miete je Wohnung und Jahr <span class="mfh-leise">vergangene Jahre, für den Jahresabgleich der Pilot-Analyse</span></summary>'
+      + '<p class="mfh-leise">Trag die Monatsmiete ein, die im Jahr gezahlt wurde. Leer heißt: die heutige Miete. Die Summe geht in die Mietentwicklung und in den Jahresabgleich.</p>'
+      + '<div class="mfh-scroll"><table class="mfh-jahre-tab"><thead>' + kopf + '</thead><tbody>' + zeilen + fuss + '</tbody></table></div>'
+      + (erh.length
+        ? '<div class="mfh-jahre-erh"><b>Mögliche Mieterhöhungen</b><ul>' + erh.map(function (x) { return '<li>Wohnung ' + esc(x.nr || String(x.i + 1)) + ': von ' + eu(x.ist) + ' auf ' + eu(x.miete) + (x.ab ? ', wirksam ab ' + esc(x.ab) : '') + '</li>'; }).join('') + '</ul>'
+          + '<button type="button" class="dp-ml-k" data-jw-erh="1">alle ' + erh.length + ' als geplante Erhöhung übernehmen ›</button><span class="mfh-leise"> Sie stehen dann bei der Wohnung als Soll-Miete und rechnen in der Mietentwicklung ab dem Datum.</span></div>'
+        : '<p class="mfh-leise">Keine weitere Erhöhung möglich. Jede Wohnung liegt an der Vergleichsmiete oder an der Kappungsgrenze, oder die Erhöhung ist schon eingetragen.</p>')
+      + '</details>';
+    h.onchange = function (ev) {
+      var t = ev.target; if (!t || !t.getAttribute || t.getAttribute('data-jw-y') == null) return;
+      var y = +t.getAttribute('data-jw-y'), i = +t.getAttribute('data-jw-i');
+      if (window.DpJahresbuch && window.DpJahresbuch.aenderungErlaubt && !window.DpJahresbuch.aenderungErlaubt(y)) { jahreZeichnen(); return; }
+      var v = jZahl(t.value); jSetzen(y, i, v != null && v >= 0 ? Math.round(v * 100) / 100 : null); jahreZeichnen();
+    };
+    h.onclick = function (ev) {
+      var t = ev.target && ev.target.closest ? ev.target.closest('[data-jw-vorjahr],[data-jw-erh]') : null; if (!t) return;
+      ev.preventDefault();
+      if (t.hasAttribute('data-jw-vorjahr')) {
+        var y = +t.getAttribute('data-jw-vorjahr');
+        _arbeit.forEach(function (e, i) { if (jWert(y, i) != null) return; var v = jWert(y - 1, i); if (v != null) jSetzen(y, i, v); });
+        jahreZeichnen(); return;
+      }
+      jErhoehungen().forEach(function (x) { var e = _arbeit[x.i]; if (!e) return; e.soll = String(x.miete); if (x.ab && !String(e.soll_ab || '').trim()) e.soll_ab = x.ab; });
+      zeichnen();
+    };
+  }
+  function jahreSchreiben() {
+    if (!_jGeaendert || !window._currentObjData) return false;
+    window._currentObjData._jahre = _jArbeit; _jGeaendert = false;
+    try { if (window.DpJahresbuch) window.DpJahresbuch.mountAll(); } catch (x) {}
+    try { if (window.DpJahresabgleich) window.DpJahresabgleich.mountAll(); } catch (x) {}
+    try { window.dispatchEvent(new CustomEvent('dp:jahre-geaendert')); } catch (x) {}
+    return true;
+  }
+  function jahreOeffnen() {
+    oeffnen(1);
+    setTimeout(function () { var d = el('mfh-jahre-det'); if (d) { d.open = true; try { d.scrollIntoView({ block: 'start', behavior: 'smooth' }); } catch (x) {} } }, 80);
+  }
+
   function zvSetzen(i, qm) {
     var e = _arbeit[i]; if (!e || !(qm > 0)) return;
     e.ziel_qm = qm.toFixed(2).replace('.', ',');
@@ -1308,6 +1406,7 @@
     el('mfh-zurueck').style.visibility = _schritt === 0 ? 'hidden' : 'visible';
     el('mfh-weiter').textContent = _schritt === SCHRITTE.length - 1 ? 'Übernehmen' : 'Weiter ›';
     zeichnenSumme(); punkteZeigen(); hausBinden(); zvZeichnen();   /* v3130 */
+    try { jahreZeichnen(); } catch (x) { try { console.warn('[v3860] Jahre je Wohnung', x); } catch (y) {} }
     var neu = el('mfh-neu'); if (neu) neu.onclick = function () { _arbeit.push({ nr: String(_arbeit.length + 1), art: standardArt(), status: 'vermietet' }); zeichnen(); };
   }
   /* v2966 · N80 · Chips und Kosten der Hausmassnahmen (dieselbe Bedienung wie je Wohnung) */
@@ -1451,6 +1550,15 @@
          das Modal. */
       '#mfh-modal .mfh-in{width:100%;min-width:0}',
       '#mfh-modal .mfh-xs,#mfh-modal .mfh-sm{text-align:right}',
+      '#mfh-modal .mfh-jahre{margin:14px 0 4px;border:1px solid #EFE7D6;border-radius:10px;padding:10px 12px;background:#fff}',
+      '#mfh-modal .mfh-jahre>summary{cursor:pointer;font:600 13px "Space Grotesk",sans-serif;color:#2A2727}',
+      '#mfh-modal .mfh-jahre-tab{border-collapse:collapse;font-size:12.5px;font-variant-numeric:tabular-nums;min-width:100%}',
+      '#mfh-modal .mfh-jahre-tab th{font:500 10.5px "JetBrains Mono",monospace;color:#7A7370;text-align:left;padding:4px 6px;vertical-align:bottom}',
+      '#mfh-modal .mfh-jahre-tab td{padding:4px 6px;border-top:1px solid #F1ECE1;white-space:nowrap}',
+      '#mfh-modal .mfh-jahre-tab input{width:84px;min-height:32px}',
+      '#mfh-modal .mfh-jahre-vj{display:block;margin-top:3px;border:0;background:none;padding:0;font:400 10.5px Inter,sans-serif;color:#2f7d55;text-decoration:underline;cursor:pointer}',
+      '#mfh-modal .mfh-jahre-sum td{font-weight:600}',
+      '#mfh-modal .mfh-jahre-erh{margin-top:10px;font-size:12.5px}#mfh-modal .mfh-jahre-erh ul{margin:4px 0 8px;padding-left:18px}',
       '#mfh-modal .mfh-tab{width:100%;table-layout:fixed;border-collapse:separate;',
       '  border-spacing:0;font-size:12px}',
       '#mfh-modal .mfh-tab th{line-height:1.25;vertical-align:bottom;padding-bottom:4px;',
@@ -1682,6 +1790,7 @@
     _weg = !!d.aufgeteilt;
     _auftK = (d.aufteilungskosten != null && String(d.aufteilungskosten).trim() !== '') ? d.aufteilungskosten : null;   /* v2430 */
     _hausM = JSON.parse(JSON.stringify(Array.isArray(d.haus_massnahmen) ? d.haus_massnahmen : []));   /* v2966 */
+    jahreStart();   /* v3860 */
     _schritt = schritt || 0;
     if (!_arbeit.length) _arbeit.push({ nr: '1', art: standardArt(), status: 'vermietet' });
     var m = document.createElement('div'); m.id = 'mfh-modal';
@@ -1718,7 +1827,16 @@
       if (t.id === 'mfh-zbjahr') { var _zj = el('zb_fertig_jahr'); if (_zj) { _zj.value = String(t.value || '').replace(/[^0-9]/g, '').slice(0, 4); try { _zj.dispatchEvent(new Event('change', { bubbles: true })); } catch (x) {} } return; } if (t.dataset && t.dataset.k) { _arbeit[+t.dataset.i][t.dataset.k] = t.value; zeichnenSumme(); punkteZeigen();
         if (/^(wfl|ist|nr|lage)$/.test(t.dataset.k)) zvZeichnen(); } });   /* v3130 · Vorschlag folgt Fläche und Ist */
     m.addEventListener('change', function (ev) {
-      var t = ev.target; if (t.tagName !== 'SELECT') return;
+      var t = ev.target;
+      /* v3860 · eigene Zielmiete und Zeitpunkt direkt in der Karte Zielmiete je Wohnung */
+      if (t.dataset && (t.dataset.zvEigen != null || t.dataset.zvWann != null)) {
+        var _e = _arbeit[+(t.dataset.zvEigen != null ? t.dataset.zvEigen : t.dataset.zvWann)]; if (!_e) return;
+        var _v = String(t.value || '').trim();
+        if (t.dataset.zvEigen != null) _e.ziel_qm = _v; else _e.ziel_wann = _v;
+        if (t.dataset.zvEigen != null && _v && !String(_e.ziel_wann || '').trim()) _e.ziel_wann = 'bei Neuvermietung';
+        zvZeichnen(); return;
+      }
+      if (t.tagName !== 'SELECT') return;
       if (t.dataset.k) { _arbeit[+t.dataset.i][t.dataset.k] = t.value; zeichnenSumme();
         if (t.dataset.k === 'art') { zeichnen(); return; }   /* v2210: Nutzungsart erscheint/verschwindet */
         if (t.dataset.k === 'status') zvZeichnen(); }   /* v3130 */
@@ -1756,7 +1874,7 @@
       if (t.dataset && t.dataset.zv != null) { zvSetzen(+t.dataset.zv, Number(t.dataset.zvQm)); zeichnen(); }
       if (t.dataset && t.dataset.zvAlle) {
         var _P = window.DpPotenzial, _r = _P && _P.zielVorschlaege ? _P.zielVorschlaege({ einheiten: _arbeit, gebaeude: _geb, aufgeteilt: _weg, aufteilungskosten: _auftK, haus_massnahmen: _hausM }) : null;
-        if (_r && _r.markt) _r.zeilen.forEach(function (z) { if (z.v && z.v.qm != null) zvSetzen(z.i, z.v.qm); });
+        if (_r) _r.zeilen.forEach(function (z) { if (z.v && z.v.qm != null) zvSetzen(z.i, z.v.qm); });   /* v3860: auch ohne Marktbewertung (Westerfeldstr.: Knopf tat nichts) */
         zeichnen();
       }
       if (t.dataset && t.dataset.del != null) { _arbeit.splice(+t.dataset.del, 1); zeichnen(); }
@@ -1963,6 +2081,7 @@
       if (ME.getMode() !== 'einheiten') meldung += ' · Mietentwicklung: aus Wohnungen';
       ME.setMode('einheiten');   /* ruft calc() selbst */
     } else if (typeof window.calc === 'function') window.calc();
+    if (jahreSchreiben()) { meldung += ' · Miete je Jahr'; try { if (typeof window.DpSpeichernFolge === 'function') window.DpSpeichernFolge(); } catch (x) {} }   /* v3860 */
     schliessen(); knopf();
     try { if (window.DpPotenzial) window.DpPotenzial.objektKarte(); } catch (x) {}   /* v2430 */
     if (typeof window.toast === 'function') window.toast('✓ ' + meldung);
@@ -2075,6 +2194,7 @@
     vermstandPruefen: vermstandPruefen /* v3001b */, vertragAblegen: vertragAblegen /* v3160 */, vorbelegen: vorbelegen /* v3016 */,
     oeffnen: oeffnen, knopf: knopf,
     /* v3027 · eine Einheit gezielt öffnen (Absprung aus der Vertragsübersicht im Reiter Miete) */
+    jahreOeffnen: jahreOeffnen,   /* v3860 */
     einheitOeffnen: function (i) { oeffnen(1); setTimeout(function () { wohnungOeffnen(i); }, 0); }, istSoll: istSoll, berichtDaten: berichtDaten, artMitEinheiten: artMitEinheiten, hausPunkte: hausPunkte /* v2483 */, modQuelle: modQuelle, hatEinheiten: hatEinheiten /* v2540 */, _summe: summe, stellplatzNachziehen: stellplatzNachziehen /* v3670 */, _punkte: punkteEinheit, _ergebnis: ergebnisDaten,
     /* v2087: die elf Vertragsformen mitexportiert. Der Reiter Miete
        braucht dieselbe Liste fuer die Objektebene (Backlog N60.8-alt) -
