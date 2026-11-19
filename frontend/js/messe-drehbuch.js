@@ -7441,8 +7441,9 @@
         await zeige(function () { return r26We('#mfh-we-soll'); }, 6);
         var hk2 = String(kv['Herkunft'] || '').replace(/^gerechnet \(§ 558\) · /, '');
         DPM_KM.soll2 = { kv: kv, hinweis: kt };
-        await kmSag(s, 'Die Soll-Miete', '<b>' + (kv['Soll-Miete'] || '–') + '</b>, erreichbar ab <b>' + (kv['erreichbar ab'] || '–') + '</b>' + (hk2 ? ' — ' + hk2 : '') + '.',
-          'Das Ergebnis: eine Soll-Miete von ' + String(kv['Soll-Miete'] || '').replace('€/Monat', 'Euro im Monat').replace('€/m²', 'Euro je Quadratmeter') + ', erreichbar ab ' + (kv['erreichbar ab'] || '') + '. Sie liegt über der Vergleichsmiete, weil die Umlage der Fassadendämmung dazukommt: die Erhöhung nach Paragraf 558 bis zur Vergleichsmiete' + (kg ? ', begrenzt durch die Kappungsgrenze von ' + kg[1] + ' Prozent in drei Jahren,' : '') + ' und die Modernisierungsumlage nach Paragraf 559 stehen nebeneinander. Die Soll-Miete ist das, was der laufende Vertrag hergibt — ohne Mieterwechsel.', null,
+        var wab = String(kv['wirksam ab'] || kv['erreichbar ab'] || '').replace(/\s*\(.*$/, '');   /* v3790 · seit v3080 „verlangbar ab“ / „wirksam ab“ statt „erreichbar ab“ */
+        await kmSag(s, 'Die Soll-Miete', '<b>' + (kv['Soll-Miete'] || '–') + '</b>, wirksam ab <b>' + (wab || '–') + '</b>' + (hk2 ? ' — ' + hk2 : '') + '.',
+          'Das Ergebnis: eine Soll-Miete von ' + String(kv['Soll-Miete'] || '').replace('€/Monat', 'Euro im Monat').replace('€/m²', 'Euro je Quadratmeter') + ', wirksam ab ' + wab + '. Sie liegt über der Vergleichsmiete, weil die Umlage der Fassadendämmung dazukommt: die Erhöhung nach Paragraf 558 bis zur Vergleichsmiete' + (kg ? ', begrenzt durch die Kappungsgrenze von ' + kg[1] + ' Prozent in drei Jahren,' : '') + ' und die Modernisierungsumlage nach Paragraf 559 stehen nebeneinander. Die Soll-Miete ist das, was der laufende Vertrag hergibt — ohne Mieterwechsel.', null,
           { was: 'Nichts — DealPilot rechnet die Soll-Miete.', warum: 'Vergleichsmiete und Kappungsgrenze (§ 558) plus Umlage (§ 559).', folge: 'Ab dem Termin rechnet die Mietentwicklung mit ihr.' });
         await r26WohnungZu();
         /* Wohnungen 3 und 5: Zielbild nach Mieterwechsel */
