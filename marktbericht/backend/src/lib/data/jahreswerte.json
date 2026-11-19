@@ -152,7 +152,7 @@
       "faellig_am": "2027-10-01",
       "verfahren": "agent",
       "orte": [
-        { "datei": "frontend/js/mandanten.js", "bezeichner": "Rueckfall reg.kst", "muster": ": (15\\.825)\\)", "nimm": "alle" },
+        { "datei": "frontend/js/mandanten.js", "bezeichner": "Rueckfall reg.kst", "muster": "Number\\(reg\\.kst\\) : (15\\.825);", "nimm": "alle" },
         { "datei": "frontend/js/ueberfuehrung-kern.js", "bezeichner": "0.15825" },
         { "datei": "frontend/js/gesellschaft-abschluss.js", "bezeichner": "0.15825" }
       ],
