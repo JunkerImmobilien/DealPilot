@@ -2438,7 +2438,7 @@ function _computeYearTotal(year, yearIdx, vorgabe, ohneVortrag) {
     einheiten: vorgabe ? (_avAuto._einheiten || null) : (auto._einheiten || null),
     afaArt: vorgabe ? (_avAuto._afa || null) : (auto._afaArt || null),
     kaufjahr: vorgabe ? (Number(_avAuto._kj) || null) : (auto._kaufjahr || null),
-    av7h: vorgabe ? (_avAuto._av7h || null) : (auto._av7h || null),
+    av7h: vorgabe ? (_avAuto._av7h || null) : ((auto._av7h && Math.abs((values.av_7h7i || 0) - (auto.av_7h7i || 0)) < 0.005) ? auto._av7h : null),   /* von Hand geaendert: ohne Satz-Angabe */
     verbilligt: vorgabe ? (_avAuto._vb ? { grund: String(_avAuto._vb) } : null)
       : ((_avVb && _avVb.grund && Math.abs((_avWerte.av_kuerzung_pct || 0) - (_avVb.pct || 0)) < 0.005) ? _avVb : null),
     avKuerzung: _avW.kuerzung,
