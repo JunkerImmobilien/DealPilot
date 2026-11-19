@@ -389,7 +389,7 @@
       /* v3860 · Marcel 19.11.2026 (Westerfeldstr. Whg. 1): „Warum steht da kein Spielraum? ... Mir ist ganz wichtig, dass immer
          hervorgeht, warum wir keinen Spielraum haben und auf was sich das bezieht." Grund + Ist + Vergleichsmiete + Quelle + Ausweg. */
       var _ksIst = (ist > 0 && wfl > 0) ? ist / wfl : 0, _ksV = zahl(so.vgl_qm);
-      var _ksU = (so.grund || 'Die Miete liegt schon an der Vergleichsmiete.')
+      var _ksU = ((_ksV > 0 && _ksIst > _ksV + 0.005) ? 'Die Miete liegt über der Vergleichsmiete.' : (so.grund || 'Die Miete liegt schon an der Vergleichsmiete.'))
         + (_ksIst > 0 ? ' Heute ' + eur2(_ksIst) + '/m²' : '')
         + (_ksV > 0 ? (_ksIst > 0 ? ', ' : ' ') + 'Vergleichsmiete bis ' + eur2(_ksV) + '/m²' + (vglKurz(so) ? ' (' + vglKurz(so) + ')' : '') : '')
         + (_ksIst > 0 || _ksV > 0 ? '.' : '')
@@ -754,7 +754,7 @@
         /* v3860b · derselbe Satz wie in der Leiter der Wohnung (Marcel: „wird dort derselbe Text angezeigt?") */
         var _kq = (ist > 0 && wfl > 0) ? ist / wfl : 0, _kv = zahl(s.vgl_qm);
         z.push({ k: 'Nächste Erhöhung', v: 'kein Spielraum',
-          u: (s.grund || 'Die Miete liegt schon an der Vergleichsmiete.') + (_kq > 0 ? ' Heute ' + eur2(_kq) + '/m²' : '') + (_kv > 0 ? (_kq > 0 ? ', ' : ' ') + 'Vergleichsmiete bis ' + eur2(_kv) + '/m²' + (vglKurz(s) ? ' (' + vglKurz(s) + ')' : '') : '') + ((_kq > 0 || _kv > 0) ? '.' : '')
+          u: ((_kv > 0 && _kq > _kv + 0.005) ? 'Die Miete liegt über der Vergleichsmiete.' : (s.grund || 'Die Miete liegt schon an der Vergleichsmiete.')) + (_kq > 0 ? ' Heute ' + eur2(_kq) + '/m²' : '') + (_kv > 0 ? (_kq > 0 ? ', ' : ' ') + 'Vergleichsmiete bis ' + eur2(_kv) + '/m²' + (vglKurz(s) ? ' (' + vglKurz(s) + ')' : '') : '') + ((_kq > 0 || _kv > 0) ? '.' : '')
             + ' Mehr geht über eine Modernisierung (§ 559 BGB) oder bei Neuvermietung.' + (fr ? ' · ' + fr : ''), warn: !!(s.termine && s.termine.letzte_fehlt) });
       }
     }

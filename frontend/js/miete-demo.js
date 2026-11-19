@@ -101,7 +101,7 @@
       + '<div class="marken"><span>heute ' + qm(w.istQ) + '</span><span>Mieterhöhung ' + qm(sQ) + '</span>' + (w.neuQ > 0 ? '<span>Neuvermietung ' + qm(w.neuQ) + '</span>' : '') + '</div></div>';
   }
   function zweiZahlen(w) {
-    return '<div class="reihe" style="margin-top:8px"><div class="zahl"><small>Mieterhöhung</small><b>' + (w.soll >= w.ist + 1 ? eur(w.soll) : 'kein Spielraum') + '</b><small>' + (w.soll >= w.ist + 1 ? '+' + eur(w.soll - w.ist) + ' im Monat' + (w.ab ? ', ' + esc(w.ab) : '') : 'am Oberwert') + '</small></div>'
+    return '<div class="reihe" style="margin-top:8px"><div class="zahl"><small>Mieterhöhung</small><b>' + (w.soll >= w.ist + 1 ? eur(w.soll) : 'kein Spielraum') + '</b><small>' + (w.soll >= w.ist + 1 ? '+' + eur(w.soll - w.ist) + ' im Monat' + (w.ab ? ', ' + esc(w.ab) : '') : (w.st === 'ueb' ? 'über dem Oberwert ' + qm(w.vgl) : 'am Oberwert')) + '</small></div>'
       + (w.neuQ > 0 ? '<div class="zahl"><small>Neuvermietung</small><b>' + eur(w.neuM) + '</b><small>' + qm(w.neuQ) + ', ' + (w.bremse ? '110 %, Mietpreisbremse' : (window.DpMieteRegel ? DpMieteRegel.pct() : 120) + ' %, ohne Bremse') + '</small></div>' : '') + '</div>';
   }
 
