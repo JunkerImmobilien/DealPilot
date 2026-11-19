@@ -1,0 +1,521 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DealPilot · Nachtflug</title>
+<meta name="description" content="Entwurf 5 · Nachtflug über die Landebahn. Ein Laser schneidet die Score-Karte, daraus werden zwei Cockpit-Instrumente.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@500..800&family=Chivo+Mono:ital,wght@0,300..700;1,300..700&family=Literata:ital,opsz,wght@0,7..72,300..600;1,7..72,300..600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --nacht:#050505; --nacht2:#0a0c0d; --gold:#C9A84C; --gold-hi:#E8CC7A; --gold-lo:#b8932f; --gruen:#3FA56C; --rot:#B8625C; --rot2:#D8564C; --creme:#FDFCFA;
+  --text:#ece6d8; --leise:#8f8a7e; --glas:rgba(20,22,22,.55); --linie:rgba(232,204,122,.18);
+  --disp:'Syne',sans-serif; --mono:'Chivo Mono',ui-monospace,monospace; --serif:'Literata',Georgia,serif;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--nacht);color:var(--text);font-family:var(--serif);font-size:18px;line-height:1.6;overflow-x:hidden}
+a{color:inherit}
+img{max-width:100%;display:block}
+.wrap{max-width:1240px;margin:0 auto;padding:0 24px}
+@media (max-width:640px){.wrap{padding:0 16px}}
+.mono{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase}
+:focus-visible{outline:2px solid var(--gold-hi);outline-offset:3px}
+.btn{display:inline-flex;align-items:center;gap:10px;min-height:46px;padding:0 20px;font-family:var(--mono);font-weight:600;font-size:12px;letter-spacing:.1em;text-transform:uppercase;text-decoration:none;border:1px solid var(--gold);color:var(--gold-hi);background:#c9a84c0d;cursor:pointer;clip-path:polygon(10px 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 100%,0 10px)}
+.btn:hover{background:#c9a84c26}
+.btn.voll{background:var(--gold);color:#050505}
+
+.nav{position:fixed;inset:0 0 auto;z-index:50;display:flex;align-items:center;gap:22px;padding:12px 24px;background:#050505d9;backdrop-filter:blur(8px);border-bottom:1px solid #c9a84c22}
+.nav .logo{font-family:var(--disp);font-weight:800;font-size:20px;text-decoration:none;letter-spacing:.02em}
+.nav .logo span{color:var(--gold)}
+.nav .links{display:flex;gap:20px;margin-left:auto}
+.nav .links a{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;text-decoration:none;color:var(--leise)}
+.nav .links a:hover{color:var(--gold-hi)}
+@media (max-width:900px){.nav .links{display:none}.nav .btn{margin-left:auto}}
+
+/* HERO */
+.hero{position:relative;min-height:100vh;overflow:hidden;isolation:isolate;padding:110px 0 60px}
+#nacht{position:absolute;inset:0;width:100%;height:100%;z-index:-1}
+.hero-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,560px);gap:40px;align-items:center}
+.hero h1{font-family:var(--disp);font-weight:800;font-size:clamp(40px,4.6vw,74px);line-height:.95;letter-spacing:-.02em;margin:16px 0 20px}
+.hero h1 span{color:var(--gold);font-size:.62em;display:inline-block;line-height:1.05;margin-top:.3em}
+.hero .lead{max-width:520px;color:#d8d2c4;font-size:19px}
+.cta{display:flex;flex-wrap:wrap;gap:10px;margin-top:24px}
+.hud-zeile{display:flex;flex-wrap:wrap;gap:6px 18px;margin-top:22px;color:var(--gold)}
+.hud-zeile b{color:var(--text);font-weight:600}
+@media (max-width:1050px){.hero-grid{grid-template-columns:minmax(0,1fr)}}
+
+.cockpit{position:relative;display:grid;perspective:1200px}
+.cockpit>.ebene{grid-area:1/1}
+.glas{position:relative;transform:rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));transform-style:preserve-3d}
+.panel{position:relative;padding:18px 20px 20px;background:var(--glas);backdrop-filter:blur(14px) saturate(1.2);border:1px solid var(--linie);box-shadow:0 30px 80px #000c,inset 0 0 40px #c9a84c0d;clip-path:polygon(18px 0,100% 0,100% calc(100% - 18px),calc(100% - 18px) 100%,0 100%,0 18px);font-family:var(--mono)}
+.panel:before{content:"";position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,#ffffff06 0 1px,transparent 1px 3px)}
+.panel .glanz{position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle at var(--gx,50%) var(--gy,30%),#E8CC7A1f,transparent 45%)}
+.panel .kopf{display:flex;justify-content:space-between;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);border-bottom:1px solid var(--linie);padding-bottom:8px}
+.panel .kopf b{color:var(--gruen);font-weight:600}
+.ecke{position:absolute;width:14px;height:14px;border:2px solid var(--gold-hi);pointer-events:none}
+.ecke.a{top:8px;left:8px;border-right:0;border-bottom:0}.ecke.b{top:8px;right:8px;border-left:0;border-bottom:0}
+.ecke.c{bottom:8px;left:8px;border-right:0;border-top:0}.ecke.d{bottom:8px;right:8px;border-left:0;border-top:0}
+.innen{display:grid;grid-template-columns:170px 1fr;gap:18px;align-items:center;margin-top:12px}
+.tacho{position:relative;width:170px;height:150px}
+.tacho svg{width:100%;height:100%;overflow:visible}
+.tacho .wert{position:absolute;left:0;right:0;top:98px;text-align:center;font-family:var(--disp);font-weight:800;font-size:32px;line-height:1}
+.tacho .wert small{display:block;font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;font-weight:500;margin-top:4px}
+.nadel{transform-origin:85px 85px;transition:transform 1.6s cubic-bezier(.3,1.5,.4,1)}
+.balken .b{display:grid;grid-template-columns:1fr auto;font-size:10.5px;margin-bottom:9px;letter-spacing:.04em}
+.balken .b span{color:#cdc6b6}
+.balken .b b{font-family:var(--disp);font-size:15px}
+.balken .b i{grid-column:1/-1;height:4px;margin-top:3px;background:repeating-linear-gradient(90deg,#ffffff1c 0 6px,transparent 6px 8px);position:relative}
+.balken .b i:after{content:"";position:absolute;inset:0;width:var(--w,0%);background:repeating-linear-gradient(90deg,var(--f) 0 6px,transparent 6px 8px);transition:width 1.2s cubic-bezier(.2,.8,.2,1)}
+.laser{position:absolute;left:-6%;width:112%;top:50%;height:3px;transform-origin:0 50%;transform:rotate(var(--wink,-11deg)) scaleX(0);background:linear-gradient(90deg,transparent,#fff 8%,#fff6d8 50%,#fff 92%,transparent);box-shadow:0 0 12px 3px #E8CC7A,0 0 40px 10px #c9a84c88;z-index:6;pointer-events:none;opacity:0}
+.cockpit.schnitt .laser{animation:laser .7s cubic-bezier(.7,0,.3,1) forwards}
+@keyframes laser{0%{opacity:1;transform:rotate(var(--wink,-11deg)) scaleX(0)}70%{opacity:1;transform:rotate(var(--wink,-11deg)) scaleX(1)}100%{opacity:0;transform:rotate(var(--wink,-11deg)) scaleX(1)}}
+.blitz{position:absolute;inset:-20% 0;background:radial-gradient(circle,#E8CC7A55,transparent 60%);opacity:0;pointer-events:none;z-index:5}
+.cockpit.schnitt .blitz{animation:blitz .9s .45s ease-out}
+@keyframes blitz{30%{opacity:1}100%{opacity:0}}
+.teil{position:absolute;inset:0;pointer-events:none;z-index:4}
+.teil .panel{height:100%}
+.cockpit.getrennt .teil.o{transform:translate(-26px,-40px) rotate(-4deg);opacity:0;transition:transform 1s cubic-bezier(.5,0,.2,1),opacity .8s .3s}
+.cockpit.getrennt .teil.u{transform:translate(26px,40px) rotate(4deg);opacity:0;transition:transform 1s cubic-bezier(.5,0,.2,1),opacity .8s .3s}
+.einzeln.weg{visibility:hidden}
+.instrumente{display:grid;grid-template-columns:1fr 1fr;gap:14px;visibility:hidden;align-content:start}
+.instrumente.da{visibility:visible}
+.instrumente .panel{opacity:0;transform:scale(.92) translateY(14px)}
+.instrumente.da .panel{opacity:1;transform:none;transition:opacity .6s,transform 1s cubic-bezier(.16,1.3,.3,1)}
+.instrumente.da .panel+.panel{transition-delay:.15s}
+.instrumente .tacho{margin:8px auto 0}
+.instrumente .frage{font-family:var(--serif);font-style:italic;font-size:14px;line-height:1.35;color:#d3ccbc;margin:8px 0 6px;min-height:38px}
+.instrumente .balken{margin-top:4px}
+.funk{grid-column:1/-1;display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:8px 14px;padding:12px;border:1px solid var(--linie);background:#0a0c0dcc;font-family:var(--mono);font-size:11px;color:var(--leise);opacity:0;transition:opacity .6s 1.2s}
+.instrumente.da .funk{opacity:1}
+.funk b{font-family:var(--disp);font-size:26px;color:var(--text)}
+.funk .k{background:var(--gruen);color:#050505;padding:3px 10px;font-weight:700}
+.steuer{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:16px;color:var(--leise)}
+@media (max-width:640px){.innen{grid-template-columns:minmax(0,1fr);justify-items:center}.innen .balken{width:100%}.instrumente{grid-template-columns:minmax(0,1fr)}.btn{min-height:44px;padding:8px 14px;line-height:1.3}}
+
+/* SEKTIONEN */
+.sek{position:relative;padding:120px 0}
+.sek h2{font-family:var(--disp);font-weight:800;font-size:clamp(38px,5.4vw,80px);line-height:.95;letter-spacing:-.02em;margin:12px 0 18px}
+.sek h2 span{color:var(--gold)}
+.sek .unter{max-width:660px;color:#d1cbbd;font-size:19px}
+@media (max-width:640px){.sek{padding:76px 0}.sek h2{font-size:30px}.hero h1{font-size:34px}.schluss h2{font-size:34px}}
+
+/* Warnpanel */
+.warn{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(0,1.1fr);gap:16px;margin-top:34px}
+.warn .panel{min-height:100%}
+.ann{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:12px}
+.lampe{padding:12px 8px;text-align:center;font-family:var(--mono);font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;border:1px solid #ffffff14;color:#3c3a35;background:#0d0e0e;transition:all .4s}
+.lampe.gruen{color:#bfe8cf;background:#163b26;border-color:#3FA56C;box-shadow:0 0 18px #3FA56C55}
+.lampe.gelb{color:#2b2208;background:var(--gold);border-color:var(--gold-hi);box-shadow:0 0 18px #C9A84C88}
+.lampe.rot{color:#fff;background:var(--rot);border-color:var(--rot2);box-shadow:0 0 22px #D8564C88;animation:puls 1s steps(1) infinite}
+@keyframes puls{50%{filter:brightness(.6)}}
+.urteil{margin-top:12px;padding:14px;text-align:center;font-family:var(--disp);font-weight:800;font-size:20px;line-height:1.2}
+.warn-knopf{display:flex;flex-wrap:wrap;gap:10px;margin-top:26px}
+.warn-knopf .btn[aria-pressed=true]{background:var(--gold);color:#050505}
+.warn-text{margin-top:20px;font-size:20px;max-width:820px;color:#e0dacb;min-height:90px}
+@media (max-width:960px){.warn{grid-template-columns:1fr}}
+
+/* Flugroute */
+.route{position:relative;margin-top:50px;overflow-x:clip}
+.route svg.pfad{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none}
+.route .spur{fill:none;stroke:#ffffff1f;stroke-width:2;stroke-dasharray:3 9}
+.route .flug{fill:none;stroke:url(#gRoute);stroke-width:3;filter:drop-shadow(0 0 6px #C9A84C)}
+.flieger{position:absolute;left:0;top:0;width:34px;height:34px;margin:-17px 0 0 -17px;pointer-events:none;z-index:3;transform:translate(var(--x,0),var(--y,0)) rotate(var(--r,0deg))}
+.wp{position:relative;display:grid;grid-template-columns:minmax(0,1fr) 120px minmax(0,1fr);align-items:center;min-height:62vh}
+.wp .karte{grid-column:1;max-width:480px;justify-self:end}
+.wp:nth-child(even) .karte{grid-column:3;justify-self:start}
+.wp .punkt{grid-column:2;grid-row:1;justify-self:center;width:58px;height:58px;border-radius:50%;display:grid;place-items:center;background:#0a0c0d;border:1px solid var(--gold);font-family:var(--disp);font-weight:800;color:var(--gold-hi);z-index:2;transition:box-shadow .5s,background .5s}
+.wp.an .punkt{background:var(--gold);color:#050505;box-shadow:0 0 0 8px #c9a84c22,0 0 30px #C9A84C}
+.wp .karte{opacity:.35;transform:translateY(20px);transition:opacity .6s,transform .8s cubic-bezier(.2,.8,.2,1)}
+.wp.an .karte{opacity:1;transform:none}
+.wp img{margin:12px 0;border:1px solid var(--linie);aspect-ratio:16/9;object-fit:cover;width:100%}
+.wp h3{font-family:var(--disp);font-weight:800;font-size:clamp(24px,2.6vw,34px);line-height:1.05;margin:6px 0 4px}
+.wp p{color:#d1cbbd;margin:0 0 10px;font-size:17px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.chips span{font-family:var(--mono);font-size:10px;letter-spacing:.06em;padding:4px 8px;border:1px solid var(--linie);color:var(--gold-hi)}
+@media (max-width:860px){
+  .wp{grid-template-columns:56px minmax(0,1fr);min-height:0;padding:28px 0}
+  .wp .karte,.wp:nth-child(even) .karte{grid-column:2;justify-self:stretch;max-width:none}
+  .wp .punkt{grid-column:1;width:44px;height:44px;font-size:14px;align-self:start}
+  .wp .karte{opacity:1;transform:none}
+}
+
+/* Bordprogramm */
+.ife{display:grid;grid-template-columns:minmax(0,1.8fr) minmax(0,1fr);gap:16px;margin-top:36px}
+.schirm{position:relative;border:1px solid var(--linie);background:#000;aspect-ratio:16/9;overflow:hidden}
+.schirm img{width:100%;height:100%;object-fit:cover;opacity:.85}
+.schirm button{position:absolute;inset:0;all:unset;cursor:pointer;display:grid;place-items:center;width:100%;height:100%}
+.schirm button:focus-visible{outline:2px solid var(--gold-hi)}
+.schirm .play{width:76px;height:76px;border-radius:50%;background:var(--gold);display:grid;place-items:center;box-shadow:0 0 0 12px #c9a84c33}
+.schirm .play:after{content:"";border-left:22px solid #050505;border-top:13px solid transparent;border-bottom:13px solid transparent;margin-left:6px}
+.schirm .titel{position:absolute;left:0;right:0;bottom:0;padding:14px 18px;background:linear-gradient(transparent,#000d);font-family:var(--disp);font-weight:800;font-size:24px}
+.kanaele{display:grid;gap:8px;align-content:start}
+.kanaele button{all:unset;cursor:pointer;display:grid;grid-template-columns:96px 1fr;gap:12px;align-items:center;padding:8px;border:1px solid #ffffff10;background:#0a0c0d}
+.kanaele button[aria-pressed=true]{border-color:var(--gold)}
+.kanaele button:focus-visible{outline:2px solid var(--gold-hi)}
+.kanaele img{aspect-ratio:16/9;object-fit:cover}
+.kanaele b{display:block;font-family:var(--disp);font-size:16px;line-height:1.1}
+.kanaele span{font-family:var(--mono);font-size:10px;color:var(--leise)}
+@media (max-width:860px){.ife{grid-template-columns:1fr}}
+
+/* Instrumentenbrett */
+.brett{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:36px}
+.brett div{padding:16px;border:1px solid var(--linie);background:#0a0c0d}
+.brett b{display:block;font-family:var(--mono);font-weight:700;font-size:clamp(24px,2.6vw,38px);color:var(--gold-hi);text-shadow:0 0 14px #c9a84c88;letter-spacing:.02em}
+.brett span{display:block;margin-top:6px;font-size:14px;color:#c8c2b4;line-height:1.4}
+@media (max-width:900px){.brett{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+.preise{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-top:36px}
+.preise .panel{display:flex;flex-direction:column}
+.preise h3{font-family:var(--disp);font-weight:800;font-size:34px;margin:10px 0 0}
+.preise .p{font-family:var(--disp);font-weight:800;font-size:40px;line-height:1;margin-top:6px}
+.preise .p small{font-family:var(--mono);font-size:10.5px;font-weight:400;color:var(--leise)}
+.preise .j{font-size:10.5px;color:var(--leise)}
+.preise ul{list-style:none;padding:0;margin:14px 0 18px;flex:1;font-family:var(--serif);font-size:16px}
+.preise li{padding:5px 0;border-top:1px solid #ffffff10}
+.preise .top{border-color:var(--gold);box-shadow:0 0 40px #c9a84c33}
+@media (max-width:1000px){.preise{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:540px){.preise{grid-template-columns:minmax(0,1fr)}}
+
+.partner{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-top:30px;counter-reset:p}
+.partner div{border-left:2px solid var(--gold);padding:4px 0 4px 16px}
+.partner b{display:block;font-family:var(--disp);font-weight:800;font-size:22px}
+.partner b:before{counter-increment:p;content:"WP0" counter(p) "  ";font-family:var(--mono);font-size:10px;color:var(--gold);letter-spacing:.1em}
+.partner span{color:#cfc9bb;font-size:16px}
+@media (max-width:900px){.partner{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:480px){.partner{grid-template-columns:minmax(0,1fr)}}
+
+.schluss{text-align:center;padding:130px 0;background:radial-gradient(ellipse at 50% 120%,#c9a84c33,transparent 60%)}
+.schluss h2{font-family:var(--disp);font-weight:800;font-size:clamp(42px,6vw,92px);line-height:.95;margin:14px 0 26px}
+.schluss h2 span{color:var(--gold)}
+footer{padding:26px 0;border-top:1px solid #ffffff12;font-family:var(--mono);font-size:10.5px;color:var(--leise)}
+footer .wrap{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between}
+
+.dpn-dlg{border:1px solid var(--gold);background:#050505;color:var(--text);padding:0;width:min(1100px,94vw)}
+.dpn-dlg::backdrop{background:#000d}
+.dpn-dlg-kopf{display:flex;justify-content:space-between;align-items:center;padding:8px 14px;font-family:var(--mono);font-size:11px;color:var(--gold);letter-spacing:.1em;text-transform:uppercase}
+.dpn-dlg-x{background:none;border:0;color:var(--text);font-size:28px;min-width:44px;min-height:44px;cursor:pointer}
+.dpn-dlg video{display:block;width:100%;aspect-ratio:16/9;background:#000}
+@media (prefers-reduced-motion:reduce){*,*:before,*:after{transition-duration:0s!important;animation:none!important}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <linearGradient id="gRoute" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#E8CC7A"/><stop offset="1" stop-color="#b8932f"/></linearGradient>
+</defs></svg>
+
+<nav class="nav" aria-label="Hauptnavigation">
+  <a class="logo" href="#">Deal<span>Pilot</span></a>
+  <div class="links"><a href="#instrumente-sek">Zwei Instrumente</a><a href="#route">Flugroute</a><a href="#bordprogramm">Bordprogramm</a><a href="#brett">Daten</a><a href="#preise">Preise</a><a href="#partner">Partner</a></div>
+  <a class="btn voll" href="https://app.dealpilot.immo/">Starten</a>
+</nav>
+
+<header class="hero">
+  <canvas id="nacht" aria-hidden="true"></canvas>
+  <div class="wrap hero-grid">
+    <div>
+      <div class="mono" style="color:var(--gold)">Nachtflug · Pre-Flight · Investor Deal Score</div>
+      <h1>Einer reicht nicht.<br><span>Du fliegst mit zwei Instrumenten.</span></h1>
+      <p class="lead">Dein Objekt kann gut sein und deine Finanzierung nicht. DealPilot schneidet den Score in zwei Anzeigen: eine für die Immobilie, eine für die Finanzierung.</p>
+      <div class="cta"><a class="btn voll" href="https://app.dealpilot.immo/">Vier Wochen Pro, kostenlos</a><button class="btn" type="button" data-video="spot-das-haus-hab-ich">Spot ansehen · 1:31</button></div>
+      <div class="hud-zeile mono"><span>Exposé → Urteil <b>30 s</b></span><span>KPIs <b>24</b></span><span>Module <b>19</b></span><span>Nutzer <b>&gt; 870</b></span></div>
+    </div>
+    <div>
+      <div class="cockpit" id="cockpit">
+        <div class="ebene einzeln" id="einzeln">
+          <div class="glas" id="glas">
+            <div class="panel" id="panel" tabindex="0" role="button" aria-label="Investor Deal Score 87, Sehr gut. Antippen zum Schneiden.">
+              <div class="kopf"><span>Pre-Flight · Investor Deal Score</span><b>Cleared</b></div>
+              <div class="innen"><div class="tacho" data-score="87" data-stufe="Sehr gut"></div><div class="balken" id="balken"></div></div>
+              <div class="mono" style="font-size:9.5px;color:var(--leise);margin-top:6px">ETW 100 m² · 180.000 € · 24/24 KPIs · Urteil Kaufen</div>
+              <span class="ecke a"></span><span class="ecke b"></span><span class="ecke c"></span><span class="ecke d"></span>
+              <div class="glanz"></div>
+            </div>
+          </div>
+          <div class="laser" aria-hidden="true"></div><div class="blitz" aria-hidden="true"></div>
+        </div>
+        <div class="ebene instrumente" id="instrumente" aria-live="polite"></div>
+      </div>
+      <div class="steuer mono"><button class="btn" type="button" id="schneiden">Schnitt auslösen</button><button class="btn" type="button" id="nochmal" hidden>Nochmal</button><span>Maus bewegt Karte und Horizont.</span></div>
+    </div>
+  </div>
+</header>
+
+<section class="sek" id="instrumente-sek">
+  <div class="wrap">
+    <div class="mono" style="color:var(--gold)">Einer reicht nicht</div>
+    <h2>Gutes Objekt.<br><span>Master Caution: Finanzierung.</span></h2>
+    <p class="unter">Gleiche Wohnung, gleicher Kaufpreis. Schalte auf die knappe Finanzierung und sieh, welches Instrument fällt und welche Warnleuchte angeht.</p>
+    <div class="warn-knopf" role="group" aria-label="Beispiel wählen">
+      <button class="btn" type="button" data-fall="gut" aria-pressed="true">30.000 € EK · 3,6 % Zins · 2 % Tilgung</button>
+      <button class="btn" type="button" data-fall="schwach" aria-pressed="false">5.000 € EK · 4,6 % Zins · 2,5 % Tilgung</button>
+    </div>
+    <div class="warn">
+      <div class="panel"><div class="kopf"><span>Investment-Score</span></div><div class="tacho" id="wInv" style="margin:14px auto 0"></div></div>
+      <div class="panel"><div class="kopf"><span>Finanzierungs-Score</span></div><div class="tacho" id="wFin" style="margin:14px auto 0"></div></div>
+      <div class="panel"><div class="kopf"><span>Warnpanel</span><span id="wGes">Gesamt 87</span></div><div class="ann" id="ann"></div><div class="urteil" id="urteil"></div></div>
+    </div>
+    <p class="warn-text" id="warnText"></p>
+  </div>
+</section>
+
+<section class="sek" id="route">
+  <div class="wrap">
+    <div class="mono" style="color:var(--gold)">So fliegt ein Deal</div>
+    <h2>Neun Wegpunkte.<br><span>Vom Exposé bis in den Bestand.</span></h2>
+    <p class="unter">DealPilot liest Exposé und Unterlagen ein, rechnet Finanzierung, Cashflow und Steuer durch und begründet den Wert mit den Daten der Gutachterausschüsse.</p>
+    <div class="route" id="routeBox">
+      <svg class="pfad" aria-hidden="true"><path class="spur" id="spur"/><path class="flug" id="flug"/></svg>
+      <svg class="flieger" id="flieger" viewBox="0 0 34 34" aria-hidden="true"><path d="M17 2 L20 13 L31 18 L31 21 L20 19 L19 27 L23 30 L23 32 L17 30.5 L11 32 L11 30 L15 27 L14 19 L3 21 L3 18 L14 13 Z" fill="#E8CC7A"/></svg>
+      <div id="wegpunkte"></div>
+    </div>
+  </div>
+</section>
+
+<section class="sek" id="bordprogramm">
+  <div class="wrap">
+    <div class="mono" style="color:var(--gold)">Bordprogramm</div>
+    <h2>Lehn dich zurück. <span>Sieh zu.</span></h2>
+    <div class="ife"><div class="schirm" id="schirm"></div><div class="kanaele" id="kanaele"></div></div>
+    <p style="margin-top:18px"><a class="btn" href="../../../frontend/landing/videothek.html">Zur Videothek · 40 Videos, 3,7 Stunden</a></p>
+  </div>
+</section>
+
+<section class="sek" id="brett">
+  <div class="wrap">
+    <div class="mono" style="color:var(--gold)">Datenbasis</div>
+    <h2>Über 1,1 Millionen <span>amtliche Datenpunkte.</span></h2>
+    <p class="unter">In eigenen Datenbanken, laufend abgeglichen, mit Herkunft je Wert. Fehlt eine amtliche Zahl, nennt DealPilot den zuständigen Ausschuss und den Weg zur Quelle.</p>
+    <div class="brett" id="brettliste"></div>
+  </div>
+</section>
+
+<section class="sek" id="preise">
+  <div class="wrap">
+    <div class="mono" style="color:var(--gold)">Preise</div>
+    <h2>Vier Klassen. <span>Ab 0 €.</span></h2>
+    <div class="preise" id="preisliste"></div>
+  </div>
+</section>
+
+<section class="sek" id="partner">
+  <div class="wrap">
+    <div class="mono" style="color:var(--gold)">Für Partner</div>
+    <h2>Deine Kunden fliegen. <span>Du hast den Tower.</span></h2>
+    <p class="unter">Mit dem Partner-Cockpit begleitest du Kapitalanleger unter deiner eigenen Marke.</p>
+    <div class="partner" id="partnerliste"></div>
+  </div>
+</section>
+
+<section class="schluss">
+  <div class="wrap">
+    <div class="mono" style="color:var(--gold)">Pre-Flight · Check-in</div>
+    <h2>Bereit für den <span>Take-off?</span></h2>
+    <a class="btn voll" href="https://app.dealpilot.immo/">Kostenlos einchecken</a>
+    <p class="mono" style="color:var(--leise);margin-top:16px">Keine Zahlungsdaten · 4 Wochen voller Pro-Umfang · danach automatisch Free</p>
+  </div>
+</section>
+<footer><div class="wrap"><span>DealPilot ist eine Marke von Junker Solution · Server in Deutschland</span><span>Keine Steuer- oder Finanzberatung.</span></div></footer>
+
+<script src="gemeinsam.js"></script>
+<script>
+(function () {
+  'use strict';
+  var D = window.DPN, ruhig = D.ruhig;
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+
+  /* ── Tacho: 240° Bogen, Zonen nach der Stufenkette ───────── */
+  function pol(v, r) { var a = (-120 + v / 100 * 240) * Math.PI / 180; return [85 + r * Math.sin(a), 85 - r * Math.cos(a)]; }
+  function bogen(v1, v2, r) { var a = pol(v1, r), b = pol(v2, r), gross = (v2 - v1) * 2.4 > 180 ? 1 : 0; return 'M' + a[0].toFixed(1) + ' ' + a[1].toFixed(1) + ' A' + r + ' ' + r + ' 0 ' + gross + ' 1 ' + b[0].toFixed(1) + ' ' + b[1].toFixed(1); }
+  function tacho(el, score, stufe) {
+    var s = '<svg viewBox="0 0 170 150" aria-hidden="true">'
+      + '<path d="' + bogen(0, 50, 70) + '" stroke="#B8625C" stroke-width="6" fill="none" opacity=".75"/>'
+      + '<path d="' + bogen(50, 70, 70) + '" stroke="#C9A84C" stroke-width="6" fill="none" opacity=".75"/>'
+      + '<path d="' + bogen(70, 100, 70) + '" stroke="#3FA56C" stroke-width="6" fill="none" opacity=".75"/>';
+    for (var v = 0; v <= 100; v += 5) { var a = pol(v, 62), b = pol(v, v % 10 ? 58 : 54); s += '<line x1="' + a[0].toFixed(1) + '" y1="' + a[1].toFixed(1) + '" x2="' + b[0].toFixed(1) + '" y2="' + b[1].toFixed(1) + '" stroke="#ece6d8" stroke-opacity="' + (v % 10 ? .3 : .7) + '" stroke-width="1.2"/>'; }
+    s += '<g class="nadel" style="transform:rotate(-120deg)"><line x1="85" y1="85" x2="85" y2="26" stroke="#E8CC7A" stroke-width="2.5" stroke-linecap="round"/><circle cx="85" cy="85" r="5" fill="#E8CC7A"/></g></svg>'
+      + '<div class="wert"><span data-z="' + score + '">0</span><small style="color:' + D.farbe(score) + '">' + stufe + '</small></div>';
+    el.innerHTML = s; el.setAttribute('role', 'img'); el.setAttribute('aria-label', score + ' von 100, ' + stufe);
+  }
+  function tachoLos(el, score, stufe, dauer) {
+    if (stufe) { var sm = el.querySelector('small'); sm.textContent = stufe; sm.style.color = D.farbe(score); el.setAttribute('aria-label', score + ' von 100, ' + stufe); }
+    el.querySelector('.nadel').style.transform = 'rotate(' + (-120 + score * 2.4) + 'deg)';
+    var z = el.querySelector('[data-z]'); z.style.color = D.farbe(score); D.zaehl(z, score, dauer == null ? 1400 : dauer);
+  }
+  function balken(liste, root) {
+    root.innerHTML = liste.map(function (g) { return '<div class="b"><span>' + g[0] + '</span><b style="color:' + D.farbe(g[1]) + '">' + g[1] + '</b><i style="--f:' + D.farbe(g[1]) + '" data-w="' + g[1] + '"></i></div>'; }).join('');
+  }
+  function balkenLos(root) { root.querySelectorAll('[data-w]').forEach(function (i) { i.style.setProperty('--w', i.dataset.w + '%'); }); }
+
+  var hT = $('#panel .tacho'); tacho(hT, 87, 'Sehr gut');
+  balken(D.KATEGORIEN.map(function (k) { return [k.name + ' · ' + k.gewicht + ' %', k.score]; }), $('#balken'));
+
+  /* ── Nachthimmel und Landebahn auf Canvas ─────────────── */
+  var cv = $('#nacht'), cx = cv.getContext('2d'), W = 0, H = 0, sterne = [], t0 = performance.now(), maus = { x: 0, y: 0 };
+  function groesse() { var d = Math.min(2, devicePixelRatio || 1), r = cv.getBoundingClientRect(); W = r.width; H = r.height; cv.width = W * d; cv.height = H * d; cx.setTransform(d, 0, 0, d, 0, 0);
+    sterne = []; for (var i = 0; i < 160; i++) sterne.push([Math.random() * W, Math.random() * H * .55, Math.random() * 1.3 + .2, Math.random() * 6]); }
+  addEventListener('resize', groesse); groesse();
+  function malen(t) {
+    var s = (t - t0) / 1000;
+    cx.clearRect(0, 0, W, H);
+    var hy = H * .58 + maus.y * 18, vx = W * (innerWidth > 1050 ? .38 : .5) + maus.x * 40, kipp = maus.x * .04;
+    var g = cx.createLinearGradient(0, 0, 0, H); g.addColorStop(0, '#050505'); g.addColorStop(.5, '#0b0d0f'); g.addColorStop(.64, '#15120b'); g.addColorStop(1, '#050505');
+    cx.fillStyle = g; cx.fillRect(0, 0, W, H);
+    sterne.forEach(function (p) { cx.globalAlpha = .35 + .35 * Math.sin(s * 1.3 + p[3]); cx.fillStyle = '#ece6d8'; cx.fillRect(p[0], p[1], p[2], p[2]); });
+    cx.globalAlpha = 1;
+    cx.save(); cx.translate(vx, hy); cx.rotate(kipp);
+    /* Horizontlinie */
+    cx.strokeStyle = '#c9a84c40'; cx.lineWidth = 1; cx.beginPath(); cx.moveTo(-W, 0); cx.lineTo(W, 0); cx.stroke();
+    /* Landebahn: zwei Lichterreihen laufen auf den Betrachter zu */
+    for (var seite = -1; seite <= 1; seite += 2) {
+      for (var i = 0; i < 26; i++) {
+        var z = ((i / 26) + s * .18) % 1, zz = z * z, x = seite * (8 + zz * W * .55), y = zz * (H - hy) * 1.1, r = .6 + zz * 3.2;
+        cx.globalAlpha = Math.min(1, z * 1.6);
+        cx.fillStyle = i % 6 === 0 ? '#3FA56C' : '#E8CC7A';
+        cx.beginPath(); cx.arc(x, y, r, 0, Math.PI * 2); cx.fill();
+      }
+    }
+    /* Mittellinie */
+    for (var k = 0; k < 14; k++) { var z2 = ((k / 14) + s * .18) % 1, q = z2 * z2; cx.globalAlpha = Math.min(.8, z2); cx.fillStyle = '#ece6d8'; cx.fillRect(-.5 - q * 2, q * (H - hy) * 1.1, 1 + q * 4, 2 + q * 18); }
+    cx.restore(); cx.globalAlpha = 1;
+    if (!ruhig) requestAnimationFrame(malen);
+  }
+  requestAnimationFrame(malen);
+  addEventListener('pointermove', function (e) { maus.x = e.clientX / innerWidth - .5; maus.y = e.clientY / innerHeight - .5; }, { passive: true });
+
+  /* ── Instrumente (nach dem Schnitt) ──────────────────── */
+  var F = D.FAELLE.gut, ins = $('#instrumente');
+  function instrument(lab, frage, t) {
+    return '<div class="panel"><div class="kopf"><span>' + lab + '</span><span>' + D.de(t.anteil, 1) + ' %</span></div><p class="frage">' + frage + '</p><div class="tacho" data-s="' + t.score + '" data-st="' + t.stufe + '"></div><div class="balken"></div><span class="ecke a"></span><span class="ecke b"></span><span class="ecke c"></span><span class="ecke d"></span></div>';
+  }
+  ins.innerHTML = instrument('Investment-Score', 'Wie gut ist die Immobilie, egal wie sie finanziert wird?', F.inv)
+    + instrument('Finanzierungs-Score', 'Trägt die geplante Finanzierung dieses Objekt?', F.fin)
+    + '<div class="funk"><span>59,3 % × 81 + 40,8 % × 97 =</span><b>87</b><span>Sehr gut</span><span class="k">Kaufen</span></div>';
+  [F.inv, F.fin].forEach(function (t, i) {
+    var p = ins.querySelectorAll('.panel')[i];
+    tacho(p.querySelector('.tacho'), t.score, t.stufe);
+    balken(t.gruppen.map(function (g) { return [g.name + ' · ' + D.de(g.anteil, 1) + ' %', g.score]; }), p.querySelector('.balken'));
+  });
+
+  var cp = $('#cockpit'), einzeln = $('#einzeln'), panel = $('#panel'), glas = $('#glas'), los = false;
+  D.neigung(glas, 8);
+  function schneiden() {
+    if (los) return; los = true;
+    $('#schneiden').hidden = true;
+    glas.style.setProperty('--rx', '0deg'); glas.style.setProperty('--ry', '0deg');
+    var r = panel.getBoundingClientRect(), wink = Math.atan2(-0.3 * r.height, r.width) * 180 / Math.PI;
+    cp.style.setProperty('--wink', wink.toFixed(2) + 'deg');
+    var laser = $('.laser', einzeln); laser.style.top = (r.height * .65) + 'px';
+    [['o', 'polygon(0 0,100% 0,100% 35%,0 65%)'], ['u', 'polygon(0 65%,100% 35%,100% 100%,0 100%)']].forEach(function (x) {
+      var t = document.createElement('div'); t.className = 'teil ' + x[0]; t.setAttribute('aria-hidden', 'true');
+      var k = panel.cloneNode(true); k.removeAttribute('id'); k.removeAttribute('tabindex'); k.removeAttribute('role');
+      t.appendChild(k); t.style.clipPath = x[1]; glas.appendChild(t);
+    });
+    if (ruhig) { fertig(); return; }
+    cp.classList.add('schnitt');
+    setTimeout(function () { panel.style.visibility = 'hidden'; cp.classList.add('getrennt'); }, 520);
+    setTimeout(fertig, 1050);
+  }
+  function fertig() {
+    ins.classList.add('da'); panel.style.visibility = 'hidden';
+    ins.querySelectorAll('.panel').forEach(function (p) { var t = p.querySelector('.tacho'); tachoLos(t, +t.dataset.s, null, ruhig ? 0 : 1400); balkenLos(p); });
+    setTimeout(function () { einzeln.classList.add('weg'); $('#nochmal').hidden = false; }, ruhig ? 0 : 900);
+  }
+  function nochmal() {
+    los = false; cp.className = 'cockpit'; einzeln.className = 'ebene einzeln'; panel.style.visibility = '';
+    glas.querySelectorAll('.teil').forEach(function (t) { t.remove(); });
+    ins.classList.remove('da');
+    ins.querySelectorAll('.nadel').forEach(function (n) { n.style.transform = 'rotate(-120deg)'; });
+    ins.querySelectorAll('[data-z]').forEach(function (z) { z.dataset.von = 0; z.textContent = '0'; });
+    ins.querySelectorAll('[data-w]').forEach(function (i) { i.style.setProperty('--w', '0%'); });
+    $('#nochmal').hidden = true; $('#schneiden').hidden = false;
+    setTimeout(schneiden, 900);
+  }
+  panel.addEventListener('click', schneiden);
+  panel.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); schneiden(); } });
+  $('#schneiden').addEventListener('click', schneiden);
+  $('#nochmal').addEventListener('click', nochmal);
+  setTimeout(function () { tachoLos(hT, 87, null, ruhig ? 0 : 1400); balkenLos($('#balken')); }, ruhig ? 0 : 300);
+  if (ruhig) schneiden(); else if (!/[?&]halt/.test(location.search)) setTimeout(schneiden, 3000);
+
+  /* ── Warnpanel ───────────────────────────────────────── */
+  tacho($('#wInv'), 81, 'Gut'); tacho($('#wFin'), 97, 'Sehr gut');
+  var TEXT = {
+    gut: 'Alle Leuchten grün. Investment 81, Finanzierung 97, Gesamturteil 87 und damit Sehr gut. Die Miete deckt den Kapitaldienst mit DSCR 1,49. Urteil: Kaufen.',
+    schwach: 'Das Investment-Instrument bleibt bei 81, denn die Wohnung ist dieselbe. Die Finanzierung fällt auf 43: 107,7 % beliehen, DSCR 1,02, nur 28 € Cashflow im Monat. Ein einzelner Score hätte 65 gezeigt und dir verschwiegen, wo es klemmt.'
+  };
+  function fall(k) {
+    var f = D.FAELLE[k], x = f.kpi;
+    document.querySelectorAll('[data-fall]').forEach(function (b) { b.setAttribute('aria-pressed', b.dataset.fall === k); });
+    tachoLos($('#wInv'), f.inv.score, f.inv.stufe, 900); tachoLos($('#wFin'), f.fin.score, f.fin.stufe, 900);
+    $('#wGes').textContent = 'Gesamt ' + f.gesamt + ' · ' + f.stufe;
+    var l = k === 'gut'
+      ? [['Objekt', 'gruen'], ['Lage', 'gelb'], ['DSCR ' + x.dscr, 'gruen'], ['LTV ' + x.ltv, 'gruen'], ['Cashflow ' + x.cf, 'gruen'], ['Finanzierung', 'gruen']]
+      : [['Objekt', 'gruen'], ['Lage', 'gelb'], ['DSCR ' + x.dscr, 'gelb'], ['LTV ' + x.ltv, 'rot'], ['Cashflow ' + x.cf, 'gelb'], ['Finanzierung', 'rot']];
+    $('#ann').innerHTML = l.map(function (a) { return '<div class="lampe ' + a[1] + '">' + a[0] + '</div>'; }).join('');
+    var u = $('#urteil'); u.textContent = f.empfehlung; u.style.background = f.art === 'ja' ? '#3FA56C' : '#C9A84C'; u.style.color = '#050505';
+    $('#warnText').textContent = TEXT[k];
+  }
+  document.querySelectorAll('[data-fall]').forEach(function (b) { b.addEventListener('click', function () { aktuell = b.dataset.fall; gezeigt = true; fall(aktuell); }); });
+  var aktuell = 'gut', gezeigt = false;
+  D.sichtbar('.warn', function () { if (!gezeigt) fall(aktuell); });
+
+  /* ── Flugroute ──────────────────────────────────────── */
+  var wpBox = $('#wegpunkte');
+  wpBox.innerHTML = D.ETAPPEN.map(function (e) {
+    return '<div class="wp"><div class="karte"><div class="mono" style="color:var(--gold)">Wegpunkt ' + e.nr + ' · ' + e.phase + '</div><h3>' + e.titel + '</h3><img src="' + e.bild + '" alt="" loading="lazy" width="800" height="450"><p>' + e.text + '</p><div class="chips">' + e.chips.map(function (c) { return '<span>' + c + '</span>'; }).join('') + '</div><button class="btn" type="button" data-video="' + e.video + '">Video ansehen</button></div><div class="punkt">' + e.nr + '</div></div>';
+  }).join('');
+  var box = $('#routeBox'), spur = $('#spur'), flug = $('#flug'), flieger = $('#flieger'), len = 0, offen = false;
+  function pfadBauen() {
+    var b = box.getBoundingClientRect(), pts = [];
+    wpBox.querySelectorAll('.punkt').forEach(function (p) { var r = p.getBoundingClientRect(); pts.push([r.left + r.width / 2 - b.left, r.top + r.height / 2 - b.top]); });
+    if (!pts.length) return;
+    var schmal = innerWidth <= 860, d = 'M' + pts[0][0] + ' ' + (pts[0][1] - 80);
+    var vorher = [pts[0][0], pts[0][1] - 80];
+    pts.forEach(function (p, i) {
+      var aus = schmal ? 14 : 140 * (i % 2 ? 1 : -1), my = (vorher[1] + p[1]) / 2;
+      d += ' C' + (vorher[0] + aus) + ' ' + my + ',' + (p[0] + aus) + ' ' + my + ',' + p[0] + ' ' + p[1];
+      vorher = p;
+    });
+    spur.setAttribute('d', d); flug.setAttribute('d', d);
+    len = flug.getTotalLength(); flug.style.strokeDasharray = len; scrollen();
+  }
+  function scrollen() {
+    offen = false; if (!len) return;
+    var b = box.getBoundingClientRect(), p = Math.max(0, Math.min(1, (innerHeight * .55 - b.top) / b.height));
+    flug.style.strokeDashoffset = (len * (1 - p)).toFixed(1);
+    var l = p * len, a = flug.getPointAtLength(l), c = flug.getPointAtLength(Math.min(len, l + 2));
+    flieger.style.setProperty('--x', a.x + 'px'); flieger.style.setProperty('--y', a.y + 'px');
+    flieger.style.setProperty('--r', (Math.atan2(c.y - a.y, c.x - a.x) * 180 / Math.PI + 90).toFixed(1) + 'deg');
+    wpBox.querySelectorAll('.wp').forEach(function (w) { var r = w.querySelector('.punkt').getBoundingClientRect(); w.classList.toggle('an', r.top < innerHeight * .62); });
+  }
+  addEventListener('scroll', function () { if (!offen) { offen = true; requestAnimationFrame(scrollen); } }, { passive: true });
+  addEventListener('resize', pfadBauen);
+  addEventListener('load', pfadBauen);
+  setTimeout(pfadBauen, 400);
+
+  /* ── Bordprogramm ───────────────────────────────────── */
+  var IDS = D.VIDEOTHEK.concat(['modul-08-finanzierung']);
+  function schirm(id) {
+    var v = D.VIDEOS[id];
+    $('#schirm').innerHTML = '<img src="' + D.BILD + v.poster + '" alt="" width="960" height="540"><button type="button" data-video="' + id + '" aria-label="' + v.titel + ' abspielen"><span class="play"></span></button><div class="titel">' + v.titel + ' · ' + D.dauer(v.dauer) + '</div>';
+    document.querySelectorAll('.kanaele button').forEach(function (b) { b.setAttribute('aria-pressed', b.dataset.k === id); });
+  }
+  $('#kanaele').innerHTML = IDS.map(function (id) { var v = D.VIDEOS[id]; return '<button type="button" data-k="' + id + '" aria-pressed="false"><img src="' + D.BILD + v.poster + '" alt="" loading="lazy" width="192" height="108"><span><b>' + v.titel + '</b><span>Kanal ' + v.nr + ' · ' + D.dauer(v.dauer) + '</span></span></button>'; }).join('');
+  document.querySelectorAll('.kanaele button').forEach(function (b) { b.addEventListener('click', function () { schirm(b.dataset.k); }); });
+  schirm(IDS[0]);
+  D.videoFenster();
+
+  $('#brettliste').innerHTML = D.ZAHLEN.map(function (z) { return '<div><b data-zahl="' + z.wert + '">0</b><span>' + z.text + '</span></div>'; }).join('');
+  D.sichtbar('#brettliste', function (el) { el.querySelectorAll('[data-zahl]').forEach(function (b) { D.zaehl(b, +b.dataset.zahl, 1800); }); });
+  $('#preisliste').innerHTML = D.PREISE.map(function (p) {
+    return '<div class="panel' + (p.top ? ' top' : '') + '"><div class="kopf"><span>' + p.klasse + '</span><span>' + (p.top ? 'Bestseller' : '') + '</span></div><h3>' + p.name + '</h3><div class="p">' + p.preis + ' €<small> / Monat</small></div><div class="j">' + p.jahr + '</div><ul>' + p.punkte.map(function (x) { return '<li>' + x + '</li>'; }).join('') + '</ul><a class="btn' + (p.top ? ' voll' : '') + '" href="https://app.dealpilot.immo/">' + p.knopf + '</a></div>';
+  }).join('');
+  $('#partnerliste').innerHTML = D.PARTNER.map(function (p) { return '<div><b>' + p[0] + '</b><span>' + p[1] + '</span></div>'; }).join('');
+})();
+</script>
+</body>
+</html>

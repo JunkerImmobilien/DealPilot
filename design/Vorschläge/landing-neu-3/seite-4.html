@@ -1,0 +1,432 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DealPilot · Zellteilung</title>
+<meta name="description" content="Entwurf 4 · Der Score ist eine flüssige Zelle, die sich in Investment und Finanzierung teilt. Die Schrift misst mit: ihre Breite ist der Score.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anybody:ital,wdth,wght@0,50..150,100..900;1,50..150,100..900&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Azeret+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ob:#050505; --ob2:#0c0b09; --gold:#C9A84C; --gold-hi:#E8CC7A; --gold-lo:#b8932f; --gruen:#3FA56C; --rot:#B8625C; --creme:#FDFCFA;
+  --text:#f2ecdf; --leise:#9d9583; --linie:#ffffff1a;
+  --disp:'Anybody',sans-serif; --txt:'Atkinson Hyperlegible',sans-serif; --mono:'Azeret Mono',ui-monospace,monospace;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--ob);color:var(--text);font-family:var(--txt);font-size:18px;line-height:1.6;overflow-x:hidden}
+a{color:inherit}
+img{max-width:100%;display:block}
+.wrap{max-width:1260px;margin:0 auto;padding:0 24px}
+@media (max-width:640px){.wrap{padding:0 16px}}
+.mono{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase}
+:focus-visible{outline:2px solid var(--gold-hi);outline-offset:3px}
+.btn{display:inline-flex;align-items:center;gap:8px;min-height:48px;padding:0 24px;border-radius:999px;font-family:var(--disp);font-variation-settings:'wdth' 120;font-weight:700;font-size:15px;text-transform:uppercase;letter-spacing:.02em;text-decoration:none;border:1.5px solid var(--gold);color:var(--gold-hi);background:transparent;cursor:pointer;transition:font-variation-settings .35s,background .2s}
+.btn:hover{font-variation-settings:'wdth' 150;background:#c9a84c14}
+.btn.voll{background:var(--gold);color:var(--ob)}
+
+.nav{position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:50;display:flex;align-items:center;gap:18px;padding:8px 8px 8px 18px;border-radius:999px;background:#0c0b09d9;border:1px solid var(--linie);backdrop-filter:blur(10px);width:min(1100px,calc(100% - 24px))}
+.nav .logo{font-family:var(--disp);font-weight:800;font-variation-settings:'wdth' 140;font-size:18px;text-decoration:none}
+.nav .logo span{color:var(--gold)}
+.nav .links{display:flex;gap:18px;margin-left:auto;font-family:var(--mono);font-size:11px;text-transform:uppercase}
+.nav .links a{text-decoration:none;color:var(--leise)}
+.nav .links a:hover{color:var(--gold-hi)}
+.nav .btn{min-height:40px;padding:0 16px}
+@media (max-width:900px){.nav .links{display:none}.nav .btn{margin-left:auto}}
+
+/* HERO */
+.hero{position:relative;min-height:100vh;padding:110px 0 50px;overflow:hidden}
+.hero:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 50% 55%,#c9a84c1f,transparent 50%);pointer-events:none}
+.titel{font-family:var(--disp);text-transform:uppercase;line-height:.84;margin:0;text-align:center;font-weight:900;font-size:clamp(46px,7vw,112px);letter-spacing:-.01em}
+.titel span{display:block;font-variation-settings:'wdth' var(--w,100);transition:font-variation-settings .15s linear}
+.titel .g{color:var(--gold);font-style:italic}
+.lead{max-width:640px;margin:16px auto 0;text-align:center;color:#d9d1c1;font-size:20px}
+.cta{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:24px}
+
+.labor{position:relative;height:560px;margin-top:0}
+.goo{position:absolute;inset:0;filter:url(#goo)}
+.blob{position:absolute;left:50%;top:50%;width:260px;height:260px;margin:-130px 0 0 -130px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#f3dc96,#C9A84C 55%,#8f7020);transition:transform 1.6s cubic-bezier(.65,0,.25,1),width .9s,height .9s,margin .9s;transform:translate(calc(var(--mx,0)*14px),calc(var(--my,0)*14px))}
+.blob.b{background:radial-gradient(circle at 35% 30%,#f6e6b5,#E8CC7A 55%,#b8932f)}
+.tropfen{position:absolute;left:50%;top:50%;width:46px;height:46px;margin:-23px 0 0 -23px;border-radius:50%;background:#C9A84C;transition:transform 1.3s cubic-bezier(.6,0,.3,1)}
+.etikett{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-family:var(--mono);font-size:11px;white-space:nowrap;color:var(--text);transition:transform 1.3s cubic-bezier(.6,0,.3,1),opacity .6s;pointer-events:none}
+.etikett b{color:var(--gold-hi);font-family:var(--disp);font-size:18px;font-weight:800;margin-left:6px}
+.kern{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);text-align:center;color:#050505;pointer-events:none;transition:opacity .5s,transform 1.6s cubic-bezier(.65,0,.25,1)}
+.kern .z{font-family:var(--disp);font-weight:900;font-size:120px;line-height:.8;font-variation-settings:'wdth' 60}
+.kern .s{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;margin-top:8px}
+.kern.inv,.kern.fin{opacity:0}
+.labor.teilt .kern.ganz{opacity:0;transform:translate(-50%,-50%) scale(.6)}
+.labor.teilt .kern.inv{opacity:1;transform:translate(calc(-50% - var(--ab)),-50%)}
+.labor.teilt .kern.fin{opacity:1;transform:translate(calc(-50% + var(--ab)),-50%)}
+.labor.teilt .blob.a{transform:translateX(calc(var(--ab)*-1))}
+.labor.teilt .blob.b{transform:translateX(var(--ab))}
+.labor.teilt .etikett{opacity:0}
+.labor{--ab:240px}
+.zellkarten{position:absolute;inset:0;display:grid;grid-template-columns:1fr 1fr;gap:28px;align-items:center;padding:0 20px;pointer-events:none}
+.zk{justify-self:center;width:min(440px,100%);border-radius:26px;padding:22px;background:#0c0b09;border:1px solid #c9a84c55;box-shadow:0 30px 80px #000c,0 0 0 1px #00000080;opacity:0;transform:scale(.6);transition:opacity .6s,transform .9s cubic-bezier(.2,1.3,.3,1);pointer-events:auto}
+.labor.karten .zk{opacity:1;transform:none}
+.labor.karten .zk.fin{transition-delay:.1s}
+.labor.karten .goo,.labor.karten .kern{opacity:0;transition:opacity .5s}
+.zk .kopf{display:flex;justify-content:space-between;align-items:baseline;font-family:var(--mono);font-size:11px;text-transform:uppercase;color:var(--gold)}
+.zk .gross{font-family:var(--disp);font-weight:900;font-size:110px;line-height:.85;margin:8px 0 2px;font-variation-settings:'wdth' var(--sw,100)}
+.zk .frage{font-style:italic;color:#d6cebd;margin:0 0 12px;font-size:16px}
+.zk .g{display:grid;grid-template-columns:1fr auto;gap:2px 10px;font-family:var(--mono);font-size:11.5px;margin-top:8px}
+.zk .g b{font-family:var(--disp);font-weight:800;font-size:18px}
+.zk .g i{grid-column:1/-1;height:6px;border-radius:3px;background:#ffffff10;overflow:hidden}
+.zk .g i:after{content:"";display:block;height:100%;width:var(--b,0%);background:var(--f);border-radius:3px;transition:width 1s .4s cubic-bezier(.2,.8,.2,1)}
+.labor.karten .zk .g i{--b:var(--ziel)}
+.summe{position:absolute;left:50%;bottom:6px;transform:translateX(-50%);font-family:var(--mono);font-size:12px;color:var(--leise);white-space:nowrap;opacity:0;transition:opacity .6s 1s}
+.labor.karten .summe{opacity:1}
+.summe b{font-family:var(--disp);color:var(--text);font-size:22px;font-weight:900}
+.summe .k{color:#050505;background:var(--gruen);padding:3px 10px;border-radius:999px;margin-left:6px}
+.steuer{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:14px}
+@media (max-width:820px){
+  .labor{height:860px;--ab:0px}
+  .blob{width:200px;height:200px;margin:-100px 0 0 -100px}
+  .labor.teilt .blob.a{transform:translateY(-190px)}
+  .labor.teilt .blob.b{transform:translateY(190px)}
+  .labor.teilt .kern.inv{transform:translate(-50%,calc(-50% - 190px))}
+  .labor.teilt .kern.fin{transform:translate(-50%,calc(-50% + 190px))}
+  .kern .z{font-size:92px}
+  .zellkarten{grid-template-columns:1fr;gap:16px;padding:0;align-content:center}
+  .zk .gross{font-size:84px}
+  .summe{white-space:normal;text-align:center;width:100%;bottom:0}
+  .etikett{font-size:10px}
+}
+
+/* Schrift als Messgerät */
+.sek{padding:120px 0}
+.sek h2{font-family:var(--disp);font-weight:900;text-transform:uppercase;font-size:clamp(40px,6vw,92px);line-height:.88;margin:12px 0 18px;font-variation-settings:'wdth' 115}
+.sek h2 em{font-style:italic;color:var(--gold);font-variation-settings:'wdth' 70}
+.sek .unter{max-width:660px;color:#d6cebd;font-size:20px}
+@media (max-width:640px){.sek{padding:76px 0}}
+.messgeraet{margin-top:40px;border-top:1px solid var(--linie)}
+.mess{display:grid;grid-template-columns:minmax(0,1fr) 120px;gap:20px;align-items:center;padding:14px 0;border-bottom:1px solid var(--linie)}
+.mess .wort{font-family:var(--disp);text-transform:uppercase;font-size:clamp(22px,6.1vw,98px);line-height:1;white-space:nowrap;overflow:hidden;font-variation-settings:'wdth' var(--w,100),'wght' var(--g,700);transition:font-variation-settings 1.2s cubic-bezier(.2,.8,.2,1),color .8s}
+.mess .wert{text-align:right;font-family:var(--disp);font-weight:900;font-size:56px;line-height:1}
+.mess .wert small{display:block;font-family:var(--mono);font-size:11px;font-weight:400;color:var(--leise);text-transform:uppercase}
+.mess-knopf{display:flex;gap:10px;flex-wrap:wrap;margin-top:28px}
+.mess-knopf .btn[aria-pressed=true]{background:var(--gold);color:var(--ob)}
+.mess-text{margin-top:22px;max-width:820px;font-size:21px;color:#e1d9c9;min-height:96px}
+.legende{font-family:var(--mono);font-size:11px;color:var(--leise);margin-top:10px}
+@media (max-width:640px){.mess{grid-template-columns:minmax(0,1fr) 64px;gap:10px}.mess .wert{font-size:34px}.mess .wort{font-size:5.3vw}}
+
+/* Runway: Etappen horizontal */
+.runway{position:relative;height:calc(9 * 70vh)}
+.runway-pin{position:sticky;top:0;height:100vh;overflow:hidden;display:flex;flex-direction:column;justify-content:center}
+.bahn{display:flex;gap:4vw;padding:0 10vw;will-change:transform}
+.etappe{flex:0 0 min(74vw,980px);display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:36px;align-items:center}
+.etappe .nr{font-family:var(--disp);font-weight:900;font-size:clamp(90px,15vw,230px);line-height:.8;color:var(--gold);font-variation-settings:'wdth' var(--nw,100)}
+.etappe h3{font-family:var(--disp);font-weight:800;text-transform:uppercase;font-size:clamp(26px,3vw,42px);line-height:1;margin:10px 0 12px;font-variation-settings:'wdth' 110}
+.etappe p{color:#d6cebd;margin:0 0 14px}
+.etappe img{border-radius:18px;border:1px solid var(--linie);aspect-ratio:16/9;object-fit:cover;width:100%}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.chips span{font-family:var(--mono);font-size:10.5px;padding:5px 10px;border-radius:999px;background:#ffffff0d}
+.bahnlinie{position:relative;height:2px;margin:40px 10vw 0;background:repeating-linear-gradient(90deg,#ffffff30 0 26px,transparent 26px 50px)}
+.bahnlinie i{position:absolute;left:0;top:-5px;width:12px;height:12px;border-radius:50%;background:var(--gold-hi);box-shadow:0 0 18px var(--gold-hi);transform:translateX(var(--px,0px))}
+.runway-kopf{position:absolute;top:96px;left:0;right:0}
+@media (max-width:820px){
+  .runway{height:auto}
+  .runway-pin{position:relative;height:auto;overflow:visible;padding:0}
+  .runway-kopf{position:relative;top:0}
+  .bahn{overflow-x:auto;scroll-snap-type:x mandatory;padding:20px 16px;transform:none!important;gap:16px}
+  .etappe{flex:0 0 86%;grid-template-columns:1fr;scroll-snap-align:center;gap:12px}
+  .etappe .nr{font-size:90px}
+  .bahnlinie{display:none}
+}
+
+/* Videos */
+.vids{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:36px}
+.vids button{all:unset;cursor:pointer;display:block;border-radius:18px;overflow:hidden;background:var(--ob2);border:1px solid var(--linie);transition:transform .4s cubic-bezier(.2,1.3,.3,1)}
+.vids button:hover{transform:translateY(-6px) rotate(-1deg)}
+.vids button:focus-visible{outline:2px solid var(--gold-hi)}
+.vids img{aspect-ratio:16/10;object-fit:cover;width:100%}
+.vids .t{padding:12px 14px 16px}
+.vids b{display:block;font-family:var(--disp);font-weight:800;font-size:20px;line-height:1.05;font-variation-settings:'wdth' 90}
+.vids span{font-family:var(--mono);font-size:10.5px;color:var(--leise)}
+@media (max-width:900px){.vids{grid-template-columns:1fr 1fr}}
+
+/* Zahlen */
+.zahlen{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:30px 24px;margin-top:40px}
+.zahlen b{display:block;font-family:var(--disp);font-size:clamp(36px,4.4vw,64px);line-height:1;color:var(--gold-hi);font-variation-settings:'wdth' var(--zw,50),'wght' var(--zg,200);transition:font-variation-settings 1.6s cubic-bezier(.2,.8,.2,1)}
+.zahlen .da b{--zw:100;--zg:850}
+.zahlen span{display:block;margin-top:8px;color:#cfc7b6;font-size:15px;line-height:1.4}
+@media (max-width:900px){.zahlen{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+.preise{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:40px}
+.pr{border-radius:24px;padding:22px;background:var(--ob2);border:1px solid var(--linie);display:flex;flex-direction:column}
+.pr.top{background:linear-gradient(160deg,#2a2213,#0c0b09);border-color:var(--gold)}
+.pr .kl{font-family:var(--mono);font-size:10.5px;color:var(--gold);text-transform:uppercase}
+.pr h3{font-family:var(--disp);font-weight:900;font-size:40px;margin:4px 0 0;text-transform:uppercase;font-variation-settings:'wdth' 130}
+.pr .p{font-family:var(--disp);font-weight:800;font-size:44px;line-height:1;margin-top:8px;font-variation-settings:'wdth' 70}
+.pr .p small{font-family:var(--mono);font-size:11px;font-weight:400;color:var(--leise)}
+.pr .j{font-family:var(--mono);font-size:10.5px;color:var(--leise)}
+.pr ul{padding:0;list-style:none;margin:16px 0 18px;flex:1}
+.pr li{padding:5px 0;font-size:16px;border-top:1px solid var(--linie)}
+@media (max-width:1000px){.preise{grid-template-columns:1fr 1fr}}
+@media (max-width:540px){.preise{grid-template-columns:1fr}}
+
+.partner{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:36px}
+.partner div{border-radius:22px;background:var(--ob2);border:1px solid var(--linie);padding:20px}
+.partner b{display:block;font-family:var(--disp);font-weight:900;text-transform:uppercase;font-size:24px;font-variation-settings:'wdth' 120;color:var(--gold-hi)}
+.partner span{color:#cfc7b6;font-size:16px}
+@media (max-width:900px){.partner{grid-template-columns:1fr 1fr}}
+@media (max-width:480px){.partner{grid-template-columns:1fr}}
+
+.welle{overflow:hidden;white-space:nowrap;border-top:1px solid var(--linie);border-bottom:1px solid var(--linie);padding:18px 0}
+.welle .spur{display:inline-block;animation:lauf 40s linear infinite}
+.welle span{display:inline-block;font-family:var(--disp);font-weight:900;text-transform:uppercase;font-size:clamp(40px,6vw,90px);line-height:1;animation:atmen 2.6s ease-in-out infinite;animation-delay:calc(var(--i)*-.12s);color:var(--gold)}
+@keyframes atmen{0%,100%{font-variation-settings:'wdth' 50}50%{font-variation-settings:'wdth' 150}}
+@keyframes lauf{to{transform:translateX(-50%)}}
+.schluss{padding:110px 0 130px;text-align:center}
+.schluss h2{margin:16px auto 26px}
+footer{padding:28px 0;border-top:1px solid var(--linie);font-family:var(--mono);font-size:11px;color:var(--leise)}
+footer .wrap{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between}
+
+.dpn-dlg{border:1px solid var(--gold);border-radius:22px;background:var(--ob);color:var(--text);padding:0;width:min(1100px,94vw);overflow:hidden}
+.dpn-dlg::backdrop{background:#000d;backdrop-filter:blur(8px)}
+.dpn-dlg-kopf{display:flex;justify-content:space-between;align-items:center;padding:8px 16px;font-family:var(--mono);font-size:11px;color:var(--gold)}
+.dpn-dlg-x{background:none;border:0;color:var(--text);font-size:28px;min-width:44px;min-height:44px;cursor:pointer}
+.dpn-dlg video{display:block;width:100%;aspect-ratio:16/9;background:#000}
+@media (prefers-reduced-motion:reduce){*,*:before,*:after{transition-duration:0s!important;animation:none!important}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <filter id="goo"><feGaussianBlur in="SourceGraphic" stdDeviation="16" result="b"/><feColorMatrix in="b" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 26 -11" result="g"/><feComposite in="SourceGraphic" in2="g" operator="atop"/></filter>
+</defs></svg>
+
+<nav class="nav" aria-label="Hauptnavigation">
+  <a class="logo" href="#">Deal<span>Pilot</span></a>
+  <div class="links"><a href="#mess">Zwei Scores</a><a href="#runway">Runway</a><a href="#videos">Videos</a><a href="#daten">Daten</a><a href="#preise">Preise</a><a href="#partner">Partner</a></div>
+  <a class="btn voll" href="https://app.dealpilot.immo/">Starten</a>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="mono" style="text-align:center;color:var(--gold)">Pre-Flight · Investor Deal Score</div>
+    <h1 class="titel" id="titel"><span data-w>Einer reicht</span><span data-w class="g">nicht.</span></h1>
+    <p class="lead">Dein Objekt kann gut sein und deine Finanzierung nicht. Sieh zu, wie sich der Score teilt.</p>
+    <div class="labor" id="labor" aria-live="polite">
+      <div class="goo" aria-hidden="true">
+        <div class="blob a"></div><div class="blob b"></div>
+        <div id="tropfen"></div>
+      </div>
+      <div id="etiketten" aria-hidden="true"></div>
+      <div class="kern ganz" role="img" aria-label="Investor Deal Score 87, Sehr gut"><div class="z" id="kernZahl">0</div><div class="s">Sehr gut</div></div>
+      <div class="kern inv" aria-hidden="true"><div class="z">81</div><div class="s">Investment</div></div>
+      <div class="kern fin" aria-hidden="true"><div class="z">97</div><div class="s">Finanzierung</div></div>
+      <div class="zellkarten" id="zellkarten"></div>
+      <div class="summe">59,3 % × 81 + 40,8 % × 97 = <b>87</b> Sehr gut <span class="k">Kaufen</span></div>
+    </div>
+    <div class="steuer"><button class="btn" type="button" id="teilen">Zelle teilen</button><button class="btn" type="button" id="nochmal" hidden>Nochmal</button><a class="btn voll" href="https://app.dealpilot.immo/">Vier Wochen Pro, kostenlos</a><button class="btn" type="button" data-video="spot-das-haus-hab-ich">Spot · 1:31</button></div>
+  </div>
+</header>
+
+<section class="sek" id="mess">
+  <div class="wrap">
+    <div class="mono" style="color:var(--gold)">Einer reicht nicht</div>
+    <h2>Die Schrift <em>misst mit.</em></h2>
+    <p class="unter">Jedes Wort ist so breit wie sein Score. Gleiche Wohnung, gleicher Kaufpreis. Schalte die Finanzierung um und sieh, welches Wort zusammenschrumpft.</p>
+    <div class="mess-knopf" role="group" aria-label="Beispiel wählen">
+      <button class="btn" type="button" data-fall="gut" aria-pressed="true">30.000 € EK · 3,6 %</button>
+      <button class="btn" type="button" data-fall="schwach" aria-pressed="false">5.000 € EK · 4,6 %</button>
+    </div>
+    <div class="messgeraet" id="messgeraet"></div>
+    <p class="legende">Breite = 50 + Score auf der Breitenachse der Schrift. Werte aus den Rechenkernen der App, Profil Ausgewogen.</p>
+    <p class="mess-text" id="messText"></p>
+  </div>
+</section>
+
+<section class="runway" id="runway">
+  <div id="rwMitte" style="position:absolute;top:45%;height:1px;width:1px" aria-hidden="true"></div>
+  <div class="runway-pin">
+    <div class="wrap runway-kopf"><div class="mono" style="color:var(--gold)">So fliegt ein Deal · neun Etappen</div></div>
+    <div class="bahn" id="bahn"></div>
+    <div class="bahnlinie" aria-hidden="true"><i id="punkt"></i></div>
+  </div>
+</section>
+
+<section class="sek" id="videos">
+  <div class="wrap">
+    <div class="mono" style="color:var(--gold)">Videothek</div>
+    <h2>Zusehen <em>statt lesen.</em></h2>
+    <div class="vids" id="vids"></div>
+    <p style="margin-top:20px"><a class="btn" href="../../../frontend/landing/videothek.html">Alle 40 Videos · 3,7 Stunden</a></p>
+  </div>
+</section>
+
+<section class="sek" id="daten">
+  <div class="wrap">
+    <div class="mono" style="color:var(--gold)">Datenbasis</div>
+    <h2>1,1 Millionen <em>amtliche Datenpunkte.</em></h2>
+    <p class="unter">In eigenen Datenbanken, laufend abgeglichen, mit Herkunft je Wert. Wo eine amtliche Zahl fehlt, wird keine erfunden.</p>
+    <div class="zahlen" id="zahlen"></div>
+  </div>
+</section>
+
+<section class="sek" id="preise">
+  <div class="wrap">
+    <div class="mono" style="color:var(--gold)">Preise</div>
+    <h2>Vier Pakete. <em>Ab 0 €.</em></h2>
+    <div class="preise" id="preisliste"></div>
+  </div>
+</section>
+
+<section class="sek" id="partner">
+  <div class="wrap">
+    <div class="mono" style="color:var(--gold)">Für Partner</div>
+    <h2>Deine Marke. <em>Deine Kunden.</em></h2>
+    <p class="unter">Mit dem Partner-Cockpit begleitest du Kapitalanleger unter deiner eigenen Marke.</p>
+    <div class="partner" id="partnerliste"></div>
+  </div>
+</section>
+
+<div class="welle" aria-hidden="true"><div class="spur" id="welle"></div></div>
+<section class="schluss">
+  <div class="wrap">
+    <h2 class="titel" style="font-size:clamp(44px,7vw,110px)"><span style="font-variation-settings:'wdth' 130">Bereit für den</span><span class="g" style="font-variation-settings:'wdth' 60">Take-off?</span></h2>
+    <div class="cta"><a class="btn voll" href="https://app.dealpilot.immo/">Kostenlos einchecken</a></div>
+    <p class="mono" style="color:var(--leise);margin-top:16px">Keine Zahlungsdaten · 4 Wochen voller Pro-Umfang · danach automatisch Free</p>
+  </div>
+</section>
+<footer><div class="wrap"><span>DealPilot ist eine Marke von Junker Solution · Server in Deutschland</span><span>Keine Steuer- oder Finanzberatung.</span></div></footer>
+
+<script src="gemeinsam.js"></script>
+<script>
+(function () {
+  'use strict';
+  var D = window.DPN, ruhig = D.ruhig;
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  var schmal = function () { return innerWidth <= 820; };
+
+  /* ── Titel: Breite folgt Maus und Scrolltempo ─────────── */
+  var tz = document.querySelectorAll('#titel [data-w]'), zielW = [100, 100], istW = [100, 100], letztY = scrollY, tempo = 0;
+  if (!ruhig) {
+    addEventListener('pointermove', function (e) { var x = e.clientX / innerWidth; zielW = [60 + x * 90, 150 - x * 90]; });
+    (function schleife() {
+      tempo = tempo * .9 + Math.abs(scrollY - letztY) * .1; letztY = scrollY;
+      for (var i = 0; i < 2; i++) { istW[i] += (Math.max(50, Math.min(150, zielW[i] - tempo * 1.2)) - istW[i]) * .08; tz[i].style.setProperty('--w', istW[i].toFixed(1)); }
+      requestAnimationFrame(schleife);
+    })();
+  }
+
+  /* ── Labor: fünf Tropfen = fünf Bereiche ─────────────── */
+  var labor = $('#labor'), tr = $('#tropfen'), et = $('#etiketten');
+  var ZU = ['beide', 'fin', 'inv', 'inv', 'inv']; /* Rendite teilt sich, Finanzierung → fin, Rest → inv */
+  D.KATEGORIEN.forEach(function (k, i) {
+    var t = document.createElement('div'); t.className = 'tropfen'; tr.appendChild(t);
+    var e = document.createElement('div'); e.className = 'etikett'; e.innerHTML = k.name + '<b>' + k.score + '</b>'; et.appendChild(e);
+  });
+  var winkel = 0, maus = { x: 0, y: 0 }, geteilt = false;
+  function bahn() {
+    var R = schmal() ? 150 : 210, Re = schmal() ? 168 : 250;
+    tr.querySelectorAll('.tropfen').forEach(function (t, i) {
+      if (geteilt) return;
+      var a = winkel + i * (Math.PI * 2 / 5), r = R + Math.sin(winkel * 3 + i) * 10;
+      t.style.transform = 'translate(' + (Math.cos(a) * r + maus.x * 22) + 'px,' + (Math.sin(a) * r * .62 + maus.y * 22) + 'px)';
+      var e = et.children[i]; e.style.transform = 'translate(calc(-50% + ' + (Math.cos(a) * Re + maus.x * 22) + 'px),calc(-50% + ' + (Math.sin(a) * Re * .62 + maus.y * 22 + 34) + 'px))';
+    });
+  }
+  if (!ruhig) (function dreh() { if (!geteilt) { winkel += .004; bahn(); } requestAnimationFrame(dreh); })(); else bahn();
+  labor.addEventListener('pointermove', function (e) {
+    var r = labor.getBoundingClientRect(); maus.x = (e.clientX - r.left) / r.width - .5; maus.y = (e.clientY - r.top) / r.height - .5;
+    labor.querySelectorAll('.blob').forEach(function (b) { b.style.setProperty('--mx', maus.x * 2); b.style.setProperty('--my', maus.y * 2); });
+  });
+
+  /* Zellkarten */
+  function karte(cls, lab, frage, t) {
+    return '<div class="zk ' + cls + '"><div class="kopf"><span>' + lab + '</span><span>' + D.de(t.anteil, 1) + ' % Gewicht</span></div>'
+      + '<div class="gross" style="--sw:' + (50 + t.score) + ';color:' + D.farbe(t.score) + '">' + t.score + '</div><div class="mono" style="color:' + D.farbe(t.score) + '">' + t.stufe + '</div>'
+      + '<p class="frage">' + frage + '</p>'
+      + t.gruppen.map(function (g) { return '<div class="g"><span>' + g.name + ' · ' + D.de(g.anteil, 1) + ' %</span><b style="color:' + D.farbe(g.score) + '">' + g.score + '</b><i style="--f:' + D.farbe(g.score) + ';--ziel:' + g.score + '%"></i></div>'; }).join('') + '</div>';
+  }
+  var F = D.FAELLE.gut;
+  $('#zellkarten').innerHTML = karte('inv', 'Investment-Score', 'Wie gut ist die Immobilie, egal wie sie finanziert wird?', F.inv) + karte('fin', 'Finanzierungs-Score', 'Trägt die geplante Finanzierung dieses Objekt?', F.fin);
+
+  function teilen() {
+    if (geteilt) return; geteilt = true;
+    $('#teilen').hidden = true;
+    var ab = schmal() ? 190 : 240;
+    /* Tropfen fliegen in ihre Zelle: Rendite teilt sich (wird zu Objektrendite und Cashflow) */
+    tr.querySelectorAll('.tropfen').forEach(function (t, i) {
+      var z = ZU[i], x = z === 'fin' ? ab : -ab, y = 0;
+      if (z === 'beide') { x = 0; }
+      if (schmal()) { y = z === 'fin' ? ab : -ab; x = 0; if (z === 'beide') y = 0; }
+      t.style.transform = 'translate(' + x + 'px,' + y + 'px) scale(.4)';
+    });
+    labor.classList.add('teilt');
+    setTimeout(function () { labor.classList.add('karten'); $('#nochmal').hidden = false; }, ruhig ? 0 : 2100);
+  }
+  function nochmal() {
+    labor.classList.remove('teilt', 'karten'); geteilt = false;
+    $('#nochmal').hidden = true; $('#teilen').hidden = false;
+    D.zaehl($('#kernZahl'), 87, 0); setTimeout(teilen, 2400);
+  }
+  $('#teilen').addEventListener('click', teilen);
+  $('#nochmal').addEventListener('click', nochmal);
+  labor.addEventListener('click', function (e) { if (!e.target.closest('.zk')) teilen(); });
+  D.zaehl($('#kernZahl'), 87, ruhig ? 0 : 1400);
+  if (ruhig) teilen(); else if (!/[?&]halt/.test(location.search)) setTimeout(teilen, 3000);
+
+  /* ── Messgerät ───────────────────────────────────────── */
+  var mg = $('#messgeraet');
+  mg.innerHTML = ['Investment', 'Finanzierung', 'Gesamt'].map(function (w, i) {
+    return '<div class="mess"><div class="wort" data-i="' + i + '">' + w + '</div><div class="wert"><span>0</span><small>' + (i < 2 ? 'Score' : 'Urteil') + '</small></div></div>';
+  }).join('');
+  var TEXT = {
+    gut: 'Alle drei Wörter stehen breit. Investment 81, Finanzierung 97, zusammen 87 und damit Sehr gut. Der DSCR liegt bei 1,49, die Miete trägt den Kapitaldienst. Urteil: Kaufen.',
+    schwach: 'Das Wort Investment bleibt stehen, denn die Wohnung ist dieselbe. Finanzierung schrumpft auf 43, weil 107,7 % beliehen sind und der DSCR nur 1,02 erreicht. Gesamt 65 Solide. Urteil: Objekt passt, Finanzierung umbauen.'
+  };
+  function fall(k) {
+    var f = D.FAELLE[k], w = [f.inv.score, f.fin.score, f.gesamt];
+    document.querySelectorAll('[data-fall]').forEach(function (b) { b.setAttribute('aria-pressed', b.dataset.fall === k); });
+    mg.querySelectorAll('.mess').forEach(function (m, i) {
+      var wort = m.querySelector('.wort'); wort.style.setProperty('--w', 50 + w[i]); wort.style.setProperty('--g', 200 + w[i] * 7); wort.style.color = D.farbe(w[i]);
+      var z = m.querySelector('.wert span'); z.style.color = D.farbe(w[i]); D.zaehl(z, w[i], 900);
+    });
+    $('#messText').textContent = TEXT[k];
+  }
+  document.querySelectorAll('[data-fall]').forEach(function (b) { b.addEventListener('click', function () { aktuell = b.dataset.fall; gezeigt = true; fall(aktuell); }); });
+  var aktuell = 'gut', gezeigt = false;
+  D.sichtbar('#messgeraet', function () { if (!gezeigt) fall(aktuell); });
+
+  /* ── Runway ─────────────────────────────────────────── */
+  var bahnEl = $('#bahn');
+  bahnEl.innerHTML = D.ETAPPEN.map(function (e) {
+    return '<article class="etappe"><div><div class="nr">' + e.nr + '</div><div class="mono" style="color:var(--gold)">' + e.phase + '</div><h3>' + e.titel + '</h3><p>' + e.text + '</p><div class="chips">' + e.chips.map(function (c) { return '<span>' + c + '</span>'; }).join('') + '</div><button class="btn" type="button" data-video="' + e.video + '">Video ansehen</button></div><img src="' + e.bild + '" alt="" loading="lazy" width="800" height="450"></article>';
+  }).join('');
+  var rw = $('#runway'), punkt = $('#punkt'), rwOffen = false;
+  function rwScroll() {
+    rwOffen = false;
+    if (schmal()) return;
+    var r = rw.getBoundingClientRect(), weg = r.height - innerHeight, p = Math.max(0, Math.min(1, -r.top / weg));
+    var max = bahnEl.scrollWidth - innerWidth;
+    bahnEl.style.transform = 'translate3d(' + (-p * max).toFixed(1) + 'px,0,0)';
+    punkt.style.setProperty('--px', (p * (innerWidth * .8 - 12)).toFixed(1) + 'px');
+    bahnEl.querySelectorAll('.etappe').forEach(function (a) {
+      var b = a.getBoundingClientRect(), d = Math.abs(b.left + b.width / 2 - innerWidth / 2) / innerWidth;
+      a.querySelector('.nr').style.setProperty('--nw', Math.max(50, 150 - d * 220).toFixed(0));
+    });
+  }
+  addEventListener('scroll', function () { if (!rwOffen) { rwOffen = true; requestAnimationFrame(rwScroll); } }, { passive: true });
+  addEventListener('resize', rwScroll); rwScroll();
+
+  /* ── Videos, Zahlen, Preise, Partner ───────────────── */
+  $('#vids').innerHTML = D.VIDEOTHEK.map(function (id) { var v = D.VIDEOS[id]; return '<button type="button" data-video="' + id + '"><img src="' + D.BILD + v.poster + '" alt="" loading="lazy" width="480" height="300"><span class="t"><b>' + v.titel + '</b><span>' + v.nr + ' · ' + D.dauer(v.dauer) + '</span></span></button>'; }).join('');
+  D.videoFenster();
+  $('#zahlen').innerHTML = D.ZAHLEN.map(function (z) { return '<div><b data-zahl="' + z.wert + '">0</b><span>' + z.text + '</span></div>'; }).join('');
+  D.sichtbar('#zahlen', function (el) { el.querySelectorAll('div').forEach(function (d) { d.classList.add('da'); }); el.querySelectorAll('[data-zahl]').forEach(function (b) { D.zaehl(b, +b.dataset.zahl, 1600); }); });
+  $('#preisliste').innerHTML = D.PREISE.map(function (p) {
+    return '<div class="pr' + (p.top ? ' top' : '') + '"><div class="kl">' + p.klasse + (p.top ? ' · Bestseller' : '') + '</div><h3>' + p.name + '</h3><div class="p">' + p.preis + ' €<small> / Monat</small></div><div class="j">' + p.jahr + '</div><ul>' + p.punkte.map(function (x) { return '<li>' + x + '</li>'; }).join('') + '</ul><a class="btn' + (p.top ? ' voll' : '') + '" href="https://app.dealpilot.immo/">' + p.knopf + '</a></div>';
+  }).join('');
+  $('#partnerliste').innerHTML = D.PARTNER.map(function (p) { return '<div><b>' + p[0] + '</b><span>' + p[1] + '</span></div>'; }).join('');
+  var txt = 'Einer reicht nicht · Zwei Scores · ';
+  var html = txt.split('').map(function (c, i) { return '<span style="--i:' + i + '">' + (c === ' ' ? '&nbsp;' : c) + '</span>'; }).join('');
+  $('#welle').innerHTML = html + html;
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,492 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DealPilot · Abriss</title>
+<meta name="description" content="Entwurf 3 · Die Bordkarte reißt an der Perforation, genau im Verhältnis 59,3 zu 40,8. Beim Scrollen zerlegt sie sich in ihre Ebenen.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Gloock&family=Newsreader:ital,opsz,wght@0,6..72,300..700;1,6..72,300..700&family=Spline+Sans+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --creme:#FDFCFA; --papier:#f6f1e6; --karte:#FBF6E9; --ink:#050505; --ink2:#3d382f; --leise:#6b6457;
+  --gold:#C9A84C; --gold-hi:#E8CC7A; --gold-lo:#b8932f; --gruen:#3FA56C; --rot:#B8625C; --linie:#e3dccb;
+  --disp:'Gloock',Georgia,serif; --serif:'Newsreader',Georgia,serif; --mono:'Spline Sans Mono',ui-monospace,monospace;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--creme);color:var(--ink);font-family:var(--serif);font-size:19px;line-height:1.6;overflow-x:hidden;font-variation-settings:'opsz' 14}
+a{color:inherit}
+img{max-width:100%;display:block}
+.wrap{max-width:1180px;margin:0 auto;padding:0 24px}
+@media (max-width:640px){.wrap{padding:0 16px}}
+.mono{font-family:var(--mono);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase}
+:focus-visible{outline:2px solid var(--gold-lo);outline-offset:3px}
+.btn{display:inline-flex;align-items:center;gap:10px;min-height:46px;padding:0 22px;border-radius:999px;font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;text-decoration:none;border:1px solid var(--ink);color:var(--ink);background:transparent;cursor:pointer}
+.btn:hover{background:#0505050d}
+.btn.voll{background:var(--ink);color:var(--creme)}
+.btn.voll:hover{background:#222}
+
+.nav{position:sticky;top:0;z-index:50;background:#fdfcfaee;backdrop-filter:blur(8px);border-bottom:1px solid var(--linie)}
+.nav .wrap{display:flex;align-items:center;gap:22px;min-height:64px}
+.nav .logo{font-family:var(--disp);font-size:26px;text-decoration:none}
+.nav .logo span{color:var(--gold-lo)}
+.nav .links{display:flex;gap:22px;margin-left:auto}
+.nav .links a{text-decoration:none;font-family:var(--serif);font-style:italic;font-size:17px;color:var(--ink2)}
+.nav .links a:hover{color:var(--ink);text-decoration:underline}
+@media (max-width:900px){.nav .links{display:none}.nav .btn{margin-left:auto}}
+
+/* HERO: angeheftete Bühne */
+.hero{position:relative;height:250vh}
+.pin{position:sticky;top:64px;height:calc(100vh - 64px);min-height:620px;display:grid;grid-template-rows:auto 1fr auto;overflow:hidden}
+.kopfzeile{display:grid;grid-template-columns:1.2fr 1fr;gap:40px;align-items:end;padding-top:28px}
+.kopfzeile h1{font-family:var(--disp);font-weight:400;font-size:clamp(50px,7vw,104px);line-height:.92;margin:8px 0 0;letter-spacing:-.01em}
+.kopfzeile h1 i{font-style:normal;color:var(--gold-lo)}
+.kopfzeile p{margin:0;color:var(--ink2);font-size:20px}
+.kopfzeile .cta{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
+@media (max-width:900px){.kopfzeile{grid-template-columns:1fr;gap:10px}.kopfzeile p{font-size:17px}}
+
+.buehne{position:relative;display:grid;place-items:center;perspective:1400px}
+.welt{position:relative;width:min(900px,calc(100vw - 48px));transform-style:preserve-3d;transform:rotateX(calc(var(--e,0)*52deg)) rotateZ(calc(var(--e,0)*-24deg)) translateY(calc(var(--e,0)*-30px)) scale(calc(1 - var(--e,0)*.12))}
+.pass{position:relative;display:grid;grid-template-columns:59.3% 40.7%;width:100%;min-height:330px;border-radius:16px;background:#0b0a08;color:#f1ebde;box-shadow:0 30px 60px #05050540,0 2px 0 #00000033;transform:rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));font-family:var(--mono)}
+.pass .glanz{position:absolute;inset:0;border-radius:16px;pointer-events:none;background:radial-gradient(circle at var(--gx,50%) var(--gy,30%),#ffffff1f,transparent 40%)}
+.pass .haupt{padding:20px 24px;display:grid;grid-template-columns:150px 1fr;gap:22px;align-items:center;border-right:2px dashed #C9A84C66;position:relative}
+.pass .haupt:before{content:"Pre-Flight · Investor Deal Score";position:absolute;top:14px;left:24px;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold)}
+.pass .stub{padding:20px 22px;display:flex;flex-direction:column;justify-content:space-between;gap:12px;background:linear-gradient(160deg,#15130f,#0b0a08);border-radius:0 16px 16px 0}
+.pass .stub .lab{font-size:10px;color:#9c9482;text-transform:uppercase;letter-spacing:.1em}
+.pass .stub .lab b{display:block;color:#f1ebde;font-size:15px;font-family:var(--disp);font-weight:400;letter-spacing:0;text-transform:none}
+.loch{position:absolute;top:-12px;left:calc(59.3% - 12px);width:24px;height:24px;border-radius:50%;background:var(--creme)}
+.loch.u{top:auto;bottom:-12px}
+.ring{position:relative;width:140px;height:140px}
+.ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.ring circle{fill:none;stroke-width:8}
+.ring .tr{stroke:#ffffff14}
+.ring .pg{stroke-linecap:round;stroke-dasharray:333;stroke-dashoffset:333;transition:stroke-dashoffset 1.4s cubic-bezier(.2,.8,.2,1)}
+.ring .zahl{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--disp);font-size:54px;line-height:1}
+.ring .zahl small{font-family:var(--mono);font-size:10px;color:#9c9482;margin-top:2px}
+.stufe{display:block;text-align:center;margin-top:8px;font-size:10px;letter-spacing:.16em;text-transform:uppercase}
+.bars .b{display:grid;grid-template-columns:1fr auto;font-size:11px;margin-bottom:8px}
+.bars .b span small{color:#9c9482;margin-left:6px}
+.bars .b b{font-family:var(--disp);font-weight:400;font-size:17px}
+.bars .b i{grid-column:1/-1;height:3px;background:#ffffff12;margin-top:3px;position:relative;overflow:hidden}
+.bars .b i:after{content:"";position:absolute;inset:0;width:var(--w,0%);background:var(--f,#3FA56C);transition:width 1.1s cubic-bezier(.2,.8,.2,1)}
+.qr{width:62px;height:62px;background:conic-gradient(from 90deg at 30% 30%,#f1ebde 25%,#0b0a08 0) 0 0/10px 10px;border:5px solid #f1ebde;border-radius:3px;opacity:.9}
+
+/* Riss */
+.haelfte{position:absolute;inset:0;pointer-events:none;z-index:4}
+.haelfte .pass{height:100%}
+.zipp{position:absolute;top:0;bottom:0;left:59.3%;width:2px;transform:translateX(-1px);background:linear-gradient(var(--gold-hi),var(--gold-hi)) 0 0/100% var(--z,0%) no-repeat;z-index:6;pointer-events:none;filter:drop-shadow(0 0 6px #E8CC7A)}
+.tickets{position:absolute;inset:0;display:grid;grid-template-columns:59.3% 40.7%;column-gap:0;z-index:3;transform-style:preserve-3d;visibility:hidden}
+.tickets.da{visibility:visible}
+.tk{position:relative;transform-style:preserve-3d;opacity:0;transition:opacity .5s,transform 1s cubic-bezier(.2,.9,.2,1)}
+.tickets.da .tk{opacity:1}
+.tickets.da .tk.inv{transform:translateX(-22px) rotate(-1.5deg)}
+.tickets.da .tk.fin{transform:translateX(22px) rotate(1.8deg)}
+.ebene{position:absolute;inset:0;border-radius:16px;transform:translateZ(calc(var(--e,0)*var(--z)))}
+.ebene.grund{background:#0b0a08;box-shadow:0 20px 50px #05050533}
+.tk.inv .ebene.grund{border-radius:16px 0 0 16px}
+.tk.fin .ebene.grund{border-radius:0 16px 16px 0;background:linear-gradient(160deg,#15130f,#0b0a08)}
+.zacken{position:absolute;top:0;bottom:0;width:10px;background:var(--creme)}
+.tk.inv .zacken{right:-1px;clip-path:polygon(100% 0,100% 100%,0 100%,40% 96%,0 92%,60% 88%,10% 84%,50% 80%,0 76%,45% 72%,5% 68%,55% 64%,0 60%,40% 56%,10% 52%,60% 48%,0 44%,45% 40%,5% 36%,50% 32%,0 28%,55% 24%,10% 20%,45% 16%,0 12%,50% 8%,10% 4%,0 0)}
+.tk.fin .zacken{left:-1px;clip-path:polygon(0 0,0 100%,100% 100%,60% 96%,100% 92%,40% 88%,90% 84%,50% 80%,100% 76%,55% 72%,95% 68%,45% 64%,100% 60%,60% 56%,90% 52%,40% 48%,100% 44%,55% 40%,95% 36%,50% 32%,100% 28%,45% 24%,90% 20%,55% 16%,100% 12%,50% 8%,90% 4%,100% 0)}
+.ebene.inhalt{padding:20px 24px;color:#f1ebde;font-family:var(--mono);display:grid;grid-template-columns:130px 1fr;gap:18px;align-items:center;--z:46px}
+.tk.fin .ebene.inhalt{grid-template-columns:110px 1fr;padding:20px 20px 20px 26px}
+.ebene.ring-e{--z:96px;pointer-events:none}
+.ebene .lab{position:absolute;top:12px;left:24px;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold)}
+.tk.fin .ebene .lab{left:26px}
+.tk .ring{width:120px;height:120px}
+.tk.fin .ring{width:104px;height:104px}
+.tk .ring .zahl{font-size:46px}
+.tk.fin .ring .zahl{font-size:40px}
+.frage{font-family:var(--serif);font-style:italic;font-size:14px;line-height:1.3;color:#d9d1c1;margin:0 0 10px}
+.notiz{position:absolute;font-family:var(--mono);font-size:10.5px;color:var(--ink);white-space:nowrap;opacity:calc(var(--e,0)*1.6 - .5);pointer-events:none;transform:translateZ(calc(var(--e,0)*120px))}
+.notiz:before{content:"";position:absolute;left:-46px;top:50%;width:40px;height:1px;background:var(--ink)}
+.steuer{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;padding-top:14px;padding-bottom:22px;color:var(--leise)}
+.fort{flex:1;min-width:120px;max-width:300px;height:2px;background:var(--linie);position:relative}
+.fort i{position:absolute;inset:0;width:calc(var(--e,0)*100%);background:var(--gold-lo)}
+@media (max-width:720px){
+  .welt{width:calc(100vw - 32px)}
+  .hero{height:auto}
+  .pin{position:relative;top:0;height:auto;min-height:0;overflow:visible;padding-bottom:10px}
+  .buehne{margin-top:22px}
+  .steuer{margin-top:26px}
+  .pass{grid-template-columns:1fr;grid-template-rows:auto auto;min-height:0}
+  .pass .haupt{grid-template-columns:104px 1fr;gap:14px;border-right:0;border-bottom:2px dashed #C9A84C66;padding:38px 14px 16px}
+  .pass .haupt:before{left:14px}
+  .pass .haupt .ring{width:100px;height:100px}
+  .pass .haupt .ring .zahl{font-size:38px}
+  .pass .haupt .bars{width:100%}
+  .pass .stub{border-radius:0 0 16px 16px;flex-direction:row;flex-wrap:wrap;padding:14px 18px}
+  .loch{left:-12px;top:var(--lochy,60%)}
+  .loch.u{left:auto;right:-12px;top:var(--lochy,60%);bottom:auto}
+  .zipp{left:0;right:0;top:var(--lochy,60%);bottom:auto;width:auto;height:2px;background-size:var(--z,0%) 100%}
+  .tickets{grid-template-columns:1fr;grid-template-rows:var(--lochy,60%) 1fr;row-gap:0}
+  .tickets.da .tk.inv{transform:translateY(-10px) rotate(-1deg)}
+  .tickets.da .tk.fin{transform:translateY(10px) rotate(1deg)}
+  .tk.inv .ebene.grund{border-radius:16px 16px 0 0}
+  .tk.fin .ebene.grund{border-radius:0 0 16px 16px}
+  .zacken{display:none}
+  .ebene.inhalt,.tk.fin .ebene.inhalt{grid-template-columns:96px 1fr;padding:30px 14px 14px}
+  .tk .ring,.tk.fin .ring{width:92px;height:92px}
+  .tk .ring .zahl,.tk.fin .ring .zahl{font-size:36px}
+  .welt{transform:none!important}
+  .notiz{display:none}
+  .kopfzeile h1{font-size:44px}
+}
+
+/* SEKTIONEN */
+.sek{padding:110px 0;border-top:1px solid var(--linie)}
+.rubrik{display:flex;gap:14px;align-items:baseline;font-family:var(--mono);font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--leise)}
+.rubrik b{color:var(--ink)}
+.sek h2{font-family:var(--disp);font-weight:400;font-size:clamp(42px,6vw,86px);line-height:.95;margin:14px 0 22px}
+.sek h2 i{font-style:normal;color:var(--gold-lo)}
+@media (max-width:640px){.sek{padding:72px 0}}
+
+.artikel{display:grid;grid-template-columns:1fr 1fr;gap:56px}
+.artikel .text p:first-child:first-letter{font-family:var(--disp);float:left;font-size:92px;line-height:.8;margin:6px 10px 0 0;color:var(--gold-lo)}
+.artikel blockquote{margin:28px 0;padding:0 0 0 22px;border-left:3px solid var(--gold);font-family:var(--disp);font-size:30px;line-height:1.2}
+.befund{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.bb{background:var(--karte);border:1px solid var(--linie);border-radius:14px;padding:18px}
+.bb h3{margin:0 0 4px;font-family:var(--disp);font-weight:400;font-size:24px}
+.bb .k{font-family:var(--mono);font-size:10.5px;color:var(--leise);text-transform:uppercase;letter-spacing:.06em}
+.bb .zeile{display:grid;grid-template-columns:1fr auto;gap:6px;margin-top:14px;align-items:baseline}
+.bb .zeile b{font-family:var(--disp);font-weight:400;font-size:44px;line-height:1}
+.bb .zeile span{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.06em}
+.bb .spur{grid-column:1/-1;height:6px;border-radius:3px;background:#0505050f;overflow:hidden}
+.bb .spur i{display:block;height:100%;width:0;transition:width 1.2s cubic-bezier(.2,.8,.2,1)}
+.bb .urteil{margin-top:16px;padding:10px 12px;border-radius:8px;font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.05em}
+.bb .daten{margin-top:12px;font-family:var(--mono);font-size:10.5px;color:var(--leise);line-height:1.7}
+@media (max-width:900px){.artikel{grid-template-columns:1fr;gap:30px}}
+@media (max-width:520px){.befund{grid-template-columns:1fr}}
+
+/* Kapitel */
+.kapitel{display:grid;gap:90px;margin-top:50px}
+.kap{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:48px;align-items:center}
+.kap:nth-child(even){grid-template-columns:minmax(0,1fr) minmax(0,1.15fr)}
+.kap:nth-child(even) .bild{order:2}
+.kap .bild{position:relative;border-radius:10px;overflow:hidden;border:1px solid var(--linie);box-shadow:0 30px 60px #05050526;clip-path:inset(0 0 100% 0);transition:clip-path 1.2s cubic-bezier(.7,0,.2,1)}
+.kap .bild:after{content:"";position:absolute;left:0;right:0;height:3px;top:0;background:var(--gold-hi);box-shadow:0 0 18px #E8CC7A;opacity:0}
+.kap.da .bild{clip-path:inset(0 0 0 0)}
+.kap.da .bild:after{animation:scan 1.2s cubic-bezier(.7,0,.2,1)}
+@keyframes scan{0%{top:0;opacity:1}100%{top:100%;opacity:0}}
+.kap .bild img{width:100%;aspect-ratio:16/9;object-fit:cover}
+.kap .nr{font-family:var(--disp);font-size:120px;line-height:.8;color:var(--gold-lo);opacity:.9}
+.kap h3{font-family:var(--disp);font-weight:400;font-size:clamp(30px,3.4vw,46px);line-height:1.05;margin:10px 0 12px}
+.kap p{color:var(--ink2);margin:0 0 14px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px}
+.chips span{font-family:var(--mono);font-size:10.5px;padding:4px 10px;border:1px solid var(--linie);border-radius:999px;background:var(--karte)}
+@media (max-width:860px){.kap,.kap:nth-child(even){grid-template-columns:1fr;gap:20px}.kap:nth-child(even) .bild{order:0}.kap .nr{font-size:80px}}
+
+/* Programm */
+.programm{margin-top:40px;border-top:2px solid var(--ink)}
+.prog{display:grid;grid-template-columns:90px 260px 1fr 90px;gap:24px;align-items:center;padding:16px 0;border-bottom:1px solid var(--linie);cursor:pointer;background:none;border-left:0;border-right:0;border-top:0;width:100%;text-align:left;font:inherit;color:inherit}
+.prog:hover{background:var(--karte)}
+.prog .n{font-family:var(--mono);font-size:12px;color:var(--leise)}
+.prog img{border-radius:6px;aspect-ratio:16/9;object-fit:cover}
+.prog b{display:block;font-family:var(--disp);font-weight:400;font-size:30px;line-height:1.05}
+.prog span.u{color:var(--ink2);font-style:italic}
+.prog .d{font-family:var(--mono);font-size:12px;text-align:right}
+@media (max-width:760px){.prog{grid-template-columns:110px 1fr;gap:12px}.prog .n,.prog .d{display:none}.prog b{font-size:21px}.prog span.u{font-size:15px}}
+
+/* Fußnoten-Zahlen */
+.fussnoten{display:grid;grid-template-columns:repeat(4,1fr);gap:34px 28px;margin-top:40px}
+.fussnoten div b{display:block;font-family:var(--disp);font-weight:400;font-size:clamp(36px,4vw,56px);line-height:1}
+.fussnoten div b sup{font-family:var(--mono);font-size:12px;color:var(--gold-lo);vertical-align:top;margin-left:4px}
+.fussnoten div span{display:block;margin-top:8px;font-size:16px;color:var(--ink2);line-height:1.4}
+@media (max-width:900px){.fussnoten{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:420px){.fussnoten{grid-template-columns:minmax(0,1fr)}}
+
+.preise{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:40px}
+.pr{background:var(--karte);border:1px solid var(--linie);border-radius:16px;padding:22px;display:flex;flex-direction:column}
+.pr.top{background:var(--ink);color:var(--creme);border-color:var(--ink)}
+.pr .kl{font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--leise)}
+.pr.top .kl{color:var(--gold)}
+.pr h3{font-family:var(--disp);font-weight:400;font-size:38px;margin:6px 0 0}
+.pr .p{font-family:var(--disp);font-size:44px;line-height:1;margin-top:8px}
+.pr .p small{font-family:var(--mono);font-size:11px}
+.pr .j{font-family:var(--mono);font-size:10.5px;opacity:.7;margin-top:4px}
+.pr ul{padding:0 0 0 18px;margin:16px 0 20px;flex:1}
+.pr li{margin:4px 0;font-size:16px}
+.pr.top .btn{background:var(--gold);color:var(--ink);border-color:var(--gold)}
+@media (max-width:1000px){.preise{grid-template-columns:1fr 1fr}}
+@media (max-width:560px){.preise{grid-template-columns:1fr}}
+
+.partner{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;margin-top:36px;counter-reset:p}
+.partner div{border-top:2px solid var(--ink);padding-top:14px}
+.partner b{font-family:var(--disp);font-weight:400;font-size:28px;display:block}
+.partner b:before{counter-increment:p;content:counter(p,upper-roman) ". ";color:var(--gold-lo)}
+.partner span{color:var(--ink2);font-size:17px}
+@media (max-width:860px){.partner{grid-template-columns:1fr 1fr}}
+@media (max-width:480px){.partner{grid-template-columns:1fr}}
+
+.schluss{background:var(--ink);color:var(--creme);text-align:center;padding:130px 0}
+.schluss h2{font-family:var(--disp);font-weight:400;font-size:clamp(46px,7vw,100px);line-height:.95;margin:14px 0 26px}
+.schluss h2 i{font-style:normal;color:var(--gold)}
+.schluss .btn.voll{background:var(--gold);color:var(--ink)}
+footer{background:var(--ink);color:#9c9482;font-family:var(--mono);font-size:11px;padding:24px 0;border-top:1px solid #222}
+footer .wrap{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between}
+
+.dpn-dlg{border:0;border-radius:14px;background:var(--ink);color:var(--creme);padding:0;width:min(1100px,94vw)}
+.dpn-dlg::backdrop{background:#fdfcfacc;backdrop-filter:blur(6px)}
+.dpn-dlg-kopf{display:flex;justify-content:space-between;align-items:center;padding:8px 14px;font-family:var(--mono);font-size:11px;color:var(--gold)}
+.dpn-dlg-x{background:none;border:0;color:var(--creme);font-size:28px;min-width:44px;min-height:44px;cursor:pointer}
+.dpn-dlg video{display:block;width:100%;aspect-ratio:16/9;background:#000}
+@media (prefers-reduced-motion:reduce){*,*:before,*:after{transition-duration:0s!important;animation-duration:0s!important}.kap .bild{clip-path:none}}
+</style>
+</head>
+<body>
+<nav class="nav" aria-label="Hauptnavigation"><div class="wrap">
+  <a class="logo" href="#">Deal<span>Pilot</span></a>
+  <div class="links"><a href="#befund">Der Befund</a><a href="#kapitel">Neun Kapitel</a><a href="#programm">Filmprogramm</a><a href="#daten">Datenbasis</a><a href="#preise">Preise</a><a href="#partner">Partner</a></div>
+  <a class="btn voll" href="https://app.dealpilot.immo/">Kostenlos starten</a>
+</div></nav>
+
+<header class="hero" id="hero">
+  <div class="pin">
+    <div class="wrap kopfzeile">
+      <div><div class="mono" style="color:var(--leise)">Ausgabe Pre-Flight · Investor Deal Score</div><h1>Eine Karte.<br><i>Zwei Urteile.</i></h1></div>
+      <div><p>Dein Objekt kann gut sein und deine Finanzierung nicht. Deshalb reißt DealPilot den Score dort auf, wo er sich teilt: Investment hier, Finanzierung dort.</p>
+        <div class="cta"><a class="btn voll" href="https://app.dealpilot.immo/">Vier Wochen Pro, kostenlos</a><button class="btn" type="button" data-video="spot-das-haus-hab-ich">Spot ansehen</button></div></div>
+    </div>
+    <div class="wrap buehne">
+      <div class="welt" id="welt">
+        <div class="pass" id="pass" tabindex="0" role="button" aria-label="Bordkarte Investor Deal Score 87, Sehr gut. Antippen zum Abreißen.">
+          <div class="haupt">
+            <div><div class="ring"><svg viewBox="0 0 120 120" aria-hidden="true"><circle class="tr" cx="60" cy="60" r="53"/><circle class="pg" cx="60" cy="60" r="53" data-score="87" stroke="#C9A84C"/></svg><div class="zahl"><span data-ziel="87">0</span><small>/ 100</small></div></div><span class="stufe" style="color:#3FA56C">◆ Sehr gut</span></div>
+            <div class="bars" id="bars"></div>
+          </div>
+          <div class="stub">
+            <div class="lab">Passagier<b>DealPilot Co-Pilot</b></div>
+            <div class="lab">Objekt<b>ETW 100 m² · 180.000 €</b></div>
+            <div class="lab">Urteil<b>Kaufen · 24/24 KPIs</b></div>
+            <div class="qr" aria-hidden="true"></div>
+          </div>
+          <span class="loch" aria-hidden="true"></span><span class="loch u" aria-hidden="true"></span>
+          <div class="glanz"></div>
+        </div>
+        <div class="tickets" id="tickets" aria-live="polite"></div>
+      </div>
+    </div>
+    <div class="wrap steuer mono"><span id="hinweis">Antippen oder warten. Die Karte reißt an der Perforation.</span><span class="fort" aria-hidden="true"><i></i></span><span><button class="btn" type="button" id="abreissen">Abreißen</button> <button class="btn" type="button" id="nochmal" hidden>Nochmal</button></span></div>
+  </div>
+  <div id="zerlegt" style="position:absolute;top:150vh;height:1px;width:1px" aria-hidden="true"></div>
+</header>
+
+<section class="sek" id="befund">
+  <div class="wrap">
+    <div class="rubrik"><b>Der Befund</b><span>Einer reicht nicht</span></div>
+    <h2>Gutes Objekt, <i>schwache Finanzierung.</i></h2>
+    <div class="artikel">
+      <div class="text">
+        <p>Ein einzelner Score ist eine Durchschnittsnote. Er mischt die Wohnung mit dem Kredit, und am Ende steht eine Zahl, die dir nicht sagt, woran es hakt. Dieselbe Wohnung kann ein guter Kauf sein und trotzdem mit der falschen Finanzierung zur Last werden.</p>
+        <p>DealPilot rechnet deshalb zwei Teile. Der Investment-Score fragt, wie gut die Immobilie ist, egal wie sie finanziert wird: Objektrendite, Risiko und Zustand, Lage und Markt, Potenzial und Preis. Der Finanzierungs-Score fragt, ob die geplante Finanzierung das Objekt trägt: Kapitaldienst und Beleihung, Cashflow und Eigenkapitalrendite.</p>
+        <blockquote>Kaufen heißt bei DealPilot: Investment ab 70, Finanzierung ab 50, und die Miete trägt den Kapitaldienst.</blockquote>
+        <p>Rechts siehst du dieselbe Wohnung zweimal, mit den echten Rechenkernen aus der App gerechnet. Nur Eigenkapital, Zins und Tilgung sind verschieden.</p>
+      </div>
+      <div class="befund" id="befundbogen"></div>
+    </div>
+  </div>
+</section>
+
+<section class="sek" id="kapitel">
+  <div class="wrap">
+    <div class="rubrik"><b>So fliegt ein Deal</b><span>Neun Kapitel vom Exposé bis in den Bestand</span></div>
+    <h2>Die ganze Strecke, <i>Kapitel für Kapitel.</i></h2>
+    <div class="kapitel" id="kapitelliste"></div>
+  </div>
+</section>
+
+<section class="sek" id="programm">
+  <div class="wrap">
+    <div class="rubrik"><b>Filmprogramm</b><span>Aus der Videothek</span></div>
+    <h2>Erst ansehen, <i>dann einsteigen.</i></h2>
+    <div class="programm" id="programmliste"></div>
+    <p style="margin-top:20px"><a class="btn" href="../../../frontend/landing/videothek.html">Zur Videothek · 40 Videos, 3,7 Stunden</a></p>
+  </div>
+</section>
+
+<section class="sek" id="daten">
+  <div class="wrap">
+    <div class="rubrik"><b>Datenbasis</b><span>Jede Zahl mit Herkunft</span></div>
+    <h2>Über 1,1 Millionen <i>amtliche Datenpunkte.</i></h2>
+    <div class="fussnoten" id="fussnoten"></div>
+    <p style="margin-top:34px;color:var(--ink2);max-width:760px;font-style:italic">Wo eine amtliche Zahl fehlt, erfindet DealPilot keine. Stattdessen stehen der zuständige Gutachterausschuss und der Weg zur Quelle im Bericht.</p>
+  </div>
+</section>
+
+<section class="sek" id="preise">
+  <div class="wrap">
+    <div class="rubrik"><b>Preise</b><span>Monatlich kündbar</span></div>
+    <h2>Vier Pakete. <i>Ab 0 €.</i></h2>
+    <div class="preise" id="preisliste"></div>
+  </div>
+</section>
+
+<section class="sek" id="partner">
+  <div class="wrap">
+    <div class="rubrik"><b>Für Partner</b><span>Berater und Kanzleien</span></div>
+    <h2>Deine Kunden rechnen. <i>Du behältst den Überblick.</i></h2>
+    <div class="partner" id="partnerliste"></div>
+  </div>
+</section>
+
+<section class="schluss">
+  <div class="wrap">
+    <div class="mono" style="color:var(--gold)">Pre-Flight · Check-in</div>
+    <h2>Bereit für den <i>Take-off?</i></h2>
+    <a class="btn voll" href="https://app.dealpilot.immo/">Kostenlos einchecken</a>
+  </div>
+</section>
+<footer><div class="wrap"><span>DealPilot ist eine Marke von Junker Solution · Server in Deutschland</span><span>Keine Steuer- oder Finanzberatung.</span></div></footer>
+
+<script src="gemeinsam.js"></script>
+<script>
+(function () {
+  'use strict';
+  var D = window.DPN, ruhig = D.ruhig;
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  var hoch = function () { return innerWidth <= 720; };
+
+  $('#bars').innerHTML = D.KATEGORIEN.map(function (k) {
+    return '<div class="b"><span>' + k.name + '<small>' + k.gewicht + ' %</small></span><b style="color:' + D.farbe(k.score) + '">' + k.score + '</b><i style="--f:' + D.farbe(k.score) + '" data-w="' + k.score + '"></i></div>';
+  }).join('');
+  function laufen(root, sofort) {
+    root.querySelectorAll('.pg').forEach(function (c) { c.style.strokeDashoffset = 333 * (1 - c.dataset.score / 100); });
+    root.querySelectorAll('[data-ziel]').forEach(function (e) { D.zaehl(e, +e.dataset.ziel, sofort ? 0 : 1300); });
+    root.querySelectorAll('[data-w]').forEach(function (i) { i.style.setProperty('--w', i.dataset.w + '%'); });
+  }
+
+  /* Tickets: drei Ebenen je Teil (Grund, Inhalt, Ring) für die Explosionszeichnung */
+  function ticket(cls, lab, frage, t) {
+    var ring = '<div class="ring"><svg viewBox="0 0 120 120" aria-hidden="true"><circle class="tr" cx="60" cy="60" r="53"/><circle class="pg" cx="60" cy="60" r="53" data-score="' + t.score + '" stroke="' + D.farbe(t.score) + '"/></svg><div class="zahl"><span data-ziel="' + t.score + '">0</span><small>/ 100</small></div></div>';
+    return '<div class="tk ' + cls + '"><div class="ebene grund"><span class="zacken"></span></div>'
+      + '<div class="ebene inhalt"><span class="lab">' + lab + '</span><div><div style="visibility:hidden">' + ring + '</div><span class="stufe" style="color:' + D.farbe(t.score) + '">◆ ' + t.stufe + '</span></div>'
+      + '<div class="bars"><p class="frage">' + frage + '</p>' + t.gruppen.map(function (g) {
+          return '<div class="b"><span>' + g.name + '<small>' + D.de(g.anteil, 1) + ' %</small></span><b style="color:' + D.farbe(g.score) + '">' + g.score + '</b><i style="--f:' + D.farbe(g.score) + '" data-w="' + g.score + '"></i></div>';
+        }).join('') + '</div></div>'
+      + '<div class="ebene inhalt ring-e"><div>' + ring + '<span class="stufe" style="visibility:hidden">x</span></div><div></div></div>'
+      + '<span class="notiz" style="left:' + (cls === 'inv' ? '-10px' : '60%') + ';top:-34px">Ebene 3 · Score ' + t.score + ' · ' + t.stufe + '</span>'
+      + '<span class="notiz" style="left:' + (cls === 'inv' ? '-10px' : '60%') + ';top:calc(100% + 10px)">Ebene 1 · ' + lab + ' · ' + D.de(t.anteil, 1) + ' % Gewicht</span>'
+      + '</div>';
+  }
+  var F = D.FAELLE.gut, tks = $('#tickets');
+  tks.innerHTML = ticket('inv', 'Investment-Score', 'Wie gut ist die Immobilie, egal wie sie finanziert wird?', F.inv)
+    + ticket('fin', 'Finanzierungs-Score', 'Trägt die Finanzierung dieses Objekt?', F.fin);
+
+  /* ── Abriss ─────────────────────────────────────── */
+  var welt = $('#welt'), pass = $('#pass'), los = false;
+  D.neigung(pass, 7);
+  function zacken(n, vert) {
+    /* Papierkante: viele kleine Zähne entlang der Perforation (59,3 % bzw. Lochhöhe) */
+    var p = [], seed = 5; function r() { seed = (seed * 9301 + 49297) % 233280; return seed / 233280; }
+    var basis = vert ? null : 59.3;
+    for (var i = 0; i <= n; i++) { var t = i / n * 100, d = (r() - .5) * 1.6; p.push(vert ? [t, 0, d] : [basis + d, t]); }
+    return p;
+  }
+  function abreissen() {
+    if (los) return; los = true;
+    $('#abreissen').hidden = true;
+    pass.style.setProperty('--rx', '0deg'); pass.style.setProperty('--ry', '0deg');
+    var vert = hoch(), lochy = 0;
+    if (vert) { var h = $('.haupt', pass).getBoundingClientRect(), pr = pass.getBoundingClientRect(); lochy = (h.bottom - pr.top) / pr.height * 100; pass.style.setProperty('--lochy', lochy + '%'); welt.style.setProperty('--lochy', lochy + '%'); }
+    var pts = zacken(40, vert).map(function (q) { return vert ? [q[0], lochy + q[2]] : q; });
+    var a = vert ? [[0, 0], [100, 0]].concat(pts.slice().reverse()) : [[0, 0]].concat(pts).concat([[0, 100]]);
+    var b = vert ? pts.concat([[100, 100], [0, 100]]) : [[100, 0]].concat(pts).concat([[100, 100]]);
+    var poly = function (x) { return 'polygon(' + x.map(function (q) { return q[0].toFixed(2) + '% ' + q[1].toFixed(2) + '%'; }).join(',') + ')'; };
+    var z = document.createElement('div'); z.className = 'zipp'; welt.appendChild(z);
+    var halb = [];
+    [a, b].forEach(function (pg, i) {
+      var h = document.createElement('div'); h.className = 'haelfte'; h.setAttribute('aria-hidden', 'true');
+      var k = pass.cloneNode(true); k.removeAttribute('id'); k.removeAttribute('tabindex'); k.removeAttribute('role');
+      h.appendChild(k); h.style.clipPath = poly(pg); welt.appendChild(h); halb.push(h);
+    });
+    pass.style.visibility = 'hidden';
+    if (ruhig) { halb.forEach(function (h) { h.remove(); }); z.remove(); fertig(); return; }
+    /* 1 · die Perforation glüht von oben nach unten auf */
+    var t0 = performance.now();
+    (function zip(t) {
+      var f = Math.max(0, Math.min(1, (t - t0) / 650));
+      z.style.setProperty('--z', (f * 100) + '%');
+      if (f < 1) requestAnimationFrame(zip);
+      else {
+        /* 2 · die Hälften gehen auseinander, eine kippt nach */
+        halb[0].animate([{ transform: 'none' }, { transform: vert ? 'translateY(-14px) rotate(-2deg)' : 'translateX(-26px) rotate(-2.5deg)' }], { duration: 700, easing: 'cubic-bezier(.2,.9,.2,1)', fill: 'forwards' });
+        halb[1].animate([{ transform: 'none' }, { transform: vert ? 'translateY(16px) rotate(2.5deg)' : 'translate(30px,14px) rotate(4deg)', offset: .6 }, { transform: vert ? 'translateY(12px) rotate(1deg)' : 'translate(22px,0) rotate(1.8deg)' }], { duration: 950, easing: 'cubic-bezier(.3,1.4,.4,1)', fill: 'forwards' });
+        z.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 400, fill: 'forwards' });
+        setTimeout(function () {
+          fertig();
+          halb.forEach(function (h) { h.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 500, fill: 'forwards' }).onfinish = function () { h.remove(); }; });
+          z.remove();
+        }, 900);
+      }
+    })(t0);
+  }
+  function fertig() {
+    tks.classList.add('da'); laufen(tks, ruhig);
+    $('#hinweis').textContent = hoch() ? 'Abgerissen: oben das Objekt, unten die Finanzierung.' : 'Weiter scrollen: die Karte zerlegt sich in ihre Ebenen.';
+    $('#nochmal').hidden = false;
+  }
+  function nochmal() {
+    los = false; tks.classList.remove('da'); pass.style.visibility = '';
+    tks.querySelectorAll('.pg').forEach(function (c) { c.style.strokeDashoffset = 333; });
+    tks.querySelectorAll('[data-ziel]').forEach(function (e) { e.dataset.von = 0; e.textContent = '0'; });
+    tks.querySelectorAll('[data-w]').forEach(function (i) { i.style.setProperty('--w', '0%'); });
+    $('#nochmal').hidden = true; $('#abreissen').hidden = false;
+    setTimeout(abreissen, 700);
+  }
+  pass.addEventListener('click', abreissen);
+  pass.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); abreissen(); } });
+  $('#abreissen').addEventListener('click', abreissen);
+  $('#nochmal').addEventListener('click', nochmal);
+  if (ruhig) { laufen(pass, true); abreissen(); }
+  else { setTimeout(function () { laufen(pass, false); }, 250); if (!/[?&]halt/.test(location.search)) setTimeout(abreissen, 3000); }
+
+  /* ── Scroll: Explosionszeichnung (nur wenn abgerissen) ── */
+  var hero = $('#hero'), offen = false;
+  function scrollen() {
+    offen = false;
+    var r = hero.getBoundingClientRect(), weg = Math.max(1, r.height - innerHeight);
+    var p = Math.max(0, Math.min(1, -r.top / weg));
+    var e = (los && !ruhig && !hoch()) ? Math.min(1, p * 1.5) : 0;
+    hero.style.setProperty('--e', e.toFixed(3));
+  }
+  addEventListener('scroll', function () { if (!offen) { offen = true; requestAnimationFrame(scrollen); } }, { passive: true });
+  scrollen();
+
+  /* ── Befundbogen ─────────────────────────────────── */
+  function bogen(k, titel) {
+    var f = D.FAELLE[k], x = f.kpi;
+    function z(name, s, st) { return '<div class="zeile"><span>' + name + '</span><span style="color:' + D.farbe(s) + '">' + st + '</span><b style="grid-column:1/-1;color:' + D.farbe(s) + '">' + s + '</b><span class="spur"><i data-w="' + s + '" style="background:' + D.farbe(s) + '"></i></span></div>'; }
+    return '<div class="bb"><div class="k">' + titel + '</div><h3>' + (k === 'gut' ? 'Solide finanziert' : 'Knapp finanziert') + '</h3>'
+      + z('Investment', f.inv.score, f.inv.stufe) + z('Finanzierung', f.fin.score, f.fin.stufe) + z('Gesamt', f.gesamt, f.stufe)
+      + '<div class="urteil" style="background:' + (f.art === 'ja' ? '#3FA56C' : '#C9A84C') + ';color:#050505">' + f.empfehlung + '</div>'
+      + '<div class="daten">EK ' + x.ek + ' · Zins ' + x.zins + ' · Tilgung ' + x.tilgung + '<br>LTV ' + x.ltv + ' · DSCR ' + x.dscr + ' · Cashflow ' + x.cf + '</div></div>';
+  }
+  $('#befundbogen').innerHTML = bogen('gut', 'Fall A') + bogen('schwach', 'Fall B');
+  D.sichtbar('#befundbogen', function (el) { el.querySelectorAll('[data-w]').forEach(function (i) { i.style.width = i.dataset.w + '%'; }); });
+
+  /* ── Kapitel ─────────────────────────────────────── */
+  $('#kapitelliste').innerHTML = D.ETAPPEN.map(function (e) {
+    return '<article class="kap"><div class="bild"><img src="' + e.bild + '" alt="" loading="lazy" width="800" height="450"></div><div><div class="nr">' + e.nr + '</div><div class="mono" style="color:var(--leise)">' + e.phase + '</div><h3>' + e.titel + '</h3><p>' + e.text + '</p><div class="chips">' + e.chips.map(function (c) { return '<span>' + c + '</span>'; }).join('') + '</div><button class="btn" type="button" data-video="' + e.video + '">Video ansehen</button></div></article>';
+  }).join('');
+  D.sichtbar('.kap', function (el) { el.classList.add('da'); }, { threshold: .3 });
+
+  /* ── Filmprogramm ────────────────────────────────── */
+  $('#programmliste').innerHTML = D.VIDEOTHEK.concat(['modul-19-das-bank-pdf']).map(function (id) {
+    var v = D.VIDEOS[id];
+    return '<button type="button" class="prog" data-video="' + id + '"><span class="n">' + v.nr + '</span><img src="' + D.BILD + v.poster + '" alt="" loading="lazy" width="320" height="180"><span><b>' + v.titel + '</b><span class="u">' + (v.unter || '') + '</span></span><span class="d">' + D.dauer(v.dauer) + '</span></button>';
+  }).join('');
+  D.videoFenster();
+
+  $('#fussnoten').innerHTML = D.ZAHLEN.map(function (z, i) { return '<div><b><span data-zahl="' + z.wert + '">0</span><sup>' + (i + 1) + '</sup></b><span>' + z.text + '</span></div>'; }).join('');
+  D.sichtbar('#fussnoten', function (el) { el.querySelectorAll('[data-zahl]').forEach(function (b) { D.zaehl(b, +b.dataset.zahl, 1500); }); });
+  $('#preisliste').innerHTML = D.PREISE.map(function (p) {
+    return '<div class="pr' + (p.top ? ' top' : '') + '"><div class="kl">' + p.klasse + (p.top ? ' · Bestseller' : '') + '</div><h3>' + p.name + '</h3><div class="p">' + p.preis + ' €<small> / Monat</small></div><div class="j">' + p.jahr + '</div><ul>' + p.punkte.map(function (x) { return '<li>' + x + '</li>'; }).join('') + '</ul><a class="btn' + (p.top ? '' : ' voll') + '" href="https://app.dealpilot.immo/">' + p.knopf + '</a></div>';
+  }).join('');
+  $('#partnerliste').innerHTML = D.PARTNER.map(function (p) { return '<div><b>' + p[0] + '</b><span>' + p[1] + '</span></div>'; }).join('');
+})();
+</script>
+</body>
+</html>
