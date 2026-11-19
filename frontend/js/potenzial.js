@@ -751,8 +751,11 @@
       else {
         var fr = s.termine ? (s.termine.letzte_fehlt ? 'Trag das Datum der letzten Erhöhung ein. Sonst prüft DealPilot die Sperrfrist nicht'
           : (s.termine.verlangbar_sofort ? 'Sperrfrist abgelaufen' : 'Sperrfrist bis ' + mmjj(s.termine.verlangbar_ab))) : '';
+        /* v3860b · derselbe Satz wie in der Leiter der Wohnung (Marcel: „wird dort derselbe Text angezeigt?") */
+        var _kq = (ist > 0 && wfl > 0) ? ist / wfl : 0, _kv = zahl(s.vgl_qm);
         z.push({ k: 'Nächste Erhöhung', v: 'kein Spielraum',
-          u: (s.grund || '') + (fr ? ' · ' + fr : ''), warn: !!(s.termine && s.termine.letzte_fehlt) });
+          u: (s.grund || 'Die Miete liegt schon an der Vergleichsmiete.') + (_kq > 0 ? ' Heute ' + eur2(_kq) + '/m²' : '') + (_kv > 0 ? (_kq > 0 ? ', ' : ' ') + 'Vergleichsmiete bis ' + eur2(_kv) + '/m²' + (vglKurz(s) ? ' (' + vglKurz(s) + ')' : '') : '') + ((_kq > 0 || _kv > 0) ? '.' : '')
+            + ' Mehr geht über eine Modernisierung (§ 559 BGB) oder bei Neuvermietung.' + (fr ? ' · ' + fr : ''), warn: !!(s.termine && s.termine.letzte_fehlt) });
       }
     }
     /* 3 · Mietpreisbremse bei Neuvermietung */

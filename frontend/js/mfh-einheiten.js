@@ -1106,33 +1106,55 @@
         u559: (w.soll.umlage559 && w.soll.umlage559.monat > 0) ? Math.round(w.soll.umlage559.monat) : 0 };
     });
   }
+  /* v3860b · Marcel 19.11.2026: „oben drüber steht 2025 ... heute müsste in der Mitte stehen, und dann, was wir umsetzen
+     wollen. Übernehmen sollte er dort eintragen und ich sehe direkt die Summe." Drei Teile: GEZAHLT (vergangene Jahre,
+     eintragbar), HEUTE (Miete der Wohnung, nur Anzeige), GEPLANT (Soll-Miete der Wohnung mit „ab“, eintragbar, dasselbe
+     Feld wie im Wohnungsfenster). „Übernehmen“ füllt GEPLANT, die Summe steht sofort darunter. Der Block bleibt offen. */
+  var _jOffen = false, _jMeldung = '';
+  function jMonat(ab) { var mm = /^(\d{4})-(\d{2})/.exec(String(ab || '')); return mm ? mm[2] + '/' + mm[1] : String(ab || ''); }
   function jahreZeichnen() {
     var h = el('mfh-jahre'); if (!h || !_jArbeit) return;
-    var Y = jahreListe(), eu = function (x) { return Math.round(x).toLocaleString('de-DE') + ' €'; };
-    var alt = h.querySelector('details'), auf = alt ? alt.open : false;
-    if (!Y || !Y.length) { h.innerHTML = '<details class="mfh-jahre" id="mfh-jahre-det"><summary>Miete je Wohnung und Jahr</summary><p class="mfh-leise">Gibt es im Bestand, wenn das Objekt gewonnen ist und einen Ankauf-Stand hat. Vorher rechnet DealPilot mit der heutigen Miete.</p></details>'; return; }
-    var erh = jErhoehungen(), sum = {};
+    var Y = jahreListe(), cy = new Date().getFullYear(), eu = function (x) { return Math.round(x).toLocaleString('de-DE') + ' €'; };
+    var erh = jErhoehungen(), sum = {}, sumHeute = 0, sumPlan = 0, mitPlan = 0;
+    Y = Y || [];
     Y.forEach(function (y) { sum[y] = 0; });
-    var kopf = '<tr><th>Wohnung</th>' + Y.map(function (y) { return '<th>' + y + '<button type="button" class="mfh-jahre-vj" data-jw-vorjahr="' + y + '" title="Leere Felder mit dem Vorjahr füllen">wie Vorjahr</button></th>'; }).join('') + '<th>heute</th></tr>';
+    var kopf = '<tr><th class="mfh-jahre-gr" colspan="' + (1 + Y.length) + '">' + (Y.length ? 'gezahlt' : '') + '</th><th class="mfh-jahre-gr mfh-jahre-h">heute</th><th class="mfh-jahre-gr mfh-jahre-p">geplant</th></tr>'
+      + '<tr><th>Wohnung</th>' + Y.map(function (y) { return '<th>' + y + '<button type="button" class="mfh-jahre-vj" data-jw-vorjahr="' + y + '" title="Leere Felder mit dem Vorjahr füllen">wie Vorjahr</button></th>'; }).join('')
+      + '<th class="mfh-jahre-h">' + cy + '</th><th class="mfh-jahre-p">Miete und ab wann</th></tr>';
     var zeilen = _arbeit.map(function (e, i) {
-      var ist = zahl(e.ist) || 0;
+      var ist = zahl(e.ist) || 0, soll = zahl(e.soll) || 0, leer = e.status === 'leer';
+      sumHeute += (leer ? 0 : ist) * 12;
+      var plan = soll > 0 ? soll : (leer ? 0 : ist); sumPlan += plan * 12; if (soll > 0) mitPlan++;
       return '<tr><td><b>' + esc(e.nr || String(i + 1)) + '</b> <small>' + esc(e.lage || '') + '</small></td>' + Y.map(function (y) {
-        var v = jWert(y, i); sum[y] += (v != null ? v : (e.status === 'leer' ? 0 : ist)) * 12;
+        var v = jWert(y, i); sum[y] += (v != null ? v : (leer ? 0 : ist)) * 12;
         return '<td><input class="mfh-in" inputmode="decimal" data-jw-i="' + i + '" data-jw-y="' + y + '" value="' + (v != null ? esc(String(v).replace('.', ',')) : '') + '" placeholder="' + (ist ? Math.round(ist) : '') + '"></td>';
-      }).join('') + '<td class="mfh-jahre-heute">' + (ist ? eu(ist) : 'leer') + '</td></tr>';
+      }).join('')
+        + '<td class="mfh-jahre-h">' + (ist && !leer ? eu(ist) : 'leer') + '</td>'
+        + '<td class="mfh-jahre-p"><input class="mfh-in" inputmode="decimal" data-jw-soll="' + i + '" value="' + (soll > 0 ? Math.round(soll) : '') + '" placeholder="wie heute">'
+        + '<input class="mfh-in mfh-jahre-ab" type="month" data-jw-ab="' + i + '" value="' + esc(String(e.soll_ab || '')) + '" title="wirksam ab"></td></tr>';
     }).join('');
-    var heuteSumme = _arbeit.reduce(function (a, e) { return a + (zahl(e.ist) || 0); }, 0) * 12;
-    var fuss = '<tr class="mfh-jahre-sum"><td>Summe im Jahr</td>' + Y.map(function (y) { return '<td>' + eu(sum[y]) + '</td>'; }).join('') + '<td>' + eu(heuteSumme) + '</td></tr>';
-    h.innerHTML = '<details class="mfh-jahre" id="mfh-jahre-det"' + (auf ? ' open' : '') + '><summary>Miete je Wohnung und Jahr <span class="mfh-leise">vergangene Jahre, für den Jahresabgleich der Pilot-Analyse</span></summary>'
-      + '<p class="mfh-leise">Trag die Monatsmiete ein, die im Jahr gezahlt wurde. Leer heißt: die heutige Miete. Die Summe geht in die Mietentwicklung und in den Jahresabgleich.</p>'
+    var fuss = '<tr class="mfh-jahre-sum"><td>Summe im Jahr</td>' + Y.map(function (y) { return '<td>' + eu(sum[y]) + '</td>'; }).join('')
+      + '<td class="mfh-jahre-h">' + eu(sumHeute) + '</td><td class="mfh-jahre-p">' + eu(sumPlan) + (sumPlan > sumHeute ? ' <small class="mfh-jahre-plus">+' + eu(sumPlan - sumHeute) + '</small>' : '') + '</td></tr>';
+    h.innerHTML = '<details class="mfh-jahre" id="mfh-jahre-det"' + (_jOffen ? ' open' : '') + '><summary>Miete je Wohnung und Jahr <span class="mfh-leise">gezahlt, heute, geplant</span></summary>'
+      + '<p class="mfh-leise">' + (Y.length ? 'Gezahlt: die Monatsmiete, die im Jahr wirklich floss, leer heißt wie heute. ' : '') + 'Heute: die Miete aus dem Mietvertrag. Geplant: die Miete nach der nächsten Erhöhung, mit dem Monat, ab dem sie gilt. Die Summen gehen in die Mietentwicklung und in den Jahresabgleich der Pilot-Analyse.</p>'
+      + (_jMeldung ? '<div class="mfh-jahre-ok">' + esc(_jMeldung) + '</div>' : '')
       + '<div class="mfh-scroll"><table class="mfh-jahre-tab"><thead>' + kopf + '</thead><tbody>' + zeilen + fuss + '</tbody></table></div>'
       + (erh.length
-        ? '<div class="mfh-jahre-erh"><b>Mögliche Mieterhöhungen</b><ul>' + erh.map(function (x) { return '<li>Wohnung ' + esc(x.nr || String(x.i + 1)) + ': von ' + eu(x.ist) + ' auf ' + eu(x.miete) + (x.u559 ? ', darin ' + eu(x.u559) + ' Modernisierungsumlage (§ 559 BGB)' : '') + (x.ab ? ', wirksam ab ' + esc(x.abText) : '') + '</li>'; }).join('') + '</ul>'
-          + '<button type="button" class="dp-ml-k" data-jw-erh="1">alle ' + erh.length + ' als geplante Erhöhung übernehmen ›</button><span class="mfh-leise"> Sie stehen dann bei der Wohnung als Soll-Miete und rechnen in der Mietentwicklung ab dem Datum.</span></div>'
-        : '<p class="mfh-leise">Keine weitere Erhöhung möglich. Jede Wohnung liegt an der Vergleichsmiete oder an der Kappungsgrenze, oder die Erhöhung ist schon eingetragen.</p>')
+        ? '<div class="mfh-jahre-erh"><b>Noch möglich</b><ul>' + erh.map(function (x) { return '<li>Wohnung ' + esc(x.nr || String(x.i + 1)) + ': von ' + eu(x.ist) + ' auf ' + eu(x.miete) + (x.u559 ? ', darin ' + eu(x.u559) + ' Modernisierungsumlage (§ 559 BGB)' : '') + (x.ab ? ', ab ' + esc(x.abText) : '') + '</li>'; }).join('') + '</ul>'
+          + '<button type="button" class="dp-ml-k" data-jw-erh="1">' + (erh.length > 1 ? 'alle ' + erh.length + ' in die Spalte geplant übernehmen ›' : 'in die Spalte geplant übernehmen ›') + '</button></div>'
+        : (mitPlan ? '' : '<p class="mfh-leise">Keine Erhöhung möglich. Jede Wohnung liegt an der Vergleichsmiete oder an der Kappungsgrenze.</p>'))
       + '</details>';
+    _jMeldung = '';
+    var det = el('mfh-jahre-det'); if (det) det.addEventListener('toggle', function () { _jOffen = det.open; });
     h.onchange = function (ev) {
-      var t = ev.target; if (!t || !t.getAttribute || t.getAttribute('data-jw-y') == null) return;
+      var t = ev.target; if (!t || !t.getAttribute) return;
+      if (t.getAttribute('data-jw-soll') != null || t.getAttribute('data-jw-ab') != null) {
+        var ei = _arbeit[+(t.getAttribute('data-jw-soll') != null ? t.getAttribute('data-jw-soll') : t.getAttribute('data-jw-ab'))]; if (!ei) return;
+        if (t.getAttribute('data-jw-soll') != null) { var sv = jZahl(t.value); ei.soll = sv != null && sv > 0 ? String(Math.round(sv)) : ''; }
+        else ei.soll_ab = String(t.value || '');
+        zeichnenSumme(); zvZeichnen(); jahreZeichnen(); return;
+      }
+      if (t.getAttribute('data-jw-y') == null) return;
       var y = +t.getAttribute('data-jw-y'), i = +t.getAttribute('data-jw-i');
       if (window.DpJahresbuch && window.DpJahresbuch.aenderungErlaubt && !window.DpJahresbuch.aenderungErlaubt(y)) { jahreZeichnen(); return; }
       var v = jZahl(t.value); jSetzen(y, i, v != null && v >= 0 ? Math.round(v * 100) / 100 : null); jahreZeichnen();
@@ -1145,10 +1167,14 @@
         _arbeit.forEach(function (e, i) { if (jWert(y, i) != null) return; var v = jWert(y - 1, i); if (v != null) jSetzen(y, i, v); });
         jahreZeichnen(); return;
       }
-      jErhoehungen().forEach(function (x) { var e = _arbeit[x.i]; if (!e) return; e.soll = String(x.miete); if (x.ab && !String(e.soll_ab || '').trim()) e.soll_ab = x.ab; });
-      zeichnen();
+      var L = jErhoehungen();
+      L.forEach(function (x) { var e = _arbeit[x.i]; if (!e) return; e.soll = String(x.miete); if (x.ab && !String(e.soll_ab || '').trim()) e.soll_ab = x.ab; });
+      _jOffen = true;
+      _jMeldung = L.length + (L.length === 1 ? ' Erhöhung' : ' Erhöhungen') + ' in die Spalte geplant eingetragen. Mit Übernehmen unten wird gespeichert.';
+      zeichnenSumme(); zvZeichnen(); jahreZeichnen();
     };
   }
+
   function jahreSchreiben() {
     if (!_jGeaendert || !window._currentObjData) return false;
     window._currentObjData._jahre = _jArbeit; _jGeaendert = false;
@@ -1158,6 +1184,7 @@
     return true;
   }
   function jahreOeffnen() {
+    _jOffen = true;
     oeffnen(1);
     setTimeout(function () { var d = el('mfh-jahre-det'); if (d) { d.open = true; try { d.scrollIntoView({ block: 'start', behavior: 'smooth' }); } catch (x) {} } }, 80);
   }
@@ -1562,6 +1589,12 @@
       '#mfh-modal .mfh-jahre-tab input{width:84px;min-height:32px}',
       '#mfh-modal .mfh-jahre-vj{display:block;margin-top:3px;border:0;background:none;padding:0;font:400 10.5px Inter,sans-serif;color:#2f7d55;text-decoration:underline;cursor:pointer}',
       '#mfh-modal .mfh-jahre-sum td{font-weight:600}',
+      '#mfh-modal .mfh-jahre-gr{font:600 10px "JetBrains Mono",monospace;letter-spacing:.08em;text-transform:uppercase;color:#7A7370;border-bottom:1px solid #EFE7D6}',
+      '#mfh-modal .mfh-jahre-h{background:#FBF6E9}',
+      '#mfh-modal .mfh-jahre-p{background:#EEF6F1}',
+      '#mfh-modal .mfh-jahre-p input{width:76px;margin-right:4px}#mfh-modal .mfh-jahre-p input.mfh-jahre-ab{width:128px}',
+      '#mfh-modal .mfh-jahre-plus{color:#2f7d55;font-weight:600}',
+      '#mfh-modal .mfh-jahre-ok{margin:6px 0;padding:7px 10px;border-left:3px solid #3FA56C;background:#EEF6F1;border-radius:0 6px 6px 0;font-size:12.5px}',
       '#mfh-modal .mfh-jahre-erh{margin-top:10px;font-size:12.5px}#mfh-modal .mfh-jahre-erh ul{margin:4px 0 8px;padding-left:18px}',
       '#mfh-modal .mfh-tab{width:100%;table-layout:fixed;border-collapse:separate;',
       '  border-spacing:0;font-size:12px}',
