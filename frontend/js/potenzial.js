@@ -1135,7 +1135,8 @@
   var _msVz = {};
   function msMerkmalQuery() {
     var q = [['standardstufe', wert('standardstufe')], ['mikrolage', wert('mikrolage')], ['mod_punkte', wert('mod_punkte')],
-      ['zustand', wert('ds2_zustand')], ['zieljahr', wert('zb_fertig_jahr')], ['mietstg', wert('mietstg')]]
+      ['zustand', wert('ds2_zustand')], ['zieljahr', wert('zb_fertig_jahr')], ['mietstg', wert('mietstg')],
+      ['lage', wert('ms_lage')], ['ausstattung', wert('ms_ausst')], ['merkmale', wert('ms_merk')]]   /* v3880 · Merkmale laut Mietspiegel */
       .filter(function (x) { return x[1] != null && String(x[1]).trim() !== ''; })
       .map(function (x) { return '&' + x[0] + '=' + encodeURIComponent(String(x[1]).trim().replace(',', '.')); });
     return q.join('') + (window.DpMieteRegel ? DpMieteRegel.query() : '');   /* v3845 */
@@ -3346,7 +3347,63 @@
       if (f && 'title' in f) f.title = v && zr.nutzung ? zr.werte_hinweis : '';   /* v3266 · Fokus-Hinweis bei Speicherverbot/Vorbehalt */
     });
   }
+  /* ═══ v3880 · MERKMALE LAUT MIETSPIEGEL (Wohnlage, Ausstattung, Zu- und Abschläge) ═══════════════════════
+     Marcel 19.11.2026: „Eine 80-m²-Wohnung hat einen anderen Mietspiegel wie eine 100-m²-Wohnung, und der Zustand
+     fließt auch ein. Ich hoffe, dass wir das alles berücksichtigen." Gemessen: die Rechnung im mb-Backend kann Lage,
+     Ausstattung und Zu-/Abschläge (lib/mietspiegel/werte.js), die App schickte sie nie. In Bielefeld galt so immer
+     „normale Wohnlage“. Die Auswahl kommt jetzt mit dem Mietspiegel (satz.auswahl) und wird hier angeboten. Felder:
+     ms_lage, ms_ausst (Schlüssel), ms_merk (Liste, Komma). Sie gehen in msMerkmalQuery und damit in jede Abfrage. */
+  var _msAusw = {};
+  function msSetz(id, v) { var e = el(id); if (!e) return; e.value = v; try { e.dispatchEvent(new Event('change', { bubbles: true })); } catch (x) {} }
+  function msAuswahl() {
+    var g = agsJetzt(), s = msRegister(); if (!g) return null;
+    if (s && s.auswahl) return s.auswahl;
+    if (g in _msAusw) { var c = _msAusw[g]; return c && typeof c.then !== 'function' ? c : null; }
+    if (!s || !s.werte_verfuegbar || !window.Auth || typeof Auth.apiCall !== 'function') return null;
+    _msAusw[g] = Auth.apiCall('/marktbericht/mietspiegel?ags=' + encodeURIComponent(g), { method: 'GET' }).then(function (a) {
+      _msAusw[g] = a && a.auswahl ? a.auswahl : null; if (agsJetzt() === g) msAuswahlZeichnen();
+    }).catch(function () { _msAusw[g] = null; });
+    return null;
+  }
+  function msAuswahlZeichnen() {
+    var an = el('ms-hinweis'); if (!an || !an.parentNode) return;
+    var box = el('ms-auswahl');
+    var A = msAuswahl();
+    var lagen = A ? (A.lage || []).concat(A.lage_gebiet || []) : [], aus = A ? (A.ausstattung || []) : [], mm = A ? (A.merkmale || []) : [];
+    if (!A || (!lagen.length && !aus.length && !mm.length)) { if (box) box.innerHTML = ''; return; }
+    if (!box) { box = document.createElement('div'); box.id = 'ms-auswahl'; box.style.cssText = 'margin:0 0 12px;padding:10px 12px;border:1px solid #EFE7D6;border-radius:10px;background:#fff'; an.parentNode.insertBefore(box, an); }
+    var lw = String(wert('ms_lage') || ''), aw = String(wert('ms_ausst') || ''), mw = String(wert('ms_merk') || '').split(',').filter(Boolean);
+    var sel = function (id, L, v, leer) {
+      return '<select id="' + id + '-w" data-ms-feld="' + id + '"><option value="">' + esc(leer) + '</option>' + L.map(function (o) { return '<option value="' + esc(o.schluessel) + '"' + (o.schluessel === v ? ' selected' : '') + '>' + esc(o.label) + '</option>'; }).join('') + '</select>';
+    };
+    var stdL = lagen.filter(function (o) { return o.standard; })[0], stdA = aus.filter(function (o) { return o.standard; })[0];
+    box.innerHTML = '<div style="font:600 12.5px Inter,sans-serif;color:#2A2727;margin-bottom:2px">Merkmale laut Mietspiegel</div>'
+      + '<div style="font-size:11.5px;color:#7A7370;margin-bottom:8px;line-height:1.45">Der Mietspiegel dieser Gemeinde unterscheidet diese Merkmale. Sie verschieben die Spanne für jede Wohnung. Die Wohnlage steht im Mietspiegel oder in seiner Wohnlagenkarte.</div>'
+      + '<div class="g3" style="margin:0">'
+      + (lagen.length ? '<div class="f"><label>Wohnlage</label><div class="iw">' + sel('ms_lage', lagen, lw, stdL ? 'nicht angegeben, ' + stdL.label : 'nicht angegeben') + '</div></div>' : '')
+      + (aus.length ? '<div class="f"><label>Ausstattung</label><div class="iw">' + sel('ms_ausst', aus, aw, stdA ? 'nicht angegeben, ' + stdA.label : 'nicht angegeben') + '</div></div>' : '')
+      + '</div>'
+      + (mm.length ? '<div style="display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:8px;font-size:12px">' + mm.map(function (m) {
+          var z = (m.wert > 0 ? '+' : '') + String(m.wert).replace('.', ',') + (m.art === 'pct' ? ' %' : ' €/m²');
+          return '<label style="display:inline-flex;gap:6px;align-items:center;cursor:pointer"><input type="checkbox" data-ms-merk="' + esc(m.merkmal) + '"' + (mw.indexOf(m.merkmal) >= 0 ? ' checked' : '') + '>' + esc(m.label) + ' <span style="color:#7A7370">' + esc(z) + '</span></label>';
+        }).join('') + '</div>' : '')
+      + ((lagen.length && !lw) ? '<div style="font-size:11.5px;color:#8a6d1f;margin-top:8px">Ohne Angabe rechnet DealPilot mit ' + esc(stdL ? stdL.label : 'der Lage ohne Zu- oder Abschlag') + '.</div>' : '');
+    if (!box._bind) {
+      box._bind = true;
+      box.addEventListener('change', function (ev) {
+        var t = ev.target; if (!t) return;
+        if (t.getAttribute('data-ms-feld')) msSetz(t.getAttribute('data-ms-feld'), t.value);
+        else if (t.hasAttribute('data-ms-merk')) {
+          var L = [].slice.call(box.querySelectorAll('[data-ms-merk]')).filter(function (x) { return x.checked; }).map(function (x) { return x.getAttribute('data-ms-merk'); });
+          msSetz('ms_merk', L.join(','));
+        } else return;
+        try { msWerteNachladen(); } catch (e) {}
+        try { if (typeof window.calc === 'function') window.calc(); } catch (e) {}
+      });
+    }
+  }
   function msHinweis() {
+    try { msAuswahlZeichnen(); } catch (e) {}   /* v3880 */
     var h = el('ms-hinweis'); if (!h) return;
     var vg = objektVgl(), rz = '';
     try { rz = msRegisterHtml(); } catch (e) {}

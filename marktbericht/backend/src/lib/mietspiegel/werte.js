@@ -382,6 +382,19 @@ export function mietspiegelMitWerten(satz, q, ordner) {
      von Staging (backend/src/routes/marktbericht.js). */
   if (w && w.freigabe === 'gesperrt' && q && String(q.nur_frei) === '1') { w = null; satz.werte_gesperrt = true; }
   satz.werte_verfuegbar = !!w;
+  /* v3880 · Marcel 19.11.2026: „Eine 80-m²-Wohnung hat einen anderen Mietspiegel wie eine 100-m²-Wohnung, und der
+     Zustand fließt auch ein." Gemessen: die Rechnung kann Lage, Ausstattung und Zu-/Abschläge, die App schickte sie nie
+     (in Bielefeld galt immer „normale Wohnlage“). Die Auswahl des Mietspiegels geht jetzt mit, damit die App sie anbietet. */
+  if (w && w.tabelle) {
+    const A = w.tabelle.achsen || {}, Z = Array.isArray(w.tabelle.zuschlaege) ? w.tabelle.zuschlaege : [];
+    const opt = (L) => (Array.isArray(L) ? L : []).map(e => ({ schluessel: e.schluessel, label: e.label || e.schluessel, standard: !!e.standard }));
+    const lageZ = Z.filter(z => /^lage:/.test(z.merkmal || '')).map(z => ({ schluessel: z.merkmal.slice(5), label: z.label || z.merkmal.slice(5), standard: false }));
+    const gesehen = {};
+    const merk = Z.filter(z => z.merkmal && !/^lage:/.test(z.merkmal) && !Array.isArray(z.wfl_klassen) && !/^(baujahr|wohnflaeche|wohnungsgroesse)$/.test(z.merkmal))
+      .filter(z => (gesehen[z.merkmal] ? false : (gesehen[z.merkmal] = true)))
+      .map(z => ({ merkmal: z.merkmal, label: z.label || z.merkmal, art: z.art === 'pct' ? 'pct' : 'eur', wert: num(z.wert) }));
+    satz.auswahl = { lage: opt(A.lage), lage_gebiet: lageZ, ausstattung: opt(A.ausstattung), merkmale: merk };
+  }
   q = q || {};
   if (w && (q.baujahr || q.wfl)) {
     const merkmale = {};

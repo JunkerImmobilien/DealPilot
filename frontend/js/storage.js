@@ -170,7 +170,7 @@ var FIELDS = [
   'zb_markt_qm', 'san_ausgefuehrt',   /* v2988 · marktuebliche Miete nach Modernisierung; Sanierung ausgefuehrt am */
   'zb_aktiv',   /* v3710 · Haken „Zielbild festlegen" (Karte jetzt im Reiter Miete); beim Laden setzt potenzial.js ihn auch, wenn schon etwas erfasst ist */
   'zb_ziel_bremse', 'zb_bremse_ausnahme',   /* v3312 - Zielmiete auf die Mietpreisbremse begrenzt (Merker ein|auf) und Ausnahme 556e/556f - Felder legt potenzial.js an */
-  'ms_art', 'ms_unten', 'ms_mittel', 'ms_oben', 'ms_stand', 'ms_url', 'ms_wahl',   /* v3246 · Mietspiegel am Objekt (potenzial.js objektVgl) */
+  'ms_art', 'ms_unten', 'ms_mittel', 'ms_oben', 'ms_stand', 'ms_url', 'ms_wahl', 'ms_lage', 'ms_ausst', 'ms_merk' /* v3880 */,   /* v3246 · Mietspiegel am Objekt (potenzial.js objektVgl) */
   /* v2087 · Mietvertrag auf OBJEKTEBENE (Backlog N60.8-alt).
      Dieselben Namen wie in `_mfh.einheiten[]` - derselbe Begriff soll
      nicht zweimal anders heissen. Ohne diesen Eintrag waeren die drei
@@ -687,7 +687,7 @@ function loadData(d) {
     'zb_soll_qm', 'zb_soll_ab', 'zb_vgl_qm', 'zb_ziel_qm', 'zb_ziel_wann', 'zb_massnahmen', 'zb_fertig_jahr',
     'zb_markt_qm', 'san_ausgefuehrt',   /* v2988: sonst erbt Objekt B das Ausfuehrungsdatum von A */
     'zb_ziel_bremse', 'zb_bremse_ausnahme',   /* v3312: sonst erbt Objekt B Begrenzung und Ausnahme von A */
-    'ms_art', 'ms_unten', 'ms_mittel', 'ms_oben', 'ms_stand', 'ms_url', 'ms_wahl',   /* v3246: sonst erbt Objekt B den Mietspiegel von A */
+    'ms_art', 'ms_unten', 'ms_mittel', 'ms_oben', 'ms_stand', 'ms_url', 'ms_wahl', 'ms_lage', 'ms_ausst', 'ms_merk' /* v3880 */,   /* v3246: sonst erbt Objekt B den Mietspiegel von A */
     /* v2660: der Mietvertrag am Objekt - fehlte er im geladenen Objekt, erbte B Vertragsart,
        Daten, Befristung und Kuendigungsverzicht von A und schrieb sie beim Speichern mit */
     'mv_art', 'mv_beginn', 'mv_letzte_erhoehung', 'mv_letzte_erhoehung_betrag',

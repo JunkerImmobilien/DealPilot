@@ -2171,6 +2171,7 @@ label.dp-required.qc-required::after {
           <div class="f"><label title="Standard: oberer Spannenwert. Mittel- oder Unterwert wählen, wenn Ausstattung und Merkmale den oberen Wert nicht tragen.">Gerechnet mit</label><div class="iw"><select id="ms_wahl"><option value="">oberem Spannenwert (Standard)</option><option value="mittel">Mittelwert</option><option value="unten">unterem Spannenwert</option></select></div></div>
           <div class="f s2"><label>Link zum Mietspiegel (optional)</label><div class="iw"><input id="ms_url" type="url" placeholder="https://…"></div></div>
         </div>
+        <input type="hidden" id="ms_lage" value=""><input type="hidden" id="ms_ausst" value=""><input type="hidden" id="ms_merk" value=""><!-- v3880 · Merkmale laut Mietspiegel (potenzial.js msAuswahlZeichnen) -->
         <div class="cf-hint" id="ms-hinweis" style="margin:0 0 12px"></div>
         <div id="zb-einzel">
           <!-- v3067 · oben steht die Mietleiter (potenzial.js objektLeiter); der Satz darunter bleibt als Erklärung -->
@@ -4071,7 +4072,7 @@ label.dp-required.qc-required::after {
 <script src="js/marktdaten-modal.js?v=v2247c"></script>
 <script src="js/ui.js?v=v3444"></script>
 <script src="js/sidebar-collapse.js?v=20260611174630"></script>
-<script src="js/storage.js?v=v3860"></script>
+<script src="js/storage.js?v=v3880"></script>
 <script src="js/nachrechnen.js?v=v3031"></script><!-- v3031: Kennzahlen/Scores gespeicherter Objekte neu rechnen (nur auf Aufruf) -->
 <!-- v845-newsearch-removed: sb-search.js entfernt (Kollision mit sidebar-search.js) -->
 <script src="js/inventar-sync.js?v=v3006c"></script><!-- V291-inv-sync-applied -->
@@ -4137,7 +4138,7 @@ label.dp-required.qc-required::after {
 <script src="js/indexmiete.js?v=v3026"></script><!-- v3026 · Indexmiete § 557b BGB -->
 <script src="js/mietpotenzial-kern.js?v=v3840b"></script><!-- v3075 · Kappung, Bremse, Termine, Soll-Miete: der reine Kern, vor potenzial.js -->
 <script src="js/miete-regel.js?v=v3845"></script><!-- v3845 · Neuvermietung ohne Mietpreisbremse 110/115/120 % (Einstellung, Vorgabe 120 %) -->
-<script src="js/potenzial.js?v=v3870"></script><script src="js/miete-demo.js?v=v3870b"></script><!-- v3870 · Demo Reiter Miete neu, nur Staging -->
+<script src="js/potenzial.js?v=v3880"></script><script src="js/miete-demo.js?v=v3870b"></script><!-- v3870 · Demo Reiter Miete neu, nur Staging -->
 <script src="js/mietvertrag-objekt.js?v=v3840b"></script>
 <script src="js/mieterhoehungen.js?v=v3860"></script><!-- v3362 · Mieterhöhungen als Liste (_erhoehungen, je Wohnung e.erhoehungen) -->
 <script src="js/hell-varianten.js?v=v1653e"></script>
