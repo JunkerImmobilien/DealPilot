@@ -31,7 +31,8 @@
       '.dp-md-schalter button{border:0;background:transparent;padding:7px 14px;font:500 12.5px Inter,sans-serif;color:#6B6356;cursor:pointer;min-height:34px}',
       '.dp-md-schalter button.an{background:linear-gradient(110deg,var(--wl-e8cc7a,#E8CC7A),var(--wl-c9a84c,#C9A84C) 55%,var(--wl-b8932f,#b8932f));color:#1a1712;font-weight:600}',
       '.dp-md-schalter span{align-self:center;padding:0 12px;font:500 10px "JetBrains Mono",monospace;letter-spacing:.08em;color:#8A8272;text-transform:uppercase}',
-      '#dp-md .dp-md-k{background:#fff;border:1px solid #E6E0D3;border-radius:14px;padding:14px 16px;margin:0 0 14px}',
+      '#dp-md{min-width:0;max-width:100%;box-sizing:border-box}#dp-md *{box-sizing:border-box}',
+      '#dp-md .dp-md-k{min-width:0;overflow:hidden;background:#fff;border:1px solid #E6E0D3;border-radius:14px;padding:14px 16px;margin:0 0 14px}',
       '#dp-md h3{margin:0 0 4px;font:600 15px "Space Grotesk",sans-serif;color:#2A2727;display:flex;gap:8px;align-items:center;flex-wrap:wrap}',
       '#dp-md .lbl{font:500 10.5px "JetBrains Mono",monospace;letter-spacing:.08em;text-transform:uppercase;color:#7A7370}',
       '#dp-md .satz{color:#6B6356;font-size:12.5px;margin:2px 0 10px;line-height:1.45}',
@@ -41,9 +42,9 @@
       '#dp-md .leg{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:11.5px;color:#7A7370}#dp-md .leg i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}',
       '#dp-md .haus{display:grid;gap:6px;margin-top:8px}#dp-md .dach{height:26px;background:linear-gradient(110deg,var(--wl-e8cc7a,#E8CC7A),var(--wl-c9a84c,#C9A84C) 55%,var(--wl-b8932f,#b8932f));clip-path:polygon(6% 100%,50% 0,94% 100%);opacity:.9}',
       '#dp-md .etage{display:grid;gap:6px}',
-      '#dp-md .whg{border-radius:10px;padding:8px 9px;border:1.5px solid #E6E0D3;background:#fff;cursor:pointer;text-align:left;font:inherit;color:#2A2727;min-height:78px;position:relative}',
+      '#dp-md .whg{display:block!important;width:100%;min-width:0;white-space:normal;height:auto;border-radius:10px;padding:8px 9px;border:1.5px solid #E6E0D3;background:#fff;cursor:pointer;text-align:left;font:inherit;color:#2A2727;min-height:78px;position:relative}',
       '#dp-md .whg.sel{outline:2px solid var(--wl-c9a84c,#C9A84C);outline-offset:1px}',
-      '#dp-md .whg .n{font:600 12px "Space Grotesk",sans-serif}#dp-md .whg .m{font:600 14.5px "Space Grotesk",sans-serif;margin-top:2px}#dp-md .whg .q{color:#7A7370;font-size:11px}',
+      '#dp-md .whg .n,#dp-md .whg .m,#dp-md .whg .q{display:block}#dp-md .whg .n{font:600 12px "Space Grotesk",sans-serif}#dp-md .whg .m{font:600 14.5px "Space Grotesk",sans-serif;margin-top:2px}#dp-md .whg .q{color:#7A7370;font-size:11px}',
       '#dp-md .whg .st{display:inline-block;font:600 9px "JetBrains Mono",monospace;letter-spacing:.04em;padding:2px 6px;border-radius:999px;margin-bottom:3px}',
       '#dp-md .s-pot{border-color:#9ED0B3}#dp-md .s-pot .st{background:#EAF5EE;color:#2f7d55}',
       '#dp-md .s-aus{border-color:#E3D3A4}#dp-md .s-aus .st{background:#F7F0DC;color:#8a6d1f}',
@@ -126,7 +127,7 @@
     var w = D.W[_sel];
     return '<div class="dp-md-k"><h3>Das Haus</h3><div class="satz">Jede Kachel ist eine Wohnung. Die Farbe zeigt den Spielraum der Miete. Klick wählt die Wohnung.</div>'
       + '<div class="haus"><div class="dach"></div>' + rows.map(function (r) {
-        return '<div class="etage" style="grid-template-columns:repeat(' + sp + ',1fr)">' + r.map(function (x) {
+        return '<div class="etage" style="grid-template-columns:repeat(' + sp + ',minmax(0,1fr))">' + r.map(function (x) {
           var j = D.W.indexOf(x);
           return '<button type="button" class="whg s-' + x.st + (j === _sel ? ' sel' : '') + '" data-md-sel="' + j + '"><span class="st">' + WORT[x.st] + '</span><div class="n">Wohnung ' + esc(x.nr) + '</div><div class="m">' + (x.ist ? eur(x.ist) : 'leer') + '</div><div class="q">' + (x.istQ ? qm(x.istQ) + ', ' : '') + Math.round(x.wfl) + ' m²</div></button>';
         }).join('') + '</div>';
