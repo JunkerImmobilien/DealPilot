@@ -82,6 +82,15 @@ function getStatus() {
  * Sendet eine Mail. Bei fehlender Konfig läuft DRY-RUN (Konsolen-Log).
  * Wirft bei SMTP-Fehlern, Caller muss try/catch.
  */
+/* v3790 · reservierte Namen (RFC 2606/6761): .test .invalid .example .localhost, example.com/.net/.org */
+function istTestadresse(email) {
+  const m = /<([^>]+)>/.exec(String(email || ''));
+  const a = String(m ? m[1] : email || '').trim().toLowerCase();
+  const dom = a.split('@')[1] || '';
+  if (!dom) return false;
+  return /\.(test|invalid|example|localhost)$/.test(dom) || /(^|\.)example\.(com|net|org)$/.test(dom);
+}
+
 async function sendMail(opts) {
   const t = _getTransporter();
   let from = process.env.BETA_MAIL_FROM || (opts.from || 'noreply@example.com');
@@ -93,7 +102,20 @@ async function sendMail(opts) {
     const addr = m ? m[1] : String(from).replace(/"/g, '').trim();
     from = '"' + String(opts.fromName).replace(/["<>\r\n]/g, '').slice(0, 80) + '" <' + addr + '>';
   }
-  const to   = opts.to || process.env.BETA_MAIL_TO || 'info@dealpilot.immo';
+  let to   = opts.to || process.env.BETA_MAIL_TO || 'info@dealpilot.immo';
+
+  /* v3790 · Testadressen gehen NIE ueber SMTP, an EINER Stelle fuer alle Mails.
+     Bis v3789 pruefte das nur objektUebergabe/partnerAnmerkungen/gutachtenAuftrag;
+     andere Wege (z. B. Partner-Benachrichtigungen an die Demo-Kunden
+     @nordlicht-demo.dealpilot.test) liefen raus, und der Mailserver des Absenders
+     bekam je Mail einen 550-Abpraller (Marcel 19.11.2026: rund 12 Stueck). */
+  const _liste = (Array.isArray(to) ? to : String(to).split(',')).map((x) => String(x).trim()).filter(Boolean);
+  const _echt = _liste.filter((x) => !istTestadresse(x));
+  if (_echt.length < _liste.length) {
+    console.log('[mailer] Testadresse nicht gesendet:', _liste.filter((x) => istTestadresse(x)).join(', '), '·', opts.subject || '');
+    if (!_echt.length) return { dryRun: true, testadresse: true, to: _liste.join(', ') };
+    to = _echt.join(', ');
+  }
 
   if (!t) {
     if (process.env.NODE_ENV === 'production' && process.env.MAIL_DRY_RUN_ALLOW !== 'true') {
@@ -207,5 +229,6 @@ async function sendConfirmation(recipientEmail, ctx) {
 module.exports = {
   sendMail,
   sendConfirmation,
-  getStatus
+  getStatus,
+  istTestadresse
 };

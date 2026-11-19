@@ -509,7 +509,7 @@ function _gaRechnenRoh(halterId, jahr, daten) {
       var _vj = (daten && daten.vortrag && daten.vortrag.jahre) || [];
       var _reihe = _vj.map(function (x) { return { jahr: x.jahr, erg: x.vorSteuern || 0, grundsteuer: x.grundsteuer || 0, entgelte: x.entgelte || 0 }; });
       _reihe.push({ jahr: jahr, erg: ergebnisVorSteuern, grundsteuer: grundsteuerSumme, entgelte: entgelteSchulden });
-      var _sr = _K.steuerReihe(_reihe, _P);
+      var _sr = _K.steuerReihe(_reihe, _gaMitBescheid(_P));   /* v3790 */
       steuerDetail = _sr[_sr.length - 1];
       steuern = steuerDetail.steuer;
       /* Vortrag der Vorjahre mit DERSELBEN Steuer (sonst stuende dort die ohne Verlustvortrag) */
@@ -729,7 +729,7 @@ async function _gaGesSteuerReihe(halterId, bisJahr, opt) {
   var vj = (d && d.vortrag && d.vortrag.jahre) || [];
   var reihe = vj.map(function (x) { return { jahr: x.jahr, erg: x.vorSteuern || 0, grundsteuer: x.grundsteuer || 0, entgelte: x.entgelte || 0 }; });
   reihe.push({ jahr: bisJahr, erg: r.guv.ergebnisVorSteuern || 0, grundsteuer: r._grundsteuer || 0, entgelte: r._entgelte || 0 });
-  var sr = K.steuerReihe(reihe, P);
+  var sr = K.steuerReihe(reihe, _gaMitBescheid(P));   /* v3790 */
   var out = sr.map(function (x, i) { return { jahr: x.jahr, erg: reihe[i].erg, steuer: x.steuer, kst: x.kst, gewst: x.gewst, vortragNach: x.vortragNach,
     objekte: (d.objekte || []).length }; });
   /* v3702a · Ueberleitung fuer das letzte Jahr: Summe der Objektbeitraege - Kosten der Gesellschaft - Zinsen Gesellschafterdarlehen
@@ -738,6 +738,14 @@ async function _gaGesSteuerReihe(halterId, bisJahr, opt) {
   if (_l) { _l.kosten = Number(r.kosten && typeof r.kosten === "object" ? r.kosten.summe : r.kosten) || 0; _l.gdZins = Number(r.gdZins) || 0; _l.summeObjekte = _l.erg + _l.kosten + _l.gdZins; }
   _gaGesStCache[key] = { t: Date.now(), r: out };
   return out;
+}
+/* v3790 · Verlustvortrag laut Bescheid (Einstellungen › Mandanten) nur hier, wo die ganze
+   Gesellschaft gerechnet wird. Die Objektrechnung (calc.js, tax.js) bekommt ihn nicht. */
+function _gaMitBescheid(P) {
+  if (!P || !P.vortragBescheid) return P;
+  var o = {}; for (var k in P) o[k] = P[k];
+  o.vortragKSt = P.vortragBescheid.kst; o.vortragGewSt = P.vortragBescheid.gewst; o.vortragJahr = P.vortragBescheid.jahr;
+  return o;
 }
 window.DpGesSteuer = { reihe: _gaGesSteuerReihe, leeren: function () { _gaGesStCache = {}; } };
 

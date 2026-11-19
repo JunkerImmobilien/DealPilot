@@ -390,8 +390,15 @@
     var kstSoliFest = (_n(p.kstSoliPct) != null ? p.kstSoliPct : 15.825) / 100;
     var heb = _n(p.hebesatz) || 0;
     var vK = _n(p.vortragKSt) || 0, vG = _n(p.vortragGewSt) || 0;
+    /* v3790 · Verlustvortrag laut Bescheid (p.vortragJahr = Stand 31.12.): Jahre bis dahin
+       rechnen wie bisher (ohne Startvortrag), im ersten Jahr DANACH ersetzt der festgestellte
+       Vortrag den selbst gerechneten — der Bescheid enthaelt die Verluste bis dahin schon.
+       Ohne Jahr gilt er ab der ersten Zeile. */
+    var vJahr = _n(p.vortragJahr), vEingesetzt = !(vJahr != null);
+    if (!vEingesetzt) { vK = 0; vG = 0; }
     return (reihe || []).map(function (r) {
       var jahr = Number(r.jahr) || 0, erg = Number(r.erg) || 0;
+      if (!vEingesetzt && jahr > vJahr) { vK = _n(p.vortragKSt) || 0; vG = _n(p.vortragGewSt) || 0; vEingesetzt = true; }
       /* KSt */
       var gK = 0, bemK = 0;
       if (erg < 0) vK += -erg;

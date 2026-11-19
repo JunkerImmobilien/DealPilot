@@ -506,7 +506,15 @@
       kstNachJahr: !(reg.kst != null && isFinite(Number(reg.kst)) && Math.abs(Number(reg.kst) - 15.825) > 1e-9),
       hebesatz: (reg.gewst != null && isFinite(Number(reg.gewst))) ? Number(reg.gewst) : 0,
       erwKuerzung: st.aktiv, erwStatus: st,
-      stammkapital: (m.bh && Number(m.bh.stammkapital)) || 0
+      stammkapital: (m.bh && Number(m.bh.stammkapital)) || 0,
+      /* v3790 · Verlustvortrag laut Bescheid. Bewusst NICHT als vortragKSt: der Kern nimmt ihn
+         nur, wo die ganze Gesellschaft gerechnet wird (gesellschaft-abschluss.js mitBescheid()),
+         sonst zoege jedes Objekt fuer sich den vollen Vortrag ab. */
+      vortragBescheid: (function () {
+        var bh = m.bh || {}, k = Number(bh.verlustvortrag) || 0, g = Number(bh.verlustvortrag_gewst) || 0;
+        if (!(k > 0) && !(g > 0)) return null;
+        return { kst: Math.max(0, k), gewst: Math.max(0, g), jahr: Number(bh.verlustvortrag_jahr) || null };
+      })()
     };
   }
 
@@ -1252,7 +1260,8 @@
       +   '<h3 class="set-section-h">Buchhaltung <span style="font-weight:400;color:#7A7370;font-size:12px">\u00b7 f\u00fcr den Jahresabschluss (GuV und Bilanz)</span></h3>'   /* v2208: war "(Stufe 3)" - den Abschluss gibt es seit v1227 */
       +   '<div class="mand-fhint" style="margin:2px 0 12px;font-size:12px;color:#7A7370;line-height:1.5">Diese Werte bilden die <b>Er\u00f6ffnungsbilanz</b> der Gesellschaft; der Jahresabschluss (GuV und Bilanz) rechnet mit ihnen. F\u00fcr die laufende Rendite- und Steuerrechnung sind sie nicht n\u00f6tig \u2014 nur f\u00fcrs Reporting. Im Zweifel mit dem Steuerberater abstimmen.</div>'
       +   '<div style="' + _fGrid() + '">'
-      +     fldH('Kontenrahmen', '<select id="mand-f-kr">' + krOpts() + '</select>', 'Buchhaltungs-Kontenrahmen f\u00fcr GuV/Bilanz. SKR04 ist der Standard f\u00fcr Kapitalgesellschaften (DATEV).')
+      /* v3790 \u00b7 Marcel 19.11.2026: Kontenrahmen raus, er wurde nirgends gelesen. Kommt mit der
+         DATEV-/Addison-Anbindung zurueck; der gespeicherte Wert bleibt erhalten (uiSave). */
       +     fldH('Wirtschaftsjahr-Beginn (MM-TT)', inp('mand-f-wj', bh.wj_start || '01-01', '01-01'), 'Beginn des Gesch\u00e4ftsjahres. Meist 01-01 (Kalenderjahr). Abweichend nur, wenn im Gesellschaftsvertrag so festgelegt.')
       +     fldH('Stammkapital (\u20ac)', inp('mand-f-sk', bh.stammkapital || 0), 'Gezeichnetes Kapital laut Gesellschaftsvertrag \u2014 GmbH mind. 25.000 \u20ac, UG ab 1 \u20ac. Steht als Eigenkapital in der Er\u00f6ffnungsbilanz.')
       +     fldH('Er\u00f6ffnung Bank (\u20ac)', inp('mand-f-bank', bh.eb_bank || 0), 'Bankguthaben der Gesellschaft zum Start des Wirtschaftsjahres (Anfangsbestand des Bankkontos).')
@@ -1260,7 +1269,14 @@
       +     fldH('Gewinnvortrag (\u20ac)', inp('mand-f-gv', bh.eb_gewinnvortrag || 0), 'Aufgelaufener, noch nicht ausgesch\u00fctteter Gewinn aus Vorjahren (Anfangsbestand). Bei einer neu gegr\u00fcndeten Gesellschaft 0.')
       /* v3197 · Marcel 05.11.2026: GmbH-Interna fehlten der Portfoliostrategie (Einlagekonto, Verlustvortrag) */
       +     fldH('Steuerliches Einlagekonto (\u20ac)', inp('mand-f-einlage', bh.einlagekonto || 0), 'Bestand nach \u00a7 27 KStG laut letzter Feststellung - Auszahlungen daraus sind steuerfrei.')
-      +     fldH('Verlustvortrag (\u20ac)', inp('mand-f-vv', bh.verlustvortrag || 0), 'K\u00f6rperschaftsteuerlicher Verlustvortrag laut letztem Bescheid (\u00a7 10d EStG, \u00a7 8 Abs. 1 KStG).')
+      +   '</div>'
+      /* v3790 \u00b7 Marcel 19.11.2026: Verlustvortrag rechnet jetzt mit (Kern steuerReihe, nur in der
+         Steuer der ganzen Gesellschaft). Bis v3789 wurde das Feld gespeichert und nie gelesen. */
+      +   '<h3 class="set-section-h" style="margin-top:14px">Verlustvortrag <span style="font-weight:400;color:#7A7370;font-size:12px">\u00b7 laut letztem Bescheid, rechnet in der Steuer der Gesellschaft</span></h3>'
+      +   '<div style="' + _fGrid() + '">'
+      +     fldH('K\u00f6rperschaftsteuer: verbleibender Verlustvortrag (\u20ac)', inp('mand-f-vv', bh.verlustvortrag || 0), 'Feststellung nach \u00a7 10d Abs. 4 EStG, \u00a7 8 Abs. 1 KStG.')
+      +     fldH('Gewerbesteuer: vortragsf\u00e4higer Fehlbetrag (\u20ac)', inp('mand-f-vvg', bh.verlustvortrag_gewst || 0), 'Feststellung nach \u00a7 10a GewStG. Bei erweiterter K\u00fcrzung meist 0.')
+      +     fldH('Stand zum 31.12. des Jahres', inp('mand-f-vvj', bh.verlustvortrag_jahr || '', 'z.B. 2025'), 'Jahr des Bescheids. Ab dem Folgejahr rechnet DealPilot mit diesen Betr\u00e4gen statt mit dem selbst gerechneten Vortrag; die Mindestbesteuerung (1 Mio. \u20ac Sockel) gilt.')
       +   '</div>'
       /* ═══════════════════════════════════════════════════════════════════
          v1226 · DER AUFWAND, DER KEINEM OBJEKT GEHÖRT.
@@ -1371,7 +1387,14 @@
   }
   function _val(id) { var el = document.getElementById(id); return el ? el.value : ''; }
   function _chk(id) { var el = document.getElementById(id); return !!(el && el.checked); }
-  function _toN(s) { var n = parseFloat(('' + s).replace(',', '.').replace(/[^\d.-]/g, '')); return isNaN(n) ? 0 : n; }
+  /* v3790 · deutsche Eingabe: 25.000 = Tausender, 15,825 = Komma. Bis v3789 wurde
+     "25.000" zu 25 (Komma zu Punkt, dann parseFloat bis zum zweiten Punkt). */
+  function _toN(s) {
+    var t = ('' + (s == null ? '' : s)).trim().replace(/[^\d.,-]/g, '');
+    if (t.indexOf(',') >= 0) t = t.replace(/\./g, '').replace(',', '.');
+    else if (/^-?\d{1,3}(\.\d{3})+$/.test(t)) t = t.replace(/\./g, '');
+    var n = parseFloat(t); return isNaN(n) ? 0 : n;
+  }
 
   function uiSave() {
     var id = _val('mand-f-id');
@@ -1405,14 +1428,16 @@
       /* v2984: die Pruefpunkte der erweiterten Kuerzung */
       try { var _K = window.DealPilotUeberfuehrungKern; if (_K && _K.PRUEFPUNKTE) { m.regime.erw_pruefung = {}; _K.PRUEFPUNKTE.forEach(function (x) { m.regime.erw_pruefung[x.k] = _chk('mand-f-ek-' + x.k); }); } } catch (_ek) {}
       m.bh = {
-        kontenrahmen: _val('mand-f-kr') || 'SKR04',
+        kontenrahmen: (function () { var a = id ? get(id) : null; return (a && a.bh && a.bh.kontenrahmen) || 'SKR04'; })(),   /* v3790: Feld ausgeblendet, Wert bleibt */
         wj_start: _val('mand-f-wj') || '01-01',
         stammkapital: _toN(_val('mand-f-sk')),
         eb_bank: _toN(_val('mand-f-bank')),
         eb_gesdar: _toN(_val('mand-f-gesdar')),
         eb_gewinnvortrag: _toN(_val('mand-f-gv')),
         einlagekonto: _toN(_val('mand-f-einlage')),   /* v3197 */
-        verlustvortrag: _toN(_val('mand-f-vv'))
+        verlustvortrag: _toN(_val('mand-f-vv')),
+        verlustvortrag_gewst: _toN(_val('mand-f-vvg')),   /* v3790 */
+        verlustvortrag_jahr: (function () { var j = parseInt(_val('mand-f-vvj'), 10); return (j >= 1990 && j <= 2100) ? j : null; })()
       };
       m.kosten = _kErnte();   /* v1226: Kosten der Gesellschaft, je Jahr */
     } else {
