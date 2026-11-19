@@ -91,7 +91,7 @@ const ok = (ab, was, b, ist) => { n++; if (!b) rot++; console.log((b ? '  ok  ' 
     ['frontend/js/mietentwicklung.js', /me-herkunft">Vergangene Jahre[\s\S]*?<\/div>'/],   /* v3860 */
     ['frontend/js/potenzial.js', /var kopf = '<div class="dp-zv-kopf"><b>Zielmiete je Wohnung[^\n]*/],   /* v3860 */
     ['frontend/js/potenzial.js', /Eine Mieterhöhung nach § 558 BGB geht nur bis zur Vergleichsmiete[^\n]*/],   /* v3860 */
-    ['frontend/js/mfh-einheiten.js', /Heute: die Miete aus dem Mietvertrag[^\n]*/],   /* v3860b */
+    ['frontend/js/mfh-einheiten.js', /ist die Miete aus dem Mietvertrag[^\n]*/],   /* v3860c */
     ['frontend/js/hausgeld-positionen.js', /Reine Aufstellung[^\n]*/],   /* v3860 */
     ['frontend/js/potenzial.js', /function mrIntro\(\)[^\n]*/],
     ['frontend/js/potenzial.js', /Beim Mehrfamilienhaus legst du Soll-Miete[^\n]*/],

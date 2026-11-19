@@ -507,7 +507,7 @@ window.MietEntwicklung = (function() {
     wrap.innerHTML = '<div class="me-herkunft">Vergangene Jahre zeigen die gezahlte Miete' + (nE ? ', gerechnet aus ' + nE + ' eingetragenen Mieterhöhungen' : '') + '. Ab ' + cy + ' schreibt DealPilot die heutige Miete fort.'
       + (eintragbar ? ' Grau ist gerechnet, schwarz ist eingetragen.' : '') + '</div>'
       + '<table><thead><tr><th>Jahr</th><th>Stand</th><th>Kaltmiete im Jahr</th><th>je Monat</th></tr></thead><tbody>' + zeilen + '</tbody></table>'
-      + (eintragbar ? '<div class="me-ist-link">' + (mfh ? '<button type="button" class="me-ist-alle" data-me-einh-jahre="1">Miete je Wohnung und Jahr</button>' : '<button type="button" class="me-ist-alle" data-me-ist-alle="1">Alle Jahre im Überblick</button>') + '</div>' : '');
+      + (eintragbar ? '<div class="me-ist-link">' + (mfh ? '<button type="button" class="me-ist-alle" data-me-einh-jahre="1">Miete je Wohnung: heute, geplant, Ziel</button>' : '<button type="button" class="me-ist-alle" data-me-ist-alle="1">Alle Jahre im Überblick</button>') + '</div>' : '');
     if (eintragbar && !wrap._dpMeIst) {
       wrap._dpMeIst = true;
       wrap.addEventListener('change', function (ev) {
