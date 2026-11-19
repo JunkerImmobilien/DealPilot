@@ -1502,7 +1502,7 @@
      "25.000" zu 25 (Komma zu Punkt, dann parseFloat bis zum zweiten Punkt). */
   /* v3790c · Prozentsaetze: Punkt und Komma sind Dezimaltrenner (das Feld zeigte "15.825", v3790 las
      es als 15.825 %). */
-  function _toPct(s) { var n = parseFloat(String(s == null ? '' : s).trim().replace(/[^d.,-]/g, '').replace(',', '.')); return isNaN(n) ? 0 : n; }
+  function _toPct(s) { var n = parseFloat(String(s == null ? '' : s).trim().replace(/[^\d.,-]/g, '').replace(',', '.')); return isNaN(n) ? 0 : n; }
   function _toN(s) {
     var t = ('' + (s == null ? '' : s)).trim().replace(/[^\d.,-]/g, '');
     if (t.indexOf(',') >= 0) t = t.replace(/\./g, '').replace(',', '.');
