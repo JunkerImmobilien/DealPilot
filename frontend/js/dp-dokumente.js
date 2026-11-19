@@ -887,7 +887,10 @@
       var F = K.FELDER[k], b = Number(v[k]) || 0; if (!b) return;
       if (F.art === 'ein') ein.push([F.l, b]); else if (F.art === 'ein_minus') ein.push([F.l, -b]); else if (F.art === 'wk') wk.push([F.l, b]);
     });
-    return { ein: ein, wk: wk, w: K.wirkung(v, wkVoll) };
+    var w = K.wirkung(v, wkVoll);
+    /* v3800b · verhaeltnismaessige Zuordnung: der nicht abzugsfaehige Teil steht als eigene Zeile, sonst geht die Aufstellung nicht auf */
+    if (w.anteilMinus > 0.005) wk.push(['Nicht abzugsfähiger Anteil (verhältnismäßige Zuordnung, abzugsfähig ' + String(Math.round(w.anteil * 100) / 100).replace('.', ',') + ' %)', -w.anteilMinus]);
+    return { ein: ein, wk: wk, w: w };
   }
   function anlageVBlatt(B, jahr, tot) {
     var K = window.AnlageVKern; if (!K || !tot) return '';
@@ -896,10 +899,9 @@
     var zl = function (nr, kz, text, betrag, o) { return '<tr class="' + ((o && o.art) || '') + '"><td class="num" style="width:17mm">' + (nr == null ? '' : 'Zeile ' + B.esc(nr)) + '</td><td class="num det" style="width:13mm">' + (kz ? 'Kz ' + B.esc(kz) : '') + '</td><td>' + B.esc(text) + '</td><td class="r num' + ((o && o.farbe) || '') + '">' + (betrag == null ? '' : B.esc((o && o.einheit && o.einheit !== '€') ? B.zahl(betrag, 0) + ' ' + o.einheit : B.eur(betrag, 2))) + '</td></tr>'; };
     var h = '';
     if (R.hinweise.length) h += R.hinweise.map(function (x) { return '<div class="hinweis">' + B.esc(x) + '</div>'; }).join('');
-    h += '<h3>Einnahmen</h3><table><tbody>' + R.einnahmen.map(function (e) { return zl(e.zeile, e.kz, e.text, e.betrag); }).join('')
+    h += '<h3>Einnahmen</h3><table><tbody>' + R.einnahmen.map(function (e) { return zl(e.zeile, e.kz, (e.teil ? '   ' : '') + e.text, e.betrag, e.teil ? { art: 'ein' } : null); }).join('')
       + zl(R.summeEinnahmen.zeile, null, 'Summe der Einnahmen', R.summeEinnahmen.betrag, { art: 'summe' }) + '</tbody></table>';
-    if (tot.zeUngeteilt > 0.5) h += '<p class="det">Zusätzliche Einnahmen von ' + B.esc(B.eur(tot.zeUngeteilt, 2)) + ' sind nicht aufgeteilt und stehen bei den Mieteinnahmen. Garagen, Stellplätze, Werbeflächen und Antennen gehören in eine eigene Zeile: im Reiter Miete unter „Zusätzliche Einnahmen › aufteilen“ eintragen.</p>';
-    h += '<h3>Werbungskosten</h3><table><tbody>' + (R.wk.length ? R.wk.map(function (e) { return zl(e.zeile, e.kz, e.text, e.betrag); }).join('') : '<tr><td colspan="4" class="det">Keine Position mit Betrag erfasst.</td></tr>') + '</tbody></table>';
+    h += '<h3>Werbungskosten</h3><table><tbody>' + (R.wk.length ? R.wk.map(function (e) { return zl(e.zeile, e.kz, e.text, e.betrag, e.teil ? { art: 'ein' } : null); }).join('') : '<tr><td colspan="4" class="det">Keine Position mit Betrag erfasst.</td></tr>') + '</tbody></table>';
     if (R.afaHinweis) h += '<p class="det">' + B.esc(R.afaHinweis.text) + '</p>';
     h += '<p class="det">Ohne Zeichen: die Kostenart steht wörtlich in der Überschrift der Formularzeile (Abschrift). * steht in keiner spezielleren Zeile; das Formular führt dafür „Sonstige Kosten“. ° folgt aus der Art des Aufwands, nicht aus dem Formulartext – Begründung unten.</p>';
     if (R.sach.length) h += '<div class="block"><h3>° Zuordnung aus der Art des Aufwands – bitte prüfen</h3>' + R.sach.map(function (x) { return '<p class="det">' + B.esc(x) + '</p>'; }).join('') + '</div>';
@@ -908,6 +910,9 @@
     h += '<table style="margin-top:4mm"><tbody>' + zl(R.summeWk.zeile, null, 'Summe der Werbungskosten', R.summeWk.betrag, { art: 'summe' })
       + zl(R.ueberschuss.zeile, null, 'Überschuss (Einnahmen Zeile ' + R.summeEinnahmen.zeile + ' abzüglich Werbungskosten Zeile ' + R.summeWk.zeile + ')', R.ueberschuss.betrag, { art: 'ende', farbe: R.ueberschuss.betrag < 0 ? ' neg' : ' pos' }) + '</tbody></table>';
     if (R.kuerzung) h += '<p class="det">' + B.esc(R.kuerzung.text) + '</p>';
+    /* v3800b · Zeile 86: Zurechnung Person A / Person B */
+    if (R.zurechnung) h += '<table><tbody>' + zl(R.zurechnung.zeile, R.zurechnung.kz, 'Zurechnung des Überschusses: Person A (' + B.esc(String(R.zurechnung.pct).replace('.', ',')) + ' %)', R.zurechnung.a)
+      + (R.zurechnung.pct < 100 ? zl(null, null, 'Person B (' + B.esc(String(Math.round((100 - R.zurechnung.pct) * 100) / 100).replace('.', ',')) + ' %)', R.zurechnung.b) : '') + '</tbody></table>';
     if (R.info.length) h += '<h3>Weitere Angaben</h3><table><tbody>' + R.info.map(function (e) { return zl(e.zeile, e.kz, e.text, e.betrag, { einheit: e.einheit }); }).join('') + '</tbody></table>';
     if (R.nichtErfasst.length) h += '<div class="block"><h3>Im Formular selbst auszufüllen</h3>' + R.nichtErfasst.map(function (n) { return '<p class="det">Zeile ' + n.zeile + ' – ' + B.esc(String(n.text || '').replace(/`/g, '')) + '</p>'; }).join('') + '</div>';
     return h + '<p class="det">Dieselben Zahlen wie die Aufstellung, sortiert nach den Zeilen des amtlichen Formulars Anlage V ' + R.jahr + ' (' + B.esc(R.formular || '') + (R.stand ? ', Stand ' + B.esc(R.stand) : '') + '). Keine Steuerberatung.</p>';
@@ -951,7 +956,7 @@
           tab.push([g[0], B.eur(s, 2), { art: 'summe' }]);
           g[1].forEach(function (f) { if (Number(v[f[0]])) tab.push([f[1], B.eur(v[f[0]], 2), { art: 'ein' }]); });
         });
-        if (_avA.wk.length) { tab.push(['7. Weitere Werbungskosten (Anlage V)', B.eur(_avA.w.wk, 2), { art: 'summe' }]); _avA.wk.forEach(function (x) { tab.push([x[0], B.eur(x[1], 2), { art: 'ein' }]); }); }
+        if (_avA.wk.length) { tab.push(['7. Weitere Werbungskosten (Anlage V)', B.eurS(_avA.w.wk, 2), { art: 'summe' }]); _avA.wk.forEach(function (x) { tab.push([x[0], B.eurS(x[1], 2), { art: 'ein' }]); }); }
         summe += _avA.w.wk;
         tab.push(['Summe ' + bg.wort + ' ' + row.cal, B.eur(summe, 2), { art: 'summe' }]);
         if (_avA.w.kuerzung > 0.005) tab.push(['Kürzung wegen verbilligter Vermietung (§ 21 Abs. 2 EStG)', B.eurS(_avA.w.kuerzung, 2), { det: 'Die Werbungskosten stehen im Formular in voller Höhe, das Finanzamt kürzt sie.' }]);
@@ -1063,7 +1068,7 @@
             tab.push([g[0], B.eur(sum, 2), { art: 'summe' }]);
             g[1].forEach(function (f) { if (e.v[f[0]]) tab.push([f[1], B.eur(e.v[f[0]], 2), { art: 'ein' }]); });
           });
-          if (e.avA.wk.length) { tab.push(['7. Weitere Werbungskosten (Anlage V)', B.eur(e.avA.w.wk, 2), { art: 'summe' }]); e.avA.wk.forEach(function (x) { tab.push([x[0], B.eur(x[1], 2), { art: 'ein' }]); }); }
+          if (e.avA.wk.length) { tab.push(['7. Weitere Werbungskosten (Anlage V)', B.eurS(e.avA.w.wk, 2), { art: 'summe' }]); e.avA.wk.forEach(function (x) { tab.push([x[0], B.eurS(x[1], 2), { art: 'ein' }]); }); }
           tab.push(['Summe ' + (e.corp ? 'Betriebsausgaben' : 'Werbungskosten') + ' ' + jahr, B.eur(e.wk, 2), { art: 'summe' }]);
           if (e.avA.w.kuerzung > 0.005) tab.push(['Kürzung wegen verbilligter Vermietung (§ 21 Abs. 2 EStG)', B.eurS(e.avA.w.kuerzung, 2), { det: 'Die Werbungskosten stehen im Formular in voller Höhe, das Finanzamt kürzt sie.' }]);
           tab.push([e.corp ? 'Beitrag zum Ergebnis der Gesellschaft (vor Steuern)' : 'Einkünfte aus Vermietung und Verpachtung', B.eurS(e.erg, 2), { art: 'ende', farbe: 1 }]);
@@ -1090,7 +1095,9 @@
           if (mitAV && !e.corp) {
             var tot = { values: e.v, einnahmen: e.ein, werbungskosten: e.wk, ergebnis: e.erg,
                         afaLinear: e.s.afa_linear != null ? num(e.s.afa_linear) : null, afaSonder7b: e.s.afa_sonder_7b != null ? num(e.s.afa_sonder_7b) : null, auto: { afa: e.v.afa },
-                        erhV: e.avS._erhV || null, erhG: num(e.avS._erhG), zeUngeteilt: num(e.avS._zeUngeteilt) };   /* v3800 */
+                        erhV: e.avS._erhV || null, erhG: num(e.avS._erhG), zeUngeteilt: num(e.avS._zeUngeteilt),   /* v3800 */
+                        einheiten: e.avS._einheiten || null, afaArt: e.avS._afa || null, kaufjahr: num(e.avS._kj) || null, av7h: e.avS._av7h || null,
+                        verbilligt: e.avS._vb ? { grund: String(e.avS._vb) } : null };   /* v3800b */
             var av = anlageVBlatt(B, jahr, tot);
             if (av) S.push(B.seite(c, 'Anlage V · Objekt ' + (i + 1), B.abschnitt('Anlage V · Zuordnung · Objekt ' + (i + 1), 'Veranlagungsjahr ' + jahr, e.adr) + av));
           }

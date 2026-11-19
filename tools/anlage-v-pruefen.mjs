@@ -27,7 +27,7 @@ import vm from 'node:vm';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const lies = (f) => fs.readFileSync(path.join(ROOT, f), 'utf8');
+const lies = (f) => fs.readFileSync(path.join(ROOT, f), 'utf8').replace(/\r\n/g, '\n');   /* Arbeitskopie kann CRLF sein (autocrlf) */
 let rot = 0, gruen = 0, still = false;
 const ok = (b, t) => { if (b) gruen++; else { rot++; if (!still) console.log('  ROT  ' + t); } };
 const nah = (a, b, tol = 0.005) => Math.abs(a - b) <= tol;
@@ -103,6 +103,31 @@ function pruefen(Q) {
   ok(R3 && R3.hinweise.length >= 1, 'B Teile groesser als die Kaltmiete: Hinweis');
   ok(K.aufstellung(2024, { values: v }) === null, 'B Aufstellung fuer ein Jahr ohne Abschrift: null');
 
+  /* ── B2 · v3800b ── */
+  const s7 = (j) => K.sieben(100000, 2020, j).satz;
+  ok(s7(2019) === 0 && s7(2020) === 9 && s7(2027) === 9 && s7(2028) === 7 && s7(2031) === 7 && s7(2032) === 0, 'B2 §§ 7h/7i: 2020-2027 je 9 %, 2028-2031 je 7 %, davor/danach 0 (Abs. 1 Satz 1)');
+  /* ELSTER-Hilfe Anlage V 2025, Beispiel Familie Muster: 420 / 1.050 = 40 %, Kuerzung 60 %, WK 4.920 -> 1.968 */
+  const vb40 = K.verbilligt({ quote: 420 / 1050 * 100 });
+  const wB = K.wirkung({ av_kuerzung_pct: vb40.pct }, 4920);
+  ok(vb40.pct === 60 && nah(4920 - wB.kuerzung, 1968), 'B2 Beispiel der ELSTER-Hilfe: 40 % entgeltlich -> Kuerzung 60 %, Werbungskosten 4.920 -> 1.968 €');
+  const pos = Array.from({ length: 10 }, () => ({ ein: 10000, wk: 9500 })), neg = Array.from({ length: 10 }, () => ({ ein: 10000, wk: 12500 }));
+  ok(K.verbilligt({ quote: 60, jahre: pos }).pct === 0 && K.verbilligt({ quote: 60, jahre: neg }).pct === 40, 'B2 60 %: Prognose positiv -> keine Kuerzung, negativ -> 40 % (§ 21 Abs. 2 Satz 2)');
+  /* Sicherheitsabschlaege Rz. 34: 30 x 10.000 x 1,1 = 330.000, 30 x 12.000 x 0,9 = 324.000 -> positiv, ohne Zuschlaege negativ */
+  ok(K.verbilligt({ quote: 60, jahre: Array.from({ length: 30 }, () => ({ ein: 10000, wk: 12000 })) }).pct === 0, 'B2 Sicherheitszuschlag/-abschlag 10 % (BMF 08.10.2004 Rz. 34)');
+  ok(K.verbilligt({ quote: 66 }).pct === 0 && K.verbilligt({ quote: 80 }).pct === 0, 'B2 ab 66 %: voll entgeltlich');
+  const wA = K.wirkung({ av_anteil_pct: 80 }, 10000);
+  ok(nah(wA.wk, -2000) && nah(K.wirkung({}, 10000).wk, 0) && nah(K.wirkung({ av_anteil_pct: 0 }, 10000).wk, 0), 'B2 abzugsfaehiger Anteil 80 %: Werbungskosten −20 %, fehlend/0 = 100 %');
+  const vA = { einnahmen_km: 12000, einnahmen_nk: 0, schuldzinsen: 3000, afa: 2000, erhaltungsaufwand: 1000, av_anteil_pct: 80, av_zurechnung_a_pct: 50, av_fewo: 2, av_angeh_flag: 2, av_andere_raeume: 3000 };
+  const RA = K.aufstellung(2025, { values: vA, einnahmen: 12000, werbungskosten: 6000 * 0.8, afaArt: { m: 'linear', s: 2 }, kaufjahr: 2024,
+    einheiten: [{ b: 'Wohnung 1', q: 60, e: 500, g: 0 }, { b: 'Wohnung 2', q: 40, e: 250, g: 0 }, { b: 'Laden', q: 50, e: 250, g: 1 }] });
+  const zA = (l, nr, teil) => l.filter((e) => e.zeile === nr && !!e.teil === !!teil);
+  ok(RA && nah(zA(RA.wk, 35)[0].betrag, 1600) && zA(RA.wk, 34, true).length === 1 && nah(zA(RA.wk, 48)[0].betrag, 2400) && zA(RA.wk, 47, true).length === 1, 'B2 verhaeltnismaessig: Zeile 35 = 80 % der AfA, Zeile 34 Gesamtbetrag/Anteil, ebenso 47/48');
+  ok(RA && zA(RA.wk, 56).length === 1 && nah(zA(RA.wk, 56)[0].betrag, 800) && !zA(RA.wk, 55).length, 'B2 Erhaltung verhaeltnismaessig in Zeile 56 (Kz 37), nicht 55');
+  ok(RA && nah(RA.wk.filter((e) => !e.teil).reduce((a, e) => a + e.betrag, 0), 4800), 'B2 Summe der Zeilen = Zeile 83 (4.800)');
+  ok(RA && zA(RA.einnahmen, 13, true).length === 1 && zA(RA.einnahmen, 14, true).length === 1 && nah(zA(RA.einnahmen, 13, true)[0].betrag + zA(RA.einnahmen, 14, true)[0].betrag, 9000) && nah(zA(RA.einnahmen, 16, true)[0].betrag, 3000), 'B2 Einzelangaben: Zeilen 13/14 ergeben Zeile 15 (9.000), Zeile 16 = Zeile 18 (3.000)');
+  ok(RA && RA.zurechnung && RA.zurechnung.zeile === 86 && nah(RA.zurechnung.a, RA.zurechnung.b), 'B2 Zeile 86: haelftige Zurechnung Person A / B');
+  ok(RA && RA.info.some((e) => e.zeile === 10 && /2 = Nein/.test(e.text) && e.kz === '61') && RA.info.some((e) => e.zeile === 33 && /wie Vorjahr/.test(e.text)), 'B2 Ankreuzfeld Zeile 10 (Kz 61), AfA-Angaben Zeile 33');
+
   /* ── C · tax.js mit gespeichertem Satz ── */
   const tc = { console: { log() {}, warn() {}, info() {}, error() {} }, Date, Math, JSON, parseFloat, parseInt, isFinite, isNaN, Number, String, Object, Array, Promise, setTimeout() {}, clearTimeout() {},
     document: { getElementById: () => null, addEventListener() {}, querySelector: () => null, querySelectorAll: () => [], createElement: () => ({ style: {} }) }, addEventListener() {}, localStorage: { getItem: () => null, setItem() {} } };
@@ -122,6 +147,20 @@ function pruefen(Q) {
     const b = cyt(2025, 0, Object.assign({}, satz, { anlage_v: { av_garagen: 1200, av_renten: 600, av_ust_gezahlt: 100, av_nk_nachzahlung: -150, av_zuschuesse: 500, av_zuschuesse_eigen: 100, av_kuerzung_pct: 10, _erhV: { 2025: 600 } } }));
     ok(nah(b.einnahmen, 14250) && nah(b.werbungskosten, 9700) && nah(b.ergebnis, 14250 - 9700 + 970), 'C mit anlage_v: Einnahmen 14.250, Werbungskosten 9.700, Ergebnis mit Kuerzung 970');
     ok(b.erhV && b.erhV[2025] === 600 && b.values.av_garagen === 1200, 'C Auskunft aus anlage_v kommt an (erhV, av_garagen)');
+    const c3 = cyt(2025, 0, Object.assign({}, satz, { anlage_v: { av_anteil_pct: 80, av_zurechnung_a_pct: 50, av_fewo: 2 } }));
+    ok(nah(c3.einnahmen, 14000) && nah(c3.werbungskosten, 7200) && nah(c3.ergebnis, 6800), 'C abzugsfaehiger Anteil 80 %: Werbungskosten 7.200, Ergebnis 6.800; Flags/Zurechnung ohne Wirkung');
+    if (process.argv.find((a) => a.startsWith('--saetze='))) {
+      /* Gespeicherte Saetze ohne anlage_v (JSON-Liste, lesend aus Staging geholt): neue Rechnung = alte Formel */
+      const S = JSON.parse(fs.readFileSync(process.argv.find((a) => a.startsWith('--saetze=')).slice(9), 'utf8').replace(/^[^\[]*/, ''));
+      const WKF = ['schuldzinsen','kontofuehrung','bereitstellung','notar_grundschuld','vermittlung','finanz_sonst','nk_umlf','nk_n_umlf','betr_sonst','hausverwaltung','steuerber','porto','verw_sonst','fahrtkosten','verpflegung','hotel','inserat','gericht','telefon','sonst_kosten','afa','sonst_bewegl_wg','anschaffungsnah','erhaltungsaufwand'];
+      let ab = 0;
+      for (const s of S) {
+        const e0 = (+s.einnahmen_km) + (+s.einnahmen_nk), w0 = WKF.reduce((a, f) => a + (+s[f] || 0), 0), t = cyt(s.year, 0, s);
+        if (!nah(t.einnahmen, e0) || !nah(t.werbungskosten, w0) || !nah(t.ergebnis, e0 - w0)) ab++;
+      }
+      ok(S.length > 0 && ab === 0, 'C ' + S.length + ' gespeicherte Saetze ohne anlage_v: neue Rechnung = alte Formel (' + ab + ' Abweichungen)');
+      if (!still) console.log('  C  ' + S.length + ' gespeicherte Saetze ohne anlage_v nachgerechnet, ' + ab + ' Abweichungen');
+    }
   }
 
   /* ── D · Verdrahtung, keine festen Nummern ── */

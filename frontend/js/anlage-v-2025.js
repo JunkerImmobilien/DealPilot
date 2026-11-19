@@ -71,14 +71,30 @@ window.AnlageV2025 = {
 
   /* v3800 · Summenzeilen und Zeilen ohne eigenes DealPilot-Feld, je Jahr. */
   summen: { einnahmen: 32, zuschuesse_ergebnis: 31, werbungskosten: 83, ueberschuss: 85, sonder7b: 38,
-            erh_verteilt_gesamt: 57, erh_verteilt_jahr: 60 },
+            erh_verteilt_gesamt: 57, erh_verteilt_jahr: 60,
+            /* v3800b · Einzelangaben, AfA-Angaben, Zurechnung */
+            einzel_wohnung: 13, einzel_wohnung_weitere: 14, einzel_raum: 16, einzel_raum_weitere: 17,
+            afa_angaben: 33, zurechnung: 86,
+            /* Zeile 56 (Kz 37) ist selbst Summenzeile der verhaeltnismaessig zugeordneten Erhaltung */
+            verh_selbst: [56] },
+
+  /* v3800b · Summenzeile -> Zeile „durch verhaeltnismaessige Zuordnung ermittelt" (Gesamtbetrag,
+     abzugsfaehiger Anteil). Abgeschrieben aus dem Formular Seite 2 bis 4: 33/34->35, 36/37->38,
+     39/40->41, 42/43/44->45, 46/47->48, 49/50->51, 52/53->54, 55 direkt / 56 verhaeltnismaessig,
+     58/59->60, 61/62->63, 64/65->66, 67/68->69, 70/71->72, 73/74->75, 76/77->78, 80/81->82.
+     Zeile 79 (gezahlte Umsatzsteuer) kennt nur die direkte Zuordnung. */
+  verh: { 35: 34, 38: 37, 41: 40, 45: 44, 48: 47, 51: 50, 54: 53, 55: 56, 60: 59, 63: 62, 66: 65, 69: 68, 72: 71, 75: 74, 78: 77, 82: 81 },
 
   /* Die Struktur des Formulars, soweit fuer die Aufstellung gebraucht.
      `kz` ist die amtliche Kennzahl, wo das Formular eine ausweist. */
   zeilen: {
-    11: { text: 'Gesamtwohnfläche (in m²)' },
-    12: { text: 'Eigengenutzter oder unentgeltlich an Dritte überlassener Wohnraum (in m²)' },
-    13: { text: 'Mieteinnahmen für Wohnungen (ohne Umlagen / ohne Umsatzsteuer)' },
+    10: { text: 'Das Objekt wird ganz oder teilweise als Ferienwohnung genutzt (Kz 61) / kurzfristig vermietet (Kz 63) / an Angehörige zu Wohnzwecken vermietet (Kz 62) — 1 = Ja, 2 = Nein' },
+    11: { text: 'Gesamtwohnfläche (in m²)', kz: '54' },
+    12: { text: 'In Zeile 11 enthaltener eigengenutzter / unentgeltlich an Dritte überlassener Wohnraum (in m²)', kz: '55' },
+    13: { text: 'Mieteinnahmen für Wohnungen (ohne Umlagen / ohne Umsatzsteuer) — Bezeichnung der Wohneinheit, Wohnfläche' },
+    14: { text: 'Bezeichnung weiterer Wohneinheiten, Wohnfläche' },
+    17: { text: 'Bezeichnung weiterer Einheiten, Nutzfläche' },
+    33: { text: 'Absetzung für Abnutzung für Gebäude — durch direkte Zuordnung ermittelt: 1 = linear / 2 = degressiv, %, 1 = wie Vorjahr / 2 = laut Erläuterung' },
     15: { text: 'Summe der Mieteinnahmen für Wohnungen', kz: '01' },
     16: { text: 'Einnahmen für andere Räume (ohne Umlagen / ohne Umsatzsteuer) — Bezeichnung der Einheit, Nutzfläche' },
     18: { text: 'Summe der Einnahmen für andere Räume', kz: '02' },
@@ -194,7 +210,9 @@ window.AnlageV2025 = {
     /* Garagen und Werbeflaechen stehen woertlich in der Zeile; Antennen/Mobilfunk sind
        Ueberlassung von Dach- oder Grundflaechen - dieselbe Gruppe wie „Grund und Boden fuer
        Kioske usw.". Die Begruendung steht im Feld. */
-    av_garagen:         { zeile: 26, art: 'einnahme', quelle: 'formular', grund: 'Garagen und Werbeflächen stehen wörtlich in der Zeile. Antennen und Mobilfunkanlagen sind die Überlassung von Dach- oder Grundflächen und gehören in dieselbe Gruppe wie „Grund und Boden für Kioske usw.“.' },
+    /* v3800b: Mobilfunkantennen nennt die ELSTER-Hilfe zur Anlage V 2025 zu Zeile 26 ausdruecklich
+       (Grundstuecksteile fuer Mobilfunkantennen, Windkraftanlagen, WLAN-Hotspots) - Abschrift, keine Sachlogik. */
+    av_garagen:         { zeile: 26, art: 'einnahme', quelle: 'formular' },
     av_ust_vereinnahmt: { zeile: 27, art: 'einnahme', quelle: 'formular' },
     av_ust_erstattet:   { zeile: 28, art: 'einnahme', quelle: 'formular' },
     av_zuschuesse:      { zeile: 29, art: 'einnahme', quelle: 'formular' },
@@ -212,19 +230,21 @@ window.AnlageV2025 = {
     av_eigen_qm:        { zeile: 12, art: 'info', quelle: 'formular' },
     av_kuerzung_pct:    { zeile: 87, art: 'info', quelle: 'formular' },
     av_kuerzung_betrag: { zeile: 88, art: 'info', quelle: 'formular' },
-    av_zuschuss_ahk:    { zeile: 89, art: 'info', quelle: 'formular' }
+    av_zuschuss_ahk:    { zeile: 89, art: 'info', quelle: 'formular' },
+    /* v3800b */
+    av_fewo:            { zeile: 10, kz: '61', art: 'info', quelle: 'formular' },
+    av_kurzfristig:     { zeile: 10, kz: '63', art: 'info', quelle: 'formular' },
+    av_angeh_flag:      { zeile: 10, kz: '62', art: 'info', quelle: 'formular' },
+    av_nk_nicht_vereinbart: { zeile: 24, art: 'info', quelle: 'formular' },
+    av_anteil_pct:      { zeile: null, art: 'info', quelle: 'formular', grund: 'Kein eigenes Feld: der Anteil steht je Posten in den Zeilen „durch verhältnismäßige Zuordnung ermittelt“ (siehe verh).' },
+    av_zurechnung_a_pct:{ zeile: 86, art: 'info', quelle: 'formular' }
   },
 
   /* Was DealPilot nicht getrennt fuehrt und deshalb in der Ansicht benannt
      statt weggelassen wird. */
   nicht_erfasst: [
-    /* v3800 · Seit dem Paket ist jede Betragszeile der Anlage V eingebbar (Reiter Steuer, Weitere Angaben der
-       Anlage V). Was bleibt, sind Ankreuzfelder, Einzelangaben je Wohnung und die Aufteilung nach Zuordnungsart. */
-    { zeile: 10, text: 'Ankreuzfelder Ferienwohnung, kurzfristige Vermietung und Vermietung an Angehörige — bitte im Formular selbst ankreuzen. Bei Ferienwohnung oder kurzfristiger Vermietung ist zusätzlich die Anlage V-FeWo abzugeben.' },
-    { zeile: 13, text: 'Einzelangaben je Wohnung und Einheit (Bezeichnung, Wohn- oder Nutzfläche, Zeilen 13, 14, 16, 17) — DealPilot liefert die Summe je Zeile.' },
-    { zeile: 24, text: 'Neben- und Betriebskosten nicht gesondert vereinbart — Ankreuzfeld, bitte im Formular selbst setzen.' },
-    { zeile: 33, text: 'Zuordnungsart der Werbungskosten — DealPilot trägt alle Beträge als direkt zugeordnet ein. Sind die Aufwendungen nur teilweise Werbungskosten (z. B. Objekt teilweise selbst genutzt), gehören sie in die Zeilen „durch verhältnismäßige Zuordnung ermittelt“. AfA-Art und AfA-Satz (Zeilen 33 und 34) stehen in der Aufstellung.' },
-    { zeile: 38, text: 'Sonderabschreibung nach § 7b EStG — DealPilot rechnet sie und weist sie getrennt aus, sobald das Objekt eine Sonderabschreibung führt. Bei älteren gespeicherten Jahreswerten ist die Aufteilung nicht bekannt: steht auf diesem Blatt keine Zeile 38, obwohl die AfA einen § 7b-Anteil enthält, gehört dieser Teil laut Formular nicht in Zeile 35, sondern in Zeile 38.' },
-    { zeile: 86, text: 'Zurechnung des Überschusses auf Person A und Person B — bei Zusammenveranlagung im Formular selbst eintragen.' }
+    /* v3800b · Ankreuzfelder (10, 24), Einzelangaben (13/14, 16/17), Zuordnungsart (33 ff.) und Zurechnung (86)
+       sind seit v3800b eingebbar bzw. werden aus dem Objekt vorgeschlagen. Es bleibt der Hinweis zu Zeile 38. */
+    { zeile: 38, text: 'Sonderabschreibung nach § 7b EStG — DealPilot rechnet sie und weist sie getrennt aus, sobald das Objekt eine Sonderabschreibung führt. Bei älteren gespeicherten Jahreswerten ist die Aufteilung nicht bekannt: steht auf diesem Blatt keine Zeile 38, obwohl die AfA einen § 7b-Anteil enthält, gehört dieser Teil laut Formular nicht in Zeile 35, sondern in Zeile 38.' }
   ]
 };

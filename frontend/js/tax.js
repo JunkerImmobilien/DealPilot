@@ -1492,6 +1492,18 @@ function _computeAutoForYear(yearIdx, year, teiljahr) {
   } else {
     afaGebaeude = afaBd && (afaBd.gebaeude != null) ? afaBd.gebaeude : (afaGesamt - afaKueche);
   }
+  /* v3800b · Zuschuesse aus oeffentlichen Mitteln zu den Anschaffungs-/Herstellungskosten des Gebaeudes
+     (Anlage V Zeile 89) mindern die AfA-Bemessungsgrundlage (R 21.5 Abs. 1 EStR, ELSTER-Hilfe Anlage V 2025
+     zu Zeile 89), ab dem Jahr der Bewilligung: die Gebaeude-AfA faellt im Verhaeltnis Zuschuss zu
+     Bemessungsgrundlage (bei linearer AfA genau Zuschuss x Satz). Ohne Eintrag Faktor 1, bitgleich. */
+  var _avZuF = 1;
+  try {
+    var _avZuS = 0, _avO = window._taxYearlyOverrides || {};
+    Object.keys(_avO).forEach(function (k) { var j = parseInt(String(k).slice(1), 10); if (j <= year && _avO[k] && Number(_avO[k].av_zuschuss_ahk) > 0) _avZuS += Number(_avO[k].av_zuschuss_ahk); });
+    var _avGeb = (State._afaStempel && Number(State._afaStempel.geb)) || 0;
+    if (_avZuS > 0 && _avGeb > 0) _avZuF = Math.max(0, 1 - _avZuS / _avGeb);
+  } catch (_eZu) {}
+  if (_avZuF !== 1) afaGebaeude *= _avZuF;
 
   // V31/V32: Sanierung + Möblierung steuerlich korrekt verteilen
   // ───────────────────────────────────────────────────────
@@ -1799,12 +1811,72 @@ function _computeAutoForYear(yearIdx, year, teiljahr) {
     av_garagen: (function () {
       try {
         var Z = window.DpZeAufteilung, t = Z && Z.teile ? Z.teile() : null, sum = t ? (t.stp + t.kueche + t.werb + t.funk + t.sonst) : 0;
-        return (t && sum > 0 && einnahmen_ze > 0) ? einnahmen_ze * (t.stp + t.werb + t.funk) / sum : 0;
+        if (t && sum > 0 && einnahmen_ze > 0) return einnahmen_ze * (t.stp + t.werb + t.funk) / sum;
+        /* v3800b: ungeteilt, aber das Objekt fuehrt Garagen/Stellplaetze -> ganz Zeile 26 (siehe _zeGarage) */
+        var n = function (id) { return parseDe((document.getElementById(id) || {}).value) || 0; };
+        return (Z && Z.aufgeteilt && !Z.aufgeteilt() && einnahmen_ze > 0 && (n('garagen') > 0 || n('stellpl_aussen') > 0 || n('stellplatz_miete_monat') > 0)) ? einnahmen_ze : 0;
       } catch (e) { return 0; }
     })(),
     av_wohnflaeche: parseDe((document.getElementById('wfl') || {}).value) || 0,
     /* zusaetzliche Einnahmen ohne Aufteilung (Auskunft fuer die Anlage-V-Seite) */
     _zeUngeteilt: (window.DpZeAufteilung && DpZeAufteilung.aufgeteilt && !DpZeAufteilung.aufgeteilt() && einnahmen_ze > 0) ? einnahmen_ze : 0,
+    /* v3800b · Marcel 19.11.2026: Garagen und Stellplaetze gehoeren IMMER in Zeile 26. Sind die zusaetzlichen
+       Einnahmen nicht aufgeteilt, das Objekt fuehrt aber Garagen oder Stellplaetze (Reiter Objekt) oder eine
+       Stellplatzmiete, gilt der ungeteilte Betrag als Stellplatz/Garage - so liest ihn auch die Aufteilung
+       beim Aufklappen (ze-aufteilung.js) und der Marktbericht. */
+    _zeGarage: (function () {
+      try {
+        if (!(window.DpZeAufteilung && DpZeAufteilung.aufgeteilt && !DpZeAufteilung.aufgeteilt() && einnahmen_ze > 0)) return 0;
+        var n = function (id) { return parseDe((document.getElementById(id) || {}).value) || 0; };
+        return (n('garagen') > 0 || n('stellpl_aussen') > 0 || n('stellplatz_miete_monat') > 0) ? einnahmen_ze : 0;
+      } catch (e) { return 0; }
+    })(),
+    /* v3800b · Gewerbe-Einheiten eines MFH/WGH (mfh-einheiten.js) -> Einnahmen fuer andere Raeume
+       (Zeile 18), Anteil an der Nettokaltmiete nach den Ist-Mieten der Einheiten; Einzelangaben je
+       Einheit fuer die Zeilen 13/14 und 16/17. Ohne Einheiten: eine Wohnung mit Wohnflaeche. */
+    _einheiten: (function () {
+      try {
+        var d = window._dpMfh, L = (d && Array.isArray(d.einheiten)) ? d.einheiten : [];
+        var z = function (x) { var t = parseDe(x); return isFinite(t) ? t : 0; };
+        if (L.length) return L.map(function (e, i) { var g = e.art === 'gewerbe'; return { b: (g ? 'Einheit ' : 'Wohnung ') + (e.nr || (i + 1)), q: z(e.wfl), e: e.status === 'leer' ? 0 : z(e.ist), g: g ? 1 : 0 }; });
+        var w = z((document.getElementById('wfl') || {}).value);
+        return nkm_m > 0 ? [{ b: 'Wohnung', q: w, e: nkm_m, g: 0 }] : [];
+      } catch (e) { return []; }
+    })(),
+    av_andere_raeume: (function () {
+      try {
+        var d = window._dpMfh, L = (d && Array.isArray(d.einheiten)) ? d.einheiten : [];
+        var z = function (x) { var t = parseDe(x); return isFinite(t) ? t : 0; };
+        var alle = 0, gew = 0;
+        L.forEach(function (e) { if (e.status === 'leer') return; var m = z(e.ist); alle += m; if (e.art === 'gewerbe') gew += m; });
+        return (alle > 0 && gew > 0) ? einnahmen_nkm * gew / alle : 0;
+      } catch (e) { return 0; }
+    })(),
+    /* v3800b · §§ 7h, 7i EStG aus der Bescheinigung (Reiter Steuer): js/anlage-v-kern.js sieben() */
+    av_7h7i: (function () {
+      if (!window.AnlageVKern) return 0;
+      var art = (document.getElementById('av7h_art') || {}).value;
+      return art ? AnlageVKern.sieben(parseDe((document.getElementById('av7h_basis') || {}).value) || 0, parseDe((document.getElementById('av7h_jahr') || {}).value) || 0, year).betrag : 0;
+    })(),
+    _av7h: (function () {
+      if (!window.AnlageVKern) return null;
+      var art = (document.getElementById('av7h_art') || {}).value, basis = parseDe((document.getElementById('av7h_basis') || {}).value) || 0;
+      var r = art ? AnlageVKern.sieben(basis, parseDe((document.getElementById('av7h_jahr') || {}).value) || 0, year) : null;
+      return r && r.betrag > 0 ? { art: art, satz: r.satz, basis: basis } : null;
+    })(),
+    /* v3800b · Zeile 86: Anteil Person A. Ehegatten gemeinsam und Zusammenveranlagung: eigener Anteil zu
+       Anteil Ehegatte (ohne Angabe haelftig, ELSTER-Hilfe Beispiel Familie Muster), sonst 100 %. */
+    av_zurechnung_a_pct: (function () {
+      try {
+        var o = (typeof Tax !== 'undefined' && Tax.optionen) ? (Tax.optionen(null, year) || {}) : {};
+        if (!o.splitting || (document.getElementById('eig_struktur') || {}).value !== 'ehegatten') return 100;
+        var a = parseDe((document.getElementById('eig_anteil_ich') || {}).value) || 0, b = parseDe((document.getElementById('eig_anteil_ehegatte') || {}).value) || 0;
+        return (a > 0 || b > 0) ? Math.round(a / (a + b) * 10000) / 100 : 50;
+      } catch (e) { return 100; }
+    })(),
+    av_fewo: 2, av_kurzfristig: 2,
+    _afaArt: (State._afaStempel ? { m: State._afaStempel.methode || 'linear', s: Number(State._afaStempel.satz) || 0 } : null),
+    _kaufjahr: (window.DealPilotAnteilig && DealPilotAnteilig.getBaseYear) ? DealPilotAnteilig.getBaseYear() : null,
     /* verteilte Erhaltung (§ 82b EStDV) je Ursprungsjahr: #san (2-5 Jahre) und geplante Sanierungen.
        Auskunft fuer die Zeilen der Anlage V, keine Eingabe, nicht in `fields`. */
     _erhV: (function () {
@@ -1823,7 +1895,7 @@ function _computeAutoForYear(yearIdx, year, teiljahr) {
   try {
     var _cut = window.State && State._v816cut;
     if (_cut && _cut.active && _cut.factor < 1 && _cut.cal === year) {
-      ['einnahmen_km', 'einnahmen_nk', 'nk_umlf', 'afa', '_afaLinear', '_afaSonder7b', 'sonst_bewegl_wg', 'anschaffungsnah', 'erhaltungsaufwand', 'av_garagen', '_zeUngeteilt', '_erhG']
+      ['einnahmen_km', 'einnahmen_nk', 'nk_umlf', 'afa', '_afaLinear', '_afaSonder7b', 'sonst_bewegl_wg', 'anschaffungsnah', 'erhaltungsaufwand', 'av_garagen', '_zeUngeteilt', '_zeGarage', '_erhG', 'av_andere_raeume', 'av_7h7i']
         .forEach(function (k) { if (typeof _autoOut[k] === 'number') _autoOut[k] *= _cut.factor; });
       if (_autoOut._erhV) Object.keys(_autoOut._erhV).forEach(function (k) { _autoOut._erhV[k] *= _cut.factor; });   /* v3800 */
     }
@@ -2178,6 +2250,43 @@ function _dpGbrFeststellungHtml(f) {
     + '</div>';
 }
 
+/* ═══ v3800b · VERBILLIGTE VERMIETUNG (§ 21 Abs. 2 EStG) ═══════════════════════════════════════
+   Quote aus _mieteQuote66 (warm gegen warm, R 21.3 Satz 2 EStR), Prognose fuer 50 bis unter 66 % nach
+   BMF 08.10.2004 Rz. 34 (js/anlage-v-kern.js verbilligt): je Jahr der Planung Einnahmen und Werbungskosten
+   mit den eigenen Angaben, Gebaeude-AfA nur linear (_afaLinear, ohne § 7b), ohne erhoehte Absetzungen
+   (av_7h7i), ohne Kuerzung. Ergebnis je Lauf gemerkt (Zeitleiste + Angaben), keine Rekursion. */
+var _dpVbCache = { schluessel: null, wert: null, aktiv: false };
+function _dpVerbilligt(year) {
+  if (!window.AnlageVKern || _dpVbCache.aktiv) return null;
+  var q = null; try { q = _mieteQuote66(); } catch (e) { return null; }
+  if (!q || q.stand !== 'ok' || !(q.quote < 66)) return q && q.stand === 'ok' ? { pct: 0, stufe: 'entgeltlich' } : null;
+  var rows = (window.State && State.cfRows) || [];
+  var key = rows.length + '|' + Math.round(q.quote * 100) + '|' + JSON.stringify(window._taxYearlyOverrides || {}) + '|' + (rows[0] && rows[0].nkm_y) + '|' + (rows[0] && rows[0].zy);
+  if (_dpVbCache.schluessel === key) return _dpVbCache.wert;
+  var jahre = [];
+  if (q.quote >= 50) {
+    _dpVbCache.aktiv = true;
+    try {
+      var WKF = ['schuldzinsen', 'kontofuehrung', 'bereitstellung', 'notar_grundschuld', 'vermittlung', 'finanz_sonst', 'nk_umlf', 'nk_n_umlf', 'betr_sonst',
+        'hausverwaltung', 'steuerber', 'porto', 'verw_sonst', 'fahrtkosten', 'verpflegung', 'hotel', 'inserat', 'gericht', 'telefon', 'sonst_kosten', 'sonst_bewegl_wg', 'anschaffungsnah', 'erhaltungsaufwand'];
+      rows.slice(0, 30).forEach(function (r, i) {
+        var a = _computeAutoForYear(i, r.cal, true), ev = function (f) { return Number(_getEffectiveValue(r.cal, f, a[f])) || 0; };
+        var ein = ev('einnahmen_km') + ev('einnahmen_nk'), wk = 0;
+        WKF.forEach(function (f) { wk += ev(f); });
+        var ov = _getYearOverride(r.cal, 'afa');
+        wk += (ov !== undefined) ? Number(ov) - (a._afaSonder7b || 0) : (a._afaLinear != null ? a._afaLinear : a.afa);
+        var av = {}; AnlageVKern.SCHLUESSEL.forEach(function (f) { if (f !== 'av_7h7i' && f !== 'av_kuerzung_pct') av[f] = ev(f); });
+        var w = AnlageVKern.wirkung(av, wk);
+        jahre.push({ ein: ein + w.ein, wk: wk + w.wk });
+      });
+    } catch (e) { jahre = []; }
+    finally { _dpVbCache.aktiv = false; }
+  }
+  var r = AnlageVKern.verbilligt({ quote: q.quote, jahre: jahre });
+  _dpVbCache.schluessel = key; _dpVbCache.wert = r;
+  return r;
+}
+
 function _computeYearTotal(year, yearIdx, vorgabe, ohneVortrag) {
   var auto = vorgabe ? {} : _computeAutoForYear(yearIdx, year, true);
   var fields = [
@@ -2240,11 +2349,23 @@ function _computeYearTotal(year, yearIdx, vorgabe, ohneVortrag) {
      ist jede Wirkung 0 - bitgleich zu vorher. Gespeicherter Satz (vorgabe): aus vorgabe.anlage_v. */
   var _avK = window.AnlageVKern, _avAuto = (vorgabe && vorgabe.anlage_v && typeof vorgabe.anlage_v === 'object') ? vorgabe.anlage_v : {};
   var _avWerte = {}, _avW = { ein: 0, wk: 0, kuerzung: 0 };
+  var _avVb = null;
   if (_avK) {
+    var _avAbh = { av_anteil_pct: 1, av_angeh_flag: 1, av_kuerzung_pct: 1 };
     _avK.SCHLUESSEL.forEach(function (f) {
+      if (!vorgabe && _avAbh[f]) return;
       _avWerte[f] = vorgabe ? (Number(_avAuto[f]) || 0) : (Number(_getEffectiveValue(year, f, auto[f] || 0)) || 0);
       values[f] = _avWerte[f];
     });
+    if (!vorgabe) {
+      /* v3800b · Vorschlaege, die von anderen Angaben abhaengen (die eigene Angabe schlaegt sie) */
+      var _wflA = _avWerte.av_wohnflaeche, _eigA = _avWerte.av_eigen_qm;
+      auto.av_anteil_pct = (_wflA > 0 && _eigA > 0 && _eigA < _wflA) ? Math.round((_wflA - _eigA) / _wflA * 10000) / 100 : 100;
+      auto.av_angeh_flag = _avWerte.av_angehoerige > 0 ? 1 : 2;
+      _avVb = _dpVerbilligt(year);
+      auto.av_kuerzung_pct = (_avVb && _avVb.pct) || 0;
+      ['av_anteil_pct', 'av_angeh_flag', 'av_kuerzung_pct'].forEach(function (f) { _avWerte[f] = Number(_getEffectiveValue(year, f, auto[f])) || 0; values[f] = _avWerte[f]; });
+    }
     _avW = _avK.wirkung(_avWerte, werbungskosten);
     einnahmen += _avW.ein;
     werbungskosten += _avW.wk;
@@ -2312,7 +2433,14 @@ function _computeYearTotal(year, yearIdx, vorgabe, ohneVortrag) {
        Kuerzung. Beim gespeicherten Satz aus anlage_v (_erhV/_erhG/_zeUngeteilt), sonst aus der Rechnung. */
     erhV: vorgabe ? (_avAuto._erhV || null) : (auto._erhV || null),
     erhG: vorgabe ? (Number(_avAuto._erhG) || 0) : (auto._erhG || 0),
-    zeUngeteilt: vorgabe ? (Number(_avAuto._zeUngeteilt) || 0) : (auto._zeUngeteilt || 0),
+    zeUngeteilt: vorgabe ? (Number(_avAuto._zeUngeteilt) || 0) : ((auto._zeGarage ? 0 : auto._zeUngeteilt) || 0),
+    /* v3800b · Einzelangaben, AfA-Art, Kaufjahr, §§ 7h/7i, verbilligte Vermietung (Auskunft fuer das Blatt) */
+    einheiten: vorgabe ? (_avAuto._einheiten || null) : (auto._einheiten || null),
+    afaArt: vorgabe ? (_avAuto._afa || null) : (auto._afaArt || null),
+    kaufjahr: vorgabe ? (Number(_avAuto._kj) || null) : (auto._kaufjahr || null),
+    av7h: vorgabe ? (_avAuto._av7h || null) : (auto._av7h || null),
+    verbilligt: vorgabe ? (_avAuto._vb ? { grund: String(_avAuto._vb) } : null)
+      : ((_avVb && _avVb.grund && Math.abs((_avWerte.av_kuerzung_pct || 0) - (_avVb.pct || 0)) < 0.005) ? _avVb : null),
     avKuerzung: _avW.kuerzung,
     refund: impact.refund,
     taxDelta: impact.taxDelta,
@@ -2626,6 +2754,8 @@ function _renderDetailForm(years) {
     sections.push({ title: '8.1 Anlage V · Teile der Einnahmen (eigene Zeile, Summe bleibt)', rows: _avG(['davon_km', 'davon_nk']) });
     sections.push({ title: '8.2 Anlage V · weitere Werbungskosten', rows: _avG(['wk']) });
     sections.push({ title: '8.3 Anlage V · Angaben ohne Wirkung auf die Summe, verbilligte Vermietung', rows: _avG(['info', 'kuerzung_pct', 'kuerzung_betrag']) });
+    /* v3800b · Zuordnungsart, Zurechnung, Ankreuzfelder */
+    sections.push({ title: '8.4 Anlage V · Zuordnung, Zurechnung, Ankreuzfelder', rows: _avG(['anteil_pct', 'zurechnung', 'flag']) });
   }
 
   sections.forEach(function(sec) {

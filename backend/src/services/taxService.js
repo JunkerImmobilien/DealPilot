@@ -17,6 +17,20 @@ function anlageV(o) {
   for (const [k, v] of Object.entries(o)) {
     if (/^av_[a-z0-9_]{1,40}$/.test(k) || k === '_erhG' || k === '_zeUngeteilt') {
       const n = safeNumeric(v); if (n !== null && n !== 0) out[k] = n;
+    } else if (k === '_kj') {
+      const n = safeNumeric(v); if (n && n > 1900 && n < 2200) out._kj = Math.round(n);
+    } else if (k === '_einheiten' && Array.isArray(v)) {
+      /* v3800b · Einzelangaben je Wohnung / Einheit: Bezeichnung, Flaeche, Miete je Monat, Gewerbe */
+      const e = v.slice(0, 60).filter((x) => x && typeof x === 'object').map((x) => ({
+        b: String(x.b == null ? '' : x.b).replace(/[<>]/g, '').slice(0, 40), q: safeNumeric(x.q) || 0, e: safeNumeric(x.e) || 0, g: x.g ? 1 : 0 }));
+      if (e.length) out._einheiten = e;
+    } else if (k === '_afa' && v && typeof v === 'object') {
+      const m = ['linear', 'degressiv', 'degressiv_wechsel'].includes(v.m) ? v.m : 'linear';
+      out._afa = { m, s: safeNumeric(v.s) || 0 };
+    } else if (k === '_av7h' && v && typeof v === 'object') {
+      if (v.art === '7h' || v.art === '7i') out._av7h = { art: v.art, satz: safeNumeric(v.satz) || 0, basis: safeNumeric(v.basis) || 0 };
+    } else if (k === '_vb' && typeof v === 'string') {
+      out._vb = v.replace(/[<>]/g, '').slice(0, 600);
     } else if (k === '_erhV' && v && typeof v === 'object') {
       const e = {};
       for (const [j, b] of Object.entries(v)) { const n = safeNumeric(b); if (/^\d{4}$/.test(j) && n) e[j] = n; }

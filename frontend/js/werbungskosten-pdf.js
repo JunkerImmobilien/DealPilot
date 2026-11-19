@@ -388,6 +388,10 @@ function _renderWerbungskostenPage(doc, year, yearIdx, W, H, M, CW, q) {
       else if (F.art === 'ein') _avEin.push([F.l, b, bem[k]]);
       else if (F.art === 'ein_minus') _avEin.push([F.l, -b, bem[k]]);
     });
+    var _avWi = AnlageVKern.wirkung(v, 0);
+    /* v3800b · verhaeltnismaessige Zuordnung: nicht abzugsfaehiger Teil aller Werbungskosten als eigene Zeile */
+    var _avM = ((totals.werbungskosten || 0) / ((_avWi.anteil || 100) / 100)) * (1 - (_avWi.anteil || 100) / 100);
+    if (_avM > 0.005) _avWk.push(['Nicht abzugsfähiger Anteil (verhältnismäßige Zuordnung)', -_avM, '']);
     if (_avWk.length) { if (cy > 230) { cy = _wkNeueSeite(doc, M, CW); } cy = _renderWkSection(doc, cy, M, CW, '7. Weitere Werbungskosten (Anlage V)', _avWk); }
     if (_avEin.length) { if (cy > 230) { cy = _wkNeueSeite(doc, M, CW); } cy = _renderWkSection(doc, cy, M, CW, 'Weitere Einnahmen (Anlage V, in den Einnahmen V+V enthalten)', _avEin); }
   }
@@ -1281,7 +1285,6 @@ function _renderAnlageVPage(doc, jahr, totals, q, W, H, M, CW) {
   doc.line(M + 28, cy - 2, M + CW, cy - 2);
   cy += 2;
   summe(R.summeEinnahmen.zeile, 'Summe der Einnahmen', R.summeEinnahmen.betrag);
-  if (totals.zeUngeteilt > 0.5) klein('Zusätzliche Einnahmen von ' + eur(totals.zeUngeteilt) + ' sind nicht aufgeteilt und stehen bei den Mieteinnahmen. Garagen, Stellplätze, Werbeflächen und Antennen gehören in eine eigene Zeile: im Reiter Miete unter „Zusätzliche Einnahmen › aufteilen“ eintragen.');
   cy += 3;
 
   /* ── 2 · Werbungskosten ── */
@@ -1311,6 +1314,10 @@ function _renderAnlageVPage(doc, jahr, totals, q, W, H, M, CW) {
   summe(R.ueberschuss.zeile, 'Überschuss (Einnahmen Zeile ' + R.summeEinnahmen.zeile + ' abzüglich Werbungskosten Zeile ' + R.summeWk.zeile + ')', R.ueberschuss.betrag,
     R.ueberschuss.betrag < 0 ? [176, 90, 84] : [46, 125, 80]);
   if (R.kuerzung) klein(R.kuerzung.text);
+  if (R.zurechnung) {   /* v3800b · Zeile 86 */
+    zeile(R.zurechnung.zeile, R.zurechnung.kz, 'Zurechnung: Person A (' + String(R.zurechnung.pct).replace('.', ',') + ' %)', R.zurechnung.a);
+    if (R.zurechnung.pct < 100) zeile(null, null, 'Person B (' + String(Math.round((100 - R.zurechnung.pct) * 100) / 100).replace('.', ',') + ' %)', R.zurechnung.b);
+  }
   cy += 3;
 
   /* ── 4 · weitere Angaben ── */

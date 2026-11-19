@@ -58,7 +58,7 @@ const taxRecordSchema = z.object({
   einnahmen_nk: z.number().nullable().optional(),
   /* v3800: weitere Angaben der Anlage V (frontend/js/anlage-v-kern.js) - Zahlen je Schluessel,
      dazu _erhV (Ursprungsjahr -> Betrag). Unbekannte Schluessel werden im Dienst verworfen. */
-  anlage_v: z.record(z.union([z.number(), z.record(z.number())])).nullable().optional()
+  anlage_v: z.record(z.any()).nullable().optional()   /* v3800b: auch _einheiten, _afa, _av7h, _vb - Pruefung im Dienst (anlageV) */
 });
 
 const bemerkungSchema = z.object({

@@ -1,10 +1,10 @@
 {
- "erzeugt_am": "2026-11-19T12:26:59.202Z",
+ "erzeugt_am": "2026-11-19T12:50:54.746Z",
  "quellen": {
   "voice-import": "a8a2e6dba58ea42c",
   "objektart-felder": "f7d9212555982a97",
-  "storage": "db2c591a78503b94",
-  "index-html": "8da1f1e0641042c7",
+  "storage": "bd159fca9a8ad4b3",
+  "index-html": "3d1e42bef06b6af9",
   "grest": "81f3fb0a4de3a6cf"
  },
  "daten": {
@@ -485,6 +485,9 @@
    "ze_sonst_monat",
    "ze_werb_monat",
    "ze_funk_monat",
+   "av7h_art",
+   "av7h_basis",
+   "av7h_jahr",
    "umlagef",
    "afa_satz",
    "afa_eigen",
@@ -1162,6 +1165,31 @@
     "id": "ze_funk_monat",
     "kind": "text",
     "label": "Antenne / Mobilfunk"
+   },
+   {
+    "id": "av7h_art",
+    "kind": "select",
+    "optionen": [
+     {
+      "wert": "7h",
+      "text": "§ 7h Sanierungsgebiet / Entwicklungsbereich"
+     },
+     {
+      "wert": "7i",
+      "text": "§ 7i Baudenkmal"
+     }
+    ],
+    "label": "Art"
+   },
+   {
+    "id": "av7h_basis",
+    "kind": "text",
+    "label": "Begünstigte Herstellungskosten laut Bescheinigung"
+   },
+   {
+    "id": "av7h_jahr",
+    "kind": "text",
+    "label": "Jahr der Herstellung (Abschluss der Maßnahme)"
    },
    {
     "id": "umlagef",

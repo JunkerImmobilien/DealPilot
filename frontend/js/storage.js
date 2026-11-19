@@ -79,7 +79,7 @@ var FIELDS = [
   // (Migration bei Load: alte kp_kueche-Werte werden in inv_kueche kopiert)
   'san','moebl','inv_kueche','inv_moebel','inv_geraete','inv_pv','inv_stellplatz','inv_sonst', /* V291-inventar-fields-applied */
   'brw','mea','gsfl','mietstg','wertstg','kostenstg','leerstand',
-  'btj','exit_bmy','nkm','ze','ze_stp_monat','ze_kueche_monat','ze_sonst_monat','ze_werb_monat','ze_funk_monat' /* v3670: Aufteilung von ze, v3800: + Werbeflaeche, Antenne */,'umlagef','afa_satz','afa_eigen','afa_eigen_grundlage','afa_rnd_jahre','geb_ant','zve','grenz',
+  'btj','exit_bmy','nkm','ze','ze_stp_monat','ze_kueche_monat','ze_sonst_monat','ze_werb_monat','ze_funk_monat' /* v3670: Aufteilung von ze, v3800: + Werbeflaeche, Antenne */,'av7h_art','av7h_basis','av7h_jahr' /* v3800b: §§ 7h, 7i */,'umlagef','afa_satz','afa_eigen','afa_eigen_grundlage','afa_rnd_jahre','geb_ant','zve','grenz',
   'ek','d1','d1z','d1t','d1_bindj','anschl_z','anschl_t','anschl_bj',
   'hg_ul','grundsteuer','grundsteuerwert' /* v3268: § 9 Nr. 1 S. 1 GewStG */,'ul_sonst','hg_nul','weg_r','weg_su' /* v3092 N100: Sonderumlagen, JSON */,'san_plan' /* v3214 N137: weitere Sanierungen, JSON */,'eigen_r',
   'mietausfall','mietausfall_alt' /* v3238: alter eigener Mietausfall (Euro), wenn Leerstand Vorrang bekam */,'nul_sonst','kp1','kp1l','kp2','kp2l','kp3','kp3l','kp4','kp4l',
@@ -655,6 +655,7 @@ function loadData(d) {
     'umlagef', 'ze',                              // Mieten-Aufschläge (calc.js Z.509)
     'ze_stp_monat', 'ze_kueche_monat', 'ze_sonst_monat',   // v3670: Aufteilung von ze - sonst erbt Objekt B die Teile von A
     'ze_werb_monat', 'ze_funk_monat',              // v3800: Werbeflaeche, Antenne/Mobilfunk (Teile von ze)
+    'av7h_art', 'av7h_basis', 'av7h_jahr',         // v3800b: erhoehte Absetzungen §§ 7h, 7i (sonst erbt Objekt B die Bescheinigung von A)
     'grundsteuer', 'ul_sonst',                    // BWK ul (calc.js Z.545)
     'eigen_r', 'mietausfall', 'mietausfall_alt' /* v3238 */, 'nul_sonst',        // BWK nul (calc.js Z.546)
     'weg_r',                                      // WEG-Rücklage (Info)
@@ -1345,6 +1346,12 @@ async function saveObj(opts) {
                 if (totals.erhV && Math.abs((v.erhaltungsaufwand || 0) - ((totals.auto || {}).erhaltungsaufwand || 0)) < 0.005) o._erhV = totals.erhV;   /* von Hand geaendert: Aufteilung unbekannt */
                 if (totals.erhG) o._erhG = totals.erhG;
                 if (totals.zeUngeteilt) o._zeUngeteilt = totals.zeUngeteilt;
+                /* v3800b · Einzelangaben, AfA-Art, Kaufjahr, §§ 7h/7i, verbilligte Vermietung */
+                if (totals.einheiten && totals.einheiten.length) o._einheiten = totals.einheiten.slice(0, 60);
+                if (totals.afaArt) o._afa = totals.afaArt;
+                if (totals.kaufjahr) o._kj = totals.kaufjahr;
+                if (totals.av7h) o._av7h = totals.av7h;
+                if (totals.verbilligt && totals.verbilligt.grund) o._vb = String(totals.verbilligt.grund).slice(0, 600);
                 return Object.keys(o).length ? o : null;
               })()
             };
