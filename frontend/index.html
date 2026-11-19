@@ -2514,7 +2514,7 @@ label.dp-required.qc-required::after {
       <div class="g3" style="margin-top:10px">
         <div class="f"><label for="av7h_art">Art</label><select id="av7h_art" onchange="calc()"><option value="">— keine —</option><option value="7h">§ 7h Sanierungsgebiet / Entwicklungsbereich</option><option value="7i">§ 7i Baudenkmal</option></select></div>
         <div class="f"><label for="av7h_basis">Begünstigte Herstellungskosten laut Bescheinigung</label><div class="iw"><span class="pfx">€</span><input id="av7h_basis" type="text" inputmode="decimal" placeholder="0" class="trl" oninput="calc()"></div></div>
-        <div class="f"><label for="av7h_jahr">Jahr der Herstellung (Abschluss der Maßnahme)</label><input id="av7h_jahr" type="text" inputmode="numeric" placeholder="JJJJ" class="tr" oninput="calc()"></div>
+        <div class="f"><label for="av7h_jahr">Jahr der Herstellung (Abschluss der Maßnahme)</label><input id="av7h_jahr" type="text" inputmode="numeric" maxlength="4" placeholder="JJJJ" style="text-align:right" oninput="calc()"><!-- Jahreszahl: ohne Tausenderformat (keine Klasse tr) --></div>
       </div>
       <span class="hint">Im Jahr der Herstellung und den folgenden sieben Jahren bis zu 9 %, in den folgenden vier Jahren bis zu 7 % (§ 7h bzw. § 7i Abs. 1 EStG). Voraussetzung ist die Bescheinigung der Gemeinde bzw. der Denkmalbehörde. Die begünstigten Kosten gehören nicht zusätzlich in die Gebäude-AfA. Je Jahr änderbar im Steuer-Detail unter 8.2.</span>
     </details>
@@ -4008,13 +4008,13 @@ label.dp-required.qc-required::after {
   <script src="js/finanzierung-validation.js?v=1"></script>
 <script src="js/data/foerderregister.js?v=v3072"></script>
   <script src="js/calc.js?v=v3760"></script>
-  <script src="js/zahlenfelder.js?v=v3023"></script>
+  <script src="js/zahlenfelder.js?v=v3800e"></script>
 <script src="js/d1-type-handler.js?v=161"></script>
 <script src="js/icons.js?v=166"></script>
 <script src="js/obj-numbering.js?v=166"></script>
 <script src="js/mietentwicklung.js?v=v3750a"></script>
 <script src="/vendor/cdn/xlsx/0.18.5/xlsx.full.min.js"></script>
-<script src="js/tax.js?v=v3800c"></script>
+<script src="js/tax.js?v=v3800e"></script>
 <script src="js/steuer-verlauf.js?v=v3273a"></script>
 <script src="js/pa-potenzial.js?v=v3710"></script><!-- v3323 · Pilot-Analyse: Reiter Potenzialanalyse -->
 <script src="js/hausverlauf.js?v=v3432"></script><!-- v3323 · Pilot-Analyse: Reiter Hausverlauf (WEG-Unterlagen chronologisch) · v3430 Haus je Jahr -->

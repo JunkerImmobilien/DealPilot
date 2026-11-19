@@ -46,7 +46,7 @@
 
   /* Nie formatieren: Jahreszahlen und Kennungen */
   var NIE = { baujahr: 1, modernis: 1, zb_fertig_jahr: 1, plz: 1, hnr: 1, flur: 1,
-              flurstueck: 1, kuerzel: 1, d1_auszahl: 1, d1_vertragsdatum: 1 };
+              flurstueck: 1, kuerzel: 1, d1_auszahl: 1, d1_vertragsdatum: 1, av7h_jahr: 1 /* v3800e: Jahr der Herstellung §§ 7h/7i */ };
   /* Felder in €/m² — das Praefix sagte nur „€" */
   var EUR_QM = { brw: 1, brw_manuell: 1, hinterland_eur_qm: 1, ds2_marktmiete: 1, me_soll: 1,
                  zb_markt_qm: 1, zb_vgl_qm: 1, zb_soll_qm: 1, zb_ziel_qm: 1 };

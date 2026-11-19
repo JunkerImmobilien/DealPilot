@@ -2749,7 +2749,7 @@ function _renderDetailForm(years) {
      Wirkung stehen in js/anlage-v-kern.js, die Zeile des Jahres im Tooltip. Nur Privatvermoegen. */
   if (window.AnlageVKern && !_dpBegriff().corp) {
     var _avG = function (arten) { return AnlageVKern.SCHLUESSEL.filter(function (k) { return arten.indexOf(AnlageVKern.FELDER[k].art) >= 0; })
-      .map(function (k) { helpTexts[k] = AnlageVKern.FELDER[k].hilfe || ''; return { f: k, l: AnlageVKern.FELDER[k].l + (AnlageVKern.FELDER[k].einheit && AnlageVKern.FELDER[k].einheit !== '€' ? ' (' + AnlageVKern.FELDER[k].einheit + ')' : '') }; }); };
+      .map(function (k) { helpTexts[k] = AnlageVKern.FELDER[k].hilfe || ''; return { f: k, l: AnlageVKern.FELDER[k].l + (AnlageVKern.FELDER[k].einheit && AnlageVKern.FELDER[k].einheit !== '€' && AnlageVKern.FELDER[k].l.indexOf('(' + AnlageVKern.FELDER[k].einheit + ')') < 0 ? ' (' + AnlageVKern.FELDER[k].einheit + ')' : '') }; }); };   /* v3800e: Einheit nicht doppelt */
     sections.push({ title: '8.0 Anlage V · weitere Einnahmen (ändern die Summe)', rows: _avG(['ein', 'ein_minus']) });
     sections.push({ title: '8.1 Anlage V · Teile der Einnahmen (eigene Zeile, Summe bleibt)', rows: _avG(['davon_km', 'davon_nk']) });
     sections.push({ title: '8.2 Anlage V · weitere Werbungskosten', rows: _avG(['wk']) });
