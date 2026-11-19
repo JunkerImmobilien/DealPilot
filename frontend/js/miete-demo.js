@@ -43,6 +43,7 @@
       '#dp-md .balken{display:flex;height:14px;border-radius:2px;overflow:hidden;margin:8px 0 4px}#dp-md .balken span{display:block}',
       '#dp-md .leg{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:11.5px;color:#7A7370}#dp-md .leg i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}',
       '#dp-md .haus{display:grid;gap:6px;margin-top:8px}#dp-md .dach{height:26px;background:linear-gradient(110deg,var(--wl-e8cc7a,#E8CC7A),var(--wl-c9a84c,#C9A84C) 55%,var(--wl-b8932f,#b8932f));clip-path:polygon(6% 100%,50% 0,94% 100%);opacity:.9}',
+      '#dp-md .etage-z{display:grid;grid-template-columns:34px minmax(0,1fr);gap:6px;align-items:stretch}#dp-md .etage-n{font:700 9.5px "JetBrains Mono",monospace;letter-spacing:1px;color:#6B645A;display:flex;align-items:center}',
       '#dp-md .etage{display:grid;gap:6px}',
       '#dp-md .whg{display:block!important;width:100%;min-width:0;white-space:normal;height:auto;border-radius:2px;padding:8px 9px;border:1.5px solid #E6E0D3;background:#fff;cursor:pointer;text-align:left;font:inherit;color:#2A2727;min-height:78px;position:relative}',
       '#dp-md .whg.sel{outline:2px solid var(--wl-c9a84c,#C9A84C);outline-offset:1px}',
@@ -121,18 +122,37 @@
       + '<div class="leg"><span><i style="background:#2A2727"></i>heute</span><span><i style="background:#3FA56C"></i>Mieterhöhung im Bestand</span><span><i style="background:var(--wl-c9a84c,#C9A84C)"></i>mehr bei Neuvermietung</span></div></div>';
   }
   var WORT = { pot: 'POTENZIAL', aus: 'AUSGEREIZT', ueb: 'ÜBER MIETSPIEGEL' };
+  function geschoss(t) {   /* v3880c · Rang und Name eines Geschosses aus freiem Text, null wenn nicht erkennbar */
+    var x = String(t || '').toLowerCase();
+    if (/\b(dg|dachgeschoss|dach|spitzboden|penthouse)\b/.test(x)) return { r: 100, name: 'DG' };
+    var m = /(\d+)\s*\.?\s*(og|obergeschoss|etage|stock)/.exec(x) || /(og|obergeschoss)\s*(\d+)/.exec(x);
+    if (m) { var n = parseInt(m[1], 10) || parseInt(m[2], 10) || 1; return { r: n, name: n + '. OG' }; }
+    if (/\b(og|obergeschoss)\b/.test(x)) return { r: 1, name: 'OG' };
+    if (/\b(eg|erdgeschoss|hochparterre|parterre)\b/.test(x)) return { r: 0, name: 'EG' };
+    if (/\b(ug|kg|untergeschoss|kellergeschoss|souterrain|keller)\b/.test(x)) return { r: -1, name: 'UG' };
+    return null;
+  }
   function karteHaus(D) {
     if (_sel >= D.W.length) _sel = 0;
-    var n = D.W.length, sp = n <= 2 ? n : (n % 3 === 0 ? 3 : 2), rows = [];
-    for (var i = 0; i < n; i += sp) rows.push(D.W.slice(i, i + sp));
-    rows.reverse();
+    /* v3880c · Marcel: „4 Wohnungen im EG, 3 im OG, 1 im DG, skaliert die Ansicht mit?" Bis hier nicht: feste 2er/3er-Reihen.
+       Jetzt eine Reihe je Geschoss (Feld Etage der Einheit, sonst aus der Lage gelesen), oben DG, unten Keller,
+       jede Reihe so breit wie ihre Wohnungszahl (ab 5 bricht sie um). Ohne erkennbares Geschoss: Reihen zu dritt, unten. */
+    var E = (window._dpMfh && Array.isArray(window._dpMfh.einheiten)) ? window._dpMfh.einheiten : [];
+    var gruppen = {}, ohne = [];
+    D.W.forEach(function (x) {
+      var e = E[x.i] || {}, t = String(e.etage || '') + ' ' + String(x.lage || ''), g = geschoss(t);
+      if (g == null) ohne.push(x); else { (gruppen[g.r] = gruppen[g.r] || { r: g.r, name: g.name, L: [] }).L.push(x); }
+    });
+    var rows = Object.keys(gruppen).map(function (k) { return gruppen[k]; }).sort(function (a, b) { return b.r - a.r; });
+    for (var i = 0; i < ohne.length; i += 3) rows.push({ r: -99, name: '', L: ohne.slice(i, i + 3) });
     var w = D.W[_sel];
     return '<div class="card dp-md-k">' + kopf('building', 'Das Haus', D.W.length + ' Wohnungen') + '<div class="satz">Jede Kachel ist eine Wohnung. Die Farbe zeigt den Spielraum der Miete. Klick wählt die Wohnung.</div>'
       + '<div class="haus"><div class="dach"></div>' + rows.map(function (r) {
-        return '<div class="etage" style="grid-template-columns:repeat(' + sp + ',minmax(0,1fr))">' + r.map(function (x) {
+        var sp = Math.min(4, r.L.length);
+        return '<div class="etage-z"><span class="etage-n">' + esc(r.name) + '</span><div class="etage" style="grid-template-columns:repeat(' + sp + ',minmax(0,1fr))">' + r.L.map(function (x) {
           var j = D.W.indexOf(x);
           return '<button type="button" class="whg s-' + x.st + (j === _sel ? ' sel' : '') + '" data-md-sel="' + j + '"><span class="st">' + WORT[x.st] + '</span><div class="n">Wohnung ' + esc(x.nr) + '</div><div class="m">' + (x.ist ? eur(x.ist) : 'leer') + '</div><div class="q">' + (x.istQ ? qm(x.istQ) + ', ' : '') + Math.round(x.wfl) + ' m²</div></button>';
-        }).join('') + '</div>';
+        }).join('') + '</div></div>';
       }).join('') + '<div class="boden"></div></div>'
       + '<div class="leg" style="margin-top:8px"><span><i style="background:#3FA56C"></i>Potenzial</span><span><i style="background:var(--wl-c9a84c,#C9A84C)"></i>ausgereizt</span><span><i style="background:#B8625C"></i>über dem Mietspiegel</span></div>'
       + '<div style="border-top:1px solid #F1ECE1;margin-top:12px;padding-top:10px"><div class="lbl">Gewählte Wohnung</div><h3 style="margin-top:2px">Wohnung ' + esc(w.nr) + (w.lage ? ', ' + esc(w.lage) : '') + '</h3>'
