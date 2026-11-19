@@ -557,7 +557,7 @@
     if (!key()) return '';
     if (!S.fertig) return '<div class="mba-zeile mba-leise">Abgleich mit dem Marktbericht wird gelesen …</div>';
     if (!S.bericht || S.nurIndikation) {
-      return '<div class="mba-zeile"><span>' + (S.bericht ? 'Bisher nur eine Marktpreisindikation — für den Abgleich mit amtlichen Werten fehlt ein Marktbericht Stufe 3.' : 'Noch kein Marktbericht zu diesem Objekt — mit ihm prüft DealPilot deine Angaben gegen amtliche Werte.')
+      return '<div class="mba-zeile"><span>' + (S.bericht ? 'Bisher nur eine Marktpreisindikation — für den Abgleich mit amtlichen Werten fehlt ein Marktbericht Stufe 3.' : 'Noch kein Marktbericht zu diesem Objekt. Mit ihm prüft DealPilot deine Angaben gegen amtliche Werte.')
         + '</span>' + knopfStufe3(S.bericht ? 'Marktbericht Stufe 3 erstellen' : 'Marktbericht erstellen') + '</div>';
     }
     var d = datum(S.zeile && S.zeile.created_at);

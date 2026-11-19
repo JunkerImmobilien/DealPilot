@@ -110,13 +110,13 @@
        erfuellt - Eingangstuer und Treppenhaus sind nur TEILE eines Elements („Fenster und Aussentueren“,
        „Innenausbau, z. B. Decken, Fussboeden, Treppen“) und tragen allein keine Punkte; alles andere
        ist kein Element der Anlage 2. Kosten zaehlen trotzdem (Zielbild, Umlage, Bank-PDF). */
-    { id: 'eingang',    t: 'Hauseingang/Außentüren', gewerk: null,       einheit: false, haus: true, hinweis: 'Teil von „Fenster und Außentüren“ (Anlage 2) — allein keine Punkte' },
-    { id: 'treppenhaus', t: 'Treppenhaus',        gewerk: null,          einheit: false, haus: true, hinweis: 'Teil des Innenausbaus (Anlage 2: Decken, Fußböden, Treppen) — allein keine Punkte' },
-    { id: 'geschossdecke', t: 'Dämmung oberste Geschossdecke/Kellerdecke', gewerk: null, einheit: false, haus: true, hinweis: 'kein eigenes Element der Anlage 2 — keine Punkte' },
-    { id: 'balkone',    t: 'Balkone/Loggien',     gewerk: null,          einheit: false, haus: true, hinweis: 'kein Element der Anlage 2 — keine Punkte' },
-    { id: 'aufzug',     t: 'Aufzug',              gewerk: null,          einheit: false, haus: true, hinweis: 'kein Element der Anlage 2 — keine Punkte' },
-    { id: 'pv',         t: 'Photovoltaik',        gewerk: null,          einheit: false, haus: true, hinweis: 'kein Element der Anlage 2 — keine Punkte' },
-    { id: 'aussenanlagen', t: 'Außenanlagen/Stellplätze', gewerk: null,  einheit: false, haus: true, hinweis: 'kein Element der Anlage 2 — keine Punkte' },
+    { id: 'eingang',    t: 'Hauseingang/Außentüren', gewerk: null,       einheit: false, haus: true, hinweis: 'Teil von „Fenster und Außentüren“ (Anlage 2), allein keine Punkte' },
+    { id: 'treppenhaus', t: 'Treppenhaus',        gewerk: null,          einheit: false, haus: true, hinweis: 'Teil des Innenausbaus (Anlage 2: Decken, Fußböden, Treppen), allein keine Punkte' },
+    { id: 'geschossdecke', t: 'Dämmung oberste Geschossdecke/Kellerdecke', gewerk: null, einheit: false, haus: true, hinweis: 'kein eigenes Element der Anlage 2, keine Punkte' },
+    { id: 'balkone',    t: 'Balkone/Loggien',     gewerk: null,          einheit: false, haus: true, hinweis: 'kein Element der Anlage 2, keine Punkte' },
+    { id: 'aufzug',     t: 'Aufzug',              gewerk: null,          einheit: false, haus: true, hinweis: 'kein Element der Anlage 2, keine Punkte' },
+    { id: 'pv',         t: 'Photovoltaik',        gewerk: null,          einheit: false, haus: true, hinweis: 'kein Element der Anlage 2, keine Punkte' },
+    { id: 'aussenanlagen', t: 'Außenanlagen/Stellplätze', gewerk: null,  einheit: false, haus: true, hinweis: 'kein Element der Anlage 2, keine Punkte' },
     { id: 'sonst',      t: 'Sonstiges',           gewerk: null,          einheit: true, haus: true }
   ];
 
@@ -370,7 +370,7 @@
     var z = [];
     z.push({ c: 'heute', t: 'Heute', v: ist > 0 ? eur(ist) + '/Monat' + qm(ist) : 'leer',
       u: f.mv_beginn ? 'Mietvertrag seit ' + deDatum(String(f.mv_beginn).slice(0, 10)) : '' });
-    if (!(ist > 0)) z.push({ c: 'soll', t: 'Mieterhöhung', v: '—', u: 'nicht vermietet — es zählt die Neuvermietung' });
+    if (!(ist > 0)) z.push({ c: 'soll', t: 'Mieterhöhung', v: '—', u: 'nicht vermietet, es zählt die Neuvermietung' });
     else if (so.vertrag) z.push({ c: 'soll', t: 'Mieterhöhung', v: vertragZeileV(so, ist, qm), u: vertragZeileU(so) });   /* v3244 */
     /* v3351 · Marcel 13.11.2026 (Westerfeldstr. 146, Whg. 1): Ist 590 € = 8,43 €/m², oberer Mietspiegelwert 8,43 -
        Grenze 590,10 €. Die 10 Cent galten als Erhöhung, die Leiter zeigte „auf 590 €, verlangbar ab sofort“ mit
@@ -683,7 +683,7 @@
       vBegr = 'gerechnet: ' + vgO.naeherung.rechnung;
     }
     var vHwU = vHw.filter(function (h) { return h && h !== vglHer; });
-    if (vglQm > 0) z.push({ k: 'Vergleichsmiete', v: eur2(vglQm) + '/m²' + (vMs ? ' · ' + vMs.wahl_text : ''),
+    if (vglQm > 0) z.push({ k: 'Vergleichsmiete', v: eur2(vglQm) + '/m²' + (vMs ? ', ' + vMs.wahl_text : ''),
       u: vglHer + (vBegr ? ' · ' + vBegr : '') + (vHwU.length ? ' · ' + vHwU.join(' · ') : ''),
       warn: vSchaetz || !!(vMs && (vMs.veraltet || vMs.art !== 'qualifiziert' || vMs.genutzt === 'oben')), lang: vHw.join(' · '),
       ms: vMs, quelle_art: vEig ? 'eigen' : (s.vgl_quelle_art || vgO.quelle_art || null) });
@@ -840,7 +840,7 @@
     var m = modell();
     var ort = wert('ort');
     var kopf = '<div class="ct ct-pro"><span class="ct-ico"><svg width="22" height="22"><use href="#i-doc"/></svg></span>Mietrecht an dieser Adresse'
-      + '<span class="oe-ct-hint">' + esc(ort || 'Ort fehlt') + ' · aus den Landesverordnungen</span></div>';
+      + '<span class="oe-ct-hint">' + esc(ort || 'Ort fehlt') + ', aus den Landesverordnungen</span></div>';
     if (m.art === 'mfh') {
       var W = m.wohnungen || [];
       /* v3062b · je Wohnung zwei Zeilen statt einer Tabelle: die Karte steht im Tab Miete in der
@@ -851,7 +851,7 @@
         var ziel = d.zeilen.filter(function (r) { return r.k === 'Zielmiete'; })[0];
         var istQm = w.ist > 0 && w.wfl > 0 ? eur2(w.ist / w.wfl) + '/m²' : (w.status === 'leer' ? 'leer' : 'ohne Miete');
         return '<div class="dp-mr-w' + (ziel && ziel.bad ? ' dp-mr-bad' : '') + '" data-dp-mr-whg="' + j + '" role="button" tabindex="0" title="Wohnung öffnen und ändern">'
-          + '<div class="dp-mr-w1"><b>' + esc(w.nr) + (w.lage ? ' · ' + esc(w.lage) : '') + '</b><span>' + istQm + '</span>'
+          + '<div class="dp-mr-w1"><b>Wohnung ' + esc(w.nr) + (w.lage ? ', ' + esc(w.lage) : '') + '</b><span>' + istQm + '</span>'
           + '<span class="dp-mr-w-v">' + esc(naechst ? naechst.v : 'keine Angabe') + '</span></div>'
           + '<div class="dp-mr-w2">' + esc(naechst && naechst.u ? kurzSaetze(naechst.u) : '')
           + (w.ziel_qm ? '<br>Zielmiete ' + eur2(w.ziel_qm) + '/m².' + (ziel && ziel.bad ? ' <b>Sie liegt über der Mietpreisbremse.</b> Höchstens ' + eur2(d.obergrenze) + '/m², außer nach § 556e oder § 556f BGB.'
@@ -3291,7 +3291,7 @@
     var s = el('ms_stand'); if (s && 'placeholder' in s) s.placeholder = v && zr.stand ? 'laut Verzeichnis ' + String(zr.stand).replace(/^(\d{4})-(\d{2}).*$/, '$2/$1') : '';
     var u = el('ms_url'); if (u && 'placeholder' in u) u.placeholder = v && zr.url ? 'laut Verzeichnis: ' + zr.url : 'https://…';
     var a = el('ms_art'), o = a && a.options && a.options[0];
-    if (o && o.value === '') o.text = v ? '— laut Verzeichnis: ' + zr.art + ' —' : '— nicht eingetragen —';
+    if (o && o.value === '') o.text = v ? 'laut Verzeichnis: ' + zr.art : 'nicht eingetragen';   /* v3840 */
     ['ms_unten', 'ms_mittel', 'ms_oben'].forEach(function (id, i) {
       var f = el(id); if (f && 'placeholder' in f) f.placeholder = v ? (zr.nutzung ? 'bitte aus dem Mietspiegel eintragen' : 'aus dem Mietspiegel') : ['z. B. 6,80', 'z. B. 7,60', 'z. B. 8,40'][i];
       if (f && 'title' in f) f.title = v && zr.nutzung ? zr.werte_hinweis : '';   /* v3266 · Fokus-Hinweis bei Speicherverbot/Vorbehalt */

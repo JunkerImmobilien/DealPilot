@@ -108,7 +108,7 @@
     if (eigen === 15 || eigen === 20) return { pct: eigen, herkunft: 'eigen', pruefen: false, text: 'Kappungsgrenze ' + eigen + ' % in 3 Jahren (eigene Angabe).' };
     var std = function (warum) {
       return { pct: 20, herkunft: 'auffang', pruefen: true,
-        text: 'Kappungsgrenze 20 % in 3 Jahren (§ 558 Abs. 3 BGB) — ' + warum + ', bitte prüfen.' };
+        text: 'Kappungsgrenze 20 % in 3 Jahren (§ 558 Abs. 3 BGB). ' + warum.charAt(0).toUpperCase() + warum.slice(1) + ', bitte prüfen.' };   /* v3840 · Punkt statt Gedankenstrich */
     };
     var f = gemeindeFinden(daten, ort);
     if (f.fehlt === 'liste') return std('die Liste der Landesverordnungen liegt nicht vor');

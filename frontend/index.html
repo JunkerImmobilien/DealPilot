@@ -1137,7 +1137,7 @@ label.dp-required.qc-required::after {
         <div id="mfh-einstieg" class="od-mfh" style="display:none"></div>
       </div>
       <div class="od-raster od-zustand">
-        <div class="f"><label class="dp-required" data-v236-required-set="1">Zustand der Wohnung <span class="ds2-tag" title="Investor Deal Score (DS2): Dieses Feld fließt in die Bewertung über 24 Kennzahlen ein. Ohne den Wert rechnet der Score an dieser Stelle nicht mit — er wird dann nicht geschätzt, sondern ausgelassen.">DS2</span> <button type="button" class="dp-tip" data-tip-id="tab1.ds2_zustand" tabindex="-1" aria-label="Hilfe zu Zustand der Wohnung"></button></label>
+        <div class="f"><label class="dp-required" data-v236-required-set="1">Zustand der Wohnung <span class="ds2-tag" title="Investor Deal Score (DS2): Dieses Feld fließt in die Bewertung über 24 Kennzahlen ein. Ohne den Wert rechnet der Score an dieser Stelle nicht mit. Er wird dann nicht geschätzt, sondern ausgelassen.">DS2</span> <button type="button" class="dp-tip" data-tip-id="tab1.ds2_zustand" tabindex="-1" aria-label="Hilfe zu Zustand der Wohnung"></button></label>
             <select id="ds2_zustand" onchange="if(typeof window._v234OnZustandChange==='function')window._v234OnZustandChange(this);if(typeof dpUpdateAll==='function')dpUpdateAll();else if(typeof renderDealScore2==='function')renderDealScore2()">
               <option value="">– bitte wählen –</option>
               <option value="neubau">Neubau / kernsaniert</option>
@@ -1157,7 +1157,7 @@ label.dp-required.qc-required::after {
           <option value="4">4 · gehoben</option>
           <option value="5">5 · stark gehoben</option>
         </select></div></div>
-        <div class="f"><label>Energieklasse <span class="ds2-tag" title="Investor Deal Score (DS2): Dieses Feld fließt in die Bewertung über 24 Kennzahlen ein. Ohne den Wert rechnet der Score an dieser Stelle nicht mit — er wird dann nicht geschätzt, sondern ausgelassen.">DS2</span> <button type="button" class="dp-tip" data-tip-id="tab1.energieklasse" tabindex="-1" aria-label="Hilfe zu Energieklasse"></button></label>
+        <div class="f"><label>Energieklasse <span class="ds2-tag" title="Investor Deal Score (DS2): Dieses Feld fließt in die Bewertung über 24 Kennzahlen ein. Ohne den Wert rechnet der Score an dieser Stelle nicht mit. Er wird dann nicht geschätzt, sondern ausgelassen.">DS2</span> <button type="button" class="dp-tip" data-tip-id="tab1.energieklasse" tabindex="-1" aria-label="Hilfe zu Energieklasse"></button></label>
             <select id="ds2_energie" onchange="if(typeof dpUpdateAll==='function')dpUpdateAll();else if(typeof renderDealScore2==='function')renderDealScore2()">
               <option value="">– keine Angabe –</option>
               <option value="A+">A+</option><option value="A">A</option><option value="B">B</option>
@@ -1686,7 +1686,7 @@ label.dp-required.qc-required::after {
         </div>
         <!-- V40: Markt-Faktor wird automatisch berechnet (KP / Jahres-NKM) -->
         <div class="f" style="margin-top:12px">
-          <label>Markt-Faktor (KP / Jahres-NKM) <span class="ds2-tag" title="Investor Deal Score (DS2): Dieses Feld fließt in die Bewertung über 24 Kennzahlen ein. Ohne den Wert rechnet der Score an dieser Stelle nicht mit — er wird dann nicht geschätzt, sondern ausgelassen.">DS2</span> <span class="hint" style="font-size:9.5px;font-weight:600;color:var(--gold);text-transform:uppercase;letter-spacing:0.04em">auto</span> <button type="button" class="dp-tip" data-tip-id="tab2.markt_faktor" tabindex="-1" aria-label="Hilfe zu Markt-Faktor"></button></label>
+          <label>Markt-Faktor (KP / Jahres-NKM) <span class="ds2-tag" title="Investor Deal Score (DS2): Dieses Feld fließt in die Bewertung über 24 Kennzahlen ein. Ohne den Wert rechnet der Score an dieser Stelle nicht mit. Er wird dann nicht geschätzt, sondern ausgelassen.">DS2</span> <span class="hint" style="font-size:9.5px;font-weight:600;color:var(--gold);text-transform:uppercase;letter-spacing:0.04em">auto</span> <button type="button" class="dp-tip" data-tip-id="tab2.markt_faktor" tabindex="-1" aria-label="Hilfe zu Markt-Faktor"></button></label>
           <div class="cf" id="qm_marktfaktor">—</div>
           <input type="hidden" id="ds2_marktfaktor" value="">
           <span class="hint">Wird automatisch berechnet aus Kaufpreis ÷ Jahres-Nettokaltmiete. Wert fließt in den DealScore 2.0 Upside-Score.</span>
@@ -1987,12 +1987,12 @@ label.dp-required.qc-required::after {
       <!-- V38: ds2_marktmiete + ds2_mietausfall verschoben aus Kennzahlen-Card -->
       <!-- V63.29: ✨-Buttons entfernt — KI-Recherche läuft über die KI-Mietpreis-Analyse-Box unten -->
       <div class="f">
-        <label>Marktmiete (€/m²) <span class="ds2-tag" title="Investor Deal Score (DS2): Dieses Feld fließt in die Bewertung über 24 Kennzahlen ein. Ohne den Wert rechnet der Score an dieser Stelle nicht mit — er wird dann nicht geschätzt, sondern ausgelassen.">DS2</span> <button type="button" class="dp-tip" data-tip-id="tab3.marktmiete" tabindex="-1" aria-label="Hilfe zu Marktmiete"></button></label>
+        <label>Marktmiete (€/m²) <span class="ds2-tag" title="Investor Deal Score (DS2): Dieses Feld fließt in die Bewertung über 24 Kennzahlen ein. Ohne den Wert rechnet der Score an dieser Stelle nicht mit. Er wird dann nicht geschätzt, sondern ausgelassen.">DS2</span> <button type="button" class="dp-tip" data-tip-id="tab3.marktmiete" tabindex="-1" aria-label="Hilfe zu Marktmiete"></button></label>
         <div class="iw"><span class="pfx">€</span><input id="ds2_marktmiete" type="text" inputmode="decimal" placeholder="9,00" class="trl" oninput="if(typeof dpUpdateAll==='function')dpUpdateAll();else if(typeof renderDealScore2==='function')renderDealScore2()"></div>
-        <span class="hint">Markt-üblich für die Region — wird mit Ist-Miete verglichen für Upside-Score.</span>
+        <span class="hint">Marktüblich für die Region. DealPilot vergleicht sie mit der Ist-Miete für den Upside-Score.</span>
       </div>
       <div class="f">
-        <label>Mietausfall-Risiko <span class="ds2-tag" title="Investor Deal Score (DS2): Dieses Feld fließt in die Bewertung über 24 Kennzahlen ein. Ohne den Wert rechnet der Score an dieser Stelle nicht mit — er wird dann nicht geschätzt, sondern ausgelassen.">DS2</span> <button type="button" class="dp-tip" data-tip-id="tab3.mietausfall_risiko" tabindex="-1" aria-label="Hilfe zu Mietausfall-Risiko"></button></label>
+        <label>Mietausfall-Risiko <span class="ds2-tag" title="Investor Deal Score (DS2): Dieses Feld fließt in die Bewertung über 24 Kennzahlen ein. Ohne den Wert rechnet der Score an dieser Stelle nicht mit. Er wird dann nicht geschätzt, sondern ausgelassen.">DS2</span> <button type="button" class="dp-tip" data-tip-id="tab3.mietausfall_risiko" tabindex="-1" aria-label="Hilfe zu Mietausfall-Risiko"></button></label>
         <select id="ds2_mietausfall" onchange="if(typeof dpUpdateAll==='function')dpUpdateAll();else if(typeof renderDealScore2==='function')renderDealScore2()">
           <option value="">– keine Angabe –</option>
           <option value="sehr_niedrig">Sehr niedrig (Leerstand unter 1,5 %)</option>
@@ -2033,17 +2033,17 @@ label.dp-required.qc-required::after {
       <div class="card" id="mv-objekt-karte" style="margin-bottom:14px">
         <div class="ct ct-pro"><span class="ct-ico"><svg width="22" height="22"><use href="#i-doc"/></svg></span>Mietvertrag
           <span class="oe-ct-hint" id="mv-objekt-hinweis">für dieses Objekt</span></div>
-        <div class="f"><label title="Die Vertragsform bestimmt, ob und wann erhöht werden darf. Staffel- und Indexmiete tragen ihren nächsten Termin schon im Vertrag — sie sind kein Potenzial, sondern ein Datum.">Vertragsart</label>
+        <div class="f"><label title="Die Vertragsform bestimmt, ob und wann erhöht werden darf. Staffel- und Indexmiete tragen ihren nächsten Termin schon im Vertrag. Sie sind kein Potenzial, sondern ein Datum.">Vertragsart</label>
           <div class="iw"><select id="mv_art"><option value="">– keine Angabe –</option></select></div></div>
         <div class="f"><label title="Seit wann das Mietverhältnis besteht. Bei Staffelmiete die Grundlage für die Stufen, bei Indexmiete für die Zwölfmonatsfrist.">Mietverhältnis seit</label>
           <div class="iw"><input id="mv_beginn" type="date"></div></div>
         <div class="f"><label title="Wann die Miete zuletzt erhöht wurde. Daran hängen die Kappungsgrenze und bei Indexmieten die Frist bis zur nächsten Anpassung.">Letzte Erhöhung</label>
           <div class="iw"><input id="mv_letzte_erhoehung" type="date"></div></div>
         <!-- v2545 · Hoehe der letzten Erhoehung: die Kappungsgrenze gilt auf die Miete drei Jahre vorher (§ 558 Abs. 3 BGB) -->
-        <div class="f"><label title="Um wie viel Euro im Monat die Miete bei der letzten Erhöhung gestiegen ist (bei mehreren in den letzten drei Jahren: die Summe, ohne Modernisierungsumlage und Betriebskosten). Die Kappungsgrenze gilt auf die Miete vor drei Jahren — ohne diese Angabe rechnet DealPilot den Spielraum zu groß.">Letzte Erhöhung um</label>
+        <div class="f"><label title="Um wie viel Euro im Monat die Miete bei der letzten Erhöhung gestiegen ist (bei mehreren in den letzten drei Jahren: die Summe, ohne Modernisierungsumlage und Betriebskosten). Die Kappungsgrenze gilt auf die Miete vor drei Jahren. Ohne diese Angabe rechnet DealPilot den Spielraum zu groß.">Letzte Erhöhung um</label>
           <div class="iw"><span class="pfx">€</span><input id="mv_letzte_erhoehung_betrag" type="text" inputmode="decimal" placeholder="€/Monat" class="trl"></div></div>
         <!-- v2660 · E2 · Restlaufzeit einer Mietabweichung am Einzelobjekt (ETW, EFH ohne Wohnungsliste) - dieselben Namen wie je Wohnung im MFH -->
-        <div class="f"><label title="Ist der Mietvertrag befristet, endet eine Abweichung der Miete vom Markt spätestens dann. Liegt die Ist-Miete mehr als 20 % über der marktüblichen Miete, rechnet der Ertragswert den Mehrertrag nur bis zu diesem Datum als besonderes Merkmal — ohne Datum nur als Szenario.">Befristet bis</label>
+        <div class="f"><label title="Ist der Mietvertrag befristet, endet eine Abweichung der Miete vom Markt spätestens dann. Liegt die Ist-Miete mehr als 20 % über der marktüblichen Miete, rechnet der Ertragswert den Mehrertrag nur bis zu diesem Datum als besonderes Merkmal. Ohne Datum nur als Szenario.">Befristet bis</label>
           <div class="iw"><input id="mv_befristet_bis" type="date"></div></div>
         <div class="f"><label title="Bis wann der Mieter auf seine Kündigung verzichtet hat. Wie bei der Befristung: so lange ist eine Miete über dem Markt gesichert und wird als besonderes Merkmal über diese Restlaufzeit angesetzt.">Kündigungsverzicht bis</label>
           <div class="iw"><input id="mv_kuendigungsverzicht_bis" type="date"></div></div>
@@ -2073,10 +2073,9 @@ label.dp-required.qc-required::after {
             <span class="me-incze-text">
               <strong>Erhöhung gilt auch für zusätzliche Einnahmen</strong>
               <span class="me-incze-desc">
-                Wenn aktiv, wachsen Stellplatz, Garage und sonstige zusätzliche Einnahmen
-                im selben Verhältnis wie die Nettokaltmiete. Standardmäßig (deaktiviert)
-                bleibt nur die NKM dynamisch — zusätzliche Einnahmen bleiben über alle
-                Jahre konstant.
+                Mit Haken wachsen Stellplatz, Garage und sonstige zusätzliche Einnahmen
+                im selben Verhältnis wie die Nettokaltmiete. Ohne Haken steigt nur die
+                Nettokaltmiete. Die zusätzlichen Einnahmen bleiben dann über alle Jahre gleich.
               </span>
             </span>
           </label>
@@ -2092,7 +2091,7 @@ label.dp-required.qc-required::after {
 
         <!-- MODUS B: Detail (Erhöhungs-Treppe wie in der Excel-Vorlage) -->
         <div id="me-block-detail" style="display:none">
-          <p class="hint">Diskrete Mieterhöhungen — z.B. bei Staffelmieten oder geplanten Anpassungen.</p>
+          <p class="hint">Einzelne Mieterhöhungen, zum Beispiel bei Staffelmieten oder geplanten Anpassungen.</p>
           <div class="g2">
             <div class="f"><label>Soll-Mietspiegel (€/m²)</label>
               <div class="iw"><span class="pfx">€</span><input id="me_soll" type="text" inputmode="decimal" step="0.10" placeholder="9,50" class="trl" oninput="calc()"></div>
@@ -2109,7 +2108,7 @@ label.dp-required.qc-required::after {
               <span class="hint">Gesamt über alle Erhöhungen verteilt</span>
             </div>
             <div class="f s2"><label>Entwicklungs-Opportunität <span class="ds2-tag" title="Geht in den Investor Deal Score 2.0">DS2</span></label><div class="cf" id="me_opp">—</div>
-              <span class="hint">Abstand deiner Ist-Kaltmiete zur Soll-Miete (Mietspiegel) oben. <b style="color:#3FA56C">Grün „Potenzial +X %“</b>: um so viel kann die Miete bis zum Mietspiegel steigen. <b style="color:#B8625C">Rot „über Mietspiegel“</b>: die Miete liegt schon darüber — kein Spielraum nach § 558 BGB.</span><!-- v3286 · bis v3285 „negativ = unter Markt“ mit negativer Zahl für Potenzial -->
+              <span class="hint">Abstand deiner Ist-Kaltmiete zur Soll-Miete aus dem Mietspiegel. <b style="color:#3FA56C">Grün „Potenzial +X %“</b>: um so viel kann die Miete bis zum Mietspiegel steigen. <b style="color:#B8625C">Rot „über Mietspiegel“</b>: die Miete liegt schon darüber. Nach § 558 BGB gibt es keinen Spielraum.</span><!-- v3286 · bis v3285 „negativ = unter Markt“ mit negativer Zahl für Potenzial -->
             </div>
           </div>
           <div id="me_table_wrap" style="margin-top:12px"></div>
@@ -2144,7 +2143,7 @@ label.dp-required.qc-required::after {
            laufenden Objekt (Bestand), nicht im eingefrorenen Ankauf-Stand. -->
       <div class="card" data-collapsible="zb-obj" data-collapse-title="Mieterhöhung und Zielbild (optional)" id="zb-karte" style="margin-top:14px">
         <div class="ct-row">
-          <div class="ct ct-pro" style="margin:0;border:none;padding:0"><span class="ct-ico"><svg width="14" height="14"><use href="#i-trend"/></svg></span>Mieterhöhung und Zielbild <span class="oe-ct-hint">optional · kann, nicht muss</span></div>
+          <div class="ct ct-pro" style="margin:0;border:none;padding:0"><span class="ct-ico"><svg width="14" height="14"><use href="#i-trend"/></svg></span>Mieterhöhung und Zielbild <span class="oe-ct-hint">freiwillig, kann, nicht muss</span></div>
         </div>
         <!-- v3710 · Marcel 18.11.2026: „Zielbild festlegen" erst per Haken - erst dann oeffnet sich der Rest der Karte.
              Der Haken wird mit dem Objekt gespeichert (storage.js FIELDS zb_aktiv). Ist schon etwas erfasst (Felder,
@@ -2156,18 +2155,18 @@ label.dp-required.qc-required::after {
         <!-- v2541: Jahr der Fertigstellung des Zielbilds (Pilot-Analyse, PDF, Karte im Tab Bewertung) - fuer Einzelobjekt und MFH -->
         <div class="g3" id="zb-jahr-zeile" style="margin:0 0 10px"><div class="f"><label title="In welchem Jahr ist das Zielbild erreicht (Umbau fertig, neu vermietet)? Leer: in Pilot-Analyse und PDF steht das Jahr als offen.">Zielbild fertig (Jahr)</label><div class="iw"><input id="zb_fertig_jahr" type="text" inputmode="numeric" maxlength="4" placeholder="z. B. 2028"></div></div>
           <!-- v2988: eigene marktuebliche Miete NACH den Massnahmen (Zielbild-Ertragswert, im Bericht „eigene Angabe") -->
-          <div class="f s2"><label title="Die marktübliche Miete der Wohnungen NACH den Maßnahmen (€/m², nicht die Wunschmiete). Leer: DealPilot nimmt sie aus der amtlichen Mietübersicht, wo diese nach Modernisierung staffelt (Minden-Lübbecke: Klasse nach Modernisierungspunkten); sonst bleibt der Ertragswert beim Mietband des Bestands. Im Bericht als „eigene Angabe“.">Marktübliche Miete nach Modernisierung (€/m²)</label><div class="iw"><span class="pfx">€</span><input id="zb_markt_qm" type="text" inputmode="decimal" placeholder="leer = amtlich bzw. Bestand" class="trl"></div></div></div>
+          <div class="f s2"><label title="Die marktübliche Miete der Wohnungen NACH den Maßnahmen (€/m², nicht die Wunschmiete). Leer: DealPilot nimmt sie aus der amtlichen Mietübersicht, wo diese nach Modernisierung staffelt (Minden-Lübbecke: Klasse nach Modernisierungspunkten). Sonst bleibt der Ertragswert beim Mietband des Bestands. Im Bericht als „eigene Angabe“.">Marktübliche Miete nach Modernisierung (€/m²)</label><div class="iw"><span class="pfx">€</span><input id="zb_markt_qm" type="text" inputmode="decimal" placeholder="leer = amtlich bzw. Bestand" class="trl"></div></div></div>
         <!-- v3246 · MIETSPIEGEL AM OBJEKT (Marcel 09.11.2026): das Register führt noch keine Mietspiegel-WERTE.
              Die Eingabe ist Quelle „Mietspiegel (eigene Eingabe aus dem Mietspiegel der Stadt)" und steht in der
              Rangfolge hinter der eigenen Vergleichsmiete und vor der Schätzung aus Angebotsmieten (potenzial.js
              objektVgl, Kern mietspiegelAus/mietspiegelWert). Gerechnet wird mit dem OBEREN Spannenwert, je Objekt
              umschaltbar (ms_wahl). Für ETW und MFH - deshalb ausserhalb von #zb-einzel. Felder in storage.js. -->
-        <div class="card-title" style="margin-top:4px">Mietspiegel <span class="oe-ct-hint">für die Mieterhöhung nach § 558 BGB · Werte aus dem Mietspiegel der Stadt</span></div>
+        <div class="card-title" style="margin-top:4px">Mietspiegel <span class="oe-ct-hint">die Grenze für eine Mieterhöhung nach § 558 BGB</span></div>
         <div class="g3" id="ms-zeile" style="margin:0 0 4px">
           <div class="f"><label title="Qualifiziert (§ 558d BGB): anerkannt nach wissenschaftlichen Grundsätzen, Vermutungswirkung zwei Jahre. Einfach (§ 558c BGB): ohne diese Vermutung.">Art des Mietspiegels</label><div class="iw"><select id="ms_art"><option value="">— nicht eingetragen —</option><option value="qualifiziert">qualifiziert (§ 558d BGB)</option><option value="einfach">einfach (§ 558c BGB)</option></select></div></div>
           <div class="f"><label title="Unterer Wert der Spanne für diese Wohnung (Baujahr, Größe, Lage).">Spanne unten (€/m²)</label><div class="iw"><span class="pfx">€</span><input id="ms_unten" type="text" inputmode="decimal" placeholder="z. B. 6,80" class="trl"></div></div>
           <div class="f"><label title="Mittelwert des Mietspiegelfelds.">Mittelwert (€/m²)</label><div class="iw"><span class="pfx">€</span><input id="ms_mittel" type="text" inputmode="decimal" placeholder="z. B. 7,60" class="trl"></div></div>
-          <div class="f"><label title="Oberer Wert der Spanne - trägt nur, wenn Ausstattung und Merkmale der Wohnung ihn rechtfertigen.">Spanne oben (€/m²)</label><div class="iw"><span class="pfx">€</span><input id="ms_oben" type="text" inputmode="decimal" placeholder="z. B. 8,40" class="trl"></div></div>
+          <div class="f"><label title="Oberer Wert der Spanne. Trägt nur, wenn Ausstattung und Merkmale der Wohnung ihn rechtfertigen.">Spanne oben (€/m²)</label><div class="iw"><span class="pfx">€</span><input id="ms_oben" type="text" inputmode="decimal" placeholder="z. B. 8,40" class="trl"></div></div>
           <div class="f"><label title="Stand des Mietspiegels (Monat/Jahr). Ein qualifizierter Mietspiegel, der älter als zwei Jahre ist, hat keine Vermutungswirkung mehr (§ 558d Abs. 2 und 3 BGB).">Stand</label><div class="iw"><input id="ms_stand" type="month"></div></div>
           <div class="f"><label title="Standard: oberer Spannenwert. Mittel- oder Unterwert wählen, wenn Ausstattung und Merkmale den oberen Wert nicht tragen.">Gerechnet mit</label><div class="iw"><select id="ms_wahl"><option value="">oberem Spannenwert (Standard)</option><option value="mittel">Mittelwert</option><option value="unten">unterem Spannenwert</option></select></div></div>
           <div class="f s2"><label>Link zum Mietspiegel (optional)</label><div class="iw"><input id="ms_url" type="url" placeholder="https://…"></div></div>
@@ -2175,10 +2174,10 @@ label.dp-required.qc-required::after {
         <div class="cf-hint" id="ms-hinweis" style="margin:0 0 12px"></div>
         <div id="zb-einzel">
           <!-- v3067 · oben steht die Mietleiter (potenzial.js objektLeiter); der Satz darunter bleibt als Erklärung -->
-          <p class="sec-desc" style="margin:0 0 12px;font-size:12px"><b>Soll-Miete</b> ist, was der jetzige Mieter nach normalen Mieterhöhungen zahlt — er bleibt wohnen. <b>Zielbild</b> ist, was nach deinem Umbau oder bei einem Mieterwechsel drin ist. Beides ist freiwillig. Score und Verkehrswert rechnen weiter mit dem Bestand; der Ertragswert je Stufe steht in der Pilot-Analyse und in beiden PDFs.</p>
+          <p class="sec-desc" style="margin:0 0 12px;font-size:12px"><b>Soll-Miete</b> ist, was der jetzige Mieter nach normalen Mieterhöhungen zahlt. Er bleibt wohnen. <b>Zielbild</b> ist, was nach deinem Umbau oder bei einem Mieterwechsel drin ist. Beides ist freiwillig. Score und Verkehrswert rechnen weiter mit dem Bestand. Den Ertragswert je Stufe zeigen die Pilot-Analyse und beide PDFs.</p>
           <div class="g3">
-            <div class="f"><label title="Eine belegte ortsübliche Vergleichsmiete (Gutachten, drei Vergleichswohnungen; § 558a BGB) - geht dem Mietspiegel oben vor. Leer: der Mietspiegel, sonst eine Schätzung aus der Marktmiete im Tab Miete abzüglich Abschlag (v3246).">Vergleichsmiete, belegt (€/m²)</label><div class="iw"><span class="pfx">€</span><input id="zb_vgl_qm" type="text" inputmode="decimal" placeholder="leer = Mietspiegel" class="trl"></div></div>
-            <div class="f"><label title="Eigene Angabe. Leer: DealPilot rechnet vor — bis zur Vergleichsmiete, höchstens Kappungsgrenze, frühestens 15 Monate nach der letzten Erhöhung.">Soll-Miete (Mieter bleibt, €/m²)</label><div class="iw"><span class="pfx">€</span><input id="zb_soll_qm" type="text" inputmode="decimal" placeholder="leer = gerechnet" class="trl"></div><div class="cf-hint" id="zb-soll-vorschlag"></div></div>
+            <div class="f"><label title="Eine belegte ortsübliche Vergleichsmiete (Gutachten, drei Vergleichswohnungen, § 558a BGB). Geht dem Mietspiegel oben vor. Leer: der Mietspiegel, sonst eine Schätzung aus der Marktmiete im Tab Miete abzüglich Abschlag (v3246).">Vergleichsmiete, belegt (€/m²)</label><div class="iw"><span class="pfx">€</span><input id="zb_vgl_qm" type="text" inputmode="decimal" placeholder="leer = Mietspiegel" class="trl"></div></div>
+            <div class="f"><label title="Eigene Angabe. Leer: DealPilot rechnet vor. Bis zur Vergleichsmiete, höchstens Kappungsgrenze, frühestens 15 Monate nach der letzten Erhöhung.">Soll-Miete (Mieter bleibt, €/m²)</label><div class="iw"><span class="pfx">€</span><input id="zb_soll_qm" type="text" inputmode="decimal" placeholder="leer = gerechnet" class="trl"></div><div class="cf-hint" id="zb-soll-vorschlag"></div></div>
             <div class="f"><label title="Leer: DealPilot rechnet verlangbar ab (ein Jahr nach der letzten Erhöhung, § 558 Abs. 1 BGB) und wirksam ab (Beginn des dritten Kalendermonats nach Zugang, § 558b Abs. 1 BGB).">Soll wirksam ab</label><div class="iw"><input id="zb_soll_ab" type="month"></div></div>
             <div class="f"><label title="Was nach Umbau oder Neuvermietung erzielbar ist.">Zielmiete (€/m²)</label><div class="iw"><span class="pfx">€</span><input id="zb_ziel_qm" type="text" inputmode="decimal" placeholder="z. B. 9,20" class="trl"></div></div>
             <div class="f s2"><label>Zielbild ab wann</label><div class="iw"><input id="zb_ziel_wann" type="text" placeholder="z. B. nach Sanierung 2027"></div></div>
@@ -4130,14 +4129,14 @@ label.dp-required.qc-required::after {
 <script src="js/feld-hilfe.js?v=v3073"></script>
 <script src="js/bgf-herleitung.js?v=v1446"></script>
 <script src="js/mfh-einheiten.js?v=v3750"></script>
-<script src="js/mfh-felder.js?v=v3247"></script><!-- v3003 · Objekt mit Einheiten: Erklaerkasten, Felder aus den Einheiten, Zustand des Gebaeudes -->
+<script src="js/mfh-felder.js?v=v3840b"></script><!-- v3003 · Objekt mit Einheiten: Erklaerkasten, Felder aus den Einheiten, Zustand des Gebaeudes -->
 <script src="js/wertangabe.js?v=v3003b"></script><!-- v3003a · eine Wertangabe: Marktwert/Verkehrswert + Herkunft statt Bankbewertung -->
 <script src="js/indexreihen.js?v=v3026"></script><!-- v3026 · VPI/Nettokaltmieten aus dem Server-Cache -->
 <script src="js/indexmiete.js?v=v3026"></script><!-- v3026 · Indexmiete § 557b BGB -->
-<script src="js/mietpotenzial-kern.js?v=v3356"></script><!-- v3075 · Kappung, Bremse, Termine, Soll-Miete: der reine Kern, vor potenzial.js -->
+<script src="js/mietpotenzial-kern.js?v=v3840b"></script><!-- v3075 · Kappung, Bremse, Termine, Soll-Miete: der reine Kern, vor potenzial.js -->
 <script src="js/miete-regel.js?v=v3845"></script><!-- v3845 · Neuvermietung ohne Mietpreisbremse 110/115/120 % (Einstellung, Vorgabe 120 %) -->
-<script src="js/potenzial.js?v=v3840"></script>
-<script src="js/mietvertrag-objekt.js?v=v3028b"></script>
+<script src="js/potenzial.js?v=v3840b"></script>
+<script src="js/mietvertrag-objekt.js?v=v3840b"></script>
 <script src="js/mieterhoehungen.js?v=v3840"></script><!-- v3362 · Mieterhöhungen als Liste (_erhoehungen, je Wohnung e.erhoehungen) -->
 <script src="js/hell-varianten.js?v=v1653e"></script>
 <script src="js/hybrid-aktionen.js?v=v3253"></script>
@@ -4200,7 +4199,7 @@ label.dp-required.qc-required::after {
 <script src="js/jahresabgleich.js?v=v3434"></script><!-- v3420 · Jahresabgleich im Bestand: erster Unterreiter der Pilot-Analyse (Miete, Steuer, Wert, Haus) · v3430 Demo Fassung 2 -->
 <script src="js/wert-zielbild.js?v=v3720"></script><!-- v2840 · Tab Bewertung: Segment „Wert &amp; Zielbild"; Pilot-Analyse: Einfach | Genau -->
 <script src="js/dealpilot-mb.js?v=v3800"></script>
-<script src="js/mb-abgleich.js?v=v3343"></script><!-- v3002 · Abgleich mit dem Marktbericht in den Reitern Objekt und Miete -->
+<script src="js/mb-abgleich.js?v=v3840b"></script><!-- v3002 · Abgleich mit dem Marktbericht in den Reitern Objekt und Miete -->
 <script src="js/mb-auftrag.js?v=v3253"></script>
   <script src="js/marktbericht-view.js?v=v3641"></script>
 <!-- V63.75: Selbstauskunft-PDF-Generator -->

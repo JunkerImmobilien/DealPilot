@@ -91,7 +91,7 @@
 
     h.style.display = '';
     h.textContent = ges
-      ? 'Bei einem Mehrfamilienhaus führen die Wohnungen ihre eigenen Verträge — '
+      ? 'Bei einem Mehrfamilienhaus führen die Wohnungen ihre eigenen Verträge. '
         + mit + ' von ' + ges + ' tragen schon eine Vertragsart. Diese Angabe hier '
         + 'gilt für das Haus als Ganzes (etwa bei Vermietung an einen Betreiber).'
       : 'Bei einem Mehrfamilienhaus gehören die Verträge zu den einzelnen '
@@ -205,7 +205,7 @@
     }).join('');
     var html = '<div class="mveu-kopf">' + esc(kopf) + '</div>'
       + '<div class="mveu-wrap"><table><thead><tr><th>Einheit</th><th>Vertrag</th><th>Mietbeginn</th><th>Letzte Anp.</th><th>Kaltmiete</th><th>Nächste Erhöhung</th></tr></thead><tbody>' + zeilen + '</tbody></table></div>'
-      + '<p class="hint" style="margin:8px 0 0">Bei erfassten Einheiten gelten deren Verträge – die Angaben für das Objekt als Ganzes bleiben gespeichert, rechnen aber nicht mit.</p>'
+      + '<p class="hint" style="margin:8px 0 0">Bei erfassten Einheiten gelten deren Verträge. Die Angaben für das Haus als Ganzes bleiben gespeichert, rechnen aber nicht mit.</p>'
       + '<div class="mveu-knopf"><button type="button" class="btn btn-outline btn-sm" data-mveu-erfassen="1">Einheiten bearbeiten</button></div>';
     if (!box) { box = document.createElement('div'); box.id = 'mv-einheiten-uebersicht'; karte.appendChild(box); }
     if (box._html !== html) { box.innerHTML = html; box._html = html; }

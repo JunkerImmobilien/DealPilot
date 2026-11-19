@@ -63,7 +63,7 @@
     if (an) {
       if (e.tagName === 'SELECT') { e.classList.add('mff-gesperrt'); e.setAttribute('tabindex', '-1'); e.setAttribute('aria-readonly', 'true'); }
       else { if (!e.hasAttribute('data-mff-ro')) e.setAttribute('data-mff-ro', e.readOnly ? '1' : '0'); e.readOnly = true; e.classList.add('mff-gesperrt'); }
-      e.title = 'Aus den erfassten Einheiten — im Einheiten-Dialog ändern';
+      e.title = 'Aus den erfassten Einheiten. Ändern in den Einheiten.';
       hinweisIn(id, ausText(text));   /* v3236 */
     } else {
       if (e.classList.contains('mff-gesperrt')) {
