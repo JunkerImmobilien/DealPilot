@@ -793,7 +793,7 @@
       '.dp-mr-teil>summary::after{content:"einklappen";margin-left:auto;font:400 11px Inter,sans-serif;color:#7A7370}',
       '.dp-mr-teil:not([open])>summary::after{content:"aufklappen"}',
       '.dp-mr-teil-satz{margin:2px 0 8px;font-size:12px;color:#6B6356;line-height:1.5}',
-      '[data-dp-mr-whg]{cursor:pointer}[data-dp-mr-whg]:hover{background:rgba(201,168,76,.06)}',
+      '[data-dp-mr-whg]{cursor:pointer}[data-dp-mr-whg]:hover{background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 6%, transparent)}',
       '.dp-mr-w{padding:8px 12px;border-top:1px solid #EFEBE3}',
       '.dp-mr-w:first-child{border-top:none}',
       '.dp-mr-w1{display:flex;gap:10px;align-items:baseline;font-size:12.5px}',
