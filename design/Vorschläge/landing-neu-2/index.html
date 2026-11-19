@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Landing Ideen</title>
+<meta name="description" content="Zehn Vorschläge für die Startseite von DealPilot, mit viel Bewegung. Nur Vorlage, nicht eingebaut.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@800;900&family=Martian+Mono:wght@400;600&family=Public+Sans:wght@400;500;600&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
+<style>
+:root{--ob:#050505;--g:#C9A84C;--gh:#E8CC7A;--gd:#b8932f;--gr:#3FA56C;--cr:#FDFCFA;--tx:#F3EEE2;--tx2:#b9b2a2;--tx3:#8a8476;--runway:linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#b8932f)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ob);color:var(--tx);font:16px/1.55 'Public Sans',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:inherit}
+.wrap{width:min(1240px,100% - 32px);margin-inline:auto}
+header{padding:56px 0 30px}
+.logo{display:inline-flex;align-items:center;gap:10px;font:700 19px 'Space Grotesk',sans-serif;text-decoration:none}
+.logo img{width:32px;height:32px;border-radius:8px}.logo b{color:var(--g)}
+.eye{margin-top:34px;font:600 11px 'Martian Mono',monospace;letter-spacing:.16em;text-transform:uppercase;color:var(--g)}
+h1{font:900 clamp(48px,8vw,112px)/.9 'Big Shoulders Display',sans-serif;text-transform:uppercase;margin:10px 0 18px;letter-spacing:.005em}
+h1 span{background:var(--runway);-webkit-background-clip:text;background-clip:text;color:transparent}
+.lead{max-width:70ch;color:var(--tx2);font-size:18px;margin:0}
+.meta{display:flex;flex-wrap:wrap;gap:8px 18px;margin-top:18px;font:400 12px 'Martian Mono',monospace;color:var(--tx3)}
+.raster{display:grid;grid-template-columns:repeat(2,1fr);gap:22px;padding:30px 0 80px}
+.kar{display:flex;flex-direction:column;border-radius:18px;overflow:hidden;background:linear-gradient(180deg,#121009,#0a0907);border:1px solid #221e15;text-decoration:none;
+  transition:transform .45s cubic-bezier(.34,1.56,.64,1),border-color .3s;opacity:0;transform:translateY(30px);animation:ein .8s cubic-bezier(.2,.8,.2,1) forwards;animation-delay:calc(var(--i) * 70ms)}
+@keyframes ein{to{opacity:1;transform:none}}
+.kar:hover{transform:translateY(-6px);border-color:rgba(232,204,122,.6)}
+.kar .bild{position:relative;display:block;aspect-ratio:16/10;overflow:hidden;background:#0d0c09}
+.kar img{width:100%;height:100%;object-fit:cover;object-position:top center;display:block;transition:transform 1s cubic-bezier(.2,.8,.2,1)}
+.kar:hover img{transform:scale(1.05)}
+.kar .leer{position:absolute;inset:0;display:grid;place-items:center;font:600 13px 'Martian Mono',monospace;color:var(--tx3)}
+.kar .nr{position:absolute;left:14px;bottom:10px;font:900 54px/1 'Big Shoulders Display',sans-serif;color:#fff;text-shadow:0 4px 24px rgba(0,0,0,.8)}
+.kar .tx{display:block;padding:20px 22px 24px}
+.kar .tx b{display:block;font:800 30px/1 'Big Shoulders Display',sans-serif;text-transform:uppercase;letter-spacing:.01em;margin-bottom:10px;color:var(--gh)}
+.kar .tx span{color:var(--tx2);font-size:15px}
+.kar .tx em{display:block;margin-top:14px;font:600 12px 'Martian Mono',monospace;font-style:normal;color:var(--gh)}
+.kar.folgt{opacity:.7}
+.trenner{grid-column:1/-1;margin:20px 0 0;font:600 11px 'Martian Mono',monospace;letter-spacing:.16em;color:var(--tx3);text-transform:uppercase;border-top:1px solid #221e15;padding-top:16px}
+footer{padding:30px 0 50px;border-top:1px solid #221e15;font:400 12px 'Martian Mono',monospace;color:var(--tx3)}
+@media(max-width:760px){.raster{grid-template-columns:1fr}.kar .nr{font-size:42px}}
+@media (prefers-reduced-motion: reduce){.kar{animation:none;opacity:1;transform:none}.kar,.kar img{transition:none}}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <a class="logo" href="../../../frontend/landing/index.html"><img src="../../../frontend/landing/assets/dealpilot-logo.png" alt="" width="32" height="32">Deal<b>Pilot</b></a>
+  <div class="eye">Landing neu · Runde 2 · 19.11.2026</div>
+  <h1>Zehn Ideen. <span>Viel Bewegung.</span></h1>
+  <p class="lead">Jede Idee ist eine voll gestaltete, scrollbare Startseite mit Hero, Video und Videothek, animierter Score-Karte, den neun Etappen, Datenbasis, Preisen, Fragen und Abschluss. In jeder steht die Botschaft „Einer reicht nicht. Zwei Scores.“ Nur Vorlage, nicht eingebaut.</p>
+  <p class="meta"><span>Score 87 · Investment 81 · Finanzierung 96</span><span>Zahlen aus register-stand.js und datenumfang.js</span><span>Ansichten mit Beispieldaten</span></p>
+</div></header>
+<main class="wrap raster">
+<p class="trenner">Ideen 01 bis 05</p>
+<a class="kar" href="idee-01.html" style="--i:0">
+  <span class="bild"><img src="vorschau/idee-01.jpg" alt="" loading="lazy" width="1440" height="900"><span class="nr">01</span></span>
+  <span class="tx"><b>Flug durch die Schrift</b><span>Das Hero-Video läuft in der Wortmarke DealPilot, beim Scrollen fliegt die Kamera durch den Strich des l, bis das Video den ganzen Schirm füllt. Im Score-Teil läuft das Cockpit-Video in einem Ring, der sich synchron zur Karte auf 87 füllt, die Videothek zieht als Filmstreifen vorbei. Die Etappen-Ziffern füllen sich mit Gold, daneben wischt die App-Ansicht kreisförmig auf.</span><em>Ansehen →</em></span></a>
+<a class="kar" href="idee-02.html" style="--i:1">
+  <span class="bild"><img src="vorschau/idee-02.jpg" alt="" loading="lazy" width="1440" height="900"><span class="nr">02</span></span>
+  <span class="tx"><b>Über den Wolken</b><span>Vier Wolkenebenen ziehen beim Scrollen verschieden schnell vorbei, das Hero-Video sitzt in einem Flugzeugfenster, dessen Rollo hochfährt und das aufzieht, bis du hindurchfliegst. Die Videothek ist eine Fensterreihe am Rumpf, beim Darüberfahren läuft der Film im Fenster an. Der Score bricht durch die Wolkendecke, zwei Instrumente schwingen auf 81 und 96, die Etappen sind eine Flugroute, die sich beim Scrollen zeichnet.</span><em>Ansehen →</em></span></a>
+<a class="kar" href="idee-03.html" style="--i:2">
+  <span class="bild"><img src="vorschau/idee-03.jpg" alt="" loading="lazy" width="1440" height="900"><span class="nr">03</span></span>
+  <span class="tx"><b>Hangar</b><span>Der Hero ist eine schräg im Raum liegende Wand aus echten App-Ansichten, die beim Scrollen flach auf dich zukippt, davor ein Monitor mit dem Runway-Video. Die Videothek ist ein Coverflow mit Spiegelung, Wischen und Pfeiltasten. Die Score-Karte liegt als Explosionszeichnung im Raum und setzt sich beim Scrollen Bauteil für Bauteil zusammen, die neun Etappen klappen als Kartenstapel nach oben weg.</span><em>Ansehen →</em></span></a>
+<a class="kar" href="idee-04.html" style="--i:3">
+  <span class="bild"><img src="vorschau/idee-04.jpg" alt="" loading="lazy" width="1440" height="900"><span class="nr">04</span></span>
+  <span class="tx"><b>Datenstrom</b><span>Tausende Goldpunkte rasen als Startbahn auf dich zu, sammeln sich zu Score-Ring und 87 und werden in diesem Moment zur echten Karte. Die Formel 81 mal 59 Prozent plus 96 mal 41 Prozent rattert wie eine Anzeigetafel, ein Regler zeigt, was mit dem Deal Score passiert, wenn die Finanzierung nicht trägt. Die Videothek ist eine Abflugtafel, die Etappen fahren quer über eine Startbahn.</span><em>Ansehen →</em></span></a>
+<a class="kar" href="idee-05.html" style="--i:4">
+  <span class="bild"><img src="vorschau/idee-05.jpg" alt="" loading="lazy" width="1440" height="900"><span class="nr">05</span></span>
+  <span class="tx"><b>Bauchgefühl gegen Flugdaten</b><span>Ein Wischregler teilt den Hero: links das Bauchgefühl verschwommen und schwankend mit flatternden Zetteln, rechts dieselbe Szene scharf mit Flugdaten. Im Score-Teil teilt sich die 87 wie eine Zelle in 81 und 96, daneben zittert eine nervöse Gefühlsnadel neben der ruhigen Karte. Der Spot läuft im Kinosaal mit neun anspringbaren Kapiteln, die Etappen werden beim Scrollen aufgewischt.</span><em>Ansehen →</em></span></a>
+<p class="trenner">Ideen 06 bis 10</p>
+<a class="kar" href="idee-06.html" style="--i:5">
+  <span class="bild"><img src="vorschau/idee-06.jpg" alt="" loading="lazy" width="1440" height="900"><span class="nr">06</span></span>
+  <span class="tx"><b>Abflugtafel</b><span>Die Startseite als Abflugtafel. Werte, Etappen und Status klappen als Split-Flap-Anzeige um, der Investor Deal Score steht als Flugstatus mit Segmentbalken.</span> <span>Beim Scrollen boardet jede Etappe auf der Tafel, die vorigen wechseln auf abgeflogen, daneben die passende Ansicht aus DealPilot.</span> <span>Die Videothek läuft auf Gate-Monitoren, der große Monitor spielt den Spot stumm, sobald er im Bild ist.</span><em>Ansehen →</em></span></a>
+<a class="kar" href="idee-07.html" style="--i:6">
+  <span class="bild"><img src="vorschau/idee-07.jpg" alt="" loading="lazy" width="1440" height="900"><span class="nr">07</span></span>
+  <span class="tx"><b>Cockpit-HUD</b><span>Vollbild-Video mit Head-up-Display. Horizont, Kursband und die Bänder für Score und amtliche Werte folgen der Maus.</span> <span>Der Score ist ein künstlicher Horizont mit Kreiselanlauf, darunter fünf Triebwerksanzeigen, deren Nadeln auf die Werte schwingen.</span> <span>Die Etappen fliegt ein Flugzeug auf dem Navigationsdisplay ab, die Videothek ist ein Multifunktionsdisplay mit Softkeys.</span><em>Ansehen →</em></span></a>
+<a class="kar" href="idee-08.html" style="--i:7">
+  <span class="bild"><img src="vorschau/idee-08.jpg" alt="" loading="lazy" width="1440" height="900"><span class="nr">08</span></span>
+  <span class="tx"><b>Magnetische Kacheln</b><span>Ein Bento-Raster, dessen Kacheln beim Laden einfliegen, mit Cursor-Licht, leichter Neigung und magnetischen Knöpfen.</span> <span>Die Score-Kachel teilt sich beim Überfahren in Investment-Score und Finanzierungs-Score. Einer reicht nicht.</span> <span>Etappen und Videos sind Kacheln, die sich öffnen, nach vorn springen und stumm anlaufen.</span><em>Ansehen →</em></span></a>
+<a class="kar" href="idee-09.html" style="--i:8">
+  <span class="bild"><img src="vorschau/idee-09.jpg" alt="" loading="lazy" width="1440" height="900"><span class="nr">09</span></span>
+  <span class="tx"><b>Exposé zerfällt in Daten</b><span>Ein Exposé liegt auf dem Tisch und zerfällt beim Scrollen in über tausend Datenpunkte.</span> <span>Die 24 Kennzahlen fliegen als Etiketten in ihre fünf Bereiche, die Teilchen formen den Ring bis 87, am Ende stehen die zwei Scores.</span> <span>Danach Kapitel im Magazin-Stil, deren Bilder sich aufziehen, und Videos als Heft-Ausgaben, die sich aufschlagen.</span><em>Ansehen →</em></span></a>
+<a class="kar" href="idee-10.html" style="--i:9">
+  <span class="bild"><img src="vorschau/idee-10.jpg" alt="" loading="lazy" width="1440" height="900"><span class="nr">10</span></span>
+  <span class="tx"><b>Startlauf</b><span>Scrollen ist Schub. Die Startbahn rast im Canvas auf dich zu, die Geschwindigkeit steigt, bei V1 und Rotate hebt die Seite ab.</span> <span>Der Score ist ein Triebwerksinstrument mit zwei Triebwerken für Investment und Finanzierung, denn mit einem startet kein Flugzeug.</span> <span>Die Etappen liegen auf einer Startbahn, deren Befeuerung mit dem Scrollen angeht. Am Ende Countdown und Abheben.</span><em>Ansehen →</em></span></a>
+</main>
+<footer><div class="wrap">Vorschläge für DealPilot · Junker Solution · Videos laden aus der Videothek von dealpilot.immo</div></footer>
+</body>
+</html>

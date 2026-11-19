@@ -1,0 +1,328 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DealPilot · Idee 04 · Datenstrom</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;800&family=Red+Hat+Text:wght@400;500;600&family=Azeret+Mono:wght@400;600&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="a-basis.css">
+<style>
+/* ═══ Idee 04 · Datenstrom ═══
+   Tausende Goldpunkte rasen als Startbahn auf dich zu (Canvas), sammeln sich zum Score-Ring und zur 87 und
+   werden in diesem Moment zur echten Karte. Die Formel 81 × 59 % + 96 × 41 % rattert wie eine Anzeigetafel,
+   ein Regler zeigt, was passiert, wenn die Finanzierung nicht traegt. Videothek als Abflugtafel. */
+:root{--fd:'Unbounded',sans-serif;--fb:'Red Hat Text',sans-serif;--fm:'Azeret Mono',monospace;--fs:'Unbounded',sans-serif}
+.a-h2{font-weight:600;font-size:clamp(28px,4vw,54px);letter-spacing:-.03em;line-height:1.06}
+.a-eye{font-size:11px}
+.sk{--fk:'Red Hat Text',sans-serif}.sk-zahl b{font-family:'Unbounded';font-weight:600;font-size:50px;letter-spacing:-.05em}
+.sk-titel{font-family:'Red Hat Text';font-weight:500}
+
+.h4-hero{position:relative;min-height:100vh;min-height:100svh;display:flex;align-items:center;padding:96px 0 60px;overflow:hidden}
+.h4-hero canvas{position:absolute;inset:0;width:100%;height:100%}
+.h4-hero::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(5,5,5,.9),rgba(5,5,5,.35) 50%,transparent),linear-gradient(0deg,#050505,transparent 22%);pointer-events:none}
+.h4-grid{position:relative;z-index:2;display:grid;grid-template-columns:1.05fr .95fr;gap:48px;align-items:center}
+.h4-hero h1{font-family:var(--fd);font-weight:800;font-size:clamp(30px,4.3vw,64px);line-height:1.02;letter-spacing:-.045em;margin:.35em 0}
+.h4-hero h1 .g{background:var(--run);-webkit-background-clip:text;background-clip:text;color:transparent}
+.h4-hero h1 [data-misch]{display:inline}
+.h4-hero .a-lead{color:#d3cbb9}
+.h4-ticker{display:flex;flex-wrap:wrap;gap:8px 26px;margin-top:28px;font-family:var(--fm);font-size:12px;color:var(--tx3)}
+.h4-ticker b{display:block;font-size:22px;color:var(--goldh);font-weight:600;font-variant-numeric:tabular-nums}
+.h4-knoepfe{display:flex;flex-wrap:wrap;gap:12px;margin-top:26px}
+.h4-karte .sk.vor{transform:none;opacity:0}
+.h4-karte .sk.auf{transition:opacity .9s}
+@media (max-width:960px){.h4-grid{grid-template-columns:1fr}.h4-hero::after{background:linear-gradient(180deg,rgba(5,5,5,.85),rgba(5,5,5,.3) 55%,#050505)}}
+
+/* Zwei Scores als Anzeigetafel */
+.h4-formel{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:12px;margin:46px 0 20px;font-family:var(--fm)}
+.h4-k{display:inline-flex;flex-direction:column;align-items:center;gap:8px}
+.h4-k small{font-size:10.5px;letter-spacing:.14em;color:var(--tx3);text-transform:uppercase}
+.h4-tafel{display:inline-flex;gap:4px}
+.h4-tafel i{position:relative;display:grid;place-items:center;width:clamp(34px,4.6vw,62px);height:clamp(48px,6.4vw,86px);border-radius:7px;background:linear-gradient(#1d1a14 50%,#141210 50%);box-shadow:inset 0 0 0 1px rgba(201,168,76,.25),0 10px 20px -10px #000;font-style:normal;font-size:clamp(24px,3.6vw,50px);font-weight:600;color:var(--goldh)}
+.h4-tafel i::after{content:"";position:absolute;left:0;right:0;top:50%;height:1px;background:rgba(0,0,0,.8)}
+.h4-tafel i.kipp{animation:h4Kipp .09s linear}
+@keyframes h4Kipp{50%{transform:rotateX(70deg)}}
+.h4-op{font-size:clamp(20px,2.6vw,36px);color:var(--tx3)}
+.h4-tafel.gesamt i{color:#140f02;background:var(--run)}
+.h4-tafel.gesamt i::after{background:rgba(0,0,0,.25)}
+.h4-spiel{max-width:760px;margin:40px auto 0;padding:26px;border-radius:20px;border:1px solid rgba(201,168,76,.22);background:linear-gradient(180deg,rgba(201,168,76,.06),transparent)}
+.h4-spiel label{display:flex;justify-content:space-between;gap:12px;font-family:var(--fm);font-size:12px;color:var(--tx2);letter-spacing:.06em}
+.h4-spiel input{width:100%;margin:18px 0;accent-color:var(--gold);height:28px}
+.h4-ergebnis{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;text-align:center}
+.h4-ergebnis div{padding:14px 6px;border-radius:14px;background:rgba(255,255,255,.03)}
+.h4-ergebnis b{display:block;font-family:var(--fd);font-weight:600;font-size:clamp(26px,3.4vw,40px);font-variant-numeric:tabular-nums}
+.h4-ergebnis span{font-family:var(--fm);font-size:10.5px;letter-spacing:.1em;color:var(--tx3);text-transform:uppercase}
+.h4-ergebnis em{display:inline-block;margin-top:6px;padding:2px 10px;border-radius:999px;font-style:normal;font-family:var(--fm);font-size:10.5px;letter-spacing:.1em;color:#fff;transition:background .3s}
+.h4-spiel p{margin:14px 0 0;color:var(--tx3);font-size:13px;text-align:center}
+
+/* Abflugtafel */
+.h4-board{display:grid;grid-template-columns:1.25fr 1fr;gap:28px;margin-top:40px;align-items:start}
+.h4-tab{border-radius:16px;overflow:hidden;background:#0d0c0a;box-shadow:inset 0 0 0 1px rgba(201,168,76,.22)}
+.h4-tab-kopf,.h4-zeile{display:grid;grid-template-columns:62px 1fr 74px 104px;gap:12px;align-items:center;padding:0 18px}
+.h4-tab-kopf{height:44px;font-family:var(--fm);font-size:10.5px;letter-spacing:.16em;color:var(--gold);border-bottom:1px solid rgba(201,168,76,.2)}
+.h4-zeile{width:100%;min-height:52px;border:0;border-bottom:1px solid rgba(255,255,255,.05);background:transparent;text-align:left;font-family:var(--fm);font-size:13px;color:var(--tx);transition:background .2s}
+.h4-zeile:hover,.h4-zeile:focus-visible,.h4-zeile.an{background:rgba(201,168,76,.1)}
+.h4-zeile .nr{color:var(--goldh)}
+.h4-zeile .ti{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:.02em}
+.h4-zeile .st{font-size:10.5px;letter-spacing:.12em;color:var(--gr)}
+.h4-zeile.an .st{color:var(--goldh);animation:h4Blink 1s steps(2) infinite}
+@keyframes h4Blink{50%{opacity:.3}}
+.h4-monitor{position:sticky;top:90px;border-radius:16px;overflow:hidden;background:#000;box-shadow:0 0 0 1px rgba(201,168,76,.35),0 40px 100px -40px rgba(201,168,76,.4)}
+.h4-monitor img{width:100%;aspect-ratio:16/9;object-fit:cover;transition:opacity .25s}
+.h4-monitor::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(0,0,0,.18) 0 1px,transparent 1px 3px);pointer-events:none}
+.h4-monitor .a-play{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%)}
+.h4-monitor-text{padding:18px 20px;background:#0d0c0a}
+.h4-monitor-text b{display:block;font-family:var(--fd);font-weight:600;font-size:20px;letter-spacing:-.02em}
+.h4-monitor-text span{color:var(--tx2);font-size:14.5px}
+.h4-monitor button.flaeche{position:absolute;inset:0;width:100%;aspect-ratio:16/9;height:auto;border:0;background:transparent;z-index:2}
+@media (max-width:900px){.h4-board{grid-template-columns:1fr}.h4-monitor{position:relative;top:0;order:-1}.h4-tab-kopf,.h4-zeile{grid-template-columns:44px 1fr 62px}.h4-tab-kopf span:last-child,.h4-zeile .st{display:none}}
+
+/* Startbahn quer */
+.h4-bahn{position:relative;height:calc(100vh + 9 * 46vw);}
+.h4-bahn-sticky{position:sticky;top:0;height:100vh;height:100svh;overflow:hidden;display:flex;flex-direction:column;justify-content:center}
+.h4-spur{display:flex;gap:28px;padding:0 max(16px,calc((100vw - 1200px)/2));will-change:transform}
+.h4-et{flex:0 0 min(560px,82vw);border-radius:20px;overflow:hidden;background:var(--ob3);box-shadow:0 0 0 1px rgba(201,168,76,.22);transition:transform .5s var(--ease),box-shadow .5s}
+.h4-et.an{transform:translateY(-10px);box-shadow:0 0 0 1px rgba(232,204,122,.7),0 30px 80px -30px rgba(201,168,76,.6)}
+.h4-et img{width:100%;aspect-ratio:16/9;object-fit:cover;object-position:top left}
+.h4-et .txt{padding:20px 22px 24px}
+.h4-et small{font-family:var(--fm);font-size:10.5px;letter-spacing:.14em;color:var(--gold);text-transform:uppercase}
+.h4-et h3{font-family:var(--fd);font-weight:600;letter-spacing:-.03em;font-size:clamp(19px,1.8vw,24px);margin:.4em 0}
+.h4-et p{color:var(--tx2);margin:0;font-size:15px}
+.h4-et button{margin-top:10px;background:none;border:0;padding:8px 0;color:var(--goldh);font-family:var(--fm);font-size:12px}
+.h4-lichter{display:flex;gap:18px;justify-content:center;margin-top:30px;padding:0 16px}
+.h4-lichter i{width:6px;height:6px;border-radius:50%;background:var(--goldh);opacity:.18;box-shadow:0 0 10px var(--gold);transition:opacity .3s}
+.h4-lichter i.an{opacity:1}
+.h4-bahn-kopf{padding:0 0 30px}
+@media (max-width:700px){.h4-bahn{height:calc(100vh + 9 * 86vw)}.h4-et p{font-size:14px}}
+@media (prefers-reduced-motion:reduce){.h4-bahn{height:auto}.h4-bahn-sticky{position:relative;height:auto}.h4-spur{flex-direction:column;padding:0 16px}.h4-et{flex-basis:auto}.h4-karte .sk.vor{opacity:1}}
+</style>
+</head>
+<body>
+<div id="a-nav"></div>
+
+<section class="h4-hero" id="top">
+  <canvas id="strom" aria-hidden="true"></canvas>
+  <div class="a-wrap h4-grid">
+    <div>
+      <div class="a-eye">Immobilien-Investmentanalyse</div>
+      <h1>Immobilien&shy;entscheidungen sind zu groß für <span class="g" data-misch>ein Bauchgefühl.</span></h1>
+      <p class="a-lead">DealPilot begleitet deine Immobilie vom ersten Exposé bis in den Bestand, mit vollständiger Rechnung, einem amtlich begründeten Wert und einem Investment Case, der bei der Bank besteht. Ab dann fliegst du nach Flugdaten.</p>
+      <div class="h4-knoepfe"><a class="a-btn" href="https://app.dealpilot.immo/?register=1">Vier Wochen als Pro, kostenlos</a><a class="a-btn-l" href="#videothek">Abflugtafel</a></div>
+      <div class="h4-ticker">
+        <div><b data-zaehl="1100360">0</b>amtliche Datenpunkte</div>
+        <div><b data-zaehl="24">0</b>KPIs je Score</div>
+        <div><b data-zaehl="201">0</b>Gutachterausschüsse</div>
+      </div>
+    </div>
+    <div class="h4-karte" id="karte"></div>
+  </div>
+</section>
+
+<section class="a-sec" id="score">
+  <div class="a-wrap a-ctr">
+    <div class="a-eye" data-rv>Pre-Flight · Etappe 03</div>
+    <h2 class="a-h2" data-rv="80">Einer reicht nicht. <span class="ac">Zwei Scores.</span></h2>
+    <p class="a-lead" data-rv="160">Dein Objekt kann gut sein, deine Finanzierung nicht. Darum rechnet DealPilot den Investment-Score und den Finanzierungs-Score getrennt und setzt den Investor Deal Score erst danach zusammen.</p>
+    <div class="h4-formel" id="formel">
+      <span class="h4-k"><span class="h4-tafel" data-z="81"></span><small>Investment</small></span><span class="h4-op">×</span>
+      <span class="h4-k"><span class="h4-tafel" data-z="59%"></span><small>Anteil</small></span><span class="h4-op">+</span>
+      <span class="h4-k"><span class="h4-tafel" data-z="96"></span><small>Finanzierung</small></span><span class="h4-op">×</span>
+      <span class="h4-k"><span class="h4-tafel" data-z="41%"></span><small>Anteil</small></span><span class="h4-op">=</span>
+      <span class="h4-k"><span class="h4-tafel gesamt" data-z="87"></span><small>Deal Score</small></span>
+    </div>
+    <div class="h4-spiel" data-rv>
+      <label for="fin"><span>Was, wenn die Finanzierung nicht trägt?</span><span>Finanzierungs-Score <b id="finw">96</b></span></label>
+      <input id="fin" type="range" min="0" max="100" value="96" aria-describedby="finh">
+      <div class="h4-ergebnis">
+        <div><b>81</b><span>Investment</span><br><em style="background:#3FA56C">GUT</em></div>
+        <div><b id="fin2">96</b><span>Finanzierung</span><br><em id="fins" style="background:#3FA56C">SEHR GUT</em></div>
+        <div><b id="ges">87</b><span>Deal Score</span><br><em id="gess" style="background:#3FA56C">SEHR GUT</em></div>
+      </div>
+      <p id="finh">Beispielrechnung mit denselben Anteilen wie oben. Dasselbe Objekt, nur die Finanzierung ändert sich.</p>
+    </div>
+  </div>
+</section>
+
+<section class="a-sec" id="videothek">
+  <div class="a-wrap">
+    <div class="a-eye" data-rv>Videothek</div>
+    <h2 class="a-h2" data-rv="80">Abflugtafel. <span class="ac">Wähl deinen Flug.</span></h2>
+    <div class="h4-board">
+      <div class="h4-tab" role="list">
+        <div class="h4-tab-kopf"><span>FLUG</span><span>ZIEL</span><span>DAUER</span><span>STATUS</span></div>
+        <div id="zeilen"></div>
+      </div>
+      <div class="h4-monitor" id="monitor"><img id="mbild" alt="" width="640" height="360"><span class="a-play"></span><button class="flaeche" id="mstart" aria-label="Video abspielen"></button><div class="h4-monitor-text"><b id="mtitel"></b><span id="msatz"></span></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="h4-bahn" id="etappen">
+  <div class="h4-bahn-sticky">
+    <div class="a-wrap h4-bahn-kopf"><div class="a-eye">So fliegt ein Deal</div><h2 class="a-h2" style="margin-bottom:0">Neun Etappen auf <span class="ac">einer Startbahn.</span></h2></div>
+    <div class="h4-spur" id="spur"></div>
+    <div class="h4-lichter" id="lichter" aria-hidden="true"></div>
+  </div>
+</section>
+
+<section class="a-sec">
+  <div class="a-wrap">
+    <div class="a-eye" data-rv>Datenbasis</div>
+    <h2 class="a-h2" data-rv="80">Über 1,1 Millionen amtliche Datenpunkte. <span class="ac">Laufend abgeglichen.</span></h2>
+    <p class="a-lead" data-rv="160">DealPilot rechnet nicht mit Schätzwerten aus dem Netz, sondern mit den Daten der Behörden, in eigenen Datenbanken, regelmäßig abgeglichen und mit Herkunft je Wert.</p>
+    <div id="a-daten"></div>
+  </div>
+</section>
+<section class="a-sec" id="preise"><div class="a-wrap"><div class="a-ctr"><div class="a-eye" data-rv>Preise</div><h2 class="a-h2" data-rv="80">Vier Pakete. <span class="ac">Ab 0 €.</span></h2></div><div id="a-preise"></div></div></section>
+<section class="a-sec" id="fragen"><div class="a-wrap"><div class="a-ctr"><div class="a-eye" data-rv>Fragen</div><h2 class="a-h2" data-rv="80">Kurz gefragt.</h2></div><div id="a-fragen"></div></div></section>
+<section class="a-sec a-schluss">
+  <div class="a-wrap">
+    <div class="a-eye">Pre-Flight · Check-in</div>
+    <h2 class="a-h2">Bereit für den <span class="ac">Take-off?</span></h2>
+    <p class="a-lead" style="margin-inline:auto">Dein Cockpit ist startklar. Kein Bauchgefühl mehr. Ab jetzt fliegst du nach Flugdaten.</p>
+    <p style="margin-top:28px"><a class="a-btn" href="https://app.dealpilot.immo/?register=1">Kostenlos starten</a></p>
+  </div>
+</section>
+<footer class="a-fuss" id="a-fuss"></footer>
+<div class="a-vorschlag">Vorschlag · Idee 04</div>
+
+<script src="a-daten.js"></script>
+<script src="a-basis.js"></script>
+<script>
+(function () {
+  var D = A_DATEN;
+  A.start();
+  var sk = A.scoreKarte(document.getElementById('karte'), { auto: false });
+
+  /* ═══ Datenstrom ═══ */
+  var cv = document.getElementById('strom'), cx = cv.getContext('2d'), hero = document.querySelector('.h4-hero');
+  var W, H, dpr, P = [], N, ziel = null, phase = 0, t0 = performance.now(), sichtbar = true;
+  function messen() {
+    dpr = Math.min(2, devicePixelRatio || 1); W = hero.clientWidth; H = hero.clientHeight;
+    cv.width = W * dpr; cv.height = H * dpr; cx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  var SPUREN = [-1.1, -.55, 0, .55, 1.1];
+  function neu(p, frisch) {
+    p.boden = Math.random() < .62;
+    p.x = p.boden ? SPUREN[Math.floor(Math.random() * 5)] + (Math.random() - .5) * .06 : (Math.random() - .5) * 3;
+    p.y = p.boden ? 1 : -1.2 + Math.random() * 1.9;
+    p.z = frisch ? Math.random() * 1 + .02 : 1; p.v = .004 + Math.random() * .006; p.vx = null;
+  }
+  function zielpunkte() {
+    /* Ring und "87" an der Stelle, an der die Karte ihren Ring zeichnet */
+    var k = sk.karte, war = k.classList.contains('vor'); k.classList.remove('vor');
+    var d = k.querySelector('.sk-dial').getBoundingClientRect(), h = hero.getBoundingClientRect();
+    if (war) k.classList.add('vor');
+    var mx = d.left + d.width / 2 - h.left, my = d.top + d.height / 2 - h.top, r = d.width * .425, pts = [];
+    var nRing = Math.round(N * .5);
+    for (var i = 0; i < nRing; i++) { var w = i / nRing * Math.PI * 2 * .872 - Math.PI / 2, rr = r + (Math.random() - .5) * 9; pts.push([mx + Math.cos(w) * rr, my + Math.sin(w) * rr]); }
+    var oc = document.createElement('canvas'), s = Math.round(d.width * .5); oc.width = s * 1.6; oc.height = s;
+    var o = oc.getContext('2d'); o.fillStyle = '#fff'; o.font = '700 ' + Math.round(s * .78) + 'px Unbounded, sans-serif'; o.textAlign = 'center'; o.textBaseline = 'middle'; o.fillText('87', oc.width / 2, s / 2);
+    var px = o.getImageData(0, 0, oc.width, oc.height).data, ziff = [];
+    for (var y = 0; y < oc.height; y += 2) for (var x = 0; x < oc.width; x += 2) if (px[(y * oc.width + x) * 4 + 3] > 128) ziff.push([mx - oc.width / 2 + x, my - s / 2 + y - 6]);
+    for (var j = 0; j < Math.round(N * .3); j++) pts.push(ziff[Math.floor(Math.random() * ziff.length)] || [mx, my]);
+    return pts;
+  }
+  var gestartet = false;
+  function start() {
+    if (gestartet) return; gestartet = true;
+    messen(); N = innerWidth < 700 ? 800 : 2200;
+    for (var i = 0; i < N; i++) { var p = {}; neu(p, true); P.push(p); }
+    if (A.rm) { zeichne(performance.now(), true); sk.spiel(); return; }
+    requestAnimationFrame(schleife);
+    setTimeout(function () { ziel = zielpunkte(); phase = 1; P.forEach(function (p, i) { p.ziel = ziel[i] || null; p.f = 0; }); }, 2600);
+    setTimeout(function () { phase = 2; sk.spiel(); }, 4600);
+  }
+  function projiziere(p) { var f = 1 / p.z, hz = H * .4; return [W * .64 + p.x * W * .045 * f, hz + p.y * H * .03 * f, Math.min(4, .6 + f * .12)]; }
+  function zeichne(t, statisch) {
+    cx.clearRect(0, 0, W, H);
+    var gl = cx.createRadialGradient(W * .64, H * .4, 0, W * .64, H * .4, W * .35);
+    gl.addColorStop(0, 'rgba(232,204,122,' + (phase === 2 ? .08 : .18) + ')'); gl.addColorStop(1, 'rgba(232,204,122,0)');
+    cx.fillStyle = gl; cx.fillRect(0, 0, W, H);
+    var pal = ['#E8CC7A', '#C9A84C', '#fff3cf', '#b8932f'];
+    cx.lineCap = 'round';
+    for (var i = 0; i < P.length; i++) {
+      var p = P[i], alt = projiziere(p);
+      if (!statisch) { p.z -= p.v * (1 + (1 - p.z) * 1.5); if (p.z < .035) { neu(p); continue; } }
+      var q = projiziere(p), x = q[0], y = q[1], g = q[2], a = Math.min(1, (1 - p.z) * 1.4), x0 = alt[0], y0 = alt[1];
+      if (p.ziel && phase >= 1) {
+        p.f = Math.min(1, p.f + .016 + (i % 7) * .002); var e = A.easeIO(p.f);
+        x = x + (p.ziel[0] - x) * e; y = y + (p.ziel[1] - y) * e; x0 = x0 + (p.ziel[0] - x0) * e; y0 = y0 + (p.ziel[1] - y0) * e; g = g + (1.8 - g) * e; a = Math.max(a, e);
+        if (phase === 2) { p.aus = Math.min(1, (p.aus || 0) + .02); a *= 1 - p.aus; if (p.aus >= 1) p.ziel = null; }
+      } else if (phase === 2) a *= .5;
+      if (x < -20 || x > W + 20 || y > H + 20 || y < -20 || a <= .01) continue;
+      cx.globalAlpha = a; cx.strokeStyle = pal[i & 3]; cx.lineWidth = g;
+      cx.beginPath(); cx.moveTo(x0, y0); cx.lineTo(x + .01, y + .01); cx.stroke();
+    }
+    cx.globalAlpha = 1;
+  }
+  function schleife(t) { if (sichtbar) zeichne(t); requestAnimationFrame(schleife); }
+  new IntersectionObserver(function (es) { sichtbar = es[0].isIntersecting; }).observe(hero);
+  addEventListener('resize', function () { messen(); if (phase >= 1) { ziel = zielpunkte(); P.forEach(function (p, i) { if (p.ziel) p.ziel = ziel[i]; }); } });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(start); setTimeout(start, 1200);
+
+  /* Ueberschrift: Zeichen entmischen */
+  var m = document.querySelector('[data-misch]'), ziel2 = m.textContent, zeichen = 'ABCDEFGHKLMNPRSTUVWXYZ0123456789%€';
+  if (!A.rm) { var n = 0, iv = setInterval(function () { n++; m.textContent = ziel2.split('').map(function (c, i) { return c === ' ' || i < n / 2 ? c : zeichen[Math.floor(Math.random() * zeichen.length)]; }).join(''); if (n / 2 > ziel2.length) { clearInterval(iv); m.textContent = ziel2; } }, 40); }
+
+  /* ═══ Anzeigetafel ═══ */
+  function tafel(el, text, verz) {
+    el.innerHTML = text.split('').map(function () { return '<i>0</i>'; }).join('');
+    var is = el.querySelectorAll('i');
+    if (A.rm) { is.forEach(function (x, i) { x.textContent = text[i]; }); return; }
+    is.forEach(function (x, i) {
+      var k = 0, max = 10 + i * 5 + verz;
+      var iv = setInterval(function () { k++; x.classList.remove('kipp'); void x.offsetWidth; x.classList.add('kipp'); x.textContent = k >= max ? text[i] : '0123456789'[Math.floor(Math.random() * 10)]; if (k >= max) clearInterval(iv); }, 60);
+    });
+  }
+  A.einmal(document.getElementById('formel'), function (f) { f.querySelectorAll('.h4-tafel').forEach(function (t, i) { tafel(t, t.dataset.z, i * 6); }); }, .5);
+
+  /* Regler: Gesamt aus denselben Gewichten (59,25 / 40,75), Stufen wie ScoreTier (85 / 70 / 50 / 35) */
+  function stufe(v) { return v >= 85 ? ['SEHR GUT', '#3FA56C'] : v >= 70 ? ['GUT', '#3FA56C'] : v >= 50 ? ['SOLIDE', '#b8932f'] : v >= 35 ? ['SCHWACH', '#B8625C'] : ['KRITISCH', '#B8625C']; }
+  var fin = document.getElementById('fin');
+  fin.addEventListener('input', function () {
+    var f = +fin.value, g = Math.round((D.score.investment.roh * D.score.investment.gewicht + f * D.score.finanzierung.gewicht) / (D.score.investment.gewicht + D.score.finanzierung.gewicht));
+    if (f === 96) g = 87;
+    document.getElementById('finw').textContent = f; document.getElementById('fin2').textContent = f; document.getElementById('ges').textContent = g;
+    var s1 = stufe(f), s2 = stufe(g), a = document.getElementById('fins'), b = document.getElementById('gess');
+    a.textContent = s1[0]; a.style.background = s1[1]; b.textContent = s2[0]; b.style.background = s2[1];
+  });
+
+  /* ═══ Abflugtafel ═══ */
+  var zeilen = document.getElementById('zeilen');
+  zeilen.innerHTML = D.videos.map(function (v, i) { return '<button class="h4-zeile" role="listitem" data-i="' + i + '"><span class="nr">' + (v.nr === 'Spot' ? 'DP-S' : 'DP-' + v.nr) + '</span><span class="ti" data-t="' + A.esc(v.titel.toUpperCase()) + '">' + A.esc(v.titel.toUpperCase()) + '</span><span>' + A.dauer(v.dauer) + '</span><span class="st">BOARDING</span></button>'; }).join('');
+  var aktiv = 0, zs = zeilen.querySelectorAll('.h4-zeile');
+  function zeige(i) {
+    aktiv = i; var v = D.videos[i], b = document.getElementById('mbild');
+    b.style.opacity = 0; setTimeout(function () { b.src = D.poster + v.poster; b.style.opacity = 1; }, 120);
+    document.getElementById('mtitel').textContent = v.titel; document.getElementById('msatz').textContent = v.satz + ' ' + (v.nr === 'Spot' ? 'Spot' : 'Video ' + v.nr) + ', ' + A.dauer(v.dauer) + '.';
+    zs.forEach(function (z, j) { z.classList.toggle('an', j === i); });
+  }
+  zs.forEach(function (z, i) { z.addEventListener('mouseenter', function () { zeige(i); }); z.addEventListener('focus', function () { zeige(i); }); z.addEventListener('click', function () { A.spiele(D.videos[i].id); }); });
+  document.getElementById('mstart').onclick = function () { A.spiele(D.videos[aktiv].id); };
+  zeige(0);
+  A.einmal(zeilen, function () {
+    if (A.rm) return;
+    zs.forEach(function (z, j) {
+      var t = z.querySelector('.ti'), ziel = t.dataset.t, k = 0;
+      var iv = setInterval(function () { k++; t.textContent = ziel.split('').map(function (c, i) { return c === ' ' || i < k - j * 2 ? c : zeichen[Math.floor(Math.random() * 26)]; }).join(''); if (k - j * 2 > ziel.length) { clearInterval(iv); t.textContent = ziel; } }, 28);
+    });
+  }, .3);
+
+  /* ═══ Startbahn quer ═══ */
+  var spur = document.getElementById('spur');
+  spur.innerHTML = D.etappen.map(function (e) { return '<article class="h4-et"><img src="' + D.L + 'assets/dp-strecke/' + e[4] + '" alt="Ansicht aus DealPilot: ' + e[2] + '" loading="lazy" width="1600" height="900"><div class="txt"><small>Etappe ' + e[0] + ' · ' + e[1] + '</small><h3>' + e[2] + '</h3><p>' + e[3] + '</p>' + (e[5] ? '<button data-video="' + e[5] + '">▶ Video ansehen</button>' : '') + '</div></article>'; }).join('');
+  document.getElementById('lichter').innerHTML = D.etappen.map(function () { return '<i></i>'; }).join('');
+  var bahn = document.getElementById('etappen'), ets = spur.querySelectorAll('.h4-et'), li = document.querySelectorAll('#lichter i'), lauf = false;
+  function quer() {
+    lauf = false;
+    var R = bahn.getBoundingClientRect(), p = Math.max(0, Math.min(1, -R.top / (bahn.offsetHeight - innerHeight)));
+    var weg = spur.scrollWidth - innerWidth; spur.style.transform = 'translateX(' + (-p * weg).toFixed(1) + 'px)';
+    var a = Math.round(p * (ets.length - 1));
+    ets.forEach(function (e, i) { e.classList.toggle('an', i === a); }); li.forEach(function (l, i) { l.classList.toggle('an', i <= a); });
+  }
+  if (!A.rm) { addEventListener('scroll', function () { if (!lauf) { lauf = true; requestAnimationFrame(quer); } }, { passive: true }); quer(); }
+})();
+</script>
+</body>
+</html>

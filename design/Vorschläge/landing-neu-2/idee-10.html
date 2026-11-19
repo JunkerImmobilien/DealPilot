@@ -1,0 +1,408 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Startlauf · Idee 10</title>
+<meta name="description" content="Landing-Vorschlag 10: Scrollen ist der Startlauf. Die Geschwindigkeit steigt, bei Rotate hebt die Seite ab. Score als zwei Triebwerke.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;500;600;800&family=Space+Grotesk:wght@700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="b-basis.css">
+<style>
+/* Typografie Idee 10: Startbahn-Markierung. Hohe, schmale Plakatschrift (Anton), Mono mit Persönlichkeit, kräftige Grotesk im Text */
+:root{--f-d:'Anton',Impact,sans-serif;--f-m:'Space Mono',monospace;--f-b:'Archivo',sans-serif}
+body{font-size:17px}
+.b-h2{font-weight:400;text-transform:uppercase;letter-spacing:.005em;line-height:.95;font-size:clamp(40px,6.6vw,92px)}
+.b-btn{font-family:var(--f-b);font-weight:800;text-transform:uppercase;letter-spacing:.06em;font-size:14px}
+.b-tarif h3{font-weight:400;text-transform:uppercase;font-size:34px;letter-spacing:.01em}
+.b-tarif .pr{font-weight:400}
+.b-fragen summary{font-family:var(--f-b);font-weight:800}
+.b-zk h3{font-weight:400;text-transform:uppercase;letter-spacing:.02em}
+.b-zk .ring b,.b-zmitte .ges b{font-weight:400}
+
+/* ── Startlauf (gepinnt) ── */
+.lauf{position:relative;height:360vh}
+.bahn{position:sticky;top:0;height:100svh;overflow:hidden;background:#050505}
+.bahn canvas{position:absolute;inset:0;width:100%;height:100%}
+.bahn video{position:absolute;left:0;right:0;top:0;height:60%;width:100%;object-fit:cover;opacity:.32;mix-blend-mode:screen;filter:saturate(.6);-webkit-mask:linear-gradient(#000 40%,transparent);mask:linear-gradient(#000 40%,transparent)}
+.ui{position:absolute;inset:0;z-index:3;pointer-events:none}
+.ui a,.ui button{pointer-events:auto}
+.ui .b-wrap{position:relative;height:100%}
+.kopf10{position:absolute;left:0;top:clamp(96px,14vh,140px);max-width:640px}
+.kopf10 h1{font:400 clamp(44px,5.8vw,86px)/.94 var(--f-d);text-transform:uppercase;margin:12px 0 18px;letter-spacing:.005em;text-shadow:0 6px 40px rgba(0,0,0,.8)}
+.kopf10 h1 em{font-style:normal;color:var(--gh)}
+.kopf10 .b-lead{color:#e3dccb;max-width:52ch;text-shadow:0 2px 14px #000}
+.kopf10 .btns{display:flex;flex-wrap:wrap;gap:12px;margin-top:20px}
+.check{position:absolute;right:0;top:clamp(110px,16vh,160px);width:300px;padding:16px 18px;border-radius:14px;background:rgba(8,7,5,.82);border:1px solid rgba(201,168,76,.3);backdrop-filter:blur(8px)}
+.check .ck{display:flex;justify-content:space-between;font:700 12px var(--f-m);letter-spacing:.12em;color:var(--g);margin-bottom:10px}
+.check ul{list-style:none;margin:0;padding:0;font:400 13px var(--f-m)}
+.check li{display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-top:1px dashed rgba(201,168,76,.18);color:var(--tx3);transition:color .3s}
+.check li b{color:var(--tx3);font-weight:700}
+.check li.ok{color:var(--tx)}.check li.ok b{color:#6fd39a}
+.instr{position:absolute;right:0;bottom:22px;display:flex;flex-direction:column;align-items:flex-end;gap:10px;text-align:right}
+.b-nav .b-btn{font-size:12px;letter-spacing:.03em;padding:0 16px;white-space:nowrap}
+.tacho{font:700 12px var(--f-m);letter-spacing:.14em;color:var(--g)}
+.tacho b{display:block;font:400 clamp(56px,8vw,110px)/.9 var(--f-d);color:#fff;letter-spacing:.01em;font-variant-numeric:tabular-nums}
+.tacho b small{font:700 16px var(--f-m);color:var(--g);margin-left:8px}
+.ruf{position:absolute;left:0;right:0;top:60%;font:400 clamp(34px,6vw,80px)/1 var(--f-d);text-transform:uppercase;color:var(--gh);opacity:0;transform:scale(.8);transition:opacity .25s,transform .35s var(--spring);text-shadow:0 0 30px rgba(232,204,122,.6);text-align:center}
+.ruf.an{opacity:1;transform:none}
+.schub{width:min(260px,40vw);font:700 11px var(--f-m);letter-spacing:.14em;color:var(--tx3);text-align:right}
+.schub i{display:block;height:8px;margin-top:8px;border-radius:4px;background:#1d1a12;overflow:hidden}
+.schub i::after{content:"";display:block;height:100%;width:var(--s,0%);background:var(--runway)}
+.countdown{position:absolute;left:72%;top:64%;transform:translate(-50%,-50%);font:400 clamp(90px,16vw,220px)/1 var(--f-d);color:rgba(253,252,250,.92);text-shadow:0 0 60px rgba(232,204,122,.6);pointer-events:none;transition:opacity .3s}
+
+/* ── Zwei Triebwerke (Score) ── */
+.trw{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:clamp(30px,5vw,70px);align-items:center}
+.n1{position:relative;width:min(480px,100%);margin:auto}
+.n1 svg{width:100%;overflow:visible}
+.n1 .bo{fill:none;stroke:#1d1a12;stroke-width:22}
+.n1 .vl{fill:none;stroke:url(#gold);stroke-width:22;stroke-linecap:round}
+.n1 .tk{stroke:#3a3426;stroke-width:2}.n1 .tk.g{stroke:#8a8476;stroke-width:3}
+.n1 text{font:700 12px 'Space Mono',monospace;fill:#8a8476}
+.n1 .nd{stroke:#fff;stroke-width:4;stroke-linecap:round}
+.n1 .wert{position:absolute;left:0;right:0;top:71%;text-align:center}
+.n1 .wert b{display:block;font:400 clamp(56px,7vw,92px)/.9 var(--f-d);font-variant-numeric:tabular-nums}
+.n1 .wert span{font:700 14px var(--f-m);letter-spacing:.16em}
+.motoren{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:10px}
+.mot{padding:16px;border-radius:14px;background:#0b0a07;border:1px solid #221e15;text-align:center}
+.mot svg{width:100%;max-width:150px;margin:auto;overflow:visible}
+.mot .bo{fill:none;stroke:#1d1a12;stroke-width:12}
+.mot .vl{fill:none;stroke-width:12;stroke-linecap:round}
+.mot .fan{transform-origin:60px 60px}
+.mot .fan line{stroke:#3a3426;stroke-width:3}
+.mot b{display:block;font:400 44px/1 var(--f-d);margin-top:4px}
+.mot small{display:block;font:700 11px var(--f-m);letter-spacing:.12em;color:var(--tx3)}
+.mot em{font-style:normal;font:700 12px var(--f-m);letter-spacing:.1em}
+.liste10{list-style:none;padding:0;margin:26px 0 0;display:grid;gap:10px}
+.liste10 li{display:grid;grid-template-columns:28px 1fr auto;gap:12px;align-items:center;padding:12px 14px;border-radius:10px;background:#0b0a07;border:1px solid #1d1a12;opacity:.35;transform:translateX(-14px);transition:all .5s var(--spring)}
+.liste10 li.ok{opacity:1;transform:none;border-color:rgba(63,165,108,.35)}
+.liste10 .hk{width:24px;height:24px;border-radius:6px;border:2px solid #3a3426;display:grid;place-items:center;color:transparent;font-weight:800;transition:all .3s}
+.liste10 li.ok .hk{background:var(--gr);border-color:var(--gr);color:#04150b}
+.liste10 .nm{font:600 16px var(--f-b)}.liste10 .nm small{font:400 12px var(--f-m);color:var(--tx3);margin-left:8px}
+.liste10 .w{font:400 30px/1 var(--f-d);font-variant-numeric:tabular-nums}
+.liste10 .bar{grid-column:2/-1;height:5px;border-radius:3px;background:#1d1a12;overflow:hidden}
+.liste10 .bar i{display:block;height:100%;width:0;transition:width 1s var(--ease)}
+
+/* ── Etappen auf der Startbahn ── */
+.rw{position:relative;margin-top:50px}
+.rw .piste{position:absolute;left:50%;top:0;bottom:0;width:120px;margin-left:-60px;background:linear-gradient(90deg,#0d0c0a,#16140f 50%,#0d0c0a);border-left:3px solid #2a261d;border-right:3px solid #2a261d}
+.rw .piste::before{content:"";position:absolute;left:50%;top:0;bottom:0;width:6px;margin-left:-3px;background:repeating-linear-gradient(180deg,rgba(253,252,250,.75) 0 40px,transparent 40px 80px);opacity:.5}
+.rw .lampen{position:absolute;top:0;bottom:0;width:8px;background:radial-gradient(circle,#3a3426 3px,transparent 4px) 0 0/8px 46px repeat-y}
+.rw .lampen.l{left:calc(50% - 72px)}.rw .lampen.r{left:calc(50% + 64px)}
+.rw .lampen i{position:absolute;left:0;top:0;width:8px;height:var(--h,0%);background:radial-gradient(circle,#E8CC7A 3px,rgba(232,204,122,.25) 5px,transparent 7px) 0 0/8px 46px repeat-y;filter:drop-shadow(0 0 4px #E8CC7A)}
+.rw .flz{position:absolute;left:50%;top:0;width:54px;height:54px;margin-left:-27px;z-index:3;filter:drop-shadow(0 8px 14px #000);transition:transform .1s linear}
+.rw ol{list-style:none;margin:0;padding:0;position:relative;z-index:2}
+.rw li{display:grid;grid-template-columns:1fr 160px 1fr;align-items:center;min-height:300px}
+.rw li .karte{padding:22px;border-radius:14px;background:linear-gradient(180deg,#110f0b,#0a0907);border:1px solid #221e15;opacity:0;transform:translateX(-50px);transition:all .9s var(--spring)}
+.rw li:nth-child(even) .karte{grid-column:3;transform:translateX(50px)}
+.rw li.an .karte{opacity:1;transform:none}
+.rw li .mark{grid-column:2;grid-row:1;justify-self:center;font:400 54px/1 var(--f-d);color:rgba(253,252,250,.85);letter-spacing:.04em;text-shadow:0 0 1px #000;transform:scaleY(1.25)}
+.rw li .karte img{width:100%;aspect-ratio:16/9;object-fit:cover;object-position:top left;border-radius:8px;margin-bottom:14px;border:1px solid #221e15}
+.rw .nr{font:700 12px var(--f-m);letter-spacing:.14em;color:var(--g)}
+.rw h3{font:400 30px/1 var(--f-d);text-transform:uppercase;margin:6px 0 10px;letter-spacing:.01em}
+.rw p{margin:0 0 10px;color:var(--tx2);font-size:15px}
+.rw a{font:700 12px var(--f-m);color:var(--gh);text-decoration:none}
+
+/* ── Videothek: Rollfeld ── */
+.feld{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:44px}
+.vz{position:relative;padding:0;border:0;background:#0b0a07;border-radius:14px;overflow:hidden;text-align:left;cursor:pointer}
+.vz:first-child{grid-column:span 2;grid-row:span 2}
+.vz .bild{position:relative;display:block;aspect-ratio:16/9}
+.vz:first-child .bild{aspect-ratio:auto;height:100%;min-height:300px}
+.vz img,.vz video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .8s var(--ease)}
+.vz video{opacity:0;transition:opacity .4s}.vz:hover video,.vz.laeuft video{opacity:1}
+.vz:hover img{transform:scale(1.06)}
+.vz::after{content:"";position:absolute;inset:0;border-radius:inherit;padding:2px;pointer-events:none;
+  background:repeating-linear-gradient(90deg,#E8CC7A 0 6px,transparent 6px 22px);background-size:200% 100%;
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;opacity:0;transition:opacity .3s}
+.vz:hover::after{opacity:1;animation:lauflicht .9s linear infinite}
+@keyframes lauflicht{to{background-position:-44px 0}}
+.vz .ov{position:absolute;left:0;right:0;bottom:0;padding:16px;background:linear-gradient(transparent,rgba(5,5,5,.94) 55%)}
+.vz .ov b{display:block;font:400 24px/1 var(--f-d);text-transform:uppercase;letter-spacing:.01em}
+.vz:first-child .ov b{font-size:44px}
+.vz .ov span{display:block;margin-top:6px;font-size:14px;color:var(--tx2)}
+.vz .tag{position:absolute;top:12px;left:12px;z-index:2;padding:4px 10px;border-radius:4px;background:#FDFCFA;color:#050505;font:700 12px var(--f-m)}
+
+/* ── Daten ── */
+.tape{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:44px}
+.tape div{padding:22px 18px;border-left:4px solid var(--g);background:linear-gradient(90deg,#100e0a,transparent)}
+.tape b{display:block;font:400 clamp(38px,4.4vw,60px)/1 var(--f-d);color:#fff;font-variant-numeric:tabular-nums}
+.tape span{display:block;margin-top:10px;color:var(--tx2);font-size:15px}
+
+/* ── Finale ── */
+.abheben{position:relative;text-align:center;overflow:hidden;padding:clamp(90px,12vw,160px) 0}
+.abheben .cd{font:400 clamp(120px,22vw,300px)/1 var(--f-d);color:var(--gh);text-shadow:0 0 60px rgba(232,204,122,.5);height:1em}
+.abheben .flieger{position:absolute;left:50%;bottom:-60px;width:90px;margin-left:-45px;opacity:0}
+.abheben.weg .flieger{animation:steig 2.2s cubic-bezier(.5,0,.3,1) forwards}
+@keyframes steig{0%{opacity:1;transform:translateY(0) scale(1)}100%{opacity:0;transform:translateY(-900px) scale(.3)}}
+
+@media(max-width:1000px){
+  .check{display:none}
+  .trw{grid-template-columns:1fr}
+  .rw .piste{left:28px;width:44px;margin-left:0}
+  .rw .lampen.l{left:18px}.rw .lampen.r{left:76px}
+  .rw .flz{left:50px;width:40px;height:40px;margin-left:-20px}
+  .rw li{grid-template-columns:1fr;padding-left:100px;min-height:0;margin-bottom:28px}
+  .rw li .karte,.rw li:nth-child(even) .karte{grid-column:1;transform:translateY(30px)}
+  .rw li .mark{display:none}
+  .feld{grid-template-columns:repeat(2,1fr)}
+  .tape{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:560px){
+  .kopf10{top:86px}
+  .kopf10 .b-lead{font-size:16px}
+  .instr{bottom:14px}.schub{display:none}.tacho b{font-size:52px}.countdown{top:74%;left:50%}
+  .kopf10 .b-lead{background:rgba(5,5,5,.6);padding:8px 10px;border-radius:8px;margin-left:-10px}
+  .rw li{padding-left:92px}.rw li .karte{padding:14px}.rw h3{font-size:24px}
+  .feld{grid-template-columns:1fr}.vz:first-child{grid-column:auto;grid-row:auto}.vz:first-child .bild{aspect-ratio:16/9;min-height:0;height:auto}.vz:first-child .ov b{font-size:30px}
+  .tape{grid-template-columns:1fr}
+  .motoren{gap:8px}.mot{padding:10px}.mot b{font-size:34px}
+}
+</style>
+</head>
+<body>
+<header class="b-nav"></header>
+
+<section class="lauf" id="lauf">
+  <div class="bahn" id="bahn">
+    <canvas id="cv"></canvas>
+    <video muted loop playsinline autoplay preload="auto" poster="../../../frontend/landing/assets/bild/hero.jpg" src="../../../frontend/landing/assets/video/dp-hero-flug.mp4"></video>
+    <div class="countdown" id="cd" aria-hidden="true"></div>
+    <div class="ui"><div class="b-wrap">
+      <div class="kopf10">
+        <div class="b-eye">Runway 87 · Immobilien-Investmentanalyse</div>
+        <h1>Immobilien&shy;entscheidungen sind zu groß für <em>ein Bauchgefühl.</em></h1>
+        <p class="b-lead">DealPilot begleitet deine Immobilie vom ersten Exposé bis in den Bestand, mit vollständiger Rechnung, einem amtlich begründeten Wert und einem Investment Case, der bei der Bank besteht. Scroll, und du gibst Schub.</p>
+        <div class="btns"><a class="b-btn b-btn-p" href="https://app.dealpilot.immo/?register=1">Vier Wochen Pro, kostenlos</a><a class="b-btn b-btn-l" href="#videothek">▶ Videos</a></div>
+      </div>
+      <div class="check" id="check"><div class="ck"><span>PRE-FLIGHT</span><span id="ckz">0/5</span></div><ul id="ckl"></ul></div>
+      <div class="ruf" id="ruf"></div>
+      <div class="instr">
+        <div class="tacho">GESCHWINDIGKEIT<b><span id="kt">0</span><small>KT</small></b></div>
+        <div class="schub" id="schub">SCHUB<i></i></div>
+      </div>
+    </div></div>
+  </div>
+</section>
+
+<section class="b-sec" id="score"><div class="b-wrap trw">
+  <div>
+    <div class="b-eye rv">Pre-Flight-Check · Investor Deal Score</div>
+    <h2 class="b-h2 rv">Zwei Triebwerke. <span class="ac">Einer reicht nicht.</span></h2>
+    <p class="b-lead rv">Ein Flugzeug startet nicht mit einem Triebwerk, ein Deal nicht mit einem Score. Dein Objekt kann gut sein und deine Finanzierung nicht. DealPilot rechnet beides getrennt und führt es zum Investor Deal Score zusammen.</p>
+    <ul class="liste10" id="liste10"></ul>
+    <p class="b-hinweis" style="margin-top:14px">Beispieldaten · Kaufpreis 180.000 € · 23/24 KPIs · Tiefe 96 %</p>
+  </div>
+  <div>
+    <div class="n1" id="n1" role="img" aria-label="Investor Deal Score 87 von 100, Sehr gut"><svg viewBox="0 0 300 220" id="n1svg"><defs><linearGradient id="gold" x1="0" x2="1"><stop offset="0" stop-color="#b8932f"/><stop offset=".55" stop-color="#C9A84C"/><stop offset="1" stop-color="#E8CC7A"/></linearGradient></defs></svg>
+      <div class="wert"><b id="n1z">0</b><span id="n1s">SPOOL UP</span></div></div>
+    <div class="motoren" id="motoren"></div>
+  </div>
+</div></section>
+
+<section class="b-sec" id="etappen"><div class="b-wrap">
+  <div class="b-ctr rv"><div class="b-eye">So fliegt ein Deal</div>
+    <h2 class="b-h2">Neun Etappen. <span class="ac">Eine Startbahn.</span></h2>
+    <p class="b-lead">Vom Exposé bis in den Bestand. Mit jeder Etappe gehen die Lichter weiter an. Ansichten aus DealPilot, Beispieldaten.</p></div>
+  <div class="rw" id="rw"><div class="piste"></div><div class="lampen l"><i></i></div><div class="lampen r"><i></i></div>
+    <svg class="flz" id="flz" viewBox="-30 -30 60 60" aria-hidden="true"><path d="M0 -26 L5 -8 L26 4 L26 9 L5 4 L3 18 L10 23 L10 26 L0 23 L-10 26 L-10 23 L-3 18 L-5 4 L-26 9 L-26 4 L-5 -8Z" fill="#FDFCFA" stroke="#C9A84C" stroke-width="1.5"/></svg>
+    <ol id="rwl"></ol></div>
+</div></section>
+
+<section class="b-sec" id="zwei"><div class="b-wrap" id="b-zwei"></div></section>
+
+<section class="b-sec" id="videothek"><div class="b-wrap">
+  <div class="rv"><div class="b-eye">Videothek · Rollfeld</div>
+    <h2 class="b-h2">Erst zusehen, <span class="ac">dann starten.</span></h2>
+    <p class="b-lead">Fahr über ein Video, die Befeuerung läuft und die Vorschau startet. Ein Klick spielt es mit Ton.</p></div>
+  <div class="feld" id="feld"></div>
+  <p style="margin-top:24px"><a class="b-btn b-btn-l" href="https://dealpilot.immo/videothek.html">Alle Videos in der Videothek →</a></p>
+</div></section>
+
+<section class="b-sec" id="daten"><div class="b-wrap">
+  <div class="rv"><div class="b-eye">Datenbasis</div>
+    <h2 class="b-h2"><span id="dRund">Über 1,1 Millionen</span> amtliche Datenpunkte. <span class="ac">Laufend abgeglichen.</span></h2>
+    <p class="b-lead">DealPilot rechnet nicht mit Schätzwerten aus dem Netz, sondern mit den Daten der Behörden. Jede Zahl nennt ihre Herkunft.</p></div>
+  <div class="tape" id="tape"></div>
+</div></section>
+
+<section class="b-sec b-ctr" id="preise"><div class="b-wrap">
+  <div class="rv"><div class="b-eye">Preise · Klasse wählen</div><h2 class="b-h2">Vier Pakete. <span class="ac">Ab 0 €.</span></h2></div>
+  <div id="b-preise"></div>
+</div></section>
+
+<section class="b-sec" id="fragen"><div class="b-wrap">
+  <div class="b-ctr rv"><div class="b-eye">Letzte Fragen</div><h2 class="b-h2">Vor dem <span class="ac">Abheben.</span></h2></div>
+  <div class="b-fragen" id="b-fragen"></div>
+</div></section>
+
+<section class="abheben" id="abheben"><div class="b-wrap">
+  <div class="cd" id="cd2" aria-hidden="true">3</div>
+  <h2 class="b-h2">Startfreigabe <span class="ac">erteilt.</span></h2>
+  <p><a class="b-btn b-btn-p" href="https://app.dealpilot.immo/?register=1">Jetzt abheben, kostenlos</a></p>
+  <ul class="b-haken" style="justify-content:center"><li>Keine Zahlungsdaten</li><li>4 Wochen voller Pro-Umfang</li><li>Ohne Kündigung</li></ul>
+</div>
+<svg class="flieger" viewBox="-30 -30 60 60" aria-hidden="true"><path d="M0 -26 L5 -8 L26 4 L26 9 L5 4 L3 18 L10 23 L10 26 L0 23 L-10 26 L-10 23 L-3 18 L-5 4 L-26 9 L-26 4 L-5 -8Z" fill="#E8CC7A"/></svg></section>
+<footer class="b-fuss"></footer>
+
+<script src="../../../frontend/landing/register-stand.js"></script>
+<script src="../../../frontend/landing/datenumfang.js"></script>
+<script src="b-basis.js"></script>
+<script>
+(function () {
+  var S = B.SCORE, $ = B.$, $$ = B.$$, ruhig = B.ruhig, NS = 'http://www.w3.org/2000/svg';
+  function el(n, a, p) { var e = document.createElementNS(NS, n); for (var k in a) e.setAttribute(k, a[k]); if (p) p.appendChild(e); return e; }
+  var vid = $('.bahn video'); if (ruhig) { vid.removeAttribute('autoplay'); vid.pause(); }
+
+  /* ── Pre-Flight-Liste im Hero, hakt nach dem Countdown ab ── */
+  var CK = [['Exposé gelesen', '✓'], ['Marktwert und Miete', '✓'], ['Finanzierung trägt', 'DSCR'], ['Steuer gerechnet', 'AfA'], ['Investor Deal Score', S.gesamt]];
+  $('#ckl').innerHTML = CK.map(function (c) { return '<li><span>' + c[0] + '</span><b>' + c[1] + '</b></li>'; }).join('');
+  function abhaken() { $$('#ckl li').forEach(function (li, i) { setTimeout(function () { li.classList.add('ok'); $('#ckz').textContent = (i + 1) + '/5'; }, ruhig ? 0 : i * 380); }); }
+  var cd = $('#cd');
+  if (ruhig) { cd.style.opacity = 0; abhaken(); }
+  else { var z = 3; cd.textContent = z; var tm = setInterval(function () { z--; if (z > 0) cd.textContent = z; else { clearInterval(tm); cd.textContent = 'GO'; setTimeout(function () { cd.style.opacity = 0; }, 500); abhaken(); } }, 650); }
+
+  /* ── Startbahn im Canvas ── */
+  var cv = $('#cv'), ctx = cv.getContext('2d'), sec = $('#lauf'), W, H, dpr, weg = 0, t0 = performance.now(), letzt = t0, p = 0;
+  function mass() { dpr = Math.min(2, devicePixelRatio || 1); W = cv.clientWidth; H = cv.clientHeight; cv.width = W * dpr; cv.height = H * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0); }
+  addEventListener('resize', mass); mass();
+  function fortschritt() { var r = sec.getBoundingClientRect(), span = sec.offsetHeight - innerHeight; return Math.max(0, Math.min(1, -r.top / span)); }
+  var rufe = [[.5, 'V1'], [.72, 'Rotate'], [.9, 'Positive climb']], rufEl = $('#ruf');
+  function male(t) {
+    var dt = Math.min(.05, (t - letzt) / 1000); letzt = t;
+    p = fortschritt();
+    var kt = Math.round(p * 168), speed = ruhig ? 0 : 1.2 + p * 70;
+    weg += speed * dt;
+    $('#kt').textContent = kt; $('#schub').style.setProperty('--s', (p * 100) + '%');
+    var ruf = ''; rufe.forEach(function (r) { if (p >= r[0]) ruf = r[1]; });
+    if (rufEl.textContent !== ruf) { rufEl.textContent = ruf; rufEl.classList.remove('an'); void rufEl.offsetWidth; if (ruf) rufEl.classList.add('an'); }
+    /* Rotation: ab 0,72 hebt die Nase, der Horizont sinkt */
+    var rot = Math.max(0, (p - .72) / .28), rotE = rot * rot * (3 - 2 * rot);
+    var yh = H * (.5 + rotE * .7), cx = W / 2 + Math.sin(t / 2300) * (ruhig ? 0 : 6) * (1 - p), f = Math.max(W, H) * .8, h = 1.15 + rotE * 6;
+    /* Himmel */
+    var g = ctx.createLinearGradient(0, 0, 0, yh);
+    g.addColorStop(0, '#050505'); g.addColorStop(.6, '#120e06'); g.addColorStop(1, '#3a2c10');
+    ctx.fillStyle = g; ctx.fillRect(0, 0, W, Math.max(0, yh));
+    var hg = ctx.createRadialGradient(cx, yh, 0, cx, yh, W * .6); hg.addColorStop(0, 'rgba(232,204,122,.35)'); hg.addColorStop(1, 'rgba(232,204,122,0)');
+    ctx.fillStyle = hg; ctx.fillRect(0, yh - W * .3, W, W * .6);
+    /* Boden */
+    ctx.fillStyle = '#070605'; ctx.fillRect(0, yh, W, H - yh);
+    function P(X, d) { return [cx + f * X / d, yh + f * h / d]; }
+    var dn = .9, df = 400;
+    /* Bahn als Trapez */
+    var a = P(-2.2, dn), b = P(2.2, dn), c = P(2.2, df), d2 = P(-2.2, df);
+    ctx.fillStyle = '#121110'; ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); ctx.lineTo(c[0], c[1]); ctx.lineTo(d2[0], d2[1]); ctx.fill();
+    /* Mittellinie */
+    ctx.fillStyle = 'rgba(253,252,250,.82)';
+    var per = 6, off = weg % per;
+    for (var z0 = per - off; z0 < 260; z0 += per) {
+      if (z0 < 2.2) continue; var n = z0, m = z0 + 3;
+      var p1 = P(-.06, n), p2 = P(.06, n), p3 = P(.06, m), p4 = P(-.06, m);
+      ctx.beginPath(); ctx.moveTo(p1[0], p1[1]); ctx.lineTo(p2[0], p2[1]); ctx.lineTo(p3[0], p3[1]); ctx.lineTo(p4[0], p4[1]); ctx.fill();
+    }
+    /* Randbefeuerung */
+    var lp = 4, lo = weg % lp;
+    for (var z1 = lp - lo; z1 < 380; z1 += lp) {
+      if (z1 < 1.6) continue;
+      [-2.3, 2.3].forEach(function (X) {
+        var q = P(X, z1), r = Math.min(7, Math.max(.6, f * .05 / z1));
+        ctx.fillStyle = z1 < 30 ? 'rgba(253,240,200,.95)' : 'rgba(232,204,122,.9)';
+        ctx.beginPath(); ctx.arc(q[0], q[1], r, 0, 6.283); ctx.fill();
+        if (z1 < 60) { ctx.fillStyle = 'rgba(232,204,122,.12)'; ctx.beginPath(); ctx.arc(q[0], q[1], r * 5, 0, 6.283); ctx.fill(); }
+      });
+    }
+    /* Geschwindigkeitsstreifen bei hoher Fahrt */
+    if (p > .35 && !ruhig) {
+      ctx.strokeStyle = 'rgba(232,204,122,' + ((p - .35) * .35) + ')'; ctx.lineWidth = 1;
+      for (var s = 0; s < 26; s++) {
+        var ang = s / 26 * Math.PI * 2 + 0.3, r0 = 80 + ((weg * 30 + s * 97) % 600), r1 = r0 + 40 + p * 160;
+        ctx.beginPath(); ctx.moveTo(cx + Math.cos(ang) * r0, yh + Math.sin(ang) * r0 * .6); ctx.lineTo(cx + Math.cos(ang) * r1, yh + Math.sin(ang) * r1 * .6); ctx.stroke();
+      }
+    }
+    /* Bodenschatten oben ausblenden, damit der Text liest */
+    var tg = ctx.createLinearGradient(0, 0, 0, H * .55); tg.addColorStop(0, 'rgba(5,5,5,.55)'); tg.addColorStop(1, 'rgba(5,5,5,0)'); ctx.fillStyle = tg; ctx.fillRect(0, 0, W, H * .55);
+    if (!ruhig) requestAnimationFrame(male);
+  }
+  requestAnimationFrame(male);
+  if (ruhig) addEventListener('scroll', function () { requestAnimationFrame(male); }, { passive: true });
+
+  /* ── Zwei Triebwerke ── */
+  var svg = $('#n1svg'), cx0 = 150, cy0 = 150, R = 120, A0 = Math.PI * .8, A1 = Math.PI * 2.2;
+  function pt(a, r) { return [cx0 + Math.cos(a) * r, cy0 + Math.sin(a) * r]; }
+  function bogen(a0, a1, r) { var s = pt(a0, r), e = pt(a1, r); return 'M' + s + ' A' + r + ' ' + r + ' 0 ' + (a1 - a0 > Math.PI ? 1 : 0) + ' 1 ' + e; }
+  el('path', { class: 'bo', d: bogen(A0, A1, R) }, svg);
+  var vl = el('path', { class: 'vl', d: bogen(A0, A1, R) }, svg), VL = vl.getTotalLength(); vl.style.strokeDasharray = VL; vl.style.strokeDashoffset = VL;
+  for (var i = 0; i <= 20; i++) { var a = A0 + (A1 - A0) * i / 20, q0 = pt(a, R - 22), q1 = pt(a, R - (i % 2 ? 30 : 38)); el('line', { class: 'tk' + (i % 2 ? '' : ' g'), x1: q0[0], y1: q0[1], x2: q1[0], y2: q1[1] }, svg); if (i % 4 === 0) { var tq = pt(a, R - 52), tx = el('text', { x: tq[0], y: tq[1] + 4, 'text-anchor': 'middle' }, svg); tx.textContent = i * 5; } }
+  var nd = el('line', { class: 'nd', x1: cx0, y1: cy0, x2: cx0, y2: cy0 - R + 30 }, svg);
+  el('circle', { cx: cx0, cy: cy0, r: 8, fill: '#fff' }, svg);
+  function nadel(v) { var a = (A0 + (A1 - A0) * v / 100) * 180 / Math.PI + 90; nd.setAttribute('transform', 'rotate(' + a + ' ' + cx0 + ' ' + cy0 + ')'); }
+  nadel(0);
+  function motor(name, frage, t, k) {
+    var st = B.stufe(t.s);
+    return '<div class="mot"><small>ENG ' + k + ' · ' + name + '</small><svg viewBox="0 0 120 120"><circle class="bo" cx="60" cy="60" r="48"/><circle class="vl" cx="60" cy="60" r="48" stroke="' + st.f + '" transform="rotate(-90 60 60)" style="stroke-dasharray:301.6;stroke-dashoffset:301.6" data-off="' + (301.6 * (1 - t.s / 100)) + '"/>'
+      + '<g class="fan">' + [0, 1, 2, 3, 4, 5, 6, 7].map(function (j) { return '<line x1="60" y1="60" x2="' + (60 + Math.cos(j * .785) * 34) + '" y2="' + (60 + Math.sin(j * .785) * 34) + '"/>'; }).join('') + '</g><circle cx="60" cy="60" r="7" fill="#C9A84C"/></svg>'
+      + '<b class="' + st.c + '" data-s="' + t.s + '">0</b><em class="' + st.c + '">' + st.v + '</em><small style="margin-top:6px;letter-spacing:.02em;text-transform:none;font-weight:400">' + frage + '</small></div>';
+  }
+  $('#motoren').innerHTML = motor('Investment', 'Das Objekt', S.inv, 1) + motor('Finanzierung', 'Das Darlehen', S.fin, 2);
+  $('#liste10').innerHTML = S.cats.map(function (c) {
+    return '<li><span class="hk">✓</span><span class="nm">' + c.n + '<small>' + c.w + ' % · ' + c.k + ' KPIs</small></span><span class="w" style="color:' + B.farbe(c.s) + '" data-s="' + c.s + '">0</span><span class="bar"><i style="background:' + B.farbe(c.s) + '" data-w="' + c.s + '"></i></span></li>';
+  }).join('');
+  function starten() {
+    $$('#liste10 li').forEach(function (li, i) {
+      setTimeout(function () { li.classList.add('ok'); li.querySelector('.bar i').style.width = li.querySelector('.bar i').getAttribute('data-w') + '%'; B.zaehle(li.querySelector('.w'), +li.querySelector('.w').getAttribute('data-s'), 900); }, ruhig ? 0 : i * 420);
+    });
+    var tS = performance.now(), dauer = ruhig ? 0 : 2600, st = B.stufe(S.gesamt);
+    (function spool(t) {
+      var q = dauer ? Math.min(1, (t - tS) / dauer) : 1, e = q < 1 ? 1 - Math.pow(1 - q, 3) : 1;
+      var over = q < 1 ? Math.sin(q * Math.PI) * 6 : 0, v = S.gesamt * e + over;
+      nadel(v); vl.style.strokeDashoffset = VL * (1 - S.gesamt * e / 100);
+      $('#n1z').textContent = Math.round(S.gesamt * e);
+      if (q < 1) requestAnimationFrame(spool); else { $('#n1s').textContent = st.v; $('#n1s').className = st.c; }
+    })(performance.now() + 1);
+    $$('.mot').forEach(function (m, i) {
+      var c = m.querySelector('.vl'), b = m.querySelector('b'), fan = m.querySelector('.fan');
+      setTimeout(function () { c.style.transition = 'stroke-dashoffset 2s cubic-bezier(.2,.8,.2,1)'; c.style.strokeDashoffset = c.getAttribute('data-off'); B.zaehle(b, +b.getAttribute('data-s'), 2000);
+        if (!ruhig && fan.animate) fan.animate([{ transform: 'rotate(0deg)' }, { transform: 'rotate(360deg)' }], { duration: 380 + i * 60, iterations: Infinity }); }, ruhig ? 0 : 600 + i * 300);
+    });
+  }
+  B.sichtbar($('#n1'), starten, { schwelle: .4 });
+
+  /* ── Etappen auf der Startbahn ── */
+  $('#rwl').innerHTML = B.ETAPPEN.map(function (e) {
+    return '<li><div class="karte"><img src="' + e.b + '" alt="" loading="lazy"><div class="nr">ETAPPE ' + e.nr + ' · ' + e.wer.toUpperCase() + '</div><h3>' + e.t + '</h3><p>' + e.x + '</p><a href="https://dealpilot.immo/videothek.html?v=' + e.v + '">▶ Video zur Etappe</a></div><span class="mark" aria-hidden="true">' + e.nr + '</span></li>';
+  }).join('');
+  $$('#rwl li').forEach(function (li) { B.sichtbar(li, function () { li.classList.add('an'); }, { schwelle: .3 }); });
+  var rw = $('#rw'), flz = $('#flz');
+  function rwSetz() {
+    var r = rw.getBoundingClientRect(), q = Math.max(0, Math.min(1, (innerHeight * .55 - r.top) / r.height));
+    flz.style.transform = 'translateY(' + (q * (r.height - 60)) + 'px)';
+    $$('.lampen i', rw).forEach(function (l) { l.style.setProperty('--h', (q * 100) + '%'); l.style.height = (q * 100) + '%'; });
+  }
+  addEventListener('scroll', rwSetz, { passive: true }); rwSetz();
+
+  /* ── Rollfeld-Videothek ── */
+  var V = B.VIDEOS.slice(0, 7);
+  $('#feld').innerHTML = V.map(function (v, i) {
+    return '<button class="vz rv" style="transition-delay:' + (i % 3) * 80 + 'ms" aria-label="Video abspielen: ' + v.t + '"><span class="bild"><img src="' + v.poster + '" alt="" loading="lazy"><video muted loop playsinline preload="none" poster="' + v.poster + '"></video></span>'
+      + '<span class="tag">' + v.nr + ' · ' + B.dauer(v.d) + '</span><span class="ov"><b>' + v.t + '</b><span>' + v.u + '</span></span></button>';
+  }).join('');
+  $$('.vz').forEach(function (k, i) { k.addEventListener('click', function () { B.spielen(V[i]); }); B.vorschauBeiHover(k, V[i]); });
+  var v0 = $('.vz'); if (!ruhig) B.sichtbar(v0, function () { var vi = v0.querySelector('video'); vi.src = V[0].src; v0.classList.add('laeuft'); var pr = vi.play(); if (pr && pr.catch) pr.catch(function () {}); }, { schwelle: .5 });
+
+  /* ── Daten ── */
+  var Z = B.ZAHLEN(), K = (window.DPS_UMFANG || {}).kopf || {};
+  if (K.amtlich_rund_gross) $('#dRund').textContent = K.amtlich_rund_gross;
+  $('#tape').innerHTML = Z.map(function (z) { return '<div class="rv"><b data-b-zaehl="' + z.z + '" data-ms="2200">0</b><span>' + z.t + '</span></div>'; }).join('');
+
+  /* ── Finale: Countdown und Abheben ── */
+  var ab = $('#abheben');
+  B.sichtbar(ab, function () {
+    var c = $('#cd2'); if (ruhig) { c.textContent = 'GO'; return; }
+    var n = 3; var t = setInterval(function () { n--; if (n > 0) c.textContent = n; else { clearInterval(t); c.textContent = 'GO'; ab.classList.add('weg'); } }, 700);
+  }, { schwelle: .5 });
+
+  B.start('10');
+})();
+</script>
+</body>
+</html>

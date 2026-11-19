@@ -1,0 +1,320 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DealPilot · Idee 01 · Flug durch die Schrift</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@500;600;700;800&family=Schibsted+Grotesk:wght@400;500;600&family=Fragment+Mono&family=Fraunces:ital,opsz,wght@1,9..144,500&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="a-basis.css">
+<style>
+:root{--fd:'Syne',sans-serif;--fb:'Schibsted Grotesk',sans-serif;--fm:'Fragment Mono',monospace;--fs:'Fraunces',serif}
+.a-eye{font-size:11px}
+.sk{--fk:'Schibsted Grotesk',sans-serif}
+/* ═══ Idee 01 · Flug durch die Schrift ═══
+   Hero: das Hero-Video laeuft IN der Wortmarke (mix-blend-mode: multiply auf schwarzer Flaeche, weisse Schrift).
+   Beim Scrollen fliegt die Kamera durch den Strich des "l" hinein, bis das Video den ganzen Schirm fuellt. */
+.h1-buehne{height:260vh;position:relative}
+.h1-sticky{position:sticky;top:0;height:100vh;height:100svh;overflow:hidden;background:#000}
+.h1-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform:scale(1.08)}
+.h1-maske{position:absolute;inset:0;background:var(--ob);mix-blend-mode:multiply;display:grid;place-items:center;will-change:opacity}
+.h1-wort,.h1-kontur{font-family:var(--fw);font-weight:700;font-size:min(21vw,300px);letter-spacing:-.055em;line-height:.8;white-space:nowrap;will-change:transform}
+.h1-wort{color:#fff}
+.h1-wort span,.h1-kontur span{display:inline-block}
+.h1-wort .bu{transform:translateY(40%) rotateX(-70deg);opacity:0;transition:transform 1.1s var(--spring),opacity .8s}
+.h1-wort.da .bu{transform:none;opacity:1}
+.h1-kontur-lage{position:absolute;inset:0;display:grid;place-items:center;pointer-events:none}
+.h1-kontur{color:transparent;-webkit-text-stroke:1.5px rgba(232,204,122,.75);filter:drop-shadow(0 0 18px rgba(201,168,76,.55))}
+.h1-kontur .bu{opacity:0;transition:opacity 1.2s .6s}
+.h1-wort.da~* .h1-kontur .bu,.h1-kontur.da .bu{opacity:1}
+.h1-zeile{position:absolute;left:0;right:0;bottom:12vh;text-align:center;font-family:var(--fm);font-size:12px;letter-spacing:.3em;color:var(--goldh);text-transform:uppercase}
+.h1-zeile i{display:block;width:1px;height:46px;margin:14px auto 0;background:linear-gradient(var(--goldh),transparent);animation:h1Fall 1.8s infinite}
+@keyframes h1Fall{0%{transform:scaleY(0);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}51%{transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
+.h1-inhalt{position:absolute;inset:0;display:flex;align-items:flex-end;padding-bottom:9vh;opacity:0;pointer-events:none;background:linear-gradient(180deg,rgba(5,5,5,.15) 30%,rgba(5,5,5,.85))}
+.h1-inhalt.da{pointer-events:auto}
+.h1-inhalt h1{font-family:var(--fd);font-weight:700;font-size:clamp(32px,5.6vw,84px);line-height:1.02;letter-spacing:-.035em;margin:.3em 0 .35em;max-width:17ch;hyphens:manual}
+.h1-inhalt h1 em{font-style:italic;font-family:var(--fs);font-weight:500;color:var(--goldh)}
+.h1-inhalt h1 .z{display:block;overflow:hidden}
+.h1-inhalt h1 .z>span{display:block;transform:translateY(105%)}
+.h1-inhalt .a-lead{color:#e3dccb}
+.h1-knoepfe{display:flex;flex-wrap:wrap;gap:12px;margin-top:26px}
+.h1-beleg{display:grid;grid-template-columns:repeat(5,1fr);border-top:1px solid rgba(201,168,76,.18);border-bottom:1px solid rgba(201,168,76,.18);background:var(--ob)}
+.h1-beleg div{padding:22px 16px;border-right:1px solid rgba(201,168,76,.12);text-align:center}
+.h1-beleg b{display:block;font-family:var(--fd);font-size:32px;font-weight:600;color:var(--goldh);font-variant-numeric:tabular-nums}
+.h1-beleg div>span{font-family:var(--fm);font-size:10.5px;letter-spacing:.14em;color:var(--tx3);text-transform:uppercase}
+@media (max-width:760px){.h1-beleg{grid-template-columns:1fr 1fr}.h1-beleg div:last-child{grid-column:span 2}}
+
+/* Film ab: Spot gross, darunter ein laufender Filmstreifen */
+.h1-film{display:grid;grid-template-columns:1.35fr 1fr;gap:40px;align-items:center;margin-top:40px}
+.h1-spot{position:relative;display:block;border:0;padding:0;border-radius:20px;overflow:hidden;aspect-ratio:16/9;background:#000;box-shadow:0 0 0 1px rgba(201,168,76,.3),0 40px 100px -40px rgba(201,168,76,.45)}
+.h1-spot img{width:100%;height:100%;object-fit:cover;transition:transform 1.2s var(--ease)}
+.h1-spot:hover img{transform:scale(1.05)}
+.h1-spot .a-play{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) scale(1.3)}
+.h1-spot .lauf{position:absolute;left:0;right:0;bottom:0;padding:16px 20px;background:linear-gradient(transparent,rgba(5,5,5,.9));text-align:left;font-family:var(--fm);font-size:11px;letter-spacing:.14em;color:var(--goldh)}
+.h1-film h3{font-family:var(--fs);font-style:italic;font-weight:500;font-size:clamp(36px,4.4vw,64px);line-height:1;margin:.2em 0}
+.h1-streifen{margin-top:60px;overflow:hidden;padding:18px 0;background:#0e0d0a;border-block:14px solid #0e0d0a;
+  -webkit-mask:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);mask:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);position:relative}
+.h1-streifen::before,.h1-streifen::after{content:"";position:absolute;left:0;right:0;height:10px;background:repeating-linear-gradient(90deg,transparent 0 10px,rgba(253,252,250,.16) 10px 22px);z-index:2}
+.h1-streifen::before{top:-12px}.h1-streifen::after{bottom:-12px}
+.h1-band{display:flex;gap:14px;width:max-content;animation:h1Band 60s linear infinite}
+.h1-streifen:hover .h1-band,.h1-streifen:focus-within .h1-band{animation-play-state:paused}
+@keyframes h1Band{to{transform:translateX(-50%)}}
+.h1-bild{flex:0 0 auto;width:260px;border:0;padding:0;background:#000;border-radius:8px;overflow:hidden;position:relative;text-align:left;transition:transform .4s var(--spring)}
+.h1-bild:hover,.h1-bild:focus-visible{transform:scale(1.07) rotate(-1deg);z-index:3}
+.h1-bild img{width:100%;aspect-ratio:16/9;object-fit:cover;filter:saturate(.75) brightness(.85);transition:filter .3s}
+.h1-bild:hover img{filter:none}
+.h1-bild span{position:absolute;left:0;right:0;bottom:0;padding:22px 10px 8px;background:linear-gradient(transparent,rgba(5,5,5,.92));font-size:12.5px;font-weight:600;color:#fff}
+.h1-bild small{display:block;font-family:var(--fm);font-size:10px;color:var(--goldh);font-weight:400}
+
+/* Score: das Cockpit-Video laeuft im Ring, der sich auf 87 fuellt */
+.h1-score{display:grid;grid-template-columns:1fr 1.1fr;gap:40px;align-items:center}
+.h1-ringlage{position:relative;display:grid;place-items:center;min-height:700px;overflow:clip;overflow-clip-margin:24px}
+#score{overflow-x:clip}
+.h1-ringvideo{position:absolute;width:min(680px,94%);aspect-ratio:1;border-radius:50%;overflow:hidden;--p:0;
+  -webkit-mask:radial-gradient(circle,transparent 61%,#000 61.4%,#000 69.6%,transparent 70%),conic-gradient(#000 calc(var(--p)*1%),transparent 0);
+  -webkit-mask-composite:source-in;mask:radial-gradient(circle,transparent 61%,#000 61.4%,#000 69.6%,transparent 70%),conic-gradient(#000 calc(var(--p)*1%),transparent 0);mask-composite:intersect}
+.h1-ringvideo video{width:100%;height:100%;object-fit:cover;transform:scale(1.25)}
+.h1-ringspur{position:absolute;width:min(680px,94%);aspect-ratio:1;border-radius:50%;
+  background:radial-gradient(circle,transparent 61%,rgba(201,168,76,.12) 61.4%,rgba(201,168,76,.12) 69.6%,transparent 70%)}
+.h1-ringtick{position:absolute;width:min(760px,105%);aspect-ratio:1;border-radius:50%;opacity:.5;animation:h1Dreh 60s linear infinite;
+  background:repeating-conic-gradient(from 0deg,rgba(232,204,122,.55) 0 .4deg,transparent .4deg 3.6deg);-webkit-mask:radial-gradient(circle,transparent 69%,#000 69.5%,#000 71%,transparent 71.5%);mask:radial-gradient(circle,transparent 69%,#000 69.5%,#000 71%,transparent 71.5%)}
+@keyframes h1Dreh{to{transform:rotate(360deg)}}
+.h1-ringlage .sk-buehne{position:relative;z-index:2;width:min(500px,100%)}
+.h1-punkte{list-style:none;padding:0;margin:26px 0 0;display:grid;gap:12px}
+.h1-punkte li{display:grid;grid-template-columns:52px 1fr;gap:14px;align-items:center;padding:14px;border-radius:14px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06)}
+.h1-punkte b{font-family:var(--fd);font-size:28px;color:var(--goldh);text-align:center}
+.h1-punkte span{color:var(--tx2);font-size:14.5px}
+.h1-punkte strong{color:var(--tx);display:block;font-family:var(--fd);font-weight:600;font-size:16px}
+
+/* Etappen: Riesenziffern fuellen sich, rechts wischt die App-Ansicht kreisfoermig auf */
+.h1-et{display:grid;grid-template-columns:1fr 1.15fr;gap:56px;margin-top:50px}
+.h1-et-liste{list-style:none;margin:0;padding:0}
+.h1-et-liste li{padding:7vh 0;border-bottom:1px solid rgba(201,168,76,.1)}
+.h1-et-nr{font-family:var(--fd);font-weight:700;font-size:clamp(72px,9vw,128px);line-height:.85;letter-spacing:-.05em;color:transparent;-webkit-text-stroke:1px rgba(201,168,76,.45);
+  background:var(--run);-webkit-background-clip:text;background-clip:text;background-size:100% 200%;background-position:0 100%;background-repeat:no-repeat;transition:all .8s var(--ease)}
+.h1-et-liste li.an .h1-et-nr{-webkit-text-fill-color:transparent;background-image:linear-gradient(180deg,#E8CC7A,#b8932f);-webkit-text-stroke-color:transparent;text-shadow:0 0 50px rgba(201,168,76,.25)}
+.h1-et-liste li:not(.an) .h1-et-nr{-webkit-text-fill-color:transparent;background-image:none}
+.h1-et-liste small{font-family:var(--fm);font-size:11px;letter-spacing:.18em;color:var(--gold);text-transform:uppercase}
+.h1-et-liste h3{font-family:var(--fd);font-size:clamp(22px,2.4vw,30px);margin:.3em 0;transition:color .4s}
+.h1-et-liste li:not(.an) h3{color:var(--tx3)}
+.h1-et-liste p{color:var(--tx2);margin:0;max-width:46ch}
+.h1-et-liste .klein-bild{display:none}
+.h1-et-liste button{margin-top:12px;background:none;border:0;padding:8px 0;color:var(--goldh);font-family:var(--fm);font-size:12px;letter-spacing:.08em}
+.h1-rahmen{position:sticky;top:14vh;height:72vh;border-radius:20px;overflow:hidden;background:var(--ob3);box-shadow:0 0 0 1px rgba(201,168,76,.25),0 40px 120px -40px rgba(0,0,0,.9)}
+.h1-rahmen img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:top left;clip-path:circle(0% at 85% 15%);transition:clip-path 1.1s var(--ease)}
+.h1-rahmen img.an{clip-path:circle(150% at 85% 15%);z-index:2}
+.h1-rahmen img.war{clip-path:circle(150% at 85% 15%);z-index:1}
+.h1-rahmen .zaehler{position:absolute;z-index:5;left:16px;bottom:14px;padding:6px 12px;border-radius:999px;background:rgba(5,5,5,.8);font-family:var(--fm);font-size:11px;color:var(--goldh)}
+@media (max-width:900px){
+  .h1-film,.h1-score,.h1-et{grid-template-columns:1fr}
+  .h1-ringlage{min-height:auto;padding:40px 0}
+  .h1-rahmen{display:none}
+  .h1-et-liste li{padding:36px 0}
+  .h1-et-liste .klein-bild{display:block;margin-top:16px;border-radius:12px;width:100%;aspect-ratio:16/9;object-fit:cover;object-position:top left}
+}
+
+/* Abschluss: Buchstabenwelle */
+.h1-welle span{display:inline-block;animation:h1Welle 2.6s ease-in-out infinite;animation-delay:calc(var(--i)*70ms)}
+@keyframes h1Welle{0%,100%{transform:none}30%{transform:translateY(-.12em);color:var(--goldh)}}
+.h1-landebahn{display:flex;justify-content:center;gap:22px;margin:40px 0}
+.h1-landebahn i{width:8px;height:8px;border-radius:50%;background:var(--goldh);box-shadow:0 0 14px var(--gold);animation:h1Licht 1.6s infinite;animation-delay:calc(var(--i)*120ms);opacity:.2}
+@keyframes h1Licht{0%,100%{opacity:.2}20%{opacity:1}}
+@media (prefers-reduced-motion:reduce){.h1-buehne{height:auto}.h1-sticky{position:relative}.h1-maske{display:none}.h1-kontur-lage{display:none}.h1-inhalt{position:relative;opacity:1;min-height:100vh;pointer-events:auto}.h1-inhalt h1 .z>span{transform:none}.h1-zeile{display:none}}
+</style>
+</head>
+<body>
+<div id="a-nav"></div>
+
+<!-- ═══ HERO ═══ -->
+<section class="h1-buehne" id="top">
+  <div class="h1-sticky">
+    <video class="h1-video" muted loop playsinline preload="none" poster="../../../frontend/landing/assets/bild/hero.jpg" data-src="../../../frontend/landing/assets/video/dp-hero-flug.mp4"></video>
+    <div class="h1-maske"><div class="h1-wort" id="wort" aria-hidden="true"></div></div>
+    <div class="h1-kontur-lage" aria-hidden="true"><div class="h1-kontur" id="kontur"></div></div>
+    <div class="h1-zeile" id="zeile">Scrollen zum Abheben<i></i></div>
+    <div class="h1-inhalt" id="inhalt">
+      <div class="a-wrap">
+        <div class="a-eye">Immobilien-Investmentanalyse</div>
+        <h1><span class="z"><span>Immobilien&shy;entscheidungen</span></span><span class="z"><span>sind zu groß für</span></span><span class="z"><span><em>ein Bauchgefühl.</em></span></span></h1>
+        <p class="a-lead">DealPilot begleitet deine Immobilie vom ersten Exposé bis in den Bestand, mit vollständiger Rechnung, einem amtlich begründeten Wert und einem Investment Case, der bei der Bank besteht. Ab dann fliegst du nach Flugdaten.</p>
+        <div class="h1-knoepfe"><a class="a-btn" href="https://app.dealpilot.immo/?register=1">Vier Wochen als Pro, kostenlos</a><a class="a-btn-l" href="#videothek">▶ Film ab</a></div>
+        <ul class="a-haken"><li>Keine Zahlungsdaten</li><li>4 Wochen voller Pro-Umfang</li><li>Danach automatisch Free, ohne Kündigung</li></ul>
+      </div>
+    </div>
+  </div>
+</section>
+<div class="h1-beleg">
+  <div><b><span data-zaehl="30">0</span> s</b><span>vom Exposé zur Bewertung</span></div>
+  <div><b data-zaehl="24">0</b><span>KPIs hinter jedem Score</span></div>
+  <div><b data-zaehl="19">0</b><span>Module an Bord</span></div>
+  <div><b data-zaehl="6187">0</b><span>amtliche Werte im Register</span></div>
+  <div><b data-zaehl="201">0</b><span>Gutachterausschüsse mit Werten</span></div>
+</div>
+
+<!-- ═══ VIDEOTHEK ═══ -->
+<section class="a-sec" id="videothek">
+  <div class="a-wrap">
+    <div class="h1-film">
+      <button class="h1-spot" data-video="spot-das-haus-hab-ich" data-rv aria-label="Spot abspielen: Das Haus hab ich.">
+        <img src="../../../frontend/landing/assets/videothek/dealpilot-spot-das-haus-hab-ich.webp" alt="" width="1280" height="720">
+        <span class="a-play"></span><span class="lauf">SPOT · 1:31 · MIT TON</span>
+      </button>
+      <div data-rv="120">
+        <div class="a-eye">Film ab</div>
+        <h3>„Das Haus hab ich.“</h3>
+        <p class="a-lead">Vom Exposé bis zum Kauf. Ein Objekt, ein Weg, in 90 Sekunden. Danach weitere Filme aus der Videothek, jeder mit Kapiteln.</p>
+        <p style="margin-top:22px"><a class="a-btn-l" href="../../../frontend/landing/videothek.html">Zur Videothek, 40 Videos</a></p>
+      </div>
+    </div>
+  </div>
+  <div class="h1-streifen" aria-label="Videos aus der Videothek"><div class="h1-band" id="band"></div></div>
+</section>
+
+<!-- ═══ SCORE ═══ -->
+<section class="a-sec" id="score" style="padding-top:20px">
+  <div class="a-wrap h1-score">
+    <div>
+      <div class="a-eye" data-rv>Pre-Flight · Etappe 03</div>
+      <h2 class="a-h2" data-rv="80">Einer reicht nicht. <span class="ac">Zwei Scores.</span></h2>
+      <p class="a-lead" data-rv="160">Dein Objekt kann gut sein, deine Finanzierung nicht. Deshalb trennt DealPilot den Investment-Score vom Finanzierungs-Score und rechnet erst dann den Investor Deal Score aus 24 Kennzahlen. Im Ring läuft der Anflug, bis er bei 87 steht.</p>
+      <ul class="h1-punkte">
+        <li data-rv="200"><b>81</b><span><strong>Investment · Gut</strong>Wie gut ist die Immobilie, egal wie sie finanziert wird? Zählt 59 %.</span></li>
+        <li data-rv="280"><b>96</b><span><strong>Finanzierung · Sehr gut</strong>Trägt die geplante Finanzierung dieses Objekt? Zählt 41 %.</span></li>
+        <li data-rv="360"><b>87</b><span><strong>Investor Deal Score · Sehr gut</strong>81 × 59 % plus 96 × 41 %. Fahr über die Karte, sie folgt deiner Hand.</span></li>
+      </ul>
+    </div>
+    <div class="h1-ringlage">
+      <div class="h1-ringtick" aria-hidden="true"></div>
+      <div class="h1-ringspur" aria-hidden="true"></div>
+      <div class="h1-ringvideo" id="ringvideo" aria-hidden="true"><video muted loop playsinline preload="none" poster="../../../frontend/landing/assets/bild/hero.jpg" data-src="../../../frontend/landing/assets/video/dp-intro-cockpit.mp4"></video></div>
+      <div class="sk-buehne" id="karte"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ ETAPPEN ═══ -->
+<section class="a-sec" id="etappen">
+  <div class="a-wrap">
+    <div class="a-eye" data-rv>So fliegt ein Deal</div>
+    <h2 class="a-h2" data-rv="80">Vom Exposé bis in den Bestand. <span class="ac">In neun Etappen.</span></h2>
+    <div class="h1-et">
+      <ol class="h1-et-liste" id="etliste"></ol>
+      <div><div class="h1-rahmen" id="rahmen"><span class="zaehler" id="etz">Etappe 01 von 09</span></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ DATENBASIS ═══ -->
+<section class="a-sec" style="background:linear-gradient(180deg,var(--ob),var(--ob2))">
+  <div class="a-wrap">
+    <div class="a-eye" data-rv>Datenbasis</div>
+    <h2 class="a-h2" data-rv="80">Über 1,1 Millionen amtliche Datenpunkte. <span class="ac">Laufend abgeglichen.</span></h2>
+    <p class="a-lead" data-rv="160">DealPilot rechnet nicht mit Schätzwerten aus dem Netz, sondern mit den Daten der Behörden, in eigenen Datenbanken, regelmäßig abgeglichen und mit Herkunft je Wert.</p>
+    <div id="a-daten"></div>
+  </div>
+</section>
+
+<section class="a-sec" id="preise"><div class="a-wrap"><div class="a-ctr"><div class="a-eye" data-rv>Preise</div><h2 class="a-h2" data-rv="80">Vier Pakete. <span class="ac">Ab 0 €.</span></h2></div><div id="a-preise"></div></div></section>
+<section class="a-sec" id="fragen"><div class="a-wrap"><div class="a-ctr"><div class="a-eye" data-rv>Fragen</div><h2 class="a-h2" data-rv="80">Kurz gefragt.</h2></div><div id="a-fragen"></div></div></section>
+
+<section class="a-sec a-schluss">
+  <div class="a-wrap">
+    <div class="a-eye">Pre-Flight · Check-in</div>
+    <h2 class="a-h2 h1-welle" id="welle">Bereit für den Take-off?</h2>
+    <div class="h1-landebahn" aria-hidden="true" id="bahn"></div>
+    <p class="a-lead" style="margin-inline:auto">Dein Cockpit ist startklar. Kein Bauchgefühl mehr. Ab jetzt fliegst du nach Flugdaten.</p>
+    <p style="margin-top:28px"><a class="a-btn" href="https://app.dealpilot.immo/?register=1">Kostenlos starten</a></p>
+  </div>
+</section>
+<footer class="a-fuss" id="a-fuss"></footer>
+<div class="a-vorschlag">Vorschlag · Idee 01</div>
+
+<script src="a-daten.js"></script>
+<script src="a-basis.js"></script>
+<script>
+(function () {
+  var D = A_DATEN;
+  /* Wortmarke in Buchstaben zerlegen, das "l" ist der Einflugpunkt */
+  function buchstaben(el, cls) {
+    el.innerHTML = 'DealPilot'.split('').map(function (c, i) { return '<span class="bu' + (i === 3 ? ' ziel' : '') + '" style="transition-delay:' + (i * 70) + 'ms">' + c + '</span>'; }).join('');
+  }
+  var wort = document.getElementById('wort'), kontur = document.getElementById('kontur');
+  buchstaben(wort); buchstaben(kontur);
+  requestAnimationFrame(function () { setTimeout(function () { wort.classList.add('da'); kontur.classList.add('da'); }, 150); });
+
+  /* Videothek-Streifen (doppelt fuer endlosen Lauf) */
+  var band = document.getElementById('band');
+  var reihe = D.videos.filter(function (v) { return v.id !== 'spot-das-haus-hab-ich'; }).map(function (v) {
+    return '<button class="h1-bild" data-video="' + v.id + '"><img src="' + D.poster + v.poster + '" alt="" loading="lazy" width="260" height="146"><span><small>' + (v.nr.length < 3 && /\d/.test(v.nr) ? 'Modul ' : '') + v.nr + ' · ' + A.dauer(v.dauer) + '</small>' + A.esc(v.titel) + '</span></button>';
+  }).join('');
+  band.innerHTML = reihe + reihe.replace(/<button /g, '<button tabindex="-1" aria-hidden="true" ');
+
+  /* Etappen */
+  var liste = document.getElementById('etliste'), rahmen = document.getElementById('rahmen');
+  D.etappen.forEach(function (e, i) {
+    liste.insertAdjacentHTML('beforeend', '<li data-i="' + i + '"><div class="h1-et-nr">' + e[0] + '</div><small>Etappe ' + e[0] + ' · ' + e[1] + '</small><h3>' + e[2] + '</h3><p>' + e[3] + '</p>' +
+      '<img class="klein-bild" src="' + D.L + 'assets/dp-strecke/' + e[4] + '" alt="Ansicht aus DealPilot: ' + e[2] + '" loading="lazy" width="1600" height="900">' +
+      (e[5] ? '<button data-video="' + e[5] + '">▶ Video ansehen</button>' : '') + '</li>');
+    rahmen.insertAdjacentHTML('beforeend', '<img src="' + D.L + 'assets/dp-strecke/' + e[4] + '" alt="" loading="lazy" width="1600" height="900"' + (i ? '' : ' class="an"') + '>');
+  });
+  liste.firstChild.classList.add('an');
+  var bilder = rahmen.querySelectorAll('img'), etz = document.getElementById('etz'), aktiv = 0;
+  var io = new IntersectionObserver(function (es) {
+    es.forEach(function (e) {
+      if (!e.isIntersecting) return;
+      var i = +e.target.dataset.i; if (i === aktiv) return;
+      liste.children[aktiv].classList.remove('an'); e.target.classList.add('an');
+      bilder.forEach(function (b, j) { b.classList.toggle('war', j === aktiv); b.classList.toggle('an', j === i); if (j !== i && j !== aktiv) b.classList.remove('war'); });
+      aktiv = i; etz.textContent = 'Etappe ' + D.etappen[i][0] + ' von 09';
+    });
+  }, { rootMargin: '-45% 0px -45% 0px' });
+  liste.querySelectorAll('li').forEach(function (li) { io.observe(li); });
+
+  /* Abschluss */
+  var w = document.getElementById('welle');
+  w.innerHTML = w.textContent.split('').map(function (c, i) { return c === ' ' ? ' ' : '<span style="--i:' + i + '">' + c + '</span>'; }).join('');
+  document.getElementById('bahn').innerHTML = Array.from({ length: 11 }, function (_, i) { return '<i style="--i:' + i + '"></i>'; }).join('');
+
+  A.start();
+
+  /* Score-Karte; der Videoring fuellt sich synchron bis 87 */
+  var rv = document.getElementById('ringvideo');
+  A.scoreKarte(document.getElementById('karte'), { verz: 200 });
+  A.einmal(rv, function () {
+    if (A.rm) { rv.style.setProperty('--p', 87.2); return; }
+    var t0 = performance.now() + 1600;
+    (function f(t) { var p = Math.max(0, Math.min(1, (t - t0) / 1400)); rv.style.setProperty('--p', (87.2 * A.easeIO(p)).toFixed(2)); if (p < 1) requestAnimationFrame(f); })(performance.now());
+  }, .3);
+
+  /* Scroll-Flug durch das "l" */
+  if (A.rm) return;
+  var buehne = document.querySelector('.h1-buehne'), maske = document.querySelector('.h1-maske'), konturLage = document.querySelector('.h1-kontur-lage');
+  var inhalt = document.getElementById('inhalt'), zeile = document.getElementById('zeile'), video = document.querySelector('.h1-video');
+  var zeilen = inhalt.querySelectorAll('h1 .z>span'), ursprung = '50% 50%';
+  function zielMessen() {
+    wort.style.transform = 'none'; kontur.style.transform = 'none';
+    var z = wort.querySelector('.ziel').getBoundingClientRect(), r = wort.getBoundingClientRect();
+    ursprung = ((z.left + z.width * .5 - r.left) / r.width * 100).toFixed(2) + '% ' + ((z.top + z.height * .52 - r.top) / r.height * 100).toFixed(2) + '%';
+    wort.style.transformOrigin = kontur.style.transformOrigin = ursprung;
+  }
+  setTimeout(zielMessen, 1300); addEventListener('resize', zielMessen);
+  var lauf = false;
+  function rahmenF() {
+    lauf = false;
+    var h = buehne.offsetHeight - innerHeight, p = Math.max(0, Math.min(1, window.scrollY / h));
+    var zoom = Math.max(0, (p - .04) / .56), s = 1 + Math.pow(Math.min(1, zoom), 3) * 70;
+    wort.style.transform = kontur.style.transform = 'scale(' + s.toFixed(3) + ')';
+    maske.style.opacity = zoom >= 1 ? 0 : 1;
+    konturLage.style.opacity = Math.max(0, 1 - zoom * 2.2);
+    zeile.style.opacity = Math.max(0, 1 - p * 8);
+    video.style.transform = 'scale(' + (1.08 + p * .12).toFixed(3) + ')';
+    var t = Math.max(0, Math.min(1, (p - .6) / .25));
+    inhalt.style.opacity = t; inhalt.classList.toggle('da', t > .5);
+    zeilen.forEach(function (z, i) { var q = Math.max(0, Math.min(1, t * 1.6 - i * .25)); z.style.transform = 'translateY(' + ((1 - A.ease(q)) * 105).toFixed(1) + '%)'; });
+  }
+  addEventListener('scroll', function () { if (!lauf) { lauf = true; requestAnimationFrame(rahmenF); } }, { passive: true });
+  rahmenF();
+})();
+</script>
+</body>
+</html>

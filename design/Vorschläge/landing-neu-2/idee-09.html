@@ -1,0 +1,377 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Exposé zerfällt · Idee 09</title>
+<meta name="description" content="Landing-Vorschlag 09: Ein Exposé zerfällt beim Scrollen in Daten, die als 24 Kennzahlen in die Score-Karte fliegen.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;0,9..144,800;1,9..144,400&family=IBM+Plex+Mono:wght@400;600&family=Newsreader:opsz,wght@6..72,400;6..72,500&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="b-basis.css">
+<style>
+/* Typografie Idee 09: Redaktion. Kontrastreiche Serif (Fraunces, optische Größen) für Titel, Buchschrift im Text, nüchterne Mono für Daten */
+:root{--f-d:'Fraunces',Georgia,serif;--f-m:'IBM Plex Mono',monospace;--f-b:'Newsreader',Georgia,serif}
+body{font-size:19px;line-height:1.55}
+.b-h2{font-weight:300;font-variation-settings:'opsz' 144;letter-spacing:-.025em;font-size:clamp(36px,5.6vw,72px);line-height:1.02}
+.b-h2 .ac{font-style:italic;font-weight:400}
+.b-eye{font-size:12px}
+.b-lead{font-size:clamp(18px,1.8vw,21px)}
+.b-btn{font-family:var(--f-m);font-size:14px;letter-spacing:.02em}
+.b-tarif h3{font-weight:600}.b-tarif .pr{font-weight:300;font-size:46px}
+.b-fragen summary{font-weight:400;font-size:clamp(20px,2.2vw,26px)}
+.b-zk h3{font-weight:600}
+
+/* ── Bühne: Exposé zerfällt ── */
+.zerfall{position:relative;height:420vh}
+.stage{position:sticky;top:0;height:100svh;overflow:hidden}
+.stage video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.16;filter:blur(2px) saturate(.6)}
+.stage::after{content:"";position:absolute;inset:0;background:radial-gradient(70% 70% at 60% 55%,transparent,#050505 85%);pointer-events:none}
+.stage canvas{position:absolute;inset:0;width:100%;height:100%;z-index:3;pointer-events:none}
+.st-grid{position:relative;z-index:2;height:100%;display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.9fr) minmax(0,1fr);gap:clamp(20px,3vw,48px);align-items:center;padding-top:60px}
+.st-text h1{font:300 clamp(40px,4.4vw,70px)/1 var(--f-d);font-variation-settings:'opsz' 144;letter-spacing:-.03em;margin:14px 0 20px}
+.st-text h1 em{font-weight:400;color:var(--gh)}
+.st-text .b-lead{font-size:19px;margin:0 0 24px}
+.st-text .btns{display:flex;flex-wrap:wrap;gap:10px}
+.st-text .scrollhin{margin-top:28px;font:400 13px var(--f-m);color:var(--tx3);display:flex;align-items:center;gap:10px}
+.st-text .scrollhin i{width:1px;height:40px;background:linear-gradient(var(--g),transparent);animation:tropf 1.8s infinite}
+@keyframes tropf{0%{transform:scaleY(0);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}51%{transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
+.fortschritt{position:absolute;left:0;bottom:0;height:3px;background:var(--runway);z-index:5;width:0}
+.phase{position:absolute;left:50%;bottom:22px;transform:translateX(-50%);z-index:5;font:400 13px var(--f-m);color:var(--tx2);letter-spacing:.08em;white-space:nowrap}
+
+/* Das Exposé */
+.expose{position:relative;width:min(380px,100%);margin:auto;aspect-ratio:1/1.38;background:#FDFCFA;color:#1b1813;border-radius:6px;padding:22px;box-shadow:0 40px 90px -30px rgba(0,0,0,.9),0 0 0 1px rgba(0,0,0,.2);
+  transform-origin:50% 60%;will-change:transform,opacity;display:flex;flex-direction:column;gap:10px}
+.expose .ex-k{display:flex;justify-content:space-between;font:600 11px var(--f-m);letter-spacing:.14em;color:#8a7a4f}
+.expose .foto{height:36%;border-radius:3px;background:#ddd url(../../../frontend/landing/assets/bild/haus.jpg) center/cover}
+.expose h4{margin:4px 0 0;font:600 22px/1.1 var(--f-d)}
+.expose .zl{height:7px;border-radius:3px;background:#e4ded0}
+.expose .zl.k{width:72%}
+.expose .tab{display:grid;grid-template-columns:1fr 1fr;gap:6px 14px;margin-top:4px;font:400 11.5px var(--f-m)}
+.expose .tab span{display:flex;justify-content:space-between;gap:6px;border-bottom:1px dotted #cfc7b3;padding-bottom:3px;color:#5d5547}
+.expose .tab b{color:#1b1813;font-weight:600}
+.expose .tab i{display:inline-block;width:44px;height:8px;border-radius:3px;background:#d9d2c0;vertical-align:middle}
+.expose .unter{margin-top:auto;font:400 11px var(--f-m);color:#8a7a4f}
+.expose .stempel{position:absolute;right:18px;top:40%;transform:rotate(-12deg);font:600 13px var(--f-m);color:#b8625c;border:2px solid #b8625c;padding:4px 8px;border-radius:4px;opacity:0}
+
+/* Die Score-Karte */
+.karte9{position:relative;width:min(420px,100%);margin:auto;padding:22px;border-radius:18px;background:linear-gradient(180deg,#121009,#080705);border:1px solid rgba(201,168,76,.28);box-shadow:0 40px 100px -40px rgba(201,168,76,.4)}
+.karte9 .kk{display:flex;justify-content:space-between;font:400 12px var(--f-m);color:var(--tx3);letter-spacing:.06em}
+.karte9 .kk b{color:var(--gh);font-weight:600}
+.k9-oben{display:flex;align-items:center;gap:18px;margin:14px 0 12px}
+.k9-ring{position:relative;width:132px;height:132px;flex:0 0 auto}
+.k9-ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.k9-ring circle{fill:none;stroke-width:9}.k9-ring .tr{stroke:#221e15}.k9-ring .pg{stroke:var(--gh);stroke-linecap:round}
+.k9-ring b{position:absolute;inset:0;display:grid;place-items:center;font:300 56px/1 var(--f-d);font-variation-settings:'opsz' 144;font-variant-numeric:tabular-nums}
+.k9-st{font:600 13px var(--f-m);letter-spacing:.14em}
+.k9-st small{display:block;font-weight:400;color:var(--tx3);letter-spacing:.04em;margin-top:6px;font-size:12px}
+.k9-zaehl{font:400 12px var(--f-m);color:var(--tx3);margin-top:8px}
+.k9-zaehl b{color:var(--tx);font-weight:600}
+.k9-bars{display:grid;gap:8px}
+.k9-bar{position:relative;padding:8px 10px;border-radius:9px;background:#0d0c09;border:1px solid #1d1a12;font-size:14px}
+.k9-bar .t{display:flex;justify-content:space-between;font-family:var(--f-b)}
+.k9-bar .t small{font:400 11px var(--f-m);color:var(--tx3);margin-left:6px}
+.k9-bar .t b{font:600 15px var(--f-m)}
+.k9-bar .sp{display:flex;gap:3px;margin-top:6px}
+.k9-bar .sp i{flex:1;height:5px;border-radius:2px;background:#221e15;transition:background .3s}
+.k9-bar .sp i.an{background:var(--c)}
+.k9-zwei{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px;opacity:0;transform:translateY(10px);transition:all .6s var(--spring)}
+.k9-zwei.an{opacity:1;transform:none}
+.k9-zwei div{padding:10px;border-radius:10px;border:1px solid rgba(201,168,76,.3);font:400 11px var(--f-m);color:var(--tx3)}
+.k9-zwei b{display:block;font:300 30px/1.1 var(--f-d);font-variation-settings:'opsz' 144}
+.k9-zwei .sz{margin-top:8px;grid-column:1/-1;font:italic 400 17px var(--f-d);color:var(--tx2);border:0;padding:0}
+.chip9{position:absolute;z-index:4;left:0;top:0;padding:3px 8px;border-radius:999px;font:400 11px var(--f-m);white-space:nowrap;background:#FDFCFA;color:#1b1813;border:1px solid #d6cfbd;will-change:transform,opacity;pointer-events:none;opacity:0}
+
+/* Mobil: Text vor der Bühne */
+.mtext{display:none}
+
+/* ── Kapitel (Etappen) ── */
+.kap{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(24px,5vw,80px);align-items:center;margin-top:clamp(70px,10vw,130px)}
+.kap:nth-child(even) .kbild{order:2}
+.kbild{position:relative;aspect-ratio:16/10;border-radius:6px;overflow:hidden;clip-path:inset(12% 12% 12% 12% round 6px);transition:clip-path 1.2s var(--ease);box-shadow:0 30px 80px -40px rgba(0,0,0,.9)}
+.kbild img{width:100%;height:100%;object-fit:cover;object-position:top left;transform:scale(1.18);transition:transform 1.6s var(--ease)}
+.kap.an .kbild{clip-path:inset(0 0 0 0 round 6px)}.kap.an .kbild img{transform:none}
+.knr{font:300 clamp(90px,12vw,170px)/.8 var(--f-d);font-variation-settings:'opsz' 144;color:transparent;-webkit-text-stroke:1px rgba(232,204,122,.55);display:block}
+.kap h3{font:400 clamp(28px,3.2vw,44px)/1.08 var(--f-d);letter-spacing:-.02em;margin:12px 0 14px}
+.kap h3 em{color:var(--gh)}
+.kap p{color:var(--tx2);margin:0 0 14px}
+.kap a{font:400 13px var(--f-m);color:var(--gh);text-decoration:none}
+.kap .ktx > *{opacity:0;transform:translateY(24px);transition:all .9s var(--ease)}
+.kap.an .ktx > *{opacity:1;transform:none}
+.kap.an .ktx > *:nth-child(2){transition-delay:.12s}.kap.an .ktx > *:nth-child(3){transition-delay:.24s}.kap.an .ktx > *:nth-child(4){transition-delay:.36s}
+
+/* ── Videothek als Magazin ── */
+.heft{display:grid;grid-template-columns:repeat(4,1fr);gap:26px;margin-top:44px;perspective:1600px}
+.ausg{position:relative;padding:0;border:0;background:none;text-align:left;cursor:pointer;transform-style:preserve-3d;transition:transform .7s var(--spring)}
+.ausg .cov{position:relative;aspect-ratio:3/4;border-radius:4px;overflow:hidden;background:#111;box-shadow:0 30px 60px -30px #000,inset 0 0 0 1px rgba(255,255,255,.06);transform-origin:left center;transition:transform .8s var(--spring),box-shadow .6s}
+.ausg:hover .cov{transform:rotateY(-18deg) translateZ(20px);box-shadow:30px 40px 70px -30px #000}
+.ausg img,.ausg video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.ausg video{opacity:0;transition:opacity .4s}.ausg:hover video{opacity:1}
+.ausg .kopf{position:absolute;left:0;right:0;top:0;padding:14px;background:linear-gradient(rgba(5,5,5,.85),transparent);font:600 12px var(--f-m);letter-spacing:.14em;color:var(--gh)}
+.ausg .kopf b{display:block;font:300 34px/1 var(--f-d);letter-spacing:-.02em;color:#fff;margin-top:6px}
+.ausg .fuss{position:absolute;left:0;right:0;bottom:0;padding:14px;background:linear-gradient(transparent,rgba(5,5,5,.92));font:italic 400 18px/1.2 var(--f-d)}
+.ausg .u{display:block;margin-top:10px;font-size:15px;color:var(--tx2)}
+
+/* ── Daten als Fußnoten ── */
+.fn{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin-top:44px;border-top:1px solid rgba(201,168,76,.3)}
+.fn div{padding:24px 18px 24px 0;border-bottom:1px solid rgba(201,168,76,.15)}
+.fn b{display:block;font:300 clamp(34px,3.6vw,52px)/1 var(--f-d);font-variation-settings:'opsz' 144;color:var(--gh);font-variant-numeric:tabular-nums}
+.fn span{display:block;margin-top:10px;font-size:16px;color:var(--tx2)}
+.fn sup{font:400 11px var(--f-m);color:var(--g)}
+
+@media(max-width:1100px){
+  .st-grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+  .st-text{display:none}
+  .mtext{display:block;padding:110px 0 30px}
+  .mtext h1{font:300 clamp(40px,9vw,64px)/1 var(--f-d);font-variation-settings:'opsz' 144;letter-spacing:-.03em;margin:12px 0 18px}
+  .mtext h1 em{font-weight:400;color:var(--gh)}
+  .mtext .btns{display:flex;flex-wrap:wrap;gap:10px}
+  .heft{grid-template-columns:repeat(2,1fr)}
+  .fn{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:700px){
+  .st-grid{grid-template-columns:1fr;grid-template-rows:auto;gap:0;padding-top:80px;align-content:start}
+  .st-grid > div{grid-area:1/1}
+  .st-grid > div:nth-child(2){z-index:4;align-self:start;padding-top:40px}
+  .expose{width:min(250px,66vw);padding:14px;gap:7px}
+  .expose h4{font-size:15px}.expose .tab{font-size:9px;gap:4px 8px}.expose .tab i{width:22px}.expose .unter{display:none}.expose .ex-k{font-size:9px}
+  .karte9{padding:14px}
+  .k9-ring{width:96px;height:96px}.k9-ring b{font-size:40px}
+  .k9-oben{margin:8px 0}
+  .k9-bars{gap:5px}.k9-bar{padding:5px 8px;font-size:13px}
+  .k9-zwei b{font-size:24px}.k9-zwei .sz{font-size:15px}
+  .chip9{font-size:9px;padding:2px 6px}
+  .kap{grid-template-columns:1fr}.kap:nth-child(even) .kbild{order:0}
+  .heft{gap:14px}.ausg .kopf b{font-size:24px}.ausg .fuss{font-size:15px}.ausg .u{font-size:13px}
+  .fn{grid-template-columns:1fr}
+  .phase{font-size:11px}
+}
+@media(max-width:700px) and (max-height:760px){.k9-bar .sp{display:none}}
+@media(max-width:700px){.phase{bottom:8px;padding:4px 10px;border-radius:999px;background:rgba(5,5,5,.8)}}
+</style>
+</head>
+<body>
+<header class="b-nav"></header>
+
+<div class="mtext"><div class="b-wrap">
+  <div class="b-eye">Immobilien-Investmentanalyse</div>
+  <h1>Immobilien&shy;entscheidungen sind zu groß für <em>ein Bauchgefühl.</em></h1>
+  <p class="b-lead">DealPilot begleitet deine Immobilie vom ersten Exposé bis in den Bestand, mit vollständiger Rechnung, einem amtlich begründeten Wert und einem Investment Case, der bei der Bank besteht.</p>
+  <div class="btns"><a class="b-btn b-btn-p" href="https://app.dealpilot.immo/?register=1">Vier Wochen als Pro, kostenlos</a><a class="b-btn b-btn-l" href="#videothek">▶ Videos</a></div>
+  <ul class="b-haken"><li>Keine Zahlungsdaten</li><li>Danach automatisch Free</li></ul>
+</div></div>
+
+<section class="zerfall" id="zerfall">
+  <div class="stage" id="stage">
+    <video muted loop playsinline autoplay preload="auto" poster="../../../frontend/landing/assets/bild/hero.jpg" src="../../../frontend/landing/assets/video/dp-intro-cockpit.mp4"></video>
+    <div class="b-wrap st-grid">
+      <div class="st-text">
+        <div class="b-eye">Immobilien-Investmentanalyse</div>
+        <h1>Immobilien&shy;entscheidungen sind zu groß für <em>ein Bauchgefühl.</em></h1>
+        <p class="b-lead">DealPilot begleitet deine Immobilie vom ersten Exposé bis in den Bestand, mit vollständiger Rechnung, einem amtlich begründeten Wert und einem Investment Case, der bei der Bank besteht.</p>
+        <div class="btns"><a class="b-btn b-btn-p" href="https://app.dealpilot.immo/?register=1">Vier Wochen als Pro, kostenlos</a><a class="b-btn b-btn-l" href="#videothek">▶ Videos</a></div>
+        <div class="scrollhin"><i></i>Scroll, und das Exposé wird zu Zahlen.</div>
+      </div>
+      <div><div class="expose" id="expose" aria-hidden="true">
+        <div class="ex-k"><span>EXPOSÉ</span><span>ANGEBOT</span></div>
+        <div class="foto"></div>
+        <h4>Ruhige Lage, solide vermietet</h4>
+        <div class="zl"></div><div class="zl k"></div>
+        <div class="tab"><span>Kaufpreis <b>180.000 €</b></span><span>Wohnfläche <i></i></span><span>Kaltmiete <i></i></span><span>Baujahr <i></i></span><span>Hausgeld <i></i></span><span>Energie <i></i></span></div>
+        <div class="zl"></div><div class="zl k"></div>
+        <div class="unter">Anlagen: Grundbuch, Mietaufstellung, WEG-Protokolle, Energieausweis</div>
+        <div class="stempel" id="stempel">GEPRÜFT</div>
+      </div></div>
+      <div><div class="karte9" id="karte9" role="img" aria-label="Investor Deal Score 87 von 100, Sehr gut. Investment-Score 81, Finanzierungs-Score 96.">
+        <div class="kk"><span>INVESTOR DEAL SCORE</span><b id="k9tag">WARTET AUF DATEN</b></div>
+        <div class="k9-oben"><div class="k9-ring"><svg viewBox="0 0 120 120"><circle class="tr" cx="60" cy="60" r="52"/><circle class="pg" id="k9pg" cx="60" cy="60" r="52"/></svg><b id="k9z">0</b></div>
+          <div><div class="k9-st" id="k9st">&nbsp;<small>Kaufpreis 180.000 €</small></div><div class="k9-zaehl">KPIs <b id="k9kpi">0</b> / 24 · Tiefe 96 %</div></div></div>
+        <div class="k9-bars" id="k9bars"></div>
+        <div class="k9-zwei" id="k9zwei"></div>
+      </div></div>
+    </div>
+    <canvas id="cv"></canvas>
+    <div class="fortschritt" id="fort"></div>
+    <div class="phase" id="phase">Exposé · Kapitel 1</div>
+  </div>
+</section>
+
+<section class="b-sec" id="zwei"><div class="b-wrap" id="b-zwei"></div></section>
+
+<section class="b-sec" id="etappen" style="padding-top:40px"><div class="b-wrap">
+  <div class="rv b-ctr"><div class="b-eye">So fliegt ein Deal</div>
+    <h2 class="b-h2">Vom Exposé bis in den Bestand. <span class="ac">In neun Kapiteln.</span></h2>
+    <p class="b-lead">Jedes Kapitel zeigt eine echte Ansicht aus DealPilot, mit Beispieldaten.</p></div>
+  <div id="kapitel"></div>
+</div></section>
+
+<section class="b-sec" id="videothek"><div class="b-wrap">
+  <div class="rv"><div class="b-eye">Videothek · Die Ausgaben</div>
+    <h2 class="b-h2">Zum Ansehen <span class="ac">statt zum Lesen.</span></h2>
+    <p class="b-lead">Fahr über eine Ausgabe, sie schlägt sich auf und läuft stumm an. Ein Klick spielt sie mit Ton.</p></div>
+  <div class="heft" id="heft"></div>
+  <p style="margin-top:30px"><a class="b-btn b-btn-l" href="https://dealpilot.immo/videothek.html">Alle Videos in der Videothek →</a></p>
+</div></section>
+
+<section class="b-sec" id="daten"><div class="b-wrap">
+  <div class="rv"><div class="b-eye">Datenbasis · Die Fußnoten</div>
+    <h2 class="b-h2"><span id="dRund">Über 1,1 Millionen</span> amtliche Datenpunkte. <span class="ac">Jede Zahl mit Herkunft.</span></h2>
+    <p class="b-lead">Wo ein Exposé behauptet, belegt DealPilot. Fehlt eine amtliche Zahl, wird keine erfunden.</p></div>
+  <div class="fn" id="fn"></div>
+</div></section>
+
+<section class="b-sec b-ctr" id="preise"><div class="b-wrap">
+  <div class="rv"><div class="b-eye">Preise</div><h2 class="b-h2">Vier Pakete. <span class="ac">Ab 0 €.</span></h2></div>
+  <div id="b-preise"></div>
+</div></section>
+
+<section class="b-sec" id="fragen"><div class="b-wrap">
+  <div class="b-ctr rv"><div class="b-eye">Fragen</div><h2 class="b-h2">Was man <span class="ac">vorher wissen will.</span></h2></div>
+  <div class="b-fragen" id="b-fragen"></div>
+</div></section>
+
+<section class="b-sec b-ctr"><div class="b-wrap rv">
+  <div class="b-eye">Das nächste Exposé</div>
+  <h2 class="b-h2">Wirf es hinein. <span class="ac">Lies die Zahlen.</span></h2>
+  <p><a class="b-btn b-btn-p" href="https://app.dealpilot.immo/?register=1">Kostenlos starten</a></p>
+  <ul class="b-haken" style="justify-content:center"><li>Keine Zahlungsdaten</li><li>4 Wochen voller Pro-Umfang</li><li>Ohne Kündigung</li></ul>
+</div></section>
+<footer class="b-fuss"></footer>
+
+<script src="../../../frontend/landing/register-stand.js"></script>
+<script src="../../../frontend/landing/datenumfang.js"></script>
+<script src="b-basis.js"></script>
+<script>
+(function () {
+  var S = B.SCORE, $ = B.$, $$ = B.$$, ruhig = B.ruhig;
+  if (ruhig) { var sv = $('.stage video'); sv.removeAttribute('autoplay'); sv.pause(); }
+
+  /* 24 Kennzahlen je Bereich (dealscore2.js), in der Zahl wie die Hero-Karte: 4/5/6/5/4 */
+  var KPI = [
+    ['Bruttorendite', 'Nettorendite', 'Cashflow / Mon.', 'Cash-on-Cash'],
+    ['DSCR', 'LTV', 'Zinssatz', 'Tilgung', 'EK-Bedarf'],
+    ['Leerstand', 'Instandhaltung', 'Bausubstanz', 'Energieklasse', 'Mietausfall-Risiko', 'Ausstattung'],
+    ['Ist-/Marktmiete', 'Mietwachstum', 'Bevölkerung', 'Nachfrage', 'Mikrolage'],
+    ['Mietsteigerung', 'Faktor vs. Markt', 'Wertsteigerung', 'Entwicklung']
+  ];
+  $('#k9bars').innerHTML = S.cats.map(function (c, i) {
+    return '<div class="k9-bar" data-i="' + i + '"><div class="t"><span>' + c.n + '<small>' + c.w + ' %</small></span><b style="color:' + B.farbe(c.s) + '" data-s="' + c.s + '">0</b></div><div class="sp" style="--c:' + B.farbe(c.s) + '">' + Array(21).join('<i></i>') + '</div></div>';
+  }).join('');
+  $('#k9zwei').innerHTML = '<div>INVESTMENT<b class="' + B.stufe(S.inv.s).c + '">' + S.inv.s + '</b>' + B.stufe(S.inv.s).w + '</div><div>FINANZIERUNG<b class="' + B.stufe(S.fin.s).c + '">' + S.fin.s + '</b>' + B.stufe(S.fin.s).w + '</div><div class="sz">Einer reicht nicht. Zwei Scores.</div>';
+
+  var stage = $('#stage'), sec = $('#zerfall'), cv = $('#cv'), ctx = cv.getContext('2d'), ex = $('#expose'), karte = $('#karte9');
+  var pg = $('#k9pg'), C = 2 * Math.PI * 52; pg.style.strokeDasharray = C; pg.style.strokeDashoffset = C;
+  /* Chips anlegen */
+  var chips = [];
+  KPI.forEach(function (liste, k) { liste.forEach(function (n) { var c = document.createElement('span'); c.className = 'chip9'; c.textContent = n; stage.appendChild(c); chips.push({ el: c, kat: k }); }); });
+
+  /* Zufall mit festem Startwert, damit jedes Laden gleich aussieht */
+  var seed = 11; function rnd() { seed = (seed * 9301 + 49297) % 233280; return seed / 233280; }
+  var W, H, dpr, teile = [], exR, ringC, ringR, barsR;
+  function mass() {
+    dpr = Math.min(2, devicePixelRatio || 1); W = stage.clientWidth; H = stage.clientHeight;
+    cv.width = W * dpr; cv.height = H * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    var sr = stage.getBoundingClientRect();
+    function rel(e) { var r = e.getBoundingClientRect(); return { x: r.left - sr.left, y: r.top - sr.top, w: r.width, h: r.height }; }
+    ex.style.transform = ''; ex.style.opacity = '';
+    exR = rel(ex); var rr = rel($('.k9-ring')); ringC = { x: rr.x + rr.w / 2, y: rr.y + rr.h / 2 }; ringR = rr.w * 52 / 120;
+    barsR = $$('.k9-bar').map(rel);
+    seed = 11; teile = [];
+    var n = W < 700 ? 520 : 1100, farben = ['#FDFCFA', '#FDFCFA', '#e4ded0', '#d9d2c0', '#C9A84C', '#8a7a4f'];
+    for (var i = 0; i < n; i++) {
+      var auf = i / n < S.gesamt / 100, a = -Math.PI / 2 + (auf ? (i / n) / (S.gesamt / 100) * 2 * Math.PI * S.gesamt / 100 : 2 * Math.PI * (S.gesamt / 100 + rnd() * (1 - S.gesamt / 100)));
+      var rj = ringR + (rnd() - .5) * 7;
+      teile.push({ sx: exR.x + rnd() * exR.w, sy: exR.y + rnd() * exR.h, ex: ringC.x + Math.cos(a) * rj, ey: ringC.y + Math.sin(a) * rj,
+        d: rnd() * .35, k: (rnd() - .5) * 260, f: auf ? (rnd() < .7 ? '#E8CC7A' : '#C9A84C') : '#3a3426', g: farben[Math.floor(rnd() * farben.length)], s: 1.2 + rnd() * 1.8 });
+    }
+    chips.forEach(function (c, i) {
+      var b = barsR[c.kat], idx = KPI[c.kat].indexOf(c.el.textContent);
+      c.sx = exR.x + 10 + rnd() * (exR.w - 90); c.sy = exR.y + exR.h * (.55 + rnd() * .35);
+      c.ex = b.x + 10 + idx * Math.min(26, (b.w - 40) / KPI[c.kat].length); c.ey = b.y + b.h / 2 - 8;
+      c.d = i * .012;
+    });
+    zeichne(true);
+  }
+  function ein(t) { return t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }
+  function clamp(x) { return Math.max(0, Math.min(1, x)); }
+  var letztesP = -1;
+  function zeichne(zwang) {
+    var r = sec.getBoundingClientRect(), span = sec.offsetHeight - stage.offsetHeight, p = clamp(-r.top / span);
+    if (ruhig) p = p > .02 ? 1 : 0;
+    if (!zwang && Math.abs(p - letztesP) < .0005) return; letztesP = p;
+    $('#fort').style.width = (p * 100) + '%';
+    /* Phase 1: Exposé kippt und wird geprüft (0 bis 0,22) */
+    var p1 = clamp(p / .22), p2 = clamp((p - .18) / .42), p3 = clamp((p - .55) / .35);
+    ex.style.transform = 'perspective(1100px) rotateY(' + (-14 * p1) + 'deg) rotateX(' + (6 * p1) + 'deg) scale(' + (1 - .06 * p1) + ')';
+    ex.style.opacity = String(1 - clamp((p - .2) / .12));
+    $('#stempel').style.opacity = p1 > .5 && p < .3 ? 1 : 0;
+    /* Teilchen */
+    ctx.clearRect(0, 0, W, H);
+    var vis = p > .17 && p < .9;
+    if (vis) {
+      var aus = 1 - clamp((p - .78) / .12);
+      teile.forEach(function (t) {
+        var q = ein(clamp((p2 - t.d) / (1 - .35)));
+        if (q <= 0 && p < .2) return;
+        var x = t.sx + (t.ex - t.sx) * q, y = t.sy + (t.ey - t.sy) * q + Math.sin(q * Math.PI) * t.k * .5;
+        var drift = q < .02 ? Math.sin(p * 40 + t.sx) * 2 : 0;
+        ctx.globalAlpha = aus * (q > .9 ? 1 : .85);
+        ctx.fillStyle = q > .6 ? t.f : t.g;
+        ctx.fillRect(x + drift, y, t.s, t.s);
+      });
+      ctx.globalAlpha = 1;
+    }
+    /* Chips fliegen in die Bereiche */
+    chips.forEach(function (c) {
+      var q = ein(clamp((p - .3 - c.d) / .3));
+      var x = c.sx + (c.ex - c.sx) * q, y = c.sy + (c.ey - c.sy) * q - Math.sin(q * Math.PI) * 120;
+      c.el.style.opacity = q > 0 && q < 1 ? 1 : 0;
+      c.el.style.transform = 'translate(' + x + 'px,' + y + 'px) scale(' + (1 - .35 * q) + ') rotate(' + ((1 - q) * (c.kat % 2 ? 8 : -8)) + 'deg)';
+    });
+    /* Karte füllt sich */
+    var ring = clamp((p - .6) / .25);
+    pg.style.strokeDashoffset = C * (1 - S.gesamt / 100 * ein(ring));
+    $('#k9z').textContent = Math.round(S.gesamt * ein(ring));
+    var kpiN = Math.round(23 * clamp((p - .32) / .45)); $('#k9kpi').textContent = kpiN;
+    $$('.k9-bar').forEach(function (b, i) {
+      var c = S.cats[i], q = clamp((p - .45 - i * .04) / .25), n = Math.round(c.s / 5 * q);
+      $$('.sp i', b).forEach(function (x, k) { x.classList.toggle('an', k < n); });
+      b.querySelector('b').textContent = Math.round(c.s * q);
+    });
+    var fertig = p > .86, st = B.stufe(S.gesamt);
+    $('#k9st').innerHTML = (fertig ? '<span class="' + st.c + '">' + st.v + '</span>' : (p > .3 ? 'RECHNET …' : '&nbsp;')) + '<small>Kaufpreis 180.000 €</small>';
+    $('#k9tag').textContent = fertig ? 'CLEARED' : p > .2 ? 'LIEST DATEN' : 'WARTET AUF DATEN';
+    $('#k9zwei').classList.toggle('an', p > .9);
+    karte.style.boxShadow = fertig ? '0 40px 120px -30px rgba(232,204,122,.65)' : '';
+    $('#phase').textContent = p < .2 ? 'Kapitel 1 · Das Exposé' : p < .55 ? 'Kapitel 2 · Zerlegt in Daten' : p < .86 ? 'Kapitel 3 · 24 Kennzahlen gerechnet' : 'Kapitel 4 · Ein Urteil. Zwei Scores.';
+  }
+  var anf = false;
+  addEventListener('scroll', function () { if (!anf) { anf = true; requestAnimationFrame(function () { anf = false; zeichne(); }); } }, { passive: true });
+  addEventListener('resize', function () { mass(); });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(mass); else setTimeout(mass, 300);
+  mass();
+
+  /* Kapitel */
+  $('#kapitel').innerHTML = B.ETAPPEN.map(function (e) {
+    var w = e.t.split(' '), last = w.pop();
+    return '<article class="kap"><div class="kbild"><img src="' + e.b + '" alt="" loading="lazy"></div><div class="ktx"><span class="knr" aria-hidden="true">' + e.nr + '</span><div class="b-eye">Kapitel ' + e.nr + ' · ' + e.wer + '</div><h3>' + w.join(' ') + ' <em>' + last + '</em></h3><p>' + e.x + '</p><a href="https://dealpilot.immo/videothek.html?v=' + e.v + '">▶ Video zu diesem Kapitel</a></div></article>';
+  }).join('');
+  $$('.kap').forEach(function (k) { B.sichtbar(k, function () { k.classList.add('an'); }, { schwelle: .25 }); });
+
+  /* Magazin */
+  var V = B.VIDEOS.slice(0, 8);
+  $('#heft').innerHTML = V.map(function (v, i) {
+    return '<button class="ausg rv" style="transition-delay:' + (i % 4) * 90 + 'ms" aria-label="Video abspielen: ' + v.t + '"><span class="cov"><img src="' + v.poster + '" alt="" loading="lazy"><video muted loop playsinline preload="none" poster="' + v.poster + '"></video>'
+      + '<span class="kopf">AUSGABE ' + v.nr + '<b>' + B.dauer(v.d) + '</b></span><span class="fuss">' + v.t + '</span></span><span class="u">' + v.u + '</span></button>';
+  }).join('');
+  $$('.ausg').forEach(function (a, i) { a.addEventListener('click', function () { B.spielen(V[i]); }); B.vorschauBeiHover(a, V[i]); });
+
+  /* Fußnoten */
+  var Z = B.ZAHLEN(), K = (window.DPS_UMFANG || {}).kopf || {};
+  if (K.amtlich_rund_gross) $('#dRund').textContent = K.amtlich_rund_gross;
+  $('#fn').innerHTML = Z.map(function (z, i) { return '<div class="rv"><b><span data-b-zaehl="' + z.z + '">0</span><sup>' + (i + 1) + '</sup></b><span>' + z.t + '</span></div>'; }).join('');
+
+  B.start('09');
+})();
+</script>
+</body>
+</html>

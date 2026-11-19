@@ -1,0 +1,312 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Magnetische Kacheln · Idee 08</title>
+<meta name="description" content="Landing-Vorschlag 08: Bento-Raster mit Cursor-Licht, magnetischen Kacheln und Video-Kacheln, die beim Überfahren aufspringen.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Fragment+Mono&family=Hanken+Grotesk:wght@400;500;600&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="b-basis.css">
+<style>
+/* Typografie Idee 08: Grotesk mit Charakter (Bricolage, optische Größen), eigenwillige Mono, warme Textschrift */
+:root{--f-d:'Bricolage Grotesque',sans-serif;--f-m:'Fragment Mono',monospace;--f-b:'Hanken Grotesk',sans-serif;--r8:22px}
+body{font-size:17px}
+.b-h2{font-weight:800;font-variation-settings:'opsz' 96;letter-spacing:-.035em}
+.b-eye{text-transform:none;letter-spacing:.02em;font-size:14px}
+.b-tarif h3{font-weight:800;letter-spacing:-.02em}
+
+/* ── Kachel mit Cursor-Licht ── */
+.k8{position:relative;border-radius:var(--r8);background:#0d0c09;border:1px solid #221e15;overflow:hidden;isolation:isolate;
+  transform-style:preserve-3d;transition:transform .5s var(--ease),border-color .3s;--mx:50%;--my:50%}
+.k8::before{content:"";position:absolute;inset:0;z-index:-1;background:radial-gradient(420px circle at var(--mx) var(--my),rgba(232,204,122,.14),transparent 45%);opacity:0;transition:opacity .3s}
+.k8::after{content:"";position:absolute;inset:0;border-radius:inherit;padding:1px;background:radial-gradient(280px circle at var(--mx) var(--my),rgba(232,204,122,.9),transparent 50%);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;opacity:0;transition:opacity .3s;pointer-events:none}
+.licht:hover .k8::before,.licht:hover .k8::after{opacity:1}
+/* Einflug */
+.flieg .k8{opacity:0;transform:translate(var(--fx,0),var(--fy,60px)) rotate(var(--fr,0)) scale(.86)}
+.flieg.an .k8{opacity:1;transform:none;transition:transform 1.1s var(--spring),opacity .6s}
+
+/* ── Hero-Bento ── */
+.h8{padding:96px 0 40px}
+.bento{display:grid;grid-template-columns:repeat(12,1fr);grid-auto-rows:minmax(92px,auto);gap:14px}
+.t-titel{grid-column:span 7;grid-row:span 4;padding:clamp(24px,3vw,44px);display:flex;flex-direction:column;justify-content:space-between;background:radial-gradient(120% 90% at 0% 0%,#1c170c,#0d0c09 60%)}
+.t-titel h1{font:800 clamp(40px,5.4vw,80px)/.95 var(--f-d);font-variation-settings:'opsz' 96;letter-spacing:-.045em;margin:12px 0 18px}
+.t-titel h1 .bl{display:inline-block;background:var(--runway);-webkit-background-clip:text;background-clip:text;color:transparent;transform:rotate(-2deg);padding:0 .06em}
+.t-titel .wort{display:inline-block;opacity:0;transform:translateY(.5em) rotate(4deg);transition:all .9s var(--spring)}
+.an .t-titel .wort{opacity:1;transform:none}
+.t-titel .b-lead{margin:0 0 22px;font-size:17px}
+.btns{display:flex;flex-wrap:wrap;gap:12px}
+.mag{will-change:transform;transition:transform .35s var(--spring)}
+.t-video{grid-column:span 5;grid-row:span 2;min-height:200px}
+.t-video video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform:scale(1.05);transition:transform 1.2s var(--ease)}
+.t-video:hover video{transform:scale(1.14)}
+.t-video .lab{position:absolute;left:16px;bottom:14px;z-index:2;font:500 13px var(--f-m);padding:6px 10px;border-radius:999px;background:rgba(5,5,5,.7);border:1px solid rgba(232,204,122,.4)}
+.t-video .lab i{display:inline-block;width:8px;height:8px;border-radius:50%;background:#e45d50;margin-right:7px;animation:puls 1.4s infinite}
+@keyframes puls{50%{opacity:.3}}
+.t-score{grid-column:span 5;grid-row:span 4;padding:22px;cursor:pointer;perspective:1200px}
+.t-zahl{grid-column:span 2;grid-row:span 1;padding:16px;display:flex;flex-direction:column;justify-content:center}
+.t-zahl.drei{grid-column:span 3}
+.t-zahl b{font:800 30px/1 var(--f-d);color:var(--gh);font-variant-numeric:tabular-nums}
+.t-zahl span{font-size:13px;color:var(--tx2);margin-top:6px}
+.t-zwei{grid-column:span 3;grid-row:span 1;padding:16px 18px;display:flex;align-items:center;gap:14px;background:linear-gradient(110deg,#1b160b,#0d0c09)}
+.t-zwei b{font:800 21px/1.05 var(--f-d);letter-spacing:-.02em}.t-zwei b span{color:var(--gh)}
+.t-zwei small{display:block;font-size:13px;color:var(--tx2);margin-top:4px}
+
+/* Score-Kachel: Ring + Balken, beim Überfahren teilt sich der Ring in zwei */
+.sk-kopf{display:flex;justify-content:space-between;align-items:center;font:500 13px var(--f-m);color:var(--tx3)}
+.sk-kopf .cl{color:#6fd39a;border:1px solid rgba(63,165,108,.5);padding:3px 10px;border-radius:999px}
+.sk-buehne{position:relative;height:210px;margin:8px 0 6px}
+.ring8{position:absolute;top:50%;left:50%;width:190px;height:190px;margin:-95px 0 0 -95px;transition:transform .9s var(--spring),opacity .5s}
+.ring8 svg{width:100%;height:100%;transform:rotate(-90deg)}
+.ring8 circle{fill:none;stroke-width:12}
+.ring8 .tr{stroke:#221e15}.ring8 .pg{stroke-linecap:round;transition:stroke-dashoffset 2s var(--ease)}
+.ring8 .wert{position:absolute;inset:0;display:grid;place-items:center;text-align:center}
+.ring8 .wert b{display:block;font:800 64px/1 var(--f-d);letter-spacing:-.04em;font-variant-numeric:tabular-nums}
+.ring8 .wert span{font:500 12px var(--f-m);letter-spacing:.08em}
+.ring8.klein{width:140px;height:140px;margin:-70px 0 0 -70px;opacity:0}
+.ring8.klein .wert b{font-size:44px}
+.ring8 .nm{display:block;font:500 11px var(--f-m);color:var(--tx3)}
+.t-score.geteilt .ring8.gross{transform:scale(.5);opacity:0}
+.t-score.geteilt .ring8.ki{opacity:1;transform:translateX(-90px) rotate(0)}
+.t-score.geteilt .ring8.kf{opacity:1;transform:translateX(90px)}
+.ring8.ki{transform:translateX(0) scale(.6)}.ring8.kf{transform:translateX(0) scale(.6)}
+.hinw{font:500 12px var(--f-m);color:var(--tx3);text-align:center;margin-bottom:10px;transition:color .3s}
+.t-score.geteilt .hinw{color:var(--gh)}
+.bars8{display:grid;gap:9px}
+.bar8{display:grid;grid-template-columns:1fr auto;gap:4px 10px;font-size:14px}
+.bar8 small{font:500 11px var(--f-m);color:var(--tx3);margin-left:6px}
+.bar8 b{font:700 15px var(--f-d)}
+.bar8 i{grid-column:1/-1;height:7px;border-radius:4px;background:#221e15;overflow:hidden}
+.bar8 i::after{content:"";display:block;height:100%;width:var(--w);border-radius:4px;background:var(--c);transform:scaleX(0);transform-origin:left;transition:transform 1.3s var(--spring) var(--d)}
+.an .bar8 i::after{transform:none}
+.t-score.geteilt .bar8{opacity:.35;transition:opacity .4s}
+.sk-fuss{display:flex;justify-content:space-between;margin-top:12px;font:500 12px var(--f-m);color:var(--tx3)}
+
+/* ── Etappen-Mosaik ── */
+.mosaik{display:grid;grid-template-columns:repeat(6,1fr);grid-auto-rows:220px;gap:14px;margin-top:40px}
+.et8{cursor:default}
+.et8:nth-child(1){grid-column:span 3;grid-row:span 2}.et8:nth-child(2){grid-column:span 3}.et8:nth-child(3){grid-column:span 3}
+.et8:nth-child(4),.et8:nth-child(5),.et8:nth-child(6){grid-column:span 2}
+.et8:nth-child(7){grid-column:span 2}.et8:nth-child(8){grid-column:span 2}.et8:nth-child(9){grid-column:span 2}
+.et8 img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:top left;opacity:.55;transform:scale(1.02);transition:transform 1s var(--ease),opacity .5s,filter .5s;filter:saturate(.6)}
+.et8:hover img{transform:scale(1.12);opacity:.85;filter:none}
+.et8 .ov{position:absolute;inset:0;padding:20px;display:flex;flex-direction:column;justify-content:flex-end;background:linear-gradient(180deg,rgba(5,5,5,.1),rgba(5,5,5,.94) 70%)}
+.et8 .nr{font:500 12px var(--f-m);color:var(--g)}
+.et8 h3{margin:4px 0 0;font:800 22px/1.1 var(--f-d);letter-spacing:-.02em}
+.et8 p{margin:8px 0 0;font-size:14px;color:var(--tx2);max-height:0;opacity:0;overflow:hidden;transition:max-height .6s var(--ease),opacity .4s}
+.et8:hover p,.et8:focus-within p,.et8:nth-child(1) p{max-height:200px;opacity:1}
+.et8 a{font:500 13px var(--f-m);color:var(--gh);text-decoration:none;margin-top:8px}
+.et8 .gross{font:800 clamp(80px,10vw,160px)/1 var(--f-d);position:absolute;top:6px;right:16px;color:rgba(232,204,122,.12);letter-spacing:-.06em}
+
+/* ── Video-Bento ── */
+.vb{display:grid;grid-template-columns:repeat(4,1fr);grid-auto-rows:190px;gap:14px;margin-top:40px}
+.vk{padding:0;text-align:left;cursor:pointer;border:1px solid #221e15;background:#0d0c09;transition:transform .5s var(--spring),box-shadow .5s,z-index 0s .5s;z-index:1}
+.vk:nth-child(1){grid-column:span 2;grid-row:span 2}
+.vk:nth-child(4){grid-column:span 2}
+.vk img,.vk video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.vk video{opacity:0;transition:opacity .4s}
+.vk:hover{transform:scale(1.06) translateY(-6px);z-index:5;box-shadow:0 40px 80px -30px rgba(0,0,0,.9),0 0 0 1px rgba(232,204,122,.5);transition:transform .5s var(--spring),box-shadow .5s,z-index 0s}
+.vk:hover video,.vk.laeuft video{opacity:1}
+.vk .ov{position:absolute;inset:auto 0 0 0;padding:16px;background:linear-gradient(transparent,rgba(5,5,5,.92) 50%)}
+.vk .ov b{display:block;font:700 17px/1.2 var(--f-d)}.vk:nth-child(1) .ov b{font-size:28px;letter-spacing:-.02em}
+.vk .ov span{font-size:13px;color:var(--tx2)}
+.vk .chip{position:absolute;top:12px;left:12px;z-index:2;font:500 12px var(--f-m);padding:4px 9px;border-radius:999px;background:rgba(5,5,5,.75);color:var(--gh)}
+.vk .pl{position:absolute;top:12px;right:12px;z-index:2;width:42px;height:42px;border-radius:50%;display:grid;place-items:center;background:var(--runway);color:#140f02;transform:scale(.7);opacity:.85;transition:transform .4s var(--spring)}
+.vk:hover .pl{transform:scale(1.05)}
+
+/* ── Daten-Bento ── */
+.db{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:40px}
+.db .k8{padding:24px}
+.db .k8:nth-child(1){grid-column:span 2;grid-row:span 2;display:flex;flex-direction:column;justify-content:flex-end;background:radial-gradient(120% 100% at 100% 0%,#211a0b,#0d0c09 60%)}
+.db b{display:block;font:800 clamp(30px,3.4vw,46px)/1 var(--f-d);letter-spacing:-.03em;color:var(--gh);font-variant-numeric:tabular-nums}
+.db .k8:nth-child(1) b{font-size:clamp(52px,7vw,104px)}
+.db span{display:block;margin-top:10px;color:var(--tx2);font-size:15px}
+
+.fin8{padding:clamp(40px,6vw,90px);text-align:center;background:radial-gradient(80% 120% at 50% 0%,#231b0b,#0d0c09 70%)}
+.fin8 .b-btn{font-size:17px;min-height:56px;padding:0 34px}
+
+@media(max-width:1080px){
+  .t-titel{grid-column:span 12;grid-row:auto}.t-video{grid-column:span 6;grid-row:span 3}.t-score{grid-column:span 6;grid-row:span 3}
+  .t-zahl,.t-zahl.drei{grid-column:span 3}.t-zwei{grid-column:span 9}
+  .vb{grid-template-columns:repeat(2,1fr)}.vk:nth-child(4){grid-column:span 1}
+}
+@media(max-width:760px){
+  .bento{gap:10px}
+  .t-video,.t-score{grid-column:span 12;grid-row:auto}.t-video{min-height:220px}
+  .t-zahl,.t-zahl.drei{grid-column:span 6}.t-zwei{grid-column:span 6}
+  .mosaik{grid-template-columns:1fr;grid-auto-rows:auto}.et8,.et8:nth-child(n){grid-column:auto;grid-row:auto;min-height:260px}
+  .et8 p{max-height:none;opacity:1}
+  .vb{grid-template-columns:1fr 1fr;grid-auto-rows:150px}.vk:nth-child(1){grid-column:span 2}
+  .vk .ov span{display:none}
+  .db{grid-template-columns:1fr 1fr}.db .k8:nth-child(1){grid-column:span 2;grid-row:auto}
+  .db .k8{padding:16px}
+}
+@media(max-width:420px){.t-score.geteilt .ring8.ki{transform:translateX(-76px)}.t-score.geteilt .ring8.kf{transform:translateX(76px)}.ring8.klein{width:124px;height:124px;margin:-62px 0 0 -62px}}
+</style>
+</head>
+<body>
+<header class="b-nav"></header>
+
+<section class="h8"><div class="b-wrap">
+  <div class="bento flieg licht" id="bento">
+    <div class="k8 t-titel" style="--fx:-80px;--fy:-40px;--fr:-3deg">
+      <div class="b-eye">Immobilien-Investmentanalyse</div>
+      <div>
+        <h1 id="h1"></h1>
+        <p class="b-lead">DealPilot begleitet deine Immobilie vom ersten Exposé bis in den Bestand, mit vollständiger Rechnung, einem amtlich begründeten Wert und einem Investment Case, der bei der Bank besteht.</p>
+        <div class="btns"><a class="b-btn b-btn-p mag" href="https://app.dealpilot.immo/?register=1">Vier Wochen als Pro, kostenlos</a><a class="b-btn b-btn-l mag" href="#videothek">▶ Videos ansehen</a></div>
+        <ul class="b-haken"><li>Keine Zahlungsdaten</li><li>Danach automatisch Free</li></ul>
+      </div>
+    </div>
+    <div class="k8 t-video" style="--fx:90px;--fy:-50px;--fr:4deg">
+      <video muted loop playsinline autoplay preload="auto" poster="../../../frontend/landing/assets/bild/hero.jpg" src="../../../frontend/landing/assets/video/dp-intro-cockpit.mp4"></video>
+      <span class="lab"><i></i>Cockpit · live</span>
+    </div>
+    <div class="k8 t-score" id="tScore" style="--fx:120px;--fy:80px;--fr:6deg" tabindex="0" role="button" aria-pressed="false" aria-label="Investor Deal Score 87, Sehr gut. Antippen teilt ihn in Investment-Score und Finanzierungs-Score.">
+      <div class="sk-kopf"><span>Investor Deal Score</span><span class="cl">Cleared</span></div>
+      <div class="sk-buehne" id="buehne"></div>
+      <div class="hinw" id="hinw">Überfahren oder antippen. Einer reicht nicht.</div>
+      <div class="bars8" id="bars8"></div>
+      <div class="sk-fuss"><span>Kaufpreis 180.000 €</span><span>23/24 KPIs · Tiefe 96 %</span></div>
+    </div>
+    <div id="zahlen8" style="display:contents"></div>
+    <a class="k8 t-zwei" href="#zwei" style="text-decoration:none;--fy:80px"><div><b>Einer reicht nicht. <span>Zwei Scores.</span></b><small>Dein Objekt kann gut sein und deine Finanzierung nicht.</small></div></a>
+  </div>
+</div></section>
+
+<section class="b-sec" id="etappen" style="padding-top:60px"><div class="b-wrap">
+  <div class="rv"><div class="b-eye">So fliegt ein Deal</div>
+    <h2 class="b-h2">Vom Exposé bis in den Bestand. <span class="ac">Neun Kacheln, ein Weg.</span></h2>
+    <p class="b-lead">Fahr über eine Kachel, dann öffnet sie sich. Jede zeigt eine echte Ansicht aus DealPilot, mit Beispieldaten.</p></div>
+  <div class="mosaik flieg licht" id="mosaik"></div>
+</div></section>
+
+<section class="b-sec" id="zwei"><div class="b-wrap" id="b-zwei"></div></section>
+
+<section class="b-sec" id="videothek"><div class="b-wrap">
+  <div class="rv"><div class="b-eye">Videothek</div>
+    <h2 class="b-h2">Kacheln, die <span class="ac">aufspringen.</span></h2>
+    <p class="b-lead">Fahr mit der Maus über ein Video, es springt nach vorn und läuft stumm an. Ein Klick spielt es mit Ton.</p></div>
+  <div class="vb flieg licht" id="vb"></div>
+  <p style="margin-top:24px"><a class="b-btn b-btn-l mag" href="https://dealpilot.immo/videothek.html">Alle Videos in der Videothek →</a></p>
+</div></section>
+
+<section class="b-sec" id="daten"><div class="b-wrap">
+  <div class="rv"><div class="b-eye">Datenbasis</div>
+    <h2 class="b-h2">Amtliche Daten. <span class="ac">Laufend abgeglichen.</span></h2>
+    <p class="b-lead">DealPilot rechnet nicht mit Schätzwerten aus dem Netz, sondern mit den Daten der Behörden. Jede Zahl nennt ihre Herkunft.</p></div>
+  <div class="db flieg licht" id="db"></div>
+</div></section>
+
+<section class="b-sec b-ctr" id="preise"><div class="b-wrap">
+  <div class="rv"><div class="b-eye">Preise</div><h2 class="b-h2">Vier Pakete. <span class="ac">Ab 0 €.</span></h2></div>
+  <div id="b-preise" class="licht"></div>
+</div></section>
+
+<section class="b-sec" id="fragen"><div class="b-wrap">
+  <div class="b-ctr rv"><div class="b-eye">Fragen</div><h2 class="b-h2">Kurz <span class="ac">beantwortet.</span></h2></div>
+  <div class="b-fragen" id="b-fragen"></div>
+</div></section>
+
+<section class="b-sec" style="padding-top:20px"><div class="b-wrap licht flieg" id="finK">
+  <div class="k8 fin8"><div class="b-eye">Bereit?</div><h2 class="b-h2">Die nächste Kachel <span class="ac">ist dein Deal.</span></h2>
+    <p><a class="b-btn b-btn-p mag" href="https://app.dealpilot.immo/?register=1">Kostenlos starten</a></p>
+    <ul class="b-haken" style="justify-content:center"><li>Keine Zahlungsdaten</li><li>4 Wochen voller Pro-Umfang</li><li>Ohne Kündigung</li></ul></div>
+</div></section>
+<footer class="b-fuss"></footer>
+
+<script src="../../../frontend/landing/register-stand.js"></script>
+<script src="../../../frontend/landing/datenumfang.js"></script>
+<script src="b-basis.js"></script>
+<script>
+(function () {
+  var S = B.SCORE, $ = B.$, $$ = B.$$, ruhig = B.ruhig, maus = matchMedia('(hover:hover)').matches;
+  if (ruhig) { var hv = $('.t-video video'); hv.removeAttribute('autoplay'); hv.pause(); }
+
+  /* Titel Wort für Wort */
+  var worte = ['Immobilien­entscheidungen', 'sind', 'zu', 'groß', 'für', '<span class="bl">ein Bauchgefühl.</span>'];
+  $('#h1').innerHTML = worte.map(function (w, i) { return '<span class="wort" style="transition-delay:' + (300 + i * 90) + 'ms">' + w + '</span>'; }).join(' ');
+
+  /* Kennzahl-Kacheln */
+  var H = B.HERO();
+  $('#zahlen8').innerHTML = H.slice(0, 4).concat(H.slice(4, 5)).map(function (h, i) {
+    return '<div class="k8 t-zahl' + (i === 2 ? ' drei' : '') + '" style="--fy:' + (60 + i * 20) + 'px;--fx:' + ((i % 2 ? 1 : -1) * 40) + 'px"><b>' + (h.v || '') + '<i data-b-zaehl="' + h.z + '" style="font-style:normal">0</i>' + (h.e || '') + '</b><span>' + h.t + '</span></div>';
+  }).join('');
+
+  /* Score-Kachel */
+  function ring(cls, s, name) {
+    var st = B.stufe(s), C = 2 * Math.PI * 52;
+    return '<div class="ring8 ' + cls + '"><svg viewBox="0 0 120 120"><circle class="tr" cx="60" cy="60" r="52"/><circle class="pg" cx="60" cy="60" r="52" style="stroke:' + st.f + ';stroke-dasharray:' + C + ';stroke-dashoffset:' + C + '" data-off="' + (C * (1 - s / 100)) + '"/></svg>'
+      + '<div class="wert"><div><b data-s="' + s + '">0</b><span class="' + st.c + '">' + st.v + '</span>' + (name ? '<span class="nm">' + name + '</span>' : '') + '</div></div></div>';
+  }
+  $('#buehne').innerHTML = ring('gross', S.gesamt) + ring('klein ki', S.inv.s, 'INVESTMENT') + ring('klein kf', S.fin.s, 'FINANZIERUNG');
+  $('#bars8').innerHTML = S.cats.map(function (c, i) {
+    return '<div class="bar8"><span>' + c.n + '<small>' + c.w + ' %</small></span><b style="color:' + B.farbe(c.s) + '">' + c.s + '</b><i style="--w:' + c.s + '%;--c:' + B.farbe(c.s) + ';--d:' + (0.9 + i * 0.12) + 's"></i></div>';
+  }).join('');
+  var ts = $('#tScore');
+  function ringeLos() {
+    $$('.ring8 .pg', ts).forEach(function (c) { c.style.strokeDashoffset = c.getAttribute('data-off'); });
+    $$('.ring8 b[data-s]', ts).forEach(function (b) { B.zaehle(b, +b.getAttribute('data-s'), 1900); });
+  }
+  function teile(an) { ts.classList.toggle('geteilt', an); ts.setAttribute('aria-pressed', an ? 'true' : 'false'); $('#hinw').textContent = an ? 'Investment ' + S.inv.s + ' und Finanzierung ' + S.fin.s + '. Zusammen ' + S.gesamt + '.' : 'Überfahren oder antippen. Einer reicht nicht.'; }
+  if (maus) { ts.addEventListener('mouseenter', function () { teile(true); }); ts.addEventListener('mouseleave', function () { teile(false); }); }
+  ts.addEventListener('click', function () { if (!maus) teile(!ts.classList.contains('geteilt')); });
+  ts.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); teile(!ts.classList.contains('geteilt')); } });
+
+  /* Etappen-Mosaik */
+  $('#mosaik').innerHTML = B.ETAPPEN.map(function (e, i) {
+    return '<article class="k8 et8" style="--fy:' + (80 + (i % 3) * 30) + 'px;--fx:' + ((i % 2 ? 1 : -1) * 30) + 'px;--fr:' + ((i % 2 ? 1 : -1) * 2) + 'deg"><img src="' + e.b + '" alt="" loading="lazy"><span class="gross" aria-hidden="true">' + e.nr + '</span>'
+      + '<div class="ov"><span class="nr">Etappe ' + e.nr + ' · ' + e.wer + '</span><h3>' + e.t + '</h3><p>' + e.x + '</p><a href="https://dealpilot.immo/videothek.html?v=' + e.v + '">▶ Video</a></div></article>';
+  }).join('');
+
+  /* Video-Bento */
+  var V = B.VIDEOS.slice(0, 8);
+  $('#vb').innerHTML = V.map(function (v, i) {
+    return '<button class="k8 vk" data-i="' + i + '" style="--fy:' + (60 + i * 10) + 'px" aria-label="Video abspielen: ' + v.t + '"><img src="' + v.poster + '" alt="" loading="lazy"><video muted loop playsinline preload="none" poster="' + v.poster + '"></video>'
+      + '<span class="chip">' + v.nr + ' · ' + B.dauer(v.d) + '</span><span class="pl" aria-hidden="true">▶</span><span class="ov"><b>' + v.t + '</b><span>' + v.u + '</span></span></button>';
+  }).join('');
+  $$('.vk').forEach(function (k, i) { k.addEventListener('click', function () { B.spielen(V[i]); }); B.vorschauBeiHover(k, V[i]); });
+  var v0 = $('.vk'); if (!ruhig) B.sichtbar(v0, function () { var vi = v0.querySelector('video'); vi.src = V[0].src; v0.classList.add('laeuft'); var p = vi.play(); if (p && p.catch) p.catch(function () {}); }, { schwelle: .6 });
+
+  /* Daten-Bento */
+  var Z = B.ZAHLEN(), K = (window.DPS_UMFANG || {}).kopf || {};
+  $('#db').innerHTML = Z.map(function (z, i) { return '<div class="k8" style="--fy:' + (50 + i * 12) + 'px"><b data-b-zaehl="' + z.z + '">0</b><span>' + z.t + '</span></div>'; }).join('');
+
+  /* Einflug der Raster */
+  ['#bento', '#mosaik', '#vb', '#db', '#finK'].forEach(function (s) {
+    var g = $(s); if (!g) return;
+    $$('.k8', g).forEach(function (k, i) { k.style.transitionDelay = (i * 70) + 'ms'; });
+    B.sichtbar(g, function () {
+      g.classList.add('an');
+      setTimeout(function () { $$('.k8', g).forEach(function (k) { k.style.transitionDelay = ''; }); }, 1800);
+      if (s === '#bento') setTimeout(ringeLos, ruhig ? 0 : 500);
+    }, { schwelle: .08 });
+  });
+
+  /* Cursor-Licht, Neigung und Magnet (nur Maus, ohne „weniger Bewegung") */
+  if (maus && !ruhig) {
+    document.addEventListener('pointermove', function (e) {
+      var k = e.target.closest && e.target.closest('.k8');
+      $$('.licht').forEach(function (g) {
+        if (!g.contains(e.target)) return;
+        $$('.k8', g).forEach(function (x) { var r = x.getBoundingClientRect(); x.style.setProperty('--mx', (e.clientX - r.left) + 'px'); x.style.setProperty('--my', (e.clientY - r.top) + 'px'); });
+      });
+      if (k && !k.classList.contains('vk') && k.closest('.an')) {
+        var r = k.getBoundingClientRect(), x = (e.clientX - r.left) / r.width - .5, y = (e.clientY - r.top) / r.height - .5;
+        k.style.transform = 'perspective(900px) rotateX(' + (-y * 5) + 'deg) rotateY(' + (x * 5) + 'deg)';
+        k._neig = 1;
+      }
+    }, { passive: true });
+    $$('.k8').forEach(function (k) { k.addEventListener('mouseleave', function () { if (k._neig) k.style.transform = ''; }); });
+    $$('.mag').forEach(function (m) {
+      m.addEventListener('mousemove', function (e) { var r = m.getBoundingClientRect(); m.style.transform = 'translate(' + ((e.clientX - r.left - r.width / 2) * .25) + 'px,' + ((e.clientY - r.top - r.height / 2) * .35) + 'px)'; });
+      m.addEventListener('mouseleave', function () { m.style.transform = ''; });
+    });
+  }
+
+  B.start('08');
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,366 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Abflugtafel · Idee 06</title>
+<meta name="description" content="Landing-Vorschlag 06: Split-Flap-Abflugtafel, Gate-Monitore als Videothek, Score als Flugstatus.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800;900&family=Instrument+Serif:ital@1&family=Martian+Mono:wght@400;600;800&family=Public+Sans:wght@400;500;600&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="b-basis.css">
+<style>
+/* Typografie Idee 06: Flughafen-Beschilderung. Kondensierte Display-Grotesk, Mono mit Persönlichkeit, ruhige Textschrift */
+:root{--f-d:'Big Shoulders Display',sans-serif;--f-m:'Martian Mono',monospace;--f-b:'Public Sans',sans-serif;--f-s:'Instrument Serif',serif}
+.b-h2{font-weight:900;font-size:clamp(40px,6.4vw,78px);line-height:.95;letter-spacing:0;text-transform:uppercase}
+.b-eye,.b-tarif .kl{font-size:11px;letter-spacing:.14em}
+.b-tarif h3,.b-zk h3{font-weight:800;font-size:30px;text-transform:uppercase}
+.b-tarif .pr{font-weight:800;font-size:46px}
+.b-fragen summary{font-weight:800;font-size:clamp(20px,2.4vw,26px);text-transform:uppercase;letter-spacing:.01em}
+.b-zk .ring b,.b-zmitte .ges b{font-weight:900}
+/* ── Split-Flap ── */
+.fl-zeile{display:inline-flex;gap:2px;--fs:20px;font-size:var(--fs)}
+.fz{position:relative;display:inline-block;width:.78em;height:1.25em;perspective:260px;font:700 1em/1 var(--f-m);color:#f6ecd0;flex:0 0 auto}
+.fz>span{position:absolute;left:0;right:0;height:50%;overflow:hidden;background:linear-gradient(#1d1a13,#14120d)}
+.fz .o,.fz .fo{top:0;border-radius:3px 3px 0 0;transform-origin:50% 100%}
+.fz .u,.fz .fu{bottom:0;border-radius:0 0 3px 3px;transform-origin:50% 0;background:linear-gradient(#121009,#0d0c08)}
+.fz .fo,.fz .fu{backface-visibility:hidden;z-index:2}
+.fz .fo{transform:rotateX(-90deg)}
+.fz i{position:absolute;left:0;right:0;height:200%;display:flex;align-items:center;justify-content:center;font-style:normal}
+.fz .o i,.fz .fo i{top:0}.fz .u i,.fz .fu i{bottom:0}
+.fz::after{content:"";position:absolute;left:0;right:0;top:calc(50% - .5px);height:1px;background:#000;z-index:3}
+.fl-gold .fz{color:var(--gh)}.fl-gruen .fz{color:#6fd39a}
+
+/* ── Hero ── */
+.h6{position:relative;min-height:100svh;display:flex;align-items:center;overflow:hidden;padding:110px 0 70px}
+.h6 video.bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.42;filter:saturate(.8) contrast(1.1)}
+.h6::before{content:"";position:absolute;inset:0;background:radial-gradient(120% 80% at 70% 40%,rgba(5,5,5,.2),#050505 75%),linear-gradient(180deg,rgba(5,5,5,.6),transparent 30%,#050505)}
+.h6::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(255,255,255,.025) 0 1px,transparent 1px 3px);pointer-events:none}
+.h6 .b-wrap{position:relative;z-index:2;display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);gap:56px;align-items:center}
+.tick{display:flex;align-items:center;gap:14px;margin-bottom:26px;padding:12px 14px;border-radius:12px;background:#0b0a07;border:1px solid rgba(201,168,76,.25);box-shadow:inset 0 0 0 1px #000,0 20px 50px -30px #000;width:max-content;max-width:100%}
+.tick .lamp{width:10px;height:10px;border-radius:50%;background:var(--gh);box-shadow:0 0 12px var(--gh);animation:blink 1.4s infinite}
+@keyframes blink{50%{opacity:.25}}
+.tick .fl-zeile{--fs:clamp(11px,3vw,19px)}
+.h6 h1{font:900 clamp(48px,6.6vw,104px)/.92 var(--f-d);letter-spacing:-.005em;text-transform:uppercase;margin:0 0 22px;hyphens:manual}
+.h6 h1 .w{max-width:100%;padding-top:.1em}
+.b-btn{font-family:var(--f-b)}
+.h6 h1 em{text-transform:none;font-size:.74em;white-space:nowrap}
+.h6 h1 .w{display:inline-block;overflow:hidden;vertical-align:top}
+.h6 h1 .w>span{display:inline-block;transform:translateY(110%) rotateX(-70deg);transform-origin:50% 100%;transition:transform 1s var(--spring)}
+.h6.los h1 .w>span{transform:none}
+.h6 h1 em{font:italic 500 1.06em var(--f-s);color:var(--gh)}
+.h6 .b-lead{margin:0 0 28px}
+.h6 .btns{display:flex;flex-wrap:wrap;gap:12px}
+.belege{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:34px}
+.belege div{padding:12px;border-radius:10px;background:rgba(12,11,9,.7);border:1px solid rgba(201,168,76,.14)}
+.belege b{display:block;font:800 30px/1 var(--f-d);color:var(--gh);font-variant-numeric:tabular-nums;margin-bottom:6px}
+.belege > div > span{font:600 10px var(--f-m);letter-spacing:.1em;text-transform:uppercase;color:var(--tx3)}
+
+/* ── Score als Flugstatus-Tafel ── */
+.board{position:relative;border-radius:22px;padding:22px;background:linear-gradient(180deg,#121009,#080705);border:1px solid rgba(201,168,76,.3);
+  box-shadow:0 50px 120px -50px rgba(201,168,76,.45),inset 0 1px 0 rgba(255,255,255,.05);transform-style:preserve-3d;transition:transform .5s var(--ease)}
+.board .kopf{display:flex;justify-content:space-between;align-items:center;font:700 11px var(--f-m);letter-spacing:.16em;color:var(--g);text-transform:uppercase;margin-bottom:16px}
+.board .kopf .cl{padding:4px 10px;border-radius:999px;background:rgba(63,165,108,.15);color:#6fd39a;border:1px solid rgba(63,165,108,.4)}
+.board .gross{display:flex;align-items:center;gap:18px;padding:16px;border-radius:14px;background:#050504;border:1px solid #1f1c14}
+.board .gross .fl-zeile{--fs:clamp(54px,9vw,92px)}
+.board .gross .fz{width:.7em}
+.board .gross .rechts{display:flex;flex-direction:column;gap:8px}
+.board .gross small{font:600 11px var(--f-m);letter-spacing:.14em;color:var(--tx3)}
+.board .gross .fl-zeile.st{--fs:clamp(15px,2vw,20px)}
+.rows{margin-top:14px;display:grid;gap:8px}
+.row{display:grid;grid-template-columns:1fr auto;gap:6px 12px;align-items:center;padding:10px 12px;border-radius:10px;background:#0b0a07;border:1px solid #1c1912}
+.row .nm{font:600 13px var(--f-d)}.row .nm small{font:500 11px var(--f-m);color:var(--tx3);margin-left:8px}
+.row .fl-zeile{--fs:17px}
+.seg{grid-column:1/-1;display:grid;grid-template-columns:repeat(20,1fr);gap:3px}
+.seg i{height:7px;border-radius:2px;background:#1c1912;transition:background .2s,box-shadow .2s}
+.seg i.an{background:var(--c);box-shadow:0 0 8px var(--c)}
+.zw{margin:16px 0 0;font:800 20px var(--f-d);text-transform:uppercase;letter-spacing:.02em;color:var(--tx2)}.zw b{color:var(--gh)}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.split div{padding:12px;border-radius:12px;background:#050504;border:1px solid #1f1c14;opacity:0;transform:translateY(14px);transition:all .7s var(--spring)}
+.split.an div{opacity:1;transform:none}.split.an div+div{transition-delay:.15s}
+.split small{display:block;font:600 10px var(--f-m);letter-spacing:.12em;color:var(--tx3);text-transform:uppercase}
+.split b{font:700 30px var(--f-d)}.split span{font:600 12px var(--f-m);margin-left:6px}
+.board .fuss{display:flex;justify-content:space-between;margin-top:14px;font:500 11px var(--f-m);color:var(--tx3);letter-spacing:.06em}
+
+/* ── Etappen: Abflugtafel ── */
+.et6 .grid{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:48px;margin-top:40px}
+.tafel-sticky{position:sticky;top:90px;align-self:start}
+.monitor{position:relative;aspect-ratio:16/9;border-radius:16px;overflow:hidden;border:1px solid rgba(201,168,76,.3);background:#000;box-shadow:0 40px 90px -50px rgba(201,168,76,.5)}
+.monitor img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:top left;opacity:0;transition:opacity .2s}
+.monitor img.an{opacity:1;animation:slat .7s var(--ease)}
+@keyframes slat{from{clip-path:inset(0 0 100% 0)}to{clip-path:inset(0 0 0 0)}}
+.monitor .scan{position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(0,0,0,.18) 0 2px,transparent 2px 4px);pointer-events:none}
+.dep{margin-top:16px;border-radius:14px;background:#080705;border:1px solid #1f1c14;padding:12px}
+.dep .th,.dep .tr{display:grid;grid-template-columns:64px 1fr 130px;gap:10px;align-items:center}
+.dep .th{font:700 10px var(--f-m);letter-spacing:.16em;color:var(--g);padding:0 4px 8px}
+.dep .tr{padding:5px 4px;border-top:1px solid #15130e}
+.dep .tr .fl-zeile{--fs:13px}
+.dep .tr.akt{background:rgba(201,168,76,.07);border-radius:6px}
+.mini{display:none}
+.stops{display:grid;gap:22vh;padding:6vh 0 18vh}
+.stop{padding:26px;border-radius:18px;background:linear-gradient(180deg,#100e0a,#0a0907);border:1px solid #1f1c14;transition:border-color .4s,transform .6s var(--ease),opacity .6s;opacity:.45;transform:scale(.97)}
+.stop.akt{border-color:rgba(232,204,122,.55);opacity:1;transform:none}
+.stop .nr{font:700 12px var(--f-m);letter-spacing:.16em;color:var(--g)}
+.stop h3{font:700 26px/1.15 var(--f-d);margin:8px 0 10px}
+.stop p{margin:0 0 14px;color:var(--tx2)}
+.stop a{font:600 13px var(--f-m);color:var(--gh);text-decoration:none}
+.stop img{display:none}
+
+/* ── Videothek: Gate-Monitore ── */
+.gates{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-top:40px}
+.gate{position:relative;border-radius:16px;background:#0a0907;border:1px solid #221e15;overflow:hidden;cursor:pointer;transition:transform .4s var(--spring),border-color .3s;text-align:left;padding:0}
+.gate:hover{transform:translateY(-6px) rotateX(4deg);border-color:rgba(232,204,122,.6)}
+.gate.gross{grid-column:span 2;grid-row:span 2}
+.gate .gk{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:#050504;border-bottom:1px solid #1d1a12}
+.gate .gk .fl-zeile{--fs:12px}
+.gate .gk em{font:700 11px var(--f-m);font-style:normal;color:var(--tx3)}
+.gate{display:flex;flex-direction:column;width:100%}
+.gate > span{display:block}.gate .gk{display:flex}.gate .tx span{display:block}
+.gate .bild{position:relative;aspect-ratio:16/9;background:#000}
+.gate.gross .bild{flex:1;aspect-ratio:auto;min-height:220px}
+.gate .bild img,.gate .bild video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.gate .bild video{opacity:0;transition:opacity .4s}.gate:hover .bild video,.gate.laeuft .bild video{opacity:1}
+.gate .bild::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(0,0,0,.16) 0 2px,transparent 2px 4px)}
+.gate .play{position:absolute;z-index:2;left:50%;top:50%;width:58px;height:58px;margin:-29px 0 0 -29px;border-radius:50%;display:grid;place-items:center;background:rgba(5,5,5,.6);border:1px solid var(--g);color:var(--gh);font-size:18px;transition:transform .3s var(--spring)}
+.gate:hover .play{transform:scale(1.15)}
+.gate .tx{padding:12px 14px 16px}
+.gate .tx b{display:block;font:700 16px var(--f-d)}.gate.gross .tx b{font-size:24px}
+.gate .tx span{font-size:13px;color:var(--tx2)}
+.mehr{margin-top:24px}
+
+/* ── Daten als Tafel ── */
+.dz{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-top:40px}
+.dz div{padding:18px;border-radius:14px;background:#080705;border:1px solid #1f1c14}
+.dz .fl-zeile{--fs:clamp(18px,2.6vw,30px)}
+.dz span{display:block;margin-top:10px;font-size:14px;color:var(--tx2)}
+
+/* ── Finale ── */
+.finale{text-align:center;overflow:hidden}
+.finale .fl-zeile{--fs:clamp(14px,3.4vw,40px)}
+.finale .b-btn{margin-top:30px}
+
+@media(max-width:980px){
+  .h6 .b-wrap{grid-template-columns:1fr;gap:40px}
+  .et6 .grid{grid-template-columns:1fr}
+  .tafel-sticky{display:none}
+  .mini{display:flex;position:sticky;top:76px;z-index:10;justify-content:center;padding:10px;border-radius:12px;background:#080705;border:1px solid rgba(201,168,76,.3);margin-top:24px}
+  .mini{overflow:hidden}.mini .fl-zeile{--fs:clamp(12px,3.6vw,16px)}
+  .stops{gap:24px;padding:20px 0}
+  .stop{opacity:1;transform:none}
+  .stop img{display:block;width:100%;border-radius:10px;margin:0 0 16px;border:1px solid #221e15}
+  .gates{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:560px){
+  .gates{grid-template-columns:1fr}.gate.gross{grid-column:auto;grid-row:auto}
+  .dz{grid-template-columns:1fr}
+  .belege{grid-template-columns:repeat(2,1fr)}
+  .board{padding:14px}.split b{font-size:24px}
+}
+</style>
+</head>
+<body>
+<header class="b-nav"></header>
+
+<section class="h6" id="top">
+  <video class="bg" muted loop playsinline autoplay preload="auto" poster="../../../frontend/landing/assets/bild/hero.jpg" src="../../../frontend/landing/assets/video/dp-hero-flug.mp4"></video>
+  <div class="b-wrap">
+    <div>
+      <div class="tick"><span class="lamp" aria-hidden="true"></span><span id="tick"></span></div>
+      <div class="b-eye">Gate DP · Immobilien-Investmentanalyse</div>
+      <h1 id="h1"><span class="w"><span>Immobilien&shy;entscheidungen</span></span> <span class="w"><span>sind zu groß für</span></span> <span class="w"><span><em>ein Bauchgefühl.</em></span></span></h1>
+      <p class="b-lead">DealPilot begleitet deine Immobilie vom ersten Exposé bis in den Bestand, mit vollständiger Rechnung, einem amtlich begründeten Wert und einem Investment Case, der bei der Bank besteht. Ab dann fliegst du nach Flugdaten.</p>
+      <div class="btns"><a class="b-btn b-btn-p" href="https://app.dealpilot.immo/?register=1">Vier Wochen als Pro, kostenlos</a><a class="b-btn b-btn-l" href="#videothek">▶ Videos ansehen</a></div>
+      <ul class="b-haken"><li>Keine Zahlungsdaten</li><li>4 Wochen voller Pro-Umfang</li><li>Danach automatisch Free</li></ul>
+      <div class="belege" id="belege"></div>
+    </div>
+    <div class="board" id="board" aria-label="Investor Deal Score 87 von 100, Sehr gut">
+      <div class="kopf"><span>Flugstatus · Investor Deal Score</span><span class="cl">Cleared</span></div>
+      <div class="gross"><span id="bZahl" class="fl-gold"></span>
+        <div class="rechts"><small>VON 100 · STUFE</small><span id="bStufe" class="st fl-gold"></span><small id="bKp"></small></div></div>
+      <div class="rows" id="bRows"></div>
+      <p class="zw">Einer reicht nicht. <b>Zwei Scores.</b></p>
+      <div class="split" id="bSplit"></div>
+      <div class="fuss"><span>KAUFPREIS 180.000 €</span><span>23/24 KPIS · TIEFE 96 %</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="b-sec et6" id="etappen"><div class="b-wrap">
+  <div class="b-ctr rv"><div class="b-eye">So fliegt ein Deal</div>
+    <h2 class="b-h2">Vom Exposé bis in den Bestand. <span class="ac">Neun Abflüge.</span></h2>
+    <p class="b-lead">Scroll weiter. Die Tafel klappt um, sobald eine Etappe boardet, und daneben siehst du die passende Ansicht aus DealPilot.</p></div>
+  <div class="mini" id="mini"></div>
+  <div class="grid">
+    <div class="tafel-sticky">
+      <div class="monitor" id="mon"><span class="scan"></span></div>
+      <div class="dep" id="dep"><div class="th"><span>FLUG</span><span>ZIEL</span><span>STATUS</span></div></div>
+      <p class="b-hinweis" style="margin-top:10px">Ansichten aus DealPilot. Beispieldaten.</p>
+    </div>
+    <div class="stops" id="stops"></div>
+  </div>
+</div></section>
+
+<section class="b-sec" id="zwei"><div class="b-wrap" id="b-zwei"></div></section>
+
+<section class="b-sec" id="videothek" style="background:linear-gradient(180deg,#050505,#0b0a07 40%,#050505)"><div class="b-wrap">
+  <div class="rv"><div class="b-eye">Videothek · Gate-Monitore</div>
+    <h2 class="b-h2">Jedes Modul hat <span class="ac">sein eigenes Gate.</span></h2>
+    <p class="b-lead">Fahr mit der Maus über einen Monitor, dann läuft die Vorschau. Ein Klick spielt das ganze Video ab.</p></div>
+  <div class="gates" id="gates"></div>
+  <p class="mehr"><a class="b-btn b-btn-l" href="https://dealpilot.immo/videothek.html">Alle Videos in der Videothek →</a></p>
+</div></section>
+
+<section class="b-sec" id="daten"><div class="b-wrap">
+  <div class="rv"><div class="b-eye">Datenbasis</div>
+    <h2 class="b-h2"><span id="dRund">Über 1,1 Millionen</span> amtliche Datenpunkte. <span class="ac">Laufend abgeglichen.</span></h2>
+    <p class="b-lead">DealPilot rechnet nicht mit Schätzwerten aus dem Netz, sondern mit den Daten der Behörden. Jede Zahl nennt ihre Herkunft.</p></div>
+  <div class="dz" id="dz"></div>
+</div></section>
+
+<section class="b-sec b-ctr" id="preise"><div class="b-wrap">
+  <div class="rv"><div class="b-eye">Preise · Boarding Pass wählen</div><h2 class="b-h2">Vier Pakete. <span class="ac">Ab 0 €.</span></h2></div>
+  <div id="b-preise"></div>
+</div></section>
+
+<section class="b-sec" id="fragen"><div class="b-wrap">
+  <div class="b-ctr rv"><div class="b-eye">Fragen</div><h2 class="b-h2">Noch eine Frage <span class="ac">vor dem Boarding?</span></h2></div>
+  <div class="b-fragen" id="b-fragen"></div>
+</div></section>
+
+<section class="b-sec finale"><div class="b-wrap">
+  <div class="b-eye">Gate DP</div>
+  <div style="margin-top:18px" id="fin1"></div><div style="margin-top:6px" id="fin2"></div>
+  <p><a class="b-btn b-btn-p" href="https://app.dealpilot.immo/?register=1">Jetzt einsteigen, vier Wochen Pro</a></p>
+  <ul class="b-haken" style="justify-content:center"><li>Keine Zahlungsdaten</li><li>Ohne Kündigung</li></ul>
+</div></section>
+<footer class="b-fuss"></footer>
+
+<script src="../../../frontend/landing/register-stand.js"></script>
+<script src="../../../frontend/landing/datenumfang.js"></script>
+<script src="b-basis.js"></script>
+<script src="b-flap.js"></script>
+<script>
+(function () {
+  var S = B.SCORE, $ = B.$, F = Flap.Tafel, ruhig = B.ruhig;
+  var hero = $('.h6'), vid = $('.h6 video');
+  if (ruhig) { vid.removeAttribute('autoplay'); vid.pause(); }
+  requestAnimationFrame(function () { setTimeout(function () { hero.classList.add('los'); }, 80); });
+  B.$$('#h1 .w > span').forEach(function (s, i) { s.style.transitionDelay = (i * 160) + 'ms'; });
+
+  /* Ticker oben: Meldungen aus den gemessenen Zahlen */
+  var H = B.HERO();
+  var mel = ['DEAL SCORE ' + S.gesamt + ' · ' + B.stufe(S.gesamt).v, B.fmt(H[4].z) + ' AMTLICHE WERTE', B.fmt(H[5].z) + ' GUTACHTERAUSSCHÜSSE',
+    H[1].z + ' KPIS JE SCORE', H[0].z + ' S BIS ZUR BEWERTUNG', H[2].z + ' MODULE AN BORD', '> ' + B.fmt(H[3].z) + ' NUTZER AN BORD'];
+  var tick = F($('#tick'), 24, '');
+  var mi = 0;
+  function naechste() { tick.setze(mel[mi % mel.length], { versatz: 28 }); mi++; }
+  naechste(); if (!ruhig) setInterval(naechste, 3600);
+
+  $('#belege').innerHTML = H.map(function (h) { return '<div><b>' + (h.v || '') + '<span data-b-zaehl="' + h.z + '">0</span>' + (h.e || '') + '</b><span>' + h.t + '</span></div>'; }).join('');
+
+  /* Score-Tafel */
+  var zahl = F($('#bZahl'), 2, '00'), st = F($('#bStufe'), 8, '');
+  $('#bKp').textContent = 'INVESTMENT ' + S.inv.s + ' · FINANZIERUNG ' + S.fin.s;
+  $('#bRows').innerHTML = S.cats.map(function (c, i) {
+    return '<div class="row"><span class="nm">' + c.n + '<small>' + c.w + ' % · ' + c.k + ' KPIs</small></span><span class="z" id="rz' + i + '"></span>'
+      + '<span class="seg" style="--c:' + B.farbe(c.s) + '">' + Array(21).join('<i></i>') + '</span></div>';
+  }).join('');
+  var rz = S.cats.map(function (c, i) { var t = F($('#rz' + i), 3, '  0'); return t; });
+  $('#bSplit').innerHTML = '<div><small>Investment-Score</small><b class="' + B.stufe(S.inv.s).c + '">' + S.inv.s + '</b><span class="' + B.stufe(S.inv.s).c + '">' + B.stufe(S.inv.s).v + '</span></div>'
+    + '<div><small>Finanzierungs-Score</small><b class="' + B.stufe(S.fin.s).c + '">' + S.fin.s + '</b><span class="' + B.stufe(S.fin.s).c + '">' + B.stufe(S.fin.s).v + '</span></div>';
+  function abflug() {
+    zahl.setze(String(S.gesamt), { min: 8, streu: 6, ms: 110, versatz: 140 });
+    setTimeout(function () { st.setze(B.stufe(S.gesamt).v, { versatz: 45 }); }, ruhig ? 0 : 900);
+    S.cats.forEach(function (c, i) {
+      setTimeout(function () {
+        rz[i].setze(String(c.s), { rechts: true, min: 4, streu: 5 });
+        var seg = B.$$('#bRows .row:nth-child(' + (i + 1) + ') .seg i'), n = Math.round(c.s / 5);
+        seg.forEach(function (s, k) { setTimeout(function () { s.classList.toggle('an', k < n); }, ruhig ? 0 : k * 40); });
+      }, ruhig ? 0 : 300 + i * 260);
+    });
+    setTimeout(function () { $('#bSplit').classList.add('an'); }, ruhig ? 0 : 2200);
+  }
+  setTimeout(abflug, ruhig ? 0 : 700);
+  /* Neigung der Tafel zur Maus */
+  var board = $('#board');
+  if (!ruhig && matchMedia('(hover:hover)').matches) {
+    board.addEventListener('mousemove', function (e) {
+      var r = board.getBoundingClientRect(), x = (e.clientX - r.left) / r.width - .5, y = (e.clientY - r.top) / r.height - .5;
+      board.style.transform = 'perspective(1200px) rotateY(' + (x * 8) + 'deg) rotateX(' + (-y * 8) + 'deg)';
+    });
+    board.addEventListener('mouseleave', function () { board.style.transform = ''; board.addEventListener('mouseenter', abflug, { once: true }); });
+  }
+
+  /* Etappen: Abflugtafel */
+  var E = B.ETAPPEN, ZIEL = ['QUICK-CHECK', 'ERFASSEN', 'DEAL SCORE', 'UNTERLAGEN', 'FINANZIERUNG', 'STEUER', 'WERTERMITTLUNG', 'ZIELBILD', 'BESTAND'];
+  var mon = $('#mon'), dep = $('#dep');
+  E.forEach(function (e, i) {
+    var im = document.createElement('img'); im.src = e.b; im.alt = ''; im.loading = 'lazy'; if (i === 0) im.className = 'an'; mon.insertBefore(im, mon.firstChild);
+    var tr = document.createElement('div'); tr.className = 'tr'; tr.innerHTML = '<span></span><span></span><span></span>'; dep.appendChild(tr);
+  });
+  var imgs = B.$$('#mon img').reverse();
+  var rows = B.$$('#dep .tr').map(function (tr, i) {
+    var s = tr.children;
+    return { tr: tr, f: F(s[0], 5, 'DP ' + E[i].nr), z: F(s[1], 14, ZIEL[i]), s: F(s[2], 10, 'PLANMÄSSIG') };
+  });
+  rows.forEach(function (r) { r.s.zellen.forEach(function (z) { z.style.color = '#9a9384'; }); });
+  var mini = F($('#mini'), 20, '01 · QUICK-CHECK');
+  $('#stops').innerHTML = E.map(function (e) {
+    var v = B.VIDEOS.filter(function (x) { return x.id === e.v; })[0];
+    return '<article class="stop" data-i="' + e.nr + '"><img src="' + e.b + '" alt="" loading="lazy"><div class="nr">ETAPPE ' + e.nr + ' · ' + e.wer.toUpperCase() + '</div><h3>' + e.t + '</h3><p>' + e.x + '</p>'
+      + '<a href="https://dealpilot.immo/videothek.html?v=' + e.v + '">▶ Video ansehen</a></article>';
+  }).join('');
+  var akt = -1;
+  function setzeAkt(i) {
+    if (i === akt) return; akt = i;
+    imgs.forEach(function (im, k) { im.classList.toggle('an', k === i); });
+    rows.forEach(function (r, k) {
+      var soll = k < i ? 'ABGEFLOGEN' : k === i ? 'BOARDING' : 'PLANMÄSSIG';
+      r.tr.classList.toggle('akt', k === i);
+      if (r._s !== soll) { r._s = soll; r.s.setze(soll, { versatz: 30, min: 2, streu: 4 });
+        r.s.zellen.forEach(function (z) { z.style.color = k < i ? '#6fd39a' : k === i ? '#E8CC7A' : '#9a9384'; }); }
+    });
+    mini.setze(E[i].nr + ' · ' + ZIEL[i], { versatz: 22, min: 2, streu: 3 });
+    B.$$('.stop').forEach(function (s, k) { s.classList.toggle('akt', k === i); });
+  }
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) setzeAkt(B.$$('.stop').indexOf(e.target)); }); }, { rootMargin: '-45% 0px -45% 0px' });
+    B.$$('.stop').forEach(function (s) { io.observe(s); });
+  }
+  setzeAkt(0);
+
+  /* Videothek */
+  var vids = B.VIDEOS.slice(0, 9);
+  $('#gates').innerHTML = vids.map(function (v, i) {
+    return '<button class="gate' + (i === 0 ? ' gross' : '') + '" data-i="' + i + '" aria-label="Video abspielen: ' + v.t + '">'
+      + '<span class="gk"><span class="gt fl-gold"></span><em>' + B.dauer(v.d) + '</em></span>'
+      + '<span class="bild"><img src="' + v.poster + '" alt="" loading="lazy"><video muted loop playsinline preload="none" poster="' + v.poster + '"></video><span class="play" aria-hidden="true">▶</span></span>'
+      + '<span class="tx"><b>' + v.t + '</b><span>' + v.u + '</span></span></button>';
+  }).join('');
+  B.$$('.gate').forEach(function (g, i) {
+    var t = F(g.querySelector('.gt'), 12, '');
+    B.sichtbar(g, function () { t.setze('GATE ' + (i < 9 ? '0' : '') + (i + 1) + ' ' + vids[i].nr, { versatz: 40 }); }, { schwelle: .3 });
+    g.addEventListener('click', function () { B.spielen(vids[i]); });
+    B.vorschauBeiHover(g, vids[i]);
+  });
+  /* großer Monitor läuft stumm, sobald er im Bild ist */
+  var g0 = B.$('.gate.gross'), v0 = g0.querySelector('video');
+  if (!ruhig) B.sichtbar(g0, function () { v0.src = vids[0].src; g0.classList.add('laeuft'); var p = v0.play(); if (p && p.catch) p.catch(function () {}); }, { schwelle: .5 });
+
+  /* Daten als Klapptafel */
+  var Z = B.ZAHLEN(), K = (window.DPS_UMFANG || {}).kopf || {};
+  if (K.amtlich_rund_gross) $('#dRund').textContent = K.amtlich_rund_gross;
+  $('#dz').innerHTML = Z.map(function (z, i) { return '<div class="rv"><span class="fl-gold" id="dz' + i + '"></span><span>' + z.t + '</span></div>'; }).join('');
+  Z.forEach(function (z, i) {
+    var s = B.fmt(z.z), t = F($('#dz' + i), Math.max(s.length, 9), '');
+    B.sichtbar($('#dz' + i), function () { t.setze(s, { rechts: true, min: 5, streu: 6, versatz: 50 }); }, { schwelle: .5 });
+  });
+
+  /* Finale */
+  var f1 = F($('#fin1'), 16, ''), f2 = F($('#fin2'), 16, '');
+  B.sichtbar($('#fin1'), function () { f1.setze('  FINAL CALL', { versatz: 50 }); setTimeout(function () { f2.setze(' GATE IST OFFEN', { versatz: 50 }); }, 700); }, { schwelle: .6 });
+
+  B.start('06');
+})();
+</script>
+</body>
+</html>

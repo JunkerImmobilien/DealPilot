@@ -1,0 +1,341 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DealPilot · Idee 02 · Über den Wolken</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Onest:wght@400;500;600&family=DM+Mono:wght@400;500&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="a-basis.css">
+<style>
+/* ═══ Idee 02 · Über den Wolken ═══
+   Parallax-Steigflug: vier Wolkenebenen ziehen beim Scrollen verschieden schnell vorbei, das Hero-Video sitzt
+   in einem Flugzeugfenster, das beim Scrollen aufzieht, bis du hindurchfliegst. Videothek als Fensterreihe am Rumpf,
+   der Score bricht durch die Wolkendecke, die Etappen sind eine Flugroute, die sich beim Scrollen zeichnet. */
+:root{--fd:'Instrument Serif',serif;--fb:'Onest',sans-serif;--fm:'DM Mono',monospace;--fs:'Instrument Serif',serif}
+.a-h2{font-weight:400;letter-spacing:-.015em;line-height:1}
+.a-h2 em{font-style:italic}
+.sk{--fk:'Onest',sans-serif}.sk-zahl b{font-family:'Instrument Serif',serif;font-weight:400;font-size:70px}
+.h2-himmel{height:240vh;position:relative}
+.h2-sticky{position:sticky;top:0;height:100vh;height:100svh;overflow:hidden;
+  background:radial-gradient(120% 70% at 50% 120%,#6a4a17 0%,#2b1f0b 35%,#0a0806 70%,#050505 100%)}
+.h2-sterne{position:absolute;inset:0;background-image:radial-gradient(1px 1px at 12% 18%,#fff8,transparent),radial-gradient(1px 1px at 72% 9%,#fff7,transparent),radial-gradient(1.5px 1.5px at 36% 27%,#ffe9b0aa,transparent),radial-gradient(1px 1px at 88% 31%,#fff6,transparent),radial-gradient(1px 1px at 52% 6%,#fff8,transparent),radial-gradient(1px 1px at 22% 40%,#fff5,transparent);opacity:.8}
+.h2-wolken{position:absolute;left:-10%;right:-10%;pointer-events:none;will-change:transform}
+.h2-wolken span{position:absolute;border-radius:50%;background:radial-gradient(closest-side,rgba(255,241,210,var(--a)) 0%,rgba(232,204,122,calc(var(--a)*.45)) 45%,transparent 100%)}
+.h2-wolken .drift{position:absolute;inset:0;animation:h2Drift var(--d) linear infinite alternate}
+@keyframes h2Drift{to{transform:translateX(var(--x))}}
+.h2-fenster-lage{position:absolute;inset:0;display:grid;place-items:center;perspective:900px}
+.h2-fenster{position:relative;width:min(330px,62vw);aspect-ratio:3/4.1;border-radius:46%/40%;overflow:hidden;will-change:transform;
+  box-shadow:0 0 0 14px #1a1712,0 0 0 16px rgba(201,168,76,.55),0 0 0 34px #0f0d0a,0 0 0 35px rgba(201,168,76,.25),0 40px 120px 20px rgba(0,0,0,.85),inset 0 0 40px rgba(0,0,0,.7)}
+.h2-fenster video{width:100%;height:100%;object-fit:cover;transform:scale(1.15)}
+.h2-fenster::after{content:"";position:absolute;inset:0;border-radius:inherit;background:linear-gradient(130deg,rgba(255,255,255,.18),transparent 35%);box-shadow:inset 0 0 0 1px rgba(255,255,255,.08),inset 0 0 50px rgba(0,0,0,.6);pointer-events:none}
+.h2-rollo{position:absolute;left:0;right:0;top:0;height:100%;background:linear-gradient(#1a1712,#0f0d0a);border-bottom:2px solid rgba(201,168,76,.5);transform:translateY(-6%);z-index:2;animation:h2Rollo 1.8s .5s var(--ease) forwards}
+@keyframes h2Rollo{to{transform:translateY(-102%)}}
+.h2-text{position:absolute;inset:0;pointer-events:none;display:flex;flex-direction:column;justify-content:center}
+.h2-text .a-wrap{display:grid;grid-template-columns:1fr min(330px,62vw) 1fr;gap:56px;align-items:center}
+.h2-links,.h2-rechts{pointer-events:auto}
+.h2-links h1{font-family:var(--fd);font-weight:400;font-size:clamp(44px,5.4vw,84px);line-height:.95;letter-spacing:-.02em;margin:.25em 0}
+.h2-links h1 em{font-style:italic;color:var(--goldh)}
+.h2-links h1 .w{display:inline-block;opacity:0;transform:translateY(.4em);filter:blur(8px);animation:h2Wort 1s var(--ease) forwards;animation-delay:calc(.6s + var(--i)*90ms)}
+@keyframes h2Wort{to{opacity:1;transform:none;filter:none}}
+.h2-rechts p{color:#d8cfbc;margin:0 0 22px}
+.h2-rechts .a-btn{margin-bottom:12px}
+.h2-hoehe{position:absolute;right:22px;top:50%;transform:translateY(-50%);width:62px;height:300px;border-left:1px solid rgba(201,168,76,.4);overflow:hidden;font-family:var(--fm);font-size:10px;color:var(--tx3)}
+.h2-hoehe .skala{position:absolute;left:0;top:0;width:100%;will-change:transform}
+.h2-hoehe .skala div{height:30px;border-top:1px solid rgba(201,168,76,.35);padding-left:8px;width:14px}
+.h2-hoehe .skala div:nth-child(5n+1){width:100%;color:var(--gold)}
+.h2-hoehe b{position:absolute;left:-1px;top:50%;transform:translateY(-50%);padding:4px 6px;background:var(--gold);color:#140f02;font-weight:500;font-size:11px;z-index:2}
+.h2-hoehe small{position:absolute;bottom:0;left:8px;letter-spacing:.14em}
+@media (max-width:980px){
+  .h2-text .a-wrap{grid-template-columns:1fr;gap:0}
+  .h2-text{justify-content:flex-start;padding-top:86px}
+  .h2-fenster-lage{place-items:end center;padding-bottom:9vh}
+  .h2-fenster{width:min(210px,52vw)}
+  .h2-rechts{display:none}.h2-hoehe{display:none}
+  .h2-links h1{font-size:clamp(38px,10.5vw,60px)}
+}
+.h2-mobil-cta{display:none}
+@media (max-width:980px){.h2-mobil-cta{display:block;padding:32px 0 8px}.h2-mobil-cta p{color:var(--tx2)}}
+
+/* Fensterreihe */
+.h2-rumpf{position:relative;margin-top:44px;padding:56px 0 64px;background:linear-gradient(180deg,#1c1913,#0e0c09 60%,#171410);border-block:1px solid rgba(201,168,76,.25);overflow:hidden}
+.h2-rumpf::before{content:"";position:absolute;left:0;right:0;top:22px;height:3px;background:var(--run);opacity:.7}
+.h2-reihe{display:flex;gap:44px;overflow-x:auto;scroll-snap-type:x mandatory;padding:10px max(16px,calc((100vw - 1200px)/2)) 20px;scrollbar-width:none}
+.h2-reihe::-webkit-scrollbar{display:none}
+.h2-luke{flex:0 0 auto;width:200px;scroll-snap-align:center;border:0;padding:0;background:none;text-align:center;color:var(--tx)}
+.h2-luke .o{position:relative;display:block;width:200px;aspect-ratio:3/4;border-radius:46%/40%;overflow:hidden;background:#000;
+  box-shadow:0 0 0 9px #26221a,0 0 0 10px rgba(201,168,76,.5),0 20px 40px -10px #000,inset 0 0 30px #000;transition:transform .5s var(--spring)}
+.h2-luke:hover .o,.h2-luke:focus-visible .o{transform:translateY(-8px) scale(1.04)}
+.h2-luke img,.h2-luke video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.h2-luke img{transform:scale(1.25);transition:transform 1.4s var(--ease),opacity .4s}
+.h2-luke:hover img{transform:scale(1.4)}
+.h2-luke video{opacity:0;transition:opacity .5s}
+.h2-luke.spielt video{opacity:1}
+.h2-luke .o::after{content:"";position:absolute;inset:0;border-radius:inherit;background:linear-gradient(130deg,rgba(255,255,255,.2),transparent 40%)}
+.h2-luke .nr{display:block;margin-top:22px;font-family:var(--fm);font-size:11px;color:var(--gold);letter-spacing:.1em}
+.h2-luke .t{display:block;font-family:var(--fd);font-size:22px;line-height:1.1;margin-top:4px}
+.h2-pfeile{display:flex;gap:10px;justify-content:flex-end;margin-top:18px}
+.h2-pfeile button{width:46px;height:46px;border-radius:50%;border:1px solid rgba(201,168,76,.4);background:transparent;color:var(--goldh);font-size:18px}
+
+/* Score durch die Wolkendecke */
+.h2-decke{position:relative;overflow:hidden;padding:120px 0 140px}
+.h2-decke .h2-wolken{left:-20%;right:-20%}
+.h2-bank{position:absolute;top:0;bottom:0;width:65%;z-index:4;pointer-events:none;will-change:transform}
+.h2-bank.l{left:-8%}.h2-bank.r{right:-8%}
+.h2-bank span{position:absolute;border-radius:50%;background:radial-gradient(closest-side,rgba(250,238,210,.95),rgba(232,204,122,.55) 50%,transparent)}
+.h2-score{display:grid;grid-template-columns:1fr minmax(0,520px) 1fr;gap:34px;align-items:center;position:relative;z-index:3}
+.h2-instr{text-align:center}
+.h2-uhr{position:relative;width:190px;aspect-ratio:1;margin:0 auto;border-radius:50%;background:radial-gradient(circle,#1d1a14 60%,#0d0b08);box-shadow:0 0 0 6px #26221a,0 0 0 7px rgba(201,168,76,.5),inset 0 0 30px #000}
+.h2-uhr svg{position:absolute;inset:0}
+.h2-uhr .nadel{position:absolute;left:50%;bottom:50%;width:3px;height:42%;margin-left:-1.5px;background:linear-gradient(var(--goldh),var(--gold));border-radius:3px;transform-origin:50% 100%;transform:rotate(-135deg);transition:transform 1.8s var(--spring);box-shadow:0 0 10px rgba(232,204,122,.7)}
+.h2-uhr .nabe{position:absolute;left:50%;top:50%;width:16px;height:16px;margin:-8px;border-radius:50%;background:var(--gold)}
+.h2-uhr .wert{position:absolute;left:0;right:0;bottom:26%;font-family:var(--fd);font-size:40px;line-height:1;color:var(--tx)}
+.h2-instr h3{font-family:var(--fd);font-weight:400;font-size:30px;margin:18px 0 4px}
+.h2-instr p{color:var(--tx2);font-size:14.5px;margin:0 auto;max-width:28ch}
+.h2-instr .st{display:inline-block;margin-top:10px;padding:3px 10px;border-radius:999px;border:1px solid var(--gr);color:#8fd6ad;font-family:var(--fm);font-size:11px;letter-spacing:.1em}
+@media (max-width:980px){.h2-score{grid-template-columns:1fr 1fr}.h2-score .sk-buehne{grid-column:1/-1;order:-1}}
+@media (max-width:520px){.h2-uhr{width:140px}.h2-uhr .wert{font-size:30px}.h2-instr h3{font-size:24px}}
+
+/* Flugroute */
+.h2-route{position:relative;margin-top:60px}
+.h2-route svg.bahn{position:absolute;left:0;top:0;pointer-events:none;overflow:visible}
+.h2-route path.spur{fill:none;stroke:rgba(201,168,76,.18);stroke-width:2;stroke-dasharray:2 9;stroke-linecap:round}
+.h2-route path.flug{fill:none;stroke:url(#h2Verlauf);stroke-width:3;stroke-linecap:round;filter:drop-shadow(0 0 6px rgba(232,204,122,.6))}
+.h2-flieger{position:absolute;left:0;top:0;width:44px;height:44px;margin:-22px 0 0 -22px;will-change:transform;z-index:3;color:var(--goldh);filter:drop-shadow(0 0 10px rgba(232,204,122,.8))}
+.h2-wp{position:relative;display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;padding:6vh 0}
+.h2-wp .karte{border-radius:18px;overflow:hidden;background:var(--ob3);box-shadow:0 0 0 1px rgba(201,168,76,.2),0 30px 80px -30px #000}
+.h2-wp .karte img{width:100%;aspect-ratio:16/9;object-fit:cover;object-position:top left}
+.h2-wp:nth-child(even) .karte{order:2}
+.h2-wp .txt small{font-family:var(--fm);font-size:11px;letter-spacing:.16em;color:var(--gold);text-transform:uppercase}
+.h2-wp .txt h3{font-family:var(--fd);font-weight:400;font-size:clamp(30px,3.2vw,44px);line-height:1.05;margin:.2em 0 .3em}
+.h2-wp .txt p{color:var(--tx2);margin:0}
+.h2-wp .txt button{margin-top:14px;background:none;border:0;padding:8px 0;color:var(--goldh);font-family:var(--fm);font-size:12px}
+.h2-wp .punkt{position:absolute;left:50%;top:50%;width:18px;height:18px;margin:-9px;border-radius:50%;background:var(--ob);border:2px solid rgba(201,168,76,.5);z-index:2;transition:all .4s}
+.h2-wp.da .punkt{background:var(--goldh);box-shadow:0 0 0 6px rgba(201,168,76,.18),0 0 20px var(--gold)}
+.h2-wp .karte,.h2-wp .txt{opacity:0;transform:translateY(40px) scale(.97);transition:all .9s var(--ease)}
+.h2-wp.da .karte,.h2-wp.da .txt{opacity:1;transform:none}
+@media (max-width:860px){
+  .h2-wp{grid-template-columns:1fr;gap:18px;padding:30px 0 30px 44px}
+  .h2-wp:nth-child(even) .karte{order:0}
+  .h2-wp .punkt{left:14px;top:40px}
+}
+@media (prefers-reduced-motion:reduce){.h2-himmel{height:auto}.h2-sticky{position:relative;min-height:100vh}.h2-rollo{display:none}.h2-links h1 .w{opacity:1;transform:none;filter:none}.h2-wp .karte,.h2-wp .txt{opacity:1;transform:none}.h2-bank{display:none}}
+</style>
+</head>
+<body>
+<div id="a-nav"></div>
+
+<section class="h2-himmel" id="top">
+  <div class="h2-sticky" id="sticky">
+    <div class="h2-sterne"></div>
+    <div class="h2-wolken" data-ebene="0" style="top:8%;height:40%"></div>
+    <div class="h2-wolken" data-ebene="1" style="top:38%;height:40%"></div>
+    <div class="h2-fenster-lage"><div class="h2-fenster" id="fenster"><div class="h2-rollo"></div>
+      <video muted loop playsinline preload="none" poster="../../../frontend/landing/assets/bild/hero.jpg" data-src="../../../frontend/landing/assets/video/dp-hero-flug.mp4"></video></div></div>
+    <div class="h2-wolken" data-ebene="2" style="top:58%;height:45%"></div>
+    <div class="h2-wolken" data-ebene="3" style="top:72%;height:50%"></div>
+    <div class="h2-text" id="htext"><div class="a-wrap">
+      <div class="h2-links">
+        <div class="a-eye">Immobilien-Investmentanalyse</div>
+        <h1 id="hl">Immobilien&shy;entscheidungen sind zu groß für <em>ein Bauchgefühl.</em></h1>
+      </div>
+      <div></div>
+      <div class="h2-rechts">
+        <p>DealPilot begleitet deine Immobilie vom ersten Exposé bis in den Bestand, mit vollständiger Rechnung, einem amtlich begründeten Wert und einem Investment Case, der bei der Bank besteht.</p>
+        <a class="a-btn" href="https://app.dealpilot.immo/?register=1">Vier Wochen als Pro, kostenlos</a><br>
+        <a class="a-btn-l" href="#videothek">Zum Fensterplatz</a>
+        <ul class="a-haken"><li>Keine Zahlungsdaten</li><li>Danach automatisch Free</li></ul>
+      </div>
+    </div></div>
+    <div class="h2-hoehe" aria-hidden="true"><div class="skala" id="skala"></div><b id="hoehe">0 %</b><small>STEIGFLUG</small></div>
+  </div>
+</section>
+
+<div class="a-wrap h2-mobil-cta">
+  <p>DealPilot begleitet deine Immobilie vom ersten Exposé bis in den Bestand, mit vollständiger Rechnung, einem amtlich begründeten Wert und einem Investment Case, der bei der Bank besteht.</p>
+  <a class="a-btn" href="https://app.dealpilot.immo/?register=1">Vier Wochen als Pro, kostenlos</a>
+  <ul class="a-haken"><li>Keine Zahlungsdaten</li><li>4 Wochen voller Pro-Umfang</li><li>Danach automatisch Free</li></ul>
+</div>
+
+<section class="a-sec" id="videothek">
+  <div class="a-wrap">
+    <div class="a-eye" data-rv>Videothek</div>
+    <h2 class="a-h2" data-rv="80">Nimm einen <em>Fensterplatz.</em></h2>
+    <p class="a-lead" data-rv="160">Fahr über ein Fenster, und der Film läuft an. Ein Klick, und er startet mit Ton. Elf Filme hier, 40 in der Videothek.</p>
+  </div>
+  <div class="h2-rumpf"><div class="h2-reihe" id="reihe"></div>
+    <div class="a-wrap h2-pfeile"><button id="zur" aria-label="Zurück">←</button><button id="vor" aria-label="Weiter">→</button></div></div>
+</section>
+
+<section class="h2-decke" id="score">
+  <div class="h2-wolken" data-ebene="4" style="top:-10%;height:60%;opacity:.5"></div>
+  <div class="h2-bank l" id="bankl"></div><div class="h2-bank r" id="bankr"></div>
+  <div class="a-wrap">
+    <div class="a-ctr" style="position:relative;z-index:3">
+      <div class="a-eye" data-rv>Pre-Flight · Etappe 03</div>
+      <h2 class="a-h2" data-rv="80">Einer reicht nicht. <em>Zwei Scores.</em></h2>
+      <p class="a-lead" data-rv="160">Dein Objekt kann gut sein, deine Finanzierung nicht. Zwei Instrumente, ein Urteil: erst der Investment-Score, dann der Finanzierungs-Score, daraus der Investor Deal Score.</p>
+    </div>
+    <div class="h2-score" style="margin-top:50px">
+      <div class="h2-instr" data-rv>
+        <div class="h2-uhr" data-wert="81"><svg viewBox="0 0 190 190" aria-hidden="true"></svg><div class="nadel"></div><div class="nabe"></div><div class="wert">0</div></div>
+        <h3>Investment</h3><p>Wie gut ist die Immobilie, egal wie sie finanziert wird?</p><span class="st">GUT · ZÄHLT 59 %</span>
+      </div>
+      <div class="sk-buehne" id="karte"></div>
+      <div class="h2-instr" data-rv="120">
+        <div class="h2-uhr" data-wert="96"><svg viewBox="0 0 190 190" aria-hidden="true"></svg><div class="nadel"></div><div class="nabe"></div><div class="wert">0</div></div>
+        <h3>Finanzierung</h3><p>Trägt die geplante Finanzierung dieses Objekt?</p><span class="st">SEHR GUT · ZÄHLT 41 %</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="a-sec" id="etappen">
+  <div class="a-wrap">
+    <div class="a-ctr"><div class="a-eye" data-rv>So fliegt ein Deal</div>
+    <h2 class="a-h2" data-rv="80">Vom Exposé bis in den Bestand. <em>Neun Wegpunkte.</em></h2></div>
+    <div class="h2-route" id="route">
+      <svg class="bahn" id="bahn" aria-hidden="true"><defs><linearGradient id="h2Verlauf" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#E8CC7A"/><stop offset="1" stop-color="#b8932f"/></linearGradient></defs><path class="spur"/><path class="flug"/></svg>
+      <svg class="h2-flieger" id="flieger" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M21 16v-2l-8-5V3.5A1.5 1.5 0 0 0 11.5 2 1.5 1.5 0 0 0 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5z"/></svg>
+    </div>
+  </div>
+</section>
+
+<section class="a-sec" style="background:radial-gradient(100% 60% at 50% 0%,#1a140a,var(--ob))">
+  <div class="a-wrap">
+    <div class="a-eye" data-rv>Datenbasis</div>
+    <h2 class="a-h2" data-rv="80">Über 1,1 Millionen amtliche Datenpunkte. <em>Laufend abgeglichen.</em></h2>
+    <p class="a-lead" data-rv="160">DealPilot rechnet nicht mit Schätzwerten aus dem Netz, sondern mit den Daten der Behörden, in eigenen Datenbanken, regelmäßig abgeglichen und mit Herkunft je Wert.</p>
+    <div id="a-daten"></div>
+  </div>
+</section>
+<section class="a-sec" id="preise"><div class="a-wrap"><div class="a-ctr"><div class="a-eye" data-rv>Preise</div><h2 class="a-h2" data-rv="80">Vier Pakete. <em>Ab 0 €.</em></h2></div><div id="a-preise"></div></div></section>
+<section class="a-sec" id="fragen"><div class="a-wrap"><div class="a-ctr"><div class="a-eye" data-rv>Fragen</div><h2 class="a-h2" data-rv="80">Kurz gefragt.</h2></div><div id="a-fragen"></div></div></section>
+<section class="a-sec a-schluss" style="background:radial-gradient(120% 70% at 50% 120%,#6a4a17,#050505 70%)">
+  <div class="h2-wolken" data-ebene="5" style="bottom:-10%;height:60%;top:auto"></div>
+  <div class="a-wrap" style="position:relative">
+    <div class="a-eye">Pre-Flight · Check-in</div>
+    <h2 class="a-h2">Bereit für den <em>Take-off?</em></h2>
+    <p class="a-lead" style="margin-inline:auto">Dein Cockpit ist startklar. Kein Bauchgefühl mehr. Ab jetzt fliegst du nach Flugdaten.</p>
+    <p style="margin-top:28px"><a class="a-btn" href="https://app.dealpilot.immo/?register=1">Kostenlos starten</a></p>
+  </div>
+</section>
+<footer class="a-fuss" id="a-fuss"></footer>
+<div class="a-vorschlag">Vorschlag · Idee 02</div>
+
+<script src="a-daten.js"></script>
+<script src="a-basis.js"></script>
+<script>
+(function () {
+  var D = A_DATEN;
+  /* Wolken: weiche Ellipsen, je Ebene groesser und heller. Fester Zufall, damit jede Ansicht gleich aussieht. */
+  var seed = 7; function r() { seed = (seed * 9301 + 49297) % 233280; return seed / 233280; }
+  document.querySelectorAll('.h2-wolken').forEach(function (w) {
+    var e = +w.dataset.ebene, n = 14 + e * 2, html = '<div class="drift" style="--d:' + (40 + e * 12) + 's;--x:' + (e % 2 ? '-' : '') + (4 + e) + '%">';
+    for (var i = 0; i < n; i++) {
+      var b = 18 + r() * 26 + e * 4;
+      html += '<span style="left:' + (r() * 100 - 10).toFixed(1) + '%;top:' + (r() * 70).toFixed(1) + '%;width:' + b.toFixed(1) + 'vw;height:' + (b * (.35 + r() * .25)).toFixed(1) + 'vw;--a:' + (.1 + e * .06 + r() * .1).toFixed(2) + '"></span>';
+    }
+    w.innerHTML = html + '</div>';
+  });
+  ['bankl', 'bankr'].forEach(function (id) {
+    var h = ''; for (var i = 0; i < 12; i++) { var b = 20 + r() * 30; h += '<span style="left:' + (r() * 80).toFixed(1) + '%;top:' + (r() * 85).toFixed(1) + '%;width:' + b.toFixed(1) + 'vw;height:' + (b * .55).toFixed(1) + 'vw"></span>'; }
+    document.getElementById(id).innerHTML = h;
+  });
+  /* Ueberschrift Wort fuer Wort */
+  var hl = document.getElementById('hl');
+  hl.innerHTML = [['Immobilien­entscheidungen', 0], ['sind', 0], ['zu', 0], ['groß', 0], ['für', 0], ['ein', 1], ['Bauchgefühl.', 1]].map(function (w, i) {
+    return '<span class="w" style="--i:' + i + '">' + (w[1] ? '<em>' + w[0] + '</em>' : w[0]) + '</span>';
+  }).join(' ');
+  /* Hoehenskala */
+  document.getElementById('skala').innerHTML = Array.from({ length: 60 }, function (_, i) { return '<div>' + (i % 5 ? '' : (100 - i / 5 * 10 >= 0 ? '' : '')) + '</div>'; }).join('');
+
+  /* Fensterreihe */
+  var reihe = document.getElementById('reihe');
+  reihe.innerHTML = D.videos.map(function (v) {
+    return '<button class="h2-luke" data-video="' + v.id + '"><span class="o"><img src="' + D.poster + v.poster + '" alt="" loading="lazy" width="200" height="267"><video muted loop playsinline preload="none" data-vorschau="' + D.medien + v.datei + '"></video></span><span class="nr">' + (v.nr === 'Spot' ? 'SPOT' : 'VIDEO ' + v.nr) + ' · ' + A.dauer(v.dauer) + '</span><span class="t">' + A.esc(v.titel) + '</span></button>';
+  }).join('');
+  if (!A.rm && A.feinZeiger) reihe.querySelectorAll('.h2-luke').forEach(function (l) {
+    var v = l.querySelector('video'), t;
+    l.addEventListener('mouseenter', function () { t = setTimeout(function () { if (!v.src) { v.src = v.dataset.vorschau + '#t=12'; } var p = v.play(); if (p && p.then) p.then(function () { l.classList.add('spielt'); }).catch(function () {}); }, 250); });
+    l.addEventListener('mouseleave', function () { clearTimeout(t); l.classList.remove('spielt'); v.pause(); });
+  });
+  document.getElementById('vor').onclick = function () { reihe.scrollBy({ left: 488, behavior: A.rm ? 'auto' : 'smooth' }); };
+  document.getElementById('zur').onclick = function () { reihe.scrollBy({ left: -488, behavior: A.rm ? 'auto' : 'smooth' }); };
+
+  /* Instrumente: Skala zeichnen, Nadel schwingt auf den Wert */
+  document.querySelectorAll('.h2-uhr').forEach(function (u) {
+    var s = '', svg = u.querySelector('svg');
+    for (var i = 0; i <= 50; i++) {
+      var a = (-225 + i * 270 / 50) * Math.PI / 180, l = i % 5 ? 8 : 15, R = 82;
+      s += '<line x1="' + (95 + R * Math.cos(a)).toFixed(1) + '" y1="' + (95 + R * Math.sin(a)).toFixed(1) + '" x2="' + (95 + (R - l) * Math.cos(a)).toFixed(1) + '" y2="' + (95 + (R - l) * Math.sin(a)).toFixed(1) + '" stroke="' + (i >= 35 ? '#3FA56C' : i >= 25 ? '#C9A84C' : '#6d6656') + '" stroke-width="' + (i % 5 ? 1 : 2) + '"/>';
+    }
+    svg.innerHTML = s;
+    A.einmal(u, function () {
+      var w = +u.dataset.wert;
+      setTimeout(function () { u.querySelector('.nadel').style.transform = 'rotate(' + (-135 + w * 2.7) + 'deg)'; A.zaehl(u.querySelector('.wert'), w, 1500); }, A.rm ? 0 : 500);
+    }, .5);
+  });
+
+  /* Flugroute */
+  var route = document.getElementById('route');
+  D.etappen.forEach(function (e, i) {
+    route.insertAdjacentHTML('beforeend', '<div class="h2-wp"><span class="punkt"></span><div class="karte"><img src="' + D.L + 'assets/dp-strecke/' + e[4] + '" alt="Ansicht aus DealPilot: ' + e[2] + '" loading="lazy" width="1600" height="900"></div>' +
+      '<div class="txt"><small>Wegpunkt ' + e[0] + ' · ' + e[1] + '</small><h3>' + e[2] + '</h3><p>' + e[3] + '</p>' + (e[5] ? '<button data-video="' + e[5] + '">▶ Video ansehen</button>' : '') + '</div></div>');
+  });
+  var wps = route.querySelectorAll('.h2-wp'), bahn = document.getElementById('bahn'), spur = bahn.querySelector('.spur'), flug = bahn.querySelector('.flug'), flieger = document.getElementById('flieger'), laenge = 0;
+  wps.forEach(function (w) { if (A.rm) w.classList.add('da'); else A.einmal(w, function () { w.classList.add('da'); }, .3); });
+  function routeBauen() {
+    var R = route.getBoundingClientRect(), pts = [];
+    wps.forEach(function (w) { var p = w.querySelector('.punkt').getBoundingClientRect(); pts.push([p.left + p.width / 2 - R.left, p.top + p.height / 2 - R.top]); });
+    bahn.setAttribute('width', R.width); bahn.setAttribute('height', R.height); bahn.setAttribute('viewBox', '0 0 ' + R.width + ' ' + R.height);
+    var schmal = R.width < 860, d = 'M' + pts[0][0] + ' ' + (pts[0][1] - 80);
+    pts.forEach(function (p, i) {
+      var q = i ? pts[i - 1] : [p[0], p[1] - 80], dy = (p[1] - q[1]) / 2, ausschlag = schmal ? 0 : (i % 2 ? 1 : -1) * R.width * .22;
+      d += ' C' + (q[0] + ausschlag) + ' ' + (q[1] + dy) + ' ' + (p[0] + ausschlag) + ' ' + (p[1] - dy) + ' ' + p[0] + ' ' + p[1];
+    });
+    spur.setAttribute('d', d); flug.setAttribute('d', d);
+    laenge = flug.getTotalLength(); flug.style.strokeDasharray = laenge; zeichnen();
+  }
+  function zeichnen() {
+    if (!laenge) return;
+    var R = route.getBoundingClientRect(), p = Math.max(0, Math.min(1, (innerHeight * .55 - R.top) / R.height));
+    if (A.rm) p = 1;
+    flug.style.strokeDashoffset = laenge * (1 - p);
+    var a = flug.getPointAtLength(laenge * p), b = flug.getPointAtLength(Math.min(laenge, laenge * p + 2)), w = Math.atan2(b.y - a.y, b.x - a.x) * 180 / Math.PI + 90;
+    flieger.style.transform = 'translate(' + a.x.toFixed(1) + 'px,' + a.y.toFixed(1) + 'px) rotate(' + w.toFixed(1) + 'deg)';
+  }
+  A.start();
+  A.scoreKarte(document.getElementById('karte'), { verz: 900 });
+  addEventListener('load', routeBauen); addEventListener('resize', routeBauen); setTimeout(routeBauen, 600);
+
+  /* Steigflug: Ebenen, Fenster, Banken, Hoehe */
+  var himmel = document.querySelector('.h2-himmel'), ebenen = document.querySelectorAll('#sticky .h2-wolken'), fenster = document.getElementById('fenster'), htext = document.getElementById('htext');
+  var skala = document.getElementById('skala'), hoehe = document.getElementById('hoehe'), decke = document.getElementById('score'), bl = document.getElementById('bankl'), br = document.getElementById('bankr');
+  var mx = 0, my = 0, lauf = false;
+  if (A.feinZeiger && !A.rm) addEventListener('pointermove', function (e) { mx = e.clientX / innerWidth - .5; my = e.clientY / innerHeight - .5; anfordern(); }, { passive: true });
+  function anfordern() { if (!lauf) { lauf = true; requestAnimationFrame(rahmenF); } }
+  function rahmenF() {
+    lauf = false;
+    if (A.rm) { zeichnen(); return; }
+    var y = scrollY, H = Math.max(1, himmel.offsetHeight - innerHeight), p = Math.max(0, Math.min(1, y / H));
+    ebenen.forEach(function (e, i) {
+      var tiefe = [.25, .5, 1.1, 1.8][i];
+      e.style.transform = 'translate3d(' + (mx * -30 * tiefe).toFixed(1) + 'px,' + (-p * innerHeight * tiefe + my * -20 * tiefe).toFixed(1) + 'px,0) scale(' + (1 + p * tiefe * .5).toFixed(3) + ')';
+      e.style.opacity = i > 1 ? 1 - p * .6 : 1;
+    });
+    var s = 1 + Math.pow(p, 2.2) * 9;
+    fenster.style.transform = 'translate(' + (mx * 14).toFixed(1) + 'px,' + (my * 10).toFixed(1) + 'px) rotateY(' + (mx * 10).toFixed(1) + 'deg) rotateX(' + (-my * 8).toFixed(1) + 'deg) scale(' + s.toFixed(3) + ')';
+    htext.style.opacity = Math.max(0, 1 - p * 2.4); htext.style.transform = 'translateY(' + (-p * 120).toFixed(1) + 'px)';
+    var gp = Math.min(1, y / (document.documentElement.scrollHeight - innerHeight));
+    skala.style.transform = 'translateY(' + (-gp * 1500 + 135).toFixed(1) + 'px)'; hoehe.textContent = Math.round(gp * 100) + ' %';
+    var R = decke.getBoundingClientRect(), q = Math.max(0, Math.min(1, (innerHeight - R.top) / (innerHeight * .9)));
+    bl.style.transform = 'translateX(' + (-q * 75).toFixed(1) + '%)'; br.style.transform = 'translateX(' + (q * 75).toFixed(1) + '%)';
+    bl.style.opacity = br.style.opacity = 1 - q * .7;
+    zeichnen();
+  }
+  addEventListener('scroll', anfordern, { passive: true }); rahmenF();
+})();
+</script>
+</body>
+</html>
