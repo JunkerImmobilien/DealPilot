@@ -42,7 +42,9 @@ async function anmerkungRecht(req, id) {
 }
 /* v3620 · avv: Stand des Auftragsverarbeitungsvertrags des angemeldeten Partners - das Cockpit fragt einmal, wenn nicht aktuell */
 partner.get('/cockpit', fn(async (req) => Object.assign(await pk.cockpit(req.reseller, req.user.id),
-  { avv: await require('../services/avvService').stand(req.user.id).catch(() => null) })));
+  /* v3830a · Auftraggeber der AVV ist das Partnerkonto, abgeschlossen vom Inhaber: ein Berater erbt dessen Stand.
+     Gemessen 19.11.2026 headless: der Berater blieb ohne eigene Zustimmung vor dem AVV-Fenster haengen. */
+  { avv: await require('../services/avvService').stand(req.partnerRolle === 'berater' && req.reseller.owner_user_id ? req.reseller.owner_user_id : req.user.id).catch(() => null) })));
 partner.put('/kunden/:id', fn(async (req) => {
   const c = await kundeRecht(req, req.params.id);
   /* v3830 A · Kunden an einen anderen Berater geben (berater_id) */
