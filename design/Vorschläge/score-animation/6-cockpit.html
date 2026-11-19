@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Score-Animation 6 · Cockpit-Instrumente</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="basis.css">
+<style>
+  /* Entwurf 6 · Cockpit: der Score ist ein Rundinstrument mit Zeiger und den fünf Stufen als Skala
+     (Kritisch < 35, Schwach, Solide ab 50, Gut ab 70, Sehr gut ab 85). Das Instrument bricht entlang der Mitte,
+     zwei Instrumente fahren heraus, die Zeiger schwenken von 87 auf 84 und 96, unten leuchten die Meldelampen. */
+  .inst{position:absolute;top:12px;width:240px;margin-left:-120px;left:50%;display:flex;flex-direction:column;align-items:center;gap:8px}
+  .inst svg{width:100%;height:auto;overflow:visible;display:block}
+  .inst .zone{fill:none;stroke-width:12}
+  .inst .z-rot{stroke:#D8564C}.inst .z-gold{stroke:var(--gd)}.inst .z-gruen{stroke:var(--grn)}
+  .inst .tick{stroke:#16130d;stroke-width:1.4}
+  .inst .zeiger{stroke:var(--ob);stroke-width:4;stroke-linecap:round}
+  .inst .nabe{fill:var(--ob)}
+  .inst .wert{font:700 30px var(--disp);fill:var(--ink);text-anchor:middle}
+  .inst .klein{font:600 7.5px var(--mono);fill:var(--mut);text-anchor:middle;letter-spacing:.08em}
+  .lampe{font:700 10px/1 var(--mono);letter-spacing:.14em;padding:6px 12px;border-radius:4px;background:#1b1a17;color:#4a4636;border:1px solid #2c2a25;transition:background .3s,color .3s,box-shadow .3s}
+  .lampe.an{background:#0f2a1b;color:var(--grnh);box-shadow:0 0 12px rgba(91,217,142,.55)}
+  .haelfte{position:absolute;inset:0}
+  .haelfte.l{clip-path:inset(-30px 50% -30px -30px)}.haelfte.r{clip-path:inset(-30px -30px -30px 50%)}
+  .gesamt .riss{stroke:var(--gd);stroke-width:2.5;fill:none;stroke-dasharray:1;stroke-dashoffset:1;filter:drop-shadow(0 0 3px rgba(232,204,122,.9))}
+  .teil{width:200px;margin-left:-100px;opacity:0}
+  .teil .wert{font-size:28px}
+  .sigma{position:absolute;left:50%;top:205px;transform:translateX(-50%);opacity:0;transition:opacity .4s}
+  @media (max-width:420px){
+    .inst.gesamt{width:210px;margin-left:-105px}
+    .teil{width:156px;margin-left:-78px}
+    .teil .lampe{font-size:9px;padding:5px 8px;letter-spacing:.08em}
+    .sigma{top:170px}
+  }
+</style>
+</head>
+<body>
+<div class="kopfzeile"><h1>6 · Cockpit-Instrumente</h1><small>Entwurf · Hero</small></div>
+<p class="idee">Der Score als Rundinstrument mit den fünf Stufen als Skala. Der Zeiger schwingt auf 87, die Meldelampe „Sehr gut“ leuchtet.
+  Dann bricht das Instrument entlang der Mitte, zwei Instrumente fahren heraus, ihre Zeiger schwenken von 87 auf 84 und 96.
+  Am deutlichsten im Cockpit-Bild, dafür weg vom Ring der App.</p>
+<div class="karte">
+  <div class="band"><span><i></i>Pre-Flight · Investor Deal Score</span><span class="cl">Cleared</span></div>
+  <div class="titel"><b>Investor <em>Deal Score</em></b><small>☰ Alle KPIs</small></div>
+  <div class="szene" id="szene">
+    <div class="inst gesamt" id="ig">
+      <div style="position:relative;width:100%"><div class="haelfte l" id="hl"></div><div class="haelfte r" id="hr"></div>
+        <svg viewBox="0 0 200 138" id="igSvg" style="visibility:hidden"></svg></div>
+      <span class="lampe" id="lg">SEHR GUT</span>
+    </div>
+    <div class="inst teil" id="ti"><svg viewBox="0 0 200 138"></svg><span class="lampe">GUT</span></div>
+    <div class="inst teil" id="tf"><svg viewBox="0 0 200 138"></svg><span class="lampe">SEHR GUT</span></div>
+    <span class="lampe an sigma" id="sigma">Σ 87 · SEHR GUT</span>
+  </div>
+  <p class="satz" id="satz"><span class="zeile">Das Gesamturteil <b>Sehr gut</b> wird aus beiden Instrumenten gebildet. Investment 84 zählt 75 %, Finanzierung 96 zählt 25 %.</span></p>
+</div>
+<div class="knoepfe"><button class="knopf" id="wieder" type="button">↻ Wiederholen</button><button class="knopf leise" id="ende" type="button">Endbild</button></div>
+<p class="hinweis" id="hinweis">Dauer rund 5 Sekunden. Skala nach den Score-Stufen der App (score-tiers.js).</p>
+<script src="basis.js"></script>
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  function pt(s, r) { var f = Math.PI - Math.PI * s / 100; return [100 + r * Math.cos(f), 100 - r * Math.sin(f)]; }
+  function bog(a, b, r) { var p = pt(a, r), q = pt(b, r); return 'M' + p[0].toFixed(2) + ' ' + p[1].toFixed(2) + ' A' + r + ' ' + r + ' 0 0 1 ' + q[0].toFixed(2) + ' ' + q[1].toFixed(2); }
+  function zifferblatt(titel) {
+    var s = '<path class="zone z-rot" d="' + bog(0, 49.6, 80) + '"/><path class="zone z-gold" d="' + bog(50.4, 69.6, 80) + '"/><path class="zone z-gruen" d="' + bog(70.4, 100, 80) + '"/>';
+    [0, 35, 50, 70, 85, 100].forEach(function (v) { var a = pt(v, 70), b = pt(v, 88); s += '<line class="tick" x1="' + a[0].toFixed(1) + '" y1="' + a[1].toFixed(1) + '" x2="' + b[0].toFixed(1) + '" y2="' + b[1].toFixed(1) + '"/>'; });
+    s += '<text class="klein" x="100" y="66">' + titel + '</text>';
+    s += '<line class="zeiger" x1="100" y1="100" x2="34" y2="100"/><circle class="nabe" cx="100" cy="100" r="6"/><text class="wert" x="100" y="134">0</text>';
+    return s;
+  }
+  function zeiger(svg, v) { svg.querySelector('.zeiger').setAttribute('transform', 'rotate(' + (1.8 * v) + ' 100 100)'); svg.querySelector('.wert').textContent = Math.round(v); }
+  function bauen() {
+    var g = zifferblatt('QUICK-CHECK · GESAMT');
+    $('hl').innerHTML = $('hr').innerHTML = '<svg viewBox="0 0 200 138">' + g + '<path class="riss" pathLength="1" d="M100 4 L95 26 L104 46 L96 66 L103 86 L100 104"/></svg>';
+    $('ti').querySelector('svg').innerHTML = zifferblatt('INVESTMENT-SCORE');
+    $('tf').querySelector('svg').innerHTML = zifferblatt('FINANZIERUNGS-SCORE');
+  }
+  function weite() { return $('szene').offsetWidth * 0.25; }
+  function teilePos(t) {
+    var w = weite();
+    $('ti').style.transform = 'translateX(' + (-w * t) + 'px) scale(' + (.7 + .3 * t) + ')';
+    $('tf').style.transform = 'translateX(' + (w * t) + 'px) scale(' + (.7 + .3 * t) + ')';
+  }
+  /* Zeiger mit Überschwingen */
+  function schwing(t) { return 1 - Math.exp(-6 * t) * Math.cos(9 * t); }
+  Demo.start(function (T) {
+    bauen();
+    var sv = [$('hl').querySelector('svg'), $('hr').querySelector('svg')];
+    T.tween(1600, function (t) { sv.forEach(function (s) { zeiger(s, 87 * t); }); }, schwing);
+    T.nach(1300, function () { $('lg').classList.add('an'); });
+    T.nach(2000, function () { T.tween(300, function (t) { sv.forEach(function (s) { s.querySelector('.riss').style.strokeDashoffset = 1 - t; }); }, 'rein'); });
+    T.nach(2350, function () { T.tween(280, function (t) { $('ig').style.transform = 'scale(' + (1 + .1 * t) + ')'; }, 'raus'); $('lg').classList.remove('an'); });
+    T.nach(2700, function () {
+      T.tween(650, function (t) {
+        $('hl').style.transform = 'translateX(' + (-90 * t) + 'px) rotate(' + (-10 * t) + 'deg)';
+        $('hr').style.transform = 'translateX(' + (90 * t) + 'px) rotate(' + (10 * t) + 'deg)';
+        $('ig').style.opacity = String(1 - t);
+      }, 'weich');
+      var si = $('ti').querySelector('svg'), sf = $('tf').querySelector('svg');
+      zeiger(si, 87); zeiger(sf, 87);
+      T.nach(200, function () {
+        $('ti').style.opacity = $('tf').style.opacity = 1;
+        T.tween(700, function (t) { teilePos(t); }, 'feder');
+        T.nach(500, function () {
+          T.tween(1300, function (t) { zeiger(si, 87 - 3 * t); zeiger(sf, 87 + 9 * t); }, schwing);
+          T.nach(900, function () { document.querySelectorAll('.teil .lampe').forEach(function (l) { l.classList.add('an'); }); $('sigma').style.opacity = 1; });
+        });
+      });
+    });
+    T.nach(4700, function () { $('satz').classList.add('an'); });
+  }, function () {
+    bauen();
+    $('ig').style.opacity = 0;
+    $('ti').style.opacity = $('tf').style.opacity = 1; teilePos(1);
+    zeiger($('ti').querySelector('svg'), 84); zeiger($('tf').querySelector('svg'), 96);
+    document.querySelectorAll('.teil .lampe').forEach(function (l) { l.classList.add('an'); }); $('sigma').style.opacity = 1;
+  });
+})();
+</script>
+</body>
+</html>

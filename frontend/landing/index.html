@@ -61,10 +61,10 @@ if (location.hash === '#forschung') location.replace('forschung.html');</script>
 <!-- v1588: der Wechselschritt loest den bisherigen Ablauf ab -->
 <!-- landing-videothek-1 · DealPilot live, F&E, Kanzlei-Zeile -->
 <link rel="stylesheet" href="dp2-live.css?v=landing-strecke-4">
-<link rel="stylesheet" href="partner.css?v=landing-partner-4"><!-- landing-partner-1 · Abschnitt #fuer-partner -->
+<link rel="stylesheet" href="partner.css?v=landing-strecke-5"><!-- landing-partner-1 · Abschnitt #fuer-partner -->
 <link rel="stylesheet" href="dp2-module.css?v=landing-module-2">
 <link rel="stylesheet" href="dp2-kern.css?v=landing-strecke-3">
-<link rel="stylesheet" href="dp2-dealcheck.css?v=landing-seo-3">
+<link rel="stylesheet" href="dp2-dealcheck.css?v=landing-dealcheck-14">
 <link rel="stylesheet" href="seo.css?v=landing-seo-5">
 </head><body>
 
@@ -373,11 +373,35 @@ if (location.hash === '#forschung') location.replace('forschung.html');</script>
   <div class="head ctr rv"><div class="eye ctr">So fliegt ein Deal</div>
     <h2>Vom Exposé bis in den Bestand. <span class="ac">In neun Etappen.</span></h2>
     <p>DealPilot liest Exposé und Unterlagen ein, rechnet Finanzierung, Cashflow und Steuer durch und begründet
-      den Wert mit den Daten der Gutachterausschüsse. Scroll weiter, bei jeder Etappe siehst du den echten Bildschirm.</p></div>
+      den Wert mit den Daten der Gutachterausschüsse. Scroll weiter, bei jeder Etappe siehst du die passende Ansicht aus DealPilot.</p></div>
   <div class="pt-aufzug">
     <div class="pt-schacht" aria-hidden="true">
       <div class="pt-rahmen pt-schirm">
-        <img data-bild="qc" class="an" src="assets/dp-strecke/00-quick-check.webp?v=landing-strecke-4" width="1600" height="900" alt="" loading="lazy">
+        <!-- landing-strecke-5 · Marcel 19.11.2026: bei Etappe 1 ein GUTES Beispiel mit den vier Prüfpunkten des Quick-Checks
+             (quickcheck-app.html v3081 „Bewertung in einer Karte“: Preis gegen Marktspanne, Zustand und Modernisierung,
+             Rendite gegen das Lage-Ziel, Finanzierung). Statt des Bildes 00-quick-check.webp („Nicht kaufen“) eine HTML-Karte
+             im Aufbau der App, Texte wie dort, ohne Gedankenstrich. Zahlen mit den echten Kernen in Node nachgerechnet
+             (DealKpis.compute + DealScore.computeFromKpis, Abbildung wie der Deal-Check, 17 % Kosten auf die Kaltmiete):
+             ETW 74 m², Kaufpreis 179.000 €, Kaltmiete 1.000 €, 10 % Nebenkosten, 80 % finanziert (143.200 €), 4,22 % Zins
+             (Stufe standard 10 J, Bauzins 18.11.2026), 1,5 % Tilgung: Cashflow +147 €, DSCR 1,22, Bruttorendite 6,70 %,
+             Faktor 14,9, Score 81 Gut, Urteil KAUFEN (qc-heuristik SCHWELLE.kaufen 70, Preis nicht über Markt).
+             Zustand „gut“ = 14 Punkte (modernisierung-herkunft.js). Marktspanne ist ein Beispielwert. -->
+        <div data-bild="qc" class="an pt-qc" role="img" aria-label="Quick-Check, Beispiel: Score 81, Starker Kauf">
+          <div class="pt-qc-kopf"><span class="pt-qc-ico"></span><b>Bewertung</b><small>Quick-Check · Beispieldaten</small></div>
+          <div class="pt-qc-urteil">
+            <div class="pt-qc-ring"><svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="17"/><circle class="v" cx="20" cy="20" r="17" style="stroke-dashoffset:20.3"/></svg><b>81</b></div>
+            <div class="pt-qc-u"><span class="pt-qc-l">Ersteinschätzung · Gut</span><h4>Starker Kauf · empfehlenswert</h4>
+              <p>Die Kennzahlen passen. Kauf bei <b>179.000 €</b> ist gerechtfertigt, der Preis liegt auch nicht über dem Marktwert.
+                Vor dem Kaufvertrag noch Finanzierungszusage einholen und Hausgeldabrechnung, Wirtschaftsplan und Protokolle prüfen.</p></div>
+            <div class="pt-qc-lage"><span class="pt-qc-l">Lageklasse</span><span class="pt-qc-seg"><i>A</i><i class="on">B</i><i>C</i></span><small>Ziel 5 % brutto</small></div>
+          </div>
+          <div class="pt-qc-liste">
+            <div class="pt-qc-pz"><i class="ok"></i><span><b>Preis unter der Marktspanne</b><em>2.419 €/m² · DealPilot-Marktbewertung 185.000 € bis 236.000 € (Mitte 208.000 €)</em></span><span class="w">179.000 €<small>−14 % zur Mitte</small></span></div>
+            <div class="pt-qc-pz"><i></i><span><b>Zustand und Modernisierung</b><em>Abgeschätzt aus Zustand „gut“: überwiegend modernisiert (Anlage 2 ImmoWertV, 14 Punkte)</em></span><span class="w">14 Pkt.<small>Modernisierung</small></span></div>
+            <div class="pt-qc-pz"><i class="ok"></i><span><b>Rendite erfüllt das Ziel der B-Lage</b><em>Bruttorendite · Ziel 5 % · Kaufpreisfaktor 14,9</em></span><span class="w">6,7 %<small>Ziel 5 %</small></span></div>
+            <div class="pt-qc-pz"><i class="ok"></i><span><b>Finanzierung trägt sich</b><em>80 % finanziert · 4,22 % Zins · 1,5 % Tilgung · DSCR 1,22</em></span><span class="w">+147 €<small>pro Monat</small></span></div>
+          </div>
+        </div>
         <img data-bild="1" src="assets/dp-strecke/01-objekt-erfassen.webp?v=landing-strecke-2" width="1600" height="900" alt="" loading="lazy">
         <img data-bild="2" src="assets/dp-strecke/02-score.webp?v=landing-strecke-2" width="1600" height="900" alt="" loading="lazy">
         <img data-bild="3" src="assets/dp-strecke/03-unterlagen.webp?v=landing-strecke-2" width="1600" height="900" alt="" loading="lazy">
@@ -388,7 +412,7 @@ if (location.hash === '#forschung') location.replace('forschung.html');</script>
         <img data-bild="8" src="assets/dp-strecke/08-bestand.webp?v=landing-strecke-2" width="1600" height="900" alt="" loading="lazy">
       </div>
       <div class="pt-anzeige">Etappe <b id="ptZahl">1</b> von 9<span class="pt-wer" id="ptWer">Quick-Check</span></div>
-      <p class="pt-bu">Echte Bildschirmaufnahmen aus DealPilot. Beispieldaten.</p>
+      <p class="pt-bu">Ansichten aus DealPilot. Beispieldaten.</p><!-- landing-strecke-5 · Etappe 1 ist eine HTML-Karte, keine Aufnahme -->
     </div>
     <div class="pt-schritte"><span class="pt-schiene" aria-hidden="true"></span><span class="pt-kabine" aria-hidden="true"></span>
     <ol class="pt-liste">
@@ -678,9 +702,9 @@ if (location.hash === '#forschung') location.replace('forschung.html');</script>
 <!-- landing-kern-2 · Deal-Check: die ECHTEN Kerne aus der App, gleiche Buster wie frontend/index.html
      (tools/buster-ebenen-pruefen.mjs liest die Zeilen unten). Die App-Domain folgt umgebung.js:
      staging.dealpilot.immo -> app.staging.dealpilot.immo, sonst app.dealpilot.immo. -->
-<script src="dealcheck-laden.js?v=landing-dealcheck-13d"></script><!-- landing-seo-3 · Kerne + Deal-Check, Buster dort (buster-ebenen-pruefen liest die Datei) -->
+<script src="dealcheck-laden.js?v=landing-dealcheck-14"></script><!-- landing-seo-3 · Kerne + Deal-Check, Buster dort (buster-ebenen-pruefen liest die Datei) -->
 <script src="dp2-live.js?v=landing-videothek-16"></script>
-<script src="partner.js?v=landing-partner-3"></script><!-- landing-strecke-1 · Aufzug der Strecke --><!-- landing-videothek-1, landing-partner-1 -->
+<script src="partner.js?v=landing-strecke-5"></script><!-- landing-strecke-1 · Aufzug der Strecke --><!-- landing-videothek-1, landing-partner-1 -->
 <!-- v1588: Zwei Funktionen, die der alten Landing schon gehoerten und
      hier gefehlt haben. Beide betreffen Geld, deshalb standen sie ganz
      oben auf der Abgleichsliste:

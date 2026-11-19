@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Score-Animation 4 · Anteile im Ring</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="basis.css">
+<style>
+  /* Entwurf 4 · Anteile im Ring: der Ring der 87 besteht aus zwei Bögen, 63 Punkte aus dem Investment (84 x 75 %) und
+     24 aus der Finanzierung (96 x 25 %). An der Naht reißt er, beide Bögen fliegen heraus und wachsen zu ihrem vollen Score.
+     Der erklärendste Entwurf: man sieht, wie sich die 87 rechnet. */
+  .r{position:absolute;left:50%;top:14px;width:150px;height:150px;margin-left:-75px}
+  .r svg{width:100%;height:100%;transform:rotate(-90deg);overflow:visible}
+  .r .tr{fill:none;stroke:var(--linie);stroke-width:9}
+  .r .bi,.r .bf{fill:none;stroke-width:9;stroke-dasharray:0 333}
+  .r .bi{stroke:var(--grn)}
+  .r .bf{stroke:#8fd3a9}
+  .r .naht{stroke:var(--gd);stroke-width:3;opacity:0}
+  .r .zahl{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+  .r .zahl b{font:700 43px/1 var(--disp);font-variant-numeric:tabular-nums}
+  .r .zahl small{font:500 9px/1 var(--mono);letter-spacing:.06em;color:var(--mut);margin-top:3px}
+  .legende{position:absolute;left:0;right:0;top:182px;display:flex;justify-content:center;gap:16px;font:600 11px/1.3 var(--mono);color:var(--mut)}
+  .legende span{display:flex;align-items:center;gap:6px;opacity:0;transition:opacity .4s}
+  .legende span.an{opacity:1}
+  .legende i{width:14px;height:6px;border-radius:3px;background:var(--grn)}
+  .legende span.f i{background:#8fd3a9}
+  .legende b{color:var(--ink)}
+  .unter{position:absolute;top:162px;width:170px;margin-left:-85px;display:flex;flex-direction:column;align-items:center;gap:6px;opacity:0;transition:opacity .4s}
+  .unter.an{opacity:1}
+  .unter .rech{font:600 11px/1.2 var(--mono);color:var(--mut);white-space:nowrap}
+  .unter .rech b{color:var(--ink)}
+  .kopfz{position:absolute;top:0;width:170px;margin-left:-85px;opacity:0;transition:opacity .4s}
+  .kopfz.an{opacity:1}
+  @media (max-width:420px){
+    .r{width:124px;height:124px;margin-left:-62px}
+    .r .zahl b{font-size:34px}
+    .legende{top:156px;gap:10px;font-size:10px}
+    .unter{top:136px;width:150px;margin-left:-75px}
+    .unter .rech{text-align:center}.unter .rech span{display:block;margin-top:2px}
+  }
+</style>
+</head>
+<body>
+<div class="kopfzeile"><h1>4 · Anteile im Ring</h1><small>Entwurf · Hero</small></div>
+<p class="idee">Der Ring der 87 läuft in zwei Grüntönen ein: 63 Punkte kommen aus dem Investment, 24 aus der Finanzierung. An der goldenen Naht
+  reißt er, pumpt sich auf, und beide Bögen fliegen heraus. Jeder wächst zu seinem vollen Score. So sieht man, wie die 87 entsteht.</p>
+<div class="karte">
+  <div class="band"><span><i></i>Pre-Flight · Investor Deal Score</span><span class="cl">Cleared</span></div>
+  <div class="titel"><b>Investor <em>Deal Score</em></b><small>☰ Alle KPIs</small></div>
+  <div class="szene" id="szene">
+    <div class="r" id="g"><svg viewBox="0 0 120 120"><circle class="tr" cx="60" cy="60" r="53"/><circle class="bi" cx="60" cy="60" r="53"/><circle class="bf" cx="60" cy="60" r="53"/><line class="naht" x1="60" y1="1" x2="60" y2="17"/></svg>
+      <div class="zahl"><b>0</b><small>QUICK-CHECK</small></div></div>
+    <div class="legende" id="leg"><span id="lgI"><i></i><b>63</b> aus Investment</span><span class="f" id="lgF"><i></i><b>24</b> aus Finanzierung</span></div>
+    <div class="r" id="ri" style="opacity:0"><svg viewBox="0 0 120 120"><circle class="tr" cx="60" cy="60" r="53"/><circle class="bi" cx="60" cy="60" r="53"/></svg><div class="zahl"><b>63</b><small>/ 100</small></div></div>
+    <div class="r" id="rf" style="opacity:0"><svg viewBox="0 0 120 120"><circle class="tr" cx="60" cy="60" r="53"/><circle class="bf" cx="60" cy="60" r="53"/></svg><div class="zahl"><b>24</b><small>/ 100</small></div></div>
+    <div class="unter" id="ui"><span class="plakette">◆ Gut</span><span class="rech">Investment <b>84</b><span> × 75 % = 63</span></span></div>
+    <div class="unter" id="uf"><span class="plakette">◆ Sehr gut</span><span class="rech">Finanzierung <b>96</b><span> × 25 % = 24</span></span></div>
+  </div>
+  <p class="satz" id="satz"><span class="zeile">63 + 24 = 87. Das Gesamturteil <b>Sehr gut</b> wird aus beiden gebildet, das Investment zählt 75 %, die Finanzierung 25 %.</span></p>
+</div>
+<div class="knoepfe"><button class="knopf" id="wieder" type="button">↻ Wiederholen</button><button class="knopf leise" id="ende" type="button">Endbild</button></div>
+<p class="hinweis" id="hinweis">Dauer rund 5 Sekunden. Gewichte wie in Etappe 3 der Strecke („Gesamt aus Investment … und Finanzierung …“).</p>
+<script src="basis.js"></script>
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var L = 333;
+  /* Bogen von a bis b (Prozent des Umfangs) */
+  function bogen(c, a, b) { c.style.strokeDasharray = (L * Math.max(0, b - a) / 100) + ' ' + L; c.style.strokeDashoffset = String(-L * a / 100); }
+  function platz() {
+    var w = $('szene').offsetWidth, x = w * 0.25, top = 0;
+    return { x: x, top: top };
+  }
+  function seiten(t, p) {   /* t 0..1: von der Mitte nach außen */
+    $('ri').style.transform = 'translate(' + (-p.x * t) + 'px,' + (p.top * t) + 'px) scale(' + (1 - .16 * t) + ')';
+    $('rf').style.transform = 'translate(' + (p.x * t) + 'px,' + (p.top * t) + 'px) scale(' + (1 - .16 * t) + ')';
+  }
+  function unterSetzen(p) {
+    ['ui', 'uf'].forEach(function (id, i) { var el = $(id); el.style.left = (50 + (i ? 25 : -25)) + '%'; el.style.top = ''; });
+  }
+  Demo.start(function (T) {
+    var bi = $('g').querySelector('.bi'), bf = $('g').querySelector('.bf'), z = $('g').querySelector('.zahl b');
+    T.tween(1100, function (t) { bogen(bi, 0, 63 * t); z.textContent = Math.round(63 * t); }, 'weich');
+    T.nach(300, function () { $('lgI').classList.add('an'); });
+    T.nach(1150, function () {
+      $('lgF').classList.add('an');
+      T.tween(600, function (t) { bogen(bf, 63, 63 + 24 * t); z.textContent = Math.round(63 + 24 * t); }, 'raus');
+    });
+    T.nach(2000, function () {   /* Naht leuchtet, Ring pumpt */
+      var n = $('g').querySelector('.naht'); n.style.transform = 'rotate(' + (63 * 3.6) + 'deg)'; n.style.transformOrigin = '60px 60px';
+      T.tween(260, function (t) { n.style.opacity = t; }, 'raus');
+      T.tween(420, function (t) { $('g').style.transform = 'scale(' + (1 + .12 * Math.sin(Math.PI * t * .5)) + ')'; }, 'raus');
+    });
+    T.nach(2550, function () {   /* auseinander */
+      var p = platz();
+      bogen($('ri').querySelector('.bi'), 0, 63);
+      bogen($('rf').querySelector('.bf'), 63, 87);
+      $('ri').style.opacity = $('rf').style.opacity = 1;
+      $('g').style.opacity = 0; $('leg').style.opacity = 0;
+      T.tween(800, function (t) {
+        seiten(t, p);
+        bogen($('rf').querySelector('.bf'), 63 * (1 - t), 63 * (1 - t) + 24);   /* der Finanzierungsbogen dreht an den Anfang */
+      }, 'weich').then(function () {
+        unterSetzen(p);
+        [['ri', '.bi', 63, 84, 'ui'], ['rf', '.bf', 24, 96, 'uf']].forEach(function (q, i) {
+          var c = $(q[0]).querySelector(q[1]), zz = $(q[0]).querySelector('.zahl b');
+          T.nach(150 + i * 150, function () { T.tween(1000, function (t) { var v = q[2] + (q[3] - q[2]) * t; bogen(c, 0, v); zz.textContent = Math.round(v); }, 'raus'); });
+          T.nach(700 + i * 150, function () { $(q[4]).classList.add('an'); });
+        });
+        T.nach(1500, function () { $('satz').classList.add('an'); });
+      });
+    });
+  }, function () {
+    var p = platz();
+    $('g').style.opacity = 0; $('leg').style.opacity = 0;
+    $('ri').style.opacity = $('rf').style.opacity = 1;
+    seiten(1, p); unterSetzen(p);
+    bogen($('ri').querySelector('.bi'), 0, 84); $('ri').querySelector('.zahl b').textContent = '84';
+    bogen($('rf').querySelector('.bf'), 0, 96); $('rf').querySelector('.zahl b').textContent = '96';
+    $('ui').classList.add('an'); $('uf').classList.add('an');
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Score-Animation Entwürfe</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap">
+<style>
+  /* Übersicht der sechs Entwürfe für den Hero-Score (Marcel 19.11.2026). Nur zur Auswahl, nicht in der Landing. */
+  :root{--ob:#050505;--gd:#C9A84C;--gdh:#E8CC7A;--gdd:#b8932f;--grn:#3FA56C;--runway:linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#b8932f);
+    --disp:'Space Grotesk',system-ui,sans-serif;--mono:'JetBrains Mono',ui-monospace,monospace;--body:'Inter',system-ui,sans-serif}
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--ob);color:#ECE6D6;font-family:var(--body)}
+  .wrap{max-width:1180px;margin:0 auto;padding:28px 16px 48px}
+  .eye{font:700 11px/1 var(--mono);letter-spacing:.2em;text-transform:uppercase;color:var(--gdh)}
+  h1{font:600 clamp(26px,3.4vw,40px)/1.1 var(--disp);color:#fff;margin:12px 0 10px}
+  h1 span{color:var(--gdh)}
+  .lead{max-width:760px;color:rgba(236,230,214,.72);font-size:15px;line-height:1.6;margin:0 0 22px}
+  .lead b{color:#fff}
+  .g{display:grid;grid-template-columns:300px minmax(0,1fr);gap:24px;align-items:start}
+  .liste{display:flex;flex-direction:column;gap:8px;list-style:none;margin:0;padding:0}
+  .liste button{width:100%;text-align:left;background:rgba(255,255,255,.03);border:1px solid rgba(236,230,214,.14);border-radius:10px;
+    color:#ECE6D6;padding:12px 14px;cursor:pointer;display:grid;grid-template-columns:28px 1fr;gap:4px 10px;font-family:var(--body)}
+  .liste button:hover{border-color:rgba(201,168,76,.55)}
+  .liste button.an{background:rgba(201,168,76,.12);border-color:var(--gd)}
+  .liste .nr{grid-row:1/3;font:700 18px/1 var(--disp);color:var(--gdh)}
+  .liste b{font:600 15px/1.2 var(--disp);color:#fff}
+  .liste small{font-size:12.5px;line-height:1.4;color:rgba(236,230,214,.6)}
+  .liste button:focus-visible,.nav button:focus-visible,.nav a:focus-visible{outline:2px solid var(--gdh);outline-offset:2px}
+  .rahmen{border:1px solid rgba(236,230,214,.12);border-radius:14px;overflow:hidden;background:#0b0a09}
+  iframe{display:block;width:100%;height:860px;border:0}
+  .nav{display:flex;gap:10px;align-items:center;justify-content:space-between;margin-top:12px;flex-wrap:wrap}
+  .nav button,.nav a{font:600 13px/1 var(--body);border:1px solid rgba(232,204,122,.4);background:transparent;color:var(--gdh);padding:11px 16px;border-radius:9px;cursor:pointer;text-decoration:none}
+  .nav .p{background:var(--runway);color:#1a1405;border:0}
+  .wertung{margin-top:26px;border-top:1px solid rgba(236,230,214,.12);padding-top:18px;font-size:14px;line-height:1.6;color:rgba(236,230,214,.75);max-width:900px}
+  .wertung b{color:#fff}
+  @media (max-width:900px){.g{grid-template-columns:1fr}.liste{flex-direction:row;overflow-x:auto;padding-bottom:4px}.liste li{flex:0 0 220px}iframe{height:900px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eye">Entwürfe · Hero der Landing · 19.11.2026</div>
+  <h1>Ein Score, <span>der sich teilt.</span></h1>
+  <p class="lead">Sechs Entwürfe für die Karte „Investor Deal Score“ im Hero. Alle zeigen erst den Gesamtscore <b>87</b>, dann den Riss,
+    das Aufpumpen und die Teilung in <b>Investment-Score 84</b> (zählt 75 %) und <b>Finanzierungs-Score 96</b> (zählt 25 %), wie in Etappe 3
+    der Strecke. Die Zahlen passen zu den Balken der heutigen Hero-Karte. Jeder Entwurf hat „Wiederholen“ und „Endbild“ und hält sich an
+    die Systemeinstellung für reduzierte Bewegung. Nichts davon ist in die Landing eingebaut.</p>
+  <div class="g">
+    <ul class="liste" id="liste">
+      <li><button type="button" data-s="1-riss.html"><span class="nr">1</span><b>Der Riss</b><small>Goldener Riss, Ring bricht in zwei Hälften. Am nächsten an deiner Beschreibung.</small></button></li>
+      <li><button type="button" data-s="2-zellteilung.html"><span class="nr">2</span><b>Zellteilung</b><small>Dunkler Kern pulsiert und teilt sich weich in zwei.</small></button></li>
+      <li><button type="button" data-s="3-abriss.html"><span class="nr">3</span><b>Abriss</b><small>Bordkarte reißt an der Perforation, Hälften drehen sich um.</small></button></li>
+      <li><button type="button" data-s="4-anteile.html"><span class="nr">4</span><b>Anteile im Ring</b><small>63 + 24 Punkte als zwei Bögen. Zeigt, wie die 87 entsteht.</small></button></li>
+      <li><button type="button" data-s="5-formel.html"><span class="nr">5</span><b>Die Ziffern teilen sich</b><small>Typografisch, die 8 fliegt links, die 7 rechts.</small></button></li>
+      <li><button type="button" data-s="6-cockpit.html"><span class="nr">6</span><b>Cockpit-Instrumente</b><small>Zeigerinstrument mit Stufen-Skala, teilt sich in zwei.</small></button></li>
+    </ul>
+    <div>
+      <div class="rahmen"><iframe id="bild" title="Entwurf" src="1-riss.html"></iframe></div>
+      <div class="nav"><button type="button" id="zur">← Vorheriger</button><button type="button" class="p" id="neu">↻ Wiederholen</button><a id="einzeln" href="1-riss.html" target="_blank" rel="noopener">Einzeln öffnen</a><button type="button" id="vor">Nächster →</button></div>
+    </div>
+  </div>
+  <div class="wertung"><b>Einordnung.</b> Am nächsten an der Vorgabe (Riss, aufpumpen, teilen) ist <b>1</b>. <b>4</b> erklärt am meisten, weil man
+    die Gewichtung sieht. <b>3</b> und <b>6</b> tragen das Luftfahrt-Bild am stärksten, 6 entfernt sich aber vom Ring der App. <b>2</b> ist die weichste,
+    <b>5</b> die ruhigste. Für die Landing würde ich 1 oder 4 nehmen und den Ablauf einmal beim Erscheinen spielen, danach steht das Endbild.</div>
+</div>
+<script>
+(function () {
+  var knoepfe = [].slice.call(document.querySelectorAll('#liste button')), f = document.getElementById('bild'), a = document.getElementById('einzeln'), i = 0;
+  function zeige(n) {
+    i = (n + knoepfe.length) % knoepfe.length;
+    knoepfe.forEach(function (b, j) { b.classList.toggle('an', j === i); b.setAttribute('aria-pressed', j === i ? 'true' : 'false'); });
+    var s = knoepfe[i].getAttribute('data-s');
+    if (f.getAttribute('src') !== s) f.setAttribute('src', s); else try { f.contentWindow.postMessage('demo-neu', '*'); } catch (e) {}
+    a.setAttribute('href', s);
+  }
+  knoepfe.forEach(function (b, j) { b.addEventListener('click', function () { zeige(j); }); });
+  document.getElementById('vor').addEventListener('click', function () { zeige(i + 1); });
+  document.getElementById('zur').addEventListener('click', function () { zeige(i - 1); });
+  document.getElementById('neu').addEventListener('click', function () { try { f.contentWindow.postMessage('demo-neu', '*'); } catch (e) {} });
+  document.addEventListener('keydown', function (e) { if (e.key === 'ArrowRight') zeige(i + 1); if (e.key === 'ArrowLeft') zeige(i - 1); });
+  zeige(0);
+})();
+</script>
+</body>
+</html>

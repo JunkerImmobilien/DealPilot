@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Score-Animation 3 · Abriss</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="basis.css">
+<style>
+  /* Entwurf 3 · Abriss: der Score sitzt auf einem Bordkarten-Abschnitt. Eine Perforation läuft durch die Mitte,
+     die Karte reißt, beide Hälften drehen sich um und zeigen ihren Teil-Score. Nimmt das Bordkarten-Motiv der Hero-Karte auf. */
+  .ticket{position:absolute;left:50%;top:14px;width:320px;height:222px;margin-left:-160px;perspective:900px}
+  .h{position:absolute;top:0;width:50%;height:100%;transform-style:preserve-3d}
+  .h.l{left:0}.h.r{right:0}
+  .seite{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;overflow:hidden;background:#FBF6E9;
+    border:1px solid #eadfc4}
+  .h.l .seite{border-right:0;border-radius:12px 0 0 12px}.h.r .seite{border-left:0;border-radius:0 12px 12px 0}
+  .hinten{transform:rotateY(180deg)}
+  .h.l .hinten{border-radius:0 12px 12px 0;border-right:1px solid #eadfc4;border-left:0}
+  .h.r .hinten{border-radius:12px 0 0 12px;border-left:1px solid #eadfc4;border-right:0}
+  .voll{position:absolute;top:0;width:200%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px}
+  .h.l .voll{left:0}.h.r .voll{left:-100%}
+  .voll .ring{position:relative}
+  .perf{position:absolute;left:50%;top:10px;bottom:10px;width:0;border-left:2px dashed var(--gd);transform:scaleY(0);transform-origin:top;opacity:.9}
+  .kerbe{position:absolute;left:50%;width:18px;height:18px;margin-left:-9px;border-radius:50%;background:#fff;border:1px solid #eadfc4;transform:scale(0)}
+  .kerbe.o{top:-10px}.kerbe.u{bottom:-10px}
+  .hinten .inh{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;padding:8px}
+  .hinten .ring{position:relative;width:104px;height:104px}
+  .hinten .ring .zahl b{font-size:31px}
+  .mitte{position:absolute;left:50%;top:92px;margin-left:-23px;width:46px;height:46px;border-radius:50%;background:var(--ob);color:#fff;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:0;transform:scale(.3);
+    transition:opacity .35s,transform .55s cubic-bezier(.2,1.6,.4,1);box-shadow:0 0 0 3px #fff,0 0 0 4px var(--gd);z-index:3}
+  .mitte b{font:700 16px/1 var(--disp)}.mitte small{font:600 6.5px/1 var(--mono);letter-spacing:.1em;color:var(--gdh);margin-top:2px}
+  .mitte.an{opacity:1;transform:none}
+  @media (max-width:420px){
+    .ticket{width:290px;margin-left:-145px;height:206px}
+    .voll .ring{width:124px;height:124px}
+    .hinten .ring{width:92px;height:92px}.hinten .ring .zahl b{font-size:27px}
+    .hinten .frage{display:none}
+    .mitte{top:84px}
+  }
+</style>
+</head>
+<body>
+<div class="kopfzeile"><h1>3 · Abriss</h1><small>Entwurf · Hero</small></div>
+<p class="idee">Der Gesamtscore steht auf einem Abschnitt der Bordkarte. Eine Perforation läuft durch die Mitte, die Karte spannt sich und
+  reißt. Beide Hälften drehen sich um, auf ihrer Rückseite steht der jeweilige Teil-Score. Am stärksten im Luftfahrt-Bild der Marke.</p>
+<div class="karte">
+  <div class="band"><span><i></i>Pre-Flight · Investor Deal Score</span><span class="cl">Cleared</span></div>
+  <div class="titel"><b>Investor <em>Deal Score</em></b><small>☰ Alle KPIs</small></div>
+  <div class="szene" id="szene">
+    <div class="ticket" id="ticket">
+      <div class="h l" id="hl">
+        <div class="seite vorn"><div class="voll"><div class="ring"><svg viewBox="0 0 120 120"><circle class="tr" cx="60" cy="60" r="53"/><circle class="pg" cx="60" cy="60" r="53"/></svg><div class="zahl"><b class="z">0</b><small>/ 100</small></div></div><span class="etikett">Quick-Check · Gesamt</span></div></div>
+        <div class="seite hinten"><div class="inh"><span class="etikett">Investment-Score</span><div class="ring"><svg viewBox="0 0 120 120"><circle class="tr" cx="60" cy="60" r="53"/><circle class="pg" cx="60" cy="60" r="53"/></svg><div class="zahl"><b>0</b><small>75 %</small></div></div><span class="plakette">◆ Gut</span></div></div>
+      </div>
+      <div class="h r" id="hr">
+        <div class="seite vorn"><div class="voll"><div class="ring"><svg viewBox="0 0 120 120"><circle class="tr" cx="60" cy="60" r="53"/><circle class="pg" cx="60" cy="60" r="53"/></svg><div class="zahl"><b class="z">0</b><small>/ 100</small></div></div><span class="etikett">Quick-Check · Gesamt</span></div></div>
+        <div class="seite hinten"><div class="inh"><span class="etikett">Finanzierungs-Score</span><div class="ring"><svg viewBox="0 0 120 120"><circle class="tr" cx="60" cy="60" r="53"/><circle class="pg" cx="60" cy="60" r="53"/></svg><div class="zahl"><b>0</b><small>25 %</small></div></div><span class="plakette">◆ Sehr gut</span></div></div>
+      </div>
+      <div class="perf" id="perf"></div><div class="kerbe o" id="ko"></div><div class="kerbe u" id="ku"></div>
+      <div class="mitte" id="mitte"><b>87</b><small>GESAMT</small></div>
+    </div>
+  </div>
+  <p class="satz" id="satz"><span class="zeile">Das Gesamturteil <b>Sehr gut</b> wird aus beiden Hälften gebildet. Investment 84 zählt 75 %, Finanzierung 96 zählt 25 %.</span></p>
+</div>
+<div class="knoepfe"><button class="knopf" id="wieder" type="button">↻ Wiederholen</button><button class="knopf leise" id="ende" type="button">Endbild</button></div>
+<p class="hinweis" id="hinweis">Dauer rund 4,5 Sekunden. 3D-Drehung wie die Wendekarte des Deal-Checks.</p>
+<script src="basis.js"></script>
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  function rueck(T, zaehlen) {
+    [['hl', 84], ['hr', 96]].forEach(function (p, i) {
+      var b = $(p[0]).querySelector('.hinten'), pg = b.querySelector('.pg'), z = b.querySelector('.zahl b');
+      if (!zaehlen) { Demo.ring(pg, p[1]); z.textContent = p[1]; return; }
+      T.nach(i * 120, function () { T.tween(1000, function (t) { Demo.ring(pg, p[1] * t); z.textContent = Math.round(p[1] * t); }); });
+    });
+  }
+  function auf(t, dreh) {
+    $('hl').style.transform = 'translateX(' + (-16 * t) + 'px) rotate(' + (-3 * t) + 'deg) rotateY(' + (-180 * dreh) + 'deg)';
+    $('hr').style.transform = 'translateX(' + (16 * t) + 'px) rotate(' + (3 * t) + 'deg) rotateY(' + (180 * dreh) + 'deg)';
+  }
+  Demo.start(function (T) {
+    var pgs = document.querySelectorAll('.vorn .pg'), zs = document.querySelectorAll('.vorn .z');
+    T.tween(1400, function (t) { pgs.forEach(function (p) { Demo.ring(p, 87 * t); }); zs.forEach(function (z) { z.textContent = Math.round(87 * t); }); });
+    T.nach(1700, function () {   /* Perforation */
+      T.tween(300, function (t) { $('ko').style.transform = $('ku').style.transform = 'scale(' + t + ')'; }, 'feder');
+      T.tween(450, function (t) { $('perf').style.transform = 'scaleY(' + t + ')'; }, 'raus');
+    });
+    T.nach(2250, function () {   /* spannen und aufpumpen */
+      T.tween(380, function (t) { $('ticket').style.transform = 'scale(' + (1 + .1 * Math.sin(Math.PI * t)) + ')'; }, function (t) { return t; });
+    });
+    T.nach(2650, function () {   /* reißen */
+      $('perf').style.transition = 'opacity .2s'; $('perf').style.opacity = 0;
+      T.tween(420, function (t) { auf(t, 0); }, 'raus');
+    });
+    T.nach(3100, function () {   /* umdrehen */
+      T.tween(800, function (t) { auf(1 - .5 * t, t); }, 'weich');
+      T.nach(380, function () { rueck(T, true); });
+    });
+    T.nach(4000, function () { $('mitte').classList.add('an'); });
+    T.nach(4250, function () { $('satz').classList.add('an'); });
+  }, function (T) {
+    $('perf').style.opacity = 0; $('ko').style.transform = $('ku').style.transform = 'scale(1)';
+    auf(.5, 1); rueck(T, false); $('mitte').classList.add('an');
+  });
+})();
+</script>
+</body>
+</html>

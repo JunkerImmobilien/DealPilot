@@ -10,7 +10,7 @@
   var liste = document.querySelector('.pt-schritte');
   if (!liste) return;
   var schritte = [].slice.call(liste.querySelectorAll('.pt-s'));
-  var bilder = [].slice.call(document.querySelectorAll('.pt-schirm img'));
+  var bilder = [].slice.call(document.querySelectorAll('.pt-schirm [data-bild]'));   /* landing-strecke-5 · auch die HTML-Karte der Etappe 1 (index.html .pt-qc) */
   var zahl = document.getElementById('ptZahl'), wer = document.getElementById('ptWer');
   var kabine = liste.querySelector('.pt-kabine'), schiene = liste.querySelector('.pt-schiene');
   var aktiv = -1;

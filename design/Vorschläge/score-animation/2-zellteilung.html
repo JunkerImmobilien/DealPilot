@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Score-Animation 2 · Zellteilung</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="basis.css">
+<style>
+  /* Entwurf 2 · Zellteilung: der Score ist ein Kern, der pulsiert, sich in die Länge zieht und wie eine Zelle teilt.
+     Die Brücke zwischen den Kernen entsteht mit einem SVG-Filter (Weichzeichnen + Schwelle), kein Bild. */
+  .goo{position:absolute;inset:0;filter:url(#goo)}
+  .blob{position:absolute;left:50%;top:34px;width:120px;height:120px;margin-left:-60px;border-radius:50%;background:var(--ob)}
+  .blob.b{background:#0d0c0a}
+  .huelle{position:absolute;left:50%;top:19px;width:150px;margin-left:-75px;display:flex;flex-direction:column;align-items:center;gap:8px}
+  .huelle .ring{position:relative;width:150px;height:150px}
+  .huelle .ring .tr{stroke:transparent}
+  .huelle .zahl b{color:#fff}
+  .huelle .zahl small{color:var(--gdh)}
+  .huelle .unter{display:flex;flex-direction:column;align-items:center;gap:6px;opacity:0;transition:opacity .4s}
+  .huelle .unter.an{opacity:1}
+  .huelle .etikett{position:absolute;top:-14px;left:-30px;right:-30px}
+  .gesamt{opacity:0;transition:opacity .4s}
+  @media (max-width:420px){
+    .blob{width:98px;height:98px;margin-left:-49px;top:33px}
+    .huelle{width:124px;margin-left:-62px;top:20px}
+    .huelle .ring{width:124px;height:124px}
+    .huelle .ring .zahl b{font-size:32px}
+  }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><filter id="goo"><feGaussianBlur in="SourceGraphic" stdDeviation="9" result="w"/><feColorMatrix in="w" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 22 -9" result="g"/><feComposite in="SourceGraphic" in2="g" operator="atop"/></filter></defs></svg>
+<div class="kopfzeile"><h1>2 · Zellteilung</h1><small>Entwurf · Hero</small></div>
+<p class="idee">Der Score ist ein dunkler Kern mit grünem Ring. Er schlägt zweimal wie ein Herz, zieht sich in die Länge und teilt sich wie
+  eine Zelle. Jeder Tochterkern bekommt seinen eigenen Ring: links die Immobilie, rechts die Finanzierung. Organisch, ruhig, eher weich.</p>
+<div class="karte">
+  <div class="band"><span><i></i>Pre-Flight · Investor Deal Score</span><span class="cl">Cleared</span></div>
+  <div class="titel"><b>Investor <em>Deal Score</em></b><small>☰ Alle KPIs</small></div>
+  <div class="szene" id="szene">
+    <div class="goo"><div class="blob a" id="ba"></div><div class="blob b" id="bb"></div></div>
+    <div class="huelle" id="hg"><div class="ring"><svg viewBox="0 0 120 120"><circle class="tr" cx="60" cy="60" r="53"/><circle class="pg" cx="60" cy="60" r="53"/></svg><div class="zahl"><b>0</b><small>QUICK-CHECK</small></div></div>
+      <div class="unter an gesamt" id="hgU"><span class="plakette">◆ Sehr gut</span></div></div>
+    <div class="huelle" id="hi" style="opacity:0"><span class="etikett">Investment-Score</span><div class="ring"><svg viewBox="0 0 120 120"><circle class="tr" cx="60" cy="60" r="53"/><circle class="pg" cx="60" cy="60" r="53"/></svg><div class="zahl"><b>84</b><small>75 %</small></div></div>
+      <div class="unter" id="hiU"><span class="plakette">◆ Gut</span></div></div>
+    <div class="huelle" id="hf" style="opacity:0"><span class="etikett">Finanzierungs-Score</span><div class="ring"><svg viewBox="0 0 120 120"><circle class="tr" cx="60" cy="60" r="53"/><circle class="pg" cx="60" cy="60" r="53"/></svg><div class="zahl"><b>96</b><small>25 %</small></div></div>
+      <div class="unter" id="hfU"><span class="plakette">◆ Sehr gut</span></div></div>
+  </div>
+  <p class="satz" id="satz"><span class="zeile">Beide zusammen ergeben das Gesamturteil <b>Sehr gut · 87</b>. Investment 84 zählt 75 %, Finanzierung 96 zählt 25 %.</span></p>
+</div>
+<div class="knoepfe"><button class="knopf" id="wieder" type="button">↻ Wiederholen</button><button class="knopf leise" id="ende" type="button">Endbild</button></div>
+<p class="hinweis" id="hinweis">Dauer rund 4,5 Sekunden. Weichzeichner-Filter läuft in allen aktuellen Browsern.</p>
+<script src="basis.js"></script>
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  function weite() { return $('szene').offsetWidth * 0.25; }
+  function setzeX(dx) {
+    $('ba').style.transform = 'translateX(' + (-dx) + 'px)';
+    $('bb').style.transform = 'translateX(' + dx + 'px)';
+    $('hi').style.transform = 'translateX(' + (-dx) + 'px)';
+    $('hf').style.transform = 'translateX(' + dx + 'px)';
+  }
+  Demo.start(function (T) {
+    var pg = $('hg').querySelector('.pg'), z = $('hg').querySelector('.zahl b');
+    $('hgU').classList.remove('an');
+    T.tween(900, function (t) { $('ba').style.transform = $('bb').style.transform = 'scale(' + (.2 + .8 * t) + ')'; }, 'feder');
+    T.nach(200, function () { T.tween(1300, function (t) { Demo.ring(pg, 87 * t); z.textContent = Math.round(87 * t); }); });
+    T.nach(1400, function () { $('hgU').classList.add('an'); });
+    T.nach(1900, function () {   /* zwei Herzschläge, der zweite größer: aufpumpen */
+      $('hgU').classList.remove('an');
+      T.tween(700, function (t) {
+        var s = 1 + .08 * Math.sin(Math.PI * Math.min(1, t * 2)) + .16 * Math.sin(Math.PI * Math.max(0, t * 2 - 1));
+        $('ba').style.transform = $('bb').style.transform = 'scale(' + s + ')';
+        $('hg').style.transform = 'scale(' + s + ')';
+      }, function (t) { return t; });
+    });
+    T.nach(2650, function () {   /* teilen */
+      var w = weite();
+      $('hg').style.transition = 'opacity .3s'; $('hg').style.opacity = 0;
+      T.tween(1000, function (t) {
+        $('ba').style.transform = 'translateX(' + (-w * t) + 'px) scale(' + (1.16 - .16 * t) + ',' + (1.16 - .3 * Math.sin(Math.PI * t) - .16 * t) + ')';
+        $('bb').style.transform = 'translateX(' + (w * t) + 'px) scale(' + (1.16 - .16 * t) + ',' + (1.16 - .3 * Math.sin(Math.PI * t) - .16 * t) + ')';
+      }, 'weich').then(function () {
+        setzeX(w);
+        [['hi', 84, 'hiU'], ['hf', 96, 'hfU']].forEach(function (p, i) {
+          var el = $(p[0]), r = el.querySelector('.pg'), zz = el.querySelector('.zahl b');
+          el.style.transition = 'opacity .35s'; el.style.opacity = 1;
+          T.nach(i * 140, function () { T.tween(1000, function (t) { Demo.ring(r, p[1] * t); zz.textContent = Math.round(p[1] * t); }); });
+          T.nach(900 + i * 140, function () { $(p[2]).classList.add('an'); });
+        });
+        T.nach(1300, function () { $('satz').classList.add('an'); });
+      });
+    });
+  }, function () {
+    $('hg').style.opacity = 0;
+    setzeX(weite());
+    [['hi', 84, 'hiU'], ['hf', 96, 'hfU']].forEach(function (p) { $(p[0]).style.opacity = 1; Demo.ring($(p[0]).querySelector('.pg'), p[1]); $(p[2]).classList.add('an'); });
+  });
+})();
+</script>
+</body>
+</html>

@@ -153,3 +153,23 @@
 .dk-kpi .dk-haupt b{color:var(--gdh);font-size:22px}
 .dk-karte:empty{min-height:560px}
 @media (max-width:420px){.dk-kpi .dk-haupt{grid-column:1/-1}}
+
+/* landing-dealcheck-14 · Zusätzliche Einnahmen (Stellplatz, Küche, Sonstiges), aufklappbar unter der Kaltmiete */
+.dk-zusatz{border-bottom:1px solid rgba(236,230,214,.14);padding-bottom:6px;min-width:0}
+.dk-zusatz summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:2px 0 4px}
+.dk-zusatz summary::-webkit-details-marker{display:none}
+.dk-zusatz summary>span{font:700 10px/1.2 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:rgba(236,230,214,.6);display:flex;align-items:center;gap:8px;min-width:0}
+.dk-zusatz summary>span::before{content:'+';display:inline-grid;place-items:center;width:16px;height:16px;flex:none;border:1px solid rgba(236,230,214,.3);border-radius:50%;font:600 12px/1 var(--mono);color:var(--gdh);transition:transform .25s}
+.dk-zusatz[open] summary>span::before{transform:rotate(45deg)}
+.dk-zusatz summary em{font-style:normal;letter-spacing:.06em;text-transform:none;color:rgba(236,230,214,.4);font-weight:500}
+.dk-zusatz summary b{flex:none;font:600 11px/1.2 var(--mono);color:rgba(236,230,214,.4);white-space:nowrap;text-align:right}
+.dk-zusatz summary b.an{color:var(--grnh,#5BD98E)}
+.dk-zusatz summary:hover>span,.dk-zusatz[open] summary>span{color:rgba(236,230,214,.85)}
+.dk-zusatz summary:focus-visible{outline:2px solid var(--gdh);outline-offset:2px;border-radius:4px}
+.dk-drei{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:6px}
+.dk-drei .dk-f{border-bottom-color:rgba(236,230,214,.1)}
+.dk-drei .dk-f input{font-size:18px}
+.dk-drei .dk-f i{font-size:13px}
+.dk-zusatz-h{display:block;margin-top:8px;font:500 11px/1.35 var(--body);color:rgba(236,230,214,.45)}
+@media (max-width:420px){.dk-drei{gap:10px}.dk-drei .dk-f span{letter-spacing:.08em}.dk-zusatz summary em{display:none}}
+@media (prefers-reduced-motion:reduce){.dk-zusatz summary>span::before{transition:none}}

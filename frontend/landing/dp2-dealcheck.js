@@ -52,6 +52,14 @@
      · LAGE & MARKT aus /api/v1/market-stats/schnellcheck (v3324, nur eigene amtliche
        Tabellen, 0 € je Abruf — Begründung im Kopf von backend/src/routes/marketStats.js).
      · Keine Animation bei prefers-reduced-motion: Karte wechselt ohne Drehung, Zahlen stehen sofort.
+
+   landing-dealcheck-14 · Marcel 19.11.2026: „zusätzliche Einnahmen, Tiefgarage 50 €, Küche 40 €, die müssen in den
+   Score". Aufklappbar unter der Kaltmiete: Stellplatz (auch Garage), Küche, Sonstiges. Die Summe geht als ze in
+   DealKpis.compute (Rendite, Cashflow, DSCR, damit in den Score), die 17 % Kosten bleiben auf der Kaltmiete (wie calc.js).
+   Die Mietrechnung (Vergleichsmiete, Kappung, Neuvermietung 110/120 %) bleibt bei der Kaltmiete je m².
+   Gemessen mit den echten Kernen in Node, 150.000 € / 850 € / 10 J voll 4,67 % (Stand 18.11.2026):
+     ohne Zusatz: CF −66 €, DSCR 0,91, 47 · Schwach
+     + 90 € (50 Tiefgarage + 40 Küche): CF +24 €, DSCR 1,03, 62 · Solide
    ═══════════════════════════════════════════════════════════════════════ */
 (function () {
   'use strict';
@@ -64,6 +72,15 @@
     "  <div class=\"dk-kopf\"><span class=\"dk-marke\">Deal-Check</span><span class=\"dk-nr\">Boarding · Vorab</span></div>",
     "  <label class=\"dk-f\"><span>Kaufpreis</span><input id=\"dcKp\" inputmode=\"decimal\" value=\"@@KP@@\" aria-label=\"Kaufpreis in Euro\"><i>€</i></label>",
     "  <label class=\"dk-f\"><span>Kaltmiete im Monat</span><input id=\"dcNkm\" inputmode=\"decimal\" value=\"@@NKM@@\" aria-label=\"Nettokaltmiete im Monat in Euro\"><i>€</i></label>",
+    /* landing-dealcheck-14 · Marcel 19.11.2026: zusätzliche Einnahmen (Stellplatz/Garage, Küche, Sonstiges), aufklappbar.
+       Sie gehen als ze in DealKpis.compute (wie im Quick-Check: qc_nkm_stp/garage/kueche/sonst -> ze), die Mietrechnung
+       (Vergleichsmiete, Kappung, Neuvermietung) bleibt bei der Kaltmiete der Wohnung. */
+    "  <details class=\"dk-zusatz\" id=\"dkZusatz\"><summary><span>Zusätzliche Einnahmen <em>optional</em></span><b id=\"dkZeSumme\">Stellplatz, Küche</b></summary>",
+    "    <div class=\"dk-drei\"><label class=\"dk-f\"><span>Stellplatz</span><input id=\"dcZeStp\" inputmode=\"decimal\" placeholder=\"0\" aria-label=\"Stellplatz oder Garage im Monat in Euro, optional\"><i>€</i></label>",
+    "      <label class=\"dk-f\"><span>Küche</span><input id=\"dcZeKue\" inputmode=\"decimal\" placeholder=\"0\" aria-label=\"Küche im Monat in Euro, optional\"><i>€</i></label>",
+    "      <label class=\"dk-f\"><span>Sonstiges</span><input id=\"dcZeSon\" inputmode=\"decimal\" placeholder=\"0\" aria-label=\"Sonstige Einnahmen im Monat in Euro, optional\"><i>€</i></label></div>",
+    "    <small class=\"dk-zusatz-h\">Je Monat, Stellplatz auch Garage oder Tiefgarage. Zählt in Rendite, Cashflow und Score. Mieterhöhung und Vergleichsmiete rechnen nur mit der Kaltmiete der Wohnung.</small>",
+    "  </details>",
     "  <fieldset class=\"dk-bind\"><legend>Zinsbindung</legend>",
     "    <div class=\"dk-chips\" id=\"dkChips\" role=\"radiogroup\" aria-label=\"Zinsbindung\">",
     "      <button type=\"button\" role=\"radio\" aria-checked=\"false\" data-b=\"5\"><b>5 J</b><small>–</small></button>",
@@ -125,7 +142,8 @@
   var RING_U = 2 * Math.PI * 52;
   var $ = function (id) { return document.getElementById(id); };
   var karte = $('dkKarte'), vorn = $('dkVorn'), hinten = $('dcErg');
-  var F = { kp: $('dcKp'), nkm: $('dcNkm'), zins: $('dcZins'), plz: $('dcPlz'), bj: $('dcBj'), wfl: $('dcWfl') };
+  var F = { kp: $('dcKp'), nkm: $('dcNkm'), zins: $('dcZins'), plz: $('dcPlz'), bj: $('dcBj'), wfl: $('dcWfl'),
+            zeStp: $('dcZeStp'), zeKue: $('dcZeKue'), zeSon: $('dcZeSon') };
   var ruhig = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var zinsen = null;            /* { '5': 4.11, … } vom Endpunkt, sonst null */
   var standText = '';
@@ -201,15 +219,27 @@
       setze('dkStand', 'Der Tageszins ist gerade nicht abrufbar. Trag deinen Zins selbst ein.');
     });
 
+  /* ── Zusätzliche Einnahmen (landing-dealcheck-14) ───────────────────── */
+  function zeTeil(el) { var z = zahl(el); return z > 0 && z < 100000 ? z : 0; }
+  function zeMonat() { return zeTeil(F.zeStp) + zeTeil(F.zeKue) + zeTeil(F.zeSon); }
+  function zeZeigen() {
+    var z = zeMonat();
+    setze('dkZeSumme', z > 0 ? '+' + eur(z) + ' im Monat' : 'Stellplatz, Küche');
+    $('dkZeSumme').classList.toggle('an', z > 0);
+  }
+  [F.zeStp, F.zeKue, F.zeSon].forEach(function (el) { if (el) el.addEventListener('input', zeZeigen); });
+
   /* ── Rechnen (nur Kerne der App) ────────────────────────────────────── */
   function rechnen() {
-    var kp = zahl(F.kp), nkm = zahl(F.nkm), zins = zinsJetzt();
+    var kp = zahl(F.kp), nkm = zahl(F.nkm), zins = zinsJetzt(), ze = zeMonat();
     if (!(kp > 0) || !(nkm > 0) || !isFinite(zins) || !window.DealKpis || !window.DealScore || !window.ScoreTier) return null;
     var ek = Math.round(kp * VORGABE.ek_pct / 100);
     var nkPct = VORGABE.nk_pct, nk = kp * nkPct / 100;
     var darlehen = Math.max(0, kp + nk - ek);
     var k = DealKpis.compute({
-      kp: kp, nk: nk, nkm: nkm, ze: 0, uf: 0,
+      /* landing-dealcheck-14 · ze = zusätzliche Einnahmen. Die 17 % nicht umlagefähige Kosten stehen wie in der App
+         (calc.js bwk_nul_pct x nkm, ohne ze) auf der Kaltmiete der Wohnung. */
+      kp: kp, nk: nk, nkm: nkm, ze: ze, uf: 0,
       bwk_ul: 0, bwk_nul: nkm * 12 * VORGABE.nul_pct / 100,
       d1: darlehen, d1z: zins, d1t: VORGABE.tilg, ek: ek
     });
@@ -218,7 +248,7 @@
       wp_kpi: kp * 0.05, mstg: 1.5,
       darlehen: (k.d_total != null && isFinite(k.d_total)) ? k.d_total : null
     });
-    return { kp: kp, nkm: nkm, zins: zins, ek: ek, nk: nk, nkPct: nkPct, darlehen: darlehen, k: k, score: ds.score, st: ScoreTier.stufe(ds.score) };
+    return { kp: kp, nkm: nkm, ze: ze, zins: zins, ek: ek, nk: nk, nkPct: nkPct, darlehen: darlehen, k: k, score: ds.score, st: ScoreTier.stufe(ds.score) };
   }
 
   function zeichne(r, anteil) {
@@ -245,9 +275,12 @@
       /* landing-kern-3 · nur das Fragment ändern — umgebung.js schreibt den Host um */
       var basis = String(los.getAttribute('href') || '').split('#')[0];
       los.setAttribute('href', basis + '#dc=1&kp=' + Math.round(r.kp) + '&nkm=' + Math.round(r.nkm) + '&ek=' + Math.round(r.ek)
-        + '&zins=' + (Math.round(r.zins * 100) / 100) + '&nk=' + (Math.round(r.nkPct * 100) / 100));
+        + '&zins=' + (Math.round(r.zins * 100) / 100) + '&nk=' + (Math.round(r.nkPct * 100) / 100)
+        /* landing-dealcheck-14 · zusätzliche Einnahmen im Monat. Die App (js/dealcheck-uebernahme.js) liest &ze noch nicht
+           und setzt ze = 0, bis sie nachgezogen ist (offener Punkt). */
+        + (r.ze > 0 ? '&ze=' + Math.round(r.ze) : ''));
     }
-    setze('dcAnnahme', 'Vorab-Rechnung mit ' + eur(r.ek) + ' Eigenkapital (10 %), ' + eur(r.nk) + ' Nebenkosten (10 %), Darlehen '
+    setze('dcAnnahme', (r.ze > 0 ? 'Mit ' + eur(r.ze) + ' zusätzlichen Einnahmen im Monat. ' : '') + 'Vorab-Rechnung mit ' + eur(r.ek) + ' Eigenkapital (10 %), ' + eur(r.nk) + ' Nebenkosten (10 %), Darlehen '
       + eur(r.darlehen) + ' zu ' + pct(r.zins) + (zinsen ? ' (' + bindung + ' J)' : '') + ', ' + pct(VORGABE.tilg)
       + ' Tilgung, ' + VORGABE.nul_pct + ' % nicht umlagefähige Kosten. Alles anpassbar in der App. Keine Finanzierungs- oder Steuerberatung.');
     if (ruhig) { zeichne(r, 1); return; }
@@ -396,7 +429,8 @@
     if (mitW) {
       var ist = nkm / wfl, bisOben = oben - ist, ziel = Math.min(oben, ist * (1 + kpct / 100));
       var mtl = function (qm) { return dez(Math.round(qm * wfl), 0) + ' €'; };
-      t += '<br><b>Deine Miete:</b> ' + dez(ist, 2) + ' € je m² (Mittel ' + dez(vg.qm, 2) + ' €). ';
+      t += '<br><b>Deine Miete:</b> ' + dez(ist, 2) + ' € je m² (Mittel ' + dez(vg.qm, 2) + ' €). '
+        + (zeMonat() > 0 ? 'Gerechnet nur mit der Kaltmiete der Wohnung, ohne Stellplatz, Küche und Sonstiges. ' : '');   /* landing-dealcheck-14 */
       if (bisOben > 0.05) {
         t += 'Bis zum oberen Rand fehlen ' + ca + dez(bisOben, 2) + ' €, das sind ' + mtl(bisOben) + ' im Monat. '
           + (ziel < oben - 0.005 ? 'Wegen der Kappung sind in 3 Jahren davon bis <b>' + dez(ziel, 2) + ' €</b> erreichbar (' + mtl(ziel - ist) + ' mehr im Monat), der Rest in den Jahren danach. '

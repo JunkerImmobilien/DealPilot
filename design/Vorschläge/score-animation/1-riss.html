@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Score-Animation 1 · Der Riss</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="basis.css">
+<style>
+  /* Entwurf 1 · Der Riss: der ganze Ring bekommt einen goldenen Riss, pumpt sich auf und bricht in zwei Hälften,
+     aus denen die beiden Teil-Scores wachsen. */
+  .gross{position:absolute;left:50%;top:18px;width:150px;margin-left:-75px;display:flex;flex-direction:column;align-items:center;gap:10px}
+  .gross .koerper{position:relative;width:150px;height:150px}
+  .gross .ring{left:0;top:0}
+  .gross .haelfte{position:absolute;inset:0}
+  .gross .haelfte.l{clip-path:inset(-20px 50% -20px -20px)}
+  .gross .haelfte.r{clip-path:inset(-20px -20px -20px 50%)}
+  .riss{position:absolute;left:0;top:0;width:150px;height:150px;overflow:visible;pointer-events:none}
+  .riss path{fill:none;stroke:var(--gd);stroke-width:3;stroke-linejoin:round;stroke-dasharray:1;stroke-dashoffset:1;
+    filter:drop-shadow(0 0 4px rgba(232,204,122,.9))}
+  .gross.beben .koerper{animation:beben .32s linear}
+  @keyframes beben{20%{transform:translateX(-2px)}40%{transform:translateX(2px)}60%{transform:translateX(-1.5px)}80%{transform:translateX(1px)}}
+  .teil{position:absolute;top:14px;width:150px;display:flex;flex-direction:column;align-items:center;gap:8px;
+    opacity:0;transform:scale(.6);transition:opacity .45s,transform .7s cubic-bezier(.2,1.4,.4,1)}
+  .teil.an{opacity:1;transform:none}
+  .teil.inv{left:calc(25% - 75px)}.teil.fin{left:calc(75% - 75px)}
+  .teil .ring{position:relative;width:124px;height:124px}
+  .teil .ring .zahl b{font-size:36px}
+  .mitte{position:absolute;left:50%;top:64px;width:52px;height:52px;margin-left:-26px;border-radius:50%;background:var(--ob);color:#fff;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 0 0 3px #fff,0 0 0 4px var(--gd);
+    opacity:0;transform:scale(.3);transition:opacity .4s,transform .6s cubic-bezier(.2,1.6,.4,1)}
+  .mitte b{font:700 18px/1 var(--disp)}.mitte small{font:600 7px/1 var(--mono);letter-spacing:.1em;color:var(--gdh);margin-top:2px}
+  .mitte.an{opacity:1;transform:none}
+  @media (max-width:420px){
+    .teil{width:124px}.teil.inv{left:calc(25% - 62px)}.teil.fin{left:calc(75% - 62px)}
+    .teil .ring{width:104px;height:104px}.teil .ring .zahl b{font-size:30px}
+    .teil .frage{display:none}
+    .mitte{top:54px;width:44px;height:44px;margin-left:-22px}.mitte b{font-size:15px}
+  }
+</style>
+</head>
+<body>
+<div class="kopfzeile"><h1>1 · Der Riss</h1><small>Entwurf · Hero</small></div>
+<p class="idee">Der Gesamtscore läuft ein wie heute. Dann zieht ein goldener Riss durch die Mitte, der Ring bebt, pumpt sich auf und
+  bricht in zwei Hälften. Aus den Hälften wachsen Investment-Score und Finanzierungs-Score, in der Mitte bleibt die 87 als Siegel.</p>
+<div class="karte">
+  <div class="band"><span><i></i>Pre-Flight · Investor Deal Score</span><span class="cl">Cleared</span></div>
+  <div class="titel"><b>Investor <em>Deal Score</em></b><small>☰ Alle KPIs</small></div>
+  <div class="szene" id="szene">
+    <div class="gross" id="gross">
+      <div class="koerper" id="koerper">
+        <div class="haelfte l" id="hl"><div class="ring"><svg viewBox="0 0 120 120"><circle class="tr" cx="60" cy="60" r="53"/><circle class="pg" cx="60" cy="60" r="53"/></svg><div class="zahl"><b class="z">0</b><small>/ 100</small></div></div></div>
+        <div class="haelfte r" id="hr"><div class="ring"><svg viewBox="0 0 120 120"><circle class="tr" cx="60" cy="60" r="53"/><circle class="pg" cx="60" cy="60" r="53"/></svg><div class="zahl"><b class="z">0</b><small>/ 100</small></div></div></div>
+        <svg class="riss" viewBox="0 0 150 150"><path id="rissPfad" pathLength="1" d="M75 -8 L68 20 L82 42 L69 68 L84 94 L71 120 L78 158"/></svg>
+      </div>
+      <span class="etikett" id="grossEt">Quick-Check · Gesamt</span>
+      <span class="plakette" id="grossPl" style="opacity:0">◆ Sehr gut</span>
+    </div>
+    <div class="teil inv" id="inv"><span class="etikett">Investment-Score</span>
+      <div class="ring"><svg viewBox="0 0 120 120"><circle class="tr" cx="60" cy="60" r="53"/><circle class="pg" cx="60" cy="60" r="53"/></svg><div class="zahl"><b>0</b><small>Anteil 75 %</small></div></div>
+      <span class="plakette">◆ Gut</span><span class="frage">Wie gut ist die Immobilie?</span></div>
+    <div class="teil fin" id="fin"><span class="etikett">Finanzierungs-Score</span>
+      <div class="ring"><svg viewBox="0 0 120 120"><circle class="tr" cx="60" cy="60" r="53"/><circle class="pg" cx="60" cy="60" r="53"/></svg><div class="zahl"><b>0</b><small>Anteil 25 %</small></div></div>
+      <span class="plakette">◆ Sehr gut</span><span class="frage">Trägt die Finanzierung?</span></div>
+    <div class="mitte" id="mitte"><b>87</b><small>GESAMT</small></div>
+  </div>
+  <p class="satz" id="satz"><span class="zeile">Das Gesamturteil <b>Sehr gut</b> entsteht aus beiden Scores. Investment 84 zählt 75 %, Finanzierung 96 zählt 25 %.</span></p>
+</div>
+<div class="knoepfe"><button class="knopf" id="wieder" type="button">↻ Wiederholen</button><button class="knopf leise" id="ende" type="button">Endbild</button></div>
+<p class="hinweis" id="hinweis">Dauer rund 4 Sekunden. Zahlen wie die Balken im Hero.</p>
+<script src="basis.js"></script>
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  function teileFertig(T, mitZaehlen) {
+    [['inv', 84], ['fin', 96]].forEach(function (p, i) {
+      var el = $(p[0]), pg = el.querySelector('.pg'), z = el.querySelector('.zahl b');
+      el.classList.add('an');
+      if (!mitZaehlen) { Demo.ring(pg, p[1]); z.textContent = p[1]; return; }
+      T.nach(i * 120, function () { T.tween(1100, function (t) { Demo.ring(pg, p[1] * t); z.textContent = Math.round(p[1] * t); }); });
+    });
+  }
+  Demo.start(function (T) {
+    var pgs = document.querySelectorAll('#gross .pg'), zs = document.querySelectorAll('#gross .z');
+    T.tween(1400, function (t) { pgs.forEach(function (p) { Demo.ring(p, 87 * t); }); zs.forEach(function (z) { z.textContent = Math.round(87 * t); }); });
+    T.nach(1250, function () { $('grossPl').style.transition = 'opacity .4s'; $('grossPl').style.opacity = 1; });
+    T.nach(1900, function () {
+      $('gross').classList.add('beben');
+      T.tween(320, function (t) { $('rissPfad').style.strokeDashoffset = 1 - t; }, 'rein');
+    });
+    T.nach(2300, function () {   /* aufpumpen */
+      T.tween(260, function (t) { $('koerper').style.transform = 'scale(' + (1 + .14 * t) + ')'; }, 'raus');
+      $('grossEt').style.transition = $('grossPl').style.transition = 'opacity .25s'; $('grossEt').style.opacity = 0; $('grossPl').style.opacity = 0;
+    });
+    T.nach(2600, function () {   /* brechen */
+      T.tween(700, function (t) {
+        $('hl').style.transform = 'translateX(' + (-120 * t) + 'px) rotate(' + (-12 * t) + 'deg)';
+        $('hr').style.transform = 'translateX(' + (120 * t) + 'px) rotate(' + (12 * t) + 'deg)';
+        $('hl').style.opacity = $('hr').style.opacity = String(1 - t);
+        $('rissPfad').style.opacity = String(1 - t * 2);
+      }, 'weich');
+      T.nach(180, function () { teileFertig(T, true); });
+    });
+    T.nach(3700, function () { $('mitte').classList.add('an'); });
+    T.nach(4000, function () { $('satz').classList.add('an'); });
+  }, function (T) {
+    $('gross').style.display = 'none';
+    teileFertig(T, false);
+    $('mitte').classList.add('an');
+  });
+})();
+</script>
+</body>
+</html>

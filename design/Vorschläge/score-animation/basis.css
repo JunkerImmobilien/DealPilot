@@ -1,0 +1,68 @@
+/* score-animation · gemeinsame Grundlage der sechs Entwürfe (19.11.2026)
+   Marcel: im Hero erst der Gesamtscore, dann ein Riss, der Score pumpt sich auf und teilt sich in
+   Investment-Score und Finanzierungs-Score, mit dem Satz, dass das Gesamturteil aus beiden entsteht.
+   Karte nach dem Vorbild der Hero-Karte (frontend/landing/index.html .idscard, dp2-hero.css):
+   weiße Karte, Runway-Band oben, Ring r=53 / Strich 9, Zahl Space Grotesk 43 px, Plakette grün.
+   Zahlen: dieselben wie die Balken im Hero (dp2.js CATS): Rendite 98, Risiko 88, Lage 60, Potenzial 53
+   ergeben Investment 84 (Gewicht 75 %), Finanzierung 96 (25 %), Gesamt 0,75 x 84,3 + 0,25 x 96 = 87. */
+:root{
+  --ob:#050505; --gd:#C9A84C; --gdh:#E8CC7A; --gdd:#b8932f; --grn:#3FA56C; --grnh:#5BD98E;
+  --ink:#16130d; --mut:#6f685b; --linie:#ece4d2; --creme:#FDFCFA; --stub:#0f0e0c;
+  --runway:linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#b8932f);
+  --disp:'Space Grotesk',system-ui,sans-serif; --mono:'JetBrains Mono',ui-monospace,monospace; --body:'Inter',system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--ob);color:#ECE6D6;font-family:var(--body)}
+body{min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:28px 16px 40px;gap:18px}
+.kopfzeile{width:100%;max-width:560px;display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+.kopfzeile h1{margin:0;font:600 18px/1.2 var(--disp);color:#fff}
+.kopfzeile small{font:600 10px/1.3 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--gdh)}
+.idee{width:100%;max-width:560px;margin:0;font:400 13.5px/1.55 var(--body);color:rgba(236,230,214,.7)}
+
+/* Die Karte */
+.karte{width:100%;max-width:560px;background:#fff;color:var(--ink);box-shadow:0 50px 96px -40px rgba(0,0,0,.8);
+  border:1px solid rgba(255,255,255,.08);overflow:hidden;position:relative}
+.band{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 18px;background:var(--runway);color:#1a1405}
+.band span:first-child{font:700 9px/1 var(--mono);letter-spacing:.15em;text-transform:uppercase;display:flex;align-items:center;gap:8px}
+.band i{width:7px;height:7px;border-radius:50%;background:#1b5e3a}
+.band .cl{font:700 8.5px/1 var(--mono);letter-spacing:.12em;background:var(--stub);color:var(--grnh);padding:4px 11px;border-radius:20px}
+.titel{display:flex;justify-content:space-between;align-items:center;padding:14px 18px 0;gap:10px}
+.titel b{font:700 17px/1.2 var(--disp)}
+.titel b em{font-style:normal;color:var(--gdd)}
+.titel small{font:500 9px/1 var(--mono);letter-spacing:.06em;color:var(--mut);border:1px solid #e9e1cf;padding:6px 10px}
+.szene{position:relative;height:256px;margin:6px 0 0}
+.satz{margin:0;padding:12px 18px 18px;min-height:64px;font:400 13.5px/1.5 var(--body);color:#3a3326;text-align:center}
+.satz b{font-family:var(--disp);font-weight:700;color:var(--grn)}
+.satz .zeile{opacity:0;transform:translateY(6px);transition:opacity .5s,transform .5s}
+.satz.an .zeile{opacity:1;transform:none}
+
+/* Ring wie im Hero */
+.ring{position:absolute;width:150px;height:150px}
+.ring svg{width:100%;height:100%;transform:rotate(-90deg);overflow:visible}
+.ring .tr{fill:none;stroke:var(--linie);stroke-width:9}
+.ring .pg{fill:none;stroke:var(--grn);stroke-width:9;stroke-linecap:round;stroke-dasharray:333;stroke-dashoffset:333;
+  filter:drop-shadow(0 0 7px rgba(63,165,108,.45))}
+.ring .zahl{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.ring .zahl b{font:700 43px/1 var(--disp);font-variant-numeric:tabular-nums}
+.ring .zahl small{font:500 9px/1 var(--mono);letter-spacing:.06em;color:var(--mut);margin-top:3px}
+.plakette{display:inline-flex;align-items:center;gap:6px;font:700 12px/1 var(--disp);color:var(--grn);
+  border:1px solid rgba(63,165,108,.4);border-radius:20px;padding:6px 14px;background:#fff;white-space:nowrap}
+.etikett{font:700 9px/1.2 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--gdd);text-align:center}
+.frage{font:400 11.5px/1.35 var(--body);color:var(--mut);text-align:center}
+
+/* Bedienung */
+.knoepfe{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.knopf{font:600 13px/1 var(--body);border:0;cursor:pointer;padding:12px 18px;border-radius:9px;background:var(--runway);color:#1a1405}
+.knopf.leise{background:transparent;color:var(--gdh);border:1px solid rgba(232,204,122,.4)}
+.knopf:focus-visible{outline:2px solid var(--gdh);outline-offset:2px}
+.hinweis{font:500 11px/1.4 var(--mono);color:rgba(236,230,214,.45);text-align:center;max-width:560px}
+
+@media (max-width:420px){
+  .szene{height:236px}
+  .etikett{letter-spacing:.05em;font-size:8.5px;white-space:nowrap}
+  .ring{width:124px;height:124px}
+  .ring .zahl b{font-size:36px}
+  .satz{font-size:12.5px}
+}
+
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation:none!important}}

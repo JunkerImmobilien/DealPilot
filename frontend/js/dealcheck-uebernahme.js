@@ -46,6 +46,7 @@
       var w = {
         kp: grenze(p.get('kp'), 10000, 50000000),
         nkm: grenze(p.get('nkm'), 50, 500000),
+        ze: grenze(p.get('ze'), 0, 100000),   /* v3890 · Zusatzeinnahmen aus dem Deal-Check (landing-dealcheck-14) */
         ek: grenze(p.get('ek'), 0, 50000000),
         zins: grenze(p.get('zins'), 0, 15),
         nk: grenze(p.get('nk'), 0, 25),
@@ -131,7 +132,7 @@
     gezeigt = true;
     band('<div style="font:600 11px JetBrains Mono,monospace;letter-spacing:.08em;color:var(--wl-b8932f, #b8932f);text-transform:uppercase">Deal-Check von der Startseite</div>'
       + '<div style="font:600 16px Space Grotesk,Inter,sans-serif;margin:4px 0 6px">Deal-Check übernehmen?</div>'
-      + '<div>Kaufpreis ' + eur(w.kp) + ' · Kaltmiete ' + eur(w.nkm) + ' im Monat · Eigenkapital ' + eur(ekVon(w))
+      + '<div>Kaufpreis ' + eur(w.kp) + ' · Kaltmiete ' + eur(w.nkm) + ' im Monat' + (w.ze > 0 ? ' · Zusatzeinnahmen ' + eur(w.ze) + ' im Monat' : '') + ' · Eigenkapital ' + eur(ekVon(w))
       + ' · Zins ' + dez(zinsVon(w), 2) + ' % · Nebenkosten ' + dez(nkVon(w), 0) + ' %</div>'
       + '<div style="color:#6b655c;font-size:12.5px;margin-top:6px">Angemeldet als <b>' + String(konto).replace(/[<>&"]/g, '') + '</b> – das Objekt kommt in dieses Konto. DealPilot legt daraus ein neues Objekt als Entwurf an. '
       + 'Adresse, Wohnfläche und Hausgeld trägst du danach selbst ein — erst dann rechnen Lage, Steuer und Wert mit.</div>',
@@ -199,7 +200,7 @@
       setze('kuerzel', 'Deal-Check vom ' + datum());
       setze('kp', String(Math.round(w.kp)));
       setze('nkm', String(Math.round(w.nkm)));
-      setze('ze', '0');
+      setze('ze', String(w.ze > 0 ? Math.round(w.ze) : 0));   /* v3890 */
       setze('ek', String(Math.round(ek)));
 
       /* Nebenkosten: die Landing kennt nur den Gesamtsatz. Die fünf Sätze des
