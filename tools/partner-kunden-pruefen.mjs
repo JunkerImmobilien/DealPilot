@@ -20,6 +20,12 @@
  *      Steuerdaten ohne zve/grenz, ohne Steuer ohne Anlage V/Jahresbuch, einmal wird verbraucht, Widerruf sperrt
  *      Anfordern und die beendete Aufgabe. GEGENPROBEN: Filterzeile bzw. Widerrufsperre entfernt -> rot.
  *
+ *   H  v3830 (Marcel 19.11.2026): Team (Rechte Inhaber/Berater, Zugang, berater_id in allen Kopplungswegen), Meldungen
+ *      (Seiten, Sortierung, Filter, Loeschen), Aufgaben (nur abgeschlossene loeschen), Loeschfristen an einer Stelle und gegen
+ *      die AVV, Kunde entfernen am ECHTEN kundeEntfernen (Reihenfolge, Frist auf dem Platz, nie das Konto) mit GEGENPROBE,
+ *      Zuordnung Objekt-Kunde, Kundenobjekt nicht in eigener Steuer/Portfolio, Frontend-Bausteine.
+ *      --live startet dazu tools/partner-team-live.js (echte HTTP-Wege, NUR Staging).
+ *
  *   node tools/partner-kunden-pruefen.mjs          RC 0 = sauber
  *   node tools/partner-kunden-pruefen.mjs --live   dazu E: NUR Staging im Backend-Container (tools/partner-kunden-live.js)
  */
@@ -68,8 +74,8 @@ const AUSNAHMEN = {
   'services/immometricaFlow.js': 'Suche nach ImmoMetrica-ID, Kopien tragen keine',
   'routes/network.js': 'Suche nach einem Objekt per Kennung',
   'services/agentWerkzeuge.js#1539': 'Suche nach Name',
-  'services/resellerService.js#374': 'Kundenseite: listet die eigenen Freigaben des Kunden (Originale), keine Kopien',
-  'services/objectService.js#119': 'Nummernvergabe (Kundenstaende tragen K-Nummern und stoeren sie nicht)',   /* v3700: eine Zeile tiefer (kunde_ziel) */
+  'services/resellerService.js#377':   /* v3830: drei Zeilen tiefer (createClient mit Berater) */ 'Kundenseite: listet die eigenen Freigaben des Kunden (Originale), keine Kopien',
+  'services/objectService.js#122': 'Nummernvergabe (Kundenstaende tragen K-Nummern und stoeren sie nicht)',   /* v3700: eine Zeile tiefer (kunde_ziel), v3830 drei weitere (Zuordnung) */
 };
 const dateien = [];
 (function lauf(d) { for (const f of fs.readdirSync(d)) { const p = path.join(d, f); if (fs.statSync(p).isDirectory()) { if (f !== 'generated' && f !== 'node_modules') lauf(p); } else if (f.endsWith('.js')) dateien.push(p); } })(path.join(WURZEL, 'backend/src'));
@@ -206,10 +212,10 @@ ok('C', 'Marke nur bei aktiver Verbindung und Wahl Partner', /getrennt_am IS NUL
 
   /* Anzeige */
   const ob2 = lies('backend/src/services/objectService.js');
-  ok('D', 'Objektliste liefert den Kunden (kunde_client_id, kunde_name, kunde_nr)', /'_von_kunde'->>'client_id' AS kunde_client_id/.test(ob2) && /'_von_kunde'->>'kundennummer' AS kunde_nr/.test(ob2));
+  ok('D', 'Objektliste liefert den Kunden (kunde_client_id, kunde_name, kunde_nr)', /'_von_kunde'->>'client_id', \(SELECT z\.client_id::text FROM partner_objekt_kunden z WHERE z\.object_id = objects\.id\)\) AS kunde_client_id/.test(ob2) && /'_von_kunde'->>'kundennummer', \(SELECT c\.kundennummer FROM partner_objekt_kunden z JOIN reseller_clients c ON c\.id = z\.client_id WHERE z\.object_id = objects\.id\)\) AS kunde_nr/.test(ob2));   /* v3830 F: oder aus der Zuordnung */
   const st = lies('frontend/js/storage.js');
   ok('D', 'Objektliste: Sortiermodus kunde, Gruppenkopf, Filter im selben Menue, Hinweis auf der Karte',
-    /var _SB_MODI = \['recent', 'id', 'kaufdat', 'lage', 'kunde'\]/.test(st) && /h\.textContent = k \? \('Kunde ' \+ k\) : 'Eigene Objekte'/.test(st) && /data-kunde="/.test(st) && /o\.kunde_client_id \? 'Kunde ' \+ _sbKundeVon\(o\)/.test(st));
+    /var _SB_MODI = \['recent', 'id', 'kaufdat', 'lage', 'kunde'\]/.test(st) && /h\.textContent = k \? \('Kunde ' \+ k\) : 'Eigene Objekte'/.test(st) && /data-kunde="/.test(st) && /o\.kunde_client_id \? \(o\.kunde_ziel === 'kunde' \? 'Kundenobjekt von ' : 'Kunde '\) \+ _sbKundeVon\(o\)/.test(st));   /* v3830 D */
   const pkf = lies('frontend/js/partner-kunden.js');
   ok('D', 'Cockpit: Kundennummer in Kundenliste, Kundenstaenden, Meldungen, Aufgaben; aenderbar in beiden Kundendialogen',
     /nrEtikett\(k\.kundennummer\)/.test(pkf) && /nrEtikett\(k\.kunde_nr\)/.test(pkf) && /m\.kunde_nr/.test(pkf) && /k\.kundennummer \? k\.kundennummer/.test(pkf) && /kundennummer: wert\(b, '#pk-k-nr'\)/.test(pkf) && /var reiter = \[kundeReiter\(k\), steuerReiter\(\)\];/.test(pkf));
@@ -547,11 +553,140 @@ ok('C', 'Marke nur bei aktiver Verbindung und Wahl Partner', /getrennt_am IS NUL
   antworte = async () => ({ rows: [], rowCount: 0 });
 }
 
+// ── H · v3830 Team, Rechte, Meldungen, Aufgaben, Loeschfristen, Kunde entfernen, Zuordnung (Marcel 19.11.2026) ──
+{
+  const Tm = require(path.join(WURZEL, 'backend/src/services/partnerTeam.js'));
+  const ICH = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa', DU = 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb';
+  ok('H', 'Rechte: Inhaber darf jeden Kunden, Berater nur eigene, ohne Rolle niemand',
+    Tm.darfKunde('owner', ICH, { berater_id: DU }) && Tm.darfKunde('berater', ICH, { berater_id: ICH }) && !Tm.darfKunde('berater', ICH, { berater_id: DU }) &&
+    !Tm.darfKunde('berater', ICH, { berater_id: null }) && !Tm.darfKunde(null, ICH, { berater_id: ICH }));
+  let eH1 = null; try { Tm.nurInhaber('berater'); } catch (e) { eH1 = e; }
+  let eH2 = null; try { Tm.pruefeKunde('berater', ICH, { berater_id: DU }); } catch (e) { eH2 = e; }
+  ok('H', 'nurInhaber und pruefeKunde werfen 403 mit Erklaerung', eH1 && eH1.status === 403 && eH1.message === 'nur_inhaber' && eH2 && eH2.status === 403 && /anderer Berater/.test(eH2.detail || ''));
+  const LF = Tm.LOESCHFRISTEN, FL = Tm.fristenListe();
+  ok('H', 'Loeschfristen an einer Stelle: Meldungen gelesen 90, ungelesen 365, Aufgaben 180, Uebergaben 180, Entzug = ENTZUG_FRIST_TAGE',
+    LF.meldung_gelesen_tage === 90 && LF.meldung_ungelesen_tage === 365 && LF.aufgabe_abgeschlossen_tage === 180 && LF.uebergabe_beendet_tage === 180 && LF.entzug_frist_tage === pk.ENTZUG_FRIST_TAGE);
+  ok('H', 'Liste fuer Verwaltung nennt jede Frist mit ihrer Zahl', FL.length >= 8 && FL.some((x) => x.wann.indexOf(LF.meldung_gelesen_tage + ' Tage') === 0) && FL.some((x) => x.wann.indexOf(LF.aufgabe_abgeschlossen_tage + ' Tage') === 0) && FL.some((x) => /Anmerkungen/.test(x.was)) && FL.some((x) => /Übergaben/.test(x.was)));
+  /* AVV-Abgleich: was dort steht, muss gleich sein; was dort fehlt, wird gemeldet (Entscheidung Marcel), nicht rot */
+  const avv = lies('frontend/landing/avv.html');
+  ok('H', 'AVV § 12: Kundenplatz nach Entzug 30 Tage, Uebergabe-Link 30 Tage, Anmerkungen sofort beim Loeschen (gleich wie die Liste)',
+    /Kundenkonto auf einem Kundenplatz nach Entzug[^<]*<\/td><td>30 Tage Frist/.test(avv) && /Link zur Übergabe eines Objekts<\/td><td>gültig 30 Tage/.test(avv) && /Anmerkungen<\/td><td>sofort, wenn der Auftraggeber sie löscht/.test(avv) &&
+    FL.some((x) => /30 Tage/.test(x.wann) && /Übergaben/.test(x.was)));
+  const avvFehlt = ['Meldungen', 'Aufgaben'].filter((w) => !new RegExp('<td>[^<]*' + w).test(avv));
+  console.log('  info H · AVV § 12 fuehrt nicht: ' + (avvFehlt.join(', ') || '–') + ' und den Verlauf der Uebergaben (neue AVV-Fassung noetig, Entscheidung Marcel)');
+  /* Meldungen: Optionen */
+  const mo = pk.meldungenOptionen({ sort: 'alt', filter: 'gelesen', kunde: DU, seite: '3', je: '500' });
+  const m0 = pk.meldungenOptionen({ sort: 'x', filter: 'kaputt', kunde: 'nein' });
+  ok('H', 'Meldungen: Sortierung, Filter, Kunde nur als UUID, je hoechstens 200, Seite und Versatz', mo.sort === 'alt' && mo.filter === 'gelesen' && mo.kunde === DU && mo.je === 200 && mo.seite === 3 && mo.offset === 400 &&
+    m0.sort === 'neu' && m0.filter === 'alle' && m0.kunde === null && m0.seite === 1);
+  /* Abfrage am ECHTEN meldungen(): Sortierrichtung, Filter, Seite landen im SQL, nicht im JS */
+  const sqlM = [];
+  antworte = async (sql, p) => { sqlM.push([sql, p]); return /count\(\*\)/.test(sql) ? { rows: [{ n: 51, gelesen: 7 }], rowCount: 1 } : { rows: [{ id: 'm1' }], rowCount: 1 }; };
+  const rm = await pk.meldungen({ id: 'R1' }, { sort: 'alt', filter: 'ungelesen', kunde: DU, seite: 2, je: 25 });
+  ok('H', 'meldungen(): ASC, gelesen_am IS NULL, client_id als Parameter, LIMIT 25 OFFSET 25, 3 Seiten bei 51', /ORDER BY m\.erstellt_am ASC LIMIT 25 OFFSET 25/.test(sqlM[0][0]) && /m\.gelesen_am IS NULL/.test(sqlM[0][0]) && sqlM[0][1][1] === DU && rm.seiten === 3 && rm.gelesen === 7, sqlM[0] && sqlM[0][0].slice(-120));
+  const rAlt = await pk.meldungen({ id: 'R1' }, '40');
+  ok('H', 'meldungen() ohne Optionen wie bisher: Liste, neueste zuerst', Array.isArray(rAlt) && /ORDER BY m\.erstellt_am DESC LIMIT 40 OFFSET 0/.test(sqlM[sqlM.length - 1][0]));
+  /* Aufgabe loeschen: nur abgeschlossene */
+  antworte = async (sql) => /SELECT status FROM partner_aufgaben/.test(sql) ? { rows: [{ status: 'aktiv' }], rowCount: 1 } : { rows: [], rowCount: 1 };
+  let eA = null; try { await pk.aufgabeLoeschen({ id: 'R1' }, DU); } catch (e) { eA = e; }
+  ok('H', 'aufgabeLoeschen: offene Aufgabe -> 409', eA && eA.status === 409 && eA.message === 'aufgabe_offen');
+  /* Kunde entfernen am ECHTEN kundeEntfernen: Reihenfolge und Weg */
+  const RSV = require(path.join(WURZEL, 'backend/src/services/resellerService.js'));
+  RSV.unassignSeat = async () => null; RSV.hatBezahltesAbo = async () => false;
+  async function entfernenLauf(kunde, platzBelegt, quelle) {
+    const sql = [];
+    antworte = async (s, p) => {
+      sql.push(s);
+      if (/SELECT \* FROM reseller_clients WHERE id = \$1 AND reseller_id = \$2 AND entfernt_am IS NULL/.test(s)) return { rows: [kunde], rowCount: 1 };
+      if (/SELECT user_id FROM reseller_members/.test(s)) return { rows: [{ user_id: ICH }, { user_id: DU }], rowCount: 2 };
+      if (/SELECT 1 FROM licenses WHERE client_id = \$1 AND status = 'zugewiesen'/.test(s)) return { rows: platzBelegt ? [{}] : [], rowCount: platzBelegt ? 1 : 0 };
+      return { rows: [], rowCount: 0 };
+    };
+    let fn = pk.kundeEntfernen;
+    if (quelle) { const Module = (await import('node:module')).default; const pf = path.join(WURZEL, 'backend/src/services/partnerKunden.js'); const m = new Module(pf, null); m.filename = pf; m.paths = Module._nodeModulePaths(path.dirname(pf)); m._compile(quelle, pf); fn = m.exports.kundeEntfernen; }
+    let fehlerE = null, r = null;
+    try { r = await fn({ id: 'R1', owner_user_id: ICH }, ICH, kunde.id, { bestaetigung: kunde._name }); } catch (e) { fehlerE = e; }
+    return { sql, r, fehlerE };
+  }
+  const KE = { id: 'cccccccc-cccc-4ccc-8ccc-cccccccccccc', user_id: DU, display_name: 'Erika Muster', platz_art: 'eigen', getrennt_am: null, entzug_am: null, _name: 'erika muster ' };
+  const e1 = await entfernenLauf(KE, false);
+  const iKopie = e1.sql.findIndex((s) => /DELETE FROM objects WHERE kunden_freigabe_id IN \(SELECT id FROM object_shares WHERE client_id/.test(s));
+  const iVerb = e1.sql.findIndex((s) => /DELETE FROM reseller_clients WHERE id = \$1 AND reseller_id = \$2/.test(s));
+  ok('H', 'Entfernen (eigener Plan): erst die Kopien, dann die Verbindung; Uebergaben, Einladungen, Anfragen ausdruecklich; nie das Konto',
+    !e1.fehlerE && e1.r && e1.r.frist === false && iKopie >= 0 && iVerb > iKopie && e1.sql.some((s) => /DELETE FROM objekt_uebergaben/.test(s)) && e1.sql.some((s) => /DELETE FROM reseller_invites/.test(s)) &&
+    e1.sql.some((s) => /DELETE FROM partner_anfragen/.test(s)) && !e1.sql.some((s) => /DELETE FROM users|UPDATE users/.test(s)), [e1.fehlerE && e1.fehlerE.message, iKopie, iVerb]);
+  ok('H', 'Entfernen: weitergefuehrte Objekte des Teams mit, eigener Bestand verliert nur den Kundenbezug', e1.sql.some((s) => /DELETE FROM objects WHERE user_id = ANY\(\$1::uuid\[\]\)[\s\S]*'kunde'\) = 'kunde'/.test(s)) && e1.sql.some((s) => /SET data = \(data::jsonb - '_von_kunde'\)/.test(s)));
+  const KP = Object.assign({}, KE, { platz_art: 'platz', _name: 'Erika Muster' });
+  const e2 = await entfernenLauf(KP, true);
+  ok('H', 'Entfernen (Partnerplatz belegt): Frist der AVV, Platz frei, Rumpf entfernt_am ohne Nummer und Notiz, keine Loeschung der Verbindung',
+    !e2.fehlerE && e2.r.frist === true && e2.r.frist_tage === 30 && e2.sql.some((s) => /UPDATE licenses SET client_id = NULL, status = 'pool'/.test(s)) && e2.sql.some((s) => /entzug_frist_bis = now\(\) \+/.test(s)) &&
+    e2.sql.some((s) => /SET entfernt_am = now\(\), notiz = NULL, kundennummer = NULL/.test(s)) && !e2.sql.some((s) => /DELETE FROM reseller_clients/.test(s)) && e2.sql.some((s) => /DELETE FROM object_shares WHERE client_id/.test(s)), e2.fehlerE && e2.fehlerE.message);
+  const e3 = await entfernenLauf(Object.assign({}, KE, { _name: 'Jemand anders' }), false);
+  ok('H', 'Entfernen: falscher Name -> 400, nichts geloescht', e3.fehlerE && e3.fehlerE.status === 400 && !e3.sql.some((s) => /^\s*DELETE/.test(s)));
+  /* GEGENPROBE: ohne die Kopien-Zeile stuende die Kopie danach als gewoehnliches Objekt beim Inhaber */
+  const pkQ = lies('backend/src/services/partnerKunden.js');
+  const ohneKopie = pkQ.replace("await zaehl('kundenstaende', `DELETE FROM objects WHERE kunden_freigabe_id IN (SELECT id FROM object_shares WHERE client_id = $1)`, [c.id]);", '/* Gegenprobe */');
+  const e4 = ohneKopie !== pkQ ? await entfernenLauf(KE, false, ohneKopie) : { sql: [] };
+  ok('H', 'Gegenprobe: ohne das Loeschen der Kopien erkennt der Pruefer es', ohneKopie !== pkQ && !e4.sql.some((s) => /DELETE FROM objects WHERE kunden_freigabe_id IN/.test(s)));
+  /* Takt: entfernte Kunden */
+  const fq = (pkQ.match(/async function fristenAbarbeiten[\s\S]*?\n\}/) || [''])[0];
+  ok('H', 'fristenAbarbeiten: entfernter Kunde mit eigenem Abo -> Rumpf weg (kein Wechsel zu eigen), nach Kontoloeschung Rumpf weg', /if \(c\.entfernt_am\) \{ if \(!dry\) await query\(`DELETE FROM reseller_clients WHERE id = \$1 AND entfernt_am IS NOT NULL`/.test(fq) && /if \(c\.entfernt_am\) \{ try \{ await query\(`DELETE FROM reseller_clients/.test(fq));
+  /* Routen: Rechte am Kunden vor jeder Aenderung, Team, Zugang */
+  const rt = lies('backend/src/routes/partnerKunden.js');
+  const aend = ["partner.put('/kunden/:id'", "partner.post('/kunden/:id/platz'", "partner.post('/kunden/:id/entzug'", "partner.post('/kunden/:id/entfernen'", "partner.post('/kunden/:id/trennen'"];
+  ok('H', 'Routen: jede Aenderung am Kunden prueft zuerst kundeRecht (Inhaber oder eigener Berater)', aend.every((a) => { const i = rt.indexOf(a); return i >= 0 && /await kundeRecht\(req, req\.params\.id\)/.test(rt.slice(i, i + 260)); }));
+  ok('H', 'Routen: Anmerkungen und Rueckgabe pruefen den Kunden des Standes', /anmerkungen', fn\(async \(req\) => \{ await shareRecht\(req, req\.params\.id\)/.test(rt) && /zurueck', fn\(async \(req\) => \{ await shareRecht/.test(rt) && /delete\('\/anmerkungen\/:id', fn\(async \(req\) => \{ await anmerkungRecht/.test(rt));
+  ok('H', 'Zugang: partnerTeam.zugang() statt requireFeature in Cockpit und Portal, Portal sperrt Plaetze/Marke fuer Berater',
+    /partner\.use\(T\.zugang\(\)\);/.test(rt) && !/partner\.use\(requireFeature/.test(rt) && /router\.use\(partnerTeam\.zugang\(\)\);/.test(lies('backend/src/routes/resellerPortal.js')) &&
+    /NUR_INHABER = \[[^\]]*branding[^\]]*\]/.test(lies('backend/src/routes/resellerPortal.js')) && /req\.partnerRolle === 'owner'/.test(lies('backend/src/routes/resellerPortal.js')));
+  ok('H', 'Routen: Team (einladen, zurueckziehen, entfernen), Meldungen loeschen, Aufgabe loeschen, Zuordnung, Loeschfristen, Beitritt',
+    ["partner.post('/team/einladen'", "partner.delete('/team/:userId'", "partner.delete('/meldungen/:id'", "partner.post('/meldungen/gelesene-loeschen'", "partner.delete('/aufgaben/:id'", "partner.put('/objekte/:id/kunde'", "partner.get('/loeschfristen'", "kunde.post('/team/:id'", "kunde.post('/team/token'"].every((x) => rt.indexOf(x) >= 0));
+  /* Team-Logik im Quelltext: nur Inhaber laedt ein, Rahmen team_plaetze, Kunden gehen beim Rauswurf an den Inhaber, Token nur als SHA-256 */
+  const tq = lies('backend/src/services/partnerTeam.js');
+  ok('H', 'Team: nurInhaber beim Einladen, Rahmen team_plaetze, Kunde kann nicht Berater sein, Rauswurf gibt Kunden an den Inhaber, Token als SHA-256',
+    /async function einladen\(rs, actor, rolleWert, b, basis\) \{\s*nurInhaber\(rolleWert\);/.test(tq) && /if \(t\.frei <= 0\) throw fehler\('team_voll'/.test(tq) && /fehler\('ist_kunde'/.test(tq) &&
+    /UPDATE reseller_clients SET berater_id = \$3 WHERE reseller_id = \$1 AND berater_id = \$2/.test(tq) && /token_hash, erstellt_von, expires_at\)/.test(tq) && /sha\(token\)/.test(tq) && !/require\(['"]stripe|stripe\./.test(tq));   /* kein Stripe-Aufruf: Teamplaetze ohne Abrechnung */
+  ok('H', 'Neuer Kunde gehoert dem einladenden Berater (createClient beraterId in allen drei Kopplungswegen und der Uebergabe)',
+    /beraterId: a\.erstellt_von/.test(pkQ) && /beraterId: invite\.invited_by/.test(lies('backend/src/services/resellerService.js')) && /beraterId: z\.absender_user_id/.test(lies('backend/src/services/objektUebergabe.js')) &&
+    /COALESCE\(\(SELECT m\.user_id FROM reseller_members m WHERE m\.reseller_id = \$1 AND m\.user_id = \$4::uuid\)/.test(lies('backend/src/services/resellerService.js')));
+  ok('H', 'Berater liest den Kundenstand des Inhabers nur lesend (sharedObjectOwner, kunden_freigabe_id, Mitglied)', /JOIN object_shares sh ON sh\.id = o\.kunden_freigabe_id[\s\S]{0,260}reseller_members m WHERE m\.reseller_id = \$2 AND m\.user_id = \$4/.test(lies('backend/src/services/resellerService.js')));
+  const m121 = lies('backend/migrations/121_partner_team.sql');
+  ok('H', 'Migration 121: team_plaetze Vorgabe 5, Einladungen mit token_hash, Altbestand berater_id = Inhaber, entfernt_am, abgeschlossen_am, Zuordnung mit Kaskade',
+    /team_plaetze integer NOT NULL DEFAULT 5/.test(m121) && /CREATE TABLE IF NOT EXISTS public\.partner_team_einladungen/.test(m121) && /token_hash\s+text NOT NULL UNIQUE/.test(m121) &&
+    /SET berater_id = r\.owner_user_id/.test(m121) && /ADD COLUMN IF NOT EXISTS entfernt_am/.test(m121) && /ADD COLUMN IF NOT EXISTS abgeschlossen_am/.test(m121) &&
+    /partner_objekt_kunden \(\s*object_id\s+uuid PRIMARY KEY REFERENCES public\.objects\(id\) ON DELETE CASCADE/.test(m121) && /client_id\s+uuid NOT NULL REFERENCES public\.reseller_clients\(id\) ON DELETE CASCADE/.test(m121));
+  ok('H', 'Objektliste liefert den Kunden auch aus der Zuordnung (kunde_client_id, kunde_name, kunde_nr, kunde_zuordnung, objart)', /partner_objekt_kunden z WHERE z\.object_id = objects\.id\)\) AS kunde_client_id/.test(lies('backend/src/services/objectService.js')) && /AS kunde_zuordnung/.test(lies('backend/src/services/objectService.js')));
+  /* D · Kundenobjekt zaehlt nicht zur eigenen Steuer/zum Portfolio */
+  const db = lies('frontend/js/dashboard.js'), ts = lies('backend/src/routes/taxSnapshots.js'), tx = lies('backend/src/services/taxService.js');
+  ok('H', 'D Kundenobjekt (fuer den Kunden weitergefuehrt): nicht im Portfolio-Cockpit, nicht in Steuer-Snapshots und Steuer-Mappe',
+    /return stageOf\(o\)==='won' && o\.kunde_ziel!=='kunde';/.test(db) && /if\(o\.kunde_ziel==='kunde'\) return;/.test(db) &&
+    /'_von_kunde' ->> 'modus' = 'eigen'/.test(ts) && /'_von_kunde' ->> 'modus' = 'eigen'/.test(tx));
+  /* Frontend */
+  const pf = lies('frontend/js/partner-kunden.js'), rp = lies('frontend/js/reseller-portal.js'), sg = lies('frontend/js/storage.js');
+  ok('H', 'Frontend: Team-Karte, Meine/Alle, Betreuer-Wahl, Entfernen mit Namen, Meldungen mit Seiten und Loeschen, Aufgaben sortierbar, Loeschfristen, Zuordnen',
+    /function teamKarte\(c\)/.test(pf) && /data-sicht="meine"/.test(pf) && /data-betreuer=/.test(pf) && /function entfernenDialog\(el, k\)/.test(pf) && /'\/partner\/kunden\/' \+ k\.id \+ '\/entfernen'/.test(pf) &&
+    /gelesene-loeschen/.test(pf) && /data-m-seite/.test(pf) && /AUFG_SORT = \[/.test(pf) && /data-aufg-weg/.test(pf) && /\['fristen', 'Löschfristen', 'trash'\]/.test(pf) && /function objekteZuordnenDialog\(el, k\)/.test(pf) && /teamTokenEinloesen\(\);/.test(pf));
+  ok('H', 'Frontend: Uebergeben gegliedert und durchsuchbar, Marke erklaert, Karte „Kundenobjekt von“, Uebernehmen sagt, was passiert',
+    /DpPartnerKunden\.objektListe/.test(rp) && /id="rp-ub-objliste"/.test(rp) && /Name, den deine Kunden sehen/.test(rp) && /rp-b-name-vorschau/.test(rp) &&
+    /'Kundenobjekt von ' : 'Kunde '/.test(sg) && /Übernehmen legt eine bearbeitbare Kopie in deiner Objektliste an\. Vorgabe ist das Kundenobjekt/.test(pf));
+  const kt = [(pf.match(/function teamKarte[\s\S]*?\n  \}/) || [''])[0], (pf.match(/function entfernenDialog[\s\S]*?\n  \}/) || [''])[0], (pf.match(/var ZIEL_TEXT = \{[\s\S]*?\};/) || [''])[0]].join('\n').match(/'(?:[^'\\\n]|\\.)*'/g).join(' ');   /* nur die Texte, nicht der Code */
+  ok('H', 'Kundentexte (Team, Entfernen, Uebernehmen): kein Semikolon im Satz, kein Gedankenstrich', kt.length > 1500 && !/[—]/.test(kt) && !/ – /.test(kt) && !/[a-zäöüß] ?; ?[a-zäöüß]/i.test(kt.replace(/style="[^"]*"/g, '').replace(/;\s*(\n|$)/g, '').replace(/&#39;|&quot;|&amp;/g, '')), kt.length);   /* Inline-CSS ist kein Kundentext */
+  antworte = async () => ({ rows: [], rowCount: 0 });
+}
+
 /* ── E · live (NUR Staging) ─────────────────────────────────────────────── */
 if (process.argv.includes('--live')) {
   const { execSync } = await import('node:child_process');
   const SERVER = 'root@116.203.214.11';
   const live = path.join(WURZEL, 'tools/partner-kunden-live.js');
+  for (const [datei, ziel] of [['tools/partner-team-live.js', 'ptl']]) {   /* v3830 · Team, Entfernen, Meldungen, Zuordnung */
+    try {
+      const aus = execSync(`scp -q "${path.join(WURZEL, datei)}" ${SERVER}:/tmp/${ziel}.js && ssh ${SERVER} "docker cp /tmp/${ziel}.js dealpilot-backend:/app/${ziel}.js && docker exec dealpilot-backend node /app/${ziel}.js; docker exec dealpilot-backend rm -f /app/${ziel}.js; rm -f /tmp/${ziel}.js"`, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
+      process.stdout.write(aus);
+      const m = aus.match(/LIVE (\d+) Punkte, (\d+) rot/);
+      ok('E', 'Live-Lauf ' + datei, !!m && m[2] === '0', m && m[0]);
+    } catch (e) { process.stdout.write(String(e.stdout || '')); ok('E', 'Live-Lauf ' + datei, false, String(e.stderr || e.message).slice(0, 300)); }
+  }
   try {
     const aus = execSync(`scp -q "${live}" ${SERVER}:/tmp/pkl.js && ssh ${SERVER} "docker cp /tmp/pkl.js dealpilot-backend:/app/partner-kunden-live.js && docker exec dealpilot-backend node /app/partner-kunden-live.js; docker exec dealpilot-backend rm -f /app/partner-kunden-live.js; rm -f /tmp/pkl.js"`, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
     process.stdout.write(aus);
@@ -560,5 +695,5 @@ if (process.argv.includes('--live')) {
   } catch (e) { process.stdout.write(String(e.stdout || '')); ok('E', 'Live-Lauf', false, String(e.stderr || e.message).slice(0, 300)); }
 }
 
-console.log('\npartner-kunden-pruefen v3700 · ' + n + ' Punkte, ' + (n - rot) + ' gruen, ' + rot + ' rot');
+console.log('\npartner-kunden-pruefen v3830 · ' + n + ' Punkte, ' + (n - rot) + ' gruen, ' + rot + ' rot');
 process.exit(rot ? 1 : 0);

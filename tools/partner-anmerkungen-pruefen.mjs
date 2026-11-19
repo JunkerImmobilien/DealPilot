@@ -65,7 +65,9 @@ const routen = fs.readFileSync(path.join(WURZEL, 'backend/src/routes/partnerKund
  ["partner.post('/kundenstaende/:id/zurueck'", 'Partner gibt zurueck'], ["partner.put('/anmerkungen/:id'", 'Partner aendert'],
  ["partner.delete('/anmerkungen/:id'", 'Partner loescht'], ["kunde.get('/aufgaben/:id/anmerkungen'", 'Kunde liest'], ["kunde.post('/anmerkungen/:id'", 'Kunde setzt']]
   .forEach(([s, t]) => ok('Route ' + t + ' am richtigen Router', routen.includes(s)));
-ok('Partner-Router verlangt das Merkmal reseller', /partner\.use\(requireFeature\('reseller'\)\)/.test(routen));
+/* v3830 · Zugang ueber partnerTeam.zugang(): Merkmal reseller ODER Berater im Team eines Partners mit Merkmal reseller */
+const teamQ = fs.readFileSync(path.join(WURZEL, 'backend/src/services/partnerTeam.js'), 'utf8');
+ok('Partner-Router verlangt das Merkmal reseller (oder Teamberater eines Partners damit)', /partner\.use\(T\.zugang\(\)\)/.test(routen) && /plan\.plan_features\.reseller\) return next\(\)/.test(teamQ) && /p2\.plan_features\.reseller\)/.test(teamQ));
 const mig = fs.readFileSync(path.join(WURZEL, 'backend/migrations/106_partner_anmerkungen.sql'), 'utf8');
 ok('Migration: Anmerkung haengt am Kundenstand (CASCADE) und am Original (SET NULL)', /share_id\s+uuid NOT NULL REFERENCES public\.object_shares\(id\) ON DELETE CASCADE/.test(mig) && /objekt_id\s+uuid REFERENCES public\.objects\(id\) ON DELETE SET NULL/.test(mig));
 

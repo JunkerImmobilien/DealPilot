@@ -92,12 +92,13 @@ async function aktiveVerbindung(userId) {
 
 // ═══ PARTNERSEITE ═══════════════════════════════════════════════════════════
 
-async function cockpit(rs) {
+async function cockpit(rs, userId) {
   const pool = await reseller.getPool(rs.id).catch(() => null);
   const kunden = (await query(
     `SELECT c.id, c.user_id, c.display_name, c.platz_art, c.stufe, c.rechte, c.kontingent, c.marke, c.netzwerk, c.mail_rueckmeldung, c.herkunft,
             c.verbunden_am, c.getrennt_am, c.getrennt_von, c.entzug_am, c.entzug_frist_bis, c.notiz, c.created_at, c.kundennummer,
-            u.email,
+            u.email, c.berater_id,   /* v3830 A · betreuender Berater */
+            (SELECT count(*)::int FROM partner_objekt_kunden z WHERE z.client_id = c.id) AS objekte_zugeordnet,   /* v3830 F */
             EXISTS (SELECT 1 FROM licenses l WHERE l.client_id = c.id AND l.status = 'zugewiesen') AS hat_platz,
             (SELECT COUNT(*) FROM object_shares s WHERE s.client_id = c.id AND s.kopie_object_id IS NOT NULL AND s.status <> 'widerrufen')::int AS sendungen,
             (SELECT MAX(s.stand_am) FROM object_shares s WHERE s.client_id = c.id AND s.status <> 'widerrufen') AS letzte_sendung,
@@ -105,7 +106,7 @@ async function cockpit(rs) {
             (SELECT json_build_object('art', f.art, 'bereiche', f.bereiche, 'erteilt_am', f.erteilt_am, 'ersetzt_am', f.ersetzt_am, 'widerrufen_am', f.widerrufen_am, 'verbraucht_am', f.verbraucht_am)
                FROM partner_freigaben f WHERE f.client_id = c.id ORDER BY f.erteilt_am DESC LIMIT 1) AS freigabe_letzte
        FROM reseller_clients c JOIN users u ON u.id = c.user_id
-      WHERE c.reseller_id = $1
+      WHERE c.reseller_id = $1 AND c.entfernt_am IS NULL   /* v3830 E · entfernt: nur noch Rumpf fuer die Entzugsfrist */
       ORDER BY (c.getrennt_am IS NULL) DESC, c.display_name ASC`, [rs.id])).rows;
   kunden.forEach((k) => {
     k.rechte_wirksam = rechteAus(k); k.stufe_text = STUFEN[k.stufe] || null;
@@ -120,12 +121,19 @@ async function cockpit(rs) {
       WHERE a.reseller_id = $1 AND a.status = 'offen' ORDER BY a.erstellt_am DESC`, [rs.id])).rows;
   const einladungen = await reseller.listInvites(rs.id).catch(() => []);
   const ungelesen = (await query(`SELECT COUNT(*)::int AS n FROM partner_meldungen WHERE reseller_id = $1 AND gelesen_am IS NULL`, [rs.id])).rows[0].n;
+  /* v3830 A · Team: wer bin ich, wer gehoert dazu, wer betreut welchen Kunden */
+  const T = require('./partnerTeam');
+  const team = await T.team(rs).catch(() => ({ mitglieder: [], einladungen: [], plaetze: 0, belegt: 0, frei: 0 }));
+  const ich = { user_id: userId || null, rolle: userId ? await T.rolle(rs, userId) : null };
+  const namen = {}; team.mitglieder.forEach((m) => { namen[m.user_id] = m.name || m.email; });
+  kunden.forEach((k) => { k.berater_name = k.berater_id ? (namen[k.berater_id] || 'nicht mehr im Team') : null; k.darf = T.darfKunde(ich.rolle, ich.user_id, k); });
   return { partner: { id: rs.id, name: rs.brand_name || rs.name, whitelabel: !!rs.whitelabel_enabled }, pool, kunden, anfragen, einladungen, meldungen_ungelesen: ungelesen,
-    stufen: STUFEN, rechte_liste: RECHTE };
+    stufen: STUFEN, rechte_liste: RECHTE, ich, team, loeschfristen: T.fristenListe() };
 }
 
 async function kundeLaden(rs, clientId) {
-  const r = await query(`SELECT * FROM reseller_clients WHERE id = $1 AND reseller_id = $2`, [clientId, rs.id]);
+  if (!UUID.test(String(clientId || ''))) throw fehler('kunde_nicht_gefunden', 404);
+  const r = await query(`SELECT * FROM reseller_clients WHERE id = $1 AND reseller_id = $2 AND entfernt_am IS NULL`, [clientId, rs.id]);
   if (!r.rowCount) throw fehler('kunde_nicht_gefunden', 404);
   return r.rows[0];
 }
@@ -180,12 +188,12 @@ async function kundennummerSetzen(rs, c, roh) {
    Aendert der Partner Nummer oder Namen, ziehen sie hier nach. */
 async function kundenbezugNachziehen(rs, clientId) {
   try {
-    const pn = await partnerName(rs.id); if (!pn.owner_user_id) return;
+    const team = await require('./partnerTeam').teamNutzer(rs.id); if (!team.length) return;   /* v3830 A · uebernommen hat ggf. ein Berater */
     const c = (await query(`SELECT display_name, kundennummer FROM reseller_clients WHERE id = $1`, [clientId])).rows[0]; if (!c) return;
     await query(
       `UPDATE objects SET data = jsonb_set(jsonb_set(data::jsonb, '{_von_kunde,kundennummer}', to_jsonb($3::text)), '{_von_kunde,kunde}', to_jsonb($4::text))
-        WHERE user_id = $1 AND kunden_freigabe_id IS NULL AND data::jsonb->'_von_kunde'->>'client_id' = $2`,
-      [pn.owner_user_id, String(clientId), c.kundennummer || '', c.display_name || '']);
+        WHERE user_id = ANY($1::uuid[]) AND kunden_freigabe_id IS NULL AND data::jsonb->'_von_kunde'->>'client_id' = $2`,
+      [team, String(clientId), c.kundennummer || '', c.display_name || '']);
   } catch (e) { console.error('[partner-kunden] Kundenbezug nachziehen:', e && e.message); }
 }
 
@@ -216,19 +224,69 @@ async function einladenOhneMail(rs, actor, b) {
   const name = String(b && b.name || '').trim();
   const platz = b && b.platz_mitgeben !== false;
   if (!email || !name) throw fehler('email_und_name');
+  /* v3830 F · beim Anlegen gleich Objekte zuordnen: nur EIGENE Objekte des Einladenden, gemerkt an Anfrage/Einladung,
+     wirksam, sobald der Kunde bestaetigt (objekteVormerkenAnwenden) */
+  const oids = await eigeneObjektIds(actor, b && b.objekt_ids);
   const u = (await query(`SELECT id, role FROM users WHERE lower(email) = $1 AND deleted_at IS NULL LIMIT 1`, [email])).rows[0];
   if (u) {
     const anfrage = await anfrageAnlegen(rs, u.id, { quelle: 'einladung', platz_mitgeben: platz, name, actor, vorschlag: b && b.vorschlag });
+    if (oids.length) { try { await query(`UPDATE partner_anfragen SET objekt_ids = $2::jsonb WHERE id = $1`, [anfrage.id, JSON.stringify(oids)]); } catch (e) {} }
     /* Antwort verraet nicht, ob es das Konto gibt: beide Wege sagen „Einladung gesendet“ */
-    return { ok: true, art: 'anfrage', anfrage_id: anfrage.id };
+    return { ok: true, art: 'anfrage', anfrage_id: anfrage.id, objekte_vorgemerkt: oids.length };
   }
   const inv = await reseller.createInvite(rs.id, { email, displayName: name, invitedBy: actor });
   try { await query(`UPDATE reseller_invites SET art = 'neu', platz_mitgeben = $2 WHERE id = $1`, [inv.id, platz]); } catch (e) {}
+  if (oids.length) { try { await query(`UPDATE reseller_invites SET objekt_ids = $2::jsonb WHERE id = $1`, [inv.id, JSON.stringify(oids)]); } catch (e) {} }
   /* v3690 · Vorschlag des Partners (Art, Bereiche), beim Kunden vorausgewaehlt und abwaehlbar. Eigene Abfrage, damit ein
      Fehler hier nicht platz_mitgeben mitnimmt. */
   const vs = F.vorschlagSauber(b && b.vorschlag);
   if (vs) { try { await query(`UPDATE reseller_invites SET vorschlag = $2::jsonb WHERE id = $1`, [inv.id, JSON.stringify(vs)]); } catch (e) { console.error('[partner] vorschlag einladung:', e.message); } }
-  return { ok: true, art: 'einladung', invite: inv };
+  return { ok: true, art: 'einladung', invite: inv, objekte_vorgemerkt: oids.length };
+}
+
+/* ── v3830 F · Objekte einem Kunden zuordnen (partner_objekt_kunden), auch ohne Uebergabe ─────────────────── */
+async function eigeneObjektIds(userId, roh) {
+  const ids = (Array.isArray(roh) ? roh : []).map(String).filter((x) => UUID.test(x)).slice(0, 200);
+  if (!ids.length || !userId) return [];
+  const r = await query(`SELECT id FROM objects WHERE user_id = $1 AND id = ANY($2::uuid[]) AND kunden_freigabe_id IS NULL`, [userId, ids]);
+  return r.rows.map((x) => x.id);
+}
+/** Vorgemerkte Objekte (Einladung/Anfrage) dem neuen Kunden zuordnen. Best effort, zaehlt die Zuordnungen. */
+async function objekteVormerkenAnwenden(resellerId, clientId, vonUserId, roh) {
+  let n = 0;
+  const ids = await eigeneObjektIds(vonUserId, roh);
+  for (const id of ids) {
+    try {
+      await query(`INSERT INTO partner_objekt_kunden (object_id, reseller_id, client_id, zugeordnet_von) VALUES ($1,$2,$3,$4)
+                   ON CONFLICT (object_id) DO UPDATE SET client_id = EXCLUDED.client_id, reseller_id = EXCLUDED.reseller_id, zugeordnet_von = EXCLUDED.zugeordnet_von, zugeordnet_am = now()`,
+        [id, resellerId, clientId, vonUserId]); n++;
+    } catch (e) { console.error('[v3830] Zuordnung', e.message); }
+  }
+  return n;
+}
+/** Ein eigenes Objekt einem Kunden zuordnen (clientId) oder die Zuordnung loesen (null). */
+async function objektZuordnen(rs, actor, rolleWert, objectId, clientId) {
+  if (!UUID.test(String(objectId || ''))) throw fehler('objekt_nicht_gefunden', 404);
+  const o = (await query(`SELECT id FROM objects WHERE id = $1 AND user_id = $2 AND kunden_freigabe_id IS NULL`, [objectId, actor])).rows[0];
+  if (!o) throw fehler('objekt_nicht_gefunden', 404, 'Zuordnen kannst du nur deine eigenen Objekte.');
+  if (!clientId) {
+    await query(`DELETE FROM partner_objekt_kunden WHERE object_id = $1 AND reseller_id = $2`, [objectId, rs.id]);
+    return { ok: true, object_id: objectId, client_id: null };
+  }
+  const c = await kundeLaden(rs, clientId);
+  require('./partnerTeam').pruefeKunde(rolleWert, actor, c);
+  await query(`INSERT INTO partner_objekt_kunden (object_id, reseller_id, client_id, zugeordnet_von) VALUES ($1,$2,$3,$4)
+               ON CONFLICT (object_id) DO UPDATE SET client_id = EXCLUDED.client_id, reseller_id = EXCLUDED.reseller_id, zugeordnet_von = EXCLUDED.zugeordnet_von, zugeordnet_am = now()`,
+    [objectId, rs.id, c.id, actor]);
+  return { ok: true, object_id: objectId, client_id: c.id, kunde: c.display_name, kundennummer: c.kundennummer || null };
+}
+/** Zuordnungen der eigenen Objekte (fuer Kunden-Fenster und Uebergeben) */
+async function zuordnungen(rs, actor) {
+  const r = await query(
+    `SELECT z.object_id, z.client_id, c.display_name AS kunde, c.kundennummer AS kunde_nr FROM partner_objekt_kunden z
+       JOIN objects o ON o.id = z.object_id JOIN reseller_clients c ON c.id = z.client_id
+      WHERE z.reseller_id = $1 AND o.user_id = $2 AND c.entfernt_am IS NULL`, [rs.id, actor]);
+  return r.rows;
 }
 
 async function anfrageAnlegen(rs, userId, o) {
@@ -275,7 +333,7 @@ async function anfrageZurueckziehen(rs, id) {
 /** Kundenstaende beim Partner, je Kunde */
 /* v3392 · Marcel 15.11.: „Unter Freigegeben fehlt mir, von welchem Kunden was freigegeben wurde.“ Dazu E-Mail und Art
    des Kunden sowie Anschrift und Objektart des Objekts (nur lesend). */
-async function kundenstaende(rs) {
+async function kundenstaende(rs, userId) {   /* v3830 A · uebernommen je angemeldetem Teammitglied */
   const r = await query(
     `SELECT s.id AS share_id, s.client_id, s.kopie_object_id, s.stand_nr, s.stand_am, s.ueber_bestand, s.gelesen_am, s.status, s.bereiche,
             c.display_name AS kunde, c.getrennt_am, c.platz_art AS kunde_platz_art, u.email AS kunde_email, c.mail_rueckmeldung AS kunde_mail_rueckmeldung,
@@ -286,9 +344,9 @@ async function kundenstaende(rs) {
             (SELECT count(*)::int FROM partner_anmerkungen n WHERE n.share_id = s.id AND n.status = 'offen' AND COALESCE(btrim(n.antwort), '') = '' AND n.bild_antwort IS NULL) AS anm_offen,
             (SELECT count(*)::int FROM partner_anmerkungen n WHERE n.share_id = s.id AND n.status = 'offen' AND (COALESCE(btrim(n.antwort), '') <> '' OR n.bild_antwort IS NOT NULL)) AS anm_rueckfrage,
             (SELECT count(*)::int FROM partner_anmerkungen n WHERE n.share_id = s.id AND n.status = 'erledigt') AS anm_erledigt,
-            (SELECT o2.id FROM objects o2 WHERE o2.user_id = o.user_id AND o2.kunden_freigabe_id IS NULL AND o2.data::jsonb->'_von_kunde'->>'share_id' = s.id::text ORDER BY o2.updated_at DESC LIMIT 1) AS uebernommen_id,
-            (SELECT o2.seq_no FROM objects o2 WHERE o2.user_id = o.user_id AND o2.kunden_freigabe_id IS NULL AND o2.data::jsonb->'_von_kunde'->>'share_id' = s.id::text ORDER BY o2.updated_at DESC LIMIT 1) AS uebernommen_seq,
-            (SELECT COALESCE(o2.data::jsonb->'_von_kunde'->>'modus', 'kunde') FROM objects o2 WHERE o2.user_id = o.user_id AND o2.kunden_freigabe_id IS NULL AND o2.data::jsonb->'_von_kunde'->>'share_id' = s.id::text ORDER BY o2.updated_at DESC LIMIT 1) AS uebernommen_ziel,
+            (SELECT o2.id FROM objects o2 WHERE o2.user_id = COALESCE($2::uuid, o.user_id) AND o2.kunden_freigabe_id IS NULL AND o2.data::jsonb->'_von_kunde'->>'share_id' = s.id::text ORDER BY o2.updated_at DESC LIMIT 1) AS uebernommen_id,
+            (SELECT o2.seq_no FROM objects o2 WHERE o2.user_id = COALESCE($2::uuid, o.user_id) AND o2.kunden_freigabe_id IS NULL AND o2.data::jsonb->'_von_kunde'->>'share_id' = s.id::text ORDER BY o2.updated_at DESC LIMIT 1) AS uebernommen_seq,
+            (SELECT COALESCE(o2.data::jsonb->'_von_kunde'->>'modus', 'kunde') FROM objects o2 WHERE o2.user_id = COALESCE($2::uuid, o.user_id) AND o2.kunden_freigabe_id IS NULL AND o2.data::jsonb->'_von_kunde'->>'share_id' = s.id::text ORDER BY o2.updated_at DESC LIMIT 1) AS uebernommen_ziel,
             (o.data::jsonb ? '_steuerbasis') AS mit_steuerprofil, s.steuerprofil_id,   /* v3700 */
             COALESCE((o.data::jsonb->>'_deal_won')::boolean, false) AS deal_won,
             (o.data::jsonb->>'_dealpilot_score')::int AS score
@@ -297,7 +355,8 @@ async function kundenstaende(rs) {
        LEFT JOIN users u ON u.id = c.user_id
        JOIN objects o ON o.id = s.kopie_object_id
       WHERE s.reseller_id = $1 AND s.kopie_object_id IS NOT NULL AND s.status <> 'widerrufen'
-      ORDER BY c.display_name, s.stand_am DESC`, [rs.id]);
+        AND c.entfernt_am IS NULL
+      ORDER BY c.display_name, s.stand_am DESC`, [rs.id, userId || null]);
   return r.rows;
 }
 
@@ -343,7 +402,9 @@ async function kundenstandUebernehmen(rs, actor, shareId, b) {
   const ziel = ZIELE.indexOf(b && b.ziel) >= 0 ? b.ziel : 'kunde';
   const kd = (await query(`SELECT id, display_name, kundennummer FROM reseller_clients WHERE id = $1`, [s.client_id])).rows[0] || {};
   const pn = await partnerName(rs.id);
-  const orig = await objectService.getById(pn.owner_user_id, s.kopie_object_id);
+  const orig = await objectService.getById(pn.owner_user_id, s.kopie_object_id);   /* die Kopie liegt beim Inhaber */
+  /* v3830 A · die Uebernahme landet beim angemeldeten Teammitglied (Inhaber oder Berater), in SEINER Objektliste */
+  const ziel_nutzer = actor || pn.owner_user_id;
   if (!orig) throw fehler('kundenstand_nicht_gefunden', 404);
   const d = typeof orig.data === 'string' ? JSON.parse(orig.data) : (orig.data || {});
   const vk = { share_id: shareId, client_id: kd.id || s.client_id, kunde: kd.display_name || null, kundennummer: kd.kundennummer || null,
@@ -353,9 +414,9 @@ async function kundenstandUebernehmen(rs, actor, shareId, b) {
   const modus = b && b.modus === 'neu' ? 'neu' : 'aktualisieren';
   const vorh = (await query(
     `SELECT id FROM objects WHERE user_id = $1 AND kunden_freigabe_id IS NULL AND data::jsonb->'_von_kunde'->>'share_id' = $2 ORDER BY updated_at DESC LIMIT 1`,
-    [pn.owner_user_id, String(shareId)])).rows[0];
+    [ziel_nutzer, String(shareId)])).rows[0];
   if (vorh && modus === 'aktualisieren') {
-    const alt = await objectService.getById(pn.owner_user_id, vorh.id, { fotos: false });
+    const alt = await objectService.getById(ziel_nutzer, vorh.id, { fotos: false });
     const ad = alt ? (typeof alt.data === 'string' ? JSON.parse(alt.data) : (alt.data || {})) : {};
     /* Nummer bleibt immer. Fuer den eigenen Bestand bleiben Halter und Deal-Status des Partners, wenn das Objekt schon
        sein eigenes war, sonst gilt die Wahl von eben. Fuer den Kunden kommt alles aus dem Stand (Halter, Deal-Status). */
@@ -366,29 +427,38 @@ async function kundenstandUebernehmen(rs, actor, shareId, b) {
       Object.keys(ad).forEach((k) => { if (/^_deal_/.test(k)) daten[k] = ad[k]; });
     }
     daten._von_kunde.erst_am = (ad._von_kunde && (ad._von_kunde.erst_am || ad._von_kunde.am)) || daten._von_kunde.am;
-    const r = await objectService.update(pn.owner_user_id, vorh.id, { data: daten, aiAnalysis: orig.ai_analysis || null, photos: Array.isArray(fotos) ? fotos : [] });
+    const r = await objectService.update(ziel_nutzer, vorh.id, { data: daten, aiAnalysis: orig.ai_analysis || null, photos: Array.isArray(fotos) ? fotos : [] });
     try { await query(`INSERT INTO share_audit (share_id, actor_user_id, action, meta) VALUES ($1,$2,'uebernommen',$3::jsonb)`, [shareId, actor, JSON.stringify({ modus: 'aktualisiert', ziel, object_id: vorh.id, stand_nr: s.stand_nr })]); } catch (e) {}
     return { ok: true, object_id: vorh.id, seq_no: r && r.seq_no, modus: 'aktualisiert', ziel };
   }
-  const neu = await objectService.create(pn.owner_user_id, { data: daten, aiAnalysis: orig.ai_analysis || null, photos: Array.isArray(fotos) ? fotos : [] });
+  const neu = await objectService.create(ziel_nutzer, { data: daten, aiAnalysis: orig.ai_analysis || null, photos: Array.isArray(fotos) ? fotos : [] });
   try { await query(`INSERT INTO share_audit (share_id, actor_user_id, action, meta) VALUES ($1,$2,'uebernommen',$3::jsonb)`, [shareId, actor, JSON.stringify({ modus: 'neu', ziel, object_id: neu.id, stand_nr: s.stand_nr })]); } catch (e) {}
   return { ok: true, object_id: neu.id, seq_no: neu.seq_no, modus: 'neu', ziel };
 }
 /** v3700 · Ein neuer Stand zieht die fuer den Kunden weitergefuehrten Objekte nach (Objekt UND Steuerprofil). Objekte im
  *  eigenen Bestand des Partners bleiben unberuehrt. d = Objekt-JSON der neuen Kopie (schon gefiltert). */
+/* v3830 A · alle Teammitglieder des Partners, dem der Kundenstand gehoert (Rueckfall: nur der Inhaber) */
+async function teamVonShare(ownerId, shareId) {
+  try {
+    const r = (await query(`SELECT reseller_id FROM object_shares WHERE id = $1`, [shareId])).rows[0];
+    if (r) { const t = await require('./partnerTeam').teamNutzer(r.reseller_id); if (t.length) return t; }
+  } catch (e) {}
+  return ownerId ? [ownerId] : [];
+}
 async function weitergefuehrtNachziehen(ownerId, shareId, d, standNr, profilZeile, fotos, ai) {
   const l = (await query(
-    `SELECT id FROM objects WHERE user_id = $1 AND kunden_freigabe_id IS NULL AND data::jsonb->'_von_kunde'->>'share_id' = $2
-        AND COALESCE(data::jsonb->'_von_kunde'->>'modus', 'kunde') = 'kunde'`, [ownerId, String(shareId)])).rows;
+    `SELECT id, user_id FROM objects WHERE user_id = ANY($1::uuid[]) AND kunden_freigabe_id IS NULL AND data::jsonb->'_von_kunde'->>'share_id' = $2
+        AND COALESCE(data::jsonb->'_von_kunde'->>'modus', 'kunde') = 'kunde'`, [await teamVonShare(ownerId, shareId), String(shareId)])).rows;   /* v3830 A · auch bei Beratern */
   for (const z of l) {
-    const alt = await objectService.getById(ownerId, z.id, { fotos: false });
+    const zu = z.user_id || ownerId;
+    const alt = await objectService.getById(zu, z.id, { fotos: false });
     if (!alt) continue;
     const ad = typeof alt.data === 'string' ? JSON.parse(alt.data) : (alt.data || {});
     const vk = Object.assign({}, ad._von_kunde || {}, { stand_nr: standNr, am: new Date().toISOString() });
     const daten = uebernahmeDaten(d, 'kunde', vk, null);
     if (ad._obj_seq != null) daten._obj_seq = ad._obj_seq;
     if (!profilZeile) delete daten._steuerbasis;
-    await objectService.update(ownerId, z.id, { data: daten, aiAnalysis: ai || alt.ai_analysis || null, photos: Array.isArray(fotos) ? fotos : [] });
+    await objectService.update(zu, z.id, { data: daten, aiAnalysis: ai || alt.ai_analysis || null, photos: Array.isArray(fotos) ? fotos : [] });
     try { await query(`INSERT INTO share_audit (share_id, actor_user_id, action, meta) VALUES ($1,NULL,'uebernommen',$2::jsonb)`, [shareId, JSON.stringify({ modus: 'nachgezogen', ziel: 'kunde', object_id: z.id, stand_nr: standNr })]); } catch (e) {}
   }
   return l.length;
@@ -421,6 +491,70 @@ async function trennen(resellerId, clientId, von) {
   return { ok: true };
 }
 
+/** v3830 E · Kunde ganz entfernen (Marcel 19.11.2026): die Verbindung und ALLES, was beim Partner zu diesem Kunden liegt,
+ *  wird wirklich geloescht - Kundenstaende (Kopien), Anmerkungen, Aufgaben-Stand, Meldungen, Uebergaben, Zuordnungen,
+ *  Steuerprofile, Freigabe-Fassungen, Kundennummer und Notiz. NICHT das Konto des Kunden (das gehoert ihm).
+ *  Auf einem Partnerplatz (Platz belegt oder Frist laeuft) gilt die Entzugsfrist der AVV: der Platz wird frei, der Kunde
+ *  behaelt 30 Tage lesend, die Verbindung bleibt so lange als Rumpf (entfernt_am, fuer den Partner unsichtbar), danach
+ *  loescht fristenAbarbeiten Konto und Rumpf - ausser der Kunde hat ein eigenes Abo.
+ *  Objekte, die das Team "fuer den Kunden weitergefuehrt" hat, gehen mit (Vorgabe, b.weitergefuehrt_behalten = true
+ *  laesst sie stehen). Objekte im EIGENEN Bestand des Partners bleiben, verlieren aber den Kundenbezug (_von_kunde). */
+async function kundeEntfernen(rs, actor, clientId, b) {
+  b = b || {};
+  const c = await kundeLaden(rs, clientId);
+  if (!b._ohneBestaetigung && String(b.bestaetigung || '').trim().toLowerCase() !== String(c.display_name).trim().toLowerCase())
+    throw fehler('bestaetigung_falsch', 400, 'Zur Bestätigung den Namen des Kunden genau eintippen.');
+  const team = await require('./partnerTeam').teamNutzer(rs.id);
+  const n = {};
+  const zaehl = async (k, sql, p) => { const r = await query(sql, p); n[k] = (n[k] || 0) + r.rowCount; return r; };
+  /* 1 · Kopien beim Partner zuerst: object_shares loeschen setzt kunden_freigabe_id sonst auf NULL, und die Kopie stuende
+       als gewoehnliches Objekt in der Objektliste des Inhabers */
+  await zaehl('kundenstaende', `DELETE FROM objects WHERE kunden_freigabe_id IN (SELECT id FROM object_shares WHERE client_id = $1)`, [c.id]);
+  if (b.weitergefuehrt_behalten !== true)
+    await zaehl('weitergefuehrt', `DELETE FROM objects WHERE user_id = ANY($1::uuid[]) AND kunden_freigabe_id IS NULL AND data::jsonb->'_von_kunde'->>'client_id' = $2
+                                     AND COALESCE(data::jsonb->'_von_kunde'->>'modus', 'kunde') = 'kunde'`, [team, String(c.id)]);
+  await zaehl('kundenbezug_entfernt', `UPDATE objects SET data = (data::jsonb - '_von_kunde') WHERE user_id = ANY($1::uuid[]) AND kunden_freigabe_id IS NULL
+                                     AND data::jsonb->'_von_kunde'->>'client_id' = $2`, [team, String(c.id)]);
+  /* 2 · Partnerseitige Saetze, die nicht ueber die Verbindung kaskadieren */
+  await zaehl('uebergaben', `DELETE FROM objekt_uebergaben WHERE reseller_id = $1 AND client_id = $2`, [rs.id, c.id]);
+  await zaehl('einladungen', `DELETE FROM reseller_invites WHERE reseller_id = $1 AND client_id = $2`, [rs.id, c.id]);
+  await zaehl('anfragen', `DELETE FROM partner_anfragen WHERE reseller_id = $1 AND user_id = $2`, [rs.id, c.user_id]);
+  /* 3 · Platz und Frist */
+  const hatPlatz = (await query(`SELECT 1 FROM licenses WHERE client_id = $1 AND status = 'zugewiesen' LIMIT 1`, [c.id])).rowCount > 0;
+  const rumpf = c.platz_art === 'platz' && ((hatPlatz && !c.getrennt_am) || (c.entzug_am && !c.entzug_erledigt_am)) && !(await reseller.hatBezahltesAbo(c.user_id));
+  if (rumpf) {
+    if (!c.entzug_am) {
+      await query(`UPDATE licenses SET client_id = NULL, status = 'pool', assigned_at = NULL WHERE reseller_id = $1 AND client_id = $2 AND status = 'zugewiesen'`, [rs.id, c.id]);
+      await query(`UPDATE reseller_clients SET entzug_am = now(), entzug_frist_bis = now() + ($2 || ' days')::interval WHERE id = $1`, [c.id, String(ENTZUG_FRIST_TAGE)]);
+      try { await planService.setUserPlanManual(c.user_id, 'investor', 'monthly', ENTZUG_FRIST_TAGE); } catch (e) {}
+    }
+    /* alles am Kunden ausser dem Rumpf loeschen; die Kaskaden (object_shares, Anmerkungen, Aufgaben-Stand, Meldungen,
+       Freigaben, Steuerprofile, Zuordnungen) greifen erst beim Loeschen der Verbindung - hier ausdruecklich */
+    await zaehl('freigaben_staende', `DELETE FROM object_shares WHERE client_id = $1`, [c.id]);
+    await zaehl('anmerkungen', `DELETE FROM partner_anmerkungen WHERE client_id = $1`, [c.id]);
+    await zaehl('aufgaben', `DELETE FROM partner_aufgaben_kunden WHERE client_id = $1`, [c.id]);
+    await zaehl('meldungen', `DELETE FROM partner_meldungen WHERE client_id = $1`, [c.id]);
+    await zaehl('steuerprofile', `DELETE FROM partner_steuerprofile WHERE client_id = $1`, [c.id]);
+    await zaehl('freigaben', `DELETE FROM partner_freigaben WHERE client_id = $1`, [c.id]);
+    await zaehl('zuordnungen', `DELETE FROM partner_objekt_kunden WHERE client_id = $1`, [c.id]);
+    await query(`UPDATE reseller_clients SET entfernt_am = now(), notiz = NULL, kundennummer = NULL, display_name = 'Entfernter Kunde', berater_id = NULL WHERE id = $1`, [c.id]);
+  } else {
+    /* eigener Plan, getrennt oder ohne Platz: Plan-Schutz wie beim Trennen (unassignSeat), dann die Verbindung loeschen */
+    try { await reseller.unassignSeat(rs.id, c.id); } catch (e) {}
+    await query(`UPDATE licenses SET client_id = NULL, status = 'pool', assigned_at = NULL WHERE reseller_id = $1 AND client_id = $2`, [rs.id, c.id]);
+    for (const [k, t] of [['freigaben_staende', 'object_shares'], ['anmerkungen', 'partner_anmerkungen'], ['aufgaben', 'partner_aufgaben_kunden'], ['meldungen', 'partner_meldungen'],
+      ['steuerprofile', 'partner_steuerprofile'], ['freigaben', 'partner_freigaben'], ['zuordnungen', 'partner_objekt_kunden']]) {
+      await zaehl(k, `SELECT 1 FROM ${t} WHERE client_id = $1`, [c.id]);   /* nur gezaehlt, geloescht wird per Kaskade */
+    }
+    await query(`DELETE FROM reseller_clients WHERE id = $1 AND reseller_id = $2`, [c.id, rs.id]);
+  }
+  /* Meldung ohne Namen: der Name waere wieder ein Datum zu diesem Kunden */
+  await meldung(rs.id, null, 'kunde_entfernt', 'Ein Kunde wurde entfernt, seine Daten beim Partner sind gelöscht' + (rumpf ? '. Sein Konto läuft in die Frist von ' + ENTZUG_FRIST_TAGE + ' Tagen.' : '.'));
+  try { await query(`INSERT INTO audit_log (user_id, action, resource_type, resource_id, metadata) VALUES ($1,'partner.kunde_entfernt','reseller_client',$2,$3::jsonb)`,
+    [actor || null, c.id, JSON.stringify({ reseller_id: rs.id, frist: rumpf, geloescht: n })]); } catch (e) { /* Audit best effort */ }
+  return { ok: true, frist: rumpf, frist_tage: rumpf ? ENTZUG_FRIST_TAGE : 0, geloescht: n };
+}
+
 /** Takt: abgelaufene Fristen. Eigenes Abo -> wird 'eigen'. Sonst Verbindungen trennen, Konto loeschen. */
 async function fristenAbarbeiten(opts) {
   const dry = !!(opts && opts.dryRun);
@@ -430,6 +564,8 @@ async function fristenAbarbeiten(opts) {
   const out = [];
   for (const c of r.rows) {
     if (await reseller.hatBezahltesAbo(c.user_id)) {
+      /* v3830 E · vom Partner entfernt: kein Wechsel zu 'eigen', der Rumpf geht (das Konto mit eigenem Abo bleibt) */
+      if (c.entfernt_am) { if (!dry) await query(`DELETE FROM reseller_clients WHERE id = $1 AND entfernt_am IS NOT NULL`, [c.id]); out.push({ client: c.id, weg: 'entfernt_eigenes_abo' }); continue; }
       if (!dry) await query(`UPDATE reseller_clients SET platz_art = 'eigen', entzug_erledigt_am = now(), entzug_am = NULL, entzug_frist_bis = NULL, rechte = NULL WHERE id = $1`, [c.id]);
       out.push({ client: c.id, weg: 'eigenes_abo' }); continue;
     }
@@ -444,8 +580,10 @@ async function fristenAbarbeiten(opts) {
       try { await query(sql, [c.user_id]); } catch (e) { /* Tabelle/Spalte fehlt in alten Staenden - weiter */ }
     }
     await query(`UPDATE reseller_clients SET entzug_erledigt_am = now(), getrennt_am = COALESCE(getrennt_am, now()), getrennt_von = 'entzug' WHERE id = $1`, [c.id]);
-    await meldung(c.reseller_id, c.id, 'getrennt', 'Frist abgelaufen, Konto des Kunden gelöscht');
+    if (!c.entfernt_am) await meldung(c.reseller_id, c.id, 'getrennt', 'Frist abgelaufen, Konto des Kunden gelöscht');
     try { await require('./userService').deleteUser(c.user_id); } catch (e) { console.error('[partner-kunden] Loeschen fehlgeschlagen:', e.message); }
+    /* v3830 E · der Rumpf eines entfernten Kunden geht mit (deleteUser kaskadiert ihn, falls das Konto wirklich weg ist) */
+    if (c.entfernt_am) { try { await query(`DELETE FROM reseller_clients WHERE id = $1 AND entfernt_am IS NOT NULL`, [c.id]); } catch (e) {} }
   }
   return out;
 }
@@ -467,14 +605,16 @@ async function aufgabeAnlegen(rs, actor, b) {
   const filt = ['alle', 'bestand', 'ankauf'].indexOf(b.objektfilter) >= 0 ? b.objektfilter : 'alle';
   const sj = art === 'steuerjahr' ? (parseInt(b.steuerjahr, 10) || (new Date().getFullYear() - 1)) : null;
   let ids = Array.isArray(b.kunden) ? b.kunden : null;
-  if (!ids || b.kunden === 'alle') ids = (await query(`SELECT id FROM reseller_clients WHERE reseller_id = $1 AND getrennt_am IS NULL`, [rs.id])).rows.map((x) => x.id);
+  /* v3830 A · ein Berater schreibt nur seinen eigenen Kunden, der Inhaber allen */
+  const nurEigene = (await require('./partnerTeam').rolle(rs, actor)) === 'berater';
+  if (!ids || b.kunden === 'alle') ids = (await query(`SELECT id FROM reseller_clients WHERE reseller_id = $1 AND getrennt_am IS NULL AND entfernt_am IS NULL AND ($2::uuid IS NULL OR berater_id = $2::uuid)`, [rs.id, nurEigene ? actor : null])).rows.map((x) => x.id);
   /* v3690 · Widerruf sperrt das Anfordern: Kunden, deren letzte Freigabe widerrufen ist, bekommen keine Aufgabe.
      Erst eine neue Freigabe des Kunden (Mein Partner › Freigaben) oeffnet es wieder. */
   const frei = [];
   let ohneFreigabe = 0;
   for (const id of ids) {
     if (!UUID.test(String(id || ''))) continue;
-    const ok = await query(`SELECT 1 FROM reseller_clients WHERE id = $1 AND reseller_id = $2 AND getrennt_am IS NULL`, [id, rs.id]);
+    const ok = await query(`SELECT 1 FROM reseller_clients WHERE id = $1 AND reseller_id = $2 AND getrennt_am IS NULL AND entfernt_am IS NULL AND ($3::uuid IS NULL OR berater_id = $3::uuid)`, [id, rs.id, nurEigene ? actor : null]);
     if (!ok.rowCount) continue;
     const z = (await query(`SELECT widerrufen_am FROM partner_freigaben WHERE client_id = $1 ORDER BY erteilt_am DESC LIMIT 1`, [id])).rows[0];
     if (z && z.widerrufen_am) { ohneFreigabe++; continue; }
@@ -503,18 +643,55 @@ async function aufgabeErinnern(rs, aufgabeId, clientId) {
 }
 
 async function aufgabeAbschliessen(rs, aufgabeId) {
-  await query(`UPDATE partner_aufgaben SET status = 'abgeschlossen' WHERE id = $1 AND reseller_id = $2`, [aufgabeId, rs.id]);
+  await query(`UPDATE partner_aufgaben SET status = 'abgeschlossen', abgeschlossen_am = COALESCE(abgeschlossen_am, now()) WHERE id = $1 AND reseller_id = $2`, [aufgabeId, rs.id]);   /* v3830 C · Beginn der Loeschfrist */
+  return { ok: true };
+}
+/** v3830 C · abgeschlossene Aufgabe sofort loeschen (mit dem Stand je Kunde). Offene erst abschliessen. */
+async function aufgabeLoeschen(rs, aufgabeId) {
+  if (!UUID.test(String(aufgabeId || ''))) throw fehler('aufgabe_nicht_gefunden', 404);
+  const a = (await query(`SELECT status FROM partner_aufgaben WHERE id = $1 AND reseller_id = $2`, [aufgabeId, rs.id])).rows[0];
+  if (!a) throw fehler('aufgabe_nicht_gefunden', 404);
+  if (a.status !== 'abgeschlossen') throw fehler('aufgabe_offen', 409, 'Nur abgeschlossene Aufgaben lassen sich löschen. Schließe sie zuerst ab.');
+  await query(`DELETE FROM partner_aufgaben WHERE id = $1 AND reseller_id = $2 AND status = 'abgeschlossen'`, [aufgabeId, rs.id]);
   return { ok: true };
 }
 
-async function meldungen(rs, limit) {
-  return (await query(
+/* v3830 B · Meldungen: sortieren (neu | alt), filtern (alle | ungelesen | gelesen, Kunde), Seiten. Rueckwaertsvertraeglich:
+   nur limit -> wie bisher die neuesten, ohne Zaehlung. */
+const MELDUNGEN_JE_SEITE = 25;
+function meldungenOptionen(o) {
+  o = o && typeof o === 'object' ? o : { limit: o };
+  const je = Math.min(Math.max(parseInt(o.je || o.limit, 10) || (o.seite ? MELDUNGEN_JE_SEITE : 50), 1), 200);
+  const seite = Math.max(parseInt(o.seite, 10) || 1, 1);
+  return { sort: o.sort === 'alt' ? 'alt' : 'neu', filter: ['ungelesen', 'gelesen'].indexOf(o.filter) >= 0 ? o.filter : 'alle',
+    kunde: UUID.test(String(o.kunde || '')) ? String(o.kunde) : null, je, seite, offset: (seite - 1) * je };
+}
+async function meldungen(rs, roh) {
+  const o = meldungenOptionen(roh);
+  const w = ['m.reseller_id = $1'], p = [rs.id];
+  if (o.filter === 'ungelesen') w.push('m.gelesen_am IS NULL');
+  if (o.filter === 'gelesen') w.push('m.gelesen_am IS NOT NULL');
+  if (o.kunde) { p.push(o.kunde); w.push('m.client_id = $' + p.length); }
+  const l = (await query(
     `SELECT m.*, c.display_name AS kunde, c.kundennummer AS kunde_nr FROM partner_meldungen m LEFT JOIN reseller_clients c ON c.id = m.client_id
-      WHERE m.reseller_id = $1 ORDER BY m.erstellt_am DESC LIMIT $2`, [rs.id, Math.min(parseInt(limit, 10) || 50, 200)])).rows;
+      WHERE ${w.join(' AND ')} ORDER BY m.erstellt_am ${o.sort === 'alt' ? 'ASC' : 'DESC'} LIMIT ${o.je} OFFSET ${o.offset}`, p)).rows;
+  if (!roh || typeof roh !== 'object') return l;
+  const z = (await query(`SELECT count(*)::int AS n, count(*) FILTER (WHERE m.gelesen_am IS NOT NULL)::int AS gelesen FROM partner_meldungen m WHERE ${w.join(' AND ')}`, p)).rows[0];
+  return { meldungen: l, gesamt: z.n, gelesen: z.gelesen, seite: o.seite, je: o.je, seiten: Math.max(1, Math.ceil(z.n / o.je)), sort: o.sort, filter: o.filter, kunde: o.kunde };
 }
 async function meldungenGelesen(rs) {
   await query(`UPDATE partner_meldungen SET gelesen_am = now() WHERE reseller_id = $1 AND gelesen_am IS NULL`, [rs.id]);
   return { ok: true };
+}
+async function meldungLoeschen(rs, id) {
+  if (!UUID.test(String(id || ''))) throw fehler('meldung_nicht_gefunden', 404);
+  const r = await query(`DELETE FROM partner_meldungen WHERE id = $1 AND reseller_id = $2`, [id, rs.id]);
+  if (!r.rowCount) throw fehler('meldung_nicht_gefunden', 404);
+  return { ok: true };
+}
+async function meldungenGeleseneLoeschen(rs) {
+  const r = await query(`DELETE FROM partner_meldungen WHERE reseller_id = $1 AND gelesen_am IS NOT NULL`, [rs.id]);
+  return { ok: true, geloescht: r.rowCount };
 }
 
 // ═══ KUNDENSEITE ════════════════════════════════════════════════════════════
@@ -528,7 +705,10 @@ async function meinPartner(userId) {
   const bezahlt = await reseller.hatBezahltesAbo(userId);
   anfragen.forEach((a) => { a.zugang = (a.platz_mitgeben && !bezahlt) ? 'platz' : 'eigen'; });
   const code = (await query(`SELECT gueltig_bis FROM verbindungs_codes WHERE user_id = $1 AND eingeloest_am IS NULL AND widerrufen_am IS NULL AND gueltig_bis > now() ORDER BY erstellt_am DESC LIMIT 1`, [userId])).rows[0] || null;
-  if (!v) return { verbunden: null, anfragen, code_gueltig_bis: code ? code.gueltig_bis : null };
+  /* v3830 A · Einladungen ins Team eines Partners (Berater), auch fuer Konten ohne Partnerverbindung */
+  let team_einladungen = [];
+  try { const uu = (await query(`SELECT id, email, name FROM users WHERE id = $1`, [userId])).rows[0]; if (uu) team_einladungen = await require('./partnerTeam').meineEinladungen(uu); } catch (e) {}
+  if (!v) return { verbunden: null, anfragen, code_gueltig_bis: code ? code.gueltig_bis : null, team_einladungen };
   const sendungen = (await query(
     `SELECT s.id, s.object_id, s.stand_nr, s.stand_am, s.ueber_bestand, s.status, s.gelesen_am, o.name, o.seq_no, o.updated_at AS objekt_geaendert
        FROM object_shares s JOIN objects o ON o.id = s.object_id
@@ -554,7 +734,8 @@ async function meinPartner(userId) {
       verbunden_am: v.verbunden_am, entzug_frist_bis: v.entzug_frist_bis, bezahltes_abo: bezahlt, kundennummer: v.kundennummer || null
     },
     anfragen, sendungen, aufgaben, anmerkungen_fehlen: fehlen, code_gueltig_bis: code ? code.gueltig_bis : null,
-    freigabe: await F.uebersicht(v.id)   /* v3690 · aktive Fassung, Zustand, Verlauf */
+    freigabe: await F.uebersicht(v.id),   /* v3690 · aktive Fassung, Zustand, Verlauf */
+    team_einladungen
   };
 }
 
@@ -576,7 +757,11 @@ async function anfrageBeantworten(user, anfrageId, annehmen, freigabeRoh) {
   const bezahlt = await reseller.hatBezahltesAbo(user.id);
   const art = (a.platz_mitgeben && !bezahlt) ? 'platz' : 'eigen';
   let c = (await query(`SELECT * FROM reseller_clients WHERE reseller_id = $1 AND user_id = $2`, [a.reseller_id, user.id])).rows[0];
-  if (!c) c = await reseller.createClient(a.reseller_id, { userId: user.id, displayName: a.anzeige_name || user.name || user.email });
+  /* v3830 E · ein entfernter Rumpf (Frist laeuft) wird beim erneuten Verbinden wieder eine normale Verbindung */
+  if (c && c.entfernt_am) { await query(`UPDATE reseller_clients SET entfernt_am = NULL, display_name = $2 WHERE id = $1`, [c.id, a.anzeige_name || user.name || user.email]); }
+  /* v3830 A · der Kunde gehoert dem Berater, der eingeladen hat (erstellt_von), sonst dem Inhaber */
+  if (!c) c = await reseller.createClient(a.reseller_id, { userId: user.id, displayName: a.anzeige_name || user.name || user.email, beraterId: a.erstellt_von });
+  else if (!c.berater_id && a.erstellt_von) { try { await query(`UPDATE reseller_clients SET berater_id = (SELECT user_id FROM reseller_members WHERE reseller_id = $2 AND user_id = $3) WHERE id = $1`, [c.id, a.reseller_id, a.erstellt_von]); } catch (e) {} }
   await query(
     `UPDATE reseller_clients SET platz_art = $2, herkunft = $3, verbunden_am = now(), getrennt_am = NULL, getrennt_von = NULL,
             entzug_am = NULL, entzug_frist_bis = NULL, entzug_erledigt_am = NULL, stufe = COALESCE(stufe, 2),
@@ -585,6 +770,7 @@ async function anfrageBeantworten(user, anfrageId, annehmen, freigabeRoh) {
   let platz = false;
   if (art === 'platz') { try { await reseller.assignSeat(a.reseller_id, c.id); platz = true; } catch (e) { /* kein freier Platz: Partner weist spaeter zu */ } }
   await query(`UPDATE partner_anfragen SET status = 'angenommen', beantwortet_am = now() WHERE id = $1`, [a.id]);
+  if (a.objekt_ids) { try { await objekteVormerkenAnwenden(a.reseller_id, c.id, a.erstellt_von, a.objekt_ids); } catch (e) {} }   /* v3830 F */
   const fg = fw ? await F.setzen(c.id, user.id, fw, a.quelle === 'code' ? 'code' : 'anfrage') : null;
   await meldung(a.reseller_id, c.id, 'verbindung_angenommen', (a.anzeige_name || user.name || 'Kunde') + ' hat die Verbindung bestätigt' + (art === 'eigen' ? ' (eigener Plan)' : platz ? ' (Partnerplatz)' : ' (Platz noch zuweisen)') +
     '. ' + F.kurztext(fg));
@@ -818,7 +1004,7 @@ async function rechteFuer(userId) {
 
 /** Ende des Partner-Abos: jeder Kunde mit Platz geht in die Frist (ohne Namensbestaetigung) */
 async function aboEnde(resellerId) {
-  const r = await query(`SELECT id, display_name FROM reseller_clients WHERE reseller_id = $1 AND platz_art = 'platz' AND getrennt_am IS NULL AND entzug_am IS NULL`, [resellerId]);
+  const r = await query(`SELECT id, display_name FROM reseller_clients WHERE reseller_id = $1 AND platz_art = 'platz' AND getrennt_am IS NULL AND entzug_am IS NULL AND entfernt_am IS NULL`, [resellerId]);
   let n = 0;
   for (const c of r.rows) {
     try { await platzEntziehen({ id: resellerId }, null, c.id, { bestaetigung: c.display_name }); n++; } catch (e) {}
@@ -858,6 +1044,8 @@ module.exports = {
   steuerprofilLesen, uebernahmeDaten, weitergefuehrtNachziehen,   /* v3700 */
   kundenstaende, kundenstandGeoeffnet, kundenstandUebernehmen, platzEntziehen, trennen, fristenAbarbeiten,
   aufgabenListe, aufgabeAnlegen, aufgabeErinnern, aufgabeAbschliessen, meldungen, meldungenGelesen,
+  /* v3830 */ kundeLaden, kundeEntfernen, aufgabeLoeschen, meldungLoeschen, meldungenGeleseneLoeschen, meldungenOptionen, MELDUNGEN_JE_SEITE,
+  objektZuordnen, zuordnungen, objekteVormerkenAnwenden, eigeneObjektIds,
   /* v3690 */ freigabeSetzen, freigabeWiderrufen, freigabeLesen,
   meinPartner, anfrageBeantworten, codeErzeugen, codeWiderrufen, senden, zurueckziehen, aufgabeKunde, kundeTrennt, markeWaehlen, rechteFuer,
   _codeNorm: codeNorm, _sha: sha, CODE_ZEICHEN, _meldung: meldung,

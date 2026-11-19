@@ -263,6 +263,23 @@
       '#dppk-ab .pk-kundenkopf{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin:0 0 10px}',
       '#dppk-ab .pk-kundenkopf b{font:600 15px "Space Grotesk",Inter,sans-serif}',
       '#dppk-ab .pk-kundenkopf small{color:#7A7370;font-size:12px}',
+      /* v3830 · Team, Betreuer je Kunde, Werkzeugleiste (Meldungen, Aufgaben), Loeschfristen, Objekt-Auswahl */
+      '#dppk-ab .pk-teamkopf{display:flex;align-items:baseline;gap:8px;margin:14px 0 8px;padding:0 0 6px;border-bottom:1px solid #EDE6D6}',
+      '#dppk-ab .pk-teamkopf b{font:600 14px "Space Grotesk",Inter,sans-serif;color:#2A2727}',
+      '#dppk-ab .pk-teamkopf small{color:#7A7370;font-size:12px}',
+      '#dppk-ab .pk-betreuer{display:inline-flex;align-items:center;gap:6px;font:500 11.5px Inter,sans-serif;color:#7A7370}',
+      '#dppk-ab .pk-betreuer select,#dppk-ab .pk-werkzeug select,#dppk-ab .pk-werkzeug input{border:1px solid #D9CFB8;border-radius:8px;background:#fff;padding:6px 8px;font:500 12.5px Inter,sans-serif;color:#2A2727;max-width:200px}',
+      '#dppk-ab .pk-team .pk-zeile{padding:9px 12px}',
+      '#dppk-ab .pk-werkzeug{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:0 0 12px}',
+      '#dppk-ab .pk-werkzeug .pk-luecke{flex:1}',
+      '#dppk-ab .pk-seiten{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:12px;font:500 12.5px Inter,sans-serif;color:#7A7370}',
+      '#dppk-ab .pk-x{border:0;background:none;color:#9A938C;font:400 18px/1 Inter,sans-serif;cursor:pointer;padding:2px 6px;border-radius:6px}',
+      '#dppk-ab .pk-x:hover{color:#B8625C;background:#F8ECEB}',
+      '#dppk-ab .pk-fristen{width:100%;border-collapse:collapse;font:400 13px/1.45 Inter,sans-serif;color:#2A2727}',
+      '#dppk-ab .pk-fristen th{text-align:left;font:600 10.5px "JetBrains Mono",monospace;letter-spacing:.06em;text-transform:uppercase;color:#7A7370;padding:8px 10px;border-bottom:1px solid #EDE6D6}',
+      '#dppk-ab .pk-fristen td{padding:9px 10px;border-bottom:1px solid #F3EEE3;vertical-align:top}',
+      '#dppk-ab .pk-fristen td:first-child{font-weight:600;white-space:nowrap}',
+      '@media (max-width:640px){#dppk-ab .pk-fristen thead{display:none}#dppk-ab .pk-fristen tr{display:block;padding:8px 0;border-bottom:1px solid #EDE6D6}#dppk-ab .pk-fristen td{display:block;border:0;padding:2px 0}#dppk-ab .pk-fristen td:first-child{white-space:normal}#dppk-ab .pk-betreuer select{max-width:150px}}',
       /* Marken-Formular aus reseller-portal.js (loadBranding) in Cockpit-Optik */
       '#dppk-ab .pk-marke .rp-intro{font-style:normal;font-size:13px;color:#7A7370;margin:0 0 12px}',
       '#dppk-ab .pk-marke .rp-panel{border:1px solid #EDE6D6;border-radius:10px;padding:14px 16px;margin-top:12px;background:#FDFCFA}',
@@ -561,6 +578,7 @@
     el.innerHTML = '<div class="pk-spalten">' +
       '<div class="pk-karte" data-form="mail"><h3>Per E-Mail einladen</h3>' + EINLADEN_HTML + '<div class="pk-fuss"><button type="button" class="pk-btn gold">Einladen</button></div></div>' +
       '<div class="pk-karte" data-form="code"><h3>Verbindungscode eingeben</h3>' + CODE_HTML + '<div class="pk-fuss"><button type="button" class="pk-btn gold">Anfrage senden</button></div></div></div>';
+    einObjBinden(el.querySelector('[data-form="mail"]'));   /* v3830 F */
     [['mail', einladenSenden], ['code', codeSenden]].forEach(function (p) {
       var f = el.querySelector('[data-form="' + p[0] + '"]'), b = f.querySelector('.pk-fuss .pk-btn');
       b.onclick = function () {
@@ -585,28 +603,42 @@
     ['logo', 'Logo', 'image'],
     ['farben', 'Farben', 'sparkles'],
     ['dokumente', 'Dokumente', 'fileText'],
-    ['plaetze', 'Plätze & Abo', 'creditCard']
+    ['plaetze', 'Plätze & Abo', 'creditCard'],
+    ['fristen', 'Löschfristen', 'trash']   /* v3830 C · was wann gelöscht wird */
   ];
+  /* v3830 C · Loeschfristen aus dem Backend (partnerTeam.fristenListe, dieselbe Stelle wie der Takt) */
+  function fristenHtml() {
+    var l = (S.partner && S.partner.loeschfristen) || [];
+    return '<h3>Was wann gelöscht wird</h3><p class="pk-klein" style="margin-top:0">Diese Fristen setzt DealPilot selbst um. Was du vorher löschst, ist sofort weg.</p>' +
+      (l.length ? '<table class="pk-fristen"><thead><tr><th>Daten</th><th>Löschung</th><th>Selbst löschen</th></tr></thead><tbody>' + l.map(function (x) {
+        return '<tr><td>' + esc(x.was) + '</td><td>' + esc(x.wann) + '</td><td>' + esc(x.selbst || '') + '</td></tr>'; }).join('') + '</tbody></table>' : '<div class="pk-leer">Die Fristen sind gerade nicht geladen.</div>') +
+      '<p class="pk-klein">Die übrigen Fristen (Konto, Sicherungen, Protokolle) stehen im Auftragsverarbeitungsvertrag, § 12.</p>';
+  }
   function verwaltungZeichnen(el) {
     var rp = window.DealPilotResellerPortal;
     if (!rp || typeof rp.markeZeichnen !== 'function') { el.innerHTML = '<div class="pk-leer">Die Verwaltung ist gerade nicht geladen. Bitte die Seite neu laden.</div>'; return; }
     verwStil();
-    var akt = PK.verwBereich || 'marke';
+    /* v3830 A · Berater sehen nur die Loeschfristen, Marke, Plaetze und Abo verwaltet der Inhaber */
+    var inhaber = !(S.partner && S.partner.ich && S.partner.ich.rolle && S.partner.ich.rolle !== 'owner');
+    var BER = inhaber ? VERW_BEREICHE : VERW_BEREICHE.filter(function (b) { return b[0] === 'fristen'; });
+    var akt = PK.verwBereich && BER.some(function (b) { return b[0] === PK.verwBereich; }) ? PK.verwBereich : BER[0][0];
     el.innerHTML = '<div class="pk-verw" id="dppk-verw">' +
-      '<nav class="pk-verw-liste" aria-label="Bereiche der Verwaltung">' + VERW_BEREICHE.map(function (b) {
+      '<nav class="pk-verw-liste" aria-label="Bereiche der Verwaltung">' + BER.map(function (b) {
         return '<button type="button" class="pk-verw-punkt' + (b[0] === akt ? ' an' : '') + '" data-bereich="' + b[0] + '" aria-current="' + (b[0] === akt) + '">' +
           '<span class="pk-verw-ico">' + ico(b[2], 17) + '</span><span class="pk-verw-txt"><b>' + esc(b[1]) + '</b><small data-stand="' + b[0] + '">…</small></span>' +
           '<span class="pk-verw-mini" data-mini="' + b[0] + '" aria-hidden="true"></span></button>';   /* v3630k · kleine Vorschau je Bereich */
       }).join('') + '</nav>' +
-      '<div class="pk-verw-inhalt">' + VERW_BEREICHE.map(function (b) {
-        var inner = b[0] === 'plaetze'
+      '<div class="pk-verw-inhalt">' + BER.map(function (b) {
+        var inner = b[0] === 'fristen' ? '<div class="pk-karte" data-v="fristen">' + fristenHtml() + '</div>' : b[0] === 'plaetze'
           ? '<div class="pk-spalten">' +
               '<div class="pk-karte" data-v="plaetze"><h3>Plätze</h3><div class="pk-leer">Lädt …</div></div>' +
               '<div class="pk-karte" data-v="abo"><h3>Abrechnung</h3><div class="pk-leer">Lädt …</div></div></div>'
           : '<div class="pk-marke" data-v-ziel="' + b[0] + '"><div class="pk-leer">Lädt …</div></div>';
         return '<section class="pk-verw-bereich" data-bereich-inhalt="' + b[0] + '"' + (b[0] === akt ? '' : ' hidden') + '>' + inner + '</section>';
-      }).join('') + '</div></div>';
+      }).join('') + (inhaber ? '' : '<div class="pk-hinweis" style="margin-top:12px">Marke, Plätze und Abrechnung verwaltet der Inhaber des Partnerkontos.</div>') + '</div></div>';
     var box = el.querySelector('#dppk-verw');
+    try { var fs0 = box.querySelector('[data-stand="fristen"]'); if (fs0) fs0.textContent = 'Meldungen, Aufgaben, Übergaben'; } catch (e) {}
+    if (!inhaber) return;
     var wahl = function (k) {
       PK.verwBereich = k;
       [].forEach.call(box.querySelectorAll('.pk-verw-punkt'), function (b) { var an = b.getAttribute('data-bereich') === k; b.classList.toggle('an', an); b.setAttribute('aria-current', String(an)); });
@@ -852,19 +884,53 @@
         return '<div class="pk-zeile"><div class="pk-name"><b>' + esc(i.display_name) + '</b><small>' + esc(i.email) + ' · Einladung an neue Adresse · bis ' + datum(i.expires_at) + '</small></div><span class="pk-chip grau">noch kein Konto</span></div>';
       }).join('');
     }
-    h += '<div class="pk-gruppe">Kunden</div>';
+    /* v3830 A · Team der Kanzlei: Mitglieder, ihre Kunden darunter, Umschalter Meine/Alle, Betreuer je Kunde */
+    var T = c.team || { mitglieder: [] }, ich = c.ich || {}, inhaber = ich.rolle === 'owner';
+    var mehrere = (T.mitglieder || []).length > 1 || (T.einladungen || []).length > 0;
+    h += teamKarte(c);
+    if (!PK.kundenSicht) PK.kundenSicht = inhaber ? 'alle' : 'meine';
+    var sicht = mehrere ? PK.kundenSicht : 'alle';
+    h += '<div class="pk-gruppe" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><span style="flex:1">Kunden</span>' +
+      (mehrere ? '<span class="pk-filter" role="group" aria-label="Welche Kunden" style="margin:0"><button type="button" data-sicht="meine"' + (sicht === 'meine' ? ' class="an"' : '') + '>Meine</button><button type="button" data-sicht="alle"' + (sicht === 'alle' ? ' class="an"' : '') + '>Alle</button></span>' : '') + '</div>';
+    var sichtbar = c.kunden.filter(function (k) { return sicht !== 'meine' || String(k.berater_id || '') === String(ich.user_id || ''); });
     if (!c.kunden.length) h += '<div class="pk-leer">Noch keine Kunden. Lade einen Kunden ein oder lass dir seinen Verbindungscode geben (Reiter Einladen).</div>';
-    h += c.kunden.map(function (k) {
+    else if (!sichtbar.length) h += '<div class="pk-leer">Du betreust noch keinen Kunden. Unter „Alle“ siehst du die Kunden des Teams.</div>';
+    var gruppen = [];
+    if (mehrere) {
+      (T.mitglieder || []).forEach(function (m) { var l = sichtbar.filter(function (k) { return String(k.berater_id || '') === String(m.user_id); }); if (l.length) gruppen.push({ titel: (m.name || m.email) + (m.rolle === 'owner' ? ' (Inhaber)' : ''), l: l }); });
+      var ohne = sichtbar.filter(function (k) { return !(T.mitglieder || []).some(function (m) { return String(m.user_id) === String(k.berater_id || ''); }); });
+      if (ohne.length) gruppen.push({ titel: 'Ohne Betreuer', l: ohne });
+    } else gruppen.push({ titel: null, l: sichtbar });
+    function betreuerWahl(k) {
+      if (!mehrere || !k.darf || k.getrennt_am) return k.berater_name && mehrere ? '<span class="pk-chip grau" title="Betreut von">' + esc(k.berater_name) + '</span>' : '';
+      return '<label class="pk-betreuer" title="Betreuer dieses Kunden"><span>Betreuer</span><select data-betreuer="' + k.id + '">' + (T.mitglieder || []).map(function (m) {
+        return '<option value="' + esc(m.user_id) + '"' + (String(m.user_id) === String(k.berater_id || '') ? ' selected' : '') + '>' + esc(m.name || m.email) + '</option>'; }).join('') + '</select></label>';
+    }
+    h += gruppen.map(function (g) {
+      return (g.titel ? '<div class="pk-teamkopf"><b>' + esc(g.titel) + '</b><small>' + g.l.length + (g.l.length === 1 ? ' Kunde' : ' Kunden') + '</small></div>' : '') + g.l.map(function (k) { return kundeZeile(k) + ''; }).join('');
+    }).join('');
+    function kundeZeile(k) {
       var getrennt = !!k.getrennt_am;
       var status = getrennt ? '<span class="pk-chip grau">getrennt</span>' : k.entzug_frist_bis ? '<span class="pk-chip rot">Frist bis ' + datum(k.entzug_frist_bis) + '</span>' : '<span class="pk-chip gruen">verbunden</span>';
       var zug = k.platz_art === 'platz' ? '<span class="pk-chip">Partnerplatz' + (k.hat_platz ? '' : ', noch ohne Platz') + '</span>' : '<span class="pk-chip grau">eigener Plan</span>';
       var info = k.platz_art === 'platz' ? (STUFEN[k.stufe] || 'Fortgeschritten') + ', ' + (k.marke === 'dealpilot' ? 'Marke DealPilot' : 'deine Marke') : 'Stufe und Rechte wählt der Kunde';
-      var knoepfe = getrennt ? '' : (k.platz_art === 'platz'
+      /* v3830 E · getrennte Kunden lassen sich entfernen (die Kopien bleiben sonst unbegrenzt beim Partner) */
+      var knoepfe = k.darf === false ? '' : getrennt ? '<button type="button" class="pk-btn klein rot" data-entf="' + k.id + '">Entfernen …</button>' : (k.platz_art === 'platz'
         ? '<button type="button" class="pk-btn klein" data-ein="' + k.id + '">Stufe und Rechte</button>' + (k.hat_platz || k.entzug_frist_bis ? '' : '<button type="button" class="pk-btn klein" data-platz="' + k.id + '">Platz zuweisen</button>')
         : '<button type="button" class="pk-btn klein" data-ein="' + k.id + '">Notiz und E-Mail</button><button type="button" class="pk-btn klein rot" data-trenn="' + k.id + '">Trennen</button>');
-      return '<div class="pk-zeile"><div class="pk-name"><b>' + nrEtikett(k.kundennummer) + esc(k.display_name) + '</b><small>' + esc(k.email) + ' · ' + esc(info) + (k.sendungen ? ' · ' + k.sendungen + (k.sendungen === 1 ? ' Objekt gesendet' : ' Objekte gesendet') : '') + (k.neu ? ', ' + k.neu + ' neu' : '') + '</small></div>' + zug + (getrennt ? '' : fgChipPartner(k.freigabe)) + status + knoepfe + '</div>';
-    }).join('');
+      return '<div class="pk-zeile"><div class="pk-name"><b>' + nrEtikett(k.kundennummer) + esc(k.display_name) + '</b><small>' + esc(k.email) + ' · ' + esc(info) + (k.sendungen ? ' · ' + k.sendungen + (k.sendungen === 1 ? ' Objekt gesendet' : ' Objekte gesendet') : '') + (k.neu ? ', ' + k.neu + ' neu' : '') + (k.objekte_zugeordnet ? ' · ' + k.objekte_zugeordnet + (k.objekte_zugeordnet === 1 ? ' Objekt zugeordnet' : ' Objekte zugeordnet') : '') + '</small></div>' + zug + (getrennt ? '' : fgChipPartner(k.freigabe)) + status + betreuerWahl(k) + knoepfe + '</div>';
+    }
     el.innerHTML = h;
+    teamBinden(el, c);
+    [].forEach.call(el.querySelectorAll('[data-sicht]'), function (b) { b.onclick = function () { PK.kundenSicht = b.getAttribute('data-sicht'); kundenZeichnen(el); }; });
+    [].forEach.call(el.querySelectorAll('[data-betreuer]'), function (s) {
+      s.onchange = function () {
+        var id = s.getAttribute('data-betreuer'), wer = s.options[s.selectedIndex] ? s.options[s.selectedIndex].text : '';
+        s.disabled = true;
+        api('/partner/kunden/' + id, { method: 'PUT', body: { berater_id: s.value } }).then(function () { toast('Kunde an ' + wer + ' gegeben.'); neuLaden(el); }, function (e) { s.disabled = false; toast(fehlerText(e)); neuLaden(el); });
+      };
+    });
+    [].forEach.call(el.querySelectorAll('[data-entf]'), function (b) { b.onclick = function () { var k = c.kunden.filter(function (x) { return x.id === b.getAttribute('data-entf'); })[0]; if (k) entfernenDialog(el, k); }; });
     var _e = el.querySelector('[data-a="einladen"]'), _c = el.querySelector('[data-a="code"]');
     if (_e) _e.onclick = function () { einladenDialog(el); };
     if (_c) _c.onclick = function () { codeDialog(el); };
@@ -879,6 +945,153 @@
           [{ t: 'Abbrechen' }, { t: 'Trennen', c: 'rot', fn: function () { return api('/partner/kunden/' + k.id + '/trennen', { method: 'POST' }).then(function () { toast('Verbindung getrennt.'); neuLaden(el); }); } }]);
       };
     });
+  }
+
+  /* ════ v3830 A · TEAM IN DER KANZLEI ═════════════════════════════════════
+     Marcel 19.11.2026: mehrere Logins je Partnerkonto. Der Inhaber laedt Berater per E-Mail ein, jedes Mitglied sieht das
+     Cockpit der Kanzlei, betreut seine eigenen Kunden und sieht die der anderen. Team, Plaetze und Marke nur der Inhaber.
+     Mitgliedsplaetze vorerst ohne Abrechnung (Rahmen team_plaetze, Vorgabe 5). Backend: services/partnerTeam.js. */
+  function teamKarte(c) {
+    var T = c.team || { mitglieder: [], einladungen: [] }, ich = c.ich || {}, inhaber = ich.rolle === 'owner';
+    var h = '<div class="pk-karte pk-team" style="margin-bottom:14px"><h3 style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><span style="flex:1">Team</span>' +
+      '<small style="font:500 12px Inter,sans-serif;color:#7A7370">' + (T.belegt || 0) + ' von ' + (T.plaetze != null ? T.plaetze : '–') + ' Teamplätzen belegt</small>' +
+      (inhaber ? '<button type="button" class="pk-btn klein gold" data-team="einladen"' + (T.frei > 0 ? '' : ' disabled title="Alle Teamplätze sind belegt"') + '>Berater einladen</button>' : '') + '</h3>';
+    h += (T.mitglieder || []).map(function (m) {
+      var selbst = String(m.user_id) === String(ich.user_id || '');
+      var knopf = m.rolle === 'owner' ? '' : (inhaber ? '<button type="button" class="pk-btn klein rot" data-team-weg="' + esc(m.user_id) + '">Aus dem Team nehmen</button>' : (selbst ? '<button type="button" class="pk-btn klein rot" data-team-gehen="1">Team verlassen</button>' : ''));
+      return '<div class="pk-zeile"><div class="pk-name"><b>' + esc(m.name || m.email) + (selbst ? ' (du)' : '') + '</b><small>' + esc(m.email) + ' · ' + m.kunden + (m.kunden === 1 ? ' Kunde' : ' Kunden') + '</small></div>' +
+        '<span class="pk-chip' + (m.rolle === 'owner' ? '' : ' grau') + '">' + (m.rolle === 'owner' ? 'Inhaber' : 'Berater') + '</span>' + knopf + '</div>';
+    }).join('');
+    h += (T.einladungen || []).map(function (e) {
+      return '<div class="pk-zeile"><div class="pk-name"><b>' + esc(e.name || e.email) + '</b><small>' + esc(e.email) + ' · eingeladen am ' + datum(e.erstellt_am) + ' · gilt bis ' + datum(e.expires_at) + '</small></div>' +
+        '<span class="pk-chip grau">wartet auf Bestätigung</span>' + (inhaber ? '<button type="button" class="pk-btn klein" data-team-zz="' + esc(e.id) + '">Zurückziehen</button>' : '') + '</div>';
+    }).join('');
+    if ((T.mitglieder || []).length < 2 && !(T.einladungen || []).length) h += '<div class="pk-klein">' + (inhaber ? 'Arbeitest du mit Kollegen? Lade sie als Berater ein. Jeder meldet sich mit seinem eigenen Konto an, sieht das Cockpit der Kanzlei und betreut seine eigenen Kunden. Die Kundenplätze teilt ihr euch.' : 'Du bist im Team dieser Kanzlei.') + '</div>';
+    else h += '<div class="pk-klein">Jeder Kunde gehört einem Berater. Der Berater betreut ihn, die anderen sehen ihn nur. Der Inhaber verwaltet Team, Plätze und Marke. Die Kundenplätze teilt ihr euch.</div>';
+    return h + '</div>';
+  }
+  function teamBinden(el, c) {
+    var e1 = el.querySelector('[data-team="einladen"]'); if (e1) e1.onclick = function () { teamEinladenDialog(el); };
+    [].forEach.call(el.querySelectorAll('[data-team-zz]'), function (b) { b.onclick = function () { api('/partner/team/einladungen/' + b.getAttribute('data-team-zz') + '/zurueckziehen', { method: 'POST' }).then(function () { toast('Einladung zurückgezogen.'); neuLaden(el); }, function (e) { toast(fehlerText(e)); }); }; });
+    [].forEach.call(el.querySelectorAll('[data-team-weg]'), function (b) {
+      b.onclick = function () {
+        var m = ((c.team && c.team.mitglieder) || []).filter(function (x) { return String(x.user_id) === b.getAttribute('data-team-weg'); })[0] || {};
+        dialog('Aus dem Team nehmen', '<p><b>' + esc(m.name || m.email) + '</b> sieht das Cockpit danach nicht mehr. Seine ' + (m.kunden || 0) + (m.kunden === 1 ? ' Kunde geht' : ' Kunden gehen') + ' an dich als Inhaber. Sein eigenes Konto und seine eigenen Objekte bleiben unverändert.</p>',
+          [{ t: 'Abbrechen' }, { t: 'Aus dem Team nehmen', c: 'rot', fn: function () { return api('/partner/team/' + m.user_id, { method: 'DELETE' }).then(function () { toast('Aus dem Team genommen.'); neuLaden(el); }); } }]);
+      };
+    });
+    var g = el.querySelector('[data-team-gehen]');
+    if (g) g.onclick = function () {
+      dialog('Team verlassen', '<p>Du siehst das Partner-Cockpit danach nicht mehr. Deine Kunden gehen an den Inhaber. Dein eigenes Konto und deine eigenen Objekte bleiben.</p>',
+        [{ t: 'Abbrechen' }, { t: 'Team verlassen', c: 'rot', fn: function () { return api('/mein-partner/team-verlassen', { method: 'POST' }).then(function () { toast('Du hast das Team verlassen.'); setTimeout(function () { location.reload(); }, 800); }); } }]);
+    };
+  }
+  function teamEinladenDialog(el) {
+    dialog('Berater einladen', '<div class="pk-hinweis">Hat die Adresse schon ein DealPilot-Konto, erscheint die Einladung nach der Anmeldung oben in der App. Sonst legt der Berater mit dieser Adresse ein Konto an. Teamplätze kosten derzeit nichts zusätzlich.</div>' +
+      '<label class="pk-feld">Name<input type="text" id="pk-t-name" maxlength="120"></label><label class="pk-feld">E-Mail<input type="email" id="pk-t-mail" maxlength="200"></label>',
+      [{ t: 'Abbrechen' }, { t: 'Einladen', c: 'gold', fn: function (d) {
+        var name = wert(d, '#pk-t-name'), mail = wert(d, '#pk-t-mail');
+        if (!String(name || '').trim() || !/@/.test(String(mail || ''))) { toast('Bitte Name und E-Mail eintragen.'); return false; }
+        return api('/partner/team/einladen', { method: 'POST', body: { name: name, email: mail } }).then(function () { toast('Einladung gesendet.'); neuLaden(el); });
+      } }]);
+  }
+  /* Eingeladene Seite: Band und Fenster (auch ueber ?dp_team=… aus der Mail) */
+  function teamEinladungDialog(e) {
+    dialog('Einladung ins Team', '<p><b>' + esc(e.partner_name || 'Ein Partner') + '</b>' + (e.von ? ' (' + esc(e.von) + ')' : '') + ' lädt dich als Berater ins Team ein.</p>' +
+      '<div class="pk-hinweis">Im Team siehst du das Partner-Cockpit der Kanzlei: Kunden, freigegebene Stände, Aufgaben und Meldungen. Du betreust deine eigenen Kunden, die Kunden der anderen siehst du nur. Dein eigenes Konto und deine eigenen Objekte bleiben deine. Du kannst das Team jederzeit verlassen.</div>',
+      [{ t: 'Später' }, { t: 'Ablehnen', fn: function () { return api('/mein-partner/team/' + e.id, { method: 'POST', body: { annehmen: false } }).then(function () { toast('Einladung abgelehnt.'); if (S.kunde) S.kunde.team_einladungen = []; bandPflegen(); }); } },
+        { t: 'Beitreten', c: 'gold', fn: function () { return api('/mein-partner/team/' + e.id, { method: 'POST', body: { annehmen: true } }).then(function (r) { toast('Du bist jetzt im Team von ' + (r.partner_name || 'deinem Partner') + '.'); setTimeout(function () { location.reload(); }, 900); }); } }]);
+  }
+  function teamTokenEinloesen() {
+    var t = null; try { t = new URLSearchParams(location.search).get('dp_team'); } catch (e) {}
+    if (!t) return;
+    try { var q = new URLSearchParams(location.search); q.delete('dp_team'); history.replaceState({}, '', location.pathname + (q.toString() ? '?' + q.toString() : '')); } catch (e) {}
+    api('/mein-partner/team/token', { method: 'POST', body: { token: t } }).then(function (r) { if (r && r.einladung) teamEinladungDialog(r.einladung); }, function (e) { toast(fehlerText(e)); });
+  }
+
+  /* ════ v3830 E · KUNDE ENTFERNEN ══════════════════════════════════════════
+     Loescht die Verbindung und alles beim Partner zu diesem Kunden (Kundenstaende, Anmerkungen, Aufgaben-Stand, Meldungen,
+     Uebergaben, Zuordnungen, Kundennummer, Notiz), nicht das Konto des Kunden. Auf einem Partnerplatz laeuft vorher die
+     Frist der AVV (30 Tage). Bestaetigung mit dem Namen wie beim Entzug. */
+  function entfernenDialog(el, k) {
+    var platz = k.platz_art === 'platz' && (k.hat_platz || k.entzug_frist_bis) && !k.getrennt_am || (k.entzug_frist_bis && !k.getrennt_am);
+    dialog('Kunde entfernen', '<div class="pk-hinweis rot"><b>' + esc(k.display_name) + '</b> wird aus deinem Partnerkonto entfernt. Gelöscht werden sofort und endgültig: die Verbindung, Kundennummer und Notiz, alle Kundenstände bei dir, Anmerkungen, sein Stand in Aufgaben, Meldungen zu ihm, Übergaben an ihn und die Zuordnung deiner Objekte.<br>' +
+      (platz ? 'Er hat einen Partnerplatz. Der Platz ist sofort wieder frei, der Kunde bekommt die Frist von 30 Tagen zum Export oder für ein eigenes Abo, danach wird sein Konto gelöscht.' : 'Sein Konto bleibt unverändert, es gehört ihm.') + '</div>' +
+      '<label class="pk-schalter"><span>Für den Kunden weitergeführte Objekte behalten<small>Vorgabe aus: sie werden mit gelöscht. Objekte in deinem eigenen Bestand bleiben immer, sie verlieren nur den Kundenbezug.</small></span><input type="checkbox" id="pk-x-behalten"></label>' +
+      '<label class="pk-feld">Zur Bestätigung den Namen eintippen: ' + esc(k.display_name) + '<input type="text" id="pk-x-name" autocomplete="off"></label>',
+      [{ t: 'Abbrechen' }, { t: 'Endgültig entfernen', c: 'rot', fn: function (d) {
+        return api('/partner/kunden/' + k.id + '/entfernen', { method: 'POST', body: { bestaetigung: wert(d, '#pk-x-name'), weitergefuehrt_behalten: !!wert(d, '#pk-x-behalten') } }).then(function (r) {
+          var g = (r && r.geloescht) || {}, n = (g.kundenstaende || 0) + (g.weitergefuehrt || 0);
+          toast('Kunde entfernt' + (n ? ', ' + n + (n === 1 ? ' Objekt' : ' Objekte') + ' gelöscht' : '') + (r && r.frist ? '. Die Frist von 30 Tagen läuft.' : '.'));
+          try { var hub = document.getElementById('dppk-hub-kunde'); if (hub) hub.remove(); } catch (e) {}
+          try { if (typeof window.renderSaved === 'function') window.renderSaved({ forceFresh: true }); } catch (e) {}
+          neuLaden(el);
+        });
+      } }]);
+  }
+
+  /* ════ v3830 F · OBJEKTE EINEM KUNDEN ZUORDNEN ═══════════════════════════
+     Eigene Objekte (nicht die Kundenstaende) einem Kunden zuordnen, auch ohne Uebergabe. Liste gegliedert nach Status
+     (Ankauf, Bestand, verloren) mit Anschrift, Art und Datum, durchsuchbar. Die Objektliste sortiert und filtert danach
+     (storage.js Modus 'kunde', Felder kunde_client_id/kunde_name aus der Zuordnung). */
+  function objektAdresse(o) {
+    var a = [[o.str, o.hnr].filter(Boolean).join(' '), [o.plz, o.ort].filter(Boolean).join(' ')].filter(Boolean).join(', ');
+    return a || o.name || o.ort || o.seq_no || 'Objekt';
+  }
+  function objektStatus(o) { return o.deal_lost ? 'verloren' : (o.deal_won ? 'bestand' : 'ankauf'); }
+  var OBJ_GRUPPEN = [['ankauf', 'Ankauf'], ['bestand', 'Bestand'], ['verloren', 'Verloren']];
+  /** Gegliederte, durchsuchbare Objektliste. art 'radio' (eine Wahl) oder 'check' (mehrere). wahl: id oder {id:true}. */
+  function objektListeHtml(objs, art, name, wahl, zusatz) {
+    var such = '<input type="search" data-obj-such placeholder="Suchen: Anschrift, Nummer, Kunde" style="width:100%;box-sizing:border-box;border:1px solid #D9CFB8;border-radius:8px;padding:8px 10px;font:400 13px Inter,sans-serif;margin:0 0 8px">';
+    var body = OBJ_GRUPPEN.map(function (g) {
+      var l = objs.filter(function (o) { return objektStatus(o) === g[0]; });
+      if (!l.length) return '';
+      return '<div data-obj-gruppe style="margin:0 0 8px"><div style="font:600 10.5px \'JetBrains Mono\',monospace;letter-spacing:.08em;text-transform:uppercase;color:#7A7370;margin:6px 0 4px">' + g[1] + ' <span data-obj-zahl>(' + l.length + ')</span></div>' +
+        l.map(function (o) {
+          var an = art === 'radio' ? String(wahl || '') === String(o.id) : !!(wahl && wahl[o.id]);
+          var datumT = o.kaufdat ? 'Kauf ' + String(o.kaufdat).slice(0, 10).split('-').reverse().join('.') : (o.updated_at ? 'geändert ' + datum(o.updated_at) : '');
+          var such = [o.seq_no, objektAdresse(o), o.objart, o.kunde_name, o.kunde_nr].filter(Boolean).join(' ').toLowerCase();
+          return '<label data-obj-zeile data-such="' + esc(such) + '" style="display:flex;align-items:flex-start;gap:9px;padding:7px 8px;border:1px solid #EDE6D6;border-radius:8px;margin:0 0 5px;background:#fff;cursor:pointer">' +
+            '<input type="' + art + '" name="' + name + '" value="' + esc(o.id) + '"' + (an ? ' checked' : '') + ' style="margin-top:3px;accent-color:var(--wl-c9a84c, #C9A84C)">' +
+            '<span style="min-width:0;flex:1"><b style="display:block;font:600 13px Inter,sans-serif;color:#2A2727;overflow-wrap:anywhere">' + esc(objektAdresse(o)) + '</b>' +
+            '<small style="font:400 11.5px Inter,sans-serif;color:#7A7370">' + esc([o.seq_no, o.objart, datumT, o.kunde_client_id ? 'Kunde ' + ((o.kunde_nr ? o.kunde_nr + ' · ' : '') + (o.kunde_name || '')) : '', zusatz ? zusatz(o) : ''].filter(Boolean).join(' · ')) + '</small></span></label>';
+        }).join('') + '</div>';
+    }).join('');
+    return such + '<div data-obj-liste style="max-height:340px;overflow:auto;padding-right:2px">' + (body || '<div class="pk-leer">Keine eigenen Objekte.</div>') + '<div data-obj-nichts class="pk-leer" style="display:none">Nichts gefunden.</div></div>';
+  }
+  function objektListeBinden(box) {
+    var s = box.querySelector('[data-obj-such]'); if (!s) return;
+    s.oninput = function () {
+      var q = String(s.value || '').trim().toLowerCase(), treffer = 0;
+      [].forEach.call(box.querySelectorAll('[data-obj-gruppe]'), function (g) {
+        var n = 0;
+        [].forEach.call(g.querySelectorAll('[data-obj-zeile]'), function (z) { var an = !q || z.getAttribute('data-such').indexOf(q) >= 0; z.style.display = an ? '' : 'none'; if (an) n++; });
+        g.style.display = n ? '' : 'none'; var zl = g.querySelector('[data-obj-zahl]'); if (zl) zl.textContent = '(' + n + ')'; treffer += n;
+      });
+      var ni = box.querySelector('[data-obj-nichts]'); if (ni) ni.style.display = treffer ? 'none' : '';
+    };
+  }
+  function eigeneObjekteHolen() {
+    return api('/objects?limit=200').then(function (r) { return (r && (r.items || r.objects)) || []; });
+  }
+  function objekteZuordnenDialog(el, k) {
+    eigeneObjekteHolen().then(function (objs) {
+      var wahl = {}; objs.forEach(function (o) { if (String(o.kunde_zuordnung || '') === String(k.id)) wahl[o.id] = true; });
+      var waehlbar = objs.filter(function (o) { return !(o.kunde_ziel) ; });   /* uebernommene Kundenstaende tragen ihren Kunden schon */
+      var d = dialog('Objekte zuordnen · ' + (k.kundennummer ? k.kundennummer + ' · ' : '') + k.display_name,
+        '<div class="pk-hinweis">Ordne deine eigenen Objekte diesem Kunden zu, auch ohne sie zu übergeben. In der Objektliste sortierst und filterst du dann nach Kunde. Ein Objekt gehört höchstens einem Kunden, ein Haken hier nimmt es einem anderen weg.</div>' +
+        objektListeHtml(waehlbar, 'checkbox', 'pk-zu-obj', wahl),
+        [{ t: 'Abbrechen' }, { t: 'Speichern', c: 'gold', fn: function (dd) {
+          var jobs = [];
+          [].forEach.call(dd.querySelectorAll('input[name="pk-zu-obj"]'), function (x) {
+            var war = !!wahl[x.value];
+            if (x.checked && !war) jobs.push(api('/partner/objekte/' + x.value + '/kunde', { method: 'PUT', body: { client_id: k.id } }));
+            if (!x.checked && war) jobs.push(api('/partner/objekte/' + x.value + '/kunde', { method: 'PUT', body: { client_id: null } }));
+          });
+          return Promise.all(jobs).then(function () { toast(jobs.length ? 'Zuordnung gespeichert.' : 'Nichts geändert.'); try { if (typeof window.renderSaved === 'function') window.renderSaved({ forceFresh: true }); } catch (e) {} neuLaden(el); });
+        } }]);
+      objektListeBinden(d);
+    }, function (e) { toast(fehlerText(e)); });
   }
 
   /* v3690 · Vorschlag des Partners fuer die Freigabe (Konzept 4.1, Frage 4): Art und Bereiche, beim Kunden vorausgewaehlt
@@ -902,7 +1115,21 @@
     '<label class="pk-feld">Name des Kunden<input type="text" id="pk-e-name" maxlength="120"></label>' +
     '<label class="pk-feld">E-Mail<input type="email" id="pk-e-mail" maxlength="200"></label>' +
     '<label class="pk-wahl"><input type="radio" name="pk-e-art" value="platz" checked><span><b>Mit Partnerplatz</b>Du bezahlst seinen Zugang und bestimmst Stufe, Rechte und Marke. Hat er ein eigenes Abo, wird er ohne Platz verbunden.</span></label>' +
-    '<label class="pk-wahl"><input type="radio" name="pk-e-art" value="eigen"><span><b>Ohne Platz</b>Der Kunde nutzt seinen eigenen Plan und schickt dir nur, was er freigibt.</span></label>' + vorschlagHtml('e');
+    '<label class="pk-wahl"><input type="radio" name="pk-e-art" value="eigen"><span><b>Ohne Platz</b>Der Kunde nutzt seinen eigenen Plan und schickt dir nur, was er freigibt.</span></label>' + vorschlagHtml('e') +
+    /* v3830 F · beim Anlegen gleich Objekte zuordnen (wirksam, sobald der Kunde bestaetigt) */
+    '<div class="pk-gruppe">Objekte gleich zuordnen (freiwillig)</div><div data-ein-objekte><button type="button" class="pk-btn klein" data-ein-obj-laden>Eigene Objekte auswählen …</button>' +
+    '<div class="pk-klein" style="font-size:12px;color:#7A7370;margin-top:6px">Die Objekte werden dem Kunden zugeordnet, sobald er die Verbindung bestätigt. Übergeben wird dabei nichts.</div></div>';
+  function einObjBinden(box) {
+    var b = box && box.querySelector('[data-ein-obj-laden]'); if (!b) return;
+    b.onclick = function () {
+      b.disabled = true;
+      eigeneObjekteHolen().then(function (objs) {
+        var z = box.querySelector('[data-ein-objekte]');
+        z.innerHTML = objektListeHtml(objs.filter(function (o) { return !o.kunde_ziel; }), 'checkbox', 'pk-e-obj', {});
+        objektListeBinden(z);
+      }, function (e) { b.disabled = false; toast(fehlerText(e)); });
+    };
+  }
   var CODE_HTML = '<div class="pk-hinweis">Den Code erzeugt dein Kunde in DealPilot unter „Mein Partner“ bzw. in den Einstellungen. Er gilt 24 Stunden und nur einmal. Danach bestätigt der Kunde die Verbindung in seiner App.</div>' +
     '<label class="pk-feld">Code<input type="text" id="pk-c-code" maxlength="12" placeholder="XXXX-XXXX" style="text-transform:uppercase;font-family:&quot;JetBrains Mono&quot;,monospace;letter-spacing:.1em"></label>' +
     '<label class="pk-feld">Name des Kunden (für deine Liste)<input type="text" id="pk-c-name" maxlength="120"></label>' +
@@ -911,14 +1138,16 @@
     var name = wert(d, '#pk-e-name'), mail = wert(d, '#pk-e-mail');
     if (!String(name).trim() || !/@/.test(String(mail))) { toast('Bitte Name und E-Mail eintragen.'); return false; }
     var art = (d.querySelector('input[name="pk-e-art"]:checked') || {}).value;
-    return api('/partner/einladen', { method: 'POST', body: { name: name, email: mail, platz_mitgeben: art !== 'eigen', vorschlag: vorschlagLesen(d, 'e') } }).then(function () { toast('Einladung gesendet.'); return neuLaden(el); });
+    return api('/partner/einladen', { method: 'POST', body: { name: name, email: mail, platz_mitgeben: art !== 'eigen', vorschlag: vorschlagLesen(d, 'e'),
+      objekt_ids: [].filter.call(d.querySelectorAll('input[name="pk-e-obj"]'), function (x) { return x.checked; }).map(function (x) { return x.value; }) } })   /* v3830 F */
+      .then(function (r) { toast('Einladung gesendet.' + (r && r.objekte_vorgemerkt ? ' ' + r.objekte_vorgemerkt + (r.objekte_vorgemerkt === 1 ? ' Objekt wird' : ' Objekte werden') + ' zugeordnet, sobald der Kunde bestätigt.' : '')); return neuLaden(el); });
   }
   function codeSenden(d, el) {
     return api('/partner/code', { method: 'POST', body: { code: wert(d, '#pk-c-code'), name: wert(d, '#pk-c-name'), platz_mitgeben: wert(d, '#pk-c-platz'), vorschlag: vorschlagLesen(d, 'c') } })
       .then(function () { toast('Anfrage gesendet. Der Kunde bestätigt sie in seiner App.'); return neuLaden(el); });
   }
   function einladenDialog(el) {
-    dialog('Kunden einladen', EINLADEN_HTML, [{ t: 'Abbrechen' }, { t: 'Einladen', c: 'gold', fn: function (d) { return einladenSenden(d, el); } }]);
+    einObjBinden(dialog('Kunden einladen', EINLADEN_HTML, [{ t: 'Abbrechen' }, { t: 'Einladen', c: 'gold', fn: function (d) { return einladenSenden(d, el); } }]));
   }
   function codeDialog(el) {
     dialog('Verbindungscode eingeben', CODE_HTML, [{ t: 'Abbrechen' }, { t: 'Anfrage senden', c: 'gold', fn: function (d) { return codeSenden(d, el); } }]);
@@ -1134,11 +1363,16 @@
     var reiter = [kundeReiter(k), steuerReiter()];   /* v3700 · Reiter Steuer */
     if (platz) {
       reiter = reiter.concat(freigabeReiter(k, S.partner.partner.name, false));
-      reiter.push({ kurz: 'Platz', titel: 'Partnerplatz entziehen', html: '<section class="rnd-hub-karte"><h3 class="rnd-hub-h">Platz</h3><p class="rnd-hub-hinweis"><strong>Platz entziehen:</strong> der Kunde bekommt 30 Tage Frist zum Export oder für ein eigenes Abo. Danach werden seine Verbindungen getrennt und sein Konto gelöscht.</p>' +
-        '<div><button type="button" class="pk-btn rot" data-hub-entzug style="border:1px solid #B8625C;background:#B8625C;color:#fff;border-radius:7px;padding:8px 14px;font:600 13px Inter,sans-serif;cursor:pointer">Platz entziehen …</button></div></section>' });
+      reiter.push({ kurz: 'Platz', titel: 'Platz entziehen oder Kunde entfernen', html: '<section class="rnd-hub-karte"><h3 class="rnd-hub-h">Platz</h3><p class="rnd-hub-hinweis"><strong>Platz entziehen:</strong> der Kunde bekommt 30 Tage Frist zum Export oder für ein eigenes Abo. Danach werden seine Verbindungen getrennt und sein Konto gelöscht.</p>' +
+        (k.entzug_frist_bis ? '<p class="rnd-hub-hinweis">Der Platz ist schon entzogen, die Frist läuft bis ' + datum(k.entzug_frist_bis) + '.</p>' : '<div><button type="button" class="pk-btn rot" data-hub-entzug style="border:1px solid #B8625C;background:#B8625C;color:#fff;border-radius:7px;padding:8px 14px;font:600 13px Inter,sans-serif;cursor:pointer">Platz entziehen …</button></div>') + '</section>' + ENTFERNEN_KARTE });
     } else {
       reiter.push({ kurz: 'Freigaben', titel: 'Stufe, Rechte und Marke', html: '<section class="rnd-hub-karte"><h3 class="rnd-hub-h">Eigener Plan</h3><p class="rnd-hub-hinweis">Der Kunde bezahlt selbst. Stufe, Rechte und Marke bestimmt er in seiner App unter Mein Partner › Freigaben. Du siehst nur, was er dir sendet.</p></section>' });
+      reiter.push({ kurz: 'Entfernen', titel: 'Kunde entfernen', html: ENTFERNEN_KARTE });
     }
+    /* v3830 F · Objekte diesem Kunden zuordnen */
+    reiter.splice(1, 0, { kurz: 'Objekte', titel: 'Deine Objekte für diesen Kunden', html: '<section class="rnd-hub-karte"><h3 class="rnd-hub-h">Zugeordnete Objekte</h3><p class="rnd-hub-hinweis">' +
+      (k.objekte_zugeordnet ? k.objekte_zugeordnet + (k.objekte_zugeordnet === 1 ? ' Objekt ist' : ' Objekte sind') + ' diesem Kunden zugeordnet.' : 'Noch kein Objekt zugeordnet.') +
+      ' Zuordnen geht auch ohne Übergabe. In deiner Objektliste sortierst und filterst du nach Kunde.</p><div><button type="button" class="pk-btn" data-hub-objekte>Objekte zuordnen …</button></div></section>' });
     var box = hubAufbauen({ id: 'dppk-hub-kunde', titel: (platz ? 'Stufe und Rechte · ' : 'Kunde · ') + (k.kundennummer ? k.kundennummer + ' · ' : '') + k.display_name, sub: platz ? 'Partnerplatz' : 'Eigener Plan', reiter: reiter,
       knoepfe: [{ t: 'Speichern', pri: true, fn: function (b) {
         var body = { kundennummer: wert(b, '#pk-k-nr'), notiz: wert(b, '#pk-k-notiz'), mail_rueckmeldung: chipWert(b, 'pk-k-mailrm') !== 'aus' };
@@ -1150,11 +1384,15 @@
         return api('/partner/kunden/' + id, { method: 'PUT', body: body }).then(function () { toast('Gespeichert.'); neuLaden(el); });
       } }] });
     var ez = box.querySelector('[data-hub-entzug]'); if (ez) ez.onclick = function () { box._zu(); entzugDialog(el, k); };
+    var ef = box.querySelector('[data-hub-entfernen]'); if (ef) ef.onclick = function () { entfernenDialog(el, k); };   /* v3830 E · Fenster bleibt darunter, schliesst nach Erfolg */
+    var ob = box.querySelector('[data-hub-objekte]'); if (ob) ob.onclick = function () { objekteZuordnenDialog(el, k); };   /* v3830 F */
     steuerReiterLaden(box, k);   /* v3700 */
     return box;
   }
   /* v3460 · Zeilen fuer den Pruefer: der Schalter steht in beiden Zugangsarten im Reiter Kunde (kundeReiter), gespeichert als mail_rueckmeldung */
 
+  var ENTFERNEN_KARTE = '<section class="rnd-hub-karte"><h3 class="rnd-hub-h">Kunde entfernen</h3><p class="rnd-hub-hinweis"><strong>Entfernen</strong> löscht die Verbindung und alles, was bei dir zu diesem Kunden liegt: Kundenstände, Anmerkungen, Aufgaben-Stand, Meldungen, Übergaben, Zuordnungen, Kundennummer und Notiz. Das Konto des Kunden bleibt, auf einem Partnerplatz läuft vorher die Frist von 30 Tagen.</p>' +
+    '<div><button type="button" class="pk-btn rot" data-hub-entfernen style="border:1px solid #B8625C;background:#fff;color:#B8625C;border-radius:7px;padding:8px 14px;font:600 13px Inter,sans-serif;cursor:pointer">Kunde entfernen …</button></div></section>';
   function entzugDialog(el, k) {
     dialog('Platz entziehen', '<div class="pk-hinweis rot"><b>' + esc(k.display_name) + '</b> verliert den Partnerplatz. Der Platz ist für dich sofort wieder frei.<br>' +
       'Der Kunde bekommt 30 Tage Frist. In der Zeit kann er seine Daten exportieren oder ein eigenes Abo abschließen, dann bleibt alles erhalten.<br>' +
@@ -1194,9 +1432,11 @@
               (x.anm_entwurf ? '<span class="pk-chip grau">' + x.anm_entwurf + ' Entwurf' + (x.anm_entwurf === 1 ? '' : 'e') + '</span>' : '') +
               (x.uebernommen_id ? '<span class="pk-chip grau" title="Schon als eigenes Objekt übernommen">übernommen als ' + esc(x.uebernommen_seq || 'Objekt') + '</span>' : '') +
               '<button type="button" class="pk-btn klein gold" data-laden="' + x.kopie_object_id + '" data-s="' + x.share_id + '">Ansehen</button>' +
-              '<button type="button" class="pk-btn klein" data-ueb="' + x.share_id + '">' + (x.uebernommen_id ? 'Erneut übernehmen' : 'Als eigenes Objekt übernehmen') + '</button></div>';
+              '<button type="button" class="pk-btn klein" data-ueb="' + x.share_id + '" title="Legt eine bearbeitbare Kopie in deiner Objektliste an. Vorgabe: als Kundenobjekt, ohne Wirkung auf deine eigene Steuer und dein Portfolio.">' + (x.uebernommen_id ? 'Erneut übernehmen …' : 'Übernehmen …') + '</button></div>';
           }).join('') + '</div>';
       }).join('');
+      /* v3830 D · vorher stand nirgends, was Uebernehmen tut */
+      h = '<div class="pk-hinweis">Ansehen zeigt den Stand des Kunden nur lesend. Übernehmen legt eine bearbeitbare Kopie in deiner Objektliste an. Vorgabe ist das Kundenobjekt: es gehört steuerlich dem Kunden und zählt nicht zu deiner eigenen Steuer und deinem Portfolio. Nur wenn du es ausdrücklich in deinen eigenen Bestand nimmst, wird es dein Objekt.</div>' + h;
       el.innerHTML = h;
       [].forEach.call(el.querySelectorAll('[data-f]'), function (b) { b.onclick = function () { PK.filter = b.getAttribute('data-f') || null; staendeZeichnen(el); }; });
       [].forEach.call(el.querySelectorAll('[data-laden]'), function (b) {
@@ -1222,8 +1462,9 @@
   /* v3700 · P2 · Marcel 18.11.2026: Übernehmen fragt, wofür. Für den Kunden weiterführen (Kanzlei) oder in den eigenen
      Bestand (Makler kauft). Halter im eigenen Bestand wählt der Partner, Vorgabe Privat. */
   var ZIEL_TEXT = {
-    kunde: ['Für den Kunden weiterführen', 'Das Objekt rechnet weiter mit dem Steuerprofil des Kunden. Sein Halter steht nur lesend da, sein Deal-Status bleibt. Es zählt nicht zu deinem Bestand und nicht zu deiner Verlustverrechnung. Ein neuer Stand des Kunden aktualisiert Objekt und Steuerprofil.'],
-    eigen: ['In meinen eigenen Bestand', 'Das Objekt rechnet mit deinen eigenen Steuerdaten. Den Halter wählst du, der Deal-Status beginnt offen. Gewonnen zählt es zu deinem Bestand und zu deiner Verlustverrechnung.']
+    /* v3830 D · Marcel 19.11.2026: ein Kundenobjekt gehoert steuerlich dem Kunden. Vorgabe 'kunde', der Satz sagt, wo es NICHT mitzaehlt. */
+    kunde: ['Für den Kunden weiterführen (Vorgabe)', 'Das Objekt steht als Kundenobjekt in deiner Objektliste und rechnet weiter mit dem Steuerprofil des Kunden. Es zählt nicht zu deiner eigenen Steuer, also weder im Steuer-Reiter noch in Steuer-Mappe und Anlage V, und nicht zu deinem Bestand und deinen Portfolio-Kennzahlen. Sein Halter steht nur lesend da, sein Deal-Status bleibt. Ein neuer Stand des Kunden aktualisiert Objekt und Steuerprofil.'],
+    eigen: ['In meinen eigenen Bestand', 'Das Objekt wird dein eigenes und rechnet mit deinen eigenen Steuerdaten. Den Halter wählst du, der Deal-Status beginnt offen. Gewonnen zählt es zu deinem Bestand, deiner Steuer und deinen Portfolio-Kennzahlen.']
   };
   function zielHtml(vorwahl) {
     var ml = []; try { ml = (window.DealPilotMandanten && DealPilotMandanten.getList) ? DealPilotMandanten.getList() : []; } catch (e) { ml = []; }
@@ -1258,27 +1499,56 @@
         [{ t: 'Abbrechen' }, { t: 'Neue Kopie', fn: function () { return los('neu'); } }, { t: 'Bestehendes aktualisieren', c: 'gold', fn: function () { return los('aktualisieren'); } }]);
       zielVerdrahten(dlg); return dlg;
     }
-    dlg = dialog('Kundenstand übernehmen', '<p>DealPilot legt eine bearbeitbare Kopie unter deinen Objekten an. Sie trägt den Kunden <b>' + esc(kunde) + '</b>, in der Objektliste kannst du nach Kunde sortieren und filtern. Sie bleibt bei dir, auch wenn der Kunde seinen Stand zurückzieht.</p>' + zielHtml('kunde'),
+    dlg = dialog('Kundenstand übernehmen', '<p>DealPilot legt eine bearbeitbare Kopie in deiner Objektliste an, gekennzeichnet als <b>Kundenobjekt von ' + esc(kunde) + '</b>. In der Objektliste kannst du nach Kunde sortieren und filtern. Die Kopie bleibt bei dir, auch wenn der Kunde seinen Stand zurückzieht. Wähle, wofür:</p>' + zielHtml('kunde'),
       [{ t: 'Abbrechen' }, { t: 'Übernehmen', c: 'gold', fn: function () { return los('aktualisieren'); } }]);
     zielVerdrahten(dlg); return dlg;
   }
 
   var AUFG_STATUS = { offen: ['offen', 'grau'], gesehen: ['gesehen', 'grau'], in_arbeit: ['in Arbeit', ''], erledigt: ['erledigt', 'gruen'], abgelehnt: ['abgelehnt', 'rot'], widerrufen: ['Freigabe widerrufen', 'rot'] };   /* v3690 */
+  /* v3830 C · Aufgaben sortierbar (Datum, Faelligkeit, Kunde, Status), abgeschlossene loeschbar, Frist steht dabei */
+  var AUFG_SORT = [['datum', 'Neueste zuerst'], ['faellig', 'Fälligkeit'], ['kunde', 'Kunde'], ['status', 'Status']];
+  function aufgabenSortieren(l, art) {
+    function offen(a) { return a.kunden.filter(function (k) { return k.status !== 'erledigt' && k.status !== 'abgelehnt' && k.status !== 'widerrufen'; }).length; }
+    function kunde(a) { var k = a.kunden.map(function (x) { return (x.kundennummer ? x.kundennummer + ' ' : '') + (x.display_name || ''); }).sort(function (p, q) { return p.localeCompare(q, 'de', { numeric: true }); }); return k[0] || '\uffff'; }
+    var c = l.slice();
+    c.sort(function (a, b) {
+      if (art === 'faellig') { var fa = a.faellig_am ? String(a.faellig_am).slice(0, 10) : '9999', fb = b.faellig_am ? String(b.faellig_am).slice(0, 10) : '9999'; if (fa !== fb) return fa < fb ? -1 : 1; }
+      else if (art === 'kunde') { var r = kunde(a).localeCompare(kunde(b), 'de', { numeric: true, sensitivity: 'base' }); if (r) return r; }
+      else if (art === 'status') { var sa = a.status === 'abgeschlossen' ? 2 : (offen(a) ? 0 : 1), sb = b.status === 'abgeschlossen' ? 2 : (offen(b) ? 0 : 1); if (sa !== sb) return sa - sb; }
+      return String(b.erstellt_am || '').localeCompare(String(a.erstellt_am || ''));
+    });
+    return c;
+  }
   function aufgabenZeichnen(el) {
     api('/partner/aufgaben').then(function (r) {
-      var l = r.aufgaben || [];
-      var h = '<div class="pk-leiste"><button type="button" class="pk-btn gold" data-a="neu">Neue Aufgabe</button></div>';
+      var roh = r.aufgaben || [], art = PK.aufgSort || 'datum';
+      var frist = ((S.partner && S.partner.loeschfristen) || []).filter(function (x) { return /^Aufgaben, abgeschlossen/.test(x.was); })[0];
+      var l = aufgabenSortieren(roh, art);
+      var h = '<div class="pk-werkzeug"><button type="button" class="pk-btn gold" data-a="neu">Neue Aufgabe</button><span class="pk-luecke"></span>' +
+        (roh.length > 1 ? '<label class="pk-betreuer">Sortieren<select data-aufg-sort>' + AUFG_SORT.map(function (x) { return '<option value="' + x[0] + '"' + (x[0] === art ? ' selected' : '') + '>' + x[1] + '</option>'; }).join('') + '</select></label>' : '') + '</div>';
       if (!l.length) h += '<div class="pk-leer">Noch keine Aufgaben. Zum Beispiel: „Steuerjahr fertigstellen und senden“ an alle Kunden.</div>';
       h += l.map(function (a) {
         var fertig = a.kunden.filter(function (k) { return k.status === 'erledigt'; }).length;
-        return '<div class="pk-zeile" style="display:block"><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><div class="pk-name"><b>' + esc(a.titel) + '</b><small>' + (a.faellig_am ? 'fällig ' + datum(a.faellig_am) + ' · ' : '') + fertig + ' von ' + a.kunden.length + ' erledigt' + (a.status === 'abgeschlossen' ? ' · abgeschlossen' : '') + '</small></div>' +
-          (a.status === 'aktiv' ? '<button type="button" class="pk-btn klein" data-er="' + a.id + '">Alle Offenen erinnern</button><button type="button" class="pk-btn klein" data-ab="' + a.id + '">Abschließen</button>' : '') + '</div>' +
+        var zu = a.status === 'abgeschlossen';
+        return '<div class="pk-zeile" style="display:block"><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><div class="pk-name"><b>' + esc(a.titel) + '</b><small>' + 'erstellt ' + datum(a.erstellt_am) + ' · ' + (a.faellig_am ? 'fällig ' + datum(a.faellig_am) + ' · ' : '') + fertig + ' von ' + a.kunden.length + ' erledigt' +
+          (zu ? ' · abgeschlossen' + (a.abgeschlossen_am ? ' am ' + datum(a.abgeschlossen_am) : '') : '') + '</small></div>' +
+          (a.status === 'aktiv' ? '<button type="button" class="pk-btn klein" data-er="' + a.id + '">Alle Offenen erinnern</button><button type="button" class="pk-btn klein" data-ab="' + a.id + '">Abschließen</button>' : '') +
+          (zu ? '<button type="button" class="pk-btn klein rot" data-aufg-weg="' + a.id + '">Löschen</button>' : '') + '</div>' +
           '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px">' + a.kunden.map(function (k) { var s = AUFG_STATUS[k.status] || [k.status, 'grau']; return '<span class="pk-chip ' + s[1] + '" title="' + esc(k.abgelehnt_grund || '') + '">' + esc((k.kundennummer ? k.kundennummer + ' ' : '') + k.display_name) + ': ' + s[0] + '</span>'; }).join('') + '</div></div>';
       }).join('');
+      if (roh.some(function (a) { return a.status === 'abgeschlossen'; }) && frist) h += '<div class="pk-klein">Abgeschlossene Aufgaben: ' + esc(frist.wann) + '. Alle Löschfristen stehen unter Verwaltung › Löschfristen.</div>';
       el.innerHTML = h;
       el.querySelector('[data-a="neu"]').onclick = function () { aufgabeDialog(el); };
+      var so = el.querySelector('[data-aufg-sort]'); if (so) so.onchange = function () { PK.aufgSort = so.value; aufgabenZeichnen(el); };
       [].forEach.call(el.querySelectorAll('[data-er]'), function (b) { b.onclick = function () { api('/partner/aufgaben/' + b.getAttribute('data-er') + '/erinnern', { method: 'POST', body: {} }).then(function (r) { toast(r.erinnert ? r.erinnert + ' Kunden erinnert.' : 'Heute schon erinnert.'); }); }; });
       [].forEach.call(el.querySelectorAll('[data-ab]'), function (b) { b.onclick = function () { api('/partner/aufgaben/' + b.getAttribute('data-ab') + '/abschliessen', { method: 'POST' }).then(function () { aufgabenZeichnen(el); }); }; });
+      [].forEach.call(el.querySelectorAll('[data-aufg-weg]'), function (b) {
+        b.onclick = function () {
+          var a = roh.filter(function (x) { return x.id === b.getAttribute('data-aufg-weg'); })[0] || {};
+          dialog('Aufgabe löschen', '<p>„' + esc(a.titel || '') + '“ wird mit dem Stand je Kunde gelöscht. Bei den Kunden verschwindet sie ebenfalls.</p>',
+            [{ t: 'Abbrechen' }, { t: 'Löschen', c: 'rot', fn: function () { return api('/partner/aufgaben/' + a.id, { method: 'DELETE' }).then(function () { toast('Aufgabe gelöscht.'); aufgabenZeichnen(el); }); } }]);
+        };
+      });
     });
   }
   function aufgabeDialog(el) {
@@ -1300,14 +1570,39 @@
       } }]).querySelector('#pk-a-alle').onchange = function (e) { [].forEach.call(document.querySelectorAll('#dppk-dlg [data-kunde]'), function (x) { x.checked = e.target.checked; }); };
   }
 
+  /* v3830 B · Meldungen: sortieren (neu/alt), filtern (alle, ungelesen, gelesen, Kunde), Seiten zu 25, einzeln loeschen,
+     alle gelesenen loeschen. Beim Oeffnen werden die angezeigten wie bisher als gelesen markiert. */
   function meldungenZeichnen(el, neu) {
-    api('/partner/meldungen').then(function (r) {
+    var o = PK.meld || (PK.meld = { sort: 'neu', filter: 'alle', kunde: '', seite: 1 });
+    var q = '?sort=' + o.sort + '&filter=' + o.filter + '&seite=' + o.seite + '&je=25' + (o.kunde ? '&kunde=' + encodeURIComponent(o.kunde) : '');
+    api('/partner/meldungen' + q).then(function (r) {
       var l = r.meldungen || [];
-      el.innerHTML = l.length ? l.map(function (m) {
-        return '<div class="pk-zeile"><div class="pk-name"><b>' + esc(m.text || m.art) + '</b><small>' + (m.kunde_nr ? esc(m.kunde_nr) + ' · ' : '') + new Date(m.erstellt_am).toLocaleString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) + '</small></div>' + (m.gelesen_am ? '' : '<span class="pk-chip gruen">neu</span>') + '</div>';
-      }).join('') : '<div class="pk-leer">Keine Meldungen.</div>';
+      if (o.seite > 1 && !l.length && r.gesamt) { o.seite = r.seiten || 1; return meldungenZeichnen(el, neu); }
+      var kunden = ((S.partner && S.partner.kunden) || []).slice().sort(function (a, b) { return String(a.display_name).localeCompare(String(b.display_name), 'de'); });
+      var frist = ((S.partner && S.partner.loeschfristen) || []).filter(function (x) { return /^Meldungen, gelesen/.test(x.was); })[0];
+      var h = '<div class="pk-werkzeug">' +
+        '<label class="pk-betreuer">Sortieren<select data-m="sort"><option value="neu"' + (o.sort === 'neu' ? ' selected' : '') + '>Neueste zuerst</option><option value="alt"' + (o.sort === 'alt' ? ' selected' : '') + '>Älteste zuerst</option></select></label>' +
+        '<label class="pk-betreuer">Zeigen<select data-m="filter"><option value="alle"' + (o.filter === 'alle' ? ' selected' : '') + '>Alle</option><option value="ungelesen"' + (o.filter === 'ungelesen' ? ' selected' : '') + '>Ungelesen</option><option value="gelesen"' + (o.filter === 'gelesen' ? ' selected' : '') + '>Gelesen</option></select></label>' +
+        (kunden.length ? '<label class="pk-betreuer">Kunde<select data-m="kunde"><option value="">Alle Kunden</option>' + kunden.map(function (k) { return '<option value="' + esc(k.id) + '"' + (o.kunde === k.id ? ' selected' : '') + '>' + esc((k.kundennummer ? k.kundennummer + ' · ' : '') + k.display_name) + '</option>'; }).join('') + '</select></label>' : '') +
+        '<span class="pk-luecke"></span>' +
+        (r.gelesen ? '<button type="button" class="pk-btn klein rot" data-m-gelesene>Alle gelesenen löschen (' + r.gelesen + ')</button>' : '') + '</div>';
+      h += l.length ? l.map(function (m) {
+        return '<div class="pk-zeile"><div class="pk-name"><b>' + esc(m.text || m.art) + '</b><small>' + (m.kunde_nr ? esc(m.kunde_nr) + ' · ' : '') + new Date(m.erstellt_am).toLocaleString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) + '</small></div>' +
+          (m.gelesen_am ? '' : '<span class="pk-chip gruen">neu</span>') + '<button type="button" class="pk-x" data-m-weg="' + esc(m.id) + '" title="Meldung löschen" aria-label="Meldung löschen">×</button></div>';
+      }).join('') : '<div class="pk-leer">' + (o.filter !== 'alle' || o.kunde ? 'Keine Meldungen für diese Auswahl.' : 'Keine Meldungen.') + '</div>';
+      if ((r.seiten || 1) > 1) h += '<div class="pk-seiten"><button type="button" class="pk-btn klein" data-m-seite="' + (o.seite - 1) + '"' + (o.seite <= 1 ? ' disabled' : '') + '>‹ Zurück</button><span>Seite ' + o.seite + ' von ' + r.seiten + ' · ' + r.gesamt + ' Meldungen</span><button type="button" class="pk-btn klein" data-m-seite="' + (o.seite + 1) + '"' + (o.seite >= r.seiten ? ' disabled' : '') + '>Weiter ›</button></div>';
+      if (frist) h += '<div class="pk-klein">' + esc(frist.was) + ': ' + esc(frist.wann) + '. Alle Löschfristen stehen unter Verwaltung › Löschfristen.</div>';
+      el.innerHTML = h;
+      [].forEach.call(el.querySelectorAll('[data-m]'), function (s) { s.onchange = function () { o[s.getAttribute('data-m')] = s.value; o.seite = 1; meldungenZeichnen(el); }; });
+      [].forEach.call(el.querySelectorAll('[data-m-seite]'), function (b) { b.onclick = function () { o.seite = Math.max(1, +b.getAttribute('data-m-seite')); meldungenZeichnen(el); }; });
+      [].forEach.call(el.querySelectorAll('[data-m-weg]'), function (b) { b.onclick = function () { b.disabled = true; api('/partner/meldungen/' + b.getAttribute('data-m-weg'), { method: 'DELETE' }).then(function () { meldungenZeichnen(el); }, function (e) { b.disabled = false; toast(fehlerText(e)); }); }; });
+      var gl = el.querySelector('[data-m-gelesene]');
+      if (gl) gl.onclick = function () {
+        dialog('Gelesene Meldungen löschen', '<p>' + r.gelesen + (r.gelesen === 1 ? ' gelesene Meldung wird' : ' gelesene Meldungen werden') + ' endgültig gelöscht, auch die auf anderen Seiten und für andere Kunden.</p>',
+          [{ t: 'Abbrechen' }, { t: 'Löschen', c: 'rot', fn: function () { return api('/partner/meldungen/gelesene-loeschen', { method: 'POST' }).then(function (x) { toast((x.geloescht || 0) + ' Meldungen gelöscht.'); o.seite = 1; meldungenZeichnen(el); }); } }]);
+      };
       if (l.some(function (m) { return !m.gelesen_am; })) api('/partner/meldungen/gelesen', { method: 'POST' }).then(function () { if (S.partner) S.partner.meldungen_ungelesen = 0; menuePflegen(); }).catch(function () {});
-    });
+    }, function (e) { el.innerHTML = '<div class="pk-leer">' + esc(fehlerText(e)) + '</div>'; });
   }
 
   /* ════ MEIN PARTNER (Kunde) ═════════════════════════════════════════════ */
@@ -1693,7 +1988,8 @@
     var m = S.kunde; if (!m) return;
     var gesehen = {}; try { gesehen = JSON.parse(sessionStorage.getItem('dppk_band_zu') || '{}'); } catch (e) {}
     var text = null, knopf = null, schl = null;
-    if (m.anfragen && m.anfragen.length) { var a = m.anfragen[0]; schl = 'a' + a.id; text = '<b>' + esc(a.partner_name) + '</b> möchte sich mit dir verbinden.'; knopf = { t: 'Ansehen', fn: function () { anfrageDialog(a); } }; }
+    if (m.team_einladungen && m.team_einladungen.length) { var te = m.team_einladungen[0]; schl = 't' + te.id; text = '<b>' + esc(te.partner_name || 'Ein Partner') + '</b> lädt dich als Berater in sein Team ein.'; knopf = { t: 'Ansehen', fn: function () { teamEinladungDialog(te); } }; }   /* v3830 A */
+    else if (m.anfragen && m.anfragen.length) { var a = m.anfragen[0]; schl = 'a' + a.id; text = '<b>' + esc(a.partner_name) + '</b> möchte sich mit dir verbinden.'; knopf = { t: 'Ansehen', fn: function () { anfrageDialog(a); } }; }
     else if (m.verbunden && m.verbunden.entzug_frist_bis) { schl = 'f'; text = 'Dein Partnerplatz endet. Frist bis <b>' + datum(m.verbunden.entzug_frist_bis) + '</b>.'; knopf = { t: 'Was jetzt?', fn: function () { meinPartnerOeffnen('verbindung'); } }; }
     else if (m.aufgaben && m.aufgaben.some(function (x) { return x.status === 'offen'; })) { var x = m.aufgaben.filter(function (y) { return y.status === 'offen'; })[0]; schl = 'g' + x.id; text = 'Neue Aufgabe von <b>' + esc(m.verbunden.partner_name) + '</b>: ' + esc(x.titel); knopf = { t: 'Öffnen', fn: function () { meinPartnerOeffnen('aufgaben'); } }; }
     if (!text || gesehen[schl]) return;
@@ -1946,6 +2242,7 @@
     _gestartet = true;
     stil();
     api('/mein-partner').then(function (m) { S.kunde = m; menuePflegen(); rechteAnwenden(); bandPflegen(); partnerzeile(); zielEinloesen(m); }).catch(function () {});
+    teamTokenEinloesen();   /* v3830 A · Link aus der Team-Einladung (?dp_team=…) */
     api('/partner/cockpit').then(function (c) { S.partner = c; S.partnerGeladen = true; menuePflegen(); sbGruppe(); }).catch(function () { S.partner = null; S.partnerGeladen = true; menuePflegen(); });
     var n = 0, iv = setInterval(function () { var a = speichernSperren(), b = ladenBeobachten(); renderBeobachten(); if ((a || window.saveObj && window.saveObj._dppk) && (b || window.loadSaved && window.loadSaved._dppk) || ++n > 40) clearInterval(iv); }, 500);
     new MutationObserver(function () {
@@ -1961,6 +2258,8 @@
 
   window.DpPartnerKunden = { cockpitOeffnen: cockpitOeffnen, cockpitSchliessen: cockpitSchliessen, sendenDialog: sendenDialog, kundenstandVerlassen: kundenstandVerlassen, reiterWahl: function (k) { if (PK.offen && PK.art === 'partner') reiterWahl(k); else cockpitOeffnen(k); }, meinPartnerOeffnen: meinPartnerOeffnen, einladungFragen: einladungFragen, darf: darf, _state: S,
     /* v3700 · fuer Pruefer und Messkabine */
+    /* v3830 F · gegliederte, durchsuchbare Objektliste fuer reseller-portal.js (Uebergeben) */
+    objektListe: { html: objektListeHtml, binden: objektListeBinden, adresse: objektAdresse },
     _uebernehmenDialog: uebernehmenDialog, _kundeDialog: function (id) { return api('/partner/cockpit').then(function (c) { S.partner = c; return kundeDialog(null, id); }); } };
   window.DpMeinPartner = { einladungFragen: einladungFragen };
 })();

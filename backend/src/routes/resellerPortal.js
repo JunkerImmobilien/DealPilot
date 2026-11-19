@@ -76,14 +76,25 @@ async function seatPreisId(interval) {
 }
 
 router.use(authenticate);
-router.use(requireFeature('reseller'));
+/* v3830 A · eigener Partner-Plan ODER Berater im Team (partnerTeam.zugang statt nur requireFeature('reseller')) */
+const partnerTeam = require('../services/partnerTeam');
+router.use(partnerTeam.zugang());
 
 // Reseller-Kontext auto-provisionieren (erste Portal-Nutzung legt die Zeile an)
 router.use(async (req, res, next) => {
   try {
     req.reseller = await reseller.ensureReseller(req.user.id, { name: req.user.name });
+    req.partnerRolle = await partnerTeam.rolle(req.reseller, req.user.id);
     next();
   } catch (e) { next(e); }
+});
+/* v3830 A · Plaetze, Abrechnung, Marke und die alten Mandanten-Wege nur fuer den Inhaber. Berater lesen (GET) und
+   uebergeben eigene Objekte (/uebergaben). */
+const NUR_INHABER = [/^\/seats\//, /^\/plaetze$/, /^\/pool\/confirm$/, /^\/clients($|\/)/, /^\/invites\//, /^\/branding/];
+router.use((req, res, next) => {
+  if (req.method === 'GET' || req.partnerRolle === 'owner') return next();
+  if (NUR_INHABER.some((rx) => rx.test(req.path))) return res.status(403).json({ error: 'nur_inhaber', detail: 'Das darf nur der Inhaber des Partnerkontos.' });
+  next();
 });
 
 function appBase(req) {
@@ -322,7 +333,9 @@ router.post('/shares/:id/revoke', async (req, res, next) => {
 });
 
 router.post('/clients/:id/remove', async (req, res, next) => {
-  try { res.json(await reseller.deleteClient(req.reseller.id, req.params.id)); }
+  /* v3830 E · der alte Weg loeschte nur die Verbindung: Kopien standen danach ohne Kundenbezug in der Objektliste,
+     der Plan des Kunden fiel ungeprueft auf Free. Jetzt derselbe Weg wie „Kunde entfernen“ (alte Oberflaeche fragt selbst). */
+  try { res.json(await require('../services/partnerKunden').kundeEntfernen(req.reseller, req.user.id, req.params.id, { _ohneBestaetigung: true })); }
   catch (e) { next(e); }
 });
 

@@ -545,6 +545,9 @@ async function start() {
       const _runPk = require('./utils/taktSperre').takt('partnerFristen', async () => {
         try { const r = await _pk.fristenAbarbeiten({}); if (r.length) console.log('[partner-fristen]', JSON.stringify(r)); }
         catch (e) { console.error('[partner-fristen] Lauf-Fehler:', e.message); }
+        /* v3830 C · Loeschfristen im Partner-Cockpit (Meldungen, abgeschlossene Aufgaben, Verlauf der Uebergaben) */
+        try { const r2 = await require('./services/partnerTeam').aufraeumen({}); if (Object.values(r2).some((x) => x)) console.log('[partner-loeschfristen]', JSON.stringify(r2)); }
+        catch (e) { console.error('[partner-loeschfristen] Lauf-Fehler:', e.message); }
       });
       setTimeout(_runPk, 3 * 60 * 1000);
       setInterval(_runPk, _RET_INTERVAL_MS);

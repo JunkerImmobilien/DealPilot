@@ -481,6 +481,13 @@ if (!window._pdfGold) {
         return '<option value="' + esc(o.id) + '"' + (o.id === wahl ? ' selected' : '') + '>' + esc(t) + '</option>';
       }).join('');
       var inp = 'width:100%;padding:9px 11px;border:1px solid #e6e0d4;border-radius:8px;font:400 13px Inter;outline:none;box-sizing:border-box';
+      var OL = window.DpPartnerKunden && DpPartnerKunden.objektListe;
+      var kf = _st.uebKunde || '';
+      var kundenL = []; objs.forEach(function (o) { if (o.kunde_client_id && !kundenL.some(function (k) { return k.id === o.kunde_client_id; })) kundenL.push({ id: o.kunde_client_id, t: (o.kunde_nr ? o.kunde_nr + ' · ' : '') + (o.kunde_name || 'Kunde') }); });
+      if (kf && !kundenL.some(function (k) { return k.id === kf; })) kf = '';
+      var sichtbar = kf ? objs.filter(function (o) { return o.kunde_client_id === kf; }) : objs;
+      var kundenFilter = kundenL.length ? '<label style="display:flex;align-items:center;gap:8px;margin:0 0 8px;font:500 12px Inter;color:#6f685d">Nur Objekte von<select id="rp-ub-kunde" style="border:1px solid #e6e0d4;border-radius:8px;padding:6px 8px;font:500 12.5px Inter;max-width:260px"><option value="">allen Kunden und ohne Kunde</option>' +
+        kundenL.map(function (k) { return '<option value="' + esc(k.id) + '"' + (k.id === kf ? ' selected' : '') + '>' + esc(k.t) + '</option>'; }).join('') + '</select></label>' : '';
       var liste = (r.uebergaben || []).map(function (u) {
         var s = UEB_STATUS[u.status] || [String(u.status || '').toUpperCase(), ''];
         var zeit = u.status === 'uebernommen' ? 'übernommen ' + _uebDatum(u.uebernommen_at)
@@ -498,7 +505,11 @@ if (!window._pdfGold) {
         '<p class="rp-label">Objekt übergeben</p>' +
         (objs.length ? (
         '<div class="rp-panel" style="margin-top:0">' +
-          '<div class="rp-fl">Objekt</div><select id="rp-ub-obj" style="' + inp + ';margin-bottom:14px">' + opts + '</select>' +
+          /* v3830 F · Marcel 19.11.2026: die Auswahlliste war unuebersichtlich. Jetzt gegliedert nach Status (Ankauf, Bestand,
+             verloren) mit Anschrift, Art, Datum und Kunde, durchsuchbar, Filter nach zugeordnetem Kunden. Der gewaehlte Wert
+             steht weiter in #rp-ub-obj (uebSenden liest ihn). Ohne partner-kunden.js bleibt die alte Auswahl. */
+          (OL ? '<div class="rp-fl">Objekt</div>' + kundenFilter + '<input type="hidden" id="rp-ub-obj" value="' + esc(wahl) + '"><div id="rp-ub-objliste" style="margin-bottom:14px">' + OL.html(sichtbar, 'radio', 'rp-ub-objwahl', wahl) + '</div>'
+              : '<div class="rp-fl">Objekt</div><select id="rp-ub-obj" style="' + inp + ';margin-bottom:14px">' + opts + '</select>') +
           '<div class="rp-row" style="align-items:flex-start">' +
             '<div style="flex:1;min-width:200px"><div class="rp-fl">E-Mail des Kunden</div><input id="rp-ub-email" type="email" autocomplete="off" style="' + inp + '"></div>' +
             '<div style="flex:1;min-width:200px"><div class="rp-fl">Name (optional, für die Anrede)</div><input id="rp-ub-name" style="' + inp + '"></div>' +
@@ -514,6 +525,20 @@ if (!window._pdfGold) {
         '</div>') : '<p class="rp-ph">Noch keine eigenen Objekte. Leg zuerst ein Objekt an und rechne es durch.</p>') +
         '<p class="rp-label" style="margin-top:24px">Bisherige Übergaben' + (r.pool ? ' <span style="text-transform:none;letter-spacing:0;font:500 11.5px Inter;color:#6f685d;margin-left:8px">Plätze: ' + (r.pool.frei || 0) + ' frei · ' + (r.pool.reserviert || 0) + ' reserviert</span>' : '') + '</p>' + (liste || '<p class="rp-ph">Noch keine Übergaben.</p>');
       w.querySelectorAll('[data-uw]').forEach(function (b) { b.addEventListener('click', function () { uebWiderrufen(b.getAttribute('data-uw')); }); });
+      /* v3830 F · Liste: Wahl in #rp-ub-obj, Suche, Kundenfilter; ein zugeordneter Kunde fuellt die E-Mail vor */
+      var ol = $('rp-ub-objliste');
+      if (ol && OL) {
+        OL.binden(ol);
+        var vorbelegen = function (id) {
+          var o = objs.filter(function (x) { return x.id === id; })[0], em0 = $('rp-ub-email'), nm0 = $('rp-ub-name');
+          var st = window.DpPartnerKunden && DpPartnerKunden._state && DpPartnerKunden._state.partner;
+          var k = o && o.kunde_client_id && st && (st.kunden || []).filter(function (x) { return x.id === o.kunde_client_id && !x.getrennt_am; })[0];
+          if (k && em0 && !em0.value) { em0.value = k.email || ''; if (nm0 && !nm0.value) nm0.value = k.display_name || ''; try { uebVorpruefung(); } catch (e) {} }
+        };
+        ol.addEventListener('change', function (ev) { var t = ev.target; if (t && t.name === 'rp-ub-objwahl') { $('rp-ub-obj').value = t.value; _st.uebObj = t.value; vorbelegen(t.value); } });
+        if (!ol.querySelector('input[name="rp-ub-objwahl"]:checked')) { var r0 = ol.querySelector('input[name="rp-ub-objwahl"]'); if (r0) { r0.checked = true; $('rp-ub-obj').value = r0.value; } }
+      }
+      var kfs = $('rp-ub-kunde'); if (kfs) kfs.addEventListener('change', function () { _st.uebKunde = kfs.value; _st.uebObj = null; loadUebergaben(); });
       var em = $('rp-ub-email'); if (em) em.addEventListener('input', function () { clearTimeout(_uebVp); _uebVp = setTimeout(uebVorpruefung, 450); });
       var sb = $('rp-ub-send'); if (sb) sb.addEventListener('click', uebSenden);
       /* v3317b · kein Platz: Verweis auf den vorhandenen Platz-Kauf (Übersicht › Seats kaufen) */
@@ -987,7 +1012,13 @@ if (!window._pdfGold) {
             '<input type="checkbox" id="rp-b-wl"' + (b.whitelabel_enabled ? ' checked' : '') + ' style="width:18px;height:18px;accent-color:var(--wl-c9a84c, #C9A84C)">' +
             '<span>Eigene Marke statt DealPilot zeigen</span></label>' +
           '<div class="hint dp-verw-hint" style="margin:5px 0 0 28px">Einschalten siehst du sofort. Ausschalten wird mit Speichern wirksam, die App lädt dann einmal neu.</div>' +
-          '<div style="margin-top:14px;max-width:420px"><label class="dp-verw-lbl">Name der Marke oder Kanzlei</label><input type="text" id="rp-b-name" value="' + esc(b.brand_name || '') + '" style="' + inp + '"></div>' +
+          /* v3830 G · Marcel 19.11.2026: „Name der Marke“ war unverstaendlich. Gemessen, wo brand_name erscheint: Absendername und
+   Kopf der Mails an Kunden (resellerInviteMail.marke), Name statt „DealPilot“ in der App der Kunden, wenn kein Logo da
+   ist (mandant-branding.js replaceWordmark), Firmenzeile im PDF-Fuss, wenn keine Firma eingetragen ist
+   (mandant-branding.js branding.get), Fusszeile der Marktbericht-PDFs (mb-whitelabel.js), „Mein Partner“ und Einladungen beim Kunden. */
+'<div style="margin-top:14px;max-width:520px"><label class="dp-verw-lbl" for="rp-b-name">Name, den deine Kunden sehen</label><input type="text" id="rp-b-name" value="' + esc(b.brand_name || '') + '" placeholder="z. B. Kanzlei Muster" style="' + inp + '">' +
+  '<div class="hint dp-verw-hint" style="margin-top:6px">Mit eingeschalteter eigener Marke erscheint er als Absender und im Kopf der E-Mails an deine Kunden, in ihrer App statt „DealPilot“, solange kein Logo hinterlegt ist, unter „Mein Partner“ und in Einladungen, in der Fußzeile der Marktbericht-PDFs und im PDF-Fuß, wenn unten keine Firma eingetragen ist. Das Logo legst du im nächsten Bereich fest.</div>' +
+  '<div id="rp-b-name-vorschau" style="margin-top:10px;font:400 12px/1.5 Inter,sans-serif;color:#6b6558"></div></div>' +
         '</div>' +
         /* v3630i · gut auffindbar: zurueck auf DealPilot */
         '<div class="card dp-verw-karte" style="margin-top:12px;display:flex;flex-wrap:wrap;align-items:center;gap:12px">' +
@@ -1104,6 +1135,10 @@ if (!window._pdfGold) {
       var upd = function () { _brandPreview(); _logoPrev(); try { if (_previewOn()) _applyPreview(); } catch (e) {} };  /*W7-livepreview W22-logoprev*/
       $('rp-b-wl').addEventListener('change', upd);
       $('rp-b-name').addEventListener('input', upd);
+      /* v3830 G · Vorschau: so steht der Name beim Kunden */
+      var nv = function () { var v = (($('rp-b-name') || {}).value || '').trim(), box = $('rp-b-name-vorschau'); if (!box) return;
+        box.innerHTML = v ? 'Vorschau: E-Mail von <b>' + esc(v) + '</b> · Betreff „<b>' + esc(v) + '</b> lädt dich ein“' : 'Ohne Namen steht beim Kunden der Name deines Partnerkontos. Ohne eigene Marke steht dort DealPilot.'; };
+      $('rp-b-name').addEventListener('input', nv); nv();
       /* v3630b · Farben direkt hier, live in der App (vorher Fenster DealPilotBrandingEditor) */
       ['rp-b-accent', 'rp-b-obsidian', 'rp-b-mail'].forEach(function (id) {
         $(id).addEventListener('input', function () { _brandState.vari = null; _brandState.dvari = null; _standZeigen(); upd(); _pdfPrev(); });

@@ -413,7 +413,7 @@ async function uebernehmen(token, user) {
     let client = (await query('SELECT * FROM reseller_clients WHERE reseller_id = $1 AND user_id = $2', [z.reseller_id, user.id])).rows[0];
     let neuerMandant = false;
     if (!client) {
-      client = await reseller.createClient(z.reseller_id, { userId: user.id, displayName: z.anzeige_name || user.name || z.email });
+      client = await reseller.createClient(z.reseller_id, { userId: user.id, displayName: z.anzeige_name || user.name || z.email, beraterId: z.absender_user_id });   /* v3830 A · Kunde des uebergebenden Beraters */
       neuerMandant = true;
     }
     let seatAssigned = null;

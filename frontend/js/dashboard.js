@@ -83,7 +83,11 @@
     if(o.deal_lost || o._deal_lost) return 'lost';
     return 'pruef';
   }
-  function wonList(){ return _summaries.filter(function(o){ return stageOf(o)==='won'; }); }
+  /* v3830 D · Marcel 19.11.2026: ein Kundenobjekt gehoert steuerlich dem Kunden. „Fuer den Kunden weitergefuehrt“
+     (kunde_ziel 'kunde', partnerKunden.kundenstandUebernehmen) zaehlt nicht zu den Portfolio-Kennzahlen des Partners -
+     am Code nachgelesen 19.11.: der Deal-Status des Kunden (gewonnen) kommt beim Uebernehmen mit, das Objekt stand im Portfolio-Cockpit. Steuer
+     (tax-snapshots, taxService) schloss es schon aus (v3700). */
+  function wonList(){ return _summaries.filter(function(o){ return stageOf(o)==='won' && o.kunde_ziel!=='kunde'; }); }
 
   /* ── persistierter Einzel-Score aus Summary ── */
   function scoreOf(o){
@@ -772,6 +776,7 @@
     var host=$('dp-status-row'); if(!host) return;
     var pruef=0,won=0,lost=0, pVol=0,wVol=0,lVol=0;
     _summaries.forEach(function(o){
+      if(o.kunde_ziel==='kunde') return;   /* v3830 D · Kundenobjekt: nicht im eigenen Volumen */
       var s=stageOf(o), v=num(o.kaufpreis)/100;  /* v475: kaufpreis kommt aus der Liste in Cent */
       if(s==='won'){won++;wVol+=v;} else if(s==='lost'){lost++;lVol+=v;} else {pruef++;pVol+=v;}
     });

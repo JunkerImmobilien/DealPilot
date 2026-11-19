@@ -154,14 +154,17 @@ async function syncPoolQuantity(resellerId, gekaufteSeats, opts = {}) {
 }
 
 // ── Clients (Endkunden; Anzeige "Mandant") ──────────────────────
-async function createClient(resellerId, { userId, displayName }) {
+/* v3830 A · beraterId: der Teamberater, der den Kunden gewonnen hat (nur wenn er zum Team gehoert), sonst der Inhaber.
+   Eine bestehende Zuordnung bleibt. */
+async function createClient(resellerId, { userId, displayName, beraterId }) {
   const r = await query(
-    `INSERT INTO reseller_clients (reseller_id, user_id, display_name)
-     VALUES ($1, $2, $3)
+    `INSERT INTO reseller_clients (reseller_id, user_id, display_name, berater_id)
+     VALUES ($1, $2, $3, COALESCE((SELECT m.user_id FROM reseller_members m WHERE m.reseller_id = $1 AND m.user_id = $4::uuid),
+                                  (SELECT owner_user_id FROM resellers WHERE id = $1)))
      ON CONFLICT (reseller_id, user_id)
-       DO UPDATE SET display_name = EXCLUDED.display_name
+       DO UPDATE SET display_name = EXCLUDED.display_name, berater_id = COALESCE(reseller_clients.berater_id, EXCLUDED.berater_id)
      RETURNING *`,
-    [resellerId, userId, displayName]
+    [resellerId, userId, displayName, beraterId || null]
   );
   return r.rows[0];
 }
@@ -174,7 +177,7 @@ async function listClients(resellerId) {
                WHERE l.reseller_id = c.reseller_id AND l.client_id = c.id AND l.status = 'zugewiesen'
             ) THEN 'zugewiesen' ELSE NULL END AS seat_status
        FROM reseller_clients c
-      WHERE c.reseller_id = $1
+      WHERE c.reseller_id = $1 AND c.entfernt_am IS NULL   /* v3830 E */
       ORDER BY c.created_at DESC`,
     [resellerId]
   );
@@ -417,7 +420,16 @@ async function sharedObjectOwner(userId, objectId) {
     const s = await query(
       `SELECT status FROM object_shares WHERE object_id = $1 AND reseller_id = $2 LIMIT 1`,
       [objectId, rs.id]);
-    if (!s.rowCount) return null;
+    if (!s.rowCount) {
+      /* v3830 A · Berater im Team: der Kundenstand (Kopie) liegt beim Inhaber - lesen darf ihn jedes Teammitglied.
+         Geschrieben wird er nie (objectService.update: kundenstand_schreibgeschuetzt). */
+      const k = await query(
+        `SELECT o.user_id FROM objects o JOIN object_shares sh ON sh.id = o.kunden_freigabe_id
+          WHERE o.id = $1 AND sh.reseller_id = $2 AND sh.status <> 'widerrufen' AND o.user_id = $3
+            AND EXISTS (SELECT 1 FROM reseller_members m WHERE m.reseller_id = $2 AND m.user_id = $4)`,
+        [objectId, rs.id, rs.owner_user_id, userId]);
+      return k.rowCount ? k.rows[0].user_id : null;
+    }
     const st = s.rows[0].status;
     if (st === 'widerrufen' || st === 'zurueckgegeben') return null;
     const o = await query(`SELECT user_id FROM objects WHERE id = $1`, [objectId]);
@@ -504,7 +516,9 @@ async function acceptInvite(token, userId, freigabeRoh) {
   const fw = freigabeRoh != null ? F.freigabeSauber(freigabeRoh) : null;
 
   // Client anlegen (bzw. vorhandenen wiederverwenden)
-  const client = await createClient(invite.reseller_id, { userId: userId, displayName: invite.display_name });
+  const client = await createClient(invite.reseller_id, { userId: userId, displayName: invite.display_name, beraterId: invite.invited_by });   /* v3830 A */
+  try { await query(`UPDATE reseller_clients SET entfernt_am = NULL WHERE id = $1 AND entfernt_am IS NOT NULL`, [client.id]); } catch (e) {}   /* v3830 E */
+  if (invite.objekt_ids) { try { await require('./partnerKunden').objekteVormerkenAnwenden(invite.reseller_id, client.id, invite.invited_by, invite.objekt_ids); } catch (e) {} }   /* v3830 F */
 
   await query(
     `UPDATE reseller_invites SET status='accepted', accepted_at=now(), client_id=$2 WHERE id=$1`,

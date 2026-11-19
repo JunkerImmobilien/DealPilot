@@ -15,7 +15,8 @@ router.use(requireAdmin);
 router.get('/resellers', async (req, res) => {
   try {
     const r = await query(
-      `SELECT r.id, r.name, r.role, r.status, r.is_master, r.whitelabel_enabled,
+      `SELECT r.id, r.name, r.role, r.status, r.is_master, r.whitelabel_enabled, r.team_plaetze,   /* v3830 A */
+              (SELECT count(*)::int FROM reseller_members m WHERE m.reseller_id = r.id AND m.role = 'berater') AS team_berater,
               u.email AS owner_email,
               COUNT(l.id) FILTER (WHERE l.kind='client')                          AS pool_gekauft,
               COUNT(l.id) FILTER (WHERE l.kind='client' AND l.status='zugewiesen') AS pool_zugewiesen,
@@ -60,6 +61,17 @@ router.post('/resellers', async (req, res) => {
     }
     await planService.setUserPlanManual(user.id, 'partner', 'yearly', 365);
     res.json({ ok: true, reseller_id: resellerId });
+  } catch (e) { res.status(500).json({ error: 'server_error', message: e.message }); }
+});
+
+/* v3830 A · Mitgliedsplaetze (Team) je Partnerkonto, vorerst ohne Abrechnung: { anzahl } 0 bis 100 */
+router.post('/resellers/:id/team-plaetze', async (req, res) => {
+  try {
+    const n = parseInt(req.body && req.body.anzahl, 10);
+    if (!Number.isFinite(n) || n < 0 || n > 100) return res.status(400).json({ error: 'anzahl_ungueltig' });
+    const r = await query('UPDATE resellers SET team_plaetze = $2, updated_at = now() WHERE id = $1 RETURNING id, team_plaetze', [req.params.id, n]);
+    if (!r.rowCount) return res.status(404).json({ error: 'reseller_not_found' });
+    res.json({ ok: true, team_plaetze: r.rows[0].team_plaetze });
   } catch (e) { res.status(500).json({ error: 'server_error', message: e.message }); }
 });
 

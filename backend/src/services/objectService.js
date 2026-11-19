@@ -52,9 +52,12 @@ async function listForUser(userId, { limit = 100, offset = 0 } = {}) {
             data::jsonb->>'kaufdat' AS kaufdat,  -- v844-kaufdat: Kaufdatum auf Sidebar-Card
             data::jsonb->>'lageklasse' AS lageklasse,  -- v1982: Sortierung nach A/B/C-Lage
             -- v3640: vom Kunden uebernommen (partnerKunden.kundenstandUebernehmen) - Kundenhinweis, Sortierung und Filter nach Kunde
-            data::jsonb->'_von_kunde'->>'client_id' AS kunde_client_id,
-            data::jsonb->'_von_kunde'->>'kunde' AS kunde_name,
-            data::jsonb->'_von_kunde'->>'kundennummer' AS kunde_nr,
+            -- v3830 F: oder dem Kunden zugeordnet (partner_objekt_kunden, auch ohne Uebergabe) - gleiche Felder, damit Sortierung und Filter nach Kunde beides finden
+            COALESCE(data::jsonb->'_von_kunde'->>'client_id', (SELECT z.client_id::text FROM partner_objekt_kunden z WHERE z.object_id = objects.id)) AS kunde_client_id,
+            COALESCE(data::jsonb->'_von_kunde'->>'kunde', (SELECT c.display_name FROM partner_objekt_kunden z JOIN reseller_clients c ON c.id = z.client_id WHERE z.object_id = objects.id)) AS kunde_name,
+            COALESCE(data::jsonb->'_von_kunde'->>'kundennummer', (SELECT c.kundennummer FROM partner_objekt_kunden z JOIN reseller_clients c ON c.id = z.client_id WHERE z.object_id = objects.id)) AS kunde_nr,
+            (SELECT z.client_id::text FROM partner_objekt_kunden z WHERE z.object_id = objects.id) AS kunde_zuordnung,
+            data::jsonb->>'objart' AS objart,
             CASE WHEN data::jsonb ? '_von_kunde' THEN COALESCE(data::jsonb->'_von_kunde'->>'modus', 'kunde') END AS kunde_ziel,  -- v3700: kunde = fuer den Kunden weitergefuehrt, eigen = eigener Bestand
             -- v2030: Ankauf-Stand. NUR die Kurzfassung (neun Zahlen) und der
             -- Stichtag - der eingefrorene Datensatz bleibt im Blob. Ohne diese

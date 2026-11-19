@@ -2294,7 +2294,8 @@ async function renderSaved(opts) {
           dateUpdated: o.updated_at ? new Date(o.updated_at).toLocaleDateString('de-DE') : '',
           halter: [_halterName(o.halter), o.paket_name ? 'Paket ' + o.paket_name + (o.paket_nr ? ' · ' + o.paket_nr + '/' + (o.paket_anzahl || '?') : '') : '',
                    /* v3640 · dezenter Kundenhinweis auf der Karte, in der Halterzeile (alle Kartenvarianten stylen sie schon) */
-                   o.kunde_client_id ? 'Kunde ' + _sbKundeVon(o) : ''].filter(Boolean).join(' · ') || null   /* v3202 */
+                   /* v3830 D · fuer den Kunden weitergefuehrt: steuerlich des Kunden, zaehlt nicht zur eigenen Steuer und zum Portfolio */
+                   o.kunde_client_id ? (o.kunde_ziel === 'kunde' ? 'Kundenobjekt von ' : 'Kunde ') + _sbKundeVon(o) : ''].filter(Boolean).join(' · ') || null   /* v3202 */
         });
       }).join('');   /* v1512: der Knopf steht jetzt OBEN */
       try { var _kfx = list.querySelector('[data-sb-kunde-aus]'); if (_kfx) _kfx.onclick = function (e) { e.stopPropagation(); _sbKundeFilterSetzen(null); }; } catch (_e) {}
