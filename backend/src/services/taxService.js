@@ -9,6 +9,23 @@ function safeNumeric(v) {
   return n;
 }
 
+/* v3800 · weitere Angaben der Anlage V: nur av_*-Zahlen und die drei Auskuenfte, sonst nichts.
+   Leer -> NULL (Altbestand und Objekte ohne Angaben bleiben ununterscheidbar: beides „keine Angabe"). */
+function anlageV(o) {
+  if (!o || typeof o !== 'object') return null;
+  const out = {};
+  for (const [k, v] of Object.entries(o)) {
+    if (/^av_[a-z0-9_]{1,40}$/.test(k) || k === '_erhG' || k === '_zeUngeteilt') {
+      const n = safeNumeric(v); if (n !== null && n !== 0) out[k] = n;
+    } else if (k === '_erhV' && v && typeof v === 'object') {
+      const e = {};
+      for (const [j, b] of Object.entries(v)) { const n = safeNumeric(b); if (/^\d{4}$/.test(j) && n) e[j] = n; }
+      if (Object.keys(e).length) out._erhV = e;
+    }
+  }
+  return Object.keys(out).length ? JSON.stringify(out) : null;
+}
+
 /**
  * Upsert a tax record for a specific year of an object.
  */
@@ -29,13 +46,15 @@ async function upsert({ userId, objectId, year, data }) {
        -- v1258: die Aufteilung von afa. Ans ENDE gehaengt, damit die
        -- Nummerierung der 41 bestehenden Parameter unveraendert bleibt --
        -- eine verschobene Position waere lautlos falsch.
-       afa_linear, afa_sonder_7b
+       afa_linear, afa_sonder_7b,
+       -- v3800: weitere Angaben der Anlage V (jsonb), wieder ans Ende
+       anlage_v
      )
      VALUES (
        $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17,
        $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28, $29,
        $30, $31, $32, $33, $34, $35, $36, $37, $38, $39, $40, $41,
-       $42, $43
+       $42, $43, $44
      )
      ON CONFLICT (user_id, object_id, year) DO UPDATE SET
        base_income = EXCLUDED.base_income,
@@ -77,7 +96,8 @@ async function upsert({ userId, objectId, year, data }) {
        anschaffungsnah = EXCLUDED.anschaffungsnah,
        erhaltungsaufwand = EXCLUDED.erhaltungsaufwand,
        einnahmen_km = EXCLUDED.einnahmen_km,
-       einnahmen_nk = EXCLUDED.einnahmen_nk
+       einnahmen_nk = EXCLUDED.einnahmen_nk,
+       anlage_v = EXCLUDED.anlage_v
      RETURNING id, year, refund`,
     [
       userId, objectId, year,
@@ -126,7 +146,8 @@ async function upsert({ userId, objectId, year, data }) {
          ein `|| 0` daraus zu machen hiesse, fuer jeden alten Satz „kein
          Paragraf 7b" zu behaupten, ohne es zu wissen. */
       safeNumeric(data.afa_linear),
-      safeNumeric(data.afa_sonder_7b)
+      safeNumeric(data.afa_sonder_7b),
+      anlageV(data.anlage_v)
     ]
   );
   return r.rows[0];

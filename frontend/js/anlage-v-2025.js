@@ -49,13 +49,29 @@
    Wirtschaftsgüter steht in Zeile 45 (Kz 60) — Marcel hatte auf sie
    hingewiesen, die Nummer stand zwölf Zeilen tiefer als vermutet.
 
+   v3800 · ERWEITERT (Marcel 19.11.2026 nach dem Termin bei der Kanzlei:
+   alles, was die Anlage V abfragt, muss eingebbar sein). Neu abgeschrieben aus
+   demselben PDF (pdftotext -layout, 19.11.2026): Zeilen 16-18, 21-24, 30, 31
+   (Kz 08), 54, 56, 57, 84, 86, 89 und die Kennzahlen 04, 05, 11, 12, 13, 37,
+   50, 57, 59. Die Seitenkennungen lauten 2025AnlV101NET bis 2025AnlV104NET,
+   Stand „September 2025" (hier stand bis v3800 nur die Kennung von Seite 3).
+   Neu: `summen` - die Zeilen fuer Summe der Einnahmen, Summe der
+   Werbungskosten, Ueberschuss und Paragraf 7b. Bis v3800 standen „Zeile 32/38/83/85"
+   fest in drei Ansichten - das waeren fuer jedes andere Jahr alte Nummern.
+   Gelesen wird diese Datei nur noch ueber js/anlage-v-kern.js.
+
    ICH BIN KEIN STEUERBERATER. Die Abschriften sind Abschrift; alles andere
    ist gekennzeichnet, damit es geprüft werden kann statt geglaubt.
    ═══════════════════════════════════════════════════════════════════════════ */
 window.AnlageV2025 = {
   jahr: 2025,
-  formular: '2025AnlV103NET',
+  formular: '2025AnlV101NET–2025AnlV104NET',
   quelle: 'design/mockups/Anlage_V_2025.pdf',
+  stand: 'September 2025',
+
+  /* v3800 · Summenzeilen und Zeilen ohne eigenes DealPilot-Feld, je Jahr. */
+  summen: { einnahmen: 32, zuschuesse_ergebnis: 31, werbungskosten: 83, ueberschuss: 85, sonder7b: 38,
+            erh_verteilt_gesamt: 57, erh_verteilt_jahr: 60 },
 
   /* Die Struktur des Formulars, soweit fuer die Aufstellung gebraucht.
      `kz` ist die amtliche Kennzahl, wo das Formular eine ausweist. */
@@ -64,16 +80,20 @@ window.AnlageV2025 = {
     12: { text: 'Eigengenutzter oder unentgeltlich an Dritte überlassener Wohnraum (in m²)' },
     13: { text: 'Mieteinnahmen für Wohnungen (ohne Umlagen / ohne Umsatzsteuer)' },
     15: { text: 'Summe der Mieteinnahmen für Wohnungen', kz: '01' },
+    16: { text: 'Einnahmen für andere Räume (ohne Umlagen / ohne Umsatzsteuer) — Bezeichnung der Einheit, Nutzfläche' },
     18: { text: 'Summe der Einnahmen für andere Räume', kz: '02' },
-    19: { text: 'Einnahmen für an Angehörige vermietete Wohnungen', kz: '03' },
-    20: { text: 'Auf die Zeilen 15 und 18 entfallende laufende Neben- / Betriebskosten' },
-    21: { text: 'Erstattungen (negativer Betrag mit vorangestelltem Minuszeichen)' },
-    22: { text: 'Auf Zeile 19 entfallende laufende Neben- / Betriebskosten' },
+    19: { text: 'Einnahmen für an Angehörige vermietete Wohnungen (ohne Umlagen / ohne Umsatzsteuer)', kz: '03' },
+    20: { text: 'Auf die Zeilen 15 und 18 entfallende laufende Neben- / Betriebskosten', kz: '04' },
+    21: { text: 'Auf die Zeilen 15 und 18 entfallende und im Jahr 2025 erhaltene Nachzahlungen / geleistete Erstattungen (negativen Betrag mit vorangestelltem Minuszeichen eintragen)', kz: '11' },
+    22: { text: 'Auf Zeile 19 entfallende laufende Neben- / Betriebskosten', kz: '05' },
+    23: { text: 'Auf Zeile 19 entfallende und im Jahr 2025 erhaltene Nachzahlungen / geleistete Erstattungen (negativen Betrag mit vorangestelltem Minuszeichen eintragen)', kz: '12' },
+    24: { text: 'Neben- / Betriebskosten wurden nicht gesondert vereinbart (1 = Ja)', kz: '13' },
     25: { text: 'Vereinnahmte Mieten für frühere Jahre / verrechnete Mietkautionen / auf das Kalenderjahr entfallende Mietvorauszahlungen aus Baukostenzuschüssen', kz: '06' },
     26: { text: 'Einnahmen aus Vermietung von Garagen, Werbeflächen, Grund und Boden für Kioske usw.', kz: '07' },
     27: { text: 'Vereinnahmte Umsatzsteuer', kz: '09' },
     28: { text: 'Vom Finanzamt erstattete und ggf. verrechnete Umsatzsteuer', kz: '10' },
-    29: { text: 'Öffentliche Zuschüsse, Aufwendungszuschüsse, Guthabenzinsen aus Bausparverträgen und sonstige Einnahmen' },
+    29: { text: 'Öffentliche Zuschüsse nach dem Wohnraumförderungsgesetz oder zu Erhaltungsaufwendungen, Aufwendungszuschüsse, Guthabenzinsen aus Bausparverträgen und sonstige Einnahmen' },
+    30: { text: 'davon entfallen auf eigengenutzte oder unentgeltlich an Dritte überlassene Wohnungen laut Zeile 12' },
     31: { text: 'Ergebnis der Zeilen 29 und 30', kz: '08' },
     32: { text: 'Summe der Einnahmen aus den Zeilen 15, 18 bis 28 und 31' },
 
@@ -84,7 +104,9 @@ window.AnlageV2025 = {
     48: { text: 'Schuldzinsen (ohne Tilgungsbeträge) — abzugsfähige Werbungskosten', kz: '33' },
     51: { text: 'Geldbeschaffungskosten (z. B. Schätz-, Notar-, Grundbuchgebühren) — abzugsfähige Werbungskosten', kz: '34' },
     54: { text: 'Renten, dauernde Lasten — abzugsfähige Werbungskosten', kz: '35' },
-    55: { text: 'Voll abzuziehende Erhaltungsaufwendungen (einschließlich Entnahmen aus der Erhaltungsrücklage)', kz: '36' },
+    55: { text: '2025 voll abzuziehende Erhaltungsaufwendungen (einschließlich Entnahmen aus der Erhaltungsrücklage) — durch direkte Zuordnung ermittelt', kz: '36' },
+    56: { text: '2025 voll abzuziehende Erhaltungsaufwendungen — durch verhältnismäßige Zuordnung ermittelt', kz: '37' },
+    57: { text: 'Auf bis zu 5 Jahre zu verteilende Erhaltungsaufwendungen (§§ 11a, 11b EStG, § 82b EStDV) — Gesamtaufwand 2025', kz: '57' },
     60: { text: 'Auf mehrere Jahre verteilte Erhaltungsaufwendungen aus 2025 — abzugsfähige Werbungskosten', kz: '38' },
     63: { text: 'Verteilte Erhaltungsaufwendungen aus 2021 — abzugsfähige Werbungskosten', kz: '39' },
     66: { text: 'Verteilte Erhaltungsaufwendungen aus 2022 — abzugsfähige Werbungskosten', kz: '40' },
@@ -95,9 +117,12 @@ window.AnlageV2025 = {
     79: { text: 'Nur bei umsatzsteuerpflichtiger Vermietung: an das Finanzamt gezahlte und ggf. verrechnete Umsatzsteuer', kz: '58' },
     82: { text: 'Sonstige Kosten — abzugsfähige Werbungskosten', kz: '49' },
     83: { text: 'Summe der Werbungskosten (Summe der Zeilen 35, 38, 41, 45, 48, 51, 54, 55, 56, 60, 63, 66, 69, 72, 75, 78, 79 und 82)' },
+    84: { text: 'Nur bei umsatzsteuerpflichtiger Vermietung: in den Werbungskosten laut Zeile 83 enthaltene abziehbare Vorsteuerbeträge', kz: '59' },
     85: { text: 'Überschuss (Einnahmen laut Zeile 32 abzüglich Werbungskosten laut Zeile 83)' },
-    87: { text: 'Kürzung der Werbungskosten wegen verbilligter Vermietung (in %)' },
-    88: { text: 'Betragsmäßige Kürzung der Werbungskosten wegen verbilligter Vermietung eines Teils des Objekts', kz: '51' }
+    86: { text: 'Zurechnung des Betrags aus Zeile 85 — Steuerpflichtige Person / Ehemann / Person A, Ehefrau / Person B', kz: '20/21' },
+    87: { text: 'Kürzung der Werbungskosten wegen verbilligter Vermietung (in %)', kz: '50' },
+    88: { text: 'Betragsmäßige Kürzung der Werbungskosten wegen verbilligter Vermietung eines Teils des Objekts', kz: '51' },
+    89: { text: '2025 vereinnahmte oder bewilligte Zuschüsse aus öffentlichen Mitteln zu den Anschaffungs- / Herstellungskosten (laut gesonderter Aufstellung)' }
   },
 
 
@@ -156,23 +181,50 @@ window.AnlageV2025 = {
        Abnutzung fuer Wirtschaftsgueter, die keine Gebaeude sind (z. B.
        bewegliche Wirtschaftsgueter)". Der Sachverhalt stimmte, die Nummer
        nicht — genau dafuer ist die Abschrift da. */
-    sonst_bewegl_wg:  { zeile: 45, art: 'wk', quelle: 'formular' }
+    sonst_bewegl_wg:  { zeile: 45, art: 'wk', quelle: 'formular' },
+
+    /* v3800 · Die weiteren Angaben der Anlage V (Bedeutung in js/anlage-v-kern.js FELDER).
+       Abschrift: die Angabe ist genau die Zeilenueberschrift. */
+    av_andere_raeume:   { zeile: 18, art: 'einnahme', quelle: 'formular' },
+    av_angehoerige:     { zeile: 19, art: 'einnahme', quelle: 'formular' },
+    av_nk_nachzahlung:  { zeile: 21, art: 'einnahme', quelle: 'formular' },
+    av_nk_angehoerige:  { zeile: 22, art: 'einnahme', quelle: 'formular' },
+    av_nk_nachz_angeh:  { zeile: 23, art: 'einnahme', quelle: 'formular' },
+    av_fruehere_mieten: { zeile: 25, art: 'einnahme', quelle: 'formular' },
+    /* Garagen und Werbeflaechen stehen woertlich in der Zeile; Antennen/Mobilfunk sind
+       Ueberlassung von Dach- oder Grundflaechen - dieselbe Gruppe wie „Grund und Boden fuer
+       Kioske usw.". Die Begruendung steht im Feld. */
+    av_garagen:         { zeile: 26, art: 'einnahme', quelle: 'formular', grund: 'Garagen und Werbeflächen stehen wörtlich in der Zeile. Antennen und Mobilfunkanlagen sind die Überlassung von Dach- oder Grundflächen und gehören in dieselbe Gruppe wie „Grund und Boden für Kioske usw.“.' },
+    av_ust_vereinnahmt: { zeile: 27, art: 'einnahme', quelle: 'formular' },
+    av_ust_erstattet:   { zeile: 28, art: 'einnahme', quelle: 'formular' },
+    av_zuschuesse:      { zeile: 29, art: 'einnahme', quelle: 'formular' },
+    av_zuschuesse_eigen:{ zeile: 30, art: 'einnahme', quelle: 'formular' },
+    av_7h7i:            { zeile: 41, art: 'wk', quelle: 'formular' },
+    av_renten:          { zeile: 54, art: 'wk', quelle: 'formular' },
+    /* „aus 2024" bis „aus 2021" - im Formular 2025 die Vorjahre 1 bis 4 */
+    av_erh_m1:          { zeile: 72, art: 'wk', quelle: 'formular' },
+    av_erh_m2:          { zeile: 69, art: 'wk', quelle: 'formular' },
+    av_erh_m3:          { zeile: 66, art: 'wk', quelle: 'formular' },
+    av_erh_m4:          { zeile: 63, art: 'wk', quelle: 'formular' },
+    av_ust_gezahlt:     { zeile: 79, art: 'wk', quelle: 'formular' },
+    av_vorsteuer:       { zeile: 84, art: 'info', quelle: 'formular' },
+    av_wohnflaeche:     { zeile: 11, art: 'info', quelle: 'formular' },
+    av_eigen_qm:        { zeile: 12, art: 'info', quelle: 'formular' },
+    av_kuerzung_pct:    { zeile: 87, art: 'info', quelle: 'formular' },
+    av_kuerzung_betrag: { zeile: 88, art: 'info', quelle: 'formular' },
+    av_zuschuss_ahk:    { zeile: 89, art: 'info', quelle: 'formular' }
   },
 
   /* Was DealPilot nicht getrennt fuehrt und deshalb in der Ansicht benannt
      statt weggelassen wird. */
   nicht_erfasst: [
-    /* v3480 · Kundentext ohne interne Begriffe. Bis v3472 stand hier, wie die Datenbank die Aufteilung
-       speichert (Tabelle tax_records, Felder afa_linear/afa_sonder_7b, „seit v1258“) - das stand so im PDF. */
+    /* v3800 · Seit dem Paket ist jede Betragszeile der Anlage V eingebbar (Reiter Steuer, Weitere Angaben der
+       Anlage V). Was bleibt, sind Ankreuzfelder, Einzelangaben je Wohnung und die Aufteilung nach Zuordnungsart. */
+    { zeile: 10, text: 'Ankreuzfelder Ferienwohnung, kurzfristige Vermietung und Vermietung an Angehörige — bitte im Formular selbst ankreuzen. Bei Ferienwohnung oder kurzfristiger Vermietung ist zusätzlich die Anlage V-FeWo abzugeben.' },
+    { zeile: 13, text: 'Einzelangaben je Wohnung und Einheit (Bezeichnung, Wohn- oder Nutzfläche, Zeilen 13, 14, 16, 17) — DealPilot liefert die Summe je Zeile.' },
+    { zeile: 24, text: 'Neben- und Betriebskosten nicht gesondert vereinbart — Ankreuzfeld, bitte im Formular selbst setzen.' },
+    { zeile: 33, text: 'Zuordnungsart der Werbungskosten — DealPilot trägt alle Beträge als direkt zugeordnet ein. Sind die Aufwendungen nur teilweise Werbungskosten (z. B. Objekt teilweise selbst genutzt), gehören sie in die Zeilen „durch verhältnismäßige Zuordnung ermittelt“. AfA-Art und AfA-Satz (Zeilen 33 und 34) stehen in der Aufstellung.' },
     { zeile: 38, text: 'Sonderabschreibung nach § 7b EStG — DealPilot rechnet sie und weist sie getrennt aus, sobald das Objekt eine Sonderabschreibung führt. Bei älteren gespeicherten Jahreswerten ist die Aufteilung nicht bekannt: steht auf diesem Blatt keine Zeile 38, obwohl die AfA einen § 7b-Anteil enthält, gehört dieser Teil laut Formular nicht in Zeile 35, sondern in Zeile 38.' },
-    { zeile: 41, text: 'Erhöhte Absetzungen nach §§ 7h, 7i EStG oder Schutzbaugesetz — nicht getrennt erfasst; sie stecken gegebenenfalls in der AfA laut Zeile 35.' },
-    { zeile: 19, text: 'Einnahmen für an Angehörige vermietete Wohnungen — DealPilot unterscheidet nicht nach Mieterkreis.' },
-    { zeile: 25, text: 'Mieten für frühere Jahre, Mietkautionen, Mietvorauszahlungen — nicht erfasst.' },
-    { zeile: 26, text: 'Einnahmen aus Garagen, Werbeflächen, Kiosken — in DealPilot Teil der Mieteinnahmen, nicht getrennt.' },
-    { zeile: 27, text: 'Vereinnahmte Umsatzsteuer — DealPilot rechnet ohne Umsatzsteuer.' },
-    { zeile: 28, text: 'Vom Finanzamt erstattete Umsatzsteuer — nicht erfasst.' },
-    { zeile: 29, text: 'Öffentliche Zuschüsse, Guthabenzinsen — nicht erfasst.' },
-    { zeile: 79, text: 'An das Finanzamt gezahlte Umsatzsteuer — nur bei umsatzsteuerpflichtiger Vermietung; DealPilot rechnet ohne.' },
-    { zeile: 87, text: 'Kürzung wegen verbilligter Vermietung — DealPilot warnt vor der 66-%-Grenze (§ 21 Abs. 2 EStG), trägt die Kürzung aber nicht ein.' }
+    { zeile: 86, text: 'Zurechnung des Überschusses auf Person A und Person B — bei Zusammenveranlagung im Formular selbst eintragen.' }
   ]
 };

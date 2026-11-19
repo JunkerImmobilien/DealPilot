@@ -181,6 +181,9 @@
       var ohne82b = !!ctx.ohne82b && n > 1;
       if (ctx.ohne82b) n = 1;
       for (var i = 0; i < n; i++) add(J + i, 'erh', b / n);
+      /* v3800 · Anlage V: verteilte Erhaltung (§ 82b EStDV) steht nicht in der Zeile der sofort abziehbaren,
+         sondern je Ursprungsjahr in eigenen Zeilen; dazu der Gesamtaufwand im Jahr der Maßnahme. Nur Auskunft. */
+      if (n > 1) { for (var iv = 0; iv < n; iv++) { var jv = jahre[J + iv]; jv.erhV = jv.erhV || {}; jv.erhV[J] = (jv.erhV[J] || 0) + b / n; } jahre[J].erhG = (jahre[J].erhG || 0) + b; }
       return { art: 'erhaltung', jahre: n, jaehrlich: b / n, ab: J, fenster: imFenster(e), warnung: ueber && imFenster(e) && vert !== 'auto', monatFehlt: grenzfall(e), ohne82b: ohne82b };
     });
     return { jahre: jahre, fensterNetto: fenster, summeNetto: summe, grenze: grenze, ueber: ueber, A: A, Am: Am || null,
@@ -253,7 +256,7 @@
   function steuerJahr(jahr, p) {
     var l = liste(); if (!l.length) return { erh: 0, anah: 0, afa: 0, wg: 0, fensterNetto: 0 };
     var r = steuerAus(l, ctxAusFormular(p)), j = r.jahre[jahr] || LEER;
-    return { erh: j.erh, anah: j.anah, afa: j.afa, wg: j.wg || 0, fensterNetto: r.fensterNetto };
+    return { erh: j.erh, anah: j.anah, afa: j.afa, wg: j.wg || 0, fensterNetto: r.fensterNetto, erhV: j.erhV || null, erhG: j.erhG || 0 };   /* v3800: erhV/erhG fuer die Anlage V */
   }
   /** Netto-Erhaltung im 3-Jahres-Fenster - für die Entscheidung über #san in tax.js */
   function fensterNetto(p) { var l = liste(); return l.length ? steuerAus(l, ctxAusFormular(p)).fensterNetto : 0; }

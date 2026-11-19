@@ -106,7 +106,7 @@ function seite() {
     classList: { _s: new Set(), toggle(c, on) { on ? this._s.add(c) : this._s.delete(c); }, contains(c) { return this._s.has(c); } },
     dispatchEvent(ev) { ev.target = this; (lst[ev.type] || []).forEach((f) => f(ev)); return true; } });
   const els = {};
-  ['ze', 'ze_stp_monat', 'ze_kueche_monat', 'ze_sonst_monat', 'ze-auft-stand'].forEach((id) => { els[id] = mk(id); });
+  ['ze', 'ze_stp_monat', 'ze_kueche_monat', 'ze_werb_monat', 'ze_funk_monat', 'ze_sonst_monat', 'ze-auft-stand'].forEach((id) => { els[id] = mk(id); });   /* v3800: + Werbeflaeche, Antenne */
   els['ze-auft'] = mk('ze-auft', 'DETAILS');
   const document = { readyState: 'complete', head: { appendChild(e) { els[e.id] = e; } },
     getElementById: (id) => els[id] || null, createElement: () => mk('', 'STYLE'),
@@ -115,7 +115,7 @@ function seite() {
   ctx.window = ctx;
   let geladen = 0;
   ctx.loadData = function (d) { geladen++; Object.keys(d || {}).forEach((k) => { if (els[k]) els[k].value = d[k]; }); };
-  ctx._newObjLeeren = function () { ['ze', 'ze_stp_monat', 'ze_kueche_monat', 'ze_sonst_monat'].forEach((k) => { els[k].value = ''; }); };
+  ctx._newObjLeeren = function () { ['ze', 'ze_stp_monat', 'ze_kueche_monat', 'ze_werb_monat', 'ze_funk_monat', 'ze_sonst_monat'].forEach((k) => { els[k].value = ''; }); };
   vm.createContext(ctx);
   return { ctx, els, tippe(id, v) { els[id].value = v; els[id].dispatchEvent(new ctx.Event('input')); },
     oeffne() { els['ze-auft'].open = true; els['ze-auft'].dispatchEvent(new ctx.Event('toggle')); }, geladen: () => geladen };
@@ -168,6 +168,12 @@ function ebeneB(quelle, tag) {
   pruefe('B', tag + '9 naechstes Objekt ohne Teile: ze frei', s.els.ze.value === '40' && s.els.ze.readOnly === false);
   s.ctx.loadData({ ze: '75', ze_stp_monat: '50', ze_kueche_monat: '25' }); s.ctx._newObjLeeren();
   pruefe('B', tag + '10 neues Objekt nach geteiltem: ze frei', s.els.ze.readOnly === false && s.els.ze.value === '');
+  /* 11 · v3800 Werbeflaeche und Antenne (Marcel 19.11.2026): Teile der Summe, teile() fuer die Anlage V */
+  s = S(); s.oeffne(); s.tippe('ze_stp_monat', '50'); s.tippe('ze_werb_monat', '25'); s.tippe('ze_funk_monat', '100'); s.tippe('ze_kueche_monat', '30');
+  const t11 = s.ctx.DpZeAufteilung.teile ? s.ctx.DpZeAufteilung.teile() : null;
+  pruefe('B', tag + '11 Werbeflaeche + Antenne: ze 205 = 50 + 30 + 25 + 100, teile() liefert alle fuenf', s.els.ze.value === '205' && t11 && t11.werb === 25 && t11.funk === 100 && t11.stp === 50 && t11.kueche === 30 && t11.sonst === 0, [s.els.ze.value, t11]);
+  s = S(); s.tippe('ze', '200'); s.tippe('ze_werb_monat', '60');
+  pruefe('B', tag + '12 Import eines neuen Teils: ze bleibt 200, Rest 140 unter Sonstiges', s.els.ze.value === '200' && s.els.ze_sonst_monat.value === '140', [s.els.ze.value, s.els.ze_sonst_monat.value]);
 }
 console.log('B · Reiter Miete (ze-aufteilung.js)');
 const zeQuelle = lies('frontend/js/ze-aufteilung.js');
@@ -262,7 +268,7 @@ function ebeneD(Q, tag) {
   has('storage', /'ze','ze_stp_monat','ze_kueche_monat','ze_sonst_monat'/, 'storage.js FIELDS speichert die Teile');
   has('storage', /'ze_stp_monat', 'ze_kueche_monat', 'ze_sonst_monat',\s+\/\/ v3670/, 'storage.js Reset (Objekt B erbt keine Teile von A)');
   has('index', /<input id="ze_stp_monat"[^>]*>[\s\S]*<input id="ze_kueche_monat"[^>]*>[\s\S]*<input id="ze_sonst_monat"/, 'index.html Felder im Aufklapper');
-  has('index', /<script src="js\/ze-aufteilung\.js\?v=v3670[a-z]?"><\/script>/, 'index.html laedt ze-aufteilung.js');
+  has('index', /<script src="js\/ze-aufteilung\.js\?v=v3\d{3}[a-z]?"><\/script>/, 'index.html laedt ze-aufteilung.js');
   has('mb', /'ze', 'ze_stp_monat', 'ze_kueche_monat', 'ze_sonst_monat',/, 'Karte (dealpilot-mb.js) schickt ze und Teile');
   has('dok', /stellplatz_miete_eur: \['ze_stp_monat'/, 'Mietvertrag: Stellplatz -> Teil Stellplatz (nicht mehr ganz ze)');
   has('dok', /kueche_miete_eur: \['ze_kueche_monat'/, 'Mietvertrag: Kuechenzuschlag -> Teil Kueche');

@@ -1,10 +1,10 @@
 {
- "erzeugt_am": "2026-11-19T11:57:10.887Z",
+ "erzeugt_am": "2026-11-19T12:16:58.009Z",
  "quellen": {
   "voice-import": "a8a2e6dba58ea42c",
   "objektart-felder": "f7d9212555982a97",
-  "storage": "be4c02d529c9eb53",
-  "index-html": "f77e1340bc324a05",
+  "storage": "db2c591a78503b94",
+  "index-html": "352e0f0db521af58",
   "grest": "81f3fb0a4de3a6cf"
  },
  "daten": {
@@ -483,6 +483,8 @@
    "ze_stp_monat",
    "ze_kueche_monat",
    "ze_sonst_monat",
+   "ze_werb_monat",
+   "ze_funk_monat",
    "umlagef",
    "afa_satz",
    "afa_eigen",
@@ -1150,6 +1152,16 @@
     "id": "ze_sonst_monat",
     "kind": "text",
     "label": "Sonstiges"
+   },
+   {
+    "id": "ze_werb_monat",
+    "kind": "text",
+    "label": "Werbefläche"
+   },
+   {
+    "id": "ze_funk_monat",
+    "kind": "text",
+    "label": "Antenne / Mobilfunk"
    },
    {
     "id": "umlagef",
@@ -5572,6 +5584,8 @@
     "ze_stp_monat",
     "ze_kueche_monat",
     "ze_sonst_monat",
+    "ze_werb_monat",
+    "ze_funk_monat",
     "wertermittlungsstichtag",
     "mikrolage",
     "makrolage",
@@ -5631,6 +5645,6 @@
  },
  "inhalt": {
   "hilfe": "3a4f541a8727888d",
-  "bewertung": "ce4f5980fbae015d"
+  "bewertung": "5bbfa69cfd78e2c0"
  }
 }

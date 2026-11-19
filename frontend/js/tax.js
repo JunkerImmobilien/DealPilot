@@ -1791,7 +1791,29 @@ function _computeAutoForYear(yearIdx, year, teiljahr) {
 
     // 7.0 Einnahmen
     einnahmen_km: einnahmen_km,
-    einnahmen_nk: einnahmen_nk
+    einnahmen_nk: einnahmen_nk,
+
+    /* v3800 · Anlage V (js/anlage-v-kern.js). av_garagen: der Teil der zusaetzlichen Einnahmen, der
+       auf Stellplatz/Garage, Werbeflaeche und Antenne entfaellt (Reiter Miete, aufteilen) - derselbe
+       Jahresbetrag wie einnahmen_ze, nur anteilig. Teil von einnahmen_km, aendert keine Summe. */
+    av_garagen: (function () {
+      try {
+        var Z = window.DpZeAufteilung, t = Z && Z.teile ? Z.teile() : null, sum = t ? (t.stp + t.kueche + t.werb + t.funk + t.sonst) : 0;
+        return (t && sum > 0 && einnahmen_ze > 0) ? einnahmen_ze * (t.stp + t.werb + t.funk) / sum : 0;
+      } catch (e) { return 0; }
+    })(),
+    av_wohnflaeche: parseDe((document.getElementById('wfl') || {}).value) || 0,
+    /* zusaetzliche Einnahmen ohne Aufteilung (Auskunft fuer die Anlage-V-Seite) */
+    _zeUngeteilt: (window.DpZeAufteilung && DpZeAufteilung.aufgeteilt && !DpZeAufteilung.aufgeteilt() && einnahmen_ze > 0) ? einnahmen_ze : 0,
+    /* verteilte Erhaltung (§ 82b EStDV) je Ursprungsjahr: #san (2-5 Jahre) und geplante Sanierungen.
+       Auskunft fuer die Zeilen der Anlage V, keine Eingabe, nicht in `fields`. */
+    _erhV: (function () {
+      var o = {}, hat = false;
+      if (!sanAnschaffungsnah && sanLaufzeit > 1 && sanThisYear > 0) { o[year - yearIdx] = sanThisYear; hat = true; }
+      if (_sp.erhV) Object.keys(_sp.erhV).forEach(function (k) { if (_sp.erhV[k] > 0) { o[k] = (o[k] || 0) + _sp.erhV[k]; hat = true; } });
+      return hat ? o : null;
+    })(),
+    _erhG: ((!sanAnschaffungsnah && sanLaufzeit > 1 && yearIdx === 0) ? san_inp : 0) + (_sp.erhG || 0)
   };
   /* v2984 · Privatobjekt im Stichtagsjahr der Ueberfuehrung: nur die Monate
      vor dem Stichtag (calc.js _v816cut). Schuldzinsen und nicht umlagefaehige
@@ -1801,8 +1823,9 @@ function _computeAutoForYear(yearIdx, year, teiljahr) {
   try {
     var _cut = window.State && State._v816cut;
     if (_cut && _cut.active && _cut.factor < 1 && _cut.cal === year) {
-      ['einnahmen_km', 'einnahmen_nk', 'nk_umlf', 'afa', '_afaLinear', '_afaSonder7b', 'sonst_bewegl_wg', 'anschaffungsnah', 'erhaltungsaufwand']
+      ['einnahmen_km', 'einnahmen_nk', 'nk_umlf', 'afa', '_afaLinear', '_afaSonder7b', 'sonst_bewegl_wg', 'anschaffungsnah', 'erhaltungsaufwand', 'av_garagen', '_zeUngeteilt', '_erhG']
         .forEach(function (k) { if (typeof _autoOut[k] === 'number') _autoOut[k] *= _cut.factor; });
+      if (_autoOut._erhV) Object.keys(_autoOut._erhV).forEach(function (k) { _autoOut._erhV[k] *= _cut.factor; });   /* v3800 */
     }
   } catch (_ce) {}
   return _autoOut;
@@ -2211,7 +2234,25 @@ function _computeYearTotal(year, yearIdx, vorgabe, ohneVortrag) {
   // Einnahmen V+V = Kaltmiete + Nebenkosten umlagefähig
   var einnahmen = values.einnahmen_km + values.einnahmen_nk;
 
-  var ergebnis = einnahmen - werbungskosten;
+  /* v3800 · Die weiteren Angaben der Anlage V (js/anlage-v-kern.js): zusaetzliche Einnahmen und
+     Werbungskosten, die DealPilot nicht selbst rechnet (Umsatzsteuer, Zuschuesse, Renten, §§ 7h/7i,
+     Nachzahlungen der Nebenkosten ...), dazu die Kuerzung bei verbilligter Vermietung. Ohne Eintrag
+     ist jede Wirkung 0 - bitgleich zu vorher. Gespeicherter Satz (vorgabe): aus vorgabe.anlage_v. */
+  var _avK = window.AnlageVKern, _avAuto = (vorgabe && vorgabe.anlage_v && typeof vorgabe.anlage_v === 'object') ? vorgabe.anlage_v : {};
+  var _avWerte = {}, _avW = { ein: 0, wk: 0, kuerzung: 0 };
+  if (_avK) {
+    _avK.SCHLUESSEL.forEach(function (f) {
+      _avWerte[f] = vorgabe ? (Number(_avAuto[f]) || 0) : (Number(_getEffectiveValue(year, f, auto[f] || 0)) || 0);
+      values[f] = _avWerte[f];
+    });
+    _avW = _avK.wirkung(_avWerte, werbungskosten);
+    einnahmen += _avW.ein;
+    werbungskosten += _avW.wk;
+  }
+
+  /* Ergebnis: Kuerzung bei verbilligter Vermietung mindert die Werbungskosten (das Formular fuehrt sie
+     in voller Hoehe, das Finanzamt kuerzt). werbungskosten bleibt der Betrag der Summenzeile. */
+  var ergebnis = einnahmen - werbungskosten + _avW.kuerzung;
 
   // Steuer: zvE base + ergebnis
   // V275-tax-cards-zve: Jahr-spezifisches zvE aus DealPilotTaxPeriods
@@ -2267,6 +2308,12 @@ function _computeYearTotal(year, yearIdx, vorgabe, ohneVortrag) {
        dann null, was „nicht bekannt" heisst und auf dem Blatt auch so steht. */
     afaLinear:    vorgabe ? null : (auto._afaLinear != null ? auto._afaLinear : null),
     afaSonder7b:  vorgabe ? null : (auto._afaSonder7b != null ? auto._afaSonder7b : null),
+    /* v3800 · Anlage V: verteilte Erhaltung je Ursprungsjahr, Gesamtaufwand, ungeteilte Zusatzeinnahmen,
+       Kuerzung. Beim gespeicherten Satz aus anlage_v (_erhV/_erhG/_zeUngeteilt), sonst aus der Rechnung. */
+    erhV: vorgabe ? (_avAuto._erhV || null) : (auto._erhV || null),
+    erhG: vorgabe ? (Number(_avAuto._erhG) || 0) : (auto._erhG || 0),
+    zeUngeteilt: vorgabe ? (Number(_avAuto._zeUngeteilt) || 0) : (auto._zeUngeteilt || 0),
+    avKuerzung: _avW.kuerzung,
     refund: impact.refund,
     taxDelta: impact.taxDelta,
     /* v1133-steuerwirkung: calcImmoTaxImpact rechnet ESt vorher/nachher und
@@ -2409,7 +2456,8 @@ function _renderQuickForm(years) {
                 v.vermittlung + v.finanz_sonst + v.hausverwaltung + v.steuerber +
                 v.porto + v.verw_sonst + v.fahrtkosten + v.verpflegung +
                 v.hotel + v.inserat + v.gericht + v.telefon + v.sonst_kosten +
-                v.sonst_bewegl_wg;
+                v.sonst_bewegl_wg +
+                (window.AnlageVKern ? AnlageVKern.wirkung(v, 0).wk : 0);   /* v3800: weitere Werbungskosten der Anlage V */
 
     // V63.58: Math.round().toLocaleString() liefert für negative Zahlen "-1.701", für
     // positive "1.701" → wir hängen nur bei positiven manuell ein '+' davor (Minus ist schon da).
@@ -2569,6 +2617,16 @@ function _renderDetailForm(years) {
       ]
     }
   ];
+  /* v3800 · Marcel 19.11.2026: alles, was die Anlage V abfragt, muss eingebbar sein. Die Angaben und ihre
+     Wirkung stehen in js/anlage-v-kern.js, die Zeile des Jahres im Tooltip. Nur Privatvermoegen. */
+  if (window.AnlageVKern && !_dpBegriff().corp) {
+    var _avG = function (arten) { return AnlageVKern.SCHLUESSEL.filter(function (k) { return arten.indexOf(AnlageVKern.FELDER[k].art) >= 0; })
+      .map(function (k) { helpTexts[k] = AnlageVKern.FELDER[k].hilfe || ''; return { f: k, l: AnlageVKern.FELDER[k].l + (AnlageVKern.FELDER[k].einheit && AnlageVKern.FELDER[k].einheit !== '€' ? ' (' + AnlageVKern.FELDER[k].einheit + ')' : '') }; }); };
+    sections.push({ title: '8.0 Anlage V · weitere Einnahmen (ändern die Summe)', rows: _avG(['ein', 'ein_minus']) });
+    sections.push({ title: '8.1 Anlage V · Teile der Einnahmen (eigene Zeile, Summe bleibt)', rows: _avG(['davon_km', 'davon_nk']) });
+    sections.push({ title: '8.2 Anlage V · weitere Werbungskosten', rows: _avG(['wk']) });
+    sections.push({ title: '8.3 Anlage V · Angaben ohne Wirkung auf die Summe, verbilligte Vermietung', rows: _avG(['info', 'kuerzung_pct', 'kuerzung_betrag']) });
+  }
 
   sections.forEach(function(sec) {
     html += '<div class="ytf-section"><div class="ytf-section-title">' + sec.title + '</div>' +
@@ -2602,34 +2660,19 @@ function _renderDetailForm(years) {
          passende Abschrift gar keine Anlage-V-Seite. Eine Orientierung mit
          Vorbehalt hilft beim Arbeiten; eine Zahl ohne Vorbehalt in einem
          Dokument, das ans Finanzamt geht, hilft niemandem. */
-      var _avT = window['AnlageV' + y.year], _avAlt = null;
-      if (!_avT) {
-        var _avJahre = Object.keys(window)
-          .filter(function (k) { return /^AnlageV\d{4}$/.test(k); })
-          .map(function (k) { return parseInt(k.slice(7), 10); })
-          .filter(function (j) { return j < y.year; })
-          .sort(function (a, b) { return b - a; });
-        if (_avJahre.length) { _avAlt = _avJahre[0]; _avT = window['AnlageV' + _avAlt]; }
-      }
-      var _avF = (_avT && _avT.felder) ? _avT.felder[r.f] : null;
-      if (_avF && _avF.zeile != null) {
-        var _avZ = (_avT.zeilen && _avT.zeilen[_avF.zeile]) || {};
-        var _herkunft = (_avF.quelle === 'formular')
-              ? 'Wörtlich aus dem Formular übernommen.'
-            : (_avF.quelle === 'auffang')
-              ? 'Steht in keiner spezielleren Zeile — das Formular führt dafür „Sonstige Kosten".'
-            : (_avF.quelle === 'sachlogik')
-              ? 'Zuordnung aus der Art des Aufwands, nicht aus dem Formulartext — bitte prüfen.'
-              : '';
-        help += (help ? '\n\n' : '')
-          + '── ANLAGE V ' + (_avAlt || y.year) + ' ──\n'
-          + 'Zeile ' + _avF.zeile + (_avZ.kz ? '  ·  Kennzahl ' + _avZ.kz : '') + '\n'
-          + (_avZ.text ? _avZ.text + '\n' : '')
-          + (_avF.grund ? '\n' + _avF.grund + '\n' : '')
-          + (_herkunft ? '\n' + _herkunft : '')
-          + (_avAlt ? '\n\nACHTUNG: Für ' + y.year + ' liegt noch keine Abschrift vor. '
-                    + 'Angezeigt ist der Stand ' + _avAlt + '. Zeilennummern ändern sich je '
-                    + 'Veranlagungsjahr — am aktuellen Formular prüfen.' : '');
+      /* v3800 · STRENG: nur die Abschrift DIESES Jahres (js/anlage-v-kern.js). Bis v3800 nahm der Tooltip
+         fuer 2026 ff. die Nummern von 2025 - fuer 2026 sind das alte Nummern (Kanzlei 19.11.2026). */
+      var _avZ = window.AnlageVKern ? AnlageVKern.zeileFuer(y.year, r.f) : null;
+      if (_avZ) {
+        var _herkunft = (_avZ.quelle === 'formular') ? 'Wörtlich aus dem Formular übernommen.'
+            : (_avZ.quelle === 'auffang') ? 'Steht in keiner spezielleren Zeile — das Formular führt dafür „Sonstige Kosten".'
+            : (_avZ.quelle === 'sachlogik') ? 'Zuordnung aus der Art des Aufwands, nicht aus dem Formulartext — bitte prüfen.' : '';
+        help += (help ? '\n\n' : '') + '── ANLAGE V ' + y.year + ' ──\n'
+          + 'Zeile ' + _avZ.zeile + (_avZ.kz ? '  ·  Kennzahl ' + _avZ.kz : '') + '\n'
+          + (_avZ.text ? _avZ.text + '\n' : '') + (_avZ.grund ? '\n' + _avZ.grund + '\n' : '') + (_herkunft ? '\n' + _herkunft : '');
+      } else if (window.AnlageVKern && !AnlageVKern.tabelle(y.year) && r.f !== 'einnahmen_km' && r.f !== 'einnahmen_nk') {
+        help += (help ? '\n\n' : '') + '── ANLAGE V ' + y.year + ' ──\nDer amtliche Vordruck ' + y.year + ' ist in DealPilot noch nicht abgeschrieben. '
+          + 'Die Zeilennummer erscheint, sobald er vorliegt — Zeilennummern ändern sich je Veranlagungsjahr.';
       }
       var labelHtml = r.l;
       if (help) {

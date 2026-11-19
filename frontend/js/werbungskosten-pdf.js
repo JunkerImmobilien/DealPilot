@@ -330,7 +330,8 @@ function _renderWerbungskostenPage(doc, year, yearIdx, W, H, M, CW, q) {
 
      DIE RECHNUNG IST RICHTIG, DIE DARSTELLUNG WAR ES NICHT. Umlagefaehige
      Nebenkosten gehoeren auf BEIDE Seiten: als Einnahme beim Zufluss
-     (Anlage V, Zeile 14) und als Werbungskosten beim Abfluss (Zeile 33 ff.).
+     (Anlage V 2025 Zeile 20, Kz 04) und als Werbungskosten beim Abfluss (Zeile 75, Kz 52).
+     v3800: hier stand „Zeile 14 ... Zeile 33 ff." - Nummern eines aelteren Formulars.
      Eine Saldierung ist ausdruecklich NICHT zulaessig (§ 11 EStG,
      Zufluss-/Abflussprinzip). Nachgelesen, nicht angenommen.
 
@@ -376,6 +377,20 @@ function _renderWerbungskostenPage(doc, year, yearIdx, W, H, M, CW, q) {
     ['Anschaffungsnah (§6 Abs.1 Nr.1a EStG)', v.anschaffungsnah || 0, bem.anschaffungsnah],
     ['Erhaltungsaufwand (sofort oder § 82b EStDV verteilt)', v.erhaltungsaufwand || 0, bem.erhaltungsaufwand]
   ]);
+
+  /* v3800 · Weitere Angaben der Anlage V (js/anlage-v-kern.js): nur wenn eingetragen. Die Summe
+     totals.werbungskosten enthaelt sie, also muessen sie hier stehen, sonst geht die Aufstellung nicht auf. */
+  if (window.AnlageVKern) {
+    var _avWk = [], _avEin = [];
+    AnlageVKern.SCHLUESSEL.forEach(function (k) {
+      var F = AnlageVKern.FELDER[k], b = Number(v[k]) || 0; if (!b) return;
+      if (F.art === 'wk') _avWk.push([F.l, b, bem[k]]);
+      else if (F.art === 'ein') _avEin.push([F.l, b, bem[k]]);
+      else if (F.art === 'ein_minus') _avEin.push([F.l, -b, bem[k]]);
+    });
+    if (_avWk.length) { if (cy > 230) { cy = _wkNeueSeite(doc, M, CW); } cy = _renderWkSection(doc, cy, M, CW, '7. Weitere Werbungskosten (Anlage V)', _avWk); }
+    if (_avEin.length) { if (cy > 230) { cy = _wkNeueSeite(doc, M, CW); } cy = _renderWkSection(doc, cy, M, CW, 'Weitere Einnahmen (Anlage V, in den Einnahmen V+V enthalten)', _avEin); }
+  }
 
   // ── SUMMARY ────────────────────────────────────
   if (cy > 245) { cy = _wkNeueSeite(doc, M, CW); }
@@ -621,7 +636,8 @@ function _renderWerbungskostenSummaryPage(doc, startYear, nYears, W, H, M, CW) {
        Einzelaufstellung behoben hatte. Jetzt steht nk_umlf auch hier, die Zeile ist nachrechenbar. */
     var btr = (v.nk_umlf || 0) + v.nk_n_umlf + v.betr_sonst;
     var vrw = v.hausverwaltung + v.steuerber + v.porto + v.verw_sonst;
-    var sst = v.fahrtkosten + v.verpflegung + v.hotel + v.inserat + v.gericht + v.telefon + v.sonst_kosten;
+    var sst = v.fahrtkosten + v.verpflegung + v.hotel + v.inserat + v.gericht + v.telefon + v.sonst_kosten
+      + (window.AnlageVKern ? AnlageVKern.wirkung(v, 0).wk : 0);   /* v3800: weitere Werbungskosten der Anlage V */
     var afa_total = v.afa + v.sonst_bewegl_wg + (v.anschaffungsnah || 0) + (v.erhaltungsaufwand || 0);
 
     rows.push([
@@ -1148,22 +1164,13 @@ function _anlageVTabelle(jahr) {
    Zurueckgegeben wird deshalb nicht mehr die Tabelle, sondern die AUSKUNFT
    ueber sie: welche Tabelle, aus welchem Jahr, und ob das ein Ersatz ist.
    ═══════════════════════════════════════════════════════════════════════════ */
+/* v3800 · STRENG, aus dem Kern (js/anlage-v-kern.js): nur die Abschrift des Jahres. Der Rueckfall von
+   v1223 (Nummern von 2025 fuer 2026 mit rotem Vorbehalt) ist zurueckgenommen - die Kanzlei las sie am
+   19.11.2026 als alte Nummern, und genau das sind sie fuer 2026. Ohne Abschrift keine Anlage-V-Seite;
+   die Schlussseite der Mappe sagt, warum (avFehlt). */
 function _anlageVQuelle(jahr) {
-  var t = _anlageVTabelle(jahr);
-  if (t) return { T: t, jahr: jahr, ersatz: null };
-  var kandidaten = [];
-  try {
-    kandidaten = Object.keys(window)
-      .filter(function (k) { return /^AnlageV[0-9][0-9][0-9][0-9]$/.test(k); })
-      .map(function (k) { return parseInt(k.slice(7), 10); })
-      .filter(function (j) { return j < jahr; })
-      .sort(function (a, b) { return b - a; });
-  } catch (e) { return null; }
-  for (var i = 0; i < kandidaten.length; i++) {
-    var c = _anlageVTabelle(kandidaten[i]);
-    if (c) return { T: c, jahr: kandidaten[i], ersatz: kandidaten[i] };
-  }
-  return null;
+  var K = window.AnlageVKern, t = K ? K.tabelle(jahr) : _anlageVTabelle(jahr);
+  return t ? { T: t, jahr: jahr, ersatz: null } : null;
 }
 
 /* Die Bezeichnungen sind WOERTLICH die der Aufstellung — beide Ansichten
@@ -1185,10 +1192,13 @@ var _AV_LABEL = {
 };
 
 function _renderAnlageVPage(doc, jahr, totals, q, W, H, M, CW) {
-  var Q = _anlageVQuelle(jahr);
-  if (!Q || !totals) return false;
-  var T = Q.T;
-  var v = totals.values || {};
+  /* v3800 · Inhalt aus dem Kern (js/anlage-v-kern.js), dieselbe Zuordnung wie Steuer-Mappe und Tooltip.
+     Keine Zeilennummer steht mehr im Code dieser Seite - alle kommen aus der Abschrift des Jahres. */
+  var K = window.AnlageVKern;
+  if (!K || !totals) return false;
+  var t = {}; Object.keys(totals).forEach(function (k) { t[k] = totals[k]; }); t.labels = _AV_LABEL;
+  var R = K.aufstellung(jahr, t);
+  if (!R) return false;
   var eur = function (n) { return (Math.round(Number(n) || 0)).toLocaleString('de-DE') + ' €'; };
 
   /* ── Kopf ── */
@@ -1205,7 +1215,7 @@ function _renderAnlageVPage(doc, jahr, totals, q, W, H, M, CW) {
   doc.setFontSize(11); doc.setFont('helvetica', 'bold');
   doc.text('Veranlagungsjahr ' + jahr, W - M, 13, { align: 'right' });
   doc.setFontSize(8); doc.setFont('helvetica', 'normal');
-  doc.text('Formular Anlage V ' + Q.jahr, W - M, 19, { align: 'right' });
+  doc.text('Formular Anlage V ' + R.jahr, W - M, 19, { align: 'right' });
 
   var cy = 34;
   var name = q ? (q.name || 'Objekt')
@@ -1217,246 +1227,109 @@ function _renderAnlageVPage(doc, jahr, totals, q, W, H, M, CW) {
   doc.setFont('helvetica', 'normal');
   cy += 8;
 
-  /* v1223 · DER VORBEHALT STEHT VOR DER ERSTEN ZAHL, NICHT IM KLEINGEDRUCKTEN.
-     Stammen die Nummern aus einem anderen Formularjahr, sagt das Blatt das
-     zuerst — in der Warnfarbe, ueber der Tabelle. Danach darf gerechnet
-     aussehen, was gerechnet ist. */
-  if (Q.ersatz) {
-    doc.setFillColor(250, 240, 236);
-    doc.setDrawColor(176, 98, 92); doc.setLineWidth(0.4);
-    var _bt = doc.splitTextToSize('Für das Veranlagungsjahr ' + jahr + ' lag bei Erstellung '
-      + 'keine amtliche Anlage V vor. Die Zeilennummern und Kennzahlen auf diesem Blatt stammen '
-      + 'aus dem Formular ' + Q.ersatz + '. Sie ändern sich je Veranlagungsjahr — vor dem '
-      + 'Übertragen am aktuellen Vordruck prüfen. Die Beträge sind davon nicht berührt.',
-      CW - 8);
-    var _bh = _bt.length * 3.4 + 6;
-    doc.rect(M, cy - 4, CW, _bh, 'FD');
-    doc.setFont('helvetica', 'bold'); doc.setFontSize(7.6);
-    doc.setTextColor(176, 98, 92);
-    doc.text('ZEILENNUMMERN AUS EINEM ANDEREN FORMULARJAHR', M + 4, cy + 0.5);
-    doc.setFont('helvetica', 'normal'); doc.setFontSize(6.9);
-    doc.setTextColor(122, 90, 86);
-    doc.text(_bt, M + 4, cy + 5);
-    doc.setTextColor(42, 39, 39);
-    cy += _bh + 4;
-  }
-
   var _need = function (h) { if (cy + h > H - 20) { doc.addPage(); cy = 24; } };
-
-  var kopf = function (t) {
+  var kopf = function (txt) {
     _need(12);
     doc.setFont('helvetica', 'bold'); doc.setFontSize(8.5); doc.setTextColor(42, 39, 39);
-    doc.text(t, M, cy);
+    doc.text(txt, M, cy);
     cy += 2;
     doc.setDrawColor(210, 205, 198); doc.setLineWidth(0.3);
     doc.line(M, cy, M + CW, cy);
     cy += 5;
   };
-
-  var zeile = function (nr, kz, text, betrag, grau) {
+  var zeile = function (nr, kz, text, betrag, grau, einheit) {
     _need(6);
     doc.setFont('helvetica', 'normal'); doc.setFontSize(8);
     doc.setTextColor.apply(doc, grau ? [140, 134, 128] : [42, 39, 39]);
-    doc.text(nr, M, cy);
+    doc.text(nr == null ? '—' : 'Zeile ' + nr, M, cy);
     doc.setTextColor(140, 134, 128); doc.setFontSize(7);
     if (kz) doc.text('Kz ' + kz, M + 15, cy);
     doc.setTextColor.apply(doc, grau ? [140, 134, 128] : [42, 39, 39]);
     doc.setFontSize(8);
     doc.text(String(text).slice(0, 74), M + 28, cy);
     if (betrag !== null && betrag !== undefined) {
-      doc.text(eur(betrag), M + CW, cy, { align: 'right' });
+      doc.text(einheit && einheit !== '€' ? Math.round(betrag).toLocaleString('de-DE') + ' ' + einheit : eur(betrag), M + CW, cy, { align: 'right' });
     }
     cy += 5.6;
   };
+  var klein = function (txt, farbe) {
+    var tt = doc.splitTextToSize(txt, CW);
+    _need(tt.length * 3.2 + 2);
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(6.8);
+    doc.setTextColor.apply(doc, farbe || [122, 115, 112]);
+    doc.text(tt, M, cy);
+    cy += tt.length * 3.2 + 2.5;
+    doc.setTextColor(42, 39, 39);
+  };
+  var summe = function (nr, text, betrag, farbe) {
+    _need(7);
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(8.5); doc.setTextColor(42, 39, 39);
+    doc.text(nr == null ? '' : 'Zeile ' + nr, M, cy);
+    doc.text(text, M + 28, cy);
+    if (farbe) doc.setTextColor.apply(doc, farbe);
+    doc.text(eur(betrag), M + CW, cy, { align: 'right' });
+    doc.setFont('helvetica', 'normal'); doc.setTextColor(42, 39, 39);
+    cy += 6.5;
+  };
+
+  R.hinweise.forEach(function (x) { klein(x, [176, 98, 92]); });
 
   /* ── 1 · Einnahmen ── */
   kopf('EINNAHMEN');
-  var eingeordnet = {}, einSumme = 0;
-  ['einnahmen_km', 'einnahmen_nk'].forEach(function (f) {
-    var z = T.felder[f];
-    if (!z || z.zeile == null) return;
-    eingeordnet[f] = 1;
-    var zz = T.zeilen[z.zeile] || {};
-    zeile('Zeile ' + z.zeile, zz.kz, _AV_LABEL[f] || f, v[f] || 0);
-    einSumme += (v[f] || 0);
-  });
-  _need(7);
+  R.einnahmen.forEach(function (e) { zeile(e.zeile, e.kz, e.text, e.betrag); });
   doc.setDrawColor(42, 39, 39); doc.setLineWidth(0.4);
   doc.line(M + 28, cy - 2, M + CW, cy - 2);
-  doc.setFont('helvetica', 'bold'); doc.setFontSize(8); doc.setTextColor(42, 39, 39);
-  doc.text('Zeile 32', M, cy + 2);
-  doc.text('Summe der Einnahmen', M + 28, cy + 2);
-  doc.text(eur(totals.einnahmen), M + CW, cy + 2, { align: 'right' });
-  doc.setFont('helvetica', 'normal');
-  cy += 11;
-
-  /* ── 2 · Werbungskosten mit Zeile ── */
-  kopf('WERBUNGSKOSTEN');
-  /* v1219: jede Zeile sagt jetzt, WORAUF ihre Zuordnung beruht. Das ist
-     wichtiger als die Zuordnung selbst — ein Leser muss unterscheiden können,
-     was aus dem Formular abgeschrieben ist und was aus der Art des Aufwands
-     folgt. Ohne diese Unterscheidung sieht beides gleich sicher aus. */
-  var ohne = [], zugeordnetSumme = 0, sachlogik = [], afaHinweis = null, gedruckt = {};
-  Object.keys(T.felder).forEach(function (f) {
-    if (f === 'einnahmen_km' || f === 'einnahmen_nk') return;
-    var z = T.felder[f];
-    var betrag = v[f] || 0;
-    if (z.zeile == null) { if (betrag) ohne.push({ f: f, betrag: betrag, grund: z.grund }); return; }
-    if (!betrag) return;                       /* Nullposten nicht drucken */
-    var zz = T.zeilen[z.zeile] || {};
-    var mark = (z.quelle === 'sachlogik') ? ' °' : ((z.quelle === 'auffang') ? ' *' : '');
-    /* v1225 · DIE AfA GEHT IN ZWEI ZEILEN, WENN § 7b DRINSTECKT.
-       Zeile 35 heisst woertlich „ohne Betraege in den Zeilen 36 bis 41" — eine
-       Gebaeude-AfA, die eine Sonderabschreibung nach § 7b enthaelt, gehoert
-       dort also NICHT vollstaendig hin. Die Aufteilung kennt _computeYearTotal
-       nur fuer das geoeffnete Objekt; fuer einen gespeicherten Satz (Mappe)
-       ist sie null. Dann wird nicht geschaetzt, sondern gesagt. */
-    if (f === 'afa') {
-      var lin = totals.afaLinear, son = totals.afaSonder7b;
-      var eigen = (v.afa === (totals.auto && totals.auto.afa));   /* nicht von Hand geaendert */
-      if (son != null && son > 0 && eigen && lin != null) {
-        var zSon = T.zeilen[38] || {};
-        zeile('Zeile ' + z.zeile, zz.kz, 'AfA Gebäude (linear, ohne § 7b)', lin);
-        zeile('Zeile 38', zSon.kz, 'Sonderabschreibung § 7b EStG', son);
-        gedruckt[38] = 1;
-        afaHinweis = 'Die Gebäude-AfA von ' + eur(betrag) + ' enthält eine Sonderabschreibung '
-          + 'nach § 7b EStG. Zeile 35 nimmt laut Formular nur den Betrag „ohne die Zeilen 36 bis 41" '
-          + 'auf, deshalb steht der § 7b-Anteil hier getrennt in Zeile 38.';
-        zugeordnetSumme += betrag;
-        return;
-      }
-      if (son == null && betrag) {
-        afaHinweis = 'Ob in dieser Gebäude-AfA eine Sonderabschreibung nach § 7b EStG steckt, '
-          + 'geht aus dem gespeicherten Steuersatz nicht hervor — er führt für beides eine Spalte. '
-          + 'Zeile 35 nimmt laut Formular nur den Betrag „ohne die Zeilen 36 bis 41" auf: enthält '
-          + 'Ihre AfA einen § 7b-Anteil, gehört dieser in Zeile 38 und ist hier abzuziehen.';
-      }
-    }
-    zeile('Zeile ' + z.zeile, zz.kz, (_AV_LABEL[f] || f) + mark, betrag);
-    if (z.quelle === 'sachlogik' && z.grund) sachlogik.push({ f: f, zeile: z.zeile, grund: z.grund });
-    zugeordnetSumme += betrag;
-  });
-  if (afaHinweis) {
-    _need(9);
-    doc.setFont('helvetica', 'normal'); doc.setFontSize(6.8);
-    doc.setTextColor(150, 120, 70);
-    var _ah = doc.splitTextToSize(afaHinweis, CW - 28);
-    doc.text(_ah, M + 28, cy);
-    cy += _ah.length * 3.2 + 2.5;
-    doc.setTextColor(42, 39, 39);
-  }
-  if (zugeordnetSumme === 0) {
-    doc.setFontSize(7.5); doc.setTextColor(140, 134, 128);
-    doc.text('Keine Position mit Betrag erfasst.', M + 28, cy);
-    cy += 6;
-  }
+  cy += 2;
+  summe(R.summeEinnahmen.zeile, 'Summe der Einnahmen', R.summeEinnahmen.betrag);
+  if (totals.zeUngeteilt > 0.5) klein('Zusätzliche Einnahmen von ' + eur(totals.zeUngeteilt) + ' sind nicht aufgeteilt und stehen bei den Mieteinnahmen. Garagen, Stellplätze, Werbeflächen und Antennen gehören in eine eigene Zeile: im Reiter Miete unter „Zusätzliche Einnahmen › aufteilen“ eintragen.');
   cy += 3;
 
-  /* v1219 · DIE LEGENDE IST DER KERN DIESER SEITE.
-     Ohne sie sehen Abschrift und Schlussfolgerung gleich sicher aus — und
-     genau das darf in einer Steuerunterlage nicht passieren. */
-  if (sachlogik.length || zugeordnetSumme) {
-    _need(10);
-    doc.setFont('helvetica', 'normal'); doc.setFontSize(6.8);
-    doc.setTextColor(122, 115, 112);
-    var leg = doc.splitTextToSize('Ohne Zeichen: die Kostenart steht wörtlich in der '
-      + 'Überschrift der Formularzeile — Abschrift.   '
-      + '*  steht in keiner spezielleren Zeile; das Formular führt dafür „Sonstige Kosten".   '
-      + '°  folgt aus der Art des Aufwands, nicht aus dem Formulartext — siehe Begründung unten.', CW);
-    doc.text(leg, M, cy);
-    cy += leg.length * 3.2 + 3;
+  /* ── 2 · Werbungskosten ── */
+  kopf('WERBUNGSKOSTEN');
+  if (!R.wk.length) { zeile(null, null, 'Keine Position mit Betrag erfasst.', null, true); }
+  R.wk.forEach(function (e) { zeile(e.zeile, e.kz, e.text, e.betrag); });
+  if (R.afaHinweis) klein(R.afaHinweis.text, [150, 120, 70]);
+  klein('Ohne Zeichen: die Kostenart steht wörtlich in der Überschrift der Formularzeile — Abschrift.   '
+    + '*  steht in keiner spezielleren Zeile; das Formular führt dafür „Sonstige Kosten".   '
+    + '°  folgt aus der Art des Aufwands, nicht aus dem Formulartext — siehe Begründung unten.');
+  if (R.sach.length) {
+    kopf('°  ZUORDNUNG AUS DER ART DES AUFWANDS — BITTE PRÜFEN');
+    R.sach.forEach(function (x) { klein(x, [140, 134, 128]); });
   }
-
-  if (sachlogik.length) {
-    _need(8);
-    doc.setFont('helvetica', 'bold'); doc.setFontSize(7);
-    doc.setTextColor(42, 39, 39);
-    doc.text('°  ZUORDNUNG AUS DER ART DES AUFWANDS — BITTE PRÜFEN', M, cy);
-    cy += 4.5;
-    doc.setFont('helvetica', 'normal'); doc.setFontSize(6.6);
-    doc.setTextColor(140, 134, 128);
-    sachlogik.forEach(function (s) {
-      var t = doc.splitTextToSize('Zeile ' + s.zeile + ' · ' + (_AV_LABEL[s.f] || s.f)
-        + ' — ' + s.grund, CW - 4);
-      _need(t.length * 3.1 + 1.5);
-      doc.text(t, M + 4, cy);
-      cy += t.length * 3.1 + 1.4;
-    });
-    cy += 3;
-  }
-
-  /* ── 3 · ohne Zeile ── */
-  if (ohne.length) {
+  if (R.ohne.length) {
     kopf('OHNE ZEILENZUORDNUNG — BITTE STEUERLICH PRÜFEN');
-    doc.setFontSize(7.2); doc.setTextColor(140, 134, 128);
-    var vor = doc.splitTextToSize('Diese Beträge sind erfasst und in der Summe enthalten. '
-      + 'Die Zeile wäre eine steuerfachliche Entscheidung und keine Abschrift aus dem Formular — '
-      + 'deshalb steht sie hier nicht.', CW);
-    _need(vor.length * 3.3 + 4);
-    doc.text(vor, M, cy); cy += vor.length * 3.3 + 3;
-    ohne.forEach(function (o) {
-      zeile('—', null, _AV_LABEL[o.f] || o.f, o.betrag, true);
-      if (o.grund) {
-        doc.setFontSize(6.6); doc.setTextColor(150, 143, 136);
-        var g = doc.splitTextToSize(o.grund, CW - 30);
-        _need(g.length * 3 + 2);
-        doc.text(g, M + 28, cy - 2.5);
-        cy += g.length * 3 + 0.5;
-        doc.setFontSize(8);
-      }
-    });
-    cy += 4;
+    klein('Diese Beträge sind erfasst und in der Summe enthalten. Die Zeile wäre eine steuerfachliche Entscheidung und keine Abschrift aus dem Formular — deshalb steht sie hier nicht.', [140, 134, 128]);
+    R.ohne.forEach(function (o) { zeile(null, null, o.text, o.betrag, true); if (o.grund) klein(o.grund, [150, 143, 136]); });
   }
 
-  /* ── 4 · Summe und Überschuss ── */
+  /* ── 3 · Summe und Ueberschuss ── */
   _need(16);
   doc.setDrawColor(42, 39, 39); doc.setLineWidth(0.5);
   doc.line(M, cy, M + CW, cy);
   cy += 6;
-  doc.setFont('helvetica', 'bold'); doc.setFontSize(9); doc.setTextColor(42, 39, 39);
-  doc.text('Zeile 83', M, cy);
-  doc.text('Summe der Werbungskosten', M + 28, cy);
-  doc.text(eur(totals.werbungskosten), M + CW, cy, { align: 'right' });
-  cy += 6.5;
-  doc.text('Zeile 85', M, cy);
-  doc.text('Überschuss (Einnahmen Zeile 32 abzüglich Werbungskosten Zeile 83)', M + 28, cy);
-  doc.setTextColor.apply(doc, totals.ergebnis < 0 ? [176, 90, 84] : [46, 125, 80]);
-  doc.text(eur(totals.ergebnis), M + CW, cy, { align: 'right' });
-  doc.setFont('helvetica', 'normal'); doc.setTextColor(42, 39, 39);
-  cy += 11;
+  summe(R.summeWk.zeile, 'Summe der Werbungskosten', R.summeWk.betrag);
+  summe(R.ueberschuss.zeile, 'Überschuss (Einnahmen Zeile ' + R.summeEinnahmen.zeile + ' abzüglich Werbungskosten Zeile ' + R.summeWk.zeile + ')', R.ueberschuss.betrag,
+    R.ueberschuss.betrag < 0 ? [176, 90, 84] : [46, 125, 80]);
+  if (R.kuerzung) klein(R.kuerzung.text);
+  cy += 3;
 
-  /* ── 5 · nicht erfasst ── */
-  /* v1225b · WAS OBEN STEHT, DARF UNTEN NICHT ALS FEHLEND GELTEN. Wurde die
-     § 7b-Sonderabschreibung in Zeile 38 gedruckt, ist sie erfasst — dann
-     gehoert sie nicht mehr in die Liste der Zeilen, die DealPilot nicht
-     fuehrt. Ein Blatt, das sich selbst widerspricht, ist schlimmer als eins,
-     das eine Luecke laesst. */
-  var _ne = (T.nicht_erfasst || []).filter(function (n) {
-    return !gedruckt[n.zeile];
-  });
-  if (_ne.length) {
-    kopf('FORMULARZEILEN, DIE DEALPILOT NICHT FÜHRT');
-    doc.setFontSize(6.8); doc.setTextColor(140, 134, 128);
-    _ne.forEach(function (n) {
-      var t = doc.splitTextToSize('Zeile ' + n.zeile + ' — ' + n.text, CW);
-      _need(t.length * 3.1 + 1.5);
-      doc.text(t, M, cy);
-      cy += t.length * 3.1 + 1.2;
-    });
-    cy += 4;
+  /* ── 4 · weitere Angaben ── */
+  if (R.info.length) {
+    kopf('WEITERE ANGABEN');
+    R.info.forEach(function (e) { zeile(e.zeile, e.kz, e.text, e.betrag, false, e.einheit); });
+    cy += 3;
+  }
+  /* ── 5 · im Formular selbst ── */
+  if (R.nichtErfasst.length) {
+    kopf('IM FORMULAR SELBST AUSZUFÜLLEN');
+    R.nichtErfasst.forEach(function (n) { klein('Zeile ' + n.zeile + ' — ' + n.text, [140, 134, 128]); });
+    cy += 3;
   }
 
-  /* ── Fuß ── */
-  _need(14);
-  doc.setFont('helvetica', 'normal'); doc.setFontSize(6.8); doc.setTextColor(122, 115, 112);
-  var fuss = doc.splitTextToSize('Zuordnung abgeschrieben aus dem amtlichen Formular '
-    + 'Anlage V ' + Q.jahr + ' (' + T.formular + ')'
-    + (Q.ersatz ? ', ersatzweise für das Veranlagungsjahr ' + jahr : '')
-    + '. Keine Steuererklärung und keine Steuerberatung — die Zahlen sind zum '
-    + 'Übertragen gedacht, die Verantwortung für den Eintrag bleibt beim Erklärenden. '
-    + 'Bei verbilligter Vermietung sind die Aufwendungen laut Formular in voller Höhe '
-    + 'einzutragen; die Kürzung erfolgt ausschließlich in Zeile 87 oder 88.', CW);
-  doc.text(fuss, M, cy);
+  /* ── Fuss ── */
+  klein('Zuordnung abgeschrieben aus dem amtlichen Formular Anlage V ' + R.jahr + ' (' + (R.formular || '') + (R.stand ? ', Stand ' + R.stand : '') + '). '
+    + 'Keine Steuererklärung und keine Steuerberatung — die Zahlen sind zum Übertragen gedacht, die Verantwortung für den Eintrag bleibt beim Erklärenden. '
+    + 'Bei verbilligter Vermietung sind die Aufwendungen laut Formular in voller Höhe einzutragen; die Kürzung nimmt das Finanzamt aus den dafür vorgesehenen Zeilen vor.');
   return true;
 }
 

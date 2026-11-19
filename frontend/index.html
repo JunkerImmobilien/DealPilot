@@ -1960,12 +1960,15 @@ label.dp-required.qc-required::after {
         <!-- v3670 · Aufteilung der Zusatzeinnahmen (js/ze-aufteilung.js). Nur wenn erforderlich: ze bleibt die Summe. -->
         <details class="ze-auft" id="ze-auft"><summary>aufteilen</summary>
           <div class="ze-auft-grid">
-            <div class="f"><label for="ze_stp_monat">Stellplatz / Garage</label><div class="iw"><span class="pfx">€</span><input id="ze_stp_monat" type="text" inputmode="decimal" placeholder="0" class="trl"></div></div>
-            <div class="f"><label for="ze_kueche_monat">Küche / Möblierung</label><div class="iw"><span class="pfx">€</span><input id="ze_kueche_monat" type="text" inputmode="decimal" placeholder="0" class="trl"></div></div>
-            <div class="f"><label for="ze_sonst_monat">Sonstiges</label><div class="iw"><span class="pfx">€</span><input id="ze_sonst_monat" type="text" inputmode="decimal" placeholder="0" class="trl"></div></div>
+            <div class="f"><label for="ze_stp_monat">Stellplatz / Garage</label><div class="iw"><span class="pfx">€</span><input id="ze_stp_monat" type="text" inputmode="decimal" placeholder="0" class="trl"></div><span class="ze-av">Anlage V: Garagen, Werbeflächen</span></div>
+            <div class="f"><label for="ze_kueche_monat">Küche / Möblierung</label><div class="iw"><span class="pfx">€</span><input id="ze_kueche_monat" type="text" inputmode="decimal" placeholder="0" class="trl"></div><span class="ze-av">Anlage V: Mieteinnahmen Wohnung</span></div>
+            <!-- v3800 · Werbefläche und Antenne/Mobilfunk (Marcel 19.11.2026, Kanzlei): eigene Zeile der Anlage V -->
+            <div class="f"><label for="ze_werb_monat">Werbefläche</label><div class="iw"><span class="pfx">€</span><input id="ze_werb_monat" type="text" inputmode="decimal" placeholder="0" class="trl"></div><span class="ze-av">Anlage V: Garagen, Werbeflächen</span></div>
+            <div class="f"><label for="ze_funk_monat">Antenne / Mobilfunk</label><div class="iw"><span class="pfx">€</span><input id="ze_funk_monat" type="text" inputmode="decimal" placeholder="0" class="trl"></div><span class="ze-av">Anlage V: Garagen, Werbeflächen, Grund und Boden</span></div>
+            <div class="f"><label for="ze_sonst_monat">Sonstiges</label><div class="iw"><span class="pfx">€</span><input id="ze_sonst_monat" type="text" inputmode="decimal" placeholder="0" class="trl"></div><span class="ze-av">Anlage V: Mieteinnahmen Wohnung</span></div>
           </div>
           <span class="hint" id="ze-auft-stand"></span>
-          <span class="hint">Je Monat. Die Wohnungsmiete bleibt in der Nettokaltmiete. Ein gesondert vereinbarter Küchen- oder Möblierungszuschlag rechnet im Marktbericht mit eigener Dauer, Stellplatz und Sonstiges als Teil des Rohertrags.</span>
+          <span class="hint">Je Monat. Die Wohnungsmiete bleibt in der Nettokaltmiete. Ein gesondert vereinbarter Küchen- oder Möblierungszuschlag rechnet im Marktbericht mit eigener Dauer, Stellplatz, Werbefläche, Antenne und Sonstiges als Teil des Rohertrags. In der Anlage V stehen Stellplatz/Garage, Werbefläche und Antenne in einer eigenen Zeile, Küche und Sonstiges bei der Wohnungsmiete.</span>
         </details></div>
       <div class="f"><label>Umlagefähige Kosten / Monat <button type="button" class="dp-tip" data-tip-id="tab3.umlagefaehig" tabindex="-1" aria-label="Hilfe zu tab3.umlagefaehig"></button></label><div class="iw"><span class="pfx">€</span><input id="umlagef" type="text" inputmode="decimal" placeholder="144" class="trl" oninput="calc()"></div></div>
       <hr class="dvd">
@@ -4001,7 +4004,7 @@ label.dp-required.qc-required::after {
 <script src="js/obj-numbering.js?v=166"></script>
 <script src="js/mietentwicklung.js?v=v3750a"></script>
 <script src="/vendor/cdn/xlsx/0.18.5/xlsx.full.min.js"></script>
-<script src="js/tax.js?v=v3704"></script>
+<script src="js/tax.js?v=v3800"></script>
 <script src="js/steuer-verlauf.js?v=v3273a"></script>
 <script src="js/pa-potenzial.js?v=v3710"></script><!-- v3323 · Pilot-Analyse: Reiter Potenzialanalyse -->
 <script src="js/hausverlauf.js?v=v3432"></script><!-- v3323 · Pilot-Analyse: Reiter Hausverlauf (WEG-Unterlagen chronologisch) · v3430 Haus je Jahr -->
@@ -4042,8 +4045,9 @@ label.dp-required.qc-required::after {
   <script src="js/promo-erstflug.js?v=v1421c"></script>
 <script src="js/stripe-success.js?v=183"></script>
 <script src="js/demo-paywall.js?v=v3280"></script>
-<script src="js/anlage-v-2025.js?v=v3480"></script>
-<script src="js/werbungskosten-pdf.js?v=v3380"></script>
+<script src="js/anlage-v-2025.js?v=v3800"></script>
+<script src="js/anlage-v-kern.js?v=v3800"></script><!-- v3800 · Anlage V: eine Zuordnung fuer Tooltip, Werbungskosten-PDF und Steuer-Mappe, streng je Jahr -->
+<script src="js/werbungskosten-pdf.js?v=v3800"></script>
 <script src="js/gesellschaft-abschluss.js?v=v3810"></script>
 <script src="js/charts.js?v=v3358"></script>
 <script src="js/market-rates.js?v=v2247d"></script>
@@ -4056,7 +4060,7 @@ label.dp-required.qc-required::after {
 <script src="js/marktdaten-modal.js?v=v2247c"></script>
 <script src="js/ui.js?v=v3444"></script>
 <script src="js/sidebar-collapse.js?v=20260611174630"></script>
-<script src="js/storage.js?v=v3710"></script>
+<script src="js/storage.js?v=v3800"></script>
 <script src="js/nachrechnen.js?v=v3031"></script><!-- v3031: Kennzahlen/Scores gespeicherter Objekte neu rechnen (nur auf Aufruf) -->
 <!-- v845-newsearch-removed: sb-search.js entfernt (Kollision mit sidebar-search.js) -->
 <script src="js/inventar-sync.js?v=v3006c"></script><!-- V291-inv-sync-applied -->
@@ -4091,7 +4095,7 @@ label.dp-required.qc-required::after {
 <script src="js/dokument-import.js?v=v3670"></script>
 <script src="js/unterlagen.js?v=v3671"></script>
 <script src="js/sonderumlage.js?v=v3221"></script>
-<script src="js/sanierung-plan.js?v=v3560"></script><!-- v3214 · N137 · W-15: weitere Sanierungen in spaeteren Jahren -->
+<script src="js/sanierung-plan.js?v=v3800"></script><!-- v3214 · N137 · W-15: weitere Sanierungen in spaeteren Jahren -->
 <script src="js/darlehen-weitere-ui.js?v=v3261"></script><!-- v3215 · W-17: Liste Weitere Darlehen (Reiter Finanzierung) -->
 
 <script src="js/beleg-import.js?v=v3166"></script>
@@ -4108,7 +4112,7 @@ label.dp-required.qc-required::after {
 <script src="js/objektart-felder.js?v=v2824"></script>
 <script src="js/vgf-merkmale.js?v=v3008"></script>
 <!-- v3073: Detailgrad Einsteiger · Fortgeschritten · Experte - Zuordnung (erzeugt aus design/Vorschläge/arbeitsbereich-detailgrad-zuordnung.json) und Modul -->
-<script src="js/data/detailgrad-zuordnung.js?v=v3740"></script>
+<script src="js/data/detailgrad-zuordnung.js?v=v3800"></script>
 <script src="js/detailgrad.js?v=v3720d"></script>
 <script src="js/objekt-reiter.js?v=v3740"></script>
 <script src="js/paket-import.js?v=v3670"></script><!-- v3202 · Portfolio/Paket aus mehreren Objekten -->
@@ -4184,7 +4188,7 @@ label.dp-required.qc-required::after {
 <script src="js/jahresbuch-grafik.js?v=v3433"></script><!-- v3364 · Verlaufsgrafik Plan gegen Ist · v3430 Engine für Jahresabgleich und Haus -->
 <script src="js/jahresabgleich.js?v=v3434"></script><!-- v3420 · Jahresabgleich im Bestand: erster Unterreiter der Pilot-Analyse (Miete, Steuer, Wert, Haus) · v3430 Demo Fassung 2 -->
 <script src="js/wert-zielbild.js?v=v3720"></script><!-- v2840 · Tab Bewertung: Segment „Wert &amp; Zielbild"; Pilot-Analyse: Einfach | Genau -->
-<script src="js/dealpilot-mb.js?v=v3670"></script>
+<script src="js/dealpilot-mb.js?v=v3800"></script>
 <script src="js/mb-abgleich.js?v=v3343"></script><!-- v3002 · Abgleich mit dem Marktbericht in den Reitern Objekt und Miete -->
 <script src="js/mb-auftrag.js?v=v3253"></script>
   <script src="js/marktbericht-view.js?v=v3641"></script>
@@ -4213,7 +4217,7 @@ label.dp-required.qc-required::after {
   <script src="js/session-expired-banner.js?v=500"></script><!-- v500-session-banner -->
   <script src="js/object-actions.js?v=v3720c"></script>
   <script src="js/unterlagen-eingang.js?v=v3670"></script><!-- v3120 · ein Eingang fuer Belege, Unterlagen, Rechnungen -->
-  <script src="js/ze-aufteilung.js?v=v3670b"></script><!-- v3670 · Zusatzeinnahmen aufteilen (Reiter Miete) -->
+  <script src="js/ze-aufteilung.js?v=v3800"></script><!-- v3670 · Zusatzeinnahmen aufteilen (Reiter Miete) -->
   <script src="js/dpsh-score-hero.js?v=v3370"></script><!-- dpsh-score-hero -->
   <script src="js/quick-boarding-share.js?v=v3370"></script>
   <script src="js/voice-import.js?v=v3740a"></script>
@@ -4679,7 +4683,7 @@ document.addEventListener('DOMContentLoaded', function(){
     <link rel="stylesheet" href="css/einheitlich.css?v=v3630k"><!-- v3239 · Marcel 09.11.2026: Felder, Karten, Schrift in allen Reitern und Fenstern wie im Reiter Objekt; Handy-Felder nie unter 16 px (iOS-Zoom). Letztes Stylesheet. -->
     <script src="js/marktbericht-profi.js?v=v3338a"></script><!-- v3176 · Marktbericht Profi (HTML/A4) -->
     <script src="js/dp-dokument.js?v=v3223"></script><!-- v3179 · einheitliches Dokument-Design -->
-    <script src="js/dp-dokumente.js?v=v3810"></script><!-- v3179 · Dokumente im einheitlichen Design (Demo) -->
+    <script src="js/dp-dokumente.js?v=v3800"></script><!-- v3179 · Dokumente im einheitlichen Design (Demo) -->
     <script src="js/pdf-wahl.js?v=v3235"></script><!-- v1636 · Rueckfrage vor dem Export -->
     <script src="js/hub-anmelden.js?v=v3190a"></script><!-- v3190 · Makler-Hub: Verbinden-Ebene (/hub/anmelden) -->
     <script src="js/dok-weiche.js?v=v3480"></script><!-- v3181 · einheitliche Dokumente an allen Knoepfen, klassisch in den Einstellungen -->

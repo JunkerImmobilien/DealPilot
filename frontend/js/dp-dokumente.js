@@ -866,54 +866,51 @@
     return ['Ertragsteuer der Gesellschaft auf dieses Objekt', '0 €'];
   }
 
+  /* v3800 · Die Zuordnung kommt aus EINEM Kern (js/anlage-v-kern.js), dieselbe wie im Werbungskosten-PDF und
+     im Tooltip. STRENG: nur die Abschrift des Jahres. Bis v3800 nahm dieses Blatt fuer 2026 die Nummern von 2025
+     (mit rotem Vorbehalt) und schrieb „Zeile 32/38/83/85" fest - fuer jedes andere Formularjahr alte Nummern.
+     Ohne Abschrift steht statt des Blatts ein Satz, warum es fehlt. */
   function anlageVQuelle(jahr) {
-    var t = function (j) { var x = window['AnlageV' + j]; return x && x.zeilen && x.felder ? x : null; };
-    if (t(jahr)) return { T: t(jahr), jahr: jahr, ersatz: null };
-    var k = Object.keys(window).filter(function (n) { return /^AnlageV\d{4}$/.test(n); }).map(function (n) { return +n.slice(7); }).filter(function (j) { return j < jahr; }).sort(function (a, b) { return b - a; });
-    for (var i = 0; i < k.length; i++) if (t(k[i])) return { T: t(k[i]), jahr: k[i], ersatz: k[i] };
-    return null;
+    var K = window.AnlageVKern; return K && K.tabelle(jahr) ? { T: K.tabelle(jahr), jahr: jahr, ersatz: null } : null;
+  }
+  function anlageVFehlt(B, jahr) {
+    var K = window.AnlageVKern, j = K ? K.jahre() : [];
+    return '<div class="hinweis"><b>Anlage V ' + jahr + ': Zuordnung noch nicht verfügbar.</b> Der amtliche Vordruck für das Veranlagungsjahr ' + jahr
+      + ' ist in DealPilot noch nicht abgeschrieben. Zeilennummern und Kennzahlen ändern sich je Jahr, deshalb druckt DealPilot keine Nummern eines anderen Jahres'
+      + (j.length ? ' (abgeschrieben: ' + j.join(', ') + ')' : '') + '. Die Beträge in der Aufstellung gelten unverändert.</div>';
+  }
+  /* weitere Angaben der Anlage V als Zeilen der Aufstellung und ihre Wirkung (dieselbe Rechnung wie tax.js) */
+  function avAufstellung(v, wkVoll) {
+    var K = window.AnlageVKern, ein = [], wk = [];
+    if (!K) return { ein: ein, wk: wk, w: { ein: 0, wk: 0, kuerzung: 0 } };
+    K.SCHLUESSEL.forEach(function (k) {
+      var F = K.FELDER[k], b = Number(v[k]) || 0; if (!b) return;
+      if (F.art === 'ein') ein.push([F.l, b]); else if (F.art === 'ein_minus') ein.push([F.l, -b]); else if (F.art === 'wk') wk.push([F.l, b]);
+    });
+    return { ein: ein, wk: wk, w: K.wirkung(v, wkVoll) };
   }
   function anlageVBlatt(B, jahr, tot) {
-    var Q = anlageVQuelle(jahr); if (!Q || !tot) return '';
-    var T = Q.T, v = tot.values || {}, z = [], sach = [], ohne = [], hinweisAfa = null;
-    var zl = function (nr, kz, text, betrag, o) { return '<tr class="' + ((o && o.art) || '') + '"><td class="num" style="width:17mm">' + B.esc(nr) + '</td><td class="num det" style="width:13mm">' + (kz ? 'Kz ' + B.esc(kz) : '') + '</td><td>' + B.esc(text) + '</td><td class="r num' + ((o && o.farbe) || '') + '">' + (betrag == null ? '' : B.esc(B.eur(betrag, 2))) + '</td></tr>'; };
-    var h = Q.ersatz ? '<div class="hinweis" style="border-left-color:var(--rot);background:#FAF0EC"><b>Zeilennummern aus einem anderen Formularjahr.</b> Für das Veranlagungsjahr ' + jahr + ' lag bei Erstellung keine amtliche Anlage V vor. Die Zeilennummern und Kennzahlen stammen aus dem Formular ' + Q.ersatz + '. Sie ändern sich je Veranlagungsjahr – vor dem Übertragen am aktuellen Vordruck prüfen. Die Beträge sind davon nicht berührt.</div>' : '';
-    h += '<h3>Einnahmen</h3><table><tbody>';
-    ['einnahmen_km', 'einnahmen_nk'].forEach(function (f) { var a = T.felder[f]; if (a && a.zeile != null) h += zl('Zeile ' + a.zeile, (T.zeilen[a.zeile] || {}).kz, WK_NAME[f], v[f] || 0); });
-    h += zl('Zeile 32', null, 'Summe der Einnahmen', tot.einnahmen, { art: 'summe' }) + '</tbody></table>';
-    h += '<h3>Werbungskosten</h3><table><tbody>';
-    var summe = 0;
-    Object.keys(T.felder).forEach(function (f) {
-      if (f === 'einnahmen_km' || f === 'einnahmen_nk') return;
-      var a = T.felder[f], betrag = v[f] || 0;
-      if (a.zeile == null) { if (betrag) ohne.push({ f: f, betrag: betrag, grund: a.grund }); return; }
-      if (!betrag) return;
-      var kz = (T.zeilen[a.zeile] || {}).kz, mark = a.quelle === 'sachlogik' ? ' °' : a.quelle === 'auffang' ? ' *' : '';
-      if (f === 'afa') {
-        var lin = tot.afaLinear, son = tot.afaSonder7b, eigen = v.afa === (tot.auto && tot.auto.afa);
-        if (son != null && son > 0 && eigen && lin != null) {
-          z.push([a.zeile, zl('Zeile ' + a.zeile, kz, 'AfA Gebäude (linear, ohne § 7b)', lin) + zl('Zeile 38', (T.zeilen[38] || {}).kz, 'Sonderabschreibung § 7b EStG', son)]);
-          hinweisAfa = 'Die Gebäude-AfA von ' + B.eur(betrag) + ' enthält eine Sonderabschreibung nach § 7b EStG. Zeile 35 nimmt laut Formular nur den Betrag „ohne die Zeilen 36 bis 41“ auf, deshalb steht der § 7b-Anteil getrennt in Zeile 38.';
-          summe += betrag; return;
-        }
-        if (son == null) hinweisAfa = 'Ob in dieser Gebäude-AfA eine Sonderabschreibung nach § 7b EStG steckt, geht aus dem Steuersatz nicht hervor. Zeile 35 nimmt laut Formular nur den Betrag „ohne die Zeilen 36 bis 41“ auf: enthält die AfA einen § 7b-Anteil, gehört dieser in Zeile 38.';
-      }
-      z.push([a.zeile, zl('Zeile ' + a.zeile, kz, (WK_NAME[f] || f) + mark, betrag)]);
-      if (a.quelle === 'sachlogik' && a.grund) sach.push('Zeile ' + a.zeile + ' · ' + (WK_NAME[f] || f) + ' – ' + a.grund);
-      summe += betrag;
-    });
-    z.sort(function (x, y) { return x[0] - y[0]; });
-    h += (z.length ? z.map(function (x) { return x[1]; }).join('') : '<tr><td colspan="4" class="det">Keine Position mit Betrag erfasst.</td></tr>') + '</tbody></table>';
-    if (hinweisAfa) h += '<p class="det">' + B.esc(hinweisAfa) + '</p>';
+    var K = window.AnlageVKern; if (!K || !tot) return '';
+    var t = {}; Object.keys(tot).forEach(function (k) { t[k] = tot[k]; }); t.labels = WK_NAME;
+    var R = K.aufstellung(jahr, t); if (!R) return anlageVFehlt(B, jahr);
+    var zl = function (nr, kz, text, betrag, o) { return '<tr class="' + ((o && o.art) || '') + '"><td class="num" style="width:17mm">' + (nr == null ? '' : 'Zeile ' + B.esc(nr)) + '</td><td class="num det" style="width:13mm">' + (kz ? 'Kz ' + B.esc(kz) : '') + '</td><td>' + B.esc(text) + '</td><td class="r num' + ((o && o.farbe) || '') + '">' + (betrag == null ? '' : B.esc((o && o.einheit && o.einheit !== '€') ? B.zahl(betrag, 0) + ' ' + o.einheit : B.eur(betrag, 2))) + '</td></tr>'; };
+    var h = '';
+    if (R.hinweise.length) h += R.hinweise.map(function (x) { return '<div class="hinweis">' + B.esc(x) + '</div>'; }).join('');
+    h += '<h3>Einnahmen</h3><table><tbody>' + R.einnahmen.map(function (e) { return zl(e.zeile, e.kz, e.text, e.betrag); }).join('')
+      + zl(R.summeEinnahmen.zeile, null, 'Summe der Einnahmen', R.summeEinnahmen.betrag, { art: 'summe' }) + '</tbody></table>';
+    if (tot.zeUngeteilt > 0.5) h += '<p class="det">Zusätzliche Einnahmen von ' + B.esc(B.eur(tot.zeUngeteilt, 2)) + ' sind nicht aufgeteilt und stehen bei den Mieteinnahmen. Garagen, Stellplätze, Werbeflächen und Antennen gehören in eine eigene Zeile: im Reiter Miete unter „Zusätzliche Einnahmen › aufteilen“ eintragen.</p>';
+    h += '<h3>Werbungskosten</h3><table><tbody>' + (R.wk.length ? R.wk.map(function (e) { return zl(e.zeile, e.kz, e.text, e.betrag); }).join('') : '<tr><td colspan="4" class="det">Keine Position mit Betrag erfasst.</td></tr>') + '</tbody></table>';
+    if (R.afaHinweis) h += '<p class="det">' + B.esc(R.afaHinweis.text) + '</p>';
     h += '<p class="det">Ohne Zeichen: die Kostenart steht wörtlich in der Überschrift der Formularzeile (Abschrift). * steht in keiner spezielleren Zeile; das Formular führt dafür „Sonstige Kosten“. ° folgt aus der Art des Aufwands, nicht aus dem Formulartext – Begründung unten.</p>';
-    if (sach.length) h += '<div class="block"><h3>° Zuordnung aus der Art des Aufwands – bitte prüfen</h3>' + sach.map(function (s) { return '<p class="det">' + B.esc(s) + '</p>'; }).join('') + '</div>';
-    if (ohne.length) h += '<div class="block"><h3>Ohne Zeilenzuordnung – bitte steuerlich prüfen</h3><p class="det">Diese Beträge sind erfasst und in der Summe enthalten. Die Zeile wäre eine steuerfachliche Entscheidung und keine Abschrift aus dem Formular.</p><table><tbody>'
-      + ohne.map(function (o) { return zl('–', null, (WK_NAME[o.f] || o.f) + (o.grund ? ' – ' + o.grund : ''), o.betrag); }).join('') + '</tbody></table></div>';
-    h += '<table style="margin-top:4mm"><tbody>' + zl('Zeile 83', null, 'Summe der Werbungskosten', tot.werbungskosten, { art: 'summe' })
-      + zl('Zeile 85', null, 'Überschuss (Einnahmen Zeile 32 abzüglich Werbungskosten Zeile 83)', tot.ergebnis, { art: 'ende', farbe: tot.ergebnis < 0 ? ' neg' : ' pos' }) + '</tbody></table>';
-    var ne = (T.nicht_erfasst || []).filter(function (n) { return !(n.zeile === 38 && hinweisAfa && /getrennt/.test(hinweisAfa)); });
-    if (ne.length) h += '<div class="block"><h3>Formularzeilen, die DealPilot nicht führt</h3>' + ne.map(function (n) { return '<p class="det">Zeile ' + n.zeile + ' – ' + B.esc(String(n.text || '').replace(/`/g, '')) + '</p>'; }).join('') + '</div>';
-    return h + '<p class="det">Dieselben Zahlen wie die Aufstellung, sortiert nach den Zeilen des amtlichen Formulars Anlage V ' + Q.jahr + '. Keine Steuerberatung.</p>';
+    if (R.sach.length) h += '<div class="block"><h3>° Zuordnung aus der Art des Aufwands – bitte prüfen</h3>' + R.sach.map(function (x) { return '<p class="det">' + B.esc(x) + '</p>'; }).join('') + '</div>';
+    if (R.ohne.length) h += '<div class="block"><h3>Ohne Zeilenzuordnung – bitte steuerlich prüfen</h3><p class="det">Diese Beträge sind erfasst und in der Summe enthalten. Die Zeile wäre eine steuerfachliche Entscheidung und keine Abschrift aus dem Formular.</p><table><tbody>'
+      + R.ohne.map(function (o) { return zl(null, null, o.text + (o.grund ? ' – ' + o.grund : ''), o.betrag); }).join('') + '</tbody></table></div>';
+    h += '<table style="margin-top:4mm"><tbody>' + zl(R.summeWk.zeile, null, 'Summe der Werbungskosten', R.summeWk.betrag, { art: 'summe' })
+      + zl(R.ueberschuss.zeile, null, 'Überschuss (Einnahmen Zeile ' + R.summeEinnahmen.zeile + ' abzüglich Werbungskosten Zeile ' + R.summeWk.zeile + ')', R.ueberschuss.betrag, { art: 'ende', farbe: R.ueberschuss.betrag < 0 ? ' neg' : ' pos' }) + '</tbody></table>';
+    if (R.kuerzung) h += '<p class="det">' + B.esc(R.kuerzung.text) + '</p>';
+    if (R.info.length) h += '<h3>Weitere Angaben</h3><table><tbody>' + R.info.map(function (e) { return zl(e.zeile, e.kz, e.text, e.betrag, { einheit: e.einheit }); }).join('') + '</tbody></table>';
+    if (R.nichtErfasst.length) h += '<div class="block"><h3>Im Formular selbst auszufüllen</h3>' + R.nichtErfasst.map(function (n) { return '<p class="det">Zeile ' + n.zeile + ' – ' + B.esc(String(n.text || '').replace(/`/g, '')) + '</p>'; }).join('') + '</div>';
+    return h + '<p class="det">Dieselben Zahlen wie die Aufstellung, sortiert nach den Zeilen des amtlichen Formulars Anlage V ' + R.jahr + ' (' + B.esc(R.formular || '') + (R.stand ? ', Stand ' + B.esc(R.stand) : '') + '). Keine Steuerberatung.</p>';
   }
   /* v3181 · opt.jahr = ein Jahr (Index wie fa-pdf-year), opt.alle = alle Jahre (wie „all-years", hoechstens 15) */
   function finanzamt(jahre, mitAnlageV, opt) {
@@ -941,26 +938,35 @@
       rows.forEach(function (row, i) {
         var t = _computeYearTotal(row.cal, i + idx0) || {}, v = t.values || {};
         var ein = (Number(v.einnahmen_km) || 0) + (Number(v.einnahmen_nk) || 0);
-        var tab = [['Mieteinnahmen (kalt)', B.eur(v.einnahmen_km, 2)], ['Umlagen / Nebenkosten', B.eur(v.einnahmen_nk, 2)], ['Einnahmen gesamt', B.eur(ein, 2), { art: 'summe' }]];
+        var tab = [['Mieteinnahmen (kalt)', B.eur(v.einnahmen_km, 2)], ['Umlagen / Nebenkosten', B.eur(v.einnahmen_nk, 2)]];
         var summe = 0;
+        WK.forEach(function (g) { summe += g[1].reduce(function (a, f) { return a + (Number(v[f[0]]) || 0); }, 0); });
+        /* v3800 · weitere Angaben der Anlage V (dieselbe Wirkung wie in tax.js) */
+        var _avA = avAufstellung(v, summe);
+        _avA.ein.forEach(function (x) { tab.push([x[0], B.eurS(x[1], 2)]); });
+        ein += _avA.w.ein;
+        tab.push(['Einnahmen gesamt', B.eur(ein, 2), { art: 'summe' }]);
         WK.forEach(function (g) {
           var s = g[1].reduce(function (a, f) { return a + (Number(v[f[0]]) || 0); }, 0); if (!s) return;
           tab.push([g[0], B.eur(s, 2), { art: 'summe' }]);
           g[1].forEach(function (f) { if (Number(v[f[0]])) tab.push([f[1], B.eur(v[f[0]], 2), { art: 'ein' }]); });
-          summe += s;
         });
+        if (_avA.wk.length) { tab.push(['7. Weitere Werbungskosten (Anlage V)', B.eur(_avA.w.wk, 2), { art: 'summe' }]); _avA.wk.forEach(function (x) { tab.push([x[0], B.eur(x[1], 2), { art: 'ein' }]); }); }
+        summe += _avA.w.wk;
         tab.push(['Summe ' + bg.wort + ' ' + row.cal, B.eur(summe, 2), { art: 'summe' }]);
-        tab.push([bg.corp ? 'Beitrag zum Ergebnis der Gesellschaft (vor Steuern)' : 'Einkünfte aus Vermietung und Verpachtung', B.eurS(ein - summe, 2), { art: 'ende', farbe: 1 }]);
+        if (_avA.w.kuerzung > 0.005) tab.push(['Kürzung wegen verbilligter Vermietung (§ 21 Abs. 2 EStG)', B.eurS(_avA.w.kuerzung, 2), { det: 'Die Werbungskosten stehen im Formular in voller Höhe, das Finanzamt kürzt sie.' }]);
+        var _erg = ein - summe + _avA.w.kuerzung;
+        tab.push([bg.corp ? 'Beitrag zum Ergebnis der Gesellschaft (vor Steuern)' : 'Einkünfte aus Vermietung und Verpachtung', B.eurS(_erg, 2), { art: 'ende', farbe: 1 }]);
         /* v3480 · Gesellschaft: kein „Erstattung +“ bei Verlust (N-04); privat: Veranlagungsart des Jahres */
-        if (bg.corp) tab.push(steuerZeileGes(B, row.tax_y, ein - summe));
+        if (bg.corp) tab.push(steuerZeileGes(B, row.tax_y, _erg));
         else {
           tab.push(['Steuerwirkung (Erstattung +, Belastung −)', B.eurS(-(row.tax_y || 0), 0), { farbe: 1 }]);
           var _vl = veranlagung(row.cal);
           if (_vl) tab.push(['Veranlagung ' + row.cal, _vl.kurz, { det: _vl.art + ' · ' + _vl.kist + ' · ' + _vl.quelle }]);
         }
-        ges.push([String(row.cal), B.eur(ein, 2), B.eur(summe, 2), B.eurS(ein - summe, 2)]);
+        ges.push([String(row.cal), B.eur(ein, 2), B.eur(summe, 2), B.eurS(_erg, 2)]);
         /* v3268 · GbR: gesonderte und einheitliche Feststellung § 180 AO */
-        var _fs = (!bg.corp && window._dpGbrFeststellung) ? window._dpGbrFeststellung(row.cal, ein - summe) : null;
+        var _fs = (!bg.corp && window._dpGbrFeststellung) ? window._dpGbrFeststellung(row.cal, _erg) : null;
         var _fsHtml = _fs ? '<h3>Gesonderte und einheitliche Feststellung (§ 180 AO) · ' + B.esc(_fs.name || 'GbR') + '</h3><table><thead><tr><th>Gesellschafter</th><th class="r">Anteil</th><th class="r">Einkünfte</th></tr></thead><tbody>'
           + '<tr class="summe"><td>Einkünfte der GbR (V+V' + (_fs.objekte > 1 ? ', ' + _fs.objekte + ' Objekte' : '') + ')</td><td class="r num">100 %</td><td class="r num">' + B.eurS(_fs.einkuenfte, 2) + '</td></tr>'
           + _fs.zeilen.map(function (z) { return '<tr><td>' + B.esc(z.name) + '</td><td class="r num">' + String(Math.round(z.anteilPct * 100) / 100).replace('.', ',') + ' %</td><td class="r num">' + B.eurS(z.betrag, 2) + '</td></tr>'; }).join('')
@@ -1022,9 +1028,13 @@
           try { m = (hId !== 'privat' && window.DealPilotMandanten) ? DealPilotMandanten.get(hId) : null; if (m && m.id !== hId) m = null; } catch (e) { m = null; }
           var corp = !!(m && window.DealPilotMandanten && DealPilotMandanten.isCorp && DealPilotMandanten.isCorp(m.rechtsform));
           var v = {}; Object.keys(WK_NAME).forEach(function (f) { v[f] = num(s[f]); });
+          /* v3800 · weitere Angaben der Anlage V aus dem gespeicherten Satz (tax_records.anlage_v) */
+          var avS = (s.anlage_v && typeof s.anlage_v === 'object') ? s.anlage_v : {};
+          if (window.AnlageVKern) AnlageVKern.SCHLUESSEL.forEach(function (k) { v[k] = num(avS[k]); });
           var ein = v.einnahmen_km + v.einnahmen_nk, wk = 0;
           WK.forEach(function (g) { g[1].forEach(function (f) { wk += v[f[0]]; }); });
-          return { s: s, d: d, adr: adr, art: OBJART[d.objart] || d.objart || 'Immobilie', halter: m ? m.name : 'Privat', corp: corp, v: v, ein: ein, wk: wk, erg: ein - wk,
+          var avA = avAufstellung(v, wk); ein += avA.w.ein; wk += avA.w.wk;
+          return { s: s, d: d, adr: adr, art: OBJART[d.objart] || d.objart || 'Immobilie', halter: m ? m.name : 'Privat', corp: corp, v: v, ein: ein, wk: wk, erg: ein - wk + avA.w.kuerzung, avA: avA, avS: avS,
                    kauf: d.kaufdat || '', vermerk: (function () {
                      if (String(d.obj_herkunft || '') === 'ueberfuehrung') return 'Aus dem Privatbestand überführt zum ' + deIso(d.halter_seit || d.kaufdat) + '. Anschaffungskosten und AfA der Gesellschaft gelten ab diesem Stichtag.'
                        + (String(d.halter_seit || d.kaufdat || '').slice(0, 4) === String(jahr) ? ' ' + jahr + ' ist das Jahr des Wechsels: die Beträge decken nur die Monate ab dem Stichtag.' : '');
@@ -1045,13 +1055,17 @@
           + eintr.map(function (e, i) { return '<tr><td class="num">' + (i + 1) + '</td><td>' + B.esc(e.adr) + '<div class="det">' + B.esc(e.art) + '</div></td><td>' + B.esc(e.halter) + '</td><td class="num">' + B.esc(deIso(e.kauf)) + '</td><td class="r num">' + B.eur(e.ein, 2) + '</td><td class="r num">' + B.eur(e.wk, 2) + '</td><td class="r num">' + B.eurS(e.erg, 2) + '</td></tr>'; }).join('')
           + '</tbody></table><p class="det" style="margin-top:3mm">Je Objekt folgen die Aufstellung' + (mitAV && priv.length ? ' und für Objekte im Privatvermögen die Zuordnung zu den Zeilen der Anlage V' : '') + '. Quelle sind die je Objekt und Jahr gespeicherten Steuersätze. Keine Steuererklärung und keine Steuerberatung.</p>'));
         eintr.forEach(function (e, i) {
-          var tab = [['Mieteinnahmen (kalt)', B.eur(e.v.einnahmen_km, 2)], ['Umlagen / Nebenkosten', B.eur(e.v.einnahmen_nk, 2)], ['Einnahmen gesamt', B.eur(e.ein, 2), { art: 'summe' }]];
+          var tab = [['Mieteinnahmen (kalt)', B.eur(e.v.einnahmen_km, 2)], ['Umlagen / Nebenkosten', B.eur(e.v.einnahmen_nk, 2)]];
+          e.avA.ein.forEach(function (x) { tab.push([x[0], B.eurS(x[1], 2)]); });   /* v3800 */
+          tab.push(['Einnahmen gesamt', B.eur(e.ein, 2), { art: 'summe' }]);
           WK.forEach(function (g) {
             var sum = g[1].reduce(function (a, f) { return a + e.v[f[0]]; }, 0); if (!sum) return;
             tab.push([g[0], B.eur(sum, 2), { art: 'summe' }]);
             g[1].forEach(function (f) { if (e.v[f[0]]) tab.push([f[1], B.eur(e.v[f[0]], 2), { art: 'ein' }]); });
           });
+          if (e.avA.wk.length) { tab.push(['7. Weitere Werbungskosten (Anlage V)', B.eur(e.avA.w.wk, 2), { art: 'summe' }]); e.avA.wk.forEach(function (x) { tab.push([x[0], B.eur(x[1], 2), { art: 'ein' }]); }); }
           tab.push(['Summe ' + (e.corp ? 'Betriebsausgaben' : 'Werbungskosten') + ' ' + jahr, B.eur(e.wk, 2), { art: 'summe' }]);
+          if (e.avA.w.kuerzung > 0.005) tab.push(['Kürzung wegen verbilligter Vermietung (§ 21 Abs. 2 EStG)', B.eurS(e.avA.w.kuerzung, 2), { det: 'Die Werbungskosten stehen im Formular in voller Höhe, das Finanzamt kürzt sie.' }]);
           tab.push([e.corp ? 'Beitrag zum Ergebnis der Gesellschaft (vor Steuern)' : 'Einkünfte aus Vermietung und Verpachtung', B.eurS(e.erg, 2), { art: 'ende', farbe: 1 }]);
           if (!e.corp) {
             if (vl) tab.push(['Veranlagung ' + jahr, vl.kurz, { det: vl.art + ' · ' + vl.kist + ' · ' + vl.quelle }]);   /* v3480 */
@@ -1075,7 +1089,8 @@
             + (e.corp ? '<p class="det" style="margin-top:3mm">Eine Anlage V gibt es für eine GmbH/UG nicht (Einkünfte aus Gewerbebetrieb, § 8 Abs. 2 KStG). Die Kosten der Gesellschaft selbst stehen im Jahresabschluss der Gesellschaft.</p>' : '')));
           if (mitAV && !e.corp) {
             var tot = { values: e.v, einnahmen: e.ein, werbungskosten: e.wk, ergebnis: e.erg,
-                        afaLinear: e.s.afa_linear != null ? num(e.s.afa_linear) : null, afaSonder7b: e.s.afa_sonder_7b != null ? num(e.s.afa_sonder_7b) : null, auto: { afa: e.v.afa } };
+                        afaLinear: e.s.afa_linear != null ? num(e.s.afa_linear) : null, afaSonder7b: e.s.afa_sonder_7b != null ? num(e.s.afa_sonder_7b) : null, auto: { afa: e.v.afa },
+                        erhV: e.avS._erhV || null, erhG: num(e.avS._erhG), zeUngeteilt: num(e.avS._zeUngeteilt) };   /* v3800 */
             var av = anlageVBlatt(B, jahr, tot);
             if (av) S.push(B.seite(c, 'Anlage V · Objekt ' + (i + 1), B.abschnitt('Anlage V · Zuordnung · Objekt ' + (i + 1), 'Veranlagungsjahr ' + jahr, e.adr) + av));
           }

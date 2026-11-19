@@ -269,7 +269,9 @@ window.DpDetailgradZuordnung = {
      "exit_bmy",
      "ze_stp_monat",
      "ze_kueche_monat",
-     "ze_sonst_monat"
+     "ze_sonst_monat",
+     "ze_werb_monat",
+     "ze_funk_monat"
     ]
    },
    "3": {

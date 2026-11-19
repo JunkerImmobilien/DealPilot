@@ -15,10 +15,19 @@
      als Ganzes und die Aufteilung wird aufgehoben (sonst stuende eine Summe neben Teilen,
      die nicht zu ihr passen).
    Der Marktbericht liest die Teile: Stellplatz + Sonstiges kapitalisiert (Rohertrag),
-   Kueche als sonstiger Ertrag mit eigener Dauer (marktbericht lib/zusatz_einnahmen.js). */
+   Kueche als sonstiger Ertrag mit eigener Dauer (marktbericht lib/zusatz_einnahmen.js).
+
+   v3800 · Marcel 19.11.2026 nach dem Termin bei der Kanzlei: „Einnahmen aus Garagen … unter dem Tab
+   zusaetzliche Einnahmen die Gesamtsumme wieder reinschreiben, aber darunter aufklappen … um diese
+   Sondersachen abzubilden." Zwei Teile dazu: ze_werb_monat (Werbeflaeche) und ze_funk_monat
+   (Antenne / Mobilfunk / Dachflaeche). Jeder Teil nennt seine Stelle in der Anlage V (ohne Nummer -
+   die steht je Jahr in js/anlage-v-<Jahr>.js): Stellplatz/Garage, Werbeflaeche, Antenne -> sonstige
+   Einnahmen „Garagen, Werbeflaechen, Grund und Boden"; Kueche und Sonstiges -> Mieteinnahmen der Wohnung.
+   tax.js liest den Anteil ueber teile(). Der Marktbericht kennt die neuen Teile nicht und nimmt sie wie
+   bisher ueber den Rest (ze - Stellplatz - Kueche) unter Sonstiges: kapitalisiert, wie es sein soll. */
 (function () {
   'use strict';
-  var TEILE = ['ze_stp_monat', 'ze_kueche_monat', 'ze_sonst_monat'];
+  var TEILE = ['ze_stp_monat', 'ze_kueche_monat', 'ze_werb_monat', 'ze_funk_monat', 'ze_sonst_monat'];   /* v3800: + Werbeflaeche, Antenne */
   function el(id) { return document.getElementById(id); }
   function zahl(v) {
     var t = String(v == null ? '' : v).trim().replace(/[^\d.,-]/g, '');
@@ -77,7 +86,8 @@
     } else if (id === 'ze_sonst_monat' || _imSetzen) _basis = null;
     if (_basis != null && so) {
       var stp = zahl((el('ze_stp_monat') || {}).value) || 0, kue = zahl((el('ze_kueche_monat') || {}).value) || 0;
-      var rest = Math.round((_basis - stp - kue) * 100) / 100;
+      var wer = zahl((el('ze_werb_monat') || {}).value) || 0, fun = zahl((el('ze_funk_monat') || {}).value) || 0;   /* v3800 */
+      var rest = Math.round((_basis - stp - kue - wer - fun) * 100) / 100;
       so.value = rest > 0.005 ? de(rest) : '';
     }
     zeSchreiben(summe()); zeichnen();
@@ -97,7 +107,7 @@
       nennt, ersetzt die Summe (die Uebernahme zeigt beide Werte zum Abgleich an). */
   function setzen(t) {
     t = t || {};
-    var map = { stp: 'ze_stp_monat', kueche: 'ze_kueche_monat', sonst: 'ze_sonst_monat' };
+    var map = { stp: 'ze_stp_monat', kueche: 'ze_kueche_monat', werb: 'ze_werb_monat', funk: 'ze_funk_monat', sonst: 'ze_sonst_monat' };
     var neu = !aufgeteilt();
     Object.keys(map).forEach(function (k) {
       var e = el(map[k]); if (!e) return;
@@ -139,6 +149,7 @@
       + '.ze-auft>summary::before{content:"\\25B8  "}.ze-auft[open]>summary::before{content:"\\25BE  "}'
       + '.ze-auft-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:6px}'
       + '.ze-auft-grid .f{margin:0}.ze-auft-grid label{font-size:11px}'
+      + '.ze-auft-grid .ze-av{display:block;font-size:10px;line-height:1.3;color:var(--muted, #7a7370);margin-top:2px}'
       + 'input.ze-gesperrt{opacity:.75;cursor:not-allowed}'
       + '@media (max-width:640px){.ze-auft-grid{grid-template-columns:1fr}}';
     document.head.appendChild(s);
@@ -146,5 +157,10 @@
   function start() { stil(); zeichnen(); }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();
 
-  window.DpZeAufteilung = { TEILE: TEILE, aufgeteilt: aufgeteilt, summe: summe, setzen: setzen, zeichnen: zeichnen };
+  /** v3800 · Teile je Monat (Zahlen, fehlend 0) - fuer die Anlage V (tax.js av_garagen). */
+  function teile() {
+    var w = function (id) { var e = el(id); return e ? (zahl(e.value) || 0) : 0; };
+    return { stp: w('ze_stp_monat'), kueche: w('ze_kueche_monat'), werb: w('ze_werb_monat'), funk: w('ze_funk_monat'), sonst: w('ze_sonst_monat') };
+  }
+  window.DpZeAufteilung = { TEILE: TEILE, aufgeteilt: aufgeteilt, summe: summe, setzen: setzen, zeichnen: zeichnen, teile: teile };
 })();

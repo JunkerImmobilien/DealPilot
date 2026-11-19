@@ -55,7 +55,10 @@ const taxRecordSchema = z.object({
   anschaffungsnah: z.number().nullable().optional(),
   erhaltungsaufwand: z.number().nullable().optional(),
   einnahmen_km: z.number().nullable().optional(),
-  einnahmen_nk: z.number().nullable().optional()
+  einnahmen_nk: z.number().nullable().optional(),
+  /* v3800: weitere Angaben der Anlage V (frontend/js/anlage-v-kern.js) - Zahlen je Schluessel,
+     dazu _erhV (Ursprungsjahr -> Betrag). Unbekannte Schluessel werden im Dienst verworfen. */
+  anlage_v: z.record(z.union([z.number(), z.record(z.number())])).nullable().optional()
 });
 
 const bemerkungSchema = z.object({
