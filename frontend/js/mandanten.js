@@ -1137,7 +1137,7 @@
     { f: 'vv_kst', t: 'Verlustvortrag K\u00f6rperschaftsteuer zum 31.12.', h: 'Feststellung nach \u00a7 10d Abs. 4 EStG, \u00a7 8 Abs. 1 KStG. 0 hei\u00dft: kein Vortrag.' },
     { f: 'vv_gewst', t: 'Fehlbetrag Gewerbesteuer zum 31.12.', h: 'Feststellung nach \u00a7 10a GewStG.' },
     { f: 'gewinnvortrag', t: 'Gewinnvortrag zum 31.12.', h: 'Noch nicht ausgesch\u00fctteter Gewinn laut Bilanz der Kanzlei.' },
-    { f: 'einlagekonto', t: 'Steuerliches Einlagekonto zum 31.12.', h: 'Bestand nach \u00a7 27 KStG laut Feststellung.' },
+    { f: 'einlagekonto', t: 'Steuerliches Einlagekonto zum 31.12.', h: 'Bestand nach \u00a7 27 KStG laut Feststellung.', aus: true },   /* v3850: ausgeblendet (Marcel 19.11.2026: ohne Wirkung), der Wert bleibt erhalten */
     { f: 'gesdar', t: 'Gesellschafterdarlehen zum 31.12.', h: 'Stand laut Bilanz der Kanzlei.' }
   ];
   var _iDraft = {}, _iJahr = null;
@@ -1178,7 +1178,7 @@
   function _iFelder() {
     var w = _iObj(_iDraft[_iJahr]);
     var q = ['', 'Jahresabschluss der Kanzlei', 'Steuerbescheid', 'ADDISON', 'DATEV', 'eigene Angabe'];
-    return ISTARTEN.map(function (k) {
+    return ISTARTEN.filter(function (k) { return !k.aus; }).map(function (k) {
       return '<div class="f"><label>' + k.t + ' (\u20ac)</label>'
         + '<input id="mand-i-' + k.f + '" type="text" inputmode="decimal" placeholder="leer = nicht bekannt" value="' + esc(w[k.f] == null ? '' : String(w[k.f]).replace('.', ',')) + '">'
         + '<div class="mand-fhint" style="margin-top:5px;font-size:11.5px;color:#7A7370;line-height:1.45">' + k.h + '</div></div>';
@@ -1188,7 +1188,10 @@
   function _iSync() {
     if (_iJahr == null) return;
     var o = {}, alt = _iDraft[_iJahr] || {};
-    ISTARTEN.forEach(function (k) { var v = String(_val('mand-i-' + k.f) || '').trim(); o[k.f] = v === '' ? null : _toN(v); });
+    ISTARTEN.forEach(function (k) {
+      if (k.aus) { o[k.f] = alt[k.f] == null ? null : alt[k.f]; return; }   /* v3850: ausgeblendet, nie ueberschreiben */
+      var v = String(_val('mand-i-' + k.f) || '').trim(); o[k.f] = v === '' ? null : _toN(v);
+    });
     o.quelle = _val('mand-i-quelle') || '';
     o.erfasst_am = _iHat(o) ? (alt.erfasst_am || new Date().toISOString().slice(0, 10)) : null;
     _iDraft[_iJahr] = o;
