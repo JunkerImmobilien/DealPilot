@@ -1,0 +1,744 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DealPilot Cockpit · Konzept A</title>
+<meta name="description" content="Konzept A für die Startseite: dunkles Cockpit mit Score-Dial, Pre-Flight-Rechner und Runway-Strecke.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600&family=Cormorant+Garamond:ital,wght@1,500;1,600&display=swap" rel="stylesheet">
+<!--
+  Konzept A · Cockpit (Vorschlag landing-neu, 19.11.2026)
+  Skill ui-ux-pro-max: Stil "Dark Mode (OLED)" + "Data-Dense Dashboard" als Instrumententafel,
+  Muster "Product Demo + Features" (interaktiver Rechner statt Video), Regeln color-contrast,
+  focus-states, reduced-motion, number-tabular, transform-performance, horizontal-scroll.
+  Der Pre-Flight-Rechner nutzt die ECHTEN Kerne der App (frontend/js), keine eigene Formel.
+-->
+<style>
+:root{
+  --ob:#050505; --ob1:#0b0b0a; --ob2:#121110; --ob3:#1a1815;
+  --gd:#C9A84C; --gdh:#E8CC7A; --gdd:#b8932f;
+  --grn:#3FA56C; --grnh:#5BD98E; --rd:#B8625C; --rdh:#D8564C;
+  --cream:#FDFCFA; --karte:#FBF6E9;
+  --txt:#ece6d6; --mut:rgba(236,230,214,.72); --dim:rgba(236,230,214,.52);
+  --line:rgba(201,168,76,.22); --line2:rgba(255,255,255,.08);
+  --runway:linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#b8932f);
+  --disp:'Space Grotesk',system-ui,sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,monospace;
+  --body:'Inter',system-ui,sans-serif;
+  --ser:'Cormorant Garamond',Georgia,serif;
+  --e-an:cubic-bezier(.2,.7,.3,1);
+  --max:1240px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;background:var(--ob)}
+body{margin:0;background:var(--ob);color:var(--txt);font:16px/1.65 var(--body);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+img{max-width:100%;display:block}
+a{color:inherit}
+h1,h2,h3{font-family:var(--disp);margin:0;letter-spacing:-.025em;line-height:1.08}
+.wrap{max-width:var(--max);margin:0 auto;padding:0 24px}
+.mono{font-family:var(--mono);letter-spacing:.12em;text-transform:uppercase;font-size:12px}
+.lbl{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--gdh)}
+:focus-visible{outline:3px solid var(--gdh);outline-offset:3px;border-radius:4px}
+.skip{position:absolute;left:-999px;top:8px;background:var(--gdh);color:#1a1408;padding:10px 14px;z-index:99;font-weight:600}
+.skip:focus{left:8px}
+.btn{display:inline-flex;align-items:center;gap:10px;min-height:48px;padding:0 22px;border-radius:6px;font:600 15px var(--disp);text-decoration:none;cursor:pointer;border:1px solid transparent;transition:transform .2s var(--e-an),box-shadow .2s var(--e-an),background .2s}
+.btn-gold{background:var(--runway);color:#1a1408;box-shadow:0 10px 30px -12px rgba(232,204,122,.6)}
+.btn-gold:hover{transform:translateY(-2px);box-shadow:0 16px 36px -12px rgba(232,204,122,.75)}
+.btn-line{border-color:var(--line);color:var(--txt);background:transparent}
+.btn-line:hover{border-color:var(--gd);background:rgba(201,168,76,.08)}
+.num{font-variant-numeric:tabular-nums}
+
+/* ── Statusleiste + Navigation ─────────────────────────── */
+.bar{background:#000;border-bottom:1px solid var(--line2);overflow:hidden}
+.bar .wrap{display:flex;gap:28px;height:34px;align-items:center;color:var(--dim);font:500 11px var(--mono);letter-spacing:.14em;white-space:nowrap}
+.bar b{color:var(--gdh);font-weight:500}
+.bar .led{width:7px;height:7px;border-radius:50%;background:var(--grnh);box-shadow:0 0 8px var(--grnh);display:inline-block;margin-right:8px;animation:blink 2.4s infinite}
+@keyframes blink{50%{opacity:.35}}
+nav.top{position:sticky;top:0;z-index:40;background:rgba(5,5,5,.82);backdrop-filter:blur(12px);border-bottom:1px solid var(--line2)}
+nav.top .wrap{display:flex;align-items:center;height:68px;gap:28px}
+.mark{font:700 22px var(--disp);letter-spacing:-.03em;text-decoration:none}
+.mark b{color:var(--gdh)}
+nav.top ul{display:flex;gap:24px;list-style:none;margin:0 0 0 auto;padding:0}
+nav.top ul a{text-decoration:none;color:var(--mut);font-size:14.5px;font-weight:500;padding:10px 0}
+nav.top ul a:hover{color:var(--gdh)}
+nav.top .btn{min-height:44px;padding:0 18px;font-size:14px}
+
+/* ── Hero ──────────────────────────────────────────────── */
+.hero{position:relative;overflow:hidden;padding:70px 0 90px;isolation:isolate}
+.hero::before{content:"";position:absolute;inset:0;background:url(../../../frontend/landing/assets/bild/hero.jpg) center 30%/cover no-repeat;opacity:.55;z-index:-2}
+.hero::after{content:"";position:absolute;inset:0;background:radial-gradient(1200px 500px at 75% 45%,rgba(201,168,76,.10),transparent 60%),linear-gradient(180deg,rgba(5,5,5,.2),var(--ob) 92%);z-index:-1}
+.hero .wrap{display:grid;grid-template-columns:1.05fr .95fr;gap:48px;align-items:center}
+.hero h1{font-size:clamp(38px,5.6vw,76px);font-weight:700}
+.hero h1 em{font-family:var(--ser);font-style:italic;font-weight:500;color:var(--gdh);letter-spacing:-.01em}
+.hero p.lead{font-size:18px;color:var(--mut);max-width:560px;margin:22px 0 30px}
+.hero p.lead b{color:var(--txt);font-weight:600}
+.cta-row{display:flex;flex-wrap:wrap;gap:12px}
+.zusage{display:flex;flex-wrap:wrap;gap:8px 18px;margin-top:20px;color:var(--dim);font:500 12px var(--mono);letter-spacing:.08em}
+.zusage span::before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--grn);margin-right:8px;vertical-align:1px}
+.lichter{position:absolute;left:0;right:0;bottom:34px;height:6px;display:flex;justify-content:space-between;padding:0 4vw;z-index:-1}
+.lichter i{width:6px;height:6px;border-radius:50%;background:var(--gdh);opacity:.15;animation:lauf 3.2s infinite}
+@keyframes lauf{0%,100%{opacity:.12;transform:scale(.8)}8%{opacity:1;transform:scale(1.4);box-shadow:0 0 14px var(--gdh)}20%{opacity:.2}}
+
+/* Instrument: Score-Dial */
+.panel{position:relative;background:linear-gradient(180deg,rgba(18,17,16,.92),rgba(8,8,7,.94));border:1px solid var(--line);border-radius:18px;padding:22px 22px 18px;box-shadow:0 40px 80px -40px rgba(0,0,0,.9),inset 0 1px 0 rgba(255,255,255,.04)}
+.panel-kopf{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:6px}
+.panel-kopf .mono{font-size:11px;color:var(--dim)}
+.clear{font:600 11px var(--mono);letter-spacing:.16em;color:var(--grnh);border:1px solid rgba(91,217,142,.35);padding:5px 9px;border-radius:4px}
+.dial{position:relative;width:100%;max-width:360px;margin:0 auto;aspect-ratio:1}
+.dial svg{width:100%;height:100%;overflow:visible}
+.dial .wert{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding-top:8px}
+.dial .zahl{font:700 clamp(64px,8vw,96px)/1 var(--disp);letter-spacing:-.05em}
+.dial .von{font:500 12px var(--mono);color:var(--dim);letter-spacing:.14em;margin-top:6px}
+.dial .stufe{margin-top:12px;font:700 12px var(--mono);letter-spacing:.2em;padding:6px 12px;border-radius:999px;background:rgba(63,165,108,.16);color:var(--grnh);border:1px solid rgba(91,217,142,.3)}
+#nadel{transform-origin:180px 180px;transition:transform 1.6s cubic-bezier(.3,1.35,.45,1)}
+#bogenV{transition:stroke-dashoffset 1.6s var(--e-an),stroke .4s}
+.gauges{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line2);border:1px solid var(--line2);border-radius:10px;overflow:hidden;margin-top:8px}
+.gauges div{background:var(--ob1);padding:12px 10px}
+.gauges small{display:block;font:500 10.5px var(--mono);letter-spacing:.12em;color:var(--dim);text-transform:uppercase}
+.gauges b{font:600 17px var(--disp);color:var(--txt)}
+.gauges b.ok{color:var(--grnh)}
+.panel-fuss{margin-top:10px;font:500 11px var(--mono);color:var(--dim);letter-spacing:.06em}
+
+/* ── Telemetrie ─────────────────────────────────────────── */
+.telemetrie{border-top:1px solid var(--line2);border-bottom:1px solid var(--line2);background:var(--ob1)}
+.telemetrie .wrap{display:grid;grid-template-columns:repeat(6,1fr)}
+.tm{padding:26px 16px;border-left:1px solid var(--line2)}
+.tm:first-child{border-left:0}
+.tm b{display:block;font:700 clamp(26px,2.6vw,36px)/1.1 var(--disp);color:var(--gdh);letter-spacing:-.03em}
+.tm span{display:block;margin-top:8px;font:500 11px/1.45 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--mut)}
+
+/* ── Abschnitte ─────────────────────────────────────────── */
+section.ab{padding:110px 0}
+.ab-kopf{max-width:760px;margin-bottom:48px}
+.ab-kopf h2{font-size:clamp(32px,4vw,54px);margin-top:14px}
+.ab-kopf p{color:var(--mut);font-size:17.5px;margin:18px 0 0}
+
+/* Pre-Flight-Rechner */
+.pf{display:grid;grid-template-columns:1fr 1fr;gap:28px;align-items:start}
+.regler{background:var(--ob1);border:1px solid var(--line2);border-radius:16px;padding:8px 26px 24px}
+.feld{padding:18px 0;border-bottom:1px solid var(--line2)}
+.feld:last-of-type{border-bottom:0}
+.feld-kopf{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+.feld label{font:500 12px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--mut)}
+.feld output{font:600 22px var(--disp);color:var(--txt)}
+.feld .hilfe{font-size:13px;color:var(--dim);margin-top:6px}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:44px;background:transparent;margin:6px 0 0;cursor:pointer;touch-action:manipulation}
+input[type=range]::-webkit-slider-runnable-track{height:4px;border-radius:2px;background:linear-gradient(90deg,var(--gd) var(--p,50%),rgba(255,255,255,.14) var(--p,50%))}
+input[type=range]::-moz-range-track{height:4px;border-radius:2px;background:rgba(255,255,255,.14)}
+input[type=range]::-moz-range-progress{height:4px;background:var(--gd)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;height:24px;margin-top:-10px;border-radius:50%;background:var(--gdh);border:4px solid var(--ob);box-shadow:0 0 0 1px var(--gd)}
+input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:var(--gdh);border:4px solid var(--ob)}
+.anzeige{position:sticky;top:90px}
+.annun{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px}
+.annun div{border:1px solid var(--line2);border-radius:8px;padding:10px;text-align:center;font:600 11px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--dim);transition:all .3s}
+.annun div.an{color:#06140c;background:var(--grnh);border-color:var(--grnh)}
+.annun div.warn{color:#1a1408;background:var(--gdh);border-color:var(--gdh)}
+.annun div.rot{color:#fff;background:var(--rd);border-color:var(--rd)}
+.pf-cta{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-top:18px}
+.pf-cta small{color:var(--dim);font-size:13px}
+.kern-fehlt{display:none;color:var(--gdh);font-size:14px;margin-top:10px}
+
+/* Runway-Strecke */
+.runway{position:relative;padding:20px 0}
+.runway .achse{position:absolute;left:50%;top:0;bottom:0;width:2px;transform:translateX(-50%);background:repeating-linear-gradient(180deg,rgba(232,204,122,.45) 0 18px,transparent 18px 38px)}
+.runway .achse i{position:absolute;left:0;top:0;width:2px;height:100%;background:var(--runway);transform-origin:top;transform:scaleY(var(--fort,0));box-shadow:0 0 12px var(--gdh)}
+.etappe{position:relative;display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;margin:0 0 90px}
+.etappe:last-child{margin-bottom:0}
+.etappe .punkt{position:absolute;left:50%;top:50%;width:46px;height:46px;margin:-23px 0 0 -23px;border-radius:50%;background:var(--ob);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font:700 13px var(--mono);color:var(--dim);transition:all .5s var(--e-an);z-index:2}
+.etappe.drin .punkt{border-color:var(--gdh);color:#1a1408;background:var(--gdh);box-shadow:0 0 0 6px rgba(232,204,122,.12),0 0 30px rgba(232,204,122,.5)}
+.etappe:nth-child(odd of .etappe) .text{order:2}
+.etappe .text .lbl{font-size:11.5px}
+.etappe h3{font-size:clamp(24px,2.4vw,32px);margin:10px 0 12px}
+.etappe p{color:var(--mut);margin:0}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.chips span{font:500 11.5px var(--mono);letter-spacing:.06em;padding:6px 10px;border:1px solid var(--line);border-radius:4px;color:var(--gdh)}
+.schirm{border-radius:12px;overflow:hidden;border:1px solid var(--line);background:#111;box-shadow:0 30px 60px -30px rgba(0,0,0,.9);transform:perspective(1200px) rotateY(var(--ry,0deg));transition:transform .8s var(--e-an)}
+.schirm .rahmen{display:flex;gap:6px;padding:9px 12px;background:#161513;border-bottom:1px solid var(--line2)}
+.schirm .rahmen i{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.16)}
+.schirm img{width:100%;height:auto;aspect-ratio:16/9;object-fit:cover;object-position:top left}
+.etappe:nth-child(even of .etappe) .schirm{--ry:4deg}
+.etappe:nth-child(odd of .etappe) .schirm{--ry:-4deg}
+.etappe.drin .schirm{--ry:0deg}
+.qc{background:var(--karte);color:#16130d;padding:18px;font-size:14px}
+.qc-kopf{display:flex;gap:14px;align-items:center;border-bottom:1px solid rgba(20,18,15,.1);padding-bottom:12px}
+.qc-ring{width:58px;height:58px;border-radius:50%;display:flex;align-items:center;justify-content:center;font:700 22px var(--disp);background:conic-gradient(var(--grn) 0 81%,rgba(20,18,15,.1) 81% 100%);position:relative}
+.qc-ring::before{content:"";position:absolute;inset:6px;border-radius:50%;background:var(--karte)}
+.qc-ring span{position:relative}
+.qc-kopf b{display:block;font:700 15px var(--disp)}
+.qc-kopf small{color:#4a4536}
+.qc-z{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px dashed rgba(20,18,15,.12)}
+.qc-z:last-child{border-bottom:0}
+.qc-z span{color:#3a3527}
+.qc-z b{font-family:var(--disp);white-space:nowrap}
+.qc-z b.g{color:#23774a}
+
+/* Datenbasis */
+.rack{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line2);border:1px solid var(--line2);border-radius:16px;overflow:hidden}
+.quelle{background:var(--ob1);padding:24px 22px;position:relative}
+.quelle .takt{font:500 10.5px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--grnh);display:flex;align-items:center;gap:8px}
+.quelle .takt::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--grnh);box-shadow:0 0 8px var(--grnh)}
+.quelle h3{font-size:18px;margin:14px 0 8px}
+.quelle p{font-size:14px;color:var(--mut);margin:0 0 14px}
+.quelle b{font:600 15px var(--mono);color:var(--gdh);letter-spacing:.02em}
+.gross{display:grid;grid-template-columns:auto 1fr;gap:40px;align-items:end;margin-bottom:40px}
+.gross .riesig{font:700 clamp(56px,9vw,128px)/.9 var(--disp);letter-spacing:-.05em;background:var(--runway);-webkit-background-clip:text;background-clip:text;color:transparent}
+.gross p{color:var(--mut);max-width:520px;margin:0}
+.hinweis{margin-top:22px;color:var(--dim);font-size:14px;max-width:820px}
+
+/* Preise · Boarding Pass */
+.umschalter{display:inline-flex;border:1px solid var(--line);border-radius:999px;padding:4px;margin-bottom:30px}
+.umschalter button{min-height:44px;padding:0 18px;border-radius:999px;border:0;background:transparent;color:var(--mut);font:600 14px var(--disp);cursor:pointer}
+.umschalter button[aria-pressed=true]{background:var(--gdh);color:#1a1408}
+.passes{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.pass{position:relative;display:flex;flex-direction:column;background:var(--ob1);border:1px solid var(--line2);border-radius:14px;overflow:hidden;transition:transform .25s var(--e-an),border-color .25s}
+.pass:hover{transform:translateY(-4px);border-color:var(--line)}
+.pass.best{border-color:var(--gd);box-shadow:0 0 0 1px var(--gd),0 30px 60px -30px rgba(201,168,76,.35)}
+.pass .oben{padding:22px 22px 18px}
+.pass .klasse{font:500 11px var(--mono);letter-spacing:.16em;color:var(--dim);text-transform:uppercase}
+.pass h3{font-size:26px;margin:8px 0 2px}
+.pass .wer{color:var(--mut);font-size:14px}
+.pass .preis{font:700 34px var(--disp);letter-spacing:-.03em;margin:18px 0 0}
+.pass .preis small{font:500 13px var(--body);color:var(--dim);letter-spacing:0}
+.pass .jahr{font-size:13px;color:var(--dim);min-height:20px}
+.pass .perf{height:0;border-top:2px dashed rgba(255,255,255,.12);margin:0 14px;position:relative}
+.pass .perf::before,.pass .perf::after{content:"";position:absolute;top:-12px;width:22px;height:22px;border-radius:50%;background:var(--ob)}
+.pass .perf::before{left:-26px}.pass .perf::after{right:-26px}
+.pass ul{list-style:none;margin:0;padding:18px 22px;flex:1;font-size:14.5px;color:var(--mut)}
+.pass li{padding:5px 0 5px 22px;position:relative}
+.pass li::before{content:"";position:absolute;left:0;top:13px;width:10px;height:2px;background:var(--gd)}
+.pass .unten{padding:0 22px 22px}
+.pass .unten .btn{width:100%;justify-content:center}
+.pass .code{font:500 10.5px var(--mono);letter-spacing:.18em;color:var(--dim);text-align:center;margin-top:12px}
+.best-tag{position:absolute;top:16px;right:16px;font:700 10.5px var(--mono);letter-spacing:.14em;color:#1a1408;background:var(--gdh);padding:4px 8px;border-radius:4px}
+
+/* Partner */
+.partner{display:grid;grid-template-columns:1fr 1.1fr;gap:56px;align-items:center}
+.schritte{counter-reset:s;display:grid;gap:12px}
+.schritt{display:grid;grid-template-columns:52px 1fr;gap:16px;align-items:start;padding:16px;border:1px solid var(--line2);border-radius:12px;background:var(--ob1)}
+.schritt::before{counter-increment:s;content:"0" counter(s);font:700 14px var(--mono);color:var(--gdh);border:1px solid var(--line);border-radius:8px;height:44px;display:flex;align-items:center;justify-content:center}
+.schritt b{font-family:var(--disp);font-size:17px}
+.schritt span{display:block;color:var(--mut);font-size:14.5px}
+
+/* Fragen */
+.fragen{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+details{border:1px solid var(--line2);border-radius:12px;background:var(--ob1)}
+summary{cursor:pointer;list-style:none;padding:20px 52px 20px 20px;font:600 16.5px var(--disp);position:relative;min-height:44px}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+";position:absolute;right:20px;top:16px;font:400 24px var(--mono);color:var(--gdh);transition:transform .25s}
+details[open] summary::after{transform:rotate(45deg)}
+details p{margin:0;padding:0 20px 20px;color:var(--mut);font-size:15px}
+
+/* Schluss */
+.schluss{position:relative;text-align:center;padding:130px 0;overflow:hidden;border-top:1px solid var(--line2)}
+.schluss::before{content:"";position:absolute;left:50%;bottom:-40%;width:140%;height:120%;transform:translateX(-50%);background:radial-gradient(closest-side,rgba(201,168,76,.18),transparent);pointer-events:none}
+.schluss h2{font-size:clamp(40px,6vw,84px)}
+.schluss p{color:var(--mut);font-size:18px;max-width:560px;margin:20px auto 32px}
+.schluss .cta-row{justify-content:center}
+footer{border-top:1px solid var(--line2);padding:40px 0 60px;color:var(--dim);font-size:13.5px}
+footer .wrap{display:flex;flex-wrap:wrap;gap:16px 40px;justify-content:space-between}
+footer a{color:var(--mut);text-decoration:none}
+footer a:hover{color:var(--gdh)}
+.vertrauen{display:flex;flex-wrap:wrap;gap:10px 28px;margin-top:40px;color:var(--mut);font-size:14px}
+.vertrauen span b{color:var(--txt);font-weight:600}
+
+/* Einblenden */
+.auf{opacity:0;transform:translateY(24px);transition:opacity .8s var(--e-an),transform .8s var(--e-an)}
+.auf.da{opacity:1;transform:none}
+
+/* ── Responsiv ─────────────────────────────────────────── */
+@media (max-width:1080px){
+  nav.top ul{display:none}
+  nav.top .btn{margin-left:auto}
+  .telemetrie .wrap{grid-template-columns:repeat(3,1fr)}
+  .tm:nth-child(4){border-left:0}
+  .tm:nth-child(n+4){border-top:1px solid var(--line2)}
+  .rack{grid-template-columns:repeat(2,1fr)}
+  .passes{grid-template-columns:repeat(2,1fr)}
+}
+@media (max-width:860px){
+  .hero .wrap,.pf,.partner,.fragen{grid-template-columns:1fr}
+  .anzeige{position:static}
+  .runway .achse{left:22px}
+  .etappe{grid-template-columns:1fr;gap:22px;padding-left:62px;margin-bottom:64px}
+  .etappe .punkt{left:22px;top:0;margin-top:0}
+  .etappe .text{order:0!important}
+  .schirm{--ry:0deg!important}
+  .gross{grid-template-columns:1fr;gap:16px}
+}
+@media (max-width:560px){
+  .wrap{padding:0 16px}
+  .bar .wrap{gap:20px}
+  .bar .weg{display:none}
+  .hero{padding:44px 0 70px}
+  .hero p.lead{font-size:16.5px}
+  .cta-row .btn{flex:1 1 100%;justify-content:center}
+  .gauges{grid-template-columns:repeat(2,1fr)}
+  .telemetrie .wrap{grid-template-columns:repeat(2,1fr)}
+  .tm{border-left:1px solid var(--line2)!important;border-top:1px solid var(--line2)}
+  .tm:nth-child(odd){border-left:0!important}
+  .tm:nth-child(-n+2){border-top:0}
+  section.ab{padding:76px 0}
+  .rack,.passes{grid-template-columns:1fr}
+  .regler{padding:4px 18px 18px}
+  .annun{grid-template-columns:1fr 1fr 1fr}
+  .annun div{font-size:10px;letter-spacing:.06em;padding:10px 4px}
+  .runway .achse{left:16px}
+  .etappe{padding-left:46px}
+  .etappe .punkt{left:16px;width:36px;height:36px;margin-left:-18px;font-size:11px}
+  .schluss{padding:90px 0}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+  .auf{opacity:1;transform:none}
+  .schirm{--ry:0deg!important}
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#inhalt">Zum Inhalt springen</a>
+
+<div class="bar" aria-label="Kurzinfo"><div class="wrap">
+  <span><i class="led" aria-hidden="true"></i>SYSTEME BEREIT</span>
+  <span><b>4 WOCHEN PRO</b> OHNE ZAHLUNGSDATEN</span>
+  <span class="weg">MONATLICH KÜNDBAR</span>
+  <span class="weg">&gt; 870 NUTZER</span>
+  <span class="weg">SERVER IN DEUTSCHLAND</span>
+</div></div>
+
+<nav class="top" aria-label="Hauptnavigation"><div class="wrap">
+  <a class="mark" href="#">Deal<b>Pilot</b></a>
+  <ul>
+    <li><a href="#preflight">Pre-Flight</a></li>
+    <li><a href="#strecke">So fliegt ein Deal</a></li>
+    <li><a href="#daten">Datenbasis</a></li>
+    <li><a href="#preise">Preise</a></li>
+    <li><a href="#fragen">Fragen</a></li>
+  </ul>
+  <a class="btn btn-gold" href="https://app.dealpilot.immo/">Kostenlos starten</a>
+</div></nav>
+
+<main id="inhalt">
+<!-- ═══ HERO ═══ -->
+<header class="hero">
+  <div class="wrap">
+    <div>
+      <div class="lbl">Immobilien-Investmentanalyse</div>
+      <h1 style="margin-top:18px">Immobilien&shy;entscheidungen sind zu groß für ein <em>Bauchgefühl.</em></h1>
+      <p class="lead">DealPilot begleitet deine Immobilie vom ersten Exposé bis in den Bestand, mit vollständiger Rechnung, einem amtlich begründeten Wert und einem Investment Case, der bei der Bank besteht. <b>Ab dann fliegst du nach Flugdaten.</b></p>
+      <div class="cta-row">
+        <a class="btn btn-gold" href="https://app.dealpilot.immo/">Vier Wochen als Pro, kostenlos</a>
+        <a class="btn btn-line" href="#preflight">Pre-Flight-Check starten</a>
+      </div>
+      <div class="zusage"><span>Keine Zahlungsdaten</span><span>4 Wochen voller Pro-Umfang</span><span>Danach automatisch Free</span></div>
+    </div>
+
+    <div class="panel" role="img" aria-label="Investor Deal Score 81 von 100, Stufe Gut, Beispieldaten">
+      <div class="panel-kopf"><span class="mono">Pre-Flight · Investor Deal Score</span><span class="clear">CLEARED</span></div>
+      <div class="dial" aria-hidden="true">
+        <svg viewBox="0 0 360 360">
+          <defs>
+            <linearGradient id="gGold" x1="0" x2="1"><stop offset="0" stop-color="#E8CC7A"/><stop offset=".55" stop-color="#C9A84C"/><stop offset="1" stop-color="#b8932f"/></linearGradient>
+          </defs>
+          <g id="skala"></g>
+          <circle cx="180" cy="180" r="132" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="14" stroke-dasharray="622 1000" transform="rotate(135 180 180)" stroke-linecap="round"/>
+          <circle id="bogenV" cx="180" cy="180" r="132" fill="none" stroke="#3FA56C" stroke-width="14" stroke-dasharray="622 1000" stroke-dashoffset="622" transform="rotate(135 180 180)" stroke-linecap="round"/>
+          <g id="nadel" style="transform:rotate(-135deg)">
+            <path d="M180 18 L189 36 L171 36 Z" fill="#E8CC7A"/>
+            <line x1="180" y1="38" x2="180" y2="60" stroke="#E8CC7A" stroke-width="3" stroke-linecap="round"/>
+          </g>
+        </svg>
+        <div class="wert"><span class="zahl num" id="heroZahl">0</span><span class="von">VON 100</span><span class="stufe">GUT</span></div>
+      </div>
+      <div class="gauges">
+        <div><small>Cashflow</small><b class="ok num">+147 €</b></div>
+        <div><small>DSCR</small><b class="num">1,22</b></div>
+        <div><small>Brutto</small><b class="num">6,7 %</b></div>
+        <div><small>Faktor</small><b class="num">14,9</b></div>
+      </div>
+      <div class="panel-fuss">BEISPIELDATEN · ETW 74 M² · KAUFPREIS 179.000 € · KALTMIETE 1.000 €</div>
+    </div>
+  </div>
+  <div class="lichter" aria-hidden="true" id="lichter"></div>
+</header>
+
+<!-- ═══ TELEMETRIE ═══ -->
+<div class="telemetrie" aria-label="Kennzahlen">
+  <div class="wrap">
+    <div class="tm"><b class="num" data-zahl="30" data-nach=" s">30 s</b><span>vom Exposé zur Bewertung</span></div>
+    <div class="tm"><b class="num" data-zahl="24">24</b><span>Kennzahlen hinter jedem Score</span></div>
+    <div class="tm"><b class="num" data-zahl="19">19</b><span>Module an Bord</span></div>
+    <div class="tm"><b class="num" data-zahl="6187">6.187</b><span>amtliche Werte im Register</span></div>
+    <div class="tm"><b class="num" data-zahl="201">201</b><span>Gutachterausschüsse mit Werten</span></div>
+    <div class="tm"><b class="num">1,1 Mio.</b><span>amtliche Datenpunkte, gemessen</span></div>
+  </div>
+</div>
+
+<!-- ═══ PRE-FLIGHT ═══ -->
+<section class="ab" id="preflight">
+  <div class="wrap">
+    <div class="ab-kopf auf">
+      <div class="lbl">Pre-Flight-Check · ohne Anmeldung</div>
+      <h2>Schieb die Regler. Das Cockpit rechnet mit.</h2>
+      <p>Hier rechnen dieselben Kerne wie in der App: Kennzahlen, DSCR und Investor Deal Score. Keine Schätzformel, keine Anmeldung. Gefällt dir der Deal, nimmst du die Zahlen mit in die App.</p>
+    </div>
+    <div class="pf">
+      <form class="regler auf" id="pfForm" onsubmit="return false" aria-label="Eingaben für den Pre-Flight-Check">
+        <div class="feld">
+          <div class="feld-kopf"><label for="rKp">Kaufpreis</label><output id="oKp" class="num" for="rKp">179.000 €</output></div>
+          <input type="range" id="rKp" min="50000" max="800000" step="1000" value="179000">
+        </div>
+        <div class="feld">
+          <div class="feld-kopf"><label for="rNkm">Kaltmiete im Monat</label><output id="oNkm" class="num" for="rNkm">1.000 €</output></div>
+          <input type="range" id="rNkm" min="200" max="5000" step="10" value="1000">
+        </div>
+        <div class="feld">
+          <div class="feld-kopf"><label for="rEk">Eigenkapital</label><output id="oEk" class="num" for="rEk">30 %</output></div>
+          <input type="range" id="rEk" min="0" max="60" step="1" value="30">
+          <div class="hilfe">Anteil am Kaufpreis. Nebenkosten 10 % und Tilgung 1,5 % wie im Deal-Check.</div>
+        </div>
+        <div class="feld">
+          <div class="feld-kopf"><label for="rZins">Zins</label><output id="oZins" class="num" for="rZins">4,22 %</output></div>
+          <input type="range" id="rZins" min="1" max="7" step="0.01" value="4.22">
+          <div class="hilfe">Beispiel 4,22 % bei 10 Jahren Zinsbindung, Stand 18.11.2026. In der App tagesaktuell je Zinsbindung.</div>
+        </div>
+      </form>
+
+      <div class="anzeige">
+        <div class="panel auf">
+          <div class="panel-kopf"><span class="mono">Live · Investor Deal Score</span><span class="mono" id="pfStand" aria-live="polite">Gut</span></div>
+          <div class="dial" style="max-width:300px" aria-hidden="true">
+            <svg viewBox="0 0 360 360">
+              <circle cx="180" cy="180" r="132" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="14" stroke-dasharray="622 1000" transform="rotate(135 180 180)" stroke-linecap="round"/>
+              <circle id="pfBogen" cx="180" cy="180" r="132" fill="none" stroke="#3FA56C" stroke-width="14" stroke-dasharray="622 1000" stroke-dashoffset="622" transform="rotate(135 180 180)" stroke-linecap="round" style="transition:stroke-dashoffset .5s var(--e-an),stroke .3s"/>
+            </svg>
+            <div class="wert"><span class="zahl num" id="pfZahl">81</span><span class="von">VON 100</span><span class="stufe" id="pfStufe">GUT</span></div>
+          </div>
+          <div class="gauges">
+            <div><small>Cashflow / Monat</small><b class="num" id="pfCf">+147 €</b></div>
+            <div><small>DSCR</small><b class="num" id="pfDscr">1,22</b></div>
+            <div><small>Brutto</small><b class="num" id="pfBr">6,70 %</b></div>
+            <div><small>Netto</small><b class="num" id="pfNe">5,06 %</b></div>
+          </div>
+          <div class="annun" aria-hidden="true">
+            <div id="aCf">Cashflow</div><div id="aDscr">Kapitaldienst</div><div id="aSc">Score</div>
+          </div>
+          <p class="kern-fehlt" id="kernFehlt">Die Rechenkerne der App sind hier gerade nicht geladen. Angezeigt wird das Beispiel.</p>
+          <div class="pf-cta">
+            <a class="btn btn-gold" id="pfLos" href="https://app.dealpilot.immo/">Mit diesen Zahlen in die App</a>
+            <small>Die Zahlen reisen im Link mit, nichts geht an einen Server.</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ RUNWAY · NEUN ETAPPEN ═══ -->
+<section class="ab" id="strecke" style="background:linear-gradient(180deg,var(--ob),var(--ob1) 20%,var(--ob1) 80%,var(--ob))">
+  <div class="wrap">
+    <div class="ab-kopf auf">
+      <div class="lbl">So fliegt ein Deal</div>
+      <h2>Vom Exposé bis in den Bestand. In neun Etappen.</h2>
+      <p>DealPilot liest Exposé und Unterlagen ein, rechnet Finanzierung, Cashflow und Steuer durch und begründet den Wert mit den Daten der Gutachterausschüsse. Die Startbahn leuchtet mit, während du scrollst.</p>
+    </div>
+    <div class="runway" id="runway">
+      <div class="achse" aria-hidden="true"><i></i></div>
+
+      <article class="etappe">
+        <div class="punkt" aria-hidden="true">01</div>
+        <div class="text"><div class="lbl">Etappe 01 · Quick-Check</div><h3>Erst prüfen, dann erfassen</h3>
+          <p>Alle Exposés und Dateien auf einmal hineinziehen. DealPilot liest sie aus, holt Marktwert und Miete dazu und zeigt in etwa einer halben Minute Score, Rendite, Cashflow und ein klares Urteil gegen dein eigenes Ziel, mit dem Kaufpreis, ab dem es passt.</p>
+          <div class="chips"><span>Alle Dateien auf einmal</span><span>Urteil gegen dein Ziel</span><span>Zielkaufpreis</span></div></div>
+        <div class="schirm"><div class="rahmen" aria-hidden="true"><i></i><i></i><i></i></div>
+          <div class="qc" role="img" aria-label="Quick-Check mit Beispieldaten: Score 81, Gut">
+            <div class="qc-kopf"><div class="qc-ring"><span>81</span></div><div><b>Ersteinschätzung · Gut</b><small>Starker Kauf · empfehlenswert · Beispieldaten</small></div></div>
+            <div class="qc-z"><span>Preis unter der Marktspanne</span><b class="g">−14 % zur Mitte</b></div>
+            <div class="qc-z"><span>Zustand und Modernisierung</span><b>14 Pkt.</b></div>
+            <div class="qc-z"><span>Rendite erfüllt das Ziel der B-Lage</span><b class="g">6,7 %</b></div>
+            <div class="qc-z"><span>Finanzierung trägt sich</span><b class="g">+147 € pro Monat</b></div>
+          </div></div>
+      </article>
+
+      <article class="etappe">
+        <div class="punkt" aria-hidden="true">02</div>
+        <div class="text"><div class="lbl">Etappe 02 · Erfassen</div><h3>Objekt erfassen</h3>
+          <p>Exposé hineinziehen, frei erzählen, ein Inserat aus ImmoMetrica übernehmen oder Frage für Frage eingeben. Wie tief du gehst, wählst du selbst: Einsteiger, Fortgeschritten oder Experte.</p>
+          <div class="chips"><span>Exposé und Dokumente</span><span>Sprache</span><span>Geführte Eingabe</span></div></div>
+        <div class="schirm"><div class="rahmen" aria-hidden="true"><i></i><i></i><i></i></div><img src="../../../frontend/landing/assets/dp-strecke/01-objekt-erfassen.webp" alt="DealPilot: Objekt erfassen" loading="lazy" width="1600" height="900"></div>
+      </article>
+
+      <article class="etappe">
+        <div class="punkt" aria-hidden="true">03</div>
+        <div class="text"><div class="lbl">Etappe 03 · Prüfen</div><h3>Rendite und Investor Deal Score</h3>
+          <p>Der Score fasst 24 Kennzahlen in fünf Bereichen zusammen: Rendite, Finanzierung, Risiko, Lage und Potenzial. Am Ende steht eine Zahl von 0 bis 100 mit Stufe und Empfehlung, und du siehst, welche Kennzahl ihn trägt und welche ihn drückt.</p>
+          <div class="chips"><span>Investment-Score</span><span>Finanzierungs-Score</span><span>Empfehlung</span></div></div>
+        <div class="schirm"><div class="rahmen" aria-hidden="true"><i></i><i></i><i></i></div><img src="../../../frontend/landing/assets/dp-strecke/02-score.webp" alt="DealPilot: Investor Deal Score mit Investment- und Finanzierungs-Score" loading="lazy" width="1600" height="900"></div>
+      </article>
+
+      <article class="etappe">
+        <div class="punkt" aria-hidden="true">04</div>
+        <div class="text"><div class="lbl">Etappe 04 · Prüfen</div><h3>Unterlagen lesen</h3>
+          <p>Mietaufstellung, Grundbuch, WEG-Protokolle und Energieausweis auf einmal hineinziehen. DealPilot erkennt jedes Dokument, schwärzt Personendaten und zeigt mit Fundstelle, was absehbar Geld kostet. Bevor du ein Angebot machst.</p>
+          <div class="chips"><span>Mehrere PDFs</span><span>Personendaten geschwärzt</span><span>Risiken mit Fundstelle</span></div></div>
+        <div class="schirm"><div class="rahmen" aria-hidden="true"><i></i><i></i><i></i></div><img src="../../../frontend/landing/assets/dp-strecke/03-unterlagen.webp" alt="DealPilot: Unterlagen lesen" loading="lazy" width="1600" height="900"></div>
+      </article>
+
+      <article class="etappe">
+        <div class="punkt" aria-hidden="true">05</div>
+        <div class="text"><div class="lbl">Etappe 05 · Rechnen</div><h3>Finanzierung und Cashflow</h3>
+          <p>Den indikativen Zins gibt es täglich aktuell je Zinsbindung und Beleihung. Von der Miete gehen Bewirtschaftung, Zinsen und Tilgung ab, übrig bleibt der Cashflow im Monat. Ob die Finanzierung trägt, prüft der DSCR, die Beleihung der LTV.</p>
+          <div class="chips"><span>Zins je Zinsbindung</span><span>DSCR</span><span>LTV</span></div></div>
+        <div class="schirm"><div class="rahmen" aria-hidden="true"><i></i><i></i><i></i></div><img src="../../../frontend/landing/assets/dp-strecke/04-finanzierung.webp" alt="DealPilot: Finanzierung und Cashflow" loading="lazy" width="1600" height="900"></div>
+      </article>
+
+      <article class="etappe">
+        <div class="punkt" aria-hidden="true">06</div>
+        <div class="text"><div class="lbl">Etappe 06 · Rechnen</div><h3>Steuer, AfA und Restnutzungsdauer</h3>
+          <p>Den Gebäudeanteil teilt DealPilot nach der Arbeitshilfe des Bundesfinanzministeriums auf, die Restnutzungsdauer folgt Anlage 2 ImmoWertV. Der Steuerverlauf zeigt, ab welchem Jahr das Objekt Steuern kostet.</p>
+          <div class="chips"><span>Kaufpreisaufteilung</span><span>AfA</span><span>Wendepunkt</span></div></div>
+        <div class="schirm"><div class="rahmen" aria-hidden="true"><i></i><i></i><i></i></div><img src="../../../frontend/landing/assets/dp-strecke/05-steuer.webp" alt="DealPilot: Steuer und AfA" loading="lazy" width="1600" height="900"></div>
+      </article>
+
+      <article class="etappe">
+        <div class="punkt" aria-hidden="true">07</div>
+        <div class="text"><div class="lbl">Etappe 07 · Bewerten</div><h3>Wertermittlung nach ImmoWertV</h3>
+          <p>Der Marktbericht zeigt Lage, Bodenrichtwert, Zensus und Vergleichspreise und begründet den Wert mit Liegenschaftszinssätzen und Sachwertfaktoren der Gutachterausschüsse. Jede Zahl nennt ihre Herkunft. Fehlt eine amtliche Zahl, wird keine erfunden.</p>
+          <div class="chips"><span>Bodenrichtwert</span><span>Ertrags- und Sachwert</span><span>Quellennachweis</span></div></div>
+        <div class="schirm"><div class="rahmen" aria-hidden="true"><i></i><i></i><i></i></div><img src="../../../frontend/landing/assets/dp-strecke/06-wertermittlung.webp" alt="DealPilot: Wertermittlung" loading="lazy" width="1600" height="900"></div>
+      </article>
+
+      <article class="etappe">
+        <div class="punkt" aria-hidden="true">08</div>
+        <div class="text"><div class="lbl">Etappe 08 · Planen</div><h3>Mieterhöhung und Zielbild</h3>
+          <p>Wohnung für Wohnung: was der laufende Vertrag hergibt, was nach Mietspiegel und Kappungsgrenze verlangbar ist und was erst nach Umbau oder Mieterwechsel geht. Ankauf, heute und Zielbild stehen nebeneinander.</p>
+          <div class="chips"><span>Ankauf</span><span>Heute</span><span>Zielbild</span></div></div>
+        <div class="schirm"><div class="rahmen" aria-hidden="true"><i></i><i></i><i></i></div><img src="../../../frontend/landing/assets/dp-strecke/07-zielbild.webp" alt="DealPilot: Mieterhöhung und Zielbild" loading="lazy" width="1600" height="900"></div>
+      </article>
+
+      <article class="etappe">
+        <div class="punkt" aria-hidden="true">09</div>
+        <div class="text"><div class="lbl">Etappe 09 · Halten</div><h3>Vom Ankauf in den Bestand</h3>
+          <p>Stellst du ein Objekt auf gewonnen, friert DealPilot den Ankauf ein und vergleicht im Bestand Plan gegen heute. Für die Bank entstehen der Investment-Case als PDF, der Track-Record und der Bankexport mit 25 Spalten je Objekt.</p>
+          <div class="chips"><span>Soll gegen Ist</span><span>Bank-PDF</span><span>Bankexport</span></div></div>
+        <div class="schirm"><div class="rahmen" aria-hidden="true"><i></i><i></i><i></i></div><img src="../../../frontend/landing/assets/dp-strecke/08-bestand.webp" alt="DealPilot: Bestand" loading="lazy" width="1600" height="900"></div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ DATENBASIS ═══ -->
+<section class="ab" id="daten">
+  <div class="wrap">
+    <div class="gross auf">
+      <div class="riesig num">1.100.360</div>
+      <div><div class="lbl">Datenbasis · gemessen am 18.11.2026</div>
+        <p style="margin-top:12px">amtliche Datenpunkte in unseren Datenbanken. DealPilot rechnet nicht mit Schätzwerten aus dem Netz, sondern mit den Daten der Behörden, regelmäßig abgeglichen und mit Herkunft je Wert.</p></div>
+    </div>
+    <div class="rack auf">
+      <div class="quelle"><span class="takt">live je Bericht</span><h3>Bodenrichtwerte</h3><p>Bodenrichtwert und Zone aus den amtlichen Diensten der Länder und des Bundes, für alle 16 Länder.</p><b>10 Dienste</b></div>
+      <div class="quelle"><span class="takt">wöchentlich bis monatlich</span><h3>Gutachterausschüsse</h3><p>Liegenschaftszinssätze, Sachwertfaktoren, Vergleichsfaktoren und Umrechnungskoeffizienten mit Fundstelle.</p><b>6.187 Werte · 201 Ausschüsse</b></div>
+      <div class="quelle"><span class="takt">Stichtag 15.05.2022</span><h3>Zensus 2022</h3><p>Wohnungen, Gebäude, Leerstand und Mieten bis auf die Gemeinde.</p><b>894.880 Werte</b></div>
+      <div class="quelle"><span class="takt">monatlich</span><h3>Regionaldatenbank</h3><p>Bevölkerung, Einkommen, Arbeitsmarkt und Wanderung je Kreis und Gemeinde.</p><b>108.676 Werte</b></div>
+      <div class="quelle"><span class="takt">monatlich</span><h3>Bautätigkeit und Bauland</h3><p>Baugenehmigungen, Fertigstellungen und Kaufwerte für Bauland.</p><b>56.128 Werte</b></div>
+      <div class="quelle"><span class="takt">bundesweit</span><h3>Obere Gutachterausschüsse</h3><p>Preis- und Mietspannen zur Einordnung jedes Objekts.</p><b>28.827 Werte</b></div>
+      <div class="quelle"><span class="takt">täglich</span><h3>Deutsche Bundesbank</h3><p>Zinsstruktur und Zinsstatistik, daraus die indikativen Bauzinsen.</p><b>1.376 Tageswerte</b></div>
+      <div class="quelle"><span class="takt">wöchentlich</span><h3>Statistisches Bundesamt</h3><p>Verbraucherpreise, Nettokaltmieten und Baupreisindex zum richtigen Stichtag.</p><b>301 Indexwerte</b></div>
+    </div>
+    <p class="hinweis">Marktdaten aus Angeboten zählen hier nicht mit und heißen im Bericht nie amtlich. Wo eine amtliche Zahl fehlt, erfindet DealPilot keine, sondern nennt den zuständigen Ausschuss und den Weg zur Quelle.</p>
+  </div>
+</section>
+
+<!-- ═══ PREISE ═══ -->
+<section class="ab" id="preise" style="background:var(--ob1);border-top:1px solid var(--line2);border-bottom:1px solid var(--line2)">
+  <div class="wrap">
+    <div class="ab-kopf auf"><div class="lbl">Boarding · Preise</div><h2>Vier Pakete. Ab 0 €.</h2><p>Monatlich kündbar. Jährlich sparst du rund 17 Prozent.</p></div>
+    <div class="umschalter" role="group" aria-label="Abrechnung">
+      <button type="button" aria-pressed="true" data-takt="m">Monatlich</button>
+      <button type="button" aria-pressed="false" data-takt="j">Jährlich −17 %</button>
+    </div>
+    <div class="passes">
+      <div class="pass auf"><div class="oben"><div class="klasse">Economy · Testflug</div><h3>Free</h3><div class="wer">Einstieg</div>
+        <div class="preis num">0 € <small>/ Monat</small></div><div class="jahr">4 Wochen Pro, keine Kreditkarte</div></div>
+        <div class="perf"></div><ul><li>1 Objekt</li><li>4 Wochen voller Pro-Umfang</li><li>Co-Pilot: 10 Fragen am Tag</li></ul>
+        <div class="unten"><a class="btn btn-line" href="https://app.dealpilot.immo/">Kostenlos starten</a><div class="code">BOARDING PASS DP-01</div></div></div>
+      <div class="pass auf"><div class="oben"><div class="klasse">Premium Economy</div><h3>Starter</h3><div class="wer">Privat-Investor</div>
+        <div class="preis num" data-m="19,99 €" data-j="219 €"><span>19,99 €</span> <small data-m="/ Monat" data-j="/ Jahr">/ Monat</small></div><div class="jahr">5 Bewertungen im Monat</div></div>
+        <div class="perf"></div><ul><li>5 Objekte</li><li>Investment-PDF ohne Wasserzeichen</li><li>Co-Pilot: 20 Fragen am Tag</li></ul>
+        <div class="unten"><a class="btn btn-line" href="https://app.dealpilot.immo/">Starter wählen</a><div class="code">BOARDING PASS DP-02</div></div></div>
+      <div class="pass best auf"><span class="best-tag">BESTSELLER</span><div class="oben"><div class="klasse">Business</div><h3>Investor</h3><div class="wer">Aktiver Investor</div>
+        <div class="preis num" data-m="34,99 €" data-j="384 €"><span>34,99 €</span> <small data-m="/ Monat" data-j="/ Jahr">/ Monat</small></div><div class="jahr">10 Bewertungen im Monat</div></div>
+        <div class="perf"></div><ul><li>25 Objekte</li><li>Investor Deal Score aus 24 Kennzahlen</li><li>Track-Record-PDF und Bankexport</li></ul>
+        <div class="unten"><a class="btn btn-gold" href="https://app.dealpilot.immo/">Investor wählen</a><div class="code">BOARDING PASS DP-03</div></div></div>
+      <div class="pass auf"><div class="oben"><div class="klasse">First</div><h3>Pro</h3><div class="wer">Profi</div>
+        <div class="preis num" data-m="49,99 €" data-j="549 €"><span>49,99 €</span> <small data-m="/ Monat" data-j="/ Jahr">/ Monat</small></div><div class="jahr">15 Bewertungen im Monat</div></div>
+        <div class="perf"></div><ul><li>Unbegrenzte Objekte</li><li>Alle Investor-Funktionen</li><li>API-Zugang</li></ul>
+        <div class="unten"><a class="btn btn-line" href="https://app.dealpilot.immo/">Pro wählen</a><div class="code">BOARDING PASS DP-04</div></div></div>
+    </div>
+    <div class="vertrauen">
+      <span><b>Server in Deutschland</b> · Hosting bei Hetzner, DSGVO-konform</span>
+      <span><b>Aus der Gutachtenpraxis</b> · DESAG-geprüfter Sachverständiger</span>
+      <span><b>Deine Daten bleiben deine</b> · kein Weiterverkauf</span>
+      <span><b>FuE-Siegel 2026</b> · Bescheinigungsstelle Forschungszulage</span>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ PARTNER ═══ -->
+<section class="ab" id="partner">
+  <div class="wrap partner">
+    <div class="auf"><div class="lbl">Für Partner · Berater und Kanzleien</div>
+      <h2 style="font-size:clamp(30px,3.6vw,48px);margin-top:14px">Deine Kunden rechnen. Du behältst den Überblick.</h2>
+      <p style="color:var(--mut);font-size:17px;margin:18px 0 26px">Mit dem Partner-Cockpit begleitest du Kapitalanleger unter deiner eigenen Marke.</p>
+      <a class="btn btn-line" href="#preise">Preise für Partner</a></div>
+    <div class="schritte auf">
+      <div class="schritt"><div><b>Einladen.</b><span>Per E-Mail oder Verbindungscode, mit Partnerplatz oder eigenem Abo.</span></div></div>
+      <div class="schritt"><div><b>Freigeben lassen.</b><span>Dein Kunde schickt dir Objekte oder seinen Bestand als Kopie.</span></div></div>
+      <div class="schritt"><div><b>Anmerken.</b><span>Feld markieren, Hinweis schreiben, Wert vorschlagen.</span></div></div>
+      <div class="schritt"><div><b>Zurückgeben.</b><span>Eine Rückmeldung mit Begleittext, auf Wunsch per E-Mail in deiner Marke.</span></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ FRAGEN ═══ -->
+<section class="ab" id="fragen" style="padding-top:20px">
+  <div class="wrap">
+    <div class="ab-kopf auf"><div class="lbl">Funkverkehr · Häufige Fragen</div><h2>Kurz gefragt, klar geantwortet.</h2></div>
+    <div class="fragen">
+      <details><summary>Was kostet der Einstieg?</summary><p>Nichts. Das Free-Paket ist dauerhaft kostenlos, und die ersten vier Wochen läuft jedes neue Konto mit dem vollen Pro-Umfang. Ohne Zahlungsdaten und ohne Kündigung. Danach wird daraus automatisch Free.</p></details>
+      <details><summary>Muss ich alles eintippen?</summary><p>Nein. Du kannst ein Exposé hochladen, das Objekt diktieren, Belege scannen oder Inserate aus ImmoMetrica übernehmen. Die Wege lassen sich mischen.</p></details>
+      <details><summary>Kann ich monatlich kündigen?</summary><p>Ja, alle Pakete sind monatlich kündbar. Beim Jahrestarif zahlst du zwölf Monate im Voraus und sparst rund 17 Prozent.</p></details>
+      <details><summary>Sind die Werte amtlich oder geschätzt?</summary><p>Jede Zahl trägt ihre Herkunft: Quelle, Jahrgang, Stichtag. Bodenrichtwerte kommen aus den amtlichen Portalen, Liegenschaftszinssätze und Sachwertfaktoren von den Gutachterausschüssen, Marktzinsen aus der Zinsstruktur der Deutschen Bundesbank.</p></details>
+      <details><summary>Sind die Marktzinsen wirklich live?</summary><p>Ja. Sie werden arbeitstäglich nachgezogen. Angezeigt wird die Pfandbrief-Rendite je Zinsbindung plus eine Bank-Marge, beides getrennt. Das ist eine indikative Schätzung, kein Bankangebot.</p></details>
+      <details><summary>Ersetzt das ein Gutachten?</summary><p>Nein. DealPilot rechnet nach den Verfahren der ImmoWertV, ein Verkehrswertgutachten ist aber eine persönliche Leistung mit Ortsbesichtigung und Haftung. DealPilot liefert eine belegbare Entscheidungshilfe für Vorauswahl, Banktermin und Steuerberater.</p></details>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ SCHLUSS ═══ -->
+<section class="schluss">
+  <div class="wrap">
+    <div class="lbl">Pre-Flight · Check-in</div>
+    <h2 style="margin-top:16px">Bereit für den Take-off?</h2>
+    <p>Dein Cockpit ist startklar. Kein Bauchgefühl mehr. Ab jetzt fliegst du nach Flugdaten.</p>
+    <div class="cta-row"><a class="btn btn-gold" href="https://app.dealpilot.immo/">Kostenlos starten</a><a class="btn btn-line" href="#preise">Preise ansehen</a></div>
+    <div class="zusage" style="justify-content:center"><span>Keine Zahlungsdaten</span><span>4 Wochen voller Pro-Umfang</span><span>Danach automatisch Free</span></div>
+  </div>
+</section>
+</main>
+
+<footer><div class="wrap">
+  <div><a class="mark" href="#">Deal<b>Pilot</b></a><div style="margin-top:8px">DealPilot ist eine Marke von Junker Solution.</div></div>
+  <div><a href="mailto:info@dealpilot.immo">info@dealpilot.immo</a> · <a href="mailto:support@dealpilot.immo">support@dealpilot.immo</a></div>
+  <div>© 2026 Junker Solution · Keine Steuer- oder Finanzberatung.</div>
+</div></footer>
+
+<!-- Die echten Rechenkerne der App (lokal aus frontend/js), keine eigene Formel -->
+<script src="../../../frontend/js/dscr-engine.js"></script>
+<script src="../../../frontend/js/deal-kpis.js"></script>
+<script src="../../../frontend/js/score-tiers.js"></script>
+<script src="../../../frontend/js/dealscore.js"></script>
+<script>
+(function(){
+  var ruhig = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var BOGEN = 622;
+  var FARBE = { top:'#3FA56C', green:'#3FA56C', gold:'#C9A84C', red:'#B8625C', na:'#555' };
+  var $ = function(id){ return document.getElementById(id); };
+  var dez = function(n, s){ return n.toLocaleString('de-DE',{minimumFractionDigits:s,maximumFractionDigits:s}); };
+  var eur = function(n){ return Math.round(n).toLocaleString('de-DE') + ' €'; };
+
+  /* Skala des Hero-Dials */
+  var sk = $('skala'), ns = 'http://www.w3.org/2000/svg';
+  for (var i = 0; i <= 50; i++) {
+    var a = (-135 + i * 5.4) * Math.PI / 180, lang = i % 5 === 0;
+    var r1 = 156, r2 = lang ? 170 : 164, l = document.createElementNS(ns,'line');
+    l.setAttribute('x1', 180 + r1 * Math.sin(a)); l.setAttribute('y1', 180 - r1 * Math.cos(a));
+    l.setAttribute('x2', 180 + r2 * Math.sin(a)); l.setAttribute('y2', 180 - r2 * Math.cos(a));
+    l.setAttribute('stroke', lang ? 'rgba(232,204,122,.7)' : 'rgba(255,255,255,.18)');
+    l.setAttribute('stroke-width', lang ? 2 : 1); sk.appendChild(l);
+  }
+  /* Runway-Lichter */
+  var li = $('lichter'), n = innerWidth < 600 ? 12 : 26;
+  for (var j = 0; j < n; j++) { var d = document.createElement('i'); d.style.animationDelay = (j * 3.2 / n) + 's'; li.appendChild(d); }
+
+  /* Hero: Nadel auf 81 */
+  function dialSetzen(bogen, s){ bogen.style.strokeDashoffset = String(BOGEN * (1 - Math.max(0, Math.min(100, s)) / 100)); }
+  function hochzaehlen(el, ziel, ms, fmt){
+    if (ruhig) { el.textContent = fmt(ziel); return; }
+    var t0 = performance.now();
+    (function s(t){ var p = Math.min(1, (t - t0) / ms), e = 1 - Math.pow(1 - p, 3); el.textContent = fmt(ziel * e); if (p < 1) requestAnimationFrame(s); })(t0);
+  }
+  setTimeout(function(){
+    $('nadel').style.transform = 'rotate(' + (-135 + 2.7 * 81) + 'deg)';
+    dialSetzen($('bogenV'), 81);
+    hochzaehlen($('heroZahl'), 81, 1600, function(v){ return String(Math.round(v)); });
+  }, ruhig ? 0 : 350);
+
+  /* Einblenden + Telemetrie zählen */
+  var io = new IntersectionObserver(function(es){ es.forEach(function(e){
+    if (!e.isIntersecting) return;
+    e.target.classList.add('da'); io.unobserve(e.target);
+  }); }, { threshold: .15 });
+  document.querySelectorAll('.auf').forEach(function(el){ io.observe(el); });
+  var io2 = new IntersectionObserver(function(es){ es.forEach(function(e){
+    if (!e.isIntersecting) return; io2.unobserve(e.target);
+    var z = +e.target.dataset.zahl, nach = e.target.dataset.nach || '';
+    hochzaehlen(e.target, z, 1400, function(v){ return Math.round(v).toLocaleString('de-DE') + nach; });
+  }); }, { threshold: .6 });
+  document.querySelectorAll('[data-zahl]').forEach(function(el){ io2.observe(el); });
+
+  /* Runway: Fortschritt + Etappen anschalten */
+  var rw = $('runway'), achse = rw.querySelector('.achse i'), et = rw.querySelectorAll('.etappe'), tick = false;
+  function runway(){
+    tick = false;
+    var r = rw.getBoundingClientRect(), mitte = innerHeight * .55;
+    var p = Math.max(0, Math.min(1, (mitte - r.top) / r.height));
+    achse.style.setProperty('--fort', p.toFixed(4));
+    et.forEach(function(e){ var b = e.getBoundingClientRect(); e.classList.toggle('drin', b.top + b.height / 2 < mitte + 40); });
+  }
+  addEventListener('scroll', function(){ if (!tick) { tick = true; requestAnimationFrame(runway); } }, { passive: true });
+  runway();
+
+  /* Preise umschalten */
+  document.querySelectorAll('.umschalter button').forEach(function(b){
+    b.addEventListener('click', function(){
+      var t = b.dataset.takt;
+      document.querySelectorAll('.umschalter button').forEach(function(x){ x.setAttribute('aria-pressed', String(x === b)); });
+      document.querySelectorAll('.preis[data-m]').forEach(function(p){ p.querySelector('span').textContent = p.dataset[t]; var s = p.querySelector('small'); s.textContent = s.dataset[t]; });
+    });
+  });
+
+  /* Pre-Flight: echte Kerne */
+  var F = { kp:$('rKp'), nkm:$('rNkm'), ek:$('rEk'), zins:$('rZins') };
+  var kernDa = !!(window.DealKpis && window.DealScore && window.ScoreTier);
+  if (!kernDa) $('kernFehlt').style.display = 'block';
+  function spur(el){ el.style.setProperty('--p', ((el.value - el.min) / (el.max - el.min) * 100) + '%'); }
+  function rechnen(){
+    var kp = +F.kp.value, nkm = +F.nkm.value, ekp = +F.ek.value, zins = +F.zins.value;
+    $('oKp').textContent = eur(kp); $('oNkm').textContent = eur(nkm); $('oEk').textContent = ekp + ' %'; $('oZins').textContent = dez(zins, 2) + ' %';
+    Object.keys(F).forEach(function(k){ spur(F[k]); });
+    if (!kernDa) return;
+    var ek = Math.round(kp * ekp / 100), nk = kp * 0.10, darlehen = Math.max(0, kp + nk - ek);
+    var k = DealKpis.compute({ kp:kp, nk:nk, nkm:nkm, ze:0, uf:0, bwk_ul:0, bwk_nul:nkm * 12 * 0.17, d1:darlehen, d1z:zins, d1t:1.5, ek:ek });
+    var ds = DealScore.computeFromKpis({ kp:kp, cf_m:k.cf_m, nmy:k.nmy, ltv:k.ltv, dscr:k.dscr, wp_kpi:kp * 0.05, mstg:1.5,
+      darlehen:(k.d_total != null && isFinite(k.d_total)) ? k.d_total : null });
+    var s = Math.round(ds.score), st = ScoreTier.stufe(s), fb = FARBE[st.farbe] || FARBE.na;
+    $('pfZahl').textContent = String(s); $('pfStufe').textContent = st.versal; $('pfStand').textContent = st.wort;
+    $('pfBogen').style.stroke = fb; dialSetzen($('pfBogen'), s);
+    $('pfStufe').style.color = fb; $('pfStufe').style.borderColor = fb; $('pfStufe').style.background = 'transparent';
+    $('pfCf').textContent = (k.cf_m >= 0 ? '+' : '−') + eur(Math.abs(k.cf_m));
+    $('pfCf').style.color = k.cf_m >= 0 ? 'var(--grnh)' : 'var(--rdh)';
+    $('pfDscr').textContent = k.d_total > 0 ? dez(Math.round(k.dscr * 100) / 100, 2) : 'entfällt';
+    $('pfBr').textContent = dez(k.bmy, 2) + ' %'; $('pfNe').textContent = dez(k.nmy, 2) + ' %';
+    $('aCf').className = k.cf_m >= 0 ? 'an' : 'rot';
+    $('aDscr').className = !(k.d_total > 0) || k.dscr >= 1 ? 'an' : 'rot';
+    $('aSc').className = st.farbe === 'gold' ? 'warn' : (st.farbe === 'red' ? 'rot' : 'an');
+    $('pfLos').href = 'https://app.dealpilot.immo/#dc=1&kp=' + kp + '&nkm=' + nkm + '&ek=' + ek + '&zins=' + zins + '&nk=10';
+  }
+  Object.keys(F).forEach(function(k){ F[k].addEventListener('input', rechnen); });
+  rechnen();
+})();
+</script>
+</body>
+</html>

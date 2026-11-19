@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Landing neu · Drei Konzepte</title>
+<meta name="description" content="Übersicht über drei Konzepte für die neue DealPilot-Startseite.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@500&family=Inter:wght@400;500;600&family=Cormorant+Garamond:ital,wght@1,500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --cream:#FDFCFA; --karte:#FBF6E9; --ink:#16130d; --mut:#5f584a; --linie:rgba(22,19,13,.12);
+  --ob:#050505; --gd:#C9A84C; --gdh:#E8CC7A; --gdi:#8a6c1e;
+  --runway:linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#b8932f);
+  --disp:'Space Grotesk',system-ui,sans-serif; --mono:'JetBrains Mono',ui-monospace,monospace;
+  --body:'Inter',system-ui,sans-serif; --ser:'Cormorant Garamond',Georgia,serif;
+  --e-an:cubic-bezier(.2,.7,.3,1);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--cream);color:var(--ink);font:16px/1.65 var(--body);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+img{max-width:100%;display:block}
+.wrap{max-width:1240px;margin:0 auto;padding:0 28px}
+:focus-visible{outline:3px solid var(--gdi);outline-offset:3px;border-radius:4px}
+.kick{font:500 12px var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--gdi)}
+header{padding:72px 0 40px;border-bottom:2px solid var(--ink)}
+h1{font:700 clamp(40px,6vw,84px)/1 var(--disp);letter-spacing:-.045em;margin:16px 0 18px}
+h1 em{font-family:var(--ser);font-weight:500;color:var(--gdi)}
+header p{max-width:70ch;color:var(--mut);font-size:17px;margin:0}
+.konzept{display:grid;grid-template-columns:7fr 5fr;gap:48px;align-items:center;padding:72px 0;border-bottom:1px solid var(--linie)}
+.konzept:nth-of-type(even) .bilder{order:2}
+.bilder{position:relative;padding-bottom:40px}
+.bilder a{display:block;text-decoration:none}
+.desk{border-radius:12px;overflow:hidden;border:1px solid var(--linie);box-shadow:0 30px 60px -30px rgba(22,19,13,.45);transition:transform .4s var(--e-an)}
+.bilder a:hover .desk{transform:translateY(-4px)}
+.desk img{aspect-ratio:16/10;object-fit:cover;object-position:top;width:100%;height:auto}
+.handy{position:absolute;right:-14px;bottom:0;width:22%;border-radius:18px;overflow:hidden;border:5px solid var(--ob);box-shadow:0 20px 40px -16px rgba(22,19,13,.6)}
+.handy img{aspect-ratio:390/844;object-fit:cover;object-position:top;width:100%;height:auto}
+.zweit{display:grid;grid-template-columns:1fr;margin-top:14px}
+.zweit img{border-radius:10px;border:1px solid var(--linie);aspect-ratio:16/7;object-fit:cover;object-position:top;width:78%;height:auto}
+.text h2{font:700 clamp(30px,3.2vw,44px)/1.05 var(--disp);letter-spacing:-.035em;margin:12px 0 16px}
+.text p{margin:0 0 14px;color:#3a352a}
+.text ul{margin:0 0 22px;padding:0;list-style:none;font-size:14px;color:var(--mut)}
+.text li{padding:7px 0;border-top:1px solid var(--linie)}
+.text li b{color:var(--ink);font-weight:600}
+.btn{display:inline-flex;align-items:center;gap:10px;min-height:48px;padding:0 22px;border-radius:999px;font:600 15px var(--disp);text-decoration:none;background:var(--ink);color:var(--cream);transition:transform .2s var(--e-an)}
+.btn:hover{transform:translateY(-2px)}
+.gleich{padding:64px 0 90px}
+.gleich h2{font:700 30px var(--disp);letter-spacing:-.03em;margin:10px 0 18px}
+.gleich .raster{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.gleich .raster div{background:var(--karte);border:1px solid var(--linie);border-radius:16px;padding:20px}
+.gleich b{font-family:var(--disp)}
+.gleich p{margin:6px 0 0;color:var(--mut);font-size:14.5px}
+.auf{opacity:0;transform:translateY(24px);transition:opacity .8s var(--e-an),transform .8s var(--e-an)}
+.auf.da{opacity:1;transform:none}
+@media (max-width:860px){
+  .wrap{padding:0 16px}
+  header{padding:48px 0 28px}
+  .konzept{grid-template-columns:1fr;gap:28px;padding:52px 0}
+  .konzept:nth-of-type(even) .bilder{order:0}
+  .handy{right:0}
+  .gleich .raster{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion:reduce){
+  *{transition:none!important;animation:none!important}
+  .auf{opacity:1;transform:none}
+}
+</style>
+</head>
+<body>
+<main>
+<header><div class="wrap">
+  <div class="kick">Vorschlag · Startseite neu · 19.11.2026</div>
+  <h1>Drei Konzepte. <em>Nimm dir das Beste.</em></h1>
+  <p>Drei vollständig gestaltete Startseiten mit den echten Inhalten, Preisen und gemessenen Zahlen der heutigen Landing. Jede läuft auf dem Desktop und auf dem Handy. Bausteine lassen sich mischen: etwa der Pre-Flight-Rechner aus A im Bento-Raster aus B.</p>
+</div></header>
+
+<div class="wrap">
+  <section class="konzept auf" aria-labelledby="ta">
+    <div class="bilder">
+      <a href="konzept-a.html" aria-label="Konzept A öffnen">
+        <div class="desk"><img src="vorschau/konzept-a-1440-0.jpg" alt="Konzept A, Desktop: dunkler Hero mit Score-Dial" width="1440" height="900"></div>
+        <div class="handy"><img src="vorschau/konzept-a-390-0.jpg" alt="Konzept A auf dem Handy" width="390" height="844"></div>
+      </a>
+      <div class="zweit"><img src="vorschau/konzept-a-1440-preflight.jpg" alt="Konzept A: Pre-Flight-Rechner mit Reglern" width="1440" height="900" loading="lazy"></div>
+    </div>
+    <div class="text">
+      <div class="kick">Konzept A</div>
+      <h2 id="ta">Cockpit</h2>
+      <p>Die Seite ist eine Instrumententafel. Im Hero schlägt die Nadel des Score-Dials auf 81 aus, darunter laufen Telemetrie-Zahlen hoch, und die Startbahn leuchtet beim Scrollen Etappe für Etappe auf.</p>
+      <p>Das Herzstück ist der Pre-Flight-Check: vier Regler, und Score, Cashflow, DSCR und Rendite rechnen live mit den echten Kernen der App. Der Knopf trägt die Zahlen direkt in die App.</p>
+      <p>Für Besucher, die selbst ausprobieren wollen, bevor sie sich anmelden.</p>
+      <ul><li><b>Skill:</b> Stil Dark Mode (OLED) mit Data-Dense-Instrumenten, Muster Product Demo statt Video</li><li><b>Bewegung:</b> Nadel mit Federkurve, Zähler, Runway-Fortschritt per requestAnimationFrame</li></ul>
+      <a class="btn" href="konzept-a.html">Konzept A öffnen →</a>
+    </div>
+  </section>
+
+  <section class="konzept auf" aria-labelledby="tb">
+    <div class="bilder">
+      <a href="konzept-b.html" aria-label="Konzept B öffnen">
+        <div class="desk"><img src="vorschau/konzept-b-1440-0.jpg" alt="Konzept B, Desktop: helle Magazinseite mit großer Typografie" width="1440" height="900"></div>
+        <div class="handy"><img src="vorschau/konzept-b-390-0.jpg" alt="Konzept B auf dem Handy" width="390" height="844"></div>
+      </a>
+      <div class="zweit"><img src="vorschau/konzept-b-1440-ueberblick.jpg" alt="Konzept B: Bento-Raster" width="1440" height="900" loading="lazy"></div>
+    </div>
+    <div class="text">
+      <div class="kick">Konzept B</div>
+      <h2 id="tb">Flugbuch</h2>
+      <p>Hell, ruhig und selbstbewusst wie ein Wirtschaftsmagazin. Riesige Schlagzeile mit Serifen-Akzent, Initiale im Vorspann, Bildunterschriften und ein Inhaltsverzeichnis, in dem sich die neun Etappen aufklappen.</p>
+      <p>Ein Bento-Raster zeigt auf einen Blick, was DealPilot kann: Score-Ring, 1,1 Millionen amtliche Datenpunkte, Quick-Check-Urteil, Register und Bankexport. Die Datenbasis steht als sauber gesetzte Tabelle.</p>
+      <p>Für Besucher, die lesen und vergleichen, etwa Berater, Kanzleien und Banken.</p>
+      <ul><li><b>Skill:</b> Stil Editorial Grid / Magazine plus Bento aus hoher Varianz, Regeln Zeilenlänge und tabellarische Ziffern</li><li><b>Bewegung:</b> Wörter steigen auf, Kacheln gestaffelt, Score-Ring und Balken füllen sich</li></ul>
+      <a class="btn" href="konzept-b.html">Konzept B öffnen →</a>
+    </div>
+  </section>
+
+  <section class="konzept auf" aria-labelledby="tc">
+    <div class="bilder">
+      <a href="konzept-c.html" aria-label="Konzept C öffnen">
+        <div class="desk"><img src="vorschau/konzept-c-1440-0.jpg" alt="Konzept C, Desktop: Einstieg mit Exposé-Karte" width="1440" height="900"></div>
+        <div class="handy"><img src="vorschau/konzept-c-390-0.jpg" alt="Konzept C auf dem Handy" width="390" height="844"></div>
+      </a>
+      <div class="zweit"><img src="vorschau/konzept-c-1440-k5.jpg" alt="Konzept C: Szene Finanzierung mit Flugschreiber" width="1440" height="900" loading="lazy"></div>
+    </div>
+    <div class="text">
+      <div class="kick">Konzept C</div>
+      <h2 id="tc">Flugschreiber</h2>
+      <p>Ein einziger Deal wird beim Scrollen erzählt: Ein Exposé landet bei dir, und neun Szenen später ist die Wohnung im Bestand. Rechts bleibt die Bühne stehen und wechselt die Ansicht aus DealPilot.</p>
+      <p>Darunter füllt sich der Flugschreiber mit den Werten des Beispiels: Score 81, Kaufpreis 179.000 €, Rendite, Cashflow und DSCR. Die Seite fliegt von Nacht über Dämmerung in den Tag.</p>
+      <p>Für Besucher, die verstehen wollen, wie der ganze Weg aussieht.</p>
+      <ul><li><b>Skill:</b> Muster Scroll-Triggered Storytelling mit Fortschritt, Kapitelfarben und Mini-CTA</li><li><b>Bewegung:</b> Sticky-Bühne, Überblenden, Szenenfarbe per IntersectionObserver, kein Scroll-Jacking</li></ul>
+      <a class="btn" href="konzept-c.html">Konzept C öffnen →</a>
+    </div>
+  </section>
+</div>
+
+<section class="gleich"><div class="wrap">
+  <div class="kick">In allen drei gleich</div>
+  <h2>Inhalte aus der heutigen Startseite, nichts erfunden.</h2>
+  <div class="raster">
+    <div><b>Zahlen gemessen</b><p>Aus register-stand.js und datenumfang.js: 1.100.360 amtliche Datenpunkte, 6.187 Werte, 201 Ausschüsse, Stand 18.11.2026.</p></div>
+    <div><b>Beispiel nachgerechnet</b><p>Das Quick-Check-Beispiel (179.000 €, Score 81, +147 €, DSCR 1,22) wurde mit den echten Kernen in Node bestätigt.</p></div>
+    <div><b>Marke und Regeln</b><p>Obsidian, Gold, Creme, die vier Hausschriften, Kundentext ohne Gedankenstrich und Semikolon, keine Partnernamen.</p></div>
+  </div>
+</div></section>
+</main>
+<script>
+(function(){
+  var io = new IntersectionObserver(function(es){ es.forEach(function(e){ if (e.isIntersecting) { e.target.classList.add('da'); io.unobserve(e.target); } }); }, { threshold: .12 });
+  document.querySelectorAll('.auf').forEach(function(el){ io.observe(el); });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,430 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DealPilot Flugschreiber · Konzept C</title>
+<meta name="description" content="Konzept C für die Startseite: ein Deal wird beim Scrollen vom Exposé bis in den Bestand erzählt, mit Flugschreiber und Szenenwechsel von Nacht zu Tag.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600&family=Cormorant+Garamond:ital,wght@1,500;1,600&display=swap" rel="stylesheet">
+<!--
+  Konzept C · Flugschreiber (Vorschlag landing-neu, 19.11.2026)
+  Skill ui-ux-pro-max: Muster "Scroll-Triggered Storytelling" (Intro-Hook, Kapitel, Mini-CTA je
+  Kapitel, Klimax-CTA, Fortschrittsanzeige, Farbstrategie "Progressive reveal, jedes Kapitel mit
+  eigener Farbe"). Regeln: kein Scroll-Jacking, Lesereihenfolge im DOM vollständig, unter
+  prefers-reduced-motion kein Überblenden, nur Endzustände. horizontal-scroll, focus-not-obscured.
+  Alle Werte des Flugschreibers stammen aus dem Quick-Check-Beispiel der heutigen Startseite
+  (ETW 74 m², 179.000 €, mit den echten Kernen nachgerechnet: Score 81, DSCR 1,22, +147 €).
+-->
+<style>
+:root{
+  --ob:#050505; --ob1:#0d0c0a; --daemm:#16120a;
+  --cream:#FDFCFA; --karte:#FBF6E9; --ink:#16130d; --inkm:#4a4536;
+  --gd:#C9A84C; --gdh:#E8CC7A; --gdd:#b8932f; --gdi:#8a6c1e;
+  --grn:#3FA56C; --grnh:#5BD98E; --grnd:#23774a; --rd:#B8625C;
+  --runway:linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#b8932f);
+  --disp:'Space Grotesk',system-ui,sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,monospace;
+  --body:'Inter',system-ui,sans-serif;
+  --ser:'Cormorant Garamond',Georgia,serif;
+  --e-an:cubic-bezier(.2,.7,.3,1);
+  /* Szene: wird je Kapitel umgeschaltet */
+  --bg:var(--ob); --fg:#ece6d6; --fgm:rgba(236,230,214,.72); --akz:var(--gdh); --lin:rgba(255,255,255,.1);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;background:var(--ob)}
+body{margin:0;background:var(--bg);color:var(--fg);font:16.5px/1.66 var(--body);-webkit-font-smoothing:antialiased;overflow-x:hidden;transition:background-color .9s var(--e-an),color .9s var(--e-an)}
+body.daemmerung{--bg:var(--daemm)}
+body.tag{--bg:var(--cream);--fg:var(--ink);--fgm:#4a4536;--akz:var(--gdi);--lin:rgba(22,19,13,.14)}
+img{max-width:100%;display:block}
+a{color:inherit}
+h1,h2,h3{font-family:var(--disp);margin:0;letter-spacing:-.03em;line-height:1.05}
+.num{font-variant-numeric:tabular-nums}
+.lbl{font:500 12px var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--akz)}
+:focus-visible{outline:3px solid var(--gdh);outline-offset:3px;border-radius:4px}
+body.tag :focus-visible{outline-color:var(--gdi)}
+.skip{position:absolute;left:-999px;top:8px;background:var(--gdh);color:#1a1408;padding:10px 14px;z-index:99}
+.skip:focus{left:8px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:50px;padding:0 24px;border-radius:999px;font:600 15px var(--disp);text-decoration:none;transition:transform .2s var(--e-an),box-shadow .2s}
+.btn-gold{background:var(--runway);color:#1a1408;box-shadow:0 12px 30px -14px rgba(201,168,76,.7)}
+.btn-gold:hover{transform:translateY(-2px)}
+.btn-line{border:1px solid var(--lin);color:var(--fg)}
+.btn-line:hover{border-color:var(--gd)}
+
+/* ── Kopf ──────────────────────────────────────────────── */
+header.kopf{position:fixed;top:0;left:0;right:0;z-index:40;display:flex;align-items:center;gap:20px;height:64px;padding:0 28px;background:linear-gradient(180deg,color-mix(in srgb,var(--bg) 92%,transparent),color-mix(in srgb,var(--bg) 70%,transparent));backdrop-filter:blur(10px);border-bottom:1px solid var(--lin);transition:background .9s}
+.mark{font:700 22px var(--disp);letter-spacing:-.03em;text-decoration:none}
+.mark b{color:var(--akz)}
+header.kopf .fort{flex:1;height:2px;background:var(--lin);border-radius:1px;overflow:hidden;max-width:420px;margin-left:auto}
+header.kopf .fort i{display:block;height:100%;background:var(--runway);transform-origin:left;transform:scaleX(var(--p,0))}
+header.kopf .btn{min-height:44px;padding:0 18px;font-size:14px}
+
+/* ── Intro ─────────────────────────────────────────────── */
+.intro{position:relative;min-height:100vh;min-height:100svh;display:flex;flex-direction:column;justify-content:center;padding:110px 28px 80px;overflow:hidden;isolation:isolate}
+.intro::before{content:"";position:absolute;inset:0;background:url(../../../frontend/landing/assets/bild/hero.jpg) center/cover;opacity:.5;z-index:-2}
+.intro::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(5,5,5,.3),var(--ob) 95%);z-index:-1}
+.intro-in{max-width:1180px;margin:0 auto;width:100%;position:relative;z-index:1}
+.intro h1{max-width:12ch}
+.intro h1{font-size:clamp(44px,8.4vw,128px);font-weight:700;letter-spacing:-.05em;line-height:.95}
+.intro h1 em{font-family:var(--ser);font-weight:500;color:var(--gdh)}
+.intro p{max-width:600px;color:var(--fgm);font-size:19px;margin:28px 0 34px}
+.intro .reihe{display:flex;flex-wrap:wrap;gap:12px}
+.exposee{position:absolute;right:6vw;top:22vh;width:min(300px,30vw);aspect-ratio:3/4;background:var(--karte);color:var(--ink);border-radius:6px;padding:20px;box-shadow:0 40px 80px -30px rgba(0,0,0,.9);transform:rotate(7deg);animation:schwebe 6s ease-in-out infinite;z-index:0}
+.exposee .foto{height:44%;background:url(../../../frontend/landing/assets/bild/haus.jpg) center/cover;border-radius:3px}
+.exposee b{display:block;font:700 16px var(--disp);margin:12px 0 4px}
+.exposee span{display:block;height:7px;border-radius:3px;background:rgba(22,19,13,.12);margin:7px 0}
+.exposee .stempel{position:absolute;right:-18px;bottom:28px;transform:rotate(-14deg);border:2px solid var(--grnd);color:var(--grnd);font:700 13px var(--mono);letter-spacing:.14em;padding:6px 10px;border-radius:4px;background:rgba(253,252,250,.9)}
+@keyframes schwebe{50%{transform:rotate(5deg) translateY(-14px)}}
+.pfeil-runter{margin-top:56px;font:500 12px var(--mono);letter-spacing:.16em;color:var(--fgm);display:flex;align-items:center;gap:12px}
+.pfeil-runter i{width:1px;height:40px;background:linear-gradient(var(--gdh),transparent);animation:tropf 2s infinite}
+@keyframes tropf{0%{transform:scaleY(0);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}51%{transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
+
+/* ── Geschichte ────────────────────────────────────────── */
+.story{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:56px;max-width:1320px;margin:0 auto;padding:0 28px}
+.kapitel{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:80px 0}
+.kapitel .zeit{font:500 12px var(--mono);letter-spacing:.14em;color:var(--fgm);margin-top:6px}
+.kapitel h2{font-size:clamp(34px,4.2vw,60px);margin:16px 0 18px}
+.kapitel h2 em{font-family:var(--ser);font-weight:500;color:var(--akz)}
+.kapitel p{color:var(--fgm);font-size:18px;margin:0 0 18px;max-width:52ch}
+.kapitel .fakten{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 0}
+.kapitel .fakten span{font:500 12px var(--mono);padding:6px 10px;border:1px solid var(--lin);border-radius:999px;color:var(--fg)}
+.kapitel .mini-cta{margin-top:22px;font:600 14.5px var(--disp);color:var(--akz);text-decoration:none;display:inline-flex;gap:8px;min-height:44px;align-items:center}
+.kapitel .mini-cta:hover{text-decoration:underline}
+.kapitel .handy-bild{display:none}
+.kapitel{opacity:.35;transition:opacity .6s var(--e-an)}
+.kapitel.aktiv{opacity:1}
+
+.kapitel-liste{grid-column:1;grid-row:1}
+.buehne{grid-column:2;grid-row:1;align-self:start;position:sticky;top:0;height:100vh;display:flex;flex-direction:column;justify-content:center;gap:18px;padding:84px 0 28px}
+.schirm{position:relative;border-radius:14px;overflow:hidden;border:1px solid var(--lin);background:#111;aspect-ratio:16/10;box-shadow:0 50px 90px -40px rgba(0,0,0,.8)}
+.schirm img,.schirm .karte-qc{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:top left;opacity:0;transform:scale(1.04);transition:opacity .7s var(--e-an),transform 1.2s var(--e-an)}
+.schirm .an{opacity:1;transform:none}
+.karte-qc{background:var(--karte);color:var(--ink);padding:6% 7%;display:flex;flex-direction:column;justify-content:center}
+.karte-qc .kopfz{display:flex;align-items:center;gap:18px;margin-bottom:14px}
+.karte-qc .ring{width:84px;height:84px;border-radius:50%;background:conic-gradient(var(--grn) 0 81%,rgba(22,19,13,.1) 81% 100%);display:flex;align-items:center;justify-content:center;position:relative;font:700 30px var(--disp);flex:0 0 auto}
+.karte-qc .ring::before{content:"";position:absolute;inset:8px;border-radius:50%;background:var(--karte)}
+.karte-qc .ring span{position:relative}
+.karte-qc b{font:700 20px var(--disp)}
+.karte-qc small{display:block;color:var(--inkm);font-size:14px}
+.karte-qc .z{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-top:1px solid rgba(22,19,13,.1);font-size:15px}
+.karte-qc .z b{font-size:15px;white-space:nowrap}
+.karte-qc .g{color:var(--grnd)}
+
+/* Flugschreiber */
+.schreiber{display:grid;grid-template-columns:repeat(5,1fr);border:1px solid var(--lin);border-radius:12px;overflow:hidden;background:color-mix(in srgb,var(--bg) 85%,#000 15%)}
+body.tag .schreiber{background:#fff}
+.schreiber div{padding:12px 14px;border-left:1px solid var(--lin);transition:background .5s}
+.schreiber div:first-child{border-left:0}
+.schreiber small{display:block;font:500 10.5px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--fgm)}
+.schreiber b{display:block;font:600 18px var(--disp);color:var(--fg);opacity:.25;transition:opacity .5s,color .5s}
+.schreiber div.da b{opacity:1}
+.schreiber div.neu{background:rgba(201,168,76,.14)}
+.schreiber .ok{color:var(--grnh)}
+body.tag .schreiber .ok{color:var(--grnd)}
+.schreiber-kopf{display:flex;justify-content:space-between;font:500 11px var(--mono);letter-spacing:.14em;color:var(--fgm);text-transform:uppercase}
+.schreiber-kopf .rec::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--rd);margin-right:8px;animation:blink 1.6s infinite}
+@keyframes blink{50%{opacity:.3}}
+
+/* Höhenmesser */
+.hoehe{position:fixed;left:18px;top:50%;transform:translateY(-50%);z-index:30;display:flex;flex-direction:column;gap:6px;opacity:0;visibility:hidden;transition:opacity .4s,visibility .4s}
+body.in-story .hoehe{opacity:1;visibility:visible}
+.hoehe a{display:flex;align-items:center;gap:10px;text-decoration:none;min-height:24px;font:500 11px var(--mono);color:var(--fgm)}
+.hoehe a i{width:14px;height:2px;background:var(--lin);transition:width .4s var(--e-an),background .4s}
+.hoehe a span{opacity:0;transition:opacity .3s}
+.hoehe a.an i{width:30px;background:var(--gdh)}
+body.tag .hoehe a.an i{background:var(--gdi)}
+.hoehe a:hover span,.hoehe a:focus-visible span{opacity:1;background:var(--bg);padding:2px 6px;border-radius:4px}
+
+/* ── Nach der Geschichte ──────────────────────────────── */
+.block{max-width:1180px;margin:0 auto;padding:110px 28px}
+.block h2{font-size:clamp(34px,4.4vw,60px)}
+.zahlen{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--lin);border:1px solid var(--lin);border-radius:18px;overflow:hidden;margin-top:40px}
+.zahlen div{background:var(--cream);padding:28px 24px}
+.zahlen b{display:block;font:700 clamp(30px,3.4vw,46px)/1 var(--disp);letter-spacing:-.04em;color:var(--ink)}
+.zahlen span{display:block;margin-top:10px;color:var(--inkm);font-size:14.5px}
+.preis-reihe{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:40px}
+.pr{border:1px solid var(--lin);border-radius:18px;padding:24px;background:#fff;display:flex;flex-direction:column}
+.pr.best{background:var(--ob);color:#ece6d6;border-color:var(--ob)}
+.pr .kl{font:500 11px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--inkm)}
+.pr.best .kl{color:var(--gdh)}
+.pr h3{font-size:24px;margin:8px 0 14px}
+.pr .b{font:700 36px/1 var(--disp);letter-spacing:-.03em}
+.pr .b small{font:500 13px var(--body);letter-spacing:0;opacity:.7}
+.pr p{font-size:14px;margin:8px 0 18px;color:var(--inkm);flex:1}
+.pr.best p{color:rgba(236,230,214,.75)}
+.pr .btn{min-height:46px;font-size:14px}
+.pr .btn-line{border-color:rgba(22,19,13,.22);color:var(--ink)}
+.klein{font-size:14px;color:var(--inkm);margin-top:18px}
+.finale{background:var(--ob);color:#ece6d6;text-align:center;padding:140px 28px;position:relative;overflow:hidden}
+.finale::before{content:"";position:absolute;left:0;right:0;bottom:60px;height:2px;background:repeating-linear-gradient(90deg,var(--gdh) 0 40px,transparent 40px 80px);opacity:.5;animation:bahn 1.4s linear infinite}
+@keyframes bahn{to{background-position:80px 0}}
+.finale h2{font-size:clamp(44px,7vw,104px);letter-spacing:-.05em}
+.finale h2 em{font-family:var(--ser);font-weight:500;color:var(--gdh)}
+.finale p{color:rgba(236,230,214,.72);font-size:18px;max-width:540px;margin:22px auto 32px}
+footer{background:var(--ob);color:rgba(236,230,214,.6);font-size:13.5px;padding:30px 28px 50px;border-top:1px solid rgba(255,255,255,.08)}
+footer .in{max-width:1180px;margin:0 auto;display:flex;flex-wrap:wrap;gap:12px 32px;justify-content:space-between}
+footer a{text-decoration:none}
+footer a:hover{color:var(--gdh)}
+
+/* ── Responsiv ─────────────────────────────────────────── */
+@media (max-width:1300px){ .hoehe{display:none} }
+.unterzeile{font:500 11px var(--mono);letter-spacing:.06em;color:var(--fgm);margin-top:-8px}
+@media (max-width:900px){
+  .intro h1{max-width:none}
+  header.kopf{padding:0 16px;gap:14px}
+  header.kopf .fort{max-width:none}
+  .intro{padding:96px 16px 64px}
+  .exposee{right:-40px;top:auto;bottom:90px;width:180px;opacity:.5}
+  .intro p{font-size:17px}
+  .intro .reihe .btn{flex:1 1 100%}
+  .story{display:block;padding:0 16px}
+  .buehne{position:sticky;top:64px;height:auto;padding:10px 0;z-index:20;background:var(--bg);transition:background .9s;margin:0 -16px;padding:10px 16px;border-bottom:1px solid var(--lin)}
+  .buehne .schirm{display:none}
+  .schreiber{grid-template-columns:repeat(5,1fr)}
+  .schreiber div{padding:8px 6px}
+  .schreiber small{font-size:9px;letter-spacing:.04em}
+  .schreiber b{font-size:13px;white-space:nowrap}
+  .unterzeile{display:none}
+  .kapitel{scroll-margin-top:150px}
+  .schreiber-kopf{font-size:10px}
+  .kapitel{min-height:auto;padding:64px 0;opacity:1}
+  .kapitel .handy-bild{display:block;margin-top:22px;border-radius:12px;overflow:hidden;border:1px solid var(--lin)}
+  .kapitel .handy-bild img{width:100%;height:auto;aspect-ratio:16/10;object-fit:cover;object-position:top left}
+  .kapitel .handy-bild .karte-qc{position:static;opacity:1;transform:none;padding:18px}
+  .kapitel p{font-size:16.5px}
+  .block{padding:76px 16px}
+  .zahlen,.preis-reihe{grid-template-columns:1fr 1fr}
+  .finale{padding:96px 16px}
+}
+@media (max-width:600px){
+  .exposee{display:none}
+}
+@media (max-width:520px){
+  .zahlen,.preis-reihe{grid-template-columns:1fr}
+  .karte-qc .ring{width:64px;height:64px;font-size:22px}
+  .karte-qc b{font-size:17px}
+  .karte-qc .z{font-size:14px}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+  .kapitel{opacity:1}
+  .schirm img,.schirm .karte-qc{transform:none}
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#geschichte">Zur Geschichte springen</a>
+<header class="kopf">
+  <a class="mark" href="#">Deal<b>Pilot</b></a>
+  <div class="fort" aria-hidden="true"><i id="fort"></i></div>
+  <a class="btn btn-gold" href="https://app.dealpilot.immo/">Kostenlos starten</a>
+</header>
+
+<nav class="hoehe" aria-label="Kapitel">
+  <a href="#k1"><i></i><span>01 Quick-Check</span></a><a href="#k2"><i></i><span>02 Erfassen</span></a><a href="#k3"><i></i><span>03 Score</span></a>
+  <a href="#k4"><i></i><span>04 Unterlagen</span></a><a href="#k5"><i></i><span>05 Finanzierung</span></a><a href="#k6"><i></i><span>06 Steuer</span></a>
+  <a href="#k7"><i></i><span>07 Wert</span></a><a href="#k8"><i></i><span>08 Zielbild</span></a><a href="#k9"><i></i><span>09 Bestand</span></a>
+</nav>
+
+<main>
+<section class="intro">
+  <div class="exposee" aria-hidden="true"><div class="foto"></div><b>ETW, 74 m²</b><span></span><span style="width:70%"></span><span style="width:84%"></span><span style="width:52%"></span><div class="stempel">GEPRÜFT</div></div>
+  <div class="intro-in">
+    <div class="lbl">Ein Deal, ein Flug</div>
+    <h1 style="margin-top:18px">Ein Exposé landet bei dir.<br><em>Und jetzt?</em></h1>
+    <p>Immobilienentscheidungen sind zu groß für ein Bauchgefühl. Scroll mit und sieh zu, wie DealPilot aus einem Exposé einen Deal macht, den du der Bank zeigen kannst. Ein Beispiel, neun Etappen, vom ersten Blick bis in den Bestand.</p>
+    <div class="reihe"><a class="btn btn-gold" href="#geschichte">Den Flug starten</a><a class="btn btn-line" href="https://app.dealpilot.immo/">Vier Wochen als Pro, kostenlos</a></div>
+    <div class="pfeil-runter" aria-hidden="true"><i></i>SCROLLEN</div>
+  </div>
+</section>
+
+<div class="story" id="geschichte">
+  <aside class="buehne" aria-label="Flugschreiber des Beispiels">
+    <div class="schirm" id="schirm">
+      <div class="karte-qc an" data-bild="qc" role="img" aria-label="Quick-Check mit Beispieldaten: Score 81, Gut">
+        <div class="kopfz"><div class="ring"><span>81</span></div><div><b>Ersteinschätzung · Gut</b><small>Starker Kauf, empfehlenswert · Beispieldaten</small></div></div>
+        <div class="z"><span>Preis unter der Marktspanne</span><b class="g">−14 % zur Mitte</b></div>
+        <div class="z"><span>Zustand und Modernisierung</span><b>14 Pkt.</b></div>
+        <div class="z"><span>Rendite erfüllt das Ziel der B-Lage</span><b class="g">6,7 %</b></div>
+        <div class="z"><span>Finanzierung trägt sich</span><b class="g">+147 € pro Monat</b></div>
+      </div>
+      <img data-bild="01-objekt-erfassen" src="../../../frontend/landing/assets/dp-strecke/01-objekt-erfassen.webp" alt="DealPilot: Objekt erfassen" width="1600" height="900">
+      <img data-bild="02-score" src="../../../frontend/landing/assets/dp-strecke/02-score.webp" alt="DealPilot: Investor Deal Score" width="1600" height="900">
+      <img data-bild="03-unterlagen" src="../../../frontend/landing/assets/dp-strecke/03-unterlagen.webp" alt="DealPilot: Unterlagen lesen" width="1600" height="900">
+      <img data-bild="04-finanzierung" src="../../../frontend/landing/assets/dp-strecke/04-finanzierung.webp" alt="DealPilot: Finanzierung" width="1600" height="900">
+      <img data-bild="05-steuer" src="../../../frontend/landing/assets/dp-strecke/05-steuer.webp" alt="DealPilot: Steuer" width="1600" height="900">
+      <img data-bild="06-wertermittlung" src="../../../frontend/landing/assets/dp-strecke/06-wertermittlung.webp" alt="DealPilot: Wertermittlung" width="1600" height="900">
+      <img data-bild="07-zielbild" src="../../../frontend/landing/assets/dp-strecke/07-zielbild.webp" alt="DealPilot: Zielbild" width="1600" height="900">
+      <img data-bild="08-bestand" src="../../../frontend/landing/assets/dp-strecke/08-bestand.webp" alt="DealPilot: Bestand" width="1600" height="900">
+    </div>
+    <div class="unterzeile" id="unterzeile">Quick-Check · dieselben Beispieldaten wie der Flugschreiber</div>
+    <div class="schreiber-kopf"><span class="rec">Flugschreiber · Beispieldaten</span><span id="etappeNr">Etappe 01 von 09</span></div>
+    <div class="schreiber" id="schreiber">
+      <div data-ab="1"><small>Score</small><b class="ok num">81 · Gut</b></div>
+      <div data-ab="2"><small>Kaufpreis</small><b class="num">179.000 €</b></div>
+      <div data-ab="3"><small>Brutto</small><b class="num">6,7 %</b></div>
+      <div data-ab="5"><small>Cashflow</small><b class="ok num">+147 €</b></div>
+      <div data-ab="5"><small>DSCR</small><b class="num">1,22</b></div>
+    </div>
+  </aside>
+  <div class="kapitel-liste">
+    <section class="kapitel" id="k1" data-k="1" data-szene="nacht">
+      <div class="lbl">Etappe 01 · Quick-Check</div><div class="zeit">T + 30 Sekunden</div>
+      <h2>Erst prüfen, <em>dann erfassen.</em></h2>
+      <p>Du ziehst das Exposé hinein. DealPilot liest es aus, holt Marktwert und Miete dazu und urteilt gegen dein eigenes Ziel. Hier: 81 Punkte, Gut. Der Preis liegt unter der Marktspanne.</p>
+      <div class="fakten"><span>Alle Dateien auf einmal</span><span>Urteil gegen dein Ziel</span><span>Zielkaufpreis</span></div>
+      <div class="handy-bild" data-bild="qc"></div>
+    </section>
+    <section class="kapitel" id="k2" data-k="2" data-szene="nacht">
+      <div class="lbl">Etappe 02 · Erfassen</div><div class="zeit">Mit einem Klick übernommen</div>
+      <h2>Das Objekt <em>steht.</em></h2>
+      <p>Aus dem Quick-Check übernommen, ist alles schon da. Du ergänzt nur, was fehlt: per Exposé, Sprache, aus ImmoMetrica oder Frage für Frage. Einsteiger, Fortgeschritten oder Experte, wie tief du gehst, wählst du selbst.</p>
+      <div class="fakten"><span>ETW 74 m²</span><span>179.000 €</span><span>1.000 € Kaltmiete</span></div>
+      <div class="handy-bild" data-bild="01-objekt-erfassen"></div>
+    </section>
+    <section class="kapitel" id="k3" data-k="3" data-szene="nacht">
+      <div class="lbl">Etappe 03 · Prüfen</div><div class="zeit">24 Kennzahlen</div>
+      <h2>Eine Zahl, die man <em>begründen</em> kann.</h2>
+      <p>Der Investor Deal Score fasst 24 Kennzahlen in fünf Bereichen zusammen: Rendite, Finanzierung, Risiko, Lage und Potenzial. Du siehst, welche Kennzahl ihn trägt und welche ihn drückt.</p>
+      <div class="fakten"><span>Bruttorendite 6,7 %</span><span>Kaufpreisfaktor 14,9</span></div>
+      <div class="handy-bild" data-bild="02-score"></div>
+    </section>
+    <section class="kapitel" id="k4" data-k="4" data-szene="daemmerung">
+      <div class="lbl">Etappe 04 · Prüfen</div><div class="zeit">Bevor du ein Angebot machst</div>
+      <h2>Die Unterlagen <em>sprechen.</em></h2>
+      <p>Mietaufstellung, Grundbuch, WEG-Protokolle und Energieausweis auf einmal. DealPilot erkennt jedes Dokument, schwärzt Personendaten und zeigt mit Fundstelle, was absehbar Geld kostet.</p>
+      <div class="fakten"><span>Mehrere PDFs</span><span>Risiken mit Fundstelle</span></div>
+      <div class="handy-bild" data-bild="03-unterlagen"></div>
+    </section>
+    <section class="kapitel" id="k5" data-k="5" data-szene="daemmerung">
+      <div class="lbl">Etappe 05 · Rechnen</div><div class="zeit">Zins tagesaktuell</div>
+      <h2>Trägt sich <em>das?</em></h2>
+      <p>80 Prozent finanziert, 4,22 Prozent Zins, 1,5 Prozent Tilgung. Nach Bewirtschaftung, Zins und Tilgung bleiben 147 € im Monat. Der DSCR von 1,22 sagt: Die Miete trägt den Kapitaldienst.</p>
+      <div class="fakten"><span>Zins je Zinsbindung</span><span>DSCR</span><span>LTV</span></div>
+      <div class="handy-bild" data-bild="04-finanzierung"></div>
+    </section>
+    <section class="kapitel" id="k6" data-k="6" data-szene="daemmerung">
+      <div class="lbl">Etappe 06 · Rechnen</div><div class="zeit">Nach BMF-Arbeitshilfe</div>
+      <h2>Was bleibt <em>nach Steuer?</em></h2>
+      <p>Den Gebäudeanteil teilt DealPilot nach der Arbeitshilfe des Bundesfinanzministeriums auf, die Restnutzungsdauer folgt Anlage 2 ImmoWertV. Der Steuerverlauf zeigt den Wendepunkt, ab dem das Objekt Steuern kostet.</p>
+      <div class="fakten"><span>Kaufpreisaufteilung</span><span>AfA</span><span>Wendepunkt</span></div>
+      <div class="handy-bild" data-bild="05-steuer"></div>
+    </section>
+    <section class="kapitel" id="k7" data-k="7" data-szene="tag">
+      <div class="lbl">Etappe 07 · Bewerten</div><div class="zeit">Mit amtlichen Daten</div>
+      <h2>Was ist es <em>wirklich</em> wert?</h2>
+      <p>Der Marktbericht begründet den Wert mit Liegenschaftszinssätzen und Sachwertfaktoren der Gutachterausschüsse. 6.187 amtliche Werte von 201 Ausschüssen liegen im Register, jede Zahl nennt ihre Herkunft. Fehlt eine, wird keine erfunden.</p>
+      <div class="fakten"><span>Bodenrichtwert</span><span>Ertrags- und Sachwert</span><span>Quellennachweis</span></div>
+      <div class="handy-bild" data-bild="06-wertermittlung"></div>
+    </section>
+    <section class="kapitel" id="k8" data-k="8" data-szene="tag">
+      <div class="lbl">Etappe 08 · Planen</div><div class="zeit">Wohnung für Wohnung</div>
+      <h2>Wohin kann <em>die Miete?</em></h2>
+      <p>Was der laufende Vertrag hergibt, was nach Mietspiegel und Kappungsgrenze verlangbar ist und was erst nach Umbau oder Mieterwechsel geht. Ankauf, heute und Zielbild stehen nebeneinander.</p>
+      <div class="fakten"><span>Ankauf</span><span>Heute</span><span>Zielbild</span></div>
+      <div class="handy-bild" data-bild="07-zielbild"></div>
+    </section>
+    <section class="kapitel" id="k9" data-k="9" data-szene="tag">
+      <div class="lbl">Etappe 09 · Halten</div><div class="zeit">Gelandet</div>
+      <h2>Gekauft. <em>Und im Blick.</em></h2>
+      <p>Auf gewonnen gestellt, friert DealPilot den Ankauf ein und vergleicht im Bestand Plan gegen heute. Für die Bank entstehen Investment-Case, Track-Record und Bankexport mit 25 Spalten je Objekt.</p>
+      <div class="fakten"><span>Soll gegen Ist</span><span>Bank-PDF</span><span>Bankexport</span></div>
+      <a class="mini-cta" href="https://app.dealpilot.immo/">Deinen ersten Deal fliegen →</a>
+      <div class="handy-bild" data-bild="08-bestand"></div>
+    </section>
+  </div>
+
+</div>
+
+<section class="block" style="color:var(--ink)">
+  <div class="lbl" style="color:var(--gdi)">Datenbasis</div>
+  <h2 style="margin-top:14px;max-width:18ch">Über 1,1 Millionen amtliche Datenpunkte. Laufend abgeglichen.</h2>
+  <div class="zahlen">
+    <div><b class="num">1.100.360</b><span>amtliche Datenpunkte in eigenen Datenbanken, gemessen am 18.11.2026</span></div>
+    <div><b class="num">36</b><span>amtliche Dienste und Tabellen angebunden</span></div>
+    <div><b class="num">6.187</b><span>Kennzahlen von 201 Gutachterausschüssen</span></div>
+    <div><b class="num">109</b><span>Veröffentlichungsseiten der Ausschüsse, automatisch auf neue Berichte geprüft</span></div>
+  </div>
+  <p class="klein">Bodenrichtwerte live je Bericht aus 10 amtlichen Diensten, Bauzinsen täglich aus der Zinsstruktur der Deutschen Bundesbank, Zensus 2022 mit 894.880 Werten bis auf die Gemeinde. Marktdaten aus Angeboten zählen nicht mit und heißen im Bericht nie amtlich.</p>
+</section>
+
+<section class="block" id="preise" style="color:var(--ink);padding-top:0">
+  <div class="lbl" style="color:var(--gdi)">Boarding</div>
+  <h2 style="margin-top:14px">Vier Pakete. Ab 0 €.</h2>
+  <div class="preis-reihe">
+    <div class="pr"><div class="kl">Economy</div><h3>Free</h3><div class="b num">0 € <small>/ Monat</small></div><p>1 Objekt. Die ersten 4 Wochen mit vollem Pro-Umfang, keine Kreditkarte.</p><a class="btn btn-line" href="https://app.dealpilot.immo/">Kostenlos starten</a></div>
+    <div class="pr"><div class="kl">Premium Economy</div><h3>Starter</h3><div class="b num">19,99 € <small>/ Monat</small></div><p>5 Objekte, 5 Bewertungen im Monat, Investment-PDF ohne Wasserzeichen. Oder 219 € im Jahr.</p><a class="btn btn-line" href="https://app.dealpilot.immo/">Starter wählen</a></div>
+    <div class="pr best"><div class="kl">Business · Bestseller</div><h3>Investor</h3><div class="b num">34,99 € <small>/ Monat</small></div><p>25 Objekte, 10 Bewertungen im Monat, Investor Deal Score, Track-Record-PDF und Bankexport. Oder 384 € im Jahr.</p><a class="btn btn-gold" href="https://app.dealpilot.immo/">Investor wählen</a></div>
+    <div class="pr"><div class="kl">First</div><h3>Pro</h3><div class="b num">49,99 € <small>/ Monat</small></div><p>Unbegrenzte Objekte, 15 Bewertungen im Monat, API-Zugang. Oder 549 € im Jahr.</p><a class="btn btn-line" href="https://app.dealpilot.immo/">Pro wählen</a></div>
+  </div>
+  <p class="klein">Alle Pakete monatlich kündbar. Server in Deutschland, DSGVO-konform. Aus der Praxis eines DESAG-geprüften Sachverständigen.</p>
+</section>
+
+<section class="finale">
+  <div class="lbl" style="color:var(--gdh)">Pre-Flight · Check-in</div>
+  <h2 style="margin-top:16px">Bereit für den <em>Take-off?</em></h2>
+  <p>Dein Cockpit ist startklar. Kein Bauchgefühl mehr. Ab jetzt fliegst du nach Flugdaten.</p>
+  <a class="btn btn-gold" href="https://app.dealpilot.immo/">Kostenlos starten</a>
+  <p style="font:500 12px var(--mono);letter-spacing:.08em;margin-top:22px">KEINE ZAHLUNGSDATEN · 4 WOCHEN VOLLER PRO-UMFANG · DANACH AUTOMATISCH FREE</p>
+</section>
+</main>
+<footer><div class="in">
+  <span>DealPilot ist eine Marke von Junker Solution.</span>
+  <span><a href="mailto:info@dealpilot.immo">info@dealpilot.immo</a> · <a href="mailto:support@dealpilot.immo">support@dealpilot.immo</a></span>
+  <span>© 2026 Junker Solution · Keine Steuer- oder Finanzberatung.</span>
+</div></footer>
+
+<script>
+(function(){
+  var kap = [].slice.call(document.querySelectorAll('.kapitel'));
+  var bilder = [].slice.call(document.querySelectorAll('#schirm [data-bild]'));
+  var felder = [].slice.call(document.querySelectorAll('#schreiber [data-ab]'));
+  var marken = [].slice.call(document.querySelectorAll('.hoehe a'));
+  var story = document.getElementById('geschichte'), fort = document.getElementById('fort');
+  var aktuell = 0;
+
+  /* Handy: das passende Bild steht im Kapitel selbst (Kopie aus der Bühne) */
+  kap.forEach(function(k){
+    var ziel = k.querySelector('.handy-bild'), q = document.querySelector('#schirm [data-bild="' + ziel.dataset.bild + '"]');
+    if (!q) return;
+    var c = q.cloneNode(true); c.classList.add('an'); c.removeAttribute('data-bild');
+    if (c.tagName === 'IMG') c.loading = 'lazy';
+    ziel.appendChild(c);
+  });
+
+  function setzen(n){
+    if (n === aktuell) return; aktuell = n;
+    var k = kap[n - 1], bild = k.querySelector('.handy-bild').dataset.bild;
+    kap.forEach(function(x){ x.classList.toggle('aktiv', x === k); });
+    bilder.forEach(function(b){ b.classList.toggle('an', b.dataset.bild === bild); });
+    felder.forEach(function(f){ var ab = +f.dataset.ab; f.classList.toggle('da', ab <= n); f.classList.toggle('neu', ab === n); });
+    marken.forEach(function(m, i){ m.classList.toggle('an', i === n - 1); if (i === n - 1) m.setAttribute('aria-current', 'step'); else m.removeAttribute('aria-current'); });
+    document.getElementById('unterzeile').textContent = bild === 'qc' ? 'Quick-Check · dieselben Beispieldaten wie der Flugschreiber' : 'Ansicht aus DealPilot · Demo-Objekt mit eigenen Beispieldaten';
+    document.getElementById('etappeNr').textContent = 'Etappe 0' + n + ' von 09';
+    var sz = k.dataset.szene;
+    document.body.classList.toggle('daemmerung', sz === 'daemmerung');
+    document.body.classList.toggle('tag', sz === 'tag');
+  }
+  var io = new IntersectionObserver(function(es){
+    es.forEach(function(e){ if (e.isIntersecting) setzen(+e.target.dataset.k); });
+  }, { rootMargin: '-45% 0px -45% 0px' });
+  kap.forEach(function(k){ io.observe(k); });
+
+  /* Nach der Geschichte bleibt es Tag, davor Nacht */
+  var tick = false;
+  function lauf(){
+    tick = false;
+    var r = story.getBoundingClientRect();
+    var p = Math.max(0, Math.min(1, (innerHeight * .5 - r.top) / r.height));
+    fort.style.setProperty('--p', p.toFixed(4));
+    document.body.classList.toggle('in-story', r.top < innerHeight * .5 && r.bottom > innerHeight * .5);
+    if (r.top > innerHeight * .5) { document.body.classList.remove('tag', 'daemmerung'); aktuell = 0; kap[0].classList.add('aktiv'); felder.forEach(function(f){ f.classList.toggle('da', +f.dataset.ab <= 1); f.classList.remove('neu'); }); }
+    if (r.bottom < innerHeight * .5) { document.body.classList.add('tag'); document.body.classList.remove('daemmerung'); }
+  }
+  addEventListener('scroll', function(){ if (!tick) { tick = true; requestAnimationFrame(lauf); } }, { passive: true });
+  lauf();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,524 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DealPilot Flugbuch · Konzept B</title>
+<meta name="description" content="Konzept B für die Startseite: helle Magazinseite mit Bento-Raster, großer Typografie und ruhiger Bewegung.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&display=swap" rel="stylesheet">
+<!--
+  Konzept B · Flugbuch (Vorschlag landing-neu, 19.11.2026)
+  Skill ui-ux-pro-max: Stil "Editorial Grid / Magazine" (asymmetrisches Raster, Pull-Quotes,
+  Initiale, Bildunterschriften) plus Bento-Raster aus der Varianz-Einstellung 8, Bewegung "Stagger
+  List (Standard)" als reines CSS. Regeln: contrast-readability, line-length-control (60 bis 75
+  Zeichen), number-tabular, visual-hierarchy, reduced-motion, touch-target-size.
+  Gold als TEXT nur in der dunklen Stufe #8a6c1e (Kontrast auf Creme ueber 4,5:1).
+-->
+<style>
+:root{
+  --cream:#FDFCFA; --papier:#F4F0E7; --karte:#FBF6E9; --linie:rgba(22,19,13,.12); --linie2:rgba(22,19,13,.22);
+  --ink:#16130d; --ink2:#3a352a; --mut:#5f584a;
+  --ob:#050505; --ob1:#0e0d0b;
+  --gd:#C9A84C; --gdh:#E8CC7A; --gdd:#b8932f; --gdi:#8a6c1e;
+  --grn:#3FA56C; --grnd:#23774a; --rd:#B8625C;
+  --runway:linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#b8932f);
+  --disp:'Space Grotesk',system-ui,sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,monospace;
+  --body:'Inter',system-ui,sans-serif;
+  --ser:'Cormorant Garamond',Georgia,serif;
+  --e-an:cubic-bezier(.2,.7,.3,1);
+  --max:1280px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;background:var(--cream)}
+body{margin:0;background:var(--cream);color:var(--ink);font:16.5px/1.68 var(--body);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+img{max-width:100%;display:block}
+a{color:inherit}
+h1,h2,h3{font-family:var(--disp);margin:0;letter-spacing:-.03em;line-height:1.04}
+.wrap{max-width:var(--max);margin:0 auto;padding:0 32px}
+.kick{font:500 12px var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--gdi)}
+.num{font-variant-numeric:tabular-nums}
+:focus-visible{outline:3px solid var(--gdi);outline-offset:3px;border-radius:3px}
+.skip{position:absolute;left:-999px;top:8px;background:var(--ink);color:var(--cream);padding:10px 14px;z-index:99}
+.skip:focus{left:8px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:50px;padding:0 24px;font:600 15px var(--disp);text-decoration:none;border:1px solid var(--ink);border-radius:999px;transition:background .2s,color .2s,transform .2s var(--e-an)}
+.btn-dunkel{background:var(--ink);color:var(--cream)}
+.btn-dunkel:hover{background:#000;transform:translateY(-2px)}
+.btn-leer{background:transparent;color:var(--ink)}
+.btn-leer:hover{background:var(--ink);color:var(--cream)}
+.btn .pfeil{transition:transform .2s var(--e-an)}
+.btn:hover .pfeil{transform:translateX(4px)}
+
+/* ── Kopf ──────────────────────────────────────────────── */
+.zeile{border-bottom:1px solid var(--linie)}
+.zeile .wrap{display:flex;justify-content:space-between;gap:16px;height:36px;align-items:center;font:500 11.5px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--mut)}
+header.kopf{position:sticky;top:0;z-index:30;background:rgba(253,252,250,.9);backdrop-filter:blur(10px);border-bottom:1px solid var(--linie)}
+header.kopf .wrap{display:flex;align-items:center;gap:28px;height:70px}
+.mark{font:700 24px var(--disp);letter-spacing:-.035em;text-decoration:none}
+.mark b{color:var(--gdi)}
+header.kopf nav{margin-left:auto;display:flex;gap:26px}
+header.kopf nav a{text-decoration:none;font-size:14.5px;font-weight:500;color:var(--ink2);padding:10px 0;background:linear-gradient(var(--gd),var(--gd)) 0 85%/0 2px no-repeat;transition:background-size .3s var(--e-an)}
+header.kopf nav a:hover{background-size:100% 2px}
+header.kopf .btn{min-height:44px;padding:0 20px;font-size:14px}
+
+/* ── Titel ─────────────────────────────────────────────── */
+.titel{padding:64px 0 40px}
+.titel h1{font-size:clamp(50px,9.4vw,148px);font-weight:700;letter-spacing:-.055em;line-height:.92}
+.titel h1 .w{display:inline-block;overflow:hidden;vertical-align:top;padding-bottom:.06em}
+.titel h1 .w>span{display:inline-block;transform:translateY(105%);animation:hoch .9s var(--e-an) forwards}
+.titel h1 em{font-family:var(--ser);font-weight:500;font-style:italic;letter-spacing:-.02em;color:var(--gdi)}
+@keyframes hoch{to{transform:none}}
+.titel-unten{display:grid;grid-template-columns:4fr 3fr 5fr;gap:40px;margin-top:48px;padding-top:28px;border-top:2px solid var(--ink)}
+.lead{font-size:19px;line-height:1.6;color:var(--ink2);margin:0;max-width:62ch}
+.lead::first-letter{float:left;font:600 4.1em/.8 var(--ser);color:var(--gdi);margin:.06em .1em 0 0}
+.titel-cta{display:flex;flex-direction:column;gap:12px;align-items:flex-start}
+.titel-cta small{color:var(--mut);font-size:13.5px}
+.bildbox figure{margin:0}
+.bildbox img{aspect-ratio:16/10;height:auto;object-fit:cover;object-position:center 40%;width:100%;filter:saturate(.85)}
+figcaption{font:500 11.5px/1.5 var(--mono);letter-spacing:.06em;color:var(--mut);margin-top:8px}
+
+/* ── Bento ─────────────────────────────────────────────── */
+section.ab{padding:96px 0}
+.ab-kopf{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:end;margin-bottom:44px}
+.ab-kopf h2{font-size:clamp(34px,4.6vw,64px)}
+.ab-kopf p{margin:0;color:var(--mut);max-width:58ch}
+.bento{display:grid;grid-template-columns:repeat(12,1fr);gap:14px;grid-template-areas:'sc sc sc sc sc da da da da ze ze ze' 'sc sc sc sc sc qc qc qc qc qc qc qc' 'zi zi zi zi bi bi bi bi bi re re re' 'ba ba ba ba se se se se co co co co'}
+.k{position:relative;border:1px solid var(--linie);background:var(--karte);border-radius:22px;padding:28px;overflow:hidden;transition:transform .35s var(--e-an),box-shadow .35s var(--e-an)}
+.k:hover{transform:translateY(-4px);box-shadow:0 24px 50px -30px rgba(22,19,13,.35)}
+.k h3{font-size:22px;margin:10px 0 8px}
+.k p{margin:0;color:var(--mut);font-size:15px}
+.k-score{grid-area:sc;display:flex;flex-direction:column}
+.k-daten{grid-area:da;background:var(--ob);color:#ece6d6;border-color:var(--ob)}
+.k-daten p{color:rgba(236,230,214,.72)}
+.k-daten .kick{color:var(--gdh)}
+.k-zeit{grid-area:ze;}
+.k-qc{grid-area:qc;background:#fff}
+.k-zitat{grid-area:zi;background:var(--papier);display:flex;flex-direction:column;justify-content:space-between}
+.k-bild{grid-area:bi;padding:0;background:#fff}
+.k-bild img{width:100%;height:100%;object-fit:cover;object-position:top left}
+.k-bild .unter{position:absolute;left:14px;bottom:14px;background:rgba(253,252,250,.94);padding:6px 10px;border-radius:999px;font:500 11.5px var(--mono);letter-spacing:.06em}
+.k-reg{grid-area:re;background:var(--runway);border-color:transparent;color:#1d1606}
+.k-reg .kick{color:#3a2e08}
+.k-reg p{color:#3a2e08}
+.k-bank{grid-area:ba;}
+.k-server{grid-area:se;}
+.k-co{grid-area:co;}
+.gross-zahl{font:700 clamp(52px,6vw,88px)/.95 var(--disp);letter-spacing:-.05em}
+.mittel-zahl{font:700 clamp(40px,4vw,58px)/1 var(--disp);letter-spacing:-.04em}
+.ring{width:150px;height:150px;position:relative;margin:18px 0 10px}
+.ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.ring .rv{transition:stroke-dashoffset 1.8s var(--e-an)}
+.ring b{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font:700 52px var(--disp);letter-spacing:-.04em}
+.pille{display:inline-block;font:700 11.5px var(--mono);letter-spacing:.16em;padding:5px 11px;border-radius:999px;background:rgba(63,165,108,.14);color:var(--grnd)}
+.bereiche{margin-top:auto;padding-top:22px;display:grid;gap:10px}
+.bereich{display:grid;grid-template-columns:110px 1fr;gap:12px;align-items:center;font-size:14px;color:var(--ink2)}
+.bereich i{height:6px;border-radius:3px;background:var(--linie);position:relative;overflow:hidden}
+.bereich i::after{content:"";position:absolute;inset:0;background:var(--gd);transform:scaleX(0);transform-origin:left;transition:transform 1.2s var(--e-an)}
+.da .bereich i::after{transform:scaleX(1)}
+.bereich:nth-child(2) i::after{transition-delay:.1s}.bereich:nth-child(3) i::after{transition-delay:.2s}.bereich:nth-child(4) i::after{transition-delay:.3s}.bereich:nth-child(5) i::after{transition-delay:.4s}
+.zeitlinie{height:4px;background:var(--linie);border-radius:2px;margin:18px 0 10px;overflow:hidden}
+.zeitlinie i{display:block;height:100%;width:100%;background:var(--grn);transform:scaleX(0);transform-origin:left}
+.da .zeitlinie i{animation:zeit 3s linear infinite}
+@keyframes zeit{0%{transform:scaleX(0)}85%,100%{transform:scaleX(1)}}
+.qc-z{display:grid;grid-template-columns:1fr auto;gap:16px;padding:11px 0;border-top:1px solid var(--linie);font-size:14.5px}
+.qc-z span{color:var(--ink2)}
+.qc-z span small{display:block;color:var(--mut);font-size:12.5px}
+.qc-z b{font-family:var(--disp);white-space:nowrap}
+.qc-z b.g{color:var(--grnd)}
+.qc-urteil{display:flex;align-items:center;gap:14px;margin:6px 0 14px}
+.qc-urteil .mini{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font:700 19px var(--disp);background:conic-gradient(var(--grn) 0 81%,var(--linie) 81% 100%);position:relative}
+.qc-urteil .mini::before{content:"";position:absolute;inset:5px;border-radius:50%;background:#fff}
+.qc-urteil .mini span{position:relative}
+.qc-urteil b{display:block;font:700 17px var(--disp)}
+.qc-urteil small{color:var(--mut)}
+blockquote{margin:0;font:500 italic clamp(26px,2.4vw,34px)/1.18 var(--ser);color:var(--ink)}
+blockquote::before{content:"„";color:var(--gdi)}
+blockquote::after{content:"“";color:var(--gdi)}
+
+/* ── Inhalt: neun Etappen ──────────────────────────────── */
+.inhalt{background:var(--papier);border-top:1px solid var(--linie);border-bottom:1px solid var(--linie)}
+.toc{border-top:2px solid var(--ink)}
+.toc details{border-bottom:1px solid var(--linie2)}
+.toc summary{list-style:none;cursor:pointer;display:grid;grid-template-columns:90px 1fr auto 40px;gap:24px;align-items:baseline;padding:22px 0;min-height:44px}
+.toc summary::-webkit-details-marker{display:none}
+.toc .nr{font:500 15px var(--mono);color:var(--gdi)}
+.toc .ti{font:600 clamp(22px,2.6vw,36px)/1.1 var(--disp);letter-spacing:-.03em;transition:transform .3s var(--e-an)}
+.toc summary:hover .ti{transform:translateX(8px)}
+.toc .ph{font:500 12px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--mut)}
+.toc .pl{width:32px;height:32px;border:1px solid var(--linie2);border-radius:50%;position:relative;align-self:center}
+.toc .pl::before,.toc .pl::after{content:"";position:absolute;left:50%;top:50%;width:12px;height:1.5px;background:var(--ink);transform:translate(-50%,-50%);transition:transform .3s var(--e-an)}
+.toc .pl::after{transform:translate(-50%,-50%) rotate(90deg)}
+.toc details[open] .pl::after{transform:translate(-50%,-50%) rotate(0)}
+.toc .koerper{display:grid;grid-template-columns:90px 5fr 6fr;gap:24px;padding:0 0 32px}
+.toc .koerper p{margin:0;color:var(--ink2);max-width:60ch}
+.toc .koerper img{border-radius:14px;border:1px solid var(--linie);aspect-ratio:16/9;object-fit:cover;object-position:top left;width:100%}
+.qcbox{background:#fff;border:1px solid var(--linie);border-radius:14px;padding:18px 20px}
+.toc .koerper img{height:auto}
+.toc details[open] .koerper{animation:auf .5s var(--e-an)}
+@keyframes auf{from{opacity:0;transform:translateY(-8px)}}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}
+.tags span{font:500 11.5px var(--mono);letter-spacing:.04em;padding:5px 10px;border:1px solid var(--linie2);border-radius:999px;color:var(--ink2)}
+
+/* ── Pull-Quote dunkel ─────────────────────────────────── */
+.zitat-gross{background:var(--ob);color:#ece6d6;padding:120px 0;position:relative;overflow:hidden}
+.zitat-gross img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.32}
+.zitat-gross .wrap{position:relative}
+.zitat-gross p.q{font:500 italic clamp(40px,7vw,104px)/1 var(--ser);margin:0;max-width:14ch;letter-spacing:-.02em}
+.zitat-gross p.q b{font-weight:600;color:var(--gdh)}
+.zitat-gross .kick{color:var(--gdh)}
+
+/* ── Datenbasis-Tabelle ───────────────────────────────── */
+.daten-kopf{display:grid;grid-template-columns:auto 1fr;gap:48px;align-items:end;margin-bottom:36px}
+.daten-kopf .gross-zahl{font-size:clamp(56px,10vw,150px)}
+table{width:100%;border-collapse:collapse;font-size:15px}
+th{font:500 11.5px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--mut);text-align:left;padding:12px 12px 12px 0;border-bottom:2px solid var(--ink)}
+td{padding:16px 12px 16px 0;border-bottom:1px solid var(--linie);vertical-align:top;color:var(--ink2)}
+td:first-child{font:600 17px var(--disp);color:var(--ink);white-space:nowrap}
+td.z{font:600 16px var(--mono);color:var(--ink);text-align:right;white-space:nowrap}
+th.z{text-align:right}
+td.t{font:500 12.5px var(--mono);color:var(--gdi);white-space:nowrap}
+.fussnote{font-size:14px;color:var(--mut);margin-top:18px;max-width:80ch}
+
+/* ── Preise ─────────────────────────────────────────────── */
+.preise{display:grid;grid-template-columns:repeat(4,1fr);border-top:2px solid var(--ink)}
+.paket{padding:28px 24px 30px;border-right:1px solid var(--linie);display:flex;flex-direction:column;position:relative}
+.paket:last-child{border-right:0}
+.paket.best{background:var(--karte)}
+.paket .kl{font:500 11.5px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--mut)}
+.paket h3{font-size:30px;margin:10px 0 4px}
+.paket .betrag{font:700 46px/1 var(--disp);letter-spacing:-.04em;margin:22px 0 4px}
+.paket .betrag small{font:500 14px var(--body);letter-spacing:0;color:var(--mut)}
+.paket .jahr{font-size:13.5px;color:var(--mut)}
+.paket ul{list-style:none;padding:0;margin:22px 0 26px;flex:1}
+.paket li{padding:8px 0;border-top:1px solid var(--linie);font-size:14.5px;color:var(--ink2)}
+.paket .btn{width:100%}
+.band{position:absolute;top:0;left:24px;transform:translateY(-50%);background:var(--ink);color:var(--gdh);font:700 10.5px var(--mono);letter-spacing:.16em;padding:5px 10px;border-radius:999px}
+.vt{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;margin-top:36px;font-size:14px;color:var(--mut)}
+.vt b{display:block;color:var(--ink);font:600 15px var(--disp)}
+
+/* ── Partner + Fragen ───────────────────────────────────── */
+.zwei{display:grid;grid-template-columns:1fr 1fr;gap:64px}
+.liste{counter-reset:p;list-style:none;padding:0;margin:0}
+.liste li{display:grid;grid-template-columns:56px 1fr;padding:18px 0;border-top:1px solid var(--linie)}
+.liste li::before{counter-increment:p;content:counter(p,decimal-leading-zero);font:500 14px var(--mono);color:var(--gdi);padding-top:3px}
+.liste b{font:600 18px var(--disp)}
+.liste span{display:block;color:var(--mut);font-size:15px}
+.frage{padding:20px 0;border-top:1px solid var(--linie)}
+.frage h3{font-size:19px;margin-bottom:6px}
+.frage p{margin:0;color:var(--mut);font-size:15px}
+
+/* ── Schluss ────────────────────────────────────────────── */
+.schluss{padding:120px 0 80px;text-align:left}
+.schluss h2{font-size:clamp(48px,9vw,140px);letter-spacing:-.055em;line-height:.92}
+.schluss h2 em{font-family:var(--ser);font-weight:500;color:var(--gdi)}
+.schluss .zeile2{display:flex;flex-wrap:wrap;gap:16px 32px;align-items:center;margin-top:36px;padding-top:24px;border-top:2px solid var(--ink)}
+.schluss small{color:var(--mut);font-size:14px}
+footer{border-top:1px solid var(--linie);padding:36px 0 56px;font-size:13.5px;color:var(--mut)}
+footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:14px 32px}
+footer a{text-decoration:none}
+footer a:hover{color:var(--gdi)}
+
+/* Einblenden */
+.auf{opacity:0;transform:translateY(28px);transition:opacity .9s var(--e-an),transform .9s var(--e-an)}
+.auf.da{opacity:1;transform:none}
+.bento .auf:nth-child(2){transition-delay:.06s}.bento .auf:nth-child(3){transition-delay:.12s}.bento .auf:nth-child(4){transition-delay:.18s}
+.bento .auf:nth-child(5){transition-delay:.06s}.bento .auf:nth-child(6){transition-delay:.12s}.bento .auf:nth-child(7){transition-delay:.18s}
+
+/* ── Responsiv ─────────────────────────────────────────── */
+@media (max-width:1100px){
+  header.kopf nav{display:none}
+  header.kopf .btn{margin-left:auto}
+  .titel-unten{grid-template-columns:1fr 1fr}
+  .bildbox{grid-column:span 2}
+  .bento{grid-template-areas:'sc sc sc sc sc sc da da da da da da' 'sc sc sc sc sc sc ze ze ze ze ze ze' 'qc qc qc qc qc qc qc qc qc qc qc qc' 'zi zi zi zi zi zi bi bi bi bi bi bi' 're re re re re re re re re re re re' 'ba ba ba ba se se se se co co co co'}
+  .preise{grid-template-columns:repeat(2,1fr)}
+  .paket:nth-child(2){border-right:0}
+  .paket:nth-child(n+3){border-top:1px solid var(--linie)}
+  .vt{grid-template-columns:repeat(2,1fr)}
+}
+@media (max-width:760px){
+  .wrap{padding:0 16px}
+  .zeile .weg{display:none}
+  .titel{padding:40px 0 24px}
+  .titel-unten,.ab-kopf,.zwei,.daten-kopf{grid-template-columns:1fr;gap:24px}
+  .bildbox{grid-column:auto}
+  .lead{font-size:17px}
+  section.ab{padding:68px 0}
+  .bento{grid-template-columns:1fr;gap:12px;grid-template-areas:none}
+  .bento>.k{grid-area:auto}
+  .k{padding:22px;border-radius:18px}
+  .k-bild{aspect-ratio:16/10}
+  .toc summary{grid-template-columns:44px 1fr 32px;gap:12px}
+  .toc .ph{display:none}
+  .toc .koerper{grid-template-columns:1fr;gap:14px;padding-left:0}
+  .toc .koerper .leer{display:none}
+  .zitat-gross{padding:80px 0}
+  table thead{display:none}
+  table,tbody,tr,td{display:block;width:100%}
+  tr{padding:14px 0;border-bottom:1px solid var(--linie)}
+  td{border:0;padding:2px 0}
+  td.z{text-align:left}
+  .preise{grid-template-columns:1fr}
+  .paket{border-right:0!important;border-top:1px solid var(--linie)}
+  .paket.best{margin-top:14px}
+  .vt{grid-template-columns:1fr}
+  .titel-cta .btn,.schluss .btn{width:100%}
+  .schluss{padding:80px 0 56px}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+  .titel h1 .w>span{transform:none}
+  .auf{opacity:1;transform:none}
+  .bereich i::after{transform:scaleX(1)}
+  .zeitlinie i{transform:scaleX(1)}
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#inhalt">Zum Inhalt springen</a>
+<div class="zeile"><div class="wrap"><span class="weg">Immobilien-Investmentanalyse</span><span class="weg">Vom Exposé bis in den Bestand</span><span>4 Wochen Pro, ohne Zahlungsdaten</span></div></div>
+<header class="kopf"><div class="wrap">
+  <a class="mark" href="#">Deal<b>Pilot</b></a>
+  <nav aria-label="Hauptnavigation"><a href="#ueberblick">Überblick</a><a href="#etappen">Neun Etappen</a><a href="#daten">Datenbasis</a><a href="#preise">Preise</a><a href="#fragen">Fragen</a></nav>
+  <a class="btn btn-dunkel" href="https://app.dealpilot.immo/">Kostenlos starten</a>
+</div></header>
+
+<main id="inhalt">
+<section class="titel">
+  <div class="wrap">
+    <div class="kick" style="margin-bottom:22px">Das Flugbuch für Kapitalanleger</div>
+    <h1 aria-label="Zu groß für ein Bauchgefühl.">
+      <span class="w" aria-hidden="true"><span style="animation-delay:.05s">Zu</span></span>
+      <span class="w" aria-hidden="true"><span style="animation-delay:.13s">groß</span></span>
+      <span class="w" aria-hidden="true"><span style="animation-delay:.21s">für</span></span>
+      <span class="w" aria-hidden="true"><span style="animation-delay:.29s">ein</span></span><br>
+      <span class="w" aria-hidden="true"><span style="animation-delay:.4s"><em>Bauchgefühl.</em></span></span>
+    </h1>
+    <div class="titel-unten">
+      <p class="lead">Immobilienentscheidungen brauchen Zahlen, die tragen. DealPilot begleitet deine Immobilie vom ersten Exposé bis in den Bestand, mit vollständiger Rechnung, einem amtlich begründeten Wert und einem Investment Case, der bei der Bank besteht.</p>
+      <div class="titel-cta">
+        <a class="btn btn-dunkel" href="https://app.dealpilot.immo/">Vier Wochen als Pro, kostenlos <span class="pfeil" aria-hidden="true">→</span></a>
+        <a class="btn btn-leer" href="#etappen">Die neun Etappen lesen</a>
+        <small>Keine Zahlungsdaten. Danach automatisch Free, ohne Kündigung.</small>
+      </div>
+      <div class="bildbox"><figure><img src="../../../frontend/landing/assets/bild/haus.jpg" alt="Mehrfamilienhaus in der Abendsonne" width="1600" height="900"><figcaption>Abb. 1 · Ein Objekt, viele Fragen. DealPilot beantwortet sie mit Zahlen.</figcaption></figure></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ BENTO ═══ -->
+<section class="ab" id="ueberblick" style="padding-top:40px">
+  <div class="wrap">
+    <div class="ab-kopf"><h2 class="auf">Was DealPilot auf einer Seite kann.</h2><p class="auf">Rendite, Cashflow, Steuer und ein Wert nach ImmoWertV. Jede Kachel steht für ein Stück der App, mit Beispieldaten und gemessenen Zahlen.</p></div>
+    <div class="bento">
+      <article class="k k-score auf" id="kScore">
+        <div class="kick">Investor Deal Score</div>
+        <h3>Eine Zahl, die man begründen kann.</h3>
+        <p>24 Kennzahlen in fünf Bereichen, getrennt nach Investment und Finanzierung.</p>
+        <div class="ring" role="img" aria-label="Score 81 von 100, Stufe Gut, Beispieldaten">
+          <svg viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="52" fill="none" stroke="rgba(22,19,13,.1)" stroke-width="9"/><circle class="rv" id="ringV" cx="60" cy="60" r="52" fill="none" stroke="#3FA56C" stroke-width="9" stroke-linecap="round" stroke-dasharray="326.7" stroke-dashoffset="326.7"/></svg>
+          <b class="num" id="ringZ" aria-hidden="true">81</b>
+        </div>
+        <div><span class="pille">GUT</span> <span style="font-size:13px;color:var(--mut)">Beispieldaten</span></div>
+        <div class="bereiche" aria-label="Die fünf Bereiche">
+          <div class="bereich"><span>Rendite</span><i></i></div>
+          <div class="bereich"><span>Finanzierung</span><i></i></div>
+          <div class="bereich"><span>Risiko</span><i></i></div>
+          <div class="bereich"><span>Lage</span><i></i></div>
+          <div class="bereich"><span>Potenzial</span><i></i></div>
+        </div>
+      </article>
+
+      <article class="k k-daten auf">
+        <div class="kick">Datenbasis · gemessen</div>
+        <div class="gross-zahl num" data-zahl="1100360" style="margin:16px 0 10px;font-size:clamp(44px,5vw,76px)">1.100.360</div>
+        <p>amtliche Datenpunkte in eigenen Datenbanken. Laufend abgeglichen, mit Herkunft je Wert. Keine Schätzwerte aus dem Netz.</p>
+      </article>
+
+      <article class="k k-zeit auf">
+        <div class="kick">Quick-Check</div>
+        <div class="mittel-zahl num" style="margin-top:14px">30 s</div>
+        <div class="zeitlinie" aria-hidden="true"><i></i></div>
+        <p>Vom Exposé zur ersten Bewertung, mit Urteil gegen dein eigenes Ziel.</p>
+      </article>
+
+      <article class="k k-qc auf">
+        <div class="kick">Bewertung Quick-Check · Beispieldaten</div>
+        <div class="qc-urteil"><div class="mini"><span>81</span></div><div><b>Ersteinschätzung · Gut</b><small>Starker Kauf, empfehlenswert. ETW 74 m², Kaufpreis 179.000 €.</small></div></div>
+        <div class="qc-z"><span>Preis unter der Marktspanne<small>DealPilot-Marktbewertung 185.000 € bis 236.000 €</small></span><b class="g">−14 % zur Mitte</b></div>
+        <div class="qc-z"><span>Rendite erfüllt das Ziel der B-Lage<small>Bruttorendite, Ziel 5 %, Kaufpreisfaktor 14,9</small></span><b class="g">6,7 %</b></div>
+        <div class="qc-z"><span>Finanzierung trägt sich<small>80 % finanziert, 4,22 % Zins, 1,5 % Tilgung, DSCR 1,22</small></span><b class="g">+147 € pro Monat</b></div>
+      </article>
+
+      <article class="k k-zitat auf">
+        <div class="kick">Der Grundsatz</div>
+        <blockquote>Fehlt eine amtliche Zahl, wird keine erfunden.</blockquote>
+        <p>Stattdessen nennt DealPilot den zuständigen Gutachterausschuss und den Weg zur Quelle.</p>
+      </article>
+
+      <figure class="k k-bild auf" style="margin:0">
+        <img src="../../../frontend/landing/assets/dp-strecke/04-finanzierung.webp" alt="DealPilot: Finanzierung mit Zins je Zinsbindung" loading="lazy" width="1600" height="900">
+        <figcaption class="unter">Zins je Zinsbindung, täglich aktuell</figcaption>
+      </figure>
+
+      <article class="k k-reg auf">
+        <div class="kick">Register der Gutachterausschüsse</div>
+        <div class="mittel-zahl num" data-zahl="6187" style="margin-top:14px">6.187</div>
+        <p>amtliche Werte von 201 Ausschüssen. Jeder mit Ausschuss, Jahrgang und Fundstelle.</p>
+      </article>
+
+      <article class="k k-bank auf"><div class="kick">Für die Bank</div><h3>25 Spalten je Objekt</h3><p>Investment-Case als PDF, Track-Record und Bankexport.</p></article>
+      <article class="k k-server auf"><div class="kick">Sicherheit</div><h3>Server in Deutschland</h3><p>Hosting bei Hetzner, DSGVO-konform. Kein Weiterverkauf deiner Daten.</p></article>
+      <article class="k k-co auf"><div class="kick">An Bord</div><h3>19 Module</h3><p>Von Boarding über Deal Score bis Bankexport. Mit Co-Pilot für deine Fragen.</p></article>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ INHALT ═══ -->
+<section class="ab inhalt" id="etappen">
+  <div class="wrap">
+    <div class="ab-kopf"><div><div class="kick">Inhalt</div><h2 style="margin-top:12px">So fliegt ein Deal. In neun Etappen.</h2></div><p>Vom Exposé bis in den Bestand. Öffne eine Etappe, um die passende Ansicht aus DealPilot zu sehen.</p></div>
+    <div class="toc">
+      <details open><summary><span class="nr">01</span><span class="ti">Erst prüfen, dann erfassen</span><span class="ph">Quick-Check</span><span class="pl" aria-hidden="true"></span></summary>
+        <div class="koerper"><span class="leer"></span><div><p>Alle Exposés und Dateien auf einmal hineinziehen. DealPilot liest sie aus, holt Marktwert und Miete dazu und zeigt in etwa einer halben Minute die Auswertung: Score, Rendite, Cashflow und ein klares Urteil gegen dein eigenes Ziel, mit dem Kaufpreis, ab dem es passt.</p><div class="tags"><span>Alle Dateien auf einmal</span><span>Zielkaufpreis</span><span>Mit einem Klick übernehmen</span></div></div>
+        <div class="qcbox" role="img" aria-label="Quick-Check mit Beispieldaten: Score 81, Gut"><div class="qc-urteil"><div class="mini"><span>81</span></div><div><b>Ersteinschätzung · Gut</b><small>Beispieldaten · ETW 74 m², 179.000 €</small></div></div>
+          <div class="qc-z"><span>Preis unter der Marktspanne</span><b class="g">−14 % zur Mitte</b></div><div class="qc-z"><span>Zustand und Modernisierung</span><b>14 Pkt.</b></div><div class="qc-z"><span>Rendite erfüllt das Ziel</span><b class="g">6,7 %</b></div><div class="qc-z"><span>Finanzierung trägt sich</span><b class="g">+147 € / Monat</b></div></div></div></details>
+      <details><summary><span class="nr">02</span><span class="ti">Objekt erfassen</span><span class="ph">Erfassen</span><span class="pl" aria-hidden="true"></span></summary>
+        <div class="koerper"><span class="leer"></span><div><p>Exposé hineinziehen, frei erzählen, ein Inserat aus ImmoMetrica übernehmen oder Frage für Frage eingeben. Wie tief du gehst, wählst du selbst: Einsteiger, Fortgeschritten oder Experte.</p><div class="tags"><span>Exposé</span><span>Sprache</span><span>Geführte Eingabe</span></div></div>
+        <img src="../../../frontend/landing/assets/dp-strecke/01-objekt-erfassen.webp" alt="DealPilot: Objekt erfassen" loading="lazy" width="1600" height="900"></div></details>
+      <details><summary><span class="nr">03</span><span class="ti">Rendite und Investor Deal Score</span><span class="ph">Prüfen</span><span class="pl" aria-hidden="true"></span></summary>
+        <div class="koerper"><span class="leer"></span><div><p>Bruttomietrendite, Nettomietrendite, Eigenkapitalrendite und Kaufpreisfaktor stehen nach wenigen Angaben fest. Der Score fasst 24 Kennzahlen in fünf Bereichen zusammen und zeigt, welche Kennzahl ihn trägt und welche ihn drückt.</p><div class="tags"><span>Investment-Score</span><span>Finanzierungs-Score</span><span>Empfehlung</span></div></div>
+        <img src="../../../frontend/landing/assets/app-bilder/11-deal-score-pilot-analyse.webp" alt="DealPilot: Pilot-Analyse mit Investor Deal Score" loading="lazy" width="1920" height="1200"></div></details>
+      <details><summary><span class="nr">04</span><span class="ti">Unterlagen lesen</span><span class="ph">Prüfen</span><span class="pl" aria-hidden="true"></span></summary>
+        <div class="koerper"><span class="leer"></span><div><p>Mietaufstellung, Grundbuch, WEG-Protokolle und Energieausweis auf einmal hineinziehen. DealPilot erkennt die Art jedes Dokuments, schwärzt Personendaten und zeigt mit Fundstelle, was absehbar Geld kostet. Bevor du ein Angebot machst.</p><div class="tags"><span>Mehrere PDFs</span><span>Risiken mit Fundstelle</span></div></div>
+        <img src="../../../frontend/landing/assets/dp-strecke/03-unterlagen.webp" alt="DealPilot: Unterlagen lesen" loading="lazy" width="1600" height="900"></div></details>
+      <details><summary><span class="nr">05</span><span class="ti">Finanzierung und Cashflow</span><span class="ph">Rechnen</span><span class="pl" aria-hidden="true"></span></summary>
+        <div class="koerper"><span class="leer"></span><div><p>Den indikativen Zins gibt es täglich aktuell je Zinsbindung und Beleihung. DealPilot zieht von der Miete die Bewirtschaftung, die Zinsen und die Tilgung ab und zeigt den Cashflow im Monat. Ob die Finanzierung trägt, prüft der DSCR, die Beleihung der LTV.</p><div class="tags"><span>Zins je Zinsbindung</span><span>DSCR</span><span>LTV</span></div></div>
+        <img src="../../../frontend/landing/assets/dp-strecke/04-finanzierung.webp" alt="DealPilot: Finanzierung" loading="lazy" width="1600" height="900"></div></details>
+      <details><summary><span class="nr">06</span><span class="ti">Steuer, AfA und Restnutzungsdauer</span><span class="ph">Rechnen</span><span class="pl" aria-hidden="true"></span></summary>
+        <div class="koerper"><span class="leer"></span><div><p>Den Gebäudeanteil teilt DealPilot nach der Arbeitshilfe des Bundesfinanzministeriums auf, die Restnutzungsdauer folgt Anlage 2 ImmoWertV. Der Steuerverlauf zeigt, wie lange das Objekt Steuern erstattet und ab welchem Jahr es Steuern kostet.</p><div class="tags"><span>Kaufpreisaufteilung</span><span>AfA</span><span>Wendepunkt</span></div></div>
+        <img src="../../../frontend/landing/assets/dp-strecke/05-steuer.webp" alt="DealPilot: Steuer und AfA" loading="lazy" width="1600" height="900"></div></details>
+      <details><summary><span class="nr">07</span><span class="ti">Wertermittlung nach ImmoWertV</span><span class="ph">Bewerten</span><span class="pl" aria-hidden="true"></span></summary>
+        <div class="koerper"><span class="leer"></span><div><p>Der Marktbericht zeigt Lage, Bodenrichtwert, Zensus und Vergleichspreise und begründet den Wert mit Liegenschaftszinssätzen und Sachwertfaktoren der Gutachterausschüsse. Jede Zahl nennt ihre Herkunft.</p><div class="tags"><span>Bodenrichtwert</span><span>Ertrags- und Sachwert</span><span>Quellennachweis</span></div></div>
+        <img src="../../../frontend/landing/assets/dp-strecke/06-wertermittlung.webp" alt="DealPilot: Wertermittlung" loading="lazy" width="1600" height="900"></div></details>
+      <details><summary><span class="nr">08</span><span class="ti">Mieterhöhung und Zielbild</span><span class="ph">Planen</span><span class="pl" aria-hidden="true"></span></summary>
+        <div class="koerper"><span class="leer"></span><div><p>Wohnung für Wohnung: was der laufende Vertrag hergibt, was nach Mietspiegel und Kappungsgrenze verlangbar ist und was erst nach Umbau oder Mieterwechsel geht. Ankauf, heute, nach Mieterhöhung und Zielbild stehen nebeneinander.</p><div class="tags"><span>Ankauf</span><span>Heute</span><span>Zielbild</span></div></div>
+        <img src="../../../frontend/landing/assets/dp-strecke/07-zielbild.webp" alt="DealPilot: Zielbild" loading="lazy" width="1600" height="900"></div></details>
+      <details><summary><span class="nr">09</span><span class="ti">Vom Ankauf in den Bestand</span><span class="ph">Halten</span><span class="pl" aria-hidden="true"></span></summary>
+        <div class="koerper"><span class="leer"></span><div><p>Stellst du ein Objekt auf gewonnen, friert DealPilot den Ankauf ein und vergleicht im Bestand Plan gegen heute, Kennzahl für Kennzahl. Für die Bank entstehen Investment-Case, Track-Record und Bankexport mit 25 Spalten je Objekt.</p><div class="tags"><span>Soll gegen Ist</span><span>Bank-PDF</span><span>Bankexport</span></div></div>
+        <img src="../../../frontend/landing/assets/dp-strecke/08-bestand.webp" alt="DealPilot: Bestand" loading="lazy" width="1600" height="900"></div></details>
+    </div>
+  </div>
+</section>
+
+<section class="zitat-gross" aria-label="Leitsatz">
+  <img src="../../../frontend/landing/assets/bild/bank.jpg" alt="" loading="lazy" width="1600" height="900">
+  <div class="wrap"><div class="kick" style="margin-bottom:24px">Pre-Flight</div>
+    <p class="q auf">Ab dann fliegst du nach <b>Flugdaten.</b></p></div>
+</section>
+
+<!-- ═══ DATEN ═══ -->
+<section class="ab" id="daten">
+  <div class="wrap">
+    <div class="daten-kopf"><div class="gross-zahl num auf">1,1 Mio.</div><div class="auf"><div class="kick">Datenbasis</div><h2 style="font-size:clamp(28px,3vw,40px);margin:10px 0 10px">Über 1,1 Millionen amtliche Datenpunkte. Laufend abgeglichen.</h2><p style="margin:0;color:var(--mut)">Gemessen am 18.11.2026 in den eigenen Datenbanken. 36 amtliche Dienste und Tabellen sind angebunden.</p></div></div>
+    <table class="auf">
+      <thead><tr><th>Quelle</th><th>Was darin steht</th><th>Abgleich</th><th class="z">Umfang</th></tr></thead>
+      <tbody>
+        <tr><td>Bodenrichtwerte</td><td>Bodenrichtwert und Zone aus den amtlichen Diensten der Länder und des Bundes, für alle 16 Länder.</td><td class="t">live je Bericht</td><td class="z">10 Dienste</td></tr>
+        <tr><td>Gutachterausschüsse</td><td>Liegenschaftszinssätze, Sachwertfaktoren, Vergleichsfaktoren und Umrechnungskoeffizienten mit Fundstelle.</td><td class="t">Januar bis Juni wöchentlich</td><td class="z">6.187 Werte</td></tr>
+        <tr><td>Zensus 2022</td><td>Wohnungen, Gebäude, Leerstand und Mieten bis auf die Gemeinde.</td><td class="t">Stichtag 15.05.2022</td><td class="z">894.880 Werte</td></tr>
+        <tr><td>Regionaldatenbank</td><td>Bevölkerung, Einkommen, Arbeitsmarkt und Wanderung je Kreis und Gemeinde.</td><td class="t">monatlich</td><td class="z">108.676 Werte</td></tr>
+        <tr><td>Bautätigkeit</td><td>Baugenehmigungen, Fertigstellungen und Kaufwerte für Bauland.</td><td class="t">monatlich</td><td class="z">56.128 Werte</td></tr>
+        <tr><td>Obere Gutachterausschüsse</td><td>Bundesweite Preis- und Mietspannen zur Einordnung jedes Objekts.</td><td class="t">bundesweit</td><td class="z">28.827 Werte</td></tr>
+        <tr><td>Deutsche Bundesbank</td><td>Zinsstruktur und Zinsstatistik, daraus die indikativen Bauzinsen.</td><td class="t">täglich</td><td class="z">1.376 Tageswerte</td></tr>
+        <tr><td>Statistisches Bundesamt</td><td>Verbraucherpreise, Nettokaltmieten und Baupreisindex zum richtigen Stichtag.</td><td class="t">wöchentlich geprüft</td><td class="z">301 Indexwerte</td></tr>
+      </tbody>
+    </table>
+    <p class="fussnote">Marktdaten aus Angeboten kommen hinzu. Sie zählen hier nicht mit und heißen im Bericht nie amtlich.</p>
+  </div>
+</section>
+
+<!-- ═══ PREISE ═══ -->
+<section class="ab" id="preise" style="background:var(--papier);border-top:1px solid var(--linie)">
+  <div class="wrap">
+    <div class="ab-kopf"><div><div class="kick">Preise</div><h2 style="margin-top:12px">Vier Pakete. Ab 0 €.</h2></div><p>Alle Pakete monatlich kündbar. Im Jahrestarif sparst du rund 17 Prozent.</p></div>
+    <div class="preise auf">
+      <div class="paket"><div class="kl">Economy · Einstieg</div><h3>Free</h3><div class="betrag num">0 € <small>/ Monat</small></div><div class="jahr">4 Wochen Pro, keine Kreditkarte</div>
+        <ul><li>1 Objekt</li><li>4 Wochen voller Pro-Umfang</li><li>Co-Pilot: 10 Fragen am Tag</li></ul><a class="btn btn-leer" href="https://app.dealpilot.immo/">Kostenlos starten</a></div>
+      <div class="paket"><div class="kl">Premium Economy · Privat-Investor</div><h3>Starter</h3><div class="betrag num">19,99 € <small>/ Monat</small></div><div class="jahr">oder 219 € im Jahr</div>
+        <ul><li>5 Objekte</li><li>5 Bewertungen im Monat</li><li>Investment-PDF ohne Wasserzeichen</li></ul><a class="btn btn-leer" href="https://app.dealpilot.immo/">Starter wählen</a></div>
+      <div class="paket best"><span class="band">BESTSELLER</span><div class="kl">Business · Aktiver Investor</div><h3>Investor</h3><div class="betrag num">34,99 € <small>/ Monat</small></div><div class="jahr">oder 384 € im Jahr</div>
+        <ul><li>25 Objekte</li><li>10 Bewertungen im Monat</li><li>Investor Deal Score aus 24 Kennzahlen</li><li>Track-Record-PDF und Bankexport</li></ul><a class="btn btn-dunkel" href="https://app.dealpilot.immo/">Investor wählen</a></div>
+      <div class="paket"><div class="kl">First · Profi</div><h3>Pro</h3><div class="betrag num">49,99 € <small>/ Monat</small></div><div class="jahr">oder 549 € im Jahr</div>
+        <ul><li>Unbegrenzte Objekte</li><li>15 Bewertungen im Monat</li><li>API-Zugang</li></ul><a class="btn btn-leer" href="https://app.dealpilot.immo/">Pro wählen</a></div>
+    </div>
+    <div class="vt">
+      <div><b>Aus der Gutachtenpraxis</b>DESAG-geprüfter Sachverständiger</div>
+      <div><b>Deine Daten bleiben deine</b>Kein Weiterverkauf, keine Profilbildung</div>
+      <div><b>Made in Germany</b>Entwickelt in Nordrhein-Westfalen</div>
+      <div><b>FuE-Siegel 2026</b>Bescheinigungsstelle Forschungszulage</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ PARTNER + FRAGEN ═══ -->
+<section class="ab" id="fragen">
+  <div class="wrap zwei">
+    <div class="auf"><div class="kick">Für Partner · Berater und Kanzleien</div>
+      <h2 style="font-size:clamp(30px,3.4vw,46px);margin:12px 0 20px">Deine Kunden rechnen. Du behältst den Überblick.</h2>
+      <ol class="liste">
+        <li><div><b>Einladen.</b><span>Per E-Mail oder Verbindungscode, mit Partnerplatz oder eigenem Abo.</span></div></li>
+        <li><div><b>Freigeben lassen.</b><span>Dein Kunde schickt dir Objekte oder seinen Bestand als Kopie.</span></div></li>
+        <li><div><b>Anmerken.</b><span>Feld markieren, Hinweis schreiben, Wert vorschlagen.</span></div></li>
+        <li><div><b>Zurückgeben.</b><span>Eine Rückmeldung mit Begleittext, auf Wunsch per E-Mail in deiner Marke.</span></div></li>
+      </ol></div>
+    <div class="auf"><div class="kick">Häufige Fragen</div>
+      <h2 style="font-size:clamp(30px,3.4vw,46px);margin:12px 0 20px">Die Antworten, die wir sonst am Telefon geben.</h2>
+      <div class="frage"><h3>Was kostet der Einstieg?</h3><p>Nichts. Free ist dauerhaft kostenlos, die ersten vier Wochen laufen mit dem vollen Pro-Umfang. Ohne Zahlungsdaten und ohne Kündigung.</p></div>
+      <div class="frage"><h3>Sind die Werte amtlich oder geschätzt?</h3><p>Jede Zahl trägt ihre Herkunft: Quelle, Jahrgang, Stichtag. Werte der Gutachterausschüsse kommen mit Link, Jahrgang und Stichtag.</p></div>
+      <div class="frage"><h3>Muss ich alles eintippen?</h3><p>Nein. Exposé hochladen, das Objekt diktieren, Belege scannen oder Inserate aus ImmoMetrica übernehmen. Die Wege lassen sich mischen.</p></div>
+      <div class="frage"><h3>Ersetzt das ein Gutachten?</h3><p>Nein. DealPilot liefert eine belegbare Entscheidungshilfe nach den Verfahren der ImmoWertV, gut für Vorauswahl, Banktermin und Steuerberater.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="schluss">
+  <div class="wrap">
+    <div class="kick" style="margin-bottom:20px">Check-in</div>
+    <h2 class="auf">Bereit für den <em>Take-off?</em></h2>
+    <div class="zeile2"><a class="btn btn-dunkel" href="https://app.dealpilot.immo/">Kostenlos starten <span class="pfeil" aria-hidden="true">→</span></a><small>Keine Zahlungsdaten. 4 Wochen voller Pro-Umfang. Danach automatisch Free, ohne Kündigung.</small></div>
+  </div>
+</section>
+</main>
+<footer><div class="wrap">
+  <span><b style="color:var(--ink)">DealPilot</b> ist eine Marke von Junker Solution.</span>
+  <span><a href="mailto:info@dealpilot.immo">info@dealpilot.immo</a> · <a href="mailto:support@dealpilot.immo">support@dealpilot.immo</a></span>
+  <span>© 2026 Junker Solution · Keine Steuer- oder Finanzberatung.</span>
+</div></footer>
+
+<script>
+(function(){
+  var ruhig = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function zaehlen(el, ziel, ms){
+    if (ruhig) return;
+    var t0 = performance.now();
+    (function s(t){ var p = Math.min(1, (t - t0) / ms), e = 1 - Math.pow(1 - p, 4);
+      el.textContent = Math.round(ziel * e).toLocaleString('de-DE'); if (p < 1) requestAnimationFrame(s); })(t0);
+  }
+  var io = new IntersectionObserver(function(es){ es.forEach(function(e){
+    if (!e.isIntersecting) return;
+    e.target.classList.add('da'); io.unobserve(e.target);
+    e.target.querySelectorAll('[data-zahl]').forEach(function(z){ zaehlen(z, +z.dataset.zahl, 1800); });
+    if (e.target.id === 'kScore') {
+      document.getElementById('ringV').style.strokeDashoffset = String(326.7 * (1 - .81));
+      zaehlen(document.getElementById('ringZ'), 81, 1800);
+    }
+  }); }, { threshold: .2 });
+  document.querySelectorAll('.auf').forEach(function(el){ io.observe(el); });
+  if (ruhig) document.getElementById('ringV').style.strokeDashoffset = String(326.7 * (1 - .81));
+})();
+</script>
+</body>
+</html>
