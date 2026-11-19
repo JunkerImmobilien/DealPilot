@@ -1378,6 +1378,7 @@ function _swSet(btn) {
       try { if (window.DealPilotBwkProfil && !window._bwkpVerdrahtet) { window._bwkpVerdrahtet = true; DealPilotBwkProfil.verdrahten(document); } } catch (e) {}   /* v2184 */
       /* v2206 · N63.5: Karten-Übersicht über das fertig verdrahtete Formular legen */
       try { if (window.DpStandardKarten) DpStandardKarten.aufbauen(host); } catch (e) {}
+      try { if (window.DpMieteRegel) DpMieteRegel.einhaengen(host); } catch (e) {}   /* v3845 · Neuvermietung ohne Mietpreisbremse */
     }
     var sel = document.getElementById('set_startup_view');
     if (sel) {

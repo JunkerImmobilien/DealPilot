@@ -39,7 +39,7 @@
 (function (global) {
   'use strict';
   if (global.DpErhoehungen) return;
-  var VERSION = 'v3366';
+  var VERSION = 'v3840';
   var ARTEN = [['558', 'Erhöhung auf die Vergleichsmiete (§ 558 BGB)'], ['559', 'Modernisierungsumlage (§ 559 BGB)'], ['staffel', 'Staffelmiete'],
     ['index', 'Indexmiete'], ['neuvermietung', 'Neuvermietung'], ['sonstig', 'sonstige Änderung']];
   var SPERRE_ARTEN = { '558': 1, staffel: 1, index: 1 };
@@ -158,7 +158,9 @@
       '.dp-erh-f label{display:flex;flex-direction:column;font-size:11.5px;gap:2px}',
       '.dp-erh-f input,.dp-erh-f select{font:inherit;padding:5px 6px;border:1px solid rgba(128,128,128,.4);border-radius:6px;background:transparent;color:inherit;min-width:0}',
       '.dp-erh-x{background:none;border:none;color:#B8625C;cursor:pointer;font:inherit;padding:6px}',
-      '.dp-erh-fehler{color:#B8625C;margin-top:4px}'
+      '.dp-erh-fehler{color:#B8625C;margin-top:4px}',
+      '.dp-erh-ok{margin:4px 0 6px;padding:6px 9px;border-left:3px solid #3FA56C;background:rgba(63,165,108,.07);font-size:12px;line-height:1.5}',
+      '.dp-erh-ok button{margin-left:6px}'
     ].join('\n');
     d.head.appendChild(s);
   }
@@ -176,23 +178,43 @@
     if (a.n558_3j > 1) hin = '<div class="cf-hint" style="margin-top:4px">In den letzten drei Jahren gab es ' + a.n558_3j + ' Erhöhungen auf die Vergleichsmiete, zusammen ' + eur(a.summe558_3j) + ' je Monat. Für die Kappungsgrenze zählt die Summe. Gerechnet wird heute mit der letzten (' + eur(a.betrag) + '), trag die Summe bei Bedarf unter „Letzte Erhöhung um“ ein.</div>';
     var vorb = (!l.length && o.vorbelegbar) ? '<button type="button" class="btn btn-outline btn-sm" data-erh-vorbelegen="1" style="margin-top:6px">Aus den Vertragsangaben übernehmen</button>' : '';
     var opt = ARTEN.map(function (x) { return '<option value="' + x[0] + '">' + esc(x[1]) + '</option>'; }).join('');
-    return '<div class="dp-erh-t">Mieterhöhungen <span>je Erhöhung eine Zeile. Die jüngste setzt „Letzte Erhöhung“' + (o.wo ? ' ' + esc(o.wo) : '') + '.</span></div>'
+    /* v3840 · Marcel 19.11.2026 (Westerfeldstr.): „Mieterhöhung … Eintragen, wohin geht das? Nicht schlüssig". Der Kopf sagt
+       jetzt, was mit dem Eintrag passiert, und nach dem Eintragen steht eine Rückmeldung mit dem Weg (o.meldung). */
+    return '<div class="dp-erh-t">Mieterhöhungen <span>Trag jede Erhöhung mit Datum ein. Die jüngste setzt „Letzte Erhöhung“' + (o.wo ? ' ' + esc(o.wo) : '') + '. Daraus rechnet DealPilot die Miete vergangener Jahre in der Mietentwicklung und die Sperrfrist für die nächste Erhöhung.</span></div>'
+      + (o.meldung ? '<div class="dp-erh-ok">' + o.meldung + '</div>' : '')
       + (zeilen || '<div style="color:#6B645A">Noch keine Erhöhung eingetragen.</div>') + hin + vorb
       + '<details' + (l.length ? '' : '') + '><summary style="cursor:pointer;margin-top:6px;min-height:28px;display:flex;align-items:center">Erhöhung eintragen</summary><div class="dp-erh-f">'
       + '<label>Wirksam ab<input type="date" data-erh-feld="datum"></label>'
       + '<label>Art<select data-erh-feld="art">' + opt + '</select></label>'
-      + '<label>Bisher (€/Monat)<input inputmode="decimal" data-erh-feld="von" placeholder="' + (istZahl(a.miete_zuletzt) ? esc(String(a.miete_zuletzt).replace('.', ',')) : 'z. B. 650') + '"></label>'
-      + '<label>Neu (€/Monat)<input inputmode="decimal" data-erh-feld="auf" placeholder="z. B. 700"></label>'
-      + '<label>Beleg oder Notiz<input data-erh-feld="beleg" placeholder="z. B. Schreiben vom 12.03."></label>'
+      + '<label>Miete bisher (€ im Monat)<input inputmode="decimal" data-erh-feld="von" placeholder="' + (istZahl(a.miete_zuletzt) ? esc(String(a.miete_zuletzt).replace('.', ',')) : 'z. B. 650') + '"></label>'
+      + '<label>Miete neu (€ im Monat)<input inputmode="decimal" data-erh-feld="auf" placeholder="z. B. 700"></label>'
+      + '<label>Beleg oder Notiz (freiwillig)<input data-erh-feld="beleg" placeholder="z. B. Schreiben vom 12.03."></label>'
       + '</div><button type="button" class="btn btn-sm" data-erh-neu="1" style="margin-top:6px">Eintragen</button><div class="dp-erh-fehler" data-erh-fehler="1"></div></details>';
+  }
+  /** v3840 · Rückmeldung nach dem Eintragen: wohin der Eintrag geht. Rein bis auf eur/datumDe. */
+  function rueckmeldung(e, a, heute, wohin) {
+    var heuteIsoS = heuteIso(), auf = zahl(e.auf), t = 'Eingetragen. ';
+    if (e.datum > heuteIsoS) t += 'Die Erhöhung gilt ab ' + datumDe(e.datum) + ' und liegt in der Zukunft. Die Mietentwicklung rechnet ab heute weiter mit ihrer Prognose. Steht die Erhöhung fest, trag sie dort im Modus Detail ein.';
+    else {
+      t += 'Die Miete von ' + esc(eur(auf)) + ' gilt ab ' + datumDe(e.datum) + ' und steht so ' + esc(wohin) + '.';
+      if (SPERRE_ARTEN[e.art] && a && a.letzte === e.datum) t += ' „Letzte Erhöhung“ ist jetzt der ' + datumDe(e.datum) + '.';
+      if (istZahl(heute) && istZahl(auf) && Math.abs(heute - auf) >= 0.5 && a && a.miete_zuletzt === auf)
+        t += ' Die heutige Miete steht noch auf ' + esc(eur(heute)) + '. <button type="button" class="btn btn-outline btn-sm" data-erh-heute="' + auf + '">Auf ' + esc(eur(auf)) + ' setzen</button>';
+    }
+    return t;
   }
   /** Bindet eine Liste an einen Host. h = { liste() -> Array, setzen(Array), vorbelegen() -> Eintrag|null, geaendert(abl) , wo } */
   function binden(host, h) {
     if (!host) return;
     stil();
     host.classList.add('dp-erh');
-    function zeichne() { host.innerHTML = html(h.liste(), { vorbelegbar: !!(h.vorbelegen && h.vorbelegen(true)), wo: h.wo }); }
-    function fertig(l) { h.setzen(l); var a = ableiten(l); if (h.geaendert) h.geaendert(a); zeichne(); }
+    var meldung = '';
+    function zeichne() { host.innerHTML = html(h.liste(), { vorbelegbar: !!(h.vorbelegen && h.vorbelegen(true)), wo: h.wo, meldung: meldung }); meldung = ''; }
+    function fertig(l, neu) {
+      h.setzen(l); var a = ableiten(l); if (h.geaendert) h.geaendert(a);
+      if (neu) meldung = rueckmeldung(neu, a, h.heute ? h.heute() : null, h.wohin || 'in der Mietentwicklung');
+      zeichne();
+    }
     host.onclick = function (ev) {
       var t = ev.target; if (!t || !t.closest) return;
       var weg = t.closest('[data-erh-weg]'), neu = t.closest('[data-erh-neu]'), vb = t.closest('[data-erh-vorbelegen]');
@@ -203,8 +225,11 @@
         var f = {}; host.querySelectorAll('[data-erh-feld]').forEach(function (i) { f[i.getAttribute('data-erh-feld')] = i.value; });
         var r = eintragAus(f), fe = host.querySelector('[data-erh-fehler]');
         if (r.fehler) { if (fe) fe.textContent = r.fehler; return; }
-        fertig(h.liste().concat([r.eintrag]));
+        fertig(h.liste().concat([r.eintrag]), r.eintrag);
+        return;
       }
+      var nkm = t.closest('[data-erh-heute]');
+      if (nkm && h.heuteSetzen) { ev.preventDefault(); h.heuteSetzen(zahl(nkm.getAttribute('data-erh-heute'))); meldung = 'Die heutige Miete ist jetzt ' + esc(eur(zahl(nkm.getAttribute('data-erh-heute')))) + ' im Monat.'; zeichne(); }
     };
     zeichne();
     return zeichne;
@@ -246,8 +271,32 @@
       if (vor && vor.parentNode === karte) karte.insertBefore(host, vor); else karte.appendChild(host);
     }
     host.style.display = '';
+    /* v3840 · GEMESSEN Westerfeldstr. 146 (Staging, 19.11.2026): beim MFH mit Wohnungen stand hier ein Formular,
+       dessen Einträge in _erhoehungen am OBJEKT landeten. quellenObjekt() nimmt aber die Wohnungen, sobald eine
+       vermietet ist, der Eintrag rechnete also nirgends. Jetzt: die Erhöhungen der Wohnungen als Liste und der Weg
+       in die Einheiten. Ein schon vorhandener Objekt-Eintrag bleibt sichtbar und lässt sich entfernen. */
+    var Mf = global.DpMfhEinheiten, M0 = global._dpMfh;
+    if (Mf && Mf.artMitEinheiten && Mf.artMitEinheiten() && M0 && Array.isArray(M0.einheiten) && M0.einheiten.length) {
+      stil(); host.classList.add('dp-erh'); host.onclick = null;
+      var we = alle().filter(function (x) { return x.einheit != null; }).reverse(), alt = objektListe();
+      host.innerHTML = '<div class="dp-erh-t">Mieterhöhungen <span>Beim Mehrfamilienhaus trägst du eine Erhöhung bei der Wohnung ein. Dort zählt sie für die Mietentwicklung, die Sperrfrist und die Kappungsgrenze dieser Wohnung.</span></div>'
+        + (we.length ? we.map(function (x) { return '<div class="dp-erh-z"><b>' + datumDe(x.datum) + '</b><span>Wohnung ' + esc(x.nr) + ', ' + esc(artWort(x.art)) + ': auf <b>' + eur(zahl(x.auf)) + '</b></span><span></span></div>'; }).join('')
+          : '<div style="color:#6B645A">In den Wohnungen ist noch keine Erhöhung eingetragen.</div>')
+        + (alt.length ? '<div class="cf-hint" style="margin-top:6px">Am Haus stehen noch ' + alt.length + ' ältere Einträge. Sie rechnen nicht mit, weil die Miete aus den Wohnungen kommt. Trag sie bei der Wohnung ein und entferne sie hier. ' + alt.map(function (x) { return datumDe(x.datum) + ' auf ' + eur(zahl(x.auf)) + ' <button type="button" class="dp-erh-x" data-erh-alt-weg="' + esc(x.id) + '" aria-label="Eintrag entfernen">✕</button>'; }).join(' ') + '</div>' : '')
+        + '<button type="button" class="btn btn-outline btn-sm" data-erh-einheiten="1" style="margin-top:8px">In den Einheiten eintragen</button>';
+      host.onclick = function (ev) {
+        var t = ev.target && ev.target.closest ? ev.target : null; if (!t) return;
+        if (t.closest('[data-erh-einheiten]')) { ev.preventDefault(); try { Mf.oeffnen(1); } catch (e) {} return; }
+        var w = t.closest('[data-erh-alt-weg]');
+        if (w) { ev.preventDefault(); var d = D(); if (d) { d._erhoehungen = objektListe().filter(function (x) { return x && x.id !== w.getAttribute('data-erh-alt-weg'); }); try { global.DpSpeichernFolge(); } catch (e) {} objektMount(); } }
+      };
+      return;
+    }
     binden(host, {
       wo: 'oben',
+      wohin: 'in der Mietentwicklung im Jahr ' + new Date().getFullYear() + ' und davor',
+      heute: function () { return zahl((el('nkm') || {}).value); },
+      heuteSetzen: function (v) { if (v > 0) setzeFeld('nkm', String(v).replace('.', ',')); try { if (typeof global.calc === 'function') global.calc(); } catch (e) {} try { global.DpSpeichernFolge(); } catch (e) {} },
       liste: objektListe,
       setzen: function (l) { var d = D(); if (d) d._erhoehungen = l; },
       vorbelegen: function (nurPruefen) {
@@ -268,6 +317,7 @@
     if (!Array.isArray(e.erhoehungen)) e.erhoehungen = [];
     binden(host, {
       wo: 'in dieser Wohnung',
+      wohin: 'bei dieser Wohnung. Die heutige Miete der Wohnung änderst du oben im Feld Ist-Miete',
       liste: function () { return Array.isArray(e.erhoehungen) ? e.erhoehungen : []; },
       setzen: function (l) { e.erhoehungen = l; },
       vorbelegen: function (nurPruefen) { var x = ausVertrag(e.mv_letzte_erhoehung, e.mv_letzte_erhoehung_betrag, e.ist); return nurPruefen ? !!x : x; },
@@ -288,13 +338,14 @@
     return sortiert(out);
   }
 
-  if (global.addEventListener) global.addEventListener('dp:object-ready', function () { setTimeout(objektMount, 600); });
+  if (global.addEventListener) global.addEventListener('dp:object-ready', function () { setTimeout(objektMount, 600); setTimeout(objektMount, 1800); });   /* v3840 · Wohnungen (_dpMfh) kommen nach */
   if (doc() && doc().addEventListener) doc().addEventListener('DOMContentLoaded', function () { setTimeout(objektMount, 800); });
 
   global.DpErhoehungen = {
     VERSION: VERSION, ARTEN: ARTEN, artWort: artWort,
     ableiten: ableiten, mieteAm: mieteAm, imJahr: imJahr, eintragAus: eintragAus, ausVertrag: ausVertrag, sortiert: sortiert,
-    html: html, binden: binden, objektMount: objektMount, einheitBinden: einheitBinden, objektListe: objektListe, alle: alle,
+    html: html, binden: binden, rueckmeldung: rueckmeldung,   /* v3840 */
+ objektMount: objektMount, einheitBinden: einheitBinden, objektListe: objektListe, alle: alle,
     mieteMonat: mieteMonat, jahresFaktor: jahresFaktor, quellenObjekt: quellenObjekt, istFaktor: istFaktor   /* v3366 */
   };
 })(typeof window !== 'undefined' ? window : globalThis);

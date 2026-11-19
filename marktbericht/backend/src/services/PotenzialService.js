@@ -164,7 +164,7 @@ function kernZusammenfassung(k) {
    Ueber der oberen Kante wird nichts kapitalisiert (§ 8 Abs. 3 ImmoWertV, wie
    im Bestand). Eine Stufe unterschreitet den Bestand nie. */
 const r2 = (x) => Math.round(x * 100) / 100;
-function bestandsBasis(basis, wl) {
+function bestandsBasis(basis, wl, faktorOhne) {   /* v3845 · faktorOhne: Neuvermietung ohne Bremse (Einstellung), Vorgabe im Kern 1,20 */
   const band = basis.miete_band || null;
   const markt = zahl(basis.markt_qm) || zahl(basis.miete_qm);
   const rB = Number(basis.ein.miete_markt_jahr) || 0;
@@ -191,7 +191,7 @@ function bestandsBasis(basis, wl) {
     return { wfl, ist, ist_qm: istQm, qm, herkunft, roh: herkunft === 'ist_im_band' ? ist : qm * wfl * 12,   /* v2541 · im Band die Vertragsmiete */
              kappe: bandW && bandW.oben_qm > 0 ? bandW.oben_qm * wfl * 12 : Infinity,
              band: bandW, markt: marktW,   /* v2936 · fuer die Bandregel der Stufenmiete */
-             vgl: vW || null, ziel_max: vW ? zielMaximum(vW, basis.bremse, w.bremse_ausnahme) : null };   /* v3343 */
+             vgl: vW || null, ziel_max: vW ? zielMaximum(vW, basis.bremse, w.bremse_ausnahme, faktorOhne) : null };   /* v3343 */
   });
   const summeRoh = zeilen.reduce((a, z) => a + (z ? z.roh : 0), 0);
   if (!(summeRoh > 0) || !(rB > 0)) return null;
@@ -1114,7 +1114,7 @@ function zielHerleitung(bb, wlB, mieteZ) {
       vergleichsmiete: v ? { quelle: v.quelle, unten: v.unten, mittel: v.mittel, oben: v.oben, ca: !!v.ca, einordnung: v.einordnung ? v.einordnung.wahl : null } : null,
       maximum: zm ? { bestand_qm: zm.bestand_max_qm, neu_qm: zm.neu_max_qm, konservativ_qm: zm.konservativ_qm, faktor: zm.faktor, bremse_gilt: zm.bremse_gilt, bedingung: zm.bedingung } : null,
       satz: zm ? ('Vergleichsmiete ' + (v.ca ? 'ca. ' : '') + de(v.mittel) + ' €/m², Spanne ' + de(v.unten) + ' bis ' + de(v.oben) + ' €/m². Rechtlich erzielbar bei Neuvermietung bis ' + de(zm.neu_max_qm)
-        + ' €/m² (' + (zm.faktor > 1.15 ? '120 % ohne Mietpreisbremse' : '110 % mit Mietpreisbremse') + '). Im Zielbild zählt die Zielmiete bis zu diesem Maximum.') : null };
+        + ' €/m² (' + (zm.bremse_gilt === false ? Math.round(zm.faktor * 100) + ' % ohne Mietpreisbremse' : '110 % mit Mietpreisbremse') + '). Im Zielbild zählt die Zielmiete bis zu diesem Maximum.') : null };
   }).filter(Boolean);
 }
 function zielbildPrognose(basis, ref, kB, zb, auftrag) {
@@ -1212,7 +1212,7 @@ export const PotenzialService = {
       miete_jahr: Object.assign({ bestand: (!ref.vacancy && zahl(ref.monthly_net_rent) > 0) ? zahl(ref.monthly_net_rent) * 12 : 0 },
         ...varianten.filter((v) => v && STUFEN.indexOf(v.key) >= 0).map((v) => ({ [v.key]: zahl(v.miete_wohnen_jahr) }))),
       ...(auftrag.einzel558 && typeof auftrag.einzel558 === 'object' ? auftrag.einzel558 : {}) }];   /* v3150 · Ziel und Historie fuer den Pfad nach § 558 */
-    const bb = bestandsBasis(basis, wlB);
+    const bb = bestandsBasis(basis, wlB, auftrag.neu_faktor_ohne);
     /* v2988 · Band und marktuebliche Miete nach den Massnahmen je Stufe */
     const MNM = {};
     for (const v of varianten) {

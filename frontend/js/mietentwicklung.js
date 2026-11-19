@@ -481,14 +481,19 @@ window.MietEntwicklung = (function() {
        Fenster Jahre). Leer = Vorbelegung grau (die Rechnung aus den Mieterhöhungen). Nur im Bestand; die
        Projektion rechnet weiter aus den Mieterhöhungen, die Angabe zählt im Jahresabgleich der Pilot-Analyse. */
     var JB = window.DpJahresbuch, eintragbar = !!(JB && JB.istMieteSetzen && JB.verfuegbar && JB.verfuegbar());
+    var _Mf = window.DpMfhEinheiten, mfh = !!(_Mf && _Mf.artMitEinheiten && _Mf.artMitEinheiten() && window._dpMfh && Array.isArray(window._dpMfh.einheiten) && window._dpMfh.einheiten.length);   /* v3840 */
     var fW = function (n) { return Math.round(n).toLocaleString('de-DE'); };
     for (var i = 0; i < bis; i++) {
       var f = factor(i), cal = by + i, ist = cal < cy;
       var jahr = nkm_m * 12 * f + ze_m * 12 * (inc ? f : 1);   /* wie calc.js _nkmJYear */
       var erh = alle.filter(function (x) { return String(x.datum).slice(0, 4) === String(cal); });
       var eig = (ist && eintragbar && JB.istMiete) ? JB.istMiete(cal) : null;
+      /* v3840 · Marcel 19.11.2026: „bei 2025 steht in Kaltmiete im Jahr plötzlich ein Eingabefeld, unverständlich".
+         Jetzt steht dort der Wert (grau = gerechnet, schwarz = eingetragen) und ein Knopf „eintragen". Er öffnet das
+         Jahr im Fenster Jahre, dort steht, wie sich der Wert zusammensetzt. Beim MFH kommt die Summe aus den Wohnungen
+         und wird nur dort je Wohnung eingetragen (DpJahresbuch). Derselbe Speicher _jahre[J].nkm_j wie bisher. */
       var zelle = ist && eintragbar
-        ? '<input class="me-ist-in" type="text" inputmode="decimal" data-me-ist-jahr="' + cal + '" value="' + (eig != null ? fW(eig) : '') + '" placeholder="' + fW(jahr) + '" aria-label="Kaltmiete ' + cal + ' laut Kontoauszug (€ im Jahr)" title="Tatsächlich eingenommene Kaltmiete ' + cal + '. Leer: gerechnet aus den Mieterhöhungen (grau)."><span class="me-ist-eur">€</span>'
+        ? '<span class="me-ist-wert' + (eig != null ? ' me-ist-eigen' : '') + '">' + fE(eig != null ? eig : jahr) + '</span> <button type="button" class="me-ist-knopf" data-me-ist-jahr="' + cal + '" title="' + (mfh ? 'Miete ' + cal + ' je Wohnung eintragen' : 'Tatsächlich eingenommene Kaltmiete ' + cal + ' eintragen') + '">' + (eig != null ? 'ändern' : 'eintragen') + '</button>'
         : fE(jahr);
       zeilen += '<tr class="' + (ist ? 'me-row-ist' : (cal === cy ? 'me-row-heute' : 'me-row-plan')) + (erh.length ? ' me-row-hike' : '') + '">'
         + '<td>' + cal + (erh.length ? ' ⬆' : '') + '</td>'
@@ -497,12 +502,13 @@ window.MietEntwicklung = (function() {
         + '<td>' + fE(eig != null ? eig / 12 : nkm_m * f) + '</td></tr>';
     }
     var nE = alle.length;
-    wrap.innerHTML = '<div class="me-herkunft">Im Bestand: <b>bis ' + (cy - 1) + ' die echte Miete</b> aus den Mieterhöhungen'
-      + (nE ? ' (' + nE + ' eingetragen)' : ' (noch keine eingetragen, gerechnet wird mit der heutigen Miete' + ((document.getElementById('mv_letzte_erhoehung') || {}).value ? ' und der letzten Erhöhung' : '') + ')')
-      + ', <b>ab ' + cy + '</b> die heutige Miete mit der Mietentwicklung fortgeschrieben. Eine Erhöhung trägst du in der Karte Mietvertrag ein.'
-      + (eintragbar ? ' Was in einem vergangenen Jahr wirklich eingenommen wurde, trägst du direkt in der Tabelle ein; leer bleibt die gerechnete Miete (grau).' : '') + '</div>'
+    /* v3840 · kurze Sätze, nur Punkt und Komma (Marcel 19.11.2026) */
+    wrap.innerHTML = '<div class="me-herkunft"><b>Bis ' + (cy - 1) + '</b> steht die Miete, die gezahlt wurde. DealPilot rechnet sie aus den Mieterhöhungen'
+      + (nE ? ' (' + nE + ' eingetragen).' : '. Es ist noch keine eingetragen, deshalb gilt die heutige Miete' + ((document.getElementById('mv_letzte_erhoehung') || {}).value ? ' mit der letzten Erhöhung' : '') + '.')
+      + ' <b>Ab ' + cy + '</b> schreibt DealPilot die heutige Miete mit der Mietentwicklung fort. Eine Mieterhöhung trägst du ' + (mfh ? 'bei der Wohnung in den Einheiten' : 'in der Karte Mietvertrag') + ' ein.'
+      + (eintragbar ? ' Weicht die echte Miete eines Jahres ab, zum Beispiel wegen Leerstand, klick bei dem Jahr auf „eintragen“.' + (mfh ? ' Beim Mehrfamilienhaus trägst du sie je Wohnung ein.' : '') + ' Grau ist gerechnet, schwarz ist eingetragen.' : '') + '</div>'
       + '<table><thead><tr><th>Jahr</th><th>Stand</th><th>Kaltmiete im Jahr</th><th>je Monat</th></tr></thead><tbody>' + zeilen + '</tbody></table>'
-      + (eintragbar ? '<div class="me-ist-link"><button type="button" class="me-ist-alle" data-me-ist-alle="1">alle Angaben je Jahr</button></div>' : '');
+      + (eintragbar ? '<div class="me-ist-link"><button type="button" class="me-ist-alle" data-me-ist-alle="1">Alle Jahre im Überblick</button></div>' : '');
     if (eintragbar && !wrap._dpMeIst) {
       wrap._dpMeIst = true;
       wrap.addEventListener('change', function (ev) {
@@ -513,6 +519,8 @@ window.MietEntwicklung = (function() {
         try { _renderTable(); } catch (e) {}
       });
       wrap.addEventListener('click', function (ev) {
+        var k = ev.target && ev.target.closest ? ev.target.closest('.me-ist-knopf[data-me-ist-jahr]') : null;
+        if (k) { ev.preventDefault(); try { window.DpJahresbuch.oeffnen(+k.getAttribute('data-me-ist-jahr')); } catch (e) {} return; }   /* v3840 */
         var b = ev.target && ev.target.closest ? ev.target.closest('[data-me-ist-alle]') : null; if (!b) return;
         ev.preventDefault();
         try { window.DpJahresbuch.oeffnen(); } catch (e) {}

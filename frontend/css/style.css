@@ -4677,6 +4677,15 @@ select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%
   text-decoration: underline; text-underline-offset: 2px;
 }
 #me_table_wrap .me-ist-alle:hover { color: var(--wl-b8932f, #b8932f) !important; }
+/* v3840 · statt Eingabefeld: Wert und Knopf „eintragen" (öffnet das Jahr im Fenster Jahre) */
+#me_table_wrap td .me-ist-wert { color: var(--muted, #7A7370); }
+#me_table_wrap td .me-ist-wert.me-ist-eigen { color: inherit; font-weight: 600; }
+#me_table_wrap td .me-ist-knopf {
+  background: none !important; border: 1px solid rgba(128,128,128,.4) !important; box-shadow: none !important;
+  padding: 2px 8px !important; margin-left: 6px; height: auto !important; min-height: 28px !important; border-radius: 6px !important;
+  font: 500 11.5px/1.2 Inter, system-ui, sans-serif !important; color: var(--wl-b8932f, #b8932f) !important; cursor: pointer;
+  display: inline-flex !important; align-items: center; width: auto !important;
+}
 #zb-karte .zb-schalter {
   display: flex; align-items: flex-start; gap: 8px; cursor: pointer;
   margin: 2px 0 10px; font-size: 13px; line-height: 1.45;

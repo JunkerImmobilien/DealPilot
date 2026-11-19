@@ -130,6 +130,30 @@
     return isFinite(n) ? n : 0;
   }
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  /* v3840 · Marcel 19.11.2026 (Reiter Miete): „ohne Semikolon und ohne Gedankenstriche, ganze, kurze Sätze".
+     Zerlegt einen zusammengesetzten Text an Gedankenstrich, Semikolon und Mittelpunkt (nur außerhalb von
+     Klammern) in Sätze: erster Buchstabe groß, Punkt am Ende. In Klammern wird aus dem Strich ein Komma.
+     Nur ANZEIGE, keine Zahl ändert sich. Rein, geprüft in tools/miete-reiter-pruefen.mjs. */
+  function kurzSaetze(t) {
+    if (t == null) return '';
+    var s0 = String(t), teile = [], cur = '', tiefe = 0;
+    for (var i = 0; i < s0.length; i++) {
+      var ch = s0.charAt(i), vor = s0.charAt(i - 1), nach = s0.charAt(i + 1);
+      if (ch === '(') tiefe++;
+      if (ch === ')' && tiefe > 0) tiefe--;
+      var strich = (ch === '—' || ch === '–' || ch === '-') && vor === ' ' && nach === ' ';
+      var trenn = strich || ch === ';' || (ch === '·' && vor === ' ');
+      if (trenn) {
+        if (tiefe > 0) { cur = cur.replace(/\s+$/, '') + ','; continue; }
+        teile.push(cur); cur = ''; continue;
+      }
+      cur += ch;
+    }
+    teile.push(cur);
+    return teile.map(function (x) { return x.replace(/\s+/g, ' ').trim().replace(/[,:]$/, ''); }).filter(function (x) { return x && x !== '.'; })
+      .map(function (x) { x = x.charAt(0).toUpperCase() + x.slice(1); return /[.!?]$/.test(x) ? x : x + '.'; }).join(' ');
+  }
+  window.DpKurzSaetze = kurzSaetze;
   function eur(n) { return (n == null || !isFinite(n)) ? '—' : Math.round(n).toLocaleString('de-DE') + ' €'; }
   function eur2(n) { return (n == null || !isFinite(n)) ? '—' : n.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €'; }
   function pct(n, d) { return (n == null || !isFinite(n)) ? '—' : n.toLocaleString('de-DE', { minimumFractionDigits: d == null ? 2 : d, maximumFractionDigits: d == null ? 2 : d }) + ' %'; }
@@ -367,9 +391,10 @@
       u: 'Mietpreisbremse gilt' + (br.bis ? ' bis ' + deDatum(br.bis) : '') + ' · Vergleichsmiete + 10 %',
       k: f.zielSetzen ? { lbl: 'als Zielmiete', fn: function () { f.zielSetzen(og); } } : null });
     else if (br && br.gilt === false) {   /* v3356 · Prüfung B3: die 120-%-Grenze mit Zahl, wie mietanker.js zielMaximum */
-      var _vq = zahl(so.vgl_qm) || zahl(w.vgl_qm), _og = _vq > 0 ? Math.round(_vq * 1.2 * 100) / 100 : 0;
+      var _fo = window.DpMieteRegel ? DpMieteRegel.faktorOhne() : 1.2;   /* v3845 · Einstellung, Vorgabe 120 % */
+      var _vq = zahl(so.vgl_qm) || zahl(w.vgl_qm), _og = _vq > 0 ? Math.round(_vq * _fo * 100) / 100 : 0;
       z.push({ c: 'neu', t: 'Bei Neuvermietung', v: _og > 0 ? 'frei, bis ca. ' + eur2(_og) + '/m²' : 'frei',
-        u: (br.neubau ? br.text : 'keine Mietpreisbremse an dieser Adresse') + (_og > 0 ? ' · unbedenklich bis rund 120 % der Vergleichsmiete (§ 5 WiStG), wenn Ausstattung, Lage und Zustand das tragen' : ''),
+        u: (br.neubau ? br.text : 'keine Mietpreisbremse an dieser Adresse') + (_og > 0 ? '. ' + (window.DpMieteRegel ? DpMieteRegel.satz() : 'DealPilot rechnet mit 120 % der Vergleichsmiete (§ 5 WiStG).') + ' Das gilt, wenn Ausstattung, Lage und Zustand es tragen' : ''),
         k: (_og > 0 && f.zielSetzen) ? { lbl: 'als Zielmiete', fn: function () { f.zielSetzen(_og); } } : null });
     }
     else z.push({ c: 'neu', t: 'Bei Neuvermietung', v: 'bitte prüfen', u: (br && br.text) || '' });
@@ -564,7 +589,7 @@
     var sp = v && v.spanne; if (!sp) return '';
     var ca = sp.ca ? 'ca. ' : '';
     var t = 'Konservativ ' + ca + qmDe(sp.konservativ_qm) + ' €/m² (Vergleichsmiete, Mittelwert). Maximum bei Neuvermietung ' + ca + qmDe(sp.maximum_qm) + ' €/m²'
-      + (v.bremse_gilt === false ? ' (120 % ohne Mietpreisbremse). Darüber Bußgeldrisiko nach § 5 WiStG nur bei Ausnutzung eines geringen Angebots.' : ' (110 % mit Mietpreisbremse). Darüber nur mit Ausnahme nach § 556e oder § 556f BGB.')
+      + (v.bremse_gilt === false ? ' (' + (window.DpMieteRegel ? DpMieteRegel.pct() : 120) + ' % ohne Mietpreisbremse). Über 120 % Bußgeldrisiko nach § 5 WiStG nur bei Ausnutzung eines geringen Angebots.' : ' (110 % mit Mietpreisbremse). Darüber nur mit Ausnahme nach § 556e oder § 556f BGB.')
       + ' Bestandsmieter bis ' + ca + qmDe(sp.bestand_max_qm) + ' €/m² in Schritten der Kappungsgrenze.'
       + (v.markt_begrenzt ? ' Angesetzt ist die niedrigere Marktmiete.' : '') + (v.ohne_markt ? ' Ohne Marktbewertung, am Markt prüfen.' : '')
       + (sp.bedingung ? ' Der Oberwert ' + sp.bedingung.replace(/^gilt, /, 'gilt, ') + '.' : '')
@@ -662,7 +687,7 @@
       u: vglHer + (vBegr ? ' · ' + vBegr : '') + (vHwU.length ? ' · ' + vHwU.join(' · ') : ''),
       warn: vSchaetz || !!(vMs && (vMs.veraltet || vMs.art !== 'qualifiziert' || vMs.genutzt === 'oben')), lang: vHw.join(' · '),
       ms: vMs, quelle_art: vEig ? 'eigen' : (s.vgl_quelle_art || vgO.quelle_art || null) });
-    else z.push({ k: 'Vergleichsmiete', v: 'fehlt', u: 'Mietspiegel der Stadt eintragen (Tab Miete, Karte Mieterhöhung und Zielbild) oder eine belegte Vergleichsmiete', warn: true });
+    else z.push({ k: 'Vergleichsmiete', v: 'fehlt', u: 'Trag den Mietspiegel der Stadt ein. Das geht unten in der Karte Mieterhöhung und Zielbild. Eine belegte Vergleichsmiete geht auch', warn: true });
     /* 2 · Nächste Erhöhung (§ 558) — aus sollFuer, nichts nachgerechnet */
     if (w) {
       var ist = zahl(w.ist), wfl = zahl(w.wfl);
@@ -674,12 +699,12 @@
            Vergleichsmiete 8,40 - 588 € nach § 558 plus 107 € Umlage. „Grenze: Vergleichsmiete" allein war falsch. */
         u: (s.termine ? s.termine.text : '') + (s.grenze ? ' · Grenze § 558: ' + s.grenze : '')
           + (s.umlage559 && s.umlage559.monat > 0 ? ' · darin Modernisierungsumlage § 559: ' + eur(s.umlage559.monat) + '/Monat'
-              + (s.umlage559.ohne_erh ? ' (Erhaltungsanteil nicht eingetragen — 0 % abgezogen)' : '') : '')
+              + (s.umlage559.ohne_erh ? ' (Erhaltungsanteil nicht eingetragen, 0 % abgezogen)' : '') : '')
           + (/^eigene Angabe/.test(s.herkunft || '') ? ' · eigene Angabe' : ''),
         warn: !!(s.termine && s.termine.letzte_fehlt) || !!(s.hinweise && s.hinweise.length),
         lang: [s.termine && s.termine.sperre, (s.hinweise || []).join(', ')].filter(Boolean).join(' · ') });
       else {
-        var fr = s.termine ? (s.termine.letzte_fehlt ? 'Datum der letzten Erhöhung eintragen — Sperrfrist sonst nicht geprüft'
+        var fr = s.termine ? (s.termine.letzte_fehlt ? 'Trag das Datum der letzten Erhöhung ein. Sonst prüft DealPilot die Sperrfrist nicht'
           : (s.termine.verlangbar_sofort ? 'Sperrfrist abgelaufen' : 'Sperrfrist bis ' + mmjj(s.termine.verlangbar_ab))) : '';
         z.push({ k: 'Nächste Erhöhung', v: 'kein Spielraum',
           u: (s.grund || '') + (fr ? ' · ' + fr : ''), warn: !!(s.termine && s.termine.letzte_fehlt) });
@@ -693,8 +718,8 @@
     z.push({ k: 'Mietpreisbremse', v: br.gilt === true ? 'gilt' + (br.bis ? ' bis ' + deDatum(br.bis) : '') : br.gilt === false ? 'gilt hier nicht' : 'bitte prüfen',
       u: br.gilt === true
         ? (obergrenze ? 'bei Neuvermietung höchstens ' + eur2(obergrenze) + '/m² (Vergleichsmiete ' + eur2(vglQm) + ' + 10 %'
-            + (vglHer ? ', ' + vglHer : '') + ')' : 'Vergleichsmiete eintragen — dann rechnet DealPilot die Obergrenze')
-        : br.gilt === false ? (br.neubau ? br.text + '. ' : '') + 'Neuvermietung frei vereinbar' + (vglQm > 0 ? ', unbedenklich bis rund 120 % der Vergleichsmiete, ca. ' + eur2(vglQm * 1.2) + '/m² (§ 5 WiStG)' : '') : '',   /* v3356 · B3 */
+            + (vglHer ? ', ' + vglHer : '') + ')' : 'Trag die Vergleichsmiete ein. Dann rechnet DealPilot die Obergrenze')
+        : br.gilt === false ? (br.neubau ? br.text + '. ' : '') + 'Neuvermietung frei vereinbar' + (vglQm > 0 ? '. ' + (window.DpMieteRegel ? DpMieteRegel.satz() : '') + ' Das sind ca. ' + eur2(vglQm * (window.DpMieteRegel ? DpMieteRegel.faktorOhne() : 1.2)) + '/m² (§ 5 WiStG)' : '') : '',   /* v3356 · B3 */
       warn: br.gilt === null || !!br.pruefen || (br.gilt === true && markt), lang: br.text
         + (br.gilt === true && naeh ? ' Die Obergrenze ist auf der DealPilot-Näherung der ortsüblichen Vergleichsmiete gerechnet: sie leitet die Vergleichsmiete aus der amtlichen Zensus-Bestandsmiete ab und ist an den freien Mietspiegeln kalibriert (mittlere Abweichung rund 7,5 %). Maßgeblich bleibt die Vergleichsmiete laut Mietspiegel — liegt sie niedriger, ist auch die zulässige Miete niedriger; vor der Neuvermietung mit dem Mietspiegel prüfen.' : '')
         + (br.gilt === true && markt && !naeh ? ' Die Obergrenze ist auf einer Schätzung aus Angebotsmieten gerechnet, nicht auf der ortsüblichen Vergleichsmiete (Mietspiegel) — die kann niedriger liegen.' : '')
@@ -715,7 +740,7 @@
             + ' · es gilt der kleinere Wert, nie unter der Ist-Miete von ' + eur(istR)
             + (s.umlage559 && s.umlage559.monat > 0 ? ' · dazu Modernisierungsumlage § 559: ' + eur(s.umlage559.monat) + '/Monat' : '')
             + (obergrenze ? ' · Neuvermietung: ' + eur2(vglQm) + '/m² × 1,10 = ' + eur2(obergrenze) + '/m² (Mietpreisbremse)'
-              : br.gilt === false ? ' · Neuvermietung: frei, unbedenklich bis ' + eur2(vglQm) + '/m² × 1,20 = ' + eur2(vglQm * 1.2) + '/m² (§ 5 WiStG)' : '');   /* v3356 · B3 */
+              : br.gilt === false ? ' · Neuvermietung: frei, DealPilot rechnet mit ' + eur2(vglQm) + '/m² × ' + dez(window.DpMieteRegel ? DpMieteRegel.faktorOhne() : 1.2, 2) + ' = ' + eur2(vglQm * (window.DpMieteRegel ? DpMieteRegel.faktorOhne() : 1.2)) + '/m² (bis 120 % unbedenklich, § 5 WiStG)' : '');   /* v3356 · B3 */
           z.push({ k: 'Rechenweg', v: m558R >= istR + 1 ? 'höchstens ' + eur(m558R) + '/Monat' : 'keine Erhöhung', u: rw });
         }
       }
@@ -725,7 +750,7 @@
     if (zbM.gekappt) z.push({ k: 'Zielmiete', v: 'auf ' + eur2(zq) + '/m² begrenzt', warn: true, gekappt: true, ein: zbM.eingetragen_qm, u: zbM.text });   /* v3312 */
     else if (zbM.ueber) z.push({ k: 'Zielmiete', v: eur2(zq) + '/m² über der Bremse (Ausnahme)', warn: true, ueber: true, u: zbM.text });
     else if (obergrenze && zq > obergrenze + 0.004) z.push({ k: 'Zielmiete', v: eur2(zq) + '/m² liegt über der Bremse', bad: true,
-      u: 'zulässig nur mit höherer Vormiete (§ 556e) oder nach umfassender Modernisierung (§ 556f) — sonst höchstens ' + eur2(obergrenze) + '/m²' });
+      u: 'Zulässig nur mit höherer Vormiete (§ 556e) oder nach umfassender Modernisierung (§ 556f). Sonst höchstens ' + eur2(obergrenze) + '/m²' });
     /* v3158 · was hier gilt, am Objekt merken (Schnittstelle) - auch ohne Potenzial-Rechnung; nur fuer das Objekt selbst (i == null) */
     try { if (!i && window.dpMarktdatenMerken) window.dpMarktdatenMerken({ kappung: kapp ? Object.assign({ ags: agsJetzt() }, kapp) : null, mietpreisbremse: br ? Object.assign({ ags: agsJetzt(), obergrenze_qm: obergrenze || null }, br) : null, vergleichsmiete_genutzt: vglQm ? { qm: vglQm, herkunft: vglHer || null } : null }); } catch (e) {}   /* v3245: eigener Schluessel - unter 'vergleichsmiete' las objektVgl() die Marktmiete als amtlich zurueck */
     return { zeilen: z, bremse: br, obergrenze: obergrenze, kapp: kapp, vgl_qm: vglQm || null, vgl_herkunft: vglHer || null };   /* v3130: vgl fuer den Zielmiete-Vorschlag */
@@ -736,9 +761,9 @@
     mietrechtStil();
     var d = mietrechtDaten(m, i);
     return '<div class="dp-mr' + (o.eng ? ' dp-mr-eng' : '') + '">' + d.zeilen.map(function (r) {
-      return '<div class="dp-mr-z' + (r.bad ? ' dp-mr-bad' : r.warn ? ' dp-mr-warn' : '') + '"' + (r.lang ? ' title="' + esc(r.lang) + '"' : '') + '>'
+      return '<div class="dp-mr-z' + (r.bad ? ' dp-mr-bad' : r.warn ? ' dp-mr-warn' : '') + '"' + (r.lang ? ' title="' + esc(kurzSaetze(r.lang)) + '"' : '') + '>'
         + '<span class="dp-mr-k">' + esc(r.k) + '</span><b class="dp-mr-v">' + esc(r.v) + '</b>'
-        + (r.u ? '<span class="dp-mr-u">' + esc(r.u) + '</span>' : '') + '</div>';
+        + (r.u ? '<span class="dp-mr-u">' + esc(kurzSaetze(r.u)) + '</span>' : '') + '</div>';
     }).join('') + '</div>';
   }
 
@@ -762,6 +787,12 @@
       '.dp-mr-eng .dp-mr-z{grid-template-columns:130px 1fr;}',
       '.dp-mr-eng .dp-mr-u{grid-column:2}',
       '.dp-mr-liste{margin-top:10px;border:1px solid #E6E0D3;border-radius:10px;overflow:hidden;background:#fff}',
+      '.dp-mr-teil{margin:10px 0 0;border-top:1px solid #EFEBE3;padding-top:8px}',
+      '.dp-mr-teil>summary{cursor:pointer;font:600 13px/1.4 "Space Grotesk",Inter,sans-serif;color:#2A2727;min-height:32px;display:flex;align-items:center;gap:8px}',
+      '.dp-mr-teil>summary::after{content:"einklappen";margin-left:auto;font:400 11px Inter,sans-serif;color:#7A7370}',
+      '.dp-mr-teil:not([open])>summary::after{content:"aufklappen"}',
+      '.dp-mr-teil-satz{margin:2px 0 8px;font-size:12px;color:#6B6356;line-height:1.5}',
+      '[data-dp-mr-whg]{cursor:pointer}[data-dp-mr-whg]:hover{background:rgba(201,168,76,.06)}',
       '.dp-mr-w{padding:8px 12px;border-top:1px solid #EFEBE3}',
       '.dp-mr-w:first-child{border-top:none}',
       '.dp-mr-w1{display:flex;gap:10px;align-items:baseline;font-size:12.5px}',
@@ -775,6 +806,27 @@
     document.head.appendChild(s);
   }
 
+  /* v3840 · einklappbare Teile der Mietrecht-Karte */
+  function mrOffen(id) { try { return localStorage.getItem('dp_mr_zu_' + id) !== '1'; } catch (e) { return true; } }
+  function mrIntro() { return '<p class="hint" style="margin:0 0 8px">Hier steht, was das Mietrecht an dieser Adresse erlaubt. DealPilot liest es aus den Landesverordnungen und dem Mietspiegel. Orientierung, keine Rechtsberatung.</p>'; }
+  function mrTeil(id, titel, satz, inhalt) {
+    return '<details class="dp-mr-teil" data-dp-mr-teil="' + id + '"' + (mrOffen(id) ? ' open' : '') + '><summary>' + esc(titel) + '</summary>'
+      + '<p class="dp-mr-teil-satz">' + esc(satz) + '</p>' + inhalt + '</details>';
+  }
+  function mrBinden(k) {
+    if (k._dpMr) return; k._dpMr = true;
+    k.addEventListener('toggle', function (ev) {
+      var d = ev.target; if (!d || !d.getAttribute || !d.getAttribute('data-dp-mr-teil')) return;
+      try { if (d.open) localStorage.removeItem('dp_mr_zu_' + d.getAttribute('data-dp-mr-teil')); else localStorage.setItem('dp_mr_zu_' + d.getAttribute('data-dp-mr-teil'), '1'); } catch (e) {}
+    }, true);
+    k.addEventListener('click', function (ev) {
+      var t = ev.target && ev.target.closest ? ev.target : null; if (!t) return;
+      var MM = M();
+      if (t.closest('[data-dp-mr-einheiten]')) { ev.preventDefault(); try { if (MM.oeffnen) MM.oeffnen(1); } catch (e) {} return; }
+      var w = t.closest('[data-dp-mr-whg]');
+      if (w && !t.closest('a,button')) { try { if (MM.einheitOeffnen) MM.einheitOeffnen(+w.getAttribute('data-dp-mr-whg')); } catch (e) {} }
+    });
+  }
   /* Karte im Tab Miete, direkt unter dem Mietvertrag (#mv-objekt-karte). */
   function mietrechtKarte() {
     try { zielBremseUmtragen(modell()); } catch (e) { console.warn('[v3312 bremse]', e); }
@@ -797,20 +849,25 @@
         var d = mietrechtDaten(m, j);
         var naechst = d.zeilen.filter(function (r) { return r.k === 'Nächste Erhöhung'; })[0];
         var ziel = d.zeilen.filter(function (r) { return r.k === 'Zielmiete'; })[0];
-        var istQm = w.ist > 0 && w.wfl > 0 ? eur2(w.ist / w.wfl) + '/m²' : (w.status === 'leer' ? 'leer' : '—');
-        return '<div class="dp-mr-w' + (ziel && ziel.bad ? ' dp-mr-bad' : '') + '">'
+        var istQm = w.ist > 0 && w.wfl > 0 ? eur2(w.ist / w.wfl) + '/m²' : (w.status === 'leer' ? 'leer' : 'ohne Miete');
+        return '<div class="dp-mr-w' + (ziel && ziel.bad ? ' dp-mr-bad' : '') + '" data-dp-mr-whg="' + j + '" role="button" tabindex="0" title="Wohnung öffnen und ändern">'
           + '<div class="dp-mr-w1"><b>' + esc(w.nr) + (w.lage ? ' · ' + esc(w.lage) : '') + '</b><span>' + istQm + '</span>'
-          + '<span class="dp-mr-w-v">' + esc(naechst ? naechst.v : '—') + '</span></div>'
-          + '<div class="dp-mr-w2">' + esc(naechst && naechst.u ? naechst.u : '')
-          + (w.ziel_qm ? '<br>Zielmiete ' + eur2(w.ziel_qm) + '/m²' + (ziel && ziel.bad ? ' — <b>über der Mietpreisbremse</b> (höchstens ' + eur2(d.obergrenze) + '/m², außer § 556e/§ 556f)'
-              : ziel && ziel.gekappt ? ' — <b>auf die Mietpreisbremse begrenzt</b> (eingetragen ' + eur2(ziel.ein) + '/m²; höher nur mit Ausnahme § 556e/§ 556f)'   /* v3312 */
-              : ziel && ziel.ueber ? ' — über der Bremse, Ausnahme eingetragen' : '') : '') + '</div></div>';
+          + '<span class="dp-mr-w-v">' + esc(naechst ? naechst.v : 'keine Angabe') + '</span></div>'
+          + '<div class="dp-mr-w2">' + esc(naechst && naechst.u ? kurzSaetze(naechst.u) : '')
+          + (w.ziel_qm ? '<br>Zielmiete ' + eur2(w.ziel_qm) + '/m².' + (ziel && ziel.bad ? ' <b>Sie liegt über der Mietpreisbremse.</b> Höchstens ' + eur2(d.obergrenze) + '/m², außer nach § 556e oder § 556f BGB.'
+              : ziel && ziel.gekappt ? ' <b>Begrenzt auf die Mietpreisbremse.</b> Eingetragen waren ' + eur2(ziel.ein) + '/m². Mehr geht nur mit einer Ausnahme nach § 556e oder § 556f BGB.'   /* v3312 */
+              : ziel && ziel.ueber ? ' Sie liegt über der Bremse, eine Ausnahme ist eingetragen.' : '') : '') + '</div></div>';
       }).join('');
-      k.innerHTML = kopf + mietrechtHtml({ kappung: m.kappung, vgl: m.vgl, wohnungen: [] }, 0)
-        + (W.length ? '<div class="dp-mr-liste">' + zeilen + '</div><p class="hint" style="margin:6px 0 0">Ändern je Wohnung im Fenster „Einheiten erfassen“ › Details.</p>' : '');
+      /* v3840 · Marcel 19.11.2026: „darunter steht eine Auflistung der Einheiten, ohne zu sagen wozu" und
+         „beides einklappbar". Zwei Teile mit Überschrift und einem Satz, Zustand je Teil im Browser gemerkt. */
+      k.innerHTML = kopf + mrIntro() + mrTeil('gilt', 'Was hier gilt', 'Diese Regeln gelten für jede Wohnung im Haus.', mietrechtHtml({ kappung: m.kappung, vgl: m.vgl, wohnungen: [] }, 0))
+        + (W.length ? mrTeil('whg', 'Was bei den einzelnen Wohnungen möglich ist', 'Je Wohnung siehst du die heutige Miete je m², die nächste mögliche Mieterhöhung und die Zielmiete bei einer Neuvermietung. Klick auf eine Wohnung, um sie zu ändern.',
+            '<div class="dp-mr-liste">' + zeilen + '</div><button type="button" class="btn btn-outline btn-sm" data-dp-mr-einheiten="1" style="margin-top:8px">In den Einheiten ändern</button>') : '');
+      mrBinden(k);
       return;
     }
-    k.innerHTML = kopf + mietrechtHtml(m, 0);
+    k.innerHTML = kopf + mrIntro() + mrTeil('gilt', 'Was hier gilt', 'Diese Regeln gelten für die Wohnung an dieser Adresse.', mietrechtHtml(m, 0));
+    mrBinden(k);
   }
 
   /* ── Gemeindeschlüssel ────────────────────────────────────────────────
@@ -1032,7 +1089,7 @@
       ['zustand', wert('ds2_zustand')], ['zieljahr', wert('zb_fertig_jahr')], ['mietstg', wert('mietstg')]]
       .filter(function (x) { return x[1] != null && String(x[1]).trim() !== ''; })
       .map(function (x) { return '&' + x[0] + '=' + encodeURIComponent(String(x[1]).trim().replace(',', '.')); });
-    return q.join('');
+    return q.join('') + (window.DpMieteRegel ? DpMieteRegel.query() : '');   /* v3845 */
   }
   /** v3343 · { vergleich, ziel, prognose } für eine Wohnungsgröße oder null (lädt einmal nach) */
   function zielMaxFuer(wflW) {
@@ -1469,6 +1526,7 @@
     if (_zj >= 1990 && _zj <= 2100) body.zielbild_jahr = _zj;
     var _ms0 = String(wert('mietstg') || '').trim();
     if (_ms0 !== '' && isFinite(zahl(_ms0))) body.mietsteigerung_pct = zahl(_ms0);
+    if (window.DpMieteRegel && !DpMieteRegel.istVorgabe()) body.neu_faktor_ohne = DpMieteRegel.faktorOhne();   /* v3845 · nur abweichend: Prüfwert bleibt */
     return body;
   }
   var _lauf = null;
@@ -1661,9 +1719,9 @@
     }
     if (out.san > 0 && out.summe > 0) {
       out.unterschied = 'Investition (Sanierungskosten) ' + eur(out.san) + ' · Zielbild-Maßnahmen ' + eur(out.summe)
-        + ' — zwei getrennte Angaben: die Sanierungskosten (Reiter Investition) gehören zum Ankauf und gelten bis zur Ausführung als offener Instandhaltungsrückstau;'
-        + ' die Zielbild-Maßnahmen sind die Kosten, die das Zielbild noch braucht, und werden vom Wertzuwachs abgezogen.'
-        + ' Ist es dieselbe Arbeit, steht sie doppelt — dann eine der beiden Angaben leeren.';
+        + '. Das sind zwei getrennte Angaben. Die Sanierungskosten (Reiter Investition) gehören zum Ankauf. Bis sie ausgeführt sind, gelten sie als offener Instandhaltungsrückstau.'
+        + ' Die Zielbild-Maßnahmen sind die Kosten, die das Zielbild noch braucht. Sie werden vom Wertzuwachs abgezogen.'
+        + ' Ist es dieselbe Arbeit, steht sie doppelt. Dann leere eine der beiden Angaben.';
     }
     return out;
   }
@@ -3083,6 +3141,12 @@
     }
     return cb.checked;
   }
+  /* v3840/v3845 · Absprung in die Einheiten, Neuzeichnen nach Wechsel der Einstellung „Neuvermietung ohne Bremse" */
+  document.addEventListener('click', function (ev) {
+    var b = ev.target && ev.target.closest ? ev.target.closest('[data-dp-zb-einheiten]') : null; if (!b) return;
+    ev.preventDefault(); try { if (M().oeffnen) M().oeffnen(1); } catch (e) {}
+  });
+  window.addEventListener('dp:miete-regel', function () { try { objektKarte(); mietrechtKarte(); } catch (e) {} });
   window.addEventListener('dp:object-ready', function () {
     setTimeout(function () { try { zbSchalter(true); } catch (e) {} }, 0);
     setTimeout(function () { try { zbSchalter(true); } catch (e) {} }, 1200);   /* Wohnungen (_dpMfh) und Fassungen kommen nach */
@@ -3110,9 +3174,9 @@
       if (sumHost) {
         var m = modell();
         sumHost.style.display = '';
-        sumHost.innerHTML = '<p class="sec-desc" style="margin:0 0 8px">Beim Mehrfamilienhaus stehen Soll-Miete und Zielbild je Wohnung — hier nur die Summe <b>aus den Wohnungen</b>. Ändern im Fenster „Einheiten erfassen" (Wohnung anklicken).</p>'
+        sumHost.innerHTML = '<p class="sec-desc" style="margin:0 0 8px">Beim Mehrfamilienhaus legst du Soll-Miete, Zielmiete und Maßnahmen je Wohnung fest. Diese Karte füllt sich daraus von selbst und zeigt die Summe <b>aus den Wohnungen</b>. <button type="button" class="btn btn-outline btn-sm" data-dp-zb-einheiten="1" style="margin-left:4px">In den Einheiten ändern</button></p>'
           + '<div class="dp-zb-sum">Ist <b>' + eur(m.stufen.bestand.miete_m) + '</b>/Monat'
-          + (m.stufen.mieterhoehung ? ' · Mieterhöhung <b class="c-soll">' + eur(m.stufen.mieterhoehung.miete_m) + '</b>/Monat' + (m.stufen.mieterhoehung.vertrag_m > 0 ? ' (darin nach Vertrag, Staffel/Index — nicht § 558: ' + eur(m.stufen.mieterhoehung.vertrag_m) + ')' : '') : '')
+          + (m.stufen.mieterhoehung ? ' · Mieterhöhung <b class="c-soll">' + eur(m.stufen.mieterhoehung.miete_m) + '</b>/Monat' + (m.stufen.mieterhoehung.vertrag_m > 0 ? ' (darin nach Vertrag, Staffel oder Index, nicht § 558: ' + eur(m.stufen.mieterhoehung.vertrag_m) + ')' : '') : '')
           + (m.stufen.zielbild ? ' · Zielbild <b class="c-ziel">' + eur(m.stufen.zielbild.miete_m) + '</b>/Monat · Maßnahmen ' + eur(m.stufen.zielbild.kosten) : '')
           + (m.aktiv ? '' : ' · noch keine Soll-Miete oder kein Zielbild eingetragen') + '</div>'
           + herkunftHtml()   /* v2988 */
@@ -3172,7 +3236,7 @@
       : (s.grund && s.grund !== 'leer' ? esc(s.grund) : (s.hinweise && s.hinweise.length ? 'Hinweis: ' + esc(s.hinweise.join(', ')) : ''));
     host.innerHTML = !m.aktiv ? 'Ohne Angaben bleibt alles beim Bestand.'
       : 'Ist <b>' + eur(m.stufen.bestand.miete_m) + '</b>/Monat'
-        + (m.stufen.mieterhoehung ? ' · Mieterhöhung <b class="c-soll">' + eur(m.stufen.mieterhoehung.miete_m) + '</b>/Monat' + (m.stufen.mieterhoehung.vertrag_m > 0 ? ' (darin nach Vertrag, Staffel/Index — nicht § 558: ' + eur(m.stufen.mieterhoehung.vertrag_m) + ')' : '') : '')
+        + (m.stufen.mieterhoehung ? ' · Mieterhöhung <b class="c-soll">' + eur(m.stufen.mieterhoehung.miete_m) + '</b>/Monat' + (m.stufen.mieterhoehung.vertrag_m > 0 ? ' (darin nach Vertrag, Staffel oder Index, nicht § 558: ' + eur(m.stufen.mieterhoehung.vertrag_m) + ')' : '') : '')
         + (m.stufen.zielbild ? ' · Zielbild <b class="c-ziel">' + eur(m.stufen.zielbild.miete_m) + '</b>/Monat' + (m.stufen.zielbild.kosten ? ' · Maßnahmen ' + eur(m.stufen.zielbild.kosten) : '') + (m.stufen.zielbild.plus ? ' · +' + dez(m.stufen.zielbild.plus, 1).replace(',0', '') + ' Modernisierungspunkte' : '') : '')
         + '<br>' + esc(m.kappung.text) + ' Die Ertragswerte stehen in der Pilot-Analyse (Reiter „Ankauf · Bestand · Zielbild") und in beiden PDFs.';
     if (m.aktiv) host.innerHTML += herkunftHtml();   /* v2988 */
@@ -3189,10 +3253,10 @@
     msPlatzhalter(zr);
     if (!zr) return '';
     var ohneWerte = !(zahl(wert('ms_unten')) > 0 || zahl(wert('ms_mittel')) > 0 || zahl(wert('ms_oben')) > 0);
-    var link = zr.url && /^https?:\/\//.test(zr.url) ? ' · <a href="' + esc(zr.url) + '" target="_blank" rel="noopener">Mietspiegel öffnen</a>' : '';
+    var link = zr.url && /^https?:\/\//.test(zr.url) ? ' <a href="' + esc(zr.url) + '" target="_blank" rel="noopener">Mietspiegel öffnen</a>' : '';   /* v3840 */
     var reg = msRegister(), regWerte = !!(reg && reg.werte_verfuegbar);   /* v3255: das Register führt die Werte selbst */
-    return '<span' + (zr.veraltet || zr.status === 'unklar' ? ' style="color:#B8625C"' : '') + '>' + esc(zr.text) + '</span>' + link
-      + (zr.vorhanden && ohneWerte && !regWerte && !(zahl(wert('zb_vgl_qm')) > 0) ? (zr.nutzung ? ' — ' : '<br>') + '<b>' + esc(zr.werte_hinweis) + '</b>' : '') + '<br>'   /* v3266: Speicherverbot/Vorbehalt hinter dem Link */
+    return '<span' + (zr.veraltet || zr.status === 'unklar' ? ' style="color:#B8625C"' : '') + '>' + esc(kurzSaetze(zr.text)) + '</span>' + link
+      + (zr.vorhanden && ohneWerte && !regWerte && !(zahl(wert('zb_vgl_qm')) > 0) ? (zr.nutzung ? ' ' : '<br>') + '<b>' + esc(kurzSaetze(zr.werte_hinweis)) + '</b>' : '') + '<br>'   /* v3266: Speicherverbot/Vorbehalt hinter dem Link */
       + (regWerte && msRegisterRechnet() ? msWerteHtml() : '');
   }
   /* v3255 · Zeile der Register-Werte: „Mietspiegel der Gemeinde Minden · Werte für Baujahr 1972, 50 m²: 6,55 / 7,70 / 8,93 €/m²
@@ -3203,14 +3267,14 @@
   }
   function msWerteHtml() {
     var reg = msRegister() || {}, bj = parseInt(wert('baujahr'), 10);
-    var kopf = 'Mietspiegel der Gemeinde ' + esc(reg.gemeinde || '') + ' · Werte für Baujahr ' + (bj > 1000 ? bj : '–');
-    var wahl = 'gerechnet mit ' + MS_WAHL_DATIV[msWahl()];
+    var kopf = 'Mietspiegel der Gemeinde ' + esc(reg.gemeinde || '') + '. Werte für Baujahr ' + (bj > 1000 ? bj : 'unbekannt');
+    var wahl = 'Gerechnet mit ' + MS_WAHL_DATIV[msWahl()] + '.';   /* v3840 · Punkt und Komma */
     var D = window._dpMfh, mfh = artMitEinheiten() && D && Array.isArray(D.einheiten) && D.einheiten.length;
     if (!mfh) {
       var fl = zahl(wert('wfl')), mw = msWerteFuer(fl);
       if (!mw) return '<span style="color:var(--muted)">' + kopf + ': Werte werden geladen …</span><br>';
       if (!(mw.mittel > 0 || mw.oben > 0 || mw.unten > 0)) return '<span style="color:#B8625C">' + kopf + ', ' + esc(dez(fl, fl % 1 ? 1 : 0)) + ' m²: kein Wert — ' + esc((mw.hinweise || []).join(' · ')) + '</span><br>';
-      return kopf + ', ' + esc(dez(fl, fl % 1 ? 1 : 0)) + ' m²: <b>' + esc(msWerteText(mw)) + '</b> · ' + wahl
+      return kopf + ', ' + esc(dez(fl, fl % 1 ? 1 : 0)) + ' m²: <b>' + esc(msWerteText(mw)) + '</b>. ' + wahl
         + (mw.zelle || mw.rechnung ? '<br><small style="color:var(--muted)">' + esc(mw.zelle ? 'Tabellenfeld ' + mw.zelle : mw.rechnung) + (mw.seite ? ' (S. ' + esc(mw.seite) + ')' : '') + '</small>' : '') + '<br>';
     }
     var zeilen = D.einheiten.map(function (e, i) { return { e: e, i: i }; }).filter(function (o) { return o.e && zahl(o.e.wfl) > 0 && o.e.art !== 'gewerbe'; }).slice(0, 12).map(function (o) {
@@ -3219,7 +3283,7 @@
       if (!(mw.mittel > 0 || mw.oben > 0 || mw.unten > 0)) return name + ' (' + esc(dez(fl, fl % 1 ? 1 : 0)) + ' m²): kein Wert';
       return name + ' (' + esc(dez(fl, fl % 1 ? 1 : 0)) + ' m²): ' + esc(msWerteText(mw));
     });
-    return kopf + ', je Wohnung nach Größe · ' + wahl + '<br><small>' + zeilen.join(' · ') + '</small><br>';
+    return kopf + ', je Wohnung nach Größe. ' + wahl + '<br><small>' + zeilen.join(', ') + '</small><br>';
   }
   /* v3250 · Platzhalter der ms_*-Felder: zeigen, was das Verzeichnis einsetzt, solange das Feld leer ist */
   function msPlatzhalter(zr) {
@@ -3237,10 +3301,37 @@
     var h = el('ms-hinweis'); if (!h) return;
     var vg = objektVgl(), rz = '';
     try { rz = msRegisterHtml(); } catch (e) {}
-    if (!(vg.qm > 0)) { h.innerHTML = rz + 'Keine Vergleichsmiete: Mietspiegel der Stadt eintragen — sonst rechnet DealPilot nur mit der Kappungsgrenze.'; return; }
-    h.innerHTML = rz + 'Gerechnet wird mit <b>' + esc(eur2(vg.qm)) + '/m²</b> — ' + esc(vg.herkunft)
-      + ((vg.hinweise || []).length ? '<br><span style="color:#B8625C">Hinweis: ' + esc(vg.hinweise.join(' · ')) + '</span>' : '')
-      + (vg.quelle_art === 'eigen' && mietspiegelObjekt() ? '<br>Die eigene Vergleichsmiete (oben) geht dem Mietspiegel vor.' : '');
+    try { msFelderOrdnen(); } catch (e) {}   /* v3840 */
+    if (!(vg.qm > 0)) { h.innerHTML = rz + 'Es gibt noch keine Vergleichsmiete. Trag die Werte aus dem Mietspiegel der Stadt ein. Sonst rechnet DealPilot die Mieterhöhung nur mit der Kappungsgrenze.'; return; }
+    /* v3840 · die Hinweise der Quelle (Oberwert, Vermutungswirkung, Lage) stehen in der Karte „Mietrecht an dieser Adresse".
+       Hier nur, womit gerechnet wird. Die Hinweise bleiben als Tooltip (Marcel 19.11.2026: Dopplungen raus). */
+    h.innerHTML = rz + '<span' + ((vg.hinweise || []).length ? ' title="' + esc(kurzSaetze(vg.hinweise.join(' · '))) + '"' : '') + '>Gerechnet wird mit <b>' + esc(eur2(vg.qm)) + '/m²</b>. Quelle: ' + esc(kurzSaetze(vg.herkunft)) + '</span>'
+      + (vg.quelle_art === 'eigen' && mietspiegelObjekt() ? '<br>Die eigene Vergleichsmiete geht dem Mietspiegel vor.' : '');
+  }
+  /* v3840 · Marcel 19.11.2026: „Mietspiegel, Art des Mietspiegels … unverständlich, was einzutragen ist. Automatisch
+     befüllen, wo DealPilot es kennt". Kennt DealPilot die Werte (Register lib/mietspiegel/werte), rechnet er schon damit,
+     die Felder sind nur eine Abweichung und stehen eingeklappt. Sonst offen, mit einem Satz, wozu. Eingetragene Werte
+     klappen nie zu. Nichts wird in die Felder geschrieben: leere Felder heißen weiter „aus dem Register" (Rangfolge unverändert). */
+  function msFelderOrdnen() {
+    var zeile = el('ms-zeile'); if (!zeile || !zeile.parentNode) return;
+    var det = el('ms-eigen');
+    if (!det) {
+      det = document.createElement('details'); det.id = 'ms-eigen'; det.className = 'dp-ms-eigen';
+      det.innerHTML = '<summary></summary><p class="dp-ms-eigen-satz"></p>';
+      zeile.parentNode.insertBefore(det, zeile); det.appendChild(zeile);
+      var tt = det.previousElementSibling;
+      if (tt && tt.classList && tt.classList.contains('card-title')) tt.innerHTML = 'Mietspiegel <span class="oe-ct-hint">die Grenze für eine Mieterhöhung nach § 558 BGB</span>';
+      if (!el('dp-ms-eigen-stil')) { var st = document.createElement('style'); st.id = 'dp-ms-eigen-stil';
+        st.textContent = '.dp-ms-eigen{margin:0 0 6px}.dp-ms-eigen>summary{cursor:pointer;min-height:30px;display:flex;align-items:center;font-size:12.5px;color:var(--wl-b8932f, #b8932f)}.dp-ms-eigen-satz{font-size:12px;margin:2px 0 8px;color:#6B6356;line-height:1.5}';
+        document.head.appendChild(st); }
+    }
+    var reg = msRegister(), kennt = !!(reg && reg.werte_verfuegbar && msRegisterRechnet());
+    var eigen = ['ms_unten', 'ms_mittel', 'ms_oben'].some(function (id) { return zahl(wert(id)) > 0; }) || !!wert('ms_url') || !!wert('ms_stand');
+    det.querySelector('summary').textContent = kennt ? (eigen ? 'Eigene Mietspiegel-Werte (eingetragen)' : 'Eigene Werte eintragen (nur wenn du abweichen willst)') : 'Werte aus dem Mietspiegel der Stadt eintragen';
+    det.querySelector('.dp-ms-eigen-satz').textContent = kennt
+      ? 'DealPilot kennt den Mietspiegel dieser Gemeinde und setzt die Werte selbst ein. Du musst hier nichts eintragen. Ein eigener Wert geht vor.'
+      : 'DealPilot kennt die Werte dieses Mietspiegels nicht. Trag aus dem Mietspiegel der Stadt die Spanne für diese Wohnung ein, also unteren Wert, Mittelwert und oberen Wert. Damit rechnet DealPilot, wie weit die Miete steigen darf.';
+    if (!det._dpGesetzt || eigen) { det.open = !kennt || eigen; det._dpGesetzt = true; }
   }
   function bindeObjektFelder() {
     /* v3246 · Mietspiegel am Objekt: neu zeichnen, auch beim MFH (Summe und Mietrecht-Karte) */

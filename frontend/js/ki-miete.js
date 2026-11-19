@@ -607,7 +607,8 @@ function _kmUebersicht(o) {
       } else if (br.gilt === false) {
         brWert = '<b style="color:#2f7d55">gilt hier nicht</b>';
         /* v3770 · wie die Mietleiter (potenzial.js leiterZeilen, v3356 B3): unbedenklich bis rund 120 % der Vergleichsmiete */
-        brText = 'Bei einer Neuvermietung ist die Miete frei vereinbar' + (vgQ ? ', unbedenklich bis rund 120 % der Vergleichsmiete, ca. <b>' + _kmQmK(Math.round(vgQ * 1.2 * 100) / 100) + '</b> (' + vgT + ', § 5 WiStG), wenn Ausstattung, Lage und Zustand das tragen.' : '. Orientierung ist der Markt.') + mfhT;
+        var _foK = window.DpMieteRegel ? DpMieteRegel.faktorOhne() : 1.2;   /* v3845 · Einstellung, Vorgabe 120 % */
+        brText = 'Bei einer Neuvermietung ist die Miete frei vereinbar.' + (vgQ ? ' DealPilot rechnet mit ' + Math.round(_foK * 100) + ' % der Vergleichsmiete, ca. <b>' + _kmQmK(Math.round(vgQ * _foK * 100) / 100) + '</b> (' + vgT + '). ' + (_foK < 1.199 ? 'Rechtlich unbedenklich sind bis 120 % (§ 5 WiStG).' : 'Das ist die rechtliche Grenze (§ 5 WiStG).') + ' Das gilt, wenn Ausstattung, Lage und Zustand es tragen.' : ' Orientierung ist der Markt.') + mfhT;
       } else { brWert = 'bitte prüfen'; brText = _kmEsc(br.text || ''); }
       var quelleBr = br.verordnung ? ' · ' + lnk(br.verordnung, br.url) : '';
       var kpWert = (kp.pct ? kp.pct + ' % in 3 Jahren' : '—');

@@ -96,6 +96,18 @@ const brH = KP.mietpreisbremseFuer('05758012', new Date('2026-11-12'));
   gleich('B', 'Bremse „bitte prüfen" rechnet vorsichtig wie mit Bremse', zp.neu_max_qm, 8.58);
   ok('B', 'eingetragene Ausnahme § 556f genannt', /556f/.test(MA.zielMaximum(vH, { gilt: true }, '556f').texte[1]));
 }
+/* v3845 · R · Neuvermietung ohne Bremse: Faktor als Parameter (Einstellung 110/115/120 %, Vorgabe 120 %) */
+{
+  const ohne = { gilt: false };
+  gleich('R', 'ohne Parameter Vorgabe 120 % × 7,80', MA.zielMaximum(vH, ohne).neu_max_qm, 9.36);
+  gleich('R', '1,10 → 8,58', MA.zielMaximum(vH, ohne, '', 1.1).neu_max_qm, 8.58);
+  gleich('R', '115 (Prozent) → 8,97', MA.zielMaximum(vH, ohne, '', '115').neu_max_qm, 8.97);
+  gleich('R', 'unbekannter Wert 1,3 → Vorgabe 120 %', MA.zielMaximum(vH, ohne, '', 1.3).neu_max_qm, 9.36);
+  gleich('R', 'mit Bremse bleibt 110 %, auch mit 1,20', MA.zielMaximum(vH, { gilt: true }, '', 1.2).neu_max_qm, 8.58);
+  gleich('R', 'Neubau § 556f nimmt den Faktor ohne Bremse (1,15)', MA.zielMaximum(vH, { gilt: true }, '556f_neubau', 1.15).neu_max_qm, 8.97);
+  ok('R', 'Text nennt 110 % und die Grenze 120 %', /rechnet mit 110 %/.test(MA.zielMaximum(vH, ohne, '', 1.1).texte[1]) && /bis 120 % \(§ 5 WiStG\)/.test(MA.zielMaximum(vH, ohne, '', 1.1).texte[1]));
+  ok('R', 'Text ohne Gedankenstrich und Semikolon', !/[—–;]/.test(MA.zielMaximum(vH, ohne, '', 1.1).texte[1]));
+}
 /* N */
 const kQ = { werte: null, naeherung_param: N.naeherungParameter(), zensus_zeilen: Z.gemeinden['05758004'], baujahr: 1966, signale: { mikrolage: 'durchschnittlich', mod_punkte: 0, zustand: 'gut' } };
 const vQ = MA.vergleichsmieteWohnung(kQ, 74);

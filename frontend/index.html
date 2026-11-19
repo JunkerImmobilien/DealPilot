@@ -40,7 +40,7 @@
      Seite unsichtbar; layout-varianten.js nimmt die Marke nach setze() ab, spätestens nach 3 s fällt sie von selbst. -->
 <style>html[data-dpl-vorab] body{visibility:hidden}</style>
 <script>(function(){try{if(/[?&]layout=aus(&|$)/.test(location.search))return;var h=document.documentElement;h.setAttribute('data-dpl-vorab','1');setTimeout(function(){h.removeAttribute('data-dpl-vorab');},3000);}catch(e){}})();</script>
-<link rel="stylesheet" href="css/style.css?v=v3780a">
+<link rel="stylesheet" href="css/style.css?v=v3840">
 <link rel="stylesheet" href="css/avsec-streifen.css?v=v2780b"><!-- v1148-spalt-1025px -->
 <link rel="stylesheet" href="css/avsec-karte-neu.css?v=v2780a"><!-- v2760/v2780a · Kartenfassung unter 940 px Kartenbreite -->
 <script src="js/einbettung.js?v=v2998a"></script><!-- v2998 · Anmeldekarte eingebettet in die Landingpage (nur im iframe mit ?einbettung=1) -->
@@ -4012,7 +4012,7 @@ label.dp-required.qc-required::after {
 <script src="js/d1-type-handler.js?v=161"></script>
 <script src="js/icons.js?v=166"></script>
 <script src="js/obj-numbering.js?v=166"></script>
-<script src="js/mietentwicklung.js?v=v3750a"></script>
+<script src="js/mietentwicklung.js?v=v3840"></script>
 <script src="/vendor/cdn/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="js/tax.js?v=v3800e"></script>
 <script src="js/steuer-verlauf.js?v=v3273a"></script>
@@ -4048,7 +4048,7 @@ label.dp-required.qc-required::after {
   <script src="js/telegram-panel.js?v=v2421"></script>
   <script src="js/unterlagen-modal.js?v=v3370"></script>
   <script src="js/standardwerte-karten.js?v=v3223c"></script>
-  <script src="js/settings.js?v=v3642"></script>
+  <script src="js/settings.js?v=v3845"></script>
   <script src="js/einstellungen-schlank.js?v=v3810"></script>
 <script src="js/pricing-modal.js?v=v3610"></script>
   <script src="js/flyer-code.js?v=v1421c"></script>
@@ -4094,12 +4094,12 @@ label.dp-required.qc-required::after {
 <script src="js/aktivitaet.js?v=v3095"></script>
 <script src="js/umsetzungswuensche.js?v=v3600"></script><!-- v3097 · Umsetzungswuensche der Entwicklungspartner (routes/wuensche.js) -->
 <script src="js/bordbuch.js?v=v3600"></script><!-- v3110 · Bordbuch: Mechaniker neben dem Piloten, Screenshot, Markierung, Diktat (Alt+B) --><!-- v3095 · Online-Dauer, ein Puls pro Minute (routes/aktivitaet.js) -->
-<script src="js/vorgaben-sync.js?v=v3292"></script><!-- v3024 · Bewertungs-Vorgaben am Konto (user_settings browser_vorgaben) -->
+<script src="js/vorgaben-sync.js?v=v3845"></script><!-- v3024 · Bewertungs-Vorgaben am Konto (user_settings browser_vorgaben) -->
 <script src="js/konto-stammdaten.js?v=v3217"></script><!-- v3040 · Stammdaten und Ersteinrichtung am Konto (user_settings stammdaten) -->
 <script src="js/dealscore2-ui.js?v=v3660d"></script>
 <script src="js/ds2-ai.js?v=v3003a"></script>
 <script src="js/ki-lage.js?v=v3247"></script>
-<script src="js/ki-miete.js?v=v3770"></script>
+<script src="js/ki-miete.js?v=v3845"></script>
 <script src="js/star-rating.js?v=v1851"></script>
 <script src="js/pdf-import.js?v=v3660c"></script>
 <script src="js/dokument-import.js?v=v3670"></script>
@@ -4135,9 +4135,10 @@ label.dp-required.qc-required::after {
 <script src="js/indexreihen.js?v=v3026"></script><!-- v3026 · VPI/Nettokaltmieten aus dem Server-Cache -->
 <script src="js/indexmiete.js?v=v3026"></script><!-- v3026 · Indexmiete § 557b BGB -->
 <script src="js/mietpotenzial-kern.js?v=v3356"></script><!-- v3075 · Kappung, Bremse, Termine, Soll-Miete: der reine Kern, vor potenzial.js -->
-<script src="js/potenzial.js?v=v3750"></script>
+<script src="js/miete-regel.js?v=v3845"></script><!-- v3845 · Neuvermietung ohne Mietpreisbremse 110/115/120 % (Einstellung, Vorgabe 120 %) -->
+<script src="js/potenzial.js?v=v3840"></script>
 <script src="js/mietvertrag-objekt.js?v=v3028b"></script>
-<script src="js/mieterhoehungen.js?v=v3366"></script><!-- v3362 · Mieterhöhungen als Liste (_erhoehungen, je Wohnung e.erhoehungen) -->
+<script src="js/mieterhoehungen.js?v=v3840"></script><!-- v3362 · Mieterhöhungen als Liste (_erhoehungen, je Wohnung e.erhoehungen) -->
 <script src="js/hell-varianten.js?v=v1653e"></script>
 <script src="js/hybrid-aktionen.js?v=v3253"></script>
 <script src="js/adress-autocomplete.js?v=v1271"></script><!-- v1270: PLZ->Ort, Strassenliste -->
@@ -4194,7 +4195,7 @@ label.dp-required.qc-required::after {
 <script src="js/bestand-analyse.js?v=v3268"></script><!-- v2985 · Pilot-Analyse im Bestand: Anschlussfinanzierung und Exit, rechnerisch -->
 <script src="js/zielbild-fassungen.js?v=v3710"></script><!-- v3361 · Zielbild-Fassungen über die Zeit (_zielbilder, _zielbild_aktiv) -->
 <script src="js/jahresstaende.js?v=v3430"></script><!-- v2989 · Jahresstaende, Rechenstand, Zielerreichung im Bestand -->
-<script src="js/jahresbuch.js?v=v3710"></script><!-- v3363 · Jahr für Jahr: Plan gegen Ist im Bestand (_jahre) -->
+<script src="js/jahresbuch.js?v=v3840"></script><!-- v3363 · Jahr für Jahr: Plan gegen Ist im Bestand (_jahre) -->
 <script src="js/jahresbuch-grafik.js?v=v3433"></script><!-- v3364 · Verlaufsgrafik Plan gegen Ist · v3430 Engine für Jahresabgleich und Haus -->
 <script src="js/jahresabgleich.js?v=v3434"></script><!-- v3420 · Jahresabgleich im Bestand: erster Unterreiter der Pilot-Analyse (Miete, Steuer, Wert, Haus) · v3430 Demo Fassung 2 -->
 <script src="js/wert-zielbild.js?v=v3720"></script><!-- v2840 · Tab Bewertung: Segment „Wert &amp; Zielbild"; Pilot-Analyse: Einfach | Genau -->

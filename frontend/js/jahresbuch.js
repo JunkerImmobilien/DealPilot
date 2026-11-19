@@ -35,7 +35,7 @@
 (function (global) {
   'use strict';
   if (global.DpJahresbuch) return;
-  var VERSION = 'v3710';
+  var VERSION = 'v3840';
   var STATUS = [['geplant', 'geplant'], ['erklaert', 'erklärt'], ['bescheid', 'Bescheid']];
 
   function doc() { return global.document || null; }
@@ -65,6 +65,22 @@
     if (!(a >= 1990 && a <= 2100) || !(b >= a)) return out;
     for (var y = b; y >= a && out.length < 40; y--) out.push(y);
     return out;
+  }
+  /** v3840 · Summe der Wohnungen MIT Aufschlüsselung: je Wohnung die eingetragene Monatsmiete, sonst die heutige
+      Miete der Wohnung (liste[i].ist, leer = 0) × (12 − Leerstandsmonate). Nur wenn mindestens eine Wohnung
+      eingetragen ist, sonst null. Rein, Prüfer tools/miete-reiter-pruefen.mjs. */
+  function summeWohnungen(einheiten, liste) {
+    var e = einheiten || {}, L = Array.isArray(liste) ? liste : [];
+    if (!Object.keys(e).some(function (k) { return istZahl(zahl((e[k] || {}).miete_m)); })) return null;
+    var teile = [], s = 0;
+    L.forEach(function (w, i) {
+      if (!w || w.art === 'gewerbe' && !istZahl(zahl((e[String(i)] || {}).miete_m))) return;
+      var x = e[String(i)] || {}, m = zahl(x.miete_m), eig = istZahl(m), l = zahl(x.leer_monate) || 0;
+      if (!eig) m = w.status === 'leer' ? 0 : (zahl(w.ist) || 0);
+      var j = Math.round(m * Math.max(0, 12 - Math.min(12, l)));
+      s += j; teile.push({ i: i, nr: w.nr || String(i + 1), miete_m: m, leer: l, jahr: j, eingetragen: eig });
+    });
+    return { summe: Math.round(s), teile: teile };
   }
   /** Summe der Wohnungen: Monatsmiete am 31.12. × (12 − Leerstandsmonate). Nur ein Vorschlag. */
   function summeEinheiten(einheiten) {
@@ -276,10 +292,18 @@
   function editHtml(z, mfh) {
     var e = jahreDaten()[String(z.jahr)] || {};
     var f = function (feld, lbl, ph, typ) { return '<label>' + lbl + '<input data-jb-feld="' + feld + '" inputmode="' + (typ || 'decimal') + '" value="' + esc(e[feld] == null ? '' : String(e[feld]).replace('.', ',')) + '" placeholder="' + esc(ph || '') + '"></label>'; };
-    var ph = istZahl(z.miete_einheiten) ? String(z.miete_einheiten) : (istZahl(z.miete_proj) ? String(z.miete_proj) : '');
-    var ein = '';
+    var ein = '', zus = '';
+    /* v3840 · Marcel 19.11.2026: „zeigen, wie sich der Wert zusammensetzt. Kommt die Miete aus den Wohnungen, muss
+       das Feld gesperrt sein mit Absprung". Beim MFH ist die Jahressumme die Summe der Wohnungen (wird beim Eintragen
+       je Wohnung gesetzt), sonst ein eigenes Feld. */
     if (mfh && mfh.length) {
-      ein = '<div style="margin:6px 0 2px;font-weight:600">Je Wohnung (Monatsmiete am 31.12., Leerstand in Monaten)</div><div class="dp-jb-f">'
+      var sw = summeWohnungen(e.einheiten, mfh);
+      zus = '<div class="dp-jb-h"><b>Kaltmiete ' + z.jahr + ': ' + eur(z.miete_ist) + '</b>. '
+        + (sw ? 'Das ist die Summe der Wohnungen: ' + sw.teile.map(function (t) { return 'Wohnung ' + esc(t.nr) + ' ' + eur(t.miete_m) + ' × ' + (12 - Math.min(12, t.leer)) + ' Monate' + (t.eingetragen ? '' : ' (heutige Miete)'); }).join(', ') + '.'
+          : (z.miete_eigen ? 'Eingetragen als Jahressumme.' : 'Gerechnet aus der heutigen Miete der Wohnungen und den Mieterhöhungen.'))
+        + ' Die Summe kommt aus den Wohnungen und lässt sich hier nicht frei ändern. Weicht ein Jahr ab, trag die Miete unten je Wohnung ein. Die heutige Miete änderst du in den Einheiten.'
+        + ' <button type="button" class="dp-jb-knopf" data-jb-aktion="einheiten">In den Einheiten ändern</button></div>';
+      ein = '<div style="margin:6px 0 2px;font-weight:600">Je Wohnung: Monatsmiete in ' + z.jahr + ' und Monate ohne Miete</div><div class="dp-jb-f">'
         + mfh.map(function (w, i) {
           if (!w) return '';
           var x = (e.einheiten || {})[String(i)] || {};
@@ -287,21 +311,25 @@
             + '<input data-jb-einheit="' + i + '" data-jb-k="miete_m" inputmode="decimal" style="flex:2" value="' + esc(x.miete_m == null ? '' : String(x.miete_m).replace('.', ',')) + '" placeholder="' + esc(String(w.ist || '')) + '">'
             + '<input data-jb-einheit="' + i + '" data-jb-k="leer_monate" inputmode="numeric" style="flex:1" value="' + esc(x.leer_monate == null ? '' : x.leer_monate) + '" placeholder="0"></span></label>';
         }).join('') + '</div>'
-        + (istZahl(z.miete_einheiten) ? '<div class="dp-jb-h">Aus den Wohnungen ergibt sich ' + eur(z.miete_einheiten) + ' im Jahr. <button type="button" class="dp-jb-knopf" data-jb-aktion="summe" data-jb-jahr="' + z.jahr + '">als Ist-Miete des Jahres</button></div>' : '');
+        ;
+    } else {
+      zus = '<div class="dp-jb-h"><b>Kaltmiete ' + z.jahr + ': ' + eur(z.miete_ist) + '</b>. '
+        + (z.miete_eigen ? 'Du hast diese Summe eingetragen. Gerechnet wären es ' + eur(z.miete_proj) + '.'
+          : 'DealPilot rechnet sie aus der Miete im Reiter Miete und den Mieterhöhungen von ' + z.jahr + '. Weicht die echte Miete ab, zum Beispiel wegen Leerstand, trag sie hier ein.') + '</div>';
     }
     var st = STATUS.map(function (s) { return '<option value="' + s[0] + '"' + (z.status === s[0] ? ' selected' : '') + '>' + s[1] + '</option>'; }).join('');
     var erh = z.erhoehungen.length ? z.erhoehungen.map(function (x) {
       return (x.einheit != null ? 'Wohnung ' + esc(x.nr) + ': ' : '') + esc(x.datum.split('-').reverse().join('.')) + ' auf ' + eur(zahl(x.auf));
     }).join(' · ') : 'keine eingetragen';
-    return '<tr class="dp-jb-edit" data-jb-edit="' + z.jahr + '"><td colspan="8">'
+    return '<tr class="dp-jb-edit" data-jb-edit="' + z.jahr + '"><td colspan="8">' + zus
       + '<div class="dp-jb-f">'
-      + (z.miete_eigen ? f('nkm_j', 'Eigene Jahressumme ' + z.jahr + ' (leer = aus dem Reiter Miete)', '') : '')
+      + ((mfh && mfh.length) ? '' : (z.jahr < heuteJahr() ? f('nkm_j', 'Kaltmiete ' + z.jahr + ', wirklich eingenommen (€ im Jahr)', istZahl(z.miete_proj) ? String(z.miete_proj) : '') : ''))
       + f('leer_monate', 'Leerstand (Monate)', '0', 'numeric')
       + f('rs_ist', 'Restschuld am 31.12. laut Kontoauszug (€)', istZahl(z.rs_plan) ? 'Plan ' + z.rs_plan : '')
       + '<label>Steuer ' + z.jahr + '<select data-jb-feld="steuer_status">' + st + '</select></label>'
       + f('notiz', 'Notiz', 'z. B. Mieterwechsel im Mai', 'text')
       + '</div>'
-      + '<div class="dp-jb-h">Die Miete ' + z.jahr + ' kommt aus dem Reiter Miete. Mieterhöhungen ' + z.jahr + ': ' + erh + '. Eintragen im Reiter Miete (Karte Mietvertrag) oder je Wohnung unter Einheiten erfassen.</div>'
+      + '<div class="dp-jb-h">Mieterhöhungen ' + z.jahr + ': ' + erh + '. Eine Erhöhung trägst du ' + ((mfh && mfh.length) ? 'bei der Wohnung in den Einheiten' : 'im Reiter Miete in der Karte Mietvertrag') + ' ein.</div>'
       + '<button type="button" class="dp-jb-knopf" data-jb-aktion="zu">Fertig</button>'
       + '</td></tr>';
   }
@@ -320,7 +348,7 @@
         + '<td>' + oP(z.rs_plan, z.rs_proj) + (istZahl(z.rs_ist) ? '<small class="' + (z.rs_abw <= 0 ? 'dp-jb-gut' : 'dp-jb-schlecht') + '">Ist ' + eur(z.rs_ist) + '</small>' : '') + '</td>'
         + '<td>' + (z.steuer ? eurVz(z.steuer.ergebnis) : '–') + '<small><span class="dp-jb-st dp-jb-st-' + z.status + '">' + statusWort(z.status) + '</span></small></td>'
         + '<td>' + (istZahl(z.ziel_nkm) ? eur(z.ziel_nkm) + '/Monat' : '–') + (z.ziel_titel ? '<small>' + esc(z.ziel_titel) + '</small>' : '') + (z.mb ? '<small>Wert ' + eur(z.mb.wert) + '</small>' : '') + '</td>'
-        + '<td><button type="button" class="dp-jb-knopf" data-jb-aktion="auf" data-jb-jahr="' + z.jahr + '" aria-expanded="' + (_offen === z.jahr) + '">' + (_offen === z.jahr ? 'zu' : 'eintragen') + '</button></td></tr>';
+        + '<td><button type="button" class="dp-jb-knopf" data-jb-aktion="auf" data-jb-jahr="' + z.jahr + '" aria-expanded="' + (_offen === z.jahr) + '">' + (_offen === z.jahr ? 'Schließen' : 'Eintragen') + '</button></td></tr>';
       return zeile + (hin ? '<tr><td colspan="8">' + hin + '</td></tr>' : '') + (_offen === z.jahr ? editHtml(z, mfh) : '');
     }).join('');
     return '<div class="dp-jb-wrap"><table class="dp-jb-tafel"><thead>' + kopf + '</thead><tbody>' + body + '</tbody></table></div>';
@@ -397,6 +425,7 @@
         if (z && istZahl(z.miete_ist) && typeof global.dpSteuerSetzen === 'function' && aenderungErlaubt(y)) global.dpSteuerSetzen(y, 'einnahmen_km', z.miete_ist);
         setTimeout(function () { mountAll(); try { if (global.DpJahresabgleich) global.DpJahresabgleich.mountAll(); } catch (x) {} }, 200); return;
       }
+      if (a === 'einheiten') { schliessen(); try { if (global.DpMfhEinheiten && global.DpMfhEinheiten.oeffnen) global.DpMfhEinheiten.oeffnen(1); } catch (x) {} return; }
       if (a === 'summe') { var z2 = zeilen().filter(function (x) { return x.jahr === y; })[0]; if (z2 && istZahl(z2.miete_einheiten)) schreiben(y, 'nkm_j', z2.miete_einheiten); mountAll(); return; }
       if (a === 'erreicht') { var F = global.DpZielbildFassungen; if (F) F.statusSetzen(fassung, 'erreicht'); mountAll(); try { if (global.DpJahresabgleich) global.DpJahresabgleich.mountAll(); } catch (x) {} }
   }
@@ -411,7 +440,11 @@
         var x = Object.assign({}, e[ei] || {}); var v = zahl(t.value);
         if (v == null) delete x[k]; else x[k] = v;
         if (Object.keys(x).length) e[ei] = x; else delete e[ei];
-        schreiben(y, 'einheiten', Object.keys(e).length ? e : '', true); mountAll();
+        schreiben(y, 'einheiten', Object.keys(e).length ? e : '', true);
+        /* v3840 · die Jahressumme des MFH folgt den Wohnungen (gesperrt, kein freies Feld mehr) */
+        var Mx = global._dpMfh, sw2 = summeWohnungen(Object.keys(e).length ? e : null, Mx && Array.isArray(Mx.einheiten) ? Mx.einheiten : []);
+        if (y < heuteJahr() && aenderungErlaubt(y)) schreiben(y, 'nkm_j', sw2 ? sw2.summe : '', true);
+        mountAll();
       }
   }
   function oeffnen(jahr) {
@@ -463,7 +496,7 @@
 
   global.DpJahresbuch = {
     VERSION: VERSION, STATUS: STATUS,
-    jahreVon: jahreVon, summeEinheiten: summeEinheiten, zeile: zeile, setzen: setzen, nachfragen: nachfragen,
+    jahreVon: jahreVon, summeEinheiten: summeEinheiten, summeWohnungen: summeWohnungen,   /* v3840 */ zeile: zeile, setzen: setzen, nachfragen: nachfragen,
     verfuegbar: verfuegbar, zeilen: zeilen, status: status, statusSetzen: statusSetzen, statusWort: statusWort, aenderungErlaubt: aenderungErlaubt,
     istMieteSetzen: istMieteSetzen, istMiete: istMiete,   /* v3710 */
     html: html, mountAll: mountAll, oeffnen: oeffnen, schliessen: schliessen, vorbelegen: vorbelegen, mbLaden: mbLaden, aktion: aktion   /* v3430 */

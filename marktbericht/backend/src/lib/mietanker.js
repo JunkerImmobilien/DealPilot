@@ -52,6 +52,18 @@ export const NAEHERUNG_OBEN = 1.14;             /* Median Oberwert/Mittel, 477 R
 export const NAEHERUNG_UNTEN = 0.86;            /* Median Unterwert/Mittel, 12.11.2026 */
 export const FAKTOR_BREMSE = 1.10;              /* § 556d Abs. 1 BGB */
 export const FAKTOR_WISTG = 1.20;               /* § 5 Abs. 2 WiStG, „nicht unerheblich" ab mehr als 20 % */
+/* v3845 · Marcel 19.11.2026: ohne Mietpreisbremse wählt der Nutzer in den Einstellungen 110 / 115 / 120 %
+   (Vorgabe 120 %, rechtliche Grenze § 5 WiStG). Der Kern liest KEINE Einstellung: der Faktor kommt als
+   Parameter, ohne Parameter oder mit unbekanntem Wert gilt FAKTOR_WISTG. Mit Bremse bleibt 110 % fest. */
+export const FAKTOREN_OHNE_BREMSE = [1.10, 1.15, 1.20];
+export function faktorOhneBremse(x) {
+  const n = num(x);
+  if (n == null) return FAKTOR_WISTG;
+  const f = n > 3 ? n / 100 : n;   /* 110 oder 1.1 */
+  const t = FAKTOREN_OHNE_BREMSE.filter((k) => Math.abs(k - f) < 0.001)[0];
+  return t || FAKTOR_WISTG;
+}
+const pctDe = (f) => String(Math.round(f * 100));
 export const HINWEIS_RECHT = 'Orientierung, keine Rechtsberatung.';
 
 const num = (v) => {
@@ -158,13 +170,14 @@ export function bandWohnung(v) {
  * bremse: Ergebnis mietpreisbremseFuer() ({ gilt: true|false|null }); ausnahme: '' | '556e' | '556f'
  * → { bestand_max_qm, neu_max_qm, konservativ_qm, risiko_ab_qm, faktor, bremse_gilt, bedingung, texte[] }
  */
-export function zielMaximum(v, bremse, ausnahme) {
+export function zielMaximum(v, bremse, ausnahme, faktorOhne) {
   if (!v || !(v.mittel > 0)) return null;
   /* v3356 · Prüfung 13.11.2026 B1: § 556f Satz 1 BGB, Erstbezug nach dem 01.10.2014 - die Bremse gilt dauerhaft nicht */
   const neubau = ausnahme === '556f_neubau';
   const gilt = neubau ? false : (bremse ? bremse.gilt : null);
   const mitBremse = gilt !== false;           /* „bitte prüfen" rechnet vorsichtig wie mit Bremse */
-  const f = mitBremse ? FAKTOR_BREMSE : FAKTOR_WISTG;
+  const fOhne = faktorOhneBremse(faktorOhne);
+  const f = mitBremse ? FAKTOR_BREMSE : fOhne;
   const oben = v.oben > 0 ? v.oben : v.mittel;
   const ca = v.ca ? 'ca. ' : '';
   const bed = (v.einordnung && v.einordnung.belegt_oben) ? null
@@ -179,7 +192,7 @@ export function zielMaximum(v, bremse, ausnahme) {
     mitBremse
       ? 'Neuvermietung: höchstens 110 % der Vergleichsmiete, ' + ca + qmDe(neuMax) + ' €/m² (Mietpreisbremse § 556d BGB' + (gilt == null ? ', ob sie gilt, bitte prüfen' : '') + ')'
         + (ausn ? '. Eingetragene Ausnahme (' + (ausnahme === '556e' ? 'höhere Vormiete § 556e' : 'umfassende Modernisierung § 556f') + ') erlaubt mehr.' : '. Mehr nur mit Vormiete (§ 556e) oder nach umfassender Modernisierung (§ 556f).') + sicher
-      : 'Neuvermietung: ' + (neubau ? 'Mietpreisbremse gilt nicht (Erstbezug nach dem 01.10.2014, § 556f BGB), ' : 'ohne Mietpreisbremse ') + 'frei vereinbar, unbedenklich bis 120 % der Vergleichsmiete, ' + ca + qmDe(neuMax) + ' €/m².' + sicher + ' Darüber Bußgeldrisiko nach § 5 WiStG nur bei Ausnutzung eines geringen Angebots.',
+      : 'Neuvermietung: ' + (neubau ? 'Mietpreisbremse gilt nicht (Erstbezug nach dem 01.10.2014, § 556f BGB), ' : 'ohne Mietpreisbremse ') + 'frei vereinbar. DealPilot rechnet mit ' + pctDe(fOhne) + ' % der Vergleichsmiete, ' + ca + qmDe(neuMax) + ' €/m².' + (fOhne < FAKTOR_WISTG - 0.001 ? ' Rechtlich unbedenklich sind bis 120 % (§ 5 WiStG).' : '') + sicher + ' Darüber Bußgeldrisiko nach § 5 WiStG nur bei Ausnutzung eines geringen Angebots.',
   ];
   return { bestand_max_qm: r2(oben), neu_max_qm: neuMax, neu_sicher_qm: neuSicher, konservativ_qm: kons, risiko_ab_qm: neuMax, faktor: f,
     bremse_gilt: gilt, neubau: neubau, ausnahme: ausn ? ausnahme : (neubau ? '556f_neubau' : null), ca: !!v.ca, bedingung: bed, texte, hinweis: HINWEIS_RECHT };

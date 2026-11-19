@@ -674,7 +674,7 @@ const EINH = [{ nr: '1', wfl: '60', ist: '480', status: 'vermietet' }, { nr: '2'
   P.msHinweis && P.msHinweis();
   const txt = String((P._el['ms-hinweis'] || {}).innerHTML || '').replace(/<[^>]+>/g, '').replace(/&nbsp;| /g, ' ');
   wahr('M7 Anzeige #ms-hinweis: „Mietspiegel der Gemeinde Minden · Werte für Baujahr 1972, 50 m²: 6,55 / 7,70 / 8,93 €/m² · gerechnet mit oberem Wert“',
-    /Mietspiegel der Gemeinde Minden · Werte für Baujahr 1972, 50 m²: 6,55 \/ 7,70 \/ 8,93 €\/m² · gerechnet mit oberem Wert/.test(txt));
+    /Mietspiegel der Gemeinde Minden\. Werte für Baujahr 1972, 50 m²: 6,55 \/ 7,70 \/ 8,93 €\/m²\. Gerechnet mit oberem Wert/.test(txt));
   wahr('M7 kein „Werte eintragen“, wenn das Register sie führt', !/Werte aus dem Mietspiegel eintragen/.test(txt));
   P = await lauf({ plz: '32423', baujahr: '1972', wfl: '50', ms_wahl: 'mittel', ds2_marktmiete: '12' }, '05770024');
   P.modell(); await warte(); await warte();
@@ -779,8 +779,9 @@ const EINH = [{ nr: '1', wfl: '60', ist: '480', status: 'vermietet' }, { nr: '2'
   P.msHinweis();
   const txt = String((P._el['ms-hinweis'] || {}).innerHTML || '').replace(/<[^>]+>/g, '').replace(/&nbsp;| /g, ' ');
   wahr('N6 #ms-hinweis bei Speicherverbot: „… · Mietspiegel öffnen — Die Werte darf DealPilot nicht vorhalten (Speicherung nur mit Genehmigung des Herausgebers). Bitte die Spanne aus dem Mietspiegel eintragen — bis dahin rechnet DealPilot mit der DealPilot-Näherung.“',
-    /^Mietspiegel der Gemeinde: qualifiziert \(§ 558d BGB\) · Stand 04\/2024 · gilt bis 31\.12\.2026 · Mietspiegel öffnen — Die Werte darf DealPilot nicht vorhalten \(Speicherung nur mit Genehmigung des Herausgebers\)\. Bitte die Spanne aus dem Mietspiegel eintragen — bis dahin rechnet DealPilot mit der DealPilot-Näherung\./.test(txt));
-  wahr('N6 darunter: „Gerechnet wird mit … — DealPilot-Näherung …“', /Gerechnet wird mit .*\/m² — DealPilot-Näherung der ortsüblichen Vergleichsmiete/.test(txt));
+    /^Mietspiegel der Gemeinde: qualifiziert \(§ 558d BGB\)\. Stand 04\/2024\. Gilt bis 31\.12\.2026\. Mietspiegel öffnen Die Werte darf DealPilot nicht vorhalten \(Speicherung nur mit Genehmigung des Herausgebers\)\. Bitte die Spanne aus dem Mietspiegel eintragen\. Bis dahin rechnet DealPilot mit der DealPilot-Näherung\./.test(txt));
+  /* v3840 · Kundentext nur Punkt und Komma: „Gerechnet wird mit X/m². Quelle: DealPilot-Näherung …“ */
+  wahr('N6 darunter: „Gerechnet wird mit …. Quelle: DealPilot-Näherung …“', /Gerechnet wird mit .*\/m²\. Quelle: DealPilot-Näherung der ortsüblichen Vergleichsmiete/.test(txt));
   gleich('N6 Felder unten/mittel/oben: Platzhalter und Fokus-Hinweis', [P._el.ms_oben.placeholder, /^Die Werte darf DealPilot nicht vorhalten/.test(P._el.ms_oben.title || '')], ['bitte aus dem Mietspiegel eintragen', true]);
   P = await lauf({ plz: '70173', baujahr: '1975', wfl: '70', ds2_marktmiete: '14', ms_oben: '9,80' }, '08111000');
   P.modell(); await warte(); await warte();
@@ -801,7 +802,7 @@ const EINH = [{ nr: '1', wfl: '60', ist: '480', status: 'vermietet' }, { nr: '2'
   const t2 = String((P._el['ms-hinweis'] || {}).innerHTML || '').replace(/<[^>]+>/g, '');
   gleich('N9 Vorbehalt auf Prod (Minden, nur_frei): Näherung rechnet', m.vgl.quelle_art, 'dealpilot_naeherung');
   wahr('N9 Hinweis Vorbehalt: „Die Werte darf DealPilot derzeit nicht ausliefern (Rechtevorbehalt …) … DealPilot-Näherung.“',
-    /Mietspiegel öffnen — Die Werte darf DealPilot derzeit nicht ausliefern \(Rechtevorbehalt des Herausgebers, die Nutzung wird geklärt\)\. Bitte die Spanne aus dem Mietspiegel eintragen — bis dahin rechnet DealPilot mit der DealPilot-Näherung\./.test(t2));
+    /Mietspiegel öffnen Die Werte darf DealPilot derzeit nicht ausliefern \(Rechtevorbehalt des Herausgebers, die Nutzung wird geklärt\)\. Bitte die Spanne aus dem Mietspiegel eintragen\. Bis dahin rechnet DealPilot mit der DealPilot-Näherung\./.test(t2));
   /* Kern: ohne Näherung (Route bietet sie nicht an) bleibt der Rückfall im Text */
   const z = K.mietspiegelRegister(Object.assign({}, mietspiegelFuer('08111000'), { naeherung_verfuegbar: false }), '2026-11-09');
   wahr('N10 Speicherverbot ohne Näherung: „bis dahin rechnet DealPilot mit der Schätzung aus Angebotsmieten.“', z.nutzung === 'verboten' && /bis dahin rechnet DealPilot mit der Schätzung aus Angebotsmieten\.$/.test(z.werte_hinweis));
