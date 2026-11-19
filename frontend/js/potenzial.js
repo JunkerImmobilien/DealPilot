@@ -788,6 +788,7 @@
       '.dp-mr-eng .dp-mr-u{grid-column:2}',
       '.dp-mr-liste{margin-top:10px;border:1px solid #E6E0D3;border-radius:10px;overflow:hidden;background:#fff}',
       '.dp-mr-teil{margin:10px 0 0;border-top:1px solid #EFEBE3;padding-top:8px}',
+      '.dp-mr-w1{flex-wrap:wrap;row-gap:2px}.dp-mr-w1 .dp-mr-w-v{white-space:normal;text-align:right}',   /* v3840f · „Wohnung 1, EG links“ lief bei 390 px aus der Liste (gemessen right 440) */
       '.dp-mr-teil>summary{cursor:pointer;font:600 13px/1.4 "Space Grotesk",Inter,sans-serif;color:#2A2727;min-height:32px;display:flex;align-items:center;gap:8px}',
       '.dp-mr-teil>summary::after{content:"einklappen";margin-left:auto;font:400 11px Inter,sans-serif;color:#7A7370}',
       '.dp-mr-teil:not([open])>summary::after{content:"aufklappen"}',

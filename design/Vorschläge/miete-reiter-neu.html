@@ -1,0 +1,322 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reiter Miete neu</title>
+<!-- Vorlage v3840 · Marcel 19.11.2026, Rückmeldung zum Reiter Miete. NICHT in der App, erst nach Abnahme.
+     Statische Demo mit Beispielzahlen (Westerfeldstr.-Kopie und ETW-Kopie, Staging 19.11.2026). Zwei Varianten:
+     A „Akte" (Karten in neuer Reihenfolge, einklappbar) und B „Cockpit" (Hausansicht vorn, Wohnung rechts).
+     Kundentext nur mit Punkt und Komma. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --obsidian:#050505;--gold:#C9A84C;--gold-hi:#E8CC7A;--gold-lo:#b8932f;--gruen:#3FA56C;--rot:#B8625C;--rot2:#D8564C;
+  --creme:#FDFCFA;--karte:#FBF6E9;--tinte:#2A2727;--grau:#6B6356;--linie:#E6E0D3;--flaeche:#fff;--bg:#F4F1EA;
+  --runway:linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#b8932f);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--creme:#141312;--karte:#1C1A17;--tinte:#EDE8DD;--grau:#A39B8C;--linie:#34302A;--flaeche:#1A1917;--bg:#0B0B0A}}
+:root[data-theme="dark"]{--creme:#141312;--karte:#1C1A17;--tinte:#EDE8DD;--grau:#A39B8C;--linie:#34302A;--flaeche:#1A1917;--bg:#0B0B0A}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tinte);font:400 14px/1.5 Inter,system-ui,sans-serif}
+.kopf{background:var(--obsidian);color:#fff;padding:14px 16px;display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center}
+.kopf h1{margin:0;font:700 18px "Space Grotesk",sans-serif;letter-spacing:.01em}
+.kopf h1 span{background:var(--runway);-webkit-background-clip:text;background-clip:text;color:transparent}
+.schalter{display:inline-flex;border:1px solid #3a3630;border-radius:999px;overflow:hidden}
+.schalter button{background:transparent;color:#cfc8ba;border:0;padding:7px 14px;font:500 12.5px Inter,sans-serif;cursor:pointer;min-height:36px}
+.schalter button.an{background:var(--runway);color:#1a1712;font-weight:600}
+.kopf .hint{color:#a39b8c;font-size:12px;flex-basis:100%}
+main{max-width:1180px;margin:0 auto;padding:16px}
+.lbl{font:500 10.5px "JetBrains Mono",monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--grau)}
+.karte{background:var(--flaeche);border:1px solid var(--linie);border-radius:14px;padding:14px 16px;margin:0 0 14px}
+.karte>h2,.karte>details>summary{font:600 15px "Space Grotesk",sans-serif;margin:0;display:flex;align-items:center;gap:10px}
+.karte h2 .nr,.karte summary .nr{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:50%;background:var(--karte);border:1px solid var(--gold);font:600 12px "JetBrains Mono",monospace;color:var(--gold-lo)}
+.satz{color:var(--grau);font-size:12.5px;margin:4px 0 10px}
+details>summary{cursor:pointer;list-style:none;min-height:36px}
+details>summary::-webkit-details-marker{display:none}
+details>summary::after{content:"aufklappen";margin-left:auto;font:400 11.5px Inter,sans-serif;color:var(--grau)}
+details[open]>summary::after{content:"einklappen"}
+.reihe{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.zahl{background:var(--karte);border-radius:10px;padding:10px 12px}
+.zahl b{display:block;font:600 18px "Space Grotesk",sans-serif}
+.zahl small{color:var(--grau)}
+.regel{display:grid;grid-template-columns:140px 1fr;gap:4px 14px;padding:9px 0;border-top:1px solid var(--linie)}
+.regel:first-of-type{border-top:0}
+.regel b{font-weight:600}
+.regel p{margin:2px 0 0;color:var(--grau);font-size:12.5px;grid-column:2}
+@media(max-width:640px){.regel{grid-template-columns:1fr}.regel p{grid-column:1}}
+.knopf{display:inline-flex;align-items:center;gap:6px;min-height:36px;padding:0 14px;border-radius:999px;border:1px solid var(--gold);background:transparent;color:var(--gold-lo);font:500 13px Inter,sans-serif;cursor:pointer}
+.knopf.voll{background:var(--runway);color:#1a1712;border:0;font-weight:600}
+/* Hausansicht */
+.haus{display:grid;gap:6px;max-width:560px}
+.dach{height:34px;background:var(--runway);clip-path:polygon(6% 100%,50% 0,94% 100%);opacity:.9}
+.etage{display:grid;grid-template-columns:62px repeat(var(--n,2),1fr);gap:6px;align-items:stretch}
+.etage>.e{font:500 10.5px "JetBrains Mono",monospace;color:var(--grau);display:flex;align-items:center}
+.whg{border-radius:10px;padding:9px 10px;border:1.5px solid var(--linie);background:var(--flaeche);cursor:pointer;text-align:left;font:inherit;color:inherit;min-height:84px;position:relative}
+.whg:hover,.whg.sel{outline:2px solid var(--gold);outline-offset:1px}
+.whg .n{font:600 12.5px "Space Grotesk",sans-serif}
+.whg .m{font:600 15px "Space Grotesk",sans-serif;margin-top:2px}
+.whg .q{color:var(--grau);font-size:11.5px}
+.whg .st{position:absolute;top:8px;right:8px;font:600 10px "JetBrains Mono",monospace;letter-spacing:.04em;padding:2px 6px;border-radius:999px}
+.s-pot{border-color:color-mix(in srgb,var(--gruen) 55%,var(--linie))}.s-pot .st{background:color-mix(in srgb,var(--gruen) 15%,transparent);color:var(--gruen)}
+.s-aus{border-color:color-mix(in srgb,var(--gold) 60%,var(--linie))}.s-aus .st{background:color-mix(in srgb,var(--gold) 18%,transparent);color:var(--gold-lo)}
+.s-ueb{border-color:color-mix(in srgb,var(--rot) 60%,var(--linie))}.s-ueb .st{background:color-mix(in srgb,var(--rot) 15%,transparent);color:var(--rot)}
+.boden{height:8px;border-radius:4px;background:var(--linie)}
+@media(max-width:640px){.whg .st{position:static;display:inline-block;margin-bottom:4px}.etage{grid-template-columns:38px repeat(var(--n,2),1fr)}}
+.legende{display:flex;flex-wrap:wrap;gap:8px 14px;font-size:12px;color:var(--grau);margin-top:10px}
+.legende i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+/* Leiter je Wohnung */
+.leiter{margin:6px 0 2px}
+.leiter .bahn{position:relative;height:12px;border-radius:6px;background:var(--karte);border:1px solid var(--linie)}
+.leiter .ist,.leiter .soll,.leiter .neu{position:absolute;top:-3px;width:3px;height:16px;border-radius:2px}
+.leiter .ist{background:var(--tinte)}.leiter .soll{background:var(--gruen)}.leiter .neu{background:var(--gold)}
+.leiter .zone{position:absolute;top:0;bottom:0;border-radius:6px;background:color-mix(in srgb,var(--gruen) 22%,transparent)}
+.leiter .marken{display:flex;justify-content:space-between;font-size:11px;color:var(--grau);margin-top:4px}
+/* Cockpit */
+.cockpit{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:14px}
+@media(max-width:860px){.cockpit{grid-template-columns:1fr}}
+.panel h3{margin:0 0 2px;font:600 16px "Space Grotesk",sans-serif}
+.schritt{display:grid;grid-template-columns:28px 1fr;gap:8px;padding:8px 0;border-top:1px solid var(--linie)}
+.schritt:first-child{border-top:0}
+.schritt .k{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:var(--karte);border:1px solid var(--gold);font:600 12px "JetBrains Mono",monospace;color:var(--gold-lo)}
+.feld{display:flex;flex-direction:column;gap:3px;font-size:12px;color:var(--grau)}
+.feld input,.feld select{font:inherit;color:var(--tinte);background:var(--flaeche);border:1px solid var(--linie);border-radius:8px;padding:8px 10px;min-height:38px}
+.ok{border-left:3px solid var(--gruen);background:color-mix(in srgb,var(--gruen) 8%,transparent);padding:9px 11px;border-radius:0 8px 8px 0;font-size:12.5px}
+.zeit{display:flex;align-items:center;gap:0;margin:10px 0 4px;font-size:11px;color:var(--grau)}
+.zeit div{flex:1;border-top:3px solid var(--linie);padding-top:5px;position:relative}
+.zeit div.an{border-color:var(--gold)}
+.zeit div.gr{border-color:var(--gruen)}
+table.jahre{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;font-size:13px}
+table.jahre th{font:500 10.5px "JetBrains Mono",monospace;text-transform:uppercase;color:var(--grau);text-align:right;padding:6px}
+table.jahre td{padding:7px 6px;border-top:1px solid var(--linie);text-align:right}
+table.jahre th:first-child,table.jahre td:first-child{text-align:left}
+td .g{color:var(--grau)}
+.mini{font-size:11px;padding:0 9px;min-height:28px}
+.vorschlaege{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px}
+.vorschlaege .zahl b{font-size:14px}
+.balken{display:flex;height:22px;border-radius:6px;overflow:hidden;margin:6px 0}
+.balken span{display:block}
+.versteckt{display:none!important}
+.hinw{font-size:11.5px;color:var(--grau);margin-top:6px}
+</style>
+</head>
+<body>
+<div class="kopf">
+  <h1>Reiter <span>Miete</span> neu</h1>
+  <div class="schalter" role="tablist" aria-label="Variante">
+    <button class="an" data-var="a">Variante A · Akte</button><button data-var="b">Variante B · Cockpit</button>
+  </div>
+  <div class="schalter" role="tablist" aria-label="Objekt">
+    <button class="an" data-obj="mfh">MFH, 6 Wohnungen</button><button data-obj="etw">ETW</button>
+  </div>
+  <div class="hint">Vorlage zur Abnahme, nicht in der App. Beispielzahlen aus der Westerfeldstr.-Kopie und einer ETW-Kopie auf Staging. Investorenregel: Bestand bis zum Oberwert des Mietspiegels in Schritten der Kappungsgrenze, Neuvermietung Oberwert × 1,10 mit Mietpreisbremse, × 1,20 ohne.</div>
+</div>
+
+<main>
+  <!-- ═════ VARIANTE A · AKTE ═════ -->
+  <section id="var-a">
+    <div class="karte">
+      <h2><span class="nr">1</span>Miete heute</h2>
+      <p class="satz" data-t="heute-satz"></p>
+      <div class="reihe" data-t="heute-zahlen"></div>
+    </div>
+
+    <div class="karte" data-nur="mfh">
+      <h2><span class="nr">2</span>Das Haus</h2>
+      <p class="satz">Jede Kachel ist eine Wohnung. Die Farbe zeigt, wie viel Spielraum die Miete noch hat. Klick auf eine Wohnung, um sie zu öffnen.</p>
+      <div class="haus" data-t="haus"></div>
+      <div class="legende"><span><i style="background:var(--gruen)"></i>Potenzial, die Miete darf steigen</span><span><i style="background:var(--gold)"></i>ausgereizt, am Oberwert</span><span><i style="background:var(--rot)"></i>über dem Mietspiegel</span></div>
+    </div>
+    <div class="karte" data-nur="etw">
+      <h2><span class="nr">2</span>Die Wohnung</h2>
+      <p class="satz">Wo die Miete heute steht und wie weit sie steigen darf.</p>
+      <div data-t="etw-leiter"></div>
+    </div>
+
+    <div class="karte"><details open>
+      <summary><span class="nr">3</span>Was hier gilt</summary>
+      <p class="satz">Diese Regeln gelten an der Adresse. DealPilot liest sie aus den Landesverordnungen und dem Mietspiegel. Orientierung, keine Rechtsberatung.</p>
+      <div data-t="regeln"></div>
+    </details></div>
+
+    <div class="karte" data-nur="mfh"><details open>
+      <summary><span class="nr">4</span>Was bei den einzelnen Wohnungen möglich ist</summary>
+      <p class="satz">Je Wohnung die heutige Miete, die nächste mögliche Mieterhöhung und die Zielmiete bei einer Neuvermietung.</p>
+      <div data-t="liste"></div>
+      <button class="knopf" style="margin-top:8px">In den Einheiten ändern</button>
+    </details></div>
+
+    <div class="karte"><details>
+      <summary><span class="nr" data-t="nr-erh">5</span>Mieterhöhung eintragen</summary>
+      <p class="satz" data-t="erh-satz"></p>
+      <div data-t="erh-ablauf"></div>
+    </details></div>
+
+    <div class="karte"><details open>
+      <summary><span class="nr">6</span>Mietentwicklung</summary>
+      <p class="satz">Bis 2025 steht die Miete, die gezahlt wurde. Ab 2026 schreibt DealPilot die heutige Miete fort. Grau ist gerechnet, schwarz ist eingetragen.</p>
+      <div data-t="jahre"></div>
+    </details></div>
+
+    <div class="karte"><details>
+      <summary><span class="nr">7</span>Zielbild</summary>
+      <p class="satz" data-t="ziel-satz"></p>
+      <div class="reihe" data-t="ziel-zahlen"></div>
+    </details></div>
+
+    <div class="karte"><details>
+      <summary><span class="nr">8</span>Mietspiegel, eigene Werte</summary>
+      <p class="satz">DealPilot kennt den Mietspiegel dieser Gemeinde und setzt die Werte selbst ein. Du musst hier nichts eintragen. Ein eigener Wert geht vor, zum Beispiel aus einem Gutachten.</p>
+      <div class="reihe"><label class="feld">Unterer Wert<input placeholder="aus dem Mietspiegel"></label><label class="feld">Mittelwert<input placeholder="aus dem Mietspiegel"></label><label class="feld">Oberer Wert<input placeholder="aus dem Mietspiegel"></label></div>
+    </details></div>
+  </section>
+
+  <!-- ═════ VARIANTE B · COCKPIT ═════ -->
+  <section id="var-b" class="versteckt">
+    <div class="karte">
+      <div class="lbl">Miete heute</div>
+      <div class="reihe" data-t="heute-zahlen" style="margin-top:6px"></div>
+      <div class="hinw" data-t="spielraum-satz"></div>
+      <div class="balken" data-t="spielraum"></div>
+      <div class="legende"><span><i style="background:var(--tinte)"></i>Ist</span><span><i style="background:var(--gruen)"></i>Mieterhöhung im Bestand</span><span><i style="background:var(--gold)"></i>mehr bei Neuvermietung</span></div>
+    </div>
+    <div class="cockpit">
+      <div class="karte">
+        <div class="lbl" data-t="cp-titel">Das Haus</div>
+        <div class="haus" data-t="haus" style="margin-top:8px"></div>
+        <div data-t="etw-leiter"></div>
+        <div class="legende" data-nur="mfh"><span><i style="background:var(--gruen)"></i>Potenzial</span><span><i style="background:var(--gold)"></i>ausgereizt</span><span><i style="background:var(--rot)"></i>über dem Mietspiegel</span></div>
+        <details style="margin-top:12px"><summary class="lbl">Was hier gilt</summary><div data-t="regeln"></div></details>
+      </div>
+      <div class="karte panel" data-t="panel"></div>
+    </div>
+    <div class="karte"><details><summary>Mietentwicklung</summary><div data-t="jahre"></div></details></div>
+    <div class="karte"><details><summary>Zielbild</summary><p class="satz" data-t="ziel-satz"></p><div class="reihe" data-t="ziel-zahlen"></div></details></div>
+  </section>
+
+  <div class="karte">
+    <h2>Weitere Bilder, die helfen könnten</h2>
+    <p class="satz">Vorschläge, nicht gebaut. Jedes nutzt nur Zahlen, die DealPilot schon rechnet.</p>
+    <div class="vorschlaege">
+      <div class="zahl"><b>Mietleiter je Wohnung</b><small>Ist, Mieterhöhung, Neuvermietung als Balken auf einer Achse. Man sieht sofort, wo noch Luft ist.</small></div>
+      <div class="zahl"><b>Spielraum des Hauses</b><small>Ein Balken für das ganze Haus: heute, nach den möglichen Erhöhungen, nach Neuvermietung. In Euro im Jahr.</small></div>
+      <div class="zahl"><b>Kalender der Erhöhungen</b><small>Je Wohnung, ab wann eine Erhöhung verlangt werden darf und wann sie wirkt. Sperrfrist und Kappung sichtbar.</small></div>
+      <div class="zahl"><b>Kappungsfenster</b><small>Drei Jahre als Leiste. Wie viel der 15 oder 20 Prozent schon verbraucht ist.</small></div>
+      <div class="zahl"><b>Plan gegen Ist</b><small>Je Jahr die geplante und die gezahlte Miete nebeneinander, Abweichung farbig.</small></div>
+    </div>
+  </div>
+</main>
+
+<script>
+(function () {
+  'use strict';
+  var eur = function (x) { return Math.round(x).toLocaleString('de-DE') + ' €'; };
+  var qm = function (x) { return x.toFixed(2).replace('.', ',') + ' €/m²'; };
+  var D = {
+    mfh: { titel: 'Westerfeldstr. 146, Bielefeld', bremse: true, kapp: 15, unten: 6.18, mittel: 7.27, oben: 8.43, stand: 'Bielefelder Mietspiegel 2026, qualifiziert',
+      etagen: [['DG', [['5', 'DG links', 55, 415], ['6', 'DG rechts', 55, 420]]], ['1. OG', [['3', '1. OG links', 70, 585], ['4', '1. OG rechts', 70, 585]]], ['EG', [['1', 'EG links', 70, 590], ['2', 'EG rechts', 70, 600]]]],
+      jahre: [[2025, 37980, true], [2026, 38340, false], [2027, 39420, false], [2028, 40650, false]], ziel: { ist: 3195, soll: 3298, ziel: 3615, kosten: 62000 } },
+    etw: { titel: 'Hölderlinstr. 1, Bad Oeynhausen', bremse: false, kapp: 20, unten: 6.05, mittel: 6.89, oben: 7.93, stand: 'Mietspiegel 2026 Bad Oeynhausen, einfach',
+      etagen: [['', [['1', 'Wohnung', 85, 660]]]], jahre: [[2025, 7920, false], [2026, 7920, false], [2027, 8160, false], [2028, 8400, false]], ziel: { ist: 660, soll: 674, ziel: 809, kosten: 18000 } }
+  };
+  var zustand = { v: 'a', o: 'mfh', sel: 0 };
+  function wohnungen(o) { var l = []; o.etagen.forEach(function (e) { e[1].forEach(function (w) { l.push({ nr: w[0], lage: w[1], wfl: w[2], ist: w[3], etage: e[0] }); }); }); return l; }
+  function bewerten(o, w) {
+    var istQ = w.ist / w.wfl, neuF = o.bremse ? 1.10 : 1.20, neuQ = o.oben * neuF;
+    var kappe = w.ist * (1 + o.kapp / 100), sollM = Math.max(w.ist, Math.min(o.oben * w.wfl, kappe));
+    var st = istQ > o.oben + 0.005 ? 'ueb' : (sollM - w.ist < 10 ? 'aus' : 'pot');
+    return { istQ: istQ, sollM: sollM, sollQ: sollM / w.wfl, neuQ: neuQ, neuM: neuQ * w.wfl, st: st, plus: sollM - w.ist };
+  }
+  var WORT = { pot: 'POTENZIAL', aus: 'AUSGEREIZT', ueb: 'ÜBER MIETSPIEGEL' };
+  function hausHtml(o) {
+    if (o.etagen.length === 1 && o.etagen[0][1].length === 1) return '';
+    var i = 0;
+    return '<div class="dach"></div>' + o.etagen.map(function (e) {
+      return '<div class="etage" style="--n:' + e[1].length + '"><div class="e">' + e[0] + '</div>' + e[1].map(function (x) {
+        var w = { nr: x[0], lage: x[1], wfl: x[2], ist: x[3] }, b = bewerten(o, w), idx = wohnungen(o).findIndex(function (y) { return y.nr === w.nr; });
+        return '<button class="whg s-' + b.st + (idx === zustand.sel ? ' sel' : '') + '" data-sel="' + idx + '"><span class="st">' + WORT[b.st] + '</span><div class="n">Wohnung ' + w.nr + '</div><div class="m">' + eur(w.ist) + '</div><div class="q">' + qm(b.istQ) + ', ' + w.wfl + ' m²</div>'
+          + '<div class="q">' + (b.st === 'pot' ? 'bis ' + eur(b.sollM) + ' möglich' : (b.st === 'ueb' ? 'über dem Oberwert' : (b.plus >= 1 ? 'kaum Spielraum, +' + eur(b.plus) : 'kein Spielraum'))) + '</div></button>';
+      }).join('') + '</div>';
+    }).join('') + '<div class="boden"></div>';
+  }
+  function leiterHtml(o, w) {
+    var b = bewerten(o, w), min = Math.min(b.istQ, o.unten) - 0.3, max = b.neuQ + 0.4, p = function (x) { return ((x - min) / (max - min) * 100).toFixed(1) + '%'; };
+    return '<div class="leiter"><div class="bahn"><div class="zone" style="left:' + p(o.unten) + ';width:calc(' + p(o.oben) + ' - ' + p(o.unten) + ')"></div>'
+      + '<div class="ist" style="left:' + p(b.istQ) + '" title="Ist"></div><div class="soll" style="left:' + p(b.sollQ) + '" title="Mieterhöhung"></div><div class="neu" style="left:' + p(b.neuQ) + '" title="Neuvermietung"></div></div>'
+      + '<div class="marken"><span>Ist ' + qm(b.istQ) + '</span><span>Mieterhöhung ' + qm(b.sollQ) + '</span><span>Neuvermietung ' + qm(b.neuQ) + '</span></div></div>';
+  }
+  function regelnHtml(o) {
+    return '<div class="regel"><span class="lbl">Kappungsgrenze</span><b>' + o.kapp + ' % in 3 Jahren</b><p>' + (o.kapp === 15 ? 'Die Gemeinde steht in der Mieterschutzverordnung.' : 'Gesetzlich nach § 558 Abs. 3 BGB.') + '</p></div>'
+      + '<div class="regel"><span class="lbl">Vergleichsmiete</span><b>' + qm(o.oben) + ', oberer Wert</b><p>' + o.stand + '. Spanne ' + qm(o.unten) + ' bis ' + qm(o.oben) + '. Der obere Wert trägt nur, wenn Ausstattung und Lage ihn rechtfertigen.</p></div>'
+      + '<div class="regel"><span class="lbl">Neuvermietung</span><b>' + (o.bremse ? 'Mietpreisbremse gilt' : 'keine Mietpreisbremse') + '</b><p>' + (o.bremse ? 'Höchstens 110 % der Vergleichsmiete, also ' + qm(o.oben * 1.1) + '. Mehr nur mit Ausnahme nach § 556e oder § 556f BGB.' : 'DealPilot rechnet mit 120 % der Vergleichsmiete, also ' + qm(o.oben * 1.2) + '. Das ist die rechtliche Grenze (§ 5 WiStG). In den Einstellungen wählbar.') + '</p></div>';
+  }
+  function listeHtml(o) {
+    return wohnungen(o).map(function (w, i) {
+      var b = bewerten(o, w);
+      return '<div class="regel"><span class="lbl">Wohnung ' + w.nr + ', ' + w.lage + '</span><b>' + (b.plus >= 1 ? 'auf ' + eur(b.sollM) + ' im Monat' : 'kein Spielraum') + '</b><p>Heute ' + qm(b.istQ) + '. ' + (b.plus >= 1 ? 'Verlangbar ab sofort, wirksam ab 02/2027.' : (b.st === 'ueb' ? 'Die Miete liegt über dem Oberwert.' : 'Die Miete liegt am Oberwert.')) + ' Bei Neuvermietung bis ' + qm(b.neuQ) + '.</p></div>';
+    }).join('');
+  }
+  function erhHtml(o, w) {
+    var mfh = o.etagen.length > 1;
+    return '<div class="schritt"><span class="k">1</span><div><b>' + (mfh ? 'Wohnung wählen' : 'Die Wohnung') + '</b><div class="hinw">' + (mfh ? 'Gewählt: Wohnung ' + w.nr + ', ' + w.lage + '. Beim Mehrfamilienhaus zählt eine Erhöhung immer für eine Wohnung.' : 'Die Erhöhung zählt für die Wohnung an dieser Adresse.') + '</div></div></div>'
+      + '<div class="schritt"><span class="k">2</span><div><b>Erhöhung eintragen</b><div class="reihe" style="margin-top:6px"><label class="feld">Wirksam ab<input type="text" value="01.03.2026"></label><label class="feld">Art<select><option>Erhöhung auf die Vergleichsmiete (§ 558 BGB)</option><option>Modernisierungsumlage (§ 559 BGB)</option><option>Staffelmiete</option><option>Indexmiete</option></select></label><label class="feld">Miete neu (€ im Monat)<input value="' + Math.round(w.ist * 1.05) + '"></label></div><button class="knopf voll" style="margin-top:8px">Eintragen</button></div></div>'
+      + '<div class="schritt"><span class="k">3</span><div><b>Was damit passiert</b><div class="ok" style="margin-top:6px">Eingetragen. Die Miete von ' + eur(w.ist * 1.05) + ' gilt ab 01.03.2026. Sie zählt in der Mietentwicklung und für die Sperrfrist. Die nächste Erhöhung ist ab 01.03.2027 verlangbar. <button class="knopf mini">Heutige Miete auf ' + eur(w.ist * 1.05) + ' setzen</button></div>'
+      + '<div class="zeit"><div class="gr">03/2026 wirksam</div><div class="an">Sperrfrist 12 Monate</div><div>03/2027 verlangbar</div><div>06/2027 frühestens wirksam</div></div></div></div>';
+  }
+  function jahreHtml(o) {
+    var mfh = o.etagen.length > 1;
+    return '<table class="jahre"><thead><tr><th>Jahr</th><th>Stand</th><th>Kaltmiete im Jahr</th><th></th></tr></thead><tbody>' + o.jahre.map(function (j) {
+      var vergangen = j[0] < 2026;
+      return '<tr><td>' + j[0] + '</td><td>' + (vergangen ? (j[2] ? 'Ist, eingetragen' : 'Ist, gerechnet') : (j[0] === 2026 ? 'heute' : 'Plan')) + '</td><td>' + (j[2] || !vergangen ? '<b>' + eur(j[1]) + '</b>' : '<span class="g">' + eur(j[1]) + '</span>') + '</td><td>' + (vergangen ? '<button class="knopf mini">' + (j[2] ? 'ändern' : 'eintragen') + '</button>' : '') + '</td></tr>'
+        + (vergangen && j[2] && mfh ? '<tr><td></td><td colspan="3" class="g" style="text-align:left;font-size:12px">Summe der Wohnungen: Wohnung 1 560 € × 12 Monate, die übrigen mit heutiger Miete. Gesperrt, ändern je Wohnung.</td></tr>' : '');
+    }).join('') + '</tbody></table>';
+  }
+  function zielHtml(o) {
+    var z = o.ziel;
+    return { satz: o.etagen.length > 1 ? 'Das Zielbild füllt sich aus den Wohnungen. Soll-Miete, Zielmiete und Maßnahmen legst du je Wohnung fest. Diese Karte zeigt die Summe.' : 'Soll-Miete, Zielmiete und Maßnahmen für diese Wohnung. Freiwillig.',
+      zahlen: '<div class="zahl"><small>Ist</small><b>' + eur(z.ist) + '</b><small>im Monat</small></div><div class="zahl"><small>nach Mieterhöhung</small><b style="color:var(--gruen)">' + eur(z.soll) + '</b><small>im Monat</small></div><div class="zahl"><small>Zielbild</small><b style="color:var(--gold-lo)">' + eur(z.ziel) + '</b><small>im Monat</small></div><div class="zahl"><small>Maßnahmen</small><b>' + eur(z.kosten) + '</b><small>' + (o.etagen.length > 1 ? 'aus 4 Wohnungen' : 'am Objekt') + '</small></div>'
+        + (o.etagen.length > 1 ? '<div><button class="knopf">In den Einheiten ändern</button></div>' : '') };
+  }
+  function panelHtml(o, w) {
+    var b = bewerten(o, w);
+    return '<div class="lbl">' + (o.etagen.length > 1 ? 'Gewählte Wohnung' : 'Die Wohnung') + '</div><h3>Wohnung ' + w.nr + (o.etagen.length > 1 ? ', ' + w.lage : '') + '</h3><p class="satz">' + w.wfl + ' m², heute ' + eur(w.ist) + ' im Monat, ' + qm(b.istQ) + '.</p>'
+      + leiterHtml(o, w)
+      + '<div class="reihe" style="margin:10px 0"><div class="zahl"><small>Mieterhöhung</small><b>' + (b.plus >= 1 ? eur(b.sollM) : 'kein Spielraum') + '</b><small>' + (b.plus >= 1 ? '+' + eur(b.plus) + ' im Monat' : 'am Oberwert') + '</small></div><div class="zahl"><small>Neuvermietung</small><b>' + eur(b.neuM) + '</b><small>' + (o.bremse ? '110 %, Bremse' : '120 %, ohne Bremse') + '</small></div></div>'
+      + '<details open><summary class="lbl">Mieterhöhung eintragen</summary>' + erhHtml(o, w) + '</details>';
+  }
+  function zeichnen() {
+    var o = D[zustand.o], W = wohnungen(o); if (zustand.sel >= W.length) zustand.sel = 0;
+    var w = W[zustand.sel], sum = W.reduce(function (a, x) { return a + x.ist; }, 0);
+    var sumSoll = W.reduce(function (a, x) { return a + bewerten(o, x).sollM; }, 0), sumNeu = W.reduce(function (a, x) { return a + bewerten(o, x).neuM; }, 0);
+    document.getElementById('var-a').classList.toggle('versteckt', zustand.v !== 'a');
+    document.getElementById('var-b').classList.toggle('versteckt', zustand.v !== 'b');
+    document.querySelectorAll('[data-nur]').forEach(function (e) { e.classList.toggle('versteckt', e.getAttribute('data-nur') !== zustand.o); });
+    var set = function (k, h) { document.querySelectorAll('[data-t="' + k + '"]').forEach(function (e) { e.innerHTML = h; }); };
+    set('heute-satz', o.titel + '. ' + (W.length > 1 ? 'Die Miete kommt aus den ' + W.length + ' Wohnungen.' : 'Eine Wohnung, ein Mietvertrag.'));
+    set('heute-zahlen', '<div class="zahl"><small>Kaltmiete</small><b>' + eur(sum) + '</b><small>im Monat</small></div><div class="zahl"><small>Kaltmiete</small><b>' + eur(sum * 12) + '</b><small>im Jahr</small></div><div class="zahl"><small>im Schnitt</small><b>' + qm(sum / W.reduce(function (a, x) { return a + x.wfl; }, 0)) + '</b><small>Oberwert ' + qm(o.oben) + '</small></div>');
+    set('haus', hausHtml(o));
+    set('etw-leiter', W.length === 1 ? leiterHtml(o, w) + '<div class="hinw">Grün ist die Spanne des Mietspiegels. Schwarz die Miete heute, grün die mögliche Mieterhöhung, gold die Grenze bei Neuvermietung.</div>' : '');
+    set('regeln', regelnHtml(o));
+    set('liste', listeHtml(o));
+    set('erh-satz', W.length > 1 ? 'Beim Mehrfamilienhaus trägst du eine Erhöhung bei der Wohnung ein. Wähle oben im Haus eine Wohnung.' : 'Trag jede Erhöhung mit Datum ein. Daraus rechnet DealPilot die Miete vergangener Jahre und die Sperrfrist.');
+    set('erh-ablauf', erhHtml(o, w));
+    set('jahre', jahreHtml(o));
+    var z = zielHtml(o); set('ziel-satz', z.satz); set('ziel-zahlen', z.zahlen);
+    set('panel', panelHtml(o, w));
+    set('cp-titel', W.length > 1 ? 'Das Haus' : 'Die Wohnung');
+    set('spielraum-satz', 'Spielraum ' + (W.length > 1 ? 'des Hauses' : 'der Wohnung') + ' im Monat: heute ' + eur(sum) + ', mit Mieterhöhungen ' + eur(sumSoll) + ', bei Neuvermietung bis ' + eur(sumNeu) + '.');
+    set('spielraum', '<span style="width:' + (sum / sumNeu * 100).toFixed(1) + '%;background:var(--tinte)"></span><span style="width:' + ((sumSoll - sum) / sumNeu * 100).toFixed(1) + '%;background:var(--gruen)"></span><span style="width:' + ((sumNeu - sumSoll) / sumNeu * 100).toFixed(1) + '%;background:var(--gold)"></span>');
+  }
+  document.addEventListener('click', function (ev) {
+    var t = ev.target.closest('[data-var],[data-obj],[data-sel]'); if (!t) return;
+    if (t.hasAttribute('data-var')) { zustand.v = t.getAttribute('data-var'); document.querySelectorAll('[data-var]').forEach(function (b) { b.classList.toggle('an', b === t); }); }
+    if (t.hasAttribute('data-obj')) { zustand.o = t.getAttribute('data-obj'); zustand.sel = 0; document.querySelectorAll('[data-obj]').forEach(function (b) { b.classList.toggle('an', b === t); }); }
+    if (t.hasAttribute('data-sel')) { zustand.sel = +t.getAttribute('data-sel'); if (zustand.v === 'a') { var d = document.querySelector('#var-a [data-t="erh-ablauf"]').closest('details'); if (d) d.open = true; } }
+    zeichnen();
+  });
+  zeichnen();
+})();
+</script>
+</body>
+</html>
