@@ -1089,6 +1089,7 @@
       h += '<div class="pk-st-ges"><h4>' + esc(m.name || m.id) + ' · ' + esc(RF_TEXT[m.rechtsform] || m.rechtsform || '') + '</h4>';
       if (corp) {
         var kst = reg.kst != null && isFinite(Number(reg.kst)) ? Number(reg.kst) : null;
+        if (kst != null && kst > 100 && kst < 100000) kst = kst / 1000;   /* v3790c: Fehlspeicherung 15825 */
         h += '<div class="pk-st-kv"><span>Steuerregime</span><span>' + (kst == null || Math.abs(kst - 15.825) < 1e-6 ? 'KSt und Soli nach Jahr (§ 23 KStG)' : String(kst).replace('.', ',') + ' % fest') + '</span>' +
           '<span>Hebesatz Gewerbesteuer</span><span>' + (reg.gewst != null ? esc(String(reg.gewst).replace('.', ',')) + ' %' : 'nicht angegeben') + '</span>' +
           '<span>Erweiterte Kürzung</span><span>' + (st.aktiv ? 'aktiv' : st.beantragt ? 'beantragt, ' + st.offen.length + ' Prüfpunkte offen' : 'nein') + '</span>' +

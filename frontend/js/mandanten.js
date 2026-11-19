@@ -68,6 +68,13 @@
      nichts fällt still auf privat zurück. Wo ein solches Objekt erscheint, sagt eine
      Karte, wem es gehört und dass die Einzelheiten ab Experte zu sehen sind
      (hinweisHtml). Die Plan-Sperre (Pro, _isPro) gilt zusätzlich. */
+  /* v3790c · KSt+Soli-Satz der Gesellschaft. Zwischen v3790 (1.0.123) und v3790c konnte das Formular
+     15,825 % als 15825 speichern. Ein Satz ueber 100 % ist unmoeglich; 15825 wird als 15,825 gelesen. */
+  function _kstSatz(reg) {
+    var v = reg && reg.kst != null && isFinite(Number(reg.kst)) ? Number(reg.kst) : 15.825;
+    if (v > 100 && v < 100000) v = v / 1000;
+    return v;
+  }
   function gesellschaftenSichtbar() {
     try { if (window.DpDetailgrad && typeof DpDetailgrad.stufe === 'function') return DpDetailgrad.stufe() >= 3; } catch (e) {}
     return true;   /* ohne Detailgrad-Modul (andere Dokumente): wie bisher */
@@ -470,7 +477,7 @@
     var m = get(id || 'privat');
     if (!m || !isCorp(m.rechtsform)) return null;
     var reg = m.regime || {};
-    var kst = (reg.kst != null ? reg.kst : 15.825) / 100;
+    var kst = _kstSatz(reg) / 100;   /* v3790c */
     var heb = (reg.gewst != null ? reg.gewst : 0);
     /* v2984 · Hier stand `reg.erw_kuerzung ? 0 : …` (Wahrheitswert), die Maske
        zeigte den Haken aber bei NIE gespeichertem Feld als gesetzt (`!== false`).
@@ -499,11 +506,11 @@
     var st = _erwStatus(reg);
     return {
       id: m.id, name: m.name, rechtsform: m.rechtsform,
-      kstSoliPct: (reg.kst != null && isFinite(Number(reg.kst))) ? Number(reg.kst) : 15.825,
+      kstSoliPct: _kstSatz(reg),   /* v3790c */
       /* v3268 · Steht der Satz auf der Vorgabe (oder fehlt), rechnet der Kern je Jahr mit
          § 23 Abs. 1 KStG n. F. (15 % bis 2027, dann 14/13/12/11, ab 2032 10 % + Soli).
          Ein abweichend eingetragener Satz gilt fest fuer alle Jahre. */
-      kstNachJahr: !(reg.kst != null && isFinite(Number(reg.kst)) && Math.abs(Number(reg.kst) - 15.825) > 1e-9),
+      kstNachJahr: !(Math.abs(_kstSatz(reg) - 15.825) > 1e-9),   /* v3790c */
       hebesatz: (reg.gewst != null && isFinite(Number(reg.gewst))) ? Number(reg.gewst) : 0,
       erwKuerzung: st.aktiv, erwStatus: st,
       stammkapital: (m.bh && Number(m.bh.stammkapital)) || 0,
@@ -968,7 +975,7 @@
       var canDel = m.id !== 'privat';
       var reg = m.regime || {};
       var sub = isCorp(m.rechtsform)
-        ? ('K\u00f6rperschaftsteuer ' + (reg.kst != null ? reg.kst : 15.825).toString().replace('.', ',') + ' %'
+        ? ('K\u00f6rperschaftsteuer ' + _kstSatz(reg).toString().replace('.', ',') + ' %'
            + (_erwAktiv(reg) ? ' \u00b7 erw. K\u00fcrzung' : (reg.erw_kuerzung === true ? ' \u00b7 erw. K\u00fcrzung beantragt, Pr\u00fcfpunkte offen' : '') + (reg.gewst ? ' \u00b7 GewSt-Hebesatz ' + reg.gewst + ' %' : ' \u00b7 Hebesatz fehlt')))
         : (m.rechtsform === 'gbr' ? 'Personengesellschaft \u00b7 transparent (ESt der Gesellschafter)'
                                   : 'Einkommensteuer \u00b7 \u00fcber zvE (Tab Steuer)');
@@ -1332,7 +1339,7 @@
       +   '<hr class="dvd" style="margin:18px 0 6px">'
       +   '<h3 class="set-section-h">Steuerregime <span style="font-weight:400;color:#7A7370;font-size:12px">\u00b7 rechnet in Steuer und Jahresabschluss</span></h3>'   /* v2208: hier stand "wird in Stufe 2 aktiv" - effRate() (Z. 328) und gesellschaft-abschluss.js rechnen laengst damit */
       +   '<div style="' + _fGrid() + '">'
-      +     fldH('K\u00f6rperschaftsteuer + Soli (%)', inp('mand-f-kst', reg.kst != null ? reg.kst : 15.825), 'Satz, mit dem der Gewinn der Gesellschaft besteuert wird: 15 % K\u00f6rperschaftsteuer + 5,5 % Solidarit\u00e4tszuschlag darauf = 15,825 %. Bleibt die Vorgabe stehen, rechnet DealPilot ab 2028 mit der gesetzlichen Senkung (\u00a7 23 Abs. 1 KStG: 14 % 2028, 13 % 2029, 12 % 2030, 11 % 2031, 10 % ab 2032, jeweils + Soli). Ein anderer Wert gilt fest f\u00fcr alle Jahre.')
+      +     fldH('K\u00f6rperschaftsteuer + Soli (%)', inp('mand-f-kst', String(_kstSatz(reg)).replace('.', ',')), 'Satz, mit dem der Gewinn der Gesellschaft besteuert wird: 15 % K\u00f6rperschaftsteuer + 5,5 % Solidarit\u00e4tszuschlag darauf = 15,825 %. Bleibt die Vorgabe stehen, rechnet DealPilot ab 2028 mit der gesetzlichen Senkung (\u00a7 23 Abs. 1 KStG: 14 % 2028, 13 % 2029, 12 % 2030, 11 % 2031, 10 % ab 2032, jeweils + Soli). Ein anderer Wert gilt fest f\u00fcr alle Jahre.')
       +     fldH('Gewerbesteuer-Hebesatz (%)', inp('mand-f-gewst', reg.gewst != null ? reg.gewst : 0), 'Hebesatz deiner Gemeinde (z.B. 400). Nur relevant, wenn die erweiterte K\u00fcrzung NICHT greift. Bei reiner Vermietung mit K\u00fcrzung 0 lassen.')
       +   '</div>'
       +   '<div style="' + _fGrid() + '">'
@@ -1493,6 +1500,9 @@
   function _chk(id) { var el = document.getElementById(id); return !!(el && el.checked); }
   /* v3790 · deutsche Eingabe: 25.000 = Tausender, 15,825 = Komma. Bis v3789 wurde
      "25.000" zu 25 (Komma zu Punkt, dann parseFloat bis zum zweiten Punkt). */
+  /* v3790c · Prozentsaetze: Punkt und Komma sind Dezimaltrenner (das Feld zeigte "15.825", v3790 las
+     es als 15.825 %). */
+  function _toPct(s) { var n = parseFloat(String(s == null ? '' : s).trim().replace(/[^d.,-]/g, '').replace(',', '.')); return isNaN(n) ? 0 : n; }
   function _toN(s) {
     var t = ('' + (s == null ? '' : s)).trim().replace(/[^\d.,-]/g, '');
     if (t.indexOf(',') >= 0) t = t.replace(/\./g, '').replace(',', '.');
@@ -1528,7 +1538,7 @@
       if (_gl.length) m.gesellschafter = _gl;
     }
     if (isCorp(rf)) {
-      m.regime = { kst: _toN(_val('mand-f-kst')), gewst: _toN(_val('mand-f-gewst')), erw_kuerzung: _chk('mand-f-kuerz') };
+      m.regime = { kst: _toPct(_val('mand-f-kst')), gewst: _toPct(_val('mand-f-gewst')), erw_kuerzung: _chk('mand-f-kuerz') };   /* v3790c: Saetze nie als Tausender lesen */
       /* v2984: die Pruefpunkte der erweiterten Kuerzung */
       try { var _K = window.DealPilotUeberfuehrungKern; if (_K && _K.PRUEFPUNKTE) { m.regime.erw_pruefung = {}; _K.PRUEFPUNKTE.forEach(function (x) { m.regime.erw_pruefung[x.k] = _chk('mand-f-ek-' + x.k); }); } } catch (_ek) {}
       m.bh = {
