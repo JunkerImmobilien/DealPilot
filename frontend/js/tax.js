@@ -2557,6 +2557,13 @@ function setTaxFormMode(m) {
    gewaehlten Stufe - das Steuerformular neu aufbauen (die Zeilen selbst blendet style.css aus). */
 if (typeof window !== 'undefined' && typeof window.addEventListener === 'function' && !window._ytfDgHoerer) {
   window._ytfDgHoerer = true;
+  /* v3900a · Steuerverlauf neu zeichnen, wenn die Mietspiegel-Werte nachkommen (potenzial.js msWerteNachladen) -
+     sonst bleibt er mit dem Stand vor den Soll-Mieten stehen. Gebuendelt, weil je Wohnung ein Ereignis kommt. */
+  var _dpMsT = null;
+  window.addEventListener('dp:mietspiegel-werte', function () {
+    clearTimeout(_dpMsT);
+    _dpMsT = setTimeout(function () { try { if (window.State && State.cfRows && State.cfRows.length && typeof renderTaxTimeline === 'function') renderTaxTimeline(); } catch (e) {} }, 250);
+  });
   window.addEventListener('dp:detailgrad', function () {
     try { if (document.querySelector('#yearly-tax-form-box .ytf-detail-wrap')) renderYearlyTaxForm(); } catch (e) {}
   });

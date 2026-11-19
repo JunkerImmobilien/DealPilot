@@ -245,6 +245,84 @@ function pruefen(Q) {
     const kunden = alle.zeilen.map((z) => z.inhalt.replace(/<[^>]*>/g, ' ').replace(/title="[^"]*"/g, '')).join(' ') + ePorto.h.replace(/<[^>]*>/g, ' ');
     ok(!/ – |;/.test(kunden.replace(/&quot;|&amp;/g, '')), 'E Kundentext der Zeilen: kein Gedankenstrich, kein Semikolon');
   }
+
+  /* ── R · v3900a: das Steuerformular RENDERT nur - es schreibt nichts und stoesst keine Rechnung an ──
+     Befund Staging 19.11.2026 (Koordinator, A/B): mit v3900 stand der Steuerverlauf beim Laden 8 s auf einem
+     anderen Wert. Geprueft wird am echten tax.js: Quick- und Detail-Ansicht (Stufe 1-3, leerer, halber und voller
+     Stand) und der Hoerer auf dp:detailgrad aendern keine Eigenwerte, keinen State, keinen Cache, keinen globalen
+     Namen, rufen weder calc noch den Steuerverlauf, und die Rechnung (_computeYearTotal) ist danach dieselbe. */
+  (function () {
+    const hoerer = {};
+    const rc = { console: { log() {}, warn() {}, info() {}, error() {} }, Date, Math, JSON, parseFloat, parseInt, isFinite, isNaN, Number, String, Object, Array, Promise, setTimeout() {}, clearTimeout() {},
+      document: { getElementById: (id) => (id === 'afa_satz' ? { value: '2' } : null), addEventListener() {}, querySelector: (s) => (rc.__detailDa && /ytf-detail-wrap/.test(s) ? {} : null), querySelectorAll: () => [], createElement: () => ({ style: {} }) },
+      addEventListener(t, f) { (hoerer[t] = hoerer[t] || []).push(f); }, localStorage: { getItem: () => null, setItem() {} } };
+    rc.window = rc; rc.parseDe = tc.parseDe; rc.State = { cfRows: [{ cal: 2025 }, { cal: 2026 }] };
+    vm.createContext(rc);
+    try {
+      for (const f of ['anteilig.js', 'afa-engine.js', 'deal-kpis.js']) vm.runInContext(lies('frontend/js/' + f), rc);
+      for (const f of jahrDateien) vm.runInContext(jahrQuelle(f), rc);
+      vm.runInContext(Q.kern, rc);
+      vm.runInContext(Q.tax, rc);
+    } catch (e) { ok(false, 'R tax.js laedt im Pruefstand: ' + e.message); return; }
+    const satz = { schuldzinsen: 3000, afa: 2500, nk_umlf: 2000, erhaltungsaufwand: 1500, einnahmen_km: 12000, einnahmen_nk: 2000, anlage_v: { av_renten: 600, av_kuerzung_pct: 10 } };
+    const vorher = JSON.stringify(rc._computeYearTotal(2025, 0, satz));
+    const echteCyt = rc._computeYearTotal;
+    rc._taxYearlyOverrides = { y2025: { porto: 30 } }; rc._taxYearlyBemerkungen = {};
+    const zaehler = { calc: 0, timeline: 0, setzen: 0, update: 0 };
+    rc.calc = () => { zaehler.calc++; }; rc.calcNow = rc.calc;
+    rc.renderTaxTimeline = () => { zaehler.timeline++; };
+    const echtSetzen = rc._setYearOverride; rc._setYearOverride = function () { zaehler.setzen++; return echtSetzen.apply(this, arguments); };
+    rc.updateTaxOverride = () => { zaehler.update++; };
+    rc._ytfSteuerAnzeige = () => ({ text: '0 €', color: '', title: '' });
+    rc._mieteQuote66 = () => ({ stand: 'ok', quote: 55 });
+    const staende = [
+      { name: 'leer', auto: {}, values: {} },
+      { name: 'halb', auto: { schuldzinsen: 5000, afa: 3000 }, values: { schuldzinsen: 5000 } },
+      { name: 'voll', auto: { schuldzinsen: 5000, afa: 3000, einnahmen_km: 12000, nk_umlf: 2000, sonst_bewegl_wg: 400, av_fewo: 2, av_7h7i: 900 }, values: { schuldzinsen: 5000, afa: 3000, einnahmen_km: 12000, nk_umlf: 2000, sonst_bewegl_wg: 400, av_fewo: 2, av_7h7i: 900, porto: 30 } }
+    ];
+    const blick = () => JSON.stringify({ ov: rc._taxYearlyOverrides, bem: rc._taxYearlyBemerkungen, st: rc.State, vb: rc._dpVbCache, mode: rc._taxFormMode, idx: rc._detailYearIdx });
+    rc.DpDetailgrad = { stufe: () => 3 };   /* Pruefstand selbst */
+    const namen0 = Object.keys(rc).sort().join(',');
+    const b0 = blick();
+    let html1 = null, html2 = null, fehler = null;
+    try {
+      for (const s of staende) {
+        const t = { auto: s.auto, values: s.values, werbungskosten: 1, einnahmen: 2, ergebnis: 1, afaSonder7b: 100, erhV: { 2025: 50 }, erhG: 200 };
+        const tJson = JSON.stringify(t);
+        rc._computeYearTotal = () => t;
+        for (const st of [1, 2, 3]) {
+          rc.DpDetailgrad = { stufe: () => st };
+          const h = rc._renderDetailForm([{ idx: 0, year: 2025 }, { idx: 1, year: 2026 }]);
+          rc._renderQuickForm([{ idx: 0, year: 2025 }, { idx: 1, year: 2026 }]);
+          if (s.name === 'voll' && st === 3) { if (html1 == null) html1 = h; else html2 = h; }
+        }
+        if (JSON.stringify(t) !== tJson) fehler = 'Rendern veraendert die Jahreswerte (' + s.name + ')';
+      }
+      /* zweiter Durchgang mit vollem Stand: gleiches HTML */
+      rc.DpDetailgrad = { stufe: () => 3 };
+      const t = { auto: staende[2].auto, values: staende[2].values, werbungskosten: 1, einnahmen: 2, ergebnis: 1, afaSonder7b: 100, erhV: { 2025: 50 }, erhG: 200 };
+      rc._computeYearTotal = () => t;
+      html2 = rc._renderDetailForm([{ idx: 0, year: 2025 }, { idx: 1, year: 2026 }]);
+    } catch (e) { fehler = e.message; }
+    ok(!fehler, 'R Rendern ohne Fehler und ohne Aenderung der Jahreswerte ' + (fehler || ''));
+    ok(blick() === b0, 'R Rendern (Quick und Detail, Stufe 1 bis 3, leerer/halber/voller Stand) schreibt keine Eigenwerte, keinen State, keinen Cache');
+    const namenNeu = Object.keys(rc).filter((k) => namen0.split(',').indexOf(k) < 0);
+    ok(!namenNeu.length, 'R Rendern legt keinen globalen Namen an ' + namenNeu.join(','));
+    ok(zaehler.calc === 0 && zaehler.timeline === 0 && zaehler.setzen === 0 && zaehler.update === 0, 'R Rendern ruft weder calc noch den Steuerverlauf noch das Setzen eines Eigenwerts ' + JSON.stringify(zaehler));
+    ok(html1 && html1 === html2, 'R zweimal gerendert, gleicher Stand: gleiches HTML');
+    /* Hoerer auf dp:detailgrad: nur in der Detail-Ansicht, nur Anzeige */
+    const dg = hoerer['dp:detailgrad'] || [];
+    ok(dg.length === 1, 'R tax.js meldet genau einen Hoerer auf dp:detailgrad an (' + dg.length + ')');
+    let neuAufbau = 0; const echtRender = rc.renderYearlyTaxForm; rc.renderYearlyTaxForm = () => { neuAufbau++; };
+    const b1 = blick();
+    rc.__detailDa = false; dg.forEach((f) => f({ detail: { stufe: 1, alt: 3 } }));
+    ok(neuAufbau === 0, 'R dp:detailgrad in der Quick-Ansicht: kein Neuaufbau');
+    rc.__detailDa = true; dg.forEach((f) => f({ detail: { stufe: 3, alt: 1 } }));
+    ok(neuAufbau === 1 && blick() === b1 && zaehler.calc === 0 && zaehler.timeline === 0, 'R dp:detailgrad in der Detail-Ansicht: nur das Steuerformular neu, keine Rechnung, kein Steuerverlauf, nichts geschrieben');
+    rc.renderYearlyTaxForm = echtRender; rc.__detailDa = false;
+    rc._computeYearTotal = echteCyt;
+    ok(JSON.stringify(rc._computeYearTotal(2025, 0, satz)) === vorher, 'R die Rechnung (_computeYearTotal mit Satz) ist nach dem Rendern dieselbe');
+  })();
   /* Mechanik: detailgrad.js kennt data-dg-stufe (Zeile = Bereich, Felder folgen ihr), style.css blendet vor dem Markieren aus,
      die Karte steht ab Einsteiger in der Zuordnung */
   ok(/querySelectorAll\('\[data-dg-stufe\]'\)[\s\S]{0,200}expl\.set\(el, L\)/.test(Q.dg) && /f\.closest\('\[data-dg-stufe\]'\)/.test(Q.dg), 'E detailgrad.js: data-dg-stufe als Bereich, Felder folgen ihrer Zeile');
@@ -324,6 +402,8 @@ const gegen = [
   ['Backend: _zeilen nicht in der Whitelist', Object.assign({}, Q, { svc: Q.svc.replace("k === '_zeilen'", "k === '_zeilenX'") })],
   ['Abschrift 2023: Zeile doppelt', Object.assign({}, Q, { jahr: { 'anlage-v-2023.js': lies('frontend/js/anlage-v-2023.js').replace("    50: { text: 'Geldbeschaffungskosten", "    47: { text: 'Geldbeschaffungskosten") } })],
   ['Abschrift 2022: Summenzeile fehlt', Object.assign({}, Q, { jahr: { 'anlage-v-2022.js': lies('frontend/js/anlage-v-2022.js').replace('sonder7b: 34,', 'sonder7b: 99,') } })],
+  ['tax.js: Detail-Ansicht schreibt einen Eigenwert', Object.assign({}, Q, { tax: Q.tax.replace('var _dgNamen = {', "_setYearOverride(y.year, 'porto', 1); var _dgNamen = {") })],
+  ['tax.js: Hoerer stoesst den Steuerverlauf an', Object.assign({}, Q, { tax: Q.tax.replace("if (document.querySelector('#yearly-tax-form-box .ytf-detail-wrap')) renderYearlyTaxForm();", 'renderYearlyTaxForm(); renderTaxTimeline();') })],
   ['detailgrad.js ohne data-dg-stufe', Object.assign({}, Q, { dg: Q.dg.replace("f.closest('[data-dg-stufe]')", 'null') })],
   ['Mappe mit fester Zeile 83', Object.assign({}, Q, { dok: Q.dok.replace("zl(R.summeWk.zeile, null, 'Summe der Werbungskosten'", "zl('83', null, 'Summe der Werbungskosten'") })],
 ];

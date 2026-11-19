@@ -1152,6 +1152,11 @@
   function msWerteNachladen() {
     try { if (artMitEinheiten() && window._dpMfh && Array.isArray(window._dpMfh.einheiten) && window._dpMfh.einheiten.length) objektKarte(); else objektSumme(); } catch (e) {}
     try { msHinweis(); } catch (e) {}
+    /* v3900a · Die Mietspiegel-Werte kommen asynchron. Mit ihnen stehen erst die Soll-Mieten je Wohnung fest, die in die
+       Mietentwicklung und damit in die Steuerrechnung je Jahr gehen. Gemessen 19.11.2026 (Westerfeldstr.-Kopie): Einnahmen
+       2028 sprangen danach von 39.420 auf 40.650 EUR, der Steuerverlauf blieb mit dem alten Stand stehen (+53.809 statt
+       +34.739 EUR). Wer davon abhaengt, hoert auf dieses Ereignis. */
+    try { window.dispatchEvent(new CustomEvent('dp:mietspiegel-werte')); } catch (e) {}
   }
   function msWerteFuer(wflW) {
     var g = agsJetzt(), reg = msRegister();
