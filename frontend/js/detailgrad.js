@@ -210,7 +210,18 @@
         (OR.pflichtFuer(L) || []).forEach(function (pid) { pflichtStufe[pid] = L; });
       });
     } catch (e) {}
+    /* v3900 · Zeilen, die ein Modul zur Laufzeit baut und selbst einstuft (data-dg-stufe="1|2|3"),
+       z. B. das Steuerformular je Jahr (tax.js): die Zeile ist ein Bereich ihrer Stufe, ihre Felder
+       folgen ihr (die naechste Zeile gewinnt). Ohne diese Angabe galten die Felder ohne id als Experte
+       und die ganze Karte erschien erst ab Experte. Die Regel in style.css blendet die Zeile auch
+       zwischen Neuaufbau und Markieren aus (kein Aufblitzen). data-dg-stufe wird hier nie geaendert. */
+    [].slice.call(sec.querySelectorAll('[data-dg-stufe]')).forEach(function (el) {
+      var L = gueltig(el.getAttribute('data-dg-stufe')); if (!L || el.closest(NIE)) return;
+      if (!expl.has(el) || L < expl.get(el)) expl.set(el, L);
+    });
     var lvl = function (f) {
+      var zs = f.closest ? f.closest('[data-dg-stufe]') : null;
+      if (zs && sec.contains(zs)) { var Lz = gueltig(zs.getAttribute('data-dg-stufe')); if (Lz) return Lz; }
       var L = (f.id && feldStufe[f.id]) || FELD_FOLGT_BEHAELTER[id] || 3;
       return (f.id && pflichtStufe[f.id] && pflichtStufe[f.id] < L) ? pflichtStufe[f.id] : L;
     };

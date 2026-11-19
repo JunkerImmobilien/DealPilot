@@ -1,10 +1,10 @@
 /* frontend/js/data/detailgrad-zuordnung.js — ERZEUGT, nicht von Hand ändern.
-   Quelle: design/Vorschläge/arbeitsbereich-detailgrad-zuordnung.json (Stand 2026-11-18)
+   Quelle: design/Vorschläge/arbeitsbereich-detailgrad-zuordnung.json (Stand 2026-11-19)
    Neu erzeugen: node tools/detailgrad-pruefen.mjs --schreiben
    Je Reiter und Stufe (1 Einsteiger · 2 Fortgeschritten · 3 Experte): Karten/Bereiche und Feld-ids,
    die AB dieser Stufe erscheinen. Was nicht gelistet ist, ist Experte. Leser: js/detailgrad.js. */
 window.DpDetailgradZuordnung = {
- "stand": "2026-11-18",
+ "stand": "2026-11-19",
  "reiter": {
   "s0": {
    "1": {
@@ -437,6 +437,11 @@ window.DpDetailgradZuordnung = {
       "s": "#tax-timeline-card",
       "art": "karte",
       "titel": "Steuerverlauf"
+     },
+     {
+      "s": "#yearly-tax-form-box",
+      "art": "kind",
+      "titel": "Steuerformular pro Jahr (v3900, Marcel 19.11.2026: ab Einsteiger; die Zeilen stuft tax.js selbst ein, data-dg-stufe)"
      }
     ],
     "felder": [

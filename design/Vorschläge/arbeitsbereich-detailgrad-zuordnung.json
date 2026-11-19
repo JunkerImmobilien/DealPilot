@@ -1,5 +1,5 @@
 {
-  "stand": "2026-11-18",
+  "stand": "2026-11-19",
   "zweck": "Zuordnung Arbeitsbereich zu Detailstufen Einsteiger / Fortgeschritten / Experte. Was hier nicht steht, ist Experte. 'fortgeschritten' listet nur, was zu Einsteiger DAZUKOMMT.",
   "regeln": {
     "karte.art": {
@@ -446,6 +446,11 @@
             "titel": "Steuerverlauf",
             "selektor": "#tax-timeline-card",
             "art": "karte"
+          },
+          {
+            "titel": "Steuerformular pro Jahr (v3900, Marcel 19.11.2026: ab Einsteiger; die Zeilen stuft tax.js selbst ein, data-dg-stufe)",
+            "selektor": "#yearly-tax-form-box",
+            "art": "kind"
           }
         ],
         "felder": [

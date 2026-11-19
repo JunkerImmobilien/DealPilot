@@ -2153,6 +2153,14 @@ select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%
   vertical-align: middle;
 }
 .ytf-section-label { color: var(--ch); padding-right: 8px; }
+/* v3900 · Steuerformular nach den Bloecken der Anlage V (tax.js): Zeilennummer des Jahres, Teile unter
+   einer Summenzeile eingerueckt, Hinweise zum Detailgrad */
+.ytf-block-zeilen { font-weight: 500; text-transform: none; letter-spacing: 0; color: var(--muted); font-size: 11px; margin-left: 6px; }
+.ytf-zeile { display: inline-block; font-family: 'JetBrains Mono', monospace; font-size: 9.5px; line-height: 1.5; padding: 0 5px; margin-left: 4px; border: 1px solid var(--border); border-radius: 4px; color: var(--muted); white-space: nowrap; vertical-align: 1px; }
+.ytf-davon .ytf-section-label { padding-left: 14px; }
+.ytf-zwischensumme td { border-top: 1px dashed var(--border); }
+.ytf-summe { font-weight: 700; }
+.ytf-sum-hint, .ytf-dg-note { display: block; font-size: 10.5px; color: var(--muted); font-weight: 400; margin-top: 1px; }
 .ytf-summary {
   grid-column: 1 / -1;
   background: linear-gradient(180deg, #FAF7EE 0%, #F5F1E5 100%);
@@ -41576,6 +41584,11 @@ body.qc-standalone-active nav.tabs { display: none !important; }
 body.dp-dg-1 :is(#s0, #s1, #s2, #s3, #s4, #s3-tax, #s5, #s6, #s8) [data-dp-dg="2"],
 body.dp-dg-1 :is(#s0, #s1, #s2, #s3, #s4, #s3-tax, #s5, #s6, #s8) [data-dp-dg="3"],
 body.dp-dg-2 :is(#s0, #s1, #s2, #s3, #s4, #s3-tax, #s5, #s6, #s8) [data-dp-dg="3"] { display: none !important; }
+/* v3900 · Zeilen, die ein Modul selbst einstuft (data-dg-stufe, z. B. Steuerformular je Jahr in tax.js):
+   ausgeblendet schon vor dem Markieren durch js/detailgrad.js, sonst blitzt jede Zeile beim Neuaufbau auf. */
+body.dp-dg-1 :is(#s0, #s1, #s2, #s3, #s4, #s3-tax, #s5, #s6, #s8) [data-dg-stufe="2"],
+body.dp-dg-1 :is(#s0, #s1, #s2, #s3, #s4, #s3-tax, #s5, #s6, #s8) [data-dg-stufe="3"],
+body.dp-dg-2 :is(#s0, #s1, #s2, #s3, #s4, #s3-tax, #s5, #s6, #s8) [data-dg-stufe="3"] { display: none !important; }
 
 /* Schalter: über jedem Reitertitel (reiter) und im Reiter Objekt (objekt) */
 .dp-dg-host { display: inline-flex; align-items: center; gap: 8px; flex: 0 0 auto; }

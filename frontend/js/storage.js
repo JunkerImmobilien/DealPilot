@@ -1353,6 +1353,9 @@ async function saveObj(opts) {
                 if (totals.kaufjahr) o._kj = totals.kaufjahr;
                 if (totals.av7h) o._av7h = totals.av7h;
                 if (totals.verbilligt && totals.verbilligt.grund) o._vb = String(totals.verbilligt.grund).slice(0, 600);
+                /* v3900 · Stempel: nach welchem Vordruck die Zeilen gelten ({jahr, kennung, stand} oder {jahr, fehlt: true})
+                   und die Zeile je Feld mit Betrag. Seitdem geht anlage_v immer mit, auch ohne av_*-Angaben. */
+                if (AnlageVKern.stempel) { var _st = AnlageVKern.stempel(t.year, v); o._formular = _st._formular; if (_st._zeilen) o._zeilen = _st._zeilen; }
                 return Object.keys(o).length ? o : null;
               })()
             };

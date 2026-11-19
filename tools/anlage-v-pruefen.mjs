@@ -71,7 +71,7 @@ function pruefen(Q) {
   const w0 = K.wirkung({}, 5000);
   ok(w0.ein === 0 && w0.wk === 0 && w0.kuerzung === 0, 'B ohne Angaben: Wirkung 0 (bitgleich)');
   ok(K.tabelle(2026) === null || !!c.AnlageV2026, 'B STRENG: ohne Abschrift 2026 kein Ersatzjahr');
-  ok(K.tabelle(2024) === null, 'B STRENG: 2024 ohne Abschrift -> null');
+  ok(K.tabelle(2019) === null, 'B STRENG: 2019 ohne Abschrift -> null');   /* v3900: 2020 bis 2024 sind abgeschrieben */
   /* Beispiel: Kaltmiete 12.000 inkl. 1.200 Garagen und 2.400 Angehoerige, Umlagen 2.000 */
   const v = { einnahmen_km: 12000, einnahmen_nk: 2000, av_garagen: 1200, av_angehoerige: 2400, av_nk_nachzahlung: -150,
     schuldzinsen: 3000, afa: 2500, nk_umlf: 2000, erhaltungsaufwand: 1500, av_renten: 600, av_ust_gezahlt: 100,
@@ -101,7 +101,7 @@ function pruefen(Q) {
   ok(R2 && nah((z(R2.wk, 55)[0] || {}).betrag, 2000) && R2.hinweise.some((h) => /von Hand/.test(h)), 'B Erhaltung von Hand geaendert: ganz in Zeile 55, mit Hinweis');
   const R3 = K.aufstellung(2025, { values: { einnahmen_km: 1000, av_garagen: 1500 }, einnahmen: 1000, werbungskosten: 0 });
   ok(R3 && R3.hinweise.length >= 1, 'B Teile groesser als die Kaltmiete: Hinweis');
-  ok(K.aufstellung(2024, { values: v }) === null, 'B Aufstellung fuer ein Jahr ohne Abschrift: null');
+  ok(K.aufstellung(2019, { values: v }) === null, 'B Aufstellung fuer ein Jahr ohne Abschrift: null');
 
   /* ── B2 · v3800b ── */
   const s7 = (j) => K.sieben(100000, 2020, j).satz;
@@ -170,7 +170,7 @@ function pruefen(Q) {
   const festeNr = /(zl|zeile|summe)\(\s*'?\d{2}\b|'Zeile \d+'|Zeile \d{2}\b/;
   ok(dokA && !festeNr.test(code(dokA)), 'D Steuer-Mappe (anlageVBlatt): keine Zeilennummer im Code');
   ok(wkA && !festeNr.test(code(wkA)), 'D Werbungskosten-PDF (_renderAnlageVPage): keine Zeilennummer im Code');
-  ok(/AnlageVKern\.zeileFuer\(y\.year, r\.f\)/.test(Q.tax) && !/_avAlt/.test(code(Q.tax)), 'D Tooltip: nur die Abschrift des Jahres, kein Ersatzjahr');
+  ok(/_avK\.zeileFuer\(y\.year, f\)/.test(Q.tax)   /* v3900: Tooltip in _hilfe(f) */ && !/_avAlt/.test(code(Q.tax)), 'D Tooltip: nur die Abschrift des Jahres, kein Ersatzjahr');
   ok(!/ersatz: k\[i\]|ersatz: kandidaten\[i\]/.test(code(Q.dok) + code(Q.wk)), 'D kein Ersatzjahr in Steuer-Mappe und Werbungskosten-PDF');
   ok(/js\/anlage-v-2025\.js\?v=[^"]+"><\/script>\s*\n<script src="js\/anlage-v-kern\.js\?v=/.test(Q.idx), 'D index.html laedt den Kern nach der Abschrift');
   ok(/anlage_v: \(function \(\) \{[\s\S]{0,200}AnlageVKern\.auszug\(v\)/.test(Q.sto), 'D Speichern schickt anlage_v (storage.js)');
@@ -178,11 +178,135 @@ function pruefen(Q) {
   ok(fs.existsSync(path.join(ROOT, 'backend/migrations/120_tax_records_anlage_v.sql')), 'D Migration 120 tax_records.anlage_v');
   ok(/av_garagen: \(function/.test(Q.tax) && /DpZeAufteilung, t = Z && Z\.teile/.test(Q.tax), 'D tax.js: Zeile Garagen aus der Aufteilung der Zusatzeinnahmen');
   ok(/erhV: j\.erhV/.test(lies('frontend/js/sanierung-plan.js')), 'D Sanierungsplan liefert verteilte Erhaltung je Ursprungsjahr');
+
+  /* ── E · v3900 Steuerformular nach den Bloecken der Anlage V, Stufen je Zeile (echter Renderer) ── */
+  const BASIS = ['schuldzinsen', 'kontofuehrung', 'bereitstellung', 'notar_grundschuld', 'vermittlung', 'finanz_sonst', 'nk_umlf', 'nk_n_umlf', 'betr_sonst',
+    'hausverwaltung', 'steuerber', 'porto', 'verw_sonst', 'fahrtkosten', 'verpflegung', 'hotel', 'inserat', 'gericht', 'telefon', 'sonst_kosten', 'afa', 'sonst_bewegl_wg',
+    'anschaffungsnah', 'erhaltungsaufwand', 'einnahmen_km', 'einnahmen_nk'];
+  const jahrDateien = fs.readdirSync(path.join(ROOT, 'frontend/js')).filter((f) => /^anlage-v-\d{4}\.js$/.test(f)).sort();
+  const jahrQuelle = (f) => (Q.jahr[f] != null ? Q.jahr[f] : lies('frontend/js/' + f));
+  function rendern(o) {
+    const rc = { console: { log() {}, warn() {}, info() {}, error() {} }, Date, Math, JSON, parseFloat, parseInt, isFinite, isNaN, Number, String, Object, Array, Promise, setTimeout() {}, clearTimeout() {},
+      document: { getElementById: (id) => (id === 'afa_satz' ? { value: '2' } : null), addEventListener() {}, querySelector: () => null, querySelectorAll: () => [], createElement: () => ({ style: {} }) },
+      addEventListener() {}, localStorage: { getItem: () => null, setItem() {} } };
+    rc.window = rc; rc.parseDe = tc.parseDe; rc.State = {};
+    vm.createContext(rc);
+    for (const f of ['anteilig.js', 'afa-engine.js', 'deal-kpis.js']) vm.runInContext(lies('frontend/js/' + f), rc);
+    for (const f of jahrDateien) vm.runInContext(jahrQuelle(f), rc);
+    vm.runInContext(Q.kern, rc);
+    vm.runInContext(Q.tax, rc);
+    rc._taxYearlyOverrides = { ['y' + o.jahr]: o.ov || {} }; rc._taxYearlyBemerkungen = {};
+    rc.DpDetailgrad = { stufe: () => o.stufe };
+    if (o.corp) rc.DealPilotMandanten = { kostenBegriff: () => ({ corp: true, wort: 'Betriebsausgaben', einnahmen: 'Betriebseinnahmen', ergebnis: 'Ergebnis' }) };
+    const auto = Object.assign({}, o.auto || {}), values = {};
+    BASIS.concat(rc.AnlageVKern.SCHLUESSEL).forEach((f) => { values[f] = (o.ov && o.ov[f] != null) ? o.ov[f] : (auto[f] || 0); });
+    rc._computeYearTotal = () => ({ auto, values, werbungskosten: 0, einnahmen: 0, ergebnis: 0, afaSonder7b: o.son7b || null, erhV: o.erhV || null, erhG: o.erhG || 0 });
+    rc._ytfSteuerAnzeige = () => ({ text: '0 €', color: '', title: '' });
+    rc._mieteQuote66 = () => (o.quote ? { stand: 'ok', quote: o.quote } : null);
+    const h = rc._renderDetailForm([{ idx: 0, year: o.jahr }]);
+    const zeilen = []; const re = /<tr data-dg-stufe="(\d)"(?: data-ytf-feld="([a-z0-9_]+)")?([^>]*)>([\s\S]*?)<\/tr>/g; let m;
+    while ((m = re.exec(h))) zeilen.push({ st: +m[1], f: m[2] || null, cls: m[3], inhalt: m[4] });
+    const bl = {}; const rb = /data-ytf-block="([A-F])" data-dg-stufe="(\d)"/g; while ((m = rb.exec(h))) bl[m[1]] = +m[2];
+    return { h, zeilen, bl };
+  }
+  let E1 = null;
+  try { E1 = rendern({ jahr: 2025, stufe: 1 }); } catch (e) { ok(false, 'E Renderer laeuft im Pruefstand: ' + e.message); }
+  if (E1) {
+    const sicht = E1.zeilen.filter((z) => z.st <= 1 && z.f).map((z) => z.f).sort().join(',');
+    ok(sicht === ['afa', 'einnahmen_km', 'einnahmen_nk', 'erhaltungsaufwand', 'nk_umlf', 'schuldzinsen'].sort().join(','), 'E Einsteiger ohne Betraege: nur Kaltmiete, Umlagen, Gebaeude-AfA, Schuldzinsen, Erhaltung, umgelegte Kosten (' + sicht + ')');
+    ok(E1.zeilen.some((z) => z.st === 1 && !z.f && /Nicht umgelegte Kosten und Verwaltung/.test(z.inhalt) && /einzeln ab Detailgrad Fortgeschritten/.test(z.inhalt)), 'E Einsteiger: Zeile 78 als eine Summe mit „einzeln ab Detailgrad Fortgeschritten"');
+    ok(E1.bl.A === 1 && E1.bl.F === 3 && E1.bl.C === 1, 'E Bloecke A bis F, F (Angaben zum Objekt) erst ab Experte');
+    ok(/data-dg-stufe="1"/.test(E1.h.slice(0, 80)), 'E Detail-Ansicht selbst ab Einsteiger');
+    const alle = rendern({ jahr: 2025, stufe: 3 });
+    const zaehl = {}; alle.zeilen.forEach((z) => { if (z.f) zaehl[z.f] = (zaehl[z.f] || 0) + 1; });
+    const SOLL_F = BASIS.concat(K.SCHLUESSEL);
+    const fehltF = SOLL_F.filter((f) => zaehl[f] !== 1);
+    ok(!fehltF.length && Object.keys(zaehl).length === SOLL_F.length, 'E jedes Feld genau einmal (' + SOLL_F.length + ': ' + BASIS.length + ' Steuerzeilen + ' + K.SCHLUESSEL.length + ' Angaben der Anlage V) ' + fehltF.join(','));
+    const ein = (f) => (alle.zeilen.find((z) => z.f === f) || {}).inhalt || '';
+    ok(/data-field="schuldzinsen"/.test(ein('schuldzinsen')) && /data-field="av_renten"/.test(ein('av_renten')) && /data-field="kontofuehrung"/.test(ein('kontofuehrung')), 'E Eingaben schreiben weiter auf ihr data-field');
+    ok(/Z\. 48</.test(ein('schuldzinsen')) && /Z\. 48</.test(ein('bereitstellung')) && /Z\. 51</.test(ein('notar_grundschuld')) && /Z\. 78</.test(ein('kontofuehrung')) && /Z\. 82</.test(ein('porto')) && /Z\. 41</.test(ein('av_7h7i')), 'E 2025: Zeilennummer je Zeile aus der Abschrift (48, 48, 51, 78, 82, 41)');
+    ok(!/ytf-dg-note/.test(alle.h), 'E Experte: kein Hinweis „sonst ab …"');
+    const e26 = rendern({ jahr: 2026, stufe: 3 });
+    ok(!/class="ytf-zeile"/.test(e26.h) && !/ytf-block-zeilen/.test(e26.h), 'E 2026 ohne Abschrift: keine Zeilennummer');
+    const ePorto = rendern({ jahr: 2025, stufe: 1, ov: { porto: 50 } });
+    const z82 = ePorto.zeilen.find((z) => !z.f && /Sonstige Kosten gesamt/.test(z.inhalt));
+    ok(z82 && z82.st === 1 && /\+1 Angabe mit Betrag, einzeln ab Detailgrad Experte/.test(z82.inhalt) && ePorto.zeilen.find((z) => z.f === 'porto').st === 3, 'E Einsteiger, Porto 50 €: die Summenzeile Sonstige Kosten erscheint mit „+1 Angabe mit Betrag", Porto bleibt einzeln Experte');
+    const eRente = rendern({ jahr: 2025, stufe: 1, ov: { av_renten: 600 } });
+    const zr = eRente.zeilen.find((z) => z.f === 'av_renten');
+    ok(zr && zr.st === 1 && /sonst ab Detailgrad Experte/.test(zr.inhalt), 'E Einsteiger, Rente 600 €: Zeile erscheint (keine stille Verwerfung) mit Hinweis');
+    const eAuto = rendern({ jahr: 2025, stufe: 1, auto: { sonst_bewegl_wg: 400, av_fewo: 2, av_wohnflaeche: 80, av_zurechnung_a_pct: 100 } });
+    ok(eAuto.zeilen.find((z) => z.f === 'sonst_bewegl_wg').st === 1 && eAuto.zeilen.find((z) => z.f === 'av_fewo').st === 3 && eAuto.zeilen.find((z) => z.f === 'av_wohnflaeche').st === 3, 'E Vorschlag mit Wirkung (Kueche 400 €) erscheint, Vorschlaege ohne Wirkung (Ankreuzfeld, Flaeche) nicht');
+    const eQ = rendern({ jahr: 2025, stufe: 2, quote: 55 }), eQ0 = rendern({ jahr: 2025, stufe: 2 });
+    ok(eQ.zeilen.find((z) => z.f === 'av_kuerzung_pct').st === 2 && eQ0.zeilen.find((z) => z.f === 'av_kuerzung_pct').st === 3, 'E Kuerzung verbilligte Vermietung ab Fortgeschritten nur bei Quote unter 66 %');
+    const eC = rendern({ jahr: 2025, stufe: 3, corp: true });
+    ok(!eC.zeilen.some((z) => z.f && /^av_/.test(z.f)) && !/class="ytf-zeile"/.test(eC.h), 'E Gesellschaft: keine Angaben der Anlage V, keine Zeilennummern (wie v3800)');
+    const e7b = rendern({ jahr: 2025, stufe: 3, son7b: 900, erhV: { 2025: 300 }, erhG: 1500 });
+    ok(e7b.zeilen.some((z) => !z.f && /Sonderabschreibung § 7b/.test(z.inhalt) && /Z\. 38</.test(z.inhalt)) && e7b.zeilen.some((z) => !z.f && /§ 82b EStDV/.test(z.inhalt) && z.st === 2), 'E Anzeige § 7b (Zeile 38) ab Experte, verteilte Erhaltung ab Fortgeschritten');
+    const kunden = alle.zeilen.map((z) => z.inhalt.replace(/<[^>]*>/g, ' ').replace(/title="[^"]*"/g, '')).join(' ') + ePorto.h.replace(/<[^>]*>/g, ' ');
+    ok(!/ – |;/.test(kunden.replace(/&quot;|&amp;/g, '')), 'E Kundentext der Zeilen: kein Gedankenstrich, kein Semikolon');
+  }
+  /* Mechanik: detailgrad.js kennt data-dg-stufe (Zeile = Bereich, Felder folgen ihr), style.css blendet vor dem Markieren aus,
+     die Karte steht ab Einsteiger in der Zuordnung */
+  ok(/querySelectorAll\('\[data-dg-stufe\]'\)[\s\S]{0,200}expl\.set\(el, L\)/.test(Q.dg) && /f\.closest\('\[data-dg-stufe\]'\)/.test(Q.dg), 'E detailgrad.js: data-dg-stufe als Bereich, Felder folgen ihrer Zeile');
+  ok(/body\.dp-dg-1 [^{]*\[data-dg-stufe="2"\][\s\S]{0,300}body\.dp-dg-2 [^{]*\[data-dg-stufe="3"\] \{ display: none !important; \}/.test(Q.css), 'E style.css: Zeilen ueber der Stufe ausgeblendet (data-dg-stufe)');
+  const zuo = (Q.zuo.match(/"s3-tax": \{\s*"1": \{[\s\S]*?"felder"/) || [''])[0];
+  ok(/#yearly-tax-form-box/.test(zuo), 'E Zuordnung: Steuerformular pro Jahr ab Einsteiger (s3-tax, Stufe 1)');
+
+  /* ── H · v3900 Stempel beim Speichern: Vordruck und Zeilen je Jahr ── */
+  const KA = kernCtx(jahrDateien.map(jahrQuelle).concat([Q.kern])).AnlageVKern;
+  ok(KA && typeof KA.stempel === 'function', 'H AnlageVKern.stempel');
+  if (KA && KA.stempel) {
+    const T25 = KA.tabelle(2025);
+    const s25 = KA.stempel(2025, { schuldzinsen: 100, notar_grundschuld: 0, av_garagen: 5, _afaSonder7b: 10 });
+    ok(s25._formular && s25._formular.jahr === 2025 && s25._formular.kennung === T25.formular && s25._formular.stand === T25.stand && !s25._formular.fehlt, 'H 2025: _formular { jahr, kennung, stand } aus der Abschrift');
+    ok(s25._zeilen && s25._zeilen.schuldzinsen === 48 && s25._zeilen.av_garagen === 26 && s25._zeilen.afa_7b === 38 && !('notar_grundschuld' in s25._zeilen), 'H 2025: _zeilen nur fuer Felder mit Betrag (Schuldzinsen 48, Garagen 26, § 7b 38, ohne Betrag keine Zeile)');
+    const s30 = KA.stempel(2030, { schuldzinsen: 100 });
+    ok(s30._formular && s30._formular.jahr === 2030 && s30._formular.fehlt === true && !s30._zeilen && !s30._formular.kennung, 'H Jahr ohne Abschrift: _formular { jahr, fehlt: true }, keine Zeilen (kein Ersatzjahr)');
+    for (const f of jahrDateien) {
+      const j = +f.slice(9, 13), T = KA.tabelle(j);
+      if (!T) { ok(false, 'H ' + f + ': Abschrift ladbar'); continue; }
+      const w = {}; Object.keys(T.felder).forEach((k) => { w[k] = 1; });
+      const s = KA.stempel(j, w);
+      const falsch = Object.keys(T.felder).filter((k) => T.felder[k].zeile != null && s._zeilen[k] !== T.felder[k].zeile);
+      ok(!falsch.length && s._formular.kennung === T.formular, 'H ' + f + ': Stempel traegt die Zeilen des Jahres ' + j + ' ' + falsch.join(','));
+      /* Zeilen eindeutig: kein Schluessel doppelt im Quelltext (JS ueberschreibt still) */
+      const src = jahrQuelle(f).replace(/\r\n/g, '\n'), zb = (src.match(/\n  zeilen: \{([\s\S]*?)\n  \}/) || [])[1] || '', fb = (src.match(/\n  felder: \{([\s\S]*?)\n  \}/) || [])[1] || '';
+      const dop = (txt, re) => { const n = {}; let m; while ((m = re.exec(txt))) n[m[1]] = (n[m[1]] || 0) + 1; return Object.keys(n).filter((k) => n[k] > 1); };
+      const ohneK = (t) => t.replace(/\/\*[\s\S]*?\*\//g, '');
+      const dz = dop(ohneK(zb), /^\s{4}(\d+):/gm), df = dop(ohneK(fb), /^\s{4}([a-z_0-9]+):/gm);
+      ok(zb && fb && !dz.length && !df.length, 'H ' + f + ': Zeilen und Felder je einmal ' + dz.concat(df).join(','));
+      const Sx = T.summen || {}, sz = Object.keys(Sx).filter((k) => typeof Sx[k] === 'number' && !T.zeilen[Sx[k]]);
+      ok(!sz.length && Object.keys(T.verh || {}).every((k) => T.zeilen[k]), 'H ' + f + ': jede Summenzeile und jede verh-Zeile abgeschrieben ' + sz.join(','));
+      /* Aufstellung des Jahres: Einnahmen- und Werbungskostenzeilen ergeben die Summenzeilen */
+      const vv = { einnahmen_km: 12000, einnahmen_nk: 2000, av_garagen: 1200, schuldzinsen: 3000, afa: 2500, nk_umlf: 2000, erhaltungsaufwand: 1500, kontofuehrung: 60, porto: 40, av_renten: 600, av_zuschuesse: 500, av_zuschuesse_eigen: 100 };
+      const ww = KA.wirkung(vv, 9100), e0 = 14000 + ww.ein, w0 = 9100 + ww.wk;
+      const RR = KA.aufstellung(j, { values: vv, einnahmen: e0, werbungskosten: w0, auto: {} });
+      const se = RR ? RR.einnahmen.filter((e) => !e.teil).reduce((a, e) => a + e.betrag, 0) : NaN, sw = RR ? RR.wk.filter((e) => !e.teil).reduce((a, e) => a + e.betrag, 0) : NaN;
+      ok(RR && nah(se, e0) && nah(sw, w0) && RR.summeEinnahmen.zeile === T.summen.einnahmen && RR.summeWk.zeile === T.summen.werbungskosten && RR.ueberschuss.zeile === T.summen.ueberschuss, 'H ' + f + ': Aufstellung ergibt Summe der Einnahmen / Werbungskosten in den Zeilen ' + T.summen.einnahmen + ' / ' + T.summen.werbungskosten + ' (' + Math.round(se) + ' / ' + Math.round(sw) + ')');
+      ok(RR && !RR.hinweise.concat(RR.kuerzung ? [RR.kuerzung.text] : []).some((h) => /Zeile\s+(eine|vor|\.|$)/.test(h)), 'H ' + f + ': kein Hinweis mit leerer Zeilennummer');
+    }
+  }
+  /* Backend nimmt den Stempel an (Whitelist taxService.anlageV), am echten Code ohne Datenbank */
+  try {
+    const fn = (Q.svc.match(/function safeNumeric[\s\S]*?\n\}\n/) || [''])[0] + (Q.svc.match(/function anlageV\(o\)[\s\S]*?\n\}\n/) || [''])[0];
+    const bc = {}; vm.createContext(bc); vm.runInContext(fn + ';this.anlageV = anlageV;', bc);
+    const r1 = JSON.parse(bc.anlageV({ _formular: { jahr: 2025, kennung: '2025AnlV101NET<b>', stand: 'September 2025', x: 1 }, _zeilen: { schuldzinsen: 48, 'BOESE KEY': 3, afa: 'x', notar_grundschuld: 51.5, av_garagen: '26' } }));
+    ok(r1._formular && r1._formular.jahr === 2025 && r1._formular.kennung === '2025AnlV101NETb' && r1._formular.stand === 'September 2025' && !('x' in r1._formular), 'H Backend: _formular angenommen, Text bereinigt, fremde Schluessel weg');
+    ok(r1._zeilen && r1._zeilen.schuldzinsen === 48 && r1._zeilen.av_garagen === 26 && Object.keys(r1._zeilen).length === 2, 'H Backend: _zeilen nur gueltige Feldnamen mit ganzzahliger Zeile');
+    const r2 = bc.anlageV({ _formular: { jahr: 2026, fehlt: true } });
+    ok(r2 && JSON.parse(r2)._formular.fehlt === true, 'H Backend: Jahr ohne Abschrift wird gespeichert (fehlt: true)');
+    const gross = {}; for (let i = 0; i < 300; i++) gross['f' + i] = 10;
+    ok(Object.keys(JSON.parse(bc.anlageV({ _zeilen: gross }))._zeilen).length <= 120 && bc.anlageV({ _formular: 'x', _zeilen: [1, 2] }) === null, 'H Backend: hoechstens 120 Zeilen, falsche Typen verworfen');
+  } catch (e) { ok(false, 'H Backend-Whitelist im Pruefstand: ' + e.message); }
+  ok(/AnlageVKern\.stempel\(t\.year, v\)/.test(Q.sto) && /return Object\.keys\(o\)\.length \? o : null;/.test(Q.sto), 'H storage.js stempelt jedes Steuerjahr beim Speichern');
+  /* index.html laedt jede Abschrift vor dem Kern */
+  for (const f of jahrDateien) ok(new RegExp('<script src="js/' + f.replace(/\./g, '\\.') + '\\?v=[^"]+"></script>').test(Q.idx) && Q.idx.indexOf('js/' + f) < Q.idx.indexOf('js/anlage-v-kern.js'), 'H index.html laedt ' + f + ' vor dem Kern');
   return rot - r0;
 }
 
 const Q = { kern: lies('frontend/js/anlage-v-kern.js'), tax: lies('frontend/js/tax.js'), dok: lies('frontend/js/dp-dokumente.js'),
-  wk: lies('frontend/js/werbungskosten-pdf.js'), idx: lies('frontend/index.html'), sto: lies('frontend/js/storage.js'), jahr: {} };
+  wk: lies('frontend/js/werbungskosten-pdf.js'), idx: lies('frontend/index.html'), sto: lies('frontend/js/storage.js'), jahr: {},
+  /* v3900 */ dg: lies('frontend/js/detailgrad.js'), css: lies('frontend/css/style.css'), zuo: lies('frontend/js/data/detailgrad-zuordnung.js'), svc: lies('backend/src/services/taxService.js') };
 console.log('Anlage V · Abschriften, Kern, Steuerrechnung, Verdrahtung');
 pruefen(Q);
 const echt = rot;
@@ -193,6 +317,14 @@ const gegen = [
   ['Kern: Ersatzjahr', Object.assign({}, Q, { kern: Q.kern.replace("return t && t.zeilen && t.felder ? t : null;", "return t && t.zeilen && t.felder ? t : window.AnlageV2025;") })],
   ['Abschrift: Garagen in falscher Zeile', Object.assign({}, Q, { jahr: { 'anlage-v-2025.js': lies('frontend/js/anlage-v-2025.js').replace("av_garagen:         { zeile: 26", "av_garagen:         { zeile: 99") } })],
   ['tax.js ohne anlage_v', Object.assign({}, Q, { tax: Q.tax.replace("einnahmen += _avW.ein;", "") })],
+  /* v3900 */
+  ['tax.js: Zeilen ohne Stufe', Object.assign({}, Q, { tax: Q.tax.split('<tr data-dg-stufe="\' + r.eff').join('<tr data-x="\' + r.eff') })],
+  ['tax.js: verborgene Zeile mit Betrag bleibt verborgen', Object.assign({}, Q, { tax: Q.tax.replace('} else if (r.f && !gedeckt[r.f] && eff > 1 && _wirkt(r.f))', '} else if (false)') })],
+  ['Kern: Stempel ohne fehlt', Object.assign({}, Q, { kern: Q.kern.replace('o._formular = { jahr: j, fehlt: true }; return o;', 'return o;') })],
+  ['Backend: _zeilen nicht in der Whitelist', Object.assign({}, Q, { svc: Q.svc.replace("k === '_zeilen'", "k === '_zeilenX'") })],
+  ['Abschrift 2023: Zeile doppelt', Object.assign({}, Q, { jahr: { 'anlage-v-2023.js': lies('frontend/js/anlage-v-2023.js').replace("    50: { text: 'Geldbeschaffungskosten", "    47: { text: 'Geldbeschaffungskosten") } })],
+  ['Abschrift 2022: Summenzeile fehlt', Object.assign({}, Q, { jahr: { 'anlage-v-2022.js': lies('frontend/js/anlage-v-2022.js').replace('sonder7b: 34,', 'sonder7b: 99,') } })],
+  ['detailgrad.js ohne data-dg-stufe', Object.assign({}, Q, { dg: Q.dg.replace("f.closest('[data-dg-stufe]')", 'null') })],
   ['Mappe mit fester Zeile 83', Object.assign({}, Q, { dok: Q.dok.replace("zl(R.summeWk.zeile, null, 'Summe der Werbungskosten'", "zl('83', null, 'Summe der Werbungskosten'") })],
 ];
 still = true;

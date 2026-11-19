@@ -2553,6 +2553,14 @@ function setTaxFormMode(m) {
   window._taxFormMode = m;
   renderYearlyTaxForm();
 }
+/* v3900 · Detailgrad gewechselt: die Hinweise „einzeln ab Detailgrad …" und „sonst ab …" haengen an der
+   gewaehlten Stufe - das Steuerformular neu aufbauen (die Zeilen selbst blendet style.css aus). */
+if (typeof window !== 'undefined' && typeof window.addEventListener === 'function' && !window._ytfDgHoerer) {
+  window._ytfDgHoerer = true;
+  window.addEventListener('dp:detailgrad', function () {
+    try { if (document.querySelector('#yearly-tax-form-box .ytf-detail-wrap')) renderYearlyTaxForm(); } catch (e) {}
+  });
+}
 
 function resetAllTaxOverrides() {
   if (!confirm('Alle manuellen Jahres-Eingaben zurücksetzen?')) return;
@@ -2564,7 +2572,7 @@ function resetAllTaxOverrides() {
 
 function _renderQuickForm(years) {
   var _corp = !!_dpBegriff().corp;   /* v3691 */
-  var html = '<div class="ytf-quick-wrap"><table class="ytf-table"><thead><tr>' +
+  var html = '<div class="ytf-quick-wrap" data-dg-stufe="1"><table class="ytf-table"><thead><tr>' +
     '<th>Jahr</th>' +
     '<th class="num">' + (_corp ? 'Betriebseinnahmen' : 'Einnahmen V+V') + '</th>' +
     '<th class="num">Schuldzinsen</th>' +
@@ -2634,7 +2642,7 @@ function _renderDetailForm(years) {
   var totals = _computeYearTotal(y.year, y.idx);
   var v = totals.values;
 
-  var html = '<div class="ytf-detail-wrap">' +
+  var html = '<div class="ytf-detail-wrap" data-dg-stufe="1">' +   /* v3900 · Karte ab Einsteiger, Zeilen je Stufe */
     '<div class="ytf-year-selector">' +
       '<label>' + (_dpBegriff().corp ? 'Geschäftsjahr' : 'Veranlagungsjahr') + ': </label>' +   /* v3691 */
       '<select onchange="window._detailYearIdx=parseInt(this.value);renderYearlyTaxForm()">';
@@ -2675,149 +2683,242 @@ function _renderDetailForm(years) {
     einnahmen_nk: 'Umlagefähige Nebenkosten (durchlaufender Posten). Werden automatisch aus Tab "Bewirtschaftung" übernommen.'
   };
 
-  // Group sections wie Excel-Steuerformular (Punkt 6)
-  var sections = [
-    {
-      title: '1.0 Finanzierungskosten',
-      rows: [
-        { f: 'schuldzinsen', l: 'Schuldzinsen' },
-        { f: 'kontofuehrung', l: 'Kontoführungsgebühren' },
-        { f: 'bereitstellung', l: 'Bereitstellungszinsen' },
-        { f: 'notar_grundschuld', l: 'Notar/Grundschuld (anteilig)' },
-        { f: 'vermittlung', l: 'Vermittlungsprovision Darlehen' },
-        { f: 'finanz_sonst', l: 'Sonstiges' }
-      ]
-    },
-    {
-      title: '2.0 Betriebskosten',
-      rows: [
-        { f: 'nk_n_umlf', l: 'Nicht-umlagefähige Nebenkosten' },
-        { f: 'betr_sonst', l: 'Sonstige Betriebskosten' }
-      ]
-    },
-    {
-      title: '3.0 Verwaltungskosten',
-      rows: [
-        { f: 'hausverwaltung', l: 'Hausverwaltung / Mietsonderverwaltung' },
-        { f: 'steuerber', l: 'Steuerberatung' },
-        { f: 'porto', l: 'Porto, Büromaterial' },
-        { f: 'verw_sonst', l: 'Sonstiges' }
-      ]
-    },
-    {
-      title: '4.0 Sonstige Kosten',
-      rows: [
-        { f: 'fahrtkosten', l: 'Fahrtkosten zur Immobilie' },
-        { f: 'verpflegung', l: 'Verpflegungsmehraufwand' },
-        { f: 'hotel', l: 'Übernachtungskosten' },
-        { f: 'inserat', l: 'Inseratskosten' },
-        { f: 'gericht', l: 'Gerichts-/Anwaltskosten' },
-        { f: 'telefon', l: 'Telefon/Internet' },
-        { f: 'sonst_kosten', l: 'Sonstiges' }   /* v3691 · Leerstand ist keine Ausgabe (Pruefbericht P-06) */
-      ]
-    },
-    {
-      title: '5.0 AfA Gebäude',
-      rows: [
-        /* v2948 · der Satz kommt aus dem Objekt (#afa_satz) - stand fest „linear 2%",
-           gemessen an Westerfeldstr. 140: 5.609 € bei 6,25 % (Marcel 25.10.2026) */
-        { f: 'afa', l: (function () {
-          var s = parseFloat(String((document.getElementById('afa_satz') || {}).value || '').replace(',', '.'));
-          return 'AfA-Betrag (linear ' + (s > 0 ? s.toLocaleString('de-DE', { maximumFractionDigits: 2 }) + ' %' : '') + ')';
-        })() }
-      ]
-    },
-    {
-      title: '6.0 AfA bewegliche Wirtschaftsgüter',
-      rows: [
-        { f: 'sonst_bewegl_wg', l: 'Bewegliche Wirtschaftsgüter (10 J.)' }
-      ]
-    },
-    {
-      title: '6.5 Anschaffungsnahe Herstellkosten / Erhaltungsaufwand (Punkt 6)',
-      rows: [
-        { f: 'anschaffungsnah', l: 'Anschaffungsnahe Herstellkosten (§6 EStG)' },
-        { f: 'erhaltungsaufwand', l: 'Erhaltungsaufwendungen (nach 3 J.)' }
-      ]
-    },
-    {
-      title: '7.0 Einnahmen (Punkt 9, 10: read-only - übernommen)',
-      rows: [
-        { f: 'einnahmen_km', l: 'Kaltmiete', readonly: true },
-        { f: 'einnahmen_nk', l: 'Nebenkosten (umlagefähig)', readonly: true }
-      ]
-    }
+  /* ═══ v3900 · STEUERFORMULAR NACH DEN BLOECKEN DER ANLAGE V, DREI DETAILGRAD-STUFEN ═══
+     Marcel 19.11.2026: „setz das für die Steuer so um, mach das genauso" (Vorschlag: Gliederung nach den
+     Bloecken der Anlage V statt der Abschnitte 1.0 bis 8.4, Stufe je Zeile). Gemessen vorher (v3820a):
+     - die ganze Karte erschien erst ab Experte: die Eingaben tragen keine id, und ein Feld ohne Zuordnung
+       ist in js/detailgrad.js Experte;
+     - Kontofuehrung stand unter „1.0 Finanzierung", gehoert aber zu den nicht umgelegten Kosten (Zeile 78
+       im Formular 2025), Bereitstellungszinsen dort zu den Schuldzinsen (48), Notar/Grundschuld,
+       Vermittlung und Sonstiges Finanzierung alle in Zeile 51; „2.0 Betriebskosten" und „3.0
+       Verwaltung" beide Zeile 78, Steuerberatung und Porto unter 3.0 landeten in Zeile 82, „4.0" sieben
+       Felder alle Zeile 82; §§ 7h/7i stand doppelt (AfA-Karte und av_7h7i unter 8.2).
+     NUR ANZEIGE: jedes data-field, jede tax_records-Spalte und jede av_*-Angabe bleibt, _computeYearTotal
+     ist unveraendert. Zusammenfassungen (Geldbeschaffung, Zeile 78, Sonstige Kosten) sind Anzeige-Summen.
+     STUFE je Zeile ueber data-dg-stufe (js/detailgrad.js, Regel in style.css).
+     KEINE STILLE VERWERFUNG: eine Zeile ueber der gewaehlten Stufe erscheint trotzdem, sobald sie in die
+     Rechnung eingeht (eigener abweichender Wert oder ein Betrag, der die Summen aendert) - ausser eine
+     sichtbare Summenzeile ihres Blocks zeigt den Betrag mit „einzeln ab Detailgrad …". Summenzeilen
+     erscheinen, sobald sie einen Betrag tragen.
+     ZEILENNUMMER nur aus der Abschrift DIESES Jahres (AnlageVKern.zeileFuer, seit v3800 streng je Jahr);
+     ohne Abschrift keine Nummer. Fruehere Hinweise zum Tooltip (v1222, v1222b, v3800) gelten weiter:
+     die Nummer steht auch unter dem Info-Zeichen, mit Kennzahl und Zeilentext. */
+  var _dgS = (window.DpDetailgrad && typeof DpDetailgrad.stufe === 'function') ? DpDetailgrad.stufe() : 3;
+  var _dgNamen = { 1: 'Einsteiger', 2: 'Fortgeschritten', 3: 'Experte' };
+  var _corpF = !!_dpBegriff().corp;
+  var _avK = window.AnlageVKern || null;
+  var _avT = (_avK && !_corpF) ? _avK.tabelle(y.year) : null;
+  var _FL = (_avK && _avK.FELDER) || {};
+  var _num = function (x) { var n = Number(x); return isFinite(n) ? n : 0; };
+  var _val = function (f) { return v[f] != null ? _num(v[f]) : _num(totals.auto[f]); };
+  var _eigen = function (f) {
+    var ov = _getYearOverride(y.year, f);
+    return ov !== undefined && ov !== null && ov !== '' && Math.abs(_num(ov) - _num(totals.auto[f])) > 0.005;
+  };
+  /* geht die Zeile in die Rechnung ein? Teile der Kaltmiete, Flaechen, Ankreuzfelder und Zurechnung aendern
+     die Summen nicht - sie zaehlen nur mit eigenem, abweichendem Wert. */
+  var _wirkt = function (f) {
+    if (_eigen(f)) return true;
+    var b = _val(f); if (Math.abs(b) < 0.005) return false;
+    var art = _FL[f] ? _FL[f].art : 'wk';
+    if (art === 'anteil_pct') return b > 0 && b < 100;
+    return ['wk', 'ein', 'ein_minus', 'kuerzung_pct', 'kuerzung_betrag'].indexOf(art) >= 0;
+  };
+  var _avL = function (f) {
+    var F = _FL[f]; if (!F) return f;
+    return F.l + (F.einheit && F.einheit !== '€' && F.l.indexOf('(' + F.einheit + ')') < 0 ? ' (' + F.einheit + ')' : '');   /* v3800e: Einheit nicht doppelt */
+  };
+  var _afaL = (function () {
+    /* v2948 · der Satz kommt aus dem Objekt (#afa_satz) - stand fest „linear 2%" (Westerfeldstr. 140: 6,25 %) */
+    var s = parseFloat(String((document.getElementById('afa_satz') || {}).value || '').replace(',', '.'));
+    return 'Gebäude-AfA (linear ' + (s > 0 ? s.toLocaleString('de-DE', { maximumFractionDigits: 2 }) + ' %' : '') + '), aus der AfA-Konfiguration';
+  })();
+  /* verbilligte Vermietung: Kuerzung ab Fortgeschritten nur, wenn die Miete unter 66 % der ortsueblichen liegt */
+  var _quoteUnter66 = false;
+  try { var _q66 = (typeof _mieteQuote66 === 'function') ? _mieteQuote66() : null; _quoteUnter66 = !!(_q66 && _q66.stand === 'ok' && _q66.quote < 66); } catch (_eQ) {}
+  var _erhVSumme = 0;
+  if (totals.erhV) Object.keys(totals.erhV).forEach(function (k) { _erhVSumme += _num(totals.erhV[k]); });
+
+  /* Zeilenarten: { f } Eingabe (ro: nur Anzeige, mit eigenem Wert doch Eingabe, damit er zurueckgesetzt
+     werden kann) · { sum: [Felder] } Anzeige-Summe · { anzeige } Auskunft ohne eigenes Feld.
+     st = ab welcher Stufe, davon = Teil der Summenzeile darueber. */
+  var bloecke = [
+    { k: 'A', titel: 'Einnahmen', zus: [(_avT && _avT.summen) ? _avT.summen.einnahmen : null], rows: [
+      { f: 'einnahmen_km', l: 'Mieteinnahmen (Kaltmiete), aus dem Reiter Miete', st: 1, ro: true },
+      { f: 'einnahmen_nk', l: 'Umlagen (umlagefähige Nebenkosten), aus der Bewirtschaftung', st: 1, ro: true },
+      { f: 'av_garagen', st: 2 },
+      { f: 'av_nk_nachzahlung', st: 2 },
+      { f: 'av_zuschuesse', st: 2 },
+      { f: 'av_andere_raeume', st: 3 },
+      { f: 'av_angehoerige', st: 3 },
+      { f: 'av_nk_angehoerige', st: 3 },
+      { f: 'av_nk_nachz_angeh', st: 3 },
+      { f: 'av_fruehere_mieten', st: 3 },
+      { f: 'av_ust_vereinnahmt', st: 3 },
+      { f: 'av_ust_erstattet', st: 3 },
+      { f: 'av_zuschuesse_eigen', st: 3 }
+    ] },
+    { k: 'B', titel: 'Abschreibungen', rows: [
+      { f: 'afa', l: _afaL, st: 1 },
+      { f: 'sonst_bewegl_wg', l: 'AfA bewegliche Wirtschaftsgüter (z. B. Einbauküche, Möbel)', st: 2 },
+      { f: 'anschaffungsnah', l: 'Anschaffungsnahe Herstellungskosten (§ 6 Abs. 1 Nr. 1a EStG), wirken über die AfA', st: 2 },
+      { anzeige: 'afa7b', l: 'davon Sonderabschreibung § 7b EStG (in der Gebäude-AfA enthalten)', st: 3, davon: true,
+        wert: _num(totals.afaSonder7b), nur: _num(totals.afaSonder7b) > 0.005, zeile: (_avT && _avT.summen) ? _avT.summen.sonder7b : null },
+      { f: 'av_7h7i', l: (_FL.av_7h7i ? _FL.av_7h7i.l : 'Erhöhte Absetzungen §§ 7h, 7i EStG') + ', Eingabe in der AfA-Konfiguration', st: 3, ro: true }
+    ] },
+    { k: 'C', titel: 'Finanzierung', rows: [
+      { f: 'schuldzinsen', l: 'Schuldzinsen laut Tilgungsplan', st: 1 },
+      { f: 'bereitstellung', l: 'Bereitstellungszinsen (gehören zu den Schuldzinsen)', st: 2 },
+      { sum: ['notar_grundschuld', 'vermittlung', 'finanz_sonst'], zf: 'notar_grundschuld', l: 'Geldbeschaffungskosten (Notar und Grundbuch der Grundschuld, Vermittlung, Schätzung)', st: 2 },
+      { f: 'notar_grundschuld', l: 'davon Notar und Grundbuch für die Grundschuld (anteilig)', st: 3, davon: true },
+      { f: 'vermittlung', l: 'davon Vermittlungsprovision für das Darlehen', st: 3, davon: true },
+      { f: 'finanz_sonst', l: 'davon sonstige Geldbeschaffungskosten (z. B. Wertgutachten für die Bank)', st: 3, davon: true },
+      { f: 'av_renten', st: 3 }
+    ] },
+    { k: 'D', titel: 'Erhaltungsaufwand', rows: [
+      { f: 'erhaltungsaufwand', l: 'Erhaltungsaufwand des Jahres (Reparaturen, Instandhaltung)', st: 1 },
+      { anzeige: 'erhV', l: 'davon auf 2 bis 5 Jahre verteilt (§ 82b EStDV), Anteil dieses Jahres' + (totals.erhG ? ', Gesamtaufwand des Jahres ' + Math.round(_num(totals.erhG)).toLocaleString('de-DE') + ' €' : '') + '. Die Verteilung wählst du im Reiter Kaufpreis und Investition.',
+        st: 2, davon: true, wert: _erhVSumme, nur: _erhVSumme > 0.005 || _num(totals.erhG) > 0.005, zeile: (_avT && _avT.summen) ? _avT.summen.erh_verteilt_jahr : null },
+      { f: 'av_erh_m1', l: 'Verteilte Erhaltungsaufwendungen aus ' + (y.year - 1) + ' (nicht in DealPilot erfasst)', st: 3 },
+      { f: 'av_erh_m2', l: 'Verteilte Erhaltungsaufwendungen aus ' + (y.year - 2) + ' (nicht in DealPilot erfasst)', st: 3 },
+      { f: 'av_erh_m3', l: 'Verteilte Erhaltungsaufwendungen aus ' + (y.year - 3) + ' (nicht in DealPilot erfasst)', st: 3 },
+      { f: 'av_erh_m4', l: 'Verteilte Erhaltungsaufwendungen aus ' + (y.year - 4) + ' (nicht in DealPilot erfasst)', st: 3 }
+    ] },
+    { k: 'E', titel: 'Laufende Kosten', rows: [
+      { f: 'nk_umlf', l: 'Umgelegte Kosten (gleich den Umlagen, heben sich mit ihnen auf)', st: 1, ro: true },
+      { sum: ['nk_n_umlf', 'hausverwaltung', 'kontofuehrung', 'betr_sonst', 'verw_sonst'], zf: 'hausverwaltung', l: 'Nicht umgelegte Kosten und Verwaltung (Hausgeld nicht umlagefähig, Verwaltung, Kontoführung)', st: 1 },
+      { f: 'nk_n_umlf', l: 'davon nicht umlagefähige Nebenkosten (Hausgeld)', st: 2, davon: true },
+      { f: 'hausverwaltung', l: 'davon Hausverwaltung, Mietsonderverwaltung', st: 2, davon: true },
+      { f: 'kontofuehrung', l: 'davon Kontoführung (Konto nur für die Immobilie)', st: 2, davon: true },
+      { f: 'betr_sonst', l: 'davon sonstige Betriebskosten', st: 3, davon: true },
+      { f: 'verw_sonst', l: 'davon sonstige Verwaltungskosten', st: 3, davon: true },
+      { f: 'av_ust_gezahlt', st: 3 },
+      { sum: ['steuerber', 'fahrtkosten', 'sonst_kosten', 'porto', 'inserat', 'gericht', 'telefon', 'hotel', 'verpflegung'], zf: 'sonst_kosten', l: 'Sonstige Kosten gesamt', st: 2 },
+      { f: 'steuerber', l: 'davon Steuerberatung (Anteil für die Vermietung)', st: 2, davon: true },
+      { f: 'fahrtkosten', l: 'davon Fahrtkosten zur Immobilie', st: 2, davon: true },
+      { f: 'sonst_kosten', l: 'davon sonstige Werbungskosten (Sammelposten)', st: 2, davon: true },
+      { f: 'porto', l: 'davon Porto, Büromaterial', st: 3, davon: true },
+      { f: 'inserat', l: 'davon Inserate', st: 3, davon: true },
+      { f: 'gericht', l: 'davon Gerichts- und Anwaltskosten', st: 3, davon: true },
+      { f: 'telefon', l: 'davon Telefon und Internet (Anteil)', st: 3, davon: true },
+      { f: 'hotel', l: 'davon Übernachtungskosten', st: 3, davon: true },
+      { f: 'verpflegung', l: 'davon Verpflegungsmehraufwand', st: 3, davon: true }
+    ] },
+    { k: 'F', titel: 'Angaben zum Objekt', rows: [
+      { f: 'av_kuerzung_pct', st: _quoteUnter66 ? 2 : 3 },
+      { f: 'av_kuerzung_betrag', st: _quoteUnter66 ? 2 : 3 },
+      { f: 'av_fewo', st: 3 },
+      { f: 'av_kurzfristig', st: 3 },
+      { f: 'av_angeh_flag', st: 3 },
+      { f: 'av_nk_nicht_vereinbart', st: 3 },
+      { f: 'av_wohnflaeche', st: 3 },
+      { f: 'av_eigen_qm', st: 3 },
+      { f: 'av_anteil_pct', st: 3 },
+      { f: 'av_zurechnung_a_pct', st: 3 },
+      { f: 'av_vorsteuer', st: 3 },
+      { f: 'av_zuschuss_ahk', st: 3 }
+    ] }
   ];
-  /* v3800 · Marcel 19.11.2026: alles, was die Anlage V abfragt, muss eingebbar sein. Die Angaben und ihre
-     Wirkung stehen in js/anlage-v-kern.js, die Zeile des Jahres im Tooltip. Nur Privatvermoegen. */
-  if (window.AnlageVKern && !_dpBegriff().corp) {
-    var _avG = function (arten) { return AnlageVKern.SCHLUESSEL.filter(function (k) { return arten.indexOf(AnlageVKern.FELDER[k].art) >= 0; })
-      .map(function (k) { helpTexts[k] = AnlageVKern.FELDER[k].hilfe || ''; return { f: k, l: AnlageVKern.FELDER[k].l + (AnlageVKern.FELDER[k].einheit && AnlageVKern.FELDER[k].einheit !== '€' && AnlageVKern.FELDER[k].l.indexOf('(' + AnlageVKern.FELDER[k].einheit + ')') < 0 ? ' (' + AnlageVKern.FELDER[k].einheit + ')' : '') }; }); };   /* v3800e: Einheit nicht doppelt */
-    sections.push({ title: '8.0 Anlage V · weitere Einnahmen (ändern die Summe)', rows: _avG(['ein', 'ein_minus']) });
-    sections.push({ title: '8.1 Anlage V · Teile der Einnahmen (eigene Zeile, Summe bleibt)', rows: _avG(['davon_km', 'davon_nk']) });
-    sections.push({ title: '8.2 Anlage V · weitere Werbungskosten', rows: _avG(['wk']) });
-    sections.push({ title: '8.3 Anlage V · Angaben ohne Wirkung auf die Summe, verbilligte Vermietung', rows: _avG(['info', 'kuerzung_pct', 'kuerzung_betrag']) });
-    /* v3800b · Zuordnungsart, Zurechnung, Ankreuzfelder */
-    sections.push({ title: '8.4 Anlage V · Zuordnung, Zurechnung, Ankreuzfelder', rows: _avG(['anteil_pct', 'zurechnung', 'flag']) });
-  }
+  /* Privatvermoegen: die Angaben der Anlage V (av_*) nur mit dem Kern und nicht fuer eine Gesellschaft (wie v3800) */
+  bloecke.forEach(function (b) {
+    b.rows = b.rows.filter(function (r) {
+      if (r.f && r.f.indexOf('av_') === 0) return !!_avK && !_corpF && !!_FL[r.f];
+      if (r.anzeige === 'afa7b' || r.anzeige === 'erhV') return r.nur;
+      return true;
+    });
+    b.rows.forEach(function (r) { if (r.f && !r.l) r.l = _avL(r.f); if (r.f && _FL[r.f]) helpTexts[r.f] = _FL[r.f].hilfe || ''; });
+  });
+  if (window._ytfBloeckeTest) window._ytfBloeckeTest(bloecke);   /* nur Pruefstand (tools/anlage-v-pruefen.mjs) */
 
-  sections.forEach(function(sec) {
-    html += '<div class="ytf-section"><div class="ytf-section-title">' + sec.title + '</div>' +
+  /* Tooltip: Erklaerung des Postens und darunter die Zeile der Anlage V DIESES Jahres (v1222, v3800 streng) */
+  var _hilfe = function (f) {
+    var help = helpTexts[f] || '';
+    var _avZ = (_avK && !_corpF) ? _avK.zeileFuer(y.year, f) : null;
+    if (_avZ) {
+      var _herkunft = (_avZ.quelle === 'formular') ? 'Wörtlich aus dem Formular übernommen.'
+          : (_avZ.quelle === 'auffang') ? 'Steht in keiner spezielleren Zeile, das Formular führt dafür „Sonstige Kosten".'
+          : (_avZ.quelle === 'sachlogik') ? 'Zuordnung aus der Art des Aufwands, nicht aus dem Formulartext. Bitte prüfen.' : '';
+      help += (help ? '\n\n' : '') + '── ANLAGE V ' + y.year + ' ──\n'
+        + 'Zeile ' + _avZ.zeile + (_avZ.kz ? '  ·  Kennzahl ' + _avZ.kz : '') + '\n'
+        + (_avZ.text ? _avZ.text + '\n' : '') + (_avZ.grund ? '\n' + _avZ.grund + '\n' : '') + (_herkunft ? '\n' + _herkunft : '');
+    } else if (_avK && !_corpF && !_avK.tabelle(y.year) && f !== 'einnahmen_km' && f !== 'einnahmen_nk') {
+      help += (help ? '\n\n' : '') + '── ANLAGE V ' + y.year + ' ──\nDer amtliche Vordruck ' + y.year + ' ist in DealPilot noch nicht abgeschrieben. '
+        + 'Die Zeilennummer erscheint, sobald er vorliegt. Zeilennummern ändern sich je Veranlagungsjahr.';
+    }
+    return help ? ' <span class="ytf-help" title="' + help.replace(/"/g, '&quot;') + '">ℹ</span>' : '';
+  };
+  var _zNr = function (r) {
+    if (!_avT) return null;
+    if (r.zeile != null) return { zeile: r.zeile, kz: (_avT.zeilen[r.zeile] || {}).kz || null };
+    if (r.sum) {
+      /* eine Summe kann im Vordruck eines Jahres auf mehrere Zeilen fallen (vor 2023: Verwaltung 48, Sonstiges 50) */
+      var nrs = [];
+      r.sum.forEach(function (sf) { var sz = _avK.zeileFuer(y.year, sf); if (sz && nrs.indexOf(sz.zeile) < 0) nrs.push(sz.zeile); });
+      nrs.sort(function (a, b) { return a - b; });
+      if (nrs.length > 1) return { zeile: nrs.join(', '), kz: null, alle: nrs };
+      if (nrs.length === 1) { var z1 = _avK.zeileFuer(y.year, r.zf || r.sum[0]); return { zeile: nrs[0], kz: z1 && z1.zeile === nrs[0] ? z1.kz : (_avT.zeilen[nrs[0]] || {}).kz || null }; }
+      return null;
+    }
+    var f = r.f || r.zf; if (!f) return null;
+    var z = _avK.zeileFuer(y.year, f);
+    return z ? { zeile: z.zeile, kz: z.kz } : null;
+  };
+  var _pille = function (r) {
+    var z = _zNr(r); if (!z) return '';
+    return ' <span class="ytf-zeile" title="Anlage V ' + y.year + (z.alle ? ', Zeilen ' : ', Zeile ') + z.zeile + (z.kz ? ', Kennzahl ' + z.kz : '') + '">Z. ' + z.zeile + '</span>';
+  };
+  var _anz = function (wert, f) {
+    var e = (f && _FL[f] && _FL[f].einheit) || '€';
+    if (e === '€') return _ytfReadonlyValue(wert);
+    return '<div class="ytf-readonly" title="Wird automatisch übernommen">' + (Math.round(_num(wert) * 100) / 100).toLocaleString('de-DE') + ' ' + e + '</div>';
+  };
+
+  bloecke.forEach(function (b) {
+    if (!b.rows.length) return;
+    /* gedeckt: ein Feld, das eine Summenzeile desselben Blocks mitzaehlt - es erscheint nie einzeln
+       vor seiner Stufe, die Summe zeigt den Betrag */
+    var gedeckt = {};
+    b.rows.forEach(function (r) { if (r.sum) r.sum.forEach(function (f) { gedeckt[f] = r; }); });
+    b.rows.forEach(function (r) {
+      var eff = r.st, sichtbarWeil = false;
+      if (r.sum) {
+        if (eff > 1 && r.sum.some(function (f) { return _wirkt(f); })) { eff = 1; sichtbarWeil = r.st > _dgS; }
+      } else if (r.f && !gedeckt[r.f] && eff > 1 && _wirkt(r.f)) { eff = 1; sichtbarWeil = r.st > _dgS; }
+      r.eff = eff; r.sichtbarWeil = sichtbarWeil;
+    });
+    var minEff = Math.min.apply(null, b.rows.map(function (r) { return r.eff; }));
+    var zeilen = [];
+    b.rows.forEach(function (r) { var z = _zNr(r); if (z) zeilen = zeilen.concat(z.alle || [z.zeile]); });
+    (b.zus || []).forEach(function (z) { if (z != null) zeilen.push(z); });
+    var bereich = (_avT && zeilen.length) ? ' <span class="ytf-block-zeilen">Anlage V ' + y.year + ', Zeilen ' + Math.min.apply(null, zeilen) + ' bis ' + Math.max.apply(null, zeilen) + '</span>' : '';
+    html += '<div class="ytf-section" data-ytf-block="' + b.k + '" data-dg-stufe="' + minEff + '"><div class="ytf-section-title">' + b.k + ' · ' + b.titel + bereich + '</div>' +
       '<table class="ytf-section-table"><tbody>';
-    sec.rows.forEach(function(r) {
-      var auto = totals.auto[r.f] || 0;
-      var val = v[r.f] != null ? v[r.f] : auto;
-      var help = helpTexts[r.f] || '';
-      /* v1222 · DIE ANLAGE-V-ZEILE GEHÖRT IN DIE INFO, NICHT DANEBEN.
-         Marcel: „prüfe das kleine Info-Teil ob dort auch beschreibungen drin
-         stehen und erklärungen und setze die Zeile mit unter das Info-Feld."
-         Er hat recht — dort steht bereits die fachliche Erklärung zu jedem
-         Posten. Eine zweite Pille daneben hätte dieselbe Sache an zwei Orten
-         erzählt; die Zeilennummer ist eine weitere Angabe ZU DIESEM Posten,
-         also gehört sie unter die vorhandene Erklärung.
-
-         Die Zuordnung ist JAHRESABHÄNGIG — sie kommt aus window.AnlageV<Jahr>,
-         der Abschrift des Formulars für genau dieses Jahr. Gibt es dafür keine
-         Datei, steht keine Zeile dort: lieber keine Nummer als die eines
-         anderen Jahres. */
-      /* v1222b · RÜCKFALL AUF DAS JÜNGSTE VERFÜGBARE JAHR — nur hier, nicht im PDF.
-         Gemessen: das Steuerformular rendert die Jahre ab 2026 (State.cfRows),
-         die Abschrift gibt es für 2025. Nach der strengen Regel erschien
-         deshalb NIE eine Zeilennummer — richtig gebaut und trotzdem nutzlos.
-         Die Anlage V 2026 ist Anfang September 2026 noch nicht veröffentlicht;
-         Marcel kann sie also gar nicht liefern.
-
-         Der Tooltip ist eine ARBEITSHILFE IM PROGRAMM, das PDF eine Unterlage,
-         die jemand weiterreicht. Deshalb hier der Rückfall mit deutlichem
-         Hinweis, im PDF weiterhin die strenge Regel: dort erscheint ohne
-         passende Abschrift gar keine Anlage-V-Seite. Eine Orientierung mit
-         Vorbehalt hilft beim Arbeiten; eine Zahl ohne Vorbehalt in einem
-         Dokument, das ans Finanzamt geht, hilft niemandem. */
-      /* v3800 · STRENG: nur die Abschrift DIESES Jahres (js/anlage-v-kern.js). Bis v3800 nahm der Tooltip
-         fuer 2026 ff. die Nummern von 2025 - fuer 2026 sind das alte Nummern (Kanzlei 19.11.2026). */
-      var _avZ = window.AnlageVKern ? AnlageVKern.zeileFuer(y.year, r.f) : null;
-      if (_avZ) {
-        var _herkunft = (_avZ.quelle === 'formular') ? 'Wörtlich aus dem Formular übernommen.'
-            : (_avZ.quelle === 'auffang') ? 'Steht in keiner spezielleren Zeile — das Formular führt dafür „Sonstige Kosten".'
-            : (_avZ.quelle === 'sachlogik') ? 'Zuordnung aus der Art des Aufwands, nicht aus dem Formulartext — bitte prüfen.' : '';
-        help += (help ? '\n\n' : '') + '── ANLAGE V ' + y.year + ' ──\n'
-          + 'Zeile ' + _avZ.zeile + (_avZ.kz ? '  ·  Kennzahl ' + _avZ.kz : '') + '\n'
-          + (_avZ.text ? _avZ.text + '\n' : '') + (_avZ.grund ? '\n' + _avZ.grund + '\n' : '') + (_herkunft ? '\n' + _herkunft : '');
-      } else if (window.AnlageVKern && !AnlageVKern.tabelle(y.year) && r.f !== 'einnahmen_km' && r.f !== 'einnahmen_nk') {
-        help += (help ? '\n\n' : '') + '── ANLAGE V ' + y.year + ' ──\nDer amtliche Vordruck ' + y.year + ' ist in DealPilot noch nicht abgeschrieben. '
-          + 'Die Zeilennummer erscheint, sobald er vorliegt — Zeilennummern ändern sich je Veranlagungsjahr.';
+    b.rows.forEach(function (r) {
+      var label = r.l, zelle;
+      if (r.sum) {
+        var summe = 0, verborgen = 0, mitBetrag = 0, abSt = 3, abBetrag = 3;
+        r.sum.forEach(function (f) {
+          summe += _val(f);
+          var t = null; b.rows.forEach(function (x) { if (x.f === f) t = x; });
+          if (t && t.st > _dgS) { verborgen++; abSt = Math.min(abSt, t.st); if (Math.abs(_val(f)) > 0.005) { mitBetrag++; abBetrag = Math.min(abBetrag, t.st); } }
+        });
+        label = '<b>' + r.l + '</b>' + _pille(r);
+        if (verborgen) label += ' <span class="ytf-sum-hint">' + (mitBetrag ? '+' + mitBetrag + (mitBetrag === 1 ? ' Angabe' : ' Angaben') + ' mit Betrag, einzeln ab Detailgrad ' + _dgNamen[abBetrag] : 'einzeln ab Detailgrad ' + _dgNamen[abSt]) + '</span>';
+        zelle = '<div class="ytf-readonly ytf-summe" title="Summe der Einzelposten">' + Math.round(summe).toLocaleString('de-DE') + ' €</div>';
+      } else if (r.anzeige) {
+        label = r.l + _pille(r);
+        zelle = _ytfReadonlyValue(r.wert);
+      } else {
+        var auto = totals.auto[r.f] || 0;
+        var val = v[r.f] != null ? v[r.f] : auto;
+        label = r.l + _pille(r) + _hilfe(r.f);
+        zelle = (r.ro && _getYearOverride(y.year, r.f) === undefined) ? _anz(val, r.f) : _ytfDetailInput(y.year, r.f, val, auto);
       }
-      var labelHtml = r.l;
-      if (help) {
-        labelHtml += ' <span class="ytf-help" title="' + help.replace(/"/g, '&quot;') + '">ℹ</span>';
-      }
-      html += '<tr><td class="ytf-section-label">' + labelHtml + '</td>' +
-        '<td class="num">' +
-          (r.readonly ? _ytfReadonlyValue(val) : _ytfDetailInput(y.year, r.f, val, auto)) +
-        '</td>' +
-        '<td class="ytf-bemerkung-cell">' +
-          _ytfBemerkungInput(y.year, r.f) +
-        '</td></tr>';
+      if (r.sichtbarWeil && !r.sum) label += ' <span class="ytf-dg-note">sonst ab Detailgrad ' + _dgNamen[r.st] + ', hier sichtbar, weil der Betrag in die Rechnung eingeht</span>';
+      html += '<tr data-dg-stufe="' + r.eff + '"' + (r.f ? ' data-ytf-feld="' + r.f + '"' : '') + (r.davon ? ' class="ytf-davon"' : (r.sum ? ' class="ytf-zwischensumme"' : '')) + '>' +
+        '<td class="ytf-section-label">' + label + '</td>' +
+        '<td class="num">' + zelle + '</td>' +
+        '<td class="ytf-bemerkung-cell">' + (r.f ? _ytfBemerkungInput(y.year, r.f) : '') + '</td></tr>';
     });
     html += '</tbody></table></div>';
   });

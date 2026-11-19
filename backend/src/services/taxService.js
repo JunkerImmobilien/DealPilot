@@ -31,6 +31,21 @@ function anlageV(o) {
       if (v.art === '7h' || v.art === '7i') out._av7h = { art: v.art, satz: safeNumeric(v.satz) || 0, basis: safeNumeric(v.basis) || 0 };
     } else if (k === '_vb' && typeof v === 'string') {
       out._vb = v.replace(/[<>]/g, '').slice(0, 600);
+    } else if (k === '_formular' && v && typeof v === 'object' && !Array.isArray(v)) {
+      /* v3900 · Stempel: nach welchem Vordruck die Zeilen gelten (js/anlage-v-kern.js stempel) */
+      const j = safeNumeric(v.jahr);
+      if (j && j > 1990 && j < 2200) {
+        if (v.fehlt === true) out._formular = { jahr: Math.round(j), fehlt: true };
+        else out._formular = { jahr: Math.round(j), kennung: String(v.kennung == null ? '' : v.kennung).replace(/[<>]/g, '').slice(0, 80), stand: String(v.stand == null ? '' : v.stand).replace(/[<>]/g, '').slice(0, 40) };
+      }
+    } else if (k === '_zeilen' && v && typeof v === 'object' && !Array.isArray(v)) {
+      /* v3900 · Zeile je Feld mit Betrag: Schluessel wie die Felder, Wert eine Zeilennummer, hoechstens 120 */
+      const e = {};
+      for (const [f, z] of Object.entries(v).slice(0, 120)) {
+        const n = safeNumeric(z);
+        if (/^[a-z][a-z0-9_]{0,40}$/.test(f) && n !== null && Number.isInteger(n) && n > 0 && n < 1000) e[f] = n;
+      }
+      if (Object.keys(e).length) out._zeilen = e;
     } else if (k === '_erhV' && v && typeof v === 'object') {
       const e = {};
       for (const [j, b] of Object.entries(v)) { const n = safeNumeric(b); if (/^\d{4}$/.test(j) && n) e[j] = n; }

@@ -342,7 +342,8 @@
       push(R.info, zeile(f), name(f).replace(/ \(1 = Ja.*\)$/, '') + ': ' + (b === 1 ? '1 = Ja' : '2 = Nein'), null, { feld: f, text_nur: true });
     });
     if (zahl(v.av_fewo) === 1 || zahl(v.av_kurzfristig) === 1) R.hinweise.push('Ferienwohnung oder kurzfristige Vermietung: zusätzlich ist die Anlage V-FeWo abzugeben. DealPilot führt sie nicht.');
-    if (!nk && zahl(v.av_nk_nicht_vereinbart) !== 1 && km > 0) R.hinweise.push('Es sind keine Umlagen erfasst. Sind mit den Mietern keine Nebenkosten gesondert vereinbart (Inklusivmiete), gehört in Zeile ' + (zeile('av_nk_nicht_vereinbart') || '') + ' eine 1.');
+    /* v3900 · Vordrucke vor 2023 haben das Ankreuzfeld nicht (zeile null): dann kein Hinweis */
+    if (!nk && zahl(v.av_nk_nicht_vereinbart) !== 1 && km > 0 && zeile('av_nk_nicht_vereinbart') != null) R.hinweise.push('Es sind keine Umlagen erfasst. Sind mit den Mietern keine Nebenkosten gesondert vereinbart (Inklusivmiete), gehört in Zeile ' + (zeile('av_nk_nicht_vereinbart') || '') + ' eine 1.');
     ['av_wohnflaeche', 'av_eigen_qm', 'av_anteil_pct', 'av_vorsteuer', 'av_zuschuss_ahk', 'av_kuerzung_pct', 'av_kuerzung_betrag'].forEach(function (f) {
       var b = zahl(v[f]); if (!b) return;
       if (f === 'av_anteil_pct' && b >= 100) return;
@@ -350,7 +351,10 @@
     });
     R.info.sort(function (a, b) { return a.zeile - b.zeile; });
     var kuerzung = zahl(tot.werbungskosten) * Math.max(0, Math.min(100, zahl(v.av_kuerzung_pct))) / 100 + Math.max(0, zahl(v.av_kuerzung_betrag));
-    if (kuerzung > 0.005) R.kuerzung = { betrag: kuerzung, text: 'Kürzung der Werbungskosten wegen verbilligter Vermietung: ' + eur(kuerzung) + '. Im Formular stehen die Werbungskosten in voller Höhe, die Kürzung nimmt das Finanzamt aus der Angabe in Zeile ' + [zeile('av_kuerzung_pct'), zeile('av_kuerzung_betrag')].filter(function (x) { return x != null; }).join(' oder ') + ' vor (§ 21 Abs. 2 EStG). DealPilot rechnet die Steuerwirkung bereits mit der Kürzung.' };
+    /* v3900 · Vordrucke vor 2023 haben keine Zeile fuer die Kuerzung (Anleitung: Werbungskosten nur mit dem entgeltlichen Teil, Spalte 3) */
+    var _kzZ = [zeile('av_kuerzung_pct'), zeile('av_kuerzung_betrag')].filter(function (x) { return x != null; });
+    if (kuerzung > 0.005 && !_kzZ.length) R.kuerzung = { betrag: kuerzung, text: 'Kürzung der Werbungskosten wegen verbilligter Vermietung: ' + eur(kuerzung) + '. Der Vordruck ' + jahr + ' hat dafür keine eigene Zeile: dort gehören die Werbungskosten nur mit dem entgeltlichen Teil in die Zeilen (verhältnismäßig ermittelt, Prozentsatz in Spalte 3). Die Zeilen auf diesem Blatt stehen in voller Höhe. DealPilot rechnet die Steuerwirkung bereits mit der Kürzung.' };
+    else if (kuerzung > 0.005) R.kuerzung = { betrag: kuerzung, text: 'Kürzung der Werbungskosten wegen verbilligter Vermietung: ' + eur(kuerzung) + '. Im Formular stehen die Werbungskosten in voller Höhe, die Kürzung nimmt das Finanzamt aus der Angabe in Zeile ' + [zeile('av_kuerzung_pct'), zeile('av_kuerzung_betrag')].filter(function (x) { return x != null; }).join(' oder ') + ' vor (§ 21 Abs. 2 EStG). DealPilot rechnet die Steuerwirkung bereits mit der Kürzung.' };
     if (tot.verbilligt && tot.verbilligt.grund) R.hinweise.push(tot.verbilligt.grund);
     /* Zeile 86: Zurechnung Person A / Person B */
     if (S.zurechnung != null) {
@@ -377,5 +381,25 @@
     return { zeile: a.zeile, kz: z.kz || null, text: z.text || '', quelle: a.quelle || null, grund: a.grund || null, formular: T.formular };
   }
 
-  window.AnlageVKern = { FELDER: FELDER, SCHLUESSEL: SCHLUESSEL, tabelle: tabelle, jahre: jahre, wirkung: wirkung, auszug: auszug, aufstellung: aufstellung, zeileFuer: zeileFuer, anteil: anteil, sieben: sieben, verbilligt: verbilligt };
+  /** v3900 · Stempel fuer den gespeicherten Steuersatz (tax_records.anlage_v): nach welchem Vordruck die
+      Zeilen gelten, damit ein spaeter gelesener Satz weiss, welche Nummern beim Speichern galten - auch wenn
+      dann eine neue Abschrift vorliegt. Mit Abschrift des Jahres:
+        { _formular: { jahr, kennung, stand }, _zeilen: { feld: zeile } }  (nur Felder mit Betrag)
+      ohne: { _formular: { jahr, fehlt: true } } und keine Zeilen (streng je Jahr, kein Ersatzjahr).
+      werte: die Werte des Jahres (values aus _computeYearTotal, auch _afaSonder7b). */
+  function stempel(jahr, werte) {
+    var j = Math.round(zahl(jahr)), T = tabelle(j), o = {};
+    if (!T) { o._formular = { jahr: j, fehlt: true }; return o; }
+    o._formular = { jahr: j, kennung: String(T.formular || '').slice(0, 80), stand: String(T.stand || '').slice(0, 40) };
+    var z = {}; werte = werte || {};
+    Object.keys(T.felder).forEach(function (f) {
+      var a = T.felder[f]; if (!a || a.zeile == null || /^_/.test(f)) return;
+      if (zahl(werte[f]) !== 0) z[f] = a.zeile;
+    });
+    if (zahl(werte._afaSonder7b) > 0 && T.summen && T.summen.sonder7b != null) z.afa_7b = T.summen.sonder7b;
+    if (Object.keys(z).length) o._zeilen = z;
+    return o;
+  }
+
+  window.AnlageVKern = { FELDER: FELDER, SCHLUESSEL: SCHLUESSEL, tabelle: tabelle, jahre: jahre, wirkung: wirkung, auszug: auszug, aufstellung: aufstellung, zeileFuer: zeileFuer, anteil: anteil, sieben: sieben, verbilligt: verbilligt, stempel: stempel };
 })();
