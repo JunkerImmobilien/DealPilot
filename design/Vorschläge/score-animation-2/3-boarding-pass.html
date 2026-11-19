@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Boarding-Pass reißt</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" media="print" onload="this.media='all'">
+<link rel="stylesheet" href="basis.css">
+<style>
+  .perf{position:absolute;z-index:7;pointer-events:none;width:0;border-left:2px dashed rgba(201,168,76,.9);
+    filter:drop-shadow(0 0 4px rgba(232,204,122,.9))}
+  .kerbe{position:absolute;z-index:7;width:16px;height:16px;border-radius:50%;background:var(--ob);pointer-events:none}
+  .zs-karte.pass{backface-visibility:hidden}
+</style>
+</head>
+<body>
+<script src="basis.js"></script>
+<script>
+/* Variante 3 · Boarding-Pass reißt
+   Die Hero-Karte ist ein Boarding-Pass. Mitten hindurch stanzt sich eine zweite Perforation,
+   der Pass reißt an ihr entlang, jede Hälfte schlägt wie eine Seite um und wird zu einem eigenen
+   Pass mit Band, Abriss und Anteil. Das Gesamturteil läuft wie aus dem Ticketdrucker heraus. */
+SA2.start({
+  nr: 'Variante 3', titel: 'Boarding-Pass reißt',
+  text: 'Eine Perforation stanzt sich durch den Pass, er reißt, und jede Hälfte schlägt um zu einem eigenen Pass: Investment-Score und Finanzierungs-Score, jeder mit Anteil am Gesamtscore.',
+  zielOpt: { pass: true },
+  ablauf: async function (c, s) {
+    await SA2.heroEinlauf(c, s);
+    await SA2.schweben(c, s, 2600);
+    var b = s.b, R = SA2.rel(s.karte, b), mx = R.x + R.w / 2;
+
+    /* 1 · Kerben oben und unten, Perforation stanzt sich von oben nach unten */
+    var k1 = document.createElement('i'), k2 = document.createElement('i'), pf = document.createElement('i');
+    k1.className = k2.className = 'kerbe'; pf.className = 'perf';
+    k1.style.cssText = 'left:' + (mx - 8) + 'px;top:' + (R.y - 8) + 'px';
+    k2.style.cssText = 'left:' + (mx - 8) + 'px;top:' + (R.y + R.h - 8) + 'px';
+    pf.style.cssText = 'left:' + (mx - 1) + 'px;top:' + (R.y + 10) + 'px;height:' + (R.h - 20) + 'px;transform-origin:50% 0';
+    b.append(k1, k2, pf);
+    await Promise.all([
+      c.anim(k1, [{ transform: 'scale(0)' }, { transform: 'scale(1)' }], { duration: 300, easing: 'cubic-bezier(.3,1.6,.5,1)' }),
+      c.anim(k2, [{ transform: 'scale(0)' }, { transform: 'scale(1)' }], { duration: 300, delay: 120, easing: 'cubic-bezier(.3,1.6,.5,1)' }),
+      c.anim(pf, [{ transform: 'scaleY(0)' }, { transform: 'scaleY(1)' }], { duration: 650, easing: 'steps(14,end)' })
+    ]);
+    await c.warte(200);
+
+    /* 2 · Der Pass reißt entlang der Perforation: feine Papierzacken, die Hälften knicken weg */
+    var hs = SA2.spalte(s.h, b, SA2.zickzack(34, .5, .006, 21));
+    s.h.style.visibility = 'hidden';
+    hs.pfade.forEach(function (p) { p.style.strokeDashoffset = 0; p.setAttribute('stroke', '#fffaf0'); });
+    pf.remove();
+    hs.L.style.transformOrigin = '0 100%'; hs.R.style.transformOrigin = '100% 100%';
+    await Promise.all([
+      c.anim(hs.svg, [{ opacity: 1 }, { opacity: 0 }], { duration: 500 }),
+      c.anim(k1, [{ opacity: 1 }, { opacity: 0 }], { duration: 300 }),
+      c.anim(k2, [{ opacity: 1 }, { opacity: 0 }], { duration: 300 }),
+      c.anim(hs.L, [{ transform: 'none' }, { transform: 'translate(-26px,-8px) rotate(-5deg)' }], { duration: 520, easing: 'cubic-bezier(.2,1.5,.4,1)' }),
+      c.anim(hs.R, [{ transform: 'none' }, { transform: 'translate(26px,-8px) rotate(5deg)' }], { duration: 520, easing: 'cubic-bezier(.2,1.5,.4,1)' })
+    ]);
+    k1.remove(); k2.remove();
+
+    /* Botschaft nach dem Riss (Marcel 19.11.), dann fliegt sie an ihren Platz */
+    await SA2.botschaftAuf(c, s, R.x + R.w / 2, R.y + R.h / 2);
+    SA2.botschaftAb(c, s);
+
+    /* 3 · Umschlagen wie eine Seite: Hälfte klappt weg, der neue Pass klappt an derselben Kante auf */
+    var z = s.z; SA2.zielNull(z); z.classList.remove('verdeckt');
+    var kopf = z.querySelector('.zs-kopf'), ki = z.querySelector('[data-karte="inv"]'), kf = z.querySelector('[data-karte="fin"]');
+    kopf.style.opacity = 0; ki.style.opacity = 0; kf.style.opacity = 0;
+    var Ti = SA2.rel(ki, b), Tf = SA2.rel(kf, b);
+    var stapel = window.innerWidth <= 820;
+    /* Linke Hälfte klappt um ihre linke Kante, rechte um ihre rechte; auf dem Handy beide um die Oberkante */
+    hs.L.style.transformOrigin = stapel ? '25% 0' : '0 50%';
+    hs.R.style.transformOrigin = stapel ? '75% 0' : '100% 50%';
+    var dreh = stapel ? 'rotateX' : 'rotateY';
+    var lZiel = 'translate(' + (Ti.x - R.x) + 'px,' + (Ti.y - R.y) + 'px) ' + dreh + '(' + (stapel ? '-90' : '90') + 'deg)';
+    var rZiel = 'translate(' + (Tf.x + Tf.w - R.x - R.w) + 'px,' + (Tf.y - R.y) + 'px) ' + dreh + '(' + (stapel ? '-90' : '-90') + 'deg)';
+    await Promise.all([
+      c.anim(hs.L, [{ transform: 'translate(-26px,-8px) rotate(-5deg)' }, { transform: lZiel }], { duration: 520, easing: 'cubic-bezier(.6,0,.9,.4)' }),
+      c.anim(hs.R, [{ transform: 'translate(26px,-8px) rotate(5deg)' }, { transform: rZiel }], { duration: 520, delay: stapel ? 120 : 60, easing: 'cubic-bezier(.6,0,.9,.4)' })
+    ]);
+    hs.L.remove(); hs.R.remove(); hs.svg.remove(); s.h.remove();
+    ki.style.opacity = kf.style.opacity = '';
+    ki.style.transformOrigin = stapel ? '50% 0' : '0 50%';
+    kf.style.transformOrigin = stapel ? '50% 0' : '100% 50%';
+    await Promise.all([
+      c.anim(ki, [{ transform: dreh + '(' + (stapel ? '90' : '-90') + 'deg)' }, { transform: dreh + '(' + (stapel ? '-8' : '8') + 'deg)', offset: .75 }, { transform: 'none' }], { duration: 760, easing: 'cubic-bezier(.1,.6,.3,1)' }),
+      c.anim(kf, [{ transform: dreh + '(' + (stapel ? '90' : '90') + 'deg)' }, { transform: dreh + '(' + (stapel ? '-8' : '-8') + 'deg)', offset: .75 }, { transform: 'none' }], { duration: 760, delay: 80, easing: 'cubic-bezier(.1,.6,.3,1)' }),
+      c.warte(380).then(function () { return c.fuelle(z.querySelector('.zs-zwei'), { dauer: 1200 }); }),
+      c.warte(500).then(function () {
+        return Promise.all([ki, kf].map(function (k, i) {
+          return c.anim(k.querySelector('.zs-foot'), [{ transform: 'translateY(-14px)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 500, delay: 300 + i * 120, easing: 'cubic-bezier(.3,1.5,.5,1)' });
+        }));
+      })
+    ]);
+
+    /* 4 · Das Gesamturteil läuft aus dem Ticketdrucker, dann die Rechnung */
+    kopf.style.opacity = '';
+    await c.anim(kopf, [{ clipPath: 'inset(0 0 100% 0)', transform: 'translateY(-10px)' }, { clipPath: 'inset(0 0 0 0)', transform: 'none' }], { duration: 900, easing: 'steps(12,end)' });
+    c.zaehle(kopf.querySelector('.zs-wert [data-zahl]'), 900);
+    await c.formel(kopf, 160);
+  }
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Riss und Aufklappen</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" media="print" onload="this.media='all'">
+<link rel="stylesheet" href="basis.css">
+</head>
+<body>
+<script src="basis.js"></script>
+<script>
+/* Variante 1 · Riss und Aufklappen
+   Ein goldener Zickzack-Riss läuft von oben nach unten durch die Hero-Karte, Licht dringt
+   durch den Spalt, die Hälften klappen auseinander und pumpen sich zu den zwei Karten auf.
+   Aus dem Lichtspalt fährt das Gesamturteil mit der Formel nach oben. */
+SA2.start({
+  nr: 'Variante 1', titel: 'Riss und Aufklappen',
+  text: 'Ein Riss läuft senkrecht durch den Investor Deal Score. Aus der linken Hälfte wird der Investment-Score, aus der rechten der Finanzierungs-Score, darüber die Rechnung zur 87.',
+  ablauf: async function (c, s) {
+    await SA2.heroEinlauf(c, s);
+    await SA2.schweben(c, s, 2600);
+    var b = s.b, sp = SA2.spalte(s.h, b, SA2.zickzack(10, .5, .04, 11)), r = sp.rect;
+    s.h.style.visibility = 'hidden';
+
+    /* 1 · Riss zeichnet sich, Karte zittert */
+    var zittern = [sp.L, sp.R].map(function (h) {
+      return c.anim(h, [{ transform: 'none' }, { transform: 'translate(-2px,1px)' }, { transform: 'translate(2px,-1px)' }, { transform: 'translate(-1px,0)' }, { transform: 'none' }],
+        { duration: 260, delay: 520, easing: 'linear', fill: 'none' });
+    });
+    await Promise.all([].map.call(sp.pfade, function (p) {
+      return c.anim(p, [{ strokeDashoffset: sp.len }, { strokeDashoffset: 0 }], { duration: 700, easing: 'cubic-bezier(.6,0,.3,1)' });
+    }).concat(zittern));
+
+    SA2.druckwelle(c, b, r.x + r.w / 2, r.y + r.h / 2, Math.max(r.w, r.h) * 1.4);
+    var bt = SA2.botschaftAuf(c, s, r.x + r.w / 2, r.y + r.h / 2);
+
+    /* 2 · Lichtspalt, die Hälften gehen auseinander, darüber die Botschaft */
+    var mitteX = r.x + r.w / 2, spalt = document.createElement('div');
+    spalt.className = 'lichtspalt';
+    spalt.style.cssText = 'left:' + (mitteX - 40) + 'px;top:' + (r.y - 20) + 'px;width:80px;height:' + (r.h + 40) + 'px';
+    b.appendChild(spalt);
+    var auf = Math.min(70, r.w * .1);
+    await Promise.all([
+      c.anim(spalt, [{ opacity: 0, transform: 'scaleX(.2)' }, { opacity: 1, transform: 'scaleX(1.4)' }], { duration: 650 }),
+      c.anim(sp.svg, [{ opacity: 1 }, { opacity: 0 }], { duration: 400 }),
+      c.anim(sp.L, [{ transform: 'none' }, { transform: 'translateX(' + (-auf) + 'px) rotate(-2.5deg)' }], { duration: 750, easing: 'cubic-bezier(.3,1.4,.5,1)' }),
+      c.anim(sp.R, [{ transform: 'none' }, { transform: 'translateX(' + auf + 'px) rotate(2.5deg)' }], { duration: 750, easing: 'cubic-bezier(.3,1.4,.5,1)' })
+    ]);
+    await bt;
+    SA2.botschaftAb(c, s);
+
+    /* 3 · Aufpumpen: jede Hälfte wird zu ihrer Karte (FLIP vom Hälften-Rechteck) */
+    var z = s.z; SA2.zielNull(z); z.classList.remove('verdeckt');
+    var kopf = z.querySelector('.zs-kopf'), ki = z.querySelector('[data-karte="inv"]'), kf = z.querySelector('[data-karte="fin"]');
+    kopf.style.opacity = 0;
+    var Ti = SA2.rel(ki, b), Tf = SA2.rel(kf, b);
+    var Hi = { x: r.x - auf, y: r.y, w: r.w / 2, h: r.h }, Hf = { x: r.x + r.w / 2 + auf, y: r.y, w: r.w / 2, h: r.h };
+    function von(H, T, rot) {
+      return 'translate(' + (H.x - T.x).toFixed(1) + 'px,' + (H.y - T.y).toFixed(1) + 'px) scale(' + (H.w / T.w).toFixed(3) + ',' + (H.h / T.h).toFixed(3) + ') rotate(' + rot + 'deg)';
+    }
+    var feder = 'cubic-bezier(.3,1.32,.45,1)';
+    [ki, kf].forEach(function (k) { k.style.transformOrigin = '0 0'; });
+    sp.L.style.transformOrigin = '0 0'; sp.R.style.transformOrigin = '100% 0';
+    await Promise.all([
+      c.anim(ki, [{ transform: von(Hi, Ti, -2.5) }, { transform: 'none' }], { duration: 1000, easing: feder }),
+      c.anim(ki.querySelector('.zs-pad'), [{ opacity: 0, filter: 'blur(6px)' }, { opacity: 1, filter: 'blur(0)' }], { duration: 450, delay: 520 }),
+      c.anim(kf, [{ transform: von(Hf, Tf, 2.5) }, { transform: 'none' }], { duration: 1000, easing: feder }),
+      c.anim(kf.querySelector('.zs-pad'), [{ opacity: 0, filter: 'blur(6px)' }, { opacity: 1, filter: 'blur(0)' }], { duration: 450, delay: 520 }),
+      c.anim(sp.L, [{ transform: 'translateX(' + (-auf) + 'px) rotate(-2.5deg)', opacity: 1 }, { transform: 'translate(' + (Ti.x - r.x) + 'px,' + (Ti.y - r.y) + 'px) scale(' + (Ti.w / (r.w / 2)).toFixed(3) + ',' + (Ti.h / r.h).toFixed(3) + ')', opacity: 0 }], { duration: 420, easing: 'cubic-bezier(.5,0,.3,1)' }),
+      c.anim(sp.R, [{ transform: 'translateX(' + auf + 'px) rotate(2.5deg)', opacity: 1 }, { transform: 'translate(' + (Tf.x + Tf.w - r.x - r.w) + 'px,' + (Tf.y - r.y) + 'px) scale(' + (Tf.w / (r.w / 2)).toFixed(3) + ',' + (Tf.h / r.h).toFixed(3) + ')', opacity: 0 }], { duration: 420, easing: 'cubic-bezier(.5,0,.3,1)' }),
+      c.anim(spalt, [{ opacity: 1 }, { opacity: 0 }], { duration: 700 }),
+      c.warte(320).then(function () { return c.fuelle(ki.parentNode, { dauer: 1300 }); })
+    ]);
+    sp.L.remove(); sp.R.remove(); sp.svg.remove(); spalt.remove(); s.h.remove();
+
+    /* 4 · Gesamturteil steigt aus dem Spalt, Formel baut sich auf */
+    kopf.style.transformOrigin = '50% 100%';
+    await c.anim(kopf, [{ opacity: 0, transform: 'translateY(40px) scaleX(.06)' }, { opacity: 1, transform: 'translateY(0) scaleX(.06)', offset: .35 }, { opacity: 1, transform: 'none' }], { duration: 800, easing: 'cubic-bezier(.6,0,.2,1)' });
+    c.zaehle(kopf.querySelector('.zs-wert [data-zahl]'), 900);
+    await c.formel(kopf, 180);
+  }
+});
+</script>
+</body>
+</html>

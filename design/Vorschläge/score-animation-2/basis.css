@@ -1,0 +1,238 @@
+/* score-animation-2 · gemeinsame Gestaltung (19.11.2026)
+   Startbild: die Hero-Karte der Landing. Die Regeln unter „HERO-KARTE“ sind
+   WOERTLICH aus frontend/landing/dp2-hero.css Z.91-164 und Z.190-194 übernommen
+   (nur der Anschnitt nach rechts, opacity und die Einlauf-Animation sind raus,
+   weil hier die Bühne die Karte führt). Tokens aus frontend/landing/dp2.css Z.18-43.
+   Zielbild: die Zwei-Score-Ansicht des Reiters Bewertung, Regeln nach
+   frontend/js/dpsh-score-hero.js Z.694-741 (.dpz-*), hier als .zs-* geführt. */
+
+:root{
+  --ob:#070707; --ob0:#050505; --ob1:#0a0a0a; --stub:#0c0b09;
+  --paper:#EDE7DA; --cream:#FDFCFA; --cream2:#F4F0E7;
+  --cream-line:rgba(20,18,15,.10);
+  --ink:#16130d; --inks:#3a2e08; --inkm:#4a4536; --mut:#6f685b;
+  --gd:var(--wl-c9a84c, #C9A84C);
+  --gdh:var(--wl-e8cc7a, #E8CC7A);
+  --gdd:var(--wl-b8932f, #b8932f);
+  --gdi:#8a6c1e;
+  --gold-on:#5a4a14;
+  --grn:#3FA56C; --grnh:#5BD98E; --rd:#B86250;
+  --txtd:#ece6d6; --mdk:rgba(255,255,255,.66); --ddk:rgba(255,255,255,.42);
+  --perf:#d9cfb4; --line:rgba(201,168,76,.24);
+  --runway:linear-gradient(110deg,var(--wl-e8cc7a, #E8CC7A),var(--wl-c9a84c, #C9A84C) 55%,var(--wl-b8932f, #b8932f));
+  --disp:'Space Grotesk',system-ui,sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,monospace;
+  --body:'Inter',system-ui,sans-serif;
+  --e-weich:cubic-bezier(.2,.7,.3,1);
+  --e-hoch:cubic-bezier(.2,.72,.2,1);
+}
+*{box-sizing:border-box}
+html{background:var(--ob)}
+html,body{margin:0;overflow-x:hidden}
+body{min-height:100vh}
+body{color:var(--txtd);font:15px/1.6 var(--body);-webkit-font-smoothing:antialiased;
+  background:
+    radial-gradient(900px 520px at 85% 100%,rgba(201,168,76,.16),transparent 70%),
+    radial-gradient(700px 420px at 10% 0%,rgba(201,168,76,.07),transparent 70%),
+    var(--ob)}
+
+/* ── Seitenrahmen ─────────────────────────────────────────────── */
+.kopfleiste{max-width:1180px;margin:0 auto;padding:18px 24px 6px;display:flex;flex-wrap:wrap;
+  gap:10px 18px;align-items:center;justify-content:space-between}
+.kopfleiste .t{font:700 10px/1.3 var(--mono);letter-spacing:.2em;text-transform:uppercase;color:var(--gdh)}
+.kopfleiste h1{margin:4px 0 0;font:700 22px/1.2 var(--disp);color:#f6f2e8}
+.kopfleiste p{margin:4px 0 0;font-size:13.5px;color:var(--mdk);max-width:640px}
+.knoepfe{display:flex;gap:8px;flex-wrap:wrap}
+.knopf{display:inline-flex;align-items:center;gap:7px;padding:9px 14px;border:1px solid rgba(201,168,76,.4);
+  background:transparent;color:var(--gdh);font:700 11px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;
+  cursor:pointer;text-decoration:none}
+.knopf:hover{background:rgba(201,168,76,.12)}
+.knopf.voll{background:var(--runway);color:#1a1508;border-color:transparent}
+.varnav{max-width:1180px;margin:0 auto;padding:0 24px 8px;display:flex;gap:6px;flex-wrap:wrap}
+.varnav a{font:600 11px/1 var(--mono);letter-spacing:.06em;color:var(--ddk);text-decoration:none;
+  padding:6px 9px;border:1px solid rgba(255,255,255,.1)}
+.varnav a.hier,.varnav a:hover{color:var(--gdh);border-color:rgba(201,168,76,.5)}
+
+.buehne{position:relative;max-width:1180px;margin:0 auto;padding:18px 24px 60px}
+.buehne-innen{position:relative;perspective:1600px}
+
+/* ══ HERO-KARTE (aus dp2-hero.css) ════════════════════════════════ */
+.idscard{position:relative;background:#fff;overflow:hidden;color:var(--ink);
+  box-shadow:0 50px 96px -40px rgba(0,0,0,.8);border:1px solid rgba(255,255,255,.08)}
+.ids-band{display:flex;align-items:center;justify-content:space-between;gap:10px;
+  padding:9px 20px;background:var(--runway);color:var(--gold-on)}
+.ids-band .l{font:700 9px/1 var(--mono);letter-spacing:.15em;text-transform:uppercase;
+  display:flex;align-items:center;gap:8px}
+.ids-band .dot{width:7px;height:7px;border-radius:50%;background:#1b5e3a;flex:none}
+.ids-band .cleared{font:700 8.5px/1 var(--mono);letter-spacing:.12em;
+  background:var(--stub);color:var(--grnh);padding:4px 11px;border-radius:20px}
+.ids-head{display:flex;align-items:center;justify-content:space-between;gap:10px;
+  padding:14px 20px 8px}
+.ids-title{font:700 17px/1.2 var(--disp);color:var(--ink)}
+.ids-title b{color:var(--gdd)}
+.ids-allkpi{font:500 9px/1 var(--mono);letter-spacing:.06em;color:var(--mut);
+  border:1px solid var(--cream-line);padding:6px 11px}
+.ids-body{display:grid;grid-template-columns:206px 1fr;gap:34px;padding:10px 26px 18px}
+.ids-left{display:flex;flex-direction:column;align-items:center;gap:12px}
+.ids-dial{position:relative;width:142px;height:142px}
+.ids-dial svg{width:142px;height:142px;transform:rotate(-90deg)}
+.ids-dial .tr{fill:none;stroke:#ece4d2;stroke-width:9}
+.ids-dial .pg{fill:none;stroke:var(--grn);stroke-width:9;stroke-linecap:round;
+  stroke-dasharray:333;stroke-dashoffset:333;
+  filter:drop-shadow(0 0 7px rgba(63,165,108,.45))}
+.ids-dv{position:absolute;inset:0;display:flex;flex-direction:column;
+  align-items:center;justify-content:center}
+.ids-dv b{font:700 43px/1 var(--disp);color:var(--ink);font-variant-numeric:tabular-nums}
+.ids-dv small{font:500 9px/1 var(--mono);letter-spacing:.06em;color:var(--mut);margin-top:2px}
+.ids-badge{display:inline-flex;align-items:center;gap:6px;font:700 12px/1 var(--disp);
+  color:var(--grn);border:1px solid rgba(63,165,108,.4);border-radius:20px;padding:6px 15px}
+.ids-stats{display:flex;width:100%;border-top:1px solid var(--cream-line);padding-top:12px}
+.ids-stats div{flex:1;text-align:center;border-right:1px solid var(--cream-line);padding:0 4px}
+.ids-stats div:last-child{border-right:0}
+.ids-stats b{display:block;font:700 14px/1.2 var(--disp);color:var(--ink)}
+.ids-stats span{font:500 8.5px/1.4 var(--mono);letter-spacing:.04em;
+  text-transform:uppercase;color:var(--mut)}
+.ids-right{min-width:0}
+.ids-h{font:700 9px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;
+  color:var(--gdd);margin-bottom:12px}
+.ids-bar{margin-bottom:13px}
+.ids-bar:last-child{margin-bottom:0}
+.ids-bar .top{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+.ids-bar .nm{font:600 13.2px/1.2 var(--disp);color:var(--ink)}
+.ids-bar .wt{font:400 8.5px/1 var(--mono);color:var(--mut);margin-left:5px}
+.ids-bar .sc{font:700 14px/1 var(--disp);white-space:nowrap}
+.ids-bar .sc small{font:400 8.5px/1 var(--mono);color:var(--mut);margin-left:1px}
+.ids-bar .track{display:block;height:7px;background:#eee6d3;overflow:hidden;margin:7px 0 4px}
+.ids-bar .track i{display:block;height:100%;width:0}
+.ids-bar .kp{font:500 8.5px/1 var(--mono);letter-spacing:.04em;
+  text-transform:uppercase;color:var(--mut)}
+.ids-tear{position:relative;height:15px;background:var(--stub)}
+.ids-tear::before{content:"";position:absolute;left:16px;right:16px;top:50%;
+  border-top:2px dashed rgba(201,168,76,.4)}
+.ids-tear .nl,.ids-tear .nr{position:absolute;top:50%;width:15px;height:15px;
+  border-radius:50%;transform:translateY(-50%);background:var(--ob)}
+.ids-tear .nl{left:-7px}
+.ids-tear .nr{right:-7px}
+.ids-foot{display:flex;align-items:center;justify-content:space-between;gap:12px;
+  background:var(--stub);padding:0 18px 13px}
+.ids-foot .lab{font:500 8.5px/1.4 var(--mono);letter-spacing:.1em;color:#9a8f6a;
+  text-transform:uppercase}
+.ids-foot .lab b{color:var(--gdh);display:block;font-size:12px;margin-top:2px}
+.ids-qr{background:#fff;padding:4px}
+.ids-qr svg{display:block}
+@media(max-width:620px){
+  .ids-body{grid-template-columns:1fr;gap:20px}
+  .ids-left{flex-direction:row;flex-wrap:wrap;justify-content:flex-start}
+  .ids-stats{width:100%}
+}
+/* Hero auf der Bühne: so breit wie auf der Landing (gemessen 749,7 px bei 1440) */
+.hero-platz{position:absolute;top:0;left:50%;width:min(750px,100%);transform:translateX(-50%);z-index:5}
+.hero-platz .idscard{width:100%}
+
+/* ══ ZIELBILD: Gesamturteil + zwei Karten (nach .dpz-*) ═══════════ */
+.zs{display:flex;flex-direction:column;gap:16px;font-family:var(--body);color:#1d1c1a}
+.zs.verdeckt{visibility:hidden}
+.zs-kopf{border-radius:14px;padding:14px 16px;background:#050505;color:#f6f2e8;display:flex;flex-wrap:wrap;
+  gap:10px 18px;align-items:center;border:1px solid rgba(201,168,76,.28);
+  box-shadow:0 30px 60px -36px rgba(0,0,0,.9)}
+.zs-lbl{font:600 10.5px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:5px}
+.zs-wort{font:700 22px/1.1 var(--disp);color:#f6f2e8}
+.zs-wert{font:600 13px/1 var(--mono);color:rgba(255,255,255,.6);margin-left:6px}
+.zs-wert b{color:#fff;font-weight:700}
+.zs-empf{font:700 12px/1 var(--mono);letter-spacing:.07em;text-transform:uppercase;padding:7px 10px;border-radius:999px;
+  background:var(--runway);color:#1a1508}
+.zs-warum{flex:1 1 280px;font-size:13.5px;line-height:1.5;color:rgba(255,255,255,.72)}
+.zs-warum b{color:#fff}
+.zs-formel{flex:1 1 100%;display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 10px;
+  border-top:1px solid rgba(255,255,255,.09);padding-top:10px;font:600 14px/1.3 var(--mono);color:rgba(255,255,255,.7)}
+.zs-formel .fl{font:600 10px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.45);margin-right:4px}
+.zs-formel .ft{display:inline-block;white-space:nowrap}
+.zs-formel .ft b{color:#fff}
+.zs-formel .fop{color:var(--gdh)}
+.zs-formel .fe b{font:700 20px/1 var(--disp);color:var(--gdh)}
+.zs-formel .fz{font:500 11.5px/1.4 var(--body);color:rgba(255,255,255,.5);flex:1 1 100%}
+
+.zs-zwei{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:stretch}
+.zs-karte{position:relative;background:#fff;border:1px solid #e6dfcf;border-radius:16px;overflow:hidden;
+  box-shadow:0 40px 80px -42px rgba(0,0,0,.85);min-width:0;display:flex;flex-direction:column}
+.zs-band{height:4px;background:var(--runway)}
+.zs-pad{padding:18px;flex:1;display:flex;flex-direction:column}
+.zs-score{display:flex;gap:16px;align-items:center}
+.zs-ring{width:104px;height:104px;flex:0 0 auto;position:relative}
+.zs-ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.zs-ring .tr{fill:none;stroke:#f0ece3;stroke-width:9}
+.zs-ring .pg{fill:none;stroke-width:9;stroke-linecap:round;stroke-dasharray:276.5;stroke-dashoffset:276.5}
+.zs-n{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font:700 32px/1 var(--disp);color:#1d1c1a;font-variant-numeric:tabular-nums}
+.zs-h3{font:600 16px/1.3 var(--disp);margin:0;color:#1d1c1a}
+.zs-pill{display:inline-block;font:700 10.5px/1 var(--mono);letter-spacing:.08em;padding:5px 9px;border-radius:999px;margin-top:6px}
+.zs-pill.g{background:rgba(63,165,108,.12);color:#2d7d52}
+.zs-pill.o{background:#FBF6E9;color:var(--wl-b8932f, #b8932f);border:1px solid #eee6d3}
+.zs-was{font-size:12.5px;color:#6b6356;margin-top:6px}
+.zs-kat{margin-top:12px}
+.zs-kz{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 10px;align-items:baseline;margin:10px 0 0}
+.zs-t{font-size:13.5px;font-weight:500}
+.zs-anteil{font:600 11px/1 var(--mono);color:#6b6356}
+.zs-p{font:600 12.5px/1 var(--mono);white-space:nowrap;font-variant-numeric:tabular-nums}
+.zs-bar{grid-column:1/-1;height:7px;border-radius:5px;background:#f0ece3;overflow:hidden}
+.zs-bar i{display:block;height:100%;border-radius:5px;width:0}
+.zs-m{grid-column:1/-1;font-size:12px;color:#6b6356}
+.zs-summe{margin-top:auto;padding-top:10px;border-top:1px dashed #e6dfcf;font-size:12.5px;color:#6b6356}
+.zs-kat + .zs-summe{margin-top:14px}
+.zs-pad > .zs-summe:last-child{margin-top:auto}
+/* Pass-Fassung (Variante 3): Band und Abriss wie die Hero-Karte */
+.zs-karte.pass{border-radius:0;border:1px solid rgba(255,255,255,.08)}
+.zs-karte.pass .zs-band{height:auto}
+.zs-foot{background:var(--stub)}
+
+@media(max-width:820px){
+  .zs-zwei{grid-template-columns:1fr}
+}
+@media(max-width:620px){
+  .kopfleiste{padding:14px 16px 4px}
+  .varnav{padding:0 16px 6px}
+  .buehne{padding:12px 16px 40px}
+  .zs-pad{padding:16px}
+  .zs-ring{width:88px;height:88px}
+  .zs-n{font-size:28px}
+  .zs-formel{font-size:13px}
+}
+
+/* ── Effekt-Bausteine ─────────────────────────────────────────── */
+.riss-svg{position:absolute;left:0;top:0;overflow:visible;pointer-events:none;z-index:7}
+.haelfte{position:absolute;margin:0;z-index:6;will-change:transform}
+.funke{position:absolute;width:5px;height:5px;border-radius:50%;background:#FFE7A3;
+  box-shadow:0 0 8px 2px rgba(232,204,122,.9);pointer-events:none;z-index:9}
+.blitz{position:absolute;pointer-events:none;z-index:8;border-radius:50%;
+  background:radial-gradient(circle,rgba(255,240,200,.95),rgba(232,204,122,.5) 30%,transparent 70%)}
+.lichtspalt{position:absolute;pointer-events:none;z-index:4;
+  background:linear-gradient(90deg,transparent,rgba(232,204,122,.75),#fff6d8,rgba(232,204,122,.75),transparent);
+  filter:blur(6px)}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* ── Marcel 19.11.: Botschaft nach dem Riss ──────────────────────── */
+.zs-botschaft{text-align:center;padding:4px 8px 2px}
+.zs-botschaft .bt1{font:700 clamp(24px,4.2vw,40px)/1.1 var(--disp);letter-spacing:-.01em;color:#f6f2e8}
+.zs-botschaft .bt1 b,.botschaft-gross .bt1 b{background:var(--runway);-webkit-background-clip:text;background-clip:text;color:transparent}
+.zs-botschaft .bt-strich,.botschaft-gross .bt-strich{display:block;height:2px;width:min(220px,50%);margin:10px auto 8px;
+  background:var(--runway);transform-origin:50% 50%;box-shadow:0 0 12px rgba(232,204,122,.7)}
+.zs-botschaft .bt2{font:500 clamp(13.5px,1.6vw,16px)/1.5 var(--body);color:var(--mdk)}
+.botschaft-gross{position:absolute;z-index:12;text-align:center;pointer-events:none;padding:18px 12px;
+  text-shadow:0 4px 30px rgba(0,0,0,.95),0 0 2px rgba(0,0,0,.9)}
+.botschaft-gross .bt1{font:700 clamp(30px,6vw,58px)/1.05 var(--disp);letter-spacing:-.01em;color:#fff}
+.botschaft-gross .bt2{font:600 clamp(14px,1.9vw,19px)/1.45 var(--body);color:#f6f2e8;margin-top:2px}
+/* Druckwelle */
+.welle{position:absolute;border-radius:50%;border:2px solid #E8CC7A;pointer-events:none;z-index:11;
+  box-shadow:0 0 30px rgba(232,204,122,.6),inset 0 0 30px rgba(232,204,122,.4)}
+/* Botschaft liegt über weißen Kartenhälften: eigene dunkle Fläche, sonst Weiß auf Weiß */
+.botschaft-gross{background:rgba(5,5,5,.86);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
+  border:1px solid rgba(232,204,122,.45);border-radius:16px;box-shadow:0 30px 80px -20px rgba(0,0,0,.9),0 0 60px rgba(232,204,122,.18)}
+/* Goldschrift ohne Schatten: der Schatten schien durch die transparente Glyphe und machte sie dunkel (gemessen 19.11.) */
+.botschaft-gross .bt1 b{text-shadow:none}
+.botschaft-gross .bt1{font-size:clamp(28px,5vw,52px)}
+/* Hälften kippen beim Reißen über die Oberkante: mehr Luft zur Navigation */
+.buehne{padding-top:40px}
+@media(max-width:620px){.buehne{padding-top:28px}}
+/* Pass-Band am Handy: Plakette bleibt einzeilig */
+.zs-karte.pass .ids-band .cleared{white-space:nowrap;flex:none}
+.zs-karte.pass .ids-band .l{min-width:0}

@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bruch mit Funken</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" media="print" onload="this.media='all'">
+<link rel="stylesheet" href="basis.css">
+<style>
+  .flug{position:absolute;z-index:10;pointer-events:none}
+  .flug .zs-ring{width:104px;height:104px;background:#fff;border-radius:50%;box-shadow:0 0 0 10px #fff,0 18px 40px -10px rgba(0,0,0,.6),0 0 40px 6px rgba(232,204,122,.45)}
+  @media(max-width:620px){.flug .zs-ring{width:88px;height:88px}}
+</style>
+</head>
+<body>
+<script src="basis.js"></script>
+<script>
+/* Variante 2 · Bruch mit Funken
+   Die Kamera fährt auf den Score-Ring, von dort springt die Karte sternförmig, Funken fliegen.
+   Die Karte zerfällt, der Ring 87 teilt sich in zwei Ringe, die zu 81 und 96 umzählen und
+   an ihren Platz fliegen. Um jeden Ring wächst die Karte kreisförmig auf. */
+SA2.start({
+  nr: 'Variante 2', titel: 'Bruch mit Funken',
+  text: 'Der Score-Ring bricht auf, die Karte zerspringt, der Ring teilt sich in zwei. Jeder Ring zählt zu seinem Teil-Score um und baut seine Karte um sich herum auf.',
+  ablauf: async function (c, s) {
+    await SA2.heroEinlauf(c, s);
+    await SA2.schweben(c, s, 2600);
+    var b = s.b, karte = s.karte, dial = karte.querySelector('.ids-dial');
+    var R = SA2.rel(karte, b), Dr = SA2.rel(dial, b);
+    var cx = Dr.x + Dr.w / 2, cy = Dr.y + Dr.h / 2;
+
+    /* 1 · Kamerafahrt auf den Ring, Ring glüht */
+    s.h.style.transformOrigin = (cx - R.x) + 'px ' + (cy - R.y) + 'px';
+    var pg = karte.querySelector('.ids-dial .pg');
+    await Promise.all([
+      c.anim(s.h, [{ transform: 'translateX(-50%) scale(1)' }, { transform: 'translateX(-50%) scale(1.07)' }], { duration: 900, easing: 'cubic-bezier(.5,0,.2,1)' }),
+      c.anim(pg, [{ filter: 'drop-shadow(0 0 7px rgba(63,165,108,.45))' }, { filter: 'drop-shadow(0 0 18px rgba(232,204,122,1))', stroke: '#E8CC7A' }], { duration: 900 })
+    ]);
+
+    /* 2 · Sternriss vom Ring aus, Blitz und Funken */
+    var ns = 'http://www.w3.org/2000/svg', st = document.createElementNS(ns, 'svg');
+    st.setAttribute('class', 'riss-svg'); st.style.overflow = 'hidden'; st.setAttribute('width', R.w); st.setAttribute('height', R.h);
+    st.style.left = R.x + 'px'; st.style.top = R.y + 'px';
+    var lx = cx - R.x, ly = cy - R.y, d = '', seed = 9;
+    function rnd() { seed = (seed * 9301 + 49297) % 233280; return seed / 233280; }
+    for (var k = 0; k < 9; k++) {
+      var w = k / 9 * Math.PI * 2 + rnd() * .4, x = lx + Math.cos(w) * 72, y = ly + Math.sin(w) * 72;
+      d += 'M' + x.toFixed(1) + ' ' + y.toFixed(1);
+      for (var j = 1; j <= 4; j++) {
+        var rr = 72 + j * (R.w * .12), ww = w + (rnd() - .5) * .35;
+        d += ' L' + (lx + Math.cos(ww) * rr).toFixed(1) + ' ' + (ly + Math.sin(ww) * rr).toFixed(1);
+      }
+    }
+    st.innerHTML = '<path d="' + d + '" fill="none" stroke="#E8CC7A" stroke-width="5" opacity=".5" style="filter:blur(3px)"/><path d="' + d + '" fill="none" stroke="#fff6d8" stroke-width="1.6"/>';
+    b.appendChild(st);
+    var sp = st.querySelectorAll('path'), sl = sp[1].getTotalLength();
+    var blitz = document.createElement('div'); blitz.className = 'blitz';
+    blitz.style.cssText = 'left:' + (cx - 160) + 'px;top:' + (cy - 160) + 'px;width:320px;height:320px';
+    b.appendChild(blitz);
+    SA2.funken(b, cx, cy, 46, c, 260);
+    SA2.druckwelle(c, b, cx, cy, Math.max(R.w, R.h) * 1.6);
+    await Promise.all([].map.call(sp, function (p) {
+      p.style.strokeDasharray = sl;
+      return c.anim(p, [{ strokeDashoffset: sl }, { strokeDashoffset: 0 }], { duration: 420, easing: 'cubic-bezier(.2,.8,.2,1)' });
+    }).concat([
+      c.anim(blitz, [{ opacity: 0, transform: 'scale(.3)' }, { opacity: 1, transform: 'scale(1)', offset: .25 }, { opacity: 0, transform: 'scale(1.6)' }], { duration: 700 }),
+      c.anim(s.h, [{ transform: 'translateX(-50%) scale(1.07)' }, { transform: 'translate(calc(-50% - 4px),3px) scale(1.07)' }, { transform: 'translate(calc(-50% + 4px),-2px) scale(1.07)' }, { transform: 'translateX(-50%) scale(1.07)' }], { duration: 300, easing: 'linear' })
+    ]));
+
+    /* Botschaft nach dem Bruch (Marcel 19.11.) */
+    await SA2.botschaftAuf(c, s, R.x + R.w / 2, R.y + R.h / 2);
+
+    /* 3 · Karte zerfällt in zwei Hälften, der Ring bleibt als Lichtkern stehen */
+    s.h.getAnimations().forEach(function (a) { a.cancel(); });
+    var hs = SA2.spalte(s.h, b, SA2.zickzack(9, (cx - R.x) / R.w, .03, 4));
+    hs.svg.remove();
+    s.h.style.visibility = 'hidden'; st.style.visibility = 'hidden';
+    var z = s.z; SA2.zielNull(z); z.classList.remove('verdeckt');
+    var kopf = z.querySelector('.zs-kopf'); kopf.style.opacity = 0;
+    var karten = [z.querySelector('[data-karte="inv"]'), z.querySelector('[data-karte="fin"]')];
+    karten.forEach(function (k) { k.style.opacity = 0; });
+
+    /* zwei fliegende Ringe, beide starten als 87 auf dem Hero-Ring */
+    var fl = karten.map(function (k) {
+      var ring = k.querySelector('.zs-ring'), T = SA2.rel(ring, b), e = document.createElement('div');
+      e.className = 'flug'; e.style.left = T.x + 'px'; e.style.top = T.y + 'px';
+      e.innerHTML = ring.outerHTML; b.appendChild(e);
+      var n = e.querySelector('.zs-n'), p = e.querySelector('.pg');
+      n.textContent = '87'; p.style.strokeDashoffset = (SA2.RU * .13).toFixed(1); p.style.stroke = '#3FA56C';
+      return { e: e, T: T, n: n, p: p, ziel: +ring.querySelector('[data-ring]').dataset.ring, k: k };
+    });
+    var fall = 'cubic-bezier(.45,0,.9,.6)';
+    await Promise.all([
+      c.anim(hs.L, [{ transform: 'none', opacity: 1 }, { transform: 'translate(-90px,160px) rotate(-14deg)', opacity: 0 }], { duration: 900, easing: fall }),
+      c.anim(hs.R, [{ transform: 'none', opacity: 1 }, { transform: 'translate(90px,180px) rotate(12deg)', opacity: 0 }], { duration: 900, easing: fall }),
+      SA2.funken(b, cx, cy, 24, c, 180),
+      SA2.botschaftAb(c, s)
+    ].concat(fl.map(function (f, i) {
+      var sc = Dr.w / f.T.w, dx = cx - (f.T.x + f.T.w / 2), dy = cy - (f.T.y + f.T.h / 2);
+      var start = 'translate(' + dx.toFixed(1) + 'px,' + dy.toFixed(1) + 'px) scale(' + sc.toFixed(3) + ')';
+      var mitte = 'translate(' + (dx * .45 + (i ? 30 : -30)).toFixed(1) + 'px,' + (dy * .45 - 90).toFixed(1) + 'px) scale(1.25)';
+      f.e.style.transformOrigin = '50% 50%';
+      setTimeout(function () { if (c.lebt()) { f.n.dataset.zahl = f.ziel; c.zaehle(f.n, 1000, 87); } }, 250);
+      return Promise.all([
+        c.anim(f.e, [{ transform: start }, { transform: mitte, offset: .45 }, { transform: 'none' }], { duration: 1250, easing: 'cubic-bezier(.4,0,.2,1)' }),
+        c.anim(f.p, [{ strokeDashoffset: (SA2.RU * .13).toFixed(1) }, { strokeDashoffset: (SA2.RU * (1 - f.ziel / 100)).toFixed(1) }], { duration: 1250 })
+      ]);
+    })));
+    hs.L.remove(); hs.R.remove(); st.remove(); blitz.remove(); s.h.remove();
+
+    /* 4 · Karte wächst kreisförmig um den gelandeten Ring */
+    await Promise.all(fl.map(function (f, i) {
+      var k = f.k, Kr = SA2.rel(k, b), ox = f.T.x + f.T.w / 2 - Kr.x, oy = f.T.y + f.T.h / 2 - Kr.y;
+      k.style.opacity = 1;
+      k.querySelector('.zs-n').textContent = f.ziel;
+      k.querySelector('[data-ring]').style.strokeDashoffset = (SA2.RU * (1 - f.ziel / 100)).toFixed(1);
+      return c.warte(i * 160).then(function () {
+        var p1 = c.anim(k, [{ clipPath: 'circle(40px at ' + ox + 'px ' + oy + 'px)' }, { clipPath: 'circle(' + Math.hypot(Kr.w, Kr.h).toFixed(0) + 'px at ' + ox + 'px ' + oy + 'px)' }],
+          { duration: 900, easing: 'cubic-bezier(.5,0,.15,1)' }).then(function () { k.style.clipPath = 'none'; });
+        var p2 = c.anim(f.e, [{ opacity: 1 }, { opacity: 0 }], { duration: 250, delay: 120 }).then(function () { f.e.remove(); });
+        var p3 = c.warte(380).then(function () { return c.fuelle(k.querySelector('.zs-kat'), { dauer: 1100, stufe: 120 }); });
+        return Promise.all([p1, p2, p3]);
+      });
+    }));
+
+    /* 5 · Gesamturteil mit Lichtkante, dann die Formel */
+    await c.anim(kopf, [{ opacity: 0, transform: 'translateY(-14px)', boxShadow: '0 0 0 0 rgba(232,204,122,0)' }, { opacity: 1, transform: 'none', boxShadow: '0 0 0 2px rgba(232,204,122,.8),0 0 40px rgba(232,204,122,.4)', offset: .6 }, { opacity: 1, transform: 'none', boxShadow: '0 30px 60px -36px rgba(0,0,0,.9)' }], { duration: 800 });
+    c.zaehle(kopf.querySelector('.zs-wert [data-zahl]'), 900);
+    await c.formel(kopf, 170);
+  }
+});
+</script>
+</body>
+</html>

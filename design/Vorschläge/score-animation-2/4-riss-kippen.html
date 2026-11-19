@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Riss und Kippen</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" media="print" onload="this.media='all'">
+<link rel="stylesheet" href="basis.css">
+<style>
+  .buehne-innen{transform-style:preserve-3d}
+  .verbinder{position:absolute;left:0;top:0;overflow:visible;pointer-events:none;z-index:3}
+</style>
+</head>
+<body>
+<script src="basis.js"></script>
+<script>
+/* Variante 4 · Riss und Kippen
+   Die Karte kippt nach hinten wie auf einen Tisch gelegt, ein schräger Riss läuft hindurch.
+   Beide Hälften öffnen sich wie Flügeltüren, drehen sich um ihre Achse und zeigen auf der
+   Rückseite die zwei Score-Karten. Zwei Goldlinien tragen die Teil-Scores in die Rechnung hoch. */
+SA2.start({
+  nr: 'Variante 4', titel: 'Riss und Kippen',
+  text: 'Die Karte kippt in den Raum, reißt schräg, und die Hälften drehen sich um. Auf ihrer Rückseite stehen Investment-Score und Finanzierungs-Score, Goldlinien führen beide in die Gesamtrechnung.',
+  ablauf: async function (c, s) {
+    await SA2.heroEinlauf(c, s);
+    await SA2.schweben(c, s, 2600);
+    var b = s.b, R = SA2.rel(s.karte, b);
+
+    /* 1 · Kippen nach hinten */
+    var kipp = 'translateX(-50%) rotateX(24deg) translateZ(-50px)';
+    s.h.style.transformOrigin = '50% 100%';
+    await c.anim(s.h, [{ transform: 'translateX(-50%)' }, { transform: kipp }], { duration: 700, easing: 'cubic-bezier(.4,0,.2,1)' });
+
+    /* 2 · Schräger Riss (oben rechts der Mitte nach unten links), gezeichnet auf der gekippten Karte */
+    var pts = SA2.zickzack(8, .5, .03, 17).map(function (p) { return [p[0] + .06 - p[1] * .12, p[1]]; });
+    s.h.getAnimations().forEach(function (a) { a.cancel(); });
+    s.h.style.transform = 'translateX(-50%)';
+    var hs = SA2.spalte(s.h, b, pts);
+    s.h.style.transform = kipp;
+    /* Hälften und Riss liegen in derselben Kippebene wie die Karte */
+    [hs.L, hs.R, hs.svg].forEach(function (e) { e.style.transformOrigin = '50% 100%'; e.style.transform = 'rotateX(24deg) translateZ(-50px)'; });
+    s.h.style.visibility = 'hidden';
+    await Promise.all([].map.call(hs.pfade, function (p) {
+      return c.anim(p, [{ strokeDashoffset: hs.len }, { strokeDashoffset: 0 }], { duration: 560, easing: 'cubic-bezier(.7,0,.3,1)' });
+    }));
+
+    SA2.druckwelle(c, b, R.x + R.w / 2, R.y + R.h / 2, Math.max(R.w, R.h) * 1.4);
+    await SA2.botschaftAuf(c, s, R.x + R.w / 2, R.y + R.h / 2);
+
+    /* 3 · Flügeltüren: die Hälften drehen um ihre Außenkante auf */
+    var tisch = 'rotateX(24deg) translateZ(-50px)';
+    hs.L.style.transformOrigin = '0 50%'; hs.R.style.transformOrigin = '100% 50%';
+    await Promise.all([
+      c.anim(hs.svg, [{ opacity: 1 }, { opacity: 0 }], { duration: 300 }),
+      c.anim(hs.L, [{ transform: tisch }, { transform: 'rotateX(6deg) rotateY(28deg) translateX(-30px)' }], { duration: 650, easing: 'cubic-bezier(.3,1.3,.5,1)' }),
+      c.anim(hs.R, [{ transform: tisch }, { transform: 'rotateX(6deg) rotateY(-28deg) translateX(30px)' }], { duration: 650, easing: 'cubic-bezier(.3,1.3,.5,1)' })
+    ]);
+
+    SA2.botschaftAb(c, s);
+    /* 4 · Umdrehen: Hälfte dreht bis zur Kante, dahinter steht die Karte und dreht sich nach vorn */
+    var z = s.z; SA2.zielNull(z); z.classList.remove('verdeckt');
+    var kopf = z.querySelector('.zs-kopf'), ki = z.querySelector('[data-karte="inv"]'), kf = z.querySelector('[data-karte="fin"]');
+    kopf.style.opacity = 0; ki.style.opacity = 0; kf.style.opacity = 0;
+    var Ti = SA2.rel(ki, b), Tf = SA2.rel(kf, b);
+    /* Mittelpunkt jeder Hälfte (sichtbarer Teil) und der Zielkarte */
+    var mL = { x: R.x + R.w * .27, y: R.y + R.h / 2 }, mR = { x: R.x + R.w * .73, y: R.y + R.h / 2 };
+    var zI = { x: Ti.x + Ti.w / 2, y: Ti.y + Ti.h / 2 }, zF = { x: Tf.x + Tf.w / 2, y: Tf.y + Tf.h / 2 };
+    hs.L.style.transformOrigin = (R.w * .27) + 'px 50%'; hs.R.style.transformOrigin = (R.w * .73) + 'px 50%';
+    function halbweg(m, zz) { return 'translate(' + ((zz.x - m.x) * .5).toFixed(1) + 'px,' + ((zz.y - m.y) * .5).toFixed(1) + 'px) '; }
+    await Promise.all([
+      c.anim(hs.L, [{ transform: 'rotateX(6deg) rotateY(28deg) translateX(-30px)' }, { transform: halbweg(mL, zI) + 'rotateY(90deg) scale(1.1)' }], { duration: 480, easing: 'cubic-bezier(.6,0,1,.6)' }),
+      c.anim(hs.R, [{ transform: 'rotateX(6deg) rotateY(-28deg) translateX(30px)' }, { transform: halbweg(mR, zF) + 'rotateY(-90deg) scale(1.1)' }], { duration: 480, easing: 'cubic-bezier(.6,0,1,.6)' })
+    ]);
+    hs.L.remove(); hs.R.remove(); hs.svg.remove(); s.h.remove();
+    ki.style.opacity = kf.style.opacity = '';
+    function rueck(m, T, zz) { return 'translate(' + ((m.x - zz.x) * .5).toFixed(1) + 'px,' + ((m.y - zz.y) * .5).toFixed(1) + 'px) '; }
+    await Promise.all([
+      c.anim(ki, [{ transform: rueck(mL, Ti, zI) + 'rotateY(-90deg) scale(.9)' }, { transform: 'translateZ(60px) rotateY(10deg)', offset: .7 }, { transform: 'none' }], { duration: 820, easing: 'cubic-bezier(0,.5,.3,1)' }),
+      c.anim(kf, [{ transform: rueck(mR, Tf, zF) + 'rotateY(90deg) scale(.9)' }, { transform: 'translateZ(60px) rotateY(-10deg)', offset: .7 }, { transform: 'none' }], { duration: 820, easing: 'cubic-bezier(0,.5,.3,1)' }),
+      c.warte(420).then(function () { return c.fuelle(z.querySelector('.zs-zwei'), { dauer: 1200 }); })
+    ]);
+
+    /* 5 · Goldlinien von beiden Ringen hoch zur Rechnung, dann klappt das Gesamturteil herunter */
+    kopf.style.opacity = '';
+    kopf.style.transformOrigin = '50% 0';
+    var ns = 'http://www.w3.org/2000/svg', v = document.createElementNS(ns, 'svg');
+    v.setAttribute('class', 'verbinder'); v.setAttribute('width', b.offsetWidth); v.setAttribute('height', b.offsetHeight);
+    var K = SA2.rel(kopf, b), ri = SA2.rel(ki.querySelector('.zs-ring'), b), rf = SA2.rel(kf.querySelector('.zs-ring'), b);
+    var ziel = { x: K.x + K.w / 2, y: K.y + K.h - 6 };
+    function bogen(r) {
+      var sx = r.x + r.w / 2, sy = r.y + 4;
+      return 'M' + sx + ' ' + sy + ' C' + sx + ' ' + (sy - 40) + ' ' + ziel.x + ' ' + (ziel.y + 40) + ' ' + ziel.x + ' ' + ziel.y;
+    }
+    v.innerHTML = '<path d="' + bogen(ri) + '" fill="none" stroke="#E8CC7A" stroke-width="2" style="filter:drop-shadow(0 0 5px rgba(232,204,122,.9))"/>'
+      + '<path d="' + bogen(rf) + '" fill="none" stroke="#E8CC7A" stroke-width="2" style="filter:drop-shadow(0 0 5px rgba(232,204,122,.9))"/>';
+    b.appendChild(v);
+    await Promise.all([
+      Promise.all([].map.call(v.querySelectorAll('path'), function (p) {
+        var l = p.getTotalLength(); p.style.strokeDasharray = l;
+        return c.anim(p, [{ strokeDashoffset: l }, { strokeDashoffset: 0 }], { duration: 650, easing: 'cubic-bezier(.6,0,.3,1)' });
+      })),
+      c.warte(350).then(function () {
+        return c.anim(kopf, [{ transform: 'rotateX(-90deg)', opacity: 0 }, { transform: 'rotateX(12deg)', opacity: 1, offset: .7 }, { transform: 'none', opacity: 1 }], { duration: 800, easing: 'cubic-bezier(.2,.7,.3,1)' });
+      })
+    ]);
+    c.zaehle(kopf.querySelector('.zs-wert [data-zahl]'), 900);
+    c.anim(v, [{ opacity: 1 }, { opacity: 0 }], { duration: 900, delay: 700 }).then(function () { v.remove(); }).catch(function () {});
+    await c.formel(kopf, 170);
+  }
+});
+</script>
+</body>
+</html>
