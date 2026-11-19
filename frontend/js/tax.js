@@ -2156,6 +2156,9 @@ function _ytfSteuerAnzeige(year, totals) {
     var _gc = window._dpGesReiheCache;
     if (!gz && _gc && _gc.r) return { text: '–', color: 'var(--muted)', title: 'Für dieses Jahr rechnet die Steuer der Gesellschaft nicht mehr voraus (höchstens 14 Jahre ab dem ersten Jahr).' };
     if (!gz && _gc && !_gc.r) return { text: '…', color: 'var(--muted)', title: 'Die Steuer der Gesellschaft über alle Objekte wird berechnet.' };
+    /* v3820a · Jahre mit „Stand laut Kanzlei“ (Einstellungen › Mandanten) sind Ist, nicht Einschätzung */
+    if (gz && gz.ist) return { text: (gz.steuer > 0.5 ? '−' + Math.round(gz.steuer).toLocaleString('de-DE') + ' €' : '0 €') + ' · Ist', color: gz.steuer > 0.5 ? 'var(--red)' : 'var(--green)',
+      title: 'Steuer der Gesellschaft ' + year + ' laut Kanzlei (' + (gz.istQuelle || 'Stand laut Kanzlei') + '), eingetragen unter Einstellungen › Mandanten. Ergebnis ' + Math.round(gz.erg).toLocaleString('de-DE') + ' €. Ab dem Folgejahr rechnet DealPilot die Einschätzung.' };
     if (gz) return gz.steuer > 0.5
       ? { text: '−' + Math.round(gz.steuer).toLocaleString('de-DE') + ' €', color: 'var(--red)', title: 'Steuer der Gesellschaft ' + year + ' auf alle ' + gz.objekte + ' Objekte (Ergebnis ' + Math.round(gz.erg).toLocaleString('de-DE') + ' €), nach Kosten der Gesellschaft und Verlustvortrag' }
       : { text: '0 €', color: 'var(--green)', title: 'Die Gesellschaft zahlt ' + year + ' keine Ertragsteuer (alle ' + gz.objekte + ' Objekte zusammen, Ergebnis ' + Math.round(gz.erg).toLocaleString('de-DE') + ' €, nach Verlustvortrag).' };
