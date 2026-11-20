@@ -36,6 +36,24 @@ sind Ketten-, Funktions- und Gestaltungsfragen, keine Optikbefunde.
 
 ---
 
+### N181 · Einzel-Check 3,99 €, Landing „Fächer“, Vertonung, Partner-Fristen (Marcel 20.11.2026) — **Staging; Prod nur 1.0.133 (v3920–v3931b) und Register-Saat**
+Erledigt am 20.11.2026 (Einzelheiten `wissen/2026-11-20.md`):
+- v3931 Partner-Fristen-Takt lief seit v3357 nie (`partnerFristen` fehlte in SCHLUESSEL), Prüfer B2. **Prod 1.0.133**, Trockenlauf vorher 0/0/0/0/0.
+- v3931a/b Ernte 20.11. alle Gebiete, OGA Brandenburg 108 Werte gesperrt (Anfrage `Dateien/Register/Anfragen/2026-11-20-OGA-Brandenburg-Nutzungserlaubnis.md`, **Marcel schickt**). Register auf Staging und Prod eingespielt, 6.097 Werte, Abgleich sauber.
+- v3920 Anlage V A–F, Prod 1.0.133.
+- Landing „Fächer“ landing-faecher-1…2a, Einzel-Check v3940/v3940a: **nur Staging**.
+- Neun Videos vertont „(v3910)“, Ton unter `Dateien/Messe/Videos/vertonung-20261120/ton`.
+
+**Offen, in dieser Reihenfolge:**
+1. **Einzel-Check auf Marktbericht Stufe 2 umstellen** (Marcel 20.11.: „Stufe 2 würde reichen“). Heute holt der Bericht Stufe 3 wegen der Wertindikation (`/reports/einzelcheck`, `einzelcheck.js` `markt`/`mbEingabe`). Mit Stufe 2 fällt die registergestützte Wertindikation weg. Bericht-Abschnitt dann ohne Wertindikation oder nur Angebotsindikation; Prüfer `einzelcheck-pruefen` mitziehen.
+2. **Stripe-Testkauf durch Marcel** auf staging.dealpilot.immo (Testkarte 4242…), danach messen: Webhook → Status bezahlt, Promotion-Code EC…, Bericht, `mb.addresses`/`mb.market_reports` ohne neue Zeile, KI-Kosten je Lauf in `ki_verbrauch`, PDF-Druck, 390 px.
+3. Offene Entscheidungen Einzel-Check: Flyer-Code oder Anrechnung (Stripe nimmt nur einen), OCR für gescannte PDFs ohne tmpdir, Datenschutz-Absatz `Dateien/Einzelcheck/…-Entwurf-2026-11-20.md` gegenlesen und einbauen. Für Prod: Preis + Coupon im Live-Konto anlegen (Freigabe).
+4. **Abnahme Landing** auf staging.dealpilot.immo (Riss 3 s, Gesamturteil-Leiste, Kaufweg, Quellen-Tabelle, Partner-Karten, Fächer bei 390 px), dann Prod. Frage offen: methodik.html nennt Quellen noch namentlich.
+5. **Abnahme der neun vertonten Videos** (besonders Modul 07: Ton läuft dem Bild teils nach, ggf. Sprechtexte kürzen), dann in die Videothek (medien/videothek) hochladen.
+6. Aus den Videos: Modul 21 Tabelle „Steuer über alle Objekte“ ungestaltet; Modul 07 linke Hälfte der Miete-Ansicht beim Scrollen leer; App speichert ein gelöschtes offenes Objekt erneut (POST /objects); drei Restobjekte im Videoreihe-Konto (Staging, Marcel löscht).
+7. Offenbach: ETW-Zins nach Wohnungszahl (etw_bis10we/etw_ueber10we) in die Zweigwahl; Gebäudefaktoren Kap. 9.4 (Baujahr × Fläche) nicht lesbar. SN-Sperren in `uk-flaeche-ost-2026.json` ohne `zugang`.
+8. Straubing-Bogen und Roth (BY): nur nichtkommerziell, Anfrage wie bei BB möglich.
+
 ### N180 · Anfordern und Freigeben zwischen Partner und Kunde (Marcel 18.11.2026, Konzept `Dateien/Mandantenkonzept/Anfordern-und-Freigeben-2026-11-18.md`) — **P0 v3683 und P1 v3690–v3690c (`aeeaf939`, `4c357f61`, `f10f7eac`) auf Staging nachgemessen; P1 Prod NICHT ausgerollt (Migration 118)**
 - [x] P0 Kundenstand rechnet nicht in der Steuer des Partners (v3683, Prod 1.0.114), v3688 `_von_kunde` nicht in der Verlustverrechnung (Prod 1.0.116).
 - [x] P1 Freigabe bei der Kopplung: Dialog in allen drei Wegen, Reiter Freigabe, Widerruf, Fassungen, Steuerdaten nur mit Freigabe (18.11.2026).
