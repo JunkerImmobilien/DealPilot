@@ -1,0 +1,32 @@
+﻿Datum;Uhrzeit;Commit;Stunden_umgegliedert;AP;Betreff;bisher_Einordnung;Begruendung
+2026-05-19;09:24;0c86e351;0,23;AP2;V227: Degressive AfA + § 7b Sonder-AfA (B4.1);Oberflaeche;Degressive AfA und § 7b Sonder-AfA als Rechenregel
+2026-05-26;17:01;339afe97;0,19;AP2;V287: §7 Abs.4 Nr.2 EStG Fix (baujahr statt anschJahr für 3% AfA);Steuer-/Rechenkern;§ 7 Abs. 4 Nr. 2 EStG: Baujahr statt Anschaffungsjahr fuer 3 % AfA
+2026-05-28;09:58;437f4fad;0,38;AP2;V292.6.6-6.9: BMF MEA-Fixes (recalc + pipeline + runBmf + objekt.mea);Oberflaeche;BMF-Kaufpreisaufteilung: MEA-Rechenkette
+2026-05-29;19:32;f22bcb87;0,24;AP2;V351-V353: Y1-Cashflow/Steuer-Konsistenz;Steuer-/Rechenkern;Cashflow/Steuer-Konsistenz Jahr 1
+2026-06-29;15:00;76907020;0,13;AP6;v814: Stufe-3 Ueberfuehrungs-Rechenblock (AfA-Verkehrswert, Stichtag-KSt-Split, Mandanten-Steuerakte, uebernommene Rests;Steuer-/Rechenkern;Ueberfuehrungs-Rechenblock: AfA auf Verkehrswert, Stichtag-KSt-Split
+2026-07-21;16:14;fe12efb7;0,50;AP4;fix2: Marktzins BBSIS-Key + sdmx_csv + Pfandbrief-Margen kalibriert;Backend sonstiges;Marktzins aus Bundesbank-Reihe, Pfandbrief-Margen kalibriert
+2026-08-12;09:18;582b6da7;0,08;AP4;BACKLOG: zwei neue Punkte aus der Sachwert-Pruefung;Doku/Journal;Sachwert-Pruefung: Befunde
+2026-08-12;14:38;29e2cb15;0,06;AP4;BACKLOG: Sachwertfaktor-Punkt korrigiert, neuer Punkt 2 aus dem Nachweislauf;Doku/Journal;Sachwertfaktor-Befund korrigiert
+2026-08-12;20:03;1f6ca22e;0,13;AP4;Uebergabe: Fehldiagnose zum Sachwertfaktor zurueckgenommen;Doku/Journal;Fehldiagnose Sachwertfaktor zurueckgenommen (gemessener Fehlversuch)
+2026-08-12;21:19;99a14db8;0,12;AP4;v1154: Die Differenz-Formel stand zweimal - jetzt eine Quelle;Backend sonstiges;Differenz-Formel Bewertung: zwei Quellen auf eine
+2026-09-02;09:36;99e3176d;0,19;AP4;Entscheidungsvorlage: Ertragswert bei ETW ohne Miteigentumsanteil;Design/Entwuerfe;Ertragswert bei ETW ohne Miteigentumsanteil
+2026-09-08;18:02;01790752;0,06;AP2;v1261: die 15-Prozent-Grenze misst ohne Umsatzsteuer;Steuer-/Rechenkern;15-%-Grenze ohne Umsatzsteuer
+2026-09-11;20:41;0405c8d1;0,14;AP4;v1312: Erbbaurecht - Feld, Erbbauzins im Cashflow, Abschlag nach § 50 ImmoWertV;Oberflaeche;Erbbaurecht: Abschlag nach § 50 ImmoWertV, Erbbauzins im Cashflow
+2026-09-12;18:19;303d3e93;0,11;AP4;v1338: Modellkonformitaet im Sachwert - GND aus dem Modell, bOM nach Paragraf 8 Abs. 3, Streuung, Doppelabzugs-Warnung;Bewertungsmodelle;Modellkonformitaet Sachwert: GND, bOM nach § 8 Abs. 3 ImmoWertV
+2026-09-13;14:20;55785830;0,10;AP4;Ernte Hamburg: Sachwertfaktor-Modell vollstaendig gehoben und geprueft;Doku/Journal;Sachwertfaktor-Modell Hamburg geprueft
+2026-09-14;16:06;aae0c8d8;0,09;AP2;v1382: Der BMF-Rechner sagt, was ihm fehlt - und rechnet nicht ohne;BMF-Kaufpreisaufteilung (Logik+Oberflaeche);BMF-Rechner: Rueckfrage statt Rechnung ohne Angabe
+2026-09-15;10:37;925a7a9a;0,36;AP2;Backlog: Steuerthematik geprueft - Trennung sauber, ein Befund bei der GbR;Doku/Journal;Steuerthematik geprueft, Befund GbR
+2026-09-15;14:43;2f7e88d7;0,10;AP4;Ernte NI: das URL-Muster entschluesselt - und bswf war ein Lesefehler;Doku/Journal;Datenquelle NI: URL-Muster, Lesefehler
+2026-09-15;14:48;3fd1c8a0;0,08;AP4;Ernte NI: die Kuerzel sind Kfz-Kennzeichen - und es sind weit weniger Ausschuesse als gedacht;Doku/Journal;Datenquelle NI: Ausschuesse
+2026-09-15;14:52;d728d609;0,06;AP4;Ernte NI: sieben Gebiete, neun Workbooks - und zwei Ruecknahmen;Doku/Journal;Datenquelle NI: Gebiete, Ruecknahmen
+2026-09-15;14:56;854205d2;0,07;AP4;Ernte NI: die vier Teilmaerkte stehen - und eine Messfalle, die Zeit kostete;Doku/Journal;Datenquelle NI: Teilmaerkte, Messfalle
+2026-09-19;09:56;642d6267;0,21;AP2;v1442: EK-Rendite vor Steuern - Haupt-App und Quick Check rechnen gleich;Oberflaeche;EK-Rendite vor Steuern: zwei Rechenwege angeglichen
+2026-09-21;09:13;a92c79f6;0,06;AP2;v1495: Steuerwirkung aufs selbe Blatt, Sofortkosten raus, Klausel als Satz;Steuer-/Rechenkern;Steuerwirkung, Sofortkosten
+2026-09-22;07:43;c8c338fe;0,20;AP3;v1509/v1510: Spanne statt fester Zahl, Kernsanierung an den Kern, altes RND-Modul ausgebaut;Oberflaeche;RND: Spanne statt fester Zahl, Kernsanierung
+2026-09-24;13:03;910ae64f;0,50;AP3;v1597: der RND-Assistent fragte ein Bauteil ab, das er gar nicht bewertet;Oberflaeche;RND-Assistent: nicht bewertetes Bauteil
+2026-09-24;13:16;7e9337e4;0,23;AP2;v1598: der Steuervorteil rechnete auf 200.000 EUR - egal wie teuer das Objekt war;Oberflaeche;Steuervorteil auf 200.000 EUR gedeckelt statt objektbezogen
+2026-09-25;07:42;0d8c3eaa;0,07;AP8;v1607: der Sprechlauf fragte das Darlehen nie - und rechnete es auch nicht;Spracheingabe (Zuordnung+Oberflaeche);Sprechlauf: Darlehen nie erfragt und nie gerechnet
+2026-09-30;13:17;f2731aaa;0,15;AP2;v1731: die Kaufpreisaufteilung hat zwei Wege, nicht einen;Oberflaeche;Kaufpreisaufteilung: zwei Wege
+2026-10-04;09:04;c7801254;0,07;AP2;v1823: die Leitzone 0 sind vier Bundeslaender - drei Grunderwerbsteuersaetze waren falsch;Oberflaeche;drei GrESt-Saetze falsch
+2026-10-04;11:15;6f0f64a9;0,06;AP4;v1832: die umgekehrte Ertragswertmethode rechnet - und trifft das Gutachten auf den Cent;Backend sonstiges;umgekehrte Ertragswertmethode gegen Gutachten
+2026-10-08;09:06;47453414;0,09;AP4;v1971: ohne Kaufpreise kein Vergleichswertverfahren;Bewertungsmodelle;Vergleichswertverfahren nur mit Kaufpreisen

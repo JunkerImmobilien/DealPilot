@@ -1,0 +1,101 @@
+﻿Datum;Von;Bis;Stunden;AP;Kategorie;Taetigkeit;Beleg;Status
+16.05.2026;08:00;17:00;;AP2;Modulentwicklung Chat;Portfolio-Chat 1 (57 Turns, V3.7-V3.11): Steuer-Engine 32a, AfA-Regel, RND gegen zwei Gutachten, VV-GmbH-Break-even;Chat 98b13932, Datenexport fuer Dauer;angegeben Marcel 09.10.2026 (aus Erinnerung, Beleg nachreichen)
+06.07.2026;08:00;16:00;;AP2;Modulentwicklung Chat;Portfolio-Chat 2 (148 Turns, V153.6-V158): Einbringung zum Verkehrswert, KSt+Soli, Gruppen-Engine, Cashflow-Profil;Chat 330c8967, Datenexport fuer Dauer;angegeben Marcel 09.10.2026 (aus Erinnerung, Beleg nachreichen)
+16.09.2026;09:00;15:00;;AP7;Modulentwicklung Chat;Portfolio-Chat 3 (146 Turns, V178-V193): 7b-Deckelung, Steuerpfad mit Drei-Objekt-Grenze, Fristen-Cockpit, Journal/Intake;Chat 89a1212a, Datenexport fuer Dauer;angegeben Marcel 09.10.2026 (aus Erinnerung, Beleg nachreichen)
+11.06.2026;10:00;14:00;;AP3;Fachrecherche;Rechtsdatenquellen fuer Normen und BFH-Urteile geprueft (NeuRIS-API, BFH statt BGH, drei Architektur-Optionen);Chat „Steuergesetze und BGH-Urteile verknuepfen“;angegeben Marcel 09.10.2026 (aus Erinnerung, Beleg nachreichen)
+21.08.2026;09:00;15:00;;AP2;Fachrecherche;Anlage V 2025 zeilenweise (89 Zeilen) gegen das Datenmodell gemappt, sechs Befunde zur Rechenlogik;Chat „Anlage V mit vorhandenen Daten ausfuellen“;angegeben Marcel 09.10.2026 (aus Erinnerung, Beleg nachreichen)
+25.08.2026;08:30;13:00;;AP4;Fachrecherche;Herkunft Liegenschaftszins und Sachwertfaktor bei Wettbewerbern, Zirkelbewertung;Chat 25.08.2026;angegeben Marcel 09.10.2026 (aus Erinnerung, Beleg nachreichen)
+08.10.2026;10:00;11:30;;AP7;Steuerberater fachlich;Abstimmung mit StB: 20/22 UmwStG gelten nicht fuer einzelne vermietete Objekte, Uebertragung als Veraeusserung/verdeckte Einlage;CLAUDE.md Abschnitt 6, Commit 4535e76 (08.10. 16:41);angegeben Marcel 09.10.2026 (aus Erinnerung, Beleg nachreichen)
+12.07.2026;09:00;13:00;;AP7;Steuerberater fachlich;Termin vor Ort bei Schmidt & Partner: fachlicher Inhalt: Modul besprechen, Wichtige Steuergesetze, Wie hängt was zusammen, Wie wird beraten;Kalender/Rechnung Schmidt & Partner;angegeben Marcel 09.10.2026 (aus Erinnerung, Beleg nachreichen)
+06.01.2026;;;2,5;;Abstimmung Steuerberater;Kick-off: Zielbild, welche steuerlichen Größen abgebildet werden;;
+13.01.2026;;;3,5;;Recherche;Anforderungen gesammelt: welche Kennzahlen braucht ein Kapitalanleger (Rendite, Cashflow, DSCR);;
+14.01.2026;;;4;;Recherche;Marktüberblick bestehende Kalkulationstools, Abgrenzung zum eigenen Ansatz;;
+15.01.2026;;;3;;Testen mit Objekten;Erste Testobjekte angelegt (ETW, MFH), Eingabemasken durchgespielt;;
+16.01.2026;;;1,5;;Testen mit Objekten;Kaufnebenkosten gegen Handrechnung geprüft;;
+17.01.2026;;;4;;Recherche;Datenquellen gesichtet (Bodenrichtwerte, Mietspiegel, Marktdaten);;
+22.01.2026;;;5;;Abstimmung Steuerberater;Abgleich Anschaffungskosten-/Nebenkosten-Logik, nächste Schritte festgelegt;;
+26.01.2026;;;3;;Testen mit Objekten;Zweites Objekt-Set geladen, Grundkennzahlen verglichen;;
+30.01.2026;;;2,5;;Testen mit Objekten;Abweichungen dokumentiert, Fehlerliste angelegt;;
+06.02.2026;;;1,5;;Recherche;Bodenrichtwert-Quellen verglichen (BORIS, Gutachterausschüsse);;
+11.02.2026;;;2,5;;Abstimmung Steuerberater;Abgleich Renditekennzahlen und Annahmen Bewirtschaftungskosten;;
+13.02.2026;;;2;;Recherche;Recherche Marktmieten / Mietspiegel-Verfügbarkeit je Region;;
+18.02.2026;;;2,5;;Testen mit Objekten;Neue Objekte geladen (verschiedene Bundesländer), GrESt-Sätze geprüft;;
+19.02.2026;;;3;;Recherche;Bewirtschaftungskosten-Ansätze recherchiert (Verwaltung, Instandhaltung, Mietausfall);;
+21.02.2026;;;3;;Testen mit Objekten;Renditekennzahlen gegen Excel-Referenz abgeglichen;;
+23.02.2026;;;2,5;;Abstimmung Steuerberater;Review Testergebnisse, Festlegung Prioritäten Folgemonat;;
+24.02.2026;;;5;;Testen mit Objekten;Bodenrichtwert-Eingabe mit realen Objekten getestet;;
+27.02.2026;;;3,5;;Recherche;Logik Brutto-/Nettomietrendite und Kaufpreisfaktor ausgearbeitet;;
+02.03.2026;;;2,5;;Recherche;Recherche AfA-Regeln (lineare AfA, Baujahresgrenzen);;
+03.03.2026;;;2;;Abstimmung Steuerberater;Abstimmung AfA-Logik und Bemessungsgrundlage;;
+07.03.2026;;;4;;Testen mit Objekten;Kaufpreisaufteilung mit 5 realen Objekten durchgerechnet;;
+12.03.2026;;;5;;Testen mit Objekten;AfA-Berechnung je Baujahr-Klasse getestet;;
+17.03.2026;;;3;;Abstimmung Steuerberater;Kaufpreisaufteilung: Vorgehen und Grenzen abgestimmt;;
+21.03.2026;;;2;;Testen mit Objekten;Vergleich Tool-Ergebnis vs. BMF-Arbeitshilfe;;
+23.03.2026;;;3;;Recherche;Kaufpreisaufteilung Boden/Gebäude: Methoden und Rechtsprechung;;
+24.03.2026;;;3;;Testen mit Objekten;Grenzfälle getestet (Altbau, hoher Bodenanteil);;
+25.03.2026;;;1,5;;Recherche;BMF-Arbeitshilfe nachvollzogen, Rechenweg dokumentiert;;
+27.03.2026;;;2;;Abstimmung Steuerberater;Review Testfälle, Abweichungen besprochen und Vorgehen festgelegt;;
+02.04.2026;;;3;;Recherche;Finanzierungsmodelle recherchiert (Annuität, Tilgungsaussetzung, Sondertilgung);;
+08.04.2026;;;4;;Recherche;Zinsbindung / Anschlussfinanzierung: Szenario-Logik entworfen;;
+10.04.2026;;;2,5;;Abstimmung Steuerberater;Abgleich Finanzierungskosten / steuerliche Behandlung;;
+23.04.2026;;;2,5;;Testen mit Objekten;Finanzierungsszenarien an Testobjekten durchgespielt;;
+24.04.2026;;;3;;Testen mit Objekten;Tilgungsplan gegen Bankangebot abgeglichen;;
+25.04.2026;;;3;;Testen mit Objekten;Cashflow vor/nach Steuern mit neuen Objekten geprüft;;
+27.04.2026;;;3;;Recherche;Cashflow-Rechnung vor und nach Steuern strukturiert;;
+28.04.2026;;;2;;Recherche;Kennzahl DSCR: Definitionen der Banken verglichen;;
+29.04.2026;;;1,5;;Abstimmung Steuerberater;Review Cashflow nach Steuern, Freigabe Rechenweg;;
+04.05.2026;;;2;;Recherche;Recherche Mietentwicklung / Indexmiete / Staffelmiete;;
+05.05.2026;;;1,5;;Abstimmung Steuerberater;Abstimmung Werbungskosten-Katalog und Umlagefähigkeit;;
+13.05.2026;;;3;;Recherche;Instandhaltungsrücklage: Ansätze (Peterssche Formel, II. BV) verglichen;;
+15.05.2026;;;1,5;;Abstimmung Steuerberater;Review Mehrjahresrechnung, Annahmen festgelegt;;
+16.05.2026;;;2;;Testen mit Objekten;Neue Objekte mit Staffel-/Indexmiete geladen;;
+19.05.2026;;;4;;Testen mit Objekten;Bewirtschaftungskosten gegen reale Abrechnungen getestet;;
+27.05.2026;;;3,5;;Recherche;Umlagefähige vs. nicht umlagefähige Kosten abgegrenzt;;
+28.05.2026;;;2,5;;Abstimmung Steuerberater;Klärung Sonderfragen aus den Tests;;
+29.05.2026;;;5;;Testen mit Objekten;Mehrjahres-Cashflow über 10 Jahre geprüft;;
+30.05.2026;;;3,5;;Recherche;Leerstands- und Mietausfallwagnis: Annahmen recherchiert;;
+01.06.2026;;;3,5;;Recherche;Werbungskosten bei V+V systematisch aufgearbeitet;;
+02.06.2026;;;2;;Testen mit Objekten;Steuerberechnung an Testobjekten gegen Steuerberater-Zahlen geprüft;;
+03.06.2026;;;2;;Abstimmung Steuerberater;Abgleich Erhaltungsaufwand / anschaffungsnahe HK;;
+06.06.2026;;;1;;Recherche;Erhaltungsaufwand vs. Herstellungskosten, 15-%-Grenze (anschaffungsnahe HK);;
+10.06.2026;;;2;;Recherche;Verteilung größerer Erhaltungsaufwand (§ 82b EStDV) recherchiert;;
+17.06.2026;;;2,5;;Recherche;Steuerliche Behandlung Disagio / Finanzierungskosten;;
+20.06.2026;;;2;;Testen mit Objekten;Sanierungsobjekt geladen: 15-%-Grenze getestet;;
+22.06.2026;;;1;;Recherche;Logik persönlicher Steuersatz / Grenzsteuersatz im Tool;;
+25.06.2026;;;3;;Abstimmung Steuerberater;Review Steuerberechnung an Testobjekten, Korrekturen vereinbart;;
+29.06.2026;;;3,5;;Testen mit Objekten;Verkaufsszenario nach 10 Jahren durchgerechnet;;
+02.07.2026;;;4;;Testen mit Objekten;Denkmal-Objekt und Neubau-Objekt als Testfälle angelegt;;
+06.07.2026;;;1,5;;Recherche;Sonderfälle: Denkmal-AfA, Sonder-AfA Neubau (§ 7b EStG);;
+08.07.2026;;;3;;Abstimmung Steuerberater;Abstimmung Sonder-AfA und Denkmal-Fälle;;
+09.07.2026;;;4;;Recherche;Degressive AfA Wohngebäude: Voraussetzungen und Rechenweg;;
+21.07.2026;;;3;;Recherche;Verkürzte Restnutzungsdauer per Gutachten: Anforderungen recherchiert;;
+22.07.2026;;;3,5;;Testen mit Objekten;Degressive AfA gegen Handrechnung geprüft;;
+23.07.2026;;;2,5;;Recherche;Möblierung / Inventar: getrennte Abschreibung;;
+27.07.2026;;;2;;Testen mit Objekten;Möbliertes Objekt getestet (getrennte AfA);;
+28.07.2026;;;1,5;;Abstimmung Steuerberater;Review Sonderfall-Tests, Festlegung was umgesetzt wird;;
+31.07.2026;;;2;;Testen mit Objekten;Neue Objekte geladen, Sonderfälle protokolliert;;
+04.08.2026;;;2;;Recherche;Portfolio-Sicht: Kennzahlen über mehrere Objekte aggregieren;;
+07.08.2026;;;3;;Recherche;Recherche vermögensverwaltende GmbH vs. Privatbesitz (Rechenlogik);;
+10.08.2026;;;2;;Abstimmung Steuerberater;Abgleich GmbH- vs. Privat-Rechenlogik;;
+13.08.2026;;;2,5;;Recherche;Drei-Objekt-Grenze / gewerblicher Grundstückshandel eingeordnet;;
+14.08.2026;;;2;;Abstimmung Steuerberater;Review Portfolio-Auswertung, steuerliche Plausibilität;;
+18.08.2026;;;2,5;;Recherche;Beleihungsauslauf und Nachbeleihung im Portfolio;;
+19.08.2026;;;3;;Testen mit Objekten;Portfolio mit mehreren Objekten geladen, Aggregation geprüft;;
+24.08.2026;;;3,5;;Testen mit Objekten;Vergleich GmbH- vs. Privat-Szenario an Testportfolio;;
+25.08.2026;;;2,5;;Abstimmung Steuerberater;Festlegung Arbeitspakete Folgemonat;;
+27.08.2026;;;2,5;;Testen mit Objekten;Performance-/Stabilitätstest mit größerem Objektbestand;;
+01.09.2026;;;3;;Recherche;Anforderungen an Export / Bankunterlagen recherchiert;;
+03.09.2026;;;3,5;;Recherche;Plausibilitätsprüfungen definiert (Grenzwerte, Warnhinweise);;
+07.09.2026;;;3;;Testen mit Objekten;Export-Unterlagen mit Testobjekten erzeugt und geprüft;;
+09.09.2026;;;1,5;;Abstimmung Steuerberater;Review Export-Unterlagen aus steuerlicher Sicht;;
+10.09.2026;;;3;;Recherche;Recherche Schnittstellen zu Bewertungs- und Marktdaten;;
+12.09.2026;;;2,5;;Testen mit Objekten;Plausibilitätswarnungen an Grenzfällen getestet;;
+15.09.2026;;;5;;Testen mit Objekten;Gesamter Durchlauf mit frisch geladenen Objekten (End-to-End);;
+16.09.2026;;;2;;Testen mit Objekten;Regressionstest komplettes Objekt-Set;;
+18.09.2026;;;2;;Recherche;Dokumentation der Rechenlogik überarbeitet;;
+25.09.2026;;;1,5;;Recherche;Rechtliche Hinweise / Haftungsausschluss für Ergebnisse recherchiert;;
+29.09.2026;;;4;;Abstimmung Steuerberater;Abschluss-Abgleich Rechenlogik, offene Punkte und nächste Schritte festgelegt;;
+;;;;;;;;
+;;;;;;;;
+;;;;;;;;
+;;;;;;;;
