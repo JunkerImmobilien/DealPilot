@@ -123,6 +123,215 @@
   };
   var SCHLUESSEL = Object.keys(FELDER);
 
+  /* ═══ v3920 · GLIEDERUNG A BIS F: EINE Stelle fuer Steuerformular, Werbungskosten-PDF und Steuer-Mappe ═══
+     Marcel 20.11.2026: wer PDF und Formular nebeneinander legt, soll dieselben Bloecke A bis F in derselben
+     Reihenfolge, dieselben Zeilennummern des Jahres und dieselben Zeilentexte finden. Bis v3910 stand die
+     Gliederung nur in tax.js (_renderDetailForm, seit v3900), die PDFs ordneten noch nach „1. Finanzierungskosten"
+     bis „7. Weitere Werbungskosten" mit eigenen Bezeichnungen (_AV_LABEL in werbungskosten-pdf.js, WK/WK_NAME in
+     dp-dokumente.js). Jetzt lesen alle drei diese Liste. Die Zeilennummer steht hier NICHT: sie kommt je Jahr aus
+     der Abschrift (zeileFuer), ohne Abschrift gibt es keine.
+     Zeilenarten: { f } Feld · { sum: [Felder], zf } Summe mehrerer Felder (Anzeige) · { anzeige } Auskunft ohne Feld.
+     l = Zeilentext (gemeinsam), woher = Hinweis nur im Steuerformular (wo die Zahl herkommt), st = Detailgrad,
+     davon = Teil der Summenzeile darueber, ro = im Formular nur Anzeige. Felder ohne l tragen FELDER[f].l.
+     Rechnung: keine. Die Summen bildet weiter _computeYearTotal (tax.js) bzw. die Steuer-Mappe. */
+  var BLOECKE = [
+    { k: 'A', titel: 'Einnahmen', zus: 'einnahmen', rows: [
+      { f: 'einnahmen_km', l: 'Mieteinnahmen (Kaltmiete)', woher: ', aus dem Reiter Miete', st: 1, ro: true },
+      { f: 'einnahmen_nk', l: 'Umlagen (umlagefähige Nebenkosten)', woher: ', aus der Bewirtschaftung', st: 1, ro: true },
+      { f: 'av_garagen', st: 2 },
+      { f: 'av_nk_nachzahlung', st: 2 },
+      { f: 'av_zuschuesse', st: 2 },
+      { f: 'av_andere_raeume', st: 3 },
+      { f: 'av_angehoerige', st: 3 },
+      { f: 'av_nk_angehoerige', st: 3 },
+      { f: 'av_nk_nachz_angeh', st: 3 },
+      { f: 'av_fruehere_mieten', st: 3 },
+      { f: 'av_ust_vereinnahmt', st: 3 },
+      { f: 'av_ust_erstattet', st: 3 },
+      { f: 'av_zuschuesse_eigen', st: 3 }
+    ] },
+    { k: 'B', titel: 'Abschreibungen', rows: [
+      { f: 'afa', l: 'Gebäude-AfA', woher: ', aus der AfA-Konfiguration', st: 1, dyn: 'afa' },
+      { f: 'sonst_bewegl_wg', l: 'AfA bewegliche Wirtschaftsgüter (z. B. Einbauküche, Möbel)', st: 2 },
+      { f: 'anschaffungsnah', l: 'Anschaffungsnahe Herstellungskosten (§ 6 Abs. 1 Nr. 1a EStG), wirken über die AfA', st: 2 },
+      { anzeige: 'afa7b', l: 'davon Sonderabschreibung § 7b EStG (in der Gebäude-AfA enthalten)', st: 3, davon: true, summe: 'sonder7b' },
+      { f: 'av_7h7i', woher: ', Eingabe in der AfA-Konfiguration', st: 3, ro: true }
+    ] },
+    { k: 'C', titel: 'Finanzierung', rows: [
+      { f: 'schuldzinsen', l: 'Schuldzinsen laut Tilgungsplan', st: 1 },
+      { f: 'bereitstellung', l: 'Bereitstellungszinsen (gehören zu den Schuldzinsen)', st: 2 },
+      { sum: ['notar_grundschuld', 'vermittlung', 'finanz_sonst'], zf: 'notar_grundschuld', l: 'Geldbeschaffungskosten (Notar und Grundbuch der Grundschuld, Vermittlung, Schätzung)', st: 2 },
+      { f: 'notar_grundschuld', l: 'davon Notar und Grundbuch für die Grundschuld (anteilig)', st: 3, davon: true },
+      { f: 'vermittlung', l: 'davon Vermittlungsprovision für das Darlehen', st: 3, davon: true },
+      { f: 'finanz_sonst', l: 'davon sonstige Geldbeschaffungskosten (z. B. Wertgutachten für die Bank)', st: 3, davon: true },
+      { f: 'av_renten', st: 3 }
+    ] },
+    { k: 'D', titel: 'Erhaltungsaufwand', rows: [
+      { f: 'erhaltungsaufwand', l: 'Erhaltungsaufwand des Jahres (Reparaturen, Instandhaltung)', st: 1 },
+      { anzeige: 'erhV', l: 'davon auf 2 bis 5 Jahre verteilt (§ 82b EStDV), Anteil dieses Jahres', woher: '. Die Verteilung wählst du im Reiter Kaufpreis und Investition.', st: 2, davon: true, summe: 'erh_verteilt_jahr', dyn: 'erhV' },
+      { f: 'av_erh_m1', st: 3, dyn: 'vj' },
+      { f: 'av_erh_m2', st: 3, dyn: 'vj' },
+      { f: 'av_erh_m3', st: 3, dyn: 'vj' },
+      { f: 'av_erh_m4', st: 3, dyn: 'vj' }
+    ] },
+    { k: 'E', titel: 'Laufende Kosten', rows: [
+      { f: 'nk_umlf', l: 'Umgelegte Kosten (gleich den Umlagen, heben sich mit ihnen auf)', st: 1, ro: true },
+      { sum: ['nk_n_umlf', 'hausverwaltung', 'kontofuehrung', 'betr_sonst', 'verw_sonst'], zf: 'hausverwaltung', l: 'Nicht umgelegte Kosten und Verwaltung (Hausgeld nicht umlagefähig, Verwaltung, Kontoführung)', st: 1 },
+      { f: 'nk_n_umlf', l: 'davon nicht umlagefähige Nebenkosten (Hausgeld)', st: 2, davon: true },
+      { f: 'hausverwaltung', l: 'davon Hausverwaltung, Mietsonderverwaltung', st: 2, davon: true },
+      { f: 'kontofuehrung', l: 'davon Kontoführung (Konto nur für die Immobilie)', st: 2, davon: true },
+      { f: 'betr_sonst', l: 'davon sonstige Betriebskosten', st: 3, davon: true },
+      { f: 'verw_sonst', l: 'davon sonstige Verwaltungskosten', st: 3, davon: true },
+      { f: 'av_ust_gezahlt', st: 3 },
+      { sum: ['steuerber', 'fahrtkosten', 'sonst_kosten', 'porto', 'inserat', 'gericht', 'telefon', 'hotel', 'verpflegung'], zf: 'sonst_kosten', l: 'Sonstige Kosten gesamt', st: 2 },
+      { f: 'steuerber', l: 'davon Steuerberatung (Anteil für die Vermietung)', st: 2, davon: true },
+      { f: 'fahrtkosten', l: 'davon Fahrtkosten zur Immobilie', st: 2, davon: true },
+      { f: 'sonst_kosten', l: 'davon sonstige Werbungskosten (Sammelposten)', st: 2, davon: true },
+      { f: 'porto', l: 'davon Porto, Büromaterial', st: 3, davon: true },
+      { f: 'inserat', l: 'davon Inserate', st: 3, davon: true },
+      { f: 'gericht', l: 'davon Gerichts- und Anwaltskosten', st: 3, davon: true },
+      { f: 'telefon', l: 'davon Telefon und Internet (Anteil)', st: 3, davon: true },
+      { f: 'hotel', l: 'davon Übernachtungskosten', st: 3, davon: true },
+      { f: 'verpflegung', l: 'davon Verpflegungsmehraufwand', st: 3, davon: true }
+    ] },
+    { k: 'F', titel: 'Angaben zum Objekt', rows: [
+      { f: 'av_kuerzung_pct', st: 3, dyn: 'quote' },
+      { f: 'av_kuerzung_betrag', st: 3, dyn: 'quote' },
+      { f: 'av_fewo', st: 3 },
+      { f: 'av_kurzfristig', st: 3 },
+      { f: 'av_angeh_flag', st: 3 },
+      { f: 'av_nk_nicht_vereinbart', st: 3 },
+      { f: 'av_wohnflaeche', st: 3 },
+      { f: 'av_eigen_qm', st: 3 },
+      { f: 'av_anteil_pct', st: 3 },
+      { f: 'av_zurechnung_a_pct', st: 3 },
+      { f: 'av_vorsteuer', st: 3 },
+      { f: 'av_zuschuss_ahk', st: 3 }
+    ] }
+  ];
+  /* Steuerzeilen ohne Angabe der Anlage V (die Spalten von tax_records), in der Reihenfolge der Bloecke */
+  var BASIS = [];
+  BLOECKE.forEach(function (b) { b.rows.forEach(function (r) { (r.sum || (r.f ? [r.f] : [])).forEach(function (f) { if (!FELDER[f] && BASIS.indexOf(f) < 0) BASIS.push(f); }); }); });
+  var REIHE = {}, _ri = 0;   /* Reihenfolge der Felder im Steuerformular, fuer gleiche Formularzeilen */
+  BLOECKE.forEach(function (b) { b.rows.forEach(function (r) { (r.f ? [r.f] : []).concat(r.sum || []).forEach(function (f) { if (REIHE[f] == null) REIHE[f] = _ri++; }); }); });
+  var reihe = function (e) { return e && e.feld != null && REIHE[e.feld] != null ? REIHE[e.feld] : 999; };
+  var BLOCK_VON = {};
+  BLOECKE.forEach(function (b) { b.rows.forEach(function (r) { (r.sum || (r.f ? [r.f] : [])).forEach(function (f) { BLOCK_VON[f] = b.k; }); }); });
+
+  /** Block eines Felds, auch der Zeilen, die die Aufstellung selbst bildet (afa_7b, erh_verteilt_<Jahr>, einheit_<i> ...). */
+  function blockVon(f) {
+    f = String(f || '');
+    if (BLOCK_VON[f]) return BLOCK_VON[f];
+    if (/^einheit_/.test(f) || f === 'av_zuschuesse_erg') return 'A';
+    if (f === 'afa_7b' || f === 'afa_angaben') return 'B';
+    if (/^erh_/.test(f)) return 'D';
+    return 'F';
+  }
+  function einheitL(f) {
+    var F = FELDER[f]; if (!F) return f;
+    return F.l + (F.einheit && F.einheit !== '€' && F.l.indexOf('(' + F.einheit + ')') < 0 ? ' (' + F.einheit + ')' : '');
+  }
+  function afaText(ctx) {
+    /* v2948 · Satz aus dem Objekt. Im Steuerformular immer „linear" (Satz aus #afa_satz), in den PDFs die Art aus dem Steuersatz */
+    var a = ctx.afaArt, s = Number(ctx.afaSatz != null ? ctx.afaSatz : (a && a.s));
+    var wort = a && a.m ? afaWort(a) : 'linear';
+    return 'Gebäude-AfA (' + wort + (s > 0 ? ' ' + s.toLocaleString('de-DE', { maximumFractionDigits: 2 }) + ' %' : '') + (ctx.zusatz || '') + ')';
+  }
+  /** Die Gliederung fuer ein Jahr, Texte aufgeloest, als frische Kopie (der Aufrufer darf sie veraendern).
+      ctx: { afaSatz, afaArt ({m, s}), erhG (Gesamtaufwand verteilter Erhaltung), quoteUnter66, woher (true: Hinweise
+      des Steuerformulars anhaengen) }. Jede Zeile traegt l (Zeilentext) und text (l mit woher, wenn ctx.woher). */
+  function bloecke(jahr, ctx) {
+    ctx = ctx || {};
+    var j = Math.round(zahl(jahr)), T = tabelle(j), S = (T && T.summen) || {};
+    return BLOECKE.map(function (b) {
+      var nb = { k: b.k, titel: b.titel, zus: b.zus ? [S[b.zus] != null ? S[b.zus] : null] : [], rows: [] };
+      b.rows.forEach(function (r) {
+        var x = {}; Object.keys(r).forEach(function (k) { x[k] = Array.isArray(r[k]) ? r[k].slice() : r[k]; });
+        if (x.f && !x.l) x.l = einheitL(x.f);
+        if (x.dyn === 'afa') x.l = afaText(ctx);
+        if (x.dyn === 'erhV' && zahl(ctx.erhG)) x.l += ', Gesamtaufwand des Jahres ' + Math.round(zahl(ctx.erhG)).toLocaleString('de-DE') + ' €';
+        if (x.dyn === 'vj') x.l = 'Verteilte Erhaltungsaufwendungen aus ' + (j - FELDER[x.f].vj) + ' (nicht in DealPilot erfasst)';
+        if (x.dyn === 'quote') x.st = ctx.quoteUnter66 ? 2 : 3;
+        if (x.summe) x.zeile = S[x.summe] != null ? S[x.summe] : null;
+        x.text = x.l + (ctx.woher && x.woher ? x.woher : '');
+        delete x.dyn; delete x.summe;
+        nb.rows.push(x);
+      });
+      return nb;
+    });
+  }
+  /** Zeilentext je Feld (fuer die Aufstellung nach Zeilen), dieselben Woerter wie das Steuerformular. */
+  function texte(jahr, ctx) {
+    var o = {};
+    bloecke(jahr, ctx).forEach(function (b) { b.rows.forEach(function (r) { if (r.f && !r.davon) o[r.f] = r.l; else if (r.f) { var t = r.l.replace(/^davon /, ''); o[r.f] = t.charAt(0).toUpperCase() + t.slice(1); } }); });
+    o.einnahmen_km = 'Mieteinnahmen (Kaltmiete)'; o.einnahmen_nk = 'Umlagen (umlagefähige Nebenkosten)';
+    return o;
+  }
+  /** Wie ein Feld in die Summe seines Blocks eingeht: +1 Einnahme/Werbungskosten, −1 mindernd, 0 nur Angabe
+      (Teile der Kaltmiete, Flaechen, Ankreuzfelder, Prozent). */
+  function zaehlt(f) {
+    var F = FELDER[f]; if (!F) return 1;
+    return (F.art === 'ein' || F.art === 'wk') ? 1 : F.art === 'ein_minus' ? -1 : 0;
+  }
+  /** Summen je Block aus den Werten des Jahres (values von _computeYearTotal oder einem gespeicherten Satz).
+      Rechnet nichts Neues: A = Kaltmiete + Umlagen + Einnahmen der Anlage V, B bis E = die Werbungskosten in voller
+      Hoehe; anteilMinus = nicht abzugsfaehiger Teil (verhaeltnismaessige Zuordnung). Dann gilt
+      A = Summe der Einnahmen und B + C + D + E − anteilMinus = Summe der Werbungskosten. */
+  function blockSummen(v) {
+    v = v || {};
+    var o = { A: 0, B: 0, C: 0, D: 0, E: 0, F: 0 }, gesehen = {};
+    BLOECKE.forEach(function (b) { b.rows.forEach(function (r) {
+      (r.sum || (r.f ? [r.f] : [])).forEach(function (f) { if (gesehen[f]) return; gesehen[f] = 1; o[b.k] += zahl(v[f]) * zaehlt(f); });
+    }); });
+    var ant = anteil(v), roh = o.B + o.C + o.D + o.E;
+    o.anteil = ant; o.anteilMinus = roh * (1 - ant / 100); o.werbungskosten = roh - o.anteilMinus; o.einnahmen = o.A;
+    return o;
+  }
+
+  /** v3920 · Die Aufstellung (Werbungskosten-PDF, Steuer-Mappe) nach den Bloecken A bis F, Zeile fuer Zeile wie das
+      Steuerformular: dieselben Texte, dieselbe Reihenfolge, die Zeilennummer des Jahres (ohne Abschrift keine).
+      v: Werte des Jahres. opt: { corp (Gesellschaft: keine Angaben der Anlage V, keine Zeilennummern), afaArt, afaSatz,
+      erhG, afaSonder7b, erhV ({Ursprungsjahr: Betrag}) }.
+      Je Block: { k, titel, bereich: [erste, letzte Zeile] | null, rows: [{ f, text, betrag, nr, davon, zaehlt, einheit,
+      flag, summe }], summe (Betrag des Blocks wie blockSummen), mitSumme (F nicht: dort stehen Angaben) }.
+      Zeilen ohne Betrag fallen weg, Bloecke ohne Zeile auch. Rechnet nichts Neues. */
+  function aufstellungBloecke(jahr, v, opt) {
+    v = v || {}; opt = opt || {};
+    var j = Math.round(zahl(jahr)), T = opt.corp ? null : tabelle(j), corp = !!opt.corp;
+    var nrVon = function (f) { if (!T) return null; var a = T.felder[f]; return a && a.zeile != null ? a.zeile : null; };
+    var erhVS = 0; if (opt.erhV) Object.keys(opt.erhV).forEach(function (k) { erhVS += zahl(opt.erhV[k]); });
+    var BS = blockSummen(v);
+    var aus = [];
+    bloecke(j, { afaArt: opt.afaArt, afaSatz: opt.afaSatz, erhG: opt.erhG }).forEach(function (b) {
+      var rows = [], nrs = [];
+      b.rows.forEach(function (r) {
+        if (r.f && FELDER[r.f] && corp) return;
+        var e = null;
+        if (r.sum) {
+          var s = 0; r.sum.forEach(function (f) { s += zahl(v[f]); });
+          var zz = []; r.sum.forEach(function (f) { var n = nrVon(f); if (n != null && zz.indexOf(n) < 0) zz.push(n); });
+          zz.sort(function (x, y) { return x - y; });
+          if (Math.abs(s) >= 0.005) e = { text: r.l, betrag: s, nr: zz.length ? zz.join(', ') : null, nrListe: zz, summe: true, zaehlt: true };
+        } else if (r.anzeige) {
+          var w = r.anzeige === 'afa7b' ? zahl(opt.afaSonder7b) : erhVS;
+          if (Math.abs(w) >= 0.005) e = { text: r.l, betrag: w, nr: T ? r.zeile : null, davon: true, zaehlt: false };
+        } else if (r.f) {
+          var bt = zahl(v[r.f]), F = FELDER[r.f];
+          if (Math.abs(bt) >= 0.005) e = { f: r.f, text: r.l, betrag: zaehlt(r.f) < 0 ? -bt : bt, nr: nrVon(r.f), davon: !!r.davon || zaehlt(r.f) === 0 && b.k !== 'F',
+            zaehlt: !r.davon && zaehlt(r.f) !== 0, minus: zaehlt(r.f) < 0, einheit: (F && F.einheit) || '€', flag: !!(F && F.art === 'flag') };
+        }
+        if (!e) return;
+        if (e.nrListe) nrs = nrs.concat(e.nrListe); else if (e.nr != null) nrs.push(e.nr);
+        rows.push(e);
+      });
+      if (!rows.length) return;
+      var z = nrs.concat(b.zus.filter(function (x) { return x != null && T; }));
+      aus.push({ k: b.k, titel: b.titel, rows: rows, bereich: (T && z.length) ? [Math.min.apply(null, z), Math.max.apply(null, z)] : null,
+                 summe: BS[b.k], mitSumme: b.k !== 'F' });
+    });
+    return { jahr: j, mitNummern: !!T, bloecke: aus, anteil: BS.anteil, anteilMinus: BS.anteilMinus, einnahmen: BS.einnahmen, werbungskosten: BS.werbungskosten };
+  }
+
   function zahl(x) { var n = Number(x); return isFinite(n) ? n : 0; }
   function anteil(av) { var a = zahl(av && av.av_anteil_pct); return a > 0 && a < 100 ? a : 100; }
 
@@ -210,7 +419,9 @@
      Jede Zeile mit teil: true ist eine Einzelangabe; die Summe der uebrigen ergibt die Summenzeilen. */
   function aufstellung(jahr, tot) {
     var T = tabelle(jahr); if (!T || !tot) return null;
-    var v = tot.values || {}, L = tot.labels || {}, S = T.summen || {}, VERH = T.verh || {};
+    var v = tot.values || {}, S = T.summen || {}, VERH = T.verh || {};
+    /* v3920 · Zeilentexte aus der Gliederung A bis F (dieselben wie im Steuerformular), tot.labels nur noch als Ausnahme */
+    var L = texte(jahr, { afaArt: tot.afaArt }); if (tot.labels) Object.keys(tot.labels).forEach(function (k) { L[k] = tot.labels[k]; });
     var F = T.felder, Z = T.zeilen;
     var kz = function (nr, f) { return (f && F[f] && F[f].kz) || (Z[nr] || {}).kz || null; };
     var zeile = function (f) { var a = F[f]; return a && a.zeile != null ? a.zeile : null; };
@@ -223,6 +434,7 @@
       if (nr == null) return false;
       var e = { zeile: nr, kz: kz(nr, extra && extra.feld), text: text, betrag: betrag };
       if (extra) Object.keys(extra).forEach(function (k) { e[k] = extra[k]; });
+      e.block = blockVon(e.feld);   /* v3920 · Block A bis F wie im Steuerformular */
       liste.push(e); return true;
     };
     var sachlogik = function (f, nr) { var a = F[f] || {}; if (a.quelle === 'sachlogik' && a.grund) R.sach.push('Zeile ' + nr + ' · ' + name(f) + ' – ' + a.grund); };
@@ -246,7 +458,7 @@
     };
     var wohnSumme = km - dKm;
     einzel(EH.filter(function (e) { return !e.g; }), wohnSumme, S.einzel_wohnung, S.einzel_wohnung_weitere, 'Wohnung');
-    push(R.einnahmen, zeile('einnahmen_km'), name('einnahmen_km') + (dKm ? ' (Wohnungen, ohne die Teile in eigenen Zeilen)' : ''), wohnSumme, { feld: 'einnahmen_km' });
+    push(R.einnahmen, zeile('einnahmen_km'), name('einnahmen_km') + (dKm ? ', nur Wohnungen, ohne die Teile in eigenen Zeilen' : ''), wohnSumme, { feld: 'einnahmen_km' });
     einzel(EH.filter(function (e) { return !!e.g; }), zahl(v.av_andere_raeume), S.einzel_raum, S.einzel_raum_weitere, 'Einheit');
     ['av_andere_raeume', 'av_angehoerige'].forEach(function (f) { if (zahl(v[f])) { push(R.einnahmen, zeile(f), name(f) + mark(f), zahl(v[f]), { feld: f }); sachlogik(f, zeile(f)); } });
     if (nk || dNk) push(R.einnahmen, zeile('einnahmen_nk'), name('einnahmen_nk') + (dNk ? ' (ohne Angehörige)' : ''), nk - dNk, { feld: 'einnahmen_nk' });
@@ -259,7 +471,7 @@
       if (zuE) push(R.einnahmen, zeile('av_zuschuesse_eigen'), name('av_zuschuesse_eigen'), -zuE, { feld: 'av_zuschuesse_eigen', teil: true });
       push(R.einnahmen, S.zuschuesse_ergebnis, 'Ergebnis der Zuschüsse und sonstigen Einnahmen', zu - zuE, { feld: 'av_zuschuesse_erg' });
     }
-    R.einnahmen.sort(function (a, b) { return a.zeile - b.zeile || (a.teil ? 0 : 1) - (b.teil ? 0 : 1); });
+    R.einnahmen.sort(function (a, b) { return a.zeile - b.zeile || (a.teil ? 0 : 1) - (b.teil ? 0 : 1) || reihe(a) - reihe(b); });
     R.summeEinnahmen = { zeile: S.einnahmen, betrag: zahl(tot.einnahmen) };
     if (zahl(tot.zeUngeteilt) > 0.5) R.hinweise.push('Zusätzliche Einnahmen von ' + eur(tot.zeUngeteilt) + ' sind nicht aufgeteilt und stehen bei den Mieteinnahmen. Garagen, Stellplätze, Werbeflächen und Antennen gehören in eine eigene Zeile: im Reiter Miete unter „Zusätzliche Einnahmen › aufteilen“ eintragen.');
 
@@ -272,7 +484,7 @@
       if (ant >= 100) return push(R.wk, nr, text, betrag, extra);
       var vz = VERH[nr], ziel = (S.verh_selbst || []).indexOf(vz) >= 0 ? vz : nr;
       push(R.wk, ziel, text + ' (abzugsfähiger Anteil)', betrag * fA, extra);
-      if (vz != null) push(R.wk, vz, 'durch verhältnismäßige Zuordnung ermittelt: Gesamtbetrag ' + eur(betrag) + ', abzugsfähiger Anteil ' + String(Math.round(ant * 100) / 100).replace('.', ',') + ' %', null, { teil: true });
+      if (vz != null) push(R.wk, vz, 'durch verhältnismäßige Zuordnung ermittelt: Gesamtbetrag ' + eur(betrag) + ', abzugsfähiger Anteil ' + String(Math.round(ant * 100) / 100).replace('.', ',') + ' %', null, { teil: true, feld: extra && extra.feld });
       return true;
     };
     var hatEigen = function (f) { var au = tot.auto || {}; return au[f] == null || Math.abs(zahl(v[f]) - zahl(au[f])) < 0.005; };
@@ -285,13 +497,13 @@
       if (f === 'afa') {
         var lin = tot.afaLinear, son = tot.afaSonder7b, eigen = hatEigen('afa');
         if (son != null && son > 0 && eigen && lin != null && S.sonder7b != null) {
-          wkPush(a.zeile, 'AfA Gebäude (' + afaWort(tot.afaArt) + ', ohne § 7b)', lin, { feld: 'afa' });
+          wkPush(a.zeile, afaText({ afaArt: tot.afaArt, zusatz: ', ohne § 7b' }), lin, { feld: 'afa' });
           wkPush(S.sonder7b, 'Sonderabschreibung § 7b EStG', son, { feld: 'afa_7b' });
           R.afaHinweis = { getrennt: true, text: 'Die Gebäude-AfA von ' + eur(betrag) + ' enthält eine Sonderabschreibung nach § 7b EStG. Zeile ' + a.zeile + ' nimmt laut Formular nur den Betrag ohne die Sonderabschreibung auf, deshalb steht der § 7b-Anteil getrennt in Zeile ' + S.sonder7b + '.' };
           return;
         }
         if (son == null) R.afaHinweis = { getrennt: false, text: 'Ob in dieser Gebäude-AfA eine Sonderabschreibung nach § 7b EStG steckt, geht aus dem gespeicherten Steuersatz nicht hervor. Zeile ' + a.zeile + ' nimmt laut Formular nur den Betrag ohne die Sonderabschreibung auf: enthält die AfA einen § 7b-Anteil, gehört dieser in Zeile ' + (S.sonder7b != null ? S.sonder7b : '(Sonderabschreibung § 7b)') + '.' };
-        wkPush(a.zeile, (tot.afaArt ? 'AfA Gebäude (' + afaWort(tot.afaArt) + ')' : name(f)) + mark(f), betrag, { feld: f });
+        wkPush(a.zeile, afaText({ afaArt: tot.afaArt }) + mark(f), betrag, { feld: f });
         return;
       }
       if (f === 'erhaltungsaufwand') {
@@ -325,7 +537,7 @@
       wkPush(nr, txt + mark(f), b, { feld: f });
       sachlogik(f, nr);
     });
-    R.wk.sort(function (a, b) { return a.zeile - b.zeile || (a.teil ? 1 : 0) - (b.teil ? 1 : 0); });
+    R.wk.sort(function (a, b) { return a.zeile - b.zeile || (a.teil ? 1 : 0) - (b.teil ? 1 : 0) || reihe(a) - reihe(b); });
     R.summeWk = { zeile: S.werbungskosten, betrag: zahl(tot.werbungskosten) };
     R.ueberschuss = { zeile: S.ueberschuss, betrag: zahl(tot.einnahmen) - zahl(tot.werbungskosten) };
     if (ant < 100) R.hinweise.push('Abzugsfähiger Anteil ' + String(Math.round(ant * 100) / 100).replace('.', ',') + ' %: DealPilot trägt alle Werbungskosten als verhältnismäßig zugeordnet ein. Direkt zuordenbare Aufwendungen (nur für den vermieteten Teil oder nur für den selbst genutzten) gehören in die Zeilen „durch direkte Zuordnung ermittelt“ und sind dann von Hand umzustellen. Die erstmalige Aufteilung ist in einer gesonderten Aufstellung zu erläutern.');
@@ -333,7 +545,7 @@
     /* 3 · Angaben ohne Wirkung auf die Summen, Ankreuzfelder, Kuerzung, Zurechnung */
     if (tot.afaArt && zeile('afa') != null) {
       var ersteZ = S.afa_angaben != null ? S.afa_angaben : null;
-      if (ersteZ != null) push(R.info, ersteZ, 'AfA Gebäude: ' + afaWort(tot.afaArt) + (zahl(tot.afaArt.s) > 0 ? ', ' + String(Math.round(zahl(tot.afaArt.s) * 100) / 100).replace('.', ',') + ' %' : '') + ' · ' + (tot.kaufjahr && jahr > tot.kaufjahr ? '1 = wie Vorjahr' : '2 = laut Erläuterung (erstes Jahr)'), null, { feld: 'afa_angaben', text_nur: true });
+      if (ersteZ != null) push(R.info, ersteZ, 'Gebäude-AfA: ' + afaWort(tot.afaArt) + (zahl(tot.afaArt.s) > 0 ? ', ' + String(Math.round(zahl(tot.afaArt.s) * 100) / 100).replace('.', ',') + ' %' : '') + ' · ' + (tot.kaufjahr && jahr > tot.kaufjahr ? '1 = wie Vorjahr' : '2 = laut Erläuterung (erstes Jahr)'), null, { feld: 'afa_angaben', text_nur: true });
     }
     if (tot.erhG) push(R.info, S.erh_verteilt_gesamt, 'Gesamtaufwand ' + jahr + ' der auf bis zu 5 Jahre verteilten Erhaltungsaufwendungen', zahl(tot.erhG), { feld: 'erh_gesamt' });
     ['av_fewo', 'av_kurzfristig', 'av_angeh_flag', 'av_nk_nicht_vereinbart'].forEach(function (f) {
@@ -401,5 +613,6 @@
     return o;
   }
 
-  window.AnlageVKern = { FELDER: FELDER, SCHLUESSEL: SCHLUESSEL, tabelle: tabelle, jahre: jahre, wirkung: wirkung, auszug: auszug, aufstellung: aufstellung, zeileFuer: zeileFuer, anteil: anteil, sieben: sieben, verbilligt: verbilligt, stempel: stempel };
+  window.AnlageVKern = { BLOECKE: BLOECKE, BASIS: BASIS, bloecke: bloecke, texte: texte, blockVon: blockVon, blockSummen: blockSummen, zaehlt: zaehlt, aufstellungBloecke: aufstellungBloecke,
+    FELDER: FELDER, SCHLUESSEL: SCHLUESSEL, tabelle: tabelle, jahre: jahre, wirkung: wirkung, auszug: auszug, aufstellung: aufstellung, zeileFuer: zeileFuer, anteil: anteil, sieben: sieben, verbilligt: verbilligt, stempel: stempel };
 })();

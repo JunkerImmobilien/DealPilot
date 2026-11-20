@@ -2737,15 +2737,9 @@ function _renderDetailForm(years) {
     if (art === 'anteil_pct') return b > 0 && b < 100;
     return ['wk', 'ein', 'ein_minus', 'kuerzung_pct', 'kuerzung_betrag'].indexOf(art) >= 0;
   };
-  var _avL = function (f) {
-    var F = _FL[f]; if (!F) return f;
-    return F.l + (F.einheit && F.einheit !== '€' && F.l.indexOf('(' + F.einheit + ')') < 0 ? ' (' + F.einheit + ')' : '');   /* v3800e: Einheit nicht doppelt */
-  };
-  var _afaL = (function () {
-    /* v2948 · der Satz kommt aus dem Objekt (#afa_satz) - stand fest „linear 2%" (Westerfeldstr. 140: 6,25 %) */
-    var s = parseFloat(String((document.getElementById('afa_satz') || {}).value || '').replace(',', '.'));
-    return 'Gebäude-AfA (linear ' + (s > 0 ? s.toLocaleString('de-DE', { maximumFractionDigits: 2 }) + ' %' : '') + '), aus der AfA-Konfiguration';
-  })();
+  /* v3920 · Zeilentexte und Gliederung A bis F aus dem Kern (AnlageVKern.bloecke), dieselben wie in den PDFs.
+     v2948 · der AfA-Satz kommt aus dem Objekt (#afa_satz) - stand fest „linear 2%" (Westerfeldstr. 140: 6,25 %) */
+  var _afaSatz = parseFloat(String((document.getElementById('afa_satz') || {}).value || '').replace(',', '.'));
   /* verbilligte Vermietung: Kuerzung ab Fortgeschritten nur, wenn die Miete unter 66 % der ortsueblichen liegt */
   var _quoteUnter66 = false;
   try { var _q66 = (typeof _mieteQuote66 === 'function') ? _mieteQuote66() : null; _quoteUnter66 = !!(_q66 && _q66.stand === 'ok' && _q66.quote < 66); } catch (_eQ) {}
@@ -2755,83 +2749,16 @@ function _renderDetailForm(years) {
   /* Zeilenarten: { f } Eingabe (ro: nur Anzeige, mit eigenem Wert doch Eingabe, damit er zurueckgesetzt
      werden kann) · { sum: [Felder] } Anzeige-Summe · { anzeige } Auskunft ohne eigenes Feld.
      st = ab welcher Stufe, davon = Teil der Summenzeile darueber. */
-  var bloecke = [
-    { k: 'A', titel: 'Einnahmen', zus: [(_avT && _avT.summen) ? _avT.summen.einnahmen : null], rows: [
-      { f: 'einnahmen_km', l: 'Mieteinnahmen (Kaltmiete), aus dem Reiter Miete', st: 1, ro: true },
-      { f: 'einnahmen_nk', l: 'Umlagen (umlagefähige Nebenkosten), aus der Bewirtschaftung', st: 1, ro: true },
-      { f: 'av_garagen', st: 2 },
-      { f: 'av_nk_nachzahlung', st: 2 },
-      { f: 'av_zuschuesse', st: 2 },
-      { f: 'av_andere_raeume', st: 3 },
-      { f: 'av_angehoerige', st: 3 },
-      { f: 'av_nk_angehoerige', st: 3 },
-      { f: 'av_nk_nachz_angeh', st: 3 },
-      { f: 'av_fruehere_mieten', st: 3 },
-      { f: 'av_ust_vereinnahmt', st: 3 },
-      { f: 'av_ust_erstattet', st: 3 },
-      { f: 'av_zuschuesse_eigen', st: 3 }
-    ] },
-    { k: 'B', titel: 'Abschreibungen', rows: [
-      { f: 'afa', l: _afaL, st: 1 },
-      { f: 'sonst_bewegl_wg', l: 'AfA bewegliche Wirtschaftsgüter (z. B. Einbauküche, Möbel)', st: 2 },
-      { f: 'anschaffungsnah', l: 'Anschaffungsnahe Herstellungskosten (§ 6 Abs. 1 Nr. 1a EStG), wirken über die AfA', st: 2 },
-      { anzeige: 'afa7b', l: 'davon Sonderabschreibung § 7b EStG (in der Gebäude-AfA enthalten)', st: 3, davon: true,
-        wert: _num(totals.afaSonder7b), nur: _num(totals.afaSonder7b) > 0.005, zeile: (_avT && _avT.summen) ? _avT.summen.sonder7b : null },
-      { f: 'av_7h7i', l: (_FL.av_7h7i ? _FL.av_7h7i.l : 'Erhöhte Absetzungen §§ 7h, 7i EStG') + ', Eingabe in der AfA-Konfiguration', st: 3, ro: true }
-    ] },
-    { k: 'C', titel: 'Finanzierung', rows: [
-      { f: 'schuldzinsen', l: 'Schuldzinsen laut Tilgungsplan', st: 1 },
-      { f: 'bereitstellung', l: 'Bereitstellungszinsen (gehören zu den Schuldzinsen)', st: 2 },
-      { sum: ['notar_grundschuld', 'vermittlung', 'finanz_sonst'], zf: 'notar_grundschuld', l: 'Geldbeschaffungskosten (Notar und Grundbuch der Grundschuld, Vermittlung, Schätzung)', st: 2 },
-      { f: 'notar_grundschuld', l: 'davon Notar und Grundbuch für die Grundschuld (anteilig)', st: 3, davon: true },
-      { f: 'vermittlung', l: 'davon Vermittlungsprovision für das Darlehen', st: 3, davon: true },
-      { f: 'finanz_sonst', l: 'davon sonstige Geldbeschaffungskosten (z. B. Wertgutachten für die Bank)', st: 3, davon: true },
-      { f: 'av_renten', st: 3 }
-    ] },
-    { k: 'D', titel: 'Erhaltungsaufwand', rows: [
-      { f: 'erhaltungsaufwand', l: 'Erhaltungsaufwand des Jahres (Reparaturen, Instandhaltung)', st: 1 },
-      { anzeige: 'erhV', l: 'davon auf 2 bis 5 Jahre verteilt (§ 82b EStDV), Anteil dieses Jahres' + (totals.erhG ? ', Gesamtaufwand des Jahres ' + Math.round(_num(totals.erhG)).toLocaleString('de-DE') + ' €' : '') + '. Die Verteilung wählst du im Reiter Kaufpreis und Investition.',
-        st: 2, davon: true, wert: _erhVSumme, nur: _erhVSumme > 0.005 || _num(totals.erhG) > 0.005, zeile: (_avT && _avT.summen) ? _avT.summen.erh_verteilt_jahr : null },
-      { f: 'av_erh_m1', l: 'Verteilte Erhaltungsaufwendungen aus ' + (y.year - 1) + ' (nicht in DealPilot erfasst)', st: 3 },
-      { f: 'av_erh_m2', l: 'Verteilte Erhaltungsaufwendungen aus ' + (y.year - 2) + ' (nicht in DealPilot erfasst)', st: 3 },
-      { f: 'av_erh_m3', l: 'Verteilte Erhaltungsaufwendungen aus ' + (y.year - 3) + ' (nicht in DealPilot erfasst)', st: 3 },
-      { f: 'av_erh_m4', l: 'Verteilte Erhaltungsaufwendungen aus ' + (y.year - 4) + ' (nicht in DealPilot erfasst)', st: 3 }
-    ] },
-    { k: 'E', titel: 'Laufende Kosten', rows: [
-      { f: 'nk_umlf', l: 'Umgelegte Kosten (gleich den Umlagen, heben sich mit ihnen auf)', st: 1, ro: true },
-      { sum: ['nk_n_umlf', 'hausverwaltung', 'kontofuehrung', 'betr_sonst', 'verw_sonst'], zf: 'hausverwaltung', l: 'Nicht umgelegte Kosten und Verwaltung (Hausgeld nicht umlagefähig, Verwaltung, Kontoführung)', st: 1 },
-      { f: 'nk_n_umlf', l: 'davon nicht umlagefähige Nebenkosten (Hausgeld)', st: 2, davon: true },
-      { f: 'hausverwaltung', l: 'davon Hausverwaltung, Mietsonderverwaltung', st: 2, davon: true },
-      { f: 'kontofuehrung', l: 'davon Kontoführung (Konto nur für die Immobilie)', st: 2, davon: true },
-      { f: 'betr_sonst', l: 'davon sonstige Betriebskosten', st: 3, davon: true },
-      { f: 'verw_sonst', l: 'davon sonstige Verwaltungskosten', st: 3, davon: true },
-      { f: 'av_ust_gezahlt', st: 3 },
-      { sum: ['steuerber', 'fahrtkosten', 'sonst_kosten', 'porto', 'inserat', 'gericht', 'telefon', 'hotel', 'verpflegung'], zf: 'sonst_kosten', l: 'Sonstige Kosten gesamt', st: 2 },
-      { f: 'steuerber', l: 'davon Steuerberatung (Anteil für die Vermietung)', st: 2, davon: true },
-      { f: 'fahrtkosten', l: 'davon Fahrtkosten zur Immobilie', st: 2, davon: true },
-      { f: 'sonst_kosten', l: 'davon sonstige Werbungskosten (Sammelposten)', st: 2, davon: true },
-      { f: 'porto', l: 'davon Porto, Büromaterial', st: 3, davon: true },
-      { f: 'inserat', l: 'davon Inserate', st: 3, davon: true },
-      { f: 'gericht', l: 'davon Gerichts- und Anwaltskosten', st: 3, davon: true },
-      { f: 'telefon', l: 'davon Telefon und Internet (Anteil)', st: 3, davon: true },
-      { f: 'hotel', l: 'davon Übernachtungskosten', st: 3, davon: true },
-      { f: 'verpflegung', l: 'davon Verpflegungsmehraufwand', st: 3, davon: true }
-    ] },
-    { k: 'F', titel: 'Angaben zum Objekt', rows: [
-      { f: 'av_kuerzung_pct', st: _quoteUnter66 ? 2 : 3 },
-      { f: 'av_kuerzung_betrag', st: _quoteUnter66 ? 2 : 3 },
-      { f: 'av_fewo', st: 3 },
-      { f: 'av_kurzfristig', st: 3 },
-      { f: 'av_angeh_flag', st: 3 },
-      { f: 'av_nk_nicht_vereinbart', st: 3 },
-      { f: 'av_wohnflaeche', st: 3 },
-      { f: 'av_eigen_qm', st: 3 },
-      { f: 'av_anteil_pct', st: 3 },
-      { f: 'av_zurechnung_a_pct', st: 3 },
-      { f: 'av_vorsteuer', st: 3 },
-      { f: 'av_zuschuss_ahk', st: 3 }
-    ] }
-  ];
+  var bloecke = _avK && typeof _avK.bloecke === 'function'
+    ? _avK.bloecke(y.year, { afaSatz: _afaSatz, afaArt: totals.afaArt || null, erhG: totals.erhG, quoteUnter66: _quoteUnter66, woher: true }) : [];
+  bloecke.forEach(function (b) {
+    if (_avT && _avT.summen && b.zus) b.zus = b.zus.filter(function (z) { return z != null; }); else b.zus = [];
+    b.rows.forEach(function (r) {
+      r.l = r.text;
+      if (r.anzeige === 'afa7b') { r.wert = _num(totals.afaSonder7b); r.nur = r.wert > 0.005; if (!_avT) r.zeile = null; }
+      if (r.anzeige === 'erhV') { r.wert = _erhVSumme; r.nur = _erhVSumme > 0.005 || _num(totals.erhG) > 0.005; if (!_avT) r.zeile = null; }
+    });
+  });
   /* Privatvermoegen: die Angaben der Anlage V (av_*) nur mit dem Kern und nicht fuer eine Gesellschaft (wie v3800) */
   bloecke.forEach(function (b) {
     b.rows = b.rows.filter(function (r) {
@@ -2839,7 +2766,7 @@ function _renderDetailForm(years) {
       if (r.anzeige === 'afa7b' || r.anzeige === 'erhV') return r.nur;
       return true;
     });
-    b.rows.forEach(function (r) { if (r.f && !r.l) r.l = _avL(r.f); if (r.f && _FL[r.f]) helpTexts[r.f] = _FL[r.f].hilfe || ''; });
+    b.rows.forEach(function (r) { if (r.f && _FL[r.f]) helpTexts[r.f] = _FL[r.f].hilfe || ''; });
   });
   if (window._ytfBloeckeTest) window._ytfBloeckeTest(bloecke);   /* nur Pruefstand (tools/anlage-v-pruefen.mjs) */
 

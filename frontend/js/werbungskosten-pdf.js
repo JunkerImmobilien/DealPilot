@@ -309,91 +309,35 @@ function _renderWerbungskostenPage(doc, year, yearIdx, W, H, M, CW, q) {
   var v = totals.values;
   var bem = (window._taxYearlyBemerkungen && window._taxYearlyBemerkungen['y' + year]) || {};
 
-  // Section 1: Finanzierungskosten
-  cy = _renderWkSection(doc, cy, M, CW, '1. Finanzierungskosten', [
-    ['Schuldzinsen', v.schuldzinsen, bem.schuldzinsen],
-    ['Kontoführungsgebühren', v.kontofuehrung, bem.kontofuehrung],
-    ['Bereitstellungszinsen', v.bereitstellung, bem.bereitstellung],
-    ['Notar/Grundschuld (anteilig)', v.notar_grundschuld, bem.notar_grundschuld],
-    ['Vermittlungsprovision Darlehen', v.vermittlung, bem.vermittlung],
-    ['Sonstiges', v.finanz_sonst, bem.finanz_sonst]
-  ]);
-
-  /* ── v1131-wkumlage · Die Aufstellung ging nicht auf ──────────────────
-     GEMESSEN am Beispiel-PDF (Am Markt 9, 2024): die sechs Zwischensummen
-     ergeben 1.928 + 700 + 405 + 0 + 978 + 0 = 4.011 EUR. Ausgewiesen waren
-     aber 5.511 EUR — 1.500 EUR mehr, die in KEINER Zeile standen.
-
-     Ursache: `_computeYearTotal` (tax.js:1056) rechnet `nk_umlf`, die
-     UMLAGEFAEHIGEN Nebenkosten, in die Summe ein — dieser Abschnitt zeigte
-     aber nur `nk_n_umlf` und `betr_sonst`.
-
-     DIE RECHNUNG IST RICHTIG, DIE DARSTELLUNG WAR ES NICHT. Umlagefaehige
-     Nebenkosten gehoeren auf BEIDE Seiten: als Einnahme beim Zufluss
-     (Anlage V 2025 Zeile 20, Kz 04) und als Werbungskosten beim Abfluss (Zeile 75, Kz 52).
-     v3800: hier stand „Zeile 14 ... Zeile 33 ff." - Nummern eines aelteren Formulars.
-     Eine Saldierung ist ausdruecklich NICHT zulaessig (§ 11 EStG,
-     Zufluss-/Abflussprinzip). Nachgelesen, nicht angenommen.
-
-     Fuer den Leser war das Papier damit unpruefbar: die Summe liess sich
-     aus den gezeigten Zeilen nicht nachrechnen. Ein Finanzamt, das genau
-     das tut, findet eine Luecke von 1.500 EUR. Die Zeile steht jetzt da. */
-  cy = _renderWkSection(doc, cy, M, CW, '2. Betriebskosten', [
-    ['Umlagefähige Nebenkosten (durchlaufend)', v.nk_umlf, bem.nk_umlf],
-    ['Nicht-umlagefähige Nebenkosten', v.nk_n_umlf, bem.nk_n_umlf],
-    ['Sonstige Betriebskosten', v.betr_sonst, bem.betr_sonst]
-  ]);
-
-  // Section 3: Verwaltungskosten
-  cy = _renderWkSection(doc, cy, M, CW, '3. Verwaltungskosten', [
-    ['Hausverwaltung / Mietsonderverwaltung', v.hausverwaltung, bem.hausverwaltung],
-    ['Steuerberatung', v.steuerber, bem.steuerber],
-    ['Porto, Büromaterial', v.porto, bem.porto],
-    ['Sonstiges', v.verw_sonst, bem.verw_sonst]
-  ]);
-
-  // Section 4: Sonstige Kosten
-  cy = _renderWkSection(doc, cy, M, CW, '4. Sonstige Kosten', [
-    ['Fahrtkosten zur Immobilie', v.fahrtkosten, bem.fahrtkosten],
-    ['Verpflegungsmehraufwand', v.verpflegung, bem.verpflegung],
-    ['Übernachtungskosten', v.hotel, bem.hotel],
-    ['Inseratskosten', v.inserat, bem.inserat],
-    ['Gerichts-/Anwaltskosten', v.gericht, bem.gericht],
-    ['Telefon/Internet', v.telefon, bem.telefon],
-    ['Sonstiges (Leerstand, etc.)', v.sonst_kosten, bem.sonst_kosten]
-  ]);
-
-  // Section 5: AfA
-  cy = _renderWkSection(doc, cy, M, CW, '5. Absetzungen für Abnutzung (AfA)', [
-    ['AfA Gebäude (einschl. § 7b)', v.afa, bem.afa],
-    ['AfA bewegliche Wirtschaftsgüter', v.sonst_bewegl_wg, bem.sonst_bewegl_wg]
-  ]);
-
-  // Page break check
-  if (cy > 230) { cy = _wkNeueSeite(doc, M, CW); }
-
-  // Section 6: Anschaffungsnah / Erhaltungsaufwand
-  cy = _renderWkSection(doc, cy, M, CW, '6. Anschaffungsnahe Herstellkosten / Erhaltungsaufwand', [
-    ['Anschaffungsnah (§6 Abs.1 Nr.1a EStG)', v.anschaffungsnah || 0, bem.anschaffungsnah],
-    ['Erhaltungsaufwand (sofort oder § 82b EStDV verteilt)', v.erhaltungsaufwand || 0, bem.erhaltungsaufwand]
-  ]);
-
-  /* v3800 · Weitere Angaben der Anlage V (js/anlage-v-kern.js): nur wenn eingetragen. Die Summe
-     totals.werbungskosten enthaelt sie, also muessen sie hier stehen, sonst geht die Aufstellung nicht auf. */
-  if (window.AnlageVKern) {
-    var _avWk = [], _avEin = [];
-    AnlageVKern.SCHLUESSEL.forEach(function (k) {
-      var F = AnlageVKern.FELDER[k], b = Number(v[k]) || 0; if (!b) return;
-      if (F.art === 'wk') _avWk.push([F.l, b, bem[k]]);
-      else if (F.art === 'ein') _avEin.push([F.l, b, bem[k]]);
-      else if (F.art === 'ein_minus') _avEin.push([F.l, -b, bem[k]]);
+  /* ═══ v3920 · GLIEDERUNG A BIS F WIE DAS STEUERFORMULAR ═══
+     Marcel 20.11.2026: wer PDF und Formular nebeneinander legt, findet dieselben Bloecke A bis F in derselben
+     Reihenfolge, dieselben Zeilennummern des Jahres und dieselben Zeilentexte. Bis v3910 stand hier
+     „1. Finanzierungskosten" bis „7. Weitere Werbungskosten (Anlage V)" mit eigenen Bezeichnungen.
+     Texte, Reihenfolge und Zeilennummern kommen aus EINER Stelle: AnlageVKern.aufstellungBloecke
+     (js/anlage-v-kern.js), dieselbe Liste wie das Steuerformular (tax.js _renderDetailForm).
+     DIE BETRAEGE BLEIBEN DIESELBEN: jede Zahl ist ein Wert aus totals.values, die Summen bildet weiter
+     _computeYearTotal. Zwischensumme je Block wie AnlageVKern.blockSummen: A = Summe der Einnahmen,
+     B bis E minus nicht abzugsfaehiger Anteil = Summe der Werbungskosten (Nachweis tools/anlage-v-pruefen.mjs, W).
+     Die Erklaerung zu v1131-wkumlage (umgelegte Kosten auf BEIDEN Seiten, Zeile der Einnahmen und Block E)
+     gilt weiter: die umgelegten Kosten stehen in E, die Umlagen in A. */
+  var _AB = window.AnlageVKern && AnlageVKern.aufstellungBloecke ? AnlageVKern.aufstellungBloecke(year, v, {
+    corp: !!(_reg && !_reg.anlageV), afaArt: totals.afaArt || null, erhG: totals.erhG, afaSonder7b: totals.afaSonder7b, erhV: totals.erhV }) : null;
+  if (_AB) {
+    _AB.bloecke.forEach(function (bl) {
+      var titel = bl.k + ' · ' + bl.titel;
+      var bereich = bl.bereich ? 'Anlage V ' + year + ', Zeilen ' + bl.bereich[0] + ' bis ' + bl.bereich[1] : '';
+      var items = bl.rows.map(function (r) {
+        return { nr: r.nr, text: r.text, betrag: r.betrag, davon: r.davon, fett: r.summe, einheit: r.einheit, flag: r.flag, note: r.f ? bem[r.f] : '' };
+      });
+      if (cy > 230) { cy = _wkNeueSeite(doc, M, CW); }
+      cy = _renderWkSection(doc, cy, M, CW, titel, items, { bereich: bereich, summe: bl.mitSumme ? bl.summe : null, mitNummern: _AB.mitNummern });
     });
-    var _avWi = AnlageVKern.wirkung(v, 0);
-    /* v3800b · verhaeltnismaessige Zuordnung: nicht abzugsfaehiger Teil aller Werbungskosten als eigene Zeile */
-    var _avM = ((totals.werbungskosten || 0) / ((_avWi.anteil || 100) / 100)) * (1 - (_avWi.anteil || 100) / 100);
-    if (_avM > 0.005) _avWk.push(['Nicht abzugsfähiger Anteil (verhältnismäßige Zuordnung)', -_avM, '']);
-    if (_avWk.length) { if (cy > 230) { cy = _wkNeueSeite(doc, M, CW); } cy = _renderWkSection(doc, cy, M, CW, '7. Weitere Werbungskosten (Anlage V)', _avWk); }
-    if (_avEin.length) { if (cy > 230) { cy = _wkNeueSeite(doc, M, CW); } cy = _renderWkSection(doc, cy, M, CW, 'Weitere Einnahmen (Anlage V, in den Einnahmen V+V enthalten)', _avEin); }
+    /* v3800b · verhaeltnismaessige Zuordnung: der nicht abzugsfaehige Teil aller Werbungskosten als eigene Zeile */
+    if (_AB.anteilMinus > 0.005) {
+      if (cy > 230) { cy = _wkNeueSeite(doc, M, CW); }
+      cy = _renderWkSection(doc, cy, M, CW, 'Verhältnismäßige Zuordnung', [{ nr: null, text: 'Nicht abzugsfähiger Anteil der Werbungskosten aus B bis E (abzugsfähig ' + String(Math.round(_AB.anteil * 100) / 100).replace('.', ',') + ' %)', betrag: -_AB.anteilMinus }],
+        { summe: -_AB.anteilMinus, mitNummern: _AB.mitNummern });
+    }
   }
 
   // ── SUMMARY ────────────────────────────────────
@@ -542,8 +486,12 @@ function _wkHatWert(v) {
   return isFinite(n) && Math.round(n) !== 0;
 }
 
-function _renderWkSection(doc, cy, M, CW, title, items) {
-  items = (items || []).filter(function (it) { return _wkHatWert(it && it[1]); });
+/* v3920 · ein Block A bis F: Kopf mit Zeilenbereich, je Zeile Zeilennummer, Text und Betrag, „davon"-Zeilen grau
+   und eingerueckt (sie stecken in der Zeile darueber). Die Zwischensumme ist die Summe des Blocks aus dem Kern
+   (opt.summe), F (Angaben zum Objekt) hat keine. items: { nr, text, betrag, davon, fett, einheit, flag, note }. */
+function _renderWkSection(doc, cy, M, CW, title, items, opt) {
+  opt = opt || {};
+  items = (items || []).filter(function (it) { return it && _wkHatWert(it.betrag); });
   if (!items.length) return cy;          /* leerer Abschnitt: gar nicht erst zeichnen */
 
   // Page break check
@@ -556,42 +504,55 @@ function _renderWkSection(doc, cy, M, CW, title, items) {
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(9);
   doc.text(title.toUpperCase(), M + 3, cy + 4.2);
+  if (opt.bereich) {
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(7); doc.setTextColor(200, 196, 188);
+    doc.text(opt.bereich, M + CW - 3, cy + 4.2, { align: 'right' });
+  }
 
   cy += 6;
+  var xT = opt.mitNummern ? M + 17 : M + 3;
 
-  // Items
-  var sectionTotal = 0;
   items.forEach(function(item, i) {
-    var label = item[0], val = item[1] || 0, note = item[2] || '';
-    sectionTotal += val;
-
-    var rowH = note ? 11 : 7;
+    var note = item.note || '';
+    var einrueck = item.davon ? 4 : 0;
+    doc.setFont('helvetica', item.fett ? 'bold' : 'normal');
+    doc.setFontSize(item.davon ? 7.8 : 8.5);
+    var tl = doc.splitTextToSize(String(item.text || ''), CW - (xT - M) - einrueck - 30);
+    var rowH = 3.6 * tl.length + 3.4 + (note ? 4 : 0);
     if (cy + rowH > 280) { cy = _wkNeueSeite(doc, M, CW); }
 
     doc.setFillColor(i % 2 === 0 ? 252 : 248, i % 2 === 0 ? 250 : 246, i % 2 === 0 ? 244 : 238);
     doc.rect(M, cy, CW, rowH, 'F');
 
-    doc.setTextColor(60, 55, 55);
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(8.5);
-    doc.text(label, M + 3, cy + 4.5);
+    if (opt.mitNummern && item.nr != null) {
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(7); doc.setTextColor(140, 134, 128);
+      doc.text('Z. ' + item.nr, M + 3, cy + 4.5);
+    }
+    doc.setFont('helvetica', item.fett ? 'bold' : 'normal');
+    doc.setFontSize(item.davon ? 7.8 : 8.5);
+    doc.setTextColor.apply(doc, item.davon ? [120, 112, 108] : [60, 55, 55]);
+    doc.text(tl, xT + einrueck, cy + 4.5);
 
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(9);
-    doc.setTextColor(42, 39, 39);
-    doc.text(Math.round(val).toLocaleString('de-DE') + ' €', M + CW - 3, cy + 4.5, { align: 'right' });
+    doc.setFont('helvetica', item.davon ? 'normal' : 'bold');
+    doc.setFontSize(item.davon ? 8 : 9);
+    doc.setTextColor.apply(doc, item.davon ? [120, 112, 108] : [42, 39, 39]);
+    var wert = item.flag ? (Math.round(item.betrag) === 1 ? '1 = Ja' : Math.round(item.betrag) === 2 ? '2 = Nein' : String(Math.round(item.betrag)))
+      : (item.einheit && item.einheit !== '€') ? (Math.round(item.betrag * 100) / 100).toLocaleString('de-DE') + ' ' + item.einheit
+      : Math.round(item.betrag).toLocaleString('de-DE') + ' €';
+    doc.text(wert, M + CW - 3, cy + 4.5, { align: 'right' });
 
     if (note) {
       doc.setFont('helvetica', 'italic');
       doc.setFontSize(7.5);
       doc.setTextColor(120, 110, 100);
-      var maxNoteW = CW - 6;
-      var noteLines = doc.splitTextToSize('Bemerkung: ' + note, maxNoteW);
-      doc.text(noteLines[0], M + 3, cy + 9);
+      var noteLines = doc.splitTextToSize('Bemerkung: ' + note, CW - (xT - M) - 3);
+      doc.text(noteLines[0], xT, cy + 3.6 * tl.length + 5.4);
     }
 
     cy += rowH;
   });
+
+  if (opt.summe == null) return cy + 2;
 
   // Section subtotal
   doc.setFillColor(245, 241, 230);
@@ -604,7 +565,7 @@ function _renderWkSection(doc, cy, M, CW, title, items) {
   doc.setFontSize(8.5);
   doc.setTextColor(122, 100, 30);
   doc.text('Zwischensumme', M + 3, cy + 4.2);
-  doc.text(Math.round(sectionTotal).toLocaleString('de-DE') + ' €', M + CW - 3, cy + 4.2, { align: 'right' });
+  doc.text(Math.round(opt.summe).toLocaleString('de-DE') + ' €', M + CW - 3, cy + 4.2, { align: 'right' });
 
   cy += 8;
   return cy;
@@ -628,44 +589,33 @@ function _renderWerbungskostenSummaryPage(doc, startYear, nYears, W, H, M, CW) {
   var cy = 36;
 
   // Build year-by-year matrix
+  /* v3920 · Spalten nach den Bloecken A bis F wie das Steuerformular (AnlageVKern.blockSummen), bis v3910
+     „1. Finanz." bis „5./6. AfA". Die Bloecke B bis E stehen mit dem abzugsfaehigen Anteil, damit die Zeile
+     aufgeht: B + C + D + E = Summe WK (bei 100 % genau die vollen Betraege). Summe WK, Einnahmen und Ergebnis
+     kommen unveraendert aus _computeYearTotal. */
   var rows = [];
-  var sumRow = ['SUMME', 0, 0, 0, 0, 0];
+  var _f = function (n) { return Math.round(n).toLocaleString('de-DE'); };
   for (var i = 0; i < nYears; i++) {
     var year = startYear + i;
     var totals = _computeYearTotal(year, i);
     var v = totals.values;
-    var fkz = v.schuldzinsen + v.kontofuehrung + v.bereitstellung + v.notar_grundschuld + v.vermittlung + v.finanz_sonst;
-    /* v3380 · Die Jahresmatrix ging nicht auf: „Summe WK" (_computeYearTotal) enthaelt die
-       umlagefaehigen Nebenkosten, die Spalte „2. Betr." nicht - derselbe Fehler, den v1131 in der
-       Einzelaufstellung behoben hatte. Jetzt steht nk_umlf auch hier, die Zeile ist nachrechenbar. */
-    var btr = (v.nk_umlf || 0) + v.nk_n_umlf + v.betr_sonst;
-    var vrw = v.hausverwaltung + v.steuerber + v.porto + v.verw_sonst;
-    var sst = v.fahrtkosten + v.verpflegung + v.hotel + v.inserat + v.gericht + v.telefon + v.sonst_kosten
-      + (window.AnlageVKern ? AnlageVKern.wirkung(v, 0).wk : 0);   /* v3800: weitere Werbungskosten der Anlage V */
-    var afa_total = v.afa + v.sonst_bewegl_wg + (v.anschaffungsnah || 0) + (v.erhaltungsaufwand || 0);
-
+    var bs = window.AnlageVKern ? AnlageVKern.blockSummen(v) : null;
+    var fa = bs ? bs.anteil / 100 : 1;
     rows.push([
       year,
-      Math.round(fkz).toLocaleString('de-DE'),
-      Math.round(btr).toLocaleString('de-DE'),
-      Math.round(vrw).toLocaleString('de-DE'),
-      Math.round(sst).toLocaleString('de-DE'),
-      Math.round(afa_total).toLocaleString('de-DE'),
-      Math.round(totals.werbungskosten).toLocaleString('de-DE'),
-      Math.round(totals.einnahmen).toLocaleString('de-DE'),
-      (totals.ergebnis >= 0 ? '+' : '') + Math.round(totals.ergebnis).toLocaleString('de-DE')
+      bs ? _f(bs.B * fa) : '',
+      bs ? _f(bs.C * fa) : '',
+      bs ? _f(bs.D * fa) : '',
+      bs ? _f(bs.E * fa) : '',
+      _f(totals.werbungskosten),
+      _f(totals.einnahmen),
+      (totals.ergebnis >= 0 ? '+' : '') + _f(totals.ergebnis)
     ]);
-
-    sumRow[1] = (parseFloat((sumRow[1] + '').replace(/\./g, '')) + fkz);
-    sumRow[2] = (parseFloat((sumRow[2] + '').replace(/\./g, '')) + btr);
-    sumRow[3] = (parseFloat((sumRow[3] + '').replace(/\./g, '')) + vrw);
-    sumRow[4] = (parseFloat((sumRow[4] + '').replace(/\./g, '')) + sst);
-    sumRow[5] = (parseFloat((sumRow[5] + '').replace(/\./g, '')) + afa_total);
   }
 
   doc.autoTable({
     startY: cy,
-    head: [['Jahr', '1. Finanz.', '2. Betr.', '3. Verw.', '4. Sonst.', '5./6. AfA', 'Summe WK', 'Einnahmen', '= Ergebnis']],
+    head: [['Jahr', 'B Abschr.', 'C Finanz.', 'D Erhaltung', 'E Lfd. Kosten', 'Summe WK', 'A Einnahmen', '= Ergebnis']],
     body: rows,
     theme: 'striped',
     headStyles: { fillColor: [42, 39, 39], textColor: window._pdfGold(), fontSize: 9, fontStyle: 'bold' },
@@ -675,10 +625,10 @@ function _renderWerbungskostenSummaryPage(doc, startYear, nYears, W, H, M, CW) {
     columnStyles: {
       0: { halign: 'center', fontStyle: 'bold' },
       1: { halign: 'right' }, 2: { halign: 'right' }, 3: { halign: 'right' },
-      4: { halign: 'right' }, 5: { halign: 'right' },
-      6: { halign: 'right', fontStyle: 'bold' },
-      7: { halign: 'right' },
-      8: { halign: 'right', fontStyle: 'bold' }
+      4: { halign: 'right' },
+      5: { halign: 'right', fontStyle: 'bold' },
+      6: { halign: 'right' },
+      7: { halign: 'right', fontStyle: 'bold' }
     }
   });
 
@@ -1177,31 +1127,14 @@ function _anlageVQuelle(jahr) {
   return t ? { T: t, jahr: jahr, ersatz: null } : null;
 }
 
-/* Die Bezeichnungen sind WOERTLICH die der Aufstellung — beide Ansichten
-   muessen dieselbe Position gleich nennen, sonst sucht der Leser. */
-var _AV_LABEL = {
-  schuldzinsen: 'Schuldzinsen', kontofuehrung: 'Kontoführungsgebühren',
-  bereitstellung: 'Bereitstellungszinsen', notar_grundschuld: 'Notar/Grundschuld (anteilig)',
-  vermittlung: 'Vermittlungsprovision Darlehen', finanz_sonst: 'Sonstiges (Finanzierung)',
-  nk_umlf: 'Umlagefähige Nebenkosten (durchlaufend)', nk_n_umlf: 'Nicht-umlagefähige Nebenkosten',
-  betr_sonst: 'Sonstige Betriebskosten', hausverwaltung: 'Hausverwaltung / Mietsonderverwaltung',
-  steuerber: 'Steuerberatung', porto: 'Porto, Büromaterial', verw_sonst: 'Sonstiges (Verwaltung)',
-  fahrtkosten: 'Fahrtkosten zur Immobilie', verpflegung: 'Verpflegungsmehraufwand',
-  hotel: 'Übernachtungskosten', inserat: 'Inseratskosten', gericht: 'Gerichts-/Anwaltskosten',
-  telefon: 'Telefon/Internet', sonst_kosten: 'Sonstiges (Leerstand, etc.)',
-  afa: 'AfA Gebäude (einschl. § 7b)', sonst_bewegl_wg: 'AfA bewegliche Wirtschaftsgüter',
-  anschaffungsnah: 'Anschaffungsnah (§ 6 Abs. 1 Nr. 1a EStG)',
-  erhaltungsaufwand: 'Erhaltungsaufwand (sofort oder § 82b EStDV verteilt)',
-  einnahmen_km: 'Mieteinnahmen (kalt)', einnahmen_nk: 'Umlagen / Nebenkosten'
-};
-
+/* v3920 · _AV_LABEL ist weg: die Zeilentexte kommen aus der Gliederung A bis F im Kern (AnlageVKern.texte),
+   dieselben wie im Steuerformular und auf der Aufstellung. Bis v3910 stand hier eine eigene Liste. */
 function _renderAnlageVPage(doc, jahr, totals, q, W, H, M, CW) {
   /* v3800 · Inhalt aus dem Kern (js/anlage-v-kern.js), dieselbe Zuordnung wie Steuer-Mappe und Tooltip.
      Keine Zeilennummer steht mehr im Code dieser Seite - alle kommen aus der Abschrift des Jahres. */
   var K = window.AnlageVKern;
   if (!K || !totals) return false;
-  var t = {}; Object.keys(totals).forEach(function (k) { t[k] = totals[k]; }); t.labels = _AV_LABEL;
-  var R = K.aufstellung(jahr, t);
+  var R = K.aufstellung(jahr, totals);
   if (!R) return false;
   var eur = function (n) { return (Math.round(Number(n) || 0)).toLocaleString('de-DE') + ' €'; };
 
@@ -1242,7 +1175,10 @@ function _renderAnlageVPage(doc, jahr, totals, q, W, H, M, CW) {
     cy += 5;
   };
   var zeile = function (nr, kz, text, betrag, grau, einheit) {
-    _need(6);
+    /* v3920 · lange Zeilentexte (dieselben wie im Steuerformular) umbrechen statt nach 74 Zeichen abschneiden */
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(8);
+    var tl = doc.splitTextToSize(String(text), CW - 28 - 30);
+    _need(5.6 + (tl.length - 1) * 3.4);
     doc.setFont('helvetica', 'normal'); doc.setFontSize(8);
     doc.setTextColor.apply(doc, grau ? [140, 134, 128] : [42, 39, 39]);
     doc.text(nr == null ? '—' : 'Zeile ' + nr, M, cy);
@@ -1250,11 +1186,11 @@ function _renderAnlageVPage(doc, jahr, totals, q, W, H, M, CW) {
     if (kz) doc.text('Kz ' + kz, M + 15, cy);
     doc.setTextColor.apply(doc, grau ? [140, 134, 128] : [42, 39, 39]);
     doc.setFontSize(8);
-    doc.text(String(text).slice(0, 74), M + 28, cy);
+    doc.text(tl, M + 28, cy);
     if (betrag !== null && betrag !== undefined) {
       doc.text(einheit && einheit !== '€' ? Math.round(betrag).toLocaleString('de-DE') + ' ' + einheit : eur(betrag), M + CW, cy, { align: 'right' });
     }
-    cy += 5.6;
+    cy += 5.6 + (tl.length - 1) * 3.4;
   };
   var klein = function (txt, farbe) {
     var tt = doc.splitTextToSize(txt, CW);
@@ -1278,58 +1214,57 @@ function _renderAnlageVPage(doc, jahr, totals, q, W, H, M, CW) {
 
   R.hinweise.forEach(function (x) { klein(x, [176, 98, 92]); });
 
-  /* ── 1 · Einnahmen ── */
-  kopf('EINNAHMEN');
-  R.einnahmen.forEach(function (e) { zeile(e.zeile, e.kz, e.text, e.betrag); });
-  doc.setDrawColor(42, 39, 39); doc.setLineWidth(0.4);
-  doc.line(M + 28, cy - 2, M + CW, cy - 2);
-  cy += 2;
-  summe(R.summeEinnahmen.zeile, 'Summe der Einnahmen', R.summeEinnahmen.betrag);
-  cy += 3;
-
-  /* ── 2 · Werbungskosten ── */
-  kopf('WERBUNGSKOSTEN');
-  if (!R.wk.length) { zeile(null, null, 'Keine Position mit Betrag erfasst.', null, true); }
-  R.wk.forEach(function (e) { zeile(e.zeile, e.kz, e.text, e.betrag); });
-  if (R.afaHinweis) klein(R.afaHinweis.text, [150, 120, 70]);
-  klein('Ohne Zeichen: die Kostenart steht wörtlich in der Überschrift der Formularzeile — Abschrift.   '
-    + '*  steht in keiner spezielleren Zeile; das Formular führt dafür „Sonstige Kosten".   '
-    + '°  folgt aus der Art des Aufwands, nicht aus dem Formulartext — siehe Begründung unten.');
-  if (R.sach.length) {
-    kopf('°  ZUORDNUNG AUS DER ART DES AUFWANDS — BITTE PRÜFEN');
-    R.sach.forEach(function (x) { klein(x, [140, 134, 128]); });
-  }
-  if (R.ohne.length) {
-    kopf('OHNE ZEILENZUORDNUNG — BITTE STEUERLICH PRÜFEN');
-    klein('Diese Beträge sind erfasst und in der Summe enthalten. Die Zeile wäre eine steuerfachliche Entscheidung und keine Abschrift aus dem Formular — deshalb steht sie hier nicht.', [140, 134, 128]);
-    R.ohne.forEach(function (o) { zeile(null, null, o.text, o.betrag, true); if (o.grund) klein(o.grund, [150, 143, 136]); });
-  }
-
-  /* ── 3 · Summe und Ueberschuss ── */
-  _need(16);
-  doc.setDrawColor(42, 39, 39); doc.setLineWidth(0.5);
-  doc.line(M, cy, M + CW, cy);
-  cy += 6;
-  summe(R.summeWk.zeile, 'Summe der Werbungskosten', R.summeWk.betrag);
-  summe(R.ueberschuss.zeile, 'Überschuss (Einnahmen Zeile ' + R.summeEinnahmen.zeile + ' abzüglich Werbungskosten Zeile ' + R.summeWk.zeile + ')', R.ueberschuss.betrag,
-    R.ueberschuss.betrag < 0 ? [176, 90, 84] : [46, 125, 80]);
-  if (R.kuerzung) klein(R.kuerzung.text);
-  if (R.zurechnung) {   /* v3800b · Zeile 86 */
-    zeile(R.zurechnung.zeile, R.zurechnung.kz, 'Zurechnung: Person A (' + String(R.zurechnung.pct).replace('.', ',') + ' %)', R.zurechnung.a);
-    if (R.zurechnung.pct < 100) zeile(null, null, 'Person B (' + String(Math.round((100 - R.zurechnung.pct) * 100) / 100).replace('.', ',') + ' %)', R.zurechnung.b);
-  }
-  cy += 3;
-
-  /* ── 4 · weitere Angaben ── */
-  if (R.info.length) {
-    kopf('WEITERE ANGABEN');
-    R.info.forEach(function (e) { zeile(e.zeile, e.kz, e.text, e.betrag, false, e.einheit); });
+  /* v3920 · Bloecke A bis F wie das Steuerformular (AnlageVKern.BLOECKE): jede Zeile der Aufstellung traegt ihren
+     Block (e.block), innerhalb des Blocks nach Formularzeile. Betraege und Zeilennummern unveraendert aus
+     AnlageVKern.aufstellung. Summe der Einnahmen nach A, Summe der Werbungskosten und Ueberschuss nach E. */
+  var _imBlock = function (liste, k) { return liste.filter(function (e) { return e.block === k; }); };
+  var _kopfB = function (k) { var b = null; (K.BLOECKE || []).forEach(function (x) { if (x.k === k) b = x; }); return k + ' · ' + (b ? b.titel : '').toUpperCase(); };
+  ['A', 'B', 'C', 'D', 'E', 'F'].forEach(function (k) {
+    var L = k === 'A' ? _imBlock(R.einnahmen, k) : _imBlock(R.wk, k), I = _imBlock(R.info, k);
+    var mitZ = k === 'F' && R.zurechnung;
+    if (k === 'A' || k === 'E' || L.length || I.length || mitZ) kopf(_kopfB(k));
+    L.forEach(function (e) { zeile(e.zeile, e.kz, (e.teil ? '   ' : '') + e.text, e.betrag, !!e.teil); });
+    I.forEach(function (e) { zeile(e.zeile, e.kz, e.text, e.betrag, false, e.einheit); });
+    if (k === 'A') {
+      doc.setDrawColor(42, 39, 39); doc.setLineWidth(0.4);
+      doc.line(M + 28, cy - 2, M + CW, cy - 2);
+      cy += 2;
+      summe(R.summeEinnahmen.zeile, 'Summe der Einnahmen', R.summeEinnahmen.betrag);
+    }
+    if (k === 'B' && R.afaHinweis) klein(R.afaHinweis.text, [150, 120, 70]);
+    if (k === 'E') {
+      if (!R.wk.length) zeile(null, null, 'Keine Position mit Betrag erfasst.', null, true);
+      klein('Ohne Zeichen: die Kostenart steht wörtlich in der Überschrift der Formularzeile, also Abschrift.   '
+        + '*  steht in keiner spezielleren Zeile, das Formular führt dafür „Sonstige Kosten".   '
+        + '°  folgt aus der Art des Aufwands, nicht aus dem Formulartext, Begründung unten.');
+      if (R.sach.length) {
+        kopf('°  ZUORDNUNG AUS DER ART DES AUFWANDS, BITTE PRÜFEN');
+        R.sach.forEach(function (x) { klein(x, [140, 134, 128]); });
+      }
+      if (R.ohne.length) {
+        kopf('OHNE ZEILENZUORDNUNG, BITTE STEUERLICH PRÜFEN');
+        klein('Diese Beträge sind erfasst und in der Summe enthalten. Die Zeile wäre eine steuerfachliche Entscheidung und keine Abschrift aus dem Formular, deshalb steht sie hier nicht.', [140, 134, 128]);
+        R.ohne.forEach(function (o) { zeile(null, null, o.text, o.betrag, true); if (o.grund) klein(o.grund, [150, 143, 136]); });
+      }
+      _need(16);
+      doc.setDrawColor(42, 39, 39); doc.setLineWidth(0.5);
+      doc.line(M, cy, M + CW, cy);
+      cy += 6;
+      summe(R.summeWk.zeile, 'Summe der Werbungskosten', R.summeWk.betrag);
+      summe(R.ueberschuss.zeile, 'Überschuss (Einnahmen Zeile ' + R.summeEinnahmen.zeile + ' abzüglich Werbungskosten Zeile ' + R.summeWk.zeile + ')', R.ueberschuss.betrag,
+        R.ueberschuss.betrag < 0 ? [176, 90, 84] : [46, 125, 80]);
+      if (R.kuerzung) klein(R.kuerzung.text);
+    }
+    if (mitZ) {   /* v3800b · Zurechnung Person A / Person B */
+      zeile(R.zurechnung.zeile, R.zurechnung.kz, 'Zurechnung: Person A (' + String(R.zurechnung.pct).replace('.', ',') + ' %)', R.zurechnung.a);
+      if (R.zurechnung.pct < 100) zeile(null, null, 'Person B (' + String(Math.round((100 - R.zurechnung.pct) * 100) / 100).replace('.', ',') + ' %)', R.zurechnung.b);
+    }
     cy += 3;
-  }
-  /* ── 5 · im Formular selbst ── */
+  });
+  /* ── im Formular selbst ── */
   if (R.nichtErfasst.length) {
     kopf('IM FORMULAR SELBST AUSZUFÜLLEN');
-    R.nichtErfasst.forEach(function (n) { klein('Zeile ' + n.zeile + ' — ' + n.text, [140, 134, 128]); });
+    R.nichtErfasst.forEach(function (n) { klein('Zeile ' + n.zeile + ' · ' + n.text, [140, 134, 128]); });
     cy += 3;
   }
 

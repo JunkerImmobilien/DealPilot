@@ -39,6 +39,84 @@ function kernCtx(quellen) {
   return ctx;
 }
 
+/* ══ W · v3920 · Werbungskosten-PDF und Steuer-Mappe nach den Bloecken A bis F ═══════════════════════════════
+   Marcel 20.11.2026: PDF und Steuerformular sollen nebeneinander dieselben Bloecke A bis F, dieselben
+   Zeilennummern und dieselben Zeilentexte zeigen, die Rechnung und alle Betraege bleiben exakt gleich.
+   Nachweis: die echten Dateien laufen im Pruefstand (jsPDF-Attrappe, die jeden Text mit Lage aufzeichnet), die
+   Faelle unten rechnen mit dem echten _computeYearTotal. WK_VORHER ist der Stand VOR v3920 (v3910, Commit a349f4d0),
+   mit diesem Pruefstand aus den damaligen Dateien erzeugt (--wk-basis=<Ordner mit den alten Dateien>):
+   Summe der Werbungskosten, Einnahmen, Ergebnis der Aufstellung, jedes Paar (Zeile, Betrag) der Anlage-V-Seite
+   (jsPDF und Steuer-Mappe) und die Gesamtuebersicht. Nachher muss jede dieser Zahlen gleich sein. */
+const WK_FAELLE = [
+  { jahr: 2025, satz: { schuldzinsen: 3000, afa: 2500, nk_umlf: 2000, erhaltungsaufwand: 1500, einnahmen_km: 12000, einnahmen_nk: 2000 } },
+  { jahr: 2025, satz: { schuldzinsen: 3000, kontofuehrung: 60, bereitstellung: 120, notar_grundschuld: 400, vermittlung: 900, finanz_sonst: 150, nk_umlf: 2000, nk_n_umlf: 700, betr_sonst: 80,
+      hausverwaltung: 360, steuerber: 250, porto: 30, verw_sonst: 45, fahrtkosten: 90, verpflegung: 28, hotel: 110, inserat: 60, gericht: 300, telefon: 40, sonst_kosten: 75, afa: 2500,
+      sonst_bewegl_wg: 400, anschaffungsnah: 800, erhaltungsaufwand: 1500, einnahmen_km: 12000, einnahmen_nk: 2000,
+      anlage_v: { av_garagen: 1200, av_renten: 600, av_ust_gezahlt: 100, av_nk_nachzahlung: -150, av_zuschuesse: 500, av_zuschuesse_eigen: 100, av_kuerzung_pct: 10, av_erh_m1: 220, av_7h7i: 900, av_fruehere_mieten: 300, _erhV: { 2025: 600, 2024: 400 } } } },
+  { jahr: 2025, satz: { schuldzinsen: 3000, afa: 2000, erhaltungsaufwand: 1000, einnahmen_km: 12000, nk_n_umlf: 500, porto: 20,
+      anlage_v: { av_anteil_pct: 80, av_zurechnung_a_pct: 50, av_fewo: 2, av_andere_raeume: 3000, av_wohnflaeche: 120, av_eigen_qm: 24 } } },
+  { jahr: 2023, satz: { schuldzinsen: 4100, kontofuehrung: 90, afa: 3100, nk_umlf: 1800, hausverwaltung: 420, telefon: 50, sonst_kosten: 120, erhaltungsaufwand: 2500, einnahmen_km: 9600, einnahmen_nk: 1800, anlage_v: { av_garagen: 600, av_renten: 300 } } },
+  { jahr: 2021, satz: { schuldzinsen: 5200, afa: 2800, nk_umlf: 1500, nk_n_umlf: 300, verw_sonst: 100, steuerber: 200, erhaltungsaufwand: 700, einnahmen_km: 8400, einnahmen_nk: 1500 } },
+  { jahr: 2026, satz: { schuldzinsen: 2900, afa: 2500, nk_umlf: 2000, hausverwaltung: 300, erhaltungsaufwand: 900, einnahmen_km: 12500, einnahmen_nk: 2000, anlage_v: { av_renten: 200 } } }
+];
+/* die 26 Steuerzeilen (Spalten von tax_records), die bis v3910 in WK/WK_NAME (dp-dokumente.js) standen */
+const WK_FELDER_ALT = ['schuldzinsen', 'kontofuehrung', 'bereitstellung', 'notar_grundschuld', 'vermittlung', 'finanz_sonst', 'nk_umlf', 'nk_n_umlf', 'betr_sonst', 'hausverwaltung', 'steuerber', 'porto', 'verw_sonst',
+  'fahrtkosten', 'verpflegung', 'hotel', 'inserat', 'gericht', 'telefon', 'sonst_kosten', 'afa', 'sonst_bewegl_wg', 'anschaffungsnah', 'erhaltungsaufwand', 'einnahmen_km', 'einnahmen_nk'];
+function wkDoc() {
+  const T = []; let seite = 0, gr = 8;
+  const d = { setFillColor() {}, rect() {}, roundedRect() {}, setTextColor() {}, setFont() {}, setFontSize(n) { gr = n; }, setDrawColor() {}, setLineWidth() {}, line() {},
+    text(t, x, y, o) { (Array.isArray(t) ? t : [t]).forEach((z, i) => T.push({ s: seite, x: Math.round(x * 10) / 10, y: Math.round((y + i * 3.2) * 10) / 10, t: String(z), r: !!(o && o.align === 'right') })); },
+    splitTextToSize(t, w) { const out = []; let z = ''; String(t).split(' ').forEach((w2) => { if ((z + ' ' + w2).length * gr * 0.19 > w && z) { out.push(z); z = w2; } else z = z ? z + ' ' + w2 : w2; }); if (z) out.push(z); return out; },
+    getTextWidth(t) { return String(t).length * gr * 0.19; }, addPage() { seite++; }, autoTable(o) { T.push({ s: seite, tabelle: o }); }, internal: { pageSize: { getHeight: () => 297 } } };
+  return { d, T };
+}
+function wkLauf(Qx) {
+  const c = { console: { log() {}, warn() {}, info() {}, error() {} }, Date, Math, JSON, parseFloat, parseInt, isFinite, isNaN, Number, String, Object, Array, Promise, setTimeout() {}, clearTimeout() {},
+    document: { getElementById: () => null, addEventListener() {}, querySelector: () => null, querySelectorAll: () => [], createElement: () => ({ style: {} }), readyState: 'complete', documentElement: {} },
+    getComputedStyle: () => ({ getPropertyValue: () => '' }), addEventListener() {}, localStorage: { getItem: () => null, setItem() {} } };
+  c.window = c; c.parseDe = (x) => { const n = parseFloat(String(x == null ? '' : x).replace(/\./g, '').replace(',', '.')); return isFinite(n) ? n : 0; }; c.State = {};
+  vm.createContext(c);
+  for (const f of ['anteilig.js', 'afa-engine.js', 'deal-kpis.js']) vm.runInContext(lies('frontend/js/' + f), c);
+  for (const f of fs.readdirSync(path.join(ROOT, 'frontend/js')).filter((f) => /^anlage-v-\d{4}\.js$/.test(f)).sort()) vm.runInContext(Qx.jahr && Qx.jahr[f] != null ? Qx.jahr[f] : lies('frontend/js/' + f), c);
+  vm.runInContext(Qx.kern, c); vm.runInContext(Qx.tax + ';window._cyt=_computeYearTotal;', c); vm.runInContext(Qx.wk, c);
+  /* Steuer-Mappe (dp-dokumente.js): der Teil von der Gliederung bis anlageVBlatt, am echten Code */
+  const dS = Qx.dok, m0 = dS.indexOf('  /* v3920 · Die Gliederung kommt aus dem Kern'), a0 = m0 >= 0 ? m0 : dS.indexOf("  var WK = [['1. Finanzierungskosten'"), a1 = dS.indexOf('  /* v3181 · opt.jahr');
+  vm.runInContext('(function(){' + dS.slice(a0, a1) + ';window.__dok={anlageVBlatt:anlageVBlatt,blockZeilen:typeof blockZeilen==="function"?blockZeilen:null,wkBasis:typeof wkBasis==="function"?wkBasis:null,satzFelder:typeof satzFelder==="function"?satzFelder:null,avAufstellung:avAufstellung};})()', c);
+  const esc = (x) => String(x == null ? '' : x).replace(/[&<>"]/g, (z) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[z]));
+  const zahlF = (v, d) => Number(v).toLocaleString('de-DE', { minimumFractionDigits: d || 0, maximumFractionDigits: d || 0 });
+  const B = { esc, zahl: zahlF, eur: (v, d) => zahlF(v, d) + ' €', eurS: (v, d) => { const n = Number(v); return (n > 0 ? '+' : n < 0 ? '−' : '') + zahlF(Math.abs(n), d) + ' €'; } };
+  const cyt = c._cyt, eur = /^[−-]?[\d.]+(,\d+)? €$/, aus = [];
+  const nachY = (L) => { const m = {}; L.forEach((e) => { if (e.tabelle) return; const k = e.s + '|' + e.y; (m[k] = m[k] || []).push(e); }); return Object.values(m); };
+  for (const F of WK_FAELLE) {
+    const tot = cyt(F.jahr, 0, F.satz);
+    const q = { name: 'Testobjekt', addr: 'Musterweg 1, 12345 Musterstadt', qm: '80', art: 'ETW', totals: tot, regime: { anlageV: true, name: 'Privat', art: 'Privatvermögen' } };
+    let { d, T } = wkDoc(); c._renderWerbungskostenPage(d, F.jahr, 0, 210, 297, 16, 178, q);
+    const si = T.findIndex((e) => /^SUMME /.test(e.t)), fund = (re) => { const e = T.find((x) => re.test(x.t)); return e ? e.t : null; };
+    const wkSeite = { summe: si >= 0 ? T[si + 1].t : null, einnahmen: fund(/^Einnahmen V\+V:/), ergebnis: fund(/^(Überschuss|Verlust): /),
+      zwischen: nachY(T).filter((z) => z.some((e) => e.t === 'Zwischensumme')).map((z) => z.find((e) => eur.test(e.t)).t), texte: T };
+    ({ d, T } = wkDoc()); const avOk = c._renderAnlageVPage(d, F.jahr, tot, q, 210, 297, 16, 178);
+    const av = avOk ? nachY(T).map((z) => { const nr = z.find((e) => /^Zeile \d+$/.test(e.t)), b = z.find((e) => eur.test(e.t) && e.r); return (nr || b) ? [nr ? +nr.t.slice(6) : null, b ? b.t : null] : null; }).filter(Boolean).map((p) => JSON.stringify(p)).sort() : null;
+    const h = c.__dok.anlageVBlatt(B, F.jahr, tot);
+    const mappe = /<tr/.test(h) ? (h.match(/<tr[^>]*>[\s\S]*?<\/tr>/g) || []).map((tr) => { const nr = (tr.match(/>Zeile (\d+)</) || [])[1], b = (tr.match(/class="r num[^"]*">([^<]+)</) || [])[1]; return (nr || b) ? JSON.stringify([nr ? +nr : null, b || null]) : null; }).filter(Boolean).sort() : null;
+    aus.push({ jahr: F.jahr, tot: { ein: tot.einnahmen, wk: tot.werbungskosten, erg: tot.ergebnis }, wk: { summe: wkSeite.summe, einnahmen: wkSeite.einnahmen, ergebnis: wkSeite.ergebnis }, av, mappe,
+      _zwischen: wkSeite.zwischen, _texte: wkSeite.texte, _avTexte: avOk ? T : null, _tot: tot, _mappeHtml: h });
+  }
+  const tots = WK_FAELLE.map((F) => cyt(F.jahr, 0, F.satz)); c._computeYearTotal = (y, i) => tots[i];
+  const { d, T } = wkDoc(); c._renderWerbungskostenSummaryPage(d, 2025, WK_FAELLE.length, 210, 297, 16, 178);
+  const tab = T.find((e) => e.tabelle);
+  const kopf = tab ? tab.tabelle.head[0] : [], spalte = (re) => kopf.findIndex((x) => re.test(x));
+  const matrix = tab ? tab.tabelle.body.map((r) => [r[spalte(/^Summe WK$/)], r[spalte(/Einnahmen$/)], r[spalte(/Ergebnis$/)]]) : null;
+  return { faelle: aus, matrix, _matrix: tab ? tab.tabelle : null, _ctx: c, _B: B };
+}
+if (process.argv.find((a) => a.startsWith('--wk-basis='))) {
+  const dir = process.argv.find((a) => a.startsWith('--wk-basis=')).slice(11), l2 = (f) => fs.readFileSync(path.join(dir, f), 'utf8').replace(/\r\n/g, '\n');
+  const r = wkLauf({ kern: l2('anlage-v-kern.js'), tax: l2('tax.js'), wk: l2('werbungskosten-pdf.js'), dok: l2('dp-dokumente.js') });
+  console.log(JSON.stringify({ faelle: r.faelle.map((f) => ({ jahr: f.jahr, tot: f.tot, wk: f.wk, av: f.av, mappe: f.mappe })), matrix: r.matrix }));
+  process.exit(0);
+}
+
+/* Stand vor v3920 (v3910, a349f4d0), erzeugt mit: node tools/anlage-v-pruefen.mjs --wk-basis=<alte Dateien> */
+const WK_VORHER = {"faelle":[{"jahr":2025,"tot":{"ein":14000,"wk":9000,"erg":5000},"wk":{"summe":"9.000 €","einnahmen":"Einnahmen V+V: 14.000 €  (Kaltmiete 12.000 € + Umlagen 2.000 €)","ergebnis":"Überschuss: +5.000 €"},"av":["[15,\"12.000 €\"]","[20,\"2.000 €\"]","[32,\"14.000 €\"]","[35,\"2.500 €\"]","[48,\"3.000 €\"]","[55,\"1.500 €\"]","[75,\"2.000 €\"]","[83,\"9.000 €\"]","[85,\"5.000 €\"]","[86,\"5.000 €\"]"],"mappe":["[15,\"12.000,00 €\"]","[20,\"2.000,00 €\"]","[32,\"14.000,00 €\"]","[35,\"2.500,00 €\"]","[48,\"3.000,00 €\"]","[55,\"1.500,00 €\"]","[75,\"2.000,00 €\"]","[83,\"9.000,00 €\"]","[85,\"5.000,00 €\"]","[86,\"5.000,00 €\"]"]},{"jahr":2025,"tot":{"ein":14550,"wk":15818,"erg":313.79999999999995},"wk":{"summe":"15.818 €","einnahmen":"Einnahmen V+V: 14.550 €  (Kaltmiete 12.000 € + Umlagen 2.000 €)","ergebnis":"Überschuss: +314 €"},"av":["[15,\"10.800 €\"]","[20,\"2.000 €\"]","[21,\"-150 €\"]","[25,\"300 €\"]","[26,\"1.200 €\"]","[29,\"500 €\"]","[30,\"-100 €\"]","[31,\"400 €\"]","[32,\"14.550 €\"]","[35,\"2.500 €\"]","[35,\"800 €\"]","[41,\"900 €\"]","[45,\"400 €\"]","[48,\"120 €\"]","[48,\"3.000 €\"]","[51,\"150 €\"]","[51,\"400 €\"]","[51,\"900 €\"]","[54,\"600 €\"]","[55,\"500 €\"]","[60,\"600 €\"]","[72,\"220 €\"]","[72,\"400 €\"]","[75,\"2.000 €\"]","[78,\"360 €\"]","[78,\"45 €\"]","[78,\"60 €\"]","[78,\"700 €\"]","[78,\"80 €\"]","[79,\"100 €\"]","[82,\"110 €\"]","[82,\"250 €\"]","[82,\"28 €\"]","[82,\"30 €\"]","[82,\"300 €\"]","[82,\"40 €\"]","[82,\"60 €\"]","[82,\"75 €\"]","[82,\"90 €\"]","[83,\"15.818 €\"]","[85,\"-1.268 €\"]","[86,\"-1.268 €\"]","[87,null]"],"mappe":["[15,\"10.800,00 €\"]","[20,\"2.000,00 €\"]","[21,\"-150,00 €\"]","[25,\"300,00 €\"]","[26,\"1.200,00 €\"]","[29,\"500,00 €\"]","[30,\"-100,00 €\"]","[31,\"400,00 €\"]","[32,\"14.550,00 €\"]","[35,\"2.500,00 €\"]","[35,\"800,00 €\"]","[41,\"900,00 €\"]","[45,\"400,00 €\"]","[48,\"120,00 €\"]","[48,\"3.000,00 €\"]","[51,\"150,00 €\"]","[51,\"400,00 €\"]","[51,\"900,00 €\"]","[54,\"600,00 €\"]","[55,\"500,00 €\"]","[60,\"600,00 €\"]","[72,\"220,00 €\"]","[72,\"400,00 €\"]","[75,\"2.000,00 €\"]","[78,\"360,00 €\"]","[78,\"45,00 €\"]","[78,\"60,00 €\"]","[78,\"700,00 €\"]","[78,\"80,00 €\"]","[79,\"100,00 €\"]","[82,\"110,00 €\"]","[82,\"250,00 €\"]","[82,\"28,00 €\"]","[82,\"30,00 €\"]","[82,\"300,00 €\"]","[82,\"40,00 €\"]","[82,\"60,00 €\"]","[82,\"75,00 €\"]","[82,\"90,00 €\"]","[83,\"15.818,00 €\"]","[85,\"-1.268,00 €\"]","[86,\"-1.268,00 €\"]","[87,\"10 %\"]"]},{"jahr":2025,"tot":{"ein":12000,"wk":5216,"erg":6784},"wk":{"summe":"5.216 €","einnahmen":"Einnahmen V+V: 12.000 €","ergebnis":"Überschuss: +6.784 €"},"av":["[10,null]","[11,null]","[12,null]","[15,\"9.000 €\"]","[18,\"3.000 €\"]","[32,\"12.000 €\"]","[34,null]","[35,\"1.600 €\"]","[47,null]","[48,\"2.400 €\"]","[56,\"800 €\"]","[56,null]","[77,null]","[78,\"400 €\"]","[81,null]","[82,\"16 €\"]","[83,\"5.216 €\"]","[85,\"6.784 €\"]","[86,\"3.392 €\"]","[null,\"3.392 €\"]"],"mappe":["[10,null]","[11,\"120 m²\"]","[12,\"24 m²\"]","[15,\"9.000,00 €\"]","[18,\"3.000,00 €\"]","[32,\"12.000,00 €\"]","[34,null]","[35,\"1.600,00 €\"]","[47,null]","[48,\"2.400,00 €\"]","[56,\"800,00 €\"]","[56,null]","[77,null]","[78,\"400,00 €\"]","[81,null]","[82,\"16,00 €\"]","[83,\"5.216,00 €\"]","[85,\"6.784,00 €\"]","[86,\"3.392,00 €\"]","[null,\"3.392,00 €\"]"]},{"jahr":2023,"tot":{"ein":11400,"wk":12480,"erg":-1080},"wk":{"summe":"12.480 €","einnahmen":"Einnahmen V+V: 11.400 €  (Kaltmiete 9.600 € + Umlagen 1.800 €)","ergebnis":"Verlust: -1.080 €"},"av":["[15,\"9.000 €\"]","[20,\"1.800 €\"]","[26,\"600 €\"]","[32,\"11.400 €\"]","[35,\"3.100 €\"]","[47,\"4.100 €\"]","[53,\"300 €\"]","[54,\"2.500 €\"]","[74,\"1.800 €\"]","[77,\"420 €\"]","[77,\"90 €\"]","[81,\"120 €\"]","[81,\"50 €\"]","[82,\"12.480 €\"]","[84,\"-1.080 €\"]","[85,\"-1.080 €\"]"],"mappe":["[15,\"9.000,00 €\"]","[20,\"1.800,00 €\"]","[26,\"600,00 €\"]","[32,\"11.400,00 €\"]","[35,\"3.100,00 €\"]","[47,\"4.100,00 €\"]","[53,\"300,00 €\"]","[54,\"2.500,00 €\"]","[74,\"1.800,00 €\"]","[77,\"420,00 €\"]","[77,\"90,00 €\"]","[81,\"120,00 €\"]","[81,\"50,00 €\"]","[82,\"12.480,00 €\"]","[84,\"-1.080,00 €\"]","[85,\"-1.080,00 €\"]"]},{"jahr":2021,"tot":{"ein":9900,"wk":10800,"erg":-900},"wk":{"summe":"10.800 €","einnahmen":"Einnahmen V+V: 9.900 €  (Kaltmiete 8.400 € + Umlagen 1.500 €)","ergebnis":"Verlust: -900 €"},"av":["[13,\"1.500 €\"]","[21,\"9.900 €\"]","[23,\"-900 €\"]","[24,\"-900 €\"]","[33,\"2.800 €\"]","[37,\"5.200 €\"]","[40,\"700 €\"]","[47,\"1.500 €\"]","[48,\"100 €\"]","[50,\"200 €\"]","[50,\"300 €\"]","[51,\"10.800 €\"]","[9,\"8.400 €\"]"],"mappe":["[13,\"1.500,00 €\"]","[21,\"9.900,00 €\"]","[23,\"-900,00 €\"]","[24,\"-900,00 €\"]","[33,\"2.800,00 €\"]","[37,\"5.200,00 €\"]","[40,\"700,00 €\"]","[47,\"1.500,00 €\"]","[48,\"100,00 €\"]","[50,\"200,00 €\"]","[50,\"300,00 €\"]","[51,\"10.800,00 €\"]","[9,\"8.400,00 €\"]"]},{"jahr":2026,"tot":{"ein":14500,"wk":8800,"erg":5700},"wk":{"summe":"8.800 €","einnahmen":"Einnahmen V+V: 14.500 €  (Kaltmiete 12.500 € + Umlagen 2.000 €)","ergebnis":"Überschuss: +5.700 €"},"av":null,"mappe":null}],"matrix":[["9.000","14.000","+5.000"],["15.818","14.550","+314"],["5.216","12.000","+6.784"],["12.480","11.400","-1.080"],["10.800","9.900","-900"],["8.800","14.500","+5.700"]]};
 function pruefen(Q) {
   const r0 = rot;
   /* ── A · Abschriften ── */
@@ -381,6 +459,84 @@ function pruefen(Q) {
   ok(/AnlageVKern\.stempel\(t\.year, v\)/.test(Q.sto) && /return Object\.keys\(o\)\.length \? o : null;/.test(Q.sto), 'H storage.js stempelt jedes Steuerjahr beim Speichern');
   /* index.html laedt jede Abschrift vor dem Kern */
   for (const f of jahrDateien) ok(new RegExp('<script src="js/' + f.replace(/\./g, '\\.') + '\\?v=[^"]+"></script>').test(Q.idx) && Q.idx.indexOf('js/' + f) < Q.idx.indexOf('js/anlage-v-kern.js'), 'H index.html laedt ' + f + ' vor dem Kern');
+  /* ── W · v3920 Werbungskosten-PDF, Anlage-V-Seite und Steuer-Mappe nach den Bloecken A bis F (Pruefstand oben) ── */
+  let WL = null;
+  try { WL = wkLauf(Q); } catch (e) { ok(false, 'W Pruefstand Werbungskosten-PDF und Steuer-Mappe laeuft: ' + e.message); }
+  if (WL) {
+    const KW = WL._ctx.AnlageVKern;
+    const zahlAus = (t) => Number(String(t).replace(/[^\d,−-]/g, '').replace('−', '-').replace(/\./g, '').replace(',', '.'));
+    const escRe = (t) => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    WK_VORHER.faelle.forEach((v0, i) => {
+      const n = WL.faelle[i], tag = 'W Fall ' + (i + 1) + ' (' + v0.jahr + ')';
+      if (!n) { ok(false, tag + ': Fall fehlt im Pruefstand'); return; }
+      ok(JSON.stringify(n.tot) === JSON.stringify(v0.tot), tag + ': Einnahmen, Werbungskosten, Ergebnis wie vor v3920 ' + JSON.stringify(n.tot));
+      ok(JSON.stringify(n.wk) === JSON.stringify(v0.wk), tag + ': Aufstellung (Summe, Einnahmen V+V, Ergebnis) wie vor v3920 (' + n.wk.summe + ')');
+      ok(JSON.stringify(n.av) === JSON.stringify(v0.av), tag + ': Anlage-V-Seite, jedes Paar Zeile und Betrag wie vor v3920');
+      ok(JSON.stringify(n.mappe) === JSON.stringify(v0.mappe), tag + ': Steuer-Mappe, Anlage-V-Blatt, jedes Paar Zeile und Betrag wie vor v3920');
+      const bs = KW.blockSummen(n._tot.values);
+      ok(nah(bs.einnahmen, n._tot.einnahmen) && nah(bs.werbungskosten, n._tot.werbungskosten), tag + ': Block A = Summe der Einnahmen, B bis E minus nicht abzugsfaehiger Anteil = Summe der Werbungskosten (' + Math.round(bs.werbungskosten) + ' / ' + Math.round(n._tot.werbungskosten) + ')');
+      /* Seite der Aufstellung: Bloecke in der Reihenfolge A bis F, je Block die gedruckten Zeilen ohne „davon" = Zwischensumme */
+      const T = n._texte, gruppen = {}; T.forEach((e) => { if (e.tabelle) return; const k = e.s + '|' + e.y; (gruppen[k] = gruppen[k] || []).push(e); });
+      const folge = T.filter((e) => /^[A-F] · /.test(e.t)).map((e) => e.t.charAt(0));
+      ok(folge.length >= 2 && folge.join('') === folge.slice().sort().join(''), tag + ': Bloecke auf der Aufstellung in der Reihenfolge A bis F (' + folge.join('') + ')');
+      let blk = null; const sum = {}, zw = {}, eurR = /^[−-]?[\d.]+(,\d+)? €$/;
+      Object.values(gruppen).sort((a, b) => a[0].s - b[0].s || a[0].y - b[0].y).forEach((g) => {
+        const kopfB = g.find((e) => /^[A-F] · /.test(e.t)); if (kopfB) { blk = kopfB.t.charAt(0); return; }
+        if (/^VERHÄLTNISMÄSSIGE/.test(g[0].t)) { blk = 'X'; return; }
+        if (g.some((e) => /^SUMME /.test(e.t))) { blk = null; return; }   /* Kasten mit der Summe: kein Block mehr */
+        const b = g.find((e) => e.r && eurR.test(e.t)); if (!b || !blk) return;
+        if (g.some((e) => e.t === 'Zwischensumme')) { zw[blk] = zahlAus(b.t); return; }
+        const lab = g.find((e) => !e.r && !/^Z\. /.test(e.t));
+        if (lab && (lab.x === 37 || lab.x === 23)) return;   /* davon-Zeile, eingerueckt */
+        sum[blk] = (sum[blk] || 0) + zahlAus(b.t);
+      });
+      const falsch = Object.keys(zw).filter((k) => Math.abs((sum[k] || 0) - zw[k]) > 6);
+      ok(Object.keys(zw).length >= 2 && !falsch.length, tag + ': je Block ergeben die gedruckten Zeilen die Zwischensumme ' + falsch.map((k) => k + ' ' + sum[k] + '/' + zw[k]).join(' '));
+      const zSum = Object.keys(zw).filter((k) => k !== 'A').reduce((a, k) => a + zw[k], 0);
+      ok(nah(zw.A || 0, Math.round(n._tot.einnahmen), 1) && Math.abs(zSum - n._tot.werbungskosten) <= 3, tag + ': Zwischensummen A = ' + (zw.A || 0) + ' (Einnahmen), B bis E und Anteil = ' + zSum + ' (Werbungskosten ' + Math.round(n._tot.werbungskosten) + ')');
+      /* Zeilennummern des Jahres: jede gedruckte „Z. n" steht neben der Zeile, der die Abschrift diese Nummer gibt */
+      const AB = KW.aufstellungBloecke(v0.jahr, n._tot.values, { afaSonder7b: n._tot.afaSonder7b, erhV: n._tot.erhV, erhG: n._tot.erhG, afaArt: n._tot.afaArt });
+      const fehltNr = [];
+      AB.bloecke.forEach((bl) => bl.rows.forEach((r) => {
+        const anfang = String(r.text).split(' ').slice(0, 3).join(' ');
+        const lab = T.find((e) => !e.r && e.t.indexOf(anfang) === 0);
+        if (!lab) { fehltNr.push('Text ' + r.text); return; }
+        const nrE = (gruppen[lab.s + '|' + lab.y] || []).find((e) => /^Z\. /.test(e.t));
+        if ((r.nr != null ? 'Z. ' + r.nr : null) !== (nrE ? nrE.t : null)) fehltNr.push(r.text + ' ' + (nrE ? nrE.t : '-') + '/' + r.nr);
+      }));
+      ok(!fehltNr.length, tag + ': jede Zeile mit Zeilentext und Zeilennummer des Jahres ' + v0.jahr + ' ' + fehltNr.slice(0, 3).join(' | '));
+      ok(AB.mitNummern === !!KW.tabelle(v0.jahr) && (!AB.mitNummern ? !T.some((e) => /^Z\. /.test(e.t)) : true), tag + ': ohne Abschrift des Jahres keine Zeilennummer');
+      /* dieselben Zeilentexte wie das Steuerformular (echter Renderer, Experte, alle Felder mit Betrag) */
+      if (v0.jahr !== 2026) {
+        const F = rendern({ jahr: v0.jahr, stufe: 3, ov: n._tot.values, son7b: n._tot.afaSonder7b, erhV: n._tot.erhV, erhG: n._tot.erhG });
+        const ohneText = [];
+        const ABf = KW.aufstellungBloecke(v0.jahr, n._tot.values, { afaSonder7b: n._tot.afaSonder7b, erhV: n._tot.erhV, erhG: n._tot.erhG, afaArt: n._tot.afaArt, afaSatz: 2 });   /* der Pruefstand des Formulars hat #afa_satz = 2 */
+        ABf.bloecke.forEach((bl) => bl.rows.forEach((r) => { if (!new RegExp('(>|<b>)' + escRe(r.text) + '(</b>| <span|</td>|,|\\.)').test(F.h)) ohneText.push(r.text); }));
+        ok(!ohneText.length, tag + ': jeder Zeilentext der Aufstellung steht genauso im Steuerformular ' + ohneText.slice(0, 3).join(' | '));
+        const bForm = Object.keys(F.bl).join(''), bPdf = AB.bloecke.map((b) => b.k).join('');
+        ok(bPdf.split('').every((k) => bForm.indexOf(k) >= 0), tag + ': Bloecke der Aufstellung (' + bPdf + ') sind Bloecke des Formulars (' + bForm + ')');
+      }
+      /* Anlage-V-Seite und Steuer-Mappe: Bloecke A bis F in dieser Reihenfolge */
+      if (n._avTexte) {
+        const f2 = n._avTexte.filter((e) => /^[A-F] · /.test(e.t)).map((e) => e.t.charAt(0)).join('');
+        ok(f2.length >= 2 && f2 === f2.split('').sort().join('') && /^A/.test(f2), tag + ': Anlage-V-Seite nach Bloecken A bis F (' + f2 + ')');
+        const f3 = (n._mappeHtml.match(/<h3>([A-F]) · /g) || []).map((x) => x.charAt(4)).join('');
+        ok(f3.length >= 2 && f3 === f3.split('').sort().join('') && /^A/.test(f3), tag + ': Steuer-Mappe, Anlage-V-Blatt nach Bloecken A bis F (' + f3 + ')');
+      }
+    });
+    ok(JSON.stringify(WL.matrix) === JSON.stringify(WK_VORHER.matrix), 'W Gesamtuebersicht: Summe WK, Einnahmen, Ergebnis je Jahr wie vor v3920');
+    const M = WL._matrix, kopfM = M ? M.head[0].join('|') : '';
+    ok(/B Abschr\.\|C Finanz\.\|D Erhaltung\|E Lfd\. Kosten\|Summe WK\|A Einnahmen/.test(kopfM)
+      && M.body.every((r) => Math.abs([1, 2, 3, 4].reduce((a, k) => a + zahlAus(r[k]), 0) - zahlAus(r[5])) <= 2), 'W Gesamtuebersicht: Spalten B bis E, ihre Summe ergibt Summe WK (' + kopfM + ')');
+    const sf = WL._ctx.__dok.satzFelder ? WL._ctx.__dok.satzFelder().slice().sort().join(',') : '';
+    ok(sf === WK_FELDER_ALT.slice().sort().join(',') && KW.BASIS.slice().sort().join(',') === sf, 'W Steuer-Mappe liest dieselben 26 Steuerzeilen wie vor v3920 (tax_records)');
+    const dz = WL._ctx.__dok.blockZeilen(WL._B, 2025, WL.faelle[1]._tot.values, {}).zeilen.filter((z) => z[2] && z[2].art === 'summe' && z[1] !== '');
+    ok(dz.length === 5 && zahlAus(dz[0][1]) === Math.round(WL.faelle[1]._tot.einnahmen) && dz.map((z) => z[0].charAt(0)).join('') === 'ABCDE', 'W Steuer-Mappe/Finanzamt: Bloecke A bis E mit Zwischensumme, A = Einnahmen (' + dz.map((z) => z[0].charAt(0) + ' ' + z[1]).join(', ') + ')');
+    ok(!/_AV_LABEL|'1\. Finanzierungskosten'|'7\. Weitere Werbungskosten/.test(code(Q.wk)) && !/WK_NAME|'1\. Finanzierungskosten'|'7\. Weitere Werbungskosten/.test(code(Q.dok)), 'W keine eigene Abschnittsliste mehr in werbungskosten-pdf.js und dp-dokumente.js');
+    ok(/_avK\.bloecke\(y\.year/.test(Q.tax) && !/\{ k: 'A', titel: 'Einnahmen'/.test(code(Q.tax)), 'W tax.js: Gliederung aus AnlageVKern.bloecke, keine zweite Liste');
+    const neuT = KW.BLOECKE.map((b) => b.titel + ' ' + b.rows.map((r) => (r.l || '') + ' ' + (r.woher || '')).join(' ')).join(' ');
+    ok(!/ – | — |;/.test(neuT), 'W Zeilentexte der Gliederung: kein Gedankenstrich, kein Semikolon');
+  }
   return rot - r0;
 }
 
@@ -408,6 +564,14 @@ const gegen = [
   ['tax.js: Hoerer stoesst den Steuerverlauf an', Object.assign({}, Q, { tax: Q.tax.replace("if (document.querySelector('#yearly-tax-form-box .ytf-toolbar')) renderYearlyTaxForm();", 'renderYearlyTaxForm(); renderTaxTimeline();') })],
   ['detailgrad.js ohne data-dg-stufe', Object.assign({}, Q, { dg: Q.dg.replace("f.closest('[data-dg-stufe]')", 'null') })],
   ['Mappe mit fester Zeile 83', Object.assign({}, Q, { dok: Q.dok.replace("zl(R.summeWk.zeile, null, 'Summe der Werbungskosten'", "zl('83', null, 'Summe der Werbungskosten'") })],
+  /* v3920 · Gliederung A bis F, Betraege wie vorher */
+  ['Kern: Block zaehlt Garagen ein zweites Mal', Object.assign({}, Q, { kern: Q.kern.replace("return (F.art === 'ein' || F.art === 'wk') ? 1", "return (F.art === 'ein' || F.art === 'wk' || F.art === 'davon_km') ? 1") })],
+  ['WK-PDF: falsche Zeilennummer', Object.assign({}, Q, { wk: Q.wk.replace('return { nr: r.nr, text: r.text', 'return { nr: r.nr != null ? r.nr + 1 : null, text: r.text') })],
+  ['WK-PDF: Betrag einer Zeile verfaelscht', Object.assign({}, Q, { wk: Q.wk.replace('betrag: r.betrag, davon: r.davon', 'betrag: r.davon ? r.betrag : r.betrag + 10, davon: r.davon') })],
+  ['WK-PDF: Bloecke in anderer Reihenfolge', Object.assign({}, Q, { wk: Q.wk.replace('_AB.bloecke.forEach(function (bl) {', '_AB.bloecke.slice().reverse().forEach(function (bl) {') })],
+  ['Gesamtuebersicht: Summe WK ohne Anteil', Object.assign({}, Q, { wk: Q.wk.replace('_f(totals.werbungskosten),', '_f(bs ? bs.B + bs.C + bs.D + bs.E : 0),') })],
+  ['Mappe: Anlage-V-Blatt aus anderem Jahr', Object.assign({}, Q, { dok: Q.dok.replace('var R = K.aufstellung(jahr, tot); if (!R) return anlageVFehlt(B, jahr);', 'var R = K.aufstellung(jahr - 2, tot) || K.aufstellung(jahr, tot); if (!R) return anlageVFehlt(B, jahr);') })],
+  ['tax.js: eigener Zeilentext im Formular', Object.assign({}, Q, { tax: Q.tax.replace('      r.l = r.text;', "      r.l = r.text + ' (Formular)';") })],
 ];
 still = true;
 let gegenRot = 0;
