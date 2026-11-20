@@ -50,6 +50,9 @@
         ek: grenze(p.get('ek'), 0, 50000000),
         zins: grenze(p.get('zins'), 0, 15),
         nk: grenze(p.get('nk'), 0, 25),
+        /* v3932 · landing-faecher-1: Tilgung und Zinsbindung aus dem Deal-Check (vorher fest 1,5 % und Bindung leer) */
+        tilg: grenze(p.get('tilg'), 0, 10),
+        bind: grenze(p.get('bind'), 1, 40),
         t: Date.now()
       };
       if (w.kp != null && w.nkm != null) localStorage.setItem(KEY, JSON.stringify(w));
@@ -133,7 +136,7 @@
     band('<div style="font:600 11px JetBrains Mono,monospace;letter-spacing:.08em;color:var(--wl-b8932f, #b8932f);text-transform:uppercase">Deal-Check von der Startseite</div>'
       + '<div style="font:600 16px Space Grotesk,Inter,sans-serif;margin:4px 0 6px">Deal-Check übernehmen?</div>'
       + '<div>Kaufpreis ' + eur(w.kp) + ' · Kaltmiete ' + eur(w.nkm) + ' im Monat' + (w.ze > 0 ? ' · Zusatzeinnahmen ' + eur(w.ze) + ' im Monat' : '') + ' · Eigenkapital ' + eur(ekVon(w))
-      + ' · Zins ' + dez(zinsVon(w), 2) + ' % · Nebenkosten ' + dez(nkVon(w), 0) + ' %</div>'
+      + ' · Zins ' + dez(zinsVon(w), 2) + ' %' + (w.bind != null ? ' (' + Math.round(w.bind) + ' J)' : '') + ' · Tilgung ' + dez(w.tilg != null ? w.tilg : 1.5, 2) + ' % · Nebenkosten ' + dez(nkVon(w), 0) + ' %</div>'   /* v3932 */
       + '<div style="color:#6b655c;font-size:12.5px;margin-top:6px">Angemeldet als <b>' + String(konto).replace(/[<>&"]/g, '') + '</b> – das Objekt kommt in dieses Konto. DealPilot legt daraus ein neues Objekt als Entwurf an. '
       + 'Adresse, Wohnfläche und Hausgeld trägst du danach selbst ein — erst dann rechnen Lage, Steuer und Wert mit.</div>',
       [{ text: 'Als Objekt anlegen', haupt: true, tun: function () { anlegen(w); } },
@@ -186,7 +189,7 @@
     /* Erst die Übergabe löschen, dann anlegen: ein Neuladen mitten im Anlegen legt nichts doppelt an. */
     loeschen();
 
-    var ek = ekVon(w), zins = zinsVon(w), nkPct = nkVon(w), tilg = 1.5;
+    var ek = ekVon(w), zins = zinsVon(w), nkPct = nkVon(w), tilg = w.tilg != null ? w.tilg : 1.5;   /* v3932 */
     window._qcTakeover = true;
     var frei = setTimeout(function () { window._qcTakeover = false; }, 8000);
     try {
@@ -217,6 +220,7 @@
       setze('d1', String(Math.round(d1)));
       setze('d1z', dez(zins, 2));
       setze('d1t', dez(tilg, 2));
+      if (w.bind != null) setze('d1_bindj', String(Math.round(w.bind)));   /* v3932 · Zinsbindung aus dem Deal-Check */
       var typ = document.getElementById('d1_type');
       if (typ && !typ.value) { typ.value = 'annuitaet'; try { typ.dispatchEvent(new Event('change', { bubbles: true })); } catch (e) {} }
       var ausz = document.getElementById('d1_auszahl');
@@ -233,7 +237,7 @@
 
       setze('notizen', 'Aus dem Deal-Check der Startseite übernommen am ' + datum() + new Date().getFullYear()
         + ': Kaufpreis ' + eur(w.kp) + ', Nettokaltmiete ' + eur(w.nkm) + ' im Monat, Eigenkapital ' + eur(ek)
-        + ', Zins ' + dez(zins, 2) + ' %, Tilgung 1,5 %, Nebenkosten pauschal ' + dez(nkPct, 0) + ' %, '
+        + ', Zins ' + dez(zins, 2) + ' %' + (w.bind != null ? ' (' + Math.round(w.bind) + ' Jahre Zinsbindung)' : '') + ', Tilgung ' + dez(tilg, 2) + ' %, Nebenkosten pauschal ' + dez(nkPct, 0) + ' %, '
         + 'nicht umlagefähige Kosten 16 % der Kaltmiete und 1 % Leerstand. Adresse, Objektart, Wohnfläche und Hausgeld fehlen noch.');
 
       /* v3313a · calc() ist entprellt (300 ms): nach den Eingabe-Ereignissen oben lief

@@ -60,6 +60,17 @@
    Gemessen mit den echten Kernen in Node, 150.000 € / 850 € / 10 J voll 4,67 % (Stand 18.11.2026):
      ohne Zusatz: CF −66 €, DSCR 0,91, 47 · Schwach
      + 90 € (50 Tiefgarage + 40 Küche): CF +24 €, DSCR 1,03, 62 · Solide
+
+   landing-faecher-1 · Marcel 20.11.2026: „Die Zinsbindung kommt wieder hinein … dazu ein Feld Tilgung“.
+     · Die Bindungen 5/10/15/20 J standen schon im Markup, aber ohne Antwort von /market-rates/bauzins
+       (Vorlagen ohne Netz, Ausfall) blendete der Fehlerzweig sie aus und zeigte nur „Zins selbst eintragen“.
+       Jetzt rechnet der Rückfall den Zins je Bindung mit DERSELBEN Formel und demselben gespeicherten Stand wie
+       die App (js/indicative-zins.js dpGetIndicativeZins(bindung, 'voll'): Bund + Aufschlag + K + Zuschlag(100 %),
+       Spiegel von config.js marketRates.bauzins und bauzinsService). Nur wenn auch das fehlt: Feld zum Selbsteintragen.
+     · Tilgung als Feld, Vorgabe 1,5 % (config.js investmentProfileDefaults.tilgung_default, Marcel 01.10.2026).
+       Sie geht als d1t in DealKpis.compute (Kapitaldienst, Cashflow, DSCR, damit in den Score) und mit &tilg und
+       &bind in die Übergabe an die App (js/dealcheck-uebernahme.js setzt d1t und d1_bindj).
+     · Nach jedem Ergebnis: Ereignis 'dp:dealcheck-ergebnis' (für die Demo Einzel-Check, nur Staging).
    ═══════════════════════════════════════════════════════════════════════ */
 (function () {
   'use strict';
@@ -89,6 +100,7 @@
     "      <button type=\"button\" role=\"radio\" aria-checked=\"false\" data-b=\"20\"><b>20 J</b><small>–</small></button>",
     "    </div>",
     "    <label class=\"dk-f dk-zins-eigen\" id=\"dkZinsEigen\" hidden><span>Zins selbst eintragen</span><input id=\"dcZins\" inputmode=\"decimal\" placeholder=\"z. B. 4,1\" aria-label=\"Sollzins in Prozent\"><i>%</i></label>",
+    "    <label class=\"dk-f dk-tilg\"><span>Tilgung im Jahr</span><input id=\"dcTilg\" inputmode=\"decimal\" value=\"1,5\" aria-label=\"Anfängliche Tilgung in Prozent im Jahr\"><i>%</i></label>",
     "    <small class=\"dk-stand\" id=\"dkStand\">Zins wird geladen …</small>",
     "  </fieldset>",
     "  <label class=\"dk-f dk-plz\"><span>PLZ <em>optional · Lage &amp; Markt</em></span><input id=\"dcPlz\" inputmode=\"numeric\" maxlength=\"5\" placeholder=\"z. B. 12345\" aria-label=\"Postleitzahl, optional\"></label>",
@@ -143,12 +155,14 @@
   var $ = function (id) { return document.getElementById(id); };
   var karte = $('dkKarte'), vorn = $('dkVorn'), hinten = $('dcErg');
   var F = { kp: $('dcKp'), nkm: $('dcNkm'), zins: $('dcZins'), plz: $('dcPlz'), bj: $('dcBj'), wfl: $('dcWfl'),
-            zeStp: $('dcZeStp'), zeKue: $('dcZeKue'), zeSon: $('dcZeSon') };
+            zeStp: $('dcZeStp'), zeKue: $('dcZeKue'), zeSon: $('dcZeSon'), tilg: $('dcTilg') };
   var ruhig = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var zinsen = null;            /* { '5': 4.11, … } vom Endpunkt, sonst null */
   var standText = '';
   var bindung = VORGABE.bindung;
   var lauf = 0;                 /* Zähler gegen überholte Animationen/Abrufe */
+  var letztes = null;           /* landing-faecher-1 · letztes Ergebnis, für die Demo Einzel-Check */
+  window.DpDealCheck = { letztes: function () { return letztes; } };
 
   function zahl(el) {
     if (!el) return NaN;
@@ -171,6 +185,29 @@
     if (zinsen && zinsen[bindung] != null) return zinsen[bindung];
     var z = zahl(F.zins);
     return z >= 0 && z < 20 ? z : NaN;
+  }
+  /* landing-faecher-1 · Tilgung: leer = Vorgabe der App (1,5 %), sonst 0 bis 10 % */
+  function tilgJetzt() {
+    if (!F.tilg || !String(F.tilg.value || '').trim()) return VORGABE.tilg;
+    var t = zahl(F.tilg);
+    return t >= 0 && t <= 10 ? t : NaN;
+  }
+  /* landing-faecher-1 · Rückfall ohne Tagesabruf: dieselbe Marktformel wie die App (js/indicative-zins.js) */
+  function zinsRueckfall() {
+    if (typeof window.dpGetIndicativeZins !== 'function') return false;
+    var z = {}, n = 0;
+    ['5', '10', '15', '20'].forEach(function (b) {
+      var w = null; try { w = window.dpGetIndicativeZins(+b, STUFE); } catch (e) {}
+      if (w != null && isFinite(w) && w > 0 && w < 20) { z[b] = Math.round(w * 100) / 100; n++; }
+    });
+    if (!n) return false;
+    zinsen = z;
+    if (zinsen[bindung] == null) bindung = Object.keys(zinsen)[0];
+    $('dkChips').hidden = false; $('dkZinsEigen').hidden = true;
+    standText = 'Zins für Vollfinanzierung (100 % Beleihung), indikativ nach der Marktformel von DealPilot mit dem zuletzt gespeicherten Stand aus Daten der Deutschen Bundesbank. Der Tageszins ist gerade nicht abrufbar.';
+    setze('dkStand', standText);
+    chipsZeigen();
+    return true;
   }
   function chipsZeigen() {
     var bt = $('dkChips').querySelectorAll('button');
@@ -212,6 +249,8 @@
       chipsZeigen();
     })
     .catch(function () {
+      /* landing-faecher-1 · erst der Rückfall der App (gleiche Formel, gespeicherter Stand), dann erst selbst eintragen */
+      if (zinsRueckfall()) return;
       /* Kein Zins erfunden: Bindungen ausblenden, Feld zum Selbsteintragen zeigen */
       zinsen = null;
       $('dkChips').hidden = true;
@@ -231,8 +270,8 @@
 
   /* ── Rechnen (nur Kerne der App) ────────────────────────────────────── */
   function rechnen() {
-    var kp = zahl(F.kp), nkm = zahl(F.nkm), zins = zinsJetzt(), ze = zeMonat();
-    if (!(kp > 0) || !(nkm > 0) || !isFinite(zins) || !window.DealKpis || !window.DealScore || !window.ScoreTier) return null;
+    var kp = zahl(F.kp), nkm = zahl(F.nkm), zins = zinsJetzt(), ze = zeMonat(), tilg = tilgJetzt();
+    if (!(kp > 0) || !(nkm > 0) || !isFinite(zins) || !isFinite(tilg) || !window.DealKpis || !window.DealScore || !window.ScoreTier) return null;
     var ek = Math.round(kp * VORGABE.ek_pct / 100);
     var nkPct = VORGABE.nk_pct, nk = kp * nkPct / 100;
     var darlehen = Math.max(0, kp + nk - ek);
@@ -241,14 +280,14 @@
          (calc.js bwk_nul_pct x nkm, ohne ze) auf der Kaltmiete der Wohnung. */
       kp: kp, nk: nk, nkm: nkm, ze: ze, uf: 0,
       bwk_ul: 0, bwk_nul: nkm * 12 * VORGABE.nul_pct / 100,
-      d1: darlehen, d1z: zins, d1t: VORGABE.tilg, ek: ek
+      d1: darlehen, d1z: zins, d1t: tilg, ek: ek   /* landing-faecher-1 · Tilgung aus dem Feld */
     });
     var ds = DealScore.computeFromKpis({
       kp: kp, cf_m: k.cf_m, nmy: k.nmy, ltv: k.ltv, dscr: k.dscr,
       wp_kpi: kp * 0.05, mstg: 1.5,
       darlehen: (k.d_total != null && isFinite(k.d_total)) ? k.d_total : null
     });
-    return { kp: kp, nkm: nkm, ze: ze, zins: zins, ek: ek, nk: nk, nkPct: nkPct, darlehen: darlehen, k: k, score: ds.score, st: ScoreTier.stufe(ds.score) };
+    return { kp: kp, nkm: nkm, ze: ze, zins: zins, tilg: tilg, bindung: zinsen ? +bindung : null, ek: ek, nk: nk, nkPct: nkPct, darlehen: darlehen, k: k, score: ds.score, st: ScoreTier.stufe(ds.score), ds: ds };
   }
 
   function zeichne(r, anteil) {
@@ -278,11 +317,15 @@
         + '&zins=' + (Math.round(r.zins * 100) / 100) + '&nk=' + (Math.round(r.nkPct * 100) / 100)
         /* landing-dealcheck-14 · zusätzliche Einnahmen im Monat. Die App (js/dealcheck-uebernahme.js) liest &ze noch nicht
            und setzt ze = 0, bis sie nachgezogen ist (offener Punkt). */
-        + (r.ze > 0 ? '&ze=' + Math.round(r.ze) : ''));
+        + (r.ze > 0 ? '&ze=' + Math.round(r.ze) : '')
+        /* landing-faecher-1 · Tilgung und Zinsbindung (js/dealcheck-uebernahme.js liest &tilg und &bind seit v3932) */
+        + '&tilg=' + (Math.round(r.tilg * 100) / 100) + (r.bindung ? '&bind=' + r.bindung : ''));
     }
     setze('dcAnnahme', (r.ze > 0 ? 'Mit ' + eur(r.ze) + ' zusätzlichen Einnahmen im Monat. ' : '') + 'Vorab-Rechnung mit ' + eur(r.ek) + ' Eigenkapital (10 %), ' + eur(r.nk) + ' Nebenkosten (10 %), Darlehen '
-      + eur(r.darlehen) + ' zu ' + pct(r.zins) + (zinsen ? ' (' + bindung + ' J)' : '') + ', ' + pct(VORGABE.tilg)
+      + eur(r.darlehen) + ' zu ' + pct(r.zins) + (r.bindung ? ' (' + r.bindung + ' J Zinsbindung)' : '') + ', ' + pct(r.tilg)
       + ' Tilgung, ' + VORGABE.nul_pct + ' % nicht umlagefähige Kosten. Alles anpassbar in der App. Keine Finanzierungs- oder Steuerberatung.');
+    letztes = r;
+    try { document.dispatchEvent(new CustomEvent('dp:dealcheck-ergebnis', { detail: r })); } catch (e) {}
     if (ruhig) { zeichne(r, 1); return; }
     zeichne(r, 0);
     var t0 = null, dauer = 1300, warte = 380;
@@ -462,7 +505,7 @@
   function pruefen() {
     var r = rechnen();
     if (!r) {
-      var leer = !(zahl(F.kp) > 0) ? F.kp : !(zahl(F.nkm) > 0) ? F.nkm : (!zinsen ? F.zins : null);
+      var leer = !(zahl(F.kp) > 0) ? F.kp : !(zahl(F.nkm) > 0) ? F.nkm : (!zinsen && !isFinite(zinsJetzt()) ? F.zins : (!isFinite(tilgJetzt()) ? F.tilg : null));
       if (leer) leer.focus();
       return;
     }

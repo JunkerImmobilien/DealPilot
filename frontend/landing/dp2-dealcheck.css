@@ -173,3 +173,5 @@
 .dk-zusatz-h{display:block;margin-top:8px;font:500 11px/1.35 var(--body);color:rgba(236,230,214,.45)}
 @media (max-width:420px){.dk-drei{gap:10px}.dk-drei .dk-f span{letter-spacing:.08em}.dk-zusatz summary em{display:none}}
 @media (prefers-reduced-motion:reduce){.dk-zusatz summary>span::before{transition:none}}
+/* landing-faecher-1 · Tilgung unter den Zinsbindungen, so klein wie die optionalen Felder */
+.dk-bind .dk-tilg{margin-top:4px}.dk-bind .dk-tilg input{font-size:18px}

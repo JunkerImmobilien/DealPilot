@@ -64,7 +64,8 @@ if (location.hash === '#forschung') location.replace('forschung.html');</script>
 <link rel="stylesheet" href="partner.css?v=landing-strecke-5"><!-- landing-partner-1 · Abschnitt #fuer-partner -->
 <link rel="stylesheet" href="dp2-module.css?v=landing-module-2">
 <link rel="stylesheet" href="dp2-kern.css?v=landing-strecke-3">
-<link rel="stylesheet" href="dp2-dealcheck.css?v=landing-dealcheck-14">
+<link rel="stylesheet" href="dp2-dealcheck.css?v=landing-faecher-1">
+<link rel="stylesheet" href="landing-faecher.css?v=landing-faecher-1"><!-- landing-faecher-1 · Streifen, Riss, Startbahn „Fächer“, Videothek als Slider -->
 <link rel="stylesheet" href="seo.css?v=landing-seo-5">
 </head><body>
 
@@ -181,7 +182,7 @@ if (location.hash === '#forschung') location.replace('forschung.html');</script>
         <div><b><span data-zaehl data-modulzahl>19</span></b><span>MODULE AN BORD</span></div>
         <div><b><i class="gr">&gt;</i><span data-zaehl data-nutzer data-umfang="nutzer_rund">870</span></b><span>REGISTRIERTE NUTZER</span></div>
         <!-- landing-zahlen-1 · Registerstand, zieht sich aus register-stand.js nach (tools/messe-schleife-daten.mjs) -->
-        <div><b><span data-zaehl data-reg="werte_gesamt">6.187</span></b><span>AMTLICHE WERTE IM REGISTER</span></div>
+        <div><b><span data-zaehl data-reg="werte_gesamt">6.097</span></b><span>AMTLICHE WERTE IM REGISTER</span></div>
         <div><b><span data-zaehl data-reg="ausschuesse">201</span></b><span>GUTACHTERAUSSCHÜSSE MIT WERTEN</span></div>
       </div>
     </div>
@@ -220,6 +221,13 @@ if (location.hash === '#forschung') location.replace('forschung.html');</script>
 <!-- landing-einstieg-aus · Marcel 28.10.2026: „lass es uns wieder so darstellen wie vorher, mit dem Absprung auf die Seite.“
      Die Einstiegskarte (landing-einstieg-1..3, einstieg.js/.css) ist hier ausgebaut; Anmelden und Kostenlos starten
      führen wieder direkt in die App. Die Dateien bleiben liegen, js/einbettung.js wirkt nur mit ?einbettung=1. -->
+
+<!-- ══ STREIFEN · landing-faecher-1 ═══════════════════════════════════
+     Marcel 20.11.2026 (Variante 5 „Fächer“ aus design/Vorschläge/landing-neu-6): unter dem Hero laufen Ansichten aus
+     DealPilot, jedes Bild springt in die Videothek unten (#live) zum Kapitel und zur Sekunde. Auf den Bildern kein
+     Play-Zeichen und keine Zeitmarke, der Hinweis steht nur in title und aria-label. Gebaut von landing-faecher.js. -->
+<section class="n6-band" aria-label="Ansichten aus DealPilot, jede mit Absprung in die Videothek"><div id="n6st" class="rand"></div>
+  <div class="wrap n6-band-fuss"><span class="n6-bu">Ansichten und Auszüge aus DealPilot. Beispieldaten.</span></div></section>
 
 <div class="laufband"><div class="laufband-t">
   <span>◆ 19 MODULE, VOM EXPOSÉ BIS ZUR BANKUNTERLAGE</span>
@@ -340,6 +348,23 @@ if (location.hash === '#forschung') location.replace('forschung.html');</script>
 </div></div></div>
 <!-- landing-kern-1 · Vertrauensband hinter die Tarife gerückt, damit die Preise auch auf dem Handy in den ersten zwei Bildschirmhöhen stehen -->
 
+<!-- ══ STARTBAHN „FÄCHER“ · landing-faecher-1 ═════════════════════════
+     Marcel 20.11.2026: acht belegte Unterlagen liegen als Fächer, jede hebt sich heraus, wird gelesen und dreht sich
+     zurück. Bei jeder Unterlage rechnet der echte Kern (DealKpis + DealScore2, geladen von dealcheck-laden.js) neu,
+     der Score startet erst ab der Schwelle der App (70 % KPI-Vollständigkeit, dealscore2-ui.js _dpDs2Schwelle).
+     Daten, Reihenfolge und Messung im Kopf von landing-faecher.js. -->
+<section class="sec n6-sb n6-hell" id="einlesen"><div class="wrap">
+  <div class="head ctr rv"><div class="eye ctr">Der Schreibtisch · alles, was du hast</div>
+    <h2>Leg alles hin. <span class="ac">DealPilot liest jede Seite.</span></h2>
+    <p>Exposé, Darlehensvertrag, Marktbericht, Energieausweis, Grundbuch, WEG-Protokoll, Mieterliste und Objektfotos.
+      DealPilot liest alles aus, setzt jeden Wert an seine Stelle und rechnet den Score, sobald genug Kennzahlen da sind.</p></div>
+  <div class="n6-zaehler" aria-hidden="true"></div>
+  <div class="n6-sb-buehne"><div class="n6-ablage"></div><div class="n6-karte"></div></div>
+  <p class="n6-sb-stand" aria-live="polite"></p>
+  <div class="n6-sb-fuss"><span class="n6-bu">Beispieldaten. Nach jeder Unterlage rechnet der Rechenkern von DealPilot neu, der Score startet ab 70 % der 24 Kennzahlen.</span>
+    <button class="n6-knopf n6-nochmal" type="button">↻ Nochmal einlesen</button></div>
+</div></section>
+
 <!-- ══ DEAL-CHECK ════════════════════════════════════════════════════
      landing-kern-2 · Marcel 11.11.2026: öffentlicher Mini-Deal-Check ohne Anmeldung.
      Rechnet mit den ECHTEN Kernen der App (DealKpis, Dscr, DealScore, ScoreTier) -
@@ -354,7 +379,7 @@ if (location.hash === '#forschung') location.replace('forschung.html');</script>
 <section class="sec sec-cream dealcheck dk" id="dealcheck"><div class="wrap dk-g">
   <div class="dk-text rv"><div class="eye">Deal-Check · 20 Sekunden</div>
     <h2>Rechnet sich das? <span class="ac">Dreh die Karte um.</span></h2>
-    <p>Zwei Zahlen, eine Zinsbindung. DealPilot rechnet mit denselben Kernen wie in der App und sagt dir sofort, wo der Deal steht.</p>
+    <p>Zwei Zahlen, Zinsbindung und Tilgung. DealPilot rechnet mit denselben Kernen wie in der App und sagt dir sofort, wo der Deal steht.</p>
     <ul class="dk-pkt"><li>Echter Deal Score, keine Schätzformel</li><li>Zins tagesaktuell je Zinsbindung</li><li>Mit PLZ: Lage &amp; Markt aus amtlichen Daten</li></ul></div>
   <div class="dk-szene rv"><div class="dk-karte" id="dkKarte"><!-- landing-seo-3 · Inhalt baut dp2-dealcheck.js (eine Komponente für Startseite und Rechner-Seiten) --></div></div>
 </div></section>
@@ -515,10 +540,10 @@ if (location.hash === '#forschung') location.replace('forschung.html');</script>
      Knopf zur Videothek.
      Gebaut von dp2-live.js aus assets/videothek/videos.json - hier steht
      nur der Platz. Die Videos selbst liegen nicht im Git (medien/). ═══ -->
-<section class="sec sec-dark dpl" id="live"><div class="wrap">
-  <div id="dplRoot" data-start="ueberblick" data-kompakt data-reihen="ueberblick,partner"
-       data-ohne="modul-03-datenaufnahme-vier-wege,modul-28-unterlagen-einlesen,modul-12-bewertung-und-kpis,modul-08-finanzierung,modul-27-steuerverlauf-mit-wendepunkt,modul-18-der-marktbericht,modul-26-mieterhoehung-und-zielbild,modul-14-ankauf-in-den-bestand"></div>
-</div></section>
+<!-- landing-faecher-1 · Marcel 20.11.2026 (Variante 5): an dieser Stelle steht die Videothek als Slider mit Abspielfläche
+     und Kapiteln. Jeder Verweis videothek.html?v=…&t=… auf der Seite (Streifen, Etappen der Strecke) startet das Video hier
+     an der Stelle. Liste und Dateien über dp2-live.js (window.DpVideoQuelle), gebaut von landing-faecher.js. -->
+<section class="sec sec-dark" id="live"><div class="wrap"><div id="n6vt"></div></div></section>
 
 <!-- ══ DATENBASIS ════════════════════════════════════════════════════
      landing-kern-1 · Marcel 11.11.2026: „Wir haben noch eine Million amtliche Daten … wie viele
@@ -535,9 +560,9 @@ if (location.hash === '#forschung') location.replace('forschung.html');</script>
       in eigenen Datenbanken, regelmäßig abgeglichen und mit Herkunft je Wert.</p></div>
 
   <div class="dt-zahlen rv">
-    <div><b data-umfang="amtlich_gesamt">1.100.360</b><span>amtliche Datenpunkte in unseren Datenbanken</span></div>
+    <div><b data-umfang="amtlich_gesamt">1.100.270</b><span>amtliche Datenpunkte in unseren Datenbanken</span></div>
     <div><b data-umfang="schnittstellen">36</b><span>amtliche Dienste und Tabellen angebunden</span></div>
-    <div><b data-umfang="register_werte">6.187</b><span>Kennzahlen von <i data-umfang="ausschuesse">201</i> Gutachterausschüssen</span></div>
+    <div><b data-umfang="register_werte">6.097</b><span>Kennzahlen von <i data-umfang="ausschuesse">201</i> Gutachterausschüssen</span></div>
     <div><b data-umfang="portale">109</b><span>Veröffentlichungsseiten der Ausschüsse, automatisch auf neue Berichte geprüft</span></div>
   </div>
   <!-- landing-strecke-3 · Marcel 18.11.2026: „Hard Facts könnten wir noch ein paar mehr angeben“. Alle vier
@@ -546,10 +571,10 @@ if (location.hash === '#forschung') location.replace('forschung.html');</script>
        (register-stand.js); 118 = aktive Quellen in mb.gaa_sources, die der Erntetakt auf neue Berichte prüft
        (Kreis- und Stadtausschüsse und Landesportale). Verschiedene Dinge, deshalb verschieden beschriftet. -->
   <div class="dt-zahlen dt-fakten rv">
-    <div><b data-umfang="api_endpunkte">515</b><span>Programmschnittstellen (API-Endpunkte) in App und Marktbericht</span></div>
-    <div><b data-umfang="register_saetze">18.318</b><span>Sätze im Register der Gutachterausschüsse</span></div>
-    <div><b data-umfang="pruefstrecken">84</b><span>automatische Prüfwerkzeuge für Rechnung und Daten</span></div>
-    <div><b data-umfang="videos">40</b><span>Videos in der Videothek, <i data-umfang="video_stunden">3,7</i> Stunden</span></div>
+    <div><b data-umfang="api_endpunkte">518</b><span>Programmschnittstellen (API-Endpunkte) in App und Marktbericht</span></div>
+    <div><b data-umfang="register_saetze">18.470</b><span>Sätze im Register der Gutachterausschüsse</span></div>
+    <div><b data-umfang="pruefstrecken">89</b><span>automatische Prüfwerkzeuge für Rechnung und Daten</span></div>
+    <div><b data-umfang="videos">38</b><span>Videos in der Videothek, <i data-umfang="video_stunden">3,5</i> Stunden</span></div>
   </div>
 
   <!-- landing-strecke-1 · Quellenkarten zum Aufklappen, die vier großen Zahlen bleiben offen -->
@@ -562,7 +587,7 @@ if (location.hash === '#forschung') location.replace('forschung.html');</script>
     <div class="dt-k"><div class="dt-takt">Quellen: Januar bis Juni wöchentlich, sonst monatlich</div>
       <h4>Gutachterausschüsse</h4>
       <p>Liegenschaftszinssätze, Sachwertfaktoren, Vergleichsfaktoren und Umrechnungskoeffizienten. Jeder Wert mit Ausschuss, Jahrgang und Fundstelle.</p>
-      <div class="dt-n"><b data-reg="werte_gesamt">6.187</b> Werte · <b data-reg="ausschuesse">201</b> Ausschüsse · <b data-umfang="portale">109</b> geprüfte Quellen</div></div>
+      <div class="dt-n"><b data-reg="werte_gesamt">6.097</b> Werte · <b data-reg="ausschuesse">201</b> Ausschüsse · <b data-umfang="portale">109</b> geprüfte Quellen</div></div>
     <div class="dt-k"><div class="dt-takt">Stichtag 15.05.2022</div>
       <h4>Zensus 2022</h4>
       <p>Wohnungen, Gebäude, Leerstand und Mieten der Statistischen Ämter des Bundes und der Länder, bis auf die Gemeinde.</p>
@@ -703,8 +728,9 @@ if (location.hash === '#forschung') location.replace('forschung.html');</script>
 <!-- landing-kern-2 · Deal-Check: die ECHTEN Kerne aus der App, gleiche Buster wie frontend/index.html
      (tools/buster-ebenen-pruefen.mjs liest die Zeilen unten). Die App-Domain folgt umgebung.js:
      staging.dealpilot.immo -> app.staging.dealpilot.immo, sonst app.dealpilot.immo. -->
-<script src="dealcheck-laden.js?v=landing-dealcheck-14"></script><!-- landing-seo-3 · Kerne + Deal-Check, Buster dort (buster-ebenen-pruefen liest die Datei) -->
-<script src="dp2-live.js?v=landing-videothek-16"></script>
+<script src="dealcheck-laden.js?v=landing-faecher-1"></script><!-- landing-seo-3 · Kerne + Deal-Check, Buster dort (buster-ebenen-pruefen liest die Datei) -->
+<script src="dp2-live.js?v=landing-faecher-1"></script><!-- landing-faecher-1 · gibt window.DpVideoQuelle für den Slider heraus -->
+<script src="landing-faecher.js?v=landing-faecher-1"></script>
 <script src="partner.js?v=landing-strecke-5"></script><!-- landing-strecke-1 · Aufzug der Strecke --><!-- landing-videothek-1, landing-partner-1 -->
 <!-- v1588: Zwei Funktionen, die der alten Landing schon gehoerten und
      hier gefehlt haben. Beide betreffen Geld, deshalb standen sie ganz

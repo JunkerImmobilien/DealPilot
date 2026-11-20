@@ -1,9 +1,9 @@
-/* datenumfang-messen.mjs · erzeugt 2026-11-18T07:51:47.776Z — NICHT von Hand ändern.
-   Neu erzeugen: node tools/datenumfang-messen.mjs */
+/* datenumfang-messen.mjs · erzeugt 2026-11-20T12:02:25.455Z — NICHT von Hand ändern.
+   Neu erzeugen: node tools/datenumfang-messen.mjs (statischer Rückfall; live: landing-zahlen.js) */
 window.DPS_UMFANG = {
- "stand": "2026-11-18",
+ "stand": "2026-11-20",
  "db_gemessen": "2026-11-18T07:51:47.776Z",
- "quelle": "tools/datenumfang-messen.mjs · Staging nur lesend (SELECT count) · BorisRegistry.status() · Takt-Konstanten im Code · register-stand.js",
+ "quelle": "tools/datenumfang-messen.mjs · DB-Zahlen aus der Messung vom 2026-11-18T07:51:47.776Z · Register und Takte aus dem Repo",
  "db": {
   "indizes": 301,
   "portale": 109,
@@ -25,7 +25,6 @@ window.DPS_UMFANG = {
   "zins_werte": 2748,
   "zins_monat_werte": 56,
   "zins_seit": "2025-07-14",
-  "host": "116.203.214.11",
   "gemessen": "2026-11-18T07:51:47.776Z"
  },
  "teile": {
@@ -33,7 +32,7 @@ window.DPS_UMFANG = {
   "regional": 108676,
   "bau": 56128,
   "akoga": 28827,
-  "register": 6187,
+  "register": 6097,
   "kennzahlen_gaa": 2557,
   "indizes": 301,
   "zinsen": 2804
@@ -61,10 +60,10 @@ window.DPS_UMFANG = {
   "BORIS-D (bundesweit)"
  ],
  "kopf": {
-  "amtlich_gesamt": 1100360,
+  "amtlich_gesamt": 1100270,
   "amtlich_rund": "über 1,1 Millionen",
   "amtlich_rund_gross": "Über 1,1 Millionen",
-  "register_werte": 6187,
+  "register_werte": 6097,
   "ausschuesse": 201,
   "zensus": 894880,
   "zensus_tabellen": 10,
@@ -86,29 +85,20 @@ window.DPS_UMFANG = {
   "statistik_tabellen": 24,
   "nutzer": 879,
   "nutzer_rund": 870,
-  "api_endpunkte": 515,
-  "register_saetze": 18318,
+  "register_saetze": 18470,
   "laender_mit_wert": 15,
-  "pruefstrecken": 84,
-  "videos": 40,
-  "video_stunden": 3.7
+  "api_endpunkte": 518,
+  "pruefstrecken": 89,
+  "videos": 38,
+  "video_stunden": 3.5
  },
  "fakten": {
   "nutzer": 879,
-  "nutzer_rund": 870,
-  "nutzer_url": "https://app.dealpilot.immo/api/v1/public/stats",
-  "nutzer_herkunft": {
-   "sockel": 865,
-   "gezaehlt": 14,
-   "summe": 879
-  },
-  "api_endpunkte": 515,
-  "api_haupt": 441,
-  "api_mb": 74,
-  "register_saetze": 18318,
-  "laender_mit_wert": 15,
-  "pruefstrecken": 84,
-  "videos": 40,
-  "video_stunden": 3.7
+  "api_endpunkte": 518,
+  "api_haupt": 443,
+  "api_mb": 75,
+  "pruefstrecken": 89,
+  "videos": 38,
+  "video_stunden": 3.5
  }
 };

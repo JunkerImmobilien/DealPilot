@@ -654,6 +654,10 @@
     } else if (hid) oeffne(hid, true, Math.max(0, parseInt(P.get('t'), 10) || 0));
   }
 
+  /* landing-faecher-1 · die Videothek als Slider auf der Startseite (landing-faecher.js) lädt die Videos auf
+     GENAU diesem Weg: dieselbe Liste, dieselben Dateien mit oder ohne Sprecher, dieselben Buster und Kapitel. */
+  window.DpVideoQuelle = { laden: laden, datei: datei, bild: bildUrl, dauer: dauerVon, kapitel: kapListe, ton: function () { return TON; } };
+
   var lr = document.getElementById('dplRoot'), tr = document.getElementById('vtRoot');
   if (!lr && !tr) return;
   laden().then(function (D) {

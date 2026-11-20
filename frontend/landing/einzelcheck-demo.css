@@ -1,0 +1,168 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   einzelcheck-demo.css · landing-faecher-1 (20.11.2026) · DEMO, nur Staging
+   Fenster der Demo „Einzel-Check“ (einzelcheck-demo.js). Farben aus dp2.css,
+   Gold nur als Token. Die Kurzbericht-Vorschau folgt frontend/js/dp-dokument.js
+   (Deckblatt mit Bild und Wertbox, Kopf mit Linie, Kacheln mit Goldkante,
+   Tabellen mit Mono-Köpfen, Hinweis mit Goldkante, Fuß).
+   ═══════════════════════════════════════════════════════════════════════ */
+.ec-einstieg{margin-top:14px;display:flex;flex-direction:column;align-items:flex-start;gap:6px}
+.ec-start{width:100%;min-height:46px;border:1px dashed color-mix(in srgb,var(--gdh) 60%,transparent);background:color-mix(in srgb,var(--gdh) 8%,transparent);
+  color:var(--gdh);font:700 12px/1.3 var(--mono);letter-spacing:.08em;text-transform:uppercase;padding:12px 14px;cursor:pointer;border-radius:10px;text-align:left}
+.ec-start:hover,.ec-start:focus-visible{background:color-mix(in srgb,var(--gdh) 16%,transparent);outline:none;border-style:solid}
+.ec-einstieg small{font:500 10px/1.3 var(--mono);color:rgba(236,230,214,.45);letter-spacing:.04em}
+
+html.ec-offen,html.ec-offen body{overflow:hidden}
+.ec-fenster{position:fixed;inset:0;z-index:400;display:flex;align-items:center;justify-content:center;padding:24px}
+.ec-fenster[hidden]{display:none}
+.ec-dunkel{position:absolute;inset:0;background:rgba(5,5,5,.72);backdrop-filter:blur(3px)}
+.ec-box{position:relative;width:min(920px,100%);max-height:calc(100vh - 48px);overflow:auto;background:var(--cream);color:var(--ink);box-shadow:0 60px 120px -40px rgba(0,0,0,.8);
+  border-top:4px solid var(--gd);overscroll-behavior:contain}
+.ec-leiste{position:sticky;top:0;z-index:3;display:flex;align-items:center;gap:12px;padding:12px 18px;background:var(--ob);color:#fff}
+.ec-marke{font:700 12px/1 var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--gdh)}
+.ec-demo{font:700 10px/1.2 var(--mono);letter-spacing:.08em;text-transform:uppercase;background:var(--runway);color:#14100a;padding:5px 8px}
+.ec-x{margin-left:auto;width:40px;height:40px;border:1px solid rgba(255,255,255,.2);background:transparent;color:#fff;font-size:22px;line-height:1;cursor:pointer;border-radius:50%}
+.ec-schritte{list-style:none;display:flex;gap:6px;margin:0;padding:14px 22px 0;flex-wrap:wrap}
+.ec-schritte li{font:700 9.5px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--mut);border:1px solid var(--cream-line);padding:6px 8px}
+.ec-schritte li.an{background:var(--runway);color:#14100a;border-color:transparent}
+.ec-schritte li.ok{color:var(--gdi);border-color:color-mix(in srgb,var(--gd) 50%,transparent)}
+.ec-schritte li.ok::before{content:"✓ "}
+.ec-inhalt{padding:18px 22px 24px}
+.ec-inhalt h3{font:700 clamp(21px,2.6vw,28px)/1.15 var(--disp);letter-spacing:-.02em;margin:4px 0 8px;outline:none}
+.ec-lead{color:var(--inkm);margin:0 0 16px;font-size:15px}
+.ec-l{display:block;font:700 9.5px/1.2 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--gdi)}
+.ec-knoepfe{display:flex;gap:12px;flex-wrap:wrap;margin-top:18px}
+.ec-fein{font-size:12px;color:var(--mut);margin:6px 0 0}
+
+/* 1 · Unterlagen */
+.ec-ablage{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.ec-dok{display:flex;gap:12px;align-items:center;background:#fff;border:1px solid var(--cream-line);padding:12px 14px;cursor:pointer;min-height:56px}
+.ec-dok input{width:20px;height:20px;accent-color:var(--gdd);flex:none}
+.ec-dok-i{flex:none;width:30px;height:38px;background:linear-gradient(135deg,#fff 70%,#ebe4d3 70%);border:1px solid #d9cfb6;position:relative}
+.ec-dok-i::after{content:"";position:absolute;left:5px;right:5px;top:10px;height:14px;background:repeating-linear-gradient(180deg,#d9cfb6 0 2px,transparent 2px 5px)}
+.ec-dok b{display:block;font:600 15px/1.2 var(--disp)}
+.ec-dok small{display:block;font:500 11px/1.35 var(--mono);color:var(--mut);margin-top:2px;overflow-wrap:anywhere}
+.ec-schutz{margin-top:14px;border-left:3px solid var(--grn);background:rgba(63,165,108,.08);padding:12px 14px;font-size:13.5px;color:var(--inkm)}
+.ec-schutz b{color:var(--ink)}
+
+/* 2 · Auslesen */
+.ec-lesen{display:grid;gap:10px}
+.ec-zeile{background:#fff;border:1px solid var(--cream-line);padding:12px 14px;opacity:.55;transition:opacity .3s}
+.ec-zeile.an{opacity:1}
+.ec-z-kopf{display:flex;justify-content:space-between;gap:10px;align-items:baseline}
+.ec-z-kopf b{font:600 15px/1.2 var(--disp)}
+.ec-z-st{font:700 10px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--mut)}
+.ec-zeile.ok .ec-z-st{color:#1b5e3a}
+.ec-balken{display:block;height:4px;background:#efe9db;margin:9px 0 6px;overflow:hidden}
+.ec-balken i{display:block;height:100%;width:0;background:var(--runway);transition:width .6s cubic-bezier(.3,.7,.3,1)}
+.ec-zeile.liest .ec-balken i{animation:ecpuls 1s ease-in-out infinite}
+@keyframes ecpuls{50%{opacity:.45}}
+.ec-felder{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:2px 16px}
+.ec-felder li{display:flex;justify-content:space-between;gap:8px;font:500 12px/1.4 var(--mono);color:var(--inkm);border-bottom:1px dotted #d9cfb6;padding:3px 0;opacity:0;transform:translateY(4px);transition:opacity .3s,transform .3s}
+.ec-felder li.da{opacity:1;transform:none}
+.ec-felder li b{font:700 12.5px/1.3 var(--disp);color:var(--ink);text-align:right}
+.ec-felder li.ec-schwarz b{display:inline-flex;align-items:center;gap:6px;color:#1b5e3a}
+.ec-felder li.ec-schwarz b i{display:inline-block;width:42px;height:9px;background:#16130d}
+
+/* 3 · Ergebnis */
+.ec-urteil{display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:center;background:#fff;border:1px solid var(--cream-line);padding:16px;border-left:5px solid var(--gd)}
+.ec-urteil[data-farbe="top"],.ec-urteil[data-farbe="green"]{border-left-color:var(--grn)}
+.ec-urteil[data-farbe="red"]{border-left-color:#B8625C}
+.ec-ring{width:76px;height:76px;border-radius:50%;border:7px solid var(--gd);display:flex;flex-direction:column;align-items:center;justify-content:center}
+.ec-urteil[data-farbe="top"] .ec-ring,.ec-urteil[data-farbe="green"] .ec-ring{border-color:var(--grn)}
+.ec-urteil[data-farbe="red"] .ec-ring{border-color:#B8625C}
+.ec-ring b{font:700 26px/1 var(--disp)}
+.ec-ring small{font:600 9px/1 var(--mono);color:var(--mut)}
+.ec-wort{font:700 22px/1.1 var(--disp);margin:4px 0}
+.ec-urteil p{margin:0;font-size:14px;color:var(--inkm)}
+.ec-kz{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:12px 0 0}
+.ec-kz div{background:#fff;border:1px solid var(--cream-line);border-top:3px solid var(--gd);padding:10px 12px}
+.ec-kz span{display:block;font:700 9.5px/1.3 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--mut)}
+.ec-kz b{display:block;font:600 18px/1.2 var(--mono);margin-top:4px;white-space:nowrap}
+.ec-kz b.pos{color:#1b5e3a}.ec-kz b.neg{color:#B8625C}
+.ec-annahme{font-size:12.5px;color:var(--mut);margin:10px 0 0}
+.ec-wege{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:20px}
+.ec-weg{display:flex;flex-direction:column;gap:6px;background:#fff;border:1px solid var(--cream-line);padding:16px}
+.ec-weg > b{font:700 17px/1.2 var(--disp)}
+.ec-weg p{margin:0;font-size:13.5px;color:var(--inkm)}
+.ec-weg .btn-p,.ec-weg .btn-l{margin-top:auto;justify-content:center;text-align:center}
+.ec-weg-1{border:2px solid var(--gd);background:color-mix(in srgb,var(--gdh) 10%,#fff)}
+.ec-preis{font:700 26px/1.1 var(--disp);margin:4px 0 0}
+.ec-preis small{display:block;font:600 10px/1.3 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--mut);margin-top:3px}
+.ec-inhalt .btn-l{color:var(--ink);border-color:var(--cream-line)}
+
+/* 4 · Demo-Kasse */
+.ec-kasse{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:0;border:1px solid var(--cream-line);background:#fff}
+.ec-k-links{padding:22px;background:#f7f5f0;border-right:1px solid var(--cream-line)}
+.ec-k-preis{font:700 38px/1 var(--disp);letter-spacing:-.02em;margin:12px 0}
+.ec-k-links p{font-size:14px;color:var(--inkm);margin:0 0 6px}
+.ec-k-rechts{padding:22px;display:flex;flex-direction:column;gap:12px}
+.ec-k-band{background:repeating-linear-gradient(-45deg,color-mix(in srgb,var(--gdh) 25%,#fff) 0 10px,#fff 10px 20px);border:1px solid var(--gd);padding:10px 12px;font:600 12.5px/1.45 var(--body);color:var(--ink)}
+.ec-k-feld{display:grid;gap:6px}
+.ec-k-feld span{font:600 12px/1 var(--body);color:var(--mut)}
+.ec-k-feld i{display:block;height:40px;border:1px solid #e3e1da;background:#f6f4ef;border-radius:6px}
+.ec-zahlen{width:100%;justify-content:center;min-height:48px}
+.ec-zahlen[disabled]{opacity:.7;cursor:wait}
+.ec-zurueck{background:none;border:0;color:var(--mut);font:600 12px/1 var(--mono);letter-spacing:.06em;text-transform:uppercase;cursor:pointer;padding:10px 0;min-height:40px}
+.ec-knoepfe .ec-zurueck.btn-l{text-transform:none;letter-spacing:0;font:inherit}
+
+/* 5 · Kurzbericht-Vorschau im Aufbau von dp-dokument.js */
+.ec-papier{display:grid;gap:18px;background:#d8d4cb;padding:18px;max-height:none}
+.ec-seite{position:relative;background:#fff;color:#16161A;padding:18px 22px 14px;font:13px/1.5 var(--body);box-shadow:0 10px 30px -18px rgba(0,0,0,.5);overflow:hidden}
+.ec-deck{padding:0}
+.ec-p-bild{height:190px;background:#F6F4EF center/cover no-repeat;position:relative}
+.ec-p-logo{position:absolute;top:16px;left:22px;background:#fff;padding:6px 10px;border-radius:4px;font:600 16px/1 var(--disp)}
+.ec-p-logo b{color:var(--gdd)}
+.ec-p-in{padding:18px 22px 20px}
+.ec-p-eye{font:600 10px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--gdd);margin-bottom:6px}
+.ec-seite h4{font:600 26px/1.12 var(--disp);margin:2px 0 4px}
+.ec-seite h5{font:600 20px/1.2 var(--disp);margin:0 0 10px}
+.ec-p-adr{color:#5F5E66;margin-bottom:14px}
+.ec-p-wertbox{display:grid;grid-template-columns:1.2fr 1fr;gap:14px;align-items:end;border-top:1px solid #16161A;border-bottom:1px solid #E3E1DA;padding:12px 0}
+.ec-p-lbl{font:500 10px/1.3 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:#5F5E66;margin-bottom:6px}
+.ec-p-wert{font:500 30px/1 var(--mono);letter-spacing:-.02em}
+.ec-p-neben{font-size:12px;color:#5F5E66}
+.ec-p-meta{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px;font-size:12.5px}
+.ec-p-meta b{display:block;font:400 9.5px/1.3 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:#5F5E66;margin-bottom:2px}
+.ec-p-kopf{display:flex;justify-content:space-between;align-items:center;gap:12px;border-bottom:1px solid #16161A;padding-bottom:8px;margin-bottom:14px}
+.ec-p-kopf strong{font:600 15px/1 var(--disp)}.ec-p-kopf strong b{color:var(--gdd)}
+.ec-p-kopf span{font:500 9.5px/1.35 var(--mono);color:#5F5E66;text-align:right;letter-spacing:.04em;text-transform:uppercase}
+.ec-p-kz{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:6px 0 12px}
+.ec-p-kz > div{border:1px solid #E3E1DA;border-top:3px solid var(--gdd);padding:8px 9px}
+.ec-p-kz .l{font:500 9px/1.3 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:#5F5E66}
+.ec-p-kz .v{font:500 16px/1.25 var(--mono);margin-top:3px;white-space:nowrap}
+.ec-p-kz .s{font-size:10.5px;color:#5F5E66}
+.ec-p-kz .gut .v{color:#2E8B57}.ec-p-kz .schlecht .v{color:#B8625C}
+.ec-p-tab{width:100%;border-collapse:collapse;font-size:12.5px}
+.ec-p-tab th{font:500 9.5px/1.3 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:#5F5E66;text-align:left;padding:6px 6px;border-bottom:1px solid #16161A}
+.ec-p-tab td{padding:6px;border-bottom:1px solid #E3E1DA;vertical-align:top}
+.ec-p-tab .r{text-align:right;white-space:nowrap;font-family:var(--mono)}
+.ec-p-tab td.q{color:#5F5E66;font-size:11.5px}
+.ec-p-zu{display:inline-block;filter:blur(5px);user-select:none;color:#16161A}
+.ec-p-hinweis{border-left:3px solid var(--gdd);background:color-mix(in srgb,var(--gdd) 10%,#fff);padding:9px 12px;margin:12px 0 0;font-size:12px}
+.ec-p-fuss{display:flex;justify-content:space-between;gap:12px;margin-top:16px;border-top:1px solid #E3E1DA;padding-top:6px;font-size:10.5px;color:#5F5E66}
+.ec-wasser{position:absolute;right:-30px;top:30px;transform:rotate(28deg);font:700 34px/1 var(--disp);letter-spacing:.2em;color:color-mix(in srgb,var(--gd) 22%,transparent);pointer-events:none}
+
+@media(max-width:760px){
+  .ec-wege{grid-template-columns:1fr}
+  .ec-kasse{grid-template-columns:1fr}.ec-k-links{border-right:0;border-bottom:1px solid var(--cream-line)}
+  .ec-kz,.ec-p-kz{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:620px){
+  .ec-fenster{padding:0;align-items:stretch}
+  .ec-box{max-height:none;height:100%;width:100%}
+  .ec-leiste{padding:10px 12px;gap:8px;flex-wrap:wrap}
+  .ec-demo{font-size:9px;order:3;flex-basis:100%}
+  .ec-x{position:absolute;right:10px;top:6px}
+  .ec-inhalt{padding:14px 16px 22px}
+  .ec-schritte{padding:12px 16px 0}
+  .ec-ablage,.ec-felder{grid-template-columns:1fr}
+  .ec-urteil{grid-template-columns:1fr;justify-items:start}
+  .ec-papier{padding:10px;margin:0 -16px}
+  .ec-seite{padding:14px 14px 10px}
+  .ec-p-in{padding:14px}
+  .ec-seite h4{font-size:21px}
+  .ec-p-wertbox{grid-template-columns:1fr}
+  .ec-p-meta{grid-template-columns:repeat(3,minmax(0,1fr));font-size:11.5px}
+  .ec-p-tab{font-size:11.5px}.ec-p-tab td.q{display:none}.ec-p-tab th:nth-child(3){display:none}
+}
+@media (prefers-reduced-motion:reduce){.ec-balken i,.ec-felder li,.ec-zeile{transition:none}.ec-zeile.liest .ec-balken i{animation:none}}
