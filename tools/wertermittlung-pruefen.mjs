@@ -296,7 +296,18 @@ try {
   const efh = { objektart: 'efh', brw: 100, brw_eur_qm: 100, wohnflaeche: 140, flaeche: 600, baujahr: 1985, rnd: 40,
     standardstufe: 3, unterkellerung_pct: 100, stellplaetze: 2 };
   const voll = bb.filter((s) => (s.korrekturen || []).some((k) => k.feld === 'stellplaetze')).map((s) => ({ s, r: GAA.vergleichsfaktor({ ...efh, ags: s.ags, zweig: s.zweig }) })).find((x) => x.r.verfuegbar);
-  if (!voll) pruefe('A', 'A-W1', 'OGA BB: ein Satz rechnet am Normobjekt', false);
+  /* v3931 · Seit 20.11.2026 sind alle 94 OGA-BB-Vergleichsfaktoren genehmigungspflichtige Sperren (Heft ohne
+     Lizenz, Impressum verbietet Verwendung ohne Zustimmung; Marcel: „erst anfragen“). Solange das so ist, prüft
+     A-W1 die SPERRE; die Logik „merkmal_fehlt“ bleibt über A-W1d (Hamburg) und A-VGF (Konstanz) abgedeckt.
+     Kommt die Zustimmung, formel_vorgemerkt zurück nach formel - dann laufen A-W1a-c wieder von selbst. */
+  const bbAlle = JSON.parse(fs.readFileSync(path.join(SRC, 'lib/register/vgf-bb-oga-2025.json'), 'utf8'));
+  const bbGesperrt = bbAlle.length > 0 && bbAlle.every((s) => s.vollstaendig === false && s.zugang === 'genehmigungspflichtig' && !s.formel && s.formel_vorgemerkt);
+  if (!voll && bbGesperrt) {
+    const probe = GAA.vergleichsfaktor({ ...efh, ags: bbAlle[0].ags, zweig: bbAlle[0].zweig });
+    pruefe('A', 'A-W1', 'OGA BB: alle ' + bbAlle.length + ' Sätze genehmigungspflichtige Sperre ohne Formel, Formel vorgemerkt', true);
+    pruefe('A', 'A-W1', 'OGA BB ' + bbAlle[0].ags + ': Kern liefert keinen Wert', probe.verfuegbar === false, probe.grund);
+    offen('A', 'A-W1a-c', 'OGA BB gesperrt bis zur Zustimmung des Ausschusses (Anfrage 20.11.2026) - Normobjekt-Prüfung ruht');
+  } else if (!voll) pruefe('A', 'A-W1', 'OGA BB: ein Satz rechnet am Normobjekt', false);
   else {
     const ohne = GAA.vergleichsfaktor({ ...efh, standardstufe: null, ags: voll.s.ags, zweig: voll.s.zweig });
     pruefe('A', 'A-W1a', 'OGA BB ' + voll.s.ags + ': ohne Standardstufe kein Wert (merkmal_fehlt)', ohne.verfuegbar === false && ohne.grund === 'merkmal_fehlt', ohne.grund);

@@ -201,7 +201,9 @@
   },
   "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss der Stadt Fürth, Bodenrichtwerte 2026",
   "quelle_parser": "v2289-uk-ernte-by (BORIS-Bayern Erläuterungen, WMS-Verweis listeumrechnungstabellen, pdftotext je Seite und Seitenbild, 16.10.2026)",
-  "modellansaetze": {}
+  "modellansaetze": {},
+  "zugang": "genehmigungspflichtig",
+  "zugang_herkunft": "abgeleitet am 20.11.2026 aus sperre_grund „lizenz_verbietet_uebernahme“ (Wortlaut in warum_kein_wert unverändert)"
  },
  {
   "land_code": "BY",
@@ -770,7 +772,9 @@
   },
   "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss der Stadt Landshut, Bodenrichtwerte 2026",
   "quelle_parser": "v2289-uk-ernte-by (BORIS-Bayern Erläuterungen, WMS-Verweis listeumrechnungstabellen, pdftotext je Seite und Seitenbild, 16.10.2026)",
-  "modellansaetze": {}
+  "modellansaetze": {},
+  "zugang": "genehmigungspflichtig",
+  "zugang_herkunft": "abgeleitet am 20.11.2026 aus sperre_grund „lizenz_verbietet_uebernahme“ (Wortlaut in warum_kein_wert unverändert)"
  },
  {
   "land_code": "BY",
@@ -892,7 +896,9 @@
   },
   "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss des Landkreises Fürstenfeldbruck, Bodenrichtwerte 2026",
   "quelle_parser": "v2289-uk-ernte-by (BORIS-Bayern Erläuterungen, WMS-Verweis listeumrechnungstabellen, pdftotext je Seite und Seitenbild, 16.10.2026)",
-  "modellansaetze": {}
+  "modellansaetze": {},
+  "zugang": "genehmigungspflichtig",
+  "zugang_herkunft": "abgeleitet am 20.11.2026 aus sperre_grund „lizenz_verbietet_uebernahme“ (Wortlaut in warum_kein_wert unverändert)"
  },
  {
   "land_code": "BY",
@@ -1022,7 +1028,9 @@
   },
   "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss des Landkreises Weilheim-Schongau, Bodenrichtwerte 2026",
   "quelle_parser": "v2289-uk-ernte-by (BORIS-Bayern Erläuterungen, WMS-Verweis listeumrechnungstabellen, pdftotext je Seite und Seitenbild, 16.10.2026)",
-  "modellansaetze": {}
+  "modellansaetze": {},
+  "zugang": "genehmigungspflichtig",
+  "zugang_herkunft": "abgeleitet am 20.11.2026 aus sperre_grund „lizenz_verbietet_uebernahme“ (Wortlaut in warum_kein_wert unverändert)"
  },
  {
   "land_code": "BY",
@@ -1138,7 +1146,9 @@
   },
   "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss der Stadt Coburg, Bodenrichtwerte 2026",
   "quelle_parser": "v2289-uk-ernte-by (BORIS-Bayern Erläuterungen, WMS-Verweis listeumrechnungstabellen, pdftotext je Seite und Seitenbild, 16.10.2026)",
-  "modellansaetze": {}
+  "modellansaetze": {},
+  "zugang": "nicht abgeleitet",
+  "zugang_herkunft": "abgeleitet am 20.11.2026 aus sperre_grund „ersatztabelle_nicht_oertlich“ (Wortlaut in warum_kein_wert unverändert)"
  },
  {
   "land_code": "BY",
@@ -1252,7 +1262,9 @@
   },
   "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss der Stadt Straubing, Bodenrichtwerte 2026",
   "quelle_parser": "v2289-uk-ernte-by (BORIS-Bayern Erläuterungen, WMS-Verweis listeumrechnungstabellen, pdftotext je Seite und Seitenbild, 16.10.2026)",
-  "modellansaetze": {}
+  "modellansaetze": {},
+  "zugang": "nicht abgeleitet",
+  "zugang_herkunft": "abgeleitet am 20.11.2026 aus sperre_grund „ersatztabelle_nicht_oertlich“ (Wortlaut in warum_kein_wert unverändert)"
  },
  {
   "land_code": "BY",
@@ -1381,7 +1393,9 @@
   "offene_frage": "Gilt eine vom Ausschuss ausdrücklich angeordnete Ersatztabelle (hier Anlage 36 BewG mit örtlich abgeleiteten Schwellen) als örtlicher Wert? Bewertungsentscheidung.",
   "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss des Landkreises Landshut, Bodenrichtwerte 2026",
   "quelle_parser": "v2289-uk-ernte-by (BORIS-Bayern Erläuterungen, WMS-Verweis listeumrechnungstabellen, pdftotext je Seite und Seitenbild, 16.10.2026)",
-  "modellansaetze": {}
+  "modellansaetze": {},
+  "zugang": "nicht abgeleitet",
+  "zugang_herkunft": "abgeleitet am 20.11.2026 aus sperre_grund „ersatztabelle_nicht_oertlich“ (Wortlaut in warum_kein_wert unverändert)"
  },
  {
   "land_code": "BY",
@@ -1422,7 +1436,9 @@
   },
   "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss des Landkreises Augsburg, Bodenrichtwerte 2026",
   "quelle_parser": "v2289-uk-ernte-by (BORIS-Bayern Erläuterungen, WMS-Verweis listeumrechnungstabellen, pdftotext je Seite und Seitenbild, 16.10.2026)",
-  "modellansaetze": {}
+  "modellansaetze": {},
+  "zugang": "nicht abgeleitet",
+  "zugang_herkunft": "abgeleitet am 20.11.2026 aus sperre_grund „ersatztabelle_nicht_oertlich“ (Wortlaut in warum_kein_wert unverändert)"
  },
  {
   "land_code": "BY",
@@ -1463,7 +1479,9 @@
   },
   "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss der Stadt Würzburg, Bodenrichtwerte 2026",
   "quelle_parser": "v2289-uk-ernte-by (BORIS-Bayern Erläuterungen, WMS-Verweis listeumrechnungstabellen, pdftotext je Seite und Seitenbild, 16.10.2026)",
-  "modellansaetze": {}
+  "modellansaetze": {},
+  "zugang": "nicht abgeleitet",
+  "zugang_herkunft": "abgeleitet am 20.11.2026 aus sperre_grund „ersatztabelle_nicht_oertlich“ (Wortlaut in warum_kein_wert unverändert)"
  },
  {
   "land_code": "BY",
@@ -1505,7 +1523,9 @@
   "hinweis_intern": "WGFZ-Umrechnung als eigene Kennzahl vorgesehen; bis dahin Sperre.",
   "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte im Bereich der Landeshauptstadt München, Bodenrichtwerte 2026",
   "quelle_parser": "v2289-uk-ernte-by (BORIS-Bayern Erläuterungen, WMS-Verweis listeumrechnungstabellen, pdftotext je Seite und Seitenbild, 16.10.2026)",
-  "modellansaetze": {}
+  "modellansaetze": {},
+  "zugang": "nicht abgeleitet",
+  "zugang_herkunft": "abgeleitet am 20.11.2026 aus sperre_grund „nur_wgfz“ (Wortlaut in warum_kein_wert unverändert)"
  },
  {
   "land_code": "BY",
@@ -1547,7 +1567,9 @@
   "hinweis_intern": "WGFZ-Umrechnung als eigene Kennzahl vorgesehen; bis dahin Sperre.",
   "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss des Landkreises München, Bodenrichtwerte 2026",
   "quelle_parser": "v2289-uk-ernte-by (BORIS-Bayern Erläuterungen, WMS-Verweis listeumrechnungstabellen, pdftotext je Seite und Seitenbild, 16.10.2026)",
-  "modellansaetze": {}
+  "modellansaetze": {},
+  "zugang": "nicht abgeleitet",
+  "zugang_herkunft": "abgeleitet am 20.11.2026 aus sperre_grund „nur_wgfz“ (Wortlaut in warum_kein_wert unverändert)"
  },
  {
   "land_code": "BY",
@@ -1589,7 +1611,9 @@
   "hinweis_intern": "WGFZ-Umrechnung als eigene Kennzahl vorgesehen; bis dahin Sperre.",
   "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss der Stadt Passau, Bodenrichtwerte 2026",
   "quelle_parser": "v2289-uk-ernte-by (BORIS-Bayern Erläuterungen, WMS-Verweis listeumrechnungstabellen, pdftotext je Seite und Seitenbild, 16.10.2026)",
-  "modellansaetze": {}
+  "modellansaetze": {},
+  "zugang": "nicht abgeleitet",
+  "zugang_herkunft": "abgeleitet am 20.11.2026 aus sperre_grund „nur_wgfz“ (Wortlaut in warum_kein_wert unverändert)"
  },
  {
   "land_code": "BY",
@@ -1680,7 +1704,9 @@
   "hinweis_intern": "WGFZ-Umrechnung als eigene Kennzahl vorgesehen; bis dahin Sperre.",
   "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss der Stadt Regensburg, Bodenrichtwerte 2024",
   "quelle_parser": "v2289-uk-ernte-by (BORIS-Bayern Erläuterungen, WMS-Verweis listeumrechnungstabellen, pdftotext je Seite und Seitenbild, 16.10.2026)",
-  "modellansaetze": {}
+  "modellansaetze": {},
+  "zugang": "nicht abgeleitet",
+  "zugang_herkunft": "abgeleitet am 20.11.2026 aus sperre_grund „nur_wgfz“ (Wortlaut in warum_kein_wert unverändert)"
  },
  {
   "land_code": "BY",
@@ -1722,7 +1748,9 @@
   "hinweis_intern": "WGFZ-Umrechnung als eigene Kennzahl vorgesehen; bis dahin Sperre.",
   "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss der Stadt Memmingen, Bodenrichtwerte 2026",
   "quelle_parser": "v2289-uk-ernte-by (BORIS-Bayern Erläuterungen, WMS-Verweis listeumrechnungstabellen, pdftotext je Seite und Seitenbild, 16.10.2026)",
-  "modellansaetze": {}
+  "modellansaetze": {},
+  "zugang": "nicht abgeleitet",
+  "zugang_herkunft": "abgeleitet am 20.11.2026 aus sperre_grund „nur_wgfz“ (Wortlaut in warum_kein_wert unverändert)"
  },
  {
   "land_code": "BY",
@@ -1763,7 +1791,9 @@
   },
   "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss der Stadt Nürnberg, Bodenrichtwerte 2026",
   "quelle_parser": "v2289-uk-ernte-by (BORIS-Bayern Erläuterungen, WMS-Verweis listeumrechnungstabellen, pdftotext je Seite und Seitenbild, 16.10.2026)",
-  "modellansaetze": {}
+  "modellansaetze": {},
+  "zugang": "kostenpflichtig",
+  "zugang_herkunft": "abgeleitet am 20.11.2026 aus sperre_grund „nur_kostenpflichtig“ (Wortlaut in warum_kein_wert unverändert)"
  },
  {
   "land_code": "BY",
@@ -1804,7 +1834,9 @@
   },
   "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss der Stadt Erlangen, Bodenrichtwerte 2026",
   "quelle_parser": "v2289-uk-ernte-by (BORIS-Bayern Erläuterungen, WMS-Verweis listeumrechnungstabellen, pdftotext je Seite und Seitenbild, 16.10.2026)",
-  "modellansaetze": {}
+  "modellansaetze": {},
+  "zugang": "kostenpflichtig",
+  "zugang_herkunft": "abgeleitet am 20.11.2026 aus sperre_grund „nur_kostenpflichtig“ (Wortlaut in warum_kein_wert unverändert)"
  },
  {
   "land_code": "BY",
@@ -1853,7 +1885,9 @@
   },
   "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss der Stadt Rosenheim, Bodenrichtwerte 2026",
   "quelle_parser": "v2289-uk-ernte-by (BORIS-Bayern Erläuterungen, WMS-Verweis listeumrechnungstabellen, pdftotext je Seite und Seitenbild, 16.10.2026)",
-  "modellansaetze": {}
+  "modellansaetze": {},
+  "zugang": "nicht abgeleitet",
+  "zugang_herkunft": "abgeleitet am 20.11.2026 aus sperre_grund „nicht_abbildbar“ (Wortlaut in warum_kein_wert unverändert)"
  },
  {
   "land_code": "BY",
@@ -1894,7 +1928,9 @@
   },
   "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss des Landkreises Rosenheim, Bodenrichtwerte 2026",
   "quelle_parser": "v2289-uk-ernte-by (BORIS-Bayern Erläuterungen, WMS-Verweis listeumrechnungstabellen, pdftotext je Seite und Seitenbild, 16.10.2026)",
-  "modellansaetze": {}
+  "modellansaetze": {},
+  "zugang": "nicht abgeleitet",
+  "zugang_herkunft": "abgeleitet am 20.11.2026 aus sperre_grund „sachverstaendig“ (Wortlaut in warum_kein_wert unverändert)"
  },
  {
   "land_code": "BY",
@@ -1935,7 +1971,9 @@
   },
   "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss des Landkreises Bad Tölz-Wolfratshausen, Bodenrichtwerte 2026",
   "quelle_parser": "v2289-uk-ernte-by (BORIS-Bayern Erläuterungen, WMS-Verweis listeumrechnungstabellen, pdftotext je Seite und Seitenbild, 16.10.2026)",
-  "modellansaetze": {}
+  "modellansaetze": {},
+  "zugang": "nicht abgeleitet",
+  "zugang_herkunft": "abgeleitet am 20.11.2026 aus sperre_grund „sachverstaendig“ (Wortlaut in warum_kein_wert unverändert)"
  },
  {
   "land_code": "BY",
@@ -1976,7 +2014,9 @@
   },
   "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss der Stadt Augsburg, Bodenrichtwerte 2026",
   "quelle_parser": "v2289-uk-ernte-by (BORIS-Bayern Erläuterungen, WMS-Verweis listeumrechnungstabellen, pdftotext je Seite und Seitenbild, 16.10.2026)",
-  "modellansaetze": {}
+  "modellansaetze": {},
+  "zugang": "nicht abgeleitet",
+  "zugang_herkunft": "abgeleitet am 20.11.2026 aus sperre_grund „sachverstaendig“ (Wortlaut in warum_kein_wert unverändert)"
  },
  {
   "land_code": "BY",
@@ -2017,7 +2057,9 @@
   },
   "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss des Landkreises Starnberg, Bodenrichtwerte 2026",
   "quelle_parser": "v2289-uk-ernte-by (BORIS-Bayern Erläuterungen, WMS-Verweis listeumrechnungstabellen, pdftotext je Seite und Seitenbild, 16.10.2026)",
-  "modellansaetze": {}
+  "modellansaetze": {},
+  "zugang": "nicht abgeleitet",
+  "zugang_herkunft": "abgeleitet am 20.11.2026 aus sperre_grund „sachverstaendig“ (Wortlaut in warum_kein_wert unverändert)"
  },
  {
   "land_code": "BY",
@@ -2058,7 +2100,9 @@
   },
   "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss des Landkreises Kulmbach, Bodenrichtwerte 2026",
   "quelle_parser": "v2289-uk-ernte-by (BORIS-Bayern Erläuterungen, WMS-Verweis listeumrechnungstabellen, pdftotext je Seite und Seitenbild, 16.10.2026)",
-  "modellansaetze": {}
+  "modellansaetze": {},
+  "zugang": "nicht abgeleitet",
+  "zugang_herkunft": "abgeleitet am 20.11.2026 aus sperre_grund „sachverstaendig“ (Wortlaut in warum_kein_wert unverändert)"
  },
  {
   "land_code": "BY",
@@ -2099,7 +2143,9 @@
   },
   "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss des Landkreises Kronach, Bodenrichtwerte 2026",
   "quelle_parser": "v2289-uk-ernte-by (BORIS-Bayern Erläuterungen, WMS-Verweis listeumrechnungstabellen, pdftotext je Seite und Seitenbild, 16.10.2026)",
-  "modellansaetze": {}
+  "modellansaetze": {},
+  "zugang": "nicht abgeleitet",
+  "zugang_herkunft": "abgeleitet am 20.11.2026 aus sperre_grund „sachverstaendig“ (Wortlaut in warum_kein_wert unverändert)"
  },
  {
   "land_code": "BY",
@@ -2140,7 +2186,9 @@
   },
   "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss des Landkreises Neuburg-Schrobenhausen, Bodenrichtwerte 2026",
   "quelle_parser": "v2289-uk-ernte-by (BORIS-Bayern Erläuterungen, WMS-Verweis listeumrechnungstabellen, pdftotext je Seite und Seitenbild, 16.10.2026)",
-  "modellansaetze": {}
+  "modellansaetze": {},
+  "zugang": "nicht abgeleitet",
+  "zugang_herkunft": "abgeleitet am 20.11.2026 aus sperre_grund „sachverstaendig“ (Wortlaut in warum_kein_wert unverändert)"
  },
  {
   "land_code": "BY",
@@ -2181,7 +2229,9 @@
   },
   "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss des Landkreises Aichach-Friedberg, Bodenrichtwerte 2026",
   "quelle_parser": "v2289-uk-ernte-by (BORIS-Bayern Erläuterungen, WMS-Verweis listeumrechnungstabellen, pdftotext je Seite und Seitenbild, 16.10.2026)",
-  "modellansaetze": {}
+  "modellansaetze": {},
+  "zugang": "nicht abgeleitet",
+  "zugang_herkunft": "abgeleitet am 20.11.2026 aus sperre_grund „nicht_abgeleitet“ (Wortlaut in warum_kein_wert unverändert)"
  },
  {
   "land_code": "BY",
@@ -2222,7 +2272,9 @@
   },
   "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss des Landkreises Garmisch-Partenkirchen, Bodenrichtwerte 2026",
   "quelle_parser": "v2289-uk-ernte-by (BORIS-Bayern Erläuterungen, WMS-Verweis listeumrechnungstabellen, pdftotext je Seite und Seitenbild, 16.10.2026)",
-  "modellansaetze": {}
+  "modellansaetze": {},
+  "zugang": "nicht abgeleitet",
+  "zugang_herkunft": "abgeleitet am 20.11.2026 aus sperre_grund „nicht_abgeleitet“ (Wortlaut in warum_kein_wert unverändert)"
  },
  {
   "land_code": "BY",
@@ -2263,7 +2315,9 @@
   },
   "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss des Landkreises Oberallgäu, Bodenrichtwerte 2026",
   "quelle_parser": "v2289-uk-ernte-by (BORIS-Bayern Erläuterungen, WMS-Verweis listeumrechnungstabellen, pdftotext je Seite und Seitenbild, 16.10.2026)",
-  "modellansaetze": {}
+  "modellansaetze": {},
+  "zugang": "nicht abgeleitet",
+  "zugang_herkunft": "abgeleitet am 20.11.2026 aus sperre_grund „nicht_abgeleitet“ (Wortlaut in warum_kein_wert unverändert)"
  },
  {
   "land_code": "BY",
@@ -2304,7 +2358,9 @@
   },
   "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss des Landkreises Traunstein, Bodenrichtwerte 2026",
   "quelle_parser": "v2289-uk-ernte-by (BORIS-Bayern Erläuterungen, WMS-Verweis listeumrechnungstabellen, pdftotext je Seite und Seitenbild, 16.10.2026)",
-  "modellansaetze": {}
+  "modellansaetze": {},
+  "zugang": "nicht abgeleitet",
+  "zugang_herkunft": "abgeleitet am 20.11.2026 aus sperre_grund „nicht_abgeleitet“ (Wortlaut in warum_kein_wert unverändert)"
  },
  {
   "land_code": "BY",
@@ -2345,7 +2401,9 @@
   },
   "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss des Landkreises Neumarkt i.d.OPf., Bodenrichtwerte 2026",
   "quelle_parser": "v2289-uk-ernte-by (BORIS-Bayern Erläuterungen, WMS-Verweis listeumrechnungstabellen, pdftotext je Seite und Seitenbild, 16.10.2026)",
-  "modellansaetze": {}
+  "modellansaetze": {},
+  "zugang": "nicht abgeleitet",
+  "zugang_herkunft": "abgeleitet am 20.11.2026 aus sperre_grund „nicht_abgeleitet“ (Wortlaut in warum_kein_wert unverändert)"
  },
  {
   "land_code": "BY",
@@ -2386,7 +2444,9 @@
   },
   "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss des Landkreises Neustadt an der Waldnaab, Bodenrichtwerte 2026",
   "quelle_parser": "v2289-uk-ernte-by (BORIS-Bayern Erläuterungen, WMS-Verweis listeumrechnungstabellen, pdftotext je Seite und Seitenbild, 16.10.2026)",
-  "modellansaetze": {}
+  "modellansaetze": {},
+  "zugang": "nicht abgeleitet",
+  "zugang_herkunft": "abgeleitet am 20.11.2026 aus sperre_grund „nicht_abgeleitet“ (Wortlaut in warum_kein_wert unverändert)"
  },
  {
   "land_code": "BY",
@@ -2427,7 +2487,9 @@
   },
   "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss des Landkreises Schwandorf, Bodenrichtwerte 2026",
   "quelle_parser": "v2289-uk-ernte-by (BORIS-Bayern Erläuterungen, WMS-Verweis listeumrechnungstabellen, pdftotext je Seite und Seitenbild, 16.10.2026)",
-  "modellansaetze": {}
+  "modellansaetze": {},
+  "zugang": "nicht abgeleitet",
+  "zugang_herkunft": "abgeleitet am 20.11.2026 aus sperre_grund „nicht_abgeleitet“ (Wortlaut in warum_kein_wert unverändert)"
  },
  {
   "land_code": "BY",
@@ -2468,7 +2530,9 @@
   },
   "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss des Landkreises Dachau, Bodenrichtwerte 2026",
   "quelle_parser": "v2289-uk-ernte-by (BORIS-Bayern Erläuterungen, WMS-Verweis listeumrechnungstabellen, pdftotext je Seite und Seitenbild, 16.10.2026)",
-  "modellansaetze": {}
+  "modellansaetze": {},
+  "zugang": "nicht abgeleitet",
+  "zugang_herkunft": "abgeleitet am 20.11.2026 aus sperre_grund „nicht_abgeleitet“ (Wortlaut in warum_kein_wert unverändert)"
  },
  {
   "land_code": "BY",
@@ -2509,7 +2573,9 @@
   },
   "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss der Stadt Bayreuth, Bodenrichtwerte 2026",
   "quelle_parser": "v2289-uk-ernte-by (BORIS-Bayern Erläuterungen, WMS-Verweis listeumrechnungstabellen, pdftotext je Seite und Seitenbild, 16.10.2026)",
-  "modellansaetze": {}
+  "modellansaetze": {},
+  "zugang": "nicht abgeleitet",
+  "zugang_herkunft": "abgeleitet am 20.11.2026 aus sperre_grund „nicht_abgeleitet“ (Wortlaut in warum_kein_wert unverändert)"
  },
  {
   "land_code": "BY",
@@ -2550,7 +2616,9 @@
   },
   "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss des Landkreises Lichtenfels, Bodenrichtwerte 2026",
   "quelle_parser": "v2289-uk-ernte-by (BORIS-Bayern Erläuterungen, WMS-Verweis listeumrechnungstabellen, pdftotext je Seite und Seitenbild, 16.10.2026)",
-  "modellansaetze": {}
+  "modellansaetze": {},
+  "zugang": "nicht abgeleitet",
+  "zugang_herkunft": "abgeleitet am 20.11.2026 aus sperre_grund „nicht_abgeleitet“ (Wortlaut in warum_kein_wert unverändert)"
  },
  {
   "land_code": "BY",
@@ -2591,7 +2659,9 @@
   },
   "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss des Landkreises Bamberg, Bodenrichtwerte 2026",
   "quelle_parser": "v2289-uk-ernte-by (BORIS-Bayern Erläuterungen, WMS-Verweis listeumrechnungstabellen, pdftotext je Seite und Seitenbild, 16.10.2026)",
-  "modellansaetze": {}
+  "modellansaetze": {},
+  "zugang": "nicht abgeleitet",
+  "zugang_herkunft": "abgeleitet am 20.11.2026 aus sperre_grund „nicht_abgeleitet“ (Wortlaut in warum_kein_wert unverändert)"
  },
  {
   "land_code": "BY",
@@ -2632,7 +2702,9 @@
   },
   "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss des Landkreises Forchheim, Bodenrichtwerte 2026",
   "quelle_parser": "v2289-uk-ernte-by (BORIS-Bayern Erläuterungen, WMS-Verweis listeumrechnungstabellen, pdftotext je Seite und Seitenbild, 16.10.2026)",
-  "modellansaetze": {}
+  "modellansaetze": {},
+  "zugang": "nicht abgeleitet",
+  "zugang_herkunft": "abgeleitet am 20.11.2026 aus sperre_grund „nicht_abgeleitet“ (Wortlaut in warum_kein_wert unverändert)"
  },
  {
   "land_code": "BY",
@@ -2673,7 +2745,9 @@
   },
   "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss des Landkreises Bayreuth, Bodenrichtwerte 2026",
   "quelle_parser": "v2289-uk-ernte-by (BORIS-Bayern Erläuterungen, WMS-Verweis listeumrechnungstabellen, pdftotext je Seite und Seitenbild, 16.10.2026)",
-  "modellansaetze": {}
+  "modellansaetze": {},
+  "zugang": "nicht abgeleitet",
+  "zugang_herkunft": "abgeleitet am 20.11.2026 aus sperre_grund „nicht_abgeleitet“ (Wortlaut in warum_kein_wert unverändert)"
  },
  {
   "land_code": "BY",
@@ -2714,7 +2788,9 @@
   },
   "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss des Landkreises Wunsiedel i.Fichtelgebirge, Bodenrichtwerte 2026",
   "quelle_parser": "v2289-uk-ernte-by (BORIS-Bayern Erläuterungen, WMS-Verweis listeumrechnungstabellen, pdftotext je Seite und Seitenbild, 16.10.2026)",
-  "modellansaetze": {}
+  "modellansaetze": {},
+  "zugang": "nicht abgeleitet",
+  "zugang_herkunft": "abgeleitet am 20.11.2026 aus sperre_grund „nicht_abgeleitet“ (Wortlaut in warum_kein_wert unverändert)"
  },
  {
   "land_code": "BY",
@@ -2755,7 +2831,9 @@
   },
   "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss des Landkreises Hof, Bodenrichtwerte 2026",
   "quelle_parser": "v2289-uk-ernte-by (BORIS-Bayern Erläuterungen, WMS-Verweis listeumrechnungstabellen, pdftotext je Seite und Seitenbild, 16.10.2026)",
-  "modellansaetze": {}
+  "modellansaetze": {},
+  "zugang": "nicht abgeleitet",
+  "zugang_herkunft": "abgeleitet am 20.11.2026 aus sperre_grund „nicht_abgeleitet“ (Wortlaut in warum_kein_wert unverändert)"
  },
  {
   "land_code": "BY",
@@ -2796,7 +2874,9 @@
   },
   "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss des Landkreises Erlangen-Höchstadt, Bodenrichtwerte 2026",
   "quelle_parser": "v2289-uk-ernte-by (BORIS-Bayern Erläuterungen, WMS-Verweis listeumrechnungstabellen, pdftotext je Seite und Seitenbild, 16.10.2026)",
-  "modellansaetze": {}
+  "modellansaetze": {},
+  "zugang": "nicht abgeleitet",
+  "zugang_herkunft": "abgeleitet am 20.11.2026 aus sperre_grund „nicht_abgeleitet“ (Wortlaut in warum_kein_wert unverändert)"
  },
  {
   "land_code": "BY",
@@ -2837,7 +2917,9 @@
   },
   "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss der Stadt Ingolstadt, Bodenrichtwerte 2026",
   "quelle_parser": "v2289-uk-ernte-by (BORIS-Bayern Erläuterungen, WMS-Verweis listeumrechnungstabellen, pdftotext je Seite und Seitenbild, 16.10.2026)",
-  "modellansaetze": {}
+  "modellansaetze": {},
+  "zugang": "nicht veröffentlicht",
+  "zugang_herkunft": "abgeleitet am 20.11.2026 aus sperre_grund „keine_angabe“ (Wortlaut in warum_kein_wert unverändert)"
  },
  {
   "land_code": "BY",
@@ -2878,7 +2960,9 @@
   },
   "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss des Landkreises Altötting, Bodenrichtwerte 2026",
   "quelle_parser": "v2289-uk-ernte-by (BORIS-Bayern Erläuterungen, WMS-Verweis listeumrechnungstabellen, pdftotext je Seite und Seitenbild, 16.10.2026)",
-  "modellansaetze": {}
+  "modellansaetze": {},
+  "zugang": "nicht veröffentlicht",
+  "zugang_herkunft": "abgeleitet am 20.11.2026 aus sperre_grund „keine_angabe“ (Wortlaut in warum_kein_wert unverändert)"
  },
  {
   "land_code": "BY",
@@ -2919,7 +3003,9 @@
   },
   "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss des Landkreises Berchtesgadener Land, Bodenrichtwerte 2026",
   "quelle_parser": "v2289-uk-ernte-by (BORIS-Bayern Erläuterungen, WMS-Verweis listeumrechnungstabellen, pdftotext je Seite und Seitenbild, 16.10.2026)",
-  "modellansaetze": {}
+  "modellansaetze": {},
+  "zugang": "nicht veröffentlicht",
+  "zugang_herkunft": "abgeleitet am 20.11.2026 aus sperre_grund „keine_angabe“ (Wortlaut in warum_kein_wert unverändert)"
  },
  {
   "land_code": "BY",
@@ -2960,7 +3046,9 @@
   },
   "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss des Landkreises Ebersberg, Bodenrichtwerte 2026",
   "quelle_parser": "v2289-uk-ernte-by (BORIS-Bayern Erläuterungen, WMS-Verweis listeumrechnungstabellen, pdftotext je Seite und Seitenbild, 16.10.2026)",
-  "modellansaetze": {}
+  "modellansaetze": {},
+  "zugang": "nicht veröffentlicht",
+  "zugang_herkunft": "abgeleitet am 20.11.2026 aus sperre_grund „keine_angabe“ (Wortlaut in warum_kein_wert unverändert)"
  },
  {
   "land_code": "BY",
@@ -3001,7 +3089,9 @@
   },
   "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss des Landkreises Eichstätt, Bodenrichtwerte 2026",
   "quelle_parser": "v2289-uk-ernte-by (BORIS-Bayern Erläuterungen, WMS-Verweis listeumrechnungstabellen, pdftotext je Seite und Seitenbild, 16.10.2026)",
-  "modellansaetze": {}
+  "modellansaetze": {},
+  "zugang": "nicht veröffentlicht",
+  "zugang_herkunft": "abgeleitet am 20.11.2026 aus sperre_grund „keine_angabe“ (Wortlaut in warum_kein_wert unverändert)"
  },
  {
   "land_code": "BY",
@@ -3042,7 +3132,9 @@
   },
   "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss des Landkreises Erding, Bodenrichtwerte 2026",
   "quelle_parser": "v2289-uk-ernte-by (BORIS-Bayern Erläuterungen, WMS-Verweis listeumrechnungstabellen, pdftotext je Seite und Seitenbild, 16.10.2026)",
-  "modellansaetze": {}
+  "modellansaetze": {},
+  "zugang": "nicht veröffentlicht",
+  "zugang_herkunft": "abgeleitet am 20.11.2026 aus sperre_grund „keine_angabe“ (Wortlaut in warum_kein_wert unverändert)"
  },
  {
   "land_code": "BY",
@@ -3083,7 +3175,9 @@
   },
   "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss des Landkreises Freising, Bodenrichtwerte 2026",
   "quelle_parser": "v2289-uk-ernte-by (BORIS-Bayern Erläuterungen, WMS-Verweis listeumrechnungstabellen, pdftotext je Seite und Seitenbild, 16.10.2026)",
-  "modellansaetze": {}
+  "modellansaetze": {},
+  "zugang": "nicht veröffentlicht",
+  "zugang_herkunft": "abgeleitet am 20.11.2026 aus sperre_grund „keine_angabe“ (Wortlaut in warum_kein_wert unverändert)"
  },
  {
   "land_code": "BY",
@@ -3124,7 +3218,9 @@
   },
   "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss des Landkreises Landsberg am Lech, Bodenrichtwerte 2026",
   "quelle_parser": "v2289-uk-ernte-by (BORIS-Bayern Erläuterungen, WMS-Verweis listeumrechnungstabellen, pdftotext je Seite und Seitenbild, 16.10.2026)",
-  "modellansaetze": {}
+  "modellansaetze": {},
+  "zugang": "nicht veröffentlicht",
+  "zugang_herkunft": "abgeleitet am 20.11.2026 aus sperre_grund „keine_angabe“ (Wortlaut in warum_kein_wert unverändert)"
  },
  {
   "land_code": "BY",
@@ -3165,7 +3261,9 @@
   },
   "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss des Landkreises Miesbach, Bodenrichtwerte 2026",
   "quelle_parser": "v2289-uk-ernte-by (BORIS-Bayern Erläuterungen, WMS-Verweis listeumrechnungstabellen, pdftotext je Seite und Seitenbild, 16.10.2026)",
-  "modellansaetze": {}
+  "modellansaetze": {},
+  "zugang": "nicht veröffentlicht",
+  "zugang_herkunft": "abgeleitet am 20.11.2026 aus sperre_grund „keine_angabe“ (Wortlaut in warum_kein_wert unverändert)"
  },
  {
   "land_code": "BY",
@@ -3206,7 +3304,9 @@
   },
   "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss des Landkreises Mühldorf a.Inn, Bodenrichtwerte 2026",
   "quelle_parser": "v2289-uk-ernte-by (BORIS-Bayern Erläuterungen, WMS-Verweis listeumrechnungstabellen, pdftotext je Seite und Seitenbild, 16.10.2026)",
-  "modellansaetze": {}
+  "modellansaetze": {},
+  "zugang": "nicht veröffentlicht",
+  "zugang_herkunft": "abgeleitet am 20.11.2026 aus sperre_grund „keine_angabe“ (Wortlaut in warum_kein_wert unverändert)"
  },
  {
   "land_code": "BY",
@@ -3247,7 +3347,9 @@
   },
   "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss des Landkreises Pfaffenhofen a.d.Ilm, Bodenrichtwerte 2026",
   "quelle_parser": "v2289-uk-ernte-by (BORIS-Bayern Erläuterungen, WMS-Verweis listeumrechnungstabellen, pdftotext je Seite und Seitenbild, 16.10.2026)",
-  "modellansaetze": {}
+  "modellansaetze": {},
+  "zugang": "nicht veröffentlicht",
+  "zugang_herkunft": "abgeleitet am 20.11.2026 aus sperre_grund „keine_angabe“ (Wortlaut in warum_kein_wert unverändert)"
  },
  {
   "land_code": "BY",
@@ -3288,7 +3390,9 @@
   },
   "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss des Landkreises Deggendorf, Bodenrichtwerte 2026",
   "quelle_parser": "v2289-uk-ernte-by (BORIS-Bayern Erläuterungen, WMS-Verweis listeumrechnungstabellen, pdftotext je Seite und Seitenbild, 16.10.2026)",
-  "modellansaetze": {}
+  "modellansaetze": {},
+  "zugang": "nicht veröffentlicht",
+  "zugang_herkunft": "abgeleitet am 20.11.2026 aus sperre_grund „keine_angabe“ (Wortlaut in warum_kein_wert unverändert)"
  },
  {
   "land_code": "BY",
@@ -3329,7 +3433,9 @@
   },
   "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss des Landkreises Kelheim, Bodenrichtwerte 2026",
   "quelle_parser": "v2289-uk-ernte-by (BORIS-Bayern Erläuterungen, WMS-Verweis listeumrechnungstabellen, pdftotext je Seite und Seitenbild, 16.10.2026)",
-  "modellansaetze": {}
+  "modellansaetze": {},
+  "zugang": "nicht veröffentlicht",
+  "zugang_herkunft": "abgeleitet am 20.11.2026 aus sperre_grund „keine_angabe“ (Wortlaut in warum_kein_wert unverändert)"
  },
  {
   "land_code": "BY",
@@ -3370,7 +3476,9 @@
   },
   "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss des Landkreises Passau, Bodenrichtwerte 2026",
   "quelle_parser": "v2289-uk-ernte-by (BORIS-Bayern Erläuterungen, WMS-Verweis listeumrechnungstabellen, pdftotext je Seite und Seitenbild, 16.10.2026)",
-  "modellansaetze": {}
+  "modellansaetze": {},
+  "zugang": "nicht veröffentlicht",
+  "zugang_herkunft": "abgeleitet am 20.11.2026 aus sperre_grund „keine_angabe“ (Wortlaut in warum_kein_wert unverändert)"
  },
  {
   "land_code": "BY",
@@ -3411,7 +3519,9 @@
   },
   "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss des Landkreises Regen, Bodenrichtwerte 2026",
   "quelle_parser": "v2289-uk-ernte-by (BORIS-Bayern Erläuterungen, WMS-Verweis listeumrechnungstabellen, pdftotext je Seite und Seitenbild, 16.10.2026)",
-  "modellansaetze": {}
+  "modellansaetze": {},
+  "zugang": "nicht veröffentlicht",
+  "zugang_herkunft": "abgeleitet am 20.11.2026 aus sperre_grund „keine_angabe“ (Wortlaut in warum_kein_wert unverändert)"
  },
  {
   "land_code": "BY",
@@ -3452,7 +3562,9 @@
   },
   "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss des Landkreises Rottal-Inn, Bodenrichtwerte 2026",
   "quelle_parser": "v2289-uk-ernte-by (BORIS-Bayern Erläuterungen, WMS-Verweis listeumrechnungstabellen, pdftotext je Seite und Seitenbild, 16.10.2026)",
-  "modellansaetze": {}
+  "modellansaetze": {},
+  "zugang": "nicht veröffentlicht",
+  "zugang_herkunft": "abgeleitet am 20.11.2026 aus sperre_grund „keine_angabe“ (Wortlaut in warum_kein_wert unverändert)"
  },
  {
   "land_code": "BY",
@@ -3493,7 +3605,9 @@
   },
   "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss des Landkreises Straubing-Bogen, Bodenrichtwerte 2026",
   "quelle_parser": "v2289-uk-ernte-by (BORIS-Bayern Erläuterungen, WMS-Verweis listeumrechnungstabellen, pdftotext je Seite und Seitenbild, 16.10.2026)",
-  "modellansaetze": {}
+  "modellansaetze": {},
+  "zugang": "nicht veröffentlicht",
+  "zugang_herkunft": "abgeleitet am 20.11.2026 aus sperre_grund „keine_angabe“ (Wortlaut in warum_kein_wert unverändert)"
  },
  {
   "land_code": "BY",
@@ -3534,7 +3648,9 @@
   },
   "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss des Landkreises Dingolfing-Landau, Bodenrichtwerte 2026",
   "quelle_parser": "v2289-uk-ernte-by (BORIS-Bayern Erläuterungen, WMS-Verweis listeumrechnungstabellen, pdftotext je Seite und Seitenbild, 16.10.2026)",
-  "modellansaetze": {}
+  "modellansaetze": {},
+  "zugang": "nicht veröffentlicht",
+  "zugang_herkunft": "abgeleitet am 20.11.2026 aus sperre_grund „keine_angabe“ (Wortlaut in warum_kein_wert unverändert)"
  },
  {
   "land_code": "BY",
@@ -3575,7 +3691,9 @@
   },
   "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss des Landkreises Freyung-Grafenau, Bodenrichtwerte 2026",
   "quelle_parser": "v2289-uk-ernte-by (BORIS-Bayern Erläuterungen, WMS-Verweis listeumrechnungstabellen, pdftotext je Seite und Seitenbild, 16.10.2026)",
-  "modellansaetze": {}
+  "modellansaetze": {},
+  "zugang": "nicht veröffentlicht",
+  "zugang_herkunft": "abgeleitet am 20.11.2026 aus sperre_grund „keine_angabe“ (Wortlaut in warum_kein_wert unverändert)"
  },
  {
   "land_code": "BY",
@@ -3616,7 +3734,9 @@
   },
   "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss der Stadt Weiden i.d.OPf., Bodenrichtwerte 2026",
   "quelle_parser": "v2289-uk-ernte-by (BORIS-Bayern Erläuterungen, WMS-Verweis listeumrechnungstabellen, pdftotext je Seite und Seitenbild, 16.10.2026)",
-  "modellansaetze": {}
+  "modellansaetze": {},
+  "zugang": "nicht veröffentlicht",
+  "zugang_herkunft": "abgeleitet am 20.11.2026 aus sperre_grund „keine_angabe“ (Wortlaut in warum_kein_wert unverändert)"
  },
  {
   "land_code": "BY",
@@ -3657,7 +3777,9 @@
   },
   "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss des Landkreises Amberg-Sulzbach, Bodenrichtwerte 2026",
   "quelle_parser": "v2289-uk-ernte-by (BORIS-Bayern Erläuterungen, WMS-Verweis listeumrechnungstabellen, pdftotext je Seite und Seitenbild, 16.10.2026)",
-  "modellansaetze": {}
+  "modellansaetze": {},
+  "zugang": "nicht veröffentlicht",
+  "zugang_herkunft": "abgeleitet am 20.11.2026 aus sperre_grund „keine_angabe“ (Wortlaut in warum_kein_wert unverändert)"
  },
  {
   "land_code": "BY",
@@ -3698,7 +3820,9 @@
   },
   "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss des Landkreises Cham, Bodenrichtwerte 2026",
   "quelle_parser": "v2289-uk-ernte-by (BORIS-Bayern Erläuterungen, WMS-Verweis listeumrechnungstabellen, pdftotext je Seite und Seitenbild, 16.10.2026)",
-  "modellansaetze": {}
+  "modellansaetze": {},
+  "zugang": "nicht veröffentlicht",
+  "zugang_herkunft": "abgeleitet am 20.11.2026 aus sperre_grund „keine_angabe“ (Wortlaut in warum_kein_wert unverändert)"
  },
  {
   "land_code": "BY",
@@ -3739,7 +3863,9 @@
   },
   "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss des Landkreises Regensburg, Bodenrichtwerte 2026",
   "quelle_parser": "v2289-uk-ernte-by (BORIS-Bayern Erläuterungen, WMS-Verweis listeumrechnungstabellen, pdftotext je Seite und Seitenbild, 16.10.2026)",
-  "modellansaetze": {}
+  "modellansaetze": {},
+  "zugang": "nicht veröffentlicht",
+  "zugang_herkunft": "abgeleitet am 20.11.2026 aus sperre_grund „keine_angabe“ (Wortlaut in warum_kein_wert unverändert)"
  },
  {
   "land_code": "BY",
@@ -3780,7 +3906,9 @@
   },
   "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss des Landkreises Tirschenreuth, Bodenrichtwerte 2026",
   "quelle_parser": "v2289-uk-ernte-by (BORIS-Bayern Erläuterungen, WMS-Verweis listeumrechnungstabellen, pdftotext je Seite und Seitenbild, 16.10.2026)",
-  "modellansaetze": {}
+  "modellansaetze": {},
+  "zugang": "nicht veröffentlicht",
+  "zugang_herkunft": "abgeleitet am 20.11.2026 aus sperre_grund „keine_angabe“ (Wortlaut in warum_kein_wert unverändert)"
  },
  {
   "land_code": "BY",
@@ -3821,7 +3949,9 @@
   },
   "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss der Stadt Bamberg, Bodenrichtwerte 2026",
   "quelle_parser": "v2289-uk-ernte-by (BORIS-Bayern Erläuterungen, WMS-Verweis listeumrechnungstabellen, pdftotext je Seite und Seitenbild, 16.10.2026)",
-  "modellansaetze": {}
+  "modellansaetze": {},
+  "zugang": "nicht veröffentlicht",
+  "zugang_herkunft": "abgeleitet am 20.11.2026 aus sperre_grund „keine_angabe“ (Wortlaut in warum_kein_wert unverändert)"
  },
  {
   "land_code": "BY",
@@ -3862,7 +3992,9 @@
   },
   "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss der Stadt Hof, Bodenrichtwerte 2026",
   "quelle_parser": "v2289-uk-ernte-by (BORIS-Bayern Erläuterungen, WMS-Verweis listeumrechnungstabellen, pdftotext je Seite und Seitenbild, 16.10.2026)",
-  "modellansaetze": {}
+  "modellansaetze": {},
+  "zugang": "nicht veröffentlicht",
+  "zugang_herkunft": "abgeleitet am 20.11.2026 aus sperre_grund „keine_angabe“ (Wortlaut in warum_kein_wert unverändert)"
  },
  {
   "land_code": "BY",
@@ -3903,7 +4035,9 @@
   },
   "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss des Landkreises Coburg, Bodenrichtwerte 2026",
   "quelle_parser": "v2289-uk-ernte-by (BORIS-Bayern Erläuterungen, WMS-Verweis listeumrechnungstabellen, pdftotext je Seite und Seitenbild, 16.10.2026)",
-  "modellansaetze": {}
+  "modellansaetze": {},
+  "zugang": "nicht veröffentlicht",
+  "zugang_herkunft": "abgeleitet am 20.11.2026 aus sperre_grund „keine_angabe“ (Wortlaut in warum_kein_wert unverändert)"
  },
  {
   "land_code": "BY",
@@ -3944,7 +4078,9 @@
   },
   "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss der Stadt Ansbach, Bodenrichtwerte 2026",
   "quelle_parser": "v2289-uk-ernte-by (BORIS-Bayern Erläuterungen, WMS-Verweis listeumrechnungstabellen, pdftotext je Seite und Seitenbild, 16.10.2026)",
-  "modellansaetze": {}
+  "modellansaetze": {},
+  "zugang": "nicht veröffentlicht",
+  "zugang_herkunft": "abgeleitet am 20.11.2026 aus sperre_grund „keine_angabe“ (Wortlaut in warum_kein_wert unverändert)"
  },
  {
   "land_code": "BY",
@@ -3985,7 +4121,9 @@
   },
   "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss des Landkreises Ansbach, Bodenrichtwerte 2026",
   "quelle_parser": "v2289-uk-ernte-by (BORIS-Bayern Erläuterungen, WMS-Verweis listeumrechnungstabellen, pdftotext je Seite und Seitenbild, 16.10.2026)",
-  "modellansaetze": {}
+  "modellansaetze": {},
+  "zugang": "nicht veröffentlicht",
+  "zugang_herkunft": "abgeleitet am 20.11.2026 aus sperre_grund „keine_angabe“ (Wortlaut in warum_kein_wert unverändert)"
  },
  {
   "land_code": "BY",
@@ -4026,7 +4164,9 @@
   },
   "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss des Landkreises Fürth, Bodenrichtwerte 2026",
   "quelle_parser": "v2289-uk-ernte-by (BORIS-Bayern Erläuterungen, WMS-Verweis listeumrechnungstabellen, pdftotext je Seite und Seitenbild, 16.10.2026)",
-  "modellansaetze": {}
+  "modellansaetze": {},
+  "zugang": "nicht veröffentlicht",
+  "zugang_herkunft": "abgeleitet am 20.11.2026 aus sperre_grund „keine_angabe“ (Wortlaut in warum_kein_wert unverändert)"
  },
  {
   "land_code": "BY",
@@ -4067,7 +4207,9 @@
   },
   "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss des Landkreises Nürnberger Land, Bodenrichtwerte 2026",
   "quelle_parser": "v2289-uk-ernte-by (BORIS-Bayern Erläuterungen, WMS-Verweis listeumrechnungstabellen, pdftotext je Seite und Seitenbild, 16.10.2026)",
-  "modellansaetze": {}
+  "modellansaetze": {},
+  "zugang": "nicht veröffentlicht",
+  "zugang_herkunft": "abgeleitet am 20.11.2026 aus sperre_grund „keine_angabe“ (Wortlaut in warum_kein_wert unverändert)"
  },
  {
   "land_code": "BY",
@@ -4108,7 +4250,9 @@
   },
   "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss des Landkreises Neustadt a.d.Aisch-Bad Windsheim, Bodenrichtwerte 2026",
   "quelle_parser": "v2289-uk-ernte-by (BORIS-Bayern Erläuterungen, WMS-Verweis listeumrechnungstabellen, pdftotext je Seite und Seitenbild, 16.10.2026)",
-  "modellansaetze": {}
+  "modellansaetze": {},
+  "zugang": "nicht veröffentlicht",
+  "zugang_herkunft": "abgeleitet am 20.11.2026 aus sperre_grund „keine_angabe“ (Wortlaut in warum_kein_wert unverändert)"
  },
  {
   "land_code": "BY",
@@ -4149,7 +4293,9 @@
   },
   "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss der Stadt Schwabach, Bodenrichtwerte 2026",
   "quelle_parser": "v2289-uk-ernte-by (BORIS-Bayern Erläuterungen, WMS-Verweis listeumrechnungstabellen, pdftotext je Seite und Seitenbild, 16.10.2026)",
-  "modellansaetze": {}
+  "modellansaetze": {},
+  "zugang": "nicht veröffentlicht",
+  "zugang_herkunft": "abgeleitet am 20.11.2026 aus sperre_grund „keine_angabe“ (Wortlaut in warum_kein_wert unverändert)"
  },
  {
   "land_code": "BY",
@@ -4190,7 +4336,9 @@
   },
   "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss der Stadt Aschaffenburg, Bodenrichtwerte 2026",
   "quelle_parser": "v2289-uk-ernte-by (BORIS-Bayern Erläuterungen, WMS-Verweis listeumrechnungstabellen, pdftotext je Seite und Seitenbild, 16.10.2026)",
-  "modellansaetze": {}
+  "modellansaetze": {},
+  "zugang": "nicht veröffentlicht",
+  "zugang_herkunft": "abgeleitet am 20.11.2026 aus sperre_grund „keine_angabe“ (Wortlaut in warum_kein_wert unverändert)"
  },
  {
   "land_code": "BY",
@@ -4231,7 +4379,9 @@
   },
   "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss der Stadt Schweinfurt, Bodenrichtwerte 2026",
   "quelle_parser": "v2289-uk-ernte-by (BORIS-Bayern Erläuterungen, WMS-Verweis listeumrechnungstabellen, pdftotext je Seite und Seitenbild, 16.10.2026)",
-  "modellansaetze": {}
+  "modellansaetze": {},
+  "zugang": "nicht veröffentlicht",
+  "zugang_herkunft": "abgeleitet am 20.11.2026 aus sperre_grund „keine_angabe“ (Wortlaut in warum_kein_wert unverändert)"
  },
  {
   "land_code": "BY",
@@ -4272,7 +4422,9 @@
   },
   "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss des Landkreises Würzburg, Bodenrichtwerte 2026",
   "quelle_parser": "v2289-uk-ernte-by (BORIS-Bayern Erläuterungen, WMS-Verweis listeumrechnungstabellen, pdftotext je Seite und Seitenbild, 16.10.2026)",
-  "modellansaetze": {}
+  "modellansaetze": {},
+  "zugang": "nicht veröffentlicht",
+  "zugang_herkunft": "abgeleitet am 20.11.2026 aus sperre_grund „keine_angabe“ (Wortlaut in warum_kein_wert unverändert)"
  },
  {
   "land_code": "BY",
@@ -4313,7 +4465,9 @@
   },
   "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss der Stadt Kaufbeuren, Bodenrichtwerte 2026",
   "quelle_parser": "v2289-uk-ernte-by (BORIS-Bayern Erläuterungen, WMS-Verweis listeumrechnungstabellen, pdftotext je Seite und Seitenbild, 16.10.2026)",
-  "modellansaetze": {}
+  "modellansaetze": {},
+  "zugang": "nicht veröffentlicht",
+  "zugang_herkunft": "abgeleitet am 20.11.2026 aus sperre_grund „keine_angabe“ (Wortlaut in warum_kein_wert unverändert)"
  },
  {
   "land_code": "BY",
@@ -4354,7 +4508,9 @@
   },
   "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss der Stadt Kempten (Allgäu), Bodenrichtwerte 2026",
   "quelle_parser": "v2289-uk-ernte-by (BORIS-Bayern Erläuterungen, WMS-Verweis listeumrechnungstabellen, pdftotext je Seite und Seitenbild, 16.10.2026)",
-  "modellansaetze": {}
+  "modellansaetze": {},
+  "zugang": "nicht veröffentlicht",
+  "zugang_herkunft": "abgeleitet am 20.11.2026 aus sperre_grund „keine_angabe“ (Wortlaut in warum_kein_wert unverändert)"
  },
  {
   "land_code": "BY",
@@ -4395,7 +4551,9 @@
   },
   "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss des Landkreises Dillingen a.d.Donau, Bodenrichtwerte 2026",
   "quelle_parser": "v2289-uk-ernte-by (BORIS-Bayern Erläuterungen, WMS-Verweis listeumrechnungstabellen, pdftotext je Seite und Seitenbild, 16.10.2026)",
-  "modellansaetze": {}
+  "modellansaetze": {},
+  "zugang": "nicht veröffentlicht",
+  "zugang_herkunft": "abgeleitet am 20.11.2026 aus sperre_grund „keine_angabe“ (Wortlaut in warum_kein_wert unverändert)"
  },
  {
   "land_code": "BY",
@@ -4436,7 +4594,9 @@
   },
   "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss des Landkreises Günzburg, Bodenrichtwerte 2026",
   "quelle_parser": "v2289-uk-ernte-by (BORIS-Bayern Erläuterungen, WMS-Verweis listeumrechnungstabellen, pdftotext je Seite und Seitenbild, 16.10.2026)",
-  "modellansaetze": {}
+  "modellansaetze": {},
+  "zugang": "nicht veröffentlicht",
+  "zugang_herkunft": "abgeleitet am 20.11.2026 aus sperre_grund „keine_angabe“ (Wortlaut in warum_kein_wert unverändert)"
  },
  {
   "land_code": "BY",
@@ -4477,7 +4637,9 @@
   },
   "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss des Landkreises Lindau (Bodensee), Bodenrichtwerte 2026",
   "quelle_parser": "v2289-uk-ernte-by (BORIS-Bayern Erläuterungen, WMS-Verweis listeumrechnungstabellen, pdftotext je Seite und Seitenbild, 16.10.2026)",
-  "modellansaetze": {}
+  "modellansaetze": {},
+  "zugang": "nicht veröffentlicht",
+  "zugang_herkunft": "abgeleitet am 20.11.2026 aus sperre_grund „keine_angabe“ (Wortlaut in warum_kein_wert unverändert)"
  },
  {
   "land_code": "BY",
@@ -4518,7 +4680,9 @@
   },
   "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss des Landkreises Ostallgäu, Bodenrichtwerte 2026",
   "quelle_parser": "v2289-uk-ernte-by (BORIS-Bayern Erläuterungen, WMS-Verweis listeumrechnungstabellen, pdftotext je Seite und Seitenbild, 16.10.2026)",
-  "modellansaetze": {}
+  "modellansaetze": {},
+  "zugang": "nicht veröffentlicht",
+  "zugang_herkunft": "abgeleitet am 20.11.2026 aus sperre_grund „keine_angabe“ (Wortlaut in warum_kein_wert unverändert)"
  },
  {
   "land_code": "BY",
@@ -4559,7 +4723,9 @@
   },
   "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss des Landkreises Unterallgäu, Bodenrichtwerte 2026",
   "quelle_parser": "v2289-uk-ernte-by (BORIS-Bayern Erläuterungen, WMS-Verweis listeumrechnungstabellen, pdftotext je Seite und Seitenbild, 16.10.2026)",
-  "modellansaetze": {}
+  "modellansaetze": {},
+  "zugang": "nicht veröffentlicht",
+  "zugang_herkunft": "abgeleitet am 20.11.2026 aus sperre_grund „keine_angabe“ (Wortlaut in warum_kein_wert unverändert)"
  },
  {
   "land_code": "BY",
@@ -4600,7 +4766,9 @@
   },
   "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss des Landkreises Donau-Ries, Bodenrichtwerte 2026",
   "quelle_parser": "v2289-uk-ernte-by (BORIS-Bayern Erläuterungen, WMS-Verweis listeumrechnungstabellen, pdftotext je Seite und Seitenbild, 16.10.2026)",
-  "modellansaetze": {}
+  "modellansaetze": {},
+  "zugang": "nicht veröffentlicht",
+  "zugang_herkunft": "abgeleitet am 20.11.2026 aus sperre_grund „keine_angabe“ (Wortlaut in warum_kein_wert unverändert)"
  },
  {
   "land_code": "BY",
@@ -4641,7 +4809,9 @@
   },
   "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss des Landkreises Schweinfurt, Bodenrichtwerte 2026",
   "quelle_parser": "v2289-uk-ernte-by (BORIS-Bayern Erläuterungen, WMS-Verweis listeumrechnungstabellen, pdftotext je Seite und Seitenbild, 16.10.2026)",
-  "modellansaetze": {}
+  "modellansaetze": {},
+  "zugang": "nicht veröffentlicht",
+  "zugang_herkunft": "abgeleitet am 20.11.2026 aus sperre_grund „keine_angabe“ (Wortlaut in warum_kein_wert unverändert)"
  },
  {
   "land_code": "BY",
@@ -4681,7 +4851,9 @@
   "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss des Landkreises Roth, Bodenrichtwerte 2026",
   "quelle_parser": "uk-nachernte 16.10.2026 (pdftotext -layout je Seite, Tabellen am Seitenbild geprüft)",
   "modellansaetze": {},
-  "fundstelle": "Volltext, alle 2 PDF-Seiten durchsucht"
+  "fundstelle": "Volltext, alle 2 PDF-Seiten durchsucht",
+  "zugang": "nicht veröffentlicht",
+  "zugang_herkunft": "abgeleitet am 20.11.2026 aus sperre_grund „kein_dokument“ (Wortlaut in warum_kein_wert unverändert)"
  },
  {
   "land_code": "BY",
@@ -4729,7 +4901,9 @@
   "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss des Landkreises Weißenburg-Gunzenhausen, Bodenrichtwerte 2024",
   "quelle_parser": "uk-nachernte 16.10.2026 (pdftotext -layout je Seite, Tabellen am Seitenbild geprüft)",
   "modellansaetze": {},
-  "fundstelle": "Volltext, alle 52 PDF-Seiten durchsucht; Volltext, alle 33 PDF-Seiten durchsucht"
+  "fundstelle": "Volltext, alle 52 PDF-Seiten durchsucht; Volltext, alle 33 PDF-Seiten durchsucht",
+  "zugang": "nicht veröffentlicht",
+  "zugang_herkunft": "abgeleitet am 20.11.2026 aus sperre_grund „keine_angabe“ (Wortlaut in warum_kein_wert unverändert)"
  },
  {
   "land_code": "BY",
@@ -4767,7 +4941,9 @@
   "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss des Landkreises Aschaffenburg, Bodenrichtwerte 2026",
   "quelle_parser": "uk-nachernte 16.10.2026 (pdftotext -layout je Seite, Tabellen am Seitenbild geprüft)",
   "modellansaetze": {},
-  "fundstelle": "BORIS-Bayern, Mandantenpfade aschaffenburg-lkr/2026_2028 und /2024_2026: HTTP 404 am 16.10.2026"
+  "fundstelle": "BORIS-Bayern, Mandantenpfade aschaffenburg-lkr/2026_2028 und /2024_2026: HTTP 404 am 16.10.2026",
+  "zugang": "nicht veröffentlicht",
+  "zugang_herkunft": "abgeleitet am 20.11.2026 aus sperre_grund „kein_dokument“ (Wortlaut in warum_kein_wert unverändert)"
  },
  {
   "land_code": "BY",
@@ -4807,7 +4983,9 @@
   "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss des Landkreises Bad Kissingen, Bodenrichtwerte 2026",
   "quelle_parser": "uk-nachernte 16.10.2026 (pdftotext -layout je Seite, Tabellen am Seitenbild geprüft)",
   "modellansaetze": {},
-  "fundstelle": "Volltext, alle 1 PDF-Seiten durchsucht"
+  "fundstelle": "Volltext, alle 1 PDF-Seiten durchsucht",
+  "zugang": "nicht veröffentlicht",
+  "zugang_herkunft": "abgeleitet am 20.11.2026 aus sperre_grund „kein_dokument“ (Wortlaut in warum_kein_wert unverändert)"
  },
  {
   "land_code": "BY",
@@ -4848,7 +5026,9 @@
   "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss des Landkreises Rhön-Grabfeld, Bodenrichtwerte 2026",
   "quelle_parser": "uk-nachernte 16.10.2026 (pdftotext -layout je Seite, Tabellen am Seitenbild geprüft)",
   "modellansaetze": {},
-  "fundstelle": "Volltext, alle 10 PDF-Seiten durchsucht"
+  "fundstelle": "Volltext, alle 10 PDF-Seiten durchsucht",
+  "zugang": "nicht veröffentlicht",
+  "zugang_herkunft": "abgeleitet am 20.11.2026 aus sperre_grund „keine_angabe“ (Wortlaut in warum_kein_wert unverändert)"
  },
  {
   "land_code": "BY",
@@ -4889,7 +5069,9 @@
   "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss des Landkreises Haßberge, Bodenrichtwerte 2026",
   "quelle_parser": "uk-nachernte 16.10.2026 (pdftotext -layout je Seite, Tabellen am Seitenbild geprüft)",
   "modellansaetze": {},
-  "fundstelle": "PDF-S. 5"
+  "fundstelle": "PDF-S. 5",
+  "zugang": "nicht veröffentlicht",
+  "zugang_herkunft": "abgeleitet am 20.11.2026 aus sperre_grund „keine_angabe“ (Wortlaut in warum_kein_wert unverändert)"
  },
  {
   "land_code": "BY",
@@ -4927,7 +5109,9 @@
   "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss des Landkreises Kitzingen, Bodenrichtwerte 2026",
   "quelle_parser": "uk-nachernte 16.10.2026 (pdftotext -layout je Seite, Tabellen am Seitenbild geprüft)",
   "modellansaetze": {},
-  "fundstelle": "BORIS-Bayern, Mandantenpfad kitzingen/2026_2028 und /2024_2026: HTTP 404 am 16.10.2026"
+  "fundstelle": "BORIS-Bayern, Mandantenpfad kitzingen/2026_2028 und /2024_2026: HTTP 404 am 16.10.2026",
+  "zugang": "nicht veröffentlicht",
+  "zugang_herkunft": "abgeleitet am 20.11.2026 aus sperre_grund „kein_dokument“ (Wortlaut in warum_kein_wert unverändert)"
  },
  {
   "land_code": "BY",
@@ -4965,7 +5149,9 @@
   "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss des Landkreises Miltenberg, Bodenrichtwerte 2026",
   "quelle_parser": "uk-nachernte 16.10.2026 (pdftotext -layout je Seite, Tabellen am Seitenbild geprüft)",
   "modellansaetze": {},
-  "fundstelle": "BORIS-Bayern, Mandantenpfad miltenberg/2026_2028 und /2024_2026: HTTP 404 am 16.10.2026"
+  "fundstelle": "BORIS-Bayern, Mandantenpfad miltenberg/2026_2028 und /2024_2026: HTTP 404 am 16.10.2026",
+  "zugang": "nicht veröffentlicht",
+  "zugang_herkunft": "abgeleitet am 20.11.2026 aus sperre_grund „kein_dokument“ (Wortlaut in warum_kein_wert unverändert)"
  },
  {
   "land_code": "BY",
@@ -5003,7 +5189,9 @@
   "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss des Landkreises Main-Spessart, Bodenrichtwerte 2026",
   "quelle_parser": "uk-nachernte 16.10.2026 (pdftotext -layout je Seite, Tabellen am Seitenbild geprüft)",
   "modellansaetze": {},
-  "fundstelle": "BORIS-Bayern, Mandantenpfad main-spessart/2026_2028 und /2024_2026: HTTP 404 am 16.10.2026"
+  "fundstelle": "BORIS-Bayern, Mandantenpfad main-spessart/2026_2028 und /2024_2026: HTTP 404 am 16.10.2026",
+  "zugang": "nicht veröffentlicht",
+  "zugang_herkunft": "abgeleitet am 20.11.2026 aus sperre_grund „kein_dokument“ (Wortlaut in warum_kein_wert unverändert)"
  },
  {
   "land_code": "BY",
@@ -5041,6 +5229,8 @@
   "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss des Landkreises Neu-Ulm, Bodenrichtwerte 2026",
   "quelle_parser": "uk-nachernte 16.10.2026 (pdftotext -layout je Seite, Tabellen am Seitenbild geprüft)",
   "modellansaetze": {},
-  "fundstelle": "BORIS-Bayern, Mandantenpfad neu-ulm/2026_2028 und /2024_2026: HTTP 404 am 16.10.2026"
+  "fundstelle": "BORIS-Bayern, Mandantenpfad neu-ulm/2026_2028 und /2024_2026: HTTP 404 am 16.10.2026",
+  "zugang": "nicht veröffentlicht",
+  "zugang_herkunft": "abgeleitet am 20.11.2026 aus sperre_grund „kein_dokument“ (Wortlaut in warum_kein_wert unverändert)"
  }
 ]

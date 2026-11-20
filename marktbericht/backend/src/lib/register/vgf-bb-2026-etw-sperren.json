@@ -1,0 +1,182 @@
+[
+ {
+  "land_code": "BB",
+  "ags": "12062",
+  "ebene": "kreis",
+  "gebiet_name": "Landkreis Elbe-Elster",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Elbe-Elster",
+  "kennzahl": "vergleichsfaktor",
+  "zweig": "etw",
+  "objektart_bez": "Eigentumswohnungen (Wohnungseigentum)",
+  "vollstaendig": false,
+  "warum_kein_wert": "Kein Vergleichsfaktor für Wohnungseigentum: Kap. 9.2.1.2 (PDF-S. 74) führt nur Wohnflächenpreise aus zwölf Kauffällen 2025 (3 Erstverkäufe, 9 Weiterverkäufe) — Durchschnittswerte ohne Normobjekt und ohne Umrechnungskoeffizienten; das Wort „Vergleichsfaktor“ kommt im ganzen Bericht nicht vor (Volltextsuche 20.11.2026). WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte im Landkreis Elbe-Elster, https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/GMB_EE.pdf (kostenfrei), Geschäftsstelle gutachterausschuss@lkee.de; Auskunft aus der Kaufpreissammlung gebührenpflichtig. Der Obere Gutachterausschuss Brandenburg leitet überregionale Gebäudefaktoren nur für Ein-/Zweifamilien-, Doppel- und Reihenhäuser ab (VF_2025_OGA.pdf), nicht für Wohnungseigentum. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "unvollstaendig_grund": "Kein Vergleichsfaktor für Wohnungseigentum: Kap. 9.2.1.2 (PDF-S. 74) führt nur Wohnflächenpreise aus zwölf Kauffällen 2025 (3 Erstverkäufe, 9 Weiterverkäufe) — Durchschnittswerte ohne Normobjekt und ohne Umrechnungskoeffizienten; das Wort „Vergleichsfaktor“ kommt im ganzen Bericht nicht vor (Volltextsuche 20.11.2026). WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte im Landkreis Elbe-Elster, https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/GMB_EE.pdf (kostenfrei), Geschäftsstelle gutachterausschuss@lkee.de; Auskunft aus der Kaufpreissammlung gebührenpflichtig. Der Obere Gutachterausschuss Brandenburg leitet überregionale Gebäudefaktoren nur für Ein-/Zweifamilien-, Doppel- und Reihenhäuser ab (VF_2025_OGA.pdf), nicht für Wohnungseigentum. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "zugang": "nicht abgeleitet",
+  "stufe": "B",
+  "berichtsjahr": 2025,
+  "stichtag": null,
+  "quelle_url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/GMB_EE.pdf",
+  "quelle_parser": "register-ernte 20.11.2026 (BE/BB/MV/ST): pdftotext -layout, Volltextsuche Vergleichsfaktor/Gebäudefaktor/Normobjekt, Kapitel gelesen",
+  "modellversion": "Grundstücksmarktbericht 2025",
+  "lizenz": "dl-de/by-2-0",
+  "lizenz_wortlaut": "Für den Grundstücksmarktbericht gilt die Lizenz „Datenlizenz Deutschland – Namensnennung – Version 2.0“ (dl-de/by-2-0). … Die Inhalte der Grundstücksmarktberichte können gemäß diesen Nutzungsbestimmungen unter Angabe der Quelle © Gutachterausschüsse für Grundstückswerte BB [Jahr] und der Lizenz mit Verweis auf den Lizenztext genutzt werden. Zusätzlich ist die Internetadresse https://gutachterausschuss.brandenburg.de anzugeben. (Impressum)",
+  "belege": [
+   {
+    "fundstelle": "Grundstücksmarktbericht Elbe-Elster 2025, Kap. 9.2 Wohnungseigentum, 9.2.1.1 Gesamtkaufpreise und 9.2.1.2 Wohnflächenpreise (PDF-S. 72–75)",
+    "url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/GMB_EE.pdf"
+   }
+  ],
+  "verwendung": "produkt",
+  "quellenvermerk": "© Gutachterausschüsse für Grundstückswerte BB 2025, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://gutachterausschuss.brandenburg.de"
+ },
+ {
+  "land_code": "BB",
+  "ags": "12068",
+  "ebene": "kreis",
+  "gebiet_name": "Landkreis Ostprignitz-Ruppin",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Ostprignitz-Ruppin",
+  "kennzahl": "vergleichsfaktor",
+  "zweig": "etw",
+  "objektart_bez": "Eigentumswohnungen (Wohnungseigentum)",
+  "vollstaendig": false,
+  "warum_kein_wert": "Kein Vergleichsfaktor für Wohnungseigentum: Für Wohnungseigentum nur „Durchschnittliche Wohnflächenpreise“ (Kap. 9.2.3, S. 59) — Mittelwerte ohne Normobjekt. Für Häuser schreibt der Bericht wörtlich: „Im Landkreis Ostprignitz-Ruppin wurden im Berichtszeitraum keine eigenen Vergleichs-/ Gebäudefaktoren beschlossen“ (Kap. 8.2.4, S. 38) und verweist auf die überregionalen Gebäudefaktoren des Oberen Gutachterausschusses (die nur Ein-/Zweifamilien-, Doppel- und Reihenhäuser umfassen, nicht Wohnungseigentum). WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte im Landkreis Ostprignitz-Ruppin, https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/GMB_OPR.pdf (kostenfrei), Geschäftsstelle gutachter@opr.de; Auskunft aus der Kaufpreissammlung gebührenpflichtig. Der Obere Gutachterausschuss Brandenburg leitet überregionale Gebäudefaktoren nur für Ein-/Zweifamilien-, Doppel- und Reihenhäuser ab (VF_2025_OGA.pdf), nicht für Wohnungseigentum. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "unvollstaendig_grund": "Kein Vergleichsfaktor für Wohnungseigentum: Für Wohnungseigentum nur „Durchschnittliche Wohnflächenpreise“ (Kap. 9.2.3, S. 59) — Mittelwerte ohne Normobjekt. Für Häuser schreibt der Bericht wörtlich: „Im Landkreis Ostprignitz-Ruppin wurden im Berichtszeitraum keine eigenen Vergleichs-/ Gebäudefaktoren beschlossen“ (Kap. 8.2.4, S. 38) und verweist auf die überregionalen Gebäudefaktoren des Oberen Gutachterausschusses (die nur Ein-/Zweifamilien-, Doppel- und Reihenhäuser umfassen, nicht Wohnungseigentum). WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte im Landkreis Ostprignitz-Ruppin, https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/GMB_OPR.pdf (kostenfrei), Geschäftsstelle gutachter@opr.de; Auskunft aus der Kaufpreissammlung gebührenpflichtig. Der Obere Gutachterausschuss Brandenburg leitet überregionale Gebäudefaktoren nur für Ein-/Zweifamilien-, Doppel- und Reihenhäuser ab (VF_2025_OGA.pdf), nicht für Wohnungseigentum. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "zugang": "nicht abgeleitet",
+  "stufe": "B",
+  "berichtsjahr": 2025,
+  "stichtag": null,
+  "quelle_url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/GMB_OPR.pdf",
+  "quelle_parser": "register-ernte 20.11.2026 (BE/BB/MV/ST): pdftotext -layout, Volltextsuche Vergleichsfaktor/Gebäudefaktor/Normobjekt, Kapitel gelesen",
+  "modellversion": "Grundstücksmarktbericht 2025",
+  "lizenz": "dl-de/by-2-0",
+  "lizenz_wortlaut": "Für den Grundstücksmarktbericht gilt die Lizenz „Datenlizenz Deutschland – Namensnennung – Version 2.0“ (dl-de/by-2-0). … Die Inhalte der Grundstücksmarktberichte können gemäß diesen Nutzungsbestimmungen unter Angabe der Quelle © Gutachterausschüsse für Grundstückswerte BB [Jahr] und der Lizenz mit Verweis auf den Lizenztext genutzt werden. Zusätzlich ist die Internetadresse https://gutachterausschuss.brandenburg.de anzugeben. (Impressum)",
+  "belege": [
+   {
+    "fundstelle": "Grundstücksmarktbericht Ostprignitz-Ruppin 2025, Kap. 9.2.3 „Durchschnittliche Wohnflächenpreise Wohnungseigentum“ (S. 59, PDF-S. 67); Kap. 8.2.4 und 8.3.4 (S. 38/46, PDF-S. 46/54)",
+    "url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/GMB_OPR.pdf"
+   }
+  ],
+  "verwendung": "produkt",
+  "quellenvermerk": "© Gutachterausschüsse für Grundstückswerte BB 2025, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://gutachterausschuss.brandenburg.de"
+ },
+ {
+  "land_code": "BB",
+  "ags": "12073",
+  "ebene": "kreis",
+  "gebiet_name": "Landkreis Uckermark",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Landkreis Uckermark",
+  "kennzahl": "vergleichsfaktor",
+  "zweig": "etw",
+  "objektart_bez": "Eigentumswohnungen (Wohnungseigentum)",
+  "vollstaendig": false,
+  "warum_kein_wert": "Kein Vergleichsfaktor für Wohnungseigentum: Für Wohnungseigentum nur Umsatz- und Preisübersichten (Tabelle 38 „Erstverkäufe mit Baujahr- und Wohnflächenangabe“, Tabelle 39 „Weiterveräußerungen mit Baujahr- und Wohnflächenangabe“, S. 70) — keine Normobjekte, keine Umrechnungskoeffizienten. Die einzige „Gebäudefaktor“-Auswertung (Tabelle 29, S. 60) betrifft Ein- und Zweifamilienhäuser nach Baujahr und Standardstufe (Mediane und Spannen). WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte im Landkreis Uckermark, https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/GMB_UM.pdf (kostenfrei), Geschäftsstelle gaa@uckermark.de; Auskunft aus der Kaufpreissammlung gebührenpflichtig. Der Obere Gutachterausschuss Brandenburg leitet überregionale Gebäudefaktoren nur für Ein-/Zweifamilien-, Doppel- und Reihenhäuser ab (VF_2025_OGA.pdf), nicht für Wohnungseigentum. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "unvollstaendig_grund": "Kein Vergleichsfaktor für Wohnungseigentum: Für Wohnungseigentum nur Umsatz- und Preisübersichten (Tabelle 38 „Erstverkäufe mit Baujahr- und Wohnflächenangabe“, Tabelle 39 „Weiterveräußerungen mit Baujahr- und Wohnflächenangabe“, S. 70) — keine Normobjekte, keine Umrechnungskoeffizienten. Die einzige „Gebäudefaktor“-Auswertung (Tabelle 29, S. 60) betrifft Ein- und Zweifamilienhäuser nach Baujahr und Standardstufe (Mediane und Spannen). WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte im Landkreis Uckermark, https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/GMB_UM.pdf (kostenfrei), Geschäftsstelle gaa@uckermark.de; Auskunft aus der Kaufpreissammlung gebührenpflichtig. Der Obere Gutachterausschuss Brandenburg leitet überregionale Gebäudefaktoren nur für Ein-/Zweifamilien-, Doppel- und Reihenhäuser ab (VF_2025_OGA.pdf), nicht für Wohnungseigentum. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "zugang": "nicht abgeleitet",
+  "stufe": "B",
+  "berichtsjahr": 2025,
+  "stichtag": null,
+  "quelle_url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/GMB_UM.pdf",
+  "quelle_parser": "register-ernte 20.11.2026 (BE/BB/MV/ST): pdftotext -layout, Volltextsuche Vergleichsfaktor/Gebäudefaktor/Normobjekt, Kapitel gelesen",
+  "modellversion": "Grundstücksmarktbericht 2025",
+  "lizenz": "dl-de/by-2-0",
+  "lizenz_wortlaut": "Für den Grundstücksmarktbericht gilt die Lizenz „Datenlizenz Deutschland – Namensnennung – Version 2.0“ (dl-de/by-2-0). … Die Inhalte der Grundstücksmarktberichte können gemäß diesen Nutzungsbestimmungen unter Angabe der Quelle © Gutachterausschüsse für Grundstückswerte BB [Jahr] und der Lizenz mit Verweis auf den Lizenztext genutzt werden. Zusätzlich ist die Internetadresse https://gutachterausschuss.brandenburg.de anzugeben. (Impressum)",
+  "belege": [
+   {
+    "fundstelle": "Grundstücksmarktbericht Uckermark 2025, Kap. 9.2 Wohnungseigentum, Tabellen 37–39 (S. 69–70, PDF-S. 70–71)",
+    "url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/GMB_UM.pdf"
+   }
+  ],
+  "verwendung": "produkt",
+  "quellenvermerk": "© Gutachterausschüsse für Grundstückswerte BB 2025, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://gutachterausschuss.brandenburg.de"
+ },
+ {
+  "land_code": "BB",
+  "ags": "12052000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Cottbus/Chóśebuz, kreisfreie Stadt",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in der Stadt Cottbus/Chóśebuz",
+  "kennzahl": "vergleichsfaktor",
+  "zweig": "etw",
+  "objektart_bez": "Eigentumswohnungen (Wohnungseigentum)",
+  "vollstaendig": false,
+  "warum_kein_wert": "Kein Vergleichsfaktor für Wohnungseigentum: Für Wohnungseigentum nur Preisniveau und Preisentwicklung (Erstverkäufe, Umwandlungen, Weiterveräußerungen; Abb. 53/54 Wohnflächenpreise) sowie Liegenschaftszinssätze (Kap. 9.2.2) — keine Vergleichsfaktoren mit Normobjekt; das Wort „Vergleichsfaktor“ kommt im Bericht nicht vor (Volltextsuche 20.11.2026). WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte in der Stadt Cottbus/Chóśebuz, https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/GMB_CB.pdf (kostenfrei), Geschäftsstelle gutachterausschuss@cottbus.de; Auskunft aus der Kaufpreissammlung gebührenpflichtig. Der Obere Gutachterausschuss Brandenburg leitet überregionale Gebäudefaktoren nur für Ein-/Zweifamilien-, Doppel- und Reihenhäuser ab (VF_2025_OGA.pdf), nicht für Wohnungseigentum. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "unvollstaendig_grund": "Kein Vergleichsfaktor für Wohnungseigentum: Für Wohnungseigentum nur Preisniveau und Preisentwicklung (Erstverkäufe, Umwandlungen, Weiterveräußerungen; Abb. 53/54 Wohnflächenpreise) sowie Liegenschaftszinssätze (Kap. 9.2.2) — keine Vergleichsfaktoren mit Normobjekt; das Wort „Vergleichsfaktor“ kommt im Bericht nicht vor (Volltextsuche 20.11.2026). WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte in der Stadt Cottbus/Chóśebuz, https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/GMB_CB.pdf (kostenfrei), Geschäftsstelle gutachterausschuss@cottbus.de; Auskunft aus der Kaufpreissammlung gebührenpflichtig. Der Obere Gutachterausschuss Brandenburg leitet überregionale Gebäudefaktoren nur für Ein-/Zweifamilien-, Doppel- und Reihenhäuser ab (VF_2025_OGA.pdf), nicht für Wohnungseigentum. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "zugang": "nicht abgeleitet",
+  "stufe": "B",
+  "berichtsjahr": 2025,
+  "stichtag": null,
+  "quelle_url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/GMB_CB.pdf",
+  "quelle_parser": "register-ernte 20.11.2026 (BE/BB/MV/ST): pdftotext -layout, Volltextsuche Vergleichsfaktor/Gebäudefaktor/Normobjekt, Kapitel gelesen",
+  "modellversion": "Grundstücksmarktbericht 2025",
+  "lizenz": "dl-de/by-2-0",
+  "lizenz_wortlaut": "Für den Grundstücksmarktbericht gilt die Lizenz „Datenlizenz Deutschland – Namensnennung – Version 2.0“ (dl-de/by-2-0). … Die Inhalte der Grundstücksmarktberichte können gemäß diesen Nutzungsbestimmungen unter Angabe der Quelle © Gutachterausschüsse für Grundstückswerte BB [Jahr] und der Lizenz mit Verweis auf den Lizenztext genutzt werden. Zusätzlich ist die Internetadresse https://gutachterausschuss.brandenburg.de anzugeben. (Impressum)",
+  "belege": [
+   {
+    "fundstelle": "Grundstücksmarktbericht Cottbus/Chóśebuz 2025, Kap. 9.2 Wohnungseigentum, 9.2.1 Preisniveau, Preisentwicklung (S. 88 ff., PDF-S. 90 ff.)",
+    "url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/GMB_CB.pdf"
+   }
+  ],
+  "verwendung": "produkt",
+  "quellenvermerk": "© Gutachterausschüsse für Grundstückswerte BB 2025, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://gutachterausschuss.brandenburg.de"
+ },
+ {
+  "land_code": "BB",
+  "ags": "12071",
+  "ebene": "kreis",
+  "gebiet_name": "Landkreis Spree-Neiße",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in den Landkreisen Spree-Neiße und Oberspreewald-Lausitz",
+  "kennzahl": "vergleichsfaktor",
+  "zweig": "etw",
+  "objektart_bez": "Eigentumswohnungen (Wohnungseigentum)",
+  "vollstaendig": false,
+  "warum_kein_wert": "Kein Vergleichsfaktor für Wohnungseigentum: Kap. 9.2.1/9.2.2 (S. 95–97) führen „Preisniveau von Wohnungseigentum (WET)“ als „Durchschnittswerte: arithmetisch / Median“ je Baujahresklasse, Bodenrichtwert und Modernisierung, dazu eine Potenzfunktion „Einfluss der Wohnfläche auf den WFP“ (R² = 0,2666, S. 96) — Preisübersichten ohne Normobjekt, kein Vergleichsfaktor nach § 20 ImmoWertV. Jüngster Bericht ist weiterhin der Jahrgang 2024 (Stand Portal 20.11.2026). WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte in den Landkreisen Spree-Neiße und Oberspreewald-Lausitz, https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/GMB-SPN_OSL.pdf (kostenfrei), Geschäftsstelle gaa-spn-osl@lkspn.de; Auskunft aus der Kaufpreissammlung gebührenpflichtig. Der Obere Gutachterausschuss Brandenburg leitet überregionale Gebäudefaktoren nur für Ein-/Zweifamilien-, Doppel- und Reihenhäuser ab (VF_2025_OGA.pdf), nicht für Wohnungseigentum. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "unvollstaendig_grund": "Kein Vergleichsfaktor für Wohnungseigentum: Kap. 9.2.1/9.2.2 (S. 95–97) führen „Preisniveau von Wohnungseigentum (WET)“ als „Durchschnittswerte: arithmetisch / Median“ je Baujahresklasse, Bodenrichtwert und Modernisierung, dazu eine Potenzfunktion „Einfluss der Wohnfläche auf den WFP“ (R² = 0,2666, S. 96) — Preisübersichten ohne Normobjekt, kein Vergleichsfaktor nach § 20 ImmoWertV. Jüngster Bericht ist weiterhin der Jahrgang 2024 (Stand Portal 20.11.2026). WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte in den Landkreisen Spree-Neiße und Oberspreewald-Lausitz, https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/GMB-SPN_OSL.pdf (kostenfrei), Geschäftsstelle gaa-spn-osl@lkspn.de; Auskunft aus der Kaufpreissammlung gebührenpflichtig. Der Obere Gutachterausschuss Brandenburg leitet überregionale Gebäudefaktoren nur für Ein-/Zweifamilien-, Doppel- und Reihenhäuser ab (VF_2025_OGA.pdf), nicht für Wohnungseigentum. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "zugang": "nicht abgeleitet",
+  "stufe": "B",
+  "berichtsjahr": 2024,
+  "stichtag": null,
+  "quelle_url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/GMB-SPN_OSL.pdf",
+  "quelle_parser": "register-ernte 20.11.2026 (BE/BB/MV/ST): pdftotext -layout, Volltextsuche Vergleichsfaktor/Gebäudefaktor/Normobjekt, Kapitel gelesen",
+  "modellversion": "Grundstücksmarktbericht 2024",
+  "lizenz": "dl-de/by-2-0",
+  "lizenz_wortlaut": "Für den Grundstücksmarktbericht gilt die Lizenz „Datenlizenz Deutschland – Namensnennung – Version 2.0“ (dl-de/by-2-0). … Die Inhalte der Grundstücksmarktberichte können gemäß diesen Nutzungsbestimmungen unter Angabe der Quelle © Gutachterausschüsse für Grundstückswerte BB [Jahr] und der Lizenz mit Verweis auf den Lizenztext genutzt werden. Zusätzlich ist die Internetadresse https://gutachterausschuss.brandenburg.de anzugeben. (Impressum)",
+  "belege": [
+   {
+    "fundstelle": "Grundstücksmarktbericht 2024 Landkreise Spree-Neiße und Oberspreewald-Lausitz, Kap. 9.2.1/9.2.2 „Preisniveau und Vergleichspreise von Wohnungseigentum im Erst-/Weiterverkauf“ (S. 95–97)",
+    "url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/GMB-SPN_OSL.pdf"
+   }
+  ],
+  "verwendung": "produkt",
+  "quellenvermerk": "© Gutachterausschüsse für Grundstückswerte BB 2024, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://gutachterausschuss.brandenburg.de"
+ },
+ {
+  "land_code": "BB",
+  "ags": "12066",
+  "ebene": "kreis",
+  "gebiet_name": "Landkreis Oberspreewald-Lausitz",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in den Landkreisen Spree-Neiße und Oberspreewald-Lausitz",
+  "kennzahl": "vergleichsfaktor",
+  "zweig": "etw",
+  "objektart_bez": "Eigentumswohnungen (Wohnungseigentum)",
+  "vollstaendig": false,
+  "warum_kein_wert": "Kein Vergleichsfaktor für Wohnungseigentum: Kap. 9.2.1/9.2.2 (S. 95–97) führen „Preisniveau von Wohnungseigentum (WET)“ als „Durchschnittswerte: arithmetisch / Median“ je Baujahresklasse, Bodenrichtwert und Modernisierung, dazu eine Potenzfunktion „Einfluss der Wohnfläche auf den WFP“ (R² = 0,2666, S. 96) — Preisübersichten ohne Normobjekt, kein Vergleichsfaktor nach § 20 ImmoWertV. Jüngster Bericht ist weiterhin der Jahrgang 2024 (Stand Portal 20.11.2026). WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte in den Landkreisen Spree-Neiße und Oberspreewald-Lausitz, https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/GMB-SPN_OSL.pdf (kostenfrei), Geschäftsstelle gaa-spn-osl@lkspn.de; Auskunft aus der Kaufpreissammlung gebührenpflichtig. Der Obere Gutachterausschuss Brandenburg leitet überregionale Gebäudefaktoren nur für Ein-/Zweifamilien-, Doppel- und Reihenhäuser ab (VF_2025_OGA.pdf), nicht für Wohnungseigentum. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "unvollstaendig_grund": "Kein Vergleichsfaktor für Wohnungseigentum: Kap. 9.2.1/9.2.2 (S. 95–97) führen „Preisniveau von Wohnungseigentum (WET)“ als „Durchschnittswerte: arithmetisch / Median“ je Baujahresklasse, Bodenrichtwert und Modernisierung, dazu eine Potenzfunktion „Einfluss der Wohnfläche auf den WFP“ (R² = 0,2666, S. 96) — Preisübersichten ohne Normobjekt, kein Vergleichsfaktor nach § 20 ImmoWertV. Jüngster Bericht ist weiterhin der Jahrgang 2024 (Stand Portal 20.11.2026). WEG ZUR QUELLE: Gutachterausschuss für Grundstückswerte in den Landkreisen Spree-Neiße und Oberspreewald-Lausitz, https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/GMB-SPN_OSL.pdf (kostenfrei), Geschäftsstelle gaa-spn-osl@lkspn.de; Auskunft aus der Kaufpreissammlung gebührenpflichtig. Der Obere Gutachterausschuss Brandenburg leitet überregionale Gebäudefaktoren nur für Ein-/Zweifamilien-, Doppel- und Reihenhäuser ab (VF_2025_OGA.pdf), nicht für Wohnungseigentum. KEIN NACHBARWERT UND KEIN LANDESMITTEL: § 10 ImmoWertV verlangt den Vergleichsfaktor des örtlich zuständigen Ausschusses in dessen Modell.",
+  "zugang": "nicht abgeleitet",
+  "stufe": "B",
+  "berichtsjahr": 2024,
+  "stichtag": null,
+  "quelle_url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/GMB-SPN_OSL.pdf",
+  "quelle_parser": "register-ernte 20.11.2026 (BE/BB/MV/ST): pdftotext -layout, Volltextsuche Vergleichsfaktor/Gebäudefaktor/Normobjekt, Kapitel gelesen",
+  "modellversion": "Grundstücksmarktbericht 2024",
+  "lizenz": "dl-de/by-2-0",
+  "lizenz_wortlaut": "Für den Grundstücksmarktbericht gilt die Lizenz „Datenlizenz Deutschland – Namensnennung – Version 2.0“ (dl-de/by-2-0). … Die Inhalte der Grundstücksmarktberichte können gemäß diesen Nutzungsbestimmungen unter Angabe der Quelle © Gutachterausschüsse für Grundstückswerte BB [Jahr] und der Lizenz mit Verweis auf den Lizenztext genutzt werden. Zusätzlich ist die Internetadresse https://gutachterausschuss.brandenburg.de anzugeben. (Impressum)",
+  "belege": [
+   {
+    "fundstelle": "Grundstücksmarktbericht 2024 Landkreise Spree-Neiße und Oberspreewald-Lausitz, Kap. 9.2.1/9.2.2 „Preisniveau und Vergleichspreise von Wohnungseigentum im Erst-/Weiterverkauf“ (S. 95–97)",
+    "url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/GMB-SPN_OSL.pdf"
+   }
+  ],
+  "verwendung": "produkt",
+  "quellenvermerk": "© Gutachterausschüsse für Grundstückswerte BB 2024, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://gutachterausschuss.brandenburg.de"
+ }
+]

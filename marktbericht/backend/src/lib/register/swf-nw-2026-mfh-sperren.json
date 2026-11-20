@@ -1,0 +1,2434 @@
+[
+ {
+  "land_code": "NW",
+  "ags": "05911",
+  "ebene": "kreis",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Bochum",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Bochum",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "mfh",
+  "objektart": "mfh",
+  "objektart_bez": "Mehrfamilienhäuser",
+  "berichtsjahr": 2026,
+  "vollstaendig": false,
+  "warum_kein_wert": "Der Grundstücksmarktbericht 2026 des Ausschusses leitet Sachwertfaktoren nur für den individuellen Wohnungsbau ab (im Register: freistehende Ein-/Zweifamilienhäuser). Einen Sachwertfaktor für Mehrfamilienhäuser führt er nicht: am 20.11.2026 alle 7 Seiten des Berichts (106 Seiten), die „Sachwertfaktor“ oder „Marktanpassungsfaktor“ enthalten, auf „Mehrfamilienhaus / Dreifamilienhaus / Mietwohnhaus / Geschosswohnungsbau / Wohn- und Geschäftshaus“ in derselben oder der Nachbarzeile durchsucht — kein Treffer. Mehrfamilienhäuser bewertet der Ausschuss im Ertragswertverfahren (Liegenschaftszinssätze für MFH im Register). WEG: Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_10300_2026.pdf · Geschäftsstelle gutachterausschuss@bochum.de. Kein Nachbarwert und kein Landesmittel (§ 21 Abs. 3 ImmoWertV).",
+  "zugang": "nicht abgeleitet",
+  "zustaendige_stelle": "Der Gutachterausschuss für Grundstückswerte in der Stadt Bochum, gutachterausschuss@bochum.de",
+  "geltungsbereich": {
+   "objektarten": [
+    "mfh"
+   ],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_10300_2026.pdf · Geschäftsstelle gutachterausschuss@bochum.de"
+  },
+  "belege": [
+   {
+    "art": "fehlstelle",
+    "fundstelle": "Grundstücksmarktbericht 2026, Sachwertkapitel PDF-S. 48, 49, 50, 78, 102, 104 (Seiten mit „Sachwertfaktor“ insgesamt: 5, 48, 49, 50, 78, 102, 104)",
+    "url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_10300_2026.pdf"
+   }
+  ],
+  "fundstelle": "GMB 2026, Sachwertkapitel PDF-S. 48, 49, 50, 78, 102, 104",
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "stichtag": null,
+  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_10300_2026.pdf",
+  "modellversion": "GMB 2026",
+  "quelle_parser": "v-ernte-20261120 (pdftotext -layout, Volltextsuche der Sachwertseiten, 20.11.2026, Agent register-ernte)"
+ },
+ {
+  "land_code": "NW",
+  "ags": "05966",
+  "ebene": "kreis",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte im Kreis Olpe",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte im Kreis Olpe",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "mfh",
+  "objektart": "mfh",
+  "objektart_bez": "Mehrfamilienhäuser",
+  "berichtsjahr": 2026,
+  "vollstaendig": false,
+  "warum_kein_wert": "Der Grundstücksmarktbericht 2026 des Ausschusses leitet Sachwertfaktoren nur für den individuellen Wohnungsbau ab (im Register: Ein-/Zweifamilienhäuser). Einen Sachwertfaktor für Mehrfamilienhäuser führt er nicht: am 20.11.2026 alle 8 Seiten des Berichts (73 Seiten), die „Sachwertfaktor“ oder „Marktanpassungsfaktor“ enthalten, auf „Mehrfamilienhaus / Dreifamilienhaus / Mietwohnhaus / Geschosswohnungsbau / Wohn- und Geschäftshaus“ in derselben oder der Nachbarzeile durchsucht — kein Treffer. Mehrfamilienhäuser bewertet der Ausschuss im Ertragswertverfahren (Liegenschaftszinssätze für MFH im Register). WEG: Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.gars.nrw/images/user/GA_Olpe/pdf/GMB_32000_2026.pdf · Geschäftsstelle gutachterausschuss@kreis-olpe.de. Kein Nachbarwert und kein Landesmittel (§ 21 Abs. 3 ImmoWertV).",
+  "zugang": "nicht abgeleitet",
+  "zustaendige_stelle": "Der Gutachterausschuss für Grundstückswerte im Kreis Olpe, gutachterausschuss@kreis-olpe.de",
+  "geltungsbereich": {
+   "objektarten": [
+    "mfh"
+   ],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.gars.nrw/images/user/GA_Olpe/pdf/GMB_32000_2026.pdf · Geschäftsstelle gutachterausschuss@kreis-olpe.de"
+  },
+  "belege": [
+   {
+    "art": "fehlstelle",
+    "fundstelle": "Grundstücksmarktbericht 2026, Sachwertkapitel PDF-S. 41, 42, 44, 45, 46, 47 (Seiten mit „Sachwertfaktor“ insgesamt: 5, 7, 41, 42, 44, 45, 46, 47)",
+    "url": "https://www.gars.nrw/images/user/GA_Olpe/pdf/GMB_32000_2026.pdf"
+   }
+  ],
+  "fundstelle": "GMB 2026, Sachwertkapitel PDF-S. 41, 42, 44, 45, 46, 47",
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "stichtag": null,
+  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "quelle_url": "https://www.gars.nrw/images/user/GA_Olpe/pdf/GMB_32000_2026.pdf",
+  "modellversion": "GMB 2026",
+  "quelle_parser": "v-ernte-20261120 (pdftotext -layout, Volltextsuche der Sachwertseiten, 20.11.2026, Agent register-ernte)"
+ },
+ {
+  "land_code": "NW",
+  "ags": "05120",
+  "ebene": "kreis",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Remscheid",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Remscheid",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "mfh",
+  "objektart": "mfh",
+  "objektart_bez": "Mehrfamilienhäuser",
+  "berichtsjahr": 2026,
+  "vollstaendig": false,
+  "warum_kein_wert": "Der Grundstücksmarktbericht 2026 des Ausschusses leitet Sachwertfaktoren nur für den individuellen Wohnungsbau ab (im Register: Ein-/Zweifamilienhäuser, Reihen-/Doppelhäuser, freistehende Ein-/Zweifamilienhäuser, Reihenmittelhäuser). Einen Sachwertfaktor für Mehrfamilienhäuser führt er nicht: am 20.11.2026 alle 8 Seiten des Berichts (88 Seiten), die „Sachwertfaktor“ oder „Marktanpassungsfaktor“ enthalten, auf „Mehrfamilienhaus / Dreifamilienhaus / Mietwohnhaus / Geschosswohnungsbau / Wohn- und Geschäftshaus“ in derselben oder der Nachbarzeile durchsucht — kein Treffer. Mehrfamilienhäuser bewertet der Ausschuss im Ertragswertverfahren (Liegenschaftszinssätze für MFH im Register). WEG: Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_12100_2026.pdf. Kein Nachbarwert und kein Landesmittel (§ 21 Abs. 3 ImmoWertV).",
+  "zugang": "nicht abgeleitet",
+  "zustaendige_stelle": "Der Gutachterausschuss für Grundstückswerte in der Stadt Remscheid",
+  "geltungsbereich": {
+   "objektarten": [
+    "mfh"
+   ],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_12100_2026.pdf"
+  },
+  "belege": [
+   {
+    "art": "fehlstelle",
+    "fundstelle": "Grundstücksmarktbericht 2026, Sachwertkapitel PDF-S. 45, 46, 47, 48, 61, 62 (Seiten mit „Sachwertfaktor“ insgesamt: 5, 6, 45, 46, 47, 48, 61, 62)",
+    "url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_12100_2026.pdf"
+   }
+  ],
+  "fundstelle": "GMB 2026, Sachwertkapitel PDF-S. 45, 46, 47, 48, 61, 62",
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "stichtag": null,
+  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_12100_2026.pdf",
+  "modellversion": "GMB 2026",
+  "quelle_parser": "v-ernte-20261120 (pdftotext -layout, Volltextsuche der Sachwertseiten, 20.11.2026, Agent register-ernte)"
+ },
+ {
+  "land_code": "NW",
+  "ags": "05913",
+  "ebene": "kreis",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Dortmund",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Dortmund",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "mfh",
+  "objektart": "mfh",
+  "objektart_bez": "Mehrfamilienhäuser",
+  "berichtsjahr": 2026,
+  "vollstaendig": false,
+  "warum_kein_wert": "Der Grundstücksmarktbericht 2026 des Ausschusses leitet Sachwertfaktoren nur für den individuellen Wohnungsbau ab (im Register: Reihenhäuser, freistehende Ein-/Zweifamilienhäuser, Ein-/Zweifamilien- und Reihenhäuser). Einen Sachwertfaktor für Mehrfamilienhäuser führt er nicht: am 20.11.2026 alle 7 Seiten des Berichts (97 Seiten), die „Sachwertfaktor“ oder „Marktanpassungsfaktor“ enthalten, auf „Mehrfamilienhaus / Dreifamilienhaus / Mietwohnhaus / Geschosswohnungsbau / Wohn- und Geschäftshaus“ in derselben oder der Nachbarzeile durchsucht — kein Treffer. Mehrfamilienhäuser bewertet der Ausschuss im Ertragswertverfahren (Liegenschaftszinssätze für MFH im Register). WEG: Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_10600_2026.pdf · Geschäftsstelle gutachterausschuss@stadtdo.de. Kein Nachbarwert und kein Landesmittel (§ 21 Abs. 3 ImmoWertV).",
+  "zugang": "nicht abgeleitet",
+  "zustaendige_stelle": "Der Gutachterausschuss für Grundstückswerte in der Stadt Dortmund, gutachterausschuss@stadtdo.de",
+  "geltungsbereich": {
+   "objektarten": [
+    "mfh"
+   ],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_10600_2026.pdf · Geschäftsstelle gutachterausschuss@stadtdo.de"
+  },
+  "belege": [
+   {
+    "art": "fehlstelle",
+    "fundstelle": "Grundstücksmarktbericht 2026, Sachwertkapitel PDF-S. 42, 43, 44 (Seiten mit „Sachwertfaktor“ insgesamt: 5, 6, 9, 10, 42, 43, 44)",
+    "url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_10600_2026.pdf"
+   }
+  ],
+  "fundstelle": "GMB 2026, Sachwertkapitel PDF-S. 42, 43, 44",
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "stichtag": null,
+  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_10600_2026.pdf",
+  "modellversion": "GMB 2026",
+  "quelle_parser": "v-ernte-20261120 (pdftotext -layout, Volltextsuche der Sachwertseiten, 20.11.2026, Agent register-ernte)"
+ },
+ {
+  "land_code": "NW",
+  "ags": "05113",
+  "ebene": "kreis",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Essen",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Essen",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "mfh",
+  "objektart": "mfh",
+  "objektart_bez": "Mehrfamilienhäuser",
+  "berichtsjahr": 2026,
+  "vollstaendig": false,
+  "warum_kein_wert": "Der Grundstücksmarktbericht 2026 des Ausschusses leitet Sachwertfaktoren nur für den individuellen Wohnungsbau ab (im Register: freistehende Ein-/Zweifamilienhäuser, Reihenmittelhäuser). Einen Sachwertfaktor für Mehrfamilienhäuser führt er nicht: am 20.11.2026 alle 12 Seiten des Berichts (81 Seiten), die „Sachwertfaktor“ oder „Marktanpassungsfaktor“ enthalten, auf „Mehrfamilienhaus / Dreifamilienhaus / Mietwohnhaus / Geschosswohnungsbau / Wohn- und Geschäftshaus“ in derselben oder der Nachbarzeile durchsucht — kein Treffer. Mehrfamilienhäuser bewertet der Ausschuss im Ertragswertverfahren (Liegenschaftszinssätze für MFH im Register). WEG: Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_10900_2026.pdf · Geschäftsstelle gutachterausschuss@essen.de. Kein Nachbarwert und kein Landesmittel (§ 21 Abs. 3 ImmoWertV).",
+  "zugang": "nicht abgeleitet",
+  "zustaendige_stelle": "Der Gutachterausschuss für Grundstückswerte in der Stadt Essen, gutachterausschuss@essen.de",
+  "geltungsbereich": {
+   "objektarten": [
+    "mfh"
+   ],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_10900_2026.pdf · Geschäftsstelle gutachterausschuss@essen.de"
+  },
+  "belege": [
+   {
+    "art": "fehlstelle",
+    "fundstelle": "Grundstücksmarktbericht 2026, Sachwertkapitel PDF-S. 43, 44, 45, 46, 67, 69 (Seiten mit „Sachwertfaktor“ insgesamt: 5, 6, 7, 8, 9, 11, 43, 44, 45, 46, 67, 69)",
+    "url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_10900_2026.pdf"
+   }
+  ],
+  "fundstelle": "GMB 2026, Sachwertkapitel PDF-S. 43, 44, 45, 46, 67, 69",
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "stichtag": null,
+  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_10900_2026.pdf",
+  "modellversion": "GMB 2026",
+  "quelle_parser": "v-ernte-20261120 (pdftotext -layout, Volltextsuche der Sachwertseiten, 20.11.2026, Agent register-ernte)"
+ },
+ {
+  "land_code": "NW",
+  "ags": "05711",
+  "ebene": "kreis",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Bielefeld",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Bielefeld",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "mfh",
+  "objektart": "mfh",
+  "objektart_bez": "Mehrfamilienhäuser",
+  "berichtsjahr": 2026,
+  "vollstaendig": false,
+  "warum_kein_wert": "Der Grundstücksmarktbericht 2026 des Ausschusses leitet Sachwertfaktoren nur für den individuellen Wohnungsbau ab (im Register: freistehende Ein-/Zweifamilienhäuser). Einen Sachwertfaktor für Mehrfamilienhäuser führt er nicht: am 20.11.2026 alle 7 Seiten des Berichts (95 Seiten), die „Sachwertfaktor“ oder „Marktanpassungsfaktor“ enthalten, auf „Mehrfamilienhaus / Dreifamilienhaus / Mietwohnhaus / Geschosswohnungsbau / Wohn- und Geschäftshaus“ in derselben oder der Nachbarzeile durchsucht — kein Treffer. Mehrfamilienhäuser bewertet der Ausschuss im Ertragswertverfahren (Liegenschaftszinssätze für MFH im Register). WEG: Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://gars.nrw/images/user/GA_Bielefeld/pdf/GMB_10200_2026.pdf. Kein Nachbarwert und kein Landesmittel (§ 21 Abs. 3 ImmoWertV).",
+  "zugang": "nicht abgeleitet",
+  "zustaendige_stelle": "Der Gutachterausschuss für Grundstückswerte in der Stadt Bielefeld",
+  "geltungsbereich": {
+   "objektarten": [
+    "mfh"
+   ],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://gars.nrw/images/user/GA_Bielefeld/pdf/GMB_10200_2026.pdf"
+  },
+  "belege": [
+   {
+    "art": "fehlstelle",
+    "fundstelle": "Grundstücksmarktbericht 2026, Sachwertkapitel PDF-S. 39, 40, 41, 70, 71 (Seiten mit „Sachwertfaktor“ insgesamt: 5, 6, 39, 40, 41, 70, 71)",
+    "url": "https://gars.nrw/images/user/GA_Bielefeld/pdf/GMB_10200_2026.pdf"
+   }
+  ],
+  "fundstelle": "GMB 2026, Sachwertkapitel PDF-S. 39, 40, 41, 70, 71",
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "stichtag": null,
+  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "quelle_url": "https://gars.nrw/images/user/GA_Bielefeld/pdf/GMB_10200_2026.pdf",
+  "modellversion": "GMB 2026",
+  "quelle_parser": "v-ernte-20261120 (pdftotext -layout, Volltextsuche der Sachwertseiten, 20.11.2026, Agent register-ernte)"
+ },
+ {
+  "land_code": "NW",
+  "ags": "05962",
+  "ebene": "kreis",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Iserlohn",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Iserlohn",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "mfh",
+  "objektart": "mfh",
+  "objektart_bez": "Mehrfamilienhäuser",
+  "berichtsjahr": 2026,
+  "vollstaendig": false,
+  "warum_kein_wert": "Der Grundstücksmarktbericht 2026 des Ausschusses leitet Sachwertfaktoren nur für den individuellen Wohnungsbau ab (im Register: freistehende Ein-/Zweifamilienhäuser, Reihen-/Doppelhäuser). Einen Sachwertfaktor für Mehrfamilienhäuser führt er nicht: am 20.11.2026 alle 9 Seiten des Berichts (88 Seiten), die „Sachwertfaktor“ oder „Marktanpassungsfaktor“ enthalten, auf „Mehrfamilienhaus / Dreifamilienhaus / Mietwohnhaus / Geschosswohnungsbau / Wohn- und Geschäftshaus“ in derselben oder der Nachbarzeile durchsucht — kein Treffer. Mehrfamilienhäuser bewertet der Ausschuss im Ertragswertverfahren (Liegenschaftszinssätze für MFH im Register). WEG: Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://gars.nrw/images/user/GA_Iserlohn/GMB_24300_2026.pdf · Geschäftsstelle gutachterausschuss@iserlohn.de. Kein Nachbarwert und kein Landesmittel (§ 21 Abs. 3 ImmoWertV).",
+  "zugang": "nicht abgeleitet",
+  "zustaendige_stelle": "Der Gutachterausschuss für Grundstückswerte in der Stadt Iserlohn, gutachterausschuss@iserlohn.de",
+  "geltungsbereich": {
+   "objektarten": [
+    "mfh"
+   ],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://gars.nrw/images/user/GA_Iserlohn/GMB_24300_2026.pdf · Geschäftsstelle gutachterausschuss@iserlohn.de"
+  },
+  "belege": [
+   {
+    "art": "fehlstelle",
+    "fundstelle": "Grundstücksmarktbericht 2026, Sachwertkapitel PDF-S. 42, 43, 44, 45, 46, 67, 77 (Seiten mit „Sachwertfaktor“ insgesamt: 5, 6, 42, 43, 44, 45, 46, 67, 77)",
+    "url": "https://gars.nrw/images/user/GA_Iserlohn/GMB_24300_2026.pdf"
+   }
+  ],
+  "fundstelle": "GMB 2026, Sachwertkapitel PDF-S. 42, 43, 44, 45, 46, 67, 77",
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "stichtag": null,
+  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "quelle_url": "https://gars.nrw/images/user/GA_Iserlohn/GMB_24300_2026.pdf",
+  "modellversion": "GMB 2026",
+  "quelle_parser": "v-ernte-20261120 (pdftotext -layout, Volltextsuche der Sachwertseiten, 20.11.2026, Agent register-ernte)"
+ },
+ {
+  "land_code": "NW",
+  "ags": "05774",
+  "ebene": "kreis",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Paderborn",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Paderborn",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "mfh",
+  "objektart": "mfh",
+  "objektart_bez": "Mehrfamilienhäuser",
+  "berichtsjahr": 2026,
+  "vollstaendig": false,
+  "warum_kein_wert": "Der Grundstücksmarktbericht 2026 des Ausschusses leitet Sachwertfaktoren nur für den individuellen Wohnungsbau ab (im Register: Ein-/Zweifamilienhäuser, Reihen-/Doppelhäuser, Zweifamilienhäuser). Einen Sachwertfaktor für Mehrfamilienhäuser führt er nicht: am 20.11.2026 alle 2 Seiten des Berichts (46 Seiten), die „Sachwertfaktor“ oder „Marktanpassungsfaktor“ enthalten, auf „Mehrfamilienhaus / Dreifamilienhaus / Mietwohnhaus / Geschosswohnungsbau / Wohn- und Geschäftshaus“ in derselben oder der Nachbarzeile durchsucht — kein Treffer. Mehrfamilienhäuser bewertet der Ausschuss im Ertragswertverfahren (Liegenschaftszinssätze für MFH im Register). WEG: Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://gars.nrw/images/user/GA_Paderborn/gmb/GMB_27000_2026.pdf · Geschäftsstelle gutachterausschuss@paderborn.de. Kein Nachbarwert und kein Landesmittel (§ 21 Abs. 3 ImmoWertV).",
+  "zugang": "nicht abgeleitet",
+  "zustaendige_stelle": "Der Gutachterausschuss für Grundstückswerte in der Stadt Paderborn, gutachterausschuss@paderborn.de",
+  "geltungsbereich": {
+   "objektarten": [
+    "mfh"
+   ],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://gars.nrw/images/user/GA_Paderborn/gmb/GMB_27000_2026.pdf · Geschäftsstelle gutachterausschuss@paderborn.de"
+  },
+  "belege": [
+   {
+    "art": "fehlstelle",
+    "fundstelle": "Grundstücksmarktbericht 2026, Sachwertkapitel PDF-S. 30, 33 (Seiten mit „Sachwertfaktor“ insgesamt: 30, 33)",
+    "url": "https://gars.nrw/images/user/GA_Paderborn/gmb/GMB_27000_2026.pdf"
+   }
+  ],
+  "fundstelle": "GMB 2026, Sachwertkapitel PDF-S. 30, 33",
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "stichtag": null,
+  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "quelle_url": "https://gars.nrw/images/user/GA_Paderborn/gmb/GMB_27000_2026.pdf",
+  "modellversion": "GMB 2026",
+  "quelle_parser": "v-ernte-20261120 (pdftotext -layout, Volltextsuche der Sachwertseiten, 20.11.2026, Agent register-ernte)"
+ },
+ {
+  "land_code": "NW",
+  "ags": "05315",
+  "ebene": "kreis",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Köln",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Köln",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "mfh",
+  "objektart": "mfh",
+  "objektart_bez": "Mehrfamilienhäuser",
+  "berichtsjahr": 2026,
+  "vollstaendig": false,
+  "warum_kein_wert": "Der Grundstücksmarktbericht 2026 des Ausschusses leitet Sachwertfaktoren nur für den individuellen Wohnungsbau ab (im Register: freistehende Ein-/Zweifamilienhäuser). Einen Sachwertfaktor für Mehrfamilienhäuser führt er nicht: am 20.11.2026 alle 13 Seiten des Berichts (169 Seiten), die „Sachwertfaktor“ oder „Marktanpassungsfaktor“ enthalten, auf „Mehrfamilienhaus / Dreifamilienhaus / Mietwohnhaus / Geschosswohnungsbau / Wohn- und Geschäftshaus“ in derselben oder der Nachbarzeile durchsucht — kein Treffer. Mehrfamilienhäuser bewertet der Ausschuss im Ertragswertverfahren (Liegenschaftszinssätze für MFH im Register). WEG: Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.gars.nrw/images/user/GA_K%C3%B6ln/GMB2026_Digitalversion.pdf. Kein Nachbarwert und kein Landesmittel (§ 21 Abs. 3 ImmoWertV).",
+  "zugang": "nicht abgeleitet",
+  "zustaendige_stelle": "Der Gutachterausschuss für Grundstückswerte in der Stadt Köln",
+  "geltungsbereich": {
+   "objektarten": [
+    "mfh"
+   ],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.gars.nrw/images/user/GA_K%C3%B6ln/GMB2026_Digitalversion.pdf"
+  },
+  "belege": [
+   {
+    "art": "fehlstelle",
+    "fundstelle": "Grundstücksmarktbericht 2026, Sachwertkapitel PDF-S. 87, 88, 90, 91, 92, 93, 94, 95, 155, 157, 159 (Seiten mit „Sachwertfaktor“ insgesamt: 4, 10, 87, 88, 90, 91, 92, 93, 94, 95, 155, 157, 159)",
+    "url": "https://www.gars.nrw/images/user/GA_K%C3%B6ln/GMB2026_Digitalversion.pdf"
+   }
+  ],
+  "fundstelle": "GMB 2026, Sachwertkapitel PDF-S. 87, 88, 90, 91, 92, 93, 94, 95, 155, 157, 159",
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "stichtag": null,
+  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "quelle_url": "https://www.gars.nrw/images/user/GA_K%C3%B6ln/GMB2026_Digitalversion.pdf",
+  "modellversion": "GMB 2026",
+  "quelle_parser": "v-ernte-20261120 (pdftotext -layout, Volltextsuche der Sachwertseiten, 20.11.2026, Agent register-ernte)"
+ },
+ {
+  "land_code": "NW",
+  "ags": "05362",
+  "ebene": "kreis",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte im Rhein-Erft-Kreis",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte im Rhein-Erft-Kreis",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "mfh",
+  "objektart": "mfh",
+  "objektart_bez": "Mehrfamilienhäuser",
+  "berichtsjahr": 2026,
+  "vollstaendig": false,
+  "warum_kein_wert": "Der Grundstücksmarktbericht 2026 des Ausschusses leitet Sachwertfaktoren nur für den individuellen Wohnungsbau ab (im Register: freistehende Ein-/Zweifamilienhäuser, Reihen-/Doppelhäuser, Reihenmittelhäuser, Fertighäuser). Einen Sachwertfaktor für Mehrfamilienhäuser führt er nicht: am 20.11.2026 alle 10 Seiten des Berichts (99 Seiten), die „Sachwertfaktor“ oder „Marktanpassungsfaktor“ enthalten, auf „Mehrfamilienhaus / Dreifamilienhaus / Mietwohnhaus / Geschosswohnungsbau / Wohn- und Geschäftshaus“ in derselben oder der Nachbarzeile durchsucht — kein Treffer. Mehrfamilienhäuser bewertet der Ausschuss im Ertragswertverfahren (Liegenschaftszinssätze für MFH im Register). WEG: Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.gars.nrw/images/user/GA_Rhein-Erft-Kreis/GMB_2026.pdf · Geschäftsstelle gutachterausschuss@rhein-erft-kreis.de. Kein Nachbarwert und kein Landesmittel (§ 21 Abs. 3 ImmoWertV).",
+  "zugang": "nicht abgeleitet",
+  "zustaendige_stelle": "Der Gutachterausschuss für Grundstückswerte im Rhein-Erft-Kreis, gutachterausschuss@rhein-erft-kreis.de",
+  "geltungsbereich": {
+   "objektarten": [
+    "mfh"
+   ],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.gars.nrw/images/user/GA_Rhein-Erft-Kreis/GMB_2026.pdf · Geschäftsstelle gutachterausschuss@rhein-erft-kreis.de"
+  },
+  "belege": [
+   {
+    "art": "fehlstelle",
+    "fundstelle": "Grundstücksmarktbericht 2026, Sachwertkapitel PDF-S. 45, 76, 79, 80, 81, 83, 85, 87 (Seiten mit „Sachwertfaktor“ insgesamt: 4, 5, 45, 76, 79, 80, 81, 83, 85, 87)",
+    "url": "https://www.gars.nrw/images/user/GA_Rhein-Erft-Kreis/GMB_2026.pdf"
+   }
+  ],
+  "fundstelle": "GMB 2026, Sachwertkapitel PDF-S. 45, 76, 79, 80, 81, 83, 85, 87",
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "stichtag": null,
+  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "quelle_url": "https://www.gars.nrw/images/user/GA_Rhein-Erft-Kreis/GMB_2026.pdf",
+  "modellversion": "GMB 2026",
+  "quelle_parser": "v-ernte-20261120 (pdftotext -layout, Volltextsuche der Sachwertseiten, 20.11.2026, Agent register-ernte)"
+ },
+ {
+  "land_code": "NW",
+  "ags": "05515",
+  "ebene": "kreis",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Münster",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Münster",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "mfh",
+  "objektart": "mfh",
+  "objektart_bez": "Mehrfamilienhäuser",
+  "berichtsjahr": 2026,
+  "vollstaendig": false,
+  "warum_kein_wert": "Der Grundstücksmarktbericht 2026 des Ausschusses leitet Sachwertfaktoren nur für den individuellen Wohnungsbau ab (im Register: freistehende Ein-/Zweifamilienhäuser, Reihen-/Doppelhäuser). Einen Sachwertfaktor für Mehrfamilienhäuser führt er nicht: am 20.11.2026 alle 9 Seiten des Berichts (83 Seiten), die „Sachwertfaktor“ oder „Marktanpassungsfaktor“ enthalten, auf „Mehrfamilienhaus / Dreifamilienhaus / Mietwohnhaus / Geschosswohnungsbau / Wohn- und Geschäftshaus“ in derselben oder der Nachbarzeile durchsucht — kein Treffer. Mehrfamilienhäuser bewertet der Ausschuss im Ertragswertverfahren (Liegenschaftszinssätze für MFH im Register). WEG: Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_11900_2026.pdf · Geschäftsstelle gutachterausschuss@stadt-muenster.de. Kein Nachbarwert und kein Landesmittel (§ 21 Abs. 3 ImmoWertV).",
+  "zugang": "nicht abgeleitet",
+  "zustaendige_stelle": "Der Gutachterausschuss für Grundstückswerte in der Stadt Münster, gutachterausschuss@stadt-muenster.de",
+  "geltungsbereich": {
+   "objektarten": [
+    "mfh"
+   ],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_11900_2026.pdf · Geschäftsstelle gutachterausschuss@stadt-muenster.de"
+  },
+  "belege": [
+   {
+    "art": "fehlstelle",
+    "fundstelle": "Grundstücksmarktbericht 2026, Sachwertkapitel PDF-S. 48, 49, 67, 68, 72, 76 (Seiten mit „Sachwertfaktor“ insgesamt: 5, 6, 8, 48, 49, 67, 68, 72, 76)",
+    "url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_11900_2026.pdf"
+   }
+  ],
+  "fundstelle": "GMB 2026, Sachwertkapitel PDF-S. 48, 49, 67, 68, 72, 76",
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "stichtag": null,
+  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_11900_2026.pdf",
+  "modellversion": "GMB 2026",
+  "quelle_parser": "v-ernte-20261120 (pdftotext -layout, Volltextsuche der Sachwertseiten, 20.11.2026, Agent register-ernte)"
+ },
+ {
+  "land_code": "NW",
+  "ags": "05774",
+  "ebene": "kreis",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte im Kreis Paderborn",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte im Kreis Paderborn",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "mfh",
+  "objektart": "mfh",
+  "objektart_bez": "Mehrfamilienhäuser",
+  "berichtsjahr": 2026,
+  "vollstaendig": false,
+  "warum_kein_wert": "Der Grundstücksmarktbericht 2026 des Ausschusses leitet Sachwertfaktoren nur für den individuellen Wohnungsbau ab (im Register: freistehende Ein-/Zweifamilienhäuser). Einen Sachwertfaktor für Mehrfamilienhäuser führt er nicht: am 20.11.2026 alle 5 Seiten des Berichts (71 Seiten), die „Sachwertfaktor“ oder „Marktanpassungsfaktor“ enthalten, auf „Mehrfamilienhaus / Dreifamilienhaus / Mietwohnhaus / Geschosswohnungsbau / Wohn- und Geschäftshaus“ in derselben oder der Nachbarzeile durchsucht — kein Treffer. Mehrfamilienhäuser bewertet der Ausschuss im Ertragswertverfahren (Liegenschaftszinssätze für MFH im Register). WEG: Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.kreis-paderborn.de/gutachterausschuss/Produkte/Grundstucksmarktbericht/GMB_32100_2026.pdf · Geschäftsstelle gutachterausschuss@kreis-paderborn.de. Kein Nachbarwert und kein Landesmittel (§ 21 Abs. 3 ImmoWertV).",
+  "zugang": "nicht abgeleitet",
+  "zustaendige_stelle": "Der Gutachterausschuss für Grundstückswerte im Kreis Paderborn, gutachterausschuss@kreis-paderborn.de",
+  "geltungsbereich": {
+   "objektarten": [
+    "mfh"
+   ],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.kreis-paderborn.de/gutachterausschuss/Produkte/Grundstucksmarktbericht/GMB_32100_2026.pdf · Geschäftsstelle gutachterausschuss@kreis-paderborn.de"
+  },
+  "belege": [
+   {
+    "art": "fehlstelle",
+    "fundstelle": "Grundstücksmarktbericht 2026, Sachwertkapitel PDF-S. 37, 46, 47, 48 (Seiten mit „Sachwertfaktor“ insgesamt: 5, 37, 46, 47, 48)",
+    "url": "https://www.kreis-paderborn.de/gutachterausschuss/Produkte/Grundstucksmarktbericht/GMB_32100_2026.pdf"
+   }
+  ],
+  "fundstelle": "GMB 2026, Sachwertkapitel PDF-S. 37, 46, 47, 48",
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "stichtag": null,
+  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "quelle_url": "https://www.kreis-paderborn.de/gutachterausschuss/Produkte/Grundstucksmarktbericht/GMB_32100_2026.pdf",
+  "modellversion": "GMB 2026",
+  "quelle_parser": "v-ernte-20261120 (pdftotext -layout, Volltextsuche der Sachwertseiten, 20.11.2026, Agent register-ernte)"
+ },
+ {
+  "land_code": "NW",
+  "ags": "05314",
+  "ebene": "kreis",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in der Bundesstadt Bonn",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Bundesstadt Bonn",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "mfh",
+  "objektart": "mfh",
+  "objektart_bez": "Mehrfamilienhäuser",
+  "berichtsjahr": 2026,
+  "vollstaendig": false,
+  "warum_kein_wert": "Der Grundstücksmarktbericht 2026 des Ausschusses leitet Sachwertfaktoren nur für den individuellen Wohnungsbau ab (im Register: freistehende Ein-/Zweifamilienhäuser, Reihen-/Doppelhäuser, Reihenmittelhäuser, Gründerzeithäuser). Einen Sachwertfaktor für Mehrfamilienhäuser führt er nicht: am 20.11.2026 alle 7 Seiten des Berichts (69 Seiten), die „Sachwertfaktor“ oder „Marktanpassungsfaktor“ enthalten, auf „Mehrfamilienhaus / Dreifamilienhaus / Mietwohnhaus / Geschosswohnungsbau / Wohn- und Geschäftshaus“ in derselben oder der Nachbarzeile durchsucht — kein Treffer. Mehrfamilienhäuser bewertet der Ausschuss im Ertragswertverfahren (Liegenschaftszinssätze für MFH im Register). WEG: Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_10400_2026.pdf · Geschäftsstelle gutachterausschuss@bonn.de. Kein Nachbarwert und kein Landesmittel (§ 21 Abs. 3 ImmoWertV).",
+  "zugang": "nicht abgeleitet",
+  "zustaendige_stelle": "Der Gutachterausschuss für Grundstückswerte in der Bundesstadt Bonn, gutachterausschuss@bonn.de",
+  "geltungsbereich": {
+   "objektarten": [
+    "mfh"
+   ],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_10400_2026.pdf · Geschäftsstelle gutachterausschuss@bonn.de"
+  },
+  "belege": [
+   {
+    "art": "fehlstelle",
+    "fundstelle": "Grundstücksmarktbericht 2026, Sachwertkapitel PDF-S. 47, 53, 54, 55, 57 (Seiten mit „Sachwertfaktor“ insgesamt: 5, 10, 47, 53, 54, 55, 57)",
+    "url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_10400_2026.pdf"
+   }
+  ],
+  "fundstelle": "GMB 2026, Sachwertkapitel PDF-S. 47, 53, 54, 55, 57",
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "stichtag": null,
+  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_10400_2026.pdf",
+  "modellversion": "GMB 2026",
+  "quelle_parser": "v-ernte-20261120 (pdftotext -layout, Volltextsuche der Sachwertseiten, 20.11.2026, Agent register-ernte)"
+ },
+ {
+  "land_code": "NW",
+  "ags": "05762",
+  "ebene": "kreis",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte im Kreis Höxter",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte im Kreis Höxter",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "mfh",
+  "objektart": "mfh",
+  "objektart_bez": "Mehrfamilienhäuser",
+  "berichtsjahr": 2026,
+  "vollstaendig": false,
+  "warum_kein_wert": "Der Grundstücksmarktbericht 2026 des Ausschusses leitet Sachwertfaktoren nur für den individuellen Wohnungsbau ab (im Register: freistehende Ein-/Zweifamilienhäuser). Einen Sachwertfaktor für Mehrfamilienhäuser führt er nicht: am 20.11.2026 alle 10 Seiten des Berichts (159 Seiten), die „Sachwertfaktor“ oder „Marktanpassungsfaktor“ enthalten, auf „Mehrfamilienhaus / Dreifamilienhaus / Mietwohnhaus / Geschosswohnungsbau / Wohn- und Geschäftshaus“ in derselben oder der Nachbarzeile durchsucht — kein Treffer. Mehrfamilienhäuser bewertet der Ausschuss im Ertragswertverfahren (Liegenschaftszinssätze für MFH im Register). WEG: Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.gars.nrw/images/user/GA_H%C3%B6xter/pdf/hx_GMB_312_2026.pdf. Kein Nachbarwert und kein Landesmittel (§ 21 Abs. 3 ImmoWertV).",
+  "zugang": "nicht abgeleitet",
+  "zustaendige_stelle": "Der Gutachterausschuss für Grundstückswerte im Kreis Höxter",
+  "geltungsbereich": {
+   "objektarten": [
+    "mfh"
+   ],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.gars.nrw/images/user/GA_H%C3%B6xter/pdf/hx_GMB_312_2026.pdf"
+  },
+  "belege": [
+   {
+    "art": "fehlstelle",
+    "fundstelle": "Grundstücksmarktbericht 2026, Sachwertkapitel PDF-S. 70, 71, 72, 94, 95, 96, 99, 117 (Seiten mit „Sachwertfaktor“ insgesamt: 5, 12, 70, 71, 72, 94, 95, 96, 99, 117)",
+    "url": "https://www.gars.nrw/images/user/GA_H%C3%B6xter/pdf/hx_GMB_312_2026.pdf"
+   }
+  ],
+  "fundstelle": "GMB 2026, Sachwertkapitel PDF-S. 70, 71, 72, 94, 95, 96, 99, 117",
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "stichtag": null,
+  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "quelle_url": "https://www.gars.nrw/images/user/GA_H%C3%B6xter/pdf/hx_GMB_312_2026.pdf",
+  "modellversion": "GMB 2026",
+  "quelle_parser": "v-ernte-20261120 (pdftotext -layout, Volltextsuche der Sachwertseiten, 20.11.2026, Agent register-ernte)"
+ },
+ {
+  "land_code": "NW",
+  "ags": "05124",
+  "ebene": "kreis",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Wuppertal",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Wuppertal",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "mfh",
+  "objektart": "mfh",
+  "objektart_bez": "Mehrfamilienhäuser",
+  "berichtsjahr": 2026,
+  "vollstaendig": false,
+  "warum_kein_wert": "Der Grundstücksmarktbericht 2026 des Ausschusses leitet Sachwertfaktoren nur für den individuellen Wohnungsbau ab (im Register: freistehende Ein-/Zweifamilienhäuser). Einen Sachwertfaktor für Mehrfamilienhäuser führt er nicht: am 20.11.2026 alle 13 Seiten des Berichts (83 Seiten), die „Sachwertfaktor“ oder „Marktanpassungsfaktor“ enthalten, auf „Mehrfamilienhaus / Dreifamilienhaus / Mietwohnhaus / Geschosswohnungsbau / Wohn- und Geschäftshaus“ in derselben oder der Nachbarzeile durchsucht — kein Treffer. Mehrfamilienhäuser bewertet der Ausschuss im Ertragswertverfahren (Liegenschaftszinssätze für MFH im Register). WEG: Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.gars.nrw/images/user/GA_Wuppertal/GMB_12300_2026.pdf · Geschäftsstelle gutachterausschuss@stadt.wuppertal.de. Kein Nachbarwert und kein Landesmittel (§ 21 Abs. 3 ImmoWertV).",
+  "zugang": "nicht abgeleitet",
+  "zustaendige_stelle": "Der Gutachterausschuss für Grundstückswerte in der Stadt Wuppertal, gutachterausschuss@stadt.wuppertal.de",
+  "geltungsbereich": {
+   "objektarten": [
+    "mfh"
+   ],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.gars.nrw/images/user/GA_Wuppertal/GMB_12300_2026.pdf · Geschäftsstelle gutachterausschuss@stadt.wuppertal.de"
+  },
+  "belege": [
+   {
+    "art": "fehlstelle",
+    "fundstelle": "Grundstücksmarktbericht 2026, Sachwertkapitel PDF-S. 35, 36, 37, 38, 46, 47, 48, 49, 71, 72, 73 (Seiten mit „Sachwertfaktor“ insgesamt: 5, 6, 35, 36, 37, 38, 46, 47, 48, 49, 71, 72, 73)",
+    "url": "https://www.gars.nrw/images/user/GA_Wuppertal/GMB_12300_2026.pdf"
+   }
+  ],
+  "fundstelle": "GMB 2026, Sachwertkapitel PDF-S. 35, 36, 37, 38, 46, 47, 48, 49, 71, 72, 73",
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "stichtag": null,
+  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "quelle_url": "https://www.gars.nrw/images/user/GA_Wuppertal/GMB_12300_2026.pdf",
+  "modellversion": "GMB 2026",
+  "quelle_parser": "v-ernte-20261120 (pdftotext -layout, Volltextsuche der Sachwertseiten, 20.11.2026, Agent register-ernte)"
+ },
+ {
+  "land_code": "NW",
+  "ags": "05513",
+  "ebene": "kreis",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Gelsenkirchen",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Gelsenkirchen",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "mfh",
+  "objektart": "mfh",
+  "objektart_bez": "Mehrfamilienhäuser",
+  "berichtsjahr": 2026,
+  "vollstaendig": false,
+  "warum_kein_wert": "Der Grundstücksmarktbericht 2026 des Ausschusses leitet Sachwertfaktoren nur für den individuellen Wohnungsbau ab (im Register: freistehende Ein-/Zweifamilienhäuser, Reihen-/Doppelhäuser). Einen Sachwertfaktor für Mehrfamilienhäuser führt er nicht: am 20.11.2026 alle 10 Seiten des Berichts (94 Seiten), die „Sachwertfaktor“ oder „Marktanpassungsfaktor“ enthalten, auf „Mehrfamilienhaus / Dreifamilienhaus / Mietwohnhaus / Geschosswohnungsbau / Wohn- und Geschäftshaus“ in derselben oder der Nachbarzeile durchsucht — kein Treffer. Mehrfamilienhäuser bewertet der Ausschuss im Ertragswertverfahren (Liegenschaftszinssätze für MFH im Register). WEG: Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.gars.nrw/images/user/GA_Gelsenkirchen/pdf/GMB_110_2026_pflichtig.pdf · Geschäftsstelle gutachterausschuss@gelsenkirchen.de. Kein Nachbarwert und kein Landesmittel (§ 21 Abs. 3 ImmoWertV).",
+  "zugang": "nicht abgeleitet",
+  "zustaendige_stelle": "Der Gutachterausschuss für Grundstückswerte in der Stadt Gelsenkirchen, gutachterausschuss@gelsenkirchen.de",
+  "geltungsbereich": {
+   "objektarten": [
+    "mfh"
+   ],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.gars.nrw/images/user/GA_Gelsenkirchen/pdf/GMB_110_2026_pflichtig.pdf · Geschäftsstelle gutachterausschuss@gelsenkirchen.de"
+  },
+  "belege": [
+   {
+    "art": "fehlstelle",
+    "fundstelle": "Grundstücksmarktbericht 2026, Sachwertkapitel PDF-S. 52, 53, 65, 66, 68, 69 (Seiten mit „Sachwertfaktor“ insgesamt: 4, 5, 7, 8, 52, 53, 65, 66, 68, 69)",
+    "url": "https://www.gars.nrw/images/user/GA_Gelsenkirchen/pdf/GMB_110_2026_pflichtig.pdf"
+   }
+  ],
+  "fundstelle": "GMB 2026, Sachwertkapitel PDF-S. 52, 53, 65, 66, 68, 69",
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "stichtag": null,
+  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "quelle_url": "https://www.gars.nrw/images/user/GA_Gelsenkirchen/pdf/GMB_110_2026_pflichtig.pdf",
+  "modellversion": "GMB 2026",
+  "quelle_parser": "v-ernte-20261120 (pdftotext -layout, Volltextsuche der Sachwertseiten, 20.11.2026, Agent register-ernte)"
+ },
+ {
+  "land_code": "NW",
+  "ags": "05116",
+  "ebene": "kreis",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Mönchengladbach",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Mönchengladbach",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "mfh",
+  "objektart": "mfh",
+  "objektart_bez": "Mehrfamilienhäuser",
+  "berichtsjahr": 2026,
+  "vollstaendig": false,
+  "warum_kein_wert": "Der Grundstücksmarktbericht 2026 des Ausschusses leitet Sachwertfaktoren nur für den individuellen Wohnungsbau ab (im Register: Ein-/Zweifamilienhäuser, Zweifamilienhäuser, Reihen-/Doppelhäuser). Einen Sachwertfaktor für Mehrfamilienhäuser führt er nicht: am 20.11.2026 alle 27 Seiten des Berichts (219 Seiten), die „Sachwertfaktor“ oder „Marktanpassungsfaktor“ enthalten, auf „Mehrfamilienhaus / Dreifamilienhaus / Mietwohnhaus / Geschosswohnungsbau / Wohn- und Geschäftshaus“ in derselben oder der Nachbarzeile durchsucht — kein Treffer. Mehrfamilienhäuser bewertet der Ausschuss im Ertragswertverfahren (Liegenschaftszinssätze für MFH im Register). WEG: Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_11700_2026.pdf · Geschäftsstelle gutachterausschuss@moenchengladbach.de. Kein Nachbarwert und kein Landesmittel (§ 21 Abs. 3 ImmoWertV).",
+  "zugang": "nicht abgeleitet",
+  "zustaendige_stelle": "Der Gutachterausschuss für Grundstückswerte in der Stadt Mönchengladbach, gutachterausschuss@moenchengladbach.de",
+  "geltungsbereich": {
+   "objektarten": [
+    "mfh"
+   ],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_11700_2026.pdf · Geschäftsstelle gutachterausschuss@moenchengladbach.de"
+  },
+  "belege": [
+   {
+    "art": "fehlstelle",
+    "fundstelle": "Grundstücksmarktbericht 2026, Sachwertkapitel PDF-S. 13, 14, 85, 86, 88, 89, 91, 92, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 184, 185 (Seiten mit „Sachwertfaktor“ insgesamt: 6, 8, 9, 10, 11, 13, 14, 85, 86, 88, 89, 91, 92, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 184, 185)",
+    "url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_11700_2026.pdf"
+   }
+  ],
+  "fundstelle": "GMB 2026, Sachwertkapitel PDF-S. 13, 14, 85, 86, 88, 89, 91, 92, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 184, 185",
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "stichtag": null,
+  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_11700_2026.pdf",
+  "modellversion": "GMB 2026",
+  "quelle_parser": "v-ernte-20261120 (pdftotext -layout, Volltextsuche der Sachwertseiten, 20.11.2026, Agent register-ernte)"
+ },
+ {
+  "land_code": "NW",
+  "ags": "05114",
+  "ebene": "kreis",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Krefeld",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Krefeld",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "mfh",
+  "objektart": "mfh",
+  "objektart_bez": "Mehrfamilienhäuser",
+  "berichtsjahr": 2026,
+  "vollstaendig": false,
+  "warum_kein_wert": "Der Grundstücksmarktbericht 2026 des Ausschusses leitet Sachwertfaktoren nur für den individuellen Wohnungsbau ab (im Register: freistehende Ein-/Zweifamilienhäuser, Reihen-/Doppelhäuser). Einen Sachwertfaktor für Mehrfamilienhäuser führt er nicht: am 20.11.2026 alle 9 Seiten des Berichts (82 Seiten), die „Sachwertfaktor“ oder „Marktanpassungsfaktor“ enthalten, auf „Mehrfamilienhaus / Dreifamilienhaus / Mietwohnhaus / Geschosswohnungsbau / Wohn- und Geschäftshaus“ in derselben oder der Nachbarzeile durchsucht — kein Treffer. Mehrfamilienhäuser bewertet der Ausschuss im Ertragswertverfahren (Liegenschaftszinssätze für MFH im Register). WEG: Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://gars.nrw/images/user/GA_Krefeld/pdf/GMB/GARS-KR-GMB-2026.pdf · Geschäftsstelle gutachterausschuss@krefeld.de. Kein Nachbarwert und kein Landesmittel (§ 21 Abs. 3 ImmoWertV).",
+  "zugang": "nicht abgeleitet",
+  "zustaendige_stelle": "Der Gutachterausschuss für Grundstückswerte in der Stadt Krefeld, gutachterausschuss@krefeld.de",
+  "geltungsbereich": {
+   "objektarten": [
+    "mfh"
+   ],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://gars.nrw/images/user/GA_Krefeld/pdf/GMB/GARS-KR-GMB-2026.pdf · Geschäftsstelle gutachterausschuss@krefeld.de"
+  },
+  "belege": [
+   {
+    "art": "fehlstelle",
+    "fundstelle": "Grundstücksmarktbericht 2026, Sachwertkapitel PDF-S. 44, 45, 46, 73, 74 (Seiten mit „Sachwertfaktor“ insgesamt: 4, 5, 6, 9, 44, 45, 46, 73, 74)",
+    "url": "https://gars.nrw/images/user/GA_Krefeld/pdf/GMB/GARS-KR-GMB-2026.pdf"
+   }
+  ],
+  "fundstelle": "GMB 2026, Sachwertkapitel PDF-S. 44, 45, 46, 73, 74",
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "stichtag": null,
+  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "quelle_url": "https://gars.nrw/images/user/GA_Krefeld/pdf/GMB/GARS-KR-GMB-2026.pdf",
+  "modellversion": "GMB 2026",
+  "quelle_parser": "v-ernte-20261120 (pdftotext -layout, Volltextsuche der Sachwertseiten, 20.11.2026, Agent register-ernte)"
+ },
+ {
+  "land_code": "NW",
+  "ags": "05758",
+  "ebene": "kreis",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte im Kreis Herford und in der Stadt Herford",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte im Kreis Herford und in der Stadt Herford",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "mfh",
+  "objektart": "mfh",
+  "objektart_bez": "Mehrfamilienhäuser",
+  "berichtsjahr": 2026,
+  "vollstaendig": false,
+  "warum_kein_wert": "Der Grundstücksmarktbericht 2026 des Ausschusses leitet Sachwertfaktoren nur für den individuellen Wohnungsbau ab (im Register: freistehende Ein-/Zweifamilienhäuser). Einen Sachwertfaktor für Mehrfamilienhäuser führt er nicht: am 20.11.2026 alle 6 Seiten des Berichts (71 Seiten), die „Sachwertfaktor“ oder „Marktanpassungsfaktor“ enthalten, auf „Mehrfamilienhaus / Dreifamilienhaus / Mietwohnhaus / Geschosswohnungsbau / Wohn- und Geschäftshaus“ in derselben oder der Nachbarzeile durchsucht — kein Treffer. Mehrfamilienhäuser bewertet der Ausschuss im Ertragswertverfahren (Liegenschaftszinssätze für MFH im Register). WEG: Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.gars.nrw/images/user/GA_Herford/pdf/GMB/KR/GMB_31000_2026.pdf · Geschäftsstelle gutachterausschuss@kreis-herford.de. Kein Nachbarwert und kein Landesmittel (§ 21 Abs. 3 ImmoWertV).",
+  "zugang": "nicht abgeleitet",
+  "zustaendige_stelle": "Der Gutachterausschuss für Grundstückswerte im Kreis Herford und in der Stadt Herford, gutachterausschuss@kreis-herford.de",
+  "geltungsbereich": {
+   "objektarten": [
+    "mfh"
+   ],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.gars.nrw/images/user/GA_Herford/pdf/GMB/KR/GMB_31000_2026.pdf · Geschäftsstelle gutachterausschuss@kreis-herford.de"
+  },
+  "belege": [
+   {
+    "art": "fehlstelle",
+    "fundstelle": "Grundstücksmarktbericht 2026, Sachwertkapitel PDF-S. 43, 44, 45, 46 (Seiten mit „Sachwertfaktor“ insgesamt: 7, 8, 43, 44, 45, 46)",
+    "url": "https://www.gars.nrw/images/user/GA_Herford/pdf/GMB/KR/GMB_31000_2026.pdf"
+   }
+  ],
+  "fundstelle": "GMB 2026, Sachwertkapitel PDF-S. 43, 44, 45, 46",
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "stichtag": null,
+  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "quelle_url": "https://www.gars.nrw/images/user/GA_Herford/pdf/GMB/KR/GMB_31000_2026.pdf",
+  "modellversion": "GMB 2026",
+  "quelle_parser": "v-ernte-20261120 (pdftotext -layout, Volltextsuche der Sachwertseiten, 20.11.2026, Agent register-ernte)"
+ },
+ {
+  "land_code": "NW",
+  "ags": "05158",
+  "ebene": "kreis",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte im Kreis Mettmann",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte im Kreis Mettmann",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "mfh",
+  "objektart": "mfh",
+  "objektart_bez": "Mehrfamilienhäuser",
+  "berichtsjahr": 2026,
+  "vollstaendig": false,
+  "warum_kein_wert": "Der Grundstücksmarktbericht 2026 des Ausschusses leitet Sachwertfaktoren nur für den individuellen Wohnungsbau ab (im Register: freistehende Ein-/Zweifamilienhäuser, Doppelhaushälften, Reihenendhäuser, Reihenmittelhäuser). Einen Sachwertfaktor für Mehrfamilienhäuser führt er nicht: am 20.11.2026 alle 13 Seiten des Berichts (89 Seiten), die „Sachwertfaktor“ oder „Marktanpassungsfaktor“ enthalten, auf „Mehrfamilienhaus / Dreifamilienhaus / Mietwohnhaus / Geschosswohnungsbau / Wohn- und Geschäftshaus“ in derselben oder der Nachbarzeile durchsucht — kein Treffer. Mehrfamilienhäuser bewertet der Ausschuss im Ertragswertverfahren (Liegenschaftszinssätze für MFH im Register). WEG: Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.gars.nrw/images/user/GA_Mettmann/GMB_31600_2026.pdf · Geschäftsstelle gutachterausschuss@kreis-mettmann.de. Kein Nachbarwert und kein Landesmittel (§ 21 Abs. 3 ImmoWertV).",
+  "zugang": "nicht abgeleitet",
+  "zustaendige_stelle": "Der Gutachterausschuss für Grundstückswerte im Kreis Mettmann, gutachterausschuss@kreis-mettmann.de",
+  "geltungsbereich": {
+   "objektarten": [
+    "mfh"
+   ],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.gars.nrw/images/user/GA_Mettmann/GMB_31600_2026.pdf · Geschäftsstelle gutachterausschuss@kreis-mettmann.de"
+  },
+  "belege": [
+   {
+    "art": "fehlstelle",
+    "fundstelle": "Grundstücksmarktbericht 2026, Sachwertkapitel PDF-S. 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 83 (Seiten mit „Sachwertfaktor“ insgesamt: 5, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 83)",
+    "url": "https://www.gars.nrw/images/user/GA_Mettmann/GMB_31600_2026.pdf"
+   }
+  ],
+  "fundstelle": "GMB 2026, Sachwertkapitel PDF-S. 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 83",
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "stichtag": null,
+  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "quelle_url": "https://www.gars.nrw/images/user/GA_Mettmann/GMB_31600_2026.pdf",
+  "modellversion": "GMB 2026",
+  "quelle_parser": "v-ernte-20261120 (pdftotext -layout, Volltextsuche der Sachwertseiten, 20.11.2026, Agent register-ernte)"
+ },
+ {
+  "land_code": "NW",
+  "ags": "05770",
+  "ebene": "kreis",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte im Kreis Minden-Lübbecke",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte im Kreis Minden-Lübbecke",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "mfh",
+  "objektart": "mfh",
+  "objektart_bez": "Mehrfamilienhäuser",
+  "berichtsjahr": 2026,
+  "vollstaendig": false,
+  "warum_kein_wert": "Der Grundstücksmarktbericht 2026 des Ausschusses leitet Sachwertfaktoren nur für den individuellen Wohnungsbau ab (im Register: freistehende Ein-/Zweifamilienhäuser). Einen Sachwertfaktor für Mehrfamilienhäuser führt er nicht: am 20.11.2026 alle 6 Seiten des Berichts (93 Seiten), die „Sachwertfaktor“ oder „Marktanpassungsfaktor“ enthalten, auf „Mehrfamilienhaus / Dreifamilienhaus / Mietwohnhaus / Geschosswohnungsbau / Wohn- und Geschäftshaus“ in derselben oder der Nachbarzeile durchsucht — kein Treffer. Mehrfamilienhäuser bewertet der Ausschuss im Ertragswertverfahren (Liegenschaftszinssätze für MFH im Register). WEG: Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.gars.nrw/images/user/GA_Minden-Luebbecke/pdf/MiLu_GMB26.pdf · Geschäftsstelle gutachterausschuss@minden-luebbecke.de. Kein Nachbarwert und kein Landesmittel (§ 21 Abs. 3 ImmoWertV).",
+  "zugang": "nicht abgeleitet",
+  "zustaendige_stelle": "Der Gutachterausschuss für Grundstückswerte im Kreis Minden-Lübbecke, gutachterausschuss@minden-luebbecke.de",
+  "geltungsbereich": {
+   "objektarten": [
+    "mfh"
+   ],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.gars.nrw/images/user/GA_Minden-Luebbecke/pdf/MiLu_GMB26.pdf · Geschäftsstelle gutachterausschuss@minden-luebbecke.de"
+  },
+  "belege": [
+   {
+    "art": "fehlstelle",
+    "fundstelle": "Grundstücksmarktbericht 2026, Sachwertkapitel PDF-S. 59, 60, 73, 74, 75 (Seiten mit „Sachwertfaktor“ insgesamt: 5, 59, 60, 73, 74, 75)",
+    "url": "https://www.gars.nrw/images/user/GA_Minden-Luebbecke/pdf/MiLu_GMB26.pdf"
+   }
+  ],
+  "fundstelle": "GMB 2026, Sachwertkapitel PDF-S. 59, 60, 73, 74, 75",
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "stichtag": null,
+  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "quelle_url": "https://www.gars.nrw/images/user/GA_Minden-Luebbecke/pdf/MiLu_GMB26.pdf",
+  "modellversion": "GMB 2026",
+  "quelle_parser": "v-ernte-20261120 (pdftotext -layout, Volltextsuche der Sachwertseiten, 20.11.2026, Agent register-ernte)"
+ },
+ {
+  "land_code": "NW",
+  "ags": "05334",
+  "ebene": "kreis",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in der Städteregion Aachen",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Städteregion Aachen",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "mfh",
+  "objektart": "mfh",
+  "objektart_bez": "Mehrfamilienhäuser",
+  "berichtsjahr": 2026,
+  "vollstaendig": false,
+  "warum_kein_wert": "Der Grundstücksmarktbericht 2026 des Ausschusses leitet Sachwertfaktoren nur für den individuellen Wohnungsbau ab (im Register: Ein-/Zweifamilienhäuser, Reihen-/Doppelhäuser, Reihenmittelhäuser, Zweifamilienhäuser). Einen Sachwertfaktor für Mehrfamilienhäuser führt er nicht: am 20.11.2026 alle 28 Seiten des Berichts (124 Seiten), die „Sachwertfaktor“ oder „Marktanpassungsfaktor“ enthalten, auf „Mehrfamilienhaus / Dreifamilienhaus / Mietwohnhaus / Geschosswohnungsbau / Wohn- und Geschäftshaus“ in derselben oder der Nachbarzeile durchsucht — kein Treffer. Mehrfamilienhäuser bewertet der Ausschuss im Ertragswertverfahren (Liegenschaftszinssätze für MFH im Register). WEG: Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_30100_2026.pdf · Geschäftsstelle gutachterausschuss@staedteregion-aachen.de. Kein Nachbarwert und kein Landesmittel (§ 21 Abs. 3 ImmoWertV).",
+  "zugang": "nicht abgeleitet",
+  "zustaendige_stelle": "Der Gutachterausschuss für Grundstückswerte in der Städteregion Aachen, gutachterausschuss@staedteregion-aachen.de",
+  "geltungsbereich": {
+   "objektarten": [
+    "mfh"
+   ],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_30100_2026.pdf · Geschäftsstelle gutachterausschuss@staedteregion-aachen.de"
+  },
+  "belege": [
+   {
+    "art": "fehlstelle",
+    "fundstelle": "Grundstücksmarktbericht 2026, Sachwertkapitel PDF-S. 14, 15, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 112, 116, 117, 118 (Seiten mit „Sachwertfaktor“ insgesamt: 8, 12, 14, 15, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 112, 116, 117, 118)",
+    "url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_30100_2026.pdf"
+   }
+  ],
+  "fundstelle": "GMB 2026, Sachwertkapitel PDF-S. 14, 15, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 112, 116, 117, 118",
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "stichtag": null,
+  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_30100_2026.pdf",
+  "modellversion": "GMB 2026",
+  "quelle_parser": "v-ernte-20261120 (pdftotext -layout, Volltextsuche der Sachwertseiten, 20.11.2026, Agent register-ernte)"
+ },
+ {
+  "land_code": "NW",
+  "ags": "05170",
+  "ebene": "kreis",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte im Kreis Wesel",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte im Kreis Wesel",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "mfh",
+  "objektart": "mfh",
+  "objektart_bez": "Mehrfamilienhäuser",
+  "berichtsjahr": 2026,
+  "vollstaendig": false,
+  "warum_kein_wert": "Der Grundstücksmarktbericht 2026 des Ausschusses leitet Sachwertfaktoren nur für den individuellen Wohnungsbau ab (im Register: Reihen-/Doppelhäuser, freistehende Ein-/Zweifamilienhäuser). Einen Sachwertfaktor für Mehrfamilienhäuser führt er nicht: am 20.11.2026 alle 5 Seiten des Berichts (70 Seiten), die „Sachwertfaktor“ oder „Marktanpassungsfaktor“ enthalten, auf „Mehrfamilienhaus / Dreifamilienhaus / Mietwohnhaus / Geschosswohnungsbau / Wohn- und Geschäftshaus“ in derselben oder der Nachbarzeile durchsucht — kein Treffer. Mehrfamilienhäuser bewertet der Ausschuss im Ertragswertverfahren (Liegenschaftszinssätze für MFH im Register). WEG: Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_33100_2026.pdf · Geschäftsstelle gutachterausschuss@kreis-wesel.de. Kein Nachbarwert und kein Landesmittel (§ 21 Abs. 3 ImmoWertV).",
+  "zugang": "nicht abgeleitet",
+  "zustaendige_stelle": "Der Gutachterausschuss für Grundstückswerte im Kreis Wesel, gutachterausschuss@kreis-wesel.de",
+  "geltungsbereich": {
+   "objektarten": [
+    "mfh"
+   ],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_33100_2026.pdf · Geschäftsstelle gutachterausschuss@kreis-wesel.de"
+  },
+  "belege": [
+   {
+    "art": "fehlstelle",
+    "fundstelle": "Grundstücksmarktbericht 2026, Sachwertkapitel PDF-S. 49, 50, 51, 53 (Seiten mit „Sachwertfaktor“ insgesamt: 6, 49, 50, 51, 53)",
+    "url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_33100_2026.pdf"
+   }
+  ],
+  "fundstelle": "GMB 2026, Sachwertkapitel PDF-S. 49, 50, 51, 53",
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "stichtag": null,
+  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_33100_2026.pdf",
+  "modellversion": "GMB 2026",
+  "quelle_parser": "v-ernte-20261120 (pdftotext -layout, Volltextsuche der Sachwertseiten, 20.11.2026, Agent register-ernte)"
+ },
+ {
+  "land_code": "NW",
+  "ags": "05978",
+  "ebene": "kreis",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte im Kreis Unna",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte im Kreis Unna",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "mfh",
+  "objektart": "mfh",
+  "objektart_bez": "Mehrfamilienhäuser",
+  "berichtsjahr": 2026,
+  "vollstaendig": false,
+  "warum_kein_wert": "Der Grundstücksmarktbericht 2026 des Ausschusses leitet Sachwertfaktoren nur für den individuellen Wohnungsbau ab (im Register: freistehende Ein-/Zweifamilienhäuser, Reihen-/Doppelhäuser, Reihenmittelhäuser). Einen Sachwertfaktor für Mehrfamilienhäuser führt er nicht: am 20.11.2026 alle 6 Seiten des Berichts (65 Seiten), die „Sachwertfaktor“ oder „Marktanpassungsfaktor“ enthalten, auf „Mehrfamilienhaus / Dreifamilienhaus / Mietwohnhaus / Geschosswohnungsbau / Wohn- und Geschäftshaus“ in derselben oder der Nachbarzeile durchsucht — kein Treffer. Mehrfamilienhäuser bewertet der Ausschuss im Ertragswertverfahren (Liegenschaftszinssätze für MFH im Register). WEG: Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.gars.nrw/images/user/GA_Kreis_Unna/pdf/GMB_33200_2026.pdf · Geschäftsstelle gutachterausschuss@kreis-unna.de. Kein Nachbarwert und kein Landesmittel (§ 21 Abs. 3 ImmoWertV).",
+  "zugang": "nicht abgeleitet",
+  "zustaendige_stelle": "Der Gutachterausschuss für Grundstückswerte im Kreis Unna, gutachterausschuss@kreis-unna.de",
+  "geltungsbereich": {
+   "objektarten": [
+    "mfh"
+   ],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.gars.nrw/images/user/GA_Kreis_Unna/pdf/GMB_33200_2026.pdf · Geschäftsstelle gutachterausschuss@kreis-unna.de"
+  },
+  "belege": [
+   {
+    "art": "fehlstelle",
+    "fundstelle": "Grundstücksmarktbericht 2026, Sachwertkapitel PDF-S. 36, 37, 58, 59 (Seiten mit „Sachwertfaktor“ insgesamt: 5, 6, 36, 37, 58, 59)",
+    "url": "https://www.gars.nrw/images/user/GA_Kreis_Unna/pdf/GMB_33200_2026.pdf"
+   }
+  ],
+  "fundstelle": "GMB 2026, Sachwertkapitel PDF-S. 36, 37, 58, 59",
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "stichtag": null,
+  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "quelle_url": "https://www.gars.nrw/images/user/GA_Kreis_Unna/pdf/GMB_33200_2026.pdf",
+  "modellversion": "GMB 2026",
+  "quelle_parser": "v-ernte-20261120 (pdftotext -layout, Volltextsuche der Sachwertseiten, 20.11.2026, Agent register-ernte)"
+ },
+ {
+  "land_code": "NW",
+  "ags": "05162",
+  "ebene": "kreis",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte im Rhein-Kreis Neuss ohne die Stadt Neuss",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte im Rhein-Kreis Neuss ohne die Stadt Neuss",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "mfh",
+  "objektart": "mfh",
+  "objektart_bez": "Mehrfamilienhäuser",
+  "berichtsjahr": 2026,
+  "vollstaendig": false,
+  "warum_kein_wert": "Der Grundstücksmarktbericht 2026 des Ausschusses leitet Sachwertfaktoren nur für den individuellen Wohnungsbau ab (im Register: freistehende Ein-/Zweifamilienhäuser, Reihen-/Doppelhäuser). Einen Sachwertfaktor für Mehrfamilienhäuser führt er nicht: am 20.11.2026 alle 10 Seiten des Berichts (83 Seiten), die „Sachwertfaktor“ oder „Marktanpassungsfaktor“ enthalten, auf „Mehrfamilienhaus / Dreifamilienhaus / Mietwohnhaus / Geschosswohnungsbau / Wohn- und Geschäftshaus“ in derselben oder der Nachbarzeile durchsucht — kein Treffer. Mehrfamilienhäuser bewertet der Ausschuss im Ertragswertverfahren (Liegenschaftszinssätze für MFH im Register). WEG: Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_31800_2026.pdf · Geschäftsstelle gutachterausschuss@rhein-kreis-neuss.de. Kein Nachbarwert und kein Landesmittel (§ 21 Abs. 3 ImmoWertV).",
+  "zugang": "nicht abgeleitet",
+  "zustaendige_stelle": "Der Gutachterausschuss für Grundstückswerte im Rhein-Kreis Neuss ohne die Stadt Neuss, gutachterausschuss@rhein-kreis-neuss.de",
+  "geltungsbereich": {
+   "objektarten": [
+    "mfh"
+   ],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_31800_2026.pdf · Geschäftsstelle gutachterausschuss@rhein-kreis-neuss.de"
+  },
+  "belege": [
+   {
+    "art": "fehlstelle",
+    "fundstelle": "Grundstücksmarktbericht 2026, Sachwertkapitel PDF-S. 50, 51, 52, 53, 69, 71, 72, 73 (Seiten mit „Sachwertfaktor“ insgesamt: 6, 7, 50, 51, 52, 53, 69, 71, 72, 73)",
+    "url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_31800_2026.pdf"
+   }
+  ],
+  "fundstelle": "GMB 2026, Sachwertkapitel PDF-S. 50, 51, 52, 53, 69, 71, 72, 73",
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "stichtag": null,
+  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_31800_2026.pdf",
+  "modellversion": "GMB 2026",
+  "quelle_parser": "v-ernte-20261120 (pdftotext -layout, Volltextsuche der Sachwertseiten, 20.11.2026, Agent register-ernte)"
+ },
+ {
+  "land_code": "NW",
+  "ags": "05382",
+  "ebene": "kreis",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte im Rhein-Sieg-Kreis und in der Stadt Troisdorf",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte im Rhein-Sieg-Kreis und in der Stadt Troisdorf",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "mfh",
+  "objektart": "mfh",
+  "objektart_bez": "Mehrfamilienhäuser",
+  "berichtsjahr": 2026,
+  "vollstaendig": false,
+  "warum_kein_wert": "Der Grundstücksmarktbericht 2026 des Ausschusses leitet Sachwertfaktoren nur für den individuellen Wohnungsbau ab (im Register: freistehende Ein-/Zweifamilienhäuser, Reihen-/Doppelhäuser, Reihenmittelhäuser, Fertighäuser). Einen Sachwertfaktor für Mehrfamilienhäuser führt er nicht: am 20.11.2026 alle 15 Seiten des Berichts (144 Seiten), die „Sachwertfaktor“ oder „Marktanpassungsfaktor“ enthalten, auf „Mehrfamilienhaus / Dreifamilienhaus / Mietwohnhaus / Geschosswohnungsbau / Wohn- und Geschäftshaus“ in derselben oder der Nachbarzeile durchsucht — kein Treffer. Mehrfamilienhäuser bewertet der Ausschuss im Ertragswertverfahren (Liegenschaftszinssätze für MFH im Register). WEG: Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_32400_2026.pdf · Geschäftsstelle gutachterausschuss@rhein-sieg-kreis.de. Kein Nachbarwert und kein Landesmittel (§ 21 Abs. 3 ImmoWertV).",
+  "zugang": "nicht abgeleitet",
+  "zustaendige_stelle": "Der Gutachterausschuss für Grundstückswerte im Rhein-Sieg-Kreis und in der Stadt Troisdorf, gutachterausschuss@rhein-sieg-kreis.de",
+  "geltungsbereich": {
+   "objektarten": [
+    "mfh"
+   ],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_32400_2026.pdf · Geschäftsstelle gutachterausschuss@rhein-sieg-kreis.de"
+  },
+  "belege": [
+   {
+    "art": "fehlstelle",
+    "fundstelle": "Grundstücksmarktbericht 2026, Sachwertkapitel PDF-S. 67, 68, 79, 86, 90, 126, 127, 137, 138, 139, 140 (Seiten mit „Sachwertfaktor“ insgesamt: 5, 6, 7, 9, 67, 68, 79, 86, 90, 126, 127, 137, 138, 139, 140)",
+    "url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_32400_2026.pdf"
+   }
+  ],
+  "fundstelle": "GMB 2026, Sachwertkapitel PDF-S. 67, 68, 79, 86, 90, 126, 127, 137, 138, 139, 140",
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "stichtag": null,
+  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_32400_2026.pdf",
+  "modellversion": "GMB 2026",
+  "quelle_parser": "v-ernte-20261120 (pdftotext -layout, Volltextsuche der Sachwertseiten, 20.11.2026, Agent register-ernte)"
+ },
+ {
+  "land_code": "NW",
+  "ags": "05554",
+  "ebene": "kreis",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte im Kreis Borken",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte im Kreis Borken",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "mfh",
+  "objektart": "mfh",
+  "objektart_bez": "Mehrfamilienhäuser",
+  "berichtsjahr": 2026,
+  "vollstaendig": false,
+  "warum_kein_wert": "Der Grundstücksmarktbericht 2026 des Ausschusses leitet Sachwertfaktoren nur für den individuellen Wohnungsbau ab (im Register: freistehende Ein-/Zweifamilienhäuser, Reihen-/Doppelhäuser). Einen Sachwertfaktor für Mehrfamilienhäuser führt er nicht: am 20.11.2026 alle 10 Seiten des Berichts (225 Seiten), die „Sachwertfaktor“ oder „Marktanpassungsfaktor“ enthalten, auf „Mehrfamilienhaus / Dreifamilienhaus / Mietwohnhaus / Geschosswohnungsbau / Wohn- und Geschäftshaus“ in derselben oder der Nachbarzeile durchsucht — kein Treffer. Mehrfamilienhäuser bewertet der Ausschuss im Ertragswertverfahren (Liegenschaftszinssätze für MFH im Register). WEG: Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_30200_2026.pdf · Geschäftsstelle gutachterausschuss@kreis-borken.de. Kein Nachbarwert und kein Landesmittel (§ 21 Abs. 3 ImmoWertV).",
+  "zugang": "nicht abgeleitet",
+  "zustaendige_stelle": "Der Gutachterausschuss für Grundstückswerte im Kreis Borken, gutachterausschuss@kreis-borken.de",
+  "geltungsbereich": {
+   "objektarten": [
+    "mfh"
+   ],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_30200_2026.pdf · Geschäftsstelle gutachterausschuss@kreis-borken.de"
+  },
+  "belege": [
+   {
+    "art": "fehlstelle",
+    "fundstelle": "Grundstücksmarktbericht 2026, Sachwertkapitel PDF-S. 93, 142, 143, 145, 147, 195, 196, 202 (Seiten mit „Sachwertfaktor“ insgesamt: 5, 7, 93, 142, 143, 145, 147, 195, 196, 202)",
+    "url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_30200_2026.pdf"
+   }
+  ],
+  "fundstelle": "GMB 2026, Sachwertkapitel PDF-S. 93, 142, 143, 145, 147, 195, 196, 202",
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "stichtag": null,
+  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_30200_2026.pdf",
+  "modellversion": "GMB 2026",
+  "quelle_parser": "v-ernte-20261120 (pdftotext -layout, Volltextsuche der Sachwertseiten, 20.11.2026, Agent register-ernte)"
+ },
+ {
+  "land_code": "NW",
+  "ags": "05162",
+  "ebene": "kreis",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Neuss",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Neuss",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "mfh",
+  "objektart": "mfh",
+  "objektart_bez": "Mehrfamilienhäuser",
+  "berichtsjahr": 2026,
+  "vollstaendig": false,
+  "warum_kein_wert": "Der Grundstücksmarktbericht 2026 des Ausschusses leitet Sachwertfaktoren nur für den individuellen Wohnungsbau ab (im Register: freistehende Ein-/Zweifamilienhäuser, Reihen-/Doppelhäuser, Reihenmittelhäuser). Einen Sachwertfaktor für Mehrfamilienhäuser führt er nicht: am 20.11.2026 alle 12 Seiten des Berichts (85 Seiten), die „Sachwertfaktor“ oder „Marktanpassungsfaktor“ enthalten, auf „Mehrfamilienhaus / Dreifamilienhaus / Mietwohnhaus / Geschosswohnungsbau / Wohn- und Geschäftshaus“ in derselben oder der Nachbarzeile durchsucht — kein Treffer. Mehrfamilienhäuser bewertet der Ausschuss im Ertragswertverfahren (Liegenschaftszinssätze für MFH im Register). WEG: Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_26700_2026.pdf · Geschäftsstelle gutachterausschuss@stadt.neuss.de. Kein Nachbarwert und kein Landesmittel (§ 21 Abs. 3 ImmoWertV).",
+  "zugang": "nicht abgeleitet",
+  "zustaendige_stelle": "Der Gutachterausschuss für Grundstückswerte in der Stadt Neuss, gutachterausschuss@stadt.neuss.de",
+  "geltungsbereich": {
+   "objektarten": [
+    "mfh"
+   ],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_26700_2026.pdf · Geschäftsstelle gutachterausschuss@stadt.neuss.de"
+  },
+  "belege": [
+   {
+    "art": "fehlstelle",
+    "fundstelle": "Grundstücksmarktbericht 2026, Sachwertkapitel PDF-S. 47, 48, 50, 51, 53, 54, 56, 57, 60, 76 (Seiten mit „Sachwertfaktor“ insgesamt: 5, 6, 47, 48, 50, 51, 53, 54, 56, 57, 60, 76)",
+    "url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_26700_2026.pdf"
+   }
+  ],
+  "fundstelle": "GMB 2026, Sachwertkapitel PDF-S. 47, 48, 50, 51, 53, 54, 56, 57, 60, 76",
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "stichtag": null,
+  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_26700_2026.pdf",
+  "modellversion": "GMB 2026",
+  "quelle_parser": "v-ernte-20261120 (pdftotext -layout, Volltextsuche der Sachwertseiten, 20.11.2026, Agent register-ernte)"
+ },
+ {
+  "land_code": "NW",
+  "ags": "05562",
+  "ebene": "kreis",
+  "gebiet_name": "Waltrop (Der Gutachterausschuss für Grundstückswerte im Kreis Recklinghausen, in der Stadt Castrop-Rauxel und in der Stadt Herten)",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte im Kreis Recklinghausen, in der Stadt Castrop-Rauxel und in der Stadt Herten",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "mfh",
+  "objektart": "mfh",
+  "objektart_bez": "Mehrfamilienhäuser",
+  "berichtsjahr": 2026,
+  "vollstaendig": false,
+  "warum_kein_wert": "Der Grundstücksmarktbericht 2026 des Ausschusses leitet Sachwertfaktoren nur für den individuellen Wohnungsbau ab (im Register: freistehende Ein-/Zweifamilienhäuser, Ein-/Zweifamilienhäuser, Reihen-/Doppelhäuser, Reihenmittelhäuser). Einen Sachwertfaktor für Mehrfamilienhäuser führt er nicht: am 20.11.2026 alle 15 Seiten des Berichts (137 Seiten), die „Sachwertfaktor“ oder „Marktanpassungsfaktor“ enthalten, auf „Mehrfamilienhaus / Dreifamilienhaus / Mietwohnhaus / Geschosswohnungsbau / Wohn- und Geschäftshaus“ in derselben oder der Nachbarzeile durchsucht — kein Treffer. Mehrfamilienhäuser bewertet der Ausschuss im Ertragswertverfahren (Liegenschaftszinssätze für MFH im Register). WEG: Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_32200_2026.pdf · Geschäftsstelle gutachterausschuss@kreis-re.de. Kein Nachbarwert und kein Landesmittel (§ 21 Abs. 3 ImmoWertV).",
+  "zugang": "nicht abgeleitet",
+  "zustaendige_stelle": "Der Gutachterausschuss für Grundstückswerte im Kreis Recklinghausen, in der Stadt Castrop-Rauxel und in der Stadt Herten, gutachterausschuss@kreis-re.de",
+  "geltungsbereich": {
+   "objektarten": [
+    "mfh"
+   ],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_32200_2026.pdf · Geschäftsstelle gutachterausschuss@kreis-re.de"
+  },
+  "belege": [
+   {
+    "art": "fehlstelle",
+    "fundstelle": "Grundstücksmarktbericht 2026, Sachwertkapitel PDF-S. 57, 58, 59, 60, 62, 64, 65, 67, 75, 81, 82 (Seiten mit „Sachwertfaktor“ insgesamt: 5, 6, 8, 10, 57, 58, 59, 60, 62, 64, 65, 67, 75, 81, 82)",
+    "url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_32200_2026.pdf"
+   }
+  ],
+  "fundstelle": "GMB 2026, Sachwertkapitel PDF-S. 57, 58, 59, 60, 62, 64, 65, 67, 75, 81, 82",
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "stichtag": null,
+  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_32200_2026.pdf",
+  "modellversion": "GMB 2026",
+  "quelle_parser": "v-ernte-20261120 (pdftotext -layout, Volltextsuche der Sachwertseiten, 20.11.2026, Agent register-ernte)"
+ },
+ {
+  "land_code": "NW",
+  "ags": "05914",
+  "ebene": "kreis",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Hagen",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Hagen",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "mfh",
+  "objektart": "mfh",
+  "objektart_bez": "Mehrfamilienhäuser",
+  "berichtsjahr": 2026,
+  "vollstaendig": false,
+  "warum_kein_wert": "Der Grundstücksmarktbericht 2026 des Ausschusses leitet Sachwertfaktoren nur für den individuellen Wohnungsbau ab (im Register: Reihenmittelhäuser, Reihen-/Doppelhäuser, Ein-/Zweifamilienhäuser, Zweifamilienhäuser). Einen Sachwertfaktor für Mehrfamilienhäuser führt er nicht: am 20.11.2026 alle 11 Seiten des Berichts (101 Seiten), die „Sachwertfaktor“ oder „Marktanpassungsfaktor“ enthalten, auf „Mehrfamilienhaus / Dreifamilienhaus / Mietwohnhaus / Geschosswohnungsbau / Wohn- und Geschäftshaus“ in derselben oder der Nachbarzeile durchsucht — kein Treffer. Mehrfamilienhäuser bewertet der Ausschuss im Ertragswertverfahren (Liegenschaftszinssätze für MFH im Register). WEG: Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_11100_2026.pdf · Geschäftsstelle gutachterausschuss@stadt-hagen.de. Kein Nachbarwert und kein Landesmittel (§ 21 Abs. 3 ImmoWertV).",
+  "zugang": "nicht abgeleitet",
+  "zustaendige_stelle": "Der Gutachterausschuss für Grundstückswerte in der Stadt Hagen, gutachterausschuss@stadt-hagen.de",
+  "geltungsbereich": {
+   "objektarten": [
+    "mfh"
+   ],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_11100_2026.pdf · Geschäftsstelle gutachterausschuss@stadt-hagen.de"
+  },
+  "belege": [
+   {
+    "art": "fehlstelle",
+    "fundstelle": "Grundstücksmarktbericht 2026, Sachwertkapitel PDF-S. 45, 46, 72, 81, 88, 89 (Seiten mit „Sachwertfaktor“ insgesamt: 5, 6, 7, 10, 12, 45, 46, 72, 81, 88, 89)",
+    "url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_11100_2026.pdf"
+   }
+  ],
+  "fundstelle": "GMB 2026, Sachwertkapitel PDF-S. 45, 46, 72, 81, 88, 89",
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "stichtag": null,
+  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_11100_2026.pdf",
+  "modellversion": "GMB 2026",
+  "quelle_parser": "v-ernte-20261120 (pdftotext -layout, Volltextsuche der Sachwertseiten, 20.11.2026, Agent register-ernte)"
+ },
+ {
+  "land_code": "NW",
+  "ags": "05512",
+  "ebene": "kreis",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Bottrop",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Bottrop",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "mfh",
+  "objektart": "mfh",
+  "objektart_bez": "Mehrfamilienhäuser",
+  "berichtsjahr": 2026,
+  "vollstaendig": false,
+  "warum_kein_wert": "Der Grundstücksmarktbericht 2026 des Ausschusses leitet Sachwertfaktoren nur für den individuellen Wohnungsbau ab (im Register: Reihenmittelhäuser, Reihen-/Doppelhäuser, Ein-/Zweifamilienhäuser, Zweifamilienhäuser). Einen Sachwertfaktor für Mehrfamilienhäuser führt er nicht: am 20.11.2026 alle 3 Seiten des Berichts (106 Seiten), die „Sachwertfaktor“ oder „Marktanpassungsfaktor“ enthalten, auf „Mehrfamilienhaus / Dreifamilienhaus / Mietwohnhaus / Geschosswohnungsbau / Wohn- und Geschäftshaus“ in derselben oder der Nachbarzeile durchsucht — kein Treffer. Mehrfamilienhäuser bewertet der Ausschuss im Ertragswertverfahren (Liegenschaftszinssätze für MFH im Register). WEG: Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_10500_2026.pdf · Geschäftsstelle gutachterausschuss@bottrop.de. Kein Nachbarwert und kein Landesmittel (§ 21 Abs. 3 ImmoWertV).",
+  "zugang": "nicht abgeleitet",
+  "zustaendige_stelle": "Der Gutachterausschuss für Grundstückswerte in der Stadt Bottrop, gutachterausschuss@bottrop.de",
+  "geltungsbereich": {
+   "objektarten": [
+    "mfh"
+   ],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_10500_2026.pdf · Geschäftsstelle gutachterausschuss@bottrop.de"
+  },
+  "belege": [
+   {
+    "art": "fehlstelle",
+    "fundstelle": "Grundstücksmarktbericht 2026, Sachwertkapitel PDF-S. 54, 88 (Seiten mit „Sachwertfaktor“ insgesamt: 4, 54, 88)",
+    "url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_10500_2026.pdf"
+   }
+  ],
+  "fundstelle": "GMB 2026, Sachwertkapitel PDF-S. 54, 88",
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "stichtag": null,
+  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_10500_2026.pdf",
+  "modellversion": "GMB 2026",
+  "quelle_parser": "v-ernte-20261120 (pdftotext -layout, Volltextsuche der Sachwertseiten, 20.11.2026, Agent register-ernte)"
+ },
+ {
+  "land_code": "NW",
+  "ags": "05566",
+  "ebene": "kreis",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte im Kreis Steinfurt",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte im Kreis Steinfurt",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "mfh",
+  "objektart": "mfh",
+  "objektart_bez": "Mehrfamilienhäuser",
+  "berichtsjahr": 2026,
+  "vollstaendig": false,
+  "warum_kein_wert": "Der Grundstücksmarktbericht 2026 des Ausschusses leitet Sachwertfaktoren nur für den individuellen Wohnungsbau ab (im Register: freistehende Ein-/Zweifamilienhäuser, Reihen-/Doppelhäuser). Einen Sachwertfaktor für Mehrfamilienhäuser führt er nicht: am 20.11.2026 alle 15 Seiten des Berichts (121 Seiten), die „Sachwertfaktor“ oder „Marktanpassungsfaktor“ enthalten, auf „Mehrfamilienhaus / Dreifamilienhaus / Mietwohnhaus / Geschosswohnungsbau / Wohn- und Geschäftshaus“ in derselben oder der Nachbarzeile durchsucht — kein Treffer. Mehrfamilienhäuser bewertet der Ausschuss im Ertragswertverfahren (Liegenschaftszinssätze für MFH im Register). WEG: Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_32700_2026.pdf · Geschäftsstelle gutachterausschuss@kreis-steinfurt.de. Kein Nachbarwert und kein Landesmittel (§ 21 Abs. 3 ImmoWertV).",
+  "zugang": "nicht abgeleitet",
+  "zustaendige_stelle": "Der Gutachterausschuss für Grundstückswerte im Kreis Steinfurt, gutachterausschuss@kreis-steinfurt.de",
+  "geltungsbereich": {
+   "objektarten": [
+    "mfh"
+   ],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_32700_2026.pdf · Geschäftsstelle gutachterausschuss@kreis-steinfurt.de"
+  },
+  "belege": [
+   {
+    "art": "fehlstelle",
+    "fundstelle": "Grundstücksmarktbericht 2026, Sachwertkapitel PDF-S. 69, 75, 76, 77, 78, 83, 84, 101, 105, 107, 108 (Seiten mit „Sachwertfaktor“ insgesamt: 5, 6, 7, 9, 69, 75, 76, 77, 78, 83, 84, 101, 105, 107, 108)",
+    "url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_32700_2026.pdf"
+   }
+  ],
+  "fundstelle": "GMB 2026, Sachwertkapitel PDF-S. 69, 75, 76, 77, 78, 83, 84, 101, 105, 107, 108",
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "stichtag": null,
+  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_32700_2026.pdf",
+  "modellversion": "GMB 2026",
+  "quelle_parser": "v-ernte-20261120 (pdftotext -layout, Volltextsuche der Sachwertseiten, 20.11.2026, Agent register-ernte)"
+ },
+ {
+  "land_code": "NW",
+  "ags": "05316",
+  "ebene": "kreis",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Leverkusen",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Leverkusen",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "mfh",
+  "objektart": "mfh",
+  "objektart_bez": "Mehrfamilienhäuser",
+  "berichtsjahr": 2026,
+  "vollstaendig": false,
+  "warum_kein_wert": "Der Grundstücksmarktbericht 2026 des Ausschusses leitet Sachwertfaktoren nur für den individuellen Wohnungsbau ab (im Register: freistehende Ein-/Zweifamilienhäuser). Einen Sachwertfaktor für Mehrfamilienhäuser führt er nicht: am 20.11.2026 alle 5 Seiten des Berichts (63 Seiten), die „Sachwertfaktor“ oder „Marktanpassungsfaktor“ enthalten, auf „Mehrfamilienhaus / Dreifamilienhaus / Mietwohnhaus / Geschosswohnungsbau / Wohn- und Geschäftshaus“ in derselben oder der Nachbarzeile durchsucht — kein Treffer. Mehrfamilienhäuser bewertet der Ausschuss im Ertragswertverfahren (Liegenschaftszinssätze für MFH im Register). WEG: Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_11600_2026.pdf · Geschäftsstelle gutachterausschuss@stadt.leverkusen.de. Kein Nachbarwert und kein Landesmittel (§ 21 Abs. 3 ImmoWertV).",
+  "zugang": "nicht abgeleitet",
+  "zustaendige_stelle": "Der Gutachterausschuss für Grundstückswerte in der Stadt Leverkusen, gutachterausschuss@stadt.leverkusen.de",
+  "geltungsbereich": {
+   "objektarten": [
+    "mfh"
+   ],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_11600_2026.pdf · Geschäftsstelle gutachterausschuss@stadt.leverkusen.de"
+  },
+  "belege": [
+   {
+    "art": "fehlstelle",
+    "fundstelle": "Grundstücksmarktbericht 2026, Sachwertkapitel PDF-S. 39, 40, 53 (Seiten mit „Sachwertfaktor“ insgesamt: 5, 6, 39, 40, 53)",
+    "url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_11600_2026.pdf"
+   }
+  ],
+  "fundstelle": "GMB 2026, Sachwertkapitel PDF-S. 39, 40, 53",
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "stichtag": null,
+  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_11600_2026.pdf",
+  "modellversion": "GMB 2026",
+  "quelle_parser": "v-ernte-20261120 (pdftotext -layout, Volltextsuche der Sachwertseiten, 20.11.2026, Agent register-ernte)"
+ },
+ {
+  "land_code": "NW",
+  "ags": "05915",
+  "ebene": "kreis",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Hamm",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Hamm",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "mfh",
+  "objektart": "mfh",
+  "objektart_bez": "Mehrfamilienhäuser",
+  "berichtsjahr": 2026,
+  "vollstaendig": false,
+  "warum_kein_wert": "Der Grundstücksmarktbericht 2026 des Ausschusses leitet Sachwertfaktoren nur für den individuellen Wohnungsbau ab (im Register: freistehende Ein-/Zweifamilienhäuser, Reihen-/Doppelhäuser). Einen Sachwertfaktor für Mehrfamilienhäuser führt er nicht: am 20.11.2026 alle 5 Seiten des Berichts (85 Seiten), die „Sachwertfaktor“ oder „Marktanpassungsfaktor“ enthalten, auf „Mehrfamilienhaus / Dreifamilienhaus / Mietwohnhaus / Geschosswohnungsbau / Wohn- und Geschäftshaus“ in derselben oder der Nachbarzeile durchsucht — kein Treffer. Mehrfamilienhäuser bewertet der Ausschuss im Ertragswertverfahren (Liegenschaftszinssätze für MFH im Register). WEG: Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_11200_2026.pdf · Geschäftsstelle gutachterausschuss@stadt.hamm.de. Kein Nachbarwert und kein Landesmittel (§ 21 Abs. 3 ImmoWertV).",
+  "zugang": "nicht abgeleitet",
+  "zustaendige_stelle": "Der Gutachterausschuss für Grundstückswerte in der Stadt Hamm, gutachterausschuss@stadt.hamm.de",
+  "geltungsbereich": {
+   "objektarten": [
+    "mfh"
+   ],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_11200_2026.pdf · Geschäftsstelle gutachterausschuss@stadt.hamm.de"
+  },
+  "belege": [
+   {
+    "art": "fehlstelle",
+    "fundstelle": "Grundstücksmarktbericht 2026, Sachwertkapitel PDF-S. 41, 42, 64, 66 (Seiten mit „Sachwertfaktor“ insgesamt: 5, 41, 42, 64, 66)",
+    "url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_11200_2026.pdf"
+   }
+  ],
+  "fundstelle": "GMB 2026, Sachwertkapitel PDF-S. 41, 42, 64, 66",
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "stichtag": null,
+  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_11200_2026.pdf",
+  "modellversion": "GMB 2026",
+  "quelle_parser": "v-ernte-20261120 (pdftotext -layout, Volltextsuche der Sachwertseiten, 20.11.2026, Agent register-ernte)"
+ },
+ {
+  "land_code": "NW",
+  "ags": "05754",
+  "ebene": "kreis",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte im Kreis Gütersloh und in der Stadt Gütersloh",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte im Kreis Gütersloh und in der Stadt Gütersloh",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "mfh",
+  "objektart": "mfh",
+  "objektart_bez": "Mehrfamilienhäuser",
+  "berichtsjahr": 2026,
+  "vollstaendig": false,
+  "warum_kein_wert": "Der Grundstücksmarktbericht 2026 des Ausschusses leitet Sachwertfaktoren nur für den individuellen Wohnungsbau ab (im Register: freistehende Ein-/Zweifamilienhäuser, Reihen-/Doppelhäuser). Einen Sachwertfaktor für Mehrfamilienhäuser führt er nicht: am 20.11.2026 alle 12 Seiten des Berichts (92 Seiten), die „Sachwertfaktor“ oder „Marktanpassungsfaktor“ enthalten, auf „Mehrfamilienhaus / Dreifamilienhaus / Mietwohnhaus / Geschosswohnungsbau / Wohn- und Geschäftshaus“ in derselben oder der Nachbarzeile durchsucht — kein Treffer. Mehrfamilienhäuser bewertet der Ausschuss im Ertragswertverfahren (Liegenschaftszinssätze für MFH im Register). WEG: Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_33300_2026.pdf · Geschäftsstelle gutachterausschuss@kreis-guetersloh.de. Kein Nachbarwert und kein Landesmittel (§ 21 Abs. 3 ImmoWertV).",
+  "zugang": "nicht abgeleitet",
+  "zustaendige_stelle": "Der Gutachterausschuss für Grundstückswerte im Kreis Gütersloh und in der Stadt Gütersloh, gutachterausschuss@kreis-guetersloh.de",
+  "geltungsbereich": {
+   "objektarten": [
+    "mfh"
+   ],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_33300_2026.pdf · Geschäftsstelle gutachterausschuss@kreis-guetersloh.de"
+  },
+  "belege": [
+   {
+    "art": "fehlstelle",
+    "fundstelle": "Grundstücksmarktbericht 2026, Sachwertkapitel PDF-S. 13, 64, 65, 66, 67, 68, 81, 83 (Seiten mit „Sachwertfaktor“ insgesamt: 7, 8, 9, 12, 13, 64, 65, 66, 67, 68, 81, 83)",
+    "url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_33300_2026.pdf"
+   }
+  ],
+  "fundstelle": "GMB 2026, Sachwertkapitel PDF-S. 13, 64, 65, 66, 67, 68, 81, 83",
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "stichtag": null,
+  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_33300_2026.pdf",
+  "modellversion": "GMB 2026",
+  "quelle_parser": "v-ernte-20261120 (pdftotext -layout, Volltextsuche der Sachwertseiten, 20.11.2026, Agent register-ernte)"
+ },
+ {
+  "land_code": "NW",
+  "ags": "05119",
+  "ebene": "kreis",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Oberhausen",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Oberhausen",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "mfh",
+  "objektart": "mfh",
+  "objektart_bez": "Mehrfamilienhäuser",
+  "berichtsjahr": 2026,
+  "vollstaendig": false,
+  "warum_kein_wert": "Der Grundstücksmarktbericht 2026 des Ausschusses leitet Sachwertfaktoren nur für den individuellen Wohnungsbau ab (im Register: freistehende Ein-/Zweifamilienhäuser). Einen Sachwertfaktor für Mehrfamilienhäuser führt er nicht: am 20.11.2026 alle 3 Seiten des Berichts (60 Seiten), die „Sachwertfaktor“ oder „Marktanpassungsfaktor“ enthalten, auf „Mehrfamilienhaus / Dreifamilienhaus / Mietwohnhaus / Geschosswohnungsbau / Wohn- und Geschäftshaus“ in derselben oder der Nachbarzeile durchsucht — kein Treffer. Mehrfamilienhäuser bewertet der Ausschuss im Ertragswertverfahren (Liegenschaftszinssätze für MFH im Register). WEG: Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_12000_2026.pdf · Geschäftsstelle gutachterausschuss@oberhausen.de. Kein Nachbarwert und kein Landesmittel (§ 21 Abs. 3 ImmoWertV).",
+  "zugang": "nicht abgeleitet",
+  "zustaendige_stelle": "Der Gutachterausschuss für Grundstückswerte in der Stadt Oberhausen, gutachterausschuss@oberhausen.de",
+  "geltungsbereich": {
+   "objektarten": [
+    "mfh"
+   ],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_12000_2026.pdf · Geschäftsstelle gutachterausschuss@oberhausen.de"
+  },
+  "belege": [
+   {
+    "art": "fehlstelle",
+    "fundstelle": "Grundstücksmarktbericht 2026, Sachwertkapitel PDF-S. 43, 44, 45 (Seiten mit „Sachwertfaktor“ insgesamt: 43, 44, 45)",
+    "url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_12000_2026.pdf"
+   }
+  ],
+  "fundstelle": "GMB 2026, Sachwertkapitel PDF-S. 43, 44, 45",
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "stichtag": null,
+  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_12000_2026.pdf",
+  "modellversion": "GMB 2026",
+  "quelle_parser": "v-ernte-20261120 (pdftotext -layout, Volltextsuche der Sachwertseiten, 20.11.2026, Agent register-ernte)"
+ },
+ {
+  "land_code": "NW",
+  "ags": "05970",
+  "ebene": "kreis",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte im Kreis Siegen-Wittgenstein",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte im Kreis Siegen-Wittgenstein",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "mfh",
+  "objektart": "mfh",
+  "objektart_bez": "Mehrfamilienhäuser",
+  "berichtsjahr": 2026,
+  "vollstaendig": false,
+  "warum_kein_wert": "Der Grundstücksmarktbericht 2026 des Ausschusses leitet Sachwertfaktoren nur für den individuellen Wohnungsbau ab (im Register: freistehende Ein-/Zweifamilienhäuser). Einen Sachwertfaktor für Mehrfamilienhäuser führt er nicht: am 20.11.2026 alle 6 Seiten des Berichts (86 Seiten), die „Sachwertfaktor“ oder „Marktanpassungsfaktor“ enthalten, auf „Mehrfamilienhaus / Dreifamilienhaus / Mietwohnhaus / Geschosswohnungsbau / Wohn- und Geschäftshaus“ in derselben oder der Nachbarzeile durchsucht — kein Treffer. Mehrfamilienhäuser bewertet der Ausschuss im Ertragswertverfahren (Liegenschaftszinssätze für MFH im Register). WEG: Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_32500_2026.pdf · Geschäftsstelle gutachterausschuss@siegen-wittgenstein.de. Kein Nachbarwert und kein Landesmittel (§ 21 Abs. 3 ImmoWertV).",
+  "zugang": "nicht abgeleitet",
+  "zustaendige_stelle": "Der Gutachterausschuss für Grundstückswerte im Kreis Siegen-Wittgenstein, gutachterausschuss@siegen-wittgenstein.de",
+  "geltungsbereich": {
+   "objektarten": [
+    "mfh"
+   ],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_32500_2026.pdf · Geschäftsstelle gutachterausschuss@siegen-wittgenstein.de"
+  },
+  "belege": [
+   {
+    "art": "fehlstelle",
+    "fundstelle": "Grundstücksmarktbericht 2026, Sachwertkapitel PDF-S. 42, 43, 44, 45, 74 (Seiten mit „Sachwertfaktor“ insgesamt: 5, 42, 43, 44, 45, 74)",
+    "url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_32500_2026.pdf"
+   }
+  ],
+  "fundstelle": "GMB 2026, Sachwertkapitel PDF-S. 42, 43, 44, 45, 74",
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "stichtag": null,
+  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_32500_2026.pdf",
+  "modellversion": "GMB 2026",
+  "quelle_parser": "v-ernte-20261120 (pdftotext -layout, Volltextsuche der Sachwertseiten, 20.11.2026, Agent register-ernte)"
+ },
+ {
+  "land_code": "NW",
+  "ags": "05122",
+  "ebene": "kreis",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in der Klingenstadt Solingen",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Klingenstadt Solingen",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "mfh",
+  "objektart": "mfh",
+  "objektart_bez": "Mehrfamilienhäuser",
+  "berichtsjahr": 2026,
+  "vollstaendig": false,
+  "warum_kein_wert": "Der Grundstücksmarktbericht 2026 des Ausschusses leitet Sachwertfaktoren nur für den individuellen Wohnungsbau ab (im Register: freistehende Ein-/Zweifamilienhäuser, Reihen-/Doppelhäuser). Einen Sachwertfaktor für Mehrfamilienhäuser führt er nicht: am 20.11.2026 alle 8 Seiten des Berichts (71 Seiten), die „Sachwertfaktor“ oder „Marktanpassungsfaktor“ enthalten, auf „Mehrfamilienhaus / Dreifamilienhaus / Mietwohnhaus / Geschosswohnungsbau / Wohn- und Geschäftshaus“ in derselben oder der Nachbarzeile durchsucht — kein Treffer. Mehrfamilienhäuser bewertet der Ausschuss im Ertragswertverfahren (Liegenschaftszinssätze für MFH im Register). WEG: Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_12200_2026.pdf · Geschäftsstelle gutachterausschuss@solingen.de. Kein Nachbarwert und kein Landesmittel (§ 21 Abs. 3 ImmoWertV).",
+  "zugang": "nicht abgeleitet",
+  "zustaendige_stelle": "Der Gutachterausschuss für Grundstückswerte in der Klingenstadt Solingen, gutachterausschuss@solingen.de",
+  "geltungsbereich": {
+   "objektarten": [
+    "mfh"
+   ],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_12200_2026.pdf · Geschäftsstelle gutachterausschuss@solingen.de"
+  },
+  "belege": [
+   {
+    "art": "fehlstelle",
+    "fundstelle": "Grundstücksmarktbericht 2026, Sachwertkapitel PDF-S. 32, 33, 34, 35, 47, 59 (Seiten mit „Sachwertfaktor“ insgesamt: 5, 6, 32, 33, 34, 35, 47, 59)",
+    "url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_12200_2026.pdf"
+   }
+  ],
+  "fundstelle": "GMB 2026, Sachwertkapitel PDF-S. 32, 33, 34, 35, 47, 59",
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "stichtag": null,
+  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_12200_2026.pdf",
+  "modellversion": "GMB 2026",
+  "quelle_parser": "v-ernte-20261120 (pdftotext -layout, Volltextsuche der Sachwertseiten, 20.11.2026, Agent register-ernte)"
+ },
+ {
+  "land_code": "NW",
+  "ags": "05770",
+  "ebene": "kreis",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Minden",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Minden",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "mfh",
+  "objektart": "mfh",
+  "objektart_bez": "Mehrfamilienhäuser",
+  "berichtsjahr": 2026,
+  "vollstaendig": false,
+  "warum_kein_wert": "Der Grundstücksmarktbericht 2026 des Ausschusses leitet Sachwertfaktoren nur für den individuellen Wohnungsbau ab (im Register: ). Einen Sachwertfaktor für Mehrfamilienhäuser führt er nicht: am 20.11.2026 alle 6 Seiten des Berichts (78 Seiten), die „Sachwertfaktor“ oder „Marktanpassungsfaktor“ enthalten, auf „Mehrfamilienhaus / Dreifamilienhaus / Mietwohnhaus / Geschosswohnungsbau / Wohn- und Geschäftshaus“ in derselben oder der Nachbarzeile durchsucht — kein Treffer. Mehrfamilienhäuser bewertet der Ausschuss im Ertragswertverfahren (Liegenschaftszinssätze für MFH im Register). WEG: Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_26100_2026.pdf · Geschäftsstelle gutachterausschuss@minden.de. Kein Nachbarwert und kein Landesmittel (§ 21 Abs. 3 ImmoWertV).",
+  "zugang": "nicht abgeleitet",
+  "zustaendige_stelle": "Der Gutachterausschuss für Grundstückswerte in der Stadt Minden, gutachterausschuss@minden.de",
+  "geltungsbereich": {
+   "objektarten": [
+    "mfh"
+   ],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_26100_2026.pdf · Geschäftsstelle gutachterausschuss@minden.de"
+  },
+  "belege": [
+   {
+    "art": "fehlstelle",
+    "fundstelle": "Grundstücksmarktbericht 2026, Sachwertkapitel PDF-S. 51, 52, 67, 68, 69 (Seiten mit „Sachwertfaktor“ insgesamt: 5, 51, 52, 67, 68, 69)",
+    "url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_26100_2026.pdf"
+   }
+  ],
+  "fundstelle": "GMB 2026, Sachwertkapitel PDF-S. 51, 52, 67, 68, 69",
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "stichtag": null,
+  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_26100_2026.pdf",
+  "modellversion": "GMB 2026",
+  "quelle_parser": "v-ernte-20261120 (pdftotext -layout, Volltextsuche der Sachwertseiten, 20.11.2026, Agent register-ernte)"
+ },
+ {
+  "land_code": "NW",
+  "ags": "05170",
+  "ebene": "kreis",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Dinslaken",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Dinslaken",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "mfh",
+  "objektart": "mfh",
+  "objektart_bez": "Mehrfamilienhäuser",
+  "berichtsjahr": 2026,
+  "vollstaendig": false,
+  "warum_kein_wert": "Der Grundstücksmarktbericht 2026 des Ausschusses leitet Sachwertfaktoren nur für den individuellen Wohnungsbau ab (im Register: Ein-/Zweifamilienhäuser, Reihen-/Doppelhäuser, Reihenmittelhäuser, Zweifamilienhäuser). Einen Sachwertfaktor für Mehrfamilienhäuser führt er nicht: am 20.11.2026 alle 22 Seiten des Berichts (195 Seiten), die „Sachwertfaktor“ oder „Marktanpassungsfaktor“ enthalten, auf „Mehrfamilienhaus / Dreifamilienhaus / Mietwohnhaus / Geschosswohnungsbau / Wohn- und Geschäftshaus“ in derselben oder der Nachbarzeile durchsucht — kein Treffer. Mehrfamilienhäuser bewertet der Ausschuss im Ertragswertverfahren (Liegenschaftszinssätze für MFH im Register). WEG: Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_21900_2026.pdf · Geschäftsstelle gutachterausschuss@dinslaken.de. Kein Nachbarwert und kein Landesmittel (§ 21 Abs. 3 ImmoWertV).",
+  "zugang": "nicht abgeleitet",
+  "zustaendige_stelle": "Der Gutachterausschuss für Grundstückswerte in der Stadt Dinslaken, gutachterausschuss@dinslaken.de",
+  "geltungsbereich": {
+   "objektarten": [
+    "mfh"
+   ],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_21900_2026.pdf · Geschäftsstelle gutachterausschuss@dinslaken.de"
+  },
+  "belege": [
+   {
+    "art": "fehlstelle",
+    "fundstelle": "Grundstücksmarktbericht 2026, Sachwertkapitel PDF-S. 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 121, 157, 166, 173, 174, 176 (Seiten mit „Sachwertfaktor“ insgesamt: 5, 6, 7, 11, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 121, 157, 166, 173, 174, 176)",
+    "url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_21900_2026.pdf"
+   }
+  ],
+  "fundstelle": "GMB 2026, Sachwertkapitel PDF-S. 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 121, 157, 166, 173, 174, 176",
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "stichtag": null,
+  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_21900_2026.pdf",
+  "modellversion": "GMB 2026",
+  "quelle_parser": "v-ernte-20261120 (pdftotext -layout, Volltextsuche der Sachwertseiten, 20.11.2026, Agent register-ernte)"
+ },
+ {
+  "land_code": "NW",
+  "ags": "05170",
+  "ebene": "kreis",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Moers",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Moers",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "mfh",
+  "objektart": "mfh",
+  "objektart_bez": "Mehrfamilienhäuser",
+  "berichtsjahr": 2026,
+  "vollstaendig": false,
+  "warum_kein_wert": "Der Grundstücksmarktbericht 2026 des Ausschusses leitet Sachwertfaktoren nur für den individuellen Wohnungsbau ab (im Register: freistehende Ein-/Zweifamilienhäuser, Reihen-/Doppelhäuser, Reihenmittelhäuser). Einen Sachwertfaktor für Mehrfamilienhäuser führt er nicht: am 20.11.2026 alle 7 Seiten des Berichts (63 Seiten), die „Sachwertfaktor“ oder „Marktanpassungsfaktor“ enthalten, auf „Mehrfamilienhaus / Dreifamilienhaus / Mietwohnhaus / Geschosswohnungsbau / Wohn- und Geschäftshaus“ in derselben oder der Nachbarzeile durchsucht — kein Treffer. Mehrfamilienhäuser bewertet der Ausschuss im Ertragswertverfahren (Liegenschaftszinssätze für MFH im Register). WEG: Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_26400_2026.pdf · Geschäftsstelle gutachterausschuss@moers.de. Kein Nachbarwert und kein Landesmittel (§ 21 Abs. 3 ImmoWertV).",
+  "zugang": "nicht abgeleitet",
+  "zustaendige_stelle": "Der Gutachterausschuss für Grundstückswerte in der Stadt Moers, gutachterausschuss@moers.de",
+  "geltungsbereich": {
+   "objektarten": [
+    "mfh"
+   ],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_26400_2026.pdf · Geschäftsstelle gutachterausschuss@moers.de"
+  },
+  "belege": [
+   {
+    "art": "fehlstelle",
+    "fundstelle": "Grundstücksmarktbericht 2026, Sachwertkapitel PDF-S. 36, 37, 38, 50, 51 (Seiten mit „Sachwertfaktor“ insgesamt: 5, 6, 36, 37, 38, 50, 51)",
+    "url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_26400_2026.pdf"
+   }
+  ],
+  "fundstelle": "GMB 2026, Sachwertkapitel PDF-S. 36, 37, 38, 50, 51",
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "stichtag": null,
+  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_26400_2026.pdf",
+  "modellversion": "GMB 2026",
+  "quelle_parser": "v-ernte-20261120 (pdftotext -layout, Volltextsuche der Sachwertseiten, 20.11.2026, Agent register-ernte)"
+ },
+ {
+  "land_code": "NW",
+  "ags": "05562",
+  "ebene": "kreis",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Recklinghausen",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Recklinghausen",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "mfh",
+  "objektart": "mfh",
+  "objektart_bez": "Mehrfamilienhäuser",
+  "berichtsjahr": 2026,
+  "vollstaendig": false,
+  "warum_kein_wert": "Der Grundstücksmarktbericht 2026 des Ausschusses leitet Sachwertfaktoren nur für den individuellen Wohnungsbau ab (im Register: freistehende Ein-/Zweifamilienhäuser, Reihen-/Doppelhäuser, Reihenmittelhäuser). Einen Sachwertfaktor für Mehrfamilienhäuser führt er nicht: am 20.11.2026 alle 11 Seiten des Berichts (81 Seiten), die „Sachwertfaktor“ oder „Marktanpassungsfaktor“ enthalten, auf „Mehrfamilienhaus / Dreifamilienhaus / Mietwohnhaus / Geschosswohnungsbau / Wohn- und Geschäftshaus“ in derselben oder der Nachbarzeile durchsucht — kein Treffer. Mehrfamilienhäuser bewertet der Ausschuss im Ertragswertverfahren (Liegenschaftszinssätze für MFH im Register). WEG: Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_27600_2026.pdf · Geschäftsstelle gutachterausschuss@recklinghausen.de. Kein Nachbarwert und kein Landesmittel (§ 21 Abs. 3 ImmoWertV).",
+  "zugang": "nicht abgeleitet",
+  "zustaendige_stelle": "Der Gutachterausschuss für Grundstückswerte in der Stadt Recklinghausen, gutachterausschuss@recklinghausen.de",
+  "geltungsbereich": {
+   "objektarten": [
+    "mfh"
+   ],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_27600_2026.pdf · Geschäftsstelle gutachterausschuss@recklinghausen.de"
+  },
+  "belege": [
+   {
+    "art": "fehlstelle",
+    "fundstelle": "Grundstücksmarktbericht 2026, Sachwertkapitel PDF-S. 35, 36, 37, 38, 51, 52, 53, 59 (Seiten mit „Sachwertfaktor“ insgesamt: 5, 7, 8, 35, 36, 37, 38, 51, 52, 53, 59)",
+    "url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_27600_2026.pdf"
+   }
+  ],
+  "fundstelle": "GMB 2026, Sachwertkapitel PDF-S. 35, 36, 37, 38, 51, 52, 53, 59",
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "stichtag": null,
+  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_27600_2026.pdf",
+  "modellversion": "GMB 2026",
+  "quelle_parser": "v-ernte-20261120 (pdftotext -layout, Volltextsuche der Sachwertseiten, 20.11.2026, Agent register-ernte)"
+ },
+ {
+  "land_code": "NW",
+  "ags": "05566",
+  "ebene": "kreis",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Rheine",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Rheine",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "mfh",
+  "objektart": "mfh",
+  "objektart_bez": "Mehrfamilienhäuser",
+  "berichtsjahr": 2026,
+  "vollstaendig": false,
+  "warum_kein_wert": "Der Grundstücksmarktbericht 2026 des Ausschusses leitet Sachwertfaktoren nur für den individuellen Wohnungsbau ab (im Register: freistehende Ein-/Zweifamilienhäuser). Einen Sachwertfaktor für Mehrfamilienhäuser führt er nicht: am 20.11.2026 alle 10 Seiten des Berichts (71 Seiten), die „Sachwertfaktor“ oder „Marktanpassungsfaktor“ enthalten, auf „Mehrfamilienhaus / Dreifamilienhaus / Mietwohnhaus / Geschosswohnungsbau / Wohn- und Geschäftshaus“ in derselben oder der Nachbarzeile durchsucht — kein Treffer. Mehrfamilienhäuser bewertet der Ausschuss im Ertragswertverfahren (Liegenschaftszinssätze für MFH im Register). WEG: Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_27900_2026.pdf · Geschäftsstelle gutachterausschuss@rheine.de. Kein Nachbarwert und kein Landesmittel (§ 21 Abs. 3 ImmoWertV).",
+  "zugang": "nicht abgeleitet",
+  "zustaendige_stelle": "Der Gutachterausschuss für Grundstückswerte in der Stadt Rheine, gutachterausschuss@rheine.de",
+  "geltungsbereich": {
+   "objektarten": [
+    "mfh"
+   ],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_27900_2026.pdf · Geschäftsstelle gutachterausschuss@rheine.de"
+  },
+  "belege": [
+   {
+    "art": "fehlstelle",
+    "fundstelle": "Grundstücksmarktbericht 2026, Sachwertkapitel PDF-S. 42, 43, 44, 45, 46, 55, 61, 62 (Seiten mit „Sachwertfaktor“ insgesamt: 4, 7, 42, 43, 44, 45, 46, 55, 61, 62)",
+    "url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_27900_2026.pdf"
+   }
+  ],
+  "fundstelle": "GMB 2026, Sachwertkapitel PDF-S. 42, 43, 44, 45, 46, 55, 61, 62",
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "stichtag": null,
+  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_27900_2026.pdf",
+  "modellversion": "GMB 2026",
+  "quelle_parser": "v-ernte-20261120 (pdftotext -layout, Volltextsuche der Sachwertseiten, 20.11.2026, Agent register-ernte)"
+ },
+ {
+  "land_code": "NW",
+  "ags": "05562",
+  "ebene": "kreis",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in den Städten Dorsten, Gladbeck und Marl",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in den Städten Dorsten, Gladbeck und Marl",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "mfh",
+  "objektart": "mfh",
+  "objektart_bez": "Mehrfamilienhäuser",
+  "berichtsjahr": 2026,
+  "vollstaendig": false,
+  "warum_kein_wert": "Der Grundstücksmarktbericht 2026 des Ausschusses leitet Sachwertfaktoren nur für den individuellen Wohnungsbau ab (im Register: ). Einen Sachwertfaktor für Mehrfamilienhäuser führt er nicht: am 20.11.2026 alle 9 Seiten des Berichts (91 Seiten), die „Sachwertfaktor“ oder „Marktanpassungsfaktor“ enthalten, auf „Mehrfamilienhaus / Dreifamilienhaus / Mietwohnhaus / Geschosswohnungsbau / Wohn- und Geschäftshaus“ in derselben oder der Nachbarzeile durchsucht — kein Treffer. Mehrfamilienhäuser bewertet der Ausschuss im Ertragswertverfahren (Liegenschaftszinssätze für MFH im Register). WEG: Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_22200_2026.pdf · Geschäftsstelle gutachterausschuss@dorsten.de. Kein Nachbarwert und kein Landesmittel (§ 21 Abs. 3 ImmoWertV).",
+  "zugang": "nicht abgeleitet",
+  "zustaendige_stelle": "Der Gutachterausschuss für Grundstückswerte in den Städten Dorsten, Gladbeck und Marl, gutachterausschuss@dorsten.de",
+  "geltungsbereich": {
+   "objektarten": [
+    "mfh"
+   ],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_22200_2026.pdf · Geschäftsstelle gutachterausschuss@dorsten.de"
+  },
+  "belege": [
+   {
+    "art": "fehlstelle",
+    "fundstelle": "Grundstücksmarktbericht 2026, Sachwertkapitel PDF-S. 51, 52, 53, 54, 75, 77, 78, 80 (Seiten mit „Sachwertfaktor“ insgesamt: 4, 51, 52, 53, 54, 75, 77, 78, 80)",
+    "url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_22200_2026.pdf"
+   }
+  ],
+  "fundstelle": "GMB 2026, Sachwertkapitel PDF-S. 51, 52, 53, 54, 75, 77, 78, 80",
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "stichtag": null,
+  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_22200_2026.pdf",
+  "modellversion": "GMB 2026",
+  "quelle_parser": "v-ernte-20261120 (pdftotext -layout, Volltextsuche der Sachwertseiten, 20.11.2026, Agent register-ernte)"
+ },
+ {
+  "land_code": "NW",
+  "ags": "05958",
+  "ebene": "kreis",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Arnsberg",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Arnsberg",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "mfh",
+  "objektart": "mfh",
+  "objektart_bez": "Mehrfamilienhäuser",
+  "berichtsjahr": 2026,
+  "vollstaendig": false,
+  "warum_kein_wert": "Der Grundstücksmarktbericht 2026 des Ausschusses leitet Sachwertfaktoren nur für den individuellen Wohnungsbau ab (im Register: Ein-/Zweifamilienhäuser, Reihen-/Doppelhäuser, Zweifamilienhäuser). Einen Sachwertfaktor für Mehrfamilienhäuser führt er nicht: am 20.11.2026 alle 8 Seiten des Berichts (100 Seiten), die „Sachwertfaktor“ oder „Marktanpassungsfaktor“ enthalten, auf „Mehrfamilienhaus / Dreifamilienhaus / Mietwohnhaus / Geschosswohnungsbau / Wohn- und Geschäftshaus“ in derselben oder der Nachbarzeile durchsucht — kein Treffer. Mehrfamilienhäuser bewertet der Ausschuss im Ertragswertverfahren (Liegenschaftszinssätze für MFH im Register). WEG: Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_20100_2026.pdf · Geschäftsstelle gutachterausschuss@arnsberg.de. Kein Nachbarwert und kein Landesmittel (§ 21 Abs. 3 ImmoWertV).",
+  "zugang": "nicht abgeleitet",
+  "zustaendige_stelle": "Der Gutachterausschuss für Grundstückswerte in der Stadt Arnsberg, gutachterausschuss@arnsberg.de",
+  "geltungsbereich": {
+   "objektarten": [
+    "mfh"
+   ],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_20100_2026.pdf · Geschäftsstelle gutachterausschuss@arnsberg.de"
+  },
+  "belege": [
+   {
+    "art": "fehlstelle",
+    "fundstelle": "Grundstücksmarktbericht 2026, Sachwertkapitel PDF-S. 64, 65, 66, 67, 68, 79, 80 (Seiten mit „Sachwertfaktor“ insgesamt: 6, 64, 65, 66, 67, 68, 79, 80)",
+    "url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_20100_2026.pdf"
+   }
+  ],
+  "fundstelle": "GMB 2026, Sachwertkapitel PDF-S. 64, 65, 66, 67, 68, 79, 80",
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "stichtag": null,
+  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_20100_2026.pdf",
+  "modellversion": "GMB 2026",
+  "quelle_parser": "v-ernte-20261120 (pdftotext -layout, Volltextsuche der Sachwertseiten, 20.11.2026, Agent register-ernte)"
+ },
+ {
+  "land_code": "NW",
+  "ags": "05378",
+  "ebene": "kreis",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Bergisch Gladbach",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Bergisch Gladbach",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "mfh",
+  "objektart": "mfh",
+  "objektart_bez": "Mehrfamilienhäuser",
+  "berichtsjahr": 2026,
+  "vollstaendig": false,
+  "warum_kein_wert": "Der Grundstücksmarktbericht 2026 des Ausschusses leitet Sachwertfaktoren nur für den individuellen Wohnungsbau ab (im Register: Ein-/Zweifamilienhäuser, Reihen-/Doppelhäuser, Reihenmittelhäuser). Einen Sachwertfaktor für Mehrfamilienhäuser führt er nicht: am 20.11.2026 alle 4 Seiten des Berichts (97 Seiten), die „Sachwertfaktor“ oder „Marktanpassungsfaktor“ enthalten, auf „Mehrfamilienhaus / Dreifamilienhaus / Mietwohnhaus / Geschosswohnungsbau / Wohn- und Geschäftshaus“ in derselben oder der Nachbarzeile durchsucht — kein Treffer. Mehrfamilienhäuser bewertet der Ausschuss im Ertragswertverfahren (Liegenschaftszinssätze für MFH im Register). WEG: Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_20700_2026.pdf · Geschäftsstelle gutachterausschuss@stadt-gl.de. Kein Nachbarwert und kein Landesmittel (§ 21 Abs. 3 ImmoWertV).",
+  "zugang": "nicht abgeleitet",
+  "zustaendige_stelle": "Der Gutachterausschuss für Grundstückswerte in der Stadt Bergisch Gladbach, gutachterausschuss@stadt-gl.de",
+  "geltungsbereich": {
+   "objektarten": [
+    "mfh"
+   ],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_20700_2026.pdf · Geschäftsstelle gutachterausschuss@stadt-gl.de"
+  },
+  "belege": [
+   {
+    "art": "fehlstelle",
+    "fundstelle": "Grundstücksmarktbericht 2026, Sachwertkapitel PDF-S. 51, 79, 80 (Seiten mit „Sachwertfaktor“ insgesamt: 6, 51, 79, 80)",
+    "url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_20700_2026.pdf"
+   }
+  ],
+  "fundstelle": "GMB 2026, Sachwertkapitel PDF-S. 51, 79, 80",
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "stichtag": null,
+  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_20700_2026.pdf",
+  "modellversion": "GMB 2026",
+  "quelle_parser": "v-ernte-20261120 (pdftotext -layout, Volltextsuche der Sachwertseiten, 20.11.2026, Agent register-ernte)"
+ },
+ {
+  "land_code": "NW",
+  "ags": "05970",
+  "ebene": "kreis",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in der Universitätsstadt Siegen",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Universitätsstadt Siegen",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "mfh",
+  "objektart": "mfh",
+  "objektart_bez": "Mehrfamilienhäuser",
+  "berichtsjahr": 2026,
+  "vollstaendig": false,
+  "warum_kein_wert": "Der Grundstücksmarktbericht 2026 des Ausschusses leitet Sachwertfaktoren nur für den individuellen Wohnungsbau ab (im Register: freistehende Ein-/Zweifamilienhäuser). Einen Sachwertfaktor für Mehrfamilienhäuser führt er nicht: am 20.11.2026 alle 9 Seiten des Berichts (79 Seiten), die „Sachwertfaktor“ oder „Marktanpassungsfaktor“ enthalten, auf „Mehrfamilienhaus / Dreifamilienhaus / Mietwohnhaus / Geschosswohnungsbau / Wohn- und Geschäftshaus“ in derselben oder der Nachbarzeile durchsucht — kein Treffer. Mehrfamilienhäuser bewertet der Ausschuss im Ertragswertverfahren (Liegenschaftszinssätze für MFH im Register). WEG: Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_28200_2026.pdf · Geschäftsstelle gutachterausschuss@siegen.de. Kein Nachbarwert und kein Landesmittel (§ 21 Abs. 3 ImmoWertV).",
+  "zugang": "nicht abgeleitet",
+  "zustaendige_stelle": "Der Gutachterausschuss für Grundstückswerte in der Universitätsstadt Siegen, gutachterausschuss@siegen.de",
+  "geltungsbereich": {
+   "objektarten": [
+    "mfh"
+   ],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_28200_2026.pdf · Geschäftsstelle gutachterausschuss@siegen.de"
+  },
+  "belege": [
+   {
+    "art": "fehlstelle",
+    "fundstelle": "Grundstücksmarktbericht 2026, Sachwertkapitel PDF-S. 37, 38, 39, 40, 42, 53, 60, 61 (Seiten mit „Sachwertfaktor“ insgesamt: 5, 37, 38, 39, 40, 42, 53, 60, 61)",
+    "url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_28200_2026.pdf"
+   }
+  ],
+  "fundstelle": "GMB 2026, Sachwertkapitel PDF-S. 37, 38, 39, 40, 42, 53, 60, 61",
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "stichtag": null,
+  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_28200_2026.pdf",
+  "modellversion": "GMB 2026",
+  "quelle_parser": "v-ernte-20261120 (pdftotext -layout, Volltextsuche der Sachwertseiten, 20.11.2026, Agent register-ernte)"
+ },
+ {
+  "land_code": "NW",
+  "ags": "05554",
+  "ebene": "kreis",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Bocholt",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Bocholt",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "mfh",
+  "objektart": "mfh",
+  "objektart_bez": "Mehrfamilienhäuser",
+  "berichtsjahr": 2026,
+  "vollstaendig": false,
+  "warum_kein_wert": "Der Grundstücksmarktbericht 2026 des Ausschusses leitet Sachwertfaktoren nur für den individuellen Wohnungsbau ab (im Register: freistehende Ein-/Zweifamilienhäuser, Reihen-/Doppelhäuser, Reihenmittelhäuser). Einen Sachwertfaktor für Mehrfamilienhäuser führt er nicht: am 20.11.2026 alle 9 Seiten des Berichts (105 Seiten), die „Sachwertfaktor“ oder „Marktanpassungsfaktor“ enthalten, auf „Mehrfamilienhaus / Dreifamilienhaus / Mietwohnhaus / Geschosswohnungsbau / Wohn- und Geschäftshaus“ in derselben oder der Nachbarzeile durchsucht — kein Treffer. Mehrfamilienhäuser bewertet der Ausschuss im Ertragswertverfahren (Liegenschaftszinssätze für MFH im Register). WEG: Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_21000_2026.pdf · Geschäftsstelle gutachterausschuss@bocholt.de. Kein Nachbarwert und kein Landesmittel (§ 21 Abs. 3 ImmoWertV).",
+  "zugang": "nicht abgeleitet",
+  "zustaendige_stelle": "Der Gutachterausschuss für Grundstückswerte in der Stadt Bocholt, gutachterausschuss@bocholt.de",
+  "geltungsbereich": {
+   "objektarten": [
+    "mfh"
+   ],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_21000_2026.pdf · Geschäftsstelle gutachterausschuss@bocholt.de"
+  },
+  "belege": [
+   {
+    "art": "fehlstelle",
+    "fundstelle": "Grundstücksmarktbericht 2026, Sachwertkapitel PDF-S. 57, 58, 59, 61, 87, 88, 93 (Seiten mit „Sachwertfaktor“ insgesamt: 5, 6, 57, 58, 59, 61, 87, 88, 93)",
+    "url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_21000_2026.pdf"
+   }
+  ],
+  "fundstelle": "GMB 2026, Sachwertkapitel PDF-S. 57, 58, 59, 61, 87, 88, 93",
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "stichtag": null,
+  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_21000_2026.pdf",
+  "modellversion": "GMB 2026",
+  "quelle_parser": "v-ernte-20261120 (pdftotext -layout, Volltextsuche der Sachwertseiten, 20.11.2026, Agent register-ernte)"
+ },
+ {
+  "land_code": "NW",
+  "ags": "05158",
+  "ebene": "kreis",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Ratingen",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Ratingen",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "mfh",
+  "objektart": "mfh",
+  "objektart_bez": "Mehrfamilienhäuser",
+  "berichtsjahr": 2026,
+  "vollstaendig": false,
+  "warum_kein_wert": "Der Grundstücksmarktbericht 2026 des Ausschusses leitet Sachwertfaktoren nur für den individuellen Wohnungsbau ab (im Register: freistehende Ein-/Zweifamilienhäuser, Doppelhaushälften, Reihenendhäuser, Reihenmittelhäuser). Einen Sachwertfaktor für Mehrfamilienhäuser führt er nicht: am 20.11.2026 alle 5 Seiten des Berichts (69 Seiten), die „Sachwertfaktor“ oder „Marktanpassungsfaktor“ enthalten, auf „Mehrfamilienhaus / Dreifamilienhaus / Mietwohnhaus / Geschosswohnungsbau / Wohn- und Geschäftshaus“ in derselben oder der Nachbarzeile durchsucht — kein Treffer. Mehrfamilienhäuser bewertet der Ausschuss im Ertragswertverfahren (Liegenschaftszinssätze für MFH im Register). WEG: Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_27300_2026.pdf · Geschäftsstelle gaa@ratingen.de. Kein Nachbarwert und kein Landesmittel (§ 21 Abs. 3 ImmoWertV).",
+  "zugang": "nicht abgeleitet",
+  "zustaendige_stelle": "Der Gutachterausschuss für Grundstückswerte in der Stadt Ratingen, gaa@ratingen.de",
+  "geltungsbereich": {
+   "objektarten": [
+    "mfh"
+   ],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_27300_2026.pdf · Geschäftsstelle gaa@ratingen.de"
+  },
+  "belege": [
+   {
+    "art": "fehlstelle",
+    "fundstelle": "Grundstücksmarktbericht 2026, Sachwertkapitel PDF-S. 39, 40, 42, 57 (Seiten mit „Sachwertfaktor“ insgesamt: 5, 39, 40, 42, 57)",
+    "url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_27300_2026.pdf"
+   }
+  ],
+  "fundstelle": "GMB 2026, Sachwertkapitel PDF-S. 39, 40, 42, 57",
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "stichtag": null,
+  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_27300_2026.pdf",
+  "modellversion": "GMB 2026",
+  "quelle_parser": "v-ernte-20261120 (pdftotext -layout, Volltextsuche der Sachwertseiten, 20.11.2026, Agent register-ernte)"
+ },
+ {
+  "land_code": "NW",
+  "ags": "05358",
+  "ebene": "kreis",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Düren",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Düren",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "mfh",
+  "objektart": "mfh",
+  "objektart_bez": "Mehrfamilienhäuser",
+  "berichtsjahr": 2026,
+  "vollstaendig": false,
+  "warum_kein_wert": "Der Grundstücksmarktbericht 2026 des Ausschusses leitet Sachwertfaktoren nur für den individuellen Wohnungsbau ab (im Register: freistehende Ein-/Zweifamilienhäuser, Reihen-/Doppelhäuser, Reihenmittelhäuser). Einen Sachwertfaktor für Mehrfamilienhäuser führt er nicht: am 20.11.2026 alle 13 Seiten des Berichts (72 Seiten), die „Sachwertfaktor“ oder „Marktanpassungsfaktor“ enthalten, auf „Mehrfamilienhaus / Dreifamilienhaus / Mietwohnhaus / Geschosswohnungsbau / Wohn- und Geschäftshaus“ in derselben oder der Nachbarzeile durchsucht — kein Treffer. Mehrfamilienhäuser bewertet der Ausschuss im Ertragswertverfahren (Liegenschaftszinssätze für MFH im Register). WEG: Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_22500_2026.pdf · Geschäftsstelle gutachterausschuss@dueren.de. Kein Nachbarwert und kein Landesmittel (§ 21 Abs. 3 ImmoWertV).",
+  "zugang": "nicht abgeleitet",
+  "zustaendige_stelle": "Der Gutachterausschuss für Grundstückswerte in der Stadt Düren, gutachterausschuss@dueren.de",
+  "geltungsbereich": {
+   "objektarten": [
+    "mfh"
+   ],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_22500_2026.pdf · Geschäftsstelle gutachterausschuss@dueren.de"
+  },
+  "belege": [
+   {
+    "art": "fehlstelle",
+    "fundstelle": "Grundstücksmarktbericht 2026, Sachwertkapitel PDF-S. 34, 35, 36, 37, 38, 39, 40, 41, 42, 61, 62 (Seiten mit „Sachwertfaktor“ insgesamt: 6, 7, 34, 35, 36, 37, 38, 39, 40, 41, 42, 61, 62)",
+    "url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_22500_2026.pdf"
+   }
+  ],
+  "fundstelle": "GMB 2026, Sachwertkapitel PDF-S. 34, 35, 36, 37, 38, 39, 40, 41, 42, 61, 62",
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "stichtag": null,
+  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_22500_2026.pdf",
+  "modellversion": "GMB 2026",
+  "quelle_parser": "v-ernte-20261120 (pdftotext -layout, Volltextsuche der Sachwertseiten, 20.11.2026, Agent register-ernte)"
+ },
+ {
+  "land_code": "NW",
+  "ags": "05170",
+  "ebene": "kreis",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Wesel",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Wesel",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "mfh",
+  "objektart": "mfh",
+  "objektart_bez": "Mehrfamilienhäuser",
+  "berichtsjahr": 2026,
+  "vollstaendig": false,
+  "warum_kein_wert": "Der Grundstücksmarktbericht 2026 des Ausschusses leitet Sachwertfaktoren nur für den individuellen Wohnungsbau ab (im Register: freistehende Ein-/Zweifamilienhäuser, Reihen-/Doppelhäuser, Reihenmittelhäuser). Einen Sachwertfaktor für Mehrfamilienhäuser führt er nicht: am 20.11.2026 alle 10 Seiten des Berichts (119 Seiten), die „Sachwertfaktor“ oder „Marktanpassungsfaktor“ enthalten, auf „Mehrfamilienhaus / Dreifamilienhaus / Mietwohnhaus / Geschosswohnungsbau / Wohn- und Geschäftshaus“ in derselben oder der Nachbarzeile durchsucht — kein Treffer. Mehrfamilienhäuser bewertet der Ausschuss im Ertragswertverfahren (Liegenschaftszinssätze für MFH im Register). WEG: Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_29400_2026.pdf · Geschäftsstelle gutachterausschuss@wesel.de. Kein Nachbarwert und kein Landesmittel (§ 21 Abs. 3 ImmoWertV).",
+  "zugang": "nicht abgeleitet",
+  "zustaendige_stelle": "Der Gutachterausschuss für Grundstückswerte in der Stadt Wesel, gutachterausschuss@wesel.de",
+  "geltungsbereich": {
+   "objektarten": [
+    "mfh"
+   ],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_29400_2026.pdf · Geschäftsstelle gutachterausschuss@wesel.de"
+  },
+  "belege": [
+   {
+    "art": "fehlstelle",
+    "fundstelle": "Grundstücksmarktbericht 2026, Sachwertkapitel PDF-S. 48, 50, 52, 54, 56, 93, 94 (Seiten mit „Sachwertfaktor“ insgesamt: 5, 6, 8, 48, 50, 52, 54, 56, 93, 94)",
+    "url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_29400_2026.pdf"
+   }
+  ],
+  "fundstelle": "GMB 2026, Sachwertkapitel PDF-S. 48, 50, 52, 54, 56, 93, 94",
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "stichtag": null,
+  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_29400_2026.pdf",
+  "modellversion": "GMB 2026",
+  "quelle_parser": "v-ernte-20261120 (pdftotext -layout, Volltextsuche der Sachwertseiten, 20.11.2026, Agent register-ernte)"
+ },
+ {
+  "land_code": "NW",
+  "ags": "05974",
+  "ebene": "kreis",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Lippstadt",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Lippstadt",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "mfh",
+  "objektart": "mfh",
+  "objektart_bez": "Mehrfamilienhäuser",
+  "berichtsjahr": 2026,
+  "vollstaendig": false,
+  "warum_kein_wert": "Der Grundstücksmarktbericht 2026 des Ausschusses leitet Sachwertfaktoren nur für den individuellen Wohnungsbau ab (im Register: freistehende Ein-/Zweifamilienhäuser, Reihen-/Doppelhäuser). Einen Sachwertfaktor für Mehrfamilienhäuser führt er nicht: am 20.11.2026 alle 7 Seiten des Berichts (81 Seiten), die „Sachwertfaktor“ oder „Marktanpassungsfaktor“ enthalten, auf „Mehrfamilienhaus / Dreifamilienhaus / Mietwohnhaus / Geschosswohnungsbau / Wohn- und Geschäftshaus“ in derselben oder der Nachbarzeile durchsucht — kein Treffer. Mehrfamilienhäuser bewertet der Ausschuss im Ertragswertverfahren (Liegenschaftszinssätze für MFH im Register). WEG: Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_24900_2026.pdf · Geschäftsstelle gutachterausschuss@lippstadt.de. Kein Nachbarwert und kein Landesmittel (§ 21 Abs. 3 ImmoWertV).",
+  "zugang": "nicht abgeleitet",
+  "zustaendige_stelle": "Der Gutachterausschuss für Grundstückswerte in der Stadt Lippstadt, gutachterausschuss@lippstadt.de",
+  "geltungsbereich": {
+   "objektarten": [
+    "mfh"
+   ],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_24900_2026.pdf · Geschäftsstelle gutachterausschuss@lippstadt.de"
+  },
+  "belege": [
+   {
+    "art": "fehlstelle",
+    "fundstelle": "Grundstücksmarktbericht 2026, Sachwertkapitel PDF-S. 34, 35, 36, 37, 38, 61 (Seiten mit „Sachwertfaktor“ insgesamt: 4, 34, 35, 36, 37, 38, 61)",
+    "url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_24900_2026.pdf"
+   }
+  ],
+  "fundstelle": "GMB 2026, Sachwertkapitel PDF-S. 34, 35, 36, 37, 38, 61",
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "stichtag": null,
+  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_24900_2026.pdf",
+  "modellversion": "GMB 2026",
+  "quelle_parser": "v-ernte-20261120 (pdftotext -layout, Volltextsuche der Sachwertseiten, 20.11.2026, Agent register-ernte)"
+ },
+ {
+  "land_code": "NW",
+  "ags": "05962",
+  "ebene": "kreis",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Lüdenscheid",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Lüdenscheid",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "mfh",
+  "objektart": "mfh",
+  "objektart_bez": "Mehrfamilienhäuser",
+  "berichtsjahr": 2026,
+  "vollstaendig": false,
+  "warum_kein_wert": "Der Grundstücksmarktbericht 2026 des Ausschusses leitet Sachwertfaktoren nur für den individuellen Wohnungsbau ab (im Register: freistehende Ein-/Zweifamilienhäuser, Reihen-/Doppelhäuser). Einen Sachwertfaktor für Mehrfamilienhäuser führt er nicht: am 20.11.2026 alle 6 Seiten des Berichts (73 Seiten), die „Sachwertfaktor“ oder „Marktanpassungsfaktor“ enthalten, auf „Mehrfamilienhaus / Dreifamilienhaus / Mietwohnhaus / Geschosswohnungsbau / Wohn- und Geschäftshaus“ in derselben oder der Nachbarzeile durchsucht — kein Treffer. Mehrfamilienhäuser bewertet der Ausschuss im Ertragswertverfahren (Liegenschaftszinssätze für MFH im Register). WEG: Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_25200_2026.pdf · Geschäftsstelle gutachterausschuss@luedenscheid.de. Kein Nachbarwert und kein Landesmittel (§ 21 Abs. 3 ImmoWertV).",
+  "zugang": "nicht abgeleitet",
+  "zustaendige_stelle": "Der Gutachterausschuss für Grundstückswerte in der Stadt Lüdenscheid, gutachterausschuss@luedenscheid.de",
+  "geltungsbereich": {
+   "objektarten": [
+    "mfh"
+   ],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_25200_2026.pdf · Geschäftsstelle gutachterausschuss@luedenscheid.de"
+  },
+  "belege": [
+   {
+    "art": "fehlstelle",
+    "fundstelle": "Grundstücksmarktbericht 2026, Sachwertkapitel PDF-S. 36, 37, 38, 39, 60 (Seiten mit „Sachwertfaktor“ insgesamt: 5, 36, 37, 38, 39, 60)",
+    "url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_25200_2026.pdf"
+   }
+  ],
+  "fundstelle": "GMB 2026, Sachwertkapitel PDF-S. 36, 37, 38, 39, 60",
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "stichtag": null,
+  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_25200_2026.pdf",
+  "modellversion": "GMB 2026",
+  "quelle_parser": "v-ernte-20261120 (pdftotext -layout, Volltextsuche der Sachwertseiten, 20.11.2026, Agent register-ernte)"
+ },
+ {
+  "land_code": "NW",
+  "ags": "05158",
+  "ebene": "kreis",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Velbert",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte in der Stadt Velbert",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "mfh",
+  "objektart": "mfh",
+  "objektart_bez": "Mehrfamilienhäuser",
+  "berichtsjahr": 2026,
+  "vollstaendig": false,
+  "warum_kein_wert": "Der Grundstücksmarktbericht 2026 des Ausschusses leitet Sachwertfaktoren nur für den individuellen Wohnungsbau ab (im Register: freistehende Ein-/Zweifamilienhäuser, Reihen-/Doppelhäuser, Reihenmittelhäuser). Einen Sachwertfaktor für Mehrfamilienhäuser führt er nicht: am 20.11.2026 alle 10 Seiten des Berichts (87 Seiten), die „Sachwertfaktor“ oder „Marktanpassungsfaktor“ enthalten, auf „Mehrfamilienhaus / Dreifamilienhaus / Mietwohnhaus / Geschosswohnungsbau / Wohn- und Geschäftshaus“ in derselben oder der Nachbarzeile durchsucht — kein Treffer. Mehrfamilienhäuser bewertet der Ausschuss im Ertragswertverfahren (Liegenschaftszinssätze für MFH im Register). WEG: Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_28900_2026.pdf · Geschäftsstelle gutachterausschuss@velbert.de. Kein Nachbarwert und kein Landesmittel (§ 21 Abs. 3 ImmoWertV).",
+  "zugang": "nicht abgeleitet",
+  "zustaendige_stelle": "Der Gutachterausschuss für Grundstückswerte in der Stadt Velbert, gutachterausschuss@velbert.de",
+  "geltungsbereich": {
+   "objektarten": [
+    "mfh"
+   ],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_28900_2026.pdf · Geschäftsstelle gutachterausschuss@velbert.de"
+  },
+  "belege": [
+   {
+    "art": "fehlstelle",
+    "fundstelle": "Grundstücksmarktbericht 2026, Sachwertkapitel PDF-S. 42, 43, 44, 45, 63, 84 (Seiten mit „Sachwertfaktor“ insgesamt: 5, 6, 9, 12, 42, 43, 44, 45, 63, 84)",
+    "url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_28900_2026.pdf"
+   }
+  ],
+  "fundstelle": "GMB 2026, Sachwertkapitel PDF-S. 42, 43, 44, 45, 63, 84",
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "stichtag": null,
+  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_28900_2026.pdf",
+  "modellversion": "GMB 2026",
+  "quelle_parser": "v-ernte-20261120 (pdftotext -layout, Volltextsuche der Sachwertseiten, 20.11.2026, Agent register-ernte)"
+ },
+ {
+  "land_code": "NW",
+  "ags": "05558",
+  "ebene": "kreis",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte im Kreis Coesfeld",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte im Kreis Coesfeld",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "mfh",
+  "objektart": "mfh",
+  "objektart_bez": "Mehrfamilienhäuser",
+  "berichtsjahr": 2026,
+  "vollstaendig": false,
+  "warum_kein_wert": "Der Grundstücksmarktbericht 2026 des Ausschusses leitet Sachwertfaktoren nur für den individuellen Wohnungsbau ab (im Register: freistehende Ein-/Zweifamilienhäuser, Reihen-/Doppelhäuser). Einen Sachwertfaktor für Mehrfamilienhäuser führt er nicht: am 20.11.2026 alle 7 Seiten des Berichts (115 Seiten), die „Sachwertfaktor“ oder „Marktanpassungsfaktor“ enthalten, auf „Mehrfamilienhaus / Dreifamilienhaus / Mietwohnhaus / Geschosswohnungsbau / Wohn- und Geschäftshaus“ in derselben oder der Nachbarzeile durchsucht — kein Treffer. Mehrfamilienhäuser bewertet der Ausschuss im Ertragswertverfahren (Liegenschaftszinssätze für MFH im Register). WEG: Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_30300_2026.pdf · Geschäftsstelle gutachterausschuss@kreis-coesfeld.de. Kein Nachbarwert und kein Landesmittel (§ 21 Abs. 3 ImmoWertV).",
+  "zugang": "nicht abgeleitet",
+  "zustaendige_stelle": "Der Gutachterausschuss für Grundstückswerte im Kreis Coesfeld, gutachterausschuss@kreis-coesfeld.de",
+  "geltungsbereich": {
+   "objektarten": [
+    "mfh"
+   ],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_30300_2026.pdf · Geschäftsstelle gutachterausschuss@kreis-coesfeld.de"
+  },
+  "belege": [
+   {
+    "art": "fehlstelle",
+    "fundstelle": "Grundstücksmarktbericht 2026, Sachwertkapitel PDF-S. 71, 72, 73, 94, 98 (Seiten mit „Sachwertfaktor“ insgesamt: 4, 6, 71, 72, 73, 94, 98)",
+    "url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_30300_2026.pdf"
+   }
+  ],
+  "fundstelle": "GMB 2026, Sachwertkapitel PDF-S. 71, 72, 73, 94, 98",
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "stichtag": null,
+  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_30300_2026.pdf",
+  "modellversion": "GMB 2026",
+  "quelle_parser": "v-ernte-20261120 (pdftotext -layout, Volltextsuche der Sachwertseiten, 20.11.2026, Agent register-ernte)"
+ },
+ {
+  "land_code": "NW",
+  "ags": "05366",
+  "ebene": "kreis",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte im Kreis Euskirchen",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte im Kreis Euskirchen",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "mfh",
+  "objektart": "mfh",
+  "objektart_bez": "Mehrfamilienhäuser",
+  "berichtsjahr": 2026,
+  "vollstaendig": false,
+  "warum_kein_wert": "Der Grundstücksmarktbericht 2026 des Ausschusses leitet Sachwertfaktoren nur für den individuellen Wohnungsbau ab (im Register: freistehende Ein-/Zweifamilienhäuser). Einen Sachwertfaktor für Mehrfamilienhäuser führt er nicht: am 20.11.2026 alle 5 Seiten des Berichts (109 Seiten), die „Sachwertfaktor“ oder „Marktanpassungsfaktor“ enthalten, auf „Mehrfamilienhaus / Dreifamilienhaus / Mietwohnhaus / Geschosswohnungsbau / Wohn- und Geschäftshaus“ in derselben oder der Nachbarzeile durchsucht — kein Treffer. Mehrfamilienhäuser bewertet der Ausschuss im Ertragswertverfahren (Liegenschaftszinssätze für MFH im Register). WEG: Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_30700_2026.pdf · Geschäftsstelle gutachterausschuss@kreis-euskirchen.de. Kein Nachbarwert und kein Landesmittel (§ 21 Abs. 3 ImmoWertV).",
+  "zugang": "nicht abgeleitet",
+  "zustaendige_stelle": "Der Gutachterausschuss für Grundstückswerte im Kreis Euskirchen, gutachterausschuss@kreis-euskirchen.de",
+  "geltungsbereich": {
+   "objektarten": [
+    "mfh"
+   ],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_30700_2026.pdf · Geschäftsstelle gutachterausschuss@kreis-euskirchen.de"
+  },
+  "belege": [
+   {
+    "art": "fehlstelle",
+    "fundstelle": "Grundstücksmarktbericht 2026, Sachwertkapitel PDF-S. 70, 72, 73, 88 (Seiten mit „Sachwertfaktor“ insgesamt: 5, 70, 72, 73, 88)",
+    "url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_30700_2026.pdf"
+   }
+  ],
+  "fundstelle": "GMB 2026, Sachwertkapitel PDF-S. 70, 72, 73, 88",
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "stichtag": null,
+  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_30700_2026.pdf",
+  "modellversion": "GMB 2026",
+  "quelle_parser": "v-ernte-20261120 (pdftotext -layout, Volltextsuche der Sachwertseiten, 20.11.2026, Agent register-ernte)"
+ },
+ {
+  "land_code": "NW",
+  "ags": "05370",
+  "ebene": "kreis",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte im Kreis Heinsberg",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte im Kreis Heinsberg",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "mfh",
+  "objektart": "mfh",
+  "objektart_bez": "Mehrfamilienhäuser",
+  "berichtsjahr": 2026,
+  "vollstaendig": false,
+  "warum_kein_wert": "Der Grundstücksmarktbericht 2026 des Ausschusses leitet Sachwertfaktoren nur für den individuellen Wohnungsbau ab (im Register: freistehende Ein-/Zweifamilienhäuser, Reihen-/Doppelhäuser). Einen Sachwertfaktor für Mehrfamilienhäuser führt er nicht: am 20.11.2026 alle 6 Seiten des Berichts (67 Seiten), die „Sachwertfaktor“ oder „Marktanpassungsfaktor“ enthalten, auf „Mehrfamilienhaus / Dreifamilienhaus / Mietwohnhaus / Geschosswohnungsbau / Wohn- und Geschäftshaus“ in derselben oder der Nachbarzeile durchsucht — kein Treffer. Mehrfamilienhäuser bewertet der Ausschuss im Ertragswertverfahren (Liegenschaftszinssätze für MFH im Register). WEG: Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_30900_2026.pdf · Geschäftsstelle gutachterausschuss@kreis-heinsberg.de. Kein Nachbarwert und kein Landesmittel (§ 21 Abs. 3 ImmoWertV).",
+  "zugang": "nicht abgeleitet",
+  "zustaendige_stelle": "Der Gutachterausschuss für Grundstückswerte im Kreis Heinsberg, gutachterausschuss@kreis-heinsberg.de",
+  "geltungsbereich": {
+   "objektarten": [
+    "mfh"
+   ],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_30900_2026.pdf · Geschäftsstelle gutachterausschuss@kreis-heinsberg.de"
+  },
+  "belege": [
+   {
+    "art": "fehlstelle",
+    "fundstelle": "Grundstücksmarktbericht 2026, Sachwertkapitel PDF-S. 43, 45, 46, 59 (Seiten mit „Sachwertfaktor“ insgesamt: 5, 6, 43, 45, 46, 59)",
+    "url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_30900_2026.pdf"
+   }
+  ],
+  "fundstelle": "GMB 2026, Sachwertkapitel PDF-S. 43, 45, 46, 59",
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "stichtag": null,
+  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_30900_2026.pdf",
+  "modellversion": "GMB 2026",
+  "quelle_parser": "v-ernte-20261120 (pdftotext -layout, Volltextsuche der Sachwertseiten, 20.11.2026, Agent register-ernte)"
+ },
+ {
+  "land_code": "NW",
+  "ags": "05358",
+  "ebene": "kreis",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte im Kreis Düren",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte im Kreis Düren",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "mfh",
+  "objektart": "mfh",
+  "objektart_bez": "Mehrfamilienhäuser",
+  "berichtsjahr": 2026,
+  "vollstaendig": false,
+  "warum_kein_wert": "Der Grundstücksmarktbericht 2026 des Ausschusses leitet Sachwertfaktoren nur für den individuellen Wohnungsbau ab (im Register: freistehende Ein-/Zweifamilienhäuser, Reihen-/Doppelhäuser). Einen Sachwertfaktor für Mehrfamilienhäuser führt er nicht: am 20.11.2026 alle 4 Seiten des Berichts (66 Seiten), die „Sachwertfaktor“ oder „Marktanpassungsfaktor“ enthalten, auf „Mehrfamilienhaus / Dreifamilienhaus / Mietwohnhaus / Geschosswohnungsbau / Wohn- und Geschäftshaus“ in derselben oder der Nachbarzeile durchsucht — kein Treffer. Mehrfamilienhäuser bewertet der Ausschuss im Ertragswertverfahren (Liegenschaftszinssätze für MFH im Register). WEG: Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_30400_2026.pdf · Geschäftsstelle gutachterausschuss@kreis-dueren.de. Kein Nachbarwert und kein Landesmittel (§ 21 Abs. 3 ImmoWertV).",
+  "zugang": "nicht abgeleitet",
+  "zustaendige_stelle": "Der Gutachterausschuss für Grundstückswerte im Kreis Düren, gutachterausschuss@kreis-dueren.de",
+  "geltungsbereich": {
+   "objektarten": [
+    "mfh"
+   ],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_30400_2026.pdf · Geschäftsstelle gutachterausschuss@kreis-dueren.de"
+  },
+  "belege": [
+   {
+    "art": "fehlstelle",
+    "fundstelle": "Grundstücksmarktbericht 2026, Sachwertkapitel PDF-S. 45, 58, 59 (Seiten mit „Sachwertfaktor“ insgesamt: 4, 45, 58, 59)",
+    "url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_30400_2026.pdf"
+   }
+  ],
+  "fundstelle": "GMB 2026, Sachwertkapitel PDF-S. 45, 58, 59",
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "stichtag": null,
+  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_30400_2026.pdf",
+  "modellversion": "GMB 2026",
+  "quelle_parser": "v-ernte-20261120 (pdftotext -layout, Volltextsuche der Sachwertseiten, 20.11.2026, Agent register-ernte)"
+ },
+ {
+  "land_code": "NW",
+  "ags": "05378",
+  "ebene": "kreis",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte im Rheinisch-Bergischen Kreis",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte im Rheinisch-Bergischen Kreis",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "mfh",
+  "objektart": "mfh",
+  "objektart_bez": "Mehrfamilienhäuser",
+  "berichtsjahr": 2026,
+  "vollstaendig": false,
+  "warum_kein_wert": "Der Grundstücksmarktbericht 2026 des Ausschusses leitet Sachwertfaktoren nur für den individuellen Wohnungsbau ab (im Register: ). Einen Sachwertfaktor für Mehrfamilienhäuser führt er nicht: am 20.11.2026 alle 8 Seiten des Berichts (121 Seiten), die „Sachwertfaktor“ oder „Marktanpassungsfaktor“ enthalten, auf „Mehrfamilienhaus / Dreifamilienhaus / Mietwohnhaus / Geschosswohnungsbau / Wohn- und Geschäftshaus“ in derselben oder der Nachbarzeile durchsucht — kein Treffer. Mehrfamilienhäuser bewertet der Ausschuss im Ertragswertverfahren (Liegenschaftszinssätze für MFH im Register). WEG: Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_32300_2026.pdf · Geschäftsstelle gutachterausschuss@rbk-online.de. Kein Nachbarwert und kein Landesmittel (§ 21 Abs. 3 ImmoWertV).",
+  "zugang": "nicht abgeleitet",
+  "zustaendige_stelle": "Der Gutachterausschuss für Grundstückswerte im Rheinisch-Bergischen Kreis, gutachterausschuss@rbk-online.de",
+  "geltungsbereich": {
+   "objektarten": [
+    "mfh"
+   ],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_32300_2026.pdf · Geschäftsstelle gutachterausschuss@rbk-online.de"
+  },
+  "belege": [
+   {
+    "art": "fehlstelle",
+    "fundstelle": "Grundstücksmarktbericht 2026, Sachwertkapitel PDF-S. 70, 71, 72, 74, 78, 103, 116 (Seiten mit „Sachwertfaktor“ insgesamt: 5, 70, 71, 72, 74, 78, 103, 116)",
+    "url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_32300_2026.pdf"
+   }
+  ],
+  "fundstelle": "GMB 2026, Sachwertkapitel PDF-S. 70, 71, 72, 74, 78, 103, 116",
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "stichtag": null,
+  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_32300_2026.pdf",
+  "modellversion": "GMB 2026",
+  "quelle_parser": "v-ernte-20261120 (pdftotext -layout, Volltextsuche der Sachwertseiten, 20.11.2026, Agent register-ernte)"
+ },
+ {
+  "land_code": "NW",
+  "ags": "05958",
+  "ebene": "kreis",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte im Hochsauerlandkreis",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte im Hochsauerlandkreis",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "mfh",
+  "objektart": "mfh",
+  "objektart_bez": "Mehrfamilienhäuser",
+  "berichtsjahr": 2026,
+  "vollstaendig": false,
+  "warum_kein_wert": "Der Grundstücksmarktbericht 2026 des Ausschusses leitet Sachwertfaktoren nur für den individuellen Wohnungsbau ab (im Register: freistehende Ein-/Zweifamilienhäuser, Reihen-/Doppelhäuser). Einen Sachwertfaktor für Mehrfamilienhäuser führt er nicht: am 20.11.2026 alle 8 Seiten des Berichts (148 Seiten), die „Sachwertfaktor“ oder „Marktanpassungsfaktor“ enthalten, auf „Mehrfamilienhaus / Dreifamilienhaus / Mietwohnhaus / Geschosswohnungsbau / Wohn- und Geschäftshaus“ in derselben oder der Nachbarzeile durchsucht — kein Treffer. Mehrfamilienhäuser bewertet der Ausschuss im Ertragswertverfahren (Liegenschaftszinssätze für MFH im Register). WEG: Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_31100_2026.pdf · Geschäftsstelle gutachterausschuss@hochsauerlandkreis.de. Kein Nachbarwert und kein Landesmittel (§ 21 Abs. 3 ImmoWertV).",
+  "zugang": "nicht abgeleitet",
+  "zustaendige_stelle": "Der Gutachterausschuss für Grundstückswerte im Hochsauerlandkreis, gutachterausschuss@hochsauerlandkreis.de",
+  "geltungsbereich": {
+   "objektarten": [
+    "mfh"
+   ],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_31100_2026.pdf · Geschäftsstelle gutachterausschuss@hochsauerlandkreis.de"
+  },
+  "belege": [
+   {
+    "art": "fehlstelle",
+    "fundstelle": "Grundstücksmarktbericht 2026, Sachwertkapitel PDF-S. 64, 65, 66, 107, 111, 112 (Seiten mit „Sachwertfaktor“ insgesamt: 5, 6, 64, 65, 66, 107, 111, 112)",
+    "url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_31100_2026.pdf"
+   }
+  ],
+  "fundstelle": "GMB 2026, Sachwertkapitel PDF-S. 64, 65, 66, 107, 111, 112",
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "stichtag": null,
+  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_31100_2026.pdf",
+  "modellversion": "GMB 2026",
+  "quelle_parser": "v-ernte-20261120 (pdftotext -layout, Volltextsuche der Sachwertseiten, 20.11.2026, Agent register-ernte)"
+ },
+ {
+  "land_code": "NW",
+  "ags": "05166",
+  "ebene": "kreis",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte im Kreis Viersen",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte im Kreis Viersen",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "mfh",
+  "objektart": "mfh",
+  "objektart_bez": "Mehrfamilienhäuser",
+  "berichtsjahr": 2026,
+  "vollstaendig": false,
+  "warum_kein_wert": "Der Grundstücksmarktbericht 2026 des Ausschusses leitet Sachwertfaktoren nur für den individuellen Wohnungsbau ab (im Register: freistehende Ein-/Zweifamilienhäuser, Reihen-/Doppelhäuser, Reihenmittelhäuser). Einen Sachwertfaktor für Mehrfamilienhäuser führt er nicht: am 20.11.2026 alle 7 Seiten des Berichts (76 Seiten), die „Sachwertfaktor“ oder „Marktanpassungsfaktor“ enthalten, auf „Mehrfamilienhaus / Dreifamilienhaus / Mietwohnhaus / Geschosswohnungsbau / Wohn- und Geschäftshaus“ in derselben oder der Nachbarzeile durchsucht — kein Treffer. Mehrfamilienhäuser bewertet der Ausschuss im Ertragswertverfahren (Liegenschaftszinssätze für MFH im Register). WEG: Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_32900_2026.pdf · Geschäftsstelle gutachterausschuss@kreis-viersen.de. Kein Nachbarwert und kein Landesmittel (§ 21 Abs. 3 ImmoWertV).",
+  "zugang": "nicht abgeleitet",
+  "zustaendige_stelle": "Der Gutachterausschuss für Grundstückswerte im Kreis Viersen, gutachterausschuss@kreis-viersen.de",
+  "geltungsbereich": {
+   "objektarten": [
+    "mfh"
+   ],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_32900_2026.pdf · Geschäftsstelle gutachterausschuss@kreis-viersen.de"
+  },
+  "belege": [
+   {
+    "art": "fehlstelle",
+    "fundstelle": "Grundstücksmarktbericht 2026, Sachwertkapitel PDF-S. 49, 50, 52, 53, 65 (Seiten mit „Sachwertfaktor“ insgesamt: 5, 6, 49, 50, 52, 53, 65)",
+    "url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_32900_2026.pdf"
+   }
+  ],
+  "fundstelle": "GMB 2026, Sachwertkapitel PDF-S. 49, 50, 52, 53, 65",
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "stichtag": null,
+  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_32900_2026.pdf",
+  "modellversion": "GMB 2026",
+  "quelle_parser": "v-ernte-20261120 (pdftotext -layout, Volltextsuche der Sachwertseiten, 20.11.2026, Agent register-ernte)"
+ },
+ {
+  "land_code": "NW",
+  "ags": "05374",
+  "ebene": "kreis",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte im Oberbergischen Kreis",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte im Oberbergischen Kreis",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "mfh",
+  "objektart": "mfh",
+  "objektart_bez": "Mehrfamilienhäuser",
+  "berichtsjahr": 2026,
+  "vollstaendig": false,
+  "warum_kein_wert": "Der Grundstücksmarktbericht 2026 des Ausschusses leitet Sachwertfaktoren nur für den individuellen Wohnungsbau ab (im Register: freistehende Ein-/Zweifamilienhäuser, Reihen-/Doppelhäuser). Einen Sachwertfaktor für Mehrfamilienhäuser führt er nicht: am 20.11.2026 alle 9 Seiten des Berichts (124 Seiten), die „Sachwertfaktor“ oder „Marktanpassungsfaktor“ enthalten, auf „Mehrfamilienhaus / Dreifamilienhaus / Mietwohnhaus / Geschosswohnungsbau / Wohn- und Geschäftshaus“ in derselben oder der Nachbarzeile durchsucht — kein Treffer. Mehrfamilienhäuser bewertet der Ausschuss im Ertragswertverfahren (Liegenschaftszinssätze für MFH im Register). WEG: Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_31900_2026.pdf · Geschäftsstelle gutachterausschuss@obk.de. Kein Nachbarwert und kein Landesmittel (§ 21 Abs. 3 ImmoWertV).",
+  "zugang": "nicht abgeleitet",
+  "zustaendige_stelle": "Der Gutachterausschuss für Grundstückswerte im Oberbergischen Kreis, gutachterausschuss@obk.de",
+  "geltungsbereich": {
+   "objektarten": [
+    "mfh"
+   ],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_31900_2026.pdf · Geschäftsstelle gutachterausschuss@obk.de"
+  },
+  "belege": [
+   {
+    "art": "fehlstelle",
+    "fundstelle": "Grundstücksmarktbericht 2026, Sachwertkapitel PDF-S. 81, 82, 83, 86, 88, 89, 106, 119, 122 (Seiten mit „Sachwertfaktor“ insgesamt: 81, 82, 83, 86, 88, 89, 106, 119, 122)",
+    "url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_31900_2026.pdf"
+   }
+  ],
+  "fundstelle": "GMB 2026, Sachwertkapitel PDF-S. 81, 82, 83, 86, 88, 89, 106, 119, 122",
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "stichtag": null,
+  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_31900_2026.pdf",
+  "modellversion": "GMB 2026",
+  "quelle_parser": "v-ernte-20261120 (pdftotext -layout, Volltextsuche der Sachwertseiten, 20.11.2026, Agent register-ernte)"
+ },
+ {
+  "land_code": "NW",
+  "ags": "05570",
+  "ebene": "kreis",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte im Kreis Warendorf",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte im Kreis Warendorf",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "mfh",
+  "objektart": "mfh",
+  "objektart_bez": "Mehrfamilienhäuser",
+  "berichtsjahr": 2026,
+  "vollstaendig": false,
+  "warum_kein_wert": "Der Grundstücksmarktbericht 2026 des Ausschusses leitet Sachwertfaktoren nur für den individuellen Wohnungsbau ab (im Register: freistehende Ein-/Zweifamilienhäuser, Reihen-/Doppelhäuser). Einen Sachwertfaktor für Mehrfamilienhäuser führt er nicht: am 20.11.2026 alle 10 Seiten des Berichts (135 Seiten), die „Sachwertfaktor“ oder „Marktanpassungsfaktor“ enthalten, auf „Mehrfamilienhaus / Dreifamilienhaus / Mietwohnhaus / Geschosswohnungsbau / Wohn- und Geschäftshaus“ in derselben oder der Nachbarzeile durchsucht — kein Treffer. Mehrfamilienhäuser bewertet der Ausschuss im Ertragswertverfahren (Liegenschaftszinssätze für MFH im Register). WEG: Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_33000_2026.pdf · Geschäftsstelle gutachterausschuss@kreis-warendorf.de. Kein Nachbarwert und kein Landesmittel (§ 21 Abs. 3 ImmoWertV).",
+  "zugang": "nicht abgeleitet",
+  "zustaendige_stelle": "Der Gutachterausschuss für Grundstückswerte im Kreis Warendorf, gutachterausschuss@kreis-warendorf.de",
+  "geltungsbereich": {
+   "objektarten": [
+    "mfh"
+   ],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_33000_2026.pdf · Geschäftsstelle gutachterausschuss@kreis-warendorf.de"
+  },
+  "belege": [
+   {
+    "art": "fehlstelle",
+    "fundstelle": "Grundstücksmarktbericht 2026, Sachwertkapitel PDF-S. 80, 81, 82, 83, 84, 85, 86, 117 (Seiten mit „Sachwertfaktor“ insgesamt: 6, 7, 80, 81, 82, 83, 84, 85, 86, 117)",
+    "url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_33000_2026.pdf"
+   }
+  ],
+  "fundstelle": "GMB 2026, Sachwertkapitel PDF-S. 80, 81, 82, 83, 84, 85, 86, 117",
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "stichtag": null,
+  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_33000_2026.pdf",
+  "modellversion": "GMB 2026",
+  "quelle_parser": "v-ernte-20261120 (pdftotext -layout, Volltextsuche der Sachwertseiten, 20.11.2026, Agent register-ernte)"
+ },
+ {
+  "land_code": "NW",
+  "ags": "05974",
+  "ebene": "kreis",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte im Kreis Soest",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte im Kreis Soest",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "mfh",
+  "objektart": "mfh",
+  "objektart_bez": "Mehrfamilienhäuser",
+  "berichtsjahr": 2026,
+  "vollstaendig": false,
+  "warum_kein_wert": "Der Grundstücksmarktbericht 2026 des Ausschusses leitet Sachwertfaktoren nur für den individuellen Wohnungsbau ab (im Register: freistehende Ein-/Zweifamilienhäuser, Reihen-/Doppelhäuser). Einen Sachwertfaktor für Mehrfamilienhäuser führt er nicht: am 20.11.2026 alle 12 Seiten des Berichts (187 Seiten), die „Sachwertfaktor“ oder „Marktanpassungsfaktor“ enthalten, auf „Mehrfamilienhaus / Dreifamilienhaus / Mietwohnhaus / Geschosswohnungsbau / Wohn- und Geschäftshaus“ in derselben oder der Nachbarzeile durchsucht — kein Treffer. Mehrfamilienhäuser bewertet der Ausschuss im Ertragswertverfahren (Liegenschaftszinssätze für MFH im Register). WEG: Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_32600_2026.pdf · Geschäftsstelle gutachterausschuss@kreis-soest.de. Kein Nachbarwert und kein Landesmittel (§ 21 Abs. 3 ImmoWertV).",
+  "zugang": "nicht abgeleitet",
+  "zustaendige_stelle": "Der Gutachterausschuss für Grundstückswerte im Kreis Soest, gutachterausschuss@kreis-soest.de",
+  "geltungsbereich": {
+   "objektarten": [
+    "mfh"
+   ],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Grundstücksmarktbericht 2026 über BORIS-NRW bzw. gars.nrw (gebührenfrei): https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_32600_2026.pdf · Geschäftsstelle gutachterausschuss@kreis-soest.de"
+  },
+  "belege": [
+   {
+    "art": "fehlstelle",
+    "fundstelle": "Grundstücksmarktbericht 2026, Sachwertkapitel PDF-S. 53, 54, 56, 59, 60, 62, 120, 131, 142, 151, 162, 182 (Seiten mit „Sachwertfaktor“ insgesamt: 53, 54, 56, 59, 60, 62, 120, 131, 142, 151, 162, 182)",
+    "url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_32600_2026.pdf"
+   }
+  ],
+  "fundstelle": "GMB 2026, Sachwertkapitel PDF-S. 53, 54, 56, 59, 60, 62, 120, 131, 142, 151, 162, 182",
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "stichtag": null,
+  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_32600_2026.pdf",
+  "modellversion": "GMB 2026",
+  "quelle_parser": "v-ernte-20261120 (pdftotext -layout, Volltextsuche der Sachwertseiten, 20.11.2026, Agent register-ernte)"
+ }
+]

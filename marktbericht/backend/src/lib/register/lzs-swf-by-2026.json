@@ -62,7 +62,7 @@
   "gaa_name": "Gutachterausschuss für Grundstückswerte im Bereich des Landkreises Freyung-Grafenau",
   "kennzahl": "liegenschaftszinssatz",
   "zweig": "ezfh",
-  "zugang": null,
+  "zugang": "nicht veröffentlicht",
   "zugang_beleg": null,
   "bestell_url": null,
   "gebuehr": null,
@@ -105,7 +105,8 @@
   "auflagen": [],
   "vollstaendig": false,
   "unvollstaendig_grund": "Der Gutachterausschuss Freyung-Grafenau hat dem Oberen Gutachterausschuss für 2023–2025 KEINE Liegenschaftszinssätze gemeldet (Landesbericht 2026, S. 198: Spalte leer). Ob das kostenpflichtige Heft „Sonstige für die Wertermittlung erforderlichen Daten 2024\" (20 €) welche enthält, ist nicht frei einsehbar. Weg: Bestellung schriftlich bei der Geschäftsstelle (gutachterausschuss@landkreis-frg.de, Fax 08551 57-4501, Tel. 08551 57-2702), Gebühr 20 € je Heft „Sachwertfaktoren\" bzw. „Sonstige für die Wertermittlung erforderlichen Daten\", Immobilienmarktbericht 30 €.",
-  "warum_kein_wert": "GEMESSEN AM 27.10.2026: Freyung-Grafenau stand bis heute mit KEINEM Satz im Register. Landesbericht 2026, Kap. 11, S. 198, Zeile „Freyung-Grafenau\": Sachwertfaktoren ✓, Liegenschaftszinssätze leer (am Seitenbild gelesen). Die BORIS-Bayern-Erläuterung 2026 nennt keinen Zinssatz. Kein freier Wert, also kein Wert. Bestellung schriftlich bei der Geschäftsstelle (gutachterausschuss@landkreis-frg.de, Fax 08551 57-4501, Tel. 08551 57-2702), Gebühr 20 € je Heft „Sachwertfaktoren\" bzw. „Sonstige für die Wertermittlung erforderlichen Daten\", Immobilienmarktbericht 30 €. KEIN Nachbarwert und kein Landesmittel: § 21 ImmoWertV verlangt den örtlichen Wert des zuständigen Ausschusses; einen Wert eines anderen Kreises zu übertragen wäre eine erfundene Herkunft."
+  "warum_kein_wert": "GEMESSEN AM 27.10.2026: Freyung-Grafenau stand bis heute mit KEINEM Satz im Register. Landesbericht 2026, Kap. 11, S. 198, Zeile „Freyung-Grafenau\": Sachwertfaktoren ✓, Liegenschaftszinssätze leer (am Seitenbild gelesen). Die BORIS-Bayern-Erläuterung 2026 nennt keinen Zinssatz. Kein freier Wert, also kein Wert. Bestellung schriftlich bei der Geschäftsstelle (gutachterausschuss@landkreis-frg.de, Fax 08551 57-4501, Tel. 08551 57-2702), Gebühr 20 € je Heft „Sachwertfaktoren\" bzw. „Sonstige für die Wertermittlung erforderlichen Daten\", Immobilienmarktbericht 30 €. KEIN Nachbarwert und kein Landesmittel: § 21 ImmoWertV verlangt den örtlichen Wert des zuständigen Ausschusses; einen Wert eines anderen Kreises zu übertragen wäre eine erfundene Herkunft.",
+  "zugang_herkunft": "gesetzt am 20.11.2026 aus dem Wortlaut dieses Satzes (unvollstaendig_grund), Pflichtfeld seit 28.10.2026"
  },
  {
   "land_code": "BY",
@@ -116,7 +117,7 @@
   "gaa_name": "Gutachterausschuss für Grundstückswerte im Bereich des Landkreises Freyung-Grafenau",
   "kennzahl": "sachwertfaktor",
   "zweig": "rhdhh",
-  "zugang": null,
+  "zugang": "nicht abgeleitet",
   "zugang_beleg": null,
   "bestell_url": null,
   "gebuehr": null,
@@ -159,7 +160,8 @@
   "auflagen": [],
   "vollstaendig": false,
   "unvollstaendig_grund": "Für Reihenhäuser und Doppelhaushälften nennt der Ausschuss keine Sachwertfaktoren — seine Seite führt sie ausdrücklich nur „für freistehende Ein- und Zweifamilienhäuser\". Weg: Anfrage bei der Geschäftsstelle (gutachterausschuss@landkreis-frg.de).",
-  "warum_kein_wert": "GEMESSEN AM 27.10.2026: der Ausschuss führt Sachwertfaktoren nur für freistehende Ein- und Zweifamilienhäuser (Webseite „Sachwertfaktoren\"); für Reihenhäuser und Doppelhaushälften ist keiner veröffentlicht oder angeboten. Freyung-Grafenau stand bis heute mit keinem Satz im Register. KEIN Nachbarwert und kein Landesmittel: § 21 ImmoWertV verlangt den örtlichen Wert des zuständigen Ausschusses; einen Wert eines anderen Kreises zu übertragen wäre eine erfundene Herkunft."
+  "warum_kein_wert": "GEMESSEN AM 27.10.2026: der Ausschuss führt Sachwertfaktoren nur für freistehende Ein- und Zweifamilienhäuser (Webseite „Sachwertfaktoren\"); für Reihenhäuser und Doppelhaushälften ist keiner veröffentlicht oder angeboten. Freyung-Grafenau stand bis heute mit keinem Satz im Register. KEIN Nachbarwert und kein Landesmittel: § 21 ImmoWertV verlangt den örtlichen Wert des zuständigen Ausschusses; einen Wert eines anderen Kreises zu übertragen wäre eine erfundene Herkunft.",
+  "zugang_herkunft": "gesetzt am 20.11.2026 aus dem Wortlaut dieses Satzes (unvollstaendig_grund), Pflichtfeld seit 28.10.2026"
  },
  {
   "land_code": "BY",
@@ -170,7 +172,7 @@
   "gaa_name": "Gutachterausschuss für Grundstückswerte im Bereich des Landkreises Freyung-Grafenau",
   "kennzahl": "liegenschaftszinssatz",
   "zweig": "rhdhh",
-  "zugang": null,
+  "zugang": "nicht veröffentlicht",
   "zugang_beleg": null,
   "bestell_url": null,
   "gebuehr": null,
@@ -213,7 +215,8 @@
   "auflagen": [],
   "vollstaendig": false,
   "unvollstaendig_grund": "Der Gutachterausschuss Freyung-Grafenau hat dem Oberen Gutachterausschuss für 2023–2025 KEINE Liegenschaftszinssätze gemeldet (Landesbericht 2026, S. 198: Spalte leer). Ob das kostenpflichtige Heft „Sonstige für die Wertermittlung erforderlichen Daten 2024\" (20 €) welche enthält, ist nicht frei einsehbar. Weg: Bestellung schriftlich bei der Geschäftsstelle (gutachterausschuss@landkreis-frg.de, Fax 08551 57-4501, Tel. 08551 57-2702), Gebühr 20 € je Heft „Sachwertfaktoren\" bzw. „Sonstige für die Wertermittlung erforderlichen Daten\", Immobilienmarktbericht 30 €.",
-  "warum_kein_wert": "GEMESSEN AM 27.10.2026: Freyung-Grafenau stand bis heute mit KEINEM Satz im Register. Landesbericht 2026, Kap. 11, S. 198, Zeile „Freyung-Grafenau\": Sachwertfaktoren ✓, Liegenschaftszinssätze leer (am Seitenbild gelesen). Die BORIS-Bayern-Erläuterung 2026 nennt keinen Zinssatz. Kein freier Wert, also kein Wert. Bestellung schriftlich bei der Geschäftsstelle (gutachterausschuss@landkreis-frg.de, Fax 08551 57-4501, Tel. 08551 57-2702), Gebühr 20 € je Heft „Sachwertfaktoren\" bzw. „Sonstige für die Wertermittlung erforderlichen Daten\", Immobilienmarktbericht 30 €. KEIN Nachbarwert und kein Landesmittel: § 21 ImmoWertV verlangt den örtlichen Wert des zuständigen Ausschusses; einen Wert eines anderen Kreises zu übertragen wäre eine erfundene Herkunft."
+  "warum_kein_wert": "GEMESSEN AM 27.10.2026: Freyung-Grafenau stand bis heute mit KEINEM Satz im Register. Landesbericht 2026, Kap. 11, S. 198, Zeile „Freyung-Grafenau\": Sachwertfaktoren ✓, Liegenschaftszinssätze leer (am Seitenbild gelesen). Die BORIS-Bayern-Erläuterung 2026 nennt keinen Zinssatz. Kein freier Wert, also kein Wert. Bestellung schriftlich bei der Geschäftsstelle (gutachterausschuss@landkreis-frg.de, Fax 08551 57-4501, Tel. 08551 57-2702), Gebühr 20 € je Heft „Sachwertfaktoren\" bzw. „Sonstige für die Wertermittlung erforderlichen Daten\", Immobilienmarktbericht 30 €. KEIN Nachbarwert und kein Landesmittel: § 21 ImmoWertV verlangt den örtlichen Wert des zuständigen Ausschusses; einen Wert eines anderen Kreises zu übertragen wäre eine erfundene Herkunft.",
+  "zugang_herkunft": "gesetzt am 20.11.2026 aus dem Wortlaut dieses Satzes (unvollstaendig_grund), Pflichtfeld seit 28.10.2026"
  },
  {
   "land_code": "BY",
@@ -224,7 +227,7 @@
   "gaa_name": "Gutachterausschuss für Grundstückswerte im Bereich des Landkreises Freyung-Grafenau",
   "kennzahl": "sachwertfaktor",
   "zweig": "etw",
-  "zugang": null,
+  "zugang": "nicht abgeleitet",
   "zugang_beleg": null,
   "bestell_url": null,
   "gebuehr": null,
@@ -267,7 +270,8 @@
   "auflagen": [],
   "vollstaendig": false,
   "unvollstaendig_grund": "Für Eigentumswohnungen nennt der Ausschuss keine Sachwertfaktoren — seine Seite führt sie ausdrücklich nur „für freistehende Ein- und Zweifamilienhäuser\". Weg: Anfrage bei der Geschäftsstelle (gutachterausschuss@landkreis-frg.de).",
-  "warum_kein_wert": "GEMESSEN AM 27.10.2026: der Ausschuss führt Sachwertfaktoren nur für freistehende Ein- und Zweifamilienhäuser (Webseite „Sachwertfaktoren\"); für Eigentumswohnungen ist keiner veröffentlicht oder angeboten. Freyung-Grafenau stand bis heute mit keinem Satz im Register. KEIN Nachbarwert und kein Landesmittel: § 21 ImmoWertV verlangt den örtlichen Wert des zuständigen Ausschusses; einen Wert eines anderen Kreises zu übertragen wäre eine erfundene Herkunft."
+  "warum_kein_wert": "GEMESSEN AM 27.10.2026: der Ausschuss führt Sachwertfaktoren nur für freistehende Ein- und Zweifamilienhäuser (Webseite „Sachwertfaktoren\"); für Eigentumswohnungen ist keiner veröffentlicht oder angeboten. Freyung-Grafenau stand bis heute mit keinem Satz im Register. KEIN Nachbarwert und kein Landesmittel: § 21 ImmoWertV verlangt den örtlichen Wert des zuständigen Ausschusses; einen Wert eines anderen Kreises zu übertragen wäre eine erfundene Herkunft.",
+  "zugang_herkunft": "gesetzt am 20.11.2026 aus dem Wortlaut dieses Satzes (unvollstaendig_grund), Pflichtfeld seit 28.10.2026"
  },
  {
   "land_code": "BY",
@@ -278,7 +282,7 @@
   "gaa_name": "Gutachterausschuss für Grundstückswerte im Bereich des Landkreises Freyung-Grafenau",
   "kennzahl": "liegenschaftszinssatz",
   "zweig": "etw",
-  "zugang": null,
+  "zugang": "nicht veröffentlicht",
   "zugang_beleg": null,
   "bestell_url": null,
   "gebuehr": null,
@@ -321,7 +325,8 @@
   "auflagen": [],
   "vollstaendig": false,
   "unvollstaendig_grund": "Der Gutachterausschuss Freyung-Grafenau hat dem Oberen Gutachterausschuss für 2023–2025 KEINE Liegenschaftszinssätze gemeldet (Landesbericht 2026, S. 198: Spalte leer). Ob das kostenpflichtige Heft „Sonstige für die Wertermittlung erforderlichen Daten 2024\" (20 €) welche enthält, ist nicht frei einsehbar. Weg: Bestellung schriftlich bei der Geschäftsstelle (gutachterausschuss@landkreis-frg.de, Fax 08551 57-4501, Tel. 08551 57-2702), Gebühr 20 € je Heft „Sachwertfaktoren\" bzw. „Sonstige für die Wertermittlung erforderlichen Daten\", Immobilienmarktbericht 30 €.",
-  "warum_kein_wert": "GEMESSEN AM 27.10.2026: Freyung-Grafenau stand bis heute mit KEINEM Satz im Register. Landesbericht 2026, Kap. 11, S. 198, Zeile „Freyung-Grafenau\": Sachwertfaktoren ✓, Liegenschaftszinssätze leer (am Seitenbild gelesen). Die BORIS-Bayern-Erläuterung 2026 nennt keinen Zinssatz. Kein freier Wert, also kein Wert. Bestellung schriftlich bei der Geschäftsstelle (gutachterausschuss@landkreis-frg.de, Fax 08551 57-4501, Tel. 08551 57-2702), Gebühr 20 € je Heft „Sachwertfaktoren\" bzw. „Sonstige für die Wertermittlung erforderlichen Daten\", Immobilienmarktbericht 30 €. KEIN Nachbarwert und kein Landesmittel: § 21 ImmoWertV verlangt den örtlichen Wert des zuständigen Ausschusses; einen Wert eines anderen Kreises zu übertragen wäre eine erfundene Herkunft."
+  "warum_kein_wert": "GEMESSEN AM 27.10.2026: Freyung-Grafenau stand bis heute mit KEINEM Satz im Register. Landesbericht 2026, Kap. 11, S. 198, Zeile „Freyung-Grafenau\": Sachwertfaktoren ✓, Liegenschaftszinssätze leer (am Seitenbild gelesen). Die BORIS-Bayern-Erläuterung 2026 nennt keinen Zinssatz. Kein freier Wert, also kein Wert. Bestellung schriftlich bei der Geschäftsstelle (gutachterausschuss@landkreis-frg.de, Fax 08551 57-4501, Tel. 08551 57-2702), Gebühr 20 € je Heft „Sachwertfaktoren\" bzw. „Sonstige für die Wertermittlung erforderlichen Daten\", Immobilienmarktbericht 30 €. KEIN Nachbarwert und kein Landesmittel: § 21 ImmoWertV verlangt den örtlichen Wert des zuständigen Ausschusses; einen Wert eines anderen Kreises zu übertragen wäre eine erfundene Herkunft.",
+  "zugang_herkunft": "gesetzt am 20.11.2026 aus dem Wortlaut dieses Satzes (unvollstaendig_grund), Pflichtfeld seit 28.10.2026"
  },
  {
   "land_code": "BY",
@@ -332,7 +337,7 @@
   "gaa_name": "Gutachterausschuss für Grundstückswerte im Bereich des Landkreises Freyung-Grafenau",
   "kennzahl": "sachwertfaktor",
   "zweig": "mfh",
-  "zugang": null,
+  "zugang": "nicht abgeleitet",
   "zugang_beleg": null,
   "bestell_url": null,
   "gebuehr": null,
@@ -375,7 +380,8 @@
   "auflagen": [],
   "vollstaendig": false,
   "unvollstaendig_grund": "Für Mehrfamilienhäuser nennt der Ausschuss keine Sachwertfaktoren — seine Seite führt sie ausdrücklich nur „für freistehende Ein- und Zweifamilienhäuser\". Weg: Anfrage bei der Geschäftsstelle (gutachterausschuss@landkreis-frg.de).",
-  "warum_kein_wert": "GEMESSEN AM 27.10.2026: der Ausschuss führt Sachwertfaktoren nur für freistehende Ein- und Zweifamilienhäuser (Webseite „Sachwertfaktoren\"); für Mehrfamilienhäuser ist keiner veröffentlicht oder angeboten. Freyung-Grafenau stand bis heute mit keinem Satz im Register. KEIN Nachbarwert und kein Landesmittel: § 21 ImmoWertV verlangt den örtlichen Wert des zuständigen Ausschusses; einen Wert eines anderen Kreises zu übertragen wäre eine erfundene Herkunft."
+  "warum_kein_wert": "GEMESSEN AM 27.10.2026: der Ausschuss führt Sachwertfaktoren nur für freistehende Ein- und Zweifamilienhäuser (Webseite „Sachwertfaktoren\"); für Mehrfamilienhäuser ist keiner veröffentlicht oder angeboten. Freyung-Grafenau stand bis heute mit keinem Satz im Register. KEIN Nachbarwert und kein Landesmittel: § 21 ImmoWertV verlangt den örtlichen Wert des zuständigen Ausschusses; einen Wert eines anderen Kreises zu übertragen wäre eine erfundene Herkunft.",
+  "zugang_herkunft": "gesetzt am 20.11.2026 aus dem Wortlaut dieses Satzes (unvollstaendig_grund), Pflichtfeld seit 28.10.2026"
  },
  {
   "land_code": "BY",
@@ -386,7 +392,7 @@
   "gaa_name": "Gutachterausschuss für Grundstückswerte im Bereich des Landkreises Freyung-Grafenau",
   "kennzahl": "liegenschaftszinssatz",
   "zweig": "mfh",
-  "zugang": null,
+  "zugang": "nicht veröffentlicht",
   "zugang_beleg": null,
   "bestell_url": null,
   "gebuehr": null,
@@ -429,7 +435,8 @@
   "auflagen": [],
   "vollstaendig": false,
   "unvollstaendig_grund": "Der Gutachterausschuss Freyung-Grafenau hat dem Oberen Gutachterausschuss für 2023–2025 KEINE Liegenschaftszinssätze gemeldet (Landesbericht 2026, S. 198: Spalte leer). Ob das kostenpflichtige Heft „Sonstige für die Wertermittlung erforderlichen Daten 2024\" (20 €) welche enthält, ist nicht frei einsehbar. Weg: Bestellung schriftlich bei der Geschäftsstelle (gutachterausschuss@landkreis-frg.de, Fax 08551 57-4501, Tel. 08551 57-2702), Gebühr 20 € je Heft „Sachwertfaktoren\" bzw. „Sonstige für die Wertermittlung erforderlichen Daten\", Immobilienmarktbericht 30 €.",
-  "warum_kein_wert": "GEMESSEN AM 27.10.2026: Freyung-Grafenau stand bis heute mit KEINEM Satz im Register. Landesbericht 2026, Kap. 11, S. 198, Zeile „Freyung-Grafenau\": Sachwertfaktoren ✓, Liegenschaftszinssätze leer (am Seitenbild gelesen). Die BORIS-Bayern-Erläuterung 2026 nennt keinen Zinssatz. Kein freier Wert, also kein Wert. Bestellung schriftlich bei der Geschäftsstelle (gutachterausschuss@landkreis-frg.de, Fax 08551 57-4501, Tel. 08551 57-2702), Gebühr 20 € je Heft „Sachwertfaktoren\" bzw. „Sonstige für die Wertermittlung erforderlichen Daten\", Immobilienmarktbericht 30 €. KEIN Nachbarwert und kein Landesmittel: § 21 ImmoWertV verlangt den örtlichen Wert des zuständigen Ausschusses; einen Wert eines anderen Kreises zu übertragen wäre eine erfundene Herkunft."
+  "warum_kein_wert": "GEMESSEN AM 27.10.2026: Freyung-Grafenau stand bis heute mit KEINEM Satz im Register. Landesbericht 2026, Kap. 11, S. 198, Zeile „Freyung-Grafenau\": Sachwertfaktoren ✓, Liegenschaftszinssätze leer (am Seitenbild gelesen). Die BORIS-Bayern-Erläuterung 2026 nennt keinen Zinssatz. Kein freier Wert, also kein Wert. Bestellung schriftlich bei der Geschäftsstelle (gutachterausschuss@landkreis-frg.de, Fax 08551 57-4501, Tel. 08551 57-2702), Gebühr 20 € je Heft „Sachwertfaktoren\" bzw. „Sonstige für die Wertermittlung erforderlichen Daten\", Immobilienmarktbericht 30 €. KEIN Nachbarwert und kein Landesmittel: § 21 ImmoWertV verlangt den örtlichen Wert des zuständigen Ausschusses; einen Wert eines anderen Kreises zu übertragen wäre eine erfundene Herkunft.",
+  "zugang_herkunft": "gesetzt am 20.11.2026 aus dem Wortlaut dieses Satzes (unvollstaendig_grund), Pflichtfeld seit 28.10.2026"
  },
  {
   "land_code": "BY",
@@ -501,7 +508,7 @@
   "gaa_name": "Gutachterausschuss für Grundstückswerte im Bereich des Landkreises Neustadt a.d.Aisch-Bad Windsheim",
   "kennzahl": "liegenschaftszinssatz",
   "zweig": "ezfh",
-  "zugang": null,
+  "zugang": "nicht abgeleitet",
   "zugang_beleg": null,
   "bestell_url": null,
   "gebuehr": null,
@@ -544,7 +551,8 @@
   "auflagen": [],
   "vollstaendig": false,
   "unvollstaendig_grund": "Der Gutachterausschuss Neustadt a.d.Aisch-Bad Windsheim leitet derzeit KEINE Liegenschaftszinssätze ab — amtlich so gesagt: „Liegenschaftszinsen, Umrechnungsfaktoren und der Regionalfaktor [sind] aktuell noch nicht verfügbar\" (Bestellseite des Landratsamts), und der Landesbericht 2026 (S. 199) führt die Spalte leer. Weg: Anfrage bei gutachterausschuss@kreis-nea.de, ob inzwischen welche vorliegen.",
-  "warum_kein_wert": "GEMESSEN AM 27.10.2026: kein Wert, weil keiner existiert — nicht weil er gesperrt wäre. Bestellseite des Landratsamts: „Liegenschaftszinsen, Umrechnungsfaktoren und der Regionalfaktor [sind] aktuell noch nicht verfügbar\". Landesbericht 2026, Kap. 11, S. 199: Spalte Liegenschaftszinssätze leer (am Seitenbild gelesen). Der Kreis stand bis heute mit keinem Satz im Register. KEIN Nachbarwert und kein Landesmittel: § 21 ImmoWertV verlangt den örtlichen Wert des zuständigen Ausschusses; einen Wert eines anderen Kreises zu übertragen wäre eine erfundene Herkunft."
+  "warum_kein_wert": "GEMESSEN AM 27.10.2026: kein Wert, weil keiner existiert — nicht weil er gesperrt wäre. Bestellseite des Landratsamts: „Liegenschaftszinsen, Umrechnungsfaktoren und der Regionalfaktor [sind] aktuell noch nicht verfügbar\". Landesbericht 2026, Kap. 11, S. 199: Spalte Liegenschaftszinssätze leer (am Seitenbild gelesen). Der Kreis stand bis heute mit keinem Satz im Register. KEIN Nachbarwert und kein Landesmittel: § 21 ImmoWertV verlangt den örtlichen Wert des zuständigen Ausschusses; einen Wert eines anderen Kreises zu übertragen wäre eine erfundene Herkunft.",
+  "zugang_herkunft": "gesetzt am 20.11.2026 aus dem Wortlaut dieses Satzes (unvollstaendig_grund), Pflichtfeld seit 28.10.2026"
  },
  {
   "land_code": "BY",
@@ -555,7 +563,7 @@
   "gaa_name": "Gutachterausschuss für Grundstückswerte im Bereich des Landkreises Neustadt a.d.Aisch-Bad Windsheim",
   "kennzahl": "sachwertfaktor",
   "zweig": "rhdhh",
-  "zugang": null,
+  "zugang": "nicht abgeleitet",
   "zugang_beleg": null,
   "bestell_url": null,
   "gebuehr": null,
@@ -605,7 +613,8 @@
   "auflagen": [],
   "vollstaendig": false,
   "unvollstaendig_grund": "Für Reihenhäuser und Doppelhaushälften nennt die Bestellseite keine Sachwertfaktoren — nur für Ein- und Zweifamilienhäuser. Weg: Anfrage bei gutachterausschuss@kreis-nea.de.",
-  "warum_kein_wert": "GEMESSEN AM 27.10.2026: der Ausschuss führt Sachwertfaktoren laut Bestellseite nur für Ein- und Zweifamilienhäuser; für Reihenhäuser und Doppelhaushälften ist keiner veröffentlicht. Der Kreis stand bis heute mit keinem Satz im Register. KEIN Nachbarwert und kein Landesmittel: § 21 ImmoWertV verlangt den örtlichen Wert des zuständigen Ausschusses; einen Wert eines anderen Kreises zu übertragen wäre eine erfundene Herkunft."
+  "warum_kein_wert": "GEMESSEN AM 27.10.2026: der Ausschuss führt Sachwertfaktoren laut Bestellseite nur für Ein- und Zweifamilienhäuser; für Reihenhäuser und Doppelhaushälften ist keiner veröffentlicht. Der Kreis stand bis heute mit keinem Satz im Register. KEIN Nachbarwert und kein Landesmittel: § 21 ImmoWertV verlangt den örtlichen Wert des zuständigen Ausschusses; einen Wert eines anderen Kreises zu übertragen wäre eine erfundene Herkunft.",
+  "zugang_herkunft": "gesetzt am 20.11.2026 aus dem Wortlaut dieses Satzes (unvollstaendig_grund), Pflichtfeld seit 28.10.2026"
  },
  {
   "land_code": "BY",
@@ -616,7 +625,7 @@
   "gaa_name": "Gutachterausschuss für Grundstückswerte im Bereich des Landkreises Neustadt a.d.Aisch-Bad Windsheim",
   "kennzahl": "liegenschaftszinssatz",
   "zweig": "rhdhh",
-  "zugang": null,
+  "zugang": "nicht abgeleitet",
   "zugang_beleg": null,
   "bestell_url": null,
   "gebuehr": null,
@@ -659,7 +668,8 @@
   "auflagen": [],
   "vollstaendig": false,
   "unvollstaendig_grund": "Der Gutachterausschuss Neustadt a.d.Aisch-Bad Windsheim leitet derzeit KEINE Liegenschaftszinssätze ab — amtlich so gesagt: „Liegenschaftszinsen, Umrechnungsfaktoren und der Regionalfaktor [sind] aktuell noch nicht verfügbar\" (Bestellseite des Landratsamts), und der Landesbericht 2026 (S. 199) führt die Spalte leer. Weg: Anfrage bei gutachterausschuss@kreis-nea.de, ob inzwischen welche vorliegen.",
-  "warum_kein_wert": "GEMESSEN AM 27.10.2026: kein Wert, weil keiner existiert — nicht weil er gesperrt wäre. Bestellseite des Landratsamts: „Liegenschaftszinsen, Umrechnungsfaktoren und der Regionalfaktor [sind] aktuell noch nicht verfügbar\". Landesbericht 2026, Kap. 11, S. 199: Spalte Liegenschaftszinssätze leer (am Seitenbild gelesen). Der Kreis stand bis heute mit keinem Satz im Register. KEIN Nachbarwert und kein Landesmittel: § 21 ImmoWertV verlangt den örtlichen Wert des zuständigen Ausschusses; einen Wert eines anderen Kreises zu übertragen wäre eine erfundene Herkunft."
+  "warum_kein_wert": "GEMESSEN AM 27.10.2026: kein Wert, weil keiner existiert — nicht weil er gesperrt wäre. Bestellseite des Landratsamts: „Liegenschaftszinsen, Umrechnungsfaktoren und der Regionalfaktor [sind] aktuell noch nicht verfügbar\". Landesbericht 2026, Kap. 11, S. 199: Spalte Liegenschaftszinssätze leer (am Seitenbild gelesen). Der Kreis stand bis heute mit keinem Satz im Register. KEIN Nachbarwert und kein Landesmittel: § 21 ImmoWertV verlangt den örtlichen Wert des zuständigen Ausschusses; einen Wert eines anderen Kreises zu übertragen wäre eine erfundene Herkunft.",
+  "zugang_herkunft": "gesetzt am 20.11.2026 aus dem Wortlaut dieses Satzes (unvollstaendig_grund), Pflichtfeld seit 28.10.2026"
  },
  {
   "land_code": "BY",
@@ -670,7 +680,7 @@
   "gaa_name": "Gutachterausschuss für Grundstückswerte im Bereich des Landkreises Neustadt a.d.Aisch-Bad Windsheim",
   "kennzahl": "sachwertfaktor",
   "zweig": "etw",
-  "zugang": null,
+  "zugang": "nicht abgeleitet",
   "zugang_beleg": null,
   "bestell_url": null,
   "gebuehr": null,
@@ -720,7 +730,8 @@
   "auflagen": [],
   "vollstaendig": false,
   "unvollstaendig_grund": "Für Eigentumswohnungen nennt die Bestellseite keine Sachwertfaktoren — nur für Ein- und Zweifamilienhäuser. Weg: Anfrage bei gutachterausschuss@kreis-nea.de.",
-  "warum_kein_wert": "GEMESSEN AM 27.10.2026: der Ausschuss führt Sachwertfaktoren laut Bestellseite nur für Ein- und Zweifamilienhäuser; für Eigentumswohnungen ist keiner veröffentlicht. Der Kreis stand bis heute mit keinem Satz im Register. KEIN Nachbarwert und kein Landesmittel: § 21 ImmoWertV verlangt den örtlichen Wert des zuständigen Ausschusses; einen Wert eines anderen Kreises zu übertragen wäre eine erfundene Herkunft."
+  "warum_kein_wert": "GEMESSEN AM 27.10.2026: der Ausschuss führt Sachwertfaktoren laut Bestellseite nur für Ein- und Zweifamilienhäuser; für Eigentumswohnungen ist keiner veröffentlicht. Der Kreis stand bis heute mit keinem Satz im Register. KEIN Nachbarwert und kein Landesmittel: § 21 ImmoWertV verlangt den örtlichen Wert des zuständigen Ausschusses; einen Wert eines anderen Kreises zu übertragen wäre eine erfundene Herkunft.",
+  "zugang_herkunft": "gesetzt am 20.11.2026 aus dem Wortlaut dieses Satzes (unvollstaendig_grund), Pflichtfeld seit 28.10.2026"
  },
  {
   "land_code": "BY",
@@ -731,7 +742,7 @@
   "gaa_name": "Gutachterausschuss für Grundstückswerte im Bereich des Landkreises Neustadt a.d.Aisch-Bad Windsheim",
   "kennzahl": "liegenschaftszinssatz",
   "zweig": "etw",
-  "zugang": null,
+  "zugang": "nicht abgeleitet",
   "zugang_beleg": null,
   "bestell_url": null,
   "gebuehr": null,
@@ -774,7 +785,8 @@
   "auflagen": [],
   "vollstaendig": false,
   "unvollstaendig_grund": "Der Gutachterausschuss Neustadt a.d.Aisch-Bad Windsheim leitet derzeit KEINE Liegenschaftszinssätze ab — amtlich so gesagt: „Liegenschaftszinsen, Umrechnungsfaktoren und der Regionalfaktor [sind] aktuell noch nicht verfügbar\" (Bestellseite des Landratsamts), und der Landesbericht 2026 (S. 199) führt die Spalte leer. Weg: Anfrage bei gutachterausschuss@kreis-nea.de, ob inzwischen welche vorliegen.",
-  "warum_kein_wert": "GEMESSEN AM 27.10.2026: kein Wert, weil keiner existiert — nicht weil er gesperrt wäre. Bestellseite des Landratsamts: „Liegenschaftszinsen, Umrechnungsfaktoren und der Regionalfaktor [sind] aktuell noch nicht verfügbar\". Landesbericht 2026, Kap. 11, S. 199: Spalte Liegenschaftszinssätze leer (am Seitenbild gelesen). Der Kreis stand bis heute mit keinem Satz im Register. KEIN Nachbarwert und kein Landesmittel: § 21 ImmoWertV verlangt den örtlichen Wert des zuständigen Ausschusses; einen Wert eines anderen Kreises zu übertragen wäre eine erfundene Herkunft."
+  "warum_kein_wert": "GEMESSEN AM 27.10.2026: kein Wert, weil keiner existiert — nicht weil er gesperrt wäre. Bestellseite des Landratsamts: „Liegenschaftszinsen, Umrechnungsfaktoren und der Regionalfaktor [sind] aktuell noch nicht verfügbar\". Landesbericht 2026, Kap. 11, S. 199: Spalte Liegenschaftszinssätze leer (am Seitenbild gelesen). Der Kreis stand bis heute mit keinem Satz im Register. KEIN Nachbarwert und kein Landesmittel: § 21 ImmoWertV verlangt den örtlichen Wert des zuständigen Ausschusses; einen Wert eines anderen Kreises zu übertragen wäre eine erfundene Herkunft.",
+  "zugang_herkunft": "gesetzt am 20.11.2026 aus dem Wortlaut dieses Satzes (unvollstaendig_grund), Pflichtfeld seit 28.10.2026"
  },
  {
   "land_code": "BY",
@@ -785,7 +797,7 @@
   "gaa_name": "Gutachterausschuss für Grundstückswerte im Bereich des Landkreises Neustadt a.d.Aisch-Bad Windsheim",
   "kennzahl": "sachwertfaktor",
   "zweig": "mfh",
-  "zugang": null,
+  "zugang": "nicht abgeleitet",
   "zugang_beleg": null,
   "bestell_url": null,
   "gebuehr": null,
@@ -835,7 +847,8 @@
   "auflagen": [],
   "vollstaendig": false,
   "unvollstaendig_grund": "Für Mehrfamilienhäuser nennt die Bestellseite keine Sachwertfaktoren — nur für Ein- und Zweifamilienhäuser. Weg: Anfrage bei gutachterausschuss@kreis-nea.de.",
-  "warum_kein_wert": "GEMESSEN AM 27.10.2026: der Ausschuss führt Sachwertfaktoren laut Bestellseite nur für Ein- und Zweifamilienhäuser; für Mehrfamilienhäuser ist keiner veröffentlicht. Der Kreis stand bis heute mit keinem Satz im Register. KEIN Nachbarwert und kein Landesmittel: § 21 ImmoWertV verlangt den örtlichen Wert des zuständigen Ausschusses; einen Wert eines anderen Kreises zu übertragen wäre eine erfundene Herkunft."
+  "warum_kein_wert": "GEMESSEN AM 27.10.2026: der Ausschuss führt Sachwertfaktoren laut Bestellseite nur für Ein- und Zweifamilienhäuser; für Mehrfamilienhäuser ist keiner veröffentlicht. Der Kreis stand bis heute mit keinem Satz im Register. KEIN Nachbarwert und kein Landesmittel: § 21 ImmoWertV verlangt den örtlichen Wert des zuständigen Ausschusses; einen Wert eines anderen Kreises zu übertragen wäre eine erfundene Herkunft.",
+  "zugang_herkunft": "gesetzt am 20.11.2026 aus dem Wortlaut dieses Satzes (unvollstaendig_grund), Pflichtfeld seit 28.10.2026"
  },
  {
   "land_code": "BY",
@@ -846,7 +859,7 @@
   "gaa_name": "Gutachterausschuss für Grundstückswerte im Bereich des Landkreises Neustadt a.d.Aisch-Bad Windsheim",
   "kennzahl": "liegenschaftszinssatz",
   "zweig": "mfh",
-  "zugang": null,
+  "zugang": "nicht abgeleitet",
   "zugang_beleg": null,
   "bestell_url": null,
   "gebuehr": null,
@@ -889,6 +902,7 @@
   "auflagen": [],
   "vollstaendig": false,
   "unvollstaendig_grund": "Der Gutachterausschuss Neustadt a.d.Aisch-Bad Windsheim leitet derzeit KEINE Liegenschaftszinssätze ab — amtlich so gesagt: „Liegenschaftszinsen, Umrechnungsfaktoren und der Regionalfaktor [sind] aktuell noch nicht verfügbar\" (Bestellseite des Landratsamts), und der Landesbericht 2026 (S. 199) führt die Spalte leer. Weg: Anfrage bei gutachterausschuss@kreis-nea.de, ob inzwischen welche vorliegen.",
-  "warum_kein_wert": "GEMESSEN AM 27.10.2026: kein Wert, weil keiner existiert — nicht weil er gesperrt wäre. Bestellseite des Landratsamts: „Liegenschaftszinsen, Umrechnungsfaktoren und der Regionalfaktor [sind] aktuell noch nicht verfügbar\". Landesbericht 2026, Kap. 11, S. 199: Spalte Liegenschaftszinssätze leer (am Seitenbild gelesen). Der Kreis stand bis heute mit keinem Satz im Register. KEIN Nachbarwert und kein Landesmittel: § 21 ImmoWertV verlangt den örtlichen Wert des zuständigen Ausschusses; einen Wert eines anderen Kreises zu übertragen wäre eine erfundene Herkunft."
+  "warum_kein_wert": "GEMESSEN AM 27.10.2026: kein Wert, weil keiner existiert — nicht weil er gesperrt wäre. Bestellseite des Landratsamts: „Liegenschaftszinsen, Umrechnungsfaktoren und der Regionalfaktor [sind] aktuell noch nicht verfügbar\". Landesbericht 2026, Kap. 11, S. 199: Spalte Liegenschaftszinssätze leer (am Seitenbild gelesen). Der Kreis stand bis heute mit keinem Satz im Register. KEIN Nachbarwert und kein Landesmittel: § 21 ImmoWertV verlangt den örtlichen Wert des zuständigen Ausschusses; einen Wert eines anderen Kreises zu übertragen wäre eine erfundene Herkunft.",
+  "zugang_herkunft": "gesetzt am 20.11.2026 aus dem Wortlaut dieses Satzes (unvollstaendig_grund), Pflichtfeld seit 28.10.2026"
  }
 ]

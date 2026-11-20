@@ -684,6 +684,12 @@ export const SAATDATEIEN = ['lzs-nrw.json', 'swf-nrw.json', 'lzs-he-2026.json', 
                                Einzelfall“ unter formel_vorgemerkt; UK-Flaeche-Sperren MV Seenplatte und
                                Vorpommern-Ruegen (genehmigungspflichtig, bisher ohne Satz). */
                             'uk-wgfz-ernte-20261103-he.json', 'uk-flaeche-ernte-20261103-mv.json',
+                            /* v3931 · Erntetag 20.11.2026 Nord: Guetersloh GMB 2026 - 2 SWF-Werte (EFH/ZFH, RH/DHH, Beispiel
+                               S. 67 nachgerechnet) und WGFZ Stadt Guetersloh (Wert) + uebriges Kreisgebiet (Sperre);
+                               64 SWF-MFH-Sperren NRW „nicht abgeleitet“ (64 Berichte 2026 durchsucht, kein MFH-Faktor). */
+                            'swf-nw-2026-nachernte-20261120.json', 'uk-wgfz-nw-2026-nachernte-20261120.json', 'swf-nw-2026-mfh-sperren.json',
+                            /* v3931 · Erntetag 20.11.2026 Ost: 6 ETW-Vergleichsfaktor-Sperren BB (Kreise leiten keine ab). */
+                            'vgf-bb-2026-etw-sperren.json',
                            ];
 
 /* ═══ v1778 · WAS LIEGT IM ORDNER, STEHT ABER NICHT IN DER LISTE? ═══

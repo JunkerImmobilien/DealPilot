@@ -1,0 +1,164 @@
+[
+ {
+  "land_code": "NW",
+  "kennzahl": "sachwertfaktor",
+  "stufe": "A",
+  "stufe_grund": null,
+  "streuung": null,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quellenvermerk": null,
+  "lizenz": "dl-de/zero-2-0",
+  "verwendung": "produkt",
+  "auflagen": "GMB 2026 (Stichtag 01.01.2026, Kauffälle 2025), gelesen am 20.11.2026 bei BORIS-NRW (GMB_33300_2026.pdf). Lizenz laut Bericht (PDF-S. 2): „Datenlizenz Deutschland - Zero - Version 2.0“ (dl-de/zero-2-0). Der Vorjahrgang 2025 bleibt daneben stehen.",
+  "modellansaetze": {
+   "gnd_jahre": 80,
+   "regionalfaktor": 1,
+   "baupreisindex": "Preisindex Destatis für den Neubau von Wohngebäuden (2010=100), keine Stichtagszahl abgedruckt",
+   "aussenanlagen_prozent": 4,
+   "wortlaut": "Kap. 8.1 (Druck-S. 83): NHK 2010; Standardstufe aus Fragebögen nach Anlage 4; BGF nach Anlage 4; Regionalfaktor 1,0 („ein individueller Regionalfaktor wurde bisher nicht ermittelt“); Baupreisindex: Preisindex des Statistischen Bundesamtes für den Neubau von Wohngebäuden (Wohngebäude insgesamt) (2010=100); GND 80 Jahre (nach Anlage 1 ImmoWertV); RND = GND − Gebäudealter, Modernisierung nach Anlage 2 (Punktetabelle); Grundstücksgröße tatsächlich, soweit typisch und angemessen; Bodenwert BRW × Fläche (WGFZ-UK nur Stadt Gütersloh); Alterswertminderung linear (§ 38); Garagen/Carports pauschal 8.000/5.000 €; Außenanlagen pauschal 4 % des Gebäudesachwerts zzgl. je 2.000 € für Gas-, Strom- und Wasseranschluss; nur Kaufpreise ohne boG.",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Preisindex des Statistischen Bundesamtes für den Neubau von Wohngebäuden (Wohngebäude insgesamt) (2010=100)",
+   "baupreisindex_seite": "Grundstücksmarktbericht 2026, Kap. 8.1 Modellparameter NHK 2010, Druck-S. 83 (GMB_33300_2026.pdf)",
+   "baupreisindex_hinweis": "Am 20.11.2026 am Bericht 2026 gelesen: das Modell nennt den Index ohne Bezugszeitpunkt; Regelfall § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag)."
+  },
+  "korrekturen": [],
+  "ags": "05754",
+  "ebene": "kreis",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte im Kreis Gütersloh und in der Stadt Gütersloh",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte im Kreis Gütersloh und in der Stadt Gütersloh",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "regression_additiv",
+   "intercept": 0.7815,
+   "rundung_stellen": 2,
+   "terme": [
+    {
+     "feld": "sachwert",
+     "bez": "vorläufiger Sachwert in Euro",
+     "koeffizient": 62777.6408,
+     "exponent": -1,
+     "gueltig": [
+      200000,
+      850000
+     ]
+    }
+   ],
+   "hinweis": "Funktion zur Ermittlung des Sachwertfaktors für freistehende Ein- und Zweifamilienhäuser: SWF = 0,7815 + 62777,6408 ÷ vorl. Sachwert (Abb. 32, Druck-S. 65); Gültigkeit = abgedruckte Wertetabelle 200–850 Tsd. €. 195 Kauffälle 2025, Stichtag 01.01.2026, adj. R² 0,18."
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten (Wertetabelle)",
+   "interpolation": "Funktion",
+   "hinweis": "Stichprobe (Druck-S. 65; die Zeilenbeschriftung der Eckdatentabelle ist im Druck um eine Zeile versetzt, hier nach den Werten zugeordnet): Baujahr 1935–2021 (Ø 1982); Standardstufe 1,7–4,1 (Ø 2,7); Grundstück 267–1.470 m² (Ø 656); Wohnfläche 91–288 m² (Ø 149); BRW 140–750 €/m² (Ø 275); vorl. Sachwert 214.656–897.951 € (Ø 448.878); SWF 0,66–1,17 (Ø 0,93)."
+  },
+  "belege": [
+   {
+    "art": "anwendungsbeispiel",
+    "fundstelle": "Abb. 32, Druck-S. 65",
+    "eingabe": {
+     "sachwert": 300000
+    },
+    "soll_tabellenwert": 0.99,
+    "soll_wert": 0.99,
+    "soll_sachwert_eur": null,
+    "wortlaut": "ERSATZPRÜFUNG — abgedruckter Tabellenwert freistehend 300.000 EUR = 0,99; Formel 0,7815 + 62.777,6408 / 300.000 = 0,9908. Das Anwendungsbeispiel des Berichts (Kap. 5.1.4.4) gilt der Doppelhaushälfte."
+   }
+  ],
+  "pruefbeispiel": {
+   "eingabe": {
+    "sachwert": 300000
+   },
+   "soll": 0.99,
+   "quelle": "ERSATZ: Wertetabelle Abb. 32, 300.000 € = 0,99 (Formel 0,9908); das Anwendungsbeispiel des Berichts gilt der DHH",
+   "ist": 0.99,
+   "ist_rechenweg": "0,7815 + 62.777,6408 / 300.000 = 0,9908 → 0,99",
+   "ergebnis": "getroffen"
+  },
+  "fallzahl": 195,
+  "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_33300_2026.pdf",
+  "quelle_parser": "v-ernte-20261120-hand (pdftotext -layout, PDF-S. 64–67 und 83 = Druckseiten, am 20.11.2026 gelesen)",
+  "fundstelle": "Kap. 5.1.4.2, Druck-S. 65; Modell Kap. 8.1 Druck-S. 83"
+ },
+ {
+  "land_code": "NW",
+  "kennzahl": "sachwertfaktor",
+  "stufe": "A",
+  "stufe_grund": null,
+  "streuung": null,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "GMB 2026",
+  "quellenvermerk": null,
+  "lizenz": "dl-de/zero-2-0",
+  "verwendung": "produkt",
+  "auflagen": "GMB 2026 (Stichtag 01.01.2026, Kauffälle 2025), gelesen am 20.11.2026 bei BORIS-NRW (GMB_33300_2026.pdf). Lizenz laut Bericht (PDF-S. 2): „Datenlizenz Deutschland - Zero - Version 2.0“ (dl-de/zero-2-0). Der Vorjahrgang 2025 bleibt daneben stehen.",
+  "modellansaetze": {
+   "gnd_jahre": 80,
+   "regionalfaktor": 1,
+   "baupreisindex": "Preisindex Destatis für den Neubau von Wohngebäuden (2010=100), keine Stichtagszahl abgedruckt",
+   "aussenanlagen_prozent": 4,
+   "wortlaut": "Kap. 8.1 (Druck-S. 83): NHK 2010; Standardstufe aus Fragebögen nach Anlage 4; BGF nach Anlage 4; Regionalfaktor 1,0 („ein individueller Regionalfaktor wurde bisher nicht ermittelt“); Baupreisindex: Preisindex des Statistischen Bundesamtes für den Neubau von Wohngebäuden (Wohngebäude insgesamt) (2010=100); GND 80 Jahre (nach Anlage 1 ImmoWertV); RND = GND − Gebäudealter, Modernisierung nach Anlage 2 (Punktetabelle); Grundstücksgröße tatsächlich, soweit typisch und angemessen; Bodenwert BRW × Fläche (WGFZ-UK nur Stadt Gütersloh); Alterswertminderung linear (§ 38); Garagen/Carports pauschal 8.000/5.000 €; Außenanlagen pauschal 4 % des Gebäudesachwerts zzgl. je 2.000 € für Gas-, Strom- und Wasseranschluss; nur Kaufpreise ohne boG.",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Preisindex des Statistischen Bundesamtes für den Neubau von Wohngebäuden (Wohngebäude insgesamt) (2010=100)",
+   "baupreisindex_seite": "Grundstücksmarktbericht 2026, Kap. 8.1 Modellparameter NHK 2010, Druck-S. 83 (GMB_33300_2026.pdf)",
+   "baupreisindex_hinweis": "Am 20.11.2026 am Bericht 2026 gelesen: das Modell nennt den Index ohne Bezugszeitpunkt; Regelfall § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag)."
+  },
+  "korrekturen": [],
+  "ags": "05754",
+  "ebene": "kreis",
+  "gebiet_name": "Der Gutachterausschuss für Grundstückswerte im Kreis Gütersloh und in der Stadt Gütersloh",
+  "gaa_name": "Der Gutachterausschuss für Grundstückswerte im Kreis Gütersloh und in der Stadt Gütersloh",
+  "zweig": "rhdhh",
+  "formel": {
+   "form": "regression_additiv",
+   "intercept": 0.6922,
+   "rundung_stellen": 2,
+   "terme": [
+    {
+     "feld": "sachwert",
+     "bez": "vorläufiger Sachwert in Euro",
+     "koeffizient": 109113.1954,
+     "exponent": -1,
+     "gueltig": [
+      175000,
+      500000
+     ]
+    }
+   ],
+   "hinweis": "Funktion zur Ermittlung des Sachwertfaktors für Reihenhäuser und Doppelhaushälften: SWF = 0,6922 + 109113,1954 ÷ vorl. Sachwert (Abb. 33, Druck-S. 66); Gültigkeit = abgedruckte Wertetabelle 175–500 Tsd. €. 78 Kauffälle 2025, Stichtag 01.01.2026, adj. R² 0,44."
+  },
+  "geltungsbereich": {
+   "extrapolation": "verboten (Wertetabelle)",
+   "interpolation": "Funktion",
+   "hinweis": "Stichprobe (Druck-S. 66, Zeilenbeschriftung im Druck versetzt, nach Werten zugeordnet): Baujahr 1953–2023 (Ø 1991); Standardstufe 1,8–3,7 (Ø 2,8); Grundstück 150–767 m² (Ø 316); Wohnfläche 87–210 m² (Ø 124); BRW 160–620 €/m² (Ø 296); vorl. Sachwert 177.131–471.293 € (Ø 330.828); SWF 0,83–1,32 (Ø 1,04)."
+  },
+  "belege": [
+   {
+    "art": "anwendungsbeispiel",
+    "fundstelle": "Kap. 5.1.4.4, Druck-S. 67",
+    "eingabe": {
+     "sachwert": 200000
+    },
+    "soll_tabellenwert": 1.24,
+    "soll_wert": 1.24,
+    "soll_sachwert_eur": 248000,
+    "wortlaut": "„Beispiel: Doppelhaushälfte — Vorläufiger Sachwert einer Doppelhaushälfte: 200.000 EUR — Sachwertfaktor (Marktanpassung): 1,24 — Marktangepasster vorläufiger Sachwert = 200.000 EUR x 1,24 = 248.000 EUR — boG: liegen hier nicht vor — Sachwert = Verkehrswert = 248.000 EUR“"
+   }
+  ],
+  "pruefbeispiel": {
+   "eingabe": {
+    "sachwert": 200000
+   },
+   "soll": 1.24,
+   "quelle": "Anwendungsbeispiel Kap. 5.1.4.4 Druck-S. 67: 200.000 € × 1,24 = 248.000 €",
+   "ist": 1.24,
+   "ist_rechenweg": "0,6922 + 109.113,1954 / 200.000 = 1,2378 → 1,24",
+   "ergebnis": "getroffen"
+  },
+  "fallzahl": 78,
+  "quelle_url": "https://www.boris.nrw.de/borisfachdaten/gmb/2026/GMB_33300_2026.pdf",
+  "quelle_parser": "v-ernte-20261120-hand (pdftotext -layout, PDF-S. 64–67 und 83 = Druckseiten, am 20.11.2026 gelesen)",
+  "fundstelle": "Kap. 5.1.4.3, Druck-S. 66; Modell Kap. 8.1 Druck-S. 83"
+ }
+]

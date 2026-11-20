@@ -7,15 +7,6 @@
   "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg",
   "kennzahl": "liegenschaftszinssatz",
   "zweig": "mfh_bu",
-  "formel": {
-   "form": "konstante",
-   "wert_pct": 3.2,
-   "bezeichnung": "Mehrfamilienhäuser (gewerblicher Mietanteil bis 20 %)",
-   "wert": 3.2,
-   "liefert": "prozent",
-   "rundung_stellen": 2,
-   "form_hinweis": "v1787: Hier stand `form: \"festwert\"` mit dem Wert ausschliesslich in `wert_pct`. GEMESSEN am 02.10.2026 ueber swf_modelle.auswerten(): der Satz lieferte `form_unbekannt` — der Auswerter kennt die Form `festwert` nicht, und das Ergebnis war KEIN Wert. Jetzt `konstante` mit `wert` und `liefert: \"prozent\"`, wie es Dresden seit v1786 fuehrt. `wert_pct` bleibt als Dokumentation stehen: sie sagt, in welcher Einheit der Bericht die Zahl druckt."
-  },
   "korrekturen": [],
   "modellansaetze": {
    "verwaltungskosten_wohnung_eur": 359,
@@ -49,23 +40,41 @@
     "kauffaelle": 75
    }
   ],
-  "stufe": "A",
+  "stufe": "E",
   "fallzahl": 75,
   "stichtag": "2024-07-01",
   "berichtsjahr": 2025,
   "modellversion": "LIZI 2025 OGA BB",
   "quelle_url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/LIZI_2025_OGA.pdf",
   "quelle_parser": "v1757-BBLZS",
-  "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg 2025, Liegenschaftszinssätze, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), www.gutachterausschuss-bb.de",
-  "lizenz": "dl-de/by-2-0",
-  "lizenz_hinweis": "v2999: Der Grundstuecksmarktbericht des Oberen Gutachterausschusses steht ausdruecklich unter dl-de/by-2-0 (GMB Land 2024, S. 2 Nutzungsbedingungen; Infoblatt Open Data MIK Brandenburg 01.03.2019; AGNB LGB Nr. 7.1a). Die LIZI-Veroeffentlichung desselben Herausgebers traegt keinen eigenen Vermerk - gefuehrt unter derselben Lizenz, schriftliche Bestaetigung beim OGA offen (Oberer.Gutachterausschuss@geobasis-bb.de). Vorher: ungeklaert.",
-  "lizenz_hinweis": "Im Dokument NICHT angegeben — 36 Seiten geprüft, null Treffer auf dl-de/Datenlizenz/Namensnennung, auch nicht auf der verlinkenden Seite. Die Kreisberichte Brandenburgs tragen dl-de/by-2-0; daraus auf dieses Dokument zu schließen wäre geraten. Vor Weitergabe beim Oberen Gutachterausschuss nachfragen.",
+  "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg 2025, Liegenschaftszinssätze (LIZI 2025 OGA), https://gutachterausschuss.brandenburg.de — Nutzungsbedingungen für dieses Heft nicht veröffentlicht, siehe Feld lizenz.",
+  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "lizenz_hinweis": "v20261120: Bis 20.11.2026 stand hier lizenz „dl-de/by-2-0“, ohne Beleg (der alte Hinweis sagte selbst: „daraus auf dieses Dokument zu schließen wäre geraten“). Ersetzt durch den Wortlaut der tatsächlich auffindbaren Bedingungen; die Zahl selbst bleibt unverändert.",
   "auflagen": "Nachrangig: das Dokument schreibt auf S. 5 selbst vor, dass vorrangig die Liegenschaftszinssätze der REGIONALEN Gutachterausschüsse zu verwenden sind, insbesondere in der Landeshauptstadt Potsdam. Diese überregionalen Werte sind der Rückfall, nicht die erste Wahl. — Potsdam ist in den meisten Räumen ausdrücklich AUSGENOMMEN (\"ohne Potsdam\"); für Potsdam gilt dieser Satz nicht.",
   "fundstelle": "S. 7, Anlage 1 (Modellansätze) S. 32-34, Anlage 2 (Gemeindeliste) S. 35-36",
   "streuung": {
    "min_pct": 0.4,
    "max_pct": 5.6
-  }
+  },
+  "vollstaendig": false,
+  "zugang": "genehmigungspflichtig",
+  "bestell_url": "mailto:Oberer.Gutachterausschuss@geobasis-bb.de",
+  "zustaendige_stelle": "Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg, Geschäftsstelle c/o LGB, Heinrich-Mann-Allee 104 B, 14473 Potsdam, +49 331 8844-540",
+  "zugang_beleg": "Impressum gutachterausschuss.brandenburg.de und Heft ohne Lizenzvermerk (geprüft 20.11.2026, siehe lizenz/lizenz_hinweis)",
+  "warum_kein_wert": "Kein Wert im Register, bis der Obere Gutachterausschuss Brandenburg zustimmt: das Heft nennt keine Lizenz, das Impressum von gutachterausschuss.brandenburg.de untersagt die Verwendung ohne ausdrückliche Zustimmung. Anfrage vorbereitet am 20.11.2026.",
+  "unvollstaendig_grund": "Kein Wert im Register, bis der Obere Gutachterausschuss Brandenburg zustimmt: das Heft nennt keine Lizenz, das Impressum von gutachterausschuss.brandenburg.de untersagt die Verwendung ohne ausdrückliche Zustimmung. Anfrage vorbereitet am 20.11.2026.",
+  "lizenz_des_dokuments": "kein Lizenzvermerk im Dokument (LIZI_2025_OGA.pdf, alle 36 Seiten am 20.11.2026 erneut durchsucht: kein Treffer auf Lizenz, dl-de, govdata, Nutzungsbedingungen, Urheber). Auch die verlinkende Seite https://gutachterausschuss.brandenburg.de/gaa/de/marktinformationen/daten-fuer-die-wertermittlung/liegenschaftszinssaetze/ nennt keine Lizenz. Das Impressum des Portals (https://gutachterausschuss.brandenburg.de/gaa/de/impressum/, Abschnitt „Urheber- und Kennzeichenrecht“) sagt wörtlich: „Eine Vervielfältigung oder Verwendung solcher Bilder, Grafiken und Texte in anderen elektronischen oder gedruckten Publikationen ist, auch wenn sie als urheberrechtlich geschützte Dokumente nicht gekennzeichnet sind, ohne ausdrückliche Zustimmung des Urheberrechtinhabers nicht gestattet.“ Die Lizenz dl-de/by-2-0 steht nur im Grundstücksmarktbericht für das Land Brandenburg 2025 (GMB_Land.pdf, Impressum S. 2: „Für den Grundstücksmarktbericht gilt die Lizenz ‚Datenlizenz Deutschland - Namensnennung - Version 2.0‘ (dl-de/by-2-0)“) — dieser druckt die Liegenschaftszinssätze NICHT ab (geprüft: kein Tabellenteil zu Liegenschaftszinssätzen), gilt also nicht für dieses Heft. Zustimmung beim Oberen Gutachterausschuss erfragen (Oberer.Gutachterausschuss@geobasis-bb.de).",
+  "formel_vorgemerkt": {
+   "form": "konstante",
+   "wert_pct": 3.2,
+   "bezeichnung": "Mehrfamilienhäuser (gewerblicher Mietanteil bis 20 %)",
+   "wert": 3.2,
+   "liefert": "prozent",
+   "rundung_stellen": 2,
+   "form_hinweis": "v1787: Hier stand `form: \"festwert\"` mit dem Wert ausschliesslich in `wert_pct`. GEMESSEN am 02.10.2026 ueber swf_modelle.auswerten(): der Satz lieferte `form_unbekannt` — der Auswerter kennt die Form `festwert` nicht, und das Ergebnis war KEIN Wert. Jetzt `konstante` mit `wert` und `liefert: \"prozent\"`, wie es Dresden seit v1786 fuehrt. `wert_pct` bleibt als Dokumentation stehen: sie sagt, in welcher Einheit der Bericht die Zahl druckt."
+  },
+  "stufe_vorher": "A",
+  "stufe_grund": "kein Wert, Wegweiser zur Quelle (Zustimmung des Ausschusses angefragt)"
  },
  {
   "land_code": "BB",
@@ -75,15 +84,6 @@
   "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg",
   "kennzahl": "liegenschaftszinssatz",
   "zweig": "mfh_wm",
-  "formel": {
-   "form": "konstante",
-   "wert_pct": 3.5,
-   "bezeichnung": "Mehrfamilienhäuser (gewerblicher Mietanteil bis 20 %)",
-   "wert": 3.5,
-   "liefert": "prozent",
-   "rundung_stellen": 2,
-   "form_hinweis": "v1787: Hier stand `form: \"festwert\"` mit dem Wert ausschliesslich in `wert_pct`. GEMESSEN am 02.10.2026 ueber swf_modelle.auswerten(): der Satz lieferte `form_unbekannt` — der Auswerter kennt die Form `festwert` nicht, und das Ergebnis war KEIN Wert. Jetzt `konstante` mit `wert` und `liefert: \"prozent\"`, wie es Dresden seit v1786 fuehrt. `wert_pct` bleibt als Dokumentation stehen: sie sagt, in welcher Einheit der Bericht die Zahl druckt."
-  },
   "korrekturen": [],
   "modellansaetze": {
    "verwaltungskosten_wohnung_eur": 359,
@@ -117,19 +117,37 @@
     "kauffaelle": 265
    }
   ],
-  "stufe": "A",
+  "stufe": "E",
   "fallzahl": 265,
   "stichtag": "2024-07-01",
   "berichtsjahr": 2025,
   "modellversion": "LIZI 2025 OGA BB",
   "quelle_url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/LIZI_2025_OGA.pdf",
   "quelle_parser": "v1757-BBLZS",
-  "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg 2025, Liegenschaftszinssätze, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), www.gutachterausschuss-bb.de",
-  "lizenz": "dl-de/by-2-0",
-  "lizenz_hinweis": "v2999: Der Grundstuecksmarktbericht des Oberen Gutachterausschusses steht ausdruecklich unter dl-de/by-2-0 (GMB Land 2024, S. 2 Nutzungsbedingungen; Infoblatt Open Data MIK Brandenburg 01.03.2019; AGNB LGB Nr. 7.1a). Die LIZI-Veroeffentlichung desselben Herausgebers traegt keinen eigenen Vermerk - gefuehrt unter derselben Lizenz, schriftliche Bestaetigung beim OGA offen (Oberer.Gutachterausschuss@geobasis-bb.de). Vorher: ungeklaert.",
-  "lizenz_hinweis": "Im Dokument NICHT angegeben — 36 Seiten geprüft, null Treffer auf dl-de/Datenlizenz/Namensnennung, auch nicht auf der verlinkenden Seite. Die Kreisberichte Brandenburgs tragen dl-de/by-2-0; daraus auf dieses Dokument zu schließen wäre geraten. Vor Weitergabe beim Oberen Gutachterausschuss nachfragen.",
+  "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg 2025, Liegenschaftszinssätze (LIZI 2025 OGA), https://gutachterausschuss.brandenburg.de — Nutzungsbedingungen für dieses Heft nicht veröffentlicht, siehe Feld lizenz.",
+  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "lizenz_hinweis": "v20261120: Bis 20.11.2026 stand hier lizenz „dl-de/by-2-0“, ohne Beleg (der alte Hinweis sagte selbst: „daraus auf dieses Dokument zu schließen wäre geraten“). Ersetzt durch den Wortlaut der tatsächlich auffindbaren Bedingungen; die Zahl selbst bleibt unverändert.",
   "auflagen": "Nachrangig: das Dokument schreibt auf S. 5 selbst vor, dass vorrangig die Liegenschaftszinssätze der REGIONALEN Gutachterausschüsse zu verwenden sind, insbesondere in der Landeshauptstadt Potsdam. Diese überregionalen Werte sind der Rückfall, nicht die erste Wahl. — Potsdam ist in den meisten Räumen ausdrücklich AUSGENOMMEN (\"ohne Potsdam\"); für Potsdam gilt dieser Satz nicht.",
-  "fundstelle": "S. 8, Anlage 1 (Modellansätze) S. 32-34, Anlage 2 (Gemeindeliste) S. 35-36"
+  "fundstelle": "S. 8, Anlage 1 (Modellansätze) S. 32-34, Anlage 2 (Gemeindeliste) S. 35-36",
+  "vollstaendig": false,
+  "zugang": "genehmigungspflichtig",
+  "bestell_url": "mailto:Oberer.Gutachterausschuss@geobasis-bb.de",
+  "zustaendige_stelle": "Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg, Geschäftsstelle c/o LGB, Heinrich-Mann-Allee 104 B, 14473 Potsdam, +49 331 8844-540",
+  "zugang_beleg": "Impressum gutachterausschuss.brandenburg.de und Heft ohne Lizenzvermerk (geprüft 20.11.2026, siehe lizenz/lizenz_hinweis)",
+  "warum_kein_wert": "Kein Wert im Register, bis der Obere Gutachterausschuss Brandenburg zustimmt: das Heft nennt keine Lizenz, das Impressum von gutachterausschuss.brandenburg.de untersagt die Verwendung ohne ausdrückliche Zustimmung. Anfrage vorbereitet am 20.11.2026.",
+  "unvollstaendig_grund": "Kein Wert im Register, bis der Obere Gutachterausschuss Brandenburg zustimmt: das Heft nennt keine Lizenz, das Impressum von gutachterausschuss.brandenburg.de untersagt die Verwendung ohne ausdrückliche Zustimmung. Anfrage vorbereitet am 20.11.2026.",
+  "lizenz_des_dokuments": "kein Lizenzvermerk im Dokument (LIZI_2025_OGA.pdf, alle 36 Seiten am 20.11.2026 erneut durchsucht: kein Treffer auf Lizenz, dl-de, govdata, Nutzungsbedingungen, Urheber). Auch die verlinkende Seite https://gutachterausschuss.brandenburg.de/gaa/de/marktinformationen/daten-fuer-die-wertermittlung/liegenschaftszinssaetze/ nennt keine Lizenz. Das Impressum des Portals (https://gutachterausschuss.brandenburg.de/gaa/de/impressum/, Abschnitt „Urheber- und Kennzeichenrecht“) sagt wörtlich: „Eine Vervielfältigung oder Verwendung solcher Bilder, Grafiken und Texte in anderen elektronischen oder gedruckten Publikationen ist, auch wenn sie als urheberrechtlich geschützte Dokumente nicht gekennzeichnet sind, ohne ausdrückliche Zustimmung des Urheberrechtinhabers nicht gestattet.“ Die Lizenz dl-de/by-2-0 steht nur im Grundstücksmarktbericht für das Land Brandenburg 2025 (GMB_Land.pdf, Impressum S. 2: „Für den Grundstücksmarktbericht gilt die Lizenz ‚Datenlizenz Deutschland - Namensnennung - Version 2.0‘ (dl-de/by-2-0)“) — dieser druckt die Liegenschaftszinssätze NICHT ab (geprüft: kein Tabellenteil zu Liegenschaftszinssätzen), gilt also nicht für dieses Heft. Zustimmung beim Oberen Gutachterausschuss erfragen (Oberer.Gutachterausschuss@geobasis-bb.de).",
+  "formel_vorgemerkt": {
+   "form": "konstante",
+   "wert_pct": 3.5,
+   "bezeichnung": "Mehrfamilienhäuser (gewerblicher Mietanteil bis 20 %)",
+   "wert": 3.5,
+   "liefert": "prozent",
+   "rundung_stellen": 2,
+   "form_hinweis": "v1787: Hier stand `form: \"festwert\"` mit dem Wert ausschliesslich in `wert_pct`. GEMESSEN am 02.10.2026 ueber swf_modelle.auswerten(): der Satz lieferte `form_unbekannt` — der Auswerter kennt die Form `festwert` nicht, und das Ergebnis war KEIN Wert. Jetzt `konstante` mit `wert` und `liefert: \"prozent\"`, wie es Dresden seit v1786 fuehrt. `wert_pct` bleibt als Dokumentation stehen: sie sagt, in welcher Einheit der Bericht die Zahl druckt."
+  },
+  "stufe_vorher": "A",
+  "stufe_grund": "kein Wert, Wegweiser zur Quelle (Zustimmung des Ausschusses angefragt)"
  },
  {
   "land_code": "BB",
@@ -139,15 +157,6 @@
   "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg",
   "kennzahl": "liegenschaftszinssatz",
   "zweig": "mfh_kf",
-  "formel": {
-   "form": "konstante",
-   "wert_pct": 2.8,
-   "bezeichnung": "Mehrfamilienhäuser (gewerblicher Mietanteil bis 20 %)",
-   "wert": 2.8,
-   "liefert": "prozent",
-   "rundung_stellen": 2,
-   "form_hinweis": "v1787: Hier stand `form: \"festwert\"` mit dem Wert ausschliesslich in `wert_pct`. GEMESSEN am 02.10.2026 ueber swf_modelle.auswerten(): der Satz lieferte `form_unbekannt` — der Auswerter kennt die Form `festwert` nicht, und das Ergebnis war KEIN Wert. Jetzt `konstante` mit `wert` und `liefert: \"prozent\"`, wie es Dresden seit v1786 fuehrt. `wert_pct` bleibt als Dokumentation stehen: sie sagt, in welcher Einheit der Bericht die Zahl druckt."
-  },
   "korrekturen": [],
   "modellansaetze": {
    "verwaltungskosten_wohnung_eur": 359,
@@ -181,23 +190,41 @@
     "kauffaelle": 79
    }
   ],
-  "stufe": "A",
+  "stufe": "E",
   "fallzahl": 79,
   "stichtag": "2024-07-01",
   "berichtsjahr": 2025,
   "modellversion": "LIZI 2025 OGA BB",
   "quelle_url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/LIZI_2025_OGA.pdf",
   "quelle_parser": "v1757-BBLZS",
-  "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg 2025, Liegenschaftszinssätze, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), www.gutachterausschuss-bb.de",
-  "lizenz": "dl-de/by-2-0",
-  "lizenz_hinweis": "v2999: Der Grundstuecksmarktbericht des Oberen Gutachterausschusses steht ausdruecklich unter dl-de/by-2-0 (GMB Land 2024, S. 2 Nutzungsbedingungen; Infoblatt Open Data MIK Brandenburg 01.03.2019; AGNB LGB Nr. 7.1a). Die LIZI-Veroeffentlichung desselben Herausgebers traegt keinen eigenen Vermerk - gefuehrt unter derselben Lizenz, schriftliche Bestaetigung beim OGA offen (Oberer.Gutachterausschuss@geobasis-bb.de). Vorher: ungeklaert.",
-  "lizenz_hinweis": "Im Dokument NICHT angegeben — 36 Seiten geprüft, null Treffer auf dl-de/Datenlizenz/Namensnennung, auch nicht auf der verlinkenden Seite. Die Kreisberichte Brandenburgs tragen dl-de/by-2-0; daraus auf dieses Dokument zu schließen wäre geraten. Vor Weitergabe beim Oberen Gutachterausschuss nachfragen.",
+  "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg 2025, Liegenschaftszinssätze (LIZI 2025 OGA), https://gutachterausschuss.brandenburg.de — Nutzungsbedingungen für dieses Heft nicht veröffentlicht, siehe Feld lizenz.",
+  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "lizenz_hinweis": "v20261120: Bis 20.11.2026 stand hier lizenz „dl-de/by-2-0“, ohne Beleg (der alte Hinweis sagte selbst: „daraus auf dieses Dokument zu schließen wäre geraten“). Ersetzt durch den Wortlaut der tatsächlich auffindbaren Bedingungen; die Zahl selbst bleibt unverändert.",
   "auflagen": "Nachrangig: das Dokument schreibt auf S. 5 selbst vor, dass vorrangig die Liegenschaftszinssätze der REGIONALEN Gutachterausschüsse zu verwenden sind, insbesondere in der Landeshauptstadt Potsdam. Diese überregionalen Werte sind der Rückfall, nicht die erste Wahl. — Potsdam ist in den meisten Räumen ausdrücklich AUSGENOMMEN (\"ohne Potsdam\"); für Potsdam gilt dieser Satz nicht.",
   "fundstelle": "S. 10, Anlage 1 (Modellansätze) S. 32-34, Anlage 2 (Gemeindeliste) S. 35-36",
   "streuung": {
    "min_pct": -0.8,
    "max_pct": 5.9
-  }
+  },
+  "vollstaendig": false,
+  "zugang": "genehmigungspflichtig",
+  "bestell_url": "mailto:Oberer.Gutachterausschuss@geobasis-bb.de",
+  "zustaendige_stelle": "Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg, Geschäftsstelle c/o LGB, Heinrich-Mann-Allee 104 B, 14473 Potsdam, +49 331 8844-540",
+  "zugang_beleg": "Impressum gutachterausschuss.brandenburg.de und Heft ohne Lizenzvermerk (geprüft 20.11.2026, siehe lizenz/lizenz_hinweis)",
+  "warum_kein_wert": "Kein Wert im Register, bis der Obere Gutachterausschuss Brandenburg zustimmt: das Heft nennt keine Lizenz, das Impressum von gutachterausschuss.brandenburg.de untersagt die Verwendung ohne ausdrückliche Zustimmung. Anfrage vorbereitet am 20.11.2026.",
+  "unvollstaendig_grund": "Kein Wert im Register, bis der Obere Gutachterausschuss Brandenburg zustimmt: das Heft nennt keine Lizenz, das Impressum von gutachterausschuss.brandenburg.de untersagt die Verwendung ohne ausdrückliche Zustimmung. Anfrage vorbereitet am 20.11.2026.",
+  "lizenz_des_dokuments": "kein Lizenzvermerk im Dokument (LIZI_2025_OGA.pdf, alle 36 Seiten am 20.11.2026 erneut durchsucht: kein Treffer auf Lizenz, dl-de, govdata, Nutzungsbedingungen, Urheber). Auch die verlinkende Seite https://gutachterausschuss.brandenburg.de/gaa/de/marktinformationen/daten-fuer-die-wertermittlung/liegenschaftszinssaetze/ nennt keine Lizenz. Das Impressum des Portals (https://gutachterausschuss.brandenburg.de/gaa/de/impressum/, Abschnitt „Urheber- und Kennzeichenrecht“) sagt wörtlich: „Eine Vervielfältigung oder Verwendung solcher Bilder, Grafiken und Texte in anderen elektronischen oder gedruckten Publikationen ist, auch wenn sie als urheberrechtlich geschützte Dokumente nicht gekennzeichnet sind, ohne ausdrückliche Zustimmung des Urheberrechtinhabers nicht gestattet.“ Die Lizenz dl-de/by-2-0 steht nur im Grundstücksmarktbericht für das Land Brandenburg 2025 (GMB_Land.pdf, Impressum S. 2: „Für den Grundstücksmarktbericht gilt die Lizenz ‚Datenlizenz Deutschland - Namensnennung - Version 2.0‘ (dl-de/by-2-0)“) — dieser druckt die Liegenschaftszinssätze NICHT ab (geprüft: kein Tabellenteil zu Liegenschaftszinssätzen), gilt also nicht für dieses Heft. Zustimmung beim Oberen Gutachterausschuss erfragen (Oberer.Gutachterausschuss@geobasis-bb.de).",
+  "formel_vorgemerkt": {
+   "form": "konstante",
+   "wert_pct": 2.8,
+   "bezeichnung": "Mehrfamilienhäuser (gewerblicher Mietanteil bis 20 %)",
+   "wert": 2.8,
+   "liefert": "prozent",
+   "rundung_stellen": 2,
+   "form_hinweis": "v1787: Hier stand `form: \"festwert\"` mit dem Wert ausschliesslich in `wert_pct`. GEMESSEN am 02.10.2026 ueber swf_modelle.auswerten(): der Satz lieferte `form_unbekannt` — der Auswerter kennt die Form `festwert` nicht, und das Ergebnis war KEIN Wert. Jetzt `konstante` mit `wert` und `liefert: \"prozent\"`, wie es Dresden seit v1786 fuehrt. `wert_pct` bleibt als Dokumentation stehen: sie sagt, in welcher Einheit der Bericht die Zahl druckt."
+  },
+  "stufe_vorher": "A",
+  "stufe_grund": "kein Wert, Wegweiser zur Quelle (Zustimmung des Ausschusses angefragt)"
  },
  {
   "land_code": "BB",
@@ -207,15 +234,6 @@
   "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg",
   "kennzahl": "liegenschaftszinssatz",
   "zweig": "wgh_bu",
-  "formel": {
-   "form": "konstante",
-   "wert_pct": 3.7,
-   "bezeichnung": "Wohn- und Geschäftshäuser (gewerblicher Mietanteil über 20 % bis unter 80 %)",
-   "wert": 3.7,
-   "liefert": "prozent",
-   "rundung_stellen": 2,
-   "form_hinweis": "v1787: Hier stand `form: \"festwert\"` mit dem Wert ausschliesslich in `wert_pct`. GEMESSEN am 02.10.2026 ueber swf_modelle.auswerten(): der Satz lieferte `form_unbekannt` — der Auswerter kennt die Form `festwert` nicht, und das Ergebnis war KEIN Wert. Jetzt `konstante` mit `wert` und `liefert: \"prozent\"`, wie es Dresden seit v1786 fuehrt. `wert_pct` bleibt als Dokumentation stehen: sie sagt, in welcher Einheit der Bericht die Zahl druckt."
-  },
   "korrekturen": [],
   "modellansaetze": {
    "verwaltungskosten_wohnung_eur": 359,
@@ -249,19 +267,37 @@
     "kauffaelle": 30
    }
   ],
-  "stufe": "A",
+  "stufe": "E",
   "fallzahl": 30,
   "stichtag": "2024-07-01",
   "berichtsjahr": 2025,
   "modellversion": "LIZI 2025 OGA BB",
   "quelle_url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/LIZI_2025_OGA.pdf",
   "quelle_parser": "v1757-BBLZS",
-  "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg 2025, Liegenschaftszinssätze, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), www.gutachterausschuss-bb.de",
-  "lizenz": "dl-de/by-2-0",
-  "lizenz_hinweis": "v2999: Der Grundstuecksmarktbericht des Oberen Gutachterausschusses steht ausdruecklich unter dl-de/by-2-0 (GMB Land 2024, S. 2 Nutzungsbedingungen; Infoblatt Open Data MIK Brandenburg 01.03.2019; AGNB LGB Nr. 7.1a). Die LIZI-Veroeffentlichung desselben Herausgebers traegt keinen eigenen Vermerk - gefuehrt unter derselben Lizenz, schriftliche Bestaetigung beim OGA offen (Oberer.Gutachterausschuss@geobasis-bb.de). Vorher: ungeklaert.",
-  "lizenz_hinweis": "Im Dokument NICHT angegeben — 36 Seiten geprüft, null Treffer auf dl-de/Datenlizenz/Namensnennung, auch nicht auf der verlinkenden Seite. Die Kreisberichte Brandenburgs tragen dl-de/by-2-0; daraus auf dieses Dokument zu schließen wäre geraten. Vor Weitergabe beim Oberen Gutachterausschuss nachfragen.",
+  "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg 2025, Liegenschaftszinssätze (LIZI 2025 OGA), https://gutachterausschuss.brandenburg.de — Nutzungsbedingungen für dieses Heft nicht veröffentlicht, siehe Feld lizenz.",
+  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "lizenz_hinweis": "v20261120: Bis 20.11.2026 stand hier lizenz „dl-de/by-2-0“, ohne Beleg (der alte Hinweis sagte selbst: „daraus auf dieses Dokument zu schließen wäre geraten“). Ersetzt durch den Wortlaut der tatsächlich auffindbaren Bedingungen; die Zahl selbst bleibt unverändert.",
   "auflagen": "Nachrangig: das Dokument schreibt auf S. 5 selbst vor, dass vorrangig die Liegenschaftszinssätze der REGIONALEN Gutachterausschüsse zu verwenden sind, insbesondere in der Landeshauptstadt Potsdam. Diese überregionalen Werte sind der Rückfall, nicht die erste Wahl. — Potsdam ist in den meisten Räumen ausdrücklich AUSGENOMMEN (\"ohne Potsdam\"); für Potsdam gilt dieser Satz nicht.",
-  "fundstelle": "S. 12, Anlage 1 (Modellansätze) S. 32-34, Anlage 2 (Gemeindeliste) S. 35-36"
+  "fundstelle": "S. 12, Anlage 1 (Modellansätze) S. 32-34, Anlage 2 (Gemeindeliste) S. 35-36",
+  "vollstaendig": false,
+  "zugang": "genehmigungspflichtig",
+  "bestell_url": "mailto:Oberer.Gutachterausschuss@geobasis-bb.de",
+  "zustaendige_stelle": "Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg, Geschäftsstelle c/o LGB, Heinrich-Mann-Allee 104 B, 14473 Potsdam, +49 331 8844-540",
+  "zugang_beleg": "Impressum gutachterausschuss.brandenburg.de und Heft ohne Lizenzvermerk (geprüft 20.11.2026, siehe lizenz/lizenz_hinweis)",
+  "warum_kein_wert": "Kein Wert im Register, bis der Obere Gutachterausschuss Brandenburg zustimmt: das Heft nennt keine Lizenz, das Impressum von gutachterausschuss.brandenburg.de untersagt die Verwendung ohne ausdrückliche Zustimmung. Anfrage vorbereitet am 20.11.2026.",
+  "unvollstaendig_grund": "Kein Wert im Register, bis der Obere Gutachterausschuss Brandenburg zustimmt: das Heft nennt keine Lizenz, das Impressum von gutachterausschuss.brandenburg.de untersagt die Verwendung ohne ausdrückliche Zustimmung. Anfrage vorbereitet am 20.11.2026.",
+  "lizenz_des_dokuments": "kein Lizenzvermerk im Dokument (LIZI_2025_OGA.pdf, alle 36 Seiten am 20.11.2026 erneut durchsucht: kein Treffer auf Lizenz, dl-de, govdata, Nutzungsbedingungen, Urheber). Auch die verlinkende Seite https://gutachterausschuss.brandenburg.de/gaa/de/marktinformationen/daten-fuer-die-wertermittlung/liegenschaftszinssaetze/ nennt keine Lizenz. Das Impressum des Portals (https://gutachterausschuss.brandenburg.de/gaa/de/impressum/, Abschnitt „Urheber- und Kennzeichenrecht“) sagt wörtlich: „Eine Vervielfältigung oder Verwendung solcher Bilder, Grafiken und Texte in anderen elektronischen oder gedruckten Publikationen ist, auch wenn sie als urheberrechtlich geschützte Dokumente nicht gekennzeichnet sind, ohne ausdrückliche Zustimmung des Urheberrechtinhabers nicht gestattet.“ Die Lizenz dl-de/by-2-0 steht nur im Grundstücksmarktbericht für das Land Brandenburg 2025 (GMB_Land.pdf, Impressum S. 2: „Für den Grundstücksmarktbericht gilt die Lizenz ‚Datenlizenz Deutschland - Namensnennung - Version 2.0‘ (dl-de/by-2-0)“) — dieser druckt die Liegenschaftszinssätze NICHT ab (geprüft: kein Tabellenteil zu Liegenschaftszinssätzen), gilt also nicht für dieses Heft. Zustimmung beim Oberen Gutachterausschuss erfragen (Oberer.Gutachterausschuss@geobasis-bb.de).",
+  "formel_vorgemerkt": {
+   "form": "konstante",
+   "wert_pct": 3.7,
+   "bezeichnung": "Wohn- und Geschäftshäuser (gewerblicher Mietanteil über 20 % bis unter 80 %)",
+   "wert": 3.7,
+   "liefert": "prozent",
+   "rundung_stellen": 2,
+   "form_hinweis": "v1787: Hier stand `form: \"festwert\"` mit dem Wert ausschliesslich in `wert_pct`. GEMESSEN am 02.10.2026 ueber swf_modelle.auswerten(): der Satz lieferte `form_unbekannt` — der Auswerter kennt die Form `festwert` nicht, und das Ergebnis war KEIN Wert. Jetzt `konstante` mit `wert` und `liefert: \"prozent\"`, wie es Dresden seit v1786 fuehrt. `wert_pct` bleibt als Dokumentation stehen: sie sagt, in welcher Einheit der Bericht die Zahl druckt."
+  },
+  "stufe_vorher": "A",
+  "stufe_grund": "kein Wert, Wegweiser zur Quelle (Zustimmung des Ausschusses angefragt)"
  },
  {
   "land_code": "BB",
@@ -271,15 +307,6 @@
   "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg",
   "kennzahl": "liegenschaftszinssatz",
   "zweig": "wgh_wm",
-  "formel": {
-   "form": "konstante",
-   "wert_pct": 4.6,
-   "bezeichnung": "Wohn- und Geschäftshäuser (gewerblicher Mietanteil über 20 % bis unter 80 %)",
-   "wert": 4.6,
-   "liefert": "prozent",
-   "rundung_stellen": 2,
-   "form_hinweis": "v1787: Hier stand `form: \"festwert\"` mit dem Wert ausschliesslich in `wert_pct`. GEMESSEN am 02.10.2026 ueber swf_modelle.auswerten(): der Satz lieferte `form_unbekannt` — der Auswerter kennt die Form `festwert` nicht, und das Ergebnis war KEIN Wert. Jetzt `konstante` mit `wert` und `liefert: \"prozent\"`, wie es Dresden seit v1786 fuehrt. `wert_pct` bleibt als Dokumentation stehen: sie sagt, in welcher Einheit der Bericht die Zahl druckt."
-  },
   "korrekturen": [],
   "modellansaetze": {
    "verwaltungskosten_wohnung_eur": 359,
@@ -313,23 +340,41 @@
     "kauffaelle": 66
    }
   ],
-  "stufe": "A",
+  "stufe": "E",
   "fallzahl": 66,
   "stichtag": "2024-07-01",
   "berichtsjahr": 2025,
   "modellversion": "LIZI 2025 OGA BB",
   "quelle_url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/LIZI_2025_OGA.pdf",
   "quelle_parser": "v1757-BBLZS",
-  "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg 2025, Liegenschaftszinssätze, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), www.gutachterausschuss-bb.de",
-  "lizenz": "dl-de/by-2-0",
-  "lizenz_hinweis": "v2999: Der Grundstuecksmarktbericht des Oberen Gutachterausschusses steht ausdruecklich unter dl-de/by-2-0 (GMB Land 2024, S. 2 Nutzungsbedingungen; Infoblatt Open Data MIK Brandenburg 01.03.2019; AGNB LGB Nr. 7.1a). Die LIZI-Veroeffentlichung desselben Herausgebers traegt keinen eigenen Vermerk - gefuehrt unter derselben Lizenz, schriftliche Bestaetigung beim OGA offen (Oberer.Gutachterausschuss@geobasis-bb.de). Vorher: ungeklaert.",
-  "lizenz_hinweis": "Im Dokument NICHT angegeben — 36 Seiten geprüft, null Treffer auf dl-de/Datenlizenz/Namensnennung, auch nicht auf der verlinkenden Seite. Die Kreisberichte Brandenburgs tragen dl-de/by-2-0; daraus auf dieses Dokument zu schließen wäre geraten. Vor Weitergabe beim Oberen Gutachterausschuss nachfragen.",
+  "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg 2025, Liegenschaftszinssätze (LIZI 2025 OGA), https://gutachterausschuss.brandenburg.de — Nutzungsbedingungen für dieses Heft nicht veröffentlicht, siehe Feld lizenz.",
+  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "lizenz_hinweis": "v20261120: Bis 20.11.2026 stand hier lizenz „dl-de/by-2-0“, ohne Beleg (der alte Hinweis sagte selbst: „daraus auf dieses Dokument zu schließen wäre geraten“). Ersetzt durch den Wortlaut der tatsächlich auffindbaren Bedingungen; die Zahl selbst bleibt unverändert.",
   "auflagen": "Nachrangig: das Dokument schreibt auf S. 5 selbst vor, dass vorrangig die Liegenschaftszinssätze der REGIONALEN Gutachterausschüsse zu verwenden sind, insbesondere in der Landeshauptstadt Potsdam. Diese überregionalen Werte sind der Rückfall, nicht die erste Wahl. — Potsdam ist in den meisten Räumen ausdrücklich AUSGENOMMEN (\"ohne Potsdam\"); für Potsdam gilt dieser Satz nicht.",
   "fundstelle": "S. 13, Anlage 1 (Modellansätze) S. 32-34, Anlage 2 (Gemeindeliste) S. 35-36",
   "streuung": {
    "min_pct": -0.9,
    "max_pct": 9.7
-  }
+  },
+  "vollstaendig": false,
+  "zugang": "genehmigungspflichtig",
+  "bestell_url": "mailto:Oberer.Gutachterausschuss@geobasis-bb.de",
+  "zustaendige_stelle": "Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg, Geschäftsstelle c/o LGB, Heinrich-Mann-Allee 104 B, 14473 Potsdam, +49 331 8844-540",
+  "zugang_beleg": "Impressum gutachterausschuss.brandenburg.de und Heft ohne Lizenzvermerk (geprüft 20.11.2026, siehe lizenz/lizenz_hinweis)",
+  "warum_kein_wert": "Kein Wert im Register, bis der Obere Gutachterausschuss Brandenburg zustimmt: das Heft nennt keine Lizenz, das Impressum von gutachterausschuss.brandenburg.de untersagt die Verwendung ohne ausdrückliche Zustimmung. Anfrage vorbereitet am 20.11.2026.",
+  "unvollstaendig_grund": "Kein Wert im Register, bis der Obere Gutachterausschuss Brandenburg zustimmt: das Heft nennt keine Lizenz, das Impressum von gutachterausschuss.brandenburg.de untersagt die Verwendung ohne ausdrückliche Zustimmung. Anfrage vorbereitet am 20.11.2026.",
+  "lizenz_des_dokuments": "kein Lizenzvermerk im Dokument (LIZI_2025_OGA.pdf, alle 36 Seiten am 20.11.2026 erneut durchsucht: kein Treffer auf Lizenz, dl-de, govdata, Nutzungsbedingungen, Urheber). Auch die verlinkende Seite https://gutachterausschuss.brandenburg.de/gaa/de/marktinformationen/daten-fuer-die-wertermittlung/liegenschaftszinssaetze/ nennt keine Lizenz. Das Impressum des Portals (https://gutachterausschuss.brandenburg.de/gaa/de/impressum/, Abschnitt „Urheber- und Kennzeichenrecht“) sagt wörtlich: „Eine Vervielfältigung oder Verwendung solcher Bilder, Grafiken und Texte in anderen elektronischen oder gedruckten Publikationen ist, auch wenn sie als urheberrechtlich geschützte Dokumente nicht gekennzeichnet sind, ohne ausdrückliche Zustimmung des Urheberrechtinhabers nicht gestattet.“ Die Lizenz dl-de/by-2-0 steht nur im Grundstücksmarktbericht für das Land Brandenburg 2025 (GMB_Land.pdf, Impressum S. 2: „Für den Grundstücksmarktbericht gilt die Lizenz ‚Datenlizenz Deutschland - Namensnennung - Version 2.0‘ (dl-de/by-2-0)“) — dieser druckt die Liegenschaftszinssätze NICHT ab (geprüft: kein Tabellenteil zu Liegenschaftszinssätzen), gilt also nicht für dieses Heft. Zustimmung beim Oberen Gutachterausschuss erfragen (Oberer.Gutachterausschuss@geobasis-bb.de).",
+  "formel_vorgemerkt": {
+   "form": "konstante",
+   "wert_pct": 4.6,
+   "bezeichnung": "Wohn- und Geschäftshäuser (gewerblicher Mietanteil über 20 % bis unter 80 %)",
+   "wert": 4.6,
+   "liefert": "prozent",
+   "rundung_stellen": 2,
+   "form_hinweis": "v1787: Hier stand `form: \"festwert\"` mit dem Wert ausschliesslich in `wert_pct`. GEMESSEN am 02.10.2026 ueber swf_modelle.auswerten(): der Satz lieferte `form_unbekannt` — der Auswerter kennt die Form `festwert` nicht, und das Ergebnis war KEIN Wert. Jetzt `konstante` mit `wert` und `liefert: \"prozent\"`, wie es Dresden seit v1786 fuehrt. `wert_pct` bleibt als Dokumentation stehen: sie sagt, in welcher Einheit der Bericht die Zahl druckt."
+  },
+  "stufe_vorher": "A",
+  "stufe_grund": "kein Wert, Wegweiser zur Quelle (Zustimmung des Ausschusses angefragt)"
  },
  {
   "land_code": "BB",
@@ -339,15 +384,6 @@
   "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg",
   "kennzahl": "liegenschaftszinssatz",
   "zweig": "wgh_kf",
-  "formel": {
-   "form": "konstante",
-   "wert_pct": 3.4,
-   "bezeichnung": "Wohn- und Geschäftshäuser (gewerblicher Mietanteil über 20 % bis unter 80 %)",
-   "wert": 3.4,
-   "liefert": "prozent",
-   "rundung_stellen": 2,
-   "form_hinweis": "v1787: Hier stand `form: \"festwert\"` mit dem Wert ausschliesslich in `wert_pct`. GEMESSEN am 02.10.2026 ueber swf_modelle.auswerten(): der Satz lieferte `form_unbekannt` — der Auswerter kennt die Form `festwert` nicht, und das Ergebnis war KEIN Wert. Jetzt `konstante` mit `wert` und `liefert: \"prozent\"`, wie es Dresden seit v1786 fuehrt. `wert_pct` bleibt als Dokumentation stehen: sie sagt, in welcher Einheit der Bericht die Zahl druckt."
-  },
   "korrekturen": [],
   "modellansaetze": {
    "verwaltungskosten_wohnung_eur": 359,
@@ -381,19 +417,37 @@
     "kauffaelle": 16
    }
   ],
-  "stufe": "A",
+  "stufe": "E",
   "fallzahl": 16,
   "stichtag": "2024-07-01",
   "berichtsjahr": 2025,
   "modellversion": "LIZI 2025 OGA BB",
   "quelle_url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/LIZI_2025_OGA.pdf",
   "quelle_parser": "v1757-BBLZS",
-  "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg 2025, Liegenschaftszinssätze, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), www.gutachterausschuss-bb.de",
-  "lizenz": "dl-de/by-2-0",
-  "lizenz_hinweis": "v2999: Der Grundstuecksmarktbericht des Oberen Gutachterausschusses steht ausdruecklich unter dl-de/by-2-0 (GMB Land 2024, S. 2 Nutzungsbedingungen; Infoblatt Open Data MIK Brandenburg 01.03.2019; AGNB LGB Nr. 7.1a). Die LIZI-Veroeffentlichung desselben Herausgebers traegt keinen eigenen Vermerk - gefuehrt unter derselben Lizenz, schriftliche Bestaetigung beim OGA offen (Oberer.Gutachterausschuss@geobasis-bb.de). Vorher: ungeklaert.",
-  "lizenz_hinweis": "Im Dokument NICHT angegeben — 36 Seiten geprüft, null Treffer auf dl-de/Datenlizenz/Namensnennung, auch nicht auf der verlinkenden Seite. Die Kreisberichte Brandenburgs tragen dl-de/by-2-0; daraus auf dieses Dokument zu schließen wäre geraten. Vor Weitergabe beim Oberen Gutachterausschuss nachfragen.",
+  "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg 2025, Liegenschaftszinssätze (LIZI 2025 OGA), https://gutachterausschuss.brandenburg.de — Nutzungsbedingungen für dieses Heft nicht veröffentlicht, siehe Feld lizenz.",
+  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "lizenz_hinweis": "v20261120: Bis 20.11.2026 stand hier lizenz „dl-de/by-2-0“, ohne Beleg (der alte Hinweis sagte selbst: „daraus auf dieses Dokument zu schließen wäre geraten“). Ersetzt durch den Wortlaut der tatsächlich auffindbaren Bedingungen; die Zahl selbst bleibt unverändert.",
   "auflagen": "Nachrangig: das Dokument schreibt auf S. 5 selbst vor, dass vorrangig die Liegenschaftszinssätze der REGIONALEN Gutachterausschüsse zu verwenden sind, insbesondere in der Landeshauptstadt Potsdam. Diese überregionalen Werte sind der Rückfall, nicht die erste Wahl. — Potsdam ist in den meisten Räumen ausdrücklich AUSGENOMMEN (\"ohne Potsdam\"); für Potsdam gilt dieser Satz nicht.",
-  "fundstelle": "S. 14, Anlage 1 (Modellansätze) S. 32-34, Anlage 2 (Gemeindeliste) S. 35-36"
+  "fundstelle": "S. 14, Anlage 1 (Modellansätze) S. 32-34, Anlage 2 (Gemeindeliste) S. 35-36",
+  "vollstaendig": false,
+  "zugang": "genehmigungspflichtig",
+  "bestell_url": "mailto:Oberer.Gutachterausschuss@geobasis-bb.de",
+  "zustaendige_stelle": "Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg, Geschäftsstelle c/o LGB, Heinrich-Mann-Allee 104 B, 14473 Potsdam, +49 331 8844-540",
+  "zugang_beleg": "Impressum gutachterausschuss.brandenburg.de und Heft ohne Lizenzvermerk (geprüft 20.11.2026, siehe lizenz/lizenz_hinweis)",
+  "warum_kein_wert": "Kein Wert im Register, bis der Obere Gutachterausschuss Brandenburg zustimmt: das Heft nennt keine Lizenz, das Impressum von gutachterausschuss.brandenburg.de untersagt die Verwendung ohne ausdrückliche Zustimmung. Anfrage vorbereitet am 20.11.2026.",
+  "unvollstaendig_grund": "Kein Wert im Register, bis der Obere Gutachterausschuss Brandenburg zustimmt: das Heft nennt keine Lizenz, das Impressum von gutachterausschuss.brandenburg.de untersagt die Verwendung ohne ausdrückliche Zustimmung. Anfrage vorbereitet am 20.11.2026.",
+  "lizenz_des_dokuments": "kein Lizenzvermerk im Dokument (LIZI_2025_OGA.pdf, alle 36 Seiten am 20.11.2026 erneut durchsucht: kein Treffer auf Lizenz, dl-de, govdata, Nutzungsbedingungen, Urheber). Auch die verlinkende Seite https://gutachterausschuss.brandenburg.de/gaa/de/marktinformationen/daten-fuer-die-wertermittlung/liegenschaftszinssaetze/ nennt keine Lizenz. Das Impressum des Portals (https://gutachterausschuss.brandenburg.de/gaa/de/impressum/, Abschnitt „Urheber- und Kennzeichenrecht“) sagt wörtlich: „Eine Vervielfältigung oder Verwendung solcher Bilder, Grafiken und Texte in anderen elektronischen oder gedruckten Publikationen ist, auch wenn sie als urheberrechtlich geschützte Dokumente nicht gekennzeichnet sind, ohne ausdrückliche Zustimmung des Urheberrechtinhabers nicht gestattet.“ Die Lizenz dl-de/by-2-0 steht nur im Grundstücksmarktbericht für das Land Brandenburg 2025 (GMB_Land.pdf, Impressum S. 2: „Für den Grundstücksmarktbericht gilt die Lizenz ‚Datenlizenz Deutschland - Namensnennung - Version 2.0‘ (dl-de/by-2-0)“) — dieser druckt die Liegenschaftszinssätze NICHT ab (geprüft: kein Tabellenteil zu Liegenschaftszinssätzen), gilt also nicht für dieses Heft. Zustimmung beim Oberen Gutachterausschuss erfragen (Oberer.Gutachterausschuss@geobasis-bb.de).",
+  "formel_vorgemerkt": {
+   "form": "konstante",
+   "wert_pct": 3.4,
+   "bezeichnung": "Wohn- und Geschäftshäuser (gewerblicher Mietanteil über 20 % bis unter 80 %)",
+   "wert": 3.4,
+   "liefert": "prozent",
+   "rundung_stellen": 2,
+   "form_hinweis": "v1787: Hier stand `form: \"festwert\"` mit dem Wert ausschliesslich in `wert_pct`. GEMESSEN am 02.10.2026 ueber swf_modelle.auswerten(): der Satz lieferte `form_unbekannt` — der Auswerter kennt die Form `festwert` nicht, und das Ergebnis war KEIN Wert. Jetzt `konstante` mit `wert` und `liefert: \"prozent\"`, wie es Dresden seit v1786 fuehrt. `wert_pct` bleibt als Dokumentation stehen: sie sagt, in welcher Einheit der Bericht die Zahl druckt."
+  },
+  "stufe_vorher": "A",
+  "stufe_grund": "kein Wert, Wegweiser zur Quelle (Zustimmung des Ausschusses angefragt)"
  },
  {
   "land_code": "BB",
@@ -403,15 +457,6 @@
   "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg",
   "kennzahl": "liegenschaftszinssatz",
   "zweig": "gh_land",
-  "formel": {
-   "form": "konstante",
-   "wert_pct": 4.5,
-   "bezeichnung": "Geschäftshäuser (gewerblicher Mietanteil ab 80 %)",
-   "wert": 4.5,
-   "liefert": "prozent",
-   "rundung_stellen": 2,
-   "form_hinweis": "v1787: Hier stand `form: \"festwert\"` mit dem Wert ausschliesslich in `wert_pct`. GEMESSEN am 02.10.2026 ueber swf_modelle.auswerten(): der Satz lieferte `form_unbekannt` — der Auswerter kennt die Form `festwert` nicht, und das Ergebnis war KEIN Wert. Jetzt `konstante` mit `wert` und `liefert: \"prozent\"`, wie es Dresden seit v1786 fuehrt. `wert_pct` bleibt als Dokumentation stehen: sie sagt, in welcher Einheit der Bericht die Zahl druckt."
-  },
   "korrekturen": [],
   "modellansaetze": {
    "verwaltungskosten_wohnung_eur": 359,
@@ -445,23 +490,41 @@
     "kauffaelle": 24
    }
   ],
-  "stufe": "A",
+  "stufe": "E",
   "fallzahl": 24,
   "stichtag": "2024-07-01",
   "berichtsjahr": 2025,
   "modellversion": "LIZI 2025 OGA BB",
   "quelle_url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/LIZI_2025_OGA.pdf",
   "quelle_parser": "v1757-BBLZS",
-  "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg 2025, Liegenschaftszinssätze, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), www.gutachterausschuss-bb.de",
-  "lizenz": "dl-de/by-2-0",
-  "lizenz_hinweis": "v2999: Der Grundstuecksmarktbericht des Oberen Gutachterausschusses steht ausdruecklich unter dl-de/by-2-0 (GMB Land 2024, S. 2 Nutzungsbedingungen; Infoblatt Open Data MIK Brandenburg 01.03.2019; AGNB LGB Nr. 7.1a). Die LIZI-Veroeffentlichung desselben Herausgebers traegt keinen eigenen Vermerk - gefuehrt unter derselben Lizenz, schriftliche Bestaetigung beim OGA offen (Oberer.Gutachterausschuss@geobasis-bb.de). Vorher: ungeklaert.",
-  "lizenz_hinweis": "Im Dokument NICHT angegeben — 36 Seiten geprüft, null Treffer auf dl-de/Datenlizenz/Namensnennung, auch nicht auf der verlinkenden Seite. Die Kreisberichte Brandenburgs tragen dl-de/by-2-0; daraus auf dieses Dokument zu schließen wäre geraten. Vor Weitergabe beim Oberen Gutachterausschuss nachfragen.",
+  "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg 2025, Liegenschaftszinssätze (LIZI 2025 OGA), https://gutachterausschuss.brandenburg.de — Nutzungsbedingungen für dieses Heft nicht veröffentlicht, siehe Feld lizenz.",
+  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "lizenz_hinweis": "v20261120: Bis 20.11.2026 stand hier lizenz „dl-de/by-2-0“, ohne Beleg (der alte Hinweis sagte selbst: „daraus auf dieses Dokument zu schließen wäre geraten“). Ersetzt durch den Wortlaut der tatsächlich auffindbaren Bedingungen; die Zahl selbst bleibt unverändert.",
   "auflagen": "Nachrangig: das Dokument schreibt auf S. 5 selbst vor, dass vorrangig die Liegenschaftszinssätze der REGIONALEN Gutachterausschüsse zu verwenden sind, insbesondere in der Landeshauptstadt Potsdam. Diese überregionalen Werte sind der Rückfall, nicht die erste Wahl. — Potsdam ist in den meisten Räumen ausdrücklich AUSGENOMMEN (\"ohne Potsdam\"); für Potsdam gilt dieser Satz nicht.",
   "fundstelle": "S. 17, Anlage 1 (Modellansätze) S. 32-34, Anlage 2 (Gemeindeliste) S. 35-36",
   "streuung": {
    "min_pct": -0.2,
    "max_pct": 9
-  }
+  },
+  "vollstaendig": false,
+  "zugang": "genehmigungspflichtig",
+  "bestell_url": "mailto:Oberer.Gutachterausschuss@geobasis-bb.de",
+  "zustaendige_stelle": "Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg, Geschäftsstelle c/o LGB, Heinrich-Mann-Allee 104 B, 14473 Potsdam, +49 331 8844-540",
+  "zugang_beleg": "Impressum gutachterausschuss.brandenburg.de und Heft ohne Lizenzvermerk (geprüft 20.11.2026, siehe lizenz/lizenz_hinweis)",
+  "warum_kein_wert": "Kein Wert im Register, bis der Obere Gutachterausschuss Brandenburg zustimmt: das Heft nennt keine Lizenz, das Impressum von gutachterausschuss.brandenburg.de untersagt die Verwendung ohne ausdrückliche Zustimmung. Anfrage vorbereitet am 20.11.2026.",
+  "unvollstaendig_grund": "Kein Wert im Register, bis der Obere Gutachterausschuss Brandenburg zustimmt: das Heft nennt keine Lizenz, das Impressum von gutachterausschuss.brandenburg.de untersagt die Verwendung ohne ausdrückliche Zustimmung. Anfrage vorbereitet am 20.11.2026.",
+  "lizenz_des_dokuments": "kein Lizenzvermerk im Dokument (LIZI_2025_OGA.pdf, alle 36 Seiten am 20.11.2026 erneut durchsucht: kein Treffer auf Lizenz, dl-de, govdata, Nutzungsbedingungen, Urheber). Auch die verlinkende Seite https://gutachterausschuss.brandenburg.de/gaa/de/marktinformationen/daten-fuer-die-wertermittlung/liegenschaftszinssaetze/ nennt keine Lizenz. Das Impressum des Portals (https://gutachterausschuss.brandenburg.de/gaa/de/impressum/, Abschnitt „Urheber- und Kennzeichenrecht“) sagt wörtlich: „Eine Vervielfältigung oder Verwendung solcher Bilder, Grafiken und Texte in anderen elektronischen oder gedruckten Publikationen ist, auch wenn sie als urheberrechtlich geschützte Dokumente nicht gekennzeichnet sind, ohne ausdrückliche Zustimmung des Urheberrechtinhabers nicht gestattet.“ Die Lizenz dl-de/by-2-0 steht nur im Grundstücksmarktbericht für das Land Brandenburg 2025 (GMB_Land.pdf, Impressum S. 2: „Für den Grundstücksmarktbericht gilt die Lizenz ‚Datenlizenz Deutschland - Namensnennung - Version 2.0‘ (dl-de/by-2-0)“) — dieser druckt die Liegenschaftszinssätze NICHT ab (geprüft: kein Tabellenteil zu Liegenschaftszinssätzen), gilt also nicht für dieses Heft. Zustimmung beim Oberen Gutachterausschuss erfragen (Oberer.Gutachterausschuss@geobasis-bb.de).",
+  "formel_vorgemerkt": {
+   "form": "konstante",
+   "wert_pct": 4.5,
+   "bezeichnung": "Geschäftshäuser (gewerblicher Mietanteil ab 80 %)",
+   "wert": 4.5,
+   "liefert": "prozent",
+   "rundung_stellen": 2,
+   "form_hinweis": "v1787: Hier stand `form: \"festwert\"` mit dem Wert ausschliesslich in `wert_pct`. GEMESSEN am 02.10.2026 ueber swf_modelle.auswerten(): der Satz lieferte `form_unbekannt` — der Auswerter kennt die Form `festwert` nicht, und das Ergebnis war KEIN Wert. Jetzt `konstante` mit `wert` und `liefert: \"prozent\"`, wie es Dresden seit v1786 fuehrt. `wert_pct` bleibt als Dokumentation stehen: sie sagt, in welcher Einheit der Bericht die Zahl druckt."
+  },
+  "stufe_vorher": "A",
+  "stufe_grund": "kein Wert, Wegweiser zur Quelle (Zustimmung des Ausschusses angefragt)"
  },
  {
   "land_code": "BB",
@@ -471,15 +534,6 @@
   "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg",
   "kennzahl": "liegenschaftszinssatz",
   "zweig": "gh_bu",
-  "formel": {
-   "form": "konstante",
-   "wert_pct": 4.3,
-   "bezeichnung": "Geschäftshäuser (gewerblicher Mietanteil ab 80 %)",
-   "wert": 4.3,
-   "liefert": "prozent",
-   "rundung_stellen": 2,
-   "form_hinweis": "v1787: Hier stand `form: \"festwert\"` mit dem Wert ausschliesslich in `wert_pct`. GEMESSEN am 02.10.2026 ueber swf_modelle.auswerten(): der Satz lieferte `form_unbekannt` — der Auswerter kennt die Form `festwert` nicht, und das Ergebnis war KEIN Wert. Jetzt `konstante` mit `wert` und `liefert: \"prozent\"`, wie es Dresden seit v1786 fuehrt. `wert_pct` bleibt als Dokumentation stehen: sie sagt, in welcher Einheit der Bericht die Zahl druckt."
-  },
   "korrekturen": [],
   "modellansaetze": {
    "verwaltungskosten_wohnung_eur": 359,
@@ -513,19 +567,37 @@
     "kauffaelle": 17
    }
   ],
-  "stufe": "A",
+  "stufe": "E",
   "fallzahl": 17,
   "stichtag": "2024-07-01",
   "berichtsjahr": 2025,
   "modellversion": "LIZI 2025 OGA BB",
   "quelle_url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/LIZI_2025_OGA.pdf",
   "quelle_parser": "v1757-BBLZS",
-  "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg 2025, Liegenschaftszinssätze, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), www.gutachterausschuss-bb.de",
-  "lizenz": "dl-de/by-2-0",
-  "lizenz_hinweis": "v2999: Der Grundstuecksmarktbericht des Oberen Gutachterausschusses steht ausdruecklich unter dl-de/by-2-0 (GMB Land 2024, S. 2 Nutzungsbedingungen; Infoblatt Open Data MIK Brandenburg 01.03.2019; AGNB LGB Nr. 7.1a). Die LIZI-Veroeffentlichung desselben Herausgebers traegt keinen eigenen Vermerk - gefuehrt unter derselben Lizenz, schriftliche Bestaetigung beim OGA offen (Oberer.Gutachterausschuss@geobasis-bb.de). Vorher: ungeklaert.",
-  "lizenz_hinweis": "Im Dokument NICHT angegeben — 36 Seiten geprüft, null Treffer auf dl-de/Datenlizenz/Namensnennung, auch nicht auf der verlinkenden Seite. Die Kreisberichte Brandenburgs tragen dl-de/by-2-0; daraus auf dieses Dokument zu schließen wäre geraten. Vor Weitergabe beim Oberen Gutachterausschuss nachfragen.",
+  "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg 2025, Liegenschaftszinssätze (LIZI 2025 OGA), https://gutachterausschuss.brandenburg.de — Nutzungsbedingungen für dieses Heft nicht veröffentlicht, siehe Feld lizenz.",
+  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "lizenz_hinweis": "v20261120: Bis 20.11.2026 stand hier lizenz „dl-de/by-2-0“, ohne Beleg (der alte Hinweis sagte selbst: „daraus auf dieses Dokument zu schließen wäre geraten“). Ersetzt durch den Wortlaut der tatsächlich auffindbaren Bedingungen; die Zahl selbst bleibt unverändert.",
   "auflagen": "Nachrangig: das Dokument schreibt auf S. 5 selbst vor, dass vorrangig die Liegenschaftszinssätze der REGIONALEN Gutachterausschüsse zu verwenden sind, insbesondere in der Landeshauptstadt Potsdam. Diese überregionalen Werte sind der Rückfall, nicht die erste Wahl. — Potsdam ist in den meisten Räumen ausdrücklich AUSGENOMMEN (\"ohne Potsdam\"); für Potsdam gilt dieser Satz nicht.",
-  "fundstelle": "S. 18, Anlage 1 (Modellansätze) S. 32-34, Anlage 2 (Gemeindeliste) S. 35-36"
+  "fundstelle": "S. 18, Anlage 1 (Modellansätze) S. 32-34, Anlage 2 (Gemeindeliste) S. 35-36",
+  "vollstaendig": false,
+  "zugang": "genehmigungspflichtig",
+  "bestell_url": "mailto:Oberer.Gutachterausschuss@geobasis-bb.de",
+  "zustaendige_stelle": "Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg, Geschäftsstelle c/o LGB, Heinrich-Mann-Allee 104 B, 14473 Potsdam, +49 331 8844-540",
+  "zugang_beleg": "Impressum gutachterausschuss.brandenburg.de und Heft ohne Lizenzvermerk (geprüft 20.11.2026, siehe lizenz/lizenz_hinweis)",
+  "warum_kein_wert": "Kein Wert im Register, bis der Obere Gutachterausschuss Brandenburg zustimmt: das Heft nennt keine Lizenz, das Impressum von gutachterausschuss.brandenburg.de untersagt die Verwendung ohne ausdrückliche Zustimmung. Anfrage vorbereitet am 20.11.2026.",
+  "unvollstaendig_grund": "Kein Wert im Register, bis der Obere Gutachterausschuss Brandenburg zustimmt: das Heft nennt keine Lizenz, das Impressum von gutachterausschuss.brandenburg.de untersagt die Verwendung ohne ausdrückliche Zustimmung. Anfrage vorbereitet am 20.11.2026.",
+  "lizenz_des_dokuments": "kein Lizenzvermerk im Dokument (LIZI_2025_OGA.pdf, alle 36 Seiten am 20.11.2026 erneut durchsucht: kein Treffer auf Lizenz, dl-de, govdata, Nutzungsbedingungen, Urheber). Auch die verlinkende Seite https://gutachterausschuss.brandenburg.de/gaa/de/marktinformationen/daten-fuer-die-wertermittlung/liegenschaftszinssaetze/ nennt keine Lizenz. Das Impressum des Portals (https://gutachterausschuss.brandenburg.de/gaa/de/impressum/, Abschnitt „Urheber- und Kennzeichenrecht“) sagt wörtlich: „Eine Vervielfältigung oder Verwendung solcher Bilder, Grafiken und Texte in anderen elektronischen oder gedruckten Publikationen ist, auch wenn sie als urheberrechtlich geschützte Dokumente nicht gekennzeichnet sind, ohne ausdrückliche Zustimmung des Urheberrechtinhabers nicht gestattet.“ Die Lizenz dl-de/by-2-0 steht nur im Grundstücksmarktbericht für das Land Brandenburg 2025 (GMB_Land.pdf, Impressum S. 2: „Für den Grundstücksmarktbericht gilt die Lizenz ‚Datenlizenz Deutschland - Namensnennung - Version 2.0‘ (dl-de/by-2-0)“) — dieser druckt die Liegenschaftszinssätze NICHT ab (geprüft: kein Tabellenteil zu Liegenschaftszinssätzen), gilt also nicht für dieses Heft. Zustimmung beim Oberen Gutachterausschuss erfragen (Oberer.Gutachterausschuss@geobasis-bb.de).",
+  "formel_vorgemerkt": {
+   "form": "konstante",
+   "wert_pct": 4.3,
+   "bezeichnung": "Geschäftshäuser (gewerblicher Mietanteil ab 80 %)",
+   "wert": 4.3,
+   "liefert": "prozent",
+   "rundung_stellen": 2,
+   "form_hinweis": "v1787: Hier stand `form: \"festwert\"` mit dem Wert ausschliesslich in `wert_pct`. GEMESSEN am 02.10.2026 ueber swf_modelle.auswerten(): der Satz lieferte `form_unbekannt` — der Auswerter kennt die Form `festwert` nicht, und das Ergebnis war KEIN Wert. Jetzt `konstante` mit `wert` und `liefert: \"prozent\"`, wie es Dresden seit v1786 fuehrt. `wert_pct` bleibt als Dokumentation stehen: sie sagt, in welcher Einheit der Bericht die Zahl druckt."
+  },
+  "stufe_vorher": "A",
+  "stufe_grund": "kein Wert, Wegweiser zur Quelle (Zustimmung des Ausschusses angefragt)"
  },
  {
   "land_code": "BB",
@@ -535,15 +607,6 @@
   "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg",
   "kennzahl": "liegenschaftszinssatz",
   "zweig": "gh_wm",
-  "formel": {
-   "form": "konstante",
-   "wert_pct": 5.3,
-   "bezeichnung": "Geschäftshäuser (gewerblicher Mietanteil ab 80 %)",
-   "wert": 5.3,
-   "liefert": "prozent",
-   "rundung_stellen": 2,
-   "form_hinweis": "v1787: Hier stand `form: \"festwert\"` mit dem Wert ausschliesslich in `wert_pct`. GEMESSEN am 02.10.2026 ueber swf_modelle.auswerten(): der Satz lieferte `form_unbekannt` — der Auswerter kennt die Form `festwert` nicht, und das Ergebnis war KEIN Wert. Jetzt `konstante` mit `wert` und `liefert: \"prozent\"`, wie es Dresden seit v1786 fuehrt. `wert_pct` bleibt als Dokumentation stehen: sie sagt, in welcher Einheit der Bericht die Zahl druckt."
-  },
   "korrekturen": [],
   "modellansaetze": {
    "verwaltungskosten_wohnung_eur": 359,
@@ -577,19 +640,37 @@
     "kauffaelle": 8
    }
   ],
-  "stufe": "A",
+  "stufe": "E",
   "fallzahl": 8,
   "stichtag": "2024-07-01",
   "berichtsjahr": 2025,
   "modellversion": "LIZI 2025 OGA BB",
   "quelle_url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/LIZI_2025_OGA.pdf",
   "quelle_parser": "v1757-BBLZS",
-  "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg 2025, Liegenschaftszinssätze, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), www.gutachterausschuss-bb.de",
-  "lizenz": "dl-de/by-2-0",
-  "lizenz_hinweis": "v2999: Der Grundstuecksmarktbericht des Oberen Gutachterausschusses steht ausdruecklich unter dl-de/by-2-0 (GMB Land 2024, S. 2 Nutzungsbedingungen; Infoblatt Open Data MIK Brandenburg 01.03.2019; AGNB LGB Nr. 7.1a). Die LIZI-Veroeffentlichung desselben Herausgebers traegt keinen eigenen Vermerk - gefuehrt unter derselben Lizenz, schriftliche Bestaetigung beim OGA offen (Oberer.Gutachterausschuss@geobasis-bb.de). Vorher: ungeklaert.",
-  "lizenz_hinweis": "Im Dokument NICHT angegeben — 36 Seiten geprüft, null Treffer auf dl-de/Datenlizenz/Namensnennung, auch nicht auf der verlinkenden Seite. Die Kreisberichte Brandenburgs tragen dl-de/by-2-0; daraus auf dieses Dokument zu schließen wäre geraten. Vor Weitergabe beim Oberen Gutachterausschuss nachfragen.",
+  "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg 2025, Liegenschaftszinssätze (LIZI 2025 OGA), https://gutachterausschuss.brandenburg.de — Nutzungsbedingungen für dieses Heft nicht veröffentlicht, siehe Feld lizenz.",
+  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "lizenz_hinweis": "v20261120: Bis 20.11.2026 stand hier lizenz „dl-de/by-2-0“, ohne Beleg (der alte Hinweis sagte selbst: „daraus auf dieses Dokument zu schließen wäre geraten“). Ersetzt durch den Wortlaut der tatsächlich auffindbaren Bedingungen; die Zahl selbst bleibt unverändert.",
   "auflagen": "Nachrangig: das Dokument schreibt auf S. 5 selbst vor, dass vorrangig die Liegenschaftszinssätze der REGIONALEN Gutachterausschüsse zu verwenden sind, insbesondere in der Landeshauptstadt Potsdam. Diese überregionalen Werte sind der Rückfall, nicht die erste Wahl. — Potsdam ist in den meisten Räumen ausdrücklich AUSGENOMMEN (\"ohne Potsdam\"); für Potsdam gilt dieser Satz nicht.",
-  "fundstelle": "S. 19, Anlage 1 (Modellansätze) S. 32-34, Anlage 2 (Gemeindeliste) S. 35-36"
+  "fundstelle": "S. 19, Anlage 1 (Modellansätze) S. 32-34, Anlage 2 (Gemeindeliste) S. 35-36",
+  "vollstaendig": false,
+  "zugang": "genehmigungspflichtig",
+  "bestell_url": "mailto:Oberer.Gutachterausschuss@geobasis-bb.de",
+  "zustaendige_stelle": "Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg, Geschäftsstelle c/o LGB, Heinrich-Mann-Allee 104 B, 14473 Potsdam, +49 331 8844-540",
+  "zugang_beleg": "Impressum gutachterausschuss.brandenburg.de und Heft ohne Lizenzvermerk (geprüft 20.11.2026, siehe lizenz/lizenz_hinweis)",
+  "warum_kein_wert": "Kein Wert im Register, bis der Obere Gutachterausschuss Brandenburg zustimmt: das Heft nennt keine Lizenz, das Impressum von gutachterausschuss.brandenburg.de untersagt die Verwendung ohne ausdrückliche Zustimmung. Anfrage vorbereitet am 20.11.2026.",
+  "unvollstaendig_grund": "Kein Wert im Register, bis der Obere Gutachterausschuss Brandenburg zustimmt: das Heft nennt keine Lizenz, das Impressum von gutachterausschuss.brandenburg.de untersagt die Verwendung ohne ausdrückliche Zustimmung. Anfrage vorbereitet am 20.11.2026.",
+  "lizenz_des_dokuments": "kein Lizenzvermerk im Dokument (LIZI_2025_OGA.pdf, alle 36 Seiten am 20.11.2026 erneut durchsucht: kein Treffer auf Lizenz, dl-de, govdata, Nutzungsbedingungen, Urheber). Auch die verlinkende Seite https://gutachterausschuss.brandenburg.de/gaa/de/marktinformationen/daten-fuer-die-wertermittlung/liegenschaftszinssaetze/ nennt keine Lizenz. Das Impressum des Portals (https://gutachterausschuss.brandenburg.de/gaa/de/impressum/, Abschnitt „Urheber- und Kennzeichenrecht“) sagt wörtlich: „Eine Vervielfältigung oder Verwendung solcher Bilder, Grafiken und Texte in anderen elektronischen oder gedruckten Publikationen ist, auch wenn sie als urheberrechtlich geschützte Dokumente nicht gekennzeichnet sind, ohne ausdrückliche Zustimmung des Urheberrechtinhabers nicht gestattet.“ Die Lizenz dl-de/by-2-0 steht nur im Grundstücksmarktbericht für das Land Brandenburg 2025 (GMB_Land.pdf, Impressum S. 2: „Für den Grundstücksmarktbericht gilt die Lizenz ‚Datenlizenz Deutschland - Namensnennung - Version 2.0‘ (dl-de/by-2-0)“) — dieser druckt die Liegenschaftszinssätze NICHT ab (geprüft: kein Tabellenteil zu Liegenschaftszinssätzen), gilt also nicht für dieses Heft. Zustimmung beim Oberen Gutachterausschuss erfragen (Oberer.Gutachterausschuss@geobasis-bb.de).",
+  "formel_vorgemerkt": {
+   "form": "konstante",
+   "wert_pct": 5.3,
+   "bezeichnung": "Geschäftshäuser (gewerblicher Mietanteil ab 80 %)",
+   "wert": 5.3,
+   "liefert": "prozent",
+   "rundung_stellen": 2,
+   "form_hinweis": "v1787: Hier stand `form: \"festwert\"` mit dem Wert ausschliesslich in `wert_pct`. GEMESSEN am 02.10.2026 ueber swf_modelle.auswerten(): der Satz lieferte `form_unbekannt` — der Auswerter kennt die Form `festwert` nicht, und das Ergebnis war KEIN Wert. Jetzt `konstante` mit `wert` und `liefert: \"prozent\"`, wie es Dresden seit v1786 fuehrt. `wert_pct` bleibt als Dokumentation stehen: sie sagt, in welcher Einheit der Bericht die Zahl druckt."
+  },
+  "stufe_vorher": "A",
+  "stufe_grund": "kein Wert, Wegweiser zur Quelle (Zustimmung des Ausschusses angefragt)"
  },
  {
   "land_code": "BB",
@@ -599,15 +680,6 @@
   "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg",
   "kennzahl": "liegenschaftszinssatz",
   "zweig": "indwb_bu",
-  "formel": {
-   "form": "konstante",
-   "wert_pct": 2.4,
-   "bezeichnung": "Individueller Wohnungsbau (EFH, ZFH, DHH, RH)",
-   "wert": 2.4,
-   "liefert": "prozent",
-   "rundung_stellen": 2,
-   "form_hinweis": "v1787: Hier stand `form: \"festwert\"` mit dem Wert ausschliesslich in `wert_pct`. GEMESSEN am 02.10.2026 ueber swf_modelle.auswerten(): der Satz lieferte `form_unbekannt` — der Auswerter kennt die Form `festwert` nicht, und das Ergebnis war KEIN Wert. Jetzt `konstante` mit `wert` und `liefert: \"prozent\"`, wie es Dresden seit v1786 fuehrt. `wert_pct` bleibt als Dokumentation stehen: sie sagt, in welcher Einheit der Bericht die Zahl druckt."
-  },
   "korrekturen": [],
   "modellansaetze": {
    "verwaltungskosten_wohnung_eur": 359,
@@ -641,23 +713,41 @@
     "kauffaelle": 119
    }
   ],
-  "stufe": "A",
+  "stufe": "E",
   "fallzahl": 119,
   "stichtag": "2024-07-01",
   "berichtsjahr": 2025,
   "modellversion": "LIZI 2025 OGA BB",
   "quelle_url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/LIZI_2025_OGA.pdf",
   "quelle_parser": "v1757-BBLZS",
-  "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg 2025, Liegenschaftszinssätze, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), www.gutachterausschuss-bb.de",
-  "lizenz": "dl-de/by-2-0",
-  "lizenz_hinweis": "v2999: Der Grundstuecksmarktbericht des Oberen Gutachterausschusses steht ausdruecklich unter dl-de/by-2-0 (GMB Land 2024, S. 2 Nutzungsbedingungen; Infoblatt Open Data MIK Brandenburg 01.03.2019; AGNB LGB Nr. 7.1a). Die LIZI-Veroeffentlichung desselben Herausgebers traegt keinen eigenen Vermerk - gefuehrt unter derselben Lizenz, schriftliche Bestaetigung beim OGA offen (Oberer.Gutachterausschuss@geobasis-bb.de). Vorher: ungeklaert.",
-  "lizenz_hinweis": "Im Dokument NICHT angegeben — 36 Seiten geprüft, null Treffer auf dl-de/Datenlizenz/Namensnennung, auch nicht auf der verlinkenden Seite. Die Kreisberichte Brandenburgs tragen dl-de/by-2-0; daraus auf dieses Dokument zu schließen wäre geraten. Vor Weitergabe beim Oberen Gutachterausschuss nachfragen.",
+  "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg 2025, Liegenschaftszinssätze (LIZI 2025 OGA), https://gutachterausschuss.brandenburg.de — Nutzungsbedingungen für dieses Heft nicht veröffentlicht, siehe Feld lizenz.",
+  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "lizenz_hinweis": "v20261120: Bis 20.11.2026 stand hier lizenz „dl-de/by-2-0“, ohne Beleg (der alte Hinweis sagte selbst: „daraus auf dieses Dokument zu schließen wäre geraten“). Ersetzt durch den Wortlaut der tatsächlich auffindbaren Bedingungen; die Zahl selbst bleibt unverändert.",
   "auflagen": "Nachrangig: das Dokument schreibt auf S. 5 selbst vor, dass vorrangig die Liegenschaftszinssätze der REGIONALEN Gutachterausschüsse zu verwenden sind, insbesondere in der Landeshauptstadt Potsdam. Diese überregionalen Werte sind der Rückfall, nicht die erste Wahl. — Potsdam ist in den meisten Räumen ausdrücklich AUSGENOMMEN (\"ohne Potsdam\"); für Potsdam gilt dieser Satz nicht.",
   "fundstelle": "S. 22, Anlage 1 (Modellansätze) S. 32-34, Anlage 2 (Gemeindeliste) S. 35-36",
   "streuung": {
    "min_pct": 0.3,
    "max_pct": 4.8
-  }
+  },
+  "vollstaendig": false,
+  "zugang": "genehmigungspflichtig",
+  "bestell_url": "mailto:Oberer.Gutachterausschuss@geobasis-bb.de",
+  "zustaendige_stelle": "Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg, Geschäftsstelle c/o LGB, Heinrich-Mann-Allee 104 B, 14473 Potsdam, +49 331 8844-540",
+  "zugang_beleg": "Impressum gutachterausschuss.brandenburg.de und Heft ohne Lizenzvermerk (geprüft 20.11.2026, siehe lizenz/lizenz_hinweis)",
+  "warum_kein_wert": "Kein Wert im Register, bis der Obere Gutachterausschuss Brandenburg zustimmt: das Heft nennt keine Lizenz, das Impressum von gutachterausschuss.brandenburg.de untersagt die Verwendung ohne ausdrückliche Zustimmung. Anfrage vorbereitet am 20.11.2026.",
+  "unvollstaendig_grund": "Kein Wert im Register, bis der Obere Gutachterausschuss Brandenburg zustimmt: das Heft nennt keine Lizenz, das Impressum von gutachterausschuss.brandenburg.de untersagt die Verwendung ohne ausdrückliche Zustimmung. Anfrage vorbereitet am 20.11.2026.",
+  "lizenz_des_dokuments": "kein Lizenzvermerk im Dokument (LIZI_2025_OGA.pdf, alle 36 Seiten am 20.11.2026 erneut durchsucht: kein Treffer auf Lizenz, dl-de, govdata, Nutzungsbedingungen, Urheber). Auch die verlinkende Seite https://gutachterausschuss.brandenburg.de/gaa/de/marktinformationen/daten-fuer-die-wertermittlung/liegenschaftszinssaetze/ nennt keine Lizenz. Das Impressum des Portals (https://gutachterausschuss.brandenburg.de/gaa/de/impressum/, Abschnitt „Urheber- und Kennzeichenrecht“) sagt wörtlich: „Eine Vervielfältigung oder Verwendung solcher Bilder, Grafiken und Texte in anderen elektronischen oder gedruckten Publikationen ist, auch wenn sie als urheberrechtlich geschützte Dokumente nicht gekennzeichnet sind, ohne ausdrückliche Zustimmung des Urheberrechtinhabers nicht gestattet.“ Die Lizenz dl-de/by-2-0 steht nur im Grundstücksmarktbericht für das Land Brandenburg 2025 (GMB_Land.pdf, Impressum S. 2: „Für den Grundstücksmarktbericht gilt die Lizenz ‚Datenlizenz Deutschland - Namensnennung - Version 2.0‘ (dl-de/by-2-0)“) — dieser druckt die Liegenschaftszinssätze NICHT ab (geprüft: kein Tabellenteil zu Liegenschaftszinssätzen), gilt also nicht für dieses Heft. Zustimmung beim Oberen Gutachterausschuss erfragen (Oberer.Gutachterausschuss@geobasis-bb.de).",
+  "formel_vorgemerkt": {
+   "form": "konstante",
+   "wert_pct": 2.4,
+   "bezeichnung": "Individueller Wohnungsbau (EFH, ZFH, DHH, RH)",
+   "wert": 2.4,
+   "liefert": "prozent",
+   "rundung_stellen": 2,
+   "form_hinweis": "v1787: Hier stand `form: \"festwert\"` mit dem Wert ausschliesslich in `wert_pct`. GEMESSEN am 02.10.2026 ueber swf_modelle.auswerten(): der Satz lieferte `form_unbekannt` — der Auswerter kennt die Form `festwert` nicht, und das Ergebnis war KEIN Wert. Jetzt `konstante` mit `wert` und `liefert: \"prozent\"`, wie es Dresden seit v1786 fuehrt. `wert_pct` bleibt als Dokumentation stehen: sie sagt, in welcher Einheit der Bericht die Zahl druckt."
+  },
+  "stufe_vorher": "A",
+  "stufe_grund": "kein Wert, Wegweiser zur Quelle (Zustimmung des Ausschusses angefragt)"
  },
  {
   "land_code": "BB",
@@ -667,15 +757,6 @@
   "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg",
   "kennzahl": "liegenschaftszinssatz",
   "zweig": "indwb_wm",
-  "formel": {
-   "form": "konstante",
-   "wert_pct": 2.9,
-   "bezeichnung": "Individueller Wohnungsbau (EFH, ZFH, DHH, RH)",
-   "wert": 2.9,
-   "liefert": "prozent",
-   "rundung_stellen": 2,
-   "form_hinweis": "v1787: Hier stand `form: \"festwert\"` mit dem Wert ausschliesslich in `wert_pct`. GEMESSEN am 02.10.2026 ueber swf_modelle.auswerten(): der Satz lieferte `form_unbekannt` — der Auswerter kennt die Form `festwert` nicht, und das Ergebnis war KEIN Wert. Jetzt `konstante` mit `wert` und `liefert: \"prozent\"`, wie es Dresden seit v1786 fuehrt. `wert_pct` bleibt als Dokumentation stehen: sie sagt, in welcher Einheit der Bericht die Zahl druckt."
-  },
   "korrekturen": [],
   "modellansaetze": {
    "verwaltungskosten_wohnung_eur": 359,
@@ -709,23 +790,41 @@
     "kauffaelle": 64
    }
   ],
-  "stufe": "A",
+  "stufe": "E",
   "fallzahl": 64,
   "stichtag": "2024-07-01",
   "berichtsjahr": 2025,
   "modellversion": "LIZI 2025 OGA BB",
   "quelle_url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/LIZI_2025_OGA.pdf",
   "quelle_parser": "v1757-BBLZS",
-  "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg 2025, Liegenschaftszinssätze, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), www.gutachterausschuss-bb.de",
-  "lizenz": "dl-de/by-2-0",
-  "lizenz_hinweis": "v2999: Der Grundstuecksmarktbericht des Oberen Gutachterausschusses steht ausdruecklich unter dl-de/by-2-0 (GMB Land 2024, S. 2 Nutzungsbedingungen; Infoblatt Open Data MIK Brandenburg 01.03.2019; AGNB LGB Nr. 7.1a). Die LIZI-Veroeffentlichung desselben Herausgebers traegt keinen eigenen Vermerk - gefuehrt unter derselben Lizenz, schriftliche Bestaetigung beim OGA offen (Oberer.Gutachterausschuss@geobasis-bb.de). Vorher: ungeklaert.",
-  "lizenz_hinweis": "Im Dokument NICHT angegeben — 36 Seiten geprüft, null Treffer auf dl-de/Datenlizenz/Namensnennung, auch nicht auf der verlinkenden Seite. Die Kreisberichte Brandenburgs tragen dl-de/by-2-0; daraus auf dieses Dokument zu schließen wäre geraten. Vor Weitergabe beim Oberen Gutachterausschuss nachfragen.",
+  "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg 2025, Liegenschaftszinssätze (LIZI 2025 OGA), https://gutachterausschuss.brandenburg.de — Nutzungsbedingungen für dieses Heft nicht veröffentlicht, siehe Feld lizenz.",
+  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "lizenz_hinweis": "v20261120: Bis 20.11.2026 stand hier lizenz „dl-de/by-2-0“, ohne Beleg (der alte Hinweis sagte selbst: „daraus auf dieses Dokument zu schließen wäre geraten“). Ersetzt durch den Wortlaut der tatsächlich auffindbaren Bedingungen; die Zahl selbst bleibt unverändert.",
   "auflagen": "Nachrangig: das Dokument schreibt auf S. 5 selbst vor, dass vorrangig die Liegenschaftszinssätze der REGIONALEN Gutachterausschüsse zu verwenden sind, insbesondere in der Landeshauptstadt Potsdam. Diese überregionalen Werte sind der Rückfall, nicht die erste Wahl. — Potsdam ist in den meisten Räumen ausdrücklich AUSGENOMMEN (\"ohne Potsdam\"); für Potsdam gilt dieser Satz nicht.",
   "fundstelle": "S. 24, Anlage 1 (Modellansätze) S. 32-34, Anlage 2 (Gemeindeliste) S. 35-36",
   "streuung": {
    "min_pct": -0.4,
    "max_pct": 10
-  }
+  },
+  "vollstaendig": false,
+  "zugang": "genehmigungspflichtig",
+  "bestell_url": "mailto:Oberer.Gutachterausschuss@geobasis-bb.de",
+  "zustaendige_stelle": "Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg, Geschäftsstelle c/o LGB, Heinrich-Mann-Allee 104 B, 14473 Potsdam, +49 331 8844-540",
+  "zugang_beleg": "Impressum gutachterausschuss.brandenburg.de und Heft ohne Lizenzvermerk (geprüft 20.11.2026, siehe lizenz/lizenz_hinweis)",
+  "warum_kein_wert": "Kein Wert im Register, bis der Obere Gutachterausschuss Brandenburg zustimmt: das Heft nennt keine Lizenz, das Impressum von gutachterausschuss.brandenburg.de untersagt die Verwendung ohne ausdrückliche Zustimmung. Anfrage vorbereitet am 20.11.2026.",
+  "unvollstaendig_grund": "Kein Wert im Register, bis der Obere Gutachterausschuss Brandenburg zustimmt: das Heft nennt keine Lizenz, das Impressum von gutachterausschuss.brandenburg.de untersagt die Verwendung ohne ausdrückliche Zustimmung. Anfrage vorbereitet am 20.11.2026.",
+  "lizenz_des_dokuments": "kein Lizenzvermerk im Dokument (LIZI_2025_OGA.pdf, alle 36 Seiten am 20.11.2026 erneut durchsucht: kein Treffer auf Lizenz, dl-de, govdata, Nutzungsbedingungen, Urheber). Auch die verlinkende Seite https://gutachterausschuss.brandenburg.de/gaa/de/marktinformationen/daten-fuer-die-wertermittlung/liegenschaftszinssaetze/ nennt keine Lizenz. Das Impressum des Portals (https://gutachterausschuss.brandenburg.de/gaa/de/impressum/, Abschnitt „Urheber- und Kennzeichenrecht“) sagt wörtlich: „Eine Vervielfältigung oder Verwendung solcher Bilder, Grafiken und Texte in anderen elektronischen oder gedruckten Publikationen ist, auch wenn sie als urheberrechtlich geschützte Dokumente nicht gekennzeichnet sind, ohne ausdrückliche Zustimmung des Urheberrechtinhabers nicht gestattet.“ Die Lizenz dl-de/by-2-0 steht nur im Grundstücksmarktbericht für das Land Brandenburg 2025 (GMB_Land.pdf, Impressum S. 2: „Für den Grundstücksmarktbericht gilt die Lizenz ‚Datenlizenz Deutschland - Namensnennung - Version 2.0‘ (dl-de/by-2-0)“) — dieser druckt die Liegenschaftszinssätze NICHT ab (geprüft: kein Tabellenteil zu Liegenschaftszinssätzen), gilt also nicht für dieses Heft. Zustimmung beim Oberen Gutachterausschuss erfragen (Oberer.Gutachterausschuss@geobasis-bb.de).",
+  "formel_vorgemerkt": {
+   "form": "konstante",
+   "wert_pct": 2.9,
+   "bezeichnung": "Individueller Wohnungsbau (EFH, ZFH, DHH, RH)",
+   "wert": 2.9,
+   "liefert": "prozent",
+   "rundung_stellen": 2,
+   "form_hinweis": "v1787: Hier stand `form: \"festwert\"` mit dem Wert ausschliesslich in `wert_pct`. GEMESSEN am 02.10.2026 ueber swf_modelle.auswerten(): der Satz lieferte `form_unbekannt` — der Auswerter kennt die Form `festwert` nicht, und das Ergebnis war KEIN Wert. Jetzt `konstante` mit `wert` und `liefert: \"prozent\"`, wie es Dresden seit v1786 fuehrt. `wert_pct` bleibt als Dokumentation stehen: sie sagt, in welcher Einheit der Bericht die Zahl druckt."
+  },
+  "stufe_vorher": "A",
+  "stufe_grund": "kein Wert, Wegweiser zur Quelle (Zustimmung des Ausschusses angefragt)"
  },
  {
   "land_code": "BB",
@@ -735,15 +834,6 @@
   "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg",
   "kennzahl": "liegenschaftszinssatz",
   "zweig": "we_bu",
-  "formel": {
-   "form": "konstante",
-   "wert_pct": 2.5,
-   "bezeichnung": "Wohnungseigentum (Weiterveräußerung, vermietet)",
-   "wert": 2.5,
-   "liefert": "prozent",
-   "rundung_stellen": 2,
-   "form_hinweis": "v1787: Hier stand `form: \"festwert\"` mit dem Wert ausschliesslich in `wert_pct`. GEMESSEN am 02.10.2026 ueber swf_modelle.auswerten(): der Satz lieferte `form_unbekannt` — der Auswerter kennt die Form `festwert` nicht, und das Ergebnis war KEIN Wert. Jetzt `konstante` mit `wert` und `liefert: \"prozent\"`, wie es Dresden seit v1786 fuehrt. `wert_pct` bleibt als Dokumentation stehen: sie sagt, in welcher Einheit der Bericht die Zahl druckt."
-  },
   "korrekturen": [],
   "modellansaetze": {
    "verwaltungskosten_wohnung_eur": 359,
@@ -777,23 +867,41 @@
     "kauffaelle": 549
    }
   ],
-  "stufe": "A",
+  "stufe": "E",
   "fallzahl": 549,
   "stichtag": "2024-07-01",
   "berichtsjahr": 2025,
   "modellversion": "LIZI 2025 OGA BB",
   "quelle_url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/LIZI_2025_OGA.pdf",
   "quelle_parser": "v1757-BBLZS",
-  "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg 2025, Liegenschaftszinssätze, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), www.gutachterausschuss-bb.de",
-  "lizenz": "dl-de/by-2-0",
-  "lizenz_hinweis": "v2999: Der Grundstuecksmarktbericht des Oberen Gutachterausschusses steht ausdruecklich unter dl-de/by-2-0 (GMB Land 2024, S. 2 Nutzungsbedingungen; Infoblatt Open Data MIK Brandenburg 01.03.2019; AGNB LGB Nr. 7.1a). Die LIZI-Veroeffentlichung desselben Herausgebers traegt keinen eigenen Vermerk - gefuehrt unter derselben Lizenz, schriftliche Bestaetigung beim OGA offen (Oberer.Gutachterausschuss@geobasis-bb.de). Vorher: ungeklaert.",
-  "lizenz_hinweis": "Im Dokument NICHT angegeben — 36 Seiten geprüft, null Treffer auf dl-de/Datenlizenz/Namensnennung, auch nicht auf der verlinkenden Seite. Die Kreisberichte Brandenburgs tragen dl-de/by-2-0; daraus auf dieses Dokument zu schließen wäre geraten. Vor Weitergabe beim Oberen Gutachterausschuss nachfragen.",
+  "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg 2025, Liegenschaftszinssätze (LIZI 2025 OGA), https://gutachterausschuss.brandenburg.de — Nutzungsbedingungen für dieses Heft nicht veröffentlicht, siehe Feld lizenz.",
+  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "lizenz_hinweis": "v20261120: Bis 20.11.2026 stand hier lizenz „dl-de/by-2-0“, ohne Beleg (der alte Hinweis sagte selbst: „daraus auf dieses Dokument zu schließen wäre geraten“). Ersetzt durch den Wortlaut der tatsächlich auffindbaren Bedingungen; die Zahl selbst bleibt unverändert.",
   "auflagen": "Nachrangig: das Dokument schreibt auf S. 5 selbst vor, dass vorrangig die Liegenschaftszinssätze der REGIONALEN Gutachterausschüsse zu verwenden sind, insbesondere in der Landeshauptstadt Potsdam. Diese überregionalen Werte sind der Rückfall, nicht die erste Wahl. — Potsdam ist in den meisten Räumen ausdrücklich AUSGENOMMEN (\"ohne Potsdam\"); für Potsdam gilt dieser Satz nicht.",
   "fundstelle": "S. 27, Anlage 1 (Modellansätze) S. 32-34, Anlage 2 (Gemeindeliste) S. 35-36",
   "streuung": {
    "min_pct": 0.1,
    "max_pct": 5.4
-  }
+  },
+  "vollstaendig": false,
+  "zugang": "genehmigungspflichtig",
+  "bestell_url": "mailto:Oberer.Gutachterausschuss@geobasis-bb.de",
+  "zustaendige_stelle": "Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg, Geschäftsstelle c/o LGB, Heinrich-Mann-Allee 104 B, 14473 Potsdam, +49 331 8844-540",
+  "zugang_beleg": "Impressum gutachterausschuss.brandenburg.de und Heft ohne Lizenzvermerk (geprüft 20.11.2026, siehe lizenz/lizenz_hinweis)",
+  "warum_kein_wert": "Kein Wert im Register, bis der Obere Gutachterausschuss Brandenburg zustimmt: das Heft nennt keine Lizenz, das Impressum von gutachterausschuss.brandenburg.de untersagt die Verwendung ohne ausdrückliche Zustimmung. Anfrage vorbereitet am 20.11.2026.",
+  "unvollstaendig_grund": "Kein Wert im Register, bis der Obere Gutachterausschuss Brandenburg zustimmt: das Heft nennt keine Lizenz, das Impressum von gutachterausschuss.brandenburg.de untersagt die Verwendung ohne ausdrückliche Zustimmung. Anfrage vorbereitet am 20.11.2026.",
+  "lizenz_des_dokuments": "kein Lizenzvermerk im Dokument (LIZI_2025_OGA.pdf, alle 36 Seiten am 20.11.2026 erneut durchsucht: kein Treffer auf Lizenz, dl-de, govdata, Nutzungsbedingungen, Urheber). Auch die verlinkende Seite https://gutachterausschuss.brandenburg.de/gaa/de/marktinformationen/daten-fuer-die-wertermittlung/liegenschaftszinssaetze/ nennt keine Lizenz. Das Impressum des Portals (https://gutachterausschuss.brandenburg.de/gaa/de/impressum/, Abschnitt „Urheber- und Kennzeichenrecht“) sagt wörtlich: „Eine Vervielfältigung oder Verwendung solcher Bilder, Grafiken und Texte in anderen elektronischen oder gedruckten Publikationen ist, auch wenn sie als urheberrechtlich geschützte Dokumente nicht gekennzeichnet sind, ohne ausdrückliche Zustimmung des Urheberrechtinhabers nicht gestattet.“ Die Lizenz dl-de/by-2-0 steht nur im Grundstücksmarktbericht für das Land Brandenburg 2025 (GMB_Land.pdf, Impressum S. 2: „Für den Grundstücksmarktbericht gilt die Lizenz ‚Datenlizenz Deutschland - Namensnennung - Version 2.0‘ (dl-de/by-2-0)“) — dieser druckt die Liegenschaftszinssätze NICHT ab (geprüft: kein Tabellenteil zu Liegenschaftszinssätzen), gilt also nicht für dieses Heft. Zustimmung beim Oberen Gutachterausschuss erfragen (Oberer.Gutachterausschuss@geobasis-bb.de).",
+  "formel_vorgemerkt": {
+   "form": "konstante",
+   "wert_pct": 2.5,
+   "bezeichnung": "Wohnungseigentum (Weiterveräußerung, vermietet)",
+   "wert": 2.5,
+   "liefert": "prozent",
+   "rundung_stellen": 2,
+   "form_hinweis": "v1787: Hier stand `form: \"festwert\"` mit dem Wert ausschliesslich in `wert_pct`. GEMESSEN am 02.10.2026 ueber swf_modelle.auswerten(): der Satz lieferte `form_unbekannt` — der Auswerter kennt die Form `festwert` nicht, und das Ergebnis war KEIN Wert. Jetzt `konstante` mit `wert` und `liefert: \"prozent\"`, wie es Dresden seit v1786 fuehrt. `wert_pct` bleibt als Dokumentation stehen: sie sagt, in welcher Einheit der Bericht die Zahl druckt."
+  },
+  "stufe_vorher": "A",
+  "stufe_grund": "kein Wert, Wegweiser zur Quelle (Zustimmung des Ausschusses angefragt)"
  },
  {
   "land_code": "BB",
@@ -803,15 +911,6 @@
   "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg",
   "kennzahl": "liegenschaftszinssatz",
   "zweig": "we_wm",
-  "formel": {
-   "form": "konstante",
-   "wert_pct": 3.2,
-   "bezeichnung": "Wohnungseigentum (Weiterveräußerung, vermietet)",
-   "wert": 3.2,
-   "liefert": "prozent",
-   "rundung_stellen": 2,
-   "form_hinweis": "v1787: Hier stand `form: \"festwert\"` mit dem Wert ausschliesslich in `wert_pct`. GEMESSEN am 02.10.2026 ueber swf_modelle.auswerten(): der Satz lieferte `form_unbekannt` — der Auswerter kennt die Form `festwert` nicht, und das Ergebnis war KEIN Wert. Jetzt `konstante` mit `wert` und `liefert: \"prozent\"`, wie es Dresden seit v1786 fuehrt. `wert_pct` bleibt als Dokumentation stehen: sie sagt, in welcher Einheit der Bericht die Zahl druckt."
-  },
   "korrekturen": [],
   "modellansaetze": {
    "verwaltungskosten_wohnung_eur": 359,
@@ -845,23 +944,41 @@
     "kauffaelle": 214
    }
   ],
-  "stufe": "A",
+  "stufe": "E",
   "fallzahl": 214,
   "stichtag": "2024-07-01",
   "berichtsjahr": 2025,
   "modellversion": "LIZI 2025 OGA BB",
   "quelle_url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/LIZI_2025_OGA.pdf",
   "quelle_parser": "v1757-BBLZS",
-  "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg 2025, Liegenschaftszinssätze, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), www.gutachterausschuss-bb.de",
-  "lizenz": "dl-de/by-2-0",
-  "lizenz_hinweis": "v2999: Der Grundstuecksmarktbericht des Oberen Gutachterausschusses steht ausdruecklich unter dl-de/by-2-0 (GMB Land 2024, S. 2 Nutzungsbedingungen; Infoblatt Open Data MIK Brandenburg 01.03.2019; AGNB LGB Nr. 7.1a). Die LIZI-Veroeffentlichung desselben Herausgebers traegt keinen eigenen Vermerk - gefuehrt unter derselben Lizenz, schriftliche Bestaetigung beim OGA offen (Oberer.Gutachterausschuss@geobasis-bb.de). Vorher: ungeklaert.",
-  "lizenz_hinweis": "Im Dokument NICHT angegeben — 36 Seiten geprüft, null Treffer auf dl-de/Datenlizenz/Namensnennung, auch nicht auf der verlinkenden Seite. Die Kreisberichte Brandenburgs tragen dl-de/by-2-0; daraus auf dieses Dokument zu schließen wäre geraten. Vor Weitergabe beim Oberen Gutachterausschuss nachfragen.",
+  "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg 2025, Liegenschaftszinssätze (LIZI 2025 OGA), https://gutachterausschuss.brandenburg.de — Nutzungsbedingungen für dieses Heft nicht veröffentlicht, siehe Feld lizenz.",
+  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "lizenz_hinweis": "v20261120: Bis 20.11.2026 stand hier lizenz „dl-de/by-2-0“, ohne Beleg (der alte Hinweis sagte selbst: „daraus auf dieses Dokument zu schließen wäre geraten“). Ersetzt durch den Wortlaut der tatsächlich auffindbaren Bedingungen; die Zahl selbst bleibt unverändert.",
   "auflagen": "Nachrangig: das Dokument schreibt auf S. 5 selbst vor, dass vorrangig die Liegenschaftszinssätze der REGIONALEN Gutachterausschüsse zu verwenden sind, insbesondere in der Landeshauptstadt Potsdam. Diese überregionalen Werte sind der Rückfall, nicht die erste Wahl. — Potsdam ist in den meisten Räumen ausdrücklich AUSGENOMMEN (\"ohne Potsdam\"); für Potsdam gilt dieser Satz nicht.",
   "fundstelle": "S. 29, Anlage 1 (Modellansätze) S. 32-34, Anlage 2 (Gemeindeliste) S. 35-36",
   "streuung": {
    "min_pct": 0.6,
    "max_pct": 7.7
-  }
+  },
+  "vollstaendig": false,
+  "zugang": "genehmigungspflichtig",
+  "bestell_url": "mailto:Oberer.Gutachterausschuss@geobasis-bb.de",
+  "zustaendige_stelle": "Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg, Geschäftsstelle c/o LGB, Heinrich-Mann-Allee 104 B, 14473 Potsdam, +49 331 8844-540",
+  "zugang_beleg": "Impressum gutachterausschuss.brandenburg.de und Heft ohne Lizenzvermerk (geprüft 20.11.2026, siehe lizenz/lizenz_hinweis)",
+  "warum_kein_wert": "Kein Wert im Register, bis der Obere Gutachterausschuss Brandenburg zustimmt: das Heft nennt keine Lizenz, das Impressum von gutachterausschuss.brandenburg.de untersagt die Verwendung ohne ausdrückliche Zustimmung. Anfrage vorbereitet am 20.11.2026.",
+  "unvollstaendig_grund": "Kein Wert im Register, bis der Obere Gutachterausschuss Brandenburg zustimmt: das Heft nennt keine Lizenz, das Impressum von gutachterausschuss.brandenburg.de untersagt die Verwendung ohne ausdrückliche Zustimmung. Anfrage vorbereitet am 20.11.2026.",
+  "lizenz_des_dokuments": "kein Lizenzvermerk im Dokument (LIZI_2025_OGA.pdf, alle 36 Seiten am 20.11.2026 erneut durchsucht: kein Treffer auf Lizenz, dl-de, govdata, Nutzungsbedingungen, Urheber). Auch die verlinkende Seite https://gutachterausschuss.brandenburg.de/gaa/de/marktinformationen/daten-fuer-die-wertermittlung/liegenschaftszinssaetze/ nennt keine Lizenz. Das Impressum des Portals (https://gutachterausschuss.brandenburg.de/gaa/de/impressum/, Abschnitt „Urheber- und Kennzeichenrecht“) sagt wörtlich: „Eine Vervielfältigung oder Verwendung solcher Bilder, Grafiken und Texte in anderen elektronischen oder gedruckten Publikationen ist, auch wenn sie als urheberrechtlich geschützte Dokumente nicht gekennzeichnet sind, ohne ausdrückliche Zustimmung des Urheberrechtinhabers nicht gestattet.“ Die Lizenz dl-de/by-2-0 steht nur im Grundstücksmarktbericht für das Land Brandenburg 2025 (GMB_Land.pdf, Impressum S. 2: „Für den Grundstücksmarktbericht gilt die Lizenz ‚Datenlizenz Deutschland - Namensnennung - Version 2.0‘ (dl-de/by-2-0)“) — dieser druckt die Liegenschaftszinssätze NICHT ab (geprüft: kein Tabellenteil zu Liegenschaftszinssätzen), gilt also nicht für dieses Heft. Zustimmung beim Oberen Gutachterausschuss erfragen (Oberer.Gutachterausschuss@geobasis-bb.de).",
+  "formel_vorgemerkt": {
+   "form": "konstante",
+   "wert_pct": 3.2,
+   "bezeichnung": "Wohnungseigentum (Weiterveräußerung, vermietet)",
+   "wert": 3.2,
+   "liefert": "prozent",
+   "rundung_stellen": 2,
+   "form_hinweis": "v1787: Hier stand `form: \"festwert\"` mit dem Wert ausschliesslich in `wert_pct`. GEMESSEN am 02.10.2026 ueber swf_modelle.auswerten(): der Satz lieferte `form_unbekannt` — der Auswerter kennt die Form `festwert` nicht, und das Ergebnis war KEIN Wert. Jetzt `konstante` mit `wert` und `liefert: \"prozent\"`, wie es Dresden seit v1786 fuehrt. `wert_pct` bleibt als Dokumentation stehen: sie sagt, in welcher Einheit der Bericht die Zahl druckt."
+  },
+  "stufe_vorher": "A",
+  "stufe_grund": "kein Wert, Wegweiser zur Quelle (Zustimmung des Ausschusses angefragt)"
  },
  {
   "land_code": "BB",
@@ -871,15 +988,6 @@
   "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg",
   "kennzahl": "liegenschaftszinssatz",
   "zweig": "we_kf",
-  "formel": {
-   "form": "konstante",
-   "wert_pct": 1.6,
-   "bezeichnung": "Wohnungseigentum (Weiterveräußerung, vermietet)",
-   "wert": 1.6,
-   "liefert": "prozent",
-   "rundung_stellen": 2,
-   "form_hinweis": "v1787: Hier stand `form: \"festwert\"` mit dem Wert ausschliesslich in `wert_pct`. GEMESSEN am 02.10.2026 ueber swf_modelle.auswerten(): der Satz lieferte `form_unbekannt` — der Auswerter kennt die Form `festwert` nicht, und das Ergebnis war KEIN Wert. Jetzt `konstante` mit `wert` und `liefert: \"prozent\"`, wie es Dresden seit v1786 fuehrt. `wert_pct` bleibt als Dokumentation stehen: sie sagt, in welcher Einheit der Bericht die Zahl druckt."
-  },
   "korrekturen": [],
   "modellansaetze": {
    "verwaltungskosten_wohnung_eur": 359,
@@ -913,22 +1021,40 @@
     "kauffaelle": 46
    }
   ],
-  "stufe": "A",
+  "stufe": "E",
   "fallzahl": 46,
   "stichtag": "2024-07-01",
   "berichtsjahr": 2025,
   "modellversion": "LIZI 2025 OGA BB",
   "quelle_url": "https://gutachterausschuss.brandenburg.de/sixcms/media.php/9/LIZI_2025_OGA.pdf",
   "quelle_parser": "v1757-BBLZS",
-  "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg 2025, Liegenschaftszinssätze, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), www.gutachterausschuss-bb.de",
-  "lizenz": "dl-de/by-2-0",
-  "lizenz_hinweis": "v2999: Der Grundstuecksmarktbericht des Oberen Gutachterausschusses steht ausdruecklich unter dl-de/by-2-0 (GMB Land 2024, S. 2 Nutzungsbedingungen; Infoblatt Open Data MIK Brandenburg 01.03.2019; AGNB LGB Nr. 7.1a). Die LIZI-Veroeffentlichung desselben Herausgebers traegt keinen eigenen Vermerk - gefuehrt unter derselben Lizenz, schriftliche Bestaetigung beim OGA offen (Oberer.Gutachterausschuss@geobasis-bb.de). Vorher: ungeklaert.",
-  "lizenz_hinweis": "Im Dokument NICHT angegeben — 36 Seiten geprüft, null Treffer auf dl-de/Datenlizenz/Namensnennung, auch nicht auf der verlinkenden Seite. Die Kreisberichte Brandenburgs tragen dl-de/by-2-0; daraus auf dieses Dokument zu schließen wäre geraten. Vor Weitergabe beim Oberen Gutachterausschuss nachfragen.",
+  "quellenvermerk": "© Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg 2025, Liegenschaftszinssätze (LIZI 2025 OGA), https://gutachterausschuss.brandenburg.de — Nutzungsbedingungen für dieses Heft nicht veröffentlicht, siehe Feld lizenz.",
+  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "lizenz_hinweis": "v20261120: Bis 20.11.2026 stand hier lizenz „dl-de/by-2-0“, ohne Beleg (der alte Hinweis sagte selbst: „daraus auf dieses Dokument zu schließen wäre geraten“). Ersetzt durch den Wortlaut der tatsächlich auffindbaren Bedingungen; die Zahl selbst bleibt unverändert.",
   "auflagen": "Nachrangig: das Dokument schreibt auf S. 5 selbst vor, dass vorrangig die Liegenschaftszinssätze der REGIONALEN Gutachterausschüsse zu verwenden sind, insbesondere in der Landeshauptstadt Potsdam. Diese überregionalen Werte sind der Rückfall, nicht die erste Wahl. — Potsdam ist in den meisten Räumen ausdrücklich AUSGENOMMEN (\"ohne Potsdam\"); für Potsdam gilt dieser Satz nicht.",
   "fundstelle": "S. 30, Anlage 1 (Modellansätze) S. 32-34, Anlage 2 (Gemeindeliste) S. 35-36",
   "streuung": {
    "min_pct": -1.6,
    "max_pct": 4.3
-  }
+  },
+  "vollstaendig": false,
+  "zugang": "genehmigungspflichtig",
+  "bestell_url": "mailto:Oberer.Gutachterausschuss@geobasis-bb.de",
+  "zustaendige_stelle": "Oberer Gutachterausschuss für Grundstückswerte im Land Brandenburg, Geschäftsstelle c/o LGB, Heinrich-Mann-Allee 104 B, 14473 Potsdam, +49 331 8844-540",
+  "zugang_beleg": "Impressum gutachterausschuss.brandenburg.de und Heft ohne Lizenzvermerk (geprüft 20.11.2026, siehe lizenz/lizenz_hinweis)",
+  "warum_kein_wert": "Kein Wert im Register, bis der Obere Gutachterausschuss Brandenburg zustimmt: das Heft nennt keine Lizenz, das Impressum von gutachterausschuss.brandenburg.de untersagt die Verwendung ohne ausdrückliche Zustimmung. Anfrage vorbereitet am 20.11.2026.",
+  "unvollstaendig_grund": "Kein Wert im Register, bis der Obere Gutachterausschuss Brandenburg zustimmt: das Heft nennt keine Lizenz, das Impressum von gutachterausschuss.brandenburg.de untersagt die Verwendung ohne ausdrückliche Zustimmung. Anfrage vorbereitet am 20.11.2026.",
+  "lizenz_des_dokuments": "kein Lizenzvermerk im Dokument (LIZI_2025_OGA.pdf, alle 36 Seiten am 20.11.2026 erneut durchsucht: kein Treffer auf Lizenz, dl-de, govdata, Nutzungsbedingungen, Urheber). Auch die verlinkende Seite https://gutachterausschuss.brandenburg.de/gaa/de/marktinformationen/daten-fuer-die-wertermittlung/liegenschaftszinssaetze/ nennt keine Lizenz. Das Impressum des Portals (https://gutachterausschuss.brandenburg.de/gaa/de/impressum/, Abschnitt „Urheber- und Kennzeichenrecht“) sagt wörtlich: „Eine Vervielfältigung oder Verwendung solcher Bilder, Grafiken und Texte in anderen elektronischen oder gedruckten Publikationen ist, auch wenn sie als urheberrechtlich geschützte Dokumente nicht gekennzeichnet sind, ohne ausdrückliche Zustimmung des Urheberrechtinhabers nicht gestattet.“ Die Lizenz dl-de/by-2-0 steht nur im Grundstücksmarktbericht für das Land Brandenburg 2025 (GMB_Land.pdf, Impressum S. 2: „Für den Grundstücksmarktbericht gilt die Lizenz ‚Datenlizenz Deutschland - Namensnennung - Version 2.0‘ (dl-de/by-2-0)“) — dieser druckt die Liegenschaftszinssätze NICHT ab (geprüft: kein Tabellenteil zu Liegenschaftszinssätzen), gilt also nicht für dieses Heft. Zustimmung beim Oberen Gutachterausschuss erfragen (Oberer.Gutachterausschuss@geobasis-bb.de).",
+  "formel_vorgemerkt": {
+   "form": "konstante",
+   "wert_pct": 1.6,
+   "bezeichnung": "Wohnungseigentum (Weiterveräußerung, vermietet)",
+   "wert": 1.6,
+   "liefert": "prozent",
+   "rundung_stellen": 2,
+   "form_hinweis": "v1787: Hier stand `form: \"festwert\"` mit dem Wert ausschliesslich in `wert_pct`. GEMESSEN am 02.10.2026 ueber swf_modelle.auswerten(): der Satz lieferte `form_unbekannt` — der Auswerter kennt die Form `festwert` nicht, und das Ergebnis war KEIN Wert. Jetzt `konstante` mit `wert` und `liefert: \"prozent\"`, wie es Dresden seit v1786 fuehrt. `wert_pct` bleibt als Dokumentation stehen: sie sagt, in welcher Einheit der Bericht die Zahl druckt."
+  },
+  "stufe_vorher": "A",
+  "stufe_grund": "kein Wert, Wegweiser zur Quelle (Zustimmung des Ausschusses angefragt)"
  }
 ]
