@@ -64,8 +64,8 @@ if (location.hash === '#forschung') location.replace('forschung.html');</script>
 <link rel="stylesheet" href="partner.css?v=landing-strecke-5"><!-- landing-partner-1 · Abschnitt #fuer-partner -->
 <link rel="stylesheet" href="dp2-module.css?v=landing-module-2">
 <link rel="stylesheet" href="dp2-kern.css?v=landing-strecke-3">
-<link rel="stylesheet" href="dp2-dealcheck.css?v=landing-faecher-1">
-<link rel="stylesheet" href="landing-faecher.css?v=landing-faecher-1"><!-- landing-faecher-1 · Streifen, Riss, Startbahn „Fächer“, Videothek als Slider -->
+<link rel="stylesheet" href="dp2-dealcheck.css?v=landing-faecher-2">
+<link rel="stylesheet" href="landing-faecher.css?v=landing-faecher-2"><!-- landing-faecher-1 · Streifen, Riss, Startbahn „Fächer“, Videothek als Slider · landing-faecher-2 Gesamturteil, Datenbasis, Partnerkarten -->
 <link rel="stylesheet" href="seo.css?v=landing-seo-5">
 </head><body>
 
@@ -560,10 +560,10 @@ if (location.hash === '#forschung') location.replace('forschung.html');</script>
       in eigenen Datenbanken, regelmäßig abgeglichen und mit Herkunft je Wert.</p></div>
 
   <div class="dt-zahlen rv">
-    <div><b data-umfang="amtlich_gesamt">1.100.270</b><span>amtliche Datenpunkte in unseren Datenbanken</span></div>
-    <div><b data-umfang="schnittstellen">36</b><span>amtliche Dienste und Tabellen angebunden</span></div>
-    <div><b data-umfang="register_werte">6.097</b><span>Kennzahlen von <i data-umfang="ausschuesse">201</i> Gutachterausschüssen</span></div>
-    <div><b data-umfang="portale">109</b><span>Veröffentlichungsseiten der Ausschüsse, automatisch auf neue Berichte geprüft</span></div>
+    <div><b data-umfang="amtlich_gesamt" data-zaehl>1.100.270</b><span>amtliche Datenpunkte in unseren Datenbanken</span></div>
+    <div><b data-umfang="schnittstellen" data-zaehl>36</b><span>amtliche Dienste und Tabellen angebunden</span></div>
+    <div><b data-umfang="register_werte" data-zaehl>6.097</b><span>Kennzahlen von <i data-umfang="ausschuesse">201</i> Gutachterausschüssen</span></div>
+    <div><b data-umfang="portale" data-zaehl>109</b><span>Veröffentlichungsseiten der Ausschüsse, automatisch auf neue Berichte geprüft</span></div>
   </div>
   <!-- landing-strecke-3 · Marcel 18.11.2026: „Hard Facts könnten wir noch ein paar mehr angeben“. Alle vier
        zählt tools/datenumfang-messen.mjs (Code, Register, videos.json), nicht von Hand ändern.
@@ -571,52 +571,50 @@ if (location.hash === '#forschung') location.replace('forschung.html');</script>
        (register-stand.js); 118 = aktive Quellen in mb.gaa_sources, die der Erntetakt auf neue Berichte prüft
        (Kreis- und Stadtausschüsse und Landesportale). Verschiedene Dinge, deshalb verschieden beschriftet. -->
   <div class="dt-zahlen dt-fakten rv">
-    <div><b data-umfang="api_endpunkte">518</b><span>Programmschnittstellen (API-Endpunkte) in App und Marktbericht</span></div>
-    <div><b data-umfang="register_saetze">18.470</b><span>Sätze im Register der Gutachterausschüsse</span></div>
-    <div><b data-umfang="pruefstrecken">89</b><span>automatische Prüfwerkzeuge für Rechnung und Daten</span></div>
-    <div><b data-umfang="videos">38</b><span>Videos in der Videothek, <i data-umfang="video_stunden">3,5</i> Stunden</span></div>
+    <div><b data-umfang="api_endpunkte" data-zaehl>518</b><span>Programmschnittstellen (API-Endpunkte) in App und Marktbericht</span></div>
+    <div><b data-umfang="register_saetze" data-zaehl>18.470</b><span>Sätze im Register der Gutachterausschüsse</span></div>
+    <div><b data-umfang="pruefstrecken" data-zaehl>89</b><span>automatische Prüfwerkzeuge für Rechnung und Daten</span></div>
+    <div><b data-umfang="videos" data-zaehl>38</b><span>Videos in der Videothek, <i data-umfang="video_stunden">3,5</i> Stunden</span></div>
   </div>
 
-  <!-- landing-strecke-1 · Quellenkarten zum Aufklappen, die vier großen Zahlen bleiben offen -->
-  <details class="dt-mehr rv"><summary>Die acht Quellen und wie oft wir sie abgleichen</summary>
-  <div class="dt-grid">
-    <div class="dt-k"><div class="dt-takt live">Live je Bericht</div>
-      <h4>Bodenrichtwerte</h4>
-      <p>Bodenrichtwert und Zone aus den amtlichen Diensten der Länder und des Bundes, für alle 16 Länder.</p>
-      <div class="dt-n"><b data-umfang="boris_dienste">10</b> Bodenrichtwert-Dienste</div></div>
-    <div class="dt-k"><div class="dt-takt">Quellen: Januar bis Juni wöchentlich, sonst monatlich</div>
-      <h4>Gutachterausschüsse</h4>
-      <p>Liegenschaftszinssätze, Sachwertfaktoren, Vergleichsfaktoren und Umrechnungskoeffizienten. Jeder Wert mit Ausschuss, Jahrgang und Fundstelle.</p>
-      <div class="dt-n"><b data-reg="werte_gesamt">6.097</b> Werte · <b data-reg="ausschuesse">201</b> Ausschüsse · <b data-umfang="portale">109</b> geprüfte Quellen</div></div>
-    <div class="dt-k"><div class="dt-takt">Stichtag 15.05.2022</div>
-      <h4>Zensus 2022</h4>
-      <p>Wohnungen, Gebäude, Leerstand und Mieten der Statistischen Ämter des Bundes und der Länder, bis auf die Gemeinde.</p>
-      <div class="dt-n"><b data-umfang="zensus">894.880</b> Werte · <b data-umfang="zensus_gebiete">11.186</b> Gebiete</div></div>
-    <div class="dt-k"><div class="dt-takt">monatlich abgeglichen</div>
-      <h4>Regionaldatenbank</h4>
-      <p>Bevölkerung, Einkommen, Arbeitsmarkt und Wanderung je Kreis und Gemeinde, die Grundlage der Lageeinschätzung.</p>
-      <div class="dt-n"><b data-umfang="regional">108.676</b> Werte · <b data-umfang="regional_tabellen">6</b> Tabellen</div></div>
-    <div class="dt-k"><div class="dt-takt">monatlich abgeglichen</div>
-      <h4>Bautätigkeit und Bauland</h4>
-      <p>Baugenehmigungen, Fertigstellungen und Kaufwerte für Bauland aus der amtlichen Statistik.</p>
-      <div class="dt-n"><b data-umfang="bau">56.128</b> Werte · <b data-umfang="bau_tabellen">5</b> Tabellen</div></div>
-    <div class="dt-k"><div class="dt-takt">bundesweit</div>
-      <h4>Obere Gutachterausschüsse</h4>
-      <p>Bundesweite Preis- und Mietspannen der Oberen Gutachterausschüsse, zur Einordnung jedes Objekts.</p>
-      <div class="dt-n"><b data-umfang="akoga">28.827</b> Werte</div></div>
-    <div class="dt-k"><div class="dt-takt live">täglich</div>
-      <h4>Deutsche Bundesbank</h4>
-      <p>Zinsstruktur und Zinsstatistik. Daraus die indikativen Bauzinsen, die in jeder Finanzierung stehen.</p>
-      <div class="dt-n"><b data-umfang="zins_tage">1.376</b> Tageswerte</div></div>
-    <div class="dt-k"><div class="dt-takt">wöchentlich geprüft</div>
-      <h4>Statistisches Bundesamt</h4>
-      <p>Verbraucherpreise, Nettokaltmieten und Baupreisindex, damit jede Zahl zum richtigen Stichtag passt.</p>
-      <div class="dt-n"><b data-umfang="indizes">301</b> Indexwerte · <b data-umfang="indizes_reihen">3</b> Reihen</div></div>
-  </div>
-  <p class="dt-fuss">Gezählt in unseren Datenbanken. Marktdaten aus Angeboten kommen hinzu. Sie zählen hier nicht mit
-    und heißen im Bericht nie amtlich. Wo eine amtliche Zahl fehlt, erfindet DealPilot keine, sondern nennt den
-    zuständigen Ausschuss und den Weg zur Quelle.</p>
-  </details>
+  <!-- landing-faecher-2 · Marcel 20.11.2026: die amtlichen Datenpunkte und wie sie sich zusammensetzen laufen hoch,
+       sobald der Abschnitt ins Bild kommt. Die acht Posten (teile) kommen aus GET /public/datenumfang
+       (window.DPS_ZAHLEN_LIVE, landing-zahlen.js) oder, wenn der nicht antwortet, aus datenumfang.js
+       (tools/datenumfang-messen.mjs). Gebaut von landing-faecher.js datenbasis(), nur wenn die Summe
+       der Posten genau die Gesamtzahl ergibt. -->
+  <div class="dt-zusammen" id="dtZusammen" hidden></div>
+  <!-- landing-faecher-2 · Marcel 20.11.2026: „Klick auf die acht Quellen öffnet eine Tabellenansicht“. Vorbild
+       design/Vorschläge/landing-neu-4/unterseite-daten.html (Tabelle „Flugbuch der Daten“), Inhalte und Namen
+       wie bisher in den acht Karten hier und in methodik.html (Gutachterausschüsse, Zensus 2022, Statistische Ämter,
+       Regionaldatenbank, amtliche Statistik, Obere Gutachterausschüsse, Deutsche Bundesbank, Statistisches Bundesamt),
+       kein Name mehr. Zahlen über data-umfang wie überall (datenumfang-messen.mjs statisch, landing-zahlen.js live);
+       nur die Zinswerte (teile.zinsen) setzt landing-faecher.js, sie stehen nicht im Kopf der Antwort.
+       Am Handy werden die Zeilen zu Karten (landing-faecher.css). -->
+  <p class="dt-quellen-zeile rv"><button type="button" class="dt-quellen-knopf" id="dtQuellenAuf" aria-haspopup="dialog" aria-controls="dtQuellen">Die acht Quellen und wie oft wir sie abgleichen <span aria-hidden="true">→</span></button></p>
+  <dialog class="dt-fenster" id="dtQuellen" aria-labelledby="dtQuellenTitel">
+    <div class="dt-f-kopf"><div><div class="eye">Datenbasis · Flugbuch der Daten</div>
+      <h3 id="dtQuellenTitel">Die acht Quellen und wie oft wir sie abgleichen.</h3></div>
+      <button type="button" class="dt-f-zu" data-zu aria-label="Fenster schließen">✕</button></div>
+    <div class="dt-f-inhalt">
+    <table class="dt-tab">
+      <thead><tr><th scope="col">Quelle</th><th scope="col">Was darin steht</th><th scope="col">Abgleich</th><th scope="col" class="z">Umfang</th></tr></thead>
+      <tbody>
+        <tr><th scope="row">Bodenrichtwerte</th><td>Bodenrichtwert und Zone aus den amtlichen Diensten der Länder und des Bundes, für alle 16 Länder.</td><td class="t"><i class="live"></i>live je Bericht</td><td class="z"><b data-umfang="boris_dienste">10</b><small>Bodenrichtwert-Dienste</small></td></tr>
+        <tr><th scope="row">Gutachterausschüsse</th><td>Liegenschaftszinssätze, Sachwertfaktoren, Vergleichsfaktoren und Umrechnungskoeffizienten. Jeder Wert mit Ausschuss, Jahrgang und Fundstelle.</td><td class="t"><i></i>Januar bis Juni wöchentlich, sonst monatlich</td><td class="z"><b data-umfang="register_werte">6.097</b><small>Werte · <span data-umfang="ausschuesse">201</span> Ausschüsse · <span data-umfang="portale">109</span> geprüfte Quellen<br>dazu <span data-umfang="kennzahlen_gaa">2.557</span> amtliche Parameter der Wertermittlung</small></td></tr>
+        <tr><th scope="row">Zensus 2022</th><td>Wohnungen, Gebäude, Leerstand und Mieten der Statistischen Ämter des Bundes und der Länder, bis auf die Gemeinde.</td><td class="t"><i></i>Stichtag 15.05.2022</td><td class="z"><b data-umfang="zensus">894.880</b><small>Werte · <span data-umfang="zensus_gebiete">11.186</span> Gebiete</small></td></tr>
+        <tr><th scope="row">Regionaldatenbank</th><td>Bevölkerung, Einkommen, Arbeitsmarkt und Wanderung je Kreis und Gemeinde, die Grundlage der Lageeinschätzung.</td><td class="t"><i></i>monatlich abgeglichen</td><td class="z"><b data-umfang="regional">108.676</b><small>Werte · <span data-umfang="regional_tabellen">6</span> Tabellen</small></td></tr>
+        <tr><th scope="row">Bautätigkeit und Bauland</th><td>Baugenehmigungen, Fertigstellungen und Kaufwerte für Bauland aus der amtlichen Statistik.</td><td class="t"><i></i>monatlich abgeglichen</td><td class="z"><b data-umfang="bau">56.128</b><small>Werte · <span data-umfang="bau_tabellen">5</span> Tabellen</small></td></tr>
+        <tr><th scope="row">Obere Gutachterausschüsse</th><td>Bundesweite Preis- und Mietspannen der Oberen Gutachterausschüsse, zur Einordnung jedes Objekts.</td><td class="t"><i></i>bundesweit</td><td class="z"><b data-umfang="akoga">28.827</b><small>Werte</small></td></tr>
+        <tr><th scope="row">Deutsche Bundesbank</th><td>Zinsstruktur und Zinsstatistik. Daraus die indikativen Bauzinsen, die in jeder Finanzierung stehen.</td><td class="t"><i class="live"></i>täglich</td><td class="z"><b data-teil="zinsen">–</b><small>Werte · <span data-umfang="zins_tage">1.376</span> Tageswerte</small></td></tr>
+        <tr><th scope="row">Statistisches Bundesamt</th><td>Verbraucherpreise, Nettokaltmieten und Baupreisindex, damit jede Zahl zum richtigen Stichtag passt.</td><td class="t"><i></i>wöchentlich geprüft</td><td class="z"><b data-umfang="indizes">301</b><small>Indexwerte · <span data-umfang="indizes_reihen">3</span> Reihen</small></td></tr>
+      </tbody>
+      <tfoot><tr><th scope="row">Zusammen</th><td colspan="2">amtliche Datenpunkte in unseren Datenbanken</td><td class="z"><b data-umfang="amtlich_gesamt">1.100.270</b></td></tr></tfoot>
+    </table>
+    <p class="dt-fuss">Gezählt in unseren Datenbanken. Marktdaten aus Angeboten kommen hinzu. Sie zählen hier nicht mit
+      und heißen im Bericht nie amtlich. Wo eine amtliche Zahl fehlt, erfindet DealPilot keine, sondern nennt den
+      zuständigen Ausschuss und den Weg zur Quelle.</p>
+    </div>
+  </dialog>
   <p class="btn-reihe"><a class="btn-dark" href="methodik.html">Woher unsere Zahlen kommen: Datenbasis und Prüfung →</a></p>
 </div></section>
 
@@ -656,19 +654,19 @@ if (location.hash === '#forschung') location.replace('forschung.html');</script>
   <!-- v1540b: kein loading=lazy im Laufband - es laeuft dauerhaft,
        und beim Ankommen saehe man sonst Luecken statt Logos.
        Neun Logos zusammen: 130 KB. -->
-  <div class="pmarq rv"><div class="pmarq-track">
+  <!-- landing-faecher-2 · Marcel 20.11.2026: „durchlaufende Karten statt einer Logo-Zeile, schön animiert, Logos etwas größer“.
+       Zwei Reihen mit je vier Partnern, gegenläufig und unterschiedlich schnell (landing-faecher.css .pk-reihe),
+       Kippen und Glanz beim Darüberfahren. Dieselben acht Logos wie bisher, keine neuen Namen; die beiden
+       Bewertungspartner bleiben draußen (v2285). Die Wiederholungen für den nahtlosen Lauf setzt landing-faecher.js
+       partnerband() (aria-hidden), data-doppelt="1" hält dp2.js davon ab, die Reihe ein zweites Mal zu verdoppeln.
+       v1540b gilt weiter: kein loading=lazy im Laufband. -->
+  <div class="pk-band rv">
     <!-- v2285 · Anbieter-Neutralitaet (CLAUDE.md): die beiden Bewertungspartner
          nie namentlich nach aussen - Logos aus dem Laufband genommen. -->
-    <div class="plogo"><img src="assets/partner/immometrica.png" width="227" height="54" decoding="async" alt="ImmoMetrica"></div>
-    <div class="plogo"><img src="assets/partner/realestatepilot.png" width="326" height="75" decoding="async" alt="RealEstatePilot"></div>
-    <div class="plogo"><img src="assets/partner/onevoice.png" width="259" height="119" decoding="async" alt="OneVoice"></div>
-    <div class="plogo"><img src="assets/partner/sauerland-finanzen.png" width="295" height="140" decoding="async" alt="Sauerland Finanzen"></div>
-    <div class="plogo"><img src="assets/partner/funck-it.png" width="276" height="140" decoding="async" alt="Funck IT"></div>
-    <div class="plogo"><img src="assets/partner/christian-sperling.png" width="433" height="124" decoding="async" alt="Christian Sperling"></div>
-    <div class="plogo"><img src="assets/partner/junker-immobilien.png" width="219" height="136" decoding="async" alt="Junker Immobilien"></div>
-    <!-- landing-videothek-1 · Logo von der Website der Kanzlei (sp-steuerberatung.de/img/logo.png) -->
-    <div class="plogo"><img src="assets/partner/schmidt-und-partner.png" width="300" height="59" decoding="async" alt="Schmidt &amp; Partner Steuerberatungsgesellschaft PartG mbB"></div>
-  </div></div>
+    <div class="pmarq pk-reihe pk-a"><div class="pmarq-track" data-doppelt="1"><div class="plogo pk"><span class="pk-glanz" aria-hidden="true"></span><img src="assets/partner/immometrica.png" width="227" height="54" decoding="async" alt="ImmoMetrica"></div><div class="plogo pk"><span class="pk-glanz" aria-hidden="true"></span><img src="assets/partner/realestatepilot.png" width="326" height="75" decoding="async" alt="RealEstatePilot"></div><div class="plogo pk"><span class="pk-glanz" aria-hidden="true"></span><img src="assets/partner/onevoice.png" width="259" height="119" decoding="async" alt="OneVoice"></div><div class="plogo pk"><span class="pk-glanz" aria-hidden="true"></span><img src="assets/partner/sauerland-finanzen.png" width="295" height="140" decoding="async" alt="Sauerland Finanzen"></div></div></div>
+    <!-- landing-videothek-1 · Logo Schmidt & Partner von der Website der Kanzlei (sp-steuerberatung.de/img/logo.png) -->
+    <div class="pmarq pk-reihe pk-b"><div class="pmarq-track" data-doppelt="1"><div class="plogo pk"><span class="pk-glanz" aria-hidden="true"></span><img src="assets/partner/funck-it.png" width="276" height="140" decoding="async" alt="Funck IT"></div><div class="plogo pk"><span class="pk-glanz" aria-hidden="true"></span><img src="assets/partner/christian-sperling.png" width="433" height="124" decoding="async" alt="Christian Sperling"></div><div class="plogo pk"><span class="pk-glanz" aria-hidden="true"></span><img src="assets/partner/junker-immobilien.png" width="219" height="136" decoding="async" alt="Junker Immobilien"></div><div class="plogo pk"><span class="pk-glanz" aria-hidden="true"></span><img src="assets/partner/schmidt-und-partner.png" width="300" height="59" decoding="async" alt="Schmidt &amp; Partner Steuerberatungsgesellschaft PartG mbB"></div></div></div>
+  </div>
   <!-- landing-videos-1 · Kanzlei-Zeile (Schmidt & Partner) unter dem Laufband entfernt, Marcel 27.10.2026; das Logo bleibt im Laufband -->
   <!-- landing-kern-1 · Bildzeile und die vier AMTLICH-Kacheln entfallen: die Datenquellen stehen jetzt ausführlich in #daten -->
 </div></section>
@@ -728,9 +726,9 @@ if (location.hash === '#forschung') location.replace('forschung.html');</script>
 <!-- landing-kern-2 · Deal-Check: die ECHTEN Kerne aus der App, gleiche Buster wie frontend/index.html
      (tools/buster-ebenen-pruefen.mjs liest die Zeilen unten). Die App-Domain folgt umgebung.js:
      staging.dealpilot.immo -> app.staging.dealpilot.immo, sonst app.dealpilot.immo. -->
-<script src="dealcheck-laden.js?v=landing-faecher-1"></script><!-- landing-seo-3 · Kerne + Deal-Check, Buster dort (buster-ebenen-pruefen liest die Datei) -->
+<script src="dealcheck-laden.js?v=landing-faecher-2"></script><!-- landing-seo-3 · Kerne + Deal-Check, Buster dort (buster-ebenen-pruefen liest die Datei) -->
 <script src="dp2-live.js?v=landing-faecher-1"></script><!-- landing-faecher-1 · gibt window.DpVideoQuelle für den Slider heraus -->
-<script src="landing-faecher.js?v=landing-faecher-1c"></script>
+<script src="landing-faecher.js?v=landing-faecher-2"></script>
 <script src="partner.js?v=landing-strecke-5"></script><!-- landing-strecke-1 · Aufzug der Strecke --><!-- landing-videothek-1, landing-partner-1 -->
 <!-- v1588: Zwei Funktionen, die der alten Landing schon gehoerten und
      hier gefehlt haben. Beide betreffen Geld, deshalb standen sie ganz

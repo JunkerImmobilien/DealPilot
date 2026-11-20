@@ -21,6 +21,8 @@
      20.11.2026: die Risslinie erscheint etwa 1 bis 1,5 s nach dem Laden, danach startet
      alles nach 10 s neu, als Schleife, ohne Knopf. Bei „weniger Bewegung“
      keine Schleife, sondern ruhig der Endzustand (die zwei Scores).
+     landing-faecher-2 · Marcel 20.11.2026: der Riss beginnt etwa 2 s später (Risslinie bei rund 3 s), oben
+     steht das Gesamturteil als schwarze Leiste wie in der App (dpsh-score-hero.js .dpz-kopf).
      Zahlen 87 / 81 / 97 und Anteile 59,3 / 40,8: DealScore2.compute() am
      Beispielobjekt der Hero-Karte (siehe BEISPIEL unten), Profil Standard.
    4 STARTBAHN „Fächer“ (#einlesen). Marcel 20.11.2026: bei jeder Unterlage
@@ -531,9 +533,16 @@
       + '<div class="zs-kat">' + grp + '</div><div class="zs-summe">Zählt ' + t.anteil + '&nbsp;% zum Gesamtscore 87.</div></div></div>';
   }
   function zweiHtml() {
-    return '<div class="zs" role="img" aria-label="Gesamturteil 87, Sehr gut. Investment-Score 81, Finanzierungs-Score 97. Empfehlung Kaufen."><div class="zs-kopf"><div class="zs-siegel"><span data-zahl="87">87</span><small>/ 100</small></div>'
-      + '<div><div class="zs-lbl">Gesamturteil · Investor Deal Score</div><div class="zs-wort">Sehr gut</div></div><span class="zs-empf">Empfehlung · Kaufen</span>'
-      + '<div class="zs-warum"><span class="zs-teil" data-t>Investment <b>81</b> zählt 59,3&nbsp;%</span><span class="zs-teil" data-t>Finanzierung <b>97</b> zählt 40,8&nbsp;%</span></div></div>'
+    /* landing-faecher-2 · Marcel 20.11.2026: „oben das Gesamturteil, genau so wie in der App, dort ist er schwarz“.
+       Aufbau, Klassen-Rollen, Farben, Schrift, Pille und Satz wie die Gesamturteil-Leiste der App
+       (frontend/js/dpsh-score-hero.js zweiAnsichtHtml() Z. 422 ff., CSS dort Z. 695-713: .dpz-kopf #050505,
+       .dpz-lbl, .dpz-wort + .dpz-wert, .dpz-empf-ja Runway, .dpz-warum). Empfehlung „Kaufen“ und Schwellen 70/50
+       aus DealScore2 (dealscore2.js Z. 840 ZWEI_SCHWELLE, Z. 930 ff.). Die Knöpfe „Alle KPIs“/„Ansicht“ und
+       „Wie wird gerechnet?“ der App fehlen hier bewusst: sie öffnen App-Fenster, die es auf der Landing nicht gibt. */
+    return '<div class="zs" role="img" aria-label="Gesamturteil Investor Deal Score: Sehr gut, 87 von 100. Empfehlung Kaufen. Investment-Score 81, Finanzierungs-Score 97."><div class="zs-kopf">'
+      + '<div class="zs-kopf-l"><div class="zs-lbl">Gesamturteil · Investor Deal Score</div><div class="zs-wort">Sehr gut <span class="zs-wert"><span data-zahl="87">87</span> / 100</span></div></div>'
+      + '<span class="zs-empf zs-empf-ja" data-t>Kaufen</span>'
+      + '<div class="zs-warum" data-t>Gesamt aus Investment <b>81</b> (59,3&nbsp;%) und Finanzierung <b>97</b> (40,8&nbsp;%). Empfehlung nach Schwellen: Investment ab 70, Finanzierung ab 50. Beide Schwellen erreicht.</div></div>'
       + '<div class="zs-zwei">' + zKarte(D.inv) + zKarte(D.fin) + '</div></div>';
   }
   function zielNull(root) {
@@ -597,7 +606,7 @@
         { duration: 600 + Math.random() * 600, easing: 'cubic-bezier(.1,.7,.3,1)' }).then((function (el) { return function () { el.remove(); }; })(f));
     }
   }
-  /* opt.erst: ms nach dem Laden bis zum Anwackeln (danach 0,8 s Wackeln, dann die Risslinie: zusammen etwa 1 bis 1,5 s),
+  /* opt.erst: ms nach dem Laden bis zum Anwackeln (danach 0,8 s Wackeln, dann die Risslinie: seit landing-faecher-2 bei etwa 3 s),
      opt.verzug: ms nach jedem Neustart (die Karte steigt wieder ein, dp2-hero.css rise), opt.halten: ms offen bis zum Neustart */
   function heroRiss(opt) {
     opt = opt || {};
@@ -671,7 +680,7 @@
               kopf.style.opacity = '';
               return Promise.all([
                 anim(kopf, [{ opacity: 0, transform: 'translateY(26px) scale(.96)' }, { opacity: 1, transform: 'none' }], { duration: 750, easing: 'cubic-bezier(.16,1,.3,1)', fill: 'none' }),
-                zaehle($('.zs-siegel [data-zahl]', kopf), 87, 1100),
+                zaehle($('.zs-wert [data-zahl]', kopf), 87, 1100),
                 Promise.all(teile.map(function (t, i) { return anim(t, [{ opacity: 0, transform: 'translateY(8px)' }, { opacity: 1, transform: 'none' }], { duration: 480, delay: 420 + i * 180, fill: 'backwards' }).then(function () { t.style.opacity = ''; }); }))
               ]);
             });
@@ -825,6 +834,101 @@
     sichtbar(host, function () { sobaldKerne(function () { setTimeout(neu, 200); }); }, .3);
   }
 
+  /* ══ 5 · Datenbasis: Zusammensetzung und Tabelle der Quellen ═════════
+     landing-faecher-2 · Marcel 20.11.2026: „die amtlichen Datenpunkte und wie sie sich zusammensetzen
+     animiert hochlaufen lassen“ und „Klick auf die acht Quellen öffnet eine Tabellenansicht“.
+     ZAHLEN: nichts hier. Die acht Posten sind teile aus GET /public/datenumfang (window.DPS_ZAHLEN_LIVE,
+     gesetzt von landing-zahlen.js), sonst teile aus datenumfang.js (tools/datenumfang-messen.mjs, derselbe
+     Rechenweg backend/src/services/datenumfang.js zusammensetzen()). Gezeigt wird die Zusammensetzung nur,
+     wenn die Summe der Posten GENAU die Gesamtzahl kopf.amtlich_gesamt ergibt. Die großen Zahlen darüber
+     zählt dp2.js hoch (data-zaehl, Endwert = gemessene Zahl, live nachgezogen über DP2_setzeZahl).
+     NAMEN: nur die, die heute schon auf der Startseite und in methodik.html stehen. */
+  var TEILE = [
+    ['zensus', 'Zensus 2022'], ['regional', 'Regionaldatenbank'], ['bau', 'Bautätigkeit und Bauland'],
+    ['akoga', 'Obere Gutachterausschüsse'], ['register', 'Gutachterausschüsse, Register'],
+    ['kennzahlen_gaa', 'Parameter der Wertermittlung'], ['zinsen', 'Deutsche Bundesbank'], ['indizes', 'Statistisches Bundesamt']
+  ];
+  function ladeSkript(src) {
+    return new Promise(function (ok) { var s = document.createElement('script'); s.src = src; s.onload = s.onerror = function () { ok(); }; document.head.appendChild(s); });
+  }
+  function umfangDaten() {
+    var fertig = window.DPS_ZAHLEN_FERTIG && window.DPS_ZAHLEN_FERTIG.then ? window.DPS_ZAHLEN_FERTIG : Promise.resolve();
+    return fertig.catch(function () {}).then(function () {
+      var L = window.DPS_ZAHLEN_LIVE;
+      if (L && L.teile && L.kopf) return L;
+      return (window.DPS_UMFANG ? Promise.resolve() : ladeSkript('datenumfang.js?v=landing-faecher-2')).then(function () { return window.DPS_UMFANG || null; });
+    });
+  }
+  function datenbasis(sec) {
+    if (!sec) return;
+    var box = $('#dtZusammen', sec);
+    umfangDaten().then(function (U) {
+      if (!U || !U.teile || !U.kopf) return;
+      var T = U.teile, summe = 0, ok = true;
+      TEILE.forEach(function (t) { var v = T[t[0]]; if (typeof v !== 'number' || !isFinite(v)) ok = false; else summe += v; });
+      var ges = U.kopf.amtlich_gesamt;
+      /* Zinswerte für die Tabelle (stehen nicht im Kopf der Antwort, daher nicht über data-umfang) */
+      $$('[data-teil]', sec).forEach(function (b) {
+        var v = T[b.getAttribute('data-teil')];
+        if (typeof v === 'number' && isFinite(v)) b.textContent = fmt(v); else b.style.display = 'none';
+      });
+      if (!box || !ok || summe !== ges) return;
+      var reihe = TEILE.slice().sort(function (a, b) { return T[b[0]] - T[a[0]]; });
+      box.innerHTML = '<div class="dt-z-kopf"><span class="dt-z-eye">So setzen sich die Datenpunkte zusammen</span>'
+        + '<span class="dt-z-sum"><b data-z="' + ges + '">' + fmt(ges) + '</b> amtliche Datenpunkte</span></div>'
+        + '<div class="dt-z-balken" aria-hidden="true">' + reihe.map(function (t, i) {
+          return '<i data-i="' + i + '" style="--w:' + (T[t[0]] / ges * 100).toFixed(3) + '%"></i>';
+        }).join('') + '</div>'
+        + '<ul class="dt-z-liste">' + reihe.map(function (t, i) {
+          return '<li><i class="dt-z-farbe" data-i="' + i + '" aria-hidden="true"></i><span>' + esc(t[1]) + '</span><b data-z="' + T[t[0]] + '">' + fmt(T[t[0]]) + '</b></li>';
+        }).join('') + '</ul>';
+      box.hidden = false;
+      if (ruhig) { box.classList.add('da'); return; }
+      $$('[data-z]', box).forEach(function (b) { b.textContent = '0'; });
+      sichtbar(box, function () {
+        box.classList.add('da');
+        $$('[data-z]', box).forEach(function (b, i) { setTimeout(function () { zaehle(b, +b.dataset.z, 1600); }, i * 70); });
+      }, .35);
+    });
+    /* Tabelle im Fenster */
+    var auf = $('#dtQuellenAuf', sec), dlg = $('#dtQuellen', sec);
+    if (!auf || !dlg) return;
+    function zu() { if (dlg.open && dlg.close) dlg.close(); else dlg.removeAttribute('open'); document.documentElement.classList.remove('dt-offen'); }
+    auf.addEventListener('click', function () {
+      if (dlg.showModal) dlg.showModal(); else dlg.setAttribute('open', '');
+      document.documentElement.classList.add('dt-offen');
+      var zeilen = $$('tbody tr', dlg);
+      zeilen.forEach(function (tr, i) {
+        var b = $('td.z b', tr), z = b ? parseInt(String(b.textContent).replace(/\D/g, ''), 10) : NaN;
+        if (ruhig) return;
+        anim(tr, [{ opacity: 0, transform: 'translateY(12px)' }, { opacity: 1, transform: 'none' }], { duration: 520, delay: 60 + i * 60, fill: 'backwards' });
+        if (b && isFinite(z) && b.offsetParent !== null) { b.textContent = '0'; setTimeout(function () { zaehle(b, z, 1200); }, 60 + i * 60); }
+      });
+      var f = $('[data-zu]', dlg); if (f) try { f.focus({ preventScroll: true }); } catch (e) {}
+    });
+    dlg.addEventListener('click', function (e) { if (e.target === dlg || (e.target.closest && e.target.closest('[data-zu]'))) zu(); });
+    dlg.addEventListener('close', function () { document.documentElement.classList.remove('dt-offen'); try { auf.focus({ preventScroll: true }); } catch (e) {} });
+  }
+
+  /* ══ 6 · Partner-Laufband als Karten ═══════════════════════════════
+     landing-faecher-2 · Marcel 20.11.2026: zwei Reihen Karten, gegenläufig und verschieden schnell.
+     Damit der Lauf nahtlos ist, steht jede Reihe 2k-mal hintereinander und die Animation pmarq
+     (dp2-hero.css, translateX 0 → −50 %) schiebt genau k Sätze weiter. k so, dass k Sätze mindestens
+     die Bildschirmbreite füllen. Kopien sind aria-hidden. Tempo in px/s, damit beide Reihen auf jeder
+     Breite gleich ruhig laufen. Bei „weniger Bewegung“ keine Kopie und kein Lauf (CSS). */
+  function partnerband() {
+    if (ruhig) return;
+    $$('.pk-reihe .pmarq-track').forEach(function (tr, r) {
+      var orig = $$('.pk', tr); if (!orig.length) return;
+      var satz = tr.scrollWidth; if (!satz) return;
+      var breit = Math.max(innerWidth || 0, (screen && screen.width) || 0, 1280);
+      var k = Math.max(1, Math.ceil(breit / satz)), html = '';
+      for (var i = 1; i < 2 * k; i++) html += orig.map(function (o) { return o.outerHTML.replace('<div class="plogo pk"', '<div class="plogo pk" aria-hidden="true"'); }).join('');
+      tr.insertAdjacentHTML('beforeend', html);
+      tr.style.animationDuration = (k * satz / (r ? 26 : 38)).toFixed(1) + 's';
+    });
+  }
+
   /* ══ Demo „Einzel-Check“: nur Staging und lokal ═════════════════════
      Produktion: dealpilot.immo, www.dealpilot.immo, app.dealpilot.immo und
      app.dealpilot.junker-immobilien.io (CLAUDE.md, Speicher „Prod hat zwei
@@ -842,14 +946,21 @@
   function einzelcheckLaden() {
     if (!einzelcheckErlaubt() || !document.getElementById('dealcheck')) return;
     var l = document.createElement('link'); l.rel = 'stylesheet'; l.href = 'einzelcheck-demo.css?v=landing-faecher-1'; document.head.appendChild(l);
-    var s = document.createElement('script'); s.src = 'einzelcheck-demo.js?v=landing-faecher-1'; s.async = true; document.body.appendChild(s);
+    var s = document.createElement('script'); s.src = 'einzelcheck-demo.js?v=landing-faecher-1'; s.async = true;
+    /* landing-faecher-2 · der Deal-Check zeigt den zweiten Weg „Bericht holen“ erst, wenn der Einzel-Check da ist */
+    s.onload = function () { try { document.dispatchEvent(new CustomEvent('dp:einzelcheck-bereit')); } catch (e) {} };
+    document.body.appendChild(s);
   }
 
   /* ══ Start ══════════════════════════════════════════════════════════ */
-  heroRiss({ erst: 250, verzug: 1500, halten: 10000 });
+  /* landing-faecher-2 · Marcel 20.11.2026: der Riss beginnt rund 2 s später. erst 250 → 2250 ms, danach 0,8 s Wackeln:
+     die Risslinie zeichnet sich ab etwa 3,05 s (vorher 1,05 s). Verzug nach jedem Neustart und die 10-s-Schleife bleiben. */
+  heroRiss({ erst: 2250, verzug: 1500, halten: 10000 });
   streifen($('#n6st'), { tempo: 30, scroll: .4 });
   vt.baue($('#n6vt'));
   startbahn($('#einlesen'));
   einzelcheckLaden();
+  datenbasis($('#daten'));
+  partnerband();
   window.DpFaecher = { D: D, rechne: rechne, dealAus: dealAus, schwelle: SCHWELLE, vt: vt };
 })();

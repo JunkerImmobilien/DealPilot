@@ -71,6 +71,19 @@
        Sie geht als d1t in DealKpis.compute (Kapitaldienst, Cashflow, DSCR, damit in den Score) und mit &tilg und
        &bind in die Übergabe an die App (js/dealcheck-uebernahme.js setzt d1t und d1_bindj).
      · Nach jedem Ergebnis: Ereignis 'dp:dealcheck-ergebnis' (für die Demo Einzel-Check, nur Staging).
+
+   landing-faecher-2 · Marcel 20.11.2026:
+     · ZWEI WEGE auf der Vorderseite: „Deal prüfen“ (kostenlos, ohne Anmeldung) und darunter, klar abgesetzt,
+       „Kompletten Bericht für <Preis> holen“ mit einem Satz, was drin ist. Der zweite Weg öffnet den Einzel-Check
+       über seine Einstiegsfunktion window.DpEinzelCheck.auf() (dieselbe wie der Knopf „Unterlagen hochladen und
+       genauer prüfen“, einzelcheck-demo.js knopf()). Der Preis kommt aus DpEinzelCheck.preis, hier steht keiner.
+       Ohne Einzel-Check (Produktion, Rechner-Seiten) bleibt der Weg verborgen: kein Angebot ohne Code dahinter.
+     · MIETE kurz: eine Spanne je m² netto kalt und ein Satz, keine Herkunftsangabe darunter. Aus dem sichtbaren Text
+       entfernt: „Regionaldatenbank, Zensus 2022“, „Mietspiegel der Gemeinde vorhanden“, „Landesverordnungen nach …“,
+       „· Zensus“ an der Leerstand-Kachel, „aus Daten der Deutschen Bundesbank“ am Zins, der Satz zur DealPilot-Näherung
+       mit „Mietspiegel, drei Vergleichswohnungen oder ein Gutachten“. Erlaubt bleibt „amtliche Daten“.
+     · PAKETE nach dem ersten Ergebnis: die vier Paketkarten der Startseite (#pricing .tk) als Kopie unter der Karte,
+       dieselben Preise aus derselben Quelle (dem Markup dort), keine Zahl hier. Ohne #pricing (Rechner-Seiten) nichts.
    ═══════════════════════════════════════════════════════════════════════ */
 (function () {
   'use strict';
@@ -107,6 +120,11 @@
     "  <div class=\"dk-zwei\" id=\"dkObj\"><label class=\"dk-f\"><span>Baujahr <em>optional</em></span><input id=\"dcBj\" inputmode=\"numeric\" maxlength=\"4\" placeholder=\"z. B. 1975\" aria-label=\"Baujahr, optional\"></label>",
     "    <label class=\"dk-f\"><span>Wohnfläche <em>optional</em></span><input id=\"dcWfl\" inputmode=\"decimal\" maxlength=\"5\" placeholder=\"z. B. 70\" aria-label=\"Wohnfläche in Quadratmetern, optional\"><i>m²</i></label></div>",
     "  <button type=\"submit\" class=\"btn-p dk-los\" id=\"dkDreh\">Deal prüfen <span aria-hidden=\"true\">↻</span></button>",
+    /* landing-faecher-2 · zweiter Weg, sichtbar nur mit Einzel-Check (siehe Kopf) */
+    "  <p class=\"dk-los-h\" id=\"dkLosH\">Kostenlos und ohne Anmeldung. Das Ergebnis steht sofort auf der Rückseite.</p>",
+    "  <div class=\"dk-wege\" id=\"dkWege\" hidden><div class=\"dk-oder\" aria-hidden=\"true\"><span>oder</span></div>",
+    "    <button type=\"button\" class=\"dk-bericht\" id=\"dkBericht\"><span class=\"dk-bericht-t\">Kompletten Bericht für <b id=\"dkPreis\"></b> holen <span aria-hidden=\"true\">→</span></span>",
+    "      <small>Unterlagen hochladen, DealPilot liest sie aus. Du bekommst Bewertung und Marktbericht als PDF, einmalig und ohne Abo.</small></button></div>",
     "</form>",
     "<div class=\"dk-seite dk-hinten\" id=\"dcErg\" aria-live=\"polite\" aria-hidden=\"true\">",
     "  <div class=\"dk-kopf\"><span class=\"dk-marke\">Deal Score</span><button type=\"button\" class=\"dk-zur\" id=\"dkZur\">↺ Eingaben ändern</button></div>",
@@ -204,7 +222,7 @@
     zinsen = z;
     if (zinsen[bindung] == null) bindung = Object.keys(zinsen)[0];
     $('dkChips').hidden = false; $('dkZinsEigen').hidden = true;
-    standText = 'Zins für Vollfinanzierung (100 % Beleihung), indikativ nach der Marktformel von DealPilot mit dem zuletzt gespeicherten Stand aus Daten der Deutschen Bundesbank. Der Tageszins ist gerade nicht abrufbar.';
+    standText = 'Zins für Vollfinanzierung (100 % Beleihung), indikativ nach der Marktformel von DealPilot mit dem zuletzt gespeicherten Stand. Der Tageszins ist gerade nicht abrufbar.';   /* landing-faecher-2 · ohne Quellenname */
     setze('dkStand', standText);
     chipsZeigen();
     return true;
@@ -244,7 +262,7 @@
       var bd = d.formel && d.formel.bund_datum && (d.formel.bund_datum['10'] || d.formel.bund_datum[bindung]);
       var st = datum(bd) || datum(d.abgerufen);
       var ltvS = d.stufen_ltv && d.stufen_ltv[STUFE];
-      standText = 'Zins für Vollfinanzierung (' + (ltvS || 100) + ' % Beleihung), indikativ aus Daten der Deutschen Bundesbank' + (st ? ' · Stand ' + st : '');
+      standText = 'Zins für Vollfinanzierung (' + (ltvS || 100) + ' % Beleihung), indikativ aus amtlichen Zinsdaten' + (st ? ' · Stand ' + st : '');   /* landing-faecher-2 · ohne Quellenname */
       setze('dkStand', standText);
       chipsZeigen();
     })
@@ -385,7 +403,7 @@
         if (ew && ew.wert > 0) k.push(kachel(ew.ebene === 'gemeinde' ? 'Einwohner' : 'Einwohner Kreis', Math.round(ew.wert).toLocaleString('de-DE'),
           (bv ? bv.wort + ' · ' + trend : (ew.fuenf_jahre_pct != null ? (ew.fuenf_jahre_pct > 0 ? '+' : '') + dez(ew.fuenf_jahre_pct, 1) + ' % in 5 J.' : 'Stand ' + ew.jahr)), bv ? bv.ton : null));
         else if (bv) k.push(kachel('Einwohner', trend, bv.wort, bv.ton));
-        if (d.leerstand) k.push(kachel('Leerstand', dez(d.leerstand.wert, 1) + ' %', d.leerstand.wort + ' · Zensus', d.leerstand.ton));
+        if (d.leerstand) k.push(kachel('Leerstand', dez(d.leerstand.wert, 1) + ' %', d.leerstand.wort, d.leerstand.ton));
         if (d.miete) {
           var art = d.mietspiegel && d.mietspiegel.art;
           /* landing-dealcheck-5 · Marcel 12.11.2026 „die Miete ist sehr gering": es ist der Durchschnitt ALLER laufenden
@@ -426,7 +444,8 @@
         var satz = mieteSatz(vg, kp, mb, wfl);
         if (satz) { var p = document.createElement('p'); p.className = 'dk-miete-satz'; p.innerHTML = satz; g.appendChild(p); }
         var mo = d.miete && d.miete.monat && /^\d{4}-\d{2}$/.test(d.miete.monat) ? d.miete.monat.slice(5) + '/' + d.miete.monat.slice(0, 4) : null;
-        setze('dkLageQ', 'Amtliche Daten: Regionaldatenbank, Zensus 2022' + (mo ? ' (Miete fortgeschrieben auf ' + mo + ')' : '') + (d.mietspiegel && d.mietspiegel.art && d.mietspiegel.art !== 'unklar' ? ', ' + (d.mietspiegel.art === 'qualifiziert' ? 'qualifizierter' : d.mietspiegel.art === 'einfach' ? 'einfacher' : '') + ' Mietspiegel der Gemeinde vorhanden' : '') + (d.kappung || d.mietpreisbremse ? ', Landesverordnungen nach § 558 Abs. 3 und § 556d BGB' : '') + (d.einwohner && d.einwohner.ebene === 'kreis' ? '. Einwohner auf Kreisebene' : '') + '.');
+        /* landing-faecher-2 · Marcel 20.11.2026: keine Quelle, kein Mietspiegel, kein Anbieter, nur „amtliche Daten“ */
+        setze('dkLageQ', 'Amtliche Daten' + (mo ? ', Miete fortgeschrieben auf ' + mo : '') + (d.einwohner && d.einwohner.ebene === 'kreis' ? '. Einwohner auf Kreisebene' : '') + '.');
       })
       .catch(function () { if (n === lauf) { g.innerHTML = ''; setze('dkLageQ', 'Lage & Markt gerade nicht abrufbar.'); } });
   }
@@ -447,47 +466,26 @@
   var OHNE_BREMSE = 1.20;   /* landing-dealcheck-13d · Marcel 19.11.2026: doch 120 % */
   /* landing-dealcheck-8b · Marcel 12.11.2026: „bitte ohne ; oder – nur mit Punkt und Komma … Mietwucher anders
      ausdrücken". Kurze Sätze, kein Gedankenstrich, kein Semikolon, das Wort Mietwucher fällt weg. */
+  /* landing-faecher-2 · Marcel 20.11.2026: „kurz und bündig, eine Zahl bzw. Spanne, ein kurzer Satz, darunter keine
+     Angabe, woher die Daten kommen“. Die Rechnung bleibt die von landing-dealcheck-8 bis -13 (Mittel und oberer Rand
+     der Vergleichsmiete, Kappung kpct in 3 Jahren, OBEN_TYPISCH ohne Spanne mit „ca.“), nur der Text ist kurz.
+     Die lange Fassung mit Mietpreisbremse und Paragrafen steht bis landing-faecher-1c in git. */
   function mieteSatz(vg, kp, mb, wfl) {
     if (!vg || !(vg.qm > 0)) return null;
     var nkm = zahl(F.nkm), mitW = wfl && nkm > 0, kpct = kp && kp.pct ? kp.pct : 20;
     var spanne = vg.quelle === 'mietspiegel' && vg.oben > 0, oben = spanne ? vg.oben : vg.qm * OBEN_TYPISCH, ca = spanne ? '' : 'ca. ';
-    var eu = function (qm, mitCa) { return '<b>' + (mitCa ? ca : '') + dez(qm, 2) + ' €</b>' + (mitW ? ' (' + dez(Math.round(qm * wfl), 0) + ' € im Monat)' : ''); };
-    var t = '<b>Was an Miete möglich ist, je m² nettokalt</b><br>';
-    /* landing-dealcheck-12 · v3770 · Marcel 18.11.2026 („die oberste Grenze nehmen plus den zehn Prozent … das nutzen wir
-       für die gesamte App"): wie die App (lib/mietanker.js zielMaximum) zuerst das Maximum am oberen Rand mit seiner
-       Bedingung, der Wert vom Mittel nur noch als sicherer Wert danach. Bis hier stand „höchstens 110 % …, also <Mittel>"
-       vorn, der Mittelwert las sich als Grenze. */
-    t += '<b>Bestand:</b> bis zur Vergleichsmiete der Wohnung, am oberen Rand ' + eu(oben, true)
-      + ', wenn Ausstattung, Lage und Zustand das tragen, sonst ' + eu(vg.qm) + ' im Mittel. Erhöht werden darf um höchstens ' + kpct + ' % in 3 Jahren, frühestens 15 Monate nach der letzten Erhöhung (§ 558 BGB).<br>';
-    if (mb && mb.gilt === true) t += '<b>Neuvermietung:</b> hier gilt die Mietpreisbremse. Nach § 556d BGB sind höchstens 110 % der Vergleichsmiete erlaubt, am oberen Rand also ' + eu(oben * 1.1, true)
-      + ', wenn Ausstattung, Lage und Zustand das tragen, sonst ' + eu(vg.qm * 1.1) + '. Ausnahmen gibt es bei höherer Vormiete, Modernisierung in den letzten 3 Jahren und Erstbezug nach dem 01.10.2014.';
-    /* landing-dealcheck-13c · Marcel 19.11.2026: ohne Mietpreisbremse zuerst 110 %, dann (13d) doch 120 %, die rechtlich
-       unbedenkliche Grenze nach § 5 WiStG; in der App einstellbar. */
-    else if (mb && mb.gilt === false) t += '<b>Neuvermietung:</b> hier gilt keine Mietpreisbremse, die Miete ist frei vereinbar. DealPilot rechnet mit 120 % der Vergleichsmiete, am oberen Rand also ' + eu(oben * OHNE_BREMSE, true)
-      + ', wenn Ausstattung, Lage und Zustand das tragen, sonst ' + eu(vg.qm * OHNE_BREMSE) + '. Das ist die Grenze, bis zu der eine Miete rechtlich unbedenklich ist. Wer darüber geht und dabei ein knappes Wohnungsangebot ausnutzt, riskiert ein Bußgeld wegen überhöhter Miete (§ 5 WiStG).';
-    else t += '<b>Neuvermietung:</b> ob die Mietpreisbremse gilt, bitte prüfen.';
-    /* landing-dealcheck-13 · Marcel 19.11.2026: die eigene Miete am oberen Rand und an der Neuvermietung messen
-       (Investorensicht), nicht am Mittel. Der Mittelwert steht nur noch als Einordnung dabei. */
-    var neuMax = mb && mb.gilt === true ? oben * 1.1 : mb && mb.gilt === false ? oben * OHNE_BREMSE : null;
+    var t = '<span class="dk-miete-k">Was an Miete möglich ist, je m² netto kalt</span>'
+      + '<b class="dk-miete-z">' + ca + dez(vg.qm, 2) + ' bis ' + dez(oben, 2) + ' €</b>';
+    var satz;
     if (mitW) {
-      var ist = nkm / wfl, bisOben = oben - ist, ziel = Math.min(oben, ist * (1 + kpct / 100));
-      var mtl = function (qm) { return dez(Math.round(qm * wfl), 0) + ' €'; };
-      t += '<br><b>Deine Miete:</b> ' + dez(ist, 2) + ' € je m² (Mittel ' + dez(vg.qm, 2) + ' €). '
-        + (zeMonat() > 0 ? 'Gerechnet nur mit der Kaltmiete der Wohnung, ohne Stellplatz, Küche und Sonstiges. ' : '');   /* landing-dealcheck-14 */
-      if (bisOben > 0.05) {
-        t += 'Bis zum oberen Rand fehlen ' + ca + dez(bisOben, 2) + ' €, das sind ' + mtl(bisOben) + ' im Monat. '
-          + (ziel < oben - 0.005 ? 'Wegen der Kappung sind in 3 Jahren davon bis <b>' + dez(ziel, 2) + ' €</b> erreichbar (' + mtl(ziel - ist) + ' mehr im Monat), der Rest in den Jahren danach. '
-                                 : 'Das ist in 3 Jahren erreichbar, also <b>' + mtl(bisOben) + ' mehr im Monat</b>. ')
-          + 'Voraussetzung: Ausstattung, Lage und Zustand tragen den oberen Wert.';
-      } else {
-        t += 'Sie liegt ' + (bisOben < -0.05 ? dez(-bisOben, 2) + ' € über dem' : 'am') + ' oberen Rand. Im Bestand ist sie ausgereizt, eine Erhöhung nach § 558 BGB geht voraussichtlich nicht mehr.';
-      }
-      if (neuMax && neuMax > ist + 0.05) t += ' Bei einer Neuvermietung sind bis ' + ca + dez(neuMax, 2) + ' € möglich, also ' + mtl(neuMax - ist) + ' mehr im Monat.';
-      t += ' Modernisierung, Index- oder Staffelmiete sind getrennt zu prüfen.';
+      var ist = nkm / wfl, ziel = Math.min(oben, ist * (1 + kpct / 100));
+      satz = ziel > ist + 0.05
+        ? 'Deine ' + dez(ist, 2) + ' € lassen sich in 3 Jahren auf bis ' + ca + dez(ziel, 2) + ' € anheben, wenn Ausstattung, Lage und Zustand das tragen.'
+        : 'Deine ' + dez(ist, 2) + ' € liegen schon am oberen Rand, im Bestand ist kaum mehr drin.';
+    } else {
+      satz = 'Der obere Wert gilt, wenn Ausstattung, Lage und Zustand ihn tragen.';
     }
-    t += ' <small>Orientierung, keine Rechtsberatung.';
-    if (!spanne) t += ' Die Vergleichsmiete ist eine DealPilot-Näherung (±' + dez(vg.abweichung_pct || 7.5, 1) + ' %). Für eine Mieterhöhung braucht es den Mietspiegel, drei Vergleichswohnungen oder ein Gutachten.';
-    return t + '</small>';
+    return t + '<span class="dk-miete-s">' + satz + ' Orientierung, keine Rechtsberatung.</span>';
   }
 
   /* ── Drehen ─────────────────────────────────────────────────────────── */
@@ -527,6 +525,51 @@
   F.plz.addEventListener('input', function () { F.plz.value = String(F.plz.value).replace(/\D/g, '').slice(0, 5); });
   F.bj.addEventListener('input', function () { F.bj.value = String(F.bj.value).replace(/\D/g, '').slice(0, 4); });
   seite(false);
+
+  /* ── landing-faecher-2 · zweiter Weg: Bericht kaufen über den Einzel-Check ── */
+  function wegZeigen() {
+    var ec = window.DpEinzelCheck, w = $('dkWege');
+    if (!w || !ec || typeof ec.auf !== 'function' || !(ec.preis > 0)) return;
+    setze('dkPreis', dez(ec.preis, 2) + ' €');
+    w.hidden = false;
+    setze('dkLosH', 'Kostenlos und ohne Anmeldung.');
+    /* Der Ablauf auf einen Blick, in der Textspalte neben der Karte (nur Startseite und Rechner-Seiten mit .dk-text) */
+    var tx = box.querySelector('.dk-text');
+    if (tx && !tx.querySelector('.dk-ablauf')) {
+      var ol = document.createElement('ol'); ol.className = 'dk-ablauf';
+      ol.innerHTML = '<li><b>Kostenlos prüfen.</b> Zahlen eintragen, Deal prüfen, das Ergebnis steht sofort da.</li>'
+        + '<li><b>Oder genauer mit Unterlagen.</b> Exposé und Co. hochladen und den kompletten Bericht für ' + dez(ec.preis, 2) + ' € holen, mit Bewertung und Marktbericht als PDF.</li>';
+      tx.appendChild(ol);
+    }
+    hoehe();
+  }
+  if ($('dkBericht')) $('dkBericht').addEventListener('click', function () {
+    var ec = window.DpEinzelCheck; if (!ec || typeof ec.auf !== 'function') return;
+    /* die Eingaben gelten auch für den Einzel-Check (er liest Zins und Tilgung aus DpDealCheck.letztes()) */
+    var r = rechnen(); if (r) letztes = r;
+    ec.auf();
+  });
+  wegZeigen();
+  document.addEventListener('dp:einzelcheck-bereit', wegZeigen);
+
+  /* ── landing-faecher-2 · Pakete nach dem ersten Ergebnis, Kopie der Karten aus #pricing ── */
+  var paketeDa = false;
+  function pakete() {
+    if (paketeDa) return;
+    var quelle = document.querySelector('#pricing #boxEinzel .tkg') || document.querySelector('#pricing .tkg');
+    var ziel = box.querySelector('.wrap');
+    if (!quelle || !ziel) return;
+    paketeDa = true;
+    var d = document.createElement('div'); d.className = 'dk-pakete'; d.id = 'dkPakete';
+    d.innerHTML = '<div class="dk-pakete-k"><span class="dk-pakete-eye">Weiter in DealPilot</span><h3>Vier Pakete. <span class="ac">Ab 0 €.</span></h3>'
+      + '<p>Mit einem Paket legst du das Objekt an und rechnest Steuer, Finanzierung und Wert im Detail.</p></div>';
+    var g = quelle.cloneNode(true);
+    [g].concat([].slice.call(g.querySelectorAll('*'))).forEach(function (x) { x.classList.remove('rv'); x.removeAttribute('id'); });
+    d.appendChild(g);
+    d.insertAdjacentHTML('beforeend', '<p class="dk-pakete-l"><a href="preise.html">Alle Leistungen der Pakete →</a></p>');
+    ziel.appendChild(d);
+  }
+  document.addEventListener('dp:dealcheck-ergebnis', pakete);
 
   /* Einmal kurz anwackeln, wenn die Karte ins Bild kommt — zeigt, dass sie sich dreht */
   if (!ruhig && 'IntersectionObserver' in window) {

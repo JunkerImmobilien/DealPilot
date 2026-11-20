@@ -110,16 +110,17 @@
 .n6-hk .funke{position:absolute;width:5px;height:5px;border-radius:50%;background:var(--gdh);box-shadow:0 0 8px var(--gd);pointer-events:none;z-index:9}
 /* die zwei Scores (Karten wie in der App, landing-neu-4 zKarte) */
 .zs{position:relative;color:var(--ink)}
-.zs-kopf{position:relative;background:#fff;border:1px solid rgba(63,165,108,.35);padding:14px 16px 14px 20px;display:grid;grid-template-columns:auto 1fr auto;gap:8px 16px;align-items:center;margin-bottom:12px;overflow:hidden}
-.zs-kopf::before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--grn)}
-.zs-siegel{width:54px;height:54px;border-radius:50%;background:var(--grn);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;font:700 21px/1 var(--disp)}
-.zs-siegel small{font:600 8.5px/1 var(--mono);letter-spacing:.08em;opacity:.85;margin-top:2px}
-.zs-lbl{font:700 9.5px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:#1b5e3a;margin-bottom:5px}
-.zs-wort{font:700 24px/1.05 var(--disp);color:#1b5e3a}
-.zs-empf{font:700 10.5px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;padding:9px 12px;border-radius:999px;background:var(--grn);color:#fff;white-space:nowrap}
-.zs-warum{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:6px}
-.zs-teil{display:inline-flex;align-items:baseline;gap:6px;padding:6px 10px;background:var(--cream2);font:500 12.5px/1.3 var(--body);color:var(--inkm)}
-.zs-teil b{font:700 15px/1 var(--disp);color:var(--ink)}
+/* landing-faecher-2 · Gesamturteil-Leiste wie in der App (frontend/js/dpsh-score-hero.js Z. 695-713, .dpz-kopf ff.):
+   schwarz #050505, Rundung 14 px, Etikett Mono 10,5 px, Wort Space Grotesk 22 px mit „87 / 100“ in Mono,
+   Empfehlung als Runway-Pille (.dpz-empf-ja), Begründungssatz Inter 13,5 px. Gold als var(--wl-…) wie dort. */
+.zs-kopf{border-radius:14px;padding:14px 16px;background:#050505;color:#f6f2e8;display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;margin-bottom:12px}
+.zs-lbl{font:600 10.5px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:5px}
+.zs-wort{font:700 22px/1.1 var(--disp);color:#f6f2e8}
+.zs-wert{font:600 13px/1 var(--mono);color:rgba(255,255,255,.6);margin-left:6px}
+.zs-empf{font:700 12px/1 var(--mono);letter-spacing:.07em;text-transform:uppercase;padding:7px 10px;border-radius:999px;white-space:nowrap}
+.zs-empf-ja{background:linear-gradient(110deg,var(--wl-e8cc7a, #E8CC7A),var(--wl-c9a84c, #C9A84C) 55%,var(--wl-b8932f, #b8932f));color:#1a1508}
+.zs-warum{flex:1 1 280px;font:400 13.5px/1.5 var(--body);color:rgba(255,255,255,.72)}
+.zs-warum b{color:#fff}
 .zs-zwei{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;align-items:stretch}
 .zs-karte{position:relative;background:#fff;border:1px solid #e6dfcf;overflow:hidden;display:flex;flex-direction:column}
 .zs-band{height:4px;background:var(--runway)}
@@ -142,7 +143,7 @@
 .zs-bar i{display:block;height:100%;width:0}
 .zs-summe{margin-top:auto;padding-top:9px;border-top:1px dashed #e6dfcf;font-size:12px;color:#6b6356}
 .zs-kat + .zs-summe{margin-top:12px}
-@media(max-width:620px){.zs-zwei{grid-template-columns:1fr}.zs-kopf{grid-template-columns:auto 1fr}.zs-empf{grid-column:1/-1;justify-self:start}}
+@media(max-width:620px){.zs-zwei{grid-template-columns:1fr}}
 
 /* ══ 4 · Startbahn mit acht Unterlagen ══════════════════════════════ */
 .n6-sb{position:relative;overflow:hidden}
@@ -226,3 +227,108 @@
 .n6-hell .n6-doc{box-shadow:0 30px 60px -36px rgba(70,52,12,.6)}
 .n6-hell .n6-ablage{height:520px}
 @media(max-width:620px){.n6-hell .n6-ablage{height:470px}}
+
+/* ══ 5 · Datenbasis · landing-faecher-2 ═══════════════════════════════ */
+/* Zusammensetzung der amtlichen Datenpunkte (gebaut von landing-faecher.js datenbasis()) */
+.dt-zusammen{margin:26px auto 0;max-width:980px;background:#fff;border:1px solid var(--cream-line,#e6dfcf);border-radius:16px;padding:18px 20px 16px;box-shadow:0 24px 50px -40px rgba(5,5,5,.5)}
+.dt-zusammen[hidden]{display:none}
+.dt-z-kopf{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:6px 16px;margin-bottom:12px}
+.dt-z-eye{font:700 10.5px/1.2 var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--gdd)}
+.dt-z-sum{font:500 13px/1.3 var(--body);color:var(--inkm)}
+.dt-z-sum b{font:700 20px/1 var(--disp);color:var(--ink);font-variant-numeric:tabular-nums;margin-right:4px}
+.dt-z-balken{display:flex;height:14px;border-radius:999px;overflow:hidden;background:#efe7d4;gap:2px}
+.dt-z-balken i{display:block;height:100%;width:0;min-width:0;flex:none;transition:width 1.4s cubic-bezier(.16,1,.3,1)}
+.dt-zusammen.da .dt-z-balken i{width:var(--w);min-width:4px}
+.dt-z-balken i:nth-child(2){transition-delay:.08s}.dt-z-balken i:nth-child(3){transition-delay:.16s}.dt-z-balken i:nth-child(4){transition-delay:.24s}
+.dt-z-balken i:nth-child(5){transition-delay:.32s}.dt-z-balken i:nth-child(6){transition-delay:.4s}.dt-z-balken i:nth-child(7){transition-delay:.48s}.dt-z-balken i:nth-child(8){transition-delay:.56s}
+/* acht Töne aus der Marke: Gold hell bis dunkel, Obsidian, Creme-Braun (kein Status-Grün/Rot) */
+.dt-zusammen [data-i="0"]{background:var(--gd)}.dt-zusammen [data-i="1"]{background:#050505}.dt-zusammen [data-i="2"]{background:var(--gdh)}.dt-zusammen [data-i="3"]{background:var(--gdd)}
+.dt-zusammen [data-i="4"]{background:#6b6356}.dt-zusammen [data-i="5"]{background:#a99a78}.dt-zusammen [data-i="6"]{background:#3d3a35}.dt-zusammen [data-i="7"]{background:#d9c9a0}
+.dt-z-liste{list-style:none;margin:14px 0 0;padding:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px 18px}
+.dt-z-liste li{display:grid;grid-template-columns:auto minmax(0,1fr);gap:2px 8px;align-items:center;min-width:0}
+.dt-z-farbe{width:10px;height:10px;border-radius:3px;grid-row:1/3;align-self:start;margin-top:3px}
+.dt-z-liste span{font:500 12px/1.3 var(--body);color:var(--inkm);min-width:0}
+.dt-z-liste b{font:700 16px/1.1 var(--disp);color:var(--ink);font-variant-numeric:tabular-nums}
+@media(max-width:860px){.dt-z-liste{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:420px){.dt-zusammen{padding:16px 14px 14px}.dt-z-liste{gap:10px 12px}.dt-z-liste b{font-size:15px}}
+@media(prefers-reduced-motion:reduce){.dt-z-balken i{transition:none}}
+/* Knopf und Fenster mit der Tabelle (Vorbild landing-neu-4/unterseite-daten.html) */
+.dt-quellen-zeile{text-align:center;margin:26px 0 0}
+.dt-quellen-knopf{display:inline-flex;align-items:center;gap:10px;cursor:pointer;font:600 13px/1.2 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--ink);background:#fff;border:1px solid color-mix(in srgb,var(--gd) 55%,transparent);border-radius:999px;padding:13px 20px;transition:background .25s,transform .25s,box-shadow .25s}
+.dt-quellen-knopf:hover{background:var(--runway);border-color:transparent;transform:translateY(-1px);box-shadow:0 14px 30px -18px rgba(5,5,5,.6)}
+.dt-quellen-knopf:focus-visible{outline:2px solid var(--gdd);outline-offset:3px}
+.dt-quellen-knopf span{transition:transform .3s}.dt-quellen-knopf:hover span{transform:translateX(3px)}
+html.dt-offen{overflow:hidden}
+.dt-fenster{width:min(1080px,calc(100vw - 32px));max-height:calc(100dvh - 32px);padding:0;border:0;border-radius:18px;background:var(--cream,#FDFCFA);color:var(--ink);box-shadow:0 40px 120px -30px rgba(0,0,0,.7);overflow:hidden}
+.dt-fenster[open]{display:flex;flex-direction:column}
+.dt-fenster::backdrop{background:rgba(5,5,5,.62);backdrop-filter:blur(3px)}
+.dt-f-kopf{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;padding:22px 26px 16px;border-bottom:1px solid var(--cream-line,#e6dfcf);position:relative}
+.dt-f-kopf::before{content:'';position:absolute;left:0;right:0;top:0;height:4px;background:var(--runway)}
+.dt-f-kopf h3{font:700 clamp(20px,2.4vw,28px)/1.15 var(--disp);margin:8px 0 0}
+.dt-f-zu{flex:none;width:38px;height:38px;border-radius:50%;border:1px solid var(--cream-line,#e6dfcf);background:#fff;cursor:pointer;font:600 15px/1 var(--body);color:var(--ink)}
+.dt-f-zu:hover{border-color:var(--gd)}
+.dt-f-zu:focus-visible{outline:2px solid var(--gdd);outline-offset:2px}
+.dt-f-inhalt{overflow:auto;padding:6px 26px 24px;-webkit-overflow-scrolling:touch}
+.dt-tab{width:100%;border-collapse:collapse;font-size:14.5px}
+.dt-tab thead th{font:600 10.5px/1.2 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:#6b6356;text-align:left;padding:14px 14px 10px 0;border-bottom:2px solid var(--ink)}
+.dt-tab td,.dt-tab tbody th{padding:15px 14px 15px 0;border-bottom:1px solid var(--cream-line,#e6dfcf);vertical-align:top;color:var(--inkm);text-align:left;font-weight:400;line-height:1.45}
+.dt-tab tbody th{font:700 16px/1.3 var(--disp);color:var(--ink);width:21%}
+.dt-tab td.t{font:500 11.5px/1.4 var(--mono);color:var(--gdd);width:17%}
+.dt-tab td.t i{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--gd);margin-right:7px;vertical-align:1px}
+.dt-tab td.t i.live{background:#3FA56C;animation:dtPuls 2s infinite}
+@keyframes dtPuls{50%{opacity:.35}}
+.dt-tab .z{text-align:right;white-space:nowrap}
+.dt-tab td.z{width:20%}
+.dt-tab td.z b{display:block;font:700 21px/1 var(--disp);color:var(--ink);font-variant-numeric:tabular-nums}
+.dt-tab td.z small{display:block;margin-top:5px;font:500 11px/1.45 var(--mono);color:#6b6356;white-space:normal}
+.dt-tab tfoot th,.dt-tab tfoot td{border-bottom:0;padding-top:18px;font:700 15px/1.3 var(--disp);color:var(--ink);text-align:left;vertical-align:baseline}
+.dt-tab tfoot td.z{text-align:right}
+.dt-tab tfoot td.z b{font-size:24px}
+.dt-fenster .dt-fuss{font-size:13px;color:#6b6356;margin:16px 0 0}
+/* Handy: Zeilen als Karten, kein Scrollen in der Seite */
+@media(max-width:760px){
+  .dt-f-kopf{padding:18px 16px 12px}
+  .dt-f-inhalt{padding:4px 16px 18px}
+  .dt-tab thead{display:none}
+  .dt-tab,.dt-tab tbody,.dt-tab tfoot,.dt-tab tr,.dt-tab td,.dt-tab th{display:block;width:auto!important}
+  .dt-tab tbody tr{padding:14px 0;border-bottom:1px solid var(--cream-line,#e6dfcf)}
+  .dt-tab td,.dt-tab tbody th{border:0;padding:3px 0}
+  .dt-tab .z,.dt-tab tfoot td.z{text-align:left}
+  .dt-tab td.z{margin-top:6px}
+  .dt-tab tfoot tr{padding-top:12px}
+  .dt-tab tfoot th,.dt-tab tfoot td{padding:2px 0}
+}
+@media(prefers-reduced-motion:reduce){.dt-tab td.t i.live{animation:none}.dt-quellen-knopf,.dt-quellen-knopf span{transition:none}}
+
+/* ══ 6 · Partner-Laufband als Karten · landing-faecher-2 ══════════════ */
+.pk-band{display:flex;flex-direction:column;gap:18px;margin-top:8px}
+.pk-reihe{padding:18px 0 22px}
+.pk-reihe .pmarq-track{gap:0;animation-duration:60s}
+.pk-reihe.pk-b .pmarq-track{animation-direction:reverse}
+.plogo.pk{position:relative;flex:none;width:300px;height:140px;margin-right:22px;padding:16px 22px;display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(180deg,#fff,#FDFCFA);border:1px solid color-mix(in srgb,var(--gd) 32%,transparent);border-radius:16px;overflow:hidden;
+  box-shadow:0 18px 36px -26px rgba(5,5,5,.45);transform:perspective(700px);transition:transform .45s cubic-bezier(.2,.8,.2,1),box-shadow .45s,border-color .45s}
+.plogo.pk::before{content:'';position:absolute;left:0;right:0;top:0;height:3px;background:var(--runway);opacity:.55;transition:opacity .45s}
+.plogo.pk img{max-height:96px;max-width:256px;width:auto;height:auto;object-fit:contain;position:relative;z-index:1}
+.pk-glanz{position:absolute;inset:0;pointer-events:none;z-index:2;overflow:hidden;border-radius:inherit}
+.pk-glanz::after{content:'';position:absolute;top:-20%;bottom:-20%;left:-60%;width:40%;background:linear-gradient(105deg,transparent,rgba(255,255,255,.75),transparent);transform:skewX(-18deg) translateX(0);opacity:0}
+.plogo.pk:hover{transform:perspective(700px) rotateX(7deg) rotateY(-9deg) translateY(-5px) scale(1.03);box-shadow:0 30px 50px -26px rgba(5,5,5,.55);border-color:var(--gd)}
+.plogo.pk:hover::before{opacity:1}
+.plogo.pk:hover .pk-glanz::after{animation:pkGlanz .9s ease-out}
+@keyframes pkGlanz{0%{opacity:0;transform:skewX(-18deg) translateX(0)}20%{opacity:1}100%{opacity:0;transform:skewX(-18deg) translateX(420%)}}
+/* die zweite Reihe in Karten-Creme #FBF6E9, die Karte bleibt hell, damit dunkle Logos lesbar sind */
+.pk-b .plogo.pk{background:linear-gradient(180deg,#FBF6E9,#fff)}
+@media(max-width:640px){
+  .pk-band{gap:8px}
+  .pk-reihe{padding:12px 0 16px}
+  .plogo.pk{width:230px;height:118px;margin-right:14px;padding:12px 16px}
+  .plogo.pk img{max-height:80px;max-width:198px}
+}
+/* weniger Bewegung: stehen bleiben, umbrechen statt laufen */
+.n6-ruhig .pk-reihe{-webkit-mask-image:none;mask-image:none;overflow:visible;padding:6px 0}
+.n6-ruhig .pk-reihe .pmarq-track{animation:none;display:flex;flex-wrap:wrap;justify-content:center;white-space:normal;gap:14px}
+.n6-ruhig .plogo.pk{margin-right:0;transition:none}
+@media(max-width:640px){.n6-ruhig .plogo.pk{width:calc(50% - 7px);height:96px;padding:12px}.n6-ruhig .plogo.pk img{max-width:100%;max-height:60px}}
+.n6-ruhig .plogo.pk:hover{transform:none}
+.n6-ruhig .plogo.pk:hover .pk-glanz::after{animation:none}
+@media(prefers-reduced-motion:reduce){.pk-reihe .pmarq-track{animation:none}}

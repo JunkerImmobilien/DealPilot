@@ -175,3 +175,61 @@
 @media (prefers-reduced-motion:reduce){.dk-zusatz summary>span::before{transition:none}}
 /* landing-faecher-1 · Tilgung unter den Zinsbindungen, so klein wie die optionalen Felder */
 .dk-bind .dk-tilg{margin-top:4px}.dk-bind .dk-tilg input{font-size:18px}
+/* ══ landing-faecher-2 · Marcel 20.11.2026 ═══════════════════════════════════════
+   Zwei Wege auf der Vorderseite: kostenlos prüfen ODER Unterlagen dazu und Bericht kaufen */
+.dk-los-h{margin:-6px 0 0;text-align:center;font:500 11.5px/1.35 var(--body);color:rgba(236,230,214,.55)}
+.dk-wege{display:flex;flex-direction:column;gap:10px}
+.dk-wege[hidden]{display:none}
+.dk-oder{display:flex;align-items:center;gap:10px;font:700 9.5px/1 var(--mono);letter-spacing:.2em;text-transform:uppercase;color:rgba(236,230,214,.4)}
+.dk-oder::before,.dk-oder::after{content:'';flex:1;height:1px;background:rgba(236,230,214,.14)}
+.dk-bericht{display:flex;flex-direction:column;gap:5px;width:100%;text-align:left;cursor:pointer;border-radius:9px;padding:12px 14px;
+  background:color-mix(in srgb,var(--gd) 10%,transparent);border:1px solid color-mix(in srgb,var(--gd) 55%,transparent);color:#fff;transition:background .25s,border-color .25s,transform .25s}
+.dk-bericht:hover{background:color-mix(in srgb,var(--gd) 18%,transparent);border-color:var(--gdh);transform:translateY(-1px)}
+.dk-bericht:focus-visible{outline:2px solid var(--gdh);outline-offset:2px}
+.dk-bericht-t{font:700 15px/1.25 var(--disp);color:#fff}
+.dk-bericht-t b{color:var(--gdh)}
+.dk-bericht-t span{display:inline-block;transition:transform .3s}
+.dk-bericht:hover .dk-bericht-t span{transform:translateX(3px)}
+.dk-bericht small{font:500 11.5px/1.4 var(--body);color:rgba(236,230,214,.66)}
+@media (prefers-reduced-motion:reduce){.dk-bericht,.dk-bericht-t span{transition:none}.dk-bericht:hover{transform:none}}
+/* Miete kurz: Etikett, Spanne, ein Satz */
+.dk-miete-satz{display:flex;flex-direction:column;gap:4px}
+.dk-miete-k{font:700 9.5px/1.2 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:rgba(236,230,214,.6)}
+.dk-miete-z{font:700 20px/1.1 var(--disp);color:#fff}
+.dk-miete-s{font:500 11.5px/1.4 var(--body);color:rgba(236,230,214,.72)}
+/* Pakete nach dem Ergebnis: Kopie der Karten aus #pricing (dp2-teile.css .tk), hier nur Rahmen und das,
+   was dort an #pricing hängt (.tk-class, .tk-rip), mit der Kerbe in der Farbe dieses Abschnitts */
+.dk-pakete{grid-column:1/-1;margin-top:18px;min-width:0;animation:dkPaketeEin .6s cubic-bezier(.2,.8,.2,1) both}
+@keyframes dkPaketeEin{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+.dk-pakete-k{text-align:center}
+.dk-pakete-eye{font:700 11px/1 var(--mono);letter-spacing:.2em;text-transform:uppercase;color:var(--gdd)}
+.dk-pakete-k h3{font:700 clamp(24px,3vw,34px)/1.1 var(--disp);margin:10px 0 8px;color:var(--ink)}
+.dk-pakete-k h3 .ac{color:var(--gdd)}
+.dk-pakete-k p{margin:0 auto;max-width:560px;color:var(--inkm)}
+.dk-pakete .tkg{margin-top:22px}
+.dk-pakete .tk-class{font-family:var(--mono);font-size:8.5px;letter-spacing:.24em;text-transform:uppercase;color:#221a06;opacity:.75;margin-top:5px;font-weight:700}
+.dk-pakete .tk-rip{position:relative;background:#fff;border-top:2px dashed #d8d2c2;padding:9px 16px 12px;display:flex;align-items:center;justify-content:space-between;gap:10px;font-family:var(--mono);font-size:9px;letter-spacing:.14em;color:#8a7c60}
+.dk-pakete .tk-rip::before,.dk-pakete .tk-rip::after{content:"";position:absolute;top:-8px;width:16px;height:16px;border-radius:50%;background:var(--cream2);z-index:2}
+.dk-pakete .tk-rip::before{left:-9px}
+.dk-pakete .tk-rip::after{right:-9px}
+.dk-pakete .tk-rip b{color:#1a1305}
+.dk-pakete-l{text-align:center;margin:18px 0 0}
+.dk-pakete-l a{font:600 12px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--gdd);text-decoration:none}
+.dk-pakete-l a:hover{text-decoration:underline}
+@media (max-width:560px){
+  .dk-pakete .tkg{grid-template-columns:1fr 1fr;gap:10px}
+  .dk-pakete .tk-stub{padding:11px 12px 10px}
+  .dk-pakete .tk-body{padding:12px 12px 14px}
+  .dk-pakete .tk-name{font-size:19px}
+  .dk-pakete .tk-price b{font-size:28px}
+  .dk-pakete .tk-feat,.dk-pakete .tk-ker,.dk-pakete .tk-rip,.dk-pakete .tk-bs,.dk-pakete .tk-class{display:none}
+  .dk-pakete .tk-note{margin-bottom:10px}
+  .dk-pakete .tk-cta{padding:11px 8px;font-size:10.5px}
+}
+@media (prefers-reduced-motion:reduce){.dk-pakete{animation:none}}
+/* Ablauf auf einen Blick in der Textspalte (nur mit Einzel-Check) */
+.dk-ablauf{list-style:none;counter-reset:dka;margin:22px auto 0;text-align:left;padding:0;display:flex;flex-direction:column;gap:10px;max-width:440px}
+.dk-ablauf li{counter-increment:dka;position:relative;padding:12px 14px 12px 50px;background:#fff;border:1px solid var(--cream-line);border-radius:12px;font:400 14px/1.45 var(--body);color:var(--inkm)}
+.dk-ablauf li::before{content:counter(dka);position:absolute;left:14px;top:12px;width:24px;height:24px;border-radius:50%;background:var(--ob);color:var(--gdh);font:700 12px/24px var(--mono);text-align:center}
+.dk-ablauf li:last-child::before{background:var(--runway);color:#1a1508}
+.dk-ablauf b{color:var(--ink)}
