@@ -728,9 +728,13 @@
   var FAECHER = {
     auf: function (st) {
       var n = st.docs.length;
+      /* landing-faecher-1b · gemessen bei 390 px auf Staging: mit 7° je Blatt ragte das letzte Blatt bis 425 px
+         hinaus und war abgeschnitten. Schmal: 3,5° und etwas kleiner. */
+      var breite = (st.docs[0] && st.docs[0].parentElement && st.docs[0].parentElement.clientWidth) || window.innerWidth;
+      var schmal = breite < 520, schritt = schmal ? 3.5 : 7, mass = schmal ? .72 : .78;
       st.docs.forEach(function (d, i) {
-        var w = (i - (n - 1) / 2) * 7; d.style.transformOrigin = '50% 115%'; d.style.zIndex = i;
-        d.dataset.ruhe = 'translateY(-62%) rotate(' + w + 'deg) scale(.78)'; d.style.transform = d.dataset.ruhe; d.style.opacity = 1; d.style.filter = '';
+        var w = (i - (n - 1) / 2) * schritt; d.style.transformOrigin = '50% 115%'; d.style.zIndex = i;
+        d.dataset.ruhe = 'translateY(-62%) rotate(' + w + 'deg) scale(' + mass + ')'; d.style.transform = d.dataset.ruhe; d.style.opacity = 1; d.style.filter = '';
       });
     },
     rein: function (d) {
