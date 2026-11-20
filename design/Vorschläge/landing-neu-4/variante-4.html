@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DealPilot · Variante 4 · Flugdaten</title>
+<meta name="description" content="Vorlage 4: Bauchgefühl gegen Flugdaten. Zettel mit Vermutungen werden durchgestrichen, echte Zahlen fliegen herein, das Exposé gibt seine Werte an die Karte. Danach der Abriss in zwei Scores.">
+<link rel="stylesheet" href="../../../frontend/landing/fonts/dp-fonts.css">
+<link rel="stylesheet" href="gemeinsam.css">
+<style>
+/* Variante 4 · Flugdaten (Idee 05 hell)
+   Oben links stehen drei Zettel mit Bauchgefühl. Sie werden durchgestrichen, und aus der Tiefe fliegen
+   die Flugdaten herein und rasten in eine Zahlenleiste ein. Rechts das Bullauge mit dem Flugvideo.
+   Darunter gibt das Exposé seine Werte an die echte Hero-Karte ab, der Datenstrom läuft leise mit.
+   Ganz unten zieht ein Band aus App-Ansichten durch, gegen die Scrollrichtung. */
+.h4-hero{position:relative;overflow:hidden;padding:54px 0 0;background:radial-gradient(70% 60% at 85% 10%,#fff6dd,transparent 60%),var(--cream)}
+.h4-oben{position:relative;z-index:3;display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:40px;align-items:center}
+.h4-titel{font:700 clamp(44px,7.4vw,112px)/.92 var(--disp);letter-spacing:-.06em;margin:16px 0 0}
+.h4-titel .bg{font-family:var(--ser);font-style:italic;font-weight:500;letter-spacing:-.02em;color:#a49a86;position:relative;display:inline-block}
+.h4-titel .bg::after{content:"";position:absolute;left:-3%;right:-3%;top:55%;height:.07em;background:var(--rot);transform:scaleX(0);transform-origin:left;transition:transform .8s var(--e-hoch) 1.6s}
+.h4-hero.an .h4-titel .bg::after{transform:scaleX(1)}
+.h4-titel .fd{background:var(--runway);-webkit-background-clip:text;background-clip:text;color:transparent;display:inline-block;opacity:0;transform:translateY(.3em) scale(1.2);filter:blur(10px);transition:all 1s var(--e-hoch) 2.1s}
+.h4-hero.an .h4-titel .fd{opacity:1;transform:none;filter:none}
+.h4-zettel{position:absolute;inset:0;pointer-events:none;z-index:4}
+.h4-zettel span{position:absolute;font:500 italic clamp(17px,1.7vw,24px)/1.2 var(--ser);color:#4a4536;background:#fffaf0;padding:10px 16px;box-shadow:0 14px 26px -16px rgba(70,52,12,.5);
+  transition:opacity .6s,transform .8s var(--e-hoch)}
+.h4-zettel span::after{content:"";position:absolute;left:8px;right:8px;top:52%;height:2px;background:var(--rot);transform:scaleX(0);transform-origin:left;transition:transform .5s var(--e-hoch)}
+.h4-hero.an .h4-zettel span::after{transform:scaleX(1)}
+.h4-hero.weg .h4-zettel span{opacity:0;transform:translateY(40px) rotate(12deg)}
+.h4-bull{position:relative;width:300px;height:300px;border-radius:50%;overflow:hidden;
+  box-shadow:0 0 0 10px #fff,0 0 0 12px rgba(201,168,76,.55),0 0 0 26px rgba(253,252,250,.8),0 0 0 27px rgba(201,168,76,.25),0 40px 80px -30px rgba(70,52,12,.6)}
+.h4-bull video{width:100%;height:100%;object-fit:cover}
+.h4-bull::after{content:"";position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle at 30% 25%,rgba(255,255,255,.45),transparent 40%)}
+.h4-lead{position:relative;z-index:3;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:30px;align-items:end;margin-top:26px}
+.h4-lead p{font-size:18px;color:var(--inkm);margin:0;max-width:62ch}
+.h4-leiste{position:relative;z-index:3;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));margin-top:38px;border-top:1px solid var(--linie);border-bottom:1px solid var(--linie);perspective:800px}
+.h4-leiste div{padding:18px 14px 16px;border-right:1px solid var(--linie)}
+.h4-leiste div:last-child{border-right:0}
+.h4-leiste b{display:block;font:500 clamp(30px,3.3vw,50px)/1 var(--ser);letter-spacing:-.02em;font-variant-numeric:lining-nums tabular-nums;
+  opacity:0;transform:translate3d(var(--fx),var(--fy),300px) scale(2.4);filter:blur(12px);transition:opacity .8s var(--e-hoch),transform 1.2s var(--e-feder),filter .9s}
+.h4-leiste div.da b{opacity:1;transform:none;filter:none}
+.h4-leiste span{display:block;margin-top:8px;font:600 9.5px/1.4 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--mut)}
+.h4-buehne{position:relative;z-index:3;display:grid;grid-template-columns:1fr 330px;gap:56px;align-items:center;margin:56px auto 0;max-width:1080px}
+.h4-buehne .expose{transform:rotate(2.4deg)}
+.h4-band{position:relative;height:210px;margin-top:-40px;overflow:hidden;-webkit-mask-image:linear-gradient(180deg,transparent,#000 40%);mask-image:linear-gradient(180deg,transparent,#000 40%)}
+.h4-band .zug{position:absolute;left:0;top:70px;display:flex;gap:18px;will-change:transform}
+.h4-band img{height:120px;width:auto;aspect-ratio:16/9;object-fit:cover;object-position:top left;border-radius:8px;box-shadow:0 0 0 1px rgba(201,168,76,.3),0 16px 30px -18px rgba(70,52,12,.5)}
+@media(max-width:1000px){
+  .h4-oben{grid-template-columns:1fr}
+  .h4-bull{width:200px;height:200px;margin:0 auto}
+  .h4-lead{grid-template-columns:1fr}
+  .h4-leiste{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .h4-leiste div{border-bottom:1px solid var(--linie)}
+  .h4-buehne{grid-template-columns:1fr;gap:30px;max-width:640px}
+  .h4-buehne #ex{order:-1}
+  .h4-buehne .expose{max-width:360px;margin:0 auto}
+  .h4-zettel span:nth-child(3){display:none}
+}
+</style>
+</head>
+<body>
+<div id="kopf"></div>
+
+<header class="h4-hero" id="top">
+  <canvas class="strom" id="strom" aria-hidden="true"></canvas>
+  <div class="h4-zettel" aria-hidden="true">
+    <span style="left:46%;top:60px;transform:rotate(-4deg)">Miete steigt bestimmt.</span>
+    <span style="left:6%;top:250px;transform:rotate(3deg)">Lage passt schon.</span>
+    <span style="left:38%;top:300px;transform:rotate(-2deg)">Die Bank macht das schon.</span>
+  </div>
+  <div class="wrap">
+    <div class="h4-oben">
+      <div>
+        <div class="eye">Immobilien-Investmentanalyse</div>
+        <h1 class="h4-titel"><span class="bg">Bauchgefühl?</span><br><span class="fd">Flugdaten.</span></h1>
+      </div>
+      <div class="h4-bull" aria-hidden="true"><video muted loop playsinline autoplay preload="metadata" poster="../../../frontend/landing/assets/bild/hero.jpg" src="../../../frontend/landing/assets/video/dp-hero-flug.mp4"></video></div>
+    </div>
+    <div class="h4-lead">
+      <p><b style="color:var(--ink)">Immobilienentscheidungen sind zu groß für ein Bauchgefühl.</b> DealPilot begleitet deine Immobilie vom ersten Exposé bis in den Bestand, mit vollständiger Rechnung, einem amtlich begründeten Wert und einem Investment Case, der bei der Bank besteht.</p>
+      <div style="display:flex;gap:12px;flex-wrap:wrap"><a class="btn-p" href="https://app.dealpilot.immo/?register=1">Vier Wochen als Pro, kostenlos</a></div>
+    </div>
+    <div class="h4-leiste" id="leiste">
+      <div style="--fx:-120px;--fy:-160px"><b data-z="87">0</b><span>Investor Deal Score des Beispiels</span></div>
+      <div style="--fx:60px;--fy:-220px"><b data-z="24">0</b><span>Kennzahlen hinter jedem Score</span></div>
+      <div style="--fx:-40px;--fy:-180px"><b data-z="1100360">0</b><span>amtliche Datenpunkte</span></div>
+      <div style="--fx:140px;--fy:-240px"><b data-z="6187">0</b><span>Werte von Gutachterausschüssen</span></div>
+      <div style="--fx:200px;--fy:-150px"><b data-z="201">0</b><span>Gutachterausschüsse</span></div>
+    </div>
+    <div class="h4-buehne">
+      <div id="karte"></div>
+      <div id="ex"></div>
+    </div>
+    <p style="max-width:1080px;margin:16px auto 0;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font:500 12px var(--mono);color:var(--mut)"><span>Das Exposé gibt seine Werte an die Karte. Beispieldaten.</span><button class="nochmal" type="button" id="nochmal">↻ Noch einmal</button></p>
+  </div>
+  <div class="h4-band" aria-hidden="true"><div class="zug" id="zug"></div></div>
+</header>
+
+<section class="sec papier" id="score" style="--kerbe:var(--cream2)">
+  <div class="wrap">
+    <div class="kopf ctr" data-rv><div class="eye ctr">Investor Deal Score · Abriss</div></div>
+    <div id="zwei"></div>
+  </div>
+</section>
+
+<section class="sec" id="daten"><div class="wrap" id="datenbox"></div></section>
+
+<section class="sec karte" id="etappen" style="--kerbe:var(--karte)">
+  <div class="wrap">
+    <div class="kopf ctr" data-rv><div class="eye ctr">So fliegt ein Deal</div><h2>Vom Exposé bis in den Bestand. <span class="ac">In neun Etappen.</span></h2>
+      <p>DealPilot liest Exposé und Unterlagen ein, rechnet Finanzierung, Cashflow und Steuer durch und begründet den Wert mit den Daten der Gutachterausschüsse. Scroll weiter, bei jeder Etappe siehst du die passende Ansicht aus DealPilot.</p></div>
+    <div id="strecke"></div>
+  </div>
+</section>
+
+<section class="sec" id="videothek" style="overflow:hidden">
+  <div class="wrap">
+    <div class="kopf ctr" data-rv><div class="eye ctr">Videothek</div><h2>Erst zusehen. <span class="ac">Dann rechnen.</span></h2></div>
+    <div id="vt"></div>
+  </div>
+</section>
+
+<section class="sec papier" id="preise" style="--kerbe:var(--cream2)">
+  <div class="wrap">
+    <div class="kopf ctr" data-rv><div class="eye ctr">Preise</div><h2>Vier Pakete. <span class="ac">Ab 0 €.</span></h2><p>Monatlich kündbar. Im Jahrestarif sparst du rund 17 Prozent.</p></div>
+    <div id="pakete"></div>
+  </div>
+</section>
+
+<div id="fuss"></div>
+
+<script src="gemeinsam.js"></script>
+<script>
+(function () {
+  var V = DPV, D = V.D, $ = V.$, $$ = V.$$;
+  V.start({ nr: 'Variante 4', titel: 'Flugdaten' });
+  var hero = $('.h4-hero');
+
+  /* Bauchgefühl wird durchgestrichen, Flugdaten fliegen in die Leiste */
+  function leiste() {
+    $$('#leiste div').forEach(function (d, i) {
+      setTimeout(function () { d.classList.add('da'); V.zaehle($('b', d), +$('b', d).dataset.z, 1600); }, 2300 + i * 160);
+    });
+  }
+  if (V.ruhig) { hero.classList.add('an', 'weg'); $$('#leiste div').forEach(function (d) { d.classList.add('da'); $('b', d).textContent = V.fmt(+$('b', d).dataset.z); }); }
+  else { setTimeout(function () { hero.classList.add('an'); }, 500); setTimeout(function () { hero.classList.add('weg'); }, 2400); leiste(); }
+
+  $('#ex').innerHTML = V.exposeHtml();
+  var k = V.karte($('#karte')), ex = $('#ex .expose');
+  var s = V.strom($('#strom'), hero, { fx: .5, fy: .62, deck: .35 });
+  function lauf() { return V.exposeFlug(ex, k, { tippen: 28, hub: -70 }); }
+  $('#nochmal').addEventListener('click', lauf);
+  k.leer(); s.start();
+  V.sichtbar(ex, function () { V.warte(innerWidth > 1000 ? 3200 : 300).then(lauf); }, .3);
+
+  /* App-Ansichten laufen gegen die Scrollrichtung */
+  var bilder = D.etappen.filter(function (e) { return e.bild !== 'qc'; }).map(function (e) { return D.L + 'assets/dp-strecke/' + e.bild; });
+  var zug = $('#zug'); zug.innerHTML = bilder.concat(bilder).concat(bilder).map(function (b) { return '<img src="' + b + '" alt="" loading="lazy" width="213" height="120">'; }).join('');
+  var t0 = performance.now();
+  (function sch(t) {
+    if (V.ruhig) return;
+    var w = zug.scrollWidth / 3 || 1, x = ((t - t0) / 1000 * 26 + scrollY * .7) % w;
+    zug.style.transform = 'translateX(' + (x - w) + 'px)';
+    requestAnimationFrame(sch);
+  })(t0);
+
+  V.zweiBuehne($('#zwei'), { art: 'abriss' });
+  V.daten($('#datenbox'));
+  V.etappen($('#strecke'));
+  V.videothek($('#vt'));
+  V.preise($('#pakete'));
+  V.einblenden(document);
+})();
+</script>
+</body>
+</html>

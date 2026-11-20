@@ -1,0 +1,264 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   landing-neu-6 · gemeinsam.css · Vorlage, NICHT eingebaut (20.11.2026)
+   Die Seiten laden die ECHTEN Stylesheets der heutigen Landing per <base>.
+   Hier stehen nur die neuen Bausteine:
+     1 Streifen unter dem Hero mit Absprung in die Videothek
+     2 Videothek als Slider mit Abspielfläche und Kapiteln
+     3 Riss und Aufklappen der Hero-Karte (Bewegung aus
+       design/Vorschläge/score-animation-2/1-riss-aufklappen.html, Karten
+       aus landing-neu-4/gemeinsam.css Z.194-279)
+     4 Startbahn mit vielen Unterlagen
+   Farben nur aus dp2.css: Obsidian, Creme, Gold in vier Stufen.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* ── Hinweis „Vorlage“ ──────────────────────────────────────────────── */
+.n6-vk{position:fixed;right:14px;bottom:14px;z-index:300;display:flex;gap:10px;align-items:center;
+  background:rgba(7,7,7,.88);border:1px solid var(--line);padding:8px 14px;border-radius:999px;
+  font:600 10.5px/1 var(--mono);letter-spacing:.08em;color:var(--mdk);backdrop-filter:blur(6px)}
+.n6-vk b{color:var(--gdh)}
+.n6-vk a{color:var(--gdh);border-bottom:1px solid rgba(232,204,122,.4)}
+@media(max-width:620px){.n6-vk{left:10px;right:10px;bottom:10px;justify-content:center;font-size:9.5px;padding:7px 10px}}
+.n6-bu{font:500 11.5px/1.5 var(--mono);color:var(--ddk);letter-spacing:.02em}
+.n6-hell .n6-bu{color:var(--mut)}
+.n6-knopf{display:inline-flex;align-items:center;gap:8px;min-height:40px;padding:0 16px;border:1px solid var(--line);background:transparent;
+  font:600 10.5px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--mdk);cursor:pointer;border-radius:999px}
+.n6-knopf:hover{border-color:var(--gdh);color:#fff}
+.n6-hell .n6-knopf{border-color:var(--cream-line);color:var(--inkm)}
+.n6-hell .n6-knopf:hover{border-color:var(--gd);color:var(--ink)}
+
+/* ══ 1 · Streifen mit Absprung ════════════════════════════════════════ */
+.n6-band{background:var(--ob);border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:26px 0 20px;overflow:hidden}
+.n6-band-fuss{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-top:14px}
+.n6-streifen{position:relative;overflow:hidden;--h:150px;--rand:var(--ob)}
+.n6-streifen .zug{display:flex;gap:18px;width:max-content;will-change:transform;padding:4px 0}
+.n6-streifen .st{flex:0 0 auto;position:relative;width:calc(var(--h) * 16 / 9);display:flex;flex-direction:column;color:inherit}
+.n6-streifen .bild{height:var(--h);background:#eee6d3 center/cover no-repeat;border:1px solid rgba(201,168,76,.35);
+  box-shadow:0 22px 40px -26px rgba(0,0,0,.75);position:relative;overflow:hidden;transition:border-color .3s,transform .4s var(--e-weich)}
+.n6-streifen img{width:100%;height:100%;object-fit:cover;object-position:top left;display:block}
+.n6-streifen .lupe{position:absolute;left:8px;top:8px;font:700 8.5px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:#14100a;background:var(--runway);padding:4px 7px}
+/* das Absprung-Zeichen: Kapitel und Sekunde */
+.n6-streifen .sprung{position:absolute;right:8px;bottom:8px;display:flex;align-items:center;gap:7px;max-width:calc(100% - 16px);
+  background:rgba(7,7,7,.86);color:var(--gdh);font:600 9.5px/1.2 var(--mono);letter-spacing:.04em;padding:6px 9px 6px 7px;border:1px solid rgba(232,204,122,.45);
+  transform:translateY(4px);opacity:.92;transition:transform .3s,opacity .3s,background .3s}
+.n6-streifen .sprung i{flex:none;width:18px;height:18px;border-radius:50%;background:var(--runway);display:grid;place-items:center}
+.n6-streifen .sprung i::after{content:"";border-left:6px solid #14100a;border-top:4px solid transparent;border-bottom:4px solid transparent;margin-left:2px}
+.n6-streifen .sprung span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.n6-streifen a.st:hover .bild,.n6-streifen a.st:focus-visible .bild{border-color:var(--gdh);transform:translateY(-4px)}
+.n6-streifen a.st:hover .sprung,.n6-streifen a.st:focus-visible .sprung{opacity:1;transform:none;background:#0c0b09}
+.n6-streifen figcaption{margin-top:9px;font:600 9.5px/1.35 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--gdh)}
+.n6-streifen figcaption b{display:block;margin-top:3px;font:600 13.5px/1.3 var(--disp);letter-spacing:-.01em;text-transform:none;color:#fff}
+.n6-streifen.rand::before,.n6-streifen.rand::after{content:"";position:absolute;top:0;bottom:0;width:7%;z-index:2;pointer-events:none}
+.n6-streifen.rand::before{left:0;background:linear-gradient(90deg,var(--rand),transparent)}
+.n6-streifen.rand::after{right:0;background:linear-gradient(-90deg,var(--rand),transparent)}
+@media(max-width:620px){.n6-streifen{--h:112px}.n6-streifen .zug{gap:12px}.n6-streifen figcaption b{font-size:12px}.n6-streifen .sprung{font-size:8.5px}}
+.n6-ruhig .n6-streifen{overflow-x:auto;scrollbar-width:thin}
+.n6-ruhig .n6-streifen .zug{transform:none!important}
+
+/* ══ 2 · Videothek als Slider ════════════════════════════════════════ */
+.n6-vt{position:relative}
+.n6-vt-kopf{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;flex-wrap:wrap;margin-bottom:26px}
+.n6-vt-kopf h2{font-size:clamp(26px,3.6vw,44px);margin:14px 0 0;color:#fff}
+.n6-vt-kopf h2 .ac{color:var(--gdh)}
+.n6-vt-reiter{display:flex;gap:6px;flex-wrap:wrap}
+.n6-vt-reiter button{border:1px solid var(--line);background:transparent;color:var(--mdk);font:700 10px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;padding:10px 14px;border-radius:999px;cursor:pointer}
+.n6-vt-reiter button.an{background:var(--runway);color:#14100a;border-color:transparent}
+.n6-vt-reiter button small{opacity:.7;margin-left:6px}
+/* Abspielfläche: Bild links, Kapitel rechts */
+.n6-vt-spiel{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);gap:0;border:1px solid var(--line);background:#0b0a08;margin-bottom:34px}
+.n6-vt-schirm{position:relative;aspect-ratio:16/9;background:#000;overflow:hidden}
+.n6-vt-schirm video,.n6-vt-schirm img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.n6-vt-schirm .ueber{position:absolute;left:0;right:0;bottom:0;padding:40px 18px 14px;background:linear-gradient(180deg,transparent,rgba(0,0,0,.85));display:flex;flex-direction:column;gap:10px}
+.n6-vt-schirm .kap{font:700 10px/1.3 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--gdh)}
+.n6-vt-schirm .kap b{display:block;margin-top:4px;font:700 clamp(16px,1.8vw,22px)/1.2 var(--disp);letter-spacing:-.01em;text-transform:none;color:#fff}
+.n6-vt-bahn{position:relative;height:6px;background:rgba(255,255,255,.14);cursor:pointer}
+.n6-vt-bahn .lauf{position:absolute;left:0;top:0;bottom:0;width:0;background:var(--runway)}
+.n6-vt-bahn .mk{position:absolute;top:-3px;width:2px;height:12px;background:rgba(255,255,255,.5)}
+.n6-vt-bahn .kopf{position:absolute;top:50%;width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:50%;background:var(--gdh);box-shadow:0 0 0 4px rgba(232,204,122,.25);left:0}
+.n6-vt-zeit{display:flex;justify-content:space-between;font:600 10.5px/1 var(--mono);color:var(--mdk)}
+.n6-vt-start{position:absolute;left:50%;top:44%;width:74px;height:74px;margin:-37px 0 0 -37px;border-radius:50%;background:var(--runway);border:0;cursor:pointer;
+  display:grid;place-items:center;box-shadow:0 0 0 10px rgba(232,204,122,.18)}
+.n6-vt-start::after{content:"";border-left:20px solid #14100a;border-top:12px solid transparent;border-bottom:12px solid transparent;margin-left:6px}
+.n6-vt-spiel.laeuft .n6-vt-start{animation:n6puls 1.6s ease-in-out infinite}
+@keyframes n6puls{50%{box-shadow:0 0 0 18px rgba(232,204,122,.06)}}
+.n6-vt-info{position:relative;min-height:0}
+.n6-vt-info .innen{position:absolute;inset:0;padding:18px 20px;display:flex;flex-direction:column;overflow:hidden}
+.n6-vt-info small{font:700 10px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--gdh)}
+.n6-vt-info h3{font-size:20px;margin:8px 0 6px;color:#fff}
+.n6-vt-info .absprung{font:600 11px/1.45 var(--mono);color:var(--mdk);margin:0 0 12px;min-height:1.45em}
+.n6-vt-info .absprung b{color:var(--gdh)}
+.n6-vt-kapitel{list-style:none;margin:0;padding:0;overflow-y:auto;flex:1;border-top:1px solid var(--line);scrollbar-width:thin}
+.n6-vt-kapitel li button{width:100%;display:grid;grid-template-columns:52px 1fr;gap:8px;text-align:left;background:transparent;border:0;border-bottom:1px solid rgba(255,255,255,.06);
+  padding:9px 4px;color:var(--mdk);font:500 13px/1.35 var(--body);cursor:pointer}
+.n6-vt-kapitel li button span{font:600 11px/1.35 var(--mono);color:var(--ddk)}
+.n6-vt-kapitel li button:hover{color:#fff}
+.n6-vt-kapitel li.an button{color:#fff;background:rgba(232,204,122,.08);box-shadow:inset 3px 0 0 var(--gdh)}
+.n6-vt-kapitel li.an button span{color:var(--gdh)}
+.n6-vt-hinweis{margin:10px 0 0;font:500 10.5px/1.45 var(--mono);color:var(--ddk)}
+@media(max-width:980px){.n6-vt-spiel{grid-template-columns:1fr}.n6-vt-info .innen{position:static}.n6-vt-kapitel{max-height:240px}}
+@media(max-width:620px){.n6-vt-start{width:58px;height:58px;margin:-29px 0 0 -29px}}
+/* Slider, Bauart „flow“ (aus landing-neu-4/gemeinsam.js videothek) */
+.n6-flow{position:relative;height:385px;perspective:1100px;touch-action:pan-y;user-select:none;overflow:hidden}
+.n6-flow .it{position:absolute;left:50%;top:6px;width:min(400px,72vw);margin-left:calc(min(400px,72vw) / -2);transition:transform .8s var(--e-hoch),opacity .6s,filter .6s;
+  background:transparent;border:0;padding:0;cursor:pointer;color:inherit;text-align:center}
+.n6-flow .it .b{display:block;position:relative;overflow:hidden;border:1px solid rgba(201,168,76,.35);box-shadow:0 34px 60px -30px rgba(0,0,0,.8)}
+.n6-flow .it img{width:100%;aspect-ratio:16/9;object-fit:cover;display:block}
+.n6-flow .it .d{position:absolute;right:8px;bottom:8px;font:600 10.5px/1 var(--mono);background:rgba(7,7,7,.86);color:var(--gdh);padding:5px 7px}
+.n6-flow .it .t{display:block;margin-top:14px;opacity:0;transition:opacity .4s}
+.n6-flow .it.mitte .t{opacity:1}
+.n6-flow .it .t small{font:700 10px/1 var(--mono);letter-spacing:.14em;color:var(--gdh)}
+.n6-flow .it .t b{display:block;font:700 19px/1.2 var(--disp);margin-top:6px;color:#fff}
+@media(max-width:620px){.n6-flow{height:300px}.n6-flow .it .t b{font-size:16px}}
+/* Slider, Bauart „band“: Reihe mit Einrasten */
+.n6-reihe{display:flex;gap:16px;overflow-x:auto;scroll-snap-type:x mandatory;padding:4px 2px 16px;scrollbar-width:thin}
+.n6-reihe .it{flex:0 0 min(300px,74vw);scroll-snap-align:start;background:transparent;border:0;padding:0;cursor:pointer;text-align:left;color:inherit}
+.n6-reihe .it .b{display:block;position:relative;border:1px solid rgba(201,168,76,.3);overflow:hidden}
+.n6-reihe .it.mitte .b{border-color:var(--gdh);box-shadow:0 0 0 2px rgba(232,204,122,.35)}
+.n6-reihe .it img{width:100%;aspect-ratio:16/9;object-fit:cover;display:block;transition:transform .5s var(--e-weich)}
+.n6-reihe .it:hover img{transform:scale(1.04)}
+.n6-reihe .it .d{position:absolute;right:8px;bottom:8px;font:600 10.5px/1 var(--mono);background:rgba(7,7,7,.86);color:var(--gdh);padding:5px 7px}
+.n6-reihe .it .t{display:block;margin-top:10px}
+.n6-reihe .it .t small{font:700 9.5px/1 var(--mono);letter-spacing:.14em;color:var(--gdh)}
+.n6-reihe .it .t b{display:block;font:600 15px/1.3 var(--disp);margin-top:5px;color:#fff}
+.n6-steuer{display:flex;justify-content:center;align-items:center;gap:16px;margin-top:12px}
+.n6-steuer button{width:46px;height:46px;border-radius:50%;border:1px solid rgba(201,168,76,.5);background:transparent;color:var(--gdh);font-size:18px;cursor:pointer}
+.n6-steuer span{font:600 11px/1 var(--mono);color:var(--mdk);min-width:70px;text-align:center}
+.n6-vt-alle{text-align:center;margin:24px 0 0}
+
+/* ══ 3 · Riss und Aufklappen im Hero ═════════════════════════════════ */
+.n6-hk{position:relative;min-width:0}
+.n6-hk .riss-svg{position:absolute;left:0;top:0;overflow:visible;pointer-events:none;z-index:7}
+.n6-hk .haelfte{position:absolute;margin:0;z-index:6;will-change:transform}
+.n6-hk .haelfte .idscard{animation:none;opacity:1;transform:none;margin:0}
+.n6-hk .lichtspalt{position:absolute;pointer-events:none;z-index:5;background:radial-gradient(closest-side,rgba(255,246,216,1),rgba(232,204,122,.55) 45%,rgba(232,204,122,0))}
+.n6-hk .welle{position:absolute;border-radius:50%;border:2px solid var(--gdh);pointer-events:none;z-index:11}
+.n6-hk .funke{position:absolute;width:5px;height:5px;border-radius:50%;background:var(--gdh);box-shadow:0 0 8px var(--gd);pointer-events:none;z-index:9}
+.n6-hk-fuss{display:flex;justify-content:flex-end;margin-top:14px}
+/* die zwei Scores (Karten wie in der App, landing-neu-4 zKarte) */
+.zs{position:relative;color:var(--ink)}
+.zs-kopf{position:relative;background:#fff;border:1px solid rgba(63,165,108,.35);padding:14px 16px 14px 20px;display:grid;grid-template-columns:auto 1fr auto;gap:8px 16px;align-items:center;margin-bottom:12px;overflow:hidden}
+.zs-kopf::before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--grn)}
+.zs-siegel{width:54px;height:54px;border-radius:50%;background:var(--grn);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;font:700 21px/1 var(--disp)}
+.zs-siegel small{font:600 8px/1 var(--mono);letter-spacing:.08em;opacity:.85;margin-top:2px}
+.zs-lbl{font:700 9.5px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:#1b5e3a;margin-bottom:5px}
+.zs-wort{font:700 24px/1.05 var(--disp);color:#1b5e3a}
+.zs-empf{font:700 10.5px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;padding:9px 12px;border-radius:999px;background:var(--grn);color:#fff;white-space:nowrap}
+.zs-warum{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:6px}
+.zs-teil{display:inline-flex;align-items:baseline;gap:6px;padding:6px 10px;background:var(--cream2);font:500 12.5px/1.3 var(--body);color:var(--inkm)}
+.zs-teil b{font:700 15px/1 var(--disp);color:var(--ink)}
+.zs-zwei{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;align-items:stretch}
+.zs-karte{position:relative;background:#fff;border:1px solid #e6dfcf;overflow:hidden;display:flex;flex-direction:column}
+.zs-band{height:4px;background:var(--runway)}
+.zs-pad{padding:14px 16px;flex:1;display:flex;flex-direction:column}
+.zs-score{display:flex;gap:12px;align-items:center}
+.zs-ring{width:84px;height:84px;flex:0 0 auto;position:relative}
+.zs-ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.zs-ring .tr{fill:none;stroke:#f0ece3;stroke-width:9}
+.zs-ring .pg{fill:none;stroke-width:9;stroke-linecap:round;stroke-dasharray:276.5}
+.zs-n{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font:700 27px/1 var(--disp);color:var(--ink)}
+.zs-h3{font:600 15.5px/1.25 var(--disp);margin:0;color:#1d1c1a}
+.zs-pill{display:inline-block;font:700 10px/1 var(--mono);letter-spacing:.08em;padding:5px 8px;border-radius:999px;margin-top:6px}
+.zs-pill.g{background:rgba(63,165,108,.12);color:#1b5e3a}
+.zs-kz{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:3px 8px;align-items:baseline;margin:10px 0 0}
+.zs-t{font:600 13px/1.25 var(--disp)}
+.zs-anteil{font:600 10px/1 var(--mono);color:#6b6356;margin-left:4px}
+.zs-p{font:600 11.5px/1 var(--mono);white-space:nowrap}
+.zs-p b{font-family:var(--disp);font-size:13.5px}
+.zs-bar{grid-column:1/-1;height:6px;background:#f0ece3;overflow:hidden}
+.zs-bar i{display:block;height:100%;width:0}
+.zs-summe{margin-top:auto;padding-top:9px;border-top:1px dashed #e6dfcf;font-size:12px;color:#6b6356}
+.zs-kat + .zs-summe{margin-top:12px}
+@media(max-width:620px){.zs-zwei{grid-template-columns:1fr}.zs-kopf{grid-template-columns:auto 1fr}.zs-empf{grid-column:1/-1;justify-self:start}}
+
+/* ══ 4 · Startbahn mit vielen Unterlagen ═════════════════════════════ */
+.n6-sb{position:relative;overflow:hidden}
+.n6-sb-buehne{position:relative;display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);gap:48px;align-items:center;max-width:1120px;margin:0 auto}
+.n6-ablage{position:relative;height:470px;perspective:1300px}
+.n6-sb .n5-karte,.n6-karte{--grund:var(--ob);min-width:0;position:relative}
+.n6-karte .idscard{margin-right:0;opacity:1;transform:none;animation:none}
+.n6-karte .ids-tear .nl,.n6-karte .ids-tear .nr{background:var(--grund)}
+.n6-karte .ids-dial .pg,.n6-karte .ids-bar .track i{transition:none}
+.n6-karte .ids-bar.trifft .track{box-shadow:0 0 0 2px rgba(201,168,76,.45)}
+.n6-karte .ids-badge{transition:opacity .4s,transform .5s cubic-bezier(.3,1.32,.45,1)}
+.n6-karte .ids-badge.weg{opacity:0;transform:scale(.6)}
+.n6-karte .ids-band .cleared.wartet{background:#0c0b09;color:var(--gdh)}
+/* Abheben: die Karte steigt, darunter ein Kondensstreifen */
+.n6-karte .spur{position:absolute;left:8%;right:8%;bottom:-10px;height:30px;pointer-events:none;opacity:0;
+  background:radial-gradient(50% 100% at 50% 0,rgba(232,204,122,.55),transparent 70%);filter:blur(6px)}
+.n6-karte.hebt .spur{animation:n6spur 2.2s ease-out}
+@keyframes n6spur{0%{opacity:0}30%{opacity:1}100%{opacity:0}}
+.n6-karte .abflug{position:absolute;right:16px;top:-14px;z-index:3;font:700 10px/1 var(--mono);letter-spacing:.16em;text-transform:uppercase;background:var(--runway);color:#14100a;padding:7px 10px;
+  opacity:0;transform:translateY(8px)}
+.n6-karte.fertig .abflug{opacity:1;transform:none;transition:opacity .4s,transform .5s cubic-bezier(.3,1.32,.45,1)}
+/* Fortschritt: welche Unterlage gerade gelesen wird */
+.n6-zaehler{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;max-width:1120px;margin:0 auto 22px}
+.n6-zaehler span{font:600 9.5px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--ddk);border:1px solid rgba(255,255,255,.12);padding:6px 8px}
+.n6-zaehler span.an{color:#14100a;background:var(--runway);border-color:transparent}
+.n6-zaehler span.ok{color:var(--gdh);border-color:rgba(232,204,122,.45)}
+.n6-zaehler span.ok::before{content:"✓ "}
+.n6-hell .n6-zaehler span{color:var(--mut);border-color:var(--cream-line)}
+.n6-hell .n6-zaehler span.ok{color:var(--gdi);border-color:rgba(201,168,76,.5)}
+/* eine Unterlage */
+.n6-doc{position:absolute;left:50%;top:50%;width:300px;margin-left:-150px;transform:translateY(-50%);background:#fff;color:#1b1813;border:1px solid rgba(20,18,15,.12);
+  padding:16px 16px 14px;box-shadow:0 40px 70px -40px rgba(0,0,0,.65);backface-visibility:hidden;transform-style:preserve-3d}
+.n6-doc .kopf{display:flex;justify-content:space-between;align-items:center;gap:8px;font:700 9.5px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--gdi)}
+.n6-doc .kopf em{font-style:normal;color:var(--mut);letter-spacing:.06em}
+.n6-doc h4{font:700 18px/1.15 var(--disp);margin:10px 0 2px;color:#1b1813}
+.n6-doc .unter{font:500 10.5px/1.35 var(--mono);color:var(--mut);margin-bottom:8px}
+.n6-doc .foto{aspect-ratio:16/7;background:#ddd center/cover no-repeat;margin:8px 0}
+.n6-doc .fotos{display:grid;grid-template-columns:repeat(2,1fr);gap:5px;margin:8px 0}
+.n6-doc .fotos i{display:block;aspect-ratio:4/3;background:#ddd center/cover no-repeat}
+.n6-doc .text{display:grid;gap:5px;margin:8px 0}
+.n6-doc .text i{display:block;height:6px;background:#ece5d4}
+.n6-doc .text i.schwarz{background:#16130d;width:62%}
+.n6-doc .text i:nth-child(3n){width:84%}
+.n6-doc .f{display:flex;justify-content:space-between;align-items:baseline;gap:8px;padding:4px 0;border-bottom:1px dotted #d9cfb6;font:500 11px/1.3 var(--mono);color:var(--inkm)}
+.n6-doc .f:last-child{border-bottom:0}
+.n6-doc .f b{font:700 12px/1.2 var(--disp);color:#1b1813;white-space:nowrap;position:relative;transition:background .3s,box-shadow .3s}
+.n6-doc .f b.leer{color:transparent}
+.n6-doc .f b.leer::after{content:"";position:absolute;right:0;top:50%;width:46px;height:7px;margin-top:-3px;background:#ebe4d3}
+.n6-doc .f.quelle b{background:rgba(232,204,122,.4);box-shadow:0 0 0 3px rgba(232,204,122,.4)}
+.n6-doc .f b.ok{color:#1b5e3a}
+.n6-doc .stempel{position:absolute;right:14px;top:30%;transform:rotate(-12deg) scale(1.6);font:700 12px var(--mono);letter-spacing:.1em;color:#1b5e3a;border:2px solid #1b5e3a;
+  padding:4px 8px;opacity:0;transition:opacity .3s,transform .45s cubic-bezier(.3,1.32,.45,1);background:rgba(255,255,255,.9)}
+.n6-doc .stempel.an{opacity:1;transform:rotate(-12deg) scale(1)}
+.n6-doc .strahl{position:absolute;left:-6px;right:-6px;top:0;height:2px;background:var(--runway);box-shadow:0 0 18px 4px rgba(232,204,122,.55);opacity:0;pointer-events:none}
+.n6-doc.liest .strahl{animation:n6strahl 1.2s var(--e-weich) infinite}
+@keyframes n6strahl{0%{top:0;opacity:0}10%{opacity:1}90%{opacity:1}100%{top:100%;opacity:0}}
+.n6-doc.weg{visibility:hidden}
+.n6-chip{position:absolute;z-index:250;pointer-events:none;font:700 12px/1 var(--disp);color:#14100a;background:var(--runway);padding:7px 10px;white-space:nowrap;box-shadow:0 14px 28px -12px rgba(0,0,0,.6)}
+.n6-chip small{font:500 8.5px/1 var(--mono);letter-spacing:.08em;margin-right:6px;opacity:.75;text-transform:uppercase}
+@media(max-width:980px){
+  .n6-sb-buehne{grid-template-columns:1fr;gap:26px;max-width:640px}
+  .n6-ablage{height:430px}
+}
+@media(max-width:620px){
+  .n6-ablage{height:400px}
+  .n6-doc{width:min(272px,78vw);margin-left:calc(min(272px,78vw) / -2);padding:13px 13px 11px}
+  .n6-doc h4{font-size:16px}
+}
+
+/* Startbahn: Kopf, Fuß, Abflugtafel, helle Fassung */
+.n6-sb .head{margin-bottom:26px}
+.n6-sb-fuss{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;max-width:1120px;margin:26px auto 0}
+.n6-tafel{background:#0c0b09;border:1px solid var(--line);padding:10px;display:grid;gap:4px;font:600 11px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase}
+.n6-tafel .zeile{display:grid;grid-template-columns:26px 1fr auto;gap:10px;align-items:center;padding:9px 10px;background:#141310;color:var(--mdk);border-left:3px solid transparent;transition:background .3s,border-color .3s}
+.n6-tafel .nr{color:var(--ddk)}
+.n6-tafel .status{font-size:9.5px;padding:5px 7px;background:#1f1d18;color:var(--ddk);min-width:72px;text-align:center}
+.n6-tafel .zeile.an{background:#1d1a12;border-left-color:var(--gdh);color:#fff}
+.n6-tafel .zeile.an .status{background:var(--runway);color:#14100a}
+.n6-tafel .zeile.ok{color:#fff}
+.n6-tafel .zeile.ok .status{background:rgba(63,165,108,.18);color:#5BD98E}
+.n6-sb-drei{display:grid;grid-template-columns:260px minmax(0,320px) minmax(0,1fr);gap:34px;align-items:center;max-width:1180px;margin:0 auto}
+@media(max-width:1180px){.n6-sb-drei{grid-template-columns:1fr 1fr}.n6-sb-drei .n6-tafel{grid-column:1/-1;grid-template-columns:repeat(4,1fr)}}
+@media(max-width:980px){.n6-sb-drei{grid-template-columns:1fr}.n6-sb-drei .n6-tafel{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:620px){.n6-tafel .zeile{grid-template-columns:20px 1fr;padding:8px}.n6-tafel .status{grid-column:1/-1;justify-self:start}}
+.n6-hell.n6-sb{background:var(--cream2);color:var(--ink)}
+.n6-hell .n6-karte{--grund:var(--cream2)}
+.n6-hell .idscard{box-shadow:0 46px 80px -46px rgba(70,52,12,.6);border:1px solid var(--cream-line)}
+.n6-hell .n6-doc{box-shadow:0 30px 60px -36px rgba(70,52,12,.6)}
+/* Blätter gleich hoch: der Rest der Seite als angedeuteter Fließtext */
+.n6-doc{display:flex;flex-direction:column}
+.n6-doc .rest{flex:1;min-height:14px;margin-top:10px;background:repeating-linear-gradient(180deg,#efe9db 0 5px,transparent 5px 14px);
+  -webkit-mask-image:linear-gradient(90deg,#000 70%,transparent);mask-image:linear-gradient(90deg,#000 70%,transparent)}
+.n6-doc .fotos{grid-template-columns:repeat(4,1fr)}
+.n6-doc .fotos i{aspect-ratio:1}

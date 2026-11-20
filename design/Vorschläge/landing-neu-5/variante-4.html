@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="de"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<base href="../../../frontend/landing/">
+<link rel="icon" href="assets/dealpilot-logo.png">
+<title>DealPilot · Startseite Runde 5 · Variante 4 · Rollweg</title>
+<meta name="robots" content="noindex">
+<meta name="description" content="Nach dem Deal-Check hält die Seite an: dein Scrollen tippt das Exposé ein und trägt jeden Wert in die Karte, vorwärts wie rückwärts, darunter rollt der App-Streifen als Startbahn mit.">
+<!-- landing-neu-5 · Vorlage, NICHT eingebaut (20.11.2026). Markup, Stylesheets und Skripte sind die der heutigen
+     Landing (frontend/landing/index.html), erzeugt per Skript. Neu sind nur die Blöcke mit der Klasse n5-*.
+     Variante 4: Nach dem Deal-Check hält die Seite an: dein Scrollen tippt das Exposé ein und trägt jeden Wert in die Karte, vorwärts wie rückwärts, darunter rollt der App-Streifen als Startbahn mit. -->
+<script src="../../design/Vorschläge/landing-neu-5/gemeinsam.js"></script>
+<link rel="stylesheet" href="fonts/dp-fonts.css">
+<script>/* landing-makler-hub-2 · der Makler-Hub steht unter „Für Partner" (loesungen.html); die QR-Codes der Messe-Tafeln zeigen auf /#makler-hub */
+if (location.hash === '#makler-hub') location.replace('loesungen.html#makler-hub');
+/* landing-kern-1 · Partner, Schnittstellen, Kontingent und Matrix stehen auf preise.html - alte Sprungziele weiterleiten */
+if (/^#(partner-plan|module|nachkauf|feature-matrix)$/.test(location.hash)) location.replace('preise.html' + location.hash);
+/* landing-kern-2 · die Geschichten stehen auf geschichten.html, F&E auf forschung.html */
+if (location.hash === '#stories') location.replace('geschichten.html');
+if (location.hash === '#forschung') location.replace('forschung.html');</script>
+<link rel="stylesheet" href="dp2.css?v=v2971b">
+<link rel="stylesheet" href="dp2-hero.css?v=landing-strecke-4">
+<link rel="stylesheet" href="dp2-teile.css?v=landing-partner-2">
+<link rel="stylesheet" href="dp2-buehne.css?v=v1570">
+<link rel="stylesheet" href="dp2-live.css?v=landing-strecke-4">
+<link rel="stylesheet" href="partner.css?v=landing-strecke-5">
+<link rel="stylesheet" href="dp2-module.css?v=landing-module-2">
+<link rel="stylesheet" href="dp2-kern.css?v=landing-strecke-3">
+<link rel="stylesheet" href="dp2-dealcheck.css?v=landing-dealcheck-14">
+<link rel="stylesheet" href="seo.css?v=landing-seo-5">
+<link rel="stylesheet" href="../../design/Vorschläge/landing-neu-5/gemeinsam.css">
+<style>
+.n5-rw{position:relative;height:330vh;background:var(--ob);color:var(--txtd)}
+.n5-rw-fix{position:sticky;top:0;height:100vh;overflow:hidden;display:flex;flex-direction:column;justify-content:center;gap:18px;padding-top:70px;
+  background:radial-gradient(70% 60% at 70% 40%,rgba(201,168,76,.10),transparent 70%),var(--ob)}
+.n5-rw-kopf{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;flex-wrap:wrap;width:100%}
+.n5-rw-kopf h2{font-size:clamp(24px,3vw,40px);margin:12px 0 0;color:#fff}
+.n5-rw-kopf h2 .ac{color:var(--gdh)}
+.n5-rw-stand{display:flex;flex-direction:column;gap:8px;font:600 10.5px/1.3 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--gdh);min-width:260px}
+.n5-rw-balken{display:block;height:3px;background:rgba(255,255,255,.1)}
+.n5-rw-balken i{display:block;height:100%;width:0;background:var(--runway)}
+.n5-rw-buehne{position:relative;width:100%}
+.n5-rw-buehne .n5-szene{max-width:1040px}
+.n5-rw-buehne .n5-expose .foto{display:none}
+.n5-rw .n5-karte{--grund:var(--ob)}
+.n5-rw-bahn{position:relative;padding-top:6px}
+.n5-rw-bahn #st4{--h:112px;--rand:var(--ob)}
+.n5-rw-bahn #st4 .st figcaption{margin-top:6px}
+.n5-rw-bahn::before{content:"";position:absolute;left:0;right:0;top:-2px;height:2px;background:repeating-linear-gradient(90deg,var(--gd) 0 28px,transparent 28px 52px);opacity:.6}
+/* ohne Anhalten: schmale oder niedrige Fenster und weniger Bewegung */
+.n5-rw.flach{height:auto}
+.n5-rw.flach .n5-rw-fix{position:relative;height:auto;padding:90px 0 60px;gap:34px}
+.n5-rw.flach .n5-rw-stand{display:none}
+@media(max-height:820px){.n5-rw-buehne .n5-expose .eigen{display:none}}
+</style>
+</head><body>
+<svg style="display:none" aria-hidden="true">
+<symbol id="i-haus" viewBox="0 0 24 24"><path d="M3 21V10l9-7 9 7v11"/><path d="M9 21v-6h6v6"/><path d="M3 21h18"/></symbol>
+<symbol id="i-blitz" viewBox="0 0 24 24"><path d="M13 2 4 14h7l-1 8 9-12h-7l1-8Z"/></symbol>
+<symbol id="i-globus" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></symbol>
+<symbol id="i-server" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="7" rx="1"/><rect x="3" y="13" width="18" height="7" rx="1"/><path d="M7 7.5h.01M7 16.5h.01"/></symbol>
+<symbol id="i-schild" viewBox="0 0 24 24"><path d="M12 2 4 5.5v6c0 5 3.4 8.9 8 10.5 4.6-1.6 8-5.5 8-10.5v-6L12 2Z"/><path d="m9 12 2.2 2.2L15.5 10"/></symbol>
+<symbol id="i-schloss" viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="11" rx="1.5"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></symbol>
+<symbol id="i-pokal" viewBox="0 0 24 24"><path d="M7 3h10v6a5 5 0 0 1-10 0V3Z"/><path d="M7 5H4v2a3 3 0 0 0 3 3M17 5h3v2a3 3 0 0 1-3 3M9 21h6M12 14v7"/></symbol>
+<symbol id="i-ebenen" viewBox="0 0 24 24"><path d="m12 3 9 5-9 5-9-5 9-5Z"/><path d="m3 13 9 5 9-5M3 18l9 5 9-5"/></symbol>
+<symbol id="i-handy" viewBox="0 0 24 24"><rect x="6" y="2" width="12" height="20" rx="2.5"/><path d="M11 18.5h2"/></symbol>
+<symbol id="i-pfeil" viewBox="0 0 24 24"><path d="M5 12h14m-6-6 6 6-6 6"/></symbol>
+<symbol id="i-code" viewBox="0 0 24 24"><path d="m8 7-5 5 5 5M16 7l5 5-5 5M14 4l-4 16"/></symbol>
+<symbol id="i-buch" viewBox="0 0 24 24"><path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v18H6.5A2.5 2.5 0 0 0 4 22.5V4.5Z"/><path d="M8 7h8M8 11h6"/></symbol>
+<symbol id="i-mikro" viewBox="0 0 24 24"><rect x="9" y="2" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v4M8 22h8"/></symbol>
+<symbol id="i-zahnrad" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><path d="M12 2v3m0 14v3M4.2 4.2l2.2 2.2m11.2 11.2 2.2 2.2M2 12h3m14 0h3M4.2 19.8l2.2-2.2M17.6 6.4l2.2-2.2"/></symbol>
+<symbol id="i-doc" viewBox="0 0 24 24"><path d="M7 2h7l5 5v15H7V2Z"/><path d="M14 2v5h5"/><path d="M10 12h6M10 16h6"/></symbol>
+<symbol id="i-ziel" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.4"/></symbol>
+<symbol id="i-bank" viewBox="0 0 24 24"><path d="M3 10 12 4l9 6"/><path d="M5 10v8m5-8v8m4-8v8m5-8v8M3 21h18"/></symbol>
+<symbol id="i-frage" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.2 9.3a2.9 2.9 0 0 1 5.6 1c0 1.9-2.8 2.4-2.8 4M12 17.5h.01"/></symbol>
+<symbol id="i-blitz2" viewBox="0 0 24 24"><path d="M13 2 4 14h7l-1 8 9-12h-7l1-8Z"/></symbol>
+</svg>
+
+<div class="tb"><div class="wrap">
+  <span class="pkt"><i></i>4 WOCHEN PRO, OHNE ZAHLUNGSDATEN</span>
+  <span class="pkt"><i></i>MONATLICH KÜNDBAR</span>
+  <span class="pkt hidemid"><i></i>KEINE BEWERTUNG VERFÄLLT</span>
+  <div class="rechts">
+    <span class="nz">&gt; <b data-nutzer data-umfang="nutzer_rund" data-zaehl>870</b> NUTZER</span>
+    <a href="mailto:info@dealpilot.immo">INFO@DEALPILOT.IMMO</a>
+    <a href="mailto:support@dealpilot.immo">SUPPORT</a>
+  </div>
+</div></div>
+<nav class="nav"><div class="wrap">
+  <a class="mark mark-gross" href="#"><span class="wort">Deal<b>Pilot</b></span></a>
+  <button class="burger" aria-label="Menü"><span></span><span></span><span></span></button>
+  <ul>
+    <li><a href="#features">Funktionen<i class="kar"></i></a>
+      <ul class="sub">
+        <li><a href="#features"><svg class="ico si"><use href="#i-blitz"/></svg><span><b>Die <b data-modulzahl style="display:inline;margin:0">19</b> Module</b><span>Von Boarding über Deal Score bis Bankexport</span></span></a></li>
+        <li><a href="leistungsumfang.html"><svg class="ico si"><use href="#i-buch"/></svg><span><b>Leistungsumfang</b><span>Alle 22 Kapitel ausführlich, was jedes Modul kann</span></span></a></li>
+        <li><a href="preise.html#feature-matrix"><svg class="ico si"><use href="#i-ziel"/></svg><span><b>Cockpit-Matrix</b><span>Jede Funktion, jeder Tarif im Vergleich</span></span></a></li>
+        <li><a href="api.html"><svg class="ico si"><use href="#i-code"/></svg><span><b>API</b><span>REST-Schnittstelle, voller CRUD, im Pro-Plan</span></span></a></li>
+        <li><a href="forschung.html"><svg class="ico si"><use href="#i-ziel"/></svg><span><b>Forschung &amp; Entwicklung</b><span>Bescheinigtes Vorhaben: das ganze Portfolio im Blick</span></span></a></li>
+      </ul></li>
+    <li><a href="#dealcheck">Deal-Check</a></li>
+    <li><a href="geschichten.html">Geschichten</a></li>
+    <li><a href="videothek.html">Videothek</a></li>
+    <li><a href="#pricing">Preise<i class="kar"></i></a>
+      <ul class="sub">
+        <li><a href="preise.html"><svg class="ico si"><use href="#i-bank"/></svg><span><b>Alle Preise</b><span>Vier Pakete von kostenlos bis Pro, im Detail</span></span></a></li>
+        <li><a href="preise.html#partner-plan"><svg class="ico si"><use href="#i-ebenen"/></svg><span><b>Partner &amp; Whitelabel</b><span>Deine Mandanten unter deiner Marke</span></span></a></li>
+        <li><a href="preise.html#feature-matrix"><svg class="ico si"><use href="#i-ziel"/></svg><span><b>Alles im Vergleich</b><span>Die vollständige Matrix</span></span></a></li>
+        <li><a href="preise.html#nachkauf"><svg class="ico si"><use href="#i-blitz"/></svg><span><b>Kontingent nachlegen</b><span>Bewertungen einzeln oder im Paket</span></span></a></li>
+      </ul></li>
+    <li><a href="partner.html">Für Partner<i class="kar"></i></a>
+      <ul class="sub">
+        <li><a href="loesungen.html"><svg class="ico si"><use href="#i-ziel"/></svg><span><b>Individuelle Lösungen</b><span>Prozesse, Automatisierung, Homepage &amp; iFrame</span></span></a></li>
+        <li><a href="partner.html"><svg class="ico si"><use href="#i-ebenen"/></svg><span><b>Partner-Programm</b><span>Cockpit, eigene Marke und der Ablauf</span></span></a></li>
+        <li><a href="preise.html#module"><svg class="ico si"><use href="#i-code"/></svg><span><b>Module &amp; Schnittstellen</b><span>Rechenkerne als Schnittstelle, auf Anfrage</span></span></a></li>
+        <li><a href="loesungen.html#makler-hub"><svg class="ico si"><use href="#i-haus"/></svg><span><b>Makler-Hub</b><span>Der Maklerprozess bis zum Notar · für Makler</span></span></a></li>
+        <li><a href="#partner"><svg class="ico si"><use href="#i-pokal"/></svg><span><b>Unsere Partner</b><span>Wer mit uns zusammenarbeitet</span></span></a></li>
+      </ul></li>
+    <li><a href="sicherheit.html">Sicherheit<i class="kar"></i></a>
+      <ul class="sub">
+        <li><a href="sicherheit.html"><svg class="ico si"><use href="#i-schild"/></svg><span><b>Daten &amp; Server</b><span>Hetzner, DSGVO, was gespeichert wird</span></span></a></li>
+        <li><a href="fragen.html"><svg class="ico si"><use href="#i-frage"/></svg><span><b>Häufige Fragen</b><span>Die Antworten, die wir sonst am Telefon geben</span></span></a></li>
+        <li><a href="methodik.html"><svg class="ico si"><use href="#i-buch"/></svg><span><b>Datenbasis &amp; Prüfung</b><span>Amtliche Daten, Herkunft je Wert, Prüfung</span></span></a></li>
+      </ul></li>
+  </ul>
+  <a class="b-log" href="https://app.dealpilot.immo/">Anmelden</a>
+  <a class="b-cta" href="https://app.dealpilot.immo/?register=1"><span class="b-cta-voll">Kostenlos starten</span><span class="b-cta-kurz">Starten</span></a>
+</div></nav>
+
+<section class="hero">
+  <video class="hero-bg" muted loop playsinline preload="none"
+         poster="assets/bild/hero.jpg" data-src="assets/video/dp-hero-flug.mp4"></video>
+  <div class="hero-grid-bg"></div>
+  <div class="hero-orb a"></div><div class="hero-orb b"></div>
+  <div class="hero-veil"></div>
+  <span class="ec ec-lo"></span><span class="ec ec-ro"></span>
+  <span class="ec ec-lu"></span><span class="ec ec-ru"></span>
+  <div class="wrap"><div class="hero-grid">
+    <div>
+      <div class="eye">Immobilien-Investmentanalyse</div>
+      <h1><span class="zl"><i>Immobilien&shy;entscheidungen</i></span>
+          <span class="zl"><i>sind zu groß für <em>ein Bauchgefühl.</em></i></span></h1>
+      <p class="lead">DealPilot begleitet deine Immobilie vom ersten Exposé bis in den Bestand, mit
+        vollständiger Rechnung, einem amtlich begründeten Wert und einem Investment Case, der bei der Bank besteht.
+        Ab dann fliegst du nach Flugdaten.</p>
+      <div class="hero-btn">
+        <a class="btn-p" href="https://app.dealpilot.immo/?register=1">Vier Wochen als Pro, kostenlos</a>
+        <a class="btn-l" href="#pricing"><svg class="ico" style="width:13px;height:13px;color:var(--gdh)"><use href="#i-pfeil"/></svg>Preise ansehen</a>
+      </div>
+      <p class="cta-haken"><span>Keine Zahlungsdaten</span><span>4 Wochen voller Pro-Umfang</span><span>Danach automatisch Free, ohne Kündigung</span></p>
+      <div class="hbeleg">
+        <div><b><span data-zaehl>30</span> s</b><span>VOM EXPOSÉ ZUR BEWERTUNG</span></div>
+        <div><b data-zaehl>24</b><span>KPIs HINTER JEDEM SCORE</span></div>
+        <div><b><span data-zaehl data-modulzahl>19</span></b><span>MODULE AN BORD</span></div>
+        <div><b><i class="gr">&gt;</i><span data-zaehl data-nutzer data-umfang="nutzer_rund">870</span></b><span>REGISTRIERTE NUTZER</span></div>
+        <div><b><span data-zaehl data-reg="werte_gesamt">6.187</span></b><span>AMTLICHE WERTE IM REGISTER</span></div>
+        <div><b><span data-zaehl data-reg="ausschuesse">201</span></b><span>GUTACHTERAUSSCHÜSSE MIT WERTEN</span></div>
+      </div>
+    </div>
+    <div class="idscard">
+      <div class="ids-band"><span class="l"><i class="dot"></i>Pre-Flight · Investor Deal Score</span><span class="cleared">Cleared</span></div>
+      <div class="ids-head"><span class="ids-title">Investor <b>Deal Score</b></span><span class="ids-allkpi">☰ Alle KPIs</span></div>
+      <div class="ids-body">
+        <div class="ids-left">
+          <div class="ids-dial">
+            <svg viewBox="0 0 120 120" aria-hidden="true">
+              <circle class="tr" cx="60" cy="60" r="53"></circle>
+              <circle class="pg" cx="60" cy="60" r="53" data-score="87"></circle>
+            </svg>
+            <div class="ids-dv"><b>87</b><small>/&thinsp;100</small></div>
+          </div>
+          <div class="ids-badge">◆ Sehr gut</div>
+          <div class="ids-stats">
+            <div><b>180.000&nbsp;€</b><span>Kaufpreis</span></div>
+            <div><b>23/24</b><span>KPIs</span></div>
+            <div><b>96&thinsp;%</b><span>Tiefe</span></div>
+          </div>
+        </div>
+        <div class="ids-right"><div class="ids-h">So setzt sich der Score zusammen</div><div id="idsBars"></div></div>
+      </div>
+      <div class="ids-tear"><span class="nl"></span><span class="nr"></span></div>
+      <div class="ids-foot">
+        <div class="lab">PASSENGER<b>DealPilot Co-Pilot</b></div>
+        <div class="lab" style="text-align:center">FLIGHT<b>DP · BOARDING</b></div>
+        <div class="ids-qr" id="idsQr"></div>
+      </div>
+    </div>
+  </div></div>
+</section>
+
+<div class="laufband"><div class="laufband-t">
+  <span>◆ 19 MODULE, VOM EXPOSÉ BIS ZUR BANKUNTERLAGE</span>
+  <span>◆ INVESTOR DEAL SCORE AUS 24 KENNZAHLEN</span>
+  <span>◆ BMF-KAUFPREISAUFTEILUNG NACH AMTLICHER ARBEITSHILFE</span>
+  <span>◆ RESTNUTZUNGSDAUER NACH ANLAGE 2 IMMOWERTV</span>
+  <span>◆ LIVE-MARKTZINSEN AUS DER PFANDBRIEF-ZINSSTRUKTUR</span>
+  <span>◆ BANKEXPORT MIT 25 SPALTEN</span>
+  <span>◆ SERVER IN DEUTSCHLAND · DSGVO-KONFORM</span>
+</div></div>
+
+
+<section class="sec sec-dark tarif-kompakt" id="pricing"><div class="wrap">
+  <div class="head ctr rv"><div class="eye ctr">Preise</div>
+    <h2>Vier Pakete. <span class="ac">Ab 0 €.</span></h2></div>
+  <div class="pseg rv">
+    <div class="seg" id="segZeit">
+      <button class="on" data-zeit="m">Monatlich</button>
+      <button data-zeit="j">Jährlich<span class="spar">−17 %</span></button>
+    </div>
+  </div>
+  <div class="ebox" id="boxEinzel"><div class="tkg">
+      <div class="tk rv">
+        <div class="tk-stub">
+          <div class="tk-stars">★</div>
+          <div class="tk-tag">Einstieg · Testflug</div>
+          <div class="tk-name">Free</div>
+          <div class="tk-class">Economy</div>
+        </div>
+        <div class="tkperf"></div>
+        <div class="tk-body">
+          <div class="tk-price"><b>0</b><span class="cur">€</span><span class="per">/ Monat</span></div>
+          <div class="tk-note">4 Wochen Pro · keine Kreditkarte</div>
+          <div class="tk-ker"><span>◗</span>4 Wochen Pro&nbsp;·&nbsp;dann 1&nbsp;/&nbsp;Monat</div>
+          <ul class="tk-feat"><li>1 Objekt</li><li>4 Wochen voller Pro-Umfang</li><li>Co-Pilot: 10 Fragen am Tag</li></ul>
+          <a class="tk-cta" href="https://app.dealpilot.immo/?register=1&plan=free">Kostenlos starten</a>
+        </div>
+        <div class="tk-rip"><span>✈ BOARDING PASS</span><b>DP-01</b></div>
+      </div>
+      <div class="tk rv">
+        <div class="tk-stub">
+          <div class="tk-stars">★★</div>
+          <div class="tk-tag">Privat-Investor</div>
+          <div class="tk-name">Starter</div>
+          <div class="tk-class">Premium Economy</div>
+        </div>
+        <div class="tkperf"></div>
+        <div class="tk-body">
+          <div class="tk-price" data-m="19.99" data-y="219"><b>19,99</b><span class="cur">€</span><span class="per">/ Monat</span></div>
+          <div class="tk-note" data-save="21">oder 219 €/Jahr</div>
+          <div class="tk-ker"><span>◗</span>5 Bewertungen&nbsp;/&nbsp;Monat</div>
+          <ul class="tk-feat"><li>5 Objekte</li><li>Investment-PDF ohne Wasserzeichen</li><li>Co-Pilot: 20 Fragen am Tag</li></ul>
+          <a class="tk-cta" href="https://app.dealpilot.immo/?register=1&plan=starter">Starter wählen</a>
+        </div>
+        <div class="tk-rip"><span>✈ BOARDING PASS</span><b>DP-02</b></div>
+      </div>
+      <div class="tk best rv">
+        <div class="tk-stub">
+          <div class="tk-stars">★★★</div>
+          <span class="tk-bs">★ Bestseller</span>
+          <div class="tk-tag">Aktiver Investor</div>
+          <div class="tk-name">Investor</div>
+          <div class="tk-class">Business</div>
+        </div>
+        <div class="tkperf"></div>
+        <div class="tk-body">
+          <div class="tk-price" data-m="34.99" data-y="384"><b>34,99</b><span class="cur">€</span><span class="per">/ Monat</span></div>
+          <div class="tk-note" data-save="36">oder 384 €/Jahr</div>
+          <div class="tk-ker"><span>◗</span>10 Bewertungen&nbsp;/&nbsp;Monat</div>
+          <ul class="tk-feat"><li>25 Objekte</li><li>Investor Deal Score (24 KPIs)</li><li>Track-Record-PDF · Bankexport</li></ul>
+          <a class="tk-cta" href="https://app.dealpilot.immo/?register=1&plan=investor">Investor wählen</a>
+        </div>
+        <div class="tk-rip"><span>✈ BOARDING PASS</span><b>DP-03</b></div>
+      </div>
+      <div class="tk rv">
+        <div class="tk-stub">
+          <div class="tk-stars">★★★★</div>
+          <div class="tk-tag">Profi</div>
+          <div class="tk-name">Pro</div>
+          <div class="tk-class">First</div>
+        </div>
+        <div class="tkperf"></div>
+        <div class="tk-body">
+          <div class="tk-price" data-m="49.99" data-y="549"><b>49,99</b><span class="cur">€</span><span class="per">/ Monat</span></div>
+          <div class="tk-note" data-save="51">oder 549 €/Jahr</div>
+          <div class="tk-ker"><span>◗</span>15 Bewertungen&nbsp;/&nbsp;Monat</div>
+          <ul class="tk-feat"><li>Unbegrenzte Objekte</li><li>Alle Investor-Funktionen</li><li>API-Zugang</li></ul>
+          <a class="tk-cta" href="https://app.dealpilot.immo/?register=1&plan=pro">Pro wählen</a>
+        </div>
+        <div class="tk-rip"><span>✈ BOARDING PASS</span><b>DP-04</b></div>
+      </div>
+  </div></div>
+  <div class="tarif-mehr">
+    <p class="cta-haken ctr"><span>Keine Zahlungsdaten</span><span>4 Wochen voller Pro-Umfang</span><span>Danach automatisch Free, ohne Kündigung</span></p>
+    <p class="tarif-links"><a href="preise.html">Alle Leistungen der Pakete</a><a href="preise.html#feature-matrix">Cockpit-Matrix</a>
+      <a href="preise.html#partner-plan">Partner &amp; Whitelabel</a><a href="preise.html#nachkauf">Kontingent nachlegen</a></p>
+  </div>
+</div></section>
+
+
+<div class="tband"><div class="wrap"><div class="tband-in">
+  <div><svg class="ico"><use href="#i-server"/></svg>
+    <div><b>Server in Deutschland</b><span>Hosting bei Hetzner · DSGVO-konform</span></div></div>
+  <div><svg class="ico"><use href="#i-pokal"/></svg>
+    <div><b>Aus der Gutachtenpraxis</b><span>DESAG-geprüfter Sachverständiger</span></div></div>
+  <div><svg class="ico"><use href="#i-schild"/></svg>
+    <div><b>Deine Daten bleiben deine</b><span>Kein Weiterverkauf, keine Profilbildung</span></div></div>
+  <div><svg class="ico"><use href="#i-globus"/></svg>
+    <div><b>Made in Germany</b><span>Entwickelt in Nordrhein-Westfalen</span></div></div>
+  <div class="tband-siegel"><a href="forschung.html" aria-label="Forschung und Entwicklung"><img src="assets/bsfz-siegel-2026.svg" alt="FuE-Siegel 2026 der Bescheinigungsstelle Forschungszulage" width="64" height="64" loading="lazy">
+    <div><b>FuE-Siegel 2026</b><span>Bescheinigungsstelle Forschungszulage (BSFZ)</span></div></a></div>
+</div></div></div>
+
+
+<section class="sec sec-cream dealcheck dk" id="dealcheck"><div class="wrap dk-g">
+  <div class="dk-text rv"><div class="eye">Deal-Check · 20 Sekunden</div>
+    <h2>Rechnet sich das? <span class="ac">Dreh die Karte um.</span></h2>
+    <p>Zwei Zahlen, eine Zinsbindung. DealPilot rechnet mit denselben Kernen wie in der App und sagt dir sofort, wo der Deal steht.</p>
+    <ul class="dk-pkt"><li>Echter Deal Score, keine Schätzformel</li><li>Zins tagesaktuell je Zinsbindung</li><li>Mit PLZ: Lage &amp; Markt aus amtlichen Daten</li></ul></div>
+  <div class="dk-szene rv"><div class="dk-karte" id="dkKarte"></div></div>
+</div></section>
+
+<section class="n5-rw" id="einlesen" aria-label="Exposé einlesen"><div class="n5-rw-fix">
+  <div class="wrap n5-rw-kopf"><div><div class="eye">Rollweg · Scroll dich durch</div>
+    <h2>Dein Scrollen liest <span class="ac">das Exposé.</span></h2></div>
+    <div class="n5-rw-stand"><span id="rwText">Scroll weiter, das Exposé wird eingelesen</span><span class="n5-rw-balken"><i id="rwBalken"></i></span></div></div>
+  <div class="wrap"><div class="n5-rw-buehne" id="b4"><div class="n5-szene" id="sz4"><div class="n5-ex" id="ex4"></div><div class="n5-pfad" aria-hidden="true"></div><div class="n5-karte" id="k4"></div></div></div></div>
+  <div class="n5-rw-bahn"><div id="st4" class="rand"></div></div>
+</div></section>
+
+<section class="sec sec-dark pt-strecke dp-strecke" id="workflow"><div class="wrap">
+  <div class="head ctr rv"><div class="eye ctr">So fliegt ein Deal</div>
+    <h2>Vom Exposé bis in den Bestand. <span class="ac">In neun Etappen.</span></h2>
+    <p>DealPilot liest Exposé und Unterlagen ein, rechnet Finanzierung, Cashflow und Steuer durch und begründet
+      den Wert mit den Daten der Gutachterausschüsse. Scroll weiter, bei jeder Etappe siehst du die passende Ansicht aus DealPilot.</p></div>
+  <div class="pt-aufzug">
+    <div class="pt-schacht" aria-hidden="true">
+      <div class="pt-rahmen pt-schirm">
+        <div data-bild="qc" class="an pt-qc" role="img" aria-label="Quick-Check, Beispiel: Score 81, Starker Kauf">
+          <div class="pt-qc-kopf"><span class="pt-qc-ico"></span><b>Bewertung</b><small>Quick-Check · Beispieldaten</small></div>
+          <div class="pt-qc-urteil">
+            <div class="pt-qc-ring"><svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="17"/><circle class="v" cx="20" cy="20" r="17" style="stroke-dashoffset:20.3"/></svg><b>81</b></div>
+            <div class="pt-qc-u"><span class="pt-qc-l">Ersteinschätzung · Gut</span><h4>Starker Kauf · empfehlenswert</h4>
+              <p>Die Kennzahlen passen. Kauf bei <b>179.000 €</b> ist gerechtfertigt, der Preis liegt auch nicht über dem Marktwert.
+                Vor dem Kaufvertrag noch Finanzierungszusage einholen und Hausgeldabrechnung, Wirtschaftsplan und Protokolle prüfen.</p></div>
+            <div class="pt-qc-lage"><span class="pt-qc-l">Lageklasse</span><span class="pt-qc-seg"><i>A</i><i class="on">B</i><i>C</i></span><small>Ziel 5 % brutto</small></div>
+          </div>
+          <div class="pt-qc-liste">
+            <div class="pt-qc-pz"><i class="ok"></i><span><b>Preis unter der Marktspanne</b><em>2.419 €/m² · DealPilot-Marktbewertung 185.000 € bis 236.000 € (Mitte 208.000 €)</em></span><span class="w">179.000 €<small>−14 % zur Mitte</small></span></div>
+            <div class="pt-qc-pz"><i></i><span><b>Zustand und Modernisierung</b><em>Abgeschätzt aus Zustand „gut“: überwiegend modernisiert (Anlage 2 ImmoWertV, 14 Punkte)</em></span><span class="w">14 Pkt.<small>Modernisierung</small></span></div>
+            <div class="pt-qc-pz"><i class="ok"></i><span><b>Rendite erfüllt das Ziel der B-Lage</b><em>Bruttorendite · Ziel 5 % · Kaufpreisfaktor 14,9</em></span><span class="w">6,7 %<small>Ziel 5 %</small></span></div>
+            <div class="pt-qc-pz"><i class="ok"></i><span><b>Finanzierung trägt sich</b><em>80 % finanziert · 4,22 % Zins · 1,5 % Tilgung · DSCR 1,22</em></span><span class="w">+147 €<small>pro Monat</small></span></div>
+          </div>
+        </div>
+        <img data-bild="1" src="assets/dp-strecke/01-objekt-erfassen.webp?v=landing-strecke-2" width="1600" height="900" alt="" loading="lazy">
+        <img data-bild="2" src="assets/dp-strecke/02-score.webp?v=landing-strecke-2" width="1600" height="900" alt="" loading="lazy">
+        <img data-bild="3" src="assets/dp-strecke/03-unterlagen.webp?v=landing-strecke-2" width="1600" height="900" alt="" loading="lazy">
+        <img data-bild="4" src="assets/dp-strecke/04-finanzierung.webp?v=landing-strecke-2" width="1600" height="900" alt="" loading="lazy">
+        <img data-bild="5" src="assets/dp-strecke/05-steuer.webp?v=landing-strecke-2" width="1600" height="900" alt="" loading="lazy">
+        <img data-bild="6" src="assets/dp-strecke/06-wertermittlung.webp?v=landing-strecke-2" width="1600" height="900" alt="" loading="lazy">
+        <img data-bild="7" src="assets/dp-strecke/07-zielbild.webp?v=landing-strecke-2" width="1600" height="900" alt="" loading="lazy">
+        <img data-bild="8" src="assets/dp-strecke/08-bestand.webp?v=landing-strecke-2" width="1600" height="900" alt="" loading="lazy">
+      </div>
+      <div class="pt-anzeige">Etappe <b id="ptZahl">1</b> von 9<span class="pt-wer" id="ptWer">Quick-Check</span></div>
+      <p class="pt-bu">Ansichten aus DealPilot. Beispieldaten.</p>
+    </div>
+    <div class="pt-schritte"><span class="pt-schiene" aria-hidden="true"></span><span class="pt-kabine" aria-hidden="true"></span>
+    <ol class="pt-liste">
+      <li class="pt-s an" data-bild="qc" data-wer="Quick-Check">
+        <span class="pt-nr">Etappe 01 · Quick-Check</span>
+        <h3>Erst prüfen, dann erfassen</h3>
+        <p>Alle Exposés und Dateien auf einmal hineinziehen. DealPilot liest sie aus, holt Marktwert und Miete dazu und
+          zeigt in etwa einer halben Minute die Auswertung: Score, Rendite, Cashflow und ein klares Urteil gegen dein eigenes Ziel,
+          mit dem Kaufpreis, ab dem es passt. Gefällt dir das Objekt, übernimmst du es mit einem Klick.</p>
+        <div class="pt-chips"><span>Alle Dateien auf einmal</span><span>Urteil gegen dein Ziel</span><span>Zielkaufpreis</span><span>Mit einem Klick übernehmen</span><a class="dp-video" href="videothek.html?v=ueberblick-1-quick-boarding">Video ansehen →</a></div>
+      </li>
+      <li class="pt-s" data-bild="1" data-wer="Erfassen">
+        <span class="pt-nr">Etappe 02 · Erfassen</span>
+        <h3>Objekt erfassen</h3>
+        <p>Exposé hineinziehen, frei erzählen, ein Inserat aus ImmoMetrica übernehmen oder Frage für Frage eingeben.
+          Mehrere Wege lassen sich anhaken und laufen nacheinander. Aus dem Quick-Check übernommen, ist alles schon da,
+          und du ergänzt nur, was fehlt. Wie tief du gehst, wählst du selbst: Einsteiger, Fortgeschritten oder Experte.</p>
+        <div class="pt-chips"><span>Exposé und Dokumente</span><span>Sprache</span><span>ImmoMetrica</span><span>Geführte Eingabe</span><a class="dp-video" href="videothek.html?v=modul-03-datenaufnahme-vier-wege">Video ansehen →</a></div>
+      </li>
+      <li class="pt-s" data-bild="2" data-wer="Prüfen">
+        <span class="pt-nr">Etappe 03 · Prüfen</span>
+        <h3>Rendite und Investor Deal Score</h3>
+        <p>Bruttomietrendite, Nettomietrendite, Eigenkapitalrendite und Kaufpreisfaktor stehen nach wenigen Angaben fest.
+          Der Score fasst 24 Kennzahlen in fünf Bereichen zusammen: Rendite, Finanzierung, Risiko, Lage und Potenzial.
+          Getrennt nach Investment und Finanzierung steht am Ende eine Zahl von 0 bis 100 mit Stufe und Empfehlung, und du siehst, welche Kennzahl ihn trägt und welche ihn drückt.</p>
+        <div class="pt-chips"><span>Rendite</span><span>Investment-Score</span><span>Finanzierungs-Score</span><span>Empfehlung</span><a class="dp-video" href="videothek.html?v=modul-12-bewertung-und-kpis">Video ansehen →</a></div>
+      </li>
+      <li class="pt-s" data-bild="3" data-wer="Prüfen">
+        <span class="pt-nr">Etappe 04 · Prüfen</span>
+        <h3>Unterlagen lesen</h3>
+        <p>Mietaufstellung, Grundbuch, WEG-Protokolle und Energieausweis auf einmal hineinziehen. DealPilot erkennt die
+          Art jedes Dokuments, schwärzt Personendaten, wertet alles gemeinsam aus und zeigt mit Fundstelle, was absehbar
+          Geld kostet. Bevor du ein Angebot machst.</p>
+        <div class="pt-chips"><span>Mehrere PDFs auf einmal</span><span>Personendaten geschwärzt</span><span>Risiken mit Fundstelle</span><a class="dp-video" href="videothek.html?v=modul-28-unterlagen-einlesen">Video ansehen →</a></div>
+      </li>
+      <li class="pt-s" data-bild="4" data-wer="Rechnen">
+        <span class="pt-nr">Etappe 05 · Rechnen</span>
+        <h3>Finanzierung und Cashflow</h3>
+        <p>Den indikativen Zins gibt es täglich aktuell je Zinsbindung und Beleihung. DealPilot zieht von der Miete
+          die Bewirtschaftung, die Zinsen und die Tilgung ab und zeigt den Cashflow im Monat. Ob die Finanzierung
+          trägt, prüft der DSCR, die Beleihung der LTV.</p>
+        <div class="pt-chips"><span>Zins je Zinsbindung</span><span>Cashflow</span><span>DSCR</span><span>LTV</span><a class="dp-video" href="videothek.html?v=modul-08-finanzierung">Video ansehen →</a></div>
+      </li>
+      <li class="pt-s" data-bild="5" data-wer="Rechnen">
+        <span class="pt-nr">Etappe 06 · Rechnen</span>
+        <h3>Steuer, AfA und Restnutzungsdauer</h3>
+        <p>Den Gebäudeanteil teilt DealPilot nach der Arbeitshilfe des Bundesfinanzministeriums auf, die
+          Restnutzungsdauer folgt Anlage 2 ImmoWertV. Mit deinem Grenzsteuersatz folgt der Cashflow nach Steuer,
+          und der Steuerverlauf zeigt, wie lange das Objekt Steuern erstattet und ab welchem Jahr es Steuern kostet.</p>
+        <div class="pt-chips"><span>Kaufpreisaufteilung</span><span>AfA</span><span>Cashflow nach Steuer</span><span>Wendepunkt</span><a class="dp-video" href="videothek.html?v=modul-27-steuerverlauf-mit-wendepunkt">Video ansehen →</a></div>
+      </li>
+      <li class="pt-s" data-bild="6" data-wer="Bewerten">
+        <span class="pt-nr">Etappe 07 · Bewerten</span>
+        <h3>Wertermittlung nach ImmoWertV</h3>
+        <p>Der Marktbericht zeigt Lage, Bodenrichtwert, Zensus und Vergleichspreise und begründet den Wert mit
+          Liegenschaftszinssätzen und Sachwertfaktoren der Gutachterausschüsse. Jede Zahl nennt ihre Herkunft.
+          Fehlt eine amtliche Zahl, wird keine erfunden.</p>
+        <div class="pt-chips"><span>Lage</span><span>Bodenrichtwert</span><span>Ertrags- und Sachwert</span><span>Quellennachweis</span><a class="dp-video" href="videothek.html?v=modul-30-marktbewertung-im-reiter-objekt">Video ansehen →</a></div>
+      </li>
+      <li class="pt-s" data-bild="7" data-wer="Planen">
+        <span class="pt-nr">Etappe 08 · Planen</span>
+        <h3>Mieterhöhung und Zielbild</h3>
+        <p>Wohnung für Wohnung: was der laufende Vertrag hergibt, was nach Mietspiegel und Kappungsgrenze verlangbar
+          ist und was erst nach Umbau oder Mieterwechsel geht. Ankauf, heute, nach Mieterhöhung und Zielbild stehen in einer Tabelle nebeneinander, bis zum Wertzuwachs nach Kosten.</p>
+        <div class="pt-chips"><span>Ankauf</span><span>Heute</span><span>Nach Mieterhöhung</span><span>Zielbild</span><a class="dp-video" href="videothek.html?v=modul-26-mieterhoehung-und-zielbild">Video ansehen →</a></div>
+      </li>
+      <li class="pt-s" data-bild="8" data-wer="Halten">
+        <span class="pt-nr">Etappe 09 · Halten</span>
+        <h3>Vom Ankauf in den Bestand</h3>
+        <p>Stellst du ein Objekt auf gewonnen, friert DealPilot den Ankauf ein und vergleicht im Bestand Plan gegen heute,
+          Kennzahl für Kennzahl. Für die Bank entstehen der Investment-Case als PDF, der Track-Record über deinen
+          Bestand und der Bankexport mit 25 Spalten je Objekt.</p>
+        <div class="pt-chips"><span>Ankauf eingefroren</span><span>Soll gegen Ist</span><span>Bank-PDF</span><span>Bankexport</span><a class="dp-video" href="videothek.html?v=modul-14-ankauf-in-den-bestand">Video ansehen →</a></div>
+      </li>
+    </ol></div>
+  </div>
+  <div class="dp-strecke-fuss" id="features">
+    <p class="dp-links">
+      <a href="leistungsumfang.html">Alle <span data-modulzahl>19</span> Module im Detail →</a>
+      <a href="prozesskarte.html">Der ganze Weg auf einer Karte →</a>
+      <a href="methodik.html">Immobilienbewertung nach ImmoWertV, Datenbasis und Prüfung →</a>
+      <a href="immobilien-rendite-berechnen.html">Immobilien Rendite berechnen →</a>
+      <a href="cashflow-immobilie-berechnen.html">Cashflow einer Immobilie berechnen →</a>
+      <a href="kaufpreisfaktor-berechnen.html">Kaufpreisfaktor berechnen →</a>
+    </p>
+    <div class="dp-strecke-cta"><a class="btn-p" href="https://app.dealpilot.immo/?register=1">Kostenlos einchecken →</a>
+      <span>Keine Zahlungsdaten · 4 Wochen voller Pro-Umfang · danach automatisch Free, ohne Kündigung</span></div>
+  </div>
+</div></section>
+
+
+<section class="sec sec-dark dpl" id="live"><div class="wrap">
+  <div id="dplRoot" data-start="ueberblick" data-kompakt data-reihen="ueberblick,partner"
+       data-ohne="modul-03-datenaufnahme-vier-wege,modul-28-unterlagen-einlesen,modul-12-bewertung-und-kpis,modul-08-finanzierung,modul-27-steuerverlauf-mit-wendepunkt,modul-18-der-marktbericht,modul-26-mieterhoehung-und-zielbild,modul-14-ankauf-in-den-bestand"></div>
+</div></section>
+
+
+<section class="sec sec-cream daten" id="daten"><div class="wrap">
+  <div class="head ctr rv"><div class="eye ctr">Datenbasis</div>
+    <h2><span data-umfang="amtlich_rund_gross">Über 1,1 Millionen</span> amtliche Datenpunkte. <span class="ac">Laufend abgeglichen.</span></h2>
+    <p>DealPilot rechnet nicht mit Schätzwerten aus dem Netz, sondern mit den Daten der Behörden,
+      in eigenen Datenbanken, regelmäßig abgeglichen und mit Herkunft je Wert.</p></div>
+  <div class="dt-zahlen rv">
+    <div><b data-umfang="amtlich_gesamt">1.100.360</b><span>amtliche Datenpunkte in unseren Datenbanken</span></div>
+    <div><b data-umfang="schnittstellen">36</b><span>amtliche Dienste und Tabellen angebunden</span></div>
+    <div><b data-umfang="register_werte">6.187</b><span>Kennzahlen von <i data-umfang="ausschuesse">201</i> Gutachterausschüssen</span></div>
+    <div><b data-umfang="portale">109</b><span>Veröffentlichungsseiten der Ausschüsse, automatisch auf neue Berichte geprüft</span></div>
+  </div>
+  <div class="dt-zahlen dt-fakten rv">
+    <div><b data-umfang="api_endpunkte">515</b><span>Programmschnittstellen (API-Endpunkte) in App und Marktbericht</span></div>
+    <div><b data-umfang="register_saetze">18.318</b><span>Sätze im Register der Gutachterausschüsse</span></div>
+    <div><b data-umfang="pruefstrecken">84</b><span>automatische Prüfwerkzeuge für Rechnung und Daten</span></div>
+    <div><b data-umfang="videos">40</b><span>Videos in der Videothek, <i data-umfang="video_stunden">3,7</i> Stunden</span></div>
+  </div>
+  <details class="dt-mehr rv"><summary>Die acht Quellen und wie oft wir sie abgleichen</summary>
+  <div class="dt-grid">
+    <div class="dt-k"><div class="dt-takt live">Live je Bericht</div>
+      <h4>Bodenrichtwerte</h4>
+      <p>Bodenrichtwert und Zone aus den amtlichen Diensten der Länder und des Bundes, für alle 16 Länder.</p>
+      <div class="dt-n"><b data-umfang="boris_dienste">10</b> Bodenrichtwert-Dienste</div></div>
+    <div class="dt-k"><div class="dt-takt">Quellen: Januar bis Juni wöchentlich, sonst monatlich</div>
+      <h4>Gutachterausschüsse</h4>
+      <p>Liegenschaftszinssätze, Sachwertfaktoren, Vergleichsfaktoren und Umrechnungskoeffizienten. Jeder Wert mit Ausschuss, Jahrgang und Fundstelle.</p>
+      <div class="dt-n"><b data-reg="werte_gesamt">6.187</b> Werte · <b data-reg="ausschuesse">201</b> Ausschüsse · <b data-umfang="portale">109</b> geprüfte Quellen</div></div>
+    <div class="dt-k"><div class="dt-takt">Stichtag 15.05.2022</div>
+      <h4>Zensus 2022</h4>
+      <p>Wohnungen, Gebäude, Leerstand und Mieten der Statistischen Ämter des Bundes und der Länder, bis auf die Gemeinde.</p>
+      <div class="dt-n"><b data-umfang="zensus">894.880</b> Werte · <b data-umfang="zensus_gebiete">11.186</b> Gebiete</div></div>
+    <div class="dt-k"><div class="dt-takt">monatlich abgeglichen</div>
+      <h4>Regionaldatenbank</h4>
+      <p>Bevölkerung, Einkommen, Arbeitsmarkt und Wanderung je Kreis und Gemeinde, die Grundlage der Lageeinschätzung.</p>
+      <div class="dt-n"><b data-umfang="regional">108.676</b> Werte · <b data-umfang="regional_tabellen">6</b> Tabellen</div></div>
+    <div class="dt-k"><div class="dt-takt">monatlich abgeglichen</div>
+      <h4>Bautätigkeit und Bauland</h4>
+      <p>Baugenehmigungen, Fertigstellungen und Kaufwerte für Bauland aus der amtlichen Statistik.</p>
+      <div class="dt-n"><b data-umfang="bau">56.128</b> Werte · <b data-umfang="bau_tabellen">5</b> Tabellen</div></div>
+    <div class="dt-k"><div class="dt-takt">bundesweit</div>
+      <h4>Obere Gutachterausschüsse</h4>
+      <p>Bundesweite Preis- und Mietspannen der Oberen Gutachterausschüsse, zur Einordnung jedes Objekts.</p>
+      <div class="dt-n"><b data-umfang="akoga">28.827</b> Werte</div></div>
+    <div class="dt-k"><div class="dt-takt live">täglich</div>
+      <h4>Deutsche Bundesbank</h4>
+      <p>Zinsstruktur und Zinsstatistik. Daraus die indikativen Bauzinsen, die in jeder Finanzierung stehen.</p>
+      <div class="dt-n"><b data-umfang="zins_tage">1.376</b> Tageswerte</div></div>
+    <div class="dt-k"><div class="dt-takt">wöchentlich geprüft</div>
+      <h4>Statistisches Bundesamt</h4>
+      <p>Verbraucherpreise, Nettokaltmieten und Baupreisindex, damit jede Zahl zum richtigen Stichtag passt.</p>
+      <div class="dt-n"><b data-umfang="indizes">301</b> Indexwerte · <b data-umfang="indizes_reihen">3</b> Reihen</div></div>
+  </div>
+  <p class="dt-fuss">Gezählt in unseren Datenbanken. Marktdaten aus Angeboten kommen hinzu. Sie zählen hier nicht mit
+    und heißen im Bericht nie amtlich. Wo eine amtliche Zahl fehlt, erfindet DealPilot keine, sondern nennt den
+    zuständigen Ausschuss und den Weg zur Quelle.</p>
+  </details>
+  <p class="btn-reihe"><a class="btn-dark" href="methodik.html">Woher unsere Zahlen kommen: Datenbasis und Prüfung →</a></p>
+</div></section>
+
+
+<section class="sec sec-dark" id="fuer-partner"><div class="wrap"><div class="pt-start">
+  <div class="rv">
+    <div class="eye">Für Partner · Berater und Kanzleien</div>
+    <h2>Deine Kunden rechnen. <span class="ac">Du behältst den Überblick.</span></h2>
+    <p>Mit dem Partner-Cockpit begleitest du Kapitalanleger unter deiner eigenen Marke. So läuft es:</p>
+    <ol class="pt-mini">
+      <li><span><b>Einladen.</b> Per E-Mail oder Verbindungscode, mit Partnerplatz oder eigenem Abo.</span></li>
+      <li><span><b>Freigeben lassen.</b> Dein Kunde schickt dir Objekte oder seinen Bestand als Kopie.</span></li>
+      <li><span><b>Anmerken.</b> Feld markieren, Hinweis schreiben, Wert vorschlagen.</span></li>
+      <li><span><b>Zurückgeben.</b> Eine Rückmeldung mit Begleittext, auf Wunsch per E-Mail in deiner Marke.</span></li>
+    </ol>
+    <div class="lz-btns" style="display:flex;gap:14px;flex-wrap:wrap"><a class="btn-p" href="partner.html">Die ganze Strecke ansehen →</a><a class="btn-l" href="preise.html#partner-plan">Preise für Partner</a></div>
+  </div>
+  <figure class="rv" style="margin:0">
+    <div class="pt-rahmen"><img src="assets/partner-strecke/05-feld-markieren.webp?v=landing-ohne-figur-1" width="1920" height="1200" loading="lazy" decoding="async" alt="Partner-Cockpit: Anmerkung direkt am Feld Wohnfläche mit Vorschlagswert"></div>
+    <figcaption class="pt-bu">Anmerkung direkt am Feld. Echte Aufnahme, Beispieldaten.</figcaption>
+  </figure>
+</div></div></section>
+
+
+<section class="sec sec-paper" id="partner"><div class="wrap">
+  <div class="head ctr rv"><div class="eye ctr">An Bord integriert</div>
+    <h2>Partner &amp; <span class="ac">Wegbegleiter.</span></h2>
+    <p>Von AVM-Bewertung über Finanzierung bis Gutachten und Technik: DealPilot arbeitet
+      mit etablierten Partnern zusammen und wird in der Praxis von Steuerberatungskanzleien begleitet.</p></div>
+  <div class="pmarq rv"><div class="pmarq-track">
+    <div class="plogo"><img src="assets/partner/immometrica.png" width="227" height="54" decoding="async" alt="ImmoMetrica"></div>
+    <div class="plogo"><img src="assets/partner/realestatepilot.png" width="326" height="75" decoding="async" alt="RealEstatePilot"></div>
+    <div class="plogo"><img src="assets/partner/onevoice.png" width="259" height="119" decoding="async" alt="OneVoice"></div>
+    <div class="plogo"><img src="assets/partner/sauerland-finanzen.png" width="295" height="140" decoding="async" alt="Sauerland Finanzen"></div>
+    <div class="plogo"><img src="assets/partner/funck-it.png" width="276" height="140" decoding="async" alt="Funck IT"></div>
+    <div class="plogo"><img src="assets/partner/christian-sperling.png" width="433" height="124" decoding="async" alt="Christian Sperling"></div>
+    <div class="plogo"><img src="assets/partner/junker-immobilien.png" width="219" height="136" decoding="async" alt="Junker Immobilien"></div>
+    <div class="plogo"><img src="assets/partner/schmidt-und-partner.png" width="300" height="59" decoding="async" alt="Schmidt &amp; Partner Steuerberatungsgesellschaft PartG mbB"></div>
+  </div></div>
+</div></section>
+
+
+<div class="board-band">
+  <span class="perf-edge"></span><span class="perf-edge rechts"></span>
+  <div class="inner">
+    <div class="txt">
+      <div class="kick">PRE-FLIGHT · CHECK-IN</div>
+      <h2>Bereit für den Take-off?</h2>
+      <p>Dein Cockpit ist startklar. Kein Bauchgefühl mehr. Ab jetzt fliegst du nach Flugdaten.</p>
+    </div>
+    <div><a class="btn-p" href="https://app.dealpilot.immo/?register=1">Kostenlos starten →</a><p class="cta-haken"><span>Keine Zahlungsdaten</span><span>4 Wochen voller Pro-Umfang</span><span>Danach automatisch Free, ohne Kündigung</span></p></div>
+  </div>
+</div>
+
+<footer class="footer"><div class="wrap">
+  <div class="footer-grid">
+    <div>
+      <div class="mark mark-gross" style="color:#fff"><span class="wort">Deal<b>Pilot</b></span></div>
+      <p class="footer-tag">Immobilien-Investmentanalyse für strukturierte Entscheidungen.
+        DealPilot ist eine Marke von Junker Solution.</p>
+    </div>
+    <div><h4>Produkt</h4>
+      <a href="#workflow">So funktioniert's</a><a href="#features">Funktionen</a>
+      <a href="leistungsumfang.html">Leistungsumfang</a><a href="preise.html">Preise</a>
+      <a href="api.html">API</a><a href="videothek.html">Videothek</a><a href="partner.html">Für Partner</a><a href="forschung.html">Forschung &amp; Entwicklung</a></div>
+    <div><h4>Vertrauen</h4>
+      <a href="sicherheit.html">Sicherheit &amp; Server</a><a href="fragen.html">Häufige Fragen</a>
+      <a href="#daten">Datenbasis</a><a href="#partner">Wegbegleiter</a><a href="preise.html#feature-matrix">Cockpit-Matrix</a></div>
+    <div><h4>Junker Immobilien</h4>
+      <a href="https://junker-immobilien.io" target="_blank" rel="noopener">Sachverständigenbüro</a>
+      <a href="https://junker-immobilien.io" target="_blank" rel="noopener">Kapitalanlage</a>
+      <a href="https://junker-immobilien.io" target="_blank" rel="noopener">Projektentwicklung</a></div>
+    <div><h4>Kontakt</h4>
+      <a href="mailto:support@dealpilot.immo">support@dealpilot.immo</a>
+      <a href="mailto:info@dealpilot.immo">info@dealpilot.immo</a>
+      <a href="../impressum.html">Impressum</a><a href="../datenschutz.html">Datenschutz</a>
+      <a href="../agb.html">AGB</a></div>
+  </div>
+  <div class="footer-bottom">
+    <div>© 2026 Junker Solution · DealPilot</div>
+    <div>Keine Steuer- oder Finanzberatung. Analyse-Werkzeug für eigene Kalkulationen.</div>
+  </div>
+</div></footer>
+<script src="dp2-daten.js?v=landing-module-2"></script>
+<script src="dp2-inhalt.js?v=landing-kern-1"></script>
+<script src="dp2-module.js?v=landing-module-2"></script>
+<script src="dp2.js?v=landing-zahlen-live-1"></script>
+<script src="landing-zahlen.js?v=landing-zahlen-live-1"></script>
+<script src="dp2-kern.js?v=landing-kern-1"></script>
+<script src="../js/dscr-engine.js?v=v3031b"></script><script src="../js/deal-kpis.js?v=v3215"></script><script src="../js/score-tiers.js?v=v3254"></script><script src="../js/dealscore.js?v=v3289"></script><script src="dp2-dealcheck.js?v=landing-dealcheck-14"></script>
+<script src="dp2-live.js?v=landing-videothek-16"></script>
+<script src="partner.js?v=landing-strecke-5"></script>
+<script src="flyer-code.js?v=v1593"></script>
+<script src="promo-erstflug.js?v=v1590"></script>
+<script src="erstflug-popup.js?v=v1595d"></script>
+  <script src="assets/umgebung.js?v=v1644"></script>
+<script>
+(function () {
+  var N = N5, $ = N.$;
+  N.hinweis('Variante 4', 'Rollweg');
+  /* Szene mit Exposé und Karte, läuft beim Sichtbarwerden. Gibt den Lauf zurück. */
+  function szene(n, opt) {
+    opt = opt || {};
+    $('#ex' + n).innerHTML = N.exposeHtml(opt);
+    var ex = $('#ex' + n + ' .n5-expose'), k = N.karte($('#k' + n));
+    if (N.ruhig) { k.fertig(); $('.stempel', ex).classList.add('an'); } else k.leer();
+    function lauf() { return N.exposeFlug(ex, k, opt); }
+    var b = $('#nm' + n); if (b) b.addEventListener('click', lauf);
+    if (!opt.vonHand) N.sichtbar($('#sz' + n), function () { setTimeout(lauf, opt.verzug || 250); }, opt.schwelle || .35);
+    return { ex: ex, k: k, lauf: lauf };
+  }
+var sek = $('.n5-rw'), bahn = N.streifen($('#st4'), { art: 'mix', tempo: 14, scroll: 0 });
+  function flach() { return N.ruhig || innerWidth < 1000 || innerHeight < 680; }
+  if (flach()) { sek.classList.add('flach'); szene(4, { ohneFoto: true }); }
+  else {
+    $('#ex4').innerHTML = N.exposeHtml({ ohneFoto: true });
+    var ex = $('#ex4 .n5-expose'), k = N.karte($('#k4')), setze = N.exposeScrub(ex, k, $('#b4'));
+    var txt = $('#rwText'), bal = $('#rwBalken');
+    N.scrollFort(sek, function (p) {
+      setze(p); bal.style.width = (p * 100).toFixed(1) + '%'; if (bahn.schiebe) bahn.schiebe(p * 1400);
+      txt.textContent = p < .34 ? 'Exposé wird eingelesen' : p < .87 ? 'Werte fliegen in die Karte' : p < .99 ? 'Score wird gerechnet' : 'Cleared · Score 87, Sehr gut';
+    });
+  }
+})();
+</script>
+</body></html>

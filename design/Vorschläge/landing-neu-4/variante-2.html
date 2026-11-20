@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DealPilot · Variante 2 · Hangar im Licht</title>
+<meta name="description" content="Vorlage 2: Eine schräge Wand aus App-Ansichten kippt beim Scrollen flach, oben rechts die echte Hero-Karte vor dem Flugvideo, das Exposé fliegt in sie hinein. Danach Videothek, Etappen, der Abriss in zwei Scores, Flugdaten, Datenbasis und Pakete.">
+<link rel="stylesheet" href="../../../frontend/landing/fonts/dp-fonts.css">
+<link rel="stylesheet" href="gemeinsam.css">
+<style>
+/* Variante 2 · Hangar im Licht (Idee 03 hell)
+   Der Hero ist ein Raum: hinten eine schräg liegende Wand aus echten App-Ansichten, die beim Scrollen
+   flach auf dich zukippt. Oben rechts, wo in Idee 03 Flieger und Schriftzug standen, sitzt die echte
+   Investor-Deal-Score-Karte, hinter ihr läuft das Flugvideo wie ein Hangar-Monitor. Das Exposé gleitet
+   von links unten heran und gibt seine Werte an die Karte ab. Der Datenstrom zieht durch den Raum. */
+.h2-hero{position:relative;height:190vh}
+.h2-sticky{position:sticky;top:0;height:100vh;height:100svh;overflow:hidden;perspective:1200px;
+  background:radial-gradient(90% 70% at 72% 40%,#fff 0%,#f7f1e3 55%,#efe6d2 100%)}
+.h2-sticky .wand{opacity:.9}
+.h2-schleier{position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(90deg,rgba(253,252,250,.98) 0%,rgba(253,252,250,.9) 36%,rgba(253,252,250,.25) 66%,rgba(253,252,250,.55)),linear-gradient(0deg,rgba(253,252,250,1),transparent 26%)}
+.h2-text{position:absolute;inset:0;display:flex;align-items:center;z-index:3;pointer-events:none}
+.h2-text .wrap{width:100%;display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:40px;align-items:center}
+.h2-text .links{pointer-events:auto;padding-top:40px}
+.h2-text h1{font-size:clamp(36px,4.3vw,64px);line-height:.98;letter-spacing:-.05em;margin:18px 0 22px}
+.h2-text h1 .z{display:block;overflow:hidden;padding-bottom:.08em}
+.h2-text h1 .z span{display:block;transform:translateY(105%) skewY(6deg);animation:h2Hoch 1s var(--e-hoch) forwards;animation-delay:calc(.15s + var(--i) * .12s)}
+.h2-text h1 em{font-style:normal;background:var(--runway);-webkit-background-clip:text;background-clip:text;color:transparent}
+@keyframes h2Hoch{to{transform:none}}
+.h2-text .lead{font-size:17.5px;color:var(--inkm);max-width:46ch;margin:0 0 24px}
+.h2-rechts{position:relative;pointer-events:auto;perspective:1400px}
+.h2-monitor{position:absolute;inset:-26px -30px -30px -22px;border-radius:24px;overflow:hidden;
+  box-shadow:0 0 0 1px rgba(201,168,76,.5),0 0 0 10px #fff,0 0 0 11px rgba(201,168,76,.35),0 60px 120px -40px rgba(70,52,12,.55)}
+.h2-monitor video{width:100%;height:100%;object-fit:cover}
+.h2-monitor::after{content:"";position:absolute;inset:0;background:linear-gradient(120deg,rgba(255,255,255,.35),transparent 45%)}
+.h2-dreh{position:relative;transform-style:preserve-3d;will-change:transform}
+.h2-dreh #karte{position:relative;z-index:2}
+.h2-ex{position:absolute;left:-46px;bottom:-56px;width:262px;z-index:4;will-change:transform}
+.h2-ex .expose{transform:rotate(-6deg);font-size:12px}
+.h2-ex .expose .foto{display:none}
+.h2-hinweis{position:absolute;left:50%;bottom:26px;transform:translateX(-50%);z-index:4;font:600 11px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--mut);display:flex;gap:12px;align-items:center}
+.h2-hinweis i{width:1px;height:34px;background:linear-gradient(var(--gd),transparent);animation:h2Fall 1.8s infinite}
+@keyframes h2Fall{0%{transform:scaleY(0);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}51%{transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
+@media(max-width:1100px){
+  .h2-hero{height:auto}
+  .h2-sticky{position:relative;height:auto;padding:70px 0 70px}
+  .h2-text{position:relative}
+  .h2-text .wrap{grid-template-columns:1fr}
+  .h2-dreh{display:flex;flex-direction:column}
+  .h2-ex{position:relative;left:auto;bottom:auto;width:min(300px,86%);margin:0 0 -24px 6px}
+  .h2-monitor{inset:-14px -12px -14px -12px}
+  .h2-hinweis{display:none}
+}
+</style>
+</head>
+<body>
+<div id="kopf"></div>
+
+<header class="h2-hero" id="top">
+  <div class="h2-sticky">
+    <div class="wand" id="wand" aria-hidden="true"></div>
+    <canvas class="strom" id="strom" aria-hidden="true"></canvas>
+    <div class="h2-schleier"></div>
+    <div class="h2-text">
+      <div class="wrap">
+        <div class="links">
+          <div class="eye">Immobilien-Investmentanalyse</div>
+          <h1><span class="z"><span style="--i:0">Immobilien&shy;entscheidungen</span></span><span class="z"><span style="--i:1">sind zu groß für</span></span><span class="z"><span style="--i:2"><em>ein Bauchgefühl.</em></span></span></h1>
+          <p class="lead">DealPilot begleitet deine Immobilie vom ersten Exposé bis in den Bestand, mit vollständiger Rechnung, einem amtlich begründeten Wert und einem Investment Case, der bei der Bank besteht.</p>
+          <div style="display:flex;gap:12px;flex-wrap:wrap"><a class="btn-p" href="https://app.dealpilot.immo/?register=1">Vier Wochen als Pro, kostenlos</a><a class="btn-l" href="#videothek"><svg viewBox="0 0 24 24"><path d="M5 12h14m-6-6 6 6-6 6"/></svg>Zum Hangar</a></div>
+          <ul class="haken"><li>Keine Zahlungsdaten</li><li>4 Wochen voller Pro-Umfang</li><li>Danach automatisch Free</li></ul>
+        </div>
+        <div class="h2-rechts">
+          <div class="h2-dreh" id="dreh">
+            <div class="h2-monitor" aria-hidden="true"><video muted loop playsinline autoplay preload="metadata" poster="../../../frontend/landing/assets/bild/hero.jpg" src="../../../frontend/landing/assets/video/dp-hero-flug.mp4"></video></div>
+            <div class="h2-ex" id="ex"></div>
+            <div id="karte"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="h2-hinweis"><i></i>Scroll, die Wand kippt in den Raum</div>
+  </div>
+</header>
+
+<section class="sec" id="videothek" style="padding-top:60px">
+  <div class="wrap">
+    <div class="kopf ctr" data-rv><div class="eye ctr">Hangar · Videothek</div><h2>Jedes Modul. <span class="ac">Als Film.</span></h2><p>Vom 90-Sekunden-Spot bis zum Komplettbeispiel. Wisch durch den Hangar oder nimm die Pfeile.</p></div>
+    <div id="vt"></div>
+  </div>
+</section>
+
+<section class="sec papier" id="etappen" style="--kerbe:var(--cream2)">
+  <div class="wrap">
+    <div class="kopf ctr" data-rv><div class="eye ctr">So fliegt ein Deal</div><h2>Vom Exposé bis in den Bestand. <span class="ac">In neun Etappen.</span></h2>
+      <p>DealPilot liest Exposé und Unterlagen ein, rechnet Finanzierung, Cashflow und Steuer durch und begründet den Wert mit den Daten der Gutachterausschüsse. Scroll weiter, bei jeder Etappe siehst du die passende Ansicht aus DealPilot.</p></div>
+    <div id="strecke"></div>
+  </div>
+</section>
+
+<section class="sec" id="score">
+  <div class="wrap">
+    <div class="kopf ctr" data-rv><div class="eye ctr">Investor Deal Score · Abriss</div></div>
+    <div id="zwei"></div>
+  </div>
+</section>
+
+<section class="sec karte" style="--kerbe:var(--karte)">
+  <div class="wrap">
+    <div class="kopf" data-rv><div class="eye">Flugdaten</div><h2>Was hinter der <span class="ac">87</span> steht.</h2><p>Sechs Zahlen aus diesem Beispiel und aus unseren Datenbanken. Keine davon ist geschätzt.</p></div>
+    <div id="zahlen"></div>
+  </div>
+</section>
+
+<section class="sec" id="daten"><div class="wrap" id="datenbox"></div></section>
+
+<section class="sec papier" id="preise" style="--kerbe:var(--cream2)">
+  <div class="wrap">
+    <div class="kopf ctr" data-rv><div class="eye ctr">Boarding · Preise</div><h2>Vier Pakete. <span class="ac">Ab 0 €.</span></h2><p>Monatlich kündbar. Im Jahrestarif sparst du rund 17 Prozent.</p></div>
+    <div id="pakete"></div>
+  </div>
+</section>
+
+<div id="fuss"></div>
+
+<script src="gemeinsam.js"></script>
+<script>
+(function () {
+  var V = DPV, $ = V.$;
+  V.start({ nr: 'Variante 2', titel: 'Hangar im Licht' });
+  V.appWand($('#wand'), { dauer: 80 });
+  $('#ex').innerHTML = V.exposeHtml({ ohneEigen: false });
+  var k = V.karte($('#karte')), ex = $('#ex .expose'), exBox = $('#ex');
+  var sticky = $('.h2-sticky'), s = V.strom($('#strom'), sticky, { fx: .7, fy: .42, deck: .5, n: innerWidth < 700 ? 500 : 1500 });
+
+  function start() {
+    s.start(); k.leer();
+    V.anim(exBox, [{ transform: 'translate(-80px,120px) rotate(-14deg)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 1100, delay: 300, easing: 'cubic-bezier(.3,1.25,.45,1)', fill: 'backwards' })
+      .then(function () { return V.exposeFlug(ex, k, { tippen: 26, hub: -60 }); })
+      .then(function () { if (innerWidth > 1100) V.anim(exBox, [{ transform: 'none', opacity: 1 }, { transform: 'translate(-60px,90px) rotate(-10deg) scale(.9)', opacity: 0 }], { duration: 900, delay: 400, easing: 'cubic-bezier(.5,0,.2,1)', fill: 'forwards' }); })
+      .then(function () {
+        var d = k.el.querySelector('.ids-dial').getBoundingClientRect(), h = sticky.getBoundingClientRect();
+        return s.sammle(d.left + d.width / 2 - h.left, d.top + d.height / 2 - h.top, d.width * .44);
+      }).then(function () { s.los(); });
+  }
+  if (innerWidth <= 1100) { k.leer(); V.sichtbar(exBox, start, .3); }
+  else if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { setTimeout(start, 50); }); else setTimeout(start, 400);
+
+  /* Wand und Karte folgen dem Scrollen: die Wand kippt flach, die Karte dreht sich zu dir */
+  var wand = $('#wand'), dreh = $('#dreh'), hero = $('.h2-hero'), mx = 0, my = 0;
+  addEventListener('pointermove', function (e) { mx = e.clientX / innerWidth - .5; my = e.clientY / innerHeight - .5; }, { passive: true });
+  function rahmen() {
+    var gross = innerWidth > 1100;
+    var p = gross ? V.clamp(scrollY / Math.max(1, hero.offsetHeight - innerHeight), 0, 1) : 0;
+    wand.style.transform = 'rotateX(' + (52 - p * 46 + my * -5).toFixed(2) + 'deg) rotateZ(' + (-26 + p * 24 + mx * 4).toFixed(2) + 'deg) translateZ(' + (-220 + p * 300).toFixed(1) + 'px)';
+    dreh.style.transform = gross ? 'rotateY(' + (-13 + p * 13 + mx * 6).toFixed(2) + 'deg) rotateX(' + (5 - p * 5 - my * 4).toFixed(2) + 'deg) translateY(' + (p * -30).toFixed(1) + 'px)' : 'none';
+    exBox.style.translate = gross ? (p * -120).toFixed(1) + 'px ' + (p * 140).toFixed(1) + 'px' : '';
+    exBox.style.opacity = gross ? String(1 - V.clamp((p - .35) / .4, 0, 1)) : '';
+    if (!V.ruhig) requestAnimationFrame(rahmen);
+  }
+  rahmen();
+
+  V.videothek($('#vt'));
+  V.etappen($('#strecke'));
+  V.zweiBuehne($('#zwei'), { art: 'abriss' });
+  V.zahlenFlug($('#zahlen'));
+  V.daten($('#datenbox'));
+  V.preise($('#pakete'));
+  V.einblenden(document);
+})();
+</script>
+</body>
+</html>

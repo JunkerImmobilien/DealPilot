@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DealPilot · Variante 3 · Datenstrom</title>
+<meta name="description" content="Vorlage 3: Das Flugvideo im großen Fenster, davor rast der Datenstrom auf die Karte zu. Die Werte des Exposés fliegen hinein, die Teilchen sammeln sich zum Ring. Danach gleich die Pakete.">
+<link rel="stylesheet" href="../../../frontend/landing/fonts/dp-fonts.css">
+<link rel="stylesheet" href="gemeinsam.css">
+<style>
+/* Variante 3 · Datenstrom (Idee 04 hell, mit dem Flugvideo)
+   Rechts ein großes Fenster mit dem Flugvideo, darüber der Datenstrom aus Goldstrichen, der auf dich
+   zurast. Das Exposé hängt oben im Fenster, seine Werte fliegen in die Karte, danach ziehen sich die
+   Teilchen zum Score-Ring zusammen und geben die 87 frei. Am rechten Rand läuft eine Spalte echter
+   App-Ansichten durch den Hero, schneller, wenn du scrollst. Gleich danach kommen die Pakete. */
+.h3-hero{position:relative;overflow:hidden;padding:56px 0 90px;background:var(--cream)}
+.h3-hero .strom{z-index:2}
+.h3-grid{position:relative;display:grid;grid-template-columns:minmax(0,.82fr) minmax(0,1.18fr);gap:40px;align-items:center}
+.h3-text{position:relative;z-index:3}
+.h3-text h1{font-size:clamp(36px,4.4vw,64px);line-height:1;letter-spacing:-.05em;margin:18px 0 22px}
+.h3-text h1 .g{background:var(--runway);-webkit-background-clip:text;background-clip:text;color:transparent}
+.h3-text h1 [data-misch]{font-variant-numeric:tabular-nums}
+.h3-text .lead{font-size:17.5px;color:var(--inkm);margin:0 0 24px;max-width:46ch}
+.h3-ticker{display:flex;flex-wrap:wrap;gap:10px 30px;margin-top:30px}
+.h3-ticker b{display:block;font:700 26px/1 var(--disp);letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.h3-ticker span{font:600 9.5px/1.3 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--mut)}
+.h3-feld{position:relative;min-height:800px}
+.h3-fenster{position:absolute;left:8%;right:-12vw;top:0;bottom:0;border-radius:28px 0 0 28px;overflow:hidden;
+  box-shadow:inset 0 0 0 1px rgba(201,168,76,.35),0 50px 100px -50px rgba(70,52,12,.6);background:#2a2012}
+.h3-fenster video{width:100%;height:100%;object-fit:cover;opacity:.95}
+.h3-fenster::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(253,252,250,.55),transparent 35%),linear-gradient(0deg,rgba(20,14,4,.35),transparent 40%)}
+.h3-spalte{position:absolute;right:-12vw;top:0;bottom:0;width:190px;overflow:hidden;z-index:1;
+  -webkit-mask-image:linear-gradient(180deg,transparent,#000 12%,#000 88%,transparent);mask-image:linear-gradient(180deg,transparent,#000 12%,#000 88%,transparent)}
+.h3-spalte .zug{display:flex;flex-direction:column;gap:14px;padding:0 18px;will-change:transform}
+.h3-spalte img{width:100%;aspect-ratio:16/10;object-fit:cover;object-position:top left;border-radius:8px;box-shadow:0 0 0 1px rgba(255,255,255,.35),0 16px 30px -16px #000}
+.h3-ex{position:absolute;right:calc(190px - 12vw + 14px);top:-14px;width:232px;z-index:6}
+.h3-ex .expose{transform:rotate(3deg);font-size:12px}
+.h3-ex .expose .foto{display:none}
+.h3-karte{position:absolute;left:0;bottom:0;width:min(580px,82%);z-index:5}
+@media(max-width:1100px){
+  .h3-grid{grid-template-columns:1fr}
+  .h3-feld{min-height:0;padding:30px 0 0}
+  .h3-fenster{left:-16px;right:-16px;top:0;bottom:-90px;border-radius:24px 24px 0 0}
+  .h3-spalte{display:none}
+  .h3-ex{position:relative;right:auto;top:auto;width:min(300px,84%);margin:0 0 -16px auto}
+  .h3-karte{position:relative;bottom:auto;width:100%}
+  .h3-ex .expose .foto{display:block;aspect-ratio:16/6}
+}
+</style>
+</head>
+<body>
+<div id="kopf"></div>
+
+<header class="h3-hero" id="top">
+  <canvas class="strom" id="strom" aria-hidden="true"></canvas>
+  <div class="wrap">
+    <div class="h3-grid">
+      <div class="h3-text">
+        <div class="eye">Immobilien-Investmentanalyse</div>
+        <h1>Immobilien&shy;entscheidungen sind zu groß für <span class="g">ein <span data-misch>Bauchgefühl.</span></span></h1>
+        <p class="lead">DealPilot begleitet deine Immobilie vom ersten Exposé bis in den Bestand, mit vollständiger Rechnung, einem amtlich begründeten Wert und einem Investment Case, der bei der Bank besteht. Ab dann fliegst du nach Flugdaten.</p>
+        <div style="display:flex;gap:12px;flex-wrap:wrap"><a class="btn-p" href="https://app.dealpilot.immo/?register=1">Vier Wochen als Pro, kostenlos</a><a class="btn-l" href="#preise"><svg viewBox="0 0 24 24"><path d="M5 12h14m-6-6 6 6-6 6"/></svg>Pakete ansehen</a></div>
+        <div class="h3-ticker">
+          <div><b data-z="1100360">1.100.360</b><span>amtliche Datenpunkte</span></div>
+          <div><b data-z="24">24</b><span>KPIs je Score</span></div>
+          <div><b data-z="201">201</b><span>Gutachterausschüsse</span></div>
+        </div>
+      </div>
+      <div class="h3-feld">
+        <div class="h3-fenster" aria-hidden="true"><video muted loop playsinline autoplay preload="metadata" poster="../../../frontend/landing/assets/bild/hero.jpg" src="../../../frontend/landing/assets/video/dp-hero-flug.mp4"></video></div>
+        <div class="h3-spalte" aria-hidden="true"><div class="zug" id="zug"></div></div>
+        <div class="h3-ex" id="ex"></div>
+        <div class="h3-karte" id="karte"></div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<section class="sec papier" id="preise" style="--kerbe:var(--cream2)">
+  <div class="wrap">
+    <div class="kopf ctr" data-rv><div class="eye ctr">Boarding · Preise</div><h2>Vier Pakete. <span class="ac">Ab 0 €.</span></h2><p>Wähle deine Klasse. Monatlich kündbar, im Jahrestarif rund 17 Prozent günstiger.</p></div>
+    <div id="pakete"></div>
+  </div>
+</section>
+
+<section class="sec" id="score">
+  <div class="wrap">
+    <div class="kopf ctr" data-rv><div class="eye ctr">Investor Deal Score</div></div>
+    <div id="zwei"></div>
+  </div>
+</section>
+
+<section class="sec karte" id="etappen" style="--kerbe:var(--karte)">
+  <div class="wrap">
+    <div class="kopf ctr" data-rv><div class="eye ctr">So fliegt ein Deal</div><h2>Vom Exposé bis in den Bestand. <span class="ac">In neun Etappen.</span></h2>
+      <p>DealPilot liest Exposé und Unterlagen ein, rechnet Finanzierung, Cashflow und Steuer durch und begründet den Wert mit den Daten der Gutachterausschüsse. Scroll weiter, bei jeder Etappe siehst du die passende Ansicht aus DealPilot.</p></div>
+    <div id="strecke"></div>
+  </div>
+</section>
+
+<section class="sec">
+  <div class="wrap">
+    <div class="kopf" data-rv><div class="eye">Anzeigetafel</div><h2>Sechs Zahlen, <span class="ac">alle belegt.</span></h2></div>
+    <div id="zahlen"></div>
+  </div>
+</section>
+
+<section class="sec papier" id="daten" style="--kerbe:var(--cream2)"><div class="wrap" id="datenbox"></div></section>
+
+<section class="sec" id="videothek" style="overflow:hidden">
+  <div class="wrap">
+    <div class="kopf" data-rv><div class="eye">Videothek</div><h2>Abflüge in die <span class="ac">Videothek.</span></h2><p>Vom Spot bis zum Komplettbeispiel. Wisch durch oder nimm die Pfeile.</p></div>
+    <div id="vt"></div>
+  </div>
+</section>
+
+<div id="fuss"></div>
+
+<script src="gemeinsam.js"></script>
+<script>
+(function () {
+  var V = DPV, D = V.D, $ = V.$, $$ = V.$$;
+  V.start({ nr: 'Variante 3', titel: 'Datenstrom' });
+  $('#ex').innerHTML = V.exposeHtml({ ohneEigen: true });
+  var k = V.karte($('#karte')), ex = $('#ex .expose'), hero = $('.h3-hero');
+
+  /* Fluchtpunkt mitten im Videofenster */
+  var feld = $('.h3-feld');
+  function flucht() { var f = feld.getBoundingClientRect(), h = hero.getBoundingClientRect(); return [(f.left + f.width * .62 - h.left) / h.width, (f.top + f.height * .38 - h.top) / h.height]; }
+  var fp = flucht(), s = V.strom($('#strom'), hero, { fx: fp[0], fy: fp[1], deck: .8, farben: ['#E8CC7A', '#fff3cf', '#C9A84C', '#ffffff'], n: innerWidth < 700 ? 600 : 2000 });
+
+  function start() {
+    s.start(); k.leer();
+    V.exposeFlug(ex, k, { tippen: 24, hub: -40 }).then(function () {
+      var d = k.el.querySelector('.ids-dial').getBoundingClientRect(), h = hero.getBoundingClientRect();
+      return s.sammle(d.left + d.width / 2 - h.left, d.top + d.height / 2 - h.top, d.width * .44);
+    }).then(function () { s.los(); });
+  }
+  if (innerWidth <= 1100) { k.leer(); V.sichtbar(ex, start, .3); }
+  else if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { setTimeout(start, 50); }); else setTimeout(start, 400);
+
+  /* Überschrift: das letzte Wort entmischt sich wie eine Anzeigetafel */
+  var m = $('[data-misch]'), ziel = m.textContent, zeichen = 'ABCDEFGHKLMNPRSTUVWXYZ0123456789';
+  if (!V.ruhig) { var n = 0, iv = setInterval(function () { n++; m.textContent = ziel.split('').map(function (c, i) { return i < n / 2 ? c : zeichen[Math.floor(Math.random() * zeichen.length)]; }).join(''); if (n / 2 > ziel.length) { clearInterval(iv); m.textContent = ziel; } }, 45); }
+  $$('.h3-ticker b').forEach(function (b, i) { setTimeout(function () { V.zaehle(b, +b.dataset.z, 1800); }, 600 + i * 200); });
+
+  /* Spalte aus App-Ansichten läuft durch den Hero, Scrollen gibt Schub */
+  var bilder = D.etappen.filter(function (e) { return e.bild !== 'qc'; }).map(function (e) { return D.L + 'assets/dp-strecke/' + e.bild; });
+  var zug = $('#zug'); zug.innerHTML = bilder.concat(bilder).map(function (b) { return '<img src="' + b + '" alt="" loading="lazy" width="154" height="96">'; }).join('');
+  var y = 0, letzt = scrollY, t0 = performance.now();
+  (function lauf(t) {
+    if (V.ruhig) return;
+    var dt = Math.min(50, t - t0); t0 = t;
+    y += dt * .025 + Math.abs(scrollY - letzt) * .8; letzt = scrollY;
+    var h = zug.scrollHeight / 2 || 1; zug.style.transform = 'translateY(' + (-(y % h)) + 'px)';
+    requestAnimationFrame(lauf);
+  })(t0);
+
+  V.preise($('#pakete'));
+  V.zweiBuehne($('#zwei'), { art: 'riss' });
+  V.etappen($('#strecke'));
+  V.zahlenFlug($('#zahlen'));
+  V.daten($('#datenbox'));
+  V.videothek($('#vt'));
+  V.einblenden(document);
+})();
+</script>
+</body>
+</html>

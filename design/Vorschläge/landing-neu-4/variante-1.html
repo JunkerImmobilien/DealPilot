@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DealPilot · Variante 1 · Exposé im Anflug</title>
+<meta name="description" content="Vorlage 1: Das Exposé füllt sich, seine Werte fliegen in die Investor-Deal-Score-Karte. Danach Flugdaten, der Riss in zwei Scores, die neun Etappen, die Datenbasis, Videothek und Pakete.">
+<link rel="stylesheet" href="../../../frontend/landing/fonts/dp-fonts.css">
+<link rel="stylesheet" href="gemeinsam.css">
+<style>
+/* Variante 1 · Exposé im Anflug
+   Der Hero erzählt in einem Zug: Überschrift, darunter liegt links das Exposé, rechts die echte Hero-Karte.
+   Die Felder tippen sich ein, jeder Wert fliegt an seine Stelle in der Karte, dann schließt sich der Ring.
+   Hinten zieht der Datenstrom auf die Karte zu, oben liegt das Flugvideo als Horizont, unten läuft ein Band
+   aus App-Ansichten schräg durch den Hero und wandert beim Scrollen mit. */
+.h1-hero{position:relative;overflow:hidden;padding:64px 0 0;background:linear-gradient(180deg,#fff 0%,var(--cream) 60%)}
+.h1-horizont{position:absolute;left:0;right:0;top:0;height:560px;overflow:hidden;pointer-events:none;
+  -webkit-mask-image:linear-gradient(180deg,#000 0%,rgba(0,0,0,.6) 40%,transparent 100%);mask-image:linear-gradient(180deg,#000 0%,rgba(0,0,0,.6) 40%,transparent 100%)}
+.h1-horizont video{position:absolute;right:-6%;top:-10%;width:72%;height:120%;object-fit:cover;opacity:.32;filter:saturate(1.1) contrast(.95);
+  -webkit-mask-image:linear-gradient(90deg,transparent,#000 40%);mask-image:linear-gradient(90deg,transparent,#000 40%)}
+.h1-hero .strom{opacity:.9}
+.h1-oben{position:relative;z-index:2;display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:30px 60px;align-items:end}
+.h1-oben h1{font-size:clamp(36px,4.6vw,66px);line-height:1.02;letter-spacing:-.045em;margin:18px 0 0}
+.h1-oben h1 em{font-style:normal;background:var(--runway);-webkit-background-clip:text;background-clip:text;color:transparent}
+.h1-oben h1 .zl{display:block;overflow:hidden;padding-bottom:.06em}
+.h1-oben h1 .zl i{display:block;font-style:normal;transform:translateY(105%);animation:h1Hoch 1.1s var(--e-hoch) forwards}
+.h1-oben h1 .zl:nth-child(2) i{animation-delay:.12s}
+.h1-oben h1 .zl:nth-child(3) i{animation-delay:.24s}
+@keyframes h1Hoch{to{transform:none}}
+.h1-oben .lead{font-size:18px;color:var(--inkm);margin:0 0 22px}
+.h1-knoepfe{display:flex;flex-wrap:wrap;gap:12px}
+.h1-buehne{position:relative;z-index:3;display:grid;grid-template-columns:330px 1fr;gap:56px;align-items:center;margin:58px auto 0;max-width:1080px}
+.h1-buehne .expose{transform:rotate(-2.2deg)}
+.h1-pfad{position:absolute;left:330px;width:56px;top:50%;height:2px;background:repeating-linear-gradient(90deg,var(--gd) 0 6px,transparent 6px 12px);opacity:.6}
+.h1-unten{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-top:18px;font:500 12px var(--mono);color:var(--mut)}
+.h1-band{position:relative;z-index:1;height:280px;margin-top:-90px;overflow:hidden;
+  -webkit-mask-image:linear-gradient(180deg,transparent,#000 35%);mask-image:linear-gradient(180deg,transparent,#000 35%)}
+.h1-band .zug{position:absolute;left:0;top:110px;display:flex;gap:22px;transform:rotate(-3deg);will-change:transform}
+.h1-band .zug img{height:150px;width:auto;aspect-ratio:16/9;object-fit:cover;object-position:top left;border-radius:10px;box-shadow:0 0 0 1px rgba(201,168,76,.3),0 20px 40px -24px rgba(70,52,12,.5)}
+.hbeleg{display:flex;flex-wrap:wrap;gap:12px 34px;margin-top:24px}
+.hbeleg b{display:block;font:700 26px/1 var(--disp);letter-spacing:-.03em;color:var(--ink)}
+.hbeleg span{font:600 9.5px/1.3 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--mut)}
+@media(max-width:1000px){
+  .h1-oben{grid-template-columns:1fr}
+  .h1-buehne{grid-template-columns:1fr;gap:34px;max-width:640px}
+  .h1-buehne .expose{max-width:360px;margin:0 auto}
+  .h1-pfad{display:none}
+  .h1-horizont video{width:120%;right:-40%;opacity:.25}
+}
+</style>
+</head>
+<body>
+<div id="kopf"></div>
+
+<header class="h1-hero" id="top">
+  <div class="h1-horizont" aria-hidden="true"><video muted loop playsinline autoplay preload="metadata" poster="../../../frontend/landing/assets/bild/hero.jpg" src="../../../frontend/landing/assets/video/dp-hero-flug.mp4"></video></div>
+  <canvas class="strom" id="strom" aria-hidden="true"></canvas>
+  <div class="wrap">
+    <div class="h1-oben">
+      <div>
+        <div class="eye">Immobilien-Investmentanalyse</div>
+        <h1><span class="zl"><i>Immobilien&shy;entscheidungen</i></span><span class="zl"><i>sind zu groß für</i></span><span class="zl"><i><em>ein Bauchgefühl.</em></i></span></h1>
+      </div>
+      <div>
+        <p class="lead">DealPilot begleitet deine Immobilie vom ersten Exposé bis in den Bestand, mit vollständiger Rechnung, einem amtlich begründeten Wert und einem Investment Case, der bei der Bank besteht. Ab dann fliegst du nach Flugdaten.</p>
+        <div class="h1-knoepfe"><a class="btn-p" href="https://app.dealpilot.immo/?register=1">Vier Wochen als Pro, kostenlos</a><a class="btn-l" href="#preise"><svg viewBox="0 0 24 24"><path d="M5 12h14m-6-6 6 6-6 6"/></svg>Preise ansehen</a></div>
+      </div>
+    </div>
+    <div class="h1-buehne">
+      <div id="ex"></div>
+      <div class="h1-pfad" aria-hidden="true"></div>
+      <div id="karte"></div>
+    </div>
+    <div class="h1-unten" style="max-width:1080px;margin-left:auto;margin-right:auto">
+      <span>Ein Exposé, sechs Angaben, drei eigene Werte. Daraus rechnet DealPilot 24 Kennzahlen. Beispieldaten.</span>
+      <button class="nochmal" type="button" id="nochmal">↻ Exposé neu einlesen</button>
+    </div>
+  </div>
+  <div class="h1-band" aria-hidden="true"><div class="zug" id="zug"></div></div>
+</header>
+
+<section class="sec" style="padding-top:40px">
+  <div class="wrap">
+    <div class="kopf" data-rv><div class="eye">Flugdaten statt Bauchgefühl</div><h2>Zahlen, die sich <span class="ac">nachrechnen lassen.</span></h2></div>
+    <div id="zahlen"></div>
+  </div>
+</section>
+
+<section class="sec papier" id="score" style="--kerbe:var(--cream2)">
+  <div class="wrap">
+    <div class="kopf ctr" data-rv><div class="eye ctr">Investor Deal Score</div></div>
+    <div id="zwei"></div>
+  </div>
+</section>
+
+<section class="sec" id="etappen">
+  <div class="wrap">
+    <div class="kopf ctr" data-rv><div class="eye ctr">So fliegt ein Deal</div><h2>Vom Exposé bis in den Bestand. <span class="ac">In neun Etappen.</span></h2>
+      <p>DealPilot liest Exposé und Unterlagen ein, rechnet Finanzierung, Cashflow und Steuer durch und begründet den Wert mit den Daten der Gutachterausschüsse. Scroll weiter, bei jeder Etappe siehst du die passende Ansicht aus DealPilot.</p></div>
+    <div id="strecke"></div>
+  </div>
+</section>
+
+<section class="sec karte" id="daten" style="--kerbe:var(--karte)"><div class="wrap" id="datenbox"></div></section>
+
+<section class="sec" id="videothek" style="overflow:hidden">
+  <div class="wrap">
+    <div class="kopf ctr" data-rv><div class="eye ctr">Videothek</div><h2>Sieh zu, bevor du <span class="ac">einsteigst.</span></h2><p>Jedes Modul als kurzes Video, vom Spot bis zum Komplettbeispiel.</p></div>
+    <div id="vt"></div>
+  </div>
+</section>
+
+<section class="sec papier" id="preise" style="--kerbe:var(--cream2)">
+  <div class="wrap">
+    <div class="kopf ctr" data-rv><div class="eye ctr">Preise</div><h2>Vier Pakete. <span class="ac">Ab 0 €.</span></h2><p>Monatlich kündbar. Im Jahrestarif sparst du rund 17 Prozent.</p></div>
+    <div id="pakete"></div>
+  </div>
+</section>
+
+<div id="fuss"></div>
+
+<script src="gemeinsam.js"></script>
+<script>
+(function () {
+  var V = DPV, D = V.D, $ = V.$;
+  V.start({ nr: 'Variante 1', titel: 'Exposé im Anflug' });
+
+  /* Hero: Exposé und Karte */
+  $('#ex').innerHTML = V.exposeHtml();
+  var k = V.karte($('#karte')), ex = $('#ex .expose');
+  function lauf() { return V.exposeFlug(ex, k, { tippen: 30 }); }
+  $('#nochmal').addEventListener('click', lauf);
+
+  /* Datenstrom zieht auf die Karte zu und sammelt sich am Ende kurz um ihren Ring */
+  var hero = $('.h1-hero'), s = V.strom($('#strom'), hero, { fx: .62, fy: .58, deck: .42 });
+  function ringMitte() { var d = k.el.querySelector('.ids-dial').getBoundingClientRect(), h = hero.getBoundingClientRect(); return [d.left + d.width / 2 - h.left, d.top + d.height / 2 - h.top, d.width * .44]; }
+  function start() {
+    s.start();
+    k.leer();
+    V.warte(700).then(lauf).then(function () {
+      var m = ringMitte(); return s.sammle(m[0], m[1], m[2]);
+    }).then(function () { s.los(); });
+  }
+  if (innerWidth <= 1000) { k.leer(); V.sichtbar(ex, start, .3); }
+  else if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { setTimeout(start, 50); }); else setTimeout(start, 400);
+
+  /* App-Ansichten laufen schräg durch den Hero und wandern beim Scrollen mit */
+  var bilder = D.etappen.filter(function (e) { return e.bild !== 'qc'; }).map(function (e) { return D.L + 'assets/dp-strecke/' + e.bild; });
+  var zug = $('#zug'); zug.innerHTML = bilder.concat(bilder).map(function (b) { return '<img src="' + b + '" alt="" loading="lazy" width="267" height="150">'; }).join('');
+  var x = 0, t0 = performance.now();
+  (function schritt(t) {
+    if (!V.ruhig) {
+      var lauf = ((t - t0) / 1000 * 22) % (zug.scrollWidth / 2 || 1);
+      zug.style.transform = 'rotate(-3deg) translateX(' + (-lauf - scrollY * .6) % (zug.scrollWidth / 2 || 1) + 'px)';
+      requestAnimationFrame(schritt);
+    }
+  })(t0);
+
+  V.zahlenFlug($('#zahlen'));
+  V.zweiBuehne($('#zwei'), { art: 'riss' });
+  V.etappen($('#strecke'));
+  V.daten($('#datenbox'));
+  V.videothek($('#vt'));
+  V.preise($('#pakete'));
+  V.einblenden(document);
+})();
+</script>
+</body>
+</html>

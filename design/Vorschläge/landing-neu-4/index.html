@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DealPilot · Startseite Runde 4 · Übersicht</title>
+<meta name="description" content="Sechs helle Startseiten-Vorlagen aus Marcels Auswahl: Exposé in die Karte, Hangar mit App-Ansichten, Datenstrom mit Flugvideo, Flugdaten, neun Etappen, amtliche Daten, Riss in zwei Scores.">
+<link rel="stylesheet" href="../../../frontend/landing/fonts/dp-fonts.css">
+<link rel="stylesheet" href="gemeinsam.css">
+<style>
+.ue-kopf{padding:70px 0 40px}
+.ue-kopf h1{font-size:clamp(34px,5vw,64px);letter-spacing:-.045em;margin:16px 0 18px}
+.ue-kopf h1 em{font-style:normal;color:var(--gdd)}
+.ue-kopf p{max-width:760px;color:var(--inkm);font-size:17.5px;margin:0}
+.ue-raster{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:26px}
+@media(max-width:860px){.ue-raster{grid-template-columns:1fr}}
+.ue-v{display:flex;flex-direction:column;background:#fff;border:1px solid var(--linie);transition:transform .4s var(--e-weich),box-shadow .4s}
+.ue-v:hover{transform:translateY(-5px);box-shadow:0 34px 60px -40px rgba(70,52,12,.65)}
+.ue-bilder{display:grid;grid-template-columns:minmax(0,1fr) 92px;gap:8px;padding:10px;background:var(--cream2)}
+.ue-bilder img{width:100%;height:100%;object-fit:cover;object-position:top;border:1px solid var(--linie)}
+.ue-bilder .gross{aspect-ratio:16/10}
+.ue-tx{padding:18px 22px 22px}
+.ue-tx small{font:700 10.5px/1 var(--mono);letter-spacing:.16em;color:var(--gdi);text-transform:uppercase}
+.ue-tx h2{font-size:26px;margin:8px 0 8px}
+.ue-tx p{margin:0 0 12px;color:var(--inkm);font-size:15px}
+.ue-tx ul{margin:0;padding:0 0 0 18px;font-size:13.5px;color:var(--mut);line-height:1.6}
+.ue-tx .los{display:inline-block;margin-top:14px;font:600 14px var(--disp);border-bottom:1px solid var(--gd);color:var(--ink)}
+.klar{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:26px 0 0}
+@media(max-width:900px){.klar{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.klar div{background:#fff;border:1px solid var(--linie);padding:16px}
+.klar b{display:block;font:700 30px/1 var(--disp);letter-spacing:-.03em}
+.klar span{display:block;margin-top:8px;font-size:13px;color:var(--inkm);line-height:1.45}
+.notiz{margin-top:18px;font-size:14px;color:var(--inkm);max-width:900px}
+.notiz b{color:var(--ink)}
+</style>
+</head>
+<body>
+<div id="kopf"></div>
+
+<header class="ue-kopf">
+  <div class="wrap">
+    <div class="eye">Vorschläge · Startseite · Runde 4 · Vorlage, nicht eingebaut</div>
+    <h1>Sechs Startseiten. <em>Hell, wie die heutige.</em></h1>
+    <p>Jede Variante nimmt alle neun Dinge auf, die Marcel aus den früheren Vorlagen ausgewählt hat, und setzt sie anders in Szene: das Exposé, das sich in die Hero-Karte entlädt, die App-Ansichten durch den Hero, den Datenstrom mit dem Flugvideo, die hereinfliegenden Zahlen, die neun Etappen, die amtlichen Daten und den Riss in zwei Scores. Grundlage für Schrift, Farbe, Bilder und Texte ist die heutige Landing.</p>
+    <div class="klar">
+      <div><b>87</b><span>Investor Deal Score, Sehr gut. Rendite 98, Finanzierung 96, Risiko 88, Lage 60, Potenzial 53 bei 35, 25, 20, 10 und 10 Prozent.</span></div>
+      <div><b>81</b><span>Investment-Score, Gut. Zählt 59,3 Prozent. Objektrendite 98, Risiko und Zustand 88, Lage und Markt 60, Potenzial und Preis 53.</span></div>
+      <div><b>97</b><span>Finanzierungs-Score, Sehr gut. Zählt 40,8 Prozent. Kapitaldienst und Beleihung 96, Cashflow und EK-Rendite 97.</span></div>
+      <div><b>24/24</b><span>Kennzahlen, Tiefe 100 Prozent. Gerechnet mit den echten Kernen der App am Beispielobjekt der Hero-Karte.</span></div>
+    </div>
+    <p class="notiz">Gesamturteil wie in der App: die Stufe des Gesamtscores 87, also <b>Sehr gut</b>. Die Empfehlung <b>Kaufen</b> folgt aus zwei Schwellen, Investment ab 70 und Finanzierung ab 50. Die Grenze über den DSCR greift nicht, die Miete deckt den Kapitaldienst 1,49-fach. Die Zahlen der Datenbasis stehen auf der <a href="unterseite-daten.html" style="border-bottom:1px solid var(--gd)">Unterseite Datenbasis</a>, alle Varianten verweisen dorthin.</p>
+  </div>
+</header>
+
+<main class="sec" style="padding-top:20px">
+  <div class="wrap">
+    <div class="ue-raster" id="raster"></div>
+  </div>
+</main>
+
+<div id="fuss"></div>
+
+<script src="gemeinsam.js"></script>
+<script>
+(function () {
+  var V = [
+    ['1', 'Exposé im Anflug', 'Das Exposé tippt sich im Hero ein, jeder Wert fliegt an seine Stelle in der echten Karte, dahinter Datenstrom und Flugvideo als Horizont, darunter ein schräges Band aus App-Ansichten.',
+      ['Hero: Exposé links, Karte rechts, automatisch', 'Zahlen fliegen herein, dann Riss und Aufklappen', 'Etappen, Datenbasis, Videothek als Karussell, Pakete']],
+    ['2', 'Hangar im Licht', 'Eine schräge Wand aus App-Ansichten kippt beim Scrollen flach, oben rechts die echte Karte vor dem Flugvideo wie in Idee 03, das Exposé gleitet heran und gibt seine Werte ab.',
+      ['Hero: Wand aus App-Ansichten, Karte als Monitor', 'Videothek direkt danach als Hangar', 'Abriss im Verhältnis 59,3 zu 40,8, die Karte legt sich hin']],
+    ['3', 'Datenstrom', 'Großes Fenster mit dem Flugvideo, davor rast der goldene Datenstrom auf die Karte zu und zieht sich am Ende zum Score-Ring zusammen. Die Pakete folgen gleich nach dem Hero.',
+      ['Hero: Flugvideo, Datenstrom, App-Spalte am Rand', 'Pakete als Bordkarten an zweiter Stelle', 'Riss und Aufklappen, Videothek als Karussell am Schluss']],
+    ['4', 'Flugdaten', 'Bauchgefühl wird durchgestrichen, Flugdaten fliegen aus der Tiefe in eine Zahlenleiste, im Bullauge läuft das Flugvideo, darunter gibt das Exposé seine Werte an die Karte.',
+      ['Hero: Zettel, Zahlenleiste, Bullauge', 'Abriss in zwei Scores direkt nach dem Hero', 'Datenbasis vor den Etappen']],
+    ['5', 'Logbuch', 'Die ruhigste Fassung. Mittige Überschrift, auf dem Kartentisch tragen goldene Bahnen die Werte vom Exposé in die Karte, darunter das Flugvideo als Breitbild und zwei gegenläufige App-Bänder.',
+      ['Hero: Kartentisch mit Bahnen, Breitbild-Video', 'Etappen zuerst, dann Riss und Aufklappen', 'Logbuch-Zahlen, Videothek, Datenbasis, Pakete']],
+    ['6', 'Cockpitfenster', 'Ein breites Cockpitfenster mit Flugvideo, Horizont und Datenstrom, auf dem Rahmen klemmt das Exposé, daneben sitzt die Karte, darunter läuft die Instrumententafel aus App-Ansichten.',
+      ['Hero: Cockpitfenster, Exposé am Klemmbrett', 'Datenbasis mit vier Kacheln, Abriss in zwei Scores', 'Pakete vor der Videothek, die das Ende bildet']]
+  ];
+  document.getElementById('raster').innerHTML = V.map(function (v, i) {
+    return '<a class="ue-v" data-rv data-rvv="' + (i % 2) * 100 + '" href="variante-' + v[0] + '.html"><div class="ue-bilder"><img class="gross" src="vorschau/variante-' + v[0] + '-1440.jpg" alt="Vorschau Variante ' + v[0] + ' bei 1440 Pixeln" loading="lazy">'
+      + '<img src="vorschau/variante-' + v[0] + '-390.jpg" alt="Vorschau Variante ' + v[0] + ' bei 390 Pixeln" loading="lazy"></div>'
+      + '<div class="ue-tx"><small>Variante ' + v[0] + '</small><h2>' + v[1] + '</h2><p>' + v[2] + '</p><ul>' + v[3].map(function (x) { return '<li>' + x + '</li>'; }).join('') + '</ul><span class="los">Variante ' + v[0] + ' ansehen →</span></div></a>';
+  }).join('') + '<a class="ue-v" data-rv href="unterseite-daten.html"><div class="ue-bilder"><img class="gross" src="vorschau/unterseite-daten-1440.jpg" alt="Vorschau Unterseite Datenbasis" loading="lazy"><img src="vorschau/unterseite-daten-390.jpg" alt="" loading="lazy"></div>'
+    + '<div class="ue-tx"><small>Unterseite</small><h2>Flugbuch der Daten</h2><p>Die Tabelle aus Konzept B mit jeder Quelle, ihrem Abgleich und ihrem Umfang, dazu das Register je Land. Die Zahlen lädt die Seite aus datenumfang.js und register-stand.js der Landing.</p><span class="los">Unterseite ansehen →</span></div></a>';
+  DPV.start({});
+})();
+</script>
+</body>
+</html>

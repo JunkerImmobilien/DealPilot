@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DealPilot · Datenbasis · Flugbuch der Daten</title>
+<meta name="description" content="Über 1 Million amtliche Datenpunkte: jede Quelle mit Inhalt, Abgleich und Umfang, dazu das Register der Gutachterausschüsse je Land. Unterseite für alle Varianten.">
+<link rel="stylesheet" href="../../../frontend/landing/fonts/dp-fonts.css">
+<link rel="stylesheet" href="gemeinsam.css">
+<style>
+/* Unterseite · Flugbuch der Daten (Tabelle aus landing-neu/konzept-b.html, hell)
+   Jede Zahl kommt zur Laufzeit aus frontend/landing/datenumfang.js (window.DPS_UMFANG, gemessen
+   18.11.2026) und register-stand.js (window.DPS_REGISTER, Stand 11.11.2026). Hier steht keine Zahl
+   von Hand, ausser als Rückfall im Markup, falls die Dateien nicht laden. */
+.fb-kopf{display:grid;grid-template-columns:auto minmax(0,1fr);gap:20px 56px;align-items:end;margin-bottom:46px}
+.fb-zahl{font:700 clamp(64px,11vw,170px)/.85 var(--disp);letter-spacing:-.06em}
+.fb-zahl em{font-style:normal;background:var(--runway);-webkit-background-clip:text;background-clip:text;color:transparent}
+.fb-kopf h1{font-size:clamp(28px,3.2vw,44px);margin:12px 0 10px}
+.fb-kopf p{margin:0;color:var(--inkm)}
+@media(max-width:860px){.fb-kopf{grid-template-columns:1fr}}
+table.fb{width:100%;border-collapse:collapse;font-size:15px}
+.fb th{font:600 11px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--mut);text-align:left;padding:12px 14px 12px 0;border-bottom:2px solid var(--ink)}
+.fb td{padding:18px 14px 18px 0;border-bottom:1px solid var(--linie);vertical-align:top;color:var(--inkm)}
+.fb td:first-child{font:700 17px/1.3 var(--disp);color:var(--ink);width:22%}
+.fb td.t{font:500 12px/1.4 var(--mono);color:var(--gdi);white-space:nowrap}
+.fb td.t i{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--gd);margin-right:7px;vertical-align:1px}
+.fb td.t i.live{background:var(--grn);animation:puls 2s infinite}
+.fb .z{text-align:right;white-space:nowrap}
+.fb td.z b{display:block;font:700 22px/1 var(--disp);color:var(--ink);font-variant-numeric:tabular-nums}
+.fb td.z small{font:500 11.5px var(--mono);color:var(--mut)}
+.fb tbody tr{opacity:0;transform:translateY(14px);transition:opacity .6s var(--e-hoch),transform .7s var(--e-hoch)}
+.fb tbody tr.da{opacity:1;transform:none}
+.fb tfoot td{border-bottom:0;padding-top:20px;font:700 15px var(--disp);color:var(--ink)}
+@media(max-width:760px){
+  .fb thead{display:none}
+  .fb,.fb tbody,.fb tfoot,.fb tr,.fb td{display:block;width:100%}
+  .fb tr{padding:16px 0;border-bottom:1px solid var(--linie)}
+  .fb td{border:0;padding:3px 0}
+  .fb td:first-child{width:100%}
+  .fb .z{text-align:left}
+}
+.reg{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin:26px 0 40px}
+@media(max-width:900px){.reg{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.reg div{background:#fff;border:1px solid var(--linie);padding:18px}
+.reg b{display:block;font:700 30px/1 var(--disp);letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.reg span{display:block;margin-top:8px;font-size:13.5px;color:var(--inkm);line-height:1.4}
+.laender{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px 40px}
+@media(max-width:760px){.laender{grid-template-columns:1fr}}
+.land{display:grid;grid-template-columns:200px minmax(0,1fr) 60px;gap:12px;align-items:center;font-size:14px}
+.land .sp{height:8px;background:#efe7d4;overflow:hidden}
+.land .sp i{display:block;height:100%;width:0;background:var(--runway);transition:width 1.4s var(--e-hoch)}
+.land b{text-align:right;font:700 14px var(--disp);font-variant-numeric:tabular-nums}
+@media(max-width:420px){.land{grid-template-columns:120px minmax(0,1fr) 50px;font-size:13px}}
+.zurueck{display:inline-flex;gap:8px;align-items:center;font:600 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--gdi);margin-bottom:26px}
+</style>
+</head>
+<body>
+<div id="kopf"></div>
+
+<main class="sec" style="padding-top:60px">
+  <div class="wrap">
+    <a class="zurueck" href="index.html">← Zurück zu den Varianten</a>
+    <div class="fb-kopf">
+      <div class="fb-zahl">1 <em>Mio.</em></div>
+      <div>
+        <div class="eye">Datenbasis · Flugbuch der Daten</div>
+        <h1>Über 1 Million amtliche Datenpunkte. <span style="color:var(--gdd)">Laufend abgeglichen.</span></h1>
+        <p>Genau <b class="num" data-u="kopf.amtlich_gesamt" style="color:var(--ink)">1.100.360</b>, gemessen am <span data-stand>18.11.2026</span> in unseren eigenen Datenbanken. <b data-u="kopf.schnittstellen">36</b> amtliche Dienste und Tabellen sind angebunden.</p>
+      </div>
+    </div>
+
+    <table class="fb">
+      <thead><tr><th>Quelle</th><th>Was darin steht</th><th>Abgleich</th><th class="z">Umfang</th></tr></thead>
+      <tbody id="zeilen"></tbody>
+      <tfoot><tr><td></td><td>Zusammen amtliche Datenpunkte in unseren Datenbanken</td><td></td><td class="z"><b data-u="kopf.amtlich_gesamt">1.100.360</b></td></tr></tfoot>
+    </table>
+    <p style="font-size:14px;color:var(--mut);margin:18px 0 0">Marktdaten aus Angeboten kommen hinzu. Sie zählen hier nicht mit und heißen im Bericht nie amtlich. Wo eine amtliche Zahl fehlt, erfindet DealPilot keine, sondern nennt den zuständigen Ausschuss und den Weg zur Quelle.</p>
+  </div>
+</main>
+
+<section class="sec papier" style="padding-top:80px">
+  <div class="wrap">
+    <div class="kopf" data-rv><div class="eye">Register der Gutachterausschüsse</div><h2>Jeder Wert mit <span class="ac">Herkunft.</span></h2>
+      <p>Stand <span data-rstand>11.11.2026</span>. Jeder Wert trägt Ausschuss, Jahrgang und Quelle, fast jeder auch die Seite im amtlichen Dokument.</p></div>
+    <div class="reg" id="reg"></div>
+    <h3 style="font-size:22px;margin:0 0 16px">Werte je Land</h3>
+    <div class="laender" id="laender"></div>
+  </div>
+</section>
+
+<div id="fuss"></div>
+
+<script src="../../../frontend/landing/datenumfang.js"></script>
+<script src="../../../frontend/landing/register-stand.js"></script>
+<script src="gemeinsam.js"></script>
+<script>
+(function () {
+  var V = DPV, $ = V.$, $$ = V.$$, U = window.DPS_UMFANG || {}, R = window.DPS_REGISTER || {};
+  V.start({ nr: 'Unterseite', titel: 'Datenbasis' });
+  function wert(pfad) { return pfad.split('.').reduce(function (o, k) { return o && o[k]; }, U); }
+  function datum(iso) { var t = String(iso || '').split('-'); return t.length === 3 ? t[2] + '.' + t[1] + '.' + t[0] : ''; }
+  if (U.stand) $$('[data-stand]').forEach(function (e) { e.textContent = datum(U.stand); });
+  if (R.stand) $$('[data-rstand]').forEach(function (e) { e.textContent = datum(R.stand); });
+  var K = U.kopf || {}, T = U.takte || {};
+  /* Quelle, Inhalt, Takt, live?, Zahl, Einheit, Zusatz */
+  var Z = [
+    ['Bodenrichtwerte', 'Bodenrichtwert und Zone aus den amtlichen Diensten der Länder und des Bundes, für alle 16 Länder, frisch für jeden Bericht.', T.bodenrichtwerte || 'live je Bericht', 1, K.boris_dienste, 'Dienste', ''],
+    ['Gutachterausschüsse', 'Liegenschaftszinssätze, Sachwertfaktoren, Vergleichsfaktoren und Umrechnungskoeffizienten. Jeder Wert mit Ausschuss, Jahrgang und Fundstelle.', 'Jan. bis Juni ' + (T.portale_halbjahr1 || 'wöchentlich') + ', sonst ' + (T.portale_halbjahr2 || 'monatlich'), 0, K.register_werte, 'Werte', K.ausschuesse + ' Ausschüsse · ' + K.portale + ' geprüfte Quellen'],
+    ['Zensus 2022', 'Wohnungen, Gebäude, Leerstand und Mieten der Statistischen Ämter des Bundes und der Länder, bis auf die Gemeinde.', 'Stichtag 15.05.2022', 0, K.zensus, 'Werte', V.fmt(K.zensus_gebiete) + ' Gebiete · ' + K.zensus_tabellen + ' Tabellen'],
+    ['Regionaldatenbank', 'Bevölkerung, Einkommen, Arbeitsmarkt und Wanderung je Kreis und Gemeinde, die Grundlage der Lageeinschätzung.', T.statistik || 'monatlich', 0, K.regional, 'Werte', V.fmt(K.regional_gebiete) + ' Gebiete · ' + K.regional_tabellen + ' Tabellen'],
+    ['Bautätigkeit und Bauland', 'Baugenehmigungen, Fertigstellungen und Kaufwerte für Bauland aus der amtlichen Statistik.', T.bau || 'monatlich', 0, K.bau, 'Werte', K.bau_tabellen + ' Tabellen'],
+    ['Obere Gutachterausschüsse', 'Bundesweite Preis- und Mietspannen der Oberen Gutachterausschüsse, zur Einordnung jedes Objekts.', 'bundesweit', 0, K.akoga, 'Werte', ''],
+    ['Parameter der Wertermittlung', 'Weitere amtliche Parameter, mit denen die Wertermittlung rechnet. Gezählt nur die Qualitätsstufen A bis C.', 'Stufe A bis C', 0, (U.teile || {}).kennzahlen_gaa, 'Werte', ''],
+    ['Deutsche Bundesbank', 'Zinsstruktur und Zinsstatistik. Daraus die indikativen Bauzinsen, die in jeder Finanzierung stehen.', T.zinsen || 'täglich', 1, (U.teile || {}).zinsen, 'Werte', V.fmt(K.zins_tage) + ' Tageswerte'],
+    ['Statistisches Bundesamt', 'Verbraucherpreise, Nettokaltmieten und Baupreisindex, damit jede Zahl zum richtigen Stichtag passt.', 'wöchentlich geprüft', 0, K.indizes, 'Indexwerte', K.indizes_reihen + ' Reihen']
+  ];
+  $('#zeilen').innerHTML = Z.map(function (z) {
+    return '<tr><td>' + z[0] + '</td><td>' + z[1] + '</td><td class="t"><i' + (z[3] ? ' class="live"' : '') + '></i>' + z[2] + '</td>'
+      + '<td class="z"><b data-z="' + (z[4] || 0) + '">' + V.fmt(z[4] || 0) + '</b><small>' + z[5] + (z[6] ? '<br>' + z[6] : '') + '</small></td></tr>';
+  }).join('');
+  $$('[data-u]').forEach(function (e) { var w = wert(e.dataset.u); if (w != null) e.textContent = V.fmt(w); });
+  $$('#zeilen tr').forEach(function (tr, i) {
+    V.sichtbar(tr, function () { setTimeout(function () { tr.classList.add('da'); var b = $('b', tr); V.zaehle(b, +b.dataset.z, 1400); }, i * 80); }, .2);
+  });
+  var RK = R.kopf || {}, H = R.herkunft || {};
+  var reg = [
+    [RK.werte_gesamt, 'amtliche Werte im Register, von ' + RK.ausschuesse + ' Gutachterausschüssen'],
+    [R.saetze, 'Sätze in ' + R.dateien + ' Registerdateien, mit Sperren und Rückfragen'],
+    [RK.lzs, 'Liegenschaftszinssätze'], [RK.swf, 'Sachwertfaktoren'], [RK.vgf, 'Vergleichsfaktoren'],
+    [RK.uk, 'Umrechnungskoeffizienten (Fläche und WGFZ)'], [RK.irw_tabellen, 'Umrechnungstabellen der Immobilienrichtwerte, ' + RK.irw_ausschuesse + ' Ausschüsse'],
+    [H.mit_seite, 'Werte mit Seite im amtlichen Dokument, von ' + V.fmt(H.werte || 0)]
+  ];
+  $('#reg').innerHTML = reg.map(function (r) { return '<div data-rv><b data-z="' + (r[0] || 0) + '">' + V.fmt(r[0] || 0) + '</b><span>' + r[1] + '</span></div>'; }).join('');
+  $$('#reg b').forEach(function (b) { V.sichtbar(b, function () { V.zaehle(b, +b.dataset.z, 1500); }, .3); });
+  var L = R.laender || {}, max = 0;
+  Object.keys(L).forEach(function (k) { max = Math.max(max, L[k].werte || 0); });
+  $('#laender').innerHTML = Object.keys(L).sort(function (a, b) { return (L[b].werte || 0) - (L[a].werte || 0); }).map(function (k) {
+    return '<div class="land"><span>' + L[k].name + '</span><span class="sp"><i data-w="' + ((L[k].werte || 0) / max * 100).toFixed(1) + '"></i></span><b>' + V.fmt(L[k].werte || 0) + '</b></div>';
+  }).join('');
+  V.sichtbar($('#laender'), function (el) { $$('i', el).forEach(function (i, n) { setTimeout(function () { i.style.width = (+i.dataset.w > 0 ? Math.max(i.dataset.w, .6) : 0) + '%'; }, n * 50); }); }, .2);
+  V.einblenden(document);
+})();
+</script>
+</body>
+</html>
