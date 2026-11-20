@@ -428,9 +428,15 @@
       var k = kapitelBei(v, t);
       $('.absprung', info).innerHTML = 'Start bei <b>' + mmss(t) + '</b>' + (k ? ', ' + (/^Kapitel/.test(k.titel) ? '' : 'Kapitel ') + '<b>' + esc(sauber(k.titel)) + '</b>' : '');
       vid.style.display = 'block'; vid.poster = bild(v);
-      vid.src = (J.basis_medien || 'medien/videothek/') + Q.datei(v);
+      /* landing-faecher-1b · gemessen auf Staging 20.11.2026: mit preload="none" laedt ein gesetztes src NICHTS,
+         loadedmetadata kam nie, das Video blieb bei readyState 0 stehen. Darum: Sekunde als Medienfragment
+         (#t=) in die Adresse, play() sofort (noch in der Klick-Geste), currentTime nach loadedmetadata als
+         Absicherung. */
+      vid.preload = 'auto';
+      vid.src = (J.basis_medien || 'medien/videothek/') + Q.datei(v) + '#t=' + Math.max(0, +t || 0);
       spiel.classList.add('spielt');
-      vid.addEventListener('loadedmetadata', function f() { vid.removeEventListener('loadedmetadata', f); try { vid.currentTime = t; } catch (e) {} var p = vid.play(); if (p && p.catch) p.catch(function () { spiel.classList.remove('spielt'); }); });
+      vid.addEventListener('loadedmetadata', function f() { vid.removeEventListener('loadedmetadata', f); try { if (Math.abs(vid.currentTime - t) > 1) vid.currentTime = t; } catch (e) {} });
+      var p = vid.play(); if (p && p.catch) p.catch(function () { spiel.classList.remove('spielt'); });
     }
     function oeffne(id, t) {
       if (!bereit) { warteschlange = [id, t]; if (host) host.scrollIntoView({ behavior: ruhig ? 'auto' : 'smooth', block: 'start' }); return true; }
