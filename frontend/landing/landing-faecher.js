@@ -844,9 +844,9 @@
      zählt dp2.js hoch (data-zaehl, Endwert = gemessene Zahl, live nachgezogen über DP2_setzeZahl).
      NAMEN: nur die, die heute schon auf der Startseite und in methodik.html stehen. */
   var TEILE = [
-    ['zensus', 'Zensus 2022'], ['regional', 'Regionaldatenbank'], ['bau', 'Bautätigkeit und Bauland'],
-    ['akoga', 'Obere Gutachterausschüsse'], ['register', 'Gutachterausschüsse, Register'],
-    ['kennzahlen_gaa', 'Parameter der Wertermittlung'], ['zinsen', 'Deutsche Bundesbank'], ['indizes', 'Statistisches Bundesamt']
+    ['zensus', 'Gebäude- und Wohnungszählung'], ['regional', 'Amtliche Regionalstatistik'], ['bau', 'Bautätigkeit und Bauland'],
+    ['akoga', 'Landesweite Marktspannen'], ['register', 'Gutachterausschüsse, Register'],
+    ['kennzahlen_gaa', 'Parameter der Wertermittlung'], ['zinsen', 'Amtliche Zinsdaten'], ['indizes', 'Amtliche Preisindizes']
   ];
   function ladeSkript(src) {
     return new Promise(function (ok) { var s = document.createElement('script'); s.src = src; s.onload = s.onerror = function () { ok(); }; document.head.appendChild(s); });
@@ -945,8 +945,9 @@
   }
   function einzelcheckLaden() {
     if (!einzelcheckErlaubt() || !document.getElementById('dealcheck')) return;
-    var l = document.createElement('link'); l.rel = 'stylesheet'; l.href = 'einzelcheck-demo.css?v=landing-faecher-1'; document.head.appendChild(l);
-    var s = document.createElement('script'); s.src = 'einzelcheck-demo.js?v=landing-faecher-1'; s.async = true;
+    /* v3940 · echter Ablauf statt Demo (einzelcheck.js/.css, Backend routes/publicEinzelcheck.js) */
+    var l = document.createElement('link'); l.rel = 'stylesheet'; l.href = 'einzelcheck.css?v=v3940'; document.head.appendChild(l);
+    var s = document.createElement('script'); s.src = 'einzelcheck.js?v=v3940'; s.async = true;
     /* landing-faecher-2 · der Deal-Check zeigt den zweiten Weg „Bericht holen“ erst, wenn der Einzel-Check da ist */
     s.onload = function () { try { document.dispatchEvent(new CustomEvent('dp:einzelcheck-bereit')); } catch (e) {} };
     document.body.appendChild(s);
