@@ -1831,6 +1831,19 @@
         while (M && Date.now() - t0 < 15000 && M.liste().some(function (a) { return a.start >= r.start && a.status === 'laeuft'; })) await new Promise(function (ok) { setTimeout(ok, 500); });
         if (M) M.liste().forEach(function (a) { if (a.start >= r.start) M.abbrechen(a.id); });
       } catch (e) {}
+      /* v3910v · GEMESSEN 20.11.2026 (Prüfläufe 10b und 10c): 1 s NACH dem Löschen der Kopie kam ein POST /objects
+         mit den vollen Daten der Kopie (Ravensberger Weg 38, 174 KB) - eine neue Kopie blieb im Demo-Konto liegen.
+         Ursache liegt in der App (ein Speichern nach delSaved des offenen Objekts), gemeldet. Der Spion läuft bis hier
+         mit und trägt das neue Objekt in DPM_REIHE.angelegt ein: nur DIESE, von diesem Lauf angelegten, zweiter Durchgang. */
+      await new Promise(function (ok) { setTimeout(ok, 1500); });
+      var nach = DPM_REIHE.angelegt.filter(function (id) { return DPM_REIHE.geloescht.indexOf(id) < 0 && ids.indexOf(id) < 0; });
+      for (var j = 0; j < nach.length; j++) {
+        try {
+          await Auth.apiCall('/objects/' + nach[j], { method: 'DELETE' });
+          DPM_REIHE.geloescht.push(nach[j]); DPM_REIHE.nachgeloescht = (DPM_REIHE.nachgeloescht || []).concat(nach[j]);
+        } catch (e) { DPM_REIHE.geloescht.push('FEHLER ' + nach[j] + ' ' + (e && e.message)); }
+      }
+      if (nach.length) { try { if (typeof window.renderSaved === 'function') window.renderSaved({ forceFresh: true, _immediate: true }); } catch (e) {} }
       zurueck();
       rhSpionAus();
       DPM_REIHE.fertig = Date.now();
@@ -2253,6 +2266,8 @@
   function r6Text(e) { return e ? String(e.textContent || '').replace(/[\s\u00a0]+/g, ' ').trim() : ''; }
   /* innerText ohne geschützte Leerzeichen (gemessen: „4,34\u00a0%" - die Muster mit „ %" griffen nicht) */
   function r6Inner(e) { return e ? String(e.innerText || '').replace(/\u00a0/g, ' ') : ''; }
+  /* v3910v \u00b7 Wert einer Zeile der Mietrecht-Karte (potenzial.js: .dp-mr-z > .dp-mr-k + .dp-mr-v), unabh\u00e4ngig von innerText */
+  function r6MrWert(re) { var z = [].filter.call(document.querySelectorAll('#dp-mietrecht-karte .dp-mr-z'), function (x) { return re.test(r6Text(x.querySelector('.dp-mr-k'))); })[0]; return z ? r6Text(z.querySelector('.dp-mr-v')) : ''; }
   function r6Id(id) { return r6Text(document.getElementById(id)); }
   /* der Wert neben einer Beschriftung: kleinstes Element mit passendem Text,
      dessen naechstes Geschwister den Wert traegt */
@@ -2488,15 +2503,20 @@
         var x = mr(); if (x) x.scrollIntoView({ block: 'center' });
         await warte(500);
         await zeige(mr, 8);
-        var t = r6Inner(mr()).replace(/\s+/g, ' '), kg = /KAPPUNGSGRENZE\s+([\d,]+ % in \d+ Jahren)/i.exec(t), vm = /VERGLEICHSMIETE\s+([\d,]+ €\/m²)/i.exec(t), mb = /MIETPREISBREMSE\s+(gilt hier nicht|gilt[^|.]*?)(?=\s+[A-ZÄÖÜ]|\s*$)/.exec(t);
-        await b2oZeile(s, 'Mietrecht an dieser Adresse', '§ 558 BGB: Kappungsgrenze <b>' + (kg ? kg[1] : '–') + '</b>, Vergleichsmiete <b>' + (vm ? vm[1] : '–') + '</b> aus der Mietspiegel-Zeile, oberer Spannenwert' + (mb ? '. Mietpreisbremse: ' + mb[1] : '') + '.');
+        /* v3910v · gemessen 20.11.2026 (Prüflauf 07): seit der neuen Ansicht (miete-demo.js, Karte in #dp-md umgehängt)
+           lieferte innerText der Karte nichts mehr - Kappungsgrenze und Vergleichsmiete standen als „–“ im Untertitel.
+           Gelesen wird jetzt Zeile für Zeile (.dp-mr-k / .dp-mr-v), wie bei „Nächste Erhöhung“. */
+        var kgV = r6MrWert(/^Kappungsgrenze$/i), vmG = /^([\d,]+ €\/m²)(?:,\s*(.+))?$/.exec(r6MrWert(/^Vergleichsmiete$/i)), mbV = r6MrWert(/^Mietpreisbremse$/i);
+        var mrTeile = [kgV ? 'Kappungsgrenze <b>' + kgV + '</b>' : '', vmG ? 'Vergleichsmiete <b>' + vmG[1] + '</b> aus der Mietspiegel-Zeile' + (vmG[2] ? ', ' + vmG[2] : '') : ''].filter(Boolean);
+        await b2oZeile(s, 'Mietrecht an dieser Adresse', '§ 558 BGB' + (mrTeile.length ? ': ' + mrTeile.join(', ') : ', die Grenzen für Mieterhöhungen an dieser Adresse') + (mbV ? '. Mietpreisbremse: ' + mbV : '') + '.');
         /* v3281 · N147: die nächste Erhöhung nach § 558 - Betrag, Grenze und die zwei Termine (verlangbar ab · wirksam ab), alles aus der Karte gelesen */
         var ne = function () { return [].filter.call(document.querySelectorAll('#dp-mietrecht-karte .dp-mr-z'), function (z) { return /Nächste Erhöhung/i.test(r6Text(z.querySelector('.dp-mr-k'))); })[0] || null; };
         if (ne()) {
           await zeige(ne, 8);
           var nv = r6Text(ne().querySelector('.dp-mr-v')), nu = r6Text(ne().querySelector('.dp-mr-u'));
-          var ter = /verlangbar ab ([^·]+?) · wirksam ab ([^·]+?)(?:\s*·|$)/.exec(nu), gr = /Grenze § 558: ([^·]+?)(?:\s*·|$)/.exec(nu);
-          await b2oZeile(s, 'Die nächste Erhöhung', 'Nach § 558: <b>' + nv + '</b>' + (gr ? ' — begrenzt durch die <b>' + gr[1].trim() + '</b>' : '') + '.' + (ter ? ' Verlangbar ab <b>' + ter[1].trim() + '</b>, wirksam ab <b>' + ter[2].trim() + '</b>.' : ''));
+          /* v3910v · seit v3840b trennt kurzSaetze() mit Punkt statt „·“ („verlangbar ab sofort. Wirksam ab 02/2027. Grenze § 558: …“) */
+          var tv = /verlangbar ab (sofort|\d{2}\/\d{4})/i.exec(nu), tw = /wirksam ab (sofort|\d{2}\/\d{4})/i.exec(nu), gr = /Grenze § 558: (.+?)(?:\s*[·.](?:\s|$)|$)/.exec(nu);
+          await b2oZeile(s, 'Die nächste Erhöhung', 'Nach § 558: <b>' + nv + '</b>' + (gr ? ' — begrenzt durch die <b>' + gr[1].trim() + '</b>' : '') + '.' + (tv && tw ? ' Verlangbar ab <b>' + tv[1] + '</b>, wirksam ab <b>' + tw[1] + '</b>.' : ''));
         }
       },
       async function (s) {   /* 7 · Mietentwicklung: Prognose */
@@ -2509,7 +2529,7 @@
         await zeige(function () { return q('#me-block-detail .g2'); }, 8);
         var zb = r6Beginn(s, 'Oder im Detail', 'Einzelne Erhöhungen bis zur Vergleichsmiete der Mietspiegel-Zeile — höchstens bis zur Kappungsgrenze.');
         /* v3272 · der Zielwert ist die Vergleichsmiete aus der Mietspiegel-Zeile (§ 558), nicht ein Angebotsniveau */
-        var vgm = (/VERGLEICHSMIETE\s+([\d,]+) €\/m²/i.exec(r6Inner(q('#dp-mietrecht-karte')).replace(/\s+/g, ' ')) || [])[1] || '8,50';
+        var vgm = (/^([\d,]+) €\/m²/.exec(r6MrWert(/^Vergleichsmiete$/i)) || [])[1] || '8,50';   /* v3910v · zeilenweise gelesen */
         /* v3281 · zwei Schritte im Abstand der Kappungsgrenze (3 Jahre); der Prozentsatz kommt aus der Soll-Miete (übernehmen) */
         await tippeH('me_anz', '2', 110);
         await tippeH('me_int', '3', 110);
@@ -2529,7 +2549,7 @@
           var tab = function () { return q('#me_table_wrap table'); };
           if (stufen.length && tab()) {
             await zeige(tab, 8);
-            var kgD = (/Kappungsgrenze\s*([\d,]+\s*%)/i.exec(r6Text(q('#dp-mietrecht-karte'))) || [])[1];   /* textContent: innerText lieferte im Lauf nichts */
+            var kgD = (/^([\d,]+\s*%)/.exec(r6MrWert(/^Kappungsgrenze$/i)) || [])[1];   /* v3910v · zeilenweise gelesen */
             await b2oZeile(s, 'Die Treppe', stufen.map(function (x) { return x.j + ': <b>' + x.qm + '</b>'; }).join(', ') + ' — jeder Schritt bleibt unter der Kappungsgrenze' + (kgD ? ' von ' + kgD : '') + ', der letzte endet an der Vergleichsmiete.');
           }
         }
@@ -4757,7 +4777,7 @@
         var x = e(); if (x) x.scrollIntoView({ block: 'center' });
         await warte(500);
         await zeige(e, 8);
-        await b2oZeile(s, 'Indikativ, kein Gutachten', 'Eine <b>Ersteinschätzung</b>. Das Finanzamt erkennt den kürzeren Satz nur mit Gutachten an — die Anfrage geht von hier, im Video nicht.');
+        await b2oZeile(s, 'Indikativ, kein Gutachten', 'Eine <b>Ersteinschätzung</b>. Das Finanzamt erkennt den kürzeren Satz nur mit Gutachten an.');   /* v3910v · ohne Gutachten-Anfrage (Marcel 09.11.2026, v3272) */
         r6WizZu();
         kegelHoch(false);
         await warte(800);
