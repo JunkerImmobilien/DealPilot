@@ -1,0 +1,536 @@
+[
+ {
+  "land_code": "BW",
+  "ags": "08221000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Heidelberg, Stadtkreis",
+  "gaa_name": "Gutachterausschuss für die Ermittlung von Grundstückswerten in Heidelberg",
+  "ausschuss": "Gutachterausschuss für die Ermittlung von Grundstückswerten in Heidelberg",
+  "kennzahl": "umrechnungskoeffizient_flaeche",
+  "zweig": "ifw",
+  "vollstaendig": false,
+  "zugang": "nicht abgeleitet",
+  "sperre_grund": "teilflaechen",
+  "warum_kein_wert": "Der Ausschuss führt für Ein-/Zweifamilienhäuser keine Umrechnungskoeffizienten für die Grundstücksgröße, sondern eine Teilflächenregel: „Ist das Bodenrichtwertmerkmal (f) mit einer Flächenangabe belegt (z.B.: 700), so ist in der Regel für diese Fläche der volle Bodenrichtwert anzusetzen (marktrelevante Baulandfläche). Die darüberhinausgehende private Grünfläche zwischen 701 und 1.400 m², deren Bebauung rechtlich ausgeschlossen ist, ist mit 10 %, wiederum darüberhinausgehende private Grünfläche ist mit 5% des betreffenden Bodenrichtwertes zu werten.“ (Erläuterungen zu den Bodenrichtwerten 2026, Kap. 5.1, Seite 4). Das ist eine Flächenaufteilung, kein Koeffizient. Weg: Geschäftsstelle des Gutachterausschusses Heidelberg (Vermessungsamt, Stadt Heidelberg); Erläuterungen zu den Bodenrichtwerten 2026 in BORIS-BW: https://www.gutachterausschuesse-bw.de/borisfachdaten/lgd/2026/08221000-oertliche-Fachinformationen_2026.pdf",
+  "formel": null,
+  "geltungsbereich": {
+   "objektarten": [],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Geschäftsstelle des Gutachterausschusses Heidelberg (Vermessungsamt, Stadt Heidelberg); Erläuterungen zu den Bodenrichtwerten 2026 in BORIS-BW: https://www.gutachterausschuesse-bw.de/borisfachdaten/lgd/2026/08221000-oertliche-Fachinformationen_2026.pdf"
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "dokument": "Gutachterausschuss Heidelberg – Erläuterungen zu den Bodenrichtwerten 2026",
+    "fundstelle": "Seite 4 von 17, Kap. 5.1 Fläche des Bodenrichtwertgrundstücks (f)",
+    "url": "https://www.gutachterausschuesse-bw.de/borisfachdaten/lgd/2026/08221000-oertliche-Fachinformationen_2026.pdf",
+    "wortlaut": "„… private Grünfläche zwischen 701 und 1.400 m² … mit 10 %, wiederum darüberhinausgehende private Grünfläche ist mit 5% des betreffenden Bodenrichtwertes zu werten.“"
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "jahrgang": 2026,
+  "quelle_url": "https://www.gutachterausschuesse-bw.de/borisfachdaten/lgd/2026/08221000-oertliche-Fachinformationen_2026.pdf",
+  "lizenz": "Kein Lizenz- und kein Urhebervermerk im Dokument. Bereitgestellt über BORIS-BW; LGL-Infoblatt BORIS-BW: „… steht für eine kostenfreie Bodenrichtwertauskunft für Interessierte, die kommerzielle Nutzung ist ausgeschlossen.“ Genutzt nach Entscheidung von Marcel Junker (18.10.2026) auf Grundlage der Freigabe für BORIS-BW (Aktennotiz Junker Solution).",
+  "weg": "Geschäftsstelle des Gutachterausschusses Heidelberg (Vermessungsamt, Stadt Heidelberg); Erläuterungen zu den Bodenrichtwerten 2026 in BORIS-BW: https://www.gutachterausschuesse-bw.de/borisfachdaten/lgd/2026/08221000-oertliche-Fachinformationen_2026.pdf",
+  "fundstelle": "Seite 4 von 17",
+  "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss Heidelberg, Jahrgang 2026",
+  "quelle_parser": "ernte-20261120 (BORIS-BW LUMNUM-Abgleich, pdftotext -layout)",
+  "modellansaetze": {},
+  "belege_meta": {
+   "abgerufen_am": "2026-11-20"
+  }
+ },
+ {
+  "land_code": "BW",
+  "ags": "08226003",
+  "ebene": "gemeinde",
+  "gebiet_name": "Altlußheim",
+  "gaa_name": "Gemeinsamer Gutachterausschuss Südwestlicher Rhein-Neckar-Kreis",
+  "ausschuss": "Gemeinsamer Gutachterausschuss Südwestlicher Rhein-Neckar-Kreis",
+  "kennzahl": "umrechnungskoeffizient_flaeche",
+  "zweig": "ifw",
+  "vollstaendig": false,
+  "zugang": "nicht abgeleitet",
+  "sperre_grund": "nur_tiefe",
+  "warum_kein_wert": "Auch zum Stichtag 01.01.2026 (Bodenrichtwerte beschlossen am 17.07.2026) führt der Ausschuss keine Umrechnungskoeffizienten für die Grundstücksgröße, sondern ein Tiefenmodell für übertiefe Wohngrundstücke: „Bei der Bewertung eines übertiefen Grundstücks erfolgt eine fiktive Aufteilung der Grundstücksfläche in das eigentliche Baugrundstück und das hausnahe Gartenland … Für die als hausnahes Gartenland eingestufte Fläche sind 35 % des Bodenrichtwerts anzusetzen.“ (Vorgarten bis 10 m, hinter dem Haus bis 20 m ab Baulinie/-grenze; Örtliche Fachinformationen 2026, PDF-S. 2–3). Das ist eine Tiefenregel. Weg: Geschäftsstelle des Gemeinsamen Gutachterausschusses Südwestlicher Rhein-Neckar-Kreis bei der Stadt Schwetzingen (schwetzingen.de); Örtliche Fachinformationen 2026 in BORIS-BW: https://www.gutachterausschuesse-bw.de/borisfachdaten/lgd/2026/08226084-GemeinsamerGutachterausschussBezirkSchwetzingen_2026.pdf",
+  "formel": null,
+  "geltungsbereich": {
+   "objektarten": [],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Geschäftsstelle des Gemeinsamen Gutachterausschusses Südwestlicher Rhein-Neckar-Kreis bei der Stadt Schwetzingen (schwetzingen.de); Örtliche Fachinformationen 2026 in BORIS-BW: https://www.gutachterausschuesse-bw.de/borisfachdaten/lgd/2026/08226084-GemeinsamerGutachterausschussBezirkSchwetzingen_2026.pdf"
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "dokument": "Örtliche Fachinformationen zur Ableitung und Verwendung der Bodenrichtwerte (Stichtag 01.01.2026), Gemeinsamer Gutachterausschuss südwestlicher Rhein-Neckar-Kreis (9 Seiten)",
+    "fundstelle": "PDF-S. 2–3, Modell für übertiefe Grundstücke, Abschnitte I–III",
+    "url": "https://www.gutachterausschuesse-bw.de/borisfachdaten/lgd/2026/08226084-GemeinsamerGutachterausschussBezirkSchwetzingen_2026.pdf",
+    "wortlaut": "„Für die als hausnahes Gartenland eingestufte Fläche sind 35 % des Bodenrichtwerts anzusetzen.“ — „Es wird eine Fläche bis 20 m Tiefe, gemessen ab der hinteren Baulinie … als Teil des typischen Baugrundstücks angerechnet.“"
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "jahrgang": 2026,
+  "quelle_url": "https://www.gutachterausschuesse-bw.de/borisfachdaten/lgd/2026/08226084-GemeinsamerGutachterausschussBezirkSchwetzingen_2026.pdf",
+  "lizenz": "Kein Lizenz- und kein Urhebervermerk im Dokument. Bereitgestellt über BORIS-BW; LGL-Infoblatt BORIS-BW: „… steht für eine kostenfreie Bodenrichtwertauskunft für Interessierte, die kommerzielle Nutzung ist ausgeschlossen.“ Genutzt nach Entscheidung von Marcel Junker (18.10.2026) auf Grundlage der Freigabe für BORIS-BW (Aktennotiz Junker Solution).",
+  "weg": "Geschäftsstelle des Gemeinsamen Gutachterausschusses Südwestlicher Rhein-Neckar-Kreis bei der Stadt Schwetzingen (schwetzingen.de); Örtliche Fachinformationen 2026 in BORIS-BW: https://www.gutachterausschuesse-bw.de/borisfachdaten/lgd/2026/08226084-GemeinsamerGutachterausschussBezirkSchwetzingen_2026.pdf",
+  "fundstelle": "PDF-S. 2–3",
+  "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gemeinsamer Gutachterausschuss Südwestlicher Rhein-Neckar-Kreis, Jahrgang 2026",
+  "quelle_parser": "ernte-20261120 (BORIS-BW LUMNUM-Abgleich, pdftotext -layout)",
+  "modellansaetze": {},
+  "gemeinsamer_ausschuss": {
+   "boris_gasl": "22645",
+   "gemeinden": 10
+  },
+  "belege_meta": {
+   "abgerufen_am": "2026-11-20"
+  },
+  "vorjahrgang": "Sperre Jahrgang 2023 in uk-flaeche-bw-2026.json bleibt stehen."
+ },
+ {
+  "land_code": "BW",
+  "ags": "08226009",
+  "ebene": "gemeinde",
+  "gebiet_name": "Brühl",
+  "gaa_name": "Gemeinsamer Gutachterausschuss Südwestlicher Rhein-Neckar-Kreis",
+  "ausschuss": "Gemeinsamer Gutachterausschuss Südwestlicher Rhein-Neckar-Kreis",
+  "kennzahl": "umrechnungskoeffizient_flaeche",
+  "zweig": "ifw",
+  "vollstaendig": false,
+  "zugang": "nicht abgeleitet",
+  "sperre_grund": "nur_tiefe",
+  "warum_kein_wert": "Auch zum Stichtag 01.01.2026 (Bodenrichtwerte beschlossen am 17.07.2026) führt der Ausschuss keine Umrechnungskoeffizienten für die Grundstücksgröße, sondern ein Tiefenmodell für übertiefe Wohngrundstücke: „Bei der Bewertung eines übertiefen Grundstücks erfolgt eine fiktive Aufteilung der Grundstücksfläche in das eigentliche Baugrundstück und das hausnahe Gartenland … Für die als hausnahes Gartenland eingestufte Fläche sind 35 % des Bodenrichtwerts anzusetzen.“ (Vorgarten bis 10 m, hinter dem Haus bis 20 m ab Baulinie/-grenze; Örtliche Fachinformationen 2026, PDF-S. 2–3). Das ist eine Tiefenregel. Weg: Geschäftsstelle des Gemeinsamen Gutachterausschusses Südwestlicher Rhein-Neckar-Kreis bei der Stadt Schwetzingen (schwetzingen.de); Örtliche Fachinformationen 2026 in BORIS-BW: https://www.gutachterausschuesse-bw.de/borisfachdaten/lgd/2026/08226084-GemeinsamerGutachterausschussBezirkSchwetzingen_2026.pdf",
+  "formel": null,
+  "geltungsbereich": {
+   "objektarten": [],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Geschäftsstelle des Gemeinsamen Gutachterausschusses Südwestlicher Rhein-Neckar-Kreis bei der Stadt Schwetzingen (schwetzingen.de); Örtliche Fachinformationen 2026 in BORIS-BW: https://www.gutachterausschuesse-bw.de/borisfachdaten/lgd/2026/08226084-GemeinsamerGutachterausschussBezirkSchwetzingen_2026.pdf"
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "dokument": "Örtliche Fachinformationen zur Ableitung und Verwendung der Bodenrichtwerte (Stichtag 01.01.2026), Gemeinsamer Gutachterausschuss südwestlicher Rhein-Neckar-Kreis (9 Seiten)",
+    "fundstelle": "PDF-S. 2–3, Modell für übertiefe Grundstücke, Abschnitte I–III",
+    "url": "https://www.gutachterausschuesse-bw.de/borisfachdaten/lgd/2026/08226084-GemeinsamerGutachterausschussBezirkSchwetzingen_2026.pdf",
+    "wortlaut": "„Für die als hausnahes Gartenland eingestufte Fläche sind 35 % des Bodenrichtwerts anzusetzen.“ — „Es wird eine Fläche bis 20 m Tiefe, gemessen ab der hinteren Baulinie … als Teil des typischen Baugrundstücks angerechnet.“"
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "jahrgang": 2026,
+  "quelle_url": "https://www.gutachterausschuesse-bw.de/borisfachdaten/lgd/2026/08226084-GemeinsamerGutachterausschussBezirkSchwetzingen_2026.pdf",
+  "lizenz": "Kein Lizenz- und kein Urhebervermerk im Dokument. Bereitgestellt über BORIS-BW; LGL-Infoblatt BORIS-BW: „… steht für eine kostenfreie Bodenrichtwertauskunft für Interessierte, die kommerzielle Nutzung ist ausgeschlossen.“ Genutzt nach Entscheidung von Marcel Junker (18.10.2026) auf Grundlage der Freigabe für BORIS-BW (Aktennotiz Junker Solution).",
+  "weg": "Geschäftsstelle des Gemeinsamen Gutachterausschusses Südwestlicher Rhein-Neckar-Kreis bei der Stadt Schwetzingen (schwetzingen.de); Örtliche Fachinformationen 2026 in BORIS-BW: https://www.gutachterausschuesse-bw.de/borisfachdaten/lgd/2026/08226084-GemeinsamerGutachterausschussBezirkSchwetzingen_2026.pdf",
+  "fundstelle": "PDF-S. 2–3",
+  "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gemeinsamer Gutachterausschuss Südwestlicher Rhein-Neckar-Kreis, Jahrgang 2026",
+  "quelle_parser": "ernte-20261120 (BORIS-BW LUMNUM-Abgleich, pdftotext -layout)",
+  "modellansaetze": {},
+  "gemeinsamer_ausschuss": {
+   "boris_gasl": "22645",
+   "gemeinden": 10
+  },
+  "belege_meta": {
+   "abgerufen_am": "2026-11-20"
+  },
+  "vorjahrgang": "Sperre Jahrgang 2023 in uk-flaeche-bw-2026.json bleibt stehen."
+ },
+ {
+  "land_code": "BW",
+  "ags": "08226018",
+  "ebene": "gemeinde",
+  "gebiet_name": "Eppelheim",
+  "gaa_name": "Gemeinsamer Gutachterausschuss Südwestlicher Rhein-Neckar-Kreis",
+  "ausschuss": "Gemeinsamer Gutachterausschuss Südwestlicher Rhein-Neckar-Kreis",
+  "kennzahl": "umrechnungskoeffizient_flaeche",
+  "zweig": "ifw",
+  "vollstaendig": false,
+  "zugang": "nicht abgeleitet",
+  "sperre_grund": "nur_tiefe",
+  "warum_kein_wert": "Auch zum Stichtag 01.01.2026 (Bodenrichtwerte beschlossen am 17.07.2026) führt der Ausschuss keine Umrechnungskoeffizienten für die Grundstücksgröße, sondern ein Tiefenmodell für übertiefe Wohngrundstücke: „Bei der Bewertung eines übertiefen Grundstücks erfolgt eine fiktive Aufteilung der Grundstücksfläche in das eigentliche Baugrundstück und das hausnahe Gartenland … Für die als hausnahes Gartenland eingestufte Fläche sind 35 % des Bodenrichtwerts anzusetzen.“ (Vorgarten bis 10 m, hinter dem Haus bis 20 m ab Baulinie/-grenze; Örtliche Fachinformationen 2026, PDF-S. 2–3). Das ist eine Tiefenregel. Weg: Geschäftsstelle des Gemeinsamen Gutachterausschusses Südwestlicher Rhein-Neckar-Kreis bei der Stadt Schwetzingen (schwetzingen.de); Örtliche Fachinformationen 2026 in BORIS-BW: https://www.gutachterausschuesse-bw.de/borisfachdaten/lgd/2026/08226084-GemeinsamerGutachterausschussBezirkSchwetzingen_2026.pdf",
+  "formel": null,
+  "geltungsbereich": {
+   "objektarten": [],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Geschäftsstelle des Gemeinsamen Gutachterausschusses Südwestlicher Rhein-Neckar-Kreis bei der Stadt Schwetzingen (schwetzingen.de); Örtliche Fachinformationen 2026 in BORIS-BW: https://www.gutachterausschuesse-bw.de/borisfachdaten/lgd/2026/08226084-GemeinsamerGutachterausschussBezirkSchwetzingen_2026.pdf"
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "dokument": "Örtliche Fachinformationen zur Ableitung und Verwendung der Bodenrichtwerte (Stichtag 01.01.2026), Gemeinsamer Gutachterausschuss südwestlicher Rhein-Neckar-Kreis (9 Seiten)",
+    "fundstelle": "PDF-S. 2–3, Modell für übertiefe Grundstücke, Abschnitte I–III",
+    "url": "https://www.gutachterausschuesse-bw.de/borisfachdaten/lgd/2026/08226084-GemeinsamerGutachterausschussBezirkSchwetzingen_2026.pdf",
+    "wortlaut": "„Für die als hausnahes Gartenland eingestufte Fläche sind 35 % des Bodenrichtwerts anzusetzen.“ — „Es wird eine Fläche bis 20 m Tiefe, gemessen ab der hinteren Baulinie … als Teil des typischen Baugrundstücks angerechnet.“"
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "jahrgang": 2026,
+  "quelle_url": "https://www.gutachterausschuesse-bw.de/borisfachdaten/lgd/2026/08226084-GemeinsamerGutachterausschussBezirkSchwetzingen_2026.pdf",
+  "lizenz": "Kein Lizenz- und kein Urhebervermerk im Dokument. Bereitgestellt über BORIS-BW; LGL-Infoblatt BORIS-BW: „… steht für eine kostenfreie Bodenrichtwertauskunft für Interessierte, die kommerzielle Nutzung ist ausgeschlossen.“ Genutzt nach Entscheidung von Marcel Junker (18.10.2026) auf Grundlage der Freigabe für BORIS-BW (Aktennotiz Junker Solution).",
+  "weg": "Geschäftsstelle des Gemeinsamen Gutachterausschusses Südwestlicher Rhein-Neckar-Kreis bei der Stadt Schwetzingen (schwetzingen.de); Örtliche Fachinformationen 2026 in BORIS-BW: https://www.gutachterausschuesse-bw.de/borisfachdaten/lgd/2026/08226084-GemeinsamerGutachterausschussBezirkSchwetzingen_2026.pdf",
+  "fundstelle": "PDF-S. 2–3",
+  "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gemeinsamer Gutachterausschuss Südwestlicher Rhein-Neckar-Kreis, Jahrgang 2026",
+  "quelle_parser": "ernte-20261120 (BORIS-BW LUMNUM-Abgleich, pdftotext -layout)",
+  "modellansaetze": {},
+  "gemeinsamer_ausschuss": {
+   "boris_gasl": "22645",
+   "gemeinden": 10
+  },
+  "belege_meta": {
+   "abgerufen_am": "2026-11-20"
+  },
+  "vorjahrgang": "Sperre Jahrgang 2023 in uk-flaeche-bw-2026.json bleibt stehen."
+ },
+ {
+  "land_code": "BW",
+  "ags": "08226032",
+  "ebene": "gemeinde",
+  "gebiet_name": "Hockenheim",
+  "gaa_name": "Gemeinsamer Gutachterausschuss Südwestlicher Rhein-Neckar-Kreis",
+  "ausschuss": "Gemeinsamer Gutachterausschuss Südwestlicher Rhein-Neckar-Kreis",
+  "kennzahl": "umrechnungskoeffizient_flaeche",
+  "zweig": "ifw",
+  "vollstaendig": false,
+  "zugang": "nicht abgeleitet",
+  "sperre_grund": "nur_tiefe",
+  "warum_kein_wert": "Auch zum Stichtag 01.01.2026 (Bodenrichtwerte beschlossen am 17.07.2026) führt der Ausschuss keine Umrechnungskoeffizienten für die Grundstücksgröße, sondern ein Tiefenmodell für übertiefe Wohngrundstücke: „Bei der Bewertung eines übertiefen Grundstücks erfolgt eine fiktive Aufteilung der Grundstücksfläche in das eigentliche Baugrundstück und das hausnahe Gartenland … Für die als hausnahes Gartenland eingestufte Fläche sind 35 % des Bodenrichtwerts anzusetzen.“ (Vorgarten bis 10 m, hinter dem Haus bis 20 m ab Baulinie/-grenze; Örtliche Fachinformationen 2026, PDF-S. 2–3). Das ist eine Tiefenregel. Weg: Geschäftsstelle des Gemeinsamen Gutachterausschusses Südwestlicher Rhein-Neckar-Kreis bei der Stadt Schwetzingen (schwetzingen.de); Örtliche Fachinformationen 2026 in BORIS-BW: https://www.gutachterausschuesse-bw.de/borisfachdaten/lgd/2026/08226084-GemeinsamerGutachterausschussBezirkSchwetzingen_2026.pdf",
+  "formel": null,
+  "geltungsbereich": {
+   "objektarten": [],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Geschäftsstelle des Gemeinsamen Gutachterausschusses Südwestlicher Rhein-Neckar-Kreis bei der Stadt Schwetzingen (schwetzingen.de); Örtliche Fachinformationen 2026 in BORIS-BW: https://www.gutachterausschuesse-bw.de/borisfachdaten/lgd/2026/08226084-GemeinsamerGutachterausschussBezirkSchwetzingen_2026.pdf"
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "dokument": "Örtliche Fachinformationen zur Ableitung und Verwendung der Bodenrichtwerte (Stichtag 01.01.2026), Gemeinsamer Gutachterausschuss südwestlicher Rhein-Neckar-Kreis (9 Seiten)",
+    "fundstelle": "PDF-S. 2–3, Modell für übertiefe Grundstücke, Abschnitte I–III",
+    "url": "https://www.gutachterausschuesse-bw.de/borisfachdaten/lgd/2026/08226084-GemeinsamerGutachterausschussBezirkSchwetzingen_2026.pdf",
+    "wortlaut": "„Für die als hausnahes Gartenland eingestufte Fläche sind 35 % des Bodenrichtwerts anzusetzen.“ — „Es wird eine Fläche bis 20 m Tiefe, gemessen ab der hinteren Baulinie … als Teil des typischen Baugrundstücks angerechnet.“"
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "jahrgang": 2026,
+  "quelle_url": "https://www.gutachterausschuesse-bw.de/borisfachdaten/lgd/2026/08226084-GemeinsamerGutachterausschussBezirkSchwetzingen_2026.pdf",
+  "lizenz": "Kein Lizenz- und kein Urhebervermerk im Dokument. Bereitgestellt über BORIS-BW; LGL-Infoblatt BORIS-BW: „… steht für eine kostenfreie Bodenrichtwertauskunft für Interessierte, die kommerzielle Nutzung ist ausgeschlossen.“ Genutzt nach Entscheidung von Marcel Junker (18.10.2026) auf Grundlage der Freigabe für BORIS-BW (Aktennotiz Junker Solution).",
+  "weg": "Geschäftsstelle des Gemeinsamen Gutachterausschusses Südwestlicher Rhein-Neckar-Kreis bei der Stadt Schwetzingen (schwetzingen.de); Örtliche Fachinformationen 2026 in BORIS-BW: https://www.gutachterausschuesse-bw.de/borisfachdaten/lgd/2026/08226084-GemeinsamerGutachterausschussBezirkSchwetzingen_2026.pdf",
+  "fundstelle": "PDF-S. 2–3",
+  "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gemeinsamer Gutachterausschuss Südwestlicher Rhein-Neckar-Kreis, Jahrgang 2026",
+  "quelle_parser": "ernte-20261120 (BORIS-BW LUMNUM-Abgleich, pdftotext -layout)",
+  "modellansaetze": {},
+  "gemeinsamer_ausschuss": {
+   "boris_gasl": "22645",
+   "gemeinden": 10
+  },
+  "belege_meta": {
+   "abgerufen_am": "2026-11-20"
+  },
+  "vorjahrgang": "Sperre Jahrgang 2023 in uk-flaeche-bw-2026.json bleibt stehen."
+ },
+ {
+  "land_code": "BW",
+  "ags": "08226037",
+  "ebene": "gemeinde",
+  "gebiet_name": "Ketsch",
+  "gaa_name": "Gemeinsamer Gutachterausschuss Südwestlicher Rhein-Neckar-Kreis",
+  "ausschuss": "Gemeinsamer Gutachterausschuss Südwestlicher Rhein-Neckar-Kreis",
+  "kennzahl": "umrechnungskoeffizient_flaeche",
+  "zweig": "ifw",
+  "vollstaendig": false,
+  "zugang": "nicht abgeleitet",
+  "sperre_grund": "nur_tiefe",
+  "warum_kein_wert": "Auch zum Stichtag 01.01.2026 (Bodenrichtwerte beschlossen am 17.07.2026) führt der Ausschuss keine Umrechnungskoeffizienten für die Grundstücksgröße, sondern ein Tiefenmodell für übertiefe Wohngrundstücke: „Bei der Bewertung eines übertiefen Grundstücks erfolgt eine fiktive Aufteilung der Grundstücksfläche in das eigentliche Baugrundstück und das hausnahe Gartenland … Für die als hausnahes Gartenland eingestufte Fläche sind 35 % des Bodenrichtwerts anzusetzen.“ (Vorgarten bis 10 m, hinter dem Haus bis 20 m ab Baulinie/-grenze; Örtliche Fachinformationen 2026, PDF-S. 2–3). Das ist eine Tiefenregel. Weg: Geschäftsstelle des Gemeinsamen Gutachterausschusses Südwestlicher Rhein-Neckar-Kreis bei der Stadt Schwetzingen (schwetzingen.de); Örtliche Fachinformationen 2026 in BORIS-BW: https://www.gutachterausschuesse-bw.de/borisfachdaten/lgd/2026/08226084-GemeinsamerGutachterausschussBezirkSchwetzingen_2026.pdf",
+  "formel": null,
+  "geltungsbereich": {
+   "objektarten": [],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Geschäftsstelle des Gemeinsamen Gutachterausschusses Südwestlicher Rhein-Neckar-Kreis bei der Stadt Schwetzingen (schwetzingen.de); Örtliche Fachinformationen 2026 in BORIS-BW: https://www.gutachterausschuesse-bw.de/borisfachdaten/lgd/2026/08226084-GemeinsamerGutachterausschussBezirkSchwetzingen_2026.pdf"
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "dokument": "Örtliche Fachinformationen zur Ableitung und Verwendung der Bodenrichtwerte (Stichtag 01.01.2026), Gemeinsamer Gutachterausschuss südwestlicher Rhein-Neckar-Kreis (9 Seiten)",
+    "fundstelle": "PDF-S. 2–3, Modell für übertiefe Grundstücke, Abschnitte I–III",
+    "url": "https://www.gutachterausschuesse-bw.de/borisfachdaten/lgd/2026/08226084-GemeinsamerGutachterausschussBezirkSchwetzingen_2026.pdf",
+    "wortlaut": "„Für die als hausnahes Gartenland eingestufte Fläche sind 35 % des Bodenrichtwerts anzusetzen.“ — „Es wird eine Fläche bis 20 m Tiefe, gemessen ab der hinteren Baulinie … als Teil des typischen Baugrundstücks angerechnet.“"
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "jahrgang": 2026,
+  "quelle_url": "https://www.gutachterausschuesse-bw.de/borisfachdaten/lgd/2026/08226084-GemeinsamerGutachterausschussBezirkSchwetzingen_2026.pdf",
+  "lizenz": "Kein Lizenz- und kein Urhebervermerk im Dokument. Bereitgestellt über BORIS-BW; LGL-Infoblatt BORIS-BW: „… steht für eine kostenfreie Bodenrichtwertauskunft für Interessierte, die kommerzielle Nutzung ist ausgeschlossen.“ Genutzt nach Entscheidung von Marcel Junker (18.10.2026) auf Grundlage der Freigabe für BORIS-BW (Aktennotiz Junker Solution).",
+  "weg": "Geschäftsstelle des Gemeinsamen Gutachterausschusses Südwestlicher Rhein-Neckar-Kreis bei der Stadt Schwetzingen (schwetzingen.de); Örtliche Fachinformationen 2026 in BORIS-BW: https://www.gutachterausschuesse-bw.de/borisfachdaten/lgd/2026/08226084-GemeinsamerGutachterausschussBezirkSchwetzingen_2026.pdf",
+  "fundstelle": "PDF-S. 2–3",
+  "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gemeinsamer Gutachterausschuss Südwestlicher Rhein-Neckar-Kreis, Jahrgang 2026",
+  "quelle_parser": "ernte-20261120 (BORIS-BW LUMNUM-Abgleich, pdftotext -layout)",
+  "modellansaetze": {},
+  "gemeinsamer_ausschuss": {
+   "boris_gasl": "22645",
+   "gemeinden": 10
+  },
+  "belege_meta": {
+   "abgerufen_am": "2026-11-20"
+  },
+  "vorjahrgang": "Sperre Jahrgang 2023 in uk-flaeche-bw-2026.json bleibt stehen."
+ },
+ {
+  "land_code": "BW",
+  "ags": "08226059",
+  "ebene": "gemeinde",
+  "gebiet_name": "Neulußheim",
+  "gaa_name": "Gemeinsamer Gutachterausschuss Südwestlicher Rhein-Neckar-Kreis",
+  "ausschuss": "Gemeinsamer Gutachterausschuss Südwestlicher Rhein-Neckar-Kreis",
+  "kennzahl": "umrechnungskoeffizient_flaeche",
+  "zweig": "ifw",
+  "vollstaendig": false,
+  "zugang": "nicht abgeleitet",
+  "sperre_grund": "nur_tiefe",
+  "warum_kein_wert": "Auch zum Stichtag 01.01.2026 (Bodenrichtwerte beschlossen am 17.07.2026) führt der Ausschuss keine Umrechnungskoeffizienten für die Grundstücksgröße, sondern ein Tiefenmodell für übertiefe Wohngrundstücke: „Bei der Bewertung eines übertiefen Grundstücks erfolgt eine fiktive Aufteilung der Grundstücksfläche in das eigentliche Baugrundstück und das hausnahe Gartenland … Für die als hausnahes Gartenland eingestufte Fläche sind 35 % des Bodenrichtwerts anzusetzen.“ (Vorgarten bis 10 m, hinter dem Haus bis 20 m ab Baulinie/-grenze; Örtliche Fachinformationen 2026, PDF-S. 2–3). Das ist eine Tiefenregel. Weg: Geschäftsstelle des Gemeinsamen Gutachterausschusses Südwestlicher Rhein-Neckar-Kreis bei der Stadt Schwetzingen (schwetzingen.de); Örtliche Fachinformationen 2026 in BORIS-BW: https://www.gutachterausschuesse-bw.de/borisfachdaten/lgd/2026/08226084-GemeinsamerGutachterausschussBezirkSchwetzingen_2026.pdf",
+  "formel": null,
+  "geltungsbereich": {
+   "objektarten": [],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Geschäftsstelle des Gemeinsamen Gutachterausschusses Südwestlicher Rhein-Neckar-Kreis bei der Stadt Schwetzingen (schwetzingen.de); Örtliche Fachinformationen 2026 in BORIS-BW: https://www.gutachterausschuesse-bw.de/borisfachdaten/lgd/2026/08226084-GemeinsamerGutachterausschussBezirkSchwetzingen_2026.pdf"
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "dokument": "Örtliche Fachinformationen zur Ableitung und Verwendung der Bodenrichtwerte (Stichtag 01.01.2026), Gemeinsamer Gutachterausschuss südwestlicher Rhein-Neckar-Kreis (9 Seiten)",
+    "fundstelle": "PDF-S. 2–3, Modell für übertiefe Grundstücke, Abschnitte I–III",
+    "url": "https://www.gutachterausschuesse-bw.de/borisfachdaten/lgd/2026/08226084-GemeinsamerGutachterausschussBezirkSchwetzingen_2026.pdf",
+    "wortlaut": "„Für die als hausnahes Gartenland eingestufte Fläche sind 35 % des Bodenrichtwerts anzusetzen.“ — „Es wird eine Fläche bis 20 m Tiefe, gemessen ab der hinteren Baulinie … als Teil des typischen Baugrundstücks angerechnet.“"
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "jahrgang": 2026,
+  "quelle_url": "https://www.gutachterausschuesse-bw.de/borisfachdaten/lgd/2026/08226084-GemeinsamerGutachterausschussBezirkSchwetzingen_2026.pdf",
+  "lizenz": "Kein Lizenz- und kein Urhebervermerk im Dokument. Bereitgestellt über BORIS-BW; LGL-Infoblatt BORIS-BW: „… steht für eine kostenfreie Bodenrichtwertauskunft für Interessierte, die kommerzielle Nutzung ist ausgeschlossen.“ Genutzt nach Entscheidung von Marcel Junker (18.10.2026) auf Grundlage der Freigabe für BORIS-BW (Aktennotiz Junker Solution).",
+  "weg": "Geschäftsstelle des Gemeinsamen Gutachterausschusses Südwestlicher Rhein-Neckar-Kreis bei der Stadt Schwetzingen (schwetzingen.de); Örtliche Fachinformationen 2026 in BORIS-BW: https://www.gutachterausschuesse-bw.de/borisfachdaten/lgd/2026/08226084-GemeinsamerGutachterausschussBezirkSchwetzingen_2026.pdf",
+  "fundstelle": "PDF-S. 2–3",
+  "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gemeinsamer Gutachterausschuss Südwestlicher Rhein-Neckar-Kreis, Jahrgang 2026",
+  "quelle_parser": "ernte-20261120 (BORIS-BW LUMNUM-Abgleich, pdftotext -layout)",
+  "modellansaetze": {},
+  "gemeinsamer_ausschuss": {
+   "boris_gasl": "22645",
+   "gemeinden": 10
+  },
+  "belege_meta": {
+   "abgerufen_am": "2026-11-20"
+  },
+  "vorjahrgang": "Sperre Jahrgang 2023 in uk-flaeche-bw-2026.json bleibt stehen."
+ },
+ {
+  "land_code": "BW",
+  "ags": "08226062",
+  "ebene": "gemeinde",
+  "gebiet_name": "Oftersheim",
+  "gaa_name": "Gemeinsamer Gutachterausschuss Südwestlicher Rhein-Neckar-Kreis",
+  "ausschuss": "Gemeinsamer Gutachterausschuss Südwestlicher Rhein-Neckar-Kreis",
+  "kennzahl": "umrechnungskoeffizient_flaeche",
+  "zweig": "ifw",
+  "vollstaendig": false,
+  "zugang": "nicht abgeleitet",
+  "sperre_grund": "nur_tiefe",
+  "warum_kein_wert": "Auch zum Stichtag 01.01.2026 (Bodenrichtwerte beschlossen am 17.07.2026) führt der Ausschuss keine Umrechnungskoeffizienten für die Grundstücksgröße, sondern ein Tiefenmodell für übertiefe Wohngrundstücke: „Bei der Bewertung eines übertiefen Grundstücks erfolgt eine fiktive Aufteilung der Grundstücksfläche in das eigentliche Baugrundstück und das hausnahe Gartenland … Für die als hausnahes Gartenland eingestufte Fläche sind 35 % des Bodenrichtwerts anzusetzen.“ (Vorgarten bis 10 m, hinter dem Haus bis 20 m ab Baulinie/-grenze; Örtliche Fachinformationen 2026, PDF-S. 2–3). Das ist eine Tiefenregel. Weg: Geschäftsstelle des Gemeinsamen Gutachterausschusses Südwestlicher Rhein-Neckar-Kreis bei der Stadt Schwetzingen (schwetzingen.de); Örtliche Fachinformationen 2026 in BORIS-BW: https://www.gutachterausschuesse-bw.de/borisfachdaten/lgd/2026/08226084-GemeinsamerGutachterausschussBezirkSchwetzingen_2026.pdf",
+  "formel": null,
+  "geltungsbereich": {
+   "objektarten": [],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Geschäftsstelle des Gemeinsamen Gutachterausschusses Südwestlicher Rhein-Neckar-Kreis bei der Stadt Schwetzingen (schwetzingen.de); Örtliche Fachinformationen 2026 in BORIS-BW: https://www.gutachterausschuesse-bw.de/borisfachdaten/lgd/2026/08226084-GemeinsamerGutachterausschussBezirkSchwetzingen_2026.pdf"
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "dokument": "Örtliche Fachinformationen zur Ableitung und Verwendung der Bodenrichtwerte (Stichtag 01.01.2026), Gemeinsamer Gutachterausschuss südwestlicher Rhein-Neckar-Kreis (9 Seiten)",
+    "fundstelle": "PDF-S. 2–3, Modell für übertiefe Grundstücke, Abschnitte I–III",
+    "url": "https://www.gutachterausschuesse-bw.de/borisfachdaten/lgd/2026/08226084-GemeinsamerGutachterausschussBezirkSchwetzingen_2026.pdf",
+    "wortlaut": "„Für die als hausnahes Gartenland eingestufte Fläche sind 35 % des Bodenrichtwerts anzusetzen.“ — „Es wird eine Fläche bis 20 m Tiefe, gemessen ab der hinteren Baulinie … als Teil des typischen Baugrundstücks angerechnet.“"
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "jahrgang": 2026,
+  "quelle_url": "https://www.gutachterausschuesse-bw.de/borisfachdaten/lgd/2026/08226084-GemeinsamerGutachterausschussBezirkSchwetzingen_2026.pdf",
+  "lizenz": "Kein Lizenz- und kein Urhebervermerk im Dokument. Bereitgestellt über BORIS-BW; LGL-Infoblatt BORIS-BW: „… steht für eine kostenfreie Bodenrichtwertauskunft für Interessierte, die kommerzielle Nutzung ist ausgeschlossen.“ Genutzt nach Entscheidung von Marcel Junker (18.10.2026) auf Grundlage der Freigabe für BORIS-BW (Aktennotiz Junker Solution).",
+  "weg": "Geschäftsstelle des Gemeinsamen Gutachterausschusses Südwestlicher Rhein-Neckar-Kreis bei der Stadt Schwetzingen (schwetzingen.de); Örtliche Fachinformationen 2026 in BORIS-BW: https://www.gutachterausschuesse-bw.de/borisfachdaten/lgd/2026/08226084-GemeinsamerGutachterausschussBezirkSchwetzingen_2026.pdf",
+  "fundstelle": "PDF-S. 2–3",
+  "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gemeinsamer Gutachterausschuss Südwestlicher Rhein-Neckar-Kreis, Jahrgang 2026",
+  "quelle_parser": "ernte-20261120 (BORIS-BW LUMNUM-Abgleich, pdftotext -layout)",
+  "modellansaetze": {},
+  "gemeinsamer_ausschuss": {
+   "boris_gasl": "22645",
+   "gemeinden": 10
+  },
+  "belege_meta": {
+   "abgerufen_am": "2026-11-20"
+  },
+  "vorjahrgang": "Sperre Jahrgang 2023 in uk-flaeche-bw-2026.json bleibt stehen."
+ },
+ {
+  "land_code": "BW",
+  "ags": "08226063",
+  "ebene": "gemeinde",
+  "gebiet_name": "Plankstadt",
+  "gaa_name": "Gemeinsamer Gutachterausschuss Südwestlicher Rhein-Neckar-Kreis",
+  "ausschuss": "Gemeinsamer Gutachterausschuss Südwestlicher Rhein-Neckar-Kreis",
+  "kennzahl": "umrechnungskoeffizient_flaeche",
+  "zweig": "ifw",
+  "vollstaendig": false,
+  "zugang": "nicht abgeleitet",
+  "sperre_grund": "nur_tiefe",
+  "warum_kein_wert": "Auch zum Stichtag 01.01.2026 (Bodenrichtwerte beschlossen am 17.07.2026) führt der Ausschuss keine Umrechnungskoeffizienten für die Grundstücksgröße, sondern ein Tiefenmodell für übertiefe Wohngrundstücke: „Bei der Bewertung eines übertiefen Grundstücks erfolgt eine fiktive Aufteilung der Grundstücksfläche in das eigentliche Baugrundstück und das hausnahe Gartenland … Für die als hausnahes Gartenland eingestufte Fläche sind 35 % des Bodenrichtwerts anzusetzen.“ (Vorgarten bis 10 m, hinter dem Haus bis 20 m ab Baulinie/-grenze; Örtliche Fachinformationen 2026, PDF-S. 2–3). Das ist eine Tiefenregel. Weg: Geschäftsstelle des Gemeinsamen Gutachterausschusses Südwestlicher Rhein-Neckar-Kreis bei der Stadt Schwetzingen (schwetzingen.de); Örtliche Fachinformationen 2026 in BORIS-BW: https://www.gutachterausschuesse-bw.de/borisfachdaten/lgd/2026/08226084-GemeinsamerGutachterausschussBezirkSchwetzingen_2026.pdf",
+  "formel": null,
+  "geltungsbereich": {
+   "objektarten": [],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Geschäftsstelle des Gemeinsamen Gutachterausschusses Südwestlicher Rhein-Neckar-Kreis bei der Stadt Schwetzingen (schwetzingen.de); Örtliche Fachinformationen 2026 in BORIS-BW: https://www.gutachterausschuesse-bw.de/borisfachdaten/lgd/2026/08226084-GemeinsamerGutachterausschussBezirkSchwetzingen_2026.pdf"
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "dokument": "Örtliche Fachinformationen zur Ableitung und Verwendung der Bodenrichtwerte (Stichtag 01.01.2026), Gemeinsamer Gutachterausschuss südwestlicher Rhein-Neckar-Kreis (9 Seiten)",
+    "fundstelle": "PDF-S. 2–3, Modell für übertiefe Grundstücke, Abschnitte I–III",
+    "url": "https://www.gutachterausschuesse-bw.de/borisfachdaten/lgd/2026/08226084-GemeinsamerGutachterausschussBezirkSchwetzingen_2026.pdf",
+    "wortlaut": "„Für die als hausnahes Gartenland eingestufte Fläche sind 35 % des Bodenrichtwerts anzusetzen.“ — „Es wird eine Fläche bis 20 m Tiefe, gemessen ab der hinteren Baulinie … als Teil des typischen Baugrundstücks angerechnet.“"
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "jahrgang": 2026,
+  "quelle_url": "https://www.gutachterausschuesse-bw.de/borisfachdaten/lgd/2026/08226084-GemeinsamerGutachterausschussBezirkSchwetzingen_2026.pdf",
+  "lizenz": "Kein Lizenz- und kein Urhebervermerk im Dokument. Bereitgestellt über BORIS-BW; LGL-Infoblatt BORIS-BW: „… steht für eine kostenfreie Bodenrichtwertauskunft für Interessierte, die kommerzielle Nutzung ist ausgeschlossen.“ Genutzt nach Entscheidung von Marcel Junker (18.10.2026) auf Grundlage der Freigabe für BORIS-BW (Aktennotiz Junker Solution).",
+  "weg": "Geschäftsstelle des Gemeinsamen Gutachterausschusses Südwestlicher Rhein-Neckar-Kreis bei der Stadt Schwetzingen (schwetzingen.de); Örtliche Fachinformationen 2026 in BORIS-BW: https://www.gutachterausschuesse-bw.de/borisfachdaten/lgd/2026/08226084-GemeinsamerGutachterausschussBezirkSchwetzingen_2026.pdf",
+  "fundstelle": "PDF-S. 2–3",
+  "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gemeinsamer Gutachterausschuss Südwestlicher Rhein-Neckar-Kreis, Jahrgang 2026",
+  "quelle_parser": "ernte-20261120 (BORIS-BW LUMNUM-Abgleich, pdftotext -layout)",
+  "modellansaetze": {},
+  "gemeinsamer_ausschuss": {
+   "boris_gasl": "22645",
+   "gemeinden": 10
+  },
+  "belege_meta": {
+   "abgerufen_am": "2026-11-20"
+  },
+  "vorjahrgang": "Sperre Jahrgang 2023 in uk-flaeche-bw-2026.json bleibt stehen."
+ },
+ {
+  "land_code": "BW",
+  "ags": "08226068",
+  "ebene": "gemeinde",
+  "gebiet_name": "Reilingen",
+  "gaa_name": "Gemeinsamer Gutachterausschuss Südwestlicher Rhein-Neckar-Kreis",
+  "ausschuss": "Gemeinsamer Gutachterausschuss Südwestlicher Rhein-Neckar-Kreis",
+  "kennzahl": "umrechnungskoeffizient_flaeche",
+  "zweig": "ifw",
+  "vollstaendig": false,
+  "zugang": "nicht abgeleitet",
+  "sperre_grund": "nur_tiefe",
+  "warum_kein_wert": "Auch zum Stichtag 01.01.2026 (Bodenrichtwerte beschlossen am 17.07.2026) führt der Ausschuss keine Umrechnungskoeffizienten für die Grundstücksgröße, sondern ein Tiefenmodell für übertiefe Wohngrundstücke: „Bei der Bewertung eines übertiefen Grundstücks erfolgt eine fiktive Aufteilung der Grundstücksfläche in das eigentliche Baugrundstück und das hausnahe Gartenland … Für die als hausnahes Gartenland eingestufte Fläche sind 35 % des Bodenrichtwerts anzusetzen.“ (Vorgarten bis 10 m, hinter dem Haus bis 20 m ab Baulinie/-grenze; Örtliche Fachinformationen 2026, PDF-S. 2–3). Das ist eine Tiefenregel. Weg: Geschäftsstelle des Gemeinsamen Gutachterausschusses Südwestlicher Rhein-Neckar-Kreis bei der Stadt Schwetzingen (schwetzingen.de); Örtliche Fachinformationen 2026 in BORIS-BW: https://www.gutachterausschuesse-bw.de/borisfachdaten/lgd/2026/08226084-GemeinsamerGutachterausschussBezirkSchwetzingen_2026.pdf",
+  "formel": null,
+  "geltungsbereich": {
+   "objektarten": [],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Geschäftsstelle des Gemeinsamen Gutachterausschusses Südwestlicher Rhein-Neckar-Kreis bei der Stadt Schwetzingen (schwetzingen.de); Örtliche Fachinformationen 2026 in BORIS-BW: https://www.gutachterausschuesse-bw.de/borisfachdaten/lgd/2026/08226084-GemeinsamerGutachterausschussBezirkSchwetzingen_2026.pdf"
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "dokument": "Örtliche Fachinformationen zur Ableitung und Verwendung der Bodenrichtwerte (Stichtag 01.01.2026), Gemeinsamer Gutachterausschuss südwestlicher Rhein-Neckar-Kreis (9 Seiten)",
+    "fundstelle": "PDF-S. 2–3, Modell für übertiefe Grundstücke, Abschnitte I–III",
+    "url": "https://www.gutachterausschuesse-bw.de/borisfachdaten/lgd/2026/08226084-GemeinsamerGutachterausschussBezirkSchwetzingen_2026.pdf",
+    "wortlaut": "„Für die als hausnahes Gartenland eingestufte Fläche sind 35 % des Bodenrichtwerts anzusetzen.“ — „Es wird eine Fläche bis 20 m Tiefe, gemessen ab der hinteren Baulinie … als Teil des typischen Baugrundstücks angerechnet.“"
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "jahrgang": 2026,
+  "quelle_url": "https://www.gutachterausschuesse-bw.de/borisfachdaten/lgd/2026/08226084-GemeinsamerGutachterausschussBezirkSchwetzingen_2026.pdf",
+  "lizenz": "Kein Lizenz- und kein Urhebervermerk im Dokument. Bereitgestellt über BORIS-BW; LGL-Infoblatt BORIS-BW: „… steht für eine kostenfreie Bodenrichtwertauskunft für Interessierte, die kommerzielle Nutzung ist ausgeschlossen.“ Genutzt nach Entscheidung von Marcel Junker (18.10.2026) auf Grundlage der Freigabe für BORIS-BW (Aktennotiz Junker Solution).",
+  "weg": "Geschäftsstelle des Gemeinsamen Gutachterausschusses Südwestlicher Rhein-Neckar-Kreis bei der Stadt Schwetzingen (schwetzingen.de); Örtliche Fachinformationen 2026 in BORIS-BW: https://www.gutachterausschuesse-bw.de/borisfachdaten/lgd/2026/08226084-GemeinsamerGutachterausschussBezirkSchwetzingen_2026.pdf",
+  "fundstelle": "PDF-S. 2–3",
+  "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gemeinsamer Gutachterausschuss Südwestlicher Rhein-Neckar-Kreis, Jahrgang 2026",
+  "quelle_parser": "ernte-20261120 (BORIS-BW LUMNUM-Abgleich, pdftotext -layout)",
+  "modellansaetze": {},
+  "gemeinsamer_ausschuss": {
+   "boris_gasl": "22645",
+   "gemeinden": 10
+  },
+  "belege_meta": {
+   "abgerufen_am": "2026-11-20"
+  },
+  "vorjahrgang": "Sperre Jahrgang 2023 in uk-flaeche-bw-2026.json bleibt stehen."
+ },
+ {
+  "land_code": "BW",
+  "ags": "08226084",
+  "ebene": "gemeinde",
+  "gebiet_name": "Schwetzingen",
+  "gaa_name": "Gemeinsamer Gutachterausschuss Südwestlicher Rhein-Neckar-Kreis",
+  "ausschuss": "Gemeinsamer Gutachterausschuss Südwestlicher Rhein-Neckar-Kreis",
+  "kennzahl": "umrechnungskoeffizient_flaeche",
+  "zweig": "ifw",
+  "vollstaendig": false,
+  "zugang": "nicht abgeleitet",
+  "sperre_grund": "nur_tiefe",
+  "warum_kein_wert": "Auch zum Stichtag 01.01.2026 (Bodenrichtwerte beschlossen am 17.07.2026) führt der Ausschuss keine Umrechnungskoeffizienten für die Grundstücksgröße, sondern ein Tiefenmodell für übertiefe Wohngrundstücke: „Bei der Bewertung eines übertiefen Grundstücks erfolgt eine fiktive Aufteilung der Grundstücksfläche in das eigentliche Baugrundstück und das hausnahe Gartenland … Für die als hausnahes Gartenland eingestufte Fläche sind 35 % des Bodenrichtwerts anzusetzen.“ (Vorgarten bis 10 m, hinter dem Haus bis 20 m ab Baulinie/-grenze; Örtliche Fachinformationen 2026, PDF-S. 2–3). Das ist eine Tiefenregel. Weg: Geschäftsstelle des Gemeinsamen Gutachterausschusses Südwestlicher Rhein-Neckar-Kreis bei der Stadt Schwetzingen (schwetzingen.de); Örtliche Fachinformationen 2026 in BORIS-BW: https://www.gutachterausschuesse-bw.de/borisfachdaten/lgd/2026/08226084-GemeinsamerGutachterausschussBezirkSchwetzingen_2026.pdf",
+  "formel": null,
+  "geltungsbereich": {
+   "objektarten": [],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Geschäftsstelle des Gemeinsamen Gutachterausschusses Südwestlicher Rhein-Neckar-Kreis bei der Stadt Schwetzingen (schwetzingen.de); Örtliche Fachinformationen 2026 in BORIS-BW: https://www.gutachterausschuesse-bw.de/borisfachdaten/lgd/2026/08226084-GemeinsamerGutachterausschussBezirkSchwetzingen_2026.pdf"
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "dokument": "Örtliche Fachinformationen zur Ableitung und Verwendung der Bodenrichtwerte (Stichtag 01.01.2026), Gemeinsamer Gutachterausschuss südwestlicher Rhein-Neckar-Kreis (9 Seiten)",
+    "fundstelle": "PDF-S. 2–3, Modell für übertiefe Grundstücke, Abschnitte I–III",
+    "url": "https://www.gutachterausschuesse-bw.de/borisfachdaten/lgd/2026/08226084-GemeinsamerGutachterausschussBezirkSchwetzingen_2026.pdf",
+    "wortlaut": "„Für die als hausnahes Gartenland eingestufte Fläche sind 35 % des Bodenrichtwerts anzusetzen.“ — „Es wird eine Fläche bis 20 m Tiefe, gemessen ab der hinteren Baulinie … als Teil des typischen Baugrundstücks angerechnet.“"
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "jahrgang": 2026,
+  "quelle_url": "https://www.gutachterausschuesse-bw.de/borisfachdaten/lgd/2026/08226084-GemeinsamerGutachterausschussBezirkSchwetzingen_2026.pdf",
+  "lizenz": "Kein Lizenz- und kein Urhebervermerk im Dokument. Bereitgestellt über BORIS-BW; LGL-Infoblatt BORIS-BW: „… steht für eine kostenfreie Bodenrichtwertauskunft für Interessierte, die kommerzielle Nutzung ist ausgeschlossen.“ Genutzt nach Entscheidung von Marcel Junker (18.10.2026) auf Grundlage der Freigabe für BORIS-BW (Aktennotiz Junker Solution).",
+  "weg": "Geschäftsstelle des Gemeinsamen Gutachterausschusses Südwestlicher Rhein-Neckar-Kreis bei der Stadt Schwetzingen (schwetzingen.de); Örtliche Fachinformationen 2026 in BORIS-BW: https://www.gutachterausschuesse-bw.de/borisfachdaten/lgd/2026/08226084-GemeinsamerGutachterausschussBezirkSchwetzingen_2026.pdf",
+  "fundstelle": "PDF-S. 2–3",
+  "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gemeinsamer Gutachterausschuss Südwestlicher Rhein-Neckar-Kreis, Jahrgang 2026",
+  "quelle_parser": "ernte-20261120 (BORIS-BW LUMNUM-Abgleich, pdftotext -layout)",
+  "modellansaetze": {},
+  "gemeinsamer_ausschuss": {
+   "boris_gasl": "22645",
+   "gemeinden": 10
+  },
+  "belege_meta": {
+   "abgerufen_am": "2026-11-20"
+  },
+  "vorjahrgang": "Sperre Jahrgang 2023 in uk-flaeche-bw-2026.json bleibt stehen."
+ }
+]

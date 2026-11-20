@@ -1,21 +1,21 @@
-/* messe-schleife-daten.mjs · erzeugt 2026-11-11T08:38:29.366Z — NICHT von Hand ändern.
+/* messe-schleife-daten.mjs · erzeugt 2026-11-20T09:36:54.567Z — NICHT von Hand ändern.
    Neu erzeugen: node tools/messe-schleife-daten.mjs */
 window.DPS_REGISTER = {
- "stand": "2026-11-11",
- "erzeugt": "2026-11-11T08:38:29.366Z",
- "register_commit": "509d481b",
- "register_lokal_geaendert": false,
+ "stand": "2026-11-20",
+ "erzeugt": "2026-11-20T09:36:54.567Z",
+ "register_commit": "fe5465c6",
+ "register_lokal_geaendert": true,
  "quelle": "registerDeckung() · lib/register_deckung.js, ohne Datenbank (wie Admin „Register & Ernte\")",
- "dateien": 144,
- "saetze": 18318,
+ "dateien": 154,
+ "saetze": 18470,
  "kopf": {
-  "werte_gesamt": 6187,
-  "lzs": 2505,
-  "swf": 846,
+  "werte_gesamt": 6097,
+  "lzs": 2500,
+  "swf": 853,
   "uk_flaeche": 162,
-  "uk_wgfz": 115,
-  "vgf": 1389,
-  "uk": 277,
+  "uk_wgfz": 117,
+  "vgf": 1295,
+  "uk": 279,
   "irw_tabellen": 135,
   "irw_ausschuesse": 57,
   "ausschuesse": 201,
@@ -24,11 +24,11 @@ window.DPS_REGISTER = {
   "laender_gesamt": 16
  },
  "herkunft": {
-  "werte": 6187,
-  "mit_ausschuss": 6187,
-  "mit_jahrgang": 6187,
-  "mit_quelle": 6187,
-  "mit_seite": 6186
+  "werte": 6097,
+  "mit_ausschuss": 6097,
+  "mit_jahrgang": 6097,
+  "mit_quelle": 6097,
+  "mit_seite": 6096
  },
  "jahrgaenge": [
   2018,
@@ -125,36 +125,36 @@ window.DPS_REGISTER = {
   },
   "NW": {
    "name": "Nordrhein-Westfalen",
-   "werte": 2872,
+   "werte": 2875,
    "lzs": {
     "w": 1476,
     "anteil": 1
    },
    "swf": {
-    "w": 188,
-    "anteil": 0.93
+    "w": 190,
+    "anteil": 0.71
    },
    "uk_flaeche": {
     "w": 21,
     "anteil": 0.27
    },
    "uk_wgfz": {
-    "w": 32,
-    "anteil": 0.34
+    "w": 33,
+    "anteil": 0.35
    },
-   "anteil4": 0.93,
+   "anteil4": 0.9,
    "erfasst": true
   },
   "HE": {
    "name": "Hessen",
-   "werte": 579,
+   "werte": 590,
    "lzs": {
-    "w": 148,
-    "anteil": 0.87
+    "w": 157,
+    "anteil": 0.86
    },
    "swf": {
-    "w": 169,
-    "anteil": 0.73
+    "w": 171,
+    "anteil": 0.72
    },
    "uk_flaeche": {
     "w": 16,
@@ -164,7 +164,7 @@ window.DPS_REGISTER = {
     "w": 10,
     "anteil": 0.27
    },
-   "anteil4": 0.73,
+   "anteil4": 0.72,
    "erfasst": true
   },
   "RP": {
@@ -191,7 +191,7 @@ window.DPS_REGISTER = {
   },
   "BW": {
    "name": "Baden-Württemberg",
-   "werte": 437,
+   "werte": 438,
    "lzs": {
     "w": 242,
     "anteil": 0.09
@@ -205,7 +205,7 @@ window.DPS_REGISTER = {
     "anteil": 0
    },
    "uk_wgfz": {
-    "w": 45,
+    "w": 46,
     "anteil": 0.05
    },
    "anteil4": 0.07,
@@ -279,10 +279,10 @@ window.DPS_REGISTER = {
   },
   "BB": {
    "name": "Brandenburg",
-   "werte": 286,
+   "werte": 178,
    "lzs": {
-    "w": 100,
-    "anteil": 0.88
+    "w": 86,
+    "anteil": 0.76
    },
    "swf": {
     "w": 37,
@@ -296,7 +296,7 @@ window.DPS_REGISTER = {
     "w": 12,
     "anteil": 0.32
    },
-   "anteil4": 0.73,
+   "anteil4": 0.67,
    "erfasst": true
   },
   "MV": {
@@ -367,13 +367,13 @@ window.DPS_REGISTER = {
   },
   "TH": {
    "name": "Thüringen",
-   "werte": 136,
+   "werte": 139,
    "lzs": {
     "w": 61,
     "anteil": 0.52
    },
    "swf": {
-    "w": 75,
+    "w": 78,
     "anteil": 0.83
    },
    "uk_flaeche": {
@@ -384,7 +384,7 @@ window.DPS_REGISTER = {
     "w": 0,
     "anteil": 0
    },
-   "anteil4": 0.65,
+   "anteil4": 0.54,
    "erfasst": true
   }
  }

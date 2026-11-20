@@ -1,0 +1,1229 @@
+[
+ {
+  "land_code": "TH",
+  "ags": "16051",
+  "ebene": "kreis",
+  "gebiet_name": "Erfurt, kreisfreie Stadt",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte für das Gebiet der kreisfreien Stadt Erfurt",
+  "ausschuss": "Gutachterausschuss für Grundstückswerte für das Gebiet der kreisfreien Stadt Erfurt",
+  "kennzahl": "umrechnungskoeffizient_wgfz",
+  "zweig": "alle",
+  "vollstaendig": false,
+  "zugang": "nicht veröffentlicht",
+  "warum_kein_wert": "Der örtliche Ausschuss veröffentlicht keine eigenen Umrechnungskoeffizienten für die wertrelevante Geschossflächenzahl (WGFZ): in seinen jüngsten Heften (Immobilienmarktinformation 2026; Sachwertfaktoren 2026) steht keine solche Tabelle, und das ThULB-Verzeichnis führt für keinen örtlichen Thüringer Ausschuss ein Heft mit Umrechnungskoeffizienten. Kein Nachbarwert, keine VW-RL. Weg: Geschäftsstelle des Gutachterausschuss für Grundstückswerte für das Gebiet der kreisfreien Stadt Erfurt (c/o TLBG, Hohenwindenstraße 13 a, 99086 Erfurt), gutachter.erfurt@tlbg.thueringen.de; Veröffentlichungen im ThULB-Verzeichnis. Landesweite Koeffizienten der Zentralen Geschäftsstelle (TLBG) sind veröffentlicht, aber nur für den privaten, nicht kommerziellen Gebrauch freigegeben (Satz der Zentralen Geschäftsstelle, uk-flaeche-laender-2026.json / uk-wgfz-ost-west-2026.json) — gesperrt bis zur Klärung der Nutzungsrechte.",
+  "formel": null,
+  "geltungsbereich": {
+   "objektarten": [],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Geschäftsstelle des Gutachterausschuss für Grundstückswerte für das Gebiet der kreisfreien Stadt Erfurt (c/o TLBG, Hohenwindenstraße 13 a, 99086 Erfurt), gutachter.erfurt@tlbg.thueringen.de; Veröffentlichungen im ThULB-Verzeichnis. Landesweite Koeffizienten der Zentralen Geschäftsstelle (TLBG) sind veröffentlicht, aber nur für den privaten, nicht kommerziellen Gebrauch freigegeben (Satz der Zentralen Geschäftsstelle, uk-flaeche-laender-2026.json / uk-wgfz-ost-west-2026.json) — gesperrt bis zur Klärung der Nutzungsrechte."
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "dokument": "Immobilienmarktinformation 2026 – Gutachterausschuss für Grundstückswerte für das Gebiet der kreisfreien Stadt Erfurt",
+    "fundstelle": "ganzes Dokument, Textsuche (leerzeichenbereinigt) nach „Umrechnungskoeffizient“ und „Geschossfläche“ ohne Treffer (20.11.2026); Impressum letzte Seite",
+    "url": "https://zs.thulb.uni-jena.de/servlets/MCRFileNodeServlet/jportal_derivate_00449738/2026_immo_r2610_ohne_Kennwort.pdf",
+    "wortlaut": "kein Treffer"
+   },
+   {
+    "art": "amtliche Veröffentlichung",
+    "dokument": "Sachwertfaktoren 2026 – Gutachterausschuss für Grundstückswerte für das Gebiet der kreisfreien Stadt Erfurt",
+    "fundstelle": "ganzes Dokument, Textsuche (leerzeichenbereinigt) nach „Umrechnungskoeffizient“ und „Geschossfläche“ ohne Treffer (20.11.2026); Impressum letzte Seite",
+    "url": "https://zs.thulb.uni-jena.de/servlets/MCRFileNodeServlet/jportal_derivate_00453245/2026_SWF_R2610_ohne_Kennwort_pdfa2b.pdf",
+    "wortlaut": "kein Treffer"
+   },
+   {
+    "art": "Verzeichnis",
+    "dokument": "ThULB journals@UrMEL",
+    "fundstelle": "Solr-Abfrage objectType:jpjournal, maintitle *Gutachterausschu* (54 Treffer), Stand 20.11.2026",
+    "url": "https://zs.thulb.uni-jena.de/",
+    "wortlaut": "ThULB-Veröffentlichungsverzeichnis (zs.thulb.uni-jena.de, Solr-Abfrage aller 54 Zeitschriften mit „Gutachterausschuss“ im Titel, 20.11.2026): kein Heft eines örtlichen Thüringer Ausschusses mit Umrechnungskoeffizienten; geführt werden Liegenschaftszinssätze/Rohertragsfaktoren, Sachwertfaktoren, Bodenpreisindexreihen, Vergleichsfaktoren (nur Erfurt, Wohnungseigentum) und Immobilienmarktberichte bis 2020."
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "berichtsjahr": 2026,
+  "jahrgang": 2026,
+  "stichtag": "2026-01-01",
+  "stichtag_hinweis": "Kein eigener Stichtag (keine Veröffentlichung); eingetragen ist der Bezugsjahrgang der jüngsten gelesenen Hefte.",
+  "quelle_url": "https://zs.thulb.uni-jena.de/servlets/MCRFileNodeServlet/jportal_derivate_00449738/2026_immo_r2610_ohne_Kennwort.pdf",
+  "landeswert_url": "https://tlbg.thueringen.de/wertermittlung/online-grundstuecksmarktinformationen/umrechnungskoeffizienten/wgfz",
+  "quelle_parser": "ernte-20261120 (ThULB-Solr + pdftotext, Textsuche)",
+  "modellversion": "Umrechnungskoeffizienten für die wertrelevante Geschossflächenzahl (WGFZ) (§ 16 Abs. 4, § 40 ImmoWertV), Gutachterausschuss für Grundstückswerte für das Gebiet der kreisfreien Stadt Erfurt, Jahrgang 2026",
+  "modellansaetze": {},
+  "lizenz": "„Eine Wiedergabe von Daten aus diesem Dokument ist nur mit Quellenangabe gestattet.“ (Titelrückseite der Hefte)",
+  "weg": "Geschäftsstelle des Gutachterausschuss für Grundstückswerte für das Gebiet der kreisfreien Stadt Erfurt (c/o TLBG, Hohenwindenstraße 13 a, 99086 Erfurt), gutachter.erfurt@tlbg.thueringen.de; Veröffentlichungen im ThULB-Verzeichnis. Landesweite Koeffizienten der Zentralen Geschäftsstelle (TLBG) sind veröffentlicht, aber nur für den privaten, nicht kommerziellen Gebrauch freigegeben (Satz der Zentralen Geschäftsstelle, uk-flaeche-laender-2026.json / uk-wgfz-ost-west-2026.json) — gesperrt bis zur Klärung der Nutzungsrechte.",
+  "belege_meta": {
+   "abgerufen_am": "2026-11-20"
+  }
+ },
+ {
+  "land_code": "TH",
+  "ags": "16070",
+  "ebene": "kreis",
+  "gebiet_name": "Ilm-Kreis",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte für das Gebiet des Ilm-Kreises, des Landkreises Saalfeld-Rudolstadt und des Landkreises Sonneberg",
+  "ausschuss": "Gutachterausschuss für Grundstückswerte für das Gebiet des Ilm-Kreises, des Landkreises Saalfeld-Rudolstadt und des Landkreises Sonneberg",
+  "kennzahl": "umrechnungskoeffizient_wgfz",
+  "zweig": "alle",
+  "vollstaendig": false,
+  "zugang": "nicht veröffentlicht",
+  "warum_kein_wert": "Der örtliche Ausschuss veröffentlicht keine eigenen Umrechnungskoeffizienten für die wertrelevante Geschossflächenzahl (WGFZ): in seinen jüngsten Heften (Liegenschaftszinssätze 2025; Sachwertfaktoren 2025) steht keine solche Tabelle, und das ThULB-Verzeichnis führt für keinen örtlichen Thüringer Ausschuss ein Heft mit Umrechnungskoeffizienten. Kein Nachbarwert, keine VW-RL. Weg: Geschäftsstelle des Gutachterausschuss für Grundstückswerte für das Gebiet des Ilm-Kreises, des Landkreises Saalfeld-Rudolstadt und des Landkreises Sonneberg (c/o TLBG, Zweigstelle Saalfeld, Albrecht-Dürer-Straße 3, 07318 Saalfeld), gutachter.saalfeld@tlbg.thueringen.de; Veröffentlichungen im ThULB-Verzeichnis. Landesweite Koeffizienten der Zentralen Geschäftsstelle (TLBG) sind veröffentlicht, aber nur für den privaten, nicht kommerziellen Gebrauch freigegeben (Satz der Zentralen Geschäftsstelle, uk-flaeche-laender-2026.json / uk-wgfz-ost-west-2026.json) — gesperrt bis zur Klärung der Nutzungsrechte.",
+  "formel": null,
+  "geltungsbereich": {
+   "objektarten": [],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Geschäftsstelle des Gutachterausschuss für Grundstückswerte für das Gebiet des Ilm-Kreises, des Landkreises Saalfeld-Rudolstadt und des Landkreises Sonneberg (c/o TLBG, Zweigstelle Saalfeld, Albrecht-Dürer-Straße 3, 07318 Saalfeld), gutachter.saalfeld@tlbg.thueringen.de; Veröffentlichungen im ThULB-Verzeichnis. Landesweite Koeffizienten der Zentralen Geschäftsstelle (TLBG) sind veröffentlicht, aber nur für den privaten, nicht kommerziellen Gebrauch freigegeben (Satz der Zentralen Geschäftsstelle, uk-flaeche-laender-2026.json / uk-wgfz-ost-west-2026.json) — gesperrt bis zur Klärung der Nutzungsrechte."
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "dokument": "Liegenschaftszinssätze 2025 – Gutachterausschuss für Grundstückswerte für das Gebiet des Ilm-Kreises, des Landkreises Saalfeld-Rudolstadt und des Landkreises Sonneberg",
+    "fundstelle": "ganzes Dokument, Textsuche (leerzeichenbereinigt) nach „Umrechnungskoeffizient“ und „Geschossfläche“ ohne Treffer (20.11.2026); Impressum letzte Seite",
+    "url": "https://zs.thulb.uni-jena.de/servlets/MCRFileNodeServlet/jportal_derivate_00363194/LiegIlm2025.pdf",
+    "wortlaut": "kein Treffer"
+   },
+   {
+    "art": "amtliche Veröffentlichung",
+    "dokument": "Sachwertfaktoren 2025 – Gutachterausschuss für Grundstückswerte für das Gebiet des Ilm-Kreises, des Landkreises Saalfeld-Rudolstadt und des Landkreises Sonneberg",
+    "fundstelle": "ganzes Dokument, Textsuche (leerzeichenbereinigt) nach „Umrechnungskoeffizient“ und „Geschossfläche“ ohne Treffer (20.11.2026); Impressum letzte Seite",
+    "url": "https://zs.thulb.uni-jena.de/servlets/MCRFileNodeServlet/jportal_derivate_00363195/SachwertIlm2025.pdf",
+    "wortlaut": "kein Treffer"
+   },
+   {
+    "art": "Verzeichnis",
+    "dokument": "ThULB journals@UrMEL",
+    "fundstelle": "Solr-Abfrage objectType:jpjournal, maintitle *Gutachterausschu* (54 Treffer), Stand 20.11.2026",
+    "url": "https://zs.thulb.uni-jena.de/",
+    "wortlaut": "ThULB-Veröffentlichungsverzeichnis (zs.thulb.uni-jena.de, Solr-Abfrage aller 54 Zeitschriften mit „Gutachterausschuss“ im Titel, 20.11.2026): kein Heft eines örtlichen Thüringer Ausschusses mit Umrechnungskoeffizienten; geführt werden Liegenschaftszinssätze/Rohertragsfaktoren, Sachwertfaktoren, Bodenpreisindexreihen, Vergleichsfaktoren (nur Erfurt, Wohnungseigentum) und Immobilienmarktberichte bis 2020."
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "berichtsjahr": 2025,
+  "jahrgang": 2025,
+  "stichtag": "2025-01-01",
+  "stichtag_hinweis": "Kein eigener Stichtag (keine Veröffentlichung); eingetragen ist der Bezugsjahrgang der jüngsten gelesenen Hefte.",
+  "quelle_url": "https://zs.thulb.uni-jena.de/servlets/MCRFileNodeServlet/jportal_derivate_00363194/LiegIlm2025.pdf",
+  "landeswert_url": "https://tlbg.thueringen.de/wertermittlung/online-grundstuecksmarktinformationen/umrechnungskoeffizienten/wgfz",
+  "quelle_parser": "ernte-20261120 (ThULB-Solr + pdftotext, Textsuche)",
+  "modellversion": "Umrechnungskoeffizienten für die wertrelevante Geschossflächenzahl (WGFZ) (§ 16 Abs. 4, § 40 ImmoWertV), Gutachterausschuss für Grundstückswerte für das Gebiet des Ilm-Kreises, des Landkreises Saalfeld-Rudolstadt und des Landkreises Sonneberg, Jahrgang 2025",
+  "modellansaetze": {},
+  "lizenz": "„Eine Wiedergabe von Daten aus diesem Dokument ist nur mit Quellenangabe gestattet.“ (Titelrückseite der Hefte)",
+  "weg": "Geschäftsstelle des Gutachterausschuss für Grundstückswerte für das Gebiet des Ilm-Kreises, des Landkreises Saalfeld-Rudolstadt und des Landkreises Sonneberg (c/o TLBG, Zweigstelle Saalfeld, Albrecht-Dürer-Straße 3, 07318 Saalfeld), gutachter.saalfeld@tlbg.thueringen.de; Veröffentlichungen im ThULB-Verzeichnis. Landesweite Koeffizienten der Zentralen Geschäftsstelle (TLBG) sind veröffentlicht, aber nur für den privaten, nicht kommerziellen Gebrauch freigegeben (Satz der Zentralen Geschäftsstelle, uk-flaeche-laender-2026.json / uk-wgfz-ost-west-2026.json) — gesperrt bis zur Klärung der Nutzungsrechte.",
+  "belege_meta": {
+   "abgerufen_am": "2026-11-20"
+  }
+ },
+ {
+  "land_code": "TH",
+  "ags": "16073",
+  "ebene": "kreis",
+  "gebiet_name": "Saalfeld-Rudolstadt, Landkreis",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte für das Gebiet des Ilm-Kreises, des Landkreises Saalfeld-Rudolstadt und des Landkreises Sonneberg",
+  "ausschuss": "Gutachterausschuss für Grundstückswerte für das Gebiet des Ilm-Kreises, des Landkreises Saalfeld-Rudolstadt und des Landkreises Sonneberg",
+  "kennzahl": "umrechnungskoeffizient_wgfz",
+  "zweig": "alle",
+  "vollstaendig": false,
+  "zugang": "nicht veröffentlicht",
+  "warum_kein_wert": "Der örtliche Ausschuss veröffentlicht keine eigenen Umrechnungskoeffizienten für die wertrelevante Geschossflächenzahl (WGFZ): in seinen jüngsten Heften (Liegenschaftszinssätze 2025; Sachwertfaktoren 2025) steht keine solche Tabelle, und das ThULB-Verzeichnis führt für keinen örtlichen Thüringer Ausschuss ein Heft mit Umrechnungskoeffizienten. Kein Nachbarwert, keine VW-RL. Weg: Geschäftsstelle des Gutachterausschuss für Grundstückswerte für das Gebiet des Ilm-Kreises, des Landkreises Saalfeld-Rudolstadt und des Landkreises Sonneberg (c/o TLBG, Zweigstelle Saalfeld, Albrecht-Dürer-Straße 3, 07318 Saalfeld), gutachter.saalfeld@tlbg.thueringen.de; Veröffentlichungen im ThULB-Verzeichnis. Landesweite Koeffizienten der Zentralen Geschäftsstelle (TLBG) sind veröffentlicht, aber nur für den privaten, nicht kommerziellen Gebrauch freigegeben (Satz der Zentralen Geschäftsstelle, uk-flaeche-laender-2026.json / uk-wgfz-ost-west-2026.json) — gesperrt bis zur Klärung der Nutzungsrechte.",
+  "formel": null,
+  "geltungsbereich": {
+   "objektarten": [],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Geschäftsstelle des Gutachterausschuss für Grundstückswerte für das Gebiet des Ilm-Kreises, des Landkreises Saalfeld-Rudolstadt und des Landkreises Sonneberg (c/o TLBG, Zweigstelle Saalfeld, Albrecht-Dürer-Straße 3, 07318 Saalfeld), gutachter.saalfeld@tlbg.thueringen.de; Veröffentlichungen im ThULB-Verzeichnis. Landesweite Koeffizienten der Zentralen Geschäftsstelle (TLBG) sind veröffentlicht, aber nur für den privaten, nicht kommerziellen Gebrauch freigegeben (Satz der Zentralen Geschäftsstelle, uk-flaeche-laender-2026.json / uk-wgfz-ost-west-2026.json) — gesperrt bis zur Klärung der Nutzungsrechte."
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "dokument": "Liegenschaftszinssätze 2025 – Gutachterausschuss für Grundstückswerte für das Gebiet des Ilm-Kreises, des Landkreises Saalfeld-Rudolstadt und des Landkreises Sonneberg",
+    "fundstelle": "ganzes Dokument, Textsuche (leerzeichenbereinigt) nach „Umrechnungskoeffizient“ und „Geschossfläche“ ohne Treffer (20.11.2026); Impressum letzte Seite",
+    "url": "https://zs.thulb.uni-jena.de/servlets/MCRFileNodeServlet/jportal_derivate_00363194/LiegIlm2025.pdf",
+    "wortlaut": "kein Treffer"
+   },
+   {
+    "art": "amtliche Veröffentlichung",
+    "dokument": "Sachwertfaktoren 2025 – Gutachterausschuss für Grundstückswerte für das Gebiet des Ilm-Kreises, des Landkreises Saalfeld-Rudolstadt und des Landkreises Sonneberg",
+    "fundstelle": "ganzes Dokument, Textsuche (leerzeichenbereinigt) nach „Umrechnungskoeffizient“ und „Geschossfläche“ ohne Treffer (20.11.2026); Impressum letzte Seite",
+    "url": "https://zs.thulb.uni-jena.de/servlets/MCRFileNodeServlet/jportal_derivate_00363195/SachwertIlm2025.pdf",
+    "wortlaut": "kein Treffer"
+   },
+   {
+    "art": "Verzeichnis",
+    "dokument": "ThULB journals@UrMEL",
+    "fundstelle": "Solr-Abfrage objectType:jpjournal, maintitle *Gutachterausschu* (54 Treffer), Stand 20.11.2026",
+    "url": "https://zs.thulb.uni-jena.de/",
+    "wortlaut": "ThULB-Veröffentlichungsverzeichnis (zs.thulb.uni-jena.de, Solr-Abfrage aller 54 Zeitschriften mit „Gutachterausschuss“ im Titel, 20.11.2026): kein Heft eines örtlichen Thüringer Ausschusses mit Umrechnungskoeffizienten; geführt werden Liegenschaftszinssätze/Rohertragsfaktoren, Sachwertfaktoren, Bodenpreisindexreihen, Vergleichsfaktoren (nur Erfurt, Wohnungseigentum) und Immobilienmarktberichte bis 2020."
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "berichtsjahr": 2025,
+  "jahrgang": 2025,
+  "stichtag": "2025-01-01",
+  "stichtag_hinweis": "Kein eigener Stichtag (keine Veröffentlichung); eingetragen ist der Bezugsjahrgang der jüngsten gelesenen Hefte.",
+  "quelle_url": "https://zs.thulb.uni-jena.de/servlets/MCRFileNodeServlet/jportal_derivate_00363194/LiegIlm2025.pdf",
+  "landeswert_url": "https://tlbg.thueringen.de/wertermittlung/online-grundstuecksmarktinformationen/umrechnungskoeffizienten/wgfz",
+  "quelle_parser": "ernte-20261120 (ThULB-Solr + pdftotext, Textsuche)",
+  "modellversion": "Umrechnungskoeffizienten für die wertrelevante Geschossflächenzahl (WGFZ) (§ 16 Abs. 4, § 40 ImmoWertV), Gutachterausschuss für Grundstückswerte für das Gebiet des Ilm-Kreises, des Landkreises Saalfeld-Rudolstadt und des Landkreises Sonneberg, Jahrgang 2025",
+  "modellansaetze": {},
+  "lizenz": "„Eine Wiedergabe von Daten aus diesem Dokument ist nur mit Quellenangabe gestattet.“ (Titelrückseite der Hefte)",
+  "weg": "Geschäftsstelle des Gutachterausschuss für Grundstückswerte für das Gebiet des Ilm-Kreises, des Landkreises Saalfeld-Rudolstadt und des Landkreises Sonneberg (c/o TLBG, Zweigstelle Saalfeld, Albrecht-Dürer-Straße 3, 07318 Saalfeld), gutachter.saalfeld@tlbg.thueringen.de; Veröffentlichungen im ThULB-Verzeichnis. Landesweite Koeffizienten der Zentralen Geschäftsstelle (TLBG) sind veröffentlicht, aber nur für den privaten, nicht kommerziellen Gebrauch freigegeben (Satz der Zentralen Geschäftsstelle, uk-flaeche-laender-2026.json / uk-wgfz-ost-west-2026.json) — gesperrt bis zur Klärung der Nutzungsrechte.",
+  "belege_meta": {
+   "abgerufen_am": "2026-11-20"
+  }
+ },
+ {
+  "land_code": "TH",
+  "ags": "16072",
+  "ebene": "kreis",
+  "gebiet_name": "Sonneberg, Landkreis",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte für das Gebiet des Ilm-Kreises, des Landkreises Saalfeld-Rudolstadt und des Landkreises Sonneberg",
+  "ausschuss": "Gutachterausschuss für Grundstückswerte für das Gebiet des Ilm-Kreises, des Landkreises Saalfeld-Rudolstadt und des Landkreises Sonneberg",
+  "kennzahl": "umrechnungskoeffizient_wgfz",
+  "zweig": "alle",
+  "vollstaendig": false,
+  "zugang": "nicht veröffentlicht",
+  "warum_kein_wert": "Der örtliche Ausschuss veröffentlicht keine eigenen Umrechnungskoeffizienten für die wertrelevante Geschossflächenzahl (WGFZ): in seinen jüngsten Heften (Liegenschaftszinssätze 2025; Sachwertfaktoren 2025) steht keine solche Tabelle, und das ThULB-Verzeichnis führt für keinen örtlichen Thüringer Ausschuss ein Heft mit Umrechnungskoeffizienten. Kein Nachbarwert, keine VW-RL. Weg: Geschäftsstelle des Gutachterausschuss für Grundstückswerte für das Gebiet des Ilm-Kreises, des Landkreises Saalfeld-Rudolstadt und des Landkreises Sonneberg (c/o TLBG, Zweigstelle Saalfeld, Albrecht-Dürer-Straße 3, 07318 Saalfeld), gutachter.saalfeld@tlbg.thueringen.de; Veröffentlichungen im ThULB-Verzeichnis. Landesweite Koeffizienten der Zentralen Geschäftsstelle (TLBG) sind veröffentlicht, aber nur für den privaten, nicht kommerziellen Gebrauch freigegeben (Satz der Zentralen Geschäftsstelle, uk-flaeche-laender-2026.json / uk-wgfz-ost-west-2026.json) — gesperrt bis zur Klärung der Nutzungsrechte.",
+  "formel": null,
+  "geltungsbereich": {
+   "objektarten": [],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Geschäftsstelle des Gutachterausschuss für Grundstückswerte für das Gebiet des Ilm-Kreises, des Landkreises Saalfeld-Rudolstadt und des Landkreises Sonneberg (c/o TLBG, Zweigstelle Saalfeld, Albrecht-Dürer-Straße 3, 07318 Saalfeld), gutachter.saalfeld@tlbg.thueringen.de; Veröffentlichungen im ThULB-Verzeichnis. Landesweite Koeffizienten der Zentralen Geschäftsstelle (TLBG) sind veröffentlicht, aber nur für den privaten, nicht kommerziellen Gebrauch freigegeben (Satz der Zentralen Geschäftsstelle, uk-flaeche-laender-2026.json / uk-wgfz-ost-west-2026.json) — gesperrt bis zur Klärung der Nutzungsrechte."
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "dokument": "Liegenschaftszinssätze 2025 – Gutachterausschuss für Grundstückswerte für das Gebiet des Ilm-Kreises, des Landkreises Saalfeld-Rudolstadt und des Landkreises Sonneberg",
+    "fundstelle": "ganzes Dokument, Textsuche (leerzeichenbereinigt) nach „Umrechnungskoeffizient“ und „Geschossfläche“ ohne Treffer (20.11.2026); Impressum letzte Seite",
+    "url": "https://zs.thulb.uni-jena.de/servlets/MCRFileNodeServlet/jportal_derivate_00363194/LiegIlm2025.pdf",
+    "wortlaut": "kein Treffer"
+   },
+   {
+    "art": "amtliche Veröffentlichung",
+    "dokument": "Sachwertfaktoren 2025 – Gutachterausschuss für Grundstückswerte für das Gebiet des Ilm-Kreises, des Landkreises Saalfeld-Rudolstadt und des Landkreises Sonneberg",
+    "fundstelle": "ganzes Dokument, Textsuche (leerzeichenbereinigt) nach „Umrechnungskoeffizient“ und „Geschossfläche“ ohne Treffer (20.11.2026); Impressum letzte Seite",
+    "url": "https://zs.thulb.uni-jena.de/servlets/MCRFileNodeServlet/jportal_derivate_00363195/SachwertIlm2025.pdf",
+    "wortlaut": "kein Treffer"
+   },
+   {
+    "art": "Verzeichnis",
+    "dokument": "ThULB journals@UrMEL",
+    "fundstelle": "Solr-Abfrage objectType:jpjournal, maintitle *Gutachterausschu* (54 Treffer), Stand 20.11.2026",
+    "url": "https://zs.thulb.uni-jena.de/",
+    "wortlaut": "ThULB-Veröffentlichungsverzeichnis (zs.thulb.uni-jena.de, Solr-Abfrage aller 54 Zeitschriften mit „Gutachterausschuss“ im Titel, 20.11.2026): kein Heft eines örtlichen Thüringer Ausschusses mit Umrechnungskoeffizienten; geführt werden Liegenschaftszinssätze/Rohertragsfaktoren, Sachwertfaktoren, Bodenpreisindexreihen, Vergleichsfaktoren (nur Erfurt, Wohnungseigentum) und Immobilienmarktberichte bis 2020."
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "berichtsjahr": 2025,
+  "jahrgang": 2025,
+  "stichtag": "2025-01-01",
+  "stichtag_hinweis": "Kein eigener Stichtag (keine Veröffentlichung); eingetragen ist der Bezugsjahrgang der jüngsten gelesenen Hefte.",
+  "quelle_url": "https://zs.thulb.uni-jena.de/servlets/MCRFileNodeServlet/jportal_derivate_00363194/LiegIlm2025.pdf",
+  "landeswert_url": "https://tlbg.thueringen.de/wertermittlung/online-grundstuecksmarktinformationen/umrechnungskoeffizienten/wgfz",
+  "quelle_parser": "ernte-20261120 (ThULB-Solr + pdftotext, Textsuche)",
+  "modellversion": "Umrechnungskoeffizienten für die wertrelevante Geschossflächenzahl (WGFZ) (§ 16 Abs. 4, § 40 ImmoWertV), Gutachterausschuss für Grundstückswerte für das Gebiet des Ilm-Kreises, des Landkreises Saalfeld-Rudolstadt und des Landkreises Sonneberg, Jahrgang 2025",
+  "modellansaetze": {},
+  "lizenz": "„Eine Wiedergabe von Daten aus diesem Dokument ist nur mit Quellenangabe gestattet.“ (Titelrückseite der Hefte)",
+  "weg": "Geschäftsstelle des Gutachterausschuss für Grundstückswerte für das Gebiet des Ilm-Kreises, des Landkreises Saalfeld-Rudolstadt und des Landkreises Sonneberg (c/o TLBG, Zweigstelle Saalfeld, Albrecht-Dürer-Straße 3, 07318 Saalfeld), gutachter.saalfeld@tlbg.thueringen.de; Veröffentlichungen im ThULB-Verzeichnis. Landesweite Koeffizienten der Zentralen Geschäftsstelle (TLBG) sind veröffentlicht, aber nur für den privaten, nicht kommerziellen Gebrauch freigegeben (Satz der Zentralen Geschäftsstelle, uk-flaeche-laender-2026.json / uk-wgfz-ost-west-2026.json) — gesperrt bis zur Klärung der Nutzungsrechte.",
+  "belege_meta": {
+   "abgerufen_am": "2026-11-20"
+  }
+ },
+ {
+  "land_code": "TH",
+  "ags": "16065",
+  "ebene": "kreis",
+  "gebiet_name": "Kyffhäuserkreis",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte für das Gebiet des Kyffhäuserkreises und des Landkreises Nordhausen",
+  "ausschuss": "Gutachterausschuss für Grundstückswerte für das Gebiet des Kyffhäuserkreises und des Landkreises Nordhausen",
+  "kennzahl": "umrechnungskoeffizient_wgfz",
+  "zweig": "alle",
+  "vollstaendig": false,
+  "zugang": "nicht veröffentlicht",
+  "warum_kein_wert": "Der örtliche Ausschuss veröffentlicht keine eigenen Umrechnungskoeffizienten für die wertrelevante Geschossflächenzahl (WGFZ): in seinen jüngsten Heften (Sachwertfaktoren 2024; Liegenschaftszinssätze, Rohertragsfaktoren und Umsatzberichte 2022) steht keine solche Tabelle, und das ThULB-Verzeichnis führt für keinen örtlichen Thüringer Ausschuss ein Heft mit Umrechnungskoeffizienten. Kein Nachbarwert, keine VW-RL. Weg: Geschäftsstelle des Gutachterausschuss für Grundstückswerte für das Gebiet des Kyffhäuserkreises und des Landkreises Nordhausen (c/o TLBG, Katasterbereich Artern, Alte Poststraße 10, 06556 Artern), gutachter.artern@tlbg.thueringen.de; Veröffentlichungen im ThULB-Verzeichnis. Landesweite Koeffizienten der Zentralen Geschäftsstelle (TLBG) sind veröffentlicht, aber nur für den privaten, nicht kommerziellen Gebrauch freigegeben (Satz der Zentralen Geschäftsstelle, uk-flaeche-laender-2026.json / uk-wgfz-ost-west-2026.json) — gesperrt bis zur Klärung der Nutzungsrechte.",
+  "formel": null,
+  "geltungsbereich": {
+   "objektarten": [],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Geschäftsstelle des Gutachterausschuss für Grundstückswerte für das Gebiet des Kyffhäuserkreises und des Landkreises Nordhausen (c/o TLBG, Katasterbereich Artern, Alte Poststraße 10, 06556 Artern), gutachter.artern@tlbg.thueringen.de; Veröffentlichungen im ThULB-Verzeichnis. Landesweite Koeffizienten der Zentralen Geschäftsstelle (TLBG) sind veröffentlicht, aber nur für den privaten, nicht kommerziellen Gebrauch freigegeben (Satz der Zentralen Geschäftsstelle, uk-flaeche-laender-2026.json / uk-wgfz-ost-west-2026.json) — gesperrt bis zur Klärung der Nutzungsrechte."
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "dokument": "Sachwertfaktoren 2024 – Gutachterausschuss für Grundstückswerte für das Gebiet des Kyffhäuserkreises und des Landkreises Nordhausen",
+    "fundstelle": "ganzes Dokument, Textsuche (leerzeichenbereinigt) nach „Umrechnungskoeffizient“ und „Geschossfläche“ ohne Treffer (20.11.2026); Impressum letzte Seite",
+    "url": "https://zs.thulb.uni-jena.de/servlets/MCRFileNodeServlet/jportal_derivate_00362095/20254161140-2024_SWF_R263_neu_ohneKennwortPDFA.pdf",
+    "wortlaut": "kein Treffer"
+   },
+   {
+    "art": "amtliche Veröffentlichung",
+    "dokument": "Liegenschaftszinssätze, Rohertragsfaktoren und Umsatzberichte 2022 – Gutachterausschuss für Grundstückswerte für das Gebiet des Kyffhäuserkreises und des Landkreises Nordhausen",
+    "fundstelle": "ganzes Dokument, Textsuche (leerzeichenbereinigt) nach „Umrechnungskoeffizient“ und „Geschossfläche“ ohne Treffer (20.11.2026); Impressum letzte Seite",
+    "url": "https://zs.thulb.uni-jena.de/servlets/MCRFileNodeServlet/jportal_derivate_00341770/20232991-2022.pdf",
+    "wortlaut": "kein Treffer"
+   },
+   {
+    "art": "Verzeichnis",
+    "dokument": "ThULB journals@UrMEL",
+    "fundstelle": "Solr-Abfrage objectType:jpjournal, maintitle *Gutachterausschu* (54 Treffer), Stand 20.11.2026",
+    "url": "https://zs.thulb.uni-jena.de/",
+    "wortlaut": "ThULB-Veröffentlichungsverzeichnis (zs.thulb.uni-jena.de, Solr-Abfrage aller 54 Zeitschriften mit „Gutachterausschuss“ im Titel, 20.11.2026): kein Heft eines örtlichen Thüringer Ausschusses mit Umrechnungskoeffizienten; geführt werden Liegenschaftszinssätze/Rohertragsfaktoren, Sachwertfaktoren, Bodenpreisindexreihen, Vergleichsfaktoren (nur Erfurt, Wohnungseigentum) und Immobilienmarktberichte bis 2020."
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "berichtsjahr": 2024,
+  "jahrgang": 2024,
+  "stichtag": "2024-01-01",
+  "stichtag_hinweis": "Kein eigener Stichtag (keine Veröffentlichung); eingetragen ist der Bezugsjahrgang der jüngsten gelesenen Hefte.",
+  "quelle_url": "https://zs.thulb.uni-jena.de/servlets/MCRFileNodeServlet/jportal_derivate_00362095/20254161140-2024_SWF_R263_neu_ohneKennwortPDFA.pdf",
+  "landeswert_url": "https://tlbg.thueringen.de/wertermittlung/online-grundstuecksmarktinformationen/umrechnungskoeffizienten/wgfz",
+  "quelle_parser": "ernte-20261120 (ThULB-Solr + pdftotext, Textsuche)",
+  "modellversion": "Umrechnungskoeffizienten für die wertrelevante Geschossflächenzahl (WGFZ) (§ 16 Abs. 4, § 40 ImmoWertV), Gutachterausschuss für Grundstückswerte für das Gebiet des Kyffhäuserkreises und des Landkreises Nordhausen, Jahrgang 2024",
+  "modellansaetze": {},
+  "lizenz": "„Eine Wiedergabe von Daten aus diesem Dokument ist nur mit Quellenangabe gestattet.“ (Titelrückseite der Hefte)",
+  "weg": "Geschäftsstelle des Gutachterausschuss für Grundstückswerte für das Gebiet des Kyffhäuserkreises und des Landkreises Nordhausen (c/o TLBG, Katasterbereich Artern, Alte Poststraße 10, 06556 Artern), gutachter.artern@tlbg.thueringen.de; Veröffentlichungen im ThULB-Verzeichnis. Landesweite Koeffizienten der Zentralen Geschäftsstelle (TLBG) sind veröffentlicht, aber nur für den privaten, nicht kommerziellen Gebrauch freigegeben (Satz der Zentralen Geschäftsstelle, uk-flaeche-laender-2026.json / uk-wgfz-ost-west-2026.json) — gesperrt bis zur Klärung der Nutzungsrechte.",
+  "belege_meta": {
+   "abgerufen_am": "2026-11-20"
+  }
+ },
+ {
+  "land_code": "TH",
+  "ags": "16062",
+  "ebene": "kreis",
+  "gebiet_name": "Nordhausen, Landkreis",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte für das Gebiet des Kyffhäuserkreises und des Landkreises Nordhausen",
+  "ausschuss": "Gutachterausschuss für Grundstückswerte für das Gebiet des Kyffhäuserkreises und des Landkreises Nordhausen",
+  "kennzahl": "umrechnungskoeffizient_wgfz",
+  "zweig": "alle",
+  "vollstaendig": false,
+  "zugang": "nicht veröffentlicht",
+  "warum_kein_wert": "Der örtliche Ausschuss veröffentlicht keine eigenen Umrechnungskoeffizienten für die wertrelevante Geschossflächenzahl (WGFZ): in seinen jüngsten Heften (Sachwertfaktoren 2024; Liegenschaftszinssätze, Rohertragsfaktoren und Umsatzberichte 2022) steht keine solche Tabelle, und das ThULB-Verzeichnis führt für keinen örtlichen Thüringer Ausschuss ein Heft mit Umrechnungskoeffizienten. Kein Nachbarwert, keine VW-RL. Weg: Geschäftsstelle des Gutachterausschuss für Grundstückswerte für das Gebiet des Kyffhäuserkreises und des Landkreises Nordhausen (c/o TLBG, Katasterbereich Artern, Alte Poststraße 10, 06556 Artern), gutachter.artern@tlbg.thueringen.de; Veröffentlichungen im ThULB-Verzeichnis. Landesweite Koeffizienten der Zentralen Geschäftsstelle (TLBG) sind veröffentlicht, aber nur für den privaten, nicht kommerziellen Gebrauch freigegeben (Satz der Zentralen Geschäftsstelle, uk-flaeche-laender-2026.json / uk-wgfz-ost-west-2026.json) — gesperrt bis zur Klärung der Nutzungsrechte.",
+  "formel": null,
+  "geltungsbereich": {
+   "objektarten": [],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Geschäftsstelle des Gutachterausschuss für Grundstückswerte für das Gebiet des Kyffhäuserkreises und des Landkreises Nordhausen (c/o TLBG, Katasterbereich Artern, Alte Poststraße 10, 06556 Artern), gutachter.artern@tlbg.thueringen.de; Veröffentlichungen im ThULB-Verzeichnis. Landesweite Koeffizienten der Zentralen Geschäftsstelle (TLBG) sind veröffentlicht, aber nur für den privaten, nicht kommerziellen Gebrauch freigegeben (Satz der Zentralen Geschäftsstelle, uk-flaeche-laender-2026.json / uk-wgfz-ost-west-2026.json) — gesperrt bis zur Klärung der Nutzungsrechte."
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "dokument": "Sachwertfaktoren 2024 – Gutachterausschuss für Grundstückswerte für das Gebiet des Kyffhäuserkreises und des Landkreises Nordhausen",
+    "fundstelle": "ganzes Dokument, Textsuche (leerzeichenbereinigt) nach „Umrechnungskoeffizient“ und „Geschossfläche“ ohne Treffer (20.11.2026); Impressum letzte Seite",
+    "url": "https://zs.thulb.uni-jena.de/servlets/MCRFileNodeServlet/jportal_derivate_00362095/20254161140-2024_SWF_R263_neu_ohneKennwortPDFA.pdf",
+    "wortlaut": "kein Treffer"
+   },
+   {
+    "art": "amtliche Veröffentlichung",
+    "dokument": "Liegenschaftszinssätze, Rohertragsfaktoren und Umsatzberichte 2022 – Gutachterausschuss für Grundstückswerte für das Gebiet des Kyffhäuserkreises und des Landkreises Nordhausen",
+    "fundstelle": "ganzes Dokument, Textsuche (leerzeichenbereinigt) nach „Umrechnungskoeffizient“ und „Geschossfläche“ ohne Treffer (20.11.2026); Impressum letzte Seite",
+    "url": "https://zs.thulb.uni-jena.de/servlets/MCRFileNodeServlet/jportal_derivate_00341770/20232991-2022.pdf",
+    "wortlaut": "kein Treffer"
+   },
+   {
+    "art": "Verzeichnis",
+    "dokument": "ThULB journals@UrMEL",
+    "fundstelle": "Solr-Abfrage objectType:jpjournal, maintitle *Gutachterausschu* (54 Treffer), Stand 20.11.2026",
+    "url": "https://zs.thulb.uni-jena.de/",
+    "wortlaut": "ThULB-Veröffentlichungsverzeichnis (zs.thulb.uni-jena.de, Solr-Abfrage aller 54 Zeitschriften mit „Gutachterausschuss“ im Titel, 20.11.2026): kein Heft eines örtlichen Thüringer Ausschusses mit Umrechnungskoeffizienten; geführt werden Liegenschaftszinssätze/Rohertragsfaktoren, Sachwertfaktoren, Bodenpreisindexreihen, Vergleichsfaktoren (nur Erfurt, Wohnungseigentum) und Immobilienmarktberichte bis 2020."
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "berichtsjahr": 2024,
+  "jahrgang": 2024,
+  "stichtag": "2024-01-01",
+  "stichtag_hinweis": "Kein eigener Stichtag (keine Veröffentlichung); eingetragen ist der Bezugsjahrgang der jüngsten gelesenen Hefte.",
+  "quelle_url": "https://zs.thulb.uni-jena.de/servlets/MCRFileNodeServlet/jportal_derivate_00362095/20254161140-2024_SWF_R263_neu_ohneKennwortPDFA.pdf",
+  "landeswert_url": "https://tlbg.thueringen.de/wertermittlung/online-grundstuecksmarktinformationen/umrechnungskoeffizienten/wgfz",
+  "quelle_parser": "ernte-20261120 (ThULB-Solr + pdftotext, Textsuche)",
+  "modellversion": "Umrechnungskoeffizienten für die wertrelevante Geschossflächenzahl (WGFZ) (§ 16 Abs. 4, § 40 ImmoWertV), Gutachterausschuss für Grundstückswerte für das Gebiet des Kyffhäuserkreises und des Landkreises Nordhausen, Jahrgang 2024",
+  "modellansaetze": {},
+  "lizenz": "„Eine Wiedergabe von Daten aus diesem Dokument ist nur mit Quellenangabe gestattet.“ (Titelrückseite der Hefte)",
+  "weg": "Geschäftsstelle des Gutachterausschuss für Grundstückswerte für das Gebiet des Kyffhäuserkreises und des Landkreises Nordhausen (c/o TLBG, Katasterbereich Artern, Alte Poststraße 10, 06556 Artern), gutachter.artern@tlbg.thueringen.de; Veröffentlichungen im ThULB-Verzeichnis. Landesweite Koeffizienten der Zentralen Geschäftsstelle (TLBG) sind veröffentlicht, aber nur für den privaten, nicht kommerziellen Gebrauch freigegeben (Satz der Zentralen Geschäftsstelle, uk-flaeche-laender-2026.json / uk-wgfz-ost-west-2026.json) — gesperrt bis zur Klärung der Nutzungsrechte.",
+  "belege_meta": {
+   "abgerufen_am": "2026-11-20"
+  }
+ },
+ {
+  "land_code": "TH",
+  "ags": "16077",
+  "ebene": "kreis",
+  "gebiet_name": "Altenburger Land, Landkreis",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Altenburger Land, des Landkreises Greiz und der kreisfreien Stadt Gera",
+  "ausschuss": "Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Altenburger Land, des Landkreises Greiz und der kreisfreien Stadt Gera",
+  "kennzahl": "umrechnungskoeffizient_wgfz",
+  "zweig": "alle",
+  "vollstaendig": false,
+  "zugang": "nicht veröffentlicht",
+  "warum_kein_wert": "Der örtliche Ausschuss veröffentlicht keine eigenen Umrechnungskoeffizienten für die wertrelevante Geschossflächenzahl (WGFZ): in seinen jüngsten Heften (Liegenschaftszinssätze und Rohertragsfaktoren 2026; Sachwertfaktoren und Vergleichspreise 2026) steht keine solche Tabelle, und das ThULB-Verzeichnis führt für keinen örtlichen Thüringer Ausschuss ein Heft mit Umrechnungskoeffizienten. Kein Nachbarwert, keine VW-RL. Weg: Geschäftsstelle des Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Altenburger Land, des Landkreises Greiz und der kreisfreien Stadt Gera (c/o TLBG, Zweigstelle Zeulenroda-Triebes, Heinrich-Heine-Straße 41, 07937 Zeulenroda-Triebes), gutachter.zeulenroda@tlbg.thueringen.de; Veröffentlichungen im ThULB-Verzeichnis. Landesweite Koeffizienten der Zentralen Geschäftsstelle (TLBG) sind veröffentlicht, aber nur für den privaten, nicht kommerziellen Gebrauch freigegeben (Satz der Zentralen Geschäftsstelle, uk-flaeche-laender-2026.json / uk-wgfz-ost-west-2026.json) — gesperrt bis zur Klärung der Nutzungsrechte.",
+  "formel": null,
+  "geltungsbereich": {
+   "objektarten": [],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Geschäftsstelle des Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Altenburger Land, des Landkreises Greiz und der kreisfreien Stadt Gera (c/o TLBG, Zweigstelle Zeulenroda-Triebes, Heinrich-Heine-Straße 41, 07937 Zeulenroda-Triebes), gutachter.zeulenroda@tlbg.thueringen.de; Veröffentlichungen im ThULB-Verzeichnis. Landesweite Koeffizienten der Zentralen Geschäftsstelle (TLBG) sind veröffentlicht, aber nur für den privaten, nicht kommerziellen Gebrauch freigegeben (Satz der Zentralen Geschäftsstelle, uk-flaeche-laender-2026.json / uk-wgfz-ost-west-2026.json) — gesperrt bis zur Klärung der Nutzungsrechte."
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "dokument": "Liegenschaftszinssätze und Rohertragsfaktoren 2026 – Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Altenburger Land, des Landkreises Greiz und der kreisfreien Stadt Gera",
+    "fundstelle": "ganzes Dokument, Textsuche (leerzeichenbereinigt) nach „Umrechnungskoeffizient“ und „Geschossfläche“ ohne Treffer (20.11.2026); Impressum letzte Seite",
+    "url": "https://zs.thulb.uni-jena.de/servlets/MCRFileNodeServlet/jportal_derivate_00445362/2026_LZ_RoF_R269_ohneKennwort_pdfa2b.pdf",
+    "wortlaut": "kein Treffer"
+   },
+   {
+    "art": "amtliche Veröffentlichung",
+    "dokument": "Sachwertfaktoren und Vergleichspreise 2026 – Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Altenburger Land, des Landkreises Greiz und der kreisfreien Stadt Gera",
+    "fundstelle": "ganzes Dokument, Textsuche (leerzeichenbereinigt) nach „Umrechnungskoeffizient“ und „Geschossfläche“ ohne Treffer (20.11.2026); Impressum letzte Seite",
+    "url": "https://zs.thulb.uni-jena.de/servlets/MCRFileNodeServlet/jportal_derivate_00445349/2026_SWF_VP_R269_2_ohneKennwort_pdfa2b.pdf",
+    "wortlaut": "kein Treffer"
+   },
+   {
+    "art": "Verzeichnis",
+    "dokument": "ThULB journals@UrMEL",
+    "fundstelle": "Solr-Abfrage objectType:jpjournal, maintitle *Gutachterausschu* (54 Treffer), Stand 20.11.2026",
+    "url": "https://zs.thulb.uni-jena.de/",
+    "wortlaut": "ThULB-Veröffentlichungsverzeichnis (zs.thulb.uni-jena.de, Solr-Abfrage aller 54 Zeitschriften mit „Gutachterausschuss“ im Titel, 20.11.2026): kein Heft eines örtlichen Thüringer Ausschusses mit Umrechnungskoeffizienten; geführt werden Liegenschaftszinssätze/Rohertragsfaktoren, Sachwertfaktoren, Bodenpreisindexreihen, Vergleichsfaktoren (nur Erfurt, Wohnungseigentum) und Immobilienmarktberichte bis 2020."
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "berichtsjahr": 2026,
+  "jahrgang": 2026,
+  "stichtag": "2026-01-01",
+  "stichtag_hinweis": "Kein eigener Stichtag (keine Veröffentlichung); eingetragen ist der Bezugsjahrgang der jüngsten gelesenen Hefte.",
+  "quelle_url": "https://zs.thulb.uni-jena.de/servlets/MCRFileNodeServlet/jportal_derivate_00445362/2026_LZ_RoF_R269_ohneKennwort_pdfa2b.pdf",
+  "landeswert_url": "https://tlbg.thueringen.de/wertermittlung/online-grundstuecksmarktinformationen/umrechnungskoeffizienten/wgfz",
+  "quelle_parser": "ernte-20261120 (ThULB-Solr + pdftotext, Textsuche)",
+  "modellversion": "Umrechnungskoeffizienten für die wertrelevante Geschossflächenzahl (WGFZ) (§ 16 Abs. 4, § 40 ImmoWertV), Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Altenburger Land, des Landkreises Greiz und der kreisfreien Stadt Gera, Jahrgang 2026",
+  "modellansaetze": {},
+  "lizenz": "„Eine Wiedergabe von Daten aus diesem Dokument ist nur mit Quellenangabe gestattet.“ (Titelrückseite der Hefte)",
+  "weg": "Geschäftsstelle des Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Altenburger Land, des Landkreises Greiz und der kreisfreien Stadt Gera (c/o TLBG, Zweigstelle Zeulenroda-Triebes, Heinrich-Heine-Straße 41, 07937 Zeulenroda-Triebes), gutachter.zeulenroda@tlbg.thueringen.de; Veröffentlichungen im ThULB-Verzeichnis. Landesweite Koeffizienten der Zentralen Geschäftsstelle (TLBG) sind veröffentlicht, aber nur für den privaten, nicht kommerziellen Gebrauch freigegeben (Satz der Zentralen Geschäftsstelle, uk-flaeche-laender-2026.json / uk-wgfz-ost-west-2026.json) — gesperrt bis zur Klärung der Nutzungsrechte.",
+  "belege_meta": {
+   "abgerufen_am": "2026-11-20"
+  }
+ },
+ {
+  "land_code": "TH",
+  "ags": "16076",
+  "ebene": "kreis",
+  "gebiet_name": "Greiz, Landkreis",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Altenburger Land, des Landkreises Greiz und der kreisfreien Stadt Gera",
+  "ausschuss": "Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Altenburger Land, des Landkreises Greiz und der kreisfreien Stadt Gera",
+  "kennzahl": "umrechnungskoeffizient_wgfz",
+  "zweig": "alle",
+  "vollstaendig": false,
+  "zugang": "nicht veröffentlicht",
+  "warum_kein_wert": "Der örtliche Ausschuss veröffentlicht keine eigenen Umrechnungskoeffizienten für die wertrelevante Geschossflächenzahl (WGFZ): in seinen jüngsten Heften (Liegenschaftszinssätze und Rohertragsfaktoren 2026; Sachwertfaktoren und Vergleichspreise 2026) steht keine solche Tabelle, und das ThULB-Verzeichnis führt für keinen örtlichen Thüringer Ausschuss ein Heft mit Umrechnungskoeffizienten. Kein Nachbarwert, keine VW-RL. Weg: Geschäftsstelle des Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Altenburger Land, des Landkreises Greiz und der kreisfreien Stadt Gera (c/o TLBG, Zweigstelle Zeulenroda-Triebes, Heinrich-Heine-Straße 41, 07937 Zeulenroda-Triebes), gutachter.zeulenroda@tlbg.thueringen.de; Veröffentlichungen im ThULB-Verzeichnis. Landesweite Koeffizienten der Zentralen Geschäftsstelle (TLBG) sind veröffentlicht, aber nur für den privaten, nicht kommerziellen Gebrauch freigegeben (Satz der Zentralen Geschäftsstelle, uk-flaeche-laender-2026.json / uk-wgfz-ost-west-2026.json) — gesperrt bis zur Klärung der Nutzungsrechte.",
+  "formel": null,
+  "geltungsbereich": {
+   "objektarten": [],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Geschäftsstelle des Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Altenburger Land, des Landkreises Greiz und der kreisfreien Stadt Gera (c/o TLBG, Zweigstelle Zeulenroda-Triebes, Heinrich-Heine-Straße 41, 07937 Zeulenroda-Triebes), gutachter.zeulenroda@tlbg.thueringen.de; Veröffentlichungen im ThULB-Verzeichnis. Landesweite Koeffizienten der Zentralen Geschäftsstelle (TLBG) sind veröffentlicht, aber nur für den privaten, nicht kommerziellen Gebrauch freigegeben (Satz der Zentralen Geschäftsstelle, uk-flaeche-laender-2026.json / uk-wgfz-ost-west-2026.json) — gesperrt bis zur Klärung der Nutzungsrechte."
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "dokument": "Liegenschaftszinssätze und Rohertragsfaktoren 2026 – Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Altenburger Land, des Landkreises Greiz und der kreisfreien Stadt Gera",
+    "fundstelle": "ganzes Dokument, Textsuche (leerzeichenbereinigt) nach „Umrechnungskoeffizient“ und „Geschossfläche“ ohne Treffer (20.11.2026); Impressum letzte Seite",
+    "url": "https://zs.thulb.uni-jena.de/servlets/MCRFileNodeServlet/jportal_derivate_00445362/2026_LZ_RoF_R269_ohneKennwort_pdfa2b.pdf",
+    "wortlaut": "kein Treffer"
+   },
+   {
+    "art": "amtliche Veröffentlichung",
+    "dokument": "Sachwertfaktoren und Vergleichspreise 2026 – Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Altenburger Land, des Landkreises Greiz und der kreisfreien Stadt Gera",
+    "fundstelle": "ganzes Dokument, Textsuche (leerzeichenbereinigt) nach „Umrechnungskoeffizient“ und „Geschossfläche“ ohne Treffer (20.11.2026); Impressum letzte Seite",
+    "url": "https://zs.thulb.uni-jena.de/servlets/MCRFileNodeServlet/jportal_derivate_00445349/2026_SWF_VP_R269_2_ohneKennwort_pdfa2b.pdf",
+    "wortlaut": "kein Treffer"
+   },
+   {
+    "art": "Verzeichnis",
+    "dokument": "ThULB journals@UrMEL",
+    "fundstelle": "Solr-Abfrage objectType:jpjournal, maintitle *Gutachterausschu* (54 Treffer), Stand 20.11.2026",
+    "url": "https://zs.thulb.uni-jena.de/",
+    "wortlaut": "ThULB-Veröffentlichungsverzeichnis (zs.thulb.uni-jena.de, Solr-Abfrage aller 54 Zeitschriften mit „Gutachterausschuss“ im Titel, 20.11.2026): kein Heft eines örtlichen Thüringer Ausschusses mit Umrechnungskoeffizienten; geführt werden Liegenschaftszinssätze/Rohertragsfaktoren, Sachwertfaktoren, Bodenpreisindexreihen, Vergleichsfaktoren (nur Erfurt, Wohnungseigentum) und Immobilienmarktberichte bis 2020."
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "berichtsjahr": 2026,
+  "jahrgang": 2026,
+  "stichtag": "2026-01-01",
+  "stichtag_hinweis": "Kein eigener Stichtag (keine Veröffentlichung); eingetragen ist der Bezugsjahrgang der jüngsten gelesenen Hefte.",
+  "quelle_url": "https://zs.thulb.uni-jena.de/servlets/MCRFileNodeServlet/jportal_derivate_00445362/2026_LZ_RoF_R269_ohneKennwort_pdfa2b.pdf",
+  "landeswert_url": "https://tlbg.thueringen.de/wertermittlung/online-grundstuecksmarktinformationen/umrechnungskoeffizienten/wgfz",
+  "quelle_parser": "ernte-20261120 (ThULB-Solr + pdftotext, Textsuche)",
+  "modellversion": "Umrechnungskoeffizienten für die wertrelevante Geschossflächenzahl (WGFZ) (§ 16 Abs. 4, § 40 ImmoWertV), Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Altenburger Land, des Landkreises Greiz und der kreisfreien Stadt Gera, Jahrgang 2026",
+  "modellansaetze": {},
+  "lizenz": "„Eine Wiedergabe von Daten aus diesem Dokument ist nur mit Quellenangabe gestattet.“ (Titelrückseite der Hefte)",
+  "weg": "Geschäftsstelle des Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Altenburger Land, des Landkreises Greiz und der kreisfreien Stadt Gera (c/o TLBG, Zweigstelle Zeulenroda-Triebes, Heinrich-Heine-Straße 41, 07937 Zeulenroda-Triebes), gutachter.zeulenroda@tlbg.thueringen.de; Veröffentlichungen im ThULB-Verzeichnis. Landesweite Koeffizienten der Zentralen Geschäftsstelle (TLBG) sind veröffentlicht, aber nur für den privaten, nicht kommerziellen Gebrauch freigegeben (Satz der Zentralen Geschäftsstelle, uk-flaeche-laender-2026.json / uk-wgfz-ost-west-2026.json) — gesperrt bis zur Klärung der Nutzungsrechte.",
+  "belege_meta": {
+   "abgerufen_am": "2026-11-20"
+  }
+ },
+ {
+  "land_code": "TH",
+  "ags": "16052",
+  "ebene": "kreis",
+  "gebiet_name": "Gera, kreisfreie Stadt",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Altenburger Land, des Landkreises Greiz und der kreisfreien Stadt Gera",
+  "ausschuss": "Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Altenburger Land, des Landkreises Greiz und der kreisfreien Stadt Gera",
+  "kennzahl": "umrechnungskoeffizient_wgfz",
+  "zweig": "alle",
+  "vollstaendig": false,
+  "zugang": "nicht veröffentlicht",
+  "warum_kein_wert": "Der örtliche Ausschuss veröffentlicht keine eigenen Umrechnungskoeffizienten für die wertrelevante Geschossflächenzahl (WGFZ): in seinen jüngsten Heften (Liegenschaftszinssätze und Rohertragsfaktoren 2026; Sachwertfaktoren und Vergleichspreise 2026) steht keine solche Tabelle, und das ThULB-Verzeichnis führt für keinen örtlichen Thüringer Ausschuss ein Heft mit Umrechnungskoeffizienten. Kein Nachbarwert, keine VW-RL. Weg: Geschäftsstelle des Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Altenburger Land, des Landkreises Greiz und der kreisfreien Stadt Gera (c/o TLBG, Zweigstelle Zeulenroda-Triebes, Heinrich-Heine-Straße 41, 07937 Zeulenroda-Triebes), gutachter.zeulenroda@tlbg.thueringen.de; Veröffentlichungen im ThULB-Verzeichnis. Landesweite Koeffizienten der Zentralen Geschäftsstelle (TLBG) sind veröffentlicht, aber nur für den privaten, nicht kommerziellen Gebrauch freigegeben (Satz der Zentralen Geschäftsstelle, uk-flaeche-laender-2026.json / uk-wgfz-ost-west-2026.json) — gesperrt bis zur Klärung der Nutzungsrechte.",
+  "formel": null,
+  "geltungsbereich": {
+   "objektarten": [],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Geschäftsstelle des Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Altenburger Land, des Landkreises Greiz und der kreisfreien Stadt Gera (c/o TLBG, Zweigstelle Zeulenroda-Triebes, Heinrich-Heine-Straße 41, 07937 Zeulenroda-Triebes), gutachter.zeulenroda@tlbg.thueringen.de; Veröffentlichungen im ThULB-Verzeichnis. Landesweite Koeffizienten der Zentralen Geschäftsstelle (TLBG) sind veröffentlicht, aber nur für den privaten, nicht kommerziellen Gebrauch freigegeben (Satz der Zentralen Geschäftsstelle, uk-flaeche-laender-2026.json / uk-wgfz-ost-west-2026.json) — gesperrt bis zur Klärung der Nutzungsrechte."
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "dokument": "Liegenschaftszinssätze und Rohertragsfaktoren 2026 – Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Altenburger Land, des Landkreises Greiz und der kreisfreien Stadt Gera",
+    "fundstelle": "ganzes Dokument, Textsuche (leerzeichenbereinigt) nach „Umrechnungskoeffizient“ und „Geschossfläche“ ohne Treffer (20.11.2026); Impressum letzte Seite",
+    "url": "https://zs.thulb.uni-jena.de/servlets/MCRFileNodeServlet/jportal_derivate_00445362/2026_LZ_RoF_R269_ohneKennwort_pdfa2b.pdf",
+    "wortlaut": "kein Treffer"
+   },
+   {
+    "art": "amtliche Veröffentlichung",
+    "dokument": "Sachwertfaktoren und Vergleichspreise 2026 – Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Altenburger Land, des Landkreises Greiz und der kreisfreien Stadt Gera",
+    "fundstelle": "ganzes Dokument, Textsuche (leerzeichenbereinigt) nach „Umrechnungskoeffizient“ und „Geschossfläche“ ohne Treffer (20.11.2026); Impressum letzte Seite",
+    "url": "https://zs.thulb.uni-jena.de/servlets/MCRFileNodeServlet/jportal_derivate_00445349/2026_SWF_VP_R269_2_ohneKennwort_pdfa2b.pdf",
+    "wortlaut": "kein Treffer"
+   },
+   {
+    "art": "Verzeichnis",
+    "dokument": "ThULB journals@UrMEL",
+    "fundstelle": "Solr-Abfrage objectType:jpjournal, maintitle *Gutachterausschu* (54 Treffer), Stand 20.11.2026",
+    "url": "https://zs.thulb.uni-jena.de/",
+    "wortlaut": "ThULB-Veröffentlichungsverzeichnis (zs.thulb.uni-jena.de, Solr-Abfrage aller 54 Zeitschriften mit „Gutachterausschuss“ im Titel, 20.11.2026): kein Heft eines örtlichen Thüringer Ausschusses mit Umrechnungskoeffizienten; geführt werden Liegenschaftszinssätze/Rohertragsfaktoren, Sachwertfaktoren, Bodenpreisindexreihen, Vergleichsfaktoren (nur Erfurt, Wohnungseigentum) und Immobilienmarktberichte bis 2020."
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "berichtsjahr": 2026,
+  "jahrgang": 2026,
+  "stichtag": "2026-01-01",
+  "stichtag_hinweis": "Kein eigener Stichtag (keine Veröffentlichung); eingetragen ist der Bezugsjahrgang der jüngsten gelesenen Hefte.",
+  "quelle_url": "https://zs.thulb.uni-jena.de/servlets/MCRFileNodeServlet/jportal_derivate_00445362/2026_LZ_RoF_R269_ohneKennwort_pdfa2b.pdf",
+  "landeswert_url": "https://tlbg.thueringen.de/wertermittlung/online-grundstuecksmarktinformationen/umrechnungskoeffizienten/wgfz",
+  "quelle_parser": "ernte-20261120 (ThULB-Solr + pdftotext, Textsuche)",
+  "modellversion": "Umrechnungskoeffizienten für die wertrelevante Geschossflächenzahl (WGFZ) (§ 16 Abs. 4, § 40 ImmoWertV), Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Altenburger Land, des Landkreises Greiz und der kreisfreien Stadt Gera, Jahrgang 2026",
+  "modellansaetze": {},
+  "lizenz": "„Eine Wiedergabe von Daten aus diesem Dokument ist nur mit Quellenangabe gestattet.“ (Titelrückseite der Hefte)",
+  "weg": "Geschäftsstelle des Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Altenburger Land, des Landkreises Greiz und der kreisfreien Stadt Gera (c/o TLBG, Zweigstelle Zeulenroda-Triebes, Heinrich-Heine-Straße 41, 07937 Zeulenroda-Triebes), gutachter.zeulenroda@tlbg.thueringen.de; Veröffentlichungen im ThULB-Verzeichnis. Landesweite Koeffizienten der Zentralen Geschäftsstelle (TLBG) sind veröffentlicht, aber nur für den privaten, nicht kommerziellen Gebrauch freigegeben (Satz der Zentralen Geschäftsstelle, uk-flaeche-laender-2026.json / uk-wgfz-ost-west-2026.json) — gesperrt bis zur Klärung der Nutzungsrechte.",
+  "belege_meta": {
+   "abgerufen_am": "2026-11-20"
+  }
+ },
+ {
+  "land_code": "TH",
+  "ags": "16061",
+  "ebene": "kreis",
+  "gebiet_name": "Eichsfeld, Landkreis",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Eichsfeld und des Unstrut-Hainich-Kreises",
+  "ausschuss": "Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Eichsfeld und des Unstrut-Hainich-Kreises",
+  "kennzahl": "umrechnungskoeffizient_wgfz",
+  "zweig": "alle",
+  "vollstaendig": false,
+  "zugang": "nicht veröffentlicht",
+  "warum_kein_wert": "Der örtliche Ausschuss veröffentlicht keine eigenen Umrechnungskoeffizienten für die wertrelevante Geschossflächenzahl (WGFZ): in seinen jüngsten Heften (Liegenschaftszinssätze und Rohertragsfaktoren 2025) steht keine solche Tabelle, und das ThULB-Verzeichnis führt für keinen örtlichen Thüringer Ausschuss ein Heft mit Umrechnungskoeffizienten. Kein Nachbarwert, keine VW-RL. Weg: Geschäftsstelle des Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Eichsfeld und des Unstrut-Hainich-Kreises (c/o TLBG, Zweigstelle Leinefelde-Worbis, Franz-Weinrich-Straße 24, 37339 Leinefelde-Worbis), gutachter.leinefelde-worbis@tlbg.thueringen.de; Veröffentlichungen im ThULB-Verzeichnis. Landesweite Koeffizienten der Zentralen Geschäftsstelle (TLBG) sind veröffentlicht, aber nur für den privaten, nicht kommerziellen Gebrauch freigegeben (Satz der Zentralen Geschäftsstelle, uk-flaeche-laender-2026.json / uk-wgfz-ost-west-2026.json) — gesperrt bis zur Klärung der Nutzungsrechte.",
+  "formel": null,
+  "geltungsbereich": {
+   "objektarten": [],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Geschäftsstelle des Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Eichsfeld und des Unstrut-Hainich-Kreises (c/o TLBG, Zweigstelle Leinefelde-Worbis, Franz-Weinrich-Straße 24, 37339 Leinefelde-Worbis), gutachter.leinefelde-worbis@tlbg.thueringen.de; Veröffentlichungen im ThULB-Verzeichnis. Landesweite Koeffizienten der Zentralen Geschäftsstelle (TLBG) sind veröffentlicht, aber nur für den privaten, nicht kommerziellen Gebrauch freigegeben (Satz der Zentralen Geschäftsstelle, uk-flaeche-laender-2026.json / uk-wgfz-ost-west-2026.json) — gesperrt bis zur Klärung der Nutzungsrechte."
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "dokument": "Liegenschaftszinssätze und Rohertragsfaktoren 2025 – Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Eichsfeld und des Unstrut-Hainich-Kreises",
+    "fundstelle": "ganzes Dokument, Textsuche (leerzeichenbereinigt) nach „Umrechnungskoeffizient“ und „Geschossfläche“ ohne Treffer (20.11.2026); Impressum letzte Seite",
+    "url": "https://zs.thulb.uni-jena.de/servlets/MCRFileNodeServlet/jportal_derivate_00364659/LiegEichsfeld2025.pdf",
+    "wortlaut": "kein Treffer"
+   },
+   {
+    "art": "Verzeichnis",
+    "dokument": "ThULB journals@UrMEL",
+    "fundstelle": "Solr-Abfrage objectType:jpjournal, maintitle *Gutachterausschu* (54 Treffer), Stand 20.11.2026",
+    "url": "https://zs.thulb.uni-jena.de/",
+    "wortlaut": "ThULB-Veröffentlichungsverzeichnis (zs.thulb.uni-jena.de, Solr-Abfrage aller 54 Zeitschriften mit „Gutachterausschuss“ im Titel, 20.11.2026): kein Heft eines örtlichen Thüringer Ausschusses mit Umrechnungskoeffizienten; geführt werden Liegenschaftszinssätze/Rohertragsfaktoren, Sachwertfaktoren, Bodenpreisindexreihen, Vergleichsfaktoren (nur Erfurt, Wohnungseigentum) und Immobilienmarktberichte bis 2020."
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "berichtsjahr": 2025,
+  "jahrgang": 2025,
+  "stichtag": "2025-01-01",
+  "stichtag_hinweis": "Kein eigener Stichtag (keine Veröffentlichung); eingetragen ist der Bezugsjahrgang der jüngsten gelesenen Hefte.",
+  "quelle_url": "https://zs.thulb.uni-jena.de/servlets/MCRFileNodeServlet/jportal_derivate_00364659/LiegEichsfeld2025.pdf",
+  "landeswert_url": "https://tlbg.thueringen.de/wertermittlung/online-grundstuecksmarktinformationen/umrechnungskoeffizienten/wgfz",
+  "quelle_parser": "ernte-20261120 (ThULB-Solr + pdftotext, Textsuche)",
+  "modellversion": "Umrechnungskoeffizienten für die wertrelevante Geschossflächenzahl (WGFZ) (§ 16 Abs. 4, § 40 ImmoWertV), Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Eichsfeld und des Unstrut-Hainich-Kreises, Jahrgang 2025",
+  "modellansaetze": {},
+  "lizenz": "„Eine Wiedergabe von Daten aus diesem Dokument ist nur mit Quellenangabe gestattet.“ (Titelrückseite der Hefte)",
+  "weg": "Geschäftsstelle des Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Eichsfeld und des Unstrut-Hainich-Kreises (c/o TLBG, Zweigstelle Leinefelde-Worbis, Franz-Weinrich-Straße 24, 37339 Leinefelde-Worbis), gutachter.leinefelde-worbis@tlbg.thueringen.de; Veröffentlichungen im ThULB-Verzeichnis. Landesweite Koeffizienten der Zentralen Geschäftsstelle (TLBG) sind veröffentlicht, aber nur für den privaten, nicht kommerziellen Gebrauch freigegeben (Satz der Zentralen Geschäftsstelle, uk-flaeche-laender-2026.json / uk-wgfz-ost-west-2026.json) — gesperrt bis zur Klärung der Nutzungsrechte.",
+  "belege_meta": {
+   "abgerufen_am": "2026-11-20"
+  }
+ },
+ {
+  "land_code": "TH",
+  "ags": "16064",
+  "ebene": "kreis",
+  "gebiet_name": "Unstrut-Hainich-Kreis",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Eichsfeld und des Unstrut-Hainich-Kreises",
+  "ausschuss": "Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Eichsfeld und des Unstrut-Hainich-Kreises",
+  "kennzahl": "umrechnungskoeffizient_wgfz",
+  "zweig": "alle",
+  "vollstaendig": false,
+  "zugang": "nicht veröffentlicht",
+  "warum_kein_wert": "Der örtliche Ausschuss veröffentlicht keine eigenen Umrechnungskoeffizienten für die wertrelevante Geschossflächenzahl (WGFZ): in seinen jüngsten Heften (Liegenschaftszinssätze und Rohertragsfaktoren 2025) steht keine solche Tabelle, und das ThULB-Verzeichnis führt für keinen örtlichen Thüringer Ausschuss ein Heft mit Umrechnungskoeffizienten. Kein Nachbarwert, keine VW-RL. Weg: Geschäftsstelle des Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Eichsfeld und des Unstrut-Hainich-Kreises (c/o TLBG, Zweigstelle Leinefelde-Worbis, Franz-Weinrich-Straße 24, 37339 Leinefelde-Worbis), gutachter.leinefelde-worbis@tlbg.thueringen.de; Veröffentlichungen im ThULB-Verzeichnis. Landesweite Koeffizienten der Zentralen Geschäftsstelle (TLBG) sind veröffentlicht, aber nur für den privaten, nicht kommerziellen Gebrauch freigegeben (Satz der Zentralen Geschäftsstelle, uk-flaeche-laender-2026.json / uk-wgfz-ost-west-2026.json) — gesperrt bis zur Klärung der Nutzungsrechte.",
+  "formel": null,
+  "geltungsbereich": {
+   "objektarten": [],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Geschäftsstelle des Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Eichsfeld und des Unstrut-Hainich-Kreises (c/o TLBG, Zweigstelle Leinefelde-Worbis, Franz-Weinrich-Straße 24, 37339 Leinefelde-Worbis), gutachter.leinefelde-worbis@tlbg.thueringen.de; Veröffentlichungen im ThULB-Verzeichnis. Landesweite Koeffizienten der Zentralen Geschäftsstelle (TLBG) sind veröffentlicht, aber nur für den privaten, nicht kommerziellen Gebrauch freigegeben (Satz der Zentralen Geschäftsstelle, uk-flaeche-laender-2026.json / uk-wgfz-ost-west-2026.json) — gesperrt bis zur Klärung der Nutzungsrechte."
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "dokument": "Liegenschaftszinssätze und Rohertragsfaktoren 2025 – Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Eichsfeld und des Unstrut-Hainich-Kreises",
+    "fundstelle": "ganzes Dokument, Textsuche (leerzeichenbereinigt) nach „Umrechnungskoeffizient“ und „Geschossfläche“ ohne Treffer (20.11.2026); Impressum letzte Seite",
+    "url": "https://zs.thulb.uni-jena.de/servlets/MCRFileNodeServlet/jportal_derivate_00364659/LiegEichsfeld2025.pdf",
+    "wortlaut": "kein Treffer"
+   },
+   {
+    "art": "Verzeichnis",
+    "dokument": "ThULB journals@UrMEL",
+    "fundstelle": "Solr-Abfrage objectType:jpjournal, maintitle *Gutachterausschu* (54 Treffer), Stand 20.11.2026",
+    "url": "https://zs.thulb.uni-jena.de/",
+    "wortlaut": "ThULB-Veröffentlichungsverzeichnis (zs.thulb.uni-jena.de, Solr-Abfrage aller 54 Zeitschriften mit „Gutachterausschuss“ im Titel, 20.11.2026): kein Heft eines örtlichen Thüringer Ausschusses mit Umrechnungskoeffizienten; geführt werden Liegenschaftszinssätze/Rohertragsfaktoren, Sachwertfaktoren, Bodenpreisindexreihen, Vergleichsfaktoren (nur Erfurt, Wohnungseigentum) und Immobilienmarktberichte bis 2020."
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "berichtsjahr": 2025,
+  "jahrgang": 2025,
+  "stichtag": "2025-01-01",
+  "stichtag_hinweis": "Kein eigener Stichtag (keine Veröffentlichung); eingetragen ist der Bezugsjahrgang der jüngsten gelesenen Hefte.",
+  "quelle_url": "https://zs.thulb.uni-jena.de/servlets/MCRFileNodeServlet/jportal_derivate_00364659/LiegEichsfeld2025.pdf",
+  "landeswert_url": "https://tlbg.thueringen.de/wertermittlung/online-grundstuecksmarktinformationen/umrechnungskoeffizienten/wgfz",
+  "quelle_parser": "ernte-20261120 (ThULB-Solr + pdftotext, Textsuche)",
+  "modellversion": "Umrechnungskoeffizienten für die wertrelevante Geschossflächenzahl (WGFZ) (§ 16 Abs. 4, § 40 ImmoWertV), Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Eichsfeld und des Unstrut-Hainich-Kreises, Jahrgang 2025",
+  "modellansaetze": {},
+  "lizenz": "„Eine Wiedergabe von Daten aus diesem Dokument ist nur mit Quellenangabe gestattet.“ (Titelrückseite der Hefte)",
+  "weg": "Geschäftsstelle des Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Eichsfeld und des Unstrut-Hainich-Kreises (c/o TLBG, Zweigstelle Leinefelde-Worbis, Franz-Weinrich-Straße 24, 37339 Leinefelde-Worbis), gutachter.leinefelde-worbis@tlbg.thueringen.de; Veröffentlichungen im ThULB-Verzeichnis. Landesweite Koeffizienten der Zentralen Geschäftsstelle (TLBG) sind veröffentlicht, aber nur für den privaten, nicht kommerziellen Gebrauch freigegeben (Satz der Zentralen Geschäftsstelle, uk-flaeche-laender-2026.json / uk-wgfz-ost-west-2026.json) — gesperrt bis zur Klärung der Nutzungsrechte.",
+  "belege_meta": {
+   "abgerufen_am": "2026-11-20"
+  }
+ },
+ {
+  "land_code": "TH",
+  "ags": "16067",
+  "ebene": "kreis",
+  "gebiet_name": "Gotha, Landkreis",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Gotha und des Wartburgkreises",
+  "ausschuss": "Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Gotha und des Wartburgkreises",
+  "kennzahl": "umrechnungskoeffizient_wgfz",
+  "zweig": "alle",
+  "vollstaendig": false,
+  "zugang": "nicht veröffentlicht",
+  "warum_kein_wert": "Der örtliche Ausschuss veröffentlicht keine eigenen Umrechnungskoeffizienten für die wertrelevante Geschossflächenzahl (WGFZ): in seinen jüngsten Heften (Liegenschaftszinssätze und Rohertragsfaktoren 2024) steht keine solche Tabelle, und das ThULB-Verzeichnis führt für keinen örtlichen Thüringer Ausschuss ein Heft mit Umrechnungskoeffizienten. Kein Nachbarwert, keine VW-RL. Weg: Geschäftsstelle des Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Gotha und des Wartburgkreises (c/o TLBG, Zweigstelle Gotha, Schloßberg 1, 99867 Gotha), gutachter.gotha@tlbg.thueringen.de; Veröffentlichungen im ThULB-Verzeichnis. Landesweite Koeffizienten der Zentralen Geschäftsstelle (TLBG) sind veröffentlicht, aber nur für den privaten, nicht kommerziellen Gebrauch freigegeben (Satz der Zentralen Geschäftsstelle, uk-flaeche-laender-2026.json / uk-wgfz-ost-west-2026.json) — gesperrt bis zur Klärung der Nutzungsrechte.",
+  "formel": null,
+  "geltungsbereich": {
+   "objektarten": [],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Geschäftsstelle des Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Gotha und des Wartburgkreises (c/o TLBG, Zweigstelle Gotha, Schloßberg 1, 99867 Gotha), gutachter.gotha@tlbg.thueringen.de; Veröffentlichungen im ThULB-Verzeichnis. Landesweite Koeffizienten der Zentralen Geschäftsstelle (TLBG) sind veröffentlicht, aber nur für den privaten, nicht kommerziellen Gebrauch freigegeben (Satz der Zentralen Geschäftsstelle, uk-flaeche-laender-2026.json / uk-wgfz-ost-west-2026.json) — gesperrt bis zur Klärung der Nutzungsrechte."
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "dokument": "Liegenschaftszinssätze und Rohertragsfaktoren 2024 – Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Gotha und des Wartburgkreises",
+    "fundstelle": "ganzes Dokument, Textsuche (leerzeichenbereinigt) nach „Umrechnungskoeffizient“ und „Geschossfläche“ ohne Treffer (20.11.2026); Impressum letzte Seite",
+    "url": "https://zs.thulb.uni-jena.de/servlets/MCRFileNodeServlet/jportal_derivate_00353936/LiegRohGotha2024.pdf",
+    "wortlaut": "kein Treffer"
+   },
+   {
+    "art": "Verzeichnis",
+    "dokument": "ThULB journals@UrMEL",
+    "fundstelle": "Solr-Abfrage objectType:jpjournal, maintitle *Gutachterausschu* (54 Treffer), Stand 20.11.2026",
+    "url": "https://zs.thulb.uni-jena.de/",
+    "wortlaut": "ThULB-Veröffentlichungsverzeichnis (zs.thulb.uni-jena.de, Solr-Abfrage aller 54 Zeitschriften mit „Gutachterausschuss“ im Titel, 20.11.2026): kein Heft eines örtlichen Thüringer Ausschusses mit Umrechnungskoeffizienten; geführt werden Liegenschaftszinssätze/Rohertragsfaktoren, Sachwertfaktoren, Bodenpreisindexreihen, Vergleichsfaktoren (nur Erfurt, Wohnungseigentum) und Immobilienmarktberichte bis 2020."
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "berichtsjahr": 2024,
+  "jahrgang": 2024,
+  "stichtag": "2024-01-01",
+  "stichtag_hinweis": "Kein eigener Stichtag (keine Veröffentlichung); eingetragen ist der Bezugsjahrgang der jüngsten gelesenen Hefte.",
+  "quelle_url": "https://zs.thulb.uni-jena.de/servlets/MCRFileNodeServlet/jportal_derivate_00353936/LiegRohGotha2024.pdf",
+  "landeswert_url": "https://tlbg.thueringen.de/wertermittlung/online-grundstuecksmarktinformationen/umrechnungskoeffizienten/wgfz",
+  "quelle_parser": "ernte-20261120 (ThULB-Solr + pdftotext, Textsuche)",
+  "modellversion": "Umrechnungskoeffizienten für die wertrelevante Geschossflächenzahl (WGFZ) (§ 16 Abs. 4, § 40 ImmoWertV), Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Gotha und des Wartburgkreises, Jahrgang 2024",
+  "modellansaetze": {},
+  "lizenz": "„Eine Wiedergabe von Daten aus diesem Dokument ist nur mit Quellenangabe gestattet.“ (Titelrückseite der Hefte)",
+  "weg": "Geschäftsstelle des Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Gotha und des Wartburgkreises (c/o TLBG, Zweigstelle Gotha, Schloßberg 1, 99867 Gotha), gutachter.gotha@tlbg.thueringen.de; Veröffentlichungen im ThULB-Verzeichnis. Landesweite Koeffizienten der Zentralen Geschäftsstelle (TLBG) sind veröffentlicht, aber nur für den privaten, nicht kommerziellen Gebrauch freigegeben (Satz der Zentralen Geschäftsstelle, uk-flaeche-laender-2026.json / uk-wgfz-ost-west-2026.json) — gesperrt bis zur Klärung der Nutzungsrechte.",
+  "belege_meta": {
+   "abgerufen_am": "2026-11-20"
+  }
+ },
+ {
+  "land_code": "TH",
+  "ags": "16063",
+  "ebene": "kreis",
+  "gebiet_name": "Wartburgkreis (einschließlich Eisenach)",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Gotha und des Wartburgkreises",
+  "ausschuss": "Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Gotha und des Wartburgkreises",
+  "kennzahl": "umrechnungskoeffizient_wgfz",
+  "zweig": "alle",
+  "vollstaendig": false,
+  "zugang": "nicht veröffentlicht",
+  "warum_kein_wert": "Der örtliche Ausschuss veröffentlicht keine eigenen Umrechnungskoeffizienten für die wertrelevante Geschossflächenzahl (WGFZ): in seinen jüngsten Heften (Liegenschaftszinssätze und Rohertragsfaktoren 2024) steht keine solche Tabelle, und das ThULB-Verzeichnis führt für keinen örtlichen Thüringer Ausschuss ein Heft mit Umrechnungskoeffizienten. Kein Nachbarwert, keine VW-RL. Weg: Geschäftsstelle des Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Gotha und des Wartburgkreises (c/o TLBG, Zweigstelle Gotha, Schloßberg 1, 99867 Gotha), gutachter.gotha@tlbg.thueringen.de; Veröffentlichungen im ThULB-Verzeichnis. Landesweite Koeffizienten der Zentralen Geschäftsstelle (TLBG) sind veröffentlicht, aber nur für den privaten, nicht kommerziellen Gebrauch freigegeben (Satz der Zentralen Geschäftsstelle, uk-flaeche-laender-2026.json / uk-wgfz-ost-west-2026.json) — gesperrt bis zur Klärung der Nutzungsrechte.",
+  "formel": null,
+  "geltungsbereich": {
+   "objektarten": [],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Geschäftsstelle des Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Gotha und des Wartburgkreises (c/o TLBG, Zweigstelle Gotha, Schloßberg 1, 99867 Gotha), gutachter.gotha@tlbg.thueringen.de; Veröffentlichungen im ThULB-Verzeichnis. Landesweite Koeffizienten der Zentralen Geschäftsstelle (TLBG) sind veröffentlicht, aber nur für den privaten, nicht kommerziellen Gebrauch freigegeben (Satz der Zentralen Geschäftsstelle, uk-flaeche-laender-2026.json / uk-wgfz-ost-west-2026.json) — gesperrt bis zur Klärung der Nutzungsrechte."
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "dokument": "Liegenschaftszinssätze und Rohertragsfaktoren 2024 – Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Gotha und des Wartburgkreises",
+    "fundstelle": "ganzes Dokument, Textsuche (leerzeichenbereinigt) nach „Umrechnungskoeffizient“ und „Geschossfläche“ ohne Treffer (20.11.2026); Impressum letzte Seite",
+    "url": "https://zs.thulb.uni-jena.de/servlets/MCRFileNodeServlet/jportal_derivate_00353936/LiegRohGotha2024.pdf",
+    "wortlaut": "kein Treffer"
+   },
+   {
+    "art": "Verzeichnis",
+    "dokument": "ThULB journals@UrMEL",
+    "fundstelle": "Solr-Abfrage objectType:jpjournal, maintitle *Gutachterausschu* (54 Treffer), Stand 20.11.2026",
+    "url": "https://zs.thulb.uni-jena.de/",
+    "wortlaut": "ThULB-Veröffentlichungsverzeichnis (zs.thulb.uni-jena.de, Solr-Abfrage aller 54 Zeitschriften mit „Gutachterausschuss“ im Titel, 20.11.2026): kein Heft eines örtlichen Thüringer Ausschusses mit Umrechnungskoeffizienten; geführt werden Liegenschaftszinssätze/Rohertragsfaktoren, Sachwertfaktoren, Bodenpreisindexreihen, Vergleichsfaktoren (nur Erfurt, Wohnungseigentum) und Immobilienmarktberichte bis 2020."
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "berichtsjahr": 2024,
+  "jahrgang": 2024,
+  "stichtag": "2024-01-01",
+  "stichtag_hinweis": "Kein eigener Stichtag (keine Veröffentlichung); eingetragen ist der Bezugsjahrgang der jüngsten gelesenen Hefte.",
+  "quelle_url": "https://zs.thulb.uni-jena.de/servlets/MCRFileNodeServlet/jportal_derivate_00353936/LiegRohGotha2024.pdf",
+  "landeswert_url": "https://tlbg.thueringen.de/wertermittlung/online-grundstuecksmarktinformationen/umrechnungskoeffizienten/wgfz",
+  "quelle_parser": "ernte-20261120 (ThULB-Solr + pdftotext, Textsuche)",
+  "modellversion": "Umrechnungskoeffizienten für die wertrelevante Geschossflächenzahl (WGFZ) (§ 16 Abs. 4, § 40 ImmoWertV), Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Gotha und des Wartburgkreises, Jahrgang 2024",
+  "modellansaetze": {},
+  "lizenz": "„Eine Wiedergabe von Daten aus diesem Dokument ist nur mit Quellenangabe gestattet.“ (Titelrückseite der Hefte)",
+  "weg": "Geschäftsstelle des Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Gotha und des Wartburgkreises (c/o TLBG, Zweigstelle Gotha, Schloßberg 1, 99867 Gotha), gutachter.gotha@tlbg.thueringen.de; Veröffentlichungen im ThULB-Verzeichnis. Landesweite Koeffizienten der Zentralen Geschäftsstelle (TLBG) sind veröffentlicht, aber nur für den privaten, nicht kommerziellen Gebrauch freigegeben (Satz der Zentralen Geschäftsstelle, uk-flaeche-laender-2026.json / uk-wgfz-ost-west-2026.json) — gesperrt bis zur Klärung der Nutzungsrechte.",
+  "belege_meta": {
+   "abgerufen_am": "2026-11-20"
+  }
+ },
+ {
+  "land_code": "TH",
+  "ags": "16069",
+  "ebene": "kreis",
+  "gebiet_name": "Hildburghausen, Landkreis",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Hildburghausen, des Landkreises Schmalkalden-Meiningen und der kreisfreien Stadt Suhl",
+  "ausschuss": "Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Hildburghausen, des Landkreises Schmalkalden-Meiningen und der kreisfreien Stadt Suhl",
+  "kennzahl": "umrechnungskoeffizient_wgfz",
+  "zweig": "alle",
+  "vollstaendig": false,
+  "zugang": "nicht veröffentlicht",
+  "warum_kein_wert": "Der örtliche Ausschuss veröffentlicht keine eigenen Umrechnungskoeffizienten für die wertrelevante Geschossflächenzahl (WGFZ): in seinen jüngsten Heften (Liegenschaftszinssätze für Wohnungseigentum 2025 (nur Abkürzungsverzeichnis „UK Umrechnungskoeffizienten“, keine Tabelle)) steht keine solche Tabelle, und das ThULB-Verzeichnis führt für keinen örtlichen Thüringer Ausschuss ein Heft mit Umrechnungskoeffizienten. Kein Nachbarwert, keine VW-RL. Weg: Geschäftsstelle des Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Hildburghausen, des Landkreises Schmalkalden-Meiningen und der kreisfreien Stadt Suhl (c/o TLBG, Zweigstelle Schmalkalden, Hoffnung 30, 98574 Schmalkalden), gutachter.schmalkalden@tlbg.thueringen.de; Veröffentlichungen im ThULB-Verzeichnis. Landesweite Koeffizienten der Zentralen Geschäftsstelle (TLBG) sind veröffentlicht, aber nur für den privaten, nicht kommerziellen Gebrauch freigegeben (Satz der Zentralen Geschäftsstelle, uk-flaeche-laender-2026.json / uk-wgfz-ost-west-2026.json) — gesperrt bis zur Klärung der Nutzungsrechte.",
+  "formel": null,
+  "geltungsbereich": {
+   "objektarten": [],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Geschäftsstelle des Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Hildburghausen, des Landkreises Schmalkalden-Meiningen und der kreisfreien Stadt Suhl (c/o TLBG, Zweigstelle Schmalkalden, Hoffnung 30, 98574 Schmalkalden), gutachter.schmalkalden@tlbg.thueringen.de; Veröffentlichungen im ThULB-Verzeichnis. Landesweite Koeffizienten der Zentralen Geschäftsstelle (TLBG) sind veröffentlicht, aber nur für den privaten, nicht kommerziellen Gebrauch freigegeben (Satz der Zentralen Geschäftsstelle, uk-flaeche-laender-2026.json / uk-wgfz-ost-west-2026.json) — gesperrt bis zur Klärung der Nutzungsrechte."
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "dokument": "Liegenschaftszinssätze für Wohnungseigentum 2025 (nur Abkürzungsverzeichnis „UK Umrechnungskoeffizienten“, keine Tabelle) – Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Hildburghausen, des Landkreises Schmalkalden-Meiningen und der kreisfreien Stadt Suhl",
+    "fundstelle": "ganzes Dokument, Textsuche (leerzeichenbereinigt) nach „Umrechnungskoeffizient“ und „Geschossfläche“ ohne Treffer (20.11.2026); Impressum letzte Seite",
+    "url": "https://zs.thulb.uni-jena.de/servlets/MCRFileNodeServlet/jportal_derivate_00375640/LiegWohnHildburghausen2025.pdf",
+    "wortlaut": "kein Treffer"
+   },
+   {
+    "art": "Verzeichnis",
+    "dokument": "ThULB journals@UrMEL",
+    "fundstelle": "Solr-Abfrage objectType:jpjournal, maintitle *Gutachterausschu* (54 Treffer), Stand 20.11.2026",
+    "url": "https://zs.thulb.uni-jena.de/",
+    "wortlaut": "ThULB-Veröffentlichungsverzeichnis (zs.thulb.uni-jena.de, Solr-Abfrage aller 54 Zeitschriften mit „Gutachterausschuss“ im Titel, 20.11.2026): kein Heft eines örtlichen Thüringer Ausschusses mit Umrechnungskoeffizienten; geführt werden Liegenschaftszinssätze/Rohertragsfaktoren, Sachwertfaktoren, Bodenpreisindexreihen, Vergleichsfaktoren (nur Erfurt, Wohnungseigentum) und Immobilienmarktberichte bis 2020."
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "berichtsjahr": 2025,
+  "jahrgang": 2025,
+  "stichtag": "2025-01-01",
+  "stichtag_hinweis": "Kein eigener Stichtag (keine Veröffentlichung); eingetragen ist der Bezugsjahrgang der jüngsten gelesenen Hefte.",
+  "quelle_url": "https://zs.thulb.uni-jena.de/servlets/MCRFileNodeServlet/jportal_derivate_00375640/LiegWohnHildburghausen2025.pdf",
+  "landeswert_url": "https://tlbg.thueringen.de/wertermittlung/online-grundstuecksmarktinformationen/umrechnungskoeffizienten/wgfz",
+  "quelle_parser": "ernte-20261120 (ThULB-Solr + pdftotext, Textsuche)",
+  "modellversion": "Umrechnungskoeffizienten für die wertrelevante Geschossflächenzahl (WGFZ) (§ 16 Abs. 4, § 40 ImmoWertV), Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Hildburghausen, des Landkreises Schmalkalden-Meiningen und der kreisfreien Stadt Suhl, Jahrgang 2025",
+  "modellansaetze": {},
+  "lizenz": "„Eine Wiedergabe von Daten aus diesem Dokument ist nur mit Quellenangabe gestattet.“ (Titelrückseite der Hefte)",
+  "weg": "Geschäftsstelle des Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Hildburghausen, des Landkreises Schmalkalden-Meiningen und der kreisfreien Stadt Suhl (c/o TLBG, Zweigstelle Schmalkalden, Hoffnung 30, 98574 Schmalkalden), gutachter.schmalkalden@tlbg.thueringen.de; Veröffentlichungen im ThULB-Verzeichnis. Landesweite Koeffizienten der Zentralen Geschäftsstelle (TLBG) sind veröffentlicht, aber nur für den privaten, nicht kommerziellen Gebrauch freigegeben (Satz der Zentralen Geschäftsstelle, uk-flaeche-laender-2026.json / uk-wgfz-ost-west-2026.json) — gesperrt bis zur Klärung der Nutzungsrechte.",
+  "belege_meta": {
+   "abgerufen_am": "2026-11-20"
+  }
+ },
+ {
+  "land_code": "TH",
+  "ags": "16066",
+  "ebene": "kreis",
+  "gebiet_name": "Schmalkalden-Meiningen, Landkreis",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Hildburghausen, des Landkreises Schmalkalden-Meiningen und der kreisfreien Stadt Suhl",
+  "ausschuss": "Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Hildburghausen, des Landkreises Schmalkalden-Meiningen und der kreisfreien Stadt Suhl",
+  "kennzahl": "umrechnungskoeffizient_wgfz",
+  "zweig": "alle",
+  "vollstaendig": false,
+  "zugang": "nicht veröffentlicht",
+  "warum_kein_wert": "Der örtliche Ausschuss veröffentlicht keine eigenen Umrechnungskoeffizienten für die wertrelevante Geschossflächenzahl (WGFZ): in seinen jüngsten Heften (Liegenschaftszinssätze für Wohnungseigentum 2025 (nur Abkürzungsverzeichnis „UK Umrechnungskoeffizienten“, keine Tabelle)) steht keine solche Tabelle, und das ThULB-Verzeichnis führt für keinen örtlichen Thüringer Ausschuss ein Heft mit Umrechnungskoeffizienten. Kein Nachbarwert, keine VW-RL. Weg: Geschäftsstelle des Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Hildburghausen, des Landkreises Schmalkalden-Meiningen und der kreisfreien Stadt Suhl (c/o TLBG, Zweigstelle Schmalkalden, Hoffnung 30, 98574 Schmalkalden), gutachter.schmalkalden@tlbg.thueringen.de; Veröffentlichungen im ThULB-Verzeichnis. Landesweite Koeffizienten der Zentralen Geschäftsstelle (TLBG) sind veröffentlicht, aber nur für den privaten, nicht kommerziellen Gebrauch freigegeben (Satz der Zentralen Geschäftsstelle, uk-flaeche-laender-2026.json / uk-wgfz-ost-west-2026.json) — gesperrt bis zur Klärung der Nutzungsrechte.",
+  "formel": null,
+  "geltungsbereich": {
+   "objektarten": [],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Geschäftsstelle des Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Hildburghausen, des Landkreises Schmalkalden-Meiningen und der kreisfreien Stadt Suhl (c/o TLBG, Zweigstelle Schmalkalden, Hoffnung 30, 98574 Schmalkalden), gutachter.schmalkalden@tlbg.thueringen.de; Veröffentlichungen im ThULB-Verzeichnis. Landesweite Koeffizienten der Zentralen Geschäftsstelle (TLBG) sind veröffentlicht, aber nur für den privaten, nicht kommerziellen Gebrauch freigegeben (Satz der Zentralen Geschäftsstelle, uk-flaeche-laender-2026.json / uk-wgfz-ost-west-2026.json) — gesperrt bis zur Klärung der Nutzungsrechte."
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "dokument": "Liegenschaftszinssätze für Wohnungseigentum 2025 (nur Abkürzungsverzeichnis „UK Umrechnungskoeffizienten“, keine Tabelle) – Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Hildburghausen, des Landkreises Schmalkalden-Meiningen und der kreisfreien Stadt Suhl",
+    "fundstelle": "ganzes Dokument, Textsuche (leerzeichenbereinigt) nach „Umrechnungskoeffizient“ und „Geschossfläche“ ohne Treffer (20.11.2026); Impressum letzte Seite",
+    "url": "https://zs.thulb.uni-jena.de/servlets/MCRFileNodeServlet/jportal_derivate_00375640/LiegWohnHildburghausen2025.pdf",
+    "wortlaut": "kein Treffer"
+   },
+   {
+    "art": "Verzeichnis",
+    "dokument": "ThULB journals@UrMEL",
+    "fundstelle": "Solr-Abfrage objectType:jpjournal, maintitle *Gutachterausschu* (54 Treffer), Stand 20.11.2026",
+    "url": "https://zs.thulb.uni-jena.de/",
+    "wortlaut": "ThULB-Veröffentlichungsverzeichnis (zs.thulb.uni-jena.de, Solr-Abfrage aller 54 Zeitschriften mit „Gutachterausschuss“ im Titel, 20.11.2026): kein Heft eines örtlichen Thüringer Ausschusses mit Umrechnungskoeffizienten; geführt werden Liegenschaftszinssätze/Rohertragsfaktoren, Sachwertfaktoren, Bodenpreisindexreihen, Vergleichsfaktoren (nur Erfurt, Wohnungseigentum) und Immobilienmarktberichte bis 2020."
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "berichtsjahr": 2025,
+  "jahrgang": 2025,
+  "stichtag": "2025-01-01",
+  "stichtag_hinweis": "Kein eigener Stichtag (keine Veröffentlichung); eingetragen ist der Bezugsjahrgang der jüngsten gelesenen Hefte.",
+  "quelle_url": "https://zs.thulb.uni-jena.de/servlets/MCRFileNodeServlet/jportal_derivate_00375640/LiegWohnHildburghausen2025.pdf",
+  "landeswert_url": "https://tlbg.thueringen.de/wertermittlung/online-grundstuecksmarktinformationen/umrechnungskoeffizienten/wgfz",
+  "quelle_parser": "ernte-20261120 (ThULB-Solr + pdftotext, Textsuche)",
+  "modellversion": "Umrechnungskoeffizienten für die wertrelevante Geschossflächenzahl (WGFZ) (§ 16 Abs. 4, § 40 ImmoWertV), Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Hildburghausen, des Landkreises Schmalkalden-Meiningen und der kreisfreien Stadt Suhl, Jahrgang 2025",
+  "modellansaetze": {},
+  "lizenz": "„Eine Wiedergabe von Daten aus diesem Dokument ist nur mit Quellenangabe gestattet.“ (Titelrückseite der Hefte)",
+  "weg": "Geschäftsstelle des Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Hildburghausen, des Landkreises Schmalkalden-Meiningen und der kreisfreien Stadt Suhl (c/o TLBG, Zweigstelle Schmalkalden, Hoffnung 30, 98574 Schmalkalden), gutachter.schmalkalden@tlbg.thueringen.de; Veröffentlichungen im ThULB-Verzeichnis. Landesweite Koeffizienten der Zentralen Geschäftsstelle (TLBG) sind veröffentlicht, aber nur für den privaten, nicht kommerziellen Gebrauch freigegeben (Satz der Zentralen Geschäftsstelle, uk-flaeche-laender-2026.json / uk-wgfz-ost-west-2026.json) — gesperrt bis zur Klärung der Nutzungsrechte.",
+  "belege_meta": {
+   "abgerufen_am": "2026-11-20"
+  }
+ },
+ {
+  "land_code": "TH",
+  "ags": "16054",
+  "ebene": "kreis",
+  "gebiet_name": "Suhl, kreisfreie Stadt",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Hildburghausen, des Landkreises Schmalkalden-Meiningen und der kreisfreien Stadt Suhl",
+  "ausschuss": "Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Hildburghausen, des Landkreises Schmalkalden-Meiningen und der kreisfreien Stadt Suhl",
+  "kennzahl": "umrechnungskoeffizient_wgfz",
+  "zweig": "alle",
+  "vollstaendig": false,
+  "zugang": "nicht veröffentlicht",
+  "warum_kein_wert": "Der örtliche Ausschuss veröffentlicht keine eigenen Umrechnungskoeffizienten für die wertrelevante Geschossflächenzahl (WGFZ): in seinen jüngsten Heften (Liegenschaftszinssätze für Wohnungseigentum 2025 (nur Abkürzungsverzeichnis „UK Umrechnungskoeffizienten“, keine Tabelle)) steht keine solche Tabelle, und das ThULB-Verzeichnis führt für keinen örtlichen Thüringer Ausschuss ein Heft mit Umrechnungskoeffizienten. Kein Nachbarwert, keine VW-RL. Weg: Geschäftsstelle des Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Hildburghausen, des Landkreises Schmalkalden-Meiningen und der kreisfreien Stadt Suhl (c/o TLBG, Zweigstelle Schmalkalden, Hoffnung 30, 98574 Schmalkalden), gutachter.schmalkalden@tlbg.thueringen.de; Veröffentlichungen im ThULB-Verzeichnis. Landesweite Koeffizienten der Zentralen Geschäftsstelle (TLBG) sind veröffentlicht, aber nur für den privaten, nicht kommerziellen Gebrauch freigegeben (Satz der Zentralen Geschäftsstelle, uk-flaeche-laender-2026.json / uk-wgfz-ost-west-2026.json) — gesperrt bis zur Klärung der Nutzungsrechte.",
+  "formel": null,
+  "geltungsbereich": {
+   "objektarten": [],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Geschäftsstelle des Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Hildburghausen, des Landkreises Schmalkalden-Meiningen und der kreisfreien Stadt Suhl (c/o TLBG, Zweigstelle Schmalkalden, Hoffnung 30, 98574 Schmalkalden), gutachter.schmalkalden@tlbg.thueringen.de; Veröffentlichungen im ThULB-Verzeichnis. Landesweite Koeffizienten der Zentralen Geschäftsstelle (TLBG) sind veröffentlicht, aber nur für den privaten, nicht kommerziellen Gebrauch freigegeben (Satz der Zentralen Geschäftsstelle, uk-flaeche-laender-2026.json / uk-wgfz-ost-west-2026.json) — gesperrt bis zur Klärung der Nutzungsrechte."
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "dokument": "Liegenschaftszinssätze für Wohnungseigentum 2025 (nur Abkürzungsverzeichnis „UK Umrechnungskoeffizienten“, keine Tabelle) – Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Hildburghausen, des Landkreises Schmalkalden-Meiningen und der kreisfreien Stadt Suhl",
+    "fundstelle": "ganzes Dokument, Textsuche (leerzeichenbereinigt) nach „Umrechnungskoeffizient“ und „Geschossfläche“ ohne Treffer (20.11.2026); Impressum letzte Seite",
+    "url": "https://zs.thulb.uni-jena.de/servlets/MCRFileNodeServlet/jportal_derivate_00375640/LiegWohnHildburghausen2025.pdf",
+    "wortlaut": "kein Treffer"
+   },
+   {
+    "art": "Verzeichnis",
+    "dokument": "ThULB journals@UrMEL",
+    "fundstelle": "Solr-Abfrage objectType:jpjournal, maintitle *Gutachterausschu* (54 Treffer), Stand 20.11.2026",
+    "url": "https://zs.thulb.uni-jena.de/",
+    "wortlaut": "ThULB-Veröffentlichungsverzeichnis (zs.thulb.uni-jena.de, Solr-Abfrage aller 54 Zeitschriften mit „Gutachterausschuss“ im Titel, 20.11.2026): kein Heft eines örtlichen Thüringer Ausschusses mit Umrechnungskoeffizienten; geführt werden Liegenschaftszinssätze/Rohertragsfaktoren, Sachwertfaktoren, Bodenpreisindexreihen, Vergleichsfaktoren (nur Erfurt, Wohnungseigentum) und Immobilienmarktberichte bis 2020."
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "berichtsjahr": 2025,
+  "jahrgang": 2025,
+  "stichtag": "2025-01-01",
+  "stichtag_hinweis": "Kein eigener Stichtag (keine Veröffentlichung); eingetragen ist der Bezugsjahrgang der jüngsten gelesenen Hefte.",
+  "quelle_url": "https://zs.thulb.uni-jena.de/servlets/MCRFileNodeServlet/jportal_derivate_00375640/LiegWohnHildburghausen2025.pdf",
+  "landeswert_url": "https://tlbg.thueringen.de/wertermittlung/online-grundstuecksmarktinformationen/umrechnungskoeffizienten/wgfz",
+  "quelle_parser": "ernte-20261120 (ThULB-Solr + pdftotext, Textsuche)",
+  "modellversion": "Umrechnungskoeffizienten für die wertrelevante Geschossflächenzahl (WGFZ) (§ 16 Abs. 4, § 40 ImmoWertV), Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Hildburghausen, des Landkreises Schmalkalden-Meiningen und der kreisfreien Stadt Suhl, Jahrgang 2025",
+  "modellansaetze": {},
+  "lizenz": "„Eine Wiedergabe von Daten aus diesem Dokument ist nur mit Quellenangabe gestattet.“ (Titelrückseite der Hefte)",
+  "weg": "Geschäftsstelle des Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Hildburghausen, des Landkreises Schmalkalden-Meiningen und der kreisfreien Stadt Suhl (c/o TLBG, Zweigstelle Schmalkalden, Hoffnung 30, 98574 Schmalkalden), gutachter.schmalkalden@tlbg.thueringen.de; Veröffentlichungen im ThULB-Verzeichnis. Landesweite Koeffizienten der Zentralen Geschäftsstelle (TLBG) sind veröffentlicht, aber nur für den privaten, nicht kommerziellen Gebrauch freigegeben (Satz der Zentralen Geschäftsstelle, uk-flaeche-laender-2026.json / uk-wgfz-ost-west-2026.json) — gesperrt bis zur Klärung der Nutzungsrechte.",
+  "belege_meta": {
+   "abgerufen_am": "2026-11-20"
+  }
+ },
+ {
+  "land_code": "TH",
+  "ags": "16068",
+  "ebene": "kreis",
+  "gebiet_name": "Sömmerda, Landkreis",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Sömmerda, des Landkreises Weimarer Land und der kreisfreien Stadt Weimar",
+  "ausschuss": "Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Sömmerda, des Landkreises Weimarer Land und der kreisfreien Stadt Weimar",
+  "kennzahl": "umrechnungskoeffizient_wgfz",
+  "zweig": "alle",
+  "vollstaendig": false,
+  "zugang": "nicht veröffentlicht",
+  "warum_kein_wert": "Der örtliche Ausschuss veröffentlicht keine eigenen Umrechnungskoeffizienten für die wertrelevante Geschossflächenzahl (WGFZ): in seinen jüngsten Heften (Liegenschaftszinssätze und Rohertragsfaktoren 2025; Sachwertfaktoren 2025) steht keine solche Tabelle, und das ThULB-Verzeichnis führt für keinen örtlichen Thüringer Ausschuss ein Heft mit Umrechnungskoeffizienten. Kein Nachbarwert, keine VW-RL. Weg: Geschäftsstelle des Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Sömmerda, des Landkreises Weimarer Land und der kreisfreien Stadt Weimar (c/o TLBG, Zweigstelle Erfurt, Hohenwindenstraße 14, 99086 Erfurt), gutachter.apolda@tlbg.thueringen.de; Veröffentlichungen im ThULB-Verzeichnis. Landesweite Koeffizienten der Zentralen Geschäftsstelle (TLBG) sind veröffentlicht, aber nur für den privaten, nicht kommerziellen Gebrauch freigegeben (Satz der Zentralen Geschäftsstelle, uk-flaeche-laender-2026.json / uk-wgfz-ost-west-2026.json) — gesperrt bis zur Klärung der Nutzungsrechte.",
+  "formel": null,
+  "geltungsbereich": {
+   "objektarten": [],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Geschäftsstelle des Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Sömmerda, des Landkreises Weimarer Land und der kreisfreien Stadt Weimar (c/o TLBG, Zweigstelle Erfurt, Hohenwindenstraße 14, 99086 Erfurt), gutachter.apolda@tlbg.thueringen.de; Veröffentlichungen im ThULB-Verzeichnis. Landesweite Koeffizienten der Zentralen Geschäftsstelle (TLBG) sind veröffentlicht, aber nur für den privaten, nicht kommerziellen Gebrauch freigegeben (Satz der Zentralen Geschäftsstelle, uk-flaeche-laender-2026.json / uk-wgfz-ost-west-2026.json) — gesperrt bis zur Klärung der Nutzungsrechte."
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "dokument": "Liegenschaftszinssätze und Rohertragsfaktoren 2025 – Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Sömmerda, des Landkreises Weimarer Land und der kreisfreien Stadt Weimar",
+    "fundstelle": "ganzes Dokument, Textsuche (leerzeichenbereinigt) nach „Umrechnungskoeffizient“ und „Geschossfläche“ ohne Treffer (20.11.2026); Impressum letzte Seite",
+    "url": "https://zs.thulb.uni-jena.de/servlets/MCRFileNodeServlet/jportal_derivate_00362094/20254161137-2025_LZ_RoF_R262_ohneKennwortPDFA.pdf",
+    "wortlaut": "kein Treffer"
+   },
+   {
+    "art": "amtliche Veröffentlichung",
+    "dokument": "Sachwertfaktoren 2025 – Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Sömmerda, des Landkreises Weimarer Land und der kreisfreien Stadt Weimar",
+    "fundstelle": "ganzes Dokument, Textsuche (leerzeichenbereinigt) nach „Umrechnungskoeffizient“ und „Geschossfläche“ ohne Treffer (20.11.2026); Impressum letzte Seite",
+    "url": "https://zs.thulb.uni-jena.de/servlets/MCRFileNodeServlet/jportal_derivate_00364658/SachwertSoemm2025.pdf",
+    "wortlaut": "kein Treffer"
+   },
+   {
+    "art": "Verzeichnis",
+    "dokument": "ThULB journals@UrMEL",
+    "fundstelle": "Solr-Abfrage objectType:jpjournal, maintitle *Gutachterausschu* (54 Treffer), Stand 20.11.2026",
+    "url": "https://zs.thulb.uni-jena.de/",
+    "wortlaut": "ThULB-Veröffentlichungsverzeichnis (zs.thulb.uni-jena.de, Solr-Abfrage aller 54 Zeitschriften mit „Gutachterausschuss“ im Titel, 20.11.2026): kein Heft eines örtlichen Thüringer Ausschusses mit Umrechnungskoeffizienten; geführt werden Liegenschaftszinssätze/Rohertragsfaktoren, Sachwertfaktoren, Bodenpreisindexreihen, Vergleichsfaktoren (nur Erfurt, Wohnungseigentum) und Immobilienmarktberichte bis 2020."
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "berichtsjahr": 2025,
+  "jahrgang": 2025,
+  "stichtag": "2025-01-01",
+  "stichtag_hinweis": "Kein eigener Stichtag (keine Veröffentlichung); eingetragen ist der Bezugsjahrgang der jüngsten gelesenen Hefte.",
+  "quelle_url": "https://zs.thulb.uni-jena.de/servlets/MCRFileNodeServlet/jportal_derivate_00362094/20254161137-2025_LZ_RoF_R262_ohneKennwortPDFA.pdf",
+  "landeswert_url": "https://tlbg.thueringen.de/wertermittlung/online-grundstuecksmarktinformationen/umrechnungskoeffizienten/wgfz",
+  "quelle_parser": "ernte-20261120 (ThULB-Solr + pdftotext, Textsuche)",
+  "modellversion": "Umrechnungskoeffizienten für die wertrelevante Geschossflächenzahl (WGFZ) (§ 16 Abs. 4, § 40 ImmoWertV), Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Sömmerda, des Landkreises Weimarer Land und der kreisfreien Stadt Weimar, Jahrgang 2025",
+  "modellansaetze": {},
+  "lizenz": "„Eine Wiedergabe von Daten aus diesem Dokument ist nur mit Quellenangabe gestattet.“ (Titelrückseite der Hefte)",
+  "weg": "Geschäftsstelle des Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Sömmerda, des Landkreises Weimarer Land und der kreisfreien Stadt Weimar (c/o TLBG, Zweigstelle Erfurt, Hohenwindenstraße 14, 99086 Erfurt), gutachter.apolda@tlbg.thueringen.de; Veröffentlichungen im ThULB-Verzeichnis. Landesweite Koeffizienten der Zentralen Geschäftsstelle (TLBG) sind veröffentlicht, aber nur für den privaten, nicht kommerziellen Gebrauch freigegeben (Satz der Zentralen Geschäftsstelle, uk-flaeche-laender-2026.json / uk-wgfz-ost-west-2026.json) — gesperrt bis zur Klärung der Nutzungsrechte.",
+  "belege_meta": {
+   "abgerufen_am": "2026-11-20"
+  }
+ },
+ {
+  "land_code": "TH",
+  "ags": "16071",
+  "ebene": "kreis",
+  "gebiet_name": "Weimarer Land, Landkreis",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Sömmerda, des Landkreises Weimarer Land und der kreisfreien Stadt Weimar",
+  "ausschuss": "Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Sömmerda, des Landkreises Weimarer Land und der kreisfreien Stadt Weimar",
+  "kennzahl": "umrechnungskoeffizient_wgfz",
+  "zweig": "alle",
+  "vollstaendig": false,
+  "zugang": "nicht veröffentlicht",
+  "warum_kein_wert": "Der örtliche Ausschuss veröffentlicht keine eigenen Umrechnungskoeffizienten für die wertrelevante Geschossflächenzahl (WGFZ): in seinen jüngsten Heften (Liegenschaftszinssätze und Rohertragsfaktoren 2025; Sachwertfaktoren 2025) steht keine solche Tabelle, und das ThULB-Verzeichnis führt für keinen örtlichen Thüringer Ausschuss ein Heft mit Umrechnungskoeffizienten. Kein Nachbarwert, keine VW-RL. Weg: Geschäftsstelle des Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Sömmerda, des Landkreises Weimarer Land und der kreisfreien Stadt Weimar (c/o TLBG, Zweigstelle Erfurt, Hohenwindenstraße 14, 99086 Erfurt), gutachter.apolda@tlbg.thueringen.de; Veröffentlichungen im ThULB-Verzeichnis. Landesweite Koeffizienten der Zentralen Geschäftsstelle (TLBG) sind veröffentlicht, aber nur für den privaten, nicht kommerziellen Gebrauch freigegeben (Satz der Zentralen Geschäftsstelle, uk-flaeche-laender-2026.json / uk-wgfz-ost-west-2026.json) — gesperrt bis zur Klärung der Nutzungsrechte.",
+  "formel": null,
+  "geltungsbereich": {
+   "objektarten": [],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Geschäftsstelle des Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Sömmerda, des Landkreises Weimarer Land und der kreisfreien Stadt Weimar (c/o TLBG, Zweigstelle Erfurt, Hohenwindenstraße 14, 99086 Erfurt), gutachter.apolda@tlbg.thueringen.de; Veröffentlichungen im ThULB-Verzeichnis. Landesweite Koeffizienten der Zentralen Geschäftsstelle (TLBG) sind veröffentlicht, aber nur für den privaten, nicht kommerziellen Gebrauch freigegeben (Satz der Zentralen Geschäftsstelle, uk-flaeche-laender-2026.json / uk-wgfz-ost-west-2026.json) — gesperrt bis zur Klärung der Nutzungsrechte."
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "dokument": "Liegenschaftszinssätze und Rohertragsfaktoren 2025 – Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Sömmerda, des Landkreises Weimarer Land und der kreisfreien Stadt Weimar",
+    "fundstelle": "ganzes Dokument, Textsuche (leerzeichenbereinigt) nach „Umrechnungskoeffizient“ und „Geschossfläche“ ohne Treffer (20.11.2026); Impressum letzte Seite",
+    "url": "https://zs.thulb.uni-jena.de/servlets/MCRFileNodeServlet/jportal_derivate_00362094/20254161137-2025_LZ_RoF_R262_ohneKennwortPDFA.pdf",
+    "wortlaut": "kein Treffer"
+   },
+   {
+    "art": "amtliche Veröffentlichung",
+    "dokument": "Sachwertfaktoren 2025 – Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Sömmerda, des Landkreises Weimarer Land und der kreisfreien Stadt Weimar",
+    "fundstelle": "ganzes Dokument, Textsuche (leerzeichenbereinigt) nach „Umrechnungskoeffizient“ und „Geschossfläche“ ohne Treffer (20.11.2026); Impressum letzte Seite",
+    "url": "https://zs.thulb.uni-jena.de/servlets/MCRFileNodeServlet/jportal_derivate_00364658/SachwertSoemm2025.pdf",
+    "wortlaut": "kein Treffer"
+   },
+   {
+    "art": "Verzeichnis",
+    "dokument": "ThULB journals@UrMEL",
+    "fundstelle": "Solr-Abfrage objectType:jpjournal, maintitle *Gutachterausschu* (54 Treffer), Stand 20.11.2026",
+    "url": "https://zs.thulb.uni-jena.de/",
+    "wortlaut": "ThULB-Veröffentlichungsverzeichnis (zs.thulb.uni-jena.de, Solr-Abfrage aller 54 Zeitschriften mit „Gutachterausschuss“ im Titel, 20.11.2026): kein Heft eines örtlichen Thüringer Ausschusses mit Umrechnungskoeffizienten; geführt werden Liegenschaftszinssätze/Rohertragsfaktoren, Sachwertfaktoren, Bodenpreisindexreihen, Vergleichsfaktoren (nur Erfurt, Wohnungseigentum) und Immobilienmarktberichte bis 2020."
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "berichtsjahr": 2025,
+  "jahrgang": 2025,
+  "stichtag": "2025-01-01",
+  "stichtag_hinweis": "Kein eigener Stichtag (keine Veröffentlichung); eingetragen ist der Bezugsjahrgang der jüngsten gelesenen Hefte.",
+  "quelle_url": "https://zs.thulb.uni-jena.de/servlets/MCRFileNodeServlet/jportal_derivate_00362094/20254161137-2025_LZ_RoF_R262_ohneKennwortPDFA.pdf",
+  "landeswert_url": "https://tlbg.thueringen.de/wertermittlung/online-grundstuecksmarktinformationen/umrechnungskoeffizienten/wgfz",
+  "quelle_parser": "ernte-20261120 (ThULB-Solr + pdftotext, Textsuche)",
+  "modellversion": "Umrechnungskoeffizienten für die wertrelevante Geschossflächenzahl (WGFZ) (§ 16 Abs. 4, § 40 ImmoWertV), Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Sömmerda, des Landkreises Weimarer Land und der kreisfreien Stadt Weimar, Jahrgang 2025",
+  "modellansaetze": {},
+  "lizenz": "„Eine Wiedergabe von Daten aus diesem Dokument ist nur mit Quellenangabe gestattet.“ (Titelrückseite der Hefte)",
+  "weg": "Geschäftsstelle des Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Sömmerda, des Landkreises Weimarer Land und der kreisfreien Stadt Weimar (c/o TLBG, Zweigstelle Erfurt, Hohenwindenstraße 14, 99086 Erfurt), gutachter.apolda@tlbg.thueringen.de; Veröffentlichungen im ThULB-Verzeichnis. Landesweite Koeffizienten der Zentralen Geschäftsstelle (TLBG) sind veröffentlicht, aber nur für den privaten, nicht kommerziellen Gebrauch freigegeben (Satz der Zentralen Geschäftsstelle, uk-flaeche-laender-2026.json / uk-wgfz-ost-west-2026.json) — gesperrt bis zur Klärung der Nutzungsrechte.",
+  "belege_meta": {
+   "abgerufen_am": "2026-11-20"
+  }
+ },
+ {
+  "land_code": "TH",
+  "ags": "16055",
+  "ebene": "kreis",
+  "gebiet_name": "Weimar, kreisfreie Stadt",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Sömmerda, des Landkreises Weimarer Land und der kreisfreien Stadt Weimar",
+  "ausschuss": "Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Sömmerda, des Landkreises Weimarer Land und der kreisfreien Stadt Weimar",
+  "kennzahl": "umrechnungskoeffizient_wgfz",
+  "zweig": "alle",
+  "vollstaendig": false,
+  "zugang": "nicht veröffentlicht",
+  "warum_kein_wert": "Der örtliche Ausschuss veröffentlicht keine eigenen Umrechnungskoeffizienten für die wertrelevante Geschossflächenzahl (WGFZ): in seinen jüngsten Heften (Liegenschaftszinssätze und Rohertragsfaktoren 2025; Sachwertfaktoren 2025) steht keine solche Tabelle, und das ThULB-Verzeichnis führt für keinen örtlichen Thüringer Ausschuss ein Heft mit Umrechnungskoeffizienten. Kein Nachbarwert, keine VW-RL. Weg: Geschäftsstelle des Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Sömmerda, des Landkreises Weimarer Land und der kreisfreien Stadt Weimar (c/o TLBG, Zweigstelle Erfurt, Hohenwindenstraße 14, 99086 Erfurt), gutachter.apolda@tlbg.thueringen.de; Veröffentlichungen im ThULB-Verzeichnis. Landesweite Koeffizienten der Zentralen Geschäftsstelle (TLBG) sind veröffentlicht, aber nur für den privaten, nicht kommerziellen Gebrauch freigegeben (Satz der Zentralen Geschäftsstelle, uk-flaeche-laender-2026.json / uk-wgfz-ost-west-2026.json) — gesperrt bis zur Klärung der Nutzungsrechte.",
+  "formel": null,
+  "geltungsbereich": {
+   "objektarten": [],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Geschäftsstelle des Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Sömmerda, des Landkreises Weimarer Land und der kreisfreien Stadt Weimar (c/o TLBG, Zweigstelle Erfurt, Hohenwindenstraße 14, 99086 Erfurt), gutachter.apolda@tlbg.thueringen.de; Veröffentlichungen im ThULB-Verzeichnis. Landesweite Koeffizienten der Zentralen Geschäftsstelle (TLBG) sind veröffentlicht, aber nur für den privaten, nicht kommerziellen Gebrauch freigegeben (Satz der Zentralen Geschäftsstelle, uk-flaeche-laender-2026.json / uk-wgfz-ost-west-2026.json) — gesperrt bis zur Klärung der Nutzungsrechte."
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "dokument": "Liegenschaftszinssätze und Rohertragsfaktoren 2025 – Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Sömmerda, des Landkreises Weimarer Land und der kreisfreien Stadt Weimar",
+    "fundstelle": "ganzes Dokument, Textsuche (leerzeichenbereinigt) nach „Umrechnungskoeffizient“ und „Geschossfläche“ ohne Treffer (20.11.2026); Impressum letzte Seite",
+    "url": "https://zs.thulb.uni-jena.de/servlets/MCRFileNodeServlet/jportal_derivate_00362094/20254161137-2025_LZ_RoF_R262_ohneKennwortPDFA.pdf",
+    "wortlaut": "kein Treffer"
+   },
+   {
+    "art": "amtliche Veröffentlichung",
+    "dokument": "Sachwertfaktoren 2025 – Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Sömmerda, des Landkreises Weimarer Land und der kreisfreien Stadt Weimar",
+    "fundstelle": "ganzes Dokument, Textsuche (leerzeichenbereinigt) nach „Umrechnungskoeffizient“ und „Geschossfläche“ ohne Treffer (20.11.2026); Impressum letzte Seite",
+    "url": "https://zs.thulb.uni-jena.de/servlets/MCRFileNodeServlet/jportal_derivate_00364658/SachwertSoemm2025.pdf",
+    "wortlaut": "kein Treffer"
+   },
+   {
+    "art": "Verzeichnis",
+    "dokument": "ThULB journals@UrMEL",
+    "fundstelle": "Solr-Abfrage objectType:jpjournal, maintitle *Gutachterausschu* (54 Treffer), Stand 20.11.2026",
+    "url": "https://zs.thulb.uni-jena.de/",
+    "wortlaut": "ThULB-Veröffentlichungsverzeichnis (zs.thulb.uni-jena.de, Solr-Abfrage aller 54 Zeitschriften mit „Gutachterausschuss“ im Titel, 20.11.2026): kein Heft eines örtlichen Thüringer Ausschusses mit Umrechnungskoeffizienten; geführt werden Liegenschaftszinssätze/Rohertragsfaktoren, Sachwertfaktoren, Bodenpreisindexreihen, Vergleichsfaktoren (nur Erfurt, Wohnungseigentum) und Immobilienmarktberichte bis 2020."
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "berichtsjahr": 2025,
+  "jahrgang": 2025,
+  "stichtag": "2025-01-01",
+  "stichtag_hinweis": "Kein eigener Stichtag (keine Veröffentlichung); eingetragen ist der Bezugsjahrgang der jüngsten gelesenen Hefte.",
+  "quelle_url": "https://zs.thulb.uni-jena.de/servlets/MCRFileNodeServlet/jportal_derivate_00362094/20254161137-2025_LZ_RoF_R262_ohneKennwortPDFA.pdf",
+  "landeswert_url": "https://tlbg.thueringen.de/wertermittlung/online-grundstuecksmarktinformationen/umrechnungskoeffizienten/wgfz",
+  "quelle_parser": "ernte-20261120 (ThULB-Solr + pdftotext, Textsuche)",
+  "modellversion": "Umrechnungskoeffizienten für die wertrelevante Geschossflächenzahl (WGFZ) (§ 16 Abs. 4, § 40 ImmoWertV), Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Sömmerda, des Landkreises Weimarer Land und der kreisfreien Stadt Weimar, Jahrgang 2025",
+  "modellansaetze": {},
+  "lizenz": "„Eine Wiedergabe von Daten aus diesem Dokument ist nur mit Quellenangabe gestattet.“ (Titelrückseite der Hefte)",
+  "weg": "Geschäftsstelle des Gutachterausschuss für Grundstückswerte für das Gebiet des Landkreises Sömmerda, des Landkreises Weimarer Land und der kreisfreien Stadt Weimar (c/o TLBG, Zweigstelle Erfurt, Hohenwindenstraße 14, 99086 Erfurt), gutachter.apolda@tlbg.thueringen.de; Veröffentlichungen im ThULB-Verzeichnis. Landesweite Koeffizienten der Zentralen Geschäftsstelle (TLBG) sind veröffentlicht, aber nur für den privaten, nicht kommerziellen Gebrauch freigegeben (Satz der Zentralen Geschäftsstelle, uk-flaeche-laender-2026.json / uk-wgfz-ost-west-2026.json) — gesperrt bis zur Klärung der Nutzungsrechte.",
+  "belege_meta": {
+   "abgerufen_am": "2026-11-20"
+  }
+ },
+ {
+  "land_code": "TH",
+  "ags": "16074",
+  "ebene": "kreis",
+  "gebiet_name": "Saale-Holzland-Kreis",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte für das Gebiet des Saale-Holzland-Kreises, des Saale-Orla-Kreises und der kreisfreien Stadt Jena",
+  "ausschuss": "Gutachterausschuss für Grundstückswerte für das Gebiet des Saale-Holzland-Kreises, des Saale-Orla-Kreises und der kreisfreien Stadt Jena",
+  "kennzahl": "umrechnungskoeffizient_wgfz",
+  "zweig": "alle",
+  "vollstaendig": false,
+  "zugang": "nicht veröffentlicht",
+  "warum_kein_wert": "Der örtliche Ausschuss veröffentlicht keine eigenen Umrechnungskoeffizienten für die wertrelevante Geschossflächenzahl (WGFZ): in seinen jüngsten Heften (Liegenschaftszinssätze 2025; Sachwertfaktoren 2025) steht keine solche Tabelle, und das ThULB-Verzeichnis führt für keinen örtlichen Thüringer Ausschuss ein Heft mit Umrechnungskoeffizienten. Kein Nachbarwert, keine VW-RL. Weg: Geschäftsstelle des Gutachterausschuss für Grundstückswerte für das Gebiet des Saale-Holzland-Kreises, des Saale-Orla-Kreises und der kreisfreien Stadt Jena (c/o TLBG, Zweigstelle Pößneck, Rosa-Luxemburg-Straße 7, 07381 Pößneck), gutachter.poessneck@tlbg.thueringen.de; Veröffentlichungen im ThULB-Verzeichnis. Landesweite Koeffizienten der Zentralen Geschäftsstelle (TLBG) sind veröffentlicht, aber nur für den privaten, nicht kommerziellen Gebrauch freigegeben (Satz der Zentralen Geschäftsstelle, uk-flaeche-laender-2026.json / uk-wgfz-ost-west-2026.json) — gesperrt bis zur Klärung der Nutzungsrechte.",
+  "formel": null,
+  "geltungsbereich": {
+   "objektarten": [],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Geschäftsstelle des Gutachterausschuss für Grundstückswerte für das Gebiet des Saale-Holzland-Kreises, des Saale-Orla-Kreises und der kreisfreien Stadt Jena (c/o TLBG, Zweigstelle Pößneck, Rosa-Luxemburg-Straße 7, 07381 Pößneck), gutachter.poessneck@tlbg.thueringen.de; Veröffentlichungen im ThULB-Verzeichnis. Landesweite Koeffizienten der Zentralen Geschäftsstelle (TLBG) sind veröffentlicht, aber nur für den privaten, nicht kommerziellen Gebrauch freigegeben (Satz der Zentralen Geschäftsstelle, uk-flaeche-laender-2026.json / uk-wgfz-ost-west-2026.json) — gesperrt bis zur Klärung der Nutzungsrechte."
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "dokument": "Liegenschaftszinssätze 2025 – Gutachterausschuss für Grundstückswerte für das Gebiet des Saale-Holzland-Kreises, des Saale-Orla-Kreises und der kreisfreien Stadt Jena",
+    "fundstelle": "ganzes Dokument, Textsuche (leerzeichenbereinigt) nach „Umrechnungskoeffizient“ und „Geschossfläche“ ohne Treffer (20.11.2026); Impressum letzte Seite",
+    "url": "https://zs.thulb.uni-jena.de/servlets/MCRFileNodeServlet/jportal_derivate_00363196/LiegSHK2025.pdf",
+    "wortlaut": "kein Treffer"
+   },
+   {
+    "art": "amtliche Veröffentlichung",
+    "dokument": "Sachwertfaktoren 2025 – Gutachterausschuss für Grundstückswerte für das Gebiet des Saale-Holzland-Kreises, des Saale-Orla-Kreises und der kreisfreien Stadt Jena",
+    "fundstelle": "ganzes Dokument, Textsuche (leerzeichenbereinigt) nach „Umrechnungskoeffizient“ und „Geschossfläche“ ohne Treffer (20.11.2026); Impressum letzte Seite",
+    "url": "https://zs.thulb.uni-jena.de/servlets/MCRFileNodeServlet/jportal_derivate_00363197/SachwertSHK2025.pdf",
+    "wortlaut": "kein Treffer"
+   },
+   {
+    "art": "Verzeichnis",
+    "dokument": "ThULB journals@UrMEL",
+    "fundstelle": "Solr-Abfrage objectType:jpjournal, maintitle *Gutachterausschu* (54 Treffer), Stand 20.11.2026",
+    "url": "https://zs.thulb.uni-jena.de/",
+    "wortlaut": "ThULB-Veröffentlichungsverzeichnis (zs.thulb.uni-jena.de, Solr-Abfrage aller 54 Zeitschriften mit „Gutachterausschuss“ im Titel, 20.11.2026): kein Heft eines örtlichen Thüringer Ausschusses mit Umrechnungskoeffizienten; geführt werden Liegenschaftszinssätze/Rohertragsfaktoren, Sachwertfaktoren, Bodenpreisindexreihen, Vergleichsfaktoren (nur Erfurt, Wohnungseigentum) und Immobilienmarktberichte bis 2020."
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "berichtsjahr": 2025,
+  "jahrgang": 2025,
+  "stichtag": "2025-01-01",
+  "stichtag_hinweis": "Kein eigener Stichtag (keine Veröffentlichung); eingetragen ist der Bezugsjahrgang der jüngsten gelesenen Hefte.",
+  "quelle_url": "https://zs.thulb.uni-jena.de/servlets/MCRFileNodeServlet/jportal_derivate_00363196/LiegSHK2025.pdf",
+  "landeswert_url": "https://tlbg.thueringen.de/wertermittlung/online-grundstuecksmarktinformationen/umrechnungskoeffizienten/wgfz",
+  "quelle_parser": "ernte-20261120 (ThULB-Solr + pdftotext, Textsuche)",
+  "modellversion": "Umrechnungskoeffizienten für die wertrelevante Geschossflächenzahl (WGFZ) (§ 16 Abs. 4, § 40 ImmoWertV), Gutachterausschuss für Grundstückswerte für das Gebiet des Saale-Holzland-Kreises, des Saale-Orla-Kreises und der kreisfreien Stadt Jena, Jahrgang 2025",
+  "modellansaetze": {},
+  "lizenz": "„Eine Wiedergabe von Daten aus diesem Dokument ist nur mit Quellenangabe gestattet.“ (Titelrückseite der Hefte)",
+  "weg": "Geschäftsstelle des Gutachterausschuss für Grundstückswerte für das Gebiet des Saale-Holzland-Kreises, des Saale-Orla-Kreises und der kreisfreien Stadt Jena (c/o TLBG, Zweigstelle Pößneck, Rosa-Luxemburg-Straße 7, 07381 Pößneck), gutachter.poessneck@tlbg.thueringen.de; Veröffentlichungen im ThULB-Verzeichnis. Landesweite Koeffizienten der Zentralen Geschäftsstelle (TLBG) sind veröffentlicht, aber nur für den privaten, nicht kommerziellen Gebrauch freigegeben (Satz der Zentralen Geschäftsstelle, uk-flaeche-laender-2026.json / uk-wgfz-ost-west-2026.json) — gesperrt bis zur Klärung der Nutzungsrechte.",
+  "belege_meta": {
+   "abgerufen_am": "2026-11-20"
+  }
+ },
+ {
+  "land_code": "TH",
+  "ags": "16075",
+  "ebene": "kreis",
+  "gebiet_name": "Saale-Orla-Kreis",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte für das Gebiet des Saale-Holzland-Kreises, des Saale-Orla-Kreises und der kreisfreien Stadt Jena",
+  "ausschuss": "Gutachterausschuss für Grundstückswerte für das Gebiet des Saale-Holzland-Kreises, des Saale-Orla-Kreises und der kreisfreien Stadt Jena",
+  "kennzahl": "umrechnungskoeffizient_wgfz",
+  "zweig": "alle",
+  "vollstaendig": false,
+  "zugang": "nicht veröffentlicht",
+  "warum_kein_wert": "Der örtliche Ausschuss veröffentlicht keine eigenen Umrechnungskoeffizienten für die wertrelevante Geschossflächenzahl (WGFZ): in seinen jüngsten Heften (Liegenschaftszinssätze 2025; Sachwertfaktoren 2025) steht keine solche Tabelle, und das ThULB-Verzeichnis führt für keinen örtlichen Thüringer Ausschuss ein Heft mit Umrechnungskoeffizienten. Kein Nachbarwert, keine VW-RL. Weg: Geschäftsstelle des Gutachterausschuss für Grundstückswerte für das Gebiet des Saale-Holzland-Kreises, des Saale-Orla-Kreises und der kreisfreien Stadt Jena (c/o TLBG, Zweigstelle Pößneck, Rosa-Luxemburg-Straße 7, 07381 Pößneck), gutachter.poessneck@tlbg.thueringen.de; Veröffentlichungen im ThULB-Verzeichnis. Landesweite Koeffizienten der Zentralen Geschäftsstelle (TLBG) sind veröffentlicht, aber nur für den privaten, nicht kommerziellen Gebrauch freigegeben (Satz der Zentralen Geschäftsstelle, uk-flaeche-laender-2026.json / uk-wgfz-ost-west-2026.json) — gesperrt bis zur Klärung der Nutzungsrechte.",
+  "formel": null,
+  "geltungsbereich": {
+   "objektarten": [],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Geschäftsstelle des Gutachterausschuss für Grundstückswerte für das Gebiet des Saale-Holzland-Kreises, des Saale-Orla-Kreises und der kreisfreien Stadt Jena (c/o TLBG, Zweigstelle Pößneck, Rosa-Luxemburg-Straße 7, 07381 Pößneck), gutachter.poessneck@tlbg.thueringen.de; Veröffentlichungen im ThULB-Verzeichnis. Landesweite Koeffizienten der Zentralen Geschäftsstelle (TLBG) sind veröffentlicht, aber nur für den privaten, nicht kommerziellen Gebrauch freigegeben (Satz der Zentralen Geschäftsstelle, uk-flaeche-laender-2026.json / uk-wgfz-ost-west-2026.json) — gesperrt bis zur Klärung der Nutzungsrechte."
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "dokument": "Liegenschaftszinssätze 2025 – Gutachterausschuss für Grundstückswerte für das Gebiet des Saale-Holzland-Kreises, des Saale-Orla-Kreises und der kreisfreien Stadt Jena",
+    "fundstelle": "ganzes Dokument, Textsuche (leerzeichenbereinigt) nach „Umrechnungskoeffizient“ und „Geschossfläche“ ohne Treffer (20.11.2026); Impressum letzte Seite",
+    "url": "https://zs.thulb.uni-jena.de/servlets/MCRFileNodeServlet/jportal_derivate_00363196/LiegSHK2025.pdf",
+    "wortlaut": "kein Treffer"
+   },
+   {
+    "art": "amtliche Veröffentlichung",
+    "dokument": "Sachwertfaktoren 2025 – Gutachterausschuss für Grundstückswerte für das Gebiet des Saale-Holzland-Kreises, des Saale-Orla-Kreises und der kreisfreien Stadt Jena",
+    "fundstelle": "ganzes Dokument, Textsuche (leerzeichenbereinigt) nach „Umrechnungskoeffizient“ und „Geschossfläche“ ohne Treffer (20.11.2026); Impressum letzte Seite",
+    "url": "https://zs.thulb.uni-jena.de/servlets/MCRFileNodeServlet/jportal_derivate_00363197/SachwertSHK2025.pdf",
+    "wortlaut": "kein Treffer"
+   },
+   {
+    "art": "Verzeichnis",
+    "dokument": "ThULB journals@UrMEL",
+    "fundstelle": "Solr-Abfrage objectType:jpjournal, maintitle *Gutachterausschu* (54 Treffer), Stand 20.11.2026",
+    "url": "https://zs.thulb.uni-jena.de/",
+    "wortlaut": "ThULB-Veröffentlichungsverzeichnis (zs.thulb.uni-jena.de, Solr-Abfrage aller 54 Zeitschriften mit „Gutachterausschuss“ im Titel, 20.11.2026): kein Heft eines örtlichen Thüringer Ausschusses mit Umrechnungskoeffizienten; geführt werden Liegenschaftszinssätze/Rohertragsfaktoren, Sachwertfaktoren, Bodenpreisindexreihen, Vergleichsfaktoren (nur Erfurt, Wohnungseigentum) und Immobilienmarktberichte bis 2020."
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "berichtsjahr": 2025,
+  "jahrgang": 2025,
+  "stichtag": "2025-01-01",
+  "stichtag_hinweis": "Kein eigener Stichtag (keine Veröffentlichung); eingetragen ist der Bezugsjahrgang der jüngsten gelesenen Hefte.",
+  "quelle_url": "https://zs.thulb.uni-jena.de/servlets/MCRFileNodeServlet/jportal_derivate_00363196/LiegSHK2025.pdf",
+  "landeswert_url": "https://tlbg.thueringen.de/wertermittlung/online-grundstuecksmarktinformationen/umrechnungskoeffizienten/wgfz",
+  "quelle_parser": "ernte-20261120 (ThULB-Solr + pdftotext, Textsuche)",
+  "modellversion": "Umrechnungskoeffizienten für die wertrelevante Geschossflächenzahl (WGFZ) (§ 16 Abs. 4, § 40 ImmoWertV), Gutachterausschuss für Grundstückswerte für das Gebiet des Saale-Holzland-Kreises, des Saale-Orla-Kreises und der kreisfreien Stadt Jena, Jahrgang 2025",
+  "modellansaetze": {},
+  "lizenz": "„Eine Wiedergabe von Daten aus diesem Dokument ist nur mit Quellenangabe gestattet.“ (Titelrückseite der Hefte)",
+  "weg": "Geschäftsstelle des Gutachterausschuss für Grundstückswerte für das Gebiet des Saale-Holzland-Kreises, des Saale-Orla-Kreises und der kreisfreien Stadt Jena (c/o TLBG, Zweigstelle Pößneck, Rosa-Luxemburg-Straße 7, 07381 Pößneck), gutachter.poessneck@tlbg.thueringen.de; Veröffentlichungen im ThULB-Verzeichnis. Landesweite Koeffizienten der Zentralen Geschäftsstelle (TLBG) sind veröffentlicht, aber nur für den privaten, nicht kommerziellen Gebrauch freigegeben (Satz der Zentralen Geschäftsstelle, uk-flaeche-laender-2026.json / uk-wgfz-ost-west-2026.json) — gesperrt bis zur Klärung der Nutzungsrechte.",
+  "belege_meta": {
+   "abgerufen_am": "2026-11-20"
+  }
+ },
+ {
+  "land_code": "TH",
+  "ags": "16053",
+  "ebene": "kreis",
+  "gebiet_name": "Jena, kreisfreie Stadt",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte für das Gebiet des Saale-Holzland-Kreises, des Saale-Orla-Kreises und der kreisfreien Stadt Jena",
+  "ausschuss": "Gutachterausschuss für Grundstückswerte für das Gebiet des Saale-Holzland-Kreises, des Saale-Orla-Kreises und der kreisfreien Stadt Jena",
+  "kennzahl": "umrechnungskoeffizient_wgfz",
+  "zweig": "alle",
+  "vollstaendig": false,
+  "zugang": "nicht veröffentlicht",
+  "warum_kein_wert": "Der örtliche Ausschuss veröffentlicht keine eigenen Umrechnungskoeffizienten für die wertrelevante Geschossflächenzahl (WGFZ): in seinen jüngsten Heften (Liegenschaftszinssätze 2025; Sachwertfaktoren 2025) steht keine solche Tabelle, und das ThULB-Verzeichnis führt für keinen örtlichen Thüringer Ausschuss ein Heft mit Umrechnungskoeffizienten. Kein Nachbarwert, keine VW-RL. Weg: Geschäftsstelle des Gutachterausschuss für Grundstückswerte für das Gebiet des Saale-Holzland-Kreises, des Saale-Orla-Kreises und der kreisfreien Stadt Jena (c/o TLBG, Zweigstelle Pößneck, Rosa-Luxemburg-Straße 7, 07381 Pößneck), gutachter.poessneck@tlbg.thueringen.de; Veröffentlichungen im ThULB-Verzeichnis. Landesweite Koeffizienten der Zentralen Geschäftsstelle (TLBG) sind veröffentlicht, aber nur für den privaten, nicht kommerziellen Gebrauch freigegeben (Satz der Zentralen Geschäftsstelle, uk-flaeche-laender-2026.json / uk-wgfz-ost-west-2026.json) — gesperrt bis zur Klärung der Nutzungsrechte.",
+  "formel": null,
+  "geltungsbereich": {
+   "objektarten": [],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Geschäftsstelle des Gutachterausschuss für Grundstückswerte für das Gebiet des Saale-Holzland-Kreises, des Saale-Orla-Kreises und der kreisfreien Stadt Jena (c/o TLBG, Zweigstelle Pößneck, Rosa-Luxemburg-Straße 7, 07381 Pößneck), gutachter.poessneck@tlbg.thueringen.de; Veröffentlichungen im ThULB-Verzeichnis. Landesweite Koeffizienten der Zentralen Geschäftsstelle (TLBG) sind veröffentlicht, aber nur für den privaten, nicht kommerziellen Gebrauch freigegeben (Satz der Zentralen Geschäftsstelle, uk-flaeche-laender-2026.json / uk-wgfz-ost-west-2026.json) — gesperrt bis zur Klärung der Nutzungsrechte."
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "dokument": "Liegenschaftszinssätze 2025 – Gutachterausschuss für Grundstückswerte für das Gebiet des Saale-Holzland-Kreises, des Saale-Orla-Kreises und der kreisfreien Stadt Jena",
+    "fundstelle": "ganzes Dokument, Textsuche (leerzeichenbereinigt) nach „Umrechnungskoeffizient“ und „Geschossfläche“ ohne Treffer (20.11.2026); Impressum letzte Seite",
+    "url": "https://zs.thulb.uni-jena.de/servlets/MCRFileNodeServlet/jportal_derivate_00363196/LiegSHK2025.pdf",
+    "wortlaut": "kein Treffer"
+   },
+   {
+    "art": "amtliche Veröffentlichung",
+    "dokument": "Sachwertfaktoren 2025 – Gutachterausschuss für Grundstückswerte für das Gebiet des Saale-Holzland-Kreises, des Saale-Orla-Kreises und der kreisfreien Stadt Jena",
+    "fundstelle": "ganzes Dokument, Textsuche (leerzeichenbereinigt) nach „Umrechnungskoeffizient“ und „Geschossfläche“ ohne Treffer (20.11.2026); Impressum letzte Seite",
+    "url": "https://zs.thulb.uni-jena.de/servlets/MCRFileNodeServlet/jportal_derivate_00363197/SachwertSHK2025.pdf",
+    "wortlaut": "kein Treffer"
+   },
+   {
+    "art": "Verzeichnis",
+    "dokument": "ThULB journals@UrMEL",
+    "fundstelle": "Solr-Abfrage objectType:jpjournal, maintitle *Gutachterausschu* (54 Treffer), Stand 20.11.2026",
+    "url": "https://zs.thulb.uni-jena.de/",
+    "wortlaut": "ThULB-Veröffentlichungsverzeichnis (zs.thulb.uni-jena.de, Solr-Abfrage aller 54 Zeitschriften mit „Gutachterausschuss“ im Titel, 20.11.2026): kein Heft eines örtlichen Thüringer Ausschusses mit Umrechnungskoeffizienten; geführt werden Liegenschaftszinssätze/Rohertragsfaktoren, Sachwertfaktoren, Bodenpreisindexreihen, Vergleichsfaktoren (nur Erfurt, Wohnungseigentum) und Immobilienmarktberichte bis 2020."
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "berichtsjahr": 2025,
+  "jahrgang": 2025,
+  "stichtag": "2025-01-01",
+  "stichtag_hinweis": "Kein eigener Stichtag (keine Veröffentlichung); eingetragen ist der Bezugsjahrgang der jüngsten gelesenen Hefte.",
+  "quelle_url": "https://zs.thulb.uni-jena.de/servlets/MCRFileNodeServlet/jportal_derivate_00363196/LiegSHK2025.pdf",
+  "landeswert_url": "https://tlbg.thueringen.de/wertermittlung/online-grundstuecksmarktinformationen/umrechnungskoeffizienten/wgfz",
+  "quelle_parser": "ernte-20261120 (ThULB-Solr + pdftotext, Textsuche)",
+  "modellversion": "Umrechnungskoeffizienten für die wertrelevante Geschossflächenzahl (WGFZ) (§ 16 Abs. 4, § 40 ImmoWertV), Gutachterausschuss für Grundstückswerte für das Gebiet des Saale-Holzland-Kreises, des Saale-Orla-Kreises und der kreisfreien Stadt Jena, Jahrgang 2025",
+  "modellansaetze": {},
+  "lizenz": "„Eine Wiedergabe von Daten aus diesem Dokument ist nur mit Quellenangabe gestattet.“ (Titelrückseite der Hefte)",
+  "weg": "Geschäftsstelle des Gutachterausschuss für Grundstückswerte für das Gebiet des Saale-Holzland-Kreises, des Saale-Orla-Kreises und der kreisfreien Stadt Jena (c/o TLBG, Zweigstelle Pößneck, Rosa-Luxemburg-Straße 7, 07381 Pößneck), gutachter.poessneck@tlbg.thueringen.de; Veröffentlichungen im ThULB-Verzeichnis. Landesweite Koeffizienten der Zentralen Geschäftsstelle (TLBG) sind veröffentlicht, aber nur für den privaten, nicht kommerziellen Gebrauch freigegeben (Satz der Zentralen Geschäftsstelle, uk-flaeche-laender-2026.json / uk-wgfz-ost-west-2026.json) — gesperrt bis zur Klärung der Nutzungsrechte.",
+  "belege_meta": {
+   "abgerufen_am": "2026-11-20"
+  }
+ }
+]

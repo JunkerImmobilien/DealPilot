@@ -372,14 +372,13 @@
     },
     "Gemeinsamer Gutachterausschuss Künzelsau": {
       "land": "BW",
-      "email": null,
+      "email": "gutachterausschuss@kuenzelsau.de",
       "telefon": "07940 129-616",
       "anschrift": "Stadtverwaltung Künzelsau, Gemeinsamer Gutachterausschuss, Stuttgarter Straße 7, 74653 Künzelsau",
       "webseite": "https://www.kuenzelsau.de/bauen+und+wohnen/Gutachterausschuss",
-      "quelle_url": "https://www.kuenzelsau.de/bauen+und+wohnen/Gutachterausschuss",
-      "gelesen_am": "2026-10-28",
-      "herkunft": "Recherche 28.10.2026",
-      "nicht_gefunden": "Adresse nur aus einer Zusammenfassung des Abrufwerkzeugs, auf der geladenen Seite nicht wörtlich gesehen – vor Nutzung prüfen"
+      "quelle_url": "https://www.kuenzelsau.de/gutachterausschuss",
+      "gelesen_am": "2026-11-20",
+      "herkunft": "Ernte 20.11.2026: Seite „Gemeinsamer Gutachterausschuss“ der Stadt Künzelsau, Kontaktblock, Adresse wörtlich auf der geladenen Seite gelesen (vorher Recherche 28.10.2026 ohne wörtlichen Beleg)"
     },
     "Gemeinsamer Gutachterausschuss Lahr": {
       "land": "BW",
@@ -3707,6 +3706,26 @@
       "alias": [
         "Gutachterausschuss für den Bereich der documenta Stadt Kassel"
       ]
+    },
+    "Gutachterausschuss für die Ermittlung von Grundstückswerten in der Stadt Heilbronn": {
+      "land": "BW",
+      "email": "gutachterausschuss@heilbronn.de",
+      "telefon": "07131 56-3158",
+      "anschrift": "Cäcilienstraße 49, 74072 Heilbronn",
+      "webseite": "https://www.heilbronn.de/gutachterausschuss",
+      "quelle_url": "https://www.heilbronn.de/fileadmin/daten/stadtheilbronn/formulare/rathaus/vermessungs_und_katasteramt/Immobilienmarktbericht_2024_Web.pdf",
+      "gelesen_am": "2026-11-20",
+      "herkunft": "Ernte 20.11.2026: Impressum/Kontaktseite des Immobilienmarktberichts 2024 (Geschäftsstelle, E-Mail wörtlich)"
+    },
+    "Gutachterausschuss Böblingen und Schönbuchgemeinden": {
+      "land": "BW",
+      "email": "gutachterausschuss@boeblingen.de",
+      "telefon": "07031 669-3236",
+      "anschrift": "Marktplatz 16, 71032 Böblingen",
+      "webseite": "https://www.boeblingen.de/gutachterausschuss",
+      "quelle_url": "https://www.boeblingen.de/gutachterausschuss",
+      "gelesen_am": "2026-11-20",
+      "herkunft": "Ernte 20.11.2026: Seite „Gutachterausschuss | Stadt Böblingen“, Kontaktblock „Geschäftsstelle Gutachterausschuss“"
     }
   }
 }

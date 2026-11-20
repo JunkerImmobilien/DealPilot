@@ -1,60 +1,119 @@
-/* messe-schleife-daten.mjs · erzeugt 2026-11-11T08:38:29.366Z — NICHT von Hand ändern.
+/* messe-schleife-daten.mjs · erzeugt 2026-11-20T09:36:54.567Z — NICHT von Hand ändern.
    Neu erzeugen: node tools/messe-schleife-daten.mjs */
 window.DPS_VIDEOTHEK = {
  "stand": "2026-11-11",
  "videos": [
+  {
+   "id": "spot-das-haus-hab-ich",
+   "nr": "Spot",
+   "kategorie": "Überblick",
+   "titel": "Das Haus hab ich.",
+   "unterzeile": "Vom Exposé bis zum Kauf. Ein Objekt, ein Weg, in 90 Sekunden.",
+   "datei": "dealpilot-spot-das-haus-hab-ich-v3730.mp4",
+   "dauer": 91,
+   "kapitel": [
+    {
+     "t": 0,
+     "titel": "Das Exposé"
+    },
+    {
+     "t": 10,
+     "titel": "Unterlagen rein"
+    },
+    {
+     "t": 16,
+     "titel": "Score und Finanzierung"
+    },
+    {
+     "t": 24,
+     "titel": "Bewertung"
+    },
+    {
+     "t": 33,
+     "titel": "Durchgerechnet"
+    },
+    {
+     "t": 46,
+     "titel": "Investment-PDF"
+    },
+    {
+     "t": 51,
+     "titel": "Kaufpreisaufteilung"
+    },
+    {
+     "t": 63,
+     "titel": "Das Haus hab ich"
+    },
+    {
+     "t": 68,
+     "titel": "Steuer und Plan gegen Ist"
+    }
+   ]
+  },
   {
    "id": "ueberblick-1-quick-boarding",
    "nr": "Ü1",
    "kategorie": "Überblick",
    "titel": "Quick-Check",
    "unterzeile": "Vom Exposé zum ersten Urteil — in wenigen Minuten.",
-   "datei": "dealpilot-ueberblick-1-quick-boarding.mp4",
-   "dauer": 221,
+   "datei": "dealpilot-ueberblick-1-quick-boarding-v3730.mp4",
+   "dauer": 224,
    "kapitel": [
     {
      "t": 0,
      "titel": "Einstieg"
     },
     {
-     "t": 14,
+     "t": 11,
      "titel": "Die Datenaufnahme"
     },
     {
-     "t": 21,
+     "t": 19,
      "titel": "Exposé & Marktbericht"
     },
     {
-     "t": 29,
+     "t": 27,
      "titel": "Sprache"
     },
     {
-     "t": 37,
+     "t": 35,
      "titel": "ImmoMetrica"
     },
     {
-     "t": 46,
+     "t": 43,
      "titel": "DealPilot-Marktbewertung"
     },
     {
-     "t": 54,
+     "t": 51,
      "titel": "Oder von Hand"
     },
     {
-     "t": 61,
+     "t": 59,
      "titel": "Datenaufnahme"
     },
     {
-     "t": 92,
+     "t": 71,
+     "titel": "Zwei Adressen?"
+    },
+    {
+     "t": 78,
+     "titel": "Jeder Wert mit Quelle"
+    },
+    {
+     "t": 90,
      "titel": "Marktwertindikation"
     },
     {
-     "t": 100,
+     "t": 98,
      "titel": "Achtung: Angebotspreise"
     },
     {
      "t": 111,
      "titel": "Die Miete"
+    },
+    {
+     "t": 117,
+     "titel": "Sofort eine Einschätzung"
     },
     {
      "t": 125,
@@ -63,6 +122,14 @@ window.DPS_VIDEOTHEK = {
     {
      "t": 141,
      "titel": "Gegen deine Lage"
+    },
+    {
+     "t": 159,
+     "titel": "Das Urteil kippt"
+    },
+    {
+     "t": 178,
+     "titel": "Und was es bräuchte"
     },
     {
      "t": 199,
@@ -76,52 +143,76 @@ window.DPS_VIDEOTHEK = {
    "kategorie": "Überblick",
    "titel": "Vom neuen Objekt zum DealScore und Investment-PDF",
    "unterzeile": "Der ganze Weg am Stück — in fünf Minuten.",
-   "datei": "dealpilot-ueberblick-2-objekt-bis-investment-pdf.mp4",
-   "dauer": 299,
+   "datei": "dealpilot-ueberblick-2-objekt-bis-investment-pdf-v3730.mp4",
+   "dauer": 305,
    "kapitel": [
     {
      "t": 0,
      "titel": "Einstieg"
     },
     {
-     "t": 11,
+     "t": 13,
      "titel": "Ein neues Objekt"
     },
     {
-     "t": 42,
+     "t": 25,
+     "titel": "Das Beispiel"
+    },
+    {
+     "t": 44,
      "titel": "Marktbewertung · Stufe 2"
     },
     {
-     "t": 83,
+     "t": 69,
+     "titel": "Marktwert und Lage"
+    },
+    {
+     "t": 85,
      "titel": "Investition"
     },
     {
-     "t": 110,
+     "t": 112,
      "titel": "Miete"
     },
     {
-     "t": 124,
+     "t": 126,
      "titel": "Kapitaldeckung"
     },
     {
-     "t": 160,
+     "t": 140,
+     "titel": "Finanzierung"
+    },
+    {
+     "t": 162,
      "titel": "Bewirtschaftung"
     },
     {
-     "t": 175,
+     "t": 177,
      "titel": "Steuer"
     },
     {
-     "t": 200,
+     "t": 202,
      "titel": "Kennzahlen mit Ampel"
     },
     {
-     "t": 213,
+     "t": 215,
      "titel": "Das Urteil"
     },
     {
-     "t": 227,
+     "t": 229,
      "titel": "Das Investment-PDF"
+    },
+    {
+     "t": 247,
+     "titel": "Deckblatt"
+    },
+    {
+     "t": 262,
+     "titel": "Die Objektfotos"
+    },
+    {
+     "t": 278,
+     "titel": "Objekt und Finanzierung"
     }
    ]
   },
@@ -131,95 +222,95 @@ window.DPS_VIDEOTHEK = {
    "kategorie": "Überblick",
    "titel": "Komplettbeispiel Mehrfamilienhaus",
    "unterzeile": "Ein Haus, zehn Kapitel: vom leeren Objekt bis zum PDF für die Bank.",
-   "datei": "dealpilot-ueberblick-3-komplettbeispiel-mehrfamilienhaus.mp4",
-   "dauer": 2628,
+   "datei": "dealpilot-ueberblick-3-komplettbeispiel-mehrfamilienhaus-v3730.mp4",
+   "dauer": 2637,
    "kapitel": [
     {
      "t": 0,
      "titel": "Einstieg"
     },
     {
-     "t": 35,
+     "t": 36,
      "titel": "Kapitel 1 · Reiter und Eingabestufen"
     },
     {
-     "t": 125,
+     "t": 126,
      "titel": "Kapitel 2 · Das Objekt anlegen"
     },
     {
-     "t": 306,
+     "t": 318,
      "titel": "Bodenrichtwert und Modernisierung"
     },
     {
-     "t": 488,
+     "t": 501,
      "titel": "Kapitel 3 · Die Einheiten"
     },
     {
-     "t": 558,
+     "t": 571,
      "titel": "Wohnung für Wohnung"
     },
     {
-     "t": 751,
+     "t": 766,
      "titel": "Kapitel 4 · Die Miete"
     },
     {
-     "t": 919,
+     "t": 941,
      "titel": "Kapitel 5 · Die Finanzierung"
     },
     {
-     "t": 1022,
+     "t": 1044,
      "titel": "Das Darlehen"
     },
     {
-     "t": 1102,
+     "t": 1126,
      "titel": "Kapitel 6 · Die Steuer"
     },
     {
-     "t": 1226,
+     "t": 1250,
      "titel": "Kapitel 7 · Marktbericht und Wertermittlung"
     },
     {
-     "t": 1410,
+     "t": 1419,
      "titel": "Der Liegenschaftszins"
     },
     {
-     "t": 1469,
+     "t": 1479,
      "titel": "Abgleich im Objekt"
     },
     {
-     "t": 1559,
+     "t": 1573,
      "titel": "Kapitel 8 · Das Zielbild"
     },
     {
-     "t": 1699,
+     "t": 1713,
      "titel": "Mieterhöhung je Wohnung"
     },
     {
-     "t": 1878,
+     "t": 1898,
      "titel": "Kapitel 9 · Unterlagen einlesen"
     },
     {
-     "t": 2016,
+     "t": 2028,
      "titel": "Die Übernahme"
     },
     {
-     "t": 2089,
+     "t": 2101,
      "titel": "Pilot-Analyse mit Unterlagen"
     },
     {
-     "t": 2221,
+     "t": 2234,
      "titel": "Unterlagen nachreichen"
     },
     {
-     "t": 2443,
+     "t": 2412,
      "titel": "Kapitel 10 · Das Ergebnis"
     },
     {
-     "t": 2515,
+     "t": 2493,
      "titel": "Das PDF für die Bank"
     },
     {
-     "t": 2590,
+     "t": 2588,
      "titel": "Abschluss"
     }
    ]
@@ -331,37 +422,41 @@ window.DPS_VIDEOTHEK = {
    ]
   },
   {
-   "id": "modul-04-marktbewertung-drei-stufen",
-   "nr": "04",
+   "id": "modul-30-marktbewertung-im-reiter-objekt",
+   "nr": "30",
    "kategorie": "Basis",
-   "titel": "Marktbewertung in drei Stufen",
-   "unterzeile": "Was jede Stufe braucht — und was sie liefert.",
-   "datei": "dealpilot-modul-04-marktbewertung-drei-stufen.mp4",
-   "dauer": 267,
+   "titel": "Marktbewertung im Reiter Objekt",
+   "unterzeile": "Drei Stufen, ein Ort — und danach das PDF.",
+   "datei": "dealpilot-modul-30-marktbewertung-im-reiter-objekt.mp4",
+   "dauer": null,
    "kapitel": [
     {
      "t": 0,
      "titel": "Einstieg"
     },
     {
-     "t": 11,
-     "titel": "Pflichtfelder je Stufe"
-    },
-    {
-     "t": 24,
+     "t": 25,
      "titel": "Stufe 1"
     },
     {
-     "t": 70,
+     "t": 74,
      "titel": "Abschlag auf Angebotspreise"
     },
     {
-     "t": 100,
+     "t": 104,
      "titel": "Stufe 2"
     },
     {
-     "t": 170,
+     "t": 175,
      "titel": "Stufe 3 amtlich"
+    },
+    {
+     "t": 260,
+     "titel": "Automatisch ermittelt"
+    },
+    {
+     "t": 287,
+     "titel": "Das PDF in der Deal-Aktion"
     }
    ]
   },
@@ -469,51 +564,67 @@ window.DPS_VIDEOTHEK = {
    "kategorie": "Basis",
    "titel": "Miete und Mietvertrag",
    "unterzeile": "Ist-Miete, Marktmiete, Vertragsart und Mietentwicklung.",
-   "datei": "dealpilot-modul-07-miete-und-mietvertrag.mp4",
-   "dauer": 260,
+   "datei": "dealpilot-modul-07-miete-und-mietvertrag-v3730.mp4",
+   "dauer": 284,
    "kapitel": [
     {
      "t": 0,
      "titel": "Einstieg"
     },
     {
-     "t": 12,
+     "t": 15,
      "titel": "Das Beispiel"
     },
     {
-     "t": 29,
+     "t": 31,
      "titel": "Die Ist-Miete"
     },
     {
-     "t": 65,
-     "titel": "Pilot-Mietpreis-Analyse"
+     "t": 52,
+     "titel": "Der Stellplatz"
     },
     {
-     "t": 81,
+     "t": 69,
+     "titel": "Welche Miete kann ich ansetzen?"
+    },
+    {
+     "t": 88,
      "titel": "Die Marktmiete"
     },
     {
-     "t": 106,
+     "t": 112,
      "titel": "Leerstand statt Mietausfall"
     },
     {
-     "t": 123,
+     "t": 129,
      "titel": "Der Mietvertrag"
     },
     {
-     "t": 148,
+     "t": 154,
      "titel": "Mietrecht an dieser Adresse"
     },
     {
-     "t": 179,
+     "t": 171,
+     "titel": "Die nächste Erhöhung"
+    },
+    {
+     "t": 185,
      "titel": "Mietentwicklung"
     },
     {
-     "t": 193,
+     "t": 199,
      "titel": "Oder im Detail"
     },
     {
-     "t": 235,
+     "t": 224,
+     "titel": "Die Treppe"
+    },
+    {
+     "t": 241,
+     "titel": "Mieterhöhung und Zielbild"
+    },
+    {
+     "t": 259,
      "titel": "Prognose-Annahmen"
     }
    ]
@@ -524,47 +635,91 @@ window.DPS_VIDEOTHEK = {
    "kategorie": "Basis",
    "titel": "Finanzierung",
    "unterzeile": "Wie der Zins entsteht — und wo du die Standardwerte setzt.",
-   "datei": "dealpilot-modul-08-finanzierung.mp4",
-   "dauer": 322,
+   "datei": "dealpilot-modul-08-finanzierung-v3730.mp4",
+   "dauer": 353,
    "kapitel": [
     {
      "t": 0,
      "titel": "Einstieg"
     },
     {
-     "t": 13,
+     "t": 15,
      "titel": "Das Beispiel"
     },
     {
-     "t": 29,
+     "t": 31,
      "titel": "Der indikative Zins"
     },
     {
-     "t": 51,
+     "t": 43,
+     "titel": "Woraus er besteht"
+    },
+    {
+     "t": 53,
      "titel": "Zuschlag nach Beleihung"
     },
     {
-     "t": 78,
+     "t": 80,
      "titel": "Marktdaten ansehen"
     },
     {
-     "t": 104,
+     "t": 93,
+     "titel": "Der Verlauf"
+    },
+    {
+     "t": 106,
      "titel": "Gruppen zum Aufklappen"
     },
     {
-     "t": 133,
+     "t": 121,
+     "titel": "Die Konditionen"
+    },
+    {
+     "t": 135,
      "titel": "Erst der Kaufpreis"
     },
     {
-     "t": 172,
+     "t": 148,
+     "titel": "Eigenkapital und Darlehen"
+    },
+    {
+     "t": 162,
+     "titel": "So kommt es zustande"
+    },
+    {
+     "t": 174,
      "titel": "Rate und Restschuld"
     },
     {
-     "t": 198,
+     "t": 185,
+     "titel": "Die Beleihung"
+    },
+    {
+     "t": 199,
+     "titel": "Zwei Stufen aus dem Objekt"
+    },
+    {
+     "t": 228,
      "titel": "Je Darlehen eine Karte"
     },
     {
-     "t": 282,
+     "t": 242,
+     "titel": "Werkzeuge"
+    },
+    {
+     "t": 254,
+     "titel": "Der Tilgungsplan"
+    },
+    {
+     "t": 270,
+     "titel": "Aus dem Bank-PDF"
+    },
+    {
+     "t": 285,
+     "titel": "Darlehen II"
+    },
+    {
+     "t": 311,
      "titel": "Deine Standardwerte"
     }
    ]
@@ -630,44 +785,52 @@ window.DPS_VIDEOTHEK = {
    "kategorie": "Basis",
    "titel": "Steuer: AfA, Zeiträume, Restnutzungsdauer",
    "unterzeile": "Was ein Mehrfamilienhaus dir steuerlich bringt — und wann ein Gutachten lohnt.",
-   "datei": "dealpilot-modul-10a-steuer-afa-restnutzungsdauer.mp4",
-   "dauer": 208,
+   "datei": "dealpilot-modul-10a-steuer-afa-restnutzungsdauer-v3730.mp4",
+   "dauer": 215,
    "kapitel": [
     {
      "t": 0,
      "titel": "Einstieg"
     },
     {
-     "t": 11,
+     "t": 13,
      "titel": "Das Beispiel"
     },
     {
-     "t": 28,
+     "t": 31,
      "titel": "Deine persönliche Steuer"
     },
     {
-     "t": 46,
+     "t": 49,
      "titel": "Steuerzeiträume"
     },
     {
-     "t": 63,
+     "t": 65,
      "titel": "Die Abschreibung"
     },
     {
-     "t": 90,
+     "t": 93,
      "titel": "Eigener Satz"
     },
     {
-     "t": 118,
+     "t": 109,
      "titel": "Restnutzungsdauer ermitteln"
     },
     {
-     "t": 152,
+     "t": 142,
+     "titel": "Das Ergebnis"
+    },
+    {
+     "t": 155,
      "titel": "Was das Gutachten bringt"
     },
     {
-     "t": 170,
+     "t": 173,
      "titel": "Was im Jahr übrig bleibt"
+    },
+    {
+     "t": 188,
+     "titel": "Über 15 Jahre"
     }
    ]
   },
@@ -677,51 +840,79 @@ window.DPS_VIDEOTHEK = {
    "kategorie": "Basis",
    "titel": "BMF-Kaufpreisaufteilung",
    "unterzeile": "Gebäude und Boden — Bodenabschlag, Notarklausel, 15-%-Grenze.",
-   "datei": "dealpilot-modul-10b-bmf-kaufpreisaufteilung.mp4",
-   "dauer": 256,
+   "datei": "dealpilot-modul-10b-bmf-kaufpreisaufteilung-v3730.mp4",
+   "dauer": 293,
    "kapitel": [
     {
      "t": 0,
      "titel": "Einstieg"
     },
     {
-     "t": 11,
+     "t": 13,
      "titel": "Das Beispiel"
     },
     {
-     "t": 55,
+     "t": 29,
+     "titel": "Angenommen: eine Sanierung"
+    },
+    {
+     "t": 40,
+     "titel": "Die 15-%-Grenze"
+    },
+    {
+     "t": 58,
      "titel": "Der BMF-Rechner"
     },
     {
-     "t": 94,
+     "t": 74,
+     "titel": "Schritt 1 · Anschaffungskosten"
+    },
+    {
+     "t": 93,
+     "titel": "Die Sanierung steht extra"
+    },
+    {
+     "t": 113,
      "titel": "Schritt 2 · Die Aufteilung"
     },
     {
-     "t": 110,
+     "t": 129,
      "titel": "Schritt 3 · Amtlich, zwei Abschläge und Jacoby"
     },
     {
-     "t": 130,
+     "t": 146,
+     "titel": "Die Sanierung je Variante"
+    },
+    {
+     "t": 164,
      "titel": "Schritt 4 · Du wählst"
     },
     {
-     "t": 157,
+     "t": 177,
+     "titel": "Optimiert"
+    },
+    {
+     "t": 190,
      "titel": "Bodenabschlag 20 %"
     },
     {
-     "t": 172,
+     "t": 205,
      "titel": "Die Notarklausel"
     },
     {
-     "t": 188,
+     "t": 221,
      "titel": "Die Absprünge"
     },
     {
-     "t": 204,
+     "t": 238,
      "titel": "Übernehmen"
     },
     {
-     "t": 228,
+     "t": 249,
+     "titel": "Im Reiter Steuer"
+    },
+    {
+     "t": 262,
      "titel": "Die 15-%-Grenze zieht mit"
     }
    ]
@@ -732,47 +923,51 @@ window.DPS_VIDEOTHEK = {
    "kategorie": "Basis",
    "titel": "Der Restnutzungsdauer-Rechner",
    "unterzeile": "Ganze Jahre, Spanne, übernehmen — und wo die Anlage 2 endet.",
-   "datei": "dealpilot-modul-10c-restnutzungsdauer-rechner.mp4",
-   "dauer": 183,
+   "datei": "dealpilot-modul-10c-restnutzungsdauer-rechner-v3730.mp4",
+   "dauer": 189,
    "kapitel": [
     {
      "t": 0,
      "titel": "Einstieg"
     },
     {
-     "t": 10,
+     "t": 12,
      "titel": "Das Beispiel"
     },
     {
-     "t": 28,
+     "t": 31,
      "titel": "Die gesetzliche AfA"
     },
     {
-     "t": 50,
+     "t": 52,
      "titel": "Den Rechner öffnen"
     },
     {
-     "t": 62,
+     "t": 64,
      "titel": "Acht Schritte"
     },
     {
-     "t": 84,
+     "t": 87,
      "titel": "Das Ergebnis"
     },
     {
-     "t": 100,
+     "t": 103,
      "titel": "Übernehmen"
     },
     {
-     "t": 126,
+     "t": 115,
+     "titel": "Vorher und nachher"
+    },
+    {
+     "t": 130,
      "titel": "Indikativ, kein Gutachten"
     },
     {
-     "t": 144,
+     "t": 147,
      "titel": "Im Reiter Steuer"
     },
     {
-     "t": 159,
+     "t": 162,
      "titel": "Ersteinschätzung in Minuten"
     }
    ]
@@ -783,63 +978,63 @@ window.DPS_VIDEOTHEK = {
    "kategorie": "Erweitert",
    "titel": "Pilot-Analyse im Detail",
    "unterzeile": "Die KI-Einschätzung Reiter für Reiter — und was sie nicht tut.",
-   "datei": "dealpilot-modul-11-pilot-analyse.mp4",
-   "dauer": 326,
+   "datei": "dealpilot-modul-11-pilot-analyse-v3502.mp4",
+   "dauer": 327,
    "kapitel": [
     {
      "t": 0,
      "titel": "Einstieg"
     },
     {
-     "t": 11,
+     "t": 18,
      "titel": "Das Beispiel"
     },
     {
-     "t": 27,
+     "t": 35,
      "titel": "Eine Kopfzeile"
     },
     {
-     "t": 56,
+     "t": 64,
      "titel": "Die Reiter"
     },
     {
-     "t": 75,
+     "t": 83,
      "titel": "Das Urteil"
     },
     {
-     "t": 103,
+     "t": 110,
      "titel": "Ankauf · Soll · Zielbild"
     },
     {
-     "t": 132,
+     "t": 140,
      "titel": "Lage und Markt"
     },
     {
-     "t": 159,
+     "t": 167,
      "titel": "Stärken und Risiken"
     },
     {
-     "t": 200,
+     "t": 196,
      "titel": "Verhandlungsempfehlung"
     },
     {
-     "t": 239,
+     "t": 235,
      "titel": "Bankargumente"
     },
     {
-     "t": 252,
+     "t": 248,
      "titel": "Steuer"
     },
     {
-     "t": 268,
+     "t": 265,
      "titel": "Unterlagen & WEG"
     },
     {
-     "t": 285,
+     "t": 282,
      "titel": "Einfach statt Detail"
     },
     {
-     "t": 299,
+     "t": 296,
      "titel": "Was der Pilot nicht tut"
     }
    ]
@@ -956,48 +1151,48 @@ window.DPS_VIDEOTHEK = {
    "kategorie": "Erweitert",
    "titel": "Vom Ankauf in den Bestand",
    "unterzeile": "Gewonnen, eingefroren, verglichen — Plan gegen heute.",
-   "datei": "dealpilot-modul-14-ankauf-in-den-bestand.mp4",
-   "dauer": 161,
+   "datei": "dealpilot-modul-14-ankauf-in-den-bestand-v3502.mp4",
+   "dauer": 178,
    "kapitel": [
     {
      "t": 0,
      "titel": "Einstieg"
     },
     {
-     "t": 14,
+     "t": 21,
      "titel": "Das Beispiel"
     },
     {
-     "t": 27,
+     "t": 34,
      "titel": "Auf „gewonnen“ gestellt"
     },
     {
-     "t": 41,
+     "t": 48,
      "titel": "Der Ankauf-Stand"
     },
     {
-     "t": 55,
+     "t": 62,
      "titel": "Soll und Ist umschalten"
     },
     {
-     "t": 79,
+     "t": 90,
      "titel": "Ist · heute"
     },
     {
-     "t": 94,
+     "t": 107,
      "titel": "Soll gegen Ist · automatisch"
     },
     {
-     "t": 106,
+     "t": 119,
      "titel": "Was sich bewegt hat"
     },
     {
-     "t": 118,
+     "t": 131,
      "titel": "Kennzahl für Kennzahl"
     },
     {
-     "t": 133,
-     "titel": "Die Pilot-Analyse: damals und heute"
+     "t": 149,
+     "titel": "Im Bestand: der Jahresabgleich"
     }
    ]
   },
@@ -1065,65 +1260,6 @@ window.DPS_VIDEOTHEK = {
    ]
   },
   {
-   "id": "modul-16-stufe-3-genauer",
-   "nr": "16",
-   "kategorie": "Erweitert",
-   "titel": "Stufe 3 genauer",
-   "unterzeile": "Pflichtfelder, optionale Felder — und welche Zahl sich bewegt.",
-   "datei": "dealpilot-modul-16-stufe-3-genauer.mp4",
-   "dauer": 329,
-   "kapitel": [
-    {
-     "t": 0,
-     "titel": "Einstieg"
-    },
-    {
-     "t": 24,
-     "titel": "Pflichtfelder"
-    },
-    {
-     "t": 58,
-     "titel": "Register des Gutachterausschusses"
-    },
-    {
-     "t": 87,
-     "titel": "Modernisierung und RND"
-    },
-    {
-     "t": 125,
-     "titel": "Standardstufe"
-    },
-    {
-     "t": 139,
-     "titel": "Grundrissart"
-    },
-    {
-     "t": 151,
-     "titel": "Hinterland"
-    },
-    {
-     "t": 164,
-     "titel": "Garagen"
-    },
-    {
-     "t": 185,
-     "titel": "Besonderheiten"
-    },
-    {
-     "t": 211,
-     "titel": "Wertermittlung Stufe 3"
-    },
-    {
-     "t": 224,
-     "titel": "Ertragswert und Sachwert"
-    },
-    {
-     "t": 288,
-     "titel": "Quellennachweis"
-    }
-   ]
-  },
-  {
    "id": "modul-17-objekt-uebertragen",
    "nr": "17",
    "kategorie": "Erweitert",
@@ -1171,107 +1307,68 @@ window.DPS_VIDEOTHEK = {
    ]
   },
   {
-   "id": "modul-18-der-marktbericht",
-   "nr": "18",
-   "kategorie": "Erweitert",
-   "titel": "Der Marktbericht",
-   "unterzeile": "Lage, Vergleichsdaten, Zensus, Wertermittlung, Quellen — und das PDF.",
-   "datei": "dealpilot-modul-18-der-marktbericht.mp4",
-   "dauer": 237,
-   "kapitel": [
-    {
-     "t": 0,
-     "titel": "Einstieg"
-    },
-    {
-     "t": 25,
-     "titel": "Marktbericht öffnen"
-    },
-    {
-     "t": 43,
-     "titel": "Score und Marktwert"
-    },
-    {
-     "t": 72,
-     "titel": "Lage"
-    },
-    {
-     "t": 84,
-     "titel": "Bodenrichtwert und Zensus"
-    },
-    {
-     "t": 99,
-     "titel": "Marktentwicklung"
-    },
-    {
-     "t": 111,
-     "titel": "Vergleichspreise"
-    },
-    {
-     "t": 123,
-     "titel": "Wertermittlung"
-    },
-    {
-     "t": 151,
-     "titel": "Quellennachweis"
-    },
-    {
-     "t": 167,
-     "titel": "Der Bericht in Worten"
-    },
-    {
-     "t": 184,
-     "titel": "PDF"
-    }
-   ]
-  },
-  {
    "id": "modul-19-das-bank-pdf",
    "nr": "19",
    "kategorie": "Erweitert",
    "titel": "Das Bank-PDF",
    "unterzeile": "Deine Marke, die Bankfassung — und was die Bank als Investment Case bekommt.",
-   "datei": "dealpilot-modul-19-das-bank-pdf.mp4",
-   "dauer": 250,
+   "datei": "dealpilot-modul-19-das-bank-pdf-v3730.mp4",
+   "dauer": 254,
    "kapitel": [
     {
      "t": 0,
      "titel": "Einstieg"
     },
     {
-     "t": 27,
-     "titel": "Wo die PDFs entstehen"
+     "t": 13,
+     "titel": "Das Beispiel"
     },
     {
-     "t": 39,
-     "titel": "Fassung wählen"
+     "t": 30,
+     "titel": "Deal-Aktion · Dokumente"
     },
     {
-     "t": 75,
-     "titel": "Deine Marke"
+     "t": 41,
+     "titel": "Vier Fassungen"
     },
     {
-     "t": 92,
-     "titel": "Objekt und Finanzierung"
+     "t": 61,
+     "titel": "Die Bankfassung"
     },
     {
-     "t": 113,
-     "titel": "Kennzahlen"
+     "t": 78,
+     "titel": "Oben: deine Marke"
     },
     {
-     "t": 150,
-     "titel": "Phasen und Exit"
+     "t": 95,
+     "titel": "Seite 1 · Objekt und Finanzierung"
     },
     {
-     "t": 190,
-     "titel": "Belastungsprobe"
+     "t": 115,
+     "titel": "Seite 2 · Kennzahlen"
     },
     {
-     "t": 209,
-     "titel": "Annahmen"
+     "t": 133,
+     "titel": "Von der Warmmiete zum Cashflow"
     },
     {
-     "t": 223,
+     "t": 153,
+     "titel": "Heute, Zinsbindung, Anschluss"
+    },
+    {
+     "t": 172,
+     "titel": "Vermögensaufbau und Exit"
+    },
+    {
+     "t": 193,
+     "titel": "Die Belastungsprobe"
+    },
+    {
+     "t": 212,
+     "titel": "Annahmen und Hinweise"
+    },
+    {
+     "t": 226,
      "titel": "Der Investment Case"
     }
    ]
@@ -1317,51 +1414,51 @@ window.DPS_VIDEOTHEK = {
    "kategorie": "Erweitert",
    "titel": "Portfolio-Cockpit und Pilot",
    "unterzeile": "Alle Objekte auf einer Seite — und ein Pilot, der sie kennt.",
-   "datei": "dealpilot-modul-21-portfolio-cockpit-und-pilot.mp4",
-   "dauer": 172,
+   "datei": "dealpilot-modul-21-portfolio-cockpit-und-pilot-v3730.mp4",
+   "dauer": 170,
    "kapitel": [
     {
      "t": 0,
      "titel": "Einstieg"
     },
     {
-     "t": 8,
+     "t": 10,
      "titel": "Das Portfolio-Cockpit"
     },
     {
-     "t": 21,
+     "t": 23,
      "titel": "Der Portfolio-Score"
     },
     {
-     "t": 33,
+     "t": 35,
      "titel": "Zwei Scores"
     },
     {
-     "t": 48,
+     "t": 50,
      "titel": "Kennzahlen über alles"
     },
     {
-     "t": 64,
+     "t": 66,
      "titel": "Bestand · Soll · Zielbild"
     },
     {
-     "t": 82,
+     "t": 77,
      "titel": "Steuer über alle Objekte"
     },
     {
-     "t": 98,
+     "t": 94,
      "titel": "Die Projektion"
     },
     {
-     "t": 113,
+     "t": 108,
      "titel": "Der Portfolio-Pilot"
     },
     {
-     "t": 129,
+     "t": 125,
      "titel": "Pilot fragen"
     },
     {
-     "t": 146,
+     "t": 142,
      "titel": "Oder eigene Fragen"
     }
    ]
@@ -1407,43 +1504,63 @@ window.DPS_VIDEOTHEK = {
    "kategorie": "Erweitert",
    "titel": "Die 15-%-Grenze",
    "unterzeile": "Anschaffungsnahe Herstellungskosten — Schwelle, netto, drei Jahre, Kaufpreisaufteilung.",
-   "datei": "dealpilot-modul-23-die-15-prozent-grenze.mp4",
-   "dauer": 215,
+   "datei": "dealpilot-modul-23-die-15-prozent-grenze-v3730.mp4",
+   "dauer": 225,
    "kapitel": [
     {
      "t": 0,
      "titel": "Einstieg"
     },
     {
-     "t": 28,
-     "titel": "Eine Sanierung"
+     "t": 13,
+     "titel": "Das Beispiel"
     },
     {
-     "t": 53,
+     "t": 30,
+     "titel": "Angenommen: eine Sanierung"
+    },
+    {
+     "t": 41,
+     "titel": "Die Sanierung"
+    },
+    {
+     "t": 55,
      "titel": "15 % in drei Jahren"
     },
     {
-     "t": 68,
+     "t": 70,
      "titel": "So wird gerechnet"
     },
     {
-     "t": 82,
+     "t": 85,
      "titel": "Netto zählt"
     },
     {
-     "t": 122,
+     "t": 101,
+     "titel": "Angenommen: netto"
+    },
+    {
+     "t": 127,
+     "titel": "Angenommen: mehr Sanierung"
+    },
+    {
+     "t": 138,
      "titel": "Über der Grenze"
     },
     {
-     "t": 148,
-     "titel": "Steuerliche Verteilung"
+     "t": 153,
+     "titel": "Steuerlich verteilt"
     },
     {
-     "t": 163,
+     "t": 171,
      "titel": "Der Gebäudeanteil"
     },
     {
-     "t": 176,
+     "t": 184,
+     "titel": "Nach der Kaufpreisaufteilung"
+    },
+    {
+     "t": 196,
      "titel": "Vor und nach der Aufteilung"
     }
    ]
@@ -1568,71 +1685,71 @@ window.DPS_VIDEOTHEK = {
    "kategorie": "Erweitert",
    "titel": "Mieterhöhung und Zielbild",
    "unterzeile": "Ein Mehrfamilienhaus, Wohnung für Wohnung — Ist, Soll und Zielbild bis zum Wertpotenzial.",
-   "datei": "dealpilot-modul-26-mieterhoehung-und-zielbild.mp4",
-   "dauer": 861,
+   "datei": "dealpilot-modul-26-mieterhoehung-und-zielbild-v3502.mp4",
+   "dauer": 746,
    "kapitel": [
     {
      "t": 0,
      "titel": "Einstieg"
     },
     {
-     "t": 13,
+     "t": 16,
      "titel": "Das Beispiel"
     },
     {
-     "t": 42,
+     "t": 45,
      "titel": "Schritt 1 · Das Haus"
     },
     {
-     "t": 80,
+     "t": 83,
      "titel": "Schritt 2 · Die Wohnungen"
     },
     {
-     "t": 131,
+     "t": 137,
      "titel": "Wohnung 1 · Der Mietvertrag"
     },
     {
-     "t": 157,
+     "t": 163,
      "titel": "Wohnung 1 · Soll-Miete"
     },
     {
-     "t": 219,
+     "t": 225,
      "titel": "Wohnung 1 · Zielbild"
     },
     {
-     "t": 261,
+     "t": 267,
      "titel": "Ertragswert dieser Wohnung"
     },
     {
-     "t": 302,
+     "t": 328,
      "titel": "Wohnung 2"
     },
     {
-     "t": 347,
+     "t": 374,
      "titel": "Die übrigen Wohnungen"
     },
     {
-     "t": 395,
-     "titel": "Schritt 4 · Ergebnis und Übernehmen"
+     "t": 424,
+     "titel": "Schritt 4 · Ergebnis"
     },
     {
-     "t": 463,
+     "t": 493,
      "titel": "Tab Miete · Mietentwicklung"
     },
     {
-     "t": 560,
+     "t": 589,
      "titel": "Pilot-Analyse"
     },
     {
-     "t": 704,
+     "t": 649,
      "titel": "Tab Bewertung"
     },
     {
-     "t": 765,
+     "t": 663,
      "titel": "Das Bank-PDF"
     },
     {
-     "t": 832,
+     "t": 711,
      "titel": "Ist, Soll, Zielbild"
     }
    ]
@@ -1643,67 +1760,59 @@ window.DPS_VIDEOTHEK = {
    "kategorie": "Erweitert",
    "titel": "Steuerverlauf mit Wendepunkt",
    "unterzeile": "Wann ein Objekt steuerlich positiv wird — und warum das der Zeitpunkt fürs nächste Investment ist.",
-   "datei": "dealpilot-modul-27-steuerverlauf-mit-wendepunkt.mp4",
-   "dauer": 523,
+   "datei": "dealpilot-modul-27-steuerverlauf-mit-wendepunkt-v3502.mp4",
+   "dauer": 436,
    "kapitel": [
     {
      "t": 0,
      "titel": "Einstieg"
     },
     {
-     "t": 10,
+     "t": 18,
      "titel": "Das Beispiel"
     },
     {
-     "t": 42,
-     "titel": "Der Steuerverlauf"
+     "t": 50,
+     "titel": "Steuerverlauf"
     },
     {
-     "t": 53,
-     "titel": "Ergebnis aus Vermietung"
+     "t": 99,
+     "titel": "Dauerhaft positiv ab 2027"
     },
     {
-     "t": 90,
-     "titel": "Der Wendepunkt"
+     "t": 144,
+     "titel": "Je Jahr der Tooltip · 2026"
     },
     {
-     "t": 115,
-     "titel": "Warum am Anfang Verluste"
+     "t": 174,
+     "titel": "Erstattungen bis dahin"
     },
     {
-     "t": 135,
-     "titel": "Jedes Jahr im Tooltip"
-    },
-    {
-     "t": 202,
+     "t": 213,
      "titel": "Der Zeitpunkt fürs nächste Investment"
     },
     {
-     "t": 223,
-     "titel": "Zinsbindung und Zehn-Jahres-Frist"
+     "t": 234,
+     "titel": "Zinsbindung endet 2033"
     },
     {
-     "t": 260,
+     "t": 271,
      "titel": "Die Jahres-Kärtchen"
     },
     {
-     "t": 276,
-     "titel": "Werbungskosten im Detail"
+     "t": 285,
+     "titel": "Werbungskosten im Detail · 2026"
     },
     {
-     "t": 367,
-     "titel": "In der Pilot-Analyse"
+     "t": 349,
+     "titel": "Pilot-Analyse · Steuer"
     },
     {
-     "t": 383,
+     "t": 371,
      "titel": "Das Gegenbild"
     },
     {
-     "t": 458,
-     "titel": "Maßnahmen planen"
-    },
-    {
-     "t": 477,
+     "t": 392,
      "titel": "Keine Steuerberatung"
     }
    ]
@@ -1712,58 +1821,643 @@ window.DPS_VIDEOTHEK = {
    "id": "modul-28-unterlagen-einlesen",
    "nr": "28",
    "kategorie": "Erweitert",
-   "titel": "Unterlagen einlesen",
-   "unterzeile": "Sieben PDFs auf einmal: gelesen, ausgewertet, übernommen.",
-   "datei": "dealpilot-modul-28-unterlagen-einlesen.mp4",
-   "dauer": 553,
+   "titel": "Alle Unterlagen reinladen",
+   "unterzeile": "Dreizehn PDFs, eine Übernahme — und was der Detailgrad damit macht.",
+   "datei": "dealpilot-modul-28-alle-unterlagen-reinladen-v3730.mp4",
+   "dauer": 307,
    "kapitel": [
     {
      "t": 0,
      "titel": "Einstieg"
     },
     {
-     "t": 28,
-     "titel": "Kein Feld getippt"
+     "t": 12,
+     "titel": "Ein leeres Objekt"
     },
     {
-     "t": 70,
-     "titel": "Kapitel 2 · Lesen"
+     "t": 26,
+     "titel": "Exposé / Dokumente"
     },
     {
-     "t": 140,
+     "t": 37,
+     "titel": "Alles auf einmal"
+    },
+    {
+     "t": 49,
+     "titel": "13 Dateien"
+    },
+    {
+     "t": 65,
+     "titel": "Jede Datei einzeln"
+    },
+    {
+     "t": 77,
+     "titel": "Die Art erkennen"
+    },
+    {
+     "t": 91,
      "titel": "Personendaten geschwärzt"
     },
     {
-     "t": 196,
-     "titel": "Gemeinsame Auswertung"
+     "t": 103,
+     "titel": "Nur was dasteht"
     },
     {
-     "t": 223,
-     "titel": "Kapitel 3 · Auswerten und übernehmen"
+     "t": 115,
+     "titel": "Alles zusammen"
     },
     {
-     "t": 299,
-     "titel": "These und Risiken"
+     "t": 128,
+     "titel": "Erkannt"
     },
     {
-     "t": 364,
+     "t": 147,
+     "titel": "Die Reiter"
+    },
+    {
+     "t": 158,
+     "titel": "Aus dem Exposé"
+    },
+    {
+     "t": 169,
+     "titel": "Erkannt, aber nicht übernommen"
+    },
+    {
+     "t": 189,
+     "titel": "Die Auswertung"
+    },
+    {
+     "t": 203,
      "titel": "Übernehmen"
     },
     {
-     "t": 421,
-     "titel": "Kapitel 4 · Pilot-Analyse"
+     "t": 214,
+     "titel": "Im Objekt"
     },
     {
-     "t": 463,
-     "titel": "Was absehbar Geld kostet"
+     "t": 226,
+     "titel": "Detailgrad höher"
     },
     {
-     "t": 500,
-     "titel": "Die genaue Ansicht"
+     "t": 236,
+     "titel": "Erneut einlesen"
     },
     {
-     "t": 534,
-     "titel": "Abschluss"
+     "t": 260,
+     "titel": "Jetzt auch die Wohnungen"
+    },
+    {
+     "t": 280,
+     "titel": "Fertig übertragen"
+    }
+   ]
+  },
+  {
+   "id": "modul-29-drei-objekte-drei-urteile",
+   "nr": "29",
+   "kategorie": "Erweitert",
+   "titel": "Drei Objekte, drei Urteile",
+   "unterzeile": "Ein gutes, ein mittleres und ein schwaches Objekt: was der Pilot jeweils sagt.",
+   "datei": "dealpilot-modul-29-drei-objekte-drei-urteile-v3502.mp4",
+   "dauer": 263,
+   "kapitel": [
+    {
+     "t": 0,
+     "titel": "Einstieg"
+    },
+    {
+     "t": 19,
+     "titel": "Objekt 1 · Kaufempfehlung"
+    },
+    {
+     "t": 93,
+     "titel": "Objekt 2 · Mit Bedingungen"
+    },
+    {
+     "t": 168,
+     "titel": "Objekt 3 · Absage"
+    },
+    {
+     "t": 237,
+     "titel": "Nebeneinander"
+    }
+   ]
+  },
+  {
+   "id": "partner-1",
+   "nr": 1,
+   "kategorie": "Für Partner",
+   "titel": "Partner-Cockpit und Marke",
+   "unterzeile": "Dein Arbeitsplatz für Kunden, Plätze und deine Marke.",
+   "datei": "dealpilot-partner-1-partner-cockpit-und-marke-v3650.mp4",
+   "dauer": 320,
+   "kapitel": [
+    {
+     "t": 15,
+     "titel": "Deine Marke"
+    },
+    {
+     "t": 29,
+     "titel": "Das Partner-Cockpit"
+    },
+    {
+     "t": 42,
+     "titel": "Auf einen Blick"
+    },
+    {
+     "t": 54,
+     "titel": "Was ansteht"
+    },
+    {
+     "t": 67,
+     "titel": "Die Reiter"
+    },
+    {
+     "t": 81,
+     "titel": "Zurück zu den Objekten"
+    },
+    {
+     "t": 97,
+     "titel": "Verwaltung"
+    },
+    {
+     "t": 111,
+     "titel": "Einmal speichern"
+    },
+    {
+     "t": 126,
+     "titel": "Dein Logo"
+    },
+    {
+     "t": 139,
+     "titel": "Auf dunklem Grund"
+    },
+    {
+     "t": 157,
+     "titel": "Sofort sichtbar"
+    },
+    {
+     "t": 170,
+     "titel": "Größe und Lage"
+    },
+    {
+     "t": 187,
+     "titel": "Deine Farbe"
+    },
+    {
+     "t": 203,
+     "titel": "Live in der App"
+    },
+    {
+     "t": 222,
+     "titel": "Deine PDFs"
+    },
+    {
+     "t": 239,
+     "titel": "Plätze"
+    },
+    {
+     "t": 251,
+     "titel": "Plätze dazukaufen"
+    },
+    {
+     "t": 268,
+     "titel": "Abrechnung"
+    },
+    {
+     "t": 279,
+     "titel": "Für deine Kunden"
+    },
+    {
+     "t": 296,
+     "titel": "Startklar"
+    }
+   ]
+  },
+  {
+   "id": "partner-2",
+   "nr": 2,
+   "kategorie": "Für Partner",
+   "titel": "Kunden hinzufügen",
+   "unterzeile": "Mit Partnerplatz oder eigenem Abo, per Einladung oder Code.",
+   "datei": "dealpilot-partner-2-kunden-hinzufuegen-v3730.mp4",
+   "dauer": 361,
+   "kapitel": [
+    {
+     "t": 11,
+     "titel": "Kunden & Plätze"
+    },
+    {
+     "t": 23,
+     "titel": "Mit Partnerplatz"
+    },
+    {
+     "t": 35,
+     "titel": "Kundennummer"
+    },
+    {
+     "t": 48,
+     "titel": "Mit eigenem Abo"
+    },
+    {
+     "t": 63,
+     "titel": "Wartet auf Zusage"
+    },
+    {
+     "t": 79,
+     "titel": "Stufe und Rechte"
+    },
+    {
+     "t": 93,
+     "titel": "Kunde"
+    },
+    {
+     "t": 108,
+     "titel": "Stufe"
+    },
+    {
+     "t": 121,
+     "titel": "Rechte"
+    },
+    {
+     "t": 135,
+     "titel": "Marke"
+    },
+    {
+     "t": 149,
+     "titel": "Per E-Mail einladen"
+    },
+    {
+     "t": 168,
+     "titel": "Mit oder ohne Platz"
+    },
+    {
+     "t": 184,
+     "titel": "Freigabe vorschlagen"
+    },
+    {
+     "t": 199,
+     "titel": "Einladen"
+    },
+    {
+     "t": 211,
+     "titel": "Verbindungscode"
+    },
+    {
+     "t": 229,
+     "titel": "Platz nur bei Bedarf"
+    },
+    {
+     "t": 252,
+     "titel": "Mein Partner"
+    },
+    {
+     "t": 267,
+     "titel": "Die Anfrage"
+    },
+    {
+     "t": 281,
+     "titel": "Er entscheidet"
+    },
+    {
+     "t": 296,
+     "titel": "Die Freigabe"
+    },
+    {
+     "t": 307,
+     "titel": "Was du siehst"
+    },
+    {
+     "t": 321,
+     "titel": "Der Code für dich"
+    },
+    {
+     "t": 336,
+     "titel": "Weiter geht’s"
+    }
+   ]
+  },
+  {
+   "id": "partner-3",
+   "nr": 3,
+   "kategorie": "Für Partner",
+   "titel": "Objekte senden und übernehmen",
+   "unterzeile": "Vom Kunden ins Cockpit, und als eigenes Objekt weiter.",
+   "datei": "dealpilot-partner-3-objekte-senden-und-uebernehmen-v3730.mp4",
+   "dauer": 316,
+   "kapitel": [
+    {
+     "t": 11,
+     "titel": "Freigegeben"
+    },
+    {
+     "t": 34,
+     "titel": "Ein neues Objekt"
+    },
+    {
+     "t": 46,
+     "titel": "Mein Partner"
+    },
+    {
+     "t": 56,
+     "titel": "Nur eine Kopie"
+    },
+    {
+     "t": 70,
+     "titel": "Auswählen"
+    },
+    {
+     "t": 84,
+     "titel": "An Partner senden"
+    },
+    {
+     "t": 94,
+     "titel": "Meine Sendungen"
+    },
+    {
+     "t": 120,
+     "titel": "Was ansteht"
+    },
+    {
+     "t": 137,
+     "titel": "Je Kunde"
+    },
+    {
+     "t": 152,
+     "titel": "Stand 2"
+    },
+    {
+     "t": 169,
+     "titel": "Nur lesen"
+    },
+    {
+     "t": 185,
+     "titel": "Alles da"
+    },
+    {
+     "t": 200,
+     "titel": "Als eigenes Objekt übernehmen"
+    },
+    {
+     "t": 213,
+     "titel": "Mit Kundenbezug"
+    },
+    {
+     "t": 227,
+     "titel": "Wofür?"
+    },
+    {
+     "t": 246,
+     "titel": "Für den Kunden weitergeführt"
+    },
+    {
+     "t": 266,
+     "titel": "Sortieren nach Kunde"
+    },
+    {
+     "t": 279,
+     "titel": "Je Kunde gruppiert"
+    },
+    {
+     "t": 294,
+     "titel": "Weiter geht’s"
+    }
+   ]
+  },
+  {
+   "id": "partner-4",
+   "nr": 4,
+   "kategorie": "Für Partner",
+   "titel": "Anmerkungen und Rückmeldung",
+   "unterzeile": "Felder markieren, Bild zeigen, zurückgeben, und was der Kunde tut.",
+   "datei": "dealpilot-partner-4-anmerkungen-und-rueckmeldung-v3650.mp4",
+   "dauer": 447,
+   "kapitel": [
+    {
+     "t": 12,
+     "titel": "Ein Kundenstand"
+    },
+    {
+     "t": 31,
+     "titel": "Die Werkzeuge"
+    },
+    {
+     "t": 45,
+     "titel": "Die Liste"
+    },
+    {
+     "t": 57,
+     "titel": "Rückfrage des Kunden"
+    },
+    {
+     "t": 77,
+     "titel": "Feld markieren"
+    },
+    {
+     "t": 92,
+     "titel": "Anmerkung zum Feld"
+    },
+    {
+     "t": 108,
+     "titel": "Art und Vorschlag"
+    },
+    {
+     "t": 122,
+     "titel": "Bildausschnitt"
+    },
+    {
+     "t": 140,
+     "titel": "Markieren"
+    },
+    {
+     "t": 154,
+     "titel": "Am Anmerkungsfenster"
+    },
+    {
+     "t": 167,
+     "titel": "Markiert"
+    },
+    {
+     "t": 178,
+     "titel": "Zurück an Kunden"
+    },
+    {
+     "t": 195,
+     "titel": "Mit Begleittext"
+    },
+    {
+     "t": 214,
+     "titel": "Zurückgegeben"
+    },
+    {
+     "t": 244,
+     "titel": "Neue Aufgabe"
+    },
+    {
+     "t": 257,
+     "titel": "Rückmeldung zu …"
+    },
+    {
+     "t": 277,
+     "titel": "Am eigenen Objekt"
+    },
+    {
+     "t": 289,
+     "titel": "Mit Bild"
+    },
+    {
+     "t": 307,
+     "titel": "Erst bearbeiten"
+    },
+    {
+     "t": 324,
+     "titel": "Vorschlag übernommen"
+    },
+    {
+     "t": 337,
+     "titel": "Erledigt"
+    },
+    {
+     "t": 352,
+     "titel": "Oder eine Rückfrage"
+    },
+    {
+     "t": 366,
+     "titel": "Alles bearbeitet"
+    },
+    {
+     "t": 380,
+     "titel": "Neuer Stand"
+    },
+    {
+     "t": 405,
+     "titel": "Meldungen"
+    },
+    {
+     "t": 423,
+     "titel": "Der Kreis schließt sich"
+    }
+   ]
+  },
+  {
+   "id": "partner-5",
+   "nr": 5,
+   "kategorie": "Für Partner",
+   "titel": "Objekt an Kunden übergeben",
+   "unterzeile": "Dein durchgerechnetes Objekt per E-Mail, der Kunde bekommt eine Kopie.",
+   "datei": "dealpilot-partner-5-objekt-an-kunden-uebergeben.mp4",
+   "dauer": 174,
+   "kapitel": [
+    {
+     "t": 15,
+     "titel": "Dein Objekt"
+    },
+    {
+     "t": 33,
+     "titel": "Übergeben"
+    },
+    {
+     "t": 42,
+     "titel": "Welches Objekt"
+    },
+    {
+     "t": 59,
+     "titel": "An wen"
+    },
+    {
+     "t": 71,
+     "titel": "Die Vorprüfung"
+    },
+    {
+     "t": 90,
+     "titel": "Ein persönlicher Satz"
+    },
+    {
+     "t": 108,
+     "titel": "Unterwegs"
+    },
+    {
+     "t": 123,
+     "titel": "Beim Kunden"
+    },
+    {
+     "t": 138,
+     "titel": "Widerrufen"
+    },
+    {
+     "t": 152,
+     "titel": "Gute Reise"
+    }
+   ]
+  },
+  {
+   "id": "partner-kunde-1",
+   "nr": "K1",
+   "kategorie": "Für Partner",
+   "titel": "Mit deinem Partner arbeiten",
+   "unterzeile": "Für Kunden: verbinden, Objekte senden, Anmerkungen bearbeiten.",
+   "datei": "dealpilot-kunde-1-mit-deinem-partner-arbeiten-v3730.mp4",
+   "dauer": 325,
+   "kapitel": [
+    {
+     "t": 14,
+     "titel": "Einladung annehmen"
+    },
+    {
+     "t": 28,
+     "titel": "Du entscheidest"
+    },
+    {
+     "t": 43,
+     "titel": "Die Freigabe"
+    },
+    {
+     "t": 68,
+     "titel": "Verbunden"
+    },
+    {
+     "t": 96,
+     "titel": "Code erzeugen"
+    },
+    {
+     "t": 118,
+     "titel": "Bestätigen"
+    },
+    {
+     "t": 132,
+     "titel": "Die Freigabe"
+    },
+    {
+     "t": 166,
+     "titel": "Objekt senden"
+    },
+    {
+     "t": 186,
+     "titel": "Erst bearbeiten"
+    },
+    {
+     "t": 207,
+     "titel": "Mit Bildausschnitt"
+    },
+    {
+     "t": 233,
+     "titel": "Rückfrage"
+    },
+    {
+     "t": 248,
+     "titel": "Erledigt"
+    },
+    {
+     "t": 261,
+     "titel": "Erneut senden"
+    },
+    {
+     "t": 281,
+     "titel": "Freigaben"
+    },
+    {
+     "t": 300,
+     "titel": "Verlauf"
     }
    ]
   }

@@ -1,0 +1,1290 @@
+[
+ {
+  "land_code": "HE",
+  "ags": "06413000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Offenbach am Main, Stadt",
+  "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich der Stadt Offenbach am Main",
+  "berichtsjahr": 2026,
+  "berichtsjahr_dokument": 2025,
+  "berichtsjahr_hinweis": "berichtsjahr = Ausgabejahr des Berichts (2026), wie bei den Offenbacher Sätzen der Jahrgänge 2024 und 2025 im Register. Impressum: „Berichtsjahr: 2025 (IMB 2026)“, „Ausgabe: November 2026“.",
+  "stichtag": "2026-01-01",
+  "stichtag_hinweis": "So abgedruckt in den Modelltabellen („Stichtag: 01.01.2026“), Untersuchungszeitraum 01.01.2025 – 31.12.2025.",
+  "auswertezeitraum": "01.01.2025 – 31.12.2025",
+  "veroeffentlicht": "2026-11",
+  "quelle_url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026",
+  "quelle_datei": "`2026_IMB_STADT_OFFENBACH.pdf",
+  "quelle_hinweis": "Kostenfreier Download im Downloadcenter der Hessischen Verwaltung für Bodenmanagement und Geoinformation (gds.hessen.de), Ordner Immobilienwerte / Regionale Immobilienmarktberichte / `IMB regional 2026, Datei „`2026_IMB_STADT_OFFENBACH.pdf“ (eingestellt 18.11.2026, 87 Seiten). Der direkte Dateilink trägt einen Tagesstempel (/downloadcenter/<JJJJMMTT>/…) und ist deshalb nicht als Dauerlink hinterlegt. Seitenangaben = gedruckte Seitenzahl; PDF-Seite = gedruckte + 2.",
+  "lizenz": "dl-de/zero-2-0",
+  "lizenz_hinweis": "Der Bericht nennt keine Lizenz namentlich. Vervielfältigungshinweis (Impressum, S. 1) im Wortlaut der Datenlizenz Deutschland – Zero – 2.0: „Jede Nutzung des Immobilienmarktberichts und der zugehörigen Metadaten ist ohne Einschränkung und Bedingung erlaubt. … Wird bei der Nutzung des Immobilienmarktberichts oder der Metadaten ein Quellenvermerk beigegeben, ist in diesem auf Veränderungen, Bearbeitungen, neue Gestaltungen oder sonstige Abwandlungen der Daten hinzuweisen.“",
+  "quellenvermerk": "Gutachterausschuss für Immobilienwerte für den Bereich der Stadt Offenbach am Main, Immobilienmarktbericht 2026",
+  "verwendung": "produkt",
+  "korrekturen": [],
+  "quelle_parser": "ernte-20261120-hand (pdftotext -layout, Tabellen per Seitenbild 90 dpi gelesen am 20.11.2026)",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "dreifh_bis1949",
+  "objektart": "dreifh",
+  "baujahr_bis": 1949,
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 1.5,
+   "rundung_stellen": 1,
+   "bezeichnung": "Dreifamilienhäuser Baujahr bis 1949, Jahrgang 2025",
+   "wert_art": "Mittelwert",
+   "median": 1.7,
+   "spanne": "-0,4 – 2,8",
+   "hinweis": "Ergebnis in PROZENT (2,5 bedeutet 2,5 %). Mittelwert der Tabelle (fett gedruckt); der Median steht in Klammern daneben und ist hier nur Beleg."
+  },
+  "modellansaetze": {
+   "gnd_jahre": 80,
+   "gesamtnutzungsdauer": 80,
+   "rnd_min_jahre": 20,
+   "rnd": "Gesamtnutzungsdauer – Gebäudealter (ggf. fiktiv), mind. 20 Jahre",
+   "stichprobe": "100 %, um Ausreißer bereinigt",
+   "rohertrag": "marktüblich erzielbare Nettokaltmiete x Wohn-/Nutzfläche (i. d. R. tatsächliche Nettokaltmiete zum Verkaufszeitpunkt; bei erheblicher Abweichung vom Mietspiegel / der gewerblichen Mietübersicht die marktüblich erzielbare)",
+   "bewirtschaftungskosten": "gemäß Anlage 3 Nummer III ImmoWertV",
+   "bodenwert": "lage- und objektangepasster Boden(richt)wert",
+   "bezug": "IMB 2026 Offenbach, Kap. 9.3, Modelltabelle S. 48",
+   "modell_hinweis": "Modellwechsel gegenüber dem Jahrgang 2025 (Vorabzug, GND 70, RND mind. 15 Jahre): jetzt GND 80 Jahre, RND mind. 20 Jahre.",
+   "restnutzungsdauer_mittel": 28,
+   "brw_mittel_eur_qm": 776,
+   "rohertragsfaktor": 27,
+   "nettokaltmiete_mittel_eur_qm": 8.03,
+   "bwk_mittel_prozent": 23
+  },
+  "geltungsbereich": {
+   "objektart_bez": "Dreifamilienhäuser Baujahr bis 1949",
+   "region": "Stadt Offenbach am Main",
+   "kauffaelle_zeitraum": "2025"
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "dokument": "Immobilienmarktbericht 2026 Stadt Offenbach am Main (Berichtsjahr 2025, Ausgabe November 2026)",
+    "fundstelle": "Kap. 9.3.1, Abbildung 43, S. 49, Spalte Jahrgang 2025: LZ 1,5 % (Median 1,7), Spanne -0,4 – 2,8, Stabw 0,9, RoF 27, 18 Kauffälle, Ø Miete 8,03 €/m², Ø BRW 776 €/m², Ø RND 28, Ø BWK 23 %",
+    "wert": 1.5,
+    "standardabweichung": 0.9,
+    "fallzahl": 18
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": "amtlich, vom Gutachterausschuss der Stadt Offenbach am Main abgeleitet und im Immobilienmarktbericht 2026 veröffentlicht.",
+  "fallzahl": 18,
+  "streuung": 0.9,
+  "modellversion": "IMB-Offenbach-2026 (Kap. 9.3, GND 80, RND mind. 20 Jahre, BWK Anlage 3 ImmoWertV)",
+  "auflagen": "Zinsspanne beachten (S. 47: „Zur sachgerechten Anwendung der nachfolgend aufgeführten Liegenschaftszinssätze und Rohertragsfaktoren wird auf die jeweils angegebenen Zinsspannen verwiesen.“). Modellkonform nur mit GND 80 Jahre und RND mind. 20 Jahre."
+ },
+ {
+  "land_code": "HE",
+  "ags": "06413000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Offenbach am Main, Stadt",
+  "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich der Stadt Offenbach am Main",
+  "berichtsjahr": 2026,
+  "berichtsjahr_dokument": 2025,
+  "berichtsjahr_hinweis": "berichtsjahr = Ausgabejahr des Berichts (2026), wie bei den Offenbacher Sätzen der Jahrgänge 2024 und 2025 im Register. Impressum: „Berichtsjahr: 2025 (IMB 2026)“, „Ausgabe: November 2026“.",
+  "stichtag": "2026-01-01",
+  "stichtag_hinweis": "So abgedruckt in den Modelltabellen („Stichtag: 01.01.2026“), Untersuchungszeitraum 01.01.2025 – 31.12.2025.",
+  "auswertezeitraum": "01.01.2025 – 31.12.2025",
+  "veroeffentlicht": "2026-11",
+  "quelle_url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026",
+  "quelle_datei": "`2026_IMB_STADT_OFFENBACH.pdf",
+  "quelle_hinweis": "Kostenfreier Download im Downloadcenter der Hessischen Verwaltung für Bodenmanagement und Geoinformation (gds.hessen.de), Ordner Immobilienwerte / Regionale Immobilienmarktberichte / `IMB regional 2026, Datei „`2026_IMB_STADT_OFFENBACH.pdf“ (eingestellt 18.11.2026, 87 Seiten). Der direkte Dateilink trägt einen Tagesstempel (/downloadcenter/<JJJJMMTT>/…) und ist deshalb nicht als Dauerlink hinterlegt. Seitenangaben = gedruckte Seitenzahl; PDF-Seite = gedruckte + 2.",
+  "lizenz": "dl-de/zero-2-0",
+  "lizenz_hinweis": "Der Bericht nennt keine Lizenz namentlich. Vervielfältigungshinweis (Impressum, S. 1) im Wortlaut der Datenlizenz Deutschland – Zero – 2.0: „Jede Nutzung des Immobilienmarktberichts und der zugehörigen Metadaten ist ohne Einschränkung und Bedingung erlaubt. … Wird bei der Nutzung des Immobilienmarktberichts oder der Metadaten ein Quellenvermerk beigegeben, ist in diesem auf Veränderungen, Bearbeitungen, neue Gestaltungen oder sonstige Abwandlungen der Daten hinzuweisen.“",
+  "quellenvermerk": "Gutachterausschuss für Immobilienwerte für den Bereich der Stadt Offenbach am Main, Immobilienmarktbericht 2026",
+  "verwendung": "produkt",
+  "korrekturen": [],
+  "quelle_parser": "ernte-20261120-hand (pdftotext -layout, Tabellen per Seitenbild 90 dpi gelesen am 20.11.2026)",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "dreifh_ab1950",
+  "objektart": "dreifh",
+  "baujahr_von": 1950,
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 1.8,
+   "rundung_stellen": 1,
+   "bezeichnung": "Dreifamilienhäuser Baujahr ab 1950, Jahrgang 2025",
+   "wert_art": "Mittelwert",
+   "median": 1.7,
+   "spanne": "1,3 – 2,9",
+   "hinweis": "Ergebnis in PROZENT (2,5 bedeutet 2,5 %). Mittelwert der Tabelle (fett gedruckt); der Median steht in Klammern daneben und ist hier nur Beleg."
+  },
+  "modellansaetze": {
+   "gnd_jahre": 80,
+   "gesamtnutzungsdauer": 80,
+   "rnd_min_jahre": 20,
+   "rnd": "Gesamtnutzungsdauer – Gebäudealter (ggf. fiktiv), mind. 20 Jahre",
+   "stichprobe": "100 %, um Ausreißer bereinigt",
+   "rohertrag": "marktüblich erzielbare Nettokaltmiete x Wohn-/Nutzfläche (i. d. R. tatsächliche Nettokaltmiete zum Verkaufszeitpunkt; bei erheblicher Abweichung vom Mietspiegel / der gewerblichen Mietübersicht die marktüblich erzielbare)",
+   "bewirtschaftungskosten": "gemäß Anlage 3 Nummer III ImmoWertV",
+   "bodenwert": "lage- und objektangepasster Boden(richt)wert",
+   "bezug": "IMB 2026 Offenbach, Kap. 9.3, Modelltabelle S. 48",
+   "modell_hinweis": "Modellwechsel gegenüber dem Jahrgang 2025 (Vorabzug, GND 70, RND mind. 15 Jahre): jetzt GND 80 Jahre, RND mind. 20 Jahre.",
+   "restnutzungsdauer_mittel": 31,
+   "brw_mittel_eur_qm": 771,
+   "rohertragsfaktor": 29,
+   "nettokaltmiete_mittel_eur_qm": 8.48,
+   "bwk_mittel_prozent": 21
+  },
+  "geltungsbereich": {
+   "objektart_bez": "Dreifamilienhäuser Baujahr ab 1950",
+   "region": "Stadt Offenbach am Main",
+   "kauffaelle_zeitraum": "2025"
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "dokument": "Immobilienmarktbericht 2026 Stadt Offenbach am Main (Berichtsjahr 2025, Ausgabe November 2026)",
+    "fundstelle": "Kap. 9.3.1, Abbildung 44, S. 49, Spalte Jahrgang 2025: LZ 1,8 % (Median 1,7), Spanne 1,3 – 2,9, Stabw 0,5, RoF 29, 12 Kauffälle, Ø Miete 8,48 €/m², Ø BRW 771 €/m², Ø RND 31, Ø BWK 21 %",
+    "wert": 1.8,
+    "standardabweichung": 0.5,
+    "fallzahl": 12
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": "amtlich, vom Gutachterausschuss der Stadt Offenbach am Main abgeleitet und im Immobilienmarktbericht 2026 veröffentlicht.",
+  "fallzahl": 12,
+  "streuung": 0.5,
+  "modellversion": "IMB-Offenbach-2026 (Kap. 9.3, GND 80, RND mind. 20 Jahre, BWK Anlage 3 ImmoWertV)",
+  "auflagen": "Zinsspanne beachten (S. 47: „Zur sachgerechten Anwendung der nachfolgend aufgeführten Liegenschaftszinssätze und Rohertragsfaktoren wird auf die jeweils angegebenen Zinsspannen verwiesen.“). Modellkonform nur mit GND 80 Jahre und RND mind. 20 Jahre."
+ },
+ {
+  "land_code": "HE",
+  "ags": "06413000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Offenbach am Main, Stadt",
+  "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich der Stadt Offenbach am Main",
+  "berichtsjahr": 2026,
+  "berichtsjahr_dokument": 2025,
+  "berichtsjahr_hinweis": "berichtsjahr = Ausgabejahr des Berichts (2026), wie bei den Offenbacher Sätzen der Jahrgänge 2024 und 2025 im Register. Impressum: „Berichtsjahr: 2025 (IMB 2026)“, „Ausgabe: November 2026“.",
+  "stichtag": "2026-01-01",
+  "stichtag_hinweis": "So abgedruckt in den Modelltabellen („Stichtag: 01.01.2026“), Untersuchungszeitraum 01.01.2025 – 31.12.2025.",
+  "auswertezeitraum": "01.01.2025 – 31.12.2025",
+  "veroeffentlicht": "2026-11",
+  "quelle_url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026",
+  "quelle_datei": "`2026_IMB_STADT_OFFENBACH.pdf",
+  "quelle_hinweis": "Kostenfreier Download im Downloadcenter der Hessischen Verwaltung für Bodenmanagement und Geoinformation (gds.hessen.de), Ordner Immobilienwerte / Regionale Immobilienmarktberichte / `IMB regional 2026, Datei „`2026_IMB_STADT_OFFENBACH.pdf“ (eingestellt 18.11.2026, 87 Seiten). Der direkte Dateilink trägt einen Tagesstempel (/downloadcenter/<JJJJMMTT>/…) und ist deshalb nicht als Dauerlink hinterlegt. Seitenangaben = gedruckte Seitenzahl; PDF-Seite = gedruckte + 2.",
+  "lizenz": "dl-de/zero-2-0",
+  "lizenz_hinweis": "Der Bericht nennt keine Lizenz namentlich. Vervielfältigungshinweis (Impressum, S. 1) im Wortlaut der Datenlizenz Deutschland – Zero – 2.0: „Jede Nutzung des Immobilienmarktberichts und der zugehörigen Metadaten ist ohne Einschränkung und Bedingung erlaubt. … Wird bei der Nutzung des Immobilienmarktberichts oder der Metadaten ein Quellenvermerk beigegeben, ist in diesem auf Veränderungen, Bearbeitungen, neue Gestaltungen oder sonstige Abwandlungen der Daten hinzuweisen.“",
+  "quellenvermerk": "Gutachterausschuss für Immobilienwerte für den Bereich der Stadt Offenbach am Main, Immobilienmarktbericht 2026",
+  "verwendung": "produkt",
+  "korrekturen": [],
+  "quelle_parser": "ernte-20261120-hand (pdftotext -layout, Tabellen per Seitenbild 90 dpi gelesen am 20.11.2026)",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "mfh_bis1949",
+  "objektart": "mfh",
+  "baujahr_bis": 1949,
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 2.3,
+   "rundung_stellen": 1,
+   "bezeichnung": "Mehrfamilienhäuser Baujahr bis 1949, Jahrgang 2025",
+   "wert_art": "Mittelwert",
+   "median": 2.5,
+   "spanne": "0,1 – 4,1",
+   "hinweis": "Ergebnis in PROZENT (2,5 bedeutet 2,5 %). Mittelwert der Tabelle (fett gedruckt); der Median steht in Klammern daneben und ist hier nur Beleg."
+  },
+  "modellansaetze": {
+   "gnd_jahre": 80,
+   "gesamtnutzungsdauer": 80,
+   "rnd_min_jahre": 20,
+   "rnd": "Gesamtnutzungsdauer – Gebäudealter (ggf. fiktiv), mind. 20 Jahre",
+   "stichprobe": "100 %, um Ausreißer bereinigt",
+   "rohertrag": "marktüblich erzielbare Nettokaltmiete x Wohn-/Nutzfläche (i. d. R. tatsächliche Nettokaltmiete zum Verkaufszeitpunkt; bei erheblicher Abweichung vom Mietspiegel / der gewerblichen Mietübersicht die marktüblich erzielbare)",
+   "bewirtschaftungskosten": "gemäß Anlage 3 Nummer III ImmoWertV",
+   "bodenwert": "lage- und objektangepasster Boden(richt)wert",
+   "bezug": "IMB 2026 Offenbach, Kap. 9.3, Modelltabelle S. 48",
+   "modell_hinweis": "Modellwechsel gegenüber dem Jahrgang 2025 (Vorabzug, GND 70, RND mind. 15 Jahre): jetzt GND 80 Jahre, RND mind. 20 Jahre.",
+   "restnutzungsdauer_mittel": 29,
+   "brw_mittel_eur_qm": 988,
+   "rohertragsfaktor": 22,
+   "nettokaltmiete_mittel_eur_qm": 8.31,
+   "bwk_mittel_prozent": 23
+  },
+  "geltungsbereich": {
+   "objektart_bez": "Mehrfamilienhäuser Baujahr bis 1949",
+   "region": "Stadt Offenbach am Main",
+   "kauffaelle_zeitraum": "2025"
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "dokument": "Immobilienmarktbericht 2026 Stadt Offenbach am Main (Berichtsjahr 2025, Ausgabe November 2026)",
+    "fundstelle": "Kap. 9.3.1, Abbildung 46, S. 50, Spalte Jahrgang 2025: LZ 2,3 % (Median 2,5), Spanne 0,1 – 4,1, Stabw 1,2, RoF 22, 28 Kauffälle, Ø Miete 8,31 €/m², Ø BRW 988 €/m², Ø RND 29, Ø BWK 23 %",
+    "wert": 2.3,
+    "standardabweichung": 1.2,
+    "fallzahl": 28
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": "amtlich, vom Gutachterausschuss der Stadt Offenbach am Main abgeleitet und im Immobilienmarktbericht 2026 veröffentlicht.",
+  "fallzahl": 28,
+  "streuung": 1.2,
+  "modellversion": "IMB-Offenbach-2026 (Kap. 9.3, GND 80, RND mind. 20 Jahre, BWK Anlage 3 ImmoWertV)",
+  "auflagen": "Zinsspanne beachten (S. 47: „Zur sachgerechten Anwendung der nachfolgend aufgeführten Liegenschaftszinssätze und Rohertragsfaktoren wird auf die jeweils angegebenen Zinsspannen verwiesen.“). Modellkonform nur mit GND 80 Jahre und RND mind. 20 Jahre."
+ },
+ {
+  "land_code": "HE",
+  "ags": "06413000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Offenbach am Main, Stadt",
+  "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich der Stadt Offenbach am Main",
+  "berichtsjahr": 2026,
+  "berichtsjahr_dokument": 2025,
+  "berichtsjahr_hinweis": "berichtsjahr = Ausgabejahr des Berichts (2026), wie bei den Offenbacher Sätzen der Jahrgänge 2024 und 2025 im Register. Impressum: „Berichtsjahr: 2025 (IMB 2026)“, „Ausgabe: November 2026“.",
+  "stichtag": "2026-01-01",
+  "stichtag_hinweis": "So abgedruckt in den Modelltabellen („Stichtag: 01.01.2026“), Untersuchungszeitraum 01.01.2025 – 31.12.2025.",
+  "auswertezeitraum": "01.01.2025 – 31.12.2025",
+  "veroeffentlicht": "2026-11",
+  "quelle_url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026",
+  "quelle_datei": "`2026_IMB_STADT_OFFENBACH.pdf",
+  "quelle_hinweis": "Kostenfreier Download im Downloadcenter der Hessischen Verwaltung für Bodenmanagement und Geoinformation (gds.hessen.de), Ordner Immobilienwerte / Regionale Immobilienmarktberichte / `IMB regional 2026, Datei „`2026_IMB_STADT_OFFENBACH.pdf“ (eingestellt 18.11.2026, 87 Seiten). Der direkte Dateilink trägt einen Tagesstempel (/downloadcenter/<JJJJMMTT>/…) und ist deshalb nicht als Dauerlink hinterlegt. Seitenangaben = gedruckte Seitenzahl; PDF-Seite = gedruckte + 2.",
+  "lizenz": "dl-de/zero-2-0",
+  "lizenz_hinweis": "Der Bericht nennt keine Lizenz namentlich. Vervielfältigungshinweis (Impressum, S. 1) im Wortlaut der Datenlizenz Deutschland – Zero – 2.0: „Jede Nutzung des Immobilienmarktberichts und der zugehörigen Metadaten ist ohne Einschränkung und Bedingung erlaubt. … Wird bei der Nutzung des Immobilienmarktberichts oder der Metadaten ein Quellenvermerk beigegeben, ist in diesem auf Veränderungen, Bearbeitungen, neue Gestaltungen oder sonstige Abwandlungen der Daten hinzuweisen.“",
+  "quellenvermerk": "Gutachterausschuss für Immobilienwerte für den Bereich der Stadt Offenbach am Main, Immobilienmarktbericht 2026",
+  "verwendung": "produkt",
+  "korrekturen": [],
+  "quelle_parser": "ernte-20261120-hand (pdftotext -layout, Tabellen per Seitenbild 90 dpi gelesen am 20.11.2026)",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "mfh_ab1950",
+  "objektart": "mfh",
+  "baujahr_von": 1950,
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 2.9,
+   "rundung_stellen": 1,
+   "bezeichnung": "Mehrfamilienhäuser Baujahr ab 1950, Jahrgang 2025",
+   "wert_art": "Mittelwert",
+   "median": 2.7,
+   "spanne": "0,8 – 4,5",
+   "hinweis": "Ergebnis in PROZENT (2,5 bedeutet 2,5 %). Mittelwert der Tabelle (fett gedruckt); der Median steht in Klammern daneben und ist hier nur Beleg."
+  },
+  "modellansaetze": {
+   "gnd_jahre": 80,
+   "gesamtnutzungsdauer": 80,
+   "rnd_min_jahre": 20,
+   "rnd": "Gesamtnutzungsdauer – Gebäudealter (ggf. fiktiv), mind. 20 Jahre",
+   "stichprobe": "100 %, um Ausreißer bereinigt",
+   "rohertrag": "marktüblich erzielbare Nettokaltmiete x Wohn-/Nutzfläche (i. d. R. tatsächliche Nettokaltmiete zum Verkaufszeitpunkt; bei erheblicher Abweichung vom Mietspiegel / der gewerblichen Mietübersicht die marktüblich erzielbare)",
+   "bewirtschaftungskosten": "gemäß Anlage 3 Nummer III ImmoWertV",
+   "bodenwert": "lage- und objektangepasster Boden(richt)wert",
+   "bezug": "IMB 2026 Offenbach, Kap. 9.3, Modelltabelle S. 48",
+   "modell_hinweis": "Modellwechsel gegenüber dem Jahrgang 2025 (Vorabzug, GND 70, RND mind. 15 Jahre): jetzt GND 80 Jahre, RND mind. 20 Jahre.",
+   "restnutzungsdauer_mittel": 36,
+   "brw_mittel_eur_qm": 845,
+   "rohertragsfaktor": 21,
+   "nettokaltmiete_mittel_eur_qm": 9.99,
+   "bwk_mittel_prozent": 20
+  },
+  "geltungsbereich": {
+   "objektart_bez": "Mehrfamilienhäuser Baujahr ab 1950",
+   "region": "Stadt Offenbach am Main",
+   "kauffaelle_zeitraum": "2025"
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "dokument": "Immobilienmarktbericht 2026 Stadt Offenbach am Main (Berichtsjahr 2025, Ausgabe November 2026)",
+    "fundstelle": "Kap. 9.3.1, Abbildung 47, S. 51, Spalte Jahrgang 2025: LZ 2,9 % (Median 2,7), Spanne 0,8 – 4,5, Stabw 1, RoF 21, 15 Kauffälle, Ø Miete 9,99 €/m², Ø BRW 845 €/m², Ø RND 36, Ø BWK 20 %",
+    "wert": 2.9,
+    "standardabweichung": 1,
+    "fallzahl": 15
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": "amtlich, vom Gutachterausschuss der Stadt Offenbach am Main abgeleitet und im Immobilienmarktbericht 2026 veröffentlicht.",
+  "fallzahl": 15,
+  "streuung": 1,
+  "modellversion": "IMB-Offenbach-2026 (Kap. 9.3, GND 80, RND mind. 20 Jahre, BWK Anlage 3 ImmoWertV)",
+  "auflagen": "Zinsspanne beachten (S. 47: „Zur sachgerechten Anwendung der nachfolgend aufgeführten Liegenschaftszinssätze und Rohertragsfaktoren wird auf die jeweils angegebenen Zinsspannen verwiesen.“). Modellkonform nur mit GND 80 Jahre und RND mind. 20 Jahre."
+ },
+ {
+  "land_code": "HE",
+  "ags": "06413000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Offenbach am Main, Stadt",
+  "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich der Stadt Offenbach am Main",
+  "berichtsjahr": 2026,
+  "berichtsjahr_dokument": 2025,
+  "berichtsjahr_hinweis": "berichtsjahr = Ausgabejahr des Berichts (2026), wie bei den Offenbacher Sätzen der Jahrgänge 2024 und 2025 im Register. Impressum: „Berichtsjahr: 2025 (IMB 2026)“, „Ausgabe: November 2026“.",
+  "stichtag": "2026-01-01",
+  "stichtag_hinweis": "So abgedruckt in den Modelltabellen („Stichtag: 01.01.2026“), Untersuchungszeitraum 01.01.2025 – 31.12.2025.",
+  "auswertezeitraum": "01.01.2025 – 31.12.2025",
+  "veroeffentlicht": "2026-11",
+  "quelle_url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026",
+  "quelle_datei": "`2026_IMB_STADT_OFFENBACH.pdf",
+  "quelle_hinweis": "Kostenfreier Download im Downloadcenter der Hessischen Verwaltung für Bodenmanagement und Geoinformation (gds.hessen.de), Ordner Immobilienwerte / Regionale Immobilienmarktberichte / `IMB regional 2026, Datei „`2026_IMB_STADT_OFFENBACH.pdf“ (eingestellt 18.11.2026, 87 Seiten). Der direkte Dateilink trägt einen Tagesstempel (/downloadcenter/<JJJJMMTT>/…) und ist deshalb nicht als Dauerlink hinterlegt. Seitenangaben = gedruckte Seitenzahl; PDF-Seite = gedruckte + 2.",
+  "lizenz": "dl-de/zero-2-0",
+  "lizenz_hinweis": "Der Bericht nennt keine Lizenz namentlich. Vervielfältigungshinweis (Impressum, S. 1) im Wortlaut der Datenlizenz Deutschland – Zero – 2.0: „Jede Nutzung des Immobilienmarktberichts und der zugehörigen Metadaten ist ohne Einschränkung und Bedingung erlaubt. … Wird bei der Nutzung des Immobilienmarktberichts oder der Metadaten ein Quellenvermerk beigegeben, ist in diesem auf Veränderungen, Bearbeitungen, neue Gestaltungen oder sonstige Abwandlungen der Daten hinzuweisen.“",
+  "quellenvermerk": "Gutachterausschuss für Immobilienwerte für den Bereich der Stadt Offenbach am Main, Immobilienmarktbericht 2026",
+  "verwendung": "produkt",
+  "korrekturen": [],
+  "quelle_parser": "ernte-20261120-hand (pdftotext -layout, Tabellen per Seitenbild 90 dpi gelesen am 20.11.2026)",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "wgh_bis1949",
+  "objektart": "wgh",
+  "baujahr_bis": 1949,
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 2.2,
+   "rundung_stellen": 1,
+   "bezeichnung": "Wohn- und Geschäftshäuser (Nutzflächenanteil < 50 %) Baujahr bis 1949, Jahrgang 2025",
+   "wert_art": "Mittelwert",
+   "median": 2.2,
+   "spanne": "1,1 – 3,1",
+   "hinweis": "Ergebnis in PROZENT (2,5 bedeutet 2,5 %). Mittelwert der Tabelle (fett gedruckt); der Median steht in Klammern daneben und ist hier nur Beleg."
+  },
+  "modellansaetze": {
+   "gnd_jahre": 80,
+   "gesamtnutzungsdauer": 80,
+   "rnd_min_jahre": 20,
+   "rnd": "Gesamtnutzungsdauer – Gebäudealter (ggf. fiktiv), mind. 20 Jahre",
+   "stichprobe": "100 %, um Ausreißer bereinigt",
+   "rohertrag": "marktüblich erzielbare Nettokaltmiete x Wohn-/Nutzfläche (i. d. R. tatsächliche Nettokaltmiete zum Verkaufszeitpunkt; bei erheblicher Abweichung vom Mietspiegel / der gewerblichen Mietübersicht die marktüblich erzielbare)",
+   "bewirtschaftungskosten": "gemäß Anlage 3 Nummer III ImmoWertV",
+   "bodenwert": "lage- und objektangepasster Boden(richt)wert",
+   "bezug": "IMB 2026 Offenbach, Kap. 9.3, Modelltabelle S. 48",
+   "modell_hinweis": "Modellwechsel gegenüber dem Jahrgang 2025 (Vorabzug, GND 70, RND mind. 15 Jahre): jetzt GND 80 Jahre, RND mind. 20 Jahre.",
+   "restnutzungsdauer_mittel": 29,
+   "brw_mittel_eur_qm": 1028,
+   "rohertragsfaktor": 21,
+   "nettokaltmiete_mittel_eur_qm": 9.81,
+   "bwk_mittel_prozent": 21
+  },
+  "geltungsbereich": {
+   "objektart_bez": "Wohn- und Geschäftshäuser (Nutzflächenanteil < 50 %) Baujahr bis 1949",
+   "region": "Stadt Offenbach am Main",
+   "kauffaelle_zeitraum": "2025"
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "dokument": "Immobilienmarktbericht 2026 Stadt Offenbach am Main (Berichtsjahr 2025, Ausgabe November 2026)",
+    "fundstelle": "Kap. 9.3.1, Abbildung 49, S. 52, Spalte Jahrgang 2025: LZ 2,2 % (Median 2,2), Spanne 1,1 – 3,1, Stabw 0,7, RoF 21, 9 Kauffälle, Ø Miete 9,81 €/m², Ø BRW 1028 €/m², Ø RND 29, Ø BWK 21 %",
+    "wert": 2.2,
+    "standardabweichung": 0.7,
+    "fallzahl": 9
+   }
+  ],
+  "stufe": "B",
+  "stufe_grund": "amtlich, vom Gutachterausschuss der Stadt Offenbach am Main abgeleitet und im Immobilienmarktbericht 2026 veröffentlicht. Stufe B wegen kleiner Stichprobe (9 Kauffälle).",
+  "fallzahl": 9,
+  "streuung": 0.7,
+  "modellversion": "IMB-Offenbach-2026 (Kap. 9.3, GND 80, RND mind. 20 Jahre, BWK Anlage 3 ImmoWertV)",
+  "auflagen": "Zinsspanne beachten (S. 47: „Zur sachgerechten Anwendung der nachfolgend aufgeführten Liegenschaftszinssätze und Rohertragsfaktoren wird auf die jeweils angegebenen Zinsspannen verwiesen.“). Modellkonform nur mit GND 80 Jahre und RND mind. 20 Jahre."
+ },
+ {
+  "land_code": "HE",
+  "ags": "06413000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Offenbach am Main, Stadt",
+  "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich der Stadt Offenbach am Main",
+  "berichtsjahr": 2026,
+  "berichtsjahr_dokument": 2025,
+  "berichtsjahr_hinweis": "berichtsjahr = Ausgabejahr des Berichts (2026), wie bei den Offenbacher Sätzen der Jahrgänge 2024 und 2025 im Register. Impressum: „Berichtsjahr: 2025 (IMB 2026)“, „Ausgabe: November 2026“.",
+  "stichtag": "2026-01-01",
+  "stichtag_hinweis": "So abgedruckt in den Modelltabellen („Stichtag: 01.01.2026“), Untersuchungszeitraum 01.01.2025 – 31.12.2025.",
+  "auswertezeitraum": "01.01.2025 – 31.12.2025",
+  "veroeffentlicht": "2026-11",
+  "quelle_url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026",
+  "quelle_datei": "`2026_IMB_STADT_OFFENBACH.pdf",
+  "quelle_hinweis": "Kostenfreier Download im Downloadcenter der Hessischen Verwaltung für Bodenmanagement und Geoinformation (gds.hessen.de), Ordner Immobilienwerte / Regionale Immobilienmarktberichte / `IMB regional 2026, Datei „`2026_IMB_STADT_OFFENBACH.pdf“ (eingestellt 18.11.2026, 87 Seiten). Der direkte Dateilink trägt einen Tagesstempel (/downloadcenter/<JJJJMMTT>/…) und ist deshalb nicht als Dauerlink hinterlegt. Seitenangaben = gedruckte Seitenzahl; PDF-Seite = gedruckte + 2.",
+  "lizenz": "dl-de/zero-2-0",
+  "lizenz_hinweis": "Der Bericht nennt keine Lizenz namentlich. Vervielfältigungshinweis (Impressum, S. 1) im Wortlaut der Datenlizenz Deutschland – Zero – 2.0: „Jede Nutzung des Immobilienmarktberichts und der zugehörigen Metadaten ist ohne Einschränkung und Bedingung erlaubt. … Wird bei der Nutzung des Immobilienmarktberichts oder der Metadaten ein Quellenvermerk beigegeben, ist in diesem auf Veränderungen, Bearbeitungen, neue Gestaltungen oder sonstige Abwandlungen der Daten hinzuweisen.“",
+  "quellenvermerk": "Gutachterausschuss für Immobilienwerte für den Bereich der Stadt Offenbach am Main, Immobilienmarktbericht 2026",
+  "verwendung": "produkt",
+  "korrekturen": [],
+  "quelle_parser": "ernte-20261120-hand (pdftotext -layout, Tabellen per Seitenbild 90 dpi gelesen am 20.11.2026)",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "wgh_ab1950",
+  "objektart": "wgh",
+  "baujahr_von": 1950,
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 3.1,
+   "rundung_stellen": 1,
+   "bezeichnung": "Wohn- und Geschäftshäuser (Nutzflächenanteil < 50 %) Baujahr ab 1950, Jahrgang 2025",
+   "wert_art": "Mittelwert",
+   "median": 2.7,
+   "spanne": "2,3 – 4,7",
+   "hinweis": "Ergebnis in PROZENT (2,5 bedeutet 2,5 %). Mittelwert der Tabelle (fett gedruckt); der Median steht in Klammern daneben und ist hier nur Beleg."
+  },
+  "modellansaetze": {
+   "gnd_jahre": 80,
+   "gesamtnutzungsdauer": 80,
+   "rnd_min_jahre": 20,
+   "rnd": "Gesamtnutzungsdauer – Gebäudealter (ggf. fiktiv), mind. 20 Jahre",
+   "stichprobe": "100 %, um Ausreißer bereinigt",
+   "rohertrag": "marktüblich erzielbare Nettokaltmiete x Wohn-/Nutzfläche (i. d. R. tatsächliche Nettokaltmiete zum Verkaufszeitpunkt; bei erheblicher Abweichung vom Mietspiegel / der gewerblichen Mietübersicht die marktüblich erzielbare)",
+   "bewirtschaftungskosten": "gemäß Anlage 3 Nummer III ImmoWertV",
+   "bodenwert": "lage- und objektangepasster Boden(richt)wert",
+   "bezug": "IMB 2026 Offenbach, Kap. 9.3, Modelltabelle S. 48",
+   "modell_hinweis": "Modellwechsel gegenüber dem Jahrgang 2025 (Vorabzug, GND 70, RND mind. 15 Jahre): jetzt GND 80 Jahre, RND mind. 20 Jahre.",
+   "restnutzungsdauer_mittel": 29,
+   "brw_mittel_eur_qm": 1025,
+   "rohertragsfaktor": 18,
+   "nettokaltmiete_mittel_eur_qm": 9.52,
+   "bwk_mittel_prozent": 21
+  },
+  "geltungsbereich": {
+   "objektart_bez": "Wohn- und Geschäftshäuser (Nutzflächenanteil < 50 %) Baujahr ab 1950",
+   "region": "Stadt Offenbach am Main",
+   "kauffaelle_zeitraum": "2025"
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "dokument": "Immobilienmarktbericht 2026 Stadt Offenbach am Main (Berichtsjahr 2025, Ausgabe November 2026)",
+    "fundstelle": "Kap. 9.3.1, Abbildung 50, S. 52, Spalte Jahrgang 2025: LZ 3,1 % (Median 2,7), Spanne 2,3 – 4,7, Stabw 0,9, RoF 18, 7 Kauffälle, Ø Miete 9,52 €/m², Ø BRW 1025 €/m², Ø RND 29, Ø BWK 21 %",
+    "wert": 3.1,
+    "standardabweichung": 0.9,
+    "fallzahl": 7
+   }
+  ],
+  "stufe": "B",
+  "stufe_grund": "amtlich, vom Gutachterausschuss der Stadt Offenbach am Main abgeleitet und im Immobilienmarktbericht 2026 veröffentlicht. Stufe B wegen kleiner Stichprobe (7 Kauffälle).",
+  "fallzahl": 7,
+  "streuung": 0.9,
+  "modellversion": "IMB-Offenbach-2026 (Kap. 9.3, GND 80, RND mind. 20 Jahre, BWK Anlage 3 ImmoWertV)",
+  "auflagen": "Zinsspanne beachten (S. 47: „Zur sachgerechten Anwendung der nachfolgend aufgeführten Liegenschaftszinssätze und Rohertragsfaktoren wird auf die jeweils angegebenen Zinsspannen verwiesen.“). Modellkonform nur mit GND 80 Jahre und RND mind. 20 Jahre."
+ },
+ {
+  "land_code": "HE",
+  "ags": "06413000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Offenbach am Main, Stadt",
+  "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich der Stadt Offenbach am Main",
+  "berichtsjahr": 2026,
+  "berichtsjahr_dokument": 2025,
+  "berichtsjahr_hinweis": "berichtsjahr = Ausgabejahr des Berichts (2026), wie bei den Offenbacher Sätzen der Jahrgänge 2024 und 2025 im Register. Impressum: „Berichtsjahr: 2025 (IMB 2026)“, „Ausgabe: November 2026“.",
+  "stichtag": "2026-01-01",
+  "stichtag_hinweis": "So abgedruckt in den Modelltabellen („Stichtag: 01.01.2026“), Untersuchungszeitraum 01.01.2025 – 31.12.2025.",
+  "auswertezeitraum": "01.01.2025 – 31.12.2025",
+  "veroeffentlicht": "2026-11",
+  "quelle_url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026",
+  "quelle_datei": "`2026_IMB_STADT_OFFENBACH.pdf",
+  "quelle_hinweis": "Kostenfreier Download im Downloadcenter der Hessischen Verwaltung für Bodenmanagement und Geoinformation (gds.hessen.de), Ordner Immobilienwerte / Regionale Immobilienmarktberichte / `IMB regional 2026, Datei „`2026_IMB_STADT_OFFENBACH.pdf“ (eingestellt 18.11.2026, 87 Seiten). Der direkte Dateilink trägt einen Tagesstempel (/downloadcenter/<JJJJMMTT>/…) und ist deshalb nicht als Dauerlink hinterlegt. Seitenangaben = gedruckte Seitenzahl; PDF-Seite = gedruckte + 2.",
+  "lizenz": "dl-de/zero-2-0",
+  "lizenz_hinweis": "Der Bericht nennt keine Lizenz namentlich. Vervielfältigungshinweis (Impressum, S. 1) im Wortlaut der Datenlizenz Deutschland – Zero – 2.0: „Jede Nutzung des Immobilienmarktberichts und der zugehörigen Metadaten ist ohne Einschränkung und Bedingung erlaubt. … Wird bei der Nutzung des Immobilienmarktberichts oder der Metadaten ein Quellenvermerk beigegeben, ist in diesem auf Veränderungen, Bearbeitungen, neue Gestaltungen oder sonstige Abwandlungen der Daten hinzuweisen.“",
+  "quellenvermerk": "Gutachterausschuss für Immobilienwerte für den Bereich der Stadt Offenbach am Main, Immobilienmarktbericht 2026",
+  "verwendung": "produkt",
+  "korrekturen": [],
+  "quelle_parser": "ernte-20261120-hand (pdftotext -layout, Tabellen per Seitenbild 90 dpi gelesen am 20.11.2026)",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "etw_erstverkauf",
+  "objektart": "etw_erstverkauf",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 2.6,
+   "rundung_stellen": 1,
+   "bezeichnung": "Wohnungseigentum – Erstverkauf, Jahrgang 2025",
+   "wert_art": "Mittelwert",
+   "median": 2.2,
+   "spanne": "2,1 – 3,5",
+   "hinweis": "Ergebnis in PROZENT (2,5 bedeutet 2,5 %). Mittelwert der Tabelle (fett gedruckt); der Median steht in Klammern daneben und ist hier nur Beleg."
+  },
+  "modellansaetze": {
+   "gnd_jahre": 80,
+   "gesamtnutzungsdauer": 80,
+   "rnd_min_jahre": 20,
+   "rnd": "Gesamtnutzungsdauer – Gebäudealter (ggf. fiktiv), mind. 20 Jahre",
+   "stichprobe": "100 %, um Ausreißer bereinigt",
+   "rohertrag": "marktüblich erzielbare Nettokaltmiete x Wohn-/Nutzfläche (i. d. R. tatsächliche Nettokaltmiete zum Verkaufszeitpunkt; bei erheblicher Abweichung vom Mietspiegel / der gewerblichen Mietübersicht die marktüblich erzielbare)",
+   "bewirtschaftungskosten": "gemäß Anlage 3 Nummer III ImmoWertV",
+   "bodenwert": "lage- und objektangepasster Boden(richt)wert",
+   "bezug": "IMB 2026 Offenbach, Kap. 9.3, Modelltabelle S. 53",
+   "modell_hinweis": "Modellwechsel gegenüber dem Jahrgang 2025 (Vorabzug, GND 70, RND mind. 15 Jahre): jetzt GND 80 Jahre, RND mind. 20 Jahre.",
+   "restnutzungsdauer_mittel": 79,
+   "brw_mittel_eur_qm": 1002,
+   "rohertragsfaktor": 30,
+   "nettokaltmiete_mittel_eur_qm": 16.58,
+   "bwk_mittel_prozent": 13
+  },
+  "geltungsbereich": {
+   "objektart_bez": "Wohnungseigentum – Erstverkauf",
+   "region": "Stadt Offenbach am Main",
+   "kauffaelle_zeitraum": "2025",
+   "standardstufe_mittel": 4.3
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "dokument": "Immobilienmarktbericht 2026 Stadt Offenbach am Main (Berichtsjahr 2025, Ausgabe November 2026)",
+    "fundstelle": "Kap. 9.3.2, Abbildung 52, S. 54, Spalte Jahrgang 2025: LZ 2,6 % (Median 2,2), Spanne 2,1 – 3,5, Stabw 0,6, RoF 30, 14 Kauffälle, Ø Miete 16,58 €/m², Ø BRW 1002 €/m², Ø RND 79, Ø BWK 13 %",
+    "wert": 2.6,
+    "standardabweichung": 0.6,
+    "fallzahl": 14
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": "amtlich, vom Gutachterausschuss der Stadt Offenbach am Main abgeleitet und im Immobilienmarktbericht 2026 veröffentlicht.",
+  "fallzahl": 14,
+  "streuung": 0.6,
+  "modellversion": "IMB-Offenbach-2026 (Kap. 9.3, GND 80, RND mind. 20 Jahre, BWK Anlage 3 ImmoWertV)",
+  "auflagen": "Zinsspanne beachten (S. 47: „Zur sachgerechten Anwendung der nachfolgend aufgeführten Liegenschaftszinssätze und Rohertragsfaktoren wird auf die jeweils angegebenen Zinsspannen verwiesen.“). Modellkonform nur mit GND 80 Jahre und RND mind. 20 Jahre."
+ },
+ {
+  "land_code": "HE",
+  "ags": "06413000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Offenbach am Main, Stadt",
+  "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich der Stadt Offenbach am Main",
+  "berichtsjahr": 2026,
+  "berichtsjahr_dokument": 2025,
+  "berichtsjahr_hinweis": "berichtsjahr = Ausgabejahr des Berichts (2026), wie bei den Offenbacher Sätzen der Jahrgänge 2024 und 2025 im Register. Impressum: „Berichtsjahr: 2025 (IMB 2026)“, „Ausgabe: November 2026“.",
+  "stichtag": "2026-01-01",
+  "stichtag_hinweis": "So abgedruckt in den Modelltabellen („Stichtag: 01.01.2026“), Untersuchungszeitraum 01.01.2025 – 31.12.2025.",
+  "auswertezeitraum": "01.01.2025 – 31.12.2025",
+  "veroeffentlicht": "2026-11",
+  "quelle_url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026",
+  "quelle_datei": "`2026_IMB_STADT_OFFENBACH.pdf",
+  "quelle_hinweis": "Kostenfreier Download im Downloadcenter der Hessischen Verwaltung für Bodenmanagement und Geoinformation (gds.hessen.de), Ordner Immobilienwerte / Regionale Immobilienmarktberichte / `IMB regional 2026, Datei „`2026_IMB_STADT_OFFENBACH.pdf“ (eingestellt 18.11.2026, 87 Seiten). Der direkte Dateilink trägt einen Tagesstempel (/downloadcenter/<JJJJMMTT>/…) und ist deshalb nicht als Dauerlink hinterlegt. Seitenangaben = gedruckte Seitenzahl; PDF-Seite = gedruckte + 2.",
+  "lizenz": "dl-de/zero-2-0",
+  "lizenz_hinweis": "Der Bericht nennt keine Lizenz namentlich. Vervielfältigungshinweis (Impressum, S. 1) im Wortlaut der Datenlizenz Deutschland – Zero – 2.0: „Jede Nutzung des Immobilienmarktberichts und der zugehörigen Metadaten ist ohne Einschränkung und Bedingung erlaubt. … Wird bei der Nutzung des Immobilienmarktberichts oder der Metadaten ein Quellenvermerk beigegeben, ist in diesem auf Veränderungen, Bearbeitungen, neue Gestaltungen oder sonstige Abwandlungen der Daten hinzuweisen.“",
+  "quellenvermerk": "Gutachterausschuss für Immobilienwerte für den Bereich der Stadt Offenbach am Main, Immobilienmarktbericht 2026",
+  "verwendung": "produkt",
+  "korrekturen": [],
+  "quelle_parser": "ernte-20261120-hand (pdftotext -layout, Tabellen per Seitenbild 90 dpi gelesen am 20.11.2026)",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "we_v_bis10we",
+  "objektart": "etw_bis10we",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 1.5,
+   "rundung_stellen": 1,
+   "bezeichnung": "Wohnungseigentum – Wiederverkauf, Anzahl WE ≤ 10, Jahrgang 2025",
+   "wert_art": "Mittelwert",
+   "median": 1.4,
+   "spanne": "-1,4 – 4,2",
+   "hinweis": "Ergebnis in PROZENT (2,5 bedeutet 2,5 %). Mittelwert der Tabelle (fett gedruckt); der Median steht in Klammern daneben und ist hier nur Beleg."
+  },
+  "modellansaetze": {
+   "gnd_jahre": 80,
+   "gesamtnutzungsdauer": 80,
+   "rnd_min_jahre": 20,
+   "rnd": "Gesamtnutzungsdauer – Gebäudealter (ggf. fiktiv), mind. 20 Jahre",
+   "stichprobe": "100 %, um Ausreißer bereinigt",
+   "rohertrag": "marktüblich erzielbare Nettokaltmiete x Wohn-/Nutzfläche (i. d. R. tatsächliche Nettokaltmiete zum Verkaufszeitpunkt; bei erheblicher Abweichung vom Mietspiegel / der gewerblichen Mietübersicht die marktüblich erzielbare)",
+   "bewirtschaftungskosten": "gemäß Anlage 3 Nummer III ImmoWertV",
+   "bodenwert": "lage- und objektangepasster Boden(richt)wert",
+   "bezug": "IMB 2026 Offenbach, Kap. 9.3, Modelltabelle S. 53",
+   "modell_hinweis": "Modellwechsel gegenüber dem Jahrgang 2025 (Vorabzug, GND 70, RND mind. 15 Jahre): jetzt GND 80 Jahre, RND mind. 20 Jahre.",
+   "restnutzungsdauer_mittel": 31,
+   "brw_mittel_eur_qm": 910,
+   "rohertragsfaktor": 23,
+   "nettokaltmiete_mittel_eur_qm": 10.65,
+   "bwk_mittel_prozent": 19
+  },
+  "geltungsbereich": {
+   "objektart_bez": "Wohnungseigentum – Wiederverkauf, Anzahl WE ≤ 10",
+   "region": "Stadt Offenbach am Main",
+   "kauffaelle_zeitraum": "2025",
+   "wohneinheiten_im_objekt_bis": 10,
+   "standardstufe_mittel": 2.7,
+   "hinweis": "Staffelung nach Wohnungszahl im Gebäude; der Rechenweg wählt sie heute nicht selbst aus (objektart etw_bis10we). Bis dahin gilt für ETW der ungestaffelte Satz des Jahrgangs 2025."
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "dokument": "Immobilienmarktbericht 2026 Stadt Offenbach am Main (Berichtsjahr 2025, Ausgabe November 2026)",
+    "fundstelle": "Kap. 9.3.2, Abbildung 53, S. 54, Spalte Jahrgang 2025: LZ 1,5 % (Median 1,4), Spanne -1,4 – 4,2, Stabw 1,7, RoF 23, 13 Kauffälle, Ø Miete 10,65 €/m², Ø BRW 910 €/m², Ø RND 31, Ø BWK 19 %",
+    "wert": 1.5,
+    "standardabweichung": 1.7,
+    "fallzahl": 13
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": "amtlich, vom Gutachterausschuss der Stadt Offenbach am Main abgeleitet und im Immobilienmarktbericht 2026 veröffentlicht.",
+  "fallzahl": 13,
+  "streuung": 1.7,
+  "modellversion": "IMB-Offenbach-2026 (Kap. 9.3, GND 80, RND mind. 20 Jahre, BWK Anlage 3 ImmoWertV)",
+  "auflagen": "Zinsspanne beachten (S. 47: „Zur sachgerechten Anwendung der nachfolgend aufgeführten Liegenschaftszinssätze und Rohertragsfaktoren wird auf die jeweils angegebenen Zinsspannen verwiesen.“). Modellkonform nur mit GND 80 Jahre und RND mind. 20 Jahre."
+ },
+ {
+  "land_code": "HE",
+  "ags": "06413000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Offenbach am Main, Stadt",
+  "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich der Stadt Offenbach am Main",
+  "berichtsjahr": 2026,
+  "berichtsjahr_dokument": 2025,
+  "berichtsjahr_hinweis": "berichtsjahr = Ausgabejahr des Berichts (2026), wie bei den Offenbacher Sätzen der Jahrgänge 2024 und 2025 im Register. Impressum: „Berichtsjahr: 2025 (IMB 2026)“, „Ausgabe: November 2026“.",
+  "stichtag": "2026-01-01",
+  "stichtag_hinweis": "So abgedruckt in den Modelltabellen („Stichtag: 01.01.2026“), Untersuchungszeitraum 01.01.2025 – 31.12.2025.",
+  "auswertezeitraum": "01.01.2025 – 31.12.2025",
+  "veroeffentlicht": "2026-11",
+  "quelle_url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026",
+  "quelle_datei": "`2026_IMB_STADT_OFFENBACH.pdf",
+  "quelle_hinweis": "Kostenfreier Download im Downloadcenter der Hessischen Verwaltung für Bodenmanagement und Geoinformation (gds.hessen.de), Ordner Immobilienwerte / Regionale Immobilienmarktberichte / `IMB regional 2026, Datei „`2026_IMB_STADT_OFFENBACH.pdf“ (eingestellt 18.11.2026, 87 Seiten). Der direkte Dateilink trägt einen Tagesstempel (/downloadcenter/<JJJJMMTT>/…) und ist deshalb nicht als Dauerlink hinterlegt. Seitenangaben = gedruckte Seitenzahl; PDF-Seite = gedruckte + 2.",
+  "lizenz": "dl-de/zero-2-0",
+  "lizenz_hinweis": "Der Bericht nennt keine Lizenz namentlich. Vervielfältigungshinweis (Impressum, S. 1) im Wortlaut der Datenlizenz Deutschland – Zero – 2.0: „Jede Nutzung des Immobilienmarktberichts und der zugehörigen Metadaten ist ohne Einschränkung und Bedingung erlaubt. … Wird bei der Nutzung des Immobilienmarktberichts oder der Metadaten ein Quellenvermerk beigegeben, ist in diesem auf Veränderungen, Bearbeitungen, neue Gestaltungen oder sonstige Abwandlungen der Daten hinzuweisen.“",
+  "quellenvermerk": "Gutachterausschuss für Immobilienwerte für den Bereich der Stadt Offenbach am Main, Immobilienmarktbericht 2026",
+  "verwendung": "produkt",
+  "korrekturen": [],
+  "quelle_parser": "ernte-20261120-hand (pdftotext -layout, Tabellen per Seitenbild 90 dpi gelesen am 20.11.2026)",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "we_v_ueber10we",
+  "objektart": "etw_ueber10we",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 2.2,
+   "rundung_stellen": 1,
+   "bezeichnung": "Wohnungseigentum – Wiederverkauf, Anzahl WE > 10, Jahrgang 2025",
+   "wert_art": "Mittelwert",
+   "median": 2.4,
+   "spanne": "-0,1 – 3,9",
+   "hinweis": "Ergebnis in PROZENT (2,5 bedeutet 2,5 %). Mittelwert der Tabelle (fett gedruckt); der Median steht in Klammern daneben und ist hier nur Beleg."
+  },
+  "modellansaetze": {
+   "gnd_jahre": 80,
+   "gesamtnutzungsdauer": 80,
+   "rnd_min_jahre": 20,
+   "rnd": "Gesamtnutzungsdauer – Gebäudealter (ggf. fiktiv), mind. 20 Jahre",
+   "stichprobe": "100 %, um Ausreißer bereinigt",
+   "rohertrag": "marktüblich erzielbare Nettokaltmiete x Wohn-/Nutzfläche (i. d. R. tatsächliche Nettokaltmiete zum Verkaufszeitpunkt; bei erheblicher Abweichung vom Mietspiegel / der gewerblichen Mietübersicht die marktüblich erzielbare)",
+   "bewirtschaftungskosten": "gemäß Anlage 3 Nummer III ImmoWertV",
+   "bodenwert": "lage- und objektangepasster Boden(richt)wert",
+   "bezug": "IMB 2026 Offenbach, Kap. 9.3, Modelltabelle S. 53",
+   "modell_hinweis": "Modellwechsel gegenüber dem Jahrgang 2025 (Vorabzug, GND 70, RND mind. 15 Jahre): jetzt GND 80 Jahre, RND mind. 20 Jahre.",
+   "restnutzungsdauer_mittel": 41,
+   "brw_mittel_eur_qm": 1004,
+   "rohertragsfaktor": 24,
+   "nettokaltmiete_mittel_eur_qm": 11.41,
+   "bwk_mittel_prozent": 18
+  },
+  "geltungsbereich": {
+   "objektart_bez": "Wohnungseigentum – Wiederverkauf, Anzahl WE > 10",
+   "region": "Stadt Offenbach am Main",
+   "kauffaelle_zeitraum": "2025",
+   "wohneinheiten_im_objekt_ab": 11,
+   "standardstufe_mittel": 2.7,
+   "hinweis": "Staffelung nach Wohnungszahl im Gebäude; der Rechenweg wählt sie heute nicht selbst aus (objektart etw_ueber10we). Bis dahin gilt für ETW der ungestaffelte Satz des Jahrgangs 2025."
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "dokument": "Immobilienmarktbericht 2026 Stadt Offenbach am Main (Berichtsjahr 2025, Ausgabe November 2026)",
+    "fundstelle": "Kap. 9.3.2, Abbildung 54, S. 55, Spalte Jahrgang 2025: LZ 2,2 % (Median 2,4), Spanne -0,1 – 3,9, Stabw 1,1, RoF 24, 30 Kauffälle, Ø Miete 11,41 €/m², Ø BRW 1004 €/m², Ø RND 41, Ø BWK 18 %",
+    "wert": 2.2,
+    "standardabweichung": 1.1,
+    "fallzahl": 30
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": "amtlich, vom Gutachterausschuss der Stadt Offenbach am Main abgeleitet und im Immobilienmarktbericht 2026 veröffentlicht.",
+  "fallzahl": 30,
+  "streuung": 1.1,
+  "modellversion": "IMB-Offenbach-2026 (Kap. 9.3, GND 80, RND mind. 20 Jahre, BWK Anlage 3 ImmoWertV)",
+  "auflagen": "Zinsspanne beachten (S. 47: „Zur sachgerechten Anwendung der nachfolgend aufgeführten Liegenschaftszinssätze und Rohertragsfaktoren wird auf die jeweils angegebenen Zinsspannen verwiesen.“). Modellkonform nur mit GND 80 Jahre und RND mind. 20 Jahre."
+ },
+ {
+  "land_code": "HE",
+  "ags": "06413000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Offenbach am Main, Stadt",
+  "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich der Stadt Offenbach am Main",
+  "berichtsjahr": 2026,
+  "berichtsjahr_dokument": 2025,
+  "berichtsjahr_hinweis": "berichtsjahr = Ausgabejahr des Berichts (2026), wie bei den Offenbacher Sätzen der Jahrgänge 2024 und 2025 im Register. Impressum: „Berichtsjahr: 2025 (IMB 2026)“, „Ausgabe: November 2026“.",
+  "stichtag": "2026-01-01",
+  "stichtag_hinweis": "So abgedruckt in den Modelltabellen („Stichtag: 01.01.2026“), Untersuchungszeitraum 01.01.2025 – 31.12.2025.",
+  "auswertezeitraum": "01.01.2025 – 31.12.2025",
+  "veroeffentlicht": "2026-11",
+  "quelle_url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026",
+  "quelle_datei": "`2026_IMB_STADT_OFFENBACH.pdf",
+  "quelle_hinweis": "Kostenfreier Download im Downloadcenter der Hessischen Verwaltung für Bodenmanagement und Geoinformation (gds.hessen.de), Ordner Immobilienwerte / Regionale Immobilienmarktberichte / `IMB regional 2026, Datei „`2026_IMB_STADT_OFFENBACH.pdf“ (eingestellt 18.11.2026, 87 Seiten). Der direkte Dateilink trägt einen Tagesstempel (/downloadcenter/<JJJJMMTT>/…) und ist deshalb nicht als Dauerlink hinterlegt. Seitenangaben = gedruckte Seitenzahl; PDF-Seite = gedruckte + 2.",
+  "lizenz": "dl-de/zero-2-0",
+  "lizenz_hinweis": "Der Bericht nennt keine Lizenz namentlich. Vervielfältigungshinweis (Impressum, S. 1) im Wortlaut der Datenlizenz Deutschland – Zero – 2.0: „Jede Nutzung des Immobilienmarktberichts und der zugehörigen Metadaten ist ohne Einschränkung und Bedingung erlaubt. … Wird bei der Nutzung des Immobilienmarktberichts oder der Metadaten ein Quellenvermerk beigegeben, ist in diesem auf Veränderungen, Bearbeitungen, neue Gestaltungen oder sonstige Abwandlungen der Daten hinzuweisen.“",
+  "quellenvermerk": "Gutachterausschuss für Immobilienwerte für den Bereich der Stadt Offenbach am Main, Immobilienmarktbericht 2026",
+  "verwendung": "produkt",
+  "korrekturen": [],
+  "quelle_parser": "ernte-20261120-hand (pdftotext -layout, Tabellen per Seitenbild 90 dpi gelesen am 20.11.2026)",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "ezfh",
+  "objektart": "ezfh",
+  "formel": null,
+  "modellansaetze": {
+   "gnd_jahre": 80,
+   "bezug": "IMB 2026 Offenbach, Kap. 9.3, S. 48"
+  },
+  "geltungsbereich": {
+   "objektart_bez": "Ein- und Zweifamilienhäuser",
+   "region": "Stadt Offenbach am Main",
+   "ausserhalb_weg": "Geschäftsstelle des Gutachterausschusses für Immobilienwerte für den Bereich der Stadt Offenbach am Main, Berliner Straße 60, 63065 Offenbach am Main, gutachterausschuss@offenbach.de, www.offenbach.de/gutachterausschuss"
+  },
+  "belege": [
+   {
+    "art": "fehlstelle",
+    "dokument": "Immobilienmarktbericht 2026 Stadt Offenbach am Main (Berichtsjahr 2025, Ausgabe November 2026)",
+    "fundstelle": "Kap. 9.3 (S. 47–55): eigene Sätze nur für Dreifamilien-, Mehrfamilien-, Wohn- und Geschäftshäuser und Wohnungseigentum; Abbildung 55, S. 56 (ZGGH, Marktbereich 5)"
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": null,
+  "fallzahl": null,
+  "streuung": null,
+  "modellversion": "IMB-Offenbach-2026 (Kap. 9.3, GND 80, RND mind. 20 Jahre, BWK Anlage 3 ImmoWertV)",
+  "zugang": "nicht abgeleitet",
+  "vollstaendig": false,
+  "unvollstaendig_grund": "Der Immobilienmarktbericht 2026 der Stadt Offenbach am Main leitet keinen eigenen Liegenschaftszinssatz für Ein- und Zweifamilienhäuser ab. S. 55: „Der Gutachterausschuss empfiehlt ersatzweise die Anwendung der nachfolgenden Liegenschaftszinssätze bzw. Rohertragsfaktoren bei den Teilmärkten, für die keine eigenständige Auswertung möglich war. … Sie wurden nicht vom Gutachterausschuss beschlossen. Es handelt sich deshalb nicht um sonstige zur Wertermittlung erforderlichen Daten gem. § 193 Abs. 5 BauGB.“ Die ersatzweise abgedruckten hessenweiten ZGGH-Mittel für den Marktbereich 5 (Abbildung 55, S. 56) sind kein Wert des örtlichen Ausschusses und werden deshalb nicht übernommen.",
+  "warum_kein_wert": "Der Immobilienmarktbericht 2026 der Stadt Offenbach am Main leitet keinen eigenen Liegenschaftszinssatz für Ein- und Zweifamilienhäuser ab. S. 55: „Der Gutachterausschuss empfiehlt ersatzweise die Anwendung der nachfolgenden Liegenschaftszinssätze bzw. Rohertragsfaktoren bei den Teilmärkten, für die keine eigenständige Auswertung möglich war. … Sie wurden nicht vom Gutachterausschuss beschlossen. Es handelt sich deshalb nicht um sonstige zur Wertermittlung erforderlichen Daten gem. § 193 Abs. 5 BauGB.“ Die ersatzweise abgedruckten hessenweiten ZGGH-Mittel für den Marktbereich 5 (Abbildung 55, S. 56) sind kein Wert des örtlichen Ausschusses und werden deshalb nicht übernommen. Weg: Geschäftsstelle des Gutachterausschusses für Immobilienwerte für den Bereich der Stadt Offenbach am Main, Berliner Straße 60, 63065 Offenbach am Main, gutachterausschuss@offenbach.de, www.offenbach.de/gutachterausschuss; Bericht: https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026"
+ },
+ {
+  "land_code": "HE",
+  "ags": "06413000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Offenbach am Main, Stadt",
+  "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich der Stadt Offenbach am Main",
+  "berichtsjahr": 2026,
+  "berichtsjahr_dokument": 2025,
+  "berichtsjahr_hinweis": "berichtsjahr = Ausgabejahr des Berichts (2026), wie bei den Offenbacher Sätzen der Jahrgänge 2024 und 2025 im Register. Impressum: „Berichtsjahr: 2025 (IMB 2026)“, „Ausgabe: November 2026“.",
+  "stichtag": "2026-01-01",
+  "stichtag_hinweis": "So abgedruckt in den Modelltabellen („Stichtag: 01.01.2026“), Untersuchungszeitraum 01.01.2025 – 31.12.2025.",
+  "auswertezeitraum": "01.01.2025 – 31.12.2025",
+  "veroeffentlicht": "2026-11",
+  "quelle_url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026",
+  "quelle_datei": "`2026_IMB_STADT_OFFENBACH.pdf",
+  "quelle_hinweis": "Kostenfreier Download im Downloadcenter der Hessischen Verwaltung für Bodenmanagement und Geoinformation (gds.hessen.de), Ordner Immobilienwerte / Regionale Immobilienmarktberichte / `IMB regional 2026, Datei „`2026_IMB_STADT_OFFENBACH.pdf“ (eingestellt 18.11.2026, 87 Seiten). Der direkte Dateilink trägt einen Tagesstempel (/downloadcenter/<JJJJMMTT>/…) und ist deshalb nicht als Dauerlink hinterlegt. Seitenangaben = gedruckte Seitenzahl; PDF-Seite = gedruckte + 2.",
+  "lizenz": "dl-de/zero-2-0",
+  "lizenz_hinweis": "Der Bericht nennt keine Lizenz namentlich. Vervielfältigungshinweis (Impressum, S. 1) im Wortlaut der Datenlizenz Deutschland – Zero – 2.0: „Jede Nutzung des Immobilienmarktberichts und der zugehörigen Metadaten ist ohne Einschränkung und Bedingung erlaubt. … Wird bei der Nutzung des Immobilienmarktberichts oder der Metadaten ein Quellenvermerk beigegeben, ist in diesem auf Veränderungen, Bearbeitungen, neue Gestaltungen oder sonstige Abwandlungen der Daten hinzuweisen.“",
+  "quellenvermerk": "Gutachterausschuss für Immobilienwerte für den Bereich der Stadt Offenbach am Main, Immobilienmarktbericht 2026",
+  "verwendung": "produkt",
+  "korrekturen": [],
+  "quelle_parser": "ernte-20261120-hand (pdftotext -layout, Tabellen per Seitenbild 90 dpi gelesen am 20.11.2026)",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "rhdhh",
+  "objektart": "rhdhh",
+  "formel": null,
+  "modellansaetze": {
+   "gnd_jahre": 80,
+   "bezug": "IMB 2026 Offenbach, Kap. 9.3, S. 48"
+  },
+  "geltungsbereich": {
+   "objektart_bez": "Reihenhäuser und Doppelhaushälften",
+   "region": "Stadt Offenbach am Main",
+   "ausserhalb_weg": "Geschäftsstelle des Gutachterausschusses für Immobilienwerte für den Bereich der Stadt Offenbach am Main, Berliner Straße 60, 63065 Offenbach am Main, gutachterausschuss@offenbach.de, www.offenbach.de/gutachterausschuss"
+  },
+  "belege": [
+   {
+    "art": "fehlstelle",
+    "dokument": "Immobilienmarktbericht 2026 Stadt Offenbach am Main (Berichtsjahr 2025, Ausgabe November 2026)",
+    "fundstelle": "Kap. 9.3 (S. 47–55); Abbildung 55, S. 56 (ZGGH, Marktbereich 5)"
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": null,
+  "fallzahl": null,
+  "streuung": null,
+  "modellversion": "IMB-Offenbach-2026 (Kap. 9.3, GND 80, RND mind. 20 Jahre, BWK Anlage 3 ImmoWertV)",
+  "zugang": "nicht abgeleitet",
+  "vollstaendig": false,
+  "unvollstaendig_grund": "Der Immobilienmarktbericht 2026 der Stadt Offenbach am Main leitet keinen eigenen Liegenschaftszinssatz für Reihenhäuser und Doppelhaushälften ab. S. 55: „Der Gutachterausschuss empfiehlt ersatzweise die Anwendung der nachfolgenden Liegenschaftszinssätze bzw. Rohertragsfaktoren bei den Teilmärkten, für die keine eigenständige Auswertung möglich war. … Sie wurden nicht vom Gutachterausschuss beschlossen. Es handelt sich deshalb nicht um sonstige zur Wertermittlung erforderlichen Daten gem. § 193 Abs. 5 BauGB.“ Die ersatzweise abgedruckten hessenweiten ZGGH-Mittel für den Marktbereich 5 (Abbildung 55, S. 56) sind kein Wert des örtlichen Ausschusses und werden deshalb nicht übernommen.",
+  "warum_kein_wert": "Der Immobilienmarktbericht 2026 der Stadt Offenbach am Main leitet keinen eigenen Liegenschaftszinssatz für Reihenhäuser und Doppelhaushälften ab. S. 55: „Der Gutachterausschuss empfiehlt ersatzweise die Anwendung der nachfolgenden Liegenschaftszinssätze bzw. Rohertragsfaktoren bei den Teilmärkten, für die keine eigenständige Auswertung möglich war. … Sie wurden nicht vom Gutachterausschuss beschlossen. Es handelt sich deshalb nicht um sonstige zur Wertermittlung erforderlichen Daten gem. § 193 Abs. 5 BauGB.“ Die ersatzweise abgedruckten hessenweiten ZGGH-Mittel für den Marktbereich 5 (Abbildung 55, S. 56) sind kein Wert des örtlichen Ausschusses und werden deshalb nicht übernommen. Weg: Geschäftsstelle des Gutachterausschusses für Immobilienwerte für den Bereich der Stadt Offenbach am Main, Berliner Straße 60, 63065 Offenbach am Main, gutachterausschuss@offenbach.de, www.offenbach.de/gutachterausschuss; Bericht: https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026"
+ },
+ {
+  "land_code": "HE",
+  "ags": "06413000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Offenbach am Main, Stadt",
+  "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich der Stadt Offenbach am Main",
+  "berichtsjahr": 2026,
+  "berichtsjahr_dokument": 2025,
+  "berichtsjahr_hinweis": "berichtsjahr = Ausgabejahr des Berichts (2026), wie bei den Offenbacher Sätzen der Jahrgänge 2024 und 2025 im Register. Impressum: „Berichtsjahr: 2025 (IMB 2026)“, „Ausgabe: November 2026“.",
+  "stichtag": "2026-01-01",
+  "stichtag_hinweis": "So abgedruckt in den Modelltabellen („Stichtag: 01.01.2026“), Untersuchungszeitraum 01.01.2025 – 31.12.2025.",
+  "auswertezeitraum": "01.01.2025 – 31.12.2025",
+  "veroeffentlicht": "2026-11",
+  "quelle_url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026",
+  "quelle_datei": "`2026_IMB_STADT_OFFENBACH.pdf",
+  "quelle_hinweis": "Kostenfreier Download im Downloadcenter der Hessischen Verwaltung für Bodenmanagement und Geoinformation (gds.hessen.de), Ordner Immobilienwerte / Regionale Immobilienmarktberichte / `IMB regional 2026, Datei „`2026_IMB_STADT_OFFENBACH.pdf“ (eingestellt 18.11.2026, 87 Seiten). Der direkte Dateilink trägt einen Tagesstempel (/downloadcenter/<JJJJMMTT>/…) und ist deshalb nicht als Dauerlink hinterlegt. Seitenangaben = gedruckte Seitenzahl; PDF-Seite = gedruckte + 2.",
+  "lizenz": "dl-de/zero-2-0",
+  "lizenz_hinweis": "Der Bericht nennt keine Lizenz namentlich. Vervielfältigungshinweis (Impressum, S. 1) im Wortlaut der Datenlizenz Deutschland – Zero – 2.0: „Jede Nutzung des Immobilienmarktberichts und der zugehörigen Metadaten ist ohne Einschränkung und Bedingung erlaubt. … Wird bei der Nutzung des Immobilienmarktberichts oder der Metadaten ein Quellenvermerk beigegeben, ist in diesem auf Veränderungen, Bearbeitungen, neue Gestaltungen oder sonstige Abwandlungen der Daten hinzuweisen.“",
+  "quellenvermerk": "Gutachterausschuss für Immobilienwerte für den Bereich der Stadt Offenbach am Main, Immobilienmarktbericht 2026",
+  "verwendung": "produkt",
+  "korrekturen": [],
+  "quelle_parser": "ernte-20261120-hand (pdftotext -layout, Tabellen per Seitenbild 90 dpi gelesen am 20.11.2026)",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "gewerbe",
+  "objektart": "gewerbe",
+  "formel": null,
+  "modellansaetze": {
+   "gnd_jahre": 80,
+   "bezug": "IMB 2026 Offenbach, Kap. 9.3, S. 48"
+  },
+  "geltungsbereich": {
+   "objektart_bez": "Gewerblich genutzte Objekte",
+   "region": "Stadt Offenbach am Main",
+   "ausserhalb_weg": "Geschäftsstelle des Gutachterausschusses für Immobilienwerte für den Bereich der Stadt Offenbach am Main, Berliner Straße 60, 63065 Offenbach am Main, gutachterausschuss@offenbach.de, www.offenbach.de/gutachterausschuss"
+  },
+  "belege": [
+   {
+    "art": "fehlstelle",
+    "dokument": "Immobilienmarktbericht 2026 Stadt Offenbach am Main (Berichtsjahr 2025, Ausgabe November 2026)",
+    "fundstelle": "Kap. 9.3.2, S. 55"
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": null,
+  "fallzahl": null,
+  "streuung": null,
+  "modellversion": "IMB-Offenbach-2026 (Kap. 9.3, GND 80, RND mind. 20 Jahre, BWK Anlage 3 ImmoWertV)",
+  "zugang": "nicht abgeleitet",
+  "vollstaendig": false,
+  "unvollstaendig_grund": "Der Immobilienmarktbericht 2026 der Stadt Offenbach am Main führt keinen Liegenschaftszinssatz für gewerblich genutzte Objekte; S. 55 wörtlich: „Werden weitere Daten wie z.B. Liegenschaftszinssätze und Rohertragsfaktoren für gewerblich genutzte Objekte benötigt, sollten die veröffentlichten Immobilienmarktberichte von benachbarten Gutachterausschüssen, die regional vergleichbar sind, herangezogen werden.“ Nachbarausschüsse sind nach der Doktrin nicht zulässig.",
+  "warum_kein_wert": "Der Immobilienmarktbericht 2026 der Stadt Offenbach am Main führt keinen Liegenschaftszinssatz für gewerblich genutzte Objekte; S. 55 wörtlich: „Werden weitere Daten wie z.B. Liegenschaftszinssätze und Rohertragsfaktoren für gewerblich genutzte Objekte benötigt, sollten die veröffentlichten Immobilienmarktberichte von benachbarten Gutachterausschüssen, die regional vergleichbar sind, herangezogen werden.“ Nachbarausschüsse sind nach der Doktrin nicht zulässig. Weg: Geschäftsstelle des Gutachterausschusses für Immobilienwerte für den Bereich der Stadt Offenbach am Main, Berliner Straße 60, 63065 Offenbach am Main, gutachterausschuss@offenbach.de, www.offenbach.de/gutachterausschuss; Bericht: https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026"
+ },
+ {
+  "land_code": "HE",
+  "ags": "06413000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Offenbach am Main, Stadt",
+  "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich der Stadt Offenbach am Main",
+  "berichtsjahr": 2026,
+  "berichtsjahr_dokument": 2025,
+  "berichtsjahr_hinweis": "berichtsjahr = Ausgabejahr des Berichts (2026), wie bei den Offenbacher Sätzen der Jahrgänge 2024 und 2025 im Register. Impressum: „Berichtsjahr: 2025 (IMB 2026)“, „Ausgabe: November 2026“.",
+  "stichtag": "2026-01-01",
+  "stichtag_hinweis": "So abgedruckt in den Modelltabellen („Stichtag: 01.01.2026“), Untersuchungszeitraum 01.01.2025 – 31.12.2025.",
+  "auswertezeitraum": "01.01.2025 – 31.12.2025",
+  "veroeffentlicht": "2026-11",
+  "quelle_url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026",
+  "quelle_datei": "`2026_IMB_STADT_OFFENBACH.pdf",
+  "quelle_hinweis": "Kostenfreier Download im Downloadcenter der Hessischen Verwaltung für Bodenmanagement und Geoinformation (gds.hessen.de), Ordner Immobilienwerte / Regionale Immobilienmarktberichte / `IMB regional 2026, Datei „`2026_IMB_STADT_OFFENBACH.pdf“ (eingestellt 18.11.2026, 87 Seiten). Der direkte Dateilink trägt einen Tagesstempel (/downloadcenter/<JJJJMMTT>/…) und ist deshalb nicht als Dauerlink hinterlegt. Seitenangaben = gedruckte Seitenzahl; PDF-Seite = gedruckte + 2.",
+  "lizenz": "dl-de/zero-2-0",
+  "lizenz_hinweis": "Der Bericht nennt keine Lizenz namentlich. Vervielfältigungshinweis (Impressum, S. 1) im Wortlaut der Datenlizenz Deutschland – Zero – 2.0: „Jede Nutzung des Immobilienmarktberichts und der zugehörigen Metadaten ist ohne Einschränkung und Bedingung erlaubt. … Wird bei der Nutzung des Immobilienmarktberichts oder der Metadaten ein Quellenvermerk beigegeben, ist in diesem auf Veränderungen, Bearbeitungen, neue Gestaltungen oder sonstige Abwandlungen der Daten hinzuweisen.“",
+  "quellenvermerk": "Gutachterausschuss für Immobilienwerte für den Bereich der Stadt Offenbach am Main, Immobilienmarktbericht 2026",
+  "verwendung": "produkt",
+  "korrekturen": [],
+  "quelle_parser": "ernte-20261120-hand (pdftotext -layout, Tabellen per Seitenbild 90 dpi gelesen am 20.11.2026)",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "ezfh",
+  "formel": {
+   "form": "potenz",
+   "achse_feld": "sachwert",
+   "achse_bez": "vorläufiger Sachwert in Euro",
+   "a": 17.374,
+   "b": -0.21,
+   "gueltig_von": 350000,
+   "gueltig_bis": 1000000,
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "hinweis": "24 Kauffälle, Bestimmtheitsmaß 0,1864, Standardabweichung 0,16. Abgedruckte Regressionsformel „17,374 x (vorl. Sachwert)^-0,21“; am 20.11.2026 an allen 14 Tabellenzeilen nachgerechnet. Gültig nur im abgedruckten Bereich.",
+   "normobjekt": "Merkmale der Datengrundlage: Ø vorläufiger Sachwert 596.008 Euro (Median 551.912), Ø Grundstücksgröße 538 m² (233 – 1.182), Ø BRW angepasst 724 €/m² (520 – 857), Ø RND 33 Jahre (20 – 71), Ø BGF 340 m², Ø Wohnfläche 170 m² (109 – 306), Ø Außenanlagen 9.898 Euro (5,0 % des Herstellungswertes), Ø Nebengebäude 6.500 Euro, Ø Bodenwertanteil am bereinigten Kaufpreis 0,62, Ø Gebäudefaktor 3.900 €/m² Wfl.",
+   "tabelle": [
+    [
+     350000,
+     1.19
+    ],
+    [
+     400000,
+     1.16
+    ],
+    [
+     450000,
+     1.13
+    ],
+    [
+     500000,
+     1.1
+    ],
+    [
+     550000,
+     1.08
+    ],
+    [
+     600000,
+     1.06
+    ],
+    [
+     650000,
+     1.05
+    ],
+    [
+     700000,
+     1.03
+    ],
+    [
+     750000,
+     1.01
+    ],
+    [
+     800000,
+     1
+    ],
+    [
+     850000,
+     0.99
+    ],
+    [
+     900000,
+     0.98
+    ],
+    [
+     950000,
+     0.97
+    ],
+    [
+     1000000,
+     0.95
+    ]
+   ]
+  },
+  "modellansaetze": {
+   "wortlaut": "Sachwertmodell IMB 2026 (Kap. 9.5, S. 70): Stichtag 01.01.2026; Stichprobe 100 %, um Ausreißer bereinigt (3-Sigma-Regel); Untersuchungszeitraum 01.01.2025 – 31.12.2025; Normalherstellungskosten NHK 2010; Bezugsmaßstab Bruttogrundfläche (BGF); Gesamtnutzungsdauer der Gebäude 80 Jahre; Restnutzungsdauer Gesamtnutzungsdauer – Gebäudealter, ggf. nach sachverständigem Ermessen; Alterswertminderung linear; Baupreisindex aktuell zum Verkaufszeitpunkt (quartalsweise); Baunebenkosten in NHK 2010 bereits enthalten; Nebengebäude pauschaler Zeitwert; bauliche Außenanlagen und sonstige Anlagen pauschal 5 % des Herstellungswertes; besondere objektspezifische Grundstücksmerkmale: Auswertung fiktiv schadensfreie Objekte; Grundstücksfläche marktübliche, objektbezogene Grundstücksgröße; Bodenwert lage- und objektangepasster Boden(richt)wert; Regionalfaktor 1,0.",
+   "nhk": "NHK 2010, Baunebenkosten enthalten",
+   "gnd_jahre": 80,
+   "baupreisindex_bezug": "kaufzeitpunkt",
+   "baupreisindex_wortlaut": "Baupreisindex: aktuell zum Verkaufszeitpunkt (quartalsweise)",
+   "baupreisindex_seite": "IMB 2026 Offenbach am Main, Kap. 9.5 Sachwertfaktoren, Modelltabelle S. 70",
+   "alterswertminderung": "linear",
+   "rnd": "Gesamtnutzungsdauer minus Gebäudealter, ggf. nach sachverständigem Ermessen",
+   "bezugsmassstab": "Brutto-Grundfläche",
+   "aussenanlagen": "pauschal 5 Prozent des Herstellungswertes; Nebengebäude pauschaler Zeitwert",
+   "bodenwert": "lage- und objektangepasster Boden(richt)wert",
+   "grundstuecksflaeche": "marktübliche, objektbezogene Grundstücksgröße",
+   "regionalfaktor": 1,
+   "bog": "Auswertung fiktiv schadensfreier Objekte",
+   "modell_hinweis": "Modellwechsel gegenüber dem Jahrgang 2025 (GND 70): jetzt GND 80 Jahre."
+  },
+  "geltungsbereich": {
+   "objektart_bez": "Freistehende Ein- und Zweifamilienhäuser",
+   "region": "Stadt Offenbach am Main",
+   "sachwert_von": 350000,
+   "sachwert_bis": 1000000
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "dokument": "Immobilienmarktbericht 2026 Stadt Offenbach am Main (Berichtsjahr 2025, Ausgabe November 2026)",
+    "fundstelle": "Kap. 9.5 Sachwertfaktoren, Modell S. 70; Abbildung 74 (tabellarisch) S. 71, Abbildung 75 (graphisch, y = 17,374x^-0,21, R² = 0,1864) S. 72"
+   }
+  ],
+  "stufe": "B",
+  "stufe_grund": "Amtlich abgedruckte Regressionsformel und Wertetabelle, gegeneinander nachgerechnet. Stufe B wegen der kleinen Stichprobe (24 Kauffälle) und des Bestimmtheitsmaßes 0,1864.",
+  "fallzahl": 24,
+  "streuung": 0.16,
+  "modellversion": "IMB-Offenbach-2026 (Sachwertmodell S. 70: NHK 2010, BGF, GND 80, lineare AWM, BPI zum Verkaufszeitpunkt, Außenanlagen 5 %, Regionalfaktor 1,0)",
+  "auflagen": "Quellenangabe. Modell: Gesamtnutzungsdauer 80 Jahre (Jahrgang 2025 noch 70), NHK 2010, BGF, lineare Alterswertminderung, Baupreisindex quartalsweise zum Verkaufszeitpunkt, Außenanlagen pauschal 5 Prozent, Regionalfaktor 1,0, fiktiv schadensfreie Objekte. Gültig nur im abgedruckten Sachwertbereich. Der Bericht verlangt eine kritische sachverständige Würdigung (Impressum).",
+  "fundstelle": "Kap. 9.5 Sachwertfaktoren, Modell S. 70; Abbildung 74 (tabellarisch) S. 71, Abbildung 75 (graphisch, y = 17,374x^-0,21, R² = 0,1864) S. 72"
+ },
+ {
+  "land_code": "HE",
+  "ags": "06413000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Offenbach am Main, Stadt",
+  "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich der Stadt Offenbach am Main",
+  "berichtsjahr": 2026,
+  "berichtsjahr_dokument": 2025,
+  "berichtsjahr_hinweis": "berichtsjahr = Ausgabejahr des Berichts (2026), wie bei den Offenbacher Sätzen der Jahrgänge 2024 und 2025 im Register. Impressum: „Berichtsjahr: 2025 (IMB 2026)“, „Ausgabe: November 2026“.",
+  "stichtag": "2026-01-01",
+  "stichtag_hinweis": "So abgedruckt in den Modelltabellen („Stichtag: 01.01.2026“), Untersuchungszeitraum 01.01.2025 – 31.12.2025.",
+  "auswertezeitraum": "01.01.2025 – 31.12.2025",
+  "veroeffentlicht": "2026-11",
+  "quelle_url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026",
+  "quelle_datei": "`2026_IMB_STADT_OFFENBACH.pdf",
+  "quelle_hinweis": "Kostenfreier Download im Downloadcenter der Hessischen Verwaltung für Bodenmanagement und Geoinformation (gds.hessen.de), Ordner Immobilienwerte / Regionale Immobilienmarktberichte / `IMB regional 2026, Datei „`2026_IMB_STADT_OFFENBACH.pdf“ (eingestellt 18.11.2026, 87 Seiten). Der direkte Dateilink trägt einen Tagesstempel (/downloadcenter/<JJJJMMTT>/…) und ist deshalb nicht als Dauerlink hinterlegt. Seitenangaben = gedruckte Seitenzahl; PDF-Seite = gedruckte + 2.",
+  "lizenz": "dl-de/zero-2-0",
+  "lizenz_hinweis": "Der Bericht nennt keine Lizenz namentlich. Vervielfältigungshinweis (Impressum, S. 1) im Wortlaut der Datenlizenz Deutschland – Zero – 2.0: „Jede Nutzung des Immobilienmarktberichts und der zugehörigen Metadaten ist ohne Einschränkung und Bedingung erlaubt. … Wird bei der Nutzung des Immobilienmarktberichts oder der Metadaten ein Quellenvermerk beigegeben, ist in diesem auf Veränderungen, Bearbeitungen, neue Gestaltungen oder sonstige Abwandlungen der Daten hinzuweisen.“",
+  "quellenvermerk": "Gutachterausschuss für Immobilienwerte für den Bereich der Stadt Offenbach am Main, Immobilienmarktbericht 2026",
+  "verwendung": "produkt",
+  "korrekturen": [],
+  "quelle_parser": "ernte-20261120-hand (pdftotext -layout, Tabellen per Seitenbild 90 dpi gelesen am 20.11.2026)",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "rhdhh",
+  "formel": {
+   "form": "potenz",
+   "achse_feld": "sachwert",
+   "achse_bez": "vorläufiger Sachwert in Euro",
+   "a": 2019.7,
+   "b": -0.578,
+   "gueltig_von": 215000,
+   "gueltig_bis": 610000,
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "hinweis": "30 Kauffälle, Bestimmtheitsmaß 0,5444, Standardabweichung 0,27. Abgedruckte Regressionsformel „2019,7 x (vorl. Sachwert)^-0,578“; am 20.11.2026 an allen 10 Tabellenzeilen nachgerechnet. Gültig nur im abgedruckten Bereich.",
+   "normobjekt": "Merkmale der Datengrundlage: Ø vorläufiger Sachwert 380.922 Euro (Median 378.864), Ø Grundstücksgröße 320 m² (171 – 752), Ø BRW angepasst 735 €/m² (522 – 1.000), Ø RND 33 Jahre (25 – 50), Ø BGF 266 m², Ø Wohnfläche 129 m² (71 – 233), Ø Außenanlagen 7.272 Euro (5 %), Ø Nebengebäude 5.500 Euro, Ø Bodenwertanteil 0,50, Ø Gebäudefaktor 3.718 €/m² Wfl.",
+   "tabelle": [
+    [
+     215000,
+     1.67
+    ],
+    [
+     250000,
+     1.53
+    ],
+    [
+     300000,
+     1.38
+    ],
+    [
+     350000,
+     1.26
+    ],
+    [
+     400000,
+     1.17
+    ],
+    [
+     450000,
+     1.09
+    ],
+    [
+     500000,
+     1.03
+    ],
+    [
+     550000,
+     0.97
+    ],
+    [
+     600000,
+     0.92
+    ],
+    [
+     610000,
+     0.91
+    ]
+   ]
+  },
+  "modellansaetze": {
+   "wortlaut": "Sachwertmodell IMB 2026 (Kap. 9.5, S. 70): Stichtag 01.01.2026; Stichprobe 100 %, um Ausreißer bereinigt (3-Sigma-Regel); Untersuchungszeitraum 01.01.2025 – 31.12.2025; Normalherstellungskosten NHK 2010; Bezugsmaßstab Bruttogrundfläche (BGF); Gesamtnutzungsdauer der Gebäude 80 Jahre; Restnutzungsdauer Gesamtnutzungsdauer – Gebäudealter, ggf. nach sachverständigem Ermessen; Alterswertminderung linear; Baupreisindex aktuell zum Verkaufszeitpunkt (quartalsweise); Baunebenkosten in NHK 2010 bereits enthalten; Nebengebäude pauschaler Zeitwert; bauliche Außenanlagen und sonstige Anlagen pauschal 5 % des Herstellungswertes; besondere objektspezifische Grundstücksmerkmale: Auswertung fiktiv schadensfreie Objekte; Grundstücksfläche marktübliche, objektbezogene Grundstücksgröße; Bodenwert lage- und objektangepasster Boden(richt)wert; Regionalfaktor 1,0.",
+   "nhk": "NHK 2010, Baunebenkosten enthalten",
+   "gnd_jahre": 80,
+   "baupreisindex_bezug": "kaufzeitpunkt",
+   "baupreisindex_wortlaut": "Baupreisindex: aktuell zum Verkaufszeitpunkt (quartalsweise)",
+   "baupreisindex_seite": "IMB 2026 Offenbach am Main, Kap. 9.5 Sachwertfaktoren, Modelltabelle S. 70",
+   "alterswertminderung": "linear",
+   "rnd": "Gesamtnutzungsdauer minus Gebäudealter, ggf. nach sachverständigem Ermessen",
+   "bezugsmassstab": "Brutto-Grundfläche",
+   "aussenanlagen": "pauschal 5 Prozent des Herstellungswertes; Nebengebäude pauschaler Zeitwert",
+   "bodenwert": "lage- und objektangepasster Boden(richt)wert",
+   "grundstuecksflaeche": "marktübliche, objektbezogene Grundstücksgröße",
+   "regionalfaktor": 1,
+   "bog": "Auswertung fiktiv schadensfreier Objekte",
+   "modell_hinweis": "Modellwechsel gegenüber dem Jahrgang 2025 (GND 70): jetzt GND 80 Jahre."
+  },
+  "geltungsbereich": {
+   "objektart_bez": "Reihenhäuser oder Doppelhaushälften",
+   "region": "Stadt Offenbach am Main",
+   "sachwert_von": 215000,
+   "sachwert_bis": 610000
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "dokument": "Immobilienmarktbericht 2026 Stadt Offenbach am Main (Berichtsjahr 2025, Ausgabe November 2026)",
+    "fundstelle": "Kap. 9.5 Sachwertfaktoren, Modell S. 70; Abbildung 76 (tabellarisch) S. 73, Abbildung 77 (graphisch) S. 74"
+   }
+  ],
+  "stufe": "B",
+  "stufe_grund": "Amtlich abgedruckte Regressionsformel und Wertetabelle, gegeneinander nachgerechnet. Stufe B wegen der kleinen Stichprobe (30 Kauffälle) und des Bestimmtheitsmaßes 0,5444.",
+  "fallzahl": 30,
+  "streuung": 0.27,
+  "modellversion": "IMB-Offenbach-2026 (Sachwertmodell S. 70: NHK 2010, BGF, GND 80, lineare AWM, BPI zum Verkaufszeitpunkt, Außenanlagen 5 %, Regionalfaktor 1,0)",
+  "auflagen": "Quellenangabe. Modell: Gesamtnutzungsdauer 80 Jahre (Jahrgang 2025 noch 70), NHK 2010, BGF, lineare Alterswertminderung, Baupreisindex quartalsweise zum Verkaufszeitpunkt, Außenanlagen pauschal 5 Prozent, Regionalfaktor 1,0, fiktiv schadensfreie Objekte. Gültig nur im abgedruckten Sachwertbereich. Der Bericht verlangt eine kritische sachverständige Würdigung (Impressum).",
+  "fundstelle": "Kap. 9.5 Sachwertfaktoren, Modell S. 70; Abbildung 76 (tabellarisch) S. 73, Abbildung 77 (graphisch) S. 74"
+ },
+ {
+  "land_code": "HE",
+  "ags": "06413000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Offenbach am Main, Stadt",
+  "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich der Stadt Offenbach am Main",
+  "berichtsjahr": 2026,
+  "berichtsjahr_dokument": 2025,
+  "berichtsjahr_hinweis": "berichtsjahr = Ausgabejahr des Berichts (2026), wie bei den Offenbacher Sätzen der Jahrgänge 2024 und 2025 im Register. Impressum: „Berichtsjahr: 2025 (IMB 2026)“, „Ausgabe: November 2026“.",
+  "stichtag": "2026-01-01",
+  "stichtag_hinweis": "So abgedruckt in den Modelltabellen („Stichtag: 01.01.2026“), Untersuchungszeitraum 01.01.2025 – 31.12.2025.",
+  "auswertezeitraum": "01.01.2025 – 31.12.2025",
+  "veroeffentlicht": "2026-11",
+  "quelle_url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026",
+  "quelle_datei": "`2026_IMB_STADT_OFFENBACH.pdf",
+  "quelle_hinweis": "Kostenfreier Download im Downloadcenter der Hessischen Verwaltung für Bodenmanagement und Geoinformation (gds.hessen.de), Ordner Immobilienwerte / Regionale Immobilienmarktberichte / `IMB regional 2026, Datei „`2026_IMB_STADT_OFFENBACH.pdf“ (eingestellt 18.11.2026, 87 Seiten). Der direkte Dateilink trägt einen Tagesstempel (/downloadcenter/<JJJJMMTT>/…) und ist deshalb nicht als Dauerlink hinterlegt. Seitenangaben = gedruckte Seitenzahl; PDF-Seite = gedruckte + 2.",
+  "lizenz": "dl-de/zero-2-0",
+  "lizenz_hinweis": "Der Bericht nennt keine Lizenz namentlich. Vervielfältigungshinweis (Impressum, S. 1) im Wortlaut der Datenlizenz Deutschland – Zero – 2.0: „Jede Nutzung des Immobilienmarktberichts und der zugehörigen Metadaten ist ohne Einschränkung und Bedingung erlaubt. … Wird bei der Nutzung des Immobilienmarktberichts oder der Metadaten ein Quellenvermerk beigegeben, ist in diesem auf Veränderungen, Bearbeitungen, neue Gestaltungen oder sonstige Abwandlungen der Daten hinzuweisen.“",
+  "quellenvermerk": "Gutachterausschuss für Immobilienwerte für den Bereich der Stadt Offenbach am Main, Immobilienmarktbericht 2026",
+  "verwendung": "produkt",
+  "korrekturen": [],
+  "quelle_parser": "ernte-20261120-hand (pdftotext -layout, Tabellen per Seitenbild 90 dpi gelesen am 20.11.2026)",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "mfh",
+  "objektart": "mfh",
+  "formel": null,
+  "modellansaetze": {
+   "gnd_jahre": 80,
+   "bezug": "IMB 2026 Offenbach, Kap. 9.5, S. 70"
+  },
+  "geltungsbereich": {
+   "objektart_bez": "Mehrfamilienhäuser",
+   "region": "Stadt Offenbach am Main",
+   "ausserhalb_weg": "Geschäftsstelle des Gutachterausschusses für Immobilienwerte für den Bereich der Stadt Offenbach am Main, Berliner Straße 60, 63065 Offenbach am Main, gutachterausschuss@offenbach.de, www.offenbach.de/gutachterausschuss"
+  },
+  "belege": [
+   {
+    "art": "fehlstelle",
+    "dokument": "Immobilienmarktbericht 2026 Stadt Offenbach am Main (Berichtsjahr 2025, Ausgabe November 2026)",
+    "fundstelle": "Kap. 9.5, S. 70"
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": null,
+  "fallzahl": null,
+  "streuung": null,
+  "modellversion": "IMB-Offenbach-2026 (Kap. 9.5)",
+  "zugang": "nicht abgeleitet",
+  "vollstaendig": false,
+  "unvollstaendig_grund": "Der Immobilienmarktbericht 2026 der Stadt Offenbach am Main führt keinen Sachwertfaktor für Mehrfamilienhäuser. Kap. 9.5, S. 70: „Für das Stadtgebiet Offenbach am Main wurden Sachwertfaktoren sowohl für freistehende Ein- und Zweifamilienhäuser als auch für Reihenhäuser bzw. Doppelhaushälften ermittelt“ — für andere Objektarten keine.",
+  "warum_kein_wert": "Der Immobilienmarktbericht 2026 der Stadt Offenbach am Main führt keinen Sachwertfaktor für Mehrfamilienhäuser. Kap. 9.5, S. 70: „Für das Stadtgebiet Offenbach am Main wurden Sachwertfaktoren sowohl für freistehende Ein- und Zweifamilienhäuser als auch für Reihenhäuser bzw. Doppelhaushälften ermittelt“ — für andere Objektarten keine. Weg: Geschäftsstelle des Gutachterausschusses für Immobilienwerte für den Bereich der Stadt Offenbach am Main, Berliner Straße 60, 63065 Offenbach am Main, gutachterausschuss@offenbach.de, www.offenbach.de/gutachterausschuss; Bericht: https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026"
+ },
+ {
+  "land_code": "HE",
+  "ags": "06413000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Offenbach am Main, Stadt",
+  "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich der Stadt Offenbach am Main",
+  "berichtsjahr": 2026,
+  "berichtsjahr_dokument": 2025,
+  "berichtsjahr_hinweis": "berichtsjahr = Ausgabejahr des Berichts (2026), wie bei den Offenbacher Sätzen der Jahrgänge 2024 und 2025 im Register. Impressum: „Berichtsjahr: 2025 (IMB 2026)“, „Ausgabe: November 2026“.",
+  "stichtag": "2026-01-01",
+  "stichtag_hinweis": "So abgedruckt in den Modelltabellen („Stichtag: 01.01.2026“), Untersuchungszeitraum 01.01.2025 – 31.12.2025.",
+  "auswertezeitraum": "01.01.2025 – 31.12.2025",
+  "veroeffentlicht": "2026-11",
+  "quelle_url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026",
+  "quelle_datei": "`2026_IMB_STADT_OFFENBACH.pdf",
+  "quelle_hinweis": "Kostenfreier Download im Downloadcenter der Hessischen Verwaltung für Bodenmanagement und Geoinformation (gds.hessen.de), Ordner Immobilienwerte / Regionale Immobilienmarktberichte / `IMB regional 2026, Datei „`2026_IMB_STADT_OFFENBACH.pdf“ (eingestellt 18.11.2026, 87 Seiten). Der direkte Dateilink trägt einen Tagesstempel (/downloadcenter/<JJJJMMTT>/…) und ist deshalb nicht als Dauerlink hinterlegt. Seitenangaben = gedruckte Seitenzahl; PDF-Seite = gedruckte + 2.",
+  "lizenz": "dl-de/zero-2-0",
+  "lizenz_hinweis": "Der Bericht nennt keine Lizenz namentlich. Vervielfältigungshinweis (Impressum, S. 1) im Wortlaut der Datenlizenz Deutschland – Zero – 2.0: „Jede Nutzung des Immobilienmarktberichts und der zugehörigen Metadaten ist ohne Einschränkung und Bedingung erlaubt. … Wird bei der Nutzung des Immobilienmarktberichts oder der Metadaten ein Quellenvermerk beigegeben, ist in diesem auf Veränderungen, Bearbeitungen, neue Gestaltungen oder sonstige Abwandlungen der Daten hinzuweisen.“",
+  "quellenvermerk": "Gutachterausschuss für Immobilienwerte für den Bereich der Stadt Offenbach am Main, Immobilienmarktbericht 2026",
+  "verwendung": "produkt",
+  "korrekturen": [],
+  "quelle_parser": "ernte-20261120-hand (pdftotext -layout, Tabellen per Seitenbild 90 dpi gelesen am 20.11.2026)",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "etw",
+  "objektart": "etw",
+  "formel": null,
+  "modellansaetze": {
+   "gnd_jahre": 80,
+   "bezug": "IMB 2026 Offenbach, Kap. 9.5, S. 70"
+  },
+  "geltungsbereich": {
+   "objektart_bez": "Eigentumswohnungen",
+   "region": "Stadt Offenbach am Main",
+   "ausserhalb_weg": "Geschäftsstelle des Gutachterausschusses für Immobilienwerte für den Bereich der Stadt Offenbach am Main, Berliner Straße 60, 63065 Offenbach am Main, gutachterausschuss@offenbach.de, www.offenbach.de/gutachterausschuss"
+  },
+  "belege": [
+   {
+    "art": "fehlstelle",
+    "dokument": "Immobilienmarktbericht 2026 Stadt Offenbach am Main (Berichtsjahr 2025, Ausgabe November 2026)",
+    "fundstelle": "Kap. 9.5, S. 70"
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": null,
+  "fallzahl": null,
+  "streuung": null,
+  "modellversion": "IMB-Offenbach-2026 (Kap. 9.5)",
+  "zugang": "nicht abgeleitet",
+  "vollstaendig": false,
+  "unvollstaendig_grund": "Der Immobilienmarktbericht 2026 der Stadt Offenbach am Main führt keinen Sachwertfaktor für Eigentumswohnungen. Kap. 9.5, S. 70: „Für das Stadtgebiet Offenbach am Main wurden Sachwertfaktoren sowohl für freistehende Ein- und Zweifamilienhäuser als auch für Reihenhäuser bzw. Doppelhaushälften ermittelt“ — für andere Objektarten keine.",
+  "warum_kein_wert": "Der Immobilienmarktbericht 2026 der Stadt Offenbach am Main führt keinen Sachwertfaktor für Eigentumswohnungen. Kap. 9.5, S. 70: „Für das Stadtgebiet Offenbach am Main wurden Sachwertfaktoren sowohl für freistehende Ein- und Zweifamilienhäuser als auch für Reihenhäuser bzw. Doppelhaushälften ermittelt“ — für andere Objektarten keine. Weg: Geschäftsstelle des Gutachterausschusses für Immobilienwerte für den Bereich der Stadt Offenbach am Main, Berliner Straße 60, 63065 Offenbach am Main, gutachterausschuss@offenbach.de, www.offenbach.de/gutachterausschuss; Bericht: https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026"
+ },
+ {
+  "land_code": "HE",
+  "ags": "06631009",
+  "ebene": "gemeinde",
+  "gebiet_name": "Fulda, Stadt",
+  "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich der Stadt Fulda",
+  "berichtsjahr": 2026,
+  "stichtag": "2026-01-01",
+  "quelle_url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026",
+  "quelle_datei": "`2026_IMB_Stadt_Fulda.pdf",
+  "quelle_hinweis": "Kostenfreier Download im Downloadcenter der HVBG (gds.hessen.de), Ordner Immobilienwerte / Regionale Immobilienmarktberichte / `IMB regional 2026, Datei „`2026_IMB_Stadt_Fulda.pdf“ (eingestellt 29.05.2026).",
+  "quelle_parser": "ernte-20261120-hand (pdftotext -layout, S. 49 als Seitenbild geprüft am 20.11.2026)",
+  "lizenz": "dl-de/zero-2-0",
+  "lizenz_hinweis": "Wie die übrigen Sätze aus diesem Bericht im Register (nachernte-2026-10b-he.json): Vervielfältigungshinweis ohne Einschränkung und Bedingung.",
+  "verwendung": "produkt",
+  "korrekturen": [],
+  "kennzahl": "sachwertfaktor",
+  "formel": null,
+  "modellansaetze": {
+   "gnd_jahre": 80,
+   "bezug": "IMB 2026 Stadt Fulda, Kap. 9.2, S. 48"
+  },
+  "stufe": "A",
+  "stufe_grund": null,
+  "fallzahl": null,
+  "streuung": null,
+  "modellversion": "IMB-Fulda-2026 (Kap. 9.2, GND 80, NHK 2010, Regionalfaktor 1,0)",
+  "zugang": "nicht veröffentlicht",
+  "vollstaendig": false,
+  "zweig": "ezfh",
+  "objektart": "ezfh",
+  "geltungsbereich": {
+   "objektart_bez": "Ein- und Zweifamilienhäuser (freistehend)",
+   "region": "Stadt Fulda"
+  },
+  "belege": [
+   {
+    "art": "fehlstelle",
+    "dokument": "Immobilienmarktbericht 2026 Stadt Fulda",
+    "fundstelle": "Kap. 9.2 Sachwertfaktoren für Ein- und Zweifamilienhäuser, Modell S. 48, Abbildung 46 S. 49 (nur Kurve)"
+   }
+  ],
+  "unvollstaendig_grund": "Der Immobilienmarktbericht 2026 der Stadt Fulda veröffentlicht den Sachwertfaktor für Ein- und Zweifamilienhäuser (freistehend) nur als Kurve (Abbildung 46, S. 49; 115 Kauffälle), ohne Wertetabelle und ohne Funktionsgleichung. Werte aus einer Grafik abzulesen wäre eine Schätzung, keine amtliche Zahl. Weg: Geschäftsstelle des Gutachterausschusses für Immobilienwerte für den Bereich der Stadt Fulda, gutachterausschuss@fulda.de, Tel. 0661/102-1665 (Wertetabelle oder Regressionsformel erfragen).",
+  "warum_kein_wert": "Der Immobilienmarktbericht 2026 der Stadt Fulda veröffentlicht den Sachwertfaktor für Ein- und Zweifamilienhäuser (freistehend) nur als Kurve (Abbildung 46, S. 49; 115 Kauffälle), ohne Wertetabelle und ohne Funktionsgleichung. Werte aus einer Grafik abzulesen wäre eine Schätzung, keine amtliche Zahl. Weg: Geschäftsstelle des Gutachterausschusses für Immobilienwerte für den Bereich der Stadt Fulda, gutachterausschuss@fulda.de, Tel. 0661/102-1665 (Wertetabelle oder Regressionsformel erfragen)."
+ },
+ {
+  "land_code": "HE",
+  "ags": "06631009",
+  "ebene": "gemeinde",
+  "gebiet_name": "Fulda, Stadt",
+  "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich der Stadt Fulda",
+  "berichtsjahr": 2026,
+  "stichtag": "2026-01-01",
+  "quelle_url": "https://gds.hessen.de/INTERSHOP/web/WFS/HLBG-Geodaten-Site/de_DE/-/EUR/ViewDownloadcenter-Start?path=Immobilienwerte/Regionale%20Immobilienmarktberichte/%60IMB%20regional%202026",
+  "quelle_datei": "`2026_IMB_Stadt_Fulda.pdf",
+  "quelle_hinweis": "Kostenfreier Download im Downloadcenter der HVBG (gds.hessen.de), Ordner Immobilienwerte / Regionale Immobilienmarktberichte / `IMB regional 2026, Datei „`2026_IMB_Stadt_Fulda.pdf“ (eingestellt 29.05.2026).",
+  "quelle_parser": "ernte-20261120-hand (pdftotext -layout, S. 49 als Seitenbild geprüft am 20.11.2026)",
+  "lizenz": "dl-de/zero-2-0",
+  "lizenz_hinweis": "Wie die übrigen Sätze aus diesem Bericht im Register (nachernte-2026-10b-he.json): Vervielfältigungshinweis ohne Einschränkung und Bedingung.",
+  "verwendung": "produkt",
+  "korrekturen": [],
+  "kennzahl": "sachwertfaktor",
+  "formel": null,
+  "modellansaetze": {
+   "gnd_jahre": 80,
+   "bezug": "IMB 2026 Stadt Fulda, Kap. 9.2, S. 48"
+  },
+  "stufe": "A",
+  "stufe_grund": null,
+  "fallzahl": null,
+  "streuung": null,
+  "modellversion": "IMB-Fulda-2026 (Kap. 9.2, GND 80, NHK 2010, Regionalfaktor 1,0)",
+  "zugang": "nicht veröffentlicht",
+  "vollstaendig": false,
+  "zweig": "rhdhh",
+  "objektart": "rhdhh",
+  "geltungsbereich": {
+   "objektart_bez": "Ein- und Zweifamilienhäuser (Doppel- und Reihenhäuser)",
+   "region": "Stadt Fulda"
+  },
+  "belege": [
+   {
+    "art": "fehlstelle",
+    "dokument": "Immobilienmarktbericht 2026 Stadt Fulda",
+    "fundstelle": "Kap. 9.2 Sachwertfaktoren für Ein- und Zweifamilienhäuser, Modell S. 48, Abbildung 47 S. 49 (nur Kurve)"
+   }
+  ],
+  "unvollstaendig_grund": "Der Immobilienmarktbericht 2026 der Stadt Fulda veröffentlicht den Sachwertfaktor für Ein- und Zweifamilienhäuser (Doppel- und Reihenhäuser) nur als Kurve (Abbildung 47, S. 49; 52 Kauffälle), ohne Wertetabelle und ohne Funktionsgleichung. Werte aus einer Grafik abzulesen wäre eine Schätzung, keine amtliche Zahl. Weg: Geschäftsstelle des Gutachterausschusses für Immobilienwerte für den Bereich der Stadt Fulda, gutachterausschuss@fulda.de, Tel. 0661/102-1665 (Wertetabelle oder Regressionsformel erfragen).",
+  "warum_kein_wert": "Der Immobilienmarktbericht 2026 der Stadt Fulda veröffentlicht den Sachwertfaktor für Ein- und Zweifamilienhäuser (Doppel- und Reihenhäuser) nur als Kurve (Abbildung 47, S. 49; 52 Kauffälle), ohne Wertetabelle und ohne Funktionsgleichung. Werte aus einer Grafik abzulesen wäre eine Schätzung, keine amtliche Zahl. Weg: Geschäftsstelle des Gutachterausschusses für Immobilienwerte für den Bereich der Stadt Fulda, gutachterausschuss@fulda.de, Tel. 0661/102-1665 (Wertetabelle oder Regressionsformel erfragen)."
+ }
+]

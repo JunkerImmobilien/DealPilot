@@ -690,6 +690,13 @@ export const SAATDATEIEN = ['lzs-nrw.json', 'swf-nrw.json', 'lzs-he-2026.json', 
                             'swf-nw-2026-nachernte-20261120.json', 'uk-wgfz-nw-2026-nachernte-20261120.json', 'swf-nw-2026-mfh-sperren.json',
                             /* v3931 · Erntetag 20.11.2026 Ost: 6 ETW-Vergleichsfaktor-Sperren BB (Kreise leiten keine ab). */
                             'vgf-bb-2026-etw-sperren.json',
+                            /* v3931b · Erntetag 20.11.2026 Sued-West: Offenbach IMB 2026 (eingestellt 18.11., GND 80 statt 70,
+                               9 LZS, 2 SWF-Potenzformeln an 24 Tabellenzeilen nachgerechnet; ETW-Wiederverkauf gestaffelt nach
+                               Wohnungszahl als etw_bis10we/etw_ueber10we - Zweigwahl kennt das noch nicht), Fulda SWF-Sperren;
+                               Erfurt SWF 3 Werte; Heidelberg WGFZ mfh; UK-/WGFZ-Sperren BW und TH. */
+                            'lzs-swf-he-2026-ernte-20261120.json', 'swf-th-2026-ernte-20261120.json',
+                            'uk-flaeche-bw-2026-ernte-20261120.json', 'uk-flaeche-th-2026-ernte-20261120.json',
+                            'uk-wgfz-bw-2026-ernte-20261120.json', 'uk-wgfz-th-2026-ernte-20261120.json',
                            ];
 
 /* ═══ v1778 · WAS LIEGT IM ORDNER, STEHT ABER NICHT IN DER LISTE? ═══
