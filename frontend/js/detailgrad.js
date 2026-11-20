@@ -215,13 +215,19 @@
        folgen ihr (die naechste Zeile gewinnt). Ohne diese Angabe galten die Felder ohne id als Experte
        und die ganze Karte erschien erst ab Experte. Die Regel in style.css blendet die Zeile auch
        zwischen Neuaufbau und Markieren aus (kein Aufblitzen). data-dg-stufe wird hier nie geaendert. */
+    /* v3910 · Die Liste ist der Boden: eine gelistete Karte erscheint nie früher als ihre Stufe, auch wenn
+       ein Modul darin Zeilen ab Stufe 1 einstuft. Gemessen 20.11.2026: das Steuerformular (ab Fortgeschritten)
+       zog sich über seine Zeilen data-dg-stufe="1" zu Einsteiger herunter. */
+    var gelistet = []; expl.forEach(function (L, el) { gelistet.push([el, L]); });
+    var boden = function (el) { var B = 0; gelistet.forEach(function (g) { if (g[0] !== el && g[0].contains(el) && g[1] > B) B = g[1]; }); return B; };
     [].slice.call(sec.querySelectorAll('[data-dg-stufe]')).forEach(function (el) {
       var L = gueltig(el.getAttribute('data-dg-stufe')); if (!L || el.closest(NIE)) return;
+      L = Math.max(L, boden(el));
       if (!expl.has(el) || L < expl.get(el)) expl.set(el, L);
     });
     var lvl = function (f) {
       var zs = f.closest ? f.closest('[data-dg-stufe]') : null;
-      if (zs && sec.contains(zs)) { var Lz = gueltig(zs.getAttribute('data-dg-stufe')); if (Lz) return Lz; }
+      if (zs && sec.contains(zs)) { var Lz = gueltig(zs.getAttribute('data-dg-stufe')); if (Lz) return Math.max(Lz, boden(zs)); }
       var L = (f.id && feldStufe[f.id]) || FELD_FOLGT_BEHAELTER[id] || 3;
       return (f.id && pflichtStufe[f.id] && pflichtStufe[f.id] < L) ? pflichtStufe[f.id] : L;
     };
