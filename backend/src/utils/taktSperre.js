@@ -31,6 +31,8 @@ const SCHLUESSEL = Object.freeze({
   bauzins: 5,            // Bundesbank-Reihen (Start + täglich 18:00)
   immometricaFlow: 6,    // Flow Investor ImmoMetrica-Abruf (alle N h, Schalter)
   plansSync: 7,          // Stripe-Preis-IDs gegen lookup_keys (einmal beim Start)
+  partnerFristen: 8,     // v3931 · Partner-Fristen nach Platzentzug + Loeschfristen Partner-Cockpit (index.js, täglich).
+                         // Fehlte seit v3357: takt('partnerFristen') warf bei JEDEM Lauf „unbekannter Takt" - nie gelaufen.
   landingZahlen: 9       // v3930 · Datenumfang der Landing neu messen (services/datenumfang.js, täglich)
 });
 

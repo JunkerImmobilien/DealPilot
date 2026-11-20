@@ -133,6 +133,31 @@ async function logik(etikett, mod, name) {
 await logik('backend/src/utils/taktSperre.js', require(path.join(WURZEL, 'backend/src/utils/taktSperre.js')), 'retention');
 await logik('marktbericht/backend/src/lib/taktSperre.js', await import(pathToFileURL(path.join(WURZEL, 'marktbericht/backend/src/lib/taktSperre.js')).href), 'harvest');
 
+/* ── B2 · jeder benutzte Takt-Name steht in SCHLUESSEL (v3931) ───────────
+ * Befund 20.11.2026: index.js rief seit v3357 takt('partnerFristen'), SCHLUESSEL kannte den Namen nicht.
+ * mitSperre warf bei JEDEM Lauf „unbekannter Takt", der Wrapper schluckte es (er wirft nie) - die
+ * Partner-Fristen und Löschfristen liefen auf Prod nie. Abschnitt A sah nur, DASS gewickelt ist,
+ * B prüfte die Logik mit einem bekannten Namen. Keiner glich die Namen ab. */
+console.log('B2 · benutzte Takt-Namen gegen SCHLUESSEL');
+for (const [basis, modPfad, esm] of [['backend/src', 'backend/src/utils/taktSperre.js', false], ['marktbericht/backend/src', 'marktbericht/backend/src/lib/taktSperre.js', true]]) {
+  const mod = esm ? await import(pathToFileURL(path.join(WURZEL, modPfad)).href) : require(path.join(WURZEL, modPfad));
+  const bekannt = mod.SCHLUESSEL || {};
+  const nummern = Object.values(bekannt);
+  if (new Set(nummern).size === nummern.length) ok(basis + ': ' + nummern.length + ' Schlüsselnummern, alle verschieden'); else rot(basis + ': doppelte Schlüsselnummer in SCHLUESSEL');
+  let n = 0;
+  for (const f of dateien(path.join(WURZEL, basis))) {
+    const rel = path.relative(WURZEL, f).replace(/\\/g, '/');
+    if (rel === modPfad) continue;
+    const zeilen = fs.readFileSync(f, 'utf8').split(/\r?\n/);
+    zeilen.forEach((z, i) => {
+      if (/^\s*(\/\/|\*)/.test(z)) return;
+      const re = /(?:\.takt|\btakt|\b_taktSperre|mitSperre)\(\s*['"]([\w-]+)['"]/g; let m;
+      while ((m = re.exec(z))) { n++; if (!(m[1] in bekannt)) rot(rel + ':' + (i + 1) + ' Takt „' + m[1] + '" fehlt in ' + modPfad + ' SCHLUESSEL (würde bei jedem Lauf werfen)'); }
+    });
+  }
+  ok(basis + ': ' + n + ' Aufrufe mit Takt-Namen abgeglichen');
+}
+
 /* ── C · echte Datenbank ──────────────────────────────────────────────── */
 if (process.argv.includes('--live')) {
   const server = (process.argv.find((a) => a.startsWith('--server=')) || '--server=root@116.203.214.11').slice(9);
