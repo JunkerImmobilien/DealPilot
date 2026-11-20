@@ -384,6 +384,8 @@ app.use('/api/v1/beta-signup', betaSignupRoutes);
 app.use('/api/v1/track', rateLimit({ windowMs: 60000, max: 120 }), require('./routes/track')); // v973
 /* v1523: oeffentliche Kennzahlen fuer die Landing - ohne Token, nur Summen. */
 app.use('/api/v1/public/stats', rateLimit({ windowMs: 60000, max: 60 }), require('./routes/publicStats'));
+/* v3930 · landing-zahlen-live-1: Datenumfang der Landing (amtliche Datenpunkte, Register) - ohne Token, nur Summen. */
+app.use('/api/v1/public/datenumfang', rateLimit({ windowMs: 60000, max: 60 }), require('./routes/publicDatenumfang'));
 app.use('/api/v1/public/partner-logo', rateLimit({ windowMs: 60000, max: 240 }), require('./routes/partnerLogo'));  // v3299 · Partner-Logos fuer Mails (gehostet statt data:)
 app.use('/api/v1/deal-action', dealActionRoutes);
 app.use('/api/v1/feedback', feedbackRoutes);
@@ -644,6 +646,14 @@ async function start() {
     require('./services/bauzinsService').starteTakt();
   } catch (e) {
     console.error('✗ Bauzins-Takt konnte nicht starten:', e.message);
+  }
+
+  /* v3930 · landing-zahlen-live-1: Datenumfang der Landing einmal nach dem Start und taeglich neu messen
+     (services/datenumfang.js, unter takt('landingZahlen')) - die Landing fragt GET /api/v1/public/datenumfang. */
+  try {
+    require('./services/datenumfang').starteTakt(pool);
+  } catch (e) {
+    console.error('✗ Datenumfang-Takt konnte nicht starten:', e.message);
   }
 
   // v507: WebSocket-Relay fuer Live-Transkription (OpenAI Realtime)

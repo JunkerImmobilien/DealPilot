@@ -37,6 +37,23 @@ function runden(n) {
   return Math.floor(n / 50) * 50;
 }
 
+/* v3930 · landing-zahlen-live-1 · dieselbe Zaehlung fuer /api/v1/public/datenumfang
+   (services/datenumfang.js) - EINE Abfrage, EINE Rundung. */
+async function gezaehlteNutzer(db) {
+  try {
+    const u = await db.query(
+      `SELECT COUNT(*)::int AS n FROM users
+        WHERE deleted_at IS NULL AND is_test_user = false`
+    );
+    return Number(u.rows[0] && u.rows[0].n) || 0;
+  } catch (e) { return 0; }
+}
+/** { registrierte_nutzer (wie /public/stats sie ausgibt), herkunft } */
+async function nutzerZahl(db) {
+  const n = await gezaehlteNutzer(db);
+  return { registrierte_nutzer: runden(SOCKEL + n), herkunft: { sockel: SOCKEL, gezaehlt: n, summe: SOCKEL + n } };
+}
+
 router.get('/', async (req, res) => {
   if (speicher.wert && Date.now() - speicher.zeit < CACHE_MS) {
     return res.json(speicher.wert);
@@ -45,13 +62,7 @@ router.get('/', async (req, res) => {
   const db = req.app.get('db');
   const zahlen = { nutzer: null, objekte: null, bewertungen: null };
 
-  try {
-    const u = await db.query(
-      `SELECT COUNT(*)::int AS n FROM users
-        WHERE deleted_at IS NULL AND is_test_user = false`
-    );
-    zahlen.nutzer = Number(u.rows[0] && u.rows[0].n) || 0;
-  } catch (e) { zahlen.nutzer = 0; }
+  zahlen.nutzer = await gezaehlteNutzer(db);
 
   try {
     const o = await db.query(`SELECT COUNT(*)::int AS n FROM objects`);
@@ -76,3 +87,5 @@ router.get('/', async (req, res) => {
 });
 
 module.exports = router;
+module.exports.nutzerZahl = nutzerZahl;   /* v3930 · landing-zahlen-live-1 */
+module.exports.runden = runden;

@@ -60,6 +60,7 @@ import { LocationFinderService } from '../services/LocationFinderService.js';
 /* v1096-WPRB · Der Aufloeser und der Registerstand fuer die Abnahme. */
 import * as GAA from '../lib/gutachterausschuss.js';
 import { registerStand } from '../lib/ausschuss_register.js';
+import { mbDatenumfang } from '../lib/datenumfang.js';   /* v3930 · landing-zahlen-live-1 */
 import { beleihungswert as belwCheck, eingabenAusBericht as belwEingaben } from '../lib/beleihungswert.js';   /* v2630 */
 
 export const router = express.Router();
@@ -89,6 +90,18 @@ router.get('/register/stand', (req, res) => {
       datei: String(g.datei).split('/').pop(), saetze: g.saetze })),
     vermisst: (st.vermisst || []).map((v) => String(v.datei).split('/').pop()),
   });
+});
+
+/* ── v3930 · landing-zahlen-live-1 · DATENUMFANG FUER DIE LANDING ────────
+ *
+ * Zaehlungen des Marktbericht-Teils (lib/datenumfang.js): SELECT count auf
+ * mb.*, BORIS-Dienste, Abruftakte, Registerstand. Nur Summen, keine Inhalte.
+ * Nur im Docker-Netz: das Haupt-Backend fragt sie fuer die oeffentliche
+ * Route /api/v1/public/datenumfang. In routes/marktbericht.js des
+ * Haupt-Backends steht dieser Weg bewusst NICHT. Zwischenspeicher 6 h. */
+router.get('/intern/datenumfang', async (req, res) => {
+  try { res.json(await mbDatenumfang(q, { frisch: req.query.frisch === '1' })); }
+  catch (e) { res.status(500).json({ error: 'Datenumfang nicht messbar' }); console.log('[datenumfang] ' + e.message); }
 });
 
 /* ── v2591 · DECKUNG DES REGISTERS, fuer die Admin-Ansicht ─────────────

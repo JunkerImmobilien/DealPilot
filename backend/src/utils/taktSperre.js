@@ -30,7 +30,8 @@ const SCHLUESSEL = Object.freeze({
   sicherheitLoeschen: 4, // Löschkonzept security_events, IP-Anonymisierung (täglich)
   bauzins: 5,            // Bundesbank-Reihen (Start + täglich 18:00)
   immometricaFlow: 6,    // Flow Investor ImmoMetrica-Abruf (alle N h, Schalter)
-  plansSync: 7           // Stripe-Preis-IDs gegen lookup_keys (einmal beim Start)
+  plansSync: 7,          // Stripe-Preis-IDs gegen lookup_keys (einmal beim Start)
+  landingZahlen: 9       // v3930 · Datenumfang der Landing neu messen (services/datenumfang.js, täglich)
 });
 
 function _log(t) { console.log('[takt-sperre] ' + t); }

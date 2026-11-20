@@ -289,6 +289,7 @@
       else e.textContent = neu.toLocaleString('de-DE');
     })(0);
   }
+  window.DP2_setzeZahl = setzeZahl;   /* landing-zahlen-live-1 · landing-zahlen.js zählt live gesetzte Zahlen damit hoch */
   var ZW = ['Null','Ein','Zwei','Drei','Vier','Fünf','Sechs','Sieben','Acht','Neun','Zehn','Elf','Zwölf','Dreizehn','Vierzehn','Fünfzehn','Sechzehn','Siebzehn','Achtzehn','Neunzehn','Zwanzig','Einundzwanzig','Zweiundzwanzig','Dreiundzwanzig','Vierundzwanzig','Fünfundzwanzig'];
   if (window.DP_MODULE && window.DP_MODULE.length) {
     var nMod = window.DP_MODULE.length;
@@ -300,7 +301,8 @@
     rs.src = 'register-stand.js?d=' + new Date().toISOString().slice(0, 10);
     rs.onload = function () {
       var R = window.DPS_REGISTER; if (!R || !R.kopf) return;
-      document.querySelectorAll('[data-reg]').forEach(function (e) { var v = R.kopf[e.getAttribute('data-reg')]; if (typeof v === 'number') setzeZahl(e, v); });
+      /* landing-zahlen-live-1 · was landing-zahlen.js schon live gesetzt hat (data-live), bleibt stehen */
+      document.querySelectorAll('[data-reg]').forEach(function (e) { if (e.hasAttribute('data-live')) return; var v = R.kopf[e.getAttribute('data-reg')]; if (typeof v === 'number') setzeZahl(e, v); });
     };
     document.head.appendChild(rs);
   }
