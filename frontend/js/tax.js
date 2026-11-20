@@ -2493,6 +2493,11 @@ function renderYearlyTaxForm() {
   }
 
   var mode = window._taxFormMode || 'quick';
+  /* v3910 · Marcel 20.11.2026: „Fortgeschritten bekommen den Quick-Modus und ab Experte bekommst du alles.“
+     Unter Experte gibt es den Detail-Modus nicht, auch keinen Knopf dafür (Einsteiger sieht die Karte gar nicht,
+     detailgrad-zuordnung). Die Wahl bleibt gemerkt und greift wieder, sobald Experte gewählt ist. */
+  var _dgYtf = (window.DpDetailgrad && typeof DpDetailgrad.stufe === 'function') ? DpDetailgrad.stufe() : 3;
+  if (_dgYtf < 3) mode = 'quick';
   var startYear = _v269_getStartYear(); // V269a1
   var years = [];
   var nYears = Math.min(15, State.cfRows.length);
@@ -2500,10 +2505,10 @@ function renderYearlyTaxForm() {
 
   var html =
     '<div class="ytf-toolbar">' +
-      '<div class="ytf-mode-toggle">' +
+      (_dgYtf < 3 ? '' : '<div class="ytf-mode-toggle">' +
         '<button class="ytf-mode-btn ' + (mode === 'quick' ? 'active' : '') + '" onclick="setTaxFormMode(\'quick\')">Quick-Modus</button>' +
         '<button class="ytf-mode-btn ' + (mode === 'detail' ? 'active' : '') + '" onclick="setTaxFormMode(\'detail\')">Detail-Modus</button>' +
-      '</div>' +
+      '</div>') +
       /* v3164 · Jahresansicht: jeder Posten mit den Belegen, aus denen er stammt (unterlagen-eingang.js) */
       (window.DpEingang && window.DpEingang.jahresAnsicht ? '<button class="btn btn-outline btn-sm" onclick="DpEingang.jahresAnsicht()" style="margin-left:auto" title="Jedes Jahr: welcher Wert aus welcher Rechnung kommt">Belege je Jahr</button>' : '') +
       '<button class="btn btn-outline btn-sm" onclick="resetAllTaxOverrides()" title="Alle manuellen Eingaben zurücksetzen">↺ Vorschläge wiederherstellen</button>' +
@@ -2565,7 +2570,8 @@ if (typeof window !== 'undefined' && typeof window.addEventListener === 'functio
     _dpMsT = setTimeout(function () { try { if (window.State && State.cfRows && State.cfRows.length && typeof renderTaxTimeline === 'function') renderTaxTimeline(); } catch (e) {} }, 250);
   });
   window.addEventListener('dp:detailgrad', function () {
-    try { if (document.querySelector('#yearly-tax-form-box .ytf-detail-wrap')) renderYearlyTaxForm(); } catch (e) {}
+    /* v3910 · jeder Wechsel baut neu: Detail-Modus und sein Knopf hängen jetzt an der Stufe */
+    try { if (document.querySelector('#yearly-tax-form-box .ytf-toolbar')) renderYearlyTaxForm(); } catch (e) {}
   });
 }
 
@@ -2588,7 +2594,7 @@ function _renderQuickForm(years) {
     '<th class="num">' + (_corp ? 'Sonstige Betriebsausgaben' : 'Sonstige WK') + '</th>' +
     /* v3074 · Marcel 02.11.2026: „stehen die Erhaltung unten bei Steuer im Detail drin?" - im Detail ja
        (6.5), hier fehlte sie: Westerfeldstr. 2028 erklärten die Spalten 39.976 von 69.242 € Werbungskosten. */
-    '<th class="num" title="Erhaltungsaufwand und anschaffungsnahe Herstellungskosten des Jahres (im Detail-Modus unter 6.5)">Erhaltung / Sanierung</th>' +
+    '<th class="num" title="Erhaltungsaufwand und anschaffungsnahe Herstellungskosten des Jahres (im Detail-Modus einzeln, ab Detailgrad Experte)">Erhaltung / Sanierung</th>' +
     '<th class="num ytf-result">' + (_corp ? '= Ergebnis vor Steuern' : '= Verlust/Überschuss') + '</th>' +
     '<th class="num ytf-result"' + (_corp ? ' title="Körperschaftsteuer, Soli und Gewerbesteuer der Gesellschaft auf alle ihre Objekte, nach Verlustvortrag (wie im Jahresabschluss)"' : '') + '>' + (_corp ? 'Steuer der GmbH (alle Objekte)' : 'Steuer-Effekt') + '</th>' +
     (window.DpJahresbuch ? '<th title="geplant, erklärt oder Bescheid. Ein Bescheid sperrt nichts, beim Ändern fragt DealPilot nach.">Status</th>' : '') +   /* v3363 · E6 */
@@ -2634,7 +2640,7 @@ function _renderQuickForm(years) {
     '<p class="hint" style="margin-top:8px">' +
       '💡 Klicke ein Feld an, um den App-Vorschlag manuell zu überschreiben (z.B. tatsächliche ' + _dpBegriff().wort + ' lt. ' + (_dpBegriff().corp ? 'Buchhaltung' : 'Steuerbescheid') + '). ' +
       'Der Pfeil ↺ neben einem überschriebenen Wert setzt ihn auf den Vorschlag zurück. ' +
-      'Umlagefähige Nebenkosten sind Einnahme und ' + _dpBegriff().wort + ' zugleich und heben sich auf — sie stehen nur im Detail-Modus.' +
+      'Umlagefähige Nebenkosten sind Einnahme und ' + _dpBegriff().wort + ' zugleich und heben sich auf. Sie stehen einzeln im Detail-Modus, ab Detailgrad Experte.' +
     '</p>';
 
   return html;

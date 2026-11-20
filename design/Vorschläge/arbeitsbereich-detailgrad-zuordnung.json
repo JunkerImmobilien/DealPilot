@@ -446,11 +446,6 @@
             "titel": "Steuerverlauf",
             "selektor": "#tax-timeline-card",
             "art": "karte"
-          },
-          {
-            "titel": "Steuerformular pro Jahr (v3900, Marcel 19.11.2026: ab Einsteiger; die Zeilen stuft tax.js selbst ein, data-dg-stufe)",
-            "selektor": "#yearly-tax-form-box",
-            "art": "kind"
           }
         ],
         "felder": [
@@ -473,6 +468,11 @@
           {
             "titel": "Steuer-Modul · Echte Progression",
             "selektor": "#tax-result-box",
+            "art": "kind"
+          },
+          {
+            "titel": "Steuerformular pro Jahr (v3910, Marcel 20.11.2026: Einsteiger sieht es nicht, Fortgeschritten nur den Quick-Modus, Detail-Modus ab Experte; tax.js renderYearlyTaxForm)",
+            "selektor": "#yearly-tax-form-box",
             "art": "kind"
           }
         ],

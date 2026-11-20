@@ -437,11 +437,6 @@ window.DpDetailgradZuordnung = {
       "s": "#tax-timeline-card",
       "art": "karte",
       "titel": "Steuerverlauf"
-     },
-     {
-      "s": "#yearly-tax-form-box",
-      "art": "kind",
-      "titel": "Steuerformular pro Jahr (v3900, Marcel 19.11.2026: ab Einsteiger; die Zeilen stuft tax.js selbst ein, data-dg-stufe)"
      }
     ],
     "felder": [
@@ -465,6 +460,11 @@ window.DpDetailgradZuordnung = {
       "s": "#tax-result-box",
       "art": "kind",
       "titel": "Steuer-Modul · Echte Progression"
+     },
+     {
+      "s": "#yearly-tax-form-box",
+      "art": "kind",
+      "titel": "Steuerformular pro Jahr (v3910, Marcel 20.11.2026: Einsteiger sieht es nicht, Fortgeschritten nur den Quick-Modus, Detail-Modus ab Experte; tax.js renderYearlyTaxForm)"
      }
     ],
     "felder": [

@@ -254,7 +254,7 @@ function pruefen(Q) {
   (function () {
     const hoerer = {};
     const rc = { console: { log() {}, warn() {}, info() {}, error() {} }, Date, Math, JSON, parseFloat, parseInt, isFinite, isNaN, Number, String, Object, Array, Promise, setTimeout() {}, clearTimeout() {},
-      document: { getElementById: (id) => (id === 'afa_satz' ? { value: '2' } : null), addEventListener() {}, querySelector: (s) => (rc.__detailDa && /ytf-detail-wrap/.test(s) ? {} : null), querySelectorAll: () => [], createElement: () => ({ style: {} }) },
+      document: { getElementById: (id) => (id === 'afa_satz' ? { value: '2' } : null), addEventListener() {}, querySelector: (s) => (rc.__detailDa && /ytf-toolbar/.test(s) ? {} : null), querySelectorAll: () => [], createElement: () => ({ style: {} }) },
       addEventListener(t, f) { (hoerer[t] = hoerer[t] || []).push(f); }, localStorage: { getItem: () => null, setItem() {} } };
     rc.window = rc; rc.parseDe = tc.parseDe; rc.State = { cfRows: [{ cal: 2025 }, { cal: 2026 }] };
     vm.createContext(rc);
@@ -316,9 +316,9 @@ function pruefen(Q) {
     let neuAufbau = 0; const echtRender = rc.renderYearlyTaxForm; rc.renderYearlyTaxForm = () => { neuAufbau++; };
     const b1 = blick();
     rc.__detailDa = false; dg.forEach((f) => f({ detail: { stufe: 1, alt: 3 } }));
-    ok(neuAufbau === 0, 'R dp:detailgrad in der Quick-Ansicht: kein Neuaufbau');
+    ok(neuAufbau === 0, 'R dp:detailgrad ohne aufgebautes Steuerformular: kein Neuaufbau (v3910)');
     rc.__detailDa = true; dg.forEach((f) => f({ detail: { stufe: 3, alt: 1 } }));
-    ok(neuAufbau === 1 && blick() === b1 && zaehler.calc === 0 && zaehler.timeline === 0, 'R dp:detailgrad in der Detail-Ansicht: nur das Steuerformular neu, keine Rechnung, kein Steuerverlauf, nichts geschrieben');
+    ok(neuAufbau === 1 && blick() === b1 && zaehler.calc === 0 && zaehler.timeline === 0, 'R dp:detailgrad mit Steuerformular: nur das Steuerformular neu (v3910 auch im Quick-Modus, Knopf haengt an der Stufe), keine Rechnung, kein Steuerverlauf, nichts geschrieben');
     rc.renderYearlyTaxForm = echtRender; rc.__detailDa = false;
     rc._computeYearTotal = echteCyt;
     ok(JSON.stringify(rc._computeYearTotal(2025, 0, satz)) === vorher, 'R die Rechnung (_computeYearTotal mit Satz) ist nach dem Rendern dieselbe');
@@ -328,7 +328,9 @@ function pruefen(Q) {
   ok(/querySelectorAll\('\[data-dg-stufe\]'\)[\s\S]{0,200}expl\.set\(el, L\)/.test(Q.dg) && /f\.closest\('\[data-dg-stufe\]'\)/.test(Q.dg), 'E detailgrad.js: data-dg-stufe als Bereich, Felder folgen ihrer Zeile');
   ok(/body\.dp-dg-1 [^{]*\[data-dg-stufe="2"\][\s\S]{0,300}body\.dp-dg-2 [^{]*\[data-dg-stufe="3"\] \{ display: none !important; \}/.test(Q.css), 'E style.css: Zeilen ueber der Stufe ausgeblendet (data-dg-stufe)');
   const zuo = (Q.zuo.match(/"s3-tax": \{\s*"1": \{[\s\S]*?"felder"/) || [''])[0];
-  ok(/#yearly-tax-form-box/.test(zuo), 'E Zuordnung: Steuerformular pro Jahr ab Einsteiger (s3-tax, Stufe 1)');
+  const zuo2 = (Q.zuo.match(/"s3-tax": \{[\s\S]*?"2": \{[\s\S]*?"felder"/) || [''])[0].replace(zuo, '');
+  ok(!/#yearly-tax-form-box/.test(zuo) && /#yearly-tax-form-box/.test(zuo2), 'E Zuordnung: Steuerformular pro Jahr ab Fortgeschritten, nicht bei Einsteiger (v3910, Marcel 20.11.2026)');
+  ok(/if \(_dgYtf < 3\) mode = 'quick';/.test(Q.tax) && /\(_dgYtf < 3 \? '' : '<div class="ytf-mode-toggle">'/.test(Q.tax), 'E tax.js: unter Experte nur Quick-Modus, kein Knopf Detail-Modus (v3910)');
 
   /* ── H · v3900 Stempel beim Speichern: Vordruck und Zeilen je Jahr ── */
   const KA = kernCtx(jahrDateien.map(jahrQuelle).concat([Q.kern])).AnlageVKern;
@@ -403,7 +405,7 @@ const gegen = [
   ['Abschrift 2023: Zeile doppelt', Object.assign({}, Q, { jahr: { 'anlage-v-2023.js': lies('frontend/js/anlage-v-2023.js').replace("    50: { text: 'Geldbeschaffungskosten", "    47: { text: 'Geldbeschaffungskosten") } })],
   ['Abschrift 2022: Summenzeile fehlt', Object.assign({}, Q, { jahr: { 'anlage-v-2022.js': lies('frontend/js/anlage-v-2022.js').replace('sonder7b: 34,', 'sonder7b: 99,') } })],
   ['tax.js: Detail-Ansicht schreibt einen Eigenwert', Object.assign({}, Q, { tax: Q.tax.replace('var _dgNamen = {', "_setYearOverride(y.year, 'porto', 1); var _dgNamen = {") })],
-  ['tax.js: Hoerer stoesst den Steuerverlauf an', Object.assign({}, Q, { tax: Q.tax.replace("if (document.querySelector('#yearly-tax-form-box .ytf-detail-wrap')) renderYearlyTaxForm();", 'renderYearlyTaxForm(); renderTaxTimeline();') })],
+  ['tax.js: Hoerer stoesst den Steuerverlauf an', Object.assign({}, Q, { tax: Q.tax.replace("if (document.querySelector('#yearly-tax-form-box .ytf-toolbar')) renderYearlyTaxForm();", 'renderYearlyTaxForm(); renderTaxTimeline();') })],
   ['detailgrad.js ohne data-dg-stufe', Object.assign({}, Q, { dg: Q.dg.replace("f.closest('[data-dg-stufe]')", 'null') })],
   ['Mappe mit fester Zeile 83', Object.assign({}, Q, { dok: Q.dok.replace("zl(R.summeWk.zeile, null, 'Summe der Werbungskosten'", "zl('83', null, 'Summe der Werbungskosten'") })],
 ];
