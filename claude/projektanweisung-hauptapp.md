@@ -45159,3 +45159,8 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Nachweis:** Staging +34.739 € nach ≤ 2 s, zweimal stabil; Stempel 2025 Kennung + 24 Zeilen, 2026/2027 `fehlt:true`. Prüfer anlage-v 2348, detailgrad, steuerjahr 36, miete-reiter 33/33, mietpotenzial 288/288, buster grün. Prod: Backend healthy, RestartCount 0, 0 Fehler, tax.js?v=v3900a, taxService mit `_formular`.
 - **Nebenbefund:** Der Steuer-Agent ließ `tools/steuer-kontext-mappe-test.mjs` laufen (Kopie ins Testkunden-Konto, Abbruch). Original unverändert, abgeräumt mit `steuer-kontext-live.js abraeumen`. Agenten bekommen das Verbot künftig ausdrücklich.
 - **Rest:** Entscheidungen bei Marcel: Teamplatz-Preis (A/B/C), Score-Animation (score-animation-2), Landing-Richtung (landing-neu, -2, -3), Etappe-03-Bild 72/68/83 gegen 87/81/96.
+
+### Rollout 1.0.132 (`f01cf77`) · 20.11.2026 morgens (v3910, v3910a)
+- **Was:** Steuerformular pro Jahr erst ab Fortgeschritten, dort nur Quick-Modus, Detail-Modus ab Experte (tax.js `renderYearlyTaxForm`, `_dgYtf`). detailgrad.js: gelistete Karte ist Boden für `data-dg-stufe`-Zeilen darin.
+- **Nachweis:** Staging Stufen 1/2/3/2/1 gemessen; anlage-v 2362, detailgrad, steuerjahr 36, buster grün. Prod healthy, RestartCount 0, 0 Fehler, Buster v3910.
+- **Rest:** Video Modul 07 wartet auf Freigabe (Aufnahme, Higgsfield-Stimme); Entscheidungen Teamplatz-Preis, Score-Animation, Landing.
