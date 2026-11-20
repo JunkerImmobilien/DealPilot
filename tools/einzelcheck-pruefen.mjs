@@ -424,5 +424,18 @@ for (const [teil, was, ueber] of GEGEN) {
   else fehl('Gegenprobe ' + teil + ': ' + was + ' bleibt GRÜN' + (f && f.length ? ' (nur Ausnahme: ' + f[0].slice(0, 80) + ')' : '') + ', der Prüfer sieht die Sperre nicht');
 }
 
+/* v3940a · Exposé-Erkennung: Lindenallee 14 kam auf Staging als Energieausweis an */
+{
+  const ex = svc.istExpose;
+  const faelle = [
+    ['Exposé mit Energieausweis-Abschnitt', ex('Exposé Lindenallee 14. Kaufpreis 480.000 Euro, Wohnfläche 520 m². Energieausweis Verbrauch 118 kWh, Klasse D.', 'unterlagen.pdf'), true],
+    ['Dateiname exposé', ex('Objektbeschreibung', 'Expose-Objekt.pdf'), true],
+    ['Verkaufsangebot ohne Wort Exposé', ex('Kaufpreis 300.000 Euro, Wohnfläche 90 m², Käuferprovision 3,57 Prozent', 'a.pdf'), true],
+    ['reiner Energieausweis', ex('Energieausweis für Wohngebäude, Endenergiebedarf 118 kWh, Wohnfläche 520 m²', 'ea.pdf'), false],
+    ['Mietaufstellung', ex('Mietaufstellung, Wohnung 1, Wohnfläche 60 m², Kaltmiete 480 Euro', 'mieten.pdf'), false]
+  ];
+  for (const [w, ist, soll] of faelle) { if (ist === soll) ok('Exposé-Erkennung: ' + w); else fehl('Exposé-Erkennung: ' + w + ' ergibt ' + ist); }
+}
+
 console.log('\n' + (rot ? 'ROT: ' + rot + ' Befund(e)' : 'GRÜN: alles sauber') + ' · RC=' + (rot ? 1 : 0));
 process.exit(rot ? 1 : 0);

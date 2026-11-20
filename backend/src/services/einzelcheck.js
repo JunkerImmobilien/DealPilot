@@ -49,6 +49,16 @@ const ERLAUBTE_MIME = ['application/pdf'];
 const DOKUMENT_ARTEN = ['mietaufstellung', 'weg_protokoll', 'hausgeld', 'energieausweis', 'teilungserklaerung', 'mietvertrag'];
 const ART_NAME = { expose: 'Exposé', mietaufstellung: 'Mietaufstellung', weg_protokoll: 'WEG-Protokoll', hausgeld: 'Wirtschaftsplan',
   energieausweis: 'Energieausweis', teilungserklaerung: 'Teilungserklärung', mietvertrag: 'Mietvertrag' };
+/* v3940a · Exposé-Merkmal: „Exposé“ im Dateinamen oder am Anfang des Textes, oder ein Verkaufsangebot
+   (Kaufpreis + Wohnfläche + Makler-/Provisions- bzw. Angebotsbegriff). Ein reiner Energieausweis, eine
+   Mietaufstellung oder ein Protokoll führt keinen Kaufpreis mit Provision. */
+function istExpose(text, name) {
+  const n = String(name || '').toLowerCase(), t = String(text || '').toLowerCase().slice(0, 6000);
+  if (/expos[eé]/.test(n) || /expos[eé]/.test(t.slice(0, 1500))) return true;
+  const kp = /kaufpreis/.test(t), wf = /wohnfl(ä|ae)che/.test(t);
+  const angebot = /(provision|courtage|makler|käuferprovision|kaeuferprovision|zum verkauf|angebot)/.test(t);
+  return kp && wf && angebot;
+}
 
 /* ── Abhaengigkeiten ─────────────────────────────────────────────────── */
 function _pdfText(buffer) {
@@ -306,7 +316,11 @@ async function leseEine(datei, modell) {
   roh = null;
   const erk = d.dokumentSchemas.klassifiziere(text, name) || {};
   if (erk.typ === 'mieter_unterlagen') return { name, ok: false, grund: 'mieter_unterlagen', geschwaerzt: sw.gesamt };
-  const typ = DOKUMENT_ARTEN.indexOf(erk.typ) >= 0 ? erk.typ : 'expose';
+  /* v3940a · gemessen auf Staging 20.11.2026: das Muster-Exposé Lindenallee 14 kam als „Energieausweis“
+     zurück (Kaufpreis, Wohnfläche, Miete fehlten). DOKUMENT_TYPEN kennt kein Exposé, und ein Exposé
+     führt fast immer einen Abschnitt zum Energieausweis. In der App wählt der Nutzer das Exposé
+     ausdrücklich, hier entscheidet nur die Erkennung - deshalb gewinnt ein Exposé-Merkmal. */
+  const typ = istExpose(text, name) ? 'expose' : (DOKUMENT_ARTEN.indexOf(erk.typ) >= 0 ? erk.typ : 'expose');
   let r;
   try {
     r = typ === 'expose'
@@ -562,5 +576,5 @@ module.exports = {
   dateiPruefen, dateiname, zahlenSauber, zahlenAus, anzeigeAus, leseEine, auslesen,
   freiMoeglich, tagesverbrauchEur, preis, landingBasis, kaufAnlegen, kaufLesen, statusAus, berichtGezaehlt,
   handleEinzelcheckPaid, marktAus, mbEingabe, markt, adresseAus, aufraeumen, starteTakt,
-  _setzeDeps, _pdfText
+  istExpose, _setzeDeps, _pdfText
 };
