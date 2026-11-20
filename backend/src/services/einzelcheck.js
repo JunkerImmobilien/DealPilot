@@ -1,0 +1,566 @@
+'use strict';
+/* ═══════════════════════════════════════════════════════════════════════════
+ * services/einzelcheck.js · v3940 · DER EINZEL-CHECK VON DER LANDING
+ *
+ * Marcel 20.11.2026 (Preis entschieden: 3,99 EUR): Ohne Konto laedt ein Besucher bis zu vier Unterlagen
+ * hoch (Exposé, Mietaufstellung, WEG-Protokoll, Energieausweis …). Kostenlos werden ZWEI davon mit
+ * einem guenstigen Modell gelesen und grob eingeschaetzt. Fuer 3,99 EUR (Stripe Checkout, mode payment,
+ * lookup_key dp_einzelcheck_399) entsteht der volle Bericht: alle vier Unterlagen, normales Modell,
+ * dazu Lage, Markt, Vergleichsmiete und Wertindikation aus dem Marktbericht-Dienst. Wer binnen
+ * 14 Tagen ein Paket bucht, bekommt die 3,99 EUR angerechnet (Stripe-Promotion-Code auf den Coupon
+ * dp_einzelcheck_anrechnung, derselbe Weg wie der Flyer-Code ?code=) und das Objekt landet im Konto
+ * (Fragment #dc=1&… an js/dealcheck-uebernahme.js, derselbe Weg wie der Deal-Check).
+ *
+ * DATENSCHUTZ, VERBINDLICH (Pruefer: tools/einzelcheck-pruefen.mjs):
+ *   1 Dateien nur im Arbeitsspeicher. multer.memoryStorage in der Route, pdftotext liest ueber STDIN und
+ *     schreibt nach STDOUT - keine Datei auf der Platte, kein Puffer in der Datenbank. Gescannte PDFs
+ *     ohne Textebene werden NICHT gelesen (die Texterkennung in ocr.js schreibt Bilder nach tmpdir).
+ *   2 Geschwaerzt wird VOR dem KI-Aufruf (schwaerzen.js), am Text, den die KI bekommt.
+ *   3 Gespeichert werden nur Zahlen (zahlenSauber, eine Weissliste), mit Token-Hash, hoechstens 14 Tage.
+ *     Danach loescht der Takt 'einzelcheckLoeschen'. Die Anschrift aus dem Exposé verlaesst den
+ *     Arbeitsspeicher nur in Richtung Marktbericht-Dienst, dort mit ohneAblage (keine Zeile in
+ *     mb.addresses, mb.properties, mb.market_reports).
+ *   4 Das PDF baut der Browser (frontend/landing/einzelcheck.js mit js/dp-dokument.js) - auf dem Server
+ *     liegt kein Bericht.
+ *
+ * Ein Kern liest NIE Einstellungen: Modell, Grenzen und Preise kommen hier aus der Umgebung bzw. aus
+ * Stripe; gerechnet wird im Browser mit denselben Kernen wie im Deal-Check (DealKpis, DealScore2,
+ * ScoreTier, DpMietpotenzial). Dieser Dienst liest, prueft und liefert nur Daten.
+ *
+ * Abhaengigkeiten sind austauschbar (_setzeDeps), damit der Pruefer ohne Netz und Datenbank laeuft.
+ * ═══════════════════════════════════════════════════════════════════════════ */
+const crypto = require('crypto');
+const { spawn } = require('child_process');
+
+const VERSION = 'v3940';
+const LOOKUP_KEY = 'dp_einzelcheck_399';
+/* Coupon in BEIDEN Stripe-Konten mit genau dieser ID anlegen (umgebungsblind wie ein lookup_key). */
+const ANRECHNUNG_COUPON = 'dp_einzelcheck_anrechnung';
+const FRIST_TAGE = 14;
+const FREI_MAX_UNTERLAGEN = 2;
+const VOLL_MAX_UNTERLAGEN = 4;
+const MAX_DATEI_BYTES = 10 * 1024 * 1024;
+const MAX_TEXT_ZEICHEN = 120000;
+const MAX_BERICHTE = 3;              /* je Kauf so oft neu erzeugbar (Kosten je Lauf, siehe Bericht) */
+const ERLAUBTE_MIME = ['application/pdf'];
+
+/* Welche Arten der Dokument-Import (dokumentSchemas.js) fuer den Einzel-Check liest. Alles andere
+   (auch nicht erkannt) laeuft ueber das Exposé-Schema - wie dokument-import.js in der App. */
+const DOKUMENT_ARTEN = ['mietaufstellung', 'weg_protokoll', 'hausgeld', 'energieausweis', 'teilungserklaerung', 'mietvertrag'];
+const ART_NAME = { expose: 'Exposé', mietaufstellung: 'Mietaufstellung', weg_protokoll: 'WEG-Protokoll', hausgeld: 'Wirtschaftsplan',
+  energieausweis: 'Energieausweis', teilungserklaerung: 'Teilungserklärung', mietvertrag: 'Mietvertrag' };
+
+/* ── Abhaengigkeiten ─────────────────────────────────────────────────── */
+function _pdfText(buffer) {
+  /* pdftotext (poppler-utils, Backend-Image) liest aus STDIN ("-") und schreibt nach STDOUT ("-").
+     -l 40: hoechstens 40 Seiten. Nichts beruehrt die Platte. */
+  return new Promise(function (ok, nein) {
+    let p;
+    try { p = spawn('pdftotext', ['-q', '-enc', 'UTF-8', '-l', '40', '-', '-'], { stdio: ['pipe', 'pipe', 'pipe'] }); }
+    catch (e) { nein(e); return; }
+    const teile = []; let laenge = 0, fehler = '';
+    const uhr = setTimeout(function () { try { p.kill('SIGKILL'); } catch (e) {} nein(new Error('pdftotext: Zeitüberschreitung')); }, 30000);
+    p.stdout.on('data', function (d) { laenge += d.length; if (laenge <= MAX_TEXT_ZEICHEN * 4) teile.push(d); });
+    p.stderr.on('data', function (d) { fehler += d; });
+    p.on('error', function (e) { clearTimeout(uhr); nein(e.code === 'ENOENT' ? new Error('pdftotext fehlt im Image') : e); });
+    p.on('close', function (code) {
+      clearTimeout(uhr);
+      if (code !== 0) { nein(new Error('pdftotext RC ' + code + ': ' + String(fehler).slice(0, 120))); return; }
+      ok(Buffer.concat(teile).toString('utf8').slice(0, MAX_TEXT_ZEICHEN));
+    });
+    p.stdin.on('error', function () { /* Prozess beendet, bevor alles geschrieben war */ });
+    p.stdin.end(buffer);
+  });
+}
+/* Getter: ein Modul wird erst geladen, wenn es gebraucht wird (der Pruefer ersetzt sie vorher). */
+const STANDARD = {
+  pdfText: _pdfText,
+  get schwaerzen() { return require('./schwaerzen'); },
+  get dokumentSchemas() { return require('./dokumentSchemas'); },
+  get openai() { return require('./openaiService'); },
+  query: function (t, p) { return require('../db/pool').query(t, p); },
+  stripe: function () { return require('./stripeService').getStripe(); },
+  mbFetch: function (url, init) { return fetch(url, init); },
+  jetzt: function () { return Date.now(); }
+};
+let _deps = null;
+function deps() { return _deps || STANDARD; }
+/** nur fuer tools/einzelcheck-pruefen.mjs */
+function _setzeDeps(d) {
+  _preisCache = null;
+  if (!d) { _deps = null; return; }
+  const o = Object.create(STANDARD);
+  Object.keys(d).forEach(function (k) { Object.defineProperty(o, k, { value: d[k], enumerable: true }); });
+  _deps = o;
+}
+
+/* ── Schalter: nur Staging, bis Marcel abnimmt ───────────────────────── */
+function istStaging() { return /staging/i.test(process.env.APP_URL || process.env.FRONTEND_URL || ''); }
+function aktiv() {
+  const s = String(process.env.EINZELCHECK_AKTIV || '');
+  if (s === '1') return true;
+  if (s === '0') return false;
+  return istStaging();
+}
+
+/* ── Modelle ─────────────────────────────────────────────────────────── */
+/* Kostenlos: gpt-4.1-mini (0,40 $ / 1,60 $ je Mio Token, kiVerbrauch.PREISE_FEST) - kein Denkmodell,
+   fuellt ein festes JSON-Schema ohne Denk-Token; gpt-4o-mini waere billiger, ist aber zum 11.12.2026
+   abgekuendigt (config.js v1329). Gekauft: das normale Modell der App (config.openai.defaultModel). */
+function modellFrei() { return process.env.EINZELCHECK_MODELL_FREI || 'gpt-4.1-mini'; }
+function modellVoll() { return process.env.EINZELCHECK_MODELL_VOLL || require('../config').openai.defaultModel; }
+function tagesdeckelEur() { const n = Number(process.env.EINZELCHECK_TAGESDECKEL_EUR); return Number.isFinite(n) && n >= 0 ? n : 5; }
+
+/* ── Token, Siegel, Frist ────────────────────────────────────────────── */
+function hash(token) { return crypto.createHash('sha256').update(String(token || '')).digest('hex'); }
+function neuesToken() { return crypto.randomBytes(32).toString('base64url'); }
+function tokenForm(t) { return typeof t === 'string' && /^[A-Za-z0-9_-]{40,60}$/.test(t); }
+function _geheim() {
+  const g = process.env.EINZELCHECK_SIEGEL || require('../config').auth.jwtSecret || '';
+  if (!g) throw new Error('einzelcheck: kein Geheimnis fuer das Siegel (JWT_SECRET)');
+  return 'einzelcheck:' + g;
+}
+function _sortiert(o) { const a = {}; Object.keys(o || {}).sort().forEach(function (k) { a[k] = o[k]; }); return a; }
+/* Das Siegel bindet die Zahlen an DIESES Auslesen: beim Kauf schickt der Browser sie zurueck, ohne dass
+   der Server sie zwischen Auslesen und Kauf speichern muss. */
+function siegel(zahlen) { return crypto.createHmac('sha256', _geheim()).update(JSON.stringify(_sortiert(zahlen))).digest('base64url'); }
+function siegelPruefen(zahlen, s) {
+  if (typeof s !== 'string' || !s) return false;
+  const soll = Buffer.from(siegel(zahlen)), ist = Buffer.from(s);
+  return soll.length === ist.length && crypto.timingSafeEqual(soll, ist);
+}
+function gueltigBis(ab) { return new Date((ab == null ? deps().jetzt() : ab) + FRIST_TAGE * 24 * 3600 * 1000); }
+function istGueltig(zeile, jetzt) {
+  if (!zeile || !zeile.gueltig_bis) return false;
+  return new Date(zeile.gueltig_bis).getTime() > (jetzt == null ? deps().jetzt() : jetzt);
+}
+/** Bericht nur mit bezahltem, gueltigem Kauf und unter der Laufgrenze. */
+function berichtErlaubt(zeile, jetzt) {
+  if (!zeile) return { ok: false, code: 'kauf_unbekannt' };
+  if (!istGueltig(zeile, jetzt)) return { ok: false, code: 'kauf_abgelaufen' };
+  if (zeile.status !== 'bezahlt') return { ok: false, code: 'nicht_bezahlt' };
+  if ((Number(zeile.berichte) || 0) >= MAX_BERICHTE) return { ok: false, code: 'berichte_aufgebraucht' };
+  return { ok: true };
+}
+
+/* ── Dateien pruefen (vor jedem Lesen) ───────────────────────────────── */
+function dateiPruefen(d) {
+  if (!d || !Buffer.isBuffer(d.buffer)) return 'keine_datei';
+  if (d.size > MAX_DATEI_BYTES || d.buffer.length > MAX_DATEI_BYTES) return 'zu_gross';
+  if (ERLAUBTE_MIME.indexOf(String(d.mimetype || '')) < 0) return 'kein_pdf';
+  if (d.buffer.slice(0, 5).toString('latin1') !== '%PDF-') return 'kein_pdf';
+  return null;
+}
+function dateiname(d) {
+  /* multer liefert den Namen als latin1 (routes/dateien.js) - fuer Umlaute zurueck nach UTF-8.
+     Der Name dient nur der Erkennung der Art und geht nie in die Datenbank. */
+  let n = String((d && d.originalname) || 'Unterlage.pdf');
+  try { n = Buffer.from(n, 'latin1').toString('utf8'); } catch (e) {}
+  return n.replace(/[^\wÄÖÜäöüß .\-()]/g, '').slice(0, 80) || 'Unterlage.pdf';
+}
+
+/* ── Zahlen: die EINE Weissliste ─────────────────────────────────────── */
+const ZAHL_GRENZEN = {
+  kp: [1000, 1e9], wfl: [5, 1e6], nkm: [0, 1e7], ze: [0, 1e6], gsfl: [1, 1e7], bj: [1500, 2100], zimmer: [0.5, 1000],
+  einheiten: [1, 10000], nk_pct: [0, 30], makler_pct: [0, 15], hausgeld_monat: [0, 1e6], bwk_nul_jahr: [0, 1e7],
+  ruecklage_zuf_jahr: [0, 1e7], ruecklage_stand: [0, 1e9], sonderumlage_eur: [0, 1e8], sonderumlagen_anzahl: [0, 100],
+  endenergie: [0, 1000], bj_heizung: [1900, 2100], leer_einheiten: [0, 10000], nkm_liste: [0, 1e7], wfl_liste: [1, 1e6],
+  risiken_hoch: [0, 100], risiken_mittel: [0, 100], unterlagen: [0, VOLL_MAX_UNTERLAGEN]
+};
+const TEXT_REGELN = {
+  plz: /^\d{5}$/,
+  ort: /^[A-Za-zÄÖÜäöüß][A-Za-zÄÖÜäöüß .\-()/]{1,59}$/,
+  art: /^(ETW|EFH|ZFH|DHH|RH|MFH|GEW)$/,
+  ek_klasse: /^(A\+|A|B|C|D|E|F|G|H)$/,
+  zustand: /^(neubau|erstbezug|saniert|renoviert|modernisiert|renovierungsbeduerftig)$/
+};
+function _zahl(v) {
+  if (v === null || v === undefined || v === '' || typeof v === 'boolean') return null;
+  const n = typeof v === 'number' ? v : Number(String(v).replace(/\s|€|%/g, '').replace(/\.(?=\d{3}(\D|$))/g, '').replace(',', '.'));
+  return Number.isFinite(n) ? n : null;
+}
+/** Nur Zahlen aus der Liste oben und fuenf Merkmale nach Regel - alles andere faellt weg (auch Namen). */
+function zahlenSauber(z) {
+  const aus = {};
+  if (!z || typeof z !== 'object') return aus;
+  Object.keys(ZAHL_GRENZEN).forEach(function (k) {
+    const n = _zahl(z[k]); const g = ZAHL_GRENZEN[k];
+    if (n != null && n >= g[0] && n <= g[1]) aus[k] = Math.round(n * 100) / 100;
+  });
+  Object.keys(TEXT_REGELN).forEach(function (k) {
+    if (typeof z[k] === 'string' && TEXT_REGELN[k].test(z[k].trim())) aus[k] = z[k].trim();
+  });
+  return aus;
+}
+
+function _artAus(t) {
+  const s = String(t || '').toLowerCase();
+  if (/eigentumswohnung|^wohnung|etw/.test(s)) return 'ETW';
+  if (/mehrfamilien|mfh/.test(s)) return 'MFH';
+  if (/doppelhaus|dhh/.test(s)) return 'DHH';
+  if (/reihenhaus/.test(s)) return 'RH';
+  if (/zweifamilien/.test(s)) return 'ZFH';
+  if (/einfamilien|efh/.test(s)) return 'EFH';
+  if (/gewerbe/.test(s)) return 'GEW';
+  return null;
+}
+function _zustandAus(t) {
+  const s = String(t || '').toLowerCase().replace('ü', 'ue');
+  const m = /(neubau|erstbezug|saniert|renoviert|modernisiert|renovierungsbeduerftig)/.exec(s);
+  return m ? m[1] : null;
+}
+function _summe(liste, feld) {
+  return (Array.isArray(liste) ? liste : []).reduce(function (a, x) { const n = _zahl(x && x[feld]); return a + (n > 0 ? n : 0); }, 0);
+}
+
+/** Aus den Antworten der Auslese die Zahlen ziehen. Reihenfolge der Quellen: Mietaufstellung vor Exposé
+ *  fuer die Miete (Ist statt Angabe im Inserat), Wirtschaftsplan fuer nicht umlagefaehige Kosten. */
+function zahlenAus(ergebnisse) {
+  const z = {}; let risHoch = 0, risMittel = 0;
+  const setze = function (k, v) { const n = _zahl(v); if (n != null && z[k] == null) z[k] = n; };
+  const liste = (Array.isArray(ergebnisse) ? ergebnisse : []).filter(function (e) { return e && e.ok && e.extracted; });
+  const nach = function (typ) { return liste.filter(function (e) { return e.typ === typ; }); };
+  nach('mietaufstellung').forEach(function (e) {
+    const x = e.extracted, eh = Array.isArray(x.einheiten) ? x.einheiten : [];
+    setze('nkm_liste', x.summe_kaltmiete_monat_eur != null ? x.summe_kaltmiete_monat_eur : _summe(eh, 'kaltmiete_eur'));
+    setze('wfl_liste', x.summe_wfl_m2 != null ? x.summe_wfl_m2 : _summe(eh, 'wfl_m2'));
+    if (eh.length) {
+      setze('einheiten', eh.filter(function (u) { return !u || !/stellplatz|garage|keller/.test(String(u.nutzung || '')); }).length || eh.length);
+      setze('leer_einheiten', eh.filter(function (u) { return u && !(_zahl(u.kaltmiete_eur) > 0) && !/stellplatz|garage|keller/.test(String(u.nutzung || '')); }).length);
+    }
+  });
+  nach('expose').forEach(function (e) {
+    const x = e.extracted;
+    setze('kp', x.kaufpreis); setze('wfl', x.wohnflaeche); setze('nkm', x.nettokaltmiete); setze('gsfl', x.grundstuecksflaeche);
+    setze('bj', x.baujahr); setze('zimmer', x.zimmer); setze('einheiten', x.wohneinheiten); setze('nk_pct', x.kaufnebenkosten);
+    setze('makler_pct', x.kaeuferprovision_pct); setze('hausgeld_monat', x.hausgeld); setze('endenergie', x.energieverbrauch);
+    const ze = (_zahl(x.stellplatz_miete_monat) || 0) + (_zahl(x.kueche_miete_monat) || 0) + (_zahl(x.zusatz_miete_monat) || 0);
+    if (ze > 0) setze('ze', ze);
+    if (!z.plz && typeof x.plz === 'string') z.plz = x.plz.trim();
+    if (!z.ort && typeof x.ort === 'string') z.ort = x.ort.trim();
+    if (!z.art) z.art = _artAus(x.objektart);
+    if (!z.ek_klasse && x.energieklasse) z.ek_klasse = String(x.energieklasse).toUpperCase();
+    if (!z.zustand) z.zustand = _zustandAus(x.zustand);
+  });
+  nach('hausgeld').forEach(function (e) {
+    const ein = e.extracted.einzel || {};
+    setze('hausgeld_monat', ein.hausgeld_monat_eur); setze('bwk_nul_jahr', ein.nicht_umlagefaehig_jahr_eur);
+    setze('ruecklage_zuf_jahr', ein.ruecklage_zufuehrung_jahr_eur); setze('ruecklage_stand', e.extracted.ruecklage_stand_eur);
+  });
+  nach('weg_protokoll').forEach(function (e) {
+    const x = e.extracted;
+    setze('ruecklage_stand', x.ruecklage_stand_eur != null ? x.ruecklage_stand_eur : x.instandhaltungsruecklage_eur);
+    const su = (Array.isArray(x.sonderumlagen_geplant) ? x.sonderumlagen_geplant : []).filter(function (s) { return s && s.status === 'beschlossen'; });
+    if (su.length) { setze('sonderumlagen_anzahl', su.length); setze('sonderumlage_eur', _summe(su, 'betrag_einheit_eur') || null); }
+  });
+  nach('energieausweis').forEach(function (e) {
+    const x = e.extracted;
+    if (!z.ek_klasse && x.energieeffizienzklasse) z.ek_klasse = String(x.energieeffizienzklasse).toUpperCase().replace(/\s/g, '');
+    setze('endenergie', x.endenergie_kwh_m2a); setze('bj', x.baujahr_gebaeude); setze('bj_heizung', x.baujahr_waermeerzeuger);
+    setze('einheiten', x.anzahl_wohnungen);
+  });
+  liste.forEach(function (e) {
+    (Array.isArray(e.extracted.risiken) ? e.extracted.risiken : []).forEach(function (r) {
+      if (r && r.schwere === 'hoch') risHoch++; else if (r && r.schwere === 'mittel') risMittel++;
+    });
+  });
+  /* Die Ist-Miete der Mietaufstellung schlaegt die Angabe im Exposé */
+  if (z.nkm_liste > 0) z.nkm = z.nkm_liste;
+  if (!(z.wfl > 0) && z.wfl_liste > 0) z.wfl = z.wfl_liste;
+  if (risHoch) z.risiken_hoch = risHoch;
+  if (risMittel) z.risiken_mittel = risMittel;
+  z.unterlagen = liste.length;
+  return zahlenSauber(z);
+}
+
+/* Was der Bericht aus einer Unterlage zeigen darf: Art, ob gelesen, Risiken als kurze Saetze.
+   Texte laufen noch einmal durch schwaerzen.js (die KI sah nur geschwaerzten Text, aber sicher ist sicher)
+   und werden gekuerzt. Nichts davon wird gespeichert. */
+function _kurz(t, n) { return String(t == null ? '' : t).replace(/\s+/g, ' ').trim().slice(0, n); }
+function anzeigeAus(e) {
+  const sw = deps().schwaerzen;
+  const s = function (t, n) { return _kurz(sw.schwaerze(_kurz(t, 400)).text, n); };
+  const aus = { name: e.name, art: ART_NAME[e.typ] || 'Unterlage', typ: e.typ || null, gelesen: !!e.ok, grund: e.ok ? null : (e.grund || 'nicht_lesbar'),
+    geschwaerzt: e.geschwaerzt || 0, risiken: [], kernpunkte: [] };
+  if (e.ok && e.extracted) {
+    (Array.isArray(e.extracted.risiken) ? e.extracted.risiken : []).slice(0, 6).forEach(function (r) {
+      if (r && r.titel) aus.risiken.push({ titel: s(r.titel, 90), beschreibung: s(r.beschreibung, 260), schwere: /^(hoch|mittel|niedrig)$/.test(r.schwere) ? r.schwere : 'mittel' });
+    });
+    (Array.isArray(e.extracted.kernpunkte) ? e.extracted.kernpunkte : []).slice(0, 5).forEach(function (k) { aus.kernpunkte.push(s(k, 220)); });
+  }
+  return aus;
+}
+
+/* ── Eine Unterlage lesen ────────────────────────────────────────────── */
+async function leseEine(datei, modell) {
+  const d = deps();
+  const name = dateiname(datei);
+  const fehler = dateiPruefen(datei);
+  if (fehler) return { name, ok: false, grund: fehler };
+  let roh;
+  try { roh = await d.pdfText(datei.buffer); } catch (e) { return { name, ok: false, grund: 'nicht_lesbar' }; }
+  if (!roh || roh.replace(/\s+/g, '').length < 80) return { name, ok: false, grund: 'kein_text' };   /* gescannt, ohne Textebene */
+  /* 2 · ERST schwaerzen, DANN klassifizieren und an die KI */
+  const sw = d.schwaerzen.schwaerze(roh);
+  const text = sw.text;
+  roh = null;
+  const erk = d.dokumentSchemas.klassifiziere(text, name) || {};
+  if (erk.typ === 'mieter_unterlagen') return { name, ok: false, grund: 'mieter_unterlagen', geschwaerzt: sw.gesamt };
+  const typ = DOKUMENT_ARTEN.indexOf(erk.typ) >= 0 ? erk.typ : 'expose';
+  let r;
+  try {
+    r = typ === 'expose'
+      ? await d.openai.extractExpose(text, { model: modell })
+      : await d.openai.extractDokument(text, typ, { model: modell });
+  } catch (e) {
+    if (e && e.code === 'NO_API_KEY') throw e;
+    return { name, typ, ok: false, grund: 'ki_fehler', geschwaerzt: sw.gesamt };
+  }
+  if (!r || !r.success) return { name, typ, ok: false, grund: 'ki_unlesbar', geschwaerzt: sw.gesamt };
+  return { name, typ, ok: true, extracted: r.extracted || {}, modell: r.model || modell, geschwaerzt: sw.gesamt };
+}
+
+/** Mehrere Unterlagen lesen. modus 'frei': hoechstens FREI_MAX_UNTERLAGEN, guenstiges Modell.
+ *  Die uebrigen Dateien werden NICHT angefasst (kein pdftotext, kein KI-Aufruf). */
+async function auslesen(dateien, modus) {
+  const voll = modus === 'voll';
+  const max = voll ? VOLL_MAX_UNTERLAGEN : FREI_MAX_UNTERLAGEN;
+  const modell = voll ? modellVoll() : modellFrei();
+  const alle = Array.isArray(dateien) ? dateien.slice(0, VOLL_MAX_UNTERLAGEN) : [];
+  const zuLesen = alle.slice(0, max);
+  const ergebnisse = [];
+  for (const f of zuLesen) ergebnisse.push(await leseEine(f, modell));
+  const zahlen = zahlenAus(ergebnisse);
+  const out = {
+    modus: voll ? 'voll' : 'frei', modell: modell,
+    zahlen: zahlen,
+    unterlagen: ergebnisse.map(anzeigeAus),
+    nicht_gelesen: alle.slice(max).map(function (f) { return { name: dateiname(f), grund: 'im_bericht' }; })
+  };
+  /* Die Anschrift nur im gekauften Lauf und nur fuer den Marktbericht-Dienst: nicht aufzaehlbar,
+     damit sie in keiner JSON-Antwort und in keinem Speicherweg landet. */
+  if (voll) Object.defineProperty(out, '_adresse', { value: adresseAus(ergebnisse), enumerable: false });
+  return out;
+}
+
+/* ── Tagesdeckel fuer den kostenlosen Teil (alle Besucher zusammen) ───── */
+async function tagesverbrauchEur() {
+  const r = await deps().query(
+    "SELECT COALESCE(SUM(eur),0) AS eur FROM ki_verbrauch WHERE endpunkt = 'public/einzelcheck/auslesen'" +
+    " AND ts >= (date_trunc('day', now() AT TIME ZONE 'Europe/Berlin') AT TIME ZONE 'Europe/Berlin')", []);
+  return Number((r.rows[0] || {}).eur) || 0;
+}
+async function freiMoeglich() {
+  try { const v = await tagesverbrauchEur(); return { ok: v < tagesdeckelEur(), verbraucht_eur: v, deckel_eur: tagesdeckelEur() }; }
+  catch (e) { return { ok: true, verbraucht_eur: null, deckel_eur: tagesdeckelEur() }; }   /* DB weg: wie kiVerbrauch fail-soft */
+}
+
+/* ── Preis aus Stripe (lookup_key), nie aus dem Code ─────────────────── */
+let _preisCache = null;
+async function preis(force) {
+  if (!force && _preisCache && (deps().jetzt() - _preisCache.t) < 10 * 60 * 1000) return _preisCache.p;
+  const stripe = deps().stripe();
+  const res = await stripe.prices.list({ lookup_keys: [LOOKUP_KEY], active: true, limit: 1, expand: ['data.product'] });
+  const p = (res && res.data && res.data[0]) || null;
+  if (!p || !(p.unit_amount > 0) || p.type !== 'one_time') {
+    const e = new Error('Preis ' + LOOKUP_KEY + ' fehlt oder ist kein Einmalpreis'); e.code = 'preis_fehlt'; throw e;
+  }
+  const out = { price_id: p.id, amount_cents: p.unit_amount, currency: p.currency, lookup_key: p.lookup_key,
+    produkt: (p.product && typeof p.product === 'object' && p.product.name) || 'Einzel-Check' };
+  _preisCache = { t: deps().jetzt(), p: out };
+  return out;
+}
+
+/* ── Kauf anlegen, Checkout ──────────────────────────────────────────── */
+function landingBasis() {
+  if (process.env.LANDING_URL) return String(process.env.LANDING_URL).replace(/\/+$/, '');
+  const app = String(process.env.APP_URL || process.env.FRONTEND_URL || 'https://app.dealpilot.immo').replace(/\/+$/, '');
+  return app.replace(/^(https?:\/\/)app\./i, '$1');
+}
+async function kaufAnlegen({ zahlen, siegelWert }) {
+  const d = deps();
+  const z = zahlenSauber(zahlen);
+  /* Ohne Zahlen (kostenloses Auslesen ging schief) gibt es nichts zu besiegeln - der Bericht liest dann alles neu */
+  if (Object.keys(z).length && !siegelPruefen(z, siegelWert)) {
+    const e = new Error('Die Daten stammen nicht aus diesem Auslesen. Bitte noch einmal auslesen.'); e.code = 'siegel'; e.status = 400; throw e;
+  }
+  const p = await preis(false);
+  const token = neuesToken();
+  const jetzt = d.jetzt();
+  const bis = gueltigBis(jetzt);
+  const ins = await d.query(
+    'INSERT INTO einzelcheck_kaeufe (token_hash, status, zahlen, amount_cents, currency, erstellt_am, gueltig_bis)' +
+    " VALUES ($1, 'offen', $2, $3, $4, $5, $6) RETURNING id",
+    [hash(token), JSON.stringify(z), p.amount_cents, p.currency, new Date(jetzt), bis]);
+  const kaufId = ins.rows[0].id;
+  const basis = landingBasis();
+  const meta = { type: 'einzelcheck', kauf_id: String(kaufId), lookup_key: LOOKUP_KEY };
+  const session = await d.stripe().checkout.sessions.create({
+    mode: 'payment',
+    payment_method_types: ['card'],
+    line_items: [{ price: p.price_id, quantity: 1 }],
+    /* wie die Einzelkaeufe (credits.js v2248): Rechnung statt Beleg, Anschrift als Pflichtangabe */
+    billing_address_collection: 'required',
+    invoice_creation: { enabled: true, invoice_data: { metadata: { einzelcheck: String(kaufId) } } },
+    automatic_tax: { enabled: false },   /* Kleinunternehmer § 19 UStG */
+    client_reference_id: String(kaufId),
+    metadata: meta,
+    payment_intent_data: { metadata: meta },
+    /* Das Token steht im FRAGMENT - es geht an keinen Server, auch nicht an Stripe zurueck */
+    success_url: basis + '/?einzelcheck=bezahlt#ec=' + token,
+    cancel_url: basis + '/?einzelcheck=abbruch#ec=' + token,
+    expires_at: Math.floor(jetzt / 1000) + 60 * 60,
+    locale: 'de'
+  });
+  await d.query('UPDATE einzelcheck_kaeufe SET stripe_session_id = $1 WHERE id = $2', [session.id, kaufId]);
+  return { token, url: session.url, kauf_id: kaufId, gueltig_bis: bis.toISOString(), amount_cents: p.amount_cents, currency: p.currency };
+}
+
+async function kaufLesen(token) {
+  if (!tokenForm(token)) return null;
+  const r = await deps().query('SELECT * FROM einzelcheck_kaeufe WHERE token_hash = $1', [hash(token)]);
+  return r.rows[0] || null;
+}
+
+/* Fuer Browser und Erfolgsseite: was der Kauf kann. Zahlen nur, solange gueltig. */
+function statusAus(z, jetzt) {
+  if (!z) return { status: 'unbekannt' };
+  const g = istGueltig(z, jetzt);
+  return {
+    status: g ? z.status : 'abgelaufen', bezahlt: z.status === 'bezahlt' && g, gueltig_bis: z.gueltig_bis,
+    berichte_rest: Math.max(0, MAX_BERICHTE - (Number(z.berichte) || 0)),
+    anrechnung: (z.status === 'bezahlt' && g && z.anrechnung_code) ? { code: z.anrechnung_code, cents: z.amount_cents, bis: z.gueltig_bis } : null,
+    zahlen: g ? zahlenSauber(z.zahlen || {}) : null
+  };
+}
+
+async function berichtGezaehlt(id, zahlen) {
+  await deps().query('UPDATE einzelcheck_kaeufe SET berichte = berichte + 1, zahlen = $2 WHERE id = $1', [id, JSON.stringify(zahlenSauber(zahlen))]);
+}
+
+/* ── Webhook: checkout.session.completed mit metadata.type = 'einzelcheck' ──
+   Muster bewertungWebhook.js: nur bezahlt, Menge/Preis aus den LINE ITEMS (der Preis in Stripe ist die
+   Quelle), Anspruch atomar und nur einmal. Ein fremder Preis schaltet nichts frei. */
+async function handleEinzelcheckPaid(session) {
+  const d = deps();
+  if (!session || session.mode !== 'payment') return { ok: false, reason: 'not_payment_mode' };
+  if (!session.metadata || session.metadata.type !== 'einzelcheck') return { ok: false, reason: 'not_einzelcheck' };
+  if (session.payment_status && session.payment_status !== 'paid') return { ok: false, reason: 'nicht_bezahlt:' + session.payment_status };
+  const stripe = d.stripe();
+  const items = await stripe.checkout.sessions.listLineItems(session.id, { limit: 10, expand: ['data.price'] });
+  const passt = (items.data || []).some(function (it) { return it && it.price && it.price.lookup_key === LOOKUP_KEY; });
+  if (!passt) { console.error('[einzelcheck-webhook] Sitzung ohne Preis ' + LOOKUP_KEY + ':', session.id); return { ok: false, reason: 'fremder_preis' }; }
+
+  const claim = await d.query(
+    "UPDATE einzelcheck_kaeufe SET status = 'bezahlt', bezahlt_am = now(), stripe_payment_intent = COALESCE($1, stripe_payment_intent)" +
+    " WHERE stripe_session_id = $2 AND status = 'offen' AND gueltig_bis > now() RETURNING id, gueltig_bis, amount_cents",
+    [session.payment_intent || null, session.id]);
+  if (!claim.rowCount) {
+    const da = await d.query('SELECT status FROM einzelcheck_kaeufe WHERE stripe_session_id = $1', [session.id]);
+    if (da.rowCount && da.rows[0].status === 'bezahlt') return { ok: true, reason: 'already_processed' };
+    console.error('[einzelcheck-webhook] kein offener Kauf zur Sitzung (abgelaufen oder geloescht):', session.id);
+    return { ok: false, reason: 'kein_kauf' };
+  }
+  const k = claim.rows[0];
+  /* Anrechnung: ein eigener Promotion-Code je Kauf auf den festen Coupon, einmal einloesbar, laeuft mit
+     der Frist ab. Fehlt der Coupon im Konto, bleibt der Kauf gueltig - nur ohne Anrechnung (gemeldet). */
+  let code = null;
+  try {
+    code = 'EC' + crypto.randomBytes(5).toString('hex').toUpperCase();
+    const pc = await stripe.promotionCodes.create({
+      coupon: ANRECHNUNG_COUPON, code: code, max_redemptions: 1,
+      expires_at: Math.floor(new Date(k.gueltig_bis).getTime() / 1000),
+      metadata: { dp_kind: 'einzelcheck_anrechnung', kauf_id: String(k.id) }
+    });
+    await d.query('UPDATE einzelcheck_kaeufe SET anrechnung_code = $1, anrechnung_promo_id = $2 WHERE id = $3', [code, pc.id, k.id]);
+  } catch (e) {
+    code = null;
+    console.warn('[einzelcheck-webhook] Anrechnung nicht angelegt (Coupon ' + ANRECHNUNG_COUPON + ' vorhanden?):', e.message);
+  }
+  console.log('[einzelcheck-webhook] bezahlt ' + k.id + (code ? ' · Anrechnung ' + code : ' · ohne Anrechnung'));
+  return { ok: true, kauf_id: k.id, anrechnung: !!code };
+}
+
+/* ── Marktbericht-Dienst: Lage, Markt, Vergleichsmiete, Wertindikation ──
+   Ohne Ablage (mb /reports/einzelcheck -> ReportOrchestrator.generate(…, { ohneAblage: true })).
+   Stufe 3 im Schnellmodus: kein KI-Text, keine Preishistorie, aber Ertrags- und Sachwert, wo das
+   Register sie traegt. */
+const MB_BASE = (process.env.MB_BACKEND_URL || 'http://mb-backend:4000/api/v1/marktbericht').replace(/\/+$/, '');
+const _QUELLEN_NAMEN = /immo\s*scout|immobilienscout|immowelt|kleinanzeigen|geomap|pricehubble|sprengnetter|on-geo|21st/i;
+function _ohneQuelle(t) { return (typeof t === 'string' && !_QUELLEN_NAMEN.test(t)) ? t : null; }
+function _n(v) { const n = Number(v); return (v === null || v === undefined || v === '' || !Number.isFinite(n)) ? null : n; }
+function marktAus(out) {
+  const p = (out && out.data) || {};
+  const v = p.valuation || {}, mv = v.market_value || {}, cc = p.cross_check || {}, ew = cc.ertragswert || {}, sw = cc.sachwert || {};
+  const wh = p.wertermittlung_herkunft || {};
+  return {
+    lage: { mikro: _n(p.micro && p.micro.score), makro: _n(p.macro && p.macro.score),
+      ort: _ohneQuelle(p.address && p.address.city) || null, plz: (p.address && /^\d{5}$/.test(String(p.address.postcode || ''))) ? String(p.address.postcode) : null,
+      ags: (p.ref && /^\d{8}$/.test(String(p.ref.ags || ''))) ? String(p.ref.ags) : null,   /* Gemeindeschluessel fuer Kappung/Bremse */
+      bevoelkerung_trend_pct: _n(p.bevoelkerung_trend_pct) },
+    markt: { wert: _n(mv.estimated), wert_von: _n(mv.low), wert_bis: _n(mv.high), qm: _n(mv.basis_median_sqm),
+      miete_qm: _n(v.inputs && v.inputs.market_rent_sqm), brutto_pct: _n(v.yield && v.yield.gross_yield_pct) },
+    vergleichsmiete: { qm: _n(ew.miete_vergleich_qm), stufe: _ohneQuelle(ew.miete_stufe && ew.miete_stufe.etikett) },
+    wert: {
+      ertragswert: ew.available ? _n(ew.value_eur) : null, ertragswert_grund: ew.available ? null : _ohneQuelle(ew.grund),
+      sachwert: sw.available ? _n(sw.value_eur) : null, sachwert_grund: sw.available ? null : _ohneQuelle(sw.grund),
+      liegenschaftszins_pct: _n(ew.liegenschaftszins_pct), zins_herkunft: _ohneQuelle(wh.kurz), zins_indikativ: wh.indikativ === true,
+      zins_weg: _ohneQuelle(wh.ertragswert_hinweis),
+      ausschuss_link: (wh.quelle_link && /^https:\/\//.test(String(wh.quelle_link.url || ''))) ? { name: _ohneQuelle(wh.quelle_link.name), url: String(wh.quelle_link.url) } : null,
+      bodenrichtwert_qm: _n(p.land_value && p.land_value.value_sqm)
+    },
+    stichtag: typeof p.wertermittlungsstichtag === 'string' ? p.wertermittlungsstichtag.slice(0, 10) : null
+  };
+}
+function mbEingabe(zahlen, adresse) {
+  const z = zahlenSauber(zahlen);
+  const ort = [z.plz, z.ort].filter(Boolean).join(' ');
+  const adr = (typeof adresse === 'string' && adresse.trim().length >= 5) ? adresse.trim().slice(0, 160) : ort;
+  return { address: adr, wert_stufe: 3, fast: true,
+    dealpilot: { plz: z.plz || '', ort: z.ort || '', objart: z.art || '', wfl: z.wfl || null, baujahr: z.bj || null, kp: z.kp || null,
+      nkm: z.nkm || null, gsfl: z.gsfl || null, einheiten: z.einheiten || null, zimmer: z.zimmer || null, energieklasse: z.ek_klasse || null } };
+}
+async function markt(zahlen, adresse) {
+  const z = zahlenSauber(zahlen);
+  if (!z.plz && !(typeof adresse === 'string' && /\b\d{5}\b/.test(adresse))) return { verfuegbar: false, grund: 'ohne_ort' };
+  try {
+    const r = await deps().mbFetch(MB_BASE + '/reports/einzelcheck', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(mbEingabe(z, adresse)) });
+    const t = await r.text();
+    let j = null; try { j = JSON.parse(t); } catch (e) { j = null; }
+    if (!r.ok || !j) return { verfuegbar: false, grund: 'dienst' };
+    return Object.assign({ verfuegbar: true }, marktAus(j));
+  } catch (e) { return { verfuegbar: false, grund: 'dienst' }; }
+}
+
+/* Adresse aus dem Exposé: nur fuer den Marktbericht-Dienst, nie gespeichert, nie in zahlen. */
+function adresseAus(ergebnisse) {
+  const e = (ergebnisse || []).find(function (x) { return x && x.ok && x.typ === 'expose' && x.extracted && typeof x.extracted.adresse === 'string'; });
+  return e ? e.extracted.adresse : null;
+}
+
+/* ── Takt: abgelaufene Kaeufe loeschen ───────────────────────────────── */
+async function aufraeumen() {
+  const r = await deps().query('DELETE FROM einzelcheck_kaeufe WHERE gueltig_bis < now()', []);
+  return r.rowCount || 0;
+}
+function starteTakt() {
+  const _ts = require('../utils/taktSperre');
+  const _einzelcheckLoeschen = _ts.takt('einzelcheckLoeschen', function () {
+    return aufraeumen().then(function (n) { if (n) console.log('[einzelcheck] ' + n + ' abgelaufene Käufe gelöscht'); })
+      .catch(function (e) { console.error('[einzelcheck] Löschen fehlgeschlagen:', e.message); });
+  });
+  setTimeout(_einzelcheckLoeschen, 4 * 60 * 1000);
+  setInterval(_einzelcheckLoeschen, 6 * 60 * 60 * 1000);
+}
+
+module.exports = {
+  VERSION, LOOKUP_KEY, ANRECHNUNG_COUPON, FRIST_TAGE, FREI_MAX_UNTERLAGEN, VOLL_MAX_UNTERLAGEN, MAX_DATEI_BYTES, MAX_BERICHTE,
+  ERLAUBTE_MIME, ZAHL_GRENZEN,
+  aktiv, istStaging, modellFrei, modellVoll, tagesdeckelEur,
+  hash, neuesToken, tokenForm, siegel, siegelPruefen, gueltigBis, istGueltig, berichtErlaubt,
+  dateiPruefen, dateiname, zahlenSauber, zahlenAus, anzeigeAus, leseEine, auslesen,
+  freiMoeglich, tagesverbrauchEur, preis, landingBasis, kaufAnlegen, kaufLesen, statusAus, berichtGezaehlt,
+  handleEinzelcheckPaid, marktAus, mbEingabe, markt, adresseAus, aufraeumen, starteTakt,
+  _setzeDeps, _pdfText
+};

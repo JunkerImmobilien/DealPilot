@@ -38,7 +38,8 @@ const DOKUMENTE = [
   'frontend/messkabine.html',
   'frontend/landing/index.html',
   'frontend/messe-studio.html'   /* v2235 · Messe-Studio laedt whitelabel-override */,
-  'frontend/landing/dealcheck-laden.js'   /* landing-seo-3 · Lader des Deal-Checks (Startseite und Rechner-Seiten) */
+  'frontend/landing/dealcheck-laden.js',   /* landing-seo-3 · Lader des Deal-Checks (Startseite und Rechner-Seiten) */
+  'frontend/landing/einzelcheck.js'        /* v3940 · Einzel-Check laedt dp-dokument, mietpotenzial-kern, dealscore2 vom App-Host */
 ].filter(function (p) { return fs.existsSync(path.join(process.cwd(), p)); });
 
 /* Je Dokument: welche js-Datei mit welchem Buster? */

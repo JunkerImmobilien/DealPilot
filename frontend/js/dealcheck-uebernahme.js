@@ -53,6 +53,13 @@
         /* v3932 · landing-faecher-1: Tilgung und Zinsbindung aus dem Deal-Check (vorher fest 1,5 % und Bindung leer) */
         tilg: grenze(p.get('tilg'), 0, 10),
         bind: grenze(p.get('bind'), 1, 40),
+        /* v3940 · Einzel-Check der Landing: was die Unterlagen hergaben (nur Zahlen und Ort, keine Anschrift, kein Name) */
+        wfl: grenze(p.get('wfl'), 5, 100000),
+        bj: grenze(p.get('bj'), 1500, 2100),
+        bwkj: grenze(p.get('bwkj'), 0, 10000000),
+        plz: /^\d{5}$/.test(p.get('plz') || '') ? p.get('plz') : null,
+        ort: /^[A-Za-zÄÖÜäöüß][A-Za-zÄÖÜäöüß .\-()/]{1,59}$/.test(p.get('ort') || '') ? p.get('ort') : null,
+        art: /^(ETW|EFH|ZFH|DHH|RH|MFH)$/.test(p.get('art') || '') ? p.get('art') : null,
         t: Date.now()
       };
       if (w.kp != null && w.nkm != null) localStorage.setItem(KEY, JSON.stringify(w));
@@ -205,6 +212,12 @@
       setze('nkm', String(Math.round(w.nkm)));
       setze('ze', String(w.ze > 0 ? Math.round(w.ze) : 0));   /* v3890 */
       setze('ek', String(Math.round(ek)));
+      /* v3940 · aus dem Einzel-Check: Wohnfläche, Baujahr, PLZ, Ort, Objektart (Straße bleibt leer) */
+      if (w.wfl != null) setze('wfl', dez(w.wfl, 0));
+      if (w.bj != null) setze('baujahr', String(Math.round(w.bj)));
+      if (w.plz) setze('plz', w.plz);
+      if (w.ort) setze('ort', w.ort);
+      if (w.art) { var oa = document.getElementById('objart'); if (oa) { oa.value = w.art; try { oa.dispatchEvent(new Event('change', { bubbles: true })); } catch (e) {} } }
 
       /* Nebenkosten: die Landing kennt nur den Gesamtsatz. Die fünf Sätze des
          neuen Objekts (aus den Einstellungen) werden anteilig auf diesen Satz
@@ -230,15 +243,19 @@
       if (typeof window.switchBwkMode === 'function') window.switchBwkMode('percent');
       else window._bwkMode = 'percent';
       window._bwkPctMode = 'nkm';
-      setze('bwk_nul_pct', '16');
+      /* v3940 · mit nicht umlagefähigen Kosten aus dem Wirtschaftsplan (Einzel-Check): deren Anteil an der Jahreskaltmiete, ohne Leerstand-Pauschale */
+      var mitBwk = w.bwkj != null && w.nkm > 0;
+      setze('bwk_nul_pct', mitBwk ? dez(w.bwkj / (w.nkm * 12) * 100, 2) : '16');
       setze('bwk_ul_pct', '0');
-      setze('leerstand', '1');
+      setze('leerstand', mitBwk ? '0' : '1');
       ['san', 'moebl', 'umlagef'].forEach(function (id) { setze(id, '0'); });
 
       setze('notizen', 'Aus dem Deal-Check der Startseite übernommen am ' + datum() + new Date().getFullYear()
         + ': Kaufpreis ' + eur(w.kp) + ', Nettokaltmiete ' + eur(w.nkm) + ' im Monat, Eigenkapital ' + eur(ek)
         + ', Zins ' + dez(zins, 2) + ' %' + (w.bind != null ? ' (' + Math.round(w.bind) + ' Jahre Zinsbindung)' : '') + ', Tilgung ' + dez(tilg, 2) + ' %, Nebenkosten pauschal ' + dez(nkPct, 0) + ' %, '
-        + 'nicht umlagefähige Kosten 16 % der Kaltmiete und 1 % Leerstand. Adresse, Objektart, Wohnfläche und Hausgeld fehlen noch.');
+        + (mitBwk ? 'nicht umlagefähige Kosten ' + eur(w.bwkj) + ' im Jahr aus dem Wirtschaftsplan. ' : 'nicht umlagefähige Kosten 16 % der Kaltmiete und 1 % Leerstand. ')
+        + (w.wfl != null || w.plz ? 'Aus dem Einzel-Check: ' + [w.wfl != null ? dez(w.wfl, 0) + ' m²' : '', w.bj != null ? 'Baujahr ' + Math.round(w.bj) : '', [w.plz, w.ort].filter(Boolean).join(' ')].filter(Boolean).join(', ') + '. Straße und Hausnummer fehlen noch.'
+          : 'Adresse, Objektart, Wohnfläche und Hausgeld fehlen noch.'));
 
       /* v3313a · calc() ist entprellt (300 ms): nach den Eingabe-Ereignissen oben lief
          er nur verzögert, und saveObj stempelte Kennzahlen 0 (gemessen 11.11.2026:

@@ -3,7 +3,8 @@ import { GeoapifyConnector } from '../connectors/GeoapifyConnector.js';
 import { q, q1 } from '../lib/db.js';
 
 export const GeocodingService = {
-  async geocode(address) {
+  /* v3940 · opts.ohneAblage: Cache lesen ja, aber keine neue Zeile in mb.addresses (Einzel-Check ohne Konto) */
+  async geocode(address, opts) {
     // Cache-Treffer?
     const cached = await q1(
       'SELECT * FROM mb.addresses WHERE raw = $1 AND lat IS NOT NULL ORDER BY id DESC LIMIT 1',
@@ -24,6 +25,7 @@ export const GeocodingService = {
 
     const g = await GeoapifyConnector.geocode(address);
     if (!g) return null;
+    if (opts && opts.ohneAblage) return { ...g, cached: false, address_id: null };
 
     const row = await q1(
       `INSERT INTO mb.addresses (raw,street,house_number,postcode,city,district,state,country,lat,lon,geom,geocoder,geocode_conf)

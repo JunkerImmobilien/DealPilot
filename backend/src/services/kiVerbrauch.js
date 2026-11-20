@@ -160,7 +160,8 @@ function vorgangAktuell() { const s = _store(); return s ? { vorgang: s.vorgang,
 const GRUPPEN = {
   analyse:   [/^ai\/analyze$/, /offerte/],
   recherche: [/^ai\/(lage|ds2-suggest|qc-suggest|bodenrichtwert|bmf-gaa|enrich-market-fields|quickcheck-analyse)$/, /^unterlagen\//],
-  dokument:  [/^ai\/(extract-(expose|paket|dokument|rndg|market-data|beleg|zustand-bilder)|seiten-lesen|dokumente-auswerten)$/]
+  dokument:  [/^ai\/(extract-(expose|paket|dokument|rndg|market-data|beleg|zustand-bilder)|seiten-lesen|dokumente-auswerten)$/,
+              /^public\/einzelcheck\/(auslesen|bericht)$/]   /* v3940 · ohne Konto: kein Monatsdeckel je Nutzer, Tagesdeckel in services/einzelcheck.js */
 };
 const GRUPPEN_NAME = { analyse: 'Deal-Analysen', recherche: 'KI-Recherchen', dokument: 'Dokument-Auswertungen' };
 function gruppeAus(endpunkt) {

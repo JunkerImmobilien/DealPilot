@@ -33,7 +33,8 @@ const SCHLUESSEL = Object.freeze({
   plansSync: 7,          // Stripe-Preis-IDs gegen lookup_keys (einmal beim Start)
   partnerFristen: 8,     // v3931 · Partner-Fristen nach Platzentzug + Loeschfristen Partner-Cockpit (index.js, täglich).
                          // Fehlte seit v3357: takt('partnerFristen') warf bei JEDEM Lauf „unbekannter Takt" - nie gelaufen.
-  landingZahlen: 9       // v3930 · Datenumfang der Landing neu messen (services/datenumfang.js, täglich)
+  landingZahlen: 9,      // v3930 · Datenumfang der Landing neu messen (services/datenumfang.js, täglich)
+  einzelcheckLoeschen: 10 // v3940 · Einzel-Check: abgelaufene Käufe löschen (services/einzelcheck.js, alle 6 h)
 });
 
 function _log(t) { console.log('[takt-sperre] ' + t); }

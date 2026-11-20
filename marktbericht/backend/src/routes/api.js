@@ -482,6 +482,23 @@ router.post('/reports/generate', async (req, res) => {
   }
 });
 
+/* v3940 · POST /reports/einzelcheck — Einzel-Check der Landing (Besucher ohne Konto, nur vom
+   Haupt-Backend: services/einzelcheck.js). Derselbe Rechenweg wie /reports/generate, aber
+   OHNE ABLAGE: kein Eintrag in mb.addresses/properties/market_reports/object_snapshots, kein
+   saveFixture, keine Anschrift im Protokoll. Die Stufe kommt aus dem Aufruf (3, Schnellmodus). */
+router.post('/reports/einzelcheck', async (req, res) => {
+  try {
+    const b = Object.assign({}, req.body || {});
+    delete b.user_id; delete b.external_ref; delete b.object_label;
+    const out = await runLimited(() => ReportOrchestrator.generate(b, { ohneAblage: true }));
+    console.log(`[req] /reports/einzelcheck OK in ${out.took_ms}ms (ohne Ablage)`);
+    res.json(out);
+  } catch (e) {
+    console.error('[req] /reports/einzelcheck FEHLER:', e.message);
+    res.status(e.status || 500).json({ error: e.message });
+  }
+});
+
 // POST /reports/generate-stream — wie /reports/generate, aber STREAMT den Fortschritt.
 // Antwort = NDJSON (eine JSON-Zeile pro Ereignis):
 //   {"type":"step","msg":"...","t":...}   Fortschritts-Schritt

@@ -123,6 +123,13 @@ async function handleEvent(event) {
         console.log('[stripe-webhook] bewertung:', JSON.stringify(r));
         return;
       }
+      /* v3940 · Einzel-Check der Landing (ohne Konto). Muster wie die Bewertung darueber: der Fehler wird
+         NICHT verschluckt, sonst waere bezahlt und kein Bericht freigeschaltet. */
+      if (session.mode === 'payment' && session.metadata?.type === 'einzelcheck') {
+        const r = await require('../services/einzelcheck').handleEinzelcheckPaid(session);
+        console.log('[stripe-webhook] einzelcheck:', JSON.stringify(r));
+        return;
+      }
       // V197: Credit-Pack-Handler — wenn payment-Mode mit type=credit_pack
       if (session.mode === 'payment' && session.metadata?.type === 'credit_pack') {
         try {

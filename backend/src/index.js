@@ -387,6 +387,8 @@ app.use('/api/v1/public/stats', rateLimit({ windowMs: 60000, max: 60 }), require
 /* v3930 · landing-zahlen-live-1: Datenumfang der Landing (amtliche Datenpunkte, Register) - ohne Token, nur Summen. */
 app.use('/api/v1/public/datenumfang', rateLimit({ windowMs: 60000, max: 60 }), require('./routes/publicDatenumfang'));
 app.use('/api/v1/public/partner-logo', rateLimit({ windowMs: 60000, max: 240 }), require('./routes/partnerLogo'));  // v3299 · Partner-Logos fuer Mails (gehostet statt data:)
+/* v3940 · Einzel-Check der Landing ohne Konto (Unterlagen nur im Arbeitsspeicher, Bremsen je Route, bis zur Abnahme nur Staging) */
+app.use('/api/v1/public/einzelcheck', require('./routes/publicEinzelcheck'));
 app.use('/api/v1/deal-action', dealActionRoutes);
 app.use('/api/v1/feedback', feedbackRoutes);
 app.use('/api/v1/dateien', require('./routes/dateien'));  // v3162 · Unterlagen-Ablage (Ordner, Grenzen je Plan, verschluesselt)
@@ -654,6 +656,14 @@ async function start() {
     require('./services/datenumfang').starteTakt(pool);
   } catch (e) {
     console.error('✗ Datenumfang-Takt konnte nicht starten:', e.message);
+  }
+
+  /* v3940 · Einzel-Check: abgelaufene Kaeufe (Token-Hash + Zahlenstand, hoechstens 14 Tage) loeschen,
+     unter takt('einzelcheckLoeschen'). Laeuft auch dort, wo der Einzel-Check abgeschaltet ist. */
+  try {
+    require('./services/einzelcheck').starteTakt();
+  } catch (e) {
+    console.error('✗ Einzel-Check-Takt konnte nicht starten:', e.message);
   }
 
   // v507: WebSocket-Relay fuer Live-Transkription (OpenAI Realtime)

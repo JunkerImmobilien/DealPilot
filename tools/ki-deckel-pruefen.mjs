@@ -348,6 +348,20 @@ if (Object.keys(STELLEN).every((f) => gefunden[f] === STELLEN[f])) ok('Liste der
   const iJson = idx.indexOf("app.use(express.json("), iKv = idx.indexOf("require('./services/kiVerbrauch').middleware");
   if (iJson > 0 && iKv > iJson) ok('index.js: Vorgangs-Middleware direkt nach express.json()'); else rot('index.js: Middleware fehlt oder steht vor dem Parser');
 }
+/* v3940 · Einzel-Check der Landing (ohne Konto): KEINE eigene Aufrufstelle, er liest ueber openaiService
+   (callOpenAI -> erfassen + vorAufruf), jeder Aufruf in einem eigenen Vorgang mit Weg public/einzelcheck/…,
+   Gruppe dokument; weil kein Nutzer da ist, greift kein Monatsdeckel - dafuer der Tagesdeckel in Euro. */
+{
+  const ec = fs.readFileSync(path.join(WURZEL, 'backend/src/services/einzelcheck.js'), 'utf8');
+  const rt = fs.readFileSync(path.join(WURZEL, 'backend/src/routes/publicEinzelcheck.js'), 'utf8');
+  const ohne = (t) => t.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:'"`])\/\/.*$/gm, '$1');
+  if (!/api\.openai\.com|OPENAI_URL/.test(ohne(ec) + ohne(rt)) && /d\.openai\.extractExpose\(/.test(ec) && /d\.openai\.extractDokument\(/.test(ec))
+    ok('Einzel-Check: liest nur ueber openaiService (callOpenAI, erfasst), keine eigene Aufrufstelle'); else rot('Einzel-Check: eigene OpenAI-Aufrufstelle oder nicht ueber openaiService');
+  if ((rt.match(/kiKontext\('public\/einzelcheck\/(auslesen|bericht)'/g) || []).length === 2 && /mitKontext\(\{ endpunkt: endpunkt \}/.test(rt))
+    ok('Einzel-Check: auslesen und bericht je in eigenem Vorgang mit Weg (Erfassung nach multer verlaesslich)'); else rot('Einzel-Check: Vorgang/Weg fehlt');
+  if (KV.gruppeAus('public/einzelcheck/auslesen') === 'dokument' && KV.gruppeAus('public/einzelcheck/bericht') === 'dokument') ok('Einzel-Check: Gruppe dokument'); else rot('Einzel-Check: gruppeAus');
+  if (/FROM ki_verbrauch WHERE endpunkt = 'public\/einzelcheck\/auslesen'/.test(ec) && /EINZELCHECK_TAGESDECKEL_EUR/.test(ec)) ok('Einzel-Check: Tagesdeckel in Euro fuer den freien Teil (alle Besucher)'); else rot('Einzel-Check: Tagesdeckel fehlt');
+}
 /* Frontend: kein direkter OpenAI-Aufruf (B21) */
 {
   const treffer = [];

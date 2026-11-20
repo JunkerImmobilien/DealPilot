@@ -77,7 +77,7 @@ export const ReportOrchestrator = {
     const t0 = Date.now();
     const step = (msg) => {
       const line = `[bericht +${Date.now() - t0}ms] ${msg}`;
-      console.log(line);
+      if (!(opts && opts.ohneAblage)) console.log(line);   /* v3940 · ohne Ablage: auch keine Koordinaten im Protokoll */
       trace.push(msg);
       if (opts && typeof opts.onStep === 'function') { try { opts.onStep(msg); } catch {} }
     };
@@ -91,6 +91,11 @@ export const ReportOrchestrator = {
        Marktkontext, kein GeoMap-Kontostand, kein KI-Text, kein Bericht. Die
        Rueckgabe endet direkt nach CrossCheckService.compute (siehe unten). */
     const NUR_WERT = !!(opts && opts.nurWertBasis);
+    /* v3940 · OHNE ABLAGE fuer den Einzel-Check der Landing (Besucher ohne Konto): derselbe Rechenweg,
+       aber keine Zeile in mb.addresses, mb.properties, mb.valuation_results, mb.deal_scores,
+       mb.market_reports, mb.object_snapshots, mb.laufzeiten und keine Protokollzeilen mit Koordinaten.
+       Aufrufer: POST /reports/einzelcheck (routes/api.js), dort auch kein saveFixture. */
+    const OHNE_ABLAGE = !!(opts && opts.ohneAblage);
     if (FAST) step('SCHNELL-MODUS: nur Marktwert+Spanne & Miete+Spanne (kein KI-Text, keine Preishistorie)');
 
     // 0) DealPilot-Objekt (.dpkt) als Quelle? -> Stammdaten + Score/KI uebernehmen.
@@ -111,7 +116,7 @@ export const ReportOrchestrator = {
     let geo = null;
     if (input.address) {
       step('Standort wird ermittelt …');
-      geo = await GeocodingService.geocode(input.address);
+      geo = await GeocodingService.geocode(input.address, { ohneAblage: OHNE_ABLAGE });   /* v3940 */
       step(`geocode: ${geo ? 'ok lat=' + geo.lat + ' lon=' + geo.lon : 'fehlgeschlagen'}`);
     }
     /* v3175 · Liegt der gefundene Ort in einer ANDEREN PLZ als angegeben (Hauptstr. 51,
@@ -399,7 +404,7 @@ export const ReportOrchestrator = {
 
     // 2) Property persistieren
     step('property: insert');
-    const prop = NUR_WERT ? { id: null } : await q1(   /* v2430: kein Eintrag im Nur-Wert-Lauf */
+    const prop = (NUR_WERT || OHNE_ABLAGE) ? { id: null } : await q1(   /* v2430: kein Eintrag im Nur-Wert-Lauf · v3940: und ohne Ablage */
       `INSERT INTO mb.properties
         (external_ref,address_id,property_type,usage_type,living_area,rooms,build_year,floor,
          condition,energy_class,purchase_price,monthly_net_rent,vacancy,lat,lon,geom,data)
@@ -2064,6 +2069,13 @@ export const ReportOrchestrator = {
     const geomapCostEur = (balanceBefore != null && balanceAfter != null)
       ? Math.round((balanceBefore - balanceAfter) * 100) / 100 : null;
     if (geomapCostEur != null) step('Marktdaten verrechnet');
+    /* v3940 · ohne Ablage endet der Lauf hier: kein INSERT, kein Snapshot, keine Laufzeiten, kein trace */
+    if (OHNE_ABLAGE) {
+      return { report_id: null, property_id: null, object_key: null, external_ref: null, ohne_ablage: true,
+        ai_mode: report.mode, ai_error: report.error || null,
+        cost: { geomap_eur: geomapCostEur, openai_posten: (report && report.ki_posten) || [] },
+        took_ms: Date.now() - t0, data: payload, report_md: report.report_md };
+    }
     await q('INSERT INTO mb.valuation_results (property_id,result) VALUES ($1,$2)',
       [propertyId, JSON.stringify(valuation)]);
     await q('INSERT INTO mb.deal_scores (property_id,score,breakdown) VALUES ($1,$2,$3)',
