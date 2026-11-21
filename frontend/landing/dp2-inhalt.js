@@ -366,7 +366,7 @@
       if (fuss) {
         var stand = null, p = d.periods && (d.periods['10'] || d.periods['5']);
         if (p) { var dt = new Date(p); if (!isNaN(dt)) stand = MON[dt.getMonth()] + ' ' + dt.getFullYear(); }
-        var q = (d.sourceInfo && d.sourceInfo.name) || 'Bundesbank';
+        var q = 'amtliche Zinsdaten';   /* landing-faecher-3 · Marcel 20.11.2026: keine Quellennamen nach aussen (vorher sourceInfo.name bzw. Bundesbank) */
         fuss.innerHTML = '<span class="live">\u25CF ' + (d.source === 'live' ? 'Live' : 'Stand')
           + ' \u00b7 ' + q + '</span>' + (stand ? ' \u00b7 Stand ' + stand : '')
           + ' \u00b7 indikative Sch\u00e4tzung, kein Bankangebot \u00b7 keine '
