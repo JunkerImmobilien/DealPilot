@@ -3306,14 +3306,19 @@
   function cardDelete(key, name){
     if(!confirm('Objekt „'+name+'" wirklich löschen? Das kann nicht rückgängig gemacht werden.')) return;
     if(!window.Auth||typeof window.Auth.apiCall!=='function') return;
+    /* v3942 · derselbe Riegel wie delSaved (storage.js DpObjektLoeschen): vor dem DELETE eintragen, sonst speichert ein
+       laufendes saveObj das offene Objekt danach als NEUES Objekt zurueck */
+    var _L = window.DpObjektLoeschen;
+    try { if (_L) _L.beginnt(key); } catch (e) {}
     window.Auth.apiCall('/objects/'+key,{method:'DELETE'}).then(function(){
+      try { if (_L) _L.abschliessen(key); } catch (e) {}
       _summaries=_summaries.filter(function(o){return (o.id||o.key)!==key;});
       delete _details[key]; _detailsLoaded=false;
       renderAll();
       loadDetails().then(function(){ renderHealth(); renderOverview(); renderKpiCards(); renderScoreHero(); buildCharts(); renderProjTable(); try{renderSteuerKette();}catch(e){} });
       if(typeof window.refreshSavedList==='function') window.refreshSavedList();
       if(typeof window.toast==='function') window.toast('Objekt geloescht');
-    }).catch(function(e){ if(typeof window.toast==='function') window.toast('Loeschen fehlgeschlagen'); });
+    }).catch(function(e){ try { if (_L) _L.gescheitert(key); } catch (x) {} if(typeof window.toast==='function') window.toast('Loeschen fehlgeschlagen'); });
   }
 
   /* ════ THEME (app-weit) ════ */

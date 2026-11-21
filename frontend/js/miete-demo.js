@@ -34,6 +34,11 @@
       '.dp-md-schalter button.an{background:linear-gradient(110deg,var(--wl-e8cc7a,#E8CC7A),var(--wl-c9a84c,#C9A84C) 55%,var(--wl-b8932f,#b8932f));color:#1a1712;font-weight:600}',
       '.dp-md-schalter span{align-self:center;padding:0 12px;font:500 10px "JetBrains Mono",monospace;letter-spacing:.08em;color:#8A8272;text-transform:uppercase}',
       '#dp-md{min-width:0;max-width:100%;box-sizing:border-box}#dp-md *{box-sizing:border-box}',
+      /* v3942 · der Block steht in voller Breite unter .col2 (siehe zeichnen). Heute und Haus/Wohnung über die ganze
+         Breite, „Was hier gilt“ und „Zielbild“ nebeneinander (gemessen 260 / 200 px hoch), unter 861 px untereinander. */
+      '#dp-md{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:14px;align-items:start;margin-top:14px}',
+      '#dp-md>.dp-md-k:nth-child(-n+2){grid-column:1/-1}',
+      '@media (max-width:860px){#dp-md{grid-template-columns:minmax(0,1fr)}}',
       '#dp-md .dp-md-k{min-width:0;overflow:hidden;margin:0 0 14px}',
       '#dp-md h3{margin:0 0 4px;font:600 15px "Space Grotesk",sans-serif;color:#2A2727;display:flex;gap:8px;align-items:center;flex-wrap:wrap}',
       '#dp-md .lbl{font:500 10.5px "JetBrains Mono",monospace;letter-spacing:.08em;text-transform:uppercase;color:#7A7370}',
@@ -217,7 +222,14 @@
     var D = daten(), mv = merken('mv'), mr = merken('mr'), zb = merken('zb');
     if (!D || !mv) { zurueck(); if (box) box.parentNode.removeChild(box); return; }
     if (!box) { box = document.createElement('div'); box.id = 'dp-md'; }
-    if (box.parentNode !== mv.parentNode && _platz.mv) _platz.mv.parentNode.insertBefore(box, _platz.mv);
+    /* v3942 · URSACHE „linke Hälfte leer“ (Stichbild 07-0.6, gemessen Staging 21.11.2026 an Sachsenstraße 18):
+       der Block stand an der Stelle der Karte Mietvertrag, also in der RECHTEN Spalte von #s2 .col2. Seine vier
+       Karten (1.792 px) kamen zu Mietentwicklung und Prognose dazu: rechts endete die Spalte bei 2.501 px, links
+       (Mietstruktur, Mietpreis-Analyse) bei 1.000 px - 1.500 px leere linke Hälfte beim Scrollen. Jetzt steht der
+       Block in voller Breite direkt hinter .col2; die Spalten enden bei 1.000 / 695 px. Ohne .col2 wie bisher. */
+    var c2 = (_platz.mv && _platz.mv.parentNode && _platz.mv.parentNode.closest) ? _platz.mv.parentNode.closest('.col2') : null;
+    if (c2 && c2.parentNode) { if (box.parentNode !== c2.parentNode || box.previousElementSibling !== c2) c2.parentNode.insertBefore(box, c2.nextSibling); }
+    else if (box.parentNode !== mv.parentNode && _platz.mv) _platz.mv.parentNode.insertBefore(box, _platz.mv);
     var aufMr = box.querySelector('[data-md-platz="mr"]'), aufZb = box.querySelector('[data-md-platz="zb"]');
     var offenMr = aufMr ? aufMr.open : false, offenZb = aufZb ? aufZb.open : false;
     /* echte Karten vor dem Neuzeichnen in Sicherheit bringen, sonst löscht innerHTML sie */

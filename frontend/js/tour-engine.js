@@ -408,6 +408,7 @@
     if (!key) return;
     try {
       if (!window.Auth || typeof window.Auth.apiCall !== 'function') return;
+      try { if (window.DpObjektLoeschen) window.DpObjektLoeschen.beginnt(key); } catch (e) {}   /* v3942 · vor dem DELETE: kein Speichern mehr unter diesem Schluessel */
       window.Auth.apiCall('/objects/' + key, { method: 'DELETE' }).then(function () {
         console.log('[DpTour v1746] Demo-Objekt wieder entfernt:', key);
         /* v2251: das Formular gehoerte dem eben geloeschten Demo */

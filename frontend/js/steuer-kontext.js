@@ -120,7 +120,11 @@
   }
 
   /* ── Gesperrt: keine Steuerzahl zeigen ───────────────────────────────── */
-  var MASKE_ID = 'dp-sk-stil';
+  /* v3942 · Hier stand 'dp-sk-stil' - dieselbe Kennung wie der Stilblock der Steuerkette im Cockpit
+     (dashboard.js _ketteStil). Diese Datei lädt früher und legt ihren Block zuerst an; _ketteStil fand
+     die Kennung, hielt sich für erledigt, und die Tabelle „Steuer über alle Objekte“ blieb ohne Stil
+     (gemessen Staging 21.11.2026: th padding 0px, .sk-nr ohne Grund). Eigene Kennung, je Datei eine. */
+  var MASKE_ID = 'dp-skx-maske-stil';
   var WERTE = ['cr-cfns', 'cr-cfm', 'ph-cfns-now', 'ph-cfns-ezb', 'ph-cfns-an', 'ph-cfnsm-now', 'ph-cfnsm-ezb', 'ph-cfnsm-an'];
   function _stil() {
     if (document.getElementById(MASKE_ID)) return;

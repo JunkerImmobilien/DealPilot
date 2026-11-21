@@ -248,7 +248,30 @@ function _dpFireObjectReady(k) {
   } catch (e) {}
 }
 var _newObjSaveInflight = false;  /* v828-inflight-guard: laeuft gerade ein POST fuer ein NEUES Objekt? */
-var _objCache = {};         // Cache of full object data when in API mode
+/* ═══ v3942 · GELOESCHT HEISST: NIE WIEDER SPEICHERN ═══════════════════════
+   GEMESSEN Staging 21.11.2026 (Testobjekt mit Foto, offen, saveObj laeuft, delSaved):
+   saveObj hatte die Kontextpruefung (v1268) schon hinter sich und wartete auf das
+   Verkleinern der Fotos/des Thumbnails. In der Zeit kam das DELETE zurueck, delSaved
+   setzte _currentObjKey = null - und saveObj nahm danach den Zweig `if (_currentObjKey)`
+   NICHT mehr: POST /objects mit den Daten von VOR dem Loeschen. Ein neues Objekt war
+   angelegt und wurde sogar das offene (danach PUT aus modernisierung-ui ausBildern).
+   Das Drehbuch hat genau das am 20.11. als „Nachloeschung“ abgefangen.
+   Jetzt: jeder Loeschweg traegt den Schluessel VOR dem DELETE hier ein; saveObj bricht
+   fuer einen eingetragenen Schluessel ab, und es prueft den Kontext ein zweites Mal
+   direkt vor PUT/POST, nach dem letzten await. */
+var _dpGeloescht = {};
+function _dpLoeschenBeginnt(k) { if (k) _dpGeloescht[String(k)] = Date.now(); }
+function _dpLoeschenGescheitert(k) { if (k) delete _dpGeloescht[String(k)]; }
+function _dpIstGeloescht(k) { return !!(k && _dpGeloescht[String(k)]); }
+/* Nach erfolgreichem DELETE: war es das offene Objekt, Kontext und Formular leeren. */
+function _dpLoeschenAbschliessen(k) {
+  if (k && _currentObjKey === k) {
+    _currentObjKey = null; _dpFireObjectReady(null);
+    try { _resetUiAfterDelete(); } catch (e) { try { console.warn('[storage v3942] Leeren nach dem Loeschen:', e.message); } catch (x) {} }
+  }
+}
+window.DpObjektLoeschen = { beginnt: _dpLoeschenBeginnt, gescheitert: _dpLoeschenGescheitert, istGeloescht: _dpIstGeloescht, abschliessen: _dpLoeschenAbschliessen };
+var _objCache = {};        // Cache of full object data when in API mode
 
 function collectData() {
   var d = {};
@@ -1061,6 +1084,7 @@ async function saveObj(opts) {
      Kontext wegziehen - dann schreibt der Save leere Felder in ein NEUES
      Objekt. Gemessen am 09.09.2026 (2026-1025). */
   var _ctxKey = _currentObjKey;
+  if (_dpIstGeloescht(_ctxKey)) { try { console.warn('[storage v3942] saveObj: Objekt wird/wurde geloescht -> nicht gespeichert'); } catch (e) {} return; }
   /* v968-qc-takeover: waehrend QC-Uebernehmen (_handleSave) nur der EINE finale Save (_qcFinal) durch.
      Alle Auto-Save-/Sofort-Anlage-/Wrapper-saveObj werden stillgelegt -> genau eine Anlage, kein Doppel. */
   if (window._qcTakeover && !(opts && opts._qcFinal)) { return; }
@@ -1229,6 +1253,22 @@ async function saveObj(opts) {
       delete data._thumb;
     }
   } catch (e) { /* defensiv: ohne _thumb weiter */ }
+
+  /* v3942 · zweite Kontextpruefung NACH dem letzten await (Fotos, Thumbnail): wurde das Objekt in der
+     Zwischenzeit geloescht oder gewechselt, gehoeren `data` und `photos` zu einem Stand, der nicht mehr
+     offen ist. Weiter hiesse: POST statt PUT, ein geloeschtes Objekt kaeme als neues zurueck. */
+  if (_currentObjKey !== _ctxKey || _dpIstGeloescht(_ctxKey)) {
+    try { console.warn('[storage v3942] saveObj: Objekt waehrend des Speicherns geloescht/gewechselt -> abgebrochen'); } catch (e) {}
+    if (_ctxKey === null) {
+      _newObjSaveInflight = false;   /* nur die eigene Sperre loesen (oben gesetzt, wenn ohne Kennung begonnen) */
+      /* wie v3198 oben: die eigene, parallel angelegte Anlage bekommt den Stand nachgeholt */
+      if (_currentObjKey && _currentObjKey === window._dpEigeneAnlageKey) {
+        var _nachKey2 = _currentObjKey;
+        setTimeout(function () { if (_currentObjKey === _nachKey2) { try { saveObj({ silent: true }); } catch (e) {} } }, 400);
+      }
+    }
+    return;
+  }
 
   if (Auth.isApiMode()) {
     try {
@@ -2565,17 +2605,15 @@ async function delSaved(k) {
   var name = '';
   if (Auth.isApiMode()) {
     if (!confirm('Objekt wirklich löschen?')) return;
+    _dpLoeschenBeginnt(k);   /* v3942 · VOR dem DELETE: ab hier speichert nichts mehr unter diesem Schluessel */
     try {
       await Auth.apiCall('/objects/' + k, { method: 'DELETE' });
       // V63.27: Wenn das aktuell geladene Objekt gelöscht wurde → Eingabemaske + Header leeren
-      if (_currentObjKey === k) {
-        _currentObjKey = null; _dpFireObjectReady(null); /* v946 */
-        _resetUiAfterDelete();
-      }
+      _dpLoeschenAbschliessen(k);   /* v946 · v3942 */
       invalidateRenderCache();  // V98
       renderSaved({forceFresh: true, _immediate: true});
       toast('Gelöscht');
-    } catch (err) { toast('⚠ Fehler: ' + err.message); }
+    } catch (err) { _dpLoeschenGescheitert(k); toast('⚠ Fehler: ' + err.message); }
   } else {
     var d = {};
     try { d = JSON.parse(localStorage.getItem(k) || '{}'); } catch(e) {}
