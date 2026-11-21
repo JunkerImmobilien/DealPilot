@@ -44,7 +44,9 @@ Erledigt am 20.11.2026 (Einzelheiten `wissen/2026-11-20.md`):
 - Landing „Fächer“ landing-faecher-1…2a, Einzel-Check v3940/v3940a: **nur Staging**.
 - Neun Videos vertont „(v3910)“, Ton unter `Dateien/Messe/Videos/vertonung-20261120/ton`.
 
-**Offen, in dieser Reihenfolge:**
+**21.11.2026: Punkte 1 (Stufe 2), 3 (Rabatt, OCR), 4 (Landing), 5 (Videos), 6 (App-Fehler v3942), 7 (Offenbach, SN v3943) erledigt, Prod 1.0.134, siehe `wissen/2026-11-21.md`.** Offen bleiben: 2 (Testkauf Marcel), aus 3 Datenschutz-Absatz und Live-Stripe-Preis/Coupon, 8 (Anfragen schickt Marcel). Neu offen: ETW-Feld „Wohneinheiten im Gebäude“ erst nach Messung am Kern (Verwaltungskosten je bewerteter Einheit); Vergleichsmiete im Einzel-Check (gibt es nur aus Stufe 3); Offenbach außerhalb der IMB-Tabellen ohne Wert ok?; UK-Fläche Dresden/Leipzig wie LZS „weiter nutzen“?; Widerspruch `swf-sn.json` gegen `nachernte-2026-10b-sn.json`; `Forschungszulage/Stundennachweise/stunden/` versehentlich committet, drin lassen?
+
+**Offen, in dieser Reihenfolge (Stand 20.11.):**
 1. **Einzel-Check auf Marktbericht Stufe 2 umstellen** (Marcel 20.11.: „Stufe 2 würde reichen“). Heute holt der Bericht Stufe 3 wegen der Wertindikation (`/reports/einzelcheck`, `einzelcheck.js` `markt`/`mbEingabe`). Mit Stufe 2 fällt die registergestützte Wertindikation weg. Bericht-Abschnitt dann ohne Wertindikation oder nur Angebotsindikation; Prüfer `einzelcheck-pruefen` mitziehen.
 2. **Stripe-Testkauf durch Marcel** auf staging.dealpilot.immo (Testkarte 4242…), danach messen: Webhook → Status bezahlt, Promotion-Code EC…, Bericht, `mb.addresses`/`mb.market_reports` ohne neue Zeile, KI-Kosten je Lauf in `ki_verbrauch`, PDF-Druck, 390 px.
 3. Offene Entscheidungen Einzel-Check: Flyer-Code oder Anrechnung (Stripe nimmt nur einen), OCR für gescannte PDFs ohne tmpdir, Datenschutz-Absatz `Dateien/Einzelcheck/…-Entwurf-2026-11-20.md` gegenlesen und einbauen. Für Prod: Preis + Coupon im Live-Konto anlegen (Freigabe).
