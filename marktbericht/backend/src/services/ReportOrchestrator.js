@@ -988,6 +988,10 @@ export const ReportOrchestrator = {
              Kalenderjahr des Wertermittlungsstichtags und den Erstbezug. Erstbezug = Baujahr im Stichtagsjahr
              oder in den drei Jahren davor (Wortlaut des Blattes); ohne Baujahr bleibt er offen. */
           stichtag: stichtagIso(stichtagVon(ref)),   /* auch wenn er heute ist */
+          /* v3941 · fuer die Zweigwahl ETW-Erstverkauf (v3943): nur die ausdrueckliche Angabe (ref.baustatus aus
+             input.baustatus / DealPilot-Feld baustatus). Das aus dem Baujahr abgeleitete erstbezug darunter zaehlt
+             bewusst NICHT als Markierung. */
+          baustatus: ref.baustatus || null,
           erstbezug: (function () { const bj = Number(ref.build_year), sj = Number(stichtagJahr(ref));
             return (Number.isFinite(bj) && bj > 1800 && Number.isFinite(sj)) ? (sj - bj >= 0 && sj - bj <= 3) : null; })(),
           /* v2790 · Punkt 5: Wohnungen UND Gewerbeeinheiten -> zuerst der Satz fuer Wohn- und

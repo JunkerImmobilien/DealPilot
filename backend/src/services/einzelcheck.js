@@ -1,20 +1,32 @@
 'use strict';
 /* ═══════════════════════════════════════════════════════════════════════════
- * services/einzelcheck.js · v3940 · DER EINZEL-CHECK VON DER LANDING
+ * services/einzelcheck.js · v3940 / v3941 · DER EINZEL-CHECK VON DER LANDING
  *
  * Marcel 20.11.2026 (Preis entschieden: 3,99 EUR): Ohne Konto laedt ein Besucher bis zu vier Unterlagen
  * hoch (Exposé, Mietaufstellung, WEG-Protokoll, Energieausweis …). Kostenlos werden ZWEI davon mit
  * einem guenstigen Modell gelesen und grob eingeschaetzt. Fuer 3,99 EUR (Stripe Checkout, mode payment,
  * lookup_key dp_einzelcheck_399) entsteht der volle Bericht: alle vier Unterlagen, normales Modell,
- * dazu Lage, Markt, Vergleichsmiete und Wertindikation aus dem Marktbericht-Dienst. Wer binnen
+ * dazu Lage und Markt aus dem Marktbericht-Dienst (v3941: Stufe 2, siehe unten). Wer binnen
  * 14 Tagen ein Paket bucht, bekommt die 3,99 EUR angerechnet (Stripe-Promotion-Code auf den Coupon
  * dp_einzelcheck_anrechnung, derselbe Weg wie der Flyer-Code ?code=) und das Objekt landet im Konto
  * (Fragment #dc=1&… an js/dealcheck-uebernahme.js, derselbe Weg wie der Deal-Check).
  *
+ * v3941 (21.11.2026):
+ *   - Marktbericht STUFE 2 statt 3 (Marcel 20.11.: „Stufe 2 würde reichen“). Keine registergestützte
+ *     Wertindikation (Ertrags-, Sachwert, Liegenschaftszins) mehr im Bericht, dafür der Satz mit dem Weg in
+ *     die App. Wie Stufe 2 in der App (dealpilot-mb.js run: wert_stufe 2 OHNE fast) mit KI-Text und
+ *     Preishistorie. Feldzuordnung in marktAus().
+ *   - Gescannte PDFs: ohne Textebene liest ocr.js ocrAusPuffer() die Seiten NUR IM SPEICHER
+ *     (pdftoppm stdin -> stdout, tesseract stdin -> stdout), höchstens 6 Seiten, eine Frist je Unterlage.
+ *     Eine gescannte Unterlage zählt im kostenlosen Teil wie jede andere.
+ *   - Rabatt-Vorrang: der Anrechnungs-Code EC… ersetzt in den Paketlinks jeden anderen Code (Flyer);
+ *     umgesetzt im Browser (frontend/landing/einzelcheck.js mitCode()).
+ *
  * DATENSCHUTZ, VERBINDLICH (Pruefer: tools/einzelcheck-pruefen.mjs):
  *   1 Dateien nur im Arbeitsspeicher. multer.memoryStorage in der Route, pdftotext liest ueber STDIN und
  *     schreibt nach STDOUT - keine Datei auf der Platte, kein Puffer in der Datenbank. Gescannte PDFs
- *     ohne Textebene werden NICHT gelesen (die Texterkennung in ocr.js schreibt Bilder nach tmpdir).
+ *     ohne Textebene liest seit v3941 ocr.ocrAusPuffer() ebenso nur ueber STDIN/STDOUT (NICHT
+ *     bildZuText(): der App-Weg schreibt Bilder nach tmpdir).
  *   2 Geschwaerzt wird VOR dem KI-Aufruf (schwaerzen.js), am Text, den die KI bekommt.
  *   3 Gespeichert werden nur Zahlen (zahlenSauber, eine Weissliste), mit Token-Hash, hoechstens 14 Tage.
  *     Danach loescht der Takt 'einzelcheckLoeschen'. Die Anschrift aus dem Exposé verlaesst den
@@ -32,7 +44,7 @@
 const crypto = require('crypto');
 const { spawn } = require('child_process');
 
-const VERSION = 'v3940';
+const VERSION = 'v3941';
 const LOOKUP_KEY = 'dp_einzelcheck_399';
 /* Coupon in BEIDEN Stripe-Konten mit genau dieser ID anlegen (umgebungsblind wie ein lookup_key). */
 const ANRECHNUNG_COUPON = 'dp_einzelcheck_anrechnung';
@@ -43,6 +55,10 @@ const MAX_DATEI_BYTES = 10 * 1024 * 1024;
 const MAX_TEXT_ZEICHEN = 120000;
 const MAX_BERICHTE = 3;              /* je Kauf so oft neu erzeugbar (Kosten je Lauf, siehe Bericht) */
 const ERLAUBTE_MIME = ['application/pdf'];
+/* v3941 · Texterkennung fuer gescannte PDFs: hoechstens 6 Seiten, 60 s je Unterlage (ocr.js grenzt selbst auch) */
+const OCR_SEITEN = 6;
+const OCR_ZEIT_MS = 60000;
+const MB_STUFE = 2;                  /* v3941 · Erweiterte Marktpreisindikation, wie in der App mit KI-Text */
 
 /* Welche Arten der Dokument-Import (dokumentSchemas.js) fuer den Einzel-Check liest. Alles andere
    (auch nicht erkannt) laeuft ueber das Exposé-Schema - wie dokument-import.js in der App. */
@@ -85,6 +101,9 @@ function _pdfText(buffer) {
 /* Getter: ein Modul wird erst geladen, wenn es gebraucht wird (der Pruefer ersetzt sie vorher). */
 const STANDARD = {
   pdfText: _pdfText,
+  /* v3941 · nur ocrAusPuffer (Speicher), nie bildZuText (tmpdir) */
+  ocr: function (buffer) { return require('./ocr').ocrAusPuffer(buffer, { maxSeiten: OCR_SEITEN, zeitMs: OCR_ZEIT_MS }); },
+  get kiVerbrauch() { return require('./kiVerbrauch'); },
   get schwaerzen() { return require('./schwaerzen'); },
   get dokumentSchemas() { return require('./dokumentSchemas'); },
   get openai() { return require('./openaiService'); },
@@ -291,7 +310,9 @@ function anzeigeAus(e) {
   const sw = deps().schwaerzen;
   const s = function (t, n) { return _kurz(sw.schwaerze(_kurz(t, 400)).text, n); };
   const aus = { name: e.name, art: ART_NAME[e.typ] || 'Unterlage', typ: e.typ || null, gelesen: !!e.ok, grund: e.ok ? null : (e.grund || 'nicht_lesbar'),
-    geschwaerzt: e.geschwaerzt || 0, risiken: [], kernpunkte: [] };
+    geschwaerzt: e.geschwaerzt || 0, risiken: [], kernpunkte: [],
+    /* v3941 · per Texterkennung gelesen (gescannt): Seiten, schwer lesbar, nach 6 Seiten oder der Frist gekuerzt */
+    texterkennung: e.ocr ? { seiten: e.ocr.seiten, schwer_lesbar: !e.ocr.lesbar, gekuerzt: !!e.ocr.abgeschnitten } : null };
   if (e.ok && e.extracted) {
     (Array.isArray(e.extracted.risiken) ? e.extracted.risiken : []).slice(0, 6).forEach(function (r) {
       if (r && r.titel) aus.risiken.push({ titel: s(r.titel, 90), beschreibung: s(r.beschreibung, 260), schwere: /^(hoch|mittel|niedrig)$/.test(r.schwere) ? r.schwere : 'mittel' });
@@ -309,13 +330,20 @@ async function leseEine(datei, modell) {
   if (fehler) return { name, ok: false, grund: fehler };
   let roh;
   try { roh = await d.pdfText(datei.buffer); } catch (e) { return { name, ok: false, grund: 'nicht_lesbar' }; }
-  if (!roh || roh.replace(/\s+/g, '').length < 80) return { name, ok: false, grund: 'kein_text' };   /* gescannt, ohne Textebene */
+  /* v3941 · gescannt, ohne Textebene: Texterkennung im Speicher. Zaehlt wie jede andere Unterlage. */
+  let ocr = null;
+  if (!roh || roh.replace(/\s+/g, '').length < 80) {
+    try { ocr = await d.ocr(datei.buffer); } catch (e) { ocr = null; }
+    if (!ocr || !ocr.roh || ocr.roh.replace(/\s+/g, '').length < 80) return { name, ok: false, grund: 'kein_text' };
+    roh = ocr.roh;
+    ocr = { seiten: ocr.seiten || 0, lesbar: !!ocr.lesbar, abgeschnitten: !!ocr.abgeschnitten };
+  }
   /* 2 · ERST schwaerzen, DANN klassifizieren und an die KI */
   const sw = d.schwaerzen.schwaerze(roh);
   const text = sw.text;
   roh = null;
   const erk = d.dokumentSchemas.klassifiziere(text, name) || {};
-  if (erk.typ === 'mieter_unterlagen') return { name, ok: false, grund: 'mieter_unterlagen', geschwaerzt: sw.gesamt };
+  if (erk.typ === 'mieter_unterlagen') return { name, ok: false, grund: 'mieter_unterlagen', geschwaerzt: sw.gesamt, ocr: ocr };
   /* v3940a · gemessen auf Staging 20.11.2026: das Muster-Exposé Lindenallee 14 kam als „Energieausweis“
      zurück (Kaufpreis, Wohnfläche, Miete fehlten). DOKUMENT_TYPEN kennt kein Exposé, und ein Exposé
      führt fast immer einen Abschnitt zum Energieausweis. In der App wählt der Nutzer das Exposé
@@ -328,10 +356,10 @@ async function leseEine(datei, modell) {
       : await d.openai.extractDokument(text, typ, { model: modell });
   } catch (e) {
     if (e && e.code === 'NO_API_KEY') throw e;
-    return { name, typ, ok: false, grund: 'ki_fehler', geschwaerzt: sw.gesamt };
+    return { name, typ, ok: false, grund: 'ki_fehler', geschwaerzt: sw.gesamt, ocr: ocr };
   }
-  if (!r || !r.success) return { name, typ, ok: false, grund: 'ki_unlesbar', geschwaerzt: sw.gesamt };
-  return { name, typ, ok: true, extracted: r.extracted || {}, modell: r.model || modell, geschwaerzt: sw.gesamt };
+  if (!r || !r.success) return { name, typ, ok: false, grund: 'ki_unlesbar', geschwaerzt: sw.gesamt, ocr: ocr };
+  return { name, typ, ok: true, extracted: r.extracted || {}, modell: r.model || modell, geschwaerzt: sw.gesamt, ocr: ocr };
 }
 
 /** Mehrere Unterlagen lesen. modus 'frei': hoechstens FREI_MAX_UNTERLAGEN, guenstiges Modell.
@@ -495,44 +523,113 @@ async function handleEinzelcheckPaid(session) {
   return { ok: true, kauf_id: k.id, anrechnung: !!code };
 }
 
-/* ── Marktbericht-Dienst: Lage, Markt, Vergleichsmiete, Wertindikation ──
+/* ── Marktbericht-Dienst: Lage, Markt, Angebotsindikation (Stufe 2) ──
    Ohne Ablage (mb /reports/einzelcheck -> ReportOrchestrator.generate(…, { ohneAblage: true })).
-   Stufe 3 im Schnellmodus: kein KI-Text, keine Preishistorie, aber Ertrags- und Sachwert, wo das
-   Register sie traegt. */
+
+   v3941 · STUFE 2 wie in der App (frontend/js/dealpilot-mb.js run(): wert_stufe 2 OHNE fast), also mit
+   KI-Text, Preishistorie und Marktkontext. Der Orchestrator verwirft unter Stufe 3 den Quercheck
+   (cross_check -> { available:false, nicht_im_umfang:true }, ReportOrchestrator „_stufe < 3“) - Boden-,
+   Ertrags- und Sachwert, Liegenschaftszins und die ortsuebliche Vergleichsmiete (miete_stufe /
+   miete_vergleich_qm stecken im Ertragswert) kommen damit NICHT mehr. marktAus() liest cross_check
+   deshalb gar nicht mehr, auch wenn es da waere.
+
+   FELDZUORDNUNG Stufe 2 (Payload data.*) -> Bericht:
+     micro.score                               -> lage.mikro
+     macro.score                               -> lage.makro
+     address.city / address.postcode           -> lage.ort / lage.plz
+     ref.ags                                   -> lage.ags (Kappung, Mietpreisbremse im Browser)
+     bevoelkerung_trend_pct                    -> lage.bevoelkerung_trend_pct
+     days_on_market                            -> lage.angebotsdauer_tage
+     valuation.market_value.estimated/low/high -> markt.wert / wert_von / wert_bis (Erweiterte Marktpreisindikation)
+     valuation.market_value.basis_median_sqm   -> markt.qm
+     valuation.market_value.angebot_abschlag   -> markt.abschlag {pct, vor_abschlag, herkunft} (Kennzeichnung wie app.js _mpZusatz)
+     valuation.inputs.market_rent_sqm          -> markt.miete_qm (Angebotsmieten, Neuvermietung)
+     valuation.yield.gross_yield_pct           -> markt.brutto_pct
+     price_trend_pct / rent_trend_pct          -> markt.preis_trend_pct / miete_trend_pct
+     wertermittlungsstichtag.datum             -> stichtag
+     report_md (nur ai_mode 'openai')          -> text (Absaetze, ohne Quellennamen, ohne Wertermittlungssaetze)
+     cost.openai_posten                        -> ki_verbrauch (public/einzelcheck/bericht), nicht im Ergebnis
+   Nicht uebernommen: cross_check (Stufe 3), wertermittlung_herkunft, land_value, zensus, datenquellen.
+
+   KOSTEN je Bericht (Stufe 2 voll): Marktdaten im Mittel bis 0,38 EUR je Lauf (gemessen 11.09.2026 an 45
+   Laeufen der Erweiterten MPI, viele 0 EUR wegen Cache), KI-Text gpt-4.1-mini (split-call, Zehntel-Cent bis
+   wenige Cent) - seit v3941 je Lauf in ki_verbrauch erfasst und im Protokoll als Zeile. */
 const MB_BASE = (process.env.MB_BACKEND_URL || 'http://mb-backend:4000/api/v1/marktbericht').replace(/\/+$/, '');
-const _QUELLEN_NAMEN = /immo\s*scout|immobilienscout|immowelt|kleinanzeigen|geomap|pricehubble|sprengnetter|on-geo|21st/i;
+const _QUELLEN_NAMEN = /immo\s*scout|immobilienscout|scout24|immowelt|kleinanzeigen|geomap|pricehubble|sprengnetter|on-geo|21st|geoapify|overpass|openstreetmap/i;
 function _ohneQuelle(t) { return (typeof t === 'string' && !_QUELLEN_NAMEN.test(t)) ? t : null; }
 function _n(v) { const n = Number(v); return (v === null || v === undefined || v === '' || !Number.isFinite(n)) ? null : n; }
+/* Herkunft des Abschlags wie die Marktbericht-App (_mpZusatz), nach aussen nur feste Woerter */
+function _abschlagAus(ab) {
+  if (!ab || !(_n(ab.pct) > 0)) return null;
+  const h = String(ab.herkunft || '');
+  const herkunft = /rtlich/.test(h) ? 'aus den Kauffällen des Gutachterausschusses'
+    : ((/^DealPilot-Marktdurchschnitt/.test(h) && _ohneQuelle(h)) ? _satzzeichen(h).slice(0, 120) : 'Marktdurchschnitt');
+  return { pct: _n(ab.pct), vor_abschlag: (ab.roh && _n(ab.roh.estimated) > 0) ? _n(ab.roh.estimated) : null, herkunft: herkunft };
+}
+/* KI-Text der Stufe 2 als Absaetze: nur Punkt und Komma, keine Quellennamen, keine Saetze zur
+   Wertermittlung (die gehoert in die App). Kein HTML, kein Markdown nach aussen. */
+const _WERT_WORTE = /ertragswert|sachwert|bodenwert|liegenschaftszins|verkehrswert|immowertv|restnutzungsdauer/i;
+function _satzzeichen(t) {
+  return String(t).replace(/(\d)\s*[–—-]\s*(\d)/g, '$1 bis $2').replace(/\s*[;–—]\s*/g, ', ').replace(/\s+-\s+/g, ', ')
+    .replace(/\s{2,}/g, ' ').replace(/,\s*,/g, ',').replace(/,\s*\./g, '.').trim();
+}
+function textAus(md) {
+  if (typeof md !== 'string' || !md.trim()) return [];
+  const aus = []; let zeichen = 0;
+  md.replace(/\r/g, '').split('\n').forEach(function (z) {
+    let t = z.trim();
+    if (!t || /^[-*_]{3,}$/.test(t) || /^\|/.test(t) || zeichen > 9000 || aus.length >= 60) return;
+    let art = 'p';
+    if (/^#{1,6}\s/.test(t)) { art = 'h'; t = t.replace(/^#{1,6}\s+/, ''); }
+    else if (/^([-*•]|\d+[.)])\s+/.test(t)) { art = 'li'; t = t.replace(/^([-*•]|\d+[.)])\s+/, ''); }
+    t = t.replace(/!\[[^\]]*\]\([^)]*\)/g, '').replace(/\[([^\]]+)\]\([^)]*\)/g, '$1').replace(/https?:\/\/\S+/g, '')
+      .replace(/[*_`>]+/g, '').replace(/<[^>]*>/g, '');
+    t = _satzzeichen(t);
+    if (t.length < 2 || !_ohneQuelle(t) || _WERT_WORTE.test(t)) return;
+    aus.push({ art: art, text: t.slice(0, 900) }); zeichen += t.length;
+  });
+  /* keine Ueberschrift ohne Inhalt: eine Ueberschrift direkt vor einer anderen oder am Ende faellt weg */
+  return aus.filter(function (x, i) { return x.art !== 'h' || (aus[i + 1] && aus[i + 1].art !== 'h'); });
+}
 function marktAus(out) {
   const p = (out && out.data) || {};
-  const v = p.valuation || {}, mv = v.market_value || {}, cc = p.cross_check || {}, ew = cc.ertragswert || {}, sw = cc.sachwert || {};
-  const wh = p.wertermittlung_herkunft || {};
+  const v = p.valuation || {}, mv = v.market_value || {};
+  const st = p.wertermittlungsstichtag;
+  const stichtag = (st && typeof st === 'object' && typeof st.datum === 'string') ? st.datum.slice(0, 10) : (typeof st === 'string' ? st.slice(0, 10) : null);
   return {
+    stufe: MB_STUFE,
     lage: { mikro: _n(p.micro && p.micro.score), makro: _n(p.macro && p.macro.score),
       ort: _ohneQuelle(p.address && p.address.city) || null, plz: (p.address && /^\d{5}$/.test(String(p.address.postcode || ''))) ? String(p.address.postcode) : null,
       ags: (p.ref && /^\d{8}$/.test(String(p.ref.ags || ''))) ? String(p.ref.ags) : null,   /* Gemeindeschluessel fuer Kappung/Bremse */
-      bevoelkerung_trend_pct: _n(p.bevoelkerung_trend_pct) },
-    markt: { wert: _n(mv.estimated), wert_von: _n(mv.low), wert_bis: _n(mv.high), qm: _n(mv.basis_median_sqm),
-      miete_qm: _n(v.inputs && v.inputs.market_rent_sqm), brutto_pct: _n(v.yield && v.yield.gross_yield_pct) },
-    vergleichsmiete: { qm: _n(ew.miete_vergleich_qm), stufe: _ohneQuelle(ew.miete_stufe && ew.miete_stufe.etikett) },
-    wert: {
-      ertragswert: ew.available ? _n(ew.value_eur) : null, ertragswert_grund: ew.available ? null : _ohneQuelle(ew.grund),
-      sachwert: sw.available ? _n(sw.value_eur) : null, sachwert_grund: sw.available ? null : _ohneQuelle(sw.grund),
-      liegenschaftszins_pct: _n(ew.liegenschaftszins_pct), zins_herkunft: _ohneQuelle(wh.kurz), zins_indikativ: wh.indikativ === true,
-      zins_weg: _ohneQuelle(wh.ertragswert_hinweis),
-      ausschuss_link: (wh.quelle_link && /^https:\/\//.test(String(wh.quelle_link.url || ''))) ? { name: _ohneQuelle(wh.quelle_link.name), url: String(wh.quelle_link.url) } : null,
-      bodenrichtwert_qm: _n(p.land_value && p.land_value.value_sqm)
-    },
-    stichtag: typeof p.wertermittlungsstichtag === 'string' ? p.wertermittlungsstichtag.slice(0, 10) : null
+      bevoelkerung_trend_pct: _n(p.bevoelkerung_trend_pct), angebotsdauer_tage: _n(p.days_on_market) },
+    markt: { bezeichnung: 'Erweiterte Marktpreisindikation', wert: _n(mv.estimated), wert_von: _n(mv.low), wert_bis: _n(mv.high), qm: _n(mv.basis_median_sqm),
+      abschlag: _abschlagAus(mv.angebot_abschlag),
+      miete_qm: _n(v.inputs && v.inputs.market_rent_sqm), brutto_pct: _n(v.yield && v.yield.gross_yield_pct),
+      preis_trend_pct: _n(p.price_trend_pct), miete_trend_pct: _n(p.rent_trend_pct) },
+    /* Stufe 2 fuehrt keine ortsuebliche Vergleichsmiete (sie steckt im Ertragswert der Stufe 3) */
+    vergleichsmiete: null,
+    /* Statt der Wertindikation der Weg in die App - keine Zahl */
+    wertermittlung: { in_app: true },
+    text: (out && out.ai_mode === 'openai') ? textAus(out.report_md) : [],
+    stichtag: stichtag
   };
 }
 function mbEingabe(zahlen, adresse) {
   const z = zahlenSauber(zahlen);
   const ort = [z.plz, z.ort].filter(Boolean).join(' ');
   const adr = (typeof adresse === 'string' && adresse.trim().length >= 5) ? adresse.trim().slice(0, 160) : ort;
-  return { address: adr, wert_stufe: 3, fast: true,
+  /* v3941 · Stufe 2 ohne fast: wie die App (dealpilot-mb.js schickt ab Stufe 2 kein fast) */
+  return { address: adr, wert_stufe: MB_STUFE,
     dealpilot: { plz: z.plz || '', ort: z.ort || '', objart: z.art || '', wfl: z.wfl || null, baujahr: z.bj || null, kp: z.kp || null,
       nkm: z.nkm || null, gsfl: z.gsfl || null, einheiten: z.einheiten || null, zimmer: z.zimmer || null, energieklasse: z.ek_klasse || null } };
+}
+/* KI-Posten des mb-Dienstes erfassen (wie routes/marktbericht.js), ohne Nutzer, im Weg des Berichts */
+function kostenErfassen(j) {
+  const c = (j && j.cost) || {};
+  let ki = 0;
+  try { ki = deps().kiVerbrauch.erfasseFremdPosten(c.openai_posten, { userId: null, endpunkt: 'public/einzelcheck/bericht', funktion: 'einzelcheck-marktbericht' }) || 0; }
+  catch (e) { ki = 0; }
+  return { ki_eur: ki, marktdaten_eur: _n(c.geomap_eur) };
 }
 async function markt(zahlen, adresse) {
   const z = zahlenSauber(zahlen);
@@ -543,7 +640,12 @@ async function markt(zahlen, adresse) {
     const t = await r.text();
     let j = null; try { j = JSON.parse(t); } catch (e) { j = null; }
     if (!r.ok || !j) return { verfuegbar: false, grund: 'dienst' };
-    return Object.assign({ verfuegbar: true }, marktAus(j));
+    const k = kostenErfassen(j);
+    console.log('[einzelcheck] Marktbericht Stufe ' + MB_STUFE + ': KI ' + Number(k.ki_eur).toFixed(4) + ' EUR, Marktdaten '
+      + (k.marktdaten_eur == null ? 'unbekannt' : k.marktdaten_eur.toFixed(2) + ' EUR'));
+    const m = Object.assign({ verfuegbar: true }, marktAus(j));
+    Object.defineProperty(m, '_kosten', { value: k, enumerable: false });
+    return m;
   } catch (e) { return { verfuegbar: false, grund: 'dienst' }; }
 }
 
@@ -575,6 +677,6 @@ module.exports = {
   hash, neuesToken, tokenForm, siegel, siegelPruefen, gueltigBis, istGueltig, berichtErlaubt,
   dateiPruefen, dateiname, zahlenSauber, zahlenAus, anzeigeAus, leseEine, auslesen,
   freiMoeglich, tagesverbrauchEur, preis, landingBasis, kaufAnlegen, kaufLesen, statusAus, berichtGezaehlt,
-  handleEinzelcheckPaid, marktAus, mbEingabe, markt, adresseAus, aufraeumen, starteTakt,
+  handleEinzelcheckPaid, marktAus, mbEingabe, markt, textAus, kostenErfassen, adresseAus, aufraeumen, starteTakt, MB_STUFE, OCR_SEITEN, OCR_ZEIT_MS,
   istExpose, _setzeDeps, _pdfText
 };

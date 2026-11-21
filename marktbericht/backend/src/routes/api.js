@@ -485,11 +485,15 @@ router.post('/reports/generate', async (req, res) => {
 /* v3940 · POST /reports/einzelcheck — Einzel-Check der Landing (Besucher ohne Konto, nur vom
    Haupt-Backend: services/einzelcheck.js). Derselbe Rechenweg wie /reports/generate, aber
    OHNE ABLAGE: kein Eintrag in mb.addresses/properties/market_reports/object_snapshots, kein
-   saveFixture, keine Anschrift im Protokoll. Die Stufe kommt aus dem Aufruf (3, Schnellmodus). */
+   saveFixture, keine Anschrift im Protokoll.
+   v3941 · Stufe 2 (Erweiterte Marktpreisindikation, mit KI-Text wie in der App), Marcel 20.11.2026
+   „Stufe 2 würde reichen“. Hier hoechstens 2: Boden-, Ertrags- und Sachwert verwirft der Orchestrator
+   unter Stufe 3 (cross_check nicht_im_umfang) - auch wenn ein Aufrufer 3 schickt. */
 router.post('/reports/einzelcheck', async (req, res) => {
   try {
     const b = Object.assign({}, req.body || {});
     delete b.user_id; delete b.external_ref; delete b.object_label;
+    b.wert_stufe = Math.min(2, Math.max(1, Math.round(Number(b.wert_stufe) || 2)));
     const out = await runLimited(() => ReportOrchestrator.generate(b, { ohneAblage: true }));
     console.log(`[req] /reports/einzelcheck OK in ${out.took_ms}ms (ohne Ablage)`);
     res.json(out);

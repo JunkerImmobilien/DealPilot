@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/* tools/einzelcheck-pruefen.mjs — v3940 · Einzel-Check der Landing (ohne Netz, ohne Datenbank)
+/* tools/einzelcheck-pruefen.mjs — v3940 / v3941 · Einzel-Check der Landing (ohne Netz, ohne Datenbank)
  *
  *   node tools/einzelcheck-pruefen.mjs        RC=0 sauber
  *
@@ -17,7 +17,12 @@
  *   H Webhook: nur bezahlt, nur unser Preis, einmal; Anrechnung als Promotion-Code auf festen Coupon
  *   I Zahlen-Weissliste (keine Namen, keine Anschrift im Zahlenstand)
  *   J Siegel: manipulierte Zahlen werden beim Kauf abgewiesen
- *   K Marktbericht-Dienst ohne Ablage, keine Quellennamen nach außen
+ *   K Marktbericht-Dienst ohne Ablage, keine Quellennamen nach außen, v3941: STUFE 2 (keine Wertindikation
+ *     aus Stufe 3, kein Ertrags-/Sachwert im Ergebnis, Satz mit dem Weg in die App, KI-Kosten erfasst)
+ *   L v3941 · gescannte PDFs: Texterkennung NUR im Speicher (ocr.js ocrAusPuffer: pdftoppm und tesseract über
+ *     stdin/stdout, fs-Spion), höchstens 6 Seiten, Zeitlimit, Schwärzen danach, zählt im freien Teil mit
+ *   M v3941 · Rabatt-Vorrang: der Anrechnungs-Code EC… ersetzt in den Paketlinks den Flyer-Code
+ *     (die App liest den ersten code=), Satz „nicht kombinierbar“
  *   GEGENPROBE: jede Sperre einzeln aus einer Kopie im Speicher entfernt -> der zugehörige Teil muss rot werden.
  */
 import fs from 'node:fs';
@@ -25,7 +30,7 @@ import os from 'node:os';
 import path from 'node:path';
 import Module, { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
-import { spawnSync } from 'node:child_process';
+import { spawnSync, spawn as spawnEcht } from 'node:child_process';
 
 const WURZEL = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const require = createRequire(import.meta.url);
@@ -41,7 +46,10 @@ const P = {
   mbOrch: path.join(WURZEL, 'marktbericht/backend/src/services/ReportOrchestrator.js'),
   mbGeo: path.join(WURZEL, 'marktbericht/backend/src/services/GeocodingService.js'),
   front: path.join(WURZEL, 'frontend/landing/einzelcheck.js'),
-  faecher: path.join(WURZEL, 'frontend/landing/landing-faecher.js')
+  faecher: path.join(WURZEL, 'frontend/landing/landing-faecher.js'),
+  ocr: path.join(WURZEL, 'backend/src/services/ocr.js'),
+  flyerApp: path.join(WURZEL, 'frontend/js/flyer-code.js'),
+  flyerLanding: path.join(WURZEL, 'frontend/landing/flyer-code.js')
 };
 const lies = (p) => fs.readFileSync(p, 'utf8');
 const ohneKommentar = (t) => t.replace(/\/\*[\s\S]*?\*\//g, (m) => m.replace(/[^\n]/g, ' ')).replace(/(^|[^:'"`\\])\/\/.*$/gm, '$1');
@@ -69,15 +77,19 @@ const TEXTE = {
     + 'Objekt ' + STRASSE + ', 32609 Hüllhorst. Kaufpreis 180.000 €, Wohnfläche 100 m², Kaltmiete 1.300 € im Monat, Baujahr 1968. '.repeat(3),
   mieter: 'Mietaufstellung zum 01.10.2026. Einheit 1, Wohnung EG, Mieter Herr Erich Beispiel geb. ' + GEB + ', Kaltmiete 1.250 €. Summe Kaltmiete 1.250 €. '.repeat(2),
   weg: 'Protokoll der Eigentümerversammlung vom 12.05.2026. Anwesend Frau Erika Mustermann, wohnhaft ' + STRASSE + ' 32609 Hüllhorst. Instandhaltungsrücklage 48.000 €. Beschluss Sonderumlage. '.repeat(2),
-  energie: 'Energieausweis für Wohngebäude nach GEG. Energieeffizienzklasse D. Endenergieverbrauch 118 kWh. Baujahr Gebäude 1968. '.repeat(2)
+  energie: 'Energieausweis für Wohngebäude nach GEG. Energieeffizienzklasse D. Endenergieverbrauch 118 kWh. Baujahr Gebäude 1968. '.repeat(2),
+  scan: ''   /* gescannt: keine Textebene, nur die Texterkennung liest ihn */
 };
+/* v3941 · was die Texterkennung aus dem Scan liest (mit Personendaten, die vor der KI fallen müssen) */
+const SCAN_TEXT = 'Exposé Mehrfamilienhaus. Ansprechpartner Herr Max Mustermann, ' + MAIL + '. Kaufpreis 520.000 €, Wohnfläche 410 m², Kaltmiete 2.900 € im Monat. '.repeat(2);
+const SCAN = pdf('scan', 'Scan.pdf');
 function pdf(id, name) { const b = Buffer.from('%PDF-1.4\n%' + id + '\n'); return { buffer: b, size: b.length, mimetype: 'application/pdf', originalname: name || (id + '.pdf') }; }
 const DATEIEN = [pdf('expose', 'Expose.pdf'), pdf('mieter', 'Mietaufstellung.pdf'), pdf('weg', 'WEG-Protokoll.pdf'), pdf('energie', 'Energieausweis.pdf')];
 
 /* ── Nachbauten ───────────────────────────────────────────────────────── */
 function umgebung(opt) {
   opt = opt || {};
-  const log = [], ki = [], sql = [], tab = new Map(), stripeLog = [];
+  const log = [], ki = [], sql = [], tab = new Map(), stripeLog = [], kiPosten = [];
   let uhr = Date.UTC(2026, 10, 20, 10, 0, 0);
   const sw = { schwaerze: function (t) { log.push('schwaerzen'); return schwaerzen.schwaerze(t); } };
   const openai = {
@@ -91,6 +103,9 @@ function umgebung(opt) {
       return { success: true, model: o.model, extracted: x }; }
   };
   const pdfText = async function (buf) { log.push('pdf'); const id = /%(\w+)\n/.exec(buf.toString('latin1').slice(8)); return TEXTE[id && id[1]] || ''; };
+  const ocr = async function (buf) { log.push('ocr'); const id = /%(\w+)\n/.exec(buf.toString('latin1').slice(8));
+    return (id && id[1] === 'scan' && !opt.ocrLeer) ? { roh: SCAN_TEXT, seiten: 2, konfidenz: 88, woerter: 40, lesbar: true, abgeschnitten: false } : { roh: '', seiten: 1, konfidenz: 0, woerter: 0, lesbar: false }; };
+  const kiVerbrauch = { erfasseFremdPosten: function (l, o) { kiPosten.push({ l, o }); return 0.0123; } };
   const query = async function (text, params) {
     sql.push({ text, params: params || [] });
     if (/INSERT INTO einzelcheck_kaeufe/.test(text)) {
@@ -121,13 +136,18 @@ function umgebung(opt) {
   };
   const mbFetch = async function (url, init) {
     stripeLog.push(['mb', url, JSON.parse(init.body)]);
-    const daten = { data: { micro: { score: 64 }, macro: { score: 58 }, address: { city: 'Hüllhorst', postcode: '32609' }, ref: { ags: '05770016' },
-      valuation: { market_value: { estimated: 190000, low: 170000, high: 210000 }, inputs: { market_rent_sqm: 9.1 } },
+    /* v3941 · Antwort wie Stufe 2 - mit einem cross_check, den der Dienst trotzdem NICHT lesen darf */
+    const daten = { ai_mode: 'openai', cost: { geomap_eur: 0.38, openai_posten: [{ modell: 'gpt-4.1-mini', usage: { prompt_tokens: 9000, completion_tokens: 1500 } }] },
+      report_md: '## Lage\nRuhige Wohnlage mit guter Anbindung; Schulen in der Nähe.\n\nDie Angebote bei ImmobilienScout liegen höher.\n\n## Wert\nDer Ertragswert liegt bei 185.000 €.\n\n## Markt\n- Preise 2020–2025 stabil',
+      data: { micro: { score: 64 }, macro: { score: 58 }, address: { city: 'Hüllhorst', postcode: '32609' }, ref: { ags: '05770016', wert_stufe: 2 },
+      valuation: { market_value: { estimated: 190000, low: 170000, high: 210000, basis_median_sqm: 1900, angebot_abschlag: { pct: 10, herkunft: 'Marktdurchschnitt GeoMap', roh: { estimated: 211000 } } },
+        inputs: { market_rent_sqm: 9.1 }, yield: { gross_yield_pct: 8.2 } },
+      price_trend_pct: 2.1, rent_trend_pct: 1.4, days_on_market: 61, wertermittlungsstichtag: { datum: '2026-11-21', eigen: false },
       cross_check: { ertragswert: { available: true, value_eur: 185000, liegenschaftszins_pct: 2.9, miete_vergleich_qm: 7.8, miete_stufe: { etikett: 'ImmobilienScout-Angebote' } }, sachwert: { available: false, grund: 'Sachwertfaktor fehlt' } },
       wertermittlung_herkunft: { kurz: 'amtlich', indikativ: false } } };
     return { ok: true, text: async () => JSON.stringify(daten) };
   };
-  return { log, ki, sql, tab, stripeLog, deps: { pdfText, schwaerzen: sw, dokumentSchemas, openai, query, stripe: () => stripe, mbFetch, jetzt: () => uhr },
+  return { log, ki, sql, tab, stripeLog, kiPosten, deps: { pdfText, ocr, kiVerbrauch, schwaerzen: sw, dokumentSchemas, openai, query, stripe: () => stripe, mbFetch, jetzt: () => uhr },
     uhr: (t) => { uhr = t; }, jetzt: () => uhr };
 }
 
@@ -137,7 +157,9 @@ TEILE.A = async function (svc, q) {
   const f = [];
   const route = ohneKommentar(q.route), dienst = ohneKommentar(q.dienst);
   if (!/multer\.memoryStorage\(\)/.test(route) || /diskStorage|\bdest\s*:/.test(route)) f.push('Route ohne memoryStorage oder mit Plattenablage');
-  if (/require\(['"](node:)?fs['"]\)|require\(['"]\.\/ocr['"]\)/.test(dienst + route)) f.push('Dienst/Route laden fs oder ocr.js (ocr schreibt nach tmpdir)');
+  if (/require\(['"](node:)?fs['"]\)/.test(dienst + route)) f.push('Dienst/Route laden fs');
+  /* v3941 · ocr.js nur über ocrAusPuffer (Speicher); bildZuText/bilderZuText schreiben nach tmpdir */
+  if (/bildZuText|bilderZuText/.test(dienst + route) || (/require\(['"]\.\/ocr['"]\)/.test(dienst) && !/require\('\.\/ocr'\)\.ocrAusPuffer\(/.test(dienst))) f.push('Dienst nutzt den tmpdir-Weg von ocr.js');
   if (!/spawn\('pdftotext', \[[^\]]*'-', '-'\]/.test(dienst)) f.push('pdftotext nicht über stdin/stdout');
   /* echter Lauf mit Spionen auf fs */
   const U = umgebung(); svc._setzeDeps(U.deps);
@@ -152,6 +174,7 @@ TEILE.A = async function (svc, q) {
     await svc.handleEinzelcheckPaid({ id: [...U.tab.values()][0].stripe_session_id, mode: 'payment', payment_status: 'paid', metadata: sess.metadata });
     const z = await svc.kaufLesen(k.token);
     const voll = await svc.auslesen(DATEIEN, 'voll');
+    await svc.auslesen([SCAN], 'frei');   /* v3941 · gescannt: Texterkennung im selben Spion-Lauf */
     await svc.berichtGezaehlt(z.id, voll.zahlen);
     await svc.markt(voll.zahlen, voll._adresse);
     if (JSON.stringify(voll).indexOf(STRASSE) >= 0) f.push('Anschrift steht in der JSON-Antwort');
@@ -360,9 +383,165 @@ TEILE.K = async function (svc, q) {
   const mbAufruf = U.stripeLog.find((x) => x[0] === 'mb');
   if (!mbAufruf || !/\/reports\/einzelcheck$/.test(mbAufruf[1])) f.push('Dienst ruft nicht /reports/einzelcheck');
   if (mbAufruf && (mbAufruf[2].user_id || mbAufruf[2].external_ref)) f.push('mb-Aufruf trägt Nutzer oder Objektbezug');
-  if (!m.verfuegbar || m.wert.ertragswert !== 185000 || m.vergleichsmiete.qm !== 7.8 || m.lage.ags !== '05770016') f.push('Marktdaten nicht übernommen: ' + JSON.stringify(m).slice(0, 200));
+  /* v3941 · Stufe 2: angefragt wird 2 ohne fast (wie die App), und der mb-Dienst begrenzt selbst auf 2 */
+  if (mbAufruf && (mbAufruf[2].wert_stufe !== 2 || mbAufruf[2].fast)) f.push('angefragt Stufe ' + mbAufruf[2].wert_stufe + (mbAufruf[2].fast ? ' (Schnellmodus)' : '') + ' statt 2 wie in der App');
+  if (!/b\.wert_stufe = Math\.min\(2, /.test(blk)) f.push('mb: /reports/einzelcheck begrenzt die Stufe nicht auf 2');
+  const mj = JSON.stringify(m);
+  if (!m.verfuegbar || m.markt.wert !== 190000 || m.markt.miete_qm !== 9.1 || m.lage.ags !== '05770016' || m.stufe !== 2 || m.stichtag !== '2026-11-21') f.push('Marktdaten nicht übernommen: ' + mj.slice(0, 200));
+  if (!m.markt.abschlag || m.markt.abschlag.pct !== 10 || m.markt.abschlag.vor_abschlag !== 211000 || m.markt.abschlag.herkunft !== 'Marktdurchschnitt') f.push('Abschlag/Kennzeichnung der Marktpreisindikation: ' + JSON.stringify(m.markt.abschlag));
+  if (m.wert !== undefined || /185000|2\.9\b|ertragswert|sachwert|liegenschaftszins/i.test(mj)) f.push('Wertindikation aus Stufe 3 im Ergebnis: ' + mj.slice(0, 160));
+  if (m.vergleichsmiete !== null) f.push('Vergleichsmiete aus dem Ertragswert übernommen');
+  if (!m.wertermittlung || m.wertermittlung.in_app !== true) f.push('Weg in die App fehlt im Ergebnis');
+  /* KI-Text: bereinigt, ohne Quellen- und Wertermittlungssatz, nur Punkt und Komma */
+  const tx = (m.text || []).map((x) => x.text).join(' | ');
+  if (!/Ruhige Wohnlage mit guter Anbindung, Schulen in der Nähe\./.test(tx) || !/Preise 2020 bis 2025 stabil/.test(tx)) f.push('KI-Text nicht übernommen oder nicht bereinigt: ' + tx);
+  if (/;|–|—|ImmobilienScout|Ertragswert/.test(tx)) f.push('KI-Text mit Semikolon/Gedankenstrich/Quelle/Wertsatz: ' + tx);
+  if ((m.text || []).some((x) => x.art === 'h' && x.text === 'Wert')) f.push('leere Überschrift im KI-Text');
+  /* Kosten: KI-Posten erfasst (Weg des Berichts, ohne Nutzer), nicht im Ergebnis */
+  const kp = U.kiPosten[0];
+  if (!kp || kp.o.endpunkt !== 'public/einzelcheck/bericht' || kp.o.userId !== null || !Array.isArray(kp.l) || kp.l.length !== 1) f.push('KI-Kosten des Marktberichts nicht erfasst: ' + JSON.stringify(kp && kp.o));
+  if (/openai_posten|geomap/i.test(mj)) f.push('Kosten oder Quelle im Ergebnis');
+  if (!m._kosten || m._kosten.marktdaten_eur !== 0.38) f.push('Kosten nicht am Ergebnis (nicht aufzählbar)');
   if (JSON.stringify(m).match(/immobilienscout|immo\s*scout/i)) f.push('Quellenname nach außen: ' + JSON.stringify(m.vergleichsmiete));
-  if (/immobilienscout|immo\s*scout|geomap|pricehubble|sprengnetter/i.test(ohneKommentar(q.front))) f.push('Quellenname im Frontend');
+  const front = ohneKommentar(q.front);
+  if (/immobilienscout|immo\s*scout|geomap|pricehubble|sprengnetter/i.test(front)) f.push('Quellenname im Frontend');
+  if (/\.ertragswert|\.sachwert|liegenschaftszins_pct|ausschuss_link/.test(front)) f.push('Frontend liest noch die Wertindikation der Stufe 3');
+  if (!/Die Wertermittlung nach amtlichen Daten findest du in DealPilot\./.test(front) || !/D\.esc\(WERT_WEG\)/.test(front)) f.push('Satz mit dem Weg in die App fehlt im Bericht');
+  return f;
+};
+
+/* v3941 · L · gescannte PDFs */
+function pdfSeiten(n) {
+  /* ein echtes PDF mit n Seiten (für pdftoppm) */
+  const inhalt = 'BT /F1 18 Tf 72 720 Td (Seite) Tj ET';
+  const objs = ['<</Type/Catalog/Pages 2 0 R>>'];
+  const kids = []; for (let i = 0; i < n; i++) kids.push((3 + i * 2) + ' 0 R');
+  objs.push('<</Type/Pages/Kids[' + kids.join(' ') + ']/Count ' + n + '>>');
+  for (let i = 0; i < n; i++) {
+    objs.push('<</Type/Page/Parent 2 0 R/MediaBox[0 0 200 200]/Resources<</Font<</F1 ' + (3 + n * 2) + ' 0 R>>>>/Contents ' + (4 + i * 2) + ' 0 R>>');
+    objs.push('<</Length ' + inhalt.length + '>>stream\n' + inhalt + '\nendstream');
+  }
+  objs.push('<</Type/Font/Subtype/Type1/BaseFont/Helvetica>>');
+  let t = '%PDF-1.4\n'; const off = [];
+  objs.forEach((o, i) => { off.push(t.length); t += (i + 1) + ' 0 obj' + o + '\nendobj\n'; });
+  const x = t.length;
+  t += 'xref\n0 ' + (objs.length + 1) + '\n0000000000 65535 f \n' + off.map((o) => String(o).padStart(10, '0') + ' 00000 n \n').join('')
+    + 'trailer<</Size ' + (objs.length + 1) + '/Root 1 0 R>>\nstartxref\n' + x + '\n%%EOF';
+  return Buffer.from(t, 'latin1');
+}
+/* Nachgebaute Prozesse (node -e): pdftoppm liefert ein PNG je Seite (Seiten aus PDF_SEITEN, danach RC 99),
+   tesseract prüft, dass ein PNG über stdin kam, und antwortet als TSV; LANGSAM=1 schläft. */
+const NACHBAU = [
+  'const ch=[];process.stdin.on("data",d=>ch.push(d));process.stdin.on("end",()=>{',
+  'const b=Buffer.concat(ch),a=JSON.parse(process.env.EC_ARGS),rolle=process.env.EC_ROLLE;',
+  'if(rolle==="pdftoppm"){const n=+a[a.indexOf("-f")+1];if(n>+process.env.PDF_SEITEN){process.stderr.write("Wrong page range");process.exit(99);}',
+  'if(a[a.length-1]!=="-"||b.slice(0,5).toString("latin1")!=="%PDF-"){process.exit(3);}',
+  'process.stdout.write(Buffer.concat([Buffer.from([137,80,78,71,13,10,26,10]),Buffer.from("seite"+n)]));return;}',
+  'if(a[0]!=="stdin"||a[1]!=="stdout"||b[1]!==80||b[2]!==78||b[3]!==71){process.exit(4);}',
+  'const out=()=>{process.stdout.write("level\\tpage_num\\tblock_num\\tpar_num\\tline_num\\tword_num\\tleft\\ttop\\twidth\\theight\\tconf\\ttext\\n");',
+  'for(let i=0;i<8;i++)process.stdout.write("5\\t1\\t1\\t1\\t1\\t"+(i+1)+"\\t0\\t0\\t1\\t1\\t91\\tWort"+i+"\\n");};',
+  'if(process.env.LANGSAM==="1")setTimeout(out,8000);else out();});'
+].join('');
+function nachbauStarter(protokoll, opt) {
+  return function (befehl, args, o) {
+    const echtPdf = opt.echtPdftoppm && befehl === 'pdftoppm';
+    protokoll.push({ befehl, args: args.slice(), echt: echtPdf });
+    if (echtPdf) return spawnEcht(befehl, args, o);
+    const env = Object.assign({}, (o && o.env) || process.env, { EC_ARGS: JSON.stringify(args), EC_ROLLE: befehl, PDF_SEITEN: String(opt.seiten || 2), LANGSAM: opt.langsam ? '1' : '0' });
+    return spawnEcht(process.execPath, ['-e', NACHBAU], Object.assign({}, o, { env }));
+  };
+}
+TEILE.L = async function (svc, q) {
+  const f = [];
+  /* 1 · Dienst: Scan wird per Texterkennung gelesen, DANN geschwärzt, dann an die KI */
+  const U = umgebung(); svc._setzeDeps(U.deps);
+  let r; try { r = await svc.auslesen([SCAN], 'frei'); } finally { svc._setzeDeps(null); }
+  const folge = U.log.slice(0, U.log.lastIndexOf('ki') + 1).join(' ');
+  if (folge !== 'pdf ocr schwaerzen ki') f.push('Scan: Reihenfolge ' + folge + ' (erwartet pdf ocr schwaerzen ki)');
+  if (!r.unterlagen[0] || !r.unterlagen[0].gelesen || !r.unterlagen[0].texterkennung) f.push('Scan nicht gelesen: ' + JSON.stringify(r.unterlagen[0]));
+  U.ki.forEach((k) => { [NAME, MAIL].forEach((x) => { if (k.text.indexOf(x) >= 0) f.push('KI bekam aus dem Scan „' + x + '“'); }); });
+  const U0 = umgebung({ ocrLeer: true }); svc._setzeDeps(U0.deps);
+  let r0; try { r0 = await svc.auslesen([SCAN], 'frei'); } finally { svc._setzeDeps(null); }
+  if (!r0.unterlagen[0] || r0.unterlagen[0].grund !== 'kein_text' || U0.ki.length) f.push('Scan ohne erkannten Text: ' + JSON.stringify(r0.unterlagen[0]));
+  /* 2 · im kostenlosen Teil zählt ein Scan wie jede andere Unterlage */
+  const U2 = umgebung(); svc._setzeDeps(U2.deps);
+  let r2; try { r2 = await svc.auslesen([SCAN, DATEIEN[0], DATEIEN[1]], 'frei'); } finally { svc._setzeDeps(null); }
+  if (U2.ki.length !== 2 || r2.nicht_gelesen.length !== 1) f.push('frei mit Scan: ' + U2.ki.length + ' KI-Aufrufe, ' + r2.nicht_gelesen.length + ' nicht gelesen (erwartet 2 und 1)');
+  /* 3 · ocr.js im Text: ocrAusPuffer ohne fs, pdftoppm stdin -> stdout, tesseract stdin -> stdout */
+  const ocrText = ohneKommentar(q.ocr);
+  const koerper = (ocrText.split('async function ocrAusPuffer(')[1] || '').split('\nfunction _setzeStarter')[0]
+    + (ocrText.split('function _imSpeicher(')[1] || '').split('\nasync function ocrAusPuffer')[0];
+  if (!koerper.trim()) f.push('ocr.js: ocrAusPuffer/_imSpeicher fehlen');
+  if (/\bfs\.|tmpdir|_datenUrlZuDatei|writeFile/.test(koerper)) f.push('ocr.js: ocrAusPuffer berührt die Platte');
+  if (!/'pdftoppm', \['-f', String\(n\), '-l', String\(n\), [^\]]*'-png', '-'\]/.test(koerper)) f.push('ocr.js: pdftoppm nicht stdin -> stdout (eine Seite je Aufruf)');
+  if (!/'tesseract', \['stdin', 'stdout'/.test(koerper)) f.push('ocr.js: tesseract nicht stdin -> stdout');
+  if (!/bildZuText\(dataUrl\)[\s\S]*_datenUrlZuDatei\(dataUrl\)/.test(ocrText)) f.push('ocr.js: der App-Weg bildZuText wurde verändert');
+  /* 4 · echter Lauf von ocrAusPuffer mit fs-Spion: nachgebaute Prozesse, pdftoppm echt, wenn poppler da ist */
+  const ocr = q.ocr === lies(P.ocr) ? require(P.ocr) : ladeAusText(P.ocr, q.ocr);
+  const pv = spawnSync('pdftoppm', ['-v'], { encoding: 'utf8' });
+  const popplerDa = !pv.error && /poppler/i.test(String(pv.stdout || '') + String(pv.stderr || ''));
+  const spione = ['writeFileSync', 'writeFile', 'appendFileSync', 'appendFile', 'createWriteStream', 'copyFileSync', 'renameSync', 'mkdtempSync', 'openSync'];
+  const lauf = async function (opt, pdfPuffer, ocrOpt) {
+    const prot = [], alt = {}, treffer = [];
+    ocr._setzeStarter(nachbauStarter(prot, opt));
+    const vorher = fs.readdirSync(os.tmpdir()).length;
+    spione.forEach((n) => { alt[n] = fs[n]; fs[n] = function () { treffer.push(n); return alt[n].apply(fs, arguments); }; });
+    let erg = null, fehler = null; const t0 = Date.now();
+    try { erg = await ocr.ocrAusPuffer(pdfPuffer, ocrOpt); } catch (e) { fehler = e; }
+    finally { spione.forEach((n) => { fs[n] = alt[n]; }); ocr._setzeStarter(null); }
+    return { prot, treffer, erg, fehler, ms: Date.now() - t0, neu: fs.readdirSync(os.tmpdir()).length - vorher };
+  };
+  const acht = pdfSeiten(8);
+  const a = await lauf({ seiten: 8, echtPdftoppm: popplerDa }, acht);
+  if (a.fehler) f.push('ocrAusPuffer: ' + a.fehler.message);
+  else {
+    const tess = a.prot.filter((x) => x.befehl === 'tesseract').length, ppm = a.prot.filter((x) => x.befehl === 'pdftoppm').length;
+    if (tess !== 6 || ppm !== 6 || a.erg.seiten !== 6) f.push('8 Seiten: ' + ppm + ' pdftoppm, ' + tess + ' tesseract, ' + a.erg.seiten + ' gelesen (erwartet je 6)');
+    if (!/Wort0/.test(a.erg.roh) || !(a.erg.konfidenz > 80)) f.push('Text der Texterkennung kam nicht an: ' + JSON.stringify(a.erg).slice(0, 120));
+  }
+  if (a.treffer.length) f.push('fs-Schreiben in ocrAusPuffer: ' + a.treffer.join(', '));
+  if (a.neu > 0) f.push('im tmpdir ist eine Datei dazugekommen');
+  const zwei = await lauf({ seiten: 2 }, pdfSeiten(2));
+  if (zwei.fehler || zwei.erg.seiten !== 2 || zwei.prot.filter((x) => x.befehl === 'pdftoppm').length !== 3) f.push('2 Seiten: Seitenende nicht erkannt ' + JSON.stringify(zwei.erg || (zwei.fehler && zwei.fehler.message)));
+  /* 5 · Zeitlimit: tesseract hängt, nach der Frist ist Schluss (gekürzt, nicht gewartet) */
+  const z = await lauf({ seiten: 3, langsam: true }, pdfSeiten(3), { zeitMs: 1500 });
+  if (z.fehler || !z.erg.abgeschnitten || z.erg.grund !== 'zeit' || z.ms > 5000) f.push('Zeitlimit: ' + (z.fehler ? z.fehler.message : JSON.stringify(z.erg)) + ' nach ' + z.ms + ' ms');
+  /* 6 · Dienst ruft genau ocrAusPuffer mit den Grenzen 6 Seiten */
+  if (!/require\('\.\/ocr'\)\.ocrAusPuffer\(buffer, \{ maxSeiten: OCR_SEITEN, zeitMs: OCR_ZEIT_MS \}\)/.test(q.dienst) || !/const OCR_SEITEN = 6;/.test(q.dienst)) f.push('Dienst ruft ocrAusPuffer nicht mit 6 Seiten');
+  if (!popplerDa) console.log('       (L: pdftoppm nachgebaut, kein poppler hier; echter Lauf ist Staging-Abnahme im Container)');
+  return f;
+};
+/* v3941 · M · Rabatt-Vorrang */
+function fnAus(text, kopf) {
+  const i = text.indexOf(kopf); if (i < 0) return null;
+  let t = 0, j = text.indexOf('{', i);
+  for (let k = j; k < text.length; k++) { if (text[k] === '{') t++; else if (text[k] === '}') { t--; if (!t) return text.slice(i, k + 1); } }
+  return null;
+}
+TEILE.M = async function (svc, q) {
+  const f = [];
+  const quelle = fnAus(q.front, 'function mitCode(href, code)');
+  if (!quelle) return ['mitCode() fehlt im Frontend'];
+  const mitCode = new Function('location', quelle + '; return mitCode;')({ href: 'https://staging.dealpilot.immo/' });
+  for (const [name, datei] of [['App', q.flyerApp], ['Landing', q.flyerLanding]]) {
+    const aq = fnAus(datei, 'function ausQuery(suche)');
+    if (!aq) { f.push(name + ': ausQuery() nicht gefunden'); continue; }
+    const ausQuery = new Function(aq + '; return ausQuery;')();
+    const suche = (u) => { try { return new URL(u).search; } catch (e) { return ''; } };
+    const faelle = [
+      ['Flyer-Code am Link, EC gewinnt', 'https://app.dealpilot.immo/?register=1&plan=pro&code=ERSTFLUG', 'EC1A2B3C4D5E', 'EC1A2B3C4D5E'],
+      ['promo= am Link, EC gewinnt', 'https://app.dealpilot.immo/?promo=MESSE&register=1&plan=investor', 'EC1A2B3C4D5E', 'EC1A2B3C4D5E'],
+      ['ohne Code am Link', 'https://app.dealpilot.immo/?register=1&plan=starter', 'EC1A2B3C4D5E', 'EC1A2B3C4D5E'],
+      ['ohne EC bleibt der Flyer-Code', 'https://app.dealpilot.immo/?register=1&plan=pro&code=ERSTFLUG', null, 'ERSTFLUG']
+    ];
+    for (const [w, href, code, soll] of faelle) {
+      const ist = ausQuery(suche(mitCode(href, code)));
+      if (ist !== soll) f.push(name + ' liest „' + ist + '“ statt „' + soll + '“ (' + w + '): ' + mitCode(href, code));
+    }
+  }
+  const front = ohneKommentar(q.front);
+  if (!/if \(code && !frei\) href = mitCode\(href, code\)/.test(front)) f.push('paketeEinsetzen setzt den Code nicht über mitCode()');
+  if (!/Ein anderer Gutscheincode lässt sich mit der Anrechnung nicht kombinieren\./.test(front) || (front.match(/esc\(KOMBI\)/g) || []).length < 2) f.push('Satz „nicht kombinierbar“ fehlt in Ansicht oder PDF');
   return f;
 };
 
@@ -376,9 +555,10 @@ function quellen(ueber) {
   return Object.assign(q, ueber || {});
 }
 const NAMEN = { A: 'Speicher-only', A2: 'pdftotext echt über stdin/stdout', B: 'Schwärzen vor dem KI-Aufruf', C: 'Bremse und Schalter', D: 'kostenlos höchstens 2 Unterlagen',
-  E: 'Bericht nur mit gültigem Kauf-Token', F: 'Frist 14 Tage', G: 'Preis aus dem lookup_key', H: 'Webhook', I: 'Zahlen-Weissliste', J: 'Siegel', K: 'Marktbericht ohne Ablage, keine Quellennamen' };
+  E: 'Bericht nur mit gültigem Kauf-Token', F: 'Frist 14 Tage', G: 'Preis aus dem lookup_key', H: 'Webhook', I: 'Zahlen-Weissliste', J: 'Siegel', K: 'Marktbericht Stufe 2 ohne Ablage, keine Quellennamen',
+  L: 'gescannte PDFs: Texterkennung nur im Speicher', M: 'Rabatt-Vorrang Anrechnung vor Flyer-Code' };
 
-console.log('einzelcheck-pruefen · v3940');
+console.log('einzelcheck-pruefen · v3941');
 const svc = require(P.dienst);
 const q0 = quellen();
 for (const k of Object.keys(TEILE)) {
@@ -411,7 +591,22 @@ const GEGEN = [
   ['H', 'unbezahlt angenommen', { dienst: ersetze(D, "if (session.payment_status && session.payment_status !== 'paid') return", "if (false) return") }],
   ['I', 'Weissliste abgeschaltet', { dienst: ersetze(D, '  z.unterlagen = liste.length;\n  return zahlenSauber(z);', '  z.unterlagen = liste.length;\n  return Object.assign({ name: ' + JSON.stringify(NAME) + ' }, z);') }],
   ['J', 'Siegel nicht geprüft', { dienst: ersetze(D, 'if (Object.keys(z).length && !siegelPruefen(z, siegelWert)) {', 'if (false) {') }],
-  ['K', 'mb speichert wieder', { mbOrch: ersetze(q0.mbOrch, '(NUR_WERT || OHNE_ABLAGE) ? { id: null }', 'NUR_WERT ? { id: null }') }]
+  ['K', 'mb speichert wieder', { mbOrch: ersetze(q0.mbOrch, '(NUR_WERT || OHNE_ABLAGE) ? { id: null }', 'NUR_WERT ? { id: null }') }],
+  /* v3941 */
+  ['K', 'Stufe 3 angefragt', { dienst: ersetze(D, 'const MB_STUFE = 2;', 'const MB_STUFE = 3;') }],
+  ['K', 'Schnellmodus statt Stufe 2 wie in der App', { dienst: ersetze(D, 'return { address: adr, wert_stufe: MB_STUFE,', 'return { address: adr, wert_stufe: MB_STUFE, fast: true,') }],
+  ['K', 'Ertragswert wieder übernommen', { dienst: ersetze(D, '    vergleichsmiete: null,\n', '    vergleichsmiete: null, wert: { ertragswert: ((p.cross_check || {}).ertragswert || {}).value_eur },\n') }],
+  ['K', 'mb begrenzt die Stufe nicht', { mbApi: ersetze(q0.mbApi, 'b.wert_stufe = Math.min(2, ', 'b.wert_stufe = Math.min(3, ') }],
+  ['K', 'KI-Kosten nicht erfasst', { dienst: ersetze(D, "try { ki = deps().kiVerbrauch.erfasseFremdPosten(", "try { ki = 0 && deps().kiVerbrauch.erfasseFremdPosten(") }],
+  ['K', 'Frontend zeigt wieder den Ertragswert', { front: ersetze(q0.front, "    if (mk && mk.qm > 0) z.push(", "    if (m.wert && m.wert.ertragswert > 0) z.push(['Ertragswert', eur(m.wert.ertragswert), 'ImmoWertV']);\n    if (mk && mk.qm > 0) z.push(") }],
+  ['L', 'Texterkennung im Dienst entfernt', { dienst: ersetze(D, 'try { ocr = await d.ocr(datei.buffer); } catch (e) { ocr = null; }', 'ocr = null;') }],
+  ['L', 'Texterkennung nach dem Schwärzen statt davor (Rohtext an die KI)', { dienst: ersetze(D, '  const sw = d.schwaerzen.schwaerze(roh);\n  const text = sw.text;', '  const sw = d.schwaerzen.schwaerze(roh);\n  const text = roh;') }],
+  ['L', 'ocrAusPuffer schreibt nach tmpdir', { ocr: ersetze(q0.ocr, "  if (!Buffer.isBuffer(pdf) || !pdf.length) throw new Error('Texterkennung: kein PDF-Puffer');", "  if (!Buffer.isBuffer(pdf) || !pdf.length) throw new Error('Texterkennung: kein PDF-Puffer');\n  fs.writeFileSync(path.join(os.tmpdir(), 'ocr-ec.pdf'), pdf); try { fs.unlinkSync(path.join(os.tmpdir(), 'ocr-ec.pdf')); } catch (e) {}") }],
+  ['L', 'Seitengrenze 20 statt 6', { ocr: ersetze(q0.ocr, 'const OCR_MAX_SEITEN = 6;', 'const OCR_MAX_SEITEN = 20;') }],
+  ['L', 'kein Zeitlimit', { ocr: ersetze(q0.ocr, "    const uhr = setTimeout(function () { try { p.kill('SIGKILL'); } catch (e) {} ende(nein, Object.assign(new Error('Texterkennung: Zeitüberschreitung'), { code: 'ZEIT' })); }, fristMs);", "    const uhr = null;") }],
+  ['L', 'freier Teil zählt den Scan nicht mit', { dienst: ersetze(D, 'const zuLesen = alle.slice(0, max);', 'const zuLesen = alle.slice(0, max + (alle[0] && /%scan/.test(alle[0].buffer.toString("latin1")) ? 1 : 0));') }],
+  ['M', 'Code wieder nur angehängt', { front: ersetze(q0.front, "      if (code && !frei) href = mitCode(href, code).split('#')[0];", "      if (code && !frei) href += (href.indexOf('?') >= 0 ? '&' : '?') + 'code=' + encodeURIComponent(code);") }],
+  ['M', 'mitCode lässt den Flyer-Code stehen', { front: ersetze(q0.front, "    ['code', 'promo', 'rabatt'].forEach(function (k) { u.searchParams.delete(k); });\n", '') }]
 ];
 for (const [teil, was, ueber] of GEGEN) {
   const q = quellen(ueber);
