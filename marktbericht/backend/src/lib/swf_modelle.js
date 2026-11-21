@@ -1962,6 +1962,31 @@ function korrekturAnwenden(k, e) {
              ausprägung: `${xk} (${kat})` };
   }
 
+  /* ═══ v3943 · EINE ANPASSUNG UEBER ZWEI ZAHLEN, IN BEIDEN INTERPOLIERT ═══
+     Offenbach am Main (IMB 2026, Kap. 9.4.1, S. 60 f.) druckt zu seinen
+     Gebaeudefaktoren eine Anpassungstabelle, die Baujahr UND Grundstuecks-
+     flaeche zugleich beruecksichtigt, und interpoliert im Beispiel in beiden
+     Richtungen (Baujahr 1982 zwischen 1980 und 1985: 1,07 → 1,12 = 1,09).
+     `stufen_kategorial` kann das nicht: es liest das Baujahr als KLASSE.
+     Gerechnet wird mit demselben bilinearen Auswerter wie die Modellform
+     `matrix_interp` - keine zweite Interpolation. Ausserhalb der Tabelle
+     gibt es keinen Wert (null = offen; der Vergleichsfaktor wird dann nicht
+     gebildet, _korrekturenPruefen meldet „ausserhalb"), nie den Randwert.
+       feld / achse_x   Spalten (z. B. Baujahr)
+       feld_y / achse_y Zeilen  (z. B. Grundstuecksflaeche); zellen[y] = Reihe ueber achse_x */
+  if (k.art === 'matrix_interp') {
+    const xm = zahl(e[k.feld]); const ym = zahl(e[k.feld_y]);
+    if (xm === null || ym === null) return null;
+    const rm = matrixInterp({ achse_x: k.achse_x, achse_y: k.achse_y, zellen: k.zellen,
+      achse_x_feld: 'x', achse_y_feld: 'y', achse_x_bez: k.achse_x_bez || k.feld,
+      achse_y_bez: k.achse_y_bez || k.feld_y, rundung_stellen: k.rundung_stellen ?? 3 },
+    { x: xm, y: ym });
+    if (!rm || !rm.verfuegbar || !istZahl(rm.wert)) return null;
+    return { merkmal: k.bez, wert: rm.wert,
+             wirkung: k.wirkung === 'multiplikativ' ? 'multiplikativ' : 'additiv',
+             ausprägung: `${xm} / ${ym}` };
+  }
+
   if (k.art === 'kategorial') {
 
     const roh = e[k.feld];

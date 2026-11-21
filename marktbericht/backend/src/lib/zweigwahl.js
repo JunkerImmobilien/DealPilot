@@ -125,11 +125,25 @@ export function dekodiere(zweig) {
   let r = String(zweig || '').toLowerCase().trim();
   const o = { zweig: r, art: null, variante: null, bj_klasse: null,
               bj_grenze: null, rnd_von: null, rnd_bis: null,
-              lage: null, stadtteil: null, alle: false };
+              lage: null, stadtteil: null, alle: false,
+              we_von: null, we_bis: null, erstverkauf: false };
   if (!r) return o;
 
+  /* v3943 · Staffel nach der Zahl der Wohnungen IM GEBAEUDE und Erstverkauf.
+   *   we_v_bis10we     Wiederverkauf, Anlagen mit hoechstens 10 Wohnungen
+   *   we_v_ueber10we   Wiederverkauf, Anlagen mit mehr als 10 Wohnungen
+   *   etw_erstverkauf  Erstverkauf (Neubau)
+   * Belegt an Offenbach am Main, IMB 2026, Kap. 9.3.2 (S. 53 f.). Der Schluessel
+   * endet auf `we` - `mfh_bis6` (Wohneinheiten des MFH als Objektart, v1820)
+   * bleibt davon unberuehrt. */
+  let m = null;
+  if ((m = /_bis(\d+)we$/.exec(r))) { o.we_bis = +m[1]; r = r.slice(0, m.index); }
+  else if ((m = /_ueber(\d+)we$/.exec(r))) { o.we_von = +m[1] + 1; r = r.slice(0, m.index); }
+  else if ((m = /_ab(\d+)we$/.exec(r))) { o.we_von = +m[1]; r = r.slice(0, m.index); }
+  if ((m = /_erstverkauf$/.exec(r))) { o.erstverkauf = true; r = r.slice(0, m.index); }
+
   /* Stadtteil:  we_v_st_finthen  →  stadtteil 'finthen' */
-  let m = /_st_([a-z_]+)$/.exec(r);
+  m = /_st_([a-z_]+)$/.exec(r);
   if (m) { o.stadtteil = m[1]; r = r.slice(0, m.index); }
 
   /* Lage:  we_e_lage_sehr_gut  →  lage 'sehr_gut' */
@@ -226,6 +240,45 @@ export function typVon({ objart, haustyp, nutzung, einheiten }) {
   return null;
 }
 
+/* v3943 · Erstverkauf nur, wenn das Objekt ausdruecklich als Neubau bzw.
+   Erstverkauf markiert ist (Feld erstverkauf oder baustatus). Der aus dem
+   Baujahr abgeleitete Erstbezug (obj.erstbezug, Hamburger Formelwerk) ist
+   KEINE solche Markierung und wird hier nicht gelesen. */
+export function istErstverkauf(obj = {}) {
+  if (obj.erstverkauf === true) return true;
+  if (obj.erstverkauf === false) return false;
+  return /neubau|erstverkauf|erstbezug/i.test(String(obj.baustatus || ''));
+}
+
+/* v3943 · Wohnungen im Gebaeude, wie sie die Staffel des Ausschusses meint.
+   Gelesen wird ein ausdrueckliches Feld (wohnungen_im_gebaeude), sonst die
+   Wohneinheiten des Formulars (einheiten = ref.units, „Wohneinheiten im
+   Gebaeude"). Bei Wohnungseigentum zaehlt eine Angabe unter 2 nicht: ein
+   Gebaeude mit einer einzigen Wohnung ist kein Wohnungseigentum im Sinne des
+   WEG - die 1 meint dann die gekaufte Wohnung, nicht das Haus. Nie geraten. */
+export function wohnungenImGebaeude(obj = {}, typ = null) {
+  const roh = obj.wohnungen_im_gebaeude != null ? obj.wohnungen_im_gebaeude
+    : (obj.einheiten_gebaeude != null ? obj.einheiten_gebaeude : obj.einheiten);
+  if (roh == null || roh === '') return null;
+  const n = Number(roh);
+  if (!Number.isFinite(n) || n <= 0 || Math.floor(n) !== n) return null;
+  if (/^etw|teileigentum/.test(String(typ || '')) && n < 2) return null;
+  return n;
+}
+
+function passtWe(d, we) {
+  if (d.we_von == null && d.we_bis == null) return true;     /* keine Staffel */
+  if (we == null) return null;                               /* unbekannt */
+  if (d.we_von != null && we < d.we_von) return false;
+  if (d.we_bis != null && we > d.we_bis) return false;
+  return true;
+}
+function weText(d) {
+  if (d.we_bis != null && d.we_von == null) return 'höchstens ' + d.we_bis + ' Wohnungen im Gebäude';
+  if (d.we_von != null && d.we_bis == null) return 'mehr als ' + (d.we_von - 1) + ' Wohnungen im Gebäude';
+  return d.we_von + ' bis ' + d.we_bis + ' Wohnungen im Gebäude';
+}
+
 function passtRnd(d, rnd) {
   if (d.rnd_von == null && d.rnd_bis == null) return true;   /* kein Band */
   if (!Number.isFinite(rnd)) return null;                    /* unbekannt */
@@ -259,6 +312,8 @@ function genauigkeit(d, typ) {
   if (d.bj_klasse) g += 2;
   if (d.lage) g += 2;
   if (d.stadtteil) g += 2;
+  if (d.we_von != null || d.we_bis != null) g += 3;   /* v3943 · Staffel nach Wohnungen im Gebaeude */
+  if (d.erstverkauf) g += 2;                          /* v3943 */
   if (d.alle) g -= 1;
   return g;
 }
@@ -272,7 +327,7 @@ function genauigkeit(d, typ) {
  * @returns {{zweig:string, begruendung:string}}
  *        | {rueckfrage:string, fehlt:string, auswahl:string[], hinweis:string}
  */
-export function waehle(zweige, obj = {}) {
+export function waehle(zweige, obj = {}, opt = {}) {
   const liste = (zweige || []).filter(Boolean);
   if (!liste.length) {
     return { rueckfrage: 'kein_ausschuss', fehlt: null, auswahl: [],
@@ -318,6 +373,55 @@ export function waehle(zweige, obj = {}) {
       return erlaubt.includes(typ);
     });
     if (!kand.length) continue;
+
+    /* v3943 · ERSTVERKAUF. Ein Erstverkaufssatz gilt nur fuer ein Objekt, das
+       als Neubau/Erstverkauf markiert ist; dann geht er vor. Ohne Markierung
+       faellt er heraus (bis v3942 las dekodiere ihn als eigene Art
+       'etw_erstverkauf', und er griff nie). */
+    const _erst = istErstverkauf(obj);
+    if (_erst && kand.some((d) => d.erstverkauf)) kand = kand.filter((d) => d.erstverkauf);
+    else kand = kand.filter((d) => !d.erstverkauf);
+    if (!kand.length) continue;
+
+    /* v3943 · STAFFEL NACH WOHNUNGEN IM GEBAEUDE (Offenbach: <= 10 / > 10 WE).
+       Bekannt: der passende Staffelsatz gewinnt ueber genauigkeit(), fremde
+       Staffeln fallen weg. Unbekannt: die Staffelsaetze fallen weg, es gilt der
+       ungestaffelte Satz, und die Begruendung sagt, dass die Staffel die
+       Wohnungszahl braucht. Gibt es keinen ungestaffelten, wird gefragt.
+       Ein Staffelsatz aus einem Jahrgang NACH dem Wertermittlungsstichtag
+       (opt.nachStichtag) weicht dem ungestaffelten, wenn es den gibt (§ 10). */
+    let _staffelOffen = null, _staffelSpaeter = null;
+    if (kand.some((d) => d.we_von != null || d.we_bis != null)) {
+      const _we = wohnungenImGebaeude(obj, typ);
+      const ohneStaffel = kand.filter((d) => d.we_von == null && d.we_bis == null);
+      const spaet = (opt && opt.nachStichtag) || null;
+      if (spaet && ohneStaffel.length) {
+        const _s = kand.filter((d) => (d.we_von != null || d.we_bis != null) && spaet.has(d.zweig));
+        if (_s.length) { _staffelSpaeter = _s.map((d) => d.zweig); kand = kand.filter((d) => !_s.includes(d)); }
+      }
+      const mitStaffel = kand.filter((d) => d.we_von != null || d.we_bis != null);
+      if (mitStaffel.length) {
+        if (_we == null) {
+          if (!ohneStaffel.length) {
+            return { rueckfrage: 'wohnungen_im_gebaeude', fehlt: 'einheiten',
+              auswahl: mitStaffel.map(weText), zweige: mitStaffel.map((d) => d.zweig),
+              hinweis: 'Der Gutachterausschuss staffelt den Liegenschaftszinssatz nach der Zahl der '
+                     + 'Wohnungen im Gebäude (' + mitStaffel.map(weText).join(' / ') + '). Bitte die '
+                     + 'Wohneinheiten im Gebäude angeben — gewählt wird nicht nach Zufall.' };
+          }
+          _staffelOffen = mitStaffel;
+          kand = ohneStaffel;
+        } else {
+          const treffer = mitStaffel.filter((d) => passtWe(d, _we));
+          kand = treffer.length ? treffer.concat(ohneStaffel) : ohneStaffel;
+          if (!kand.length) {
+            return { rueckfrage: 'we_ausserhalb', fehlt: null, auswahl: mitStaffel.map((d) => d.zweig),
+              hinweis: 'Die Zahl von ' + _we + ' Wohnungen im Gebäude liegt außerhalb der Staffel des '
+                     + 'Gutachterausschusses (' + mitStaffel.map(weText).join(' / ') + ').' };
+          }
+        }
+      }
+    }
 
     /* Hat der Ausschuss eine Variante für diesen Typ, ist der Satz OHNE
        Variante der allgemeine — der genauere gewinnt später über
@@ -456,9 +560,23 @@ export function waehle(zweige, obj = {}) {
     }
     if (sieger.lage) teile.push('Lage ' + sieger.lage);
     if (sieger.stadtteil) teile.push('Stadtteil ' + sieger.stadtteil);
+    if (sieger.we_von != null || sieger.we_bis != null) teile.push(weText(sieger));   /* v3943 */
+    if (sieger.erstverkauf) teile.push('Erstverkauf');                                 /* v3943 */
+    let _zusatz = '';
+    if (_staffelOffen && _staffelOffen.length) {
+      _zusatz = ' Der Gutachterausschuss staffelt den Satz für Wohnungseigentum nach der Zahl der Wohnungen im Gebäude ('
+        + _staffelOffen.map((d) => d.zweig + ': ' + weText(d)).join('; ')
+        + '). Die Staffel braucht die Wohnungszahl; ohne sie gilt der ungestaffelte Satz ' + sieger.zweig
+        + '. Mit den Wohneinheiten im Gebäude wird der gestaffelte Satz gewählt.';
+    } else if (_staffelSpaeter && _staffelSpaeter.length) {
+      _zusatz = ' Die Staffel nach Wohnungen im Gebäude (' + _staffelSpaeter.join(', ')
+        + ') führt der Gutachterausschuss erst in einem Jahrgang nach dem Wertermittlungsstichtag; '
+        + 'zum Stichtag gilt der ungestaffelte Satz (§ 10 ImmoWertV).';
+    }
     return { zweig: sieger.zweig, art: sieger.art,
+      staffel_offen: _staffelOffen ? _staffelOffen.map((d) => d.zweig) : null,   /* v3943 */
       begruendung: 'Zweig des Gutachterausschusses: ' + sieger.zweig
-        + (teile.length ? ' (' + teile.join(', ') + ')' : '') };
+        + (teile.length ? ' (' + teile.join(', ') + ')' : '') + _zusatz };
   }
 
   /* Keine Art des Registers passt zu diesem Objekt. */
@@ -494,7 +612,20 @@ export function zinssatzFuerObjekt(deps, ags, obj = {}) {
   }
 
   const zweige = [...new Set(saetze.map((s) => s.zweig).filter(Boolean))];
-  const w = waehle(zweige, obj);
+  /* v3943 · Zweige, deren Saetze ALLE nach dem Wertermittlungsstichtag liegen
+     (ausgewertet nur fuer die Staffel nach Wohnungen im Gebaeude). */
+  const _st = String(obj.stichtag || '').slice(0, 10);
+  let _nach = null;
+  if (/^\d{4}-\d{2}-\d{2}$/.test(_st)) {
+    const tag = (s) => { const t = String(s.stichtag || '').slice(0, 10);
+      if (/^\d{4}-\d{2}-\d{2}$/.test(t)) return t;
+      const b = Number(s.berichtsjahr); return Number.isFinite(b) && b > 1900 ? b + '-01-01' : null; };
+    _nach = new Set(zweige.filter((z) => {
+      const ts = saetze.filter((s) => s.zweig === z).map(tag);
+      return ts.length && ts.every((t) => t && t > _st);
+    }));
+  }
+  const w = waehle(zweige, obj, { nachStichtag: _nach });
   if (!w.zweig) return { verfuegbar: false, ...w };
 
   /* Lage: führt der Ausschuss mehrere Sätze zu DIESEM Zweig, entscheidet

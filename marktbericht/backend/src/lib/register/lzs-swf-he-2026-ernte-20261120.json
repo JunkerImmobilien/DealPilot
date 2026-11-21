@@ -590,7 +590,7 @@
    "kauffaelle_zeitraum": "2025",
    "wohneinheiten_im_objekt_bis": 10,
    "standardstufe_mittel": 2.7,
-   "hinweis": "Staffelung nach Wohnungszahl im Gebäude; der Rechenweg wählt sie heute nicht selbst aus (objektart etw_bis10we). Bis dahin gilt für ETW der ungestaffelte Satz des Jahrgangs 2025."
+   "hinweis": "Staffelung nach Wohnungszahl im Gebäude; seit v3943 wählt die Zweigwahl (lib/zweigwahl.js) den Satz nach den Wohneinheiten im Gebäude (objektart etw_bis10we). Ohne Wohnungszahl gilt der ungestaffelte Satz des Jahrgangs 2025 (we_v), und der Rechenweg sagt, dass die Staffel die Wohnungszahl braucht."
   },
   "belege": [
    {
@@ -668,7 +668,7 @@
    "kauffaelle_zeitraum": "2025",
    "wohneinheiten_im_objekt_ab": 11,
    "standardstufe_mittel": 2.7,
-   "hinweis": "Staffelung nach Wohnungszahl im Gebäude; der Rechenweg wählt sie heute nicht selbst aus (objektart etw_ueber10we). Bis dahin gilt für ETW der ungestaffelte Satz des Jahrgangs 2025."
+   "hinweis": "Staffelung nach Wohnungszahl im Gebäude; seit v3943 wählt die Zweigwahl (lib/zweigwahl.js) den Satz nach den Wohneinheiten im Gebäude (objektart etw_ueber10we). Ohne Wohnungszahl gilt der ungestaffelte Satz des Jahrgangs 2025 (we_v), und der Rechenweg sagt, dass die Staffel die Wohnungszahl braucht."
   },
   "belege": [
    {

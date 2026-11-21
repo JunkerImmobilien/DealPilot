@@ -1762,6 +1762,99 @@ fallB('B70', () => {
   wert('B', 'B70', 'mit Maßnahme bleibt die RND des Zielbilds', pM ? pM.rnd : null, zb.rnd, 0.05);
 });
 
+/* B71 · v3943 · OFFENBACH: ETW-LIEGENSCHAFTSZINS GESTAFFELT NACH WOHNUNGEN IM GEBAEUDE.
+   IMB 2026 Stadt Offenbach, Kap. 9.3.2 (S. 53 f.): Wiederverkauf <= 10 WE 1,5 %, > 10 WE 2,2 %,
+   Erstverkauf 2,6 %; ohne Wohnungszahl der ungestaffelte Satz des Jahrgangs 2025 (2,2 %).
+   Am echten Register (Saatdateien) und an der echten Zweigwahl. */
+let B71_REG = null, B71_GAA = null;
+try { B71_REG = await lade('lib/ausschuss_register.js'); B71_GAA = await lade('lib/gutachterausschuss.js'); } catch (e) { B71_REG = null; }
+fallB('B71', () => {
+  if (!ZW || !B71_REG || !B71_GAA) return pruefe('B', 'B71', 'zweigwahl/Register geladen', false, 'fehlt');
+  const deps = { finde: B71_REG.finde, lagenFuer: B71_REG.lagenFuer, abruf: (o) => B71_GAA.liegenschaftszinssatz(o) };
+  const of = (o) => ZW.zinssatzFuerObjekt(deps, '06413000', { objart: 'etw', nutzung: 'vermietet', baujahr: 1975, restnutzungsdauer: 30, ...o }) || {};
+  const r6 = of({ einheiten: 6 }), r10 = of({ einheiten: 10 }), r11 = of({ einheiten: 11 }), r0 = of({}), r1 = of({ einheiten: 1 });
+  pruefe('B', 'B71', '6 WE → we_v_bis10we 1,5 % (Jahrgang 2026)', r6.zweig === 'we_v_bis10we' && r6.wert_pct === 1.5 && r6.berichtsjahr === 2026, r6.zweig + ' ' + r6.wert_pct);
+  pruefe('B', 'B71', '10 WE (Grenze) → we_v_bis10we 1,5 %', r10.zweig === 'we_v_bis10we' && r10.wert_pct === 1.5, r10.zweig + ' ' + r10.wert_pct);
+  pruefe('B', 'B71', '11 WE → we_v_ueber10we 2,2 % (Jahrgang 2026)', r11.zweig === 'we_v_ueber10we' && r11.wert_pct === 2.2 && r11.berichtsjahr === 2026, r11.zweig + ' ' + r11.wert_pct);
+  pruefe('B', 'B71', 'ohne Wohnungszahl → ungestaffelter Satz we_v 2,2 % (2025), Rechenweg nennt die Staffel',
+    r0.zweig === 'we_v' && r0.wert_pct === 2.2 && r0.berichtsjahr === 2025 && /Die Staffel braucht die Wohnungszahl/.test(r0.begruendung || ''), r0.zweig + ' ' + (r0.begruendung || '').slice(0, 80));
+  pruefe('B', 'B71', 'ETW mit „1 Einheit" ist keine Angabe zum Gebäude → ungestaffelt', r1.zweig === 'we_v', r1.zweig);
+  const rN = of({ einheiten: 6, baustatus: 'neubau' }), rE = of({ einheiten: 6, erstbezug: true }), rB = of({ einheiten: 6, baustatus: 'bestand' });
+  pruefe('B', 'B71', 'als Neubau markiert → etw_erstverkauf 2,6 %', rN.zweig === 'etw_erstverkauf' && rN.wert_pct === 2.6, rN.zweig + ' ' + rN.wert_pct);
+  pruefe('B', 'B71', 'Erstbezug nur aus dem Baujahr abgeleitet ist keine Markierung → kein Erstverkauf', rE.zweig === 'we_v_bis10we', rE.zweig);
+  pruefe('B', 'B71', 'Bestand → kein Erstverkauf', rB.zweig === 'we_v_bis10we', rB.zweig);
+  const r25 = of({ einheiten: 6, stichtag: '2025-06-30' });
+  pruefe('B', 'B71', 'Stichtag 2025: Staffel erst ab Jahrgang 2026 → ungestaffelter Satz, mit Grund', r25.zweig === 'we_v' && /nach dem Wertermittlungsstichtag/.test(r25.begruendung || ''), r25.zweig);
+  /* Gegenproben an der reinen Zweigwahl */
+  const w = (z, o) => ZW.waehle(z, { objart: 'etw', ...o });
+  const g1 = w(['we_v_bis10we', 'we_v_ueber10we'], {});
+  pruefe('B', 'B71', 'Gegenprobe: nur gestaffelte Sätze, keine Wohnungszahl → Rückfrage statt Raten', !g1.zweig && g1.rueckfrage === 'wohnungen_im_gebaeude' && g1.fehlt === 'einheiten', g1.rueckfrage);
+  const g2 = w(['we_v', 'etw_erstverkauf'], { einheiten: 6 });
+  pruefe('B', 'B71', 'Gegenprobe: Erstverkaufssatz greift ohne Markierung nie', g2.zweig === 'we_v', g2.zweig);
+  const g3 = w(['we_v'], { einheiten: 6 });
+  pruefe('B', 'B71', 'Gegenprobe: Ausschuss ohne Staffel → we_v ohne Staffelhinweis', g3.zweig === 'we_v' && !/Staffel/.test(g3.begruendung), g3.begruendung);
+  const d = ZW.dekodiere('mfh_bis6'), d2 = ZW.dekodiere('we_v_ueber10we');
+  pruefe('B', 'B71', 'Gegenprobe: mfh_bis6 bleibt Objektart (v1820), we_v_ueber10we → art we_v ab 11 WE', d.art === 'mfh_bis6' && d.we_bis == null && d2.art === 'we_v' && d2.we_von === 11, d.art + ' / ' + d2.art + ' ' + d2.we_von);
+  const m = ZW.waehle(['mfh_bis6', 'mfh_ueber6', 'mfh'], { objart: 'mfh', einheiten: 12 });
+  pruefe('B', 'B71', 'Gegenprobe: MFH-Staffel über die Objektart unverändert (12 WE → mfh_ueber6)', m.zweig === 'mfh_ueber6', m.zweig);
+});
+
+/* B72 · v3943 · OFFENBACH GEBAEUDEFAKTOREN (IMB 2026, Kap. 9.4.1) - Anwendungsbeispiele S. 61 und S. 63.
+   Tabelle nach Bodenrichtwert x Wohnflaeche (matrix_interp) und Anpassungsfaktor nach Baujahr x
+   Grundstuecksflaeche (Korrekturart matrix_interp, multiplikativ, in beiden Richtungen interpoliert).
+   Die Satzdatei liegt in register/ (in SAATDATEIEN) oder noch in register-vorgemerkt/; der Pruefer
+   laedt sie dazu, wenn sie noch nicht in der Liste steht, und stellt das Register danach wieder her. */
+let B72_SWF = null;
+try { B72_SWF = await lade('lib/swf_modelle.js'); } catch (e) { B72_SWF = null; }
+fallB('B72', () => {
+  if (!B71_REG || !B71_GAA) return pruefe('B', 'B72', 'Register/Gutachterausschuss geladen', false, 'fehlt');
+  const DATEI = 'vgf-he-offenbach-imb-2026.json';
+  const imReg = path.join(SRC, 'lib/register', DATEI), vorg = path.join(SRC, 'lib/register-vorgemerkt', DATEI);
+  const pfad = fs.existsSync(imReg) ? imReg : (fs.existsSync(vorg) ? vorg : null);
+  if (!pfad) return pruefe('B', 'B72', 'Satzdatei ' + DATEI + ' vorhanden', false, 'fehlt');
+  const saetze = JSON.parse(fs.readFileSync(pfad, 'utf8'));
+  const inListe = B71_REG.SAATDATEIEN.includes(DATEI);
+  const vf = (o) => B71_GAA.vergleichsfaktor({ ags: '06413000', ...o }) || {};
+  const efh = { objektart: 'EFH', brw: 690, wohnflaeche: 120, flaeche: 700, baujahr_modifiziert: 1982, baujahr: 1982, rnd: 36 };
+  const rh = { objektart: 'RH', brw: 785, wohnflaeche: 120, flaeche: 400, baujahr_modifiziert: 1975, baujahr: 1975, rnd: 29 };
+  /* Gegenprobe vorher: ohne die Datei rechnet Offenbach mit den Landes-Vergleichsfaktoren (Stufe B) */
+  if (!inListe) {
+    const v0 = vf(efh);
+    pruefe('B', 'B72', 'Gegenprobe ohne IMB-Satz: Landes-Vergleichsfaktor Hessen (Stufe B), nicht 5.158', v0.stufe === 'B' && v0.wert !== 5158, v0.stufe + ' ' + v0.wert);
+    B71_REG.ladeSaat([...B71_REG.SAATDATEIEN, pfad.split(path.sep).join('/')]);   /* leseSaatdateien erkennt einen Pfad am Schraegstrich */
+  }
+  try {
+    const e = vf(efh), r = vf(rh);
+    pruefe('B', 'B72', 'EFH S. 61: 4.732 × 1,09 = 5.158 €/m² (Stufe A, IMB)', e.verfuegbar && e.wert === 5158 && e.stufe === 'A'
+      && (e.korrekturen || []).some((k) => k.wert === 1.09 && k.wirkung === 'multiplikativ') && /Tabellenwert 4732/.test(e.rechenweg || ''), e.wert + ' ' + (e.rechenweg || e.hinweis || '').slice(0, 90));
+    pruefe('B', 'B72', 'RH/DHH S. 63: 4.152 × 0,95 = 3.944 €/m² (Stufe A, IMB)', r.verfuegbar && r.wert === 3944 && r.stufe === 'A', r.wert + ' ' + r.stufe);
+    const d = vf({ ...rh, objektart: 'DHH' });
+    pruefe('B', 'B72', 'DHH fällt auf denselben Satz (keine Unterscheidung im Bericht)', d.wert === 3944, d.wert);
+    for (const s of saetze) {
+      const bsp = (s.belege || []).find((b) => b && b.erwartet);
+      const z = vf({ objektart: s.zweig === 'ezfh' ? 'EFH' : 'RH', rnd: 30, ...bsp.eingabe });
+      pruefe('B', 'B72', 'Satz ' + s.zweig + ': Beispiel aus dem Satz selbst (' + bsp.fundstelle + ') = ' + bsp.erwartet.wert, z.wert === bsp.erwartet.wert, z.wert);
+    }
+    const oB = vf({ ...efh, baujahr_modifiziert: null }), aB = vf({ ...efh, baujahr_modifiziert: 1990 }), aF = vf({ ...efh, flaeche: 300 }), aR = vf({ ...efh, brw: 900 }), aN = vf({ ...efh, rnd: 12 });
+    pruefe('B', 'B72', 'ohne fiktives Baujahr: kein Wert, Merkmal fehlt', !oB.verfuegbar && oB.grund === 'merkmal_fehlt', oB.grund);
+    pruefe('B', 'B72', 'Baujahr 1990 (Tabelle bis 1985): kein Wert, keine Extrapolation', !aB.verfuegbar && aB.grund === 'korrektur_nicht_anwendbar', aB.grund);
+    pruefe('B', 'B72', 'Grundstück 300 m² (Tabelle ab 350): kein Wert, kein Randwert', !aF.verfuegbar && aF.grund === 'korrektur_nicht_anwendbar', aF.grund);
+    pruefe('B', 'B72', 'Bodenrichtwert 900 (Tabelle bis 825): kein Wert', !aR.verfuegbar && aR.grund === 'ausserhalb_der_tabelle', aR.grund);
+    pruefe('B', 'B72', 'Restnutzungsdauer 12 (Auswertung > 15): kein Wert', !aN.verfuegbar && aN.grund === 'ausserhalb_des_anwendungsbereichs', aN.grund);
+    /* Gegenprobe am Auswerter: ohne die Anpassung kaeme der blanke Tabellenwert 4.732 heraus - die neue
+       Korrekturart traegt das Ergebnis; mit einer Baujahrsklasse statt Interpolation waere es 1,07 statt 1,09. */
+    if (B72_SWF) {
+      const f = saetze.find((x) => x.zweig === 'ezfh');
+      const ein = { brw: 690, wohnflaeche: 120, flaeche: 700, baujahr_modifiziert: 1982, rnd: 36 };
+      const ohne = B72_SWF.auswerten({ ...f.formel, kennzahl: 'vergleichsfaktor', korrekturen: [] }, ein);
+      const mit = B72_SWF.auswerten({ ...f.formel, kennzahl: 'vergleichsfaktor', korrekturen: f.korrekturen }, ein);
+      pruefe('B', 'B72', 'Gegenprobe Auswerter: ohne Anpassung 4.732, mit Anpassung 5.158', ohne.wert === 4732 && mit.wert === 5158, ohne.wert + ' / ' + mit.wert);
+    }
+  } finally {
+    if (!inListe) B71_REG.ladeSaat();
+  }
+});
+
 /* ══ v3343 · C2 · ANKER = VERGLEICHSMIETE DER WOHNUNG — ALT → NEU (Entscheidung offen, bis Marcel neu einfriert) ══
    Die eingefrorenen Argumente der Ebene C tragen keinen vergleichsmiete_kontext (der kommt im Orchestrator aus
    Dateien und mb.zensus_werte). Hier wird er offline gebaut (Mietspiegel-Werte, Naeherung mit

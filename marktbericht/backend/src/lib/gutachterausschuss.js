@@ -374,6 +374,21 @@ function waehleAusGruppe(kandidaten, baujahr) {
 
   const passend = kandidaten.filter((s) => passtZumBaujahr(s, baujahr));
   if (passend.length === 1) return passend[0];
+  /* v3943 · ZWEI SAETZE DESSELBEN JAHRGANGS, VERSCHIEDENER HERKUNFT.
+     Offenbach am Main: die Vergleichsfaktoren des Landes Hessen 2026 (ZGGH,
+     Stufe B) und die eigenen Gebaeudefaktoren des Ausschusses im IMB 2026
+     (Stufe A, Anwendungsbeispiel nachgerechnet) - beide Zweig ezfh/rhdhh,
+     beide Stichtag 01.01.2026. Bis hier kam dann NICHTS heraus (beide
+     „passen", also null). Unterscheiden sie sich in der STUFE, gilt die
+     bessere (eigene Tabelle des Ausschusses zuerst, Marcel 17.10.2026);
+     gleiche Stufe bleibt null - dann ist es wirklich eine Frage. Faelle,
+     die bisher einen Wert hatten, aendern sich dadurch nicht. */
+  if (passend.length > 1) {
+    const rang = (s) => { const r = 'ABCDE'.indexOf(String(s.stufe || '').toUpperCase()); return r < 0 ? 9 : r; };
+    const best = Math.min(...passend.map(rang));
+    const top = passend.filter((s) => rang(s) === best);
+    if (top.length === 1) return top[0];
+  }
   /* Mehrere oder keine Gruppe passt: kein Wert. Lieber nichts als die
    * falsche Tabelle. */
   return null;
@@ -1483,6 +1498,8 @@ const VGF_EINTRAGEN = {
   garagen_anzahl: 'Reiter Objekt: „Garagen“',
   stellplaetze: 'Reiter Objekt: „Garagen“ und „Stellplätze außen“',
   rnd: 'Reiter Objekt: Baujahr und Modernisierungsgrad (Restnutzungsdauer nach Anlage 2)',
+  /* v3943 · fiktives Baujahr = Wertermittlungsjahr - (80 - RND), Offenbach IMB 2026 S. 58 */
+  baujahr_modifiziert: 'Reiter Objekt: Baujahr und Modernisierungsgrad (fiktives Baujahr aus der Restnutzungsdauer nach Anlage 2)',
   brw: 'Bodenrichtwert (BORIS-Abruf oder Reiter Objekt „Bodenrichtwert“)',
 };
 function _eintragenText(feld) {
@@ -1624,8 +1641,9 @@ function _korrekturenPruefen(korr, e, offenListe) {
       }
       continue;
     }
-    if (leer(v) || (k.art === 'stufen_kategorial' && leer(e[k.kategorie_feld]))) {
-      zeilen.push({ bez: name, feld: leer(v) ? k.feld : k.kategorie_feld, status: 'merkmal_fehlt' });
+    if (leer(v) || (k.art === 'stufen_kategorial' && leer(e[k.kategorie_feld]))
+        || (k.art === 'matrix_interp' && leer(e[k.feld_y]))) {   /* v3943 · zweite Achse */
+      zeilen.push({ bez: name, feld: leer(v) ? k.feld : (k.art === 'matrix_interp' ? k.feld_y : k.kategorie_feld), status: 'merkmal_fehlt' });
       continue;
     }
     if (offen.has(String(name))) { zeilen.push({ bez: name, feld: k.feld, status: 'ausserhalb', wert: v }); continue; }
