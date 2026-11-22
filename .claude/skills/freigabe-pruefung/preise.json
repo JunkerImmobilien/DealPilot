@@ -1,0 +1,17 @@
+{
+  "_stand": "22.11.2026, gemessen in frontend/js/config.js (Z. 323, 324, 375, 376, 423, 424, 489-491) und backend/src/services/einzelcheck.js (3,99 EUR, Betrag kommt aus Stripe). Bei jeder Preisaenderung hier nachziehen und vorher in config.js nachmessen.",
+  "erlaubt_eur": [0, 3.99, 19.99, 34.99, 49.99, 219, 384, 549, 0.90, 1.90, 3.90],
+  "einordnung": {
+    "0": "Free",
+    "3.99": "Einzel-Check ohne Abo, 14 Tage auf ein Paket angerechnet",
+    "19.99": "Starter monatlich",
+    "34.99": "Investor monatlich",
+    "49.99": "Pro monatlich",
+    "219": "Starter jaehrlich",
+    "384": "Investor jaehrlich",
+    "549": "Pro jaehrlich",
+    "0.90": "Marktpreisindikation einzeln",
+    "1.90": "Erweiterte Marktpreisindikation einzeln",
+    "3.90": "Wertermittlung nach ImmoWertV einzeln"
+  }
+}
