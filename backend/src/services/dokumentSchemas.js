@@ -130,6 +130,29 @@ const DOKUMENT_TYPEN = {
     leit: ['Baulastenverzeichnis', 'Baulastenauskunft', 'Baulastenblatt', 'Auskunft aus dem Baulastenverzeichnis'],
     keywords: ['Baulast', 'Bauaufsicht', 'Abstandsfläche', 'Stellplatz', 'Zufahrt', 'Vereinigungsbaulast', 'übernimmt die Verpflichtung']
   },
+  /* v3982 · F11 Gesamt-Flow 22.11.2026: Mieterhöhungsverlangen, Betriebskostenabrechnung, Sanierungsangebot und
+     Darlehensvertrag hatten keine Art. Sie liefen als Marktbericht durch und die KI füllte Lage, Marktmiete
+     (7,92 €/m² aus dem Mieterhöhungsschreiben) und Baujahr (1970 aus der Baualtersklasse), teils vorgehakt. */
+  mieterhoehung: {
+    label: 'Mieterhöhungsverlangen',
+    leit: ['Mieterhöhungsverlangen', 'Mieterhoehungsverlangen', 'Zustimmung zur Mieterhöhung', 'Erhöhung der Nettokaltmiete', 'Mieterhöhung nach § 558', 'Mieterhoehung'],
+    keywords: ['§ 558 BGB', 'Mietspiegel', 'ortsübliche Vergleichsmiete', 'Zustimmung', 'Kappungsgrenze', 'Vergleichswohnungen']
+  },
+  betriebskosten: {
+    label: 'Betriebskostenabrechnung',
+    leit: ['Betriebskostenabrechnung', 'Nebenkostenabrechnung', 'Heizkostenabrechnung', 'Betriebskostenaufstellung'],
+    keywords: ['Betriebskostenverordnung', 'Vorauszahlungen', 'Nachzahlung', 'Guthaben', 'Umlageschlüssel', 'Abrechnungszeitraum', 'Grundsteuer', 'Müllabfuhr']
+  },
+  sanierungsangebot: {
+    label: 'Sanierungsangebot / Kostenvoranschlag',
+    leit: ['Kostenvoranschlag', 'Angebotssumme', 'Angebot Nr', 'Leistungsverzeichnis', 'Auftragsbestätigung'],
+    keywords: ['Angebot', 'Summe netto', 'Umsatzsteuer', 'Bauvorhaben', 'Ausführung', 'Lohnkosten', 'Position']
+  },
+  darlehensvertrag: {
+    label: 'Darlehensvertrag',
+    leit: ['Darlehensvertrag', 'Nettodarlehensbetrag', 'Sollzinsbindung', 'Effektiver Jahreszins', 'Tilgungsfreie Anlaufzeit', 'Annuitätendarlehen'],
+    keywords: ['Darlehensnehmer', 'Darlehensgeber', 'Sollzins', 'Tilgung', 'Zinsbindung', 'Sondertilgung', 'Auszahlung', 'Grundschuld']
+  },
   mieter_unterlagen: {
     label: 'Persönliche Unterlagen eines Mieters',
     leit: ['Mietzahlungsbestätigung', 'Mietschuldenfreiheit', 'Selbstauskunft', 'Rentenbescheid', 'Gehaltsabrechnung', 'Lohnabrechnung', 'SCHUFA', 'Bonitätsauskunft', 'Entschädigungsrente'],
@@ -566,6 +589,79 @@ const SCHEMATA = {
     ]
   },
 
+  /* v3982 · F11 */
+  mieterhoehung: {
+    einleitung: 'Aus dem folgenden Mieterhoehungsverlangen (Schreiben des Vermieters an einen Mieter) extrahiere die Daten als JSON. KEINE Namen von Mietern oder Vermietern.',
+    schema: [
+      '{',
+      '  "einheit": string|null (Bezeichnung der Wohnung, z. B. "WE 5", "Whg. 3", "DG links" - KEIN Name),',
+      '  "schreiben_datum": string|null DD.MM.JJJJ,',
+      '  "art": "558"|"559"|"staffel"|"index"|"sonstig" (558 = Erhoehung auf die ortsuebliche Vergleichsmiete, 559 = Modernisierungsumlage),',
+      '  "bisherige_miete_eur": number (Nettokaltmiete je Monat VOR der Erhoehung),',
+      '  "neue_miete_eur": number (verlangte Nettokaltmiete je Monat),',
+      '  "wirksam_ab": string DD.MM.JJJJ,',
+      '  "wohnflaeche_m2": number|null,',
+      '  "begruendung": "mietspiegel"|"vergleichswohnungen"|"gutachten"|"mietdatenbank"|"modernisierung"|"sonstig"|null,',
+      '  "vergleichsmiete_qm_eur": number|null (ortsuebliche Vergleichsmiete je m2, NUR wenn als Zahl im Schreiben genannt, keine Baualtersklasse, kein Baujahr),',
+      '  "seit_unveraendert_monate": number|null',
+      '}'
+    ],
+    zahlen: { bisherige_miete_eur: [0, 1e5], neue_miete_eur: [0, 1e5], wohnflaeche_m2: [1, 1e4], vergleichsmiete_qm_eur: [1, 100] }
+  },
+  betriebskosten: {
+    einleitung: 'Aus der folgenden Betriebskosten- oder Nebenkostenabrechnung (Vermieter an Mieter oder fuer das ganze Haus) extrahiere die Daten als JSON. KEINE Namen.',
+    schema: [
+      '{',
+      '  "jahr": number (Abrechnungsjahr),',
+      '  "umfang": "einheit"|"haus" (Abrechnung fuer EINE Wohnung oder fuer das ganze Haus),',
+      '  "einheit": string|null (Bezeichnung der Wohnung, KEIN Name),',
+      '  "umlagefaehig_eur": number|null (Summe der umlagefaehigen Kosten im Jahr),',
+      '  "nicht_umlagefaehig_eur": number|null (Summe der nicht umlagefaehigen Kosten, z. B. Verwaltung, Instandhaltung, Bankgebuehren - nur wenn genannt),',
+      '  "vorauszahlungen_eur": number|null (geleistete Vorauszahlungen im Jahr),',
+      '  "ergebnis_eur": number|null (Nachzahlung des Mieters positiv, Guthaben negativ),',
+      '  "positionen": [{"bezeichnung": string, "betrag_eur": number, "umlagefaehig": true|false|null}]',
+      '}'
+    ],
+    zahlen: { jahr: [1990, 2100] }
+  },
+  sanierungsangebot: {
+    einleitung: 'Aus dem folgenden Angebot / Kostenvoranschlag eines Handwerksbetriebs extrahiere die Daten als JSON. Firmennamen sind erlaubt, KEINE Namen von Privatpersonen.',
+    schema: [
+      '{',
+      '  "firma": string|null (Name des Betriebs),',
+      '  "titel": string|null (Bauvorhaben in wenigen Worten, z. B. "Badmodernisierung WE 5"),',
+      '  "angebot_datum": string|null DD.MM.JJJJ,',
+      '  "ausfuehrung": string|null (geplante Ausfuehrung, Jahr oder Zeitraum),',
+      '  "netto_eur": number|null, "ust_pct": number|null, "brutto_eur": number|null (Angebotssumme inkl. Umsatzsteuer),',
+      '  "lohnkosten_eur": number|null (Lohnanteil, falls genannt, fuer § 35a EStG),',
+      '  "positionen": [{"bezeichnung": string, "netto_eur": number}],',
+      '  "gewerke": [string] (z. B. "Bad", "Fenster", "Dach", "Heizung", "Daemmung")',
+      '}'
+    ],
+    zahlen: { netto_eur: [0, 1e8], brutto_eur: [0, 1e8], ust_pct: [0, 25] }
+  },
+  darlehensvertrag: {
+    einleitung: 'Aus dem folgenden Darlehensvertrag extrahiere die Konditionen als JSON. KEINE Namen oder Anschriften von Darlehensnehmern.',
+    schema: [
+      '{',
+      '  "bank": string|null (Name der Bank mit Rechtsform, z. B. "Musterbank eG"),',
+      '  "vertragsnummer": string|null,',
+      '  "darlehensart": "annuitaet"|"tilgungsaussetzung"|"endfaellig"|"kfw"|"sonstig",',
+      '  "darlehensbetrag_eur": number (Nettodarlehensbetrag),',
+      '  "sollzins_pct": number (gebundener Sollzins p. a.),',
+      '  "tilgung_pct": number|null (anfaengliche Tilgung p. a.),',
+      '  "zinsbindung_jahre": number|null,',
+      '  "auszahlung": string|null DD.MM.JJJJ (Auszahlungstag),',
+      '  "auszahlungskurs_pct": number|null (100 = kein Disagio),',
+      '  "tilgungsfrei_monate": number|null (tilgungsfreie Anlaufzeit in Monaten, 0 wenn "keine"),',
+      '  "rate_monat_eur": number|null (Monatsrate nach der Anlaufzeit),',
+      '  "sondertilgung_pct": number|null (jaehrliches Sondertilgungsrecht in % des Darlehensbetrags),',
+      '  "bereitstellungszins_pct_monat": number|null, "bereitstellungsfrei_monate": number|null,',
+      '  "restschuld_ende_bindung_eur": number|null (laut Tilgungsplan, ohne Sondertilgungen)',
+      '}'
+    ],
+    zahlen: { darlehensbetrag_eur: [1000, 1e9], sollzins_pct: [0, 20], tilgung_pct: [0, 20], zinsbindung_jahre: [1, 40], tilgungsfrei_monate: [0, 120], auszahlungskurs_pct: [50, 110], sondertilgung_pct: [0, 100] }
+  },
   marktbericht: {
     einleitung: 'Aus dem folgenden Grundstuecksmarktbericht extrahiere die fuer eine Immobilienbewertung relevanten Daten als JSON.',
     schema: [

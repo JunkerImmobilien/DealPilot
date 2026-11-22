@@ -2118,6 +2118,47 @@
     if (vorher.hgVorgabe) { nm.hgAbw = { monat: vorher.hgMonat, quelle: quelle }; return; }   /* Hausgeld: ein Satz für beide Zeilen, am Ende von recompute() */
     _importHinweise.push('Abweichung ' + (nm.label || feld) + ': ' + (vorher.source || 'Exposé') + ' ' + vorher.value + ', ' + quelle + ' ' + nm.value + '. Übernommen ist ' + quelle + '.');
   }
+  /* v3982 · F11 Gesamt-Flow 22.11.2026: ein Mieterhöhungsverlangen wird eine Zeile „Mieterhöhung eintragen" (nie
+     vorgehakt) mit der Kappungsprüfung aus dem Kern (DpMietpotenzial.zulaessig: Kappungsgrenze der Gemeinde, ohne
+     Vergleichsmiete gerechnet unter der Annahme, dass sie mindestens so hoch liegt). Musterallee 12 WE 5: 510 → 625 €
+     ab 01.08.2025 = +22,5 %, zulässig höchstens 612 € (20 %) - die Zeile sagt das. */
+  function _isoAus(s) { var m = String(s || '').match(/^(\d{1,2})\.(\d{1,2})\.(\d{4})$/); return m ? m[3] + '-' + ('0' + m[2]).slice(-2) + '-' + ('0' + m[1]).slice(-2) : (/^\d{4}-\d{2}-\d{2}$/.test(String(s || '')) ? String(s) : null); }
+  function _kappungPct() {
+    try { var P = window.DpPotenzial, k = P && P.kappung ? P.kappung() : null; if (k && (k.pct === 15 || k.pct === 20)) return k; } catch (e) {}
+    return { pct: 20, text: 'Kappungsgrenze 20 % in 3 Jahren (§ 558 Abs. 3 BGB), Gemeinde nicht geprüft.' };
+  }
+  function _mieterhoehungPruefung(x, kapp, K) {
+    var alt = numDe(x.bisherige_miete_eur), neu = numDe(x.neue_miete_eur);
+    if (!(alt > 0 && neu > 0)) return null;
+    var art = /^(558|559|staffel|index|sonstig)$/.test(String(x.art || '')) ? String(x.art) : '558';
+    var pct = Math.round((neu / alt - 1) * 1000) / 10, r = { alt: alt, neu: neu, art: art, plus_pct: pct, max: null, ueber: false, text: '' };
+    if (art === '558' && K && typeof K.zulaessig === 'function') {
+      var z = K.zulaessig({ ist: alt, wfl: numDe(x.wohnflaeche_m2), vgl_qm: numDe(x.vergleichsmiete_qm_eur), kappung_pct: kapp.pct, mv_art: '' });
+      r.max = z && z.miete_monat > 0 ? z.miete_monat : null;
+      r.ueber = r.max != null && neu > r.max + 0.5;
+      r.text = r.ueber ? 'Über der Kappungsgrenze: ' + kapp.pct + ' % in 3 Jahren erlauben höchstens ' + fmt0(r.max) + ' € (§ 558 Abs. 3 BGB), verlangt sind ' + fmt0(neu) + ' € (+' + String(pct).replace('.', ',') + ' %). Ohne frühere Erhöhung in den drei Jahren davor gerechnet.'
+        : 'Innerhalb der Kappungsgrenze ' + kapp.pct + ' % (höchstens ' + fmt0(r.max) + ' €).';
+    }
+    return r;
+  }
+  function _mieterhoehungZeile(t) {
+    var x = t.extracted || {}, ab = _isoAus(x.wirksam_ab), kapp = _kappungPct();
+    var r = _mieterhoehungPruefung(x, kapp, window.DpMietpotenzial);
+    if (!r || !ab) { _importHinweise.push('Mieterhöhungsverlangen' + (x.einheit ? ' ' + x.einheit : '') + ' gelesen, aber ohne bisherige und neue Miete oder ohne Datum. Bitte die Erhöhung im Reiter Miete von Hand eintragen.'); return; }
+    var key = 'erh:' + (x.einheit || '') + ':' + ab;
+    _merged[key] = { nurAktiv: true, label: 'Mieterhöhung' + (x.einheit ? ' ' + x.einheit : ''), value: fmt0(r.alt) + ' → ' + fmt0(r.neu) + ' € ab ' + ab.split('-').reverse().join('.'),
+      raw: String(r.neu), source: t.label || 'Mieterhöhungsverlangen', kind: 'erhoehung', erh: { einheit: x.einheit || null, datum: ab, art: r.art, von: r.alt, auf: r.neu, beleg: 'Mieterhöhungsverlangen' + (x.schreiben_datum ? ' vom ' + x.schreiben_datum : '') },
+      herleitung: 'trägt die Erhöhung in die Liste der Mieterhöhungen ein (Reiter Miete' + (x.einheit ? ', Wohnung ' + x.einheit : '') + ')' + (r.text ? ' · ' + r.text : '') };
+    if (r.ueber) _importHinweise.push('Mieterhöhung' + (x.einheit ? ' ' + x.einheit : '') + ': ' + r.text);
+  }
+  function _betriebskostenHinweis(t) {
+    var x = t.extracted || {}, teile = [];
+    if (numDe(x.umlagefaehig_eur) > 0) teile.push('umlagefähig ' + fmt0(numDe(x.umlagefaehig_eur)) + ' €');
+    if (numDe(x.nicht_umlagefaehig_eur) > 0) teile.push('nicht umlagefähig ' + fmt0(numDe(x.nicht_umlagefaehig_eur)) + ' €');
+    if (numDe(x.vorauszahlungen_eur) > 0) teile.push('Vorauszahlungen ' + fmt0(numDe(x.vorauszahlungen_eur)) + ' €');
+    if (x.ergebnis_eur != null && numDe(x.ergebnis_eur) != null) teile.push((numDe(x.ergebnis_eur) >= 0 ? 'Nachzahlung ' : 'Guthaben ') + fmt0(Math.abs(numDe(x.ergebnis_eur))) + ' €');
+    _importHinweise.push('Betriebskostenabrechnung' + (x.jahr ? ' ' + x.jahr : '') + (x.einheit ? ' (' + x.einheit + ')' : '') + ' gelesen' + (teile.length ? ': ' + teile.join(', ') : '') + '. Sie ändert keine Felder; die Kosten des Jahres stehen im Reiter Steuer bzw. Bewirtschaftung.');
+  }
   function _hausgeldAbweichung() {
     var u = _merged.hg_ul, n = _merged.hg_nul, a = (u && u.hgAbw) || (n && n.hgAbw); if (!a) return;
     var mon = ((numDe(u && u.raw) || 0) + (numDe(n && n.raw) || 0)) / 12;
@@ -2174,6 +2215,8 @@
         return;
       }
       var ktx = _kontext();
+      if (t.typ === 'mieterhoehung') { _mieterhoehungZeile(t); return; }   /* v3982 · F11 */
+      if (t.typ === 'betriebskosten') { _betriebskostenHinweis(t); return; }
       (D.abgleich(t.extracted || {}, t.typ, ktx) || []).forEach(function (z) {
         if (z.hinweis) { _importHinweise.push(z.hinweis); return; }
         /* v3088a · Marcel 02.11.2026: Wirtschaftsplan/Abrechnung „immer erst mal auflisten und zum Übernehmen aktiv anstoßen“ - nie vorgehakt */
@@ -2595,7 +2638,7 @@
         }).join('') + '<div class="oabi-addr-hinweis" style="font-size:12px;margin-top:4px;opacity:.8">Übernommen werden nur Werte aus dem Dokument der gewählten Adresse.</div></div>';
     }
     /* v3029-import · eine Zeile ohne Zielfeld wird nicht angeboten (sie konnte nie ankommen) */
-    var _SONDER = { steuer: 1, anhaengen: 1, merken: 1, einheiten: 1, mv_einheit: 1, sonderumlage: 1 };   /* v3120 · v3972: sonderumlage fehlte - die Zeilen „Sonderumlage · …“ (Schlüssel su:Jahr:Betrag, kein Formularfeld) fielen still weg (Gesamtflow 22.11.2026, Protokoll mit beschlossener Dach-Sonderumlage) */
+    var _SONDER = { steuer: 1, anhaengen: 1, merken: 1, einheiten: 1, mv_einheit: 1, sonderumlage: 1, erhoehung: 1 /* v3982 */ };   /* v3120 · v3972: sonderumlage fehlte - die Zeilen „Sonderumlage · …“ (Schlüssel su:Jahr:Betrag, kein Formularfeld) fielen still weg (Gesamtflow 22.11.2026, Protokoll mit beschlossener Dach-Sonderumlage) */
     var keys = Object.keys(_merged).filter(function (id) {
       var it = _merged[id]; if (!it || _SONDER[it.kind] || id === 'me_modus' || id === 'mfh_wohnungen' || (_qcMode && OBJ2QC[id])) return true;
       return !!document.getElementById(id);
@@ -2942,8 +2985,9 @@
      im Dateinamen. Ein Exposé, das als Dokument gelesen wird, verliert seine Felder. */
   var DOK_KOPF = ['Energieausweis', 'Teilungserklärung', 'Teilungserklaerung', 'Gemeinschaftsordnung', 'Aufteilungsplan', 'Mietvertrag',
     'Wohnraummietvertrag', 'Mieterliste', 'Mietaufstellung', 'Mieterübersicht', 'Mietenliste', 'Einladung zur', 'Protokoll', 'Grundbuch', 'Flurkarte', 'Liegenschaftskarte',
-    /* v3017 */ 'Wirtschaftsplan', 'Hausgeldabrechnung', 'Jahresabrechnung', 'Einzelabrechnung', 'Baulastenverzeichnis', 'Baulastenauskunft'];
-  var DOK_NAME = /grundbuch|\bgb\b|teilung|weg|etv|protokoll|energie|flur|kataster|mietvertrag|mieterliste|mietaufstellung|baulast|wirtschaftsplan|hausgeld|abrechnung/i;   /* v3017: wirtschaftsplan|hausgeld|abrechnung */
+    /* v3017 */ 'Wirtschaftsplan', 'Hausgeldabrechnung', 'Jahresabrechnung', 'Einzelabrechnung', 'Baulastenverzeichnis', 'Baulastenauskunft',
+    /* v3982 · F11 */ 'Mieterhöhungsverlangen', 'Betriebskostenabrechnung', 'Nebenkostenabrechnung', 'Heizkostenabrechnung', 'Kostenvoranschlag', 'Angebot Nr', 'Darlehensvertrag'];
+  var DOK_NAME = /grundbuch|\bgb\b|teilung|weg|etv|protokoll|energie|flur|kataster|mietvertrag|mieterliste|mietaufstellung|baulast|wirtschaftsplan|hausgeld|abrechnung|mieterh|betriebskost|nebenkost|angebot|kostenvoranschlag|darlehen/i;   /* v3982: mieterh|betriebskost|nebenkost|angebot|kostenvoranschlag|darlehen */   /* v3017: wirtschaftsplan|hausgeld|abrechnung */
   function istDokument(text, name) {
     var t = String(text || '');
     /* v3120 · der Schutz gilt den eigenen DealPilot-Berichten. Steht ein eindeutiger Leitbegriff am Anfang
@@ -3229,6 +3273,22 @@
     if (it.kind === 'ze_teile') {
       if (window.DpZeAufteilung && it.teile && document.getElementById('ze_stp_monat')) { window.DpZeAufteilung.setzen(it.teile); return 'text'; }
       setInput('ze', String(it.raw)); return 'text';
+    }
+    if (it.kind === 'erhoehung') {   /* v3982 · F11: in die Liste der Mieterhöhungen (Objekt oder Wohnung) */
+      var E = window.DpErhoehungen, er = it.erh || {}; if (!E || !E.eintragAus) return null;
+      var neuE = E.eintragAus({ datum: er.datum, art: er.art, von: er.von, auf: er.auf, beleg: er.beleg }); if (!neuE.eintrag) return null;
+      var M = window._dpMfh, nrN = function (s) { return String(s || '').toLowerCase().replace(/[^a-z0-9]/g, '').replace(/^(we|whg|wohnung)/, ''); };
+      if (M && Array.isArray(M.einheiten) && M.einheiten.length) {
+        var iE = -1; M.einheiten.forEach(function (e, i) { if (iE < 0 && e && er.einheit && nrN(e.nr) === nrN(er.einheit)) iE = i; });
+        if (iE < 0) { _importHinweise.push('Mieterhöhung ' + (er.einheit || '') + ': keine passende Wohnung gefunden, bitte im Fenster „Einheiten erfassen" eintragen.'); return null; }
+        var eu = M.einheiten[iE]; eu.erhoehungen = (Array.isArray(eu.erhoehungen) ? eu.erhoehungen : []).filter(function (y) { return y && y.datum !== er.datum; }).concat([neuE.eintrag]);
+      } else {
+        var dO = window._currentObjData; if (!dO) return null;
+        dO._erhoehungen = (Array.isArray(dO._erhoehungen) ? dO._erhoehungen : []).filter(function (y) { return y && y.datum !== er.datum; }).concat([neuE.eintrag]);
+      }
+      try { if (E.objektMount) E.objektMount(); } catch (e) {}
+      try { window.dispatchEvent(new Event('dp:erhoehungen')); } catch (e) {}
+      return 'text';
     }
     if (it.kind === 'sonderumlage') {   /* v3092 · N100 */
       return (window.DpSonderumlage && window.DpSonderumlage.uebernehmen(it.su)) ? 'text' : null;

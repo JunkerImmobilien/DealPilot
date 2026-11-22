@@ -140,6 +140,11 @@
     einheiten_anzahl: ['einheiten', 'Wohneinheiten im Gebäude', 'zahl'],
     /* v3670 · in die Aufteilung der Zusatzeinnahmen (js/ze-aufteilung.js): der Stellplatz ersetzt nicht mehr
        die ganze Summe ze (eine Kuechenmiete darin ging verloren), ze wird Summe der Teile */
+    /* v3982 · F11: Darlehensvertrag → Reiter Finanzierung (Darlehen I), Sanierungsangebot → Sanierungskosten */
+    darlehensbetrag_eur: ['d1', 'Darlehenssumme', 'eur'], sollzins_pct: ['d1z', 'Zinssatz nominal', 'pct'], tilgung_pct: ['d1t', 'Tilgung', 'pct'],
+    zinsbindung_jahre: ['d1_bindj', 'Zinsbindung (Jahre)', 'zahl'], tilgungsfrei_monate: ['d1_tf_mon', 'Tilgungsfrei (Monate)', 'zahl'],
+    auszahlung: ['d1_auszahl', 'Auszahlung', 'monat'], bank: ['bank_inst', 'Bank', 'text'], vertragsnummer: ['d1_vertrag', 'Vertragsnummer', 'text'],
+    brutto_eur: ['san', 'Sanierungskosten (Angebot brutto)', 'eur'],
     stellplatz_miete_eur: ['ze_stp_monat', 'Zusätzliche Einnahmen: Stellplatz / Monat', 'eur'],
     kueche_miete_eur: ['ze_kueche_monat', 'Zusätzliche Einnahmen: Küche / Möblierung / Monat', 'eur']
   };
@@ -148,7 +153,9 @@
   /* v3029-import · die Wohnfläche des Verkehrswertgutachtens (objekt.wohnflaeche_m2) fiel bis v3028 mit
      unter diese Sperre und kam nie an. Beim Haus mit mehreren Einheiten entfernt object-actions.js
      Miete/Fläche/Zimmer/Stellplatz eines Mietvertrags wieder (eine Einheit ist nicht das Haus). */
-  var NUR_AUS = { kaltmiete_eur: { mietvertrag: 1 }, wohnflaeche_m2: { mietvertrag: 1, vwg_vorgutachten: 1 }, zimmer: { mietvertrag: 1 }, stellplatz_miete_eur: { mietvertrag: 1 }, kueche_miete_eur: { mietvertrag: 1 } };
+  var NUR_AUS = { darlehensbetrag_eur: { darlehensvertrag: 1 }, sollzins_pct: { darlehensvertrag: 1 }, tilgung_pct: { darlehensvertrag: 1 }, zinsbindung_jahre: { darlehensvertrag: 1 },
+    tilgungsfrei_monate: { darlehensvertrag: 1 }, auszahlung: { darlehensvertrag: 1 }, bank: { darlehensvertrag: 1 }, vertragsnummer: { darlehensvertrag: 1 }, brutto_eur: { sanierungsangebot: 1 },   /* v3982 */
+    kaltmiete_eur: { mietvertrag: 1 }, wohnflaeche_m2: { mietvertrag: 1, vwg_vorgutachten: 1 }, zimmer: { mietvertrag: 1 }, stellplatz_miete_eur: { mietvertrag: 1 }, kueche_miete_eur: { mietvertrag: 1 } };
   /* Klartext statt Schluessel fuer die uebrigen Angaben */
   var NAMEN = {
     notar: 'Notar', ur_nr: 'Urkundennummer', nebenkosten_eur: 'Nebenkosten', verkaeufer_anzahl: 'Verkäufer (Anzahl)', kaeufer_anzahl: 'Käufer (Anzahl)',
@@ -180,6 +187,7 @@
   }
   function _schreibwert(v, art) {
     if (art === 'datum') return _datumIso(v);
+    if (art === 'monat') { var _mi = _datumIso(v); return _mi ? _mi.slice(5, 7) + '.' + _mi.slice(0, 4) : null; }   /* v3982 · d1_auszahl MM.JJJJ */
     if (art === 'text') return String(v).trim();
     if (art === 'auswahl') return String(v).trim().toUpperCase().replace(/\s/g, '');   /* Energieklasse: „b" → „B" wie im Auswahlfeld */
     var n = _zahl(v); if (n === null) return null;
@@ -187,7 +195,7 @@
     return (n % 1 === 0) ? String(n) : String(n).replace('.', ',');
   }
   function _gleich(ist, neu, art) {
-    if (art === 'text' || art === 'datum' || art === 'auswahl') return String(ist).trim().toLowerCase() === String(neu).trim().toLowerCase();
+    if (art === 'text' || art === 'datum' || art === 'auswahl' || art === 'monat') return String(ist).trim().toLowerCase() === String(neu).trim().toLowerCase();
     var a = (typeof parseDe === 'function') ? parseDe(ist) : parseFloat(ist), b = (typeof parseDe === 'function') ? parseDe(neu) : parseFloat(neu);
     return Math.abs(a - b) < 0.005;
   }

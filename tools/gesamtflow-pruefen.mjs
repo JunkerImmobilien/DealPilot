@@ -231,5 +231,42 @@ function funk(src, name) {
   ok(/function vertragsErhoehungen\(E\)/.test(jb) && /erh = erh\.concat\(vertragsErhoehungen\(E\)\)/.test(jb), 'F18 Jahresabgleich zeigt die Erhöhung aus „Letzte Erhöhung" (ohne Liste), nicht „Keine Erhöhung"');
 }
 
-console.log(`gesamtflow-pruefen (v3981): ${gruen} von ${gruen + rot} ok`);
+/* ── F11 · Importarten Mieterhöhung, Betriebskosten, Angebot, Darlehensvertrag ── */
+{
+  const mod = { exports: {} };
+  try { new Function('module', 'exports', 'require', lies('backend/src/services/dokumentSchemas.js'))(mod, mod.exports, () => ({})); } catch (e) { ok(false, 'F11 dokumentSchemas lädt: ' + e.message); }
+  const DS = mod.exports;
+  const faelle = [
+    ['Mieterhöhungsverlangen WE 5\nMieterhöhungsverlangen nach § 558 BGB\nDie Nettokaltmiete Ihrer Wohnung (66 m²) beträgt derzeit 510,00 € (7,73 €/m²). Erhöhung auf 625,00 € ab 01.08.2025. Begründung: Mietspiegel der Stadt Herford, Baualtersklasse 1970 bis 1979.', 'Mieterhoehung WE 5 ab 01.08.2025.pdf', 'mieterhoehung'],
+    ['Betriebskostenabrechnung 2024 · Musterallee 12\nBetriebskostenabrechnung 2024 (Gesamthaus)\nGrundsteuer Müllabfuhr Vorauszahlungen Nachzahlung', 'Betriebskostenabrechnung 2024.pdf', 'betriebskosten'],
+    ['Betriebskostenabrechnung 2025 · WE 5\nBetriebskostenabrechnung 2025\nGrundsteuer Wasser Vorauszahlungen (12 × 265,00 €) Guthaben Mieter', 'Betriebskostenabrechnung Mieter 2025.pdf', 'betriebskosten'],
+    ['Muster Bad & Haustechnik GmbH · Angebot\nAngebot Nr. A-7-2023\nSumme netto 11.630,00 € Umsatzsteuer 19 % Angebotssumme brutto 13.839,70 €', '06 Sanierungsangebot Badmodernisierung.pdf', 'sanierungsangebot'],
+    ['Musterbank eG · Darlehensvertrag MB-2023-4711\nDarlehensvertrag (Annuitätendarlehen)\nNettodarlehensbetrag 175.200,00 € Tilgungsfreie Anlaufzeit 3 Monate', '07 Darlehensvertrag MB-2023-4711.pdf', 'darlehensvertrag'],
+    ['WEG Musterweg 7 · Jahresabrechnung 2024\nHausgeldabrechnung 2024 · Einzelabrechnung', 'Hausgeldabrechnung 2024.pdf', 'hausgeld'],
+    ['Wohnraummietvertrag WE 5\nWohnraummietvertrag\nDie Nettokaltmiete beträgt 590,00 €. Vermieter Mieter Kaution 1.770,00 €.', '03 Mietvertrag WE 5.pdf', 'mietvertrag']];
+  faelle.forEach((f) => { const k = DS.klassifiziere ? DS.klassifiziere(f[0], f[1]).typ : null; ok(k === f[2], 'F11 Art „' + f[1] + '" = ' + f[2] + ' (Ist ' + k + ')'); });
+  ['mieterhoehung', 'betriebskosten', 'sanierungsangebot', 'darlehensvertrag'].forEach((t) => ok(DS.SCHEMATA && DS.SCHEMATA[t] && DS.SCHEMATA[t].schema.length > 3, 'F11 Schema für ' + t));
+  const oa = lies('frontend/js/object-actions.js');
+  const dn = (oa.match(/var DOK_NAME = (\/[^\n]*?\/i);/) || [])[1];
+  const DN = dn ? eval(dn) : /$^/;
+  ok(['Mieterhoehung WE 5 ab 01.08.2025.pdf', 'Betriebskostenabrechnung 2024.pdf', '06 Sanierungsangebot Bad.pdf', '07 Darlehensvertrag MB-2023-4711.pdf'].every((n) => DN.test(n)), 'F11 Dateinamen gelten als Unterlage (nie mehr Marktbericht-Suche)');
+  /* Kappungsprüfung am echten Kern */
+  const kctx = { console, Math, JSON, Number, String, isFinite, parseFloat, parseInt, Object, Array, Date, setTimeout: () => 0, document: undefined };
+  kctx.window = kctx; kctx.globalThis = kctx; vm.createContext(kctx);
+  try { vm.runInContext(lies('frontend/js/mietpotenzial-kern.js'), kctx); } catch (e) {}
+  const pr = funk(oa, '_mieterhoehungPruefung'), hilf = ['numDe', 'fmt0'].map((n) => funk(oa, n) || '').join('\n');
+  const pctx = { Math, JSON, Number, String, isFinite, parseFloat, Intl, K: kctx.DpMietpotenzial };
+  vm.createContext(pctx);
+  let r = null;
+  try { vm.runInContext(hilf + '\n' + (pr || '') + '\n;var __r = _mieterhoehungPruefung({ bisherige_miete_eur: 510, neue_miete_eur: 625, wohnflaeche_m2: 66, art: "558" }, { pct: 20 }, K);', pctx); r = pctx.__r; } catch (e) { r = null; }
+  ok(r && r.max === 612 && r.ueber === true && /Kappungsgrenze/.test(r.text), 'F11 WE 5 510 → 625 € (+22,5 %): über der Kappungsgrenze, höchstens 612 € (Kern zulaessig) (Ist ' + (r ? r.max + ' / ' + r.ueber : '-') + ')');
+  let r2 = null;
+  try { vm.runInContext('var __r2 = _mieterhoehungPruefung({ bisherige_miete_eur: 545, neue_miete_eur: 600, wohnflaeche_m2: 68, art: "558" }, { pct: 20 }, K);', pctx); r2 = pctx.__r2; } catch (e) {}
+  ok(r2 && r2.ueber === false, 'F11 WE 2 545 → 600 € (+10 %) innerhalb der Kappungsgrenze');
+  ok(/kind === 'erhoehung'/.test(oa) && /erhoehung: 1/.test(oa), 'F11 Zeile „Mieterhöhung" wird geschrieben und erscheint in der Prüftabelle (_SONDER)');
+  const di = lies('frontend/js/dokument-import.js');
+  ok(/darlehensbetrag_eur: \['d1'/.test(di) && /tilgungsfrei_monate: \['d1_tf_mon'/.test(di) && /brutto_eur: \['san'/.test(di), 'F11 Darlehensvertrag → Darlehen I (inkl. tilgungsfrei), Angebot → Sanierungskosten');
+}
+
+console.log(`gesamtflow-pruefen (v3982): ${gruen} von ${gruen + rot} ok`);
 process.exit(rot ? 1 : 0);
