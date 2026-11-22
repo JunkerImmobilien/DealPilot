@@ -1684,5 +1684,878 @@
    "surplus": 70035.86,
    "project_count": 7
   }
+ },
+ "nach_schritt3": {
+  "_zweck": "Nach den Testdaten (Mietanpassungen, Mietende, Sondertilgungen) und den Beleg-Uploads, gelesen 22.11.2026",
+  "mietverlauf": {
+   "rtu_2pHlZE38tqFK": {
+    "rental_start": "2011-05-01",
+    "start_state": {
+     "rent": 590,
+     "utility": 175
+    },
+    "rent_changes": [
+     {
+      "id": "rch_1fyLqb0mIoGA",
+      "effective_date": "2026-11-01",
+      "status": "active",
+      "adjustment_type": "utility_adjustment",
+      "adjustment_reason": "Testfall: höhere Betriebskosten",
+      "previous_rent": 590,
+      "new_rent": 590,
+      "previous_utility_costs": 175,
+      "new_utility_costs": 185
+     }
+    ],
+    "amenity_changes": []
+   },
+   "rtu_0WEvSK3bzatJ": {
+    "rental_start": "2019-09-01",
+    "start_state": {
+     "rent": 600,
+     "utility": 175
+    },
+    "rent_changes": [
+     {
+      "id": "rch_4aa6BO01HI5k",
+      "effective_date": "2026-11-01",
+      "status": "active",
+      "adjustment_type": "increase",
+      "adjustment_reason": "Testfall",
+      "previous_rent": 600,
+      "new_rent": 630,
+      "previous_utility_costs": 175,
+      "new_utility_costs": 175
+     }
+    ],
+    "amenity_changes": []
+   },
+   "rtu_3BOpEJ0JbJaw": {
+    "rental_start": "2019-04-01",
+    "start_state": {
+     "rent": 950,
+     "utility": 265
+    },
+    "rent_changes": [
+     {
+      "id": "rch_3Yua7X3yX4pM",
+      "effective_date": "2026-11-01",
+      "status": "active",
+      "adjustment_type": "increase",
+      "adjustment_reason": "Testfall: Anpassung an die Vergleichsmiete",
+      "previous_rent": 950,
+      "new_rent": 990,
+      "previous_utility_costs": 265,
+      "new_utility_costs": 280
+     }
+    ],
+    "amenity_changes": []
+   }
+  },
+  "mietverhaeltnisse_1041": [
+   {
+    "id": "rtu_2pHlZE38tqFK",
+    "project_id": "prj_34f3ix17DflJ",
+    "unit_id": "unt_0qOjPg06QGZS",
+    "tenant_first_name": "Mieter",
+    "tenant_last_name": "WE 1 · EG links",
+    "tenant_salutation": null,
+    "tenant_title": null,
+    "tenant_date_of_birth": null,
+    "tenant_phone": null,
+    "tenant_email": null,
+    "is_company": false,
+    "company_name": null,
+    "tenant_alt_street": null,
+    "tenant_alt_zip": null,
+    "tenant_alt_city": null,
+    "rent": 590,
+    "target_rent": 590,
+    "monthly_utility_costs": 185,
+    "rental_start": "2011-05-01",
+    "rental_end": null,
+    "rent_due_day": 3,
+    "monthly_hausgeld": null,
+    "occupancy_type": "rented",
+    "contract_type": "free_rent",
+    "last_rent_increase": "2026-11-01",
+    "is_special": false,
+    "index_base_year": null,
+    "index_base_month": null,
+    "index_base_value": null,
+    "index_base_since": null,
+    "index_auto_prepare": false,
+    "deposit_amount": 1770,
+    "deposit_type": null,
+    "deposit_location": null,
+    "deposit_due_date": null,
+    "deposit_received_date": null,
+    "deposit_returned_date": null,
+    "deposit_retained_amount": null,
+    "deposit_retention_note": null,
+    "vat_rate_rent": null,
+    "vat_rate_utility": null,
+    "vat_rate_deposit": null,
+    "unit": {
+     "id": "unt_0qOjPg06QGZS",
+     "identifier": "WE 1 · EG links",
+     "unit_type": "residential",
+     "square_meters": 70,
+     "rooms": null,
+     "floor": "EG"
+    },
+    "co_tenants": [],
+    "amenities": [
+     {
+      "id": "amn_4SAu7T2tO9IF",
+      "type": "parking_space",
+      "description": "Stellplatz",
+      "monthly_rent": 30,
+      "vat_rate": null
+     }
+    ]
+   },
+   {
+    "id": "rtu_0WEvSK3bzatJ",
+    "project_id": "prj_34f3ix17DflJ",
+    "unit_id": "unt_4NN1zz1OJLn0",
+    "tenant_first_name": "Mieter",
+    "tenant_last_name": "WE 2 · EG rechts",
+    "tenant_salutation": null,
+    "tenant_title": null,
+    "tenant_date_of_birth": null,
+    "tenant_phone": null,
+    "tenant_email": null,
+    "is_company": false,
+    "company_name": null,
+    "tenant_alt_street": null,
+    "tenant_alt_zip": null,
+    "tenant_alt_city": null,
+    "rent": 630,
+    "target_rent": 630,
+    "monthly_utility_costs": 175,
+    "rental_start": "2019-09-01",
+    "rental_end": null,
+    "rent_due_day": 3,
+    "monthly_hausgeld": null,
+    "occupancy_type": "rented",
+    "contract_type": "free_rent",
+    "last_rent_increase": "2026-11-01",
+    "is_special": false,
+    "index_base_year": null,
+    "index_base_month": null,
+    "index_base_value": null,
+    "index_base_since": null,
+    "index_auto_prepare": false,
+    "deposit_amount": 1800,
+    "deposit_type": null,
+    "deposit_location": null,
+    "deposit_due_date": null,
+    "deposit_received_date": null,
+    "deposit_returned_date": null,
+    "deposit_retained_amount": null,
+    "deposit_retention_note": null,
+    "vat_rate_rent": null,
+    "vat_rate_utility": null,
+    "vat_rate_deposit": null,
+    "unit": {
+     "id": "unt_4NN1zz1OJLn0",
+     "identifier": "WE 2 · EG rechts",
+     "unit_type": "residential",
+     "square_meters": 70,
+     "rooms": null,
+     "floor": "EG"
+    },
+    "co_tenants": [],
+    "amenities": [
+     {
+      "id": "amn_2BZIzF0Rjxom",
+      "type": "parking_space",
+      "description": "Stellplatz",
+      "monthly_rent": 30,
+      "vat_rate": null
+     }
+    ]
+   },
+   {
+    "id": "rtu_0hHnbE1zmlnx",
+    "project_id": "prj_34f3ix17DflJ",
+    "unit_id": "unt_3co2WZ3sJ8KP",
+    "tenant_first_name": "Mieter",
+    "tenant_last_name": "WE 3 · 1. OG links",
+    "tenant_salutation": null,
+    "tenant_title": null,
+    "tenant_date_of_birth": null,
+    "tenant_phone": null,
+    "tenant_email": null,
+    "is_company": false,
+    "company_name": null,
+    "tenant_alt_street": null,
+    "tenant_alt_zip": null,
+    "tenant_alt_city": null,
+    "rent": 585,
+    "target_rent": 585,
+    "monthly_utility_costs": 175,
+    "rental_start": "2008-03-01",
+    "rental_end": null,
+    "rent_due_day": 3,
+    "monthly_hausgeld": null,
+    "occupancy_type": "rented",
+    "contract_type": "free_rent",
+    "last_rent_increase": "2023-07-01",
+    "is_special": false,
+    "index_base_year": null,
+    "index_base_month": null,
+    "index_base_value": null,
+    "index_base_since": null,
+    "index_auto_prepare": false,
+    "deposit_amount": 1755,
+    "deposit_type": null,
+    "deposit_location": null,
+    "deposit_due_date": null,
+    "deposit_received_date": null,
+    "deposit_returned_date": null,
+    "deposit_retained_amount": null,
+    "deposit_retention_note": null,
+    "vat_rate_rent": null,
+    "vat_rate_utility": null,
+    "vat_rate_deposit": null,
+    "unit": {
+     "id": "unt_3co2WZ3sJ8KP",
+     "identifier": "WE 3 · 1. OG links",
+     "unit_type": "residential",
+     "square_meters": 70,
+     "rooms": null,
+     "floor": "1. OG"
+    },
+    "co_tenants": [],
+    "amenities": [
+     {
+      "id": "amn_3XDIXf2xtTUi",
+      "type": "parking_space",
+      "description": "Stellplatz",
+      "monthly_rent": 30,
+      "vat_rate": null
+     }
+    ]
+   },
+   {
+    "id": "rtu_2nRfa82qaUMl",
+    "project_id": "prj_34f3ix17DflJ",
+    "unit_id": "unt_49ih5q1toBE4",
+    "tenant_first_name": "Mieter",
+    "tenant_last_name": "WE 4 · 1. OG rechts",
+    "tenant_salutation": null,
+    "tenant_title": null,
+    "tenant_date_of_birth": null,
+    "tenant_phone": null,
+    "tenant_email": null,
+    "is_company": false,
+    "company_name": null,
+    "tenant_alt_street": null,
+    "tenant_alt_zip": null,
+    "tenant_alt_city": null,
+    "rent": 585,
+    "target_rent": 585,
+    "monthly_utility_costs": 175,
+    "rental_start": "2015-10-01",
+    "rental_end": null,
+    "rent_due_day": 3,
+    "monthly_hausgeld": null,
+    "occupancy_type": "rented",
+    "contract_type": "free_rent",
+    "last_rent_increase": "2023-07-01",
+    "is_special": false,
+    "index_base_year": null,
+    "index_base_month": null,
+    "index_base_value": null,
+    "index_base_since": null,
+    "index_auto_prepare": false,
+    "deposit_amount": 1755,
+    "deposit_type": null,
+    "deposit_location": null,
+    "deposit_due_date": null,
+    "deposit_received_date": null,
+    "deposit_returned_date": null,
+    "deposit_retained_amount": null,
+    "deposit_retention_note": null,
+    "vat_rate_rent": null,
+    "vat_rate_utility": null,
+    "vat_rate_deposit": null,
+    "unit": {
+     "id": "unt_49ih5q1toBE4",
+     "identifier": "WE 4 · 1. OG rechts",
+     "unit_type": "residential",
+     "square_meters": 70,
+     "rooms": null,
+     "floor": "1. OG"
+    },
+    "co_tenants": [],
+    "amenities": []
+   },
+   {
+    "id": "rtu_2tD3Nm2NmaYX",
+    "project_id": "prj_34f3ix17DflJ",
+    "unit_id": "unt_4UMMBm0LF2TK",
+    "tenant_first_name": "Mieter",
+    "tenant_last_name": "WE 5 · DG links",
+    "tenant_salutation": null,
+    "tenant_title": null,
+    "tenant_date_of_birth": null,
+    "tenant_phone": null,
+    "tenant_email": null,
+    "is_company": false,
+    "company_name": null,
+    "tenant_alt_street": null,
+    "tenant_alt_zip": null,
+    "tenant_alt_city": null,
+    "rent": 415,
+    "target_rent": 415,
+    "monthly_utility_costs": 138,
+    "rental_start": "2004-06-01",
+    "rental_end": null,
+    "rent_due_day": 3,
+    "monthly_hausgeld": null,
+    "occupancy_type": "rented",
+    "contract_type": "free_rent",
+    "last_rent_increase": "2022-01-01",
+    "is_special": false,
+    "index_base_year": null,
+    "index_base_month": null,
+    "index_base_value": null,
+    "index_base_since": null,
+    "index_auto_prepare": false,
+    "deposit_amount": 1245,
+    "deposit_type": null,
+    "deposit_location": null,
+    "deposit_due_date": null,
+    "deposit_received_date": null,
+    "deposit_returned_date": null,
+    "deposit_retained_amount": null,
+    "deposit_retention_note": null,
+    "vat_rate_rent": null,
+    "vat_rate_utility": null,
+    "vat_rate_deposit": null,
+    "unit": {
+     "id": "unt_4UMMBm0LF2TK",
+     "identifier": "WE 5 · DG links",
+     "unit_type": "residential",
+     "square_meters": 55,
+     "rooms": null,
+     "floor": "DG"
+    },
+    "co_tenants": [],
+    "amenities": []
+   },
+   {
+    "id": "rtu_01ocqA2YQFtV",
+    "project_id": "prj_34f3ix17DflJ",
+    "unit_id": "unt_4Ts5gd2PKI2t",
+    "tenant_first_name": "Mieter",
+    "tenant_last_name": "WE 6 · DG rechts",
+    "tenant_salutation": null,
+    "tenant_title": null,
+    "tenant_date_of_birth": null,
+    "tenant_phone": null,
+    "tenant_email": null,
+    "is_company": false,
+    "company_name": null,
+    "tenant_alt_street": null,
+    "tenant_alt_zip": null,
+    "tenant_alt_city": null,
+    "rent": 420,
+    "target_rent": 420,
+    "monthly_utility_costs": 138,
+    "rental_start": "2017-02-01",
+    "rental_end": "2026-10-31",
+    "rent_due_day": 3,
+    "monthly_hausgeld": null,
+    "occupancy_type": "rented",
+    "contract_type": "free_rent",
+    "last_rent_increase": "2023-07-01",
+    "is_special": false,
+    "index_base_year": null,
+    "index_base_month": null,
+    "index_base_value": null,
+    "index_base_since": null,
+    "index_auto_prepare": false,
+    "deposit_amount": 1260,
+    "deposit_type": null,
+    "deposit_location": null,
+    "deposit_due_date": null,
+    "deposit_received_date": null,
+    "deposit_returned_date": null,
+    "deposit_retained_amount": null,
+    "deposit_retention_note": null,
+    "vat_rate_rent": null,
+    "vat_rate_utility": null,
+    "vat_rate_deposit": null,
+    "unit": {
+     "id": "unt_4Ts5gd2PKI2t",
+     "identifier": "WE 6 · DG rechts",
+     "unit_type": "residential",
+     "square_meters": 55,
+     "rooms": null,
+     "floor": "DG"
+    },
+    "co_tenants": [],
+    "amenities": []
+   }
+  ],
+  "darlehen_1157": [
+   {
+    "id": "fin_4agqLH4NR14T",
+    "project_id": "prj_0XQ3hs2htSc7",
+    "name": "Darlehen I Beispielbank eG",
+    "bank_name": "Beispielbank eG",
+    "financing_type": "primary",
+    "status": "active",
+    "financing_amount": 330000,
+    "interest_rate": 3.6,
+    "initial_repayment": 0,
+    "fixed_monthly_rate": null,
+    "fixed_interest_period": 15,
+    "fixed_interest_end_date": null,
+    "financing_start_date": "2025-03-01",
+    "financing_end_date": null,
+    "equity_amount": null,
+    "equity_percentage": null,
+    "is_bullet_loan": false,
+    "maturity_date": null,
+    "repayment_free_until_date": null,
+    "is_repayment_substitute": true,
+    "is_savings_plan": false,
+    "savings_rate": null,
+    "expected_return_rate": null,
+    "initial_savings_amount": null,
+    "special_repayment_allowed": false,
+    "special_repayment_max_percent": null,
+    "special_repayment_max_amount": null,
+    "disagio_amount": null,
+    "disagio_distribution_years": null,
+    "is_split": false,
+    "share_factor": 1,
+    "current": {
+     "monthly_rate": 990,
+     "monthly_interest": 990,
+     "monthly_repayment": 0,
+     "remaining_debt": 330000
+    },
+    "special_repayments": [],
+    "rate_overrides": [],
+    "shares": []
+   },
+   {
+    "id": "fin_2WK7yP0tKAaN",
+    "project_id": "prj_0XQ3hs2htSc7",
+    "name": "Darlehen II KfW über Beispielbank eG",
+    "bank_name": "KfW über Beispielbank eG",
+    "financing_type": "parallel",
+    "status": "active",
+    "financing_amount": 50000,
+    "interest_rate": 2.35,
+    "initial_repayment": 2,
+    "fixed_monthly_rate": null,
+    "fixed_interest_period": 10,
+    "fixed_interest_end_date": null,
+    "financing_start_date": "2025-09-01",
+    "financing_end_date": null,
+    "equity_amount": null,
+    "equity_percentage": null,
+    "is_bullet_loan": false,
+    "maturity_date": null,
+    "repayment_free_until_date": null,
+    "is_repayment_substitute": false,
+    "is_savings_plan": false,
+    "savings_rate": null,
+    "expected_return_rate": null,
+    "initial_savings_amount": null,
+    "special_repayment_allowed": false,
+    "special_repayment_max_percent": null,
+    "special_repayment_max_amount": null,
+    "disagio_amount": null,
+    "disagio_distribution_years": null,
+    "is_split": false,
+    "share_factor": 1,
+    "current": {
+     "monthly_rate": 181.25,
+     "monthly_interest": 95.6,
+     "monthly_repayment": 85.65,
+     "remaining_debt": 48818.37
+    },
+    "special_repayments": [
+     {
+      "id": "spr_3GW4h34VoU9C",
+      "date": "2026-11-15",
+      "amount": 5000,
+      "notes": null,
+      "linked_to_bank_transaction": false
+     }
+    ],
+    "rate_overrides": [],
+    "shares": []
+   }
+  ],
+  "steueruebersicht": {
+   "2026-1041": {
+    "year": 2026,
+    "project_id": "prj_34f3ix17DflJ",
+    "project_name": "Musterstadt - Musterstraße 1041 - Mehrfamilienhaus",
+    "income": [
+     {
+      "zeile": "13-15",
+      "label": "Mieteinnahmen für Wohnungen",
+      "amount": 32850
+     },
+     {
+      "zeile": "20",
+      "label": "Umgelegte Nebenkosten (Vorauszahlungen)",
+      "amount": 9760
+     },
+     {
+      "zeile": "26",
+      "label": "Sonstige Einnahmen",
+      "amount": 0
+     },
+     {
+      "zeile": "27",
+      "label": "Vereinnahmte Umsatzsteuer",
+      "amount": 0
+     }
+    ],
+    "expenses": [
+     {
+      "zeile": "33-35",
+      "label": "AfA auf Gebäude",
+      "amount": 0
+     },
+     {
+      "zeile": "42-45",
+      "label": "AfA auf bewegliche Wirtschaftsgüter",
+      "amount": 0
+     },
+     {
+      "zeile": "46-48",
+      "label": "Schuldzinsen, Geldbeschaffungskosten",
+      "amount": 15524.77
+     },
+     {
+      "zeile": "55-72",
+      "label": "Erhaltungsaufwendungen",
+      "amount": 4760
+     },
+     {
+      "zeile": "73-75",
+      "label": "Umgelegte Betriebskosten",
+      "amount": 690.2
+     },
+     {
+      "zeile": "76-78",
+      "label": "Nicht umgelegte Kosten",
+      "amount": 0
+     },
+     {
+      "zeile": "79",
+      "label": "Gezahlte Umsatzsteuer",
+      "amount": 0
+     },
+     {
+      "zeile": "80-82",
+      "label": "Sonstige Kosten",
+      "amount": 535.5
+     }
+    ],
+    "summary": {
+     "total_income": 42610,
+     "total_expenses": 21510.47,
+     "surplus": 21099.53
+    },
+    "fifteen_percent_rule": {
+     "limit": 74405.58,
+     "used_net": 4000,
+     "remaining": 70405.58,
+     "percentage_used": 5.4,
+     "exceeded": false,
+     "borderline": false,
+     "window_end": "01.01.2028"
+    },
+    "self_occupancy_warning": null
+   },
+   "2026-1157": {
+    "year": 2026,
+    "project_id": "prj_0XQ3hs2htSc7",
+    "project_name": "Musterstadt - Musterstraße 1157 - Wohnung",
+    "income": [
+     {
+      "zeile": "13-15",
+      "label": "Mieteinnahmen für Wohnungen",
+      "amount": 10490
+     },
+     {
+      "zeile": "20",
+      "label": "Umgelegte Nebenkosten (Vorauszahlungen)",
+      "amount": 2930
+     },
+     {
+      "zeile": "26",
+      "label": "Sonstige Einnahmen",
+      "amount": 0
+     },
+     {
+      "zeile": "27",
+      "label": "Vereinnahmte Umsatzsteuer",
+      "amount": 0
+     }
+    ],
+    "expenses": [
+     {
+      "zeile": "33-35",
+      "label": "AfA auf Gebäude",
+      "amount": 0
+     },
+     {
+      "zeile": "42-45",
+      "label": "AfA auf bewegliche Wirtschaftsgüter",
+      "amount": 0
+     },
+     {
+      "zeile": "46-48",
+      "label": "Schuldzinsen, Geldbeschaffungskosten",
+      "amount": 10865.18
+     },
+     {
+      "zeile": "55-72",
+      "label": "Erhaltungsaufwendungen",
+      "amount": 1850
+     },
+     {
+      "zeile": "73-75",
+      "label": "Umgelegte Betriebskosten",
+      "amount": 57.12
+     },
+     {
+      "zeile": "76-78",
+      "label": "Nicht umgelegte Kosten",
+      "amount": 0
+     },
+     {
+      "zeile": "79",
+      "label": "Gezahlte Umsatzsteuer",
+      "amount": 0
+     },
+     {
+      "zeile": "80-82",
+      "label": "Sonstige Kosten",
+      "amount": 297.5
+     }
+    ],
+    "summary": {
+     "total_income": 13420,
+     "total_expenses": 13069.8,
+     "surplus": 350.2
+    },
+    "fifteen_percent_rule": {
+     "limit": 61698.06,
+     "used_net": 1554.62,
+     "remaining": 60143.44,
+     "percentage_used": 2.5,
+     "exceeded": false,
+     "borderline": false,
+     "window_end": "01.04.2028"
+    },
+    "self_occupancy_warning": null
+   },
+   "2026-1053": {
+    "year": 2026,
+    "project_id": "prj_2VorIh2u3uhX",
+    "project_name": "Musterstadt - Musterstraße 1053 - Mehrfamilienhaus",
+    "income": [
+     {
+      "zeile": "13-15",
+      "label": "Mieteinnahmen für Wohnungen",
+      "amount": 55043
+     },
+     {
+      "zeile": "20",
+      "label": "Umgelegte Nebenkosten (Vorauszahlungen)",
+      "amount": 15180
+     },
+     {
+      "zeile": "26",
+      "label": "Sonstige Einnahmen",
+      "amount": 0
+     },
+     {
+      "zeile": "27",
+      "label": "Vereinnahmte Umsatzsteuer",
+      "amount": 0
+     }
+    ],
+    "expenses": [
+     {
+      "zeile": "33-35",
+      "label": "AfA auf Gebäude",
+      "amount": 0
+     },
+     {
+      "zeile": "42-45",
+      "label": "AfA auf bewegliche Wirtschaftsgüter",
+      "amount": 0
+     },
+     {
+      "zeile": "46-48",
+      "label": "Schuldzinsen, Geldbeschaffungskosten",
+      "amount": 30403.2
+     },
+     {
+      "zeile": "55-72",
+      "label": "Erhaltungsaufwendungen",
+      "amount": 2380
+     },
+     {
+      "zeile": "73-75",
+      "label": "Umgelegte Betriebskosten",
+      "amount": 311.99
+     },
+     {
+      "zeile": "76-78",
+      "label": "Nicht umgelegte Kosten",
+      "amount": 0
+     },
+     {
+      "zeile": "79",
+      "label": "Gezahlte Umsatzsteuer",
+      "amount": 0
+     },
+     {
+      "zeile": "80-82",
+      "label": "Sonstige Kosten",
+      "amount": 0
+     }
+    ],
+    "summary": {
+     "total_income": 70223,
+     "total_expenses": 33095.19,
+     "surplus": 37127.81
+    },
+    "fifteen_percent_rule": null,
+    "self_occupancy_warning": null
+   },
+   "2026-001": {
+    "year": 2026,
+    "project_id": "prj_0w8jrk4bVgJ3",
+    "project_name": "Musterstadt - Musterstraße 1 - Wohnung",
+    "income": [
+     {
+      "zeile": "13-15",
+      "label": "Mieteinnahmen für Wohnungen",
+      "amount": 5500
+     },
+     {
+      "zeile": "20",
+      "label": "Umgelegte Nebenkosten (Vorauszahlungen)",
+      "amount": 65
+     },
+     {
+      "zeile": "26",
+      "label": "Sonstige Einnahmen",
+      "amount": 0
+     },
+     {
+      "zeile": "27",
+      "label": "Vereinnahmte Umsatzsteuer",
+      "amount": 0
+     }
+    ],
+    "expenses": [
+     {
+      "zeile": "33-35",
+      "label": "AfA auf Gebäude",
+      "amount": 0
+     },
+     {
+      "zeile": "42-45",
+      "label": "AfA auf bewegliche Wirtschaftsgüter",
+      "amount": 0
+     },
+     {
+      "zeile": "46-48",
+      "label": "Schuldzinsen, Geldbeschaffungskosten",
+      "amount": 1797.75
+     },
+     {
+      "zeile": "55-72",
+      "label": "Erhaltungsaufwendungen",
+      "amount": 980
+     },
+     {
+      "zeile": "73-75",
+      "label": "Umgelegte Betriebskosten",
+      "amount": 0
+     },
+     {
+      "zeile": "76-78",
+      "label": "Nicht umgelegte Kosten",
+      "amount": 0
+     },
+     {
+      "zeile": "79",
+      "label": "Gezahlte Umsatzsteuer",
+      "amount": 0
+     },
+     {
+      "zeile": "80-82",
+      "label": "Sonstige Kosten",
+      "amount": 0
+     }
+    ],
+    "summary": {
+     "total_income": 5565,
+     "total_expenses": 2777.75,
+     "surplus": 2787.25
+    },
+    "fifteen_percent_rule": {
+     "limit": 27304.8,
+     "used_net": 823.53,
+     "remaining": 26481.27,
+     "percentage_used": 3,
+     "exceeded": false,
+     "borderline": false,
+     "window_end": "09.06.2029"
+    },
+    "self_occupancy_warning": null
+   }
+  },
+  "beleg_beispiel": {
+   "id": "rcp_2LsYMR3yrDr6",
+   "status": "booked",
+   "amount": 980,
+   "open_amount": 0,
+   "discount_amount": null,
+   "date": "2026-11-13",
+   "due_date": null,
+   "sender": null,
+   "invoice_number": null,
+   "description": null,
+   "direction": "expense",
+   "project": {
+    "id": "prj_0w8jrk4bVgJ3",
+    "name": "Musterstadt - Musterstraße 1 - Wohnung"
+   },
+   "file_name": "2026-11-13_Rechnung Elektroarbeiten_Elektro Funke.pdf",
+   "created_at": "2026-11-22T14:21:35+00:00",
+   "payments": [
+    {
+     "id": "txn_37oc0Z4d05qb",
+     "booking_date": "2026-11-13",
+     "value_date": "2026-11-13",
+     "amount": -980,
+     "counterparty_name": null,
+     "purpose": "Elektroarbeiten Unterverteilung",
+     "is_manual": true,
+     "bank_account": null
+    }
+   ]
+  }
  }
 }

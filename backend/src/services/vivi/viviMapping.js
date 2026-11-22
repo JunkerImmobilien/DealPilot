@@ -328,10 +328,29 @@ function stellplatzMiete(r) {
   L.forEach(function (x) { if (x && (x.type === 'parking_space' || x.type === 'garage')) { const n = zahl(x.monthly_rent); if (n != null) { s += n; hat = true; } } });
   return hat ? rund(s) : null;
 }
+/* v3966 · letzte Mieterhoehung (Kaltmiete). verlauf = data von GET …/rental-units/{id}/rent-history oder null.
+   Aus dem Verlauf: letzte wirksame Aenderung bis heute mit new_rent > previous_rent. Ohne solche Aenderung gilt
+   last_rent_increase, aber nicht, wenn es der Mietbeginn ist oder der Tag einer reinen NK-Anpassung. */
+function letzteErhoehung(r, verlauf, heute) {
+  const L = verlauf && Array.isArray(verlauf.rent_changes) ? verlauf.rent_changes : [];
+  const nurNk = {};
+  let best = null;
+  L.forEach(function (c) {
+    if (!c || (c.status && c.status !== 'active')) return;
+    const d = isoDatum(c.effective_date); if (!d || d > heute) return;
+    const alt = zahl(c.previous_rent), neu = zahl(c.new_rent);
+    if (alt != null && neu != null && neu > alt) { if (!best || d > best) best = d; }
+    else if (alt != null && neu != null && neu === alt) nurNk[d] = true;
+  });
+  if (best) return best;
+  const e = isoDatum(r && r.last_rent_increase);
+  if (!e || e === isoDatum(r && r.rental_start) || nurNk[e]) return null;
+  return e;
+}
 function monatJahr(iso) { const m = /^(\d{4})-(\d{2})/.exec(text(iso)); return m ? m[2] + '.' + m[1] : null; }
 
 /**
- * @param paket    { projekt, einheiten[], mietverhaeltnisse[], darlehen[], tilgungsplan }
+ * @param paket    { projekt, einheiten[], mietverhaeltnisse[], darlehen[], tilgungsplan, mietverlauf: { rentalId: rent-history } (v3966) }
  * @param kontext  { vivi_ids, mitEinheiten (bool), objart, jetzt, musterAnschrift (bool, v3951) }
  * @returns { felder: { id: { wert, quelle } }, info: { restschuld_heute, darlehen_weitere[] } }
  */
@@ -405,9 +424,11 @@ function ausVivi(paket, kontext) {
     /* Kaution gibt es in DealPilot nur je Wohnung (_mfh), nicht am Einzelobjekt */
     const kaution = zahl(r.deposit_amount); if (P && kaution != null && kaution > 0) setze(P + 'mv_kaution', rund(kaution), rq);
     /* v3953 · ViVi setzt last_rent_increase beim Anlegen ohne Angabe auf den Mietbeginn (gemessen 22.11.2026 am
-       Testkonto, 2026-001, 1158, 1053 WE 5, 1055 GE 1). Das ist keine Erhoehung, also nicht zuruecklesen. */
-    const erh = isoDatum(r.last_rent_increase);
-    if (erh && erh !== isoDatum(r.rental_start)) setze(P + 'mv_letzte_erhoehung', erh, rq);
+       Testkonto, 2026-001, 1158, 1053 WE 5, 1055 GE 1). Das ist keine Erhoehung, also nicht zuruecklesen.
+       v3966 · ViVi setzt es auch bei einer reinen NK-Anpassung (gemessen 2026-001, 1041 WE 1). Deshalb zaehlt der
+       Mietverlauf (rent-history), wenn er da ist: letzte wirksame Aenderung mit hoeherer Kaltmiete. */
+    const erh = letzteErhoehung(r, paket.mietverlauf && paket.mietverlauf[r.id], heute);
+    if (erh) setze(P + 'mv_letzte_erhoehung', erh, rq);
     const va = VERTRAG_AUS_VIVI[text(r.contract_type)]; if (va) setze(P + 'mv_art', va, rq);
     const stp = stellplatzMiete(r); if (stp != null) setze(P ? P + 'stellplatz_miete' : 'ze_stp_monat', stp, rq);
   });
@@ -450,12 +471,21 @@ function ausVivi(paket, kontext) {
     bisHeute.forEach(function (z) { nachDatum[isoDatum(z.date)] = (nachDatum[isoDatum(z.date)] || 0) + (zahl(z.remaining_debt_after) || 0); });
     const letzt = Object.keys(nachDatum).sort().pop();
     info.restschuld_heute = { wert: rund(nachDatum[letzt]), stand: letzt };
+    /* v3966 · Sondertilgungen nach dem letzten Planmonat bis heute stehen erst im naechsten Planmonat. Gemessen
+       2026-1157: Sondertilgung 15.11., Plan bis 31.10. Sie werden hier abgezogen und ausgewiesen. */
+    let st = 0;
+    fin.forEach(function (f) { (Array.isArray(f.special_repayments) ? f.special_repayments : []).forEach(function (x) {
+      const d = isoDatum(x && x.date); const b = zahl(x && x.amount); if (d && d > letzt && d <= heute && b > 0) st += b; }); });
+    if (st > 0) { info.restschuld_heute.wert = rund(info.restschuld_heute.wert - st); info.restschuld_heute.sondertilgung = rund(st); }
   }
+  info.sondertilgungen = [];
+  fin.forEach(function (f) { (Array.isArray(f.special_repayments) ? f.special_repayments : []).forEach(function (x) {
+    const d = isoDatum(x && x.date), b = zahl(x && x.amount); if (d && b > 0) info.sondertilgungen.push({ darlehen: f === d1 ? 'd1' : (f === d2 ? 'd2' : String(f.id)), datum: d, betrag: rund(b) }); }); });
   fin.forEach(function (f) { if (f !== d1 && f !== d2) info.darlehen_weitere.push({ id: f.id, name: f.name, betrag: zahl(f.financing_amount), zins: zahl(f.interest_rate) }); });
   return { felder: felder, info: info };
 }
 
 module.exports = {
-  nachVivi, ausVivi, nkVorschlag, ulJahr, einheitenListe, zahl, isoDatum, monatDatum, etageText, etageZahl, mieterName,
+  nachVivi, ausVivi, letzteErhoehung, nkVorschlag, ulJahr, einheitenListe, zahl, isoDatum, monatDatum, etageText, etageZahl, mieterName,
   NK_MIN_QM, OBJEKTTYP, VERTRAG_NACH_VIVI, VERTRAG_AUS_VIVI, UL_FELDER, ARTEN_MIT_EINHEITEN, MUSTER_ANSCHRIFT
 };

@@ -303,7 +303,16 @@ async function abrufen(userId, objectId, opt) {
     const miet = liste(await cl.get(P + '/rental-units', q));
     const darl = liste(await cl.get(P + '/financings', q));
     const plan = darl.length ? (await cl.get(P + '/financing-schedule', q)) : null;
-    const erg = mapping.ausVivi({ projekt: projekt, einheiten: einheiten, mietverhaeltnisse: miet, darlehen: darl, tilgungsplan: plan },
+    /* v3966 · Mietverlauf je laufendem Mietverhaeltnis (nur GET): unterscheidet Mieterhoehung und NK-Anpassung.
+       Ein Fehler hier kostet nur die Unterscheidung, die Anfragebremse beendet die Runde wie immer. */
+    const mietverlauf = {};
+    const heuteIso = new Date(deps().jetzt()).toISOString().slice(0, 10);
+    for (const r of miet) {
+      if (!r || r.id == null || (r.rental_end && String(r.rental_end).slice(0, 10) < heuteIso)) continue;
+      try { mietverlauf[r.id] = ((await cl.get(P + '/rental-units/' + encodeURIComponent(String(r.id)) + '/rent-history', q)) || {}).data || null; }
+      catch (e) { if (e && (e.code === 'bremse_429' || e.code === 'bremse_lokal' || e.code === 'nicht_berechtigt')) throw e; }
+    }
+    const erg = mapping.ausVivi({ projekt: projekt, einheiten: einheiten, mietverhaeltnisse: miet, darlehen: darl, tilgungsplan: plan, mietverlauf: mietverlauf },
       { vivi_ids: v.vivi_ids || {}, mitEinheiten: mitEinheiten(v, o.data), objart: o.data && o.data.objart, jetzt: deps().jetzt(),
         musterAnschrift: !!(v.vivi_ids && v.vivi_ids.muster_anschrift) });
     /* v3951 · Paket V4 (Steuer): Entwurf hinter dem Schalter steuer.AKTIV (aus). Erst mit echten Antworten umlegen. */

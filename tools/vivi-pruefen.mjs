@@ -502,6 +502,7 @@ const ID_DA = (id) => new RegExp('id="' + id + '"').test(HTML) && new RegExp("'"
 let rundOk = 0, rundAlle = 0; const rundFehler = [];
 for (const oid of OIDS) {
   const d = objekte[oid].data;
+  viviClient._fensterLeeren();
   const r = await dienst.abrufen(USER, oid);
   const v = SP.v[oid];
   /* Proxy-Lauf auf denselben Antworten: welche Felder fasst ausVivi an? */
@@ -561,6 +562,7 @@ ok(gelesen.length > 50 && !unbekannt.length, 'ausVivi liest nur Felder aus den R
   objekte[neuOid] = { user: USER, data: FAELLE[2].d };
   const r = await dienst.zuordnen(USER, neuOid, Object.keys(A.st.projekte)[2], null);
   ok(r.ok && A.st.posts === posts && A.st.anfragen.slice(vorher).every((a) => a.startsWith('GET ')), 'Zuordnen eines vorhandenen ViVi-Objekts: nur GET, kein POST');
+  viviClient._fensterLeeren();   /* v3966 · der Abruf liest jetzt auch den Mietverlauf je Mietverhaeltnis */
   const w = await dienst.abrufen(USER, neuOid);
   ok(w.felder.kp && w.felder.wfl, 'zugeordnetes Objekt wird gelesen (Einheiten in ViVi-Reihenfolge)');
   const l = await dienst.loesen(USER, neuOid);
@@ -944,6 +946,36 @@ kopf('R  Echte ViVi-Antworten (Testkonto, 22.11.2026, tools/vivi-antworten/)');
   ok(tv.einnahmen_km === 32850 && tv.einnahmen_nk === 9760 && tv.schuldzinsen === 15524.77 && tv.erhaltungsaufwand === undefined, 'Steuerübersicht als Objekt: Zeile 13-15, 20, 46-48 erkannt, Betrag 0 (nichts gebucht) ist kein Wert');
   const ko = ECHT.objekte['2026-1041'].antworten.costs;
   ok(ko && !Array.isArray(ko) && 'realized_costs' in ko && !Object.keys(steuerEntwurf.ausKosten(ko, 2026).verknuepft).length, 'gemessen: /costs ist ein Summen-Objekt ohne Steuerkategorie, daraus wird nichts gelesen');
+}
+
+/* ═══ R2 · nach den Bewegungsdaten (v3966) ═══════════════════════════════ */
+kopf('R2 Echte Antworten nach Mietanpassung, Mietende, Sondertilgung, Belegen');
+{
+  const ECHT = JSON.parse(lies('tools/vivi-antworten/testkonto-2026-11-22.json')).nach_schritt3;
+  const heute = '2026-11-22';
+  const r1041 = ECHT.mietverhaeltnisse_1041;
+  const we = (n) => r1041.find((r) => r.unit.identifier.startsWith('WE ' + n));
+  ok(we(1).last_rent_increase === '2026-11-01' && we(1).rent === 590, 'gemessen: ViVi setzt last_rent_increase auch bei einer reinen NK-Anpassung (1041 WE 1, Kaltmiete 590 unverändert)');
+  ok(mapping.letzteErhoehung(we(1), ECHT.mietverlauf[we(1).id], heute) === null,
+    'NK-Anpassung ist keine Mieterhöhung: letzte Erhöhung von WE 1 kommt nicht als 01.11.2026 zurück');
+  ok(mapping.letzteErhoehung(we(2), ECHT.mietverlauf[we(2).id], heute) === '2026-11-01', 'Mieterhöhung WE 2 600 → 630 zum 01.11.2026 aus dem Mietverlauf');
+  ok(mapping.letzteErhoehung({ last_rent_increase: '2026-11-01', rental_start: '2011-05-01' }, null, heute) === '2026-11-01', 'ohne Mietverlauf gilt last_rent_increase (außer Mietbeginn)');
+  const L = r1041.map((r) => ({ id: r.unit_id, identifier: r.unit.identifier, unit_type: 'residential', square_meters: r.unit.square_meters }));
+  const F = mapping.ausVivi({ projekt: { id: 'p' }, einheiten: L, mietverhaeltnisse: r1041, darlehen: [], mietverlauf: ECHT.mietverlauf },
+    { vivi_ids: {}, mitEinheiten: true, objart: 'MFH', jetzt: Date.parse(heute + 'T12:00:00Z'), musterAnschrift: true }).felder;
+  const ist = [0, 1, 2, 3, 4, 5].map((i) => F['einheit.' + i + '.status'] && F['einheit.' + i + '.status'].wert === 'vermietet' ? F['einheit.' + i + '.ist'].wert : 0).reduce((a, b) => a + b, 0);
+  ok(F['einheit.5.status'].wert === 'leer' && ist === 2805 && F['einheit.0.nk_vorauszahlung'].wert === 185 && F['einheit.1.ist'].wert === 630,
+    '1041: WE 6 nach Mietende leer, Nettokaltmiete 590 + 630 + 585 + 585 + 415 = ' + ist + ' (Testplan 4.6: 2.805), WE 1 NK 185, WE 2 630');
+  const d = ECHT.darlehen_1157;
+  const erg = mapping.ausVivi({ projekt: {}, einheiten: [], mietverhaeltnisse: [], darlehen: d, tilgungsplan: { data: [{ date: '2026-10-31', remaining_debt_after: 330000 }, { date: '2026-10-31', remaining_debt_after: 48818.37 }, { date: '2026-11-30', remaining_debt_after: 1 }] } },
+    { vivi_ids: {}, jetzt: Date.parse(heute + 'T12:00:00Z') });
+  ok(erg.info.restschuld_heute.wert === 373818.37 && erg.info.restschuld_heute.sondertilgung === 5000 && erg.felder.d2 && erg.felder.d2.wert === 50000,
+    '1157: Sondertilgung 5.000 € am 15.11. senkt die Restschuld heute (378.818,37 → 373.818,37), die Darlehenssumme bleibt 50.000 (Testplan 4.9)');
+  const soll = { '2026-1157': 1850, '2026-1041': 4760, '2026-1053': 2380, '2026-001': 980 };
+  const st = Object.keys(soll).map((k) => [k, steuerEntwurf.ausSteueruebersicht(ECHT.steueruebersicht[k]).erhaltungsaufwand]);
+  ok(st.every(([k, v]) => v === soll[k]), 'V4 mit echten Belegen: Erhaltungsaufwand 2026 ' + st.map(([k, v]) => k + ' ' + v).join(', ') + ' (Testplan 7.4)');
+  const b = ECHT.beleg_beispiel;
+  ok(b && b.status === 'booked' && b.payments && b.payments[0] && b.payments[0].is_manual === true, 'gemessen: hochgeladene Belege als manuelle Transaktion gebucht (/receipts status booked)');
 }
 
 dienst._setzeDeps(null);
