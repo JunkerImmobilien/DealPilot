@@ -1,0 +1,708 @@
+[
+ {
+  "land_code": "SH",
+  "ags": "01060",
+  "ebene": "kreis",
+  "gebiet_name": "Segeberg, Kreis",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Kreis Segeberg",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "ezfh",
+  "objektart_bez": "freistehende Ein- und Zweifamilienhäuser",
+  "zugang": "genehmigungspflichtig",
+  "gebuehr": "Bericht kostenfrei abrufbar; Wiedergabe nur mit Genehmigung des Herausgebers",
+  "formel": null,
+  "formel_vorgemerkt": {
+   "form": "matrix_interp",
+   "achse_x": [
+    60,
+    120,
+    240,
+    480,
+    960
+   ],
+   "achse_x_feld": "brw",
+   "achse_x_bez": "Bodenrichtwertniveau in Euro/m²",
+   "achse_y": [
+    190000,
+    230000,
+    270000,
+    310000,
+    350000,
+    390000,
+    430000,
+    470000,
+    510000,
+    550000,
+    590000,
+    630000,
+    670000,
+    710000,
+    750000,
+    790000,
+    830000,
+    870000,
+    910000,
+    950000
+   ],
+   "achse_y_feld": "sachwert",
+   "achse_y_bez": "vorläufiger Sachwert in Euro",
+   "zellen_schluessel": "y-Stützstelle -> Werte in Reihenfolge achse_x",
+   "zellen": {
+    "190000": [
+     1.01,
+     1.14,
+     1.26,
+     1.39,
+     null
+    ],
+    "230000": [
+     0.98,
+     1.09,
+     1.19,
+     1.29,
+     null
+    ],
+    "270000": [
+     0.96,
+     1.05,
+     1.13,
+     1.22,
+     null
+    ],
+    "310000": [
+     0.94,
+     1.01,
+     1.09,
+     1.16,
+     null
+    ],
+    "350000": [
+     0.93,
+     0.99,
+     1.05,
+     1.11,
+     1.17
+    ],
+    "390000": [
+     0.91,
+     0.96,
+     1.01,
+     1.07,
+     1.12
+    ],
+    "430000": [
+     0.9,
+     0.94,
+     0.98,
+     1.03,
+     1.07
+    ],
+    "470000": [
+     0.89,
+     0.92,
+     0.96,
+     1,
+     1.03
+    ],
+    "510000": [
+     0.87,
+     0.9,
+     0.94,
+     0.97,
+     1
+    ],
+    "550000": [
+     0.86,
+     0.89,
+     0.91,
+     0.94,
+     0.96
+    ],
+    "590000": [
+     0.85,
+     0.87,
+     0.89,
+     0.92,
+     0.94
+    ],
+    "630000": [
+     0.85,
+     0.86,
+     0.88,
+     0.89,
+     0.91
+    ],
+    "670000": [
+     0.84,
+     0.85,
+     0.86,
+     0.87,
+     0.88
+    ],
+    "710000": [
+     0.83,
+     0.84,
+     0.85,
+     0.85,
+     0.86
+    ],
+    "750000": [
+     0.82,
+     0.83,
+     0.83,
+     0.84,
+     0.84
+    ],
+    "790000": [
+     null,
+     0.82,
+     0.82,
+     0.82,
+     0.82
+    ],
+    "830000": [
+     null,
+     0.81,
+     0.81,
+     0.81,
+     0.81
+    ],
+    "870000": [
+     null,
+     null,
+     0.8,
+     0.79,
+     0.79
+    ],
+    "910000": [
+     null,
+     null,
+     null,
+     0.78,
+     0.77
+    ],
+    "950000": [
+     null,
+     null,
+     null,
+     null,
+     0.76
+    ]
+   },
+   "rundung_stellen": 2,
+   "liefert": "faktor",
+   "hinweis": "vorgemerkt, nicht gerechnet (Sperre: Genehmigung fehlt). Tabelle „2024“ S. 82, am Seitenbild gelesen. Grau gedruckte Zellen (außerhalb der Stichprobe: BRW 960 bei 190.000–310.000 €, BRW 60/120/240/480 ab 790.000 € teils) sind hier leer gelassen.",
+   "normobjekt": "Stichprobe 2024: 178 Kauffälle (vor Ausreißerbereinigung, Streuungsbereich ±30 %), Median Kaufpreis 445.500 €, BRW 60–740 €/m² (Median 260), Baujahr 1962–2022, Wohnfläche 90–200 m² (Median 136), Grundstück 352–1.466 m² (Median 703), Standardstufe 1,5–4,1 (Median 3,3), angesetzte RND 4–73 (Median 44), Sachwertfaktor Median 0,95 (S. 82)"
+  },
+  "modellansaetze": null,
+  "modellansaetze_vorgemerkt": {
+   "nhk": "NHK 2010 (Anlage 4 ImmoWertV) inkl. Baunebenkosten",
+   "gnd_jahre": 80,
+   "gnd_beleg": "S. 79: „Gesamtnutzungsdauer: 80 Jahre (Anlage 1 ImmoWertV)“ — die Stichprobenbeschreibung 2024 (S. 82) nennt dagegen GND Min. 60 / Max. 75 / Median 71; vor einer Freigabe beim Ausschuss klären",
+   "baupreisindex": null,
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "Baupreisindex: BPI des Statistischen Bundesamts für Neubau von Wohngebäuden Basisjahr 2010",
+   "baupreisindex_seite": "S. 79",
+   "regionalfaktor": "kein",
+   "alterswertminderung": "linear (§ 38 ImmoWertV)",
+   "aussenanlagen": "5 % des Gebäudewertes",
+   "garagen": "pauschal 5.000 bis 12.000 €",
+   "bodenwert": "erschließungsbeitragsfrei, flächenangepasster Bodenrichtwert (Umrechnungskoeffizienten des GAA)",
+   "bezugsmassstab": "Brutto-Grundfläche (BGF)",
+   "zeitraum": "01/2022 bis 12/2024",
+   "geltung": "Grundstücksgröße bis 1.500 m², Baujahr 1960–2024, Wohnfläche 90–200 m²"
+  },
+  "geltungsbereich": null,
+  "belege": [
+   {
+    "art": "fundstelle",
+    "fundstelle": "Grundstücksmarktbericht Kreis Segeberg 2025, Kap. 7.1 Sachwertfaktoren Ein- und Zweifamilienhäuser, Modell S. 79, Tabelle 2024 S. 82",
+    "url": "https://www.segeberg.de/loadDocument.phtml?ObjSvrID=3466&ObjID=1081&ObjLa=1&Ext=PDF"
+   },
+   {
+    "art": "lizenz",
+    "fundstelle": "S. 2: „Nachdruck oder sonstige Vervielfältigung nur mit Genehmigung des Herausgebers gestattet.“",
+    "url": "https://www.segeberg.de/loadDocument.phtml?ObjSvrID=3466&ObjID=1081&ObjLa=1&Ext=PDF"
+   }
+  ],
+  "fallzahl": 178,
+  "streuung": null,
+  "stichtag": null,
+  "stichtag_hinweis": "Kaufverträge 2024 (Tabelle „2024“); Bericht Stand Oktober 2026",
+  "fundstelle": "Grundstücksmarktbericht Kreis Segeberg 2025, Kap. 7.1, S. 79–83",
+  "seite": 82,
+  "auflagen": null,
+  "warum_kein_wert": "Der Grundstücksmarktbericht Kreis Segeberg 2025 (Stand Oktober 2026, 90 Seiten, frei: https://www.segeberg.de/loadDocument.phtml?ObjSvrID=3466&ObjID=1081&ObjLa=1&Ext=PDF) führt in Kap. 7.1 (S. 79–83) Sachwertfaktoren für freistehende Ein- und Zweifamilienhäuser als Tabelle vorläufiger Sachwert × Bodenrichtwertniveau je Kaufjahr 2022–2024 (Modell NHK 2010, GND 80, linear, Außenanlagen 5 %). Der Bericht trägt aber auf S. 2: „Nachdruck oder sonstige Vervielfältigung nur mit Genehmigung des Herausgebers gestattet.“ Ohne diese Genehmigung kein Wert; die Tabelle 2024 ist vorgemerkt. Weg: Genehmigung bei der Geschäftsstelle anfragen (gutachterausschuss@segeberg.de, 04551 951-9526).",
+  "korrekturen": [],
+  "stufe": "A",
+  "stufe_grund": null,
+  "berichtsjahr": 2025,
+  "modellversion": "GMB Kreis Segeberg 2025 (Stand Oktober 2026)",
+  "quelle_url": "https://www.segeberg.de/loadDocument.phtml?ObjSvrID=3466&ObjID=1081&ObjLa=1&Ext=PDF",
+  "quelle_parser": "ernte-20261122-hand (curl, pdftotext -layout und Seitenbilder S. 79–85, gelesen am 22.11.2026)",
+  "quellenvermerk": null,
+  "lizenz": "Keine Lizenz im Dokument; S. 2: „Nachdruck oder sonstige Vervielfältigung nur mit Genehmigung des Herausgebers gestattet.“",
+  "lizenz_hinweis": null,
+  "zustaendige_stelle": "Gutachterausschuss für Grundstückswerte im Kreis Segeberg, Geschäftsstelle (Fachdienst 63.40), Kreis Segeberg, Tel. 04551 951-9526, gutachterausschuss@segeberg.de",
+  "bestell_url": "mailto:gutachterausschuss@segeberg.de",
+  "zugang_beleg": "Grundstücksmarktbericht Kreis Segeberg 2025, S. 2 (Impressum, Schutzvermerk, Stand Oktober 2026), am 22.11.2026 per curl/pdftotext gelesen",
+  "vollstaendig": false,
+  "abloesung": {
+   "datei": "swf-ni-sh-rp-sl-2026.json",
+   "ags": "01060",
+   "zweig": "ezfh",
+   "berichtsjahr": 2025,
+   "grund": "Grundstücksmarktbericht 2025 (Stand Oktober 2026) neu erschienen und gelesen"
+  }
+ },
+ {
+  "land_code": "SH",
+  "ags": "01060",
+  "ebene": "kreis",
+  "gebiet_name": "Segeberg, Kreis",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Kreis Segeberg",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "rhdhh",
+  "objektart_bez": "Reihenhäuser und Doppelhaushälften",
+  "zugang": "nicht veröffentlicht",
+  "gebuehr": null,
+  "formel": null,
+  "modellansaetze": null,
+  "geltungsbereich": null,
+  "belege": [
+   {
+    "art": "fehlstelle",
+    "fundstelle": "Grundstücksmarktbericht Kreis Segeberg 2025, Inhaltsverzeichnis und Kap. 7 (S. 79–85): Sachwertfaktoren und Liegenschaftszinssätze nur für Ein- und Zweifamilienhäuser",
+    "url": "https://www.segeberg.de/loadDocument.phtml?ObjSvrID=3466&ObjID=1081&ObjLa=1&Ext=PDF"
+   }
+  ],
+  "fallzahl": null,
+  "streuung": null,
+  "stichtag": null,
+  "stichtag_hinweis": null,
+  "fundstelle": "Grundstücksmarktbericht Kreis Segeberg 2025, Kap. 7, S. 79–85",
+  "seite": 79,
+  "auflagen": null,
+  "warum_kein_wert": "Der Grundstücksmarktbericht Kreis Segeberg 2025 (Stand Oktober 2026) führt Sachwertfaktoren nur für freistehende Ein- und Zweifamilienhäuser (Kap. 7.1, S. 79–83). Für Reihenhäuser und Doppelhaushälften veröffentlicht er keinen Sachwertfaktor. Weg: Geschäftsstelle des Gutachterausschusses (gutachterausschuss@segeberg.de, 04551 951-9526).",
+  "korrekturen": [],
+  "stufe": "A",
+  "stufe_grund": null,
+  "berichtsjahr": 2025,
+  "modellversion": "GMB Kreis Segeberg 2025 (Stand Oktober 2026)",
+  "quelle_url": "https://www.segeberg.de/loadDocument.phtml?ObjSvrID=3466&ObjID=1081&ObjLa=1&Ext=PDF",
+  "quelle_parser": "ernte-20261122-hand (curl, pdftotext -layout und Seitenbilder S. 79–85, gelesen am 22.11.2026)",
+  "quellenvermerk": null,
+  "lizenz": "Keine Lizenz im Dokument; S. 2: „Nachdruck oder sonstige Vervielfältigung nur mit Genehmigung des Herausgebers gestattet.“",
+  "lizenz_hinweis": null,
+  "zustaendige_stelle": "Gutachterausschuss für Grundstückswerte im Kreis Segeberg, Geschäftsstelle (Fachdienst 63.40), Kreis Segeberg, Tel. 04551 951-9526, gutachterausschuss@segeberg.de",
+  "bestell_url": "mailto:gutachterausschuss@segeberg.de",
+  "zugang_beleg": "Grundstücksmarktbericht Kreis Segeberg 2025, S. 2 (Impressum, Schutzvermerk, Stand Oktober 2026), am 22.11.2026 per curl/pdftotext gelesen",
+  "vollstaendig": false,
+  "abloesung": {
+   "datei": "swf-ni-sh-rp-sl-2026.json",
+   "ags": "01060",
+   "zweig": "rhdhh",
+   "berichtsjahr": 2025,
+   "grund": "Grundstücksmarktbericht 2025 (Stand Oktober 2026) neu erschienen und gelesen"
+  }
+ },
+ {
+  "land_code": "SH",
+  "ags": "01060",
+  "ebene": "kreis",
+  "gebiet_name": "Segeberg, Kreis",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Kreis Segeberg",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "etw",
+  "objektart_bez": "Eigentumswohnungen",
+  "zugang": "nicht veröffentlicht",
+  "gebuehr": null,
+  "formel": null,
+  "modellansaetze": null,
+  "geltungsbereich": null,
+  "belege": [
+   {
+    "art": "fehlstelle",
+    "fundstelle": "Grundstücksmarktbericht Kreis Segeberg 2025, Inhaltsverzeichnis und Kap. 7 (S. 79–85): Sachwertfaktoren und Liegenschaftszinssätze nur für Ein- und Zweifamilienhäuser",
+    "url": "https://www.segeberg.de/loadDocument.phtml?ObjSvrID=3466&ObjID=1081&ObjLa=1&Ext=PDF"
+   }
+  ],
+  "fallzahl": null,
+  "streuung": null,
+  "stichtag": null,
+  "stichtag_hinweis": null,
+  "fundstelle": "Grundstücksmarktbericht Kreis Segeberg 2025, Kap. 7, S. 79–85",
+  "seite": 79,
+  "auflagen": null,
+  "warum_kein_wert": "Der Grundstücksmarktbericht Kreis Segeberg 2025 (Stand Oktober 2026) führt Sachwertfaktoren nur für freistehende Ein- und Zweifamilienhäuser (Kap. 7.1, S. 79–83). Für Eigentumswohnungen veröffentlicht er keinen Sachwertfaktor. Weg: Geschäftsstelle des Gutachterausschusses (gutachterausschuss@segeberg.de, 04551 951-9526).",
+  "korrekturen": [],
+  "stufe": "A",
+  "stufe_grund": null,
+  "berichtsjahr": 2025,
+  "modellversion": "GMB Kreis Segeberg 2025 (Stand Oktober 2026)",
+  "quelle_url": "https://www.segeberg.de/loadDocument.phtml?ObjSvrID=3466&ObjID=1081&ObjLa=1&Ext=PDF",
+  "quelle_parser": "ernte-20261122-hand (curl, pdftotext -layout und Seitenbilder S. 79–85, gelesen am 22.11.2026)",
+  "quellenvermerk": null,
+  "lizenz": "Keine Lizenz im Dokument; S. 2: „Nachdruck oder sonstige Vervielfältigung nur mit Genehmigung des Herausgebers gestattet.“",
+  "lizenz_hinweis": null,
+  "zustaendige_stelle": "Gutachterausschuss für Grundstückswerte im Kreis Segeberg, Geschäftsstelle (Fachdienst 63.40), Kreis Segeberg, Tel. 04551 951-9526, gutachterausschuss@segeberg.de",
+  "bestell_url": "mailto:gutachterausschuss@segeberg.de",
+  "zugang_beleg": "Grundstücksmarktbericht Kreis Segeberg 2025, S. 2 (Impressum, Schutzvermerk, Stand Oktober 2026), am 22.11.2026 per curl/pdftotext gelesen",
+  "vollstaendig": false,
+  "abloesung": {
+   "datei": "swf-ni-sh-rp-sl-2026.json",
+   "ags": "01060",
+   "zweig": "etw",
+   "berichtsjahr": 2025,
+   "grund": "Grundstücksmarktbericht 2025 (Stand Oktober 2026) neu erschienen und gelesen"
+  }
+ },
+ {
+  "land_code": "SH",
+  "ags": "01060",
+  "ebene": "kreis",
+  "gebiet_name": "Segeberg, Kreis",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Kreis Segeberg",
+  "kennzahl": "sachwertfaktor",
+  "zweig": "mfh",
+  "objektart_bez": "Mehrfamilienhäuser",
+  "zugang": "nicht veröffentlicht",
+  "gebuehr": null,
+  "formel": null,
+  "modellansaetze": null,
+  "geltungsbereich": null,
+  "belege": [
+   {
+    "art": "fehlstelle",
+    "fundstelle": "Grundstücksmarktbericht Kreis Segeberg 2025, Inhaltsverzeichnis und Kap. 7 (S. 79–85): Sachwertfaktoren und Liegenschaftszinssätze nur für Ein- und Zweifamilienhäuser",
+    "url": "https://www.segeberg.de/loadDocument.phtml?ObjSvrID=3466&ObjID=1081&ObjLa=1&Ext=PDF"
+   }
+  ],
+  "fallzahl": null,
+  "streuung": null,
+  "stichtag": null,
+  "stichtag_hinweis": null,
+  "fundstelle": "Grundstücksmarktbericht Kreis Segeberg 2025, Kap. 7, S. 79–85",
+  "seite": 79,
+  "auflagen": null,
+  "warum_kein_wert": "Der Grundstücksmarktbericht Kreis Segeberg 2025 (Stand Oktober 2026) führt Sachwertfaktoren nur für freistehende Ein- und Zweifamilienhäuser (Kap. 7.1, S. 79–83). Für Mehrfamilienhäuser veröffentlicht er keinen Sachwertfaktor. Weg: Geschäftsstelle des Gutachterausschusses (gutachterausschuss@segeberg.de, 04551 951-9526).",
+  "korrekturen": [],
+  "stufe": "A",
+  "stufe_grund": null,
+  "berichtsjahr": 2025,
+  "modellversion": "GMB Kreis Segeberg 2025 (Stand Oktober 2026)",
+  "quelle_url": "https://www.segeberg.de/loadDocument.phtml?ObjSvrID=3466&ObjID=1081&ObjLa=1&Ext=PDF",
+  "quelle_parser": "ernte-20261122-hand (curl, pdftotext -layout und Seitenbilder S. 79–85, gelesen am 22.11.2026)",
+  "quellenvermerk": null,
+  "lizenz": "Keine Lizenz im Dokument; S. 2: „Nachdruck oder sonstige Vervielfältigung nur mit Genehmigung des Herausgebers gestattet.“",
+  "lizenz_hinweis": null,
+  "zustaendige_stelle": "Gutachterausschuss für Grundstückswerte im Kreis Segeberg, Geschäftsstelle (Fachdienst 63.40), Kreis Segeberg, Tel. 04551 951-9526, gutachterausschuss@segeberg.de",
+  "bestell_url": "mailto:gutachterausschuss@segeberg.de",
+  "zugang_beleg": "Grundstücksmarktbericht Kreis Segeberg 2025, S. 2 (Impressum, Schutzvermerk, Stand Oktober 2026), am 22.11.2026 per curl/pdftotext gelesen",
+  "vollstaendig": false,
+  "abloesung": {
+   "datei": "swf-ni-sh-rp-sl-2026.json",
+   "ags": "01060",
+   "zweig": "mfh",
+   "berichtsjahr": 2025,
+   "grund": "Grundstücksmarktbericht 2025 (Stand Oktober 2026) neu erschienen und gelesen"
+  }
+ },
+ {
+  "land_code": "SH",
+  "ags": "01060",
+  "ebene": "kreis",
+  "gebiet_name": "Segeberg, Kreis",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Kreis Segeberg",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "ezfh",
+  "objektart_bez": "freistehende Ein- und Zweifamilienhäuser",
+  "zugang": "genehmigungspflichtig",
+  "gebuehr": "Bericht kostenfrei abrufbar; Wiedergabe nur mit Genehmigung des Herausgebers",
+  "formel": null,
+  "formel_vorgemerkt": {
+   "form": "konstante",
+   "wert": 2.806,
+   "einheit": "Prozent",
+   "fallzahl": 178,
+   "seite": 85,
+   "nach_rnd": {
+    "achse_rnd": [
+     10,
+     15,
+     20,
+     25,
+     30,
+     40,
+     50,
+     60
+    ],
+    "lzs_2024": [
+     3.08,
+     2.99,
+     2.93,
+     2.88,
+     2.84,
+     2.78,
+     2.73,
+     2.7
+    ],
+    "grau_gedruckt": [
+     10,
+     15
+    ]
+   },
+   "hinweis": "vorgemerkt, nicht gerechnet (Sperre: Genehmigung fehlt): Mittelwert 2024 2,806 % (Median 2,735 %, Spanne 0,62–6,34 %, 178 Kauffälle, Ø RND 41,16); Vorjahre 2023 2,573 %, 2022 1,888 % (S. 84–85)"
+  },
+  "modellansaetze": null,
+  "modellansaetze_vorgemerkt": {
+   "gnd_jahre": 80,
+   "gnd_beleg": "Sachwertmodell S. 79 („80 Jahre (Anlage 1 ImmoWertV)“); dieselben rd. 470 Kauffälle (S. 84)",
+   "rohertrag": "Angebotsmieten (IMV GmbH) je Ort/Gemeinde, überwiegend verwendet (Kap. 8.3, S. 85)"
+  },
+  "geltungsbereich": null,
+  "belege": [
+   {
+    "art": "fundstelle",
+    "fundstelle": "Grundstücksmarktbericht Kreis Segeberg 2025, Kap. 7.2 Liegenschaftszinssätze Ein- und Zweifamilienhäuser, S. 84–85 (Tabelle Reg.-Jahr 2024 und Tabelle nach RND)",
+    "url": "https://www.segeberg.de/loadDocument.phtml?ObjSvrID=3466&ObjID=1081&ObjLa=1&Ext=PDF"
+   },
+   {
+    "art": "lizenz",
+    "fundstelle": "S. 2: „Nachdruck oder sonstige Vervielfältigung nur mit Genehmigung des Herausgebers gestattet.“",
+    "url": "https://www.segeberg.de/loadDocument.phtml?ObjSvrID=3466&ObjID=1081&ObjLa=1&Ext=PDF"
+   }
+  ],
+  "fallzahl": 178,
+  "streuung": null,
+  "stichtag": null,
+  "stichtag_hinweis": "Kaufverträge 2024; Bericht Stand Oktober 2026",
+  "fundstelle": "Grundstücksmarktbericht Kreis Segeberg 2025, Kap. 7.2, S. 84–85",
+  "seite": 85,
+  "auflagen": null,
+  "warum_kein_wert": "Der Grundstücksmarktbericht Kreis Segeberg 2025 (Stand Oktober 2026, frei: https://www.segeberg.de/loadDocument.phtml?ObjSvrID=3466&ObjID=1081&ObjLa=1&Ext=PDF) führt in Kap. 7.2 (S. 84–85) Liegenschaftszinssätze für freistehende Ein- und Zweifamilienhäuser (2024: Mittelwert 2,806 %, 178 Kauffälle; Tabelle nach Restnutzungsdauer). Rohertrag überwiegend aus Angebotsmieten (S. 85). Der Bericht trägt auf S. 2: „Nachdruck oder sonstige Vervielfältigung nur mit Genehmigung des Herausgebers gestattet.“ Ohne Genehmigung kein Wert; vorgemerkt. Weg: Genehmigung bei der Geschäftsstelle anfragen (gutachterausschuss@segeberg.de, 04551 951-9526).",
+  "korrekturen": [],
+  "stufe": "A",
+  "stufe_grund": null,
+  "berichtsjahr": 2025,
+  "modellversion": "GMB Kreis Segeberg 2025 (Stand Oktober 2026)",
+  "quelle_url": "https://www.segeberg.de/loadDocument.phtml?ObjSvrID=3466&ObjID=1081&ObjLa=1&Ext=PDF",
+  "quelle_parser": "ernte-20261122-hand (curl, pdftotext -layout und Seitenbilder S. 79–85, gelesen am 22.11.2026)",
+  "quellenvermerk": null,
+  "lizenz": "Keine Lizenz im Dokument; S. 2: „Nachdruck oder sonstige Vervielfältigung nur mit Genehmigung des Herausgebers gestattet.“",
+  "lizenz_hinweis": null,
+  "zustaendige_stelle": "Gutachterausschuss für Grundstückswerte im Kreis Segeberg, Geschäftsstelle (Fachdienst 63.40), Kreis Segeberg, Tel. 04551 951-9526, gutachterausschuss@segeberg.de",
+  "bestell_url": "mailto:gutachterausschuss@segeberg.de",
+  "zugang_beleg": "Grundstücksmarktbericht Kreis Segeberg 2025, S. 2 (Impressum, Schutzvermerk, Stand Oktober 2026), am 22.11.2026 per curl/pdftotext gelesen",
+  "vollstaendig": false,
+  "abloesung": {
+   "datei": "lzs-st-th-sh-ni-2025.json",
+   "ags": "01060",
+   "zweig": "alle",
+   "berichtsjahr": 2025,
+   "grund": "Grundstücksmarktbericht 2025 (Stand Oktober 2026) neu erschienen und gelesen"
+  }
+ },
+ {
+  "land_code": "SH",
+  "ags": "01060",
+  "ebene": "kreis",
+  "gebiet_name": "Segeberg, Kreis",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Kreis Segeberg",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "alle",
+  "objektart_bez": "alle übrigen Objektarten (Mehrfamilienhäuser, Eigentumswohnungen, Reihenhäuser, Gewerbe)",
+  "zugang": "nicht veröffentlicht",
+  "gebuehr": null,
+  "formel": null,
+  "modellansaetze": null,
+  "geltungsbereich": null,
+  "belege": [
+   {
+    "art": "fehlstelle",
+    "fundstelle": "Grundstücksmarktbericht Kreis Segeberg 2025, Inhaltsverzeichnis: Kap. 7.2 Liegenschaftszinssätze nur „Ein- und Zweifamilienhäuser“ (S. 84)",
+    "url": "https://www.segeberg.de/loadDocument.phtml?ObjSvrID=3466&ObjID=1081&ObjLa=1&Ext=PDF"
+   }
+  ],
+  "fallzahl": null,
+  "streuung": null,
+  "stichtag": null,
+  "stichtag_hinweis": null,
+  "fundstelle": "Grundstücksmarktbericht Kreis Segeberg 2025, Kap. 7.2, S. 84",
+  "seite": 84,
+  "auflagen": null,
+  "warum_kein_wert": "Der Grundstücksmarktbericht Kreis Segeberg 2025 (Stand Oktober 2026) führt Liegenschaftszinssätze nur für freistehende Ein- und Zweifamilienhäuser (Kap. 7.2, S. 84–85; dafür eigener Satz, genehmigungspflichtig). Für Mehrfamilienhäuser, Eigentumswohnungen, Reihenhäuser und Gewerbe veröffentlicht er keinen Zinssatz. Weg: Geschäftsstelle des Gutachterausschusses (gutachterausschuss@segeberg.de, 04551 951-9526).",
+  "korrekturen": [],
+  "stufe": "A",
+  "stufe_grund": null,
+  "berichtsjahr": 2025,
+  "modellversion": "GMB Kreis Segeberg 2025 (Stand Oktober 2026)",
+  "quelle_url": "https://www.segeberg.de/loadDocument.phtml?ObjSvrID=3466&ObjID=1081&ObjLa=1&Ext=PDF",
+  "quelle_parser": "ernte-20261122-hand (curl, pdftotext -layout und Seitenbilder S. 79–85, gelesen am 22.11.2026)",
+  "quellenvermerk": null,
+  "lizenz": "Keine Lizenz im Dokument; S. 2: „Nachdruck oder sonstige Vervielfältigung nur mit Genehmigung des Herausgebers gestattet.“",
+  "lizenz_hinweis": null,
+  "zustaendige_stelle": "Gutachterausschuss für Grundstückswerte im Kreis Segeberg, Geschäftsstelle (Fachdienst 63.40), Kreis Segeberg, Tel. 04551 951-9526, gutachterausschuss@segeberg.de",
+  "bestell_url": "mailto:gutachterausschuss@segeberg.de",
+  "zugang_beleg": "Grundstücksmarktbericht Kreis Segeberg 2025, S. 2 (Impressum, Schutzvermerk, Stand Oktober 2026), am 22.11.2026 per curl/pdftotext gelesen",
+  "vollstaendig": false,
+  "abloesung": {
+   "datei": "lzs-st-th-sh-ni-2025.json",
+   "ags": "01060",
+   "zweig": "alle",
+   "berichtsjahr": 2025,
+   "grund": "Grundstücksmarktbericht 2025 (Stand Oktober 2026) neu erschienen und gelesen"
+  }
+ },
+ {
+  "land_code": "SH",
+  "ags": "01001000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Flensburg, Stadt",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte in der Stadt Flensburg",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "alle",
+  "objektart_bez": null,
+  "zugang": "kostenpflichtig",
+  "gebuehr": "50,00 € (PDF per E-Mail, unter Angabe der Rechnungsadresse)",
+  "bestell_url": "mailto:Gutachterausschuss-Flensburg@LVermGeo.landsh.de",
+  "zustaendige_stelle": "Gutachterausschuss für Grundstückswerte in der Stadt Flensburg, Geschäftsstelle beim Landesamt für Vermessung und Geoinformation Schleswig-Holstein, Gutachterausschuss-Flensburg@LVermGeo.landsh.de",
+  "zugang_beleg": "Ausschussseite auf dem Landesportal (https://www.schleswig-holstein.de/gaa/DE/wir_ueber_uns/Gutachterausschuesse/gaFlensburg), am 22.11.2026 gelesen: „Der aktuelle Grundstücksmarktbericht 2025 kann per E-Mail als pdf-Datei zu einem Preis von 50,- € unter Angabe der Rechnungsadresse bei der Geschäftsstelle bestellt werden.“",
+  "formel": null,
+  "korrekturen": [],
+  "modellansaetze": null,
+  "geltungsbereich": null,
+  "belege": [
+   {
+    "art": "fundstelle",
+    "fundstelle": "Ausschussseite Flensburg auf dem Landesportal, Abschnitt Grundstücksmarktbericht (gelesen 22.11.2026)",
+    "url": "https://www.schleswig-holstein.de/gaa/DE/wir_ueber_uns/Gutachterausschuesse/gaFlensburg"
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": null,
+  "fallzahl": null,
+  "streuung": null,
+  "stichtag": null,
+  "stichtag_hinweis": null,
+  "berichtsjahr": 2025,
+  "modellversion": null,
+  "quelle_url": "https://www.schleswig-holstein.de/gaa/DE/wir_ueber_uns/Gutachterausschuesse/gaFlensburg",
+  "quelle_parser": "ernte-20261122-hand (curl, Ausschussseite gelesen am 22.11.2026)",
+  "quellenvermerk": null,
+  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "lizenz_hinweis": null,
+  "fundstelle": "Ausschussseite auf dem Landesportal",
+  "seite": null,
+  "auflagen": null,
+  "warum_kein_wert": "Der Grundstücksmarktbericht 2025 der Stadt Flensburg ist nicht frei abrufbar: „Der aktuelle Grundstücksmarktbericht 2025 kann per E-Mail als pdf-Datei zu einem Preis von 50,- € unter Angabe der Rechnungsadresse bei der Geschäftsstelle bestellt werden“ (Ausschussseite, gelesen 22.11.2026). Kein Wert ohne den Bericht. Weg: Bestellung per E-Mail an Gutachterausschuss-Flensburg@LVermGeo.landsh.de (50 €).",
+  "vollstaendig": false,
+  "abloesung": {
+   "datei": "lzs-st-th-sh-ni-2025.json",
+   "ags": "01001000",
+   "zweig": "alle",
+   "berichtsjahr": 2025,
+   "grund": "Preis und Bestellweg belegt (vorher „Preis unbekannt“, ohne Zugangsangabe)"
+  }
+ },
+ {
+  "land_code": "SH",
+  "ags": "01060",
+  "ebene": "kreis",
+  "gebiet_name": "Segeberg, Kreis",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Kreis Segeberg",
+  "kennzahl": "umrechnungskoeffizient_flaeche",
+  "zweig": "ifw",
+  "vollstaendig": false,
+  "warum_kein_wert": "Der Grundstücksmarktbericht Kreis Segeberg 2025 (Stand Oktober 2026, 90 S., frei: https://www.segeberg.de/loadDocument.phtml?ObjSvrID=3466&ObjID=1081&ObjLa=1&Ext=PDF) nennt Flächenumrechnungskoeffizienten nur als Rechenschritt: die Kaufpreise für Bauland wurden „auf die normierte Bodenrichtwertgröße (600 m2) anhand der Flächenumrechnungskoeffizienten angepasst“ (Kap. 4.9, S. 32), und das Sachwertmodell verwendet einen „flächenangepasste[n] Bodenrichtwert (unter Berücksichtigung der Umrechnungskoeffizienten des GAA)“ (S. 79). Die Koeffizienten selbst druckt der Bericht nicht (Volltextsuche „Umrechnungskoeff“: 0 Tabellen). Zudem: „Nachdruck oder sonstige Vervielfältigung nur mit Genehmigung des Herausgebers gestattet“ (S. 2). Weg: Geschäftsstelle des Gutachterausschusses, gutachterausschuss@segeberg.de, 04551 951-9526 — nach der Tabelle für die Normgröße 600 m² fragen.",
+  "sperre_grund": "keine_angabe",
+  "formel": null,
+  "geltungsbereich": {
+   "ausserhalb_weg": "Geschäftsstelle des Ausschusses (Gutachterausschuss für Grundstückswerte im Kreis Segeberg), Übersicht der Ausschüsse: https://www.schleswig-holstein.de/gaa; Bodenrichtwerte: Digitaler Atlas Nord (VBORIS)"
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "fundstelle": "Grundstücksmarktbericht Kreis Segeberg 2025, Kap. 4.9 S. 32 und Kap. 7.1 S. 79: Koeffizienten verwendet, aber nicht abgedruckt",
+    "url": "https://www.segeberg.de/loadDocument.phtml?ObjSvrID=3466&ObjID=1081&ObjLa=1&Ext=PDF"
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "stichtag": null,
+  "berichtsjahr": 2025,
+  "quelle_url": "https://www.segeberg.de/loadDocument.phtml?ObjSvrID=3466&ObjID=1081&ObjLa=1&Ext=PDF",
+  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "lizenz_hinweis": null,
+  "quellenvermerk": null,
+  "fundstelle": "Grundstücksmarktbericht Kreis Segeberg 2025, S. 32 und S. 79",
+  "weg": "Geschäftsstelle des Ausschusses (Gutachterausschuss für Grundstückswerte im Kreis Segeberg), Übersicht der Ausschüsse: https://www.schleswig-holstein.de/gaa; Bodenrichtwerte: Digitaler Atlas Nord (VBORIS)",
+  "belege_meta": {
+   "dokument": "Grundstücksmarktbericht Kreis Segeberg 2025 (Stand Oktober 2026, 90 S.)",
+   "abgerufen_am": "2026-11-22"
+  },
+  "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte im Kreis Segeberg, Jahrgang 2025",
+  "quelle_parser": "ernte-20261122-hand (curl, pdftotext -layout, Volltextsuche im Grundstücksmarktbericht Kreis Segeberg 2025, Stand Oktober 2026, 90 S., am 22.11.2026)",
+  "modellansaetze": {},
+  "zugang": "nicht veröffentlicht",
+  "seite": 32,
+  "abloesung": {
+   "datei": "uk-flaeche-west-2026.json",
+   "ags": "01060",
+   "zweig": "ifw",
+   "berichtsjahr": 2025,
+   "grund": "Bericht 2025 (Stand Oktober 2026) neu erschienen und gelesen"
+  }
+ },
+ {
+  "kennzahl": "umrechnungskoeffizient_wgfz",
+  "land_code": "SH",
+  "ags": "01060",
+  "ebene": "kreis",
+  "gebiet_name": "Segeberg, Kreis",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte im Kreis Segeberg",
+  "ausschuss": "Gutachterausschuss für Grundstückswerte im Kreis Segeberg",
+  "zweig": "alle",
+  "jahrgang": 2025,
+  "berichtsjahr": 2025,
+  "vollstaendig": false,
+  "warum_kein_wert": "Der Grundstücksmarktbericht Kreis Segeberg 2025 (Stand Oktober 2026, 90 S., frei: https://www.segeberg.de/loadDocument.phtml?ObjSvrID=3466&ObjID=1081&ObjLa=1&Ext=PDF) führt keine WGFZ-Umrechnungskoeffizienten: Volltextsuche nach „WGFZ“, „GFZ“ und „Geschossflächenzahl“ ohne Treffer. Der Bericht wertet Bauland des individuellen Wohnungsbaus über die Grundstücksgröße aus (Kap. 4.9, S. 32). Weg: Geschäftsstelle des Gutachterausschusses, gutachterausschuss@segeberg.de, 04551 951-9526.",
+  "geltungsbereich": {
+   "objektarten": [],
+   "objektarten_ausgeschlossen": [],
+   "ausserhalb_weg": "Grundstücksmarktbericht/Erläuterungen des Ausschusses: https://www.segeberg.de/loadDocument.phtml?ObjSvrID=3466&ObjID=1081&ObjLa=1&Ext=PDF"
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "dokument": "Grundstücksmarktbericht Kreis Segeberg 2025",
+    "fundstelle": "ganzer Text (Volltextsuche WGFZ/GFZ/Geschossflächenzahl, 0 Treffer), am 22.11.2026",
+    "url": "https://www.segeberg.de/loadDocument.phtml?ObjSvrID=3466&ObjID=1081&ObjLa=1&Ext=PDF"
+   }
+  ],
+  "fundstelle": "Grundstücksmarktbericht Kreis Segeberg 2025, ganzer Text (Volltextsuche)",
+  "stufe": "A",
+  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+  "stichtag": null,
+  "stichtag_hinweis": "Ohne Wert kein Stichtag.",
+  "quelle_url": "https://www.segeberg.de/loadDocument.phtml?ObjSvrID=3466&ObjID=1081&ObjLa=1&Ext=PDF",
+  "seite": null,
+  "lizenz": "kein Wert - Lizenz nicht einschlägig",
+  "quellenvermerk": null,
+  "modellversion": "Umrechnungskoeffizienten WGFZ (§ 16 Abs. 4, § 40 ImmoWertV), Gutachterausschuss für Grundstückswerte im Kreis Segeberg, Jahrgang 2025",
+  "quelle_parser": "ernte-20261122-hand (curl, pdftotext -layout, Volltextsuche im Grundstücksmarktbericht Kreis Segeberg 2025, Stand Oktober 2026, 90 S., am 22.11.2026)",
+  "modellansaetze": {},
+  "belege_meta": {
+   "dokument": "Grundstücksmarktbericht Kreis Segeberg 2025 (Stand Oktober 2026, 90 S.)",
+   "abgerufen_am": "2026-11-22"
+  },
+  "zugang": "nicht veröffentlicht",
+  "abloesung": {
+   "datei": "uk-wgfz-ost-west-2026.json",
+   "ags": "01060",
+   "zweig": "alle",
+   "berichtsjahr": 2026,
+   "grund": "Bericht 2025 (Stand Oktober 2026) gelesen; vorher „nicht ausgewertet, offen“"
+  }
+ }
+]

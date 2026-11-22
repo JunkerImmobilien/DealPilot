@@ -1,0 +1,217 @@
+[
+ {
+  "land_code": "HE",
+  "ags": "06611000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Kassel, documenta-Stadt",
+  "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich der Stadt Kassel",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "wgh",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 4.5,
+   "rundung_stellen": 1,
+   "bezeichnung": "Wohn- und Geschäftshäuser, Jahrgang 2025",
+   "hinweis": "Ergebnis in PROZENT (4,5 bedeutet 4,5 %). Arithmetischer Mittelwert der Einzelliegenschaftszinssätze.",
+   "wert_art": "arithmetisches Mittel"
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "gnd_jahre": 80,
+   "gesamtnutzungsdauer": 80,
+   "restnutzungsdauer_mittel": 25,
+   "brw_mittel_eur_qm": 406,
+   "rohertragsfaktor": 11.9,
+   "rnd_min_jahre": 15,
+   "miete": "Wohnanteil: ortsübliche Vergleichsmiete (Mietspiegel); gewerblicher Anteil: auf Marktüblichkeit überprüfter Ist-Ertrag (Tabelle 19)",
+   "bewirtschaftungskosten": "ImmoWertV 2021 Anlage 3",
+   "bodenwert": "Bodenrichtwert zum 1. Januar des Vertragsjahres (ebf), WGFZ-/flächenangepasst",
+   "bezug": "IMB 2026 Kassel, Kap. 7.3 Modellbeschreibung S. 56–57 und Tabelle 19 „Ertragswertmodell nach ImmoWertV 21\"",
+   "rohertragsfaktor_stabw": 1.8,
+   "gnd_beleg": "Tabelle 19 „Ertragswertmodell nach ImmoWertV 21“, S. 57: GND EFH/ZFH/MFH/WGH 80, Büro/Verwaltung 60, Verbrauchermärkte 30, Gewerbe/Industrie 40 Jahre"
+  },
+  "geltungsbereich": {
+   "objektart_bez": "Wohn- und Geschäftshäuser",
+   "region": "Stadt Kassel",
+   "kauffaelle_zeitraum": "2025",
+   "ausgewertete_geschaeftsjahre": 1
+  },
+  "belege": [
+   {
+    "art": "amtliche Veroeffentlichung",
+    "fundstelle": "IMB 2026 Kassel, Tabelle 25 „LZ / REF Wohn- und Geschäftshaus“, S. 61, Zeile 2025: LZ 4,5 %, Stabw 1,3, REF 11,9 (Stabw 1,8), N 19, Ø BRW 406 €/m², Ø RND 25. Zeitreihe: 2021 2,5 · 2022 3,3 · 2023 2,7 · 2024 2,5 · 2025 4,5",
+    "wert": 4.5,
+    "standardabweichung": 1.3,
+    "fallzahl": 19
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": "amtlich, gutachterausschussscharf — regionale Ableitung des Gutachterausschusses, vom Ausschuss beschlossen; nicht die hessenweite ZGGH-Auswertung",
+  "fallzahl": 19,
+  "streuung": 1.3,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "IMB-Kassel-2026 (Ertragswertmodell Hessen Kap. 7.3 / Tabelle 19, GND 80, RND mind. 15 Jahre, Mietspiegel 2024, BWK Anlage 3 ImmoWertV 2021)",
+  "quelle_url": "https://www1.kassel.de/service/media/Dateien_und_Verzeichnisse/immobilienmarktberichte/Immobilienmarktbericht-Stadt-Kassel-2026.pdf",
+  "quelle_datei": "Immobilienmarktbericht-Stadt-Kassel-2026.pdf (92 Seiten, PDF-Änderungsdatum 29.10.2026)",
+  "quelle_hinweis": "Kostenfrei auf kassel.de und im Downloadcenter gds.hessen.de (`IMB regional 2026, Datei „`2026 IMB Stadt Kassel.pdf\"). Seitenangaben = gedruckte Seitenzahl; PDF-Seite = gedruckte + 4. Kostenfreier Download im Downloadcenter der Hessischen Verwaltung für Bodenmanagement und Geoinformation (gds.hessen.de), Ordner Immobilienwerte / Regionale Immobilienmarktberichte / `IMB regional 2026. Die Dateiliste liefert der REST-Endpunkt /INTERSHOP/rest/WFS/HLBG-Geodaten-Site/-/downloadcenter?path=…; der direkte Dateilink trägt einen Tagesstempel (/downloadcenter/<JJJJMMTT>/…) und ist deshalb nicht als Dauerlink hinterlegt.",
+  "quelle_parser": "ernte-20261122-hand (pdftotext -layout und Seitenbild S. 61, gelesen am 22.11.2026)",
+  "quellenvermerk": "Immobilienmarktbericht 2026, Gutachterausschuss für Immobilienwerte für den Bereich der Stadt Kassel — Quellenvermerk nach Vervielfältigungshinweis S. 4 erforderlich",
+  "lizenz": "dl-de/by-2-0",
+  "lizenz_hinweis": "Der Bericht nennt keine Lizenz namentlich. Der Vervielfältigungshinweis trägt den Wortlaut der Datenlizenz Deutschland – Namensnennung – 2.0: „Bei der Nutzung … ist ein Quellenvermerk anzugeben.\" Der Quellenvermerk ist damit PFLICHT und muss im Bericht erscheinen. Achtung: Der Jahrgang 2024 war im Register als dl-de/zero-2-0 erfasst; der Hinweis 2026 verlangt den Quellenvermerk ausdrücklich („ist ein Quellenvermerk anzugeben\").",
+  "objektart_bez": "Wohn- und Geschäftshäuser",
+  "fundstelle": "IMB 2026 Kassel, Tabelle 25 „LZ / REF Wohn- und Geschäftshaus“, S. 61",
+  "seite": 61,
+  "auflagen": [
+   "Bis zur Fassung vom Juli 2026 stand in der Zeile 2025 „k.A.“ (Programmumstellung, Sperre im Register). Die am 29.10.2026 geänderte PDF-Fassung trägt die Zeile jetzt.",
+   "Ausreißer eliminiert (Kauffälle mit außergewöhnlich hohen oder niedrigen Zinssätzen, ohne Mietangaben), S. 58; Restnutzungsdauer mindestens 15 Jahre (S. 56)."
+  ],
+  "ersetzt_sperre": true,
+  "abloesung": {
+   "datei": "lzs-he-2026.json",
+   "ags": "06611000",
+   "zweig": "wgh",
+   "berichtsjahr": 2026,
+   "grund": "Zeile 2025 der Tabelle 25 in der aktualisierten PDF-Fassung vom 29.10.2026 gefüllt"
+  }
+ },
+ {
+  "land_code": "HE",
+  "ags": "06611000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Kassel, documenta-Stadt",
+  "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich der Stadt Kassel",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "buero",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 5.1,
+   "rundung_stellen": 1,
+   "bezeichnung": "Gewerbe: Büro- und Geschäftshäuser, Jahrgang 2025",
+   "hinweis": "Ergebnis in PROZENT (5,1 bedeutet 5,1 %). Arithmetischer Mittelwert der Einzelliegenschaftszinssätze.",
+   "wert_art": "arithmetisches Mittel"
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "gnd_jahre": 60,
+   "gesamtnutzungsdauer": 60,
+   "restnutzungsdauer_mittel": 28,
+   "brw_mittel_eur_qm": 643,
+   "rohertragsfaktor": 11.5,
+   "rnd_min_jahre": 15,
+   "miete": "auf Marktüblichkeit überprüfter Ist-Ertrag (Tabelle 19, S. 57: „gewerbliche Grundstücke“)",
+   "bewirtschaftungskosten": "ImmoWertV 2021 Anlage 3",
+   "bodenwert": "Bodenrichtwert zum 1. Januar des Vertragsjahres (ebf), WGFZ-/flächenangepasst",
+   "bezug": "IMB 2026 Kassel, Kap. 7.3 Modellbeschreibung S. 56–57 und Tabelle 19 „Ertragswertmodell nach ImmoWertV 21\"",
+   "rohertragsfaktor_stabw": 3.4,
+   "gnd_beleg": "Tabelle 19 „Ertragswertmodell nach ImmoWertV 21“, S. 57: GND EFH/ZFH/MFH/WGH 80, Büro/Verwaltung 60, Verbrauchermärkte 30, Gewerbe/Industrie 40 Jahre"
+  },
+  "geltungsbereich": {
+   "objektart_bez": "Gewerbe: Büro- und Geschäftshäuser",
+   "region": "Stadt Kassel",
+   "kauffaelle_zeitraum": "2025",
+   "ausgewertete_geschaeftsjahre": 1
+  },
+  "belege": [
+   {
+    "art": "amtliche Veroeffentlichung",
+    "fundstelle": "IMB 2026 Kassel, Tabelle 27 „LZ / REF Gewerbe (Büro- und Geschäftshaus)“, S. 62, Zeile 2025: LZ 5,1 %, Stabw 1,1, REF 11,5 (Stabw 3,4), N 6, Ø BRW 643 €/m², Ø RND 28. Zeitreihe: 2021 5,4 (grau: gemeinsam für ALLE Gewerbeeinheiten) · 2022 4,8 · 2023 5,8 · 2024 * (nicht ausreichend auswertbare Daten) · 2025 5,1",
+    "wert": 5.1,
+    "standardabweichung": 1.1,
+    "fallzahl": 6
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": "amtlich, gutachterausschussscharf — regionale Ableitung des Gutachterausschusses, vom Ausschuss beschlossen; nicht die hessenweite ZGGH-Auswertung",
+  "fallzahl": 6,
+  "streuung": 1.1,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "IMB-Kassel-2026 (Ertragswertmodell Hessen Kap. 7.3 / Tabelle 19, GND 80, RND mind. 15 Jahre, Mietspiegel 2024, BWK Anlage 3 ImmoWertV 2021)",
+  "quelle_url": "https://www1.kassel.de/service/media/Dateien_und_Verzeichnisse/immobilienmarktberichte/Immobilienmarktbericht-Stadt-Kassel-2026.pdf",
+  "quelle_datei": "Immobilienmarktbericht-Stadt-Kassel-2026.pdf (92 Seiten, PDF-Änderungsdatum 29.10.2026)",
+  "quelle_hinweis": "Kostenfrei auf kassel.de und im Downloadcenter gds.hessen.de (`IMB regional 2026, Datei „`2026 IMB Stadt Kassel.pdf\"). Seitenangaben = gedruckte Seitenzahl; PDF-Seite = gedruckte + 4. Kostenfreier Download im Downloadcenter der Hessischen Verwaltung für Bodenmanagement und Geoinformation (gds.hessen.de), Ordner Immobilienwerte / Regionale Immobilienmarktberichte / `IMB regional 2026. Die Dateiliste liefert der REST-Endpunkt /INTERSHOP/rest/WFS/HLBG-Geodaten-Site/-/downloadcenter?path=…; der direkte Dateilink trägt einen Tagesstempel (/downloadcenter/<JJJJMMTT>/…) und ist deshalb nicht als Dauerlink hinterlegt.",
+  "quelle_parser": "ernte-20261122-hand (pdftotext -layout und Seitenbild S. 62, gelesen am 22.11.2026)",
+  "quellenvermerk": "Immobilienmarktbericht 2026, Gutachterausschuss für Immobilienwerte für den Bereich der Stadt Kassel — Quellenvermerk nach Vervielfältigungshinweis S. 4 erforderlich",
+  "lizenz": "dl-de/by-2-0",
+  "lizenz_hinweis": "Der Bericht nennt keine Lizenz namentlich. Der Vervielfältigungshinweis trägt den Wortlaut der Datenlizenz Deutschland – Namensnennung – 2.0: „Bei der Nutzung … ist ein Quellenvermerk anzugeben.\" Der Quellenvermerk ist damit PFLICHT und muss im Bericht erscheinen. Achtung: Der Jahrgang 2024 war im Register als dl-de/zero-2-0 erfasst; der Hinweis 2026 verlangt den Quellenvermerk ausdrücklich („ist ein Quellenvermerk anzugeben\").",
+  "objektart_bez": "Gewerbe: Büro- und Geschäftshäuser",
+  "fundstelle": "IMB 2026 Kassel, Tabelle 27 „LZ / REF Gewerbe (Büro- und Geschäftshaus)“, S. 62",
+  "seite": 62,
+  "auflagen": [
+   "Kleine Stichprobe (6 Kauffälle) — der Bericht weist sie aus, der Vorbehalt gehört in den Bericht. Gesamtnutzungsdauer Büro/Verwaltung 60 Jahre (Tabelle 19, S. 57).",
+   "Ausreißer eliminiert (Kauffälle mit außergewöhnlich hohen oder niedrigen Zinssätzen, ohne Mietangaben), S. 58; Restnutzungsdauer mindestens 15 Jahre (S. 56)."
+  ]
+ },
+ {
+  "land_code": "HE",
+  "ags": "06611000",
+  "ebene": "gemeinde",
+  "gebiet_name": "Kassel, documenta-Stadt",
+  "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich der Stadt Kassel",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "produktion_logistik",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 5.3,
+   "rundung_stellen": 1,
+   "bezeichnung": "Gewerbe: Werkstatt, Halle, Industrie (z. B. Produktionsgebäude, Werkstätten, Fabriken, Lagerhallen), Jahrgang 2025",
+   "hinweis": "Ergebnis in PROZENT (5,3 bedeutet 5,3 %). Arithmetischer Mittelwert der Einzelliegenschaftszinssätze.",
+   "wert_art": "arithmetisches Mittel"
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "gnd_jahre": 40,
+   "gesamtnutzungsdauer": 40,
+   "restnutzungsdauer_mittel": 19,
+   "brw_mittel_eur_qm": 115,
+   "rohertragsfaktor": 12.4,
+   "rnd_min_jahre": 15,
+   "miete": "auf Marktüblichkeit überprüfter Ist-Ertrag (Tabelle 19, S. 57: „gewerbliche Grundstücke“)",
+   "bewirtschaftungskosten": "ImmoWertV 2021 Anlage 3",
+   "bodenwert": "Bodenrichtwert zum 1. Januar des Vertragsjahres (ebf), WGFZ-/flächenangepasst",
+   "bezug": "IMB 2026 Kassel, Kap. 7.3 Modellbeschreibung S. 56–57 und Tabelle 19 „Ertragswertmodell nach ImmoWertV 21\"",
+   "rohertragsfaktor_stabw": 1.8,
+   "gnd_beleg": "Tabelle 19 „Ertragswertmodell nach ImmoWertV 21“, S. 57: GND EFH/ZFH/MFH/WGH 80, Büro/Verwaltung 60, Verbrauchermärkte 30, Gewerbe/Industrie 40 Jahre"
+  },
+  "geltungsbereich": {
+   "objektart_bez": "Gewerbe: Werkstatt, Halle, Industrie (z. B. Produktionsgebäude, Werkstätten, Fabriken, Lagerhallen)",
+   "region": "Stadt Kassel",
+   "kauffaelle_zeitraum": "2025",
+   "ausgewertete_geschaeftsjahre": 1
+  },
+  "belege": [
+   {
+    "art": "amtliche Veroeffentlichung",
+    "fundstelle": "IMB 2026 Kassel, Tabelle 26 „LZ / REF Gewerbe (Werkstatt/Halle/Industrie)“, S. 62, Zeile 2025: LZ 5,3 %, Stabw 1, REF 12,4 (Stabw 1,8), N 4, Ø BRW 115 €/m², Ø RND 19. Zeitreihe: 2021 5,4 (grau: gemeinsam für ALLE Gewerbeeinheiten) · 2022 5,5 · 2023 3,5 · 2024 * (nicht ausreichend auswertbare Daten) · 2025 5,3",
+    "wert": 5.3,
+    "standardabweichung": 1,
+    "fallzahl": 4
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": "amtlich, gutachterausschussscharf — regionale Ableitung des Gutachterausschusses, vom Ausschuss beschlossen; nicht die hessenweite ZGGH-Auswertung",
+  "fallzahl": 4,
+  "streuung": 1,
+  "stichtag": "2026-01-01",
+  "berichtsjahr": 2026,
+  "modellversion": "IMB-Kassel-2026 (Ertragswertmodell Hessen Kap. 7.3 / Tabelle 19, GND 80, RND mind. 15 Jahre, Mietspiegel 2024, BWK Anlage 3 ImmoWertV 2021)",
+  "quelle_url": "https://www1.kassel.de/service/media/Dateien_und_Verzeichnisse/immobilienmarktberichte/Immobilienmarktbericht-Stadt-Kassel-2026.pdf",
+  "quelle_datei": "Immobilienmarktbericht-Stadt-Kassel-2026.pdf (92 Seiten, PDF-Änderungsdatum 29.10.2026)",
+  "quelle_hinweis": "Kostenfrei auf kassel.de und im Downloadcenter gds.hessen.de (`IMB regional 2026, Datei „`2026 IMB Stadt Kassel.pdf\"). Seitenangaben = gedruckte Seitenzahl; PDF-Seite = gedruckte + 4. Kostenfreier Download im Downloadcenter der Hessischen Verwaltung für Bodenmanagement und Geoinformation (gds.hessen.de), Ordner Immobilienwerte / Regionale Immobilienmarktberichte / `IMB regional 2026. Die Dateiliste liefert der REST-Endpunkt /INTERSHOP/rest/WFS/HLBG-Geodaten-Site/-/downloadcenter?path=…; der direkte Dateilink trägt einen Tagesstempel (/downloadcenter/<JJJJMMTT>/…) und ist deshalb nicht als Dauerlink hinterlegt.",
+  "quelle_parser": "ernte-20261122-hand (pdftotext -layout und Seitenbild S. 62, gelesen am 22.11.2026)",
+  "quellenvermerk": "Immobilienmarktbericht 2026, Gutachterausschuss für Immobilienwerte für den Bereich der Stadt Kassel — Quellenvermerk nach Vervielfältigungshinweis S. 4 erforderlich",
+  "lizenz": "dl-de/by-2-0",
+  "lizenz_hinweis": "Der Bericht nennt keine Lizenz namentlich. Der Vervielfältigungshinweis trägt den Wortlaut der Datenlizenz Deutschland – Namensnennung – 2.0: „Bei der Nutzung … ist ein Quellenvermerk anzugeben.\" Der Quellenvermerk ist damit PFLICHT und muss im Bericht erscheinen. Achtung: Der Jahrgang 2024 war im Register als dl-de/zero-2-0 erfasst; der Hinweis 2026 verlangt den Quellenvermerk ausdrücklich („ist ein Quellenvermerk anzugeben\").",
+  "objektart_bez": "Gewerbe: Werkstatt, Halle, Industrie (z. B. Produktionsgebäude, Werkstätten, Fabriken, Lagerhallen)",
+  "fundstelle": "IMB 2026 Kassel, Tabelle 26 „LZ / REF Gewerbe (Werkstatt/Halle/Industrie)“, S. 62",
+  "seite": 62,
+  "auflagen": [
+   "Sehr kleine Stichprobe (4 Kauffälle) — Wert mit Vorbehalt. Gesamtnutzungsdauer Gewerbe/Industrie 40 Jahre (Tabelle 19, S. 57).",
+   "Ausreißer eliminiert (Kauffälle mit außergewöhnlich hohen oder niedrigen Zinssätzen, ohne Mietangaben), S. 58; Restnutzungsdauer mindestens 15 Jahre (S. 56)."
+  ]
+ }
+]

@@ -5101,6 +5101,7 @@
     "gaa_name": "Gutachterausschuss für Grundstückswerte Hameln-Hannover, Bereich Landkreis Hameln-Pyrmont",
     "kennzahl": "sachwertfaktor",
     "zweig": "ezfh",
+    "zugang": "frei",
     "objektart_bez": null,
     "formel": null,
     "korrekturen": [],

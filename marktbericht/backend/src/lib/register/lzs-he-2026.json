@@ -1922,65 +1922,6 @@
   },
   {
     "land_code": "HE",
-    "ags": "06611000",
-    "ebene": "gemeinde",
-    "gebiet_name": "Kassel, documenta-Stadt",
-    "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich der Stadt Kassel",
-    "kennzahl": "liegenschaftszinssatz",
-    "zweig": "wgh",
-    "formel_vorgemerkt": {
-      "form": "konstante",
-      "liefert": "prozent",
-      "wert": null,
-      "warum_kein_wert": "Tabelle 25 „LZ / REF Wohn- und Geschäftshaus\" führt für 2025 nur „k.A.\""
-    },
-    "korrekturen": [],
-    "modellansaetze": {
-      "gnd_jahre": 80,
-      "gesamtnutzungsdauer": 80,
-      "restnutzungsdauer_mittel": null,
-      "brw_mittel_eur_qm": null,
-      "rohertragsfaktor": null,
-      "rnd_min_jahre": 15,
-      "miete": "ortsübliche Nettokaltmiete gemäß Mietspiegel 2024 (bzw. tatsächliche Miete bei Abweichung < ±20 %)",
-      "bewirtschaftungskosten": "ImmoWertV 2021 Anlage 3",
-      "bodenwert": "Bodenrichtwert zum 1. Januar des Vertragsjahres (ebf), WGFZ-/flächenangepasst",
-      "bezug": "IMB 2026 Kassel, Kap. 7.3 Modellbeschreibung S. 56–57 und Tabelle 19 „Ertragswertmodell nach ImmoWertV 21\""
-    },
-    "geltungsbereich": {
-      "objektart_bez": "Wohn- und Geschäftshäuser",
-      "region": "Stadt Kassel"
-    },
-    "belege": [
-      {
-        "art": "amtliche Veroeffentlichung",
-        "fundstelle": "IMB 2026 Kassel, Tabelle 25, S. 61: 2025 k.A.; 2024 2,5 % (Stabw 0,6, N 5); 2023 2,7 % (1,6, N 6); Fußnote S. 58 zur Programmumstellung",
-        "wert": null,
-        "standardabweichung": null,
-        "fallzahl": 0
-      }
-    ],
-    "stufe": "A",
-    "stufe_grund": "amtlich, gutachterausschussscharf — regionale Ableitung des Gutachterausschusses, vom Ausschuss beschlossen; nicht die hessenweite ZGGH-Auswertung",
-    "fallzahl": 0,
-    "streuung": null,
-    "stichtag": "2026-01-01",
-    "berichtsjahr": 2026,
-    "modellversion": "IMB-Kassel-2026 (Ertragswertmodell Hessen Kap. 7.3 / Tabelle 19, GND 80, RND mind. 15 Jahre, Mietspiegel 2024, BWK Anlage 3 ImmoWertV 2021)",
-    "quelle_url": "https://www.kassel.de/service/media/Dateien_und_Verzeichnisse/immobilienmarktberichte/",
-    "quelle_datei": "`2026 IMB Stadt Kassel.pdf",
-    "quelle_hinweis": "Kostenfrei auf kassel.de und im Downloadcenter gds.hessen.de (`IMB regional 2026, Datei „`2026 IMB Stadt Kassel.pdf\"). Seitenangaben = gedruckte Seitenzahl; PDF-Seite = gedruckte + 4. Kostenfreier Download im Downloadcenter der Hessischen Verwaltung für Bodenmanagement und Geoinformation (gds.hessen.de), Ordner Immobilienwerte / Regionale Immobilienmarktberichte / `IMB regional 2026. Die Dateiliste liefert der REST-Endpunkt /INTERSHOP/rest/WFS/HLBG-Geodaten-Site/-/downloadcenter?path=…; der direkte Dateilink trägt einen Tagesstempel (/downloadcenter/<JJJJMMTT>/…) und ist deshalb nicht als Dauerlink hinterlegt.",
-    "quelle_parser": "v1879-hand (pdftotext, Seite 61, am 05.10.2026 gelesen)",
-    "quellenvermerk": "Immobilienmarktbericht 2026, Gutachterausschuss für Immobilienwerte für den Bereich der Stadt Kassel — Quellenvermerk nach Vervielfältigungshinweis S. 4 erforderlich",
-    "lizenz": "dl-de/by-2-0",
-    "lizenz_hinweis": "Der Bericht nennt keine Lizenz namentlich. Der Vervielfältigungshinweis trägt den Wortlaut der Datenlizenz Deutschland – Namensnennung – 2.0: „Bei der Nutzung … ist ein Quellenvermerk anzugeben.\" Der Quellenvermerk ist damit PFLICHT und muss im Bericht erscheinen. Achtung: Der Jahrgang 2024 war im Register als dl-de/zero-2-0 erfasst; der Hinweis 2026 verlangt den Quellenvermerk ausdrücklich („ist ein Quellenvermerk anzugeben\").",
-    "vollstaendig": false,
-    "unvollstaendig_grund": "Der Immobilienmarktbericht 2026 der Stadt Kassel druckt für Wohn- und Geschäftshäuser (Tabelle 25, S. 61) im Jahrgang 2025 „k.A.\" — wegen einer Programmumstellung konnten die bebauten Kaufverträge in den Segmenten Wohn- und Geschäftshäuser sowie Gewerbe nicht nachbewertet werden. Der Ausschuss kündigt eine aktualisierte Anlage zum IMB 2026 im Laufe des Geschäftsjahres 2026 an (S. 58). Der letzte gedruckte Wert ist 2024: 2,5 % ± 0,6 bei N 5 — ein Vorjahreswert mit fünf Fällen wird nicht als Ortswert geführt.",
-    "warum_kein_wert": "Der Immobilienmarktbericht 2026 der Stadt Kassel druckt für Wohn- und Geschäftshäuser (Tabelle 25, S. 61) im Jahrgang 2025 „k.A.\" — wegen einer Programmumstellung konnten die bebauten Kaufverträge in den Segmenten Wohn- und Geschäftshäuser sowie Gewerbe nicht nachbewertet werden. Der Ausschuss kündigt eine aktualisierte Anlage zum IMB 2026 im Laufe des Geschäftsjahres 2026 an (S. 58). Der letzte gedruckte Wert ist 2024: 2,5 % ± 0,6 bei N 5 — ein Vorjahreswert mit fünf Fällen wird nicht als Ortswert geführt.",
-    "hinweis": "Nachernte: Anlage zum IMB 2026 Kassel im Laufe 2026 prüfen."
-  },
-  {
-    "land_code": "HE",
     "ags": "06531005",
     "ebene": "gemeinde",
     "gebiet_name": "Gießen, Universitätsstadt",
@@ -2334,6 +2275,7 @@
     "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich der Universitätsstadt Gießen",
     "kennzahl": "liegenschaftszinssatz",
     "zweig": "wgh",
+    "zugang": "nicht abgeleitet",
     "formel_vorgemerkt": {
       "form": "konstante",
       "liefert": "prozent",
@@ -2642,6 +2584,7 @@
     "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich der Stadt Bad Homburg v. d. Höhe",
     "kennzahl": "liegenschaftszinssatz",
     "zweig": "ezfh",
+    "zugang": "nicht abgeleitet",
     "formel_vorgemerkt": {
       "form": "konstante",
       "liefert": "prozent",
@@ -2695,6 +2638,7 @@
     "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich der Stadt Bad Homburg v. d. Höhe",
     "kennzahl": "liegenschaftszinssatz",
     "zweig": "mfh",
+    "zugang": "nicht abgeleitet",
     "formel_vorgemerkt": {
       "form": "konstante",
       "liefert": "prozent",
@@ -2748,6 +2692,7 @@
     "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich der Stadt Bad Homburg v. d. Höhe",
     "kennzahl": "liegenschaftszinssatz",
     "zweig": "etw",
+    "zugang": "nicht abgeleitet",
     "formel_vorgemerkt": {
       "form": "konstante",
       "liefert": "prozent",
@@ -5266,6 +5211,7 @@
     "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich des Hochtaunuskreises, des Main-Taunus-Kreises, des Rheingau-Taunus-Kreises und des Landkreises Limburg-Weilburg",
     "kennzahl": "liegenschaftszinssatz",
     "zweig": "ezfh",
+    "zugang": "nicht abgeleitet",
     "formel_vorgemerkt": {
       "form": "konstante",
       "liefert": "prozent",
@@ -5588,6 +5534,7 @@
     "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich des Hochtaunuskreises, des Main-Taunus-Kreises, des Rheingau-Taunus-Kreises und des Landkreises Limburg-Weilburg",
     "kennzahl": "liegenschaftszinssatz",
     "zweig": "ezfh",
+    "zugang": "nicht abgeleitet",
     "formel_vorgemerkt": {
       "form": "konstante",
       "liefert": "prozent",
@@ -5910,6 +5857,7 @@
     "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich des Hochtaunuskreises, des Main-Taunus-Kreises, des Rheingau-Taunus-Kreises und des Landkreises Limburg-Weilburg",
     "kennzahl": "liegenschaftszinssatz",
     "zweig": "ezfh",
+    "zugang": "nicht abgeleitet",
     "formel_vorgemerkt": {
       "form": "konstante",
       "liefert": "prozent",
@@ -6232,6 +6180,7 @@
     "gaa_name": "Gutachterausschuss für Immobilienwerte für den Bereich des Hochtaunuskreises, des Main-Taunus-Kreises, des Rheingau-Taunus-Kreises und des Landkreises Limburg-Weilburg",
     "kennzahl": "liegenschaftszinssatz",
     "zweig": "ezfh",
+    "zugang": "nicht abgeleitet",
     "formel_vorgemerkt": {
       "form": "konstante",
       "liefert": "prozent",

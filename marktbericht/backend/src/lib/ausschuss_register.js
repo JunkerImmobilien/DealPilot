@@ -700,6 +700,8 @@ export const SAATDATEIEN = ['lzs-nrw.json', 'swf-nrw.json', 'lzs-he-2026.json', 
                             /* v3943 · Offenbach IMB 2026 Kap. 9.4.1: Gebaeudefaktoren EZFH und RH/DHH (Stufe A, matrix_interp Baujahr x Grundstueck),
                                Beispiele S. 61 (5.158) und S. 63 (3.944) am Kern getroffen. Ausserhalb der Tabellen kein Wert (kein Landesrueckfall). */
                             'vgf-he-offenbach-imb-2026.json',
+                            /* Ernte 22.11.2026: BY (Muenchen MFH 2,8 %), NI (Aurich 12 LZS, GND 80), HE (Kassel wgh/buero/produktion), SH (Segeberg/Flensburg Sperren mit Grund) */
+                            'ernte-by-20261122.json', 'ernte-ni-20261122.json', 'ernte-he-20261122.json', 'ernte-sh-20261122.json',
                            ];
 
 /* ═══ v1778 · WAS LIEGT IM ORDNER, STEHT ABER NICHT IN DER LISTE? ═══

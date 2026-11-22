@@ -1,0 +1,110 @@
+[
+ {
+  "land_code": "BY",
+  "ags": "09162",
+  "ebene": "kreis",
+  "gebiet_name": "München, kreisfreie Stadt",
+  "gebiet_hinweis": null,
+  "gaa_name": "Gutachterausschuss für Grundstückswerte München, Landeshauptstadt",
+  "gaa_name_dokument": "Gutachterausschuss für Grundstückswerte im Bereich der Landeshauptstadt München",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "mfh",
+  "objektart": "mfh",
+  "objektart_bez": "mehrgeschossige Mietwohnhäuser (Gewerbeanteil bis 30 %)",
+  "berichtsjahr": 2026,
+  "berichtsjahr_hinweis": "Halbjahresreport 2026 des Ausschusses (erstes Halbjahr 2026, Impressum „August 2026“). Der Jahresbericht 2025 (veröffentlicht 11.06.2026) ist kostenpflichtig und nicht Quelle dieses Satzes.",
+  "stichtag": "2026-06-30",
+  "stichtag_hinweis": "Der Halbjahresreport druckt keinen eigenen Stichtag; eingetragen ist das Ende des abgedruckten Berichtszeitraums („erstes Halbjahr 2026“, S. 2 und S. 9).",
+  "auswertezeitraum": "01.01.2026 – 30.06.2026 (erstes Halbjahr 2026)",
+  "veroeffentlicht": "2026-08",
+  "quelle_url": "https://stadt.muenchen.de/dam/jcr:1ab1829c-2c44-4fdc-b03b-6646c7849fab/Halbjahresreport_2026.pdf",
+  "quelle_hinweis": "Kostenfreier Download des Ausschusses (Der Immobilienmarkt in München, Halbjahresreport 2026, 11 Seiten, PDF erstellt 20.08.2026), verlinkt über https://stadt.muenchen.de/infos/immobilienmarktbericht.html. Seitenangaben = gedruckte Seitenzahl = PDF-Seite.",
+  "seite": 9,
+  "fundstelle": "S. 9, Abschnitt „Weitere Preisentwicklungen“, Absatz „Mietwohnhäuser“",
+  "lizenz": "Wörtlich (Impressum, S. 11): „Nachdruck nur mit Genehmigung, auszugsweise nur mit Quellenangabe und bei Übersendung eines Belegexemplars an den Gutachterausschuss für Grundstückswerte im Bereich der Landeshauptstadt München“",
+  "lizenz_hinweis": "Keine offene Datenlizenz. Die Übernahme EINER Kennzahl ist eine auszugsweise Wiedergabe und mit Quellenangabe gedeckt; das Belegexemplar ist eine offene Auflage an den Herausgeber (wie bei Ludwigslust-Parchim, nachernte-2026-10-mv.json). Ein Nachdruck des Berichts findet nicht statt.",
+  "quellenvermerk": "Gutachterausschuss für Grundstückswerte im Bereich der Landeshauptstadt München, Der Immobilienmarkt in München – Halbjahresreport 2026, S. 9",
+  "auflagen": "Belegexemplar an den Herausgeber (Geschäftsstelle des Gutachterausschusses für Grundstückswerte im Bereich der Landeshauptstadt München, Marsstr. 22, 80335 München, gutachterausschuss@muenchen.de) – offene Auflage aus dem Impressum. Der Satz ist ein Halbjahres-Durchschnitt („rund“) ohne abgedrucktes Ableitungsmodell: Restnutzungsdauer, Bewirtschaftungskosten, Gesamtnutzungsdauer und Mietansatz nennt der Halbjahresreport nicht. Modellkonform nach § 10 ImmoWertV nur insoweit, als das Objekt dem Teilmarkt entspricht (Mietwohnhaus, Gewerbeanteil bis 30 %); die Modellprüfung zieht für die fehlenden Merkmale ab.",
+  "verwendung": "produkt",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 2.8,
+   "rundung_stellen": 1,
+   "bezeichnung": "Durchschnittlicher Liegenschaftszinssatz Mietwohnhäuser, München, erstes Halbjahr 2026",
+   "wert_art": "Durchschnitt („rund“)",
+   "hinweis": "Ergebnis in PROZENT (2,8 bedeutet 2,8 %). Wortlaut: „Durchschnittlicher Liegenschaftszinssatz rund 2,8 %“."
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "modell_im_dokument": false,
+   "modell_hinweis": "Der Halbjahresreport nennt nur Teilmarkt, Fallzahl und Bereinigung. Die Modellbeschreibung (Restnutzungsdauer, Bewirtschaftungskosten, Gesamtnutzungsdauer) steht im kostenpflichtigen Jahresbericht des Ausschusses („Liegenschaftszinssätze für Mehrfamilien-, Bürohäuser“ und „Durchschnittliche Liegenschaftszinssätze“, Jahresbericht 2025 S. 43 laut freiem Inhaltsverzeichnis) und ist hier NICHT übernommen.",
+   "teilmarkt": "mehrgeschossige Mietwohnhäuser",
+   "gewerbeanteil_max_pct": 30,
+   "stichprobe": "35 ausgewertete Mietwohnhäuser, ohne Extremfälle",
+   "rohertragsfaktor": 30,
+   "rohertragsfaktor_wortlaut": "Ertragsfaktor (Vielfaches des Jahresrohertrags) durchschnittlich rund 30-fach",
+   "gnd_jahre": null,
+   "restnutzungsdauer_mittel": null,
+   "bewirtschaftungskosten": null,
+   "bezug": "Halbjahresreport 2026, S. 9"
+  },
+  "geltungsbereich": {
+   "objektarten": ["mfh"],
+   "objektarten_ausgeschlossen": ["efh", "zfh", "dhh", "rh", "etw", "gewerbe"],
+   "objektart_bez": "mehrgeschossige Mietwohnhäuser mit Gewerbeanteil bis 30 %",
+   "region": "Landeshauptstadt München",
+   "kauffaelle_zeitraum": "erstes Halbjahr 2026",
+   "ausserhalb_wortlaut": "Basis: 35 ausgewertete Mietwohnhäuser (Gewerbeanteil bis 30 %, ohne Extremfälle)",
+   "ausserhalb_weg": "Für Ein-/Zweifamilienhäuser, Reihenhäuser, Eigentumswohnungen sowie Büro- und Geschäftshäuser nennt der Halbjahresreport keinen Zinssatz; diese stehen im kostenpflichtigen Jahresbericht (www.bodenrichtwerte-muenchen.de, gutachterausschuss@muenchen.de)."
+  },
+  "belege": [
+   {
+    "art": "amtliche Veröffentlichung",
+    "dokument": "Der Immobilienmarkt in München – Halbjahresreport 2026, Gutachterausschuss für Grundstückswerte im Bereich der Landeshauptstadt München (August 2026)",
+    "fundstelle": "S. 9, „Weitere Preisentwicklungen“ › „Mietwohnhäuser“",
+    "url": "https://stadt.muenchen.de/dam/jcr:1ab1829c-2c44-4fdc-b03b-6646c7849fab/Halbjahresreport_2026.pdf",
+    "wortlaut": "Mietwohnhäuser · Durchschnittlicher Liegenschaftszinssatz rund 2,8 % · Ertragsfaktor (Vielfaches des Jahresrohertrags) durchschnittlich rund 30-fach · Basis: 35 ausgewertete Mietwohnhäuser (Gewerbeanteil bis 30 %, ohne Extremfälle)",
+    "wert": 2.8,
+    "fallzahl": 35
+   },
+   {
+    "art": "Plausibilität (nicht Quelle des Werts)",
+    "dokument": "Der Immobilienmarkt in München – Herbstanalyse 2025 (1.–3. Quartal 2025)",
+    "fundstelle": "S. 9, „Weitere Preisentwicklungen“ › „Mietwohnhäuser“",
+    "url": "https://stadt.muenchen.de/dam/jcr:e3601f58-c801-47ab-8bd3-1ac2cf5dc4c9/Herbstanalyse_2025.pdf",
+    "wortlaut": "Durchschnittlicher Liegenschaftszinssatz rund 2,7 % · Ertragsfaktor … durchschnittlich rund 31-fach · Basis: 45 ausgewertete Mietwohnhäuser (Gewerbeanteil bis 30 %, ohne Extremfälle)",
+    "wert": 2.7,
+    "fallzahl": 45
+   },
+   {
+    "art": "Plausibilität (nicht Quelle des Werts)",
+    "dokument": "Der Immobilienmarkt in München – Halbjahresreport 2025",
+    "fundstelle": "S. 9, „Weitere Preisentwicklungen“ › „Mietwohnhäuser“",
+    "url": "https://stadt.muenchen.de/dam/jcr:8c838ecd-781d-441b-820d-635c0a420583/Halbjahresreport_2025.pdf",
+    "wortlaut": "Durchschnittlicher Liegenschaftszinssatz rund 2,6 % · Ertragsfaktor … durchschnittlich rund 31-fach · Basis: 30 ausgewertete Mietwohnhäuser (Gewerbeanteil bis 30 %, ohne Extremfälle)",
+    "wert": 2.6,
+    "fallzahl": 30
+   }
+  ],
+  "belege_meta": {
+   "abgerufen_am": "2026-11-22",
+   "seitenzaehlung": "gedruckte Seite = PDF-Seite",
+   "seiten": 11
+  },
+  "stufe": "A",
+  "stufe_grund": "amtlich, vom örtlich zuständigen Gutachterausschuss der Landeshauptstadt München abgeleitet und im kostenfreien Halbjahresreport 2026 veröffentlicht. Keine Streuung abgedruckt; Modell im Dokument nicht beschrieben (siehe auflagen).",
+  "fallzahl": 35,
+  "streuung": null,
+  "modellversion": "Halbjahresreport-München-2026 (Durchschnitt Mietwohnhäuser, Gewerbeanteil bis 30 %, 35 Fälle; Ableitungsmodell im Dokument nicht beschrieben)",
+  "quelle_parser": "ernte-by-20261122-hand (pdftotext -layout je Seite, 22.11.2026)",
+  "vollstaendig": true,
+  "ersetzt_sperre": true,
+  "abgeloeste_sperre": {
+   "datei": "lzs-swf-by-2026-sperren.json",
+   "schluessel": "09162 | liegenschaftszinssatz | mfh | 2026",
+   "zugang_alt": "auf_anfrage",
+   "grund": "Die Sperre sagte, frei stehe für München nur das Inhaltsverzeichnis, und die Herbstanalyse 2025 enthalte keinen Liegenschaftszinssatz. Das stimmte nicht: Herbstanalyse 2025 und Halbjahresreport 2025/2026 nennen auf S. 9 je einen durchschnittlichen Zinssatz für Mietwohnhäuser. Die Sperre ist am 22.11.2026 aus ihrer Datei entfernt (gleicher Mischschlüssel ags|kennzahl|zweig|berichtsjahr – sonst verwirft der DB-Abgleich in ausschuss_register.js diesen Wert)."
+  }
+ }
+]

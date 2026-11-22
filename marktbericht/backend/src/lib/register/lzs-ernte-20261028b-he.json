@@ -627,6 +627,7 @@
   "korrekturen": [],
   "kennzahl": "liegenschaftszinssatz",
   "zweig": "ezfh",
+  "zugang": "nicht abgeleitet",
   "objektart": "ezfh",
   "formel_vorgemerkt": {
    "form": "konstante",
@@ -700,6 +701,7 @@
   "korrekturen": [],
   "kennzahl": "liegenschaftszinssatz",
   "zweig": "rhdhh",
+  "zugang": "nicht abgeleitet",
   "objektart": "rhdhh",
   "modellansaetze": {
    "gnd_jahre": 70,
@@ -750,6 +752,7 @@
   "korrekturen": [],
   "kennzahl": "liegenschaftszinssatz",
   "zweig": "gewerbe",
+  "zugang": "nicht abgeleitet",
   "objektart": "gewerbe",
   "modellansaetze": {
    "gnd_jahre": 70,

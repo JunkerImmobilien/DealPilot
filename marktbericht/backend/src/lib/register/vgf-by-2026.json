@@ -2681,7 +2681,10 @@
   "quelle_url": "https://www.traunstein.com/assets/gutachterausschuss/immobilienrechner_info.pdf",
   "quelle_parser": "v3001-vgf-sued-west (pdftotext -layout, Seitenbilder 60-110 dpi, Websuche; 27.10.2026)",
   "lizenz": "kein Wert - Lizenz nicht einschlägig",
-  "stichtag": "2024-01-01"
+  "stichtag": "2024-01-01",
+  "zugang": "auf_anfrage",
+  "zugang_herkunft": "nachgetragen am 22.11.2026 (Ernte BY): ob der kostenpflichtige EFH/ZFH-Rechner (70 €) Reihenhäuser und Doppelhaushälften einschließt, sagt das Informationsblatt nicht – das klärt nur eine Anfrage beim Ausschuss.",
+  "gebuehr": "70 Euro je Rechner (Excel-Datei mit Erläuterungen), falls der EFH/ZFH-Rechner RH/DHH einschließt"
  },
  {
   "land_code": "BY",

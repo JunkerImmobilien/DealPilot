@@ -268,6 +268,7 @@
     "korrekturen": [],
     "kennzahl": "sachwertfaktor",
     "zweig": "mfh",
+    "zugang": "nicht abgeleitet",
     "modellansaetze": {
       "gnd_jahre": 70,
       "bezug": "Vorabzug 2025 Offenbach, Kap. 1.5"
@@ -317,6 +318,7 @@
     "korrekturen": [],
     "kennzahl": "sachwertfaktor",
     "zweig": "etw",
+    "zugang": "nicht abgeleitet",
     "modellansaetze": {
       "gnd_jahre": 70,
       "bezug": "Vorabzug 2025 Offenbach, Kap. 1.5"

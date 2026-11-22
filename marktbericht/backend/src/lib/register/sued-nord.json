@@ -3621,6 +3621,9 @@
    }
   ],
   "vollstaendig": false,
+  "zugang": "frei",
+  "zugang_herkunft": "nachgetragen am 22.11.2026 (Ernte BY): frei abrufbares Korrekturblatt, aber ohne bezifferte Gesamtnutzungsdauer nicht verwertbar",
+  "nachtrag_20261122": "NACHTRAG 22.11.2026 (Ernte BY, Korrektur): Der Auswertezeitraum IST abgedruckt – Korrekturblatt S. 58 (PDF-S. 1): „Die nachfolgenden Angaben zu den Sachwertfaktoren basieren auf 196 ausgewerteten Kaufverträgen aus dem Jahr 2024.“ Einen Stichtag druckt das Blatt weiterhin nicht. Es bleiben drei Gründe: (1) Die Gesamtnutzungsdauer ist NICHT beziffert; das Blatt sagt nur „Seit dem Berichtsjahr 2024 basieren alle Auswertungen auf der ImmoWertV 2021“ und zählt seine Abweichungen von der ImmoWertV auf (die GND ist nicht darunter). 80 Jahre nach Anlage 1 daraus abzuleiten wäre ein Schluss, keine abgedruckte Zahl – Entscheidung Marcel. (2) Baupreisindex: „Baupreisindex für Wohngebäude des Statistischen Bundesamtes (2010 = 100)“ ohne abweichenden Bezug – das wäre baupreisindex_bezug „stichtag_regelfall“ und kein Sperrgrund. (3) Lizenz: das Korrekturblatt trägt keine; der Jahresbericht 2024 ist kostenpflichtig. Die frei abrufbaren Kurzberichte desselben Ausschusses erlauben die auszugsweise Wiedergabe mit Quellenangabe und Belegexemplar (Impressum S. 11).",
   "unvollstaendig_grund": "Zwei Lücken. ERSTENS fehlen die Zeitangaben: weder Stichtag noch Auswertezeitraum sind im Korrekturblatt abgedruckt. Ohne Stichtag kann der Bericht nicht warnen, wenn der Datensatz altert. ZWEITENS ist dies kein geschlossenes Wertermittlungsmodell mit Normobjekt, sondern eine Sammlung von RANDAUSWERTUNGEN derselben Stichprobe nach acht Merkmalen. Ein Normobjekt, eine Gleichung oder eine mehrdimensionale Matrix druckt das Blatt nicht ab. Gerechnet werden darf deshalb nur EINE Achse — siehe formel und geltungsbereich.merkmalsauswertungen_dokumentation.",
   "objektart": "ezfh",
   "objektart_bez": "Ein-/Zweifamilienhaus, Doppelhaushälfte, Reiheneckhaus",
@@ -3637,7 +3640,7 @@
   "quelle_url": "https://stadt.muenchen.de/dam/jcr:39b9a80a-f355-4831-a2c9-ab3793274e72/1_Druckversion_Korrektur-JB24_drei_PDFs.pdf",
   "quelle_parser": "v1084-WREZ",
   "quellenvermerk": null,
-  "lizenz": null,
+  "lizenz": "im Korrekturblatt keine Lizenzangabe (alle 11 Seiten durchgesehen, 22.11.2026); das Impressum des kostenpflichtigen Jahresberichts 2024 liegt nicht frei vor",
   "fundstelle": "Korrekturseiten zum Immobilienmarktbericht 2024, Tabellen 49–64 (Sachwertfaktoren) und 65 (Erbbaurechtsfaktoren)"
  },
  {
@@ -3950,6 +3953,9 @@
    }
   ],
   "vollstaendig": false,
+  "zugang": "frei",
+  "zugang_herkunft": "nachgetragen am 22.11.2026 (Ernte BY): frei abrufbares Korrekturblatt, aber ohne bezifferte Gesamtnutzungsdauer nicht verwertbar",
+  "nachtrag_20261122": "NACHTRAG 22.11.2026 (Ernte BY, Korrektur): Der Auswertezeitraum IST abgedruckt – Korrekturblatt S. 58 (PDF-S. 1): „Die nachfolgenden Angaben zu den Sachwertfaktoren basieren auf 196 ausgewerteten Kaufverträgen aus dem Jahr 2024.“ Einen Stichtag druckt das Blatt weiterhin nicht. Es bleiben drei Gründe: (1) Die Gesamtnutzungsdauer ist NICHT beziffert; das Blatt sagt nur „Seit dem Berichtsjahr 2024 basieren alle Auswertungen auf der ImmoWertV 2021“ und zählt seine Abweichungen von der ImmoWertV auf (die GND ist nicht darunter). 80 Jahre nach Anlage 1 daraus abzuleiten wäre ein Schluss, keine abgedruckte Zahl – Entscheidung Marcel. (2) Baupreisindex: „Baupreisindex für Wohngebäude des Statistischen Bundesamtes (2010 = 100)“ ohne abweichenden Bezug – das wäre baupreisindex_bezug „stichtag_regelfall“ und kein Sperrgrund. (3) Lizenz: das Korrekturblatt trägt keine; der Jahresbericht 2024 ist kostenpflichtig. Die frei abrufbaren Kurzberichte desselben Ausschusses erlauben die auszugsweise Wiedergabe mit Quellenangabe und Belegexemplar (Impressum S. 11).",
   "unvollstaendig_grund": "Zwei Lücken. ERSTENS fehlen die Zeitangaben: weder Stichtag noch Auswertezeitraum sind im Korrekturblatt abgedruckt. Ohne Stichtag kann der Bericht nicht warnen, wenn der Datensatz altert. ZWEITENS ist dies kein geschlossenes Wertermittlungsmodell mit Normobjekt, sondern eine Sammlung von RANDAUSWERTUNGEN derselben Stichprobe nach acht Merkmalen. Ein Normobjekt, eine Gleichung oder eine mehrdimensionale Matrix druckt das Blatt nicht ab. Gerechnet werden darf deshalb nur EINE Achse — siehe formel und geltungsbereich.merkmalsauswertungen_dokumentation.",
   "objektart": "rmh",
   "objektart_bez": "Reihenmittelhaus",
@@ -3966,7 +3972,7 @@
   "quelle_url": "https://stadt.muenchen.de/dam/jcr:39b9a80a-f355-4831-a2c9-ab3793274e72/1_Druckversion_Korrektur-JB24_drei_PDFs.pdf",
   "quelle_parser": "v1084-WREZ",
   "quellenvermerk": null,
-  "lizenz": null,
+  "lizenz": "im Korrekturblatt keine Lizenzangabe (alle 11 Seiten durchgesehen, 22.11.2026); das Impressum des kostenpflichtigen Jahresberichts 2024 liegt nicht frei vor",
   "fundstelle": "Korrekturseiten zum Immobilienmarktbericht 2024, Tabellen 49–64 (Sachwertfaktoren) und 65 (Erbbaurechtsfaktoren)"
  }
 ]

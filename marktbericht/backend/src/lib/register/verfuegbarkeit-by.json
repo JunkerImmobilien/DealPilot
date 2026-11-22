@@ -1371,6 +1371,7 @@
    "preis": "Berichtspaket mit PDF-Rechner (IMB-Plus+) 340 Euro, PDF-Download ohne Immobilienmarktbericht 280 Euro"
   },
   "folge": "Fuer Bayern aendert sich an der Doktrin nichts: kostenpflichtig heisst kein Wert, sondern der Weg. Dieser Wegweiser ist dieser Weg und bleibt die richtige Antwort. Die beiden Muenchener Sachwertfaktoren in sued-nord.json stammen aus den FREIEN Korrekturseiten und sind davon nicht betroffen - sie tragen allerdings weder lizenz noch quellenvermerk und gehoeren insoweit nachgezogen.",
-  "quelle_parser": "v1770-BYLIZ"
+  "quelle_parser": "v1770-BYLIZ",
+  "korrektur_20261122": "KORREKTUR 22.11.2026 (Ernte BY): Der Befund oben unter muenchen.gemessen_negativ „Auch die Herbstanalyse 2025 (12 Seiten) trägt keine Werte“ war falsch. Herbstanalyse 2025, Halbjahresreport 2025 und Halbjahresreport 2026 des Münchner Ausschusses nennen auf S. 9 je einen durchschnittlichen Liegenschaftszinssatz für mehrgeschossige Mietwohnhäuser (2,7 % / 2,6 % / 2,8 %; 45 / 30 / 35 Fälle; Gewerbeanteil bis 30 %). Lizenz der Kurzberichte (Impressum S. 11): „Nachdruck nur mit Genehmigung, auszugsweise nur mit Quellenangabe und bei Übersendung eines Belegexemplars“. Der Wert 2026 steht als Satz in ernte-by-20261122.json."
  }
 }

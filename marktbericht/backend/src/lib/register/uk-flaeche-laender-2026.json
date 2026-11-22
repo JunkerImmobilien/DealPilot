@@ -406,6 +406,9 @@
     "gaa_name": "Oberer Gutachterausschuss für Grundstückswerte für den Bereich des Landes Rheinland-Pfalz",
     "kennzahl": "umrechnungskoeffizient_flaeche",
     "zweig": "ifw",
+    "bestell_url": "https://lvermgeo.rlp.de/geodaten-geoshop/shops/grundstuecksmarktberichte",
+    "gebuehr": "Landesgrundstücksmarktbericht Rheinland-Pfalz 2025, Kapitel 4: 200,00 € zzgl. Versand (Gesamtbericht PDF 150 €)",
+    "zugang": "kostenpflichtig",
     "vollstaendig": false,
     "warum_kein_wert": "Grundstücksgrößen-Umrechnungskoeffizienten stehen im Landesgrundstücksmarktbericht Rheinland-Pfalz 2025, Kapitel 4 (Abschn. 4.5.4 ff.). Kapitel 4 ist kostenpflichtig (200,00 Euro zuzüglich Versandkosten); frei sind nur die Kapitel 1 bis 3. Werte, Geltungsbereich und Rang liegen uns deshalb nicht vor.",
     "geltungsbereich": {

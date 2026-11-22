@@ -1,0 +1,1086 @@
+[
+ {
+  "land_code": "NI",
+  "ags": "03402",
+  "ebene": "kreis",
+  "gebiet_name": "Emden, Stadt",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte Aurich",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "ezfh",
+  "objektart_bez": "Ein- und Zweifamilienhausgrundstücke (Dauerwohnen)",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 1.8,
+   "rundung_stellen": 2,
+   "bezeichnung": "Ein- und Zweifamilienhäuser — Median (Beschluss)",
+   "hinweis": "Ergebnis in PROZENT (1,8 bedeutet 1,8 %), nicht als Dezimalbruch.",
+   "wert_art": "median"
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Landesweit einheitlicher Modellrahmen der niedersächsischen Gutachterausschüsse (Beschreibung der Dashboards 2026, Kachel 8.1–8.5).",
+   "rohertrag": "Jahresrohertrag vorrangig aus auf Marktüblichkeit geprüften tatsächlichen Mieten, sonst marktüblich erzielbare Nettokaltmiete",
+   "bewirtschaftungskosten": "nicht umlagefähige Kosten für Verwaltung, Instandhaltung und Mietausfallwagnis in Anlehnung an die indizierten Modellwerte der Anlage 3 ImmoWertV",
+   "bewirtschaftungskostenquote": null,
+   "gnd_jahre": 80,
+   "gnd_beleg": "Modellblock des jeweiligen Teilmarkts: „Gesamtnutzungsdauer 80 Jahre“ bzw. „gemäß § 12 (5) Satz 2 und Anlage 3 ImmoWertV“",
+   "restnutzungsdauer": "modifizierte Restnutzungsdauer nach Anlage 2 ImmoWertV (§ 4 Abs. 3)",
+   "bodenwert": "rentierlicher Bodenwert aus erschließungsbeitragsfreiem Bodenrichtwert, ggf. mit Umrechnungskoeffizienten angepasst; sonstige Bodenwerte abgetrennt",
+   "baupreisindex_stichtag": null
+  },
+  "geltungsbereich": {
+   "raeumlich": "Zuständigkeitsbereich des GAG Aurich ohne die ostfriesischen Inseln (Emden, Wilhelmshaven, Aurich, Friesland, Leer, Wittmund)",
+   "extrapolation": "gesperrt",
+   "stichprobe": {
+    "restnutzungsdauer_jahre": [
+     22,
+     80
+    ],
+    "wohnflaeche_qm": [
+     83,
+     180
+    ],
+    "wohnflaeche_median": 136,
+    "mod_baujahr": [
+     1966,
+     2013
+    ],
+    "mod_baujahr_median": 1985
+   },
+   "hinweis": "KEIN TREFFER HEISST KEIN WERT. Gilt für den im Block genannten räumlichen Anwendungsbereich; Bodenrichtwert- und Wohnflächenspannen der Stichprobe begrenzen den Anwendungsbereich mit."
+  },
+  "belege": [
+   {
+    "art": "tabellenwert",
+    "fundstelle": "Grundstücksmarktdaten 2026 Aurich, Abschnitt Liegenschaftszinssätze – Ein- und Zweifamilienhäuser, S. 36",
+    "wortlaut": "Ergebnis (Median) 1.8 % · 10. Perzentil 0.5 % · 90. Perzentil 3.3 % · Stichtag 01.01.2025 · Anzahl Kauffälle 157",
+    "verfahren": "Medianuntersuchung",
+    "ausreisser": "keine Ausreißer beseitigt, da Medianergebnis",
+    "kauffaelle": 157
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": "amtlich, gutachterausschussscharf, Fallzahl und Perzentilspanne ausgewiesen",
+  "fallzahl": 157,
+  "streuung": {
+   "p10_pct": 0.5,
+   "p90_pct": 3.3,
+   "spannen_art": "10. und 90. Perzentil der Einzelliegenschaftszinssätze (keine Standardabweichung gedruckt)"
+  },
+  "stichtag": "2025-01-01",
+  "stichtag_hinweis": null,
+  "berichtsjahr": 2025,
+  "modellversion": "GMD 2026 Aurich",
+  "quelle_url": "https://www.gag.niedersachsen.de/download/224463",
+  "quelle_parser": "ernte-20261122-hand (pdftotext, GMD 2026 S. 36–38 und GMD 2025 S. 38–40 nebeneinander gelesen am 22.11.2026)",
+  "quellenvermerk": "© Gutachterausschuss für Grundstückswerte Aurich 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+  "lizenz": "dl-de/by-2-0",
+  "lizenz_hinweis": "Die PDF-Datei selbst trägt KEINEN Lizenzvermerk (am 05.10.2026 per grep auf dl-de, ©, Nutzungsbedingung geprüft: kein Treffer). Die Lizenz dl-de/by-2-0 ist die Nutzungsregel der GAG-Website (nutzungsbedingungen-197313.html), so wie sie die Sätze des Jahrgangs 2024 (quelle_parser v1084-WREZ) führen. In dieser Sitzung nicht erneut auf der Website nachgelesen.",
+  "fundstelle": "Grundstücksmarktdaten 2026 Aurich, Abschnitt Liegenschaftszinssätze – Ein- und Zweifamilienhäuser, S. 36",
+  "seite": 36,
+  "auflagen": [
+   "GEGENGELESEN AM 22.11.2026 (offener Punkt der Sperre „Prüfung ausstehend“): Beide Berichte werten DIESELBE Stichprobe aus (Kaufverträge 01.01.2023–31.12.2024, gleiche Fallzahl, Stichtag 01.01.2025). Der Bericht 2025 rechnete mit Restnutzungsdauern bis 70 Jahre (Gesamtnutzungsdauer 70), der Bericht 2026 rechnet dieselben Fälle mit Gesamtnutzungsdauer 80 Jahre (Anlage 1 ImmoWertV) neu und beschließt den Median neu. Vergleich: „Grundstücksmarktdaten 2025“ (download/210956), S. 38: Median 1,2 % · Stichtag 01.01.2025 · Restnutzungsdauer 15–70 Jahre, Gesamtnutzungsdauer 70 Jahre. Es gilt der Beschluss 2026 mit GND 80 — der 2024er Registersatz (laender2.json, GND 70) ist damit überholt; beide Zahlen sind nur im jeweils eigenen Modell richtig (§ 10 ImmoWertV).",
+   "Gleicher Wert wie die bereits geführten Sätze Wilhelmshaven (03405) und Friesland (03455): der räumliche Anwendungsbereich ist der „Zuständigkeitsbereich des GAG Aurich (ohne Inseln)“. Für die Inselgemeinden stehen eigene Sätze (lzs-ni-aurich-inseln-2026.json)."
+  ],
+  "ersetzt_sperre": true,
+  "abloesung": {
+   "datei": "lzs-st-th-sh-ni-2025.json",
+   "ags": "03402",
+   "zweig": "ezfh",
+   "berichtsjahr": 2025,
+   "grund": "Sperre „Prüfung ausstehend“ am 2025er-PDF gegengelesen und in einen Wert überführt"
+  }
+ },
+ {
+  "land_code": "NI",
+  "ags": "03402",
+  "ebene": "kreis",
+  "gebiet_name": "Emden, Stadt",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte Aurich",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "rhdhh",
+  "objektart_bez": "Reihenhäuser und Doppelhaushälften (Dauerwohnen)",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 2.3,
+   "rundung_stellen": 2,
+   "bezeichnung": "Reihenhäuser und Doppelhaushälften — Median (Beschluss)",
+   "hinweis": "Ergebnis in PROZENT (2,3 bedeutet 2,3 %), nicht als Dezimalbruch.",
+   "wert_art": "median"
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Landesweit einheitlicher Modellrahmen der niedersächsischen Gutachterausschüsse (Beschreibung der Dashboards 2026, Kachel 8.1–8.5).",
+   "rohertrag": "Jahresrohertrag vorrangig aus auf Marktüblichkeit geprüften tatsächlichen Mieten, sonst marktüblich erzielbare Nettokaltmiete",
+   "bewirtschaftungskosten": "nicht umlagefähige Kosten für Verwaltung, Instandhaltung und Mietausfallwagnis in Anlehnung an die indizierten Modellwerte der Anlage 3 ImmoWertV",
+   "bewirtschaftungskostenquote": null,
+   "gnd_jahre": 80,
+   "gnd_beleg": "Modellblock des jeweiligen Teilmarkts: „Gesamtnutzungsdauer 80 Jahre“ bzw. „gemäß § 12 (5) Satz 2 und Anlage 3 ImmoWertV“",
+   "restnutzungsdauer": "modifizierte Restnutzungsdauer nach Anlage 2 ImmoWertV (§ 4 Abs. 3)",
+   "bodenwert": "rentierlicher Bodenwert aus erschließungsbeitragsfreiem Bodenrichtwert, ggf. mit Umrechnungskoeffizienten angepasst; sonstige Bodenwerte abgetrennt",
+   "baupreisindex_stichtag": null
+  },
+  "geltungsbereich": {
+   "raeumlich": "Zuständigkeitsbereich des GAG Aurich ohne die ostfriesischen Inseln (Emden, Wilhelmshaven, Aurich, Friesland, Leer, Wittmund)",
+   "extrapolation": "gesperrt",
+   "stichprobe": {
+    "wohnflaeche_qm": [
+     71,
+     130
+    ],
+    "wohnflaeche_median": 103,
+    "mod_baujahr": [
+     1969,
+     2023
+    ],
+    "mod_baujahr_median": 1995
+   },
+   "hinweis": "KEIN TREFFER HEISST KEIN WERT. Gilt für den im Block genannten räumlichen Anwendungsbereich; Bodenrichtwert- und Wohnflächenspannen der Stichprobe begrenzen den Anwendungsbereich mit."
+  },
+  "belege": [
+   {
+    "art": "tabellenwert",
+    "fundstelle": "Grundstücksmarktdaten 2026 Aurich, Abschnitt Liegenschaftszinssätze – Reihenhäuser und Doppelhaushälften, S. 37",
+    "wortlaut": "Ergebnis (Median) 2.3 % · 10. Perzentil 0.8 % · 90. Perzentil 3.8 % · Stichtag 01.01.2025 · Anzahl Kauffälle 96",
+    "verfahren": "Medianuntersuchung",
+    "ausreisser": "keine Ausreißer beseitigt, da Medianergebnis",
+    "kauffaelle": 96
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": "amtlich, gutachterausschussscharf, Fallzahl und Perzentilspanne ausgewiesen",
+  "fallzahl": 96,
+  "streuung": {
+   "p10_pct": 0.8,
+   "p90_pct": 3.8,
+   "spannen_art": "10. und 90. Perzentil der Einzelliegenschaftszinssätze (keine Standardabweichung gedruckt)"
+  },
+  "stichtag": "2025-01-01",
+  "stichtag_hinweis": null,
+  "berichtsjahr": 2025,
+  "modellversion": "GMD 2026 Aurich",
+  "quelle_url": "https://www.gag.niedersachsen.de/download/224463",
+  "quelle_parser": "ernte-20261122-hand (pdftotext, GMD 2026 S. 36–38 und GMD 2025 S. 38–40 nebeneinander gelesen am 22.11.2026)",
+  "quellenvermerk": "© Gutachterausschuss für Grundstückswerte Aurich 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+  "lizenz": "dl-de/by-2-0",
+  "lizenz_hinweis": "Die PDF-Datei selbst trägt KEINEN Lizenzvermerk (am 05.10.2026 per grep auf dl-de, ©, Nutzungsbedingung geprüft: kein Treffer). Die Lizenz dl-de/by-2-0 ist die Nutzungsregel der GAG-Website (nutzungsbedingungen-197313.html), so wie sie die Sätze des Jahrgangs 2024 (quelle_parser v1084-WREZ) führen. In dieser Sitzung nicht erneut auf der Website nachgelesen.",
+  "fundstelle": "Grundstücksmarktdaten 2026 Aurich, Abschnitt Liegenschaftszinssätze – Reihenhäuser und Doppelhaushälften, S. 37",
+  "seite": 37,
+  "auflagen": [
+   "GEGENGELESEN AM 22.11.2026 (offener Punkt der Sperre „Prüfung ausstehend“): Beide Berichte werten DIESELBE Stichprobe aus (Kaufverträge 01.01.2023–31.12.2024, gleiche Fallzahl, Stichtag 01.01.2025). Der Bericht 2025 rechnete mit Restnutzungsdauern bis 70 Jahre (Gesamtnutzungsdauer 70), der Bericht 2026 rechnet dieselben Fälle mit Gesamtnutzungsdauer 80 Jahre (Anlage 1 ImmoWertV) neu und beschließt den Median neu. Vergleich: „Grundstücksmarktdaten 2025“ (download/210956), S. 39: Median 1,7 % · Stichtag 01.01.2025 · Restnutzungsdauer 15–70 Jahre. Es gilt der Beschluss 2026 mit GND 80 — der 2024er Registersatz (laender2.json, GND 70) ist damit überholt; beide Zahlen sind nur im jeweils eigenen Modell richtig (§ 10 ImmoWertV).",
+   "Gleicher Wert wie die bereits geführten Sätze Wilhelmshaven (03405) und Friesland (03455): der räumliche Anwendungsbereich ist der „Zuständigkeitsbereich des GAG Aurich (ohne Inseln)“. Für die Inselgemeinden stehen eigene Sätze (lzs-ni-aurich-inseln-2026.json)."
+  ],
+  "ersetzt_sperre": true,
+  "abloesung": {
+   "datei": "lzs-st-th-sh-ni-2025.json",
+   "ags": "03402",
+   "zweig": "rhdhh",
+   "berichtsjahr": 2025,
+   "grund": "Sperre „Prüfung ausstehend“ am 2025er-PDF gegengelesen und in einen Wert überführt"
+  }
+ },
+ {
+  "land_code": "NI",
+  "ags": "03402",
+  "ebene": "kreis",
+  "gebiet_name": "Emden, Stadt",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte Aurich",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "we_v",
+  "objektart_bez": "Eigentumswohnungen (Dauerwohnen, Anlagen unter 20 Einheiten)",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 2.3,
+   "rundung_stellen": 2,
+   "bezeichnung": "Eigentumswohnungen — Median (Beschluss)",
+   "hinweis": "Ergebnis in PROZENT (2,3 bedeutet 2,3 %), nicht als Dezimalbruch.",
+   "wert_art": "median"
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Landesweit einheitlicher Modellrahmen der niedersächsischen Gutachterausschüsse (Beschreibung der Dashboards 2026, Kachel 8.1–8.5).",
+   "rohertrag": "Jahresrohertrag vorrangig aus auf Marktüblichkeit geprüften tatsächlichen Mieten, sonst marktüblich erzielbare Nettokaltmiete",
+   "bewirtschaftungskosten": "nicht umlagefähige Kosten für Verwaltung, Instandhaltung und Mietausfallwagnis in Anlehnung an die indizierten Modellwerte der Anlage 3 ImmoWertV",
+   "bewirtschaftungskostenquote": null,
+   "gnd_jahre": 80,
+   "gnd_beleg": "Modellblock des jeweiligen Teilmarkts: „Gesamtnutzungsdauer 80 Jahre“ bzw. „gemäß § 12 (5) Satz 2 und Anlage 3 ImmoWertV“",
+   "restnutzungsdauer": "modifizierte Restnutzungsdauer nach Anlage 2 ImmoWertV (§ 4 Abs. 3)",
+   "bodenwert": "rentierlicher Bodenwert aus erschließungsbeitragsfreiem Bodenrichtwert, ggf. mit Umrechnungskoeffizienten angepasst; sonstige Bodenwerte abgetrennt",
+   "baupreisindex_stichtag": null
+  },
+  "geltungsbereich": {
+   "raeumlich": "Zuständigkeitsbereich des GAG Aurich ohne die ostfriesischen Inseln (Emden, Wilhelmshaven, Aurich, Friesland, Leer, Wittmund)",
+   "extrapolation": "gesperrt",
+   "stichprobe": {
+    "wohnflaeche_qm": [
+     35,
+     129
+    ],
+    "wohnflaeche_median": 72,
+    "mod_baujahr": [
+     1971,
+     2025
+    ],
+    "mod_baujahr_median": 2015
+   },
+   "hinweis": "KEIN TREFFER HEISST KEIN WERT. Gilt für den im Block genannten räumlichen Anwendungsbereich; Bodenrichtwert- und Wohnflächenspannen der Stichprobe begrenzen den Anwendungsbereich mit."
+  },
+  "belege": [
+   {
+    "art": "tabellenwert",
+    "fundstelle": "Grundstücksmarktdaten 2026 Aurich, Abschnitt Liegenschaftszinssätze – Eigentumswohnungen, S. 38",
+    "wortlaut": "Ergebnis (Median) 2.3 % · 10. Perzentil 0.7 % · 90. Perzentil 4.4 % · Stichtag 01.01.2025 · Anzahl Kauffälle 337",
+    "verfahren": "Medianuntersuchung",
+    "ausreisser": "keine Ausreißer beseitigt, da Medianergebnis",
+    "kauffaelle": 337
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": "amtlich, gutachterausschussscharf, Fallzahl und Perzentilspanne ausgewiesen",
+  "fallzahl": 337,
+  "streuung": {
+   "p10_pct": 0.7,
+   "p90_pct": 4.4,
+   "spannen_art": "10. und 90. Perzentil der Einzelliegenschaftszinssätze (keine Standardabweichung gedruckt)"
+  },
+  "stichtag": "2025-01-01",
+  "stichtag_hinweis": null,
+  "berichtsjahr": 2025,
+  "modellversion": "GMD 2026 Aurich",
+  "quelle_url": "https://www.gag.niedersachsen.de/download/224463",
+  "quelle_parser": "ernte-20261122-hand (pdftotext, GMD 2026 S. 36–38 und GMD 2025 S. 38–40 nebeneinander gelesen am 22.11.2026)",
+  "quellenvermerk": "© Gutachterausschuss für Grundstückswerte Aurich 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+  "lizenz": "dl-de/by-2-0",
+  "lizenz_hinweis": "Die PDF-Datei selbst trägt KEINEN Lizenzvermerk (am 05.10.2026 per grep auf dl-de, ©, Nutzungsbedingung geprüft: kein Treffer). Die Lizenz dl-de/by-2-0 ist die Nutzungsregel der GAG-Website (nutzungsbedingungen-197313.html), so wie sie die Sätze des Jahrgangs 2024 (quelle_parser v1084-WREZ) führen. In dieser Sitzung nicht erneut auf der Website nachgelesen.",
+  "fundstelle": "Grundstücksmarktdaten 2026 Aurich, Abschnitt Liegenschaftszinssätze – Eigentumswohnungen, S. 38",
+  "seite": 38,
+  "auflagen": [
+   "GEGENGELESEN AM 22.11.2026 (offener Punkt der Sperre „Prüfung ausstehend“): Beide Berichte werten DIESELBE Stichprobe aus (Kaufverträge 01.01.2023–31.12.2024, gleiche Fallzahl, Stichtag 01.01.2025). Der Bericht 2025 rechnete mit Restnutzungsdauern bis 70 Jahre (Gesamtnutzungsdauer 70), der Bericht 2026 rechnet dieselben Fälle mit Gesamtnutzungsdauer 80 Jahre (Anlage 1 ImmoWertV) neu und beschließt den Median neu. Vergleich: „Grundstücksmarktdaten 2025“ (download/210956), S. 40: Median 1,9 % · Stichtag 01.01.2025 · Restnutzungsdauer 15–70 Jahre. Es gilt der Beschluss 2026 mit GND 80 — der 2024er Registersatz (laender2.json, GND 70) ist damit überholt; beide Zahlen sind nur im jeweils eigenen Modell richtig (§ 10 ImmoWertV).",
+   "Gleicher Wert wie die bereits geführten Sätze Wilhelmshaven (03405) und Friesland (03455): der räumliche Anwendungsbereich ist der „Zuständigkeitsbereich des GAG Aurich (ohne Inseln)“. Für die Inselgemeinden stehen eigene Sätze (lzs-ni-aurich-inseln-2026.json)."
+  ],
+  "ersetzt_sperre": true,
+  "abloesung": {
+   "datei": "lzs-st-th-sh-ni-2025.json",
+   "ags": "03402",
+   "zweig": "we_v",
+   "berichtsjahr": 2025,
+   "grund": "Sperre „Prüfung ausstehend“ am 2025er-PDF gegengelesen und in einen Wert überführt"
+  }
+ },
+ {
+  "land_code": "NI",
+  "ags": "03452",
+  "ebene": "kreis",
+  "gebiet_name": "Aurich, Landkreis",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte Aurich",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "ezfh",
+  "objektart_bez": "Ein- und Zweifamilienhausgrundstücke (Dauerwohnen)",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 1.8,
+   "rundung_stellen": 2,
+   "bezeichnung": "Ein- und Zweifamilienhäuser — Median (Beschluss)",
+   "hinweis": "Ergebnis in PROZENT (1,8 bedeutet 1,8 %), nicht als Dezimalbruch.",
+   "wert_art": "median"
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Landesweit einheitlicher Modellrahmen der niedersächsischen Gutachterausschüsse (Beschreibung der Dashboards 2026, Kachel 8.1–8.5).",
+   "rohertrag": "Jahresrohertrag vorrangig aus auf Marktüblichkeit geprüften tatsächlichen Mieten, sonst marktüblich erzielbare Nettokaltmiete",
+   "bewirtschaftungskosten": "nicht umlagefähige Kosten für Verwaltung, Instandhaltung und Mietausfallwagnis in Anlehnung an die indizierten Modellwerte der Anlage 3 ImmoWertV",
+   "bewirtschaftungskostenquote": null,
+   "gnd_jahre": 80,
+   "gnd_beleg": "Modellblock des jeweiligen Teilmarkts: „Gesamtnutzungsdauer 80 Jahre“ bzw. „gemäß § 12 (5) Satz 2 und Anlage 3 ImmoWertV“",
+   "restnutzungsdauer": "modifizierte Restnutzungsdauer nach Anlage 2 ImmoWertV (§ 4 Abs. 3)",
+   "bodenwert": "rentierlicher Bodenwert aus erschließungsbeitragsfreiem Bodenrichtwert, ggf. mit Umrechnungskoeffizienten angepasst; sonstige Bodenwerte abgetrennt",
+   "baupreisindex_stichtag": null
+  },
+  "geltungsbereich": {
+   "raeumlich": "Zuständigkeitsbereich des GAG Aurich ohne die ostfriesischen Inseln (Emden, Wilhelmshaven, Aurich, Friesland, Leer, Wittmund)",
+   "extrapolation": "gesperrt",
+   "stichprobe": {
+    "restnutzungsdauer_jahre": [
+     22,
+     80
+    ],
+    "wohnflaeche_qm": [
+     83,
+     180
+    ],
+    "wohnflaeche_median": 136,
+    "mod_baujahr": [
+     1966,
+     2013
+    ],
+    "mod_baujahr_median": 1985
+   },
+   "hinweis": "KEIN TREFFER HEISST KEIN WERT. Gilt für den im Block genannten räumlichen Anwendungsbereich; Bodenrichtwert- und Wohnflächenspannen der Stichprobe begrenzen den Anwendungsbereich mit."
+  },
+  "belege": [
+   {
+    "art": "tabellenwert",
+    "fundstelle": "Grundstücksmarktdaten 2026 Aurich, Abschnitt Liegenschaftszinssätze – Ein- und Zweifamilienhäuser, S. 36",
+    "wortlaut": "Ergebnis (Median) 1.8 % · 10. Perzentil 0.5 % · 90. Perzentil 3.3 % · Stichtag 01.01.2025 · Anzahl Kauffälle 157",
+    "verfahren": "Medianuntersuchung",
+    "ausreisser": "keine Ausreißer beseitigt, da Medianergebnis",
+    "kauffaelle": 157
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": "amtlich, gutachterausschussscharf, Fallzahl und Perzentilspanne ausgewiesen",
+  "fallzahl": 157,
+  "streuung": {
+   "p10_pct": 0.5,
+   "p90_pct": 3.3,
+   "spannen_art": "10. und 90. Perzentil der Einzelliegenschaftszinssätze (keine Standardabweichung gedruckt)"
+  },
+  "stichtag": "2025-01-01",
+  "stichtag_hinweis": null,
+  "berichtsjahr": 2025,
+  "modellversion": "GMD 2026 Aurich",
+  "quelle_url": "https://www.gag.niedersachsen.de/download/224463",
+  "quelle_parser": "ernte-20261122-hand (pdftotext, GMD 2026 S. 36–38 und GMD 2025 S. 38–40 nebeneinander gelesen am 22.11.2026)",
+  "quellenvermerk": "© Gutachterausschuss für Grundstückswerte Aurich 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+  "lizenz": "dl-de/by-2-0",
+  "lizenz_hinweis": "Die PDF-Datei selbst trägt KEINEN Lizenzvermerk (am 05.10.2026 per grep auf dl-de, ©, Nutzungsbedingung geprüft: kein Treffer). Die Lizenz dl-de/by-2-0 ist die Nutzungsregel der GAG-Website (nutzungsbedingungen-197313.html), so wie sie die Sätze des Jahrgangs 2024 (quelle_parser v1084-WREZ) führen. In dieser Sitzung nicht erneut auf der Website nachgelesen.",
+  "fundstelle": "Grundstücksmarktdaten 2026 Aurich, Abschnitt Liegenschaftszinssätze – Ein- und Zweifamilienhäuser, S. 36",
+  "seite": 36,
+  "auflagen": [
+   "GEGENGELESEN AM 22.11.2026 (offener Punkt der Sperre „Prüfung ausstehend“): Beide Berichte werten DIESELBE Stichprobe aus (Kaufverträge 01.01.2023–31.12.2024, gleiche Fallzahl, Stichtag 01.01.2025). Der Bericht 2025 rechnete mit Restnutzungsdauern bis 70 Jahre (Gesamtnutzungsdauer 70), der Bericht 2026 rechnet dieselben Fälle mit Gesamtnutzungsdauer 80 Jahre (Anlage 1 ImmoWertV) neu und beschließt den Median neu. Vergleich: „Grundstücksmarktdaten 2025“ (download/210956), S. 38: Median 1,2 % · Stichtag 01.01.2025 · Restnutzungsdauer 15–70 Jahre, Gesamtnutzungsdauer 70 Jahre. Es gilt der Beschluss 2026 mit GND 80 — der 2024er Registersatz (laender2.json, GND 70) ist damit überholt; beide Zahlen sind nur im jeweils eigenen Modell richtig (§ 10 ImmoWertV).",
+   "Gleicher Wert wie die bereits geführten Sätze Wilhelmshaven (03405) und Friesland (03455): der räumliche Anwendungsbereich ist der „Zuständigkeitsbereich des GAG Aurich (ohne Inseln)“. Für die Inselgemeinden stehen eigene Sätze (lzs-ni-aurich-inseln-2026.json)."
+  ],
+  "ersetzt_sperre": true,
+  "abloesung": {
+   "datei": "lzs-st-th-sh-ni-2025.json",
+   "ags": "03452",
+   "zweig": "ezfh",
+   "berichtsjahr": 2025,
+   "grund": "Sperre „Prüfung ausstehend“ am 2025er-PDF gegengelesen und in einen Wert überführt"
+  }
+ },
+ {
+  "land_code": "NI",
+  "ags": "03452",
+  "ebene": "kreis",
+  "gebiet_name": "Aurich, Landkreis",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte Aurich",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "rhdhh",
+  "objektart_bez": "Reihenhäuser und Doppelhaushälften (Dauerwohnen)",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 2.3,
+   "rundung_stellen": 2,
+   "bezeichnung": "Reihenhäuser und Doppelhaushälften — Median (Beschluss)",
+   "hinweis": "Ergebnis in PROZENT (2,3 bedeutet 2,3 %), nicht als Dezimalbruch.",
+   "wert_art": "median"
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Landesweit einheitlicher Modellrahmen der niedersächsischen Gutachterausschüsse (Beschreibung der Dashboards 2026, Kachel 8.1–8.5).",
+   "rohertrag": "Jahresrohertrag vorrangig aus auf Marktüblichkeit geprüften tatsächlichen Mieten, sonst marktüblich erzielbare Nettokaltmiete",
+   "bewirtschaftungskosten": "nicht umlagefähige Kosten für Verwaltung, Instandhaltung und Mietausfallwagnis in Anlehnung an die indizierten Modellwerte der Anlage 3 ImmoWertV",
+   "bewirtschaftungskostenquote": null,
+   "gnd_jahre": 80,
+   "gnd_beleg": "Modellblock des jeweiligen Teilmarkts: „Gesamtnutzungsdauer 80 Jahre“ bzw. „gemäß § 12 (5) Satz 2 und Anlage 3 ImmoWertV“",
+   "restnutzungsdauer": "modifizierte Restnutzungsdauer nach Anlage 2 ImmoWertV (§ 4 Abs. 3)",
+   "bodenwert": "rentierlicher Bodenwert aus erschließungsbeitragsfreiem Bodenrichtwert, ggf. mit Umrechnungskoeffizienten angepasst; sonstige Bodenwerte abgetrennt",
+   "baupreisindex_stichtag": null
+  },
+  "geltungsbereich": {
+   "raeumlich": "Zuständigkeitsbereich des GAG Aurich ohne die ostfriesischen Inseln (Emden, Wilhelmshaven, Aurich, Friesland, Leer, Wittmund)",
+   "extrapolation": "gesperrt",
+   "stichprobe": {
+    "wohnflaeche_qm": [
+     71,
+     130
+    ],
+    "wohnflaeche_median": 103,
+    "mod_baujahr": [
+     1969,
+     2023
+    ],
+    "mod_baujahr_median": 1995
+   },
+   "hinweis": "KEIN TREFFER HEISST KEIN WERT. Gilt für den im Block genannten räumlichen Anwendungsbereich; Bodenrichtwert- und Wohnflächenspannen der Stichprobe begrenzen den Anwendungsbereich mit."
+  },
+  "belege": [
+   {
+    "art": "tabellenwert",
+    "fundstelle": "Grundstücksmarktdaten 2026 Aurich, Abschnitt Liegenschaftszinssätze – Reihenhäuser und Doppelhaushälften, S. 37",
+    "wortlaut": "Ergebnis (Median) 2.3 % · 10. Perzentil 0.8 % · 90. Perzentil 3.8 % · Stichtag 01.01.2025 · Anzahl Kauffälle 96",
+    "verfahren": "Medianuntersuchung",
+    "ausreisser": "keine Ausreißer beseitigt, da Medianergebnis",
+    "kauffaelle": 96
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": "amtlich, gutachterausschussscharf, Fallzahl und Perzentilspanne ausgewiesen",
+  "fallzahl": 96,
+  "streuung": {
+   "p10_pct": 0.8,
+   "p90_pct": 3.8,
+   "spannen_art": "10. und 90. Perzentil der Einzelliegenschaftszinssätze (keine Standardabweichung gedruckt)"
+  },
+  "stichtag": "2025-01-01",
+  "stichtag_hinweis": null,
+  "berichtsjahr": 2025,
+  "modellversion": "GMD 2026 Aurich",
+  "quelle_url": "https://www.gag.niedersachsen.de/download/224463",
+  "quelle_parser": "ernte-20261122-hand (pdftotext, GMD 2026 S. 36–38 und GMD 2025 S. 38–40 nebeneinander gelesen am 22.11.2026)",
+  "quellenvermerk": "© Gutachterausschuss für Grundstückswerte Aurich 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+  "lizenz": "dl-de/by-2-0",
+  "lizenz_hinweis": "Die PDF-Datei selbst trägt KEINEN Lizenzvermerk (am 05.10.2026 per grep auf dl-de, ©, Nutzungsbedingung geprüft: kein Treffer). Die Lizenz dl-de/by-2-0 ist die Nutzungsregel der GAG-Website (nutzungsbedingungen-197313.html), so wie sie die Sätze des Jahrgangs 2024 (quelle_parser v1084-WREZ) führen. In dieser Sitzung nicht erneut auf der Website nachgelesen.",
+  "fundstelle": "Grundstücksmarktdaten 2026 Aurich, Abschnitt Liegenschaftszinssätze – Reihenhäuser und Doppelhaushälften, S. 37",
+  "seite": 37,
+  "auflagen": [
+   "GEGENGELESEN AM 22.11.2026 (offener Punkt der Sperre „Prüfung ausstehend“): Beide Berichte werten DIESELBE Stichprobe aus (Kaufverträge 01.01.2023–31.12.2024, gleiche Fallzahl, Stichtag 01.01.2025). Der Bericht 2025 rechnete mit Restnutzungsdauern bis 70 Jahre (Gesamtnutzungsdauer 70), der Bericht 2026 rechnet dieselben Fälle mit Gesamtnutzungsdauer 80 Jahre (Anlage 1 ImmoWertV) neu und beschließt den Median neu. Vergleich: „Grundstücksmarktdaten 2025“ (download/210956), S. 39: Median 1,7 % · Stichtag 01.01.2025 · Restnutzungsdauer 15–70 Jahre. Es gilt der Beschluss 2026 mit GND 80 — der 2024er Registersatz (laender2.json, GND 70) ist damit überholt; beide Zahlen sind nur im jeweils eigenen Modell richtig (§ 10 ImmoWertV).",
+   "Gleicher Wert wie die bereits geführten Sätze Wilhelmshaven (03405) und Friesland (03455): der räumliche Anwendungsbereich ist der „Zuständigkeitsbereich des GAG Aurich (ohne Inseln)“. Für die Inselgemeinden stehen eigene Sätze (lzs-ni-aurich-inseln-2026.json)."
+  ],
+  "ersetzt_sperre": true,
+  "abloesung": {
+   "datei": "lzs-st-th-sh-ni-2025.json",
+   "ags": "03452",
+   "zweig": "rhdhh",
+   "berichtsjahr": 2025,
+   "grund": "Sperre „Prüfung ausstehend“ am 2025er-PDF gegengelesen und in einen Wert überführt"
+  }
+ },
+ {
+  "land_code": "NI",
+  "ags": "03452",
+  "ebene": "kreis",
+  "gebiet_name": "Aurich, Landkreis",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte Aurich",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "we_v",
+  "objektart_bez": "Eigentumswohnungen (Dauerwohnen, Anlagen unter 20 Einheiten)",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 2.3,
+   "rundung_stellen": 2,
+   "bezeichnung": "Eigentumswohnungen — Median (Beschluss)",
+   "hinweis": "Ergebnis in PROZENT (2,3 bedeutet 2,3 %), nicht als Dezimalbruch.",
+   "wert_art": "median"
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Landesweit einheitlicher Modellrahmen der niedersächsischen Gutachterausschüsse (Beschreibung der Dashboards 2026, Kachel 8.1–8.5).",
+   "rohertrag": "Jahresrohertrag vorrangig aus auf Marktüblichkeit geprüften tatsächlichen Mieten, sonst marktüblich erzielbare Nettokaltmiete",
+   "bewirtschaftungskosten": "nicht umlagefähige Kosten für Verwaltung, Instandhaltung und Mietausfallwagnis in Anlehnung an die indizierten Modellwerte der Anlage 3 ImmoWertV",
+   "bewirtschaftungskostenquote": null,
+   "gnd_jahre": 80,
+   "gnd_beleg": "Modellblock des jeweiligen Teilmarkts: „Gesamtnutzungsdauer 80 Jahre“ bzw. „gemäß § 12 (5) Satz 2 und Anlage 3 ImmoWertV“",
+   "restnutzungsdauer": "modifizierte Restnutzungsdauer nach Anlage 2 ImmoWertV (§ 4 Abs. 3)",
+   "bodenwert": "rentierlicher Bodenwert aus erschließungsbeitragsfreiem Bodenrichtwert, ggf. mit Umrechnungskoeffizienten angepasst; sonstige Bodenwerte abgetrennt",
+   "baupreisindex_stichtag": null
+  },
+  "geltungsbereich": {
+   "raeumlich": "Zuständigkeitsbereich des GAG Aurich ohne die ostfriesischen Inseln (Emden, Wilhelmshaven, Aurich, Friesland, Leer, Wittmund)",
+   "extrapolation": "gesperrt",
+   "stichprobe": {
+    "wohnflaeche_qm": [
+     35,
+     129
+    ],
+    "wohnflaeche_median": 72,
+    "mod_baujahr": [
+     1971,
+     2025
+    ],
+    "mod_baujahr_median": 2015
+   },
+   "hinweis": "KEIN TREFFER HEISST KEIN WERT. Gilt für den im Block genannten räumlichen Anwendungsbereich; Bodenrichtwert- und Wohnflächenspannen der Stichprobe begrenzen den Anwendungsbereich mit."
+  },
+  "belege": [
+   {
+    "art": "tabellenwert",
+    "fundstelle": "Grundstücksmarktdaten 2026 Aurich, Abschnitt Liegenschaftszinssätze – Eigentumswohnungen, S. 38",
+    "wortlaut": "Ergebnis (Median) 2.3 % · 10. Perzentil 0.7 % · 90. Perzentil 4.4 % · Stichtag 01.01.2025 · Anzahl Kauffälle 337",
+    "verfahren": "Medianuntersuchung",
+    "ausreisser": "keine Ausreißer beseitigt, da Medianergebnis",
+    "kauffaelle": 337
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": "amtlich, gutachterausschussscharf, Fallzahl und Perzentilspanne ausgewiesen",
+  "fallzahl": 337,
+  "streuung": {
+   "p10_pct": 0.7,
+   "p90_pct": 4.4,
+   "spannen_art": "10. und 90. Perzentil der Einzelliegenschaftszinssätze (keine Standardabweichung gedruckt)"
+  },
+  "stichtag": "2025-01-01",
+  "stichtag_hinweis": null,
+  "berichtsjahr": 2025,
+  "modellversion": "GMD 2026 Aurich",
+  "quelle_url": "https://www.gag.niedersachsen.de/download/224463",
+  "quelle_parser": "ernte-20261122-hand (pdftotext, GMD 2026 S. 36–38 und GMD 2025 S. 38–40 nebeneinander gelesen am 22.11.2026)",
+  "quellenvermerk": "© Gutachterausschuss für Grundstückswerte Aurich 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+  "lizenz": "dl-de/by-2-0",
+  "lizenz_hinweis": "Die PDF-Datei selbst trägt KEINEN Lizenzvermerk (am 05.10.2026 per grep auf dl-de, ©, Nutzungsbedingung geprüft: kein Treffer). Die Lizenz dl-de/by-2-0 ist die Nutzungsregel der GAG-Website (nutzungsbedingungen-197313.html), so wie sie die Sätze des Jahrgangs 2024 (quelle_parser v1084-WREZ) führen. In dieser Sitzung nicht erneut auf der Website nachgelesen.",
+  "fundstelle": "Grundstücksmarktdaten 2026 Aurich, Abschnitt Liegenschaftszinssätze – Eigentumswohnungen, S. 38",
+  "seite": 38,
+  "auflagen": [
+   "GEGENGELESEN AM 22.11.2026 (offener Punkt der Sperre „Prüfung ausstehend“): Beide Berichte werten DIESELBE Stichprobe aus (Kaufverträge 01.01.2023–31.12.2024, gleiche Fallzahl, Stichtag 01.01.2025). Der Bericht 2025 rechnete mit Restnutzungsdauern bis 70 Jahre (Gesamtnutzungsdauer 70), der Bericht 2026 rechnet dieselben Fälle mit Gesamtnutzungsdauer 80 Jahre (Anlage 1 ImmoWertV) neu und beschließt den Median neu. Vergleich: „Grundstücksmarktdaten 2025“ (download/210956), S. 40: Median 1,9 % · Stichtag 01.01.2025 · Restnutzungsdauer 15–70 Jahre. Es gilt der Beschluss 2026 mit GND 80 — der 2024er Registersatz (laender2.json, GND 70) ist damit überholt; beide Zahlen sind nur im jeweils eigenen Modell richtig (§ 10 ImmoWertV).",
+   "Gleicher Wert wie die bereits geführten Sätze Wilhelmshaven (03405) und Friesland (03455): der räumliche Anwendungsbereich ist der „Zuständigkeitsbereich des GAG Aurich (ohne Inseln)“. Für die Inselgemeinden stehen eigene Sätze (lzs-ni-aurich-inseln-2026.json)."
+  ],
+  "ersetzt_sperre": true,
+  "abloesung": {
+   "datei": "lzs-st-th-sh-ni-2025.json",
+   "ags": "03452",
+   "zweig": "we_v",
+   "berichtsjahr": 2025,
+   "grund": "Sperre „Prüfung ausstehend“ am 2025er-PDF gegengelesen und in einen Wert überführt"
+  }
+ },
+ {
+  "land_code": "NI",
+  "ags": "03457",
+  "ebene": "kreis",
+  "gebiet_name": "Leer, Landkreis",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte Aurich",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "ezfh",
+  "objektart_bez": "Ein- und Zweifamilienhausgrundstücke (Dauerwohnen)",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 1.8,
+   "rundung_stellen": 2,
+   "bezeichnung": "Ein- und Zweifamilienhäuser — Median (Beschluss)",
+   "hinweis": "Ergebnis in PROZENT (1,8 bedeutet 1,8 %), nicht als Dezimalbruch.",
+   "wert_art": "median"
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Landesweit einheitlicher Modellrahmen der niedersächsischen Gutachterausschüsse (Beschreibung der Dashboards 2026, Kachel 8.1–8.5).",
+   "rohertrag": "Jahresrohertrag vorrangig aus auf Marktüblichkeit geprüften tatsächlichen Mieten, sonst marktüblich erzielbare Nettokaltmiete",
+   "bewirtschaftungskosten": "nicht umlagefähige Kosten für Verwaltung, Instandhaltung und Mietausfallwagnis in Anlehnung an die indizierten Modellwerte der Anlage 3 ImmoWertV",
+   "bewirtschaftungskostenquote": null,
+   "gnd_jahre": 80,
+   "gnd_beleg": "Modellblock des jeweiligen Teilmarkts: „Gesamtnutzungsdauer 80 Jahre“ bzw. „gemäß § 12 (5) Satz 2 und Anlage 3 ImmoWertV“",
+   "restnutzungsdauer": "modifizierte Restnutzungsdauer nach Anlage 2 ImmoWertV (§ 4 Abs. 3)",
+   "bodenwert": "rentierlicher Bodenwert aus erschließungsbeitragsfreiem Bodenrichtwert, ggf. mit Umrechnungskoeffizienten angepasst; sonstige Bodenwerte abgetrennt",
+   "baupreisindex_stichtag": null
+  },
+  "geltungsbereich": {
+   "raeumlich": "Zuständigkeitsbereich des GAG Aurich ohne die ostfriesischen Inseln (Emden, Wilhelmshaven, Aurich, Friesland, Leer, Wittmund)",
+   "extrapolation": "gesperrt",
+   "stichprobe": {
+    "restnutzungsdauer_jahre": [
+     22,
+     80
+    ],
+    "wohnflaeche_qm": [
+     83,
+     180
+    ],
+    "wohnflaeche_median": 136,
+    "mod_baujahr": [
+     1966,
+     2013
+    ],
+    "mod_baujahr_median": 1985
+   },
+   "hinweis": "KEIN TREFFER HEISST KEIN WERT. Gilt für den im Block genannten räumlichen Anwendungsbereich; Bodenrichtwert- und Wohnflächenspannen der Stichprobe begrenzen den Anwendungsbereich mit."
+  },
+  "belege": [
+   {
+    "art": "tabellenwert",
+    "fundstelle": "Grundstücksmarktdaten 2026 Aurich, Abschnitt Liegenschaftszinssätze – Ein- und Zweifamilienhäuser, S. 36",
+    "wortlaut": "Ergebnis (Median) 1.8 % · 10. Perzentil 0.5 % · 90. Perzentil 3.3 % · Stichtag 01.01.2025 · Anzahl Kauffälle 157",
+    "verfahren": "Medianuntersuchung",
+    "ausreisser": "keine Ausreißer beseitigt, da Medianergebnis",
+    "kauffaelle": 157
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": "amtlich, gutachterausschussscharf, Fallzahl und Perzentilspanne ausgewiesen",
+  "fallzahl": 157,
+  "streuung": {
+   "p10_pct": 0.5,
+   "p90_pct": 3.3,
+   "spannen_art": "10. und 90. Perzentil der Einzelliegenschaftszinssätze (keine Standardabweichung gedruckt)"
+  },
+  "stichtag": "2025-01-01",
+  "stichtag_hinweis": null,
+  "berichtsjahr": 2025,
+  "modellversion": "GMD 2026 Aurich",
+  "quelle_url": "https://www.gag.niedersachsen.de/download/224463",
+  "quelle_parser": "ernte-20261122-hand (pdftotext, GMD 2026 S. 36–38 und GMD 2025 S. 38–40 nebeneinander gelesen am 22.11.2026)",
+  "quellenvermerk": "© Gutachterausschuss für Grundstückswerte Aurich 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+  "lizenz": "dl-de/by-2-0",
+  "lizenz_hinweis": "Die PDF-Datei selbst trägt KEINEN Lizenzvermerk (am 05.10.2026 per grep auf dl-de, ©, Nutzungsbedingung geprüft: kein Treffer). Die Lizenz dl-de/by-2-0 ist die Nutzungsregel der GAG-Website (nutzungsbedingungen-197313.html), so wie sie die Sätze des Jahrgangs 2024 (quelle_parser v1084-WREZ) führen. In dieser Sitzung nicht erneut auf der Website nachgelesen.",
+  "fundstelle": "Grundstücksmarktdaten 2026 Aurich, Abschnitt Liegenschaftszinssätze – Ein- und Zweifamilienhäuser, S. 36",
+  "seite": 36,
+  "auflagen": [
+   "GEGENGELESEN AM 22.11.2026 (offener Punkt der Sperre „Prüfung ausstehend“): Beide Berichte werten DIESELBE Stichprobe aus (Kaufverträge 01.01.2023–31.12.2024, gleiche Fallzahl, Stichtag 01.01.2025). Der Bericht 2025 rechnete mit Restnutzungsdauern bis 70 Jahre (Gesamtnutzungsdauer 70), der Bericht 2026 rechnet dieselben Fälle mit Gesamtnutzungsdauer 80 Jahre (Anlage 1 ImmoWertV) neu und beschließt den Median neu. Vergleich: „Grundstücksmarktdaten 2025“ (download/210956), S. 38: Median 1,2 % · Stichtag 01.01.2025 · Restnutzungsdauer 15–70 Jahre, Gesamtnutzungsdauer 70 Jahre. Es gilt der Beschluss 2026 mit GND 80 — der 2024er Registersatz (laender2.json, GND 70) ist damit überholt; beide Zahlen sind nur im jeweils eigenen Modell richtig (§ 10 ImmoWertV).",
+   "Gleicher Wert wie die bereits geführten Sätze Wilhelmshaven (03405) und Friesland (03455): der räumliche Anwendungsbereich ist der „Zuständigkeitsbereich des GAG Aurich (ohne Inseln)“. Für die Inselgemeinden stehen eigene Sätze (lzs-ni-aurich-inseln-2026.json)."
+  ],
+  "ersetzt_sperre": true,
+  "abloesung": {
+   "datei": "lzs-st-th-sh-ni-2025.json",
+   "ags": "03457",
+   "zweig": "ezfh",
+   "berichtsjahr": 2025,
+   "grund": "Sperre „Prüfung ausstehend“ am 2025er-PDF gegengelesen und in einen Wert überführt"
+  }
+ },
+ {
+  "land_code": "NI",
+  "ags": "03457",
+  "ebene": "kreis",
+  "gebiet_name": "Leer, Landkreis",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte Aurich",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "rhdhh",
+  "objektart_bez": "Reihenhäuser und Doppelhaushälften (Dauerwohnen)",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 2.3,
+   "rundung_stellen": 2,
+   "bezeichnung": "Reihenhäuser und Doppelhaushälften — Median (Beschluss)",
+   "hinweis": "Ergebnis in PROZENT (2,3 bedeutet 2,3 %), nicht als Dezimalbruch.",
+   "wert_art": "median"
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Landesweit einheitlicher Modellrahmen der niedersächsischen Gutachterausschüsse (Beschreibung der Dashboards 2026, Kachel 8.1–8.5).",
+   "rohertrag": "Jahresrohertrag vorrangig aus auf Marktüblichkeit geprüften tatsächlichen Mieten, sonst marktüblich erzielbare Nettokaltmiete",
+   "bewirtschaftungskosten": "nicht umlagefähige Kosten für Verwaltung, Instandhaltung und Mietausfallwagnis in Anlehnung an die indizierten Modellwerte der Anlage 3 ImmoWertV",
+   "bewirtschaftungskostenquote": null,
+   "gnd_jahre": 80,
+   "gnd_beleg": "Modellblock des jeweiligen Teilmarkts: „Gesamtnutzungsdauer 80 Jahre“ bzw. „gemäß § 12 (5) Satz 2 und Anlage 3 ImmoWertV“",
+   "restnutzungsdauer": "modifizierte Restnutzungsdauer nach Anlage 2 ImmoWertV (§ 4 Abs. 3)",
+   "bodenwert": "rentierlicher Bodenwert aus erschließungsbeitragsfreiem Bodenrichtwert, ggf. mit Umrechnungskoeffizienten angepasst; sonstige Bodenwerte abgetrennt",
+   "baupreisindex_stichtag": null
+  },
+  "geltungsbereich": {
+   "raeumlich": "Zuständigkeitsbereich des GAG Aurich ohne die ostfriesischen Inseln (Emden, Wilhelmshaven, Aurich, Friesland, Leer, Wittmund)",
+   "extrapolation": "gesperrt",
+   "stichprobe": {
+    "wohnflaeche_qm": [
+     71,
+     130
+    ],
+    "wohnflaeche_median": 103,
+    "mod_baujahr": [
+     1969,
+     2023
+    ],
+    "mod_baujahr_median": 1995
+   },
+   "hinweis": "KEIN TREFFER HEISST KEIN WERT. Gilt für den im Block genannten räumlichen Anwendungsbereich; Bodenrichtwert- und Wohnflächenspannen der Stichprobe begrenzen den Anwendungsbereich mit."
+  },
+  "belege": [
+   {
+    "art": "tabellenwert",
+    "fundstelle": "Grundstücksmarktdaten 2026 Aurich, Abschnitt Liegenschaftszinssätze – Reihenhäuser und Doppelhaushälften, S. 37",
+    "wortlaut": "Ergebnis (Median) 2.3 % · 10. Perzentil 0.8 % · 90. Perzentil 3.8 % · Stichtag 01.01.2025 · Anzahl Kauffälle 96",
+    "verfahren": "Medianuntersuchung",
+    "ausreisser": "keine Ausreißer beseitigt, da Medianergebnis",
+    "kauffaelle": 96
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": "amtlich, gutachterausschussscharf, Fallzahl und Perzentilspanne ausgewiesen",
+  "fallzahl": 96,
+  "streuung": {
+   "p10_pct": 0.8,
+   "p90_pct": 3.8,
+   "spannen_art": "10. und 90. Perzentil der Einzelliegenschaftszinssätze (keine Standardabweichung gedruckt)"
+  },
+  "stichtag": "2025-01-01",
+  "stichtag_hinweis": null,
+  "berichtsjahr": 2025,
+  "modellversion": "GMD 2026 Aurich",
+  "quelle_url": "https://www.gag.niedersachsen.de/download/224463",
+  "quelle_parser": "ernte-20261122-hand (pdftotext, GMD 2026 S. 36–38 und GMD 2025 S. 38–40 nebeneinander gelesen am 22.11.2026)",
+  "quellenvermerk": "© Gutachterausschuss für Grundstückswerte Aurich 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+  "lizenz": "dl-de/by-2-0",
+  "lizenz_hinweis": "Die PDF-Datei selbst trägt KEINEN Lizenzvermerk (am 05.10.2026 per grep auf dl-de, ©, Nutzungsbedingung geprüft: kein Treffer). Die Lizenz dl-de/by-2-0 ist die Nutzungsregel der GAG-Website (nutzungsbedingungen-197313.html), so wie sie die Sätze des Jahrgangs 2024 (quelle_parser v1084-WREZ) führen. In dieser Sitzung nicht erneut auf der Website nachgelesen.",
+  "fundstelle": "Grundstücksmarktdaten 2026 Aurich, Abschnitt Liegenschaftszinssätze – Reihenhäuser und Doppelhaushälften, S. 37",
+  "seite": 37,
+  "auflagen": [
+   "GEGENGELESEN AM 22.11.2026 (offener Punkt der Sperre „Prüfung ausstehend“): Beide Berichte werten DIESELBE Stichprobe aus (Kaufverträge 01.01.2023–31.12.2024, gleiche Fallzahl, Stichtag 01.01.2025). Der Bericht 2025 rechnete mit Restnutzungsdauern bis 70 Jahre (Gesamtnutzungsdauer 70), der Bericht 2026 rechnet dieselben Fälle mit Gesamtnutzungsdauer 80 Jahre (Anlage 1 ImmoWertV) neu und beschließt den Median neu. Vergleich: „Grundstücksmarktdaten 2025“ (download/210956), S. 39: Median 1,7 % · Stichtag 01.01.2025 · Restnutzungsdauer 15–70 Jahre. Es gilt der Beschluss 2026 mit GND 80 — der 2024er Registersatz (laender2.json, GND 70) ist damit überholt; beide Zahlen sind nur im jeweils eigenen Modell richtig (§ 10 ImmoWertV).",
+   "Gleicher Wert wie die bereits geführten Sätze Wilhelmshaven (03405) und Friesland (03455): der räumliche Anwendungsbereich ist der „Zuständigkeitsbereich des GAG Aurich (ohne Inseln)“. Für die Inselgemeinden stehen eigene Sätze (lzs-ni-aurich-inseln-2026.json)."
+  ],
+  "ersetzt_sperre": true,
+  "abloesung": {
+   "datei": "lzs-st-th-sh-ni-2025.json",
+   "ags": "03457",
+   "zweig": "rhdhh",
+   "berichtsjahr": 2025,
+   "grund": "Sperre „Prüfung ausstehend“ am 2025er-PDF gegengelesen und in einen Wert überführt"
+  }
+ },
+ {
+  "land_code": "NI",
+  "ags": "03457",
+  "ebene": "kreis",
+  "gebiet_name": "Leer, Landkreis",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte Aurich",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "we_v",
+  "objektart_bez": "Eigentumswohnungen (Dauerwohnen, Anlagen unter 20 Einheiten)",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 2.3,
+   "rundung_stellen": 2,
+   "bezeichnung": "Eigentumswohnungen — Median (Beschluss)",
+   "hinweis": "Ergebnis in PROZENT (2,3 bedeutet 2,3 %), nicht als Dezimalbruch.",
+   "wert_art": "median"
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Landesweit einheitlicher Modellrahmen der niedersächsischen Gutachterausschüsse (Beschreibung der Dashboards 2026, Kachel 8.1–8.5).",
+   "rohertrag": "Jahresrohertrag vorrangig aus auf Marktüblichkeit geprüften tatsächlichen Mieten, sonst marktüblich erzielbare Nettokaltmiete",
+   "bewirtschaftungskosten": "nicht umlagefähige Kosten für Verwaltung, Instandhaltung und Mietausfallwagnis in Anlehnung an die indizierten Modellwerte der Anlage 3 ImmoWertV",
+   "bewirtschaftungskostenquote": null,
+   "gnd_jahre": 80,
+   "gnd_beleg": "Modellblock des jeweiligen Teilmarkts: „Gesamtnutzungsdauer 80 Jahre“ bzw. „gemäß § 12 (5) Satz 2 und Anlage 3 ImmoWertV“",
+   "restnutzungsdauer": "modifizierte Restnutzungsdauer nach Anlage 2 ImmoWertV (§ 4 Abs. 3)",
+   "bodenwert": "rentierlicher Bodenwert aus erschließungsbeitragsfreiem Bodenrichtwert, ggf. mit Umrechnungskoeffizienten angepasst; sonstige Bodenwerte abgetrennt",
+   "baupreisindex_stichtag": null
+  },
+  "geltungsbereich": {
+   "raeumlich": "Zuständigkeitsbereich des GAG Aurich ohne die ostfriesischen Inseln (Emden, Wilhelmshaven, Aurich, Friesland, Leer, Wittmund)",
+   "extrapolation": "gesperrt",
+   "stichprobe": {
+    "wohnflaeche_qm": [
+     35,
+     129
+    ],
+    "wohnflaeche_median": 72,
+    "mod_baujahr": [
+     1971,
+     2025
+    ],
+    "mod_baujahr_median": 2015
+   },
+   "hinweis": "KEIN TREFFER HEISST KEIN WERT. Gilt für den im Block genannten räumlichen Anwendungsbereich; Bodenrichtwert- und Wohnflächenspannen der Stichprobe begrenzen den Anwendungsbereich mit."
+  },
+  "belege": [
+   {
+    "art": "tabellenwert",
+    "fundstelle": "Grundstücksmarktdaten 2026 Aurich, Abschnitt Liegenschaftszinssätze – Eigentumswohnungen, S. 38",
+    "wortlaut": "Ergebnis (Median) 2.3 % · 10. Perzentil 0.7 % · 90. Perzentil 4.4 % · Stichtag 01.01.2025 · Anzahl Kauffälle 337",
+    "verfahren": "Medianuntersuchung",
+    "ausreisser": "keine Ausreißer beseitigt, da Medianergebnis",
+    "kauffaelle": 337
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": "amtlich, gutachterausschussscharf, Fallzahl und Perzentilspanne ausgewiesen",
+  "fallzahl": 337,
+  "streuung": {
+   "p10_pct": 0.7,
+   "p90_pct": 4.4,
+   "spannen_art": "10. und 90. Perzentil der Einzelliegenschaftszinssätze (keine Standardabweichung gedruckt)"
+  },
+  "stichtag": "2025-01-01",
+  "stichtag_hinweis": null,
+  "berichtsjahr": 2025,
+  "modellversion": "GMD 2026 Aurich",
+  "quelle_url": "https://www.gag.niedersachsen.de/download/224463",
+  "quelle_parser": "ernte-20261122-hand (pdftotext, GMD 2026 S. 36–38 und GMD 2025 S. 38–40 nebeneinander gelesen am 22.11.2026)",
+  "quellenvermerk": "© Gutachterausschuss für Grundstückswerte Aurich 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+  "lizenz": "dl-de/by-2-0",
+  "lizenz_hinweis": "Die PDF-Datei selbst trägt KEINEN Lizenzvermerk (am 05.10.2026 per grep auf dl-de, ©, Nutzungsbedingung geprüft: kein Treffer). Die Lizenz dl-de/by-2-0 ist die Nutzungsregel der GAG-Website (nutzungsbedingungen-197313.html), so wie sie die Sätze des Jahrgangs 2024 (quelle_parser v1084-WREZ) führen. In dieser Sitzung nicht erneut auf der Website nachgelesen.",
+  "fundstelle": "Grundstücksmarktdaten 2026 Aurich, Abschnitt Liegenschaftszinssätze – Eigentumswohnungen, S. 38",
+  "seite": 38,
+  "auflagen": [
+   "GEGENGELESEN AM 22.11.2026 (offener Punkt der Sperre „Prüfung ausstehend“): Beide Berichte werten DIESELBE Stichprobe aus (Kaufverträge 01.01.2023–31.12.2024, gleiche Fallzahl, Stichtag 01.01.2025). Der Bericht 2025 rechnete mit Restnutzungsdauern bis 70 Jahre (Gesamtnutzungsdauer 70), der Bericht 2026 rechnet dieselben Fälle mit Gesamtnutzungsdauer 80 Jahre (Anlage 1 ImmoWertV) neu und beschließt den Median neu. Vergleich: „Grundstücksmarktdaten 2025“ (download/210956), S. 40: Median 1,9 % · Stichtag 01.01.2025 · Restnutzungsdauer 15–70 Jahre. Es gilt der Beschluss 2026 mit GND 80 — der 2024er Registersatz (laender2.json, GND 70) ist damit überholt; beide Zahlen sind nur im jeweils eigenen Modell richtig (§ 10 ImmoWertV).",
+   "Gleicher Wert wie die bereits geführten Sätze Wilhelmshaven (03405) und Friesland (03455): der räumliche Anwendungsbereich ist der „Zuständigkeitsbereich des GAG Aurich (ohne Inseln)“. Für die Inselgemeinden stehen eigene Sätze (lzs-ni-aurich-inseln-2026.json)."
+  ],
+  "ersetzt_sperre": true,
+  "abloesung": {
+   "datei": "lzs-st-th-sh-ni-2025.json",
+   "ags": "03457",
+   "zweig": "we_v",
+   "berichtsjahr": 2025,
+   "grund": "Sperre „Prüfung ausstehend“ am 2025er-PDF gegengelesen und in einen Wert überführt"
+  }
+ },
+ {
+  "land_code": "NI",
+  "ags": "03462",
+  "ebene": "kreis",
+  "gebiet_name": "Wittmund, Landkreis",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte Aurich",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "ezfh",
+  "objektart_bez": "Ein- und Zweifamilienhausgrundstücke (Dauerwohnen)",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 1.8,
+   "rundung_stellen": 2,
+   "bezeichnung": "Ein- und Zweifamilienhäuser — Median (Beschluss)",
+   "hinweis": "Ergebnis in PROZENT (1,8 bedeutet 1,8 %), nicht als Dezimalbruch.",
+   "wert_art": "median"
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Landesweit einheitlicher Modellrahmen der niedersächsischen Gutachterausschüsse (Beschreibung der Dashboards 2026, Kachel 8.1–8.5).",
+   "rohertrag": "Jahresrohertrag vorrangig aus auf Marktüblichkeit geprüften tatsächlichen Mieten, sonst marktüblich erzielbare Nettokaltmiete",
+   "bewirtschaftungskosten": "nicht umlagefähige Kosten für Verwaltung, Instandhaltung und Mietausfallwagnis in Anlehnung an die indizierten Modellwerte der Anlage 3 ImmoWertV",
+   "bewirtschaftungskostenquote": null,
+   "gnd_jahre": 80,
+   "gnd_beleg": "Modellblock des jeweiligen Teilmarkts: „Gesamtnutzungsdauer 80 Jahre“ bzw. „gemäß § 12 (5) Satz 2 und Anlage 3 ImmoWertV“",
+   "restnutzungsdauer": "modifizierte Restnutzungsdauer nach Anlage 2 ImmoWertV (§ 4 Abs. 3)",
+   "bodenwert": "rentierlicher Bodenwert aus erschließungsbeitragsfreiem Bodenrichtwert, ggf. mit Umrechnungskoeffizienten angepasst; sonstige Bodenwerte abgetrennt",
+   "baupreisindex_stichtag": null
+  },
+  "geltungsbereich": {
+   "raeumlich": "Zuständigkeitsbereich des GAG Aurich ohne die ostfriesischen Inseln (Emden, Wilhelmshaven, Aurich, Friesland, Leer, Wittmund)",
+   "extrapolation": "gesperrt",
+   "stichprobe": {
+    "restnutzungsdauer_jahre": [
+     22,
+     80
+    ],
+    "wohnflaeche_qm": [
+     83,
+     180
+    ],
+    "wohnflaeche_median": 136,
+    "mod_baujahr": [
+     1966,
+     2013
+    ],
+    "mod_baujahr_median": 1985
+   },
+   "hinweis": "KEIN TREFFER HEISST KEIN WERT. Gilt für den im Block genannten räumlichen Anwendungsbereich; Bodenrichtwert- und Wohnflächenspannen der Stichprobe begrenzen den Anwendungsbereich mit."
+  },
+  "belege": [
+   {
+    "art": "tabellenwert",
+    "fundstelle": "Grundstücksmarktdaten 2026 Aurich, Abschnitt Liegenschaftszinssätze – Ein- und Zweifamilienhäuser, S. 36",
+    "wortlaut": "Ergebnis (Median) 1.8 % · 10. Perzentil 0.5 % · 90. Perzentil 3.3 % · Stichtag 01.01.2025 · Anzahl Kauffälle 157",
+    "verfahren": "Medianuntersuchung",
+    "ausreisser": "keine Ausreißer beseitigt, da Medianergebnis",
+    "kauffaelle": 157
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": "amtlich, gutachterausschussscharf, Fallzahl und Perzentilspanne ausgewiesen",
+  "fallzahl": 157,
+  "streuung": {
+   "p10_pct": 0.5,
+   "p90_pct": 3.3,
+   "spannen_art": "10. und 90. Perzentil der Einzelliegenschaftszinssätze (keine Standardabweichung gedruckt)"
+  },
+  "stichtag": "2025-01-01",
+  "stichtag_hinweis": null,
+  "berichtsjahr": 2025,
+  "modellversion": "GMD 2026 Aurich",
+  "quelle_url": "https://www.gag.niedersachsen.de/download/224463",
+  "quelle_parser": "ernte-20261122-hand (pdftotext, GMD 2026 S. 36–38 und GMD 2025 S. 38–40 nebeneinander gelesen am 22.11.2026)",
+  "quellenvermerk": "© Gutachterausschuss für Grundstückswerte Aurich 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+  "lizenz": "dl-de/by-2-0",
+  "lizenz_hinweis": "Die PDF-Datei selbst trägt KEINEN Lizenzvermerk (am 05.10.2026 per grep auf dl-de, ©, Nutzungsbedingung geprüft: kein Treffer). Die Lizenz dl-de/by-2-0 ist die Nutzungsregel der GAG-Website (nutzungsbedingungen-197313.html), so wie sie die Sätze des Jahrgangs 2024 (quelle_parser v1084-WREZ) führen. In dieser Sitzung nicht erneut auf der Website nachgelesen.",
+  "fundstelle": "Grundstücksmarktdaten 2026 Aurich, Abschnitt Liegenschaftszinssätze – Ein- und Zweifamilienhäuser, S. 36",
+  "seite": 36,
+  "auflagen": [
+   "GEGENGELESEN AM 22.11.2026 (offener Punkt der Sperre „Prüfung ausstehend“): Beide Berichte werten DIESELBE Stichprobe aus (Kaufverträge 01.01.2023–31.12.2024, gleiche Fallzahl, Stichtag 01.01.2025). Der Bericht 2025 rechnete mit Restnutzungsdauern bis 70 Jahre (Gesamtnutzungsdauer 70), der Bericht 2026 rechnet dieselben Fälle mit Gesamtnutzungsdauer 80 Jahre (Anlage 1 ImmoWertV) neu und beschließt den Median neu. Vergleich: „Grundstücksmarktdaten 2025“ (download/210956), S. 38: Median 1,2 % · Stichtag 01.01.2025 · Restnutzungsdauer 15–70 Jahre, Gesamtnutzungsdauer 70 Jahre. Es gilt der Beschluss 2026 mit GND 80 — der 2024er Registersatz (laender2.json, GND 70) ist damit überholt; beide Zahlen sind nur im jeweils eigenen Modell richtig (§ 10 ImmoWertV).",
+   "Gleicher Wert wie die bereits geführten Sätze Wilhelmshaven (03405) und Friesland (03455): der räumliche Anwendungsbereich ist der „Zuständigkeitsbereich des GAG Aurich (ohne Inseln)“. Für die Inselgemeinden stehen eigene Sätze (lzs-ni-aurich-inseln-2026.json)."
+  ],
+  "ersetzt_sperre": true,
+  "abloesung": {
+   "datei": "lzs-st-th-sh-ni-2025.json",
+   "ags": "03462",
+   "zweig": "ezfh",
+   "berichtsjahr": 2025,
+   "grund": "Sperre „Prüfung ausstehend“ am 2025er-PDF gegengelesen und in einen Wert überführt"
+  }
+ },
+ {
+  "land_code": "NI",
+  "ags": "03462",
+  "ebene": "kreis",
+  "gebiet_name": "Wittmund, Landkreis",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte Aurich",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "rhdhh",
+  "objektart_bez": "Reihenhäuser und Doppelhaushälften (Dauerwohnen)",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 2.3,
+   "rundung_stellen": 2,
+   "bezeichnung": "Reihenhäuser und Doppelhaushälften — Median (Beschluss)",
+   "hinweis": "Ergebnis in PROZENT (2,3 bedeutet 2,3 %), nicht als Dezimalbruch.",
+   "wert_art": "median"
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Landesweit einheitlicher Modellrahmen der niedersächsischen Gutachterausschüsse (Beschreibung der Dashboards 2026, Kachel 8.1–8.5).",
+   "rohertrag": "Jahresrohertrag vorrangig aus auf Marktüblichkeit geprüften tatsächlichen Mieten, sonst marktüblich erzielbare Nettokaltmiete",
+   "bewirtschaftungskosten": "nicht umlagefähige Kosten für Verwaltung, Instandhaltung und Mietausfallwagnis in Anlehnung an die indizierten Modellwerte der Anlage 3 ImmoWertV",
+   "bewirtschaftungskostenquote": null,
+   "gnd_jahre": 80,
+   "gnd_beleg": "Modellblock des jeweiligen Teilmarkts: „Gesamtnutzungsdauer 80 Jahre“ bzw. „gemäß § 12 (5) Satz 2 und Anlage 3 ImmoWertV“",
+   "restnutzungsdauer": "modifizierte Restnutzungsdauer nach Anlage 2 ImmoWertV (§ 4 Abs. 3)",
+   "bodenwert": "rentierlicher Bodenwert aus erschließungsbeitragsfreiem Bodenrichtwert, ggf. mit Umrechnungskoeffizienten angepasst; sonstige Bodenwerte abgetrennt",
+   "baupreisindex_stichtag": null
+  },
+  "geltungsbereich": {
+   "raeumlich": "Zuständigkeitsbereich des GAG Aurich ohne die ostfriesischen Inseln (Emden, Wilhelmshaven, Aurich, Friesland, Leer, Wittmund)",
+   "extrapolation": "gesperrt",
+   "stichprobe": {
+    "wohnflaeche_qm": [
+     71,
+     130
+    ],
+    "wohnflaeche_median": 103,
+    "mod_baujahr": [
+     1969,
+     2023
+    ],
+    "mod_baujahr_median": 1995
+   },
+   "hinweis": "KEIN TREFFER HEISST KEIN WERT. Gilt für den im Block genannten räumlichen Anwendungsbereich; Bodenrichtwert- und Wohnflächenspannen der Stichprobe begrenzen den Anwendungsbereich mit."
+  },
+  "belege": [
+   {
+    "art": "tabellenwert",
+    "fundstelle": "Grundstücksmarktdaten 2026 Aurich, Abschnitt Liegenschaftszinssätze – Reihenhäuser und Doppelhaushälften, S. 37",
+    "wortlaut": "Ergebnis (Median) 2.3 % · 10. Perzentil 0.8 % · 90. Perzentil 3.8 % · Stichtag 01.01.2025 · Anzahl Kauffälle 96",
+    "verfahren": "Medianuntersuchung",
+    "ausreisser": "keine Ausreißer beseitigt, da Medianergebnis",
+    "kauffaelle": 96
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": "amtlich, gutachterausschussscharf, Fallzahl und Perzentilspanne ausgewiesen",
+  "fallzahl": 96,
+  "streuung": {
+   "p10_pct": 0.8,
+   "p90_pct": 3.8,
+   "spannen_art": "10. und 90. Perzentil der Einzelliegenschaftszinssätze (keine Standardabweichung gedruckt)"
+  },
+  "stichtag": "2025-01-01",
+  "stichtag_hinweis": null,
+  "berichtsjahr": 2025,
+  "modellversion": "GMD 2026 Aurich",
+  "quelle_url": "https://www.gag.niedersachsen.de/download/224463",
+  "quelle_parser": "ernte-20261122-hand (pdftotext, GMD 2026 S. 36–38 und GMD 2025 S. 38–40 nebeneinander gelesen am 22.11.2026)",
+  "quellenvermerk": "© Gutachterausschuss für Grundstückswerte Aurich 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+  "lizenz": "dl-de/by-2-0",
+  "lizenz_hinweis": "Die PDF-Datei selbst trägt KEINEN Lizenzvermerk (am 05.10.2026 per grep auf dl-de, ©, Nutzungsbedingung geprüft: kein Treffer). Die Lizenz dl-de/by-2-0 ist die Nutzungsregel der GAG-Website (nutzungsbedingungen-197313.html), so wie sie die Sätze des Jahrgangs 2024 (quelle_parser v1084-WREZ) führen. In dieser Sitzung nicht erneut auf der Website nachgelesen.",
+  "fundstelle": "Grundstücksmarktdaten 2026 Aurich, Abschnitt Liegenschaftszinssätze – Reihenhäuser und Doppelhaushälften, S. 37",
+  "seite": 37,
+  "auflagen": [
+   "GEGENGELESEN AM 22.11.2026 (offener Punkt der Sperre „Prüfung ausstehend“): Beide Berichte werten DIESELBE Stichprobe aus (Kaufverträge 01.01.2023–31.12.2024, gleiche Fallzahl, Stichtag 01.01.2025). Der Bericht 2025 rechnete mit Restnutzungsdauern bis 70 Jahre (Gesamtnutzungsdauer 70), der Bericht 2026 rechnet dieselben Fälle mit Gesamtnutzungsdauer 80 Jahre (Anlage 1 ImmoWertV) neu und beschließt den Median neu. Vergleich: „Grundstücksmarktdaten 2025“ (download/210956), S. 39: Median 1,7 % · Stichtag 01.01.2025 · Restnutzungsdauer 15–70 Jahre. Es gilt der Beschluss 2026 mit GND 80 — der 2024er Registersatz (laender2.json, GND 70) ist damit überholt; beide Zahlen sind nur im jeweils eigenen Modell richtig (§ 10 ImmoWertV).",
+   "Gleicher Wert wie die bereits geführten Sätze Wilhelmshaven (03405) und Friesland (03455): der räumliche Anwendungsbereich ist der „Zuständigkeitsbereich des GAG Aurich (ohne Inseln)“. Für die Inselgemeinden stehen eigene Sätze (lzs-ni-aurich-inseln-2026.json)."
+  ],
+  "ersetzt_sperre": true,
+  "abloesung": {
+   "datei": "lzs-st-th-sh-ni-2025.json",
+   "ags": "03462",
+   "zweig": "rhdhh",
+   "berichtsjahr": 2025,
+   "grund": "Sperre „Prüfung ausstehend“ am 2025er-PDF gegengelesen und in einen Wert überführt"
+  }
+ },
+ {
+  "land_code": "NI",
+  "ags": "03462",
+  "ebene": "kreis",
+  "gebiet_name": "Wittmund, Landkreis",
+  "gaa_name": "Gutachterausschuss für Grundstückswerte Aurich",
+  "kennzahl": "liegenschaftszinssatz",
+  "zweig": "we_v",
+  "objektart_bez": "Eigentumswohnungen (Dauerwohnen, Anlagen unter 20 Einheiten)",
+  "formel": {
+   "form": "konstante",
+   "liefert": "prozent",
+   "wert": 2.3,
+   "rundung_stellen": 2,
+   "bezeichnung": "Eigentumswohnungen — Median (Beschluss)",
+   "hinweis": "Ergebnis in PROZENT (2,3 bedeutet 2,3 %), nicht als Dezimalbruch.",
+   "wert_art": "median"
+  },
+  "korrekturen": [],
+  "modellansaetze": {
+   "hinweis": "PFLICHTANGABE nach § 10 ImmoWertV. Landesweit einheitlicher Modellrahmen der niedersächsischen Gutachterausschüsse (Beschreibung der Dashboards 2026, Kachel 8.1–8.5).",
+   "rohertrag": "Jahresrohertrag vorrangig aus auf Marktüblichkeit geprüften tatsächlichen Mieten, sonst marktüblich erzielbare Nettokaltmiete",
+   "bewirtschaftungskosten": "nicht umlagefähige Kosten für Verwaltung, Instandhaltung und Mietausfallwagnis in Anlehnung an die indizierten Modellwerte der Anlage 3 ImmoWertV",
+   "bewirtschaftungskostenquote": null,
+   "gnd_jahre": 80,
+   "gnd_beleg": "Modellblock des jeweiligen Teilmarkts: „Gesamtnutzungsdauer 80 Jahre“ bzw. „gemäß § 12 (5) Satz 2 und Anlage 3 ImmoWertV“",
+   "restnutzungsdauer": "modifizierte Restnutzungsdauer nach Anlage 2 ImmoWertV (§ 4 Abs. 3)",
+   "bodenwert": "rentierlicher Bodenwert aus erschließungsbeitragsfreiem Bodenrichtwert, ggf. mit Umrechnungskoeffizienten angepasst; sonstige Bodenwerte abgetrennt",
+   "baupreisindex_stichtag": null
+  },
+  "geltungsbereich": {
+   "raeumlich": "Zuständigkeitsbereich des GAG Aurich ohne die ostfriesischen Inseln (Emden, Wilhelmshaven, Aurich, Friesland, Leer, Wittmund)",
+   "extrapolation": "gesperrt",
+   "stichprobe": {
+    "wohnflaeche_qm": [
+     35,
+     129
+    ],
+    "wohnflaeche_median": 72,
+    "mod_baujahr": [
+     1971,
+     2025
+    ],
+    "mod_baujahr_median": 2015
+   },
+   "hinweis": "KEIN TREFFER HEISST KEIN WERT. Gilt für den im Block genannten räumlichen Anwendungsbereich; Bodenrichtwert- und Wohnflächenspannen der Stichprobe begrenzen den Anwendungsbereich mit."
+  },
+  "belege": [
+   {
+    "art": "tabellenwert",
+    "fundstelle": "Grundstücksmarktdaten 2026 Aurich, Abschnitt Liegenschaftszinssätze – Eigentumswohnungen, S. 38",
+    "wortlaut": "Ergebnis (Median) 2.3 % · 10. Perzentil 0.7 % · 90. Perzentil 4.4 % · Stichtag 01.01.2025 · Anzahl Kauffälle 337",
+    "verfahren": "Medianuntersuchung",
+    "ausreisser": "keine Ausreißer beseitigt, da Medianergebnis",
+    "kauffaelle": 337
+   }
+  ],
+  "stufe": "A",
+  "stufe_grund": "amtlich, gutachterausschussscharf, Fallzahl und Perzentilspanne ausgewiesen",
+  "fallzahl": 337,
+  "streuung": {
+   "p10_pct": 0.7,
+   "p90_pct": 4.4,
+   "spannen_art": "10. und 90. Perzentil der Einzelliegenschaftszinssätze (keine Standardabweichung gedruckt)"
+  },
+  "stichtag": "2025-01-01",
+  "stichtag_hinweis": null,
+  "berichtsjahr": 2025,
+  "modellversion": "GMD 2026 Aurich",
+  "quelle_url": "https://www.gag.niedersachsen.de/download/224463",
+  "quelle_parser": "ernte-20261122-hand (pdftotext, GMD 2026 S. 36–38 und GMD 2025 S. 38–40 nebeneinander gelesen am 22.11.2026)",
+  "quellenvermerk": "© Gutachterausschuss für Grundstückswerte Aurich 2026, dl-de/by-2-0 (www.govdata.de/dl-de/by-2-0), https://immobilienmarkt.niedersachsen.de",
+  "lizenz": "dl-de/by-2-0",
+  "lizenz_hinweis": "Die PDF-Datei selbst trägt KEINEN Lizenzvermerk (am 05.10.2026 per grep auf dl-de, ©, Nutzungsbedingung geprüft: kein Treffer). Die Lizenz dl-de/by-2-0 ist die Nutzungsregel der GAG-Website (nutzungsbedingungen-197313.html), so wie sie die Sätze des Jahrgangs 2024 (quelle_parser v1084-WREZ) führen. In dieser Sitzung nicht erneut auf der Website nachgelesen.",
+  "fundstelle": "Grundstücksmarktdaten 2026 Aurich, Abschnitt Liegenschaftszinssätze – Eigentumswohnungen, S. 38",
+  "seite": 38,
+  "auflagen": [
+   "GEGENGELESEN AM 22.11.2026 (offener Punkt der Sperre „Prüfung ausstehend“): Beide Berichte werten DIESELBE Stichprobe aus (Kaufverträge 01.01.2023–31.12.2024, gleiche Fallzahl, Stichtag 01.01.2025). Der Bericht 2025 rechnete mit Restnutzungsdauern bis 70 Jahre (Gesamtnutzungsdauer 70), der Bericht 2026 rechnet dieselben Fälle mit Gesamtnutzungsdauer 80 Jahre (Anlage 1 ImmoWertV) neu und beschließt den Median neu. Vergleich: „Grundstücksmarktdaten 2025“ (download/210956), S. 40: Median 1,9 % · Stichtag 01.01.2025 · Restnutzungsdauer 15–70 Jahre. Es gilt der Beschluss 2026 mit GND 80 — der 2024er Registersatz (laender2.json, GND 70) ist damit überholt; beide Zahlen sind nur im jeweils eigenen Modell richtig (§ 10 ImmoWertV).",
+   "Gleicher Wert wie die bereits geführten Sätze Wilhelmshaven (03405) und Friesland (03455): der räumliche Anwendungsbereich ist der „Zuständigkeitsbereich des GAG Aurich (ohne Inseln)“. Für die Inselgemeinden stehen eigene Sätze (lzs-ni-aurich-inseln-2026.json)."
+  ],
+  "ersetzt_sperre": true,
+  "abloesung": {
+   "datei": "lzs-st-th-sh-ni-2025.json",
+   "ags": "03462",
+   "zweig": "we_v",
+   "berichtsjahr": 2025,
+   "grund": "Sperre „Prüfung ausstehend“ am 2025er-PDF gegengelesen und in einen Wert überführt"
+  }
+ }
+]
