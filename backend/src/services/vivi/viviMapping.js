@@ -268,8 +268,7 @@ function nachVivi(daten, opt) {
   }
   if (nkNiedrig.length) hinweise.push('Die abgeleitete Nebenkosten-Vorauszahlung ist auffällig niedrig bei ' + nkNiedrig.join(', ') + '. Bitte vor dem Anlegen die Vorauszahlung je Einheit eintragen.');
   /* v3953 · ViVi legt mit dem Objekt immer eine Einheit an (units, Minimum 1). Ihren Namen und ihre Flaeche setzt nur ein
-     Mietverhaeltnis. Ist keine Einheit vermietet, bleibt sie in ViVi „Einheit 1“ ohne Flaeche (gemessen an 2026-1006). */
-  if (einheiten.length && !einheiten.some(function (x) { return x.miete; })) hinweise.push('Keine Einheit ist vermietet. ViVi legt die erste Einheit deshalb als „Einheit 1“ ohne Fläche an. Name und Fläche von ' + einheiten[0].name + ' bitte in ViVi ergänzen.');
+     Mietverhaeltnis. v3965: ist keine Einheit vermietet, benennt viviDienst.anlegen() sie einmal per PATCH. */
   if (einheiten.some(function (x) { return x.miete; })) hinweise.push('ViVi legt ab Mietbeginn die Sollstellungen an und markiert die Monate bis heute als bezahlt.');
   if (einheiten.some(function (x) { return x.miete && x.miete.tenant_first_name === 'Mieter'; })) hinweise.push('Wo kein Mietername erfasst ist, steht in ViVi ein Platzhalter. Den echten Namen trägst du in ViVi ein.');
 

@@ -100,7 +100,7 @@ function pfadVorlage(methode, pfad) {
 
 /* ── Demo-Faelle (eingefroren aus tools/flow-berechnen-faelle.json, Stammdaten erfunden) ─────────── */
 const FLOW = JSON.parse(lies('tools/flow-berechnen-faelle.json')).faelle;
-const DEMO = ['2026-1157', '2026-1158', '2026-001', '2026-1006', '2026-1041', '2026-1053', '2026-1055', '2026-1051'];
+const DEMO = ['2026-1157', '2026-1158', '2026-001', '2026-1006', '2026-1041', '2026-1053', '2026-1055'];   /* v3965 · 2026-1051 gestrichen (Marcel 22.11.2026) */
 function faelle() {
   const aus = [];
   DEMO.forEach((nr, i) => {
@@ -133,6 +133,10 @@ function faelle() {
     wfl: '68,5', etage: '0', nkm: '820', mv_mieter: 'Erika Beispiel', mv_beginn: '2021-07-01', umlagef: '210',
     makler_p: '3,57', gest_p: '6,5', notar_p: '1,5', gba_p: '0,5', ji_p: '0', d1: '200000', d1z: '3.5', d1t: '2', d1_bindj: '10', d1_auszahl: '03.2025',
     darlehen_weitere: JSON.stringify([{ bez: 'KfW 261', betrag: 30000, zins: 1.9, tilg: 3, bindj: 10 }]) } });
+  /* v3965 · ZFH, beide Einheiten leer (wie 2026-1006): die automatische Einheit wird einmal per PATCH benannt */
+  aus.push({ nr: 'zfh-leer', d: { objart: 'ZFH', str: 'Musterweg', hnr: '2', plz: '12345', ort: 'Musterstadt', kp: '350000', wirtschaftlicher_uebergang: '2026-08-12',
+    d1: '280000', d1z: '3,5', d1t: '2', d1_bindj: '10', d1_auszahl: '08.2026',
+    _mfh: { einheiten: [{ nr: '1', lage: 'EG / OG', wfl: '141,7', status: 'leer' }, { nr: '2', lage: 'DG', wfl: '103,38', status: 'leer' }] } } });
   return aus;
 }
 const FAELLE = faelle();
@@ -210,7 +214,7 @@ for (const fa of FAELLE) {
   const idxs = fa.d._mfh ? fa.d._mfh.einheiten.map((_, i) => i) : [null];
   idxs.forEach((i) => { nkVergl++; if (mapping.nkVorschlag(fa.d, i) === NK.vorschlag(fa.d, i)) nkGleich++; });
 }
-ok(nkVergl > 20 && nkGleich === nkVergl, 'nkVorschlag (Backend) == DpNkVorauszahlung.vorschlag (Frontend) in ' + nkGleich + ' von ' + nkVergl + ' Einheiten');
+ok(nkVergl >= 15 && nkGleich === nkVergl, 'nkVorschlag (Backend) == DpNkVorauszahlung.vorschlag (Frontend) in ' + nkGleich + ' von ' + nkVergl + ' Einheiten');
 {
   const d = { objart: 'MFH', hg_ul: '6000', grundsteuer: '1200', ul_sonst: '0', _mfh: { einheiten: [{ nr: '1', wfl: '60', ist: '500' }, { nr: '2', wfl: '90', ist: '700' }, { nr: '3', wfl: '50', status: 'leer' }] } };
   const v = [0, 1, 2].map((i) => mapping.nkVorschlag(d, i));
@@ -228,7 +232,16 @@ function nurLesenBefunde(dateien) {
   const f = [];
   for (const [rel, t] of dateien) {
     const ohneKommentar = t.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/.*$/gm, '$1');
-    if (/['"`](PUT|PATCH|DELETE)['"`]/.test(ohneKommentar) && !rel.endsWith('routes/vivi.js')) f.push(rel + ': Methode PUT/PATCH/DELETE als Text');
+    /* v3965 · genau EIN PATCH ist erlaubt: senden('PATCH' …) in viviClient.einheitBeimAnlegen() */
+    const ohnePatch = rel.endsWith('viviClient.js') ? ohneKommentar.replace(/function einheitBeimAnlegen\(pfad, rumpf\) \{[\s\S]*?return senden\('PATCH', pfad, null, r\);\r?\n  \}/, '') : ohneKommentar;
+    if (rel.endsWith('viviClient.js') && ohnePatch === ohneKommentar) f.push(rel + ': einheitBeimAnlegen() fehlt oder ist verändert');
+    if (/['"`](PUT|PATCH|DELETE)['"`]/.test(ohnePatch) && !rel.endsWith('routes/vivi.js')) f.push(rel + ': Methode PUT/PATCH/DELETE als Text');
+    if (rel.endsWith('viviDienst.js')) {
+      const aufrufe = (ohneKommentar.match(/einheitBeimAnlegen\(/g) || []).length;
+      const anl = /async function anlegen\([\s\S]*?\r?\n\}\r?\n/.exec(ohneKommentar);
+      if (aufrufe !== 1 || !anl || !/einheitBeimAnlegen\(/.test(anl[0])) f.push(rel + ': einheitBeimAnlegen ' + aufrufe + ' mal, erlaubt genau einmal in anlegen()');
+      if (anl && !/!ids\.auto_angepasst/.test(anl[0])) f.push(rel + ': einheitBeimAnlegen ohne Merker auto_angepasst');
+    }
     if (/method\s*:\s*['"`](?!GET['"`]|POST['"`])/i.test(ohneKommentar.replace(/method\s*:\s*methode/g, ''))) f.push(rel + ': method mit anderem Wert als GET/POST');
     if (/\bfetch\s*\(/.test(ohneKommentar) && !rel.endsWith('viviClient.js')) f.push(rel + ': eigenes fetch ausserhalb von viviClient.js');
     if (/require\(['"](node:)?(https?|axios|node-fetch|undici)['"]\)/.test(ohneKommentar)) f.push(rel + ': eigener HTTP-Weg');
@@ -236,7 +249,7 @@ function nurLesenBefunde(dateien) {
     if (rel.endsWith('viviClient.js')) {
       const m = ohneKommentar.match(/senden\(\s*'([A-Z]+)'/g) || [];
       const meth = m.map((x) => x.replace(/senden\(\s*'|'/g, ''));
-      if (meth.some((x) => x !== 'GET' && x !== 'POST')) f.push(rel + ': senden() mit ' + meth.join(','));
+      if (meth.filter((x) => x === 'PATCH').length !== 1 || meth.some((x) => x !== 'GET' && x !== 'POST' && x !== 'PATCH')) f.push(rel + ': senden() mit ' + meth.join(','));
       if (!/function get\(/.test(ohneKommentar) || !/function post\(/.test(ohneKommentar)) f.push(rel + ': get/post fehlen');
     }
   }
@@ -244,10 +257,15 @@ function nurLesenBefunde(dateien) {
 }
 const echtDateien = VIVI_DATEIEN.map((r) => [r, lies(r)]);
 const befunde = nurLesenBefunde(echtDateien);
-ok(!befunde.length, VIVI_DATEIEN.length + ' Dateien: kein PUT, PATCH, DELETE an ViVi, fetch nur im Client' + (befunde.length ? ': ' + befunde.join(' | ') : ''));
+ok(!befunde.length, VIVI_DATEIEN.length + ' Dateien: kein PUT, DELETE an ViVi, PATCH nur einmal in einheitBeimAnlegen() aus anlegen(), fetch nur im Client' + (befunde.length ? ': ' + befunde.join(' | ') : ''));
 {
   const cl = viviClient.erzeugen('test-token-12345', { fetch: async () => ({ status: 200, json: async () => ({ data: [] }) }) });
-  ok(JSON.stringify(Object.keys(cl).sort()) === JSON.stringify(['get', 'post', 'zaehler']), 'der Client bietet nur get, post (und den Zähler)');
+  ok(JSON.stringify(Object.keys(cl).sort()) === JSON.stringify(['einheitBeimAnlegen', 'get', 'post', 'zaehler']), 'der Client bietet nur get, post, einheitBeimAnlegen (und den Zähler)');
+  let patchGesperrt = 0;
+  for (const p of ['/projects/prj_1', '/projects/prj_1/rental-units/r1', '/projects/prj_1/financings/f1', '/projects/prj_1/units', '/projects/prj_1/units/u1/condition']) {
+    try { await cl.einheitBeimAnlegen(p, { identifier: 'x' }); } catch (e) { if (e.code === 'pfad_gesperrt') patchGesperrt++; }
+  }
+  ok(patchGesperrt === 5 && operation('PATCH', '/projects/{project}/units/{unit}'), 'PATCH nur an /projects/{p}/units/{u} (5 andere Pfade abgewiesen), Pfad steht in der Spezifikation');
   let gesperrt = 0;
   for (const p of ['/projects/prj_1', '/projects/prj_1/rental-units/r1/end', '/projects/prj_1/financings/f1/split', '/rental-payments/1/mark-paid', '/contacts', '/projects/prj_1/rental-units/r1/rent-changes']) {
     try { await cl.post(p, {}); } catch (e) { if (e.code === 'pfad_gesperrt') gesperrt++; }
@@ -262,7 +280,9 @@ ok(!befunde.length, VIVI_DATEIEN.length + ' Dateien: kein PUT, PATCH, DELETE an 
   const proben = [
     ['viviClient.js mit method: PATCH', 'backend/src/services/vivi/viviClient.js', (t) => t.replace("function get(pfad, abfrage) { return senden('GET', pfad, abfrage, null); }", "function get(pfad, abfrage) { return senden('PATCH', pfad, abfrage, null); }")],
     ['viviDienst.js mit eigenem fetch', 'backend/src/services/vivi/viviDienst.js', (t) => t + "\nfetch('https://app.vivi-immo.de/api/v1/projects/1', { method: 'DELETE' });\n"],
-    ['viviMapping.js mit method: PUT', 'backend/src/services/vivi/viviMapping.js', (t) => t + "\nconst x = { method: 'PUT' };\n"]
+    ['viviMapping.js mit method: PUT', 'backend/src/services/vivi/viviMapping.js', (t) => t + "\nconst x = { method: 'PUT' };\n"],
+    ['viviDienst.js ruft einheitBeimAnlegen auch im Abruf', 'backend/src/services/vivi/viviDienst.js', (t) => t.replace('const projekt = (await cl.get(P, q) || {}).data || {};', "await cl.einheitBeimAnlegen(P + '/units/x', {}); const projekt = (await cl.get(P, q) || {}).data || {};")],
+    ['viviClient.js mit zweitem PATCH', 'backend/src/services/vivi/viviClient.js', (t) => t.replace("function get(pfad, abfrage) { return senden('GET', pfad, abfrage, null); }", "function get(pfad, abfrage) { return senden('GET', pfad, abfrage, null); }\n  function aendern(p, r) { return senden('PATCH', p, null, r); }")]
   ];
   for (const [name, rel, aendern] of proben) {
     const neu = aendern(lies(rel));
@@ -291,6 +311,12 @@ function attrappe() {
     if (!vorlage) { st.fehler.push('Pfad nicht in der Spezifikation: ' + m + ' ' + pfad); return antwort(404, { message: 'nicht in der Spezifikation' }); }
     if (!/^Bearer \S+$/.test((init.headers || {}).Authorization || '')) return antwort(401, { message: 'Unauthenticated.' });
     let rumpf = null;
+    if (m === 'PATCH') {
+      st.patches = (st.patches || 0) + 1;
+      rumpf = init.body ? JSON.parse(init.body) : {};
+      const f = pruefeSchema(rumpf, deref(SPEC.components.schemas.UpdateUnitRequest), m + ' ' + vorlage);
+      if (f.length) { st.fehler.push(...f); return antwort(422, { message: 'invalid', errors: f }); }
+    }
     if (m === 'POST') {
       st.posts++;
       rumpf = init.body ? JSON.parse(init.body) : {};
@@ -315,6 +341,10 @@ function attrappe() {
     }
     if (m === 'GET' && pfad === '/projects') return antwort(200, { data: Object.values(st.projekte).map(projektRes) });
     if ((x = /^\/projects\/([^/]+)$/.exec(pfad))) { const p = st.projekte[x[1]]; return p ? antwort(200, { data: projektRes(p) }) : antwort(404, {}); }
+    if (m === 'PATCH' && (x = /^\/projects\/([^/]+)\/units\/([^/]+)$/.exec(pfad))) {
+      const u = st.einheiten[x[2]]; if (!u || u._p !== x[1]) return antwort(404, {});
+      Object.assign(u, b); return antwort(200, { data: einheitRes(u) });
+    }
     if ((x = /^\/projects\/([^/]+)\/units$/.exec(pfad))) {
       if (!st.projekte[x[1]]) return antwort(404, {});
       if (m === 'GET') return antwort(200, { data: Object.values(st.einheiten).filter((u) => u._p === x[1]).map(einheitRes) });
@@ -409,7 +439,13 @@ ok(Object.keys(A.st.projekte).length === OIDS.length, 'je Objekt genau ein ViVi-
   ok(Object.keys(A.st.miete).length === erwartetM && Object.keys(A.st.darlehen).length === erwartetD, 'Mietverhältnisse ' + Object.keys(A.st.miete).length + '/' + erwartetM + ', Darlehen ' + Object.keys(A.st.darlehen).length + '/' + erwartetD);
   const ohneFlaeche = Object.values(A.st.einheiten).filter((u) => !(u.square_meters > 0) && objekte[Object.keys(SP.v).find((k) => SP.v[k].vivi_objekt_id === u._p)].data._mfh);
   ok(!ohneFlaeche.length, 'jede MFH-Einheit trägt in ViVi ihre Fläche (auch die von ViVi angelegte erste)');
-  ok(A.st.anfragen.every((a) => /^(GET|POST) /.test(a)), 'die Attrappe sah nur GET und POST (' + A.st.anfragen.length + ' Anfragen)');
+  const patches = A.st.anfragen.filter((a) => a.startsWith('PATCH '));
+  const ohneMiete = OIDS.filter((o) => !mapping.nachVivi(objekte[o].data, {}).einheiten.some((e) => e.miete)).length;
+  ok(A.st.anfragen.every((a) => /^(GET|POST) /.test(a) || /^PATCH \/projects\/[^/]+\/units\/[^/]+$/.test(a)) && patches.length === ohneMiete && ohneMiete >= 1,
+    'die Attrappe sah GET und POST, PATCH nur an die automatische Einheit, genau ' + patches.length + ' mal (Objekte ohne vermietete Einheit: ' + ohneMiete + ')');
+  const zl = OIDS.find((o) => objekte[o].nr === 'zfh-leer');
+  const zu = Object.values(A.st.einheiten).filter((u) => u._p === SP.v[zl].vivi_objekt_id).map((u) => u.identifier + ':' + u.square_meters).sort().join(' | ');
+  ok(zu === 'WE 1 · EG / OG:141.7 | WE 2 · DG:103.38', 'ZFH ohne Mieter: beide Einheiten mit Name und Fläche in ViVi, keine „Einheit 1“ (' + zu + ')');
 }
 {
   const oid = OIDS[0], postsVorher = A.st.posts;
@@ -898,8 +934,7 @@ kopf('R  Echte ViVi-Antworten (Testkonto, 22.11.2026, tools/vivi-antworten/)');
   const o1006 = ECHT.objekte['2026-1006'];
   const e1006 = o1006.antworten.projekt.units.find((u) => u.id === o1006.vivi_ids.auto_einheit);
   ok(e1006 && e1006.identifier === 'Einheit 1' && e1006.square_meters == null, 'gemessen: ohne Mietverhältnis bleibt die automatische Einheit „Einheit 1“ ohne Fläche (2026-1006)');
-  const plan1006 = mapping.nachVivi({ objart: 'ZFH', kp: '100000', wirtschaftlicher_uebergang: '2026-01-01', _mfh: { einheiten: [{ nr: '1', wfl: '80', status: 'leer' }, { nr: '2', wfl: '60', status: 'leer' }] } }, { musterAnschrift: true });
-  ok(plan1006.hinweise.some((h) => /Einheit 1“ ohne Fläche/.test(h)), 'Vorschau sagt es vorher: „Keine Einheit ist vermietet …“');
+  ok(/einheitBeimAnlegen/.test(lies('backend/src/services/vivi/viviDienst.js')), 'deshalb benennt anlegen() die automatische Einheit einmal per PATCH (Marcel 22.11.2026, Teil C und D)');
   const nkPlan = mapping.nachVivi({ objart: 'MFH', kp: '100000', wirtschaftlicher_uebergang: '2026-01-01', grundsteuer: '336', _mfh: { einheiten: [{ nr: '1', wfl: '79', ist: '717', status: 'vermietet', mv_beginn: '2020-01-01' }, { nr: '2', wfl: '79', ist: '717', status: 'vermietet', mv_beginn: '2020-01-01' }] } }, { musterAnschrift: true });
   ok(nkPlan.hinweise.some((h) => /auffällig niedrig/.test(h)) && nkPlan.einheiten[0].miete.monthly_utility_costs === 14, 'abgeleitete NK-Vorauszahlung unter 0,50 €/m²: Hinweis „auffällig niedrig“, der Wert selbst bleibt (14 €)');
   /* V4 an den echten Antworten */

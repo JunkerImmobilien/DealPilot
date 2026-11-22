@@ -157,7 +157,7 @@ async function anlegen(userId, objectId, opt) {
   const q = abfrage(z.vivi_account_id || opt.account_id || null);
   const cl = deps().client(tok, { maxWarten: 65000 });
   const t0 = deps().jetzt();
-  const gezaehlt = { projekt: 0, einheiten: 0, mietverhaeltnisse: 0, darlehen: 0, uebernommen: 0 };
+  const gezaehlt = { projekt: 0, einheiten: 0, mietverhaeltnisse: 0, darlehen: 0, uebernommen: 0, angepasst: 0 };
   const merken = function () { return sp.idsSpeichern(objectId, ids, ids.projekt || null); };
   try {
     /* 1 · Objekt */
@@ -202,6 +202,12 @@ async function anlegen(userId, objectId, opt) {
             gezaehlt.mietverhaeltnisse++;
           }
         }
+      } else if (g.unit_id && String(g.unit_id) === String(ids.auto_einheit) && !ids.auto_angepasst) {
+        /* v3965 · die automatische Einheit ist leer: einmal benennen (Name, Art, Flaeche, Etage), sonst bliebe sie
+           „Einheit 1“ ohne Flaeche. Gemerkt in ids.auto_angepasst, ein Fortsetzen schickt es nicht noch einmal. */
+        await cl.einheitBeimAnlegen(P + '/units/' + encodeURIComponent(String(g.unit_id)), e.einheit);
+        ids.auto_angepasst = true;
+        gezaehlt.angepasst++;
       } else if (!g.unit_id) {
         const da = vorhUnits && vorhUnits.find(function (u) { return u.identifier === e.name; });
         if (da) { g.unit_id = da.id; gezaehlt.uebernommen++; }

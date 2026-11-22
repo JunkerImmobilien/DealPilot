@@ -6,8 +6,13 @@
  *
  * ── MARCELS REGEL, TECHNISCH ──────────────────────────────────────────────
  * Ein Objekt wird genau EINMAL angelegt, danach wird nur gelesen. Dieser Client kennt deshalb genau zwei
- * Methoden: get() und post(). post() nimmt nur Pfade, die auf ANLEGEN_PFADE passen. PUT, PATCH und DELETE
- * gibt es hier nicht, auch nicht als Parameter: die Methode steht fest im Code der beiden Funktionen.
+ * Methoden: get() und post(). post() nimmt nur Pfade, die auf ANLEGEN_PFADE passen. PUT und DELETE gibt es
+ * hier nicht, auch nicht als Parameter: die Methode steht fest im Code der Funktionen.
+ *
+ * v3965 · EINE Ausnahme, Marcel 22.11.2026: einheitBeimAnlegen() schickt genau ein PATCH an die Einheit, die ViVi
+ * mit dem Objekt von selbst anlegt (units, Minimum 1). Name und Flaeche bekommt diese Einheit sonst nur ueber ein
+ * Mietverhaeltnis, ohne vermietete Einheit blieb sie „Einheit 1“ ohne Flaeche (gemessen an 2026-1006). Das gehoert
+ * zum Anlegen: viviDienst.anlegen() ruft es hoechstens einmal je Objekt (vivi_ids.auto_angepasst), sonst niemand.
  * tools/vivi-pruefen.mjs wird rot, sobald in services/vivi/ oder routes/vivi.js eine andere Methode auftaucht.
  *
  * ── ANFRAGEBREMSE ─────────────────────────────────────────────────────────
@@ -33,6 +38,9 @@ const ANLEGEN_PFADE = Object.freeze([
   /^\/projects\/[A-Za-z0-9_-]+\/rental-units$/,
   /^\/projects\/[A-Za-z0-9_-]+\/financings$/
 ]);
+
+/* v3965 · der einzige PATCH-Pfad: die automatisch angelegte Einheit, nur beim Anlegen */
+const EINHEIT_PFAD = /^\/projects\/[A-Za-z0-9_-]+\/units\/[A-Za-z0-9_-]+$/;
 
 const _fenster = new Map();   // tokenHash -> [Zeitpunkte]
 
@@ -128,10 +136,18 @@ function erzeugen(token, opt) {
     return senden('POST', pfad, abfrage, rumpf || {});
   }
 
-  return { get: get, post: post, zaehler: zaehler };
+  /** v3965 · nur beim Anlegen: die automatisch angelegte Einheit benennen (identifier, unit_type, square_meters, floor). */
+  function einheitBeimAnlegen(pfad, rumpf) {
+    if (!EINHEIT_PFAD.test(pfad)) return Promise.reject(fehler('pfad_gesperrt', 'Dieser ViVi-Pfad ist zum Ändern nicht freigegeben: ' + pfad));
+    const r = {};
+    ['identifier', 'unit_type', 'square_meters', 'floor'].forEach(function (k) { if (rumpf && rumpf[k] !== undefined) r[k] = rumpf[k]; });
+    return senden('PATCH', pfad, null, r);
+  }
+
+  return { get: get, post: post, einheitBeimAnlegen: einheitBeimAnlegen, zaehler: zaehler };
 }
 
 /** nur fuer tools/vivi-pruefen.mjs */
 function _fensterLeeren() { _fenster.clear(); }
 
-module.exports = { erzeugen, fehler, ANLEGEN_PFADE, BASIS, MAX_JE_MINUTE, FENSTER_MS, _fensterLeeren };
+module.exports = { erzeugen, fehler, ANLEGEN_PFADE, EINHEIT_PFAD, BASIS, MAX_JE_MINUTE, FENSTER_MS, _fensterLeeren };
