@@ -42015,8 +42015,11 @@ h3.bc-head-title > .accent { color: var(--wl-7a5d18, #7a5d18); }
 }
 /* Hilfe (Pilot) unter Aktionen › System: nur bis 1080 px. Desktop behaelt die Figur unten rechts
    (pilot-blase.js). #sidebar-Anker, weil `aside.sidebar .sb-act-item{display:flex!important}`
-   jede schwaechere Sperre schlaegt (v3495). */
-html body #sidebar .sb-act-item.sb-act-pilot { display: none !important; }
+   jede schwaechere Sperre schlaegt (v3495). v3962a: dazu #sb-actions-accordion - ab 1025 px
+   setzt die Aktenmappe das Register in die .dpl-schiene, AUSSERHALB von #sidebar. */
+html body #sidebar .sb-act-item.sb-act-pilot,
+html body #sb-actions-accordion .sb-act-item.sb-act-pilot { display: none !important; }
 @media (max-width: 1080px) {
-  html body #sidebar .sb-act-item.sb-act-pilot { display: flex !important; }
+  html body #sidebar .sb-act-item.sb-act-pilot,
+  html body #sb-actions-accordion .sb-act-item.sb-act-pilot { display: flex !important; }
 }
