@@ -270,7 +270,7 @@ details.fz-mehr > summary {
   display: inline; list-style: none; cursor: pointer;
   font: 600 10px/1.5 "JetBrains Mono", monospace;
   letter-spacing: .1em; text-transform: uppercase;
-  color: var(--wl-9a7f33, #9a7f33);
+  color: var(--wl-7a5d18, #7a5d18);   /* gold-hell-1: Schrift auf Weiss 3,85 -> 6,2 */
 }
 details.fz-mehr > summary::-webkit-details-marker { display: none; }
 details.fz-mehr > summary::after { content: " ▾"; }

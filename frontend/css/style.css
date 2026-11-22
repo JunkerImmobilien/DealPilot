@@ -41983,3 +41983,4 @@ summary > .oe-btn.dp-sh-btn { color: var(--wl-7a5d18, #7a5d18); }
 .bc-matrix-grid > .bc-matrix-axis-x-label,
 .bc-footer-cell > .bc-footer-value.gold,
 h3.bc-head-title > .accent { color: var(--wl-7a5d18, #7a5d18); }
+.dpfk-strip .mrpf-top-head > .mrpf-top-label { color: var(--wl-7a5d18, #7a5d18); }   /* Finanzierung, Ticketkopf 4,49 -> 6,2 */
