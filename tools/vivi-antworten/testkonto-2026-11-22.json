@@ -1,0 +1,1688 @@
+{
+ "_zweck": "Echte Antworten der ViVi-API v1 aus dem Testkonto, gelesen am 22.11.2026 (nur GET) nach dem Anlegen der Demo-Objekte von Staging. Anschriften sind Musteranschriften, Mieter Platzhalter. Erzeugt fuer tools/vivi-pruefen.mjs Teil R.",
+ "jetzt": "2026-11-22T12:00:00Z",
+ "objekte": {
+  "2026-1041": {
+   "objart": "MFH",
+   "vivi_ids": {
+    "projekt": "prj_34f3ix17DflJ",
+    "darlehen": {
+     "d1": "fin_2fW4fr0uH56G"
+    },
+    "auto_fuer": "e0",
+    "einheiten": {
+     "e0": {
+      "nr": "1",
+      "name": "WE 1 · EG links",
+      "index": 0,
+      "fertig": true,
+      "unit_id": "unt_0qOjPg06QGZS",
+      "rental_id": "rtu_2pHlZE38tqFK"
+     },
+     "e1": {
+      "nr": "2",
+      "name": "WE 2 · EG rechts",
+      "index": 1,
+      "fertig": true,
+      "unit_id": "unt_4NN1zz1OJLn0",
+      "rental_id": "rtu_0WEvSK3bzatJ"
+     },
+     "e2": {
+      "nr": "3",
+      "name": "WE 3 · 1. OG links",
+      "index": 2,
+      "fertig": true,
+      "unit_id": "unt_3co2WZ3sJ8KP",
+      "rental_id": "rtu_0hHnbE1zmlnx"
+     },
+     "e3": {
+      "nr": "4",
+      "name": "WE 4 · 1. OG rechts",
+      "index": 3,
+      "fertig": true,
+      "unit_id": "unt_49ih5q1toBE4",
+      "rental_id": "rtu_2nRfa82qaUMl"
+     },
+     "e4": {
+      "nr": "5",
+      "name": "WE 5 · DG links",
+      "index": 4,
+      "fertig": true,
+      "unit_id": "unt_4UMMBm0LF2TK",
+      "rental_id": "rtu_2tD3Nm2NmaYX"
+     },
+     "e5": {
+      "nr": "6",
+      "name": "WE 6 · DG rechts",
+      "index": 5,
+      "fertig": true,
+      "unit_id": "unt_4Ts5gd2PKI2t",
+      "rental_id": "rtu_01ocqA2YQFtV"
+     }
+    },
+    "auto_einheit": "unt_0qOjPg06QGZS",
+    "muster_anschrift": true
+   },
+   "gesendet": {
+    "projekt": {
+     "type": "multi_family_house",
+     "street": "Musterstraße",
+     "house_number": "1041",
+     "postal_code": "12345",
+     "city": "Musterstadt",
+     "purchase_price": 545000,
+     "purchase_date": "2025-01-01",
+     "units": 1,
+     "construction_year": 1967,
+     "broker": 19456.5,
+     "real_estate_transfer_tax": 35425,
+     "notary": 9265,
+     "land_register": 2725,
+     "other_costs": 8175
+    },
+    "einheiten": [
+     {
+      "schluessel": "e0",
+      "index": 0,
+      "einheit": null,
+      "mietverhaeltnis": {
+       "tenant_first_name": "Mieter",
+       "tenant_last_name": "WE 1 · EG links",
+       "rent": 590,
+       "monthly_utility_costs": 175,
+       "rental_start": "2011-05-01",
+       "rent_due_day": 3,
+       "unit_identifier": "WE 1 · EG links",
+       "unit_square_meters": 70,
+       "unit_floor": "EG",
+       "deposit_amount": 1770,
+       "last_rent_increase": "2023-07-01",
+       "amenities": [
+        {
+         "type": "parking_space",
+         "description": "Stellplatz",
+         "monthly_rent": 30
+        }
+       ]
+      }
+     },
+     {
+      "schluessel": "e1",
+      "index": 1,
+      "einheit": null,
+      "mietverhaeltnis": {
+       "tenant_first_name": "Mieter",
+       "tenant_last_name": "WE 2 · EG rechts",
+       "rent": 600,
+       "monthly_utility_costs": 175,
+       "rental_start": "2019-09-01",
+       "rent_due_day": 3,
+       "unit_identifier": "WE 2 · EG rechts",
+       "unit_square_meters": 70,
+       "unit_floor": "EG",
+       "deposit_amount": 1800,
+       "last_rent_increase": "2024-01-01",
+       "amenities": [
+        {
+         "type": "parking_space",
+         "description": "Stellplatz",
+         "monthly_rent": 30
+        }
+       ]
+      }
+     },
+     {
+      "schluessel": "e2",
+      "index": 2,
+      "einheit": null,
+      "mietverhaeltnis": {
+       "tenant_first_name": "Mieter",
+       "tenant_last_name": "WE 3 · 1. OG links",
+       "rent": 585,
+       "monthly_utility_costs": 175,
+       "rental_start": "2008-03-01",
+       "rent_due_day": 3,
+       "unit_identifier": "WE 3 · 1. OG links",
+       "unit_square_meters": 70,
+       "unit_floor": "1. OG",
+       "deposit_amount": 1755,
+       "last_rent_increase": "2023-07-01",
+       "amenities": [
+        {
+         "type": "parking_space",
+         "description": "Stellplatz",
+         "monthly_rent": 30
+        }
+       ]
+      }
+     },
+     {
+      "schluessel": "e3",
+      "index": 3,
+      "einheit": null,
+      "mietverhaeltnis": {
+       "tenant_first_name": "Mieter",
+       "tenant_last_name": "WE 4 · 1. OG rechts",
+       "rent": 585,
+       "monthly_utility_costs": 175,
+       "rental_start": "2015-10-01",
+       "rent_due_day": 3,
+       "unit_identifier": "WE 4 · 1. OG rechts",
+       "unit_square_meters": 70,
+       "unit_floor": "1. OG",
+       "deposit_amount": 1755,
+       "last_rent_increase": "2023-07-01"
+      }
+     },
+     {
+      "schluessel": "e4",
+      "index": 4,
+      "einheit": null,
+      "mietverhaeltnis": {
+       "tenant_first_name": "Mieter",
+       "tenant_last_name": "WE 5 · DG links",
+       "rent": 415,
+       "monthly_utility_costs": 138,
+       "rental_start": "2004-06-01",
+       "rent_due_day": 3,
+       "unit_identifier": "WE 5 · DG links",
+       "unit_square_meters": 55,
+       "unit_floor": "DG",
+       "deposit_amount": 1245,
+       "last_rent_increase": "2022-01-01"
+      }
+     },
+     {
+      "schluessel": "e5",
+      "index": 5,
+      "einheit": null,
+      "mietverhaeltnis": {
+       "tenant_first_name": "Mieter",
+       "tenant_last_name": "WE 6 · DG rechts",
+       "rent": 420,
+       "monthly_utility_costs": 138,
+       "rental_start": "2017-02-01",
+       "rent_due_day": 3,
+       "unit_identifier": "WE 6 · DG rechts",
+       "unit_square_meters": 55,
+       "unit_floor": "DG",
+       "deposit_amount": 1260,
+       "last_rent_increase": "2023-07-01"
+      }
+     }
+    ],
+    "darlehen": [
+     {
+      "schluessel": "d1",
+      "body": {
+       "name": "Darlehen I Dealkasse",
+       "financing_type": "primary",
+       "financing_start_date": "2025-01-01",
+       "financing_amount": 472415,
+       "interest_rate": 4,
+       "bank_name": "Dealkasse",
+       "initial_repayment": 1,
+       "fixed_interest_period": 10
+      }
+     }
+    ]
+   },
+   "antworten": {
+    "projekt": {
+     "id": "prj_34f3ix17DflJ",
+     "name": "Musterstadt - Musterstraße 1041 - Mehrfamilienhaus",
+     "type": "multi_family_house",
+     "street": "Musterstraße",
+     "house_number": "1041",
+     "postal_code": "12345",
+     "city": "Musterstadt",
+     "construction_year": 1967,
+     "purchase_date": "2025-01-01",
+     "description": null,
+     "area": null,
+     "project_type": "bestand",
+     "planned_sale_date": null,
+     "vat_enabled": false,
+     "externally_managed_from": null,
+     "externally_managed_until": null,
+     "purchase_price": 545000,
+     "real_estate_transfer_tax": 35425,
+     "notary": 9265,
+     "land_register": 2725,
+     "broker": 19456.5,
+     "other_costs": 8175,
+     "units": [
+      {
+       "id": "unt_0qOjPg06QGZS",
+       "identifier": "WE 1 · EG links",
+       "unit_type": "residential",
+       "square_meters": 70,
+       "rooms": null,
+       "floor": "EG"
+      },
+      {
+       "id": "unt_4NN1zz1OJLn0",
+       "identifier": "WE 2 · EG rechts",
+       "unit_type": "residential",
+       "square_meters": 70,
+       "rooms": null,
+       "floor": "EG"
+      },
+      {
+       "id": "unt_3co2WZ3sJ8KP",
+       "identifier": "WE 3 · 1. OG links",
+       "unit_type": "residential",
+       "square_meters": 70,
+       "rooms": null,
+       "floor": "1. OG"
+      },
+      {
+       "id": "unt_49ih5q1toBE4",
+       "identifier": "WE 4 · 1. OG rechts",
+       "unit_type": "residential",
+       "square_meters": 70,
+       "rooms": null,
+       "floor": "1. OG"
+      },
+      {
+       "id": "unt_4UMMBm0LF2TK",
+       "identifier": "WE 5 · DG links",
+       "unit_type": "residential",
+       "square_meters": 55,
+       "rooms": null,
+       "floor": "DG"
+      },
+      {
+       "id": "unt_4Ts5gd2PKI2t",
+       "identifier": "WE 6 · DG rechts",
+       "unit_type": "residential",
+       "square_meters": 55,
+       "rooms": null,
+       "floor": "DG"
+      }
+     ]
+    },
+    "mietverhaeltnisse": [
+     {
+      "id": "rtu_2pHlZE38tqFK",
+      "project_id": "prj_34f3ix17DflJ",
+      "unit_id": "unt_0qOjPg06QGZS",
+      "tenant_first_name": "Mieter",
+      "tenant_last_name": "WE 1 · EG links",
+      "tenant_salutation": null,
+      "tenant_title": null,
+      "tenant_date_of_birth": null,
+      "tenant_phone": null,
+      "tenant_email": null,
+      "is_company": false,
+      "company_name": null,
+      "tenant_alt_street": null,
+      "tenant_alt_zip": null,
+      "tenant_alt_city": null,
+      "rent": 590,
+      "target_rent": 590,
+      "monthly_utility_costs": 175,
+      "rental_start": "2011-05-01",
+      "rental_end": null,
+      "rent_due_day": 3,
+      "monthly_hausgeld": null,
+      "occupancy_type": "rented",
+      "contract_type": "free_rent",
+      "last_rent_increase": "2023-07-01",
+      "is_special": false,
+      "index_base_year": null,
+      "index_base_month": null,
+      "index_base_value": null,
+      "index_base_since": null,
+      "index_auto_prepare": false,
+      "deposit_amount": 1770,
+      "deposit_type": null,
+      "deposit_location": null,
+      "deposit_due_date": null,
+      "deposit_received_date": null,
+      "deposit_returned_date": null,
+      "deposit_retained_amount": null,
+      "deposit_retention_note": null,
+      "vat_rate_rent": null,
+      "vat_rate_utility": null,
+      "vat_rate_deposit": null,
+      "unit": {
+       "id": "unt_0qOjPg06QGZS",
+       "identifier": "WE 1 · EG links",
+       "unit_type": "residential",
+       "square_meters": 70,
+       "rooms": null,
+       "floor": "EG"
+      },
+      "co_tenants": [],
+      "amenities": [
+       {
+        "id": "amn_4SAu7T2tO9IF",
+        "type": "parking_space",
+        "description": "Stellplatz",
+        "monthly_rent": 30,
+        "vat_rate": null
+       }
+      ]
+     },
+     {
+      "id": "rtu_0WEvSK3bzatJ",
+      "project_id": "prj_34f3ix17DflJ",
+      "unit_id": "unt_4NN1zz1OJLn0",
+      "tenant_first_name": "Mieter",
+      "tenant_last_name": "WE 2 · EG rechts",
+      "tenant_salutation": null,
+      "tenant_title": null,
+      "tenant_date_of_birth": null,
+      "tenant_phone": null,
+      "tenant_email": null,
+      "is_company": false,
+      "company_name": null,
+      "tenant_alt_street": null,
+      "tenant_alt_zip": null,
+      "tenant_alt_city": null,
+      "rent": 600,
+      "target_rent": 600,
+      "monthly_utility_costs": 175,
+      "rental_start": "2019-09-01",
+      "rental_end": null,
+      "rent_due_day": 3,
+      "monthly_hausgeld": null,
+      "occupancy_type": "rented",
+      "contract_type": "free_rent",
+      "last_rent_increase": "2024-01-01",
+      "is_special": false,
+      "index_base_year": null,
+      "index_base_month": null,
+      "index_base_value": null,
+      "index_base_since": null,
+      "index_auto_prepare": false,
+      "deposit_amount": 1800,
+      "deposit_type": null,
+      "deposit_location": null,
+      "deposit_due_date": null,
+      "deposit_received_date": null,
+      "deposit_returned_date": null,
+      "deposit_retained_amount": null,
+      "deposit_retention_note": null,
+      "vat_rate_rent": null,
+      "vat_rate_utility": null,
+      "vat_rate_deposit": null,
+      "unit": {
+       "id": "unt_4NN1zz1OJLn0",
+       "identifier": "WE 2 · EG rechts",
+       "unit_type": "residential",
+       "square_meters": 70,
+       "rooms": null,
+       "floor": "EG"
+      },
+      "co_tenants": [],
+      "amenities": [
+       {
+        "id": "amn_2BZIzF0Rjxom",
+        "type": "parking_space",
+        "description": "Stellplatz",
+        "monthly_rent": 30,
+        "vat_rate": null
+       }
+      ]
+     },
+     {
+      "id": "rtu_0hHnbE1zmlnx",
+      "project_id": "prj_34f3ix17DflJ",
+      "unit_id": "unt_3co2WZ3sJ8KP",
+      "tenant_first_name": "Mieter",
+      "tenant_last_name": "WE 3 · 1. OG links",
+      "tenant_salutation": null,
+      "tenant_title": null,
+      "tenant_date_of_birth": null,
+      "tenant_phone": null,
+      "tenant_email": null,
+      "is_company": false,
+      "company_name": null,
+      "tenant_alt_street": null,
+      "tenant_alt_zip": null,
+      "tenant_alt_city": null,
+      "rent": 585,
+      "target_rent": 585,
+      "monthly_utility_costs": 175,
+      "rental_start": "2008-03-01",
+      "rental_end": null,
+      "rent_due_day": 3,
+      "monthly_hausgeld": null,
+      "occupancy_type": "rented",
+      "contract_type": "free_rent",
+      "last_rent_increase": "2023-07-01",
+      "is_special": false,
+      "index_base_year": null,
+      "index_base_month": null,
+      "index_base_value": null,
+      "index_base_since": null,
+      "index_auto_prepare": false,
+      "deposit_amount": 1755,
+      "deposit_type": null,
+      "deposit_location": null,
+      "deposit_due_date": null,
+      "deposit_received_date": null,
+      "deposit_returned_date": null,
+      "deposit_retained_amount": null,
+      "deposit_retention_note": null,
+      "vat_rate_rent": null,
+      "vat_rate_utility": null,
+      "vat_rate_deposit": null,
+      "unit": {
+       "id": "unt_3co2WZ3sJ8KP",
+       "identifier": "WE 3 · 1. OG links",
+       "unit_type": "residential",
+       "square_meters": 70,
+       "rooms": null,
+       "floor": "1. OG"
+      },
+      "co_tenants": [],
+      "amenities": [
+       {
+        "id": "amn_3XDIXf2xtTUi",
+        "type": "parking_space",
+        "description": "Stellplatz",
+        "monthly_rent": 30,
+        "vat_rate": null
+       }
+      ]
+     },
+     {
+      "id": "rtu_2nRfa82qaUMl",
+      "project_id": "prj_34f3ix17DflJ",
+      "unit_id": "unt_49ih5q1toBE4",
+      "tenant_first_name": "Mieter",
+      "tenant_last_name": "WE 4 · 1. OG rechts",
+      "tenant_salutation": null,
+      "tenant_title": null,
+      "tenant_date_of_birth": null,
+      "tenant_phone": null,
+      "tenant_email": null,
+      "is_company": false,
+      "company_name": null,
+      "tenant_alt_street": null,
+      "tenant_alt_zip": null,
+      "tenant_alt_city": null,
+      "rent": 585,
+      "target_rent": 585,
+      "monthly_utility_costs": 175,
+      "rental_start": "2015-10-01",
+      "rental_end": null,
+      "rent_due_day": 3,
+      "monthly_hausgeld": null,
+      "occupancy_type": "rented",
+      "contract_type": "free_rent",
+      "last_rent_increase": "2023-07-01",
+      "is_special": false,
+      "index_base_year": null,
+      "index_base_month": null,
+      "index_base_value": null,
+      "index_base_since": null,
+      "index_auto_prepare": false,
+      "deposit_amount": 1755,
+      "deposit_type": null,
+      "deposit_location": null,
+      "deposit_due_date": null,
+      "deposit_received_date": null,
+      "deposit_returned_date": null,
+      "deposit_retained_amount": null,
+      "deposit_retention_note": null,
+      "vat_rate_rent": null,
+      "vat_rate_utility": null,
+      "vat_rate_deposit": null,
+      "unit": {
+       "id": "unt_49ih5q1toBE4",
+       "identifier": "WE 4 · 1. OG rechts",
+       "unit_type": "residential",
+       "square_meters": 70,
+       "rooms": null,
+       "floor": "1. OG"
+      },
+      "co_tenants": [],
+      "amenities": []
+     },
+     {
+      "id": "rtu_2tD3Nm2NmaYX",
+      "project_id": "prj_34f3ix17DflJ",
+      "unit_id": "unt_4UMMBm0LF2TK",
+      "tenant_first_name": "Mieter",
+      "tenant_last_name": "WE 5 · DG links",
+      "tenant_salutation": null,
+      "tenant_title": null,
+      "tenant_date_of_birth": null,
+      "tenant_phone": null,
+      "tenant_email": null,
+      "is_company": false,
+      "company_name": null,
+      "tenant_alt_street": null,
+      "tenant_alt_zip": null,
+      "tenant_alt_city": null,
+      "rent": 415,
+      "target_rent": 415,
+      "monthly_utility_costs": 138,
+      "rental_start": "2004-06-01",
+      "rental_end": null,
+      "rent_due_day": 3,
+      "monthly_hausgeld": null,
+      "occupancy_type": "rented",
+      "contract_type": "free_rent",
+      "last_rent_increase": "2022-01-01",
+      "is_special": false,
+      "index_base_year": null,
+      "index_base_month": null,
+      "index_base_value": null,
+      "index_base_since": null,
+      "index_auto_prepare": false,
+      "deposit_amount": 1245,
+      "deposit_type": null,
+      "deposit_location": null,
+      "deposit_due_date": null,
+      "deposit_received_date": null,
+      "deposit_returned_date": null,
+      "deposit_retained_amount": null,
+      "deposit_retention_note": null,
+      "vat_rate_rent": null,
+      "vat_rate_utility": null,
+      "vat_rate_deposit": null,
+      "unit": {
+       "id": "unt_4UMMBm0LF2TK",
+       "identifier": "WE 5 · DG links",
+       "unit_type": "residential",
+       "square_meters": 55,
+       "rooms": null,
+       "floor": "DG"
+      },
+      "co_tenants": [],
+      "amenities": []
+     },
+     {
+      "id": "rtu_01ocqA2YQFtV",
+      "project_id": "prj_34f3ix17DflJ",
+      "unit_id": "unt_4Ts5gd2PKI2t",
+      "tenant_first_name": "Mieter",
+      "tenant_last_name": "WE 6 · DG rechts",
+      "tenant_salutation": null,
+      "tenant_title": null,
+      "tenant_date_of_birth": null,
+      "tenant_phone": null,
+      "tenant_email": null,
+      "is_company": false,
+      "company_name": null,
+      "tenant_alt_street": null,
+      "tenant_alt_zip": null,
+      "tenant_alt_city": null,
+      "rent": 420,
+      "target_rent": 420,
+      "monthly_utility_costs": 138,
+      "rental_start": "2017-02-01",
+      "rental_end": null,
+      "rent_due_day": 3,
+      "monthly_hausgeld": null,
+      "occupancy_type": "rented",
+      "contract_type": "free_rent",
+      "last_rent_increase": "2023-07-01",
+      "is_special": false,
+      "index_base_year": null,
+      "index_base_month": null,
+      "index_base_value": null,
+      "index_base_since": null,
+      "index_auto_prepare": false,
+      "deposit_amount": 1260,
+      "deposit_type": null,
+      "deposit_location": null,
+      "deposit_due_date": null,
+      "deposit_received_date": null,
+      "deposit_returned_date": null,
+      "deposit_retained_amount": null,
+      "deposit_retention_note": null,
+      "vat_rate_rent": null,
+      "vat_rate_utility": null,
+      "vat_rate_deposit": null,
+      "unit": {
+       "id": "unt_4Ts5gd2PKI2t",
+       "identifier": "WE 6 · DG rechts",
+       "unit_type": "residential",
+       "square_meters": 55,
+       "rooms": null,
+       "floor": "DG"
+      },
+      "co_tenants": [],
+      "amenities": []
+     }
+    ],
+    "darlehen": [
+     {
+      "id": "fin_2fW4fr0uH56G",
+      "project_id": "prj_34f3ix17DflJ",
+      "name": "Darlehen I Dealkasse",
+      "bank_name": "Dealkasse",
+      "financing_type": "primary",
+      "status": "active",
+      "financing_amount": 472415,
+      "interest_rate": 4,
+      "initial_repayment": 1,
+      "fixed_monthly_rate": null,
+      "fixed_interest_period": 10,
+      "fixed_interest_end_date": null,
+      "financing_start_date": "2025-01-01",
+      "financing_end_date": null,
+      "equity_amount": null,
+      "equity_percentage": null,
+      "is_bullet_loan": false,
+      "maturity_date": null,
+      "repayment_free_until_date": null,
+      "is_repayment_substitute": false,
+      "is_savings_plan": false,
+      "savings_rate": null,
+      "expected_return_rate": null,
+      "initial_savings_amount": null,
+      "special_repayment_allowed": false,
+      "special_repayment_max_percent": null,
+      "special_repayment_max_amount": null,
+      "disagio_amount": null,
+      "disagio_distribution_years": null,
+      "is_split": false,
+      "share_factor": 1,
+      "current": {
+       "monthly_rate": 1968.4,
+       "monthly_interest": 1544.81,
+       "monthly_repayment": 423.58,
+       "remaining_debt": 463444.08
+      },
+      "special_repayments": [],
+      "rate_overrides": [],
+      "shares": []
+     }
+    ],
+    "tilgungsplan_anfang": [
+     {
+      "date": "2025-01-31",
+      "remaining_debt": 472415,
+      "interest": 1574.72,
+      "repayment": 393.68,
+      "monthly_rate": 1968.4,
+      "remaining_debt_after": 472021.32,
+      "is_repayment_substitute": false,
+      "savings_rate": 0,
+      "savings_balance": 0
+     },
+     {
+      "date": "2025-02-28",
+      "remaining_debt": 472021.32,
+      "interest": 1573.4,
+      "repayment": 394.99,
+      "monthly_rate": 1968.4,
+      "remaining_debt_after": 471626.33,
+      "is_repayment_substitute": false,
+      "savings_rate": 0,
+      "savings_balance": 0
+     },
+     {
+      "date": "2025-03-31",
+      "remaining_debt": 471626.33,
+      "interest": 1572.09,
+      "repayment": 396.31,
+      "monthly_rate": 1968.4,
+      "remaining_debt_after": 471230.02,
+      "is_repayment_substitute": false,
+      "savings_rate": 0,
+      "savings_balance": 0
+     }
+    ],
+    "costs": {
+     "planned_costs": 0,
+     "realized_costs": 0,
+     "monthly_costs_planned": 0,
+     "monthly_costs_realized": 0,
+     "financing_costs_planned": 0,
+     "financing_costs_realized": 43304.70833333333,
+     "total_planned_costs": 0,
+     "total_realized_costs": 43304.70833333333
+    },
+    "monthly_costs": [],
+    "revenues": []
+   }
+  },
+  "2026-1006": {
+   "objart": "ZFH",
+   "vivi_ids": {
+    "projekt": "prj_2Ynied1lGHAX",
+    "darlehen": {
+     "d1": "fin_08r9ee3DpyHK"
+    },
+    "auto_fuer": "e0",
+    "einheiten": {
+     "e0": {
+      "nr": "1",
+      "name": "WE 1 · EG / OG — Hauptwohnung",
+      "index": 0,
+      "fertig": true,
+      "unit_id": "unt_11QO7g3R2mdD"
+     },
+     "e1": {
+      "nr": "2",
+      "name": "WE 2 · DG — Wohnrecht",
+      "index": 1,
+      "fertig": true,
+      "unit_id": "unt_1xZeYk09VcFb"
+     }
+    },
+    "auto_einheit": "unt_11QO7g3R2mdD",
+    "muster_anschrift": true
+   },
+   "gesendet": {
+    "projekt": {
+     "type": "multi_family_house",
+     "street": "Musterstraße",
+     "house_number": "1006",
+     "postal_code": "12345",
+     "city": "Musterstadt",
+     "purchase_price": 350000,
+     "purchase_date": "2026-08-12",
+     "units": 1,
+     "construction_year": 1964,
+     "broker": 12495,
+     "real_estate_transfer_tax": 22750,
+     "notary": 5950,
+     "land_register": 1750,
+     "other_costs": 5250
+    },
+    "einheiten": [
+     {
+      "schluessel": "e0",
+      "index": 0,
+      "einheit": {
+       "identifier": "WE 1 · EG / OG — Hauptwohnung",
+       "unit_type": "residential",
+       "square_meters": 141.7,
+       "floor": "EG / OG — Hauptwohnung"
+      },
+      "mietverhaeltnis": null
+     },
+     {
+      "schluessel": "e1",
+      "index": 1,
+      "einheit": {
+       "identifier": "WE 2 · DG — Wohnrecht",
+       "unit_type": "residential",
+       "square_meters": 103.38,
+       "floor": "DG — Wohnrecht"
+      },
+      "mietverhaeltnis": null
+     }
+    ],
+    "darlehen": [
+     {
+      "schluessel": "d1",
+      "body": {
+       "name": "Darlehen I Demo-Bank (Platzhalter)",
+       "financing_type": "primary",
+       "financing_start_date": "2026-08-01",
+       "financing_amount": 280000,
+       "interest_rate": 3.5,
+       "bank_name": "Demo-Bank (Platzhalter)",
+       "initial_repayment": 2,
+       "fixed_interest_period": 10
+      }
+     }
+    ]
+   },
+   "antworten": {
+    "projekt": {
+     "id": "prj_2Ynied1lGHAX",
+     "name": "Musterstadt - Musterstraße 1006 - Mehrfamilienhaus",
+     "type": "multi_family_house",
+     "street": "Musterstraße",
+     "house_number": "1006",
+     "postal_code": "12345",
+     "city": "Musterstadt",
+     "construction_year": 1964,
+     "purchase_date": "2026-08-12",
+     "description": null,
+     "area": null,
+     "project_type": "bestand",
+     "planned_sale_date": null,
+     "vat_enabled": false,
+     "externally_managed_from": null,
+     "externally_managed_until": null,
+     "purchase_price": 350000,
+     "real_estate_transfer_tax": 22750,
+     "notary": 5950,
+     "land_register": 1750,
+     "broker": 12495,
+     "other_costs": 5250,
+     "units": [
+      {
+       "id": "unt_11QO7g3R2mdD",
+       "identifier": "Einheit 1",
+       "unit_type": "residential",
+       "square_meters": null,
+       "rooms": null,
+       "floor": null
+      },
+      {
+       "id": "unt_1xZeYk09VcFb",
+       "identifier": "WE 2 · DG — Wohnrecht",
+       "unit_type": "residential",
+       "square_meters": 103.38,
+       "rooms": null,
+       "floor": "DG — Wohnrecht"
+      }
+     ]
+    },
+    "mietverhaeltnisse": [],
+    "darlehen": [
+     {
+      "id": "fin_08r9ee3DpyHK",
+      "project_id": "prj_2Ynied1lGHAX",
+      "name": "Darlehen I Demo-Bank (Platzhalter)",
+      "bank_name": "Demo-Bank (Platzhalter)",
+      "financing_type": "primary",
+      "status": "active",
+      "financing_amount": 280000,
+      "interest_rate": 3.5,
+      "initial_repayment": 2,
+      "fixed_monthly_rate": null,
+      "fixed_interest_period": 10,
+      "fixed_interest_end_date": null,
+      "financing_start_date": "2026-08-01",
+      "financing_end_date": null,
+      "equity_amount": null,
+      "equity_percentage": null,
+      "is_bullet_loan": false,
+      "maturity_date": null,
+      "repayment_free_until_date": null,
+      "is_repayment_substitute": false,
+      "is_savings_plan": false,
+      "savings_rate": null,
+      "expected_return_rate": null,
+      "initial_savings_amount": null,
+      "special_repayment_allowed": false,
+      "special_repayment_max_percent": null,
+      "special_repayment_max_amount": null,
+      "disagio_amount": null,
+      "disagio_distribution_years": null,
+      "is_split": false,
+      "share_factor": 1,
+      "current": {
+       "monthly_rate": 1283.33,
+       "monthly_interest": 812.57,
+       "monthly_repayment": 470.76,
+       "remaining_debt": 278595.91
+      },
+      "special_repayments": [],
+      "rate_overrides": [],
+      "shares": []
+     }
+    ],
+    "tilgungsplan_anfang": [
+     {
+      "date": "2026-08-31",
+      "remaining_debt": 280000,
+      "interest": 816.67,
+      "repayment": 466.67,
+      "monthly_rate": 1283.33,
+      "remaining_debt_after": 279533.33,
+      "is_repayment_substitute": false,
+      "savings_rate": 0,
+      "savings_balance": 0
+     },
+     {
+      "date": "2026-09-30",
+      "remaining_debt": 279533.33,
+      "interest": 815.31,
+      "repayment": 468.03,
+      "monthly_rate": 1283.33,
+      "remaining_debt_after": 279065.31,
+      "is_repayment_substitute": false,
+      "savings_rate": 0,
+      "savings_balance": 0
+     },
+     {
+      "date": "2026-10-31",
+      "remaining_debt": 279065.31,
+      "interest": 813.94,
+      "repayment": 469.39,
+      "monthly_rate": 1283.33,
+      "remaining_debt_after": 278595.91,
+      "is_repayment_substitute": false,
+      "savings_rate": 0,
+      "savings_balance": 0
+     }
+    ],
+    "costs": {
+     "planned_costs": 0,
+     "realized_costs": 0,
+     "monthly_costs_planned": 0,
+     "monthly_costs_realized": 0,
+     "financing_costs_planned": 0,
+     "financing_costs_realized": 3850.0000000000005,
+     "total_planned_costs": 0,
+     "total_realized_costs": 3850.0000000000005
+    },
+    "monthly_costs": [],
+    "revenues": []
+   }
+  },
+  "2026-1158": {
+   "objart": "DHH",
+   "vivi_ids": {
+    "projekt": "prj_4eWGVG2vXwkA",
+    "darlehen": {
+     "d1": "fin_472fXP2cRn0z",
+     "d2": "fin_32siU414Fo6g"
+    },
+    "auto_fuer": "e0",
+    "einheiten": {
+     "e0": {
+      "nr": "1",
+      "name": "Haus",
+      "index": null,
+      "fertig": true,
+      "unit_id": "unt_1MAVkt2PVqha",
+      "rental_id": "rtu_0Gt4ZG1X8fZ7"
+     }
+    },
+    "auto_einheit": "unt_1MAVkt2PVqha",
+    "muster_anschrift": true
+   },
+   "gesendet": {
+    "projekt": {
+     "type": "single_family_house",
+     "street": "Musterstraße",
+     "house_number": "1158",
+     "postal_code": "12345",
+     "city": "Musterstadt",
+     "purchase_price": 470000,
+     "purchase_date": "2026-10-01",
+     "units": 1,
+     "construction_year": 2026,
+     "real_estate_transfer_tax": 30550,
+     "notary": 7050,
+     "land_register": 2350
+    },
+    "einheiten": [
+     {
+      "schluessel": "e0",
+      "index": null,
+      "einheit": null,
+      "mietverhaeltnis": {
+       "tenant_first_name": "Mieter",
+       "tenant_last_name": "Haus",
+       "rent": 1650,
+       "monthly_utility_costs": 201,
+       "rental_start": "2026-10-01",
+       "rent_due_day": 3,
+       "unit_identifier": "Haus",
+       "unit_square_meters": 128,
+       "rental_end": "2031-09-30"
+      }
+     }
+    ],
+    "darlehen": [
+     {
+      "schluessel": "d1",
+      "body": {
+       "name": "Darlehen I Beispielbank AG",
+       "financing_type": "primary",
+       "financing_start_date": "2026-10-01",
+       "financing_amount": 300000,
+       "interest_rate": 3.9,
+       "bank_name": "Beispielbank AG",
+       "initial_repayment": 2,
+       "fixed_interest_period": 10
+      }
+     },
+     {
+      "schluessel": "d2",
+      "body": {
+       "name": "Darlehen II Beispielbank AG",
+       "financing_type": "parallel",
+       "financing_start_date": "2026-10-01",
+       "financing_amount": 100000,
+       "interest_rate": 3.7,
+       "bank_name": "Beispielbank AG",
+       "is_repayment_substitute": true,
+       "fixed_interest_period": 10
+      }
+     }
+    ]
+   },
+   "antworten": {
+    "projekt": {
+     "id": "prj_4eWGVG2vXwkA",
+     "name": "Musterstadt - Musterstraße 1158 - Einfamilienhaus",
+     "type": "single_family_house",
+     "street": "Musterstraße",
+     "house_number": "1158",
+     "postal_code": "12345",
+     "city": "Musterstadt",
+     "construction_year": 2026,
+     "purchase_date": "2026-10-01",
+     "description": null,
+     "area": null,
+     "project_type": "bestand",
+     "planned_sale_date": null,
+     "vat_enabled": false,
+     "externally_managed_from": null,
+     "externally_managed_until": null,
+     "purchase_price": 470000,
+     "real_estate_transfer_tax": 30550,
+     "notary": 7050,
+     "land_register": 2350,
+     "broker": 0,
+     "other_costs": 0,
+     "units": [
+      {
+       "id": "unt_1MAVkt2PVqha",
+       "identifier": "Haus",
+       "unit_type": "residential",
+       "square_meters": 128,
+       "rooms": null,
+       "floor": null
+      }
+     ]
+    },
+    "mietverhaeltnisse": [
+     {
+      "id": "rtu_0Gt4ZG1X8fZ7",
+      "project_id": "prj_4eWGVG2vXwkA",
+      "unit_id": "unt_1MAVkt2PVqha",
+      "tenant_first_name": "Mieter",
+      "tenant_last_name": "Haus",
+      "tenant_salutation": null,
+      "tenant_title": null,
+      "tenant_date_of_birth": null,
+      "tenant_phone": null,
+      "tenant_email": null,
+      "is_company": false,
+      "company_name": null,
+      "tenant_alt_street": null,
+      "tenant_alt_zip": null,
+      "tenant_alt_city": null,
+      "rent": 1650,
+      "target_rent": 1650,
+      "monthly_utility_costs": 201,
+      "rental_start": "2026-10-01",
+      "rental_end": "2031-09-30",
+      "rent_due_day": 3,
+      "monthly_hausgeld": null,
+      "occupancy_type": "rented",
+      "contract_type": "free_rent",
+      "last_rent_increase": "2026-10-01",
+      "is_special": false,
+      "index_base_year": null,
+      "index_base_month": null,
+      "index_base_value": null,
+      "index_base_since": null,
+      "index_auto_prepare": false,
+      "deposit_amount": null,
+      "deposit_type": null,
+      "deposit_location": null,
+      "deposit_due_date": null,
+      "deposit_received_date": null,
+      "deposit_returned_date": null,
+      "deposit_retained_amount": null,
+      "deposit_retention_note": null,
+      "vat_rate_rent": null,
+      "vat_rate_utility": null,
+      "vat_rate_deposit": null,
+      "unit": {
+       "id": "unt_1MAVkt2PVqha",
+       "identifier": "Haus",
+       "unit_type": "residential",
+       "square_meters": 128,
+       "rooms": null,
+       "floor": null
+      },
+      "co_tenants": [],
+      "amenities": []
+     }
+    ],
+    "darlehen": [
+     {
+      "id": "fin_472fXP2cRn0z",
+      "project_id": "prj_4eWGVG2vXwkA",
+      "name": "Darlehen I Beispielbank AG",
+      "bank_name": "Beispielbank AG",
+      "financing_type": "primary",
+      "status": "active",
+      "financing_amount": 300000,
+      "interest_rate": 3.9,
+      "initial_repayment": 2,
+      "fixed_monthly_rate": null,
+      "fixed_interest_period": 10,
+      "fixed_interest_end_date": null,
+      "financing_start_date": "2026-10-01",
+      "financing_end_date": null,
+      "equity_amount": null,
+      "equity_percentage": null,
+      "is_bullet_loan": false,
+      "maturity_date": null,
+      "repayment_free_until_date": null,
+      "is_repayment_substitute": false,
+      "is_savings_plan": false,
+      "savings_rate": null,
+      "expected_return_rate": null,
+      "initial_savings_amount": null,
+      "special_repayment_allowed": false,
+      "special_repayment_max_percent": null,
+      "special_repayment_max_amount": null,
+      "disagio_amount": null,
+      "disagio_distribution_years": null,
+      "is_split": false,
+      "share_factor": 1,
+      "current": {
+       "monthly_rate": 1475,
+       "monthly_interest": 973.38,
+       "monthly_repayment": 501.63,
+       "remaining_debt": 299500
+      },
+      "special_repayments": [],
+      "rate_overrides": [],
+      "shares": []
+     },
+     {
+      "id": "fin_32siU414Fo6g",
+      "project_id": "prj_4eWGVG2vXwkA",
+      "name": "Darlehen II Beispielbank AG",
+      "bank_name": "Beispielbank AG",
+      "financing_type": "parallel",
+      "status": "active",
+      "financing_amount": 100000,
+      "interest_rate": 3.7,
+      "initial_repayment": 0,
+      "fixed_monthly_rate": null,
+      "fixed_interest_period": 10,
+      "fixed_interest_end_date": null,
+      "financing_start_date": "2026-10-01",
+      "financing_end_date": null,
+      "equity_amount": null,
+      "equity_percentage": null,
+      "is_bullet_loan": false,
+      "maturity_date": null,
+      "repayment_free_until_date": null,
+      "is_repayment_substitute": true,
+      "is_savings_plan": false,
+      "savings_rate": null,
+      "expected_return_rate": null,
+      "initial_savings_amount": null,
+      "special_repayment_allowed": false,
+      "special_repayment_max_percent": null,
+      "special_repayment_max_amount": null,
+      "disagio_amount": null,
+      "disagio_distribution_years": null,
+      "is_split": false,
+      "share_factor": 1,
+      "current": {
+       "monthly_rate": 308.33,
+       "monthly_interest": 308.33,
+       "monthly_repayment": 0,
+       "remaining_debt": 100000
+      },
+      "special_repayments": [],
+      "rate_overrides": [],
+      "shares": []
+     }
+    ],
+    "tilgungsplan_anfang": [
+     {
+      "date": "2026-10-31",
+      "remaining_debt": 400000,
+      "interest": 1283.33,
+      "repayment": 500,
+      "monthly_rate": 1783.33,
+      "remaining_debt_after": 399500,
+      "is_repayment_substitute": false,
+      "savings_rate": 0,
+      "savings_balance": 0
+     },
+     {
+      "date": "2026-11-30",
+      "remaining_debt": 399500,
+      "interest": 1281.71,
+      "repayment": 501.63,
+      "monthly_rate": 1783.33,
+      "remaining_debt_after": 398998.38,
+      "is_repayment_substitute": false,
+      "savings_rate": 0,
+      "savings_balance": 0
+     },
+     {
+      "date": "2026-12-31",
+      "remaining_debt": 398998.38,
+      "interest": 1280.08,
+      "repayment": 503.26,
+      "monthly_rate": 1783.33,
+      "remaining_debt_after": 398495.12,
+      "is_repayment_substitute": false,
+      "savings_rate": 0,
+      "savings_balance": 0
+     }
+    ],
+    "costs": {
+     "planned_costs": 0,
+     "realized_costs": 0,
+     "monthly_costs_planned": 0,
+     "monthly_costs_realized": 0,
+     "financing_costs_planned": 0,
+     "financing_costs_realized": 1475,
+     "total_planned_costs": 0,
+     "total_realized_costs": 1475
+    },
+    "monthly_costs": [],
+    "revenues": []
+   }
+  },
+  "2026-001": {
+   "objart": "ETW",
+   "vivi_ids": {
+    "projekt": "prj_0w8jrk4bVgJ3",
+    "darlehen": {
+     "d1": "fin_182vdO3rn1Ns"
+    },
+    "auto_fuer": "e0",
+    "einheiten": {
+     "e0": {
+      "nr": "1",
+      "name": "Wohnung",
+      "index": null,
+      "fertig": true,
+      "unit_id": "unt_0An5nH1AUHOt",
+      "rental_id": "rtu_0PdI3K1EFXNE"
+     }
+    },
+    "auto_einheit": "unt_0An5nH1AUHOt",
+    "muster_anschrift": true
+   },
+   "gesendet": {
+    "projekt": {
+     "type": "apartment",
+     "street": "Musterstraße",
+     "house_number": "1",
+     "postal_code": "12345",
+     "city": "Musterstadt",
+     "purchase_price": 200000,
+     "purchase_date": "2026-06-09",
+     "units": 1,
+     "construction_year": 1962,
+     "broker": 7140,
+     "real_estate_transfer_tax": 13000,
+     "notary": 3400,
+     "land_register": 1000,
+     "other_costs": 3000
+    },
+    "einheiten": [
+     {
+      "schluessel": "e0",
+      "index": null,
+      "einheit": null,
+      "mietverhaeltnis": {
+       "tenant_first_name": "Mieter",
+       "tenant_last_name": "Wohnung",
+       "rent": 1100,
+       "monthly_utility_costs": 13,
+       "rental_start": "2026-06-09",
+       "rent_due_day": 3,
+       "unit_identifier": "Wohnung",
+       "unit_square_meters": 100,
+       "unit_floor": "1. OG"
+      }
+     }
+    ],
+    "darlehen": [
+     {
+      "schluessel": "d1",
+      "body": {
+       "name": "Darlehen I Demo-Bank (Platzhalter)",
+       "financing_type": "primary",
+       "financing_start_date": "2026-07-01",
+       "financing_amount": 180000,
+       "interest_rate": 3,
+       "bank_name": "Demo-Bank (Platzhalter)",
+       "initial_repayment": 1,
+       "fixed_interest_period": 10
+      }
+     }
+    ]
+   },
+   "antworten": {
+    "projekt": {
+     "id": "prj_0w8jrk4bVgJ3",
+     "name": "Musterstadt - Musterstraße 1 - Wohnung",
+     "type": "apartment",
+     "street": "Musterstraße",
+     "house_number": "1",
+     "postal_code": "12345",
+     "city": "Musterstadt",
+     "construction_year": 1962,
+     "purchase_date": "2026-06-09",
+     "description": null,
+     "area": null,
+     "project_type": "bestand",
+     "planned_sale_date": null,
+     "vat_enabled": false,
+     "externally_managed_from": null,
+     "externally_managed_until": null,
+     "purchase_price": 200000,
+     "real_estate_transfer_tax": 13000,
+     "notary": 3400,
+     "land_register": 1000,
+     "broker": 7140,
+     "other_costs": 3000,
+     "units": [
+      {
+       "id": "unt_0An5nH1AUHOt",
+       "identifier": "Wohnung",
+       "unit_type": "residential",
+       "square_meters": 100,
+       "rooms": null,
+       "floor": "1. OG"
+      }
+     ]
+    },
+    "mietverhaeltnisse": [
+     {
+      "id": "rtu_0PdI3K1EFXNE",
+      "project_id": "prj_0w8jrk4bVgJ3",
+      "unit_id": "unt_0An5nH1AUHOt",
+      "tenant_first_name": "Mieter",
+      "tenant_last_name": "Wohnung",
+      "tenant_salutation": null,
+      "tenant_title": null,
+      "tenant_date_of_birth": null,
+      "tenant_phone": null,
+      "tenant_email": null,
+      "is_company": false,
+      "company_name": null,
+      "tenant_alt_street": null,
+      "tenant_alt_zip": null,
+      "tenant_alt_city": null,
+      "rent": 1100,
+      "target_rent": 1100,
+      "monthly_utility_costs": 13,
+      "rental_start": "2026-06-09",
+      "rental_end": null,
+      "rent_due_day": 3,
+      "monthly_hausgeld": null,
+      "occupancy_type": "rented",
+      "contract_type": "free_rent",
+      "last_rent_increase": "2026-06-09",
+      "is_special": false,
+      "index_base_year": null,
+      "index_base_month": null,
+      "index_base_value": null,
+      "index_base_since": null,
+      "index_auto_prepare": false,
+      "deposit_amount": null,
+      "deposit_type": null,
+      "deposit_location": null,
+      "deposit_due_date": null,
+      "deposit_received_date": null,
+      "deposit_returned_date": null,
+      "deposit_retained_amount": null,
+      "deposit_retention_note": null,
+      "vat_rate_rent": null,
+      "vat_rate_utility": null,
+      "vat_rate_deposit": null,
+      "unit": {
+       "id": "unt_0An5nH1AUHOt",
+       "identifier": "Wohnung",
+       "unit_type": "residential",
+       "square_meters": 100,
+       "rooms": null,
+       "floor": "1. OG"
+      },
+      "co_tenants": [],
+      "amenities": []
+     }
+    ],
+    "darlehen": [
+     {
+      "id": "fin_182vdO3rn1Ns",
+      "project_id": "prj_0w8jrk4bVgJ3",
+      "name": "Darlehen I Demo-Bank (Platzhalter)",
+      "bank_name": "Demo-Bank (Platzhalter)",
+      "financing_type": "primary",
+      "status": "active",
+      "financing_amount": 180000,
+      "interest_rate": 3,
+      "initial_repayment": 1,
+      "fixed_monthly_rate": null,
+      "fixed_interest_period": 10,
+      "fixed_interest_end_date": null,
+      "financing_start_date": "2026-07-01",
+      "financing_end_date": null,
+      "equity_amount": null,
+      "equity_percentage": null,
+      "is_bullet_loan": false,
+      "maturity_date": null,
+      "repayment_free_until_date": null,
+      "is_repayment_substitute": false,
+      "is_savings_plan": false,
+      "savings_rate": null,
+      "expected_return_rate": null,
+      "initial_savings_amount": null,
+      "special_repayment_allowed": false,
+      "special_repayment_max_percent": null,
+      "special_repayment_max_amount": null,
+      "disagio_amount": null,
+      "disagio_distribution_years": null,
+      "is_split": false,
+      "share_factor": 1,
+      "current": {
+       "monthly_rate": 600,
+       "monthly_interest": 448.49,
+       "monthly_repayment": 151.51,
+       "remaining_debt": 179397.75
+      },
+      "special_repayments": [],
+      "rate_overrides": [],
+      "shares": []
+     }
+    ],
+    "tilgungsplan_anfang": [
+     {
+      "date": "2026-07-31",
+      "remaining_debt": 180000,
+      "interest": 450,
+      "repayment": 150,
+      "monthly_rate": 600,
+      "remaining_debt_after": 179850,
+      "is_repayment_substitute": false,
+      "savings_rate": 0,
+      "savings_balance": 0
+     },
+     {
+      "date": "2026-08-31",
+      "remaining_debt": 179850,
+      "interest": 449.63,
+      "repayment": 150.38,
+      "monthly_rate": 600,
+      "remaining_debt_after": 179699.63,
+      "is_repayment_substitute": false,
+      "savings_rate": 0,
+      "savings_balance": 0
+     },
+     {
+      "date": "2026-09-30",
+      "remaining_debt": 179699.63,
+      "interest": 449.25,
+      "repayment": 150.75,
+      "monthly_rate": 600,
+      "remaining_debt_after": 179548.87,
+      "is_repayment_substitute": false,
+      "savings_rate": 0,
+      "savings_balance": 0
+     }
+    ],
+    "costs": {
+     "planned_costs": 0,
+     "realized_costs": 0,
+     "monthly_costs_planned": 0,
+     "monthly_costs_realized": 0,
+     "financing_costs_planned": 0,
+     "financing_costs_realized": 2400,
+     "total_planned_costs": 0,
+     "total_realized_costs": 2400
+    },
+    "monthly_costs": [],
+    "revenues": []
+   }
+  }
+ },
+ "steueruebersicht_objekt": {
+  "year": 2026,
+  "project_id": "prj_34f3ix17DflJ",
+  "project_name": "Musterstadt - Musterstraße 1041 - Mehrfamilienhaus",
+  "income": [
+   {
+    "zeile": "13-15",
+    "label": "Mieteinnahmen für Wohnungen",
+    "amount": 32850
+   },
+   {
+    "zeile": "20",
+    "label": "Umgelegte Nebenkosten (Vorauszahlungen)",
+    "amount": 9760
+   },
+   {
+    "zeile": "26",
+    "label": "Sonstige Einnahmen",
+    "amount": 0
+   },
+   {
+    "zeile": "27",
+    "label": "Vereinnahmte Umsatzsteuer",
+    "amount": 0
+   }
+  ],
+  "expenses": [
+   {
+    "zeile": "33-35",
+    "label": "AfA auf Gebäude",
+    "amount": 0
+   },
+   {
+    "zeile": "42-45",
+    "label": "AfA auf bewegliche Wirtschaftsgüter",
+    "amount": 0
+   },
+   {
+    "zeile": "46-48",
+    "label": "Schuldzinsen, Geldbeschaffungskosten",
+    "amount": 15524.77
+   },
+   {
+    "zeile": "55-72",
+    "label": "Erhaltungsaufwendungen",
+    "amount": 0
+   },
+   {
+    "zeile": "73-75",
+    "label": "Umgelegte Betriebskosten",
+    "amount": 0
+   },
+   {
+    "zeile": "76-78",
+    "label": "Nicht umgelegte Kosten",
+    "amount": 0
+   },
+   {
+    "zeile": "79",
+    "label": "Gezahlte Umsatzsteuer",
+    "amount": 0
+   },
+   {
+    "zeile": "80-82",
+    "label": "Sonstige Kosten",
+    "amount": 0
+   }
+  ],
+  "summary": {
+   "total_income": 42610,
+   "total_expenses": 15524.77,
+   "surplus": 27085.23
+  },
+  "fifteen_percent_rule": {
+   "limit": 74405.58,
+   "used_net": 0,
+   "remaining": 74405.58,
+   "percentage_used": 0,
+   "exceeded": false,
+   "borderline": false,
+   "window_end": "01.01.2028"
+  },
+  "self_occupancy_warning": null
+ },
+ "steueruebersicht_konto": {
+  "year": 2026,
+  "projects": [
+   {
+    "project_id": "prj_0w8jrk4bVgJ3",
+    "project_name": "Musterstadt - Musterstraße 1 - Wohnung",
+    "total_income": 5565,
+    "total_expenses": 1797.75,
+    "surplus": 3767.25,
+    "fifteen_percent_rule_exceeded": false
+   },
+   {
+    "project_id": "prj_2Ynied1lGHAX",
+    "project_name": "Musterstadt - Musterstraße 1006 - Mehrfamilienhaus",
+    "total_income": 0,
+    "total_expenses": 2445.91,
+    "surplus": -2445.91,
+    "fifteen_percent_rule_exceeded": false
+   },
+   {
+    "project_id": "prj_34f3ix17DflJ",
+    "project_name": "Musterstadt - Musterstraße 1041 - Mehrfamilienhaus",
+    "total_income": 42610,
+    "total_expenses": 15524.77,
+    "surplus": 27085.23,
+    "fifteen_percent_rule_exceeded": false
+   },
+   {
+    "project_id": "prj_2VorIh2u3uhX",
+    "project_name": "Musterstadt - Musterstraße 1053 - Mehrfamilienhaus",
+    "total_income": 70180,
+    "total_expenses": 30403.2,
+    "surplus": 39776.8,
+    "fifteen_percent_rule_exceeded": false
+   },
+   {
+    "project_id": "prj_0XQ3hs2htSc7",
+    "project_name": "Musterstadt - Musterstraße 1157 - Wohnung",
+    "total_income": 12150,
+    "total_expenses": 10865.18,
+    "surplus": 1284.82,
+    "fifteen_percent_rule_exceeded": false
+   },
+   {
+    "project_id": "prj_4eWGVG2vXwkA",
+    "project_name": "Musterstadt - Musterstraße 1158 - Einfamilienhaus",
+    "total_income": 1851,
+    "total_expenses": 1283.33,
+    "surplus": 567.67,
+    "fifteen_percent_rule_exceeded": false
+   }
+  ],
+  "general": {
+   "income": [],
+   "expenses": [],
+   "summary": {
+    "total_income": 0,
+    "total_expenses": 0,
+    "surplus": 0
+   }
+  },
+  "summary": {
+   "total_income": 132356,
+   "total_expenses": 62320.14,
+   "surplus": 70035.86,
+   "project_count": 7
+  }
+ }
+}

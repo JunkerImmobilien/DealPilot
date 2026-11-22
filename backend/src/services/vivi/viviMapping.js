@@ -34,6 +34,7 @@ const VERTRAG_NACH_VIVI = { staffel: 'stepped_rent', index: 'indexed_rent' };
 const VERTRAG_AUS_VIVI = { stepped_rent: 'staffel', indexed_rent: 'index' };
 const UL_FELDER = ['hg_ul', 'grundsteuer', 'ul_sonst', 'kp1', 'kp2', 'kp3', 'kp4'];   /* wie calc.js und main.js V187 */
 const FAELLIG_TAG = 3;
+const NK_MIN_QM = 0.5;   /* v3953 · €/m² im Monat, darunter Hinweis „auffällig niedrig“ */
 const MUSTER_ANSCHRIFT = Object.freeze({ street: 'Musterstraße', postal_code: '12345', city: 'Musterstadt' });   /* v3951 */
 
 /* ── Zahlen und Daten ─────────────────────────────────────────────────── */
@@ -201,6 +202,7 @@ function nachVivi(daten, opt) {
   const mitListe = einheitenListe(daten);
   const faellig = Math.min(31, Math.max(1, Math.round(zahl(opt.faelligTag) || FAELLIG_TAG)));
   const leerMeldung = [];
+  const nkNiedrig = [];
   function miete(e, name, qm, etage, ist, nkEigen, nkIndex, stp) {
     const n = mieterName(e.mv_mieter, name, !!opt.platzhalterNamen);
     const nkWert = zahl(nkEigen);
@@ -222,6 +224,8 @@ function nachVivi(daten, opt) {
     const notizen = [];
     if (n.platzhalter) notizen.push('Mietername als Platzhalter');
     if (nkWert == null) notizen.push(nkV != null ? 'Nebenkosten aus den umlagefähigen Kosten abgeleitet, bitte prüfen' : 'Nebenkosten unbekannt, mit 0 € angesetzt');
+    /* v3953 · unter 0,50 €/m² im Monat ist ein abgeleiteter Abschlag fast sicher zu niedrig (2026-1053/1055: 3 bis 4 €) */
+    if (nkWert == null && nkV != null && qm > 0 && nkV / qm < NK_MIN_QM) { notizen.push('nur ' + String(rund(nkV / qm, 2)).replace('.', ',') + ' €/m², auffällig niedrig'); nkNiedrig.push(name); }
     if (!isoDatum(e.mv_beginn)) notizen.push(kauf ? 'Mietbeginn fehlt, angesetzt ist der Übergang' : 'Mietbeginn fehlt');
     if (!beginn) fehlt.push({ feld: 'mv_beginn', text: 'Mietbeginn fehlt bei ' + name });
     if (!(qm > 0)) fehlt.push({ feld: 'wfl', text: 'Wohnfläche fehlt bei ' + name });
@@ -262,6 +266,10 @@ function nachVivi(daten, opt) {
     if (a === 'ZFH' || a === 'MFH') hinweise.push('Keine Einheiten erfasst. Übertragen wird eine Einheit für das ganze Haus. Genauer wird es mit den Einheiten im Reiter Objekt.');
     einheiten.push(eintrag);
   }
+  if (nkNiedrig.length) hinweise.push('Die abgeleitete Nebenkosten-Vorauszahlung ist auffällig niedrig bei ' + nkNiedrig.join(', ') + '. Bitte vor dem Anlegen die Vorauszahlung je Einheit eintragen.');
+  /* v3953 · ViVi legt mit dem Objekt immer eine Einheit an (units, Minimum 1). Ihren Namen und ihre Flaeche setzt nur ein
+     Mietverhaeltnis. Ist keine Einheit vermietet, bleibt sie in ViVi „Einheit 1“ ohne Flaeche (gemessen an 2026-1006). */
+  if (einheiten.length && !einheiten.some(function (x) { return x.miete; })) hinweise.push('Keine Einheit ist vermietet. ViVi legt die erste Einheit deshalb als „Einheit 1“ ohne Fläche an. Name und Fläche von ' + einheiten[0].name + ' bitte in ViVi ergänzen.');
   if (einheiten.some(function (x) { return x.miete; })) hinweise.push('ViVi legt ab Mietbeginn die Sollstellungen an und markiert die Monate bis heute als bezahlt.');
   if (einheiten.some(function (x) { return x.miete && x.miete.tenant_first_name === 'Mieter'; })) hinweise.push('Wo kein Mietername erfasst ist, steht in ViVi ein Platzhalter. Den echten Namen trägst du in ViVi ein.');
 
@@ -397,7 +405,10 @@ function ausVivi(paket, kontext) {
     setze(P + 'mv_befristet_bis', isoDatum(r.rental_end), rq);
     /* Kaution gibt es in DealPilot nur je Wohnung (_mfh), nicht am Einzelobjekt */
     const kaution = zahl(r.deposit_amount); if (P && kaution != null && kaution > 0) setze(P + 'mv_kaution', rund(kaution), rq);
-    setze(P + 'mv_letzte_erhoehung', isoDatum(r.last_rent_increase), rq);
+    /* v3953 · ViVi setzt last_rent_increase beim Anlegen ohne Angabe auf den Mietbeginn (gemessen 22.11.2026 am
+       Testkonto, 2026-001, 1158, 1053 WE 5, 1055 GE 1). Das ist keine Erhoehung, also nicht zuruecklesen. */
+    const erh = isoDatum(r.last_rent_increase);
+    if (erh && erh !== isoDatum(r.rental_start)) setze(P + 'mv_letzte_erhoehung', erh, rq);
     const va = VERTRAG_AUS_VIVI[text(r.contract_type)]; if (va) setze(P + 'mv_art', va, rq);
     const stp = stellplatzMiete(r); if (stp != null) setze(P ? P + 'stellplatz_miete' : 'ze_stp_monat', stp, rq);
   });
@@ -447,5 +458,5 @@ function ausVivi(paket, kontext) {
 
 module.exports = {
   nachVivi, ausVivi, nkVorschlag, ulJahr, einheitenListe, zahl, isoDatum, monatDatum, etageText, etageZahl, mieterName,
-  OBJEKTTYP, VERTRAG_NACH_VIVI, VERTRAG_AUS_VIVI, UL_FELDER, ARTEN_MIT_EINHEITEN, MUSTER_ANSCHRIFT
+  NK_MIN_QM, OBJEKTTYP, VERTRAG_NACH_VIVI, VERTRAG_AUS_VIVI, UL_FELDER, ARTEN_MIT_EINHEITEN, MUSTER_ANSCHRIFT
 };

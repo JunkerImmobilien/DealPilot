@@ -7,6 +7,15 @@
  *   GET /projects/{p}/costs                     200: { data: array<{}> }    Summen geplanter und angefallener Kosten
  *   GET /projects/{p}/monthly-costs             200: { data: array<{}> }    laufende Kosten (Hausgeld, Grundsteuer …)
  *   GET /projects/{p}/revenues                  200: { data: array<{}> }    Erloese ausserhalb der Miete
+ *
+ * v3953 · GEMESSEN am Testkonto (22.11.2026, Antworten in tools/vivi-antworten/): die Spezifikation stimmt hier nicht.
+ *   /tax-overview?year=&project_id=  data ist ein OBJEKT: { year, project_id, income: [{ zeile: '13-15', label, amount }],
+ *                                    expenses: [{ zeile: '46-48', ... }], summary, fifteen_percent_rule }. Ohne project_id
+ *                                    nur Summen je Objekt (projects[].total_income/total_expenses), keine Zeilen.
+ *   /projects/{p}/costs              data ist ein OBJEKT mit Summen (planned_costs, realized_costs, financing_costs_...),
+ *                                    keine Positionen und keine Steuerkategorie. ausKosten() findet darin nichts (richtig so).
+ *   /monthly-costs, /revenues        Listen, im Testkonto leer: Feldnamen weiter offen.
+ * ausSteueruebersicht() liest deshalb das Objekt (Zeilenbereich -> Spalte) und als Rueckfall den Text.
  * Die Schluessel unten (amount, tax_category, interval …) sind deshalb ANNAHMEN nach dem Hilfe-Center
  * (kb/objekt-kosten.html: Steuerkategorien „Erhaltungsaufwand“, „Hausgeld (WEG)“, „Hausgeld (Vorauszahlung)“,
  * „Hausgeld (Rücklage)“, „Sonstige Werbungskosten“, „Nicht absetzbar“ …). Jede Funktion nimmt mehrere Schreibweisen
@@ -61,6 +70,21 @@ function betrag(o) { return zahl(erstes(o, ['amount', 'gross_amount', 'total', '
  */
 function ausSteueruebersicht(text) {
   const aus = {};
+  /* v3953 · echte Form: Objekt mit income[] und expenses[], zeile als Bereich '13-15'. Betrag 0 heisst bei ViVi
+     „nichts gebucht“, nicht „null Euro Aufwand“: kein Wert. */
+  if (text && typeof text === 'object') {
+    [].concat(Array.isArray(text.income) ? text.income : [], Array.isArray(text.expenses) ? text.expenses : []).forEach(function (z) {
+      if (!z || typeof z !== 'object') return;
+      const m = /^(\d{1,3})(?:\s*-\s*(\d{1,3}))?$/.exec(String(z.zeile == null ? '' : z.zeile).trim());
+      if (!m) return;
+      const von = +m[1], bis = m[2] ? +m[2] : von;
+      const n = zahl(z.amount); if (n == null || n === 0) return;
+      Object.keys(ZEILE_ZU_SPALTE).forEach(function (k) {
+        if (+k >= von && +k <= bis) { const sp = ZEILE_ZU_SPALTE[k]; aus[sp] = rund((aus[sp] || 0) + Math.abs(n)); }
+      });
+    });
+    return aus;
+  }
   String(text == null ? '' : text).split(/\r?\n/).forEach(function (z) {
     const m = /(?:Zeile|Z\.)\s*(\d{1,3})\b[^\n]*?(-?\d{1,3}(?:\.\d{3})*,\d{2}|-?\d+,\d{2}|-?\d+\.\d{2})\s*(?:€|EUR)?\s*$/i.exec(z);
     if (!m) return;

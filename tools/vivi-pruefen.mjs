@@ -24,6 +24,8 @@
  *      dann nicht zurueckgelesen, Gegenprobe ohne Testbetrieb
  *   V5 v3951 Unterlagen-Abgleich: vivi_abweichung an den echten Dateien dokument-import.js + vivi-felder.js, nie
  *      vorgehakt, Hinweis Zeichen fuer Zeichen, Entscheidung gemerkt, lokal festlegen ohne Netz, Gegenproben
+ *   R  v3953 Echte Antworten aus dem Testkonto (tools/vivi-antworten/): Rundweg, gelesene Felder, was ViVi selbst setzt,
+ *      Steueruebersicht als Objekt
  *   V4 v3951 Steuer als Entwurf: Schalter aus, Lesepfade in der Spezifikation, Zielspalten in tax_records, Auslese an
  *      nachgebauten Antworten (Feldnamen sind Annahmen, erst mit Key pruefbar)
  *
@@ -829,7 +831,7 @@ kopf('V4 Steuer: Entwurf hinter dem Schalter, nicht aktiv');
   ok(/if \(steuer\.AKTIV\) \{/.test(ds) && !/steuer\.(ausViviSteuer|lesePfade)/.test(ds.replace(/if \(steuer\.AKTIV\) \{[\s\S]*?\n    \}/, '')), 'viviDienst ruft den Steuer-Entwurf nur hinter if (steuer.AKTIV) (' + nutz + ' Stellen)');
   const TO = SPEC.paths['/tax-overview'] && SPEC.paths['/tax-overview'].get;
   const toTyp = TO && TO.responses['200'].content['application/json'].schema.properties.data.type;
-  ok(toTyp === 'string', 'Spezifikation: /tax-overview liefert data als string (deshalb Textauslese)');
+  ok(toTyp === 'string', 'Spezifikation: /tax-overview liefert data als string (gemessen: Objekt, siehe Teil R, die Textauslese bleibt Rückfall)');
   const pf = steuerEntwurf.lesePfade('p1', 2026).map((x) => x.pfad.replace('/projects/p1', '/projects/{project}'));
   ok(pf.every((x) => SPEC.paths[x] && SPEC.paths[x].get), 'alle Lesepfade stehen in der Spezifikation mit GET: ' + pf.join(', '));
   const mig = lies('backend/migrations/005_tax_records.sql') + lies('backend/migrations/006_tax_extended.sql');
@@ -848,6 +850,65 @@ kopf('V4 Steuer: Entwurf hinter dem Schalter, nicht aktiv');
   ok(!Object.keys(f).some((k) => /ruecklage/.test(k)) && r.vorschlaege['steuer.2026.sonst_kosten'].wert === 120 && !f['steuer.2026.sonst_kosten'], 'Rücklage ohne Abzug, sonstige Werbungskosten nur als Vorschlag (nicht verknüpft)');
   ok(f.hg_ul.wert === 2400 && f.hg_nul.wert === 1284, 'laufendes Hausgeld je Jahr: umlagefähig 200 × 12 = 2.400, nicht umlagefähig 107 × 12 = 1.284, Grundsteuer kein Hausgeld');
   ok(Object.keys(steuerEntwurf.ausViviSteuer({}, 2026).felder).length === 0, 'leere oder unbekannte Antworten: kein Wert (nie geraten)');
+}
+
+/* ═══ R · Echte Antworten aus dem Testkonto (v3953) ═══════════════════════ */
+kopf('R  Echte ViVi-Antworten (Testkonto, 22.11.2026, tools/vivi-antworten/)');
+{
+  const ECHT = JSON.parse(lies('tools/vivi-antworten/testkonto-2026-11-22.json'));
+  const jetzt = Date.parse(ECHT.jetzt);
+  const befunde = [], gelesenEcht = [];
+  let werte = 0;
+  for (const [nr, o] of Object.entries(ECHT.objekte)) {
+    const a = o.antworten;
+    const mitE = Object.values(o.vivi_ids.einheiten || {}).some((g) => g.index != null);
+    const paket = {
+      projekt: beobachtet(a.projekt, SPEC.components.schemas.ProjectResource, 'ProjectResource', gelesenEcht),
+      einheiten: a.projekt.units.map((u) => beobachtet(u, SPEC.components.schemas.UnitResource, 'UnitResource', gelesenEcht)),
+      mietverhaeltnisse: a.mietverhaeltnisse.map((r) => beobachtet(r, SPEC.components.schemas.RentalUnitResource, 'RentalUnitResource', gelesenEcht)),
+      darlehen: a.darlehen.map((f) => beobachtet(f, SPEC.components.schemas.FinancingResource, 'FinancingResource', gelesenEcht)),
+      tilgungsplan: { data: a.tilgungsplan_anfang }
+    };
+    const F = mapping.ausVivi(paket, { vivi_ids: o.vivi_ids, mitEinheiten: mitE, objart: o.objart, jetzt, musterAnschrift: true }).felder;
+    const z = mapping.zahl;
+    const soll = (feld, w) => { if (w == null || w === '') return; werte++; const ist = F[feld] && F[feld].wert; const g = typeof w === 'number' ? Math.abs(z(ist) - w) < 0.01 : String(ist) === String(w); if (!g) befunde.push(nr + ' ' + feld + ': ' + JSON.stringify(ist) + ' statt ' + JSON.stringify(w)); };
+    const g = o.gesendet;
+    soll('kp', g.projekt.purchase_price); soll('wirtschaftlicher_uebergang', g.projekt.purchase_date);
+    if (g.projekt.construction_year) soll('baujahr', String(g.projekt.construction_year));
+    ['str', 'hnr', 'plz', 'ort'].forEach((k) => { if (F[k]) befunde.push(nr + ' ' + k + ' trotz Musteranschrift zurückgelesen'); });
+    g.einheiten.forEach((e) => {
+      const P = mitE ? 'einheit.' + e.index + '.' : '';
+      const m = e.mietverhaeltnis;
+      if (!m) { if (mitE) soll(P + 'status', 'leer'); return; }
+      if (mitE) { soll(P + 'status', 'vermietet'); soll(P + 'ist', m.rent); soll(P + 'wfl', m.unit_square_meters); if (m.deposit_amount) soll(P + 'mv_kaution', m.deposit_amount); }
+      else { soll('nkm', m.rent); soll('wfl', m.unit_square_meters); }
+      soll(P + 'nk_vorauszahlung', m.monthly_utility_costs); soll(P + 'mv_beginn', m.rental_start); soll(P + 'mv_befristet_bis', m.rental_end);
+      soll(P + 'mv_letzte_erhoehung', m.last_rent_increase);
+      if (!m.last_rent_increase && F[P + 'mv_letzte_erhoehung']) befunde.push(nr + ' ' + P + 'mv_letzte_erhoehung: ViVi-Vorgabe (= Mietbeginn) als Erhöhung gelesen');
+      if (m.amenities) soll(mitE ? P + 'stellplatz_miete' : 'ze_stp_monat', m.amenities.reduce((s, x) => s + x.monthly_rent, 0));
+    });
+    g.darlehen.forEach((d) => { const k = d.schluessel; soll(k, d.body.financing_amount); soll(k + 'z', d.body.interest_rate); if (d.body.initial_repayment != null) soll(k + 't', d.body.initial_repayment); });
+  }
+  ok(!befunde.length && werte > 60, 'Rundweg an echten Antworten: ' + werte + ' gesendete Werte kommen gleich zurück, Anschrift bleibt liegen' + (befunde.length ? ':\n        ' + befunde.slice(0, 10).join('\n        ') : ''));
+  const fehltEcht = [...new Set(gelesenEcht.filter((x) => !x[2]).map((x) => x[0] + '.' + x[1]))];
+  ok(gelesenEcht.length > 50 && !fehltEcht.length, 'ausVivi liest an echten Antworten nur Felder aus den Resource-Schemas' + (fehltEcht.length ? ': ' + fehltEcht.join(', ') : ''));
+  /* Was ViVi selbst setzt (gemessen): letzte Erhoehung = Mietbeginn, Vertragsart free_rent, Einheit 1 ohne Flaeche */
+  const b1158 = ECHT.objekte['2026-1158'].antworten.mietverhaeltnisse[0];
+  ok(b1158.last_rent_increase === b1158.rental_start && b1158.contract_type === 'free_rent', 'gemessen: ViVi setzt last_rent_increase = rental_start und contract_type free_rent, wenn nichts gesendet wird');
+  const o1006 = ECHT.objekte['2026-1006'];
+  const e1006 = o1006.antworten.projekt.units.find((u) => u.id === o1006.vivi_ids.auto_einheit);
+  ok(e1006 && e1006.identifier === 'Einheit 1' && e1006.square_meters == null, 'gemessen: ohne Mietverhältnis bleibt die automatische Einheit „Einheit 1“ ohne Fläche (2026-1006)');
+  const plan1006 = mapping.nachVivi({ objart: 'ZFH', kp: '100000', wirtschaftlicher_uebergang: '2026-01-01', _mfh: { einheiten: [{ nr: '1', wfl: '80', status: 'leer' }, { nr: '2', wfl: '60', status: 'leer' }] } }, { musterAnschrift: true });
+  ok(plan1006.hinweise.some((h) => /Einheit 1“ ohne Fläche/.test(h)), 'Vorschau sagt es vorher: „Keine Einheit ist vermietet …“');
+  const nkPlan = mapping.nachVivi({ objart: 'MFH', kp: '100000', wirtschaftlicher_uebergang: '2026-01-01', grundsteuer: '336', _mfh: { einheiten: [{ nr: '1', wfl: '79', ist: '717', status: 'vermietet', mv_beginn: '2020-01-01' }, { nr: '2', wfl: '79', ist: '717', status: 'vermietet', mv_beginn: '2020-01-01' }] } }, { musterAnschrift: true });
+  ok(nkPlan.hinweise.some((h) => /auffällig niedrig/.test(h)) && nkPlan.einheiten[0].miete.monthly_utility_costs === 14, 'abgeleitete NK-Vorauszahlung unter 0,50 €/m²: Hinweis „auffällig niedrig“, der Wert selbst bleibt (14 €)');
+  /* V4 an den echten Antworten */
+  const so = ECHT.steueruebersicht_objekt;
+  ok(so && typeof so === 'object' && Array.isArray(so.income) && so.income.some((x) => x.zeile === '13-15'), 'gemessen: /tax-overview mit project_id liefert ein Objekt mit income[]/expenses[] und Zeilenbereichen (Spezifikation sagt string)');
+  const tv = steuerEntwurf.ausSteueruebersicht(so);
+  ok(tv.einnahmen_km === 32850 && tv.einnahmen_nk === 9760 && tv.schuldzinsen === 15524.77 && tv.erhaltungsaufwand === undefined, 'Steuerübersicht als Objekt: Zeile 13-15, 20, 46-48 erkannt, Betrag 0 (nichts gebucht) ist kein Wert');
+  const ko = ECHT.objekte['2026-1041'].antworten.costs;
+  ok(ko && !Array.isArray(ko) && 'realized_costs' in ko && !Object.keys(steuerEntwurf.ausKosten(ko, 2026).verknuepft).length, 'gemessen: /costs ist ein Summen-Objekt ohne Steuerkategorie, daraus wird nichts gelesen');
 }
 
 dienst._setzeDeps(null);
