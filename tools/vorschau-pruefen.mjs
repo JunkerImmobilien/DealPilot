@@ -201,6 +201,8 @@ console.log('E  Gegenprobe (Kopien im Speicher, je eine Sperre entfernt)');
 const proben = [
   ['Route gutachterpartner ohne router.use(vorschau.sperre)', 'backend/src/routes/gutachterpartner.js', (t) => t.replace(/router\.use\(vorschau\.sperre\('gutachten_org'\)\);/, '')],
   ['Route wuensche ohne Sperre', 'backend/src/routes/wuensche.js', (t) => t.replace(/router\.use\(vorschau\.sperre\('umsetzungswuensche'\)\);/, '')],
+  ['Route vivi ohne Sperre (v3950)', 'backend/src/routes/vivi.js', (t) => t.replace(/router\.use\(vorschau\.sperre\('vivi'\)\);/, '')],
+  ['vivi.js (App) ohne DpVorschau.frei (v3950)', 'frontend/js/vivi.js', (t) => t.split("DpVorschau.frei('vivi')").join('DpVorschau.x()')],
   ['Sperre der Route nach der ersten Route', 'backend/src/routes/gutachterpartner.js', (t) => t.replace(/router\.use\(vorschau\.sperre\('gutachten_org'\)\);/, '') + "\nrouter.use(vorschau.sperre('gutachten_org'));\n"],
   ['PDF dok_vermoegen ohne vorschau.darf', 'backend/src/services/telegramPdfService.js', (t) => t.replace(/\.darf\(\{ id: s\.userId, role: s\.role \}, 'vermoegen'\)/, '.nix()')],
   ['gutachterpartner.js (App) ohne DpVorschau.frei', 'frontend/js/gutachterpartner.js', (t) => t.split("DpVorschau.frei('gutachten_org')").join('DpVorschau.x()')],

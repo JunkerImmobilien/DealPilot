@@ -264,6 +264,7 @@ window.DpDetailgradZuordnung = {
      "mv_befristet_bis",
      "mv_kuendigungsverzicht_bis",
      "mv_abw_jahre",
+     "nk_vorauszahlung",
      "kostenstg",
      "btj",
      "exit_bmy",

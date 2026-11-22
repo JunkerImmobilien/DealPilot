@@ -179,6 +179,8 @@ var FIELDS = [
      beim Speichern lautlos. */
   'mv_art','mv_beginn','mv_letzte_erhoehung','mv_letzte_erhoehung_betrag',   /* v2545 */
   'mv_befristet_bis','mv_kuendigungsverzicht_bis','mv_abw_jahre',   /* v2660 · E2 · Restlaufzeit der Mietabweichung am Einzelobjekt */
+  'nk_vorauszahlung',   /* v3950 · Nebenkosten-Vorauszahlung des Mieters je Monat (§ 556 Abs. 2 BGB), Stammdatum fuer ViVi, kein Kern liest es. Beim MFH je Wohnung in _mfh */
+  '_vivi',              /* v3950 · ViVi-Verknuepfung (js/vivi-felder.js): eigene Werte und Anzeige-Spiegel, JSON im versteckten Feld */
   // V36: DealScore 2.0 Zusatzangaben
   'ds2_zustand','ds2_energie','ds2_mietausfall','ds2_marktmiete',
   'ds2_bevoelkerung','ds2_nachfrage','ds2_marktfaktor',
@@ -715,6 +717,7 @@ function loadData(d) {
        Daten, Befristung und Kuendigungsverzicht von A und schrieb sie beim Speichern mit */
     'mv_art', 'mv_beginn', 'mv_letzte_erhoehung', 'mv_letzte_erhoehung_betrag',
     'mv_befristet_bis', 'mv_kuendigungsverzicht_bis', 'mv_abw_jahre',
+    'nk_vorauszahlung', '_vivi',   /* v3950: sonst erbt Objekt B die Vorauszahlung und die ViVi-Verknuepfung von A */
     /* v3073: sonst erbt ein Bestandsobjekt ohne Detailgrad den des vorigen Objekts (leer = Experte) */
     'dp_stufe'
   ].concat(WM_FIELDS);  /* v1136-WMTAB-1: dieselbe Falle, siehe Kommentar an WM_FIELDS */

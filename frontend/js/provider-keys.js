@@ -20,6 +20,7 @@
         '<p class="hint" style="margin:0 0 12px">Meta-Suche für Off-Market-Deals. Erfordert ein <b>Investor-Pro-Abo</b> bei ImmoMetrica – den API-Token findest du dort im Dashboard.</p>' +
         '<div id="pk-imo-body"></div>' +
       '</div>' +
+      '<div id="pk-vivi-host"></div>' +   /* v3950 · ViVi-Verbindung (js/vivi.js, nur Vorschau-Funktion vivi) */
       '<p class="hint" style="margin-top:12px;font-size:11px;color:var(--muted,#5F5E5A)">Weitere Bewertungspartner folgen.</p>';
   }
 
@@ -75,7 +76,7 @@
 
   var api = {
     renderPane: renderPane,
-    afterRender: load,
+    afterRender: function () { load(); try { if (window.DpVivi) window.DpVivi.verbindungKarte(document.getElementById('pk-vivi-host')); } catch (e) {} },   /* v3950 */
     save: function () {
       var inp = document.getElementById('pk-imo-input'); if (!inp) return;
       var v = (inp.value || '').trim(); if (!v) { alert('Bitte Token eingeben.'); return; }

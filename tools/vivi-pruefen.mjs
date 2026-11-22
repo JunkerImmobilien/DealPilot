@@ -1,0 +1,676 @@
+#!/usr/bin/env node
+/* tools/vivi-pruefen.mjs — v3950 · ViVi-Anbindung (Pakete V1 bis V3), ohne Netz, ohne Datenbank, ohne Token
+ *
+ * Prueft gegen die ECHTE Spezifikation Dateien/Architektur/vivi/vivi-openapi-v1.json (ViVi API v1.5.0) und die
+ * ECHTEN Dateien des Repos. Statt ViVi antwortet eine Attrappe, die jede Anfrage gegen die Schemas der
+ * Spezifikation prueft (Pflichtfelder, nur bekannte Felder, Typen, Wertelisten) und Antworten nach den
+ * Resource-Schemas baut.
+ *
+ *   A  Abbildung DealPilot -> ViVi an Demo-Faellen: jede Nutzlast passt zum Request-Schema, Objekttyp nach Tabelle,
+ *      ETW eine Einheit, Prozente -> Betraege, "3.5" bleibt 3,5, kein Kontakt, keine IBAN, Platzhalter-Namen
+ *   B  Nebenkosten-Vorauszahlung: Backend nkVorschlag() == Frontend DpNkVorauszahlung.vorschlag(), Summe = UL / 12
+ *   C  Nur GET und POST: services/vivi/ und routes/vivi.js, Client-Schnittstelle, gesperrte Pfade, Gegenprobe
+ *   D  Einmal anlegen: Ende zu Ende gegen die Attrappe, zweites Anlegen 409, Fortsetzen nach 429 und nach
+ *      verlorener Antwort legt nichts doppelt an
+ *   E  Lesen ViVi -> DealPilot: Rundweg Feld fuer Feld, jedes gelesene ViVi-Feld steht im Resource-Schema,
+ *      jedes Ziel-Feld gibt es in DealPilot (index.html, FIELDS, Einheiten-Felder)
+ *   F  Anfragebremse: hoechstens 50 je Minute, 429 bricht ab, keine Wiederholung
+ *   G  Takt viviAbruf unter taktSperre (Schluessel 11)
+ *   H  Frontend: _vivi und nk_vorauszahlung in FIELDS, Hinweis Zeichen fuer Zeichen, eigenes Merkattribut,
+ *      Ausgrauen und lokal Ueberschreiben an einem nachgebauten Formular, Gegenproben
+ *   I  Token: nie im Protokoll, nie in einer Antwort, nie im Code, nie in .env-Vorlagen
+ *   J  Kundentext ohne Gedankenstrich und Semikolon
+ *
+ * Aufruf: node tools/vivi-pruefen.mjs [--zeigen]   (--zeigen druckt die Nutzlast je Demo-Fall)
+ * RC=0 sauber, RC=1 rot.
+ */
+import fs from 'node:fs';
+import path from 'node:path';
+import vm from 'node:vm';
+import { createRequire } from 'node:module';
+import { fileURLToPath } from 'node:url';
+
+const require = createRequire(import.meta.url);
+const WURZEL = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const P = (rel) => path.join(WURZEL, rel);
+const lies = (rel) => fs.readFileSync(P(rel), 'utf8');
+const ZEIGEN = process.argv.includes('--zeigen');
+
+let rot = 0, gruen = 0;
+const ok = (b, t) => { if (b) { gruen++; console.log('  ok  ' + t); } else { rot++; console.log('  ROT ' + t); } return b; };
+const kopf = (t) => console.log('\n' + t);
+
+const SPEC = JSON.parse(lies('Dateien/Architektur/vivi/vivi-openapi-v1.json'));
+const mapping = require(P('backend/src/services/vivi/viviMapping.js'));
+const viviClient = require(P('backend/src/services/vivi/viviClient.js'));
+const dienst = require(P('backend/src/services/vivi/viviDienst.js'));
+
+/* ── Schema-Werkzeug ─────────────────────────────────────────────────── */
+function deref(s) { let n = 0; while (s && s.$ref && n++ < 10) s = SPEC.components.schemas[s.$ref.split('/').pop()]; return s; }
+function operation(methode, pfad) { const o = SPEC.paths[pfad]; return o && o[methode.toLowerCase()]; }
+function rumpfSchema(methode, pfad) { const op = operation(methode, pfad); return op && op.requestBody ? deref(op.requestBody.content['application/json'].schema) : null; }
+function typen(s) { return Array.isArray(s.type) ? s.type : (s.type ? [s.type] : []); }
+/* Prueft wert gegen schema, liefert Liste der Befunde (leer = passt). Unbekannte Felder sind ein Befund. */
+function pruefeSchema(wert, schema, wo) {
+  const f = [];
+  schema = deref(schema);
+  if (!schema) return f;
+  if (schema.anyOf) { if (!schema.anyOf.some((s) => !pruefeSchema(wert, s, wo).length)) f.push(wo + ': passt zu keiner anyOf-Form'); return f; }
+  const T = typen(schema);
+  if (wert === null) { if (T.length && !T.includes('null')) f.push(wo + ': null nicht erlaubt'); return f; }
+  const passt = (t) => (t === 'string' && typeof wert === 'string') || (t === 'number' && typeof wert === 'number' && isFinite(wert))
+    || (t === 'integer' && Number.isInteger(wert)) || (t === 'boolean' && typeof wert === 'boolean')
+    || (t === 'array' && Array.isArray(wert)) || (t === 'object' && wert && typeof wert === 'object' && !Array.isArray(wert));
+  if (T.length && !T.some(passt)) { f.push(wo + ': Typ ' + JSON.stringify(T) + ' erwartet, ist ' + typeof wert + ' (' + JSON.stringify(wert) + ')'); return f; }
+  if (schema.enum && !schema.enum.map(String).includes(String(wert))) f.push(wo + ': ' + JSON.stringify(wert) + ' nicht in ' + JSON.stringify(schema.enum));
+  if (typeof wert === 'number') {
+    if (schema.minimum != null && wert < schema.minimum) f.push(wo + ': unter ' + schema.minimum);
+    if (schema.maximum != null && wert > schema.maximum) f.push(wo + ': über ' + schema.maximum);
+  }
+  if (typeof wert === 'string' && schema.maxLength != null && wert.length > schema.maxLength) f.push(wo + ': länger als ' + schema.maxLength);
+  if (typeof wert === 'string' && schema.format === 'date-time' && !/^\d{4}-\d{2}-\d{2}/.test(wert)) f.push(wo + ': kein Datum YYYY-MM-DD');
+  if (Array.isArray(wert) && schema.items) wert.forEach((x, i) => f.push(...pruefeSchema(x, schema.items, wo + '[' + i + ']')));
+  if (wert && typeof wert === 'object' && !Array.isArray(wert) && schema.properties) {
+    (schema.required || []).forEach((k) => { if (!(k in wert)) f.push(wo + ': Pflichtfeld ' + k + ' fehlt'); });
+    Object.keys(wert).forEach((k) => {
+      if (!(k in schema.properties)) f.push(wo + ': Feld ' + k + ' gibt es in der Spezifikation nicht');
+      else f.push(...pruefeSchema(wert[k], schema.properties[k], wo + '.' + k));
+    });
+  }
+  return f;
+}
+function pfadVorlage(methode, pfad) {
+  for (const v of Object.keys(SPEC.paths)) {
+    const re = new RegExp('^' + v.replace(/\{[^}]+\}/g, '[^/]+') + '$');
+    if (re.test(pfad) && operation(methode, v)) return v;
+  }
+  return null;
+}
+
+/* ── Demo-Faelle (eingefroren aus tools/flow-berechnen-faelle.json, Stammdaten erfunden) ─────────── */
+const FLOW = JSON.parse(lies('tools/flow-berechnen-faelle.json')).faelle;
+const DEMO = ['2026-1157', '2026-1158', '2026-001', '2026-1006', '2026-1041', '2026-1053', '2026-1055', '2026-1051'];
+function faelle() {
+  const aus = [];
+  DEMO.forEach((nr, i) => {
+    const q = FLOW['demo-konto:' + nr];
+    if (!q) return;
+    const d = JSON.parse(JSON.stringify(q.d));
+    /* Musteranschrift, nie eine echte (Regel: echte Namen und Strassen nie ins Repo, nie in ein Fremdsystem) */
+    Object.assign(d, { str: 'Musterstraße', hnr: String(10 + i), ort: 'Musterstadt', plz: /^\d{5}$/.test(String(d.plz || '')) ? String(d.plz) : '33602',
+      wirtschaftlicher_uebergang: '2024-0' + (1 + (i % 8)) + '-01', baujahr: String(1960 + i * 5), d1_auszahl: '0' + (1 + (i % 8)) + '.2024', bank_inst: 'Musterbank' });
+    if (d.d2 && Number(String(d.d2).replace(',', '.')) > 0) d.d2_auszahl = '0' + (1 + (i % 8)) + '.2024';
+    const art = String(d.objart || '').toUpperCase();
+    if (art === 'MFH' || art === 'GESCH') {
+      /* erfundene Einheiten aus Gesamtflaeche und Miete, eine davon leer */
+      const n = art === 'GESCH' ? 3 : (nr === '2026-1051' ? 12 : 4);
+      const wfl = Number(String(d.wfl || 400).replace(',', '.')) || 400;
+      const nkm = Number(String(d.nkm || 2000).replace(',', '.')) || 2000;
+      d._mfh = { einheiten: Array.from({ length: n }, (_, k) => ({
+        nr: String(k + 1), lage: ['EG links', 'EG rechts', '1. OG links', '1. OG rechts'][k % 4], art: art === 'GESCH' && k === 0 ? 'gewerbe' : 'wohnen',
+        wfl: String(Math.round(wfl / n * 10) / 10).replace('.', ','), status: k === n - 1 ? 'leer' : 'vermietet',
+        ist: k === n - 1 ? '' : String(Math.round(nkm / (n - 1))), mv_art: k === 1 ? 'staffel' : 'unbefristet', mv_beginn: '2019-0' + (1 + k % 9) + '-01',
+        mv_kaution: String(Math.round(nkm / (n - 1)) * 3), stellplatz_miete: k === 0 ? '45' : '', nk_vorauszahlung: k === 2 ? '180' : ''
+      })) };
+    } else {
+      d.mv_beginn = '2020-05-01'; d.mv_kaution = '2400'; d.mv_art = 'index'; d.ze_stp_monat = '40'; d.etage = art === 'ETW' ? '2' : '';
+    }
+    aus.push({ nr: nr, d: d });
+  });
+  /* Sonderfall: Mietername vorhanden, Zins mit Dezimalpunkt "3.5", Nebenkosten nur im Monatsfeld */
+  aus.push({ nr: 'name-und-punkt', d: { objart: 'ETW', str: 'Musterweg', hnr: '1a', plz: '12345', ort: 'Musterstadt', kp: '250.000', wirtschaftlicher_uebergang: '2025-03-01',
+    wfl: '68,5', etage: '0', nkm: '820', mv_mieter: 'Erika Beispiel', mv_beginn: '2021-07-01', umlagef: '210',
+    makler_p: '3,57', gest_p: '6,5', notar_p: '1,5', gba_p: '0,5', ji_p: '0', d1: '200000', d1z: '3.5', d1t: '2', d1_bindj: '10', d1_auszahl: '03.2025',
+    darlehen_weitere: JSON.stringify([{ bez: 'KfW 261', betrag: 30000, zins: 1.9, tilg: 3, bindj: 10 }]) } });
+  return aus;
+}
+const FAELLE = faelle();
+
+/* ═══ A · DealPilot -> ViVi ═══════════════════════════════════════════════ */
+kopf('A  Abbildung DealPilot -> ViVi gegen die Request-Schemas (' + FAELLE.length + ' Fälle)');
+ok(FAELLE.length >= 9, 'acht Demo-Objekte aus dem Bauplan plus Sonderfall vorhanden (' + FAELLE.length + ')');
+const TYPTABELLE = { ETW: 'apartment', EFH: 'single_family_house', DHH: 'single_family_house', RH: 'single_family_house', ZFH: 'multi_family_house', MFH: 'multi_family_house', BUERO: 'commercial', GESCH: 'commercial', HOTEL: 'commercial', GEW: 'commercial', GRST: 'land', GAR: 'other' };
+const typEnum = rumpfSchema('POST', '/projects').properties.type.enum;
+ok(Object.values(TYPTABELLE).every((t) => typEnum.includes(t)) && JSON.stringify(mapping.OBJEKTTYP) === JSON.stringify(Object.assign({}, TYPTABELLE)), 'Objekttyp-Tabelle wie im Bauplan, alle Werte in der Werteliste der Spezifikation');
+let schemaFehler = [];
+for (const fa of FAELLE) {
+  const plan = mapping.nachVivi(fa.d, {});
+  const art = String(fa.d.objart).toUpperCase();
+  if (!ok(plan.ok, fa.nr + ' (' + art + '): alle ViVi-Pflichtangaben vorhanden' + (plan.ok ? '' : ': ' + plan.fehlt.map((x) => x.text).join(', ')))) continue;
+  schemaFehler.push(...pruefeSchema(plan.projekt, rumpfSchema('POST', '/projects'), fa.nr + ' POST /projects'));
+  plan.einheiten.forEach((e) => {
+    if (e.miete) schemaFehler.push(...pruefeSchema(Object.assign({ unit_id: 'unt_x' }, e.miete), rumpfSchema('POST', '/projects/{project}/rental-units'), fa.nr + ' rental-units ' + e.name));
+    else schemaFehler.push(...pruefeSchema(e.einheit, rumpfSchema('POST', '/projects/{project}/units'), fa.nr + ' units ' + e.name));
+  });
+  plan.darlehen.forEach((x) => schemaFehler.push(...pruefeSchema(x.body, rumpfSchema('POST', '/projects/{project}/financings'), fa.nr + ' financings ' + x.schluessel)));
+  if (ZEIGEN) console.log(JSON.stringify({ fall: fa.nr, projekt: plan.projekt, einheiten: plan.einheiten, darlehen: plan.darlehen }, null, 1));
+  ok(plan.projekt.type === (TYPTABELLE[art] || 'other'), fa.nr + ': Objekttyp ' + art + ' -> ' + plan.projekt.type);
+  if (!fa.d._mfh) ok(plan.einheiten.length === 1 && plan.projekt.units === 1, fa.nr + ': ohne Einheitenliste genau eine Einheit (nicht das Feld einheiten)');
+  else ok(plan.einheiten.length === fa.d._mfh.einheiten.length, fa.nr + ': ' + plan.einheiten.length + ' Einheiten wie in _mfh, leere ohne Mietverhältnis (' + plan.einheiten.filter((e) => !e.miete).length + ')');
+  const txt = JSON.stringify({ p: plan.projekt, e: plan.einheiten, d: plan.darlehen });
+  ok(!/iban|tenant_email|tenant_phone|tenant_date_of_birth|tenant_alt_/i.test(txt), fa.nr + ': keine IBAN, keine Kontaktdaten in der Nutzlast');
+}
+{
+  /* Gegenproben des Schema-Werkzeugs: ein erfundenes Feld, ein fehlendes Pflichtfeld, ein Wert ausserhalb der Werteliste */
+  const p0 = mapping.nachVivi(FAELLE[0].d, {}).projekt;
+  const S0 = rumpfSchema('POST', '/projects');
+  ok(pruefeSchema(Object.assign({}, p0, { tenant_iban: 'DE00' }), S0, 'x').length > 0, 'Gegenprobe rot: erfundenes Feld tenant_iban');
+  const ohne = Object.assign({}, p0); delete ohne.purchase_date;
+  ok(pruefeSchema(ohne, S0, 'x').some((x) => /Pflichtfeld purchase_date/.test(x)), 'Gegenprobe rot: Pflichtfeld purchase_date fehlt');
+  ok(pruefeSchema(Object.assign({}, p0, { type: 'house' }), S0, 'x').length > 0 && pruefeSchema(Object.assign({}, p0, { purchase_price: '250000' }), S0, 'x').length > 0, 'Gegenprobe rot: Objektart außerhalb der Werteliste, Kaufpreis als Text');
+}
+ok(!schemaFehler.length, 'jede Nutzlast passt zum Request-Schema der Spezifikation' + (schemaFehler.length ? ':\n        ' + schemaFehler.slice(0, 12).join('\n        ') : ''));
+{
+  const s = FAELLE.find((x) => x.nr === 'name-und-punkt');
+  const plan = mapping.nachVivi(s.d, {});
+  const d1 = plan.darlehen.find((x) => x.schluessel === 'd1').body;
+  ok(d1.interest_rate === 3.5, 'Zins "3.5" bleibt 3,5 (nicht 35)');
+  ok(plan.projekt.purchase_price === 250000, 'Kaufpreis "250.000" -> 250000');
+  ok(plan.projekt.broker === 8925 && plan.projekt.real_estate_transfer_tax === 16250 && plan.projekt.notary === 3750 && plan.projekt.land_register === 1250 && !('other_costs' in plan.projekt),
+    'Prozente -> Beträge: Makler 3,57 % = 8.925, GrESt 16.250, Notar 3.750, Grundbuch 1.250, Sonstige 0 % nicht gesendet');
+  const m = plan.einheiten[0].miete;
+  ok(m.tenant_first_name === 'Erika' && m.tenant_last_name === 'Beispiel', 'vorhandener Mietername wird geteilt (Vorname, Nachname)');
+  ok(m.unit_floor === 'EG' && m.unit_square_meters === 68.5, 'Etage 0 -> "EG", Fläche 68,5 -> 68.5');
+  ok(m.monthly_utility_costs === 210, 'Nebenkosten ohne Bewirtschaftungsposten aus umlagef (210 €/Monat)');
+  const mp = mapping.nachVivi(s.d, { platzhalterNamen: true }).einheiten[0].miete;
+  ok(mp.tenant_first_name === 'Mieter' && mp.tenant_last_name === 'Wohnung', 'Platzhalter-Wahl ersetzt den Namen ("Mieter Wohnung")');
+  ok(plan.darlehen.length === 2 && plan.darlehen[1].body.name === 'KfW 261' && plan.darlehen[1].body.financing_type === 'parallel', 'weiteres Darlehen aus darlehen_weitere als parallel');
+  const leer = mapping.nachVivi({ objart: 'MFH', kp: '1', str: 'a', hnr: '1', plz: '1234', ort: 'x' }, {});
+  ok(!leer.ok && leer.fehlt.some((x) => x.feld === 'plz') && leer.fehlt.some((x) => x.feld === 'wirtschaftlicher_uebergang'), 'fehlende Pflichtangaben werden genannt (PLZ vierstellig, Übergang fehlt), kein Anlegen');
+  const ohneName = mapping.nachVivi(FAELLE[0].d, {}).einheiten.find((e) => e.miete);
+  ok(ohneName && ohneName.miete.tenant_first_name === 'Mieter', 'ohne Mieternamen steht ein Platzhalter');
+}
+
+/* ═══ B · Nebenkosten-Vorauszahlung ══════════════════════════════════════ */
+kopf('B  Nebenkosten-Vorauszahlung: Backend und Frontend rechnen gleich');
+function frontendModul(rel, extra) {
+  const ctx = { console, setTimeout: () => 0, clearTimeout: () => {}, Event: function () {}, CustomEvent: function () {}, MutationObserver: function () { this.observe = () => {}; }, WeakSet };
+  ctx.window = ctx;
+  ctx.document = Object.assign({ readyState: 'complete', addEventListener: () => {}, getElementById: () => null, querySelectorAll: () => [], body: {}, head: { appendChild: () => {} }, createElement: () => ({ style: {} }) }, (extra && extra.document) || {});
+  ctx.addEventListener = () => {};
+  Object.assign(ctx, (extra && extra.globals) || {});
+  vm.createContext(ctx);
+  vm.runInContext(lies(rel), ctx, { filename: rel });
+  return ctx;
+}
+const NK = frontendModul('frontend/js/nk-vorauszahlung.js').DpNkVorauszahlung;
+let nkGleich = 0, nkVergl = 0;
+for (const fa of FAELLE) {
+  const idxs = fa.d._mfh ? fa.d._mfh.einheiten.map((_, i) => i) : [null];
+  idxs.forEach((i) => { nkVergl++; if (mapping.nkVorschlag(fa.d, i) === NK.vorschlag(fa.d, i)) nkGleich++; });
+}
+ok(nkVergl > 20 && nkGleich === nkVergl, 'nkVorschlag (Backend) == DpNkVorauszahlung.vorschlag (Frontend) in ' + nkGleich + ' von ' + nkVergl + ' Einheiten');
+{
+  const d = { objart: 'MFH', hg_ul: '6000', grundsteuer: '1200', ul_sonst: '0', _mfh: { einheiten: [{ nr: '1', wfl: '60', ist: '500' }, { nr: '2', wfl: '90', ist: '700' }, { nr: '3', wfl: '50', status: 'leer' }] } };
+  const v = [0, 1, 2].map((i) => mapping.nkVorschlag(d, i));
+  ok(v[0] === 180 && v[1] === 270 && v[2] === 150, 'MFH 7.200 €/Jahr nach Fläche 60/90/50 m²: 180, 270, 150 €/Monat (leere Einheit trägt ihren Anteil)');
+  ok(mapping.nkVorschlag({ objart: 'ETW', hg_ul: '1391', grundsteuer: '336' }, null) === 144, 'ETW (1.391 + 336) / 12 = 144 €/Monat');
+  ok(mapping.nkVorschlag({ objart: 'ETW' }, null) === null, 'ohne umlagefähige Kosten kein Vorschlag (null, nie 0)');
+  const kerne = ['frontend/js/calc.js', 'frontend/js/deal-kpis.js', 'frontend/js/dscr-engine.js', 'frontend/js/dealscore.js', 'frontend/js/score-tiers.js'];
+  ok(kerne.every((k) => !lies(k).includes('nk_vorauszahlung')), 'kein Rechenkern liest nk_vorauszahlung (calc, deal-kpis, dscr-engine, dealscore, score-tiers)');
+}
+
+/* ═══ C · Nur GET und POST ═══════════════════════════════════════════════ */
+kopf('C  Nur GET und POST an ViVi');
+const VIVI_DATEIEN = fs.readdirSync(P('backend/src/services/vivi')).filter((f) => f.endsWith('.js')).map((f) => 'backend/src/services/vivi/' + f).concat(['backend/src/routes/vivi.js']);
+function nurLesenBefunde(dateien) {
+  const f = [];
+  for (const [rel, t] of dateien) {
+    const ohneKommentar = t.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/.*$/gm, '$1');
+    if (/['"`](PUT|PATCH|DELETE)['"`]/.test(ohneKommentar) && !rel.endsWith('routes/vivi.js')) f.push(rel + ': Methode PUT/PATCH/DELETE als Text');
+    if (/method\s*:\s*['"`](?!GET['"`]|POST['"`])/i.test(ohneKommentar.replace(/method\s*:\s*methode/g, ''))) f.push(rel + ': method mit anderem Wert als GET/POST');
+    if (/\bfetch\s*\(/.test(ohneKommentar) && !rel.endsWith('viviClient.js')) f.push(rel + ': eigenes fetch ausserhalb von viviClient.js');
+    if (/require\(['"](node:)?(https?|axios|node-fetch|undici)['"]\)/.test(ohneKommentar)) f.push(rel + ': eigener HTTP-Weg');
+    if (rel.endsWith('routes/vivi.js') && /viviClient/.test(ohneKommentar.replace(/services\/vivi\/viviClient\.js/g, ''))) f.push(rel + ': Route spricht den Client direkt an');
+    if (rel.endsWith('viviClient.js')) {
+      const m = ohneKommentar.match(/senden\(\s*'([A-Z]+)'/g) || [];
+      const meth = m.map((x) => x.replace(/senden\(\s*'|'/g, ''));
+      if (meth.some((x) => x !== 'GET' && x !== 'POST')) f.push(rel + ': senden() mit ' + meth.join(','));
+      if (!/function get\(/.test(ohneKommentar) || !/function post\(/.test(ohneKommentar)) f.push(rel + ': get/post fehlen');
+    }
+  }
+  return f;
+}
+const echtDateien = VIVI_DATEIEN.map((r) => [r, lies(r)]);
+const befunde = nurLesenBefunde(echtDateien);
+ok(!befunde.length, VIVI_DATEIEN.length + ' Dateien: kein PUT, PATCH, DELETE an ViVi, fetch nur im Client' + (befunde.length ? ': ' + befunde.join(' | ') : ''));
+{
+  const cl = viviClient.erzeugen('test-token-12345', { fetch: async () => ({ status: 200, json: async () => ({ data: [] }) }) });
+  ok(JSON.stringify(Object.keys(cl).sort()) === JSON.stringify(['get', 'post', 'zaehler']), 'der Client bietet nur get, post (und den Zähler)');
+  let gesperrt = 0;
+  for (const p of ['/projects/prj_1', '/projects/prj_1/rental-units/r1/end', '/projects/prj_1/financings/f1/split', '/rental-payments/1/mark-paid', '/contacts', '/projects/prj_1/rental-units/r1/rent-changes']) {
+    try { await cl.post(p, {}); } catch (e) { if (e.code === 'pfad_gesperrt') gesperrt++; }
+  }
+  ok(gesperrt === 6, 'POST nur an Anlege-Pfade: 6 von 6 andere Pfade abgewiesen (Objekt ändern, Mietende, Aufteilung, bezahlt, Kontakte, Mietänderung)');
+  let frei = 0;
+  for (const p of ['/projects', '/projects/prj_1/units', '/projects/prj_1/rental-units', '/projects/prj_1/financings']) { try { await cl.post(p, {}); frei++; } catch (e) { /* */ } }
+  ok(frei === 4 && viviClient.ANLEGEN_PFADE.length === 4, 'die vier Anlege-Pfade sind offen (Objekt, Einheit, Mietverhältnis, Darlehen)');
+  const alle = viviClient.ANLEGEN_PFADE.every((re) => Object.keys(SPEC.paths).some((v) => re.test(v.replace(/\{[^}]+\}/g, 'x1')) && operation('POST', v)));
+  ok(alle, 'jeder Anlege-Pfad ist ein POST-Pfad der Spezifikation');
+  /* Gegenproben: je eine eingeschmuggelte Methode muss rot werden */
+  const proben = [
+    ['viviClient.js mit method: PATCH', 'backend/src/services/vivi/viviClient.js', (t) => t.replace("function get(pfad, abfrage) { return senden('GET', pfad, abfrage, null); }", "function get(pfad, abfrage) { return senden('PATCH', pfad, abfrage, null); }")],
+    ['viviDienst.js mit eigenem fetch', 'backend/src/services/vivi/viviDienst.js', (t) => t + "\nfetch('https://app.vivi-immo.de/api/v1/projects/1', { method: 'DELETE' });\n"],
+    ['viviMapping.js mit method: PUT', 'backend/src/services/vivi/viviMapping.js', (t) => t + "\nconst x = { method: 'PUT' };\n"]
+  ];
+  for (const [name, rel, aendern] of proben) {
+    const neu = aendern(lies(rel));
+    const f = nurLesenBefunde(echtDateien.map(([r, t]) => [r, r === rel ? neu : t]));
+    ok(neu !== lies(rel) && f.length > 0, 'Gegenprobe rot: ' + name);
+  }
+}
+
+/* ═══ Attrappe nach der Spezifikation ════════════════════════════════════ */
+function attrappe() {
+  const st = { n: 0, projekte: {}, einheiten: {}, miete: {}, darlehen: {}, anfragen: [], posts: 0, stoerung: null, fehler: [] };
+  const id = (p) => p + '_' + (++st.n).toString(36).padStart(4, '0');
+  const projektRes = (p) => Object.assign({ name: p.name || (p.street + ' ' + p.house_number), description: null, area: null, project_type: 'bestand', planned_sale_date: null, vat_enabled: false,
+    externally_managed_from: null, externally_managed_until: null, construction_year: null, real_estate_transfer_tax: null, notary: null, land_register: null, broker: null, other_costs: null },
+    p, { units: Object.values(st.einheiten).filter((u) => u._p === p.id).map(einheitRes) });
+  const einheitRes = (u) => ({ id: u.id, identifier: u.identifier, unit_type: u.unit_type || 'residential', square_meters: u.square_meters == null ? null : u.square_meters, rooms: null, floor: u.floor == null ? null : u.floor });
+  const mieteRes = (r) => { const o = Object.assign({}, r); delete o._p; o.unit = einheitRes(st.einheiten[r.unit_id]); o.occupancy_type = 'rented'; o.is_special = false; o.co_tenants = []; o.amenities = (r.amenities || []).map((a, i) => Object.assign({ id: 'am' + i, vat_rate: null }, a)); return o; };
+  const darlRes = (f) => { const o = Object.assign({ status: 'active', is_bullet_loan: false, is_repayment_substitute: false, is_savings_plan: false, initial_repayment: null, fixed_monthly_rate: null, fixed_interest_period: null, share_factor: 1, is_split: false, special_repayments: [], rate_overrides: [], shares: [] }, f); delete o._p; return o; };
+  const antwort = (status, daten) => ({ status, json: async () => daten });
+  async function holen(url, init) {
+    const u = new URL(url);
+    const pfad = u.pathname.replace(/^\/api\/v1/, '');
+    const m = init.method;
+    st.anfragen.push(m + ' ' + pfad);
+    const vorlage = pfadVorlage(m, pfad);
+    if (!vorlage) { st.fehler.push('Pfad nicht in der Spezifikation: ' + m + ' ' + pfad); return antwort(404, { message: 'nicht in der Spezifikation' }); }
+    if (!/^Bearer \S+$/.test((init.headers || {}).Authorization || '')) return antwort(401, { message: 'Unauthenticated.' });
+    let rumpf = null;
+    if (m === 'POST') {
+      st.posts++;
+      rumpf = init.body ? JSON.parse(init.body) : {};
+      const f = pruefeSchema(rumpf, rumpfSchema('POST', vorlage), m + ' ' + vorlage);
+      if (f.length) { st.fehler.push(...f); return antwort(422, { message: 'invalid', errors: f }); }
+      if (st.stoerung && st.stoerung.nachPosts === st.posts) {
+        const art = st.stoerung.art; st.stoerung = null;
+        if (art === '429') return antwort(429, { message: 'Too Many Attempts.' });
+        if (art === 'verloren') { await verarbeiten(m, pfad, rumpf); throw new Error('socket hang up'); }
+      }
+    }
+    return verarbeiten(m, pfad, rumpf);
+  }
+  async function verarbeiten(m, pfad, b) {
+    let x;
+    if (m === 'GET' && pfad === '/accounts') return antwort(200, { data: [{ id: 'acc_1', name: 'Hauptaccount', label: 'Hauptaccount', is_master: true, is_default: true }, { id: 'acc_2', name: 'Muster GmbH', label: 'GmbH', is_master: false, is_default: false }] });
+    if (m === 'POST' && pfad === '/projects') {
+      const p = Object.assign({}, b, { id: id('prj') }); const n = p.units || 1; delete p.units;
+      st.projekte[p.id] = p;
+      for (let k = 0; k < n; k++) { const uid = id('unt'); st.einheiten[uid] = { id: uid, _p: p.id, identifier: 'Einheit ' + (k + 1), unit_type: 'residential' }; }
+      return antwort(201, { data: projektRes(p) });
+    }
+    if (m === 'GET' && pfad === '/projects') return antwort(200, { data: Object.values(st.projekte).map(projektRes) });
+    if ((x = /^\/projects\/([^/]+)$/.exec(pfad))) { const p = st.projekte[x[1]]; return p ? antwort(200, { data: projektRes(p) }) : antwort(404, {}); }
+    if ((x = /^\/projects\/([^/]+)\/units$/.exec(pfad))) {
+      if (!st.projekte[x[1]]) return antwort(404, {});
+      if (m === 'GET') return antwort(200, { data: Object.values(st.einheiten).filter((u) => u._p === x[1]).map(einheitRes) });
+      const uid = id('unt'); st.einheiten[uid] = Object.assign({ id: uid, _p: x[1] }, b); return antwort(201, { data: einheitRes(st.einheiten[uid]) });
+    }
+    if ((x = /^\/projects\/([^/]+)\/rental-units$/.exec(pfad))) {
+      if (!st.projekte[x[1]]) return antwort(404, {});
+      if (m === 'GET') return antwort(200, { data: Object.values(st.miete).filter((r) => r._p === x[1]).map(mieteRes) });
+      let uid = b.unit_id;
+      if (uid) { const u = st.einheiten[uid]; if (!u || u._p !== x[1]) return antwort(422, { message: 'unit_id' }); if (b.unit_identifier) u.identifier = b.unit_identifier; if (b.unit_square_meters != null) u.square_meters = b.unit_square_meters; if (b.unit_floor) u.floor = b.unit_floor; }
+      else { if (!b.unit_identifier || b.unit_square_meters == null) return antwort(422, { message: 'neue Einheit braucht unit_identifier und unit_square_meters' }); uid = id('unt'); st.einheiten[uid] = { id: uid, _p: x[1], identifier: b.unit_identifier, square_meters: b.unit_square_meters, floor: b.unit_floor || null, unit_type: b.unit_type || 'residential' }; }
+      if (Object.values(st.miete).some((r) => r.unit_id === uid)) return antwort(422, { message: 'Überschneidung' });
+      const rid = id('ren');
+      const r = { id: rid, _p: x[1], project_id: x[1], unit_id: uid };
+      ['tenant_first_name', 'tenant_last_name', 'rent', 'monthly_utility_costs', 'rental_start', 'rent_due_day', 'rental_end', 'deposit_amount', 'last_rent_increase', 'contract_type', 'amenities'].forEach((k) => { if (k in b) r[k] = b[k]; });
+      st.miete[rid] = r;
+      return antwort(201, { data: mieteRes(r) });
+    }
+    if ((x = /^\/projects\/([^/]+)\/financings$/.exec(pfad))) {
+      if (!st.projekte[x[1]]) return antwort(404, {});
+      if (m === 'GET') return antwort(200, { data: Object.values(st.darlehen).filter((f) => f._p === x[1]).map(darlRes) });
+      const fid = 'fin_' + (++st.n); st.darlehen[fid] = Object.assign({ id: fid, _p: x[1], project_id: x[1] }, b); return antwort(201, { data: darlRes(st.darlehen[fid]) });
+    }
+    if ((x = /^\/projects\/([^/]+)\/financing-schedule$/.exec(pfad))) {
+      const L = Object.values(st.darlehen).filter((f) => f._p === x[1]);
+      const zeilen = [];
+      L.forEach((f) => { let rs = f.financing_amount; const rate = rs * ((f.interest_rate || 0) + (f.initial_repayment || 0)) / 1200; let d = new Date(f.financing_start_date);
+        for (let k = 0; k < 24; k++) { const z = rs * (f.interest_rate || 0) / 1200; const t = Math.max(0, rate - z); const nach = rs - t;
+          zeilen.push({ date: d.toISOString().slice(0, 10), remaining_debt: rs, interest: z, repayment: t, monthly_rate: rate, remaining_debt_after: nach, is_repayment_substitute: false, savings_rate: 0, savings_balance: 0 }); rs = nach; d = new Date(d.getFullYear(), d.getMonth() + 1, 1, 12); } });
+      return antwort(200, { data: zeilen, meta: { months: zeilen.length } });
+    }
+    return antwort(404, { message: 'Attrappe kennt ' + m + ' ' + pfad + ' nicht' });
+  }
+  return { holen, st, projektRes, einheitRes, mieteRes, darlRes };
+}
+function speicherImArbeitsspeicher(objekte) {
+  const v = {}, w = {}, prot = [];
+  const zeit = { jetzt: Date.now() };
+  return {
+    prot, v, w, zeit,
+    async objektHolen(u, o) { const x = objekte[o]; return x && x.user === u ? { id: o, data: x.data } : null; },
+    async verknuepfung(u, o) { return v[o] && v[o].user_id === u ? Object.assign({}, v[o]) : null; },
+    async beanspruchen(u, o, acc) {
+      if (!v[o]) { v[o] = { object_id: o, user_id: u, vivi_objekt_id: null, vivi_account_id: acc, vivi_ids: {}, herkunft: 'angelegt', anlage_status: 'laeuft', aktualisiert: zeit.jetzt }; return { zeile: Object.assign({}, v[o]), fortsetzen: false }; }
+      const z = v[o];
+      if (z.user_id === u && z.herkunft === 'angelegt' && (z.anlage_status === 'abgebrochen' || (z.anlage_status === 'laeuft' && zeit.jetzt - z.aktualisiert > 10 * 60 * 1000))) { z.anlage_status = 'laeuft'; z.aktualisiert = zeit.jetzt; return { zeile: JSON.parse(JSON.stringify(z)), fortsetzen: true }; }
+      return null;
+    },
+    async idsSpeichern(o, ids, pid) { v[o].vivi_ids = JSON.parse(JSON.stringify(ids)); if (pid) v[o].vivi_objekt_id = pid; v[o].aktualisiert = zeit.jetzt; },
+    async statusSetzen(o, s, f) { v[o].anlage_status = s; v[o].letzter_fehler = f || null; v[o].aktualisiert = zeit.jetzt; },
+    async zuordnen(u, o, pid, acc) { if (v[o]) return null; v[o] = { object_id: o, user_id: u, vivi_objekt_id: pid, vivi_account_id: acc, vivi_ids: {}, herkunft: 'zugeordnet', anlage_status: 'fertig' }; return v[o]; },
+    async loesen(u, o) { if (!v[o] || v[o].user_id !== u) return false; delete v[o]; delete w[o]; return true; },
+    async werteSchreiben(o, felder, info) { w[o] = []; Object.keys(felder).forEach((k) => w[o].push({ feld: k, jahr: 0, wert: felder[k].wert, vivi_quelle: felder[k].quelle, gelesen_am: new Date(zeit.jetzt).toISOString() }));
+      Object.keys(info || {}).forEach((k) => { if (info[k] != null) w[o].push({ feld: '_info.' + k, jahr: 0, wert: info[k], vivi_quelle: null }); }); v[o].letzter_abruf = new Date(zeit.jetzt).toISOString(); },
+    async abrufFehler(o, t) { if (v[o]) v[o].letzter_fehler = t; },
+    async werteLesen(o) { return w[o] || []; },
+    async verknuepfteObjekte(u) { return Object.values(v).filter((x) => x.user_id === u); },
+    async faelligeAbrufe() { return Object.values(v).filter((x) => x.anlage_status === 'fertig' && x.vivi_objekt_id).map((x) => ({ object_id: x.object_id, user_id: x.user_id })); },
+    async protokoll(e) { prot.push(e); }
+  };
+}
+
+/* ═══ D · Einmal anlegen ═════════════════════════════════════════════════ */
+kopf('D  Einmal anlegen, Ende zu Ende gegen die Attrappe');
+const TOKEN = 'vivi-testtoken-NIEMALS-ECHT-7f3a';
+const USER = '11111111-1111-4111-8111-111111111111';
+const objekte = {};
+FAELLE.forEach((fa, i) => { objekte['00000000-0000-4000-8000-' + String(i + 1).padStart(12, '0')] = { user: USER, data: fa.d, nr: fa.nr }; });
+const A = attrappe();
+const SP = speicherImArbeitsspeicher(objekte);
+const tresor = { [USER]: TOKEN };
+viviClient._fensterLeeren();
+dienst._setzeDeps({
+  speicher: SP,
+  creds: { getSecret: async (u) => tresor[u] || null, getMeta: async (u) => (tresor[u] ? { exists: true, hint: tresor[u].slice(-4) } : { exists: false }), setCredential: async (u, p, s) => { tresor[u] = s; return { exists: true, hint: s.slice(-4) }; }, remove: async (u) => { delete tresor[u]; return { exists: false }; } },
+  client: (t, o) => viviClient.erzeugen(t, Object.assign({}, o, { fetch: A.holen, maxWarten: 0 })),
+  jetzt: () => SP.zeit.jetzt,
+  schlafen: async () => {}
+});
+const OIDS = Object.keys(objekte);
+let alleAngelegt = true;
+for (const oid of OIDS) {
+  try { const r = await dienst.anlegen(USER, oid, { platzhalter_namen: false }); if (!r.ok) alleAngelegt = false; }
+  catch (e) { alleAngelegt = false; console.log('        ' + objekte[oid].nr + ': ' + e.message + (e.details ? ' ' + JSON.stringify(e.details).slice(0, 300) : '')); }
+}
+ok(alleAngelegt && !A.st.fehler.length, OIDS.length + ' Objekte angelegt, die Attrappe fand keine Abweichung von der Spezifikation' + (A.st.fehler.length ? ': ' + A.st.fehler.slice(0, 5).join(' | ') : ''));
+ok(Object.keys(A.st.projekte).length === OIDS.length, 'je Objekt genau ein ViVi-Objekt (' + Object.keys(A.st.projekte).length + ')');
+{
+  let erwartetE = 0, erwartetM = 0, erwartetD = 0;
+  OIDS.forEach((o) => { const p = mapping.nachVivi(objekte[o].data, {}); erwartetE += p.einheiten.length; erwartetM += p.einheiten.filter((e) => e.miete).length; erwartetD += p.darlehen.length; });
+  ok(Object.keys(A.st.einheiten).length === erwartetE, 'Einheiten in ViVi = Einheiten in DealPilot (' + Object.keys(A.st.einheiten).length + ' von ' + erwartetE + ', die von ViVi selbst angelegte mitgezählt)');
+  ok(Object.keys(A.st.miete).length === erwartetM && Object.keys(A.st.darlehen).length === erwartetD, 'Mietverhältnisse ' + Object.keys(A.st.miete).length + '/' + erwartetM + ', Darlehen ' + Object.keys(A.st.darlehen).length + '/' + erwartetD);
+  const ohneFlaeche = Object.values(A.st.einheiten).filter((u) => !(u.square_meters > 0) && objekte[Object.keys(SP.v).find((k) => SP.v[k].vivi_objekt_id === u._p)].data._mfh);
+  ok(!ohneFlaeche.length, 'jede MFH-Einheit trägt in ViVi ihre Fläche (auch die von ViVi angelegte erste)');
+  ok(A.st.anfragen.every((a) => /^(GET|POST) /.test(a)), 'die Attrappe sah nur GET und POST (' + A.st.anfragen.length + ' Anfragen)');
+}
+{
+  const oid = OIDS[0], postsVorher = A.st.posts;
+  let code = null; try { await dienst.anlegen(USER, oid, {}); } catch (e) { code = e.status + ' ' + e.code; }
+  ok(code === '409 bereits_angelegt' && A.st.posts === postsVorher, 'zweites Anlegen: 409, kein einziger POST an ViVi');
+  SP.v[OIDS[1]].anlage_status = 'laeuft'; SP.v[OIDS[1]].aktualisiert = SP.zeit.jetzt;
+  code = null; try { await dienst.anlegen(USER, OIDS[1], {}); } catch (e) { code = e.status + ' ' + e.code; }
+  ok(code === '409 laeuft' && A.st.posts === postsVorher, 'gleichzeitiges Anlegen (Zeile läuft): 409, nichts gesendet');
+  SP.v[OIDS[1]].anlage_status = 'fertig';
+  code = null; try { await dienst.anlegen('22222222-2222-4222-8222-222222222222', oid, {}); } catch (e) { code = e.status; }
+  ok(code === 404, 'fremder Nutzer: 404 (Objekt gehört ihm nicht)');
+}
+/* Fortsetzen nach 429 und nach verlorener Antwort */
+for (const [art, nach] of [['429', 3], ['verloren', 2], ['verloren', 1]]) {
+  const B = attrappe();
+  const objs = { 'aaaaaaaa-0000-4000-8000-000000000001': { user: USER, data: FAELLE.find((x) => x.nr === '2026-1041').d } };
+  const S2 = speicherImArbeitsspeicher(objs);
+  viviClient._fensterLeeren();
+  dienst._setzeDeps({ speicher: S2, creds: { getSecret: async () => TOKEN }, client: (t, o) => viviClient.erzeugen(t, Object.assign({}, o, { fetch: B.holen, maxWarten: 0 })), jetzt: () => S2.zeit.jetzt, schlafen: async () => {} });
+  const oid = Object.keys(objs)[0];
+  B.st.stoerung = { nachPosts: nach, art: art };
+  let erst = null; try { await dienst.anlegen(USER, oid, {}); } catch (e) { erst = e; }
+  const status1 = S2.v[oid].anlage_status;
+  let zweit = null; try { zweit = await dienst.anlegen(USER, oid, {}); } catch (e) { zweit = e; }
+  const p = mapping.nachVivi(objs[oid].data, {});
+  ok(erst && status1 === 'abgebrochen' && erst.fortsetzbar && zweit && zweit.ok && zweit.fortgesetzt
+    && Object.keys(B.st.projekte).length === 1 && Object.keys(B.st.einheiten).length === p.einheiten.length && Object.keys(B.st.miete).length === p.einheiten.filter((e) => e.miete).length && Object.keys(B.st.darlehen).length === p.darlehen.length,
+    'Abbruch durch ' + (art === '429' ? '429' : 'verlorene Antwort') + ' beim ' + nach + '. POST: Zeile abgebrochen, Fortsetzen ergänzt, nichts doppelt (' + Object.keys(B.st.projekte).length + ' Objekt, ' + Object.keys(B.st.einheiten).length + ' Einheiten, ' + Object.keys(B.st.miete).length + ' Mietverhältnisse)');
+}
+
+/* ═══ E · Lesen ViVi -> DealPilot ════════════════════════════════════════ */
+kopf('E  Lesen ViVi -> DealPilot');
+dienst._setzeDeps({ speicher: SP, creds: { getSecret: async (u) => tresor[u] || null }, client: (t, o) => viviClient.erzeugen(t, Object.assign({}, o, { fetch: A.holen, maxWarten: 0 })), jetzt: () => SP.zeit.jetzt, schlafen: async () => {} });
+viviClient._fensterLeeren();
+/* Jede Antwort der Attrappe ist selbst gegen das Resource-Schema geprueft */
+{
+  const f = [];
+  Object.values(A.st.projekte).forEach((p) => f.push(...pruefeSchema(A.projektRes(p), SPEC.components.schemas.ProjectResource, 'ProjectResource')));
+  Object.values(A.st.miete).forEach((r) => f.push(...pruefeSchema(A.mieteRes(r), SPEC.components.schemas.RentalUnitResource, 'RentalUnitResource').filter((x) => !/Pflichtfeld/.test(x))));
+  /* Die Spezifikation fuehrt einige Datumsfelder als reinen string, beschreibt aber null ("null = bis heute"). Die Attrappe liefert null wie ViVi. */
+  f.splice(0, f.length, ...f.filter((x) => !/(planned_sale_date|externally_managed_from|externally_managed_until|rental_end|tenant_date_of_birth|maturity_date|repayment_free_until_date|fixed_interest_end_date|financing_end_date|last_rent_increase|deposit_\w+_date): null nicht erlaubt/.test(x)));
+  ok(!f.length, 'Antworten der Attrappe passen zu ProjectResource und RentalUnitResource' + (f.length ? ': ' + f.slice(0, 4).join(' | ') : ''));
+}
+/* Welche ViVi-Felder liest ausVivi? Ueber Proxies gemessen, gegen die Resource-Schemas */
+function beobachtet(obj, schema, name, gelesen) {
+  const props = deref(schema).properties || {};
+  return new Proxy(obj, { get(t, k) { if (typeof k === 'string' && !(k in Object.prototype) && k !== 'toJSON' && k !== 'then') gelesen.push([name, k, k in props]); return t[k]; } });
+}
+const gelesen = [];
+const FIELDS_TEXT = lies('frontend/js/storage.js');
+const HTML = lies('frontend/index.html');
+const MV_FELDER = (lies('frontend/js/mfh-einheiten.js').match(/var MV_FELDER = \[([\s\S]*?)\];/) || [, ''])[1];
+const ID_DA = (id) => new RegExp('id="' + id + '"').test(HTML) && new RegExp("'" + id + "'").test(FIELDS_TEXT);
+let rundOk = 0, rundAlle = 0; const rundFehler = [];
+for (const oid of OIDS) {
+  const d = objekte[oid].data;
+  const r = await dienst.abrufen(USER, oid);
+  const v = SP.v[oid];
+  /* Proxy-Lauf auf denselben Antworten: welche Felder fasst ausVivi an? */
+  const pr = A.st.projekte[v.vivi_objekt_id];
+  const paket = {
+    projekt: beobachtet(A.projektRes(pr), SPEC.components.schemas.ProjectResource, 'ProjectResource', gelesen),
+    einheiten: Object.values(A.st.einheiten).filter((u) => u._p === pr.id).map((u) => beobachtet(A.einheitRes(u), SPEC.components.schemas.UnitResource, 'UnitResource', gelesen)),
+    mietverhaeltnisse: Object.values(A.st.miete).filter((x) => x._p === pr.id).map((x) => beobachtet(A.mieteRes(x), SPEC.components.schemas.RentalUnitResource, 'RentalUnitResource', gelesen)),
+    darlehen: Object.values(A.st.darlehen).filter((x) => x._p === pr.id).map((x) => beobachtet(A.darlRes(x), SPEC.components.schemas.FinancingResource, 'FinancingResource', gelesen)),
+    tilgungsplan: { data: [] }
+  };
+  mapping.ausVivi(paket, { vivi_ids: v.vivi_ids, mitEinheiten: !!d._mfh, objart: d.objart, jetzt: SP.zeit.jetzt });
+  /* Rundweg: was hingeschickt wurde, kommt gleich zurueck */
+  const F = r.felder, z = mapping.zahl;
+  const pruefe = (feld, soll) => { rundAlle++; const ist = F[feld] && F[feld].wert; const g = (typeof soll === 'number') ? Math.abs(z(ist) - soll) < 0.01 : String(ist) === String(soll); if (g) rundOk++; else rundFehler.push(objekte[oid].nr + ' ' + feld + ': ' + JSON.stringify(ist) + ' statt ' + JSON.stringify(soll)); };
+  pruefe('kp', z(d.kp)); pruefe('str', d.str); pruefe('plz', d.plz); pruefe('wirtschaftlicher_uebergang', d.wirtschaftlicher_uebergang);
+  if (z(d.makler_p) > 0) pruefe('makler_p', Math.round(z(d.makler_p) * 100) / 100);
+  pruefe('d1', z(d.d1)); pruefe('d1z', z(d.d1z)); if (d.d1_type !== 'tilgungsaussetzung') pruefe('d1t', z(d.d1t)); pruefe('bank_inst', d.bank_inst);
+  if (d._mfh) {
+    d._mfh.einheiten.forEach((e, i) => {
+      if (z(e.wfl) > 0) pruefe('einheit.' + i + '.wfl', z(e.wfl));
+      pruefe('einheit.' + i + '.status', e.status === 'leer' ? 'leer' : 'vermietet');
+      if (e.status !== 'leer') { pruefe('einheit.' + i + '.ist', z(e.ist)); pruefe('einheit.' + i + '.mv_beginn', e.mv_beginn); if (z(e.stellplatz_miete) > 0) pruefe('einheit.' + i + '.stellplatz_miete', z(e.stellplatz_miete)); }
+    });
+  } else {
+    pruefe('wfl', z(d.wfl)); pruefe('nkm', z(d.nkm)); pruefe('mv_beginn', d.mv_beginn); if (d.mv_art) pruefe('mv_art', d.mv_art); if (z(d.ze_stp_monat) > 0) pruefe('ze_stp_monat', z(d.ze_stp_monat));
+    if (String(d.objart).toUpperCase() === 'ETW') pruefe('etage', d.etage || '0');
+  }
+  /* jedes Ziel-Feld gibt es in DealPilot */
+  Object.keys(F).forEach((feld) => {
+    const m = /^einheit\.\d+\.(\w+)$/.exec(feld);
+    const da = m ? (['wfl', 'ist', 'status'].includes(m[1]) || new RegExp("'" + m[1] + "'").test(MV_FELDER)) : ID_DA(feld);
+    if (!da) rundFehler.push(objekte[oid].nr + ': Ziel-Feld ' + feld + ' gibt es in DealPilot nicht (index.html/FIELDS bzw. Einheiten-Felder)');
+  });
+}
+ok(!rundFehler.length && rundAlle > 100, 'Rundweg Feld für Feld: ' + rundOk + ' von ' + rundAlle + ' Werten kommen gleich zurück, jedes Ziel-Feld existiert' + (rundFehler.length ? ':\n        ' + rundFehler.slice(0, 10).join('\n        ') : ''));
+const unbekannt = [...new Set(gelesen.filter((g) => !g[2]).map((g) => g[0] + '.' + g[1]))];
+ok(gelesen.length > 50 && !unbekannt.length, 'ausVivi liest nur Felder aus den Resource-Schemas (' + new Set(gelesen.map((g) => g[0] + '.' + g[1])).size + ' verschiedene)' + (unbekannt.length ? ': unbekannt ' + unbekannt.join(', ') : ''));
+{
+  /* feste Rate statt Tilgung, Zinsbindung als Datum, Leerstand aus fehlendem Mietverhaeltnis, Restschuld heute */
+  const erg = mapping.ausVivi({
+    projekt: { id: 'p', street: 'a', purchase_price: 100000 },
+    einheiten: [{ id: 'u1', identifier: 'WE 1', unit_type: 'residential', square_meters: 50 }, { id: 'u2', identifier: 'WE 2', unit_type: 'residential', square_meters: 60 }, { id: 'g', identifier: 'Garage', unit_type: 'ancillary' }],
+    mietverhaeltnisse: [{ id: 'r1', unit_id: 'u1', rent: 500, rental_start: '2020-01-01', occupancy_type: 'rented' }, { id: 'r0', unit_id: 'u2', rent: 400, rental_start: '2015-01-01', rental_end: '2019-12-31', occupancy_type: 'rented' }],
+    darlehen: [{ id: 'f1', financing_amount: 120000, interest_rate: 4, initial_repayment: null, fixed_monthly_rate: 600, fixed_interest_end_date: '2034-01-01', financing_start_date: '2024-01-01', financing_type: 'primary' }],
+    tilgungsplan: { data: [{ date: '2026-10-01', remaining_debt_after: 115000 }, { date: '2026-11-01', remaining_debt_after: 114800 }, { date: '2099-01-01', remaining_debt_after: 1 }] }
+  }, { vivi_ids: {}, mitEinheiten: true, objart: 'MFH', jetzt: Date.parse('2026-11-22T10:00:00Z') });
+  ok(erg.felder.d1t && erg.felder.d1t.wert === 2, 'Tilgung aus fester Rate: 600 × 12 / 120.000 − 4 % = 2 %');
+  ok(erg.felder.d1_bindj && erg.felder.d1_bindj.wert === '10', 'Zinsbindung aus Enddatum: 2024 bis 2034 = 10 Jahre');
+  ok(erg.felder['einheit.1.status'] && erg.felder['einheit.1.status'].wert === 'leer' && erg.felder['einheit.0.ist'].wert === 500, 'Leerstand aus beendetem Mietverhältnis, Garage (ancillary) ist keine Wohneinheit');
+  ok(erg.info.restschuld_heute && erg.info.restschuld_heute.wert === 114800, 'Restschuld heute aus dem Tilgungsplan (Gegenprobe, kein Eingabefeld)');
+}
+{
+  /* Zuordnen: nichts geht an ViVi, nur ein GET */
+  const vorher = A.st.anfragen.length, posts = A.st.posts;
+  const neuOid = 'bbbbbbbb-0000-4000-8000-000000000009';
+  objekte[neuOid] = { user: USER, data: FAELLE[2].d };
+  const r = await dienst.zuordnen(USER, neuOid, Object.keys(A.st.projekte)[2], null);
+  ok(r.ok && A.st.posts === posts && A.st.anfragen.slice(vorher).every((a) => a.startsWith('GET ')), 'Zuordnen eines vorhandenen ViVi-Objekts: nur GET, kein POST');
+  const w = await dienst.abrufen(USER, neuOid);
+  ok(w.felder.kp && w.felder.wfl, 'zugeordnetes Objekt wird gelesen (Einheiten in ViVi-Reihenfolge)');
+  const l = await dienst.loesen(USER, neuOid);
+  ok(l.ok && !SP.v[neuOid] && Object.keys(A.st.projekte).length === OIDS.length && A.st.posts === posts, 'Lösen entfernt nur die DealPilot-Seite, ViVi bleibt unverändert');
+}
+
+/* ═══ F · Anfragebremse ══════════════════════════════════════════════════ */
+kopf('F  Anfragebremse');
+{
+  viviClient._fensterLeeren();
+  let n = 0; let t = 1000;
+  const cl = viviClient.erzeugen('bremsen-test-token', { fetch: async () => { n++; return { status: 200, json: async () => ({ data: [] }) }; }, jetzt: () => t, maxWarten: 0 });
+  for (let i = 0; i < 50; i++) await cl.get('/accounts');
+  let code = null; try { await cl.get('/accounts'); } catch (e) { code = e.code; }
+  ok(n === 50 && code === 'bremse_lokal', 'höchstens 50 Anfragen je Minute und Token, die 51. wird nicht gesendet');
+  t += 60 * 1000 + 10;
+  await cl.get('/accounts');
+  ok(n === 51, 'nach Ablauf der Minute geht es weiter');
+  let gewartet = 0;
+  const cl2 = viviClient.erzeugen('bremsen-test-token', { fetch: async () => { n++; return { status: 200, json: async () => ({}) }; }, jetzt: () => t, schlafen: async (ms) => { gewartet += ms; t += ms; }, maxWarten: 70000 });
+  for (let i = 0; i < 50; i++) await cl2.get('/accounts');
+  ok(gewartet > 0 && gewartet <= 61000, 'mit Wartezeit (Takt, Anlegen) wartet der Client auf den nächsten freien Platz statt zu überziehen (' + Math.round(gewartet / 1000) + ' s)');
+  viviClient._fensterLeeren();
+  let m = 0;
+  const c3 = viviClient.erzeugen('t429-token-abcdef', { fetch: async () => { m++; return { status: 429, json: async () => ({ message: 'Too Many Attempts.' }) }; } });
+  let c1 = null, c2 = null; try { await c3.get('/projects'); } catch (e) { c1 = e.code; } try { await c3.get('/projects'); } catch (e) { c2 = e.code; }
+  ok(c1 === 'bremse_429' && c2 === 'bremse_429' && m === 1 && c3.zaehler.bremse429, '429 bricht ab, die nächste Anfrage dieser Runde wird gar nicht mehr gesendet (1 Anfrage)');
+  const quelle = lies('backend/src/services/vivi/viviClient.js');
+  ok(!/retry|wiederhol\w*\s*\(/i.test(quelle.replace(/\/\*[\s\S]*?\*\//g, '')), 'keine Wiederholungsschleife im Client');
+  /* Takt bricht die Runde eines Nutzers bei 429 ab */
+  const C = attrappe(); const S3 = speicherImArbeitsspeicher({});
+  S3.v['o1'] = { object_id: 'o1', user_id: USER, vivi_objekt_id: 'x', anlage_status: 'fertig', vivi_ids: {} }; S3.v['o2'] = Object.assign({}, S3.v['o1'], { object_id: 'o2' });
+  let anfragen = 0;
+  dienst._setzeDeps({ speicher: Object.assign(S3, { objektHolen: async (u, o) => ({ id: o, data: {} }) }), creds: { getSecret: async () => TOKEN },
+    client: (tk, o) => viviClient.erzeugen(tk, Object.assign({}, o, { fetch: async () => { anfragen++; return { status: 429, json: async () => ({}) }; }, maxWarten: 0 })), jetzt: () => Date.now(), schlafen: async () => {} });
+  viviClient._fensterLeeren();
+  const s = await dienst.taktLauf();
+  ok(anfragen === 1 && s.bremse === 1 && s.objekte === 0, 'Takt: 429 beim ersten Objekt beendet die Runde dieses Nutzers (1 Anfrage, zweites Objekt nicht gefragt)');
+}
+
+/* ═══ G · Takt ═══════════════════════════════════════════════════════════ */
+kopf('G  Takt viviAbruf');
+{
+  const ts = require(P('backend/src/utils/taktSperre.js'));
+  ok(ts.SCHLUESSEL.viviAbruf === 11, 'SCHLUESSEL viviAbruf = 11 in utils/taktSperre.js');
+  const q = lies('backend/src/services/vivi/viviDienst.js');
+  ok(/const _viviAbruf = _ts\.takt\('viviAbruf'/.test(q) && /setInterval\(_viviAbruf,/.test(q), 'setInterval(_viviAbruf) läuft unter _ts.takt(\'viviAbruf\')');
+  ok(/require\('\.\/services\/vivi\/viviDienst'\)\.starteTakt\(\)/.test(lies('backend/src/index.js')), 'index.js startet den Takt');
+}
+
+/* ═══ H · Frontend ═══════════════════════════════════════════════════════ */
+kopf('H  Frontend: Felder, Hinweis, Ausgrauen');
+{
+  const fieldsBlock = (function () { const a = FIELDS_TEXT.indexOf('var FIELDS = ['); if (a < 0) return ''; const r = FIELDS_TEXT.slice(a + 14); const e = r.search(/\n(var|function|const|let) /); return e < 0 ? r : r.slice(0, e); })();   /* bis zur naechsten Deklaration am Zeilenanfang */
+  ok(/'_vivi'/.test(fieldsBlock) && /'nk_vorauszahlung'/.test(fieldsBlock), "storage.js FIELDS führt '_vivi' und 'nk_vorauszahlung' (sonst fallen sie beim Speichern lautlos weg)");
+  ok(/id="_vivi"/.test(HTML) && /id="nk_vorauszahlung"/.test(HTML), 'index.html: verstecktes Feld _vivi und Eingabe nk_vorauszahlung');
+  const dz = lies('frontend/js/data/detailgrad-zuordnung.js');
+  const z = {}; vm.runInNewContext(dz, { window: z });
+  const s2 = z.DpDetailgradZuordnung.reiter.s2;
+  ok(s2['2'].felder.includes('nk_vorauszahlung') && !s2['1'].felder.includes('nk_vorauszahlung'), 'nk_vorauszahlung ab Detailgrad Fortgeschritten (nicht Einsteiger)');
+  ok(/f\('nk_vorauszahlung'/.test(lies('frontend/js/mfh-einheiten.js')), 'MFH: je Wohnung das Feld nk_vorauszahlung im Wohnungsfenster');
+  const vf = lies('frontend/js/vivi-felder.js');
+  ok(vf.includes("var HINWEIS = 'Verknüpft mit ViVi, der Wert kommt aus ViVi, Änderungen bitte in ViVi.';"), 'Hinweis Zeichen für Zeichen: „Verknüpft mit ViVi, der Wert kommt aus ViVi, Änderungen bitte in ViVi.“');
+  const ohneK = vf.replace(/\/\*[\s\S]*?\*\//g, '');
+  ok(/data-vivi-ro/.test(ohneK) && !/data-mff-ro/.test(ohneK) && !/mff-gesperrt/.test(ohneK), 'eigenes Merkattribut data-vivi-ro, kein data-mff-ro und keine mff-Klasse (mfh-felder.js bleibt unberührt)');
+  ok(!/["'`]\/vivi\//.test(ohneK), 'vivi-felder.js spricht nicht mit dem Backend (das tut nur vivi.js hinter DpVorschau.frei)');
+  ok(/DpVorschau\.frei\('vivi'\)/.test(lies('frontend/js/vivi.js')), "vivi.js fragt DpVorschau.frei('vivi')");
+
+  /* Nachgebautes Formular: setzen, sperren, eigen, loesen */
+  function feldbau() {
+    const els = {};
+    function mk(id, tag, wert) {
+      const attrs = {}; const cls = new Set();
+      const el = { id, tagName: tag || 'INPUT', value: wert || '', readOnly: false, title: '', placeholder: '',
+        classList: { add: (c) => cls.add(c), remove: (c) => cls.delete(c), contains: (c) => cls.has(c) },
+        setAttribute: (k, v) => { attrs[k] = String(v); }, getAttribute: (k) => (k in attrs ? attrs[k] : null), hasAttribute: (k) => k in attrs, removeAttribute: (k) => { delete attrs[k]; },
+        dispatchEvent: () => true, insertAdjacentElement: () => {}, focus: () => {} };
+      el.parentNode = { querySelector: () => null, querySelectorAll: () => [] };
+      els[id] = el; return el;
+    }
+    mk('kp', 'INPUT', '400000'); mk('wfl', 'INPUT', '80'); mk('mv_art', 'SELECT', ''); mk('_vivi', 'INPUT', ''); mk('nkm', 'INPUT', '700');
+    const doc = { createElement: (tag) => mk('neu' + Object.keys(els).length, String(tag).toUpperCase()), getElementById: (id) => els[id] || null, querySelectorAll: (s) => (/vivi-verknuepft/.test(s) ? Object.values(els).filter((e) => e.classList.contains('vivi-verknuepft') || e.classList.contains('vivi-eigen')) : []) };
+    return { els, doc };
+  }
+  function lauf(quelle) {
+    const fb = feldbau();
+    const ctx = frontendModul('frontend/js/vivi-felder.js', { document: fb.doc });
+    if (quelle) vm.runInContext(quelle.replace('if (window.DpViviFelder) return;', ''), ctx);
+    return { F: ctx.DpViviFelder, els: fb.els };
+  }
+  const stand = { verknuepft: true, letzter_abruf: '2026-11-22T13:05:00Z', felder: { kp: { wert: 465000 }, wfl: { wert: 82.5 }, mv_art: { wert: 'index' } }, info: {} };
+  let t = lauf();
+  const geaendert = t.F.setzen(stand);
+  const kp = t.els.kp, wfl = t.els.wfl, sel = t.els.mv_art;
+  ok(geaendert && kp.value === '465000' && wfl.value === '82,5' && sel.value === 'index', 'ViVi-Werte kommen ins Formular (465000, 82,5 im deutschen Format, Select)');
+  ok(kp.readOnly && kp.classList.contains('vivi-verknuepft') && kp.getAttribute('data-vivi-ro') === '0' && kp.title.indexOf(t.F.HINWEIS) === 0 && /Stand \d\d\.\d\d\.2026/.test(kp.title), 'Feld gesperrt: readOnly, Klasse, eigenes Merkattribut, Hinweis mit Stand im title');
+  ok(sel.getAttribute('tabindex') === '-1' && sel.classList.contains('vivi-verknuepft'), 'Select gesperrt (tabindex -1, pointer-events über die Klasse)');
+  ok(t.els.nkm.readOnly === false && !t.els.nkm.classList.contains('vivi-verknuepft'), 'nicht verknüpftes Feld bleibt frei');
+  const v = JSON.parse(t.els._vivi.value);
+  ok(v.verknuepft && v.felder.kp === 465000, '_vivi im Objekt: Spiegel der ViVi-Werte');
+  /* eigene Angabe: der Kunde hat kp lokal festgelegt */
+  t.els._vivi.value = JSON.stringify({ verknuepft: true, felder: {}, eigen: { kp: '455000' } });
+  kp.value = '455000';
+  t.F.setzen(stand);
+  ok(kp.value === '455000' && !kp.readOnly && kp.classList.contains('vivi-eigen') && /ViVi führt 465000/.test(kp.title), 'lokal überschrieben: Wert bleibt, Feld frei, Hinweis nennt den ViVi-Wert, nichts geht nach ViVi');
+  t.F.setzen({ verknuepft: false });
+  ok(!wfl.readOnly && !wfl.classList.contains('vivi-verknuepft') && wfl.getAttribute('data-vivi-ro') === null && t.els._vivi.value === '', 'Verknüpfung gelöst: alte Sperre zurück (readOnly wie vorher), _vivi leer');
+  /* Gegenprobe: anderer Hinweistext bzw. fremdes Merkattribut */
+  const quelle = lies('frontend/js/vivi-felder.js');
+  t = lauf(quelle.replace("'Verknüpft mit ViVi, der Wert kommt aus ViVi, Änderungen bitte in ViVi.'", "'Kommt aus ViVi'"));
+  t.F.setzen(stand);
+  ok(t.els.kp.title.indexOf('Verknüpft mit ViVi, der Wert kommt aus ViVi, Änderungen bitte in ViVi.') !== 0, 'Gegenprobe rot: geänderter Hinweistext fällt auf');
+  t = lauf(quelle.split("'data-vivi-ro'").join("'data-mff-ro'"));
+  t.F.setzen(stand);
+  ok(t.els.kp.getAttribute('data-vivi-ro') === null, 'Gegenprobe rot: fremdes Merkattribut fällt auf');
+}
+
+/* ═══ I · Token ══════════════════════════════════════════════════════════ */
+kopf('I  Token');
+{
+  const alles = JSON.stringify(SP.prot) + JSON.stringify(SP.v) + JSON.stringify(SP.w);
+  ok(SP.prot.length > 10 && !alles.includes(TOKEN) && !alles.includes(TOKEN.slice(0, 12)), 'Token nie im Protokoll, nie in der Verknüpfung, nie in vivi_werte (' + SP.prot.length + ' Protokolleinträge)');
+  dienst._setzeDeps({ speicher: SP, creds: { getSecret: async () => TOKEN, getMeta: async () => ({ exists: true, hint: TOKEN.slice(-4) }) }, client: (tk, o) => viviClient.erzeugen(tk, Object.assign({}, o, { fetch: async () => ({ status: 401, json: async () => ({ message: 'Unauthenticated.' }) }), maxWarten: 0 })), jetzt: () => Date.now(), schlafen: async () => {} });
+  let msg = ''; try { await dienst.probe(USER); } catch (e) { msg = e.message + JSON.stringify(e); }
+  const meta = JSON.stringify(await dienst.verbindungMeta(USER));
+  ok(msg && !msg.includes(TOKEN) && /401/.test(msg) && !meta.includes(TOKEN.slice(0, -4)), 'Fehler 401 und Verbindungsstatus nennen den Token nicht (nur die letzten vier Zeichen)');
+  const grepToken = [...VIVI_DATEIEN, 'frontend/js/vivi.js', 'frontend/js/vivi-felder.js'].filter((r) => /Bearer\s+[A-Za-z0-9]{16,}|VIVI_TOKEN|process\.env\.VIVI/.test(lies(r)));
+  ok(!grepToken.length, 'kein Token im Code, keine VIVI_TOKEN-Umgebungsvariable' + (grepToken.length ? ': ' + grepToken.join(', ') : ''));
+  const envs = ['.env.example', 'backend/.env.example'].filter((f) => fs.existsSync(P(f)) && /VIVI/i.test(lies(f)));
+  ok(!envs.length, 'keine ViVi-Zeile in den .env-Vorlagen');
+  const r = lies('backend/src/routes/vivi.js');
+  ok(/router\.use\(vorschau\.sperre\('vivi'\)\)/.test(r) && !/credentials\/reveal|reveal/.test(r), "Route hinter vorschau.sperre('vivi'), kein Anzeigen des Tokens");
+}
+
+/* ═══ J · Kundentext ═════════════════════════════════════════════════════ */
+kopf('J  Kundentext ohne Gedankenstrich und Semikolon');
+{
+  const texte = [];
+  FAELLE.forEach((fa) => { const p = mapping.nachVivi(fa.d, { platzhalterNamen: true }); texte.push(...p.hinweise, ...p.fehlt.map((x) => x.text), ...p.vorschau.map((x) => x.feld + ' ' + x.wert + ' ' + x.notiz)); });
+  texte.push(...mapping.nachVivi({ objart: 'XYZ' }, {}).fehlt.map((x) => x.text), ...mapping.nachVivi({ objart: 'XYZ' }, {}).hinweise);
+  const schlecht = texte.filter((x) => /[–—;]/.test(x));
+  ok(texte.length > 50 && !schlecht.length, texte.length + ' Texte der Vorschau ohne – — ;' + (schlecht.length ? ': ' + schlecht.slice(0, 3).join(' | ') : ''));
+  const datei = ['frontend/js/vivi.js', 'frontend/js/vivi-felder.js', 'frontend/js/nk-vorauszahlung.js', 'backend/src/services/vivi/viviDienst.js', 'backend/src/services/vivi/viviClient.js'];
+  const funde = [];
+  datei.forEach((rel) => {
+    const t = lies(rel).replace(/\/\*[\s\S]*?\*\//g, '').split('\n').filter((z) => !/^\s*\/\//.test(z)).join('\n');
+    const re = /'((?:[^'\\\n]|\\.)*)'/g; let m;
+    while ((m = re.exec(t))) {
+      const s = m[1];
+      if (!/[A-Za-zÄÖÜäöüß]{3,} [A-Za-zÄÖÜäöüß]{2,}/.test(s)) continue;            /* nur Saetze */
+      if (/[{}]|style=|px|rgba|var\(--|@media|font:/.test(s)) continue;          /* CSS und Markup-Attribute */
+      if (/[–—]/.test(s) || /;\s*\S/.test(s.replace(/&[a-z]+;/g, ''))) funde.push(rel + ': ' + s.slice(0, 70));
+    }
+  });
+  ok(!funde.length, 'Kundentexte in ' + datei.length + ' Dateien ohne – — ;' + (funde.length ? ':\n        ' + funde.slice(0, 6).join('\n        ') : ''));
+}
+
+dienst._setzeDeps(null);
+console.log('\n' + (rot ? 'ROT · ' + rot + ' Befund(e), ' + gruen + ' grün' : 'SAUBER · ' + gruen + ' Prüfpunkte grün'));
+process.exit(rot ? 1 : 0);

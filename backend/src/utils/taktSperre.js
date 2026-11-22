@@ -34,7 +34,8 @@ const SCHLUESSEL = Object.freeze({
   partnerFristen: 8,     // v3931 · Partner-Fristen nach Platzentzug + Loeschfristen Partner-Cockpit (index.js, täglich).
                          // Fehlte seit v3357: takt('partnerFristen') warf bei JEDEM Lauf „unbekannter Takt" - nie gelaufen.
   landingZahlen: 9,      // v3930 · Datenumfang der Landing neu messen (services/datenumfang.js, täglich)
-  einzelcheckLoeschen: 10 // v3940 · Einzel-Check: abgelaufene Käufe löschen (services/einzelcheck.js, alle 6 h)
+  einzelcheckLoeschen: 10, // v3940 · Einzel-Check: abgelaufene Käufe löschen (services/einzelcheck.js, alle 6 h)
+  viviAbruf: 11          // v3950 · ViVi-Anbindung: verknüpfte Objekte lesen, nur GET (services/vivi/viviDienst.js, alle 6 h, je Objekt höchstens alle 20 h)
 });
 
 function _log(t) { console.log('[takt-sperre] ' + t); }

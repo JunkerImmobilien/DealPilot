@@ -546,6 +546,7 @@
     function blk(cls, titel, inhalt) { return '<section class="mfh-we-blk ' + cls + '"><div class="mfh-we-blk-t">' + titel + '</div>' + inhalt + '</section>'; }
     var titel = (e.lage || e.nr || (i + 1));
     var ov = document.createElement("div"); ov.id = "mfh-we-ov";
+    ov.setAttribute('data-i', String(i));   /* v3950 · welche Einheit offen ist (js/vivi-felder.js sperrt verknuepfte Felder dieser Einheit) */
     ov.style.cssText = 'position:fixed;inset:0;background:rgba(42,39,39,.60);z-index:99999;display:flex;align-items:center;justify-content:center;padding:14px';
     var _wort = e.art === 'gewerbe' ? 'Einheit' : 'Wohnung';   /* v2824 · eine Gewerbeeinheit ist keine Wohnung */
     ov.innerHTML = '<div class="mfh-we-karte" role="dialog" aria-modal="true" aria-label="' + _wort + ' ' + esc(String(titel)) + '">' +
@@ -592,7 +593,7 @@
           '<div class="mfh-we-raster">' +
             f('ist', 'Ist-Kaltmiete (€/Monat)', '', 'decimal') +
             s('status', 'Status', [['vermietet', 'vermietet'], ['leer', 'leer']]) +
-            f('nk_vorauszahlung', 'NK-Vorauszahlung (€/Monat)', '', 'decimal') +
+            f('nk_vorauszahlung', 'NK-Vorauszahlung (€/Monat)', (window.DpNkVorauszahlung ? window.DpNkVorauszahlung.platzhalterEinheit(_arbeit, i) : ''), 'decimal') +   /* v3950 · leer gilt der Vorschlag aus den umlagefaehigen Kosten nach Wohnflaeche (js/nk-vorauszahlung.js) */
             f('stellplatz_miete', 'Stellplatzmiete (€/Monat)', '', 'decimal') +
             s('mv_art', 'Vertragsart', MIETVERTRAG_ARTEN) +
             d('mv_beginn', 'Mietbeginn') +

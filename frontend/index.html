@@ -1072,6 +1072,7 @@ label.dp-required.qc-required::after {
   <input type="hidden" id="_avm_state" value="">
   <input type="hidden" id="dp_stufe" value="">  <!-- v3073: Detailgrad JE OBJEKT (js/detailgrad.js): 1 Einsteiger · 2 Fortgeschritten · 3 Experte; leer bei einem Bestandsobjekt = Experte -->
   <input type="hidden" id="_mb_state" value="">  <!-- v540: DealPilot-Marktbewertung Snapshot -->
+  <input type="hidden" id="_vivi" value="">  <!-- v3950: ViVi-Verknuepfung im Objekt (js/vivi-felder.js), JSON: verknuepft, stand, felder (Anzeige-Spiegel), eigen (lokal ueberschriebene Werte). Massgeblich bleibt vivi_werte im Backend -->
   <input type="hidden" id="_dok_eingang" value="">  <!-- v3120: Herkunft der Steuerposten und Verlauf des Eingangs (unterlagen-eingang.js), JSON -->
   <input type="hidden" id="_dok_auswertung" value="">  <!-- v3016: Auswertung der Unterlagen (WEG, Grundbuch, Teilung), JSON - unterlagen.js -->
   <input type="hidden" id="_lage_herkunft" value="">  <!-- v2515: Herkunft je Lage-Feld (gemessen | ki | eigen), JSON -->
@@ -2051,6 +2052,13 @@ label.dp-required.qc-required::after {
           <div class="iw"><input id="mv_kuendigungsverzicht_bis" type="date"></div></div>
         <div class="f"><label title="Nur bei einer Miete mehr als 20 % UNTER dem Markt: wie viele Jahre die Abweichung voraussichtlich noch besteht, bis die Miete rechtlich angepasst werden kann (Kappungsgrenze, Mieterhöhungsverlangen). Ohne Angabe zeigt der Bericht Szenarien über 3, 5 und 10 Jahre und setzt nichts an.">Abweichung erwartet noch (Jahre)</label>
           <div class="iw"><input id="mv_abw_jahre" type="text" inputmode="decimal" placeholder="nur bei Miete unter Markt" class="tr"></div></div>
+        <!-- v3950 · Nebenkosten-Vorauszahlung (Marcel 22.11.2026): der monatliche Abschlag des Mieters (§ 556 Abs. 2 BGB), ein Stammdatum
+             fuer ViVi (monthly_utility_costs) und die Nebenkostenabrechnung. Kein Rechenkern liest es: Cashflow und KPI rechnen weiter mit
+             den umlagefaehigen Kosten. Leer gilt der Vorschlag aus den umlagefaehigen Kosten (js/nk-vorauszahlung.js). Beim MFH je Wohnung
+             im Wohnungsfenster, gleicher Name. Ab Detailgrad Fortgeschritten wie die ganze Karte. -->
+        <div class="f"><label for="nk_vorauszahlung" title="Der monatliche Abschlag, den der Mieter auf die Betriebskosten zahlt (§ 556 Abs. 2 BGB). Er steht im Mietvertrag und kann von den tatsächlichen umlagefähigen Kosten abweichen. DealPilot rechnet Cashflow und Kennzahlen weiter mit den umlagefähigen Kosten.">Nebenkosten-Vorauszahlung / Monat</label>
+          <div class="iw"><span class="pfx">€</span><input id="nk_vorauszahlung" type="text" inputmode="decimal" placeholder="" class="trl"></div>
+          <span class="hint" id="nk-vz-hinweis"></span></div>
         <p class="hint" id="mv-objekt-mfh-hinweis" style="display:none"></p>
       </div>
       <div class="card"><div class="ct ct-pro me-header"><!-- V316-miete-header -->
@@ -4044,7 +4052,7 @@ label.dp-required.qc-required::after {
   <script src="js/immometrica-import.js?v=v3370"></script>
   <script src="js/immometrica-qc.js?v=v2199"></script>
   <script src="js/modal-boarding-skin.js?v=v3370"></script>
-  <script src="js/provider-keys.js?v=v3370"></script>
+  <script src="js/provider-keys.js?v=v3950"></script>
   <script src="js/ueberfuehrung-kern.js?v=v3790"></script>
   <script src="js/mandanten.js?v=v3850"></script>
   <script src="js/ueberfuehrung-wizard.js?v=v3686"></script>
@@ -4079,7 +4087,7 @@ label.dp-required.qc-required::after {
 <script src="js/marktdaten-modal.js?v=v2247c"></script>
 <script src="js/ui.js?v=v3444"></script>
 <script src="js/sidebar-collapse.js?v=20260611174630"></script>
-<script src="js/storage.js?v=v3945"></script>
+<script src="js/storage.js?v=v3950"></script>
 <script src="js/nachrechnen.js?v=v3031"></script><!-- v3031: Kennzahlen/Scores gespeicherter Objekte neu rechnen (nur auf Aufruf) -->
 <!-- v845-newsearch-removed: sb-search.js entfernt (Kollision mit sidebar-search.js) -->
 <script src="js/inventar-sync.js?v=v3006c"></script><!-- V291-inv-sync-applied -->
@@ -4132,15 +4140,18 @@ label.dp-required.qc-required::after {
 <script src="js/objektart-felder.js?v=v3945"></script>
 <script src="js/vgf-merkmale.js?v=v3008"></script>
 <!-- v3073: Detailgrad Einsteiger · Fortgeschritten · Experte - Zuordnung (erzeugt aus design/Vorschläge/arbeitsbereich-detailgrad-zuordnung.json) und Modul -->
-<script src="js/data/detailgrad-zuordnung.js?v=v3910"></script>
+<script src="js/data/detailgrad-zuordnung.js?v=v3950"></script>
 <script src="js/detailgrad.js?v=v3910"></script>
 <script src="js/objekt-reiter.js?v=v3740"></script>
 <script src="js/paket-import.js?v=v3670"></script><!-- v3202 · Portfolio/Paket aus mehreren Objekten -->
 <script src="js/objekt-bloecke.js?v=v3034"></script><!-- v3034 -->
 <script src="js/feld-hilfe.js?v=v3073"></script>
 <script src="js/bgf-herleitung.js?v=v1446"></script>
-<script src="js/mfh-einheiten.js?v=v3860c"></script>
+<script src="js/mfh-einheiten.js?v=v3950"></script>
 <script src="js/mfh-felder.js?v=v3840b"></script><!-- v3003 · Objekt mit Einheiten: Erklaerkasten, Felder aus den Einheiten, Zustand des Gebaeudes -->
+<script src="js/nk-vorauszahlung.js?v=v3950"></script><!-- v3950 · Nebenkosten-Vorauszahlung: Vorschlag aus den umlagefaehigen Kosten je Einheit nach Wohnflaeche -->
+<script src="js/vivi-felder.js?v=v3950"></script><!-- v3950 · ViVi: verknuepfte Felder ausgegraut, Hinweis, lokal ueberschreiben -->
+<script src="js/vivi.js?v=v3950"></script><!-- v3950 · ViVi: Verbindung, einmal anlegen mit Vorschau, Jetzt abgleichen (Vorschau-Funktion vivi) -->
 <script src="js/wertangabe.js?v=v3003b"></script><!-- v3003a · eine Wertangabe: Marktwert/Verkehrswert + Herkunft statt Bankbewertung -->
 <script src="js/indexreihen.js?v=v3026"></script><!-- v3026 · VPI/Nettokaltmieten aus dem Server-Cache -->
 <script src="js/indexmiete.js?v=v3026"></script><!-- v3026 · Indexmiete § 557b BGB -->

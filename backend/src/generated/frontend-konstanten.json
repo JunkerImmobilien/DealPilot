@@ -1,10 +1,10 @@
 {
- "erzeugt_am": "2026-11-22T10:10:37.100Z",
+ "erzeugt_am": "2026-11-22T10:33:25.675Z",
  "quellen": {
   "voice-import": "a8a2e6dba58ea42c",
   "objektart-felder": "16af21246a92d8f6",
-  "storage": "3914fbcef8f03bf4",
-  "index-html": "6d2026f398a3faf5",
+  "storage": "d84fc7dfa50d47de",
+  "index-html": "5b62148bb5b845c2",
   "grest": "81f3fb0a4de3a6cf"
  },
  "daten": {
@@ -620,6 +620,8 @@
    "mv_befristet_bis",
    "mv_kuendigungsverzicht_bis",
    "mv_abw_jahre",
+   "nk_vorauszahlung",
+   "_vivi",
    "ds2_zustand",
    "ds2_energie",
    "ds2_mietausfall",
@@ -1847,6 +1849,11 @@
     "id": "mv_abw_jahre",
     "kind": "text",
     "label": "Abweichung erwartet noch (Jahre)"
+   },
+   {
+    "id": "nk_vorauszahlung",
+    "kind": "text",
+    "label": "Nebenkosten-Vorauszahlung / Monat"
    },
    {
     "id": "ds2_zustand",
