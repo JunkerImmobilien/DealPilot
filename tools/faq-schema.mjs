@@ -5,13 +5,15 @@
    nie von Hand. Nach jeder Textänderung in fragen.html laufen lassen.
    landing-seo-2 · auch die Rechner-Seiten (immobilien-rendite-berechnen, cashflow-immobilie-berechnen,
    kaufpreisfaktor-berechnen) tragen <details class="fq"> - sie werden mitgeschrieben, sofern vorhanden.
+   landing-seo-6 (22.11.2026) · dazu immobilien-investment-rechner und renditeobjekt-pruefen.
    Aufruf: node tools/faq-schema.mjs   (RC 0 · 1 wenn eine Seite keine Fragen hat) */
 import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 
 const LANDING = join(dirname(fileURLToPath(import.meta.url)), '..', 'frontend/landing');
-const SEITEN = ['fragen.html', 'immobilien-rendite-berechnen.html', 'cashflow-immobilie-berechnen.html', 'kaufpreisfaktor-berechnen.html']
+const SEITEN = ['fragen.html', 'immobilien-rendite-berechnen.html', 'cashflow-immobilie-berechnen.html', 'kaufpreisfaktor-berechnen.html',
+  'immobilien-investment-rechner.html', 'renditeobjekt-pruefen.html']
   .filter((s, i) => i === 0 || fs.existsSync(join(LANDING, s)));
 const ent = (s) => s.replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
   .replace(/&quot;/g, '"').replace(/&thinsp;/g, ' ').replace(/&shy;/g, '').replace(/&[a-z]+;/g, ' ');
