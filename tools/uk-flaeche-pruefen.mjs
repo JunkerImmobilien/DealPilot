@@ -76,6 +76,40 @@ for (const f of fs.readdirSync(ORDNER).filter((x) => x.endsWith('.json')).sort()
     else beispiele++;
   }
 }
+/* v3946 · UEBERTRAGUNG NACH SACHVERSTAENDIGER PRUEFUNG (Dresden 2026). Das ZFH
+   rechnet nach der Dresdner Formel, aber als Uebertragung (Stufe C, nicht amtlich,
+   Hinweis nennt die Pruefung); das RH bleibt ausserhalb der Geltung; das EFH
+   bleibt amtlich (Stufe A). Gegenproben: ohne uebertragen_objektarten waere das
+   ZFH still amtlich (muss die Probe sehen), eine Uebertragung fuer eine
+   AUSGESCHLOSSENE Objektart (RH) darf nichts freischalten. */
+{
+  const dd = (JSON.parse(fs.readFileSync(path.join(ORDNER, 'uk-flaeche-ost-2026.json'), 'utf8')) || [])
+    .filter((s) => s && s.kennzahl === UK.KENNZAHL && s.ags === '14612000');
+  const probe = (saetze, objektart) => UK.groessenanpassung({ ags: '14612000', objektart, flaeche_qm: 800,
+    bezugsgroesse_qm: 600, brw_eur_qm: 300, saetze });
+  const istUebertragung = (r) => !!(r && r.verfuegbar && r.uebertragen === true && r.amtlich === false
+    && r.stufe === 'C' && /sachverständiger Prüfung/.test(String(r.hinweis || '')));
+  if (dd.length !== 1) rot('Dresden-Probe: genau ein UK-Satz 14612000 erwartet, gefunden ' + dd.length);
+  else {
+    const zfh = probe(dd, 'zfh'), rh = probe(dd, 'rh'), efh = probe(dd, 'efh');
+    if (!istUebertragung(zfh)) rot('Dresden-Probe: ZFH keine Uebertragung Stufe C/nicht amtlich (' + JSON.stringify({ v: zfh.verfuegbar, g: zfh.grund, u: zfh.uebertragen, s: zfh.stufe }) + ')');
+    if (rh.verfuegbar || rh.grund !== 'ausserhalb_geltung') rot('Dresden-Probe: RH soll ausserhalb_geltung sein, ist ' + (rh.grund || 'verfuegbar'));
+    if (!efh.verfuegbar || efh.uebertragen || efh.stufe !== 'A') rot('Dresden-Probe: EFH soll amtlich Stufe A rechnen');
+    if (zfh.verfuegbar && efh.verfuegbar && zfh.faktor !== efh.faktor) rot('Dresden-Probe: ZFH rechnet mit anderem Koeffizienten als EFH');
+    /* Gegenprobe 1: Uebertragungsvermerk entfernt -> ZFH waere amtlich, die Probe muss das erkennen */
+    const ohne = dd.map((s) => ({ ...s, geltungsbereich: { ...s.geltungsbereich, uebertragen_objektarten: undefined } }));
+    if (istUebertragung(probe(ohne, 'zfh'))) rot('Dresden-Gegenprobe 1: ohne Vermerk trotzdem Uebertragung - Probe blind');
+    /* Gegenprobe 2: Vermerk fuer das ausgeschlossene RH schaltet nichts frei */
+    const rhVermerk = dd.map((s) => ({ ...s, geltungsbereich: { ...s.geltungsbereich,
+      uebertragen_objektarten: { ...s.geltungsbereich.uebertragen_objektarten, rh: { wortlaut: 'x', begruendung: 'x' } } } }));
+    if (probe(rhVermerk, 'rh').grund !== 'ausserhalb_geltung') rot('Dresden-Gegenprobe 2: Vermerk schaltet das ausgeschlossene RH frei');
+    /* Gegenprobe 3: ZFH zurueck nach ausgeschlossen -> ausserhalb_geltung trotz Vermerk */
+    const zfhRaus = dd.map((s) => ({ ...s, geltungsbereich: { ...s.geltungsbereich,
+      objektarten: ['efh', 'dhh'], objektarten_ausgeschlossen: ['zfh', ...s.geltungsbereich.objektarten_ausgeschlossen] } }));
+    if (probe(zfhRaus, 'zfh').grund !== 'ausserhalb_geltung') rot('Dresden-Gegenprobe 3: ausgeschlossenes ZFH rechnet trotz Ausschluss');
+    if (rc === 0) console.log('  DRESDEN ZFH Uebertragung Stufe C (Faktor ' + zfh.faktor + '), RH ausserhalb_geltung, EFH Stufe A, 3 Gegenproben greifen');
+  }
+}
 console.log('DECKUNG: ' + dateien + ' Datei(en), ' + saetze + ' Saetze, Laender ' + ([...laender].sort().join(' ') || '–')
   + ', ' + beispiele + ' Anwendungsbeispiel(e) getroffen');
 console.log(rc ? 'ERGEBNIS: ROT' : 'ERGEBNIS: sauber');

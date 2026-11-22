@@ -4873,21 +4873,32 @@
       "nutzung": "unbebaute baureife Grundstücke des individuellen Wohnungsbaus (ein Bauplatz), voll erschlossen; Stichprobe 94 Einfamilienhäuser, 16 Doppelhaushälften, 3 Reihenhäuser, 3 Zweifamilienhäuser",
       "objektarten": [
         "efh",
-        "dhh"
+        "dhh",
+        "zfh"
       ],
       "objektarten_ausgeschlossen": [
-        "zfh",
         "rh",
         "mfh",
         "etw",
         "gewerbe"
       ],
+      "uebertragen_objektarten": {
+        "zfh": {
+          "wortlaut": "Aufgrund der geringen Anzahl an Kauffällen für Reihenhaus- und Zweifamilienhausgrundstücke ist die Verwendbarkeit der im Folgenden ausgewiesenen Regressionsformel für diese Grundstücksarten sachverständig zu prüfen.",
+          "seite": 67,
+          "begruendung": "Die Stichprobe enthält 3 Zweifamilienhäuser (S. 67); der Ausschuss gruppiert in der Verteilungsgrafik „freistehendes Ein- und Zweifamilienhaus“ (S. 68) und lässt für Zweifamilienhäuser hilfsweise den Bodenpreisindex der Einfamilienhäuser zu (S. 62); die Grundstücke freistehender Zweifamilienhäuser liegen in Dresden bei 285 bis 1.363 m², Median 763 m² (S. 89), also im Gültigkeitsbereich 202 bis 1.720 m².",
+          "belege_seiten": [62, 67, 68, 89],
+          "entscheidung": "Recherche 22.11.2026, von Marcel delegiert",
+          "stufe": "C"
+        }
+      },
+      "rh_ausschluss_grund": "Reihenhaus bleibt ausgeschlossen (Recherche 22.11.2026): nur 3 Reihenhäuser in der Stichprobe (S. 67); Grundstücke der Reihenmittelhäuser 110 bis 630 m², Median 210 m² (S. 88), rund die Hälfte unter der Gültigkeitsgrenze 202 m², Extrapolation „im Ermessen des Sachverständigen“ (S. 67); eigener Teilmarkt Doppelhaushälften/Reihenhäuser mit eigenem Bodenpreisindex (S. 62–63).",
       "ausserhalb_wortlaut": "Aufgrund der geringen Anzahl an Kauffällen für Reihenhaus- und Zweifamilienhausgrundstücke ist die Verwendbarkeit der im Folgenden ausgewiesenen Regressionsformel für diese Grundstücksarten sachverständig zu prüfen. (S. 67) Geschossbaugrundstücke rechnet der Ausschuss über die WGFZ (Abschn. 7.2.2, S. 68 ff.).",
       "ausserhalb_weg": "Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Dresden (Amt für Geodaten und Kataster), Grundstücksmarktbericht 2026, Abschn. 7.2.1, S. 67–68",
       "vorbehalt": "Bestimmtheitsmaß R² = 0,40 bei 105 Kauffällen; Vertrauensintervall k1 -0,5757 bis -0,3051 (S. 68). Gilt nur bei gleicher Wohnlage von Objekt und Richtwertgrundstück."
     },
     "stufe": "A",
-    "stufe_grund": "amtlich: Umrechnungsformel des Ausschusses (105 Kauffälle 2024–2025, Stichtag 01.07.2025); Anwendungsbeispiel mischt Fläche und Wohnlage und ist mit dem Flächenkern nicht nachrechenbar, Koeffizienten an den abgedruckten Zwischenwerten gegengeprüft.",
+    "stufe_grund": "amtlich: Umrechnungsformel des Ausschusses (105 Kauffälle 2024–2025, Stichtag 01.07.2025); Anwendungsbeispiel mischt Fläche und Wohnlage und ist mit dem Flächenkern nicht nachrechenbar, Koeffizienten an den abgedruckten Zwischenwerten gegengeprüft. Stufe A gilt für EFH und DHH; das ZFH rechnet als Übertragung nach sachverständiger Prüfung (Stufe C, nicht amtlich, geltungsbereich.uebertragen_objektarten), das RH bleibt ausgeschlossen.",
     "stichtag": "2025-07-01",
     "berichtsjahr": 2026,
     "quelle_url": "https://www.dresden.de/media/pdf/vermessung/2026-Grundstuecksmarktbericht.pdf",

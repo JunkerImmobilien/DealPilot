@@ -241,6 +241,15 @@ export function groessenanpassung({ ags, objektart, flaeche_qm, bezugsgroesse_qm
      schaltet es ein (mfh_uebertragen) - ein Kern liest keine Einstellungen. */
   const _uebertragen = ausgeschlossen && art === 'mfh' && mfh_uebertragen === true
     && (g.objektarten || []).some((a) => ['efh', 'zfh', 'dhh', 'rh'].indexOf(a) >= 0);
+  /* v3946 · UEBERTRAGUNG NACH SACHVERSTAENDIGER PRUEFUNG (Dresden 2026, ZFH).
+     Verlangt der Ausschuss fuer eine Objektart ausdruecklich, die Verwendbarkeit
+     sachverstaendig zu pruefen, und ist diese Pruefung mit Beleg im Satz
+     dokumentiert (geltungsbereich.uebertragen_objektarten[art]: wortlaut,
+     begruendung, entscheidung), rechnet die Formel - aber nie amtlich: Stufe C,
+     uebertragen, mit dem Wortlaut des Ausschusses im Hinweis. Die Objektart
+     muss zugleich in objektarten stehen; sonst bleibt sie ausgeschlossen. */
+  const _uebObj = (!ausgeschlossen && art && g.uebertragen_objektarten
+    && typeof g.uebertragen_objektarten === 'object') ? (g.uebertragen_objektarten[art] || null) : null;
   if (ausgeschlossen && !_uebertragen) {
     return nichts('ausserhalb_geltung',
       'Die Umrechnungskoeffizienten des Ausschusses gelten für ' + (g.nutzung || 'den Regelfall')
@@ -327,6 +336,20 @@ export function groessenanpassung({ ags, objektart, flaeche_qm, bezugsgroesse_qm
       + 'Grundstücksgröße angepasst: ' + fl + ' m² gegen ' + bez + ' m² Bezugsgröße, Koeffizient '
       + String(kFl.k).replace('.', ',') + ' (' + kFl.weg + '). Quelle: ' + herkunft.quelle_text + '.',
   };
+  if (_uebObj) {
+    const _artName = { efh: 'Einfamilienhaus', zfh: 'Zweifamilienhaus', dhh: 'Doppelhaushälfte', rh: 'Reihenhaus' }[art] || art;
+    return {
+      ..._erg, uebertragen: true, amtlich: false, stufe: 'C',
+      uebertragung_grund: 'sachverstaendig_geprueft',
+      quelle_art: 'Formel des Ausschusses, nach sachverständiger Prüfung auf das ' + _artName + ' übertragen',
+      hinweis: 'Übertragung nach sachverständiger Prüfung, keine amtliche Angabe für diese Objektart: Der Ausschuss leitet '
+        + 'seine Umrechnung für „' + (g.nutzung || 'den individuellen Wohnungsbau') + '“ ab und schreibt dazu'
+        + (_uebObj.wortlaut ? ' „' + String(_uebObj.wortlaut).replace(/[.\s]+$/, '') + '“' : ', dass die Verwendbarkeit sachverständig zu prüfen ist') + '. '
+        + (_uebObj.begruendung ? 'Ergebnis der Prüfung: ' + _uebObj.begruendung + ' ' : '')
+        + 'Angepasst: ' + fl + ' m² gegen ' + bez + ' m² Bezugsgröße, Koeffizient ' + String(kFl.k).replace('.', ',')
+        + ' (' + kFl.weg + '). Quelle der Formel: ' + herkunft.quelle_text + '.',
+    };
+  }
   if (!_uebertragen) return _erg;
   return {
     ..._erg, uebertragen: true, amtlich: false, stufe: 'C',
