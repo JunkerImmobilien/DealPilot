@@ -327,5 +327,17 @@ function funk(src, name) {
   ok(/\['Anschaffungsnahe Herstellkosten \(§ 6 Abs\. 1 Nr\. 1a EStG\)', _sanUnterGrenze\(\) \? 0 : zahlAus\('ak_ahk'\)\]/.test(dd) && /sofort als Werbungskosten abziehbar\. Sie gehört nicht zu den Anschaffungskosten/.test(dd), 'F14 KPA-Dokument führt die Sanierung unter der Grenze gesondert, nicht in den Anschaffungskosten');
 }
 
-console.log(`gesamtflow-pruefen (v3986): ${gruen} von ${gruen + rot} ok`);
+/* ── F15 · Pilot-Analyse: kein Satz doppelt, kein „API-Key"-Hinweis ── */
+{
+  const pa = lies('frontend/js/pilot-analyse-v4.js');
+  const code = pa.slice(pa.indexOf('function saetze('), pa.indexOf('/* ── Modus Einfach'));   /* Regex mit Anführungszeichen: funk() zählt dort falsch */
+  const c = { String, Object }; vm.createContext(c);
+  let r = null;
+  try { vm.runInContext(code + ';var __r = ohneDoppel(["Die Wohnung kostet 219.000 €. Der Cashflow ist negativ.", "Der Cashflow ist negativ. Die Bank verlangt mehr Eigenkapital.", "Die Wohnung kostet 219.000 €.", ""]);', c); r = c.__r; } catch (e) { r = null; }
+  ok(r && r[1] === 'Die Bank verlangt mehr Eigenkapital.' && r[2] === '' && r[0].indexOf('Cashflow') > 0, 'F15 jeder Satz nur in der ersten Rubrik (' + JSON.stringify(r) + ')');
+  ok((pa.match(/ohneDoppel\(\[/g) || []).length === 2, 'F15 Übersicht und Gesamtstatement nutzen die Entdopplung');
+  ok(!/Gib deinen KI API-Key ein/.test(lies('frontend/js/storage.js')), 'F15 kein Hinweis auf einen eigenen KI-Schlüssel beim neuen Objekt');
+}
+
+console.log(`gesamtflow-pruefen (v3987): ${gruen} von ${gruen + rot} ok`);
 process.exit(rot ? 1 : 0);

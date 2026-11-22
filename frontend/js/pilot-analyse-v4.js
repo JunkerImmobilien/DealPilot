@@ -53,6 +53,20 @@
     return out.join(' ');
   }
 
+  /* v3987 · F15 Gesamt-Flow 22.11.2026: Gesamtbewertung, Begründung, Investmentbewertung und Insight wiederholten dieselben
+     Sätze (die KI schreibt sie in mehrere Felder). Ein Satz steht nur in der ERSTEN Rubrik, in der er vorkommt; was danach
+     leer bleibt, entfällt. Gleich heißt: gleicher Wortlaut ohne Satzzeichen und Groß-/Kleinschreibung. */
+  function ohneDoppel(texte) {
+    var gesehen = {};
+    var schl = function (s) { return String(s).toLowerCase().replace(/[^a-z0-9äöüß%€]+/g, ' ').trim(); };
+    return texte.map(function (t) {
+      var teile = saetze(t, 999); if (!teile) return t;
+      var alle = String(teile).split(/(?<=[.!?])(?<!(?:^|[\s(])(?:z|B|u|a|d|h|v|o|ca|bzw|ggf|inkl|etc|Nr|Str|evtl|max|min|rd|sog|vgl|Mio|Mrd|Tsd|Abs|S|Dr|St|zzgl|abzgl)\.)\s+(?=[A-ZÄÖÜ„"(])/);
+      var rest = alle.filter(function (s) { var k = schl(s); if (!k || k.length < 12) return true; if (gesehen[k]) return false; gesehen[k] = 1; return true; });
+      return rest.join(' ');
+    });
+  }
+
   /* ── Modus Einfach | Detail ──────────────────────────────────────────── */
   function modus() { try { return localStorage.getItem(MERKER) === 'detail' ? 'detail' : 'einfach'; } catch (e) { return 'einfach'; } }
   function setzeModus(m) {
@@ -565,6 +579,8 @@
   /** Das Gesamtstatement (Detail): Einordnung, Investmentbewertung, Strategie, Insight – die Gesamtbewertung steht oben. */
   function gesamtstatement(a, bestand) {
     var t = [];
+    var _od = ohneDoppel([a.gesamtbewertung || a.fazit_kurz, a.empfehlung_begruendung, a.investmentbewertung, a.dealpilot_insight]);   /* v3987 · F15 */
+    a = Object.assign({}, a, { empfehlung_begruendung: _od[1], investmentbewertung: _od[2], dealpilot_insight: _od[3] });
     t.push(abschnitt(bestand ? 'Einordnung' : 'Begründung des Urteils', absatz(a.empfehlung_begruendung)));
     t.push(abschnitt('Investmentbewertung', absatz(a.investmentbewertung)));
     if (bestand && a.bestand_modus && has(a.verhandlungsempfehlung))
@@ -619,10 +635,9 @@
     var links = abKopf(bestand ? 'Einordnung' : 'Begründung')
       + '<div class="dp-pa-e">' + absatz(saetze(a.empfehlung_begruendung || gb, 2)) + '</div>'
       + '<div class="dp-pa-d"><div class="dp-pa4-ta">'
-      + abschnitt('Gesamtbewertung', absatz(gb))
-      + abschnitt(bestand ? 'Einordnung' : 'Begründung des Urteils', absatz(a.empfehlung_begruendung))
-      + abschnitt('Investmentbewertung', absatz(a.investmentbewertung))
-      + abschnitt('DealPilot-Insight', absatz(a.dealpilot_insight)) + '</div></div>';
+      + (function () { var od = ohneDoppel([gb, a.empfehlung_begruendung, a.investmentbewertung, a.dealpilot_insight]);   /* v3987 · F15 */
+        return abschnitt('Gesamtbewertung', absatz(od[0])) + abschnitt(bestand ? 'Einordnung' : 'Begründung des Urteils', absatz(od[1]))
+          + abschnitt('Investmentbewertung', absatz(od[2])) + abschnitt('DealPilot-Insight', absatz(od[3])); })() + '</div></div>';
     var re = '';
     if (bestand) {
       var tun = a.bestand_modus && has(a.verhandlungsempfehlung) ? a.verhandlungsempfehlung : '';

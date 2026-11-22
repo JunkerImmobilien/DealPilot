@@ -1685,7 +1685,7 @@ function _newObjLeeren() {
   }
   var aiContent = document.getElementById('ai-content');
   if (aiContent) {
-    aiContent.innerHTML = 'Gib deinen KI API-Key ein, wähle ein Modell und klicke "Analyse starten".';
+    aiContent.innerHTML = 'Noch keine KI-Analyse für dieses Objekt. Klicke auf <strong>"KI-Analyse starten"</strong>, um eine Investmentanalyse zu erzeugen.';   /* v3987 · F15: kein eigener Schlüssel nötig */
   }
   // V25: Mini-AI-Block in Tab Kennzahlen zurücksetzen
   var miniBody = document.getElementById('ai-mini-body');
