@@ -46,6 +46,14 @@
  {"@type":"WebSite","@id":"https://dealpilot.immo/#website","url":"https://dealpilot.immo/","name":"DealPilot","inLanguage":"de","publisher":{"@id":"https://dealpilot.immo/#organisation"}}
 ]}
 </script>
+<!-- landing-tempo-1 (22.11.2026) · Marcel: „die Seite hat sehr lange Ladezeiten“. Gemessen: die drei Schriften des
+     ersten Bildschirms (Überschrift Space Grotesk, Text Inter, Kleinzeilen JetBrains Mono) fragte der Browser erst nach
+     allen zwölf Stylesheets an (kalt bei 1,9 s), das Hero-Poster (= größtes Element, LCP) erst mit dem Video-Tag.
+     Vorladen startet beide sofort mit dem HTML. Dieselben Dateien wie in dp-fonts.css, nur latin. -->
+<link rel="preload" href="/fonts/SpaceGrotesk-300_700-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/Inter-300_800-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/JetBrainsMono-400_700-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/bild/hero.jpg" as="image" fetchpriority="high">
 <link rel="stylesheet" href="/fonts/dp-fonts.css">
 <script>/* landing-makler-hub-2 · der Makler-Hub steht unter „Für Partner" (loesungen.html); die QR-Codes der Messe-Tafeln zeigen auf /#makler-hub */
 if (location.hash === '#makler-hub') location.replace('loesungen.html#makler-hub');
@@ -655,13 +663,14 @@ if (location.hash === '#forschung') location.replace('forschung.html');</script>
        Kippen und Glanz beim Darüberfahren. Dieselben acht Logos wie bisher, keine neuen Namen; die beiden
        Bewertungspartner bleiben draußen (v2285). Die Wiederholungen für den nahtlosen Lauf setzt landing-faecher.js
        partnerband() (aria-hidden), data-doppelt="1" hält dp2.js davon ab, die Reihe ein zweites Mal zu verdoppeln.
+       landing-tempo-1 · die acht Logos als verlustfreies WebP (gleiche Pixel, 74 statt 128 KB); die PNG bleiben daneben liegen.
        v1540b gilt weiter: kein loading=lazy im Laufband. -->
   <div class="pk-band rv">
     <!-- v2285 · Anbieter-Neutralitaet (CLAUDE.md): die beiden Bewertungspartner
          nie namentlich nach aussen - Logos aus dem Laufband genommen. -->
-    <div class="pmarq pk-reihe pk-a"><div class="pmarq-track" data-doppelt="1"><div class="plogo pk"><span class="pk-glanz" aria-hidden="true"></span><img src="assets/partner/immometrica.png" width="227" height="54" decoding="async" alt="ImmoMetrica"></div><div class="plogo pk"><span class="pk-glanz" aria-hidden="true"></span><img src="assets/partner/realestatepilot.png" width="326" height="75" decoding="async" alt="RealEstatePilot"></div><div class="plogo pk"><span class="pk-glanz" aria-hidden="true"></span><img src="assets/partner/onevoice.png" width="259" height="119" decoding="async" alt="OneVoice"></div><div class="plogo pk"><span class="pk-glanz" aria-hidden="true"></span><img src="assets/partner/sauerland-finanzen.png" width="295" height="140" decoding="async" alt="Sauerland Finanzen"></div></div></div>
+    <div class="pmarq pk-reihe pk-a"><div class="pmarq-track" data-doppelt="1"><div class="plogo pk"><span class="pk-glanz" aria-hidden="true"></span><img src="assets/partner/immometrica.webp" width="227" height="54" decoding="async" alt="ImmoMetrica"></div><div class="plogo pk"><span class="pk-glanz" aria-hidden="true"></span><img src="assets/partner/realestatepilot.webp" width="326" height="75" decoding="async" alt="RealEstatePilot"></div><div class="plogo pk"><span class="pk-glanz" aria-hidden="true"></span><img src="assets/partner/onevoice.webp" width="259" height="119" decoding="async" alt="OneVoice"></div><div class="plogo pk"><span class="pk-glanz" aria-hidden="true"></span><img src="assets/partner/sauerland-finanzen.webp" width="295" height="140" decoding="async" alt="Sauerland Finanzen"></div></div></div>
     <!-- landing-videothek-1 · Logo Schmidt & Partner von der Website der Kanzlei (sp-steuerberatung.de/img/logo.png) -->
-    <div class="pmarq pk-reihe pk-b"><div class="pmarq-track" data-doppelt="1"><div class="plogo pk"><span class="pk-glanz" aria-hidden="true"></span><img src="assets/partner/funck-it.png" width="276" height="140" decoding="async" alt="Funck IT"></div><div class="plogo pk"><span class="pk-glanz" aria-hidden="true"></span><img src="assets/partner/christian-sperling.png" width="433" height="124" decoding="async" alt="Christian Sperling"></div><div class="plogo pk"><span class="pk-glanz" aria-hidden="true"></span><img src="assets/partner/junker-immobilien.png" width="219" height="136" decoding="async" alt="Junker Immobilien"></div><div class="plogo pk"><span class="pk-glanz" aria-hidden="true"></span><img src="assets/partner/schmidt-und-partner.png" width="300" height="59" decoding="async" alt="Schmidt &amp; Partner Steuerberatungsgesellschaft PartG mbB"></div></div></div>
+    <div class="pmarq pk-reihe pk-b"><div class="pmarq-track" data-doppelt="1"><div class="plogo pk"><span class="pk-glanz" aria-hidden="true"></span><img src="assets/partner/funck-it.webp" width="276" height="140" decoding="async" alt="Funck IT"></div><div class="plogo pk"><span class="pk-glanz" aria-hidden="true"></span><img src="assets/partner/christian-sperling.webp" width="433" height="124" decoding="async" alt="Christian Sperling"></div><div class="plogo pk"><span class="pk-glanz" aria-hidden="true"></span><img src="assets/partner/junker-immobilien.webp" width="219" height="136" decoding="async" alt="Junker Immobilien"></div><div class="plogo pk"><span class="pk-glanz" aria-hidden="true"></span><img src="assets/partner/schmidt-und-partner.webp" width="300" height="59" decoding="async" alt="Schmidt &amp; Partner Steuerberatungsgesellschaft PartG mbB"></div></div></div>
   </div>
   <!-- landing-videos-1 · Kanzlei-Zeile (Schmidt & Partner) unter dem Laufband entfernt, Marcel 27.10.2026; das Logo bleibt im Laufband -->
   <!-- landing-kern-1 · Bildzeile und die vier AMTLICH-Kacheln entfallen: die Datenquellen stehen jetzt ausführlich in #daten -->
@@ -732,7 +741,7 @@ if (location.hash === '#forschung') location.replace('forschung.html');</script>
      staging.dealpilot.immo -> app.staging.dealpilot.immo, sonst app.dealpilot.immo. -->
 <script src="dealcheck-laden.js?v=landing-handy-1"></script><!-- landing-seo-3 · Kerne + Deal-Check, Buster dort (buster-ebenen-pruefen liest die Datei) -->
 <script src="dp2-live.js?v=landing-faecher-3"></script><!-- landing-faecher-1 · gibt window.DpVideoQuelle für den Slider heraus -->
-<script src="landing-faecher.js?v=landing-handy-1c"></script>
+<script src="landing-faecher.js?v=einzelcheck-v3946"></script>
 <script src="partner.js?v=landing-strecke-5"></script><!-- landing-strecke-1 · Aufzug der Strecke --><!-- landing-videothek-1, landing-partner-1 -->
 <!-- v1588: Zwei Funktionen, die der alten Landing schon gehoerten und
      hier gefehlt haben. Beide betreffen Geld, deshalb standen sie ganz

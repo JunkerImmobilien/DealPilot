@@ -491,12 +491,15 @@ router.post('/reports/generate', async (req, res) => {
    unter Stufe 3 (cross_check nicht_im_umfang) - auch wenn ein Aufrufer 3 schickt.
    v3944 · dazu NUR die ortsuebliche Vergleichsmiete aus dem Quercheck (opts.vergleichsmiete,
    lib/vergleichsmiete_auszug.js), Marcel 22.11.2026 „Vergleichsmieten angeben“. Antwortfeld
-   `vergleichsmiete` neben `data`, nicht im Payload. */
+   `vergleichsmiete` neben `data`, nicht im Payload.
+   v3946 · hoechstens Stufe 3: Boden-, Ertrags-, Sach- und Vergleichswert kommen mit, der Haupt-Dienst nimmt sie
+   nur ueber seine Weissliste (services/einzelcheck.js wertAus). */
 router.post('/reports/einzelcheck', async (req, res) => {
   try {
     const b = Object.assign({}, req.body || {});
     delete b.user_id; delete b.external_ref; delete b.object_label;
-    b.wert_stufe = Math.min(2, Math.max(1, Math.round(Number(b.wert_stufe) || 2)));
+    /* v3946 · Stufe 3 (Wertermittlung), Marcel 22.11.2026 „wir machen einfach eine Stufe drei“. Weiter ohne Ablage. */
+    b.wert_stufe = Math.min(3, Math.max(1, Math.round(Number(b.wert_stufe) || 3)));
     const out = await runLimited(() => ReportOrchestrator.generate(b, { ohneAblage: true, vergleichsmiete: true }));
     console.log(`[req] /reports/einzelcheck OK in ${out.took_ms}ms (ohne Ablage)`);
     res.json(out);

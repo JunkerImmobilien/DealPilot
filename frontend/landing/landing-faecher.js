@@ -129,7 +129,7 @@
        felder: [Bezeichnung, Wert, Ziel in der Karte: 'kp' | Kategorie | null]
        daten:  was der Rechenkern daraus bekommt (BEISPIEL, landing-neu-3/gemeinsam.js Z.10-16) */
     unterlagen: [
-      { id: 'expose', art: 'Exposé', titel: 'Ruhige Lage, solide vermietet', unter: 'Eigentumswohnung · Beispieldaten', foto: 'assets/bild/haus.jpg',
+      { id: 'expose', art: 'Exposé', titel: 'Ruhige Lage, solide vermietet', unter: 'Eigentumswohnung · Beispieldaten', foto: 'assets/bild/haus-640.webp',
         quelle: 'backend/src/routes/ai.js POST /ai/extract-expose',
         felder: [['Kaufpreis', '180.000 €', 'kp'], ['Wohnfläche', '100 m²', 'lage'], ['Kaltmiete', '1.300 € / Monat', 'rendite'], ['Kaufnebenkosten', '10,5 %', 'rendite'], ['Lage', 'mittel', 'lage']],
         daten: { kp: 180000, nk_pct: 10.5, nkm: 1300, wfl: 100, mikrolage: 'mittel' } },
@@ -157,7 +157,7 @@
         quelle: 'dokumentSchemas.js (Typ mietaufstellung)',
         felder: [['Einheiten', '1', null], ['Kaltmiete', '1.300 € / Monat', 'rendite'], ['Leerstandsquote', '2,5 %', 'risiko'], ['Mietausfallrisiko', 'mittel', 'risiko']],
         daten: { leerstandPct: 2.5, mietausfallRisiko: 'mittel' } },
-      { id: 'fotos', art: 'Objektfotos', titel: 'Zustand je Gewerk', unter: 'aus bis zu acht Fotos', fotos: ['assets/bild/haus.jpg', 'assets/bild/mfh-gerberstrasse.webp', 'assets/bild/mfh-gerberstrasse-alt.webp', 'assets/bild/hero.jpg'],
+      { id: 'fotos', art: 'Objektfotos', titel: 'Zustand je Gewerk', unter: 'aus bis zu acht Fotos', fotos: ['assets/bild/haus-640.webp', 'assets/bild/mfh-gerberstrasse-240.webp', 'assets/bild/mfh-gerberstrasse-alt-240.webp', 'assets/bild/hero.jpg'],
         quelle: 'backend/src/routes/ai.js POST /ai/extract-zustand-bilder',
         felder: [['Dach und Fenster', '', null], ['Bäder und Innenausbau', '', null], ['Zustand', 'gut', 'risiko'], ['Ausstattung', '5 von 5', 'risiko']],
         daten: { zustand: 'gut', qualitaetSterne: 5 } }
@@ -310,11 +310,17 @@
   }
 
   /* ══ 1 · Streifen mit Absprung ══════════════════════════════════════ */
+  /* landing-tempo-1 (22.11.2026) · der Streifen ist höchstens 267 px breit (--h 150 px), der Ausschnitt mit 205 %
+     also 547 px: die Kacheln laden eine 1100 px breite Fassung (assets/dp-strecke/*-1100.webp, rund 380 statt
+     690 KB für alle acht). Der Schirm der Strecke in index.html behält die 1600er Originale.
+     Ebenso die Fotos der Unterlagen-Karten (Exposé 205 px, Objektfotos 54 px): haus-640.webp statt haus.jpg
+     (20 statt 174 KB), mfh-gerberstrasse(-alt)-240.webp statt der 1024er (je 7 statt 80 KB). */
   function streifenHtml(liste) {
     return liste.map(function (x, i) {
+      var klein = x[0].replace(/\.webp$/, '-1100.webp');
       var bild = x[1]
-        ? '<span class="bild" style="background-image:url(assets/dp-strecke/' + x[0] + '?v=landing-strecke-2);background-size:' + x[1][0] + '% auto;background-position:' + x[1][1] + '% ' + x[1][2] + '%"></span>'
-        : '<span class="bild"><img src="assets/dp-strecke/' + x[0] + '?v=landing-strecke-2" alt="" loading="lazy" width="1600" height="900"></span>';
+        ? '<span class="bild" style="background-image:url(assets/dp-strecke/' + klein + '?v=landing-tempo-1);background-size:' + x[1][0] + '% auto;background-position:' + x[1][1] + '% ' + x[1][2] + '%"></span>'
+        : '<span class="bild"><img src="assets/dp-strecke/' + klein + '?v=landing-tempo-1" alt="" loading="lazy" decoding="async" width="1600" height="900"></span>';
       var hinweis = esc(x[3]) + ': Video ab ' + mmss(x[6]) + ', Kapitel ' + esc(x[5]);
       return '<a class="st" href="videothek.html?v=' + x[4] + '&amp;t=' + x[6] + '" data-v="' + x[4] + '" data-t="' + x[6] + '" title="' + hinweis + '" aria-label="' + hinweis + '">'
         + bild + '<figcaption aria-hidden="true">' + esc(x[2]) + '<b>' + esc(x[3]) + '</b></figcaption></a>';
@@ -949,8 +955,9 @@
   function einzelcheckLaden() {
     if (!einzelcheckErlaubt() || !document.getElementById('dealcheck')) return;
     /* v3940 · echter Ablauf statt Demo (einzelcheck.js/.css, Backend routes/publicEinzelcheck.js) */
-    var l = document.createElement('link'); l.rel = 'stylesheet'; l.href = 'einzelcheck.css?v=v3941'; document.head.appendChild(l);
-    var s = document.createElement('script'); s.src = 'einzelcheck.js?v=v3944'; s.async = true;
+    /* v3946 · Grundangaben, Bezahlen im selben Tab, Stufe 3, Finanzierung: beide Buster neu */
+    var l = document.createElement('link'); l.rel = 'stylesheet'; l.href = 'einzelcheck.css?v=v3946'; document.head.appendChild(l);
+    var s = document.createElement('script'); s.src = 'einzelcheck.js?v=v3946'; s.async = true;
     /* landing-faecher-2 · der Deal-Check zeigt den zweiten Weg „Bericht holen“ erst, wenn der Einzel-Check da ist */
     s.onload = function () { try { document.dispatchEvent(new CustomEvent('dp:einzelcheck-bereit')); } catch (e) {} };
     document.body.appendChild(s);

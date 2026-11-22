@@ -1,6 +1,9 @@
 'use strict';
 /* ═══════════════════════════════════════════════════════════════════════════
- * routes/publicEinzelcheck.js · v3940 · /api/v1/public/einzelcheck/…  (OHNE Anmeldung)
+ * routes/publicEinzelcheck.js · v3940 / v3946 · /api/v1/public/einzelcheck/…  (OHNE Anmeldung)
+ *
+ * v3946 · Grundangaben (Feld „grund“, JSON) sind Pflicht für /auslesen und /kaufen (ec.grundFehlt), der Bericht
+ * nimmt sie und eine freiwillige Anschrift (Feld „adresse“, nur für den Marktbericht-Dienst, nie gespeichert).
  *
  *   GET  /preis       Preis aus Stripe (lookup_key dp_einzelcheck_399), Frist, Grenzen
  *   POST /auslesen    bis zu 4 PDFs (multipart „unterlagen“), kostenlos gelesen werden 2 · Bremse 3 je Tag und IP
@@ -86,6 +89,9 @@ router.post('/auslesen', bremseAuslesen, mitDateien, async function (req, res) {
   try {
     const dateien = req.files || [];
     if (!dateien.length) return res.status(400).json({ error: 'Bitte mindestens ein PDF hochladen.', code: 'keine_datei' });
+    /* v3946 · erst die Grundangaben (Objekt und Finanzierung), dann die Unterlagen */
+    const fehltG = ec.grundFehlt(req.body && req.body.grund);
+    if (fehltG.length) return res.status(400).json({ error: 'Bitte zuerst die Grundangaben zu Objekt und Finanzierung eintragen.', code: 'grundangaben', fehlt: fehltG });
     const deckel = await ec.freiMoeglich();
     if (!deckel.ok) return res.status(503).json({ error: 'Der kostenlose Teil ist für heute ausgelastet. Morgen geht es wieder, der Bericht ist weiter kaufbar.', code: 'tagesdeckel' });
     const r = await kiKontext('public/einzelcheck/auslesen', function () { return ec.auslesen(dateien, 'frei'); });
@@ -100,7 +106,7 @@ router.post('/kaufen', bremseKaufen, express.json({ limit: '32kb' }), async func
     /* Widerrufsverzicht wie beim Abo (§ 356 Abs. 5 BGB): Pflicht, mit Fassung protokolliert */
     const cs = require('../services/consentService');
     if (b.widerruf_verzicht !== true) return res.status(400).json({ error: 'Bitte bestätige vor dem Kauf, dass der Bericht sofort entstehen soll (Widerrufsrecht).', code: 'widerruf_verzicht_fehlt' });
-    const k = await ec.kaufAnlegen({ zahlen: b.zahlen, siegelWert: b.siegel });
+    const k = await ec.kaufAnlegen({ zahlen: b.zahlen, siegelWert: b.siegel, grund: b.grund });
     try { await cs.widerrufVerzichtPruefen(req, { kauf: 'einzelcheck', kauf_id: String(k.kauf_id) }); } catch (e) { console.warn('[einzelcheck] Widerrufsverzicht nicht protokolliert:', e.message); }
     res.json({ url: k.url, token: k.token, gueltig_bis: k.gueltig_bis, amount_cents: k.amount_cents, currency: k.currency });
   } catch (e) { fehler(res, e, 'kaufen'); }
@@ -126,9 +132,14 @@ router.post('/bericht', bremseBericht, mitDateien, async function (req, res) {
     const dateien = req.files || [];
     let r = null;
     if (dateien.length) r = await kiKontext('public/einzelcheck/bericht', function () { return ec.auslesen(dateien, 'voll'); });
-    /* Ohne neue Dateien (Tab verloren): der gespeicherte Zahlenstand traegt den Bericht - ehrlich gekennzeichnet */
-    const zahlen = r ? Object.assign({}, ec.zahlenSauber(z.zahlen), r.zahlen) : ec.zahlenSauber(z.zahlen);
-    const markt = await ec.markt(zahlen, r ? r._adresse : null);
+    /* Ohne neue Dateien (Tab verloren): der gespeicherte Zahlenstand traegt den Bericht - ehrlich gekennzeichnet.
+       v3946 · die Grundangaben des Kaeufers schlagen die gelesenen Werte (sonst die beim Kauf gespeicherten). */
+    let grund = ec.grundSauber(req.body && req.body.grund);
+    if (!Object.keys(grund).length) grund = ec.grundSauber(z.zahlen);
+    const zahlen = Object.assign({}, ec.zahlenSauber(z.zahlen), r ? r.zahlen : {}, grund);
+    /* Anschrift: aus dem Formular (freiwillig) oder dem Exposé, nur für den Marktbericht-Dienst, nie gespeichert */
+    const adrForm = (req.body && typeof req.body.adresse === 'string') ? req.body.adresse.replace(/[\u0000-\u001f]/g, ' ').trim().slice(0, 160) : '';
+    const markt = await ec.markt(zahlen, adrForm.length >= 5 ? adrForm : (r ? r._adresse : null));
     await ec.berichtGezaehlt(z.id, zahlen);
     res.json({ zahlen: zahlen, unterlagen: r ? r.unterlagen : [], modell: r ? r.modell : null, aus_zahlenstand: !r,
       markt: markt, status: ec.statusAus(Object.assign({}, z, { berichte: (Number(z.berichte) || 0) + 1, zahlen: zahlen })) });

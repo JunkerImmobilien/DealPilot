@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════════════════
-   einzelcheck.css · v3940 (20.11.2026) · Fenster des Einzel-Checks (einzelcheck.js)
+   einzelcheck.css · v3940 (20.11.2026) / v3946 (22.11.2026, Grundangaben) · Fenster des Einzel-Checks (einzelcheck.js)
    Vorher einzelcheck-demo.css. Farben aus dp2.css, Gold nur als Token. Die Paketkarten sind
    Kopien aus #pricing (dp2-teile.css .tk), hier nur der Rahmen wie .dk-pakete (dp2-dealcheck.css).
    Den Bericht selbst gestaltet frontend/js/dp-dokument.js (Vorschau mit Drucken / als PDF).
@@ -139,3 +139,25 @@ html.ec-offen,html.ec-offen body{overflow:hidden}
   .ec-pk .tk-feat,.ec-pk .tk-ker,.ec-pk .tk-rip,.ec-pk .tk-bs,.ec-pk .tk-class{display:none}
 }
 @media (prefers-reduced-motion:reduce){.ec-balken i,.ec-zeile{transition:none}.ec-zeile.liest .ec-balken i{animation:none}}
+
+/* v3946 · 0 Grundangaben (Objekt und Finanzierung), Abweichungen, Kurzfassung im Schritt Unterlagen */
+.ec-grund fieldset{border:1px solid var(--cream-line);background:#fff;margin:0 0 14px;padding:12px 14px 14px;min-width:0}
+.ec-grund legend{font:700 10px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--gdi);padding:0 6px}
+.ec-raster{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px 12px}
+.ec-f{display:flex;flex-direction:column;gap:4px;position:relative;min-width:0}
+.ec-f.breit{grid-column:1/-1}
+.ec-f span{font:600 11px/1.3 var(--mono);letter-spacing:.04em;color:var(--inkm)}
+.ec-f em{font-style:normal;color:var(--mut);font-weight:500}
+.ec-f input,.ec-f select{min-height:44px;border:1px solid var(--cream-line);background:var(--cream);color:var(--ink);font:500 15px/1.2 var(--body,Inter,system-ui,sans-serif);padding:8px 30px 8px 10px;border-radius:6px;width:100%}
+.ec-f select{padding-right:10px}
+.ec-f i{position:absolute;right:10px;bottom:13px;font:600 12px/1 var(--mono);font-style:normal;color:var(--mut);pointer-events:none}
+.ec-f input:focus,.ec-f select:focus{outline:2px solid var(--gd);outline-offset:1px}
+.ec-f.fehlt input,.ec-f.fehlt select{border-color:#B8625C;background:rgba(184,98,92,.06)}
+.ec-grund-kurz{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;background:#fff;border:1px solid var(--cream-line);border-left:3px solid var(--gd);padding:10px 12px;margin:0 0 14px}
+.ec-grund-kurz .ec-l{flex-basis:100%;margin:0}
+.ec-grund-kurz p{flex:1;margin:0;font-size:13.5px;color:var(--inkm);min-width:200px}
+.ec-abw{background:#fff;border:1px solid var(--cream-line);border-left:3px solid #B8625C;padding:10px 12px;margin:0 0 14px}
+.ec-abw ul{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.ec-abw li{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;justify-content:space-between;font-size:13.5px}
+@media(max-width:760px){.ec-raster{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:420px){.ec-raster{grid-template-columns:1fr}}

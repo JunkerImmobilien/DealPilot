@@ -29,6 +29,18 @@
  *     sonst kein Wert. marktAus() -> vergleichsmiete, Weissliste vglAus().
  *   - Die Obergrenze rechnet der Browser mit js/mietpotenzial-kern.js (zulaessig, neuvermietung, zielmieteBremse).
  *
+ * v3946 (22.11.2026) · Marcel nach dem Testkauf: „danach direkt den Bericht erstellen … wir machen einfach eine
+ * Stufe drei … den Bodenrichtwert mit ausgeben … Grundangaben auf jeden Fall angegeben“.
+ *   - Marktbericht STUFE 3 (MB_STUFE): Bodenrichtwert, Ertrags-, Sach- und Vergleichswert, fuehrendes Verfahren.
+ *     Uebernommen nur ueber die Weissliste wertAus(): Zahlen, Herkunftsstufe, Gruende, Lizenzvermerke ohne Portal-
+ *     und Quellennamen. Ohne Anschrift (Strasse) gilt der Bodenrichtwert nicht fuer das Objekt: dann kein
+ *     Bodenrichtwert und keine Verfahren, die ihn brauchen (kein Verfahren rechnet halb), nur der Weg dorthin.
+ *   - GRUNDANGABEN (grundSauber, grundFehlt): Kaufpreis, Miete, Wohnflaeche, Objektart, PLZ oder Ort und die
+ *     Finanzierung (Eigenkapital, Zins, Tilgung, Zinsbindung) sind Pflicht vor dem Auslesen und vor dem Kauf.
+ *     Sie gehen mit dem Kauf in den Zahlenstand (Weissliste, ohne Namen) und schlagen beim Bericht die
+ *     gelesenen Werte (der Kaeufer hat sie bestaetigt). Eine Anschrift aus dem Formular geht wie die aus dem
+ *     Exposé nur an den Marktbericht-Dienst, nie in den Zahlenstand.
+ *
  * DATENSCHUTZ, VERBINDLICH (Pruefer: tools/einzelcheck-pruefen.mjs):
  *   1 Dateien nur im Arbeitsspeicher. multer.memoryStorage in der Route, pdftotext liest ueber STDIN und
  *     schreibt nach STDOUT - keine Datei auf der Platte, kein Puffer in der Datenbank. Gescannte PDFs
@@ -51,7 +63,7 @@
 const crypto = require('crypto');
 const { spawn } = require('child_process');
 
-const VERSION = 'v3944';
+const VERSION = 'v3946';
 const LOOKUP_KEY = 'dp_einzelcheck_399';
 /* Coupon in BEIDEN Stripe-Konten mit genau dieser ID anlegen (umgebungsblind wie ein lookup_key). */
 const ANRECHNUNG_COUPON = 'dp_einzelcheck_anrechnung';
@@ -65,7 +77,7 @@ const ERLAUBTE_MIME = ['application/pdf'];
 /* v3941 · Texterkennung fuer gescannte PDFs: hoechstens 6 Seiten, 60 s je Unterlage (ocr.js grenzt selbst auch) */
 const OCR_SEITEN = 6;
 const OCR_ZEIT_MS = 60000;
-const MB_STUFE = 2;                  /* v3941 · Erweiterte Marktpreisindikation, wie in der App mit KI-Text */
+const MB_STUFE = 3;                  /* v3946 · Wertermittlung (Stufe 3) wie in der App, mit KI-Text. v3941 bis v3945: 2 */
 
 /* Welche Arten der Dokument-Import (dokumentSchemas.js) fuer den Einzel-Check liest. Alles andere
    (auch nicht erkannt) laeuft ueber das Exposé-Schema - wie dokument-import.js in der App. */
@@ -201,8 +213,27 @@ const ZAHL_GRENZEN = {
   einheiten: [1, 10000], nk_pct: [0, 30], makler_pct: [0, 15], hausgeld_monat: [0, 1e6], bwk_nul_jahr: [0, 1e7],
   ruecklage_zuf_jahr: [0, 1e7], ruecklage_stand: [0, 1e9], sonderumlage_eur: [0, 1e8], sonderumlagen_anzahl: [0, 100],
   endenergie: [0, 1000], bj_heizung: [1900, 2100], leer_einheiten: [0, 10000], nkm_liste: [0, 1e7], wfl_liste: [1, 1e6],
-  risiken_hoch: [0, 100], risiken_mittel: [0, 100], unterlagen: [0, VOLL_MAX_UNTERLAGEN]
+  risiken_hoch: [0, 100], risiken_mittel: [0, 100], unterlagen: [0, VOLL_MAX_UNTERLAGEN],
+  /* v3946 · Grundangaben: Miteigentumsanteil (Prozent) und die Finanzierung */
+  mea_pct: [0.01, 100], ek_eur: [0, 1e9], zins_pct: [0, 20], tilg_pct: [0, 10], bindung_j: [1, 40]
 };
+/* v3946 · GRUNDANGABEN des Kaeufers (Formular „Objekt“ und „Finanzierung“). Nur diese Felder, ueber dieselbe
+   Weissliste wie die gelesenen Zahlen. Pflicht: GRUND_PFLICHT und PLZ oder Ort. */
+const GRUND_FELDER = ['kp', 'nkm', 'wfl', 'art', 'plz', 'ort', 'bj', 'gsfl', 'ze', 'nk_pct', 'mea_pct', 'ek_eur', 'zins_pct', 'tilg_pct', 'bindung_j'];
+const GRUND_PFLICHT = ['kp', 'nkm', 'wfl', 'art', 'ek_eur', 'zins_pct', 'tilg_pct', 'bindung_j'];
+function grundSauber(g) {
+  if (typeof g === 'string') { try { g = JSON.parse(g); } catch (e) { g = null; } }
+  const z = zahlenSauber(g), aus = {};
+  GRUND_FELDER.forEach(function (k) { if (z[k] != null) aus[k] = z[k]; });
+  return aus;
+}
+/** Welche Pflichtangaben fehlen (leer = vollstaendig). */
+function grundFehlt(g) {
+  const z = grundSauber(g);
+  const f = GRUND_PFLICHT.filter(function (k) { return z[k] == null || (k !== 'ek_eur' && k !== 'zins_pct' && k !== 'art' && !(z[k] > 0)); });
+  if (!z.plz && !z.ort) f.push('plz');
+  return f;
+}
 const TEXT_REGELN = {
   plz: /^\d{5}$/,
   ort: /^[A-Za-zÄÖÜäöüß][A-Za-zÄÖÜäöüß .\-()/]{1,59}$/,
@@ -426,13 +457,20 @@ function landingBasis() {
   const app = String(process.env.APP_URL || process.env.FRONTEND_URL || 'https://app.dealpilot.immo').replace(/\/+$/, '');
   return app.replace(/^(https?:\/\/)app\./i, '$1');
 }
-async function kaufAnlegen({ zahlen, siegelWert }) {
+async function kaufAnlegen({ zahlen, siegelWert, grund }) {
   const d = deps();
-  const z = zahlenSauber(zahlen);
+  const gelesen = zahlenSauber(zahlen);
   /* Ohne Zahlen (kostenloses Auslesen ging schief) gibt es nichts zu besiegeln - der Bericht liest dann alles neu */
-  if (Object.keys(z).length && !siegelPruefen(z, siegelWert)) {
+  if (Object.keys(gelesen).length && !siegelPruefen(gelesen, siegelWert)) {
     const e = new Error('Die Daten stammen nicht aus diesem Auslesen. Bitte noch einmal auslesen.'); e.code = 'siegel'; e.status = 400; throw e;
   }
+  /* v3946 · Grundangaben sind Pflicht (Marcel 22.11.2026). Das Siegel bindet nur die GELESENEN Zahlen,
+     die Grundangaben sind Angaben des Kaeufers und kommen danach dazu. */
+  const fehlt = grundFehlt(grund);
+  if (fehlt.length) {
+    const e = new Error('Bitte zuerst die Grundangaben zu Objekt und Finanzierung eintragen.'); e.code = 'grundangaben'; e.status = 400; e.fehlt = fehlt; throw e;
+  }
+  const z = Object.assign({}, gelesen, grundSauber(grund));
   const p = await preis(false);
   const token = neuesToken();
   const jetzt = d.jetzt();
@@ -565,7 +603,8 @@ async function handleEinzelcheckPaid(session) {
    Laeufen der Erweiterten MPI, viele 0 EUR wegen Cache), KI-Text gpt-4.1-mini (split-call, Zehntel-Cent bis
    wenige Cent) - seit v3941 je Lauf in ki_verbrauch erfasst und im Protokoll als Zeile. */
 const MB_BASE = (process.env.MB_BACKEND_URL || 'http://mb-backend:4000/api/v1/marktbericht').replace(/\/+$/, '');
-const _QUELLEN_NAMEN = /immo\s*scout|immobilienscout|scout24|immowelt|kleinanzeigen|geomap|pricehubble|sprengnetter|on-geo|21st|geoapify|overpass|openstreetmap/i;
+/* v3946 · dazu die amtlichen Portal- und Datenbanknamen (Marcel: „keine Datenquelle namentlich“) */
+const _QUELLEN_NAMEN = /immo\s*scout|immobilienscout|scout24|immowelt|kleinanzeigen|geomap|pricehubble|sprengnetter|on-geo|21st|geoapify|overpass|openstreetmap|boris|bundesbank|zensus|regionaldatenbank|regionalstatistik|destatis|genesis/i;
 function _ohneQuelle(t) { return (typeof t === 'string' && !_QUELLEN_NAMEN.test(t)) ? t : null; }
 function _n(v) { const n = Number(v); return (v === null || v === undefined || v === '' || !Number.isFinite(n)) ? null : n; }
 /* Herkunft des Abschlags wie die Marktbericht-App (_mpZusatz), nach aussen nur feste Woerter */
@@ -583,7 +622,17 @@ function _satzzeichen(t) {
   return String(t).replace(/(\d)\s*[–—-]\s*(\d)/g, '$1 bis $2').replace(/\s*[;–—]\s*/g, ', ').replace(/\s+-\s+/g, ', ')
     .replace(/\s{2,}/g, ' ').replace(/,\s*,/g, ',').replace(/,\s*\./g, '.').trim();
 }
-function textAus(md) {
+/* v3946 · Kapitel des KI-Texts heissen wie im Marktbericht-PDF (frontend/marktbericht-app/app.js PDF_SECTION_TITLES),
+   ohne Buchstaben davor. Marcel 22.11.2026: „nichts davor mit A, B und C. Da kommt eine Überschrift hin, eine vernünftige.“ */
+const KAPITEL = { A: 'Zusammenfassung und Empfehlung', B: 'Objekt, Lage und Markt', C: 'Bewertung, Rendite und Ausblick', D: 'Entwicklung, Ableitung und Prognose' };
+function ueberschrift(t) {
+  const m = /^([A-P])\s*[).:·]\s*(.*)$/.exec(String(t || '').trim());
+  let s = m ? (KAPITEL[m[1]] || m[2]) : String(t || '').trim();
+  s = s.replace(/^[A-Z]\d?\s*[).:·]\s+/, '').replace(/^(Kapitel|Abschnitt|Teil)\s+[A-Z0-9]+\s*[).:·]?\s*/i, '');
+  return s.replace(/\s*&\s*/g, ' und ').trim();
+}
+/** mitWert: Stufe 3 mit genauer Lage - Saetze zur Wertermittlung bleiben (die Zahlen stehen im Bericht daneben). */
+function textAus(md, mitWert) {
   if (typeof md !== 'string' || !md.trim()) return [];
   const aus = []; let zeichen = 0;
   md.replace(/\r/g, '').split('\n').forEach(function (z) {
@@ -594,8 +643,9 @@ function textAus(md) {
     else if (/^([-*•]|\d+[.)])\s+/.test(t)) { art = 'li'; t = t.replace(/^([-*•]|\d+[.)])\s+/, ''); }
     t = t.replace(/!\[[^\]]*\]\([^)]*\)/g, '').replace(/\[([^\]]+)\]\([^)]*\)/g, '$1').replace(/https?:\/\/\S+/g, '')
       .replace(/[*_`>]+/g, '').replace(/<[^>]*>/g, '');
+    if (art === 'h') t = ueberschrift(t);
     t = _satzzeichen(t);
-    if (t.length < 2 || !_ohneQuelle(t) || _WERT_WORTE.test(t)) return;
+    if (t.length < 2 || !_ohneQuelle(t) || (!mitWert && _WERT_WORTE.test(t))) return;
     aus.push({ art: art, text: t.slice(0, 900) }); zeichen += t.length;
   });
   /* keine Ueberschrift ohne Inhalt: eine Ueberschrift direkt vor einer anderen oder am Ende faellt weg */
@@ -616,6 +666,7 @@ function marktAus(out) {
   const v = p.valuation || {}, mv = v.market_value || {};
   const st = p.wertermittlungsstichtag;
   const stichtag = (st && typeof st === 'object' && typeof st.datum === 'string') ? st.datum.slice(0, 10) : (typeof st === 'string' ? st.slice(0, 10) : null);
+  const wert = wertAus(out);
   return {
     stufe: MB_STUFE,
     lage: { mikro: _n(p.micro && p.micro.score), makro: _n(p.macro && p.macro.score),
@@ -628,20 +679,137 @@ function marktAus(out) {
       preis_trend_pct: _n(p.price_trend_pct), miete_trend_pct: _n(p.rent_trend_pct) },
     /* v3944 · Vergleichsmiete aus dem Auszug des mb-Dienstes (nie aus cross_check), sonst null */
     vergleichsmiete: vglAus(out && out.vergleichsmiete),
-    /* Statt der Wertindikation der Weg in die App - keine Zahl */
-    wertermittlung: { in_app: true },
-    text: (out && out.ai_mode === 'openai') ? textAus(out.report_md) : [],
+    /* v3946 · Stufe 3: Bodenrichtwert und Verfahren ueber die Weissliste wertAus() */
+    wert: wert,
+    text: (out && out.ai_mode === 'openai') ? textAus(out.report_md, wert.verfuegbar === true) : [],
     stichtag: stichtag
   };
+}
+
+/* ── v3946 · WERTERMITTLUNG (Stufe 3) FUER DEN KUNDEN ──────────────────────────────────────────────────
+   Nur feste Felder aus dem Quercheck (cross_check) und dem Bodenrichtwert (land_value). Regeln aus CLAUDE.md:
+     - jede Zahl traegt ihre Herkunft (Stufe A bis E, M, N, Lizenzvermerk), alles indikativ
+     - kein Verfahren rechnet halb: nicht ausgewiesen heisst KEINE Zahl, dafuer der Grund und der Weg
+     - die Wertindikation ist der Wert des FUEHRENDEN Verfahrens (§ 6 Abs. 1 ImmoWertV). Ein Sachwert ohne
+       Sachwertfaktor des Gutachterausschusses ist kein Marktwert und traegt keine Wertindikation.
+     - ohne Anschrift (Strasse) steht der Bodenrichtwert einer Zone am Mittelpunkt der PLZ, nicht der des Objekts:
+       dann kein Bodenrichtwert und kein Verfahren, das ihn braucht (kein Treffer heisst kein Wert).
+   Texte laufen durch _kunde(): ohne Links, ohne Portal- und Datenbanknamen, nur Punkt und Komma. */
+const VERFAHREN_NAME = { ertragswert: 'Ertragswertverfahren', sachwert: 'Sachwertverfahren', vergleichswert: 'Vergleichswertverfahren' };
+const STUFE_TEXT = {
+  /* wie KiGegenrechnungService (Liegenschaftszins) und CLAUDE.md „Jede Zahl trägt Herkunft“ */
+  A: 'amtlich', B: 'amtlich, große Streuung oder regional', C: 'indikativ',
+  D: 'gesetzlicher Auffangwert § 256 BewG', E: 'eigene Angabe', M: 'indikativ, aus Angebotspreisen abgeleitet', N: 'abgeleitet aus der DealPilot-Formel, nicht amtlich'
+};
+function _kunde(t, n) {
+  if (typeof t !== 'string' || !t.trim()) return null;
+  let s = t.replace(/https?:\/\/\S+/g, '').replace(/\bwww\.[\w.\/-]+/gi, '').replace(/\bBORIS[\w-]*/g, '')
+    .replace(/\(\s*[,;]?\s*\)/g, '').replace(/,\s*\)/g, ')').replace(/\(\s*,\s*/g, '(').replace(/\(\s*\)/g, '');
+  /* Lizenzkennungen (dl-de/by-2-0) sind keine Spannen: vor den Satzzeichen schuetzen */
+  s = s.replace(/dl-de\/(by|zero)-2-0/gi, 'DLDE_$1_20');
+  s = _satzzeichen(s).replace(/\s+([,.)])/g, '$1').replace(/\s{2,}/g, ' ').trim().replace(/DLDE_(by|zero)_20/gi, 'dl-de/$1-2-0');
+  if (!s || !_ohneQuelle(s)) return null;
+  return s.length > (n || 400) ? s.slice(0, (n || 400) - 1).replace(/\s+\S*$/, '') + ' …' : s;
+}
+function _stufe(x) { const s = String(x || '').trim().toUpperCase(); return /^[A-EMN]$/.test(s) ? s : null; }
+function _jahr(x) { const n = _n(x); return n > 0 ? Math.round(n * 10) / 10 : null; }
+function wertAus(out) {
+  const p = (out && out.data) || {}, cc = p.cross_check || {}, lv = p.land_value || {}, ref = p.ref || {};
+  if (!(Number(ref.wert_stufe) >= 3) || cc.nicht_im_umfang) return { verfuegbar: false, grund: 'nicht_im_umfang' };
+  const genau = !!(p.address && typeof p.address.street === 'string' && p.address.street.trim());
+  if (!genau) {
+    return { verfuegbar: false, grund: 'ohne_anschrift',
+      text: 'Ohne Anschrift nennt DealPilot keinen Bodenrichtwert. Er gilt je Zone, die Postleitzahl reicht dafür nicht. '
+        + 'Damit fehlt auch der Bodenwert, den Ertrags- und Sachwert brauchen. Mit der Anschrift im Exposé oder im Formular rechnet der Bericht beides.' };
+  }
+  const aus = { verfuegbar: true, genau: true, boden: null, verfahren: [], fuehrend: null, stuetzend: null, fuehrend_grund: null,
+    weg: null, wertindikation: null, wertindikation_grund: null, quellen: [], hinweis: 'Indikative Wertermittlung, kein Verkehrswertgutachten nach § 194 BauGB.' };
+  /* Bodenrichtwert und Bodenwert */
+  const bw = cc.bodenwert || {};
+  if (lv.available && _n(lv.value_sqm) > 0) {
+    aus.boden = { verfuegbar: true, brw_qm: _n(lv.value_sqm), stichtag: /^\d{4}-\d{2}-\d{2}$/.test(String(lv.stichtag || '')) ? String(lv.stichtag) : null,
+      veraltet: !!lv.stichtag_veraltet, herkunft: 'amtlicher Bodenrichtwert des Gutachterausschusses',
+      bodenwert_eur: (bw.vollstaendig !== false && _n(bw.wert) > 0) ? Math.round(_n(bw.wert)) : null,
+      hinweise: (Array.isArray(bw.hinweise) ? bw.hinweise : []).map(function (h) { return _kunde(h, 260); }).filter(Boolean).slice(0, 3) };
+  } else {
+    aus.boden = { verfuegbar: false, grund: _kunde(lv.note, 260) || 'Für diese Lage liegt kein amtlicher Bodenrichtwert vor.' };
+  }
+  /* Ertragswert */
+  const ew = cc.ertragswert || {}, wh = p.wertermittlung_herkunft || {};
+  if (ew.available && _n(ew.value_eur) > 0) {
+    const st = _stufe(ew.liegenschaftszins_stufe || wh.stufe);
+    aus.verfahren.push({ art: 'ertragswert', name: VERFAHREN_NAME.ertragswert, verfuegbar: true, wert_eur: Math.round(_n(ew.value_eur)),
+      bezeichnung: _kunde(ew.bezeichnung, 120), lzs_pct: _n(ew.liegenschaftszins_pct), stufe: st,
+      herkunft: _kunde(wh.kurz || wh.klartext, 160) || (st ? STUFE_TEXT[st] : null),
+      indikativ: !!(wh.indikativ || ew.indikativ_wegen_zins || (st && st !== 'A')),
+      rnd_j: _jahr(ew.restnutzungsdauer_jahre), gnd_j: _jahr(ew.gesamtnutzungsdauer_jahre), miete_qm: _n(ew.miete_qm),
+      weg: wh.unter_a && wh.weg && wh.weg.text ? _kunde(wh.weg.text, 300) : null });
+  } else {
+    aus.verfahren.push({ art: 'ertragswert', name: VERFAHREN_NAME.ertragswert, verfuegbar: false, grund: _kunde(ew.grund, 320) || 'Nicht ausgewiesen.' });
+  }
+  /* Sachwert */
+  const sw = cc.sachwert || {};
+  if (sw.available && _n(sw.value_eur) > 0 && !sw.pauschal) {
+    aus.verfahren.push({ art: 'sachwert', name: VERFAHREN_NAME.sachwert, verfuegbar: true, wert_eur: Math.round(_n(sw.value_eur)),
+      marktangepasst: !!sw.marktangepasst, swf: _n(sw.sachwertfaktor),
+      bezeichnung: _kunde(sw.bezeichnung, 120),
+      herkunft: sw.marktangepasst ? 'Sachwertfaktor des Gutachterausschusses' : 'ohne Sachwertfaktor, vorläufiger Sachwert, kein Marktwert',
+      indikativ: true, rnd_j: _jahr(sw.restnutzungsdauer_jahre), gnd_j: _jahr(sw.gnd_jahre) });
+  } else {
+    aus.verfahren.push({ art: 'sachwert', name: VERFAHREN_NAME.sachwert, verfuegbar: false, nicht_massgeblich: !!sw.nicht_massgeblich,
+      grund: _kunde(sw.grund, 320) || 'Nicht ausgewiesen.' });
+  }
+  /* Vergleichswert: nur aus Kaufpreisen (amtlicher Vergleichsfaktor, Immobilienrichtwert) oder Stufe M */
+  const cmp = cc.comparison || {}, vw = cc.verfahrenswahl || {}, vi = cc.vergleichswert_irw || {};
+  const stufeM = vw.verfahren === 'vergleichswert' && vw.basis === 'angebote' && cmp.basis !== 'kaufpreise';
+  if (vi.verfuegbar && _n(vi.vergleichswert_eur) > 0) {
+    aus.verfahren.push({ art: 'vergleichswert', name: VERFAHREN_NAME.vergleichswert, verfuegbar: true, wert_eur: Math.round(_n(vi.vergleichswert_eur)),
+      stufe: 'A', herkunft: 'Immobilienrichtwert des Gutachterausschusses, auf das Objekt umgerechnet', indikativ: true });
+  } else if (cmp.basis === 'kaufpreise' && _n(cmp.vergleichswert_eur) > 0) {
+    aus.verfahren.push({ art: 'vergleichswert', name: VERFAHREN_NAME.vergleichswert, verfuegbar: true, wert_eur: Math.round(_n(cmp.vergleichswert_eur)),
+      stufe: 'A', herkunft: 'amtlicher Vergleichsfaktor des Gutachterausschusses', rechnung: _kunde(cmp.basis_hinweis, 300), indikativ: true });
+  } else if (stufeM && _n(cmp.vergleichswert_eur) > 0) {
+    aus.verfahren.push({ art: 'vergleichswert', name: VERFAHREN_NAME.vergleichswert, verfuegbar: true, wert_eur: Math.round(_n(cmp.vergleichswert_eur)),
+      stufe: 'M', herkunft: STUFE_TEXT.M, indikativ: true, weg: _kunde(vw.weg, 300) });
+  } else {
+    aus.verfahren.push({ art: 'vergleichswert', name: VERFAHREN_NAME.vergleichswert, verfuegbar: false,
+      grund: 'Für diesen Ort liegt kein amtlicher Vergleichsfaktor vor. Angebotspreise sind keine Kaufpreise (§ 25 Abs. 1 ImmoWertV).' });
+  }
+  /* Fuehrendes und stuetzendes Verfahren, Wertindikation */
+  const nimm = function (a) { return aus.verfahren.filter(function (x) { return x.art === a; })[0] || null; };
+  aus.fuehrend = VERFAHREN_NAME[vw.verfahren] ? vw.verfahren : null;
+  aus.stuetzend = VERFAHREN_NAME[vw.stuetzend] && nimm(vw.stuetzend) && nimm(vw.stuetzend).verfuegbar ? vw.stuetzend : null;
+  aus.fuehrend_grund = _kunde(vw.grund, 300);
+  if (!aus.fuehrend && vw.nicht_gerechnet) aus.weg = _kunde(vw.weg, 320);
+  const f = aus.fuehrend ? nimm(aus.fuehrend) : null;
+  if (f && f.verfuegbar && !(f.art === 'sachwert' && !f.marktangepasst)) {
+    aus.wertindikation = { wert_eur: f.wert_eur, verfahren: f.art, name: f.name, stufe: f.stufe || null, indikativ: true };
+  } else if (f && f.art === 'sachwert' && f.verfuegbar) {
+    aus.wertindikation_grund = 'Führend ist das Sachwertverfahren. Ohne Sachwertfaktor des Gutachterausschusses ist der Sachwert eine Herstellungskostenrechnung und kein Marktwert. DealPilot nennt deshalb keine Wertindikation.';
+  } else {
+    aus.wertindikation_grund = aus.weg || 'Das führende Verfahren ist mit den vorliegenden Angaben nicht rechenbar. Kein Verfahren rechnet halb.';
+  }
+  /* Namensnennung: nur, was in diesem Bericht steckt (Bodenrichtwert und die Saetze des Quercheck) */
+  const q = [];
+  if (aus.boden && aus.boden.verfuegbar && lv.quellenvermerk) q.push({ vermerk: _kunde(lv.quellenvermerk, 260), kennzahlen: ['Bodenrichtwert'] });
+  (Array.isArray(cc.quellen_nachweis) ? cc.quellen_nachweis : []).slice(0, 8).forEach(function (x) {
+    if (!x) return;
+    q.push({ vermerk: _kunde(x.vermerk, 260), kennzahlen: (Array.isArray(x.kennzahlen) ? x.kennzahlen : []).map(function (k) { return _kunde(k, 60); }).filter(Boolean),
+      jahrgang: _n(x.jahrgang), lizenz: _kunde(x.lizenz, 120) });
+  });
+  aus.quellen = q.filter(function (x) { return x.vermerk; });
+  return aus;
 }
 function mbEingabe(zahlen, adresse) {
   const z = zahlenSauber(zahlen);
   const ort = [z.plz, z.ort].filter(Boolean).join(' ');
   const adr = (typeof adresse === 'string' && adresse.trim().length >= 5) ? adresse.trim().slice(0, 160) : ort;
-  /* v3941 · Stufe 2 ohne fast: wie die App (dealpilot-mb.js schickt ab Stufe 2 kein fast) */
+  /* v3941 · ohne fast: wie die App (dealpilot-mb.js schickt ab Stufe 2 kein fast). v3946 · Stufe 3, dazu der
+     Miteigentumsanteil (ohne ihn kein Bodenwert einer Eigentumswohnung) */
   return { address: adr, wert_stufe: MB_STUFE,
     dealpilot: { plz: z.plz || '', ort: z.ort || '', objart: z.art || '', wfl: z.wfl || null, baujahr: z.bj || null, kp: z.kp || null,
-      nkm: z.nkm || null, gsfl: z.gsfl || null, einheiten: z.einheiten || null, zimmer: z.zimmer || null, energieklasse: z.ek_klasse || null } };
+      nkm: z.nkm || null, gsfl: z.gsfl || null, einheiten: z.einheiten || null, zimmer: z.zimmer || null, energieklasse: z.ek_klasse || null,
+      mea: z.mea_pct || null } };
 }
 /* KI-Posten des mb-Dienstes erfassen (wie routes/marktbericht.js), ohne Nutzer, im Weg des Berichts */
 function kostenErfassen(j) {
@@ -653,7 +821,7 @@ function kostenErfassen(j) {
 }
 async function markt(zahlen, adresse) {
   const z = zahlenSauber(zahlen);
-  if (!z.plz && !(typeof adresse === 'string' && /\b\d{5}\b/.test(adresse))) return { verfuegbar: false, grund: 'ohne_ort' };
+  if (!z.plz && !z.ort && !(typeof adresse === 'string' && /\b\d{5}\b/.test(adresse))) return { verfuegbar: false, grund: 'ohne_ort' };
   try {
     const r = await deps().mbFetch(MB_BASE + '/reports/einzelcheck', { method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(mbEingabe(z, adresse)) });
@@ -698,5 +866,6 @@ module.exports = {
   dateiPruefen, dateiname, zahlenSauber, zahlenAus, anzeigeAus, leseEine, auslesen,
   freiMoeglich, tagesverbrauchEur, preis, landingBasis, kaufAnlegen, kaufLesen, statusAus, berichtGezaehlt,
   handleEinzelcheckPaid, marktAus, vglAus, mbEingabe, markt, textAus, kostenErfassen, adresseAus, aufraeumen, starteTakt, MB_STUFE, OCR_SEITEN, OCR_ZEIT_MS,
+  /* v3946 */ grundSauber, grundFehlt, GRUND_FELDER, GRUND_PFLICHT, wertAus, ueberschrift, KAPITEL,
   istExpose, _setzeDeps, _pdfText
 };

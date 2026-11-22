@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/* tools/einzelcheck-pruefen.mjs — v3940 / v3941 / v3944 · Einzel-Check der Landing (ohne Netz, ohne Datenbank)
+/* tools/einzelcheck-pruefen.mjs — v3940 / v3941 / v3944 / v3946 · Einzel-Check der Landing (ohne Netz, ohne Datenbank)
  *
  *   node tools/einzelcheck-pruefen.mjs        RC=0 sauber
  *
@@ -26,6 +26,18 @@
  *   N v3944 · Vergleichsmiete (Auszug aus dem Quercheck vor der Stufensperre, nur Mietspiegel, amtlich, Näherung,
  *     ohne Treffer kein Wert) und Obergrenze für Investoren mit dem echten js/mietpotenzial-kern.js: Fälle mit
  *     Vergleichsmiete, ohne Vergleichsmiete, mit Bremse, Bremse ohne Vergleichsmiete, Näherung bei offener Bremse
+ *   K v3946 · jetzt STUFE 3: Bodenrichtwert, Verfahren mit Herkunft, Wertindikation nur aus dem führenden Verfahren
+ *     (nie ein Sachwert ohne Sachwertfaktor), ohne Anschrift kein Bodenrichtwert und kein Verfahren, Kapitel des
+ *     KI-Texts ohne Buchstaben davor, keine Portal- und Datenbanknamen, Lizenzvermerke heil
+ *   O v3946 · Finanzierung wie im Investment-PDF am echten Frontend mit den echten Kernen: Restschuld gegen den
+ *     Tilgungsplan der Bank (calc.js v3029: 300.000 €, 3,8 %, 2 % -> 227.146 €), Anschluss 5 % mit derselben Tilgung,
+ *     Cashflow und DSCR je Phase aus DealKpis, Laufzeit aus dem Monatsplan, keine eigene Zins- oder Tilgungsformel
+ *   P v3946 · Grundangaben Pflicht (Server und Browser, dieselbe Liste), schlagen die gelesenen Werte, keine Anschrift
+ *     im Zahlenstand, Formular getrennt in Objekt und Finanzierung
+ *   Q v3946 · nach dem Kauf kein zweites Hochladen: kein zweites Fenster, Ablage auf dem Gerät vor der Weiterleitung,
+ *     Bericht startet nach der Rückkehr von selbst, Ablage gelöscht (fertig, Abbruch, Alter), Datenschutztext
+ *   R v3946 · Bericht am echten pdf() mit dem echten dp-dokument.js: Kapitel mit Überschrift, keine Buchstaben davor,
+ *     Bodenrichtwert und Wertindikation auf dem Deckblatt, Kundentext ohne Gedankenstrich, Semikolon, Quellennamen
  *   GEGENPROBE: jede Sperre einzeln aus einer Kopie im Speicher entfernt -> der zugehörige Teil muss rot werden.
  */
 import fs from 'node:fs';
@@ -34,6 +46,7 @@ import path from 'node:path';
 import Module, { createRequire } from 'node:module';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { spawnSync, spawn as spawnEcht } from 'node:child_process';
+import vm from 'node:vm';
 
 const WURZEL = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const require = createRequire(import.meta.url);
@@ -92,6 +105,8 @@ const TEXTE = {
 const SCAN_TEXT = 'Exposé Mehrfamilienhaus. Ansprechpartner Herr Max Mustermann, ' + MAIL + '. Kaufpreis 520.000 €, Wohnfläche 410 m², Kaltmiete 2.900 € im Monat. '.repeat(2);
 const SCAN = pdf('scan', 'Scan.pdf');
 function pdf(id, name) { const b = Buffer.from('%PDF-1.4\n%' + id + '\n'); return { buffer: b, size: b.length, mimetype: 'application/pdf', originalname: name || (id + '.pdf') }; }
+/* v3946 · Grundangaben des Käufers (Pflicht vor Auslesen und Kauf), erfunden */
+const GRUND = { art: 'ETW', kp: 180000, nkm: 1300, wfl: 100, plz: '32609', ort: 'Hüllhorst', ek_eur: 20000, nk_pct: 10, zins_pct: 3.8, tilg_pct: 2, bindung_j: 10 };
 const DATEIEN = [pdf('expose', 'Expose.pdf'), pdf('mieter', 'Mietaufstellung.pdf'), pdf('weg', 'WEG-Protokoll.pdf'), pdf('energie', 'Energieausweis.pdf')];
 
 /* ── Nachbauten ───────────────────────────────────────────────────────── */
@@ -143,15 +158,25 @@ function umgebung(opt) {
     promotionCodes: { create: async function (a) { stripeLog.push(['promo', a]); return { id: 'promo_test_1' }; } }
   };
   const mbFetch = async function (url, init) {
-    stripeLog.push(['mb', url, JSON.parse(init.body)]);
-    /* v3941 · Antwort wie Stufe 2 - mit einem cross_check, den der Dienst trotzdem NICHT lesen darf */
+    const ein = JSON.parse(init.body);
+    stripeLog.push(['mb', url, ein]);
+    /* v3946 · Antwort wie Stufe 3 (cross_check, land_value, quellen_nachweis), Strasse nur mit Anschrift */
     const daten = { ai_mode: 'openai', cost: { geomap_eur: 0.38, openai_posten: [{ modell: 'gpt-4.1-mini', usage: { prompt_tokens: 9000, completion_tokens: 1500 } }] },
-      report_md: '## Lage\nRuhige Wohnlage mit guter Anbindung; Schulen in der Nähe.\n\nDie Angebote bei ImmobilienScout liegen höher.\n\n## Wert\nDer Ertragswert liegt bei 185.000 €.\n\n## Markt\n- Preise 2020–2025 stabil',
-      data: { micro: { score: 64 }, macro: { score: 58 }, address: { city: 'Hüllhorst', postcode: '32609' }, ref: { ags: '05770016', wert_stufe: 2 },
+      report_md: '# A) Zusammenfassung & Empfehlung\nSolide Wohnung.\n## Lage\nRuhige Wohnlage mit guter Anbindung; Schulen in der Nähe.\n\nDie Angebote bei ImmobilienScout liegen höher.\n\n## Wert\nDer Ertragswert liegt bei 185.000 €.\n\n## Markt\n- Preise 2020–2025 stabil\n- Der Bodenrichtwert stammt aus BORIS-NRW.',
+      data: { micro: { score: 64 }, macro: { score: 58 }, address: Object.assign({ city: 'Hüllhorst', postcode: '32609' }, opt.ohneStrasse ? {} : { street: 'Musterweg' }),
+      ref: { ags: '05770016', wert_stufe: ein.wert_stufe },
+      land_value: { available: true, value_sqm: 95, stichtag: '2026-01-01', source: 'BORIS-NRW', quellenvermerk: 'Der obere Gutachterausschuss für Grundstückswerte im Land Nordrhein-Westfalen (www.boris.nrw.de), dl-de/by-2-0' },
       valuation: { market_value: { estimated: 190000, low: 170000, high: 210000, basis_median_sqm: 1900, angebot_abschlag: { pct: 10, herkunft: 'Marktdurchschnitt GeoMap', roh: { estimated: 211000 } } },
         inputs: { market_rent_sqm: 9.1 }, yield: { gross_yield_pct: 8.2 } },
       price_trend_pct: 2.1, rent_trend_pct: 1.4, days_on_market: 61, wertermittlungsstichtag: { datum: '2026-11-21', eigen: false },
-      cross_check: { ertragswert: { available: true, value_eur: 185000, liegenschaftszins_pct: 2.9, miete_vergleich_qm: 7.8, miete_stufe: { etikett: 'ImmobilienScout-Angebote' } }, sachwert: { available: false, grund: 'Sachwertfaktor fehlt' } },
+      cross_check: ein.wert_stufe >= 3 ? Object.assign({ ertragswert: { available: true, value_eur: 185000, liegenschaftszins_pct: 2.9, liegenschaftszins_stufe: 'A', restnutzungsdauer_jahre: 38, gesamtnutzungsdauer_jahre: 80,
+          miete_vergleich_qm: 7.8, miete_stufe: { etikett: 'ImmobilienScout-Angebote' } },
+        sachwert: opt.swOhneFaktor ? { available: true, value_eur: 240000, marktangepasst: false } : { available: false, grund: 'Sachwert nicht ausgewiesen — es fehlt die BGF; siehe https://www.boris.nrw.de/x.' },
+        bodenwert: { wert: 41000, vollstaendig: true, hinweise: [] },
+        comparison: { basis: 'angebote', vergleichswert_eur: 190000 },
+        verfahrenswahl: opt.swOhneFaktor ? { verfahren: 'sachwert', grund: 'Einfamilienhaus.', stuetzend: 'ertragswert' } : { verfahren: 'ertragswert', grund: 'Renditeobjekt — Erwerb unter Renditegesichtspunkten.', stuetzend: null },
+        quellen_nachweis: [{ vermerk: 'Grundstuecksmarktdaten NRW, Oberer Gutachterausschuss, dl-de/zero-2-0 (BORIS-NRW)', kennzahlen: ['Liegenschaftszinssatz'], jahrgang: 2025, lizenz: 'dl-de/zero-2-0' }] })
+        : { available: false, nicht_im_umfang: true, stufe: ein.wert_stufe },
       wertermittlung_herkunft: { kurz: 'amtlich', indikativ: false } } };
     if (opt.vgl !== undefined) daten.vergleichsmiete = opt.vgl;   /* v3944 · Auszug der Vergleichsmiete neben data */
     return { ok: true, text: async () => JSON.stringify(daten) };
@@ -178,7 +203,7 @@ TEILE.A = async function (svc, q) {
   const altP = fs.promises.writeFile; fs.promises.writeFile = async function () { treffer.push('promises.writeFile'); };
   try {
     const frei = await svc.auslesen(DATEIEN.slice(0, 2), 'frei');
-    const k = await svc.kaufAnlegen({ zahlen: frei.zahlen, siegelWert: svc.siegel(frei.zahlen) });
+    const k = await svc.kaufAnlegen({ zahlen: frei.zahlen, siegelWert: svc.siegel(frei.zahlen), grund: GRUND });
     const sess = U.stripeLog.find((x) => x[0] === 'session')[1];
     await svc.handleEinzelcheckPaid({ id: [...U.tab.values()][0].stripe_session_id, mode: 'payment', payment_status: 'paid', metadata: sess.metadata });
     const z = await svc.kaufLesen(k.token);
@@ -297,7 +322,7 @@ TEILE.F = async function (svc, q) {
   const U = umgebung(); svc._setzeDeps(U.deps);
   try {
     const frei = await svc.auslesen(DATEIEN.slice(0, 2), 'frei');
-    await svc.kaufAnlegen({ zahlen: frei.zahlen, siegelWert: svc.siegel(frei.zahlen) });
+    await svc.kaufAnlegen({ zahlen: frei.zahlen, siegelWert: svc.siegel(frei.zahlen), grund: GRUND });
     const z = [...U.tab.values()][0];
     await svc.handleEinzelcheckPaid({ id: z.stripe_session_id, mode: 'payment', payment_status: 'paid', metadata: U.stripeLog.find((x) => x[0] === 'session')[1].metadata });
     const p = U.stripeLog.find((x) => x[0] === 'promo');
@@ -313,7 +338,7 @@ TEILE.G = async function (svc, q) {
   const f = [], U = umgebung({ betrag: 517 }); svc._setzeDeps(U.deps);
   try {
     const frei = await svc.auslesen(DATEIEN.slice(0, 1), 'frei');
-    const k = await svc.kaufAnlegen({ zahlen: frei.zahlen, siegelWert: svc.siegel(frei.zahlen) });
+    const k = await svc.kaufAnlegen({ zahlen: frei.zahlen, siegelWert: svc.siegel(frei.zahlen), grund: GRUND });
     const pl = U.stripeLog.find((x) => x[0] === 'prices.list');
     if (!pl || JSON.stringify(pl[1].lookup_keys) !== '["dp_einzelcheck_399"]') f.push('Preis nicht über den lookup_key gesucht');
     const s = U.stripeLog.find((x) => x[0] === 'session')[1];
@@ -335,7 +360,7 @@ TEILE.H = async function (svc, q) {
     const U = umgebung(opt); svc._setzeDeps(U.deps);
     try {
       const frei = await svc.auslesen(DATEIEN.slice(0, 1), 'frei');
-      await svc.kaufAnlegen({ zahlen: frei.zahlen, siegelWert: svc.siegel(frei.zahlen) });
+      await svc.kaufAnlegen({ zahlen: frei.zahlen, siegelWert: svc.siegel(frei.zahlen), grund: GRUND });
       const z = [...U.tab.values()][0];
       const se = Object.assign({ id: z.stripe_session_id, mode: 'payment', metadata: { type: 'einzelcheck', kauf_id: z.id } }, sitz);
       const r1 = await svc.handleEinzelcheckPaid(se);
@@ -373,7 +398,7 @@ TEILE.J = async function (svc) {
     const frei = await svc.auslesen(DATEIEN.slice(0, 2), 'frei');
     const s = svc.siegel(frei.zahlen);
     let fehler = null;
-    try { await svc.kaufAnlegen({ zahlen: Object.assign({}, frei.zahlen, { kp: 1000 }), siegelWert: s }); } catch (e) { fehler = e.code; }
+    try { await svc.kaufAnlegen({ zahlen: Object.assign({}, frei.zahlen, { kp: 1000 }), siegelWert: s, grund: GRUND }); } catch (e) { fehler = e.code; }
     if (fehler !== 'siegel') f.push('manipulierte Zahlen angenommen');
     if (U.tab.size !== 0) f.push('trotz falschem Siegel ein Kauf angelegt');
   } finally { svc._setzeDeps(null); }
@@ -387,35 +412,52 @@ TEILE.K = async function (svc, q) {
   if (!/GeocodingService\.geocode\(input\.address, \{ ohneAblage: OHNE_ABLAGE \}\)/.test(q.mbOrch) || !/if \(opts && opts\.ohneAblage\) return/.test(q.mbGeo)) f.push('mb: Geocoding schreibt mb.addresses');
   const blk = (q.mbApi.split("router.post('/reports/einzelcheck'")[1] || '').split('router.post(')[0];
   if (!blk || /saveFixture/.test(blk) || !/ohneAblage: true/.test(blk)) f.push('mb: Route /reports/einzelcheck fehlt oder speichert');
-  const U = umgebung(); svc._setzeDeps(U.deps);
-  let m; try { m = await svc.markt({ plz: '32609', ort: 'Hüllhorst', wfl: 100, kp: 180000, nkm: 1300, art: 'ETW' }, STRASSE + ', 32609 Hüllhorst'); } finally { svc._setzeDeps(null); }
+  /* v3946 · Stufe 3, der mb-Dienst begrenzt auf höchstens 3 */
+  if (!/b\.wert_stufe = Math\.min\(3, Math\.max\(1, /.test(blk)) f.push('mb: /reports/einzelcheck begrenzt die Stufe nicht auf höchstens 3');
+  const lauf = async (opt, adr) => { const U = umgebung(opt); svc._setzeDeps(U.deps);
+    try { return { m: await svc.markt({ plz: '32609', ort: 'Hüllhorst', wfl: 100, kp: 180000, nkm: 1300, art: 'ETW', mea_pct: 12.5 }, adr), U }; } finally { svc._setzeDeps(null); } };
+  const { m, U } = await lauf({}, STRASSE + ', 32609 Hüllhorst');
   const mbAufruf = U.stripeLog.find((x) => x[0] === 'mb');
   if (!mbAufruf || !/\/reports\/einzelcheck$/.test(mbAufruf[1])) f.push('Dienst ruft nicht /reports/einzelcheck');
   if (mbAufruf && (mbAufruf[2].user_id || mbAufruf[2].external_ref)) f.push('mb-Aufruf trägt Nutzer oder Objektbezug');
-  /* v3941 · Stufe 2: angefragt wird 2 ohne fast (wie die App), und der mb-Dienst begrenzt selbst auf 2 */
-  if (mbAufruf && (mbAufruf[2].wert_stufe !== 2 || mbAufruf[2].fast)) f.push('angefragt Stufe ' + mbAufruf[2].wert_stufe + (mbAufruf[2].fast ? ' (Schnellmodus)' : '') + ' statt 2 wie in der App');
-  if (!/b\.wert_stufe = Math\.min\(2, /.test(blk)) f.push('mb: /reports/einzelcheck begrenzt die Stufe nicht auf 2');
+  if (mbAufruf && (mbAufruf[2].wert_stufe !== 3 || mbAufruf[2].fast)) f.push('angefragt Stufe ' + mbAufruf[2].wert_stufe + (mbAufruf[2].fast ? ' (Schnellmodus)' : '') + ' statt 3');
+  if (mbAufruf && mbAufruf[2].dealpilot.mea !== 12.5) f.push('Miteigentumsanteil geht nicht an den mb-Dienst');
   const mj = JSON.stringify(m);
-  if (!m.verfuegbar || m.markt.wert !== 190000 || m.markt.miete_qm !== 9.1 || m.lage.ags !== '05770016' || m.stufe !== 2 || m.stichtag !== '2026-11-21') f.push('Marktdaten nicht übernommen: ' + mj.slice(0, 200));
+  if (!m.verfuegbar || m.markt.wert !== 190000 || m.markt.miete_qm !== 9.1 || m.lage.ags !== '05770016' || m.stufe !== 3 || m.stichtag !== '2026-11-21') f.push('Marktdaten nicht übernommen: ' + mj.slice(0, 200));
   if (!m.markt.abschlag || m.markt.abschlag.pct !== 10 || m.markt.abschlag.vor_abschlag !== 211000 || m.markt.abschlag.herkunft !== 'Marktdurchschnitt') f.push('Abschlag/Kennzeichnung der Marktpreisindikation: ' + JSON.stringify(m.markt.abschlag));
-  if (m.wert !== undefined || /185000|2\.9\b|ertragswert|sachwert|liegenschaftszins/i.test(mj)) f.push('Wertindikation aus Stufe 3 im Ergebnis: ' + mj.slice(0, 160));
-  if (m.vergleichsmiete !== null) f.push('Vergleichsmiete aus dem Ertragswert übernommen');
-  if (!m.wertermittlung || m.wertermittlung.in_app !== true) f.push('Weg in die App fehlt im Ergebnis');
-  /* KI-Text: bereinigt, ohne Quellen- und Wertermittlungssatz, nur Punkt und Komma */
+  /* Stufe 3: Bodenrichtwert, Verfahren mit Herkunft, Wertindikation = führendes Verfahren */
+  const w = m.wert || {};
+  if (!w.verfuegbar || !w.boden || w.boden.brw_qm !== 95 || w.boden.stichtag !== '2026-01-01' || w.boden.bodenwert_eur !== 41000) f.push('Bodenrichtwert/Bodenwert fehlen: ' + JSON.stringify(w.boden));
+  const ew = (w.verfahren || []).find((x) => x.art === 'ertragswert');
+  if (!ew || ew.wert_eur !== 185000 || ew.stufe !== 'A' || ew.lzs_pct !== 2.9 || !ew.herkunft) f.push('Ertragswert ohne Wert oder Herkunft: ' + JSON.stringify(ew));
+  if (!w.wertindikation || w.wertindikation.wert_eur !== 185000 || w.wertindikation.verfahren !== 'ertragswert' || w.fuehrend !== 'ertragswert') f.push('Wertindikation ist nicht das führende Verfahren: ' + JSON.stringify(w.wertindikation));
+  const sw = (w.verfahren || []).find((x) => x.art === 'sachwert');
+  if (!sw || sw.verfuegbar || sw.wert_eur != null || !/nicht ausgewiesen/.test(sw.grund || '')) f.push('Sachwert ohne Grund oder mit Zahl: ' + JSON.stringify(sw));
+  const vg = (w.verfahren || []).find((x) => x.art === 'vergleichswert');
+  if (!vg || vg.verfuegbar) f.push('Angebotspreise als Vergleichswert ausgegeben: ' + JSON.stringify(vg));
+  if (!(w.quellen || []).length || !(w.quellen || []).every((x) => /dl-de\/(by|zero)-2-0/.test(x.vermerk))) f.push('Lizenzvermerk fehlt oder verstümmelt: ' + JSON.stringify(w.quellen));
+  /* Sachwert ohne Sachwertfaktor führt: KEINE Wertindikation (kein Marktwert), aber der Grund */
+  const sf = (await lauf({ swOhneFaktor: true }, STRASSE + ', 32609 Hüllhorst')).m.wert || {};
+  if (sf.wertindikation || !/Sachwertfaktor/.test(sf.wertindikation_grund || '') || sf.stuetzend !== 'ertragswert') f.push('Sachwert ohne Faktor trägt eine Wertindikation: ' + JSON.stringify(sf.wertindikation));
+  /* ohne Anschrift (keine Strasse): kein Bodenrichtwert, keine Verfahren, nur der Weg */
+  const oa = (await lauf({ ohneStrasse: true }, null)).m;
+  if (!oa.wert || oa.wert.verfuegbar !== false || oa.wert.grund !== 'ohne_anschrift' || /185000|"brw_qm"/.test(JSON.stringify(oa.wert)) || !/Anschrift/.test(oa.wert.text || '')) f.push('ohne Anschrift trotzdem Bodenrichtwert oder Verfahren: ' + JSON.stringify(oa.wert).slice(0, 160));
+  if ((oa.text || []).some((x) => /Ertragswert/.test(x.text))) f.push('ohne Anschrift steht der Ertragswert im KI-Text');
+  /* KI-Text: Kapitel ohne Buchstaben, bereinigt, ohne Quellennamen */
   const tx = (m.text || []).map((x) => x.text).join(' | ');
-  if (!/Ruhige Wohnlage mit guter Anbindung, Schulen in der Nähe\./.test(tx) || !/Preise 2020 bis 2025 stabil/.test(tx)) f.push('KI-Text nicht übernommen oder nicht bereinigt: ' + tx);
-  if (/;|–|—|ImmobilienScout|Ertragswert/.test(tx)) f.push('KI-Text mit Semikolon/Gedankenstrich/Quelle/Wertsatz: ' + tx);
-  if ((m.text || []).some((x) => x.art === 'h' && x.text === 'Wert')) f.push('leere Überschrift im KI-Text');
+  const kopf = (m.text || []).filter((x) => x.art === 'h').map((x) => x.text);
+  if (kopf[0] !== 'Zusammenfassung und Empfehlung' || kopf.some((h) => /^[A-Z]\d?\s*[).:·]/.test(h))) f.push('Kapitel des KI-Texts mit Buchstaben davor: ' + JSON.stringify(kopf));
+  if (!/Ruhige Wohnlage mit guter Anbindung, Schulen in der Nähe\./.test(tx) || !/Preise 2020 bis 2025 stabil/.test(tx) || !/Ertragswert liegt bei 185\.000/.test(tx)) f.push('KI-Text nicht übernommen oder nicht bereinigt: ' + tx);
+  if (/;|–|—|ImmobilienScout|BORIS/i.test(tx)) f.push('KI-Text mit Semikolon/Gedankenstrich/Quelle: ' + tx);
   /* Kosten: KI-Posten erfasst (Weg des Berichts, ohne Nutzer), nicht im Ergebnis */
   const kp = U.kiPosten[0];
   if (!kp || kp.o.endpunkt !== 'public/einzelcheck/bericht' || kp.o.userId !== null || !Array.isArray(kp.l) || kp.l.length !== 1) f.push('KI-Kosten des Marktberichts nicht erfasst: ' + JSON.stringify(kp && kp.o));
   if (/openai_posten|geomap/i.test(mj)) f.push('Kosten oder Quelle im Ergebnis');
   if (!m._kosten || m._kosten.marktdaten_eur !== 0.38) f.push('Kosten nicht am Ergebnis (nicht aufzählbar)');
-  if (JSON.stringify(m).match(/immobilienscout|immo\s*scout/i)) f.push('Quellenname nach außen: ' + JSON.stringify(m.vergleichsmiete));
+  if (/immobilienscout|immo\s*scout|boris|www\.|https?:/i.test(mj)) f.push('Quellenname oder Link nach außen: ' + (mj.match(/.{40}(immobilienscout|boris|www\.|https?:).{20}/i) || [])[0]);
   const front = ohneKommentar(q.front);
-  if (/immobilienscout|immo\s*scout|geomap|pricehubble|sprengnetter/i.test(front)) f.push('Quellenname im Frontend');
-  if (/\.ertragswert|\.sachwert|liegenschaftszins_pct|ausschuss_link/.test(front)) f.push('Frontend liest noch die Wertindikation der Stufe 3');
-  if (!/Die Wertermittlung nach amtlichen Daten findest du in DealPilot\./.test(front) || !/D\.esc\(WERT_WEG\)/.test(front)) f.push('Satz mit dem Weg in die App fehlt im Bericht');
+  if (/immobilienscout|immo\s*scout|geomap|pricehubble|sprengnetter|boris|bundesbank/i.test(front)) f.push('Quellenname im Frontend');
+  if (!/function wertSeite\(D, m, r\)/.test(front) || !/wertSeite\(D, m, r\)\)\)/.test(front)) f.push('Kapitel Wertermittlung fehlt im Bericht');
   return f;
 };
 
@@ -696,6 +738,172 @@ TEILE.N = async function (svc, q) {
   return f;
 };
 
+/* ── v3946 · O P Q R ────────────────────────────────────────────────────────────────────────────────────
+   Das ECHTE frontend/landing/einzelcheck.js läuft in einer vm-Umgebung mit einem Minimal-DOM, zusammen mit den
+   ECHTEN Kernen der App (dscr-engine, darlehen-weitere, deal-kpis, score-tiers, dealscore, mietpotenzial-kern,
+   dp-dokument). Gerechnet und gesetzt wird über window.DpEinzelCheck._bericht/_pdf/_fin/_grundFehlt. */
+const KERN_DATEIEN = ['dscr-engine.js', 'darlehen-weitere.js', 'deal-kpis.js', 'score-tiers.js', 'dealscore.js', 'mietpotenzial-kern.js', 'dp-dokument.js'];
+function frontLaden(frontText, ueber) {
+  const leer = () => null;
+  const el = () => ({ style: {}, classList: { add() {}, remove() {}, toggle() {} }, setAttribute() {}, appendChild() {}, addEventListener() {} });
+  const ctx = { console, Math, JSON, Date, Number, String, Array, Object, Promise, isFinite, parseFloat, parseInt, encodeURIComponent, URL, setTimeout, clearTimeout,
+    navigator: { userAgent: 'pruefer' }, sessionStorage: { getItem: leer, setItem() {} }, localStorage: { getItem: leer, setItem() {} },
+    location: { hostname: 'localhost', search: '', hash: '', pathname: '/', origin: 'http://localhost', href: 'http://localhost/', protocol: 'http:' },
+    history: { replaceState() {} }, fetch: () => Promise.reject(new Error('offline')), alert() {}, CustomEvent: function () {},
+    matchMedia: () => ({ matches: true }), getComputedStyle: () => ({ getPropertyValue: () => '' }),
+    document: { addEventListener() {}, getElementById: leer, querySelector: leer, querySelectorAll: () => [], createElement: el, dispatchEvent() {},
+      documentElement: { classList: { add() {}, remove() {} } }, body: { appendChild() {} } } };
+  ctx.window = ctx; ctx.self = ctx;
+  vm.createContext(ctx);
+  const opfer = Object.assign({}, ueber || {});
+  for (const d of KERN_DATEIEN) vm.runInContext(opfer[d] || lies(path.join(WURZEL, 'frontend/js', d)), ctx, { filename: d });
+  vm.runInContext(frontText, ctx, { filename: 'einzelcheck.js' });
+  ctx.DpDokument.vorschau = function () {};
+  return ctx;
+}
+/* Ein Bericht wie nach dem Kauf (erfunden): MFH Musterstadt, Stufe 3 mit Ertragswert führend */
+const GRUND_O = { art: 'MFH', kp: 690000, nkm: 3650, wfl: 420, plz: '12345', ort: 'Musterstadt', bj: 1972, gsfl: 610, ze: 120, ek_eur: 140000, nk_pct: 10, zins_pct: 3.85, tilg_pct: 2, bindung_j: 10 };
+function antwortO(wertUeber) {
+  return { zahlen: Object.assign({ einheiten: 6, ruecklage_stand: 38000, ek_klasse: 'E', endenergie: 148, unterlagen: 2 }, GRUND_O),
+    unterlagen: [{ art: 'Exposé', gelesen: true, kernpunkte: ['Sechs Wohnungen'], risiken: [{ titel: 'Dach', schwere: 'mittel', beschreibung: 'Dämmung fehlt' }] }],
+    status: {}, markt: { verfuegbar: true, stufe: 3, stichtag: '2026-11-22', lage: { mikro: 66, makro: 58, ort: 'Musterstadt', plz: '12345', ags: null },
+      markt: { bezeichnung: 'Erweiterte Marktpreisindikation', wert: 712000, qm: 1695, miete_qm: 9.6 }, vergleichsmiete: null,
+      wert: Object.assign({ verfuegbar: true, genau: true, boden: { verfuegbar: true, brw_qm: 260, stichtag: '2026-01-01', bodenwert_eur: 158600, hinweise: [] },
+        verfahren: [{ art: 'ertragswert', name: 'Ertragswertverfahren', verfuegbar: true, wert_eur: 668000, lzs_pct: 3.1, stufe: 'A', herkunft: 'amtlich', rnd_j: 30, gnd_j: 80 },
+          { art: 'sachwert', name: 'Sachwertverfahren', verfuegbar: false, grund: 'Für dieses Objekt ist das Ertragswertverfahren maßgeblich.' },
+          { art: 'vergleichswert', name: 'Vergleichswertverfahren', verfuegbar: false, grund: 'Kein amtlicher Vergleichsfaktor.' }],
+        fuehrend: 'ertragswert', fuehrend_grund: 'Renditeobjekt.', wertindikation: { wert_eur: 668000, verfahren: 'ertragswert', name: 'Ertragswertverfahren', stufe: 'A' },
+        quellen: [{ vermerk: 'Gutachterausschuss Musterstadt, dl-de/by-2-0', kennzahlen: ['Bodenrichtwert'] }] }, wertUeber || {}),
+      text: [{ art: 'h', text: 'A) Zusammenfassung & Empfehlung' }, { art: 'p', text: 'Solide Lage.' }] } };
+}
+/* O · Finanzierung wie im Investment-PDF, nur mit den Kernen. Prüfmaßstab: calc.js v3029 (Tilgungsplan der Bank,
+   monatlich): 300.000 € zu 3,8 % mit 2 % Tilgung, Restschuld nach 10 Jahren 227.146 € (jährlich gerechnet 228.628 €). */
+TEILE.O = async function (svc, q) {
+  const f = [];
+  let C; try { C = frontLaden(q.front, q.kerne); } catch (e) { return ['Frontend lädt nicht: ' + e.message]; }
+  const EC = C.DpEinzelCheck;
+  if (!EC || typeof EC._fin !== 'function') return ['DpEinzelCheck._fin fehlt'];
+  EC._S.grund = { art: 'ETW', kp: 272727.27, nkm: 1500, wfl: 100, plz: '32609', ek_eur: 0, nk_pct: 10, zins_pct: 3.8, tilg_pct: 2, bindung_j: 10 };
+  const r = EC.rechne({});
+  if (!r || !r.k || Math.abs(r.d1 - 300000) > 0.01) return ['Darlehen aus den Grundangaben: ' + (r && r.d1)];
+  const fin = EC._fin(r, C.DpDarlehenWeitere, C.DealKpis, C.Dscr, 5);
+  if (Math.abs(fin.bindung.rs - 227146) > 1) f.push('Restschuld nach 10 Jahren ' + Math.round(fin.bindung.rs) + ' statt 227.146 € (Tilgungsplan monatlich, calc.js v3029)');
+  if (Math.abs(fin.heute.rate_m - 300000 * 0.058 / 12) > 0.01) f.push('Rate heute ' + fin.heute.rate_m);
+  if (Math.abs(fin.heute.cf_nach_m - r.k.cf_m) > 0.001 || Math.abs(fin.heute.dscr - r.k.dscr) > 1e-9) f.push('Cashflow/DSCR heute nicht aus DealKpis');
+  const a = fin.anschluss;
+  if (!a || a.zins !== 5 || a.tilg !== 2) f.push('Anschluss nicht mit 5 % und derselben Tilgung: ' + JSON.stringify(a && { z: a.zins, t: a.tilg }));
+  else {
+    if (Math.abs(a.rate_m - fin.bindung.rs * 0.07 / 12) > 0.01) f.push('Rate im Anschluss ' + a.rate_m + ' statt Restschuld × 7 % / 12');
+    const ka = C.DealKpis.compute({ kp: r.e.kp, nk: r.nk, nkm: r.e.nkm, ze: r.e.ze, uf: 0, bwk_ul: 0, bwk_nul: r.bwkNul, d1: fin.bindung.rs, d1z: 5, d1t: 2, ek: r.ek });
+    if (Math.abs(a.cf_nach_m - ka.cf_m) > 0.001 || Math.abs(a.dscr - ka.dscr) > 1e-9) f.push('Cashflow/DSCR im Anschluss nicht aus DealKpis');
+    /* Laufzeit: der Monatsplan des Kerns muss im Monat laufzeit_monate bei 0 sein, davor nicht */
+    const plan = C.DpDarlehenWeitere.monatsplan({ betrag: fin.bindung.rs, zins: 5, tilg: 2 }, 1200);
+    if (!(a.laufzeit_monate > 0) || plan[a.laufzeit_monate - 1].rs >= 0.5 || plan[a.laufzeit_monate - 2].rs < 0.5) f.push('Laufzeit im Anschluss ' + a.laufzeit_monate);
+    if (!(a.gesamt_jahre > 10 && a.gesamt_jahre < 60)) f.push('Gesamtlaufzeit unplausibel ' + a.gesamt_jahre);
+  }
+  const fk = ohneKommentar(q.front).split('function finanzierungAus')[1].split('\n  }\n')[0];
+  if (/Math\.pow|\*\s*\(1\s*\+|\/\s*12\s*\*\s*\(|rs\s*-=|rs\s*=\s*rs/.test(fk)) f.push('finanzierungAus rechnet Zins oder Tilgung selbst');
+  if (!/DW\.monatsplan\(/.test(fk) || !/DK\.compute\(/.test(fk) || !/DS\.compute\(/.test(fk)) f.push('finanzierungAus ruft die Kerne nicht');
+  if (!/var ANSCHLUSS_ZINS = 5\.0;/.test(q.front)) f.push('Anschlusszins nicht 5,0 %');
+  return f;
+};
+/* P · Grundangaben Pflicht: Server (grundFehlt in /auslesen und kaufAnlegen), Browser (zeigeUnterlagen erst danach),
+   Grundangaben schlagen gelesene Werte, Anschrift geht nie in den Zahlenstand */
+TEILE.P = async function (svc, q) {
+  const f = [];
+  if (svc.grundFehlt(GRUND).length) f.push('vollständige Grundangaben gelten als unvollständig: ' + svc.grundFehlt(GRUND));
+  const ohne = Object.assign({}, GRUND); delete ohne.zins_pct; delete ohne.plz; delete ohne.ort;
+  const fe = svc.grundFehlt(ohne);
+  if (fe.indexOf('zins_pct') < 0 || fe.indexOf('plz') < 0) f.push('fehlender Zins oder Ort nicht erkannt: ' + fe);
+  if (svc.grundFehlt(Object.assign({}, GRUND, { plz: undefined, ort: 'Hüllhorst' })).length) f.push('Ort ohne PLZ wird abgelehnt');
+  const U = umgebung(); svc._setzeDeps(U.deps);
+  try {
+    const frei = await svc.auslesen(DATEIEN.slice(0, 2), 'frei');
+    let code = null;
+    try { await svc.kaufAnlegen({ zahlen: frei.zahlen, siegelWert: svc.siegel(frei.zahlen) }); } catch (e) { code = e.code; }
+    if (code !== 'grundangaben') f.push('Kauf ohne Grundangaben angenommen (' + code + ')');
+    const g = Object.assign({}, GRUND, { kp: 175000, strasse: STRASSE, name: NAME });
+    await svc.kaufAnlegen({ zahlen: frei.zahlen, siegelWert: svc.siegel(frei.zahlen), grund: g });
+    const zeile = [...U.tab.values()].pop();
+    if (!zeile || zeile.zahlen.kp !== 175000 || zeile.zahlen.ek_eur !== 20000 || zeile.zahlen.bindung_j !== 10) f.push('Grundangaben nicht im Zahlenstand oder schlagen die gelesenen nicht: ' + JSON.stringify(zeile && zeile.zahlen));
+    if (JSON.stringify(zeile && zeile.zahlen).indexOf(STRASSE) >= 0 || JSON.stringify(zeile && zeile.zahlen).indexOf(NAME) >= 0) f.push('Anschrift oder Name im Zahlenstand');
+  } finally { svc._setzeDeps(null); }
+  const route = ohneKommentar(q.route);
+  if (!/const fehltG = ec\.grundFehlt\(req\.body && req\.body\.grund\);\s*if \(fehltG\.length\) return res\.status\(400\)/.test(route)) f.push('/auslesen prüft die Grundangaben nicht');
+  if (!/kaufAnlegen\(\{ zahlen: b\.zahlen, siegelWert: b\.siegel, grund: b\.grund \}\)/.test(route)) f.push('/kaufen gibt die Grundangaben nicht weiter');
+  const bb = route.split("router.post('/bericht'")[1] || '';
+  if (!/Object\.assign\(\{\}, ec\.zahlenSauber\(z\.zahlen\), r \? r\.zahlen : \{\}, grund\)/.test(bb)) f.push('/bericht: Grundangaben schlagen die gelesenen Werte nicht');
+  if (/berichtGezaehlt\([^)]*adr/.test(bb)) f.push('/bericht speichert die Anschrift');
+  /* Browser: Pflicht vor dem Hochladen, dieselbe Liste wie der Server */
+  let C; try { C = frontLaden(q.front, q.kerne); } catch (e) { return f.concat(['Frontend lädt nicht: ' + e.message]); }
+  const gf = C.DpEinzelCheck._grundFehlt;
+  if (gf(GRUND).length || gf(ohne).indexOf('zins_pct') < 0 || gf({}).length < 8) f.push('Browser prüft die Grundangaben anders als der Server');
+  const fr = ohneKommentar(q.front);
+  if (!/function zeigeUnterlagen\(hinweis\) \{\s*if \(grundFehlt\(S\.grund\)\.length\) \{ zeigeGrund\(hinweis\); return; \}/.test(fr)) f.push('Unterlagen ohne Grundangaben erreichbar');
+  if (!/<legend>Objekt<\/legend>/.test(fr) || !/<legend>Finanzierung<\/legend>/.test(fr)) f.push('Formular nicht in Objekt und Finanzierung getrennt');
+  if (!/fd\.append\('grund', JSON\.stringify\(S\.grund\)\)/.test(fr)) f.push('Grundangaben gehen nicht mit dem Formular');
+  return f;
+};
+/* Q · Nach dem Kauf kein zweites Hochladen: selber Tab, Ablage auf dem Gerät, Bericht startet von selbst, Ablage wird gelöscht */
+TEILE.Q = async function (svc, q) {
+  const f = [], fr = ohneKommentar(q.front);
+  if (/window\.open\(/.test(fr)) f.push('Stripe öffnet wieder ein zweites Fenster');
+  const kauf = fnAus(fr, 'function kaufen()') || '';
+  if (!/ablage\.schreiben\(ablageAus\(r\.token\)\)\.then\(weiter, weiter\)/.test(kauf) || !/location\.href = r\.url/.test(kauf)) f.push('Kauf legt die Unterlagen vor der Weiterleitung nicht ab');
+  const rk = fnAus(fr, 'function rueckkehrPruefen()') || '';
+  if (!/ablage\.lesen\(\)\.then\(function \(rec\) \{\s*if \(rec && rec\.token === tokenLesen\(\)\) ablageEin\(rec\);/.test(rk)) f.push('Rückkehr holt die Ablage dieses Kaufs nicht zurück');
+  if (!/if \(s && s\.bezahlt\) \{ erstelleBericht\(\); return; \}/.test(rk)) f.push('Bericht startet nach der Rückkehr nicht von selbst');
+  if (!/ablage\.loeschen\(\);/.test(rk)) f.push('Abbruch löscht die Ablage nicht');
+  const eb = fnAus(fr, 'function erstelleBericht()') || '';
+  if (!/ablage\.loeschen\(\);/.test(eb)) f.push('fertiger Bericht löscht die Ablage nicht');
+  const st = /var ABLAGE_STUNDEN = (\d+);/.exec(q.front);
+  if (!st || +st[1] > 24) f.push('Ablage länger als einen Tag');
+  if (!/Date\.now\(\) - \(rec\.zeit \|\| 0\) < ABLAGE_STUNDEN \* 3600000/.test(fr)) f.push('alte Ablage wird nicht verworfen');
+  if (/ablage[\s\S]{0,400}(fetch|holeJson)\(/.test(fnAus(fr, 'function ablageAus(token)') || '')) f.push('Ablage geht an einen Server');
+  /* Datenschutztext sagt es */
+  const schutz = (/var SCHUTZ = ([\s\S]*?);\n/.exec(q.front) || [])[1] || '';
+  if (!/auf deinem Gerät ab/.test(schutz) || !/nicht an DealPilot/.test(schutz) || !/gelöscht, sobald dein Bericht fertig ist/.test(schutz)) f.push('Datenschutztext nennt die Ablage im Browser nicht');
+  if (/kann der Einzel-Check noch nicht lesen/.test(schutz)) f.push('Datenschutztext sagt noch, gescannte PDFs gingen nicht');
+  if (KUNDENTEXT_VERBOTEN.test(schutz.replace(/'\s*\+\s*'/g, ''))) f.push('Datenschutztext mit Gedankenstrich oder Semikolon');
+  return f;
+};
+/* R · Bericht: Kapitel mit Überschrift, keine Buchstaben davor, Bodenrichtwert oben, Kundentext ohne Gedankenstrich,
+   Semikolon, Quellennamen. Am ECHTEN pdf() mit dem ECHTEN dp-dokument.js. */
+TEILE.R = async function (svc, q) {
+  const f = [];
+  let C; try { C = frontLaden(q.front, q.kerne); } catch (e) { return ['Frontend lädt nicht: ' + e.message]; }
+  const EC = C.DpEinzelCheck;
+  EC._S.grund = Object.assign({}, GRUND_O);
+  const d = EC._bericht(antwortO(), null);
+  if (!d.fin || !d.fin.anschluss) f.push('Bericht ohne Finanzierung');
+  const doc = EC._pdf(d);
+  if (typeof doc !== 'string' || doc.length < 5000) return f.concat(['kein Dokument']);
+  const kopf = (doc.match(/<h[123][^>]*>[\s\S]*?<\/h[123]>/g) || []).map((x) => x.replace(/<[^>]+>/g, '').trim());
+  const brauch = ['Auf einen Blick', 'Objekt und Miete', 'Finanzierung und Anschluss', 'Bodenrichtwert und Verfahren', 'Mietpotenzial und Obergrenze', 'Quellen und Methodik', 'Rate und Cashflow je Phase', 'Anschlussfinanzierung', 'Zusammenfassung und Empfehlung'];
+  brauch.forEach((b) => { if (kopf.indexOf(b) < 0 && !(b === 'Mietpotenzial und Obergrenze')) f.push('Kapitel fehlt: ' + b); });
+  const brief = kopf.filter((h) => /^[A-Z]\d?\s*[).:·]\s|^[A-Z]\s·/.test(h));
+  if (brief.length) f.push('Überschrift mit Buchstaben davor: ' + brief.join(' | '));
+  const eyebrow = (doc.match(/<div class="eyebrow">([^<]*)</g) || []).map((x) => x.replace(/<[^>]+>/g, ''));
+  if (eyebrow.some((e) => /^[A-Z]\s*[·.)]\s/.test(e))) f.push('Kapitelzeile mit Buchstaben davor: ' + eyebrow.join(' | '));
+  /* Deckblatt: Bodenrichtwert oben, Wertindikation als Hauptzahl */
+  const deck = (doc.split('<section class="seite deck">')[1] || '').split('</section>')[0];
+  if (!/Bodenrichtwert<\/div><div class="v">260 €\/m²/.test(deck)) f.push('Bodenrichtwert nicht auf dem Deckblatt');
+  if (!/Wertindikation · Ertragswertverfahren/.test(deck) || !/668\.000 €/.test(deck)) f.push('Wertindikation nicht auf dem Deckblatt');
+  /* Kundentext: kein Gedankenstrich, kein Semikolon (ausser in CSS und Platzhalter), keine Quellennamen, kein „Mietwucher“ */
+  const text = doc.replace(/<style>[\s\S]*?<\/style>/, '').replace(/<[^>]+>/g, ' ').replace(/&[a-z]+;|&#\d+;/g, ' ');
+  const verboten = text.match(/[–—;]|mietwucher|immobilienscout|immo\s*scout|immowelt|geomap|pricehubble|sprengnetter|zensus|regionaldatenbank|boris|bundesbank/i);
+  if (verboten) f.push('Kundentext mit „' + verboten[0] + '“: …' + text.slice(Math.max(0, verboten.index - 60), verboten.index + 20).replace(/\s+/g, ' '));
+  /* jede Zahl der Wertermittlung mit Herkunft: Stufe und Liegenschaftszins in der Zeile des Ertragswerts */
+  if (!/amtlich, Stufe A, Liegenschaftszinssatz 3,10 %/.test(text)) f.push('Ertragswert ohne Herkunft im Bericht');
+  if (!/Restschuld am Ende der Zinsbindung/.test(text) || !/Schuldenfrei nach/.test(text) || !/Cashflow vor Finanzierung im Monat/.test(text)) f.push('Finanzierung unvollständig im Bericht');
+  /* ohne Anschrift: kein Bodenrichtwert, kein Ertragswert, dafür der Weg */
+  EC._S.grund = Object.assign({}, GRUND_O);
+  const d2 = EC._bericht(Object.assign(antwortO(), { markt: Object.assign(antwortO().markt, { wert: { verfuegbar: false, grund: 'ohne_anschrift', text: 'Ohne Anschrift nennt DealPilot keinen Bodenrichtwert.' } }) }), null);
+  const doc2 = EC._pdf(d2).replace(/<[^>]+>/g, ' ');
+  if (/668\.000|260 €\/m²/.test(doc2) || !/Ohne Anschrift nennt DealPilot keinen Bodenrichtwert/.test(doc2)) f.push('ohne Anschrift trotzdem Werte im Bericht');
+  return f;
+};
+
 /* ── Lauf ─────────────────────────────────────────────────────────────── */
 let rot = 0;
 const ok = (t) => console.log('  ok   ' + t);
@@ -706,10 +914,11 @@ function quellen(ueber) {
   return Object.assign(q, ueber || {});
 }
 const NAMEN = { A: 'Speicher-only', A2: 'pdftotext echt über stdin/stdout', B: 'Schwärzen vor dem KI-Aufruf', C: 'Bremse und Schalter', D: 'kostenlos höchstens 2 Unterlagen',
-  E: 'Bericht nur mit gültigem Kauf-Token', F: 'Frist 14 Tage', G: 'Preis aus dem lookup_key', H: 'Webhook', I: 'Zahlen-Weissliste', J: 'Siegel', K: 'Marktbericht Stufe 2 ohne Ablage, keine Quellennamen',
-  L: 'gescannte PDFs: Texterkennung nur im Speicher', M: 'Rabatt-Vorrang Anrechnung vor Flyer-Code', N: 'Vergleichsmiete und Obergrenze für Investoren' };
+  E: 'Bericht nur mit gültigem Kauf-Token', F: 'Frist 14 Tage', G: 'Preis aus dem lookup_key', H: 'Webhook', I: 'Zahlen-Weissliste', J: 'Siegel', K: 'Marktbericht Stufe 3 ohne Ablage, Wertermittlung mit Herkunft, keine Quellennamen',
+  L: 'gescannte PDFs: Texterkennung nur im Speicher', M: 'Rabatt-Vorrang Anrechnung vor Flyer-Code', N: 'Vergleichsmiete und Obergrenze für Investoren',
+  O: 'Finanzierung wie im Investment-PDF (Kerne)', P: 'Grundangaben Pflicht', Q: 'kein zweites Hochladen nach dem Kauf', R: 'Bericht: Kapitel, Deckblatt, Kundentext' };
 
-console.log('einzelcheck-pruefen · v3944');
+console.log('einzelcheck-pruefen · v3946');
 const svc = require(P.dienst);
 const q0 = quellen();
 for (const k of Object.keys(TEILE)) {
@@ -741,15 +950,19 @@ const GEGEN = [
   ['H', 'Preisprüfung im Webhook entfernt', { dienst: ersetze(D, "if (!passt) { console.error('[einzelcheck-webhook] Sitzung ohne Preis ' + LOOKUP_KEY + ':', session.id); return { ok: false, reason: 'fremder_preis' }; }", '') }],
   ['H', 'unbezahlt angenommen', { dienst: ersetze(D, "if (session.payment_status && session.payment_status !== 'paid') return", "if (false) return") }],
   ['I', 'Weissliste abgeschaltet', { dienst: ersetze(D, '  z.unterlagen = liste.length;\n  return zahlenSauber(z);', '  z.unterlagen = liste.length;\n  return Object.assign({ name: ' + JSON.stringify(NAME) + ' }, z);') }],
-  ['J', 'Siegel nicht geprüft', { dienst: ersetze(D, 'if (Object.keys(z).length && !siegelPruefen(z, siegelWert)) {', 'if (false) {') }],
+  ['J', 'Siegel nicht geprüft', { dienst: ersetze(D, 'if (Object.keys(gelesen).length && !siegelPruefen(gelesen, siegelWert)) {', 'if (false) {') }],
   ['K', 'mb speichert wieder', { mbOrch: ersetze(q0.mbOrch, '(NUR_WERT || OHNE_ABLAGE) ? { id: null }', 'NUR_WERT ? { id: null }') }],
-  /* v3941 */
-  ['K', 'Stufe 3 angefragt', { dienst: ersetze(D, 'const MB_STUFE = 2;', 'const MB_STUFE = 3;') }],
-  ['K', 'Schnellmodus statt Stufe 2 wie in der App', { dienst: ersetze(D, 'return { address: adr, wert_stufe: MB_STUFE,', 'return { address: adr, wert_stufe: MB_STUFE, fast: true,') }],
-  ['K', 'Ertragswert wieder übernommen', { dienst: ersetze(D, '    vergleichsmiete: vglAus(out && out.vergleichsmiete),\n', '    vergleichsmiete: vglAus(out && out.vergleichsmiete), wert: { ertragswert: ((p.cross_check || {}).ertragswert || {}).value_eur },\n') }],
-  ['K', 'mb begrenzt die Stufe nicht', { mbApi: ersetze(q0.mbApi, 'b.wert_stufe = Math.min(2, ', 'b.wert_stufe = Math.min(3, ') }],
+  /* v3941 / v3946 */
+  ['K', 'wieder Stufe 2 angefragt', { dienst: ersetze(D, 'const MB_STUFE = 3;', 'const MB_STUFE = 2;') }],
+  ['K', 'Schnellmodus statt Stufe 3 wie in der App', { dienst: ersetze(D, 'return { address: adr, wert_stufe: MB_STUFE,', 'return { address: adr, wert_stufe: MB_STUFE, fast: true,') }],
+  ['K', 'mb begrenzt die Stufe nicht', { mbApi: ersetze(q0.mbApi, 'b.wert_stufe = Math.min(3, ', 'b.wert_stufe = Math.min(9, ') }],
+  ['K', 'ohne Anschrift trotzdem Bodenrichtwert und Verfahren', { dienst: ersetze(D, "  const genau = !!(p.address && typeof p.address.street === 'string' && p.address.street.trim());", '  const genau = true;') }],
+  ['K', 'Sachwert ohne Sachwertfaktor als Wertindikation', { dienst: ersetze(D, "if (f && f.verfuegbar && !(f.art === 'sachwert' && !f.marktangepasst)) {", 'if (f && f.verfuegbar) {') }],
+  ['K', 'Angebotspreise als Vergleichswert', { dienst: ersetze(D, "  } else if (cmp.basis === 'kaufpreise' && _n(cmp.vergleichswert_eur) > 0) {", "  } else if (_n(cmp.vergleichswert_eur) > 0) {") }],
+  ['K', 'Kapitel des KI-Texts behalten ihre Buchstaben', { dienst: ersetze(D, '    if (art === \'h\') t = ueberschrift(t);', '') }],
+  ['K', 'Portalnamen in Wertermittlungstexten', { dienst: ersetze(D, "  if (!s || !_ohneQuelle(s)) return null;", '  if (!s) return null;').split(".replace(/\\bBORIS[\\w-]*/g, '')").join('') }],
+  ['K', 'Lizenzkennung wird zur Spanne', { dienst: ersetze(D, "  s = s.replace(/dl-de\\/(by|zero)-2-0/gi, 'DLDE_$1_20');", '') }],
   ['K', 'KI-Kosten nicht erfasst', { dienst: ersetze(D, "try { ki = deps().kiVerbrauch.erfasseFremdPosten(", "try { ki = 0 && deps().kiVerbrauch.erfasseFremdPosten(") }],
-  ['K', 'Frontend zeigt wieder den Ertragswert', { front: ersetze(q0.front, "    if (mk && mk.qm > 0) z.push(", "    if (m.wert && m.wert.ertragswert > 0) z.push(['Ertragswert', eur(m.wert.ertragswert), 'ImmoWertV']);\n    if (mk && mk.qm > 0) z.push(") }],
   ['L', 'Texterkennung im Dienst entfernt', { dienst: ersetze(D, 'try { ocr = await d.ocr(datei.buffer); } catch (e) { ocr = null; }', 'ocr = null;') }],
   ['L', 'Texterkennung nach dem Schwärzen statt davor (Rohtext an die KI)', { dienst: ersetze(D, '  const sw = d.schwaerzen.schwaerze(roh);\n  const text = sw.text;', '  const sw = d.schwaerzen.schwaerze(roh);\n  const text = roh;') }],
   ['L', 'ocrAusPuffer schreibt nach tmpdir', { ocr: ersetze(q0.ocr, "  if (!Buffer.isBuffer(pdf) || !pdf.length) throw new Error('Texterkennung: kein PDF-Puffer');", "  if (!Buffer.isBuffer(pdf) || !pdf.length) throw new Error('Texterkennung: kein PDF-Puffer');\n  fs.writeFileSync(path.join(os.tmpdir(), 'ocr-ec.pdf'), pdf); try { fs.unlinkSync(path.join(os.tmpdir(), 'ocr-ec.pdf')); } catch (e) {}") }],
@@ -768,6 +981,24 @@ const GEGEN = [
   ['N', 'Frontend rechnet die Bremse selbst (120 %)', { front: ersetze(q0.front, 'var grenze = vglQm ? MP.zielmieteBremse({ ziel_qm: vglQm, vgl_qm: vglQm, bremse: bremse }) : null;', 'var grenze = vglQm ? { obergrenze_qm: vglQm * 1.2 } : null;') }],
   ['N', 'Frontend nennt ohne Vergleichsmiete den Marktdurchschnitt als Richtwert', { front: ersetze(q0.front, "    else nv = { art: 'ohne', qm: null };", "    else nv = marktQm ? { art: 'richtwert', qm: marktQm } : { art: 'ohne', qm: null };") }],
   ['N', 'Frontend zeigt keinen Abstand im Jahr', { front: ersetze(q0.front, "' im Monat, ' + eurS(nv.plus_jahr) + ' im Jahr.'", "' im Monat.'") }],
+  /* v3946 */
+  ['O', 'Restschuld jährlich statt Monat für Monat', { kerne: { 'darlehen-weitere.js': ersetze(lies(path.join(WURZEL, 'frontend/js/darlehen-weitere.js')), '      var zm = rs * z / 12;', '      var zm = (m - start) % 12 === 0 ? rs * z : 0; if ((m - start) % 12 !== 0) { if (cb) cb(m, 0, 0, rs); continue; }') } }],
+  ['O', 'Anschluss mit 4 % statt 5 %', { front: ersetze(q0.front, 'var ANSCHLUSS_ZINS = 5.0;', 'var ANSCHLUSS_ZINS = 4.0;') }],
+  ['O', 'Anschluss mit eigener Tilgung', { front: ersetze(q0.front, 'var plan2 = DW.monatsplan({ betrag: rs, zins: anschlussZins, tilg: e.tilg }, 1200);', 'var plan2 = DW.monatsplan({ betrag: rs, zins: anschlussZins, tilg: 1 }, 1200);').split("d1: rs, d1z: anschlussZins, d1t: e.tilg, ek: r.ek });").join("d1: rs, d1z: anschlussZins, d1t: 1, ek: r.ek });") }],
+  ['O', 'Restschuld selbst gerechnet', { front: ersetze(q0.front, '    var rs = plan.length ? plan[plan.length - 1].rs : r.d1;', '    var rs = r.d1 * Math.pow(1 + e.zins / 1200, bind * 12) - (r.d1 * (e.zins + e.tilg) / 1200) * (Math.pow(1 + e.zins / 1200, bind * 12) - 1) / (e.zins / 1200) * 1.01;') }],
+  ['P', 'Kauf ohne Prüfung der Grundangaben', { dienst: ersetze(D, '  if (fehlt.length) {\n    const e = new Error(\'Bitte zuerst die Grundangaben', '  if (false) {\n    const e = new Error(\'Bitte zuerst die Grundangaben') }],
+  ['P', '/auslesen ohne Grundangaben', { route: ersetze(R, '    if (fehltG.length) return res.status(400)', '    if (false) return res.status(400)') }],
+  ['P', 'Unterlagen ohne Grundangaben im Browser', { front: ersetze(q0.front, '    if (grundFehlt(S.grund).length) { zeigeGrund(hinweis); return; }   /* v3946 · Pflicht vor dem Hochladen */\n', '') }],
+  ['P', 'Browser ohne Zinsbindung als Pflicht', { front: ersetze(q0.front, "  var GRUND_PFLICHT = ['kp', 'nkm', 'wfl', 'art', 'ek_eur', 'zins_pct', 'tilg_pct', 'bindung_j'];", "  var GRUND_PFLICHT = ['kp', 'nkm', 'wfl', 'art', 'ek_eur', 'tilg_pct', 'bindung_j'];") }],
+  ['P', 'Grundangaben schlagen die gelesenen Werte nicht', { dienst: ersetze(D, '  const z = Object.assign({}, gelesen, grundSauber(grund));', '  const z = Object.assign({}, grundSauber(grund), gelesen);') }],
+  ['Q', 'Stripe wieder im zweiten Fenster', { front: ersetze(q0.front, "        var weiter = function () { location.href = r.url; };", "        var weiter = function () { window.open(r.url, '_blank'); };") }],
+  ['Q', 'Bericht startet nach der Rückkehr nicht von selbst', { front: ersetze(q0.front, '          if (s && s.bezahlt) { erstelleBericht(); return; }', '          if (s && s.bezahlt) { zeigeRueckkehr(); return; }') }],
+  ['Q', 'Ablage bleibt nach dem Bericht liegen', { front: ersetze(q0.front, '        ablage.loeschen();   /* v3946 · Bericht fertig', '        /* v3946 · Bericht fertig') }],
+  ['Q', 'Datenschutztext ohne Ablage', { front: ersetze(q0.front, "Für die Zahlung legt dein Browser die Unterlagen kurz auf deinem Gerät ab, damit", "Für die Zahlung bleiben die Unterlagen offen, damit") }],
+  ['R', 'Buchstabe vor der Überschrift', { front: ersetze(q0.front, "'Finanzierung und Anschluss', annahmeText(r))", "'A · Finanzierung und Anschluss', annahmeText(r))") }],
+  ['R', 'KI-Kapitel im Browser nicht umbenannt', { front: ersetze(q0.front, "html += b.art === 'h' ? '<h3>' + D.esc(kapitel(b.text)) + '</h3>'", "html += b.art === 'h' ? '<h3>' + D.esc(b.text) + '</h3>'") }],
+  ['R', 'Bodenrichtwert nicht auf dem Deckblatt', { front: ersetze(q0.front, "      kz: [{ l: 'Bodenrichtwert',", "      kz: [{ l: 'Grundwert',") }],
+  ['R', 'Gedankenstrich im Kundentext', { front: ersetze(q0.front, "zeile('Tilgung im Jahr', dez(h.tilg, 2) + ' %', a && dez(a.tilg, 2) + ' %', { det: 'Anschluss mit derselben Tilgung' }),", "zeile('Tilgung im Jahr', dez(h.tilg, 2) + ' %', a && dez(a.tilg, 2) + ' %', { det: 'Anschluss – dieselbe Tilgung' }),") }],
   ['M', 'mitCode lässt den Flyer-Code stehen', { front: ersetze(q0.front, "    ['code', 'promo', 'rabatt'].forEach(function (k) { u.searchParams.delete(k); });\n", '') }]
 ];
 for (const [teil, was, ueber] of GEGEN) {
