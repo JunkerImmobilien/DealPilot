@@ -1983,7 +1983,7 @@
     if (_hg) {
       addRow('hg_ul', 'Hausgeld umlagefähig / Jahr', String(_hg.ul), String(_hg.ul), S, 'input');
       addRow('hg_nul', 'Hausgeld nicht umlagefähig / Jahr', String(_hg.nul), String(_hg.nul), S, 'input');
-      ['hg_ul', 'hg_nul'].forEach(function (k) { if (_merged[k] && _merged[k].source === S) { _merged[k].herleitung = _hg.text; _merged[k].hgVorgabe = true; } });
+      ['hg_ul', 'hg_nul'].forEach(function (k) { if (_merged[k] && _merged[k].source === S) { _merged[k].herleitung = _hg.text; _merged[k].hgVorgabe = true; _merged[k].hgMonat = numDe(d.hausgeld); } });
     }
     addRow('ek', 'Eigenkapital', d.eigenkapital, d.eigenkapital, S, 'input');
     /* v3029-import · inst, verwaltung, nk_pct gab es als Felder nie - die Zeilen standen
@@ -2089,11 +2089,41 @@
       if (_wegMv.length) _importHinweise.push('Der Mietvertrag gilt für EINE Einheit - Miete und Fläche des Hauses wurden daraus nicht gesetzt. Trag die Einheit unter „Einheiten erfassen" ein.');
     }
     _unterlagenZeilen();   /* v3016 */
+    _hausgeldAbweichung();   /* v3979 */
     /* v3349 · der Quick-Check hat keine Einheitenliste: nennt keine Unterlage Wohnfläche oder Miete des
        ganzen Hauses, rechnet er mit den Summen der Einheiten (wie die Einsteiger-Stufe, _dgEinheitenSummen) */
     if (_qcMode) { try { _dgEinheitenSummen({ importErlaubt: function () { return false; } }); } catch (e) {} }
   }
   var _vergleich = [], _importHinweise = [];
+  /* v3979 · F3 Gesamt-Flow 22.11.2026: „Exposé-Werte gewinnen still gegen Mieterliste, Teilungserklärung und
+     Wirtschaftsplan". Die Unterlagen gingen zwar vor (amtliche Dokumente zuletzt), aber still - und beim Hausgeld
+     ersetzte die nie vorgehakte Wirtschaftsplan-Zeile (v3088a) die vorgehakte Exposé-Zeile: das Feld blieb leer und
+     der Quick-Check schätzte 76 m² × 5 € = 380 €. Jetzt:
+       · ersetzt eine Unterlage einen ABWEICHENDEN Wert aus Exposé/Marktbericht, steht die Abweichung an der Zeile
+         und als Hinweis über der Tabelle („Abweichung Wohnfläche: Exposé 76 m², Mietvertrag 74 m²")
+       · war die Exposé-Zeile vorgehakt, übernimmt die belastbarere Unterlage den Haken (es wird nicht mehr
+         überschrieben als vorher, nur mit der besseren Zahl). Eine ViVi-Abweichung bleibt nie vorgehakt. */
+  function _rohGleich(a, b) {
+    var x = numDe(a), y = numDe(b);
+    if (x != null && y != null) return Math.abs(x - y) < 0.5;
+    return String(a == null ? '' : a).trim().toLowerCase() === String(b == null ? '' : b).trim().toLowerCase();
+  }
+  function _abweichungMerken(feld, vorher, quelle) {
+    var nm = _merged[feld];
+    if (!nm || !vorher || vorher.typ || vorher.raw == null || vorher.raw === '' || nm.raw == null || nm.raw === '') return;
+    if (_rohGleich(vorher.raw, nm.raw)) return;
+    if (!vorher.nurAktiv && nm.nurAktiv && !nm.viviAbw) nm.nurAktiv = false;
+    nm.abweichung = { quelle: vorher.source, wert: vorher.value };
+    nm.herleitung = (nm.herleitung ? nm.herleitung + ' · ' : '') + 'Abweichung: ' + (vorher.source || 'Exposé') + ' nannte ' + vorher.value + ', es gilt ' + quelle;
+    if (vorher.hgVorgabe) { nm.hgAbw = { monat: vorher.hgMonat, quelle: quelle }; return; }   /* Hausgeld: ein Satz für beide Zeilen, am Ende von recompute() */
+    _importHinweise.push('Abweichung ' + (nm.label || feld) + ': ' + (vorher.source || 'Exposé') + ' ' + vorher.value + ', ' + quelle + ' ' + nm.value + '. Übernommen ist ' + quelle + '.');
+  }
+  function _hausgeldAbweichung() {
+    var u = _merged.hg_ul, n = _merged.hg_nul, a = (u && u.hgAbw) || (n && n.hgAbw); if (!a) return;
+    var mon = ((numDe(u && u.raw) || 0) + (numDe(n && n.raw) || 0)) / 12;
+    if (a.monat > 0 && mon > 0 && Math.abs(a.monat - mon) >= 1)
+      _importHinweise.push('Abweichung Hausgeld: Exposé ' + fmt0(a.monat) + ' €/Monat, ' + a.quelle + ' ' + fmt0(mon) + ' €/Monat. Übernommen ist ' + a.quelle + '.');
+  }
   /* v3198 · Mietverträge, die in die Einheiten DIESES Imports gehören (neues Objekt oder Quick-Check) */
   var _mvImport = [];
   /* v3029-import · Objektart und MEA für die Auslese: erst was gerade eingelesen wird, dann das Formular */
@@ -2151,11 +2181,17 @@
            hier durch und überschrieb Fläche und Miete des Exposés (518 m² → 72 m², 3.660 → 545 €); die MFH-Regel
            in recompute() löschte sie danach - die Zeilen fehlten ganz. Ein Vertrag ist EINE Einheit: er
            überschreibt kein Objektfeld, das eine andere Unterlage schon gesetzt hat. */
-        if (t.typ === 'mietvertrag' && /^(nkm|wfl|zimmer|ze)$/.test(z.feld) && _merged[z.feld] && _merged[z.feld].typ !== 'mietvertrag') return;
+        /* v3979 · F3 Gesamt-Flow 22.11.2026: bei einer Wohnung (ETW) oder einem Haus mit EINER Einheit IST der Vertrag das
+           Objekt - dort schlug das Exposé (76 m², 660 €) still den Vertrag (74 m², 640 €). Die Sperre gilt jetzt nur noch
+           beim Haus mit mehreren Einheiten, bei unbekannter Objektart und gegen eine andere Unterlage. */
+        var _eineEinheit = /^(ETW|EFH|DHH|RH)$/.test(ktx.objart || '');
+        if (t.typ === 'mietvertrag' && /^(nkm|wfl|zimmer|ze)$/.test(z.feld) && _merged[z.feld] && _merged[z.feld].typ !== 'mietvertrag' && !(_eineEinheit && !_merged[z.feld].typ)) return;
         /* v3352 · beim ganzen Haus (MFH/WGH/ZFH) IST der Gesamtplan der Gemeinschaft das Hausgeld des Objekts -
            dort vorgehakt. Bei ETW/Einzelwohnung bleibt es beim aktiven Anstoßen (v3088a). */
         var _ganzesHaus = /^(MFH|WGH|ZFH)$/.test(ktx.objart || '');
+        var _vorher = _merged[z.feld];
         _merged[z.feld] = { nurAktiv: t.typ === 'hausgeld' && !_ganzesHaus, label: z.wort, value: z.anzeige, raw: z.neu, source: t.label || 'Dokument', kind: z.feld === 'ds2_energie' ? 'select' : 'input', herleitung: z.herleitung, einheit: z.einheit, ort: z.ort, typ: t.typ };
+        _abweichungMerken(z.feld, _vorher, t.label || 'Unterlage');
         /* v3951 · Paket V5: Feld mit ViVi verknuepft. Weicht die Unterlage ab, nie vorgehakt, dritte Spalte „laut ViVi“ */
         if (z.status === 'vivi_abweichung') { _merged[z.feld].nurAktiv = true; _merged[z.feld].viviAbw = { anzeige: z.vivi, wert: z.viviWert, dokWert: z.neu, entschieden: z.viviEntschieden || null }; }
         else if (z.viviGleich) _merged[z.feld].viviGleich = { anzeige: z.vivi };
@@ -2232,7 +2268,7 @@
          Zimmer“, die Lesung erfand daraus 8 Einheiten zu 530/500 € (Summe 4.120 statt 4.240 €). Beide
          Listen hatten 14 Zeilen mit Miete - Gleichstand, und das Exposé lag vorn. */
       var punkte = (t.typ === 'mietaufstellung' && !t.ausExpose ? 1e6 : 0) + miete * 1000 + l.length;
-      if (punkte > bestPunkte) { best = l; bestPunkte = punkte; best._summeListe = numDe((t.extracted || {}).summe_kaltmiete_monat_eur); }
+      if (punkte > bestPunkte) { best = l; bestPunkte = punkte; best._summeListe = numDe((t.extracted || {}).summe_kaltmiete_monat_eur); best._eigeneListe = t.typ === 'mietaufstellung' && !t.ausExpose; best._quelle = t.label || 'Mieterliste'; }
     });
     return best;
   }
@@ -2300,6 +2336,26 @@
           _merged.nkm.value = _nkmNeu.toLocaleString('de-DE', { maximumFractionDigits: 2 }) + ' €';
           _merged.nkm.herleitung = (_merged.nkm.source || 'Unterlage') + ' nannte ' + fmt0(_nkmAlt) + ' € inklusive Stellplätze - die ' + fmt0(stp) + ' € stehen unten als Zusatzeinnahme';
         }
+      }
+      /* v3979 · F3/F4 Gesamt-Flow 22.11.2026 (Musterallee 12): das Exposé nannte 2.890 € „alle vermietet" und 420 m², die
+         Mieterliste 2.660 € Wohnungen + 90 € Stellplätze (WE 4 und G 3 leer) und 412 m². Im Quick-Check standen 2.890 €
+         Grundmiete PLUS 90 € Stellplätze = 2.980 € (doppelt) und 420 m². Eine eigene Mieterliste ist belastbarer als das
+         Exposé: ihre Summe der Wohnungen gilt als Objektmiete, ihre Fläche als Wohnfläche - mit Abweichungsmeldung. */
+      if (we._eigeneListe && miete > 0 && _merged.nkm && !_merged.nkm.dgSumme && !_merged.nkm.typ && !_rohGleich(_merged.nkm.raw, miete)) {
+        var _nkmVor = { source: _merged.nkm.source, value: _merged.nkm.value, raw: _merged.nkm.raw };
+        var _mN = Math.round(miete * 100) / 100;
+        _merged.nkm = { label: _merged.nkm.label || 'Nettokaltmiete / Monat', value: _mN.toLocaleString('de-DE', { maximumFractionDigits: 2 }) + ' €', raw: String(_mN), source: we._quelle, kind: 'input', typ: 'mietaufstellung',
+          herleitung: 'Summe der Wohnungen laut ' + we._quelle + (stp > 0 ? ', die ' + fmt0(stp) + ' € Stellplätze stehen unten als Zusatzeinnahme' : '') };
+        _abweichungMerken('nkm', _nkmVor, we._quelle);
+      }
+      var _wflL = we.reduce(function (s, e) { return s + (numDe(e.wfl) || 0); }, 0);
+      var _wflAlle = we.filter(function (e) { return !/stellpl|garage/i.test(String(e.nutzung || e.art || '')); }).every(function (e) { return numDe(e.wfl) > 0; });
+      if (we._eigeneListe && _wflL > 0 && _wflAlle && _merged.wfl && !_merged.wfl.typ && !_rohGleich(_merged.wfl.raw, _wflL)) {
+        var _wflVor = { source: _merged.wfl.source, value: _merged.wfl.value, raw: _merged.wfl.raw };
+        var _wR = Math.round(_wflL * 100) / 100;
+        _merged.wfl = { label: _merged.wfl.label || 'Wohnfläche', value: _anzeigeMitEinheit('wfl', _wR.toLocaleString('de-DE', { maximumFractionDigits: 2 })), raw: String(_wR), source: we._quelle, kind: 'input', typ: 'mietaufstellung',
+          herleitung: 'Summe der Wohnflächen laut ' + we._quelle };
+        _abweichungMerken('wfl', _wflVor, we._quelle);
       }
       /* v3352 · Marcel 13.11.2026: „die Stellplätze hast du unter Sonstiges geschrieben, da gibt es Felder für“.
          Im Quick-Check gehen sie in das Feld Stellplatz (qc_nkm_stp), Küchenmieten in Küche (qc_nkm_kueche); im
