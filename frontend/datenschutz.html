@@ -85,7 +85,7 @@
     }
     /* gold-hell-1 (Befund 12 der Landing-Durchsicht 22.11.2026): bei 360 px scrollWidth 378 - die lange Hetzner-URL brach nicht um (Links sind unter 768 px inline-flex), die Tabelle trug Zellen breiter als der Schirm. */
     main a { overflow-wrap: anywhere; max-width: 100%; }
-    @media (max-width: 620px) { main td, main th { overflow-wrap: anywhere; } }
+    @media (max-width: 620px) { main table { display: table; table-layout: fixed; width: 100%; } main td:first-child, main th:first-child { width: 40%; } main td, main th { overflow-wrap: break-word; hyphens: auto; -webkit-hyphens: auto; } }
   </style>
 </head>
 <body>
