@@ -21,6 +21,8 @@
 
   /* ── Lesen aus dem geladenen Objekt ───────────────────────────────── */
   function feld(id) { var e = document.getElementById(id); if (!e) return ''; if (e.type === 'checkbox') return e.checked; return e.value == null ? '' : String(e.value); }
+  /* v3986 · F14: dieselbe Entscheidung wie Reiter Steuer und BMF-Rechner (tax.js _dpAnschaffungsnah, v3704): Grenze, Fenster, Wahl */
+  function _sanUnterGrenze() { try { var A = typeof window._dpAnschaffungsnah === 'function' ? window._dpAnschaffungsnah() : null; return !!(A && A.san > 0 && !A.an); } catch (e) { return false; } }
   function zahlAus(id) {
     var s = String(feld(id) || '').trim(); if (!s) return null;
     s = s.replace(/[^\d,.\-]/g, '');
@@ -733,11 +735,14 @@
           ['Anwaltskosten (Kaufvorgang)', zahlAus('ak_anwalt')], ['Sonstiges (Vermessung, Energieausweis)', zahlAus('ak_sonst')],
           /* v3511 · Kosten der Kaufpreisaufteilung als Anschaffungsnebenkosten (Vorgabe, kpa-kosten.js) */
           [window.DpKpaKosten ? DpKpaKosten.TEXT_ANK : 'Gutachten zur Kaufpreisaufteilung', window.DpKpaKosten ? DpKpaKosten().ank : 0],
-          ['Anschaffungsnahe Herstellkosten (§ 6 Abs. 1 Nr. 1a EStG)', zahlAus('ak_ahk')]];
+          /* v3986 · F14 Gesamt-Flow 22.11.2026: die Sanierung stand hier IMMER als anschaffungsnahe Herstellungskosten - auch
+             unter der 15-%-Grenze, wo sie Erhaltungsaufwand ist (Reiter Sanierung: „Unter Grenze, sofort abziehbar“). Dann gesondert. */
+          ['Anschaffungsnahe Herstellkosten (§ 6 Abs. 1 Nr. 1a EStG)', _sanUnterGrenze() ? 0 : zahlAus('ak_ahk')]];
         var akZ = ak.filter(function (x, i) { return i === 0 || (x[1] && x[1] > 0); });
         var akSum = akZ.reduce(function (s, x) { return s + (x[1] || 0); }, 0);
         var akTab = akZ.length > 1 || akSum > 0 ? '<h3>Anschaffungskosten im Einzelnen</h3>' + B.liste(akZ.map(function (x, i) { return [x[0], B.eur(x[1] || 0, 2), i ? { art: 'ein' } : {}]; })
           .concat([[(zahlAus('bmf_hk') > 0 ? 'Anschaffungs- und Herstellungskosten gesamt' : 'Anschaffungskosten gesamt') + ' (Eingaben im Reiter Anschaffungskosten)', B.eur(akSum, 2), { art: 'summe' }]])) : '';
+        if (_sanUnterGrenze() && zahlAus('ak_ahk') > 0) akTab += '<p class="det">Sanierung ' + B.eur(zahlAus('ak_ahk'), 2) + ': ' + (function () { var A = window._dpAnschaffungsnah(); return A.wahl === 'auto' ? 'unter der 15-%-Grenze des § 6 Abs. 1 Nr. 1a EStG' : 'als Erhaltungsaufwand gewählt'; })() + ', sofort als Werbungskosten abziehbar. Sie gehört nicht zu den Anschaffungskosten.</p>';   /* v3986 · F14 */
         /* v3510 · Marcel 16.11.2026: „wo ist das Gutachten drin in den Anschaffungskosten von 549 Euro?" Kosten,
            die erst die Abschreibung ermitteln (#kpa_kosten), stehen gesondert - nicht in den Anschaffungskosten. */
         /* v3511 · nur „sofort abziehbar" steht gesondert; als Anschaffungsnebenkosten steht sie oben in der Liste */

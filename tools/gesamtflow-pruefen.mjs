@@ -318,5 +318,14 @@ function funk(src, name) {
   ok(/id="qc_ort" placeholder="Musterstadt"/.test(qc) && !/placeholder="116/.test(qc), 'F26 Quick-Check-Platzhalter ohne echten Ort und ohne echte Hausnummer');
 }
 
-console.log(`gesamtflow-pruefen (v3985): ${gruen} von ${gruen + rot} ok`);
+/* ── F14 · KPA-Dokument: Sanierung unter der 15-%-Grenze nicht als anschaffungsnahe HK ── */
+{
+  const dd = lies('frontend/js/dp-dokumente.js');
+  const f = funk(dd, '_sanUnterGrenze');
+  const lauf = (A) => { const c = { window: { _dpAnschaffungsnah: () => A } }; vm.createContext(c); try { vm.runInContext((f || '') + ';var __r = _sanUnterGrenze();', c); return c.__r; } catch (e) { return null; } };
+  ok(lauf({ san: 13839.7, an: false, wahl: 'auto' }) === true && lauf({ san: 72000, an: true, wahl: 'auto' }) === false, 'F14 Entscheidung aus tax.js _dpAnschaffungsnah (13.839,70 € unter der Grenze = Erhaltung, 72.000 € darüber = anschaffungsnah)');
+  ok(/\['Anschaffungsnahe Herstellkosten \(§ 6 Abs\. 1 Nr\. 1a EStG\)', _sanUnterGrenze\(\) \? 0 : zahlAus\('ak_ahk'\)\]/.test(dd) && /sofort als Werbungskosten abziehbar\. Sie gehört nicht zu den Anschaffungskosten/.test(dd), 'F14 KPA-Dokument führt die Sanierung unter der Grenze gesondert, nicht in den Anschaffungskosten');
+}
+
+console.log(`gesamtflow-pruefen (v3986): ${gruen} von ${gruen + rot} ok`);
 process.exit(rot ? 1 : 0);
