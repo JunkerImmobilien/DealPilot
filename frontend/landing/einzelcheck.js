@@ -835,7 +835,7 @@
       + '</svg>';
     return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
   }
-  function logoUrl() { try { return location.origin + '/assets/dealpilot-logo.png'; } catch (e) { return null; } }
+  function logoUrl() { try { return location.origin + '/assets/dealpilot-logo-2026.png';   /* v3946a · neues Logo ohne „by Junker Immobilien“ */ } catch (e) { return null; } }
   /* Überschriften des KI-Texts: nie ein Buchstabe davor (das Backend benennt sie schon um, hier zur Sicherheit) */
   function kapitel(t) {
     var K = { A: 'Zusammenfassung und Empfehlung', B: 'Objekt, Lage und Markt', C: 'Bewertung, Rendite und Ausblick', D: 'Entwicklung, Ableitung und Prognose' };
