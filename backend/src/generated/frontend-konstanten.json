@@ -1,10 +1,10 @@
 {
- "erzeugt_am": "2026-11-22T15:50:28.432Z",
+ "erzeugt_am": "2026-11-22T16:03:59.102Z",
  "quellen": {
   "voice-import": "a8a2e6dba58ea42c",
   "objektart-felder": "16af21246a92d8f6",
-  "storage": "223347902b381b16",
-  "index-html": "15dc5d734dcf868e",
+  "storage": "aba0f74d7ea27b11",
+  "index-html": "5709e8cb84b47d28",
   "grest": "81f3fb0a4de3a6cf"
  },
  "daten": {
@@ -698,6 +698,7 @@
    "eig_erwerb_datum",
    "d1_verwendung",
    "d2_verwendung",
+   "d1_tf_mon",
    "halter",
    "halter_seit",
    "obj_herkunft",
@@ -2552,6 +2553,11 @@
      }
     ],
     "label": "Verwendung"
+   },
+   {
+    "id": "d1_tf_mon",
+    "kind": "text",
+    "label": "Tilgungsfrei"
    },
    {
     "id": "halter",
