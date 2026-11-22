@@ -33,23 +33,31 @@
     }, { passive: true });
   }
 
-  /* ── Menue am Handy ─────────────────────────────────────────────── */
+  /* ── Menue am Handy (landing-handy-1, Marcel 22.11.2026 IMG_2052: die Untermenues
+        lagen absolut UEBER den anderen Punkten). Jetzt: Klasse .menue-auf an der nav,
+        Untermenues klappen als Liste im Fluss auf (.zu-auf am li), erster Tipp auf einen
+        Punkt mit Untermenue klappt nur auf, statt wegzuspringen. ─────────────────── */
   var burger = document.querySelector('.burger');
-  if (burger) {
+  var navEl = document.querySelector('.nav');
+  if (burger && navEl) {
     burger.addEventListener('click', function () {
-      var ul = document.querySelector('.nav ul');
-      if (!ul) return;
-      var auf = ul.style.display === 'flex';
-      ul.style.display = auf ? '' : 'flex';
-      ul.style.position = auf ? '' : 'absolute';
-      ul.style.top = auf ? '' : '100%';
-      ul.style.left = auf ? '' : '0';
-      ul.style.right = auf ? '' : '0';
-      ul.style.background = auf ? '' : '#fff';
-      ul.style.flexDirection = auf ? '' : 'column';
-      ul.style.alignItems = auf ? '' : 'stretch';
-      ul.style.padding = auf ? '' : '10px 20px 18px';
-      ul.style.borderBottom = auf ? '' : '1px solid rgba(20,18,15,.10)';
+      var auf = navEl.classList.toggle('menue-auf');
+      burger.setAttribute('aria-expanded', auf ? 'true' : 'false');
+      if (!auf) navEl.querySelectorAll('li.zu-auf').forEach(function (li) { li.classList.remove('zu-auf'); });
+    });
+    navEl.querySelectorAll('.nav > .wrap > ul > li').forEach(function (li) {
+      var sub = li.querySelector(':scope > ul.sub'); var a = li.querySelector(':scope > a');
+      if (!sub || !a) return;
+      a.addEventListener('click', function (ev) {
+        if (!navEl.classList.contains('menue-auf')) return;
+        ev.preventDefault();
+        var war = li.classList.contains('zu-auf');
+        navEl.querySelectorAll('li.zu-auf').forEach(function (x) { x.classList.remove('zu-auf'); });
+        if (!war) li.classList.add('zu-auf');
+      });
+    });
+    navEl.querySelectorAll('ul.sub a').forEach(function (a) {
+      a.addEventListener('click', function () { navEl.classList.remove('menue-auf'); });
     });
   }
 

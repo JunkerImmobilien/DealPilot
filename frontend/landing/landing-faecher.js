@@ -421,7 +421,10 @@
       $('.n6-vt-zeit', host).innerHTML = '<span>' + mmss(t) + '</span><span>' + mmss(dauer(v)) + '</span>';
       $('.kap', schirm).innerHTML = (k ? 'Kapitel · ' + mmss(k.t) : 'Anfang') + '<b>' + esc(sauber(k ? k.titel : v.titel)) + '</b>';
       $$('li', kapListe).forEach(function (li) { li.classList.toggle('an', !!k && +li.dataset.t === k.t); });
-      var an = $('li.an', kapListe); if (an) kapListe.scrollTop = an.offsetTop - kapListe.offsetTop - 40;
+      /* landing-handy-1 · Marcel 22.11.2026 (IMG_2055): timeupdate rief das hier mehrmals je Sekunde und setzte die
+         Liste jedes Mal zurueck, man konnte waehrend des Videos nicht hochscrollen. Nur noch beim Kapitelwechsel. */
+      var an = $('li.an', kapListe), anT = an ? an.dataset.t : null;
+      if (an && anT !== kapListe.dataset.zuletzt) { kapListe.dataset.zuletzt = anT; kapListe.scrollTop = an.offsetTop - kapListe.offsetTop - 40; }
     }
     /* Start an Sekunde t: dieselbe Datei wie die Videothek-Seite (dp2-live.js datei(): mit oder ohne Sprecher) */
     function starte(t) {
@@ -430,6 +433,8 @@
       var k = kapitelBei(v, t);
       $('.absprung', info).innerHTML = 'Start bei <b>' + mmss(t) + '</b>' + (k ? ', ' + (/^Kapitel/.test(k.titel) ? '' : 'Kapitel ') + '<b>' + esc(sauber(k.titel)) + '</b>' : '');
       vid.style.display = 'block'; vid.poster = bild(v);
+      /* landing-handy-1 · am Handy steht der Schirm ueber Kapiteln und Slider: nach oben holen, wenn er nicht ganz zu sehen ist */
+      var rs = schirm.getBoundingClientRect(); if (rs.top < 70 || rs.bottom > innerHeight) schirm.scrollIntoView({ behavior: ruhig ? 'auto' : 'smooth', block: 'start' });
       /* landing-faecher-1b · gemessen auf Staging 20.11.2026: mit preload="none" laedt ein gesetztes src NICHTS,
          loadedmetadata kam nie, das Video blieb bei readyState 0 stehen. Darum: Sekunde als Medienfragment
          (#t=) in die Adresse, play() sofort (noch in der Klick-Geste), currentTime nach loadedmetadata als
@@ -874,21 +879,19 @@
       });
       if (!box || !ok || summe !== ges) return;
       var reihe = TEILE.slice().sort(function (a, b) { return T[b[0]] - T[a[0]]; });
-      box.innerHTML = '<div class="dt-z-kopf"><span class="dt-z-eye">So setzen sich die Datenpunkte zusammen</span>'
-        + '<span class="dt-z-sum"><b data-z="' + ges + '">' + fmt(ges) + '</b> amtliche Datenpunkte</span></div>'
+      /* landing-handy-1 · Marcel 22.11.2026 (IMG_2056): „doppelt die amtlichen Zahlen, es reicht, wenn wir die darüber
+         animieren“. Die Summe und die Zahlen je Posten stehen oben (hochzaehlend) und in der Tabelle. Hier nur noch der
+         Balken mit den Namen, ohne zweite Zahlenreihe. */
+      box.innerHTML = '<div class="dt-z-kopf"><span class="dt-z-eye">So setzen sie sich zusammen</span></div>'
         + '<div class="dt-z-balken" aria-hidden="true">' + reihe.map(function (t, i) {
           return '<i data-i="' + i + '" style="--w:' + (T[t[0]] / ges * 100).toFixed(3) + '%"></i>';
         }).join('') + '</div>'
-        + '<ul class="dt-z-liste">' + reihe.map(function (t, i) {
-          return '<li><i class="dt-z-farbe" data-i="' + i + '" aria-hidden="true"></i><span>' + esc(t[1]) + '</span><b data-z="' + T[t[0]] + '">' + fmt(T[t[0]]) + '</b></li>';
+        + '<ul class="dt-z-liste dt-z-namen">' + reihe.map(function (t, i) {
+          return '<li><i class="dt-z-farbe" data-i="' + i + '" aria-hidden="true"></i><span>' + esc(t[1]) + '</span></li>';
         }).join('') + '</ul>';
       box.hidden = false;
       if (ruhig) { box.classList.add('da'); return; }
-      $$('[data-z]', box).forEach(function (b) { b.textContent = '0'; });
-      sichtbar(box, function () {
-        box.classList.add('da');
-        $$('[data-z]', box).forEach(function (b, i) { setTimeout(function () { zaehle(b, +b.dataset.z, 1600); }, i * 70); });
-      }, .35);
+      sichtbar(box, function () { box.classList.add('da'); }, .35);
     });
     /* Tabelle im Fenster */
     var auf = $('#dtQuellenAuf', sec), dlg = $('#dtQuellen', sec);

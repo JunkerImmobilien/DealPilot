@@ -54,7 +54,7 @@ if (/^#(partner-plan|module|nachkauf|feature-matrix)$/.test(location.hash)) loca
 /* landing-kern-2 · die Geschichten stehen auf geschichten.html, F&E auf forschung.html */
 if (location.hash === '#stories') location.replace('geschichten.html');
 if (location.hash === '#forschung') location.replace('forschung.html');</script>
-<link rel="stylesheet" href="dp2.css?v=v2971b">
+<link rel="stylesheet" href="dp2.css?v=landing-handy-1">
 <link rel="stylesheet" href="dp2-hero.css?v=landing-strecke-4">
 <link rel="stylesheet" href="dp2-teile.css?v=landing-partner-2">
 <link rel="stylesheet" href="dp2-buehne.css?v=v1570">
@@ -65,7 +65,7 @@ if (location.hash === '#forschung') location.replace('forschung.html');</script>
 <link rel="stylesheet" href="dp2-module.css?v=landing-module-2">
 <link rel="stylesheet" href="dp2-kern.css?v=landing-strecke-3">
 <link rel="stylesheet" href="dp2-dealcheck.css?v=landing-faecher-2">
-<link rel="stylesheet" href="landing-faecher.css?v=landing-faecher-2"><!-- landing-faecher-1 · Streifen, Riss, Startbahn „Fächer“, Videothek als Slider · landing-faecher-2 Gesamturteil, Datenbasis, Partnerkarten -->
+<link rel="stylesheet" href="landing-faecher.css?v=landing-handy-1"><!-- landing-faecher-1 · Streifen, Riss, Startbahn „Fächer“, Videothek als Slider · landing-faecher-2 Gesamturteil, Datenbasis, Partnerkarten -->
 <link rel="stylesheet" href="seo.css?v=landing-seo-5">
 </head><body>
 
@@ -518,14 +518,7 @@ if (location.hash === '#forschung') location.replace('forschung.html');</script>
   </div>
   <!-- die Verweise aus #software und #features, jetzt unter der Strecke; id="features" hält die Navigation -->
   <div class="dp-strecke-fuss" id="features">
-    <p class="dp-links">
-      <a href="leistungsumfang.html">Alle <span data-modulzahl>19</span> Module im Detail →</a>
-      <a href="prozesskarte.html">Der ganze Weg auf einer Karte →</a>
-      <a href="methodik.html">Immobilienbewertung nach ImmoWertV, Datenbasis und Prüfung →</a>
-      <a href="immobilien-rendite-berechnen.html">Immobilien Rendite berechnen →</a>
-      <a href="cashflow-immobilie-berechnen.html">Cashflow einer Immobilie berechnen →</a>
-      <a href="kaufpreisfaktor-berechnen.html">Kaufpreisfaktor berechnen →</a>
-    </p>
+    <!-- landing-handy-1 · Marcel 22.11.2026 (IMG_2054): die sechs Verweise standen hier als lange Liste. Sie bleiben fuer die Suche erreichbar, jetzt im Fuss unter „Ratgeber“. -->
     <div class="dp-strecke-cta"><a class="btn-p" href="https://app.dealpilot.immo/?register=1">Kostenlos einchecken →</a>
       <span>Keine Zahlungsdaten · 4 Wochen voller Pro-Umfang · danach automatisch Free, ohne Kündigung</span></div>
   </div>
@@ -699,6 +692,12 @@ if (location.hash === '#forschung') location.replace('forschung.html');</script>
     <div><h4>Vertrauen</h4>
       <a href="sicherheit.html">Sicherheit &amp; Server</a><a href="fragen.html">Häufige Fragen</a>
       <a href="#daten">Datenbasis</a><a href="#partner">Wegbegleiter</a><a href="preise.html#feature-matrix">Cockpit-Matrix</a></div>
+    <div><h4>Ratgeber</h4>
+      <a href="immobilien-rendite-berechnen.html">Immobilien Rendite berechnen</a>
+      <a href="cashflow-immobilie-berechnen.html">Cashflow einer Immobilie berechnen</a>
+      <a href="kaufpreisfaktor-berechnen.html">Kaufpreisfaktor berechnen</a>
+      <a href="methodik.html">Immobilienbewertung nach ImmoWertV</a>
+      <a href="prozesskarte.html">Der ganze Weg auf einer Karte</a></div>
     <div><h4>Junker Immobilien</h4>
       <a href="https://junker-immobilien.io" target="_blank" rel="noopener">Sachverständigenbüro</a>
       <a href="https://junker-immobilien.io" target="_blank" rel="noopener">Kapitalanlage</a>
@@ -720,15 +719,15 @@ if (location.hash === '#forschung') location.replace('forschung.html');</script>
 <script src="dp2-inhalt.js?v=landing-faecher-3"></script>
 <script src="dp2-module.js?v=landing-module-2"></script>
 <!-- dp2-ablauf.js abgeloest durch demo-wechsel.js (v1588) -->
-<script src="dp2.js?v=landing-zahlen-live-1"></script>
+<script src="dp2.js?v=landing-handy-1"></script>
 <script src="landing-zahlen.js?v=landing-zahlen-live-1"></script><!-- landing-zahlen-live-1 · Zahlen live aus GET /api/v1/public/datenumfang, das HTML bleibt Rückfall -->
 <script src="dp2-kern.js?v=landing-kern-1"></script>
 <!-- landing-kern-2 · Deal-Check: die ECHTEN Kerne aus der App, gleiche Buster wie frontend/index.html
      (tools/buster-ebenen-pruefen.mjs liest die Zeilen unten). Die App-Domain folgt umgebung.js:
      staging.dealpilot.immo -> app.staging.dealpilot.immo, sonst app.dealpilot.immo. -->
-<script src="dealcheck-laden.js?v=landing-faecher-2"></script><!-- landing-seo-3 · Kerne + Deal-Check, Buster dort (buster-ebenen-pruefen liest die Datei) -->
+<script src="dealcheck-laden.js?v=landing-handy-1"></script><!-- landing-seo-3 · Kerne + Deal-Check, Buster dort (buster-ebenen-pruefen liest die Datei) -->
 <script src="dp2-live.js?v=landing-faecher-3"></script><!-- landing-faecher-1 · gibt window.DpVideoQuelle für den Slider heraus -->
-<script src="landing-faecher.js?v=landing-faecher-3"></script>
+<script src="landing-faecher.js?v=landing-handy-1"></script>
 <script src="partner.js?v=landing-strecke-5"></script><!-- landing-strecke-1 · Aufzug der Strecke --><!-- landing-videothek-1, landing-partner-1 -->
 <!-- v1588: Zwei Funktionen, die der alten Landing schon gehoerten und
      hier gefehlt haben. Beide betreffen Geld, deshalb standen sie ganz

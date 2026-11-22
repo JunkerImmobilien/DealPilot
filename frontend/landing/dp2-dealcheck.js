@@ -560,13 +560,12 @@
     var ziel = box.querySelector('.wrap');
     if (!quelle || !ziel) return;
     paketeDa = true;
-    var d = document.createElement('div'); d.className = 'dk-pakete'; d.id = 'dkPakete';
-    d.innerHTML = '<div class="dk-pakete-k"><span class="dk-pakete-eye">Weiter in DealPilot</span><h3>Vier Pakete. <span class="ac">Ab 0 €.</span></h3>'
-      + '<p>Mit einem Paket legst du das Objekt an und rechnest Steuer, Finanzierung und Wert im Detail.</p></div>';
-    var g = quelle.cloneNode(true);
-    [g].concat([].slice.call(g.querySelectorAll('*'))).forEach(function (x) { x.classList.remove('rv'); x.removeAttribute('id'); });
-    d.appendChild(g);
-    d.insertAdjacentHTML('beforeend', '<p class="dk-pakete-l"><a href="preise.html">Alle Leistungen der Pakete →</a></p>');
+    /* landing-handy-1 · Marcel 22.11.2026 (IMG_2053): die Karten standen doppelt, direkt darueber in #pricing.
+       Statt der Kopie ein kurzer Absprung zu den Paketen. */
+    var d = document.createElement('div'); d.className = 'dk-pakete dk-pakete-kurz'; d.id = 'dkPakete';
+    d.innerHTML = '<div class="dk-pakete-k"><span class="dk-pakete-eye">Weiter in DealPilot</span>'
+      + '<p>Mit einem Paket legst du das Objekt an und rechnest Steuer, Finanzierung und Wert im Detail. Vier Pakete, ab 0 €.</p>'
+      + '<p class="dk-pakete-l"><a href="#pricing">Pakete ansehen ↑</a> · <a href="preise.html">Alle Leistungen →</a></p></div>';
     ziel.appendChild(d);
   }
   document.addEventListener('dp:dealcheck-ergebnis', pakete);

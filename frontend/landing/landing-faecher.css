@@ -332,3 +332,9 @@ html.dt-offen{overflow:hidden}
 .n6-ruhig .plogo.pk:hover{transform:none}
 .n6-ruhig .plogo.pk:hover .pk-glanz::after{animation:none}
 @media(prefers-reduced-motion:reduce){.pk-reihe .pmarq-track{animation:none}}
+
+/* landing-handy-1 · IMG_2055: das height-Attribut (270) hielt das Vorschaubild fest, aspect-ratio griff nicht, das Bild wurde gestaucht */
+.n6-flow .it img{height:auto}
+.n6-vt-schirm{scroll-margin-top:84px}
+@media(max-width:620px){.n6-flow{height:250px}.n6-vt-kapitel{max-height:200px;overscroll-behavior:contain}}
+.dt-z-namen{gap:6px 16px}.dt-z-namen li{align-items:center}.dt-z-namen li span{font-size:13px}

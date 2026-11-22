@@ -367,3 +367,24 @@ img{max-width:100%;display:block}
   .b-log::after{content:'';position:absolute;left:-6px;right:-6px;top:-10px;bottom:-10px}
   .footer a{padding:11px 0}
 }
+
+/* landing-handy-1 · Handy-Menue: Liste im Fluss, Untermenues als Akkordeon (IMG_2052) */
+@media(max-width:1080px){
+  .nav.menue-auf > .wrap > ul{display:flex;flex-direction:column;align-items:stretch;position:absolute;top:100%;left:0;right:0;
+    background:#fff;padding:8px 20px 18px;border-bottom:1px solid rgba(20,18,15,.10);
+    max-height:calc(100vh - 80px);max-height:calc(100dvh - 80px);overflow-y:auto;-webkit-overflow-scrolling:touch;
+    box-shadow:0 18px 40px rgba(0,0,0,.12)}
+  .nav.menue-auf > .wrap > ul > li{border-bottom:1px solid rgba(20,18,15,.07)}
+  .nav.menue-auf > .wrap > ul > li > a{display:flex;justify-content:space-between;align-items:center;padding:13px 0}
+  .nav.menue-auf ul.sub{position:static;display:none;opacity:1;visibility:visible;transform:none;min-width:0;
+    box-shadow:none;border:0;margin:0 0 10px;padding:0;background:transparent}
+  .nav.menue-auf ul.sub::before{display:none}
+  .nav.menue-auf li.zu-auf > ul.sub{display:block}
+  .nav.menue-auf li.zu-auf > a .kar{transform:rotate(180deg)}
+  .nav.menue-auf .sub a{padding:9px 6px}
+  .nav.menue-auf .sub span span{display:none}
+}
+/* landing-handy-1 · Fuss mit sechster Spalte „Ratgeber“, am Handy zweispaltig statt einer langen Liste */
+.footer-grid{grid-template-columns:1.4fr .9fr .9fr 1fr .9fr .9fr}
+@media(max-width:1080px){.footer-grid{grid-template-columns:1fr 1fr 1fr}}
+@media(max-width:700px){.footer-grid{grid-template-columns:1fr 1fr;gap:22px 18px}.footer-grid > div:first-child{grid-column:1 / -1}}
