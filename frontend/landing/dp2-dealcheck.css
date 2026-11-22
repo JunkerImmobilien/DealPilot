@@ -12,7 +12,7 @@
 .dk-g{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,420px);gap:56px;align-items:center;max-width:1040px}
 .dk [hidden]{display:none!important}
 .dk-text h2{font-size:clamp(28px,3.6vw,44px);line-height:1.08;margin:14px 0 14px}
-.dk-text h2 .ac{color:var(--gdd);display:block}
+.dk-text h2 .ac{color:var(--gdi);display:block}  /* gold-hell-1: auf --cream2 2,35 -> 5,4 */
 .dk-text p{margin:0 0 18px;color:var(--inkm);max-width:440px}
 .dk-pkt{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
 .dk-pkt li{font:500 14px/1.4 var(--body);color:var(--ink);display:flex;gap:10px;align-items:center}

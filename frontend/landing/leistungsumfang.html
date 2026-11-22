@@ -10,7 +10,7 @@
 <meta property="og:title" content="Immobilienanalyse-Software: alle Funktionen · DealPilot"><meta property="og:description" content="Alle 22 Module von DealPilot im Detail: Boarding, PDF-Import, Investition, Finanzierung, Deal Score, KI-Analyse, Exporte, Steuer und Restnutzungsdauer.">
 <meta property="og:image" content="https://dealpilot.immo/assets/og-dealpilot.jpg"><meta name="twitter:card" content="summary_large_image">
 <link rel="stylesheet" href="/fonts/dp-fonts.css">
-<link rel="stylesheet" href="dp2.css?v=gold-hell-1">
+<link rel="stylesheet" href="dp2.css?v=gold-hell-1a">
 <link rel="stylesheet" href="dp2-teile.css?v=gold-hell-1">
 <style>
 /* ═══════════════════════════════════════════════════════════════════════
@@ -135,7 +135,7 @@ hr.rws{height:4px;border:0;background:var(--runway);margin:0;position:relative;z
 .lu-ed.light h4{color:#1a1305}  /* landing-pruefung-1: Kasten-Ueberschrift weiss auf Creme (Kontrast 1,08) */
 .lu-phase:not(.d) .ph-s{color:var(--wl-8a6d24, #8a6d24)}  /* landing-pruefung-1: helles Gold auf Weiss (Kontrast 1,57) */
 .lu-item .luc-chips{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 12px}
-.lu-item .luc-chip{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.02em;color:#8a6d24;background:rgba(201,168,76,.14);border:1px solid rgba(201,168,76,.38);border-radius:20px;padding:3px 9px;white-space:nowrap}
+.lu-item .luc-chip{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.02em;color:var(--gdi);background:rgba(201,168,76,.14);border:1px solid rgba(201,168,76,.38);border-radius:20px;padding:3px 9px;white-space:nowrap}
 .lu-item .lu-more{display:inline-flex;align-items:center;gap:5px;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.03em;text-transform:uppercase;color:var(--gdi);text-decoration:none;font-weight:600;cursor:pointer}
 .lu-item .lu-more:hover{color:#8a6d24;text-decoration:underline}
 .lu-phase.d .lu-item .luc-chip{color:#E8CC7A;background:rgba(201,168,76,.12);border-color:rgba(201,168,76,.3)}
@@ -158,6 +158,7 @@ hr.rws{height:4px;border:0;background:var(--runway);margin:0;position:relative;z
 }
 
 /* v1559 · Gewicht je Score-Bereich und der Plan-Hinweis am Kapitelende. */
+.sec-dark:not(.light) .gew{color:#8a6c1e}  /* gold-hell-1: auf Dunkel unveraendert (vorher --gdi #8a6c1e) */
 .gew{display:inline-block;font:700 9px/1 var(--mono);letter-spacing:.1em;
   background:rgba(201,168,76,.16);color:var(--gdi);padding:3px 7px;margin:0 6px;
   vertical-align:middle;border-radius:20px}
@@ -1209,7 +1210,7 @@ hr.rws{height:4px;border:0;background:var(--runway);margin:0;position:relative;z
       <style>
       /* v14: Funktionsumfang-Chips + Detail-Link */
       .lu-item .luc-chips{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 12px}
-      .lu-item .luc-chip{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.02em;color:#8a6d24;background:rgba(201,168,76,.14);border:1px solid rgba(201,168,76,.38);border-radius:20px;padding:3px 9px;white-space:nowrap}
+      .lu-item .luc-chip{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.02em;color:var(--gdi);background:rgba(201,168,76,.14);border:1px solid rgba(201,168,76,.38);border-radius:20px;padding:3px 9px;white-space:nowrap}
       .lu-item .lu-more{display:inline-flex;align-items:center;gap:5px;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.03em;text-transform:uppercase;color:var(--gdi);text-decoration:none;font-weight:600;cursor:pointer}
       .lu-item .lu-more:hover{color:#8a6d24;text-decoration:underline}
       .lu-phase.d .lu-item .luc-chip{color:#E8CC7A;background:rgba(201,168,76,.12);border-color:rgba(201,168,76,.3)}

@@ -66,6 +66,10 @@ img{max-width:100%;display:block}
 .eye.ctr{justify-content:center}
 .sec-dark .eye,.hero .eye{color:var(--gdh)}
 .sec-dark .eye::before,.hero .eye::before{background:var(--gdh)}
+/* gold-hell-1: --gdi ist jetzt dunkler (Schrift auf Hell). Auf diesen DUNKLEN Flaechen
+   stand die Eyebrow schon vorher in --gdi (#8a6c1e auf #070707, Kontrast 4,0) - sie
+   behalten genau diesen Ton, auf Dunkel aendert sich nichts. Offen: eigentlich --gdh. */
+.lz-hero .eye,.lz-dunkel .eye,.api-hero .eye{color:#8a6c1e}
 .ico{width:1em;height:1em;stroke:currentColor;fill:none;stroke-width:1.6;
   stroke-linecap:round;stroke-linejoin:round;flex:none}
 
