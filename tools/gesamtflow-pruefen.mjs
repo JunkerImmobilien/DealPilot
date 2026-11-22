@@ -342,7 +342,8 @@ function funk(src, name) {
 /* ── F23 · Prüftabelle: kein rohes JSON in „bisher im Objekt" ── */
 {
   const oa = lies('frontend/js/object-actions.js');
-  const code = ['fmt0', '_bisherText'].map((n) => funk(oa, n) || '').join('\n');
+  const bi = oa.indexOf('function _bisherText('), be = oa.indexOf('\n  function ', bi + 10);   /* Regex mit { : funk() zählt dort falsch */
+  const code = (funk(oa, 'fmt0') || '') + '\n' + oa.slice(bi, be);
   const c = { String, JSON, Intl, Math, parseFloat }; vm.createContext(c);
   let r = null;
   try { vm.runInContext(code + ';var __r = _bisherText({ label: "Aufstellung des Hausgelds" }, ' + JSON.stringify(JSON.stringify({ jahr: 2023, art: 'Wirtschaftsplan', p: [{ b: 'Heizung', e: 900 }, { b: 'Verwaltung', e: 300 }] })) + ');', c); r = c.__r; } catch (e) { r = 'Fehler ' + e.message; }
