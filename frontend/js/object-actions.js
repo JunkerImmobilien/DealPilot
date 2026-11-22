@@ -2942,9 +2942,17 @@
         renderFileRow(f); return;
       }
       delete f.cache.dokument;        /* unklar → der alte Weg */
+      var _warDok = true;
     }
     var cls = classifyType({ name: f.name }, String(f.text || '').slice(0, 12000));   /* Einordnung wie bisher auf dem Anfang */
     if (cls === 'market' || cls === 'expose') { f.type = cls; await ensureExtract(f); return; }
+    /* v3975 · Gesamtflow 22.11.2026: Betriebskostenabrechnung (MFH) und Mieterhöhungsverlangen sehen nach Unterlage aus
+       (Dateiname/Kopf), die Art kennt der Import aber nicht („Art unklar“). Sie liefen als Marktbericht durch, und die KI
+       füllte Makro-/Mikrolage, Marktmiete 7,92 €/m² (die Miete aus dem Mieterhöhungsschreiben) und Baujahr 1970 (die
+       Baualtersklasse des Mietspiegels), teils vorgehakt. Dann keine Marktbericht-Suche, sondern „Art wählen“. */
+    if (_warDok) {
+      f.type = 'dokument'; f.status = 'err'; f.fehler = 'Art unklar, bitte die Art wählen'; renderFileRow(f); return;
+    }
     setStatus(f, 'Typ prüfen…');
     f.type = 'market'; await ensureExtract(f);
     if (f.limit) return;
