@@ -2148,6 +2148,26 @@ function extractJson(text) {
     }
   }
 
+  // 6) v3974: Rechenausdruck statt Zahl — gemessen im Gesamtflow-Test 22.11.2026 am Wirtschaftsplan:
+  //    "kosten_jahr_eur": 26824 + 9882 + 12000. Nur reine Summen/Differenzen aus Zahlen werden
+  //    ausgerechnet; alles andere bleibt ungültig (keine Auswertung beliebiger Ausdrücke).
+  if (first >= 0) {
+    const roh = (last > first ? text.slice(first, last + 1) : text.slice(first));
+    const summe = /(:\s*)(-?\d+(?:\.\d+)?(?:\s*[+-]\s*\d+(?:\.\d+)?)+)(\s*[,}\]\r\n])/g;
+    if (summe.test(roh)) {
+      const gerechnet = roh.replace(summe, function (m, vor, ausdruck, nach) {
+        const teile = ausdruck.replace(/\s+/g, '').match(/[+-]?\d+(?:\.\d+)?/g) || [];
+        const wert = teile.reduce(function (s, t) { return s + Number(t); }, 0);
+        return vor + String(Math.round(wert * 100) / 100) + nach;
+      });
+      try { return JSON.parse(gerechnet); } catch (e) { /* fallthrough */ }
+      const recovered = _recoverTruncatedJson(gerechnet);
+      if (recovered) {
+        try { return JSON.parse(recovered); } catch (e) { /* still fails */ }
+      }
+    }
+  }
+
   return null;
 }
 
