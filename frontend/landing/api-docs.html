@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="robots" content="noindex,nofollow">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>DealPilot API — Dokumentation</title>
+<title>DealPilot API · Dokumentation</title>
 <style>
   :root{
     --obsidian:#050505; --ink:#1b1815; --gold:#C9A84C; --gold-h:#E8CC7A; --gold-d:#b8932f;
@@ -50,6 +50,7 @@
   .toc{display:flex;flex-wrap:wrap;gap:8px 16px;margin:18px 0 0;font-size:14px}
   .toc a{border:0}
   @media(max-width:620px){.uc{grid-template-columns:1fr}}
+  @media(max-width:620px){th,td{overflow-wrap:anywhere;padding:8px 6px}}  /* landing-pruefung-1: Feldtabelle schob die Seite bei 360 px auf 382 px */
 </style>
 </head>
 <body>
@@ -57,7 +58,7 @@
   <div class="wrap">
     <p class="kick">◆ DealPilot Platform</p>
     <h1>DealPilot API</h1>
-    <p>Greife programmatisch auf deine Immobilien-Objekte zu — anlegen, lesen, ändern, löschen. Eine vollständige REST-Schnittstelle über HTTPS, JSON rein und raus. Für Pro-Konten.</p>
+    <p>Greife programmatisch auf deine Immobilien-Objekte zu, anlegen, lesen, ändern, löschen. Eine vollständige REST-Schnittstelle über HTTPS, JSON rein und raus. Für Pro-Konten.</p>
   </div>
 </header>
 <hr class="runway">
@@ -76,19 +77,19 @@
   <h2 id="was"><span class="num">01</span>Was du mit der API machen kannst</h2>
   <p class="lead">Die API gibt dir vollen Lese- und Schreibzugriff auf deinen eigenen Objektbestand. Typische Anwendungen:</p>
   <div class="uc">
-    <div class="card"><h3>Objekte automatisiert anlegen</h3><p>Neue Investments aus einer Tabelle, einem CRM oder einem Akquise-Tool direkt in DealPilot kippen — ohne manuelles Abtippen.</p></div>
+    <div class="card"><h3>Objekte automatisiert anlegen</h3><p>Neue Investments aus einer Tabelle, einem CRM oder einem Akquise-Tool direkt in DealPilot kippen, ohne manuelles Abtippen.</p></div>
     <div class="card"><h3>Bestand synchronisieren</h3><p>Mietänderungen, neue Finanzierungskonditionen oder Sanierungskosten aus deinem System per <code>PUT</code> nach DealPilot spiegeln.</p></div>
     <div class="card"><h3>Eigene Dashboards &amp; Reports</h3><p>Alle Objektdaten abrufen und in eigene Auswertungen, BI-Tools oder ein Investoren-Reporting einspeisen.</p></div>
     <div class="card"><h3>Buchhaltung &amp; Steuerberater anbinden</h3><p>Objekt- und Mandanten-/Halter-Daten exportieren und an die Buchhaltung oder den StB übergeben.</p></div>
-    <div class="card"><h3>Massen-Import &amp; Migration</h3><p>Einen ganzen Bestand aus einer Alt-Lösung übernehmen — Schleife über deine Datensätze, je ein <code>POST</code>.</p></div>
+    <div class="card"><h3>Massen-Import &amp; Migration</h3><p>Einen ganzen Bestand aus einer Alt-Lösung übernehmen, Schleife über deine Datensätze, je ein <code>POST</code>.</p></div>
     <div class="card"><h3>Aufräumen &amp; Pflegen</h3><p>Veraltete Objekte per <code>DELETE</code> entfernen oder Felder programmatisch korrigieren.</p></div>
   </div>
-  <p>Ein Key sieht und ändert ausschließlich die Objekte des eigenen Kontos — nie fremde Daten und nie mehr, als der Pro-Plan erlaubt.</p>
+  <p>Ein Key sieht und ändert ausschließlich die Objekte des eigenen Kontos, nie fremde Daten und nie mehr, als der Pro-Plan erlaubt.</p>
 
   <h2 id="start"><span class="num">02</span>Schnellstart</h2>
   <p class="lead">Basis-URL für alle Aufrufe:</p>
   <pre>https://app.dealpilot.junker-immobilien.io/api/v1</pre>
-  <p>Den API-Key erzeugst du in DealPilot unter <b>Einstellungen → Account &amp; Sicherheit → DealPilot API</b>. Er wird genau einmal vollständig angezeigt (Aufbau <code>dpk_live_…</code>) — danach nur noch der Anfang. Verloren? Einfach widerrufen und neu erzeugen.</p>
+  <p>Den API-Key erzeugst du in DealPilot unter <b>Einstellungen → Account &amp; Sicherheit → DealPilot API</b>. Er wird genau einmal vollständig angezeigt (Aufbau <code>dpk_live_…</code>), danach nur noch der Anfang. Verloren? Einfach widerrufen und neu erzeugen.</p>
   <pre><span class="c"># Alle eigenen Objekte abrufen</span>
 curl -H "X-API-Key: dpk_live_DEIN_KEY" \
   https://app.dealpilot.junker-immobilien.io/api/v1/objects</pre>
@@ -100,7 +101,7 @@ curl -H "X-API-Key: dpk_live_DEIN_KEY" \
     <tr><td>Voraussetzung</td><td>Aktiver <span class="pill">Pro</span>-Plan. Fällt das Konto unter Pro, sind die Keys inaktiv.</td></tr>
     <tr><td>Geltungsbereich</td><td>Nur die Objekte des eigenen Kontos. Voller CRUD (Lesen/Schreiben/Löschen).</td></tr>
     <tr><td>Rate-Limit</td><td>120 Anfragen pro Minute und Key (darüber <code>429</code>).</td></tr>
-    <tr><td>Speicherung</td><td>Der Key wird serverseitig nur als SHA-256-Hash abgelegt — der Klartext ist nicht wiederherstellbar.</td></tr>
+    <tr><td>Speicherung</td><td>Der Key wird serverseitig nur als SHA-256-Hash abgelegt, der Klartext ist nicht wiederherstellbar.</td></tr>
   </table>
 
   <h2 id="objekte"><span class="num">04</span>Endpunkte</h2>
@@ -114,7 +115,7 @@ curl -H "X-API-Key: dpk_live_DEIN_KEY" \
   <pre>{ "ok": true }</pre>
 
   <h2 id="modell"><span class="num">05</span>Datenmodell &amp; Felder</h2>
-  <p>Ein Objekt hat eine schlanke Hülle; alle Rechen-Eingaben liegen im <code>data</code>-Objekt:</p>
+  <p>Ein Objekt hat eine schlanke Hülle. Alle Rechen-Eingaben liegen im <code>data</code>-Objekt:</p>
   <table>
     <tr><th>Feld</th><th>Typ</th><th>Bedeutung</th></tr>
     <tr><td><code>id</code></td><td>string</td><td>Eindeutige ID</td></tr>
@@ -123,7 +124,7 @@ curl -H "X-API-Key: dpk_live_DEIN_KEY" \
     <tr><td><code>photos</code></td><td>array</td><td>Objektfotos</td></tr>
     <tr><td><code>ai_analysis</code></td><td>string</td><td>Gespeicherte KI-Analyse</td></tr>
   </table>
-  <div class="note"><b>Voll durchlässig:</b> Das <code>data</code>-Objekt akzeptiert beim Anlegen/Ändern beliebige Schlüssel und gibt sie unverändert wieder zurück. Es gibt keine serverseitige Whitelist — alle hier gelisteten Felder (und künftige) gehen 1:1 durch.</div>
+  <div class="note"><b>Voll durchlässig:</b> Das <code>data</code>-Objekt akzeptiert beim Anlegen/Ändern beliebige Schlüssel und gibt sie unverändert wieder zurück. Es gibt keine serverseitige Whitelist, alle hier gelisteten Felder (und künftige) gehen 1:1 durch.</div>
 
   <p class="lead">Alle <code>data</code>-Felder, nach Themen gruppiert:</p>
 
@@ -148,10 +149,10 @@ curl -H "X-API-Key: dpk_live_DEIN_KEY" \
   <div class="grp"><h3>Bewirtschaftungskosten</h3><p class="gd">Umlagefähige und nicht-umlagefähige Kosten, Rücklagen, Mietausfall, BWK-Pauschalen.</p>
     <div class="keys"><code>hg_ul</code><code>grundsteuer</code><code>ul_sonst</code><code>hg_nul</code><code>weg_r</code><code>eigen_r</code><code>mietausfall</code><code>nul_sonst</code><code>bwk_ul_pct</code><code>bwk_nul_pct</code><code>bwk_kp_pct</code></div></div>
 
-  <div class="grp"><h3>Finanzierung — Darlehen 1 &amp; Anschluss</h3><p class="gd">Eigenkapital, Darlehen 1 (Betrag/Zins/Tilgung/Bindung/Typ/Auszahlung), Anschlussfinanzierung.</p>
+  <div class="grp"><h3>Finanzierung · Darlehen 1 &amp; Anschluss</h3><p class="gd">Eigenkapital, Darlehen 1 (Betrag/Zins/Tilgung/Bindung/Typ/Auszahlung), Anschlussfinanzierung.</p>
     <div class="keys"><code>ek</code><code>d1</code><code>d1z</code><code>d1t</code><code>d1_bindj</code><code>d1_type</code><code>d1_auszahl</code><code>d1_vertrag</code><code>anschl_z</code><code>anschl_t</code><code>anschl_bj</code></div></div>
 
-  <div class="grp"><h3>Finanzierung — Darlehen 2</h3><p class="gd">Zweites Darlehen mit eigener Anschlussfinanzierung.</p>
+  <div class="grp"><h3>Finanzierung · Darlehen 2</h3><p class="gd">Zweites Darlehen mit eigener Anschlussfinanzierung.</p>
     <div class="keys"><code>d2</code><code>d2z</code><code>d2t</code><code>d2_bindj</code><code>d2_inst</code><code>d2_type</code><code>d2_auszahl</code><code>d2_az</code><code>d2_at</code></div></div>
 
   <div class="grp"><h3>Bausparvertrag</h3><p class="gd">Bausparsumme, Rate, Zuteilung, Zins, Mindestquote, Darlehenskonditionen.</p>
@@ -172,7 +173,7 @@ curl -H "X-API-Key: dpk_live_DEIN_KEY" \
   <div class="grp"><h3>Ausstattung (für Marktbewertung)</h3><p class="gd">Ausstattungsdetails für die AVM-Bewertung.</p>
     <div class="keys"><code>eq_heating</code><code>eq_windows</code><code>eq_floor</code><code>eq_bath</code><code>eq_guest_wc</code><code>eq_store_room</code><code>eq_walls</code><code>eq_roof</code><code>eq_elevator</code></div></div>
 
-  <div class="grp"><h3>Mandant &amp; Halter</h3><p class="gd">Wer das Objekt hält und — bei Überführung in eine Gesellschaft — die steuerlich relevanten Eckwerte.</p>
+  <div class="grp"><h3>Mandant &amp; Halter</h3><p class="gd">Wer das Objekt hält und, bei Überführung in eine Gesellschaft, die steuerlich relevanten Eckwerte.</p>
     <table>
       <tr><th>Feld</th><th>Bedeutung</th></tr>
       <tr><td><code>halter</code></td><td>ID des haltenden Mandanten (<code>privat</code> oder eine Gesellschaft)</td></tr>
@@ -217,7 +218,7 @@ curl -X DELETE -H "X-API-Key: dpk_live_DEIN_KEY" \
   https://app.dealpilot.junker-immobilien.io/api/v1/objects/OBJEKT_ID</pre>
 
   <footer>
-    DealPilot API · Junker Group UG · Fragen an <a href="mailto:dealpilot@junker-immobilien.io">dealpilot@junker-immobilien.io</a><br>
+    DealPilot API · Junker Solution · Fragen an <a href="mailto:dealpilot@junker-immobilien.io">dealpilot@junker-immobilien.io</a><br>
     Endpunkte v1 · voller CRUD-Zugriff für Pro-Konten · <code>data</code> ist voll durchlässig.
   </footer>
 </div>

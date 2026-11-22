@@ -49,7 +49,7 @@
 .n6-vt-reiter{display:flex;gap:6px;flex-wrap:wrap}
 .n6-vt-reiter button{border:1px solid var(--line);background:transparent;color:var(--mdk);font:700 10px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;padding:10px 14px;border-radius:999px;cursor:pointer;min-height:36px}
 .n6-vt-reiter button.an{background:var(--runway);color:#14100a;border-color:transparent}
-.n6-vt-reiter button small{opacity:.7;margin-left:6px}
+.n6-vt-reiter button small{opacity:.7;margin-left:6px;font-size:9px}/* landing-pruefung-1: small ergab 8,33 px, unter der Untergrenze 8,5 px */
 .n6-vt-spiel{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);gap:0;border:1px solid var(--line);background:#0b0a08;margin-bottom:34px}
 .n6-vt-schirm{position:relative;aspect-ratio:16/9;background:#000;overflow:hidden}
 .n6-vt-schirm video,.n6-vt-schirm img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}

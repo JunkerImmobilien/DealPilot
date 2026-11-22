@@ -1424,8 +1424,8 @@
     {
       "id": "modul-24-bodenrichtwert-und-unterlagen", "kategorie": "spezial", "nr": "24", "dauer": 195,
       "titel": "Bodenrichtwert und Unterlagen",
-      "unterzeile": "BORIS, die zuständigen Ämter — und was DealPilot nicht verschickt.",
-      "story": "Den Bodenrichtwert holt DealPilot amtlich aus BORIS, mit Stichtag und Zone zum Nachsehen. Für Grundbuch, Bauakte und Flurkarte zeigt es je Unterlage die zuständige Stelle und bereitet die Anfrage als Entwurf vor — verschickt wird nichts ohne dich. Dazu der Weg zum Restnutzungsdauer-Gutachten.",
+      "unterzeile": "Der amtliche Bodenrichtwert, die zuständigen Ämter und was DealPilot nicht verschickt.",
+      "story": "Den Bodenrichtwert holt DealPilot amtlich aus dem Bodenrichtwertportal des Landes, mit Stichtag und Zone zum Nachsehen. Für Grundbuch, Bauakte und Flurkarte zeigt es je Unterlage die zuständige Stelle und bereitet die Anfrage als Entwurf vor. Verschickt wird nichts ohne dich. Dazu der Weg zum Restnutzungsdauer-Gutachten.",
       "nutzen": "Du weißt, wo jede Unterlage liegt, statt Behörden abzutelefonieren.",
       "kapitel": [
         { "t": 0, "titel": "Einstieg", "stichworte": "Bodenrichtwert Unterlagen BORIS zuständigen Ämter DealPilot nicht verschickt" },

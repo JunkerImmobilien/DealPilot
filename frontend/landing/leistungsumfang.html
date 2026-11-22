@@ -11,7 +11,7 @@
 <meta property="og:image" content="https://dealpilot.immo/assets/og-dealpilot.jpg"><meta name="twitter:card" content="summary_large_image">
 <link rel="stylesheet" href="/fonts/dp-fonts.css">
 <link rel="stylesheet" href="dp2.css?v=landing-handy-1">
-<link rel="stylesheet" href="dp2-teile.css?v=landing-partner-2">
+<link rel="stylesheet" href="dp2-teile.css?v=landing-pruefung-1">
 <style>
 /* ═══════════════════════════════════════════════════════════════════════
    Leistungsumfang aus frontend/landing/index.html Z.3266-3969 (18 Kapitel).
@@ -45,7 +45,7 @@ hr.rws{height:4px;border:0;background:var(--runway);margin:0;position:relative;z
 .lu-packs-3{grid-template-columns:repeat(3,1fr)}
 .lu-pack{position:relative;background:#fff;border:1px solid var(--cream-line);border-radius:14px;padding:20px 18px;text-align:center}
 .lu-pack.pop{border-color:var(--gd)}
-.lu-pack .lp-tag{position:absolute;top:-9px;left:50%;transform:translateX(-50%);background:var(--runway);color:#221a06;font-family:var(--mono);font-size:8px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:3px 10px;border-radius:20px}
+.lu-pack .lp-tag{position:absolute;top:-9px;left:50%;transform:translateX(-50%);background:var(--runway);color:#221a06;font-family:var(--mono);font-size:8.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:3px 10px;border-radius:20px}
 .lu-pack .lp-l{font-family:var(--disp);font-weight:700;font-size:24px;color:var(--ink)}
 .lu-pack .lp-p{font-family:var(--disp);font-weight:700;font-size:15px;color:var(--gdd);margin-top:2px}
 .lu-pack .lp-u{font-family:var(--mono);font-size:9px;color:var(--mut);margin-top:4px}
@@ -131,6 +131,9 @@ hr.rws{height:4px;border:0;background:var(--runway);margin:0;position:relative;z
 .lu-ed.light .stat-tile-num{background:linear-gradient(110deg,#b8932f,#8a6d24);-webkit-background-clip:text;background-clip:text;color:transparent}
 .lu-ed.light .stat-tile-lbl{color:#8a7c60}
 .lu-ed.light .pull{color:#1a1305;border-left-color:#C9A84C}
+.lu-ed.light li{color:#4a4436}  /* landing-pruefung-1: Listen in hellen Kapiteln erbten die helle Schrift von .sec-dark (Kontrast 1,25, unlesbar) */
+.lu-ed.light h4{color:#1a1305}  /* landing-pruefung-1: Kasten-Ueberschrift weiss auf Creme (Kontrast 1,08) */
+.lu-phase:not(.d) .ph-s{color:var(--wl-8a6d24, #8a6d24)}  /* landing-pruefung-1: helles Gold auf Weiss (Kontrast 1,57) */
 .lu-item .luc-chips{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 12px}
 .lu-item .luc-chip{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.02em;color:#8a6d24;background:rgba(201,168,76,.14);border:1px solid rgba(201,168,76,.38);border-radius:20px;padding:3px 9px;white-space:nowrap}
 .lu-item .lu-more{display:inline-flex;align-items:center;gap:5px;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.03em;text-transform:uppercase;color:#b8932f;text-decoration:none;font-weight:600;cursor:pointer}
@@ -186,7 +189,7 @@ hr.rws{height:4px;border:0;background:var(--runway);margin:0;position:relative;z
 
 
 <div class="tb"><div class="wrap">
-  <span class="pkt"><i></i>4 WOCHEN PRO — OHNE ZAHLUNGSDATEN</span>
+  <span class="pkt"><i></i>4 WOCHEN PRO, OHNE ZAHLUNGSDATEN</span>
   <span class="pkt"><i></i>MONATLICH KÜNDBAR</span>
   <span class="pkt hidemid"><i></i>KEINE BEWERTUNG VERFÄLLT</span>
   <div class="rechts">
@@ -204,9 +207,9 @@ hr.rws{height:4px;border:0;background:var(--runway);margin:0;position:relative;z
     <li><a href="/#features" class="hier">Funktionen<i class="kar"></i></a>
       <ul class="sub">
         <li><a href="/#features"><svg class="ico si"><use href="#i-blitz"/></svg><span><b>Die 19 Module</b><span>Von Boarding über Deal Score bis Bankexport</span></span></a></li>
-        <li><a href="leistungsumfang.html"><svg class="ico si"><use href="#i-buch"/></svg><span><b>Leistungsumfang</b><span>Alle 22 Kapitel ausführlich — was jedes Modul kann</span></span></a></li>
-        <li><a href="preise.html#feature-matrix"><svg class="ico si"><use href="#i-ziel"/></svg><span><b>Cockpit-Matrix</b><span>Jede Funktion, jeder Tarif — im Vergleich</span></span></a></li>
-        <li><a href="api.html"><svg class="ico si"><use href="#i-code"/></svg><span><b>API</b><span>REST-Schnittstelle, voller CRUD — im Pro-Plan</span></span></a></li>
+        <li><a href="leistungsumfang.html"><svg class="ico si"><use href="#i-buch"/></svg><span><b>Leistungsumfang</b><span>Alle 22 Kapitel ausführlich, was jedes Modul kann</span></span></a></li>
+        <li><a href="preise.html#feature-matrix"><svg class="ico si"><use href="#i-ziel"/></svg><span><b>Cockpit-Matrix</b><span>Jede Funktion, jeder Tarif im Vergleich</span></span></a></li>
+        <li><a href="api.html"><svg class="ico si"><use href="#i-code"/></svg><span><b>API</b><span>REST-Schnittstelle, voller CRUD, im Pro-Plan</span></span></a></li>
         <li><a href="forschung.html"><svg class="ico si"><use href="#i-ziel"/></svg><span><b>Forschung &amp; Entwicklung</b><span>Bescheinigtes Vorhaben: das ganze Portfolio im Blick</span></span></a></li>
       </ul></li>
     <li><a href="geschichten.html">Geschichten</a></li>
@@ -223,7 +226,7 @@ hr.rws{height:4px;border:0;background:var(--runway);margin:0;position:relative;z
         <li><a href="loesungen.html"><svg class="ico si"><use href="#i-ziel"/></svg><span><b>Individuelle Lösungen</b><span>Prozesse, Automatisierung, Homepage &amp; iFrame</span></span></a></li>
         <li><a href="partner.html"><svg class="ico si"><use href="#i-ebenen"/></svg><span><b>Partner-Programm</b><span>Cockpit, eigene Marke und der Ablauf</span></span></a></li><!-- landing-partner-1 -->
         <li><a href="preise.html#module"><svg class="ico si"><use href="#i-code"/></svg><span><b>Module &amp; Schnittstellen</b><span>Rechenkerne als Schnittstelle, auf Anfrage</span></span></a></li>
-        <li><a href="#makler-hub"><svg class="ico si"><use href="#i-haus"/></svg><span><b>Makler-Hub</b><span>Der Maklerprozess bis zum Notar · für Makler</span></span></a></li>
+        <li><a href="loesungen.html#makler-hub"><svg class="ico si"><use href="#i-haus"/></svg><span><b>Makler-Hub</b><span>Der Maklerprozess bis zum Notar · für Makler</span></span></a></li>
         <li><a href="/#partner"><svg class="ico si"><use href="#i-pokal"/></svg><span><b>Unsere Partner</b><span>Wer mit uns zusammenarbeitet</span></span></a></li>
       </ul></li>
     <li><a href="sicherheit.html">Sicherheit<i class="kar"></i></a>
@@ -244,7 +247,7 @@ hr.rws{height:4px;border:0;background:var(--runway);margin:0;position:relative;z
       <div class="lu-hero">
         <span class="eye">// Alles, was an Bord ist</span>
         <h1>Vom Fund <span class="ac">bis zur Bank.</span></h1><!-- landing-seo-1 · genau ein h1 je Seite -->
-        <p class="lu-hero-lead">Jede Zahl, die z&auml;hlt &mdash; in einem Cockpit. Vom Expos&eacute; bis zum bankfertigen Investment-Case: Flugdaten statt Bauchgef&uuml;hl.</p>
+        <p class="lu-hero-lead">Jede Zahl, die z&auml;hlt, in einem Cockpit. Vom Expos&eacute; bis zum bankfertigen Investment-Case: Flugdaten statt Bauchgef&uuml;hl.</p>
         <div class="lu-hero-stats">
           <div class="lhs"><b>22</b><span>Module</span></div>
           <div class="lhs"><b>24</b><span>KPIs im Score</span></div>
@@ -253,7 +256,7 @@ hr.rws{height:4px;border:0;background:var(--runway);margin:0;position:relative;z
         </div>
         <p style="margin:18px 0 0"><a href="#lu-weg" style="color:var(--wl-c9a84c,#C9A84C);font-weight:600;text-decoration:none">Den ganzen Weg auf einer Karte ansehen →</a></p>
         <div class="lu-toc">
-          <div class="lu-toc-h">Inhaltsverzeichnis <span>&mdash; direkt anspringen</span></div>
+          <div class="lu-toc-h">Inhaltsverzeichnis <span>· direkt anspringen</span></div>
           <div class="lu-toc-grid"><a class="lu-toc-item" href="#lu-warum"><span class="n">01</span><span class="t">Warum DealPilot existiert</span></a><a class="lu-toc-item" href="#lu-einstieg"><span class="n">02</span><span class="t">Drei Wege zur Analyse</span></a><a class="lu-toc-item" href="#lu-quick-check"><span class="n">03</span><span class="t">Boarding im Detail</span></a><a class="lu-toc-item" href="#lu-pdf-import"><span class="n">04</span><span class="t">PDF-Import &amp; KI-Extraktion</span></a><a class="lu-toc-item" href="#lu-objekt"><span class="n">05</span><span class="t">Objekt-Erfassung &amp; Lage</span></a><a class="lu-toc-item" href="#lu-investition"><span class="n">06</span><span class="t">Investitionsmodul &amp; 15-%-Regel</span></a><a class="lu-toc-item" href="#lu-miete"><span class="n">07</span><span class="t">Miete &amp; Marktvergleich</span></a><a class="lu-toc-item" href="#lu-werbungskosten"><span class="n">08</span><span class="t">Werbungskostenrechner</span></a><a class="lu-toc-item" href="#lu-finanzierung"><span class="n">09</span><span class="t">Finanzierung &amp; Anschlusstest</span></a><a class="lu-toc-item" href="#lu-bewirtschaftung"><span class="n">10</span><span class="t">Bewirtschaftungskosten</span></a><a class="lu-toc-item" href="#lu-dealscore"><span class="n">11</span><span class="t">Investor Deal Score 2.0</span></a><a class="lu-toc-item" href="#lu-ki-analyse"><span class="n">12</span><span class="t">KI-Investment-Analyse</span></a><a class="lu-toc-item" href="#lu-exports"><span class="n">13</span><span class="t">Bankexport &amp; Investment-Case</span></a><a class="lu-toc-item" href="#lu-portfolio"><span class="n">14</span><span class="t">Portfolio &amp; Track-Record</span></a><a class="lu-toc-item" href="#lu-daten"><span class="n">15</span><span class="t">Datensicherheit &amp; Hosting</span></a><a class="lu-toc-item" href="#lu-steuer"><span class="n">16</span><span class="t">Steuer-Modul &amp; AfA</span></a><a class="lu-toc-item" href="#lu-marktdaten"><span class="n">17</span><span class="t">Marktdaten &amp; Marktwert</span></a><a class="lu-toc-item" href="#lu-rnd"><span class="n">18</span><span class="t">RND-Gutachten</span></a><a class="lu-toc-item" href="#lu-sprechlauf"><span class="n">19</span><span class="t">Sprechlauf</span></a><a class="lu-toc-item" href="#lu-beleg"><span class="n">20</span><span class="t">Beleg-Import</span></a><a class="lu-toc-item" href="#lu-datenraum"><span class="n">21</span><span class="t">Datenraum</span></a><a class="lu-toc-item" href="#lu-dealaktion"><span class="n">22</span><span class="t">Deal-Aktion &amp; Netzwerk</span></a></div>
         </div>
       </div>
@@ -267,11 +270,11 @@ hr.rws{height:4px;border:0;background:var(--runway);margin:0;position:relative;z
   <section class="sec sec-dark lu-ed light" id="lu-weg">
     <div class="wrap">
       <span class="eyebrow">Der Weg durch DealPilot</span>
-      <h2>Vom ersten Blick bis zum Bestand — <span class="gold">auf einer Karte.</span></h2>
+      <h2>Vom ersten Blick bis zum Bestand <span class="gold">auf einer Karte.</span></h2>
       <p>
         Drei Bahnen, ein Datenbestand: Im <strong>Pre-Flight</strong> prüfst du ein Objekt in Minuten mit dem Quick-Check.
         Beim <strong>Boarding</strong> wird daraus ein vollständiger Ankauf mit Finanzierung, Steuer, Marktbericht und Bankexport.
-        Im <strong>Reiseflug</strong> läuft das Objekt im Bestand weiter — mit dem Ankauf als Maßstab, gegen den jedes Jahr gemessen wird.
+        Im <strong>Reiseflug</strong> läuft das Objekt im Bestand weiter, mit dem Ankauf als Maßstab, gegen den jedes Jahr gemessen wird.
       </p>
       <p>
         Die Prozesskarte zeigt an jeder Station, <em>was du tun kannst</em> und <em>was dabei herauskommt</em>.
@@ -316,13 +319,13 @@ hr.rws{height:4px;border:0;background:var(--runway);margin:0;position:relative;z
       <span class="eyebrow"><span class="anchor">01</span>Warum DealPilot existiert</span>
       <h2>Bauchgefühl ist ein guter Anfang. Aber <span class="gold">kein Schluss.</span></h2>
       <p>
-        DealPilot ist aus einem persönlichen Frust entstanden. Wer in Deutschland Immobilien als Kapitalanlage prüft, jongliert in der Regel mit drei bis fünf verschiedenen Excel-Vorlagen, einer Handvoll PDF-Exposés, einem Steuerrechner aus dem Internet und einer handgeschriebenen Cashflow-Rechnung auf der Rückseite eines Notizblocks. Am Ende kommt eine grobe Einschätzung dabei heraus — aber nichts, was man einem Bankberater, Steuerberater oder Geschäftspartner in die Hand drücken könnte.
+        DealPilot ist aus einem persönlichen Frust entstanden. Wer in Deutschland Immobilien als Kapitalanlage prüft, jongliert in der Regel mit drei bis fünf verschiedenen Excel-Vorlagen, einer Handvoll PDF-Exposés, einem Steuerrechner aus dem Internet und einer handgeschriebenen Cashflow-Rechnung auf der Rückseite eines Notizblocks. Am Ende kommt eine grobe Einschätzung dabei heraus, aber nichts, was man einem Bankberater, Steuerberater oder Geschäftspartner in die Hand drücken könnte.
       </p>
       <p>
-        Hinter DealPilot steht <strong>Junker Solution</strong><!-- landing-kern-2 · Betreiber ist Junker Solution, nicht das Sachverständigenbüro -->. Aus der Praxis, in der jede Woche mehrere Objekte geprüft werden — für eigene Investments und für Auftraggeber —, ist DealPilot entstanden: ein Werkzeug, das alle relevanten Kennzahlen einer Immobilien-Investition strukturiert sammelt, sauber berechnet und in einer Form ausgibt, mit der eine Bank, ein Steuerberater oder ein Geschäftspartner tatsächlich arbeiten kann.
+        Hinter DealPilot steht <strong>Junker Solution</strong><!-- landing-kern-2 · Betreiber ist Junker Solution, nicht das Sachverständigenbüro -->. Aus der Praxis, in der jede Woche mehrere Objekte geprüft werden, für eigene Investments und für Auftraggeber, ist DealPilot entstanden: ein Werkzeug, das alle relevanten Kennzahlen einer Immobilien-Investition strukturiert sammelt, sauber berechnet und in einer Form ausgibt, mit der eine Bank, ein Steuerberater oder ein Geschäftspartner tatsächlich arbeiten kann.
       </p>
       <p>
-        DealPilot ist <em>kein Anlagevermittler</em>, <em>kein Steuerberater</em>, <em>kein Finanzdienstleister</em>. Es ist ein Analyse- und Kalkulationstool. Es zeigt dir die wirtschaftlichen Auswirkungen einer Investitionsentscheidung — auf Basis deiner Eingaben und deiner Annahmen. Die Entscheidung selbst triffst du.
+        DealPilot ist <em>kein Anlagevermittler</em>, <em>kein Steuerberater</em>, <em>kein Finanzdienstleister</em>. Es ist ein Analyse- und Kalkulationstool. Es zeigt dir die wirtschaftlichen Auswirkungen einer Investitionsentscheidung, auf Basis deiner Eingaben und deiner Annahmen. Die Entscheidung selbst triffst du.
       </p>
       <div class="info-card">
         <h4>Wichtiger Hinweis</h4>
@@ -338,26 +341,26 @@ hr.rws{height:4px;border:0;background:var(--runway);margin:0;position:relative;z
       <span class="eyebrow"><span class="anchor">02</span>Drei Wege zur Analyse</span>
       <h2>Du bestimmst die <span class="gold">Tiefe.</span></h2>
       <p>
-        Nicht jede Immobilie verdient eine 20-seitige Vollanalyse. Manche willst du in einer Minute einschätzen, andere strukturiert für das Bankgespräch vorbereiten. DealPilot kennt drei Einstiegswege — du wählst je nach Situation.
+        Nicht jede Immobilie verdient eine 20-seitige Vollanalyse. Manche willst du in einer Minute einschätzen, andere strukturiert für das Bankgespräch vorbereiten. DealPilot kennt drei Einstiegswege. Du wählst je nach Situation.
       </p>
 
-      <h3>Boarding — 30 Sekunden</h3>
+      <h3>Boarding · 30 Sekunden</h3>
       <p>
         Du tippst sechs Zahlen ein: Kaufpreis, Wohnfläche, Nettokaltmiete, Eigenkapital, Zinssatz, Tilgung. DealPilot rechnet sofort: Bruttomietrendite, Faktor, monatliche Rate, Cashflow vor Steuern, LTV auf den Kaufpreis, Kaufpreis pro Quadratmeter. Eine Ampel-Bewertung zeigt dir auf den ersten Blick, ob die Eckwerte solide sind oder Schwächen haben.
       </p>
       <p>
-        Wenn dir das Ergebnis gefällt, übernimmst du die Eingaben mit einem Klick in die Vollberechnung. Wenn nicht, war es <em>30 Sekunden investierte Zeit</em> — und du weißt, dass dieses Objekt nicht funktioniert.
+        Wenn dir das Ergebnis gefällt, übernimmst du die Eingaben mit einem Klick in die Vollberechnung. Wenn nicht, war es <em>30 Sekunden investierte Zeit</em> und du weißt, dass dieses Objekt nicht funktioniert.
       </p>
 
-      <h3>PDF-Import — 30 Sekunden</h3>
+      <h3>PDF-Import · 30 Sekunden</h3>
       <p>
-        Du lädst ein Exposé hoch — egal ob von einem Portal, als Maklerexposé oder als eigener Marktbericht. Die KI liest die strukturierten Felder aus: Adresse, PLZ, Ort, Straße, Hausnummer, Kaufpreis, Wohnfläche, Baujahr, Nettokaltmiete, Hausgeld, Nebenkosten, Energieklasse, Heizungsart. Du bekommst eine Liste extrahierter Werte mit Checkboxen und übernimmst sie per Klick.
+        Du lädst ein Exposé hoch, egal ob von einem Portal, als Maklerexposé oder als eigener Marktbericht. Die KI liest die strukturierten Felder aus: Adresse, PLZ, Ort, Straße, Hausnummer, Kaufpreis, Wohnfläche, Baujahr, Nettokaltmiete, Hausgeld, Nebenkosten, Energieklasse, Heizungsart. Du bekommst eine Liste extrahierter Werte mit Checkboxen und übernimmst sie per Klick.
       </p>
       <p>
-        Auch Bilder aus dem Exposé werden ausgelesen und automatisch als Objektfotos vorgeschlagen — bis zu 30 Stück, zugeschnitten und bereit für deinen späteren Investment-Case.
+        Auch Bilder aus dem Exposé werden ausgelesen und automatisch als Objektfotos vorgeschlagen, bis zu 30 Stück, zugeschnitten und bereit für deinen späteren Investment-Case.
       </p>
 
-      <h3>Vollanalyse — 10 Minuten</h3>
+      <h3>Vollanalyse · 10 Minuten</h3>
       <p>
         Wenn du ein Objekt ernsthaft prüfen willst, gehst du alle Module der Reihe nach durch: Objekt, Investition, Miete, Werbungskosten, Finanzierung, Bewirtschaftung. Am Ende hast du eine 15-Jahres-Cashflow-Projektion, einen Investor Deal Score 2.0 aus 24 Kennzahlen, eine KI-Investment-Analyse mit Verhandlungsempfehlung und ein bankfähiges Investment-Case-PDF.
       </p>
@@ -371,27 +374,27 @@ hr.rws{height:4px;border:0;background:var(--runway);margin:0;position:relative;z
       <span class="eyebrow"><span class="anchor">03</span>Boarding im Detail</span>
       <h2>Sechs Zahlen. <span class="gold">Eine fundierte Sofort-Bewertung.</span></h2>
       <p>
-        Das Boarding ist nicht die abgespeckte Version der Vollanalyse — es ist eine eigenständige Methode, in unter 30 Sekunden die Tragfähigkeit eines Deals zu bewerten. Sechs Eingabefelder, alles wird <em>live während der Eingabe</em> berechnet. Kein Klick auf „Berechnen", kein Warten.
+        Das Boarding ist nicht die abgespeckte Version der Vollanalyse. Es ist eine eigenständige Methode, in unter 30 Sekunden die Tragfähigkeit eines Deals zu bewerten. Sechs Eingabefelder, alles wird <em>live während der Eingabe</em> berechnet. Kein Klick auf „Berechnen", kein Warten.
       </p>
 
       <h3>Was du eingibst</h3>
       <ul>
-        <li><strong>Kaufpreis</strong> — der reine Erwerbspreis ohne Nebenkosten</li>
-        <li><strong>Wohnfläche</strong> — Quadratmeter laut Exposé</li>
-        <li><strong>Nettokaltmiete</strong> — monatlich, ohne Nebenkosten</li>
-        <li><strong>Eigenkapital</strong> — als Euro-Betrag oder als Prozentsatz</li>
-        <li><strong>Zinssatz</strong> — Sollzins der Finanzierung in % p.a.</li>
-        <li><strong>Tilgung</strong> — Anfangstilgung in % p.a.</li>
+        <li><strong>Kaufpreis</strong>: der reine Erwerbspreis ohne Nebenkosten</li>
+        <li><strong>Wohnfläche</strong>: Quadratmeter laut Exposé</li>
+        <li><strong>Nettokaltmiete</strong>: monatlich, ohne Nebenkosten</li>
+        <li><strong>Eigenkapital</strong>: als Euro-Betrag oder als Prozentsatz</li>
+        <li><strong>Zinssatz</strong>: Sollzins der Finanzierung in % p.a.</li>
+        <li><strong>Tilgung</strong>: Anfangstilgung in % p.a.</li>
       </ul>
 
       <h3>Was du sofort siehst</h3>
       <ul>
-        <li><strong>Bruttomietrendite</strong> — Jahresmiete dividiert durch Kaufpreis</li>
-        <li><strong>Faktor</strong> — Kaufpreis dividiert durch Jahresmiete (Maklersprache: das 18-Fache, das 22-Fache)</li>
-        <li><strong>Monatliche Rate</strong> — Annuität aus Zins und Tilgung</li>
-        <li><strong>Cashflow vor Steuern</strong> — Miete minus Rate, monatlich</li>
-        <li><strong>LTV (Loan to Value)</strong> — wie viel Prozent des Kaufpreises sind fremdfinanziert</li>
-        <li><strong>Kaufpreis pro Quadratmeter</strong> — wichtige Vergleichsgröße zur Lage</li>
+        <li><strong>Bruttomietrendite</strong>: Jahresmiete dividiert durch Kaufpreis</li>
+        <li><strong>Faktor</strong>: Kaufpreis dividiert durch Jahresmiete (Maklersprache: das 18-Fache, das 22-Fache)</li>
+        <li><strong>Monatliche Rate</strong>: Annuität aus Zins und Tilgung</li>
+        <li><strong>Cashflow vor Steuern</strong>: Miete minus Rate, monatlich</li>
+        <li><strong>LTV (Loan to Value)</strong>: wie viel Prozent des Kaufpreises sind fremdfinanziert</li>
+        <li><strong>Kaufpreis pro Quadratmeter</strong>: wichtige Vergleichsgröße zur Lage</li>
       </ul>
 
       <div class="pull">
@@ -412,10 +415,10 @@ hr.rws{height:4px;border:0;background:var(--runway);margin:0;position:relative;z
       <span class="eyebrow"><span class="anchor">04</span>PDF-Import &amp; KI-Extraktion</span>
       <h2>Vom Exposé zur Bewertung in <span class="gold">30 Sekunden.</span></h2>
       <p>
-        Das aufwändigste am Beginn einer Objektprüfung ist meistens nicht das Rechnen — es ist das <strong>Abtippen.</strong> Kaufpreis aus dem Exposé, Wohnfläche aus den Plänen, Miete aus dem Mietvertrag, Adresse, Baujahr, Energieklasse, Nebenkosten. Alles steht in PDFs, alles muss von Hand in Felder kopiert werden.
+        Das aufwändigste am Beginn einer Objektprüfung ist meistens nicht das Rechnen. Es ist das <strong>Abtippen.</strong> Kaufpreis aus dem Exposé, Wohnfläche aus den Plänen, Miete aus dem Mietvertrag, Adresse, Baujahr, Energieklasse, Nebenkosten. Alles steht in PDFs, alles muss von Hand in Felder kopiert werden.
       </p>
       <p>
-        DealPilot übernimmt das. Du lädst ein PDF hoch — egal ob von einem Portal, als Maklerexposé oder als eigener Marktbericht — und die KI liest die strukturierten Felder aus.
+        DealPilot übernimmt das. Du lädst ein PDF hoch, egal ob von einem Portal, als Maklerexposé oder als eigener Marktbericht und die KI liest die strukturierten Felder aus.
       </p>
 
       <h3>Was die KI extrahiert</h3>
@@ -434,17 +437,17 @@ hr.rws{height:4px;border:0;background:var(--runway);margin:0;position:relative;z
       </ul>
 
       <p>
-        Du bekommst eine Liste extrahierter Werte mit Checkboxen — du wählst aus, was du übernehmen willst, und ein Klick reicht. Die Werte landen in deinem Objekt.
+        Du bekommst eine Liste extrahierter Werte mit Checkboxen. Du wählst aus, was du übernehmen willst, und ein Klick reicht. Die Werte landen in deinem Objekt.
       </p>
 
       <h3>Bilder aus dem Exposé</h3>
       <p>
-        Auch die <strong>Bilder im Exposé</strong> kann die KI extrahieren und direkt als Objektfotos vorschlagen — bis zu 30 Stück, automatisch zugeschnitten und für den späteren Investment-Case vorbereitet. Du wählst per Checkbox aus, welche Fotos in dein Objekt sollen.
+        Auch die <strong>Bilder im Exposé</strong> kann die KI extrahieren und direkt als Objektfotos vorschlagen, bis zu 30 Stück, automatisch zugeschnitten und für den späteren Investment-Case vorbereitet. Du wählst per Checkbox aus, welche Fotos in dein Objekt sollen.
       </p>
 
       <div class="info-card">
         <h4>Datenschutz beim PDF-Import</h4>
-        <p>Das PDF wird an unsere Server gesendet, dort wird der Text extrahiert und zur Strukturierung an die KI weitergereicht. Wir speichern weder das PDF noch die extrahierten Werte langfristig — sobald du sie in dein Objekt übernommen hast, sind sie nur noch in deinem persönlichen Account. Die KI-Antworten werden nicht für Training verwendet (Enterprise-API ohne Opt-In).</p>
+        <p>Das PDF wird an unsere Server gesendet, dort wird der Text extrahiert und zur Strukturierung an die KI weitergereicht. Wir speichern weder das PDF noch die extrahierten Werte langfristig, sobald du sie in dein Objekt übernommen hast, sind sie nur noch in deinem persönlichen Account. Die KI-Antworten werden nicht für Training verwendet (Enterprise-API ohne Opt-In).</p>
       </div>
     </div>
   </section>
@@ -456,35 +459,35 @@ hr.rws{height:4px;border:0;background:var(--runway);margin:0;position:relative;z
       <span class="eyebrow"><span class="anchor">05</span>Objekt-Erfassung &amp; Lage</span>
       <h2>Mehr als nur <span class="gold">Adresse und Fläche.</span></h2>
       <p>
-        Wenn du ein Objekt in DealPilot anlegst, sammelst du nicht nur die offensichtlichen Eckdaten — PLZ, Ort, Straße, Hausnummer, Objektart, Wohnfläche, Baujahr, Kaufdatum. Du erfasst auch die <em>weichen Faktoren</em>, die später in den Investor Deal Score einfließen.
+        Wenn du ein Objekt in DealPilot anlegst, sammelst du nicht nur die offensichtlichen Eckdaten: PLZ, Ort, Straße, Hausnummer, Objektart, Wohnfläche, Baujahr, Kaufdatum. Du erfasst auch die <em>weichen Faktoren</em>, die später in den Investor Deal Score einfließen.
       </p>
 
       <h3>Lage-Bewertung</h3>
       <ul>
-        <li><strong>Makrolage</strong> — wie steht die Region demografisch und wirtschaftlich da? Wachstum oder Schrumpfung? Beschäftigungslage? Kaufkraftindex?</li>
-        <li><strong>Mikrolage</strong> — Stadtteil-Reputation, Infrastruktur, Anbindung an ÖPNV, Einkaufsmöglichkeiten, Schulen, Ärzte</li>
-        <li><strong>Bevölkerungs-Entwicklung</strong> — wachsender Markt? Stagnation? Strukturwandel?</li>
-        <li><strong>Mietnachfrage</strong> — Selbsteinschätzung von „sehr hoch" bis „kritisch"</li>
-        <li><strong>Wertsteigerungs-Potenzial</strong> — wo siehst du das Objekt in zehn Jahren?</li>
+        <li><strong>Makrolage</strong>: wie steht die Region demografisch und wirtschaftlich da? Wachstum oder Schrumpfung? Beschäftigungslage? Kaufkraftindex?</li>
+        <li><strong>Mikrolage</strong>: Stadtteil-Reputation, Infrastruktur, Anbindung an ÖPNV, Einkaufsmöglichkeiten, Schulen, Ärzte</li>
+        <li><strong>Bevölkerungs-Entwicklung</strong>: wachsender Markt? Stagnation? Strukturwandel?</li>
+        <li><strong>Mietnachfrage</strong>: Selbsteinschätzung von „sehr hoch" bis „kritisch"</li>
+        <li><strong>Wertsteigerungs-Potenzial</strong>: wo siehst du das Objekt in zehn Jahren?</li>
       </ul>
 
       <h3>Substanz und Zustand</h3>
       <ul>
-        <li><strong>Energieklasse</strong> — A bis H mit Auswirkung auf Heizkosten und zukünftige Sanierungskosten</li>
-        <li><strong>Heizungsart</strong> — Gas, Öl, Fernwärme, Wärmepumpe, Pellets</li>
-        <li><strong>Zustand</strong> — von „unsaniert" bis „kernsaniert mit Energieausweis"</li>
+        <li><strong>Energieklasse</strong>: A bis H mit Auswirkung auf Heizkosten und zukünftige Sanierungskosten</li>
+        <li><strong>Heizungsart</strong>: Gas, Öl, Fernwärme, Wärmepumpe, Pellets</li>
+        <li><strong>Zustand</strong>: von „unsaniert" bis „kernsaniert mit Energieausweis"</li>
         <li><strong>Sanierungsbedarf-Schätzung</strong> nach Gewerken (Dach, Fassade, Fenster, Heizung, Elektrik, Bäder, Böden, Innenwände)</li>
         <li><strong>Mietausfall-Risiko</strong> als Prozentsatz der Jahresmiete (typisch 2–5 %)</li>
       </ul>
 
       <h3>BMF-AfA-Rechner integriert</h3>
       <p>
-        Für die spätere AfA-Berechnung musst du die Kaufpreisaufteilung zwischen Grundstück und Gebäude kennen. DealPilot hat den <em>BMF-Sachwertverfahren-Rechner</em> direkt integriert — du gibst Grundstücksart, Standardstufe, Baujahr und Größe ein, und bekommst eine plausible Aufteilung. Quelle: BMF-Arbeitshilfe (Fassung Juni 2023).
+        Für die spätere AfA-Berechnung musst du die Kaufpreisaufteilung zwischen Grundstück und Gebäude kennen. DealPilot hat den <em>BMF-Sachwertverfahren-Rechner</em> direkt integriert. Du gibst Grundstücksart, Standardstufe, Baujahr und Größe ein, und bekommst eine plausible Aufteilung. Quelle: BMF-Arbeitshilfe (Fassung Juni 2023).
       </p>
 
       <h3>Objektfotos</h3>
       <p>
-        Bis zu 30 Fotos pro Objekt — automatisch komprimiert, in einer übersichtlichen Galerie verwaltet. Sie tauchen später im Investment-Case auf dem Deckblatt und in der Objektübersicht auf.
+        Bis zu 30 Fotos pro Objekt, automatisch komprimiert, in einer übersichtlichen Galerie verwaltet. Sie tauchen später im Investment-Case auf dem Deckblatt und in der Objektübersicht auf.
       </p>
     </div>
   </section>
@@ -496,28 +499,28 @@ hr.rws{height:4px;border:0;background:var(--runway);margin:0;position:relative;z
       <span class="eyebrow"><span class="anchor">06</span>Investitionsmodul &amp; 15-%-Regel</span>
       <h2>Kaufpreis ist nur <span class="gold">der Anfang.</span></h2>
       <p>
-        Im Investitionsmodul rechnest du die <strong>echte Gesamtinvestition</strong> zusammen — den Betrag, den du tatsächlich bewegen musst, um die Immobilie zu erwerben und in einen vermietbaren Zustand zu bringen.
+        Im Investitionsmodul rechnest du die <strong>echte Gesamtinvestition</strong> zusammen, den Betrag, den du tatsächlich bewegen musst, um die Immobilie zu erwerben und in einen vermietbaren Zustand zu bringen.
       </p>
 
       <h3>Erwerbsnebenkosten</h3>
       <p>
-        DealPilot kennt die typischen Sätze und schlägt sie dir als Default vor — du kannst sie anpassen:
+        DealPilot kennt die typischen Sätze und schlägt sie dir als Default vor. Du kannst sie anpassen:
       </p>
       <ul>
-        <li><strong>Notar &amp; Grundbuch</strong> — typisch 1,5 bis 2,0 % vom Kaufpreis</li>
-        <li><strong>Grunderwerbsteuer</strong> — je nach Bundesland 3,5 bis 6,5 %</li>
-        <li><strong>Maklerprovision</strong> — typisch 3,57 bis 7,14 % je nach Region und Aufteilung</li>
-        <li><strong>Sonstige Erwerbsnebenkosten</strong> — Gutachten, Beratung, Behördengebühren</li>
+        <li><strong>Notar &amp; Grundbuch</strong>: typisch 1,5 bis 2,0 % vom Kaufpreis</li>
+        <li><strong>Grunderwerbsteuer</strong>: je nach Bundesland 3,5 bis 6,5 %</li>
+        <li><strong>Maklerprovision</strong>: typisch 3,57 bis 7,14 % je nach Region und Aufteilung</li>
+        <li><strong>Sonstige Erwerbsnebenkosten</strong>: Gutachten, Beratung, Behördengebühren</li>
       </ul>
 
       <h3>Sanierungsbedarf nach Gewerken</h3>
       <p>
-        Du erfasst den Sanierungsbedarf gewerkeweise — Dach, Fassade, Fenster, Heizung, Elektrik, Bäder, Böden, Innenwände. Für jedes Gewerk gibst du einen Betrag ein. DealPilot hat Erfahrungswerte pro Quadratmeter hinterlegt — als Orientierung, nicht als Vorschrift.
+        Du erfasst den Sanierungsbedarf gewerkeweise: Dach, Fassade, Fenster, Heizung, Elektrik, Bäder, Böden, Innenwände. Für jedes Gewerk gibst du einen Betrag ein. DealPilot hat Erfahrungswerte pro Quadratmeter hinterlegt, als Orientierung, nicht als Vorschrift.
       </p>
 
       <h3>Die 15-%-Regel transparent dargestellt</h3>
       <p>
-        Wenn du innerhalb der ersten drei Jahre nach Anschaffung mehr als 15 % der Gebäude-Anschaffungskosten in Instandsetzung investierst, gelten diese Kosten steuerlich als <em>anschaffungsnahe Herstellungskosten</em> und müssen über die Restnutzungsdauer abgeschrieben werden — sie sind dann <strong>nicht sofort als Werbungskosten abzugsfähig.</strong>
+        Wenn du innerhalb der ersten drei Jahre nach Anschaffung mehr als 15 % der Gebäude-Anschaffungskosten in Instandsetzung investierst, gelten diese Kosten steuerlich als <em>anschaffungsnahe Herstellungskosten</em> und müssen über die Restnutzungsdauer abgeschrieben werden. Sie sind dann <strong>nicht sofort als Werbungskosten abzugsfähig.</strong>
       </p>
 
       <div class="pull">
@@ -525,7 +528,7 @@ hr.rws{height:4px;border:0;background:var(--runway);margin:0;position:relative;z
       </div>
 
       <p>
-        So weißt du sofort, wie viel Spielraum dir noch bleibt — und kannst entweder die Sanierung über zwei Jahre splitten oder bewusst akzeptieren, sie zu aktivieren. Diese eine Funktion hat in unseren Beratungsfällen schon mehrfach <em>vier- bis fünfstellige Liquiditätsverluste</em> verhindert.
+        So weißt du sofort, wie viel Spielraum dir noch bleibt und kannst entweder die Sanierung über zwei Jahre splitten oder bewusst akzeptieren, sie zu aktivieren. Diese eine Funktion hat in unseren Beratungsfällen schon mehrfach <em>vier- bis fünfstellige Liquiditätsverluste</em> verhindert.
       </p>
 
       <h3>Möblierung separat</h3>
@@ -542,23 +545,23 @@ hr.rws{height:4px;border:0;background:var(--runway);margin:0;position:relative;z
       <span class="eyebrow"><span class="anchor">07</span>Miete &amp; Marktvergleich</span>
       <h2>Was Vermietung <span class="gold">wirklich bringt.</span></h2>
       <p>
-        Die Miete ist die Einnahmenseite — und je sauberer du sie aufschlüsselst, desto realistischer wird dein Cashflow. DealPilot trennt klar zwischen:
+        Die Miete ist die Einnahmenseite. Und je sauberer du sie aufschlüsselst, desto realistischer wird dein Cashflow. DealPilot trennt klar zwischen:
       </p>
       <ul>
-        <li><strong>Nettokaltmiete</strong> — der reine Mietzins ohne Nebenkosten</li>
-        <li><strong>Umlagefähige Nebenkosten</strong> — Heizung, Wasser, Müll, Hausmeister (trägt der Mieter)</li>
-        <li><strong>Nicht-umlagefähige Kosten</strong> — Hausgeld-Verwaltungsanteil (trägst du)</li>
-        <li><strong>Zusätzliche Einnahmen</strong> — Stellplatz, Garten, Garage, Werbeflächen</li>
+        <li><strong>Nettokaltmiete</strong>: der reine Mietzins ohne Nebenkosten</li>
+        <li><strong>Umlagefähige Nebenkosten</strong>: Heizung, Wasser, Müll, Hausmeister (trägt der Mieter)</li>
+        <li><strong>Nicht-umlagefähige Kosten</strong>: Hausgeld-Verwaltungsanteil (trägst du)</li>
+        <li><strong>Zusätzliche Einnahmen</strong>: Stellplatz, Garten, Garage, Werbeflächen</li>
       </ul>
 
       <h3>Mietpreis-Analyse direkt unter der Mietstruktur</h3>
       <p>
-        Sobald du Wohnfläche und Nettokaltmiete eingegeben hast, zeigt DealPilot dir den Quadratmeterpreis und legt ihn neben den lokalen Mietspiegel — wenn vorhanden. Sind deine 7,80 €/m² in einer Stadt mit Mietspiegel 9,20 €/m² ein Schnäppchen für den Mieter, also Mietsteigerungs-Potenzial? Oder einfach zu niedrig kalkuliert?
+        Sobald du Wohnfläche und Nettokaltmiete eingegeben hast, zeigt DealPilot dir den Quadratmeterpreis und legt ihn neben den lokalen Mietspiegel, wenn vorhanden. Sind deine 7,80 €/m² in einer Stadt mit Mietspiegel 9,20 €/m² ein Schnäppchen für den Mieter, also Mietsteigerungs-Potenzial? Oder einfach zu niedrig kalkuliert?
       </p>
 
       <h3>KI-Marktmieten-Recherche (Investor &amp; Pro)</h3>
       <p>
-        Im Investor- und Pro-Plan kannst du eine <em>KI-gestützte Mietmarkt-Recherche</em> starten. Die KI sucht im Web nach aktuellen Vergleichsangeboten in deiner Lage, schätzt eine plausible Mietbandbreite und nennt dir die Quellen. So weißt du, ob deine Miete unter, am oder über Markt liegt — wichtig für die Cashflow-Projektion und die Verhandlungsstrategie.
+        Im Investor- und Pro-Plan kannst du eine <em>KI-gestützte Mietmarkt-Recherche</em> starten. Die KI sucht im Web nach aktuellen Vergleichsangeboten in deiner Lage, schätzt eine plausible Mietbandbreite und nennt dir die Quellen. So weißt du, ob deine Miete unter, am oder über Markt liegt, wichtig für die Cashflow-Projektion und die Verhandlungsstrategie.
       </p>
 
       <h3>Staffelmiete und Mieterhöhungen</h3>
@@ -575,22 +578,22 @@ hr.rws{height:4px;border:0;background:var(--runway);margin:0;position:relative;z
       <span class="eyebrow"><span class="anchor">08</span>Werbungskostenrechner</span>
       <h2>Was die Vermietung an <span class="gold">Werbungskosten erzeugt.</span></h2>
       <p>
-        Werbungskosten sind alle Kosten, die im Zusammenhang mit den Mieteinnahmen anfallen — sie reduzieren die Bemessungsgrundlage für die Einkommensteuer und damit den Liquiditätsabfluss. DealPilot zeigt dir transparent, welche Werbungskosten deine Vermietung erzeugt und wie sich diese über 15 Jahre entwickeln.
+        Werbungskosten sind alle Kosten, die im Zusammenhang mit den Mieteinnahmen anfallen. Sie reduzieren die Bemessungsgrundlage für die Einkommensteuer und damit den Liquiditätsabfluss. DealPilot zeigt dir transparent, welche Werbungskosten deine Vermietung erzeugt und wie sich diese über 15 Jahre entwickeln.
       </p>
 
       <h3>Positionen im Werbungskostenmodul</h3>
       <ul>
-        <li><strong>Absetzung für Abnutzung (AfA)</strong> — linear über 50 Jahre für Gebäude ab Baujahr 1925; 40 Jahre für Baujahr vor 1925; 33 Jahre für Gebäude ab Baujahr 2023. Sonderabschreibungen für Denkmäler und Sanierungsgebiete kannst du manuell eintragen.</li>
-        <li><strong>Schuldzinsen</strong> — automatisch aus dem Finanzierungsmodul übernommen, über die gesamte Zinsbindung und in der Anschlussphase</li>
-        <li><strong>Bewirtschaftungskosten</strong> — nicht-umlagefähige Anteile (Verwaltung, Instandhaltung, Hausgeld-Verwalteranteil)</li>
-        <li><strong>Sanierungskosten</strong> — vollständig abzugsfähig, wenn sie unter der 15-%-Grenze bleiben; sonst über die Restnutzungsdauer verteilt</li>
-        <li><strong>Möblierung</strong> — linear über zehn Jahre</li>
-        <li><strong>Fahrtkosten, Beratung, Kontoführung</strong> — als Pauschalen oder Einzelpositionen</li>
+        <li><strong>Absetzung für Abnutzung (AfA)</strong>: linear über 50 Jahre für Gebäude ab Baujahr 1925, 40 Jahre für Baujahr vor 1925, 33 Jahre für Gebäude ab Baujahr 2023. Sonderabschreibungen für Denkmäler und Sanierungsgebiete kannst du manuell eintragen.</li>
+        <li><strong>Schuldzinsen</strong>: automatisch aus dem Finanzierungsmodul übernommen, über die gesamte Zinsbindung und in der Anschlussphase</li>
+        <li><strong>Bewirtschaftungskosten</strong>: nicht-umlagefähige Anteile (Verwaltung, Instandhaltung, Hausgeld-Verwalteranteil)</li>
+        <li><strong>Sanierungskosten</strong>: vollständig abzugsfähig, wenn sie unter der 15-%-Grenze bleiben, sonst über die Restnutzungsdauer verteilt</li>
+        <li><strong>Möblierung</strong>: linear über zehn Jahre</li>
+        <li><strong>Fahrtkosten, Beratung, Kontoführung</strong>: als Pauschalen oder Einzelpositionen</li>
       </ul>
 
       <h3>15-Jahres-Verlauf</h3>
       <p>
-        Das Modul zeigt dir den <strong>15-Jahres-Verlauf aller Werbungskosten</strong> als Tabelle und als Diagramm. Du siehst, wann die AfA-Effekte abnehmen, wann die Schuldzinsen am höchsten sind, wann sich Sanierungskosten amortisiert haben. Ein eigenständiges <em>Werbungskosten-PDF</em> kannst du als Belegübersicht nutzen — etwa um deinem Steuerberater einen sauberen Überblick über die geplante Vermietung zu geben.
+        Das Modul zeigt dir den <strong>15-Jahres-Verlauf aller Werbungskosten</strong> als Tabelle und als Diagramm. Du siehst, wann die AfA-Effekte abnehmen, wann die Schuldzinsen am höchsten sind, wann sich Sanierungskosten amortisiert haben. Ein eigenständiges <em>Werbungskosten-PDF</em> kannst du als Belegübersicht nutzen, etwa um deinem Steuerberater einen sauberen Überblick über die geplante Vermietung zu geben.
       </p>
 
       <div class="info-card">
@@ -607,7 +610,7 @@ hr.rws{height:4px;border:0;background:var(--runway);margin:0;position:relative;z
       <span class="eyebrow"><span class="anchor">09</span>Finanzierung &amp; Anschlusstest</span>
       <h2>Von Annuität bis <span class="gold">Tilgungsaussetzung.</span></h2>
       <p>
-        Die Finanzierung ist der Hebel — sie macht aus 30.000 € Eigenkapital ein Investment von 300.000 € möglich. DealPilot kennt alle gängigen Darlehensarten und bildet sie korrekt ab.
+        Die Finanzierung ist der Hebel. Sie macht aus 30.000 € Eigenkapital ein Investment von 300.000 € möglich. DealPilot kennt alle gängigen Darlehensarten und bildet sie korrekt ab.
       </p>
 
       <figure class="lu-bild"><!-- landing-app-bilder-1 · echte Aufnahme von Staging (Testkonto mit Kopien der Demo-Objekte), Anschriften unscharf -->
@@ -618,35 +621,35 @@ hr.rws{height:4px;border:0;background:var(--runway);margin:0;position:relative;z
 
       <h3>Darlehensarten</h3>
       <ul>
-        <li><strong>Annuitätendarlehen</strong> — gleichbleibende Rate, Tilgung steigt mit der Zeit (Standard für Wohnimmobilien)</li>
-        <li><strong>Volltilgerdarlehen</strong> — kein Tilgungsrest am Ende der Zinsbindung</li>
-        <li><strong>Tilgungsaussetzungsdarlehen mit Bausparvertrag</strong> — Zinsen während der Laufzeit, Tilgung über Bausparsumme</li>
-        <li><strong>KfW-Förderdarlehen</strong> — als zweites Darlehen kombinierbar mit dem Hauptdarlehen</li>
+        <li><strong>Annuitätendarlehen</strong>: gleichbleibende Rate, Tilgung steigt mit der Zeit (Standard für Wohnimmobilien)</li>
+        <li><strong>Volltilgerdarlehen</strong>: kein Tilgungsrest am Ende der Zinsbindung</li>
+        <li><strong>Tilgungsaussetzungsdarlehen mit Bausparvertrag</strong>: Zinsen während der Laufzeit, Tilgung über Bausparsumme</li>
+        <li><strong>KfW-Förderdarlehen</strong>: als zweites Darlehen kombinierbar mit dem Hauptdarlehen</li>
         <li><strong>Kombinationen</strong> aus mehreren Darlehen mit unterschiedlichen Zinsbindungen</li>
       </ul>
 
       <h3>Live-Marktzinsen aus amtlicher Statistik</h3>
       <p>
-        Statt dir die Zinsen aus dem Internet zusammensuchen zu müssen, zeigt dir DealPilot direkt im Finanzierungs-Tab die <strong>aktuellen Effektivzinsen für Wohnungsbaukredite an Privathaushalte</strong> — variabel, 1–5 Jahre, 5–10 Jahre, über 10 Jahre. Daten kommen aus der amtlichen Zinsstatistik, monatlich aktualisiert. Plus Vergleichslinks zu Interhyp, Dr. Klein und Baufi24, damit du deine eigene Konditionen-Anfrage direkt machen kannst.
+        Statt dir die Zinsen aus dem Internet zusammensuchen zu müssen, zeigt dir DealPilot direkt im Finanzierungs-Tab die <strong>aktuellen Effektivzinsen für Wohnungsbaukredite an Privathaushalte</strong>: variabel, 1–5 Jahre, 5–10 Jahre, über 10 Jahre. Daten kommen aus der amtlichen Zinsstatistik, monatlich aktualisiert. Plus Vergleichslinks zu Interhyp, Dr. Klein und Baufi24, damit du deine eigene Konditionen-Anfrage direkt machen kannst.
       </p>
 
       <h3>Tilgungsplan über die gesamte Laufzeit</h3>
       <p>
-        DealPilot rechnet dir den vollständigen Tilgungsplan aus — Jahr für Jahr, Restschuld, gezahlte Zinsen, gezahlte Tilgung. Du siehst, wie viel Eigenkapital du am Ende der Zinsbindung aufgebaut hast und wie hoch die Restschuld ist, mit der du in die Anschlussfinanzierung gehst.
+        DealPilot rechnet dir den vollständigen Tilgungsplan aus, Jahr für Jahr, Restschuld, gezahlte Zinsen, gezahlte Tilgung. Du siehst, wie viel Eigenkapital du am Ende der Zinsbindung aufgebaut hast und wie hoch die Restschuld ist, mit der du in die Anschlussfinanzierung gehst.
       </p>
 
       <h3>Anschlussfinanzierungs-Stresstest</h3>
       <p>
-        Ende der Zinsbindung — und plötzlich liegt der Markt bei 5 % statt 3,5 %? <strong>DealPilot rechnet das für dich durch.</strong> Du gibst eine Annahme für den Anschlusszins ein (etwa „aktueller Marktzins + 1,5 %") und siehst sofort, wie sich die monatliche Rate ändert und ob dein Cashflow das verträgt.
+        Ende der Zinsbindung. Und plötzlich liegt der Markt bei 5 % statt 3,5 %? <strong>DealPilot rechnet das für dich durch.</strong> Du gibst eine Annahme für den Anschlusszins ein (etwa „aktueller Marktzins + 1,5 %") und siehst sofort, wie sich die monatliche Rate ändert und ob dein Cashflow das verträgt.
       </p>
 
       <div class="pull">
-        Das ist der Stresstest, den jede Bank von dir erwartet — und den die meisten Investoren in ihren Excel-Tabellen vergessen.
+        Das ist der Stresstest, den jede Bank von dir erwartet und den die meisten Investoren in ihren Excel-Tabellen vergessen.
       </div>
 
       <h3>Bausparvertrag-Lebenszyklus</h3>
       <p>
-        Wer mit Tilgungsaussetzung arbeitet, hat in der Regel einen Bausparvertrag als Tilgungsträger. DealPilot bildet den vollen Bausparvertrag-Lebenszyklus ab: Ansparphase, Zuteilungs-Zeitpunkt (auf Basis der Mindest-Quote), Darlehensphase mit dem zugesagten Sollzins. <strong>Wenn die Bausparsumme nicht reicht, um das Tilgungsaussetzungsdarlehen abzulösen, warnt dich die App</strong> — das ist die kritische Lücke, die viele Investoren übersehen.
+        Wer mit Tilgungsaussetzung arbeitet, hat in der Regel einen Bausparvertrag als Tilgungsträger. DealPilot bildet den vollen Bausparvertrag-Lebenszyklus ab: Ansparphase, Zuteilungs-Zeitpunkt (auf Basis der Mindest-Quote), Darlehensphase mit dem zugesagten Sollzins. <strong>Wenn die Bausparsumme nicht reicht, um das Tilgungsaussetzungsdarlehen abzulösen, warnt dich die App</strong>: das ist die kritische Lücke, die viele Investoren übersehen.
       </p>
     </div>
   </section>
@@ -658,23 +661,23 @@ hr.rws{height:4px;border:0;background:var(--runway);margin:0;position:relative;z
       <span class="eyebrow"><span class="anchor">10</span>Bewirtschaftungskosten</span>
       <h2>Was die Vermietung <span class="gold">wirklich kostet.</span></h2>
       <p>
-        Die Bewirtschaftungskosten sind der Bereich, in dem die meisten Hobby-Investoren danebenliegen — entweder weil sie zu niedrig ansetzen („Hausgeld wird ja umgelegt"), oder weil sie Positionen vergessen, die sich später als unangenehme Überraschung entpuppen.
+        Die Bewirtschaftungskosten sind der Bereich, in dem die meisten Hobby-Investoren danebenliegen, entweder weil sie zu niedrig ansetzen („Hausgeld wird ja umgelegt"), oder weil sie Positionen vergessen, die sich später als unangenehme Überraschung entpuppen.
       </p>
 
       <h3>Umlagefähig vs. nicht-umlagefähig</h3>
       <p>
-        DealPilot trennt sauber zwischen den beiden Welten. Umlagefähig sind Heizung, Warmwasser, Wasser, Abwasser, Müll, Hausmeister-Dienstleistungen, Gartenpflege — diese trägt der Mieter. Nicht-umlagefähig sind Verwaltergebühren, Instandhaltungs-Rücklage, Reparaturen, Vermietungs-Aufwand, Mietausfall-Risiko, eigene Kontoführung — diese trägst du.
+        DealPilot trennt sauber zwischen den beiden Welten. Umlagefähig sind Heizung, Warmwasser, Wasser, Abwasser, Müll, Hausmeister-Dienstleistungen, Gartenpflege. Diese trägt der Mieter. Nicht-umlagefähig sind Verwaltergebühren, Instandhaltungs-Rücklage, Reparaturen, Vermietungs-Aufwand, Mietausfall-Risiko, eigene Kontoführung. Diese trägst du.
       </p>
 
       <h3>Zwei Erfassungs-Modi</h3>
       <ul>
-        <li><strong>Detail-Modus</strong> — du gibst jede Position einzeln ein, in € pro Jahr. Sinnvoll für laufende Vermietungen mit echten Zahlen aus der WEG-Abrechnung.</li>
-        <li><strong>Quick-Modus</strong> — du gibst die Bewirtschaftung als Prozentsatz der Nettokaltmiete ein (IVD-Richtwert: 18–35 %). Sinnvoll für Erstprüfungen, wenn du noch keine genauen Zahlen hast.</li>
+        <li><strong>Detail-Modus</strong>: du gibst jede Position einzeln ein, in € pro Jahr. Sinnvoll für laufende Vermietungen mit echten Zahlen aus der WEG-Abrechnung.</li>
+        <li><strong>Quick-Modus</strong>: du gibst die Bewirtschaftung als Prozentsatz der Nettokaltmiete ein (IVD-Richtwert: 18–35 %). Sinnvoll für Erstprüfungen, wenn du noch keine genauen Zahlen hast.</li>
       </ul>
 
       <h3>Mietausfall-Risiko separat</h3>
       <p>
-        Für Mietausfall gibt es einen separaten Risikoaufschlag (typisch 2–5 % der Jahresmiete), der direkt in die Cashflow-Projektion einfließt. So sind 1–2 Monate Leerstand pro Mieterwechsel realistisch eingepreist — etwas, das in der Excel-Welt oft komplett übersehen wird.
+        Für Mietausfall gibt es einen separaten Risikoaufschlag (typisch 2–5 % der Jahresmiete), der direkt in die Cashflow-Projektion einfließt. So sind 1–2 Monate Leerstand pro Mieterwechsel realistisch eingepreist, etwas, das in der Excel-Welt oft komplett übersehen wird.
       </p>
     </div>
   </section>
@@ -686,7 +689,7 @@ hr.rws{height:4px;border:0;background:var(--runway);margin:0;position:relative;z
       <span class="eyebrow"><span class="anchor">11</span>Investor Deal Score 2.0</span>
       <h2>24 KPIs <span class="gold">auf einer Skala.</span></h2>
       <p>
-        Der Investor Deal Score 2.0 ist das Herzstück von DealPilot. Eine Bewertung des Deals auf einer Skala von 0 bis 100, basierend auf <strong>24 Einzelkennzahlen</strong> aus fünf Bereichen. Vergleichbar, sortierbar, professionell — wie es institutionelle Investoren machen.
+        Der Investor Deal Score 2.0 ist das Herzstück von DealPilot. Eine Bewertung des Deals auf einer Skala von 0 bis 100, basierend auf <strong>24 Einzelkennzahlen</strong> aus fünf Bereichen. Vergleichbar, sortierbar, professionell, wie es institutionelle Investoren machen.
       </p>
 
       <figure class="lu-bild"><!-- landing-app-bilder-1 · echte Aufnahme von Staging (Testkonto mit Kopien der Demo-Objekte), Anschriften unscharf -->
@@ -712,11 +715,11 @@ hr.rws{height:4px;border:0;background:var(--runway);margin:0;position:relative;z
 
       <h3>Die fünf Bereiche</h3>
       <ul>
-        <li><strong>Rendite</strong> <span class="gew">35 %</span> — Bruttorendite, Nettorendite, Cashflow je Monat, Cash-on-Cash</li>
-        <li><strong>Finanzierung</strong> <span class="gew">25 %</span> — DSCR, LTV, Zinssatz, Tilgung, Eigenkapitalbedarf</li>
-        <li><strong>Risiko</strong> <span class="gew">20 %</span> — Leerstand, Instandhaltung, Baujahr und Zustand, Energieklasse, Mietausfall-Risiko, Qualität &amp; Zustand</li>
-        <li><strong>Lage &amp; Markt</strong> <span class="gew">10 %</span> — Ist- gegen Marktmiete, Mietwachstum pro Jahr, Bevölkerung, Nachfrage, Mikrolage</li>
-        <li><strong>Potenzial</strong> <span class="gew">10 %</span> — Mietsteigerungs-Potenzial, Faktor gegen Markt, Wertsteigerung, Entwicklungsmöglichkeiten</li>
+        <li><strong>Rendite</strong> <span class="gew">35 %</span>: Bruttorendite, Nettorendite, Cashflow je Monat, Cash-on-Cash</li>
+        <li><strong>Finanzierung</strong> <span class="gew">25 %</span>: DSCR, LTV, Zinssatz, Tilgung, Eigenkapitalbedarf</li>
+        <li><strong>Risiko</strong> <span class="gew">20 %</span>: Leerstand, Instandhaltung, Baujahr und Zustand, Energieklasse, Mietausfall-Risiko, Qualität &amp; Zustand</li>
+        <li><strong>Lage &amp; Markt</strong> <span class="gew">10 %</span>: Ist- gegen Marktmiete, Mietwachstum pro Jahr, Bevölkerung, Nachfrage, Mikrolage</li>
+        <li><strong>Potenzial</strong> <span class="gew">10 %</span>: Mietsteigerungs-Potenzial, Faktor gegen Markt, Wertsteigerung, Entwicklungsmöglichkeiten</li>
       </ul>
 
       <h3>Wie die Bewertung funktioniert</h3>
@@ -726,12 +729,12 @@ hr.rws{height:4px;border:0;background:var(--runway);margin:0;position:relative;z
 
       <h3>LTV/DSCR-Interaktions-Bonus</h3>
       <p>
-        Eine Besonderheit des Scores: Wenn du mit hohem LTV (≥ 95 %) und gleichzeitig starkem DSCR (≥ 1,20) finanzierst, bekommst du einen <strong>Bonus</strong> — das ist eine professionelle Hebel-Struktur. Umgekehrt: Hoher LTV (≥ 95 %) mit schwachem DSCR (&lt; 1,00) gibt einen <strong>Malus</strong>, weil das eine riskante Finanzierungsstruktur ist.
+        Eine Besonderheit des Scores: Wenn du mit hohem LTV (≥ 95 %) und gleichzeitig starkem DSCR (≥ 1,20) finanzierst, bekommst du einen <strong>Bonus</strong>: das ist eine professionelle Hebel-Struktur. Umgekehrt: Hoher LTV (≥ 95 %) mit schwachem DSCR (&lt; 1,00) gibt einen <strong>Malus</strong>, weil das eine riskante Finanzierungsstruktur ist.
       </p>
 
       <h3>Anpassbare Gewichtungen</h3>
       <p>
-        Die Gewichtungen der fünf Kategorien sind in den Einstellungen anpassbar — wenn du als Cashflow-Investor arbeitest, kannst du Cashflow höher gewichten; wenn du auf Wertsteigerung optimierst, das Potenzial. <strong>Du baust deine Bewertung nach deiner Strategie.</strong> Nicht eine pauschale Wahrheit für alle.
+        Die Gewichtungen der fünf Kategorien sind in den Einstellungen anpassbar, wenn du als Cashflow-Investor arbeitest, kannst du Cashflow höher gewichten. Wenn du auf Wertsteigerung optimierst, das Potenzial. <strong>Du baust deine Bewertung nach deiner Strategie.</strong> Nicht eine pauschale Wahrheit für alle.
       </p>
 
       <div class="info-card">
@@ -748,7 +751,7 @@ hr.rws{height:4px;border:0;background:var(--runway);margin:0;position:relative;z
       <span class="eyebrow"><span class="anchor">12</span>KI-Investment-Analyse</span>
       <h2>Ein erfahrener Berater, <span class="gold">der nie müde wird.</span></h2>
       <p>
-        Sobald deine Eingaben vollständig sind, kannst du die KI-Investment-Analyse starten. Sie nimmt alle Zahlen aus deinem Objekt (Kaufpreis, Miete, Finanzierung, Werbungskosten, Lage), die berechneten Kennzahlen (Cashflow, DSCR, LTV, Deal Score) und deine Selbsteinschätzungen (Strategie, Verkäufer-Situation, Risikotoleranz, Marktphase) — und schickt sie zusammen mit einem strukturierten Analyse-Auftrag an ChatGPT.
+        Sobald deine Eingaben vollständig sind, kannst du die KI-Investment-Analyse starten. Sie nimmt alle Zahlen aus deinem Objekt (Kaufpreis, Miete, Finanzierung, Werbungskosten, Lage), die berechneten Kennzahlen (Cashflow, DSCR, LTV, Deal Score) und deine Selbsteinschätzungen (Strategie, Verkäufer-Situation, Risikotoleranz, Marktphase) und schickt sie zusammen mit einem strukturierten Analyse-Auftrag an ChatGPT.
       </p>
       <p>
         Die KI macht zusätzlich <strong>Web-Recherche zu deiner Lage</strong>: aktueller Mietmarkt, Bevölkerungs-Entwicklung, wirtschaftliche Situation, Stadtteil-Reputation, vergleichbare Verkäufe. Diese Informationen fließen in die Analyse ein.
@@ -756,26 +759,26 @@ hr.rws{height:4px;border:0;background:var(--runway);margin:0;position:relative;z
 
       <h3>Was du zurückbekommst</h3>
       <ul>
-        <li><strong>Gesamtbewertung</strong> — eine 4–6 Sätze umfassende Bewertung mit konkreten Zahlen und einem klaren Investment-Rating („Sehr attraktiv", „Attraktiv", „Neutral", „Kritisch", „Ungeeignet")</li>
-        <li><strong>Stärken &amp; Risiken</strong> — jeweils 4–5 nummerierte Punkte, jeweils ausführlich begründet mit Bezug auf die echten Zahlen aus deinem Objekt</li>
-        <li><strong>Risikoanalyse</strong> — Finanzierungsrisiko (LTV + DSCR), Cashflow-Stabilität, Annahmen-Abhängigkeit</li>
-        <li><strong>Szenario-Analyse</strong> — Worst Case (Miete −10 %, Zins +1 %) und Best Case durchgerechnet, jeweils mit beschriebenen Auswirkungen</li>
-        <li><strong>Investor-Fit</strong> — passt der Deal zum Cashflow-Investor, zum Wertsteigerungs-Investor oder zum sicherheitsorientierten Investor?</li>
-        <li><strong>Empfehlung</strong> — klar „Kaufen", „Prüfen" oder „Nicht kaufen", mit Begründung und gegebenenfalls Bedingungen</li>
-        <li><strong>Verhandlungsempfehlung</strong> — Erstangebot, Zielpreis, Schmerzgrenze, jeweils mit konkretem Euro-Betrag und ausführlicher Begründung</li>
-        <li><strong>Kaufpreis-Offerte</strong> — ein vorgefertigter, formell gehaltener Text als Vorlage für deine schriftliche Kaufpreis-Offerte an den Verkäufer (ca. 200–300 Wörter, direkt kopierbar)</li>
-        <li><strong>Bankargumente</strong> — 5–7 ausführliche, fundierte Argumente für die Finanzierungsanfrage, mit konkreten Zahlen und Bezug auf den Deal</li>
+        <li><strong>Gesamtbewertung</strong>: eine 4–6 Sätze umfassende Bewertung mit konkreten Zahlen und einem klaren Investment-Rating („Sehr attraktiv", „Attraktiv", „Neutral", „Kritisch", „Ungeeignet")</li>
+        <li><strong>Stärken &amp; Risiken</strong>: jeweils 4–5 nummerierte Punkte, jeweils ausführlich begründet mit Bezug auf die echten Zahlen aus deinem Objekt</li>
+        <li><strong>Risikoanalyse</strong>: Finanzierungsrisiko (LTV + DSCR), Cashflow-Stabilität, Annahmen-Abhängigkeit</li>
+        <li><strong>Szenario-Analyse</strong>: Worst Case (Miete −10 %, Zins +1 %) und Best Case durchgerechnet, jeweils mit beschriebenen Auswirkungen</li>
+        <li><strong>Investor-Fit</strong>: passt der Deal zum Cashflow-Investor, zum Wertsteigerungs-Investor oder zum sicherheitsorientierten Investor?</li>
+        <li><strong>Empfehlung</strong>: klar „Kaufen", „Prüfen" oder „Nicht kaufen", mit Begründung und gegebenenfalls Bedingungen</li>
+        <li><strong>Verhandlungsempfehlung</strong>: Erstangebot, Zielpreis, Schmerzgrenze, jeweils mit konkretem Euro-Betrag und ausführlicher Begründung</li>
+        <li><strong>Kaufpreis-Offerte</strong>: ein vorgefertigter, formell gehaltener Text als Vorlage für deine schriftliche Kaufpreis-Offerte an den Verkäufer (ca. 200–300 Wörter, direkt kopierbar)</li>
+        <li><strong>Bankargumente</strong>: 5–7 ausführliche, fundierte Argumente für die Finanzierungsanfrage, mit konkreten Zahlen und Bezug auf den Deal</li>
       </ul>
 
       <h3>Wie das Kontingent funktioniert</h3>
       <p>
-        DealPilot rechnet in <strong>Bewertungen</strong> — und zwar getrennt nach Art, weil sie unterschiedlich aufwendig sind: die <strong>Marktpreisindikation</strong> als schneller Marktabgleich, die <strong>erweiterte Marktpreisindikation</strong> mit Vergleichswerten und Korridor, und die <strong>Wertermittlung nach ImmoWertV</strong> als vollständiges Verfahren mit Modellvermerken. Jede Art hat ihr eigenes Kontingent. Wir rechnen so statt mit einer Flatrate, weil die Verfahren für uns echte Kosten bedeuten — und ein Pauschalmodell entweder zu teuer für Gelegenheitsnutzer wäre oder zu beschränkt für Power-Nutzer.
+        DealPilot rechnet in <strong>Bewertungen</strong>: und zwar getrennt nach Art, weil sie unterschiedlich aufwendig sind: die <strong>Marktpreisindikation</strong> als schneller Marktabgleich, die <strong>erweiterte Marktpreisindikation</strong> mit Vergleichswerten und Korridor, und die <strong>Wertermittlung nach ImmoWertV</strong> als vollständiges Verfahren mit Modellvermerken. Jede Art hat ihr eigenes Kontingent. Wir rechnen so statt mit einer Flatrate, weil die Verfahren für uns echte Kosten bedeuten und ein Pauschalmodell entweder zu teuer für Gelegenheitsnutzer wäre oder zu beschränkt für Power-Nutzer.
       </p>
       <p>
-        Dein Plan setzt die Kontingente jeden Monat neu (Starter: 5 Marktpreisindikationen, Investor zusätzlich 5 erweiterte, Pro zusätzlich 5 Wertermittlungen). <strong>Was du im Monat nicht nutzt, verfällt zum Monatsende</strong> — das Kontingent gehört zum Plan, nicht auf ein Konto. Brauchst du mehr, kaufst du nach: dein Monatskontingent noch einmal für ein Viertel deines Monatsbeitrags (Starter 4,00 €, Investor 8,75 €, Pro 12,50 €) — oder einzeln ab 0,90 € für eine Marktpreisindikation. Zugekaufte Bewertungen verfallen nie und werden zuletzt verbraucht.
+        Dein Plan setzt die Kontingente jeden Monat neu (Starter: 5 Marktpreisindikationen, Investor zusätzlich 5 erweiterte, Pro zusätzlich 5 Wertermittlungen). <strong>Was du im Monat nicht nutzt, verfällt zum Monatsende</strong>: das Kontingent gehört zum Plan, nicht auf ein Konto. Brauchst du mehr, kaufst du nach: dein Monatskontingent noch einmal für ein Viertel deines Monatsbeitrags (Starter 4,00 €, Investor 8,75 €, Pro 12,50 €) oder einzeln ab 0,90 € für eine Marktpreisindikation. Zugekaufte Bewertungen verfallen nie und werden zuletzt verbraucht.
       </p>
       <p>
-        Die kleinen KI-Hilfen — Spracheingabe, Bodenrichtwert-Abruf und Feldvorschläge — sind <strong>in jedem Plan enthalten</strong> und zählen gegen kein Kontingent.
+        Die kleinen KI-Hilfen, Spracheingabe, Bodenrichtwert-Abruf und Feldvorschläge, sind <strong>in jedem Plan enthalten</strong> und zählen gegen kein Kontingent.
       </p>
     </div>
   </section>
@@ -787,7 +790,7 @@ hr.rws{height:4px;border:0;background:var(--runway);margin:0;position:relative;z
       <span class="eyebrow"><span class="anchor">13</span>Bankexport &amp; Investment-Case</span>
       <h2>Bankfähig in <span class="gold">unter einer Minute.</span></h2>
       <p>
-        Am Ende einer Vollanalyse hast du eine vollständige Datengrundlage — und genau die brauchst du, um bei der Bank einen souveränen Eindruck zu hinterlassen. DealPilot bietet mehrere Export-Formate.
+        Am Ende einer Vollanalyse hast du eine vollständige Datengrundlage. Und genau die brauchst du, um bei der Bank einen souveränen Eindruck zu hinterlassen. DealPilot bietet mehrere Export-Formate.
       </p>
 
       <h3>Investment-Case-PDF</h3>
@@ -795,32 +798,32 @@ hr.rws{height:4px;border:0;background:var(--runway);margin:0;position:relative;z
         Sechs Seiten, professionelles Layout in deinem oder unserem Branding:
       </p>
       <ol>
-        <li><strong>Deckblatt</strong> — dunkles Design mit Gold-Akzenten, Titelfoto, vier Cover-KPIs (Score, Cashflow, Rendite, LTV)</li>
-        <li><strong>Executive Summary</strong> — Übersicht aller wichtigen Kennzahlen, Szenarien (heute / Ende Zinsbindung / Anschluss), Cashflow-Aufschlüsselung</li>
-        <li><strong>Objekt &amp; Finanzierung</strong> — Erwerbsnebenkosten-Aufstellung, Wertpuffer-Visualisierung, Darlehensstruktur, Bewirtschaftungskosten</li>
-        <li><strong>Cashflow-Projektion</strong> — 15-Jahres-Tabelle mit Goldzeile am Ende der Zinsbindung als Markierung</li>
-        <li><strong>KI-Analyse</strong> — die strukturierte KI-Bewertung als Volltext, mit allen Sektionen (falls eine KI-Analyse vorliegt)</li>
-        <li><strong>Annahmen &amp; Disclaimer</strong> — alle eingegebenen Prognose-Parameter zur Nachvollziehbarkeit, plus rechtlicher Disclaimer</li>
+        <li><strong>Deckblatt</strong>: dunkles Design mit Gold-Akzenten, Titelfoto, vier Cover-KPIs (Score, Cashflow, Rendite, LTV)</li>
+        <li><strong>Executive Summary</strong>: Übersicht aller wichtigen Kennzahlen, Szenarien (heute / Ende Zinsbindung / Anschluss), Cashflow-Aufschlüsselung</li>
+        <li><strong>Objekt &amp; Finanzierung</strong>: Erwerbsnebenkosten-Aufstellung, Wertpuffer-Visualisierung, Darlehensstruktur, Bewirtschaftungskosten</li>
+        <li><strong>Cashflow-Projektion</strong>: 15-Jahres-Tabelle mit Goldzeile am Ende der Zinsbindung als Markierung</li>
+        <li><strong>KI-Analyse</strong>: die strukturierte KI-Bewertung als Volltext, mit allen Sektionen (falls eine KI-Analyse vorliegt)</li>
+        <li><strong>Annahmen &amp; Disclaimer</strong>: alle eingegebenen Prognose-Parameter zur Nachvollziehbarkeit, plus rechtlicher Disclaimer</li>
       </ol>
 
       <h3>Eigenes Logo &amp; Footer (Investor &amp; Pro)</h3>
       <p>
-        Ab dem Investor-Plan machst du den Investment-Case zu deinem Dokument: eigenes Logo und eigene Adresszeile im PDF. Der Bankexport selbst bleibt in jedem Fall derselbe vollständige Export — mit Logo und Footer tritt er nur unter deiner Marke auf. Geeignet für anspruchsvolle Bankgespräche und Investorenmeetings.
+        Ab dem Investor-Plan machst du den Investment-Case zu deinem Dokument: eigenes Logo und eigene Adresszeile im PDF. Der Bankexport selbst bleibt in jedem Fall derselbe vollständige Export, mit Logo und Footer tritt er nur unter deiner Marke auf. Geeignet für anspruchsvolle Bankgespräche und Investorenmeetings.
       </p>
 
       <h3>Werbungskosten-PDF</h3>
       <p>
-        Eigenständiges PDF mit allen Werbungskosten-Positionen, sortiert und summiert — geeignet als Übersicht für deinen Steuerberater. Du kannst einzelne Jahre oder den 15-Jahres-Verlauf exportieren.
+        Eigenständiges PDF mit allen Werbungskosten-Positionen, sortiert und summiert, geeignet als Übersicht für deinen Steuerberater. Du kannst einzelne Jahre oder den 15-Jahres-Verlauf exportieren.
       </p>
 
       <h3>Track-Record-PDF</h3>
       <p>
-        Wenn du mehrere Objekte besitzt, kannst du einen Track-Record über dein gesamtes Portfolio erstellen — mit kompakter Übersicht jedes Objekts (Foto, Kaufpreis, Miete, Cashflow, Rendite), Portfolio-Aggregaten und Entwicklungsprognose. Wichtig für Folgefinanzierungen, neue Bankgespräche oder Investoren-Pitches.
+        Wenn du mehrere Objekte besitzt, kannst du einen Track-Record über dein gesamtes Portfolio erstellen, mit kompakter Übersicht jedes Objekts (Foto, Kaufpreis, Miete, Cashflow, Rendite), Portfolio-Aggregaten und Entwicklungsprognose. Wichtig für Folgefinanzierungen, neue Bankgespräche oder Investoren-Pitches.
       </p>
 
       <h3>Excel-Bankexport (25 Spalten)</h3>
       <p>
-        Wer mit eigenen Excel-Tools weiterarbeiten will, kann jedes Objekt als CSV oder XLSX exportieren. Der <strong>Bankexport</strong> ist ein spezielles Format mit 25 Spalten pro Objekt — Datum, Adresse, Bank, Vertragsnummer, Darlehenssumme, Zins, Tilgung, Kapitaldienst, Zinsbindung, Restschuld etc. — im Format, das die meisten Banken in Deutschland zur Aufstellung von Immobilien-Engagements erwarten.
+        Wer mit eigenen Excel-Tools weiterarbeiten will, kann jedes Objekt als CSV oder XLSX exportieren. Der <strong>Bankexport</strong> ist ein spezielles Format mit 25 Spalten pro Objekt: Datum, Adresse, Bank, Vertragsnummer, Darlehenssumme, Zins, Tilgung, Kapitaldienst, Zinsbindung, Restschuld etc., im Format, das die meisten Banken in Deutschland zur Aufstellung von Immobilien-Engagements erwarten.
       </p>
     </div>
   </section>
@@ -832,7 +835,7 @@ hr.rws{height:4px;border:0;background:var(--runway);margin:0;position:relative;z
       <span class="eyebrow"><span class="anchor">14</span>Portfolio &amp; Track-Record</span>
       <h2>Vom Einzelobjekt <span class="gold">zum Bestand.</span></h2>
       <p>
-        Sobald du mehr als ein Objekt analysierst, willst du die Übersicht behalten — und vergleichen können. DealPilot bietet eine <strong>Portfolio-Übersicht</strong>, in der alle deine Objekte als suchbare, sortierbare Tabelle erscheinen.
+        Sobald du mehr als ein Objekt analysierst, willst du die Übersicht behalten und vergleichen können. DealPilot bietet eine <strong>Portfolio-Übersicht</strong>, in der alle deine Objekte als suchbare, sortierbare Tabelle erscheinen.
       </p>
 
       <figure class="lu-bild"><!-- landing-app-bilder-1 · echte Aufnahme von Staging (Testkonto mit Kopien der Demo-Objekte), Anschriften unscharf -->
@@ -848,12 +851,12 @@ hr.rws{height:4px;border:0;background:var(--runway);margin:0;position:relative;z
 
       <h3>Sidebar mit Live-KPIs</h3>
       <p>
-        Eine kompakte Sidebar mit Mockup-Karten zeigt dir die wichtigsten Werte jedes Objekts auf einen Blick — Foto, Adresse, Kaufpreis, DSCR mit Ampel-Slider, Cashflow mit Trendkurve, Bruttomietrendite mit Bar. Perfekt für den schnellen Status-Check beim Vorbeischauen.
+        Eine kompakte Sidebar mit Mockup-Karten zeigt dir die wichtigsten Werte jedes Objekts auf einen Blick: Foto, Adresse, Kaufpreis, DSCR mit Ampel-Slider, Cashflow mit Trendkurve, Bruttomietrendite mit Bar. Perfekt für den schnellen Status-Check beim Vorbeischauen.
       </p>
 
       <h3>Portfolio-Cockpit</h3>
       <p>
-        Das Portfolio-Cockpit aggregiert dein gesamtes Portfolio auf einen Blick: ein <strong>investitionsvolumen-gewichteter Gesamt-Score</strong> über alle gekauften Objekte, dazu Cashflow, Restschuld und Finanzierungskennzahlen als Portfolio-Summen — mit Objekt-Selektor für den schnellen Wechsel ins Detail. Das Cockpit gibt es in Hell und Dunkel und du kannst es als Startansicht festlegen.
+        Das Portfolio-Cockpit aggregiert dein gesamtes Portfolio auf einen Blick: ein <strong>investitionsvolumen-gewichteter Gesamt-Score</strong> über alle gekauften Objekte, dazu Cashflow, Restschuld und Finanzierungskennzahlen als Portfolio-Summen, mit Objekt-Selektor für den schnellen Wechsel ins Detail. Das Cockpit gibt es in Hell und Dunkel und du kannst es als Startansicht festlegen.
       </p>
     </div>
   </section>
@@ -865,20 +868,20 @@ hr.rws{height:4px;border:0;background:var(--runway);margin:0;position:relative;z
       <span class="eyebrow"><span class="anchor">15</span>Datensicherheit &amp; Hosting</span>
       <h2>Deutsche Daten. <span class="gold">Deutsche Server.</span></h2>
       <p>
-        DealPilot wird in Deutschland (Hetzner Cloud) betrieben. Alle Daten — deine Objektkalkulationen, hochgeladenen PDFs, Berechnungsergebnisse, Auth-Daten — liegen auf Servern in der EU. Wir nutzen verschlüsselte Verbindungen (TLS) zwischen Browser und Server. Die Datenbank ist nicht öffentlich erreichbar.
+        DealPilot wird in Deutschland (Hetzner Cloud) betrieben. Alle Daten, deine Objektkalkulationen, hochgeladenen PDFs, Berechnungsergebnisse, Auth-Daten, liegen auf Servern in der EU. Wir nutzen verschlüsselte Verbindungen (TLS) zwischen Browser und Server. Die Datenbank ist nicht öffentlich erreichbar.
       </p>
       <p>
-        Die KI-Aufrufe gehen über OpenAI (ChatGPT) — diese Daten verlassen die EU für die Dauer der Anfrage. Wir nutzen das <strong>Enterprise-API ohne Training-Opt-In</strong>, das heißt: deine Inhalte werden nicht für das Training der KI-Modelle verwendet.
+        Die KI-Aufrufe gehen über OpenAI (ChatGPT). Diese Daten verlassen die EU für die Dauer der Anfrage. Wir nutzen das <strong>Enterprise-API ohne Training-Opt-In</strong>, das heißt: deine Inhalte werden nicht für das Training der KI-Modelle verwendet.
       </p>
 
       <h3>Lokal-Modus ohne Account</h3>
       <p>
-        Wenn du DealPilot ohne Account testen willst, gibt es einen Lokal-Modus: Alle Daten bleiben in deinem Browser (localStorage), nichts wird an Server übertragen. Nützlich für ein erstes Ausprobieren — hat aber keinen Cloud-Sync und keine KI-Analyse (für die brauchst du einen Account, weil die KI-Aufrufe über unseren Server laufen).
+        Wenn du DealPilot ohne Account testen willst, gibt es einen Lokal-Modus: Alle Daten bleiben in deinem Browser (localStorage), nichts wird an Server übertragen. Nützlich für ein erstes Ausprobieren, hat aber keinen Cloud-Sync und keine KI-Analyse (für die brauchst du einen Account, weil die KI-Aufrufe über unseren Server laufen).
       </p>
 
       <h3>JSON-Export für Backup</h3>
       <p>
-        Im Pro-Plan kannst du dein gesamtes Portfolio als JSON-Datei exportieren — als Backup oder zum Übertragen in eine andere Installation. Der Import funktioniert genauso einfach: JSON-Datei reinziehen, Objekte werden übernommen. (JSON-Objektsicherung ist Teil des Pro-Plans.)
+        Im Pro-Plan kannst du dein gesamtes Portfolio als JSON-Datei exportieren, als Backup oder zum Übertragen in eine andere Installation. Der Import funktioniert genauso einfach: JSON-Datei reinziehen, Objekte werden übernommen. (JSON-Objektsicherung ist Teil des Pro-Plans.)
       </p>
     </div>
   </section>
@@ -890,7 +893,7 @@ hr.rws{height:4px;border:0;background:var(--runway);margin:0;position:relative;z
       <span class="eyebrow"><span class="anchor">16</span>Steuer-Modul &amp; AfA</span>
       <h2>Die Steuer rechnet <span class="gold">mit.</span></h2>
       <p>
-        Bei vermieteten Immobilien entscheidet die steuerliche Seite oft über den echten Cashflow nach Steuern. DealPilot rechnet sie deshalb durchgängig mit: Du wählst das AfA-Modell — linear, degressiv für Neubauten nach § 7 Abs. 5a EStG oder die § 7b Sonder-AfA für neuen Mietwohnraum — und DealPilot zeigt dir Jahr für Jahr die Abschreibung, die Werbungskosten, das Ergebnis aus Vermietung und Verpachtung und die daraus resultierende Steuerersparnis auf Basis deines Grenzsteuersatzes (Tarif 2026).
+        Bei vermieteten Immobilien entscheidet die steuerliche Seite oft über den echten Cashflow nach Steuern. DealPilot rechnet sie deshalb durchgängig mit: Du wählst das AfA-Modell: linear, degressiv für Neubauten nach § 7 Abs. 5a EStG oder die § 7b Sonder-AfA für neuen Mietwohnraum und DealPilot zeigt dir Jahr für Jahr die Abschreibung, die Werbungskosten, das Ergebnis aus Vermietung und Verpachtung und die daraus resultierende Steuerersparnis auf Basis deines Grenzsteuersatzes (Tarif 2026).
       </p>
 
       <figure class="lu-bild"><!-- landing-app-bilder-1 · echte Aufnahme von Staging (Testkonto mit Kopien der Demo-Objekte), Anschriften unscharf -->
@@ -899,11 +902,11 @@ hr.rws{height:4px;border:0;background:var(--runway);margin:0;position:relative;z
       </figure>
 
       <p>
-        Für die Aufteilung des Kaufpreises in Gebäude- und Bodenanteil ist der <strong>BMF-Rechner</strong> integriert — nach der offiziellen Arbeitshilfe des Bundesfinanzministeriums, mit drei Verfahren im Vergleich und direkter Übernahme in die AfA-Berechnung. Der Steuerverlauf zeigt dir die Entwicklung über die Haltedauer, anteilige Werte im ersten Jahr ab wirtschaftlichem Übergang inklusive. BMF-Rechner und -Export stehen ab dem Investor-Plan zur Verfügung.
+        Für die Aufteilung des Kaufpreises in Gebäude- und Bodenanteil ist der <strong>BMF-Rechner</strong> integriert, nach der offiziellen Arbeitshilfe des Bundesfinanzministeriums, mit drei Verfahren im Vergleich und direkter Übernahme in die AfA-Berechnung. Der Steuerverlauf zeigt dir die Entwicklung über die Haltedauer, anteilige Werte im ersten Jahr ab wirtschaftlichem Übergang inklusive. BMF-Rechner und -Export stehen ab dem Investor-Plan zur Verfügung.
       </p>
       <div class="info-card">
         <h4>Wichtiger Hinweis</h4>
-        <p>DealPilot ersetzt keine Steuerberatung. Alle steuerlichen Berechnungen sind Modellrechnungen auf Basis deiner Eingaben — für verbindliche Aussagen wende dich an deinen Steuerberater.</p>
+        <p>DealPilot ersetzt keine Steuerberatung. Alle steuerlichen Berechnungen sind Modellrechnungen auf Basis deiner Eingaben, für verbindliche Aussagen wende dich an deinen Steuerberater.</p>
       </div>
     </div>
   </section>
@@ -918,7 +921,7 @@ hr.rws{height:4px;border:0;background:var(--runway);margin:0;position:relative;z
         Eine Kalkulation ist nur so gut wie ihre Annahmen. DealPilot holt deshalb echte Marktdaten in die Analyse: <strong>Live-Marktzinsen</strong> für realistische Finanzierungskonditionen, den automatischen <strong>Mietspiegel-Vergleich</strong> für deine Mietansätze und den <strong>Bodenrichtwert-Abruf</strong> für die Einordnung des Grundstücksanteils.
       </p>
       <p>
-        Für die Preisfrage selbst gibt es <strong>drei Stufen</strong> — von der schnellen <strong>Marktpreisindikation</strong> über die <strong>erweiterte Indikation mit Korridor</strong> bis zur vollen <strong>Wertermittlung nach ImmoWertV</strong>, dem Verfahren, mit dem auch Sachverständige arbeiten. Jede Stufe liegt in deinem Monatskontingent; reicht es nicht, kaufst du nach, ohne zusätzliche Abo-Bindung. So siehst du schwarz auf weiß, ob der Angebotspreis im Marktkorridor liegt, bevor du verhandelst.
+        Für die Preisfrage selbst gibt es <strong>drei Stufen</strong>: von der schnellen <strong>Marktpreisindikation</strong> über die <strong>erweiterte Indikation mit Korridor</strong> bis zur vollen <strong>Wertermittlung nach ImmoWertV</strong>, dem Verfahren, mit dem auch Sachverständige arbeiten. Jede Stufe liegt in deinem Monatskontingent. Reicht es nicht, kaufst du nach, ohne zusätzliche Abo-Bindung. So siehst du schwarz auf weiß, ob der Angebotspreis im Marktkorridor liegt, bevor du verhandelst.
       </p>
     </div>
   </section>
@@ -930,13 +933,13 @@ hr.rws{height:4px;border:0;background:var(--runway);margin:0;position:relative;z
       <span class="eyebrow"><span class="anchor">18</span>RND-Gutachten</span>
       <h2>Restnutzungsdauer: der unterschätzte <span class="gold">AfA-Hebel.</span></h2>
       <p>
-        Die gesetzliche AfA unterstellt pauschal lange Nutzungsdauern — bei älteren Objekten liegt die tatsächliche Restnutzungsdauer oft deutlich darunter. Wer das nachweist, schreibt schneller ab und spart jedes Jahr Steuern. Das <strong>RND-Modul</strong> führt dich durch die Einschätzung nach Sachverständigen-Standard: Gesamtnutzungsdauer-Tabelle, Modernisierungs-Katalog mit Punktesystem und nachvollziehbarer Herleitung.
+        Die gesetzliche AfA unterstellt pauschal lange Nutzungsdauern, bei älteren Objekten liegt die tatsächliche Restnutzungsdauer oft deutlich darunter. Wer das nachweist, schreibt schneller ab und spart jedes Jahr Steuern. Das <strong>RND-Modul</strong> führt dich durch die Einschätzung nach Sachverständigen-Standard: Gesamtnutzungsdauer-Tabelle, Modernisierungs-Katalog mit Punktesystem und nachvollziehbarer Herleitung.
       </p>
       <p>
-        Wichtig zur Einordnung: Das Modul liefert eine <strong>grobe, nachvollziehbare Erst-Einschätzung</strong> — eine Orientierung, kein Gutachten. Für den steuerlich belastbaren Nachweis stellst du die Gutachten-Anfrage an unser Sachverständigenbüro direkt aus der App, und wir kümmern uns um den Rest. Das Einschätzungs-Modul steht ab dem Investor-Plan bereit, die Gutachten-Anfrage in jedem Plan.
+        Wichtig zur Einordnung: Das Modul liefert eine <strong>grobe, nachvollziehbare Erst-Einschätzung</strong>: eine Orientierung, kein Gutachten. Für den steuerlich belastbaren Nachweis stellst du die Gutachten-Anfrage an unser Sachverständigenbüro direkt aus der App, und wir kümmern uns um den Rest. Das Einschätzungs-Modul steht ab dem Investor-Plan bereit, die Gutachten-Anfrage in jedem Plan.
       </p>
       <div class="info-card">
-        <p><strong>Direkt eingebunden &mdash; in Partnerschaft mit gutachten.org.</strong> Für das Restnutzungsdauergutachten zur AfA arbeiten wir mit unserem Partner <a href="https://gutachten.org" target="_blank" rel="noopener">gutachten.org</a> zusammen: Der Anfrage stellst du aus dem RND-Modul heraus — aber <strong>DealPilot schickt nichts selbst an Dritte</strong>. Du siehst vorher genau, welche Angaben mitgehen, und sendest sie über dein eigenes Mailprogramm oder trägst sie per Zwischenablage in das Formular von gutachten.org ein. Der Status „angefragt" wird am Objekt vermerkt.</p>
+        <p><strong>Direkt eingebunden &mdash; in Partnerschaft mit gutachten.org.</strong> Für das Restnutzungsdauergutachten zur AfA arbeiten wir mit unserem Partner <a href="https://gutachten.org" target="_blank" rel="noopener">gutachten.org</a> zusammen: Der Anfrage stellst du aus dem RND-Modul heraus, aber <strong>DealPilot schickt nichts selbst an Dritte</strong>. Du siehst vorher genau, welche Angaben mitgehen, und sendest sie über dein eigenes Mailprogramm oder trägst sie per Zwischenablage in das Formular von gutachten.org ein. Der Status „angefragt" wird am Objekt vermerkt.</p>
       </div>
     </div>
   </section>
@@ -950,23 +953,23 @@ hr.rws{height:4px;border:0;background:var(--runway);margin:0;position:relative;z
 <section class="lu-sec" id="lu-sprechlauf">
   <div class="wrap">
     <span class="lu-num">19</span>
-    <h2>Sprich das Objekt ein — <span class="ac">in sechs Etappen.</span></h2>
+    <h2>Sprich das Objekt ein <span class="ac">in sechs Etappen.</span></h2>
     <p class="lu-lead">Die aufwändigste Minute einer Besichtigung ist die, in der du danach
       im Auto sitzt und versuchst, dich zu erinnern. Der Sprechlauf nimmt dir das ab: Du
       diktierst, was du siehst, und DealPilot füllt die Felder.</p>
 
-    <p><strong>Wo er startet:</strong> In der <strong>Pre-Flight-Leiste</strong> über dem Objekt — der Bordkarte mit den Einlese-Kacheln. Dort steht neben Exposé und Marktbericht die Kachel <strong>„Sprache"</strong>. Ein Klick, und der Sprechlauf öffnet sich.</p>
+    <p><strong>Wo er startet:</strong> In der <strong>Pre-Flight-Leiste</strong> über dem Objekt, der Bordkarte mit den Einlese-Kacheln. Dort steht neben Exposé und Marktbericht die Kachel <strong>„Sprache"</strong>. Ein Klick, und der Sprechlauf öffnet sich.</p>
 
-    <p>Beim Öffnen steht eine Frage mit zwei Antworten — und sie wird bei <em>jedem</em> Öffnen
+    <p>Beim Öffnen steht eine Frage mit zwei Antworten und sie wird bei <em>jedem</em> Öffnen
       neu gestellt. Welchen Weg du beim letzten Objekt genommen hast, spielt keine Rolle:
-      ein gemerkter Modus wäre genau dann falsch, wenn er am meisten stört — beim nächsten
+      ein gemerkter Modus wäre genau dann falsch, wenn er am meisten stört, beim nächsten
       Objekt, das anders liegt als das letzte.</p>
 
     <div class="zwei-wege">
       <div class="weg">
         <span class="weg-k">Weg A</span>
         <h4>Ich erzähle frei</h4>
-        <p>Die Aufnahme startet sofort. Du redest am Stück — über das, was dir wichtig ist,
+        <p>Die Aufnahme startet sofort. Du redest am Stück, über das, was dir wichtig ist,
           in deiner Reihenfolge. Danach wertet die KI aus und fragt nur noch nach, was
           gefehlt hat.</p>
         <p class="weg-fuer"><b>Für dich, wenn</b> du das Objekt schon kennst und einfach
@@ -975,25 +978,25 @@ hr.rws{height:4px;border:0;background:var(--runway);margin:0;position:relative;z
       <div class="weg" id="frag-mich">
         <span class="weg-k">Weg B</span>
         <h4>Frag mich durch</h4>
-        <p>DealPilot führt. Es ist derselbe Fragen-Ablauf wie bei den Rückfragen — nur von
+        <p>DealPilot führt. Es ist derselbe Fragen-Ablauf wie bei den Rückfragen, nur von
           Anfang an und über <strong>alle</strong> Blöcke statt nur über die Lücken.
           29 Fragen in fünf Blöcken, eine nach der anderen.</p>
-        <p class="weg-fuer"><b>Für dich, wenn</b> du nicht weißt, was DealPilot hören will —
+        <p class="weg-fuer"><b>Für dich, wenn</b> du nicht weißt, was DealPilot hören will 
           oder mitten in der Besichtigung stehst.</p>
       </div>
     </div>
 
     <p>Der geführte Weg ist bewusst nicht starr. Du <strong>sprichst oder tippst</strong>,
-      wie es gerade passt — beides geht bei jeder Frage. <strong>„Weiß ich nicht"</strong>
+      wie es gerade passt. Beides geht bei jeder Frage. <strong>„Weiß ich nicht"</strong>
       überspringt eine Frage, ohne dass etwas Falsches eingetragen wird.
       <strong>„Fertig"</strong> bringt dich jederzeit zur Übernahme-Tabelle, auch mitten
-      im Block — du musst nicht durchhalten, um etwas zu bekommen.</p>
+      im Block. Du musst nicht durchhalten, um etwas zu bekommen.</p>
 
     <p>Und du kannst auf ein ganzes Thema antworten statt auf ein einzelnes Feld. Sagst du
       <em>„die Adresse ist Musterweg 12 in 32105 Musterstadt"</em>, füllt das vier Felder
       auf einmal. Dasselbe gilt für <em>Objektdaten</em>, <em>Finanzierung</em>,
       <em>Kaufnebenkosten</em>, <em>Mieteinnahmen</em>, <em>Hausgeld</em>, <em>Grundstück</em>
-      und <em>Lage</em> — DealPilot erkennt den Sammelbegriff und hakt die Felder ab, die
+      und <em>Lage</em>. DealPilot erkennt den Sammelbegriff und hakt die Felder ab, die
       darin vorkamen.</p>
 
 
@@ -1001,21 +1004,21 @@ hr.rws{height:4px;border:0;background:var(--runway);margin:0;position:relative;z
       ein Ergebnis</strong>:</p>
 
     <ul class="lu-list">
-      <li><strong>1 · Basis</strong> — Objekt, Preis und Miete</li>
-      <li><strong>2 · Geld</strong> — Finanzierung und Kaufnebenkosten. <em>Hier steht dein
+      <li><strong>1 · Basis</strong>: Objekt, Preis und Miete</li>
+      <li><strong>2 · Geld</strong>: Finanzierung und Kaufnebenkosten. <em>Hier steht dein
         erster Deal Score.</em></li>
-      <li><strong>3 · Lage &amp; Zustand</strong> — wo es steht und wie es dasteht.
+      <li><strong>3 · Lage &amp; Zustand</strong>: wo es steht und wie es dasteht.
         <em>Hier steht der Investor Deal Score.</em></li>
-      <li><strong>4 · Feinschliff</strong> — Bewirtschaftung, Entwicklung, Steuer</li>
-      <li><strong>5 · Deine Sicht</strong> — These und Risiken</li>
-      <li><strong>6 · Feinheiten</strong> — alle übrigen Felder, nur auf Wunsch</li>
+      <li><strong>4 · Feinschliff</strong>: Bewirtschaftung, Entwicklung, Steuer</li>
+      <li><strong>5 · Deine Sicht</strong>: These und Risiken</li>
+      <li><strong>6 · Feinheiten</strong>: alle übrigen Felder, nur auf Wunsch</li>
     </ul>
 
     <p>Wer nach Etappe 2 aufhört, hat trotzdem eine Antwort auf „lohnt sich das?".</p>
 
     <p>Während du sprichst, läuft eine Live-Mitschrift mit, und um das Mikrofon kreisen
       Stichwörter, die verschwinden, sobald du sie gesagt hast. Ausgewertet wird immer die
-      <strong>Tonaufnahme</strong>, nicht der mitgeschriebene Text — Erkennungsfehler in der
+      <strong>Tonaufnahme</strong>, nicht der mitgeschriebene Text. Erkennungsfehler in der
       Mitschrift wirken sich also nicht auf die Werte aus.</p>
 
     <p>Am Ende bekommst du dieselbe Übernahme-Tabelle wie beim Exposé-Import: jede Zeile mit
@@ -1026,7 +1029,7 @@ hr.rws{height:4px;border:0;background:var(--runway);margin:0;position:relative;z
       <h4>Eine siebte Etappe, wenn du sie willst</h4>
       <p>Ab Pro bietet DealPilot nach den sechs Etappen eine Zusatzrunde <em>Wertermittlung</em>
         an. Sie fragt die beiden Angaben nach, die das Sachwertverfahren nach ImmoWertV braucht
-        und die sonst nirgends vorkommen — Gebäudestandard nach Anlage 4 und Garagen-BGF — und
+        und die sonst nirgends vorkommen, Gebäudestandard nach Anlage 4 und Garagen-BGF und
         holt danach den amtlichen Sachwertfaktor deines Gutachterausschusses. Wer keine
         Wertermittlung will, wird auch nicht danach gefragt.</p>
     </div>
@@ -1046,12 +1049,12 @@ hr.rws{height:4px;border:0;background:var(--runway);margin:0;position:relative;z
       in zwölf Handwerkerrechnungen und in einem Stapel Fahrtbelege. Genau diesen Stapel
       liest DealPilot.</p>
 
-    <p>Du wählst einen Ordner oder einzelne Dateien — PDF oder Foto, beides geht. Die Seiten
+    <p>Du wählst einen Ordner oder einzelne Dateien, PDF oder Foto, beides geht. Die Seiten
       werden zu Bildern gerendert und an die Bilderkennung geschickt, die je Beleg Datum,
       Netto, Umsatzsteuer, Brutto, Aussteller und Kategorie herausliest.</p>
 
     <p>Danach kommt der wichtigste Schritt: <strong>du bestätigst jede einzelne Zeile.</strong>
-      Nicht der Import entscheidet, was in deine Anschaffungskosten wandert, sondern du — mit
+      Nicht der Import entscheidet, was in deine Anschaffungskosten wandert, sondern du, mit
       dem erkannten Betrag und der vorgeschlagenen Kategorie daneben. Das ist Absicht: Aus
       diesen Zahlen entsteht die Kaufpreisaufteilung, und die geht ans Finanzamt.</p>
 
@@ -1059,7 +1062,7 @@ hr.rws{height:4px;border:0;background:var(--runway);margin:0;position:relative;z
       <li>PDF <strong>und</strong> Foto, ganze Ordner auf einmal</li>
       <li>Erkannt werden Datum, Netto, Umsatzsteuer, Brutto, Aussteller und Kategorie</li>
       <li>Feste Zuordnung in die Anschaffungs- beziehungsweise Herstellungskosten</li>
-      <li>Jede Zeile wird einzeln bestätigt — nichts läuft ungeprüft in die Steuerrechnung</li>
+      <li>Jede Zeile wird einzeln bestätigt. Nichts läuft ungeprüft in die Steuerrechnung</li>
       <li>Die Summen landen direkt in der BMF-Kaufpreisaufteilung</li>
     </ul>
 
@@ -1078,13 +1081,13 @@ hr.rws{height:4px;border:0;background:var(--runway);margin:0;position:relative;z
       noch fehlt.</p>
 
     <p>Er hat zwei Ebenen. Der <strong>persönliche Ordner</strong> gilt für alle deine
-      Objekte — Ausweis, SCHUFA-Auskunft, Gehaltsabrechnungen, Lohnsteuerbescheinigung,
+      Objekte: Ausweis, SCHUFA-Auskunft, Gehaltsabrechnungen, Lohnsteuerbescheinigung,
       Steuerbescheide, Selbstauskunft, Rentenbescheid, EÜR, Kontoauszüge. Den
       <strong>Objektordner</strong> legst du je Immobilie an: Exposé, Grundrisse,
       Teilungserklärung, WEG-Abrechnung, Mietverträge und was sonst dazugehört.</p>
 
     <p>Jeder Dokumenttyp trägt zwei Merker: Braucht die <strong>Bank</strong> ihn? Braucht die
-      <strong>Finanzierungsbestätigung</strong> ihn? Daraus entsteht die Fortschrittsanzeige —
+      <strong>Finanzierungsbestätigung</strong> ihn? Daraus entsteht die Fortschrittsanzeige 
       und ohne ausreichend gefüllten Ordner lässt sich keine Netzwerk-Anfrage abschicken.</p>
 
     <p>Die Selbstauskunft musst du dabei nicht abtippen: DealPilot erzeugt sie als
@@ -1107,19 +1110,19 @@ hr.rws{height:4px;border:0;background:var(--runway);margin:0;position:relative;z
     <span class="lu-num">22</span>
     <h2>Wenn die Zahlen stehen, <span class="ac">fängt die Arbeit an.</span></h2>
     <p class="lu-lead">Eine durchgerechnete Immobilie ist noch keine gekaufte. Danach kommen
-      Bankanfragen, Gutachten, Finanzierungsbestätigungen — und genau da hören die meisten
+      Bankanfragen, Gutachten, Finanzierungsbestätigungen und genau da hören die meisten
       Werkzeuge auf. DealPilot hat dafür einen eigenen Reiter.</p>
 
     <p>Vier Aktionskarten decken ab, was nach der Analyse ansteht: <strong>Bankanfrage</strong>
       mit Dokumenten-Upload und Vorprüfung, <strong>Finanzierungsbestätigung</strong> für den
       Makler, <strong>Gutachten &amp; Expertise</strong> (Verkehrswert, Restnutzungsdauer,
       Sanierungskonzept) und <strong>Beratung &amp; Zweite Meinung</strong>. Jede Anfrage geht
-      mit deinen Objektdaten, dem Investment-Case-PDF und deinen Unterlagen raus — du stellst
+      mit deinen Objektdaten, dem Investment-Case-PDF und deinen Unterlagen raus. Du stellst
       nichts noch einmal zusammen.</p>
 
     <p>Darüber liegt das <strong>Partnernetzwerk</strong>: Sachverständige, Finanzierer,
       Steuerberater und Handwerksbetriebe als Karten, jede mit Schwerpunkt und Antwortzeit.
-      Bevor eine Anfrage rausgeht, prüft DealPilot, ob sie überhaupt Aussicht hat — sind die
+      Bevor eine Anfrage rausgeht, prüft DealPilot, ob sie überhaupt Aussicht hat, sind die
       Kennzahlen vollständig, liegen die Unterlagen im Datenraum? Fehlt etwas, ist der Knopf
       gesperrt, und jeder fehlende Punkt verlinkt dorthin, wo du ihn nachtragen kannst.</p>
 
@@ -1145,11 +1148,11 @@ hr.rws{height:4px;border:0;background:var(--runway);margin:0;position:relative;z
       <div class="head">
         <span class="eye">// Dein Kontingent</span>
         <h2>Drei Tiefen, <span class="ac">du entscheidest.</span></h2>
-        <p>Gez&auml;hlt werden <strong>Bewertungen</strong>, getrennt nach Art &mdash; weil sie unterschiedlich aufwendig sind. Dein Plan setzt die Kontingente jeden Monat neu. <strong>Was du im Monat nicht nutzt, verf&auml;llt zum Monatsende</strong>. Nur Zugekauftes bleibt dauerhaft.</p>
+        <p>Gez&auml;hlt werden <strong>Bewertungen</strong>, getrennt nach Art, weil sie unterschiedlich aufwendig sind. Dein Plan setzt die Kontingente jeden Monat neu. <strong>Was du im Monat nicht nutzt, verf&auml;llt zum Monatsende</strong>. Nur Zugekauftes bleibt dauerhaft.</p>
       </div>
 
       <div class="lu-sub">Was dein Plan im Monat enthält</div>
-      <p class="kont-vor">Gezählt werden nur <strong>Bewertungen</strong> — Abrufe, bei denen
+      <p class="kont-vor">Gezählt werden nur <strong>Bewertungen</strong>: Abrufe, bei denen
         DealPilot einen Marktwert ermittelt. Davon gibt es drei Arten, unterschiedlich
         aufwendig. Alles andere zählt gegen kein Kontingent: rechnen, Score, PDF,
         Sprechlauf, Bodenrichtwert, Exposé-Import.</p>
@@ -1176,7 +1179,7 @@ hr.rws{height:4px;border:0;background:var(--runway);margin:0;position:relative;z
         </tbody>
       </table>
       <p class="kont-nach">Was du im Monat nicht nutzt, <strong>verfällt zum Monatsende</strong>.
-        Ist das Kontingent aufgebraucht, lässt es sich einmal nachkaufen — dieselbe Menge für
+        Ist das Kontingent aufgebraucht, lässt es sich einmal nachkaufen, dieselbe Menge für
         ein Viertel des Monatsbeitrags. Zugekauftes bleibt dauerhaft.</p>
 
 <div class="lu-sub">Nachkaufen &mdash; jederzeit, ohne Abo</div>
@@ -1218,28 +1221,41 @@ hr.rws{height:4px;border:0;background:var(--runway);margin:0;position:relative;z
   <hr class="rws">
 
   <div class="board-band"><span class="perf-edge"></span><div class="inner">
-    <div class="txt"><div class="kick">PRE-FLIGHT &middot; CHECK-IN</div><h2>Bereit f&uuml;r den Take-off?</h2><p>Starte kostenlos mit dem Free-Plan &mdash; kein Verkaufsgespr&auml;ch. Dein erstes Objekt rechnest du in Minuten durch.</p></div>
+    <div class="txt"><div class="kick">PRE-FLIGHT &middot; CHECK-IN</div><h2>Bereit f&uuml;r den Take-off?</h2><p>Starte kostenlos mit dem Free-Plan, kein Verkaufsgespr&auml;ch. Dein erstes Objekt rechnest du in Minuten durch.</p></div>
     <div class="act"><a class="btn-dark" href="https://app.dealpilot.immo/?register=1">Kostenlos starten &rarr;</a></div>
   </div></div>
 </main>
 <footer class="footer"><div class="wrap">
-  <div class="footer-grid">
+  <div class="footer-grid"><!-- landing-pruefung-1 · Fuss gleich der Startseite (sechs Spalten, Ratgeber, AGB) -->
     <div>
       <div class="mark mark-gross" style="color:#fff"><span class="wort">Deal<b>Pilot</b></span></div>
       <p class="footer-tag">Immobilien-Investmentanalyse für strukturierte Entscheidungen.
         DealPilot ist eine Marke von Junker Solution.<!-- landing-kern-1 · Betreiber Junker Solution (Einzelunternehmen), das Sachverständigenbüro ist eine eigene Marke und nur verlinkt --></p>
     </div>
     <div><h4>Produkt</h4>
-      <a href="#workflow">So funktioniert's</a><a href="#features">Funktionen</a>
+      <a href="/#workflow">So funktioniert's</a><a href="/#features">Funktionen</a>
       <a href="leistungsumfang.html">Leistungsumfang</a><a href="preise.html">Preise</a>
-      <a href="api.html">API</a><a href="#app">App</a></div>
+      <a href="api.html">API</a><a href="videothek.html">Videothek</a><a href="partner.html">Für Partner</a><a href="forschung.html">Forschung &amp; Entwicklung</a></div>
     <div><h4>Vertrauen</h4>
       <a href="sicherheit.html">Sicherheit &amp; Server</a><a href="fragen.html">Häufige Fragen</a>
-      <a href="#partner">Partner &amp; Datenquellen</a><a href="preise.html#feature-matrix">Cockpit-Matrix</a></div>
+      <a href="/#daten">Datenbasis</a><a href="/#partner">Wegbegleiter</a><a href="preise.html#feature-matrix">Cockpit-Matrix</a></div>
+    <div><h4>Ratgeber</h4>
+      <a href="immobilien-rendite-berechnen.html">Immobilien Rendite berechnen</a>
+      <a href="cashflow-immobilie-berechnen.html">Cashflow einer Immobilie berechnen</a>
+      <a href="immobilien-investment-rechner.html">Investment-Rechner für Kapitalanleger</a>
+      <a href="renditeobjekt-pruefen.html">Renditeobjekt vor dem Kauf prüfen</a>
+      <a href="kaufpreisfaktor-berechnen.html">Kaufpreisfaktor berechnen</a>
+      <a href="methodik.html">Immobilienbewertung nach ImmoWertV</a>
+      <a href="prozesskarte.html">Der ganze Weg auf einer Karte</a></div>
+    <div><h4>Junker Immobilien</h4>
+      <a href="https://junker-immobilien.io" target="_blank" rel="noopener">Sachverständigenbüro</a>
+      <a href="https://junker-immobilien.io" target="_blank" rel="noopener">Kapitalanlage</a>
+      <a href="https://junker-immobilien.io" target="_blank" rel="noopener">Projektentwicklung</a></div>
     <div><h4>Kontakt</h4>
       <a href="mailto:support@dealpilot.immo">support@dealpilot.immo</a>
       <a href="mailto:info@dealpilot.immo">info@dealpilot.immo</a>
-      <a href="/impressum.html">Impressum</a><a href="/datenschutz.html">Datenschutz</a></div>
+      <a href="/impressum.html">Impressum</a><a href="/datenschutz.html">Datenschutz</a>
+      <a href="/agb.html">AGB</a></div>
   </div>
   <div class="footer-bottom">
     <div>© 2026 Junker Solution · DealPilot</div>
@@ -1249,7 +1265,7 @@ hr.rws{height:4px;border:0;background:var(--runway);margin:0;position:relative;z
 
 
 
-<script src="dp2-lufeat.js?v=v2285"></script>
+<script src="dp2-lufeat.js?v=landing-pruefung-1"></script>
 <script src="dp2.js?v=landing-handy-1"></script>
 <script src="landing-zahlen.js?v=landing-zahlen-live-1"></script><!-- landing-zahlen-live-1 · Zahlen live aus GET /api/v1/public/datenumfang, das HTML bleibt Rückfall -->
   <script src="assets/umgebung.js?v=v1644"></script><!-- v1644 · Landing zeigt auf DIE App, in der sie steht -->

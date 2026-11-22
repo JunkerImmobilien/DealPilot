@@ -321,6 +321,7 @@
 
   .dreh{margin-top:18px}
   .dreh table{width:100%; border-collapse:collapse}
+  @media(max-width:620px){.dreh th,.dreh td{overflow-wrap:anywhere}}  /* landing-pruefung-1: Tabelle schob die Seite bei 360/390 px auf 400 px */
   .dreh th{font-family:var(--f-mono); font-size:9px; letter-spacing:.13em;
     text-transform:uppercase; color:var(--gold); text-align:left;
     padding:0 10px 7px 0; border-bottom:1px solid rgba(201,168,76,.26)}
@@ -371,7 +372,7 @@
       </div>
     </div>
     <p class="kopf-satz">Drei Tafeln für das Gespräch nach dem ersten Blick:
-      <em>in welcher Reihenfolge</em>, <em>was jedes Jahr dazukommt</em> —
+      <em>in welcher Reihenfolge</em>, <em>was jedes Jahr dazukommt</em> 
       und <em>woraus die Scores bestehen</em>.</p>
   </header>
 
@@ -388,7 +389,7 @@
       <span class="tafel-nr">Tafel A</span>
       <h2>Netzplan Boarding</h2>
       <p>Jede Stufe schaltet frei, was ohne sie nicht rechnen darf.
-        Was fehlt, wird nicht geschätzt — es wird genannt.</p>
+        Was fehlt, wird nicht geschätzt. Es wird genannt.</p>
     </div>
 
     <div class="netz">
@@ -409,7 +410,7 @@
             Kaufpreisfaktor · Marktpreisindikation (Stufe 1)</p>
         </article>
 
-        <div class="wartet">ohne Stufe 1 kein Score — und keine Schätzung
+        <div class="wartet">ohne Stufe 1 kein Score und keine Schätzung
           an ihrer Stelle</div>
       </div>
 
@@ -457,7 +458,7 @@
 
         <article class="knoten">
           <h4><span class="nr">E5</span> Deine Sicht</h4>
-          <p class="ziel">Investmentthese und Risiken — in eigenen Worten.</p>
+          <p class="ziel">Investmentthese und Risiken, in eigenen Worten.</p>
           <p class="frei">schaltet frei</p>
           <p class="frei-txt">Pilot-Analyse mit Bezug auf die eigene
             These statt auf allgemeines Wissen</p>
@@ -466,7 +467,7 @@
         <article class="knoten extra">
           <h4><span class="nr">E7</span> Wertermittlung</h4>
           <p class="ziel">Sachwertverfahren nach ImmoWertV. Nutzungsart,
-            Grundstück, Bodenrichtwert, BGF — bei ETW der
+            Grundstück, Bodenrichtwert, BGF, bei ETW der
             Miteigentumsanteil, am Haus Hausform, Geschosse und Dach.</p>
           <p class="frei">schaltet frei</p>
           <p class="frei-txt">Sachwert (NHK 2010) · Ertragswert ·
@@ -475,7 +476,7 @@
 
         <article class="knoten extra">
           <h4><span class="nr">E8</span> Restnutzungsdauer</h4>
-          <p class="ziel">Modernisierungsgrad nach Anlage 2 — acht Bauteile,
+          <p class="ziel">Modernisierungsgrad nach Anlage 2, acht Bauteile,
             zwanzig Punkte.</p>
           <p class="frei">schaltet frei</p>
           <p class="frei-txt">Restnutzungsdauer aus dem Punktraster ·
@@ -483,7 +484,7 @@
         </article>
 
         <div class="wartet">ETW ohne Miteigentumsanteil: Sachwert OHNE
-          Bodenwert — und das steht dann dran</div>
+          Bodenwert und das steht dann dran</div>
       </div>
 
     </div>
@@ -491,7 +492,7 @@
     <div class="merke">
       <b>Etappe 6 „Feinheiten" steht absichtlich nicht im Netz</b>
       Sie sammelt die übrigen Felder der 259 und schaltet nichts frei.
-      Ein Knoten ohne Nachfolger gehört nicht in einen Netzplan — er
+      Ein Knoten ohne Nachfolger gehört nicht in einen Netzplan. Er
       täuscht eine Abhängigkeit vor, die es nicht gibt. Die Etappen 7
       und 8 tragen gestrichelte Kanten: sie sind als <em>extra</em>
       gekennzeichnet, also optional, bis jemand den Wert braucht.
@@ -510,7 +511,7 @@
       <span class="tafel-nr">Tafel B</span>
       <h2>Das Steuerjahr im Bestand</h2>
       <p>Der Plan von damals bleibt stehen. Daneben wachsen die
-        IST-Eintragungen — und die Abweichung bleibt sichtbar.</p>
+        IST-Eintragungen und die Abweichung bleibt sichtbar.</p>
     </div>
 
     <div class="jahr">
@@ -533,7 +534,7 @@
         <span class="wann">laufendes Jahr</span>
         <h4>Steuerzeitraum anlegen</h4>
         <p>Je Objekt ein Zeitraum mit Von- und Bis-Datum. DealPilot prüft
-          auf Überlappung — zwei Zeiträume über denselben Monat wären
+          auf Überlappung, zwei Zeiträume über denselben Monat wären
           zwei Wahrheiten über dieselbe Miete.</p>
         <div class="ist"><span class="ist-lbl">was dabei entsteht</span>
           <div class="pillen">
@@ -545,7 +546,7 @@
       <article class="monat">
         <span class="wann">zum Jahresende</span>
         <h4>Werbungskosten eintragen</h4>
-        <p>Die tatsächlichen Kosten des Jahres je Objekt — als
+        <p>Die tatsächlichen Kosten des Jahres je Objekt, als
           Schnappschuss mit Jahr und Quelle. Belege lassen sich
           fotografieren und auslesen, statt abgetippt zu werden.</p>
         <div class="ist"><span class="ist-lbl">IST-Eintragung</span>
@@ -559,7 +560,7 @@
       <article class="monat">
         <span class="wann">zur Erklärung</span>
         <h4>Anlage V und Bilanz</h4>
-        <p>Die Summe über <em>alle</em> gehaltenen Objekte — Überschuss
+        <p>Die Summe über <em>alle</em> gehaltenen Objekte, Überschuss
           der Vermietung und Verpachtung je Jahr. Als PDF für den
           Steuerberater, nicht als Behauptung.</p>
         <div class="ist"><span class="ist-lbl">was herauskommt</span>
@@ -576,14 +577,14 @@
       <b>Und dann beginnt es wieder.</b>
       Jedes Jahr kommt eine Zeile dazu: Werbungskosten, Miete, Instandhaltung,
       Wertverlauf aus dem wiederholten Marktbericht. Der Ankaufstand bleibt
-      der Maßstab — <em>eingefroren</em>, damit die Abweichung nach zehn
+      der Maßstab, <em>eingefroren</em>, damit die Abweichung nach zehn
       Jahren noch etwas bedeutet. Wer den Maßstab mitwachsen lässt, misst
       am Ende nur noch sich selbst.
     </div>
 
     <div class="merke">
       <b>Warum nichts neu gerechnet wird</b>
-      Beide Sätze — Ankauf und heute — wurden zu ihrer Zeit mit den damaligen
+      Beide Sätze, Ankauf und heute, wurden zu ihrer Zeit mit den damaligen
       Rechenkernen gerechnet. Eine Neuberechnung mit heutigen Regeln würde
       nicht das Objekt messen, sondern unsere eigene Regeländerung. Deshalb
       geht die Soll-Ist-Tabelle fertig in die Analyse, und das Modell
@@ -604,7 +605,7 @@
       <span class="tafel-nr">Tafel C</span>
       <h2>Woraus die Scores bestehen</h2>
       <p>Zwei Scores, bewusst verschieden. Dass sie abweichen, ist der
-        Zweck — und die Differenz wird erklärt, nicht geglättet.</p>
+        Zweck und die Differenz wird erklärt, nicht geglättet.</p>
     </div>
 
     <div class="score-paar">
@@ -686,7 +687,7 @@
         <div class="merke" style="margin-top:14px">
           <b>Fehlt eine Unterkennzahl, fällt sie aus der Gewichtung</b>
           Sie wird nicht mit einem Mittelwert gefüllt. Der Score sagt
-          dann, wie viele Kennzahlen er hatte — eine Note aus drei von
+          dann, wie viele Kennzahlen er hatte, eine Note aus drei von
           sechs ist etwas anderes als eine aus sechs.
         </div>
       </div>
@@ -717,7 +718,7 @@
             <td><b>Eigene Gewichte</b>
               <span class="ort">jede der fünf Zahlen frei, Summe 100</span></td>
             <td>Wer Potenzial über Cashflow stellt, bekommt eine andere
-              Rangfolge im Portfolio — dieselben Objekte, anderes Urteil.</td>
+              Rangfolge im Portfolio, dieselben Objekte, anderes Urteil.</td>
             <td>Einstellungen → Score</td>
           </tr>
           <tr>
@@ -735,7 +736,7 @@
               <span class="ort">Mindest-DSCR · Mindest-Cashflow ·
                 maximaler Beleihungsauslauf</span></td>
             <td>Das Urteil der KI-Analyse: sie prüft jede Schwelle einzeln
-              ab und nennt beide Zahlen — die eigene und die gemessene.
+              ab und nennt beide Zahlen, die eigene und die gemessene.
               Den Score lassen sie unberührt.</td>
             <td>Einstellungen → Standardwerte</td>
           </tr>
@@ -752,7 +753,7 @@
     </div>
 
     <div class="merke">
-      <b>Der Score sieht die persönlichen Schwellen nie — und das ist Absicht</b>
+      <b>Der Score sieht die persönlichen Schwellen nie und das ist Absicht</b>
       Dieselbe Wohnung hat für jeden Nutzer denselben Score. Eine
       Einstellung, die ihn verschiebt, macht zwei Nutzer unvergleichbar und
       jedes gespeicherte Urteil rückwirkend ungültig. Die <em>Gewichte</em>
@@ -764,7 +765,7 @@
       <b>Und was es nicht gibt, bekommt keine Note</b>
       Ein Barkauf hat keinen Beleihungsauslauf und keinen
       Schuldendeckungsgrad. Diese beiden Kategorien entfallen dann aus der
-      Gewichtung — die übrigen drei tragen die volle Bewertung. Vorher
+      Gewichtung, die übrigen drei tragen die volle Bewertung. Vorher
       standen dort zwei Platzhalter von je 50 von 100, und damit lagen
       30 % des Scores fest, bevor das Objekt angesehen war.
     </div>
@@ -775,15 +776,15 @@
   <div class="fuss">
     <div><b>Jede Zahl auf diesem Blatt ist gemessen</b>
       Gewichte, Pflichtfelder, Etappen und Schwellen stehen so im Code und
-      nicht in einer Folie. Wo eine Zahl fehlt, fehlt sie — es steht keine
+      nicht in einer Folie. Wo eine Zahl fehlt, fehlt sie. Es steht keine
       geschätzte an ihrer Stelle.</div>
     <div><b>Was fehlt, schaltet nicht frei</b>
       Eine Pflichtangabe lässt sich nicht umgehen, und das Verfahren
       erscheint nicht halb. Ein halb gerechneter Wert sieht aus wie ein
-      ganzer — das ist teurer als eine Lücke.</div>
+      ganzer, das ist teurer als eine Lücke.</div>
     <div><b>Die Strategie ist einstellbar, der Maßstab nicht</b>
       Gewichte und Zielrenditen gehören dem Kunden. Die Schwellen der
-      Stufen und die Rechenkerne gehören dem Produkt — sonst vergleicht
+      Stufen und die Rechenkerne gehören dem Produkt, sonst vergleicht
       niemand mehr zwei Objekte.</div>
   </div>
 

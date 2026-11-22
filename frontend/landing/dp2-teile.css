@@ -84,7 +84,7 @@
 .cond-c{padding:20px 18px;border-right:1px solid var(--cream-line);text-align:center}
 .cond-c:last-child{border-right:0}
 .cond-c .zb{font:700 9px/1 var(--mono);letter-spacing:.11em;color:var(--mut);margin-bottom:5px}
-.cond-c .bd{display:inline-block;font:700 7.5px/1 var(--mono);letter-spacing:.1em;
+.cond-c .bd{display:inline-block;font:700 8.5px/1 var(--mono);letter-spacing:.1em;
   background:rgba(201,168,76,.15);color:var(--gdi);padding:3px 7px;margin-bottom:9px}
 .cond-c .zs{font:700 25px/1 var(--disp);color:var(--ink);font-variant-numeric:tabular-nums}
 .cond-c .er{font-size:11px;color:var(--mut);margin-top:6px;line-height:1.45}
