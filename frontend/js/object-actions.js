@@ -2795,6 +2795,10 @@
     _oabiDone = (typeof onDone === 'function') ? onDone : null;
     _qcMode = !!(opts && opts.target === 'qc');  /* v418 */
     _ergaenzen = !!(opts && opts.ergaenzen) && !!(window.DpUnterlagen && window.DpUnterlagen.laden());   /* v3017 */
+    /* v3971 · Gesamtflow 22.11.2026: im Bestand (Ankauf-Stand liegt vor) ersetzte jede neue Datenaufnahme die
+       Auswertung - nach dem Einlesen der Unterlagen 2025 zeigte der Jahresabgleich 2024 „Protokoll fehlt ·
+       Wirtschaftsplan fehlt · Abrechnung fehlt“, obwohl sie eingelesen waren. Im Bestand wird ergänzt. */
+    try { if (!_ergaenzen && !(opts && opts.target === 'qc') && window.DealPilotAnkauf && DealPilotAnkauf.vorhanden && DealPilotAnkauf.vorhanden() && window.DpUnterlagen && window.DpUnterlagen.laden()) _ergaenzen = true; } catch (e) {}
     _eingang = !!(opts && opts.eingang);   /* v3120 · ein Eingang für Belege, Unterlagen, Rechnungen (unterlagen-eingang.js) */
     _auswertung = null;
     _qcPendingMerged = {};

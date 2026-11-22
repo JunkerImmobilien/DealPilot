@@ -498,7 +498,7 @@ const SCHEMATA = {
       '  "vertragsart": "unbefristet"|"staffel"|"index"|"zeitmiete"|"gewerbe"|"moebliert",',
       '  "befristet_bis": string DD.MM.JJJJ,',
       '  "kuendigungsverzicht_bis": string DD.MM.JJJJ,',
-      '  "kaltmiete_eur": number (Nettokaltmiete der Wohnung je Monat, OHNE Stellplatz und OHNE gesonderten Kuechen-/Moeblierungszuschlag),',
+      '  "kaltmiete_eur": number (Nettokaltmiete der Wohnung je Monat, OHNE Stellplatz und OHNE gesonderten Kuechen-/Moeblierungszuschlag; die HEUTE geltende Miete: enthaelt das Dokument einen Nachtrag oder eine vereinbarte Mieterhoehung, gilt der neueste Betrag, sein Datum gehoert in letzte_erhoehung),',
       '  "nebenkosten_vorauszahlung_eur": number,',
       '  "heizkosten_vorauszahlung_eur": number,',
       '  "kaution_eur": number,',
