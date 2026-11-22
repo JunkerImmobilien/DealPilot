@@ -113,6 +113,30 @@ const K = c.DpMietpotenzial, E = c.DpErhoehungen, JA = c.DpJahresabgleich, HV = 
   ok(u && u.wort === 'Haus mit Baustellen.' && /Eine Sonderumlage in 4 Jahren \(2023\)/.test(u.satz) && /Rücklage steigt/.test(u.satz) && /Hausgeld \+6,2 % seit 2023/.test(u.satz), 'W Urteil: ' + (u && u.wort + ' ' + u.satz));
   ok(HV.urteil([{ jahr: 2024, ruecklage_stand: 1 }, { jahr: 2025, ruecklage_stand: 2 }], [], 2024).wort === 'Ruhiges Haus.', 'W Urteil ruhig: keine Sonderumlage, Rücklage steigt');
   ok(HV.urteil([{ jahr: 2024, su_anteil: 500 }, { jahr: 2025, su_anteil: 700 }], [], 2024).wort === 'Unruhiges Haus.', 'W Urteil unruhig: zwei Sonderumlagen');
+  /* F1 (v3977, Gesamt-Flow 22.11.2026): KI-Zeilen um ein Jahr verschoben - Zeile 2023 mit Versammlung 18.04.2024 und
+     Quelle „Hausgeldabrechnung 2024.pdf". Die Dokumente tragen das richtige Jahr und entscheiden. */
+  {
+    const aus = { weg: { jahre: [
+      { jahr: 2023, versammlung: '18.04.2024', protokoll: true, jahresabrechnung: true, hausgeld_plan_monat_eur: 310, hausgeld_ist_jahr_eur: 3855, abrechnungsergebnis_eur: 135, ruecklage_stand_eur: 64500, beschluesse: ['Hausgeld 2024 auf 310 €'], quelle: 'WEG-Protokoll 2024.pdf, Hausgeldabrechnung 2024.pdf' },
+      { jahr: 2024, versammlung: '10.04.2025', protokoll: true, wirtschaftsplan: true, jahresabrechnung: true, hausgeld_plan_monat_eur: 330, hausgeld_ist_jahr_eur: 3977, abrechnungsergebnis_eur: 17, ruecklage_stand_eur: 52000, beschluesse: ['Hausgeld ab 2025 330 €'], quelle: 'WEG-Protokoll 2025.pdf, Wirtschaftsplan 2025.pdf, Hausgeldabrechnung 2025.pdf' },
+      { jahr: 2025, versammlung: '15.04.2026', protokoll: true, hausgeld_plan_monat_eur: 345, ruecklage_stand_eur: 48500, sonderumlagen_anteil_eur: 8160, beschluesse: ['Wirtschaftsplan 2026 beschlossen'], quelle: 'WEG-Protokoll 2026.pdf' },
+      { jahr: 2026, versammlung: '15.04.2026', protokoll: true, wirtschaftsplan: true, hausgeld_plan_monat_eur: 345, quelle: 'WEG-Protokoll 2026.pdf' }] } };
+    const dk = [
+      { typ: 'hausgeld', datei: 'Hausgeldabrechnung 2024.pdf', art: 'Jahresabrechnung', jahr: 2024 }, { typ: 'hausgeld', datei: 'Hausgeldabrechnung 2025.pdf', art: 'Jahresabrechnung', jahr: 2025 },
+      { typ: 'hausgeld', datei: 'Wirtschaftsplan 2025.pdf', art: 'Wirtschaftsplan', jahr: 2025 }, { typ: 'hausgeld', datei: 'Wirtschaftsplan 2026.pdf', art: 'Wirtschaftsplan', jahr: 2026 },
+      { typ: 'weg_protokoll', datei: 'WEG-Protokoll 2024.pdf', datum: '18.04.2024' }, { typ: 'weg_protokoll', datei: 'WEG-Protokoll 2025.pdf', datum: '10.04.2025' }];
+    const F = HV.wegJahre(aus, [], dk, { etw: true, mea_pct: '8,5' }), f = (y) => F.filter((z) => z.jahr === y)[0] || {};
+    ok(f(2024).hausgeld_plan_monat === 310 && f(2024).hausgeld_ist_jahr === 3855 && f(2024).abrechnungsergebnis === 135, 'W F1 2024 = Abrechnung 2024 (3.855 €, +135) und Plan 310 € (' + [f(2024).hausgeld_plan_monat, f(2024).hausgeld_ist_jahr, f(2024).abrechnungsergebnis].join('/') + ')');
+    ok(f(2025).hausgeld_plan_monat === 330 && f(2025).hausgeld_ist_jahr === 3977 && f(2025).abrechnungsergebnis === 17, 'W F1 2025 = Abrechnung 2025 (3.977 €, +17) und Plan 330 € (' + [f(2025).hausgeld_plan_monat, f(2025).hausgeld_ist_jahr].join('/') + ')');
+    ok(f(2023).hausgeld_plan_monat == null && f(2023).hausgeld_ist_jahr == null && f(2023).ruecklage_stand === 64500, 'W F1 2023 ohne verschobene Hausgeldwerte, Rücklage 31.12.2023 bleibt');
+    ok(f(2024).versammlung === '18.04.2024' && f(2026).hausgeld_plan_monat === 345 && f(2025).su_anteil === 8160, 'W F1 Versammlung im Jahr ihres Datums, Plan 2026 = 345 €, Sonderumlage bleibt 2025');
+    const dw = dk.map((d) => d.datei === 'Hausgeldabrechnung 2024.pdf' ? Object.assign({}, d, { werte: { kosten_jahr: 3850, ergebnis: 130 } }) : d);
+    const W2 = HV.wegJahre(aus, [], dw, { etw: true }).filter((z) => z.jahr === 2024)[0];
+    ok(W2 && W2.hausgeld_ist_jahr === 3850 && W2.abrechnungsergebnis === 130, 'W F1 Werte am Dokument gehen der KI-Zeile vor');
+    const oa = lies('frontend/js/object-actions.js');
+    ok(/function _hgWerte\(ex\)/.test(oa) && /o\.werte = _w/.test(oa), 'W F1 object-actions.js speichert die Hausgeldwerte am Dokument');
+    ok(/AUCH wenn sie in der Versammlung eines anderen Jahres/.test(lies('backend/src/services/openaiService.js')), 'W F1 Prompt: Jahr = Wirtschafts-/Abrechnungsjahr, nicht das Versammlungsjahr');
+  }
   const sp = HV.grafikSpec(J);
   ok(sp && sp.panels.length === 2 && sp.panels[0].marken.length === 1 && sp.panels[0].serien[0].werte[2024] === 233 * 12, 'W Grafik: Hausgeld (Plan × 12) und Rücklage, Sonderumlage als Marke');
 }
@@ -159,7 +183,7 @@ const K = c.DpMietpotenzial, E = c.DpErhoehungen, JA = c.DpJahresabgleich, HV = 
   ok(/o\.art = ex\.art/.test(lies('frontend/js/object-actions.js')) && /o\.jahr = ex\.jahr/.test(lies('frontend/js/object-actions.js')), 'E gespeicherte Dokumente tragen Art und Jahr');
   const idx = lies('frontend/index.html');
   for (const f of ['jahresabgleich.js', 'hausverlauf.js', 'jahresbuch.js', 'jahresbuch-grafik.js', 'jahresstaende.js', 'object-actions.js'])
-    ok(new RegExp('js/' + f.replace('.', '\\.') + '\\?v=v343\\d').test(idx), 'E Buster v343x für ' + f);
+    { const m = idx.match(new RegExp('js/' + f.replace('.', '[.]') + '[?]v=v([0-9]+)')); ok(m && +m[1] >= 3430, 'E Buster ab v3430 für ' + f + ' (' + (m ? m[1] : 'fehlt') + ')'); }
 }
 
 console.log(`jahresabgleich-pruefen (v3430): ${gruen} von ${gruen + rot} ok`);

@@ -3132,6 +3132,21 @@
    * Rueckgabe ist die ART des Schreibens, nicht true/false — der Aufrufer
    * braucht sie, um markSvwertAvm() weiterhin NUR im Textfall zu rufen.
    * null heisst: nichts geschrieben, also auch nicht zaehlen. */
+  /* v3977 · Hausgeld je Dokument: nur Einzelplan/-abrechnung der Wohnung (Gesamtwerte der Gemeinschaft passen nicht zu weg.jahre). Ist = umlagefähig + nicht
+     umlagefähig + Rücklage, wenn alle drei genannt sind (so rechnet die Abrechnung das Hausgeld), sonst kosten_jahr. */
+  function _hgWerte(ex) {
+    var t = (ex && ex.einzel) || null, n = function (v) { return typeof v === 'number' && isFinite(v) ? v : null; };
+    var w = {};
+    if (t) {
+      if (ex.einzel && n(ex.einzel.hausgeld_monat_eur) != null) w.hausgeld_monat = n(ex.einzel.hausgeld_monat_eur);
+      var u = n(t.umlagefaehig_jahr_eur), nu = n(t.nicht_umlagefaehig_jahr_eur), r = n(t.ruecklage_zufuehrung_jahr_eur);
+      var k = (u != null && nu != null && r != null) ? Math.round((u + nu + r) * 100) / 100 : n(t.kosten_jahr_eur);
+      if (k != null && k > 0) w.kosten_jahr = k;
+    }
+    if (ex && n(ex.abrechnungsergebnis_eur) != null) w.ergebnis = n(ex.abrechnungsergebnis_eur);
+    if (ex && n(ex.ruecklage_stand_eur) != null) w.ruecklage_stand = n(ex.ruecklage_stand_eur);
+    return Object.keys(w).length ? w : null;
+  }
   function _wertSchreiben(id, it) {
     /* v3660a · Modernisierung und Zustand aus dem Exposé (modernisierung-ui.js schreibt mit Herkunft) */
     if (it.kind === 'modernisierung') return (window.DpModUI && window.DpModUI.uebernehmen(it.raw, false)) ? 'text' : null;
@@ -3166,7 +3181,10 @@
       if (!_auswertung || !window.DpUnterlagen) return null;
       /* v3430 · Wirtschaftsplan/Abrechnung (Art „hausgeld") tragen sonst weder Art noch Jahr - der Jahresabgleich braucht beides (hausverlauf.js wegJahre) */
       var neueDoks = _unterlagenListe().map(function (x) { var ex = x.extracted || {}, o = { typ: x.typ, label: x.label, datei: x.dateiname, datum: x.datum };
-        if (ex.art && typeof ex.art === 'string') o.art = ex.art; if (typeof ex.jahr === 'number' && ex.jahr > 1950 && ex.jahr < 2100) o.jahr = ex.jahr; return o; });
+        if (ex.art && typeof ex.art === 'string') o.art = ex.art; if (typeof ex.jahr === 'number' && ex.jahr > 1950 && ex.jahr < 2100) o.jahr = ex.jahr;
+        /* v3977 · F1: die Zahlen des Dokuments reisen mit - der Jahresabgleich ordnet sie dem Jahr DIESES Dokuments zu (hausverlauf.js wegJahre) */
+        if (x.typ === 'hausgeld') { var _w = _hgWerte(ex); if (_w) o.werte = _w; }
+        return o; });
       /* v3017 · Nachreichen: die Liste der Unterlagen wächst, die Auswertung ist schon zusammengeführt */
       var alt = _ergaenzen ? (window.DpUnterlagen.laden() || {}) : {};
       var doks = (alt.dokumente || []).filter(function (x) { return !neueDoks.some(function (n) { return n.datei && n.datei === x.datei; }); }).concat(neueDoks);

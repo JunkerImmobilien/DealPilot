@@ -156,26 +156,58 @@
     };
     var plusQ = function (z, q) { if (z && q && z.quellen.indexOf(q) < 0) z.quellen.push(q); };
     var plusB = function (z, t) { t = String(t || '').trim(); if (z && t && !z.beschluesse.some(function (x) { return norm(x) === norm(t); })) z.beschluesse.push(t); };
+    /* v3977 · F1 Gesamt-Flow 22.11.2026: die KI ordnete Hausgeld, Abrechnung und Beschlüsse einer Versammlung dem
+       VORJAHR zu (Zeile 2023 mit Versammlung 18.04.2024 und Quelle „Hausgeldabrechnung 2024.pdf"), der Jahresabgleich
+       stand nach dem Ergänzen um ein Jahr verschoben. Die Dokumente selbst tragen das richtige Jahr - sie entscheiden:
+         · Ist/Ergebnis gehen in das Jahr der zitierten Abrechnung, der Plan in das Jahr des zitierten Wirtschaftsplans
+         · widerspricht die Zeile sich selbst (Versammlung in einem anderen Jahr als „jahr"), gehen Versammlung,
+           Beschlüsse und - ohne zitierten Wirtschaftsplan - der Plan in das Jahr der Versammlung
+         · Rücklage und Sonderumlage bleiben (sie tragen ihren Stichtag)
+         · Werte, die beim Übernehmen am Dokument selbst gespeichert wurden (d.werte), gehen allem vor
+       Ein Wert aus einer Zeile, die sich nicht widerspricht, schlägt einen verschobenen. */
+    var dokListe = (Array.isArray(doks) ? doks : []).filter(function (d) { return d && d.datei; });
+    var zitiert = function (q) {
+      var t = String(q || '').toLowerCase(); if (!t) return [];
+      return dokListe.filter(function (d) { var n = String(d.datei).toLowerCase(); return n.length > 4 && t.indexOf(n) >= 0; });
+    };
+    var einJahr = function (liste) {
+      var js = []; liste.forEach(function (j) { if (j && js.indexOf(j) < 0) js.push(j); });
+      return js.length === 1 ? js[0] : null;
+    };
+    var setze = function (z, k, v, direkt) {
+      if (!z || v == null) return;
+      z._q = z._q || {};
+      if (z[k] == null || (direkt && z._q[k] !== 'direkt' && z._q[k] !== 'dok')) { z[k] = v; z._q[k] = direkt ? 'direkt' : 'verschoben'; }
+    };
     /* 1 · weg.jahre (seit v3430) */
     (Array.isArray(w.jahre) ? w.jahre : []).forEach(function (x) {
       if (!x || typeof x !== 'object') return;
-      var z = get(x.jahr); if (!z) return;
-      var dt = datumAus(x.versammlung);
-      if (dt) { z.versammlung = dt.text; z.protokoll = true; }
-      if (x.protokoll === true) z.protokoll = true;
-      if (x.wirtschaftsplan === true) z.wirtschaftsplan = true;
-      if (x.jahresabrechnung === true) z.abrechnung = true;
-      ['hausgeld_plan_monat', 'hausgeld_ist_jahr', 'abrechnungsergebnis', 'ruecklage_stand', 'ruecklage_zufuehrung'].forEach(function (k) {
+      var J = zahl(x.jahr), z = get(J); if (!z) return;
+      var dt = datumAus(x.versammlung), V = dt ? dt.jahr : null;
+      var zit = zitiert(x.quelle);
+      var jAb = einJahr(zit.filter(function (d) { return artDok(d) === 'abrechnung'; }).map(function (d) { return zahl(d.jahr); }));
+      var jWp = einJahr(zit.filter(function (d) { return artDok(d) === 'wirtschaftsplan'; }).map(function (d) { return zahl(d.jahr); }));
+      var jV = V || J, jI = jAb || J, jP = jWp || (V && V !== J ? V : J);
+      var zV = get(jV) || z, zI = get(jI) || z, zP = get(jP) || z;
+      if (dt) { zV.versammlung = zV.versammlung || dt.text; zV.protokoll = true; }
+      if (x.protokoll === true) zV.protokoll = true;
+      if (x.wirtschaftsplan === true) zP.wirtschaftsplan = true;
+      if (x.jahresabrechnung === true) zI.abrechnung = true;
+      setze(zP, 'hausgeld_plan_monat', zahl(x.hausgeld_plan_monat_eur), zP === z);
+      setze(zI, 'hausgeld_ist_jahr', zahl(x.hausgeld_ist_jahr_eur), zI === z);
+      setze(zI, 'abrechnungsergebnis', zahl(x.abrechnungsergebnis_eur), zI === z);
+      ['ruecklage_stand', 'ruecklage_zufuehrung'].forEach(function (k) {
         var v = zahl(x[k + '_eur']); if (v != null) z[k] = v;
       });
       var sg = zahl(x.sonderumlagen_gesamt_eur), sa = zahl(x.sonderumlagen_anteil_eur);
       if (sg != null) z.su_gesamt = sg; if (sa != null) z.su_anteil = sa;
-      if (z.hausgeld_plan_monat != null) z.wirtschaftsplan = true;
-      if (z.hausgeld_ist_jahr != null || z.abrechnungsergebnis != null) z.abrechnung = true;
-      (Array.isArray(x.beschluesse) ? x.beschluesse : []).forEach(function (b) { plusB(z, b); });
-      if (z.beschluesse.length) z._bJ = true;
-      if (x.verwalter && String(x.verwalter).trim()) z.verwalter = String(x.verwalter).trim();
-      plusQ(z, x.quelle);
+      if (zP.hausgeld_plan_monat != null) zP.wirtschaftsplan = true;
+      if (zI.hausgeld_ist_jahr != null || zI.abrechnungsergebnis != null) zI.abrechnung = true;
+      (Array.isArray(x.beschluesse) ? x.beschluesse : []).forEach(function (b) { plusB(zV, b); });
+      if (zV.beschluesse.length) zV._bJ = true;
+      if (x.verwalter && String(x.verwalter).trim()) { var vw = String(x.verwalter).trim(); z.verwalter = z.verwalter || vw; zV.verwalter = zV.verwalter || vw; }
+      plusQ(z, x.quelle); if (zV !== z) plusQ(zV, x.quelle);
+      if (zI !== z && zI !== zV) plusQ(zI, x.quelle); if (zP !== z && zP !== zV && zP !== zI) plusQ(zP, x.quelle);
     });
     /* 2 · die Dokumente selbst */
     (Array.isArray(doks) ? doks : []).forEach(function (d) {
@@ -187,6 +219,16 @@
       if (art === 'protokoll') { z.protokoll = true; if (dt && !z.versammlung) z.versammlung = dt.text; }
       if (art === 'wirtschaftsplan') z.wirtschaftsplan = true;
       if (art === 'abrechnung') z.abrechnung = true;
+      /* v3977 · Werte am Dokument (object-actions.js „merken") gehen vor - sie stammen aus genau diesem Dokument */
+      var wv = d.werte && typeof d.werte === 'object' ? d.werte : null;
+      if (wv) {
+        z._q = z._q || {};
+        var hg = zahl(wv.hausgeld_monat), ist = zahl(wv.kosten_jahr), erg = zahl(wv.ergebnis), rl = zahl(wv.ruecklage_stand);
+        if (art === 'wirtschaftsplan' && hg != null) { z.hausgeld_plan_monat = hg; z._q.hausgeld_plan_monat = 'dok'; }
+        if (art === 'abrechnung' && ist != null) { z.hausgeld_ist_jahr = ist; z._q.hausgeld_ist_jahr = 'dok'; }
+        if (art === 'abrechnung' && erg != null) { z.abrechnungsergebnis = erg; z._q.abrechnungsergebnis = 'dok'; }
+        if (rl != null && z.ruecklage_stand == null) z.ruecklage_stand = rl;
+      }
       plusQ(z, (d.label || '') + (d.datum ? ' ' + d.datum : (d.jahr ? ' ' + d.jahr : '')));
     });
     /* 3 · Chronik: Beschlüsse, Verwalter, Sonderumlagen der Gemeinschaft */
@@ -214,7 +256,7 @@
       if (z.su_anteil == null && z.su_gesamt != null && !opt.etw) z.su_anteil = z.su_gesamt;
       if (z.su_anteil == null && z.su_gesamt != null && opt.etw && mea > 0) z.su_anteil = Math.round(z.su_gesamt * mea / 100);
       z.erledigt = !!(z.protokoll && (z.abrechnung || z.wirtschaftsplan));
-      delete z._bJ;
+      delete z._bJ; delete z._q;
     });
     return aus;
   }
@@ -454,6 +496,6 @@
     if (card) Array.prototype.forEach.call(card.querySelectorAll('[data-dp-hv-e="' + art + '"]'), function (e) { e.style.display = an ? '' : 'none'; });
   });
 
-  g.DpHausverlauf = { VERSION: 'v3432', ereignisse: ereignisse, wegJahre: wegJahre, urteil: urteil, artDok: artDok, html: html, kurz: kurz, lesen: lesen, jahrDaten: jahrDaten, grafikSpec: grafikSpec, mountGrafik: mountGrafik, ARTEN: ARTEN };
+  g.DpHausverlauf = { VERSION: 'v3977', ereignisse: ereignisse, wegJahre: wegJahre, urteil: urteil, artDok: artDok, html: html, kurz: kurz, lesen: lesen, jahrDaten: jahrDaten, grafikSpec: grafikSpec, mountGrafik: mountGrafik, ARTEN: ARTEN };
   if (typeof module !== 'undefined' && module.exports) module.exports = g.DpHausverlauf;
 })(typeof window !== 'undefined' ? window : globalThis);
