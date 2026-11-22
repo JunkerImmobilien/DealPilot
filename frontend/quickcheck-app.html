@@ -7784,6 +7784,16 @@ document.addEventListener('DOMContentLoaded', () => QcApp.init());
         return null;
       }
       function de2(x){ return (Math.round(x*100)/100).toFixed(2).replace(".", ","); }
+      /* qc-v3978 · F2: Objektart lesen, Haus = kein Wohnungseigentum (kein Hausgeld) */
+      function qcArt(){ return String(((document.getElementById("qc_objektart") || {}).value) || "").trim().toUpperCase(); }
+      function istHaus(a){ return /^(MFH|EFH|ZFH|DHH|RH)$/.test(a); }
+      function hgBeschriften(haus){
+        try {
+          var lb = document.querySelector('label[for="qc_hg"]'), fld = hgEl.closest ? hgEl.closest(".field") : null, hn = fld ? fld.querySelector(".hint") : null;
+          if (lb) lb.textContent = haus ? "Bewirtschaftung / Monat (€)" : "Hausgeld / Monat (€)";
+          if (hn) hn.textContent = haus ? "Betriebskosten + Verwaltung + Instandhaltung, kein Hausgeld (keine WEG)" : "Inkl. Heizung + Rücklagen — wie im Exposé oder Wirtschaftsplan";
+        } catch(e){}
+      }
       function bandText(est){
         try {
           var H = window.parent && window.parent.Hausgeld, rw = est.baujahrBereich;
@@ -7803,8 +7813,26 @@ document.addEventListener('DOMContentLoaded', () => QcApp.init());
         var est = (typeof IP.getHausgeldEstimate === "function")
           ? IP.getHausgeldEstimate(kp, { wohnflaeche: wfl, baujahr: bj, energieklasse: ek })
           : (typeof IP.getHausgeldMonthly === "function" ? { monatlich: IP.getHausgeldMonthly(kp), grundlageText: "" } : null);
+        /* qc-v3978 · F2 Gesamt-Flow 22.11.2026: beim MFH setzte der Quick-Check pauschal 5 €/m² „Hausgeld" (420 m² →
+           2.100 €/Monat), ohne Hinweis. Ein Haus ohne Eigentümergemeinschaft hat kein Hausgeld. Es gilt dieselbe Logik
+           wie im Objekt (bwk-profil.js vorschlag): Betriebskosten je m² (umlagefähig) + Verwaltung je Wohnung und
+           Instandhaltung je m² nach ImmoWertV Anlage 3 (nicht umlagefähig). Der Anteil nicht umlagefähig kommt aus
+           nulAnteil() mit denselben Zahlen. */
+        var wflN = num(wfl), artQ = qcArt(), haus = istHaus(artQ);
+        hgBeschriften(haus);
+        if (haus) {
+          var BPh = window.parent && window.parent.DealPilotBwkProfil, einhEl = document.getElementById("qc_einheiten");
+          var vs = (BPh && BPh.vorschlag && wflN > 0) ? BPh.vorschlag({ objart: artQ, wfl: wflN, einheiten: einhEl ? num(einhEl.value) : 0 }) : null;
+          est = null;
+          if (vs) {
+            var mon = Math.round((vs.hg_ul + vs.hg_nul + vs.eigen_r) / 12);
+            est = { monatlich: mon, grundlageText: "x",
+              herkunft: "Kein Hausgeld: " + (artQ === "MFH" ? "ein Mehrfamilienhaus" : "ein Haus") + " ohne Eigentümergemeinschaft hat keinen Wirtschaftsplan. Geschätzte Bewirtschaftung "
+                + mon.toLocaleString("de-DE") + " €/Monat: " + vs.text + ". Die Betriebskosten gehen über die Nebenkosten auf die Mieter, Verwaltung und Instandhaltung trägst du. Echte Zahlen aus der Betriebskostenabrechnung gehen vor." };
+          }
+        }
         /* qc-v2546a: eigener Standard aus den Einstellungen schlaegt die Baujahr-Tabelle */
-        var eig = eigenerHgQm(), wflN = num(wfl);
+        var eig = haus ? null : eigenerHgQm();
         if (eig != null && wflN > 0) {
           est = { monatlich: Math.round(wflN * eig), grundlageText: "x",
             herkunft: "Geschätzt aus deinem Standard: " + wflN + " m² × " + de2(eig) + " €/m² = " + Math.round(wflN * eig)
@@ -7819,7 +7847,7 @@ document.addEventListener('DOMContentLoaded', () => QcApp.init());
         renderHint(est);
       }
       if (!hgEl._hgUserBound){ hgEl._hgUserBound = 1; hgEl.addEventListener("input", function(){ if (hgEl.dataset.autoHg === "1") { hgEl.dataset.autoHg = ""; } else { hgEl.dataset.userSet = "1"; renderHint(null); } }); }
-      [kpEl, wflEl, bjEl, ekEl].forEach(function(el){ if (el && !el._hgBound){ el._hgBound = 1; el.addEventListener("input", recalc); el.addEventListener("change", recalc); } });
+      [kpEl, wflEl, bjEl, ekEl, document.getElementById("qc_objektart"), document.getElementById("qc_einheiten")].forEach(function(el){ if (el && !el._hgBound){ el._hgBound = 1; el.addEventListener("input", recalc); el.addEventListener("change", recalc); } });
       recalc();
     } catch(e){}
   }
