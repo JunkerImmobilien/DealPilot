@@ -2894,7 +2894,9 @@
        v3016k · VOR den Leitbegriffen: gemessen 28.10. las der Import das Exposé Lindenallee als
        Energieausweis, weil es „Protokolle der Eigentümerversammlungen“ als Unterlage nennt. */
     var expo = ['kaufpreis', 'provision', 'courtage', 'exposé', 'expose'].filter(function (w) { return t.toLowerCase().indexOf(w) >= 0; }).length;
-    if (expo >= 2 && !DOK_NAME.test(String(name || ''))) return false;
+    /* v3970 · Gesamtflow 22.11.2026: „01 Expose Musterweg 7.pdf“ lief als Dokument (Kaufvertrag), weil DOK_NAME
+       „weg“ in „Musterweg“ fand. Steht „Exposé“ im Dateinamen, gewinnt das Exposé. */
+    if (expo >= 2 && (!DOK_NAME.test(String(name || '')) || /expos[eé]/i.test(String(name || '')))) return false;
     if (DOK_LEIT.some(function (w) { return t.indexOf(w) >= 0; })) return true;
     var kopf = t.slice(0, 800);
     return DOK_KOPF.some(function (w) { return kopf.indexOf(w) >= 0; }) || DOK_NAME.test(String(name || ''));
