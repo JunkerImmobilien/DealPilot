@@ -2539,7 +2539,7 @@
         }).join('') + '<div class="oabi-addr-hinweis" style="font-size:12px;margin-top:4px;opacity:.8">Übernommen werden nur Werte aus dem Dokument der gewählten Adresse.</div></div>';
     }
     /* v3029-import · eine Zeile ohne Zielfeld wird nicht angeboten (sie konnte nie ankommen) */
-    var _SONDER = { steuer: 1, anhaengen: 1, merken: 1, einheiten: 1, mv_einheit: 1 };   /* v3120 */
+    var _SONDER = { steuer: 1, anhaengen: 1, merken: 1, einheiten: 1, mv_einheit: 1, sonderumlage: 1 };   /* v3120 · v3972: sonderumlage fehlte - die Zeilen „Sonderumlage · …“ (Schlüssel su:Jahr:Betrag, kein Formularfeld) fielen still weg (Gesamtflow 22.11.2026, Protokoll mit beschlossener Dach-Sonderumlage) */
     var keys = Object.keys(_merged).filter(function (id) {
       var it = _merged[id]; if (!it || _SONDER[it.kind] || id === 'me_modus' || id === 'mfh_wohnungen' || (_qcMode && OBJ2QC[id])) return true;
       return !!document.getElementById(id);
@@ -2933,6 +2933,14 @@
       f.type = 'dokument'; await ensureExtract(f);
       if (f.cache.dokument && f.cache.dokument.success) return;
       if (f.limit) return;   /* v3349d · beim Stundenlimit nicht noch zwei weitere Abrufe versuchen */
+      /* v3972 · Gesamtflow 22.11.2026: schlug die Auslese eines klar erkannten Dokuments fehl (Abbruch, Zeitüberschreitung),
+         lief es weiter als Marktbericht bzw. Exposé - „Wirtschaftsplan 2026.pdf“ brachte erfundene Lage-Werte (Makro-/Mikrolage,
+         Wertsteigerung), vorgehakt. Nur die Antwort „Art unklar“ nimmt noch den alten Weg. */
+      if (f.status === 'gesperrt') return;   /* persönliche Unterlagen: erkannt, bewusst nicht ausgelesen */
+      if (!(f.cache.dokument && f.cache.dokument.unklar)) {
+        delete f.cache.dokument; f.status = 'err'; f.fehler = f.fehler || 'nicht gelesen, bitte die Art wählen oder erneut einlesen';
+        renderFileRow(f); return;
+      }
       delete f.cache.dokument;        /* unklar → der alte Weg */
     }
     var cls = classifyType({ name: f.name }, String(f.text || '').slice(0, 12000));   /* Einordnung wie bisher auf dem Anfang */
