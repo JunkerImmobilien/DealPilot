@@ -160,7 +160,7 @@
       var n = Object.keys(st.felder || {}).length;
       text = 'Mit ViVi verknüpft. ' + standText(st.letzter_abruf) + '. ' + (n ? n + ' Felder kommen aus ViVi und sind ausgegraut.' : 'Noch keine Werte gelesen.') + (st.letzter_fehler ? ' Letzter Abruf: ' + st.letzter_fehler : '');
       if (st.info && st.info.restschuld_heute && st.info.restschuld_heute.wert != null) text += ' Restschuld laut ViVi ' + Math.round(st.info.restschuld_heute.wert).toLocaleString('de-DE') + ' €' +
-        (st.info.restschuld_heute.sondertilgung ? ', darin ' + Math.round(st.info.restschuld_heute.sondertilgung).toLocaleString('de-DE') + ' € Sondertilgung' : '') + '.';
+        (st.info.restschuld_heute.sondertilgung ? ' nach ' + Math.round(st.info.restschuld_heute.sondertilgung).toLocaleString('de-DE') + ' € Sondertilgung' : '') + '.';
       knoepfe = '<button type="button" class="btn btn-sm btn-ghost" data-vivi="abgleichen">Jetzt abgleichen</button><button type="button" class="btn btn-sm btn-ghost" data-vivi="loesen">Verknüpfung lösen</button>';
     } else if (st.status === 'abgebrochen' || st.status === 'laeuft') {
       text = st.status === 'laeuft' ? 'Die Übertragung nach ViVi läuft.' : 'Die Übertragung nach ViVi ist unterbrochen. Ein neuer Versuch setzt an der letzten Stelle fort, es entsteht nichts doppelt.';
