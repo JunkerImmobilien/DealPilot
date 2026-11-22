@@ -144,7 +144,7 @@
    *  d: Darlehenssumme, dz_pct: Zins in %, dt_pct: Tilgung in %, months: aktive Monate
    *  Returns: {zins, tilg, restschuld}
    */
-  function computeY1Annuitaet(d, dz_pct, dt_pct, months) {
+  function computeY1Annuitaet(d, dz_pct, dt_pct, months, tfMon) {   /* v3980 · tfMon: tilgungsfreie Monate ab Auszahlung */
     if (!d || d <= 0 || !months || months <= 0) {
       return { zins: 0, tilg: 0, restschuld: d || 0 };
     }
@@ -156,7 +156,7 @@
     var n = Math.min(months, 12);
     for (var k = 0; k < n; k++) {
       var zm = rs * z_decimal / 12;
-      var tm = rate_m - zm;
+      var tm = (tfMon > 0 && k < tfMon) ? 0 : rate_m - zm;
       if (tm > rs) tm = rs;
       sumZ += zm;
       sumT += tm;

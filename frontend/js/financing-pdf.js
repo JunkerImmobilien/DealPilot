@@ -230,7 +230,11 @@
         /\b(Raiffeisenbank [A-ZÄÖÜ][^\n,;\.]{1,40})/,
         /\b(KfW(?:bank(?:engruppe)?)?)\b/,
         /\b(Deutsche Bank|Commerzbank|HypoVereinsbank|ING(?:-DiBa)?|DKB|Postbank|N26|Targobank)\b/,
-        /(?:Bank|Kreditinstitut|Darlehensgeber|Gl[äa]ubigerin?)\s*[:\s]+([A-ZÄÖÜ][^\n,;]{2,60})/i
+        /* v3980 · F7 Gesamt-Flow 22.11.2026: „Musterbank eG · Darlehensvertrag …" ergab „eG · Darlehensvertrag MB-…" -
+           das /i der Zeile darunter traf das „bank" IN „Musterbank". Jetzt zuerst der Name mit Rechtsform, die
+           Schlüsselwörter nur als eigenes Wort. */
+        /\b([A-ZÄÖÜ][A-Za-zÄÖÜäöüß\-]*(?:bank|kasse|Bank|Kasse)\s+(?:eG|AG|SE|e\.\s?G\.))(?=[\s,;·]|$)/,
+        /\b(?:Bank|Kreditinstitut|Darlehensgeber|Gl[äa]ubigerin?)\b\s*[:\s]+([A-ZÄÖÜ][^\n,;·]{2,60})/i
       ]);
       if (iMatch) {
         var instKey = (target === 'd1') ? 'bank_inst' : 'd2_inst';
@@ -251,12 +255,20 @@
         var aMatch = _findFirst(text, [
           /Auszahlung\s*(?:zum|am)?\s*[:\s]+(\d{2}\.\d{2}\.\d{4})/i,
           /Valuta\s*[:\s]+(\d{2}\.\d{2}\.\d{4})/i,
-          /ausgezahlt\s+(?:am|zum)\s+(\d{2}\.\d{2}\.\d{4})/i
+          /ausgezahlt\s+(?:am|zum)\s+(\d{2}\.\d{2}\.\d{4})/i,
+          /Auszahlung\b[^\n\d]{0,24}?(\d{2}\.\d{2}\.\d{4})/i   /* v3980 · F7: „Auszahlung voll am 29.12.2023" */
         ]);
         if (aMatch) {
           var parts = aMatch[1].split('.');
           result.fields[target + '_auszahl'] = parts[1] + '.' + parts[2];
         }
+      }
+
+      /* v3980 · F6/F7: tilgungsfreie Anlaufzeit („Tilgungsfreie Anlaufzeit 3 Monate", „tilgungsfrei für 1 Jahr") - nur Darlehen I hat das Feld */
+      if (target === 'd1') {
+        var tfMatch = text.match(/tilgungsfrei\w*(?:\s+Anlauf\w*|\s+Zeit|\s+Phase)?[^\d\n]{0,24}?(\d{1,3})\s*(Monat|Jahr)/i);
+        if (tfMatch) { var tfN = parseInt(tfMatch[1], 10) * (/jahr/i.test(tfMatch[2]) ? 12 : 1); if (tfN > 0 && tfN <= 120) result.fields.d1_tf_mon = tfN; }
+        else if (/tilgungsfreie\s+Anlaufzeit\W{0,4}keine/i.test(text)) result.fields.d1_tf_mon = 0;
       }
 
       // Ableitung Bindungs-Jahre wenn nur Enddatum + Auszahlung
@@ -334,7 +346,7 @@
     var fieldLabels = {
       d1: 'Darlehenssumme (€)', d1z: 'Zinssatz nominal (%)', d1t: 'Tilgung (%)',
       d1_bindj: 'Zinsbindung (Jahre)', d1_auszahl: 'Auszahlung (MM.YYYY)',
-      d1_type: 'Darlehenstyp', bank_inst: 'Bank', d1_vertrag: 'Vertragsnummer',
+      d1_type: 'Darlehenstyp', bank_inst: 'Bank', d1_vertrag: 'Vertragsnummer', d1_tf_mon: 'Tilgungsfrei (Monate)',   /* v3980 */
       d2: 'Darlehenssumme (€)', d2z: 'Zinssatz nominal (%)', d2t: 'Tilgung (%)',
       d2_bindj: 'Zinsbindung (Jahre)', d2_inst: 'Bank', d2_type: 'Darlehenstyp',
       d2_vertrag: 'Vertragsnummer', d2_auszahl: 'Auszahlung (MM.YYYY)',   /* v3261 */

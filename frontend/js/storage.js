@@ -197,7 +197,7 @@ var FIELDS = [
   /* v727-ausst: Ausstattungsdetails fuer AVM-Bewertung (Sprengnetter-Enums als Wert) */
   'eq_heating','eq_windows','eq_floor','eq_bath','eq_guest_wc','eq_store_room','eq_walls','eq_roof','eq_elevator',
   /* mand-fields v803: Mandanten/Halter + Überführung */
-  'paket_id','paket_name','paket_nr','paket_anzahl','paket_kp_gesamt','paket_share_deal','paket_beteiligung' /* v3202, v3204 */,'eig_struktur','eig_erwerb','eig_anteil_ich','eig_anteil_ehegatte','eig_anteil_dritte','eig_erwerb_datum','d1_verwendung','d2_verwendung' /* v3197 */,'halter','halter_seit','obj_herkunft','verkehrswert_ueberf','ueberf_preis','gesellschafterdarlehen',
+  'paket_id','paket_name','paket_nr','paket_anzahl','paket_kp_gesamt','paket_share_deal','paket_beteiligung' /* v3202, v3204 */,'eig_struktur','eig_erwerb','eig_anteil_ich','eig_anteil_ehegatte','eig_anteil_dritte','eig_erwerb_datum','d1_verwendung','d2_verwendung' /* v3197 */,'d1_tf_mon' /* v3980 */,'halter','halter_seit','obj_herkunft','verkehrswert_ueberf','ueberf_preis','gesellschafterdarlehen',
   /* v813-3d: uebernommene Restschuld bei Ueberfuehrung */
   'ueberf_restschuld','ueberf_rest_zins',
   /* v816: Privat-Cut Enddatum + Wizard-Verknuepfung */
@@ -563,6 +563,7 @@ function collectData() {
     /* v3161 · Protokoll Portfolio-Strategie 03.11.2026 (P3): Restschuld am Ende der Zinsbindung, Anschlussrate,
        Bindungsende und Bauspar-Luecke - aus derselben Rechnung wie der Reiter Finanzierung (calc.js). */
     if (isFinite(State.rs)) d._kpis_rs_bindung = Math.round(State.rs);
+    if (isFinite(State.rs1)) d._kpis_rs1_bindung = Math.round(State.rs1);   /* v3980 · nur Darlehen I (Bankexport, F20) */
     if (isFinite(State.anschlRate)) d._kpis_anschl_rate = Math.round(State.anschlRate * 100) / 100;
     if (State.bindungsEnde) d._kpis_bindung_ende = State.bindungsEnde;
     /* v3198 · AfA-Grundlage (Gebaeude) aus calc.js - daraus rechnet der Export den Buchwert */
@@ -4368,14 +4369,14 @@ async function exportTrackRecordAll() {
 // 25 columns matching AuswertungBank-worksheet
 // ═══════════════════════════════════════════════════
 /* v899-bankexport: monatsgenaue Restschuld HEUTE fuer Annuitaetendarlehen (jeden Monat Zins/Tilgung) */
-function _restschuldMonatsgenau(darl, zinsDec, tilgDec, monate) {
+function _restschuldMonatsgenau(darl, zinsDec, tilgDec, monate, tfMon) {
   if (!(darl > 0) || !(monate > 0)) return darl || 0;
   var zm = zinsDec / 12;
   var ann_m = darl * (zinsDec + tilgDec) / 12;
   var rest = darl;
   for (var i = 0; i < monate; i++) {
     var zins_i = rest * zm;
-    var tilg_i = ann_m - zins_i;
+    var tilg_i = (tfMon > 0 && i < tfMon) ? 0 : ann_m - zins_i;   /* v3980 · tilgungsfreie Monate */
     rest -= tilg_i;
     if (rest <= 0) return 0;
   }
@@ -4414,7 +4415,11 @@ function _buildBankExportRows(objects) {
       var rate_m = (d1 * (d1z + d1t) / 100) / 12;
       var rate_y = rate_m * 12;
       // Rough Restschuld estimate (proper calc via tilgungsplan)
-      var restAfterBind = _estimateRestschuld(d1, d1z / 100, d1t / 100, bindj);
+      /* v3980 · F20/F6: die Restschuld am Ende der Bindung aus derselben Rechnung wie der Reiter Finanzierung
+         (calc.js State.rs1, beim Speichern _kpis_rs1_bindung). Bis hier eine Jahresformel: 133.422 statt 132.541 €. */
+      var _d1Tf = parseInt(d.d1_tf_mon, 10) || 0;
+      var restAfterBind = (typeof d._kpis_rs1_bindung === 'number' && isFinite(d._kpis_rs1_bindung)) ? d._kpis_rs1_bindung
+        : _restschuldMonatsgenau(d1, d1z / 100, d1t / 100, bindj * 12, _d1Tf);
       var bindEnd = d.kaufdat ? new Date(d.kaufdat) : new Date();
       bindEnd.setFullYear(bindEnd.getFullYear() + bindj);
       var volltilg = _estimateVolltilgung(d1, d1z / 100, d1t / 100, d.kaufdat ? new Date(d.kaufdat) : new Date());
@@ -4431,7 +4436,7 @@ function _buildBankExportRows(objects) {
         tilgung: d1t / 100,
         kapitaldienst: rate_m,
         zinsbindung: bindj,
-        akt_restschuld: _restschuldMonatsgenau(d1, d1z / 100, d1t / 100, commonFields.monate), /*v899-bankexport*/
+        akt_restschuld: _restschuldMonatsgenau(d1, d1z / 100, d1t / 100, commonFields.monate, _d1Tf), /*v899-bankexport · v3980 tilgungsfrei*/
         laufzeit: bindEnd.toLocaleDateString('de-DE'),
         restschuld_ende: restAfterBind,
         volltilgung: volltilg

@@ -157,5 +157,47 @@ function funk(src, name) {
   ok(/Abweichung .*Exposé 2.890 €, Mieterliste 2.660 €/.test(ctx4._importHinweise.join(' ')), 'F4 Abweichungsmeldung Miete (' + ctx4._importHinweise.join(' | ').slice(0, 140) + ')');
 }
 
-console.log(`gesamtflow-pruefen (v3979): ${gruen} von ${gruen + rot} ok`);
+/* ── F6 · tilgungsfreie Anlaufzeit im Annuitätendarlehen ────────── */
+{
+  const cj = lies('frontend/js/calc.js');
+  const code = ['_jahrMonatlich', '_zbVor', '_zbIn', '_d1Bindung'].map((n) => funk(cj, n) || '').join('\n');
+  function restEndeBindung(D, z, t, bindj, tf, m1) {
+    const ctx = { Math, d1z: z, d1_rate_m: D * (z + t) / 12, d1_tf: tf, _zbM1: m1, _zbMon: bindj * 12 };
+    vm.createContext(ctx);
+    try { vm.runInContext(code + '\n;var __r = ' + D + '; for (var __y = 1; _zbVor(__y) < _zbMon && __y < 400; __y++) __r = _d1Bindung(__r, __y).rs;', ctx); } catch (e) { return NaN; }
+    return ctx.__r;
+  }
+  const a = restEndeBindung(175200, 0.0385, 0.02, 10, 3, 1);   /* Musterweg 7, Auszahlung 12/2023 */
+  ok(Math.abs(a - 133819.78) < 1, 'F6 ETW-A Restschuld Ende Bindung mit 3 Monaten tilgungsfrei 133.819,78 € laut Vertrag (Ist ' + (a || 0).toFixed(2) + ')');
+  const b = restEndeBindung(512000, 0.0395, 0.02, 10, 6, 1);   /* Musterallee 12 */
+  ok(Math.abs(b - 394185.46) < 2, 'F6 MFH-A Restschuld mit 6 Monaten tilgungsfrei ≈ 394.185 € (Ist ' + (b || 0).toFixed(2) + ')');
+  const c = restEndeBindung(175200, 0.0385, 0.02, 10, 0, 1);
+  ok(Math.abs(c - 132541.40) < 1, 'F6 ohne tilgungsfreie Zeit unverändert 132.541,40 € (Ist ' + (c || 0).toFixed(2) + ')');
+  /* Jahr 1 anteilig (anteilig.js) mit tilgungsfreien Monaten */
+  const actx = { Math, console, Date, window: {}, document: { getElementById: () => null, addEventListener() {} }, setTimeout: () => 0 };
+  actx.window = actx; vm.createContext(actx);
+  try { vm.runInContext(lies('frontend/js/anteilig.js'), actx); } catch (e) {}
+  const A = actx.DealPilotAnteilig;
+  const y1 = A && A.computeY1Annuitaet(175200, 3.85, 2, 1, 3);
+  ok(y1 && Math.abs(y1.tilg) < 0.01 && Math.abs(y1.zins - 562.10) < 0.01, 'F6 anteiliges Jahr 1 (1 Monat, tilgungsfrei): nur Zins 562,10 € (Ist ' + (y1 ? y1.zins.toFixed(2) + ' / ' + y1.tilg.toFixed(2) : '-') + ')');
+  ok(/id="d1_tf_mon"/.test(lies('frontend/index.html')) && /'d1_tf_mon'/.test(lies('frontend/js/storage.js')), 'F6 Feld d1_tf_mon im Reiter Finanzierung und in FIELDS (wird gespeichert)');
+}
+
+/* ── F7 · Darlehensvertrag einlesen (financing-pdf.js, echter Parser) ── */
+{
+  const ctx = { console, Math, JSON, Number, String, isFinite, parseFloat, parseInt, Object, Array, Date, RegExp, setTimeout: () => 0,
+    document: { getElementById: () => null, addEventListener() {}, createElement: () => ({ style: {} }), body: { appendChild() {} }, head: { appendChild() {} } }, addEventListener() {} };
+  ctx.window = ctx; vm.createContext(ctx);
+  try { vm.runInContext(lies('frontend/js/financing-pdf.js'), ctx); } catch (e) { ok(false, 'F7 financing-pdf.js lädt: ' + e.message); }
+  const P = ctx.dpFinPdfLesen;
+  const text = 'Musterbank eG · Darlehensvertrag MB-2024-0815\nDarlehensvertrag (Annuitätendarlehen)\nDarlehensart Annuitätendarlehen\nNettodarlehensbetrag 175.200,00 €\n'
+    + 'Auszahlungskurs 100 % (kein Disagio)\nAuszahlung voll am 29.12.2023\nSollzins gebunden 3,85 % p. a.\nTilgungsfreie Anlaufzeit 3 Monate (nur Zinsen, 562,10 € im Monat)\n'
+    + 'Monatsrate 854,10 € ab dem 4. Monat\nSondertilgung jährlich bis 5 % des Nettodarlehensbetrags (8.760,00 €) ohne Vorfälligkeitsentschädigung\n';
+  const r = P ? P(text, 'd1') : { fields: {} }, f = r.fields || {};
+  ok(f.bank_inst === 'Musterbank eG', 'F7 Bank „Musterbank eG" statt „eG · Darlehensvertrag …" (Ist ' + f.bank_inst + ')');
+  ok(f.d1_auszahl === '12.2023', 'F7 Auszahlung „voll am 29.12.2023" → 12.2023 (Ist ' + f.d1_auszahl + ')');
+  ok(f.d1_tf_mon === 3, 'F7 tilgungsfreie Anlaufzeit 3 Monate gelesen (Ist ' + f.d1_tf_mon + ')');
+}
+
+console.log(`gesamtflow-pruefen (v3980): ${gruen} von ${gruen + rot} ok`);
 process.exit(rot ? 1 : 0);

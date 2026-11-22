@@ -1788,6 +1788,11 @@ function _calcImmediate(){
   var d1t = _d1IsAussetzung ? 0 : (v('d1t') / 100);
   var d1_rate_m=(d1*(d1z+d1t))/12;
   var d1_zm=d1*d1z/12,d1_tm=d1_rate_m-d1_zm;
+  /* v3980 · F6 Gesamt-Flow 22.11.2026: tilgungsfreie Anlaufzeit (Monate ab Auszahlung, nur Zinsen). Bis hier
+     kannte das Annuitätendarlehen sie nicht: Restschuld Ende Bindung 132.541 statt 133.819,78 € laut Vertrag
+     (Musterweg 7: 175.200 €, 3,85 %, 2 %, 3 Monate tilgungsfrei). Die Rate danach bleibt die Annuität. */
+  var d1_tf = _d1IsAussetzung ? 0 : Math.max(0, Math.min(120, Math.round(v('d1_tf_mon') || 0)));
+  State.d1_tf = d1_tf;
   // V63.49: Bauspar-Sparrate (nur relevant bei Aussetzung)
   var bsparRate_m = _d1IsAussetzung ? v('bspar_rate') : 0;
   State.bsparRate_m = bsparRate_m;
@@ -1979,16 +1984,16 @@ function _calcImmediate(){
      (monatlich, wie der Tilgungsplan der Bank), 1.482 € Zinsen zu viel.
      Jetzt rechnen Bindung, Anschluss und Darlehen 2 ueber diese Funktion.
      zinsJ = Jahreszins (Dezimal), rateM = Monatsrate (Zins + Tilgung). */
-  function _jahrMonatlich(r, zinsJ, rateM, monate) {
-    var n = (monate == null) ? 12 : monate, zy = 0, ty = 0;
+  function _jahrMonatlich(r, zinsJ, rateM, monate, tfMon) {
+    var n = (monate == null) ? 12 : monate, zy = 0, ty = 0, tf = tfMon > 0 ? tfMon : 0;   /* v3980 · tf: erste Monate nur Zinsen */
     for (var _k = 0; _k < n; _k++) {
-      var _zm = r * zinsJ / 12, _tm = Math.min(r, Math.max(0, rateM - _zm));
+      var _zm = r * zinsJ / 12, _tm = _k < tf ? 0 : Math.min(r, Math.max(0, rateM - _zm));
       zy += _zm; ty += _tm; r = Math.max(0, r - _tm);
     }
     return { zy: zy, ty: ty, rs: r };
   }
   for(var y=0;y<bindj;y++){
-    rs=_jahrMonatlich(rs, d1z, d1_rate_m).rs;   /* v3029-rechnen */
+    rs=_jahrMonatlich(rs, d1z, d1_rate_m, 12, d1_tf - y * 12).rs;   /* v3029-rechnen · v3980 tilgungsfrei */
     // Tilgung d2 nur wenn Annuität (nicht bei Tilgungsaussetzung)
     if(d2_enabled && d2_type !== 'tilgungsaussetzung'){
       rs2=_jahrMonatlich(rs2, d2z, d2_rate_m).rs;   /* v3029-rechnen */
@@ -2026,7 +2031,7 @@ function _calcImmediate(){
     var vor = _zbVor(y), mon = _zbIn(y);
     var kB = Math.max(0, Math.min(mon, _zbMon - vor));
     /* v3029-rechnen: auch volle Jahre Monat fuer Monat (bis v3028 ein Jahresschritt) */
-    var _jm = _jahrMonatlich(rsIn, d1z, d1_rate_m, kB);
+    var _jm = _jahrMonatlich(rsIn, d1z, d1_rate_m, kB, d1_tf - vor);   /* v3980 · tilgungsfreie Monate ab Auszahlung */
     return { zy: _jm.zy, ty: _jm.ty, rs: _jm.rs, kB: kB, mon: mon, vor: vor };
   }
   if (_zbStd) {
@@ -2767,6 +2772,8 @@ function _calcImmediate(){
       if (y <= bindj) {
         zy = rs_loop * d1z;
         ty = Math.min(rs_loop, d1_rate_m * 12 - zy);
+        var _tfY = Math.max(0, Math.min(12, d1_tf - (y - 1) * 12));   /* v3980 · tilgungsfreie Monate im Jahr */
+        if (_tfY > 0) ty = Math.max(0, ty * (12 - _tfY) / 12);
       } else if (rs_loop > 0) {
         zy = rs_loop * az_eff_v;
         ty = Math.min(rs_loop, Math.max(0, rate_anschl_v - zy));
@@ -3781,6 +3788,8 @@ function _calcImmediate(){
       } else if (y <= bindj) {
         zy2 = rs3 * d1z;
         ty2 = d1_rate_m * 12 - zy2;
+        var _tfY2 = Math.max(0, Math.min(12, d1_tf - (y - 1) * 12));   /* v3980 */
+        if (_tfY2 > 0) ty2 = Math.max(0, ty2 * (12 - _tfY2) / 12);
       } else if (rs3 > 0) {
         // Anschluss-Phase: Annuität bleibt konstant
         var rate_anschl = (typeof State.rs1 === 'number' ? State.rs1 : State.rs) * anschl_rate_eff;  // V354c-anschluss-rs1: D1-only RS (kein D2-Doppelzaehlen)
@@ -3866,7 +3875,7 @@ function _calcImmediate(){
             // d1t kann 0 sein bei Voll-Tilger ohne T-Anteil — dann ist es effektiv Aussetzung
             // Wir nutzen Annuitaet wenn d1t > 0
             if (d1t > 0) {
-              var _v269_rA = window.DealPilotAnteilig.computeY1Annuitaet(d1, d1z * 100, d1t * 100, _v269_monthsY1);
+              var _v269_rA = window.DealPilotAnteilig.computeY1Annuitaet(d1, d1z * 100, d1t * 100, _v269_monthsY1, d1_tf);   /* v3980 */
               zy2 = _v269_rA.zins;
               ty2 = _v269_rA.tilg;
               // Restschuld korrekt: anstatt komplett getilgt für volles Jahr,

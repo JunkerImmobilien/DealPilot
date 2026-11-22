@@ -2974,6 +2974,7 @@ label.dp-required.qc-required::after {
             <div class="f"><label class="dp-required" data-v236-required-set="1" title="Zinssatz nominal (% p.a.)">Zinssatz nominal <button type="button" class="dp-tip" data-tip-id="tab5.zinssatz" tabindex="-1" aria-label="Hilfe zu Zinssatz nominal"></button></label><div class="iw"><input id="d1z" type="text" inputmode="decimal" value="3.50" step="0.01" class="tr" oninput="calc()"><span class="sfx">%</span></div></div>
             <div class="f" id="d1t_field"><label class="dp-required" data-v236-required-set="1" title="Tilgung (% p.a.)">Tilgung <span class="cf-hint" id="d1t_hint" style="display:none"></span> <button type="button" class="dp-tip" data-tip-id="tab5.tilgung" tabindex="-1" aria-label="Hilfe zu Tilgung"></button></label><div class="iw"><input id="d1t" type="text" inputmode="decimal" value="2.00" step="0.01" class="tr" oninput="calc()"><span class="sfx">%</span></div></div>
             <div class="f"><label>Zinsbindung</label><div class="iw"><input id="d1_bindj" type="text" inputmode="decimal" value="10" class="tr" oninput="calc(); calcD1Volltilgung()"><span class="sfx">J.</span></div></div>
+            <div class="f" id="d1_tf_field"><label title="Tilgungsfreie Anlaufzeit laut Darlehensvertrag: in diesen Monaten ab Auszahlung zahlst du nur die Zinsen, danach die volle Rate">Tilgungsfrei</label><div class="iw"><input id="d1_tf_mon" type="text" inputmode="numeric" placeholder="0" class="tr" oninput="calc()"><span class="sfx">Mon.</span></div></div><!-- v3980 · F6 tilgungsfreie Anlaufzeit -->
             <div class="f"><label title="Monatliche Rate (berechnet)">Rate / Monat</label><div class="cf" id="d1_rate">—</div></div>
             <div class="f"><label>davon Zinsen</label><div class="cf" id="d1_zm">—</div></div>
             <div class="f"><label id="d1_tm_lbl">davon Tilgung</label><div class="cf" id="d1_tm">—</div></div><!-- v3256: bei Tilgungsaussetzung „Sparrate Bausparvertrag" (financing.js _wortwahl) -->
@@ -4029,12 +4030,12 @@ label.dp-required.qc-required::after {
   <!-- V276.2-no-sidebar-widget: wk-dashboard entfernt - Inhalt jetzt im Steuermodul -->
   <script src="js/all-objects-views.js?v=v2422"></script>
   <script src="js/tour-sidebar.js?v=v1696"></script>
-  <script src="js/anteilig.js?v=v3314"></script>
+  <script src="js/anteilig.js?v=v3980"></script>
   <script src="js/wirtschaftlicher-uebergang.js?v=v3720"></script>
   <script src="js/anteilig-recalc.js?v=353"></script>
   <script src="js/finanzierung-validation.js?v=1"></script>
 <script src="js/data/foerderregister.js?v=v3072"></script>
-  <script src="js/calc.js?v=v3760"></script>
+  <script src="js/calc.js?v=v3980"></script>
   <script src="js/zahlenfelder.js?v=v3800e"></script>
 <script src="js/d1-type-handler.js?v=161"></script>
 <script src="js/icons.js?v=166"></script>
@@ -4102,7 +4103,7 @@ label.dp-required.qc-required::after {
 <script src="js/marktdaten-modal.js?v=v2247c"></script>
 <script src="js/ui.js?v=v3444"></script>
 <script src="js/sidebar-collapse.js?v=20260611174630"></script>
-<script src="js/storage.js?v=v3976"></script>
+<script src="js/storage.js?v=v3980"></script>
 <script src="js/nachrechnen.js?v=v3031"></script><!-- v3031: Kennzahlen/Scores gespeicherter Objekte neu rechnen (nur auf Aufruf) -->
 <!-- v845-newsearch-removed: sb-search.js entfernt (Kollision mit sidebar-search.js) -->
 <script src="js/inventar-sync.js?v=v3006c"></script><!-- V291-inv-sync-applied -->
@@ -4144,7 +4145,7 @@ label.dp-required.qc-required::after {
 
 <script src="js/beleg-import.js?v=v3166"></script>
 <script src="js/financing.js?v=v3261"></script>
-<script src="js/financing-pdf.js?v=v3261"></script>
+<script src="js/financing-pdf.js?v=v3980"></script>
 <script src="js/finanzierung-kopf.js?v=v3264"></script><!-- v3261 · Reiter Finanzierung: Eckdaten je Darlehen und eingeklappte Gruppen (rechnet nichts) -->
 <script src="js/immokalk-import.js?v=v1260"></script>
 <script src="js/import-export-modal.js?v=v1678"></script>
