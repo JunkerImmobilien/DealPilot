@@ -28,7 +28,7 @@ const ROT = [
   [/kerosin|\bliter\b/i, 'abgeschaffter Begriff (heisst Kontingent)'],
   [/revolution|die beste app|die beste software|marktführer|testsieger/i, 'Superlativ, den wir nicht belegen'],
   [/garantiert|garantie|sichere rendite|risikolos|ohne risiko/i, 'Versprechen oder Garantie'],
-  [/staatlich geprüft|staatlich gefördert|vom ministerium/i, 'falsche Aussage zum Forschungsprojekt'],
+  [/staatlich geprüft(?!er (Elektro)?[Tt]echniker)|staatlich gefördert|vom ministerium/i, 'falsche Aussage zum Forschungsprojekt'],
   [/mietwucher/i, 'Begriff nicht verwenden'],
   [/immobewertung|investmentpunk|hörhan|hoerhan|rentably|rentablo/i, 'Wettbewerber genannt (vergleichende Werbung)'],
   [/\bTOP\b|\bOkay\b/, 'falsches Score-Wort (Sehr gut, Gut, Solide, Schwach, Kritisch)']

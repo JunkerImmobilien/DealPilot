@@ -15,6 +15,8 @@
  *      teamplatz-rechner.js, partner-kunden.js, partner-plan-kauf.js, Kundentext ohne Gedankenstrich und Semikolon
  *   F  Stripe-Skript: Parameter aus der Quelle, Sicherungen (Trockenlauf, Testschluessel, --live), lookup_key = Backend
  *   G  Ladeweg und Buster
+ *   I  Bestand zaehlt in der Staffel mit (v3947a): k kostenlose Plaetze, naechster Login zum Satz SEINER Stufe,
+ *      Stripe-Menge k + b mit Coupon in Hoehe der ersten k Plaetze. Rechner = Cockpit = Stripe-Betrag
  *   H  Gegenproben: verfaelschte Quelle, Volume statt Graduated, falsche Stufe, Sicherung ohne Schluessel
  * RC=0 ist sauber.
  */
@@ -255,8 +257,8 @@ const ohneKommentar = (t) => t.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\
 ok(!PREISZAHL.test(ohneKommentar(rechnerJs)) && !/\b(5900|4900|3900)\b/.test(rechnerJs), 'teamplatz-rechner.js trägt keine Preiszahl (liest Quelle und Partner-Karte)');
 const pk = text('frontend/js/partner-kunden.js');
 const pkTeam = pk.slice(pk.indexOf('v3947 · Teamplaetze mit Preis'), pk.indexOf('/* Eingeladene Seite: Band und Fenster'));
-ok(pkTeam.length > 2000 && !PREISZAHL.test(ohneKommentar(pkTeam)) && /summeAusStufen\(a\.stufen, n\)/.test(pkTeam) && /api\('\/partner\/team\/preis'\)/.test(pkTeam),
-  'Cockpit: keine Preiszahl im Code, Beträge aus GET /partner/team/preis (Stripe-Stufen), Summe über DpTeamplatz.summeAusStufen');
+ok(pkTeam.length > 2000 && !PREISZAHL.test(ohneKommentar(pkTeam)) && /summeBezahlt\(a\.stufen, a\.bestand \|\| 0, n\)/.test(pkTeam) && /api\('\/partner\/team\/preis'\)/.test(pkTeam),
+  'Cockpit: keine Preiszahl im Code, Beträge aus GET /partner/team/preis (Stripe-Stufen), Summe über DpTeamplatz.summeBezahlt mit Bestand');
 ok(/nx\.satz_cent/.test(pkTeam) && /nx\.summe_cent/.test(pkTeam) && /'Platz buchen und einladen'/.test(pkTeam) && /anzahl: a\.bezahlt_abo \+ 1/.test(pkTeam),
   'Cockpit: vor dem Bestätigen Satz des nächsten Platzes und neue Summe, dann Platz buchen (+1) und einladen');
 const ppk = text('frontend/js/partner-plan-kauf.js');
@@ -329,6 +331,64 @@ const landKaputt = preise.replace('data-m="59" data-j="649">59 €', 'data-m="59
 ok(landingGegenQuelle(landKaputt, TP).length > 0, 'Landing mit 58 statt 59 €: rot');
 const landStrich = sichtbar(teamBlock(preise.replace('Teamplätze für deine Kanzlei', 'Teamplätze – für deine Kanzlei')));
 ok(/[–—;]/.test(landStrich), 'Gedankenstrich im Landing-Text würde gefunden');
+
+// ══ I · Bestand zaehlt in der Staffel mit ═══════════════════════════════════
+kopf('I Bestand zählt mit (v3947a): nächster Login zum Satz seiner Stufe, Rechner = Cockpit = Stripe');
+const TB = require(join(SRC, 'services', 'teamplatzBestand.js'));
+// Hand: [Bestand k, bezahlt b, Login-Nr des naechsten, Satz Monat, Satz Jahr, Summe der b bezahlten im Monat]
+const HAND_BESTAND = [
+  [0, 0, 2, 59, 649, 0], [0, 3, 5, 49, 539, 177], [0, 8, 10, 39, 429, 422],
+  [3, 0, 5, 49, 539, 0], [3, 4, 9, 49, 539, 196], [3, 5, 10, 39, 429, 245], [3, 6, 11, 39, 429, 284],
+  [5, 0, 7, 49, 539, 0], [5, 2, 9, 49, 539, 98], [5, 3, 10, 39, 429, 147], [5, 7, 14, 39, 429, 303]
+];
+const tiersM = stripeTiers('monthly'), tiersJ = stripeTiers('yearly');
+function bestandGegenHand(Q, TBx) {
+  const abw = [];
+  for (const [k, b, login, sm, sj, summe] of HAND_BESTAND) {
+    if (1 + k + b + 1 !== login) abw.push('Login ' + k + '/' + b);
+    if (Q.satzNaechster(k, b, 'monthly') !== sm || Q.satzNaechster(k, b, 'yearly') !== sj) abw.push('Rechner ' + k + '/' + b + ': ' + Q.satzNaechster(k, b, 'monthly'));
+    if (Q.summeBezahlt(Q.stripeStufen('monthly'), k, b) !== summe * 100) abw.push('Summe Frontend ' + k + '/' + b);
+    if (TBx.summeBezahlt(tiersM, k, b) !== summe * 100 || TBx.summeBezahlt(tiersM, k, b + 1) - TBx.summeBezahlt(tiersM, k, b) !== sm * 100) abw.push('Backend ' + k + '/' + b);
+    /* Stripe: Menge k + b auf der Staffel, Coupon = Kosten der ersten k Plaetze */
+    const c = TBx.couponParameter(k, 'monthly', { tiers: tiersM, product: 'prod_X' });
+    const stripeBetrag = TBx.staffel(tiersM, TBx.positionFelder(k, b, c && c.id).quantity) - (c ? c.amount_off : 0);
+    if (stripeBetrag !== summe * 100) abw.push('Stripe ' + k + '/' + b + ': ' + stripeBetrag);
+  }
+  return abw;
+}
+const abwBe = bestandGegenHand(TP, TB);
+ok(!abwBe.length, 'Bestand 0, 3 und 5: nächster Login, Satz Monat/Jahr, Summe der bezahlten, Stripe-Betrag (Menge k + b minus Coupon) = Hand-Tabelle, 11 Fälle' + (abwBe.length ? ': ' + abwBe.slice(0, 3).join(' · ') : ''));
+ok([3, 5].every((k) => TP.satzNaechster(k, 0, 'monthly') === 49) && TP.satzNaechster(0, 0, 'monthly') === 59,
+  'Altkunde mit 3 oder 5 kostenlosen Plätzen zahlt für den nächsten Login 49 €, nicht 59 € (Marcel 22.11.2026)');
+let gleichFB = true;
+for (let k = 0; k <= 6; k++) for (let b = 0; b <= 12; b++) for (const iv of ['monthly', 'yearly']) {
+  if (TP.summeBezahlt(TP.stripeStufen(iv), k, b) !== TB.summeBezahlt(iv === 'yearly' ? tiersJ : tiersM, k, b)) gleichFB = false;
+}
+ok(gleichFB, 'Frontend summeBezahlt = Backend teamplatzBestand.summeBezahlt für Bestand 0 bis 6, bezahlt 0 bis 12, Monat und Jahr');
+const c3 = TB.couponParameter(3, 'monthly', { tiers: tiersM, product: 'prod_X' }), c5 = TB.couponParameter(5, 'yearly', { tiers: tiersJ, product: { id: 'prod_Y' } });
+ok(TB.couponParameter(0, 'monthly', { tiers: tiersM, product: 'prod_X' }) === null && c3.amount_off === 17700 && c3.id === 'dp_teamplatz_bestand_monthly_3_17700'
+   && c3.duration === 'forever' && c3.currency === 'eur' && c3.applies_to.products[0] === 'prod_X' && c5.amount_off === 302500 && c5.applies_to.products[0] === 'prod_Y',
+  'Coupon: Bestand 0 keiner, 3 im Monat 177 €, 5 im Jahr 3.025 €, für immer, nur auf das Teamplatz-Produkt, Betrag in der ID');
+const pf = TB.positionFelder(5, 3, 'c5'), p0 = TB.positionFelder(0, 2, null);
+ok(pf.quantity === 8 && pf.metadata.bestand === '5' && pf.discounts[0].coupon === 'c5' && p0.quantity === 2 && p0.discounts === '' && p0.metadata.bestand === '0',
+  'Position: Menge Bestand + bezahlt, metadata.bestand, Rabatt nur mit Bestand (ohne: Feld geleert)');
+ok(TB.bezahltAusPosition({ quantity: 8, metadata: { bestand: '5' } }) === 3 && TB.bezahltAusPosition({ quantity: 2 }) === 2 && TB.bezahltAusPosition({ quantity: 1, metadata: { bestand: '5' } }) === 0,
+  'bezahlt aus der Position = Menge minus Bestand, ohne Metadaten die Menge, nie negativ');
+db.resellers.set('k5', { id: 'k5', stripe_subscription_id: null, team_plaetze: 5, team_plaetze_bezahlt: 0 });
+const aboB = ppAbo('sub_B', 'k5', { team: 8 }); aboB.items.data[1].metadata = { bestand: '5' };
+r = await handlePartnerSeatsEvent(ev('customer.subscription.updated', aboB), deps);
+ok(bezahlt('k5') === 3 && db.resellers.get('k5').team_plaetze === 5, 'Webhook: Position Menge 8 mit Bestand 5 ergibt 3 bezahlte, Bestand bleibt 5');
+const qK2 = text('backend/src/services/partnerPlanKauf.js'), aendern = qK2.slice(qK2.indexOf('async function teamplaetzeAendern'), qK2.indexOf('/** Rueckweg nach dem Checkout'));
+ok(/TB\.couponSicherstellen\(stripe\(\), k, iv, preis\)/.test(aendern) && /TB\.positionFelder\(k, ziel, coupon\)/.test(aendern) && /const k = team\.kostenlos;/.test(qK2) && /TB\.summeBezahlt\(preis\.tiers \|\| \[\], k, n\)/.test(qK2),
+  'Cockpit-Angebot und Buchung rechnen mit Bestand k über teamplatzBestand.js (Coupon, Position, Summe)');
+ok(!/discounts\s*:/.test(qK2), 'partnerPlanKauf.js bleibt ohne Rabatt-Feld (der Bestandsrabatt sitzt in teamplatzBestand.js an der Teamplatz-Position)');
+// Gegenproben
+const naiv = (k, b) => TP.satzAusStufen(TP.stripeStufen('monthly'), b + 1) / 100;   // Bestand vergessen
+ok(naiv(5, 0) === 59 && naiv(5, 0) !== TP.satzNaechster(5, 0, 'monthly'), 'Gegenprobe: ohne Bestand kostete der 7. Login eines Altkunden 59 statt 49 € (der Prüfer sieht den Unterschied)');
+const TBkaputt = Object.assign({}, TB, { summeBezahlt: (t, k, b) => TB.staffel(t, b) });
+ok(bestandGegenHand(TP, TBkaputt).length > 0, 'Gegenprobe: Backend ohne Bestand wird rot');
+const TBohneCoupon = Object.assign({}, TB, { couponParameter: () => null });
+ok(bestandGegenHand(TP, TBohneCoupon).length > 0, 'Gegenprobe: Stripe-Menge k + b ohne Coupon berechnet den Bestand mit und wird rot');
 
 console.log((fehler ? 'ROT' : 'SAUBER') + ': ' + (n - fehler) + '/' + n + ' Punkte');
 process.exit(fehler ? 1 : 0);

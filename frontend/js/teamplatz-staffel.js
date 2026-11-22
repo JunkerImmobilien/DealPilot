@@ -61,6 +61,12 @@
     }
     return summe;
   }
+  /** v3947a · Was b bezahlte Plätze bei k kostenlosen (Bestand) kosten, Cent: die kostenlosen zählen in der Staffel mit
+   *  (Marcel 22.11.2026). Gleiche Rechnung wie backend/src/services/teamplatzBestand.js summeBezahlt und wie Stripe
+   *  (Menge k + b, Coupon in Höhe der ersten k Plätze an der Position). */
+  function summeBezahlt(stufen, bestand, bezahlt) { var k = anzahl(bestand); return summeAusStufen(stufen, k + anzahl(bezahlt)) - summeAusStufen(stufen, k); }
+  /** Satz in Euro für den nächsten Login bei k Bestand und b bezahlten Plätzen. */
+  function satzNaechster(bestand, bezahlt, intervall) { var st = stripeStufen(intervall), b = anzahl(bezahlt); return (summeBezahlt(st, bestand, b + 1) - summeBezahlt(st, bestand, b)) / 100; }
   /** Satz (Cent) des n-ten Teamplatzes. */
   function satzAusStufen(stufen, platzNr) {
     var n = anzahl(platzNr); if (!n || !stufen || !stufen.length) return 0;
@@ -81,7 +87,7 @@
 
   return {
     VERSION: VERSION, STUFEN: STUFEN, FREIMONATE: FREIMONATE, LOOKUP: LOOKUP,
-    stripeStufen: stripeStufen, summeAusStufen: summeAusStufen, satzAusStufen: satzAusStufen,
+    stripeStufen: stripeStufen, summeAusStufen: summeAusStufen, satzAusStufen: satzAusStufen, summeBezahlt: summeBezahlt, satzNaechster: satzNaechster,
     teamSumme: teamSumme, summeLogins: summeLogins, satzLogin: satzLogin, ab: ab, stufenName: stufenName, intervall: iv
   };
 });

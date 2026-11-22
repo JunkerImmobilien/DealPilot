@@ -977,7 +977,7 @@
   }
   function teamSumme(a, n) {
     var TP = window.DpTeamplatz;
-    return TP && a && a.stufen ? TP.summeAusStufen(a.stufen, n) : 0;
+    return TP && a && a.stufen ? TP.summeBezahlt(a.stufen, a.bestand || 0, n) : 0;   /* v3947a · Bestand zählt in der Staffel mit */
   }
   function teamPreisHolen() { return api('/partner/team/preis'); }
   function nichtBuchbarText(a) {

@@ -18,7 +18,7 @@
   if (!box) return;
   var h = location.hostname, app = /(^|\.)staging\.dealpilot\.immo$/.test(h) ? 'https://app.staging.dealpilot.immo/' : 'https://app.dealpilot.immo/';
   if (/^(localhost|127\.0\.0\.1)$/.test(h) || /^app\./.test(h)) app = '/';   /* lokal und unter /landing/ der App: derselbe Host */
-  var QUELLE = 'js/teamplatz-staffel.js?v=v3947';
+  var QUELLE = 'js/teamplatz-staffel.js?v=v3947a';
 
   var S = { zeit: 'm', logins: 3 };
   function eur(n) {

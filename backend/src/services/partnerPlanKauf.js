@@ -103,7 +103,9 @@ function teamPosition(sub) {
   const items = (sub && sub.items && sub.items.data) || [];
   return items.find((i) => i && i.price && /^dp_teamplatz_/.test(i.price.lookup_key || '')) || null;
 }
-function teamMenge(sub) { const p = teamPosition(sub); return p ? (p.quantity || 0) : 0; }
+/* v3947a · BEZAHLTE Teamplaetze: Menge der Position minus metadata.bestand (kostenlose Plaetze zaehlen in der Staffel mit,
+   services/teamplatzBestand.js) */
+function teamMenge(sub) { return require('./teamplatzBestand').bezahltAusPosition(teamPosition(sub)); }
 function planPosition(sub) {
   const items = (sub && sub.items && sub.items.data) || [];
   return items.find((i) => i && i.price && /^dp_plan_/.test(i.price.lookup_key || '')) || null;
@@ -237,7 +239,7 @@ function aboIntervall(sub) {
 /** Was das Cockpit vor dem Bestaetigen zeigt: Rahmen, Stufen aus Stripe, Summe heute und mit einem Platz mehr.
  *  Betraege in Cent, gerechnet mit staffelSumme(…, 'graduated') auf den Stripe-Stufen. */
 async function teamAngebot(rs) {
-  const T = require('./partnerTeam');
+  const T = require('./partnerTeam'), TB = require('./teamplatzBestand');
   const team = await T.team(rs);
   const rahmen = { plaetze: team.plaetze, kostenlos: team.kostenlos, bezahlt: team.bezahlt, belegt: team.belegt, frei: team.frei,
                    ueberbelegt: team.ueberbelegt, mindest_bezahlt: team.mindest_bezahlt };
@@ -248,23 +250,24 @@ async function teamAngebot(rs) {
   const preis = by && by[TEAM_LOOKUP[iv]];
   if (!preis) return Object.assign(rahmen, { buchbar: false, grund: 'preis_fehlt', intervall: iv });
   const stufen = (preis.tiers || []).map((t) => ({ bis: t.up_to == null ? null : t.up_to, cent: t.unit_amount, pauschal: t.flat_amount || 0 }));
-  const mode = preis.tiers_mode || 'graduated';
-  const summe = (n) => staffelSumme(preis.tiers || [], mode, n);
+  /* v3947a · k kostenlose Plaetze zaehlen in der Staffel mit: b bezahlte kosten staffel(k + b) - staffel(k) */
+  const k = team.kostenlos;
+  const summe = (n) => TB.summeBezahlt(preis.tiers || [], k, n);
   const bezahltAbo = sub ? teamMenge(sub) : 0;
   const naechsterNr = bezahltAbo + 1;
-  const out = Object.assign(rahmen, {
+  return Object.assign(rahmen, {
     buchbar: !!sub && !sub.cancel_at_period_end, grund: !sub ? 'kein_abo' : (sub.cancel_at_period_end ? 'abo_gekuendigt' : null),
-    intervall: iv, tiers_mode: mode, stufen, bezahlt_abo: bezahltAbo,
+    intervall: iv, tiers_mode: preis.tiers_mode || 'graduated', stufen, bestand: k, bezahlt_abo: bezahltAbo,
     summe_cent: summe(bezahltAbo),
-    naechster: { teamplatz: naechsterNr, login: 1 + team.kostenlos + naechsterNr, satz_cent: summe(naechsterNr) - summe(bezahltAbo), summe_cent: summe(naechsterNr) }
+    naechster: { teamplatz: naechsterNr, login: 1 + k + naechsterNr, satz_cent: summe(naechsterNr) - summe(bezahltAbo), summe_cent: summe(naechsterNr) }
   });
-  return out;
 }
 
-/** Teamplaetze im laufenden Abo auf `anzahl` setzen (nur Inhaber, Route prueft). Untergrenze: so viele bezahlte,
- *  dass Berater und offene Einladungen Platz haben (teamRahmen().mindest_bezahlt). */
+/** Bezahlte Teamplaetze im laufenden Abo auf `anzahl` setzen (nur Inhaber, Route prueft). Untergrenze: so viele bezahlte,
+ *  dass Berater und offene Einladungen Platz haben (teamRahmen().mindest_bezahlt). v3947a: Stripe-Menge = Bestand + bezahlt,
+ *  der Bestand wird an der Position per Coupon abgezogen (teamplatzBestand.js). */
 async function teamplaetzeAendern(rs, anzahl) {
-  const T = require('./partnerTeam');
+  const T = require('./partnerTeam'), TB = require('./teamplatzBestand');
   const ziel = plaetzeNorm(anzahl);
   const sub = await aktivesPlatzAbo(rs.id);
   if (!sub) throw fehler('kein_abo', 409, 'Teamplätze werden im Partner-Plan-Abo gebucht. Dein Partner-Plan läuft nicht über ein Abo, schreib uns an info@dealpilot.immo.');
@@ -273,21 +276,26 @@ async function teamplaetzeAendern(rs, anzahl) {
   const team = await T.team(rs);
   if (ziel < team.mindest_bezahlt) throw fehler('unter_belegung', 409, 'Im Team sind ' + team.belegt + ' Plätze belegt oder eingeladen, davon ' + team.kostenlos + ' kostenlos. Weniger als ' + team.mindest_bezahlt + ' bezahlte Teamplätze geht erst, wenn jemand das Team verlässt oder du eine Einladung zurückziehst.');
   const pos = teamPosition(sub);
-  const alt = pos ? (pos.quantity || 0) : 0;
-  if (ziel === alt) { await T.bezahltAbgleichen(rs.id, alt); return { ok: true, unveraendert: true, bezahlt: alt }; }
+  const alt = TB.bezahltAusPosition(pos), k = team.kostenlos;
+  const bestandAlt = pos ? parseInt((pos.metadata && pos.metadata.bestand) || '0', 10) || 0 : k;
+  if (ziel === alt && bestandAlt === k) { await T.bezahltAbgleichen(rs.id, alt); return { ok: true, unveraendert: true, bezahlt: alt }; }
   const iv = aboIntervall(sub);
+  const by = await preiseLesen();
+  const preis = by[TEAM_LOOKUP[iv]];
   let items;
-  if (pos && ziel > 0) items = [{ id: pos.id, quantity: ziel }];
-  else if (pos && ziel === 0) items = [{ id: pos.id, deleted: true }];
+  if (pos && ziel === 0) items = [{ id: pos.id, deleted: true }];
+  else if (ziel === 0) { await T.bezahltAbgleichen(rs.id, 0); return { ok: true, unveraendert: true, bezahlt: 0 }; }
   else {
-    const by = await preiseLesen();
-    if (!by[TEAM_LOOKUP[iv]]) throw fehler('teamplatz_preis_fehlt', 503, 'Teamplätze lassen sich noch nicht buchen. Bitte schreib uns an info@dealpilot.immo.');
-    items = [{ price: by[TEAM_LOOKUP[iv]].id, quantity: ziel }];
+    if (!preis) throw fehler('teamplatz_preis_fehlt', 503, 'Teamplätze lassen sich noch nicht buchen. Bitte schreib uns an info@dealpilot.immo.');
+    const coupon = await TB.couponSicherstellen(stripe(), k, iv, preis);
+    const felder = TB.positionFelder(k, ziel, coupon);
+    if (!pos && !coupon) delete felder.discounts;   /* neue Position ohne Bestand: kein Rabatt-Feld */
+    items = [Object.assign(pos ? { id: pos.id } : { price: preis.id }, felder)];
   }
   const neu = await stripe().subscriptions.update(sub.id, { items, proration_behavior: proration(alt, ziel), expand: ['items.data.price'] });
   const menge = teamMenge(neu);
   await T.bezahltAbgleichen(rs.id, menge);
-  return { ok: true, vorher: alt, nachher: menge, bezahlt: menge };
+  return { ok: true, vorher: alt, nachher: menge, bezahlt: menge, bestand: k };
 }
 
 /** Rueckweg nach dem Checkout: dasselbe wie der Webhook (Plan + Plaetze), falls er spaeter kommt oder
