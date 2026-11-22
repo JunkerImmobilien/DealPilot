@@ -284,7 +284,7 @@
           var t0 = Date.now();
           var zeichneWarte = function () {
             var s = Math.round((Date.now() - t0) / 1000);
-            warte.textContent = 'Übertragung läuft, ' + s + ' s. ' + (n > 2 ? 'Bei einem Mehrfamilienhaus kann das bis zu zwei Minuten dauern, ' : 'Das dauert meist nur Sekunden, ') + 'weil ViVi alle Mieten ab Mietbeginn anlegt. Bitte das Fenster offen lassen.';
+            warte.textContent = 'Übertragung läuft, ' + s + ' s. ' + (n > 2 ? 'Bei einem Mehrfamilienhaus kann das bis zu zwei Minuten dauern, weil ViVi alle Mieten ab Mietbeginn anlegt. ' : 'Das dauert meist nur Sekunden. ') + 'Bitte das Fenster offen lassen.';
           };
           zeichneWarte();
           var fuss = ov.querySelector('.vivi-fuss'); if (fuss) fuss.parentNode.insertBefore(warte, fuss);

@@ -305,5 +305,18 @@ function funk(src, name) {
   ok(!/notesParts\.push\(snapshot\.zimmer \+ '-Zimmer'\)/.test(lies('frontend/js/quick-check.js')), 'F5 „3-Zimmer" geht nicht mehr in die Investitionsthese');
 }
 
-console.log(`gesamtflow-pruefen (v3984): ${gruen} von ${gruen + rot} ok`);
+/* ── F16 · Rundung Hausgeld-Anteil, Komma ── F17 · Wartehinweis ── F26 · Platzhalter ── */
+{
+  const oa = lies('frontend/js/object-actions.js'), qc = lies('frontend/quickcheck-app.html');
+  const m = oa.match(/qcData\['qc_hg_split'\] = String\(Math\.round\(_n \/ \(_u \+ _n\) \* (\d+)\) \/ (\d+)\)/);
+  const u = 1740, n = 1440, ges = Math.round((u + n) / 12), pct = m ? Math.round(n / (u + n) * +m[1]) / +m[2] : NaN;
+  const nZur = Math.round(ges * 12 * pct / 100), uZur = ges * 12 - nZur;
+  ok(nZur === 1440 && uZur === 1740, 'F16 Wirtschaftsplan 1.740/1.440 € kommt über den Quick-Check unverändert ins Objekt (Ist ' + uZur + '/' + nZur + ')');
+  ok(/k!=='bj' && \/\^\\d\+\\\.\\d\+\$\/\.test\(v\)\) v=v\.replace\('\.',','\)/.test(qc), 'F16 Übernahmeliste schreibt 58,5 m² mit Komma');
+  const vv = lies('frontend/js/vivi.js');
+  ok(!/Das dauert meist nur Sekunden, ' \) \+ 'weil ViVi/.test(vv.replace(/\s+/g, ' ')) && /'Das dauert meist nur Sekunden\. '/.test(vv), 'F17 Wartehinweis: die Begründung „alle Mieten ab Mietbeginn" steht nur beim langen Fall');
+  ok(/id="qc_ort" placeholder="Musterstadt"/.test(qc) && !/placeholder="116/.test(qc), 'F26 Quick-Check-Platzhalter ohne echten Ort und ohne echte Hausnummer');
+}
+
+console.log(`gesamtflow-pruefen (v3985): ${gruen} von ${gruen + rot} ok`);
 process.exit(rot ? 1 : 0);

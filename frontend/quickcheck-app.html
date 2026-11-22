@@ -3717,7 +3717,7 @@ button[onclick="QcApp.openQc6Settings()"] { display:none !important; }
       </div>
       <div class="field">
         <label for="qc_hnr">Hausnr.</label>
-        <input type="text" id="qc_hnr" placeholder="116 · optional" autocomplete="off">
+        <input type="text" id="qc_hnr" placeholder="1 · optional" autocomplete="off">
         <span class="source">PDF</span>
       </div>
       <div class="field">
@@ -3727,7 +3727,7 @@ button[onclick="QcApp.openQc6Settings()"] { display:none !important; }
       </div>
       <div class="field">
         <label class="req" for="qc_ort">Ort</label>
-        <input type="text" id="qc_ort" placeholder="Herford" autocomplete="off">
+        <input type="text" id="qc_ort" placeholder="Musterstadt" autocomplete="off"><!-- v3985 · F26: kein echter Ort als Platzhalter -->
         <span class="source">PDF</span>
       </div>
     </div>
@@ -6923,7 +6923,7 @@ const QcApp = (function() {
       __ADR=__ADR.replace(/^,\s*/,'').trim(); if(__ADR) __qcSet.push({label:'Adresse',value:__ADR});
       var __L={objektart:'Objektart',wfl:'Wohnfläche',bj:'Baujahr',zimmer:'Zimmer',energieklasse:'Energieklasse',stellplatz:'Stellplatz',kp:'Kaufpreis',nkm:'Grundmiete',hg:'Hausgeld',ek:'Eigenkapital',zins:'Zins',tilg:'Tilgung'};
       var __U={wfl:' m²',kp:' €',nkm:' €/Mo',hg:' €/Mo',ek:' €',zins:' %',tilg:' %'};
-      ['objektart','wfl','bj','zimmer','energieklasse','stellplatz','kp','nkm','hg','ek','zins','tilg'].forEach(function(k){ var v=(IN[k]||'').trim(); if(v) __qcSet.push({label:__L[k]||k,value:v+(__U[k]||'')}); });
+      ['objektart','wfl','bj','zimmer','energieklasse','stellplatz','kp','nkm','hg','ek','zins','tilg'].forEach(function(k){ var v=(IN[k]||'').trim(); if(v && k!=='bj' && /^\d+\.\d+$/.test(v)) v=v.replace('.',','); /* v3985 · F16: 58.5 m² → 58,5 m² */ if(v) __qcSet.push({label:__L[k]||k,value:v+(__U[k]||'')}); });
     } catch(e){}
     if (window.parent && window.parent!==window) { try { window.parent.postMessage({source:'dp-qc',type:'qc-save-open',items:__items,avmRaw:__avmRaw,avmDefault:__def,qcSet:__qcSet},'*'); return; } catch(e){} }
     renderTransferList();
