@@ -2495,6 +2495,9 @@
   }
   function _bisherText(it, ist) {
     var s = String(ist == null ? '' : ist).trim();
+    /* v3988 · F23 Gesamt-Flow 22.11.2026: versteckte Felder mit JSON (Aufstellung des Hausgelds, hg_pos) erschienen roh in der Prüftabelle */
+    if (/^[\[{]/.test(s)) { try { var j = JSON.parse(s), pl = Array.isArray(j) ? j : (j && Array.isArray(j.p) ? j.p : null);
+      return pl ? pl.length + ' Positionen' + (j && j.jahr ? ' (' + (j.art || 'Wirtschaftsplan') + ' ' + j.jahr + ')' : '') : 'andere Aufstellung'; } catch (e) { return 'andere Aufstellung'; } }
     if (!/^-?\d+([.,]\d+)?$/.test(s)) return s;
     if (it.einheit) return fmt0(parseFloat(s.replace(',', '.'))) + ' ' + it.einheit;
     if (it.kind === 'steuer') return fmt0(parseFloat(s.replace(',', '.'))) + ' € im Jahr ' + it.jahr;
