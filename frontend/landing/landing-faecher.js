@@ -950,7 +950,7 @@
     if (!einzelcheckErlaubt() || !document.getElementById('dealcheck')) return;
     /* v3940 · echter Ablauf statt Demo (einzelcheck.js/.css, Backend routes/publicEinzelcheck.js) */
     var l = document.createElement('link'); l.rel = 'stylesheet'; l.href = 'einzelcheck.css?v=v3941'; document.head.appendChild(l);
-    var s = document.createElement('script'); s.src = 'einzelcheck.js?v=v3941'; s.async = true;
+    var s = document.createElement('script'); s.src = 'einzelcheck.js?v=v3941b'; s.async = true;
     /* landing-faecher-2 · der Deal-Check zeigt den zweiten Weg „Bericht holen“ erst, wenn der Einzel-Check da ist */
     s.onload = function () { try { document.dispatchEvent(new CustomEvent('dp:einzelcheck-bereit')); } catch (e) {} };
     document.body.appendChild(s);

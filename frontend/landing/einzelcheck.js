@@ -173,7 +173,7 @@
     ['dragover', 'dragenter'].forEach(function (t) { zone.addEventListener(t, function (e) { e.preventDefault(); zone.classList.add('ueber'); }); });
     ['dragleave', 'drop'].forEach(function (t) { zone.addEventListener(t, function () { zone.classList.remove('ueber'); }); });
     zone.addEventListener('drop', function (e) { e.preventDefault(); if (e.dataTransfer) dazu(e.dataTransfer.files); });
-    $('.ec-entf', inhalt).forEach(function (b) { b.addEventListener('click', function () { S.dateien.splice(+b.dataset.i, 1); S.frei = null; zeigeUnterlagen(); }); });
+    $$('.ec-entf', inhalt).forEach(function (b) { b.addEventListener('click', function () { S.dateien.splice(+b.dataset.i, 1); S.frei = null; zeigeUnterlagen(); }); });
     $$('.ec-hoch', inhalt).forEach(function (b) { b.addEventListener('click', function () { var i = +b.dataset.i, x = S.dateien[i]; S.dateien[i] = S.dateien[i - 1]; S.dateien[i - 1] = x; S.frei = null; zeigeUnterlagen(); }); });
     $('.ec-los', inhalt).addEventListener('click', zeigeAuslesen);
   }
