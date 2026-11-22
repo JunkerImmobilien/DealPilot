@@ -234,11 +234,13 @@
       stil();
       var ov = fenster('<h3>In ViVi anlegen</h3><p>Lade Vorschau…</p>');
       var opt = function () {
-        var pz = $('vivi-platzhalter'), ft = $('vivi-faellig'), ac = $('vivi-account');
-        return { platzhalter_namen: !!(pz && pz.checked), faellig_tag: ft ? Number(ft.value) || 3 : 3, account_id: ac && ac.value ? ac.value : null };
+        var pz = $('vivi-platzhalter'), ma = $('vivi-muster'), ft = $('vivi-faellig'), ac = $('vivi-account');
+        return { platzhalter_namen: !!(pz && pz.checked), muster_anschrift: !!(ma && ma.checked), faellig_tag: ft ? Number(ft.value) || 3 : 3, account_id: ac && ac.value ? ac.value : null };
       };
       var zeichnen = function (v, accounts, o) {
         o = o || {};
+        /* v3951 · die Vorgaben des Servers (Testbetrieb: Musteranschrift und Platzhalter an) gelten, bis der Kunde umschaltet */
+        if (v.optionen) { if (o.platzhalter_namen === undefined) o.platzhalter_namen = v.optionen.platzhalter_namen; if (o.muster_anschrift === undefined) o.muster_anschrift = v.optionen.muster_anschrift; }
         var zeilen = (v.vorschau || []).map(function (z) {
           return '<tr><td>' + esc(z.bereich) + '</td><td>' + esc(z.feld) + '</td><td>' + esc(z.wert) + (z.notiz ? '<div class="vivi-notiz">' + esc(z.notiz) + '</div>' : '') + '</td></tr>';
         }).join('');
@@ -254,12 +256,13 @@
           '<table><thead><tr><th>Bereich</th><th>Feld</th><th>Wert</th></tr></thead><tbody>' + zeilen + '</tbody></table>' +
           acc +
           '<label class="vivi-wahl"><input type="checkbox" id="vivi-platzhalter"' + (o.platzhalter_namen ? ' checked' : '') + '> Mieternamen durch Platzhalter ersetzen</label>' +
+          '<label class="vivi-wahl"><input type="checkbox" id="vivi-muster"' + (o.muster_anschrift ? ' checked' : '') + '> Anschrift durch Musteranschrift ersetzen' + (v.optionen && v.optionen.testbetrieb ? ' (Testbetrieb)' : '') + '</label>' +
           '<label class="vivi-wahl">Miete fällig am <input type="number" id="vivi-faellig" min="1" max="31" value="' + esc(o.faellig_tag || 3) + '" style="width:64px"> des Monats</label>' +
           '<details><summary>Was genau an ViVi geht</summary><pre>' + esc(JSON.stringify(v.nutzlast, null, 2)) + '</pre></details>' +
           '<div class="vivi-fuss"><button type="button" class="btn btn-sm btn-ghost" id="vivi-abbrechen">Abbrechen</button>' +
           (v.gesperrt ? '<span class="hint">Schon mit ViVi verknüpft.</span>' : '<button type="button" class="btn btn-sm btn-gold" id="vivi-los"' + (v.ok ? '' : ' disabled') + '>Jetzt in ViVi anlegen</button>') + '</div>';
         $('vivi-abbrechen').onclick = schliessen;
-        ['vivi-platzhalter', 'vivi-faellig'].forEach(function (id) { var e = $(id); if (e) e.onchange = function () { neu(); }; });
+        ['vivi-platzhalter', 'vivi-muster', 'vivi-faellig'].forEach(function (id) { var e = $(id); if (e) e.onchange = function () { neu(); }; });
         var los = $('vivi-los');
         if (los) los.onclick = function () {
           los.disabled = true; los.textContent = 'Wird angelegt…';

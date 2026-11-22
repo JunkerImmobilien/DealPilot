@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/* tools/vivi-pruefen.mjs — v3950 · ViVi-Anbindung (Pakete V1 bis V3), ohne Netz, ohne Datenbank, ohne Token
+/* tools/vivi-pruefen.mjs — v3950/v3951 · ViVi-Anbindung (Pakete V1 bis V3, V5, V4 als Entwurf), ohne Netz, ohne Datenbank, ohne Token
  *
  * Prueft gegen die ECHTE Spezifikation Dateien/Architektur/vivi/vivi-openapi-v1.json (ViVi API v1.5.0) und die
  * ECHTEN Dateien des Repos. Statt ViVi antwortet eine Attrappe, die jede Anfrage gegen die Schemas der
@@ -20,6 +20,12 @@
  *      Ausgrauen und lokal Ueberschreiben an einem nachgebauten Formular, Gegenproben
  *   I  Token: nie im Protokoll, nie in einer Antwort, nie im Code, nie in .env-Vorlagen
  *   J  Kundentext ohne Gedankenstrich und Semikolon
+ *   K  v3951 Testbetrieb: Musteranschrift und Platzhalter vorgegeben, solange vivi Vorschau-Funktion ist, Anschrift wird
+ *      dann nicht zurueckgelesen, Gegenprobe ohne Testbetrieb
+ *   V5 v3951 Unterlagen-Abgleich: vivi_abweichung an den echten Dateien dokument-import.js + vivi-felder.js, nie
+ *      vorgehakt, Hinweis Zeichen fuer Zeichen, Entscheidung gemerkt, lokal festlegen ohne Netz, Gegenproben
+ *   V4 v3951 Steuer als Entwurf: Schalter aus, Lesepfade in der Spezifikation, Zielspalten in tax_records, Auslese an
+ *      nachgebauten Antworten (Feldnamen sind Annahmen, erst mit Key pruefbar)
  *
  * Aufruf: node tools/vivi-pruefen.mjs [--zeigen]   (--zeigen druckt die Nutzlast je Demo-Fall)
  * RC=0 sauber, RC=1 rot.
@@ -44,6 +50,9 @@ const SPEC = JSON.parse(lies('Dateien/Architektur/vivi/vivi-openapi-v1.json'));
 const mapping = require(P('backend/src/services/vivi/viviMapping.js'));
 const viviClient = require(P('backend/src/services/vivi/viviClient.js'));
 const dienst = require(P('backend/src/services/vivi/viviDienst.js'));
+const steuerEntwurf = require(P('backend/src/services/vivi/viviSteuer.js'));   /* v3951 · V4 als Entwurf */
+/* v3951 · Testbetrieb (Musteranschrift) ist in den Teilen A bis J aus, damit sie die echte Abbildung pruefen. Teil K schaltet ihn an. */
+const setzeDeps = (d) => dienst._setzeDeps(Object.assign({ testbetrieb: async () => false }, d));
 
 /* ── Schema-Werkzeug ─────────────────────────────────────────────────── */
 function deref(s) { let n = 0; while (s && s.$ref && n++ < 10) s = SPEC.components.schemas[s.$ref.split('/').pop()]; return s; }
@@ -376,7 +385,7 @@ const A = attrappe();
 const SP = speicherImArbeitsspeicher(objekte);
 const tresor = { [USER]: TOKEN };
 viviClient._fensterLeeren();
-dienst._setzeDeps({
+setzeDeps({
   speicher: SP,
   creds: { getSecret: async (u) => tresor[u] || null, getMeta: async (u) => (tresor[u] ? { exists: true, hint: tresor[u].slice(-4) } : { exists: false }), setCredential: async (u, p, s) => { tresor[u] = s; return { exists: true, hint: s.slice(-4) }; }, remove: async (u) => { delete tresor[u]; return { exists: false }; } },
   client: (t, o) => viviClient.erzeugen(t, Object.assign({}, o, { fetch: A.holen, maxWarten: 0 })),
@@ -417,7 +426,7 @@ for (const [art, nach] of [['429', 3], ['verloren', 2], ['verloren', 1]]) {
   const objs = { 'aaaaaaaa-0000-4000-8000-000000000001': { user: USER, data: FAELLE.find((x) => x.nr === '2026-1041').d } };
   const S2 = speicherImArbeitsspeicher(objs);
   viviClient._fensterLeeren();
-  dienst._setzeDeps({ speicher: S2, creds: { getSecret: async () => TOKEN }, client: (t, o) => viviClient.erzeugen(t, Object.assign({}, o, { fetch: B.holen, maxWarten: 0 })), jetzt: () => S2.zeit.jetzt, schlafen: async () => {} });
+  setzeDeps({ speicher: S2, creds: { getSecret: async () => TOKEN }, client: (t, o) => viviClient.erzeugen(t, Object.assign({}, o, { fetch: B.holen, maxWarten: 0 })), jetzt: () => S2.zeit.jetzt, schlafen: async () => {} });
   const oid = Object.keys(objs)[0];
   B.st.stoerung = { nachPosts: nach, art: art };
   let erst = null; try { await dienst.anlegen(USER, oid, {}); } catch (e) { erst = e; }
@@ -431,7 +440,7 @@ for (const [art, nach] of [['429', 3], ['verloren', 2], ['verloren', 1]]) {
 
 /* ═══ E · Lesen ViVi -> DealPilot ════════════════════════════════════════ */
 kopf('E  Lesen ViVi -> DealPilot');
-dienst._setzeDeps({ speicher: SP, creds: { getSecret: async (u) => tresor[u] || null }, client: (t, o) => viviClient.erzeugen(t, Object.assign({}, o, { fetch: A.holen, maxWarten: 0 })), jetzt: () => SP.zeit.jetzt, schlafen: async () => {} });
+setzeDeps({ speicher: SP, creds: { getSecret: async (u) => tresor[u] || null }, client: (t, o) => viviClient.erzeugen(t, Object.assign({}, o, { fetch: A.holen, maxWarten: 0 })), jetzt: () => SP.zeit.jetzt, schlafen: async () => {} });
 viviClient._fensterLeeren();
 /* Jede Antwort der Attrappe ist selbst gegen das Resource-Schema geprueft */
 {
@@ -547,7 +556,7 @@ kopf('F  Anfragebremse');
   const C = attrappe(); const S3 = speicherImArbeitsspeicher({});
   S3.v['o1'] = { object_id: 'o1', user_id: USER, vivi_objekt_id: 'x', anlage_status: 'fertig', vivi_ids: {} }; S3.v['o2'] = Object.assign({}, S3.v['o1'], { object_id: 'o2' });
   let anfragen = 0;
-  dienst._setzeDeps({ speicher: Object.assign(S3, { objektHolen: async (u, o) => ({ id: o, data: {} }) }), creds: { getSecret: async () => TOKEN },
+  setzeDeps({ speicher: Object.assign(S3, { objektHolen: async (u, o) => ({ id: o, data: {} }) }), creds: { getSecret: async () => TOKEN },
     client: (tk, o) => viviClient.erzeugen(tk, Object.assign({}, o, { fetch: async () => { anfragen++; return { status: 429, json: async () => ({}) }; }, maxWarten: 0 })), jetzt: () => Date.now(), schlafen: async () => {} });
   viviClient._fensterLeeren();
   const s = await dienst.taktLauf();
@@ -636,7 +645,7 @@ kopf('I  Token');
 {
   const alles = JSON.stringify(SP.prot) + JSON.stringify(SP.v) + JSON.stringify(SP.w);
   ok(SP.prot.length > 10 && !alles.includes(TOKEN) && !alles.includes(TOKEN.slice(0, 12)), 'Token nie im Protokoll, nie in der Verknüpfung, nie in vivi_werte (' + SP.prot.length + ' Protokolleinträge)');
-  dienst._setzeDeps({ speicher: SP, creds: { getSecret: async () => TOKEN, getMeta: async () => ({ exists: true, hint: TOKEN.slice(-4) }) }, client: (tk, o) => viviClient.erzeugen(tk, Object.assign({}, o, { fetch: async () => ({ status: 401, json: async () => ({ message: 'Unauthenticated.' }) }), maxWarten: 0 })), jetzt: () => Date.now(), schlafen: async () => {} });
+  setzeDeps({ speicher: SP, creds: { getSecret: async () => TOKEN, getMeta: async () => ({ exists: true, hint: TOKEN.slice(-4) }) }, client: (tk, o) => viviClient.erzeugen(tk, Object.assign({}, o, { fetch: async () => ({ status: 401, json: async () => ({ message: 'Unauthenticated.' }) }), maxWarten: 0 })), jetzt: () => Date.now(), schlafen: async () => {} });
   let msg = ''; try { await dienst.probe(USER); } catch (e) { msg = e.message + JSON.stringify(e); }
   const meta = JSON.stringify(await dienst.verbindungMeta(USER));
   ok(msg && !msg.includes(TOKEN) && /401/.test(msg) && !meta.includes(TOKEN.slice(0, -4)), 'Fehler 401 und Verbindungsstatus nennen den Token nicht (nur die letzten vier Zeichen)');
@@ -669,6 +678,176 @@ kopf('J  Kundentext ohne Gedankenstrich und Semikolon');
     }
   });
   ok(!funde.length, 'Kundentexte in ' + datei.length + ' Dateien ohne – — ;' + (funde.length ? ':\n        ' + funde.slice(0, 6).join('\n        ') : ''));
+}
+
+
+/* ═══ K · Testbetrieb: Musteranschrift (v3951) ═══════════════════════════ */
+kopf('K  Testbetrieb: Musteranschrift und Platzhalter, solange vivi Vorschau-Funktion ist');
+{
+  const VS = require(P('backend/src/services/vorschau.js'));
+  ok(!!VS.eintrag('vivi'), "vivi steht in vorschau-funktionen.json (dort hängt der Testbetrieb)");
+  const echt = FAELLE.find((x) => x.nr === '2026-1041').d;
+  const mit = mapping.nachVivi(Object.assign({}, echt, { str: 'Echtweg', hnr: '77', plz: '33613', ort: 'Echtstadt' }), { musterAnschrift: true, musterNr: '1041' });
+  ok(mit.projekt.street === 'Musterstraße' && mit.projekt.house_number === '1041' && mit.projekt.postal_code === '12345' && mit.projekt.city === 'Musterstadt', 'Musteranschrift: Musterstraße 1041, 12345 Musterstadt');
+  const txt = JSON.stringify(mit);
+  ok(!/Echtweg|Echtstadt|33613/.test(txt), 'die echte Anschrift steht nirgends in Nutzlast, Vorschau oder Hinweisen');
+  ok(!pruefeSchema(mit.projekt, rumpfSchema('POST', '/projects'), 'muster').length, 'Musteranschrift passt zum Request-Schema POST /projects');
+  const ohneAdr = mapping.nachVivi(Object.assign({}, echt, { str: '', hnr: '', plz: '', ort: '' }), { musterAnschrift: true });
+  ok(ohneAdr.ok && ohneAdr.projekt.house_number === '1', 'mit Musteranschrift fehlt keine Anschrift (Hausnummer ohne Nummer: 1)');
+  const pk = { projekt: { id: 'p1', street: 'Musterstraße', house_number: '1041', postal_code: '12345', city: 'Musterstadt', purchase_price: 545000, purchase_date: '2025-01-01' } };
+  const a1 = mapping.ausVivi(pk, { musterAnschrift: true }).felder, a2 = mapping.ausVivi(pk, {}).felder;
+  ok(!a1.str && !a1.hnr && !a1.plz && !a1.ort && a1.kp && a2.str && a2.plz, 'ausVivi liest die Anschrift bei Musteranschrift nicht zurück (Kaufpreis schon), ohne Musteranschrift wie bisher');
+
+  /* Dienst Ende zu Ende gegen die Attrappe, Testbetrieb an */
+  const B = attrappe();
+  const oid = 'bbbbbbbb-0000-4000-8000-000000000001';
+  const objs = { [oid]: { user: USER, data: Object.assign({}, echt, { _obj_seq: '2026-1041', str: 'Echtweg', hnr: '77', ort: 'Echtstadt' }) } };
+  const S4 = speicherImArbeitsspeicher(objs);
+  viviClient._fensterLeeren();
+  const deps4 = (test) => dienst._setzeDeps({ speicher: S4, testbetrieb: async () => test, creds: { getSecret: async () => TOKEN }, client: (t, o) => viviClient.erzeugen(t, Object.assign({}, o, { fetch: B.holen, maxWarten: 0 })), jetzt: () => S4.zeit.jetzt, schlafen: async () => {} });
+  deps4(true);
+  const vs = await dienst.vorschau(USER, oid, {});
+  ok(vs.optionen && vs.optionen.muster_anschrift === true && vs.optionen.platzhalter_namen === true && vs.optionen.testbetrieb === true, 'Vorschau im Testbetrieb: Musteranschrift und Platzhalter vorgegeben (an)');
+  const vsAus = await dienst.vorschau(USER, oid, { muster_anschrift: false, platzhalter_namen: false });
+  ok(vsAus.optionen.muster_anschrift === false && vsAus.nutzlast.projekt.street === 'Echtweg', 'ausdrücklich abgewählt: echte Anschrift (Wahl des Kunden)');
+  await dienst.anlegen(USER, oid, {});
+  const proj = Object.values(B.st.projekte)[0] || {};
+  const rentals = Object.values(B.st.miete);
+  ok(proj.street === 'Musterstraße' && proj.house_number === '1041' && !JSON.stringify(B.st).includes('Echtweg'), 'angelegt mit Musterstraße 1041, die echte Straße kam nie bei ViVi an');
+  ok(rentals.length && rentals.every((r) => r.tenant_first_name === 'Mieter'), 'Mieter als Platzhalter (' + rentals.length + ' Mietverhältnisse)');
+  ok(S4.v[oid].vivi_ids.muster_anschrift === true, 'Verknüpfung merkt sich die Musteranschrift');
+  const ab = await dienst.abrufen(USER, oid);
+  ok(!ab.felder.str && !ab.felder.plz && ab.felder.kp, 'Zurücklesen: keine Anschrift aus ViVi, die echte bleibt im DealPilot-Objekt');
+  const w = await dienst.werte(USER, oid);
+  ok(w.muster_anschrift === true, 'werte() meldet die Musteranschrift an den Browser');
+  /* Zuordnen im Testbetrieb */
+  const oid2 = 'bbbbbbbb-0000-4000-8000-000000000002';
+  objs[oid2] = { user: USER, data: { objart: 'ETW' } };
+  await dienst.zuordnen(USER, oid2, proj.id || Object.keys(B.st.projekte)[0], null);
+  ok(S4.v[oid2] && S4.v[oid2].vivi_ids && S4.v[oid2].vivi_ids.muster_anschrift === true, 'Zuordnen im Testbetrieb: Musteranschrift gemerkt (Anschrift wird nicht zurückgelesen)');
+  /* Gegenprobe: ohne Testbetrieb gilt die echte Anschrift */
+  deps4(false);
+  const vsOhne = await dienst.vorschau(USER, oid, {});
+  ok(vsOhne.optionen.muster_anschrift === false && vsOhne.nutzlast.projekt.street === 'Echtweg', 'Gegenprobe: ohne Testbetrieb ist die Vorgabe aus (echte Anschrift)');
+  const fe = lies('frontend/js/vivi.js');
+  ok(/id="vivi-muster"/.test(fe) && /Anschrift durch Musteranschrift ersetzen/.test(fe) && /muster_anschrift: !!\(ma && ma\.checked\)/.test(fe), 'Vorschaufenster: Schalter „Anschrift durch Musteranschrift ersetzen“, wird mitgeschickt');
+}
+
+/* ═══ V5 · Abweichungs-Abgleich beim Auslesen von Unterlagen (v3951) ══════ */
+kopf('V5 Unterlagen gegen ViVi: Zustand vivi_abweichung, nie vorgehakt, lokal festlegen statt nach ViVi');
+{
+  function formular(werte) {
+    const els = {};
+    function mk(id, wert, tag) {
+      const attrs = {}; const cls = new Set();
+      const el = { id, tagName: tag || 'INPUT', value: wert == null ? '' : String(wert), readOnly: false, title: '',
+        classList: { add: (c) => cls.add(c), remove: (c) => cls.delete(c), contains: (c) => cls.has(c) },
+        setAttribute: (k, v) => { attrs[k] = String(v); }, getAttribute: (k) => (k in attrs ? attrs[k] : null), hasAttribute: (k) => k in attrs, removeAttribute: (k) => { delete attrs[k]; },
+        dispatchEvent: () => true, insertAdjacentElement: () => {}, focus: () => {} };
+      el.parentNode = { querySelector: () => null, querySelectorAll: () => [] };
+      els[id] = el; return el;
+    }
+    Object.keys(werte).forEach((k) => mk(k, werte[k]));
+    mk('_vivi', '');
+    const doc = { createElement: (tag) => mk('neu' + Object.keys(els).length, '', String(tag).toUpperCase()), getElementById: (id) => els[id] || null,
+      querySelectorAll: (q) => (/vivi-verknuepft/.test(q) ? Object.values(els).filter((e) => e.classList.contains('vivi-verknuepft') || e.classList.contains('vivi-eigen')) : []), querySelector: () => null };
+    return { els, doc };
+  }
+  function bauen(werte, quellen) {
+    const fb = formular(werte);
+    const ctx = frontendModul('frontend/js/vivi-felder.js', { document: fb.doc, globals: { confirm: () => true, parseDe: (x) => { const n = parseFloat(String(x).replace(/\./g, '').replace(',', '.')); return isFinite(n) ? n : NaN; } } });
+    vm.runInContext((quellen && quellen.di) || lies('frontend/js/dokument-import.js'), ctx, { filename: 'dokument-import.js' });
+    return { ctx, F: ctx.DpViviFelder, D: ctx.DokumentImport, els: fb.els };
+  }
+  const STAND = { verknuepft: true, letzter_abruf: '2026-11-22T13:05:00Z', felder: { kp: { wert: 465000 }, nkm: { wert: 950 }, hg_ul: { wert: 2160 }, hg_nul: { wert: 2160 }, 'einheit.0.ist': { wert: 717 }, 'einheit.0.mv_beginn': { wert: '2014-08-01' } }, info: { einheiten: { 0: { nr: '1' } } } };
+  const FORM = { kp: '465000', nkm: '950', hg_ul: '2160', hg_nul: '2160', objart: 'ETW', mea: '4,85', wfl: '82' };
+  const zeile = (L, f) => (L || []).find((z) => z.feld === f) || {};
+
+  let t = bauen(FORM);
+  ok(t.D && typeof t.D.abgleich === 'function' && t.F && typeof t.F.vergleich === 'function', 'dokument-import.js und vivi-felder.js laufen zusammen (echte Dateien)');
+  let z = zeile(t.D.abgleich({ kaufpreis_eur: 480000 }, 'kaufvertrag', {}), 'kp');
+  ok(z.status === 'abweichung', 'ohne ViVi-Verknüpfung alles wie bisher: Kaufpreis 480.000 gegen 465.000 = abweichung');
+  t.F.setzen(STAND);
+  z = zeile(t.D.abgleich({ kaufpreis_eur: 480000 }, 'kaufvertrag', {}), 'kp');
+  ok(z.status === 'vivi_abweichung' && z.vivi === '465.000' && z.viviWert === 465000, 'verknüpft und abweichend: Zustand vivi_abweichung, laut ViVi 465.000');
+  z = zeile(t.D.abgleich({ kaufpreis_eur: 465000 }, 'kaufvertrag', {}), 'kp');
+  ok(z.status === 'gleich' && z.viviGleich, 'gleich mit ViVi: „stimmt mit ViVi überein“');
+  const hg = t.D.abgleich({ jahr: 2026, art: 'Wirtschaftsplan', einzel: { umlagefaehig_jahr_eur: 2400, nicht_umlagefaehig_jahr_eur: 1284 } }, 'hausgeld', { objart: 'ETW', mea: 4.85 });
+  ok(zeile(hg, 'hg_ul').status === 'vivi_abweichung' && zeile(hg, 'hg_nul').status === 'vivi_abweichung' && zeile(hg, 'hg_ul').vivi === '2.160', 'Wirtschaftsplan 2026 mit abweichendem Hausgeld: hg_ul und hg_nul vivi_abweichung');
+  const hgGleich = t.D.abgleich({ jahr: 2026, einzel: { umlagefaehig_jahr_eur: 2160, nicht_umlagefaehig_jahr_eur: 2160 } }, 'hausgeld', { objart: 'ETW', mea: 4.85 });
+  ok(zeile(hgGleich, 'hg_ul').status === 'gleich' && zeile(hgGleich, 'hg_ul').viviGleich, 'Wirtschaftsplan mit gleichem Hausgeld: gleich');
+  z = zeile(t.D.abgleich({ kaltmiete_eur: 1000 }, 'mietvertrag', {}), 'nkm');
+  ok(z.status === 'vivi_abweichung' && z.vivi === '950', 'ETW-Mietvertrag 1.000 gegen ViVi 950: vivi_abweichung');
+  /* Mietvertrag gegen eine Einheit */
+  t.ctx._dpMfh = { einheiten: [{ nr: '1', ist: '717', mv_beginn: '2014-08-01' }, { nr: '2', ist: '717' }] };
+  const ev = t.F.einheitVergleich(0, { ist: 750, mv_beginn: '01.08.2014', mv_kaution: 2100 });
+  ok(ev.length === 1 && ev[0].id === 'einheit.0.ist' && ev[0].k === 'ist', 'Mietvertrag WE 1: Kaltmiete 750 weicht von ViVi 717 ab, Mietbeginn gleich (01.08.2014 = 2014-08-01), Kaution nicht verknüpft');
+  ok(t.F.einheitVergleich(1, { ist: 900 }).length === 0, 'Einheit ohne ViVi-Werte: keine Abweichung');
+  /* Entscheidung merken */
+  t.F.entscheiden('kp', { wahl: 'vivi', dok: 'Kaufvertrag', dok_wert: '480000', vivi_wert: 465000 });
+  z = zeile(t.D.abgleich({ kaufpreis_eur: 480000 }, 'kaufvertrag', {}), 'kp');
+  ok(z.status === 'vivi_abweichung' && z.viviEntschieden && z.viviEntschieden.wahl === 'vivi', '„ViVi-Wert behalten“ gemerkt: dieselbe Unterlage fragt nicht noch einmal');
+  z = zeile(t.D.abgleich({ kaufpreis_eur: 490000 }, 'kaufvertrag', {}), 'kp');
+  ok(z.status === 'vivi_abweichung' && !z.viviEntschieden, 'anderer Wert in der Unterlage: es wird wieder gefragt');
+  /* Wert aus der Unterlage nehmen = lokal festlegen */
+  ok(t.els.kp.readOnly && t.els.kp.classList.contains('vivi-verknuepft'), 'vorher: Kaufpreis ausgegraut (verknüpft)');
+  t.F.lokalFestlegen('kp', '480000', 'Kaufvertrag');
+  t.els.kp.value = '480000';
+  const v = JSON.parse(t.els._vivi.value);
+  ok(v.eigen.kp === '480000' && v.herkunft.kp.quelle === 'Kaufvertrag' && !t.els.kp.readOnly && t.els.kp.classList.contains('vivi-eigen'), '„Wert aus der Unterlage nehmen“: eigene Angabe mit Herkunft, Feld frei');
+  t.F.setzen(STAND);
+  ok(t.els.kp.value === '480000' && !t.F.istVerknuepft('kp'), 'nächster Abgleich mit ViVi überschreibt die eigene Angabe nicht');
+  z = zeile(t.D.abgleich({ kaufpreis_eur: 480000 }, 'kaufvertrag', {}), 'kp');
+  ok(z.status === 'gleich' && !z.viviGleich, 'danach: Feld nicht mehr verknüpft, Abgleich gegen das Objekt wie ohne ViVi');
+
+  /* Pruefliste in object-actions.js: nie vorgehakt, Hinweis, Knoepfe, kein Weg nach ViVi */
+  const oa = lies('frontend/js/object-actions.js');
+  const vf = lies('frontend/js/vivi-felder.js');
+  ok(vf.includes("var HINWEIS_ABWEICHUNG = 'Weicht ab. Bitte in ViVi ändern, damit beide gleich sind.';"), 'Hinweis Zeichen für Zeichen: „Weicht ab. Bitte in ViVi ändern, damit beide gleich sind.“');
+  ok(/if \(z\.status === 'vivi_abweichung'\) \{ _merged\[z\.feld\]\.nurAktiv = true;/.test(oa) && /\(abw\[id\] !== undefined \|\| it\.nurAktiv\) \? '' : ' checked'/.test(oa), 'Prüftabelle: vivi_abweichung ist nurAktiv, also nie vorgehakt');
+  ok(/>ViVi-Wert behalten<\/button>/.test(oa) && />Wert aus der Unterlage nehmen<\/button>/.test(oa) && /<td>laut ViVi<\/td>/.test(oa), 'Knöpfe „ViVi-Wert behalten“ und „Wert aus der Unterlage nehmen“, Spalte „laut ViVi“');
+  const fn = (src, name) => { const a = src.indexOf('function ' + name + '('); if (a < 0) return ''; let i = src.indexOf('{', a), tiefe = 0; for (let k = i; k < src.length; k++) { if (src[k] === '{') tiefe++; else if (src[k] === '}') { tiefe--; if (!tiefe) return src.slice(a, k + 1); } } return ''; };
+  const ent = fn(oa, '_viviEntscheiden'), lok = fn(vf, 'lokalFestlegen'), ents = fn(vf, 'entscheiden');
+  const netz = /apiCall|fetch\(|XMLHttpRequest|sendBeacon|\/vivi\//;
+  ok(ent && lok && ents && !netz.test(ent + lok + ents), 'lokal festlegen und Entscheidung merken: kein Netz, kein /vivi/ (schreibt nie nach ViVi)');
+  ok(oa.indexOf('_viviEntscheiden(ov);') > 0 && oa.indexOf('_viviEntscheiden(ov);') < oa.indexOf("ov.querySelectorAll('.oabi-tbl input[type=\"checkbox\"]:checked').forEach"), 'Übernehmen: erst lokal festlegen, dann schreiben (sonst setzt die Sperre den Wert zurück)');
+
+  /* Gegenproben */
+  const ohne = bauen(FORM, { di: lies('frontend/js/dokument-import.js').split('return zeilen.map(_viviPruefen);').join('return zeilen;') });
+  ohne.F.setzen(STAND);
+  ok(zeile(ohne.D.abgleich({ kaufpreis_eur: 480000 }, 'kaufvertrag', {}), 'kp').status !== 'vivi_abweichung', 'Gegenprobe rot: ohne _viviPruefen fällt der fehlende Zustand auf');
+  const lokNetz = lok.replace('schreiben(v);', "schreiben(v); Auth.apiCall('/vivi/objekt/x', { method: 'POST' });");
+  ok(netz.test(lokNetz), 'Gegenprobe rot: ein Aufruf nach ViVi in lokalFestlegen würde gefunden');
+}
+
+/* ═══ V4 · Steuer als Entwurf (v3951) ════════════════════════════════════ */
+kopf('V4 Steuer: Entwurf hinter dem Schalter, nicht aktiv');
+{
+  ok(steuerEntwurf.AKTIV === false, 'Schalter viviSteuer.AKTIV ist aus');
+  const ds = lies('backend/src/services/vivi/viviDienst.js');
+  const nutz = ds.split('steuer.').length - 1;
+  ok(/if \(steuer\.AKTIV\) \{/.test(ds) && !/steuer\.(ausViviSteuer|lesePfade)/.test(ds.replace(/if \(steuer\.AKTIV\) \{[\s\S]*?\n    \}/, '')), 'viviDienst ruft den Steuer-Entwurf nur hinter if (steuer.AKTIV) (' + nutz + ' Stellen)');
+  const TO = SPEC.paths['/tax-overview'] && SPEC.paths['/tax-overview'].get;
+  const toTyp = TO && TO.responses['200'].content['application/json'].schema.properties.data.type;
+  ok(toTyp === 'string', 'Spezifikation: /tax-overview liefert data als string (deshalb Textauslese)');
+  const pf = steuerEntwurf.lesePfade('p1', 2026).map((x) => x.pfad.replace('/projects/p1', '/projects/{project}'));
+  ok(pf.every((x) => SPEC.paths[x] && SPEC.paths[x].get), 'alle Lesepfade stehen in der Spezifikation mit GET: ' + pf.join(', '));
+  const mig = lies('backend/migrations/005_tax_records.sql') + lies('backend/migrations/006_tax_extended.sql');
+  const spalten = [...new Set([...Object.values(steuerEntwurf.ZEILE_ZU_SPALTE), ...Object.values(steuerEntwurf.KATEGORIE_ZU_SPALTE)])];
+  ok(spalten.every((c) => new RegExp('\\b' + c + '\\b').test(mig)), 'jede Zielspalte steht in tax_records (Migration 005/006): ' + spalten.join(', '));
+  ok(/id="hg_ul"/.test(HTML) && /id="hg_nul"/.test(HTML), 'Hausgeld-Ziele hg_ul und hg_nul gibt es im Formular');
+  const r = steuerEntwurf.ausViviSteuer({
+    steueruebersicht: 'Anlage V 2026\nZeile 15 Mieteinnahmen 11.400,00 €\nZeile 48 Schuldzinsen 11.880,00\nZeile 99 Unbekannt 5,00\nFreitext ohne Zeile 1.000,00',
+    kosten: [{ tax_category: 'Erhaltungsaufwand', amount: 1850, date: '2026-05-12' }, { tax_category: 'Erhaltungsaufwand', amount: '640,50', date: '2026-09-02' }, { tax_category: 'Erhaltungsaufwand', amount: 999, date: '2025-12-30' },
+      { tax_category: 'Hausgeld (Rücklage)', amount: 85, date: '2026-01-01' }, { tax_category: 'Sonstige Werbungskosten', amount: 120, date: '2026-03-01' }],
+    laufend: [{ name: 'Hausgeld', tax_category: 'Hausgeld (Vorauszahlung)', amount: 200, interval: 'monthly' }, { name: 'Hausgeld', tax_category: 'Hausgeld (WEG)', amount: 107, interval: 'monthly' }, { name: 'Grundsteuer', amount: 90, interval: 'quarterly' }]
+  }, 2026);
+  const f = r.felder;
+  ok(f['steuer.2026.einnahmen_km'].wert === 11400 && f['steuer.2026.schuldzinsen'].wert === 11880 && !Object.keys(f).some((k) => /99|unbekannt/i.test(k)), 'Steuerübersicht als Text: Zeile 15 und 48 erkannt, unbekannte Zeile und Freitext bleiben liegen');
+  ok(f['steuer.2026.erhaltungsaufwand'].wert === 2490.5, 'Erhaltungsaufwand 2026 = 1.850 + 640,50 (der Beleg aus 2025 zählt nicht)');
+  ok(!Object.keys(f).some((k) => /ruecklage/.test(k)) && r.vorschlaege['steuer.2026.sonst_kosten'].wert === 120 && !f['steuer.2026.sonst_kosten'], 'Rücklage ohne Abzug, sonstige Werbungskosten nur als Vorschlag (nicht verknüpft)');
+  ok(f.hg_ul.wert === 2400 && f.hg_nul.wert === 1284, 'laufendes Hausgeld je Jahr: umlagefähig 200 × 12 = 2.400, nicht umlagefähig 107 × 12 = 1.284, Grundsteuer kein Hausgeld');
+  ok(Object.keys(steuerEntwurf.ausViviSteuer({}, 2026).felder).length === 0, 'leere oder unbekannte Antworten: kein Wert (nie geraten)');
 }
 
 dienst._setzeDeps(null);

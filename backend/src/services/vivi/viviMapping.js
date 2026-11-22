@@ -34,6 +34,7 @@ const VERTRAG_NACH_VIVI = { staffel: 'stepped_rent', index: 'indexed_rent' };
 const VERTRAG_AUS_VIVI = { stepped_rent: 'staffel', indexed_rent: 'index' };
 const UL_FELDER = ['hg_ul', 'grundsteuer', 'ul_sonst', 'kp1', 'kp2', 'kp3', 'kp4'];   /* wie calc.js und main.js V187 */
 const FAELLIG_TAG = 3;
+const MUSTER_ANSCHRIFT = Object.freeze({ street: 'Musterstraße', postal_code: '12345', city: 'Musterstadt' });   /* v3951 */
 
 /* ── Zahlen und Daten ─────────────────────────────────────────────────── */
 /* "50.000" -> 50000, "3,1" -> 3.1, "3.5" -> 3.5 (Punkt mit ein oder zwei Nachkommastellen ist ein Dezimalpunkt).
@@ -139,7 +140,12 @@ function etageZahl(v) {
 /* ══ DealPilot -> ViVi ═══════════════════════════════════════════════════ */
 /**
  * @param daten  objects.data
- * @param opt    { platzhalterNamen: bool, faelligTag: 1..31 }
+ * @param opt    { platzhalterNamen: bool, faelligTag: 1..31, musterAnschrift: bool, musterNr: '1'..'99' }
+ *
+ * v3951 · musterAnschrift (Testbetrieb, solange 'vivi' Vorschau-Funktion ist): statt der Anschrift des Objekts geht
+ * MUSTER_ANSCHRIFT an ViVi (Hausnummer musterNr, damit mehrere Demo-Objekte unterscheidbar bleiben). Die echte
+ * Anschrift verlaesst DealPilot dann nie. ausVivi() liest die Anschrift einer so angelegten Verknuepfung nicht
+ * zurueck (kontext.musterAnschrift), sonst stuende die Musteranschrift danach im DealPilot-Objekt.
  */
 function nachVivi(daten, opt) {
   daten = daten || {};
@@ -154,20 +160,23 @@ function nachVivi(daten, opt) {
   const kp = zahl(daten.kp);
   const kauf = isoDatum(daten.wirtschaftlicher_uebergang) || isoDatum(daten.kaufdat);
   const plz = text(daten.plz);
-  if (!text(daten.str)) fehlt.push({ feld: 'str', text: 'Straße fehlt' });
-  if (!text(daten.hnr)) fehlt.push({ feld: 'hnr', text: 'Hausnummer fehlt' });
-  if (!/^\d{5}$/.test(plz)) fehlt.push({ feld: 'plz', text: 'Postleitzahl fehlt oder ist nicht fünfstellig' });
-  if (!text(daten.ort)) fehlt.push({ feld: 'ort', text: 'Ort fehlt' });
+  if (!opt.musterAnschrift) {
+    if (!text(daten.str)) fehlt.push({ feld: 'str', text: 'Straße fehlt' });
+    if (!text(daten.hnr)) fehlt.push({ feld: 'hnr', text: 'Hausnummer fehlt' });
+    if (!/^\d{5}$/.test(plz)) fehlt.push({ feld: 'plz', text: 'Postleitzahl fehlt oder ist nicht fünfstellig' });
+    if (!text(daten.ort)) fehlt.push({ feld: 'ort', text: 'Ort fehlt' });
+  }
   if (!(kp > 0)) fehlt.push({ feld: 'kp', text: 'Kaufpreis fehlt' });
   if (!kauf) fehlt.push({ feld: 'wirtschaftlicher_uebergang', text: 'Übergang von Nutzen und Lasten fehlt (Reiter Objekt)' });
   else if (!isoDatum(daten.wirtschaftlicher_uebergang)) hinweise.push('Übergang von Nutzen und Lasten fehlt, angesetzt ist das Kaufdatum ' + deDatum(kauf) + '.');
 
+  const muster = !!opt.musterAnschrift;
   const projekt = {
     type: typ,
-    street: text(daten.str).slice(0, 255),
-    house_number: text(daten.hnr).slice(0, 255),
-    postal_code: plz,
-    city: text(daten.ort).slice(0, 255),
+    street: muster ? MUSTER_ANSCHRIFT.street : text(daten.str).slice(0, 255),
+    house_number: muster ? (text(opt.musterNr) || '1').slice(0, 255) : text(daten.hnr).slice(0, 255),
+    postal_code: muster ? MUSTER_ANSCHRIFT.postal_code : plz,
+    city: muster ? MUSTER_ANSCHRIFT.city : text(daten.ort).slice(0, 255),
     purchase_price: kp > 0 ? rund(kp) : 0,
     purchase_date: kauf || '',
     units: 1
@@ -177,7 +186,8 @@ function nachVivi(daten, opt) {
   const nk = [['broker', 'makler_p', 'Makler'], ['real_estate_transfer_tax', 'gest_p', 'Grunderwerbsteuer'],
     ['notary', 'notar_p', 'Notar'], ['land_register', 'gba_p', 'Grundbuch'], ['other_costs', 'ji_p', 'Sonstige Kaufnebenkosten']];
   zeige('Objekt', 'Objektart', typ);
-  zeige('Objekt', 'Anschrift', [projekt.street, projekt.house_number].join(' ') + ', ' + plz + ' ' + projekt.city);
+  zeige('Objekt', 'Anschrift', [projekt.street, projekt.house_number].join(' ') + ', ' + projekt.postal_code + ' ' + projekt.city, muster ? 'Musteranschrift für den Testbetrieb. Die Anschrift des Objekts bleibt in DealPilot' : '');
+  if (muster) hinweise.push('Testbetrieb: In ViVi steht eine Musteranschrift. DealPilot liest die Anschrift deshalb nicht aus ViVi zurück.');
   zeige('Objekt', 'Kaufpreis', eur(kp));
   zeige('Objekt', 'Übergang Nutzen und Lasten', deDatum(kauf));
   if (projekt.construction_year) zeige('Objekt', 'Baujahr', String(projekt.construction_year));
@@ -315,7 +325,7 @@ function monatJahr(iso) { const m = /^(\d{4})-(\d{2})/.exec(text(iso)); return m
 
 /**
  * @param paket    { projekt, einheiten[], mietverhaeltnisse[], darlehen[], tilgungsplan }
- * @param kontext  { vivi_ids, mitEinheiten (bool), objart, jetzt }
+ * @param kontext  { vivi_ids, mitEinheiten (bool), objart, jetzt, musterAnschrift (bool, v3951) }
  * @returns { felder: { id: { wert, quelle } }, info: { restschuld_heute, darlehen_weitere[] } }
  */
 function ausVivi(paket, kontext) {
@@ -327,10 +337,13 @@ function ausVivi(paket, kontext) {
   const p = paket.projekt || {};
   const pq = 'projects/' + (p.id == null ? '' : p.id);
 
-  setze('str', text(p.street), pq);
-  setze('hnr', text(p.house_number), pq);
-  setze('plz', text(p.postal_code), pq);
-  setze('ort', text(p.city), pq);
+  /* v3951 · Testbetrieb mit Musteranschrift: die Anschrift in ViVi ist nicht die des Objekts, also nicht zuruecklesen */
+  if (!kontext.musterAnschrift) {
+    setze('str', text(p.street), pq);
+    setze('hnr', text(p.house_number), pq);
+    setze('plz', text(p.postal_code), pq);
+    setze('ort', text(p.city), pq);
+  }
   if (p.construction_year != null && +p.construction_year > 0) setze('baujahr', String(p.construction_year), pq);
   setze('wirtschaftlicher_uebergang', isoDatum(p.purchase_date), pq);
   const kp = zahl(p.purchase_price);
@@ -434,5 +447,5 @@ function ausVivi(paket, kontext) {
 
 module.exports = {
   nachVivi, ausVivi, nkVorschlag, ulJahr, einheitenListe, zahl, isoDatum, monatDatum, etageText, etageZahl, mieterName,
-  OBJEKTTYP, VERTRAG_NACH_VIVI, VERTRAG_AUS_VIVI, UL_FELDER, ARTEN_MIT_EINHEITEN
+  OBJEKTTYP, VERTRAG_NACH_VIVI, VERTRAG_AUS_VIVI, UL_FELDER, ARTEN_MIT_EINHEITEN, MUSTER_ANSCHRIFT
 };

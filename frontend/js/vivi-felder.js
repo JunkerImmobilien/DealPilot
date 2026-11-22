@@ -19,6 +19,8 @@
  *
  * Gespeichert im Objekt: _vivi (storage.js FIELDS, versteckt) = { verknuepft, stand, felder: {id: wert},
  * eigen: {id: wert} }. Massgeblich bleibt vivi_werte im Backend, _vivi ist der Spiegel fuer die Anzeige.
+ * v3951 (Paket V5) dazu: herkunft: {id: {quelle, am}} (woher eine eigene Angabe kam, z. B. „Wirtschaftsplan 2026“) und
+ * entscheidungen: {id: {wahl, dok, dok_wert, vivi_wert, am}} (Unterlagen-Abgleich, damit nicht jedes Mal gefragt wird).
  * ═════════════════════════════════════════════════════════════════════════════════════════════════ */
 (function () {
   if (window.DpViviFelder) return;
@@ -312,9 +314,89 @@
   window.addEventListener('dp:object-ready', function () { _stand = null; allesLoesen(false); });
   window.addEventListener('dp:detailgrad', function () { if (_stand) setzen(_stand); });
 
+  /* ── v3951 · Paket V5: Abgleich mit Unterlagen ─────────────────────
+     Marcel 22.11.2026: liest der Kunde eine Unterlage ein (Wirtschaftsplan, Protokoll, Mietvertrag …) und weicht ein
+     verknuepftes Feld ab, zeigt die Pruefliste beide Werte und ist nie vorgehakt. „Wert aus der Unterlage nehmen“ ist
+     ein lokales Festlegen wie das Schloss: der Wert gilt als eigene Angabe und geht NIE nach ViVi. */
+  var HINWEIS_ABWEICHUNG = 'Weicht ab. Bitte in ViVi ändern, damit beide gleich sind.';
+  function istVerknuepft(id) { var v = lesen(); return !!(_stand && _stand.verknuepft !== false && _stand.felder && _stand.felder[id]) && !Object.prototype.hasOwnProperty.call(v.eigen, id); }
+  function viviWert(id) { return _stand && _stand.felder && _stand.felder[id] ? _stand.felder[id].wert : undefined; }
+  function isoTag(s) {
+    var t = String(s == null ? '' : s).trim(), m;
+    if ((m = /^(\d{4})-(\d{2})-(\d{2})/.exec(t))) return m[1] + '-' + m[2] + '-' + m[3];
+    if ((m = /^(\d{1,2})\.(\d{1,2})\.(\d{4})$/.exec(t))) return m[3] + '-' + ('0' + m[2]).slice(-2) + '-' + ('0' + m[1]).slice(-2);
+    return null;
+  }
+  /* gleich im Sinne des Abgleichs: Zahlen auf 0,5 Cent, Daten nach Tag, Text ohne Gross/Klein und Leerraum */
+  function gleichDok(a, b) {
+    var da = isoTag(a), db = isoTag(b);
+    if (da && db) return da === db;
+    var x = zahl(a), y = zahl(b);
+    if (x != null && y != null && /^[\s\d.,%€+-]+$/.test(String(a)) && /^[\s\d.,%€+-]+$/.test(String(b))) return Math.abs(x - y) < 0.005;
+    return String(a == null ? '' : a).trim().toLowerCase().replace(/\s+/g, ' ') === String(b == null ? '' : b).trim().toLowerCase().replace(/\s+/g, ' ');
+  }
+  function anzeige(w) {
+    if (w == null || w === '') return '';
+    var d = isoTag(w); if (d) return d.slice(8, 10) + '.' + d.slice(5, 7) + '.' + d.slice(0, 4);
+    if (typeof w === 'number') return w.toLocaleString('de-DE', { maximumFractionDigits: 3 });
+    return String(w);
+  }
+  function entscheidung(id) { var v = lesen(); return v.entscheidungen && v.entscheidungen[id] ? v.entscheidungen[id] : null; }
+  /**
+   * Vergleicht einen Wert aus einer Unterlage mit dem ViVi-Wert des Feldes.
+   * null = Feld nicht verknuepft (alles wie ohne ViVi). Sonst { wert, anzeige, gleich, entschieden }.
+   * entschieden: dieselbe Unterlage mit demselben Wert wurde schon einmal mit „ViVi-Wert behalten“ beantwortet und
+   * ViVi fuehrt noch denselben Wert. Dann fragt die Pruefliste nicht noch einmal.
+   */
+  function vergleich(id, dokWert) {
+    if (!id || !istVerknuepft(id)) return null;
+    var w = viviWert(id);
+    var g = gleichDok(w, dokWert);
+    var e = g ? null : entscheidung(id);
+    var ent = e && e.wahl === 'vivi' && gleichDok(e.dok_wert, dokWert) && gleichDok(e.vivi_wert, w) ? e : null;
+    return { id: id, wert: w, anzeige: anzeige(w), gleich: g, entschieden: ent };
+  }
+  /** Feld-ID in vivi_werte fuer die Zelle k der Einheit i in _dpMfh (z. B. einheit.2.ist), sonst null */
+  function einheitFeld(i, k) { return einheitSchluessel(i, k); }
+  /** Mietvertrag gegen die ViVi-Werte der Einheit i: Liste der abweichenden Felder { id, k, vivi, dok, anzeige } */
+  function einheitVergleich(i, werte) {
+    var aus = [];
+    Object.keys(werte || {}).forEach(function (k) {
+      var dw = werte[k]; if (dw == null || dw === '') return;
+      var id = einheitFeld(i, k); if (!id) return;
+      var c = vergleich(id, dw); if (!c || c.gleich || c.entschieden) return;
+      aus.push({ id: id, k: k, vivi: c.wert, anzeige: c.anzeige, dok: dw });
+    });
+    return aus;
+  }
+  /**
+   * „Wert aus der Unterlage nehmen“: das Feld wird lokal festgelegt (eigene Angabe), genau wie mit dem Schloss.
+   * Schreibt nur _vivi im Objekt. Es gibt keinen Weg nach ViVi (dieses Modul spricht nicht mit dem Backend).
+   */
+  function lokalFestlegen(id, wert, herkunft) {
+    var v = lesen(); if (!v.verknuepft) return false;
+    v.eigen[id] = wert == null ? '' : String(wert);
+    if (!v.herkunft || typeof v.herkunft !== 'object') v.herkunft = {};
+    v.herkunft[id] = { quelle: String(herkunft || 'Unterlage').slice(0, 120), am: new Date().toISOString().slice(0, 10) };
+    schreiben(v);
+    if (/^einheit\./.test(id)) einheitenSperren();
+    else { var el = $(id); if (el) sperreAn(el, id, viviWert(id), v.eigen, ''); }
+    try { var h = $('_vivi'); if (h) h.dispatchEvent(new Event('input', { bubbles: true })); } catch (e) {}
+    return true;
+  }
+  /** Entscheidung merken (wahl 'vivi' oder 'unterlage'), damit dieselbe Unterlage nicht jedes Mal wieder fragt */
+  function entscheiden(id, e) {
+    var v = lesen(); if (!v.verknuepft || !id || !e) return false;
+    if (!v.entscheidungen || typeof v.entscheidungen !== 'object') v.entscheidungen = {};
+    v.entscheidungen[id] = { wahl: e.wahl === 'unterlage' ? 'unterlage' : 'vivi', dok: String(e.dok || '').slice(0, 120), dok_wert: e.dok_wert == null ? '' : String(e.dok_wert), vivi_wert: e.vivi_wert == null ? '' : e.vivi_wert, am: new Date().toISOString().slice(0, 10) };
+    schreiben(v);
+    return true;
+  }
+
   window.DpViviFelder = { setzen: setzen, allesLoesen: allesLoesen, einheitenSperren: einheitenSperren, lesen: lesen, HINWEIS: HINWEIS, EINHEIT_FELDER: EINHEIT_FELDER,
     /* fuer den Unterlagen-Abgleich (Paket V5): ist ein Feld verknuepft, und welchen Wert fuehrt ViVi? */
-    istVerknuepft: function (id) { var v = lesen(); return !!(_stand && _stand.felder && _stand.felder[id]) && !Object.prototype.hasOwnProperty.call(v.eigen, id); },
-    viviWert: function (id) { return _stand && _stand.felder && _stand.felder[id] ? _stand.felder[id].wert : undefined; }
+    istVerknuepft: istVerknuepft, viviWert: viviWert,
+    HINWEIS_ABWEICHUNG: HINWEIS_ABWEICHUNG, vergleich: vergleich, einheitFeld: einheitFeld, einheitVergleich: einheitVergleich,
+    lokalFestlegen: lokalFestlegen, entscheiden: entscheiden, entscheidung: entscheidung, gleichDok: gleichDok
   };
 })();

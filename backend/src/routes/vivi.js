@@ -72,13 +72,14 @@ router.post('/objekt/:id/anlegen', bremse, function (req, res, next) {
   const id = oid(req, res); if (!id) return;
   const b = req.body || {};
   if (b.bestaetigt !== true) return res.status(400).json({ error: 'Bitte die Vorschau bestätigen.' });
-  dienst.anlegen(uid(req), id, { account_id: b.account_id ? String(b.account_id) : null, platzhalter_namen: !!b.platzhalter_namen, faellig_tag: b.faellig_tag })
+  dienst.anlegen(uid(req), id, { account_id: b.account_id ? String(b.account_id) : null, platzhalter_namen: typeof b.platzhalter_namen === 'boolean' ? b.platzhalter_namen : undefined,
+    muster_anschrift: typeof b.muster_anschrift === 'boolean' ? b.muster_anschrift : undefined, faellig_tag: b.faellig_tag })
     .then(function (r) { res.json(r); }).catch(antwort(res, next));
 });
 router.post('/objekt/:id/zuordnen', bremse, function (req, res, next) {
   const id = oid(req, res); if (!id) return;
   const b = req.body || {};
-  dienst.zuordnen(uid(req), id, b.vivi_objekt_id, b.account_id ? String(b.account_id) : null).then(function (r) { res.json(r); }).catch(antwort(res, next));
+  dienst.zuordnen(uid(req), id, b.vivi_objekt_id, b.account_id ? String(b.account_id) : null, { muster_anschrift: typeof b.muster_anschrift === 'boolean' ? b.muster_anschrift : undefined }).then(function (r) { res.json(r); }).catch(antwort(res, next));
 });
 router.get('/objekt/:id/werte', function (req, res, next) {
   const id = oid(req, res); if (!id) return;

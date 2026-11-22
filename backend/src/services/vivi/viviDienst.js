@@ -16,6 +16,7 @@
  */
 const mapping = require('./viviMapping');
 const viviClient = require('./viviClient');
+const steuer = require('./viviSteuer');   /* v3951 · Paket V4 als Entwurf, steuer.AKTIV = false */
 
 const ANBIETER = 'vivi';
 const TAKT_STUNDEN = 20;          /* ein Objekt wird hoechstens alle 20 h vom Takt gelesen, der Takt laeuft alle 6 h */
@@ -27,6 +28,12 @@ const STANDARD = {
   get creds() { return require('../providerCredentialsService'); },
   client: function (token, opt) { return viviClient.erzeugen(token, opt); },
   jetzt: function () { return Date.now(); },
+  /* v3951 · Testbetrieb: solange 'vivi' als Vorschau-Funktion gefuehrt und nicht fuer alle freigegeben ist */
+  testbetrieb: async function () {
+    const vs = require('../vorschau');
+    if (!vs.eintrag('vivi')) return false;
+    try { return !(await vs.fuerAlle()).has('vivi'); } catch (e) { return true; }
+  },
   schlafen: function (ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
 };
 let _deps = null;
@@ -94,13 +101,25 @@ async function objekt(userId, objectId) {
   if (!o) throw fehler(404, 'objekt_nicht_gefunden', 'Objekt nicht gefunden');
   return o;
 }
-function planOptionen(opt) { opt = opt || {}; return { platzhalterNamen: !!opt.platzhalter_namen, faelligTag: opt.faellig_tag }; }
+/* v3951 · Im Testbetrieb sind Musteranschrift und Platzhalter-Mieter vorgegeben (an), solange der Aufrufer sie nicht
+   ausdruecklich auf false setzt. Die Hausnummer der Musteranschrift ist die laufende Nummer des Objekts
+   (2026-1157 -> Musterstraße 1157), damit die Demo-Objekte in ViVi unterscheidbar bleiben. */
+async function planOptionen(opt, daten) {
+  opt = opt || {};
+  const test = await deps().testbetrieb();
+  const vorgabe = function (v) { return v === undefined || v === null ? test : !!v; };
+  const nr = String((daten && daten._obj_seq) || '').split('-').pop().replace(/\D/g, '').replace(/^0+/, '') || '1';
+  return { platzhalterNamen: vorgabe(opt.platzhalter_namen), musterAnschrift: vorgabe(opt.muster_anschrift), musterNr: nr, faelligTag: opt.faellig_tag, testbetrieb: test };
+}
+function optionenAntwort(po) { return { platzhalter_namen: po.platzhalterNamen, muster_anschrift: po.musterAnschrift, testbetrieb: po.testbetrieb }; }
 
 async function vorschau(userId, objectId, opt) {
   const o = await objekt(userId, objectId);
   const v = await deps().speicher.verknuepfung(userId, objectId);
-  const plan = mapping.nachVivi(o.data || {}, planOptionen(opt));
+  const po = await planOptionen(opt, o.data);
+  const plan = mapping.nachVivi(o.data || {}, po);
   return {
+    optionen: optionenAntwort(po),
     status: v ? v.anlage_status : null,
     gesperrt: !!(v && (v.anlage_status === 'fertig' || v.herkunft === 'zugeordnet')),
     ok: plan.ok, fehlt: plan.fehlt, hinweise: plan.hinweise, vorschau: plan.vorschau,
@@ -119,7 +138,8 @@ function gleicheAnschrift(p, projekt) {
 async function anlegen(userId, objectId, opt) {
   opt = opt || {};
   const o = await objekt(userId, objectId);
-  const plan = mapping.nachVivi(o.data || {}, planOptionen(opt));
+  const po = await planOptionen(opt, o.data);
+  const plan = mapping.nachVivi(o.data || {}, po);
   if (!plan.ok) throw fehler(422, 'angaben_fehlen', 'Für ViVi fehlen Angaben: ' + plan.fehlt.map(function (f) { return f.text; }).join(', '), { fehlt: plan.fehlt });
   const tok = await token(userId);
   const sp = deps().speicher;
@@ -131,6 +151,9 @@ async function anlegen(userId, objectId, opt) {
   }
   const z = anspruch.zeile;
   const ids = (z.vivi_ids && typeof z.vivi_ids === 'object') ? JSON.parse(JSON.stringify(z.vivi_ids)) : {};
+  /* v3951 · ein Fortsetzen bleibt bei der Anschrift des ersten Laufs, sonst faende gleicheAnschrift() das Objekt nicht */
+  if (ids.muster_anschrift === undefined) ids.muster_anschrift = po.musterAnschrift;
+  else if (ids.muster_anschrift !== po.musterAnschrift) { po.musterAnschrift = ids.muster_anschrift; Object.assign(plan.projekt, mapping.nachVivi(o.data || {}, po).projekt); }
   const q = abfrage(z.vivi_account_id || opt.account_id || null);
   const cl = deps().client(tok, { maxWarten: 65000 });
   const t0 = deps().jetzt();
@@ -226,7 +249,8 @@ async function anlegen(userId, objectId, opt) {
 }
 
 /* Ein vorhandenes ViVi-Objekt verknuepfen. Nur lesend: es wird geprueft, dass es das Objekt gibt. */
-async function zuordnen(userId, objectId, viviObjektId, accountId) {
+async function zuordnen(userId, objectId, viviObjektId, accountId, opt) {
+  opt = opt || {};
   if (!viviObjektId) throw fehler(400, 'id_fehlt', 'ViVi-Objekt fehlt');
   await objekt(userId, objectId);
   const cl = deps().client(await token(userId));
@@ -234,6 +258,9 @@ async function zuordnen(userId, objectId, viviObjektId, accountId) {
   catch (e) { throw alsAntwort(e); }
   const z = await deps().speicher.zuordnen(userId, objectId, viviObjektId, accountId);
   if (!z) throw fehler(409, 'bereits_verknuepft', 'Dieses Objekt ist schon mit ViVi verknüpft.');
+  /* v3951 · Im Testbetrieb tragen die ViVi-Objekte Musteranschriften: die Anschrift wird dann nicht zurueckgelesen */
+  const muster = opt.muster_anschrift === undefined || opt.muster_anschrift === null ? await deps().testbetrieb() : !!opt.muster_anschrift;
+  if (muster) await deps().speicher.idsSpeichern(objectId, Object.assign({}, z.vivi_ids || {}, { muster_anschrift: true }), null);
   return { ok: true, vivi_objekt_id: String(viviObjektId) };
 }
 
@@ -271,7 +298,16 @@ async function abrufen(userId, objectId, opt) {
     const darl = liste(await cl.get(P + '/financings', q));
     const plan = darl.length ? (await cl.get(P + '/financing-schedule', q)) : null;
     const erg = mapping.ausVivi({ projekt: projekt, einheiten: einheiten, mietverhaeltnisse: miet, darlehen: darl, tilgungsplan: plan },
-      { vivi_ids: v.vivi_ids || {}, mitEinheiten: mitEinheiten(v, o.data), objart: o.data && o.data.objart, jetzt: deps().jetzt() });
+      { vivi_ids: v.vivi_ids || {}, mitEinheiten: mitEinheiten(v, o.data), objart: o.data && o.data.objart, jetzt: deps().jetzt(),
+        musterAnschrift: !!(v.vivi_ids && v.vivi_ids.muster_anschrift) });
+    /* v3951 · Paket V4 (Steuer): Entwurf hinter dem Schalter steuer.AKTIV (aus). Erst mit echten Antworten umlegen. */
+    if (steuer.AKTIV) {
+      const jahr = new Date(deps().jetzt()).getFullYear();
+      const roh = {};
+      for (const x of steuer.lesePfade(v.vivi_objekt_id, jahr)) roh[x.pfad.split('/').pop()] = await cl.get(x.pfad, Object.assign({}, q, x.abfrage));
+      const st = steuer.ausViviSteuer({ steueruebersicht: roh['tax-overview'] && roh['tax-overview'].data, kosten: liste(roh.costs), laufend: liste(roh['monthly-costs']), einnahmen: liste(roh.revenues) }, jahr);
+      Object.assign(erg.felder, st.felder);
+    }
     await sp.werteSchreiben(objectId, erg.felder, erg.info);
     await sp.protokoll({ user_id: userId, object_id: objectId, art: opt.takt ? 'takt' : 'abruf', anfragen: cl.zaehler.anfragen - vorher, ok: true, dauer_ms: deps().jetzt() - t0 });
     return { ok: true, felder: erg.felder, info: erg.info, anzahl: Object.keys(erg.felder).length };
@@ -296,6 +332,7 @@ async function werte(userId, objectId) {
   });
   return {
     verknuepft: v.anlage_status === 'fertig', status: v.anlage_status, herkunft: v.herkunft,
+    muster_anschrift: !!(v.vivi_ids && v.vivi_ids.muster_anschrift),
     vivi_objekt_id: v.vivi_objekt_id, letzter_abruf: v.letzter_abruf, letzter_fehler: v.letzter_fehler,
     felder: felder, info: info
   };
@@ -343,5 +380,5 @@ function starteTakt() {
 
 module.exports = {
   ANBIETER, verbindungMeta, verbindungSpeichern, verbindungLoeschen, probe, vorschau, anlegen, zuordnen, projekte,
-  abrufen, werte, loesen, taktLauf, starteTakt, _setzeDeps, alsAntwort
+  abrufen, werte, loesen, taktLauf, starteTakt, _setzeDeps, alsAntwort, planOptionen
 };

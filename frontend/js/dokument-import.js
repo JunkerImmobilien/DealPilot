@@ -224,6 +224,18 @@
     if (art === 'ETW') return 'Wirtschaftsplan/Abrechnung: Hausgeld nicht übernommen - es gibt nur den Gesamtplan und keinen Miteigentumsanteil. Trag den MEA im Reiter Objekt ein und lies den Plan erneut ein.';
     return null;
   }
+  /* v3951 · Paket V5 (ViVi): ist das Feld mit ViVi verknuepft, zaehlt der ViVi-Wert. Weicht die Unterlage davon ab,
+     heisst der Zustand vivi_abweichung (nie vorgehakt, Pruefliste zeigt „laut ViVi“). Stimmt sie, ist es „gleich“
+     mit dem Zusatz viviGleich. Ohne Verknuepfung bleibt alles wie bisher. */
+  function _viviPruefen(z) {
+    var F = window.DpViviFelder;
+    if (!z || !z.feld || z.hinweis || !F || typeof F.vergleich !== 'function') return z;
+    var c = F.vergleich(z.feld, z.neu); if (!c) return z;
+    z.vivi = c.anzeige; z.viviWert = c.wert;
+    if (c.gleich) { z.status = 'gleich'; z.viviGleich = true; }
+    else { z.status = 'vivi_abweichung'; if (c.entschieden) z.viviEntschieden = c.entschieden; }
+    return z;
+  }
   function _abgleichHausgeld(ext, ktx) {
     var b = _hausgeldBasis(ext, ktx); if (!b) { var h = _hausgeldHinweis(ext, ktx); return h ? [{ hinweis: h }] : []; }
     var w = b.w, f = b.faktor, rd = function (x) { var n = _zahl(x); return n == null ? null : Math.round(n * f); };
@@ -255,7 +267,7 @@
       var istP = _feldWert('hg_pos');
       zeilen.push({ feld: 'hg_pos', wort: 'Aufstellung des Hausgelds', neu: pj, anzeige: pos.length + ' Positionen' + (ext.jahr ? ' (' + (ext.art || 'Wirtschaftsplan') + ' ' + ext.jahr + ')' : ''), ist: istP ? 'andere Aufstellung' : '', einheit: '', ort: 'Bewirtschaftung', status: istP === '' ? 'neu' : (istP === pj ? 'gleich' : 'abweichung'), herleitung: (ext.art || 'Wirtschaftsplan') + (ext.jahr ? ' ' + ext.jahr : '') + ' · ' + b.wie });
     }
-    return zeilen;
+    return zeilen.map(_viviPruefen);   /* v3951 */
   }
   /* Vorschläge für den Steuer-Reiter: Verwaltung, übrige nicht umlagefähige Kosten (OHNE Rücklage -
      die Zuführung ist erst absetzbar, wenn die Gemeinschaft sie ausgibt), Erhaltungsaufwand aus
@@ -408,7 +420,7 @@
       var anz = z[2] === 'jahr' ? String(Math.round(_zahl(f[k]))) : (_zahl(f[k]) != null && EINH[z[2]]) ? _fmt(f[k]) + EINH[z[2]] : typeof f[k] === 'number' ? _fmt(f[k]) : String(f[k]);
       zeilen.push({ feld: z[0], wort: z[1], neu: neu, anzeige: anz,   /* Baujahr nie „1.967" */ ist: ist, status: status });
     });
-    return zeilen;
+    return zeilen.map(_viviPruefen);   /* v3951 */
   }
   function _uebernehmen(zeilen) {
     var n = 0;
@@ -416,6 +428,8 @@
       var cb = document.querySelector('#dpdi-abgleich input[data-feld="' + z.feld + '"]');
       if (!cb || !cb.checked) return;
       var el = document.getElementById(z.feld); if (!el) return;
+      /* v3951 · verknuepft mit ViVi und abweichend: lokal festlegen (eigene Angabe), nie nach ViVi */
+      if (z.status === 'vivi_abweichung' && window.DpViviFelder) { window.DpViviFelder.lokalFestlegen(z.feld, z.neu, 'Unterlage'); window.DpViviFelder.entscheiden(z.feld, { wahl: 'unterlage', dok: 'Unterlage', dok_wert: z.neu, vivi_wert: z.viviWert }); }
       el.value = z.neu;
       try { el.dispatchEvent(new Event('input', { bubbles: true })); el.dispatchEvent(new Event('change', { bubbles: true })); } catch (e) {}
       n++;
@@ -606,8 +620,10 @@
             + 'Sie sind nicht vorgehakt — hak sie an, wenn das Dokument recht hat.</div>' : '')
         + '<table class="dpdi-table" id="dpdi-abgleich"><tr><th></th><th>Feld</th><th>im Dokument</th><th>im Objekt</th></tr>'
         + abg.map(function (z) {
-            var farbe = z.status === 'abweichung' ? ' style="background:rgba(217,164,65,.14)"' : '';
-            var stat = z.status === 'gleich' ? '<span style="color:#3FA56C">gleich</span>' : z.status === 'neu' ? '<span style="color:#7A7370">leer</span>' : '<b style="color:#b5651d">' + _esc(z.ist) + '</b>';
+            var farbe = (z.status === 'abweichung' || z.status === 'vivi_abweichung') ? ' style="background:rgba(217,164,65,.14)"' : '';
+            var stat = z.status === 'gleich' ? '<span style="color:#3FA56C">' + (z.viviGleich ? 'stimmt mit ViVi überein' : 'gleich') + '</span>' : z.status === 'neu' ? '<span style="color:#7A7370">leer</span>'
+              : z.status === 'vivi_abweichung' ? '<b style="color:#b5651d">laut ViVi ' + _esc(z.vivi) + '</b><div style="font-size:11.5px">' + _esc(window.DpViviFelder ? window.DpViviFelder.HINWEIS_ABWEICHUNG : '') + '</div>'
+              : '<b style="color:#b5651d">' + _esc(z.ist) + '</b>';
             return '<tr' + farbe + '><td><input type="checkbox" data-feld="' + _esc(z.feld) + '"' + (z.status === 'neu' ? ' checked' : '') + (z.status === 'gleich' ? ' disabled' : '') + '></td>'
               + '<td>' + _esc(z.wort) + '</td><td class="num">' + _esc(z.anzeige) + '</td><td class="num">' + stat + '</td></tr>';
           }).join('') + '</table>'

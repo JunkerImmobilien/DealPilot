@@ -2113,6 +2113,12 @@
     var mea = numDe(meaRoh);
     return { objart: art, mea: (mea > 0 && mea <= 100) ? mea : null };
   }
+  /* v3951 · Vertragswerte, die ViVi je Einheit fuehrt (Schluessel wie _mfh.einheiten[], vivi-felder.js EINHEIT_FELDER) */
+  var _MV_VIVI_WORT = { ist: 'Kaltmiete', mv_beginn: 'Mietbeginn', mv_kaution: 'Kaution', nk_vorauszahlung: 'Nebenkosten', mv_befristet_bis: 'befristet bis' };
+  function _mvViviWerte(mx) {
+    mx = mx || {};
+    return { ist: mx.kaltmiete_eur, mv_beginn: mx.mietbeginn, mv_kaution: mx.kaution_eur, nk_vorauszahlung: mx.nebenkosten_vorauszahlung_eur, mv_befristet_bis: mx.befristet_bis };
+  }
   function mergeDokument(a, nurHausgeld) {
     var D = window.DokumentImport; if (!D) return;
     /* v3016 · ein PDF kann mehrere Dokumente tragen (a.weitere, z. B. Flurkarte + Energieausweis) */
@@ -2129,8 +2135,12 @@
       }
       if (t.typ === 'mietvertrag' && !_qcMode && window.DpEingang && window.DpEingang.einheiten()) {
         var _mx = t.extracted || {}, _mv = window.DpEingang.mvVorschlag(_mx) || { i: -1, sicher: false, grund: '' };
-        _merged['mv:' + Object.keys(_merged).length] = { label: 'Mietvertrag → Einheit', value: window.DpEingang.mvText(_mx), raw: _mx, source: t.label || 'Mietvertrag',
+        var _mvKey = 'mv:' + Object.keys(_merged).length;
+        _merged[_mvKey] = { label: 'Mietvertrag → Einheit', value: window.DpEingang.mvText(_mx), raw: _mx, source: t.label || 'Mietvertrag',
           kind: 'mv_einheit', mv: _mv, nurAktiv: !_mv.sicher, herleitung: _mv.grund + ' · überschreibt Miete und Vertragsdaten der Einheit, Fläche/Zimmer nur wenn leer' };
+        /* v3951 · Paket V5: die vorgeschlagene Einheit ist mit ViVi verknuepft und der Vertrag weicht ab */
+        var _vD = (_mv.i >= 0 && window.DpViviFelder && window.DpViviFelder.einheitVergleich) ? window.DpViviFelder.einheitVergleich(_mv.i, _mvViviWerte(_mx)) : [];
+        if (_vD.length) { var _mk = _mvKey; _merged[_mk].nurAktiv = true; _merged[_mk].viviAbw = { einheit: _vD, anzeige: _vD.map(function (x) { return (_MV_VIVI_WORT[x.k] || x.k) + ' ' + x.anzeige; }).join(', ') }; }
         return;
       }
       var ktx = _kontext();
@@ -2146,6 +2156,9 @@
            dort vorgehakt. Bei ETW/Einzelwohnung bleibt es beim aktiven Anstoßen (v3088a). */
         var _ganzesHaus = /^(MFH|WGH|ZFH)$/.test(ktx.objart || '');
         _merged[z.feld] = { nurAktiv: t.typ === 'hausgeld' && !_ganzesHaus, label: z.wort, value: z.anzeige, raw: z.neu, source: t.label || 'Dokument', kind: z.feld === 'ds2_energie' ? 'select' : 'input', herleitung: z.herleitung, einheit: z.einheit, ort: z.ort, typ: t.typ };
+        /* v3951 · Paket V5: Feld mit ViVi verknuepft. Weicht die Unterlage ab, nie vorgehakt, dritte Spalte „laut ViVi“ */
+        if (z.status === 'vivi_abweichung') { _merged[z.feld].nurAktiv = true; _merged[z.feld].viviAbw = { anzeige: z.vivi, wert: z.viviWert, dokWert: z.neu, entschieden: z.viviEntschieden || null }; }
+        else if (z.viviGleich) _merged[z.feld].viviGleich = { anzeige: z.vivi };
       });
       /* v3017 · Wirtschaftsplan/Abrechnung → Steuer-Reiter. Weicht der Vorschlag vom heutigen Wert ab,
          ist die Zeile nicht vorgehakt und zeigt den bisherigen Wert („erstmal drauf hinweisen") */
@@ -2154,6 +2167,8 @@
           var w = window.dpSteuerWert(s.jahr, s.feld); if (w === null) return;
           _merged['steuer:' + s.jahr + ':' + s.feld] = { nurAktiv: true, label: 'Steuer ' + s.jahr + ' · ' + s.wort, value: fmt0(s.betrag) + ' € im Jahr ' + s.jahr, raw: String(s.betrag),
             ist: (w.eigen || w.wert) ? String(Math.round(w.wert)) : '', istEigen: !!w.eigen, source: t.label || 'Dokument', kind: 'steuer', jahr: s.jahr, feld: s.feld, herleitung: s.hinweis };
+          var _sv = window.DpViviFelder && window.DpViviFelder.vergleich ? window.DpViviFelder.vergleich('steuer.' + s.jahr + '.' + s.feld, s.betrag) : null;   /* v3951 · V5, ab V4 */
+          if (_sv && !_sv.gleich) _merged['steuer:' + s.jahr + ':' + s.feld].viviAbw = { anzeige: _sv.anzeige, wert: _sv.wert, dokWert: String(s.betrag), entschieden: _sv.entschieden, viviId: 'steuer.' + s.jahr + '.' + s.feld };
         });
       }
       /* v3092 · N100 · Sonderumlagen aus Wirtschaftsplan/Abrechnung oder Protokoll → Liste im Reiter
@@ -2365,6 +2380,7 @@
     return String(el.value || '').trim();
   }
   /* v3017a · der bisherige Wert in derselben Schreibweise wie der neue: „3313" → „3.313 €" */
+  function _deDat(iso) { var m = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(iso || '')); return m ? m[3] + '.' + m[2] + '.' + m[1] : String(iso || ''); }   /* v3951 */
   function _bisherKopf(it) {
     if (it.kind === 'steuer') return 'bisher im Steuer-Reiter ' + it.jahr + (it.istEigen ? ' (deine Angabe)' : ' (Vorschlag der App)') + ': ';
     return 'bisher im Objekt' + (it.ort ? ' (' + it.ort + ')' : '') + ': ';
@@ -2547,6 +2563,12 @@
        einen anderen, schon eingetragenen. Jetzt steht je Zeile, was im Objekt
        steht; weicht es ab, ist die Zeile markiert und NICHT vorgehakt. */
     var abw = _qcMode ? {} : _abweichungen(keys);
+    /* v3951 · Paket V5: Zeilen, die von ViVi abweichen, zaehlen nicht als „weicht vom Objekt ab“ (das Objekt traegt den
+       ViVi-Wert), sie haben einen eigenen Kopf. Die Anschrift bleibt in der Adress-Rueckfrage. */
+    var _viviKeys = _qcMode ? [] : keys.filter(function (id) { return _merged[id] && _merged[id].viviAbw; });
+    _viviKeys.forEach(function (id) { if (!/^(str|hnr|plz|ort)$/.test(id)) delete abw[id]; });
+    var _viviOffen = _viviKeys.filter(function (id) { return !_merged[id].viviAbw.entschieden; }).length;
+    var _hatVivi = _viviKeys.length > 0 || keys.some(function (id) { return _merged[id] && _merged[id].viviGleich; });
     var nAbw = Object.keys(abw).length;
     /* v3279 · ANDERE ADRESSE ALS IM OBJEKT (Marcel 10.11.2026: „wenn die nicht passt und vom
        Objekt abweicht, dass man es direkt nennt und fragt“). Bis v3278 war nur die Adresszeile
@@ -2583,7 +2605,10 @@
     var abwKopf = nAbw ? '<div class="oabi-abw-kopf" style="margin:8px 0;padding:8px 10px;border-radius:8px;border:1px solid #d9a441;background:rgba(217,164,65,.12);font-size:12.5px">'
       + '<b>' + nAbw + (nAbw === 1 ? ' Wert weicht' : ' Werte weichen') + ' vom Objekt ab.</b> Diese Zeilen sind nicht vorgehakt — hak sie an, wenn das Dokument recht hat.</div>' : '';
     /* v3088a · Hinweis, wenn Zeilen aus Wirtschaftsplan/Abrechnung bewusst nicht vorgehakt sind */
-    var nAktiv = keys.filter(function (id) { return _merged[id] && _merged[id].nurAktiv && abw[id] === undefined; }).length;
+    var nAktiv = keys.filter(function (id) { return _merged[id] && _merged[id].nurAktiv && !_merged[id].viviAbw && abw[id] === undefined; }).length;
+    if (_viviOffen) abwKopf += '<div class="oabi-abw-kopf oabi-vivi-kopf" style="margin:8px 0;padding:8px 10px;border-radius:8px;border:1px solid #d9a441;background:rgba(217,164,65,.12);font-size:12.5px">'
+      + '<b>' + _viviOffen + (_viviOffen === 1 ? ' Wert weicht' : ' Werte weichen') + ' von ViVi ab.</b> Diese Felder sind mit ViVi verknüpft und nicht vorgehakt. '
+      + 'Behalte den ViVi-Wert oder nimm den Wert aus der Unterlage. Er gilt dann nur in DealPilot, an ViVi geht nichts.</div>';
     if (nAktiv) abwKopf += '<div class="oabi-abw-kopf" style="margin:8px 0;padding:8px 10px;border-radius:8px;border:1px solid rgba(42,39,39,.2);font-size:12.5px"><b>' + nAktiv + (nAktiv === 1 ? ' Wert' : ' Werte') + ' aus WEG-Unterlagen</b> (Hausgeld, Steuer, Sonderumlage) stehen hier nur zur Ansicht. Hak an, was übernommen werden soll.</div>';
     /* v3120 · erkannte Rechnungen: an den Beleg-Leser (Werbungskosten je Jahr, jede Zeile bestätigen) */
     var _rech = _files.filter(function (f) { return f.type === 'rechnung' && f.file; });
@@ -2596,14 +2621,22 @@
     var _pkHtml = _pkF ? '<div class="oabi-paket" style="margin:0 0 10px;padding:10px 12px;border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 40%, transparent);border-left:3px solid var(--wl-c9a84c,#C9A84C);background:#FBF6E9;border-radius:2px;font-size:12.5px">'
       + '<b>Dieses Exposé bietet ' + window.DpPaket.erkennen(_pkF.text) + ' Objekte einzeln an.</b> Statt eines Objekts kannst du das Paket anlegen: jedes Haus als eigenes Objekt mit seinen Einheiten, verbunden über den Paketnamen. '
       + '<button type="button" id="oabi-paket" class="oabi-btn primary" style="margin-left:6px">Als Paket anlegen</button></div>' : '';
-    host.innerHTML = _pkHtml + addrHtml + adrFrage + abwKopf + '<table class="oabi-tbl"><tbody>' + photoRow + keys.map(function (id) {
+    var _viviKopfZeile = _hatVivi ? '<tr class="oabi-vivi-thead" style="font-size:11.5px;color:#7A7370"><td></td><td>Feld</td><td>laut Unterlage</td><td>laut ViVi</td><td>Quelle</td></tr>' : '';
+    host.innerHTML = _pkHtml + addrHtml + adrFrage + abwKopf + '<table class="oabi-tbl"><tbody>' + _viviKopfZeile + photoRow + keys.map(function (id) {
       var it = _merged[id];
       var valCell = it.range ? ('<b class="oabi-vnum">' + escH(it.value) + '</b>' + spanToggle(id, it.range.cur)) : ('<b>' + escH(it.value) + '</b>');
       if (abw[id] !== undefined) valCell += '<div class="oabi-bisher" style="font-size:11.5px;color:#b5651d;margin-top:2px">' + escH(_bisherKopf(it)) + escH(_bisherText(it, abw[id])) + '</div>';
+      /* v3951 · Paket V5: Hinweis und die zwei Knoepfe. Sie setzen nur den Haken der Zeile: angehakt heisst „aus der Unterlage“ */
+      if (it.viviAbw && !_qcMode) valCell += it.viviAbw.entschieden
+        ? '<div class="oabi-vivi" style="font-size:11.5px;color:#7A7370;margin-top:2px">Am ' + escH(_deDat(it.viviAbw.entschieden.am)) + ' entschieden: ViVi-Wert behalten.</div>'
+        : '<div class="oabi-vivi" style="font-size:11.5px;color:#b5651d;margin-top:2px">' + escH(window.DpViviFelder ? window.DpViviFelder.HINWEIS_ABWEICHUNG : '') + '</div>'
+          + '<div class="oabi-vivi-wahl" style="margin-top:4px;display:flex;gap:6px;flex-wrap:wrap"><button type="button" class="oabi-btn on" data-vivi-wahl="vivi" data-id="' + escH(id) + '">ViVi-Wert behalten</button>'
+          + '<button type="button" class="oabi-btn" data-vivi-wahl="unterlage" data-id="' + escH(id) + '">Wert aus der Unterlage nehmen</button></div>';
+      var viviCell = !_hatVivi ? '' : '<td class="oabi-vivi-sp">' + (it.viviAbw ? '<b style="color:#b5651d">' + escH(it.viviAbw.anzeige) + '</b>' : it.viviGleich ? '<span style="color:#3FA56C">stimmt mit ViVi überein</span>' : '') + '</td>';
       if (it.kind === 'mv_einheit' && window.DpEingang) valCell += '<div style="margin-top:4px"><select data-mv="' + escH(id) + '" style="max-width:100%;font-size:12.5px">' + window.DpEingang.mvOptionen(it.mv && it.mv.i >= 0 ? it.mv.i : -1) + '</select></div>';   /* v3120 */
       if (it.herleitung) valCell += '<div class="oabi-herl" style="font-size:11.5px;color:#7A7370;margin-top:2px;line-height:1.35">' + escH(it.herleitung) + '</div>';
       if (it.kind === 'anhaengen' && String(it.value).length > 160) valCell = valCell.replace('<b>' + escH(it.value) + '</b>', '<div style="white-space:pre-wrap;font-size:12px;max-height:120px;overflow:auto">' + escH(it.value) + '</div>');
-      return '<tr' + (abw[id] !== undefined ? ' class="oabi-abw" style="background:rgba(217,164,65,.10)"' : '') + '><td style="width:34px"><input type="checkbox" data-id="' + escH(id) + '"' + ((abw[id] !== undefined || it.nurAktiv) ? '' : ' checked') + '></td><td>' + escH(it.label) + '</td><td>' + valCell + '</td><td class="src">' + escH(it.source) + (_qcMode ? (OBJ2QC[id] ? ' <span style="color:#2A8C5A;font-weight:600">\u2192 Quick-Check</span>' : ' <span style="color:var(--wl-9a7f33, #9a7f33);font-weight:600">\u2192 Vollobjekt</span>') : '') + '</td></tr>';
+      return '<tr' + (abw[id] !== undefined ? ' class="oabi-abw" style="background:rgba(217,164,65,.10)"' : '') + '><td style="width:34px"><input type="checkbox" data-id="' + escH(id) + '"' + ((abw[id] !== undefined || it.nurAktiv) ? '' : ' checked') + '></td><td>' + escH(it.label) + '</td><td>' + valCell + '</td>' + viviCell + '<td class="src">' + escH(it.source) + (_qcMode ? (OBJ2QC[id] ? ' <span style="color:#2A8C5A;font-weight:600">\u2192 Quick-Check</span>' : ' <span style="color:var(--wl-9a7f33, #9a7f33);font-weight:600">\u2192 Vollobjekt</span>') : '') + '</td></tr>';
     }).join('') + '</tbody></table>'
       + _dg.html   /* v3236 · was der Detailgrad zurückhält */
       + (_vergleich.length ? '<div class="oabi-vgl" style="margin-top:10px;padding:9px 11px;border-radius:8px;border:1px dashed rgba(42,39,39,.25);font-size:12.5px">'
@@ -2622,6 +2655,18 @@
       if (_aj) _aj.addEventListener('click', function () { _addrOkSig = _adrSig; renderMergedTable(); });
       if (_an) _an.addEventListener('click', function () { var c = $('oabi-cancel'); if (c) c.click(); });
     }
+    /* v3951 · Paket V5: „ViVi-Wert behalten“ nimmt den Haken weg, „Wert aus der Unterlage nehmen“ setzt ihn */
+    host.querySelectorAll('button[data-vivi-wahl]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var tr = b.closest('tr'), cb = tr && tr.querySelector('input[type="checkbox"]'); if (!cb) return;
+        cb.checked = b.getAttribute('data-vivi-wahl') === 'unterlage';
+        tr.querySelectorAll('button[data-vivi-wahl]').forEach(function (x) { x.classList.toggle('on', x === b); });
+      });
+    });
+    host.querySelectorAll('.oabi-tbl input[type="checkbox"][data-id]').forEach(function (cb) {
+      var it = _merged[cb.getAttribute('data-id')]; if (!it || !it.viviAbw) return;
+      cb.addEventListener('change', function () { var tr = cb.closest('tr'); if (tr) tr.querySelectorAll('button[data-vivi-wahl]').forEach(function (x) { x.classList.toggle('on', (x.getAttribute('data-vivi-wahl') === 'unterlage') === cb.checked); }); });
+    });
     /* v3120 · Einheit gewählt = Zeile angehakt; Rechnungen an den Beleg-Leser */
     host.querySelectorAll('select[data-mv]').forEach(function (sl) {
       sl.addEventListener('change', function () { var cb = sl.closest('tr') && sl.closest('tr').querySelector('input[type="checkbox"]'); if (cb) cb.checked = sl.value !== ''; });
@@ -3224,6 +3269,24 @@
       return true;
     });
   }
+  /* v3951 · Paket V5. Angehakt = „Wert aus der Unterlage nehmen“: das Feld wird in DealPilot lokal festgelegt
+     (eigene Angabe, Herkunft die Unterlage), genau wie mit dem Schloss in vivi-felder.js. Nicht angehakt = „ViVi-Wert
+     behalten“, gemerkt je Feld, damit dieselbe Unterlage nicht wieder fragt. Nach ViVi geht in keinem Fall etwas. */
+  function _viviEntscheiden(ov) {
+    var F = window.DpViviFelder; if (!F || !F.lokalFestlegen) return;
+    ov.querySelectorAll('.oabi-tbl input[type="checkbox"][data-id]').forEach(function (cb) {
+      var id = cb.getAttribute('data-id'), it = _merged[id]; if (!it || !it.viviAbw) return;
+      if (it.kind === 'mv_einheit') {
+        if (!cb.checked) return;
+        var sl = document.querySelector('#oabi-ov select[data-mv="' + id + '"]'), i = sl && sl.value !== '' ? parseInt(sl.value, 10) : -1;
+        if (i >= 0) F.einheitVergleich(i, _mvViviWerte(it.raw)).forEach(function (x) { F.lokalFestlegen(x.id, x.dok, it.source); });
+        return;
+      }
+      var vid = it.viviAbw.viviId || id;
+      if (cb.checked) { F.lokalFestlegen(vid, it.raw, it.source); F.entscheiden(vid, { wahl: 'unterlage', dok: it.source, dok_wert: it.viviAbw.dokWert, vivi_wert: it.viviAbw.wert }); }
+      else if (!it.viviAbw.entschieden) F.entscheiden(vid, { wahl: 'vivi', dok: it.source, dok_wert: it.viviAbw.dokWert, vivi_wert: it.viviAbw.wert });
+    });
+  }
   function applyMerged() {
     var ov = $('oabi-ov'); if (!ov) return;
     if (_qcMode) { return applyMergedQc(ov); }  /* v418 */
@@ -3231,6 +3294,7 @@
     var _E = window.DpEingang && window.DpEingang.txStart ? window.DpEingang : null;   /* v3154 · Änderungen merken für „Zurücknehmen" */
     if (_E) _E.txStart();
     try {
+    _viviEntscheiden(ov);   /* v3951 · Paket V5: vor dem Schreiben, damit die Sperre den Wert nicht zuruecksetzt */
     ov.querySelectorAll('.oabi-tbl input[type="checkbox"]:checked').forEach(function (cb) {
       var id = cb.getAttribute('data-id'), it = _merged[id]; if (!it) return;
       var _vor = _E ? _E.feldStand(id) : null;
