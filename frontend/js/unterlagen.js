@@ -190,10 +190,14 @@
     var artK = ktx.objart || v('objart'), meaK = (ktx.mea > 0) ? String(ktx.mea).replace('.', ',') : v('mea');
     var objekt = { objektart: artK, adresse: [v('str'), v('hnr'), v('plz'), v('ort')].join(' ').trim(), kaufpreis: v('kp'), wohnflaeche: v('wfl'),
       baujahr: v('baujahr'), nettokaltmiete_monat: v('nkm'), miteigentumsanteil_pct: meaK, einheiten: v('einheiten'), hausgeld_ul_jahr: v('hg_ul'), hausgeld_nul_jahr: v('hg_nul') };
+    /* v3984 · F5: im Quick-Check kommen die Eckdaten aus dem Import, nie aus dem Formular des vorher offenen Objekts */
+    if (ktx.eckdaten) { artK = ktx.objart || ''; meaK = (ktx.mea > 0) ? String(ktx.mea).replace('.', ',') : ''; Object.keys(ktx.eckdaten).forEach(function (k) { objekt[k] = String(ktx.eckdaten[k] == null ? '' : ktx.eckdaten[k]); }); objekt.objektart = artK; objekt.miteigentumsanteil_pct = meaK; }
     /* v3016f · gemessen am Demo-Set Lindenallee (MFH, alle 6 Einheiten im Paket): die Auswertung
        rechnete die Sonderumlage mit dem MEA EINES Grundbuchblatts (204/1.000 → 9.466 statt 46.400 €).
        Ohne eigenen MEA im Objekt wird das ganze Gebäude gekauft. */
     objekt.kauf_umfang = (meaK && artK === 'ETW') ? 'eine Einheit, Anteil laut Miteigentumsanteil' : (artK === 'ETW' ? 'eine Einheit, Miteigentumsanteil noch unbekannt - Betraege der Gemeinschaft NICHT als Anteil der Einheit ausgeben' : (meaK ? 'Anteil laut Miteigentumsanteil' : 'ganzes Gebaeude, alle Einheiten (Anteil 100 %)'));
+    /* v3984 · F5: ohne Objektart keine Behauptung über den Kaufumfang (bis hier „ganzes Gebäude") */
+    if (!artK) objekt.kauf_umfang = 'unbekannt (Objektart fehlt) - nicht schreiben, ob das ganze Gebaeude oder eine Einheit gekauft wird; Betraege der Gemeinschaft als Gemeinschaftsbetraege nennen';
     var body = { dokumente: dokumente, objekt: objekt };
     var alt = opts && opts.ergaenzen ? laden() : null;   /* v3017 · zusammenführen statt ersetzen */
     if (alt && alt.auswertung) { body.vorher = alt.auswertung; body.vorherDokumente = (alt.dokumente || []).map(function (x) { return x.label + (x.datum ? ' ' + x.datum : ''); }); }

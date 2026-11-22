@@ -2078,7 +2078,7 @@
     /* v3016g · gemessen am Demo-Set Lindenallee (MFH, alle Einheiten): das Wohnungsgrundbuch EINER
        Einheit setzte „Miteigentumsanteil 20,4 %“ - das Haus hätte dann als Anteil gerechnet.
        Beim Haus (MFH/WGH/ZFH/EFH) gilt kein MEA aus einem einzelnen Blatt. */
-    var _art = String((_merged.objart && (_merged.objart.raw || _merged.objart.value)) || (($('objart') || {}).value) || '');
+    var _art = String((_merged.objart && (_merged.objart.raw || _merged.objart.value)) || (_qcMode ? '' : (($('objart') || {}).value)) || '');   /* v3984 · F5: im Quick-Check nie die Objektart des vorher offenen Objekts */
     if (_merged.mea && /mfh|mehrfam|wgh|wohn.*gesch|zfh|zweifam|efh|einfam/i.test(_art)) delete _merged.mea;
     /* v3029-import · Ein Mietvertrag ist EINE Wohnung. Beim Haus mit mehreren Einheiten setzte er
        bis v3028 Objektmiete, Wohnfläche und Zimmer (MFH mit 8 WE → nkm 520 €, wfl 65 m²,
@@ -2178,11 +2178,20 @@
     if (/eigentumswohnung|wohnung|\betw\b/.test(l)) return 'ETW';
     return t;
   }
+  /* v3984 · F5 Gesamt-Flow 22.11.2026: im Quick-Check ist das Formular das des VORHER offenen Objekts (das Quick Boarding
+     öffnet ohne newObj). Objektart, MEA und Eckdaten kamen von dort - die Auswertung einer Eigentumswohnung schrieb
+     „Das Objekt wird als ganzes Gebäude erworben". Im Quick-Check zählt nur, was gerade eingelesen wird. */
+  function _mergedRoh(k) { var m = _merged[k]; return m && m.raw != null && m.raw !== '' ? m.raw : ''; }
   function _kontext() {
-    var art = _artCode((_merged.objart && (_merged.objart.raw || _merged.objart.value)) || (($('objart') || {}).value) || '');
-    var meaRoh = (_merged.mea && _merged.mea.raw != null && _merged.mea.raw !== '') ? _merged.mea.raw : (($('mea') || {}).value || '');
+    var art = _artCode((_merged.objart && (_merged.objart.raw || _merged.objart.value)) || (_qcMode ? '' : (($('objart') || {}).value)) || '');
+    var meaRoh = _mergedRoh('mea') !== '' ? _mergedRoh('mea') : (_qcMode ? '' : (($('mea') || {}).value || ''));
     var mea = numDe(meaRoh);
-    return { objart: art, mea: (mea > 0 && mea <= 100) ? mea : null };
+    var k = { objart: art, mea: (mea > 0 && mea <= 100) ? mea : null };
+    if (_qcMode) {
+      k.eckdaten = { adresse: [_mergedRoh('str'), _mergedRoh('hnr'), _mergedRoh('plz'), _mergedRoh('ort')].join(' ').trim(), kaufpreis: _mergedRoh('kp'), wohnflaeche: _mergedRoh('wfl'),
+        baujahr: _mergedRoh('baujahr'), nettokaltmiete_monat: _mergedRoh('nkm'), einheiten: _mergedRoh('einheiten'), hausgeld_ul_jahr: _mergedRoh('hg_ul'), hausgeld_nul_jahr: _mergedRoh('hg_nul') };
+    }
+    return k;
   }
   /* v3951 · Vertragswerte, die ViVi je Einheit fuehrt (Schluessel wie _mfh.einheiten[], vivi-felder.js EINHEIT_FELDER) */
   var _MV_VIVI_WORT = { ist: 'Kaltmiete', mv_beginn: 'Mietbeginn', mv_kaution: 'Kaution', nk_vorauszahlung: 'Nebenkosten', mv_befristet_bis: 'befristet bis' };

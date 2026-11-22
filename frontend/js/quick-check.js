@@ -2073,9 +2073,10 @@
     }
 
     // Zimmer + Stellplatz in 'thesis'
+    /* v3984 · F5: „3-Zimmer" stand vor der Investitionsthese der Unterlagen (Investment-PDF). Die Zimmer haben ein eigenes Feld
+       (oben, v1877a) - in die These gehört nur ein Stellplatz-Text, den es als Zahl nicht gibt. */
     var notesParts = [];
-    if (snapshot.zimmer)     notesParts.push(snapshot.zimmer + '-Zimmer');
-    if (snapshot.stellplatz) notesParts.push('Stellplatz: ' + snapshot.stellplatz);
+    if (snapshot.stellplatz && !/^\d{1,3}$/.test(String(snapshot.stellplatz).trim())) notesParts.push('Stellplatz: ' + snapshot.stellplatz);
     /* v3349 · eine Anzahl (aus dem Import, z. B. „8 Außenstellplätze“) gehört ins Feld des Objekts */
     if (/^\d{1,3}$/.test(String(snapshot.stellplatz || '').trim()) && !v('stellpl_aussen')) set('stellpl_aussen', String(snapshot.stellplatz).trim());
     if (notesParts.length && !v('thesis')) {

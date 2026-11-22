@@ -288,5 +288,22 @@ function funk(src, name) {
   ok(/var _lk = window\._dpQcLeereKarte;[\s\S]{0,600}window\._currentObjKey = _lk\.key/.test(qb) && qb.indexOf('_dpQcLeereKarte') > qb.indexOf("window.newObj({ ohneAuswahl: true })"), 'F10 „Als Objekt speichern" schreibt in diese Karte (nach newObj, nur wenn der Server sie leer meldet)');
 }
 
-console.log(`gesamtflow-pruefen (v3983): ${gruen} von ${gruen + rot} ok`);
+/* ── F5 · Investitionsthese im Quick-Check: Kaufumfang aus dem Import, kein „3-Zimmer" davor ── */
+{
+  const oa = lies('frontend/js/object-actions.js');
+  const code = ['numDe', '_artCode', '_mergedRoh', '_kontext'].map((n) => funk(oa, n) || '').join('\n');
+  const form = { objart: 'MFH', mea: '', kp: '640000' };
+  const ctx = { Math, String, Number, isFinite, parseFloat, _qcMode: true, $: (id) => ({ value: form[id] || '' }),
+    _merged: { objart: { raw: 'Eigentumswohnung' }, mea: { raw: '8,5' }, wfl: { raw: '74' }, kp: { raw: '219000' } } };
+  vm.createContext(ctx);
+  let k = null; try { vm.runInContext(code + '\n;var __k = _kontext();', ctx); k = ctx.__k; } catch (e) { k = null; }
+  ok(k && k.objart === 'ETW' && k.mea === 8.5 && k.eckdaten && k.eckdaten.kaufpreis === '219000' && k.eckdaten.wohnflaeche === '74', 'F5 Quick-Check: Objektart, MEA und Eckdaten aus dem Import (ETW, 8,5 %, 219.000 €), nicht aus dem offenen MFH');
+  const ctx2 = Object.assign({}, ctx, { _merged: {} }); vm.createContext(ctx2);
+  let k2 = null; try { vm.runInContext(code + '\n;var __k = _kontext();', ctx2); k2 = ctx2.__k; } catch (e) {}
+  ok(k2 && k2.objart === '', 'F5 ohne Objektart im Import keine Objektart vom Vorgänger (Ist ' + (k2 && k2.objart) + ')');
+  ok(/if \(!artK\) objekt\.kauf_umfang = 'unbekannt/.test(lies('frontend/js/unterlagen.js')), 'F5 ohne Objektart behauptet die Auswertung keinen Kaufumfang („ganzes Gebäude")');
+  ok(!/notesParts\.push\(snapshot\.zimmer \+ '-Zimmer'\)/.test(lies('frontend/js/quick-check.js')), 'F5 „3-Zimmer" geht nicht mehr in die Investitionsthese');
+}
+
+console.log(`gesamtflow-pruefen (v3984): ${gruen} von ${gruen + rot} ok`);
 process.exit(rot ? 1 : 0);
