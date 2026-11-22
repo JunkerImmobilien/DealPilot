@@ -5,9 +5,7 @@
  "befunde": {
   "berlin.json": {},
   "bodenpreise-nrw.json": {},
-  "dresden.json": {
-   "modellansaetze.baupreisindex fehlt als Zahl": 1
-  },
+  "dresden.json": {},
   "erbbau-bs-wob.json": {},
   "erfurt.json": {},
   "hamburg.json": {},
@@ -21,9 +19,7 @@
    "modellansaetze.gnd_jahre fehlt als Zahl": 3,
    "modellansaetze.baupreisindex fehlt als Zahl": 3
   },
-  "leipzig.json": {
-   "modellansaetze.baupreisindex fehlt als Zahl": 8
-  },
+  "leipzig.json": {},
   "ludwigslust-parchim.json": {},
   "lzs-bb.json": {},
   "lzs-be-2025.json": {},

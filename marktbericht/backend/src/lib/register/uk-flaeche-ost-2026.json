@@ -4848,57 +4848,82 @@
     "gaa_name": "Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Dresden",
     "kennzahl": "umrechnungskoeffizient_flaeche",
     "zweig": "ifw",
-    "vollstaendig": false,
-    "zugang": "genehmigungspflichtig",
-    "zugang_beleg": "Wortlaut warum_kein_wert: „die Verwertung für wirtschaftliche Zwecke ist nur mit Erlaubnis des Herausgebers zulässig. Eine Erlaubnis liegt nicht vor.“",
-    "zugang_herkunft": "abgeleitet am 21.11.2026 (v3943) aus dem Wortlaut in warum_kein_wert (unverändert), sperre_grund „lizenz“",
-    "warum_kein_wert": "Der Ausschuss veröffentlicht für den individuellen Wohnungsbau eine Umrechnungsformel (Fläche und Wohnlage, Stichtag 01.07.2025, 105 Kauffälle 2024–2025, gültig 202–1.720 m²; Grundstücksmarktbericht 2026, Abschn. 7.2.1, S. 66–67). Der Bericht ist urheberrechtlich geschützt; die Verwertung für wirtschaftliche Zwecke ist nur mit Erlaubnis des Herausgebers zulässig. Eine Erlaubnis liegt nicht vor. Weg: Erlaubnis beim Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Dresden (Amt für Geodaten und Kataster) einholen; Bericht frei einsehbar: https://www.dresden.de/media/pdf/vermessung/2026-Grundstuecksmarktbericht.pdf.",
-    "sperre_grund": "lizenz",
-    "formel": null,
-    "geltungsbereich": null,
-    "formel_vorgemerkt": {
-      "nutzung_intern": "stuetzstelle",
-      "nutzung_hinweis": "Nur als Stützstelle für eine spätere, ausdrücklich als Näherung gekennzeichnete DealPilot-Formel – nie als amtliche Zahl ausgeben. Übernahme als Wert erst nach Erlaubnis des Herausgebers.",
-      "lizenz_wortlaut": "Der Grundstücksmarktbericht 2026 ist urheberrechtlich geschützt. Die Verwertung für nichteigene oder wirtschaftliche Zwecke und die öffentliche Wiedergabe sind nur mit Erlaubnis des Herausgebers zulässig. Alle Rechte, auch die des Nachdruckes von Auszügen und der fotomechanischen Wiedergabe, sind dem Herausgeber vorbehalten.",
+    "vollstaendig": true,
+    "formel": {
       "form": "flaeche_funktion",
       "typ": "potenz",
       "exponent": -0.4404,
-      "formel_wortlaut": "ln(BodenpreisGrundstück) = -0,4404 x ln(FlächeGrundstück) + 0,2332 x Wohnlage + 7,8564 (Wohnlage: dörflich = 1, einfach = 2, mittel = 3, gut = 4, sehr gut = 5), R² = 0,40",
-      "hinweis": "Bei gleicher Wohnlage entspricht die Formel einer Potenzfunktion UK = (F / F_Norm)^-0,4404; bei abweichender Wohnlage kommt der Faktor e^(0,2332 × ΔWohnlage) hinzu (Anwendungsbeispiel S. 67 mit Wohnlage 3 gegen 4).",
+      "basis_qm": 1,
+      "bezug": "Bodenpreis(Objekt) / Bodenpreis(Vergleich) = (Fläche Objekt / Fläche Vergleich)^-0,4404 bei gleicher Wohnlage",
+      "formel_wortlaut": "ln(BodenpreisGrundstück) = -0,4404 x ln(FlächeGrundstück) + 0,2332 x Wohnlage + 7,8564",
+      "hinweis": "Bei gleicher Wohnlage kürzen sich Wohnlage-Term und Verschiebungskonstante aus dem Quotienten der beiden Bodenpreise heraus; übrig bleibt die Potenz der Flächen mit dem Exponenten -0,4404 (basis_qm ohne Einfluss auf den Quotienten). Den Wohnlage-Faktor e^(0,2332 × ΔWohnlage) rechnet DealPilot NICHT: der Bodenrichtwert der Zone trägt die Lage selbst. Das Dokument verzichtet ausdrücklich auf eine Koeffiziententabelle, weil die Umrechnungsformel genauere Ergebnisse liefert (S. 67).",
       "spanne_qm": [
         202,
         1720
       ],
-      "beispiel": "Preis des Vergleichsobjekts 280 €/m²; Wertermittlungsobjekt 700 m², Wohnlage mittel = 3; Vergleichsobjekt 1.100 m², Wohnlage gut = 4; e^5,6709 = 290,30 €/m², e^5,7050 = 300,37 €/m²; 280 €/m² x 290,30/300,37 = 270,61 €/m² ≈ 271 €/m²",
-      "seite": "66–67"
+      "spanne_wortlaut": "Die Umrechnungsformeln sind nur für die unten aufgeführten Wertebereiche der Merkmale gültig. Eine Extrapolation darüber hinaus liegt im Ermessen des Sachverständigen. (S. 67; Grundstücksfläche 202 bis 1.720 m²)",
+      "beispiel_nicht_pruefbar": {
+        "grund": "Das Anwendungsbeispiel des Dokuments (S. 68) vergleicht Grundstücke verschiedener Wohnlage (mittel = 3 gegen gut = 4); der Kern rechnet nur die Fläche. Ein Prüfbeispiel nur für die Fläche druckt das Dokument nicht – ein selbst gerechnetes wird nicht als Prüfmaßstab eingesetzt.",
+        "wortlaut": "Preis des Vergleichsobjekts 280 €/m²; Wertermittlungsobjekt 700 m², Wohnlage mittel = 3; Vergleichsobjekt 1.100 m², Wohnlage gut = 4; e^5,6709 = 290,30 €/m², e^5,7050 = 300,37 €/m²; 280 €/m² x 290,30/300,37 = 270,61 €/m² ≈ 271 €/m²",
+        "seite": 68,
+        "gegenprobe_22_11_2026": "Koeffizienten an den abgedruckten Zwischenwerten nachgerechnet: -0,4404·ln(700) + 0,2332·3 + 7,8564 = 5,6709 und -0,4404·ln(1100) + 0,2332·4 + 7,8564 = 5,7050, e^5,6709 = 290,30 – wie gedruckt; Ergebnis 280 × 290,30/300,38 = 270,60 (gedruckt 270,61 ≈ 271 €/m²)."
+      }
     },
-    "weg": "Erlaubnis beim Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Dresden (Amt für Geodaten und Kataster) einholen; Bericht frei einsehbar: https://www.dresden.de/media/pdf/vermessung/2026-Grundstuecksmarktbericht.pdf.",
+    "geltungsbereich": {
+      "nutzung": "unbebaute baureife Grundstücke des individuellen Wohnungsbaus (ein Bauplatz), voll erschlossen; Stichprobe 94 Einfamilienhäuser, 16 Doppelhaushälften, 3 Reihenhäuser, 3 Zweifamilienhäuser",
+      "objektarten": [
+        "efh",
+        "dhh"
+      ],
+      "objektarten_ausgeschlossen": [
+        "zfh",
+        "rh",
+        "mfh",
+        "etw",
+        "gewerbe"
+      ],
+      "ausserhalb_wortlaut": "Aufgrund der geringen Anzahl an Kauffällen für Reihenhaus- und Zweifamilienhausgrundstücke ist die Verwendbarkeit der im Folgenden ausgewiesenen Regressionsformel für diese Grundstücksarten sachverständig zu prüfen. (S. 67) Geschossbaugrundstücke rechnet der Ausschuss über die WGFZ (Abschn. 7.2.2, S. 68 ff.).",
+      "ausserhalb_weg": "Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Dresden (Amt für Geodaten und Kataster), Grundstücksmarktbericht 2026, Abschn. 7.2.1, S. 67–68",
+      "vorbehalt": "Bestimmtheitsmaß R² = 0,40 bei 105 Kauffällen; Vertrauensintervall k1 -0,5757 bis -0,3051 (S. 68). Gilt nur bei gleicher Wohnlage von Objekt und Richtwertgrundstück."
+    },
     "stufe": "A",
-    "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+    "stufe_grund": "amtlich: Umrechnungsformel des Ausschusses (105 Kauffälle 2024–2025, Stichtag 01.07.2025); Anwendungsbeispiel mischt Fläche und Wohnlage und ist mit dem Flächenkern nicht nachrechenbar, Koeffizienten an den abgedruckten Zwischenwerten gegengeprüft.",
     "stichtag": "2025-07-01",
     "berichtsjahr": 2026,
     "quelle_url": "https://www.dresden.de/media/pdf/vermessung/2026-Grundstuecksmarktbericht.pdf",
-    "lizenz": "urheberrechtlich geschützt — Verwertung für nichteigene oder wirtschaftliche Zwecke nur mit Erlaubnis des Herausgebers",
+    "lizenz": "Urheberrechtlich geschützt — Nutzung mit Erlaubnis des Herausgebers",
     "lizenz_wortlaut": "Der Grundstücksmarktbericht 2026 ist urheberrechtlich geschützt. Die Verwertung für nichteigene oder wirtschaftliche Zwecke und die öffentliche Wiedergabe sind nur mit Erlaubnis des Herausgebers zulässig. Alle Rechte, auch die des Nachdruckes von Auszügen und der fotomechanischen Wiedergabe, sind dem Herausgeber vorbehalten.",
-    "quellenvermerk": null,
-    "fundstelle": "Abschn. 7.2 und 7.2.1, S. 66–67; Copyright Impressum S. 2",
+    "quellenvermerk": "Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Dresden, Grundstücksmarktbericht 2026",
+    "fundstelle": "Abschn. 7.2 und 7.2.1, S. 67–68 (Formel, Gültigkeit, Anwendungsbeispiel); Copyright Impressum S. 2",
     "belege": [
       {
         "art": "amtliche Veröffentlichung",
         "dokument": "Grundstücksmarktbericht 2026 der Landeshauptstadt Dresden",
-        "fundstelle": "Abschn. 7.2 und 7.2.1, S. 66–67; Copyright Impressum S. 2",
+        "fundstelle": "Abschn. 7.2 und 7.2.1, S. 67–68; Copyright Impressum S. 2",
         "url": "https://www.dresden.de/media/pdf/vermessung/2026-Grundstuecksmarktbericht.pdf",
         "wortlaut": "ln(BodenpreisGrundstück) = -0,4404 x ln(FlächeGrundstück) + 0,2332 x Wohnlage + 7,8564"
       }
     ],
     "belege_meta": {
       "dokument": "Grundstücksmarktbericht 2026 der Landeshauptstadt Dresden",
-      "abgerufen_am": "2026-10-16"
+      "abgerufen_am": "2026-10-16",
+      "nachgelesen_am": "2026-11-22",
+      "seiten_korrektur": "bis 22.11.2026 „S. 66–67“; am PDF gemessen stehen Abschn. 7.2/7.2.1 auf S. 67, Formel und Anwendungsbeispiel auf S. 68 (gedruckte Seitenzahl = PDF-Seite)"
     },
     "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Dresden, Jahrgang 2026",
     "quelle_parser": "uk-ernte-ost 16.10.2026 (Grundstücksmarktbericht, pdftotext -layout und Seitenbild)",
     "modellansaetze": {},
-    "nutzung_intern": "stuetzstelle"
+    "nutzungsrecht": "Der Bericht verbietet die Verwertung für wirtschaftliche Zwecke ohne Erlaubnis (S. 2). Marcel Junker hat am 01.10.2026 mitgeteilt, dass die Erlaubnis des Herausgebers vorliegt; am 22.10.2026 „weiter nutzen“, am 22.11.2026 für die Umrechnungskoeffizienten bestätigt („wie LZS weiter nutzen“). Nachweis (Datum, Aktenzeichen, Umfang) ist noch nachzutragen.",
+    "stufe_vorher": "A",
+    "freigabe": {
+      "datum": "2026-11-22",
+      "notiz": "22.11.2026 · Marcel: wie LZS weiter nutzen (Entscheidung zum Genehmigungsvorbehalt wie beim Liegenschaftszins seit 22.10.2026, wissen/2026-10-22.md Nr. 3). Vorher Sperre zugang genehmigungspflichtig, sperre_grund lizenz.",
+      "vorher": {
+        "zugang": "genehmigungspflichtig",
+        "sperre_grund": "lizenz",
+        "warum_kein_wert": "Der Ausschuss veröffentlicht für den individuellen Wohnungsbau eine Umrechnungsformel (Fläche und Wohnlage, Stichtag 01.07.2025, 105 Kauffälle 2024–2025, gültig 202–1.720 m²; Grundstücksmarktbericht 2026, Abschn. 7.2.1, S. 66–67). Der Bericht ist urheberrechtlich geschützt; die Verwertung für wirtschaftliche Zwecke ist nur mit Erlaubnis des Herausgebers zulässig. Eine Erlaubnis liegt nicht vor. Weg: Erlaubnis beim Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Dresden (Amt für Geodaten und Kataster) einholen; Bericht frei einsehbar: https://www.dresden.de/media/pdf/vermessung/2026-Grundstuecksmarktbericht.pdf."
+      }
+    }
   },
   {
     "land_code": "SN",
@@ -4908,119 +4933,163 @@
     "gaa_name": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig",
     "kennzahl": "umrechnungskoeffizient_flaeche",
     "zweig": "ifw",
-    "vollstaendig": false,
-    "zugang": "genehmigungspflichtig",
-    "zugang_beleg": "Wortlaut warum_kein_wert: „Wiedergabe und Weitergabe jeder Art nur mit Genehmigung des Herausgebers; eine Genehmigung liegt nicht vor.“",
-    "zugang_herkunft": "abgeleitet am 21.11.2026 (v3943) aus dem Wortlaut in warum_kein_wert (unverändert), sperre_grund „lizenz“",
-    "warum_kein_wert": "Der Ausschuss veröffentlicht Flächenumrechnungskoeffizienten für den individuellen Wohnungsbau (Gleichung UK = 4,47 × Fläche^-0,2408, normiert 500 m² = 1,00, 200–1.500 m², 1.105 Kauffälle 2015–2025, Stichtag 01.01.2026; Marktbericht 2026, Abschn. 7.5.2, S. 86–87). Wiedergabe und Weitergabe jeder Art nur mit Genehmigung des Herausgebers; eine Genehmigung liegt nicht vor. Weg: Genehmigung beim Gutachterausschuss für Grundstückswerte in der Stadt Leipzig (Amt für Geoinformation und Bodenordnung) einholen; Bericht frei einsehbar: https://static.leipzig.de/fileadmin/mediendatenbank/leipzig-de/Stadt/02.6_Dez6_Stadtentwicklung_Bau/62_Amt_fuer_Geoinformationen_und_Bodenordnung/Gutachterausschuss/Marktbericht_Leipzig_2026.pdf.",
-    "sperre_grund": "lizenz",
-    "formel": null,
-    "geltungsbereich": null,
-    "formel_vorgemerkt": {
-      "nutzung_intern": "stuetzstelle",
-      "nutzung_hinweis": "Nur als Stützstelle für eine spätere, ausdrücklich als Näherung gekennzeichnete DealPilot-Formel – nie als amtliche Zahl ausgeben. Übernahme als Wert erst nach Erlaubnis des Herausgebers.",
-      "lizenz_wortlaut": "Alle Rechte vorbehalten. Nachdruck, Vervielfältigung, Wiedergabe oder Weitergabe jeder Art sind nur mit Genehmigung des Herausgebers gestattet.",
-      "form": "flaeche_funktion",
-      "typ": "potenz",
-      "basis_qm": 500,
-      "exponent": -0.2408,
-      "formel_wortlaut": "UK (Fläche) = 4,47 × Fläche^-0,2408 (normiert auf 500 m² = 1,00)",
+    "vollstaendig": true,
+    "formel": {
+      "form": "flaeche_tabelle",
+      "bezug": "BRWang = BRW × UK(Fläche des Bewertungsobjekts) / UK(Fläche des Bodenrichtwerts)",
+      "wirkung": "multiplikativ",
+      "tabelle_nach": "eine Tabelle für jede Bezugsgröße (Quotient der beiden Koeffizienten), normiert auf 500 m² = 1,00",
+      "tabellen": {
+        "*": {
+          "bezug_qm": 500,
+          "flaeche_qm": [
+            200,
+            250,
+            300,
+            350,
+            400,
+            450,
+            500,
+            550,
+            600,
+            650,
+            700,
+            750,
+            800,
+            850,
+            900,
+            950,
+            1000,
+            1050,
+            1100,
+            1150,
+            1200,
+            1250,
+            1300,
+            1350,
+            1400,
+            1450,
+            1500
+          ],
+          "koeffizient": [
+            1.25,
+            1.18,
+            1.13,
+            1.09,
+            1.06,
+            1.03,
+            1,
+            0.98,
+            0.96,
+            0.94,
+            0.92,
+            0.91,
+            0.89,
+            0.88,
+            0.87,
+            0.86,
+            0.85,
+            0.84,
+            0.83,
+            0.82,
+            0.81,
+            0.8,
+            0.79,
+            0.79,
+            0.78,
+            0.77,
+            0.77
+          ]
+        }
+      },
+      "zwischenwerte": "linear",
+      "zwischenwerte_hinweis": "Das Dokument druckt die Tabelle im 50-m²-Raster und nennt die erzeugende Gleichung UK (Fläche) = 4,47 × Fläche^-0,2408 (S. 87); eine eigene Regel für Zwischenwerte nennt es nicht. Linear zwischen den Tabellenwerten: gemessen am 22.11.2026 über 200–1.500 m² höchstens 0,0052 von der Gleichung entfernt – dieselbe Abweichung, die die auf zwei Stellen gerundete Tabelle selbst hat.",
+      "funktion_dokument": {
+        "typ": "potenz",
+        "exponent": -0.2408,
+        "basis_qm": 500,
+        "formel_wortlaut": "UK (Fläche) = 4,47 × Fläche^-0,2408",
+        "seite": 87
+      },
       "spanne_qm": [
         200,
         1500
       ],
-      "tabelle_dokument": {
-        "bezug_qm": 500,
-        "flaeche_qm": [
-          200,
-          250,
-          300,
-          350,
-          400,
-          450,
-          500,
-          550,
-          600,
-          650,
-          700,
-          750,
-          800,
-          850,
-          900,
-          950,
-          1000,
-          1050,
-          1100,
-          1150,
-          1200,
-          1250,
-          1300,
-          1350,
-          1400,
-          1450,
-          1500
-        ],
-        "koeffizient": [
-          1.25,
-          1.18,
-          1.13,
-          1.09,
-          1.06,
-          1.03,
-          1,
-          0.98,
-          0.96,
-          0.94,
-          0.92,
-          0.91,
-          0.89,
-          0.88,
-          0.87,
-          0.86,
-          0.85,
-          0.84,
-          0.83,
-          0.82,
-          0.81,
-          0.8,
-          0.79,
-          0.79,
-          0.78,
-          0.77,
-          0.77
-        ]
+      "unterhalb": {
+        "regel": "keine",
+        "wortlaut": "Eine Anwendung der Umrechnungskoeffizienten für Grundstücke mit einer Fläche von unter 200 m² und über 1.500 m² ist grundsätzlich möglich, allerdings ist dieser Bereich nicht mit Daten hinterlegt. Aus diesem Grund werden keine Umrechnungskoeffizienten ausgewiesen. Diese können bei Bedarf eigenverantwortlich mit der oben angegebenen Formel berechnet werden."
       },
-      "geltung": "unbebaute Baugrundstücke des Teilmarkts individueller Wohnungsbau, 200–1.500 m², voll erschlossen; ausgeschlossen Einfamilienhäuser in Geschossbaulagen (WGFZ > 1,0) und Einheitskauffälle in neuen Wohngebieten",
-      "beispiel": "Fläche des Bewertungsobjekts 700 m²; Fläche des Bodenrichtwerts 400 m²; Bodenrichtwert 300 €/m²; UK gesucht 0,92; UK BRW 1,06; BRWang = 300 €/m² x (0,92/1,06) ≈ 260 €/m²",
-      "seite": 87
+      "oberhalb": {
+        "regel": "keine",
+        "wortlaut": "Eine Anwendung der Umrechnungskoeffizienten für Grundstücke mit einer Fläche von unter 200 m² und über 1.500 m² ist grundsätzlich möglich, allerdings ist dieser Bereich nicht mit Daten hinterlegt. Aus diesem Grund werden keine Umrechnungskoeffizienten ausgewiesen. Diese können bei Bedarf eigenverantwortlich mit der oben angegebenen Formel berechnet werden."
+      },
+      "pruefbeispiel": {
+        "wortlaut": "Fläche des Bewertungsobjekts 700 m²; Fläche des Bodenrichtwerts 400 m²; Bodenrichtwert 300 €/m²; UK gesucht 0,92; UK BRW 1,06; BRWang = 300 €/m² x (0,92/1,06) ≈ 260 €/m²",
+        "flaeche_qm": 700,
+        "normgroesse_qm": 400,
+        "brw_eur_qm": 300,
+        "koeffizient_objekt": 0.92,
+        "koeffizient_norm": 1.06,
+        "koeffizient": 0.8679,
+        "bodenwert_eur_qm": 260,
+        "rundung_eur_qm": 1,
+        "seite": 87
+      }
     },
-    "weg": "Genehmigung beim Gutachterausschuss für Grundstückswerte in der Stadt Leipzig (Amt für Geoinformation und Bodenordnung) einholen; Bericht frei einsehbar: https://static.leipzig.de/fileadmin/mediendatenbank/leipzig-de/Stadt/02.6_Dez6_Stadtentwicklung_Bau/62_Amt_fuer_Geoinformationen_und_Bodenordnung/Gutachterausschuss/Marktbericht_Leipzig_2026.pdf.",
+    "geltungsbereich": {
+      "nutzung": "unbebaute Baugrundstücke des individuellen Wohnungsbaus (Ein-/Zweifamilienhaus, Doppelhaus, Reihenhaus), 200–1.500 m², voll erschlossen",
+      "objektarten": [
+        "efh",
+        "zfh",
+        "dhh",
+        "rh"
+      ],
+      "objektarten_ausgeschlossen": [
+        "mfh",
+        "etw",
+        "gewerbe"
+      ],
+      "ausserhalb_wortlaut": "Filterkriterien: unbebaute Baugrundstücke des Teilmarkts individueller Wohnungsbau; Grundstücksfläche zwischen 200 m² und 1.500 m²; voll erschlossenes baureifes Land; Ausschluss von Einfamilienhäusern in Geschossbaulagen (Richtwertzone mit WGFZ Bezug > 1,0); Ausschluss von „Einheitskauffällen“ i.d.R. in neuen Wohngebieten.",
+      "ausserhalb_weg": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig (Amt für Geoinformation und Bodenordnung), Marktbericht 2026, Abschn. 7.5.2, S. 86–87",
+      "vorbehalt": "Richtwertzonen mit WGFZ-Bezug > 1,0 (Geschossbaulagen) sind vom Ausschuss ausgeschlossen; die Zone wird hier nicht automatisch geprüft. Die Ergebnisse sind „insbesondere bei Anpassungen mit stark differierenden Flächen, sachverständig auf ihre Plausibilität (Marktkonformität) zu prüfen“ (S. 87)."
+    },
     "stufe": "A",
-    "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
+    "stufe_grund": "amtlich: Tabelle 127 des Ausschusses (1.105 Kauffälle 2015–2025, Stichtag 01.01.2026), Anwendungsbeispiel S. 87 nachgerechnet.",
     "stichtag": "2026-01-01",
     "berichtsjahr": 2026,
     "quelle_url": "https://static.leipzig.de/fileadmin/mediendatenbank/leipzig-de/Stadt/02.6_Dez6_Stadtentwicklung_Bau/62_Amt_fuer_Geoinformationen_und_Bodenordnung/Gutachterausschuss/Marktbericht_Leipzig_2026.pdf",
     "lizenz": "Alle Rechte vorbehalten — Nutzung mit Genehmigung des Herausgebers",
     "lizenz_wortlaut": "Alle Rechte vorbehalten. Nachdruck, Vervielfältigung, Wiedergabe oder Weitergabe jeder Art sind nur mit Genehmigung des Herausgebers gestattet.",
-    "quellenvermerk": null,
-    "fundstelle": "Abschn. 7.5.2, Tabelle 127, S. 86–87 (am Seitenbild abgelesen); Impressum S. 2",
+    "quellenvermerk": "Gutachterausschuss für Grundstückswerte in der Stadt Leipzig, Grundstücksmarktbericht 2026",
+    "fundstelle": "Abschn. 7.5.2, Tabelle 127, S. 86–87 (Gleichung, Tabelle, Anwendungsbeispiel); Impressum S. 2",
     "belege": [
       {
         "art": "amtliche Veröffentlichung",
         "dokument": "Marktbericht 2026 des Gutachterausschusses für Grundstückswerte in der Stadt Leipzig",
-        "fundstelle": "Abschn. 7.5.2, Tabelle 127, S. 86–87 (am Seitenbild abgelesen); Impressum S. 2",
+        "fundstelle": "Abschn. 7.5.2, Tabelle 127, S. 86–87; Impressum S. 2",
         "url": "https://static.leipzig.de/fileadmin/mediendatenbank/leipzig-de/Stadt/02.6_Dez6_Stadtentwicklung_Bau/62_Amt_fuer_Geoinformationen_und_Bodenordnung/Gutachterausschuss/Marktbericht_Leipzig_2026.pdf",
-        "wortlaut": "UK (Fläche) = 4,47 × Fläche^-0,2408"
+        "wortlaut": "UK (Fläche) = 4,47 × Fläche^-0,2408; Beispiel: BRWang = 300 €/m² x (0,92/1,06) ≈ 260 €/m²"
       }
     ],
     "belege_meta": {
       "dokument": "Marktbericht 2026 des Gutachterausschusses für Grundstückswerte in der Stadt Leipzig",
-      "abgerufen_am": "2026-10-16"
+      "abgerufen_am": "2026-10-16",
+      "nachgelesen_am": "2026-11-22"
     },
     "modellversion": "Umrechnungskoeffizienten Grundstücksgröße (§ 19 ImmoWertV), Gutachterausschuss für Grundstückswerte in der Stadt Leipzig, Jahrgang 2026",
     "quelle_parser": "uk-ernte-ost 16.10.2026 (Grundstücksmarktbericht, pdftotext -layout und Seitenbild)",
     "modellansaetze": {},
-    "nutzung_intern": "stuetzstelle"
+    "nutzungsrecht": "Der Bericht verbietet Wiedergabe und Weitergabe ohne Genehmigung (S. 2). Marcel Junker hat am 01.10.2026 mitgeteilt, dass die Erlaubnis des Herausgebers vorliegt; am 22.10.2026 „weiter nutzen“, am 22.11.2026 für die Umrechnungskoeffizienten bestätigt („wie LZS weiter nutzen“). Nachweis (Datum, Aktenzeichen, Umfang) ist noch nachzutragen.",
+    "stufe_vorher": "A",
+    "freigabe": {
+      "datum": "2026-11-22",
+      "notiz": "22.11.2026 · Marcel: wie LZS weiter nutzen (Entscheidung zum Genehmigungsvorbehalt wie beim Liegenschaftszins seit 22.10.2026, wissen/2026-10-22.md Nr. 3). Vorher Sperre zugang genehmigungspflichtig, sperre_grund lizenz.",
+      "vorher": {
+        "zugang": "genehmigungspflichtig",
+        "sperre_grund": "lizenz",
+        "warum_kein_wert": "Der Ausschuss veröffentlicht Flächenumrechnungskoeffizienten für den individuellen Wohnungsbau (Gleichung UK = 4,47 × Fläche^-0,2408, normiert 500 m² = 1,00, 200–1.500 m², 1.105 Kauffälle 2015–2025, Stichtag 01.01.2026; Marktbericht 2026, Abschn. 7.5.2, S. 86–87). Wiedergabe und Weitergabe jeder Art nur mit Genehmigung des Herausgebers; eine Genehmigung liegt nicht vor. Weg: Genehmigung beim Gutachterausschuss für Grundstückswerte in der Stadt Leipzig (Amt für Geoinformation und Bodenordnung) einholen; Bericht frei einsehbar: https://static.leipzig.de/fileadmin/mediendatenbank/leipzig-de/Stadt/02.6_Dez6_Stadtentwicklung_Bau/62_Amt_fuer_Geoinformationen_und_Bodenordnung/Gutachterausschuss/Marktbericht_Leipzig_2026.pdf."
+      }
+    }
   },
   {
     "land_code": "SN",

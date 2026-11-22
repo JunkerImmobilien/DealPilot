@@ -1,13 +1,13 @@
 # Sperren — Anfrageliste an die Gutachterausschüsse
 
-Stand 2026-11-21 · erzeugt mit `node tools/sperren-anfrageliste.mjs` aus den aktiven Registerdateien und `ausschuss_kontakte.json` (Stand 2026-11-20).
+Stand 2026-11-22 · erzeugt mit `node tools/sperren-anfrageliste.mjs` aus den aktiven Registerdateien und `ausschuss_kontakte.json` (Stand 2026-11-20).
 
 ## Zusammenfassung
 
 | | |
 |---|---:|
 | Ausschüsse mit Sperren | 398 |
-| Sperren | 12373 |
+| Sperren | 12371 |
 | davon Ausschüsse mit belegter E-Mail der Geschäftsstelle | 368 |
 | nur E-Mail der oberen Stelle | 1 |
 | nur Kontaktformular | 2 |
@@ -20,7 +20,7 @@ Stand 2026-11-21 · erzeugt mit `node tools/sperren-anfrageliste.mjs` aus den ak
 | kostenpflichtig | 3489 |
 | auf Anfrage | 3333 |
 | ohne Angabe | 2835 |
-| genehmigungspflichtig | 920 |
+| genehmigungspflichtig | 918 |
 | nicht abgeleitet | 646 |
 | nicht veröffentlicht | 372 |
 | frei, aber nicht verwertbar | 287 |
@@ -46,7 +46,7 @@ Stand 2026-11-21 · erzeugt mit `node tools/sperren-anfrageliste.mjs` aus den ak
 | RP | 13 | 479 | 12 |
 | SH | 15 | 154 | 15 |
 | SL | 7 | 91 | 7 |
-| SN | 13 | 111 | 13 |
+| SN | 13 | 109 | 13 |
 | ST | 1 | 81 | 1 |
 | TH | 10 | 184 | 9 |
 
@@ -504,8 +504,8 @@ Stand 2026-11-21 · erzeugt mit `node tools/sperren-anfrageliste.mjs` aus den ak
 | Gutachterausschuss für Grundstückswerte im Landkreis Zwickau | 9 | Liegenschaftszinssatz 3, Vergleichsfaktor (§ 20) 3, Sachwertfaktor 1, UK Grundstücksgröße 1, UK WGFZ 1 | kostenpflichtig 8, ohne Angabe 1 | Vollversion 140,00 €; Verwertung zusätzlich erlaubnispflichtig | 2026 | gaa@landkreis-zwickau.de | [Quelle](https://www.landkreis-zwickau.de/detail?type=BHW&id=152) |
 | Gutachterausschuss für Grundstückswerte im Vogtlandkreis | 9 | Liegenschaftszinssatz 3, Vergleichsfaktor (§ 20) 3, Sachwertfaktor 1, UK Grundstücksgröße 1, UK WGFZ 1 | genehmigungspflichtig 5, nicht abgeleitet 3, ohne Angabe 1 | Bericht kostenfrei; Verwertung nur mit Erlaubnis des Herausgebers | 2026 | gutachterausschuss@vogtlandkreis.de | [Quelle](https://www.vogtlandkreis.de/media/custom/3434_6169_1.PDF) |
 | Gutachterausschuss für Grundstückswerte in der Stadt Chemnitz | 9 | Liegenschaftszinssatz 3, Vergleichsfaktor (§ 20) 3, Sachwertfaktor 1, UK Grundstücksgröße 1, UK WGFZ 1 | kostenpflichtig 8, ohne Angabe 1 | 65,00 € (PDF oder Druck); die Verwertung ist zusätzlich erlaubnispflichtig | 2026 | gutachterausschuss@stadt-chemnitz.de | [Quelle](https://www.chemnitz.de/de/leben-in-chemnitz/lebenssituationen/bauen-und-wohnen/bodenrichtwerte) |
-| Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Dresden | 6 | Vergleichsfaktor (§ 20) 3, UK Grundstücksgröße 1, UK WGFZ 1, Sachwertfaktor 1 | nicht abgeleitet 3, kostenpflichtig 1, genehmigungspflichtig 1, ohne Angabe 1 |  | 2026 | grundstueckswertermittlung@dresden.de | [Quelle](https://www.dresden.de/media/pdf/vermessung/2026-Grundstuecksmarktbericht.pdf#page=71) |
-| Gutachterausschuss für Grundstückswerte in der Stadt Leipzig | 6 | Vergleichsfaktor (§ 20) 3, UK Grundstücksgröße 1, UK WGFZ 1, Sachwertfaktor 1 | nicht abgeleitet 3, kostenpflichtig 1, genehmigungspflichtig 1, ohne Angabe 1 |  | 2026 | gutachterausschuss@leipzig.de | [Quelle](https://static.leipzig.de/fileadmin/mediendatenbank/leipzig-de/Stadt/02.6_Dez6_Stadtentwicklung_Bau/62_Amt_fuer_Geoinformationen_und_Bodenordnung/Gutachterausschuss/Marktbericht_Leipzig_2026.pdf) |
+| Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Dresden | 5 | Vergleichsfaktor (§ 20) 3, UK WGFZ 1, Sachwertfaktor 1 | nicht abgeleitet 3, kostenpflichtig 1, ohne Angabe 1 |  | 2026 | grundstueckswertermittlung@dresden.de | [Quelle](https://www.dresden.de/media/pdf/vermessung/2026-Grundstuecksmarktbericht.pdf#page=71) |
+| Gutachterausschuss für Grundstückswerte in der Stadt Leipzig | 5 | Vergleichsfaktor (§ 20) 3, UK WGFZ 1, Sachwertfaktor 1 | nicht abgeleitet 3, kostenpflichtig 1, ohne Angabe 1 |  | 2026 | gutachterausschuss@leipzig.de | [Quelle](https://static.leipzig.de/fileadmin/mediendatenbank/leipzig-de/Stadt/02.6_Dez6_Stadtentwicklung_Bau/62_Amt_fuer_Geoinformationen_und_Bodenordnung/Gutachterausschuss/Marktbericht_Leipzig_2026.pdf) |
 
 ## ST
 

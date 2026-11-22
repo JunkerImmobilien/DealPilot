@@ -600,8 +600,13 @@
   "stichtag": "2026-01-01",
   "kennzahl": "sachwertfaktor",
   "zweig": "efh_frei_vor1991",
+  "objektart": "ezfh",
+  "baujahr_von": null,
+  "baujahr_bis": 1990,
   "formel": {
-   "form": "konstante", "liefert": "faktor", "form_hinweis": "v2996: bis hier festwert - swf_modelle.auswerten() lieferte form_unbekannt, der Jahrgang 2026 brachte keinen Wert (Registerpruefung 27.10.2026). Wie die Zinssaetze seit v1787.",
+   "form": "konstante",
+   "liefert": "faktor",
+   "form_hinweis": "v2996: bis hier festwert - swf_modelle.auswerten() lieferte form_unbekannt, der Jahrgang 2026 brachte keinen Wert (Registerpruefung 27.10.2026). Wie die Zinssaetze seit v1787.",
    "wert": 1.06,
    "median": 0.98,
    "bezeichnung": "Ein-/Zweifamilienhaus freistehend, Baujahre vor 1991"
@@ -618,7 +623,11 @@
     "grundstueck_max_qm": 1500,
     "wohnflaeche_min_qm": 80,
     "rnd_min_jahre": 15
-   }
+   },
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "quartalsweise Indexreihe für die Bauwirtschaft des Statistischen Bundesamtes - Preisindex für den Neubau von Wohngebäuden, umgerechnet auf Basis 2010",
+   "baupreisindex_seite": "Marktbericht 2026 Stadt Leipzig, Kap. 7.4.2 Sachwertfaktor, Modellparameter, S. 84",
+   "baupreisindex_hinweis": "Das Modell nennt den Index ohne abweichenden Bezugszeitpunkt; Regelfall § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag). Nachgetragen 22.11.2026 am Dokument."
   },
   "geltungsbereich": {
    "raeumlich": "Stadtgebiet Leipzig",
@@ -646,7 +655,16 @@
    "max": 1.66,
    "sigma": 0.25
   },
-  "fundstelle": "S. 87"
+  "fundstelle": "Kap. 7.4.2, S. 83–85; Tabelle 124 „Sachwertfaktor für Ein- und Zweifamilienhausgrundstücke Baujahre vor 1991“, S. 85 (Spalte Mittel)",
+  "korrektur_22_11_2026": {
+   "vorher": {
+    "fundstelle": "S. 87",
+    "objektart": null,
+    "baujahr_von": null,
+    "baujahr_bis": null
+   },
+   "grund": "Widerspruch Sachsen: der Kern zog für Leipzig die Faktoren des Jahrgangs 2024 aus swf-sn.json (GMB 2025), weil diese Sätze 2026 ohne objektart und Baujahrsgrenzen keinem Objekt zuzuordnen waren. Am PDF gemessen: Tab. 124 (vor 1991) und Tab. 126 (ab 1991) auf S. 85, nicht S. 87 (dort steht Abschn. 7.5.2 Flächenumrechnung). Werte unverändert, stimmen mit der Spalte Mittel überein."
+  }
  },
  {
   "land_code": "SN",
@@ -664,8 +682,13 @@
   "stichtag": "2026-01-01",
   "kennzahl": "sachwertfaktor",
   "zweig": "efh_dhh_vor1991",
+  "objektart": "dhh",
+  "baujahr_von": null,
+  "baujahr_bis": 1990,
   "formel": {
-   "form": "konstante", "liefert": "faktor", "form_hinweis": "v2996: bis hier festwert - swf_modelle.auswerten() lieferte form_unbekannt, der Jahrgang 2026 brachte keinen Wert (Registerpruefung 27.10.2026). Wie die Zinssaetze seit v1787.",
+   "form": "konstante",
+   "liefert": "faktor",
+   "form_hinweis": "v2996: bis hier festwert - swf_modelle.auswerten() lieferte form_unbekannt, der Jahrgang 2026 brachte keinen Wert (Registerpruefung 27.10.2026). Wie die Zinssaetze seit v1787.",
    "wert": 1.16,
    "median": 1.18,
    "bezeichnung": "Doppelhaushälfte, Baujahre vor 1991"
@@ -682,7 +705,11 @@
     "grundstueck_max_qm": 1500,
     "wohnflaeche_min_qm": 80,
     "rnd_min_jahre": 15
-   }
+   },
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "quartalsweise Indexreihe für die Bauwirtschaft des Statistischen Bundesamtes - Preisindex für den Neubau von Wohngebäuden, umgerechnet auf Basis 2010",
+   "baupreisindex_seite": "Marktbericht 2026 Stadt Leipzig, Kap. 7.4.2 Sachwertfaktor, Modellparameter, S. 84",
+   "baupreisindex_hinweis": "Das Modell nennt den Index ohne abweichenden Bezugszeitpunkt; Regelfall § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag). Nachgetragen 22.11.2026 am Dokument."
   },
   "geltungsbereich": {
    "raeumlich": "Stadtgebiet Leipzig",
@@ -710,7 +737,16 @@
    "max": 1.61,
    "sigma": 0.2
   },
-  "fundstelle": "S. 87"
+  "fundstelle": "Kap. 7.4.2, S. 83–85; Tabelle 124 „Sachwertfaktor für Ein- und Zweifamilienhausgrundstücke Baujahre vor 1991“, S. 85 (Spalte Mittel)",
+  "korrektur_22_11_2026": {
+   "vorher": {
+    "fundstelle": "S. 87",
+    "objektart": null,
+    "baujahr_von": null,
+    "baujahr_bis": null
+   },
+   "grund": "Widerspruch Sachsen: der Kern zog für Leipzig die Faktoren des Jahrgangs 2024 aus swf-sn.json (GMB 2025), weil diese Sätze 2026 ohne objektart und Baujahrsgrenzen keinem Objekt zuzuordnen waren. Am PDF gemessen: Tab. 124 (vor 1991) und Tab. 126 (ab 1991) auf S. 85, nicht S. 87 (dort steht Abschn. 7.5.2 Flächenumrechnung). Werte unverändert, stimmen mit der Spalte Mittel überein."
+  }
  },
  {
   "land_code": "SN",
@@ -728,8 +764,13 @@
   "stichtag": "2026-01-01",
   "kennzahl": "sachwertfaktor",
   "zweig": "efh_reh_vor1991",
+  "objektart": "reh",
+  "baujahr_von": null,
+  "baujahr_bis": 1990,
   "formel": {
-   "form": "konstante", "liefert": "faktor", "form_hinweis": "v2996: bis hier festwert - swf_modelle.auswerten() lieferte form_unbekannt, der Jahrgang 2026 brachte keinen Wert (Registerpruefung 27.10.2026). Wie die Zinssaetze seit v1787.",
+   "form": "konstante",
+   "liefert": "faktor",
+   "form_hinweis": "v2996: bis hier festwert - swf_modelle.auswerten() lieferte form_unbekannt, der Jahrgang 2026 brachte keinen Wert (Registerpruefung 27.10.2026). Wie die Zinssaetze seit v1787.",
    "wert": 1.21,
    "median": 1.19,
    "bezeichnung": "Reihenendhaus, Baujahre vor 1991"
@@ -746,7 +787,11 @@
     "grundstueck_max_qm": 1500,
     "wohnflaeche_min_qm": 80,
     "rnd_min_jahre": 15
-   }
+   },
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "quartalsweise Indexreihe für die Bauwirtschaft des Statistischen Bundesamtes - Preisindex für den Neubau von Wohngebäuden, umgerechnet auf Basis 2010",
+   "baupreisindex_seite": "Marktbericht 2026 Stadt Leipzig, Kap. 7.4.2 Sachwertfaktor, Modellparameter, S. 84",
+   "baupreisindex_hinweis": "Das Modell nennt den Index ohne abweichenden Bezugszeitpunkt; Regelfall § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag). Nachgetragen 22.11.2026 am Dokument."
   },
   "geltungsbereich": {
    "raeumlich": "Stadtgebiet Leipzig",
@@ -774,7 +819,16 @@
    "max": 1.67,
    "sigma": 0.27
   },
-  "fundstelle": "S. 87"
+  "fundstelle": "Kap. 7.4.2, S. 83–85; Tabelle 124 „Sachwertfaktor für Ein- und Zweifamilienhausgrundstücke Baujahre vor 1991“, S. 85 (Spalte Mittel)",
+  "korrektur_22_11_2026": {
+   "vorher": {
+    "fundstelle": "S. 87",
+    "objektart": null,
+    "baujahr_von": null,
+    "baujahr_bis": null
+   },
+   "grund": "Widerspruch Sachsen: der Kern zog für Leipzig die Faktoren des Jahrgangs 2024 aus swf-sn.json (GMB 2025), weil diese Sätze 2026 ohne objektart und Baujahrsgrenzen keinem Objekt zuzuordnen waren. Am PDF gemessen: Tab. 124 (vor 1991) und Tab. 126 (ab 1991) auf S. 85, nicht S. 87 (dort steht Abschn. 7.5.2 Flächenumrechnung). Werte unverändert, stimmen mit der Spalte Mittel überein."
+  }
  },
  {
   "land_code": "SN",
@@ -792,8 +846,13 @@
   "stichtag": "2026-01-01",
   "kennzahl": "sachwertfaktor",
   "zweig": "efh_rmh_vor1991",
+  "objektart": "rmh",
+  "baujahr_von": null,
+  "baujahr_bis": 1990,
   "formel": {
-   "form": "konstante", "liefert": "faktor", "form_hinweis": "v2996: bis hier festwert - swf_modelle.auswerten() lieferte form_unbekannt, der Jahrgang 2026 brachte keinen Wert (Registerpruefung 27.10.2026). Wie die Zinssaetze seit v1787.",
+   "form": "konstante",
+   "liefert": "faktor",
+   "form_hinweis": "v2996: bis hier festwert - swf_modelle.auswerten() lieferte form_unbekannt, der Jahrgang 2026 brachte keinen Wert (Registerpruefung 27.10.2026). Wie die Zinssaetze seit v1787.",
    "wert": 1.45,
    "median": 1.46,
    "bezeichnung": "Reihenmittelhaus, Baujahre vor 1991"
@@ -810,7 +869,11 @@
     "grundstueck_max_qm": 1500,
     "wohnflaeche_min_qm": 80,
     "rnd_min_jahre": 15
-   }
+   },
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "quartalsweise Indexreihe für die Bauwirtschaft des Statistischen Bundesamtes - Preisindex für den Neubau von Wohngebäuden, umgerechnet auf Basis 2010",
+   "baupreisindex_seite": "Marktbericht 2026 Stadt Leipzig, Kap. 7.4.2 Sachwertfaktor, Modellparameter, S. 84",
+   "baupreisindex_hinweis": "Das Modell nennt den Index ohne abweichenden Bezugszeitpunkt; Regelfall § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag). Nachgetragen 22.11.2026 am Dokument."
   },
   "geltungsbereich": {
    "raeumlich": "Stadtgebiet Leipzig",
@@ -838,7 +901,16 @@
    "max": 1.98,
    "sigma": 0.36
   },
-  "fundstelle": "S. 87"
+  "fundstelle": "Kap. 7.4.2, S. 83–85; Tabelle 124 „Sachwertfaktor für Ein- und Zweifamilienhausgrundstücke Baujahre vor 1991“, S. 85 (Spalte Mittel)",
+  "korrektur_22_11_2026": {
+   "vorher": {
+    "fundstelle": "S. 87",
+    "objektart": null,
+    "baujahr_von": null,
+    "baujahr_bis": null
+   },
+   "grund": "Widerspruch Sachsen: der Kern zog für Leipzig die Faktoren des Jahrgangs 2024 aus swf-sn.json (GMB 2025), weil diese Sätze 2026 ohne objektart und Baujahrsgrenzen keinem Objekt zuzuordnen waren. Am PDF gemessen: Tab. 124 (vor 1991) und Tab. 126 (ab 1991) auf S. 85, nicht S. 87 (dort steht Abschn. 7.5.2 Flächenumrechnung). Werte unverändert, stimmen mit der Spalte Mittel überein."
+  }
  },
  {
   "land_code": "SN",
@@ -856,8 +928,13 @@
   "stichtag": "2026-01-01",
   "kennzahl": "sachwertfaktor",
   "zweig": "efh_frei_ab1991",
+  "objektart": "ezfh",
+  "baujahr_von": 1991,
+  "baujahr_bis": null,
   "formel": {
-   "form": "konstante", "liefert": "faktor", "form_hinweis": "v2996: bis hier festwert - swf_modelle.auswerten() lieferte form_unbekannt, der Jahrgang 2026 brachte keinen Wert (Registerpruefung 27.10.2026). Wie die Zinssaetze seit v1787.",
+   "form": "konstante",
+   "liefert": "faktor",
+   "form_hinweis": "v2996: bis hier festwert - swf_modelle.auswerten() lieferte form_unbekannt, der Jahrgang 2026 brachte keinen Wert (Registerpruefung 27.10.2026). Wie die Zinssaetze seit v1787.",
    "wert": 1.12,
    "median": 1.09,
    "bezeichnung": "Ein-/Zweifamilienhaus freistehend, Baujahre ab 1991"
@@ -874,7 +951,11 @@
     "grundstueck_max_qm": 1500,
     "wohnflaeche_min_qm": 80,
     "rnd_min_jahre": 15
-   }
+   },
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "quartalsweise Indexreihe für die Bauwirtschaft des Statistischen Bundesamtes - Preisindex für den Neubau von Wohngebäuden, umgerechnet auf Basis 2010",
+   "baupreisindex_seite": "Marktbericht 2026 Stadt Leipzig, Kap. 7.4.2 Sachwertfaktor, Modellparameter, S. 84",
+   "baupreisindex_hinweis": "Das Modell nennt den Index ohne abweichenden Bezugszeitpunkt; Regelfall § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag). Nachgetragen 22.11.2026 am Dokument."
   },
   "geltungsbereich": {
    "raeumlich": "Stadtgebiet Leipzig",
@@ -902,7 +983,16 @@
    "max": 1.53,
    "sigma": 0.19
   },
-  "fundstelle": "S. 87"
+  "fundstelle": "Kap. 7.4.2, S. 83–85; Tabelle 126 „Sachwertfaktor für Ein- und Zweifamilienhausgrundstücke Baujahre ab 1991“, S. 85 (Spalte Mittel)",
+  "korrektur_22_11_2026": {
+   "vorher": {
+    "fundstelle": "S. 87",
+    "objektart": null,
+    "baujahr_von": null,
+    "baujahr_bis": null
+   },
+   "grund": "Widerspruch Sachsen: der Kern zog für Leipzig die Faktoren des Jahrgangs 2024 aus swf-sn.json (GMB 2025), weil diese Sätze 2026 ohne objektart und Baujahrsgrenzen keinem Objekt zuzuordnen waren. Am PDF gemessen: Tab. 124 (vor 1991) und Tab. 126 (ab 1991) auf S. 85, nicht S. 87 (dort steht Abschn. 7.5.2 Flächenumrechnung). Werte unverändert, stimmen mit der Spalte Mittel überein."
+  }
  },
  {
   "land_code": "SN",
@@ -920,8 +1010,13 @@
   "stichtag": "2026-01-01",
   "kennzahl": "sachwertfaktor",
   "zweig": "efh_dhh_ab1991",
+  "objektart": "dhh",
+  "baujahr_von": 1991,
+  "baujahr_bis": null,
   "formel": {
-   "form": "konstante", "liefert": "faktor", "form_hinweis": "v2996: bis hier festwert - swf_modelle.auswerten() lieferte form_unbekannt, der Jahrgang 2026 brachte keinen Wert (Registerpruefung 27.10.2026). Wie die Zinssaetze seit v1787.",
+   "form": "konstante",
+   "liefert": "faktor",
+   "form_hinweis": "v2996: bis hier festwert - swf_modelle.auswerten() lieferte form_unbekannt, der Jahrgang 2026 brachte keinen Wert (Registerpruefung 27.10.2026). Wie die Zinssaetze seit v1787.",
    "wert": 1.11,
    "median": 1.15,
    "bezeichnung": "Doppelhaushälfte, Baujahre ab 1991"
@@ -938,7 +1033,11 @@
     "grundstueck_max_qm": 1500,
     "wohnflaeche_min_qm": 80,
     "rnd_min_jahre": 15
-   }
+   },
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "quartalsweise Indexreihe für die Bauwirtschaft des Statistischen Bundesamtes - Preisindex für den Neubau von Wohngebäuden, umgerechnet auf Basis 2010",
+   "baupreisindex_seite": "Marktbericht 2026 Stadt Leipzig, Kap. 7.4.2 Sachwertfaktor, Modellparameter, S. 84",
+   "baupreisindex_hinweis": "Das Modell nennt den Index ohne abweichenden Bezugszeitpunkt; Regelfall § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag). Nachgetragen 22.11.2026 am Dokument."
   },
   "geltungsbereich": {
    "raeumlich": "Stadtgebiet Leipzig",
@@ -966,7 +1065,16 @@
    "max": 1.38,
    "sigma": 0.16
   },
-  "fundstelle": "S. 87"
+  "fundstelle": "Kap. 7.4.2, S. 83–85; Tabelle 126 „Sachwertfaktor für Ein- und Zweifamilienhausgrundstücke Baujahre ab 1991“, S. 85 (Spalte Mittel)",
+  "korrektur_22_11_2026": {
+   "vorher": {
+    "fundstelle": "S. 87",
+    "objektart": null,
+    "baujahr_von": null,
+    "baujahr_bis": null
+   },
+   "grund": "Widerspruch Sachsen: der Kern zog für Leipzig die Faktoren des Jahrgangs 2024 aus swf-sn.json (GMB 2025), weil diese Sätze 2026 ohne objektart und Baujahrsgrenzen keinem Objekt zuzuordnen waren. Am PDF gemessen: Tab. 124 (vor 1991) und Tab. 126 (ab 1991) auf S. 85, nicht S. 87 (dort steht Abschn. 7.5.2 Flächenumrechnung). Werte unverändert, stimmen mit der Spalte Mittel überein."
+  }
  },
  {
   "land_code": "SN",
@@ -984,8 +1092,13 @@
   "stichtag": "2026-01-01",
   "kennzahl": "sachwertfaktor",
   "zweig": "efh_reh_ab1991",
+  "objektart": "reh",
+  "baujahr_von": 1991,
+  "baujahr_bis": null,
   "formel": {
-   "form": "konstante", "liefert": "faktor", "form_hinweis": "v2996: bis hier festwert - swf_modelle.auswerten() lieferte form_unbekannt, der Jahrgang 2026 brachte keinen Wert (Registerpruefung 27.10.2026). Wie die Zinssaetze seit v1787.",
+   "form": "konstante",
+   "liefert": "faktor",
+   "form_hinweis": "v2996: bis hier festwert - swf_modelle.auswerten() lieferte form_unbekannt, der Jahrgang 2026 brachte keinen Wert (Registerpruefung 27.10.2026). Wie die Zinssaetze seit v1787.",
    "wert": 1.3,
    "median": 1.12,
    "bezeichnung": "Reihenendhaus, Baujahre ab 1991"
@@ -1002,7 +1115,11 @@
     "grundstueck_max_qm": 1500,
     "wohnflaeche_min_qm": 80,
     "rnd_min_jahre": 15
-   }
+   },
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "quartalsweise Indexreihe für die Bauwirtschaft des Statistischen Bundesamtes - Preisindex für den Neubau von Wohngebäuden, umgerechnet auf Basis 2010",
+   "baupreisindex_seite": "Marktbericht 2026 Stadt Leipzig, Kap. 7.4.2 Sachwertfaktor, Modellparameter, S. 84",
+   "baupreisindex_hinweis": "Das Modell nennt den Index ohne abweichenden Bezugszeitpunkt; Regelfall § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag). Nachgetragen 22.11.2026 am Dokument."
   },
   "geltungsbereich": {
    "raeumlich": "Stadtgebiet Leipzig",
@@ -1030,7 +1147,16 @@
    "max": 1.99,
    "sigma": 0.37
   },
-  "fundstelle": "S. 87"
+  "fundstelle": "Kap. 7.4.2, S. 83–85; Tabelle 126 „Sachwertfaktor für Ein- und Zweifamilienhausgrundstücke Baujahre ab 1991“, S. 85 (Spalte Mittel)",
+  "korrektur_22_11_2026": {
+   "vorher": {
+    "fundstelle": "S. 87",
+    "objektart": null,
+    "baujahr_von": null,
+    "baujahr_bis": null
+   },
+   "grund": "Widerspruch Sachsen: der Kern zog für Leipzig die Faktoren des Jahrgangs 2024 aus swf-sn.json (GMB 2025), weil diese Sätze 2026 ohne objektart und Baujahrsgrenzen keinem Objekt zuzuordnen waren. Am PDF gemessen: Tab. 124 (vor 1991) und Tab. 126 (ab 1991) auf S. 85, nicht S. 87 (dort steht Abschn. 7.5.2 Flächenumrechnung). Werte unverändert, stimmen mit der Spalte Mittel überein."
+  }
  },
  {
   "land_code": "SN",
@@ -1048,8 +1174,13 @@
   "stichtag": "2026-01-01",
   "kennzahl": "sachwertfaktor",
   "zweig": "efh_rmh_ab1991",
+  "objektart": "rmh",
+  "baujahr_von": 1991,
+  "baujahr_bis": null,
   "formel": {
-   "form": "konstante", "liefert": "faktor", "form_hinweis": "v2996: bis hier festwert - swf_modelle.auswerten() lieferte form_unbekannt, der Jahrgang 2026 brachte keinen Wert (Registerpruefung 27.10.2026). Wie die Zinssaetze seit v1787.",
+   "form": "konstante",
+   "liefert": "faktor",
+   "form_hinweis": "v2996: bis hier festwert - swf_modelle.auswerten() lieferte form_unbekannt, der Jahrgang 2026 brachte keinen Wert (Registerpruefung 27.10.2026). Wie die Zinssaetze seit v1787.",
    "wert": 1.34,
    "median": 1.4,
    "bezeichnung": "Reihenmittelhaus, Baujahre ab 1991"
@@ -1066,7 +1197,11 @@
     "grundstueck_max_qm": 1500,
     "wohnflaeche_min_qm": 80,
     "rnd_min_jahre": 15
-   }
+   },
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "quartalsweise Indexreihe für die Bauwirtschaft des Statistischen Bundesamtes - Preisindex für den Neubau von Wohngebäuden, umgerechnet auf Basis 2010",
+   "baupreisindex_seite": "Marktbericht 2026 Stadt Leipzig, Kap. 7.4.2 Sachwertfaktor, Modellparameter, S. 84",
+   "baupreisindex_hinweis": "Das Modell nennt den Index ohne abweichenden Bezugszeitpunkt; Regelfall § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag). Nachgetragen 22.11.2026 am Dokument."
   },
   "geltungsbereich": {
    "raeumlich": "Stadtgebiet Leipzig",
@@ -1094,6 +1229,15 @@
    "max": 1.49,
    "sigma": 0.13
   },
-  "fundstelle": "S. 87"
+  "fundstelle": "Kap. 7.4.2, S. 83–85; Tabelle 126 „Sachwertfaktor für Ein- und Zweifamilienhausgrundstücke Baujahre ab 1991“, S. 85 (Spalte Mittel)",
+  "korrektur_22_11_2026": {
+   "vorher": {
+    "fundstelle": "S. 87",
+    "objektart": null,
+    "baujahr_von": null,
+    "baujahr_bis": null
+   },
+   "grund": "Widerspruch Sachsen: der Kern zog für Leipzig die Faktoren des Jahrgangs 2024 aus swf-sn.json (GMB 2025), weil diese Sätze 2026 ohne objektart und Baujahrsgrenzen keinem Objekt zuzuordnen waren. Am PDF gemessen: Tab. 124 (vor 1991) und Tab. 126 (ab 1991) auf S. 85, nicht S. 87 (dort steht Abschn. 7.5.2 Flächenumrechnung). Werte unverändert, stimmen mit der Spalte Mittel überein."
+  }
  }
 ]

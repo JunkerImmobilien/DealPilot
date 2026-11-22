@@ -43,7 +43,11 @@
    "swf_median": 1.08,
    "swf_mittel": 1.12,
    "swf_sigma": 0.22,
-   "stichtag_hinweis": "Median der Kaufzeitpunkte, 24.06.2025"
+   "stichtag_hinweis": "Median der Kaufzeitpunkte, 24.06.2025",
+   "baupreisindex_bezug": "stichtag_regelfall",
+   "baupreisindex_wortlaut": "quartalsweise ausgewiesene Indexreihen für die Bauwirtschaft des Statistischen Bundesamts 2021 – Preisindex für den Neubau von Wohngebäuden",
+   "baupreisindex_seite": "Grundstücksmarktbericht 2026 Landeshauptstadt Dresden, Kap. 7.3, Modellparameter Sachwertfaktoren, S. 76",
+   "baupreisindex_hinweis": "Das Modell nennt den Index ohne abweichenden Bezugszeitpunkt; Regelfall § 36 Abs. 2 ImmoWertV (Index zum Wertermittlungsstichtag). Nachgetragen 22.11.2026 am Dokument."
   },
   "geltungsbereich": {
    "raeumlich": "Stadtgebiet Dresden",

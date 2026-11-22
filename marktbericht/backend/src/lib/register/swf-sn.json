@@ -106,16 +106,24 @@
   "stufe_grund": "Amtliche Regressionsfunktion MIT ANWENDUNGSBEISPIEL: 440.000 € / 270 €/m² / 40 Jahre → ln(SWF) = 0,0942 → Faktor 1,0988 → marktangepasster Sachwert 483.472 €. Das Register rechnet dieselben Zahlen, Glied für Glied.",
   "fallzahl": 263,
   "streuung": 0.22,
-  "stichtag": "2026-01-01",
-  "berichtsjahr": 2025,
-  "modellversion": "GMB 2025",
+  "stichtag": "2025-06-24",
+  "berichtsjahr": 2026,
+  "modellversion": "Grundstücksmarktbericht Dresden 2026",
   "quelle_url": "https://www.dresden.de/media/pdf/vermessung/2026-Grundstuecksmarktbericht.pdf",
   "quelle_parser": "v1084-WREZ",
   "quellenvermerk": "Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Dresden, Grundstücksmarktbericht 2026, Amt für Geodaten und Kataster",
   "lizenz": "frei zugänglich, kostenfreier Download",
   "verwendung": "produkt",
   "auflagen": "Quellenangabe. Die Modellparameter des Berichts sind einzuhalten (Modellkonformität).",
-  "fundstelle": "Kap. 7.3 Sachwertfaktor, S. 76 ff., mit Modellparametern, Regressionsformel, Vertrauensintervallen und Anwendungsbeispiel (S. 79)."
+  "fundstelle": "Kap. 7.3 Sachwertfaktor, S. 76 ff., mit Modellparametern, Regressionsformel, Vertrauensintervallen und Anwendungsbeispiel (S. 79).",
+  "korrektur_22_11_2026": {
+   "vorher": {
+    "berichtsjahr": 2025,
+    "stichtag": "2026-01-01",
+    "modellversion": "GMB 2025"
+   },
+   "grund": "Widerspruch zu dresden.json und nachernte-2026-10b-sn.json (beide Jahrgang 2026). Quelle, Formel und Beleg dieses Satzes sind der Grundstücksmarktbericht 2026 (Kauffälle 2025). Am PDF gemessen: S. 77 Modellparameter „Stichtag 24. Juni 2025 (Median der Kaufzeitpunkte nach Ausreißerbereinigung)“, Selektion „Vertragsdatum 1. Januar 2025 bis 31. Dezember 2025“; Anwendungsbeispiel S. 79 (1,0988) unverändert."
+  }
  },
  {
   "land_code": "SN",
@@ -224,16 +232,24 @@
   "stufe_grund": "Amtliche Regressionsfunktion MIT ANWENDUNGSBEISPIEL: 440.000 € / 270 €/m² / 40 Jahre → ln(SWF) = 0,0942 → Faktor 1,0988 → marktangepasster Sachwert 483.472 €. Das Register rechnet dieselben Zahlen, Glied für Glied.",
   "fallzahl": 263,
   "streuung": 0.22,
-  "stichtag": "2026-01-01",
-  "berichtsjahr": 2025,
-  "modellversion": "GMB 2025",
+  "stichtag": "2025-06-24",
+  "berichtsjahr": 2026,
+  "modellversion": "Grundstücksmarktbericht Dresden 2026",
   "quelle_url": "https://www.dresden.de/media/pdf/vermessung/2026-Grundstuecksmarktbericht.pdf",
   "quelle_parser": "v1084-WREZ",
   "quellenvermerk": "Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Dresden, Grundstücksmarktbericht 2026, Amt für Geodaten und Kataster",
   "lizenz": "frei zugänglich, kostenfreier Download",
   "verwendung": "produkt",
   "auflagen": "Quellenangabe. Die Modellparameter des Berichts sind einzuhalten (Modellkonformität).",
-  "fundstelle": "Kap. 7.3 Sachwertfaktor, S. 76 ff., mit Modellparametern, Regressionsformel, Vertrauensintervallen und Anwendungsbeispiel (S. 79)."
+  "fundstelle": "Kap. 7.3 Sachwertfaktor, S. 76 ff., mit Modellparametern, Regressionsformel, Vertrauensintervallen und Anwendungsbeispiel (S. 79).",
+  "korrektur_22_11_2026": {
+   "vorher": {
+    "berichtsjahr": 2025,
+    "stichtag": "2026-01-01",
+    "modellversion": "GMB 2025"
+   },
+   "grund": "Widerspruch zu dresden.json und nachernte-2026-10b-sn.json (beide Jahrgang 2026). Quelle, Formel und Beleg dieses Satzes sind der Grundstücksmarktbericht 2026 (Kauffälle 2025). Am PDF gemessen: S. 77 Modellparameter „Stichtag 24. Juni 2025 (Median der Kaufzeitpunkte nach Ausreißerbereinigung)“, Selektion „Vertragsdatum 1. Januar 2025 bis 31. Dezember 2025“; Anwendungsbeispiel S. 79 (1,0988) unverändert."
+  }
  },
  {
   "land_code": "SN",
@@ -342,16 +358,24 @@
   "stufe_grund": "Amtliche Regressionsfunktion MIT ANWENDUNGSBEISPIEL: 440.000 € / 270 €/m² / 40 Jahre → ln(SWF) = 0,0942 → Faktor 1,0988 → marktangepasster Sachwert 483.472 €. Das Register rechnet dieselben Zahlen, Glied für Glied.",
   "fallzahl": 263,
   "streuung": 0.22,
-  "stichtag": "2026-01-01",
-  "berichtsjahr": 2025,
-  "modellversion": "GMB 2025",
+  "stichtag": "2025-06-24",
+  "berichtsjahr": 2026,
+  "modellversion": "Grundstücksmarktbericht Dresden 2026",
   "quelle_url": "https://www.dresden.de/media/pdf/vermessung/2026-Grundstuecksmarktbericht.pdf",
   "quelle_parser": "v1084-WREZ",
   "quellenvermerk": "Gutachterausschuss für Grundstückswerte in der Landeshauptstadt Dresden, Grundstücksmarktbericht 2026, Amt für Geodaten und Kataster",
   "lizenz": "frei zugänglich, kostenfreier Download",
   "verwendung": "produkt",
   "auflagen": "Quellenangabe. Die Modellparameter des Berichts sind einzuhalten (Modellkonformität).",
-  "fundstelle": "Kap. 7.3 Sachwertfaktor, S. 76 ff., mit Modellparametern, Regressionsformel, Vertrauensintervallen und Anwendungsbeispiel (S. 79)."
+  "fundstelle": "Kap. 7.3 Sachwertfaktor, S. 76 ff., mit Modellparametern, Regressionsformel, Vertrauensintervallen und Anwendungsbeispiel (S. 79).",
+  "korrektur_22_11_2026": {
+   "vorher": {
+    "berichtsjahr": 2025,
+    "stichtag": "2026-01-01",
+    "modellversion": "GMB 2025"
+   },
+   "grund": "Widerspruch zu dresden.json und nachernte-2026-10b-sn.json (beide Jahrgang 2026). Quelle, Formel und Beleg dieses Satzes sind der Grundstücksmarktbericht 2026 (Kauffälle 2025). Am PDF gemessen: S. 77 Modellparameter „Stichtag 24. Juni 2025 (Median der Kaufzeitpunkte nach Ausreißerbereinigung)“, Selektion „Vertragsdatum 1. Januar 2025 bis 31. Dezember 2025“; Anwendungsbeispiel S. 79 (1,0988) unverändert."
+  }
  },
  {
   "land_code": "SN",
