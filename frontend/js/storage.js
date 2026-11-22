@@ -3327,21 +3327,26 @@ async function _getAllObjectsDataRaw() {
   return objects;
 }
 
+/* v3976 · Gesamtflow 22.11.2026: Zins und Tilgung stehen gespeichert oft mit Komma („3,85“, so wie getippt).
+   parseFloat("3,85") ist 3 - der Bankexport zeigte 3,00 % statt 3,85/3,95/3,75 % und rechnete Rate und Restschuld
+   damit. Nur das Darlehen mit Punkt (aus dem Darlehensvertrag-Import) stimmte. */
+function _dpPz(v) { return (typeof parseDe === 'function') ? (parseDe(v) || 0) : (parseFloat(String(v == null ? '' : v).replace(',', '.')) || 0); }
+
 // Calculates basic KPIs from a stored object's data
 function extractKpisFromData(d) {
   var kp = parseFloat(d.kp) || 0;
   var nkm_m = parseFloat(d.nkm) || 0;
   var d1 = parseFloat(d.d1) || 0;
-  var d1z = (parseFloat(d.d1z) || 0) / 100;
-  var d1t = (parseFloat(d.d1t) || 0) / 100;
+  var d1z = (_dpPz(d.d1z) || 0) / 100;
+  var d1t = (_dpPz(d.d1t) || 0) / 100;
   var d2 = parseFloat(d.d2) || 0;
-  var d2z = (parseFloat(d.d2z) || 0) / 100;
+  var d2z = (_dpPz(d.d2z) || 0) / 100;
 
   var nkm_j = nkm_m * 12;
   var bmy = kp > 0 ? (nkm_j / kp * 100) : 0;
   var d1_rate_m = d1 > 0 ? (d1 * (d1z + d1t)) / 12 : 0;
   var d2_zm = d2 > 0 ? (d2 * d2z / 12) : 0;
-  var d2_tm = (d._d2_enabled && d.d2_type !== 'tilgungsaussetzung') ? ((d2 * (d2z + (parseFloat(d.d2t) || 0) / 100)) / 12 - d2_zm) : 0;
+  var d2_tm = (d._d2_enabled && d.d2_type !== 'tilgungsaussetzung') ? ((d2 * (d2z + (_dpPz(d.d2t) || 0) / 100)) / 12 - d2_zm) : 0;
   var d2_rate_m = d2_zm + d2_tm;
   /* v3215 · W-17: weitere Darlehen ab Kauf (Kern DpDarlehenWeitere) */
   var _dw = window.DpDarlehenWeitere ? DpDarlehenWeitere.ausObjekt(d) : { betrag: 0, rate_m: 0 };
@@ -3997,7 +4002,7 @@ function exportGlobalBankCSV() {
       d.bank_inst || '',
       d.d1_vertrag || '',
       darl.toFixed(0),
-      (parseFloat(d.d1z) || 0).toFixed(2),
+      (_dpPz(d.d1z) || 0).toFixed(2),
       darl.toFixed(0),
       d.d1_bindj || '',
       (o.kpis.cf_ns_yearly || 0).toFixed(0),
@@ -4075,7 +4080,7 @@ async function exportGlobalBankPDF() {
       d.bank_inst || '–',
       d.d1_vertrag || '–',
       darl.toLocaleString('de-DE'),
-      (parseFloat(d.d1z) || 0).toFixed(2),
+      (_dpPz(d.d1z) || 0).toFixed(2),
       (d.d1_bindj || '–') + ' J',
       (o.kpis.cf_ns_yearly >= 0 ? '+' : '') + Math.round(o.kpis.cf_ns_yearly).toLocaleString('de-DE'),
       ltv.toFixed(1)
@@ -4403,8 +4408,8 @@ function _buildBankExportRows(objects) {
     var d1 = parseFloat(d.d1) || 0;
     if (d1 > 0) {
       rowNr++;
-      var d1z = parseFloat(d.d1z) || 0;
-      var d1t = parseFloat(d.d1t) || 0;
+      var d1z = _dpPz(d.d1z) || 0;
+      var d1t = _dpPz(d.d1t) || 0;
       var bindj = parseInt(d.d1_bindj) || 10;
       var rate_m = (d1 * (d1z + d1t) / 100) / 12;
       var rate_y = rate_m * 12;
@@ -4437,8 +4442,8 @@ function _buildBankExportRows(objects) {
     if (d._d2_enabled && d.d2_type === 'annuitaet' && parseFloat(d.d2) > 0) {
       rowNr++;
       var d2 = parseFloat(d.d2);
-      var d2z = parseFloat(d.d2z) || 0;
-      var d2t = parseFloat(d.d2t) || 0;
+      var d2z = _dpPz(d.d2z) || 0;
+      var d2t = _dpPz(d.d2t) || 0;
       var d2bindj = parseInt(d.d2_bindj) || 10;
       var d2_rate_m = (d2 * (d2z + d2t) / 100) / 12;
       var d2_restEnd = _estimateRestschuld(d2, d2z / 100, d2t / 100, d2bindj);
@@ -4469,7 +4474,7 @@ function _buildBankExportRows(objects) {
     if (d._d2_enabled && d.d2_type === 'tilgungsaussetzung' && parseFloat(d.d2) > 0) {
       rowNr++;
       var ds = parseFloat(d.d2);
-      var dsz = parseFloat(d.d2z) || 0;
+      var dsz = _dpPz(d.d2z) || 0;
       var dsbindj = parseInt(d.d2_bindj) || 10;
       var ds_rate_m = (ds * dsz / 100) / 12;  // nur Zinsen
       var dsbindEnd = d.kaufdat ? new Date(d.kaufdat) : new Date();
