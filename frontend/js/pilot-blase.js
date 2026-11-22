@@ -240,7 +240,7 @@
     ausstatten();
     bezug();
     offen = true;
-    fenster.classList.toggle('ohne-fab', !istAn());
+    fenster.classList.toggle('ohne-fab', !istAn() || schmal());
     fenster.classList.add('an'); fab.classList.add('auf'); fab.setAttribute('aria-expanded', 'true');
     document.body.classList.add('dp-blase-offen');
     var inp = el('dp-cp-in');
@@ -293,10 +293,25 @@
     if (!angemeldet()) { try { if (typeof window.showHelp === 'function') window.showHelp(); } catch (e) {} return; }
     offen ? zu() : auf();
   }
+  /* v3962 · Marcel 22.11.2026: „Der Hilfe-Pilot soll bitte in der App-Version nie angezeigt
+     werden. Füge auf dem Handy dann doch lieber ‚Hilfe (Pilot)‘ unter Aktionen im Menü unter
+     System. Aber nur dort.“ Bis 1080 px (Handy und Tablet, dieselbe Grenze wie der Kopf v3952)
+     steht die Figur NIE - unabhaengig vom Schalter in den Einstellungen. Das Fenster bleibt:
+     es oeffnet sich ueber Aktionen › System › „Hilfe (Pilot)“ (index.html, .sb-act-pilot,
+     ausMenue() unten). Am Desktop bleibt alles wie es war. */
+  var SCHMAL = 1080;
+  function schmal() { return innerWidth <= SCHMAL; }
+  /* Aus dem Aktionen-Menue: wie sbActionsAction (ui.js) erst das Register zuklappen, dann
+     oeffnen. Die Schublade schliesst closeMobileSidebarOnAction() ueber .sb-act-item. */
+  function ausMenue() {
+    var a = el('sb-actions-accordion');
+    try { if (a && a.classList.contains('sb-actions-open') && typeof window.sbActionsToggle === 'function') window.sbActionsToggle(); } catch (e) {}
+    setTimeout(function () { if (!angemeldet()) { try { if (typeof window.showHelp === 'function') window.showHelp(); } catch (e) {} return; } auf(); }, 220);
+  }
   var GRUND = 12;
   function platz() {
     if (!fab) return;
-    var an = angemeldet() && istAn();
+    var an = angemeldet() && istAn() && !schmal();
     /* Handy: offene Datenaufnahme-Schublade (z 1100, von unten) hat Vorrang */
     var schublade = innerWidth <= 640 && document.querySelector('.dp-pf-scroll.dp-pf-open');
     var zeigen = an && !schublade;
@@ -353,6 +368,6 @@
   bauen();   /* synchron: der Rumpf muss stehen, bevor copilot.js montiert */
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();
 
-  window.DealPilotBlase = { VERSION: 'v3223', auf: auf, zu: zu, anhaengen: anhaengen, platz: platz,
+  window.DealPilotBlase = { VERSION: 'v3962', auf: auf, zu: zu, anhaengen: anhaengen, platz: platz, ausMenue: ausMenue,
     istOffen: function () { return offen; }, istAn: istAn, setzeAn: setzeAn, fragezeichen: fragezeichen };
 })();

@@ -40,7 +40,7 @@
      Seite unsichtbar; layout-varianten.js nimmt die Marke nach setze() ab, spätestens nach 3 s fällt sie von selbst. -->
 <style>html[data-dpl-vorab] body{visibility:hidden}</style>
 <script>(function(){try{if(/[?&]layout=aus(&|$)/.test(location.search))return;var h=document.documentElement;h.setAttribute('data-dpl-vorab','1');setTimeout(function(){h.removeAttribute('data-dpl-vorab');},3000);}catch(e){}})();</script>
-<link rel="stylesheet" href="css/style.css?v=v3961a">
+<link rel="stylesheet" href="css/style.css?v=v3962">
 <link rel="stylesheet" href="css/avsec-streifen.css?v=v2780b"><!-- v1148-spalt-1025px -->
 <link rel="stylesheet" href="css/avsec-karte-neu.css?v=v2780a"><!-- v2760/v2780a · Kartenfassung unter 940 px Kartenbreite -->
 <script src="js/einbettung.js?v=v2998a"></script><!-- v2998 · Anmeldekarte eingebettet in die Landingpage (nur im iframe mit ?einbettung=1) -->
@@ -618,6 +618,16 @@ label.dp-required.qc-required::after {
   function updateToolbarHeight() {
     var vv = window.visualViewport;
     var topInset = 0;
+    /* v3962 · Kopf flacher (Marcel 22.11.2026, Bild Prod 1.0.138 am iPhone: rund 85 px leeres
+       Schwarz ueber der Kopfzeile). URSACHE: diese Schaetzung. innerHeight - vv.height misst, was
+       UNTEN fehlt (Safari-Leiste unten, Tastatur), und schrieb es als Abstand OBEN in
+       header.hdr { padding-top: var(--dp-toolbar-top) } (style.css V102, schlug die Safe-Area-Regel
+       V99); dazu ein Mindestwert von 12 px (iPhone) bzw. 50 px (iPad). Bis 1080 px gilt jetzt nur
+       noch env(safe-area-inset-top) aus dem CSS (Block v3962 in style.css) - die Variable bleibt 0. */
+    if (window.innerWidth <= 1080) {
+      document.documentElement.style.setProperty('--dp-toolbar-top', '0px');
+      return;
+    }
     if (vv) {
       // Differenz zwischen Layout-Viewport und visual-Viewport = überdeckter Bereich oben
       topInset = Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
@@ -842,6 +852,11 @@ label.dp-required.qc-required::after {
       <div class="sb-act-section-title">System</div>
       <button class="sb-act-item" type="button" onclick="sbActionsAction('settings')">
         <span class="sb-act-ico" data-icon="settings"></span><span class="sb-act-l">Einstellungen</span>
+      </button>
+      <!-- v3962 · Marcel 22.11.2026: bis 1080 px steht keine Pilot-Figur mehr unten rechts,
+           die Hilfe (Pilot) sitzt NUR hier. Sichtbar nur bis 1080 px (style.css, Block v3962). -->
+      <button class="sb-act-item sb-act-pilot" type="button" data-act="pilot-hilfe" onclick="if(window.DealPilotBlase&&DealPilotBlase.ausMenue)DealPilotBlase.ausMenue();else if(window.showHelp)showHelp();">
+        <span class="sb-act-ico" data-icon="help"></span><span class="sb-act-l">Hilfe (Pilot)</span>
       </button>
       <!-- v857: Hilfe aus Aktionen-Menue entfernt (weiterhin ueber Header + Settings erreichbar) -->
       <!-- v1179 · Aus dem Testbericht: „Pop-Up mit Reisebegleiter, der dir die
@@ -4681,7 +4696,7 @@ document.addEventListener('DOMContentLoaded', function(){
 });
 </script>
 
-<script src="js/pilot-blase.js?v=v3223a"></script><!-- v3218 · W-4 · EINE Pilot-Blase unten rechts: Co-Pilot-Chat in jeder Ansicht, F1 bleibt Feld-Hilfe -->
+<script src="js/pilot-blase.js?v=v3962"></script><!-- v3218 · W-4 · EINE Pilot-Blase unten rechts: Co-Pilot-Chat in jeder Ansicht, F1 bleibt Feld-Hilfe -->
 <script src="js/erinnerung-mieterhoehung.js?v=v3218"></script><!-- v3218 · W-12b · Einstellung Erinnerung vor Mieterhoehung -->
 <script src="js/copilot.js?v=v3318"></script>
 <script src="js/copilot-pillen.js?v=v3720b"></script>

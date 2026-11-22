@@ -41984,3 +41984,39 @@ summary > .oe-btn.dp-sh-btn { color: var(--wl-7a5d18, #7a5d18); }
 .bc-footer-cell > .bc-footer-value.gold,
 h3.bc-head-title > .accent { color: var(--wl-7a5d18, #7a5d18); }
 .dpfk-strip .mrpf-top-head > .mrpf-top-label { color: var(--wl-7a5d18, #7a5d18); }   /* Finanzierung, Ticketkopf 4,49 -> 6,2 */
+
+/* ═══ v3962 · KOPF FLACH, HILFE (PILOT) NUR IM MENÜ (Marcel 22.11.2026) ════════════════════════
+   Bild Prod 1.0.138 am iPhone: zwischen Safari-Leiste und der Zeile „☰ Objekt · Schalter“ rund
+   85 px leeres Schwarz. Marcel: „Der Header oben im Handy ist sehr hoch. Das geht doch jetzt
+   deutlich flacher, oder?“
+   URSACHE (gemessen, Kaskade header.hdr bei 390 px): es gewinnt V102
+   `header.hdr{padding-top:var(--dp-toolbar-top)!important}` (Z. ~27860, spaeter als V99). Die
+   Variable setzt ein Skript in index.html aus innerHeight - visualViewport.height, also aus dem,
+   was UNTEN verdeckt ist (Safari-Leiste unten, Tastatur), mit Mindestwert 12 px (iPhone) bzw.
+   50 px (iPad). Im Desktop-Chrome ist sie 0 - deshalb sah es in der Messkabine immer flach aus.
+   Bis 1080 px setzt das Skript sie jetzt auf 0, und der Kopf traegt genau EINMAL die Safe-Area:
+     · header.hdr          padding-top = env(safe-area-inset-top)  (auch gegen V100/V101 max(8px,…))
+     · .app-wrap           padding-top 0 (V99 gab ihr dieselbe Safe-Area noch einmal; ≤640 schon
+                           seit v2969, 641-1080 bisher doppelt). Ausnahme Schiene „oben im Fluss“
+                           (layout-varianten.css), dort steht kein Kopf darueber.
+     · aside.sidebar       padding-top = env(safe-area-inset-top) statt der Schaetzung (Schublade).
+     · nav.tabs            klebt unter dem GEMESSENEN Kopf (--hdr-h, calc.js _updateHdrHeight).
+                           Vorher gewann `header.hdr:has(.hdr-v61-row2:empty) ~ nav.tabs{top:48px}`
+                           (0,4,2): der Kopf ist bis 1080 px 57-61 px hoch, die Reiter rutschten
+                           beim Scrollen 9-13 px darunter - mit Safe-Area waeren es 60 px mehr.
+   Nicht beruehrt: v3952 (dunkler Kopf, Pille 0/6 aus, nav.tabs::after). */
+@media (max-width: 1080px) {
+  html body header.hdr,
+  html body header.hdr.has-v64-score,
+  html body .main-col > header.hdr.hdr { padding-top: env(safe-area-inset-top, 0px) !important; }
+  html body .app-wrap:not(:has(.dpl-schiene[data-dpl-oben-im-fluss])) { padding-top: 0 !important; }
+  html body aside.sidebar#sidebar { padding-top: env(safe-area-inset-top, 0px) !important; }
+  html body .main-col > header.hdr:has(> .hdr-v61-row1) ~ nav.tabs { top: var(--hdr-h, 61px) !important; }
+}
+/* Hilfe (Pilot) unter Aktionen › System: nur bis 1080 px. Desktop behaelt die Figur unten rechts
+   (pilot-blase.js). #sidebar-Anker, weil `aside.sidebar .sb-act-item{display:flex!important}`
+   jede schwaechere Sperre schlaegt (v3495). */
+html body #sidebar .sb-act-item.sb-act-pilot { display: none !important; }
+@media (max-width: 1080px) {
+  html body #sidebar .sb-act-item.sb-act-pilot { display: flex !important; }
+}
