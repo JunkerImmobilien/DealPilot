@@ -40,7 +40,7 @@ const DOKUMENTE = [
   'frontend/messe-studio.html'   /* v2235 · Messe-Studio laedt whitelabel-override */,
   'frontend/landing/dealcheck-laden.js',   /* landing-seo-3 · Lader des Deal-Checks (Startseite und Rechner-Seiten) */
   'frontend/landing/einzelcheck.js',       /* v3940 · Einzel-Check laedt dp-dokument, mietpotenzial-kern, dealscore2 vom App-Host */
-  'frontend/landing/teamplatz-rechner.js'  /* v3947 · Teamplaetze auf preise.html laden js/teamplatz-staffel.js vom App-Host */
+  'frontend/landing/partner-pakete.js'     /* v3960 · Partner-Pakete auf preise.html laden js/kundenplatz-staffel.js und js/teamplatz-staffel.js vom App-Host (vorher teamplatz-rechner.js, v3947) */
 ].filter(function (p) { return fs.existsSync(path.join(process.cwd(), p)); });
 
 /* Je Dokument: welche js-Datei mit welchem Buster? */

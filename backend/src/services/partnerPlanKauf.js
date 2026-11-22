@@ -17,6 +17,13 @@
  *   Fehlt der Preis in Stripe (vor Marcels OK), laeuft alles andere weiter: angebot().team ist null, Teamplaetze
  *   lassen sich nicht buchen, die kostenlosen (team_plaetze) gelten wie bisher.
  *
+ * v3960 · Teamplaetze schon im ersten Checkout (Landing preise.html › vier Pakete, Preisfenster mit Mengenwahl):
+ *   checkoutParameter() nimmt teamPreisId + teamplaetze und haengt die dritte Position an (Menge = Teamplaetze,
+ *   graduated wie oben). checkoutAnlegen() tut das NUR, wenn der Stripe-Preis existiert UND das Partnerkonto keine
+ *   kostenlosen Bestandsplaetze hat (k = 0: ohne Coupon gilt Menge = bezahlt, teamplatzBestand.js). Sonst kauft er
+ *   leise ohne Teamplaetze und meldet team_hinweis ('preis_fehlt' | 'bestand'), die Plaetze bucht man danach im
+ *   Cockpit (teamplaetzeAendern). Nie ein Fehler wegen Teamplaetzen. Kein Rabatt im Checkout, auch hier nicht.
+ *
  * Abo-Metadaten: kind = 'partner_plan', reseller_id, userId. Der Webhook
  * (partnerSeatsWebhook.js + stripeWebhook.js) gleicht damit BEIDES ab: den Plan (subscriptions)
  * und den Platz-Pool (resellerService.syncPoolQuantity).
@@ -67,11 +74,14 @@ function staffelSumme(tiers, mode, menge) {
 }
 
 /** Die Checkout-Sitzung als Objekt. Bewusst OHNE trial_*, OHNE allow_promotion_codes, OHNE discounts. */
-function checkoutParameter({ kundeId, planPreisId, seatPreisId, plaetze, resellerId, userId, successUrl, cancelUrl }) {
+function checkoutParameter({ kundeId, planPreisId, seatPreisId, plaetze, teamPreisId, teamplaetze, resellerId, userId, successUrl, cancelUrl }) {
   const n = plaetzeNorm(plaetze);
+  const t = teamPreisId ? plaetzeNorm(teamplaetze) : 0;   /* v3960 · ohne Preis keine Teamplaetze */
   const meta = { kind: 'partner_plan', reseller_id: String(resellerId), userId: String(userId), plaetze: String(n) };
+  if (t > 0) meta.teamplaetze = String(t);
   const items = [{ price: planPreisId, quantity: 1 }];
   if (n > 0) items.push({ price: seatPreisId, quantity: n });
+  if (t > 0) items.push({ price: teamPreisId, quantity: t });
   return {
     mode: 'subscription',
     customer: kundeId,
@@ -169,8 +179,19 @@ async function aktivesPlatzAbo(resellerId) {
   } catch (e) { return null; }
 }
 
+/** v3960 · Duerfen Teamplaetze in den ersten Checkout? Preis vorhanden und kein kostenloser Bestand (sonst bräuchte die
+ *  Position einen Coupon, den es im Checkout nicht gibt). Liefert { menge, preisId, hinweis }. */
+function teamImCheckout(teamplaetze, teamPreis, reseller) {
+  const t = plaetzeNorm(teamplaetze);
+  if (!t) return { menge: 0, preisId: null, hinweis: null };
+  if (!teamPreis) return { menge: 0, preisId: null, hinweis: 'preis_fehlt' };
+  const k = parseInt(reseller && reseller.team_plaetze, 10) || 0;
+  if (k > 0) return { menge: 0, preisId: null, hinweis: 'bestand' };
+  return { menge: t, preisId: teamPreis.id, hinweis: null };
+}
+
 /** Checkout fuer den Partner-Plan. user = req.user. */
-async function checkoutAnlegen({ user, interval, plaetze, successUrl, cancelUrl }) {
+async function checkoutAnlegen({ user, interval, plaetze, teamplaetze, successUrl, cancelUrl }) {
   const reseller = require('./resellerService');
   const iv = intervallNorm(interval);
   /* Ein zweites Abo neben einem bezahlten (Pro, Investor ...) wuerde dieselbe subscriptions-Zeile
@@ -184,12 +205,13 @@ async function checkoutAnlegen({ user, interval, plaetze, successUrl, cancelUrl 
   }
   const by = await preiseLesen();
   const kunde = await require('./stripeService').getOrCreateCustomer({ userId: user.id, email: user.email, name: user.name });
+  const team = teamImCheckout(teamplaetze, by[TEAM_LOOKUP[iv]], rs);
   const params = checkoutParameter({
     kundeId: kunde.id, planPreisId: by[PLAN_LOOKUP[iv]].id, seatPreisId: by[SEAT_LOOKUP[iv]].id,
-    plaetze, resellerId: rs.id, userId: user.id, successUrl, cancelUrl
+    plaetze, teamPreisId: team.preisId, teamplaetze: team.menge, resellerId: rs.id, userId: user.id, successUrl, cancelUrl
   });
   const s = await stripe().checkout.sessions.create(params);
-  return { url: s.url, sessionId: s.id };
+  return { url: s.url, sessionId: s.id, teamplaetze: team.menge, team_hinweis: team.hinweis };
 }
 
 /** Plaetze im laufenden Abo auf `anzahl` setzen (Cockpit). Untergrenze: belegt + reserviert. */
@@ -359,7 +381,7 @@ async function kuendigungsFolgen(resellerId) {
 
 module.exports = {
   PLAN_LOOKUP, SEAT_LOOKUP, TEAM_LOOKUP, MAX_PLAETZE,
-  staffelSumme, checkoutParameter, seatPosition, planPosition, teamPosition, teamMenge, aboIntervall, mindestPlaetze, proration, plaetzeNorm,
+  staffelSumme, checkoutParameter, teamImCheckout, seatPosition, planPosition, teamPosition, teamMenge, aboIntervall, mindestPlaetze, proration, plaetzeNorm,
   angebot, checkoutAnlegen, bestaetigen, plaetzeAendern, kuendigenLink, kuendigungsFolgen,
   teamAngebot, teamplaetzeAendern
 };

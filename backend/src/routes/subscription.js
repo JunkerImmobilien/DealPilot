@@ -200,7 +200,8 @@ router.post('/portal', validate({ body: portalSchema }), async (req, res, next) 
 
 /* ── v3610 · Partner-Plan kaufen, kuendigen (services/partnerPlanKauf.js) ───────────────────────────────
    GET  /subscription/partner/angebot     Preise und Platzstaffel, so wie Stripe sie abrechnet
-   POST /subscription/partner/checkout    { billingInterval, plaetze, widerruf_verzicht, widerruf_version }
+   POST /subscription/partner/checkout    { billingInterval, plaetze, teamplaetze?, widerruf_verzicht, widerruf_version }
+                                          (v3960 · teamplaetze nur, wenn der Stripe-Preis da ist, sonst leise ohne)
    GET  /subscription/partner/folgen      was eine Kuendigung fuer die Kunden bedeutet
    POST /subscription/partner/kuendigen   { returnUrl } -> Kuendigungs-Ablauf im Stripe-Kundenportal
    Keine Testphase und kein Rabattcode: der Kauf ist ein direkter Kauf. */
@@ -222,6 +223,7 @@ router.get('/partner/angebot', async (req, res, next) => {
 const partnerCheckoutSchema = z.object({
   billingInterval: z.enum(['monthly', 'yearly']),
   plaetze: z.number().int().min(0).max(partnerKauf.MAX_PLAETZE),
+  teamplaetze: z.number().int().min(0).max(partnerKauf.MAX_PLAETZE).optional(),   /* v3960 · Logins ohne Inhaber */
   successUrl: z.string().url().optional(),
   cancelUrl: z.string().url().optional(),
   widerruf_verzicht: z.boolean().optional(),
@@ -240,14 +242,14 @@ router.post('/partner/checkout', validate({ body: partnerCheckoutSchema }), asyn
       throw e;
     }
     try {
-      await require('../services/consentService').widerrufVerzichtPruefen(req, { kauf: 'abo', plan: 'partner', intervall: req.body.billingInterval, plaetze: req.body.plaetze });
+      await require('../services/consentService').widerrufVerzichtPruefen(req, { kauf: 'abo', plan: 'partner', intervall: req.body.billingInterval, plaetze: req.body.plaetze, teamplaetze: req.body.teamplaetze || 0 });
     } catch (e) {
       if (e.code === 'widerruf_verzicht_fehlt') throw new HttpError(400, e.message);
       throw e;
     }
     const base = getFrontendBase(req);
     const r = await partnerKauf.checkoutAnlegen({
-      user: req.user, interval: req.body.billingInterval, plaetze: req.body.plaetze,
+      user: req.user, interval: req.body.billingInterval, plaetze: req.body.plaetze, teamplaetze: req.body.teamplaetze || 0,
       successUrl: req.body.successUrl || `${base}/?subscription=success&partner=1&session_id={CHECKOUT_SESSION_ID}`,
       cancelUrl: req.body.cancelUrl || `${base}/?subscription=cancel`
     });

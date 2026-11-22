@@ -15,7 +15,7 @@
  *
  * Wer liest diese Datei:
  *   frontend/index.html                    Preisfenster (partner-plan-kauf.js) und Partner-Cockpit (partner-kunden.js)
- *   frontend/landing/teamplatz-rechner.js  Landing preise.html › Partner › Teamplätze (lädt sie vom App-Host)
+ *   frontend/landing/partner-pakete.js     Landing preise.html › Partner › vier Pakete (lädt sie vom App-Host, v3960; vorher teamplatz-rechner.js)
  *   tools/stripe-teamplatz-preis-anlegen.mjs  legt die zwei Stripe-Preise aus GENAU diesen Stufen an
  *   tools/teamplatz-pruefen.mjs            Hand-Tabelle, Landing-Rückfall, Stripe-Skript, Gegenproben
  * Das Backend rechnet nicht mit dieser Datei, es liest die Stufen aus Stripe (partnerPlanKauf.angebot()).

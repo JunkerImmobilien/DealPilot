@@ -11,13 +11,19 @@
  *   C  Webhook-Mengenabgleich nachgebaut (wie partner-seats-webhook-pruefen): echte partnerSeatsWebhook +
  *      echte partnerTeam.bezahltAbgleichen auf einer In-Memory-Tabelle
  *   D  Rahmen (kostenlos + bezahlt), Bestand, Migration 124, Einladen ohne freien Platz
- *   E  Anzeige: Landing preise.html (Rueckfall) und partner.html gegen dieselbe Quelle, keine Preis-Kopie in
- *      teamplatz-rechner.js, partner-kunden.js, partner-plan-kauf.js, Kundentext ohne Gedankenstrich und Semikolon
+ *   E  Anzeige: Landing preise.html (v3960: vier Partner-Pakete, Rueckfall) und partner.html gegen dieselben Quellen,
+ *      keine Preis-Kopie in partner-pakete.js, partner-kunden.js, partner-plan-kauf.js, Kundentext ohne Gedankenstrich und Semikolon
  *   F  Stripe-Skript: Parameter aus der Quelle, Sicherungen (Trockenlauf, Testschluessel, --live), lookup_key = Backend
  *   G  Ladeweg und Buster
  *   I  Bestand zaehlt in der Staffel mit (v3947a): k kostenlose Plaetze, naechster Login zum Satz SEINER Stufe,
  *      Stripe-Menge k + b mit Coupon in Hoehe der ersten k Plaetze. Rechner = Cockpit = Stripe-Betrag
  *   H  Gegenproben: verfaelschte Quelle, Volume statt Graduated, falsche Stufe, Sicherung ohne Schluessel
+ *   K  v3960 · Kundenplatz-Quelle frontend/js/kundenplatz-staffel.js: lookup_keys = partnerPlanKauf.js, Stufen = Sandbox-Messung
+ *      (gelesen aus partner-seats-webhook-pruefen.mjs), staffelSumme(volume) 0 bis 120, partner.html, reseller-portal.js
+ *   L  Rechenproben der vier Pakete (Solo 0, Buero 5, Kanzlei 10, Netzwerk 25 Kunden) gegen eine Hand-Tabelle, Monat und Jahr
+ *   M  Jetzt buchen: Landing-Link, partner-plan-kauf.js ECHT im vm (Adresse -> Merker -> openPricingModal({period}) ->
+ *      Mengen -> Kaufen-Body), ohne Teamplatz-Preis leise ohne Teamplaetze, checkoutParameter mit dritter Position,
+ *      teamImCheckout, Route; Gegenproben je Regel
  * RC=0 ist sauber.
  */
 import { createRequire } from 'node:module';
@@ -205,56 +211,72 @@ const qR = text('backend/src/routes/partnerKunden.js');
 ok(/partner\.post\('\/team\/plaetze', fn\(async \(req\) => \{\s*T\.nurInhaber\(req\.partnerRolle\);/.test(qR) && /partner\.get\('\/team\/preis'/.test(qR), 'Routen: GET /partner/team/preis (alle), POST /partner/team/plaetze nur Inhaber');
 
 // ══ E · Anzeige gegen dieselbe Quelle ═══════════════════════════════════════
-kopf('E Landing und App gegen dieselbe Quelle');
+kopf('E Landing und App gegen dieselbe Quelle (v3960: vier Pakete auf preise.html)');
+const K = require(join(ROOT, 'frontend', 'js', 'kundenplatz-staffel.js'));
 const preise = text('frontend/landing/preise.html'), partnerHtml = text('frontend/landing/partner.html');
 function eurText(v) { const r = Math.round(v * 100) / 100; return r.toLocaleString('de-DE', { minimumFractionDigits: r % 1 ? 2 : 0, maximumFractionDigits: 2 }) + ' €'; }
-function teamBlock(html) { const a = html.indexOf('id="teamplaetze"'); if (a < 0) return ''; const b = html.indexOf('<div class="pe rv">', a); return html.slice(a, b < 0 ? a + 6000 : b); }
-function partnerAusHtml(html) {
-  const m = /<div class="pr" data-m="([^"]+)" data-j="([^"]+)">/.exec(html);
-  const z = (t) => parseFloat(String(t).replace(/[^\d,]/g, '').replace(',', '.'));
-  return m ? { m: z(m[1]), j: z(m[2]) } : null;
+/** Partner-Block der Landing: von #partner-plan bis zu den sechs Kacheln (.pe) */
+function teamBlock(html) { const a = html.indexOf('id="partner-plan"'); if (a < 0) return ''; const b = html.indexOf('<div class="pe rv">', a); return html.slice(a, b < 0 ? a + 12000 : b); }
+/* Marcels Entscheidung 22.11.2026: Variante C, vorbelegt mit 0 / 5 / 10 / 25 Kundenplaetzen; Logins wie in der Demo 1 / 2 / 3 / 8 */
+const PAKETE_SOLL = [['Solo', 0, 1], ['Büro', 5, 2], ['Kanzlei', 10, 3], ['Netzwerk', 25, 8]];
+function teileText(Q, n) {
+  const st = Q.stripeStufen('monthly'); let rest = n, unten = 0; const teile = [];
+  for (const s of st) { if (rest <= 0) break; const k = Math.max(0, Math.min(rest, (s.bis == null ? Infinity : s.bis) - unten)); if (k) teile.push(k + ' × ' + eurText(s.cent / 100)); rest -= k; unten = s.bis == null ? Infinity : s.bis; }
+  return teile.join(' + ');
 }
-/** Vergleicht den Landing-Rueckfall mit einer Quelle Q. Liefert Liste der Abweichungen. */
-function landingGegenQuelle(html, Q) {
+function karten(html) {
+  const blk = teamBlock(html);
+  return [...blk.matchAll(/<div class="tk ppk[^"]*" data-paket="([^"]+)" data-kunden="(\d+)" data-logins="(\d+)">([\s\S]*?)<div class="tk-rip">/g)]
+    .map((m) => ({ paket: m[1], kunden: +m[2], logins: +m[3], inhalt: m[4] }));
+}
+/** Vergleicht den Landing-Rueckfall (monatlich, Vorbelegung) mit den Quellen Kq (Kundenplatz) und Q (Teamplatz). */
+function landingGegenQuelle(html, Q, Kq = K) {
   const abw = [], blk = teamBlock(html);
-  if (!blk) return ['Block #teamplaetze fehlt'];
-  Q.STUFEN.forEach((s, i) => {
-    const re = new RegExp('<div class="st">([^<]+)</div><div class="pv" data-team-stufe="' + i + '" data-m="(\\d+)" data-j="(\\d+)">([^<]+)<small>/ Monat</small></div><div class="pj">oder ([^<]+) im Jahr</div>');
-    const m = re.exec(blk);
-    if (!m) { abw.push('Stufe ' + i + ' nicht gefunden'); return; }
-    if (m[1] !== Q.stufenName(s).toUpperCase()) abw.push('Stufe ' + i + ' Name ' + m[1]);
-    if (+m[2] !== s.monat || +m[3] !== s.jahr) abw.push('Stufe ' + i + ' data-m/j ' + m[2] + '/' + m[3]);
-    if (m[4] !== eurText(s.monat) || m[5] !== eurText(s.jahr)) abw.push('Stufe ' + i + ' Text ' + m[4] + ' / ' + m[5]);
+  if (!blk) return ['Block #partner-plan fehlt'];
+  if (!/id="teamplaetze"/.test(blk)) abw.push('Anker #teamplaetze fehlt im Partner-Block');
+  const ks = karten(html);
+  if (ks.length !== 4) abw.push('Zahl der Paketkarten ' + ks.length);
+  ks.forEach((k, i) => {
+    const soll = PAKETE_SOLL[i] || [];
+    const name = (/<div class="tk-name">([^<]+)</.exec(k.inhalt) || [])[1];
+    if (name !== soll[0] || k.kunden !== soll[1] || k.logins !== soll[2]) abw.push('Paket ' + i + ' ' + name + ' ' + k.kunden + '/' + k.logins);
+    const tp = k.logins - 1, plan = Kq.plan('monthly'), ksum = Kq.summe(k.kunden, 'monthly'), team = Q.teamSumme(tp, 'monthly'), g = plan + ksum + team;
+    const gesamt = (/data-o="gesamt">([^<]+)</.exec(k.inhalt) || [])[1];
+    if (gesamt !== eurText(g).replace(' €', '')) abw.push(name + ' gesamt ' + gesamt + ' statt ' + eurText(g));
+    if (!/<span class="per">\/ Monat<\/span>/.test(k.inhalt)) abw.push(name + ' Einheit');
+    const schnitt = (/data-o="schnitt">([^<]+)</.exec(k.inhalt) || [])[1];
+    const schnittSoll = k.kunden ? 'im Schnitt ' + eurText(g / k.kunden) + ' je Kunde' : 'ohne Kundenplätze';
+    if (schnitt !== schnittSoll) abw.push(name + ' Schnitt ' + schnitt);
+    const zeilen = [...(/data-o="rechnung">([\s\S]*?)<div class="ppk-fuell">/.exec(k.inhalt) || ['', ''])[1].matchAll(/<div><span>([\s\S]*?)<\/span><b>([^<]+)<\/b><\/div>/g)]
+      .map((m) => [m[1].replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim(), m[2]]);
+    const zSoll = [['Partner-Plan du als Inhaber', eurText(plan)],
+      [k.kunden + (k.kunden === 1 ? ' Kundenplatz ' : ' Kundenplätze ') + (k.kunden ? k.kunden + ' × ' + eurText(Kq.satz(k.kunden, 'monthly')) : 'nach Bedarf dazu'), eurText(ksum)],
+      [(tp ? tp + (tp === 1 ? ' Teamplatz ' : ' Teamplätze ') + teileText(Q, tp) : 'Kein Teamplatz nur du'), eurText(team)]];
+    if (JSON.stringify(zeilen) !== JSON.stringify(zSoll)) abw.push(name + ' Rechnung ' + JSON.stringify(zeilen) + ' statt ' + JSON.stringify(zSoll));
+    const href = (/data-o="buchen" href="([^"]+)"/.exec(k.inhalt) || [])[1];
+    if (href !== 'https://app.dealpilot.immo/?register=1&amp;partner_kauf=1&amp;intervall=monthly&amp;kundenplaetze=' + k.kunden + '&amp;teamplaetze=' + tp) abw.push(name + ' Buchungslink ' + href);
+    const inp = [...k.inhalt.matchAll(/value="(\d+)" inputmode="numeric" data-k="(kunden|logins)"/g)].map((m) => m[2] + '=' + m[1]).join(',');
+    if (inp !== 'kunden=' + k.kunden + ',logins=' + k.logins) abw.push(name + ' Mengenwahl ' + inp);
   });
-  if ((blk.match(/data-team-stufe="/g) || []).length !== Q.STUFEN.length) abw.push('Zahl der Stufen');
-  const l = /value="(\d+)"[^>]*data-team-logins/.exec(blk), P = partnerAusHtml(html);
-  if (!l || !P) abw.push('Rechner oder Partner-Preis fehlt');
-  else {
-    const logins = +l[1], tp = logins - 1, team = Q.summeLogins(logins, 'monthly'), zus = P.m + team;
-    const erg = blk.slice(blk.indexOf('data-team-ergebnis'));
-    const zeilen = [...erg.matchAll(/<div class="pteam-z[^"]*"><span>([\s\S]*?)<\/span><span>([^<]+)<\/span><\/div>/g)].map((m) => [m[1].replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim(), m[2]]);
-    const st = Q.stripeStufen('monthly'); let rest = tp, unten = 0; const teile = [];
-    for (const s of st) { if (rest <= 0) break; const k = Math.max(0, Math.min(rest, (s.bis == null ? Infinity : s.bis) - unten)); if (k) teile.push(k + ' × ' + eurText(s.cent / 100)); rest -= k; unten = s.bis == null ? Infinity : s.bis; }
-    const soll = [['Partner-Plan mit dir als Inhaber', eurText(P.m)], [tp + (tp === 1 ? ' Teamplatz ' : ' Teamplätze ') + teile.join(' + '), eurText(team)],
-                  ['Zusammen je Monat', eurText(zus)], ['im Schnitt je Login', eurText(zus / logins)]];
-    if (JSON.stringify(zeilen) !== JSON.stringify(soll)) abw.push('Rechner-Rückfall ' + JSON.stringify(zeilen) + ' statt ' + JSON.stringify(soll));
-  }
-  for (const [name, h] of [['preise.html', html]]) {
-    const li = /<li data-team-ab>([^<]*)</.exec(h);
-    if (!li || li[1].indexOf('ab ' + eurText(Q.ab('monthly')) + ' im Monat') < 0) abw.push(name + ' Zeile „weitere Logins ab …“');
-  }
+  const st = (/data-o="staffel">([^<]+)</.exec(blk) || [])[1];
+  const vor = (n) => /^ab /.test(n) ? n : 'für ' + (/Login$/.test(n) ? 'den ' : '') + n;
+  const stSoll = 'Kundenplatz ' + Kq.STUFEN.map((s) => eurText(s.monat) + ' ' + vor(Kq.stufenName(s))).join(', ') + ', alle Plätze zum Satz der erreichten Stufe. Teamplatz ' +
+    Q.STUFEN.map((s) => eurText(s.monat) + ' ' + vor(Q.stufenName(s))).join(', ') + ', jeder zum Satz seiner Stufe. Preise je Monat.';
+  if (st !== stSoll) abw.push('Staffelzeile ' + st + ' statt ' + stSoll);
   return abw;
 }
 const abwL = landingGegenQuelle(preise, TP);
-ok(!abwL.length, 'preise.html #teamplaetze: Stufen, Beträge, Monat/Jahr und Rechner-Rückfall (3 Logins) = Quelle' + (abwL.length ? ': ' + abwL.join(' · ') : ''));
-const P = partnerAusHtml(preise);
-ok(P && P.m === PARTNER.m && P.j === PARTNER.j, 'Partner-Plan auf der Seite 99 € / 1.089 € (der Rechner liest ihn dort, keine Kopie)');
+ok(!abwL.length, 'preise.html Partner-Pakete: vier Karten (Solo 0, Büro 5, Kanzlei 10, Netzwerk 25), Gesamt, Schnitt, Rechnung, Mengenwahl, Buchungslink und Staffelzeile = Quellen' + (abwL.length ? ': ' + abwL.join(' · ') : ''));
+ok(K.plan('monthly') === PARTNER.m && K.plan('yearly') === PARTNER.j, 'Partner-Plan in der Quelle 99 € / 1.089 € (die Landing liest ihn dort, keine Kopie)');
+ok(!/class="pcard|data-team-rechner|data-team-stufen|class="pstaffel/.test(teamBlock(preise)) && (preise.match(/id="teamplaetze"/g) || []).length === 1 && (preise.match(/id="partner-plan"/g) || []).length === 1,
+  'alter Partnerblock (Karte, Mandanten-Staffel, Teamplatz-Rechner) ist ersetzt, #partner-plan und #teamplaetze je genau einmal');
 ok(/<li data-team-ab>[^<]*ab 39 € im Monat/.test(partnerHtml) && /href="preise\.html#teamplaetze"/.test(partnerHtml) && TP.ab('monthly') === 39,
-  'partner.html: „weitere Logins ab 39 € im Monat“ = DpTeamplatz.ab, Link auf die Staffel');
-const rechnerJs = text('frontend/landing/teamplatz-rechner.js');
-const PREISZAHL = /\b(59|49|39|649|539|429|99|1\.?089)\s*(€|EUR|\\u20ac)/;
+  'partner.html: „weitere Logins ab 39 € im Monat“ = DpTeamplatz.ab, Link auf preise.html#teamplaetze (landet auf den Paketen)');
+const rechnerJs = text('frontend/landing/partner-pakete.js');
+const PREISZAHL = /\b(59|49|39|649|539|429|99|1\.?089|19|15|12|209|165|132)\s*(€|EUR|\\u20ac)/;
 const ohneKommentar = (t) => t.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
-ok(!PREISZAHL.test(ohneKommentar(rechnerJs)) && !/\b(5900|4900|3900)\b/.test(rechnerJs), 'teamplatz-rechner.js trägt keine Preiszahl (liest Quelle und Partner-Karte)');
+ok(!PREISZAHL.test(ohneKommentar(rechnerJs)) && !/\b(5900|4900|3900|1900|1500|1200|9900)\b/.test(rechnerJs) && !/data-kunden="\d|kunden:\s*\d/.test(rechnerJs),
+  'partner-pakete.js trägt keine Preiszahl und keine Vorbelegung (liest Quellen und data-kunden/data-logins)');
 const pk = text('frontend/js/partner-kunden.js');
 const pkTeam = pk.slice(pk.indexOf('v3947 · Teamplaetze mit Preis'), pk.indexOf('/* Eingeladene Seite: Band und Fenster'));
 ok(pkTeam.length > 2000 && !PREISZAHL.test(ohneKommentar(pkTeam)) && /summeBezahlt\(a\.stufen, a\.bestand \|\| 0, n\)/.test(pkTeam) && /api\('\/partner\/team\/preis'\)/.test(pkTeam),
@@ -262,15 +284,16 @@ ok(pkTeam.length > 2000 && !PREISZAHL.test(ohneKommentar(pkTeam)) && /summeBezah
 ok(/nx\.satz_cent/.test(pkTeam) && /nx\.summe_cent/.test(pkTeam) && /'Platz buchen und einladen'/.test(pkTeam) && /anzahl: a\.bezahlt_abo \+ 1/.test(pkTeam),
   'Cockpit: vor dem Bestätigen Satz des nächsten Platzes und neue Summe, dann Platz buchen (+1) und einladen');
 const ppk = text('frontend/js/partner-plan-kauf.js');
-ok(/TP\.ab\(iv\)/.test(ppk) && /teamZeile\(iv\)/.test(ppk) && !/Logins für dein Team ab \d/.test(ppk), 'Preisfenster: „weitere Logins ab …“ aus DpTeamplatz.ab, keine Zahl im Code');
+ok(/TP\.ab\(iv\)/.test(ppk) && /teamZeile\(iv\)/.test(ppk) && !/Logins für dein Team ab \d/.test(ppk) && !PREISZAHL.test(ohneKommentar(ppk)),
+  'Preisfenster: „weitere Logins ab …“ aus DpTeamplatz.ab, keine Preiszahl im Code');
 /* Kundentext: sichtbarer Text ohne Gedankenstrich und Semikolon */
-const sichtbar = (h) => h.replace(/<!--[\s\S]*?-->/g, '').replace(/<style[\s\S]*?<\/style>/g, '').replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ');
-const blkText = sichtbar(teamBlock(preise)) + ' ' + sichtbar((/<li data-team-ab>[\s\S]*?<\/li>/.exec(preise) || [''])[0]) + ' ' + sichtbar((/<li data-team-ab>[\s\S]*?<\/li>/.exec(partnerHtml) || [''])[0]);
-ok(!/[–—;]/.test(blkText), 'Landing-Text der Teamplätze ohne Gedankenstrich und Semikolon');
+const sichtbar = (h) => h.replace(/<!--[\s\S]*?-->/g, '').replace(/<style[\s\S]*?<\/style>/g, '').replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ').replace(/&[a-z]+;|&#\d+;/g, ' ');   /* v3960 · &amp; ist kein Semikolon im Text */
+const blkText = sichtbar(teamBlock(preise)) + ' ' + sichtbar((/<li data-team-ab>[\s\S]*?<\/li>/.exec(partnerHtml) || [''])[0]);
+ok(!/[–—;]/.test(blkText), 'Landing-Text der Partner-Pakete ohne Gedankenstrich und Semikolon');
 const strings = (src) => [...ohneKommentar(src).matchAll(/'((?:[^'\\\n]|\\.)*)'/g)].map((m) => m[1]).filter((s) => !/^[#.][\w-]/.test(s) && !/[{}]/.test(s) && /[a-zäöü]{3}/i.test(s));
-const kt = strings(pkTeam).concat(strings(rechnerJs)).concat(strings(ppk.slice(ppk.indexOf('function teamZeile'), ppk.indexOf('/* ── Karte im Preis-Fenster'))));
+const kt = strings(pkTeam).concat(strings(rechnerJs)).concat(strings(ppk.slice(ppk.indexOf('function teamZeile'), ppk.indexOf('function einhaengen'))));
 const kaputt = kt.filter((s) => /[–—;]/.test(s.replace(/style="[^"]*"/g, '').replace(/&[a-z#0-9]+;/g, '')));
-ok(!kaputt.length, 'Kundentext in Cockpit, Rechner und Preisfenster ohne Gedankenstrich und Semikolon (' + kt.length + ' Texte)' + (kaputt.length ? ': ' + kaputt.slice(0, 2).join(' | ') : ''));
+ok(!kaputt.length, 'Kundentext in Cockpit, Paketen und Preisfenster ohne Gedankenstrich und Semikolon (' + kt.length + ' Texte)' + (kaputt.length ? ': ' + kaputt.slice(0, 2).join(' | ') : ''));
 
 // ══ F · Stripe-Skript ═══════════════════════════════════════════════════════
 kopf('F tools/stripe-teamplatz-preis-anlegen.mjs');
@@ -300,12 +323,17 @@ ok(l2.status === 3 && l3.status === 3 && l4.status === 3 && !/sk_live_x|sk_test_
 // ══ G · Ladeweg und Buster ══════════════════════════════════════════════════
 kopf('G Ladeweg und Buster');
 const idx = text('frontend/index.html');
-const bIdx = (/js\/teamplatz-staffel\.js\?v=([\w.-]+)/.exec(idx) || [])[1], bRech = (/js\/teamplatz-staffel\.js\?v=([\w.-]+)/.exec(rechnerJs) || [])[1];
-ok(bIdx && bIdx === bRech, 'teamplatz-staffel.js: gleicher Buster in index.html und teamplatz-rechner.js (' + bIdx + ' / ' + bRech + ')');
-ok(idx.indexOf('js/teamplatz-staffel.js') < idx.indexOf('js/partner-plan-kauf.js') && idx.indexOf('js/teamplatz-staffel.js') < idx.indexOf('js/partner-kunden.js'),
-  'index.html lädt die Quelle vor Preisfenster und Cockpit');
-ok(/<script src="teamplatz-rechner\.js\?v=[\w.-]+"><\/script>/.test(preise), 'preise.html lädt teamplatz-rechner.js');
-ok(/frontend\/landing\/teamplatz-rechner\.js/.test(text('tools/buster-ebenen-pruefen.mjs')), 'buster-ebenen-pruefen.mjs kennt teamplatz-rechner.js als Dokument');
+const buster = (t, datei) => (new RegExp('js\\/' + datei.replace('.', '\\.') + '\\?v=([\\w.-]+)').exec(t) || [])[1];
+for (const d of ['teamplatz-staffel.js', 'kundenplatz-staffel.js']) {
+  const bIdx = buster(idx, d), bRech = buster(rechnerJs, d);
+  ok(bIdx && bIdx === bRech, d + ': gleicher Buster in index.html und partner-pakete.js (' + bIdx + ' / ' + bRech + ')');
+}
+ok(idx.indexOf('js/teamplatz-staffel.js') < idx.indexOf('js/partner-plan-kauf.js') && idx.indexOf('js/kundenplatz-staffel.js') < idx.indexOf('js/partner-plan-kauf.js')
+   && idx.indexOf('js/teamplatz-staffel.js') < idx.indexOf('js/partner-kunden.js'),
+  'index.html lädt beide Quellen vor Preisfenster und Cockpit');
+ok(/<script src="partner-pakete\.js\?v=[\w.-]+"><\/script>/.test(preise) && /<link rel="stylesheet" href="partner-pakete\.css\?v=[\w.-]+">/.test(preise) && !/teamplatz-rechner\.js/.test(preise),
+  'preise.html lädt partner-pakete.js und partner-pakete.css, teamplatz-rechner.js nicht mehr');
+ok(/frontend\/landing\/partner-pakete\.js/.test(text('tools/buster-ebenen-pruefen.mjs')), 'buster-ebenen-pruefen.mjs kennt partner-pakete.js als Dokument');
 
 // ══ H · Gegenproben ═════════════════════════════════════════════════════════
 kopf('H Gegenproben (der Prüfer muss rot werden, wenn es falsch ist)');
@@ -327,9 +355,9 @@ const falsch = SKRIPT.preisParameter('monthly').tiers.map((t, i) => i === 1 ? { 
 ok(!SKRIPT.gleicheStufen(gelesen('monthly', falsch), 'monthly') && !SKRIPT.gleicheStufen(gelesen('monthly', SKRIPT.preisParameter('monthly').tiers, 'volume'), 'monthly')
    && !SKRIPT.gleicheStufen(gelesen('yearly', SKRIPT.preisParameter('monthly').tiers), 'monthly'),
   'Nachmessung erkennt falsche Stufe, volume und falsches Intervall');
-const landKaputt = preise.replace('data-m="59" data-j="649">59 €', 'data-m="59" data-j="649">58 €');
-ok(landingGegenQuelle(landKaputt, TP).length > 0, 'Landing mit 58 statt 59 €: rot');
-const landStrich = sichtbar(teamBlock(preise.replace('Teamplätze für deine Kanzlei', 'Teamplätze – für deine Kanzlei')));
+const landKaputt0 = preise.replace('data-o="gesamt">253<', 'data-o="gesamt">252<');
+ok(landKaputt0 !== preise && landingGegenQuelle(landKaputt0, TP).length > 0, 'Landing Büro 252 statt 253 €: rot');
+const landStrich = sichtbar(teamBlock(preise.replace('Vier Größen.', 'Vier Größen –')));
 ok(/[–—;]/.test(landStrich), 'Gedankenstrich im Landing-Text würde gefunden');
 
 // ══ I · Bestand zaehlt in der Staffel mit ═══════════════════════════════════
@@ -389,6 +417,166 @@ const TBkaputt = Object.assign({}, TB, { summeBezahlt: (t, k, b) => TB.staffel(t
 ok(bestandGegenHand(TP, TBkaputt).length > 0, 'Gegenprobe: Backend ohne Bestand wird rot');
 const TBohneCoupon = Object.assign({}, TB, { couponParameter: () => null });
 ok(bestandGegenHand(TP, TBohneCoupon).length > 0, 'Gegenprobe: Stripe-Menge k + b ohne Coupon berechnet den Bestand mit und wird rot');
+
+// ══ K · Kundenplatz-Quelle (v3960) ══════════════════════════════════════════
+kopf('K Quelle frontend/js/kundenplatz-staffel.js ' + K.VERSION + ' gegen Stripe-Form, Backend und Altstellen');
+/* Die Sandbox-Messung vom 17.11.2026 steht in tools/partner-seats-webhook-pruefen.mjs (T_M, T_J). Sie wird von dort
+   GELESEN, nicht abgeschrieben: aendert jemand die Messung, sieht dieser Pruefer es. */
+const wsp = text('tools/partner-seats-webhook-pruefen.mjs');
+const tiersAus = (name) => JSON.parse(((new RegExp('const ' + name + ' = (\\[[^\\n]+\\]);').exec(wsp) || [])[1] || '[]').replace(/(\w+):/g, '"$1":'));
+const SB = { monthly: tiersAus('T_M'), yearly: tiersAus('T_J') };
+ok(SB.monthly.length === 3 && SB.yearly.length === 3, 'Sandbox-Stufen aus partner-seats-webhook-pruefen.mjs gelesen (T_M, T_J)');
+function kQuellePruefen(Q) {
+  const s = Q.STUFEN, r = [];
+  r.push(s.length === 3 && s[0].von === 1 && s[s.length - 1].bis == null);
+  for (let i = 1; i < s.length; i++) r.push(s[i].von === s[i - 1].bis + 1 && s[i].monat < s[i - 1].monat);
+  r.push(s.every((x) => x.jahr === x.monat * (12 - Q.FREIMONATE)) && Q.PLAN.jahr === Q.PLAN.monat * (12 - Q.FREIMONATE));
+  r.push(Q.MODUS === 'volume');
+  return r.every(Boolean);
+}
+ok(kQuellePruefen(K), 'Stufen lückenlos ab 1, offen nach oben, je Stufe günstiger, Jahr = 11 Monatsbeiträge (Plan und Plätze), Modus volume');
+ok(K.PLAN.monat === 99 && K.PLAN.jahr === 1089 && K.STUFEN.map((s) => s.monat).join('/') === '19/15/12' && K.STUFEN.map((s) => s.jahr).join('/') === '209/165/132',
+  'Beträge: Partner-Plan 99 / 1.089 €, Kundenplatz 19/15/12 € bzw. 209/165/132 €');
+ok(JSON.stringify(K.LOOKUP.plan) === JSON.stringify(kauf.PLAN_LOOKUP) && JSON.stringify(K.LOOKUP.platz) === JSON.stringify(kauf.SEAT_LOOKUP) && K.MAX === kauf.MAX_PLAETZE,
+  'lookup_keys und Obergrenze = partnerPlanKauf.js (dp_plan_partner_*, dp_seat_*, ' + kauf.MAX_PLAETZE + ')');
+function kGegenStripe(Q) {
+  const abw = [];
+  for (const iv of ['monthly', 'yearly']) {
+    const st = Q.stripeStufen(iv).map((s) => ({ up_to: s.bis, unit_amount: s.cent }));
+    if (JSON.stringify(st) !== JSON.stringify(SB[iv])) abw.push('Stufen ' + iv);
+    for (let n = 0; n <= 120; n++) {
+      const soll = kauf.staffelSumme(SB[iv], 'volume', n);
+      if (Q.summe(n, iv) * 100 !== soll) { abw.push(iv + ' ' + n + ': ' + Q.summe(n, iv) + ' statt ' + soll / 100); break; }
+    }
+  }
+  return abw;
+}
+const abwK = kGegenStripe(K);
+ok(!abwK.length, 'Quelle = Sandbox-Stufen und = partnerPlanKauf.staffelSumme(volume) für 0 bis 120 Plätze, Monat und Jahr' + (abwK.length ? ': ' + abwK.join(' · ') : ''));
+const HAND_K = [[0, 0, 0], [1, 19, 209], [9, 171, 1881], [10, 150, 1650], [24, 360, 3960], [25, 300, 3300], [60, 720, 7920]];
+ok(HAND_K.every(([n, m, j]) => K.summe(n, 'monthly') === m && K.summe(n, 'yearly') === j), 'Hand-Tabelle Kundenplätze: 1 → 19, 9 → 171, 10 → 150, 24 → 360, 25 → 300, 60 → 720 € (Jahr 209 … 7.920 €)');
+const angebotSB = (team) => ({ plan: { monthly: 9900, yearly: 108900 },
+  platz: { monthly: { tiers_mode: 'volume', stufen: SB.monthly.map((t) => ({ bis: t.up_to, cent: t.unit_amount, pauschal: 0 })) },
+           yearly: { tiers_mode: 'volume', stufen: SB.yearly.map((t) => ({ bis: t.up_to, cent: t.unit_amount, pauschal: 0 })) } },
+  team: team ? { monthly: { tiers_mode: 'graduated', stufen: TP.stripeStufen('monthly').map((s) => ({ ...s, pauschal: 0 })) },
+                 yearly: { tiers_mode: 'graduated', stufen: TP.stripeStufen('yearly').map((s) => ({ ...s, pauschal: 0 })) } } : null,
+  darf_kaufen: true, max_plaetze: 500 });
+ok(K.abweichungen(angebotSB(true)).length === 0, 'DpKundenplatz.abweichungen(Angebot in Stripe-Form) leer: Preisfenster und Quelle stimmen überein');
+const rpS = text('frontend/js/reseller-portal.js');
+ok(K.STUFEN.every((s) => new RegExp('bis: ' + (s.bis == null ? 'Infinity' : s.bis) + ',\\s+monat: ' + s.monat + ', jahr: ' + s.jahr).test(rpS)), 'reseller-portal.js STAFFEL (Vorschau im alten Kaufpanel) = Quelle');
+ok(K.STUFEN.every((s) => partnerHtml.indexOf((s.bis == null ? 'AB ' + s.von : s.von + ' – ' + s.bis) + ' MANDANTEN</div><div class="pv">' + s.monat + ' € / Platz') >= 0), 'partner.html Mandanten-Staffel = Quelle');
+
+// ══ L · Pakete: Rechenproben ════════════════════════════════════════════════
+kopf('L Rechenproben der vier Pakete (Hand-Tabelle, Monat und Jahr)');
+//               Paket       Kunden Logins  Monat  Jahr       Monat von Hand                     Jahr von Hand
+const HAND_P = [['Solo',      0,  1,   99, 1089],   // 99                                1.089
+                ['Büro',      5,  2,  253, 2783],   // 99 + 5 × 19 + 59                  1.089 + 5 × 209 + 649
+                ['Kanzlei',  10,  3,  367, 4037],   // 99 + 10 × 15 + 2 × 59             1.089 + 10 × 165 + 2 × 649
+                ['Netzwerk', 25,  8,  772, 8492]];  // 99 + 25 × 12 + 3 × 59 + 4 × 49    1.089 + 25 × 132 + 3 × 649 + 4 × 539
+const paketSumme = (Kq, Q, kunden, logins, iv) => Kq.plan(iv) + Kq.summe(kunden, iv) + Q.teamSumme(logins - 1, iv);
+const abwP = HAND_P.filter(([n, k, l, m, j]) => paketSumme(K, TP, k, l, 'monthly') !== m || paketSumme(K, TP, k, l, 'yearly') !== j);
+ok(!abwP.length, 'Solo 99 / 1.089 €, Büro 253 / 2.783 €, Kanzlei 367 / 4.037 €, Netzwerk 772 / 8.492 €' + (abwP.length ? ': ' + abwP.map((x) => x[0]).join(', ') : ''));
+ok(HAND_P.every(([, , , m, j]) => j === m * 11), 'Jahr = 11 × Monat für jedes Paket (ein Monat frei, Plan, Kunden- und Teamplätze)');
+ok(HAND_P.every(([n, k, l], i) => PAKETE_SOLL[i][0] === n && PAKETE_SOLL[i][1] === k && PAKETE_SOLL[i][2] === l), 'Hand-Tabelle und Landing-Vorbelegung sind dieselben Pakete');
+ok(eurText(367 / 10) === '36,70 €' && eurText(772 / 25) === '30,88 €', 'im Schnitt je Kunde: Kanzlei 36,70 €, Netzwerk 30,88 € im Monat');
+
+// ══ M · Buchungsweg Landing → Preisfenster → Checkout ═══════════════════════
+kopf('M Jetzt buchen mit Mengen: Link, vonDerLanding, Preisfenster, Checkout mit drei Positionen');
+ok(/'\?register=1&partner_kauf=1&intervall=' \+ iv\(\) \+ '&kundenplaetze=' \+ r\.kunden \+ '&teamplaetze=' \+ r\.tp/.test(rechnerJs),
+  'partner-pakete.js verlinkt ?register=1&partner_kauf=1&intervall=…&kundenplaetze=…&teamplaetze=… (Teamplätze = Logins ohne Inhaber)');
+const vm = await import('node:vm');
+/** partner-plan-kauf.js echt ausfuehren (vm, Browser nachgebaut): Adresse/Merker -> Preisfenster -> Kaufen. */
+async function ppkLauf({ quelle = ppk, search = '', merker = null, angebot, karte = 'monthly' } = {}) {
+  const store = new Map(merker != null ? [['dp_partner_kauf', merker]] : []), timers = [], aufrufe = { open: [], api: [], warn: [] };
+  const knopf = { disabled: false, textContent: '', onclick: null };
+  const el = { innerHTML: '', id: '', className: '', classList: { add() {} }, style: {}, querySelectorAll: () => [], querySelector: (s) => (s === '[data-a="kaufen"]' ? knopf : null), scrollIntoView() {} };
+  const w = {
+    console: { log() {}, warn: (...a) => aufrufe.warn.push(a.join(' ')), error() {} }, URLSearchParams, JSON, Math, Number, String, Date, Promise, Object, Array, parseInt, isNaN,
+    location: { search, origin: 'https://app.x', pathname: '/' },
+    localStorage: { getItem: (k) => (store.has(k) ? store.get(k) : null), setItem: (k, v) => store.set(k, String(v)), removeItem: (k) => store.delete(k) },
+    document: { readyState: 'complete', getElementById: () => null, querySelector: () => null, head: { appendChild() {} }, body: { appendChild() {} },
+                createElement: (t) => (t === 'div' ? el : { textContent: '' }) },
+    history: { replaceState() {} }, setTimeout: (f) => { timers.push(f); return timers.length; }, alert() {},
+    Auth: { isLoggedIn: () => true, apiCall: async (p, o) => { aufrufe.api.push([p, o]); return p === '/subscription/partner/angebot' ? angebot : { url: 'https://checkout.stripe.test/c' }; } },
+    openPricingModal: (o) => aufrufe.open.push(o === undefined ? null : o),
+    DpKundenplatz: K, DpTeamplatz: TP, DpWiderruf: { einholen: async () => ({ widerruf_version: 'w1', zusatz: {} }) }
+  };
+  w.window = w; w.addEventListener = () => {};
+  vm.createContext(w);
+  vm.runInContext(quelle, w, { filename: 'partner-plan-kauf.js' });
+  for (let i = 0; i < timers.length && i < 20; i++) { try { timers[i](); } catch (e) { /* Scroll-Takte */ } }
+  const S = w.DpPartnerPlan._state;
+  const nachher = { iv: S.iv, plaetze: S.plaetze, team: S.team };
+  S.angebot = null;
+  w.DpPartnerPlan.einhaengen({ parentNode: { insertBefore() {} }, nextSibling: null }, karte);
+  const nb = (t) => t.replace(/ /g, ' ');   /* eur() im Preisfenster setzt ein geschuetztes Leerzeichen vor € */
+  const vorlaeufig = nb(el.innerHTML);
+  await new Promise((r) => setImmediate(r)); await new Promise((r) => setImmediate(r));
+  const html = nb(el.innerHTML);
+  if (knopf.onclick) { knopf.onclick(); for (let i = 0; i < 6; i++) await new Promise((r) => setImmediate(r)); }
+  const kauf1 = aufrufe.api.find((a) => a[0] === '/subscription/partner/checkout');
+  return { aufrufe, nachher, vorlaeufig, html, body: kauf1 && kauf1[1].body };
+}
+let L1 = await ppkLauf({ search: '?register=1&partner_kauf=1&intervall=yearly&kundenplaetze=10&teamplaetze=2', angebot: angebotSB(true), karte: 'yearly' });
+ok(L1.aufrufe.open.length === 1 && L1.aufrufe.open[0] && L1.aufrufe.open[0].period === 'yearly' && L1.nachher.iv === 'yearly' && L1.nachher.plaetze === 10 && L1.nachher.team === 2,
+  'vonDerLanding: Adresse intervall=yearly, kundenplaetze=10, teamplaetze=2 → openPricingModal({period: yearly}), 10 Kundenplätze, 2 Teamplätze');
+ok(/data-art="team"/.test(L1.html) && /4\.037 €/.test(L1.html) && L1.body && L1.body.billingInterval === 'yearly' && L1.body.plaetze === 10 && L1.body.teamplaetze === 2,
+  'Preisfenster mit Teamplatz-Preis: Mengenwahl Teamplätze, Kanzlei im Jahr 4.037 €, Kauf schickt yearly, 10 Kundenplätze, 2 Teamplätze');
+ok(/Preise werden mit dem Zahlungsanbieter abgeglichen/.test(L1.vorlaeufig) && /data-a="kaufen" disabled/.test(L1.vorlaeufig) && /2\.739 €/.test(L1.vorlaeufig),
+  'vor der Stripe-Antwort: Vorschau aus kundenplatz-staffel.js (1.089 + 10 × 165 = 2.739 €), Kaufen gesperrt');
+ok(L1.aufrufe.warn.length === 0 && L1.body.widerruf_verzicht === true, 'Stripe-Angebot = Quelle (keine Warnung), Widerrufsverzicht bleibt im Kauf');
+let L2 = await ppkLauf({ search: '?register=1&partner_kauf=1&intervall=yearly&kundenplaetze=10&teamplaetze=2', angebot: angebotSB(false), karte: 'yearly' });
+ok(!/data-art="team"/.test(L2.html) && /data-hinweis="team"/.test(L2.html) && /im Partner-Cockpit unter Team/.test(L2.html) && /2\.739 €/.test(L2.html)
+   && L2.body && L2.body.teamplaetze === 0 && L2.body.plaetze === 10 && !/fehler|Fehler/.test(L2.html),
+  'ohne Teamplatz-Preis (angebot.team null, wie Prod): keine Mengenwahl, Hinweis aufs Cockpit, Summe ohne Team 2.739 €, Kauf mit 0 Teamplätzen, kein Fehler');
+let L3 = await ppkLauf({ merker: String(Date.now()), angebot: angebotSB(true) });
+ok(L3.aufrufe.open.length === 1 && L3.aufrufe.open[0].period === 'monthly' && L3.nachher.plaetze === 0 && L3.nachher.team === 0, 'alter Merker (nur Zeit, vor v3960): Preisfenster monatlich ohne Mengen, wie bisher');
+let L4 = await ppkLauf({ search: '?register=1&partner_kauf=1&intervall=monthly&kundenplaetze=25&teamplaetze=7', angebot: angebotSB(true) });
+ok(/772 €/.test(L4.html) && L4.body.teamplaetze === 7 && L4.body.plaetze === 25 && L4.body.billingInterval === 'monthly', 'Netzwerk monatlich: 772 € im Preisfenster, Kauf mit 25 Kunden- und 7 Teamplätzen');
+let L5 = await ppkLauf({ search: '?partner_kauf=1&kundenplaetze=-4&teamplaetze=x&intervall=quatsch', angebot: angebotSB(true) });
+ok(L5.aufrufe.open[0].period === 'monthly' && L5.nachher.plaetze === 0 && L5.nachher.team === 0, 'kaputte Adresswerte: monatlich, 0, 0 (kein NaN, keine negative Menge)');
+const qPm = text('frontend/js/pricing-modal.js');
+ok(/window\.openPricingModal = function\(opts\)/.test(qPm) && /STATE\.period = \(opts && opts\.period === 'yearly'\) \? 'yearly' : 'monthly';/.test(qPm) && /dp-toggle-btn\[data-period="yearly"\]'\);\s*if \(yb\) yb\.click\(\);/.test(qPm),
+  'openPricingModal({period}) setzt das Intervall und schaltet den Umschalter über denselben Klickweg');
+
+// Backend: dritte Position
+const cp3 = (o) => kauf.checkoutParameter(Object.assign({ kundeId: 'cus_X', planPreisId: 'price_plan', seatPreisId: 'price_seat', plaetze: 10, resellerId: 'r1', userId: 'u1', successUrl: 'https://x/s', cancelUrl: 'https://x/c' }, o));
+const cT = cp3({ teamPreisId: 'price_team', teamplaetze: 2 });
+ok(cT.line_items.length === 3 && cT.line_items[2].price === 'price_team' && cT.line_items[2].quantity === 2 && cT.line_items[1].quantity === 10 && cT.metadata.teamplaetze === '2' && cT.subscription_data.metadata.teamplaetze === '2',
+  'checkoutParameter: Plan × 1, Kundenplätze × 10, Teamplätze × 2 in EINEM Abo, Menge in den Metadaten');
+ok(cp3({ teamplaetze: 4 }).line_items.length === 2 && cp3({ teamPreisId: 'price_team', teamplaetze: 0 }).line_items.length === 2 && !('teamplaetze' in cp3({}).metadata),
+  'ohne Teamplatz-Preis oder mit 0 Teamplätzen: keine dritte Position');
+const schl3 = (o, acc = []) => { if (o && typeof o === 'object') for (const k2 of Object.keys(o)) { acc.push(k2); schl3(o[k2], acc); } return acc; };
+ok(!schl3(cT).some((k2) => /trial|discount|promotion/i.test(k2)), 'auch mit Teamplätzen kein trial-, Rabatt- oder Gutscheinfeld im Checkout');
+function teamRegelOk(fn) {
+  const preis = { id: 'price_team' };
+  const a = fn(2, preis, { team_plaetze: 0 }), b = fn(2, null, { team_plaetze: 0 }), c = fn(2, preis, { team_plaetze: 5 }), d = fn(0, preis, { team_plaetze: 0 });
+  return a.menge === 2 && a.preisId === 'price_team' && !a.hinweis && b.menge === 0 && b.hinweis === 'preis_fehlt' && c.menge === 0 && c.hinweis === 'bestand' && d.menge === 0 && !d.hinweis;
+}
+ok(teamRegelOk(kauf.teamImCheckout), 'teamImCheckout: Preis da und kein Bestand → mitbuchen, Preis fehlt → leise ohne (preis_fehlt), kostenloser Bestand → leise ohne (bestand, sonst fehlte der Coupon)');
+const qSubM = text('backend/src/routes/subscription.js'), qKaufM = text('backend/src/services/partnerPlanKauf.js');
+ok(/partnerCheckoutSchema = z\.object\(\{[\s\S]{0,300}teamplaetze: z\.number\(\)\.int\(\)\.min\(0\)\.max\(partnerKauf\.MAX_PLAETZE\)\.optional\(\)/.test(qSubM)
+   && /checkoutAnlegen\(\{\s*user: req\.user, interval: req\.body\.billingInterval, plaetze: req\.body\.plaetze, teamplaetze: req\.body\.teamplaetze \|\| 0/.test(qSubM),
+  'Route partner/checkout: teamplaetze optional im strikten Schema und an checkoutAnlegen durchgereicht');
+ok(/const team = teamImCheckout\(teamplaetze, by\[TEAM_LOOKUP\[iv\]\], rs\);/.test(qKaufM) && /teamPreisId: team\.preisId, teamplaetze: team\.menge/.test(qKaufM) && /team_hinweis: team\.hinweis/.test(qKaufM),
+  'checkoutAnlegen: Teamplätze nur über teamImCheckout, Antwort meldet team_hinweis');
+// Gegenproben
+ok(!kQuellePruefen(Object.assign({}, K, { STUFEN: K.STUFEN.map((s, i) => i === 1 ? { ...s, jahr: 180 } : s) })), 'Gegenprobe: Jahr 12 statt 11 Monatsbeiträge in der Kundenplatz-Quelle wird rot');
+const K16 = Object.assign({}, K, { STUFEN: K.STUFEN.map((s, i) => i === 1 ? { ...s, monat: 16 } : s) });
+K16.summe = (n, iv) => { const x = Math.max(0, parseInt(n, 10) || 0); if (!x) return 0; const st = K16.STUFEN.find((s) => s.bis == null || x <= s.bis); return x * st[iv === 'yearly' ? 'jahr' : 'monat']; };
+K16.stripeStufen = (iv) => K16.STUFEN.map((s) => ({ bis: s.bis, cent: s[iv === 'yearly' ? 'jahr' : 'monat'] * 100 }));
+ok(kGegenStripe(K16).length > 0 && landingGegenQuelle(preise, TP, K16).length > 0, 'Gegenprobe: Quelle 16 statt 15 € → Stripe-Vergleich und Landing-Rückfall werden rot');
+const Kgrad = Object.assign({}, K, { summe: (n, iv) => kauf.staffelSumme(SB[iv], 'graduated', n) / 100 });
+ok(kGegenStripe(Kgrad).length > 0, 'Gegenprobe: graduated statt volume bei den Kundenplätzen wird rot');
+ok(K.abweichungen(Object.assign(angebotSB(true), { plan: { monthly: 9900, yearly: 118800 } })).length > 0, 'Gegenprobe: Stripe-Jahrespreis 1.188 € statt 1.089 € → abweichungen() meldet es');
+ok(!teamRegelOk((t, p) => ({ menge: p ? t : 0, preisId: p ? p.id : null, hinweis: p ? null : 'preis_fehlt' })), 'Gegenprobe: eine Regel, die den kostenlosen Bestand übersieht, wird rot');
+const ppkKaputt = ppk.replace("teamplaetze: (S.angebot && S.angebot.team && S.angebot.team[S.iv]) ? S.team : 0,", 'teamplaetze: S.team,');
+const LK = await ppkLauf({ quelle: ppkKaputt, search: '?partner_kauf=1&intervall=yearly&kundenplaetze=10&teamplaetze=2', angebot: angebotSB(false), karte: 'yearly' });
+ok(ppkKaputt !== ppk && LK.body && LK.body.teamplaetze === 2, 'Gegenprobe: schickt das Preisfenster Teamplätze ohne Stripe-Preis, sähe der Prüfer 2 statt 0');
+const landKaputt = preise.replace('data-o="gesamt">367<', 'data-o="gesamt">368<');
+ok(landKaputt !== preise && landingGegenQuelle(landKaputt, TP).length > 0, 'Gegenprobe: Kanzlei-Rückfall 368 statt 367 € wird rot');
+const landVorbelegung = preise.replace('data-paket="kanzlei" data-kunden="10"', 'data-paket="kanzlei" data-kunden="12"');
+ok(landVorbelegung !== preise && landingGegenQuelle(landVorbelegung, TP).length > 0, 'Gegenprobe: Kanzlei mit 12 statt 10 Kundenplätzen (Marcels Vorbelegung) wird rot');
 
 console.log((fehler ? 'ROT' : 'SAUBER') + ': ' + (n - fehler) + '/' + n + ' Punkte');
 process.exit(fehler ? 1 : 0);

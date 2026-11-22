@@ -10,10 +10,17 @@
  * Was eine Kuendigung fuer die Kunden bedeutet, kommt aus GET /subscription/partner/folgen
  * (Regel in partnerKunden.js: 30 Tage Frist je Kunde mit Partnerplatz, danach Trennung und Loeschung
  * seines Kontos, ausser er bucht ein eigenes Abo; Kunden mit eigenem Abo sind nicht betroffen).
+ *
+ * v3960 · Teamplaetze im Kauf (Marcel 22.11.2026): dritte Mengenwahl an der Karte, die Staffel kommt aus Stripe
+ * (angebot().team, graduated). Fehlt der Preis in Stripe (angebot().team null, heute auf Prod), faellt die Wahl leise
+ * weg: kein Fehler, Hinweis, dass Teamplaetze danach im Cockpit buchbar sind, gekauft wird ohne sie.
+ * Solange Stripe nicht geantwortet hat, zeigt die Karte die Preise aus frontend/js/kundenplatz-staffel.js
+ * (window.DpKundenplatz, Knopf gesperrt); weicht Stripe davon ab, gilt Stripe (das wird abgebucht).
+ * Von der Landing kommen intervall, kundenplaetze und teamplaetze mit (vonDerLanding).
  */
 (function () {
   'use strict';
-  var S = { angebot: null, plaetze: 0, iv: 'monthly' };
+  var S = { angebot: null, plaetze: 0, team: 0, iv: 'monthly' };
 
   function api(p, o) { return Auth.apiCall(p, o || {}); }
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
@@ -33,8 +40,11 @@
     for (var i = 0; i < stufen.length; i++) { if (stufen[i].bis == null || n <= stufen[i].bis) return stufen[i].cent; }
     return stufen[stufen.length - 1].cent;
   }
-  function platzSumme(a, iv, n) {
-    var p = a && a.platz && a.platz[iv]; if (!p || n <= 0) return 0;
+  function platzSumme(a, iv, n) { return stufenSumme(a && a.platz && a.platz[iv], n); }
+  /* v3960 · Teamplaetze nach Stripe-Staffel (graduated), 0 ohne Preis */
+  function teamSumme(a, iv, n) { return stufenSumme(a && a.team && a.team[iv], n); }
+  function stufenSumme(p, n) {
+    if (!p || n <= 0) return 0;
     if (p.tiers_mode === 'graduated') {
       var rest = n, unten = 0, sum = 0;
       p.stufen.forEach(function (t) { var oben = t.bis == null ? Infinity : t.bis, k = Math.max(0, Math.min(rest, oben - unten)); if (k > 0) sum += k * t.cent + (t.pauschal || 0); rest -= k; unten = oben; });
@@ -46,7 +56,7 @@
     var p = a && a.platz && a.platz[iv]; if (!p || !p.stufen) return '';
     var von = 1, ein = iv === 'yearly' ? 'Jahr' : 'Monat';
     return p.stufen.map(function (t) {
-      var txt = (t.bis == null ? 'ab ' + von : von + '–' + t.bis) + ' Plätze: ' + eur(t.cent);
+      var txt = (t.bis == null ? 'ab ' + von : von + ' bis ' + t.bis) + ' Plätze: ' + eur(t.cent);
       von = (t.bis || 0) + 1; return txt;
     }).join(' · ') + ' je Platz und ' + ein;
   }
@@ -78,6 +88,7 @@
       P + " .dppp-cta.zweit{background:#fff;border:1px solid " + GD + ';color:' + GD + ';font-weight:600}' +
       P + ' .dppp-cta[disabled]{opacity:.55;cursor:default}' +
       P + ' .dppp-knoepfe{display:flex;gap:8px;flex-wrap:wrap}.dppp-knoepfe .dppp-cta{flex:1;min-width:150px}' +
+      P + ' .dppp-mengen{display:flex;gap:14px;flex-wrap:wrap}' + P + ' .dppp-mengen > div{display:flex;flex-direction:column;gap:6px}' +   /* v3960 */
       '@media(max-width:720px){' + P + '{grid-template-columns:1fr}' + P + ' .dppp-l{border-right:0;border-bottom:2px dashed #d8d2c2}}' +
       D + '{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:100050;display:flex;align-items:center;justify-content:center;padding:16px}' +
       D + ' .dppp-box{background:#fff;border-radius:14px;max-width:540px;width:100%;padding:22px;box-shadow:0 20px 60px rgba(0,0,0,.4);color:#2A2727;max-height:90vh;overflow:auto}' +
@@ -90,9 +101,22 @@
     document.head.appendChild(s);
   }
 
+  /* v3960 · Vorschau aus der Quelle frontend/js/kundenplatz-staffel.js, solange Stripe nicht geantwortet hat
+     (gleiche Form wie GET /subscription/partner/angebot, ohne Teamplaetze und ohne Kaufrecht) */
+  function quellAngebot() {
+    var K = window.DpKundenplatz; if (!K || typeof K.stripeStufen !== 'function') return null;
+    var platz = function (iv) { return { tiers_mode: K.MODUS, stufen: K.stripeStufen(iv) }; };
+    return { plan: { monthly: K.plan('monthly') * 100, yearly: K.plan('yearly') * 100 }, platz: { monthly: platz('monthly'), yearly: platz('yearly') },
+             team: null, max_plaetze: K.MAX, vorlaeufig: true };
+  }
+
   function angebotHolen() {
     if (S.angebot) return Promise.resolve(S.angebot);
-    return api('/subscription/partner/angebot').then(function (a) { S.angebot = a; return a; });
+    return api('/subscription/partner/angebot').then(function (a) {
+      S.angebot = a;
+      try { var abw = window.DpKundenplatz ? DpKundenplatz.abweichungen(a) : []; if (abw.length) console.warn('[partner-plan] Stripe weicht von kundenplatz-staffel.js ab, es gilt Stripe:', abw.join(' · ')); } catch (e) {}
+      return a;
+    });
   }
 
   /* v3947 · „weitere Logins ab 39 €“ aus der EINEN Quelle frontend/js/teamplatz-staffel.js (window.DpTeamplatz).
@@ -103,9 +127,16 @@
   }
 
   /* ── Karte im Preis-Fenster ─────────────────────────────────────────────── */
+  /* v3960 · Mengenwahl (Kundenplaetze, Teamplaetze) */
+  function stepHtml(art, wert, max, label) {
+    return '<div class="dppp-k">' + label + '</div>' +
+      '<div class="dppp-step" data-art="' + art + '"><button type="button" data-d="-1" aria-label="' + label + ' weniger">−</button><input type="number" min="0" max="' + max + '" value="' + wert + '" aria-label="Anzahl ' + label + '"><button type="button" data-d="1" aria-label="' + label + ' mehr">+</button></div>';
+  }
+
   function karteZeichnen(el) {
-    var a = S.angebot, iv = S.iv, cur = aktuellerPlan();
+    var a = S.angebot || quellAngebot(), iv = S.iv, cur = aktuellerPlan(), vorlaeufig = !S.angebot;
     var plan = a ? a.plan[iv] : null, n = S.plaetze, ps = platzSumme(a, iv, n), ein = iv === 'yearly' ? 'Jahr' : 'Monat';
+    var mitTeam = !!(a && a.team && a.team[iv]), t = mitTeam ? S.team : 0, ts = teamSumme(a, iv, t);
     var links =
       '<div class="dppp-l"><div class="dppp-tag">Für Steuerberater, Finanzierer, Makler und Sachverständige</div>' +
         '<div class="dppp-name">Partner-Plan</div>' +
@@ -125,23 +156,33 @@
           : '<div class="dppp-knoepfe"><button type="button" class="dppp-cta" data-a="cockpit">Plätze verwalten</button>' +
             '<button type="button" class="dppp-cta zweit" data-a="kuendigen">Partner-Plan kündigen</button></div></div>');
     } else {
-      rechts = '<div class="dppp-r"><div class="dppp-preis"><b>' + eur(plan) + '</b><span>/ ' + ein + '</span></div>' +
-        '<div class="dppp-k">Kundenplätze</div>' +
-        '<div class="dppp-step"><button type="button" data-d="-1" aria-label="weniger">−</button><input type="number" min="0" max="' + (a.max_plaetze || 500) + '" value="' + n + '" aria-label="Anzahl Kundenplätze"><button type="button" data-d="1" aria-label="mehr">+</button></div>' +
+      var max = a.max_plaetze || 500;
+      rechts = '<div class="dppp-r"><div class="dppp-preis"><b>' + eur(plan + ps + ts) + '</b><span>/ ' + ein + '</span></div>' +
+        '<div class="dppp-mengen"><div>' + stepHtml('kunden', n, max, 'Kundenplätze') + '</div>' +
+          (mitTeam ? '<div>' + stepHtml('team', t, max, 'Teamplätze') + '</div>' : '') + '</div>' +
         '<div class="dppp-zeile"><span>Partner-Plan</span><span>' + eur(plan) + '</span></div>' +
-        '<div class="dppp-zeile"><span>' + n + (n === 1 ? ' Platz' : ' Plätze') + (n > 0 ? ' à ' + eur(platzSatz(a.platz[iv].stufen, n)) : '') + '</span><span>' + eur(ps) + '</span></div>' +
-        '<div class="dppp-zeile dppp-summe"><span>Zusammen je ' + ein + '</span><span>' + eur(plan + ps) + '</span></div>' +
-        '<p class="dppp-klein">' + esc(stufenText(a, iv)) + '. Im Partner-Plan ist kein Platz enthalten. Keine Testphase, die Abrechnung beginnt mit dem Kauf. Kündigung jederzeit zum Ende der Laufzeit.</p>' +
+        '<div class="dppp-zeile"><span>' + n + (n === 1 ? ' Kundenplatz' : ' Kundenplätze') + (n > 0 ? ' à ' + eur(platzSatz(a.platz[iv].stufen, n)) : '') + '</span><span>' + eur(ps) + '</span></div>' +
+        (mitTeam ? '<div class="dppp-zeile"><span>' + (t ? t + (t === 1 ? ' Teamplatz' : ' Teamplätze') : 'Kein Teamplatz, nur du') + '</span><span>' + eur(ts) + '</span></div>' : '') +
+        '<div class="dppp-zeile dppp-summe"><span>Zusammen je ' + ein + '</span><span>' + eur(plan + ps + ts) + '</span></div>' +
+        '<p class="dppp-klein">' + esc(stufenText(a, iv)) + '. Im Partner-Plan ist kein Platz enthalten. ' +
+          (mitTeam ? 'Teamplätze sind weitere Logins für dein Team, du selbst bist enthalten. '
+                   : 'Teamplätze für weitere Logins buchst du nach dem Kauf im Partner-Cockpit unter Team dazu. ') +
+          'Keine Testphase, die Abrechnung beginnt mit dem Kauf. Kündigung jederzeit zum Ende der Laufzeit.</p>' +
+        (!mitTeam && S.team > 0 && !vorlaeufig ? '<p class="dppp-klein" data-hinweis="team">Deine ' + S.team + (S.team === 1 ? ' gewählter Teamplatz ist' : ' gewählten Teamplätze sind') + ' hier noch nicht buchbar. Du buchst sie nach dem Kauf im Partner-Cockpit unter Team.</p>' : '') +
         (a.darf_kaufen === false ? '<p class="dppp-klein"><b>Du hast bereits ein Abo.</b> Kündige es zuerst zum Laufzeitende, danach kannst du den Partner-Plan buchen.</p>' : '') +
-        '<button type="button" class="dppp-cta" data-a="kaufen"' + (a.darf_kaufen === false ? ' disabled' : '') + '>Partner-Plan kaufen</button></div>';
+        (vorlaeufig ? '<p class="dppp-klein">Preise werden mit dem Zahlungsanbieter abgeglichen …</p>' : '') +
+        '<button type="button" class="dppp-cta" data-a="kaufen"' + (a.darf_kaufen === false || vorlaeufig ? ' disabled' : '') + '>Partner-Plan kaufen</button></div>';
     }
     el.innerHTML = links + rechts;
-    var inp = el.querySelector('.dppp-step input');
-    if (inp) {
-      var setzen = function (v) { S.plaetze = Math.max(0, Math.min(a.max_plaetze || 500, parseInt(v, 10) || 0)); karteZeichnen(el); var i2 = el.querySelector('.dppp-step input'); if (i2) i2.focus(); };
-      [].forEach.call(el.querySelectorAll('.dppp-step button'), function (b) { b.onclick = function () { setzen(S.plaetze + Number(b.getAttribute('data-d'))); }; });
-      inp.onchange = function () { setzen(inp.value); };
-    }
+    [].forEach.call(el.querySelectorAll('.dppp-step'), function (st) {
+      var art = st.getAttribute('data-art'), inp = st.querySelector('input'), feldName = art === 'team' ? 'team' : 'plaetze';
+      var setzen = function (v) {
+        S[feldName] = Math.max(0, Math.min(a.max_plaetze || 500, parseInt(v, 10) || 0)); karteZeichnen(el);
+        var i2 = el.querySelector('.dppp-step[data-art="' + art + '"] input'); if (i2) i2.focus();
+      };
+      [].forEach.call(st.querySelectorAll('button'), function (b) { b.onclick = function () { setzen(S[feldName] + Number(b.getAttribute('data-d'))); }; });
+      if (inp) inp.onchange = function () { setzen(inp.value); };
+    });
     var k = el.querySelector('[data-a="kaufen"]'); if (k) k.onclick = function () { kaufen(k); };
     var c = el.querySelector('[data-a="cockpit"]'); if (c) c.onclick = cockpitOeffnen;
     var q = el.querySelector('[data-a="kuendigen"]'); if (q) q.onclick = kuendigenDialog;
@@ -176,6 +217,7 @@
     try {
       var r = await api('/subscription/partner/checkout', { method: 'POST', body: {
         billingInterval: S.iv, plaetze: S.plaetze,
+        teamplaetze: (S.angebot && S.angebot.team && S.angebot.team[S.iv]) ? S.team : 0,   /* v3960 · ohne Stripe-Preis nie mitschicken */
         successUrl: location.origin + location.pathname + '?subscription=success&partner=1&session_id={CHECKOUT_SESSION_ID}',
         cancelUrl: location.origin + location.pathname + '?subscription=cancel',
         widerruf_verzicht: true, widerruf_version: _wv.widerruf_version,
@@ -253,19 +295,39 @@
      Merker im localStorage, damit er Registrierung, Mail-Bestaetigung und Anmeldung im selben Browser ueberlebt
      (auth.js raeumt die Adresse beim Start, dieses Skript liest sie vorher). Ist jemand angemeldet, oeffnet sich
      das Preis-Fenster an der Partner-Karte; der Merker wird dabei verbraucht. */
+  /* v3960 · die Landing gibt intervall, kundenplaetze und teamplaetze mit (preise.html › vier Pakete). Der Merker ist
+     seitdem JSON {t, intervall, kundenplaetze, teamplaetze}; ein alter Merker (nur die Zeit) gilt weiter, ohne Mengen. */
+  function merkerLesen(roh) {
+    var m = null; try { m = JSON.parse(roh); } catch (e) { m = null; }
+    if (typeof m === 'number') m = { t: m };
+    if (!m || typeof m !== 'object') return null;
+    var ganz = function (v) { if (v == null || v === '') return null; var x = parseInt(v, 10); return Number.isFinite(x) && x >= 0 ? Math.min(500, x) : null; };
+    return { t: parseInt(m.t, 10) || 0, intervall: m.intervall === 'yearly' ? 'yearly' : (m.intervall === 'monthly' ? 'monthly' : null),
+             kundenplaetze: ganz(m.kundenplaetze), teamplaetze: ganz(m.teamplaetze) };
+  }
+  function merkerAusAdresse(q) {
+    var iv = q.get('intervall');
+    return JSON.stringify({ t: Date.now(), intervall: iv === 'yearly' || iv === 'monthly' ? iv : null,
+      kundenplaetze: q.get('kundenplaetze'), teamplaetze: q.get('teamplaetze') });
+  }
+
   (function vonDerLanding() {
     var K = 'dp_partner_kauf';
-    try { if (new URLSearchParams(location.search).get('partner_kauf') === '1') localStorage.setItem(K, String(Date.now())); } catch (e) {}
+    try { var q0 = new URLSearchParams(location.search); if (q0.get('partner_kauf') === '1') localStorage.setItem(K, merkerAusAdresse(q0)); } catch (e) {}
     var versuche = 0;
     function pruefen() {
-      var seit = 0; try { seit = parseInt(localStorage.getItem(K), 10) || 0; } catch (e) {}
+      var m = null; try { m = merkerLesen(localStorage.getItem(K)); } catch (e) { m = null; }
+      var seit = m ? m.t : 0;
       if (!seit) return;
       if (Date.now() - seit > 7 * 864e5) { try { localStorage.removeItem(K); } catch (e) {} return; }
       var drin = window.Auth && typeof Auth.isLoggedIn === 'function' && Auth.isLoggedIn();
       if (!drin || typeof window.openPricingModal !== 'function') { if (++versuche < 120) setTimeout(pruefen, 1000); return; }
       try { localStorage.removeItem(K); } catch (e) {}
       if (aktuellerPlan() === 'partner') { cockpitOeffnen(); return; }
-      window.openPricingModal();
+      if (m.intervall) S.iv = m.intervall;
+      if (m.kundenplaetze != null) S.plaetze = m.kundenplaetze;
+      if (m.teamplaetze != null) S.team = m.teamplaetze;
+      window.openPricingModal({ period: S.iv });
       setTimeout(function () { var k = document.getElementById('dppp-karte'); if (k) k.scrollIntoView({ block: 'center', behavior: 'smooth' }); }, 1200);
     }
     if (document.readyState === 'complete') setTimeout(pruefen, 1500); else window.addEventListener('load', function () { setTimeout(pruefen, 1500); });
@@ -273,5 +335,6 @@
   })();
 
   window.DpPartnerPlan = { einhaengen: einhaengen, periode: periode, kuendigenDialog: kuendigenDialog, angebotHolen: angebotHolen,
-    platzSumme: platzSumme, platzSatz: platzSatz, stufenText: stufenText, eur: eur, _state: S };
+    platzSumme: platzSumme, platzSatz: platzSatz, teamSumme: teamSumme, stufenText: stufenText, eur: eur,
+    merkerLesen: merkerLesen, quellAngebot: quellAngebot, _state: S };
 })();

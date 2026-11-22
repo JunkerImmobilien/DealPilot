@@ -119,11 +119,16 @@
   // ═══════════════════════════════════════════════════════════════
   // PUBLIC API
   // ═══════════════════════════════════════════════════════════════
-  window.openPricingModal = function() {
+  window.openPricingModal = function(opts) {
     // V63.6: Beim Öffnen IMMER auf Investor starten (Bestseller-Highlight),
     // unabhängig vom aktuellen Plan. Der aktuelle Plan ist im UI als "✓ Aktueller Plan"
     // markiert (auf der jeweiligen Plan-Karte), aber initial sichtbar ist Investor.
     STATE.activeKey = 'investor';
+    /* v3960 · Intervall beim Öffnen (Landing „Jetzt buchen“ mit intervall=yearly, partner-plan-kauf.js vonDerLanding).
+       Ohne Angabe Monatlich: der Umschalter wird monatlich gezeichnet, ein Jahr aus dem letzten Öffnen blieb sonst
+       in STATE stehen, waehrend der Knopf „Monatlich“ zeigte. Jaehrlich wird nach dem Aufbau per Klick gesetzt,
+       damit Umschalter, Plan-Karten und Partner-Karte denselben Weg nehmen wie beim Klick des Nutzers. */
+    STATE.period = (opts && opts.period === 'yearly') ? 'yearly' : 'monthly';
     /* v1674 · Erst den echten Katalog, dann zeichnen.
        Der Preis, der hier steht, muss der sein, der abgebucht wird —
        und der kommt aus `/credits/bewertungen`, nicht aus einer
@@ -879,6 +884,10 @@
       _mountPlanCards();
       _wireKerosinStrip();
     }, 30);
+    if (STATE.period === 'yearly') setTimeout(function () {   /* v3960 · eigener Takt nach der Kette */
+      var yb = document.querySelector('#pricing-plugin-host .dp-toggle-btn[data-period="yearly"]');
+      if (yb) yb.click();
+    }, 90);
 
     /* ── v2132a · DIE FALTE HAENGT NICHT MEHR AN DER KETTE ──────────
        Sie stand als FUENFTER Aufruf in einem setTimeout hinter
