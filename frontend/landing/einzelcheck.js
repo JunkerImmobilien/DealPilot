@@ -1,5 +1,7 @@
 /* ═══════════════════════════════════════════════════════════════════════
-   einzelcheck.js · v3940 (20.11.2026) / v3941 (21.11.2026) · Einzel-Check der Landing, echter Ablauf
+   einzelcheck.js · v3940 (20.11.2026) / v3941 (21.11.2026) / v3944 (22.11.2026) · Einzel-Check der Landing, echter Ablauf
+   v3944 · Vergleichsmiete mit Herkunft und Obergrenze für Investoren (mietpotenzialAus, mieteZeilen, mieteSaetze),
+   gerechnet nur mit js/mietpotenzial-kern.js. Vergleichsmiete vom Server, ohne Treffer kein Wert.
    Vorher einzelcheck-demo.js (landing-faecher-1, nur Beispieldaten).
 
    Marcel 20.11.2026 (Preis entschieden: 3,99 €, Betrag kommt aus Stripe):
@@ -32,7 +34,7 @@
 (function () {
   'use strict';
   if (window.DpEinzelCheck) return;
-  var VERSION = 'v3941';
+  var VERSION = 'v3944';
   var SPEICHER = 'dp_ec_kauf';
   var KANAL = 'dp-einzelcheck';
   var INFO = { frei_max: 2, voll_max: 4, max_mb: 10, frist_tage: 14, amount_cents: 0 };
@@ -385,33 +387,97 @@
       if (leerPct != null) S2.leerstandPct = Math.round(leerPct * 10) / 10;
       if (z.wfl > 0) { try { d.ds2 = DpFaecher.rechne(S2); } catch (e) { d.ds2 = null; } }
     }
-    /* Mietpotenzial: zulässige Bestandsmiete nach drei Jahren und Neuvermietung (js/mietpotenzial-kern.js) */
-    if (r && r.k && z.wfl > 0 && window.DpMietpotenzial) {
-      var MP = window.DpMietpotenzial, ort = m.lage && m.lage.ags ? { ags: m.lage.ags } : {};
-      var kapp = kappDaten ? MP.kappungAus(kappDaten, ort) : null;
-      var kPct = kapp && (kapp.pct === 15 || kapp.pct === 20) && kapp.herkunft !== 'auffang' ? kapp.pct : 15;
-      var vglQm = m.vergleichsmiete && m.vergleichsmiete.qm > 0 ? m.vergleichsmiete.qm : null;
-      var zul = MP.zulaessig({ ist: r.e.nkm, wfl: z.wfl, vgl_qm: vglQm || '', kappung_pct: kPct });
-      var bremse = kappDaten ? MP.mietpreisbremseAus(kappDaten, ort) : null;
-      var neu = (m.markt && m.markt.miete_qm > 0) ? MP.neuvermietung({ markt_qm: m.markt.miete_qm, wfl: z.wfl, vgl_qm: vglQm || '', bremse: bremse }) : null;
-      d.miete = { ist_qm: r.e.nkm / z.wfl, vgl_qm: vglQm, markt_qm: m.markt && m.markt.miete_qm > 0 ? m.markt.miete_qm : null, zul: zul, kPct: kPct,
-        kAus: !!(kapp && kapp.herkunft !== 'auffang' && kapp.pct === kPct), bremse: bremse ? bremse.gilt : null, neu: neu };
-    }
+    /* Mietpotenzial: zulässige Bestandsmiete nach drei Jahren und Obergrenze bei Neuvermietung (js/mietpotenzial-kern.js) */
+    if (r && r.k && z.wfl > 0 && window.DpMietpotenzial) d.miete = mietpotenzialAus(window.DpMietpotenzial, kappDaten, r.e.nkm, z.wfl, m);
     return d;
   }
 
+  /* ── v3944 · OBERGRENZE FÜR INVESTOREN (Marcel 22.11.2026: „Vergleichsmieten angeben und Obergrenze für
+     Investoren, was max drin ist.“) ─────────────────────────────────────────────────────────────────────────
+     Gerechnet NUR mit js/mietpotenzial-kern.js (kappungAus, mietpreisbremseAus, zulaessig, neuvermietung,
+     zielmieteBremse), hier wird nichts nachgebaut:
+       Bestand       zulaessig(): Kappungsgrenze, Vergleichsmiete, Sperrfrist (§ 558 BGB) nach drei Jahren
+       Neuvermietung gilt die Mietpreisbremse und ist die Vergleichsmiete bekannt: zielmieteBremse().obergrenze_qm
+                     (Vergleichsmiete + 10 %, § 556d BGB). Gilt sie nicht oder ist sie offen: die
+                     Vergleichsmiete als Richtwert. Ohne Vergleichsmiete: keine Zahl.
+     Die Vergleichsmiete kommt vom Server (services/einzelcheck.js vglAus, mb lib/vergleichsmiete_auszug.js):
+     Mietspiegel, amtliche Mietpreisübersicht oder DealPilot-Näherung. Kein Treffer heißt kein Wert.
+     Prüfer: tools/einzelcheck-pruefen.mjs Teil N (ruft diese Funktionen mit dem echten Kern). */
+  var VGL_HERKUNFT = {
+    mietspiegel: 'amtliche Mietdaten, Mietspiegel der Gemeinde',
+    amtlich: 'amtliche Mietdaten des Gutachterausschusses',
+    naeherung: 'Schätzung von DealPilot aus amtlichen Mietdaten der Gemeinde, nicht amtlich'
+  };
+  function mietpotenzialAus(MP, kappDaten, ist, wfl, m) {
+    m = m || {};
+    var ort = m.lage && m.lage.ags ? { ags: m.lage.ags } : {};
+    var kapp = kappDaten ? MP.kappungAus(kappDaten, ort) : null;
+    var kPct = kapp && (kapp.pct === 15 || kapp.pct === 20) && kapp.herkunft !== 'auffang' ? kapp.pct : 15;
+    var vg = m.vergleichsmiete && m.vergleichsmiete.qm > 0 ? m.vergleichsmiete : null;
+    var vglQm = vg ? vg.qm : null;
+    var marktQm = m.markt && m.markt.miete_qm > 0 ? m.markt.miete_qm : null;
+    var zul = MP.zulaessig({ ist: ist, wfl: wfl, vgl_qm: vglQm || '', kappung_pct: kPct });
+    var bremse = kappDaten ? MP.mietpreisbremseAus(kappDaten, ort) : null;
+    var gilt = bremse ? bremse.gilt : null;
+    var neu = marktQm ? MP.neuvermietung({ markt_qm: marktQm, wfl: wfl, vgl_qm: vglQm || '', bremse: bremse }) : null;
+    var grenze = vglQm ? MP.zielmieteBremse({ ziel_qm: vglQm, vgl_qm: vglQm, bremse: bremse }) : null;
+    var nv;
+    if (gilt === true) nv = grenze && grenze.obergrenze_qm > 0 ? { art: 'bremse', qm: grenze.obergrenze_qm } : { art: 'bremse_ohne_vgl', qm: null };
+    else if (vglQm) nv = { art: gilt === false ? 'richtwert' : 'richtwert_pruefen', qm: vglQm };
+    else nv = { art: 'ohne', qm: null };
+    var rund = function (x) { return Math.round(x * 100) / 100; };
+    if (nv.qm > 0) { nv.monat = rund(nv.qm * wfl); nv.plus_monat = rund(nv.monat - ist); nv.plus_jahr = rund(nv.plus_monat * 12); }
+    var bestand = (zul && zul.miete_monat > 0) ? { monat: zul.miete_monat, plus_monat: rund(zul.miete_monat - ist), plus_jahr: rund((zul.miete_monat - ist) * 12) } : null;
+    return { ist_monat: ist, ist_qm: ist / wfl, wfl: wfl, vgl: vg, vgl_qm: vglQm, vgl_herkunft: vg ? (VGL_HERKUNFT[vg.art] || null) : null,
+      markt_qm: marktQm, zul: zul, bestand: bestand, kPct: kPct, kAus: !!(kapp && kapp.herkunft !== 'auffang' && kapp.pct === kPct), kVo: !!(kapp && kapp.herkunft === 'verordnung'),
+      bremse: gilt, neu: neu, nv: nv };
+  }
+  function qmText(x, ca) { return (ca ? 'ca. ' : '') + dez(x, 2) + ' €/m²'; }
+  /* Spanne der Vergleichsmiete als Satz, nur wenn unten und oben verschieden sind */
+  function spanneText(vg) {
+    if (!vg || !(vg.unten > 0) || !(vg.oben > 0) || !(vg.oben > vg.unten)) return '';
+    return 'Spanne ' + (vg.ca ? 'ca. ' : '') + dez(vg.unten, 2) + ' bis ' + dez(vg.oben, 2) + ' €/m²';
+  }
+  /* Tabelle der Obergrenzen: Miete im Monat und Abstand zur Ist-Miete in Monat und Jahr */
+  function mieteZeilen(mi) {
+    var z = [];
+    if (!mi) return z;
+    z.push(['Ist-Miete heute', eur(mi.ist_monat), '', '', { det: qmText(mi.ist_qm) + ' kalt' }]);
+    if (mi.bestand) z.push(['Bestandsmiete in drei Jahren', eur(mi.bestand.monat), eurS(mi.bestand.plus_monat), eurS(mi.bestand.plus_jahr),
+      { det: qmText(mi.bestand.monat / mi.wfl) + ', höchstens zulässig bei laufendem Mietvertrag (§ 558 BGB)', farbe: true }]);
+    if (mi.nv && mi.nv.qm > 0) z.push([mi.nv.art === 'bremse' ? 'Neuvermietung, Obergrenze' : 'Neuvermietung, Richtwert', eur(mi.nv.monat), eurS(mi.nv.plus_monat), eurS(mi.nv.plus_jahr),
+      { det: qmText(mi.nv.qm, mi.vgl && mi.vgl.ca) + (mi.nv.art === 'bremse' ? ', Mietpreisbremse (Vergleichsmiete plus 10 %, § 556d BGB)' : ', ortsübliche Vergleichsmiete'), farbe: true }]);
+    return z;
+  }
   function mieteSaetze(mi) {
     var s = [];
     if (!mi) return s;
-    var z = mi.zul;
+    var z = mi.zul, vq = mi.vgl_qm, ca = !!(mi.vgl && mi.vgl.ca), nv = mi.nv || {};
+    /* Vergleichsmiete */
+    if (vq) s.push('Ortsübliche Vergleichsmiete ' + qmText(vq, ca) + ' (' + mi.vgl_herkunft + (spanneText(mi.vgl) ? ', ' + spanneText(mi.vgl) : '') + ').');
+    else s.push('Für diesen Ort liegen keine amtlichen Mietdaten zur Vergleichsmiete vor. DealPilot nennt deshalb keine Zahl.');
+    /* Bestand nach drei Jahren */
     if (z && z.miete_monat > 0) {
       if (z.grund === 'vergleichsmiete_erreicht') s.push('Die Miete liegt schon an der ortsüblichen Vergleichsmiete. Eine Erhöhung nach § 558 BGB ist nicht möglich.');
       else if (z.plus_pct > 0.05) s.push('Zulässig in drei Jahren: ' + eur(z.miete_monat) + ' im Monat, das sind ' + dez(z.plus_pct, 1) + ' % mehr'
         + (z.grund === 'kappung' ? ', begrenzt durch die Kappungsgrenze von ' + mi.kPct + ' %.' : ', bis zur ortsüblichen Vergleichsmiete.'));
-      if (z.vgl_fehlt) s.push('Die ortsübliche Vergleichsmiete prüft DealPilot in der App. Hier ist deshalb nur bis zur Kappungsgrenze gerechnet.');
+      if (z.vgl_fehlt) s.push('Gerechnet ist deshalb nur bis zur Kappungsgrenze. Liegt die Vergleichsmiete darunter, ist sie die Grenze.');
+      if (z.plus_pct > 0.05) s.push('Eine Erhöhung ist frühestens 15 Monate nach Einzug oder der letzten Erhöhung möglich (§ 558 Abs. 1 BGB).');
     }
-    s.push(mi.kAus ? 'Kappungsgrenze ' + mi.kPct + ' % in drei Jahren laut Landesverordnung.' : 'Kappungsgrenze vorsichtig mit 15 % angesetzt. Gilt in der Gemeinde keine Verordnung, sind es 20 %.');
-    if (mi.bremse === true) s.push('In der Gemeinde gilt die Mietpreisbremse. Bei Neuvermietung höchstens Vergleichsmiete plus 10 %.');
+    s.push(mi.kAus ? 'Kappungsgrenze ' + mi.kPct + ' % in drei Jahren ' + (mi.kVo ? 'laut Landesverordnung.' : 'nach § 558 Abs. 3 BGB, für die Gemeinde gilt keine Landesverordnung.') : 'Kappungsgrenze vorsichtig mit 15 % angesetzt. Gilt in der Gemeinde keine Verordnung, sind es 20 %.');
+    /* Neuvermietung */
+    if (nv.art === 'bremse') s.push('In der Gemeinde gilt die Mietpreisbremse. Bei Neuvermietung höchstens ' + qmText(nv.qm, ca) + ', das ist die Vergleichsmiete plus 10 % (§ 556d BGB).');
+    else if (nv.art === 'bremse_ohne_vgl') s.push('In der Gemeinde gilt die Mietpreisbremse. Bei Neuvermietung höchstens Vergleichsmiete plus 10 %. Ohne Vergleichsmiete nennt DealPilot hier keine Zahl.');
+    else if (nv.art === 'richtwert') s.push('In der Gemeinde gilt keine Mietpreisbremse. Als Richtwert für die Neuvermietung dient die ortsübliche Vergleichsmiete von ' + qmText(nv.qm, ca) + '.');
+    else if (nv.art === 'richtwert_pruefen') s.push('Ob in der Gemeinde die Mietpreisbremse gilt, bitte prüfen. Als Richtwert für die Neuvermietung dient die ortsübliche Vergleichsmiete von ' + qmText(nv.qm, ca) + '. Gilt die Bremse, sind höchstens 10 % mehr zulässig.');
+    else s.push('Für die Neuvermietung nennt DealPilot ohne Vergleichsmiete keine Obergrenze.');
+    if (nv.qm > 0) {
+      if (nv.plus_monat > 0.5) s.push('Abstand zur Ist-Miete bei Neuvermietung: ' + eurS(nv.plus_monat) + ' im Monat, ' + eurS(nv.plus_jahr) + ' im Jahr.');
+      else if (nv.art === 'bremse') s.push('Die Ist-Miete liegt schon an oder über dieser Grenze. Bei Neuvermietung darf eine höhere Vormiete weiter verlangt werden (§ 556e BGB).');
+      else s.push('Die Ist-Miete liegt schon an oder über der Vergleichsmiete.');
+      if (mi.markt_qm > 0 && mi.markt_qm < nv.qm - 0.004) s.push('Der aktuelle Marktdurchschnitt liegt mit ' + qmText(mi.markt_qm) + ' darunter. Ob die Grenze erreichbar ist, hängt von Wohnung und Lage ab.');
+    }
+    if (mi.bestand && mi.bestand.plus_monat > 0.5) s.push('Abstand zur Ist-Miete im Bestand: ' + eurS(mi.bestand.plus_monat) + ' im Monat, ' + eurS(mi.bestand.plus_jahr) + ' im Jahr.');
     s.push('Orientierung, keine Rechtsberatung.');
     return s;
   }
@@ -535,11 +601,13 @@
     /* Mietpotenzial */
     if (d.miete) {
       var mi = d.miete;
-      seiten.push(D.seite(c, 'Mietpotenzial', D.abschnitt('Miete', 'Mietpotenzial', 'Ist-Miete aus deinen Unterlagen gegen den aktuellen Marktdurchschnitt.')
-        + D.kacheln([{ l: 'Ist-Miete', v: D.zahl(mi.ist_qm, 2) + ' €/m²' }, { l: 'Vergleichsmiete', v: mi.vgl_qm ? D.zahl(mi.vgl_qm, 2) + ' €/m²' : 'in der App', s: mi.vgl_qm ? '' : 'Abgleich mit dem Mietspiegel' },
+      /* v3944 · Vergleichsmiete mit Herkunft und die Obergrenze für Investoren (mietpotenzialAus, mieteZeilen) */
+      seiten.push(D.seite(c, 'Mietpotenzial', D.abschnitt('Miete', 'Mietpotenzial und Obergrenze', 'Ist-Miete aus deinen Unterlagen gegen die ortsübliche Vergleichsmiete und das, was rechtlich höchstens drin ist.')
+        + D.kacheln([{ l: 'Ist-Miete', v: D.zahl(mi.ist_qm, 2) + ' €/m²' },
+          { l: 'Vergleichsmiete', v: mi.vgl_qm ? (mi.vgl && mi.vgl.ca ? 'ca. ' : '') + D.zahl(mi.vgl_qm, 2) + ' €/m²' : 'kein Wert', s: mi.vgl_qm ? mi.vgl_herkunft : 'keine amtlichen Mietdaten für den Ort' },
           { l: 'Marktdurchschnitt', v: mi.markt_qm ? D.zahl(mi.markt_qm, 2) + ' €/m²' : 'nicht ermittelt', s: 'Angebotsmieten, Neuvermietung' }], true)
-        + '<ul>' + mieteSaetze(mi).map(function (t) { return '<li>' + D.esc(t) + '</li>'; }).join('') + '</ul>'
-        + (mi.neu && mi.neu.qm > 0 ? '<p>Bei Neuvermietung: ' + D.zahl(mi.neu.qm, 2) + ' €/m²' + (mi.neu.gedeckelt ? ', begrenzt durch die Mietpreisbremse' : '') + '.</p>' : '')));
+        + '<h3>Obergrenze für Investoren</h3>' + D.liste(mieteZeilen(mi), ['Miete', 'im Monat', 'Abstand im Monat', 'Abstand im Jahr'])
+        + '<ul>' + mieteSaetze(mi).map(function (t) { return '<li>' + D.esc(t) + '</li>'; }).join('') + '</ul>'));
     }
     /* Lage und Markt (Marktbericht in Kurzform) */
     if (m.verfuegbar) {

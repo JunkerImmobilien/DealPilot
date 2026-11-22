@@ -488,13 +488,16 @@ router.post('/reports/generate', async (req, res) => {
    saveFixture, keine Anschrift im Protokoll.
    v3941 · Stufe 2 (Erweiterte Marktpreisindikation, mit KI-Text wie in der App), Marcel 20.11.2026
    „Stufe 2 würde reichen“. Hier hoechstens 2: Boden-, Ertrags- und Sachwert verwirft der Orchestrator
-   unter Stufe 3 (cross_check nicht_im_umfang) - auch wenn ein Aufrufer 3 schickt. */
+   unter Stufe 3 (cross_check nicht_im_umfang) - auch wenn ein Aufrufer 3 schickt.
+   v3944 · dazu NUR die ortsuebliche Vergleichsmiete aus dem Quercheck (opts.vergleichsmiete,
+   lib/vergleichsmiete_auszug.js), Marcel 22.11.2026 „Vergleichsmieten angeben“. Antwortfeld
+   `vergleichsmiete` neben `data`, nicht im Payload. */
 router.post('/reports/einzelcheck', async (req, res) => {
   try {
     const b = Object.assign({}, req.body || {});
     delete b.user_id; delete b.external_ref; delete b.object_label;
     b.wert_stufe = Math.min(2, Math.max(1, Math.round(Number(b.wert_stufe) || 2)));
-    const out = await runLimited(() => ReportOrchestrator.generate(b, { ohneAblage: true }));
+    const out = await runLimited(() => ReportOrchestrator.generate(b, { ohneAblage: true, vergleichsmiete: true }));
     console.log(`[req] /reports/einzelcheck OK in ${out.took_ms}ms (ohne Ablage)`);
     res.json(out);
   } catch (e) {
@@ -1750,6 +1753,7 @@ router.post('/wertparameter/zinssatz', async (req, res) => {
     /* v2401a · die genaue Hausart wie im Bericht (ReportOrchestrator, v2381): mit „haus" fiel
        § 256 hier auf den MFH-Satz 4,0 % (gemessen Erfurt EFH), der Bericht rechnete 2,5 %. */
     const _zObjekt = { objart: d.objart, baujahr: m.build_year, einheiten: m.units,
+                wohnungen_im_gebaeude: m.wohnungen_im_gebaeude || null,   /* v3945 */
                 haustyp: d.haustyp, nutzung: d.nutzungsart, lage: d.lage };
     let p = await WertParameterService.hole({
       typ: 'lzs', ags: String(agsFein), objektart: m.property_subtype || m.property_type, anzahlWe: m.units || null,

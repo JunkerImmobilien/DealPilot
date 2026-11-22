@@ -22,6 +22,13 @@
  *   - Rabatt-Vorrang: der Anrechnungs-Code EC… ersetzt in den Paketlinks jeden anderen Code (Flyer);
  *     umgesetzt im Browser (frontend/landing/einzelcheck.js mitCode()).
  *
+ * v3944 (22.11.2026) · Marcel: „Vergleichsmieten angeben und Obergrenze für Investoren, was max drin ist.“
+ *   - Die ortsuebliche Vergleichsmiete kommt wieder mit, OHNE Stufe 3: der mb-Dienst nimmt sie in
+ *     /reports/einzelcheck vor der Stufensperre aus dem Quercheck (lib/vergleichsmiete_auszug.js, Antwortfeld
+ *     `vergleichsmiete` neben data). Nur Mietspiegel, amtliche Mietpreisuebersicht oder DealPilot-Naeherung,
+ *     sonst kein Wert. marktAus() -> vergleichsmiete, Weissliste vglAus().
+ *   - Die Obergrenze rechnet der Browser mit js/mietpotenzial-kern.js (zulaessig, neuvermietung, zielmieteBremse).
+ *
  * DATENSCHUTZ, VERBINDLICH (Pruefer: tools/einzelcheck-pruefen.mjs):
  *   1 Dateien nur im Arbeitsspeicher. multer.memoryStorage in der Route, pdftotext liest ueber STDIN und
  *     schreibt nach STDOUT - keine Datei auf der Platte, kein Puffer in der Datenbank. Gescannte PDFs
@@ -44,7 +51,7 @@
 const crypto = require('crypto');
 const { spawn } = require('child_process');
 
-const VERSION = 'v3941';
+const VERSION = 'v3944';
 const LOOKUP_KEY = 'dp_einzelcheck_399';
 /* Coupon in BEIDEN Stripe-Konten mit genau dieser ID anlegen (umgebungsblind wie ein lookup_key). */
 const ANRECHNUNG_COUPON = 'dp_einzelcheck_anrechnung';
@@ -532,6 +539,9 @@ async function handleEinzelcheckPaid(session) {
    Ertrags- und Sachwert, Liegenschaftszins und die ortsuebliche Vergleichsmiete (miete_stufe /
    miete_vergleich_qm stecken im Ertragswert) kommen damit NICHT mehr. marktAus() liest cross_check
    deshalb gar nicht mehr, auch wenn es da waere.
+   v3944 · Die Vergleichsmiete liefert der mb-Dienst als eigenes Feld out.vergleichsmiete (Auszug VOR der
+   Sperre, dieselbe Zahl wie Stufe 3). Uebernommen nur ueber die Weissliste vglAus(): Zahl, Art (mietspiegel,
+   amtlich, naeherung), Spanne, Einordnung. Kein Quellenname, kein Dokumenttitel.
 
    FELDZUORDNUNG Stufe 2 (Payload data.*) -> Bericht:
      micro.score                               -> lage.mikro
@@ -591,6 +601,16 @@ function textAus(md) {
   /* keine Ueberschrift ohne Inhalt: eine Ueberschrift direkt vor einer anderen oder am Ende faellt weg */
   return aus.filter(function (x, i) { return x.art !== 'h' || (aus[i + 1] && aus[i + 1].art !== 'h'); });
 }
+/* v3944 · Vergleichsmiete aus dem mb-Auszug, nur feste Felder. Kein Treffer heisst kein Wert. */
+const VGL_ARTEN = ['mietspiegel', 'amtlich', 'naeherung'];
+function vglAus(v) {
+  if (!v || v.verfuegbar !== true || VGL_ARTEN.indexOf(v.art) < 0) return null;
+  const qm = _n(v.qm);
+  if (!(qm > 0 && qm < 60)) return null;
+  const s = function (x) { const n = _n(x); return n > 0 && n < 60 ? n : null; };
+  return { qm: qm, art: v.art, ca: v.art === 'naeherung', unten: s(v.unten), mittel: s(v.mittel), oben: s(v.oben),
+    einordnung: /^(oben|mittel|unten)$/.test(String(v.einordnung || '')) ? v.einordnung : null };
+}
 function marktAus(out) {
   const p = (out && out.data) || {};
   const v = p.valuation || {}, mv = v.market_value || {};
@@ -606,8 +626,8 @@ function marktAus(out) {
       abschlag: _abschlagAus(mv.angebot_abschlag),
       miete_qm: _n(v.inputs && v.inputs.market_rent_sqm), brutto_pct: _n(v.yield && v.yield.gross_yield_pct),
       preis_trend_pct: _n(p.price_trend_pct), miete_trend_pct: _n(p.rent_trend_pct) },
-    /* Stufe 2 fuehrt keine ortsuebliche Vergleichsmiete (sie steckt im Ertragswert der Stufe 3) */
-    vergleichsmiete: null,
+    /* v3944 · Vergleichsmiete aus dem Auszug des mb-Dienstes (nie aus cross_check), sonst null */
+    vergleichsmiete: vglAus(out && out.vergleichsmiete),
     /* Statt der Wertindikation der Weg in die App - keine Zahl */
     wertermittlung: { in_app: true },
     text: (out && out.ai_mode === 'openai') ? textAus(out.report_md) : [],
@@ -677,6 +697,6 @@ module.exports = {
   hash, neuesToken, tokenForm, siegel, siegelPruefen, gueltigBis, istGueltig, berichtErlaubt,
   dateiPruefen, dateiname, zahlenSauber, zahlenAus, anzeigeAus, leseEine, auslesen,
   freiMoeglich, tagesverbrauchEur, preis, landingBasis, kaufAnlegen, kaufLesen, statusAus, berichtGezaehlt,
-  handleEinzelcheckPaid, marktAus, mbEingabe, markt, textAus, kostenErfassen, adresseAus, aufraeumen, starteTakt, MB_STUFE, OCR_SEITEN, OCR_ZEIT_MS,
+  handleEinzelcheckPaid, marktAus, vglAus, mbEingabe, markt, textAus, kostenErfassen, adresseAus, aufraeumen, starteTakt, MB_STUFE, OCR_SEITEN, OCR_ZEIT_MS,
   istExpose, _setzeDeps, _pdfText
 };

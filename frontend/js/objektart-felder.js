@@ -49,7 +49,7 @@
      abgeblendet. Die Kuerzel sind die Werte des Auswahlfeldes
      (index.html:1028) — gemessen, nicht geraten. */
   var ARTEN = {
-    ETW:   { passt: ['zimmer', 'bad_anz', 'etage', 'etagen_ges', 'mea'],
+    ETW:   { passt: ['zimmer', 'bad_anz', 'etage', 'etagen_ges', 'mea', 'wohnungen_geb' /* v3945 */],
              pflicht: ['mea'],
              hinweis: { mea: 'Bei Wohnungseigentum trägt der Miteigentumsanteil den Bodenwert.' } },
     EFH:   { passt: ['zimmer', 'bad_anz', 'etagen_ges'], pflicht: [] },
@@ -82,7 +82,7 @@
      steht, bleibt unberuehrt. Seit v2245 stehen Wohnflaeche und Baujahr
      hier mit drin - sie gelten fuer jede Art AUSSER dem unbebauten
      Grundstueck; der Kaufpreis gilt fuer alle. */
-  var ALLE = ['zimmer', 'bad_anz', 'etage', 'etagen_ges', 'einheiten', 'mea', 'wfl', 'baujahr', 'gsfl'];
+  var ALLE = ['zimmer', 'bad_anz', 'etage', 'etagen_ges', 'einheiten', 'wohnungen_geb', 'mea', 'wfl', 'baujahr', 'gsfl'];
 
   /* Warum ein Feld nicht passt — in der Sprache des Objekts, nicht der
      Software. */
@@ -93,6 +93,7 @@
     etagen_ges: 'gilt für Gebäude',
     einheiten:  'gilt für Gebäude mit mehreren Einheiten',
     mea:        'gilt nur für Wohnungseigentum',
+    wohnungen_geb: 'gilt nur für Wohnungseigentum',
     wfl:        'gilt nur für bebaute Grundstücke',
     baujahr:    'gilt nur für bebaute Grundstücke',
   };

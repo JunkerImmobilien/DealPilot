@@ -154,7 +154,7 @@ if (!window._wlc) {
      rechnete die Marktpreisindikation jedes Objekt als „gepflegt", ohne Ausstattung
      als „normal". Der DealPilotObjectMapper versteht das ganze Objekt; mit geht,
      was im Formular steht (leere Felder nicht). */
-  var ZUSATZ = ['ds2_zustand', 'ausst', 'ds2_energie', 'modernis', 'gsfl', 'einheiten', 'zimmer', 'etage', 'vermstand',
+  var ZUSATZ = ['ds2_zustand', 'ausst', 'ds2_energie', 'modernis', 'gsfl', 'einheiten', 'wohnungen_geb' /* v3945 */, 'zimmer', 'etage', 'vermstand',
     'eq_heating', 'eq_windows', 'eq_floor', 'eq_bath', 'eq_guest_wc', 'eq_store_room', 'eq_walls', 'eq_roof', 'eq_elevator',
     /* v1851 · N4: alles, was der Mapper seit v1851 liest - vorher kam vom
        Block Wertermittlung KEIN Feld an (gemessen 04.10.2026). Dazu nkm, brw,

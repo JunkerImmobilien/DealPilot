@@ -1788,7 +1788,10 @@ fallB('B71', () => {
   /* Gegenproben an der reinen Zweigwahl */
   const w = (z, o) => ZW.waehle(z, { objart: 'etw', ...o });
   const g1 = w(['we_v_bis10we', 'we_v_ueber10we'], {});
-  pruefe('B', 'B71', 'Gegenprobe: nur gestaffelte Sätze, keine Wohnungszahl → Rückfrage statt Raten', !g1.zweig && g1.rueckfrage === 'wohnungen_im_gebaeude' && g1.fehlt === 'einheiten', g1.rueckfrage);
+  /* v3945 · eigenes Feld wohnungen_im_gebaeude (Reiter Objekt „Wohnungen im Gebäude“, nur ETW) */
+  const w8 = w(['we_v_bis10we', 'we_v_ueber10we'], { wohnungen_im_gebaeude: 8 }), w14 = w(['we_v_bis10we', 'we_v_ueber10we'], { wohnungen_im_gebaeude: 14 });
+  pruefe('B', 'B71', 'eigenes Feld Wohnungen im Gebäude: 8 → bis10we, 14 → ueber10we', w8.zweig === 'we_v_bis10we' && w14.zweig === 'we_v_ueber10we', w8.zweig + ' / ' + w14.zweig);
+  pruefe('B', 'B71', 'Gegenprobe: nur gestaffelte Sätze, keine Wohnungszahl → Rückfrage statt Raten', !g1.zweig && g1.rueckfrage === 'wohnungen_im_gebaeude' && g1.fehlt === 'wohnungen_geb', g1.rueckfrage + ' fehlt ' + g1.fehlt);   /* v3945 · ETW fragt nach dem eigenen Feld */
   const g2 = w(['we_v', 'etw_erstverkauf'], { einheiten: 6 });
   pruefe('B', 'B71', 'Gegenprobe: Erstverkaufssatz greift ohne Markierung nie', g2.zweig === 'we_v', g2.zweig);
   const g3 = w(['we_v'], { einheiten: 6 });

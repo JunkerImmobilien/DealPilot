@@ -403,7 +403,7 @@ export function waehle(zweige, obj = {}, opt = {}) {
       if (mitStaffel.length) {
         if (_we == null) {
           if (!ohneStaffel.length) {
-            return { rueckfrage: 'wohnungen_im_gebaeude', fehlt: 'einheiten',
+            return { rueckfrage: 'wohnungen_im_gebaeude', fehlt: /^etw|teileigentum/.test(String(typ || '')) ? 'wohnungen_geb' : 'einheiten',   /* v3945 · ETW: eigenes Feld */
               auswahl: mitStaffel.map(weText), zweige: mitStaffel.map((d) => d.zweig),
               hinweis: 'Der Gutachterausschuss staffelt den Liegenschaftszinssatz nach der Zahl der '
                      + 'Wohnungen im Gebäude (' + mitStaffel.map(weText).join(' / ') + '). Bitte die '

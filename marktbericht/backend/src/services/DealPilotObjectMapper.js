@@ -473,6 +473,9 @@ export const DealPilotObjectMapper = {
          je BEWERTETER Einheit an (Anlage 3 ImmoWertV) und rechnete auf dem Objektweg
          ohne sie am Durchschnitt. Der Sprechlauf fragt sie beim MFH jetzt ab. */
       units: num(pick(d, ['einheiten', 'units'])),
+      /* v3945 · Wohnungseigentum: Wohnungen im ganzen Gebaeude (eigenes Feld wohnungen_geb), nur fuer die Staffel
+         des Liegenschaftszinses (zweigwahl.wohnungenImGebaeude). NICHT units: units teilt die Wohnflaeche. */
+      wohnungen_im_gebaeude: num(pick(d, ['wohnungen_geb', 'wohnungen_im_gebaeude'])),
       gewerbe: gewerbeAus(d),   /* v2210 */
       leerstand: leerstandAus(d),   /* v2520 */
       einheiten_miete: einheitenMieteAus(d),   /* v2540 */

@@ -1132,6 +1132,8 @@ label.dp-required.qc-required::after {
         <div class="f"><label>Etage</label><input id="etage" type="text" inputmode="decimal" placeholder="z.B. 1"></div>
         <div class="f"><label>Anzahl Etagen</label><input id="etagen_ges" type="text" inputmode="decimal" placeholder="z.B. 3"></div>
         <div class="f"><label>Wohneinheiten im Gebäude</label><div class="iw"><input id="einheiten" type="text" inputmode="numeric" placeholder="10" class="tr" oninput="calc()"></div></div>
+        <!-- v3945 · nur Wohnungseigentum: Wohnungen im ganzen Gebaeude (Staffel des Liegenschaftszinses, z. B. Offenbach bis/ueber 10). Eigenes Feld, weil einheiten an fuenf Stellen die Wohnflaeche teilt -->
+        <div class="f"><label>Wohnungen im Gebäude</label><div class="iw"><input id="wohnungen_geb" type="text" inputmode="numeric" placeholder="z.B. 8" class="tr"></div></div>
         <div class="f"><label>Grundstücksfläche (m²) <button type="button" class="dp-tip" data-tip-id="tab1.wert_gsfl" tabindex="-1" aria-label="Hilfe zu Grundstücksfläche"></button></label><div class="iw"><input id="gsfl" type="text" inputmode="decimal" placeholder="1570" class="tr" oninput="calc()"><span class="sfx">m²</span></div></div>
         <div class="f"><label>Miteigentumsanteil (%) <button type="button" class="dp-tip" data-tip-id="tab1.miteigentumsanteil" tabindex="-1" aria-label="Hilfe zu tab1.miteigentumsanteil"></button></label><div class="iw"><input id="mea" type="text" inputmode="decimal" placeholder="7,06" class="tr" oninput="calc()"><span class="sfx">%</span></div></div>
         <div id="mfh-einstieg" class="od-mfh" style="display:none"></div>
@@ -4077,7 +4079,7 @@ label.dp-required.qc-required::after {
 <script src="js/marktdaten-modal.js?v=v2247c"></script>
 <script src="js/ui.js?v=v3444"></script>
 <script src="js/sidebar-collapse.js?v=20260611174630"></script>
-<script src="js/storage.js?v=v3942"></script>
+<script src="js/storage.js?v=v3945"></script>
 <script src="js/nachrechnen.js?v=v3031"></script><!-- v3031: Kennzahlen/Scores gespeicherter Objekte neu rechnen (nur auf Aufruf) -->
 <!-- v845-newsearch-removed: sb-search.js entfernt (Kollision mit sidebar-search.js) -->
 <script src="js/inventar-sync.js?v=v3006c"></script><!-- V291-inv-sync-applied -->
@@ -4126,7 +4128,7 @@ label.dp-required.qc-required::after {
 <script src="js/bodenrichtwert.js?v=v3208by"></script>
 <script src="js/brw-karte.js?v=v3241"></script><!-- v3237 · Bodenrichtwert-Karte -->
 <!-- v1391: welche Felder zu welcher Objektart gehoeren -->
-<script src="js/objektart-felder.js?v=v2824"></script>
+<script src="js/objektart-felder.js?v=v3945"></script>
 <script src="js/vgf-merkmale.js?v=v3008"></script>
 <!-- v3073: Detailgrad Einsteiger · Fortgeschritten · Experte - Zuordnung (erzeugt aus design/Vorschläge/arbeitsbereich-detailgrad-zuordnung.json) und Modul -->
 <script src="js/data/detailgrad-zuordnung.js?v=v3910"></script>
@@ -4206,7 +4208,7 @@ label.dp-required.qc-required::after {
 <script src="js/jahresbuch-grafik.js?v=v3433"></script><!-- v3364 · Verlaufsgrafik Plan gegen Ist · v3430 Engine für Jahresabgleich und Haus -->
 <script src="js/jahresabgleich.js?v=v3434"></script><!-- v3420 · Jahresabgleich im Bestand: erster Unterreiter der Pilot-Analyse (Miete, Steuer, Wert, Haus) · v3430 Demo Fassung 2 -->
 <script src="js/wert-zielbild.js?v=v3720"></script><!-- v2840 · Tab Bewertung: Segment „Wert &amp; Zielbild"; Pilot-Analyse: Einfach | Genau -->
-<script src="js/dealpilot-mb.js?v=v3800"></script>
+<script src="js/dealpilot-mb.js?v=v3945"></script>
 <script src="js/mb-abgleich.js?v=v3840b"></script><!-- v3002 · Abgleich mit dem Marktbericht in den Reitern Objekt und Miete -->
 <script src="js/mb-auftrag.js?v=v3253"></script>
   <script src="js/marktbericht-view.js?v=v3641"></script>

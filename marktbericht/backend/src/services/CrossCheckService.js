@@ -404,6 +404,8 @@ export const CrossCheckService = {
           /* v2396 · Rueckfragen statt Zufall bei gleich passenden Zweigen (Dresden) */
           haustyp: 'die Hausart (Reihenend- oder Reihenmittelhaus)',
           bauweise: 'die Bauweise (offen oder geschlossen)',
+          /* v3945 · Staffel nach Wohnungen im Gebaeude (Offenbach) */
+          einheiten: 'die Zahl der Wohneinheiten im Gebäude', wohnungen_geb: 'die Zahl der Wohnungen im Gebäude (Reiter Objekt)',
         }[_rf.fehlt || _rf.grund] || 'eine Angabe';
         const _auswahl = (Array.isArray(_rf.auswahl) && _rf.auswahl.length)
           ? ' Der Ausschuss führt: ' + _rf.auswahl.slice(0, 12).join(', ') + '.' : '';

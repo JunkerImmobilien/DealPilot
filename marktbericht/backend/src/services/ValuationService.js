@@ -124,6 +124,7 @@ export function abschlagAusLzs(ref, sale, area, opt) {
     const objart = ref.property_subtype || ref.property_type;
     const obj = { objart, nutzung: ref.nutzung || ref.usage_type || 'vermietet', haustyp: ref.haustyp || null,
       baujahr: ref.build_year || null, einheiten: ref.units || null, lage: ref.lage || null,
+      wohnungen_im_gebaeude: ref.wohnungen_im_gebaeude || null,   /* v3945 */
       stadtteil: ref.stadtteil || ref.ortsteil || null, bauweise: ref.bauweise || null };
     const typ = typVon(obj);
     if (!typ || !LZS_AB_TEILMARKT[typ]) return nein('K1: kein Wohnteilmarkt für Objektart ' + (objart || '-'));

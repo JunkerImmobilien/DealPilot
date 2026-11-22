@@ -1,5 +1,6 @@
 // v564-neutralized: Anbieternamen aus provenance + steps entfernt
 // ReportOrchestrator.js — orchestriert die gesamte Bericht-Pipeline.
+// v3944 · Einzel-Check: opts.vergleichsmiete nimmt VOR der Stufensperre nur die Vergleichsmiete aus dem Quercheck (lib/vergleichsmiete_auszug.js)
 import { q, q1 } from '../lib/db.js';
 import { quelleFuer, quellenSatz } from '../lib/quellen_links.js';   /* v1099b-WQL */
 import { cfg, geomapEnabled, geoEnabled } from '../lib/config.js';
@@ -55,6 +56,7 @@ import { zensusMieteAmStichtag, nkmIndexAm, NKM_INDEX } from '../lib/zensus_miet
 import { protokolliereMessung as protokolliereAbschlag } from './JahreswerteService.js';   /* v3021 */
 import { stichtagVon, stichtagJahr, stichtagIso } from '../lib/stichtag.js';
 import { vergleichsmieteKontext } from '../lib/mietanker_kontext.js';   /* v3343 · Vergleichsmiete der Wohnung */
+import { vergleichsmieteAuszug } from '../lib/vergleichsmiete_auszug.js';   /* v3944 · Einzel-Check: nur die Vergleichsmiete aus dem Quercheck */
 import { regVfEingabe, regVfErgebnis } from '../lib/vergleichsfaktor_eingabe.js';   /* v3200 */   /* v3010 · Wertermittlungsstichtag */
 
 /* v3043 · Fortschreibungsfaktor der Zensus-Miete zum Stichtag an den Zensus-Block haengen */
@@ -208,6 +210,7 @@ export const ReportOrchestrator = {
       garden_area: input.garden_area ? Number(input.garden_area) : null,
       plot_area: input.plot_area ? Number(input.plot_area) : null,
       units: input.units ? Number(input.units) : null,
+      wohnungen_im_gebaeude: input.wohnungen_im_gebaeude ? Number(input.wohnungen_im_gebaeude) : null,   /* v3945 · nur ETW, Staffel des LZS */
       /* v2210 · Gewerbeteil aus den MFH-Einheiten (DealPilotObjectMapper.gewerbeAus) - ohne
          diese Zeile laege er im input und kaeme im CrossCheckService nie an (wie WREF-1). */
       gewerbe: (input.gewerbe && typeof input.gewerbe === 'object') ? input.gewerbe : null,
@@ -981,6 +984,7 @@ export const ReportOrchestrator = {
           restnutzungsdauer: _rndVorab.rnd,
           gemeinde: ref.gemeinde || null,   /* v3009 · W3 · Zu-/Abschlag nach Gemeinde (§ 33) */
           einheiten: ref.units || null,
+          wohnungen_im_gebaeude: ref.wohnungen_im_gebaeude || null,   /* v3945 */
           lage: ref.lage || null,
           stadtteil: ref.stadtteil || ref.ortsteil || null,
           norm_brw: _hhNorm19 ? _hhNorm19.wert : null,   /* v3205 · Hamburg-Formelwerk */
@@ -1817,6 +1821,15 @@ export const ReportOrchestrator = {
      *
      * Quellennachweis faellt mit: genannt wird nur, was im Bericht steckt. */
     const _stufe = Number(ref.wert_stufe) || 1;
+    /* v3944 · Einzel-Check (Marcel 22.11.2026 „Vergleichsmieten angeben“): VOR der Sperre nur die
+       Vergleichsmiete aus dem Quercheck herausnehmen (lib/vergleichsmiete_auszug.js), dieselbe Zahl wie
+       Stufe 3. Nur auf ausdruecklichen Wunsch des Aufrufers (opts.vergleichsmiete, Route /reports/einzelcheck),
+       nicht im Payload: sie geht weder in den KI-Text noch in eine Ablage. */
+    let _vglAuszug = null;
+    if (opts && opts.vergleichsmiete) {
+      try { _vglAuszug = vergleichsmieteAuszug(crossCheck); } catch (e) { _vglAuszug = { verfuegbar: false, grund: 'fehler' }; }
+      step('vergleichsmiete (Auszug): ' + (_vglAuszug.verfuegbar ? _vglAuszug.qm + ' EUR/m2 (' + _vglAuszug.art + ')' : 'keine (' + _vglAuszug.grund + ')'));
+    }
     if (_stufe < 3) {
       crossCheck = {
         available: false,
@@ -2078,7 +2091,8 @@ export const ReportOrchestrator = {
       return { report_id: null, property_id: null, object_key: null, external_ref: null, ohne_ablage: true,
         ai_mode: report.mode, ai_error: report.error || null,
         cost: { geomap_eur: geomapCostEur, openai_posten: (report && report.ki_posten) || [] },
-        took_ms: Date.now() - t0, data: payload, report_md: report.report_md };
+        took_ms: Date.now() - t0, data: payload, report_md: report.report_md,
+        ...(_vglAuszug ? { vergleichsmiete: _vglAuszug } : {}) };   /* v3944 · nur mit opts.vergleichsmiete */
     }
     await q('INSERT INTO mb.valuation_results (property_id,result) VALUES ($1,$2)',
       [propertyId, JSON.stringify(valuation)]);

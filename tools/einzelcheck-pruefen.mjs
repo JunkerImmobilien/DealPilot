@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/* tools/einzelcheck-pruefen.mjs — v3940 / v3941 · Einzel-Check der Landing (ohne Netz, ohne Datenbank)
+/* tools/einzelcheck-pruefen.mjs — v3940 / v3941 / v3944 · Einzel-Check der Landing (ohne Netz, ohne Datenbank)
  *
  *   node tools/einzelcheck-pruefen.mjs        RC=0 sauber
  *
@@ -23,13 +23,16 @@
  *     stdin/stdout, fs-Spion), höchstens 6 Seiten, Zeitlimit, Schwärzen danach, zählt im freien Teil mit
  *   M v3941 · Rabatt-Vorrang: der Anrechnungs-Code EC… ersetzt in den Paketlinks den Flyer-Code
  *     (die App liest den ersten code=), Satz „nicht kombinierbar“
+ *   N v3944 · Vergleichsmiete (Auszug aus dem Quercheck vor der Stufensperre, nur Mietspiegel, amtlich, Näherung,
+ *     ohne Treffer kein Wert) und Obergrenze für Investoren mit dem echten js/mietpotenzial-kern.js: Fälle mit
+ *     Vergleichsmiete, ohne Vergleichsmiete, mit Bremse, Bremse ohne Vergleichsmiete, Näherung bei offener Bremse
  *   GEGENPROBE: jede Sperre einzeln aus einer Kopie im Speicher entfernt -> der zugehörige Teil muss rot werden.
  */
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import Module, { createRequire } from 'node:module';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { spawnSync, spawn as spawnEcht } from 'node:child_process';
 
 const WURZEL = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -49,9 +52,14 @@ const P = {
   faecher: path.join(WURZEL, 'frontend/landing/landing-faecher.js'),
   ocr: path.join(WURZEL, 'backend/src/services/ocr.js'),
   flyerApp: path.join(WURZEL, 'frontend/js/flyer-code.js'),
-  flyerLanding: path.join(WURZEL, 'frontend/landing/flyer-code.js')
+  flyerLanding: path.join(WURZEL, 'frontend/landing/flyer-code.js'),
+  /* v3944 · Vergleichsmiete und Obergrenze */
+  mbVgl: path.join(WURZEL, 'marktbericht/backend/src/lib/vergleichsmiete_auszug.js'),
+  kern: path.join(WURZEL, 'frontend/js/mietpotenzial-kern.js'),
+  kappDaten: path.join(WURZEL, 'frontend/js/data/kappungsgrenzen.json')
 };
-const lies = (p) => fs.readFileSync(p, 'utf8');
+/* v3944 · Zeilenenden auf LF: die Anker der Gegenprobe stehen mit \n, die Windows-Arbeitskopie hat CRLF (autocrlf) */
+const lies = (p) => fs.readFileSync(p, 'utf8').replace(/\r\n/g, '\n');
 const ohneKommentar = (t) => t.replace(/\/\*[\s\S]*?\*\//g, (m) => m.replace(/[^\n]/g, ' ')).replace(/(^|[^:'"`\\])\/\/.*$/gm, '$1');
 
 process.env.EINZELCHECK_SIEGEL = 'pruefer-geheimnis-nur-fuer-den-test-0123456789';
@@ -145,6 +153,7 @@ function umgebung(opt) {
       price_trend_pct: 2.1, rent_trend_pct: 1.4, days_on_market: 61, wertermittlungsstichtag: { datum: '2026-11-21', eigen: false },
       cross_check: { ertragswert: { available: true, value_eur: 185000, liegenschaftszins_pct: 2.9, miete_vergleich_qm: 7.8, miete_stufe: { etikett: 'ImmobilienScout-Angebote' } }, sachwert: { available: false, grund: 'Sachwertfaktor fehlt' } },
       wertermittlung_herkunft: { kurz: 'amtlich', indikativ: false } } };
+    if (opt.vgl !== undefined) daten.vergleichsmiete = opt.vgl;   /* v3944 · Auszug der Vergleichsmiete neben data */
     return { ok: true, text: async () => JSON.stringify(daten) };
   };
   return { log, ki, sql, tab, stripeLog, kiPosten, deps: { pdfText, ocr, kiVerbrauch, schwaerzen: sw, dokumentSchemas, openai, query, stripe: () => stripe, mbFetch, jetzt: () => uhr },
@@ -545,6 +554,148 @@ TEILE.M = async function (svc, q) {
   return f;
 };
 
+/* v3944 · N · Vergleichsmiete und Obergrenze für Investoren (Marcel 22.11.2026)
+   Kette am echten Code: Quercheck -> mb lib/vergleichsmiete_auszug.js -> Antwort des mb-Dienstes -> services/einzelcheck.js
+   vglAus -> frontend/landing/einzelcheck.js mietpotenzialAus/mieteZeilen/mieteSaetze mit dem ECHTEN
+   js/mietpotenzial-kern.js und der echten js/data/kappungsgrenzen.json. Fälle: mit Vergleichsmiete (Mietspiegel,
+   ohne Bremse), ohne Vergleichsmiete, mit Bremse, Bremse ohne Vergleichsmiete, Näherung (ca.), Bremse offen. */
+const KUNDENTEXT_VERBOTEN = /[–—;]|mietwucher|immobilienscout|immo\s*scout|immowelt|geomap|pricehubble|sprengnetter|zensus|regionaldatenbank/i;
+function frontMiete(front) {
+  const vh = /var VGL_HERKUNFT = \{[\s\S]*?\};/.exec(front);
+  const koepfe = ['function istZahl(v)', 'function dez(n, st)', 'function eur(n)', 'function eurS(n)', 'function mietpotenzialAus(MP, kappDaten, ist, wfl, m)',
+    'function qmText(x, ca)', 'function spanneText(vg)', 'function mieteZeilen(mi)', 'function mieteSaetze(mi)'];
+  const teile = koepfe.map((k) => fnAus(front, k));
+  if (!vh || teile.some((x) => !x)) return null;
+  return new Function(vh[0] + '\n' + teile.join('\n') + '\n; return { mietpotenzialAus, mieteZeilen, mieteSaetze };')();
+}
+TEILE.N = async function (svc, q) {
+  const f = [];
+  /* 1 · mb-Auszug: nur Mietspiegel, amtliche Mietpreisübersicht, Näherung. Kein Quellentext nach außen. */
+  let A;
+  try { A = await import('data:text/javascript,' + encodeURIComponent(q.mbVgl)); } catch (e) { return ['mb-Auszug lädt nicht: ' + e.message]; }
+  const cc = (code, qm, spanne) => ({ ertragswert: { available: true, value_eur: 185000, liegenschaftszins_pct: 2.9,
+    miete_stufe: { code, etikett: 'Vergleichsmiete der Wohnung (qualifizierter Mietspiegel Musterstadt)', quelle: 'Mietspiegel Musterstadt 2025, S. 4, ImmobilienScout', qm },
+    miete_band: spanne ? { spanne: { unten: spanne[0], mittel: spanne[1], oben: spanne[2], ca: code === 'naeherung' }, einordnung: { wahl: 'mittel', text: 'Einordnung am Mittelwert' } } : null } });
+  const msp = A.vergleichsmieteAuszug(cc('mietspiegel', 8.4, [7.2, 8.4, 9.6]));
+  if (!msp.verfuegbar || msp.qm !== 8.4 || msp.art !== 'mietspiegel' || msp.unten !== 7.2 || msp.oben !== 9.6 || msp.ca || msp.einordnung !== 'mittel') f.push('Auszug Mietspiegel: ' + JSON.stringify(msp));
+  if (/Musterstadt|ImmobilienScout|S\. 4|185000|2\.9/.test(JSON.stringify(msp))) f.push('Auszug trägt Quelle, Dokument oder Ertragswert: ' + JSON.stringify(msp));
+  const amt = A.vergleichsmieteAuszug(cc('amtlich', 6.1, null));
+  if (!amt.verfuegbar || amt.qm !== 6.1 || amt.art !== 'amtlich' || amt.unten !== null) f.push('Auszug amtlich: ' + JSON.stringify(amt));
+  const nae = A.vergleichsmieteAuszug(cc('naeherung', 7.05, [6.06, 7.05, 8.04]));
+  if (!nae.verfuegbar || !nae.ca) f.push('Auszug Näherung ohne ca.: ' + JSON.stringify(nae));
+  for (const c of ['satz_mittel', 'zensus', 'angebot']) {
+    const x = A.vergleichsmieteAuszug(cc(c, 7.5, null));
+    if (x.verfuegbar !== false || x.qm !== undefined) f.push('Auszug gibt „' + c + '“ als Vergleichsmiete aus: ' + JSON.stringify(x));
+  }
+  /* am ECHTEN Quercheck: ETW ohne Miteigentumsanteil (Ertragswert nicht ausgewiesen), Mietspiegel-Werte Wolfsburg -
+     der Anker steht oben in crossCheck.miete_band, dieselbe Zahl wie in Stufe 3 */
+  try {
+    const W = path.join(WURZEL, 'marktbericht/backend/src/');
+    const { CrossCheckService } = await import(pathToFileURL(W + 'services/CrossCheckService.js').href);
+    const { werteFuer } = await import(pathToFileURL(W + 'lib/mietspiegel/werte.js').href);
+    const ags = '03103000', werte = werteFuer(ags);
+    if (!werte) f.push('Mietspiegel-Werte ' + ags + ' fehlen (Testfall anpassen)');
+    else {
+      const echt = CrossCheckService.compute({ property_type: 'etw', living_area: 70, build_year: 1975, units: 1, monthly_net_rent: 500, ags },
+        { available: true, value_sqm: 200 }, { median_per_sqm: 9 }, { market_value: { estimated: 150000 } },
+        { lzs_pct: 2.5, lzs_stufe: 'B', lzs_quelle: 'Test', vergleichsmiete_kontext: { ags, werte, naeherung_param: null, zensus_zeilen: null, baujahr: 1975, signale: {}, bremse: null } });
+      const ax = A.vergleichsmieteAuszug(echt);
+      const anker = echt.miete_band && echt.miete_band.anker_qm;
+      if (!ax.verfuegbar || ax.art !== 'mietspiegel' || !(ax.qm > 0) || ax.qm !== Math.round(anker * 100) / 100) f.push('echter Quercheck: Auszug ' + JSON.stringify(ax) + ' gegen Anker ' + anker);
+      if (echt.ertragswert && echt.ertragswert.available !== false) f.push('Testfall: Ertragswert sollte ohne Miteigentumsanteil fehlen');
+    }
+  } catch (e) { f.push('echter Quercheck lädt nicht: ' + e.message); }
+  const leer = A.vergleichsmieteAuszug({ available: false, nicht_im_umfang: true });
+  if (leer.verfuegbar !== false || leer.grund !== 'nicht_ermittelt') f.push('Auszug ohne Quercheck: ' + JSON.stringify(leer));
+  /* 2 · mb: Auszug VOR der Stufensperre, nur auf Wunsch, neben data (nicht im Payload, nicht im KI-Text) */
+  const o = q.mbOrch, iAus = o.indexOf('_vglAuszug = vergleichsmieteAuszug(crossCheck)'), iSperre = o.indexOf('if (_stufe < 3) {');
+  if (iAus < 0 || iSperre < 0 || iAus > iSperre) f.push('mb: Auszug nicht vor der Stufensperre');
+  if (!/if \(opts && opts\.vergleichsmiete\) \{/.test(o)) f.push('mb: Auszug nicht an opts.vergleichsmiete gebunden');
+  if (/payload\.vergleichsmiete\s*=|vergleichsmiete: _vglAuszug[^}]*\}\s*;?\s*\n\s*const payload/.test(o)) f.push('mb: Auszug im Payload');
+  const ohneBlk = (o.split('if (OHNE_ABLAGE) {')[1] || '').split('await q(')[0];
+  if (!/vergleichsmiete: _vglAuszug/.test(ohneBlk)) f.push('mb: Auszug nicht in der Antwort ohne Ablage');
+  const blk = (q.mbApi.split("router.post('/reports/einzelcheck'")[1] || '').split('router.post(')[0];
+  if (!/generate\(b, \{ ohneAblage: true, vergleichsmiete: true \}\)/.test(blk)) f.push('mb: Route /reports/einzelcheck fragt die Vergleichsmiete nicht an');
+  /* 3 · Dienst: Weissliste, nie aus cross_check */
+  const lauf = async (vgl) => { const U = umgebung({ vgl }); svc._setzeDeps(U.deps);
+    try { return await svc.markt({ plz: '32609', ort: 'Hüllhorst', wfl: 100, kp: 180000, nkm: 650, art: 'ETW' }, STRASSE + ', 32609 Hüllhorst'); } finally { svc._setzeDeps(null); } };
+  const mMit = await lauf(Object.assign({ quelle: 'ImmobilienScout', etikett: 'Mietspiegel Musterstadt', herkunft: 'S. 4' }, msp));
+  const vj = JSON.stringify(mMit.vergleichsmiete);
+  if (!mMit.vergleichsmiete || mMit.vergleichsmiete.qm !== 8.4 || mMit.vergleichsmiete.art !== 'mietspiegel' || mMit.vergleichsmiete.oben !== 9.6) f.push('Dienst übernimmt die Vergleichsmiete nicht: ' + vj);
+  if (/ImmobilienScout|Musterstadt|S\. 4|quelle|etikett|herkunft/.test(vj || '')) f.push('Dienst reicht Quellentext durch: ' + vj);
+  const mOhne = await lauf(undefined);
+  if (mOhne.vergleichsmiete !== null) f.push('ohne Auszug trotzdem eine Vergleichsmiete (aus cross_check?): ' + JSON.stringify(mOhne.vergleichsmiete));
+  const mFremd = await lauf({ verfuegbar: true, qm: 7.5, art: 'zensus' });
+  if (mFremd.vergleichsmiete !== null) f.push('Dienst nimmt Art „zensus“ als Vergleichsmiete');
+  const mKein = await lauf({ verfuegbar: false, grund: 'keine_vergleichsmiete' });
+  if (mKein.vergleichsmiete !== null) f.push('Dienst erfindet eine Vergleichsmiete ohne Treffer');
+  /* 4 · Frontend mit dem echten Kern */
+  const front = q.front;
+  const F = frontMiete(front);
+  if (!F) return f.concat(['Frontend: mietpotenzialAus/mieteZeilen/mieteSaetze nicht gefunden']);
+  let MP, KD;
+  try { MP = require(P.kern); KD = JSON.parse(lies(P.kappDaten)); } catch (e) { return f.concat(['Kern oder Kappungsdaten laden nicht: ' + e.message]); }
+  const mitOrt = (m, ags) => Object.assign({}, m, { lage: Object.assign({}, m.lage, { ags }) });
+  const faelle = [];
+  /* A · Mietspiegel, Hüllhorst (keine Bremse, Kappung 20 % Gesetz): Ist 650 €, 100 m², Vergleichsmiete 8,40 */
+  faelle.push(['mit Vergleichsmiete, ohne Bremse', F.mietpotenzialAus(MP, KD, 650, 100, mitOrt(mMit, '05770016')), (mi, s) => {
+    const w = [];
+    if (mi.vgl_qm !== 8.4 || mi.bremse !== false) w.push('vgl ' + mi.vgl_qm + ', Bremse ' + mi.bremse);
+    if (!mi.bestand || mi.bestand.monat !== 780 || mi.bestand.plus_monat !== 130 || mi.bestand.plus_jahr !== 1560) w.push('Bestand ' + JSON.stringify(mi.bestand) + ' (erwartet 780, +130, +1.560: Kappung 20 %)');
+    if (mi.nv.art !== 'richtwert' || mi.nv.qm !== 8.4 || mi.nv.monat !== 840 || mi.nv.plus_monat !== 190 || mi.nv.plus_jahr !== 2280) w.push('Neuvermietung ' + JSON.stringify(mi.nv) + ' (erwartet Richtwert 8,40, 840, +190, +2.280)');
+    if (!/Ortsübliche Vergleichsmiete 8,40 €\/m² \(amtliche Mietdaten, Mietspiegel der Gemeinde, Spanne 7,20 bis 9,60 €\/m²\)\./.test(s)) w.push('Satz zur Vergleichsmiete fehlt');
+    if (!/gilt keine Mietpreisbremse\. Als Richtwert für die Neuvermietung dient die ortsübliche Vergleichsmiete von 8,40 €\/m²/.test(s)) w.push('Richtwert-Satz fehlt');
+    if (!/\+190 € im Monat, \+2\.280 € im Jahr/.test(s) || !/\+130 € im Monat, \+1\.560 € im Jahr/.test(s)) w.push('Abstand in Monat und Jahr fehlt');
+    return w; }]);
+  /* B · ohne Vergleichsmiete (kein Treffer): keine Zahl, nur Kappung */
+  faelle.push(['ohne Vergleichsmiete', F.mietpotenzialAus(MP, KD, 650, 100, mitOrt(mOhne, '05770016')), (mi, s) => {
+    const w = [];
+    if (mi.vgl_qm !== null || mi.nv.qm !== null || mi.nv.art !== 'ohne') w.push('Zahl ohne Treffer: ' + JSON.stringify(mi.nv));
+    if (!mi.zul.vgl_fehlt || !mi.bestand || mi.bestand.monat !== 780) w.push('Bestand ohne Vergleichsmiete ' + JSON.stringify(mi.bestand));
+    if (!/keine amtlichen Mietdaten zur Vergleichsmiete vor\. DealPilot nennt deshalb keine Zahl\./.test(s) || !/nur bis zur Kappungsgrenze/.test(s)) w.push('Hinweis ohne Vergleichsmiete fehlt');
+    if (/Vergleichsmiete \d|Richtwert|Obergrenze, /.test(s)) w.push('Zahl zur Vergleichsmiete trotz fehlendem Wert');
+    return w; }]);
+  /* C · Bremse (Köln, Kappung 15 %): Ist 800 €, 100 m², Vergleichsmiete 10,00 -> Obergrenze 11,00 */
+  const v10 = Object.assign({}, mMit.vergleichsmiete, { qm: 10, unten: null, mittel: null, oben: null, art: 'amtlich' });
+  faelle.push(['mit Bremse', F.mietpotenzialAus(MP, KD, 800, 100, mitOrt(Object.assign({}, mMit, { vergleichsmiete: v10 }), '05315000')), (mi, s) => {
+    const w = [];
+    if (mi.bremse !== true || mi.kPct !== 15 || !mi.kAus) w.push('Bremse/Kappung Köln: ' + mi.bremse + ', ' + mi.kPct);
+    if (!mi.bestand || mi.bestand.monat !== 920 || mi.bestand.plus_jahr !== 1440) w.push('Bestand ' + JSON.stringify(mi.bestand) + ' (erwartet 920, +1.440)');
+    if (mi.nv.art !== 'bremse' || mi.nv.qm !== 11 || mi.nv.monat !== 1100 || mi.nv.plus_monat !== 300 || mi.nv.plus_jahr !== 3600) w.push('Obergrenze ' + JSON.stringify(mi.nv) + ' (erwartet 11,00, 1.100, +300, +3.600)');
+    if (!/gilt die Mietpreisbremse\. Bei Neuvermietung höchstens 11,00 €\/m², das ist die Vergleichsmiete plus 10 % \(§ 556d BGB\)\./.test(s)) w.push('Bremse-Satz fehlt');
+    if (!/amtliche Mietdaten des Gutachterausschusses/.test(s)) w.push('Herkunft amtlich fehlt');
+    if (!/Marktdurchschnitt liegt mit 9,10 €\/m² darunter/.test(s)) w.push('Hinweis Marktdurchschnitt unter der Grenze fehlt');
+    return w; }]);
+  /* D · Bremse ohne Vergleichsmiete: keine Zahl */
+  faelle.push(['Bremse ohne Vergleichsmiete', F.mietpotenzialAus(MP, KD, 800, 100, mitOrt(mOhne, '05315000')), (mi, s) => {
+    const w = [];
+    if (mi.nv.art !== 'bremse_ohne_vgl' || mi.nv.qm !== null) w.push('Obergrenze ohne Vergleichsmiete: ' + JSON.stringify(mi.nv));
+    if (!/Ohne Vergleichsmiete nennt DealPilot hier keine Zahl\./.test(s)) w.push('Satz fehlt');
+    return w; }]);
+  /* E · Näherung (ca.), Bremse offen (ohne Gemeindeschlüssel) */
+  faelle.push(['Näherung, Bremse offen', F.mietpotenzialAus(MP, KD, 600, 100, Object.assign({}, mMit, { lage: {}, vergleichsmiete: Object.assign({}, nae) })), (mi, s) => {
+    const w = [];
+    if (mi.bremse !== null || mi.nv.art !== 'richtwert_pruefen' || mi.nv.qm !== 7.05) w.push('offen: ' + mi.bremse + ' ' + JSON.stringify(mi.nv));
+    if (!/Ortsübliche Vergleichsmiete ca\. 7,05 €\/m² \(Schätzung von DealPilot aus amtlichen Mietdaten der Gemeinde, nicht amtlich, Spanne ca\. 6,06 bis 8,04 €\/m²\)/.test(s)) w.push('Näherung nicht als Schätzung gekennzeichnet');
+    if (!/Ob in der Gemeinde die Mietpreisbremse gilt, bitte prüfen\./.test(s)) w.push('Hinweis „bitte prüfen“ fehlt');
+    return w; }]);
+  for (const [name, mi, pruef] of faelle) {
+    const saetze = F.mieteSaetze(mi), zeilen = F.mieteZeilen(mi);
+    const s = saetze.join(' | ');
+    pruef(mi, s).forEach((x) => f.push(name + ': ' + x));
+    const alles = s + ' ' + JSON.stringify(zeilen);
+    if (KUNDENTEXT_VERBOTEN.test(alles)) f.push(name + ': Kundentext mit Gedankenstrich, Semikolon, Quelle oder „Mietwucher“: ' + (alles.match(KUNDENTEXT_VERBOTEN) || [])[0]);
+    if (!/Orientierung, keine Rechtsberatung\./.test(s)) f.push(name + ': Hinweis „keine Rechtsberatung“ fehlt');
+  }
+  /* 5 · nur der Kern rechnet, im Bericht steht die Tabelle */
+  const fk = ohneKommentar(front);
+  ['MP.zulaessig(', 'MP.zielmieteBremse(', 'MP.mietpreisbremseAus(', 'MP.kappungAus('].forEach((x) => { if (fk.indexOf(x) < 0) f.push('Frontend ruft ' + x + ' nicht'); });
+  if (/\*\s*1[.,]1\d?\b|\*\s*1[.,]2\b|\*\s*\(1 \+ /.test(fk.split('function mietpotenzialAus')[1].split('function mieteSaetze')[0])) f.push('Frontend rechnet Kappung oder Bremse selbst');
+  if (!/D\.liste\(mieteZeilen\(mi\), \['Miete', 'im Monat', 'Abstand im Monat', 'Abstand im Jahr'\]\)/.test(fk)) f.push('Tabelle der Obergrenze fehlt im PDF');
+  if (!/DpMietpotenzial: 'js\/mietpotenzial-kern\.js\?v=/.test(fk)) f.push('Kern wird nicht nachgeladen');
+  return f;
+};
+
 /* ── Lauf ─────────────────────────────────────────────────────────────── */
 let rot = 0;
 const ok = (t) => console.log('  ok   ' + t);
@@ -556,9 +707,9 @@ function quellen(ueber) {
 }
 const NAMEN = { A: 'Speicher-only', A2: 'pdftotext echt über stdin/stdout', B: 'Schwärzen vor dem KI-Aufruf', C: 'Bremse und Schalter', D: 'kostenlos höchstens 2 Unterlagen',
   E: 'Bericht nur mit gültigem Kauf-Token', F: 'Frist 14 Tage', G: 'Preis aus dem lookup_key', H: 'Webhook', I: 'Zahlen-Weissliste', J: 'Siegel', K: 'Marktbericht Stufe 2 ohne Ablage, keine Quellennamen',
-  L: 'gescannte PDFs: Texterkennung nur im Speicher', M: 'Rabatt-Vorrang Anrechnung vor Flyer-Code' };
+  L: 'gescannte PDFs: Texterkennung nur im Speicher', M: 'Rabatt-Vorrang Anrechnung vor Flyer-Code', N: 'Vergleichsmiete und Obergrenze für Investoren' };
 
-console.log('einzelcheck-pruefen · v3941');
+console.log('einzelcheck-pruefen · v3944');
 const svc = require(P.dienst);
 const q0 = quellen();
 for (const k of Object.keys(TEILE)) {
@@ -595,7 +746,7 @@ const GEGEN = [
   /* v3941 */
   ['K', 'Stufe 3 angefragt', { dienst: ersetze(D, 'const MB_STUFE = 2;', 'const MB_STUFE = 3;') }],
   ['K', 'Schnellmodus statt Stufe 2 wie in der App', { dienst: ersetze(D, 'return { address: adr, wert_stufe: MB_STUFE,', 'return { address: adr, wert_stufe: MB_STUFE, fast: true,') }],
-  ['K', 'Ertragswert wieder übernommen', { dienst: ersetze(D, '    vergleichsmiete: null,\n', '    vergleichsmiete: null, wert: { ertragswert: ((p.cross_check || {}).ertragswert || {}).value_eur },\n') }],
+  ['K', 'Ertragswert wieder übernommen', { dienst: ersetze(D, '    vergleichsmiete: vglAus(out && out.vergleichsmiete),\n', '    vergleichsmiete: vglAus(out && out.vergleichsmiete), wert: { ertragswert: ((p.cross_check || {}).ertragswert || {}).value_eur },\n') }],
   ['K', 'mb begrenzt die Stufe nicht', { mbApi: ersetze(q0.mbApi, 'b.wert_stufe = Math.min(2, ', 'b.wert_stufe = Math.min(3, ') }],
   ['K', 'KI-Kosten nicht erfasst', { dienst: ersetze(D, "try { ki = deps().kiVerbrauch.erfasseFremdPosten(", "try { ki = 0 && deps().kiVerbrauch.erfasseFremdPosten(") }],
   ['K', 'Frontend zeigt wieder den Ertragswert', { front: ersetze(q0.front, "    if (mk && mk.qm > 0) z.push(", "    if (m.wert && m.wert.ertragswert > 0) z.push(['Ertragswert', eur(m.wert.ertragswert), 'ImmoWertV']);\n    if (mk && mk.qm > 0) z.push(") }],
@@ -606,6 +757,17 @@ const GEGEN = [
   ['L', 'kein Zeitlimit', { ocr: ersetze(q0.ocr, "    const uhr = setTimeout(function () { try { p.kill('SIGKILL'); } catch (e) {} ende(nein, Object.assign(new Error('Texterkennung: Zeitüberschreitung'), { code: 'ZEIT' })); }, fristMs);", "    const uhr = null;") }],
   ['L', 'freier Teil zählt den Scan nicht mit', { dienst: ersetze(D, 'const zuLesen = alle.slice(0, max);', 'const zuLesen = alle.slice(0, max + (alle[0] && /%scan/.test(alle[0].buffer.toString("latin1")) ? 1 : 0));') }],
   ['M', 'Code wieder nur angehängt', { front: ersetze(q0.front, "      if (code && !frei) href = mitCode(href, code).split('#')[0];", "      if (code && !frei) href += (href.indexOf('?') >= 0 ? '&' : '?') + 'code=' + encodeURIComponent(code);") }],
+  /* v3944 */
+  ['N', 'mb-Auszug lässt die Zensus-Miete als Vergleichsmiete durch', { mbVgl: ersetze(q0.mbVgl, "export const VGL_STUFEN = ['mietspiegel', 'amtlich', 'naeherung'];", "export const VGL_STUFEN = ['mietspiegel', 'amtlich', 'naeherung', 'zensus', 'satz_mittel', 'angebot'];") }],
+  ['N', 'mb-Auszug liest nur den Ertragswert (fehlt bei ETW ohne Miteigentumsanteil)', { mbVgl: ersetze(q0.mbVgl, 'const b = (crossCheck && crossCheck.miete_band && crossCheck.miete_band.anker_stufe) ? crossCheck.miete_band : (ew.miete_band || null);', 'const b = ew.miete_band || null;') }],
+  ['N', 'mb-Auszug erst nach der Stufensperre', { mbOrch: ersetze(ersetze(q0.mbOrch, '      try { _vglAuszug = vergleichsmieteAuszug(crossCheck); }', '      try { _vglAuszug = null; }'),
+    "      step('quercheck: nicht im Umfang (Stufe ' + _stufe + ')');", "      step('quercheck: nicht im Umfang (Stufe ' + _stufe + ')'); _vglAuszug = vergleichsmieteAuszug(crossCheck);") }],
+  ['N', 'mb-Route fragt die Vergleichsmiete nicht an', { mbApi: ersetze(q0.mbApi, '{ ohneAblage: true, vergleichsmiete: true }', '{ ohneAblage: true }') }],
+  ['N', 'Dienst reicht den Quellentext durch', { dienst: ersetze(D, "  return { qm: qm, art: v.art, ca: v.art === 'naeherung',", "  return { quelle: v.quelle, qm: qm, art: v.art, ca: v.art === 'naeherung',") }],
+  ['N', 'Dienst nimmt jede Art', { dienst: ersetze(D, "if (!v || v.verfuegbar !== true || VGL_ARTEN.indexOf(v.art) < 0) return null;", "if (!v || !(v.qm > 0)) return null;") }],
+  ['N', 'Frontend rechnet die Bremse selbst (120 %)', { front: ersetze(q0.front, 'var grenze = vglQm ? MP.zielmieteBremse({ ziel_qm: vglQm, vgl_qm: vglQm, bremse: bremse }) : null;', 'var grenze = vglQm ? { obergrenze_qm: vglQm * 1.2 } : null;') }],
+  ['N', 'Frontend nennt ohne Vergleichsmiete den Marktdurchschnitt als Richtwert', { front: ersetze(q0.front, "    else nv = { art: 'ohne', qm: null };", "    else nv = marktQm ? { art: 'richtwert', qm: marktQm } : { art: 'ohne', qm: null };") }],
+  ['N', 'Frontend zeigt keinen Abstand im Jahr', { front: ersetze(q0.front, "' im Monat, ' + eurS(nv.plus_jahr) + ' im Jahr.'", "' im Monat.'") }],
   ['M', 'mitCode lässt den Flyer-Code stehen', { front: ersetze(q0.front, "    ['code', 'promo', 'rabatt'].forEach(function (k) { u.searchParams.delete(k); });\n", '') }]
 ];
 for (const [teil, was, ueber] of GEGEN) {
