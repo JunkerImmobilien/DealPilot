@@ -27,6 +27,11 @@
  *      canceled/unpaid/incomplete_expired -> 0
  *  - customer.subscription.deleted -> 0 (gleiche Abo-Pruefung)
  *
+ * v3947 · Teamplaetze: im Partner-Plan-Abo gleicht derselbe Durchlauf auch die Position dp_teamplatz_* ab
+ * (deps.teamAbgleichen = partnerTeam.bezahltAbgleichen -> resellers.team_plaetze_bezahlt). Gleiche Regeln:
+ * bezahlt/past_due -> Menge der Position (fehlt sie: 0), beendet/deleted -> 0, incomplete und fremdes Abo -> nichts.
+ * Ein altes Platz-Abo (partner_seats) kennt keine Teamplaetze und laesst sie unberuehrt.
+ *
  * Abhaengigkeiten werden injiziert (deps), damit tools/partner-seats-webhook-pruefen.mjs
  * die Funktion mit nachgebauten Ereignissen ohne Stripe und ohne Datenbank laufen lassen kann.
  */
@@ -56,8 +61,17 @@ function standardDeps() {
     query: require('../db/pool').query,
     syncPoolQuantity: require('./resellerService').syncPoolQuantity,
     getSubscription: require('./stripeService').getSubscription,
-    aboEnde: (rid) => require('./partnerKunden').aboEnde(rid)   /* v3357 */
+    aboEnde: (rid) => require('./partnerKunden').aboEnde(rid),   /* v3357 */
+    teamAbgleichen: (rid, n) => require('./partnerTeam').bezahltAbgleichen(rid, n)   /* v3947 */
   };
+}
+
+/* v3947 · Teamplaetze nur im Partner-Plan-Abo; ohne deps.teamAbgleichen (aeltere Pruefer) bleibt alles wie vorher */
+async function teamAbgleichen(deps, resellerId, sub, endet) {
+  if (!istPartnerPlan(sub) || typeof deps.teamAbgleichen !== 'function') return undefined;
+  const menge = endet ? 0 : require('./partnerPlanKauf').teamMenge(sub);
+  const r = await deps.teamAbgleichen(resellerId, menge);
+  return Object.assign({ menge }, r || {});
 }
 
 async function abgleichen(deps, resellerId, sub, menge, abo) {
@@ -103,7 +117,8 @@ async function _seats(deps, typ, obj, resellerId) {
     }
     const menge = platzMenge(sub);
     const pool = await abgleichen(deps, resellerId, sub, menge, true);
-    return { handled: true, aktion: 'abgeglichen', menge, pool };
+    const team = await teamAbgleichen(deps, resellerId, sub, false);   /* v3947 */
+    return { handled: true, aktion: 'abgeglichen', menge, pool, team };
   }
 
   if (typ === 'customer.subscription.created' || typ === 'customer.subscription.updated'
@@ -128,9 +143,10 @@ async function _seats(deps, typ, obj, resellerId) {
     /* v3610 · im Partner-Plan-Abo bleibt die Abo-ID am Reseller auch bei 0 Plaetzen, solange es laeuft */
     const aboBleibt = menge > 0 || (istPartnerPlan(sub) && BEZAHLT.has(sub.status) && typ !== 'customer.subscription.deleted');
     const pool = await abgleichen(deps, resellerId, sub, menge, aboBleibt);
+    const team = await teamAbgleichen(deps, resellerId, sub, endet);   /* v3947 */
     /* v3357 · Ende des Partner-Abos: zugewiesene Plaetze laufen in die Frist (wie ein Platzentzug), statt
        10 Jahre Investor zu behalten (Luecke aus dem Konzept 13.11.2026, Abschnitt 1.2) */
-    return { handled: true, aktion: 'abgeglichen', menge, pool, abo_ende: ende };
+    return { handled: true, aktion: 'abgeglichen', menge, pool, abo_ende: ende, team };
   }
 
   return { handled: false };

@@ -950,33 +950,73 @@
   /* ════ v3830 A · TEAM IN DER KANZLEI ═════════════════════════════════════
      Marcel 19.11.2026: mehrere Logins je Partnerkonto. Der Inhaber laedt Berater per E-Mail ein, jedes Mitglied sieht das
      Cockpit der Kanzlei, betreut seine eigenen Kunden und sieht die der anderen. Team, Plaetze und Marke nur der Inhaber.
-     Mitgliedsplaetze vorerst ohne Abrechnung (Rahmen team_plaetze, Vorgabe 5). Backend: services/partnerTeam.js. */
+     Mitgliedsplaetze bis v3946 ohne Abrechnung (Rahmen team_plaetze, Vorgabe 5), seit v3947 mit Preis (unten). Backend: services/partnerTeam.js. */
+  /* v3947 · Teamplaetze mit Preis (Marcel 22.11.2026): Rahmen = kostenlose (Bestand vor v3947 oder Admin) + gebuchte
+     (Stripe-Position dp_teamplatz_*, Staffel aus frontend/js/teamplatz-staffel.js, in Stripe als graduated angelegt).
+     Ist kein Platz frei, bucht „Berater einladen“ einen Teamplatz dazu und zeigt VOR dem Bestaetigen den Satz dieses
+     Platzes und die neue Summe. Die Betraege kommen aus GET /partner/team/preis (Stufen aus Stripe), gerechnet mit
+     DpTeamplatz.summeAusStufen (dieselbe Rechnung wie Stripe graduated). Kundentext nur Punkt und Komma. */
+  function teamStil() {
+    if (document.getElementById('dppk-team-stil')) return;
+    var s = document.createElement('style'); s.id = 'dppk-team-stil';
+    s.textContent = [
+      '#dppk-dlg .pk-tp{width:100%;border-collapse:collapse;margin:10px 0 4px;font:400 13px Inter,sans-serif;font-variant-numeric:tabular-nums}',
+      '#dppk-dlg .pk-tp td{padding:6px 0;border-top:1px solid #EDE6D6}',
+      '#dppk-dlg .pk-tp td:last-child{text-align:right;white-space:nowrap;padding-left:10px}',
+      '#dppk-dlg .pk-tp tr.pk-tp-s td{font-weight:700;color:#2A2727;border-top:1px solid #D9CFB8}',
+      '#dppk-dlg .pk-stepper{display:inline-flex;border:1px solid #D9CFB8;border-radius:8px;overflow:hidden;margin:4px 0 8px}',
+      '#dppk-dlg .pk-stepper button{width:38px;border:0;background:#FBF8F1;font:600 16px Inter,sans-serif;color:#2A2727;cursor:pointer}',
+      '#dppk-dlg .pk-stepper input{width:60px;border:0;text-align:center;font:600 14px "JetBrains Mono",monospace;padding:8px 0;-moz-appearance:textfield}',
+      '.pk-team .pk-chip.pk-bestand{background:#F4F0E7;color:#6B6460}'
+    ].join('');
+    document.head.appendChild(s);
+  }
+  function eurC(cent) {
+    var v = (Number(cent) || 0) / 100;
+    return v.toLocaleString('de-DE', { minimumFractionDigits: v % 1 ? 2 : 0, maximumFractionDigits: 2 }) + ' €';
+  }
+  function teamSumme(a, n) {
+    var TP = window.DpTeamplatz;
+    return TP && a && a.stufen ? TP.summeAusStufen(a.stufen, n) : 0;
+  }
+  function teamPreisHolen() { return api('/partner/team/preis'); }
+  function nichtBuchbarText(a) {
+    var g = a && a.grund;
+    if (g === 'preis_fehlt') return 'Weitere Teamplätze lassen sich bald direkt hier buchen. Bis dahin richten wir sie für dich ein, schreib uns an info@dealpilot.immo.';
+    if (g === 'kein_abo') return 'Dein Partner-Plan läuft ohne Abo. Weitere Teamplätze richten wir für dich ein, schreib uns an info@dealpilot.immo.';
+    if (g === 'abo_gekuendigt') return 'Dein Abo ist zum Laufzeitende gekündigt. Teamplätze lassen sich erst nach einer Wiederaufnahme im Abo-Portal buchen.';
+    return 'Teamplätze lassen sich gerade nicht buchen.';
+  }
   function teamKarte(c) {
     var T = c.team || { mitglieder: [], einladungen: [] }, ich = c.ich || {}, inhaber = ich.rolle === 'owner';
+    var rahmen = (T.kostenlos || T.bezahlt) ? ' (' + [T.kostenlos ? T.kostenlos + ' kostenlos' : '', T.bezahlt ? T.bezahlt + ' gebucht' : ''].filter(Boolean).join(', ') + ')' : '';
     var h = '<div class="pk-karte pk-team" style="margin-bottom:14px"><h3 style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><span style="flex:1">Team</span>' +
-      '<small style="font:500 12px Inter,sans-serif;color:#7A7370">' + (T.belegt || 0) + ' von ' + (T.plaetze != null ? T.plaetze : '–') + ' Teamplätzen belegt</small>' +
-      (inhaber ? '<button type="button" class="pk-btn klein gold" data-team="einladen"' + (T.frei > 0 ? '' : ' disabled title="Alle Teamplätze sind belegt"') + '>Berater einladen</button>' : '') + '</h3>';
+      '<small style="font:500 12px Inter,sans-serif;color:#7A7370">' + (T.belegt || 0) + ' von ' + (T.plaetze != null ? T.plaetze : '0') + ' Teamplätzen belegt' + rahmen + '</small>' +
+      (inhaber ? '<button type="button" class="pk-btn klein" data-team="plaetze">Teamplätze</button><button type="button" class="pk-btn klein gold" data-team="einladen">Berater einladen</button>' : '') + '</h3>';
     h += (T.mitglieder || []).map(function (m) {
       var selbst = String(m.user_id) === String(ich.user_id || '');
       var knopf = m.rolle === 'owner' ? '' : (inhaber ? '<button type="button" class="pk-btn klein rot" data-team-weg="' + esc(m.user_id) + '">Aus dem Team nehmen</button>' : (selbst ? '<button type="button" class="pk-btn klein rot" data-team-gehen="1">Team verlassen</button>' : ''));
       return '<div class="pk-zeile"><div class="pk-name"><b>' + esc(m.name || m.email) + (selbst ? ' (du)' : '') + '</b><small>' + esc(m.email) + ' · ' + m.kunden + (m.kunden === 1 ? ' Kunde' : ' Kunden') + '</small></div>' +
-        '<span class="pk-chip' + (m.rolle === 'owner' ? '' : ' grau') + '">' + (m.rolle === 'owner' ? 'Inhaber' : 'Berater') + '</span>' + knopf + '</div>';
+        '<span class="pk-chip' + (m.rolle === 'owner' ? '' : ' grau') + '">' + (m.rolle === 'owner' ? 'Inhaber' : 'Berater') + '</span>' +
+        (m.rolle !== 'owner' && m.team_bestand ? '<span class="pk-chip pk-bestand" title="Schon vor der Abrechnung der Teamplätze im Team, wird nicht berechnet">Bestand</span>' : '') + knopf + '</div>';
     }).join('');
     h += (T.einladungen || []).map(function (e) {
       return '<div class="pk-zeile"><div class="pk-name"><b>' + esc(e.name || e.email) + '</b><small>' + esc(e.email) + ' · eingeladen am ' + datum(e.erstellt_am) + ' · gilt bis ' + datum(e.expires_at) + '</small></div>' +
         '<span class="pk-chip grau">wartet auf Bestätigung</span>' + (inhaber ? '<button type="button" class="pk-btn klein" data-team-zz="' + esc(e.id) + '">Zurückziehen</button>' : '') + '</div>';
     }).join('');
-    if ((T.mitglieder || []).length < 2 && !(T.einladungen || []).length) h += '<div class="pk-klein">' + (inhaber ? 'Arbeitest du mit Kollegen? Lade sie als Berater ein. Jeder meldet sich mit seinem eigenen Konto an, sieht das Cockpit der Kanzlei und betreut seine eigenen Kunden. Die Kundenplätze teilt ihr euch.' : 'Du bist im Team dieser Kanzlei.') + '</div>';
+    if (T.ueberbelegt) h += '<div class="pk-hinweis">Im Team sind ' + T.belegt + ' Plätze belegt, gebucht oder kostenlos sind ' + T.plaetze + '. Bis du Teamplätze dazubuchst, kannst du niemanden neu einladen.</div>';
+    if ((T.mitglieder || []).length < 2 && !(T.einladungen || []).length) h += '<div class="pk-klein">' + (inhaber ? 'Arbeitest du mit Kollegen? Lade sie als Berater ein. Jeder meldet sich mit seinem eigenen Konto an, sieht das Cockpit der Kanzlei und betreut seine eigenen Kunden. Die Kundenplätze teilt ihr euch. Du als Inhaber bist im Partner-Plan enthalten, jeder weitere Login ist ein Teamplatz.' : 'Du bist im Team dieser Kanzlei.') + '</div>';
     else h += '<div class="pk-klein">Jeder Kunde gehört einem Berater. Der Berater betreut ihn, die anderen sehen ihn nur. Der Inhaber verwaltet Team, Plätze und Marke. Die Kundenplätze teilt ihr euch.</div>';
     return h + '</div>';
   }
   function teamBinden(el, c) {
-    var e1 = el.querySelector('[data-team="einladen"]'); if (e1) e1.onclick = function () { teamEinladenDialog(el); };
+    var e1 = el.querySelector('[data-team="einladen"]'); if (e1) e1.onclick = function () { teamEinladenDialog(el, c); };
+    var e2 = el.querySelector('[data-team="plaetze"]'); if (e2) e2.onclick = function () { teamPlaetzeDialog(el); };
     [].forEach.call(el.querySelectorAll('[data-team-zz]'), function (b) { b.onclick = function () { api('/partner/team/einladungen/' + b.getAttribute('data-team-zz') + '/zurueckziehen', { method: 'POST' }).then(function () { toast('Einladung zurückgezogen.'); neuLaden(el); }, function (e) { toast(fehlerText(e)); }); }; });
     [].forEach.call(el.querySelectorAll('[data-team-weg]'), function (b) {
       b.onclick = function () {
         var m = ((c.team && c.team.mitglieder) || []).filter(function (x) { return String(x.user_id) === b.getAttribute('data-team-weg'); })[0] || {};
-        dialog('Aus dem Team nehmen', '<p><b>' + esc(m.name || m.email) + '</b> sieht das Cockpit danach nicht mehr. Seine ' + (m.kunden || 0) + (m.kunden === 1 ? ' Kunde geht' : ' Kunden gehen') + ' an dich als Inhaber. Sein eigenes Konto und seine eigenen Objekte bleiben unverändert.</p>',
+        dialog('Aus dem Team nehmen', '<p><b>' + esc(m.name || m.email) + '</b> sieht das Cockpit danach nicht mehr. Seine ' + (m.kunden || 0) + (m.kunden === 1 ? ' Kunde geht' : ' Kunden gehen') + ' an dich als Inhaber. Sein eigenes Konto und seine eigenen Objekte bleiben unverändert. Der Teamplatz bleibt gebucht und ist dann frei, unter Teamplätze kannst du ihn abbestellen.</p>',
           [{ t: 'Abbrechen' }, { t: 'Aus dem Team nehmen', c: 'rot', fn: function () { return api('/partner/team/' + m.user_id, { method: 'DELETE' }).then(function () { toast('Aus dem Team genommen.'); neuLaden(el); }); } }]);
       };
     });
@@ -986,14 +1026,74 @@
         [{ t: 'Abbrechen' }, { t: 'Team verlassen', c: 'rot', fn: function () { return api('/mein-partner/team-verlassen', { method: 'POST' }).then(function () { toast('Du hast das Team verlassen.'); setTimeout(function () { location.reload(); }, 800); }); } }]);
     };
   }
-  function teamEinladenDialog(el) {
-    dialog('Berater einladen', '<div class="pk-hinweis">Hat die Adresse schon ein DealPilot-Konto, erscheint die Einladung nach der Anmeldung oben in der App. Sonst legt der Berater mit dieser Adresse ein Konto an. Teamplätze kosten derzeit nichts zusätzlich.</div>' +
-      '<label class="pk-feld">Name<input type="text" id="pk-t-name" maxlength="120"></label><label class="pk-feld">E-Mail<input type="email" id="pk-t-mail" maxlength="200"></label>',
-      [{ t: 'Abbrechen' }, { t: 'Einladen', c: 'gold', fn: function (d) {
-        var name = wert(d, '#pk-t-name'), mail = wert(d, '#pk-t-mail');
-        if (!String(name || '').trim() || !/@/.test(String(mail || ''))) { toast('Bitte Name und E-Mail eintragen.'); return false; }
-        return api('/partner/team/einladen', { method: 'POST', body: { name: name, email: mail } }).then(function () { toast('Einladung gesendet.'); neuLaden(el); });
-      } }]);
+  var TEAM_FELDER = '<label class="pk-feld">Name<input type="text" id="pk-t-name" maxlength="120"></label><label class="pk-feld">E-Mail<input type="email" id="pk-t-mail" maxlength="200"></label>';
+  var TEAM_WEG = 'Hat die Adresse schon ein DealPilot-Konto, erscheint die Einladung nach der Anmeldung oben in der App. Sonst legt der Berater mit dieser Adresse ein Konto an.';
+  function teamEinladen(el, d) {
+    var name = wert(d, '#pk-t-name'), mail = wert(d, '#pk-t-mail');
+    if (!String(name || '').trim() || !/@/.test(String(mail || ''))) { toast('Bitte Name und E-Mail eintragen.'); return null; }
+    return { name: name, email: mail };
+  }
+  function teamEinladenDialog(el, c) {
+    teamStil();
+    var T = (c && c.team) || {};
+    if (T.frei > 0) {
+      dialog('Berater einladen', '<div class="pk-hinweis">' + TEAM_WEG + ' Für ihn ist ein Teamplatz frei, es kommt nichts dazu.</div>' + TEAM_FELDER,
+        [{ t: 'Abbrechen' }, { t: 'Einladen', c: 'gold', fn: function (d) {
+          var p = teamEinladen(el, d); if (!p) return false;
+          return api('/partner/team/einladen', { method: 'POST', body: p }).then(function () { toast('Einladung gesendet.'); neuLaden(el); });
+        } }]);
+      return;
+    }
+    teamPreisHolen().then(function (a) {
+      if (!a || !a.buchbar) { dialog('Berater einladen', '<div class="pk-hinweis">Alle Teamplätze sind belegt. ' + esc(nichtBuchbarText(a)) + '</div>'); return; }
+      var ein = a.intervall === 'yearly' ? 'Jahr' : 'Monat', nx = a.naechster || {};
+      dialog('Berater einladen', '<div class="pk-hinweis">Alle Teamplätze sind belegt. Für diesen Berater buchst du einen Teamplatz dazu. Er ist dein ' + nx.login + '. Login.</div>' +
+        '<table class="pk-tp"><tr><td>Dieser Teamplatz</td><td>' + eurC(nx.satz_cent) + ' je ' + ein + '</td></tr>' +
+        '<tr><td>Teamplätze heute (' + a.bezahlt_abo + ')</td><td>' + eurC(a.summe_cent) + ' je ' + ein + '</td></tr>' +
+        '<tr class="pk-tp-s"><td>Teamplätze danach (' + nx.teamplatz + ')</td><td>' + eurC(nx.summe_cent) + ' je ' + ein + '</td></tr></table>' +
+        '<p class="pk-klein">Abgerechnet mit deinem Partner-Plan, für den laufenden Zeitraum sofort anteilig. Du als Inhaber bist im Partner-Plan enthalten. ' + TEAM_WEG + '</p>' + TEAM_FELDER,
+        [{ t: 'Abbrechen' }, { t: 'Platz buchen und einladen', c: 'gold', fn: function (d) {
+          var p = teamEinladen(el, d); if (!p) return false;
+          return api('/partner/team/plaetze', { method: 'POST', body: { anzahl: a.bezahlt_abo + 1 } }).then(function () {
+            return api('/partner/team/einladen', { method: 'POST', body: p }).then(function () { toast('Teamplatz gebucht, Einladung gesendet.'); neuLaden(el); },
+              function (e) { toast('Teamplatz gebucht. Die Einladung hat nicht geklappt: ' + fehlerText(e)); neuLaden(el); });
+          });
+        } }]);
+    }, function (e) { toast(fehlerText(e)); });
+  }
+  function teamPlaetzeDialog(el) {
+    teamStil();
+    teamPreisHolen().then(function (a) {
+      var kopf = '<div class="pk-hinweis">Du als Inhaber bist im Partner-Plan enthalten. Jeder weitere Login ist ein Teamplatz. ' +
+        'Belegt sind ' + (a.belegt || 0) + (a.kostenlos ? ', ' + a.kostenlos + ' davon kostenlos aus dem Bestand' : '') + '.</div>';
+      if (!a.buchbar) { dialog('Teamplätze', kopf + '<p class="pk-klein">' + esc(nichtBuchbarText(a)) + '</p>'); return; }
+      var ein = a.intervall === 'yearly' ? 'Jahr' : 'Monat', min = a.mindest_bezahlt || 0, ziel = a.bezahlt_abo || 0;
+      var d = dialog('Teamplätze', kopf +
+        '<div class="pk-gruppe">Gebuchte Teamplätze</div><div class="pk-stepper"><button type="button" data-d="-1" aria-label="weniger">−</button><input type="number" min="' + min + '" max="500" value="' + ziel + '" aria-label="Anzahl gebuchter Teamplätze"><button type="button" data-d="1" aria-label="mehr">+</button></div>' +
+        '<table class="pk-tp" data-v="tab"></table><p class="pk-klein">' + esc(stufenZeile(a, ein)) + '. Jeder Platz kostet den Satz seiner Stufe. Weniger als ' + min + ' geht nicht, so viele brauchen Berater und offene Einladungen. Mehr Plätze werden sofort anteilig berechnet, weniger als Gutschrift auf die nächste Rechnung.</p>',
+        [{ t: 'Abbrechen' }, { t: 'Teamplätze übernehmen', c: 'gold', fn: function () {
+          if (ziel === a.bezahlt_abo) return true;
+          return api('/partner/team/plaetze', { method: 'POST', body: { anzahl: ziel } }).then(function (x) { toast('Teamplätze geändert: ' + (x && x.bezahlt != null ? x.bezahlt : ziel) + ' gebucht.'); neuLaden(el); });
+        } }]);
+      var inp = d.querySelector('.pk-stepper input');
+      function zeigen() {
+        ziel = Math.max(min, Math.min(500, parseInt(inp.value, 10) || 0)); inp.value = ziel;
+        var heute = a.summe_cent || 0, neu = teamSumme(a, ziel);
+        d.querySelector('[data-v="tab"]').innerHTML = '<tr><td>Heute (' + a.bezahlt_abo + ')</td><td>' + eurC(heute) + ' je ' + ein + '</td></tr>' +
+          '<tr class="pk-tp-s"><td>Neu (' + ziel + ')</td><td>' + eurC(neu) + ' je ' + ein + '</td></tr>';
+      }
+      [].forEach.call(d.querySelectorAll('.pk-stepper button'), function (b) { b.onclick = function () { inp.value = (parseInt(inp.value, 10) || 0) + Number(b.getAttribute('data-d')); zeigen(); }; });
+      inp.oninput = function () { if (inp.value !== '') zeigen(); };
+      zeigen();
+    }, function (e) { toast(fehlerText(e)); });
+  }
+  /** „1. bis 3. Teamplatz 59 €, 4. bis 8. Teamplatz 49 €, ab dem 9. Teamplatz 39 € je Monat“ aus den Stripe-Stufen */
+  function stufenZeile(a, ein) {
+    var von = 1;
+    return (a.stufen || []).map(function (t) {
+      var txt = (t.bis == null ? 'ab dem ' + von + '. Teamplatz ' : von + '. bis ' + t.bis + '. Teamplatz ') + eurC(t.cent);
+      von = (t.bis || 0) + 1; return txt;
+    }).join(', ') + ' je ' + ein;
   }
   /* Eingeladene Seite: Band und Fenster (auch ueber ?dp_team=… aus der Mail) */
   function teamEinladungDialog(e) {

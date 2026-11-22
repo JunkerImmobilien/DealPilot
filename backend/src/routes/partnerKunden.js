@@ -101,6 +101,15 @@ partner.get('/team', fn(async (req) => Object.assign(await T.team(req.reseller),
 partner.post('/team/einladen', fn((req) => T.einladen(req.reseller, req.user.id, req.partnerRolle, req.body, require('../services/resellerInviteMail').basisAus(req))));
 partner.post('/team/einladungen/:id/zurueckziehen', fn((req) => T.einladungZurueckziehen(req.reseller, req.partnerRolle, req.params.id)));
 partner.delete('/team/:userId', fn((req) => T.mitgliedEntfernen(req.reseller, req.user.id, req.partnerRolle, req.params.userId)));
+/* v3947 · Teamplaetze mit Preis (Marcel 22.11.2026): Angebot mit Stufen aus Stripe, Summe heute und mit einem Platz mehr
+   (lesen alle), bezahlte Menge im Partner-Plan-Abo setzen (nur Inhaber). Abrechnung wie die Kundenplaetze. */
+partner.get('/team/preis', fn((req) => require('../services/partnerPlanKauf').teamAngebot(req.reseller)));
+partner.post('/team/plaetze', fn(async (req) => {
+  T.nurInhaber(req.partnerRolle);
+  const n = parseInt(req.body && req.body.anzahl, 10);
+  if (!Number.isFinite(n) || n < 0) { const e = new Error('anzahl_ungueltig'); e.status = 400; e.detail = 'Bitte eine Zahl ab 0 angeben.'; throw e; }
+  return require('../services/partnerPlanKauf').teamplaetzeAendern(req.reseller, n);
+}));
 /* v3830 F · eigene Objekte einem Kunden zuordnen (body.client_id, null loest) */
 partner.get('/zuordnungen', fn(async (req) => ({ zuordnungen: await pk.zuordnungen(req.reseller, req.user.id) })));
 partner.put('/objekte/:id/kunde', fn((req) => pk.objektZuordnen(req.reseller, req.user.id, req.partnerRolle, req.params.id, req.body && req.body.client_id)));

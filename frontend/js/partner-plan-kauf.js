@@ -95,6 +95,13 @@
     return api('/subscription/partner/angebot').then(function (a) { S.angebot = a; return a; });
   }
 
+  /* v3947 · „weitere Logins ab 39 €“ aus der EINEN Quelle frontend/js/teamplatz-staffel.js (window.DpTeamplatz).
+     Fehlt sie, faellt die Zeile weg (keine Zahl im Code). */
+  function teamZeile(iv) {
+    var TP = window.DpTeamplatz; if (!TP || typeof TP.ab !== 'function') return '';
+    return '<li>Du bist im Plan enthalten. Weitere Logins für dein Team ab ' + TP.ab(iv) + ' € im ' + (iv === 'yearly' ? 'Jahr' : 'Monat') + '</li>';
+  }
+
   /* ── Karte im Preis-Fenster ─────────────────────────────────────────────── */
   function karteZeichnen(el) {
     var a = S.angebot, iv = S.iv, cur = aktuellerPlan();
@@ -105,7 +112,7 @@
         '<ul><li>Alles aus Pro, dazu Partner-Cockpit für deine Kunden</li>' +
         '<li>Deine Marke: Logo und Farben für deine Kunden</li>' +
         '<li>Kundenplätze nach Bedarf, je mehr, desto günstiger jeder Platz</li>' +
-        '<li>Plätze jederzeit im Partner-Cockpit nachkaufen oder reduzieren</li></ul></div>';
+        '<li>Plätze jederzeit im Partner-Cockpit nachkaufen oder reduzieren</li>' + teamZeile(iv) + '</ul></div>';
     var rechts;
     if (!a) {
       rechts = '<div class="dppp-r"><p class="dppp-klein">Preise werden geladen …</p></div>';

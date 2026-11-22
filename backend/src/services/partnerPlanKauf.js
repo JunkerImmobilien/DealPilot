@@ -10,6 +10,13 @@
  * Die Betraege stehen NUR in Stripe (Staffel gemessen 17.11.2026 in der Sandbox: tiers_mode volume,
  * bis 9 / bis 24 / darueber). Diese Datei rechnet keinen Preis, sie liest ihn (angebot()).
  *
+ * v3947 · DRITTE Position, optional: Teamplaetze (weitere Logins der Kanzlei, Marcel 22.11.2026)
+ *   - Teamplaetze    lookup_key dp_teamplatz_monat / _jahr   (tiers_mode GRADUATED: 1. bis 3. Teamplatz 59 EUR,
+ *                    4. bis 8. 49 EUR, ab dem 9. 39 EUR, im Jahr 649/539/429 EUR; Menge = Logins ohne Inhaber)
+ *   Quelle der Betraege: frontend/js/teamplatz-staffel.js, angelegt von tools/stripe-teamplatz-preis-anlegen.mjs.
+ *   Fehlt der Preis in Stripe (vor Marcels OK), laeuft alles andere weiter: angebot().team ist null, Teamplaetze
+ *   lassen sich nicht buchen, die kostenlosen (team_plaetze) gelten wie bisher.
+ *
  * Abo-Metadaten: kind = 'partner_plan', reseller_id, userId. Der Webhook
  * (partnerSeatsWebhook.js + stripeWebhook.js) gleicht damit BEIDES ab: den Plan (subscriptions)
  * und den Platz-Pool (resellerService.syncPoolQuantity).
@@ -26,6 +33,7 @@
 
 const PLAN_LOOKUP = { monthly: 'dp_plan_partner_monthly', yearly: 'dp_plan_partner_yearly' };
 const SEAT_LOOKUP = { monthly: 'dp_seat_monthly', yearly: 'dp_seat_yearly' };
+const TEAM_LOOKUP = { monthly: 'dp_teamplatz_monat', yearly: 'dp_teamplatz_jahr' };   /* v3947 · = DpTeamplatz.LOOKUP (tools/teamplatz-pruefen.mjs) */
 const MAX_PLAETZE = 500;
 
 function fehler(code, status, detail) { const e = new Error(code); e.status = status || 400; if (detail) e.detail = detail; return e; }
@@ -90,6 +98,12 @@ function seatPosition(sub) {
   if (sub && sub.metadata && sub.metadata.kind === 'partner_seats') return items[0] || null;
   return null;
 }
+/** v3947 · Position der Teamplaetze (lookup_key dp_teamplatz_*), sonst null. */
+function teamPosition(sub) {
+  const items = (sub && sub.items && sub.items.data) || [];
+  return items.find((i) => i && i.price && /^dp_teamplatz_/.test(i.price.lookup_key || '')) || null;
+}
+function teamMenge(sub) { const p = teamPosition(sub); return p ? (p.quantity || 0) : 0; }
 function planPosition(sub) {
   const items = (sub && sub.items && sub.items.data) || [];
   return items.find((i) => i && i.price && /^dp_plan_/.test(i.price.lookup_key || '')) || null;
@@ -113,7 +127,8 @@ const _cache = { wert: null, bis: 0 };
 async function preiseLesen() {
   if (_cache.wert && _cache.bis > Date.now()) return _cache.wert;
   const keys = [PLAN_LOOKUP.monthly, PLAN_LOOKUP.yearly, SEAT_LOOKUP.monthly, SEAT_LOOKUP.yearly];
-  const r = await stripe().prices.list({ lookup_keys: keys, active: true, limit: 10, expand: ['data.tiers'] });
+  const optional = [TEAM_LOOKUP.monthly, TEAM_LOOKUP.yearly];   /* v3947 · ohne sie bleibt der Kauf moeglich */
+  const r = await stripe().prices.list({ lookup_keys: keys.concat(optional), active: true, limit: 10, expand: ['data.tiers'] });
   const by = {};
   for (const p of r.data) by[p.lookup_key] = p;
   const fehlt = keys.filter((k) => !by[k]);
@@ -133,6 +148,8 @@ async function angebot() {
   return {
     plan: { monthly: by[PLAN_LOOKUP.monthly].unit_amount, yearly: by[PLAN_LOOKUP.yearly].unit_amount },
     platz: { monthly: seat(by[SEAT_LOOKUP.monthly]), yearly: seat(by[SEAT_LOOKUP.yearly]) },
+    /* v3947 · Teamplaetze (graduated), null solange der Preis in Stripe fehlt */
+    team: by[TEAM_LOOKUP.monthly] && by[TEAM_LOOKUP.yearly] ? { monthly: seat(by[TEAM_LOOKUP.monthly]), yearly: seat(by[TEAM_LOOKUP.yearly]) } : null,
     inklusiv: require('./resellerService').INKLUSIV_MANDANTEN,
     testphase: false,
     max_plaetze: MAX_PLAETZE
@@ -209,6 +226,70 @@ async function plaetzeAendern(resellerId, anzahl) {
   return { ok: true, vorher: alt, nachher: ziel, pool: poolNeu };
 }
 
+/* ── v3947 · Teamplaetze im laufenden Abo ─────────────────────────────── */
+
+/** Intervall des Abos (aus der Plan-Position, sonst der Platz-Position). */
+function aboIntervall(sub) {
+  const ref = planPosition(sub) || seatPosition(sub) || teamPosition(sub);
+  return ref && ref.price && ref.price.recurring && ref.price.recurring.interval === 'year' ? 'yearly' : 'monthly';
+}
+
+/** Was das Cockpit vor dem Bestaetigen zeigt: Rahmen, Stufen aus Stripe, Summe heute und mit einem Platz mehr.
+ *  Betraege in Cent, gerechnet mit staffelSumme(…, 'graduated') auf den Stripe-Stufen. */
+async function teamAngebot(rs) {
+  const T = require('./partnerTeam');
+  const team = await T.team(rs);
+  const rahmen = { plaetze: team.plaetze, kostenlos: team.kostenlos, bezahlt: team.bezahlt, belegt: team.belegt, frei: team.frei,
+                   ueberbelegt: team.ueberbelegt, mindest_bezahlt: team.mindest_bezahlt };
+  let sub = null, by = null;
+  try { sub = await aktivesPlatzAbo(rs.id); } catch (e) { sub = null; }
+  try { by = await preiseLesen(); } catch (e) { by = null; }
+  const iv = sub ? aboIntervall(sub) : 'monthly';
+  const preis = by && by[TEAM_LOOKUP[iv]];
+  if (!preis) return Object.assign(rahmen, { buchbar: false, grund: 'preis_fehlt', intervall: iv });
+  const stufen = (preis.tiers || []).map((t) => ({ bis: t.up_to == null ? null : t.up_to, cent: t.unit_amount, pauschal: t.flat_amount || 0 }));
+  const mode = preis.tiers_mode || 'graduated';
+  const summe = (n) => staffelSumme(preis.tiers || [], mode, n);
+  const bezahltAbo = sub ? teamMenge(sub) : 0;
+  const naechsterNr = bezahltAbo + 1;
+  const out = Object.assign(rahmen, {
+    buchbar: !!sub && !sub.cancel_at_period_end, grund: !sub ? 'kein_abo' : (sub.cancel_at_period_end ? 'abo_gekuendigt' : null),
+    intervall: iv, tiers_mode: mode, stufen, bezahlt_abo: bezahltAbo,
+    summe_cent: summe(bezahltAbo),
+    naechster: { teamplatz: naechsterNr, login: 1 + team.kostenlos + naechsterNr, satz_cent: summe(naechsterNr) - summe(bezahltAbo), summe_cent: summe(naechsterNr) }
+  });
+  return out;
+}
+
+/** Teamplaetze im laufenden Abo auf `anzahl` setzen (nur Inhaber, Route prueft). Untergrenze: so viele bezahlte,
+ *  dass Berater und offene Einladungen Platz haben (teamRahmen().mindest_bezahlt). */
+async function teamplaetzeAendern(rs, anzahl) {
+  const T = require('./partnerTeam');
+  const ziel = plaetzeNorm(anzahl);
+  const sub = await aktivesPlatzAbo(rs.id);
+  if (!sub) throw fehler('kein_abo', 409, 'Teamplätze werden im Partner-Plan-Abo gebucht. Dein Partner-Plan läuft nicht über ein Abo, schreib uns an info@dealpilot.immo.');
+  if (sub.cancel_at_period_end) throw fehler('abo_gekuendigt', 409, 'Das Abo ist zum Laufzeitende gekündigt. Teamplätze lassen sich erst nach einer Wiederaufnahme ändern.');
+  if (!planPosition(sub)) throw fehler('nur_platz_abo', 409, 'Dieses ältere Platz-Abo kennt keine Teamplätze. Bitte schreib uns an info@dealpilot.immo.');
+  const team = await T.team(rs);
+  if (ziel < team.mindest_bezahlt) throw fehler('unter_belegung', 409, 'Im Team sind ' + team.belegt + ' Plätze belegt oder eingeladen, davon ' + team.kostenlos + ' kostenlos. Weniger als ' + team.mindest_bezahlt + ' bezahlte Teamplätze geht erst, wenn jemand das Team verlässt oder du eine Einladung zurückziehst.');
+  const pos = teamPosition(sub);
+  const alt = pos ? (pos.quantity || 0) : 0;
+  if (ziel === alt) { await T.bezahltAbgleichen(rs.id, alt); return { ok: true, unveraendert: true, bezahlt: alt }; }
+  const iv = aboIntervall(sub);
+  let items;
+  if (pos && ziel > 0) items = [{ id: pos.id, quantity: ziel }];
+  else if (pos && ziel === 0) items = [{ id: pos.id, deleted: true }];
+  else {
+    const by = await preiseLesen();
+    if (!by[TEAM_LOOKUP[iv]]) throw fehler('teamplatz_preis_fehlt', 503, 'Teamplätze lassen sich noch nicht buchen. Bitte schreib uns an info@dealpilot.immo.');
+    items = [{ price: by[TEAM_LOOKUP[iv]].id, quantity: ziel }];
+  }
+  const neu = await stripe().subscriptions.update(sub.id, { items, proration_behavior: proration(alt, ziel), expand: ['items.data.price'] });
+  const menge = teamMenge(neu);
+  await T.bezahltAbgleichen(rs.id, menge);
+  return { ok: true, vorher: alt, nachher: menge, bezahlt: menge };
+}
+
 /** Rueckweg nach dem Checkout: dasselbe wie der Webhook (Plan + Plaetze), falls er spaeter kommt oder
  *  verloren geht. Idempotent: upsert je Nutzer, syncPoolQuantity auf die Zielmenge. */
 async function bestaetigen({ userId, sessionId }) {
@@ -228,6 +309,7 @@ async function bestaetigen({ userId, sessionId }) {
     interval: iv, stripeSubscriptionId: sub.id, stripeSubscriptionItemId: pos && pos.id,
     currentPeriodEnd: sub.current_period_end ? new Date(sub.current_period_end * 1000) : null
   });
+  await require('./partnerTeam').bezahltAbgleichen(s.metadata.reseller_id, teamMenge(sub));   /* v3947 */
   return { ok: true, plan: 'partner', intervall: iv, pool };
 }
 
@@ -268,7 +350,8 @@ async function kuendigungsFolgen(resellerId) {
 }
 
 module.exports = {
-  PLAN_LOOKUP, SEAT_LOOKUP, MAX_PLAETZE,
-  staffelSumme, checkoutParameter, seatPosition, planPosition, mindestPlaetze, proration, plaetzeNorm,
-  angebot, checkoutAnlegen, bestaetigen, plaetzeAendern, kuendigenLink, kuendigungsFolgen
+  PLAN_LOOKUP, SEAT_LOOKUP, TEAM_LOOKUP, MAX_PLAETZE,
+  staffelSumme, checkoutParameter, seatPosition, planPosition, teamPosition, teamMenge, aboIntervall, mindestPlaetze, proration, plaetzeNorm,
+  angebot, checkoutAnlegen, bestaetigen, plaetzeAendern, kuendigenLink, kuendigungsFolgen,
+  teamAngebot, teamplaetzeAendern
 };

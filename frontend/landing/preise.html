@@ -17,6 +17,28 @@
 <!-- landing-videothek-1 · DealPilot live, F&E, Kanzlei-Zeile -->
 <link rel="stylesheet" href="dp2-live.css?v=landing-strecke-4">
 <link rel="stylesheet" href="dp2-kern.css?v=landing-kern-1a">
+<!-- v3947 · Teamplätze mit Staffel und Rechner (Abschnitt #teamplaetze), nur auf dieser Seite -->
+<style>
+.pteam .pstaffel-g > div > div{padding:0;border:0}  /* .pstaffel-g div trifft sonst auch die inneren Zeilen (Abstand und Linie je Zeile) */
+.pteam .pstaffel-g .pv small{font:500 11px/1 var(--mono);color:var(--mut);margin-left:3px}
+.pteam .pstaffel-g .pj{font:500 11px/1.3 var(--mono);color:var(--mut);margin-top:6px}
+.pteam-r{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:0;border-top:1px solid var(--cream-line)}
+.pteam-r > div{padding:18px 24px}
+.pteam-r > div:first-child{border-right:1px solid var(--cream-line)}
+.pteam-k{font:700 9px/1 var(--mono);letter-spacing:.11em;color:var(--mut);margin-bottom:9px;text-transform:uppercase}
+.pteam-step{display:inline-flex;border:1px solid var(--cream-line);background:var(--cream)}
+.pteam-step button{width:40px;height:40px;border:0;background:transparent;font:600 18px/1 var(--body);color:var(--ink);cursor:pointer}
+.pteam-step button:hover{color:var(--gdi)}
+.pteam-step input{width:64px;height:40px;border:0;border-left:1px solid var(--cream-line);border-right:1px solid var(--cream-line);text-align:center;font:600 16px var(--mono);color:var(--ink);background:#fff;-moz-appearance:textfield}
+.pteam-step input::-webkit-inner-spin-button,.pteam-step input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+.pteam-hilfe{font-size:12.4px;color:var(--mut);line-height:1.5;margin:10px 0 0}
+.pteam-z{display:flex;justify-content:space-between;gap:12px;font-size:13.4px;color:var(--inkm);padding:6px 0;border-bottom:1px solid var(--cream-line);font-variant-numeric:tabular-nums}
+.pteam-z span:last-child{white-space:nowrap;color:var(--ink)}
+.pteam-z small{display:block;font:500 11px/1.4 var(--mono);color:var(--mut)}
+.pteam-z.sum{border-bottom:0;font:700 16px/1.3 var(--disp);color:var(--ink);padding-top:9px}
+.pteam-z.schnitt{border-bottom:0;font-size:12.4px;color:var(--mut);padding-top:0}
+@media(max-width:700px){.pteam-r{grid-template-columns:1fr}.pteam-r > div:first-child{border-right:0;border-bottom:1px solid var(--cream-line)}.pteam-r > div,.pteam .pstaffel-h,.pteam .pstaffel-f{padding-left:16px;padding-right:16px}}
+</style>
 </head><body>
 
 <svg style="display:none" aria-hidden="true">
@@ -214,6 +236,7 @@
           <li>Anmerkungen direkt am Feld und Rückmeldung an den Kunden, auf Wunsch per E-Mail in deiner Marke</li>
           <li>Voller Pro-Funktionsumfang für deinen Zugang</li>
           <li>Mandanten-Plätze buchst du nach Bedarf dazu — 19, 15 oder 12 € je Platz, keiner ist im Grundpreis enthalten</li>
+          <li data-team-ab>Du bist im Plan enthalten. Weitere Logins für dein Team ab 39 € im Monat, <a href="#teamplaetze" style="color:inherit;text-decoration:underline">Staffel und Rechner</a></li><!-- v3947 -->
           <li>Individuelle Prozesse, Homepage-Einbindung und Schnittstellen — <a href="loesungen.html" style="color:inherit;text-decoration:underline">auf Anfrage</a></li>
         </ul>
       </div>
@@ -231,6 +254,34 @@
       <div class="pstaffel-f">Dein Mandant arbeitet mit einem Werkzeug, das einzeln 34,99 € kostet —
         du zahlst ab 12 €. Wird ein Mandat beendet, wird der Platz frei und ist sofort neu
         vergebbar. Monatlich oder jährlich, jährlich mit einem Freimonat.</div>
+    </div>
+
+    <!-- v3947 · Teamplätze (Marcel 22.11.2026). Die Zahlen hier sind nur der Rückfall ohne Skript.
+         Quelle: frontend/js/teamplatz-staffel.js, teamplatz-rechner.js zeichnet Stufen und Rechner daraus neu
+         und folgt dem Umschalter Monatlich / Jährlich. tools/teamplatz-pruefen.mjs vergleicht den Rückfall mit der Quelle. -->
+    <div class="pstaffel pteam rv" id="teamplaetze">
+      <div class="pstaffel-h"><svg class="ico"><use href="#i-ebenen"/></svg>
+        <div><b>Teamplätze für deine Kanzlei</b>
+          <span>Du als Inhaber bist im Partner-Plan enthalten. Jeder weitere Login für einen Berater kostet nach Staffel, jeder Platz zum Satz seiner Stufe.</span></div></div>
+      <div class="pstaffel-g" data-team-stufen>
+        <div><div class="st">2. BIS 4. LOGIN</div><div class="pv" data-team-stufe="0" data-m="59" data-j="649">59 €<small>/ Monat</small></div><div class="pj">oder 649 € im Jahr</div></div>
+        <div><div class="st">5. BIS 9. LOGIN</div><div class="pv" data-team-stufe="1" data-m="49" data-j="539">49 €<small>/ Monat</small></div><div class="pj">oder 539 € im Jahr</div></div>
+        <div><div class="st">AB DEM 10. LOGIN</div><div class="pv" data-team-stufe="2" data-m="39" data-j="429">39 €<small>/ Monat</small></div><div class="pj">oder 429 € im Jahr</div></div>
+      </div>
+      <div class="pteam-r" data-team-rechner>
+        <div><div class="pteam-k">Wie viele Logins braucht ihr?</div>
+          <div class="pteam-step"><button type="button" data-d="-1" aria-label="ein Login weniger">−</button><input type="number" min="1" max="50" value="3" inputmode="numeric" aria-label="Logins in deiner Kanzlei, du eingeschlossen" data-team-logins><button type="button" data-d="1" aria-label="ein Login mehr">+</button></div>
+          <p class="pteam-hilfe">Du eingeschlossen. Kundenplätze kommen nach Bedarf dazu.</p></div>
+        <div data-team-ergebnis>
+          <div class="pteam-z"><span>Partner-Plan mit dir als Inhaber</span><span>99 €</span></div>
+          <div class="pteam-z"><span>2 Teamplätze<small>2 × 59 €</small></span><span>118 €</span></div>
+          <div class="pteam-z sum"><span>Zusammen je Monat</span><span>217 €</span></div>
+          <div class="pteam-z schnitt"><span>im Schnitt je Login</span><span>72,33 €</span></div>
+        </div>
+      </div>
+      <div class="pstaffel-f">Jeder Berater meldet sich mit seinem eigenen Konto an, sieht das Cockpit der Kanzlei und betreut
+        seine eigenen Kunden. Die Kundenplätze teilt ihr euch. Teamplätze buchst du im Partner-Cockpit unter Team dazu oder
+        bestellst sie wieder ab. Monatlich oder jährlich, jährlich mit einem Freimonat.</div>
     </div>
 
     <div class="pe rv">
@@ -426,6 +477,7 @@
 </div></footer>
 
 <script src="dp2-inhalt.js?v=landing-faecher-3"></script>
+<script src="teamplatz-rechner.js?v=v3947"></script><!-- v3947 · Teamplätze: lädt js/teamplatz-staffel.js vom App-Host, Buster dort (buster-ebenen-pruefen) -->
 <script src="dp2.js?v=landing-handy-1"></script>
 <script src="landing-zahlen.js?v=landing-zahlen-live-1"></script><!-- landing-zahlen-live-1 · Zahlen live aus GET /api/v1/public/datenumfang, das HTML bleibt Rückfall -->
 <script src="flyer-code.js?v=v1593"></script>

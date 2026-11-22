@@ -12,15 +12,18 @@
  *              Trennen, Entfernen, Anmerkungen, Objekte zuordnen, an einen anderen Berater abgeben.
  *              Kunden anderer Berater sieht er nur. Team, Plaetze kaufen, Marke: nur der Inhaber.
  *
- *   Mitgliedsplaetze: vorerst OHNE Abrechnung (der Preis ist nicht entschieden), begrenzt durch resellers.team_plaetze
- *   (Vorgabe 5, zaehlt Berater und offene Einladungen, nicht den Inhaber). Kein Stripe.
+ *   Mitgliedsplaetze: bis v3946 OHNE Abrechnung, begrenzt durch resellers.team_plaetze (Vorgabe 5).
+ *   v3947 (Marcel 22.11.2026): Rahmen = kostenlose Plaetze (team_plaetze: Bestand vor v3947 oder Admin)
+ *   + bezahlte Plaetze (team_plaetze_bezahlt = Menge der Stripe-Position dp_teamplatz_*, Staffel 59/49/39 EUR,
+ *   Quelle frontend/js/teamplatz-staffel.js). Gezaehlt werden Berater und offene Einladungen, nicht der Inhaber.
+ *   Den bezahlten Teil setzt NUR bezahltAbgleichen() (Webhook, Cockpit, Checkout-Rueckweg). Rahmen rein: teamRahmen().
  *
  *   Zugang: requireFeature('reseller') ODER Berater eines Partnerkontos, dessen Inhaber den Partner-Plan hat (zugang()).
  */
 const crypto = require('crypto');
 const { query } = require('../db/pool');
 
-function fehler(code, status, detail) { const e = new Error(code); e.status = status || 400; if (detail) e.detail = detail; return e; }
+function fehler(code, status, detail, extra) { const e = new Error(code); e.status = status || 400; if (detail) e.detail = detail; if (extra) e.extra = extra; return e; }
 const EMAIL_RX = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
 const EINLADUNG_TAGE = 30;
 function sha(s) { return crypto.createHash('sha256').update(String(s)).digest('hex'); }
@@ -93,7 +96,7 @@ function zugang() {
 // ── Team lesen ───────────────────────────────────────────────────────────────
 async function team(rs) {
   const mitglieder = (await query(
-    `SELECT m.user_id, m.role::text AS rolle, m.created_at, u.name, u.email,
+    `SELECT m.user_id, m.role::text AS rolle, m.created_at, u.name, u.email, m.team_bestand,
             (SELECT count(*)::int FROM reseller_clients c WHERE c.reseller_id = m.reseller_id AND c.berater_id = m.user_id AND c.entfernt_am IS NULL AND c.getrennt_am IS NULL) AS kunden
        FROM reseller_members m JOIN users u ON u.id = m.user_id
       WHERE m.reseller_id = $1 AND u.deleted_at IS NULL
@@ -106,9 +109,26 @@ async function team(rs) {
   const einladungen = (await query(
     `SELECT id, email, name, erstellt_am, expires_at, (user_id IS NOT NULL) AS bestehendes_konto FROM partner_team_einladungen
       WHERE reseller_id = $1 AND status = 'offen' AND expires_at > now() ORDER BY erstellt_am DESC`, [rs.id])).rows;
-  const plaetze = Number.isFinite(Number(rs.team_plaetze)) ? Number(rs.team_plaetze) : 5;
   const berater = mitglieder.filter((x) => x.rolle === 'berater').length;
-  return { mitglieder, einladungen, plaetze, belegt: berater + einladungen.length, frei: Math.max(0, plaetze - berater - einladungen.length) };
+  return Object.assign({ mitglieder, einladungen }, teamRahmen(rs, berater, einladungen.length));
+}
+
+/** v3947 · Rahmen des Teams, rein (ohne DB). plaetze = kostenlos + bezahlt; mindest_bezahlt = so viele bezahlte
+ *  Plaetze braucht das Team mindestens, damit Berater und offene Einladungen Platz haben. */
+function zahl(v) { const n = Number(v); return Number.isFinite(n) && n > 0 ? Math.floor(n) : 0; }
+function teamRahmen(rs, berater, offen) {
+  const kostenlos = zahl(rs && rs.team_plaetze), bezahlt = zahl(rs && rs.team_plaetze_bezahlt);
+  const plaetze = kostenlos + bezahlt, belegt = zahl(berater) + zahl(offen);
+  return { plaetze, kostenlos, bezahlt, belegt, frei: Math.max(0, plaetze - belegt),
+           ueberbelegt: Math.max(0, belegt - plaetze), mindest_bezahlt: Math.max(0, belegt - kostenlos) };
+}
+
+/** v3947 · bezahlte Teamplaetze auf die Menge der Stripe-Position setzen (idempotent). Nimmt nie einen Berater
+ *  aus dem Team: sinkt die Menge unter die Belegung, ist das Team ueberbelegt und laedt niemanden mehr ein. */
+async function bezahltAbgleichen(resellerId, menge, q) {
+  const n = Math.min(500, zahl(menge));
+  const r = await (q || query)(`UPDATE resellers SET team_plaetze_bezahlt = $2 WHERE id = $1 AND team_plaetze_bezahlt IS DISTINCT FROM $2 RETURNING id`, [resellerId, n]);
+  return { bezahlt: n, geaendert: !!(r && r.rowCount) };
 }
 
 // ── Einladen (nur Inhaber) ───────────────────────────────────────────────────
@@ -136,7 +156,7 @@ async function einladen(rs, actor, rolleWert, b, basis) {
   if (!EMAIL_RX.test(email) || email.length > 254) throw fehler('email_ungueltig', 400, 'Bitte eine gültige E-Mail eintragen.');
   if (!name) throw fehler('name_fehlt', 400, 'Bitte den Namen eintragen.');
   const t = await team(rs);
-  if (t.frei <= 0) throw fehler('team_voll', 409, 'Alle ' + t.plaetze + ' Teamplätze sind belegt. Den Rahmen stellt DealPilot ein.');
+  if (t.frei <= 0) throw fehler('team_voll', 409, 'Alle ' + t.plaetze + ' Teamplätze sind belegt. Buche einen weiteren Teamplatz dazu.', { teamplatz_buchen: true });   /* v3947 */
   const u = (await query(`SELECT id, email FROM users WHERE lower(email) = $1 AND deleted_at IS NULL LIMIT 1`, [email])).rows[0];
   if (u) { const f = await kontoPruefen(rs, u.id); if (f) throw f; }
   await query(`UPDATE partner_team_einladungen SET status = 'zurueckgezogen', beantwortet_am = now() WHERE reseller_id = $1 AND lower(email) = $2 AND status = 'offen'`, [rs.id, email]);
@@ -284,6 +304,6 @@ async function aufraeumen(opts) {
 module.exports = {
   LOESCHFRISTEN, fristenListe, EINLADUNG_TAGE,
   rolle, darfKunde, nurInhaber, pruefeKunde, zugang,
-  team, einladen, einladungZurueckziehen, meineEinladungen, einladungPerToken, beantworten,
+  team, teamRahmen, bezahltAbgleichen, einladen, einladungZurueckziehen, meineEinladungen, einladungPerToken, beantworten,
   mitgliedEntfernen, kundeZuweisen, teamNutzer, aufraeumen, kontoPruefen, _sha: sha
 };

@@ -15,7 +15,7 @@ router.use(requireAdmin);
 router.get('/resellers', async (req, res) => {
   try {
     const r = await query(
-      `SELECT r.id, r.name, r.role, r.status, r.is_master, r.whitelabel_enabled, r.team_plaetze,   /* v3830 A */
+      `SELECT r.id, r.name, r.role, r.status, r.is_master, r.whitelabel_enabled, r.team_plaetze, r.team_plaetze_bezahlt,   /* v3830 A · v3947 bezahlt */
               (SELECT count(*)::int FROM reseller_members m WHERE m.reseller_id = r.id AND m.role = 'berater') AS team_berater,
               u.email AS owner_email,
               COUNT(l.id) FILTER (WHERE l.kind='client')                          AS pool_gekauft,
@@ -64,7 +64,8 @@ router.post('/resellers', async (req, res) => {
   } catch (e) { res.status(500).json({ error: 'server_error', message: e.message }); }
 });
 
-/* v3830 A · Mitgliedsplaetze (Team) je Partnerkonto, vorerst ohne Abrechnung: { anzahl } 0 bis 100 */
+/* v3830 A · Mitgliedsplaetze (Team) je Partnerkonto: { anzahl } 0 bis 100.
+   v3947 · das sind jetzt die KOSTENLOSEN Teamplaetze (Bestand oder von Hand), die bezahlten (team_plaetze_bezahlt) setzt nur der Stripe-Abgleich */
 router.post('/resellers/:id/team-plaetze', async (req, res) => {
   try {
     const n = parseInt(req.body && req.body.anzahl, 10);
