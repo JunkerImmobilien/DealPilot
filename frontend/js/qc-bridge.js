@@ -247,6 +247,17 @@
         if (_nr && typeof _nr.then === 'function') await _nr;
       }
     } catch (e) { console.warn('[qc-bridge] newObj:', e); }
+    /* v3983 · F10: war das Quick Boarding aus einer frisch angelegten, leeren Karte geöffnet (ui.js enterQuickCheckMode),
+       wird sie jetzt gefüllt statt ein zweites Objekt anzulegen. Nur wenn der Server sie weiter als leer meldet. */
+    try {
+      var _lk = window._dpQcLeereKarte; window._dpQcLeereKarte = null;
+      if (_lk && _lk.key && typeof Auth !== 'undefined' && Auth.apiCall) {
+        var _lo = await Auth.apiCall('/objects/' + _lk.key);
+        var _ld = (_lo && _lo.data) || {};
+        var _lLeer = _lo && !String(_ld.ort || '').trim() && !String(_ld.str || '').trim() && !String(_ld.kp || '').trim() && !String(_ld.wfl || '').trim();
+        if (_lLeer) { window._currentObjKey = _lk.key; window._currentObjSeq = _lk.seq || window._currentObjSeq; window._objSeqIsPreview = false; window._dpLetzteLeereKarte = null; }
+      }
+    } catch (e) { console.warn('[qc-bridge] leere Karte:', e); }
 
     // (2) qc_-Carrier aus den iframe-Werten füllen (NACH newObj, das die qc_-Felder leert)
     Object.keys(inputs).forEach(function (k) { _set('qc_' + k, inputs[k], 'input'); });

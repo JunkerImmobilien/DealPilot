@@ -268,5 +268,25 @@ function funk(src, name) {
   ok(/darlehensbetrag_eur: \['d1'/.test(di) && /tilgungsfrei_monate: \['d1_tf_mon'/.test(di) && /brutto_eur: \['san'/.test(di), 'F11 Darlehensvertrag → Darlehen I (inkl. tilgungsfrei), Angebot → Sanierungskosten');
 }
 
-console.log(`gesamtflow-pruefen (v3982): ${gruen} von ${gruen + rot} ok`);
+/* ── F21 · Deal-Aktion nach neuem Objekt neu zeichnen ── F10 · leere Karte im Quick Boarding füllen ── */
+{
+  const st = lies('frontend/js/storage.js');
+  const n = (st.match(/_dwA\.value = '';\r?\n[^\n]*v3983 · F21[\s\S]{0,400}?DealPilotDealAction\.initStatusSync\(\)/g) || []).length;
+  ok(n === 2, 'F21 beide Rücksetzstellen (newObj und Formular leeren) zeichnen die Deal-Aktion neu (initStatusSync), gefunden ' + n);
+  /* echte initStatusSync: versteckte Felder leer, _currentObjData {} → „open" */
+  const da = lies('frontend/js/deal-action.js');
+  const i = da.indexOf('initStatusSync: function()'), body = i > 0 ? da.slice(i + 'initStatusSync: '.length, da.indexOf('\n    },', i) + 6) : '';
+  let status = null;
+  try {
+    const els = { _deal_won_state: { value: 'false' }, _deal_lost_state: { value: 'false' } };
+    const ctx = { console, document: { getElementById: (id) => els[id] || null }, window: { _currentObjData: {} }, updateStatusUI: (s) => { status = s; } };
+    vm.createContext(ctx); vm.runInContext('(' + body.replace(/,\s*$/, '') + ')()', ctx);
+  } catch (e) { status = 'Fehler ' + e.message; }
+  ok(status === 'open', 'F21 initStatusSync nach dem Zurücksetzen: Status „open" (Ist ' + status + ')');
+  const ui = lies('frontend/js/ui.js'), qb = lies('frontend/js/qc-bridge.js');
+  ok(/window\._dpQcLeereKarte = \(window\._currentObjKey && _lk && _lk\.key === window\._currentObjKey && _leer\)/.test(ui), 'F10 Quick Boarding merkt sich die frisch angelegte leere Karte');
+  ok(/var _lk = window\._dpQcLeereKarte;[\s\S]{0,600}window\._currentObjKey = _lk\.key/.test(qb) && qb.indexOf('_dpQcLeereKarte') > qb.indexOf("window.newObj({ ohneAuswahl: true })"), 'F10 „Als Objekt speichern" schreibt in diese Karte (nach newObj, nur wenn der Server sie leer meldet)');
+}
+
+console.log(`gesamtflow-pruefen (v3983): ${gruen} von ${gruen + rot} ok`);
 process.exit(rot ? 1 : 0);

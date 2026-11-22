@@ -356,6 +356,14 @@ function enterQuickCheckMode() {
     if (_mbv) { _mbv.classList.remove('active'); _mbv.innerHTML = ''; }
     document.body.classList.remove('mb-standalone-active');
   }
+  /* v3983 · F10 Gesamt-Flow 22.11.2026: „Neues Objekt“ legt sofort eine leere Karte an (newobj-fixes.js v434). Wer danach
+     ins Quick Boarding wechselt, liess sie als „Unbenannt“ zurück (2026-1178), und „Als Objekt speichern“ legte ein ZWEITES
+     Objekt an. Ist das offene Objekt genau diese frisch angelegte, leere Karte, merkt sich das Quick Boarding sie und
+     schreibt beim Speichern hinein (qc-bridge.js _handleSave). */
+  try {
+    var _lk = window._dpLetzteLeereKarte, _leer = ['ort', 'str', 'plz', 'kp', 'wfl', 'baujahr'].every(function (id) { var e = document.getElementById(id); return !e || String(e.value || '').trim() === ''; });
+    window._dpQcLeereKarte = (window._currentObjKey && _lk && _lk.key === window._currentObjKey && _leer) ? { key: _lk.key, seq: _lk.seq || null } : null;
+  } catch (_eLk) { window._dpQcLeereKarte = null; }
   // Body-Klasse setzt CSS, das Tab-Bar + Workflow-Bar versteckt
   document.body.classList.add('qc-standalone-active');
 

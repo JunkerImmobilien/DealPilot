@@ -1529,6 +1529,9 @@ function _clearFormForNewObject() {
   var _dwS = document.getElementById('_deal_won_state'); if (_dwS) _dwS.value = 'false';
   var _dlS = document.getElementById('_deal_lost_state'); if (_dlS) _dlS.value = 'false';
   var _dwA = document.getElementById('_deal_won_at_state'); if (_dwA) _dwA.value = '';
+  /* v3983 · F21 Gesamt-Flow 22.11.2026: die versteckten Felder waren zurückgesetzt, die Deal-Aktion aber nicht neu gezeichnet -
+     nach „Als Objekt speichern“ im Quick-Check stand dort „Gewonnen · im Bestand“ des vorher offenen Objekts. */
+  try { if (window.DealPilotDealAction && typeof DealPilotDealAction.initStatusSync === 'function') DealPilotDealAction.initStatusSync(); } catch (_eDs) {}
   /* v2164: der Ankauf-Stand gehoert zum OBJEKT. Ohne diese Zeile erbte ein
      neues Objekt den Stand des vorher geoeffneten (gemessen: 2026-1090
      "Unbenannt", offen, trug den Stand der Bismarckstr. 27). */
@@ -1655,6 +1658,9 @@ function _newObjLeeren() {
   var _dwS = document.getElementById('_deal_won_state'); if (_dwS) _dwS.value = 'false';
   var _dlS = document.getElementById('_deal_lost_state'); if (_dlS) _dlS.value = 'false';
   var _dwA = document.getElementById('_deal_won_at_state'); if (_dwA) _dwA.value = '';
+  /* v3983 · F21 Gesamt-Flow 22.11.2026: die versteckten Felder waren zurückgesetzt, die Deal-Aktion aber nicht neu gezeichnet -
+     nach „Als Objekt speichern“ im Quick-Check stand dort „Gewonnen · im Bestand“ des vorher offenen Objekts. */
+  try { if (window.DealPilotDealAction && typeof DealPilotDealAction.initStatusSync === 'function') DealPilotDealAction.initStatusSync(); } catch (_eDs) {}
   /* v2164: der Ankauf-Stand gehoert zum OBJEKT. Ohne diese Zeile erbte ein
      neues Objekt den Stand des vorher geoeffneten (gemessen: 2026-1090
      "Unbenannt", offen, trug den Stand der Bismarckstr. 27). */
