@@ -3279,3 +3279,20 @@ body .dp-pf-tile.on .dp-pf-led, html.qc-app .dp-pf-tile.on .dp-pf-led, body.dp-p
 @media (min-width: 1024px) and (max-width: 1139px){
   html body #oab-bar.dp-pfbar > .dp-pf-qr{ display: none !important; }
 }
+
+/* ═══ v3952 · DATENAUFNAHME IN DER SPALTE (App-Durchsicht 22.11.2026, Messkabine, Büttenstil) ═══
+   (1) Bis 900 px steht #oab-bar als Spalte (flex-direction:column). Die Perforation .dp-pf-perf ist
+       eine SENKRECHTE Linie mit zwei Löchern oben und unten - in der Spalte 1 x 0 px, beide Löcher
+       übereinander: ein schwarzer Punkt links unter dem Bordkarten-Kopf (gemessen 390, 641, 768,
+       834, 900 px). `html[data-dp-kartenstil="buetten"] .dp-pfbar .dp-pf-perf{display:block !important}`
+       (0,3,1) schlug dabei auch die Schubladen-Regel `.dp-pf-scroll .dp-pf-perf{display:none}` (0,2,0).
+       Dasselbe für den Trennstrich .dp-pf-sep (0 px hoch). Ab 901 px (Zeile) unverändert. */
+@media (max-width: 900px) {
+  html[data-dp-kartenstil] body #oab-bar.dp-pfbar > .dp-pf-perf,
+  html[data-dp-kartenstil] body #oab-bar.dp-pfbar > .dp-pf-sep { display: none !important; }
+}
+/* (2) Schublade bis 640 px: `.dp-pf-logo{flex:1 1 0%}` (style.css) zog die schwarze DealPilot-Pille
+       in der Kachel „Marktbewertung“ auf 272 px - ein schwarzer Balken statt eines Logos. */
+@media (max-width: 640px) {
+  html body .dp-pf-scroll .dp-pf-tile .dp-pf-logo.dp { flex: 0 0 auto !important; }
+}

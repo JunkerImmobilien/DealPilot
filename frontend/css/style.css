@@ -41896,3 +41896,56 @@ html body #bmfOverlay .v292-final-value { white-space: nowrap !important; }
 html body #bmfOverlay .v292-row-result > span:last-child { white-space: nowrap !important; }
 html body #s3-tax .ytf-table td select { min-width: 98px; }
 html body .vi-rf-gr-nr { font-size: 8.5px !important; }
+/* ═══ v3952 · APP-DURCHSICHT 22.11.2026 (Messkabine 390/430/768/820/1024/1440/1920, Aktenmappe + Büttenstil) ═══
+   (1) Goldschimmer im Kopf. Marcel: „In der Leiste mit den Tabs schimmert es immer leicht gold durch …
+       dunkler, eher so wie links in der Großansicht“ und „bei der Handy-Ansicht den Header oben, da ist
+       im Schwarz auch Gold drin“. Gemessen: header.hdr.has-v64-score::before trägt
+       radial-gradient(600x200 at 50% 0, Gold 18 %) mit Puls-Animation dpV64HdrGlow (style.css ~24637),
+       die Fläche selbst ist schon schwarz (#0E0D0B in der Aktenmappe, --wl-obs-hi/-lo in „Heute“).
+       Der Schimmer fällt weg, die Fläche bleibt wie die Seitenleiste. Gold bleibt nur Akzent
+       (aktiver Reiter, Knöpfe, Wortmarke). Am Desktop bleibt die dünne Goldlinie unter dem Kopf. */
+html body header.hdr.has-v64-score::before { background: none !important; animation: none !important; }
+/* (2) Handy und Tablet bis 1080 px: auch die Goldlinie unter dem Kopf (::after, Gold 60 %) und die
+       Goldkante über der Reiterleiste (Gold 15 %) werden zur ruhigen dunklen Trennlinie. Die
+       „0 / 6 Bereiche“-Pille (#tabs-status-badge, von layout-varianten.js badgeInDenKopf() in den Kopf
+       geholt) fällt dort weg (Marcel 22.11.: „dann ist der Header nicht so hoch“); dieselbe Angabe tragen
+       die Häkchen an den Reitern (.tab-wf-check, workflow.js), die bei 390 px sichtbar sind. Die Textzeile
+       #hdr-completeness bleibt über die :has-Regel v2216d verborgen, weil das Element weiter im Kopf steht. */
+@media (max-width: 1080px) {
+  html body header.hdr.has-v64-score::after { background: rgba(255,255,255,.06) !important; }
+  html body header.hdr .hdr-v61-row1 > .dpl-badge-im-kopf { display: none !important; }
+  html body header.hdr.has-v64-score + nav.tabs { border-top-color: rgba(255,255,255,.06) !important; }
+}
+/* (3) Reiterleiste bis 768 px: der Auslauf rechts war eine mask-image auf nav.tabs (v2216b). Eine Maske
+       macht die Leiste DURCHSICHTIG - durch die rechten 12 % schien der helle Seitengrund (.main-col
+       rgb(244,242,237)) und färbte das Schwarz goldbeige. Jetzt ein klebender Auslauf in der EIGENEN
+       Farbe der Leiste (background-color: inherit), damit Aktenmappe, „Heute“ und Mandantenmarke stimmen.
+       nav.tabs::after ist sonst aus (style.css ~17118, display:none !important) - hier (0,1,4). */
+@media (max-width: 768px) {
+  html body nav.tabs { -webkit-mask-image: none !important; mask-image: none !important; }
+  html body nav.tabs::after {
+    display: block !important; content: "" !important;
+    position: sticky !important; right: 0 !important; left: auto !important; top: auto !important; bottom: auto !important;
+    flex: 0 0 32px !important; width: 32px !important; height: auto !important; align-self: stretch !important;
+    margin-left: -32px !important; z-index: 2 !important; pointer-events: none !important;
+    background: inherit !important; background-color: inherit !important;
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 85%) !important;
+            mask-image: linear-gradient(90deg, transparent, #000 85%) !important;
+  }
+}
+/* (4) 769-1024 px: nav.tabs hat scrollbar-width:thin, aber scrollbar-color:auto - Windows malt einen
+       hellgrauen Balken mit Pfeilen auf die schwarze Leiste (gemessen 1024 px, 13 px hoch). Dieselbe
+       Farbe wie ab 1025 px (v2571). */
+@media (min-width: 769px) and (max-width: 1024px) {
+  html body nav.tabs { scrollbar-color: color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 45%, transparent) transparent !important; }
+}
+/* (5) 641-768 px: das Hilfe-Symbol im Kopf war leer. `.btn, button {padding:8px 14px !important}` (≤768)
+       ließ im 30 px breiten .hdr-icon-btn 2 px Inhalt - das SVG schrumpfte auf 0 x 14 px. */
+@media (max-width: 768px) {
+  html body header.hdr .hdr-icon-btn { padding: 0 !important; width: 36px !important; justify-content: center !important; }
+}
+/* (6) Bis 900 px: die geschlossene Seitenleisten-Schublade (translateX(-100%)) warf ihren Schatten
+       4px 0 34px rgba(0,0,0,.55) auf die Seite - ein dunkler Streifen am linken Rand (v622-mobile-shell). */
+@media (max-width: 900px) {
+  html body .app-wrap:not(.sb-mobile-open) #sidebar.sidebar:not(.sb-mobile-open):not(.open) { box-shadow: none !important; }
+}
