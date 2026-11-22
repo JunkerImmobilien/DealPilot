@@ -1,10 +1,10 @@
 {
- "erzeugt_am": "2026-11-21T11:11:59.811Z",
+ "erzeugt_am": "2026-11-22T08:38:36.417Z",
  "quellen": {
   "voice-import": "a8a2e6dba58ea42c",
-  "objektart-felder": "f7d9212555982a97",
-  "storage": "9b67eb9135261237",
-  "index-html": "934f77d778d07337",
+  "objektart-felder": "16af21246a92d8f6",
+  "storage": "3914fbcef8f03bf4",
+  "index-html": "1cfb482cffa9a120",
   "grest": "81f3fb0a4de3a6cf"
  },
  "daten": {
@@ -16,6 +16,7 @@
      "etage",
      "etagen_ges",
      "mea",
+     "wohnungen_geb",
      "gsfl",
      "wfl",
      "baujahr"
@@ -658,6 +659,7 @@
    "_dok_auswertung",
    "_dok_eingang",
    "einheiten",
+   "wohnungen_geb",
    "kpa_kosten",
    "kpa_kosten_art",
    "san_tax_active",
@@ -2140,6 +2142,11 @@
     "id": "einheiten",
     "kind": "text",
     "label": "Wohneinheiten im Gebäude"
+   },
+   {
+    "id": "wohnungen_geb",
+    "kind": "text",
+    "label": "Wohnungen im Gebäude"
    },
    {
     "id": "kpa_kosten",
@@ -5547,6 +5554,7 @@
     "modernis",
     "gsfl",
     "einheiten",
+    "wohnungen_geb",
     "zimmer",
     "etage",
     "vermstand",
@@ -5667,6 +5675,7 @@
     "etage",
     "etagen_ges",
     "einheiten",
+    "wohnungen_geb",
     "mea",
     "wfl",
     "baujahr",
@@ -5677,6 +5686,6 @@
  },
  "inhalt": {
   "hilfe": "3a4f541a8727888d",
-  "bewertung": "5bbfa69cfd78e2c0"
+  "bewertung": "4119201154a9f321"
  }
 }
