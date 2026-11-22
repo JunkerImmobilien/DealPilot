@@ -19,6 +19,7 @@
   if (window.DpVivi) return;
   var ABGLEICH_NACH_MS = 6 * 60 * 60 * 1000;   /* beim Oeffnen neu lesen, wenn der Stand aelter ist */
   var _frei = null, _verbunden = null, _stand = null, _key = null, _laeuft = false;
+  var _anlegenLaeuft = false;   /* v3967 · kein zweites Anlegen, solange eines laeuft (Doppelklick, zweiter Knopf) */
 
   function $(id) { return document.getElementById(id); }
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
@@ -158,12 +159,18 @@
     if (st.verknuepft) {
       var n = Object.keys(st.felder || {}).length;
       text = 'Mit ViVi verknüpft. ' + standText(st.letzter_abruf) + '. ' + (n ? n + ' Felder kommen aus ViVi und sind ausgegraut.' : 'Noch keine Werte gelesen.') + (st.letzter_fehler ? ' Letzter Abruf: ' + st.letzter_fehler : '');
-      if (st.info && st.info.restschuld_heute && st.info.restschuld_heute.wert != null) text += ' Restschuld laut ViVi ' + Math.round(st.info.restschuld_heute.wert).toLocaleString('de-DE') + ' €.';
+      if (st.info && st.info.restschuld_heute && st.info.restschuld_heute.wert != null) text += ' Restschuld laut ViVi ' + Math.round(st.info.restschuld_heute.wert).toLocaleString('de-DE') + ' €' +
+        (st.info.restschuld_heute.sondertilgung ? ', darin ' + Math.round(st.info.restschuld_heute.sondertilgung).toLocaleString('de-DE') + ' € Sondertilgung' : '') + '.';
       knoepfe = '<button type="button" class="btn btn-sm btn-ghost" data-vivi="abgleichen">Jetzt abgleichen</button><button type="button" class="btn btn-sm btn-ghost" data-vivi="loesen">Verknüpfung lösen</button>';
     } else if (st.status === 'abgebrochen' || st.status === 'laeuft') {
       text = st.status === 'laeuft' ? 'Die Übertragung nach ViVi läuft.' : 'Die Übertragung nach ViVi ist unterbrochen. Ein neuer Versuch setzt an der letzten Stelle fort, es entsteht nichts doppelt.';
       knoepfe = '<button type="button" class="btn btn-sm btn-gold" data-vivi="anlegen">Übertragung fortsetzen</button>';
+    } else if (_anlegenLaeuft) {
+      text = 'Die Übernahme nach ViVi läuft. Bei einem Mehrfamilienhaus kann das bis zu zwei Minuten dauern.';
+      knoepfe = '';
     } else {
+      /* v3967 · Marcel 22.11.2026: anlegen erst nach Gewonnen bzw. im Bestand, sonst nichts zeigen */
+      if (!(window.DpBuchhaltung && window.DpBuchhaltung.istGewonnen())) { l.style.display = 'none'; l.innerHTML = ''; return; }
       text = 'Dieses Objekt ist noch nicht in ViVi. Es wird einmal angelegt, danach liest DealPilot nur noch.';
       knoepfe = '<button type="button" class="btn btn-sm btn-gold" data-vivi="anlegen">In ViVi anlegen</button><button type="button" class="btn btn-sm btn-ghost" data-vivi="zuordnen">Mit ViVi-Objekt verknüpfen</button>';
     }
@@ -220,7 +227,7 @@
     schliessen();
     var ov = document.createElement('div'); ov.id = 'vivi-ov';
     ov.innerHTML = '<div class="vivi-karte" role="dialog" aria-modal="true">' + html + '</div>';
-    ov.addEventListener('click', function (ev) { if (ev.target === ov) schliessen(); });
+    ov.addEventListener('click', function (ev) { if (ev.target === ov && !_anlegenLaeuft) schliessen(); });
     document.body.appendChild(ov);
     return ov;
   }
@@ -228,6 +235,7 @@
 
   function anlegen() {
     if (!_key) { alert('Bitte das Objekt zuerst speichern.'); return; }
+    if (_anlegenLaeuft) { meldung('Die Übernahme nach ViVi läuft schon.'); return; }
     var key = _key;
     frei().then(function (ok) {
       if (!ok) return;
@@ -265,16 +273,33 @@
         ['vivi-platzhalter', 'vivi-muster', 'vivi-faellig'].forEach(function (id) { var e = $(id); if (e) e.onchange = function () { neu(); }; });
         var los = $('vivi-los');
         if (los) los.onclick = function () {
+          if (_anlegenLaeuft) return;
+          /* v3967 · Wartehinweis: ViVi legt je Mietverhaeltnis alle Sollstellungen ab Mietbeginn an. Gemessen bis 113 s
+             (2026-1053, acht Mietverhaeltnisse ab 2009). Knopf und Fenster bleiben gesperrt, bis die Antwort da ist. */
+          _anlegenLaeuft = true; leiste();
           los.disabled = true; los.textContent = 'Wird angelegt…';
+          Array.prototype.forEach.call(ov.querySelectorAll('input, select, #vivi-abbrechen'), function (x) { x.disabled = true; });
+          var n = (v.anzahl && v.anzahl.mietverhaeltnisse) || 0;
+          var warte = document.createElement('div'); warte.className = 'vivi-hinw'; warte.id = 'vivi-warte';
+          var t0 = Date.now();
+          var zeichneWarte = function () {
+            var s = Math.round((Date.now() - t0) / 1000);
+            warte.textContent = 'Übertragung läuft, ' + s + ' s. ' + (n > 2 ? 'Bei einem Mehrfamilienhaus kann das bis zu zwei Minuten dauern, ' : 'Das dauert meist nur Sekunden, ') + 'weil ViVi alle Mieten ab Mietbeginn anlegt. Bitte das Fenster offen lassen.';
+          };
+          zeichneWarte();
+          var fuss = ov.querySelector('.vivi-fuss'); if (fuss) fuss.parentNode.insertBefore(warte, fuss);
+          var uhr = setInterval(zeichneWarte, 1000);
+          var fertig = function () { clearInterval(uhr); _anlegenLaeuft = false; };
           var b = opt(); b.bestaetigt = true;
-          api('/vivi/objekt/' + encodeURIComponent(key) + '/anlegen', { method: 'POST', body: b, timeout: 180000 }).then(function () {
-            schliessen(); meldung('In ViVi angelegt');
+          api('/vivi/objekt/' + encodeURIComponent(key) + '/anlegen', { method: 'POST', body: b, timeout: 240000 }).then(function () {
+            fertig(); schliessen(); meldung('In ViVi angelegt');
             return abgleichen(true);
           }).catch(function (e) {
+            fertig();
             alert((e && e.message) || 'Anlegen fehlgeschlagen.');
             schliessen();
             api('/vivi/objekt/' + encodeURIComponent(key) + '/werte').then(function (r) { if (window._currentObjKey === key) { _stand = r; leiste(); } }).catch(function () {});
-          });
+          }).then(function () { try { if (window.DpBuchhaltung) window.DpBuchhaltung.zeigen(); } catch (x) {} });
         };
       };
       var accounts = null;
@@ -336,7 +361,7 @@
     if (!b) return;
     ev.preventDefault();
     var was = b.getAttribute('data-vivi');
-    if (was === 'anlegen') anlegen();
+    if (was === 'anlegen') { if (b.disabled) return; anlegen(); }
     else if (was === 'zuordnen') zuordnen();
     else if (was === 'abgleichen') abgleichen(false);
     else if (was === 'loesen') loesen();
@@ -345,6 +370,29 @@
     var key = (ev && ev.detail && (ev.detail.key || ev.detail.id)) || window._currentObjKey || null;
     setTimeout(function () { objektGeladen(window._currentObjKey || key); }, 500);
   });
+
+  /* v3967 · Statuswechsel (gewonnen, offen, verloren) aus js/buchhaltung-verbinden.js: Leiste neu zeichnen */
+  window.addEventListener('dp:buchhaltung-status', function () { frei().then(function (ok) { if (ok && _key) leiste(); }); });
+
+  /* v3967 · Anbieter in der Schicht „Buchhaltung verbinden“ (js/buchhaltung-verbinden.js) */
+  function anmelden() {
+    if (!window.DpBuchhaltung) return;
+    window.DpBuchhaltung.anbieter({
+      id: 'vivi', name: 'ViVi', frei: frei,
+      verbunden: function () { return verbindung(); },
+      status: function (key) {
+        if (_anlegenLaeuft && key === _key) return { laeuft: true, text: 'Die Übernahme nach ViVi läuft. Bei einem Mehrfamilienhaus kann das bis zu zwei Minuten dauern.' };
+        return api('/vivi/objekt/' + encodeURIComponent(key) + '/werte').then(function (r) {
+          if (r && r.verknuepft) return { verknuepft: true, text: 'In ViVi verwaltet. ' + standText(r.letzter_abruf) + '. Die Werte kommen aus ViVi und sind im Reiter Objekt ausgegraut.' };
+          if (r && r.status === 'laeuft') return { laeuft: true };
+          if (r && r.status === 'abgebrochen') return { verknuepft: false, text: '' };
+          return { verknuepft: false };
+        });
+      },
+      uebernehmen: anlegen
+    });
+  }
+  if (window.DpBuchhaltung) anmelden(); else document.addEventListener('DOMContentLoaded', anmelden);
 
   window.DpVivi = { verbindungKarte: verbindungKarte, leiste: leiste, anlegen: anlegen, abgleichen: abgleichen, zuordnen: zuordnen, loesen: loesen, objektGeladen: objektGeladen };
 })();
