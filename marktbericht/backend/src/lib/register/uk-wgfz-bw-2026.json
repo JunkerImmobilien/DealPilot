@@ -110,49 +110,6 @@
  {
   "kennzahl": "umrechnungskoeffizient_wgfz",
   "land_code": "BW",
-  "ags": "08311000",
-  "ebene": "gemeinde",
-  "gebiet_name": "Freiburg im Breisgau, Stadtkreis",
-  "gaa_name": "Gutachterausschuss für die Ermittlung von Grundstückswerten in Freiburg i. Br.",
-  "ausschuss": "Gutachterausschuss für die Ermittlung von Grundstückswerten in Freiburg i. Br.",
-  "zweig": "alle",
-  "jahrgang": 2026,
-  "berichtsjahr": 2026,
-  "vollstaendig": false,
-  "warum_kein_wert": "Für Mehrfamilien- und Wohn-/Geschäftshäuser nennt Freiburg: „Statistische Auswertungen haben eine Abhängigkeit von der Geschossflächenzahl nachgewiesen“, „Die vorstehenden wertrelevanten Faktoren sind in den Bodenrichtwerten bereits berücksichtigt.“ Eine Umrechnungstabelle steht in den Erläuterungen 2025 nicht.",
-  "geltungsbereich": {
-   "objektarten": [],
-   "objektarten_ausgeschlossen": [],
-   "ausserhalb_weg": "Geschäftsstelle des Gutachterausschusses, Amt für Wohnraumentwicklung und Vermessung der Stadt Freiburg i. Br., Berliner Allee 1, 79114 Freiburg i. Br., gutachterausschuss@freiburg.de"
-  },
-  "belege": [
-   {
-    "art": "amtliche Veröffentlichung",
-    "dokument": "Erläuterungen 2025 – Gutachterausschuss für die Ermittlung von Grundstückswerten in Freiburg i. Br.",
-    "fundstelle": "Erläuterungen 2025",
-    "url": "https://www.gutachterausschuesse-bw.de/borisfachdaten/lgd/2025/08311000_erlaeuterungen_2025.pdf"
-   }
-  ],
-  "fundstelle": "Erläuterungen 2025",
-  "stufe": "A",
-  "stufe_grund": "Sperre: kein Wert, Weg zur Quelle.",
-  "stichtag": null,
-  "stichtag_hinweis": "Ohne Wert kein Stichtag.",
-  "quelle_url": "https://www.gutachterausschuesse-bw.de/borisfachdaten/lgd/2025/08311000_erlaeuterungen_2025.pdf",
-  "seite": "Erläuterungen 2025",
-  "lizenz": "kein Wert - Lizenz nicht einschlägig",
-  "quellenvermerk": null,
-  "modellversion": "Umrechnungskoeffizienten WGFZ (§ 16 Abs. 4, § 40 ImmoWertV), Gutachterausschuss für die Ermittlung von Grundstückswerten in Freiburg i. Br., Jahrgang 2026",
-  "quelle_parser": "v-uk-wgfz-ernte-2 (pdftotext -layout, Seitenbild wo noetig, 18.10.2026)",
-  "modellansaetze": {},
-  "belege_meta": {
-   "abgerufen_am": "2026-10-18",
-   "dokument": "Erläuterungen 2025 – Gutachterausschuss für die Ermittlung von Grundstückswerten in Freiburg i. Br."
-  }
- },
- {
-  "kennzahl": "umrechnungskoeffizient_wgfz",
-  "land_code": "BW",
   "ags": "08215009",
   "ebene": "gemeinde",
   "gebiet_name": "Bruchsal",

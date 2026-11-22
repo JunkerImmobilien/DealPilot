@@ -3946,37 +3946,5 @@
   "lizenz_des_dokuments": "kein Lizenzvermerk in den Dokumenten gefunden",
   "fundstelle": "Blatt 1 beider Schaubilder (Regressionsgleichungen im Diagramm)",
   "seite": null
- },
- {
-  "land_code": "BW",
-  "ags": "08215009",
-  "ebene": "gemeinde",
-  "gebiet_name": "Bruchsal",
-  "gaa_name": "Gemeinsamer Gutachterausschuss bei der Stadt Bruchsal",
-  "kennzahl": "sachwertfaktor",
-  "zweig": "ezfh",
-  "vollstaendig": false,
-  "warum_kein_wert": "FORM D — Zugang und Lizenz stehen nicht im Weg, die DARSTELLUNG tut es: der Wert ist nur als Bild, als Schaubild ohne Zahlen oder in einer fehlerhaften OCR-Textschicht vorhanden. Daraus eine Zahl zu lesen, hiesse sie zu erfinden.\n\nAUSSCHUSS: Gemeinsamer Gutachterausschuss bei der Stadt Bruchsal. ZUSTAENDIGKEITSBEREICH: Bruchsal, Bad Schönborn, Eggenstein-Leopoldshafen, Forst, Hambrücken, Karlsdorf-Neuthard, Kronau, Östringen, Stutensee, Ubstadt-Weiher, Walzbachtal, Weingarten (Baden). BERICHT: Grundstücksmarktbericht 2024, Kapitel 8.1 Sachwertfaktoren (Druck-S. 25–27). FUNDSTELLE: Kapitel 8.1 \"Sachwertfaktoren\", Schaubilder Druck-S. 25 (Gebäudetyp 1) und Druck-S. 27 (Gebäudetyp 2/3), Modellbeschreibungen Druck-S. 26 und 28. LIZENZ IM WORTLAUT: \"kein Lizenz- und kein Urhebervermerk im Dokument\". GEMESSEN: DERSELBE BERICHT LIEFERT DEN ZINSSATZ, ABER NICHT DEN FAKTOR. Der Liegenschaftszinssatz fuer Wohnungseigentum steht als TABELLE auf Druck-S. 28 und liegt als Wert im Register. Die Sachwertfaktoren druckt derselbe Bericht nur als Streudiagramm mit Regressionsgerade. DREI Gruende gegen eine Uebernahme. ERSTENS: von den beiden Schaubildern traegt nur EINES eine lesbare Gleichung — \"y = -0,0000008957x + 1,5531063\" fuer Gebaeudetyp 1 (freistehende Ein- und Zweifamilienhaeuser, 109 Faelle); fuer Typ 2/3 ist in der Textschicht keine Gleichung zu finden. ZWEITENS: unmittelbar hinter dem Achsenabschnitt steht in der Textschicht ein freistehendes \"06\", das sich aus dem Text allein nicht zuordnen laesst — Teil der Konstanten oder die Achsenmarke \"0,6\"? Beide Lesarten sind plausibel, und eine davon ist falsch. DRITTENS: R² = 0,3323674778. Ein Anwendungsbeispiel druckt der Bericht nicht ab. Immerhin ist die Stichprobe vollstaendig beschrieben (Bodenrichtwertniveau 260–680 €/m², Grundstuecksflaechen 344–1.169 m², Restnutzungsdauern 12–73 Jahre, Bruttogrundflaechen 138–632 m²) und das Modell benannt (NHK 2010, GND 80 Jahre, Regionalfaktor 1,0, Kauffaelle 01.01.2023–31.12.2023). PREIS: kostenfrei. WEG ZUR QUELLE: Gemeinsamer Gutachterausschuss bei der Stadt Bruchsal, Rathaus an der Luisenstraße, Luisenstraße 13, 76646 Bruchsal, Telefon 07251 79 4333, gutachterausschuss@bruchsal.de. KEIN NACHBARWERT UND KEIN LANDESMITTEL. § 21 Abs. 2 bzw. Abs. 3 ImmoWertV verlangt den Wert des oertlich zustaendigen Gutachterausschusses. Baden-Wuerttemberg hat keinen Landeswert: die Zentrale Geschaeftsstelle fuer Grundstueckswertermittlung (ZGG) gibt nach eigener Darstellung EINZELNE wertermittlungsrelevante Daten wie Sachwertfaktoren oder Liegenschaftszinssaetze NICHT heraus. Den Wert eines Nachbarausschusses zu uebertragen waere eine erfundene Herkunft. DOKTRIN: kostenpflichtig oder genehmigungspflichtig heisst nicht \"kein Wert\", sondern \"hier ist der Weg\" — dieser Satz IST dieser Weg.",
-  "unvollstaendig_grund": "Kein Wert im Register: Zugang und Lizenz stehen nicht im Weg, die DARSTELLUNG tut es: der Wert ist nur als Bild, als Schaubild ohne Zahlen oder in einer fehlerhaften OCR-Textschicht vorhanden. Daraus eine Zahl zu lesen, hiesse sie zu erfinden.",
-  "gilt_fuer_zweige": [
-   "ezfh",
-   "rhdhh",
-   "mfh",
-   "etw",
-   "we_v"
-  ],
-  "gilt_fuer_zweige_hinweis": "Diese Sperre gilt fuer ALLE Objektarten dieses Ausschusses. Im Register steht sie — wie beauftragt, EINE Sperre je Ausschussgebiet und Kennzahl — nur unter zweig \"ezfh\". Der Registerzugriff sucht nach Zweig; unter den anderen vier Zweigen wird sie deshalb NICHT gefunden. Das Ausrollen auf jeden Zweig und jede Gemeinde des Gebiets ist eine eigene Entscheidung und steht im Bericht zu diesem Paket.",
-  "gilt_auch_fuer": "Bruchsal, Bad Schönborn, Eggenstein-Leopoldshafen, Forst, Hambrücken, Karlsdorf-Neuthard, Kronau, Östringen, Stutensee, Ubstadt-Weiher, Walzbachtal, Weingarten (Baden)",
-  "stufe": "E",
-  "stufe_grund": "kein Wert — Wegweiser zur Quelle (§ 21 ImmoWertV verlangt den oertlichen Wert)",
-  "berichtsjahr": 2024,
-  "stichtag": "2024-01-01",
-  "quelle_url": "https://www.bruchsal.de/site/Bruchsal-Internet-2023/get/documents_E-9812412/bruchsal-internet/StadtBruchsal-Dateien/PDF-Sammlungen/Gutachterausschuss/Gem.%20GAA%20bei%20der%20Stadt%20Bruchsal,%20GMB%202024.pdf",
-  "quelle_parser": "v1891-hand (pdftotext, Impressum und Datenkapitel, am 05.10.2026 gelesen)",
-  "quellenvermerk": "Grundstücksmarktbericht 2024, Kapitel 8.1 Sachwertfaktoren (Druck-S. 25–27), Gemeinsamer Gutachterausschuss bei der Stadt Bruchsal",
-  "lizenz": "kein Wert - Lizenz nicht einschlägig",
-  "lizenz_des_dokuments": "kein Lizenz- und kein Urhebervermerk im Dokument",
-  "fundstelle": "Kapitel 8.1 \"Sachwertfaktoren\", Schaubilder Druck-S. 25 (Gebäudetyp 1) und Druck-S. 27 (Gebäudetyp 2/3), Modellbeschreibungen Druck-S. 26 und 28",
-  "seite": null
  }
 ]

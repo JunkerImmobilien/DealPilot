@@ -702,6 +702,7 @@ export const SAATDATEIEN = ['lzs-nrw.json', 'swf-nrw.json', 'lzs-he-2026.json', 
                             'vgf-he-offenbach-imb-2026.json',
                             /* Ernte 22.11.2026: BY (Muenchen MFH 2,8 %), NI (Aurich 12 LZS, GND 80), HE (Kassel wgh/buero/produktion), SH (Segeberg/Flensburg Sperren mit Grund) */
                             'ernte-by-20261122.json', 'ernte-ni-20261122.json', 'ernte-he-20261122.json', 'ernte-sh-20261122.json',
+                            'ernte-bw-20261122.json',   /* BW: Freiburg UK Flaeche+WGFZ, Bruchsal UK Flaeche (12), Ulm Vergleichsfaktoren (4) */
                            ];
 
 /* ═══ v1778 · WAS LIEGT IM ORDNER, STEHT ABER NICHT IN DER LISTE? ═══

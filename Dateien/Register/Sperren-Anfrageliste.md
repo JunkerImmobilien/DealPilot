@@ -7,7 +7,7 @@ Stand 2026-11-22 · erzeugt mit `node tools/sperren-anfrageliste.mjs` aus den ak
 | | |
 |---|---:|
 | Ausschüsse mit Sperren | 398 |
-| Sperren | 12349 |
+| Sperren | 12340 |
 | davon Ausschüsse mit belegter E-Mail der Geschäftsstelle | 368 |
 | nur E-Mail der oberen Stelle | 1 |
 | nur Kontaktformular | 2 |
@@ -17,12 +17,12 @@ Stand 2026-11-22 · erzeugt mit `node tools/sperren-anfrageliste.mjs` aus den ak
 
 | Grund | Sperren |
 |---|---:|
-| kostenpflichtig | 3560 |
-| auf Anfrage | 3335 |
-| ohne Angabe | 2342 |
+| kostenpflichtig | 3561 |
+| auf Anfrage | 3332 |
+| ohne Angabe | 2327 |
 | nicht abgeleitet | 952 |
-| genehmigungspflichtig | 942 |
-| nicht veröffentlicht | 401 |
+| genehmigungspflichtig | 944 |
+| nicht veröffentlicht | 407 |
 | frei, aber nicht verwertbar | 325 |
 | kostenfrei, aber nicht verwertbar | 278 |
 | nur nichtkommerziell | 200 |
@@ -35,7 +35,7 @@ Stand 2026-11-22 · erzeugt mit `node tools/sperren-anfrageliste.mjs` aus den ak
 |---|---:|---:|---:|
 | BB | 17 | 264 | 17 |
 | BE | 1 | 14 | 1 |
-| BW | 111 | 8738 | 98 |
+| BW | 111 | 8720 | 98 |
 | BY | 96 | 1165 | 96 |
 | HB | 2 | 17 | 2 |
 | HE | 19 | 320 | 19 |
@@ -44,7 +44,7 @@ Stand 2026-11-22 · erzeugt mit `node tools/sperren-anfrageliste.mjs` aus den ak
 | NI | 11 | 383 | 0 |
 | NW | 72 | 250 | 68 |
 | RP | 13 | 479 | 12 |
-| SH | 15 | 146 | 15 |
+| SH | 15 | 155 | 15 |
 | SL | 7 | 91 | 7 |
 | SN | 13 | 109 | 13 |
 | ST | 1 | 81 | 1 |
@@ -125,7 +125,6 @@ Stand 2026-11-22 · erzeugt mit `node tools/sperren-anfrageliste.mjs` aus den ak
 | Gemeinsamer Gutachterausschuss für den südwestlichen Schwarzwald-Baar-Kreis | 78 | Vergleichsfaktor (§ 20) 33, Liegenschaftszinssatz 12, Sachwertfaktor 11, UK Grundstücksgröße 11, UK WGFZ 11 | auf Anfrage 33, kostenfrei, aber nicht verwertbar 23, ohne Angabe 22 |  | 2026 | gutachterausschuss@donaueschingen.de | [Quelle](https://www.donaueschingen.de/gutachterausschuss/Marktberichte) |
 | Gemeinsamer Gutachterausschuss Südwestlicher Rhein-Neckar-Kreis | 76 | Vergleichsfaktor (§ 20) 30, UK Grundstücksgröße 20, UK WGFZ 10, Liegenschaftszinssatz 8, Sachwertfaktor 8 | ohne Angabe 41, nur nichtkommerziell 25, nicht abgeleitet 10 |  | 2026 | gutachterausschuss@schwetzingen.de | [Quelle](https://www.schwetzingen.de/site/Schwetzingen_2021/get/params_E1638776855_Dattachment/3521216/Grundst%C3%BCcksmarktbericht%20%20GAA%20s%C3%BCdwestlicher%20RNK_Auswertung%20des%20Jahres%202023.pdf) |
 | Gemeinsamer Gutachterausschuss bei der Stadt Rottweil | 75 | Vergleichsfaktor (§ 20) 45, UK Grundstücksgröße 15, UK WGFZ 15 | auf Anfrage 45, ohne Angabe 30 |  | 2026 | – | [Quelle](https://www.gutachterausschuesse-bw.de/borisfachdaten/lgd/2025/08325049-Rottweil_2025.pdf) |
-| Gemeinsamer Gutachterausschuss bei der Stadt Bruchsal | 73 | Vergleichsfaktor (§ 20) 36, Sachwertfaktor 13, UK Grundstücksgröße 12, UK WGFZ 12 | auf Anfrage 36, ohne Angabe 25, nicht abgeleitet 12 |  | 2026 | gutachterausschuss@bruchsal.de | [Quelle](https://www.forst-baden.de/site/forst-baden/get/params_E755979667_Dattachment/3333364/Grundst%C3%BCcksmarktbericht%202025.pdf) |
 | Zweckverband Gemeinsamer Gutachterausschuss Bottwartal und Umgebung | 72 | Vergleichsfaktor (§ 20) 27, Sachwertfaktor 27, UK Grundstücksgröße 9, UK WGFZ 9 | auf Anfrage 27, nicht veröffentlicht 27, ohne Angabe 18 |  | 2026 | gutachter@gabottwartal.de | [Quelle](https://www.gutachterausschuss-bottwartal.de/) |
 | Gutachterausschuss mit BORIS-BW-Nr. 32733 (Tuttlingen und 13 Gemeinden) | 70 | Vergleichsfaktor (§ 20) 42, UK Grundstücksgröße 14, UK WGFZ 14 | auf Anfrage 42, ohne Angabe 28 |  | 2026 | – | [Quelle](https://www.gutachterausschuesse-bw.de/) |
 | Gemeinsamer Gutachterausschuss bei der Stadt Philippsburg | 65 | Liegenschaftszinssatz 25, Vergleichsfaktor (§ 20) 15, Sachwertfaktor 15, UK Grundstücksgröße 5, UK WGFZ 5 | nur nichtkommerziell 35, auf Anfrage 15, ohne Angabe 10, nicht abgeleitet 5 |  | 2026 | gutachterausschuss@philippsburg.de | [Quelle](https://www.philippsburg.de/index.php/bodenrichtwerte.html) |
@@ -134,6 +133,7 @@ Stand 2026-11-22 · erzeugt mit `node tools/sperren-anfrageliste.mjs` aus den ak
 | Gutachterausschuss Limpurger Land-Bühlertal | 65 | Vergleichsfaktor (§ 20) 39, UK Grundstücksgröße 13, UK WGFZ 13 | auf Anfrage 39, ohne Angabe 26 |  | 2026 | gutachterausschuss@gaildorf.de | [Quelle](https://www.gutachterausschuesse-bw.de/) |
 | Gemeinsamer Gutachterausschuss Achern | 64 | Liegenschaftszinssatz 40, Sachwertfaktor 24 | kostenpflichtig 64 | Immobilienmarktbericht 2025: 50 Euro (Veröffentlichung vom 09.09.2025, S. 1) | 2025 | gutachterausschuss@achern.de | [Quelle](https://www.achern.de/de/Rathaus/Aktuelles-Nachrichtenblatt/Aktuelles/Aktuell?view=publish&item=article&id=4870) |
 | Gemeinsamer Gutachterausschuss bei der Stadt Bopfingen | 63 | Vergleichsfaktor (§ 20) 27, Liegenschaftszinssatz 9, Sachwertfaktor 9, UK Grundstücksgröße 9, UK WGFZ 9 | genehmigungspflichtig 43, ohne Angabe 20 |  | 2026 | info@gaa-bopfingen.de | [Quelle](https://www.bopfingen.de/site/Bopfingen-2021/get/params_E1338868447_Dattachment/23958667/Auszug%20aus%20dem%20Grundst%C3%BCcksmarktbericht%202025.pdf) |
+| Gemeinsamer Gutachterausschuss bei der Stadt Bruchsal | 60 | Vergleichsfaktor (§ 20) 36, UK WGFZ 12, Sachwertfaktor 12 | auf Anfrage 36, ohne Angabe 12, nicht abgeleitet 12 |  | 2026 | gutachterausschuss@bruchsal.de | [Quelle](https://www.forst-baden.de/site/forst-baden/get/params_E755979667_Dattachment/3333364/Grundst%C3%BCcksmarktbericht%202025.pdf) |
 | Gemeinsamer Gutachterausschuss Hegau-Hochrhein bei der Stadt Singen (Hohentwiel) | 60 | Vergleichsfaktor (§ 20) 36, UK Grundstücksgröße 12, UK WGFZ 12 | auf Anfrage 36, ohne Angabe 24 |  | 2026 | gutachterausschuss@singen.de | [Quelle](https://www.gutachterausschuesse-bw.de/borisfachdaten/lgd/2025/08335075-oertliche_Fachinformation_2025.pdf) |
 | Gemeinsamer Gutachterausschuss Künzelsau | 55 | Vergleichsfaktor (§ 20) 33, UK Grundstücksgröße 11, UK WGFZ 11 | auf Anfrage 33, ohne Angabe 22 |  | 2026 | gutachterausschuss@kuenzelsau.de | [Quelle](https://www.kuenzelsau.de/site/Kuenzelsau/get/documents_E-1783241126/kuenzelsau/Dateien/3.%20Bauen%20und%20Wohnen/Gemeinsamer%20Gutachterausschuss/Bodenrichtwert%20%E2%89%A0%20Bodenwert.pdf) |
 | Gemeinsamer Gutachterausschuss Main-Tauber-Süd | 55 | Vergleichsfaktor (§ 20) 33, UK Grundstücksgröße 11, UK WGFZ 11 | auf Anfrage 33, ohne Angabe 22 |  | 2026 | gutachterausschuss@bad-mergentheim.de | [Quelle](https://www.gutachterausschuesse-bw.de/) |
@@ -170,12 +170,12 @@ Stand 2026-11-22 · erzeugt mit `node tools/sperren-anfrageliste.mjs` aus den ak
 | Gemeinsamer Gutachterausschuss Horb a. N. | 15 | Vergleichsfaktor (§ 20) 9, UK Grundstücksgröße 3, UK WGFZ 3 | auf Anfrage 9, ohne Angabe 6 |  | 2026 | gutachterausschuss@horb.de | [Quelle](https://www.gutachterausschuesse-bw.de/borisfachdaten/lgd/2025/08237040-FachinformationenBRW_2025.pdf) |
 | Gemeinsamer Gutachterausschuss Weil der Stadt – Aidlingen – Grafenau | 15 | Vergleichsfaktor (§ 20) 9, UK Grundstücksgröße 3, UK WGFZ 3 | auf Anfrage 9, ohne Angabe 6 |  | 2026 | gutachterausschuss@weil-der-stadt.de | [Quelle](https://www.gutachterausschuesse-bw.de/borisfachdaten/lgd/2025/08115050-WeilderStadtAidlingenGrafenau_2025.pdf) |
 | Gutachterausschuss für die Ermittlung von Grundstückswerten in Esslingen am Neckar | 13 | Liegenschaftszinssatz 5, Vergleichsfaktor (§ 20) 3, Sachwertfaktor 3, UK Grundstücksgröße 1, UK WGFZ 1 | kostenpflichtig 9, auf Anfrage 3, ohne Angabe 1 | im Dokument nicht beziffert | 2026 | gutachterausschuss@esslingen.de | [Quelle](https://www.gutachterausschuesse-bw.de/borisfachdaten/lgd/2025/08116019-Esslingen_2025.pdf) |
-| Gutachterausschuss für die Ermittlung von Grundstückswerten in Freiburg i. Br. | 13 | Liegenschaftszinssatz 5, Vergleichsfaktor (§ 20) 3, Sachwertfaktor 3, UK Grundstücksgröße 1, UK WGFZ 1 | kostenpflichtig 8, auf Anfrage 3, ohne Angabe 2 | Immobilienmarktbericht digital (PDF) 40 Euro zzgl. 19 % USt = 47,60 Euro, Kreditkarte, Zustellung per E-Mail; gedruckt 40 Euro zzgl. 2,50 Euro Versand und 7 % … | 2026 | gutachterausschuss@freiburg.de | [Quelle](https://www.service-bw.de/onlineantraege/onlineantrag?prozessKey=m40169.universalbestellprozess_freiburg&regionIds=1977&regionName=Freiburg%20im%20Breisgau&ags=08311000&leistungId=6004357&processIntegrationName=freiburg) |
 | Gutachterausschuss für die Ermittlung von Grundstückswerten in Mannheim | 13 | Liegenschaftszinssatz 5, Vergleichsfaktor (§ 20) 3, Sachwertfaktor 3, UK Grundstücksgröße 1, UK WGFZ 1 | kostenpflichtig 8, auf Anfrage 3, ohne Angabe 2 | Grundstücksmarktbericht als PDF-Datei 40 Euro, Druckversion 50 Euro (Örtliche Fachinformation 2025, 2. Ausgabe, S. 5) | 2026 | gutachterausschuss@mannheim.de | [Quelle](https://www.service-bw.de/zufi/leistungen/6015515) |
-| Gutachterausschuss für die Ermittlung von Grundstückswerten in Ulm | 13 | Sachwertfaktor 6, Vergleichsfaktor (§ 20) 3, UK Grundstücksgröße 3, UK WGFZ 1 | kostenfrei, aber nicht verwertbar 9, auf Anfrage 3, ohne Angabe 1 |  | 2026 | gutachterausschuss@ulm.de | [Quelle](https://www.ulm.de/-/media/ulm/vgv/me/downloads/gaa/2025-immobilienmarktbericht-2025.pdf) |
 | Gemeinsamer Gutachterausschuss im südlichen Landkreis Karlsruhe (Geschäftsstelle Ettlingen) | 12 | Sachwertfaktor 12 | auf Anfrage 6, nicht abgeleitet 6 |  | 2025 | gutachterausschuss@ettlingen.de | [Quelle](https://www.gutachterausschuesse-bw.de/borisfachdaten/lgd/2025/08215017-Erlaeuterungen_2025.pdf) |
 | Gutachterausschuss bei der Stadt Leonberg | 11 | Liegenschaftszinssatz 5, Vergleichsfaktor (§ 20) 3, UK Grundstücksgröße 1, UK WGFZ 1, Sachwertfaktor 1 | auf Anfrage (kostenfrei) 6, auf Anfrage 3, ohne Angabe 2 | kostenfrei, aber nur auf Anfrage bei der Geschäftsstelle — nicht veröffentlicht | 2026 | gutachterausschuss@leonberg.de | [Quelle](https://www.leonberg.de/B%C3%BCrger-Stadt/Politik-und-Rathaus/Serviceportal-Leonberg/B%C3%BCrgerservice/F%C3%BCr-die-Wertermittlung-erforderlichen-Daten.php?ModID=10&FID=2691.10.1&randbox=aus) |
+| Gutachterausschuss für die Ermittlung von Grundstückswerten in Freiburg i. Br. | 11 | Liegenschaftszinssatz 5, Vergleichsfaktor (§ 20) 3, Sachwertfaktor 3 | kostenpflichtig 8, auf Anfrage 3 | Immobilienmarktbericht digital (PDF) 40 Euro zzgl. 19 % USt = 47,60 Euro, Kreditkarte, Zustellung per E-Mail; gedruckt 40 Euro zzgl. 2,50 Euro Versand und 7 % … | 2026 | gutachterausschuss@freiburg.de | [Quelle](https://www.service-bw.de/onlineantraege/onlineantrag?prozessKey=m40169.universalbestellprozess_freiburg&regionIds=1977&regionName=Freiburg%20im%20Breisgau&ags=08311000&leistungId=6004357&processIntegrationName=freiburg) |
 | Gutachterausschuss für die Ermittlung von Grundstückswerten in Pforzheim | 11 | Liegenschaftszinssatz 5, Vergleichsfaktor (§ 20) 3, Sachwertfaktor 1, UK Grundstücksgröße 1, UK WGFZ 1 | kostenpflichtig 8, ohne Angabe 2, genehmigungspflichtig 1 | als PDF-Datei 40 €, als gedruckte Broschüre 50 € (Impressum S. 3) | 2026 | gutachterausschuss@pforzheim.de | [Quelle](https://www.pforzheim.de/stadt/bauen-stadtentwicklung/gutachterausschuss/immobilienmarktbericht.html) |
+| Gutachterausschuss für die Ermittlung von Grundstückswerten in Ulm | 10 | Sachwertfaktor 6, UK Grundstücksgröße 3, UK WGFZ 1 | kostenfrei, aber nicht verwertbar 9, ohne Angabe 1 |  | 2026 | gutachterausschuss@ulm.de | [Quelle](https://www.ulm.de/-/media/ulm/vgv/me/downloads/gaa/2025-immobilienmarktbericht-2025.pdf) |
 | Gutachterausschuss für die Ermittlung von Grundstückswerten in Stuttgart | 7 | Vergleichsfaktor (§ 20) 3, Liegenschaftszinssatz 1, Sachwertfaktor 1, UK Grundstücksgröße 1, UK WGFZ 1 | kostenpflichtig 5, ohne Angabe 2 | nicht beziffert (Volltext beim Kundenzentrum des Stadtmessungsamtes) | 2026 | stadtmessungsamt@stuttgart.de | [Quelle](https://www.stuttgart.de/leben/bauen/grundstueckswerte/Marktberichte-und-Dashboard) |
 | Gutachterausschuss für die Ermittlung von Grundstückswerten und sonstige Wertermittlungen in Karlsruhe | 7 | Vergleichsfaktor (§ 20) 3, Liegenschaftszinssatz 1, Sachwertfaktor 1, UK Grundstücksgröße 1, UK WGFZ 1 | kostenpflichtig 4, ohne Angabe 3 | 50,00 € je PDF-Exemplar (Verwaltungsgebührensatzung) | 2026 | gga@karlsruhe.de | [Quelle](https://www.karlsruhe.de/fileadmin/user_upload/05_Mobilitaet_Stadtbild/054_Bauen_und_Immobilien/3_Gutachterausschuss/Immobilienmarktbericht_KA_2025_INTERNET.pdf) |
 | Gutachterausschuss für Grundstückswerte für den Bereich der Stadt Konstanz | 7 | Vergleichsfaktor (§ 20) 3, Liegenschaftszinssatz 1, Sachwertfaktor 1, UK Grundstücksgröße 1, UK WGFZ 1 | kostenpflichtig 4, ohne Angabe 3 | nicht beziffert | 2026 | gutachterausschuss@konstanz.de | [Quelle](https://www.gutachterausschuesse-bw.de/borisfachdaten/lgd/2026/08335043-%C3%B6rtlicheFachinformationenKN_2026.pdf) |
@@ -464,6 +464,7 @@ Stand 2026-11-22 · erzeugt mit `node tools/sperren-anfrageliste.mjs` aus den ak
 | Gutachterausschuss für Grundstückswerte im Kreis Dithmarschen | 18 | Vergleichsfaktor (§ 20) 12, Sachwertfaktor 4, UK Grundstücksgröße 1, UK WGFZ 1 | frei, aber nicht verwertbar 12, kostenfrei, aber nicht verwertbar 4, nicht abgeleitet 1, nicht veröffentlicht 1 |  | 2026 | geschaeftsstelle-gutachterausschuss@dithmarschen.de | [Quelle](https://www.dithmarschen.de/fileadmin/download/themen/wirtschaft/grundstuecksmarktbericht_2025.pdf) |
 | Gutachterausschuss für Grundstückswerte im Kreis Pinneberg | 14 | Liegenschaftszinssatz 5, Sachwertfaktor 4, Vergleichsfaktor (§ 20) 3, UK Grundstücksgröße 1, UK WGFZ 1 | genehmigungspflichtig 9, frei, aber nicht verwertbar 3, nicht veröffentlicht 2 |  | 2026 | gutachterausschuss-pinneberg@lvermgeo.landsh.de | [Quelle](https://www.schleswig-holstein.de/gaa/DE/gaPdf/pdf_Pinneberg/gaAntragKpsPinneberg.pdf?__blob=publicationFile&v=4) |
 | Gutachterausschuss für Grundstückswerte im Kreis Stormarn | 14 | Liegenschaftszinssatz 5, Sachwertfaktor 4, Vergleichsfaktor (§ 20) 3, UK Grundstücksgröße 1, UK WGFZ 1 | genehmigungspflichtig 7, nicht abgeleitet 3, frei, aber nicht verwertbar 3, nicht veröffentlicht 1 | Bericht kostenfrei abrufbar (Deckblatt: Gebühr 60,00 €); Wiedergabe nur mit Erlaubnis | 2026 | ga@kreis-stormarn.de | [Quelle](https://www.kreis-stormarn.de/kreis/sonderbereiche/gutachterausschuss-fuer-grundstueckswerte-im-kreis-stormarn/index.html) |
+| Gutachterausschuss für Grundstückswerte im Kreis Segeberg | 11 | Sachwertfaktor 4, Vergleichsfaktor (§ 20) 3, Liegenschaftszinssatz 2, UK Grundstücksgröße 1, UK WGFZ 1 | nicht veröffentlicht 6, frei, aber nicht verwertbar 3, genehmigungspflichtig 2 | Bericht kostenfrei abrufbar; Wiedergabe nur mit Genehmigung des Herausgebers | 2025 | gutachterausschuss@segeberg.de | [Quelle](https://www.segeberg.de/loadDocument.phtml?ObjSvrID=3466&ObjID=1081&ObjLa=1&Ext=PDF) |
 | Gutachterausschuss für Grundstückswerte im Kreis Nordfriesland | 10 | Sachwertfaktor 4, Vergleichsfaktor (§ 20) 3, Liegenschaftszinssatz 1, UK Grundstücksgröße 1, UK WGFZ 1 | nicht abgeleitet 5, frei, aber nicht verwertbar 3, nicht veröffentlicht 2 |  | 2026 | gutachterausschuss@nordfriesland.de | [Quelle](https://www.nordfriesland.de/gutachterausschuss) |
 | Gutachterausschuss für Grundstückswerte im Kreis Plön | 10 | Sachwertfaktor 4, Vergleichsfaktor (§ 20) 3, Liegenschaftszinssatz 1, UK Grundstücksgröße 1, UK WGFZ 1 | kostenpflichtig 10 | gegen Kostenerstattung (Betrag nicht genannt) | 2026 | gutachterausschuss.kreis_ploen@lvermgeo.landsh.de | [Quelle](https://www.schleswig-holstein.de/gaa/DE/gaPdf/pdf_Ploen/gaMB2025Ploen.pdf?__blob=publicationFile&v=2) |
 | Gutachterausschuss für Grundstückswerte im Kreis Steinburg | 10 | Sachwertfaktor 4, Vergleichsfaktor (§ 20) 3, Liegenschaftszinssatz 1, UK Grundstücksgröße 1, UK WGFZ 1 | auf Anfrage 5, kostenpflichtig 3, nicht abgeleitet 1, nicht veröffentlicht 1 | Preis auf der Seite nicht genannt | 2026 | gutachterausschuss@steinburg.de | [Quelle](https://www.steinburg.de/kreisverwaltung/informationen-der-fachaemter/amt-fuer-kreisentwicklung/gutachterausschuss/grundstuecksmarktbericht.html) |
@@ -474,8 +475,7 @@ Stand 2026-11-22 · erzeugt mit `node tools/sperren-anfrageliste.mjs` aus den ak
 | Gutachterausschuss für Grundstückswerte im Kreis Herzogtum Lauenburg | 8 | Vergleichsfaktor (§ 20) 3, Sachwertfaktor 2, Liegenschaftszinssatz 2, UK Grundstücksgröße 1 | kostenfrei, aber nicht verwertbar 4, frei, aber nicht verwertbar 3, nicht abgeleitet 1 |  | 2026 | poststelle-luebeck@lvermgeo.landsh.de | [Quelle](https://www.schleswig-holstein.de/gaa/DE/gaPdf/pdf_Antraege/gaFormKpsLuebeck.pdf?__blob=publicationFile&v=2) |
 | Gutachterausschuss für Grundstückswerte im Kreis Ostholstein | 8 | Vergleichsfaktor (§ 20) 3, Sachwertfaktor 2, Liegenschaftszinssatz 2, UK Grundstücksgröße 1 | kostenfrei, aber nicht verwertbar 4, frei, aber nicht verwertbar 3, nicht abgeleitet 1 |  | 2026 | poststelle-luebeck@lvermgeo.landsh.de | [Quelle](https://www.schleswig-holstein.de/gaa/DE/gaPdf/pdf_Antraege/gaFormKpsLuebeck.pdf?__blob=publicationFile&v=2) |
 | Gutachterausschuss für Grundstückswerte in der Hansestadt Lübeck | 8 | Vergleichsfaktor (§ 20) 3, Sachwertfaktor 2, Liegenschaftszinssatz 2, UK Grundstücksgröße 1 | kostenfrei, aber nicht verwertbar 4, frei, aber nicht verwertbar 3, nicht abgeleitet 1 |  | 2026 | poststelle-luebeck@lvermgeo.landsh.de | [Quelle](https://www.schleswig-holstein.de/gaa/DE/gaPdf/pdf_Antraege/gaFormKpsLuebeck.pdf?__blob=publicationFile&v=2) |
-| Gutachterausschuss für Grundstückswerte in der Stadt Flensburg | 7 | Sachwertfaktor 4, Vergleichsfaktor (§ 20) 3 | auf Anfrage 4, kostenpflichtig 3 | nicht genannt | 2025 | gutachterausschuss-flensburg@lvermgeo.landsh.de | [Quelle](https://www.schleswig-holstein.de/gaa/DE/wir_ueber_uns/Gutachterausschuesse/gaFlensburg) |
-| Gutachterausschuss für Grundstückswerte im Kreis Segeberg | 3 | Vergleichsfaktor (§ 20) 3 | frei, aber nicht verwertbar 3 |  | 2024 | gutachterausschuss@segeberg.de | [Quelle](https://www.segeberg.de/loadDocument.phtml?ObjSvrID=3466&ObjID=1081&ObjLa=1&Ext=PDF) |
+| Gutachterausschuss für Grundstückswerte in der Stadt Flensburg | 8 | Sachwertfaktor 4, Vergleichsfaktor (§ 20) 3, Liegenschaftszinssatz 1 | auf Anfrage 4, kostenpflichtig 4 | nicht genannt | 2025 | gutachterausschuss-flensburg@lvermgeo.landsh.de | [Quelle](https://www.schleswig-holstein.de/gaa/DE/wir_ueber_uns/Gutachterausschuesse/gaFlensburg) |
 
 ## SL
 
