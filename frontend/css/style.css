@@ -41949,3 +41949,37 @@ html body header.hdr.has-v64-score::before { background: none !important; animat
 @media (max-width: 900px) {
   html body .app-wrap:not(.sb-mobile-open) #sidebar.sidebar:not(.sb-mobile-open):not(.open) { box-shadow: none !important; }
 }
+
+/* ════════════════════════════════════════════════════════════════════
+   gold-hell-1 · Gold als SCHRIFT auf hellem Grund wird dunkles Gold
+   Marcel 22.11.2026: Gold als Flaeche, Knopf, Linie und Runway bleibt,
+   Gold auf dunklem Grund bleibt. Nur Schrift auf Hell wird lesbar.
+   Token: var(--wl-7a5d18, #7a5d18) — steht in WL_TINTS, whitelabel-override.js
+   leitet es fuer Mandanten ab (Mindestkontrast 4,5 auf Creme).
+   Gemessen auf Staging 22.11.2026 (App, Messkabine, alle Reiter):
+     #oe-abruf-box .card-title  „Marktbericht abrufen“   2,12 -> 5,71
+     .oe-lk-tag                 „Ziel“                   2,29 -> 6,16
+     .ass-inp .badge            „Annahme“                2,29 -> 6,16
+     #ki-miete-box .ki-lage-tag                          2,29 -> 6,16
+     #ek-pct (LTV-Beschriftung)                          2,29 -> 6,16
+     .dp-sh-btn (Steuer, Hinweise)                       2,68 -> 5,71
+     #s4 .dp-bwk-kopf                                    2,90 -> 6,16
+     .bc-head-eyebrow/.bc-section-eyebrow/.bc-matrix-*   2,97-3,18 -> 5,5
+     .bc-footer-value.gold                               3,07 -> 5,5
+     .bc-head-title .accent (26 px)                      2,19 -> 5,6
+   Je Flaeche benannt, keine Sammelregel: Kopf, Reiterleiste und
+   Seitenleiste tragen keine dieser Klassen.
+   ════════════════════════════════════════════════════════════════════ */
+#oe-abruf-box > .card-title { color: var(--wl-7a5d18, #7a5d18); }
+label > .oe-lk-tag { color: var(--wl-7a5d18, #7a5d18); }
+.ass-inp > .badge { color: var(--wl-7a5d18, #7a5d18); }
+#ki-miete-box .ki-lage-title > .ki-lage-tag { color: var(--wl-7a5d18, #7a5d18); }
+.ltv-labels > #ek-pct.c-gold { color: var(--wl-7a5d18, #7a5d18); }
+summary > .oe-btn.dp-sh-btn { color: var(--wl-7a5d18, #7a5d18); }
+#s4 .dp-bwk-spalte > .dp-bwk-kopf { color: var(--wl-7a5d18, #7a5d18); }
+.bc-head-left > .bc-head-eyebrow,
+.bc-section-header > .bc-section-eyebrow,
+.bc-matrix-axis-y > .bc-matrix-axis-y-label,
+.bc-matrix-grid > .bc-matrix-axis-x-label,
+.bc-footer-cell > .bc-footer-value.gold,
+h3.bc-head-title > .accent { color: var(--wl-7a5d18, #7a5d18); }

@@ -149,6 +149,12 @@
           v = DealPilotConfig.branding.tonAufHell(v);
         }
       } catch (e) {}
+      /* gold-hell-1 (22.11.2026): #7a5d18 ist DAS Token fuer Gold als Schrift auf hellem Grund (Marcel: Gold als Text auf Hell wird dunkles Gold). Fuer einen Mandanten haelt es dieselbe Zusage wie das Original: 4,5:1 auch auf der dunkelsten Cremeflaeche #ECE0C2 (Original 4,70). */
+      try {
+        if (h === '#7a5d18' && window.DealPilotConfig && DealPilotConfig.branding && DealPilotConfig.branding.tonFuerGrund) {
+          v = DealPilotConfig.branding.tonFuerGrund(v, [236, 224, 194], 4.5);
+        }
+      } catch (e) {}
       r.setProperty('--wl-' + h.slice(1).toLowerCase(), v);
     });
   }

@@ -144,7 +144,7 @@
     if (el('ze-auft-stil')) return;
     var s = document.createElement('style'); s.id = 'ze-auft-stil';
     s.textContent = '.ze-auft{margin-top:6px}'
-      + '.ze-auft>summary{cursor:pointer;font-size:12px;color:var(--wl-c9a84c, #C9A84C);list-style:none;display:inline-block;padding:2px 0}'
+      + '.ze-auft>summary{cursor:pointer;font-size:12px;color:var(--wl-7a5d18, #7a5d18);list-style:none;display:inline-block;padding:2px 0}'
       + '.ze-auft>summary::-webkit-details-marker{display:none}'
       + '.ze-auft>summary::before{content:"\\25B8  "}.ze-auft[open]>summary::before{content:"\\25BE  "}'
       + '.ze-auft-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:6px}'

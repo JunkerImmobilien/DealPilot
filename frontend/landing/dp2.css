@@ -24,7 +24,7 @@
   --gd:#C9A84C;        /* Linien, Icons, Rahmen */
   --gdh:#E8CC7A;       /* Gold AUF dunklem Grund */
   --gdd:#b8932f;       /* Ueberschriften-Akzent */
-  --gdi:#8a6c1e;       /* Gold ALS TEXT auf hellem Grund */
+  --gdi:var(--wl-7a5d18, #7a5d18);  /* Gold ALS TEXT auf hellem Grund (gold-hell-1: war #8a6c1e, Kontrast 4,35 auf --cream2; jetzt 5,4 bis 6,2) */
   --gold-on:#5a4a14;   /* Text AUF Gold */
   /* Status - nie tokenisieren, in jeder Marke gleich */
   --grn:#3FA56C; --grnh:#5BD98E; --rd:#B86250;
@@ -173,7 +173,7 @@ img{max-width:100%;display:block}
 .head{max-width:800px;margin-bottom:46px}
 .head.ctr{margin-left:auto;margin-right:auto;text-align:center}
 .head h2{font-size:clamp(26px,4.4vw,50px);margin:14px 0}
-.head h2 .ac{color:var(--gdd)}
+.head h2 .ac{color:var(--gdi)}  /* gold-hell-1: Akzentwort auf Hell 2,35 -> 5,4; .sec-dark darunter behaelt --gdh */
 .sec-dark .head h2 .ac{color:var(--gdh)}
 .head p{margin:0;color:var(--inkm);font-size:17px;max-width:62ch}
 .head.ctr p{margin-left:auto;margin-right:auto}

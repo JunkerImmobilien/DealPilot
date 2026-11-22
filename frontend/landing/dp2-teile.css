@@ -139,13 +139,13 @@
 .tk.best .tk-price b{background:linear-gradient(110deg,#b8932f,#8a6d24);-webkit-background-clip:text;background-clip:text;color:transparent}
 .tk-price .cur{font-family:'Space Grotesk',sans-serif;font-size:18px;color:#1a1305}
 .tk-price .per{font-family:'JetBrains Mono',monospace;font-size:11px;color:#6b6250;margin-left:3px}
-.tk-note{font-family:'JetBrains Mono',monospace;font-size:10px;color:#b8932f;min-height:14px;margin-bottom:14px}
+.tk-note{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--gdi);min-height:14px;margin-bottom:14px}
 .tk-ker{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.03em;color:#1a1305;background:rgba(201,168,76,.14);border:1px solid rgba(201,168,76,.34);border-radius:9px;padding:7px 10px;display:flex;align-items:center;gap:7px;margin-bottom:16px}
-.tk-ker span{color:#b8932f}
+.tk-ker span{color:var(--gdi)}
 .tk-feat{list-style:none;padding:0;margin:0 0 20px;display:flex;flex-direction:column;gap:9px;flex:1}
 .tk-feat li{font-size:13px;line-height:1.4;color:#3a352c;padding-left:22px;position:relative}
 .tk-feat li::before{content:'✓';position:absolute;left:0;top:0;color:#2f8a58;font-weight:700}
-.tk-cta{display:block;text-align:center;font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.05em;text-transform:uppercase;text-decoration:none;border-radius:11px;padding:13px 16px;border:1px solid #b8932f;color:#b8932f;transition:.16s}
+.tk-cta{display:block;text-align:center;font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.05em;text-transform:uppercase;text-decoration:none;border-radius:11px;padding:13px 16px;border:1px solid var(--wl-b8932f, #b8932f);color:var(--gdi);transition:.16s}  /* gold-hell-1: Schrift auf dem weissen Ticketkoerper 2,9 -> 6,2; Rahmen bleibt Gold */
 .tk-cta:hover{background:linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#b8932f);color:#221a06;border-color:transparent;font-weight:700}
 .tk.best .tk-cta{background:linear-gradient(110deg,#E8CC7A,#C9A84C 55%,#b8932f);color:#221a06;border-color:transparent;font-weight:700}
 #pricing .tkg{align-items:stretch}

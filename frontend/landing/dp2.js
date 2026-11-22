@@ -81,7 +81,7 @@
     bars.innerHTML = CATS.map(function (c) {
       return '<div class="ids-bar"><div class="top">'
         + '<span class="nm">' + c[0] + '<span class="wt">' + c[1] + '%</span></span>'
-        + '<span class="sc" style="color:' + c[4] + '">' + c[2] + '<small>/100</small></span>'
+        + '<span class="sc" style="color:' + (c[4] === '#C9A84C' ? 'var(--gdi)' : c[4]) + '">' + c[2] + '<small>/100</small></span>'
         + '</div><span class="track"><i data-breit="' + c[2] + '" style="background:' + c[4] + '"></i></span>'
         + '<div class="kp">' + c[3] + ' KPIs</div></div>';
     }).join('');

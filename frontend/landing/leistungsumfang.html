@@ -10,8 +10,8 @@
 <meta property="og:title" content="Immobilienanalyse-Software: alle Funktionen · DealPilot"><meta property="og:description" content="Alle 22 Module von DealPilot im Detail: Boarding, PDF-Import, Investition, Finanzierung, Deal Score, KI-Analyse, Exporte, Steuer und Restnutzungsdauer.">
 <meta property="og:image" content="https://dealpilot.immo/assets/og-dealpilot.jpg"><meta name="twitter:card" content="summary_large_image">
 <link rel="stylesheet" href="/fonts/dp-fonts.css">
-<link rel="stylesheet" href="dp2.css?v=landing-handy-1">
-<link rel="stylesheet" href="dp2-teile.css?v=landing-pruefung-1">
+<link rel="stylesheet" href="dp2.css?v=gold-hell-1">
+<link rel="stylesheet" href="dp2-teile.css?v=gold-hell-1">
 <style>
 /* ═══════════════════════════════════════════════════════════════════════
    Leistungsumfang aus frontend/landing/index.html Z.3266-3969 (18 Kapitel).
@@ -47,7 +47,7 @@ hr.rws{height:4px;border:0;background:var(--runway);margin:0;position:relative;z
 .lu-pack.pop{border-color:var(--gd)}
 .lu-pack .lp-tag{position:absolute;top:-9px;left:50%;transform:translateX(-50%);background:var(--runway);color:#221a06;font-family:var(--mono);font-size:8.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:3px 10px;border-radius:20px}
 .lu-pack .lp-l{font-family:var(--disp);font-weight:700;font-size:24px;color:var(--ink)}
-.lu-pack .lp-p{font-family:var(--disp);font-weight:700;font-size:15px;color:var(--gdd);margin-top:2px}
+.lu-pack .lp-p{font-family:var(--disp);font-weight:700;font-size:15px;color:var(--gdi);margin-top:2px}
 .lu-pack .lp-u{font-family:var(--mono);font-size:9px;color:var(--mut);margin-top:4px}
 .lu-costs{display:grid;grid-template-columns:1fr 1fr;gap:0 40px;background:#fff;border:1px solid var(--cream-line);border-radius:14px;padding:8px 22px}
 .lu-cost{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid var(--cream-line)}
@@ -118,13 +118,13 @@ hr.rws{height:4px;border:0;background:var(--runway);margin:0;position:relative;z
 .lu-ed.light .lu-bild figcaption{color:#6f685b}
 .lu-ed.light h2{color:#1a1305}
 .lu-ed.light h2 .gold{background:linear-gradient(110deg,#b8932f,#8a6d24);-webkit-background-clip:text;background-clip:text;color:transparent}
-.lu-ed.light h3{color:#b8932f}
+.lu-ed.light h3{color:var(--gdi)}
 .lu-ed.light p{color:#4a4436}
 .lu-ed.light p.lead{color:#2a251c}
-.lu-ed.light em{color:#b8932f}
+.lu-ed.light em{color:var(--gdi)}
 .lu-ed.light strong{color:#1a1305}
 .lu-ed.light a{color:#8a6d24}
-.lu-ed.light .eyebrow{color:#b8932f}
+.lu-ed.light .eyebrow{color:var(--gdi)}  /* gold-hell-1: h3/em/eyebrow auf Weiss 2,9 -> 6,2 */
 .lu-ed.light .info-card{background:#faf6ea;border-color:rgba(201,168,76,.3);border-left-color:#C9A84C}
 .lu-ed.light .info-card p{color:#4a4436}
 .lu-ed.light .stat-tile{background:#faf6ea;border-color:rgba(201,168,76,.28)}
@@ -136,7 +136,7 @@ hr.rws{height:4px;border:0;background:var(--runway);margin:0;position:relative;z
 .lu-phase:not(.d) .ph-s{color:var(--wl-8a6d24, #8a6d24)}  /* landing-pruefung-1: helles Gold auf Weiss (Kontrast 1,57) */
 .lu-item .luc-chips{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 12px}
 .lu-item .luc-chip{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.02em;color:#8a6d24;background:rgba(201,168,76,.14);border:1px solid rgba(201,168,76,.38);border-radius:20px;padding:3px 9px;white-space:nowrap}
-.lu-item .lu-more{display:inline-flex;align-items:center;gap:5px;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.03em;text-transform:uppercase;color:#b8932f;text-decoration:none;font-weight:600;cursor:pointer}
+.lu-item .lu-more{display:inline-flex;align-items:center;gap:5px;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.03em;text-transform:uppercase;color:var(--gdi);text-decoration:none;font-weight:600;cursor:pointer}
 .lu-item .lu-more:hover{color:#8a6d24;text-decoration:underline}
 .lu-phase.d .lu-item .luc-chip{color:#E8CC7A;background:rgba(201,168,76,.12);border-color:rgba(201,168,76,.3)}
 .lu-phase.d .lu-item .lu-more{color:#E8CC7A}
@@ -1210,7 +1210,7 @@ hr.rws{height:4px;border:0;background:var(--runway);margin:0;position:relative;z
       /* v14: Funktionsumfang-Chips + Detail-Link */
       .lu-item .luc-chips{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 12px}
       .lu-item .luc-chip{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.02em;color:#8a6d24;background:rgba(201,168,76,.14);border:1px solid rgba(201,168,76,.38);border-radius:20px;padding:3px 9px;white-space:nowrap}
-      .lu-item .lu-more{display:inline-flex;align-items:center;gap:5px;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.03em;text-transform:uppercase;color:#b8932f;text-decoration:none;font-weight:600;cursor:pointer}
+      .lu-item .lu-more{display:inline-flex;align-items:center;gap:5px;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.03em;text-transform:uppercase;color:var(--gdi);text-decoration:none;font-weight:600;cursor:pointer}
       .lu-item .lu-more:hover{color:#8a6d24;text-decoration:underline}
       .lu-phase.d .lu-item .luc-chip{color:#E8CC7A;background:rgba(201,168,76,.12);border-color:rgba(201,168,76,.3)}
       .lu-phase.d .lu-item .lu-more{color:#E8CC7A}
@@ -1266,7 +1266,7 @@ hr.rws{height:4px;border:0;background:var(--runway);margin:0;position:relative;z
 
 
 <script src="dp2-lufeat.js?v=landing-pruefung-1"></script>
-<script src="dp2.js?v=landing-handy-1"></script>
+<script src="dp2.js?v=gold-hell-1"></script>
 <script src="landing-zahlen.js?v=landing-zahlen-live-1"></script><!-- landing-zahlen-live-1 · Zahlen live aus GET /api/v1/public/datenumfang, das HTML bleibt Rückfall -->
   <script src="assets/umgebung.js?v=v1644"></script><!-- v1644 · Landing zeigt auf DIE App, in der sie steht -->
 </body></html>

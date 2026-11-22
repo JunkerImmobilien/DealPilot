@@ -107,7 +107,7 @@
 .ids-head{display:flex;align-items:center;justify-content:space-between;gap:10px;
   padding:14px 20px 8px}
 .ids-title{font:700 17px/1.2 var(--disp);color:var(--ink)}
-.ids-title b{color:var(--gdd)}
+.ids-title b{color:var(--gdi)}
 .ids-allkpi{font:500 9px/1 var(--mono);letter-spacing:.06em;color:var(--mut);
   border:1px solid var(--cream-line);padding:6px 11px}
 .ids-body{display:grid;grid-template-columns:206px 1fr;gap:34px;padding:10px 26px 18px}
@@ -134,7 +134,7 @@
   text-transform:uppercase;color:var(--mut)}
 .ids-right{min-width:0}
 .ids-h{font:700 9px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;
-  color:var(--gdd);margin-bottom:12px}
+  color:var(--gdi);margin-bottom:12px}
 .ids-bar{margin-bottom:13px}
 .ids-bar:last-child{margin-bottom:0}
 .ids-bar .top{display:flex;align-items:baseline;justify-content:space-between;gap:8px}

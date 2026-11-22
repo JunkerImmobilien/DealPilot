@@ -156,7 +156,7 @@
     if (!zeigen) { if (h) h.style.display = 'none'; return; }
     if (!h) {
       h = document.createElement('div'); h.id = 'geb-ant-vorgabe';
-      h.style.cssText = 'font-size:11.5px;margin-top:4px;color:var(--gold-3,#9a7f33);line-height:1.35';
+      h.style.cssText = 'font-size:11.5px;margin-top:4px;color:var(--wl-7a5d18, #7a5d18);line-height:1.35';   /* gold-hell-1: 3,85 -> 6,2 */
       h.innerHTML = 'Vorgabe 80 % - nicht aus diesem Objekt ermittelt. Genauer über die '
         + '<a href="#" onclick="if(typeof openBMFModal===\'function\'){openBMFModal();}return false;">Kaufpreisaufteilung (BMF-Arbeitshilfe)</a> oder ein Gutachten.';
       var nach = fld.querySelector('.hint');

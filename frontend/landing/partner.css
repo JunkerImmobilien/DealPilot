@@ -194,7 +194,7 @@
 .pt-qc-ico{width:3.4cqw;height:3.4cqw;border-radius:.8cqw;background:var(--runway);flex:none;position:relative}
 .pt-qc-ico::after{content:'';position:absolute;left:28%;right:28%;bottom:30%;height:32%;border-left:.25cqw solid var(--ob);border-bottom:.25cqw solid var(--ob)}
 .pt-qc-kopf b{font:600 2.4cqw/1 var(--disp)}
-.pt-qc-kopf small{margin-left:auto;font:600 1.3cqw/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--gdd)}
+.pt-qc-kopf small{margin-left:auto;font:600 1.3cqw/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--gdi)}
 .pt-qc-urteil{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:2cqw;align-items:center;background:#fff;
   border:1px solid #EFE7D6;border-left:.7cqw solid var(--grn);border-radius:1.3cqw;padding:1.6cqw 2cqw;
   box-shadow:0 0 0 .35cqw color-mix(in srgb,var(--gd) 35%,transparent)}
