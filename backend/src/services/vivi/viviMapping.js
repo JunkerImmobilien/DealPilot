@@ -347,6 +347,20 @@ function letzteErhoehung(r, verlauf, heute) {
   if (!e || e === isoDatum(r && r.rental_start) || nurNk[e]) return null;
   return e;
 }
+/* v3981 · F8 Gesamt-Flow 22.11.2026: der Abruf setzte das Datum der letzten Erhöhung (01.11.2026), der Betrag blieb
+   der alte (45 € statt 25 €). Der Jahresabgleich rechnete damit 520 − 45 = 475 € als Vorjahresmiete (2025: 5.700
+   statt 5.940 €). Betrag = neue minus bisherige Kaltmiete der Änderung an genau diesem Tag (Mietverlauf). Ohne
+   Mietverlauf ist der Betrag unbekannt: dann leer (der alte Betrag gehört nicht zum neuen Datum). */
+function erhoehungBetrag(verlauf, datum) {
+  const L = verlauf && Array.isArray(verlauf.rent_changes) ? verlauf.rent_changes : [];
+  let b = null;
+  L.forEach(function (c) {
+    if (!c || (c.status && c.status !== 'active') || isoDatum(c.effective_date) !== datum) return;
+    const alt = zahl(c.previous_rent), neu = zahl(c.new_rent);
+    if (alt != null && neu != null && neu > alt) b = Math.round((neu - alt) * 100) / 100;
+  });
+  return b;
+}
 function monatJahr(iso) { const m = /^(\d{4})-(\d{2})/.exec(text(iso)); return m ? m[2] + '.' + m[1] : null; }
 
 /**
@@ -428,7 +442,12 @@ function ausVivi(paket, kontext) {
        v3966 · ViVi setzt es auch bei einer reinen NK-Anpassung (gemessen 2026-001, 1041 WE 1). Deshalb zaehlt der
        Mietverlauf (rent-history), wenn er da ist: letzte wirksame Aenderung mit hoeherer Kaltmiete. */
     const erh = letzteErhoehung(r, paket.mietverlauf && paket.mietverlauf[r.id], heute);
-    if (erh) setze(P + 'mv_letzte_erhoehung', erh, rq);
+    if (erh) {
+      setze(P + 'mv_letzte_erhoehung', erh, rq);
+      const eb = erhoehungBetrag(paket.mietverlauf && paket.mietverlauf[r.id], erh);   /* v3981 · F8 */
+      if (eb != null) setze(P + 'mv_letzte_erhoehung_betrag', rund(eb), rq);
+      else felder[P + 'mv_letzte_erhoehung_betrag'] = { wert: '', quelle: rq };   /* unbekannt: leer, nie der alte Betrag */
+    }
     const va = VERTRAG_AUS_VIVI[text(r.contract_type)]; if (va) setze(P + 'mv_art', va, rq);
     const stp = stellplatzMiete(r); if (stp != null) setze(P ? P + 'stellplatz_miete' : 'ze_stp_monat', stp, rq);
   });
@@ -486,6 +505,6 @@ function ausVivi(paket, kontext) {
 }
 
 module.exports = {
-  nachVivi, ausVivi, letzteErhoehung, nkVorschlag, ulJahr, einheitenListe, zahl, isoDatum, monatDatum, etageText, etageZahl, mieterName,
+  nachVivi, ausVivi, letzteErhoehung, erhoehungBetrag, nkVorschlag, ulJahr, einheitenListe, zahl, isoDatum, monatDatum, etageText, etageZahl, mieterName,
   NK_MIN_QM, OBJEKTTYP, VERTRAG_NACH_VIVI, VERTRAG_AUS_VIVI, UL_FELDER, ARTEN_MIT_EINHEITEN, MUSTER_ANSCHRIFT
 };

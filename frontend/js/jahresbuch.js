@@ -232,12 +232,29 @@
     var im = l.filter(function (x) { return x.am.slice(0, 4) === String(jahr); }).sort(function (a, b) { return a.am < b.am ? -1 : 1; });
     return im.length ? im[im.length - 1] : null;
   }
+  function vertragsErhoehungen(E) {
+    if (!E || !E.ausVertrag) return [];
+    var out = [], M = global._dpMfh;
+    if (M && Array.isArray(M.einheiten) && M.einheiten.length) {
+      M.einheiten.forEach(function (e, i) {
+        if (!e || (Array.isArray(e.erhoehungen) && e.erhoehungen.length)) return;
+        var x = E.ausVertrag(e.mv_letzte_erhoehung, e.mv_letzte_erhoehung_betrag, e.ist); if (x) out.push(Object.assign({ einheit: i, nr: e.nr || String(i + 1), ausVertrag: true }, x));
+      });
+      return out;
+    }
+    if (E.objektListe && E.objektListe().length) return [];
+    var o = E.ausVertrag((el('mv_letzte_erhoehung') || {}).value, (el('mv_letzte_erhoehung_betrag') || {}).value, (el('nkm') || {}).value);
+    return o ? [Object.assign({ einheit: null, ausVertrag: true }, o)] : [];
+  }
   /** Alle Zeilen, jüngstes Jahr zuerst. */
   function zeilen() {
     var a = ankauf(); if (!a) return [];
     var plan = Array.isArray(a.plan) ? a.plan : [], rows = (global.State && global.State.cfRows) || [];
     var J = global.DpJahresstaende, staende = J && J.liste ? J.liste() : [];
     var E = global.DpErhoehungen, erh = E && E.alle ? E.alle() : [];
+    /* v3981 · F18: ohne Liste der Mieterhöhungen zählt „Letzte Erhöhung" (z. B. aus ViVi) - sonst stand im Jahr der
+       Erhöhung „Keine Erhöhung in diesem Jahr", obwohl die Miete gestiegen ist. Je Wohnung ebenso. */
+    try { erh = erh.concat(vertragsErhoehungen(E)); } catch (e) {}
     var ist = jahreDaten();
     return jahreVon(startJahr(), heuteJahr()).map(function (y) {
       var st = steuerJahr(y), zl = zielFuer(y);

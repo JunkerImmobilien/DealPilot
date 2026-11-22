@@ -284,10 +284,13 @@ window.MietEntwicklung = (function() {
       return (by > 1990 && cy > by) ? Math.min(40, cy - by) : 0;
     } catch (e) { return 0; }
   }
+  /* v3981 · F18 Gesamt-Flow 22.11.2026: auch das LAUFENDE Jahr aus dem Mietverlauf. Bis hier bekam es die heutige
+     Miete für alle zwölf Monate - eine Erhöhung ab 11/2026 (495 → 520 €) stand als 12 × 520 = 6.240 statt
+     10 × 495 + 2 × 520 = 5.990 € im Jahr. Ohne Erhöhung im Jahr ergibt istFaktor 1, wie bisher. */
   function factor(y) {
     var off = bestandVersatz();
     if (!off) return factorRoh(y);
-    if (y < off) {
+    if (y <= off) {
       var E = window.DpErhoehungen;
       return (E && typeof E.istFaktor === 'function') ? E.istFaktor(_basisJahr() + y) : 1.0;
     }

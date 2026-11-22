@@ -199,5 +199,37 @@ function funk(src, name) {
   ok(f.d1_tf_mon === 3, 'F7 tilgungsfreie Anlaufzeit 3 Monate gelesen (Ist ' + f.d1_tf_mon + ')');
 }
 
-console.log(`gesamtflow-pruefen (v3980): ${gruen} von ${gruen + rot} ok`);
+/* ── F8/F18 · ViVi: Betrag der letzten Erhöhung, Miete der Jahre aus dem Mietverlauf ── */
+{
+  const mod = { exports: {} };
+  const req = (n) => { if (n === 'crypto' || n === 'node:crypto') return { randomUUID: () => 'x' }; return {}; };
+  try { new Function('module', 'exports', 'require', lies('backend/src/services/vivi/viviMapping.js'))(mod, mod.exports, req); } catch (e) { ok(false, 'F8 viviMapping lädt: ' + e.message); }
+  const M = mod.exports;
+  const paket = { projekt: { id: 'p1' }, einheiten: [{ id: 'u1', square_meters: 58.5, unit_type: 'residential' }],
+    mietverhaeltnisse: [{ id: 'r1', unit_id: 'u1', rent: 520, monthly_utility_costs: 175, rental_start: '2019-07-01', last_rent_increase: '2026-11-01' }],
+    mietverlauf: { r1: { rent_changes: [{ effective_date: '2026-11-01', previous_rent: 495, new_rent: 520, status: 'active' }, { effective_date: '2023-07-01', previous_rent: 450, new_rent: 495, status: 'active' }] } } };
+  let F = {};
+  try { F = M.ausVivi(paket, { vivi_ids: {}, mitEinheiten: false, objart: 'ETW', jetzt: '2026-11-22' }).felder || {}; } catch (e) { ok(false, 'F8 ausVivi läuft: ' + e.message); }
+  ok(F.mv_letzte_erhoehung && F.mv_letzte_erhoehung.wert === '2026-11-01', 'F8 letzte Erhöhung 01.11.2026 (Ist ' + (F.mv_letzte_erhoehung && F.mv_letzte_erhoehung.wert) + ')');
+  ok(F.mv_letzte_erhoehung_betrag && Number(F.mv_letzte_erhoehung_betrag.wert) === 25, 'F8 Betrag der letzten Erhöhung 25 € aus dem Mietverlauf, nicht der alte (Ist ' + (F.mv_letzte_erhoehung_betrag && F.mv_letzte_erhoehung_betrag.wert) + ')');
+  const ohne = JSON.parse(JSON.stringify(paket)); delete ohne.mietverlauf;
+  let F2 = {}; try { F2 = M.ausVivi(ohne, { vivi_ids: {}, mitEinheiten: false, objart: 'ETW', jetzt: '2026-11-22' }).felder || {}; } catch (e) {}
+  ok(F2.mv_letzte_erhoehung_betrag && F2.mv_letzte_erhoehung_betrag.wert === '', 'F8 ohne Mietverlauf: Betrag leer statt alter Betrag zum neuen Datum');
+  const vf = lies('frontend/js/vivi-felder.js');
+  ok(/'mv_letzte_erhoehung_betrag'/.test(vf), 'F8 vivi-felder.js führt den Betrag (Einheiten und Zahlenvergleich)');
+  /* F18 · echte mieterhoehungen.js: Jahresmiete aus letzter Erhöhung und Betrag */
+  const ctx = { console, Math, JSON, Number, String, isFinite, parseFloat, parseInt, Object, Array, Date, setTimeout: () => 0, document: undefined };
+  ctx.window = ctx; ctx.globalThis = ctx; vm.createContext(ctx);
+  try { vm.runInContext(lies('frontend/js/mieterhoehungen.js'), ctx); } catch (e) {}
+  const E = ctx.DpErhoehungen;
+  const q = [{ liste: [], heute: 520, letzte: '2026-11-01', betrag: 25 }];
+  const j25 = E ? Math.round(E.jahresFaktor(q, 2025) * 520 * 12) : null, j26 = E ? Math.round(E.jahresFaktor(q, 2026) * 520 * 12) : null;
+  ok(j25 === 5940, 'F18 2025 = 12 × 495 = 5.940 € (Ist ' + j25 + ')');
+  ok(j26 === 5990, 'F18 2026 = 10 × 495 + 2 × 520 = 5.990 € (Ist ' + j26 + ')');
+  ok(/if \(y <= off\) \{/.test(lies('frontend/js/mietentwicklung.js')), 'F18 mietentwicklung.js: auch das laufende Jahr aus dem Mietverlauf (istFaktor), nicht 12 × heutige Miete');
+  const jb = lies('frontend/js/jahresbuch.js');
+  ok(/function vertragsErhoehungen\(E\)/.test(jb) && /erh = erh\.concat\(vertragsErhoehungen\(E\)\)/.test(jb), 'F18 Jahresabgleich zeigt die Erhöhung aus „Letzte Erhöhung" (ohne Liste), nicht „Keine Erhöhung"');
+}
+
+console.log(`gesamtflow-pruefen (v3981): ${gruen} von ${gruen + rot} ok`);
 process.exit(rot ? 1 : 0);
