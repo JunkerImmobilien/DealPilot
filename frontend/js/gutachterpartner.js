@@ -126,6 +126,9 @@
     var s = document.createElement('style'); s.id = 'gp-stil';
     s.textContent = [
       '#gp-overlay [hidden]{display:none !important}',
+      /* v3989 · F24 Gesamt-Flow 22.11.2026: „Objektbeschreibung“ stand doppelt. Das versteckte Feld (Gewerbe, visibleWhen) trug [hidden],
+         rnd-styles.css „html:not(#rnd-nie) .rnd-wiz-overlay.rnd-hub .rnd-wiz-field{display:flex !important}“ war spezifischer (1 ID + 3 Klassen schlagen 1 ID + 1 Attribut). */
+      'html:not(#gp-nie) #gp-overlay .rnd-wiz-field[hidden]{display:none !important}',
       '#gp-overlay .gp-logo{display:inline-flex;align-items:center;background:#fff;border-radius:8px;padding:6px 10px;margin:0 12px 0 0}',
       '#gp-overlay .gp-logo img{height:16px;width:auto;display:block}',
       '#gp-overlay .gp-kopf-rechts{display:flex;align-items:center}',

@@ -350,5 +350,12 @@ function funk(src, name) {
   ok(r === '2 Positionen (Wirtschaftsplan 2023)', 'F23 Aufstellung des Hausgelds als „2 Positionen (Wirtschaftsplan 2023)" statt JSON (Ist ' + String(r).slice(0, 60) + ')');
 }
 
-console.log(`gesamtflow-pruefen (v3988): ${gruen} von ${gruen + rot} ok`);
+/* ── F24 · Ersteinschätzung: verstecktes Feld bleibt versteckt ── */
+{
+  const gp = lies('frontend/js/gutachterpartner.js'), rs = lies('frontend/css/rnd-styles.css');
+  const gegner = /html:not\(#rnd-nie\) \.rnd-wiz-overlay\.rnd-hub \.rnd-wiz-field\s*\{[^}]*display:\s*flex\s*!important/.test(rs);
+  ok(!gegner || /'html:not\(#gp-nie\) #gp-overlay \.rnd-wiz-field\[hidden\]\{display:none !important\}'/.test(gp), 'F24 [hidden] schlägt „html:not(#rnd-nie) … .rnd-wiz-field{display:flex !important}“ (Spezifität 2 IDs + 2 gegen 1 ID + 3)');
+}
+
+console.log(`gesamtflow-pruefen (v3989): ${gruen} von ${gruen + rot} ok`);
 process.exit(rot ? 1 : 0);
