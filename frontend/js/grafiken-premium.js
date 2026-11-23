@@ -77,7 +77,7 @@
     var s = document.createElement('style'); s.id = 'dp-gx-stil';
     s.textContent = [
       /* Premium-Karte: Obsidian, Creme-Schrift, Gold als Akzent. Gilt auch für die Karten aus v4140 in der Pilot-Analyse. */
-      '.dp-pa-wrap .dp-gn.dp-gn-karte,.dp-pa-wrap .dp-gn.dp-gx,.dp-gx-frei.dp-gx{background:linear-gradient(180deg,#16140F,#0E0D0B)!important;color:' + F.tinte + '!important;border:1px solid ' + F.linie + '!important;border-radius:14px!important;padding:18px 18px 14px!important;box-shadow:0 1px 0 rgba(255,255,255,.03) inset,0 10px 30px rgba(5,5,5,.18)!important;--gn-card:' + F.karte + ';--gn-grau:rgba(243,238,228,.28);--gn-netz:rgba(243,238,228,.08);--gn-leise:' + F.tinte2 + ';--gn-rot:' + F.rot + '}',
+      '.dp-pa-wrap .dp-gn.dp-gn-karte,.dp-pa-wrap .dp-gn.dp-gx,.dp-gx-frei.dp-gx,.dp-pa-wrap[data-dp-pa-v4] .dp-pa-content .dp-gn.dp-gn-karte,.dp-pa-wrap[data-dp-pa-v4] .dp-pa-content .dp-gn.dp-gx{background:linear-gradient(180deg,#16140F,#0E0D0B)!important;color:' + F.tinte + '!important;border:1px solid ' + F.linie + '!important;border-radius:14px!important;padding:18px 18px 14px!important;box-shadow:0 1px 0 rgba(255,255,255,.03) inset,0 10px 30px rgba(5,5,5,.18)!important;--gn-card:' + F.karte + ';--gn-grau:rgba(243,238,228,.28);--gn-netz:rgba(243,238,228,.08);--gn-leise:' + F.tinte2 + ';--gn-rot:' + F.rot + '}',
       '.dp-pa-wrap .dp-gn.dp-gn-karte .dp-gn-k-t,.dp-gx .gx-t{font:600 17px/1.25 "Space Grotesk",Inter,sans-serif!important;letter-spacing:-.01em;color:' + F.tinte + '!important;margin:4px 0 3px!important;text-wrap:balance}',
       '.dp-pa-wrap .dp-gn.dp-gn-karte .dp-gn-k-s,.dp-gx .gx-s{font:400 12.5px/1.45 Inter,sans-serif!important;color:' + F.tinte2 + '!important;margin:0 0 12px!important}',
       '.dp-pa-wrap .dp-gn.dp-gn-karte .gn-tip,.dp-gx .gx-tip{background:#F3EEE4!important;color:#0B0A09!important}',
@@ -229,7 +229,7 @@
     tk.forEach(function (v) { out.push('<line class="gx-netz" x1="' + m.l + '" x2="' + (W - m.r) + '" y1="' + f1(ys(v)) + '" y2="' + f1(ys(v)) + '"/><text class="gx-ax" x="' + (m.l - 8) + '" y="' + f1(ys(v) + 4) + '" text-anchor="end">' + kurz(v) + '</text>'); });
     if (y0 < 0) out.push('<line x1="' + m.l + '" x2="' + (W - m.r) + '" y1="' + f1(ys(0)) + '" y2="' + f1(ys(0)) + '" style="stroke:' + F.linie2 + ';stroke-width:1.2"/>');
     var schritt = Math.max(1, Math.ceil(n / Math.max(2, Math.floor((W - m.l - m.r) / 52))));
-    X.forEach(function (j, i) { if (i % schritt === 0 || i === n - 1) out.push('<text class="gx-ax" x="' + f1(xs(j)) + '" y="' + (H - 6) + '" text-anchor="middle"' + (j === d.heute ? ' style="fill:' + F.goldH + '"' : '') + '>' + j + '</text>'); });
+    X.forEach(function (j, i) { if (i % schritt === 0 || (i === n - 1 && (n - 1) % schritt >= schritt / 2)) out.push('<text class="gx-ax" x="' + f1(xs(j)) + '" y="' + (H - 6) + '" text-anchor="middle"' + (j === d.heute ? ' style="fill:' + F.goldH + '"' : '') + '>' + j + '</text>'); });
     if (d.band) {
       var pts = X.map(function (j, i) { return d.band.hi[i] == null ? null : f1(xs(j)) + ',' + f1(ys(d.band.hi[i])); }).filter(Boolean)
         .concat(X.slice().reverse().map(function (j, k) { var i = n - 1 - k; return d.band.lo[i] == null ? null : f1(xs(j)) + ',' + f1(ys(d.band.lo[i])); }).filter(Boolean));
@@ -402,7 +402,7 @@
     if (d.freiAb != null && d.freiAb > j0) { var xf = x(Math.min(j1, d.freiAb - 0.5)); out.push('<rect x="' + f1(m.l - 4) + '" y="' + m.t + '" width="' + f1(Math.max(0, xf - m.l + 4)) + '" height="' + (H - m.t - m.b) + '" style="fill:' + F.rot + ';opacity:.08"/><text class="gx-ax" x="' + m.l + '" y="' + (m.t + 10) + '" style="fill:' + F.rot + '">STEUERPFLICHTIG</text>'); if (d.freiAb <= j1) out.push('<text class="gx-ax" x="' + f1(xf + 6) + '" y="' + (m.t + 10) + '" style="fill:' + F.gruen + '">' + esc(d.freiText || 'STEUERFREI') + '</text>'); }
     tk.forEach(function (v) { out.push('<line class="gx-netz" x1="' + m.l + '" x2="' + (W - m.r) + '" y1="' + f1(y(v)) + '" y2="' + f1(y(v)) + '"/><text class="gx-ax" x="' + (m.l - 8) + '" y="' + f1(y(v) + 4) + '" text-anchor="end">' + nf0.format(v) + ' %</text>'); });
     var st = Math.max(1, Math.ceil(D.length / Math.max(2, Math.floor((W - m.l - m.r) / 52))));
-    D.forEach(function (p, i) { if (i % st === 0 || i === D.length - 1) out.push('<text class="gx-ax" x="' + f1(x(p.j)) + '" y="' + (H - 6) + '" text-anchor="middle">' + p.j + '</text>'); });
+    D.forEach(function (p, i) { if (i % st === 0 || (i === D.length - 1 && (D.length - 1) % st >= st / 2)) out.push('<text class="gx-ax" x="' + f1(x(p.j)) + '" y="' + (H - 6) + '" text-anchor="middle">' + p.j + '</text>'); });
     out.push('<path class="gx-zieh" d="M' + D.map(function (p) { return f1(x(p.j)) + ',' + f1(y(p.irr)); }).join(' L') + '" style="fill:none;stroke:' + F.gold + ';stroke-width:2.2;stroke-linejoin:round"/>');
     var best = D.reduce(function (a, b) { return b.irr > a.irr ? b : a; });
     out.push('<circle cx="' + f1(x(best.j)) + '" cy="' + f1(y(best.irr)) + '" r="5" style="fill:' + F.gold + ';stroke:' + F.karte + ';stroke-width:2"/><text x="' + f1(x(best.j)) + '" y="' + f1(y(best.irr) - 10) + '" text-anchor="' + (x(best.j) > W - 120 ? 'end' : 'middle') + '" style="font:600 11px JetBrains Mono,monospace;fill:' + F.tinte + '">bestes Jahr ' + best.j + ' · ' + esc(pct(best.irr)) + '</text>');
