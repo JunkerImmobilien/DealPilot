@@ -132,7 +132,9 @@ const router = express.Router();
    POST /ai/kontingent/reservieren { anzahl } prüft VOR dem Einlesen. Passt das Paket mit höchstens
    EXTRACT_TOLERANZ Abrufen über die Grenze, gilt für 20 Minuten eine erhöhte Grenze (genau so viele Abrufe,
    wie das Paket braucht). Sonst sagt die Antwort, wie viele frei sind und ab wann wieder - gelesen wird nichts. */
-const EXTRACT_MAX = 30, EXTRACT_FENSTER_MS = 60 * 60 * 1000, EXTRACT_TOLERANZ = 10, EXTRACT_RESERV_MS = 20 * 60 * 1000;
+/* v3999 · Marcel 23.11.2026: von 30 auf 60 je Stunde angehoben. Ein Objekt mit allen Unterlagen ueber mehrere Jahre
+   braucht rund 40 Auslesen (Gesamt-Flow F25). Die Kosten deckelt kiVerbrauch je Monat. */
+const EXTRACT_MAX = 60, EXTRACT_FENSTER_MS = 60 * 60 * 1000, EXTRACT_TOLERANZ = 10, EXTRACT_RESERV_MS = 20 * 60 * 1000;
 const _extractLog = new Map();   /* key -> [Zeitstempel] */
 const _extractReserv = new Map(); /* key -> { bis, max } */
 function _extractKey(req) { return req.user && req.user.id ? 'u:' + req.user.id : 'ip:' + req.ip; }
@@ -149,7 +151,7 @@ function extractLimiter(req, res, next) {
   const key = _extractKey(req), st = _extractStand(key);
   if (st.genutzt >= st.max) {
     res.set('Retry-After', String(st.frei_ab ? Math.max(1, Math.ceil((Date.parse(st.frei_ab) - Date.now()) / 1000)) : 3600));
-    return res.status(429).json({ error: 'Zu viele Dokument-Auswertungen — bitte eine Stunde warten oder einen eigenen OpenAI-Key in den Einstellungen hinterlegen.', kontingent: st });
+    return res.status(429).json({ error: 'Zu viele Dokument-Auswertungen in einer Stunde. Bitte etwas warten oder einen eigenen OpenAI-Schlüssel in den Einstellungen hinterlegen.', kontingent: st });
   }
   _extractLog.get(key).push(Date.now());
   next();
