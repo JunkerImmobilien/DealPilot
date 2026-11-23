@@ -1359,8 +1359,8 @@ kopf('V  v4040 Reiter ViVi, Bewirtschaftung Ist heute aus dem Steuerjahr');
   ok(plan.vivi_ids.projekt === 'prj_T1' && plan.vivi_ids.einheiten.e0.unit_id === 'u1' && plan.vivi_ids.einheiten.e2.index === 2 && plan.vivi_ids.darlehen.d1 === 'f1' && !plan.vivi_ids.darlehen.d2 && plan.vivi_ids.import.kaufdatum === '2023-05-01',
     'I8 vivi_ids: Projekt, Einheiten mit Index (wie beim Anlegen gemerkt), Darlehen d1, Kaufdatum des Imports');
   const fT = plan.fehlt_bewertung.map((x) => x.text).join(' | ');
-  ok(/Zustand/.test(fT) && /Modernisierungen/.test(fT) && /Grundstücksgröße/.test(fT) && !/Miteigentumsanteil/.test(fT) && !/Wohnfläche/.test(fT) && !/Kaufpreis/.test(fT) && d.dp_stufe === '2',
-    'I9 Für die Bewertung fehlt: Zustand, Modernisierungen, Grundstück (kein MEA beim Haus), Wohnfläche und Kaufpreis sind da, Detailgrad Fortgeschritten');
+  ok(/Zustand/.test(fT) && /Modernisierungen/.test(fT) && /Grundstücksgröße/.test(fT) && !/Miteigentumsanteil/.test(fT) && !/Wohnfläche/.test(fT) && !/Kaufpreis/.test(fT) && d.dp_stufe === undefined,
+    'I9 Für die Bewertung fehlt: Zustand, Modernisierungen, Grundstück (kein MEA beim Haus), Wohnfläche und Kaufpreis sind da, kein Detailgrad am Objekt (gilt je Nutzer)');
   /* ETW mit Erhöhung VOR dem Kauf */
   const pE = mapping.importDaten({ projekt: { id: 'prj_E', type: 'apartment', street: 'Probeweg', house_number: '7', postal_code: '12345', city: 'Teststadt', purchase_date: '2024-03-01', purchase_price: 150000,
       units: [{ id: 'w1', identifier: 'Wohnung', unit_type: 'residential', square_meters: 68, rooms: 3, floor: '2. OG' }] },

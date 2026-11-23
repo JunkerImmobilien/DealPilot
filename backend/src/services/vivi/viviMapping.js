@@ -693,8 +693,8 @@ function importDaten(paket, kontext) {
     _deal_won: true,
     _deal_won_at: new Date(kontext.jetzt == null ? Date.now() : kontext.jetzt).toISOString(),
     kaufdat: kauf || '',
-    wirtschaftlicher_uebergang: kauf || '',
-    dp_stufe: '2'
+    wirtschaftlicher_uebergang: kauf || ''
+    /* kein dp_stufe: der Detailgrad gilt seit v3077 je Nutzer (detailgrad.js), das Objektfeld spiegelt ihn nur */
   };
   Object.keys(f).forEach(function (id) {
     if (/^einheit\./.test(id)) return;
@@ -758,12 +758,14 @@ const BEWERTUNG_FELDER = [
   { feld: 'ds2_zustand', text: 'Zustand des Objekts' },
   { feld: 'mod_punkte', text: 'Modernisierungen (für die Restnutzungsdauer)', alle: ['mod_dach', 'mod_fenster', 'mod_leitungen', 'mod_heizung', 'mod_aussenwand', 'mod_baeder', 'mod_innenausbau', 'mod_grundriss'] },
   { feld: 'ausst', text: 'Ausstattung' },
+  { feld: 'standardstufe', text: 'Standardstufe' },
   { feld: 'ds2_energie', text: 'Energieeffizienz' },
   { feld: 'gsfl', text: 'Grundstücksgröße', nicht: ['ETW'] },
   { feld: 'mea', text: 'Miteigentumsanteil', nur: ['ETW'] },
   { feld: 'etage', text: 'Etage der Wohnung', nur: ['ETW'] },
   { feld: 'zimmer', text: 'Zimmerzahl', nur: ['ETW', 'EFH'] },
   { feld: 'baujahr', text: 'Baujahr' },
+  { feld: 'bgf', text: 'Bruttogrundfläche' },
   { feld: 'wfl', text: 'Wohnfläche' },
   { feld: 'kp', text: 'Kaufpreis' },
   { feld: 'wirtschaftlicher_uebergang', text: 'Kaufdatum (Übergang von Nutzen und Lasten)' },
