@@ -75,7 +75,7 @@
       '#dp-md .bahn i{position:absolute;top:-3px;width:3px;height:16px;border-radius:2px}',
       '#dp-md .marken{display:flex;justify-content:space-between;gap:6px;flex-wrap:wrap;font-size:11px;color:#7A7370;margin-top:4px}',
       '#dp-md .grund{font-size:11.5px;color:#625C59;line-height:1.5;border-left:2px solid var(--wl-c9a84c,#C9A84C);padding:4px 0 4px 10px;margin:10px 0}',
-      '#dp-md .knoepfe{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}#dp-md .knoepfe .btn{white-space:normal;max-width:100%;height:auto;min-height:32px;text-align:left}',   /* v4060 · am Handy brach „Nebenkosten in ViVi anpassen (180 € auf 188 €)“ nicht um und wurde abgeschnitten */
+      '#dp-md .knoepfe{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}#dp-md .knoepfe .btn{white-space:normal!important;max-width:100%;height:auto!important;min-height:32px;text-align:left}',   /* v4060 · am Handy brach „Nebenkosten in ViVi anpassen (180 € auf 188 €)“ nicht um und wurde abgeschnitten */
       '#dp-md .regel{display:grid;grid-template-columns:120px 1fr;gap:2px 12px;padding:7px 0;border-top:1px solid #F1ECE1;font-size:12.5px}#dp-md .regel:first-of-type{border-top:0}',
       '#dp-md .regel p{margin:2px 0 0;color:#7A7370;font-size:11.5px}',
       '#dp-md details.dp-md-auf>summary{cursor:pointer;list-style:none;font:600 13px "Space Grotesk",sans-serif;color:#2A2727;min-height:32px;display:flex;align-items:center}',
