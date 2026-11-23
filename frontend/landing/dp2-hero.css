@@ -198,8 +198,11 @@
    links 93 % schwarz genau über dem Flieger, Video gar nicht geladen. Am Handy jetzt ein eigenes Bild bzw. Video
    (dp-hero-flug-handy.mp4, 640 px, 0,34 MB), oben im Kopf, nach unten ausgeblendet, Schleier von oben nach unten. */
 @media(max-width:760px){
-  .hero-bg{inset:0 0 auto 0;height:560px;opacity:.9;object-position:50% 30%;transform:none;animation:none;
-    -webkit-mask-image:linear-gradient(180deg,#000 55%,transparent 100%);mask-image:linear-gradient(180deg,#000 55%,transparent 100%)}
-  .hero-veil{background:linear-gradient(180deg,rgba(7,7,7,.30) 0,rgba(7,7,7,.55) 260px,rgba(7,7,7,.92) 520px,rgba(7,7,7,.97) 100%)!important}
+  /* landing-hero-handy-1a · nachgemessen: der Flieger lag hinter der Überschrift. Jetzt ein freies Band von 210 px oben,
+     das Bild zeigt seinen unteren Teil (dort sitzt der Flieger), der Text beginnt darunter. */
+  .hero-bg{inset:0 0 auto 0;height:430px;opacity:1;object-position:50% 100%;transform:none;animation:none;
+    -webkit-mask-image:linear-gradient(180deg,#000 62%,transparent 100%);mask-image:linear-gradient(180deg,#000 62%,transparent 100%)}
+  .hero-veil{background:linear-gradient(180deg,rgba(7,7,7,.05) 0,rgba(7,7,7,.12) 170px,rgba(7,7,7,.80) 300px,rgba(7,7,7,.96) 430px,rgba(7,7,7,.97) 100%)!important}
+  .hero .wrap{padding-top:210px}
   .hero h1,.hero .eye{text-shadow:0 2px 14px rgba(0,0,0,.75)}
 }
