@@ -322,5 +322,32 @@ const K = c.DpMietpotenzial, E = c.DpErhoehungen, JA = c.DpJahresabgleich, HV = 
   ok(/function start\(\) \{[\s\S]{0,260}reiter: 'jahre'/.test(ue), 'H Start-Reiter: mit Belegen „Belege je Jahr“, sonst „Einlesen“');
 }
 
+/* ── E · v4110 Assistent im DealPilot-Design, Anlage V nach Stufe, Hinweiszeile folgt dem gewählten Jahr ─────── */
+{
+  const H = new Date().getFullYear();
+  const mk = (aus) => {
+    const c8 = kontext({ document: { getElementById: (id) => (id === 'yearly-tax-form-box' ? { id } : null), addEventListener() {}, head: null, createElement: () => ({}), querySelectorAll: () => [] } });
+    for (const f of ['mieterhoehungen.js', 'jahresbuch.js', 'hausverlauf.js', 'jahresabgleich.js', 'jahresabschluss.js']) vm.runInContext(lies('frontend/js/' + f), c8);
+    if (aus != null) c8.DpDetailgrad = { ausgeblendet: () => aus, stufe: () => (aus ? 1 : 2) };
+    return c8;
+  };
+  ok(mk(true).DpJahresabgleich.anlageVErlaubt() === false && mk(false).DpJahresabgleich.anlageVErlaubt() === true, 'E Anlage V nur, wenn der Detailgrad #yearly-tax-form-box nicht ausblendet (Einsteiger nein, ab Fortgeschritten ja)');
+  ok(mk(true).DpJahresabschluss.anlageVErlaubt() === false, 'E Assistent fragt dieselbe Stufe ab');
+  const c9 = mk(false), J9 = c9.DpJahresabgleich;
+  const Z = [{ jahr: H - 2, status: 'geplant' }, { jahr: H - 1, status: 'geplant' }, { jahr: H, status: 'geplant' }];
+  const L = { liste: [] };
+  const w1 = J9.wechselJahr(Z, false, L, H - 2), w2 = J9.wechselJahr(Z, false, L, H), w3 = J9.wechselJahr(Z, false, L, H - 1);
+  ok(w1 && w1.jahr === H - 2 && w2 && w2.jahr === H - 1 && w3 && w3.jahr === H - 1, 'E Hinweiszeile folgt dem gewählten Jahr (vergangenes Jahr gewählt: dieses, laufendes Jahr gewählt: Vorjahr)');
+  c9.DpJahresbuch.fest = (j) => (j === H - 2 ? { miete: 1, wert: 1, haus: 1, steuer: 1 } : {});
+  ok(J9.wechselJahr(Z, false, L, H - 2) === null, 'E festgeschriebenes Jahr: keine Zeile, kein Knopf');
+  const as = lies('frontend/js/jahresabschluss.js'), ja = lies('frontend/js/jahresabgleich.js'), sk = lies('frontend/js/modal-boarding-skin.js');
+  ok(as.includes("ov.className = 'oabi-ov dp-jab-mode'") && as.includes('class="oabi-reiter"') && as.includes('class="oabi-body"') && as.includes('class="oabi-foot"') && as.includes("class=\"oabi-btn' + (haupt ? ' primary' : '')"), 'E Assistent im Rahmen von „Belege einlesen“ (.oabi-ov, .oabi-reiter, .oabi-body, .oabi-foot, .oabi-btn)');
+  ok(sk.includes("t.indexOf('jahresabschluss') >= 0"), 'E Obsidian-Leiste und Gold-Kopf über modal-boarding-skin.js');
+  ok(as.includes("ov.querySelector('.oabi-foot').innerHTML = knopf('zu', 'Schließen', false)"), 'E erster Fuß-Knopf ist Schließen (das × der Leiste klickt ihn)');
+  ok(as.includes("(anlageVErlaubt() ? knopf('anlage-v'") && as.includes('JA().zuAnlageV(J)'), 'E Absprung zur Anlage V nur mit Stufe und bis zur Anlage V');
+  ok(/function zuAnlageV\(\) \{[\s\S]{0,420}yearly-tax-form-box[\s\S]{0,320}scrollIntoView\(\{ block: 'start'/.test(ja) && ja.includes("if (a === 'steuer') { zuAnlageV(); return; }"), 'E Absprung wartet auf die Anlage V und rollt hin');
+  ok(!ja.includes('dp-ja-fertig-k') && /function wechselHtml[\s\S]{0,400}knopf\('fertig', w\.jahr \+ ' fertig machen'/.test(ja), 'E „fertig machen“ nur noch in der Hinweiszeile');
+}
+
 console.log(`jahresabgleich-pruefen (v3430): ${gruen} von ${gruen + rot} ok`);
 process.exit(rot ? 1 : 0);

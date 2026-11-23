@@ -49,6 +49,8 @@
   // Hero-Text je Modal (anhand des h3-Titels erkannt)
   function heroFor(title) {
     var t = (title || '').toLowerCase();
+    if (t.indexOf('vivi') >= 0 || t.indexOf('vorauszahlung') >= 0) return { kick: 'ABGLEICH MIT VIVI', title: null };   /* v4120 · ViVi-Fenster im Boarding-Rahmen */
+    if (t.indexOf('jahresabschluss') >= 0) return { kick: 'BESTAND · JAHRESABSCHLUSS', title: null };   /* v4110 · Assistent Jahresabschluss (jahresabschluss.js) */
     if (t.indexOf('immometrica') >= 0) return { kick: 'OBJEKT-IMPORT', title: 'ImmoMetrica' };
     if (t.indexOf('sprach') >= 0) return { kick: 'FREI EINSPRECHEN', title: 'Sprachaufzeichnung' };
     if (t.indexOf('expos') >= 0 || t.indexOf('markt') >= 0) return { kick: 'OBJEKT EINLESEN', title: 'Unterlagen: PDF oder Foto' };   /* v3090: Fotos dazu (Marcel 02.11.2026); v2218h: Dokumente laufen hier mit */

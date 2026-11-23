@@ -18,7 +18,7 @@
  * ════════════════════════════════════════════════════════════════════════════════════════════════════════════════ */
 (function (global) {
   'use strict';
-  var VERSION = 'v4100b';
+  var VERSION = 'v4110';
   var SCHRITTE = [['miete', 'Miete'], ['wert', 'Wert'], ['haus', 'Haus & Belege'], ['steuer', 'Steuer'], ['fest', 'Festschreiben']];
   var _z = null;                 /* { jahr, k, frage, vivi: 'laeuft' | null } */
   var _merk = {}, _gelesen = {}; /* Schritt je Objekt|Jahr · ViVi schon gelesen je Objekt|Jahr */
@@ -36,7 +36,7 @@
   function schluessel(j) { return (global._currentObjKey || '') + '|' + j; }
   function jahrDaten(j) { try { return ((global._currentObjData || {})._jahre || {})[String(j)] || {}; } catch (e) { return {}; } }
   function toast(t) { try { if (typeof global.toast === 'function') global.toast(t); } catch (e) {} }
-  function knopf(a, t, haupt, extra) { return '<button type="button" class="dp-jab-k' + (haupt ? ' haupt' : '') + '" data-jab="' + a + '"' + (extra || '') + '>' + t + '</button>'; }
+  function knopf(a, t, haupt, extra) { return '<button type="button" class="oabi-btn' + (haupt ? ' primary' : '') + '" data-jab="' + a + '"' + (extra || '') + '>' + t + '</button>'; }
 
   function lage() {
     var a = JA(), r = a && a.standFuer ? a.standFuer(_z.jahr) : null;
@@ -56,44 +56,43 @@
   }
 
   /* ── Stil ──────────────────────────────────────────────────────────── */
+  /* v4110 · Marcel 23.11.2026: „Die Strecke ist ganz cool, aber nicht im DealPilot-Design. Sollte so sein wie das Modal
+     BMF-Rechner oder Belege einlesen.“ GEMESSEN: „Belege einlesen“ ist ein .oabi-ov, den modal-boarding-skin.js mit
+     Obsidian-Leiste (bdg-brand) und Gold-Kopf (bdg-hero) belegt, Reiter .oabi-reiter, Inhalt .oabi-body, Fuß .oabi-foot
+     mit .oabi-btn / .oabi-btn.primary (object-actions.js). Der Assistent nutzt jetzt genau diese Bausteine. Hier steht nur
+     noch, was es dort nicht gibt: Schrittnummern im Reiter, Kacheln und Kästen im Stil von „Belege je Jahr“ (ue-bj-summe). */
   function stil() {
     var d = doc(); if (!d || $('dp-jab-stil')) return;
     var G = 'var(--wl-c9a84c, #C9A84C)', T = 'var(--ch, #2A2727)', M = 'var(--muted, #7A7370)', L = 'var(--border, #E7E2DC)';
     var s = d.createElement('style'); s.id = 'dp-jab-stil';
     s.textContent = [
-      '.dp-jab-ov{position:fixed;inset:0;background:rgba(20,18,16,.55);z-index:10000;display:flex;align-items:center;justify-content:center;padding:18px}',
-      '.dp-jab{background:var(--surface, #F8F6F1);color:' + T + ';border:1px solid color-mix(in srgb, ' + G + ' 35%, transparent);border-radius:16px;width:min(820px,100%);max-height:92vh;display:flex;flex-direction:column;box-shadow:0 24px 60px rgba(0,0,0,.35);font:400 13.5px/1.5 Inter,system-ui,sans-serif}',
-      '.dp-jab-kopf{display:flex;align-items:baseline;gap:10px;padding:16px 20px 4px}.dp-jab-kopf b{font:600 17px "Space Grotesk",Inter,sans-serif}.dp-jab-kopf small{color:' + M + ';font-size:12px}',
-      '.dp-jab-kopf button{margin-left:auto;align-self:center;border:0;background:none;font-size:22px;line-height:1;cursor:pointer;color:' + M + ';min-width:40px;min-height:40px}',
-      '.dp-jab-leiste{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;list-style:none;margin:0;padding:6px 20px 12px;border-bottom:1px solid color-mix(in srgb, ' + G + ' 25%, transparent)}',
-      '.dp-jab-leiste button{width:100%;display:flex;flex-direction:column;align-items:center;gap:3px;border:0;background:none;cursor:pointer;padding:4px 2px;color:' + M + ';font:600 11.5px/1.2 Inter,system-ui,sans-serif;text-align:center}',
-      '.dp-jab-leiste i{font-style:normal;display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;border:1.5px solid ' + L + ';background:#fff;font-size:12px;color:' + M + '}',
-      '.dp-jab-leiste .ok i,.dp-jab-leiste .fest i{background:#3FA56C;border-color:#3FA56C;color:#fff}',
-      '.dp-jab-leiste .teil i{border-color:' + G + ';color:' + T + '}',
-      '.dp-jab-leiste .an{color:' + T + '}.dp-jab-leiste .an i{box-shadow:0 0 0 3px color-mix(in srgb, ' + G + ' 40%, transparent);border-color:' + G + '}',
-      '.dp-jab-inhalt{padding:14px 20px;overflow:auto;flex:1 1 auto}',
-      '.dp-jab-inhalt h4{margin:0 0 4px;font:600 15px "Space Grotesk",Inter,sans-serif}',
-      '.dp-jab-satz{margin:0 0 12px;color:' + T + '}.dp-jab-satz small{display:block;color:' + M + ';font-size:12px;margin-top:2px}',
+      '.oabi-ov.dp-jab-mode .oabi-modal{width:min(860px,100%);max-height:92vh}',
+      '.dp-jab-mode .oabi-reiter{flex:none;margin-bottom:0;overflow-x:auto;scrollbar-width:none;background:#fff}.dp-jab-mode .oabi-reiter::-webkit-scrollbar{display:none}',
+      '.dp-jab-mode .oabi-reiter button{flex:0 0 auto;white-space:nowrap;display:inline-flex;align-items:center;gap:7px}',
+      '.dp-jab-mode .oabi-reiter .n{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;border:1.5px solid ' + L + ';background:#fff;font:700 10.5px/1 Inter,system-ui,sans-serif;color:' + M + '}',
+      '.dp-jab-mode .oabi-reiter .ok .n,.dp-jab-mode .oabi-reiter .fest .n{background:#3FA56C;border-color:#3FA56C;color:#fff}',
+      '.dp-jab-mode .oabi-reiter .teil .n{border-color:' + G + ';color:' + T + '}',
+      '.dp-jab-mode .oabi-reiter button.on .n{border-color:' + G + ';box-shadow:0 0 0 2px color-mix(in srgb, ' + G + ' 35%, transparent)}',
+      '.dp-jab-mode .oabi-body{padding:16px 22px 18px;font:400 13px/1.5 Inter,system-ui,sans-serif;color:' + T + '}',
+      '.dp-jab-mode .oabi-body h4{margin:0 0 4px;font:700 15px "Space Grotesk",Inter,system-ui,sans-serif;color:' + T + '}',
+      '.dp-jab-satz{margin:0 0 12px}.dp-jab-satz small{display:block;color:' + M + ';font-size:12px;margin-top:2px}',
       '.dp-jab-zahl{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:0 0 12px}',
-      '.dp-jab-zahl span{background:#fff;border:1px solid ' + L + ';border-radius:10px;padding:8px 10px;font-size:11.5px;color:' + M + '}',
-      '.dp-jab-zahl b{display:block;font-size:16px;color:' + T + ';font-variant-numeric:tabular-nums;margin-top:2px}',
-      '.dp-jab-box{border:1px solid ' + L + ';background:#fff;border-radius:10px;padding:10px 12px;margin:0 0 12px}',
-      '.dp-jab-box.gold{border-color:' + G + ';background:var(--gold-bg, color-mix(in srgb, ' + G + ' 6%, #fff))}',
+      '.dp-jab-zahl span{background:color-mix(in srgb, ' + G + ' 6%, #fff);border:1px solid color-mix(in srgb, ' + G + ' 25%, transparent);border-radius:10px;padding:8px 10px;font-size:11.5px;color:' + M + ';line-height:1.35}',
+      '.dp-jab-zahl b{display:block;font-size:15px;color:' + T + ';font-variant-numeric:tabular-nums;margin-top:2px}',
+      '.dp-jab-box{background:#fff;border:1px solid ' + L + ';border-radius:8px;padding:9px 12px;margin:0 0 12px;font-size:12.5px}',
+      '.dp-jab-box.gold{background:color-mix(in srgb, ' + G + ' 6%, #fff);border-color:color-mix(in srgb, ' + G + ' 45%, transparent)}',
       '.dp-jab-box.rot{border-color:#B8625C;background:color-mix(in srgb, #B8625C 6%, #fff)}',
-      '.dp-jab-liste{list-style:none;margin:0 0 12px;padding:0}.dp-jab-liste li{display:flex;justify-content:space-between;gap:10px;padding:6px 0;border-top:1px solid rgba(42,39,39,.07)}',
+      '.dp-jab-liste{list-style:none;margin:0 0 12px;padding:0 12px;background:#fff;border:1px solid ' + L + ';border-radius:8px}.dp-jab-liste li{display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-top:1px solid rgba(42,39,39,.07);font-size:12.5px}',
       '.dp-jab-liste li:first-child{border-top:0}.dp-jab-ok{color:#3FA56C;font-weight:600}.dp-jab-offen{color:#B8625C;font-weight:600}',
       '.dp-jab-reihe{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:0 0 12px}',
-      '.dp-jab-k{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border:1px solid ' + L + ';border-radius:8px;background:#fff;font:600 12.5px Inter,system-ui,sans-serif;color:' + T + ';cursor:pointer;min-height:36px}',
-      '.dp-jab-k.haupt{background:' + G + ';border-color:' + G + ';color:#fff}',
-      '.dp-jab-k[disabled]{opacity:.55;cursor:default}',
-      '.dp-jab-fuss{display:flex;align-items:center;gap:10px;padding:12px 20px;border-top:1px solid ' + L + '}',
-      '.dp-jab-fuss span{flex:1;text-align:center;color:' + M + ';font-size:12px}',
       '.dp-jab-lesen{font-size:12px;color:' + M + ';margin:0 0 10px}',
-      '.dp-jab select{font:inherit;padding:7px 10px;border:1px solid ' + L + ';border-radius:8px;background:#fff;min-height:36px}',
-      '.dp-jab .dp-jb-inline{margin:0 0 12px}',
-      '@media (max-width:640px){.dp-jab-ov{padding:0;align-items:stretch}.dp-jab{max-height:none;height:100%;border-radius:0;width:100%}',
-      '.dp-jab-kopf{padding:12px 14px 2px}.dp-jab-leiste{padding:4px 8px 10px}.dp-jab-leiste .w{font-size:10px}.dp-jab-inhalt{padding:12px 14px}',
-      '.dp-jab-fuss{padding:10px 14px calc(10px + env(safe-area-inset-bottom))}.dp-jab-zahl{grid-template-columns:1fr 1fr}.dp-jab-zahl span:last-child{grid-column:1/-1}}'
+      '.dp-jab-mode select{font:inherit;font-size:12.5px;padding:6px 10px;border:1px solid ' + L + ';border-radius:8px;background:#fff;min-height:34px}',
+      '.dp-jab-mode .dp-jb-inline{margin:0 0 12px}',
+      '.dp-jab-mode .oabi-foot{align-items:center;flex:none}.dp-jab-mode .oabi-foot>span{flex:1;text-align:center;color:' + M + ';font-size:12px}',
+      '@media (max-width:640px){.oabi-ov.dp-jab-mode{padding:0;align-items:stretch}.oabi-ov.dp-jab-mode .oabi-modal{max-height:none;height:100%;width:100%;border-radius:0;border:0}',
+      '.dp-jab-mode .oabi-reiter{padding:2px 10px 0}.dp-jab-mode .oabi-reiter button{padding:8px 8px 9px}.dp-jab-mode .oabi-reiter button:not(.on) .w{display:none}',
+      '.dp-jab-mode .oabi-body{padding:12px 14px}.dp-jab-mode .oabi-foot{padding:10px 14px calc(10px + env(safe-area-inset-bottom));gap:6px}.dp-jab-mode .oabi-foot>span{font-size:11px}',
+      '.dp-jab-zahl{grid-template-columns:1fr 1fr}.dp-jab-zahl span:last-child{grid-column:1/-1}}'
     ].join('\n');
     d.head.appendChild(s);
   }
@@ -147,11 +146,15 @@
     var h = '<h4>Steuer ' + J + '</h4><p class="dp-jab-satz">Die Anlage V ' + J + ' aus dem Reiter Steuer, zusammengefasst.<small>Übernommene Belege und ViVi-Werte aus Schritt 3 sind eingerechnet.</small></p>';
     h += '<div class="dp-jab-zahl"><span>Einnahmen<b>' + eur(t && t.einnahmen) + '</b></span><span>Werbungskosten<b>' + eur(t && t.werbungskosten) + '</b></span><span>Ergebnis V+V<b>' + (t ? vz(t.ergebnis) : '–') + '</b></span></div>';
     var opts = (B && B.STATUS ? B.STATUS : [['geplant', 'nicht erklärt'], ['erklaert', 'erklärt'], ['bescheid', 'Bescheid liegt vor']]).map(function (x) { return '<option value="' + x[0] + '"' + (x[0] === st ? ' selected' : '') + '>' + esc(x[1]) + '</option>'; }).join('');
-    h += '<div class="dp-jab-reihe"><label style="display:flex;align-items:center;gap:8px">Stand der Steuer <select data-jab-status' + (fest ? ' disabled' : '') + '>' + opts + '</select></label>' + knopf('anlage-v', 'Volle Anlage V öffnen', false) + '</div>';
+    h += '<div class="dp-jab-reihe"><label style="display:flex;align-items:center;gap:8px">Stand der Steuer <select data-jab-status' + (fest ? ' disabled' : '') + '>' + opts + '</select></label>' + (anlageVErlaubt() ? knopf('anlage-v', 'Volle Anlage V öffnen', false) : '') + '</div>';
     if (fest) h += '<div class="dp-jab-box">Die Steuer ' + J + ' ist festgeschrieben.</div>';
     else if (st !== 'bescheid') h += '<div class="dp-jab-box">Erledigt ist der Schritt mit dem Bescheid. Ist die Erklärung abgegeben, setz den Stand auf erklärt.</div>';
     return h;
   }
+  /* v4110 · Marcel 23.11.2026: Absprung zur Anlage V nur mit passender Stufe. Die Anlage V (#yearly-tax-form-box) steht
+     in detailgrad-zuordnung.js unter s3-tax Stufe 2: Einsteiger sieht sie nicht, Fortgeschritten im Quick-Modus, Experte
+     auch im Detail. Ohne Stufe bleibt im Schritt 4 nur die Zusammenfassung. */
+  function anlageVErlaubt() { try { return JA() && JA().anlageVErlaubt ? JA().anlageVErlaubt() : true; } catch (e) { return true; } }
   function schrittFest(r) {
     var J = _z.jahr, s = r.s, a = JA(), L = a && a.offenListe ? a.offenListe(r.z, s, r.weg) : [];
     var h = '<h4>' + J + ' festschreiben</h4>';
@@ -175,20 +178,22 @@
   function zeichnen() {
     var ov = $('dp-jab-ov'); if (!ov || !_z) return;
     var r = lage();
-    if (!r) { ov.querySelector('.dp-jab-inhalt').innerHTML = '<p class="dp-jab-satz">Für ' + _z.jahr + ' gibt es keine Zeile im Jahresabgleich.</p>'; return; }
+    if (!r) { ov.querySelector('.oabi-body').innerHTML = '<p class="dp-jab-satz">Für ' + _z.jahr + ' gibt es keine Zeile im Jahresabgleich.</p>'; return; }
     var i = SCHRITTE.map(function (x) { return x[0]; }).indexOf(_z.k);
     _merk[schluessel(_z.jahr)] = _z.k;
     var leiste = SCHRITTE.map(function (x, n) {
       var st = r.st[x[0]], zeichen = st === 'ok' || st === 'fest' ? '✓' : String(n + 1);
-      return '<li><button type="button" class="' + st + (x[0] === _z.k ? ' an' : '') + '" data-jab="zu-schritt" data-jab-k="' + x[0] + '" aria-current="' + (x[0] === _z.k ? 'step' : 'false') + '"><i>' + zeichen + '</i><span class="w">' + x[1] + '</span></button></li>';
+      return '<button type="button" class="' + st + (x[0] === _z.k ? ' on' : '') + '" data-jab="zu-schritt" data-jab-k="' + x[0] + '" aria-current="' + (x[0] === _z.k ? 'step' : 'false') + '"><span class="n">' + zeichen + '</span><span class="w">' + x[1] + '</span></button>';
     }).join('');
     var inhalt = viviZeile(_z.jahr) + ({ miete: schrittMiete, wert: schrittWert, haus: schrittHaus, steuer: schrittSteuer, fest: schrittFest }[_z.k])(r);
     var stW = { ok: 'erledigt', fest: 'festgeschrieben', teil: 'teilweise', offen: 'offen', bereit: 'bereit', laufend: 'läuft' }[r.st[_z.k]] || '';
-    ov.querySelector('.dp-jab-kopf small').textContent = 'Schritt ' + (i + 1) + ' von 5 · ' + SCHRITTE[i][1] + ' · ' + stW;
-    ov.querySelector('.dp-jab-leiste').innerHTML = leiste;
-    var inh = ov.querySelector('.dp-jab-inhalt'); inh.innerHTML = inhalt; inh.scrollTop = 0;
-    ov.querySelector('.dp-jab-fuss').innerHTML = (i > 0 ? knopf('zurueck', 'Zurück', false) : '<b></b>') + '<span>' + esc(_z.jahr + ' · ' + SCHRITTE.filter(function (x) { return r.st[x[0]] === 'ok' || r.st[x[0]] === 'fest'; }).length + ' von 5 erledigt') + '</span>'
-      + (i < 4 ? knopf('weiter', 'Weiter', true) : knopf('zu', 'Schließen', false));
+    var sub = ov.querySelector('.oabi-sub'); if (sub) sub.textContent = 'Schritt ' + (i + 1) + ' von 5 · ' + SCHRITTE[i][1] + ' · ' + stW;
+    ov.querySelector('.oabi-reiter').innerHTML = leiste;
+    try { var an = ov.querySelector('.oabi-reiter .on'); if (an && an.scrollIntoView) an.scrollIntoView({ block: 'nearest', inline: 'center' }); } catch (x) {}
+    var inh = ov.querySelector('.oabi-body'); inh.innerHTML = inhalt; inh.scrollTop = 0;
+    /* v4110 · erster Knopf im Fuß ist Schließen: das × der Obsidian-Leiste klickt den ersten .oabi-btn ohne primary */
+    ov.querySelector('.oabi-foot').innerHTML = knopf('zu', 'Schließen', false) + '<span>' + esc(_z.jahr + ' · ' + SCHRITTE.filter(function (x) { return r.st[x[0]] === 'ok' || r.st[x[0]] === 'fest'; }).length + ' von 5 erledigt') + '</span>'
+      + (i > 0 ? knopf('zurueck', 'Zurück', false) : '') + (i < 4 ? knopf('weiter', 'Weiter', true) : '');
     /* eingebettete Bausteine */
     var e = inh.querySelector('[data-jab-eingabe]'), B = JB();
     if (e && B && B.eingabeHtml) {
@@ -213,9 +218,9 @@
     _z = { jahr: J, k: 'miete', frage: false, vivi: null };
     var r = lage();
     _z.k = startSchritt(r && r.s, k, k ? null : _merk[schluessel(J)]);
-    var ov = d.createElement('div'); ov.className = 'dp-jab-ov'; ov.id = 'dp-jab-ov';
-    ov.innerHTML = '<div class="dp-jab" role="dialog" aria-modal="true" aria-label="Jahresabschluss ' + J + '"><div class="dp-jab-kopf"><b>Jahresabschluss ' + J + '</b><small></small><button type="button" data-jab="zu" aria-label="Schließen">×</button></div>'
-      + '<ol class="dp-jab-leiste"></ol><div class="dp-jab-inhalt"></div><div class="dp-jab-fuss"></div></div>';
+    var ov = d.createElement('div'); ov.className = 'oabi-ov dp-jab-mode'; ov.id = 'dp-jab-ov';
+    ov.innerHTML = '<div class="oabi-modal" role="dialog" aria-modal="true" aria-label="Jahresabschluss ' + J + '"><div class="oabi-head"><span></span><h3>Jahresabschluss ' + J + '</h3></div><div class="oabi-sub"></div>'
+      + '<div class="oabi-reiter" role="tablist" aria-label="Schritte"></div><div class="oabi-body"></div><div class="oabi-foot"></div></div>';
     d.body.appendChild(ov);
     binden(ov);
     /* ViVi einmal je Objekt und Jahr lesen (nur GET): Ist-Miete, Steuerjahr, Hausgeld */
@@ -225,7 +230,7 @@
       a.viviAbgleichen(true).then(function () { if (_z && _z.jahr === J) { _z.vivi = null; zeichnen(); } });
     }
     zeichnen();
-    try { var f = ov.querySelector('.dp-jab-kopf button'); if (f) f.focus({ preventScroll: true }); } catch (e) {}
+    try { var f = ov.querySelector('.oabi-foot .oabi-btn.primary') || ov.querySelector('.oabi-foot .oabi-btn'); if (f) f.focus({ preventScroll: true }); } catch (e) {}
   }
   function gehe(k) { if (!_z) return; _z.k = k; _z.frage = false; zeichnen(); }
   function binden(ov) {
@@ -245,7 +250,7 @@
       if (a === 'wert-nein') { if (JB()) JB().festSetzen(J, ['wert'], true); zeichnen(); return; }
       if (a === 'wert-abrufen') { schliessen(); try { JA().mbAbrufen(); } catch (e) {} return; }
       if (a === 'hochladen') { try { global.DpEingang.oeffnen({ fertig: function () { setTimeout(zeichnen, 300); } }); } catch (e) {} return; }
-      if (a === 'anlage-v') { schliessen(); try { JA().zuReiter('s3-tax'); } catch (e) {} return; }
+      if (a === 'anlage-v') { schliessen(); try { JA().zuAnlageV(J); } catch (e) {} return; }   /* v4110 · Reiter Steuer UND zur Anlage V rollen */
       if (a === 'fest-frage') { _z.frage = true; zeichnen(); return; }
       if (a === 'fest-nein') { _z.frage = false; zeichnen(); return; }
       if (a === 'fest-ja') { _z.frage = false; if (JB()) JB().festSetzen(J, null, true); toast(J + ' ist festgeschrieben'); zeichnen(); return; }
@@ -257,5 +262,5 @@
     global.addEventListener('dp:object-ready', function () { if (_z) schliessen(); _merk = {}; });
   }
 
-  global.DpJahresabschluss = { VERSION: VERSION, SCHRITTE: SCHRITTE, oeffnen: oeffnen, schliessen: schliessen, startSchritt: startSchritt, offen: function () { return _z ? { jahr: _z.jahr, k: _z.k } : null; } };
+  global.DpJahresabschluss = { VERSION: VERSION, SCHRITTE: SCHRITTE, oeffnen: oeffnen, schliessen: schliessen, startSchritt: startSchritt, anlageVErlaubt: anlageVErlaubt, offen: function () { return _z ? { jahr: _z.jahr, k: _z.k } : null; } };
 })(typeof window !== 'undefined' ? window : globalThis);

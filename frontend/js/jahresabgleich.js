@@ -48,7 +48,7 @@
 (function (global) {
   'use strict';
   if (global.DpJahresabgleich) return;
-  var VERSION = 'v4100';
+  var VERSION = 'v4110';
   var GOLD = 'var(--wl-c9a84c, #C9A84C)';
   /* v4090 · Marcel 23.11.2026: „ich würde die Reihenfolge ändern in Miete, Wert, Haus und dann Steuern" (die Steuer braucht die Zahlen der drei davor) */
   var SCHRITTE = [['miete', 'Miete'], ['wert', 'Wert'], ['haus', 'Haus'], ['steuer', 'Steuer']];
@@ -430,7 +430,6 @@
       '.dp-ja-prot{font:400 11.5px Inter,sans-serif;color:' + LE + ';margin:-4px 0 10px}',
       /* v4100 · Jahreswechsel und Knopf „fertig machen“ */
       '.dp-ja-wechsel{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:6px 14px;border:1px solid ' + GOLD + ';border-radius:10px;padding:8px 8px 8px 14px;margin:0 0 10px;background:var(--gold-bg, color-mix(in srgb, ' + GOLD + ' 8%, #fff));font:400 13px/1.45 Inter,sans-serif;color:' + T + '}',
-      '.dp-pa-wrap .dp-ja-erg button.dp-ja-fertig-k{margin-left:auto}',
       '@keyframes dpJaBlink{0%,100%{box-shadow:0 0 0 0 transparent}20%,60%{box-shadow:0 0 0 4px color-mix(in srgb, ' + GOLD + ' 45%, transparent)}}',
       '.dp-ja-blink{animation:dpJaBlink 1.3s ease-in-out 2;border-radius:8px}',
       '@media (max-width:760px){.dp-ja-fuehrung{grid-template-columns:1fr;padding:10px}.dp-ja-f-p{flex-wrap:nowrap}.dp-ja-f-k{justify-content:flex-start}.dp-ja-f-p button:not(.an) .w{display:none}.dp-pa-wrap .dp-ja-f-p button:not(.an){padding:4px !important}}',   /* v4090b · am Handy nur der aktive Schritt mit Wort */
@@ -549,9 +548,10 @@
       + (dm != null ? (Math.abs(dm) < 0.5 ? 'Miete wie ' + (z.ohne_plan ? 'die Projektion' : 'im Plan vom Kauf') : 'Miete ' + vz(dm) + (dm > 0 ? ' über' : ' unter') + (z.ohne_plan ? ' der Projektion' : ' dem Plan vom Kauf')) : 'Für dieses Jahr gibt es keinen Plan vom Kauf')
       + (cfPlan != null && cfIst != null ? ', Cashflow ' + vz(cfIst - cfPlan) : '') + '.'
       + (lauf ? ' Abgleich ab Februar ' + (z.jahr + 1) + ', wenn Steuer, Abrechnung und Protokoll da sind.' : '');
-    /* v4100 · „Jahr fertig machen“ für jedes vergangene, nicht ganz festgeschriebene Jahr */
-    var fertigKn = !lauf && s.nFest < 4 ? '<button type="button" class="btn-clean dp-pa4-btn dp-ja-gold dp-ja-fertig-k" data-ja-aktion="fertig" data-ja-j="' + z.jahr + '">' + z.jahr + ' fertig machen</button>' : '';
-    var jahrKn = fertigKn + (lauf ? '' : (s.nFest === 4
+    /* v4110 · Marcel 23.11.2026: „Der Button ‚2025 fertig machen‘ könnte auch oben mit unter ‚2025 ist vorbei. Du kannst es
+       jetzt abschließen.‘, ist sonst doppelt.“ Der Knopf steht nur noch in der Hinweiszeile (wechselHtml), die dem gewählten
+       Jahr folgt. */
+    var jahrKn = (lauf ? '' : (s.nFest === 4
       ? '<button type="button" class="btn-clean dp-ja-fest an" data-ja-aktion="freigeben" title="Alle vier Schritte von ' + z.jahr + ' wieder freigeben.">' + SCHLOSS + ' Jahr ' + z.jahr + ' wieder freigeben</button>'
       : '<button type="button" class="btn-clean dp-ja-fest" data-ja-aktion="festschreiben" title="Alle vier Schritte von ' + z.jahr + ' festschreiben und das Jahr abschließen. Wieder freigeben geht jederzeit.">' + SCHLOSS + ' Jahr ' + z.jahr + ' festschreiben</button>'));
     out += '<div class="dp-ja-erg"><div class="dp-ja-jahre" role="group" aria-label="Jahr wählen">' + Z.slice().reverse().map(function (x) {
@@ -576,7 +576,7 @@
     var stW = { geplant: 'nicht erklärt', erklaert: 'erklärt, Bescheid fehlt', bescheid: 'Bescheid liegt vor' }[z.status] || 'nicht erklärt';
     var stI = z.steuer ? z.steuer.ergebnis : null, stP = pl && istZahl(pl.zve_y) ? pl.zve_y : null;
     teile.steuer = schritt('steuer', 'Steuer', s, istZahl(stI) ? vz(stI) : '–', (stP != null ? 'Plan ' + vz(stP) : 'kein Plan') + (abw(stP, stI, true) ? ' · ' + abw(stP, stI, true) : ''),
-      'Ergebnis Anlage V · ' + stW + '.', knopf('steuer', z.status === 'geplant' ? 'Anlage V ' + z.jahr + ' ausfüllen' : 'Anlage V ansehen', s.steuer === 'offen') + ' ' + knopf('eintragen', 'Stand setzen', false, z.jahr), z.jahr);
+      'Ergebnis Anlage V · ' + stW + '.', (lauf && !anlageVErlaubt() ? '' : knopf('steuer', z.status === 'geplant' ? 'Anlage V ' + z.jahr + ' ausfüllen' : 'Anlage V ansehen', s.steuer === 'offen')) + ' ' + knopf('eintragen', 'Stand setzen', false, z.jahr), z.jahr);
     var wP = pl && istZahl(pl.wert_y) ? pl.wert_y : null, wI = z.mb ? z.mb.wert : null;
     teile.wert = schritt('wert', 'Wert', s, wI != null ? eur(wI) : '–', (wP != null ? 'Plan ' + eur(wP) : 'kein Plan') + (abw(wP, wI, true) ? ' · ' + abw(wP, wI, true) : ''),
       z.mb ? 'Marktbericht vom ' + datumText(z.mb.am) + '.' : 'Kein Marktbericht in ' + z.jahr + '.', knopf(z.mb ? 'wert-sehen' : 'wert', z.mb ? 'Alle Berichte' : 'Marktbericht abrufen', s.wert === 'offen'), z.jahr);
@@ -600,7 +600,7 @@
     } else {
       var ev = h.ereignisse.slice(0, 2).map(function (e) { return esc(e.titel || e.text); }).filter(Boolean);
       teile.haus = schritt('haus', 'Haus', s, h.suDa && h.su > 0 ? eur(h.su) : 'keine', 'Sonderumlage · Plan ' + eur(pl && istZahl(pl.su_y) ? pl.su_y : 0),
-        'Kein Wohnungseigentum, die Hauskosten stehen in der Anlage V.' + (ev.length ? ' ' + ev.join(' · ') + '.' : ''), knopf('steuer', 'Anlage V ansehen', false), z.jahr);
+        'Kein Wohnungseigentum, die Hauskosten stehen in der Anlage V.' + (ev.length ? ' ' + ev.join(' · ') + '.' : ''), (lauf && !anlageVErlaubt() ? '' : knopf('steuer', 'Anlage V ansehen', false)), z.jahr);
     }
     var akt = aktiverSchritt(z, s, lauf);
     sch = SCHRITTE.map(function (x) { var t = teile[x[0]] || ''; return x[0] === akt ? t.replace('class="dp-ja-schritt', 'class="dp-ja-schritt dp-ja-akt') : t; }).join('');
@@ -716,6 +716,28 @@
       e.classList.remove('dp-ja-blink'); void e.offsetWidth; e.classList.add('dp-ja-blink');
       setTimeout(function () { try { e.classList.remove('dp-ja-blink'); } catch (x) {} }, 2600);
     } catch (x) {}
+  }
+  /* v4110 · Marcel 23.11.2026: „Absprung zu Anlage V soll nur möglich sein, wenn man das passende Level hat … beim
+     Absprung muss er dann auch runter springen zur Anlage V und nicht nur den Tab aufmachen.“ Die Anlage V ist
+     #yearly-tax-form-box, in detailgrad-zuordnung.js s3-tax Stufe 2 (Einsteiger nein, Fortgeschritten Quick, Experte
+     auch Detail). Erlaubt heißt: der Detailgrad blendet sie nicht aus. */
+  function anlageVErlaubt() {
+    try {
+      var D = global.DpDetailgrad, el = doc() && doc().getElementById('yearly-tax-form-box');
+      if (D && D.ausgeblendet && el) return !D.ausgeblendet(el);
+      if (D && D.stufe) return D.stufe() >= 2;
+    } catch (e) {}
+    return true;
+  }
+  function zuAnlageV() {
+    if (!anlageVErlaubt()) { zuReiter('s3-tax'); return; }
+    var d = doc(); zuReiter('s3-tax');
+    warteSichtbar(function () { return d.getElementById('yearly-tax-form-box'); }, function (e) {
+      if (!e) return;
+      aufklappen(e);
+      try { e.scrollIntoView({ block: 'start', behavior: 'smooth' }); } catch (x) { try { e.scrollIntoView(); } catch (y) {} }
+      try { e.classList.remove('dp-ja-blink'); void e.offsetWidth; e.classList.add('dp-ja-blink'); setTimeout(function () { try { e.classList.remove('dp-ja-blink'); } catch (x) {} }, 2600); } catch (x) {}
+    });
   }
   function warteSichtbar(finde, fertig, n) {
     var e = finde();
@@ -838,12 +860,18 @@
     return frei.then(function (ok) { return ok ? global.DpVivi.abgleichen(!!still) : null; }).then(function () { return warte(1500); }).then(function () { return true; }, function () { return false; });
   }
   /** Jahreswechsel: das Vorjahr ist vorbei und noch nicht festgeschrieben */
+  /* v4110 · Marcel 23.11.2026: „sollte auch umstellen, wenn man 2024 anklickt.“ Die Zeile gilt dem gewählten Jahr, wenn es
+     vorbei ist, sonst (laufendes Jahr gewählt) dem Vorjahr. Festgeschrieben: keine Zeile und kein Knopf. */
+  function wechselJahr(Z, weg, L, gew) {
+    var H = heuteJahr(), j = gew < H ? gew : H - 1, z = Z.filter(function (x) { return x.jahr === j; })[0];
+    if (!z) return null;
+    var s = stand(z, weg, L); if (s.nFest === 4) return null;
+    return { jahr: j, alleOk: s.n === 4 };
+  }
   function wechselHtml(Z, weg, L) {
-    var vj = heuteJahr() - 1, z = Z.filter(function (x) { return x.jahr === vj; })[0];
-    if (!z) return '';
-    var s = stand(z, weg, L); if (s.nFest === 4) return '';
-    return '<div class="dp-ja-wechsel"><span><b>' + vj + ' ist vorbei.</b> Du kannst es jetzt abschließen.</span>'
-      + (_gewaehlt === vj ? '' : knopf('fertig', vj + ' fertig machen', true, vj)) + '</div>';
+    var w = wechselJahr(Z, weg, L, _gewaehlt); if (!w) return '';
+    return '<div class="dp-ja-wechsel"><span><b>' + w.jahr + ' ist vorbei.</b> ' + (w.alleOk ? 'Alle Schritte sind erledigt, du kannst es festschreiben.' : 'Du kannst es jetzt abschließen.') + '</span>'
+      + knopf('fertig', w.jahr + ' fertig machen', true, w.jahr) + '</div>';
   }
   function frageHtml(jahr) {
     if (!_frage || _frage.jahr !== jahr) return '';
@@ -908,7 +936,7 @@
       if (a === 'mieterhoehung') { zuMiete('mh'); return; }
       if (a === 'vivi-reiter') { try { global.DpViviReiter.oeffnen(Number(b.getAttribute('data-ja-j')) || null); } catch (x) {} return; }   /* v4042 */
       if (a === 'vivi-mh') { try { global.DpViviMieterhoehung.oeffnen({ quelle: 'pilot-analyse' }); } catch (x) {} return; }   /* v4037 */
-      if (a === 'steuer') { zuReiter('s3-tax'); return; }
+      if (a === 'steuer') { zuAnlageV(); return; }   /* v4110 · bis zur Anlage V rollen (nur mit Stufe, sonst nur der Reiter) */
       if (a === 'eintragen') { eingabeAuf(y); return; }   /* v4090 · im Reiter statt im Fenster „Jahre" (JB().oeffnen(y) bleibt für Steuer und Mietentwicklung) */
       if (a === 'ein-zu') { _eingabe = null; mountAll(); return; }
       if (a === 'f-weiter' || a === 'f-zurueck') { var ks = SCHRITTE.map(function (x) { return x[0]; }), ik = ks.indexOf(b.getAttribute('data-ja-k')), nk = ks[Math.max(0, Math.min(3, ik + (a === 'f-weiter' ? 1 : -1)))];
@@ -933,5 +961,6 @@
     SCHRITTE: SCHRITTE, aktiverSchritt: aktiverSchritt, aufgabe: aufgabe, fuehrungHtml: fuehrungHtml,   /* v4090 · für den Prüfer */
     hgViviRein: hgViviRein, hausMitViviRein: hausMitViviRein, offenListe: offenListe, fertigErgebnis: fertigErgebnis,   /* v4100 */
     standFuer: function (j) { var z = zeileJahr(j), w = mitWeg(); return z ? { z: z, s: stand(z, w, hausLesen()), weg: w } : null; },
-    viviVerknuepft: viviVerknuepft, viviAbgleichen: viviAbgleichen, viviHgJahr: viviHgJahr, zuMiete: zuMiete, zuReiter: zuReiter, hervorheben: hervorheben };
+    viviVerknuepft: viviVerknuepft, viviAbgleichen: viviAbgleichen, viviHgJahr: viviHgJahr, zuMiete: zuMiete, zuReiter: zuReiter, hervorheben: hervorheben,
+    anlageVErlaubt: anlageVErlaubt, zuAnlageV: zuAnlageV, wechselJahr: wechselJahr };   /* v4110 */
 })(typeof window !== 'undefined' ? window : globalThis);
