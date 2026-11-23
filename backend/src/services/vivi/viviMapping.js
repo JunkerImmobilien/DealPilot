@@ -229,7 +229,9 @@ function nachVivi(daten, opt) {
     if (!isoDatum(e.mv_beginn)) notizen.push(kauf ? 'Mietbeginn fehlt, angesetzt ist der Übergang' : 'Mietbeginn fehlt');
     if (!beginn) fehlt.push({ feld: 'mv_beginn', text: 'Mietbeginn fehlt bei ' + name });
     if (!(qm > 0)) fehlt.push({ feld: 'wfl', text: 'Wohnfläche fehlt bei ' + name });
-    zeige('Mietverhältnis', name, eur(ist) + ' kalt, ' + eur(m.monthly_utility_costs) + ' Nebenkosten, ab ' + deDatum(beginn), notizen.join('. '));
+    /* v4034 · Demo-Durchlauf 23.11.2026: der Stellplatz ging als amenity mit, die Vorschau nannte ihn nicht */
+    const stpText = (stp != null && stp > 0) ? ', Stellplatz ' + eur(rund(stp)) : '';
+    zeige('Mietverhältnis', name, eur(ist) + ' kalt' + stpText + ', ' + eur(m.monthly_utility_costs) + ' Nebenkosten, ab ' + deDatum(beginn), notizen.join('. '));
     return m;
   }
 
