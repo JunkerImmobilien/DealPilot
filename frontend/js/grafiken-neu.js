@@ -483,6 +483,79 @@
     tipBinden(k, function (i) { var r = R[i]; if (!r) return ''; return '<div class="gn-tip-j">' + r.j + (r.j > H ? ' · Projektion' : '') + '</div>Ergebnis <b>' + eurV(r.vuv) + '</b><br>davon AfA <b>' + eur(r.afa) + '</b><br>Steuer <b>' + (r.steuer <= 0 ? 'Erstattung ' + eur(-r.steuer) : eur(r.steuer)) + '</b>'; });
   }
 
+  /* 4b · v4160 · Verlauf im Jahresabgleich: EIN Bild je Jahr mit Plan vom Kauf, Ist, Projektion (gestrichelt),
+     umschaltbar Kaltmiete / Cashflow vor Steuer / nach Steuer, Abweichung als Band (grün darüber, rot darunter),
+     festgeschriebene Jahre mit Schloss. Marcel 23.11.2026: „Kann man das besser darstellen, Verlauf vor Steuer und
+     alles? Geht da noch was?“ Ersetzt die Karten Plan gegen Ist und Weg zum positiven Cashflow (v4140).
+     Plan = Ankauf-Stand (DealPilotAnkauf.stand().plan), Ist/Projektion = State.cfRows, Ist-Miete = DpJahresbuch. */
+  var _jaModus = 'cfop';
+  function verlaufJa(k, w) {
+    var H = heuteJahr(), R = (window.State && Array.isArray(window.State.cfRows)) ? window.State.cfRows : [];
+    var plan = []; try { var A = window.DealPilotAnkauf, st = A && A.vorhanden && A.vorhanden() ? A.stand() : null; plan = st && Array.isArray(st.plan) ? st.plan : []; } catch (e) { plan = []; }
+    var Z = []; try { Z = window.DpJahresbuch && window.DpJahresbuch.zeilen ? window.DpJahresbuch.zeilen() : []; } catch (e) { Z = []; }
+    var feld = { miete: 'nkm_y', cfop: 'cfop_y', cfns: 'cfns_y' }[_jaModus], wort = { miete: 'Kaltmiete', cfop: 'Cashflow vor Steuer', cfns: 'Cashflow nach Steuer' }[_jaModus];
+    var start = plan.length ? plan[0].cal : (R[0] ? R[0].cal : H), X = [];
+    for (var j = start; j < start + 15; j++) X.push(j);
+    var pv = X.map(function (j) { var p = plan.filter(function (x) { return x.cal === j; })[0]; return p ? zahl(p[feld]) : null; });
+    var iv = X.map(function (j) {
+      var r = R.filter(function (x) { return x.cal === j; })[0], v = r ? zahl(r[feld]) : null;
+      if (_jaModus === 'miete') { var z = Z.filter(function (q) { return q.jahr === j; })[0]; if (z && j <= H && zahl(z.miete_ist) != null) v = zahl(z.miete_ist); }
+      return v;
+    });
+    if (iv.filter(function (v) { return v != null; }).length < 2) { k.innerHTML = ''; return ''; }
+    var festJ = X.map(function (j) { if (j >= H) return null; try { var f = window.DpJahresbuch && window.DpJahresbuch.fest ? window.DpJahresbuch.fest(j) : {}; var n = Object.keys(f || {}).length; return n ? { n: n, ks: Object.keys(f) } : null; } catch (e) { return null; } });
+    /* Titel */
+    var hi = X.indexOf(H), dH = hi >= 0 && pv[hi] != null && iv[hi] != null ? iv[hi] - pv[hi] : null;
+    var vergangen = X.map(function (j, i) { return j <= H && pv[i] != null && iv[i] != null ? iv[i] - pv[i] : null; }).filter(function (v) { return v != null; });
+    var immer = vergangen.length && vergangen.every(function (d) { return d >= -0.5; });
+    var plus = _jaModus !== 'miete' ? X.filter(function (j, i) { return j > H && iv[i] != null && iv[i] > 0; })[0] : null;
+    var titel = !plan.length ? wort + ': Projektion der App' + (plus ? ', im Plus ab ' + plus : '')
+      : (immer ? wort + ': jedes Jahr mindestens wie beim Kauf geplant' : wort + (dH != null ? ' ' + H + ' ' + eurV(dH) + ' gegen den Plan vom Kauf' : ' gegen den Plan vom Kauf')) + (dH != null && immer ? ', ' + H + ' ' + eurV(dH) : '') + (plus ? ', im Plus ab ' + plus : '');
+    /* Zeichnung */
+    var Hh = 270, L = 56, Rr = 14, T = 16, B = 44, n = X.length;
+    var alle = pv.concat(iv).filter(function (v) { return v != null && isFinite(v); });
+    var tk = ticks(Math.min(0, Math.min.apply(null, alle)), Math.max(0, Math.max.apply(null, alle)), 4), y0 = tk[0], y1 = tk[tk.length - 1];
+    var pw = w - L - Rr, ph = Hh - T - B, dx = pw / (n - 1), xv = function (i) { return L + dx * i; }, yv = function (v) { return T + ph - (v - y0) / (y1 - y0) * ph; };
+    var o = ['<svg viewBox="0 0 ' + w + ' ' + Hh + '" role="img" aria-label="' + esc(wort + ' Plan gegen Ist je Jahr') + '">'];
+    if (hi >= 0 && hi < n - 1) o.push('<rect class="gn-proj" x="' + f1(xv(hi)) + '" y="' + T + '" width="' + f1(w - Rr - xv(hi)) + '" height="' + ph + '"/>');
+    tk.forEach(function (t) { o.push('<line class="gn-netz" x1="' + L + '" x2="' + (w - Rr) + '" y1="' + f1(yv(t)) + '" y2="' + f1(yv(t)) + '"/><text class="gn-ax" x="' + (L - 7) + '" y="' + f1(yv(t) + 3.5) + '" text-anchor="end">' + kurzEur(t) + '</text>'); });
+    if (y0 < 0) o.push('<line class="gn-null" x1="' + L + '" x2="' + (w - Rr) + '" y1="' + f1(yv(0)) + '" y2="' + f1(yv(0)) + '"/>');
+    /* Band: Abweichung Ist gegen Plan, an Kreuzungen geteilt */
+    for (var i = 0; i < n - 1; i++) {
+      var a0 = pv[i], a1 = pv[i + 1], b0 = iv[i], b1 = iv[i + 1]; if ([a0, a1, b0, b1].some(function (v) { return v == null; })) continue;
+      var d0 = b0 - a0, d1 = b1 - a1, xa = xv(i), xb = xv(i + 1);
+      var poly = function (pts, gut) { o.push('<polygon points="' + pts.map(function (p) { return f1(p[0]) + ',' + f1(p[1]); }).join(' ') + '" style="fill:' + (gut ? 'var(--gn-gruen)' : 'var(--gn-rot)') + ';fill-opacity:.22"/>'); };
+      if (d0 * d1 >= 0) poly([[xa, yv(a0)], [xb, yv(a1)], [xb, yv(b1)], [xa, yv(b0)]], d0 + d1 >= 0);
+      else { var t = d0 / (d0 - d1), xc = xa + (xb - xa) * t, yc = yv(a0 + (a1 - a0) * t); poly([[xa, yv(a0)], [xc, yc], [xa, yv(b0)]], d0 >= 0); poly([[xc, yc], [xb, yv(a1)], [xb, yv(b1)]], d1 >= 0); }
+    }
+    var pfad = function (werte, von, bis) { var d = '', auf = false; for (var q = von; q <= bis; q++) { var v = werte[q]; if (v == null) { auf = false; continue; } d += (auf ? 'L' : 'M') + f1(xv(q)) + ' ' + f1(yv(v)); auf = true; } return d; };
+    o.push('<path class="gn-linie" d="' + pfad(pv, 0, n - 1) + '" style="fill:none;stroke:var(--gn-grau);stroke-width:2;stroke-dasharray:2 4;stroke-linecap:round"/>');
+    var bisIst = hi >= 0 ? hi : n - 1;
+    o.push('<path class="gn-linie" d="' + pfad(iv, 0, bisIst) + '" style="fill:none;stroke:var(--gn-gold);stroke-width:2.75;stroke-linejoin:round;stroke-linecap:round"/>');
+    if (bisIst < n - 1) o.push('<path d="' + pfad(iv, bisIst, n - 1) + '" style="fill:none;stroke:var(--gn-gold);stroke-width:2.25;stroke-dasharray:6 5;opacity:.85"/>');
+    iv.forEach(function (v, q) { if (v == null || X[q] > H) return; o.push('<circle class="gn-punkt" cx="' + f1(xv(q)) + '" cy="' + f1(yv(v)) + '" r="3.6" style="fill:var(--gn-gold);stroke:var(--gn-card,#0E0D0B);stroke-width:2;animation-delay:' + (300 + q * 40) + 'ms"/>'); });
+    if (hi >= 0) o.push('<line class="gn-heute" x1="' + f1(xv(hi)) + '" x2="' + f1(xv(hi)) + '" y1="' + T + '" y2="' + (T + ph) + '"/><text class="gn-wert" x="' + f1(xv(hi) + 5) + '" y="' + (T + 10) + '" style="fill:var(--gn-gold-h)">HEUTE</text>');
+    var jede = Math.ceil(n / Math.max(1, Math.floor(pw / 44)));
+    X.forEach(function (j, q) {
+      if (q % jede === 0 || q === n - 1) o.push('<text class="gn-ax" x="' + f1(xv(q)) + '" y="' + (Hh - 24) + '" text-anchor="middle"' + (j === H ? ' style="fill:var(--gn-gold-h);font-weight:600"' : '') + '>' + j + '</text>');
+      var fj = festJ[q];
+      if (fj) { var lx = xv(q), ly = Hh - 12, voll = fj.n >= 4; o.push('<g><rect x="' + f1(lx - 4.5) + '" y="' + (ly - 3) + '" width="9" height="7" rx="1.5" style="fill:' + (voll ? 'var(--gn-gold)' : 'none') + ';stroke:var(--gn-gold);stroke-width:1.3"/><path d="M' + f1(lx - 2.6) + ' ' + (ly - 3) + ' v-2.2 a2.6 2.6 0 0 1 5.2 0 v2.2" style="fill:none;stroke:var(--gn-gold);stroke-width:1.3"/></g>'); }
+      o.push('<rect class="gn-treff" data-gn-i="' + q + '" x="' + f1(xv(q) - dx / 2) + '" y="' + T + '" width="' + f1(dx) + '" height="' + (Hh - T) + '"/><rect class="gn-hl" x="' + f1(xv(q) - dx / 2) + '" y="' + T + '" width="' + f1(dx) + '" height="' + ph + '"/>');
+    });
+    o.push('</svg>');
+    var seg = '<div class="dp-gn-seg" role="group" aria-label="Kennzahl" style="margin:0 0 10px">' + [['miete', 'Kaltmiete'], ['cfop', 'vor Steuer'], ['cfns', 'nach Steuer']].map(function (m) { return '<button type="button" data-gn-ja-modus="' + m[0] + '" aria-pressed="' + (_jaModus === m[0]) + '">' + m[1] + '</button>'; }).join('') + '</div>';
+    k.innerHTML = karteHtml('ja', titel, '€ im Jahr · gepunktet Plan vom Kauf, gold Ist, gestrichelt Projektion ab ' + H + ' · Band: grün über, rot unter dem Plan · Schloss: festgeschrieben', seg + o.join(''),
+      legende([{ name: 'Plan vom Kauf', farbe: 'color-mix(in srgb,currentColor 30%,transparent)', linie: true }, { name: 'Ist', farbe: 'var(--gn-gold)', linie: true }, { name: 'Projektion', farbe: 'var(--gn-gold)', muster: true }, { name: 'besser als Plan', farbe: 'var(--gn-gruen)' }, { name: 'schlechter', farbe: 'var(--gn-rot)' }]));
+    k.onclick = function (ev) { var b = ev.target && ev.target.closest ? ev.target.closest('[data-gn-ja-modus]') : null; if (!b) return; _jaModus = b.getAttribute('data-gn-ja-modus'); k.removeAttribute('data-gn-sig'); lauf(); };
+    var SW = { miete: 'Kaltmiete', cfop: 'vor Steuer', cfns: 'nach Steuer' };
+    tipBinden(k, function (q) {
+      var j = X[q]; if (j == null) return ''; var p = pv[q], s = iv[q], f = festJ[q];
+      return '<div class="gn-tip-j">' + j + (j > H ? ' · Projektion' : j === H ? ' · läuft' : '') + '</div>' + SW[_jaModus] + '<br>Plan vom Kauf <b>' + (p == null ? 'keine Angabe' : eurV(p)) + '</b><br>' + (j > H ? 'Projektion' : 'Ist') + ' <b>' + (s == null ? 'keine Angabe' : eurV(s)) + '</b>'
+        + (p != null && s != null ? '<br>Abweichung <b>' + eurV(s - p) + '</b>' : '') + (f ? '<br>festgeschrieben: ' + f.ks.map(function (x) { return { miete: 'Miete', steuer: 'Steuer', wert: 'Wert', haus: 'Haus' }[x] || x; }).join(', ') : '');
+    });
+    return _jaModus + pv.join(',') + iv.map(function (v) { return v == null ? '' : Math.round(v); }).join(',') + festJ.map(function (f) { return f ? f.n : 0; }).join('');
+  }
+
   function pilotAnalyse() {
     var wr = document.querySelector('.dp-pa-wrap'); if (!wr) return;
     var J = jahre(), sj = sigJ(J);
@@ -505,9 +578,10 @@
       if (karten) {
         var anker = karten.parentNode;
         var kpi = platz(anker, 'pi', karten, 'dp-pa-card dp-gn-karte'), kw = platz(anker, 'weg', karten, 'dp-pa-card dp-gn-karte');
-        var sigZ = ''; try { sigZ = JSON.stringify((window.DpJahresbuch && DpJahresbuch.zeilen ? DpJahresbuch.zeilen() : []).map(function (z) { return [z.jahr, z.miete_ist, z.miete_plan, z.cf_plan, z.cf_proj, z.cf_stand]; })); } catch (e) {}
-        zeichnen(kpi, sigZ, function (k, w) { planIst(k, w); });
-        if (J.length >= 2) zeichnen(kw, sj, function (k, w) { wegPositiv(k, w, J); });
+        var sigZ = ''; try { sigZ = JSON.stringify((window.DpJahresbuch && DpJahresbuch.zeilen ? DpJahresbuch.zeilen() : []).map(function (z) { return [z.jahr, z.miete_ist, z.miete_plan, z.cf_plan, z.cf_proj, z.cf_stand, JSON.stringify(DpJahresbuch.fest ? DpJahresbuch.fest(z.jahr) : '')]; })); } catch (e) {}
+        /* v4160 · ein gemeinsamer Verlauf statt zwei Karten (planIst, wegPositiv bleiben für andere Stellen) */
+        zeichnen(kpi, _jaModus + sj + sigZ, function (k, w) { verlaufJa(k, w); });
+        kw.innerHTML = ''; kw.style.display = 'none';
         weg(karten);
       }
     }
@@ -685,6 +759,7 @@
   function lauf() {
     if (!AN) return;
     try { pilotAnalyse(); } catch (e) { try { console.warn('[grafiken-neu] Pilot-Analyse', e); } catch (x) {} }
+    try { if (window.DpGrafikenPremium) window.DpGrafikenPremium.lauf(HILFEN); } catch (e) { try { console.warn('[grafiken-neu] Premium', e); } catch (x) {} }   /* v4160 */
     try { cockpit(); } catch (e) { try { console.warn('[grafiken-neu] Cockpit', e); } catch (x) {} }
   }
   function spaeter() { if (_timer) clearTimeout(_timer); _timer = setTimeout(lauf, 220); }
@@ -701,7 +776,9 @@
   function pruefeFreigabe() {
     try { if (window.DpVorschau) window.DpVorschau.frei('grafiken_neu').then(function (an) { if (an) start(); }); } catch (e) {}
   }
-  window.DpGrafikenNeu = { an: function () { return AN; }, neu: function () { document.querySelectorAll('[data-dp-gn]').forEach(function (k) { k.removeAttribute('data-gn-sig'); }); lauf(); },
+  /* v4160 · Hilfen für grafiken-premium.js (Platz, Zeichnen nur bei Änderung und nur sichtbar, alte Grafik ausblenden) */
+  var HILFEN = { platz: platz, zeichnen: zeichnen, weg: weg, jahre: jahre, sigJ: sigJ, karteHtml: karteHtml, legende: legende, tipBinden: tipBinden };
+  window.DpGrafikenNeu = { an: function () { return AN; }, _h: HILFEN, neu: function () { document.querySelectorAll('[data-dp-gn]').forEach(function (k) { k.removeAttribute('data-gn-sig'); }); lauf(); },
     _test: { ticks: ticks, saeulen: saeulen, wasserfall: wasserfall, linien: linien, hantel: hantel, balkenH: balkenH, streuung: streuung, projektion: projektion, hinweise: hinweise } };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', pruefeFreigabe); else pruefeFreigabe();
   window.addEventListener('dp:vorschau', pruefeFreigabe);
