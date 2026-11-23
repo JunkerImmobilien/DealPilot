@@ -1176,7 +1176,7 @@
       }
       if (t.getAttribute('data-jw-y') == null) return;
       var y = +t.getAttribute('data-jw-y'), i = +t.getAttribute('data-jw-i');
-      if (window.DpJahresbuch && window.DpJahresbuch.aenderungErlaubt && !window.DpJahresbuch.aenderungErlaubt(y)) { jahreZeichnen(); return; }
+      if (window.DpJahresbuch && window.DpJahresbuch.aenderungErlaubt && !window.DpJahresbuch.aenderungErlaubt(y, 'miete')) { jahreZeichnen(); return; }   /* v4016 · Miete festgeschrieben */
       var v = jZahl(t.value); jSetzen(y, i, v != null && v >= 0 ? Math.round(v * 100) / 100 : null); jahreZeichnen();
     };
     h.onclick = function (ev) {

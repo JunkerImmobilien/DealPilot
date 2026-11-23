@@ -6,6 +6,10 @@
  * verhält sich das Haus" · „ja Jahresabgleich zuerst" · Punkt 2: „wie es am
  * meisten Sinn macht" → ein Jahr gilt von selbst als abgeglichen, wenn alle
  * vier Schritte erledigt sind (kein Knopf, nichts wird gesperrt).
+ * v4016 · Marcel 23.11.2026: ein Jahr oder einzelne Schritte festschreiben (sperren) und wieder freigeben
+ *   (_jahre[J].fest, jahresbuch.js festSetzen); festgeschrieben zählt als erledigt. Kopf und Reitermarke folgen
+ *   dem gewählten Jahr, „2 von 4 Schritten erledigt (Miete, Haus)" statt „2 von 4".
+ * v4017 · ViVi des Jahres (Kaltmiete laut ViVi-Mietverlauf, Restschuld heute, Sondertilgungen) mit Differenz.
  * v3430 · Marcel 15.11.2026 zur Demo Fassung 2: „die Demo ist super, gerne noch
  * professionelle Grafiken rein und die Auswertung der WEG-Protokolle und
  * Wirtschaftspläne … Setz alles um, was geht."
@@ -44,7 +48,7 @@
 (function (global) {
   'use strict';
   if (global.DpJahresabgleich) return;
-  var VERSION = 'v3434';
+  var VERSION = 'v4017';
   var GOLD = 'var(--wl-c9a84c, #C9A84C)';
   var SCHRITTE = [['miete', 'Miete'], ['steuer', 'Steuer'], ['wert', 'Wert'], ['haus', 'Haus']];
   var WORT = { ok: 'erledigt', teil: 'teilweise', offen: 'offen', laufend: 'läuft' };
@@ -107,9 +111,25 @@
     s.wert = z.mb ? 'ok' : (lauf ? 'laufend' : 'offen');
     s.haus = weg ? hausStand(h, lauf) : (lauf ? 'laufend' : steuerStand(z.status));
     s._haus = h;
+    /* v4016 · festgeschrieben gilt als erledigt (nur vergangene Jahre) */
+    s.fest = {};
+    var f = festJahr(z.jahr);
+    if (!lauf) SCHRITTE.forEach(function (x) { if (f[x[0]]) { s.fest[x[0]] = f[x[0]]; s[x[0]] = 'ok'; } });
+    s.nFest = Object.keys(s.fest).length;
     s.n = SCHRITTE.filter(function (x) { return s[x[0]] === 'ok'; }).length;
     s.fertig = !lauf && s.n === 4;
+    s.erledigt = SCHRITTE.filter(function (x) { return s[x[0]] === 'ok'; }).map(function (x) { return x[1]; });
+    s.offen = SCHRITTE.filter(function (x) { return s[x[0]] !== 'ok'; }).map(function (x) { return x[1]; });
     return s;
+  }
+  function festJahr(jahr) { try { var j = JB(); return j && j.fest ? j.fest(jahr) : {}; } catch (e) { return {}; } }
+  /** v4016 · „2 von 4 Schritten erledigt (Miete, Haus)" statt „2 von 4" */
+  function standText(s, jahr) {
+    if (!s) return '';
+    if (jahr >= heuteJahr()) return jahr + ' läuft noch';
+    if (s.nFest === 4) return jahr + ' festgeschrieben';
+    if (s.fertig) return jahr + ' abgeglichen, alle 4 Schritte erledigt';
+    return jahr + ': ' + s.n + ' von 4 Schritten erledigt' + (s.erledigt.length ? ' (' + s.erledigt.join(', ') + ')' : '');
   }
   /** Erinnerung: ab Februar das Vorjahr, solange nicht alle vier erledigt sind */
   function erinnerung() {
@@ -193,6 +213,68 @@
     return _mp.jahre[jahr];
   }
 
+  /* ── ViVi je Jahr (v4017) ─────────────────────────────────────────────
+     Marcel 23.11.2026: „bei ViVi-Verknüpfung die ViVi-Daten des Jahres zeigen und Differenzen je Jahr sichtbar
+     machen, einfach." Gelesen wird nur, was schon im Objekt liegt: _vivi.felder (Miete heute laut ViVi, je Wohnung
+     einheit.<n>.ist) und der Mietverlauf aus ViVi in der Liste der Mieterhöhungen (Einträge mit id vivi-…), dazu
+     aus DpVivi.stand() die Restschuld heute und die Sondertilgungen. Kein Abruf, kein Schreiben.
+     Kaltmiete im Jahr laut ViVi = je Monat ab dem Übergang (Kaufjahr) die Miete laut ViVi-Mietverlauf, summiert -
+     dieselbe Zählung wie die Ist-Miete des Jahresbuchs, damit die Differenz nur echte Abweichungen zeigt. */
+  /** Rein: Kaltmiete eines Jahres aus Quellen [{ liste, heute }] mit E.mieteMonat, ab Monat abM (1-12) */
+  function viviMieteRein(quellen, jahr, abM, E) {
+    if (!quellen || !quellen.length || !E || !E.mieteMonat) return null;
+    var sum = 0;
+    for (var m = Math.max(1, abM || 1); m <= 12; m++) {
+      var iso = jahr + '-' + String(m).padStart(2, '0') + '-01';
+      quellen.forEach(function (q) { var v = E.mieteMonat({ liste: q.liste, heute: q.heute }, iso); if (istZahl(v)) sum += v; });
+    }
+    return Math.round(sum * 100) / 100;
+  }
+  function viviDaten() {
+    var F = global.DpViviFelder, v = null;
+    try { v = F && F.lesen ? F.lesen() : null; } catch (e) { v = null; }
+    if (!v || !v.verknuepft || !v.felder) return null;
+    var st = null; try { st = global.DpVivi && global.DpVivi.stand ? global.DpVivi.stand() : null; } catch (e) { st = null; }
+    var E = global.DpErhoehungen, M = global._dpMfh, quellen = [];
+    var nurVivi = function (l) { return (Array.isArray(l) ? l : []).filter(function (x) { return x && /^vivi-/.test(String(x.id || '')); }); };
+    if (M && Array.isArray(M.einheiten) && M.einheiten.length) {
+      M.einheiten.forEach(function (e, i) {
+        var id = null; try { id = F.einheitFeld ? F.einheitFeld(i, 'ist') : null; } catch (x) {}
+        var h = id ? zahl(v.felder[id]) : null;
+        if (h != null) quellen.push({ liste: nurVivi(e && e.erhoehungen), heute: h });
+      });
+    } else if (zahl(v.felder.nkm) != null) quellen.push({ liste: nurVivi(E && E.objektListe ? E.objektListe() : []), heute: zahl(v.felder.nkm) });
+    return { stand: v.stand || (st && st.letzter_abruf) || null, quellen: quellen, info: (st && st.info) || null };
+  }
+  function viviJahr(jahr, vd) {
+    if (!vd) return null;
+    var ab = 1;
+    try { var A = global.DealPilotAnkauf, a = A && A.vorhanden && A.vorhanden() ? A.stand() : null, m = a && /^(\d{4})-(\d{2})/.exec(String(a.stichtag || '')); if (m && +m[1] === jahr) ab = +m[2]; } catch (e) {}
+    var out = { miete: viviMieteRein(vd.quellen, jahr, ab, global.DpErhoehungen), st: [], rs: null };
+    var info = vd.info || {};
+    (info.sondertilgungen || []).forEach(function (x) { if (x && String(x.datum || '').slice(0, 4) === String(jahr)) out.st.push(x); });
+    if (jahr === heuteJahr() && info.restschuld_heute && istZahl(info.restschuld_heute.wert)) out.rs = info.restschuld_heute;
+    return out;
+  }
+  function viviHtml(z, vd) {
+    var vj = viviJahr(z.jahr, vd); if (!vj) return '';
+    var zeilen = [];
+    if (istZahl(vj.miete)) {
+      var dI = istZahl(z.miete_ist) ? z.miete_ist - vj.miete : null;
+      zeilen.push('<div class="dp-ja-vz"><span>Kaltmiete ' + z.jahr + '</span><b>' + eur(vj.miete) + '</b><span>' + (dI == null ? 'kein Ist in DealPilot'
+        : Math.abs(dI) < 1 ? '<span class="dp-ja-gut">stimmt mit DealPilot überein</span>' : 'DealPilot ' + eur(z.miete_ist) + ', <span class="dp-ja-schlecht">Differenz ' + vz(dI) + '</span>') + '</span></div>');
+    }
+    if (vj.rs) {
+      var rsD = istZahl(z.rs_proj) ? z.rs_proj - vj.rs.wert : null;
+      zeilen.push('<div class="dp-ja-vz"><span>Restschuld heute</span><b>' + eur(vj.rs.wert) + '</b><span>' + (rsD == null ? '' : Math.abs(rsD) < 50 ? '<span class="dp-ja-gut">wie die Projektion</span>'
+        : 'Projektion ' + eur(z.rs_proj) + ', Differenz ' + vz(rsD)) + (vj.rs.sondertilgung ? ' (nach Sondertilgung ' + eur(vj.rs.sondertilgung) + ')' : '') + '</span></div>');
+    }
+    if (vj.st.length) zeilen.push('<div class="dp-ja-vz"><span>Sondertilgung</span><b>' + eur(vj.st.reduce(function (a, x) { return a + (zahl(x.betrag) || 0); }, 0)) + '</b><span>' + esc(vj.st.map(function (x) { return datumText(x.datum); }).join(', ')) + ', in DealPilot nicht eingerechnet</span></div>');
+    if (!zeilen.length) return '';
+    var stT = ''; try { var d = vd.stand ? new Date(vd.stand) : null; if (d && !isNaN(d.getTime())) stT = 'Stand ' + String(d.getDate()).padStart(2, '0') + '.' + String(d.getMonth() + 1).padStart(2, '0') + '.' + d.getFullYear(); } catch (e) {}
+    return '<div class="dp-ja-vivi" data-ja-vivi="' + z.jahr + '"><div class="dp-ja-eti">Laut ViVi' + (stT ? ' · ' + stT : '') + '</div>' + zeilen.join('') + '</div>';
+  }
+
   /* ── Anzeige ───────────────────────────────────────────────────── */
   function stil() {
     var d = doc(); if (!d || d.getElementById('dp-ja-stil') || !d.head) return;
@@ -200,13 +282,30 @@
     var T = '#2A2727', M = '#6B645A', LE = '#9A9285', LI = '#EFE8D6', RA = '#E6DCC2';
     s.textContent = [
       '.dp-ja{display:block;color:' + T + ';font:400 13px/1.55 Inter,system-ui,sans-serif}',
-      '.dp-ja-erg{display:flex;gap:16px;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;padding:2px 0 16px;border-bottom:1px solid ' + LI + ';margin-bottom:16px}',
+      '.dp-ja-erg{display:flex;gap:10px 12px;align-items:center;flex-wrap:wrap;padding:2px 0 14px;border-bottom:1px solid ' + LI + ';margin-bottom:14px}',
+      '.dp-ja-erg .dp-ja-satz{flex:1 1 100%}',
       '.dp-ja-satz{font:500 18px/1.38 "Space Grotesk",Inter,sans-serif;letter-spacing:-.005em;max-width:680px;color:' + T + '}',
       '.dp-ja-satz b{font-weight:700}',
       '.dp-ja-jahre{display:flex;gap:6px;flex-wrap:wrap}',
       '.dp-pa-wrap .dp-ja-jahre button{border:1px solid ' + RA + ' !important;background:#fff !important;border-radius:8px !important;padding:5px 11px !important;font:500 12.5px Inter,sans-serif !important;color:' + T + ' !important;display:inline-flex;align-items:center;gap:7px;cursor:pointer;box-shadow:none !important;min-height:0 !important}',
       '.dp-pa-wrap .dp-ja-jahre button[aria-pressed="true"]{border-color:' + GOLD + ' !important;background:color-mix(in srgb, ' + GOLD + ' 12%, #fff) !important;font-weight:600 !important}',
       '.dp-ja-pkt{width:7px;height:7px;border-radius:50%;display:inline-block;flex:0 0 auto}',
+      /* v4016 · je Jahr vier Kästchen (Miete, Steuer, Wert, Haus), Schritt-Nummer, Stand-Pille, Festschreiben */
+      '.dp-ja-mini{display:inline-flex;gap:2px}.dp-ja-mini i{width:6px;height:10px;border-radius:2px;display:inline-block}',
+      '.dp-ja-jahre small,.dp-ja-tab td small.dp-ja-l{font:500 10.5px Inter,sans-serif;color:' + M + '}',
+      '.dp-ja-schl{display:inline-flex;color:#2f7d52}',
+      '.dp-ja-nr{width:18px;height:18px;border-radius:50%;display:inline-grid;place-items:center;flex:0 0 auto;font:600 10.5px Inter,sans-serif;background:rgba(42,39,39,.07);color:' + T + '}',
+      '.dp-ja-kk .st{border-radius:9px;padding:0 7px;line-height:17px;border:1px solid transparent}',
+      '.dp-ja-kk .st.dp-ja-st-ok{color:#2f7d52;border-color:rgba(63,165,108,.35)}.dp-ja-kk .st.dp-ja-st-teil{color:#8a6d1f;border-color:rgba(201,154,46,.45)}',
+      '.dp-ja-kk .st.dp-ja-st-offen{color:#B8625C;border-color:rgba(184,98,92,.4)}.dp-ja-kk .st.dp-ja-st-fest{color:#fff;background:#3FA56C;border-color:#3FA56C}',
+      '.dp-ja-schritt.fest{background:color-mix(in srgb, #3FA56C 5%, #fff)}',
+      '.dp-pa-wrap .dp-ja button.dp-ja-fest{display:inline-flex;align-items:center;gap:5px;font:500 11.5px Inter,sans-serif !important;padding:3px 9px !important;min-height:0 !important;height:auto !important;border:1px dashed ' + RA + ' !important;background:#fff !important;box-shadow:none !important;color:' + M + ' !important;border-radius:8px !important;cursor:pointer;white-space:nowrap !important}',
+      '.dp-pa-wrap .dp-ja button.dp-ja-fest.an{border-style:solid !important;border-color:rgba(63,165,108,.45) !important;color:#2f7d52 !important}',
+      '.dp-pa-wrap .dp-ja-erg button.dp-ja-fest{margin-left:auto}',
+      '.dp-pa-wrap .dp-ja-schritt button.dp-ja-fest{margin-top:2px}',
+      '.dp-ja-vivi{border:1px solid ' + LI + ';border-radius:10px;padding:10px 16px;margin-top:12px;background:#fff;display:flex;flex-direction:column;gap:4px}',
+      '.dp-ja-vz{display:grid;grid-template-columns:150px auto minmax(0,1fr);gap:4px 14px;align-items:baseline;font-size:12.5px;color:' + M + '}',
+      '.dp-ja-vz b{font:600 14px "Space Grotesk",Inter,sans-serif;color:' + T + ';font-variant-numeric:tabular-nums;white-space:nowrap}',
       '.dp-ja-ok{background:#3FA56C}.dp-ja-teil{background:#C99A2E}.dp-ja-offen{background:#B8625C}.dp-ja-laufend{background:#D9D1BF}',
       '.dp-ja-erinnerung{border-left:2px solid ' + GOLD + ';background:color-mix(in srgb, ' + GOLD + ' 9%, #fff);border-radius:0 8px 8px 0;padding:8px 12px;font:500 13px Inter,sans-serif;color:' + T + ';margin:0 0 14px}',
       '.dp-ja-schritte{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border:1px solid ' + LI + ';border-radius:10px;overflow:hidden;background:#fff}',
@@ -250,8 +349,10 @@
       '.dp-ja-notiz.ok{border-left-color:#3FA56C}',
       '.dp-ja-fuss{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:10px;font-size:12px;color:' + LE + '}',
       '@media (max-width:760px){.dp-ja-schritte{grid-template-columns:repeat(2,minmax(0,1fr))}.dp-ja-schritt:nth-child(2n){border-right:none}.dp-ja-schritt:nth-child(-n+2){border-bottom:1px solid ' + LI + '}'
-        + '.dp-ja-pot{grid-template-columns:1fr}.dp-ja-satz{font-size:16px}.dp-ja-schritt{padding:12px}'
-        + '.dp-pa-wrap .dp-ja-schritt button{font-size:12px !important;padding:5px 8px !important}}'
+        + '.dp-ja-pot{grid-template-columns:1fr}.dp-ja-satz{font-size:15px}.dp-ja-schritt{padding:11px 10px;gap:5px}.dp-ja-w{font-size:17px}'
+        + '.dp-pa-wrap .dp-ja-schritt p{font-size:11.5px}.dp-ja-kk{flex-wrap:wrap;gap:5px}.dp-ja-kk .st{margin-left:0}'
+        + '.dp-pa-wrap .dp-ja-schritt button{font-size:12px !important;padding:5px 8px !important}'
+        + '.dp-pa-wrap .dp-ja-erg button.dp-ja-fest{margin-left:0}.dp-ja-vivi{padding:10px 12px}.dp-ja-vz{grid-template-columns:auto auto;gap:0 10px}.dp-ja-vz>span:last-child{grid-column:1/-1;margin-bottom:4px}}'
     ].join('\n');
     d.head.appendChild(s);
   }
@@ -262,9 +363,16 @@
     return '<span class="' + kl + '">' + vz(d) + '</span>';
   }
   function pktKlasse(sx, lauf) { return lauf ? 'laufend' : (sx.n === 4 ? 'ok' : (sx.n >= 2 ? 'teil' : 'offen')); }
-  function schritt(k, titel, s, wert, vgl, text, kn) {
-    return '<div class="dp-ja-schritt" data-ja-schritt="' + k + '"><div class="dp-ja-kk"><span class="dp-ja-pkt dp-ja-' + s[k] + '"></span><b>' + titel + '</b><span class="st">' + WORT[s[k]] + '</span></div>'
-      + '<div class="dp-ja-w">' + wert + '</div><div class="dp-ja-vgl">' + vgl + '</div><p>' + text + '</p>' + kn + '</div>';
+  var SCHLOSS = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>';
+  /* v4016 · Schritt mit Nummer, Stand als Pille, festschreiben / wieder freigeben (nur vergangene Jahre) */
+  function schritt(k, titel, s, wert, vgl, text, kn, jahr) {
+    var nr = SCHRITTE.map(function (x) { return x[0]; }).indexOf(k) + 1, fest = s.fest && s.fest[k], lauf = jahr >= heuteJahr();
+    var stW = fest ? 'festgeschrieben' : WORT[s[k]];
+    var festKn = lauf ? '' : (fest
+      ? '<button type="button" class="btn-clean dp-ja-fest an" data-ja-aktion="freigeben" data-ja-schritt-k="' + k + '" title="Festgeschrieben am ' + esc(datumText(fest)) + '. Wieder freigeben, um ' + titel + ' ' + jahr + ' zu ändern.">' + SCHLOSS + ' wieder freigeben</button>'
+      : '<button type="button" class="btn-clean dp-ja-fest" data-ja-aktion="festschreiben" data-ja-schritt-k="' + k + '" title="' + titel + ' ' + jahr + ' abschließen. Danach lässt sich der Schritt nicht mehr ändern, bis er freigegeben ist.">' + SCHLOSS + ' festschreiben</button>');
+    return '<div class="dp-ja-schritt' + (fest ? ' fest' : '') + '" data-ja-schritt="' + k + '"><div class="dp-ja-kk"><span class="dp-ja-nr">' + nr + '</span><b>' + titel + '</b><span class="st dp-ja-st-' + (fest ? 'fest' : s[k]) + '">' + stW + '</span></div>'
+      + '<div class="dp-ja-w">' + wert + '</div><div class="dp-ja-vgl">' + vgl + '</div><p>' + text + '</p>' + (fest ? '' : kn) + festKn + '</div>';
   }
   function abschnitt(t, eti) { return '<div class="dp-ja-abs"><h4>' + t + '</h4>' + (eti ? '<span class="dp-ja-eti">' + eti + '</span>' : '') + '</div>'; }
 
@@ -291,12 +399,12 @@
       + (genutzt ? '<div class="dp-ja-vgl">' + vz(Math.round(mp.zul - mp.ist)) + ' / Monat ab ' + mmjj(gen[0].datum) + '</div>' : '') + '</div>'
       + '<div><div class="dp-ja-balken" role="img" aria-label="eingetragen ' + quote + ' % der zulässigen Miete"><i style="width:' + quote + '%"></i></div><p>' + t + '</p></div>'
       + (ungenutzt > 0 ? knopf('mieterhoehung', 'Mieterhöhung vorbereiten', true) : '<span></span>') + '</div>'
-      + '<p class="dp-ja-hin">Gerechnet mit dem Kern der Potenzialanalyse (Kappungsgrenze, Sperrfrist, Vergleichsmiete). Frühere Jahre rechnen mit der heutigen Vergleichsmiete; den damaligen Mietspiegel kennt DealPilot nicht. Sperrfrist und Kappung kommen aus der Liste der Mieterhöhungen im Reiter Miete.</p>';
+      + '<p class="dp-ja-hin">Gerechnet wie die Potenzialanalyse (Kappung, Sperrfrist, Vergleichsmiete). Frühere Jahre mit der heutigen Vergleichsmiete, den damaligen Mietspiegel kennt DealPilot nicht.</p>';
   }
 
-  function tabelleHtml(Z, weg, L) {
+  function tabelleHtml(Z, weg, L, vd) {
     var J = global.DpJahresstaende;
-    var kopf = '<tr><th>Jahr</th><th>Kaltmiete<br>Plan</th><th>Kaltmiete<br>Ist</th><th>zulässig<br>§ 558</th><th>Cashflow v. St.<br>Plan · Ist</th><th>Ergebnis<br>V+V</th><th>Wert</th><th>Rest&shy;schuld</th><th>DSCR</th><th>Score</th><th>Abgleich</th></tr>';
+    var kopf = '<tr><th>Jahr</th><th>Kaltmiete<br>Plan</th><th>Kaltmiete<br>Ist</th>' + (vd ? '<th>Kaltmiete<br>laut ViVi</th>' : '') + '<th>zulässig<br>§ 558</th><th>Cashflow v. St.<br>Plan · Ist</th><th>Ergebnis<br>V+V</th><th>Wert</th><th>Rest&shy;schuld</th><th>DSCR</th><th>Score</th><th>Abgleich</th></tr>';
     var body = Z.map(function (z) {
       var sx = stand(z, weg, L), lauf = z.jahr >= heuteJahr(), pl = planZeile(z.jahr), mp = mpJahr(z.jahr);
       var st = J && J.standJahr ? J.standJahr(z.jahr) : null, kz = (st && st.kz) || {};
@@ -310,6 +418,8 @@
         + '<td><b>' + z.jahr + '</b>' + (lauf ? '<small>läuft</small>' : '') + '<button type="button" class="btn-clean dp-ja-ein" data-ja-aktion="eintragen" data-ja-j="' + z.jahr + '" title="Steuerstand, Restschuld laut Kontoauszug, Leerstand und Notiz für ' + z.jahr + '">eintragen</button></td>'
         + '<td>' + planM + '</td>'
         + '<td>' + (istZahl(z.miete_ist) ? eur(z.miete_ist) : '–') + '<small>' + (lauf ? 'Projektion' : abw(z.miete_basis, z.miete_ist, true)) + '</small></td>'
+        + (vd ? (function () { var vj = viviJahr(z.jahr, vd), m = vj && vj.miete, d = istZahl(m) && istZahl(z.miete_ist) ? z.miete_ist - m : null;
+            return '<td>' + (istZahl(m) ? eur(m) : '–') + '<small' + (d != null && Math.abs(d) >= 1 ? ' class="dp-ja-schlecht">Δ ' + vz(d) : (d != null ? ' class="dp-ja-gut">gleich' : '>')) + '</small></td>'; })() : '')
         + '<td>' + (mp && mp.n ? eur(mp.zul * 12) + ung : '–') + '</td>'
         + '<td>' + eur(cfP) + '<small>' + (cfI != null ? 'Ist ' + eur(cfI) : (lauf ? 'läuft' : 'kein Stand')) + '</small></td>'
         + '<td>' + (z.steuer && istZahl(z.steuer.ergebnis) ? vz(z.steuer.ergebnis) : '–') + '<small>' + (pl && istZahl(pl.zve_y) ? 'Plan ' + vz(pl.zve_y) : '') + '</small><span class="dp-ja-stp ' + esc(z.status) + '">' + esc(JB().statusWort(z.status)) + '</span></td>'
@@ -317,7 +427,8 @@
         + '<td>' + eur(rs) + '<small>' + (istZahl(z.rs_ist) ? 'Kontoauszug' : 'Projektion') + '</small></td>'
         + '<td>' + (dscr != null ? z2(dscr) : '–') + '</td>'
         + '<td>' + (score != null ? String(Math.round(score)) : '–') + '</td>'
-        + '<td><span class="dp-ja-pkt dp-ja-' + pktKlasse(sx, lauf) + '"></span> ' + (lauf ? '–' : sx.n + '/4') + '</td></tr>';
+        + '<td title="' + esc(standText(sx, z.jahr)) + '">' + (lauf ? '<small>läuft</small>' : sx.nFest === 4 ? '<span class="dp-ja-schl">' + SCHLOSS + '</span>'
+          : '<span class="dp-ja-mini">' + SCHRITTE.map(function (y) { return '<i class="dp-ja-' + (sx[y[0]] === 'ok' ? 'ok' : sx[y[0]]) + '"></i>'; }).join('') + '</span>') + '</td></tr>';
     }).join('');
     return '<div class="dp-ja-tab"><table><thead>' + kopf + '</thead><tbody>' + body + '</tbody></table></div>';
   }
@@ -337,23 +448,29 @@
     var pl = planZeile(z.jahr), pr = projZeile(z.jahr), lauf = z.jahr >= heuteJahr();
 
     var out = '<div class="dp-ja" data-dp-ja="1">';
-    var er = erinnerung();
-    if (er && er.jahr !== _gewaehlt) out += '<div class="dp-ja-erinnerung">Jahresabgleich ' + er.jahr + ': ' + er.n + ' von 4 erledigt. Offen: ' + esc(er.offen.join(', ')) + '. <button type="button" class="btn-clean dp-pa4-link" data-ja-jahr="' + er.jahr + '">' + er.jahr + ' ansehen</button></div>';
+    /* v4016 · Die Erinnerung „Jahresabgleich 2025: 2 von 4" stand oben über JEDEM gewählten Jahr (Marcel 23.11.2026:
+       „bleibt beim Wechsel der Jahre stehen"). Jetzt sagt der Kopf nur das gewählte Jahr; offene Jahre zeigt die
+       Jahresleiste mit Punkt und Zahl. */
 
-    /* Ergebnissatz mit Jahresleiste rechts */
+    /* Jahresleiste oben, darunter der Ergebnissatz des gewählten Jahres */
     var dm = istZahl(z.miete_ist) && istZahl(z.miete_basis) ? z.miete_ist - z.miete_basis : null;
     var cfPlan = pl && istZahl(pl.cfop_y) ? pl.cfop_y : null, cfIst = pr && istZahl(pr.cfop_y) ? pr.cfop_y : null;
-    var offen = SCHRITTE.filter(function (x) { return s[x[0]] !== 'ok'; }).map(function (x) { return x[1]; });
-    var satz = '<b>' + z.jahr + (lauf ? ' läuft noch.' : ': ' + (s.fertig ? 'abgeglichen.' : s.n + ' von 4 erledigt.')) + '</b> '
-      + (dm != null ? 'Miete ' + vz(dm) + (dm >= 0 ? ' über' : ' unter') + (z.ohne_plan ? ' der Projektion' : ' dem Plan vom Kauf') : 'Für dieses Jahr gibt es keinen Plan vom Kauf')
+    var satz = '<b>' + esc(standText(s, z.jahr)) + '.</b> '
+      + (!lauf && s.offen.length && s.nFest < 4 ? 'Offen: ' + esc(s.offen.join(', ')) + '. ' : '')
+      + (dm != null ? (Math.abs(dm) < 0.5 ? 'Miete wie ' + (z.ohne_plan ? 'die Projektion' : 'im Plan vom Kauf') : 'Miete ' + vz(dm) + (dm > 0 ? ' über' : ' unter') + (z.ohne_plan ? ' der Projektion' : ' dem Plan vom Kauf')) : 'Für dieses Jahr gibt es keinen Plan vom Kauf')
       + (cfPlan != null && cfIst != null ? ', Cashflow ' + vz(cfIst - cfPlan) : '') + '.'
-      + (!lauf && offen.length ? ' Offen: ' + esc(offen.join(', ')) + '.' : '')
-      + (lauf ? ' Abgeglichen wird ab Februar ' + (z.jahr + 1) + ', wenn Steuer, Abrechnung und Protokoll da sind.' : '');
-    out += '<div class="dp-ja-erg"><div class="dp-ja-satz">' + satz + '</div>'
-      + '<div class="dp-ja-jahre" role="group" aria-label="Jahr wählen">' + Z.slice().reverse().map(function (x) {
-        var sx = stand(x, weg, L);
-        return '<button type="button" class="btn-clean" data-ja-jahr="' + x.jahr + '" aria-pressed="' + (x.jahr === _gewaehlt) + '"><span class="dp-ja-pkt dp-ja-' + pktKlasse(sx, x.jahr >= heuteJahr()) + '"></span>' + x.jahr + '</button>';
-      }).join('') + '</div></div>';
+      + (lauf ? ' Abgleich ab Februar ' + (z.jahr + 1) + ', wenn Steuer, Abrechnung und Protokoll da sind.' : '');
+    var jahrKn = lauf ? '' : (s.nFest === 4
+      ? '<button type="button" class="btn-clean dp-ja-fest an" data-ja-aktion="freigeben" title="Alle vier Schritte von ' + z.jahr + ' wieder freigeben.">' + SCHLOSS + ' Jahr ' + z.jahr + ' wieder freigeben</button>'
+      : '<button type="button" class="btn-clean dp-ja-fest" data-ja-aktion="festschreiben" title="Alle vier Schritte von ' + z.jahr + ' festschreiben und das Jahr abschließen. Wieder freigeben geht jederzeit.">' + SCHLOSS + ' Jahr ' + z.jahr + ' festschreiben</button>');
+    out += '<div class="dp-ja-erg"><div class="dp-ja-jahre" role="group" aria-label="Jahr wählen">' + Z.slice().reverse().map(function (x) {
+        var sx = stand(x, weg, L), xl = x.jahr >= heuteJahr();
+        var tt = standText(sx, x.jahr) + (!xl && sx.offen.length ? '. Offen: ' + sx.offen.join(', ') : '');
+        /* je Schritt ein Kästchen in der Reihenfolge Miete, Steuer, Wert, Haus: grün erledigt, gelb teilweise, rot offen */
+        return '<button type="button" class="btn-clean" data-ja-jahr="' + x.jahr + '" aria-pressed="' + (x.jahr === _gewaehlt) + '" title="' + esc(tt) + '" aria-label="' + esc(tt) + '">' + x.jahr
+          + (xl ? '<small>läuft</small>' : sx.nFest === 4 ? '<small class="dp-ja-schl">' + SCHLOSS + '</small>'
+            : '<span class="dp-ja-mini">' + SCHRITTE.map(function (y) { return '<i class="dp-ja-' + (sx[y[0]] === 'ok' ? 'ok' : sx[y[0]]) + '"></i>'; }).join('') + '</span>') + '</button>';
+      }).join('') + '</div>' + jahrKn + '<div class="dp-ja-satz">' + satz + '</div></div>';
 
     /* die vier Schritte als eine Leiste */
     var erh = (z.erhoehungen || []).map(function (e) { return datumText(e.datum) + (e.nr ? ' (Whg. ' + e.nr + ')' : '') + (istZahl(zahl(e.auf)) ? ' auf ' + eur(zahl(e.auf)) : ''); });
@@ -362,14 +479,14 @@
     var sch = '';
     sch += schritt('miete', 'Miete', s, eur(z.miete_ist), (z.miete_plan != null ? 'Plan ' : 'Projektion ') + eur(mPlan) + (abw(mPlan, z.miete_ist, true) ? ' · ' + abw(mPlan, z.miete_ist, true) : ''),
       (erh.length ? 'Erhöhung ' + esc(erh.join(', ')) + '.' : 'Keine Erhöhung in diesem Jahr eingetragen.') + (listeLeer && !lauf ? ' Ohne Liste rechnet DealPilot vergangene Jahre mit der heutigen Miete.' : ''),
-      knopf('miete', 'Mieterhöhung eintragen', listeLeer && !lauf));
+      knopf('miete', 'Mieterhöhung eintragen', listeLeer && !lauf), z.jahr);
     var stW = { geplant: 'nicht erklärt', erklaert: 'erklärt, Bescheid fehlt', bescheid: 'Bescheid liegt vor' }[z.status] || 'nicht erklärt';
     var stI = z.steuer ? z.steuer.ergebnis : null, stP = pl && istZahl(pl.zve_y) ? pl.zve_y : null;
     sch += schritt('steuer', 'Steuer', s, istZahl(stI) ? vz(stI) : '–', (stP != null ? 'Plan ' + vz(stP) : 'kein Plan') + (abw(stP, stI, true) ? ' · ' + abw(stP, stI, true) : ''),
-      'Ergebnis Anlage V · ' + stW + '.', knopf('steuer', z.status === 'geplant' ? 'Anlage V ' + z.jahr + ' ausfüllen' : 'Anlage V ansehen', s.steuer === 'offen') + ' ' + knopf('eintragen', 'Stand setzen', false, z.jahr));
+      'Ergebnis Anlage V · ' + stW + '.', knopf('steuer', z.status === 'geplant' ? 'Anlage V ' + z.jahr + ' ausfüllen' : 'Anlage V ansehen', s.steuer === 'offen') + ' ' + knopf('eintragen', 'Stand setzen', false, z.jahr), z.jahr);
     var wP = pl && istZahl(pl.wert_y) ? pl.wert_y : null, wI = z.mb ? z.mb.wert : null;
     sch += schritt('wert', 'Wert', s, wI != null ? eur(wI) : '–', (wP != null ? 'Plan ' + eur(wP) : 'kein Plan') + (abw(wP, wI, true) ? ' · ' + abw(wP, wI, true) : ''),
-      z.mb ? 'Marktbericht vom ' + datumText(z.mb.am) + '.' : 'Kein Marktbericht in ' + z.jahr + '.', knopf(z.mb ? 'wert-sehen' : 'wert', z.mb ? 'Alle Berichte' : 'Marktbericht abrufen', s.wert === 'offen'));
+      z.mb ? 'Marktbericht vom ' + datumText(z.mb.am) + '.' : 'Kein Marktbericht in ' + z.jahr + '.', knopf(z.mb ? 'wert-sehen' : 'wert', z.mb ? 'Alle Berichte' : 'Marktbericht abrufen', s.wert === 'offen'), z.jahr);
     if (weg) {
       var hgW = istZahl(h.hg_ist_j) ? eur(h.hg_ist_j) : (istZahl(h.hg_plan_m) ? eur(h.hg_plan_m * 12) : '–');
       var hgV = istZahl(h.hg_plan_m) ? 'Plan ' + eur(h.hg_plan_m * 12) + (istZahl(h.hg_ist_j) ? ' · ' + abw(h.hg_plan_m * 12, h.hg_ist_j, false) : ' · Wirtschaftsplan') : (istZahl(h.hg_ist_j) ? 'Hausgeld laut Abrechnung' : 'Hausgeld im Jahr');
@@ -386,28 +503,32 @@
       var suT = h.suDa && h.su > 0 ? ' Sonderumlage ' + eur(h.su) + (suP ? ' (Plan ' + eur(suP) + ')' : ' (nicht geplant)') + '.' : '';
       var bT = h.beschluesse.length ? ' ' + esc(h.beschluesse.slice(0, 2).join(' · ')) + '.' : '';
       sch += schritt('haus', 'Haus', s, hgW, hgV, hausT.join(' · ') + '.' + suT + bT,
-        knopf('haus', 'Unterlagen hochladen', s.haus !== 'ok' && !lauf) + ' ' + knopf('haus-sehen', 'Haus ansehen', false));
+        knopf('haus', 'Unterlagen hochladen', s.haus !== 'ok' && !lauf) + ' ' + knopf('haus-sehen', 'Haus ansehen', false), z.jahr);
     } else {
       var ev = h.ereignisse.slice(0, 2).map(function (e) { return esc(e.titel || e.text); }).filter(Boolean);
       sch += schritt('haus', 'Haus', s, h.suDa && h.su > 0 ? eur(h.su) : 'keine', 'Sonderumlage · Plan ' + eur(pl && istZahl(pl.su_y) ? pl.su_y : 0),
-        'Kein Wohnungseigentum: die Kosten des Hauses stehen in der Anlage V, der Schritt folgt der Steuer.' + (ev.length ? ' ' + ev.join(' · ') + '.' : ''), knopf('steuer', 'Anlage V ansehen', false));
+        'Kein Wohnungseigentum, die Hauskosten stehen in der Anlage V.' + (ev.length ? ' ' + ev.join(' · ') + '.' : ''), knopf('steuer', 'Anlage V ansehen', false), z.jahr);
     }
     out += '<div class="dp-ja-schritte">' + sch + '</div>';
+
+    /* v4017 · ViVi des Jahres mit Differenz zu DealPilot */
+    var vd = null; try { vd = viviDaten(); } catch (e) { vd = null; }
+    try { out += viviHtml(z, vd); } catch (e) { try { console.warn('[jahresabgleich] ViVi', e); } catch (x) {} }
 
     /* Mieterhöhungspotenzial des Jahres */
     try { out += potenzialHtml(z, lauf); } catch (e) { try { console.warn('[jahresabgleich] Mietpotenzial', e); } catch (x) {} }
 
     /* Jahr für Jahr: eine Tabelle statt drei */
     out += abschnitt('Jahr für Jahr', 'Plan vom Kauf gegen Ist · Zeile wählt das Jahr');
-    out += tabelleHtml(Z, weg, L);
+    out += tabelleHtml(Z, weg, L, vd);
     var hin = '';
     if (z.abgleich && z.abgleich.art !== 'gleich') hin += '<div class="dp-ja-notiz">' + esc(z.abgleich.text) + (z.abgleich.art === 'vorschlag' ? ' ' + knopf('av', 'übernehmen', false, z.jahr) : '') + '</div>';
     if (z.ziel_erreicht && z.ziel_fassung && z.ziel_fassung.status !== 'erreicht') hin += '<div class="dp-ja-notiz ok">Die Ist-Miete ' + z.jahr + ' erreicht das Ziel von ' + esc(z.ziel_titel || 'Zielbild') + '. <button type="button" class="btn-clean dp-pa4-btn" data-ja-aktion="erreicht" data-ja-fassung="' + esc(z.ziel_fassung.id) + '">als erreicht kennzeichnen</button></div>';
     if (z.notiz) hin += '<div class="dp-ja-notiz">Notiz ' + z.jahr + ': ' + esc(z.notiz) + '</div>';
     out += hin;
     var nSt = 0; try { nSt = global.DpJahresstaende && global.DpJahresstaende.liste ? global.DpJahresstaende.liste().length : 0; } catch (e) {}
-    out += '<div class="dp-ja-fuss"><span>Plan ist die Rechnung vom Kauf, eingefroren. DSCR und Score kommen aus dem Jahresstand (' + nSt + ' festgehalten, gespeichert beim normalen Speichern). '
-      + (z.ohne_plan ? 'Dieser Ankauf-Stand ist älter als die eingefrorene Planrechnung, grau steht die heutige Projektion. ' : '') + '</span>'
+    out += '<div class="dp-ja-fuss"><span>Plan ist die Rechnung vom Kauf, eingefroren. DSCR und Score aus dem Jahresstand (' + nSt + ' festgehalten). '
+      + (z.ohne_plan ? 'Ohne eingefrorenen Plan steht grau die heutige Projektion. ' : '') + '</span>'
       + '<button type="button" class="btn-clean dp-pa4-btn" data-ja-aktion="festhalten">Stand ' + heuteJahr() + ' festhalten</button></div>';
 
     /* Verlauf */
@@ -417,16 +538,31 @@
   }
 
   /* ── Hosts, Klicks ─────────────────────────────────────────────── */
+  /* v4016 · Marcel 23.11.2026: beim Wechsel der Jahre blieb im Reiter „Jahresabgleich 2025 · 2/4" stehen. Die Marke
+     folgt jetzt dem gewählten Jahr (vor dem ersten Öffnen: dem Vorjahr, wie die Auswahl) und sagt es in Worten. */
+  function gewaehltesJahr(Z) {
+    var jahre = Z.map(function (z) { return z.jahr; });
+    if (_gewaehltKey === global._currentObjKey && _gewaehlt != null && jahre.indexOf(_gewaehlt) >= 0) return _gewaehlt;
+    return jahre.indexOf(heuteJahr() - 1) >= 0 ? heuteJahr() - 1 : jahre[0];
+  }
   function reiterMarke() {
     var d = doc(); if (!d) return;
-    var er = erinnerung();
+    var info = null;
+    try {
+      if (verfuegbar()) {
+        var Z = JB().zeilen(), j = Z.length ? gewaehltesJahr(Z) : null, z = Z.filter(function (x) { return x.jahr === j; })[0];
+        var s = z ? stand(z, mitWeg()) : null;
+        if (s && j < heuteJahr()) info = { t: s.nFest === 4 ? j + ' festgeschrieben' : (s.fertig ? j + ' erledigt' : j + ' · ' + s.n + ' von 4 erledigt'), ok: s.fertig, title: standText(s, j) + (s.offen.length && s.nFest < 4 ? '. Offen: ' + s.offen.join(', ') : '') };
+      }
+    } catch (e) { info = null; }
     Array.prototype.forEach.call(d.querySelectorAll('.dp-pa-tab'), function (b) {
       if ((b.getAttribute('onclick') || '').indexOf("'jahr'") < 0) return;
       var m = b.querySelector('.dp-ja-marke');
-      if (!er) { if (m) m.parentNode.removeChild(m); return; }
-      if (!m) { m = d.createElement('span'); m.className = 'dp-ja-marke'; m.style.cssText = 'margin-left:6px;font:600 10.5px Inter,sans-serif;color:#B8625C'; b.appendChild(m); }
-      m.textContent = er.jahr + ' · ' + er.n + '/4';
-      m.title = 'Jahresabgleich ' + er.jahr + ': ' + er.n + ' von 4 erledigt';
+      if (!info) { if (m) m.parentNode.removeChild(m); return; }
+      if (!m) { m = d.createElement('span'); m.className = 'dp-ja-marke'; b.appendChild(m); }
+      m.style.cssText = 'margin-left:6px;font:600 10.5px Inter,sans-serif;color:' + (info.ok ? '#2f7d52' : '#B8625C');
+      m.textContent = info.t;
+      m.title = info.title;
     });
   }
   function grafikOpt() { return { gewaehlt: _gewaehlt, onJahr: function (j) { if (j && j <= heuteJahr()) { _gewaehlt = j; mountAll(); } } }; }
@@ -475,6 +611,11 @@
       var a = b.getAttribute('data-ja-aktion');
       if (!a) { var j = +b.getAttribute('data-ja-jahr'); if (j) { _gewaehlt = j; mountAll(); } return; }
       var y = +b.getAttribute('data-ja-j') || _gewaehlt;
+      if (a === 'festschreiben' || a === 'freigeben') {   /* v4016 · ein Schritt (data-ja-schritt-k) oder das ganze Jahr */
+        var k = b.getAttribute('data-ja-schritt-k');
+        if (JB() && JB().festSetzen) JB().festSetzen(_gewaehlt, k ? [k] : null, a === 'festschreiben');
+        mountAll(); return;
+      }
       if (a === 'miete') { zuMiete(); return; }
       if (a === 'mieterhoehung') { zuMiete('mh'); return; }
       if (a === 'steuer') { zuReiter('s3-tax'); return; }
@@ -493,5 +634,6 @@
   }
 
   global.DpJahresabgleich = { VERSION: VERSION, stand: stand, hausStand: hausStand, hausJahr: hausJahr, erinnerung: erinnerung, mbAbrufen: mbAbrufen,
-    mpRein: mpRein, mpQuellen: mpQuellen, mpJahr: mpJahr, html: html, mountAll: mountAll, verfuegbar: verfuegbar, grafikOpt: grafikOpt };
+    mpRein: mpRein, mpQuellen: mpQuellen, mpJahr: mpJahr, html: html, mountAll: mountAll, verfuegbar: verfuegbar, grafikOpt: grafikOpt,
+    standText: standText, viviMieteRein: viviMieteRein, viviJahr: viviJahr };   /* v4016, v4017 */
 })(typeof window !== 'undefined' ? window : globalThis);

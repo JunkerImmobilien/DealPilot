@@ -16,6 +16,10 @@
  *             leer_monate, rs_ist, steuer_status, notiz, geaendert_am } }
  *
  *   steuer_status: geplant | erklaert | bescheid  (fehlt = geplant)
+ *   fest: { miete, steuer, wert, haus }  je Schritt das Datum (ISO) des Festschreibens (v4016,
+ *         Marcel 23.11.2026: „ein Jahr bzw. einzelne Schritte festschreiben, mit wieder freigeben").
+ *         Ein festgeschriebener Schritt gilt im Jahresabgleich als erledigt; Steuer und Miete des
+ *         Jahres lassen sich dann nicht mehr ändern (aenderungErlaubt), bis er freigegeben ist.
  *
  * ── EIN FELD, EINE STELLE ───────────────────────────────────────────
  *
@@ -35,7 +39,7 @@
 (function (global) {
   'use strict';
   if (global.DpJahresbuch) return;
-  var VERSION = 'v3840';
+  var VERSION = 'v4016';
   var STATUS = [['geplant', 'geplant'], ['erklaert', 'erklärt'], ['bescheid', 'Bescheid']];
 
   function doc() { return global.document || null; }
@@ -179,12 +183,47 @@
   }
   function statusSetzen(jahr, s) {
     if (!STATUS.some(function (x) { return x[0] === s; })) return false;
+    if (festGesperrt(jahr, 'steuer')) { mountAll(); return false; }   /* v4016 */
     schreiben(jahr, 'steuer_status', s === 'geplant' ? '' : s);
     mountAll();
     return true;
   }
-  /** Für tax.js updateTaxOverride: darf die Zelle dieses Jahres geändert werden? Fragt bei erklärt/Bescheid nach. */
-  function aenderungErlaubt(jahr) {
+  /* ── v4016 · Festschreiben je Jahr und Schritt (_jahre[J].fest) ─────── */
+  var FEST_SCHRITTE = [['miete', 'Miete'], ['steuer', 'Steuer'], ['wert', 'Wert'], ['haus', 'Haus']];
+  /** Rein: die festgeschriebenen Schritte eines Jahreseintrags, nur bekannte Schlüssel mit Datum */
+  function festAus(eintrag) {
+    var f = eintrag && eintrag.fest && typeof eintrag.fest === 'object' ? eintrag.fest : {}, o = {};
+    FEST_SCHRITTE.forEach(function (x) { if (f[x[0]]) o[x[0]] = String(f[x[0]]); });
+    return o;
+  }
+  /** Rein: neuer fest-Stand. schritte: Liste der Schlüssel (leer/null = alle vier), an: true festschreiben, false freigeben */
+  function festNeu(alt, schritte, an, heute) {
+    var o = festAus({ fest: alt }), ks = (schritte && schritte.length ? schritte : FEST_SCHRITTE.map(function (x) { return x[0]; }));
+    ks.forEach(function (k) { if (!FEST_SCHRITTE.some(function (x) { return x[0] === k; })) return; if (an) { if (!o[k]) o[k] = heute; } else delete o[k]; });
+    return o;
+  }
+  function fest(jahr) { return festAus(jahreDaten()[String(jahr)]); }
+  /** Schritte festschreiben oder freigeben (nur vergangene Jahre). Speichert. */
+  function festSetzen(jahr, schritte, an) {
+    var y = parseInt(jahr, 10);
+    if (!verfuegbar() || !(y >= 1990) || (an && y >= heuteJahr())) return false;
+    var n = festNeu(fest(y), schritte, !!an, heuteIso());
+    schreiben(y, 'fest', Object.keys(n).length ? n : '');
+    mountAll();
+    return true;
+  }
+  /** Ist der Schritt festgeschrieben? Dann Hinweis, kein Dialog. */
+  function festGesperrt(jahr, schritt) {
+    var f = fest(jahr), k = schritt || 'steuer';
+    if (!f[k]) return false;
+    var w = (FEST_SCHRITTE.filter(function (x) { return x[0] === k; })[0] || [k, k])[1];
+    if (typeof global.toast === 'function') global.toast(w + ' ' + jahr + ' ist festgeschrieben. Freigeben im Jahresabgleich.');
+    return true;
+  }
+  /** Für tax.js updateTaxOverride: darf die Zelle dieses Jahres geändert werden? Fragt bei erklärt/Bescheid nach.
+      v4016 · schritt (Standard 'steuer'): ein festgeschriebener Schritt sperrt ohne Rückfrage. */
+  function aenderungErlaubt(jahr, schritt) {
+    if (festGesperrt(jahr, schritt || 'steuer')) return false;
     var s = status(jahr);
     if (!nachfragen(s) || typeof global.confirm !== 'function') return true;
     return global.confirm('Für ' + jahr + ' ist die Steuer als „' + statusWort(s) + '“ gekennzeichnet. Wert trotzdem ändern?');
@@ -501,7 +540,7 @@
     if (v != null && !(v >= 0)) return false;
     var alt = (jahreDaten()[String(y)] || {}).nkm_j;
     if ((alt == null ? null : zahl(alt)) === v) return true;
-    if (!aenderungErlaubt(y)) return false;
+    if (!aenderungErlaubt(y, 'miete')) return false;   /* v4016 · Miete festgeschrieben sperrt */
     schreiben(y, 'nkm_j', v == null ? '' : Math.round(v * 100) / 100);
     mountAll();
     try { if (global.DpJahresabgleich) global.DpJahresabgleich.mountAll(); } catch (x) {}
@@ -519,6 +558,7 @@
     jahreVon: jahreVon, summeEinheiten: summeEinheiten, summeWohnungen: summeWohnungen,   /* v3840 */ zeile: zeile, setzen: setzen, nachfragen: nachfragen,
     verfuegbar: verfuegbar, zeilen: zeilen, status: status, statusSetzen: statusSetzen, statusWort: statusWort, aenderungErlaubt: aenderungErlaubt,
     istMieteSetzen: istMieteSetzen, istMiete: istMiete,   /* v3710 */
+    FEST_SCHRITTE: FEST_SCHRITTE, festAus: festAus, festNeu: festNeu, fest: fest, festSetzen: festSetzen, festGesperrt: festGesperrt,   /* v4016 */
     html: html, mountAll: mountAll, oeffnen: oeffnen, schliessen: schliessen, vorbelegen: vorbelegen, mbLaden: mbLaden, aktion: aktion   /* v3430 */
   };
 })(typeof window !== 'undefined' ? window : globalThis);

@@ -443,5 +443,7 @@
   }
   if (window.DpBuchhaltung) anmelden(); else document.addEventListener('DOMContentLoaded', anmelden);
 
-  window.DpVivi = { verbindungKarte: verbindungKarte, leiste: leiste, anlegen: anlegen, abgleichen: abgleichen, zuordnen: zuordnen, loesen: loesen, objektGeladen: objektGeladen };
+  window.DpVivi = { verbindungKarte: verbindungKarte, leiste: leiste, anlegen: anlegen, abgleichen: abgleichen, zuordnen: zuordnen, loesen: loesen, objektGeladen: objektGeladen,
+    /* v4017 · der letzte Stand aus ViVi (felder, info: restschuld_heute, sondertilgungen) für den Jahresabgleich, nur lesen */
+    stand: function () { return _stand && _stand.verknuepft ? _stand : null; } };
 })();

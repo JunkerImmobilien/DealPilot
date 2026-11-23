@@ -1,10 +1,10 @@
 {
- "erzeugt_am": "2026-11-23T06:49:41.478Z",
+ "erzeugt_am": "2026-11-23T07:11:40.897Z",
  "quellen": {
   "voice-import": "a8a2e6dba58ea42c",
   "objektart-felder": "16af21246a92d8f6",
-  "storage": "4e70a1ebdc70ae36",
-  "index-html": "bcd84e18e36b024b",
+  "storage": "557676e588eb4edc",
+  "index-html": "f4a902a198060f2f",
   "grest": "81f3fb0a4de3a6cf"
  },
  "daten": {
@@ -871,7 +871,7 @@
    {
     "id": "wirtschaftlicher_uebergang",
     "kind": "text",
-    "label": "Wirtsch. Übergang · Nutzen-/Lastenwechsel"
+    "label": "Wirtschaftlicher Übergang"
    },
    {
     "id": "kuerzel",

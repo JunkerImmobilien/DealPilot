@@ -186,5 +186,36 @@ const K = c.DpMietpotenzial, E = c.DpErhoehungen, JA = c.DpJahresabgleich, HV = 
     { const m = idx.match(new RegExp('js/' + f.replace('.', '[.]') + '[?]v=v([0-9]+)')); ok(m && +m[1] >= 3430, 'E Buster ab v3430 für ' + f + ' (' + (m ? m[1] : 'fehlt') + ')'); }
 }
 
+/* ── F · Festschreiben, Kopf je Jahr, ViVi je Jahr (v4016/v4017) ───────────────── */
+{
+  const c4 = kontext();
+  for (const f of ['mieterhoehungen.js', 'jahresbuch.js', 'jahresabgleich.js']) vm.runInContext(lies('frontend/js/' + f), c4);
+  const B = c4.DpJahresbuch, J4 = c4.DpJahresabgleich, E4 = c4.DpErhoehungen;
+  ok(JSON.stringify(B.festAus({ fest: { miete: '2026-11-23', foo: 'x', steuer: '' } })) === '{"miete":"2026-11-23"}', 'F festAus: nur bekannte Schritte mit Datum');
+  const alle = B.festNeu({}, null, true, '2026-11-23');
+  ok(Object.keys(alle).join(',') === 'miete,steuer,wert,haus', 'F Jahr festschreiben = alle vier Schritte');
+  ok(B.festNeu(alle, ['steuer'], false, 'x').steuer === undefined && B.festNeu(alle, ['steuer'], false, 'x').miete === '2026-11-23', 'F einen Schritt wieder freigeben, die anderen bleiben');
+  ok(B.festNeu({ miete: '2025-01-01' }, ['miete'], true, '2026-11-23').miete === '2025-01-01', 'F erneut festschreiben behält das erste Datum');
+  ok(Object.keys(B.festNeu(alle, null, false, 'x')).length === 0, 'F Jahr freigeben = leer');
+  /* stand(): festgeschrieben zählt als erledigt, Text mit Namen der Schritte */
+  c4.DpJahresbuch.fest = (j) => (j === 2024 ? { steuer: '2026-11-23', wert: '2026-11-23' } : {});
+  const s24 = J4.stand({ jahr: 2024, status: 'geplant', mb: null }, false);
+  ok(s24.steuer === 'ok' && s24.wert === 'ok' && s24.nFest === 2 && s24.n === 3, 'F fest: Steuer und Wert erledigt, mit Miete 3 von 4 (' + s24.n + ')');
+  ok(s24.offen.join(',') === 'Haus' && s24.erledigt.join(',') === 'Miete,Steuer,Wert', 'F erledigt/offen mit Namen');
+  const lauf = J4.stand({ jahr: new Date().getFullYear(), status: 'geplant' }, false);
+  ok(lauf.nFest === 0 && lauf.miete === 'laufend', 'F laufendes Jahr lässt sich nicht festschreiben');
+  const js = lies('frontend/js/jahresabgleich.js');
+  ok(!/dp-ja-erinnerung">Jahresabgleich ' \+ er\.jahr/.test(js), 'F keine Erinnerung an ein anderes Jahr über dem gewählten (Fehler „bleibt 2025 · 2 von 4")');
+  ok(/function reiterMarke\(\)[\s\S]{0,900}gewaehltesJahr\(Z\)/.test(js), 'F Reitermarke folgt dem gewählten Jahr');
+  ok(/von 4 Schritten erledigt/.test(js), 'F „2 von 4 Schritten erledigt (…)" statt „2 von 4"');
+  const jb = lies('frontend/js/jahresbuch.js');
+  ok(/function aenderungErlaubt\(jahr, schritt\) \{\s*if \(festGesperrt\(jahr, schritt \|\| 'steuer'\)\) return false;/.test(jb), 'F Steuer festgeschrieben sperrt die Anlage V ohne Dialog');
+  ok(/aenderungErlaubt\(y, 'miete'\)/.test(jb) && /aenderungErlaubt\(y, 'miete'\)/.test(lies('frontend/js/mfh-einheiten.js')), 'F Miete festgeschrieben sperrt Ist-Miete und Wohnungsmieten des Jahres');
+  /* ViVi: Kaltmiete im Jahr aus dem Mietverlauf, ab dem Übergang */
+  const q = [{ liste: [{ id: 'vivi-1', datum: '2026-11-01', art: '558', von: 495, auf: 520 }], heute: 520 }];
+  ok(J4.viviMieteRein(q, 2024, 7, E4) === 2970 && J4.viviMieteRein(q, 2025, 1, E4) === 5940 && J4.viviMieteRein(q, 2026, 1, E4) === 5990, 'F ViVi-Kaltmiete 2024 ab 07 = 2.970, 2025 = 5.940, 2026 = 5.990 (Testobjekt 1179)');
+  ok(J4.viviMieteRein([], 2025, 1, E4) === null, 'F ohne ViVi-Quelle kein Wert');
+}
+
 console.log(`jahresabgleich-pruefen (v3430): ${gruen} von ${gruen + rot} ok`);
 process.exit(rot ? 1 : 0);
