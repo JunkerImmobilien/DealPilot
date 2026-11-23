@@ -266,6 +266,13 @@ function nachVivi(daten, opt) {
     if (a === 'ZFH' || a === 'MFH') hinweise.push('Keine Einheiten erfasst. Übertragen wird eine Einheit für das ganze Haus. Genauer wird es mit den Einheiten im Reiter Objekt.');
     einheiten.push(eintrag);
   }
+  /* v3997 · F19 Gesamt-Flow, Marcel 23.11.2026: Stellplaetze nie als eigene Nebeneinheit, sondern beim Mieter
+     (amenities am Mietverhaeltnis). Eine Stellplatzmiete nur am Objekt (ze_stp_monat) gehoert keinem Mieter und geht
+     deshalb nicht mit, das sagt der Hinweis. */
+  const stpObjekt = zahl(daten.ze_stp_monat);
+  if (mitListe.length && stpObjekt != null && stpObjekt > 0 && !mitListe.some(function (x) { return zahl(x.e.stellplatz_miete) > 0; })) {
+    hinweise.push('Die Stellplatzmiete von ' + eur(stpObjekt) + ' im Monat ist keinem Mieter zugeordnet und geht nicht mit. Trag sie in der Einheitentabelle bei der Wohnung ein, zu der der Stellplatz gehört.');
+  }
   if (nkNiedrig.length) hinweise.push('Die abgeleitete Nebenkosten-Vorauszahlung ist auffällig niedrig bei ' + nkNiedrig.join(', ') + '. Bitte vor dem Anlegen die Vorauszahlung je Einheit eintragen.');
   /* v3953 · ViVi legt mit dem Objekt immer eine Einheit an (units, Minimum 1). Ihren Namen und ihre Flaeche setzt nur ein
      Mietverhaeltnis. v3965: ist keine Einheit vermietet, benennt viviDienst.anlegen() sie einmal per PATCH. */

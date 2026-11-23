@@ -1012,6 +1012,12 @@ console.log('\nTeil S · in ViVi gelöscht: Verknüpfung lösen nur bei eindeuti
   const VJ = lies('frontend/js/vivi.js'), VF = lies('frontend/js/vivi-felder.js');
   ok(/in_vivi_geloescht/.test(VJ) && /DpViviFelder\.setzen\(_stand\)/.test(VJ), 'S6 Browser: bei in_vivi_geloescht fallen die Sperren, Werte bleiben, Objekt wird gespeichert');
   ok(!/im Reiter Objekt ausgegraut/.test(VJ) && /function reiterText/.test(VJ), 'S7 Deal-Aktion nennt die gemessenen Reiter statt immer „Reiter Objekt“');
+  const dS = { objart: 'MFH', str: 'A', hnr: '1', plz: '33607', ort: 'B', kp: 400000, wirtschaftlicher_uebergang: '2024-07-01', ze_stp_monat: 70, _mfh: { einheiten: [{ nr: '1', wfl: 60, ist: 500, status: 'vermietet' }, { nr: '2', wfl: 60, ist: 500, status: 'vermietet' }] } };
+  const hS = (d) => mapping.nachVivi(d, {}).hinweise.filter((h) => /Stellplatzmiete/.test(h)).length;
+  const pS = mapping.nachVivi(dS, {});
+  ok(hS(dS) === 1 && !pS.einheiten.some((e) => e.einheit.unit_type === 'ancillary'), 'S9 F19: Stellplatzmiete nur am Objekt: Hinweis, keine Nebeneinheit (Marcel 23.11.)');
+  dS._mfh.einheiten[0].stellplatz_miete = 35;
+  ok(hS(dS) === 0 && mapping.nachVivi(dS, {}).einheiten[0].miete.amenities[0].monthly_rent === 35, 'S10 Stellplatz an der Wohnung geht als amenity des Mieters mit, kein Hinweis');
   ok(/function alleSelbst/.test(VF) && /data-vivi="alle-selbst"/.test(VJ) && /data-vivi="alle-vivi"/.test(VJ), 'S8 alle Schlösser auf einmal: selbst festlegen und aus ViVi übernehmen');
 }
 
