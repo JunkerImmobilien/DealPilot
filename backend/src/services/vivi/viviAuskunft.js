@@ -356,46 +356,58 @@ async function darlehen(userId, objectId, args) {
   });
 }
 
-/* ── Die Frage aus dem Reiter ViVi ──────────────────────────────────────
-   POST /vivi/objekt/:id/frage { text, einheit?, verlauf? } (routes/vivi.js, hinter Vorschau-Sperre 'vivi').
-   Derselbe Agent wie Telegram und Flow (agentLauf.laufen, alle LESENDEN Werkzeuge, dazu die ViVi-Werkzeuge oben),
-   mit dem Objekt als Bezug. Schreiben gibt es hier nicht (vormerken lehnt ab), Kosten auch nicht (darfKosten false).
-   Tageslimit: derselbe Zaehler wie der Co-Pilot (routes/ai.js copilotKontingent). KI-Deckel: agentLauf._ruf. */
-async function frage(userId, objectId, b, opt) {
-  b = b || {}; opt = opt || {};
-  const text = String(b.text || '').trim();
-  if (text.length < 2) throw Object.assign(new Error('Bitte eine Frage eingeben.'), { status: 400, code: 'text_fehlt' });
-  if (text.length > 1500) throw Object.assign(new Error('Die Frage ist zu lang (höchstens 1.500 Zeichen).'), { status: 400, code: 'text_zu_lang' });
-  const query = opt.query || require('../../db/pool').query;
-  const o = await query('SELECT id, data FROM objects WHERE id=$1 AND user_id=$2', [objectId, userId]);
-  if (!o.rowCount) throw Object.assign(new Error('Objekt nicht gefunden.'), { status: 404, code: 'objekt_fehlt' });
+/* ── v4190 · ViVi-Wissen fuer den EINEN Co-Piloten ──────────────────────
+   Marcel 23.11.2026: „Den Co-Piloten haben wir unten doch schon. Reicht das nicht? Ist das nicht dasselbe?“
+   Bis v4130 gab es ein eigenes Fragefeld im Reiter ViVi (Route /vivi/objekt/:id/frage, agentLauf). Jetzt legt der
+   Server beim normalen Co-Piloten (routes/ai.js _copilotObjektwissen) das passende ViVi-Wissen in den Kontext:
+   nur bei verknuepftem Objekt, nur mit Vorschau-Freigabe 'vivi', nur wenn die Frage nach Verwaltungsdaten klingt.
+   Dieselben Lesefunktionen wie oben, dieselbe Schwaerzung, derselbe 5-min-Zwischenspeicher. Kein eigener KI-Aufruf. */
+const _VIVI = {
+  vivi: /\bvivi\b/i,
+  einheiten: /mieter|mietverh|mieterh(ö|oe)hung|letzte\w*\s+erh(ö|oe)hung|erh(ö|oe)h(t|ung)|kaution|mietvertrag|vertragsart|befrist|leerstand|steht\s+leer|leer\s+steh|eingezogen|auszug|nebenkosten|vorauszahlung|mietverlauf|seit\s+wann|zielmiete|indexmiete|staffelmiete/i,
+  belege: /beleg|rechnung|ausgabe|ausgegeben|bezahlt|zahlstatus|buchung|gebucht|erhaltungsaufwand|anlage\s*v|werbungskosten|betriebskosten|kosten\s+(?:20\d\d|im\s+jahr|letzt)/i,
+  vorgaenge: /schaden|sch(ä|ae)den|vorgang|vorg(ä|ae)nge|gemeldet|meldung|m(ä|ae)ngel|mieterportal|defekt/i,
+  handwerker: /handwerker|reparatur|auftrag|auftr(ä|ae)ge|maler|installateur|angebot\s+(?:f(ü|ue)r|vom)/i,
+  darlehen: /darlehen|restschuld|tilgung|tilgungsplan|kredit|zinsbindung|sondertilgung|annuit|zinsen\s+(?:20\d\d|im\s+jahr|letzt)|monatsrate|bankrate/i
+};
+/** Rein: welche ViVi-Teile eine Frage braucht, dazu Einheit und Jahr. null = keine ViVi-Frage. */
+function frageErkennen(text) {
+  const t = String(text || '');
+  const teile = ['einheiten', 'belege', 'vorgaenge', 'handwerker', 'darlehen'].filter(function (k) { return _VIVI[k].test(t); });
+  if (!teile.length && _VIVI.vivi.test(t)) teile.push('einheiten', 'darlehen');
+  if (!teile.length) return null;
+  const e = t.match(/(?:wohnung|whg\.?|einheit|we)\s*(?:nr\.?\s*)?(\d{1,3})\b/i);
+  const j = t.match(/\b(20\d\d)\b/);
+  return { teile: teile, einheit: e ? e[1] : null, jahr: j ? +j[1] : null };
+}
+function _kuerzen(x, tiefe) {
+  if (Array.isArray(x)) { const k = x.slice(0, 25).map(function (y) { return _kuerzen(y, (tiefe || 0) + 1); }); if (x.length > 25) k.push({ weitere: x.length - 25 }); return k; }
+  if (x && typeof x === 'object') { const o = {}; Object.keys(x).forEach(function (k) { o[k] = _kuerzen(x[k], (tiefe || 0) + 1); }); return o; }
+  return x;
+}
+/**
+ * ViVi-Wissen zu einer Co-Pilot-Frage. Gibt null zurueck, wenn nichts zu holen ist (keine ViVi-Frage, Vorschau
+ * gesperrt, nicht verknuepft) - dann geht KEINE Anfrage an ViVi. opt.darf(userId) ersetzt die Vorschau-Pruefung (Pruefer).
+ */
+async function copilotWissen(userId, objectId, text, opt) {
+  opt = opt || {};
+  const f = frageErkennen(text); if (!f || !userId || !objectId) return null;
+  let frei = false;
+  try { frei = opt.darf ? await opt.darf(userId) : await require('../vorschau').darf({ id: userId }, 'vivi'); } catch (e) { frei = false; }
+  if (!frei) return null;
   const v = await umgebung().speicher.verknuepfung(userId, objectId);
-  if (!v || v.anlage_status !== 'fertig' || !v.vivi_objekt_id) throw Object.assign(new Error('Dieses Objekt ist nicht mit ViVi verknüpft.'), { status: 409, code: 'nicht_verknuepft' });
-  const kont = opt.kontingent || require('../../routes/ai').copilotKontingent;
-  const lim = await kont.verbrauchen(userId);
-  if (!lim.ok) throw Object.assign(new Error('Co-Pilot-Tageslimit erreicht (' + lim.limit + ' am Tag). Morgen wieder verfügbar.'), { status: 429, code: 'copilot_tageslimit' });
-  const d = o.rows[0].data || {};
-  const adr = [d.str, d.hnr].filter(Boolean).join(' ') + (d.ort ? ', ' + d.ort : '');
-  const einheit = b.einheit != null && String(b.einheit).trim() ? String(b.einheit).trim().slice(0, 40) : null;
-  const vorspann = '[Frage aus dem Reiter ViVi zum Objekt ' + (adr || 'dieses Nutzers') + ' (objekt id ' + objectId + ').'
-    + (einheit ? ' Gewählt ist die Einheit ' + einheit + ', ohne andere Angabe ist sie gemeint (Werkzeuge mit einheit "' + einheit + '").' : '')
-    + ' Nutze für Daten aus der Verwaltung die Werkzeuge vivi_*, für die DealPilot-Rechnung die übrigen. Mieter nur abgekürzt nennen.'
-    + ' Antworte auf Deutsch im Du, knapp, ohne Markdown, ohne Gedankenstriche und Semikolons.]\n';
-  const ctx = {
-    userId: userId, kanal: 'vivi', nummerErfunden: true, letzteListe: null, letztesObjekt: objectId, protokoll: [],
-    merkeObjekt: function () {}, merkeListe: function () {}, anlageFertig: async function () {},
-    merkeAngebot: async function () {}, angebotVerbraucht: async function () {}
-  };
-  const verlauf = Array.isArray(b.verlauf) ? b.verlauf.slice(-6).map(function (e) { return { rolle: e && e.rolle === 'user' ? 'user' : 'assistant', text: String((e && e.text) || '').slice(0, 1500) }; }) : [];
-  const laufen = opt.laufen || require('../agentLauf').laufen;
-  const r = await laufen(vorspann + text, ctx, {
-    darfKosten: false, verlauf: verlauf,
-    schreibenVormerken: async function () { return { ok: false, gesperrt: true, hinweis: 'Im Reiter ViVi wird nur gelesen. Sag, dass Änderungen in DealPilot oder in ViVi selbst gemacht werden.' }; }
-  });
-  const schritte = (r.protokoll || ctx.protokoll || []).map(function (x) { return x.werkzeug; });
-  /* Kundentext: keine Gedankenstriche und Semikolons (Marcel), auch wenn das Modell sie trotz Vorspann setzt */
-  const antwort = String(r.text || '').trim().replace(/\s+[–—]\s+/g, ', ').replace(/\s*;\s*/g, '. ').replace(/\*\*/g, '');
-  return { antwort: antwort, werkzeuge: schritte, abgebrochen: !!r.abgebrochen, tageslimit: { benutzt: lim.benutzt, limit: lim.limit } };
+  if (!v || v.anlage_status !== 'fertig' || !v.vivi_objekt_id) return null;
+  const fn = { einheiten: einheiten, belege: belege, vorgaenge: vorgaenge, handwerker: handwerker, darlehen: darlehen };
+  const out = { quelle: 'aus ViVi (Hausverwaltung), Mieter abgekürzt', teile: f.teile };
+  if (f.einheit) out.einheit = f.einheit;
+  for (const k of f.teile) {
+    const args = {};
+    if (k === 'einheiten' && f.einheit) args.einheit = f.einheit;
+    if ((k === 'belege' || k === 'darlehen') && f.jahr) args.jahr = f.jahr;
+    if (k === 'vorgaenge') args.nur_offen = /offen/i.test(String(text));
+    try { out[k] = _kuerzen(await fn[k](userId, objectId, args)); } catch (e) { out[k] = { ok: false, fehler: 'ViVi nicht lesbar' }; }
+  }
+  return out;
 }
 
-module.exports = { einheiten, belege, vorgaenge, handwerker, darlehen, frage, mieterKurz, namenAus, schwaerzer, _setzeTest, CACHE_MS };
+module.exports = { einheiten, belege, vorgaenge, handwerker, darlehen, copilotWissen, frageErkennen, mieterKurz, namenAus, schwaerzer, _setzeTest, CACHE_MS };

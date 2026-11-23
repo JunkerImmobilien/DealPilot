@@ -2104,6 +2104,15 @@ async function _copilotObjektwissen(uid, payload) {
         const t = await fn('portfolio_todos')(wctx, { id: oid });
         if (t && t.anzahl) wissen.todos = { liste: t.objekte[0].todos, hinweis: t.hinweis };
       }
+      /* v4190 · Marcel 23.11.2026: EIN Co-Pilot. Bei einer Frage nach Verwaltungsdaten (Mieter, Erhoehung, Belege, Darlehen …)
+         und verknuepftem Objekt legt der Server das ViVi-Wissen dazu (services/vivi/viviAuskunft.js copilotWissen:
+         Vorschau 'vivi', Mieter abgekuerzt, Freitext geschwaerzt, 5-min-Zwischenspeicher). Keine ViVi-Frage = keine Anfrage. */
+      try {
+        const _vorschau = require('../services/vorschau');
+        const vw = await require('../services/vivi/viviAuskunft').copilotWissen(uid, oid, payload.message,
+          { darf: function () { return _vorschau.darf({ id: uid }, 'vivi'); } });
+        if (vw) wissen.vivi = vw;
+      } catch (e) { wissen.vivi = { ok: false, fehler: 'ViVi nicht lesbar' }; }
     } else if (istPortfolio) {
       const r = await query('SELECT id, data FROM objects WHERE user_id = $1 AND kunden_freigabe_id IS NULL ORDER BY seq_no NULLS LAST, created_at', [uid]);
       const ow = require('../services/objektWissen');
@@ -2136,7 +2145,8 @@ async function _copilotObjektwissen(uid, payload) {
   if (Object.keys(wissen).length) {
     wissen.hinweis = 'Objektwissen aus DealPilot (serverseitig gelesen, Stand je Teil): Unterlagen-Auswertung, Mietpotenzial '
       + 'dieses Jahres, offene Punkte (To-dos), ggf. Marktmiete mit allen Quellen. Beträge unverändert übernehmen, Quelle und Stand '
-      + 'nennen; bei der Marktmiete jede Quelle einzeln, kein Mittelwert, keine Anbieternamen.';
+      + 'nennen; bei der Marktmiete jede Quelle einzeln, kein Mittelwert, keine Anbieternamen.'
+      + (wissen.vivi ? ' Unter vivi stehen Daten aus der Hausverwaltung ViVi (Mietverhältnisse, Mietverlauf, Belege, Vorgänge, Handwerker, Darlehen): Quelle „laut ViVi“ nennen, Mieter nur so abgekürzt wie geliefert (z. B. Hr. M.), nie nach vollen Namen oder Kontaktdaten fragen.' : '');
     payload.context.objektwissen = wissen;
   }
 }

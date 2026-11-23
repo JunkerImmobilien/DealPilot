@@ -17,7 +17,6 @@
  *   GET    /objekt/:id/werte            zuletzt gelesene ViVi-Werte (schickt nichts an ViVi)
  *   POST   /objekt/:id/abrufen          „Jetzt abgleichen": nur GET bei ViVi
  *   DELETE /objekt/:id/verknuepfung     Verknuepfung in DealPilot loesen, ViVi bleibt unberuehrt
- *   POST   /objekt/:id/frage   {text, einheit?, verlauf?}   v4130 · Co-Pilot mit ViVi-Werkzeugen, nur lesen, Mieter abgekuerzt
  *   GET    /steuer-einstellung          v4020 · Steuerjahre aus ViVi: { einstellung: {modus, kategorien}, kategorien: [...] }
  *   PUT    /steuer-einstellung          v4020 · { modus: aus|vorschlag|automatisch, kategorien: {id: bool} } (user_settings 'vivi_steuer')
  *
@@ -136,19 +135,9 @@ router.get('/steuer-einstellung', function (req, res, next) {
 router.put('/steuer-einstellung', function (req, res, next) {
   dienst.steuerEinstellungSpeichern(uid(req), req.body || null).then(function (e) { res.json({ einstellung: e }); }).catch(antwort(res, next));
 });
-/* v4130 · Marcel 23.11.2026: Fragen an den Co-Piloten zum verknuepften Objekt (services/vivi/viviAuskunft.js frage).
-   ViVi wird dabei nur gelesen, Mieter kommen abgekuerzt beim Modell an. */
-const frageBremse = rateLimit({ windowMs: 60 * 1000, max: 10, standardHeaders: true, legacyHeaders: false });
-router.post('/objekt/:id/frage', frageBremse, function (req, res, next) {
-  const id = oid(req, res); if (!id) return;
-  require('../services/vivi/viviAuskunft').frage(uid(req), id, req.body || {})
-    .then(function (r) { res.set('Cache-Control', 'no-store'); res.json(r); })
-    .catch(function (e) {
-      if (e && e.code === 'NO_API_KEY') return res.status(503).json({ error: 'Der Co-Pilot ist gerade nicht verfügbar.', code: 'NO_API_KEY' });
-      if (e && e.status) return res.status(e.status).json({ error: e.message, code: e.code || null });
-      next(e);
-    });
-});
+/* v4190 · Route /objekt/:id/frage (v4130) entfernt: der ViVi-Teil steckt jetzt im normalen Co-Piloten
+   (routes/ai.js _copilotObjektwissen -> services/vivi/viviAuskunft.js copilotWissen). Telegram und Flow nutzen die
+   vivi_*-Werkzeuge direkt (agentWerkzeuge.js), nicht diese Route. */
 router.delete('/objekt/:id/verknuepfung', function (req, res, next) {
   const id = oid(req, res); if (!id) return;
   dienst.loesen(uid(req), id).then(function (r) { res.json(r); }).catch(antwort(res, next));

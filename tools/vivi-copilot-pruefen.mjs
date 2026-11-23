@@ -16,6 +16,8 @@
  *   I  frage(): Tageslimit 429, Schreiben wird abgelehnt, keine Kosten, Objekt als Bezug
  *   J  Bauart: viviAuskunft ruft nur get(), die Werkzeuge stehen als 'lesen' in agentWerkzeuge.js, Route hinter der
  *      Vorschau-Sperre in routes/vivi.js
+ *   K  v4190 · copilotWissen fuer den normalen Co-Piloten: Erkenner, keine Anfrage ohne ViVi-Frage, Vorschau,
+ *      Verknuepfung oder bei fremdem Nutzer, alle Teile geschwaerzt im Kontext, Einheit eingegrenzt, Verdrahtung ai.js
  * RC 0 = sauber.
  */
 import { createRequire } from 'node:module';
@@ -109,7 +111,7 @@ function sauber(obj, liste) {
   return (liste || VERBOTEN).filter(function (w) { return s.toLowerCase().indexOf(String(w).toLowerCase()) >= 0; });
 }
 
-console.log('vivi-copilot-pruefen (v4130)');
+console.log('vivi-copilot-pruefen (v4130, v4190)');
 
 /* A */
 ok(A.mieterKurz(MIET[0]) === 'Hr. M.', 'A1 Herr Müllermann -> Hr. M. (' + A.mieterKurz(MIET[0]) + ')');
@@ -161,11 +163,6 @@ ok(f.ok === false && f.nicht_verknuepft === true && U.zaehler.anfragen === 0, 'G
 U = umgebung({ ohne: true }); A._setzeTest(U);
 const g2 = await A.belege('nutzer-1', 'obj-1', { jahr: 2025 });
 ok(g2.ok === false && g2.nicht_verknuepft === true && U.zaehler.anfragen === 0, 'G2 ohne Verknuepfung: saubere Antwort, keine Anfrage');
-async function fehlerVon(p) { try { await p; return null; } catch (x) { return x; } }
-const g3 = await fehlerVon(A.frage('nutzer-2', 'obj-1', { text: 'Wann war die letzte Erhöhung?' }, { query: async function () { return { rowCount: 0, rows: [] }; } }));
-ok(g3 && g3.status === 404, 'G3 frage() an fremdes Objekt: 404');
-const g4 = await fehlerVon(A.frage('nutzer-1', 'obj-1', { text: 'Wann war die letzte Erhöhung?' }, { query: async function () { return { rowCount: 1, rows: [{ data: {} }] }; } }));
-ok(g4 && g4.status === 409, 'G4 frage() ohne Verknuepfung: 409');
 
 /* H */
 U = umgebung({ bremse: true }); A._setzeTest(U);
@@ -177,24 +174,6 @@ const vorher = U.zaehler.anfragen;
 await A.vorgaenge('nutzer-1', 'obj-1', {});
 ok(vorher > 0 && U.zaehler.anfragen === vorher, 'H2 Zwischenspeicher: zweiter Aufruf ohne Anfrage');
 
-/* I */
-const Q = async function () { return { rowCount: 1, rows: [{ data: { str: 'Teststr.', hnr: '1', ort: 'Musterstadt' } }] }; };
-const i1 = await fehlerVon(A.frage('nutzer-1', 'obj-1', { text: 'Wie hoch ist die Kaution?' }, { query: Q, kontingent: { verbrauchen: async function () { return { ok: false, limit: 10 }; } } }));
-ok(i1 && i1.status === 429, 'I1 Tageslimit erreicht: 429');
-let gesehen = null;
-const i2 = await A.frage('nutzer-1', 'obj-1', { text: 'Wann war die letzte Mieterhöhung in Wohnung 1?', einheit: '1' }, {
-  query: Q, kontingent: { verbrauchen: async function () { return { ok: true, limit: 10, benutzt: 1 }; } },
-  laufen: async function (text, ctx, o) {
-    const schreib = await o.schreibenVormerken('felder_aendern', {});
-    gesehen = { text, objekt: ctx.letztesObjekt, erfunden: ctx.nummerErfunden, kosten: o.darfKosten, schreib };
-    ctx.protokoll.push({ werkzeug: 'vivi_einheiten' });
-    return { text: 'Zuletzt am 01.06.2024 bei Hr. M.', protokoll: ctx.protokoll };
-  } });
-ok(gesehen && gesehen.objekt === 'obj-1' && gesehen.erfunden === true && gesehen.kosten === false, 'I2 Objekt als Bezug, keine erfundene Nummer, keine Kosten');
-ok(gesehen && gesehen.schreib && gesehen.schreib.ok === false && gesehen.schreib.gesperrt === true, 'I3 Schreiben wird abgelehnt');
-ok(/Einheit 1/.test(gesehen.text) && /Teststr\. 1, Musterstadt/.test(gesehen.text), 'I4 Einheit und Anschrift im Vorspann');
-ok(i2.antwort === 'Zuletzt am 01.06.2024 bei Hr. M.' && i2.werkzeuge[0] === 'vivi_einheiten' && i2.tageslimit.limit === 10, 'I5 Antwort, Werkzeuge, Tageslimit zurueck');
-
 /* J */
 const quelle = fs.readFileSync(path.join(WURZEL, 'backend/src/services/vivi/viviAuskunft.js'), 'utf8');
 ok(!/\bcl\.(post|put|patch|delete|senden)\s*\(/.test(quelle) && /\bcl\.get\(/.test(quelle), 'J1 viviAuskunft ruft nur cl.get()');
@@ -204,7 +183,44 @@ const aw = fs.readFileSync(path.join(WURZEL, 'backend/src/services/agentWerkzeug
 });
 ok(/darf\(\{ id: ctx\.userId \}, 'vivi'\)/.test(aw), 'J3 Werkzeuge pruefen die Vorschau-Freigabe vivi');
 const rv = fs.readFileSync(path.join(WURZEL, 'backend/src/routes/vivi.js'), 'utf8');
-ok(rv.indexOf("router.use(vorschau.sperre('vivi'))") >= 0 && rv.indexOf("router.post('/objekt/:id/frage'") > rv.indexOf("router.use(vorschau.sperre('vivi'))"), 'J4 Route /objekt/:id/frage hinter der Vorschau-Sperre');
+ok(rv.indexOf("router.post('/objekt/:id/frage'") < 0, 'J4 eigene Frage-Route /objekt/:id/frage ist weg (v4190: ein Co-Pilot)');
+
+/* K · v4190 · ViVi-Wissen im normalen Co-Piloten (copilotWissen) */
+const darfJa = async function () { return true; }, darfNein = async function () { return false; };
+ok(A.frageErkennen('Wie hoch ist der Cashflow?') === null, 'K1 Nicht-ViVi-Frage erkannt als keine ViVi-Frage');
+const k2 = A.frageErkennen('Wann war die letzte Mieterhöhung in Wohnung 3?');
+ok(k2 && k2.teile.indexOf('einheiten') >= 0 && k2.einheit === '3', 'K2 Mieterhöhung -> einheiten, Wohnung 3');
+const k3 = A.frageErkennen('Welche Belege gab es 2025?');
+ok(k3 && k3.teile.join() === 'belege' && k3.jahr === 2025, 'K3 Belege 2025 -> belege, Jahr 2025');
+const k4 = A.frageErkennen('Wie hoch ist die Restschuld laut ViVi?');
+ok(k4 && k4.teile.indexOf('darlehen') >= 0, 'K4 Restschuld -> darlehen');
+U = umgebung(); A._setzeTest(U);
+const kn = await A.copilotWissen('nutzer-1', 'obj-1', 'Wie hoch ist der Cashflow?', { darf: darfJa });
+ok(kn === null && U.zaehler.anfragen === 0, 'K5 Nicht-ViVi-Frage: kein Wissen, keine Anfrage an ViVi');
+U = umgebung(); A._setzeTest(U);
+const kv = await A.copilotWissen('nutzer-1', 'obj-1', 'Wann war die letzte Mieterhöhung?', { darf: darfNein });
+ok(kv === null && U.zaehler.anfragen === 0, 'K6 Vorschau vivi gesperrt: kein Wissen, keine Anfrage');
+U = umgebung({ ohne: true }); A._setzeTest(U);
+const ko = await A.copilotWissen('nutzer-1', 'obj-1', 'Wann war die letzte Mieterhöhung?', { darf: darfJa });
+ok(ko === null && U.zaehler.anfragen === 0, 'K7 ohne Verknüpfung: kein Wissen, keine Anfrage');
+U = umgebung(); A._setzeTest(U);
+const kf = await A.copilotWissen('nutzer-2', 'obj-1', 'Wann war die letzte Mieterhöhung?', { darf: darfJa });
+ok(kf === null && U.zaehler.anfragen === 0, 'K8 fremder Nutzer: kein Wissen, keine Anfrage');
+U = umgebung(); A._setzeTest(U);
+const kw = await A.copilotWissen('nutzer-1', 'obj-1', 'Wann war die letzte Mieterhöhung, welche Belege gab es 2025, gibt es offene Schäden, Handwerker und Restschuld laut ViVi?', { darf: darfJa });
+ok(kw && /aus ViVi/.test(kw.quelle) && kw.einheiten && kw.einheiten.ok === true && kw.belege && kw.belege.jahr === 2025 && kw.vorgaenge && kw.handwerker && kw.darlehen && kw.darlehen.restschuld_heute === 100499, 'K9 alle fünf Teile im Kontext, Quelle aus ViVi');
+ok(sauber(kw).length === 0, 'K10 Kontext ohne Namen, Kontakt, IBAN' + (sauber(kw).length ? ': ' + sauber(kw).join(', ') : ''));
+ok(JSON.stringify(kw).indexOf('Hr. M.') >= 0, 'K11 Mieter abgekürzt (Hr. M.) im Kontext');
+U = umgebung(); A._setzeTest(U);
+const ke = await A.copilotWissen('nutzer-1', 'obj-1', 'Seit wann wohnt der Mieter in Wohnung 2?', { darf: darfJa });
+ok(ke && ke.einheit === '2' && ke.einheiten.einheiten.length === 1 && ke.einheiten.einheiten[0].einheit === 'WE 02', 'K12 Frage zu Wohnung 2 auf die Einheit eingegrenzt');
+/* Gegenprobe: ohne Schwärzung (roh) fände der Prüfer den Namen, K10 wäre rot */
+ok(sauber({ roh: MIET[0] }).length > 0, 'K13 Gegenprobe: Rohdaten trügen Namen (Prüfer erkennt sie)');
+const ai = fs.readFileSync(path.join(WURZEL, 'backend/src/routes/ai.js'), 'utf8');
+const ow = ai.slice(ai.indexOf('async function _copilotObjektwissen'), ai.indexOf("router.post('/copilot'"));
+ok(ow.indexOf('copilotWissen(uid, oid, payload.message') >= 0 && ow.indexOf("_vorschau.darf({ id: uid }, 'vivi')") >= 0 && ow.indexOf('wissen.vivi = vw') >= 0, 'K14 _copilotObjektwissen legt wissen.vivi aus copilotWissen');
+const fe = fs.readFileSync(path.join(WURZEL, 'frontend/js/vivi-copilot.js'), 'utf8');
+ok(fe.indexOf("apiCall") < 0 && /DealPilotBlase/.test(fe) && /dp-cp-in/.test(fe), 'K15 Reiter ViVi: keine eigene Route mehr, Beispielfragen gehen an den Co-Piloten unten');
 
 A._setzeTest(null);
 console.log('\n' + (rot ? 'ROT: ' + rot + ' von ' + (gruen + rot) : 'SAUBER · ' + gruen + ' Prüfpunkte grün'));

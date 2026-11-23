@@ -337,7 +337,7 @@
       + '<button type="button" class="btn-clean vr-k" data-vr="abgleichen">Jetzt abgleichen</button></div>';
     if (!st) return '<div class="vr">' + kopf + '<p class="vr-klein">Der Stand aus ViVi wird geladen.</p></div>';
     return '<div class="vr">' + kopf
-      + (global.DpViviCopilot && global.DpViviCopilot.html ? global.DpViviCopilot.html() : '')   /* v4130 · Co-Pilot mit ViVi-Werkzeugen (js/vivi-copilot.js) */
+      + (global.DpViviCopilot && global.DpViviCopilot.html ? global.DpViviCopilot.html() : '')   /* v4190 · Beispielfragen an den Co-Piloten unten (js/vivi-copilot.js) */
       + stammHtml(st)
       + '<div class="vr-jahre" role="group" aria-label="Jahr">' + pills + '</div>'
       + jahrHtml(_jahr)
