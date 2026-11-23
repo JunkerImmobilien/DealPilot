@@ -366,12 +366,15 @@
     spreize(L); spreize(R);
     var knoten = function (q, links) {
       out.push('<rect x="' + f1(q.x) + '" y="' + f1(q.y) + '" width="' + nw + '" height="' + f1(Math.max(2, q.h)) + '" rx="2" style="fill:' + q.f + '"/>');
-      if (schmal) out.push('<text x="' + f1(links ? q.x + nw + 6 : q.x - 6) + '" y="' + f1(q.ly + 4) + '" text-anchor="' + (links ? 'start' : 'end') + '" style="font:500 11.5px Inter,sans-serif;fill:' + F.tinte + ';paint-order:stroke;stroke:' + F.karte + ';stroke-width:4;stroke-linejoin:round">' + esc(q.n + ' ' + eur(q.v)) + '</text>');
+      if (schmal) { /* am Handy keine Beschriftung im Bild, die Liste darunter trägt Namen und Beträge */ }
+      else if (false) out.push('<text x="' + f1(links ? q.x + nw + 6 : q.x - 6) + '" y="' + f1(q.ly + 4) + '" text-anchor="' + (links ? 'start' : 'end') + '" style="font:500 11.5px Inter,sans-serif;fill:' + F.tinte + ';paint-order:stroke;stroke:' + F.karte + ';stroke-width:4;stroke-linejoin:round">' + esc(q.n + ' ' + eur(q.v)) + '</text>');
       else out.push('<text x="' + f1(links ? q.x - 8 : q.x + nw + 8) + '" y="' + f1(q.ly - 2) + '" text-anchor="' + (links ? 'end' : 'start') + '" style="font:500 12.5px Inter,sans-serif;fill:' + F.tinte + '">' + esc(q.n) + '</text><text class="gx-ax" x="' + f1(links ? q.x - 8 : q.x + nw + 8) + '" y="' + f1(q.ly + 13) + '" text-anchor="' + (links ? 'end' : 'start') + '">' + esc(eur(q.v) + ' · ' + nf0.format(q.v / sE * 100) + ' %') + '</text>');
     };
     L.forEach(function (q) { knoten(q, true); }); R.forEach(function (q) { knoten(q, false); });
     out.push('</svg>');
-    host.innerHTML = out.join('');
+    var liste = !schmal ? '' : '<div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 14px;margin-top:10px;font:500 11.5px/1.35 Inter,sans-serif">'
+      + [['Woher', L], ['Wohin', R]].map(function (sp) { return '<div><div class="gx-eye" style="margin-bottom:4px">' + sp[0] + '</div>' + sp[1].map(function (q) { return '<div style="display:flex;gap:6px;align-items:baseline"><i style="flex:0 0 8px;height:8px;border-radius:2px;background:' + q.f + '"></i><span style="flex:1;color:' + F.tinte2 + '">' + esc(q.n) + '</span><b style="font:600 11px JetBrains Mono,monospace;color:' + F.tinte + '">' + esc(kurz(q.v)) + '</b></div>'; }).join('') + '</div>'; }).join('') + '</div>';
+    host.innerHTML = out.join('') + liste;
     return { host: host, sE: sE, sA: sA };
   }
 
