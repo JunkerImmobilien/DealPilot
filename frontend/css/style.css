@@ -16820,7 +16820,7 @@ body:not(.hdr-collapsed) .hdr-toggle-btn-chevron {
   font-size: 13px;
   align-items: flex-start;
 }
-.plan-hint-icon {
+.plan-hint-icon { display: inline-flex; margin-top: 1px;
   font-size: 18px;
   flex-shrink: 0;
 }

@@ -2780,7 +2780,7 @@ function _dpSicherungCsv(paket) {
   } catch (e) { console.warn('[v2045] CSV:', e.message); }
 }
 
-function _v893rExpPhotos(){ try { return localStorage.getItem('dp_export_photos') !== '0'; } catch(e){ return true; } } /* v893r-expphotos */
+function _v893rExpPhotos(){ return true; } /* v893r-expphotos · v4030: Fotos immer mit (Marcel 23.11.2026), Schalter entfernt */
 /* v893t-crypto: AES-GCM Passwort-Verschluesselung (Web-Crypto) */
 async function _dpDeriveKey(password, salt) {
   var km = await crypto.subtle.importKey('raw', new TextEncoder().encode(password), 'PBKDF2', false, ['deriveKey']);

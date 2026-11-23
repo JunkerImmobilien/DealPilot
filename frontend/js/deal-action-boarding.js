@@ -889,7 +889,7 @@
     var mit = mitOf(card);
     var body = {
       object_ref: currentObjId(),
-      mit_bilder: (function(){try{return localStorage.getItem('dp_export_photos')!=='0';}catch(e){return true;}})(), /* v893r-mitbilder */
+      mit_bilder: true, /* v4030 · Fotos immer mit */ /* v893r-mitbilder */
       adresse: mit.objekt ? adresse() : '',
       eckdaten: mit.eckdaten ? eckdaten() : {},
       dr: (mit.dr_persoenlich || mit.dr_objekt) ? drInfo() : {},

@@ -544,6 +544,15 @@
   }
   function profilHtml() {
     var f = foto(), L = checkliste();
+    /* v4030 · Marcel 23.11.2026: „wenn das noch nichts macht, dann ausblenden“. Ohne Freigabe der Vorschau-Funktion
+       'vermoegen' gibt es weder Fenster noch Vermoegensseite, gebraucht wird dann nur das Foto (Deckblatt Track Record). */
+    if (!vorschauFrei()) {
+      return '<div class="dp-vm-foto"' + (f ? ' style="background-image:url(\'' + f + '\')"' : '') + '>' + (f ? '' : 'kein Foto') + '</div>'
+        + '<div><h3 class="ip-section" style="margin-top:0">Dein Foto für den Track Record</h3>'
+        + '<p class="hint">Das Foto steht oben rechts auf dem Deckblatt deines Track Records. Keine Pflicht.</p>'
+        + '<div class="dp-vm-knoepfe"><label class="btn btn-outline btn-sm" style="cursor:pointer">Foto hochladen<input type="file" accept="image/*" data-vm="foto" style="display:none"></label>'
+        + (f ? '<button type="button" class="btn btn-outline btn-sm" data-vm="foto-weg">Foto entfernen</button>' : '') + '</div></div>';
+    }
     return '<div class="dp-vm-foto"' + (f ? ' style="background-image:url(\'' + f + '\')"' : '') + '>' + (f ? '' : 'kein Foto') + '</div>'
       + '<div><h3 class="ip-section" style="margin-top:0">Dein Profil für Track Record und Bank</h3>'
       + '<p class="hint">Foto, Vermögensaufstellung und Haushaltsrechnung sind wichtig für deinen Track Record und die Bank – keine Pflicht. Das Foto steht auf dem Deckblatt des Track Records.</p>'

@@ -388,14 +388,34 @@ function showSettings(initialTab) {
               planKey = DealPilotConfig.pricing.currentKey() || 'free';
             }
           } catch(e) {}
+          /* v4030 · Marcel 23.11.2026 (Prod, als Partner angemeldet): „steht dort oben Free Plan“. 'partner' fehlte in der
+             Liste und fiel auf free zurueck. Dazu Strich-Symbole statt Emoji (das Schloss wirkte nicht professionell). */
+          var SYM_SCHLOSS = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>';
+          var SYM_HAKEN = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>';
           var planMsgs = {
-            free: { cls: 'plan-hint-free', icon: '🔒', title: 'Free-Plan', text: 'Kein eigenes Branding auf PDFs — nur DealPilot-Logo + Wasserzeichen.' },
-            starter: { cls: 'plan-hint-starter', icon: '✓', title: 'Starter-Plan', text: 'Nur Name, E-Mail und Telefon werden auf PDFs übernommen. Logo, Adresse und Website nicht.' },
-            investor: { cls: 'plan-hint-investor', icon: '✓', title: 'Investor-Plan', text: 'Vollständiges Branding inkl. Logo, Adresse, Website wird übernommen.' },
-            pro: { cls: 'plan-hint-pro', icon: '✓', title: 'Pro-Plan', text: 'Vollständiges Branding inkl. Logo, Adresse, Website + erweiterte PDF-Features.' }
+            free: { cls: 'plan-hint-free', icon: SYM_SCHLOSS, title: 'Free-Plan', text: 'Kein eigenes Branding auf PDFs. Es erscheinen das DealPilot-Logo und ein Wasserzeichen.' },
+            starter: { cls: 'plan-hint-starter', icon: SYM_HAKEN, title: 'Starter-Plan', text: 'Name, E-Mail und Telefon stehen auf den PDFs. Logo, Adresse und Website nicht.' },
+            investor: { cls: 'plan-hint-investor', icon: SYM_HAKEN, title: 'Investor-Plan', text: 'Vollständiges Branding mit Logo, Adresse und Website.' },
+            pro: { cls: 'plan-hint-pro', icon: SYM_HAKEN, title: 'Pro-Plan', text: 'Vollständiges Branding mit Logo, Adresse und Website, dazu erweiterte PDF-Funktionen.' },
+            partner: { cls: 'plan-hint-pro', icon: SYM_HAKEN, title: 'Partner-Plan', text: 'Vollständiges Branding mit Logo, Adresse und Website auf allen PDFs, dazu deine Marke für deine Kunden.' }
           };
           var msg = planMsgs[planKey] || planMsgs.free;
-          return '<div class="plan-hint-box ' + msg.cls + '">' +
+          /* v4030 · oeffnet jemand die Einstellungen, bevor das Abo geladen ist, stand dort „Free“ bis zum naechsten Oeffnen */
+          if (!window._dpPlanHinweisHorcht) {
+            window._dpPlanHinweisHorcht = true;
+            window.addEventListener('dp:plan-ready', function () {
+              try {
+                var k = (window.DealPilotConfig && DealPilotConfig.pricing && DealPilotConfig.pricing.currentKey()) || 'free';
+                var m = planMsgs[k] || planMsgs.free;
+                Array.prototype.forEach.call(document.querySelectorAll('.plan-hint-box[data-plan]'), function (box) {
+                  if (box.getAttribute('data-plan') === k) return;
+                  box.className = 'plan-hint-box ' + m.cls; box.setAttribute('data-plan', k);
+                  box.innerHTML = '<span class="plan-hint-icon">' + m.icon + '</span><div class="plan-hint-content"><strong>' + m.title + '</strong>: ' + m.text + '</div>';
+                });
+              } catch (e) {}
+            });
+          }
+          return '<div class="plan-hint-box ' + msg.cls + '" data-plan="' + (planMsgs[planKey] ? planKey : 'free') + '">' +
                    '<span class="plan-hint-icon">' + msg.icon + '</span>' +
                    '<div class="plan-hint-content">' +
                      '<strong>' + msg.title + '</strong>: ' + msg.text +
@@ -926,18 +946,8 @@ function showSettings(initialTab) {
         '') : '') +   /* v3032: Ende Investor-Deal-Score-Abschnitt */
         /* v3032 · „Quickboarding Auto-Übernahme“ entfernt (Marcel 29.10.2026: es gibt nur noch eine
            AVM-Quelle, DealPilot). quickcheck-app.html nimmt immer den Konsens = DealPilot. */
-        /* v893r-exportphotos: Bilder in Export & Netzwerk-Anhang */
-        '<hr class="dvd">' +
-        '<h3 class="set-section-h">Bilder in Sicherung & Netzwerk</h3>' +
-        '<div style="padding:12px 14px;background:#FAF9F4;border-radius:8px;border:1px solid rgba(201,168,76,0.25)">' +
-          '<label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;">' +
-            '<input type="checkbox" id="set_export_photos"' + (function(){try{return localStorage.getItem('dp_export_photos')!=='0'?' checked':'';}catch(e){return ' checked';}})() + ' style="margin-top:3px;flex-shrink:0;cursor:pointer;" onchange="window._exportPhotosToggle(this)">' +
-            '<span>' +
-              '<span style="display:block;color:var(--ch,#2A2727);font-weight:500">Objektfotos einbeziehen</span>' +
-              '<span style="display:block;color:var(--muted,#5F5E5A);margin-top:2px;line-height:1.5;font-weight:400">Beim JSON-Export und beim Anhängen eines Objekts im Netzwerk werden die Fotos mitgegeben (größere Dateien). Aus = ohne Bilder. (Wird auf diesem Gerät gespeichert.)</span>' +
-            '</span>' +
-          '</label>' +
-        '</div>' +
+        /* v4030 · Marcel 23.11.2026: „Bilder in Sicherung & Netzwerk, Objektfotos einbeziehen kann komplett raus. Wir nehmen
+           immer die Objektfotos mit, wenn wir sie haben.“ Schalter entfernt, storage.js und deal-action-boarding.js nehmen sie immer mit. */
         /* === V213 collapse-toggle profilanzeige END === */
         /* === V228 tooltip-mode-toggle START === */
         '<hr class="dvd">' +
