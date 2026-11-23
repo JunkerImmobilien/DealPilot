@@ -77,14 +77,14 @@
       '.dp-gb .gb-leg i{display:inline-block;width:14px;height:2px;margin-right:5px;vertical-align:3px}',
       '.dp-gb .gb-leg i.d{border-top:1px dashed currentColor;height:0;background:none}',
       /* Einordnung */
-      '.dp-gb-bul{display:grid;grid-template-columns:minmax(120px,190px) minmax(0,1fr) 92px;gap:8px 14px;align-items:center}',
+      '.dp-gb-bul{display:flex;flex-direction:column;gap:10px}.dp-gb-bul .zl{display:grid;grid-template-columns:minmax(120px,190px) minmax(0,1fr) 92px;gap:6px 14px;align-items:center}',
       '.dp-gb-bul .n{font:600 13px/1.3 Inter,sans-serif}.dp-gb-bul .n small{display:block;font:400 11px/1.3 Inter,sans-serif;color:var(--gb-leise)}',
       '.dp-gb-bul .w{font:600 13px "JetBrains Mono",monospace;text-align:right}.dp-gb-bul .w small{display:block;font:600 10.5px Inter,sans-serif;letter-spacing:.02em}',
       '.dp-gb-bul .bahn{position:relative;height:18px;border-radius:4px;overflow:hidden;display:flex;gap:2px}',
       '.dp-gb-bul .bahn i{display:block;height:100%}',
       '.dp-gb-bul .mark{position:absolute;top:-3px;bottom:-3px;width:4px;margin-left:-2px;border-radius:2px;background:currentColor;box-shadow:0 0 0 2px var(--surface,#fff)}',
       '.dp-gb-bul .ziel{position:absolute;top:2px;bottom:2px;width:2px;margin-left:-1px;background:var(--gb-gold)}',
-      '@media (max-width:640px){.dp-gb-bul{grid-template-columns:minmax(0,1fr) 84px}.dp-gb-bul .bahn{grid-column:1/-1;margin-bottom:6px}}',
+      '@media (max-width:640px){.dp-gb-bul .zl{grid-template-columns:minmax(0,1fr) auto}.dp-gb-bul .bahn{grid-column:1/-1;order:3}}',
       /* Heatmap */
       '.dp-gb-hm{display:grid;gap:2px;font:600 12px "JetBrains Mono",ui-monospace,monospace}',
       '.dp-gb-hm .k{font:500 11px "JetBrains Mono",monospace;color:var(--gb-leise);display:flex;align-items:center;justify-content:center;padding:4px 2px;text-align:center}',
@@ -137,11 +137,11 @@
     var span = o.max - o.min, pos = function (v) { return Math.max(0, Math.min(100, (v - o.min) / span * 100)); };
     var start = o.min, teile = o.baender.map(function (b) { var w = pos(Math.min(b.bis, o.max)) - pos(start); start = Math.min(b.bis, o.max); return '<i style="width:' + w.toFixed(2) + '%;background:' + b.farbe + '"></i>'; }).join('');
     var farbe = o.farbe;
-    return '<div class="n">' + esc(o.name) + (o.sub ? '<small>' + esc(o.sub) + '</small>' : '') + '</div>'
+    return '<div class="zl"><div class="n">' + esc(o.name) + (o.sub ? '<small>' + esc(o.sub) + '</small>' : '') + '</div>'
       + '<div class="bahn" data-tip="' + esc(o.tip) + '">' + teile
       + (o.ziel != null ? '<span class="ziel" style="left:' + pos(o.ziel).toFixed(2) + '%"></span>' : '')
       + '<span class="mark" style="left:' + pos(o.wert).toFixed(2) + '%;color:' + farbe + '"></span></div>'
-      + '<div class="w">' + esc(o.text) + '<small style="color:' + farbe + '">' + esc(o.wort) + '</small></div>';
+      + '<div class="w">' + esc(o.text) + '<small style="color:' + farbe + '">' + esc(o.wort) + '</small></div></div>';
   }
   function einordnungHtml(D) {
     var K = D.K, s = D.sw, C = D.C;
