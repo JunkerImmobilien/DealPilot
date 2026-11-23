@@ -278,7 +278,7 @@
 
     /* Objekte im Einzelnen (eingeklappt) und Rechenprüfung */
     var H = hinweise(alle), nH = 0; rows.forEach(function (r) { nH += (H[r.id] || []).length; });
-    var tab = '<details class="gp-det"' + (nH ? ' open' : '') + '><summary>Objekte im Einzelnen' + (nH ? ' · ' + nH + ' Angabe' + (nH === 1 ? '' : 'n') + ' bitte prüfen' : '') + '</summary><div style="overflow-x:auto"><table class="gp-tab"><thead><tr><th>Objekt</th><th>Wert</th><th>Restschuld</th><th>LTV</th><th>Rendite</th><th>DSCR</th><th>Bindung bis</th><th>Score</th></tr></thead><tbody>'
+    var tab = '<details class="gp-det"><summary>Objekte im Einzelnen' + (nH ? ' · ' + nH + ' Angabe' + (nH === 1 ? '' : 'n') + ' bitte prüfen' : '') + '</summary><div style="overflow-x:auto"><table class="gp-tab"><thead><tr><th>Objekt</th><th>Wert</th><th>Restschuld</th><th>LTV</th><th>Rendite</th><th>DSCR</th><th>Bindung bis</th><th>Score</th></tr></thead><tbody>'
       + rows.map(function (r) {
         var h = H[r.id] || [];
         return '<tr><td>' + esc(r.name) + (h.length ? '<br>' + h.map(function (t) { return '<span class="gp-pill">Bitte prüfen: ' + esc(t) + '</span>'; }).join('') : '') + '</td><td>' + mio(r.wert) + (r.wertQ === 'mb' ? '' : ' <small title="kein Marktbericht, Kaufpreis">KP</small>') + '</td><td>' + mio(r.rest) + '</td>'
