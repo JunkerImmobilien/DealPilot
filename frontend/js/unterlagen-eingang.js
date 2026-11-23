@@ -58,7 +58,14 @@
     if (!OA || typeof OA.openImport !== 'function') { try { if (window.toast) window.toast('Import nicht geladen – Seite neu laden.'); } catch (e) {} return; }
     var ergaenzen = false;
     try { ergaenzen = !!(window.DpUnterlagen && window.DpUnterlagen.laden()); } catch (e) {}
-    OA.openImport(null, { ergaenzen: ergaenzen, eingang: true, reiter: wie && wie.reiter, jahr: wie && wie.jahr });
+    OA.openImport(wie && typeof wie.fertig === 'function' ? wie.fertig : null, { ergaenzen: ergaenzen, eingang: true, reiter: wie && wie.reiter, jahr: wie && wie.jahr });   /* v4100 · fertig: Rückruf nach dem Schließen (Assistent Jahresabschluss) */
+  }
+  /* v4100 · Marcel 23.11.2026: im Reiter Steuer nur noch EIN Knopf „Belege & Unterlagen“. Liegen schon Belege vor, öffnet
+     das Fenster auf „Belege je Jahr“ (jüngstes Jahr mit Belegen), sonst auf „Einlesen“. */
+  function start() {
+    var J = _jahre(), mit = Object.keys(J.mitBelegen).map(Number).sort(function (a, b) { return b - a; });
+    if (mit.length && J.jahre.length) { oeffnen({ reiter: 'jahre', jahr: mit[0] }); return; }
+    oeffnen();
   }
 
   /* ── Rechnungen erkennen ──────────────────────────────────────────────────
@@ -562,6 +569,10 @@
       + '.ue-bj .bj-warn{color:#B8625C;font-weight:600}'
       + '.ue-bj-fuss{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px;font-size:11px;color:var(--muted,#7A7370)}'
       + '.ue-bj-fuss span{flex:1 1 260px}'
+      /* v4100 · Gruppen „Laut ViVi“ und „In DealPilot gebucht“ */
+      + '.ue-bj-gruppe{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:4px 0 8px;font:700 11px/1.3 Inter,system-ui,sans-serif;letter-spacing:.06em;text-transform:uppercase;color:var(--muted,#7A7370)}'
+      + '.ue-bj-gruppe .oabi-btn{text-transform:none;letter-spacing:0;padding:6px 12px}'
+      + '.ue-bj-vivi{margin:0 0 14px}.ue-bj-vivi .vst{margin:0}'
       + '@media (max-width:640px){.ue-bj-summe{grid-template-columns:1fr 1fr}.ue-bj-summe span:last-child{grid-column:1/-1}'
       + '.ue-bj summary{grid-template-columns:minmax(0,1fr) auto}.ue-bj summary .bj-z:not(.bj-zb){grid-column:2;grid-row:1}.ue-bj summary .bj-zb{grid-column:1/-1;grid-row:2;text-align:left}.ue-bj summary .bj-zb:empty{display:none}.ue-bj summary .bj-zb small{display:inline;margin-left:4px}'
       + '.ue-bj .bj-b{grid-template-columns:minmax(0,1fr) auto}.ue-bj .bj-b .bj-d{grid-column:1/-1;order:3}}';
@@ -578,6 +589,20 @@
     return q;
   }
   var _jbJahr = null;
+  /* v4100 · Marcel 23.11.2026: „einmal das, was wir selber gebucht haben im DealPilot, und das, was ViVi uns gibt“.
+     Bei ViVi-Verknüpfung steht über den Posten die Gegenüberstellung je Anlage-V-Zeile (DealPilot, ViVi, Abweichung,
+     übernehmen). Gezeichnet von vivi-steuer-abgleich.js (DpViviSteuer.html), dieselben Kerne und Sperren wie im Reiter
+     ViVi: festgeschriebene oder erklärte Jahre nur nach Rückfrage, nie automatisch. */
+  function _viviVerknuepft() { try { var v = window.DpVivi && window.DpVivi.stand && window.DpVivi.stand(); return !!(v && v.verknuepft); } catch (e) { return false; } }
+  function _viviTeil(jahr, opt) {
+    if (!_viviVerknuepft()) return '';
+    var VS = window.DpViviSteuer, J = VS && VS.jahre ? VS.jahre() : [], inhalt = '';
+    if (J.indexOf(jahr) >= 0 && VS.html) {
+      inhalt = VS.html(jahr);
+      if (!inhalt) inhalt = '<p class="oabi-sub" style="padding:0">Der Abgleich der Steuer mit ViVi ist in den Einstellungen ausgeschaltet.</p>';
+    } else inhalt = '<p class="oabi-sub" style="padding:0">ViVi führt für ' + jahr + ' noch keine Buchungen der Anlage V. Gleich ab, um sie zu holen.</p>';
+    return '<div class="ue-bj-vivi"><div class="ue-bj-gruppe"><span>Laut ViVi</span><button type="button" class="oabi-btn" data-bj-vivi>Mit ViVi abgleichen</button></div>' + inhalt + '</div>';
+  }
   function _jahre() {
     var jahre = ((typeof window.dpWkJahre === 'function' ? window.dpWkJahre() : []) || []).slice();
     var o = lesen(), mitBelegen = {};
@@ -586,8 +611,9 @@
     jahre.sort(function (a, b) { return a - b; });
     return { jahre: jahre, mitBelegen: mitBelegen };
   }
-  function jahresInRahmen(box, jahr) {
+  function jahresInRahmen(box, jahr, opt) {
     if (!box) return;
+    opt = opt || box._bjOpt || {}; box._bjOpt = opt;   /* v4100 · opt.festesJahr: ohne Jahresleiste (Assistent Jahresabschluss) */
     _belegCss();
     var J = _jahre(), jahre = J.jahre, mitBelegen = J.mitBelegen;
     if (!jahre.length) { box.innerHTML = '<div class="ue-bj"><p class="oabi-sub" style="padding:0">Noch keine Steuerjahre. Bitte erst Kaufdatum und Werte eingeben.</p></div>'; return; }
@@ -618,8 +644,10 @@
     var nDat = Object.keys(d.buchungen.reduce(function (a, b) { a[b.datei] = 1; return a; }, {})).length;
     box.innerHTML = '<div class="ue-bj">'
       + '<div class="oabi-sub" style="padding:0 0 8px">Jedes Steuerjahr mit seinen Werbungskosten, und für jeden Posten, woher der Wert kommt: eingelesener Beleg, Unterlage, ViVi, von Hand oder von der App berechnet.</div>'
-      + '<div class="ue-bj-jahre" role="tablist">' + jahre.map(function (j) { return '<button type="button" data-bj-jahr="' + j + '"' + (j === jahr ? ' class="an"' : '') + '>' + j + (mitBelegen[j] ? '<i title="' + mitBelegen[j] + ' Positionen aus Belegen">●</i>' : '') + '</button>'; }).join('') + '</div>'
+      + (opt.festesJahr ? '' : '<div class="ue-bj-jahre" role="tablist">' + jahre.map(function (j) { return '<button type="button" data-bj-jahr="' + j + '"' + (j === jahr ? ' class="an"' : '') + '>' + j + (mitBelegen[j] ? '<i title="' + mitBelegen[j] + ' Positionen aus Belegen">●</i>' : '') + '</button>'; }).join('') + '</div>')
       + '<div class="ue-bj-summe"><span>Werbungskosten ohne AfA<b>' + eur2(sumWert) + '</b></span><span>davon einzeln aus Belegen<b>' + eur2(sumBel) + '</b></span><span>Belege ' + jahr + '<b>' + nDat + ' <small style="font-size:11px;font-weight:400;color:var(--muted,#7A7370)">(' + d.buchungen.length + (d.buchungen.length === 1 ? ' Position' : ' Positionen') + ')</small></b></span></div>'
+      + _viviTeil(jahr, opt)
+      + (_viviVerknuepft() ? '<div class="ue-bj-gruppe">In DealPilot gebucht</div>' : '')
       + posten
       + '<div class="ue-bj-fuss"><span>Einzeln aufgeführt sind Belege, die seit dem 04.11.2026 eingelesen oder aus ViVi übernommen wurden. Wird ein Import im Verlauf zurückgenommen, verschwinden seine Belege hier mit.</span>'
       + (d.buchungen.length ? '<button type="button" class="oabi-btn" data-bj-csv>Liste als CSV</button>' : '') + '</div></div>';
@@ -628,6 +656,18 @@
       box.addEventListener('click', function (e) {
         var t = e.target, jb = t.closest && t.closest('[data-bj-jahr]');
         if (jb) { jahresInRahmen(box, Number(jb.getAttribute('data-bj-jahr'))); return; }
+        /* v4100 · ViVi: abgleichen (nur lesen), Jahr der Karte, nach „übernehmen“ neu zeichnen */
+        if (t.closest && t.closest('[data-bj-vivi]')) {
+          var kb = t.closest('[data-bj-vivi]'); kb.disabled = true; kb.textContent = 'ViVi wird gelesen …';
+          Promise.resolve(window.DpVivi.abgleichen(false)).then(function () { return new Promise(function (r) { setTimeout(r, 1500); }); })
+            .then(function () { jahresInRahmen(box, _jbJahr); }, function () { jahresInRahmen(box, _jbJahr); });
+          return;
+        }
+        var vk = t.closest && t.closest('[data-vst]');
+        if (vk && box.contains(vk)) {
+          if (vk.getAttribute('data-vst') === 'jahr') { e.stopPropagation(); if (!box._bjOpt.festesJahr) jahresInRahmen(box, Number(vk.getAttribute('data-vst-jahr'))); return; }
+          setTimeout(function () { jahresInRahmen(box, _jbJahr); }, 400);
+        }
         if (t.closest && t.closest('[data-bj-csv]')) _jbCsv(_jbJahr, _jahrDaten(_jbJahr));
       });
     }
@@ -647,7 +687,7 @@
     setTimeout(function () { a.remove(); URL.revokeObjectURL(url); }, 0);
   }
 
-  window.DpEingang = { VERSION: 'v4080', jahresAnsicht: jahresAnsicht, jahresInRahmen: jahresInRahmen, oeffnen: oeffnen, istRechnung: istRechnung, belegeAuslesen: belegeAuslesen,
+  window.DpEingang = { VERSION: 'v4100', start: start, jahresAnsicht: jahresAnsicht, jahresInRahmen: jahresInRahmen, oeffnen: oeffnen, istRechnung: istRechnung, belegeAuslesen: belegeAuslesen,
     einheiten: einheiten, mvVorschlag: mvVorschlag, mvOptionen: mvOptionen, mvText: mvText, mvUebernehmen: mvUebernehmen, mvFelder: mvFelder,
     jahrStand: jahrStand, protokoll: protokoll, verlaufHtml: verlaufHtml, lesen: lesen,
     /* v3154 */ txStart: txStart, txEnde: txEnde, feldStand: feldStand, feldGeaendert: feldGeaendert,

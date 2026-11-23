@@ -48,7 +48,7 @@
 (function (global) {
   'use strict';
   if (global.DpJahresabgleich) return;
-  var VERSION = 'v4090b';
+  var VERSION = 'v4100';
   var GOLD = 'var(--wl-c9a84c, #C9A84C)';
   /* v4090 · Marcel 23.11.2026: „ich würde die Reihenfolge ändern in Miete, Wert, Haus und dann Steuern" (die Steuer braucht die Zahlen der drei davor) */
   var SCHRITTE = [['miete', 'Miete'], ['wert', 'Wert'], ['haus', 'Haus'], ['steuer', 'Steuer']];
@@ -101,12 +101,40 @@
   /** Rein: Stand des Hausschritts aus den Jahreswerten */
   function hausStand(h, lauf) {
     var da = !!h.protokoll, papier = !!(h.abrechnung || h.wirtschaftsplan);
-    return da && papier ? 'ok' : (da || papier ? 'teil' : (lauf ? 'laufend' : 'offen'));
+    /* v4100 · Hausgeld des Jahres laut ViVi zählt als Teil-Ist (Protokoll und Abrechnung liefert ViVi nicht) */
+    var vivi = h.hg_quelle === 'vivi' && istZahl(h.hg_ist_j);
+    return da && papier ? 'ok' : (da || papier || vivi ? 'teil' : (lauf ? 'laufend' : 'offen'));
+  }
+  /* ── v4100 · Hausgeld des Jahres aus ViVi ──────────────────────────
+     Marcel 23.11.2026: „im Schritt 3 unter Unterlagen hochladen sollten wir bei einer ViVi-Anbindung den Abgleich machen“.
+     ViVi liefert je Steuerjahr die Belege der Anlage V (stand.steuer[jahr], viviSteuer.js). Das Hausgeld steht dort in den
+     Zeilen umgelegte und nicht umgelegte Kosten, erkannt am Text wie im Backend (RE_HAUSGELD, bewirtschaftungAus).
+     Nur gelesen, nie geschrieben. Eigene Angaben und die Abrechnung schlagen ViVi, ein festgeschriebener Haus-Schritt
+     bleibt, wie er ist. */
+  var RE_HAUSGELD = /hausgeld|\(vorauszahlung\)|\(nicht umlagef/i;
+  function hgViviRein(sj) {
+    if (!sj || typeof sj !== 'object') return null;
+    var s = 0, n = 0;
+    ['nk_umlf', 'nk_n_umlf'].forEach(function (sp) {
+      var z = sj[sp]; if (!z || !Array.isArray(z.posten)) return;
+      z.posten.forEach(function (p) { if (p && RE_HAUSGELD.test(String(p.text || '')) && istZahl(p.betrag)) { s += p.betrag; n++; } });
+    });
+    return n ? Math.round(s * 100) / 100 : null;
+  }
+  function viviStand() { try { return global.DpVivi && global.DpVivi.stand ? global.DpVivi.stand() : null; } catch (e) { return null; } }
+  function viviVerknuepft() { var v = viviStand(); return !!(v && v.verknuepft); }
+  function viviHgJahr(jahr) { var v = viviStand(); return v && v.steuer ? hgViviRein(v.steuer[jahr] || v.steuer[String(jahr)]) : null; }
+  /** Rein: Haus des Jahres mit dem Hausgeld aus ViVi ergänzen (nur wo kein eigener Wert steht und der Schritt nicht fest ist) */
+  function hausMitViviRein(h, hgVivi, fest) {
+    if (!h) return h;
+    if (istZahl(h.hg_ist_j)) { h.hg_quelle = h.hg_quelle || 'eigen'; return h; }
+    if (!fest && istZahl(hgVivi)) { h.hg_ist_j = hgVivi; h.hg_quelle = 'vivi'; }
+    return h;
   }
   /** Stand je Schritt für ein Jahr (z = Zeile aus DpJahresbuch.zeilen()) */
   function stand(z, weg, L) {
     if (!z) return null;
-    var lauf = z.jahr >= heuteJahr(), h = hausJahr(z.jahr, L), s = {};
+    var lauf = z.jahr >= heuteJahr(), h = hausMitViviRein(hausJahr(z.jahr, L), lauf ? null : viviHgJahr(z.jahr), !!festJahr(z.jahr).haus), s = {};
     /* v4037 · Marcel 23.11.2026: „für jedes Jahr tatsächlich die Werte reinschreiben … sicherstellen“. Ein vergangenes
        Jahr ist bei der Miete erst erledigt, wenn die Ist-Miete da ist (eingetragen oder aus ViVi) oder der Schritt
        festgeschrieben ist. Bis v4036 galt jedes vergangene Jahr als erledigt, auch nur mit gerechneter Miete. */
@@ -400,6 +428,9 @@
       '.dp-ja-fh{display:inline-flex;align-items:center;gap:4px}',
       '.dp-ja-frage{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 14px;border:1px solid #B8625C;border-radius:10px;padding:10px 14px;margin:0 0 10px;background:color-mix(in srgb, #B8625C 6%, #fff);font:400 13px/1.45 Inter,sans-serif;color:' + T + '}',
       '.dp-ja-prot{font:400 11.5px Inter,sans-serif;color:' + LE + ';margin:-4px 0 10px}',
+      /* v4100 · Jahreswechsel und Knopf „fertig machen“ */
+      '.dp-ja-wechsel{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:6px 14px;border:1px solid ' + GOLD + ';border-radius:10px;padding:8px 8px 8px 14px;margin:0 0 10px;background:var(--gold-bg, color-mix(in srgb, ' + GOLD + ' 8%, #fff));font:400 13px/1.45 Inter,sans-serif;color:' + T + '}',
+      '.dp-pa-wrap .dp-ja-erg button.dp-ja-fertig-k{margin-left:auto}',
       '@keyframes dpJaBlink{0%,100%{box-shadow:0 0 0 0 transparent}20%,60%{box-shadow:0 0 0 4px color-mix(in srgb, ' + GOLD + ' 45%, transparent)}}',
       '.dp-ja-blink{animation:dpJaBlink 1.3s ease-in-out 2;border-radius:8px}',
       '@media (max-width:760px){.dp-ja-fuehrung{grid-template-columns:1fr;padding:10px}.dp-ja-f-p{flex-wrap:nowrap}.dp-ja-f-k{justify-content:flex-start}.dp-ja-f-p button:not(.an) .w{display:none}.dp-pa-wrap .dp-ja-f-p button:not(.an){padding:4px !important}}',   /* v4090b · am Handy nur der aktive Schritt mit Wort */
@@ -505,6 +536,7 @@
     var pl = planZeile(z.jahr), pr = projZeile(z.jahr), lauf = z.jahr >= heuteJahr();
 
     var out = '<div class="dp-ja" data-dp-ja="1">';
+    try { out += wechselHtml(Z, weg, L); } catch (e) {}   /* v4100 · Jahreswechsel */
     /* v4016 · Die Erinnerung „Jahresabgleich 2025: 2 von 4" stand oben über JEDEM gewählten Jahr (Marcel 23.11.2026:
        „bleibt beim Wechsel der Jahre stehen"). Jetzt sagt der Kopf nur das gewählte Jahr; offene Jahre zeigt die
        Jahresleiste mit Punkt und Zahl. */
@@ -517,9 +549,11 @@
       + (dm != null ? (Math.abs(dm) < 0.5 ? 'Miete wie ' + (z.ohne_plan ? 'die Projektion' : 'im Plan vom Kauf') : 'Miete ' + vz(dm) + (dm > 0 ? ' über' : ' unter') + (z.ohne_plan ? ' der Projektion' : ' dem Plan vom Kauf')) : 'Für dieses Jahr gibt es keinen Plan vom Kauf')
       + (cfPlan != null && cfIst != null ? ', Cashflow ' + vz(cfIst - cfPlan) : '') + '.'
       + (lauf ? ' Abgleich ab Februar ' + (z.jahr + 1) + ', wenn Steuer, Abrechnung und Protokoll da sind.' : '');
-    var jahrKn = lauf ? '' : (s.nFest === 4
+    /* v4100 · „Jahr fertig machen“ für jedes vergangene, nicht ganz festgeschriebene Jahr */
+    var fertigKn = !lauf && s.nFest < 4 ? '<button type="button" class="btn-clean dp-pa4-btn dp-ja-gold dp-ja-fertig-k" data-ja-aktion="fertig" data-ja-j="' + z.jahr + '">' + z.jahr + ' fertig machen</button>' : '';
+    var jahrKn = fertigKn + (lauf ? '' : (s.nFest === 4
       ? '<button type="button" class="btn-clean dp-ja-fest an" data-ja-aktion="freigeben" title="Alle vier Schritte von ' + z.jahr + ' wieder freigeben.">' + SCHLOSS + ' Jahr ' + z.jahr + ' wieder freigeben</button>'
-      : '<button type="button" class="btn-clean dp-ja-fest" data-ja-aktion="festschreiben" title="Alle vier Schritte von ' + z.jahr + ' festschreiben und das Jahr abschließen. Wieder freigeben geht jederzeit.">' + SCHLOSS + ' Jahr ' + z.jahr + ' festschreiben</button>');
+      : '<button type="button" class="btn-clean dp-ja-fest" data-ja-aktion="festschreiben" title="Alle vier Schritte von ' + z.jahr + ' festschreiben und das Jahr abschließen. Wieder freigeben geht jederzeit.">' + SCHLOSS + ' Jahr ' + z.jahr + ' festschreiben</button>'));
     out += '<div class="dp-ja-erg"><div class="dp-ja-jahre" role="group" aria-label="Jahr wählen">' + Z.slice().reverse().map(function (x) {
         var sx = stand(x, weg, L), xl = x.jahr >= heuteJahr();
         var tt = standText(sx, x.jahr) + (!xl && sx.offen.length ? '. Offen: ' + sx.offen.join(', ') : '');
@@ -548,7 +582,7 @@
       z.mb ? 'Marktbericht vom ' + datumText(z.mb.am) + '.' : 'Kein Marktbericht in ' + z.jahr + '.', knopf(z.mb ? 'wert-sehen' : 'wert', z.mb ? 'Alle Berichte' : 'Marktbericht abrufen', s.wert === 'offen'), z.jahr);
     if (weg) {
       var hgW = istZahl(h.hg_ist_j) ? eur(h.hg_ist_j) : (istZahl(h.hg_plan_m) ? eur(h.hg_plan_m * 12) : '–');
-      var hgV = istZahl(h.hg_plan_m) ? 'Plan ' + eur(h.hg_plan_m * 12) + (istZahl(h.hg_ist_j) ? ' · ' + abw(h.hg_plan_m * 12, h.hg_ist_j, false) : ' · Wirtschaftsplan') : (istZahl(h.hg_ist_j) ? 'Hausgeld laut Abrechnung' : 'Hausgeld im Jahr');
+      var hgV = istZahl(h.hg_plan_m) ? 'Plan ' + eur(h.hg_plan_m * 12) + (istZahl(h.hg_ist_j) ? ' · ' + abw(h.hg_plan_m * 12, h.hg_ist_j, false) : ' · Wirtschaftsplan') : (istZahl(h.hg_ist_j) ? (h.hg_quelle === 'vivi' ? 'Hausgeld laut ViVi' : 'Hausgeld laut Abrechnung') : 'Hausgeld im Jahr');
       var hausT = [];
       hausT.push(h.protokoll ? 'Versammlung ' + esc(h.protokoll) : 'Protokoll fehlt');
       hausT.push(h.wirtschaftsplan ? 'Wirtschaftsplan da' : 'Wirtschaftsplan fehlt');
@@ -562,7 +596,7 @@
       var suT = h.suDa && h.su > 0 ? ' Sonderumlage ' + eur(h.su) + (suP ? ' (Plan ' + eur(suP) + ')' : ' (nicht geplant)') + '.' : '';
       var bT = h.beschluesse.length ? ' ' + esc(h.beschluesse.slice(0, 2).join(' · ')) + '.' : '';
       teile.haus = schritt('haus', 'Haus', s, hgW, hgV, hausT.join(' · ') + '.' + suT + bT,
-        knopf('haus', 'Unterlagen hochladen', s.haus !== 'ok' && !lauf) + ' ' + knopf('haus-sehen', 'Haus ansehen', false), z.jahr);
+        knopf('haus', 'Unterlagen hochladen', s.haus !== 'ok' && !lauf) + (viviVerknuepft() && !lauf ? ' ' + knopf('vivi-abgleich', 'Mit ViVi abgleichen', false, z.jahr) : '') + ' ' + knopf('haus-sehen', 'Haus ansehen', false), z.jahr);
     } else {
       var ev = h.ereignisse.slice(0, 2).map(function (e) { return esc(e.titel || e.text); }).filter(Boolean);
       teile.haus = schritt('haus', 'Haus', s, h.suDa && h.su > 0 ? eur(h.su) : 'keine', 'Sonderumlage · Plan ' + eur(pl && istZahl(pl.su_y) ? pl.su_y : 0),
@@ -737,7 +771,9 @@
       : { t: 'Für ' + J + ' fehlt ein Marktbericht. Ein neuer Bericht zählt für das laufende Jahr. Gibt es keinen für ' + J + ', schreib den Schritt fest.', kn: knopf('wert', 'Marktbericht abrufen', true) };
     if (k === 'haus') return weg
       ? (ok ? { t: 'Protokoll und Abrechnung ' + J + ' sind da. Hausgeld, Rücklage und Beschlüsse stehen im Schritt Haus.', kn: knopf('haus-sehen', 'Haus ansehen', false) }
-        : { t: 'Lade Protokoll, Wirtschaftsplan und Abrechnung ' + J + ' hoch. DealPilot liest Hausgeld, Rücklage und Beschlüsse daraus.', kn: knopf('haus', 'Unterlagen hochladen', true) })
+        : { t: (s._haus && s._haus.hg_quelle === 'vivi' ? 'Das Hausgeld ' + J + ' kommt aus ViVi. Lade noch Protokoll und Abrechnung ' + J + ' hoch, DealPilot liest Rücklage und Beschlüsse daraus.'
+              : 'Lade Protokoll, Wirtschaftsplan und Abrechnung ' + J + ' hoch. DealPilot liest Hausgeld, Rücklage und Beschlüsse daraus.' + (viviVerknuepft() ? ' Das Hausgeld kann auch ViVi liefern.' : '')),
+            kn: knopf('haus', 'Unterlagen hochladen', true) + (viviVerknuepft() ? ' ' + knopf('vivi-abgleich', 'Mit ViVi abgleichen', false, J) : '') })
       : { t: 'Kein Wohnungseigentum. Die Hauskosten stehen in der Anlage V, der Schritt folgt der Steuer.', kn: '' };
     return ok
       ? { t: 'Der Bescheid ' + J + ' liegt vor. Damit ist die Steuer abgeglichen.', kn: knopf('steuer', 'Anlage V ansehen', false) }
@@ -762,6 +798,52 @@
       + '</div></div>';
   }
   /* v4090 · Rückfrage vor dem Freigeben und Protokoll des Jahres */
+  /* ── v4100 · Jahr fertig machen ─────────────────────────────────────
+     Marcel 23.11.2026: „schauen, ob wir schon im neuen Jahr sind und für das Jahr schon komplett alles fertig machen
+     können“. Ein vergangenes Jahr: (a) bei ViVi erst abgleichen (Miete aus dem Mietverlauf, Steuerjahr, Hausgeld),
+     (b) Stand neu rechnen, (c) zum ersten offenen Schritt mit dem, was noch fehlt, (d) ist alles erledigt, Rückfrage
+     „festschreiben?“. Festgeschrieben wird nie ohne Rückfrage. */
+  /** Rein: was im Jahr noch fehlt, in Worten je offenem Schritt */
+  function offenListe(z, s, weg) {
+    var L = [];
+    SCHRITTE.forEach(function (x) {
+      var k = x[0]; if (s[k] === 'ok') return;
+      if (k === 'miete') L.push('Ist-Miete ' + z.jahr);
+      else if (k === 'wert') L.push('Marktbericht oder Wert festschreiben');
+      else if (k === 'haus') {
+        var h = s._haus || {};
+        if (!weg) L.push('Hauskosten in der Anlage V');
+        else { if (!h.protokoll) L.push('Protokoll hochladen'); if (!(h.abrechnung || h.wirtschaftsplan)) L.push('Abrechnung hochladen'); }
+      } else L.push(z.status === 'erklaert' ? 'Steuerbescheid' : 'Anlage V ' + z.jahr);
+    });
+    return L;
+  }
+  /** Rein: was nach dem Prüfen geschieht. Nie festschreiben, nur fragen. */
+  function fertigErgebnis(z, s, weg) {
+    if (!z || z.jahr >= heuteJahr()) return { art: 'laeuft' };
+    if (s.nFest === 4) return { art: 'fest' };
+    var L = offenListe(z, s, weg);
+    if (!L.length) return { art: 'frage', text: 'Alle vier Schritte von ' + z.jahr + ' sind erledigt.' };
+    var erster = SCHRITTE.filter(function (x) { return s[x[0]] !== 'ok'; })[0][0];
+    return { art: 'offen', schritt: erster, text: 'Noch offen: ' + L.join(', ') + '.' };
+  }
+  function zeileJahr(jahr) { try { return JB().zeilen().filter(function (x) { return x.jahr === jahr; })[0] || null; } catch (e) { return null; } }
+  function hausLesen() { try { return global.DpHausverlauf && global.DpHausverlauf.lesen ? global.DpHausverlauf.lesen() : null; } catch (e) { return null; } }
+  function warte(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+  /** ViVi abrufen (nur lesen). vivi-felder schreibt die Ist-Miete des Jahres, vivi-steuer-abgleich die Steuerjahre nach
+      Einstellung, beide lassen festgeschriebene Jahre unberührt (v4090). */
+  function viviAbgleichen(still) {
+    if (!viviVerknuepft() || !global.DpVivi || !global.DpVivi.abgleichen) return Promise.resolve(false);
+    return Promise.resolve(global.DpVivi.abgleichen(!!still)).then(function () { return warte(1500); }).then(function () { return true; }, function () { return false; });
+  }
+  /** Jahreswechsel: das Vorjahr ist vorbei und noch nicht festgeschrieben */
+  function wechselHtml(Z, weg, L) {
+    var vj = heuteJahr() - 1, z = Z.filter(function (x) { return x.jahr === vj; })[0];
+    if (!z) return '';
+    var s = stand(z, weg, L); if (s.nFest === 4) return '';
+    return '<div class="dp-ja-wechsel"><span><b>' + vj + ' ist vorbei.</b> Du kannst es jetzt abschließen.</span>'
+      + (_gewaehlt === vj ? '' : knopf('fertig', vj + ' fertig machen', true, vj)) + '</div>';
+  }
   function frageHtml(jahr) {
     if (!_frage || _frage.jahr !== jahr) return '';
     var w = _frage.k ? (SCHRITTE.filter(function (x) { return x[0] === _frage.k; })[0] || ['', _frage.k])[1] + ' ' + jahr : 'Das ganze Jahr ' + jahr;
@@ -799,6 +881,7 @@
       var y = +b.getAttribute('data-ja-j') || _gewaehlt;
       if (a === 'festschreiben') {   /* v4016 · ein Schritt (data-ja-schritt-k) oder das ganze Jahr */
         var k = b.getAttribute('data-ja-schritt-k');
+        if (!k && global.DpJahresabschluss) { global.DpJahresabschluss.oeffnen(_gewaehlt, 'fest'); return; }   /* v4100 · ganzes Jahr nur mit Rückfrage */
         if (JB() && JB().festSetzen) JB().festSetzen(_gewaehlt, k ? [k] : null, true);
         _frage = null; mountAll(); return;
       }
@@ -807,6 +890,14 @@
       if (a === 'freigeben') { _frage = { jahr: _gewaehlt, k: b.getAttribute('data-ja-schritt-k') || null }; mountAll();
         setTimeout(function () { var q = host.querySelector('.dp-ja-frage'); if (q) hervorheben(q); }, 30); return; }
       if (a === 'freigeben-nein') { _frage = null; mountAll(); return; }
+      /* v4100 · Marcel 23.11.2026: „vom Schritt 1 Miete … dann weiter über alle Schritte bis zur Festschreibung“. Ein
+         vergangenes Jahr läuft über den Assistenten „Jahresabschluss“ (jahresabschluss.js), jeder Schritt-Knopf öffnet ihn
+         beim jeweiligen Schritt. Das laufende Jahr behält die direkten Wege. */
+      var AS = global.DpJahresabschluss, vorbei = y < heuteJahr();
+      if (AS && vorbei) {
+        var ziel = { fertig: null, eintragen: 'miete', wert: 'wert', haus: 'haus', 'vivi-abgleich': 'haus', steuer: 'steuer' }[a];
+        if (a === 'fertig' || ziel) { AS.oeffnen(y, ziel); return; }
+      }
       if (a === 'freigeben-ja') {
         var fq = _frage; _frage = null;
         if (fq && JB() && JB().festSetzen) JB().festSetzen(fq.jahr, fq.k ? [fq.k] : null, false);
@@ -838,5 +929,8 @@
   global.DpJahresabgleich = { VERSION: VERSION, stand: stand, hausStand: hausStand, hausJahr: hausJahr, erinnerung: erinnerung, mbAbrufen: mbAbrufen,
     mpRein: mpRein, mpQuellen: mpQuellen, mpJahr: mpJahr, html: html, mountAll: mountAll, verfuegbar: verfuegbar, grafikOpt: grafikOpt,
     standText: standText, viviMieteRein: viviMieteRein, viviJahr: viviJahr,   /* v4016, v4017 */
-    SCHRITTE: SCHRITTE, aktiverSchritt: aktiverSchritt, aufgabe: aufgabe, fuehrungHtml: fuehrungHtml };   /* v4090 · für den Prüfer */
+    SCHRITTE: SCHRITTE, aktiverSchritt: aktiverSchritt, aufgabe: aufgabe, fuehrungHtml: fuehrungHtml,   /* v4090 · für den Prüfer */
+    hgViviRein: hgViviRein, hausMitViviRein: hausMitViviRein, offenListe: offenListe, fertigErgebnis: fertigErgebnis,   /* v4100 */
+    standFuer: function (j) { var z = zeileJahr(j), w = mitWeg(); return z ? { z: z, s: stand(z, w, hausLesen()), weg: w } : null; },
+    viviVerknuepft: viviVerknuepft, viviAbgleichen: viviAbgleichen, viviHgJahr: viviHgJahr, zuMiete: zuMiete, zuReiter: zuReiter, hervorheben: hervorheben };
 })(typeof window !== 'undefined' ? window : globalThis);

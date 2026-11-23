@@ -284,5 +284,43 @@ const K = c.DpMietpotenzial, E = c.DpErhoehungen, JA = c.DpJahresabgleich, HV = 
   ok(/a === 'freigeben'\) \{ _frage = /.test(ja) && /a === 'freigeben-ja'\)/.test(ja) && /fest_protokoll/.test(jb) && /aktion: an \? 'festgeschrieben' : 'freigegeben'/.test(jb), 'X Freigeben nur nach Rückfrage, Vorgang im Protokoll');
 }
 
+/* ── H · v4100 ViVi im Schritt Haus, Assistent Jahresabschluss, ein Knopf Belege & Unterlagen ───────────────── */
+{
+  const c7 = kontext();
+  for (const f of ['mieterhoehungen.js', 'jahresbuch.js', 'hausverlauf.js', 'jahresabgleich.js', 'jahresabschluss.js']) vm.runInContext(lies('frontend/js/' + f), c7);
+  const J7 = c7.DpJahresabgleich, AS = c7.DpJahresabschluss;
+  const sj = { nk_umlf: { posten: [{ text: 'Hausgeld (Vorauszahlung) Jan', betrag: 200 }, { text: 'Grundsteuer B', betrag: 300 }, { text: 'Hausgeld Feb', betrag: 200 }] },
+    nk_n_umlf: { posten: [{ text: 'Hausgeld (nicht umlagefähig)', betrag: 50.5 }] }, erhaltungsaufwand: { posten: [{ text: 'Hausgeld Sonder', betrag: 999 }] } };
+  ok(J7.hgViviRein(sj) === 450.5, 'H Hausgeld laut ViVi = Hausgeld-Posten der umgelegten und nicht umgelegten Kosten, ohne Grundsteuer (' + J7.hgViviRein(sj) + ')');
+  ok(J7.hgViviRein({}) === null && J7.hgViviRein(null) === null, 'H ohne ViVi-Posten kein Wert');
+  const hV = J7.hausMitViviRein({ hg_ist_j: null }, 450, false);
+  ok(hV.hg_ist_j === 450 && hV.hg_quelle === 'vivi', 'H ViVi-Hausgeld zählt, wo kein eigener Wert steht');
+  const hE = J7.hausMitViviRein({ hg_ist_j: 4800 }, 450, false);
+  ok(hE.hg_ist_j === 4800 && hE.hg_quelle === 'eigen', 'H Abrechnung/eigene Angabe schlägt ViVi');
+  const hF = J7.hausMitViviRein({ hg_ist_j: null }, 450, true);
+  ok(hF.hg_ist_j === null && !hF.hg_quelle, 'H festgeschriebener Haus-Schritt bleibt unberührt');
+  ok(J7.hausStand({ hg_ist_j: 450, hg_quelle: 'vivi' }, false) === 'teil' && J7.hausStand({ protokoll: 'x', abrechnung: true, hg_ist_j: 1, hg_quelle: 'vivi' }, false) === 'ok', 'H ViVi-Hausgeld allein = teilweise, mit Protokoll und Abrechnung erledigt');
+  const z = { jahr: 2025, status: 'geplant' };
+  const alleOk = { miete: 'ok', wert: 'ok', haus: 'ok', steuer: 'ok', nFest: 0, fest: {}, _haus: {} };
+  ok(J7.fertigErgebnis(z, alleOk, true).art === 'frage', 'H alles erledigt: Rückfrage, nie direkt festschreiben');
+  const teil = Object.assign({}, alleOk, { haus: 'teil', steuer: 'offen', _haus: { protokoll: 'x' } });
+  const e2 = J7.fertigErgebnis(z, teil, true);
+  ok(e2.art === 'offen' && e2.schritt === 'haus' && /Abrechnung hochladen/.test(e2.text) && /Anlage V 2025/.test(e2.text) && !/[–—;]/.test(e2.text), 'H offen: erster offener Schritt Haus, Satz „Noch offen: …“ (' + e2.text + ')');
+  ok(J7.fertigErgebnis({ jahr: new Date().getFullYear() }, alleOk, true).art === 'laeuft', 'H laufendes Jahr wird nicht abgeschlossen');
+  ok(AS.SCHRITTE.map((x) => x[1]).join(',') === 'Miete,Wert,Haus & Belege,Steuer,Festschreiben', 'H Assistent: fünf Schritte');
+  ok(AS.startSchritt(teil, null, null) === 'haus' && AS.startSchritt(alleOk, null, null) === 'fest' && AS.startSchritt(teil, 'miete', 'steuer') === 'miete' && AS.startSchritt(teil, null, 'steuer') === 'steuer', 'H Startschritt: Wunsch, sonst gemerkter Schritt, sonst erster offener');
+  const as = lies('frontend/js/jahresabschluss.js'), ja = lies('frontend/js/jahresabgleich.js');
+  ok(as.split('festSetzen(J, null, true)').length === 2 && as.includes("if (a === 'fest-ja') { _z.frage = false; if (JB()) JB().festSetzen(J, null, true)"), 'H Jahr festschreiben nur über „Ja, festschreiben“ nach der Rückfrage');
+  ok(ja.includes("if (!k && global.DpJahresabschluss) { global.DpJahresabschluss.oeffnen(_gewaehlt, 'fest'); return; }"), 'H „Jahr festschreiben“ im Reiter führt in den Assistenten (Rückfrage)');
+  ok(ja.includes("fertig: null, eintragen: 'miete', wert: 'wert', haus: 'haus', 'vivi-abgleich': 'haus', steuer: 'steuer'"), 'H Schritt-Knöpfe eines vergangenen Jahres öffnen den Assistenten beim Schritt');
+  ok(as.includes('DpEingang.jahresInRahmen(bx, _z.jahr, { festesJahr: true })') && as.includes('eingabeHtml(_z.jahr)'), 'H Assistent nutzt Belege je Jahr und die Jahreseingabe, kein Nachbau');
+  const ohneKommentar = as.split(String.fromCharCode(10)).filter((l) => !/^\s*(\/\*|\*|\/\/)/.test(l)).join(' ');
+  ok(!/—| – /.test(ohneKommentar), 'H Assistent: Kundentext ohne Gedankenstrich (– allein steht nur für einen leeren Wert)');
+  const ue = lies('frontend/js/unterlagen-eingang.js');
+  ok(ue.includes('function _viviTeil(jahr, opt)') && ue.includes('data-bj-vivi') && ue.includes('In DealPilot gebucht'), 'H Belege je Jahr: bei ViVi Gegenüberstellung „Laut ViVi“ und „In DealPilot gebucht“');
+  ok(!lies('frontend/js/tax.js').includes('>Belege je Jahr</button>') && lies('frontend/index.html').includes('Belege &amp; Unterlagen') && lies('frontend/index.html').includes('DpEingang.start()'), 'H Reiter Steuer: ein Knopf „Belege & Unterlagen“, der zweite ist entfernt');
+  ok(/function start\(\) \{[\s\S]{0,260}reiter: 'jahre'/.test(ue), 'H Start-Reiter: mit Belegen „Belege je Jahr“, sonst „Einlesen“');
+}
+
 console.log(`jahresabgleich-pruefen (v3430): ${gruen} von ${gruen + rot} ok`);
 process.exit(rot ? 1 : 0);

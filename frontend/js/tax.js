@@ -2574,8 +2574,7 @@ function renderYearlyTaxForm() {
      390 px in vier Zeilen ohne Linie (185 px). Jetzt EINE Leiste mit Rahmen: Umschalter links, die Knoepfe
      gleich hoch daneben (am Handy darunter in einer Reihe). */
   var _knoepfe =
-      /* v3164 · Jahresansicht: jeder Posten mit den Belegen, aus denen er stammt (unterlagen-eingang.js) */
-      (window.DpEingang && window.DpEingang.jahresAnsicht ? '<button type="button" class="ytf-bar-btn" onclick="DpEingang.jahresAnsicht()" title="Jedes Jahr: welcher Wert aus welcher Rechnung kommt">Belege je Jahr</button>' : '') +
+      /* v4100 · Marcel 23.11.2026: „Belege je Jahr“ ist im Knopf „Belege & Unterlagen“ aufgegangen (ein Fenster, zwei Reiter) */
       '<button type="button" class="ytf-bar-btn" onclick="resetAllTaxOverrides()" title="Vorschläge wiederherstellen: alle manuellen Eingaben zurücksetzen">↺ Vorschläge</button>' +
       /* v3363 · Jahresbuch (Ist-Miete je Jahr, Status der Steuer) - dieselbe Eingabe wie im Reiter Miete */
       (window.DpJahresbuch && window.DpJahresbuch.verfuegbar() ? '<button type="button" class="ytf-bar-btn" onclick="DpJahresbuch.oeffnen()" title="Ist-Miete, Restschuld und Status der Steuer je Jahr">Jahre</button>' : '');
