@@ -100,7 +100,7 @@
     'Nebenkosten nicht umlagefähig':         'nk_n_umlf',
     'Erhaltungsrücklage (nicht absetzbar)':  null,
     'Hausverwaltung':                        'hausverwaltung',
-    'Erhaltungsaufwand / Reparatur':         'betr_sonst',
+    'Erhaltungsaufwand / Reparatur':         'erhaltungsaufwand',   /* v4270 · Marcel 23.11.2026: Reparatur ist Erhaltungsaufwand (eigene Zeile der Anlage V, zaehlt in den ersten 3 Jahren zur 15-%-Grenze), vorher betr_sonst */
     'Grundsteuer':                           'betr_sonst',
     'Versicherung':                          'betr_sonst',
     'Schuldzinsen':                          'schuldzinsen',
@@ -117,7 +117,7 @@
 
   var LABELS_WK = {
     nk_umlf: 'Umlagefähige Nebenkosten', nk_n_umlf: 'Nicht umlagefähige Nebenkosten',
-    hausverwaltung: 'Hausverwaltung', betr_sonst: 'Sonstige Bewirtschaftung',
+    hausverwaltung: 'Hausverwaltung', betr_sonst: 'Sonstige Bewirtschaftung', erhaltungsaufwand: 'Erhaltungsaufwand',
     schuldzinsen: 'Schuldzinsen', kontofuehrung: 'Kontoführung',
     steuerber: 'Steuerberatung', fahrtkosten: 'Fahrtkosten',
     inserat: 'Inserate / Vermietung', porto: 'Porto & Telefon',
