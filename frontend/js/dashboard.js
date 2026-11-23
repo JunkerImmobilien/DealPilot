@@ -4214,6 +4214,16 @@
     portfolioPayload: portfolioPayload,
     /* v4140 · gleiche Reihenfolge wie portfolioPayload().objekte, nur lesen (grafiken-neu.js) */
     grafikDaten: function () { return detailArr(true).slice(0, PP_MAX_OBJEKTE); },
+    /* v4180 · Portfolio auf einen Blick (grafiken-portfolio.js): dieselben Summen wie Kennzahlen p. a. und Gesamtbewertung,
+       nur gelesen, nichts neu gerechnet. aggStats(true) und detailArr(true) = alle Objekte wie grafikDaten. */
+    blickDaten: function () {
+      if (!_detailsLoaded) return null;
+      var arr = detailArr(true); if (!arr.length) return null;
+      var S = aggStats(true), A = {}; try { A = _zielbildAgg(arr) || {}; } catch (e) { A = {}; }
+      var W = _wertHeuteJeObjekt(arr), BW = _bewertungJeObjekt(arr, A), BS = _bewSummen(BW);
+      var zw = 0, zws = 0; arr.forEach(function (o) { var z = _pct(o.d1z), r = _restschuldOf(o) || 1; if (z > 0) { zw += r; zws += z * r; } });
+      return { S: S, W: W, BW: BW, BS: BS, n: arr.length, avgZins: zw > 0 ? zws / zw : null, mbLaedt: W.some(function (x) { return x.quelle === 'laedt'; }) };
+    },
     /* v2170: die Detailkopien werden sonst nur beim LOESCHEN erneuert - eine
        Pilot-Analyse aus derselben Sitzung kam beim Portfolio-Piloten nie an
        (gemessen: Stand 09.10. statt 13.10.). Vor jeder Pilot-Anfrage frisch. */
