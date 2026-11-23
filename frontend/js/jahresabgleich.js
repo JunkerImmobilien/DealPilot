@@ -48,7 +48,7 @@
 (function (global) {
   'use strict';
   if (global.DpJahresabgleich) return;
-  var VERSION = 'v4042a';
+  var VERSION = 'v4042b';
   var GOLD = 'var(--wl-c9a84c, #C9A84C)';
   var SCHRITTE = [['miete', 'Miete'], ['steuer', 'Steuer'], ['wert', 'Wert'], ['haus', 'Haus']];
   var WORT = { ok: 'erledigt', teil: 'teilweise', offen: 'offen', laufend: 'läuft' };
@@ -337,6 +337,7 @@
       '.dp-pa-wrap .dp-ja-erg button.dp-ja-fest{margin-left:auto}',
       '.dp-pa-wrap .dp-ja-schritt button.dp-ja-fest{margin-top:2px}',
       '.dp-ja-vivi{border:1px solid ' + LI + ';border-radius:10px;padding:10px 16px;margin-top:12px;background:#fff;display:flex;flex-direction:column;gap:4px}',
+      '.dp-ja-vivi.dp-ja-vivi-kurz{flex-direction:row;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:6px 12px;padding:6px 6px 6px 16px}',   /* v4042b · eine Zeile */
       '.dp-ja-vz{display:grid;grid-template-columns:150px auto minmax(0,1fr);gap:4px 14px;align-items:baseline;font-size:12.5px;color:' + M + '}',
       '.dp-ja-vz b{font:600 14px "Space Grotesk",Inter,sans-serif;color:' + T + ';font-variant-numeric:tabular-nums;white-space:nowrap}',
       '.dp-ja-ok{background:#3FA56C}.dp-ja-teil{background:#C99A2E}.dp-ja-offen{background:#B8625C}.dp-ja-laufend{background:#D9D1BF}',
