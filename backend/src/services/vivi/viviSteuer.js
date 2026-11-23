@@ -126,7 +126,8 @@ function ausJahr(uebersicht, details) {
     if (def.art === 'belege' && d && typeof d === 'object' && Array.isArray(d.items)) {
       w.posten = d.items.map(function (it) {
         const b = zahl(it && it.amount);
-        return b == null ? null : { datum: isoDatum(it.date), betrag: rund(Math.abs(b)), text: String((it && (it.label || it.group)) || '').slice(0, 160) };
+        /* v4040 · aufgeteilte Kontoumsaetze tragen die Beschreibung in group (label ist nur „Zahlung vom …“) */
+        return b == null ? null : { datum: isoDatum(it.date), betrag: rund(Math.abs(b)), text: String((it && (it.group || it.label)) || '').slice(0, 160) };
       }).filter(Boolean);
       w.posten_gekuerzt = +d.items_truncated || 0;
     }
@@ -155,6 +156,41 @@ function lesePfade(projektId, jahr, zeilen) {
 /** Feld-ID in vivi_werte (jahr > 0): steuer.<jahr>.<spalte> */
 function feldId(jahr, spalte) { return 'steuer.' + jahr + '.' + spalte; }
 
+/* v4040 · Marcel 23.11.2026: „Bewirtschaftung ist heute, Hausgeld und allem, das wäre geil, wenn wir das übernehmen können …
+   in jedem Tab, wenn wir im Ist-Zustand sind, die aktuellen Werte anzeigen“. Aus den Belegen EINES Steuerjahres (posten der
+   Zeilen 73 bis 75 und 76 bis 78) die Jahreswerte Hausgeld umlagefaehig, Hausgeld nicht umlagefaehig und Grundsteuer.
+   Nur was als Hausgeld oder Grundsteuer erkennbar ist (Text des Postens, ViVi teilt Hausgeld in „(Vorauszahlung)“ und
+   „(nicht umlagefähig)“). Kaufjahr mit weniger als 12 Monaten: auf 12 Monate hochgerechnet. Ohne Treffer kein Feld. */
+const RE_HAUSGELD = /hausgeld|\(vorauszahlung\)|\(nicht umlagef/i;
+const RE_GRUNDSTEUER = /grundsteuer/i;
+function bewirtschaftungAus(felder, jahr, monate) {
+  const out = {};
+  const w = function (sp) { return felder ? felder[feldId(jahr, sp)] : null; };
+  const summe = function (z, re) {
+    if (!z || !Array.isArray(z.posten)) return null;
+    let s = 0, n = 0;
+    z.posten.forEach(function (p) { if (p && re.test(String(p.text || '')) && typeof p.betrag === 'number') { s += p.betrag; n++; } });
+    return n ? s : null;
+  };
+  const f = monate > 0 && monate < 12 ? 12 / monate : 1;
+  const q = 'tax-overview ' + jahr + (f !== 1 ? ' (auf 12 Monate)' : '');
+  const ul = summe(w('nk_umlf'), RE_HAUSGELD), gs = summe(w('nk_umlf'), RE_GRUNDSTEUER), nul = summe(w('nk_n_umlf'), RE_HAUSGELD);
+  if (ul != null && ul > 0) out.hg_ul = { wert: Math.round(ul * f), quelle: q };
+  if (nul != null && nul > 0) out.hg_nul = { wert: Math.round(nul * f), quelle: q };
+  if (gs != null && gs > 0) out.grundsteuer = { wert: Math.round(gs * f), quelle: q };
+  return out;
+}
+/** Welches Steuerjahr traegt die Bewirtschaftung von heute: das letzte volle Jahr nach dem Kaufjahr, sonst das Kaufjahr. */
+function bewirtschaftungsJahr(kaufdatum, jetzt, gelesen) {
+  const heute = new Date(jetzt == null ? Date.now() : jetzt).getFullYear();
+  const m = /^(\d{4})-(\d{2})/.exec(String(kaufdatum || ''));
+  const kj = m ? +m[1] : null;
+  const J = (gelesen || []).map(Number).filter(function (j) { return j < heute; }).sort(function (a, b) { return b - a; });
+  for (const j of J) { if (kj == null || j > kj) return { jahr: j, monate: 12 }; }
+  if (kj != null && J.indexOf(kj) >= 0) return { jahr: kj, monate: 13 - +m[2] };
+  return null;
+}
+
 /* Alt (v3951, Entwurf): Textform der Steueruebersicht, Zeile -> Spalte. Bleibt als Rueckfall, falls ViVi doch Text liefert. */
 const ZEILE_ZU_SPALTE = Object.freeze({ 15: 'einnahmen_km', 20: 'einnahmen_nk', 48: 'schuldzinsen', 55: 'erhaltungsaufwand', 75: 'nk_umlf', 78: 'nk_n_umlf' });
 function ausSteueruebersicht(text) {
@@ -175,4 +211,4 @@ function ausSteueruebersicht(text) {
 }
 
 module.exports = { ZEILEN, KATEGORIEN, MODI, STANDARD_MODUS, MAX_JAHRE, ZEILE_ZU_SPALTE, einstellungNormal, jahre, kaufdatumAus, ausJahr, zeilenMitPosten,
-  lesePfade, feldId, isoDatum, ausSteueruebersicht };
+  lesePfade, feldId, isoDatum, ausSteueruebersicht, bewirtschaftungAus, bewirtschaftungsJahr };

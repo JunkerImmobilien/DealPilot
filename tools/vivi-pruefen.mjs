@@ -1202,6 +1202,37 @@ kopf('U  v4037 Ist je Jahr aus dem Mietverlauf, geplante Erhöhungen');
   ok(g.length === 1 && g[0].datum === '2027-03-01' && g[0].auf === 650 && g[0].geplant === true, 'U5 geplante Erhöhung 01.03.2027 auf 650 € als eigene Liste');
   ok(mapping.erhoehungenAus(h1, '2026-11-23').length === 2, 'U6 die geplante zählt nicht als wirksame Erhöhung');
 }
+/* ═══ V · v4040 Reiter ViVi: Bewirtschaftung aus dem Steuerjahr, Reiter nur verknüpft ═══ */
+kopf('V  v4040 Reiter ViVi, Bewirtschaftung Ist heute aus dem Steuerjahr');
+{
+  const S = steuerEntwurf;
+  const roh = { income: [], expenses: [
+    { zeile: '73-75', label: 'Umgelegte Betriebskosten', amount: 2252 }, { zeile: '76-78', label: 'Nicht umgelegte Kosten', amount: 1200 }] };
+  const det = { '73-75': { items: [{ group: 'Testbeleg Hausgeld 2025 (umlagefähig 2.040, nicht umlagefähig 1.200) (Vorauszahlung)', label: 'Zahlung vom 15.12.2025', amount: 2040 },
+      { label: 'Grundsteuer (Testbeleg Grundsteuer 2025)', date: '15.07.2025', amount: 212 }] },
+    '76-78': { items: [{ group: 'WEG Abrechnung (nicht umlagefähig)', label: 'Zahlung vom 15.12.2025', amount: 1200 }] } };
+  const w = S.ausJahr(roh, det);
+  ok(w.nk_umlf && w.nk_umlf.posten[0].text.indexOf('Hausgeld') >= 0, 'V1 aufgeteilter Kontoumsatz: der Posten trägt die Beschreibung (group), nicht nur „Zahlung vom …“');
+  const fe = {}; Object.keys(w).forEach((sp) => { fe[S.feldId(2025, sp)] = w[sp]; });
+  const bw = S.bewirtschaftungAus(fe, 2025, 12);
+  ok(bw.hg_ul && bw.hg_ul.wert === 2040 && bw.grundsteuer && bw.grundsteuer.wert === 212 && bw.hg_nul && bw.hg_nul.wert === 1200,
+    'V2 Hausgeld umlagefähig 2.040, Grundsteuer 212, Hausgeld nicht umlagefähig 1.200 aus den Posten (' + JSON.stringify(bw) + ')');
+  const ohne = S.bewirtschaftungAus({ [S.feldId(2025, 'nk_umlf')]: { summe: 99, posten: [{ text: 'Wartung Heizung', betrag: 99 }] } }, 2025, 12);
+  ok(!Object.keys(ohne).length, 'V3 Gegenprobe: ein Posten ohne Hausgeld oder Grundsteuer wird kein Feld');
+  const halb = S.bewirtschaftungAus(fe, 2025, 6);
+  ok(halb.hg_ul.wert === 4080, 'V4 Kaufjahr mit 6 Monaten: auf 12 Monate hochgerechnet');
+  const j1 = S.bewirtschaftungsJahr('2024-03-01', Date.parse('2026-11-23'), [2024, 2025, 2026]);
+  const j2 = S.bewirtschaftungsJahr('2025-08-01', Date.parse('2026-11-23'), [2025, 2026]);
+  ok(j1 && j1.jahr === 2025 && j1.monate === 12 && j2 && j2.jahr === 2025 && j2.monate === 5, 'V5 Jahr der Bewirtschaftung: letztes volles Jahr nach dem Kauf, sonst Kaufjahr anteilig');
+  const quelle = (f) => fs.readFileSync(P(f), 'utf8');
+  const pa = quelle('frontend/js/pilot-analyse-v4.js'), vr = quelle('frontend/js/vivi-reiter.js');
+  ok(/bestand && window\.DpViviReiter && window\.DpViviReiter\.sichtbar\(\)/.test(pa) && /add\('vivi', 'ViVi'/.test(pa), 'V6 Pilot-Analyse: Reiter ViVi nur im Bestand und nur, wenn sichtbar()');
+  ok(/function sichtbar\(\) \{[^}]*verknuepft[^}]*!einsteiger\(\)/.test(vr), 'V7 sichtbar(): nur verknüpft und nicht Einsteiger');
+  ok(/S\.uebernehmen\(j, zeilen, false\)/.test(vr) && /JB\.festSetzen\(j, \['miete', 'steuer'\], true\)/.test(vr) && !/dpSteuerSetzen|dpWkUebernehmen/.test(vr),
+    'V8 Reiter schreibt nur über die vorhandenen Kerne (DpViviSteuer.uebernehmen, DpJahresbuch.festSetzen), keine eigene Steuerschreibung');
+  const dn = quelle('backend/src/services/vivi/viviDienst.js');
+  ok(/steuer\.bewirtschaftungAus\(st\._felder/.test(dn) && /delete st\._felder/.test(dn), 'V9 abrufen: Bewirtschaftung aus dem gelesenen Steuerjahr, _felder geht nicht an den Browser');
+}
 dienst._setzeDeps(null);
 console.log('\n' + (rot ? 'ROT · ' + rot + ' Befund(e), ' + gruen + ' grün' : 'SAUBER · ' + gruen + ' Prüfpunkte grün'));
 process.exit(rot ? 1 : 0);

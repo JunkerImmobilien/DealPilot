@@ -410,6 +410,14 @@ async function abrufen(userId, objectId, opt) {
     /* v4020 · Paket V4: Steuerjahre vom Kaufjahr bis heute (nur GET). Einstellung „aus“ fragt ViVi nicht. Ein Fehler hier
        kostet nur die Steuerjahre dieses Abrufs: die Objektwerte sind schon geschrieben, die alten Steuerwerte bleiben. */
     const st = await steuerLesen(userId, objectId, o.data, projekt, cl, q, v.vivi_objekt_id);
+    /* v4040 · Bewirtschaftung Ist heute aus dem letzten vollen Steuerjahr (Hausgeld, Grundsteuer). Werden mit den anderen
+       Feldern gesperrt (vivi-felder.js). Faellt der Steuerabruf aus, fehlen sie bis zum naechsten Abgleich. */
+    if (st && st._felder) {
+      const bj = steuer.bewirtschaftungsJahr(steuer.kaufdatumAus(o.data, projekt), deps().jetzt(), st.jahre);
+      const bw = bj ? steuer.bewirtschaftungAus(st._felder, bj.jahr, bj.monate) : {};
+      if (Object.keys(bw).length) { await sp.werteErgaenzen(objectId, bw); Object.assign(erg.felder, bw); }
+    }
+    if (st) delete st._felder;
     await sp.protokoll({ user_id: userId, object_id: objectId, art: opt.takt ? 'takt' : 'abruf', anfragen: cl.zaehler.anfragen - vorher, bremse_429: !!st.bremse, ok: true, fehler: st.fehler || null, dauer_ms: deps().jetzt() - t0 });
     /* im Takt beendet die Bremse die Runde wie immer (taktLauf bricht bei bremse_429 ab) */
     if (st.bremse && opt.takt) throw fehler(429, 'bremse_429', 'ViVi bremst gerade. Die Steuerjahre folgen beim nächsten Abgleich.');
@@ -460,7 +468,7 @@ async function steuerLesen(userId, objectId, daten, projekt, cl, q, projektId) {
     return { modus: e.modus, jahre: gelesen, fehler: 'Steuerjahre: ' + ((x && x.message) || 'Fehler'), bremse: bremse };
   }
   await deps().speicher.steuerSchreiben(objectId, gelesen, felder);
-  return { modus: e.modus, jahre: gelesen, anzahl: Object.keys(felder).length };
+  return { modus: e.modus, jahre: gelesen, anzahl: Object.keys(felder).length, _felder: felder };   /* v4040 · _felder nur intern (abrufen) */
 }
 
 /** Was der Browser braucht: Status und die zuletzt gelesenen Werte. Schickt nichts an ViVi. */

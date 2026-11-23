@@ -79,6 +79,16 @@ async function werteSchreiben(objectId, felder, info) {
   await q('UPDATE vivi_verknuepfung SET letzter_abruf = now(), letzter_fehler = NULL WHERE object_id = $1', [objectId]);
 }
 
+/* v4040 · einzelne Felder (jahr = 0) ergaenzen, ohne den Stand zu ersetzen (Bewirtschaftung aus dem Steuerjahr) */
+async function werteErgaenzen(objectId, felder) {
+  for (const feld of Object.keys(felder || {})) {
+    const w = felder[feld];
+    await q(`INSERT INTO vivi_werte (object_id, feld, jahr, wert, vivi_quelle, gelesen_am) VALUES ($1, $2, 0, $3::jsonb, $4, now())
+             ON CONFLICT (object_id, feld, jahr) DO UPDATE SET wert = EXCLUDED.wert, vivi_quelle = EXCLUDED.vivi_quelle, gelesen_am = now()`,
+      [objectId, feld, JSON.stringify(w.wert), w.quelle || null]);
+  }
+}
+
 /* v4020 · Paket V4: Steuerjahre (jahr > 0). Ersetzt nur die gelesenen Jahre, aeltere Jahre bleiben stehen. */
 async function steuerSchreiben(objectId, jahre, felder) {
   const J = (jahre || []).map(Number).filter(function (j) { return j > 0; });
@@ -140,5 +150,5 @@ async function protokoll(eintrag) {
 
 module.exports = {
   objektHolen, verknuepfung, beanspruchen, idsSpeichern, statusSetzen, zuordnen, loesen,
-  werteSchreiben, steuerSchreiben, einstellungLesen, einstellungSchreiben, abrufFehler, werteLesen, verknuepfteObjekte, faelligeAbrufe, protokoll, ABGEBROCHEN_NACH_MIN
+  werteSchreiben, werteErgaenzen, steuerSchreiben, einstellungLesen, einstellungSchreiben, abrufFehler, werteLesen, verknuepfteObjekte, faelligeAbrufe, protokoll, ABGEBROCHEN_NACH_MIN
 };
