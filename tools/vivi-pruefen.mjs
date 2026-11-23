@@ -542,7 +542,10 @@ for (const oid of OIDS) {
   mapping.ausVivi(paket, { vivi_ids: v.vivi_ids, mitEinheiten: !!d._mfh, objart: d.objart, jetzt: SP.zeit.jetzt });
   /* Rundweg: was hingeschickt wurde, kommt gleich zurueck */
   const F = r.felder, z = mapping.zahl;
-  const pruefe = (feld, soll) => { rundAlle++; const ist = F[feld] && F[feld].wert; const g = (typeof soll === 'number') ? Math.abs(z(ist) - soll) < 0.01 : String(ist) === String(soll); if (g) rundOk++; else rundFehler.push(objekte[oid].nr + ' ' + feld + ': ' + JSON.stringify(ist) + ' statt ' + JSON.stringify(soll)); };
+  const pruefe = (feld, soll) => {
+    /* v4050 · Stammdaten setzt der Abgleich nie: nicht in den Feldern, und weil gleich, auch kein Hinweis */
+    if (mapping.istStamm(feld)) { rundAlle++; const an = (r.info.stamm_aenderungen || []).find((x) => x.feld === feld); if (!F[feld] && !an) rundOk++; else rundFehler.push(objekte[oid].nr + ' ' + feld + ': Stammdatum im Abgleich ' + (F[feld] ? 'gesetzt' : 'als Abweichung gemeldet')); return; }
+    rundAlle++; const ist = F[feld] && F[feld].wert; const g = (typeof soll === 'number') ? Math.abs(z(ist) - soll) < 0.01 : String(ist) === String(soll); if (g) rundOk++; else rundFehler.push(objekte[oid].nr + ' ' + feld + ': ' + JSON.stringify(ist) + ' statt ' + JSON.stringify(soll)); };
   pruefe('kp', z(d.kp)); pruefe('str', d.str); pruefe('plz', d.plz); pruefe('wirtschaftlicher_uebergang', d.wirtschaftlicher_uebergang);
   if (z(d.makler_p) > 0) pruefe('makler_p', Math.round(z(d.makler_p) * 100) / 100);
   pruefe('d1', z(d.d1)); pruefe('d1z', z(d.d1z)); if (d.d1_type !== 'tilgungsaussetzung') pruefe('d1t', z(d.d1t)); pruefe('bank_inst', d.bank_inst);
@@ -589,7 +592,7 @@ ok(gelesen.length > 50 && !unbekannt.length, 'ausVivi liest nur Felder aus den R
   ok(r.ok && A.st.posts === posts && A.st.anfragen.slice(vorher).every((a) => a.startsWith('GET ')), 'Zuordnen eines vorhandenen ViVi-Objekts: nur GET, kein POST');
   viviClient._fensterLeeren();   /* v3966 · der Abruf liest jetzt auch den Mietverlauf je Mietverhaeltnis */
   const w = await dienst.abrufen(USER, neuOid);
-  ok(w.felder.kp && w.felder.wfl, 'zugeordnetes Objekt wird gelesen (Einheiten in ViVi-Reihenfolge)');
+  ok(Object.keys(w.felder).length > 0 && !w.felder.kp && !w.felder.wfl && Array.isArray(w.info.stamm_aenderungen), 'zugeordnetes Objekt wird gelesen (Einheiten in ViVi-Reihenfolge), Stammdaten nur als Vergleich (v4050)');
   const l = await dienst.loesen(USER, neuOid);
   ok(l.ok && !SP.v[neuOid] && Object.keys(A.st.projekte).length === OIDS.length && A.st.posts === posts, 'Lösen entfernt nur die DealPilot-Seite, ViVi bleibt unverändert');
 }
@@ -761,7 +764,7 @@ kopf('K  Testbetrieb: Musteranschrift und Platzhalter, solange vivi Vorschau-Fun
   const ohneAdr = mapping.nachVivi(Object.assign({}, echt, { str: '', hnr: '', plz: '', ort: '' }), { musterAnschrift: true });
   ok(ohneAdr.ok && ohneAdr.projekt.house_number === '1', 'mit Musteranschrift fehlt keine Anschrift (Hausnummer ohne Nummer: 1)');
   const pk = { projekt: { id: 'p1', street: 'Musterstraße', house_number: '1041', postal_code: '12345', city: 'Musterstadt', purchase_price: 545000, purchase_date: '2025-01-01' } };
-  const a1 = mapping.ausVivi(pk, { musterAnschrift: true }).felder, a2 = mapping.ausVivi(pk, {}).felder;
+  const a1 = mapping.ausVivi(pk, { musterAnschrift: true, stammdaten: true }).felder, a2 = mapping.ausVivi(pk, { stammdaten: true }).felder;   /* v4050: beim Anlegen aus ViVi */
   ok(!a1.str && !a1.hnr && !a1.plz && !a1.ort && a1.kp && a2.str && a2.plz, 'ausVivi liest die Anschrift bei Musteranschrift nicht zurück (Kaufpreis schon), ohne Musteranschrift wie bisher');
 
   /* Dienst Ende zu Ende gegen die Attrappe, Testbetrieb an */
@@ -785,7 +788,7 @@ kopf('K  Testbetrieb: Musteranschrift und Platzhalter, solange vivi Vorschau-Fun
   ok(rentals.length && rentals.every((r) => r.tenant_first_name === 'Mieter'), 'Mieter als Platzhalter (' + rentals.length + ' Mietverhältnisse)');
   ok(S4.v[oid].vivi_ids.muster_anschrift === true, 'Verknüpfung merkt sich die Musteranschrift');
   const ab = await dienst.abrufen(USER, oid);
-  ok(!ab.felder.str && !ab.felder.plz && ab.felder.kp, 'Zurücklesen: keine Anschrift aus ViVi, die echte bleibt im DealPilot-Objekt');
+  ok(!ab.felder.str && !ab.felder.plz && !ab.felder.kp && !(ab.info.stamm_aenderungen || []).some((x) => /^(str|hnr|plz|ort)$/.test(x.feld)), 'Zurücklesen: keine Anschrift aus ViVi, die echte bleibt im DealPilot-Objekt, Kaufpreis als Stammdatum nicht gesetzt (v4050)');
   const w = await dienst.werte(USER, oid);
   ok(w.muster_anschrift === true, 'werte() meldet die Musteranschrift an den Browser');
   /* Zuordnen im Testbetrieb */
@@ -953,9 +956,9 @@ function zeileDetails(nr, jahr, zeile) {
   ok(L.r.bremse === true && L.geschrieben.length === 1 && JSON.stringify(L.geschrieben[0][0]) === '[2025]' && /Steuerjahre/.test(L.r.fehler), 'Bremse mitten im Abruf: gelesene Jahre bleiben (2025), das Jahr danach behält den alten Stand, kein Abbruch');
   /* werte() liefert die Steuerjahre aus */
   dienst._setzeDeps({ speicher: { verknuepfung: async () => ({ anlage_status: 'fertig', vivi_ids: {} }), einstellungLesen: async () => ({ modus: 'automatisch', kategorien: { zinsen: false } }),
-    werteLesen: async () => [{ feld: 'kp', jahr: 0, wert: 1, vivi_quelle: 'projects', gelesen_am: '2026-11-23T09:00:00Z' }, { feld: 'steuer.2026.erhaltungsaufwand', jahr: 2026, wert: w.erhaltungsaufwand, vivi_quelle: 'tax-overview', gelesen_am: '2026-11-23T10:00:00Z' }] }, testbetrieb: async () => false });
+    werteLesen: async () => [{ feld: 'kp', jahr: 0, wert: 1, vivi_quelle: 'projects', gelesen_am: '2026-11-23T09:00:00Z' }, { feld: 'nkm', jahr: 0, wert: 500, vivi_quelle: 'rental-units', gelesen_am: '2026-11-23T09:00:00Z' }, { feld: 'steuer.2026.erhaltungsaufwand', jahr: 2026, wert: w.erhaltungsaufwand, vivi_quelle: 'tax-overview', gelesen_am: '2026-11-23T10:00:00Z' }] }, testbetrieb: async () => false });
   const wt = await dienst.werte(USER, 'o1');
-  ok(wt.steuer[2026].erhaltungsaufwand.summe === 1850 && !wt.felder['steuer.2026.erhaltungsaufwand'] && wt.felder.kp && wt.steuer_einstellung.modus === 'automatisch' && wt.steuer_einstellung.kategorien.zinsen === false && /2026-11-23T10/.test(wt.steuer_stand),
+  ok(wt.steuer[2026].erhaltungsaufwand.summe === 1850 && !wt.felder['steuer.2026.erhaltungsaufwand'] && wt.felder.nkm && !wt.felder.kp && wt.steuer_einstellung.modus === 'automatisch' && wt.steuer_einstellung.kategorien.zinsen === false && /2026-11-23T10/.test(wt.steuer_stand),
     'werte(): Steuerjahre unter steuer[jahr][spalte], nicht unter felder (nichts wird ausgegraut), mit Einstellung und Stand');
   let fe = null; try { await dienst.steuerEinstellungSpeichern(USER, { modus: 'immer' }); } catch (e) { fe = e; }
   ok(fe && fe.status === 400, 'unbekannte Einstellung wird abgewiesen (400)');
@@ -981,7 +984,7 @@ kopf('R  Echte ViVi-Antworten (Testkonto, 22.11.2026, tools/vivi-antworten/)');
       darlehen: a.darlehen.map((f) => beobachtet(f, SPEC.components.schemas.FinancingResource, 'FinancingResource', gelesenEcht)),
       tilgungsplan: { data: a.tilgungsplan_anfang }
     };
-    const F = mapping.ausVivi(paket, { vivi_ids: o.vivi_ids, mitEinheiten: mitE, objart: o.objart, jetzt, musterAnschrift: true }).felder;
+    const F = mapping.ausVivi(paket, { vivi_ids: o.vivi_ids, mitEinheiten: mitE, objart: o.objart, jetzt, musterAnschrift: true, stammdaten: true }).felder;   /* v4050: Abbildung wie beim Anlegen aus ViVi */
     const z = mapping.zahl;
     const soll = (feld, w) => { if (w == null || w === '') return; werte++; const ist = F[feld] && F[feld].wert; const g = typeof w === 'number' ? Math.abs(z(ist) - w) < 0.01 : String(ist) === String(w); if (!g) befunde.push(nr + ' ' + feld + ': ' + JSON.stringify(ist) + ' statt ' + JSON.stringify(w)); };
     const g = o.gesendet;
@@ -1422,6 +1425,42 @@ kopf('V  v4040 Reiter ViVi, Bewirtschaftung Ist heute aus dem Steuerjahr');
     && /router\.get\('\/importierbar', bremse/.test(rt) && /router\.post\('\/importieren', bremse/.test(rt) && !/[–;](?=[^']*'\s*\+?)/.test((vi.match(/'[^'\n]*(?:übernehm|Bewertung|Ankauf)[^'\n]*'/g) || []).join('')),
     'I15 Browser: erst Ankauf zum Kaufdatum festschreiben (nach den Steuergrundlagen), dann die Werte von heute, Routen hinter Bremse, Kundentext ohne Gedankenstrich und Semikolon');
   dienst._setzeDeps(null);
+}
+/* ═══ G1–G6 · v4050 · Grundregel ViVi (Marcel 23.11.2026): beim Anlegen so voll wie möglich, danach Stammdaten in beiden
+   Richtungen nie mehr überschreiben, der Abgleich zieht nur Zahlen, Änderungen in ViVi nur als Hinweis ═══════════════ */
+{
+  kopf('G · Grundregel ViVi: Stammdaten nur beim Anlegen (v4050)');
+  const P0 = { id: 'p', type: 'multi_family_house', street: 'Probeweg', house_number: '5', postal_code: '12345', city: 'Teststadt', construction_year: 1965, purchase_date: '2023-05-01', purchase_price: 400000, broker: 14280,
+    units: [{ id: 'u1', identifier: 'WE 1 · EG', unit_type: 'residential', square_meters: 62, floor: 'EG' }, { id: 'u2', identifier: 'WE 2 · OG', unit_type: 'residential', square_meters: 70, floor: 'OG' }] };
+  const M0 = [{ id: 'r1', unit_id: 'u1', rent: 600, monthly_utility_costs: 150, rental_start: '2015-01-01', occupancy_type: 'rented' }];
+  const ids0 = { einheiten: { e0: { index: 0, unit_id: 'u1' }, e1: { index: 1, unit_id: 'u2' } } };
+  const ab = mapping.ausVivi({ projekt: P0, einheiten: P0.units, mietverhaeltnisse: M0 }, { vivi_ids: ids0, mitEinheiten: true, objart: 'MFH', jetzt: Date.parse('2026-11-23T10:00:00Z') });
+  const an = mapping.ausVivi({ projekt: P0, einheiten: P0.units, mietverhaeltnisse: M0 }, { vivi_ids: ids0, mitEinheiten: true, objart: 'MFH', jetzt: Date.parse('2026-11-23T10:00:00Z'), stammdaten: true });
+  const stammIn = (F) => Object.keys(F).filter((k) => mapping.istStamm(k));
+  ok(stammIn(ab.felder).length === 0 && ab.felder['einheit.0.ist'] && ab.felder['einheit.0.nk_vorauszahlung'] && ab.info.stamm.str === 'Probeweg' && ab.info.stamm['einheit.0.wfl'] === 62 && ab.info.stamm_einheiten === 2
+    && stammIn(an.felder).length >= 6 && an.felder.kp && an.felder['einheit.0.wfl'],
+    'G1 Abgleich: keine Stammdaten in den Feldern (Anschrift, Baujahr, Kaufdaten, Flächen), nur Zahlen (Miete, NK), Stammdaten nur zum Vergleich, beim Anlegen aus ViVi alle');
+  const dDP = { str: 'probeweg', hnr: '5', plz: '12345', ort: 'Teststadt', baujahr: '1965', kp: '400000', makler_p: '3.57', wirtschaftlicher_uebergang: '2023-05-01',
+    _mfh: { einheiten: [{ nr: '1', wfl: '60' }, { nr: '2', wfl: '70' }, { nr: '3', wfl: '40' }] } };
+  const A = mapping.stammAenderungen(ab.info.stamm, dDP, ab.info.stamm_einheiten);
+  ok(A.length === 2 && A[0].feld === 'einheit.0.wfl' && A[0].dealpilot === '60' && A[0].vivi === 62 && A[0].uebernehmbar && /Fläche WE 1/.test(A[0].wort)
+    && A[1].feld === '_einheiten' && A[1].vivi === 2 && A[1].dealpilot === 3 && !A[1].uebernehmbar,
+    'G2 Hinweis „In ViVi geändert“: Fläche WE 1 60 → 62 m² übernehmbar, Zahl der Einheiten nur als Hinweis, gleiche Anschrift (Groß/klein) und gleiche Zahlen ohne Hinweis');
+  const vd = lies('backend/src/services/vivi/viviDienst.js');
+  const ohneFilter = vd.replace("else if (mapping.istStamm(z.feld)) return;", '');
+  ok(/mapping\.stammAenderungen\(erg\.info\.stamm, o\.data/.test(vd) && /else if \(mapping\.istStamm\(z\.feld\)\) return;/.test(vd) && ohneFilter !== vd,
+    'G3 abrufen() meldet Abweichungen statt zu setzen, werte() gibt Stammdaten älterer Abrufe nicht mehr als gebundene Felder aus (Gegenprobe: ohne Filter rot)');
+  const ve = lies('frontend/js/vivi-felder.js'), vr = lies('frontend/js/vivi-reiter.js');
+  ok(!/var EINHEIT_FELDER = \['wfl'/.test(ve) && /EINHEIT_FELDER = \['ist'/.test(ve) && /function stammHtml\(st\)/.test(vr) && /data-vr="stamm"/.test(vr) && /In ViVi geändert/.test(vr) && /stammHtml\(st\)\s*\r?\n?\s*\+ '<div class="vr-jahre"/.test(vr),
+    'G4 Fläche der Wohnung nicht mehr ausgegraut, Reiter ViVi zeigt die Änderungen oben mit „übernehmen“ (nur auf Klick)');
+  const voll = mapping.nachVivi({ objart: 'MFH', str: 'Probeweg', hnr: '5', plz: '12345', ort: 'Teststadt', kp: '400000', wirtschaftlicher_uebergang: '2023-05-01', d1: '300000', d1z: '4', d1t: '2', d1_bindj: '10', d1_auszahl: '05.2023', d1_kurs: '98', d1_tf_mon: '6', d1_st_pct: '5',
+    _mfh: { einheiten: [{ nr: '1', wfl: '60', ist: '540', status: 'vermietet', mv_beginn: '2020-01-01', nk_vorauszahlung: '150', ziel_qm: '10,5' }] } }, { musterAnschrift: false });
+  const m1 = voll.einheiten[0].miete, f1 = voll.darlehen[0].body;
+  ok(voll.projekt.name === 'Teststadt - Probeweg 5 - Mehrfamilienhaus' && m1.target_rent === 630 && f1.disagio_amount === 6000 && f1.repayment_free_months === 6 && f1.special_repayment_allowed === true && f1.special_repayment_max_percent === 5
+    && !pruefeSchema(voll.projekt, rumpfSchema('POST', '/projects'), 'p').length && !pruefeSchema(f1, rumpfSchema('POST', '/projects/{project}/financings'), 'f').length,
+    'G5 Anlegen so voll wie möglich: Anzeigename Ort, Straße, Art, Zielmiete 10,50 × 60 = 630 €, Disagio aus Kurs 98 % (6.000 €), 6 tilgungsfreie Monate, Sondertilgung 5 %, passt zum Schema');
+  const leer = mapping.nachVivi({ objart: 'ETW', str: 'Probeweg', hnr: '5', plz: '12345', ort: 'Teststadt', kp: '100000', wirtschaftlicher_uebergang: '2023-05-01', nkm: '500', wfl: '50', d1: '80000', d1z: '4', d1t: '2' }, { musterAnschrift: true });
+  ok(!leer.projekt.name && !('target_rent' in leer.einheiten[0].miete) && !('disagio_amount' in leer.darlehen[0].body), 'G6 Gegenprobe: Musteranschrift ohne Anzeigename, ohne Zielbild keine Zielmiete, ohne Kurs kein Disagio');
 }
 dienst._setzeDeps(null);
 console.log('\n' + (rot ? 'ROT · ' + rot + ' Befund(e), ' + gruen + ' grün' : 'SAUBER · ' + gruen + ' Prüfpunkte grün'));

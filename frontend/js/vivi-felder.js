@@ -29,7 +29,8 @@
   var FRAGE_LOESEN = 'Diesen Wert in DealPilot selbst festlegen? Er wird nicht nach ViVi übertragen.';
   var FRAGE_ZURUECK = 'Den Wert aus ViVi wieder übernehmen?';
   /* Felder einer Einheit, die ViVi fuehrt (Schluessel wie in _mfh.einheiten[]) */
-  var EINHEIT_FELDER = ['wfl', 'ist', 'status', 'nk_vorauszahlung', 'mv_beginn', 'mv_befristet_bis', 'mv_kaution', 'mv_letzte_erhoehung', 'mv_letzte_erhoehung_betrag' /* v3981 · F8 */, 'mv_art', 'stellplatz_miete'];
+  /* v4050 · die Flaeche ist ein Stammdatum: nach dem Anlegen nicht mehr an ViVi gebunden (Grundregel ViVi, Marcel 23.11.2026) */
+  var EINHEIT_FELDER = ['ist', 'status', 'nk_vorauszahlung', 'mv_beginn', 'mv_befristet_bis', 'mv_kaution', 'mv_letzte_erhoehung', 'mv_letzte_erhoehung_betrag' /* v3981 · F8 */, 'mv_art', 'stellplatz_miete'];
   var ZAHL_FELDER = /^(kp|makler_p|gest_p|notar_p|gba_p|ji_p|wfl|nkm|nk_vorauszahlung|ze_stp_monat|mv_kaution|mv_letzte_erhoehung_betrag|d[12]|d[12]z|d[12]t|ist|stellplatz_miete)$/;
 
   var SCHLOSS_ZU = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>';

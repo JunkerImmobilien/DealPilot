@@ -272,6 +272,50 @@
     return out;
   }
 
+  /* ── v4050 · Stammdaten: in ViVi geändert, übernehmen nur auf Klick ──
+     Marcel 23.11.2026 (Grundregel ViVi): nach dem Anlegen werden Stammdaten nie mehr überschrieben. Ändert sich in ViVi
+     etwas (andere Fläche, neue Einheit, Anschrift), steht es hier. Der Abgleich (viviDienst.abrufen) liefert die
+     Abweichungen in info.stamm_aenderungen. */
+  var _stammWeg = {};
+  function wertText(v) {
+    if (v == null || v === '') return 'leer';
+    var n = zahl(v);
+    if (/^\d{4}-\d{2}-\d{2}$/.test(String(v))) return datumText(String(v));
+    return (n != null && /^[\d.,\s]+$/.test(String(v))) ? n.toLocaleString('de-DE', { maximumFractionDigits: 2 }) : String(v);
+  }
+  function stammListe(st) {
+    var L = st && st.info && Array.isArray(st.info.stamm_aenderungen) ? st.info.stamm_aenderungen : [];
+    return L.filter(function (x) { return x && !_stammWeg[x.feld]; });
+  }
+  function stammHtml(st) {
+    var L = stammListe(st); if (!L.length) return '';
+    return '<div class="vr-stamm"><h4 class="vr-h">In ViVi geändert</h4><p class="vr-satz">Stammdaten übernimmt DealPilot nicht von selbst. Übernimm, was stimmt.</p>'
+      + '<div class="vr-tab-w"><table class="vr-tab"><thead><tr><th>Feld</th><th>DealPilot</th><th>ViVi</th><th></th></tr></thead><tbody>' + L.map(function (x) {
+        return '<tr><td><b>' + esc(x.wort || x.feld) + '</b></td><td>' + esc(wertText(x.dealpilot)) + '</td><td>' + esc(wertText(x.vivi)) + '</td><td>'
+          + (x.uebernehmbar ? '<button type="button" class="btn-clean vr-k" data-vr="stamm" data-vr-id="' + esc(x.feld) + '">übernehmen</button>' : '<span class="vr-klein">bitte im Reiter Objekt prüfen</span>')
+          + '</td></tr>';
+      }).join('') + '</tbody></table></div></div>';
+  }
+  function stammUebernehmen(id) {
+    var x = stammListe(vstand()).filter(function (y) { return y.feld === id; })[0];
+    if (!x || !x.uebernehmbar) return false;
+    var m = /^einheit\.(\d+)\.wfl$/.exec(id);
+    if (m) {
+      var L = global._dpMfh && global._dpMfh.einheiten, e = L && L[+m[1]];
+      if (!e) return false;
+      e.wfl = String(x.vivi);
+      try { if (global.DpMfhFelder) global.DpMfhFelder.anwenden(); } catch (er) {}
+    } else {
+      var el = $(id); if (!el) return false;
+      el.value = String(x.vivi);
+      try { el.dispatchEvent(new Event('input', { bubbles: true })); el.dispatchEvent(new Event('change', { bubbles: true })); } catch (er) {}
+    }
+    _stammWeg[id] = true;
+    try { if (typeof global.calc === 'function') global.calc(); } catch (er) {}
+    return true;
+  }
+  global.addEventListener('dp:object-ready', function () { _stammWeg = {}; });
+
   /* ── Ganzer Reiter ──────────────────────────────────────────────── */
   function html() {
     if (!sichtbar()) return '';
@@ -287,6 +331,7 @@
       + '<button type="button" class="btn-clean vr-k" data-vr="abgleichen">Jetzt abgleichen</button></div>';
     if (!st) return '<div class="vr">' + kopf + '<p class="vr-klein">Der Stand aus ViVi wird geladen.</p></div>';
     return '<div class="vr">' + kopf
+      + stammHtml(st)
       + '<div class="vr-jahre" role="group" aria-label="Jahr">' + pills + '</div>'
       + jahrHtml(_jahr)
       + hausHtml()
@@ -350,6 +395,11 @@
       var JB = global.DpJahresbuch; if (!JB || !JB.festSetzen) return;
       if (!global.confirm('Miete und Steuer ' + j + ' festschreiben? Danach ändert ViVi dieses Jahr nicht mehr. Freigeben geht im Jahresabgleich.')) return;
       if (JB.festSetzen(j, ['miete', 'steuer'], true)) { meldung(j + ' festgeschrieben'); speichern(); }
+      setTimeout(mountAll, 150);
+      return;
+    }
+    if (was === 'stamm') {   /* v4050 */
+      if (stammUebernehmen(b.getAttribute('data-vr-id'))) { meldung('Aus ViVi übernommen'); speichern(); }
       setTimeout(mountAll, 150);
       return;
     }
@@ -417,6 +467,7 @@
       '.vr-w-pot{border-color:#3FA56C;box-shadow:inset 3px 0 0 #3FA56C}.vr-w-pot .vr-wm{background:#3FA56C;color:#fff}',
       '.vr-w-leer{background:#FBF9F4}.vr-w-leer .vr-wm{background:rgba(42,39,39,.08);color:#6B645A}',
       '.vr-w-ab{border-color:#B8625C;box-shadow:inset 3px 0 0 #B8625C}.vr-w-ab .vr-wm{background:#B8625C;color:#fff}',
+      '.vr-stamm{border-left:3px solid var(--wl-c9a84c,#C9A84C);padding:2px 0 2px 10px;margin:10px 0}',
       '.vr-bw{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin:6px 0 10px}',
       '.vr-bw>div{background:#FBF6E9;border:1px solid color-mix(in srgb,var(--wl-c9a84c,#C9A84C) 18%,transparent);border-radius:2px;padding:8px 10px}',
       '.vr-bw span{display:block;font:700 9.5px "JetBrains Mono",monospace;letter-spacing:.06em;text-transform:uppercase;color:#6B645A}.vr-bw b{display:block;font:600 17px "Space Grotesk",sans-serif}.vr-bw small{color:#7A7370;font-size:11px}',

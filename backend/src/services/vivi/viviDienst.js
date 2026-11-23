@@ -407,6 +407,11 @@ async function abrufen(userId, objectId, opt) {
       if (gz && Object.keys(gz.gezahlt).length) { erg.info.ist_jahre.gezahlt = gz.gezahlt; erg.info.ist_jahre.soll_warm = gz.soll; }
       else erg.info.ist_jahre.soll_warm = sollWarmJeJahr(miet, mietverlauf, uebergang, heuteIso);
     }
+    /* v4050 · Stammdaten nur vergleichen, nie setzen: Abweichungen als Hinweis fuer den Reiter ViVi */
+    if (erg.info && erg.info.stamm) {
+      erg.info.stamm_aenderungen = mapping.stammAenderungen(erg.info.stamm, o.data, mitEinheiten(v, o.data) ? erg.info.stamm_einheiten : null);
+      delete erg.info.stamm; delete erg.info.stamm_einheiten;
+    }
     await sp.werteSchreiben(objectId, erg.felder, erg.info);
     /* v4020 · Paket V4: Steuerjahre vom Kaufjahr bis heute (nur GET). Einstellung „aus“ fragt ViVi nicht. Ein Fehler hier
        kostet nur die Steuerjahre dieses Abrufs: die Objektwerte sind schon geschrieben, die alten Steuerwerte bleiben. */
@@ -488,6 +493,7 @@ async function werte(userId, objectId) {
       return;
     }
     if (z.feld.indexOf('_info.') === 0) info[z.feld.slice(6)] = z.wert;
+    else if (mapping.istStamm(z.feld)) return;   /* v4050 · Stammdaten aus aelteren Abrufen: nie mehr gebunden */
     else felder[z.feld] = { wert: z.wert, quelle: z.vivi_quelle, gelesen_am: z.gelesen_am };
   });
   return {

@@ -1961,15 +1961,14 @@ label.dp-required.qc-required::after {
              Kindern). Jetzt eine eigene Zeile unter dem Titel: Hauptknopf + ein Satz, was er tut. „einklappen"
              (ki-miete.js haengt ihn an den Kopf an, weil der Knopf nicht mehr direkt im Kopf steht) bleibt klein rechts. -->
         <div class="kmu-start">
-          <button class="btn btn-gold btn-sm" id="ki-miete-btn" onclick="runKiMiete()" type="button">
+          <button class="btn btn-gold btn-sm" id="ki-miete-btn" onclick="runKiMiete()" type="button" title="Ordnet deine Miete ein: gegen den Marktdurchschnitt, das marktübliche Band, die amtliche Vergleichsmiete und eine eigene Recherche. Ergebnis: welche Miete du ansetzen kannst. Braucht Adresse und Wohnfläche.">
             <span data-ico="sparkles" data-ico-size="14"></span> Mietpreis recherchieren
           </button>
-          <span class="dp-rnd-info kmu-info" role="button" tabindex="0" title="Ordnet deine Miete ein: gegen den Marktdurchschnitt, das marktübliche Band, die amtliche Vergleichsmiete und eine eigene Recherche. Ergebnis: welche Miete du ansetzen kannst." aria-label="Was die Recherche tut" onclick="var s=this.nextElementSibling;if(s)s.hidden=!s.hidden" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}">i</span><!-- v4005 · Satz im Tooltip -->
-          <span class="kmu-start-satz" hidden>Ordnet deine Miete ein: gegen den Marktdurchschnitt, das marktübliche Band, die amtliche Vergleichsmiete und eine eigene Recherche. Ergebnis: welche Miete du ansetzen kannst.</span>
+          <span class="dp-rnd-info kmu-info" title="Ordnet deine Miete ein: gegen den Marktdurchschnitt, das marktübliche Band, die amtliche Vergleichsmiete und eine eigene Recherche. Ergebnis: welche Miete du ansetzen kannst. Braucht Adresse und Wohnfläche." aria-label="Was die Recherche tut">i</span><!-- v4060 · Marcel 23.11.2026: i nur mit eingeschalteten Tooltips (body.dp-tt-off blendet es aus), Erklärung nur beim Überfahren, kein Satz darunter -->
         </div>
       </div>
       <div class="ki-lage-body" id="ki-miete-body">
-        <div class="ki-lage-empty">Noch keine Analyse für dieses Objekt. Sie braucht Adresse und Wohnfläche und nennt dazu das Mietausfall-Risiko.</div>
+        
       </div>
     </div>
   <div class="col2">
@@ -4182,9 +4181,9 @@ label.dp-required.qc-required::after {
 <script src="js/mfh-einheiten.js?v=v4016"></script>
 <script src="js/mfh-felder.js?v=v3840b"></script><!-- v3003 · Objekt mit Einheiten: Erklaerkasten, Felder aus den Einheiten, Zustand des Gebaeudes -->
 <script src="js/nk-vorauszahlung.js?v=v3950"></script><!-- v3950 · Nebenkosten-Vorauszahlung: Vorschlag aus den umlagefaehigen Kosten je Einheit nach Wohnflaeche -->
-<script src="js/vivi-felder.js?v=v4043a"></script><!-- v3950/v3951 · ViVi: verknuepfte Felder ausgegraut, Hinweis, lokal ueberschreiben -->
+<script src="js/vivi-felder.js?v=v4050d"></script><!-- v3950/v3951 · ViVi: verknuepfte Felder ausgegraut, Hinweis, lokal ueberschreiben -->
 <script src="js/buchhaltung-verbinden.js?v=v4040"></script><!-- v3967 · Buchhaltung verbinden: Angebot unter Gewonnen in der Deal-Aktion, Anbieterliste (heute ViVi), nur mit hinterlegtem Schluessel -->
-<script src="js/vivi.js?v=v4050"></script><script src="js/vivi-import.js?v=v4050a"></script><!-- v4050 · Objekte aus ViVi uebernehmen, Ankauf rueckwirkend --><script src="js/vivi-mieterhoehung.js?v=v4042a"></script><script src="js/vivi-nk-anpassung.js?v=v4042a"></script><!-- v4042 · Nebenkosten-Vorauszahlung nach ViVi --><script src="js/vivi-reiter.js?v=v4042a"></script><!-- v4040 · Reiter ViVi in der Pilot-Analyse --><!-- v4037 · Mieterhöhung aus DealPilot in ViVi anlegen (ein Fenster für Reiter Miete und Pilot-Analyse) --><!-- v3950/v3951/v3967 · ViVi: Verbindung, einmal anlegen mit Vorschau und Wartehinweis, Jetzt abgleichen (Vorschau-Funktion vivi) -->
+<script src="js/vivi.js?v=v4050"></script><script src="js/vivi-import.js?v=v4050a"></script><!-- v4050 · Objekte aus ViVi uebernehmen, Ankauf rueckwirkend --><script src="js/vivi-mieterhoehung.js?v=v4042a"></script><script src="js/vivi-nk-anpassung.js?v=v4042a"></script><!-- v4042 · Nebenkosten-Vorauszahlung nach ViVi --><script src="js/vivi-reiter.js?v=v4050d"></script><!-- v4040 · Reiter ViVi in der Pilot-Analyse --><!-- v4037 · Mieterhöhung aus DealPilot in ViVi anlegen (ein Fenster für Reiter Miete und Pilot-Analyse) --><!-- v3950/v3951/v3967 · ViVi: Verbindung, einmal anlegen mit Vorschau und Wartehinweis, Jetzt abgleichen (Vorschau-Funktion vivi) -->
 <script src="js/vivi-steuer-abgleich.js?v=v4042a"></script><!-- v4020 · ViVi Steuerjahre: Einstellung, Abgleich je Jahr im Jahresabgleich, automatisch nur offene Jahre, Marke im Reiter Steuer -->
 <script src="js/wertangabe.js?v=v3003b"></script><!-- v3003a · eine Wertangabe: Marktwert/Verkehrswert + Herkunft statt Bankbewertung -->
 <script src="js/indexreihen.js?v=v3026"></script><!-- v3026 · VPI/Nettokaltmieten aus dem Server-Cache -->

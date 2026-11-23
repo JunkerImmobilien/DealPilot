@@ -29,7 +29,9 @@ const OBJEKTTYP = Object.freeze({
   BUERO: 'commercial', GESCH: 'commercial', HOTEL: 'commercial', GEW: 'commercial',
   GRST: 'land', GAR: 'other'
 });
-const ARTEN_MIT_EINHEITEN = { MFH: 1, ZFH: 1, GESCH: 1, BUERO: 1, HOTEL: 1, GEW: 1 };   /* wie mfh-einheiten.js */
+const ARTEN_MIT_EINHEITEN = { MFH: 1, ZFH: 1, GESCH: 1, BUERO: 1, HOTEL: 1, GEW: 1 };
+const ART_WORT = { ETW: 'Wohnung', EFH: 'Einfamilienhaus', DHH: 'Einfamilienhaus', RH: 'Einfamilienhaus', ZFH: 'Mehrfamilienhaus', MFH: 'Mehrfamilienhaus',
+  BUERO: 'Gewerbe', GESCH: 'Gewerbe', HOTEL: 'Gewerbe', GEW: 'Gewerbe', GRST: 'Grundstück', GAR: 'Objekt' };   /* v4050 · Anzeigename in ViVi */   /* wie mfh-einheiten.js */
 const VERTRAG_NACH_VIVI = { staffel: 'stepped_rent', index: 'indexed_rent' };
 const VERTRAG_AUS_VIVI = { stepped_rent: 'staffel', indexed_rent: 'index' };
 const UL_FELDER = ['hg_ul', 'grundsteuer', 'ul_sonst', 'kp1', 'kp2', 'kp3', 'kp4'];   /* wie calc.js und main.js V187 */
@@ -184,6 +186,9 @@ function nachVivi(daten, opt) {
   };
   const bj = zahl(daten.baujahr);
   if (bj != null && bj > 0) projekt.construction_year = Math.round(bj);
+  /* v4050 · Marcel 23.11.2026: „die Schnittstelle so voll wie möglich befüllen“. Anzeigename wie bei der Umbenennung
+     vom 23.11.2026 (Ort - Straße Nr - Art), sonst bildet ViVi ihn selbst. Nicht im Testbetrieb mit Musteranschrift. */
+  if (!muster && text(daten.ort) && text(daten.str)) projekt.name = (text(daten.ort) + ' - ' + text(daten.str) + ' ' + text(daten.hnr) + ' - ' + (ART_WORT[a] || 'Objekt')).replace(/\s+/g, ' ').trim().slice(0, 255);
   const nk = [['broker', 'makler_p', 'Makler'], ['real_estate_transfer_tax', 'gest_p', 'Grunderwerbsteuer'],
     ['notary', 'notar_p', 'Notar'], ['land_register', 'gba_p', 'Grundbuch'], ['other_costs', 'ji_p', 'Sonstige Kaufnebenkosten']];
   zeige('Objekt', 'Objektart', typ);
@@ -203,7 +208,7 @@ function nachVivi(daten, opt) {
   const faellig = Math.min(31, Math.max(1, Math.round(zahl(opt.faelligTag) || FAELLIG_TAG)));
   const leerMeldung = [];
   const nkNiedrig = [];
-  function miete(e, name, qm, etage, ist, nkEigen, nkIndex, stp) {
+  function miete(e, name, qm, etage, ist, nkEigen, nkIndex, stp, zielQm) {
     const n = mieterName(e.mv_mieter, name, !!opt.platzhalterNamen);
     const nkWert = zahl(nkEigen);
     const nkV = nkWert != null ? nkWert : nkVorschlag(daten, nkIndex);
@@ -220,6 +225,8 @@ function nachVivi(daten, opt) {
     const kaution = zahl(e.mv_kaution); if (kaution != null && kaution > 0) m.deposit_amount = rund(kaution);
     const erh = isoDatum(e.mv_letzte_erhoehung); if (erh) m.last_rent_increase = erh;
     const ct = VERTRAG_NACH_VIVI[text(e.mv_art)]; if (ct) m.contract_type = ct;
+    /* v4050 · Zielmiete (Zielbild €/m² × Fläche) als target_rent, in ViVi rein informativ */
+    const zq = zahl(zielQm); if (zq != null && zq > 0 && qm > 0 && zq * qm > ist) m.target_rent = rund(zq * qm);
     if (stp != null && stp > 0) m.amenities = [{ type: 'parking_space', description: 'Stellplatz', monthly_rent: rund(stp) }];
     const notizen = [];
     if (n.platzhalter) notizen.push('Mietername als Platzhalter');
@@ -249,7 +256,7 @@ function nachVivi(daten, opt) {
         einheit: { identifier: name.slice(0, 255), unit_type: 'residential' } };
       if (qm != null && qm > 0) eintrag.einheit.square_meters = rund(qm);
       if (etage) eintrag.einheit.floor = etage;
-      if (vermietet) eintrag.miete = miete(e, name, qm, etage, ist, e.nk_vorauszahlung, x.index, zahl(e.stellplatz_miete));
+      if (vermietet) eintrag.miete = miete(e, name, qm, etage, ist, e.nk_vorauszahlung, x.index, zahl(e.stellplatz_miete), e.ziel_qm);
       else { leerMeldung.push(name); zeige('Einheit', name, (qm ? String(qm).replace('.', ',') + ' m²' : 'ohne Fläche') + ', leer'); }
       einheiten.push(eintrag);
     });
@@ -267,7 +274,7 @@ function nachVivi(daten, opt) {
        (stellplatz_miete_monat), ze_stp_monat war leer. ViVi bekam deshalb keinen Stellplatz, die Mieteinnahmen 2025 wichen
        um 9 × 60 € ab. Jetzt: Aufteilung im Reiter Miete zuerst, sonst das Feld des Reiters Objekt. */
     const stpEinzel = zahl(daten.ze_stp_monat) > 0 ? zahl(daten.ze_stp_monat) : (zahl(daten.stellplatz_miete_monat) > 0 ? zahl(daten.stellplatz_miete_monat) : null);
-    if (vermietet) eintrag.miete = miete(daten, name, qm, etage, ist, daten.nk_vorauszahlung, null, stpEinzel);
+    if (vermietet) eintrag.miete = miete(daten, name, qm, etage, ist, daten.nk_vorauszahlung, null, stpEinzel, daten.zb_ziel_qm);
     else zeige('Einheit', name, (qm ? String(qm).replace('.', ',') + ' m²' : 'ohne Fläche') + (text(daten.nutzungsart) === 'eigennutzung' ? ', selbst genutzt' : ', leer'));
     if (a === 'ZFH' || a === 'MFH') hinweise.push('Keine Einheiten erfasst. Übertragen wird eine Einheit für das ganze Haus. Genauer wird es mit den Einheiten im Reiter Objekt.');
     einheiten.push(eintrag);
@@ -287,7 +294,7 @@ function nachVivi(daten, opt) {
 
   /* Darlehen */
   const darlehen = [];
-  function darl(schluessel, bez, betrag, zins, tilg, bindj, start, bank, tilgAus, typ) {
+  function darl(schluessel, bez, betrag, zins, tilg, bindj, start, bank, tilgAus, typ, mehr) {
     if (!(betrag > 0)) return;
     const z = zins != null ? zins : null;
     if (z == null) { fehlt.push({ feld: schluessel + 'z', text: 'Zinssatz fehlt bei ' + bez }); }
@@ -303,12 +310,17 @@ function nachVivi(daten, opt) {
     if (tilgAus) b.is_repayment_substitute = true;
     else if (tilg != null && tilg >= 0 && tilg <= 100) b.initial_repayment = rund(tilg, 3);
     if (bindj != null && bindj >= 0 && bindj <= 30) b.fixed_interest_period = Math.round(bindj);
+    /* v4050 · was DealPilot zum Darlehen weiß, geht mit (Disagio aus dem Auszahlungskurs, tilgungsfreie Monate, Sondertilgungsrecht) */
+    mehr = mehr || {};
+    const kurs = zahl(mehr.kurs); if (kurs != null && kurs > 0 && kurs < 100) b.disagio_amount = rund(betrag * (100 - kurs) / 100);
+    const tf = zahl(mehr.tfMon); if (tf != null && tf > 0 && tf <= 120) b.repayment_free_months = Math.round(tf);
+    const stp = zahl(mehr.stPct); if (stp != null && stp > 0 && stp <= 100) { b.special_repayment_allowed = true; b.special_repayment_max_percent = rund(stp, 2); }
     if (!start && kauf) hinweise.push('Beginn von ' + bez + ' fehlt, angesetzt ist der Übergang.');
     darlehen.push({ schluessel: schluessel, body: b });
     zeige('Darlehen', bez, eur(betrag) + ', ' + String(b.interest_rate).replace('.', ',') + ' % Zins' + (b.initial_repayment != null ? ', ' + String(b.initial_repayment).replace('.', ',') + ' % Tilgung' : '') + (tilgAus ? ', Tilgungsersatz' : ''), b.fixed_interest_period != null ? 'Zinsbindung ' + b.fixed_interest_period + ' Jahre' : '');
   }
-  darl('d1', 'Darlehen I', zahl(daten.d1), zahl(daten.d1z), zahl(daten.d1t), zahl(daten.d1_bindj), monatDatum(daten.d1_auszahl), daten.bank_inst, text(daten.d1_type) === 'tilgungsaussetzung', 'primary');
-  darl('d2', 'Darlehen II', zahl(daten.d2), zahl(daten.d2z), zahl(daten.d2t), zahl(daten.d2_bindj), monatDatum(daten.d2_auszahl), daten.d2_inst, text(daten.d2_type) === 'tilgungsaussetzung', 'parallel');
+  darl('d1', 'Darlehen I', zahl(daten.d1), zahl(daten.d1z), zahl(daten.d1t), zahl(daten.d1_bindj), monatDatum(daten.d1_auszahl), daten.bank_inst, text(daten.d1_type) === 'tilgungsaussetzung', 'primary', { kurs: daten.d1_kurs, tfMon: daten.d1_tf_mon, stPct: daten.d1_st_pct });
+  darl('d2', 'Darlehen II', zahl(daten.d2), zahl(daten.d2z), zahl(daten.d2t), zahl(daten.d2_bindj), monatDatum(daten.d2_auszahl), daten.d2_inst, text(daten.d2_type) === 'tilgungsaussetzung', 'parallel', { kurs: daten.d2_kurs, stPct: daten.d2_st_pct });
   let weitere = daten.darlehen_weitere;
   if (typeof weitere === 'string') { try { weitere = weitere.trim() ? JSON.parse(weitere) : []; } catch (e) { weitere = []; } }
   if (Array.isArray(weitere)) {
@@ -458,6 +470,38 @@ function istJahreSumme(teile) {
   return out;
 }
 function monatJahr(iso) { const m = /^(\d{4})-(\d{2})/.exec(text(iso)); return m ? m[2] + '.' + m[1] : null; }
+
+/* ══ v4050 · STAMMDATEN NACH DEM ANLEGEN NIE MEHR ÜBERSCHREIBEN ═══════════════════════════════════════════
+   Marcel 23.11.2026 (Grundregel ViVi): beim Anlegen (DealPilot → ViVi wie ViVi → DealPilot) so voll wie möglich, danach
+   werden Stammdaten in BEIDE Richtungen nie mehr überschrieben: Anschrift, Objektart, Baujahr, Einheiten mit Fläche,
+   Zimmer, Geschoss, Namen, Kaufdaten. Der Abgleich zieht nur noch Zahlen (Mieten, NK-Vorauszahlung, Hausgeld,
+   Darlehen, Ist je Jahr, Bewirtschaftung). Ändert sich in ViVi ein Stammdatum, zeigt der Reiter ViVi einen Hinweis
+   „In ViVi geändert … übernehmen?“, übernommen wird nur auf Klick (info.stamm_aenderungen, js/vivi-reiter.js). */
+const STAMM_FELD = /^(str|hnr|plz|ort|baujahr|wirtschaftlicher_uebergang|kp|makler_p|gest_p|notar_p|gba_p|ji_p|wfl|etage|einheit\.\d+\.wfl)$/;
+const STAMM_WORT = { str: 'Straße', hnr: 'Hausnummer', plz: 'Postleitzahl', ort: 'Ort', baujahr: 'Baujahr', wirtschaftlicher_uebergang: 'Übergang von Nutzen und Lasten',
+  kp: 'Kaufpreis', makler_p: 'Makler (%)', gest_p: 'Grunderwerbsteuer (%)', notar_p: 'Notar (%)', gba_p: 'Grundbuch (%)', ji_p: 'Sonstige Kaufnebenkosten (%)', wfl: 'Wohnfläche', etage: 'Etage' };
+function istStamm(id) { return STAMM_FELD.test(String(id || '')); }
+/** Vergleich der ViVi-Stammdaten (info.stamm) mit dem DealPilot-Objekt. Ergebnis fuer den Hinweis im Reiter ViVi. */
+function stammAenderungen(stamm, daten, viviEinheiten) {
+  const aus = [];
+  daten = daten || {};
+  const L = daten._mfh && Array.isArray(daten._mfh.einheiten) ? daten._mfh.einheiten : null;
+  Object.keys(stamm || {}).forEach(function (id) {
+    const vw = stamm[id];
+    let dw = null, wort = STAMM_WORT[id] || id;
+    const m = /^einheit\.(\d+)\.wfl$/.exec(id);
+    if (m) { const e = L && L[+m[1]]; if (!e) return; dw = e.wfl; wort = 'Fläche ' + (text(e.art) === 'gewerbe' ? 'GE ' : 'WE ') + (text(e.nr) || String(+m[1] + 1)); }
+    else dw = daten[id];
+    const zv = zahl(vw), zd = zahl(dw);
+    const gleich = (zv != null && zd != null && !/^(str|hnr|plz|ort|wirtschaftlicher_uebergang)$/.test(id)) ? Math.abs(zv - zd) < 0.005 : text(vw).toLowerCase() === text(dw).toLowerCase();
+    if (gleich || text(vw) === '') return;
+    aus.push({ feld: id, wort: wort, dealpilot: dw == null ? '' : dw, vivi: vw, uebernehmbar: true });
+  });
+  if (L && viviEinheiten != null && viviEinheiten !== L.length) {
+    aus.push({ feld: '_einheiten', wort: 'Zahl der Einheiten', dealpilot: L.length, vivi: viviEinheiten, uebernehmbar: false });
+  }
+  return aus;
+}
 
 /**
  * @param paket    { projekt, einheiten[], mietverhaeltnisse[], darlehen[], tilgungsplan, mietverlauf: { rentalId: rent-history } (v3966) }
@@ -615,6 +659,14 @@ function ausVivi(paket, kontext) {
   fin.forEach(function (f) { (Array.isArray(f.special_repayments) ? f.special_repayments : []).forEach(function (x) {
     const d = isoDatum(x && x.date), b = zahl(x && x.amount); if (d && b > 0) info.sondertilgungen.push({ darlehen: f === d1 ? 'd1' : (f === d2 ? 'd2' : String(f.id)), datum: d, betrag: rund(b) }); }); });
   fin.forEach(function (f) { if (f !== d1 && f !== d2) info.darlehen_weitere.push({ id: f.id, name: f.name, betrag: zahl(f.financing_amount), zins: zahl(f.interest_rate) }); });
+  /* v4050 · ausser beim Anlegen aus ViVi (kontext.stammdaten) gehen Stammdaten NICHT in die Felder, sondern nur in den
+     Vergleich (info.stamm). Der Abgleich ueberschreibt sie so nie mehr. */
+  if (!kontext.stammdaten) {
+    const stamm = {};
+    Object.keys(felder).forEach(function (id) { if (istStamm(id)) { stamm[id] = felder[id].wert; delete felder[id]; } });
+    info.stamm = stamm;
+    info.stamm_einheiten = units.length;
+  }
   return { felder: felder, info: info };
 }
 
@@ -675,7 +727,7 @@ function importDaten(paket, kontext) {
   const tag = Date.parse(stichtag + 'T12:00:00Z');
   /* der ganze Abbildungsweg von ausVivi, nur mit „heute“ = Kaufdatum: laufende Mietverhaeltnisse, letzte Erhoehung
      und die Liste der Erhoehungen gelten zu diesem Tag */
-  const erg = ausVivi(paket, { vivi_ids: ids, mitEinheiten: mehr, objart: objart, jetzt: tag, musterAnschrift: false, uebergang: null });
+  const erg = ausVivi(paket, { vivi_ids: ids, mitEinheiten: mehr, objart: objart, jetzt: tag, musterAnschrift: false, uebergang: null, stammdaten: true });
   const f = erg.felder, info = erg.info || {};
   const rentals = Array.isArray(paket.mietverhaeltnisse) ? paket.mietverhaeltnisse : [];
   const verlauf = paket.mietverlauf || {};
@@ -723,6 +775,10 @@ function importDaten(paket, kontext) {
       if (e.mv_letzte_erhoehung && e.mv_letzte_erhoehung > stichtag) { delete e.mv_letzte_erhoehung; delete e.mv_letzte_erhoehung_betrag; }
       if (e.status === 'vermietet') { const m = mieteAmTag(u); const ist = m != null ? m : zahl(g('ist')); if (ist != null) e.ist = zs(ist); }
       else leer++;
+      /* v4050 · Zielmiete aus ViVi (target_rent) als Zielbild €/m², nur beim Anlegen */
+      const rz = rentals.filter(function (x) { return String(x.unit_id) === String(u.id) && laufend(x, heute); })[0];
+      const tr = rz ? zahl(rz.target_rent) : null, fq = zahl(e.wfl);
+      if (tr != null && tr > 0 && fq > 0) e.ziel_qm = zs(rund(tr / fq, 2));
       const erh = info.erhoehungen && info.erhoehungen[String(i)];
       if (Array.isArray(erh) && erh.length) e.erhoehungen = erh;
       return e;
@@ -738,6 +794,9 @@ function importDaten(paket, kontext) {
     if (m != null) d.nkm = zs(m);
     else if (d.nkm == null) leer = 1;
     const zi = zahl(units[0].rooms); if (zi != null && zi > 0) d.zimmer = zs(zi);
+    const rz = rentals.filter(function (x) { return String(x.unit_id) === String(units[0].id) && laufend(x, heute); })[0];
+    const tr = rz ? zahl(rz.target_rent) : null, fq = zahl(d.wfl);
+    if (tr != null && tr > 0 && fq > 0) d.zb_ziel_qm = zs(rund(tr / fq, 2));   /* v4050 · Zielmiete aus ViVi */
     if (info.erhoehungen && Array.isArray(info.erhoehungen.objekt) && info.erhoehungen.objekt.length) d._erhoehungen = info.erhoehungen.objekt;
     if (d.mv_letzte_erhoehung && d.mv_letzte_erhoehung > stichtag) { delete d.mv_letzte_erhoehung; delete d.mv_letzte_erhoehung_betrag; }
     d.einheiten = '1';
@@ -780,7 +839,7 @@ function importFehlt(d, objart) {
   }).map(function (x) { return { feld: x.feld, text: x.text }; });
 }
 
-module.exports = { importDaten, importIds, importArt, importFehlt, BEWERTUNG_FELDER, erhoehungenAus, geplanteAus, istJahreAus, istJahreSumme, mieteImMonat,
+module.exports = { istStamm, stammAenderungen, STAMM_FELD, importDaten, importIds, importArt, importFehlt, BEWERTUNG_FELDER, erhoehungenAus, geplanteAus, istJahreAus, istJahreSumme, mieteImMonat,
   nachVivi, ausVivi, letzteErhoehung, erhoehungBetrag, nkVorschlag, ulJahr, einheitenListe, zahl, isoDatum, monatDatum, etageText, etageZahl, mieterName,
   NK_MIN_QM, OBJEKTTYP, VERTRAG_NACH_VIVI, VERTRAG_AUS_VIVI, UL_FELDER, ARTEN_MIT_EINHEITEN, MUSTER_ANSCHRIFT
 };
