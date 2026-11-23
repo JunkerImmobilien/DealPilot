@@ -3847,7 +3847,12 @@
   function maybeStartupDashboard(){
     try {
       var sv=localStorage.getItem('dp_startup_view');
-      if(sv==='dashboard'){ setTimeout(function(){ if(typeof window.setMainView==='function') window.setMainView('dashboard'); }, 600); }
+      /* v4010 · ohne gewonnenes Objekt kein Cockpit als Startansicht (storage.js _dpBestandMelden, Ereignis dp:bestand) */
+      if(sv==='dashboard'){
+        var auf=function(){ if(typeof window.setMainView==='function') window.setMainView('dashboard'); };
+        if(window._dpHatBestand===true) setTimeout(auf, 600);
+        else if(window._dpHatBestand!==false) window.addEventListener('dp:bestand', function h(e){ window.removeEventListener('dp:bestand', h); if(e && e.detail && e.detail.hat) auf(); });
+      }
     } catch(e){}
   }
 

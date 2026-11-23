@@ -95,6 +95,17 @@
       '#dp-blase .dpb-anh{flex:0 0 auto;border:1px solid #E7E4DC;background:#fff;color:#5C554E;border-radius:9px;width:38px;cursor:pointer;display:grid;place-items:center}',
       '#dp-blase .dpb-anh:hover{border-color:' + G + ';color:' + GL + '}',
       '#dp-blase .dpb-anh svg{width:17px;height:17px}',
+      /* v4012 · Marcel 23.11.2026 (Handy): Mikrofon, Klammer und Senden waren ungleich (30x44, 38x60, 76x60),
+         das Eingabefeld trug 2 px Radius und Goldrand aus einer Handy-Formularregel. Jetzt eine Leiste:
+         alles 44 px hoch, Klammer und Mikrofon als Obsidian-Quadrat mit Gold, Senden im Gold-Verlauf. */
+      '#dp-blase .dp-cp-bar{align-items:flex-end;gap:8px}',
+      'html body #dp-blase .dp-cp-bar textarea.dp-cp-in{min-height:44px;height:44px;border-radius:10px !important;border:1px solid #E7E4DC !important;padding:11px 12px !important;line-height:1.4 !important;box-shadow:none !important;background:#fff !important}',
+      'html body #dp-blase .dp-cp-bar textarea.dp-cp-in:focus{border-color:' + G + ' !important}',
+      'html body #dp-blase .dp-cp-bar .dpb-anh,html body #dp-blase .dp-cp-bar button.dp-dik{flex:0 0 44px;width:44px !important;min-width:44px !important;height:44px !important;padding:0 !important;margin:0 !important;border-radius:10px !important;background:#141210 !important;color:' + GH + ' !important;border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 60%, transparent) !important;display:grid !important;place-items:center;box-shadow:none !important}',
+      'html body #dp-blase .dp-cp-bar .dpb-anh:hover,html body #dp-blase .dp-cp-bar button.dp-dik:hover{border-color:' + G + ' !important;background:#1f1c18 !important}',
+      'html body #dp-blase .dp-cp-bar button.dp-dik svg,html body #dp-blase .dp-cp-bar .dpb-anh svg{width:18px;height:18px}',
+      'html body #dp-blase .dp-cp-bar button.dp-dik.dp-dik-an{background:#D8564C !important;border-color:#D8564C !important;color:#fff !important}',
+      'html body #dp-blase .dp-cp-bar .dp-cp-send{flex:0 0 auto;height:44px;min-height:44px;padding:0 16px !important;border-radius:10px !important;border:0 !important;background:linear-gradient(110deg, var(--wl-e8cc7a, #E8CC7A), var(--wl-c9a84c, #C9A84C) 55%, var(--wl-b8932f, #b8932f)) !important;color:#141210 !important;font:600 13px/1 Inter,sans-serif !important}',
       '#dp-blase.zieht{outline:3px dashed ' + G + ';outline-offset:-6px}',
       '#dp-cp-verweis{margin-top:18px;padding:12px 16px;border:1px dashed color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 55%, transparent);border-radius:14px;background:#FBFAF6;font:13px/1.5 Inter,sans-serif;color:#5C554E;display:flex;gap:12px;align-items:center;flex-wrap:wrap}',
       '#dp-cp-verweis button{border:0;border-radius:9px;background:' + G + ';color:#1a1407;font:600 12.5px Inter,sans-serif;padding:7px 12px;cursor:pointer}',

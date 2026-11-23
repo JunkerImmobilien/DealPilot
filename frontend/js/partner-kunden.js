@@ -42,7 +42,7 @@
     if (document.getElementById('dppk-stil')) return;
     var s = document.createElement('style'); s.id = 'dppk-stil';
     var R = [
-      '.sb-act-partner:not(.dp-frei),.sb-act-meinpartner:not(.dp-frei){display:none !important}',
+      '.sb-act-partner:not(.dp-frei),.sb-act-meinpartner:not(.dp-frei),html body #sidebar .sb-act-item.sb-act-partner:not(.dp-frei),html body #sidebar .sb-act-item.sb-act-meinpartner:not(.dp-frei),html body #sb-actions-accordion .sb-act-item.sb-act-partner:not(.dp-frei),html body #sb-actions-accordion .sb-act-item.sb-act-meinpartner:not(.dp-frei){display:none !important}',   /* v4011 · gemessen 23.11.: (0,2,0) verlor gegen aside.sidebar .sb-act-item{display:flex!important} (0,2,1), Mein Partner stand ohne dp-frei sichtbar */
       '.sb-act-item .sb-act-punkt{display:none}',
       '.sb-act-item.dp-punkt .sb-act-punkt{display:inline-block;width:7px;height:7px;border-radius:50%;background:#B8625C;margin-left:auto;flex:0 0 7px}',
       '#dppk-ov{position:fixed;inset:0;z-index:100050;background:rgba(5,5,5,.62);display:flex;align-items:flex-start;justify-content:center;padding:28px 16px;overflow:auto;font-family:Inter,system-ui,sans-serif}',
@@ -2102,14 +2102,18 @@
   }
 
   /* ── Aktionen-Eintraege ──────────────────────────────────────────────── */
+  /* v4011 · verknuepft = Verbindung steht oder eine Anfrage / Team-Einladung wartet */
+  function verknuepft() { var m = S.kunde; return !!(m && (m.verbunden || (m.anfragen && m.anfragen.length) || (m.team_einladungen && m.team_einladungen.length))); }
   function menuePflegen() {
     stil();
     var p = document.querySelector('.sb-act-partner'), k = document.querySelector('.sb-act-meinpartner');
     if (p) { p.classList.toggle('dp-frei', !!S.partner); p.classList.toggle('dp-punkt', !!(S.partner && (S.partner.meldungen_ungelesen || S.partner.anfragen && 0))); }
     if (k) {
       var m = S.kunde, offen = !!(m && ((m.anfragen && m.anfragen.length) || (m.verbunden && (m.verbunden.entzug_frist_bis || (m.aufgaben || []).some(function (a) { return a.status === 'offen'; })))));
-      /* v3640b · auch ohne Verbindung (Verbindungscode), nur nicht fuer Partnerkonten - die Einstellungen fuehren nicht mehr dorthin */
-      k.classList.toggle('dp-frei', !!(m && (m.verbunden || (S.partnerGeladen && !S.partner))));
+      /* v4011 · Marcel 23.11.2026: „Mein Partner“ erst, wenn ein Partner verknuepft ist (oder eine Anfrage bzw.
+         Team-Einladung wartet). Ohne Verbindung fuehrt der Hinweis in den Einstellungen (einstellungenErgaenzen)
+         direkt zu „Mit einem Partner verbinden“, der Verbindungscode bleibt erreichbar. Vorher v3640b: auch ohne Verbindung. */
+      k.classList.toggle('dp-frei', verknuepft());
       k.classList.toggle('dp-punkt', offen);
     }
     if (PK.offen && document.getElementById('dppk-tabzeile')) tabzeile();   /* v3390 · Zahlen an den Reitern */
@@ -2270,7 +2274,8 @@
     var p = S.partner; if (p) return;   /* ein Partnerkonto verbindet sich nicht als Kunde */
     var c = document.createElement('p'); c.id = 'dppk-st'; c.className = 'hint';
     c.setAttribute('style', 'margin:14px 0 0;font:400 12.5px Inter,sans-serif');
-    c.innerHTML = 'Mein Partner findest du jetzt unter <a href="#" data-mp="1">Aktionen › Mein Partner</a>.';
+    c.innerHTML = verknuepft() ? 'Mein Partner findest du unter <a href="#" data-mp="1">Aktionen › Mein Partner</a>.'   /* v4011 */
+      : 'Arbeitest du mit einem Berater? <a href="#" data-mp="1">Mit einem Partner verbinden</a>. Danach steht er unter Aktionen › Mein Partner.';
     c.querySelector('[data-mp]').onclick = function (e) { e.preventDefault(); try { if (typeof window.closeSettings === 'function') window.closeSettings(); } catch (x) {} meinPartnerOeffnen(); };
     pane.appendChild(c);
   }

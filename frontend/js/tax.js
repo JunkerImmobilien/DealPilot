@@ -2483,10 +2483,61 @@ function _ytfJahresHinweise(heute) {
     + ' kannst du bis zum 31.03.' + j + ' bei der Gemeinde einen Teilerlass beantragen. Fehlt mehr als die Hälfte des üblichen Rohertrags,'
     + ' werden 25 % erlassen, fehlt er ganz, 50 % (§§ 34, 35 GrStG).';
   if (!t) return '';
-  return '<div class="ytf-hinweis" style="margin:8px 0 12px;padding:10px 12px;border-left:3px solid var(--gold, var(--wl-c9a84c, #C9A84C));background:color-mix(in srgb, var(--gold, var(--wl-c9a84c, #C9A84C)) 8%, transparent);border-radius:6px;font-size:12.5px;line-height:1.5">'
-    + t + ' <span style="color:var(--muted)">Hinweis, keine Steuerberatung.</span></div>';
+  /* v4014 · Marcel 23.11.2026: „viel Text“ im Kopf. Gemessen bei 390 px: der Hinweis stand mit 189 px offen
+     ueber dem Formular. Jetzt eine Zeile (die fette Ueberschrift), Antippen klappt den Text auf. */
+  var _kurz = (t.match(/^<b>([^<]+)<\/b>/) || [])[1] || 'Hinweis';
+  return '<details class="ytf-hinweis" style="margin:8px 0 12px;padding:8px 12px;border-left:3px solid var(--gold, var(--wl-c9a84c, #C9A84C));background:color-mix(in srgb, var(--gold, var(--wl-c9a84c, #C9A84C)) 8%, transparent);border-radius:6px;font-size:12.5px;line-height:1.5">'
+    + '<summary style="cursor:pointer;font-weight:600">' + _kurz.replace(/\.$/, '') + ': Tipp zur Jahreszeit</summary><div style="margin-top:6px">'
+    + t.replace(/^<b>[^<]+<\/b>\s*/, '') + ' <span style="color:var(--muted)">Hinweis, keine Steuerberatung.</span></div></details>';
 }
 if (typeof window !== 'undefined') window._ytfJahresHinweise = _ytfJahresHinweise;
+
+/* v4014 · Stil fuer Kopf und Leiste der Karte „Steuerformular pro Jahr“ (index.html .tax-module-card).
+   Gemessen 23.11.2026 bei 390 px: Kopf 159 px, Erklaerung 74 px, Belege-Block 157 px, Leiste 185 px,
+   Jahreszeit-Hinweis 189 px = 764 px vor dem ersten Feld. Erklaerungen klappen jetzt ueber das i auf. */
+function _ytfStil() {
+  if (document.getElementById('ytf-stil-v4014')) return;
+  var s = document.createElement('style'); s.id = 'ytf-stil-v4014';
+  var C = 'html body .tax-module-card';
+  s.textContent = [
+    C + ' > p.hint.ytf-erkl:not(.auf){display:none !important}',
+    C + ' > p.hint.ytf-erkl{margin:8px 0 10px !important;font-size:12px;line-height:1.5}',
+    C + ' .ytf-i{display:inline-grid;place-items:center;width:18px;height:18px;min-width:18px !important;min-height:18px !important;padding:0 !important;margin:0 0 0 6px;border-radius:50%;border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 55%, transparent) !important;background:transparent !important;color:var(--wl-b8932f, #b8932f) !important;font:600 11px/1 Inter,sans-serif !important;cursor:pointer;vertical-align:2px;box-shadow:none !important}',
+    C + ' .ytf-i[aria-expanded="true"],' + C + ' .ytf-i:hover{background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 16%, transparent) !important}',
+    C + ' .ytf-belege{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:0 0 12px}',
+    C + ' .ytf-belege > .hint:not(.auf){display:none !important}',
+    C + ' .ytf-belege > .hint{flex:1 1 100% !important;min-width:0 !important;margin:4px 0 0 !important}',
+    /* die Leiste */
+    C + ' .ytf-bar{display:flex !important;align-items:center;gap:6px !important;flex-wrap:wrap;padding:6px !important;margin:0 0 12px !important;border:1px solid var(--border, #E6E0D3);border-radius:10px;background:#FBFAF6}',
+    C + ' .ytf-bar .ytf-mode-toggle{display:inline-flex;border:1px solid var(--border, #E6E0D3);border-radius:8px;overflow:hidden;flex:0 0 auto}',
+    C + ' .ytf-bar .ytf-mode-btn{height:34px !important;min-height:34px !important;padding:0 14px !important;border:0 !important;border-radius:0 !important;background:#fff !important;color:#6B6460 !important;font:600 12px Inter,sans-serif !important;box-shadow:none !important}',
+    C + ' .ytf-bar .ytf-mode-btn.active{background:#141210 !important;color:var(--wl-e8cc7a, #E8CC7A) !important}',
+    C + ' .ytf-bar .ytf-bar-knoepfe{display:flex;gap:6px;margin-left:auto;flex-wrap:wrap}',
+    C + ' .ytf-bar .ytf-bar-btn{height:34px !important;min-height:34px !important;padding:0 12px !important;border:1px solid var(--border, #E6E0D3) !important;border-radius:8px !important;background:#fff !important;color:#2A2727 !important;font:600 12px Inter,sans-serif !important;white-space:nowrap;cursor:pointer;box-shadow:none !important}',
+    C + ' .ytf-bar .ytf-bar-btn:hover{border-color:var(--wl-c9a84c, #C9A84C) !important}',
+    '@media (max-width:640px){'
+      + C + ' .ytf-bar .ytf-mode-toggle{flex:1 1 100%}'
+      + C + ' .ytf-bar .ytf-mode-btn{flex:1 1 50%}'
+      + C + ' .ytf-bar .ytf-bar-knoepfe{flex:1 1 100%;margin-left:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(0,1fr));gap:6px}'
+      + C + ' .ytf-bar .ytf-bar-btn{padding:0 6px !important;min-width:0 !important;overflow:hidden;text-overflow:ellipsis}'
+      + C + ' .fa-pdf-ctrl{display:grid !important;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:8px !important}'
+      + C + ' .fa-pdf-ctrl > label[for="fa-pdf-year"]{grid-column:1}'
+      + C + ' .fa-pdf-ctrl > #fa-pdf-year{min-width:0 !important;width:100% !important;height:38px}'
+      + C + ' .fa-pdf-ctrl > button{grid-column:1 / -1;justify-content:center}'
+      + C + ' .ytf-belege > .btn{flex:1 1 auto}'
+    + '}'
+  ].join('\n');
+  document.head.appendChild(s);
+}
+/* v4014 · i-Symbol: klappt die Erklaerung auf (Handy hat kein Hover), title fuer den Browser */
+function _ytfErklaeren(btn, sel) {
+  var z = btn && btn.closest('.tax-module-card'); if (!z) return;
+  var e = z.querySelector(sel); if (!e) return;
+  var auf = !e.classList.contains('auf');
+  e.classList.toggle('auf', auf); btn.setAttribute('aria-expanded', auf ? 'true' : 'false');
+}
+if (typeof window !== 'undefined') window._ytfErklaeren = _ytfErklaeren;
+if (typeof document !== 'undefined') { try { if (document.head) _ytfStil(); else document.addEventListener('DOMContentLoaded', _ytfStil); } catch (e) {} }
 
 function renderYearlyTaxForm() {
   var box = document.getElementById('yearly-tax-form-box');
@@ -2507,17 +2558,23 @@ function renderYearlyTaxForm() {
   var nYears = Math.min(15, State.cfRows.length);
   for (var i = 0; i < nYears; i++) years.push({ idx: i, year: startYear + i });
 
-  var html =
-    '<div class="ytf-toolbar">' +
-      (_dgYtf < 3 ? '' : '<div class="ytf-mode-toggle">' +
-        '<button class="ytf-mode-btn ' + (mode === 'quick' ? 'active' : '') + '" onclick="setTaxFormMode(\'quick\')">Quick-Modus</button>' +
-        '<button class="ytf-mode-btn ' + (mode === 'detail' ? 'active' : '') + '" onclick="setTaxFormMode(\'detail\')">Detail-Modus</button>' +
-      '</div>') +
+  _ytfStil();   /* v4014 */
+  /* v4014 · Marcel 23.11.2026: Quick/Detail, Belege je Jahr, Vorschläge wiederherstellen und Jahre standen bei
+     390 px in vier Zeilen ohne Linie (185 px). Jetzt EINE Leiste mit Rahmen: Umschalter links, die Knoepfe
+     gleich hoch daneben (am Handy darunter in einer Reihe). */
+  var _knoepfe =
       /* v3164 · Jahresansicht: jeder Posten mit den Belegen, aus denen er stammt (unterlagen-eingang.js) */
-      (window.DpEingang && window.DpEingang.jahresAnsicht ? '<button class="btn btn-outline btn-sm" onclick="DpEingang.jahresAnsicht()" style="margin-left:auto" title="Jedes Jahr: welcher Wert aus welcher Rechnung kommt">Belege je Jahr</button>' : '') +
-      '<button class="btn btn-outline btn-sm" onclick="resetAllTaxOverrides()" title="Alle manuellen Eingaben zurücksetzen">↺ Vorschläge wiederherstellen</button>' +
+      (window.DpEingang && window.DpEingang.jahresAnsicht ? '<button type="button" class="ytf-bar-btn" onclick="DpEingang.jahresAnsicht()" title="Jedes Jahr: welcher Wert aus welcher Rechnung kommt">Belege je Jahr</button>' : '') +
+      '<button type="button" class="ytf-bar-btn" onclick="resetAllTaxOverrides()" title="Vorschläge wiederherstellen: alle manuellen Eingaben zurücksetzen">↺ Vorschläge</button>' +
       /* v3363 · Jahresbuch (Ist-Miete je Jahr, Status der Steuer) - dieselbe Eingabe wie im Reiter Miete */
-      (window.DpJahresbuch && window.DpJahresbuch.verfuegbar() ? '<button class="btn btn-outline btn-sm" onclick="DpJahresbuch.oeffnen()" title="Ist-Miete, Restschuld und Status der Steuer je Jahr">Jahre</button>' : '') +
+      (window.DpJahresbuch && window.DpJahresbuch.verfuegbar() ? '<button type="button" class="ytf-bar-btn" onclick="DpJahresbuch.oeffnen()" title="Ist-Miete, Restschuld und Status der Steuer je Jahr">Jahre</button>' : '');
+  var html =
+    '<div class="ytf-toolbar ytf-bar">' +
+      (_dgYtf < 3 ? '' : '<div class="ytf-mode-toggle">' +
+        '<button type="button" class="ytf-mode-btn ' + (mode === 'quick' ? 'active' : '') + '" onclick="setTaxFormMode(\'quick\')" title="Quick-Modus">Quick</button>' +
+        '<button type="button" class="ytf-mode-btn ' + (mode === 'detail' ? 'active' : '') + '" onclick="setTaxFormMode(\'detail\')" title="Detail-Modus">Detail</button>' +
+      '</div>') +
+      '<div class="ytf-bar-knoepfe">' + _knoepfe + '</div>' +
     '</div>';
 
   html += _ytfJahresHinweise();

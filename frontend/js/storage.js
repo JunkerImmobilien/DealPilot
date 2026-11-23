@@ -1753,6 +1753,29 @@ window._newObjLeeren = _newObjLeeren;
 //   3) Debounce: mehrere renderSaved()-Aufrufe innerhalb von 80ms werden zu einem einzigen zusammengefasst
 //   4) Wenn die DOM-Liste schon korrekte Cards zeigt und der Cache frisch ist → nur live-Daten der aktiven Karte updaten
 var _renderCache = { items: null, ts: 0, ttl: 60 * 1000 };
+/* v4010 · Marcel 23.11.2026: das Portfolio-Cockpit erst zeigen, wenn mindestens ein Objekt gewonnen
+   (im Bestand) ist, die leere Ansicht verwirrt. Gezaehlt aus DERSELBEN Listenabfrage wie die Karten,
+   vor dem Mandanten- und Kundenfilter, ohne Objekte, die fuer den Kunden weitergefuehrt werden
+   (kunde_ziel 'kunde', wie dashboard.js wonList). Gesperrt per Klasse, nie per Inline-Stil (v1935d), mit
+   #sidebar-Anker: aside.sidebar .sb-act-item{display:flex!important} (0,2,1) schlaegt jede schwaechere
+   Sperre (v3495). #sb-actions-accordion: ab 1025 px steht das Register in der .dpl-schiene (v3962a). */
+(function _dpCockpitSperreStil() {
+  try {
+    if (document.getElementById('dp-cockpit-sperre')) return;
+    var st = document.createElement('style'); st.id = 'dp-cockpit-sperre';
+    var sel = ".sb-act-item[onclick=\"sbActionsAction('cockpit')\"]:not(.dp-frei)";
+    st.textContent = sel + ',html body #sidebar ' + sel + ',html body #sb-actions-accordion ' + sel + '{display:none !important}';
+    (document.head || document.documentElement).appendChild(st);
+  } catch (e) {}
+})();
+function _dpBestandMelden(items) {
+  var n = 0;
+  try { (items || []).forEach(function (o) { if (o && o.deal_won && o.kunde_ziel !== 'kunde') n++; }); } catch (e) {}
+  var hat = n > 0, vorher = window._dpHatBestand;
+  window._dpHatBestand = hat;
+  try { document.querySelectorAll(".sb-act-item[onclick=\"sbActionsAction('cockpit')\"]").forEach(function (b) { b.classList.toggle('dp-frei', hat); }); } catch (e) {}
+  if (vorher !== hat) { try { window.dispatchEvent(new CustomEvent('dp:bestand', { detail: { anzahl: n, hat: hat } })); } catch (e) {} }
+}
 /* v729-allobj-cache: Cache fuer getAllObjectsData (verhindert N+1-Flut -> 429). TTL 8s + inflight-dedup. */
 var _allObjCache = { data: null, ts: 0, ttl: 8000, inflight: null };
 var _renderTimer = null;
@@ -2196,6 +2219,7 @@ async function renderSaved(opts) {
         }
       }
 
+      _dpBestandMelden(items);   /* v4010 */
       if (!items.length) {
         list.innerHTML = '<div class="sb-empty">Noch keine Objekte<br>gespeichert.</div>';
         return;

@@ -271,6 +271,29 @@
       X + '.dab-row-sub{font-size:12px !important;color:#6B6356 !important;text-align:left !important}',
       X + '.dab-row-x{text-align:left !important}',
       '@media(max-width:700px){' + X + '.dab-tafel-rows{grid-template-columns:1fr}}',
+      /* v4013 · Marcel 23.11.2026 (Handy): „komischer Rahmen“ um Gewonnen / im Bestand. Gemessen bei 390 px:
+         die Tafel trug einen eigenen Rahmen (#s8 .dab-cockpit .dab-tafel, 1 px) um Karten UND Ankauf-/ViVi-Zeilen,
+         und der ViVi-Knopf (nowrap, 316 px) zog die Rasterspalte auf 347 px bei 277 px Platz: Karten und Knoepfe
+         liefen rechts aus der Karte und wurden abgeschnitten. Dazu die 3-px-Kante oben auf der gewaehlten Karte.
+         Jetzt: Spalte minmax(0,1fr), kein Tafelrahmen, drei gleich hohe Statuskarten (Punkt links, Text, Haken
+         rechts an der gewaehlten), Knoepfe brechen um. */
+      '@media(max-width:760px){'
+        + X + '.dab-body{padding:18px 14px 18px !important}'
+        + X + '.dab-status-grid{grid-template-columns:minmax(0,1fr) !important}'
+        + X + '.dab-tafel,' + X + '.dab-cockpit .dab-tafel{border:0 !important;background:transparent !important;min-width:0 !important;overflow:visible !important}'
+        + X + '.dab-cockpit .dab-tafel-bar{background:transparent !important;border:0 !important;padding:0 2px 8px !important;flex-wrap:wrap;row-gap:2px}'
+        + X + '.dab-tafel-rows{grid-template-columns:minmax(0,1fr) !important;gap:8px !important}'
+        + X + '.dab-row{flex-direction:row !important;align-items:center !important;gap:12px !important;padding:12px 14px !important;min-height:60px !important;border:1px solid #E6E0D3 !important;border-radius:12px !important;box-shadow:none !important;position:relative}'
+        + X + '.dab-row .dab-row-dot{flex:0 0 10px;width:10px !important;height:10px !important;margin:0 !important}'
+        + X + '.dab-row-x{flex:1 1 auto;min-width:0}'
+        + X + '.dab-row-sub{margin-top:2px}'
+        + X + '.dab-row.active,' + X + '.dab-row[data-status="won"].active,' + X + '.dab-row[data-status="lost"].active{box-shadow:none !important;border-width:1.5px !important}'
+        + X + '.dab-row.active::after{content:"✓";flex:0 0 auto;font:700 15px/1 Inter,sans-serif;color:var(--wl-c9a84c, #C9A84C)}'
+        + X + '.dab-row[data-status="won"].active::after{color:#3FA56C}'
+        + X + '.dab-row[data-status="lost"].active::after{color:#B8625C}'
+        + X + '.dab-tafel .btn,' + X + '.dab-tafel button,' + X + '.dab-tafel .ank-btn-leise{white-space:normal !important;max-width:100%;min-width:0 !important;height:auto;line-height:1.3}'
+        + X + '.dab-tafel .ank-aktionen{min-width:0 !important;flex-wrap:wrap}'
+      + '}',
       /* Dokumente als Karten */
       X + '.dab-smart-head{display:none !important}',
       X + '.dab-smart-body{max-height:none !important;overflow:visible !important;display:grid !important;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}',
@@ -1018,12 +1041,12 @@
       }
     } catch (e) {}
     function drChip(ok, lbl) {
-      return '<span style="display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:99px;font-size:11px;font-weight:600;margin-right:6px;' +
+      return '<span class="dab-dr-chip" style="display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:99px;font-size:11px;font-weight:600;white-space:nowrap;line-height:1.4;' +   /* v4014 nowrap, Abstand ueber gap */
         (ok ? 'background:rgba(63,165,108,.14);color:#2f7d52;border:1px solid rgba(63,165,108,.4)'
             : 'background:rgba(0,0,0,.04);color:#8a8378;border:1px solid #ddd6c8') + '">' +
         (ok ? '\u2713' : '\u2715') + ' ' + lbl + '</span>';
     }
-    var drChips = '<div style="margin-top:7px">' + drChip(_pOk, 'Pers\u00f6nlich verkn\u00fcpft') + drChip(_oOk, 'Objekt verkn\u00fcpft') + '</div>';
+    var drChips = '<div class="dab-dr-chips" style="margin-top:8px;display:flex;flex-wrap:wrap;gap:6px">' + drChip(_pOk, 'Pers\u00f6nlich verkn\u00fcpft') + drChip(_oOk, 'Objekt verkn\u00fcpft') + '</div>';
     var drBtnLabel = (_pOk && _oOk) ? 'Verwalten' : 'Einrichten';
     var inner = '';
     try {
@@ -1033,7 +1056,7 @@
     } catch (e) { inner = ''; }
     host.innerHTML =
       '<div class="dab-dr-link"><div class="dab-dr-ic"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7a8 3 0 0 0 16 0 8 3 0 0 0-16 0z"/><path d="M4 7v10a8 3 0 0 0 16 0V7"/><path d="M4 12a8 3 0 0 0 16 0"/></svg></div>' +
-        '<div class="dab-dr-x"><div class="dab-dr-t">Datenraum verkn\u00fcpfen</div><div class="dab-dr-s">Pers\u00f6nlicher + Objekt-Datenraum \u2014 werden Bank-Anfragen automatisch beigef\u00fcgt und schalten Partner-Anfragen frei.</div>' + drChips + '</div>' +
+        '<div class="dab-dr-x"><div class="dab-dr-t">Datenraum verkn\u00fcpfen</div><div class="dab-dr-s">Pers\u00f6nlicher und Objekt-Datenraum gehen mit jeder Bank-Anfrage mit und schalten Partner-Anfragen frei.</div>' + drChips + '</div>' +
         '<button class="dab-dr-btn" type="button" onclick="DealPilotDealAction.openDatenraumSettings()">' + drBtnLabel + '</button></div>' +
       (inner ? '<div class="dab-dr-panel">' + inner + '</div>' : '');
   }
@@ -1693,6 +1716,29 @@
     '#s8 .dab-bp-stub-ad{background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 6%, transparent)}',
     '#s8 .dab-bp-plus{color:var(--acc);font-size:20px;font-family:var(--dab-fs);font-weight:700}',
     '@media(max-width:600px){#s8 .dab-bp{flex-basis:352px}#s8 .dab-row-flip{min-width:92px}}',
+    /* v4014 · Marcel 23.11.2026 (Handy): Datenraum-Pillen ueberschnitten sich (zwei 41 px hohe Pillen ohne
+       Abstand untereinander, Text in einer 112 px schmalen Spalte), „Einrichten“ unschoen. Netzwerk-Karten
+       gedrungen: 289 x 557 px bei 390 px, davon 49 px Abriss rechts und 28 px doppelter Seitenrand.
+       Nur bis 760 px, der Browser bleibt wie er ist. */
+    '@media(max-width:760px){'
+      + 'html body #s8 .dab-panel{padding-left:0 !important;padding-right:0 !important}'
+      + 'html body #s8 .dab-dr-link{display:grid !important;grid-template-columns:38px minmax(0,1fr) auto;grid-template-areas:"ic t btn" "s s s" "c c c";align-items:center;column-gap:12px;row-gap:8px;padding:14px !important}'
+      + 'html body #s8 .dab-dr-x{display:contents}'
+      + 'html body #s8 .dab-dr-ic{grid-area:ic}'
+      + 'html body #s8 .dab-dr-t{grid-area:t;min-width:0}'
+      + 'html body #s8 .dab-dr-s{grid-area:s;font-size:12px !important;line-height:1.45;margin:0 !important}'
+      + 'html body #s8 .dab-dr-chips{grid-area:c;margin:0 !important}'
+      + 'html body #s8 .dab-dr-btn{grid-area:btn;width:auto !important;height:36px !important;min-height:36px !important;padding:0 14px !important;border-radius:9px !important;background:#141210 !important;color:var(--wl-e8cc7a, #E8CC7A) !important;border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 60%, transparent) !important;font:600 12.5px Inter,sans-serif !important;box-shadow:none !important}'
+      + 'html body #s8 #dab-rails-host .dab-rail{gap:10px !important;padding:4px 0 8px !important}'
+      + 'html body #s8 #dab-rails-host .dab-bp{flex:0 0 calc(100% - 26px) !important;border-radius:14px !important}'
+      + 'html body #s8 #dab-rails-host .dab-bp-stub,html body #s8 #dab-rails-host .dab-edge{display:none !important}'
+      + 'html body #s8 #dab-rails-host .dab-bp-l{padding:14px !important}'
+      + 'html body #s8 #dab-rails-host .dab-bp-logo{width:44px !important;height:44px !important;flex:0 0 44px !important}'
+      + 'html body #s8 #dab-rails-host .dab-bp-logo img{width:42px !important;height:42px !important}'
+      + 'html body #s8 #dab-rails-host .dab-bp-top{gap:10px !important;margin-bottom:10px !important}'
+      + 'html body #s8 #dab-rails-host .dab-bp-desc{font-size:12.5px !important;line-height:1.45 !important}'
+      + 'html body #s8 #dab-rails-host .dab-bp-tags{gap:5px !important;margin-bottom:8px !important}'
+    + '}',
     /* Lead-Sheet (an body) */
     '.dabm-mask{position:fixed;inset:0;background:rgba(10,10,10,.55);backdrop-filter:blur(3px);display:none;align-items:center;justify-content:center;z-index:9990;padding:16px}',
     '.dabm-mask.show{display:flex}',
