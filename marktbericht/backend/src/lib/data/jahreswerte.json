@@ -341,9 +341,9 @@
       "id": "kappungsgrenzen",
       "name": "Kappungsgrenzen- und Mietpreisbremse-Verordnungen der Laender",
       "gruppe": "miete",
-      "stand": "Liste Stand 19.10.2026",
-      "erwartet": "2026-10-19",
-      "quelle": "Landesverordnungen (§ 558 Abs. 3 BGB, § 556d BGB)",
+      "stand": "Liste Stand 23.11.2026 (HE neue MiSchuV ab 20.11.2026, BW Nachfolge ab 01.01.2027 vorgemerkt)",
+      "erwartet": "2026-11-23",
+      "quelle": "Landesverordnungen (§ 558 Abs. 3 BGB, § 556d BGB); HE: GVBl. 2026 Nr. 78 vom 19.11.2026 (MiSchuV vom 17.11.2026, § 1, § 5, Anlage 1 S. 3); BW: GBl. 2026 Nr. 95 und Nr. 96 vom 12.11.2026 (MietBegrVO BW / KappVO BW vom 10.11.2026, je § 1 und § 2); abgerufen 23.11.2026",
       "turnus": "je Verordnung (naechster Ablauf wird aus der Liste gelesen)",
       "faellig_aus": { "datei": "marktbericht/backend/src/lib/data/kappungsgrenzen.json", "muster": "\"gueltig_bis\":\\s*\"(\\d{4}-\\d{2}-\\d{2})\"" },
       "verfahren": "agent",
@@ -351,7 +351,7 @@
         { "datei": "marktbericht/backend/src/lib/data/kappungsgrenzen.json", "bezeichner": "stand", "muster": "\"stand\":\\s*\"([\\d-]+)\"" },
         { "datei": "frontend/js/data/kappungsgrenzen.json", "bezeichner": "stand (Spiegel)", "muster": "\"stand\":\\s*\"([\\d-]+)\"" }
       ],
-      "hinweis": "Pruefer im Deploy: tools/kappungsgrenzen-pruefen.mjs (120-Tage-Vorlauf je Verordnung). Stand 07.11.2026: HE - neue Mieterschutzverordnung (Entwurf 24.09.2026, 71 Gemeinden) nicht verkuendet; laut Ministerium (dpa 06.11.2026) Kabinettsbeschluss in KW 46 und Inkrafttreten noch im November geplant - nach Verkuendung im GVBl. HE nachziehen, faellig bleibt 25.11.2026. BW - Neufassung Mietpreisbegrenzungs-/Kappungsgrenzenverordnung ab 01.01.2027 nur zur Anhoerung freigegeben (Ministerrat 22.09.2026, mlw.baden-wuerttemberg.de), nicht im GBl. verkuendet."
+      "hinweis": "Pruefer im Deploy: tools/kappungsgrenzen-pruefen.mjs (120-Tage-Vorlauf je Verordnung). Stand 23.11.2026: HE - Hessische Mieterschutzverordnung (MiSchuV) vom 17.11.2026, GVBl. 2026 Nr. 78 vom 19.11.2026, in Kraft 20.11.2026 (§ 5 Abs. 1), hebt die VO 2020 auf (§ 4); 71 Gemeinden (Anlage 1), Mietpreisbremse bis 31.12.2029, Kappung 15 % bis 19.11.2031 (§ 5 Abs. 2); 36 neu, 14 weggefallen; unsicher aufgehoben. BW - MietBegrVO BW und KappVO BW vom 10.11.2026 (GBl. 2026 Nr. 95/96 vom 12.11.2026) gelten 01.01.2027 bis 31.12.2029 fuer 133 Gemeinden: die 130 bisherigen (gueltig_bis schon auf 2029-12-31) plus Kehl, Konstanz, Mannheim (stehen bis dahin nur unter laender.BW.nachfolge). Faellig 31.12.2026 = Umstellung laut nachfolge.umstellen_am (Land-Kopf auf die neue VO, drei Gemeinden aufnehmen); ab 01.01.2027 wird kappungsgrenzen-pruefen sonst ROT."
     },
     {
       "id": "belwertv_mindestzins",

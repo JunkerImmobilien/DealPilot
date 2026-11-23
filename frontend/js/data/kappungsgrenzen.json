@@ -1,6 +1,6 @@
 {
-  "stand": "2026-10-19",
-  "quelle_hinweis": "Kappungsgrenze nach § 558 Abs. 3 BGB (15 % statt 20 % in drei Jahren) und Mietpreisbremse nach § 556d BGB je Land, aus den geltenden Landesverordnungen (Gesetz- und Verordnungsblaetter, Landesrecht-Portale), Stand 19.10.2026. Ausserhalb der Liste gilt die Kappungsgrenze von 20 % und keine Mietpreisbremse. AGS: Die Verordnungen nennen meist nur Namen; zugeordnet ueber das Destatis-Gemeindeverzeichnis (GV-ISys, Stand 31.12.2025), je Land unter ags_zuordnung vermerkt. Jede Gemeinde traegt kappung_gueltig_bis bzw. mietpreisbremse_gueltig_bis: nach diesem Datum gilt der Eintrag nicht mehr und muss neu geerntet werden - nie stillschweigend weiterverwenden. Laender mit unsicher: true nicht automatisch setzen, sondern mit Hinweis anzeigen.",
+  "stand": "2026-11-23",
+  "quelle_hinweis": "Kappungsgrenze nach § 558 Abs. 3 BGB (15 % statt 20 % in drei Jahren) und Mietpreisbremse nach § 556d BGB je Land, aus den geltenden Landesverordnungen (Gesetz- und Verordnungsblaetter, Landesrecht-Portale), Stand 19.10.2026, HE und BW nachgeführt 23.11.2026. Ausserhalb der Liste gilt die Kappungsgrenze von 20 % und keine Mietpreisbremse. AGS: Die Verordnungen nennen meist nur Namen; zugeordnet ueber das Destatis-Gemeindeverzeichnis (GV-ISys, Stand 31.12.2025), je Land unter ags_zuordnung vermerkt. Jede Gemeinde traegt kappung_gueltig_bis bzw. mietpreisbremse_gueltig_bis: nach diesem Datum gilt der Eintrag nicht mehr und muss neu geerntet werden - nie stillschweigend weiterverwenden. Laender mit unsicher: true nicht automatisch setzen, sondern mit Hinweis anzeigen.",
   "standard_kappung_pct": 20,
   "laender": {
     "SH": {
@@ -1815,435 +1815,607 @@
       "anzahl_mietpreisbremse": 57
     },
     "HE": {
-      "verordnung": "Verordnung zur Bestimmung des Geltungsbereichs der bundesrechtlichen Mieterschutzvorschriften (Mieterschutzverordnung) vom 18. November 2020, geändert durch Verordnung vom 12. November 2025",
-      "fundstelle": "GVBl. 2020 S. 802 (Nr. 23 vom 25.11.2020); Änderung GVBl. 2025 Nr. 74 vom 17.11.2025",
-      "gueltig_ab": "2020-11-26",
-      "gueltig_bis": "2026-11-25",
-      "url": "https://verkuendung.hessen.de/sites/verkuendung.hessen.de/files/veroeffentlichungsplattform_plugin/published/1174/GVBl_2025_Nr_74_Regelungstext.pdf",
+      "verordnung": "Hessische Verordnung zur Bestimmung des Geltungsbereichs der bundesrechtlichen Mieterschutzvorschriften (Hessische Mieterschutzverordnung – MiSchuV) vom 17. November 2026",
+      "fundstelle": "GVBl. 2026 Nr. 78 vom 19.11.2026",
+      "gueltig_ab": "2026-11-20",
+      "gueltig_bis": "2031-11-19",
+      "url": "https://verkuendung.hessen.de/sites/verkuendung.hessen.de/files/veroeffentlichungsplattform_plugin/published/1568/GVBl_2026_Nr_78_Regelungstext.pdf",
       "kappung_pct_gelistet": 15,
       "mietpreisbremse_gelistet": true,
       "mietpreisbremse_verordnung": {
-        "verordnung": "Verordnung zur Bestimmung des Geltungsbereichs der bundesrechtlichen Mieterschutzvorschriften (Mieterschutzverordnung) vom 18. November 2020, geändert durch Verordnung vom 12. November 2025",
-        "fundstelle": "GVBl. 2020 S. 802 (Nr. 23 vom 25.11.2020); Änderung GVBl. 2025 Nr. 74 vom 17.11.2025",
-        "gueltig_ab": "2020-11-26",
-        "gueltig_bis": "2026-11-25",
-        "url": "https://verkuendung.hessen.de/sites/verkuendung.hessen.de/files/veroeffentlichungsplattform_plugin/published/1174/GVBl_2025_Nr_74_Regelungstext.pdf",
+        "verordnung": "Hessische Verordnung zur Bestimmung des Geltungsbereichs der bundesrechtlichen Mieterschutzvorschriften (Hessische Mieterschutzverordnung – MiSchuV) vom 17. November 2026",
+        "fundstelle": "GVBl. 2026 Nr. 78 vom 19.11.2026",
+        "gueltig_ab": "2026-11-20",
+        "gueltig_bis": "2029-12-31",
+        "url": "https://verkuendung.hessen.de/sites/verkuendung.hessen.de/files/veroeffentlichungsplattform_plugin/published/1568/GVBl_2026_Nr_78_Regelungstext.pdf",
         "gleiche_verordnung": true
       },
-      "ags_zuordnung": "über Destatis-Gemeindeverzeichnis 31.12.2025 nach Name (VO nennt keine AGS)",
+      "ags_zuordnung": "über Destatis-Gemeindeverzeichnis 31.12.2025 (GV-ISys, Auszug GV) nach Name (VO nennt keine AGS)",
+      "belege": [
+        "https://verkuendung.hessen.de/sites/verkuendung.hessen.de/files/veroeffentlichungsplattform_plugin/published/1568/GVBl_2026_Nr_78_Regelungstext.pdf — GVBl. Hessen 2026 Nr. 78 vom 19.11.2026, S. 1–3 (abgerufen 23.11.2026): MiSchuV vom 17.11.2026; § 1 Nr. 1 Mietpreisbremse (§ 556d Abs. 2 BGB), Nr. 2 Kappungsgrenze 15 Prozent (§ 558 Abs. 3 Satz 2 BGB), Nr. 3 Kündigungsbeschränkung sechs Jahre (§ 577a Abs. 2 BGB) für die 71 Gemeinden der Anlage 1 (S. 3); § 4 hebt die Mieterschutzverordnung vom 18.11.2020 (GVBl. S. 802), geändert durch VO vom 12.11.2025 (GVBl. 2025 Nr. 74), auf; § 5 Abs. 1: in Kraft am Tag nach der Verkündung (= 20.11.2026); § 5 Abs. 2: § 1 Nr. 1 (Mietpreisbremse), § 3 und Anlage 2 außer Kraft mit Ablauf des 31.12.2029, im Übrigen mit Ablauf des 19.11.2031.",
+        "https://www.destatis.de/DE/Themen/Laender-Regionen/Regionales/Gemeindeverzeichnis/Administrativ/Archiv/GVAuszugJ/31122025_Auszug_GV.xlsx — AGS-Zuordnung der 71 Namen (abgerufen 23.11.2026), alle eindeutig",
+        "https://hessen.de/presse/mieterschutz-soll-auf-71-kommunen-wachsen — 24.09.2026: Entwurf mit 71 Kommunen (Kontext, kein Beleg)"
+      ],
+      "unsicher": false,
+      "hinweise": [
+        "Eine Verordnung regelt Mietpreisbremse (§ 556d), Kappung 15 % (§ 558 Abs. 3) und Kündigungssperre (§ 577a) für dieselben 71 Gemeinden; Mietpreisbremse bis 31.12.2029, Kappung bis 19.11.2031.",
+        "Gegenüber der MieterschutzVO 2020 (49 Gemeinden) neu: Alsbach-Hähnlein, Bad Nauheim, Bensheim, Beselich, Bickenbach, Einhausen, Erlensee, Fernwald, Friedberg (Hessen), Gießen, Gladenbach, Großkrotzenburg, Groß-Umstadt, Hanau, Heidenrod, Heppenheim (Bergstraße), Hochheim am Main, Hofheim am Taunus, Idstein, Karben, Kronberg im Taunus, Lampertheim, Liederbach am Taunus, Lorsch, Merenberg, Mühlheim am Main, Münster (Hessen), Neustadt (Hessen), Niederdorfelden, Oberursel (Taunus), Rodenbach, Rödermark, Ronneburg, Seeheim-Jugenheim, Wehrheim, Zwingenberg. Weggefallen (seit 20.11.2026 Kappung 20 %, keine Bremse): Biebesheim am Rhein, Fuldabrück, Groß-Zimmern, Hainburg, Kelsterbach, Kiedrich, Mainhausen, Maintal, Mörfelden-Walldorf, Pfungstadt, Rosbach vor der Höhe, Roßdorf, Usingen, Viernheim.",
+        "Vorgänger: Mieterschutzverordnung vom 18.11.2020 (GVBl. S. 802), verlängert durch GVBl. 2025 Nr. 74 bis 25.11.2026, durch § 4 MiSchuV aufgehoben. Deren Verlängerung ab 26.11.2025 hielt AG Frankfurt, Urteil vom 10.06.2026, Az. 33029 C 130/25 (nicht rechtskräftig) für unwirksam — betrifft nur Mietbeginne 26.11.2025 bis 19.11.2026, nicht die neue VO.",
+        "Destatis-Namen abweichend: Bad Homburg v. d. Höhe (06434001)."
+      ],
+      "anzahl_kappung15": 71,
+      "anzahl_mietpreisbremse": 71,
       "gemeinden": [
+        {
+          "ags": "06432001",
+          "name": "Alsbach-Hähnlein",
+          "kappung15": true,
+          "mietpreisbremse": true,
+          "kappung_gueltig_bis": "2031-11-19",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
+        },
         {
           "ags": "06434001",
           "name": "Bad Homburg vor der Höhe",
           "kappung15": true,
           "mietpreisbremse": true,
           "hinweis": "Destatis-Name: Bad Homburg v. d. Höhe, Stadt",
-          "kappung_gueltig_bis": "2026-11-25",
-          "mietpreisbremse_gueltig_bis": "2026-11-25"
+          "kappung_gueltig_bis": "2031-11-19",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
+        },
+        {
+          "ags": "06440002",
+          "name": "Bad Nauheim",
+          "kappung15": true,
+          "mietpreisbremse": true,
+          "kappung_gueltig_bis": "2031-11-19",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "06436001",
           "name": "Bad Soden am Taunus",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-11-25",
-          "mietpreisbremse_gueltig_bis": "2026-11-25"
+          "kappung_gueltig_bis": "2031-11-19",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "06440003",
           "name": "Bad Vilbel",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-11-25",
-          "mietpreisbremse_gueltig_bis": "2026-11-25"
+          "kappung_gueltig_bis": "2031-11-19",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
-          "ags": "06433001",
-          "name": "Biebesheim am Rhein",
+          "ags": "06431002",
+          "name": "Bensheim",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-11-25",
-          "mietpreisbremse_gueltig_bis": "2026-11-25"
+          "kappung_gueltig_bis": "2031-11-19",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
+        },
+        {
+          "ags": "06533001",
+          "name": "Beselich",
+          "kappung15": true,
+          "mietpreisbremse": true,
+          "kappung_gueltig_bis": "2031-11-19",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
+        },
+        {
+          "ags": "06432003",
+          "name": "Bickenbach",
+          "kappung15": true,
+          "mietpreisbremse": true,
+          "kappung_gueltig_bis": "2031-11-19",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "06433002",
           "name": "Bischofsheim",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-11-25",
-          "mietpreisbremse_gueltig_bis": "2026-11-25"
+          "kappung_gueltig_bis": "2031-11-19",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "06411000",
           "name": "Darmstadt",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-11-25",
-          "mietpreisbremse_gueltig_bis": "2026-11-25"
+          "kappung_gueltig_bis": "2031-11-19",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "06438001",
           "name": "Dietzenbach",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-11-25",
-          "mietpreisbremse_gueltig_bis": "2026-11-25"
+          "kappung_gueltig_bis": "2031-11-19",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "06438002",
           "name": "Dreieich",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-11-25",
-          "mietpreisbremse_gueltig_bis": "2026-11-25"
+          "kappung_gueltig_bis": "2031-11-19",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "06438003",
           "name": "Egelsbach",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-11-25",
-          "mietpreisbremse_gueltig_bis": "2026-11-25"
+          "kappung_gueltig_bis": "2031-11-19",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
+        },
+        {
+          "ags": "06431006",
+          "name": "Einhausen",
+          "kappung15": true,
+          "mietpreisbremse": true,
+          "kappung_gueltig_bis": "2031-11-19",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "06439003",
           "name": "Eltville am Rhein",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-11-25",
-          "mietpreisbremse_gueltig_bis": "2026-11-25"
+          "kappung_gueltig_bis": "2031-11-19",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
+        },
+        {
+          "ags": "06435007",
+          "name": "Erlensee",
+          "kappung15": true,
+          "mietpreisbremse": true,
+          "kappung_gueltig_bis": "2031-11-19",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "06436003",
           "name": "Eschborn",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-11-25",
-          "mietpreisbremse_gueltig_bis": "2026-11-25"
+          "kappung_gueltig_bis": "2031-11-19",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
+        },
+        {
+          "ags": "06531004",
+          "name": "Fernwald",
+          "kappung15": true,
+          "mietpreisbremse": true,
+          "kappung_gueltig_bis": "2031-11-19",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "06436004",
           "name": "Flörsheim am Main",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-11-25",
-          "mietpreisbremse_gueltig_bis": "2026-11-25"
+          "kappung_gueltig_bis": "2031-11-19",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "06412000",
           "name": "Frankfurt am Main",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-11-25",
-          "mietpreisbremse_gueltig_bis": "2026-11-25"
+          "kappung_gueltig_bis": "2031-11-19",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
+        },
+        {
+          "ags": "06440008",
+          "name": "Friedberg (Hessen)",
+          "kappung15": true,
+          "mietpreisbremse": true,
+          "kappung_gueltig_bis": "2031-11-19",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "06434002",
           "name": "Friedrichsdorf",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-11-25",
-          "mietpreisbremse_gueltig_bis": "2026-11-25"
+          "kappung_gueltig_bis": "2031-11-19",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
-          "ags": "06633008",
-          "name": "Fuldabrück",
+          "ags": "06531005",
+          "name": "Gießen",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-11-25",
-          "mietpreisbremse_gueltig_bis": "2026-11-25"
+          "kappung_gueltig_bis": "2031-11-19",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "06433005",
           "name": "Ginsheim-Gustavsburg",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-11-25",
-          "mietpreisbremse_gueltig_bis": "2026-11-25"
+          "kappung_gueltig_bis": "2031-11-19",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
+        },
+        {
+          "ags": "06534010",
+          "name": "Gladenbach",
+          "kappung15": true,
+          "mietpreisbremse": true,
+          "kappung_gueltig_bis": "2031-11-19",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "06432008",
           "name": "Griesheim",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-11-25",
-          "mietpreisbremse_gueltig_bis": "2026-11-25"
+          "kappung_gueltig_bis": "2031-11-19",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "06433006",
           "name": "Groß-Gerau",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-11-25",
-          "mietpreisbremse_gueltig_bis": "2026-11-25"
+          "kappung_gueltig_bis": "2031-11-19",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
-          "ags": "06432011",
-          "name": "Groß-Zimmern",
+          "ags": "06432010",
+          "name": "Groß-Umstadt",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-11-25",
-          "mietpreisbremse_gueltig_bis": "2026-11-25"
+          "kappung_gueltig_bis": "2031-11-19",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
-          "ags": "06438004",
-          "name": "Hainburg",
+          "ags": "06435011",
+          "name": "Großkrotzenburg",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-11-25",
-          "mietpreisbremse_gueltig_bis": "2026-11-25"
+          "kappung_gueltig_bis": "2031-11-19",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
+        },
+        {
+          "ags": "06435014",
+          "name": "Hanau",
+          "kappung15": true,
+          "mietpreisbremse": true,
+          "kappung_gueltig_bis": "2031-11-19",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
+        },
+        {
+          "ags": "06439005",
+          "name": "Heidenrod",
+          "kappung15": true,
+          "mietpreisbremse": true,
+          "kappung_gueltig_bis": "2031-11-19",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
+        },
+        {
+          "ags": "06431011",
+          "name": "Heppenheim (Bergstraße)",
+          "kappung15": true,
+          "mietpreisbremse": true,
+          "kappung_gueltig_bis": "2031-11-19",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "06438005",
           "name": "Heusenstamm",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-11-25",
-          "mietpreisbremse_gueltig_bis": "2026-11-25"
+          "kappung_gueltig_bis": "2031-11-19",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
+        },
+        {
+          "ags": "06436006",
+          "name": "Hochheim am Main",
+          "kappung15": true,
+          "mietpreisbremse": true,
+          "kappung_gueltig_bis": "2031-11-19",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
+        },
+        {
+          "ags": "06436007",
+          "name": "Hofheim am Taunus",
+          "kappung15": true,
+          "mietpreisbremse": true,
+          "kappung_gueltig_bis": "2031-11-19",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
+        },
+        {
+          "ags": "06439008",
+          "name": "Idstein",
+          "kappung15": true,
+          "mietpreisbremse": true,
+          "kappung_gueltig_bis": "2031-11-19",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
+        },
+        {
+          "ags": "06440012",
+          "name": "Karben",
+          "kappung15": true,
+          "mietpreisbremse": true,
+          "kappung_gueltig_bis": "2031-11-19",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "06436008",
           "name": "Kelkheim (Taunus)",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-11-25",
-          "mietpreisbremse_gueltig_bis": "2026-11-25"
-        },
-        {
-          "ags": "06433007",
-          "name": "Kelsterbach",
-          "kappung15": true,
-          "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-11-25",
-          "mietpreisbremse_gueltig_bis": "2026-11-25"
-        },
-        {
-          "ags": "06439009",
-          "name": "Kiedrich",
-          "kappung15": true,
-          "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-11-25",
-          "mietpreisbremse_gueltig_bis": "2026-11-25"
+          "kappung_gueltig_bis": "2031-11-19",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "06436009",
           "name": "Kriftel",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-11-25",
-          "mietpreisbremse_gueltig_bis": "2026-11-25"
+          "kappung_gueltig_bis": "2031-11-19",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
+        },
+        {
+          "ags": "06434006",
+          "name": "Kronberg im Taunus",
+          "kappung15": true,
+          "mietpreisbremse": true,
+          "kappung_gueltig_bis": "2031-11-19",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
+        },
+        {
+          "ags": "06431013",
+          "name": "Lampertheim",
+          "kappung15": true,
+          "mietpreisbremse": true,
+          "kappung_gueltig_bis": "2031-11-19",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "06438006",
           "name": "Langen (Hessen)",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-11-25",
-          "mietpreisbremse_gueltig_bis": "2026-11-25"
+          "kappung_gueltig_bis": "2031-11-19",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "06435017",
           "name": "Langenselbold",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-11-25",
-          "mietpreisbremse_gueltig_bis": "2026-11-25"
+          "kappung_gueltig_bis": "2031-11-19",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
-          "ags": "06438007",
-          "name": "Mainhausen",
+          "ags": "06436010",
+          "name": "Liederbach am Taunus",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-11-25",
-          "mietpreisbremse_gueltig_bis": "2026-11-25"
+          "kappung_gueltig_bis": "2031-11-19",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
-          "ags": "06435019",
-          "name": "Maintal",
+          "ags": "06431016",
+          "name": "Lorsch",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-11-25",
-          "mietpreisbremse_gueltig_bis": "2026-11-25"
+          "kappung_gueltig_bis": "2031-11-19",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "06534014",
           "name": "Marburg",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-11-25",
-          "mietpreisbremse_gueltig_bis": "2026-11-25"
+          "kappung_gueltig_bis": "2031-11-19",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
-          "ags": "06433008",
-          "name": "Mörfelden-Walldorf",
+          "ags": "06533012",
+          "name": "Merenberg",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-11-25",
-          "mietpreisbremse_gueltig_bis": "2026-11-25"
+          "kappung_gueltig_bis": "2031-11-19",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
+        },
+        {
+          "ags": "06438008",
+          "name": "Mühlheim am Main",
+          "kappung15": true,
+          "mietpreisbremse": true,
+          "kappung_gueltig_bis": "2031-11-19",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
+        },
+        {
+          "ags": "06432015",
+          "name": "Münster (Hessen)",
+          "kappung15": true,
+          "mietpreisbremse": true,
+          "kappung_gueltig_bis": "2031-11-19",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "06433009",
           "name": "Nauheim",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-11-25",
-          "mietpreisbremse_gueltig_bis": "2026-11-25"
+          "kappung_gueltig_bis": "2031-11-19",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "06434007",
           "name": "Neu-Anspach",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-11-25",
-          "mietpreisbremse_gueltig_bis": "2026-11-25"
+          "kappung_gueltig_bis": "2031-11-19",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "06438009",
           "name": "Neu-Isenburg",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-11-25",
-          "mietpreisbremse_gueltig_bis": "2026-11-25"
+          "kappung_gueltig_bis": "2031-11-19",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
+        },
+        {
+          "ags": "06534016",
+          "name": "Neustadt (Hessen)",
+          "kappung15": true,
+          "mietpreisbremse": true,
+          "kappung_gueltig_bis": "2031-11-19",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "06435021",
           "name": "Nidderau",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-11-25",
-          "mietpreisbremse_gueltig_bis": "2026-11-25"
+          "kappung_gueltig_bis": "2031-11-19",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
+        },
+        {
+          "ags": "06435022",
+          "name": "Niederdorfelden",
+          "kappung15": true,
+          "mietpreisbremse": true,
+          "kappung_gueltig_bis": "2031-11-19",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "06438010",
           "name": "Obertshausen",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-11-25",
-          "mietpreisbremse_gueltig_bis": "2026-11-25"
+          "kappung_gueltig_bis": "2031-11-19",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
+        },
+        {
+          "ags": "06434008",
+          "name": "Oberursel (Taunus)",
+          "kappung15": true,
+          "mietpreisbremse": true,
+          "kappung_gueltig_bis": "2031-11-19",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "06413000",
           "name": "Offenbach am Main",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-11-25",
-          "mietpreisbremse_gueltig_bis": "2026-11-25"
-        },
-        {
-          "ags": "06432018",
-          "name": "Pfungstadt",
-          "kappung15": true,
-          "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-11-25",
-          "mietpreisbremse_gueltig_bis": "2026-11-25"
+          "kappung_gueltig_bis": "2031-11-19",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "06433010",
           "name": "Raunheim",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-11-25",
-          "mietpreisbremse_gueltig_bis": "2026-11-25"
+          "kappung_gueltig_bis": "2031-11-19",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
-          "ags": "06440023",
-          "name": "Rosbach vor der Höhe",
+          "ags": "06435023",
+          "name": "Rodenbach",
           "kappung15": true,
           "mietpreisbremse": true,
-          "hinweis": "Destatis-Name: Rosbach v. d. Höhe, Stadt",
-          "kappung_gueltig_bis": "2026-11-25",
-          "mietpreisbremse_gueltig_bis": "2026-11-25"
+          "kappung_gueltig_bis": "2031-11-19",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
-          "ags": "06432020",
-          "name": "Roßdorf",
+          "ags": "06438012",
+          "name": "Rödermark",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-11-25",
-          "mietpreisbremse_gueltig_bis": "2026-11-25"
+          "kappung_gueltig_bis": "2031-11-19",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
+        },
+        {
+          "ags": "06435024",
+          "name": "Ronneburg",
+          "kappung15": true,
+          "mietpreisbremse": true,
+          "kappung_gueltig_bis": "2031-11-19",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "06433012",
           "name": "Rüsselsheim am Main",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-11-25",
-          "mietpreisbremse_gueltig_bis": "2026-11-25"
+          "kappung_gueltig_bis": "2031-11-19",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "06436011",
           "name": "Schwalbach am Taunus",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-11-25",
-          "mietpreisbremse_gueltig_bis": "2026-11-25"
+          "kappung_gueltig_bis": "2031-11-19",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
+        },
+        {
+          "ags": "06432022",
+          "name": "Seeheim-Jugenheim",
+          "kappung15": true,
+          "mietpreisbremse": true,
+          "kappung_gueltig_bis": "2031-11-19",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "06434010",
           "name": "Steinbach (Taunus)",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-11-25",
-          "mietpreisbremse_gueltig_bis": "2026-11-25"
-        },
-        {
-          "ags": "06434011",
-          "name": "Usingen",
-          "kappung15": true,
-          "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-11-25",
-          "mietpreisbremse_gueltig_bis": "2026-11-25"
-        },
-        {
-          "ags": "06431020",
-          "name": "Viernheim",
-          "kappung15": true,
-          "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-11-25",
-          "mietpreisbremse_gueltig_bis": "2026-11-25"
+          "kappung_gueltig_bis": "2031-11-19",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "06439017",
           "name": "Walluf",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-11-25",
-          "mietpreisbremse_gueltig_bis": "2026-11-25"
+          "kappung_gueltig_bis": "2031-11-19",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
+        },
+        {
+          "ags": "06434012",
+          "name": "Wehrheim",
+          "kappung15": true,
+          "mietpreisbremse": true,
+          "kappung_gueltig_bis": "2031-11-19",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "06432023",
           "name": "Weiterstadt",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-11-25",
-          "mietpreisbremse_gueltig_bis": "2026-11-25"
+          "kappung_gueltig_bis": "2031-11-19",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "06414000",
           "name": "Wiesbaden",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-11-25",
-          "mietpreisbremse_gueltig_bis": "2026-11-25"
+          "kappung_gueltig_bis": "2031-11-19",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
+        },
+        {
+          "ags": "06431022",
+          "name": "Zwingenberg",
+          "kappung15": true,
+          "mietpreisbremse": true,
+          "kappung_gueltig_bis": "2031-11-19",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         }
-      ],
-      "belege": [
-        "https://verkuendung.hessen.de/sites/verkuendung.hessen.de/files/veroeffentlichungsplattform_plugin/published/1174/GVBl_2025_Nr_74_Regelungstext.pdf — GVBl. Hessen 2025 Nr. 74: Art. 1 Nr. 1 ersetzt in § 5 Satz 2 der MieterschutzVO vom 18.11.2020 (GVBl. S. 802) \"2025\" durch \"2026\"; Begründung: \"unter Beibehaltung der bisherigen Gebietskulisse zunächst bis zum 25. November 2026 verlängert\"; Rechtsgrundlage § 556d Abs. 2, § 558 Abs. 3 Satz 3, § 577a Abs. 2 BGB (eine VO für alles); Kappung 15 % in den bestimmten Gebieten; 49 Gemeinden; Art. 2: Inkrafttreten am Tag nach Verkündung (18.11.2025)",
-        "https://www.umwelt-online.de/recht/bau/laender/he/mietschv20.htm — Volltext § 1 der MieterschutzVO 2020 mit den 49 Gemeinden (Sekundärquelle, Stand 19.11.2025)",
-        "https://www.hessenschau.de/politik/hanau-giessen-friedberg-in-diesen-kommunen-soll-kuenftig-die-mietpreisbremse-gelten-v1,faq-mietpreisbremse-ausgeweitet-100.html — 24.09.2026: Entwurf einer neuen VO mit 71 Kommunen; 35 bleiben, 14 fallen weg (zusammen = die 49 geltenden, Gegenprobe stimmt); geltende VO läuft im November 2026 aus; Beschluss Mitte November 2026 erwartet",
-        "https://www.hessenschau.de/politik/was-bedeutet-das-urteil-zur-hessischen-mietpreisbremse-v2,mietpreisbremse-hessen-unwirksam-100.html — 18.06.2026: AG Frankfurt hält die einjährige Verlängerung (Mietpreisbremse) für unwirksam; nicht rechtskräftig, Einzelfall, VO formal nicht aufgehoben"
-      ],
-      "unsicher": true,
-      "unsicher_grund": "Formal gilt die VO bis 25.11.2026 (belegt im GVBl. 2025 Nr. 74). Aber: AG Frankfurt, Urteil vom 10.06.2026, Az. 33029 C 130/25 (nicht rechtskräftig, Einzelfall; Stand Haufe 22.06.2026, ein Berufungsverfahren war am 20.10.2026 nicht auffindbar) hält die Verlängerung ab 26.11.2025 für unwirksam — Wirksamkeit seit 26.11.2025 gerichtlich umstritten, VO formal nicht aufgehoben. Nachfolge: Entwurf einer neuen Mieterschutzverordnung mit 71 Gemeinden (36 neu, 35 bleiben, 14 fallen weg; Mietpreisbremse 3 Jahre, übrige Vorschriften 5 Jahre) am 24.09.2026 in die Anhörung gegeben (Pressemitteilung Wirtschaftsministerium https://hessen.de/presse/mieterschutz-soll-auf-71-kommunen-wachsen); Kabinettsbeschluss Mitte November 2026 erwartet. Stand 20.10.2026: nicht beschlossen, nicht verkündet (FAQ https://wirtschaft.hessen.de/wohnen-und-bauen/wohnungsrecht/mieterschutzverordnung-vom-18-november-2020-gvbl-s-802; kein Eintrag auf verkuendung.hessen.de gefunden). Ab 26.11.2026 droht eine Lücke, falls die neue VO nicht rechtzeitig verkündet wird. Gemeindeliste aus Sekundär-Volltext (umwelt-online), per hessenschau-Liste gegengeprüft; der GVBl.-Text 2020 S. 802 selbst wurde nicht abgerufen.",
-      "hinweise": [
-        "Eine Verordnung regelt Mietpreisbremse (§ 556d), Kappung 15 % (§ 558 Abs. 3) und Kündigungssperre (§ 577a) für dieselben 49 Gemeinden.",
-        "gueltig_ab 2020-11-26 = Inkrafttreten der Ursprungs-VO (Vorgänger befristet bis 26.11.2020); die Verlängerung trat am 18.11.2025 in Kraft.",
-        "Ab 26.11.2026 soll eine neue VO gelten (Entwurf: 71 Gemeinden, u. a. neu Hanau, Gießen, Friedberg, Oberursel, Hofheim; raus u. a. Maintal, Viernheim, Mörfelden-Walldorf) — bei Verkündung neu ernten.",
-        "Vorgänger: Hessische Mietenbegrenzungsverordnung 11.06.2019 (GVBl. S. 78) und Kappungsgrenzen- und Kündigungsbeschränkungsverordnung 23.09.2019 (GVBl. S. 277), beide durch § 4 der VO 2020 aufgehoben.",
-        "Destatis-Namen abweichend: Bad Homburg v. d. Höhe (06434001), Rosbach v. d. Höhe (06440023)."
-      ],
-      "anzahl_kappung15": 49,
-      "anzahl_mietpreisbremse": 49
+      ]
     },
     "RP": {
       "verordnung": "Landesverordnung über die Bestimmung der Gebiete mit abgesenkter Kappungsgrenze nach § 558 Abs. 3 Satz 2 des Bürgerlichen Gesetzbuchs (Kappungsgrenzenverordnung) vom 13. September 2024",
@@ -3099,7 +3271,7 @@
     },
     "BW": {
       "verordnung": "Verordnung der Landesregierung zur Bestimmung der Gebiete mit abgesenkter Kappungsgrenze bei Mieterhöhungen (Kappungsgrenzenverordnung Baden-Württemberg – KappVO BW) vom 16. Dezember 2025",
-      "fundstelle": "GBl. 2025 Nr. 145 vom 19.12.2025",
+      "fundstelle": "GBl. 2025 Nr. 145 vom 19.12.2025; ab 01.01.2027 KappVO BW vom 10.11.2026, GBl. 2026 Nr. 96",
       "gueltig_ab": "2026-01-01",
       "gueltig_bis": "2026-12-31",
       "url": "https://www.landtag-bw.de/files/live/sites/LTBW/files/dokumente/gesetzblaetter/2025/GBl2025145.pdf",
@@ -3107,7 +3279,7 @@
       "mietpreisbremse_gelistet": true,
       "mietpreisbremse_verordnung": {
         "verordnung": "Verordnung der Landesregierung zur Bestimmung der Gebiete mit Begrenzung der zulässigen Miethöhe bei Mietbeginn (Mietpreisbegrenzungsverordnung Baden-Württemberg – MietBegrenzVO BW) vom 16. Dezember 2025",
-        "fundstelle": "GBl. 2025 Nr. 144 vom 19.12.2025",
+        "fundstelle": "GBl. 2025 Nr. 144 vom 19.12.2025; ab 01.01.2027 MietBegrVO BW vom 10.11.2026, GBl. 2026 Nr. 95",
         "gueltig_ab": "2026-01-01",
         "gueltig_bis": "2026-12-31",
         "url": "https://www.landtag-bw.de/files/live/sites/LTBW/files/dokumente/gesetzblaetter/2025/GBl2025144.pdf",
@@ -3120,760 +3292,760 @@
           "name": "Achern",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08436004",
           "name": "Aitrach",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08116004",
           "name": "Altbach",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08118003",
           "name": "Asperg",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08119008",
           "name": "Backnang",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08336006",
           "name": "Bad Bellingen",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08315006",
           "name": "Bad Krozingen",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08426014",
           "name": "Bad Schussenried",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08436011",
           "name": "Baienfurt",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08115003",
           "name": "Böblingen",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08335098",
           "name": "Bodman-Ludwigshafen",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08315013",
           "name": "Bötzingen",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08435067",
           "name": "Deggenhausertal",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08116015",
           "name": "Denkendorf",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08415014",
           "name": "Dettingen an der Erms",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08226010",
           "name": "Dielheim",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08425028",
           "name": "Dietenheim",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08226105",
           "name": "Edingen-Neckarhausen",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08315131",
           "name": "Ehrenkirchen",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08315031",
           "name": "Eisenbach (Hochschwarzwald)",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08117019",
           "name": "Eislingen/Fils",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08125024",
           "name": "Ellhofen",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08316011",
           "name": "Emmendingen",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08415019",
           "name": "Eningen u. Achalm",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08116019",
           "name": "Esslingen am Neckar",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08119020",
           "name": "Fellbach",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08116077",
           "name": "Filderstadt",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08316054",
           "name": "Freiamt",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08311000",
           "name": "Freiburg i. Br.",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08435015",
           "name": "Frickingen",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08435016",
           "name": "Friedrichshafen",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08317031",
           "name": "Friesenheim",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08117026",
           "name": "Göppingen",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08315043",
           "name": "Gottenheim",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08215099",
           "name": "Graben-Neudorf",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08125038",
           "name": "Güglingen",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08315047",
           "name": "Gundelfingen",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08336106",
           "name": "Häg-Ehrsberg",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08226028",
           "name": "Heddesheim",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08221000",
           "name": "Heidelberg",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08121000",
           "name": "Heilbronn",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08435020",
           "name": "Heiligenberg",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08315050",
           "name": "Heitersheim",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08115024",
           "name": "Holzgerlingen",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08436047",
           "name": "Hoßkirch",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08415039",
           "name": "Hülben",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08125047",
           "name": "Ittlingen",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08125048",
           "name": "Jagsthausen",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08317152",
           "name": "Kappel-Grafenhausen",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08212000",
           "name": "Karlsruhe",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08316020",
           "name": "Kenzingen",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08119093",
           "name": "Kernen im Remstal",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08317059",
           "name": "Kippenheim",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08125049",
           "name": "Kirchardt",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08116033",
           "name": "Kirchheim unter Teck",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08315064",
           "name": "Kirchzarten",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08436052",
           "name": "Kißlegg",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08119041",
           "name": "Korb",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08118080",
           "name": "Korntal-Münchingen",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08118046",
           "name": "Kornwestheim",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08317065",
           "name": "Lahr/Schwarzwald",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08115028",
           "name": "Leonberg",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08415092",
           "name": "Lichtenstein",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08336050",
           "name": "Lörrach",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08118048",
           "name": "Ludwigsburg",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08317073",
           "name": "Mahlberg",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08327033",
           "name": "Mahlstetten",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08336104",
           "name": "Malsburg-Marzell",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08316024",
           "name": "Malterdingen",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08315132",
           "name": "March",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08426071",
           "name": "Maselheim",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08125061",
           "name": "Massenbachhausen",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08435035",
           "name": "Meckenbeuren",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08317075",
           "name": "Meißenheim",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08425079",
           "name": "Merklingen",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08315073",
           "name": "Merzhausen",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08415050",
           "name": "Metzingen",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08118051",
           "name": "Möglingen",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08236040",
           "name": "Mühlacker",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08335097",
           "name": "Mühlhausen-Ehingen",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08335057",
           "name": "Mühlingen",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08116047",
           "name": "Neuhausen auf den Fildern",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08226059",
           "name": "Neulußheim",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08116049",
           "name": "Nürtingen",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08215107",
           "name": "Oberhausen-Rheinhausen",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08317096",
           "name": "Offenburg",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08116080",
           "name": "Ostfildern",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08125081",
           "name": "Pfaffenhofen",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08315089",
           "name": "Pfaffenweiler",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08126069",
           "name": "Pfedelbach",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08231000",
           "name": "Pforzheim",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08215066",
           "name": "Philippsburg",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08335066",
           "name": "Reichenau",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08226068",
           "name": "Reilingen",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08415061",
           "name": "Reutlingen",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08316053",
@@ -3881,208 +4053,208 @@
           "kappung15": true,
           "mietpreisbremse": true,
           "hinweis": "Destatis-Name: Rheinhausen im Breisgau",
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08415062",
           "name": "Riederich",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08316037",
           "name": "Riegel am Kaiserstuhl",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08117042",
           "name": "Salach",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08317116",
           "name": "Sasbach",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08316038",
           "name": "Sasbach am Kaiserstuhl",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08315098",
           "name": "Schallstadt",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08317122",
           "name": "Schutterwald",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08119068",
           "name": "Schwaikheim",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08225116",
           "name": "Schwarzach",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08115045",
           "name": "Sindelfingen",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08226103",
           "name": "St. Leon-Rot",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08315109",
           "name": "Stegen",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08115046",
           "name": "Steinenbronn",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08335079",
           "name": "Stockach",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08111000",
           "name": "Stuttgart",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08316043",
           "name": "Teningen",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08416041",
           "name": "Tübingen",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08421000",
           "name": "Ulm",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08315115",
           "name": "Umkirch",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08425123",
           "name": "Untermarchtal",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08336090",
           "name": "Utzenfeld",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08436078",
           "name": "Vogt",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08315133",
           "name": "Vogtsburg im Kaiserstuhl",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08316056",
           "name": "Waldkirch",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08336091",
           "name": "Weil am Rhein",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08436082",
@@ -4090,72 +4262,72 @@
           "kappung15": true,
           "mietpreisbremse": true,
           "hinweis": "Name in BW zweimal (Lkr. Ravensburg 08436082, Lkr. Karlsruhe 08215090); die VO nennt keinen Kreis. Aufgeloest ueber die amtliche Begruendung der MietBegrenzVO BW (GBl. 2025 Nr. 144, Indikator 1, S. 42): Weingarten mit 13.127 Haushalten und 12.599 Wohnungen - das ist Weingarten (Wuertt.) mit rund 25.000 Einwohnern; Weingarten (Baden) hat rund 10.000 Einwohner und kann diese Haushaltszahl nicht haben.",
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08336094",
           "name": "Wembach",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08116072",
           "name": "Wernau (Neckar)",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08125103",
           "name": "Widdern",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08226098",
           "name": "Wiesloch",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08315125",
           "name": "Wittnau",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08436085",
           "name": "Wolfegg",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08337127",
           "name": "Wutach",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         },
         {
           "ags": "08415085",
           "name": "Zwiefalten",
           "kappung15": true,
           "mietpreisbremse": true,
-          "kappung_gueltig_bis": "2026-12-31",
-          "mietpreisbremse_gueltig_bis": "2026-12-31"
+          "kappung_gueltig_bis": "2029-12-31",
+          "mietpreisbremse_gueltig_bis": "2029-12-31"
         }
       ],
       "belege": [
@@ -4164,10 +4336,12 @@
         "https://www.landtag-bw.de/resource/blob/645672/023e90d4921b01b1f177f9df9cfceaa8/18_0342_D.pdf — Landtag Drs. 18/342 (Stellungnahme MLW vom 14.08.2026): Mietpreisbegrenzungs-, Kappungsgrenzen- und Kündigungssperrfristverordnung wurden bis 31.12.2026 verlängert; Nachfolge ab 01.01.2027 geplant, noch nicht erlassen",
         "https://www.umwelt-online.de/recht/bau/laender/bw/mietschv25.htm — Vorgänger MietBegrenzVO BW 2025 vom 24.06.2025 (GBl. Nr. 55), 89 Gemeinden, 01.07.–31.12.2025, aufgehoben/ausgelaufen; KappVO 2020 parallel bis 31.12.2025 verlängert",
         "https://www.landtag-bw.de/files/live/sites/LTBW/files/dokumente/gesetzblaetter/2025/GBl2025146.pdf — GBl. 2025 Nr. 146: KSpVO BW (§ 577a) mit derselben Liste, nur Kontext",
-        "https://www.landtag-bw.de/files/live/sites/LTBW/files/dokumente/gesetzblaetter/2025/GBl2025144.pdf - Begruendung S. 42, Indikator 1 Wohnungsversorgungsgrad: \"Weingarten 13.127 / 13.505 / 12.599 / 906 / 93,3 %\" -> Weingarten (Lkr. Ravensburg)"
+        "https://www.landtag-bw.de/files/live/sites/LTBW/files/dokumente/gesetzblaetter/2025/GBl2025144.pdf - Begruendung S. 42, Indikator 1 Wohnungsversorgungsgrad: \"Weingarten 13.127 / 13.505 / 12.599 / 906 / 93,3 %\" -> Weingarten (Lkr. Ravensburg)",
+        "https://www.baden-wuerttemberg.de/index.php?eID=dumpFile&t=r&r=505679&dl=1&fn=GBl._2026_Nr._96_vom_12.11.2026_signed.pdf&token=7501ab621c6310eb41e5a679938b6e8e8cc96921 — GBl. BW 2026 Nr. 96 vom 12.11.2026, S. 1–2 (abgerufen 23.11.2026): KappVO BW vom 10.11.2026, § 1 133 Städte und Gemeinden als Gebiete i. S. d. § 558 Abs. 3 Satz 2 BGB, § 2 in Kraft 01.01.2027, außer Kraft mit Ablauf 31.12.2029",
+        "https://www.baden-wuerttemberg.de/index.php?eID=dumpFile&t=r&r=505678&dl=1&fn=GBl._2026_Nr._95_vom_12.11.2026_signed.pdf&token=5d6f71246a6ebc1ec3df5997af31ead7f03e45ad — GBl. BW 2026 Nr. 95 vom 12.11.2026, S. 1–2 (abgerufen 23.11.2026, SHA-256 35ed09a2…0ba1 wie auf baden-wuerttemberg.de/…/gesetzblatt/detail/2026-95): MietBegrVO BW vom 10.11.2026, § 1 dieselben 133 Gemeinden (Wortlaut der Liste gleich Nr. 96) als Gebiete i. S. d. § 556d Abs. 2 Satz 2 BGB, § 2 in Kraft 01.01.2027, außer Kraft mit Ablauf 31.12.2029; Begründung S. 3 ff."
       ],
       "unsicher": false,
-      "unsicher_grund": "Die geltenden VO (GBl. 2025 Nr. 144/145) sind amtlich und gelten bis 31.12.2026. Nachfolge ab 01.01.2027: Der Ministerrat hat am 22.09.2026 Entwürfe der Mietpreisbegrenzungs-, Kappungsgrenzen- und Kündigungssperrfristverordnung zur Anhörung freigegeben (Pressemitteilung https://stm.baden-wuerttemberg.de/de/service/presse/pressemitteilung/pid/land-will-mietpreisbremse-verlaengern-1; https://mlw.baden-wuerttemberg.de/de/bauen-wohnen/wohnungsbau/mietpreisbremse), Ziel nahtlose Verlängerung; neu Mannheim, Konstanz, Kehl, sonst Gebietskulisse unverändert; Gesamtzahl und Enddatum nicht genannt (Kulisse nur in Gutachten/Tabelle 2026 des MLW). Stand 20.10.2026: nicht beschlossen, nicht verkündet.",
+      "unsicher_grund": "Die geltenden VO (GBl. 2025 Nr. 144/145) sind amtlich und gelten bis 31.12.2026. Nachfolge verkündet: MietBegrVO BW und KappVO BW vom 10.11.2026 (GBl. 2026 Nr. 95 und 96 vom 12.11.2026), 01.01.2027 bis 31.12.2029, 133 Gemeinden = die 130 bisherigen plus Kehl, Konstanz, Mannheim (siehe nachfolge).",
       "hinweise": [
         "Zwei getrennte Verordnungen (GBl. Nr. 144 und Nr. 145), Gemeindelisten wörtlich identisch (130 = 130, per Skript verglichen).",
         "Beide gelten nur bis 31.12.2026 – Nachfolge-VO ab 01.01.2027 laut MLW (Drs. 18/342) in Vorbereitung; Stand 19.10.2026 keine Neufassung im GBl. gefunden. Zum Jahreswechsel neu prüfen.",
@@ -4175,10 +4349,46 @@
         "Weingarten: in BW zweimal vorhanden (Lkr. Ravensburg 08436082 / Lkr. Karlsruhe 08215090), VO ohne Kreisangabe. Zugeordnet zu 08436082 (Weingarten, Stadt, Lkr. Ravensburg) nach Pressebericht Schwäbische Zeitung – nicht amtlich, Restunsicherheit.",
         "Rheinhausen (VO) = Destatis 'Rheinhausen im Breisgau' (08316053), einzige Gemeinde dieses Namens in BW.",
         "PDF-Silbentrennung korrigiert: 'Bodman-Ludwigshafen', 'Korntal-Münchingen' (im Fließtext des GBl. getrennt geschrieben).",
-        "Beide Verordnungen laufen am 31.12.2026 aus; Nachfolge ab 01.01.2027 laut Landtag Drs. 18/342 geplant, noch nicht verkuendet - zum Jahreswechsel neu ernten."
+        "Beide Verordnungen laufen am 31.12.2026 aus; Nachfolge ab 01.01.2027 laut Landtag Drs. 18/342 geplant, noch nicht verkuendet - zum Jahreswechsel neu ernten.",
+        "Nachfolge ab 01.01.2027 verkündet (GBl. 2026 Nr. 95/96): die 130 Gemeinden bleiben, daher kappung_/mietpreisbremse_gueltig_bis 2029-12-31; Kehl, Konstanz, Mannheim kommen erst am 01.01.2027 dazu und stehen bis dahin nur unter nachfolge.neu_ab_2027."
       ],
       "anzahl_kappung15": 130,
-      "anzahl_mietpreisbremse": 130
+      "anzahl_mietpreisbremse": 130,
+      "nachfolge": {
+        "ab": "2027-01-01",
+        "kappung": {
+          "verordnung": "Verordnung der Landesregierung zur Bestimmung der Gebiete mit abgesenkter Kappungsgrenze bei Mieterhöhungen (Kappungsgrenzenverordnung Baden-Württemberg – KappVO BW) vom 10. November 2026",
+          "fundstelle": "GBl. 2026 Nr. 96 vom 12.11.2026",
+          "gueltig_ab": "2027-01-01",
+          "gueltig_bis": "2029-12-31",
+          "url": "https://www.baden-wuerttemberg.de/index.php?eID=dumpFile&t=r&r=505679&dl=1&fn=GBl._2026_Nr._96_vom_12.11.2026_signed.pdf&token=7501ab621c6310eb41e5a679938b6e8e8cc96921"
+        },
+        "mietpreisbremse": {
+          "verordnung": "Verordnung der Landesregierung zur Bestimmung der Gebiete mit Begrenzung der zulässigen Miethöhe bei Mietbeginn (Mietpreisbegrenzungsverordnung Baden-Württemberg – MietBegrVO BW) vom 10. November 2026",
+          "fundstelle": "GBl. 2026 Nr. 95 vom 12.11.2026",
+          "gueltig_ab": "2027-01-01",
+          "gueltig_bis": "2029-12-31",
+          "url": "https://www.baden-wuerttemberg.de/index.php?eID=dumpFile&t=r&r=505678&dl=1&fn=GBl._2026_Nr._95_vom_12.11.2026_signed.pdf&token=5d6f71246a6ebc1ec3df5997af31ead7f03e45ad"
+        },
+        "anzahl": 133,
+        "bleiben": 130,
+        "neu_ab_2027": [
+          {
+            "ags": "08317057",
+            "name": "Kehl"
+          },
+          {
+            "ags": "08335043",
+            "name": "Konstanz"
+          },
+          {
+            "ags": "08222000",
+            "name": "Mannheim"
+          }
+        ],
+        "wegfall": [],
+        "umstellen_am": "2027-01-01: verordnung/fundstelle/url/gueltig_ab/gueltig_bis von Land und mietpreisbremse_verordnung auf die Nachfolge setzen, die drei neu_ab_2027 als Gemeinden aufnehmen (bis 2029-12-31), anzahl_* auf 133, Block nachfolge entfernen. Vorher nicht: die drei gelten erst ab 01.01.2027."
+      }
     },
     "BY": {
       "verordnung": "Verordnung zur Festlegung des Anwendungsbereichs bundesrechtlicher Mieterschutzvorschriften (Mieterschutzverordnung – MiSchuV) vom 16. Dezember 2025, geändert durch Verordnung vom 16. Juni 2026",
