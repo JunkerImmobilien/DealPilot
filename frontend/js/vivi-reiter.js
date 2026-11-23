@@ -17,7 +17,7 @@
  * ═══════════════════════════════════════════════════════════════════════════════════════════════════════════════ */
 (function (global) {
   'use strict';
-  var VERSION = 'v4040e';
+  var VERSION = 'v4040g';
   if (!global.document || global.DpViviReiter) return;
   var doc = global.document;
   var _jahr = null, _offen = {};
@@ -184,13 +184,17 @@
   function hausHtml() {
     var D = wohnungen(); if (!D) return '';
     var V = global.DpViviMieterhoehung, mh = !!(V && V.verfuegbar && V.verfuegbar());
-    var W = D.W.slice(), reihen = [];
-    for (var i = 0; i < W.length; i += 3) reihen.push(W.slice(i, i + 3));
-    reihen.reverse();
+    /* Geschosse wie das Haus im Reiter Miete (DpMieteDemo.geschoss): oben DG, unten Keller, ohne Geschoss zu dritt unten */
+    var E = (global._dpMfh && Array.isArray(global._dpMfh.einheiten)) ? global._dpMfh.einheiten : [], G = global.DpMieteDemo && global.DpMieteDemo.geschoss;
+    var gruppen = {}, ohne = [], reihen = [];
+    D.W.forEach(function (x) { var e = E[x.i] || {}, g = G ? G(String(e.etage || '') + ' ' + String(x.lage || '')) : null; if (!g) ohne.push(x); else (gruppen[g.r] = gruppen[g.r] || { r: g.r, L: [] }).L.push(x); });
+    Object.keys(gruppen).map(function (k) { return gruppen[k]; }).sort(function (a, b) { return b.r - a.r; }).forEach(function (g) { for (var i = 0; i < g.L.length; i += 4) reihen.push(g.L.slice(i, i + 4)); });
+    for (var j = 0; j < ohne.length; j += 3) reihen.push(ohne.slice(j, j + 3));
     var kachel = function (w) {
       var abw = istZahl(w.abw) && Math.abs(w.abw) >= 1;
-      var cls = abw ? 'vr-w-ab' : w.pot ? 'vr-w-pot' : 'vr-w-ok';
-      var marke = abw ? 'ABWEICHUNG' : w.pot ? 'POTENZIAL' : 'PASST';
+      var leer = !(w.ist > 0) && !(w.vivi > 0);
+      var cls = abw ? 'vr-w-ab' : leer ? 'vr-w-leer' : w.pot ? 'vr-w-pot' : 'vr-w-ok';
+      var marke = abw ? 'ABWEICHUNG' : leer ? 'LEER' : w.pot ? 'POTENZIAL' : 'PASST';
       return '<div class="vr-w ' + cls + '"><span class="vr-wm">' + marke + '</span><b>' + (D.mfh ? 'Wohnung ' + esc(w.nr) : 'Wohnung') + '</b>'
         + '<div class="vr-wz"><span>DealPilot</span><span>' + (w.ist ? eur(w.ist) : 'leer') + '</span></div>'
         + '<div class="vr-wz"><span>ViVi</span><span>' + (istZahl(w.vivi) ? eur(w.vivi) : '–') + '</span></div>'
@@ -363,6 +367,7 @@
       '.vr-wk{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}.vr-wk .vr-k{padding:5px 8px;font-size:11px}',
       '.vr-w-ok{box-shadow:inset 3px 0 0 #3FA56C}.vr-w-ok .vr-wm{background:rgba(63,165,108,.14);color:#2f7d52}',
       '.vr-w-pot{border-color:#3FA56C;box-shadow:inset 3px 0 0 #3FA56C}.vr-w-pot .vr-wm{background:#3FA56C;color:#fff}',
+      '.vr-w-leer{background:#FBF9F4}.vr-w-leer .vr-wm{background:rgba(42,39,39,.08);color:#6B645A}',
       '.vr-w-ab{border-color:#B8625C;box-shadow:inset 3px 0 0 #B8625C}.vr-w-ab .vr-wm{background:#B8625C;color:#fff}',
       '.vr-bw{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin:6px 0 10px}',
       '.vr-bw>div{background:#FBF6E9;border:1px solid color-mix(in srgb,var(--wl-c9a84c,#C9A84C) 18%,transparent);border-radius:2px;padding:8px 10px}',

@@ -266,5 +266,5 @@
   window.addEventListener('dp:vivi-stand', function () { spaeter(600); });
   document.addEventListener('change', function (e) { if (aktiv() && e.target && e.target.closest && e.target.closest('#s2')) spaeter(600); });
   document.addEventListener('click', function (e) { if (e.target && e.target.closest && e.target.closest('#mfh-ok, #mfh-zu, [onclick*="switchTab(2)"], [data-tab="s2"]')) spaeter(900); });
-  window.DpMieteDemo = { zeichnen: zeichnen, aktiv: aktiv, daten: daten };
+  window.DpMieteDemo = { zeichnen: zeichnen, aktiv: aktiv, daten: daten, geschoss: geschoss };   /* v4040 · geschoss für den Reiter ViVi */
 })();
