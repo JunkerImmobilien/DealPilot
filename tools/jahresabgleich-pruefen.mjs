@@ -345,7 +345,7 @@ const K = c.DpMietpotenzial, E = c.DpErhoehungen, JA = c.DpJahresabgleich, HV = 
   ok(sk.includes("t.indexOf('jahresabschluss') >= 0"), 'E Obsidian-Leiste und Gold-Kopf über modal-boarding-skin.js');
   ok(as.includes("ov.querySelector('.oabi-foot').innerHTML = knopf('zu', 'Schließen', false)"), 'E erster Fuß-Knopf ist Schließen (das × der Leiste klickt ihn)');
   ok(as.includes("(anlageVErlaubt() ? knopf('anlage-v'") && as.includes('JA().zuAnlageV(J)'), 'E Absprung zur Anlage V nur mit Stufe und bis zur Anlage V');
-  ok(/function zuAnlageV\(\) \{[\s\S]{0,420}yearly-tax-form-box[\s\S]{0,320}scrollIntoView\(\{ block: 'start'/.test(ja) && ja.includes("if (a === 'steuer') { zuAnlageV(); return; }"), 'E Absprung wartet auf die Anlage V und rollt hin');
+  ok(/function zuAnlageV\(\) \{[\s\S]{0,420}yearly-tax-form-box[\s\S]{0,700}nav\.tabs[\s\S]{0,400}scrollBy\(\{ top: dy/.test(ja) && ja.includes("if (a === 'steuer') { zuAnlageV(); return; }"), 'E Absprung wartet auf die Anlage V und rollt hin');
   ok(!ja.includes('dp-ja-fertig-k') && /function wechselHtml[\s\S]{0,400}knopf\('fertig', w\.jahr \+ ' fertig machen'/.test(ja), 'E „fertig machen“ nur noch in der Hinweiszeile');
 }
 

@@ -48,7 +48,7 @@
 (function (global) {
   'use strict';
   if (global.DpJahresabgleich) return;
-  var VERSION = 'v4110';
+  var VERSION = 'v4110a';
   var GOLD = 'var(--wl-c9a84c, #C9A84C)';
   /* v4090 · Marcel 23.11.2026: „ich würde die Reihenfolge ändern in Miete, Wert, Haus und dann Steuern" (die Steuer braucht die Zahlen der drei davor) */
   var SCHRITTE = [['miete', 'Miete'], ['wert', 'Wert'], ['haus', 'Haus'], ['steuer', 'Steuer']];
@@ -735,7 +735,13 @@
     warteSichtbar(function () { return d.getElementById('yearly-tax-form-box'); }, function (e) {
       if (!e) return;
       aufklappen(e);
-      try { e.scrollIntoView({ block: 'start', behavior: 'smooth' }); } catch (x) { try { e.scrollIntoView(); } catch (y) {} }
+      /* v4110a · GEMESSEN (Demostraße, 1568 px): scrollIntoView start legte die Anlage V auf −4 px, also unter Kopf und
+         Reiterleiste (nav.tabs endet bei 92 px). Jetzt die Rollstrecke selbst: Oberkante knapp unter die Reiterleiste. */
+      try {
+        var nav = d.querySelector('nav.tabs'), nb = nav ? nav.getBoundingClientRect() : null, unten = nb && nb.height > 0 && nb.bottom > 0 ? nb.bottom : 0;
+        var dy = e.getBoundingClientRect().top - (unten + 12), sc = d.querySelector('.main-col');
+        if (sc && sc.scrollHeight > sc.clientHeight + 4) sc.scrollBy({ top: dy, behavior: 'smooth' }); else global.scrollBy({ top: dy, behavior: 'smooth' });
+      } catch (x) { try { e.scrollIntoView(); } catch (y) {} }
       try { e.classList.remove('dp-ja-blink'); void e.offsetWidth; e.classList.add('dp-ja-blink'); setTimeout(function () { try { e.classList.remove('dp-ja-blink'); } catch (x) {} }, 2600); } catch (x) {}
     });
   }

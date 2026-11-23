@@ -18,7 +18,7 @@
  * ════════════════════════════════════════════════════════════════════════════════════════════════════════════════ */
 (function (global) {
   'use strict';
-  var VERSION = 'v4110';
+  var VERSION = 'v4110a';
   var SCHRITTE = [['miete', 'Miete'], ['wert', 'Wert'], ['haus', 'Haus & Belege'], ['steuer', 'Steuer'], ['fest', 'Festschreiben']];
   var _z = null;                 /* { jahr, k, frage, vivi: 'laeuft' | null } */
   var _merk = {}, _gelesen = {}; /* Schritt je Objekt|Jahr · ViVi schon gelesen je Objekt|Jahr */
@@ -145,8 +145,9 @@
     var st = B ? B.status(J) : 'geplant', fest = r.s.fest && r.s.fest.steuer;
     var h = '<h4>Steuer ' + J + '</h4><p class="dp-jab-satz">Die Anlage V ' + J + ' aus dem Reiter Steuer, zusammengefasst.<small>Übernommene Belege und ViVi-Werte aus Schritt 3 sind eingerechnet.</small></p>';
     h += '<div class="dp-jab-zahl"><span>Einnahmen<b>' + eur(t && t.einnahmen) + '</b></span><span>Werbungskosten<b>' + eur(t && t.werbungskosten) + '</b></span><span>Ergebnis V+V<b>' + (t ? vz(t.ergebnis) : '–') + '</b></span></div>';
-    var opts = (B && B.STATUS ? B.STATUS : [['geplant', 'nicht erklärt'], ['erklaert', 'erklärt'], ['bescheid', 'Bescheid liegt vor']]).map(function (x) { return '<option value="' + x[0] + '"' + (x[0] === st ? ' selected' : '') + '>' + esc(x[1]) + '</option>'; }).join('');
-    h += '<div class="dp-jab-reihe"><label style="display:flex;align-items:center;gap:8px">Stand der Steuer <select data-jab-status' + (fest ? ' disabled' : '') + '>' + opts + '</select></label>' + (anlageVErlaubt() ? knopf('anlage-v', 'Volle Anlage V öffnen', false) : '') + '</div>';
+    /* v4110 · eigene Wörter statt der Kurzform des Jahresbuchs (dort „geplant“) */
+    var opts = [['geplant', 'nicht erklärt'], ['erklaert', 'erklärt'], ['bescheid', 'Bescheid liegt vor']].map(function (x) { return '<option value="' + x[0] + '"' + (x[0] === st ? ' selected' : '') + '>' + esc(x[1]) + '</option>'; }).join('');
+    h += '<div class="dp-jab-reihe"><label style="display:flex;align-items:center;gap:8px;white-space:nowrap">Stand der Steuer <select data-jab-status' + (fest ? ' disabled' : '') + '>' + opts + '</select></label>' + (anlageVErlaubt() ? knopf('anlage-v', 'Volle Anlage V öffnen', false) : '') + '</div>';
     if (fest) h += '<div class="dp-jab-box">Die Steuer ' + J + ' ist festgeschrieben.</div>';
     else if (st !== 'bescheid') h += '<div class="dp-jab-box">Erledigt ist der Schritt mit dem Bescheid. Ist die Erklärung abgegeben, setz den Stand auf erklärt.</div>';
     return h;
