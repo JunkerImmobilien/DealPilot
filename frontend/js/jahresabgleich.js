@@ -257,6 +257,9 @@
     var info = vd.info || {};
     /* v4037 · Kaltmiete laut ViVi aus dem Mietverlauf ALLER Mietverhältnisse (mit Leerstand), sonst wie bisher */
     var ij = info.ist_jahre || null;
+    /* v4037 · auch der Rechenweg ohne Ist-Jahre (laufendes Jahr): Zusatzeinnahmen aus DealPilot je Monat dazu, ViVi kennt
+       nicht alle. Sonst stand bei 2026-1041 eine Differenz von genau 12 × 90 € in der Spalte „laut ViVi“. */
+    if (istZahl(out.miete)) { var zeL = zahl((doc() && doc().getElementById('ze') || {}).value) || 0; if (zeL > 0) out.miete = Math.round((out.miete + zeL * (13 - ab)) * 100) / 100; }
     if (ij && ij.summe && ij.summe[String(jahr)] && istZahl(zahl(ij.summe[String(jahr)].miete))) {
       /* wie vivi-felder: Kaltmiete aus ViVi plus Zusatzeinnahmen aus DealPilot je vermietetem Monat */
       var xj = ij.summe[String(jahr)], zeD = zahl((doc() && doc().getElementById('ze') || {}).value) || 0;
