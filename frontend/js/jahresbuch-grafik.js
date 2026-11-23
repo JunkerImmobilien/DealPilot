@@ -29,10 +29,10 @@
 (function (global) {
   'use strict';
   if (global.DpJahresbuchGrafik) return;
-  var VERSION = 'v3433';
+  var VERSION = 'v4090';
   var GOLD = 'var(--wl-c9a84c, #C9A84C)', GRAU = '#8A8278', TINTE = '#5B544C', ROT = '#B8625C';
   var FLAECHE = 'var(--jbg-flaeche, #FDFCFA)';
-  var W0 = 720, L = 60, R = 54, OBEN = 26, LUECKE = 56;   /* v3432 · W je Bild: so breit wie der Platz (340-720), sonst wird die Schrift am Handy 4 px klein */
+  var W0 = 720, WMAX = 1400, L = 60, R = 54, OBEN = 26, LUECKE = 56;   /* v4090 · WMAX: das Bild wird nicht mehr über 720 hochskaliert (am Desktop war die Schrift 1,6-fach groß) */   /* v3432 · W je Bild: so breit wie der Platz (340-720), sonst wird die Schrift am Handy 4 px klein */
 
   function istZahl(v) { return typeof v === 'number' && isFinite(v); }
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
@@ -69,7 +69,7 @@
   function strichStil(s) {
     if (s.strich === 'plan') return 'stroke:' + (s.farbe || GRAU) + ';stroke-width:2;stroke-dasharray:6 4;stroke-linecap:round';
     if (s.strich === 'proj') return 'stroke:' + (s.farbe || GOLD) + ';stroke-width:2;stroke-dasharray:0.1 5;stroke-linecap:round';
-    if (s.strich === 'ziel' || s.strich === 'stufe') return 'stroke:' + (s.farbe || TINTE) + ';stroke-width:2;stroke-dasharray:8 3 2 3';
+    if (s.strich === 'ziel' || s.strich === 'stufe') return 'stroke:' + (s.farbe || TINTE) + ';stroke-width:1.5;stroke-opacity:.75;stroke-dasharray:8 3 2 3';
     return 'stroke:' + (s.farbe || GOLD) + ';stroke-width:2;stroke-linejoin:round;stroke-linecap:round';
   }
 
@@ -93,7 +93,7 @@
       p.serien.forEach(function (s) { J.forEach(function (y) { var v = s.werte[y]; if (istZahl(v)) werte.push(v); }); });
       var sk = skala(werte, mitNull), kompakt = Math.max(Math.abs(sk.lo), Math.abs(sk.hi)) >= 10000;
       var yv = function (v) { return top + H - (v - sk.lo) / (sk.hi - sk.lo) * H; };
-      out.push('<text x="' + x0 + '" y="' + (top - 12) + '" class="jbg-t">' + esc(p.titel) + '</text>');
+      if (!spec.ohneTitel) out.push('<text x="' + x0 + '" y="' + (top - 12) + '" class="jbg-t">' + esc(p.titel) + '</text>');
       for (var t = sk.lo; t <= sk.hi + sk.st * 1e-6; t += sk.st) {
         var yy = f1(yv(t));
         out.push('<line x1="' + x0 + '" x2="' + x1 + '" y1="' + yy + '" y2="' + yy + '" style="stroke:currentColor;stroke-opacity:' + (Math.abs(t) < 1e-9 && mitNull ? '.38' : '.10') + ';stroke-width:1"/>'
@@ -209,7 +209,19 @@
       '.jbg-tip div span{display:inline-flex;align-items:center;gap:6px;color:#6B645A}',
       '.jbg-tj{font:600 12.5px "Space Grotesk",Inter,sans-serif;margin-bottom:2px}',
       '.jbg-tp{font:500 9.5px "JetBrains Mono",monospace;letter-spacing:.07em;text-transform:uppercase;color:#9A9285;margin-top:5px;display:block!important}',
-      '.jbg-tev{color:#6B645A;display:block!important;margin-top:4px;max-width:240px;white-space:normal}'
+      '.jbg-tev{color:#6B645A;display:block!important;margin-top:4px;max-width:240px;white-space:normal}',
+      /* v4090 · Karten je Kennzahl */
+      '.jbg-karten{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:12px}',
+      '.jbg-karte{border:1px solid #EFE8D6;border-radius:10px;background:#fff;padding:12px 14px 6px;min-width:0}',
+      '.jbg-karte header{display:flex;flex-direction:column;gap:2px;margin-bottom:6px}',
+      '.jbg-karte h5{margin:0;font:500 10px "JetBrains Mono",monospace;letter-spacing:.09em;text-transform:uppercase;color:#6B645A}',
+      '.jbg-kz{display:flex;align-items:baseline;flex-wrap:wrap;gap:2px 10px;font-variant-numeric:tabular-nums}',
+      '.jbg-kz-l{font:500 11.5px Inter,sans-serif;color:#9A9285}',
+      '.jbg-kz-w{font:600 22px "Space Grotesk",Inter,sans-serif;color:#2A2727;letter-spacing:-.01em}',
+      '.jbg-kz-p{font:400 12.5px Inter,sans-serif;color:#6B645A}',
+      '.jbg-kz-d{font:600 12px Inter,sans-serif;color:#6B645A}.jbg-kz-d.gut{color:#2f7d52}.jbg-kz-d.schlecht{color:#B8625C}',
+      '.jbg-kz-n{font:500 13px Inter,sans-serif;color:#9A9285}',
+      '.jbg-karte .jbg-leg{margin:4px 0 2px}'
     ].join('\n');
     doc.head.appendChild(s);
   }
@@ -218,11 +230,15 @@
     if (!host) return;
     var doc = host.ownerDocument; stil(doc);
     var bw = host.clientWidth || 0;
-    spec.W = bw > 0 ? Math.max(340, Math.min(W0, Math.round(bw))) : W0;
+    spec.W = bw > 0 ? Math.max(300, Math.min(WMAX, Math.round(bw))) : W0;
     host._jbgSpec = spec;   /* nachziehen(): neu zeichnen, wenn der Platz sich ändert (verdeckter Reiter, Drehen) */
+    if (spec.karten && spec.panels && spec.panels.length > 1) { kartenMalen(host, spec); return; }
     var s = bild(spec);
     if (!s) { host.innerHTML = ''; return; }
     host.innerHTML = '<div class="jbg">' + legendeHtml(spec) + s + '<div class="jbg-tip" role="status"></div></div>';
+    zeigen(host, spec);
+  }
+  function zeigen(host, spec) {
     var box = host.querySelector('.jbg'), tip = host.querySelector('.jbg-tip'), kreuz = host.querySelector('.jbg-cross'), W = spec.W || W0;
     Array.prototype.forEach.call(host.querySelectorAll('[data-jbg-i]'), function (r) {
       function zeig() {
@@ -239,12 +255,48 @@
     });
   }
 
+  /** v4090 · Marcel 23.11.2026: „Auch die Grafik dürfte deutlich professioneller aussehen." Gemessen (Demostraße, 1.188 px
+      breit): ein Bild mit zwei Teilen, auf 720 gezeichnet und 1,65-fach hochskaliert (Achsenschrift 17 px), der Titel des
+      zweiten Teils stand zwischen den Marken des ersten. Jetzt je Kennzahl eine Karte (kleine Vielfache, je eine Achse):
+      Kopf mit Titel und der Zahl des gewählten Jahres (Ist, Plan, Abstand mit Wort), Legende, Bild in echter Größe. */
+  function kopfZahl(p, spec) {
+    var y = spec.gewaehlt, ist = null, plan = null, f = null;
+    p.serien.forEach(function (s) {
+      if (s.rolle === 'ist' && istZahl(s.werte[y])) { ist = s.werte[y]; f = s.format; }
+      if (s.rolle === 'plan' && istZahl(s.werte[y])) plan = s.werte[y];
+    });
+    var fm = f || eur;
+    if (!istZahl(ist) && !istZahl(plan)) return '<div class="jbg-kz"><span class="jbg-kz-l">' + (y || '') + '</span><span class="jbg-kz-n">keine Zahl</span></div>';
+    var d = istZahl(ist) && istZahl(plan) ? ist - plan : null;
+    var dT = d == null ? '' : (Math.abs(d) < 0.5 ? '<span class="jbg-kz-d">wie geplant</span>'
+      : '<span class="jbg-kz-d ' + (d > 0 ? 'gut' : 'schlecht') + '">' + (d > 0 ? '▲ ' : '▼ ') + fm(Math.abs(d)) + (d > 0 ? ' über' : ' unter') + ' Plan</span>');
+    return '<div class="jbg-kz"><span class="jbg-kz-l">' + y + (y === spec.heute ? ' · läuft' : '') + '</span>'
+      + '<span class="jbg-kz-w">' + (istZahl(ist) ? fm(ist) : '<span class="jbg-kz-n">' + esc(p.ohneIst || 'Ist fehlt') + '</span>') + '</span>'
+      + (istZahl(plan) ? '<span class="jbg-kz-p">Plan ' + fm(plan) + '</span>' : '') + dT + '</div>';
+  }
+  function kartenMalen(host, spec) {
+    host.innerHTML = '<div class="jbg-karten">' + spec.panels.map(function (p, k) {
+      return '<section class="jbg-karte" data-jbg-k="' + k + '"><header><h5>' + esc(p.titel) + '</h5>' + kopfZahl(p, spec) + '</header><div class="jbg-k-bild"></div></section>';
+    }).join('') + '</div>';
+    spec.panels.forEach(function (p, k) {
+      var ziel = host.querySelector('[data-jbg-k="' + k + '"] .jbg-k-bild'); if (!ziel) return;
+      var bw = ziel.clientWidth || 0;
+      var sub = { jahre: spec.jahre, heute: spec.heute, gewaehlt: spec.gewaehlt, onJahr: spec.onJahr, titel: p.titel, ohneTitel: true,
+        ereignisse: k === 0 ? spec.ereignisse : [], panels: [Object.assign({}, p, { hoehe: p.hoeheKarte || p.hoehe })],
+        W: bw > 0 ? Math.max(280, Math.min(WMAX, Math.round(bw))) : W0 };
+      var sv = bild(sub);
+      if (!sv) { ziel.innerHTML = ''; return; }
+      ziel.innerHTML = '<div class="jbg">' + legendeHtml(sub) + sv + '<div class="jbg-tip" role="status"></div></div>';
+      zeigen(ziel, sub);
+    });
+  }
+
   /** Bilder, deren Platz sich geändert hat (in einem verdeckten Reiter gezeichnet, Fenster gedreht), neu zeichnen */
   function nachziehen() {
     var doc = global.document; if (!doc || !doc.querySelectorAll) return;
     Array.prototype.forEach.call(doc.querySelectorAll('[data-dp-jb-grafik],[data-dp-hv-grafik]'), function (h) {
       var sp = h._jbgSpec, bw = h.clientWidth || 0; if (!sp || !bw) return;
-      if (Math.abs(Math.max(340, Math.min(W0, Math.round(bw))) - (sp.W || W0)) > 8) { try { malen(h, sp); } catch (e) {} }
+      if (Math.abs(Math.max(300, Math.min(WMAX, Math.round(bw))) - (sp.W || W0)) > 8) { try { malen(h, sp); } catch (e) {} }
     });
   }
   if (global.document && global.document.addEventListener) {
@@ -260,19 +312,19 @@
     var letzteIst = null; J.forEach(function (z) { if (istZahl(z.miete_ist)) letzteIst = { jahr: z.jahr, wert: z.miete_ist }; });
     var mErh = (d.ereignisse || []).filter(function (e) { return e.art === 'erhoehung'; }).map(function (e) { return { jahr: e.jahr, monat: e.monat, text: e.text, art: 'Mieterhöhung', legende: 'Mieterhöhung' }; });
     return {
-      jahre: J.map(function (z) { return z.jahr; }), heute: d.heute, gewaehlt: d.gewaehlt, onJahr: d.onJahr,
+      jahre: J.map(function (z) { return z.jahr; }), heute: d.heute, gewaehlt: d.gewaehlt, onJahr: d.onJahr, karten: !!d.karten,   /* v4090 */
       titel: 'Kaltmiete und Cashflow je Jahr, Plan gegen Ist',
       ereignisse: (d.ereignisse || []).filter(function (e) { return e.art !== 'erhoehung'; }),
       panels: [
-        { titel: 'Kaltmiete je Jahr', kurz: 'Kaltmiete', art: 'linie', hoehe: 190, marken: mErh, serien: [
-          { name: 'Plan vom Ankauf', kurz: 'Plan', typ: 'linie', strich: 'plan', farbe: GRAU, werte: w('miete_plan'), ende: true },
+        { titel: 'Kaltmiete je Jahr', kurz: 'Kaltmiete', art: 'linie', hoehe: 190, hoeheKarte: 170, ohneIst: 'Ist fehlt noch', marken: mErh, serien: [
+          { name: 'Plan vom Ankauf', kurz: 'Plan', rolle: 'plan', typ: 'linie', strich: 'plan', farbe: GRAU, werte: w('miete_plan'), ende: true },
           { name: 'Ziel (Zielbild des Jahres)', kurz: 'Ziel', typ: 'linie', strich: 'ziel', werte: w('ziel_j'), ende: true },
-          { name: 'Ist', kurz: 'Ist', typ: 'linie', strich: 'ist', werte: w('miete_ist'), ende: true },
+          { name: 'Ist', kurz: 'Ist', rolle: 'ist', typ: 'linie', strich: 'ist', werte: w('miete_ist'), ende: true },
           { name: 'Projektion heute', typ: 'linie', strich: 'proj', werte: proj, anschluss: letzteIst }
         ] },
-        { titel: 'Cashflow vor Steuer je Jahr', kurz: 'Cashflow vor Steuer', art: 'balken', hoehe: 120, serien: [
-          { name: d.cf_projektion ? 'Cashflow Plan oder Projektion' : 'Cashflow Plan', typ: 'balken', farbe: GRAU, deckkraft: 0.45, werte: w('cf_plan') },
-          { name: 'Cashflow Jahresstand', typ: 'balken', farbe: GOLD, werte: w('cf_ist') }
+        { titel: 'Cashflow vor Steuer je Jahr', kurz: 'Cashflow vor Steuer', art: 'balken', hoehe: 120, hoeheKarte: 170, ohneIst: 'kein Jahresstand', serien: [
+          { name: d.cf_projektion ? 'Plan oder Projektion' : 'Plan vom Ankauf', rolle: 'plan', typ: 'balken', farbe: GRAU, deckkraft: 0.45, werte: w('cf_plan') },
+          { name: 'Ist (Jahresstand)', rolle: 'ist', typ: 'balken', farbe: GOLD, werte: w('cf_ist') }
         ] }
       ]
     };
@@ -318,6 +370,7 @@
     opt = opt || (global.DpJahresabgleich && global.DpJahresabgleich.grafikOpt ? global.DpJahresabgleich.grafikOpt() : {});
     var d = null; try { d = daten(opt.gewaehlt); } catch (e) { d = null; }
     if (d && opt.onJahr) d.onJahr = opt.onJahr;
+    if (d && opt.karten) d.karten = true;   /* v4090 · Jahresabgleich: je Kennzahl eine Karte */
     for (var i = 0; i < hs.length; i++) { try { zeichnen(hs[i], d); } catch (e) { hs[i].innerHTML = ''; } }
   }
 

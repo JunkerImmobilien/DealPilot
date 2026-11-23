@@ -252,6 +252,8 @@
     var meldung = '';
     function zeichne() { host.innerHTML = html(h.liste(), { vorbelegbar: !!(h.vorbelegen && h.vorbelegen(true)), wo: h.wo, meldung: meldung, geplant: h.geplant ? h.geplant() : [], vivi: h.vivi ? h.vivi() : null }); meldung = ''; }
     function fertig(l, neu) {
+      /* v4090 · festgeschriebene Mietjahre bleiben, wie sie sind (jahresbuch.js erhoehungenSchuetzen) */
+      try { var JBx = global.DpJahresbuch; if (JBx && JBx.erhoehungenSchuetzen) { var rx = JBx.erhoehungenSchuetzen(h.liste(), l); if (rx.abgewiesen) { l = rx.liste; neu = null; } } } catch (x) {}
       h.setzen(l); var a = ableiten(l); if (h.geaendert) h.geaendert(a);
       if (neu) meldung = rueckmeldung(neu, a, h.heute ? h.heute() : null, h.wohin || null);
       zeichne();

@@ -3320,6 +3320,8 @@
     if (it.kind === 'erhoehung') {   /* v3982 · F11: in die Liste der Mieterhöhungen (Objekt oder Wohnung) */
       var E = window.DpErhoehungen, er = it.erh || {}; if (!E || !E.eintragAus) return null;
       var neuE = E.eintragAus({ datum: er.datum, art: er.art, von: er.von, auf: er.auf, beleg: er.beleg }); if (!neuE.eintrag) return null;
+      /* v4090 · festgeschriebenes Mietjahr: nicht übernehmen, Hinweis in der Liste */
+      try { var yE = parseInt(String(er.datum || '').slice(0, 4), 10), JBf = window.DpJahresbuch; if (JBf && JBf.istFest && JBf.istFest(yE, 'miete')) { _importHinweise.push('Mieterhöhung ' + (er.datum || '') + ': Miete ' + yE + ' ist festgeschrieben, nicht übernommen.'); return null; } } catch (e) {}
       var M = window._dpMfh, nrN = function (s) { return String(s || '').toLowerCase().replace(/[^a-z0-9]/g, '').replace(/^(we|whg|wohnung)/, ''); };
       if (M && Array.isArray(M.einheiten) && M.einheiten.length) {
         var iE = -1; M.einheiten.forEach(function (e, i) { if (iE < 0 && e && er.einheit && nrN(e.nr) === nrN(er.einheit)) iE = i; });

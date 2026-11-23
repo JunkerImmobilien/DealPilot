@@ -249,6 +249,12 @@
       severity: 'beginner'
     },
     /* v4060 · Mietvertrag: Hilfetexte zum Überfahren (Marcel 23.11.2026: „da steht keine Hilfe“) */
+    /* v4090 · Jahresabgleich: Knopf „Kennzahlen JJJJ jetzt sichern" (hieß „Stand JJJJ festhalten") */
+    'pa.ja_kennzahlen_sichern': {
+      title: 'Kennzahlen des Jahres sichern',
+      body: 'DealPilot merkt sich je Jahr DSCR, Deal Score, Cashflow, Miete und Restschuld. Das passiert bei jedem Speichern von selbst, der Knopf tut es sofort. Im nächsten Jahr steht dieser Stand dann in der Tabelle Jahr für Jahr neben dem Plan vom Kauf. Ein früheres Jahr wird dabei nicht verändert.',
+      severity: 'beginner'
+    },
     'tab3.mv_art': {
       title: 'Vertragsart',
       body: 'Die Vertragsform bestimmt, ob und wann die Miete steigen darf. Bei der Standardmiete gilt die Erhöhung auf die ortsübliche Vergleichsmiete (§ 558 BGB). Staffel- und Indexmiete tragen ihren nächsten Termin schon im Vertrag, dort ist § 558 ausgeschlossen. Bei verknüpften Objekten kommt die Angabe aus ViVi.',

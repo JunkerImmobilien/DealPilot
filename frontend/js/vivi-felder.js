@@ -236,6 +236,12 @@
      e.erhoehungen. Eintraege aus ViVi (id vivi-…) werden ersetzt, eigene bleiben. Steht am selben Tag schon ein eigener
      Eintrag, gilt der eigene (keine Doppelung). Gibt true zurueck, wenn sich etwas geaendert hat. */
   function erhoehungenMischen(alt, neu) {
+    var m = erhoehungenMischenRoh(alt, neu);
+    /* v4090 · ein festgeschriebenes Mietjahr übernimmt nichts mehr aus ViVi (jahresbuch.js erhoehungenSchuetzenRein, ohne Hinweis) */
+    try { var JB = window.DpJahresbuch; if (m && JB && JB.erhoehungenSchuetzenRein) { var r = JB.erhoehungenSchuetzenRein(alt, m, function (y) { return JB.istFest(y, 'miete'); }); if (r.abgewiesen) { m = r.liste; var k = function (l) { return JSON.stringify((l || []).map(function (x) { return [x.id, x.datum, x.art, x.von, x.auf]; })); }; if (k(m) === k(alt)) m = null; } } } catch (e) {}
+    return m;
+  }
+  function erhoehungenMischenRoh(alt, neu) {
     alt = Array.isArray(alt) ? alt : [];
     var eigene = alt.filter(function (x) { return x && !/^vivi-/.test(String(x.id || '')); });
     var tage = {}; eigene.forEach(function (x) { if (x.datum) tage[x.datum] = true; });

@@ -239,7 +239,7 @@
     Promise.resolve(global.saveObj()).then(function () {
       mount();
       try { if (global.DpJahresabgleich) global.DpJahresabgleich.mountAll(); } catch (e) {}   /* v3430 · die Tabelle dort zeigt den Stand */
-      if (typeof global.toast === 'function') global.toast('✓ Stand ' + new Date().getFullYear() + ' festgehalten');
+      if (typeof global.toast === 'function') global.toast('✓ Kennzahlen ' + new Date().getFullYear() + ' gesichert');   /* v4090 */
     }, function () {});
   }
 

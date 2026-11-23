@@ -178,7 +178,8 @@ const K = c.DpMietpotenzial, E = c.DpErhoehungen, JA = c.DpJahresabgleich, HV = 
   ok(/standJahr: standJahr/.test(js) && /J\.standJahr\(z\.jahr\)/.test(lies('frontend/js/jahresabgleich.js')), 'E DSCR und Score aus dem Jahresstand in der Tabelle');
   const jb = lies('frontend/js/jahresbuch.js');
   ok(/querySelector\('\[data-dp-ja-host\]'\)/.test(jb) && /closest\('#dp-jb-ov'\)/.test(jb), 'E Jahresbuch-Tafel im Reiter leer, im Fenster „Jahre" (Eingabe) bleibt sie');
-  ok(/data-ja-aktion="' \+ aktion/.test(lies('frontend/js/jahresabgleich.js')) && /JB\(\)\.oeffnen\(y\)/.test(lies('frontend/js/jahresabgleich.js')), 'E „eintragen" öffnet die Bearbeitung des Jahres');
+  /* v4090 · „eintragen" öffnet die Eingabe IM Reiter (vorher Fenster „Jahre"). Kommentare zählen nicht (Prüfer findet sein Zitat). */
+  ok(/data-ja-aktion="' \+ aktion/.test(lies('frontend/js/jahresabgleich.js')) && /a === 'eintragen'\) \{ eingabeAuf\(y\)/.test(lies('frontend/js/jahresabgleich.js')) && !/JB\(\)\.oeffnen\(/.test(lies('frontend/js/jahresabgleich.js').replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*$/gm, '')) && /eingabeHtml: eingabeHtml/.test(jb), 'E „eintragen" öffnet die Bearbeitung des Jahres');
   ok(!/Kauf gegen heute/.test(lies('frontend/js/jahresabgleich.js').replace(/\/\*[\s\S]*?\*\//g, '')), 'E Tafel „Kauf gegen heute" je Jahr entfällt');
   ok(/o\.art = ex\.art/.test(lies('frontend/js/object-actions.js')) && /o\.jahr = ex\.jahr/.test(lies('frontend/js/object-actions.js')), 'E gespeicherte Dokumente tragen Art und Jahr');
   const idx = lies('frontend/index.html');
@@ -203,7 +204,7 @@ const K = c.DpMietpotenzial, E = c.DpErhoehungen, JA = c.DpJahresabgleich, HV = 
   ok(J4.stand({ jahr: 2024, status: 'geplant', mb: null }, false).miete === 'offen' && J4.stand({ jahr: 2024, status: 'geplant', mb: null, miete_vivi: true }, false).miete === 'ok', 'F v4037 Miete 2024 ohne Ist offen, mit Ist aus ViVi erledigt');
   const s24 = J4.stand({ jahr: 2024, status: 'geplant', mb: null, miete_eigen: true }, false);
   ok(s24.steuer === 'ok' && s24.wert === 'ok' && s24.nFest === 2 && s24.n === 3, 'F fest: Steuer und Wert erledigt, mit Miete 3 von 4 (' + s24.n + ')');
-  ok(s24.offen.join(',') === 'Haus' && s24.erledigt.join(',') === 'Miete,Steuer,Wert', 'F erledigt/offen mit Namen');
+  ok(s24.offen.join(',') === 'Haus' && s24.erledigt.join(',') === 'Miete,Wert,Steuer', 'F erledigt/offen mit Namen (v4090 Reihenfolge Miete, Wert, Haus, Steuer)');
   const lauf = J4.stand({ jahr: new Date().getFullYear(), status: 'geplant' }, false);
   ok(lauf.nFest === 0 && lauf.miete === 'laufend', 'F laufendes Jahr lässt sich nicht festschreiben');
   const js = lies('frontend/js/jahresabgleich.js');
@@ -217,6 +218,70 @@ const K = c.DpMietpotenzial, E = c.DpErhoehungen, JA = c.DpJahresabgleich, HV = 
   const q = [{ liste: [{ id: 'vivi-1', datum: '2026-11-01', art: '558', von: 495, auf: 520 }], heute: 520 }];
   ok(J4.viviMieteRein(q, 2024, 7, E4) === 2970 && J4.viviMieteRein(q, 2025, 1, E4) === 5940 && J4.viviMieteRein(q, 2026, 1, E4) === 5990, 'F ViVi-Kaltmiete 2024 ab 07 = 2.970, 2025 = 5.940, 2026 = 5.990 (Testobjekt 1179)');
   ok(J4.viviMieteRein([], 2025, 1, E4) === null, 'F ohne ViVi-Quelle kein Wert');
+}
+
+
+/* ── A · v4090 Ablauf, Reihenfolge, Sprung, Grafik, Kennzahlen sichern ───────────────── */
+{
+  const c5 = kontext();
+  for (const f of ['mieterhoehungen.js', 'jahresbuch.js', 'jahresbuch-grafik.js', 'jahresabgleich.js']) vm.runInContext(lies('frontend/js/' + f), c5);
+  const J5 = c5.DpJahresabgleich, G5 = c5.DpJahresbuchGrafik;
+  ok(J5.SCHRITTE.map((x) => x[1]).join(',') === 'Miete,Wert,Haus,Steuer', 'A Reihenfolge Miete, Wert, Haus, Steuer');
+  const s1 = { miete: 'ok', wert: 'offen', haus: 'teil', steuer: 'offen', fest: {}, nFest: 0 };
+  ok(J5.aktiverSchritt({ jahr: 2025 }, s1, false) === 'wert', 'A Ablauf startet beim ersten offenen Schritt (Wert)');
+  ok(J5.aktiverSchritt({ jahr: 2026 }, s1, true) === null, 'A laufendes Jahr ohne Ablauf');
+  ok(J5.aktiverSchritt({ jahr: 2025 }, { miete: 'ok', wert: 'ok', haus: 'ok', steuer: 'ok', fest: {}, nFest: 0 }, false) === null, 'A alles erledigt: kein aktiver Schritt');
+  const fh = J5.fuehrungHtml({ jahr: 2025, status: 'geplant' }, s1, false, 'wert', true);
+  ok(/Schritt 2 von 4 · Wert · offen/.test(fh) && /data-ja-aktion="f-zurueck"/.test(fh) && /data-ja-aktion="f-weiter"/.test(fh), 'A Leiste: Schritt 2 von 4, zurück und weiter');
+  ok(!/f-weiter/.test(J5.fuehrungHtml({ jahr: 2025, status: 'geplant' }, s1, false, 'steuer', true)), 'A letzter Schritt ohne weiter');
+  let texte = '';
+  for (const k of ['miete', 'wert', 'haus', 'steuer']) for (const st of ['ok', 'offen']) for (const weg of [true, false]) texte += J5.aufgabe(k, { jahr: 2025, status: 'geplant' }, Object.assign({}, s1, { [k]: st }), weg).t + '\n';
+  ok(!/[–—;]/.test(texte), 'A Kundentext des Ablaufs ohne Gedankenstrich und Semikolon');
+  const js = lies('frontend/js/jahresabgleich.js');
+  ok(/function warteSichtbar\(/.test(js) && /a === 'miete'\) \{ zuMiete\('erh'\)/.test(js) && /det\.open = true/.test(js) && /einheitOeffnen\(wohnungMitLuft\(\)\)/.test(js), 'A Mieterhöhung eintragen: wartet auf das Ziel, klappt die Eingabe auf, MFH öffnet die Wohnung');
+  ok(/Kennzahlen ' \+ heuteJahr\(\) \+ ' jetzt sichern/.test(js) && /data-tip-id="pa\.ja_kennzahlen_sichern"/.test(js) && /'pa\.ja_kennzahlen_sichern'/.test(lies('frontend/js/tooltip-content.js')) && !/festhalten<\/button>/.test(js), 'A „Stand festhalten" heißt „Kennzahlen JJJJ jetzt sichern", Hilfe nur über den Tooltip-Schalter');
+  /* Grafik: Karten je Kennzahl, Kopf mit Ist, Plan und Abstand in Worten */
+  const sp = G5.ausAlt({ jahre: [{ jahr: 2024, miete_plan: 6000, miete_ist: 6200, cf_plan: -1000, cf_ist: null }, { jahr: 2025, miete_plan: 6240, miete_ist: 6770, cf_plan: -2000, cf_ist: -1500 }], heute: 2026, gewaehlt: 2025, karten: true });
+  ok(sp.karten === true && sp.panels.every((p) => p.serien.some((s) => s.rolle === 'ist') && p.serien.some((s) => s.rolle === 'plan')), 'A Grafik: Karten, jede mit Ist und Plan');
+  const gr = lies('frontend/js/jahresbuch-grafik.js');
+  ok(/WMAX = 1400/.test(gr) && /Math\.min\(WMAX, Math\.round\(bw\)\)/.test(gr) && !/Math\.min\(W0, Math\.round\(bw\)\)/.test(gr), 'A Grafik in echter Größe, nicht über 720 hochskaliert');
+  ok(/' über' : ' unter'\) \+ ' Plan/.test(gr) && /'▲ ' : '▼ '/.test(gr), 'A Abstand zum Plan mit Zeichen und Wort, nie nur Farbe');
+}
+
+
+/* ── X · v4090 Festgeschriebene Jahre sind gesperrt (Marcel 23.11.2026) ───────────────── */
+{
+  const c6 = kontext({ toast() {} });
+  for (const f of ['mieterhoehungen.js', 'jahresbuch.js']) vm.runInContext(lies('frontend/js/' + f), c6);
+  const B = c6.DpJahresbuch;
+  ok(B.feldGesperrtRein({ miete: 'x' }, 'nkm_j') && B.feldGesperrtRein({ miete: 'x' }, 'einheiten') && B.feldGesperrtRein({ miete: 'x' }, 'leer_monate') && !B.feldGesperrtRein({ miete: 'x' }, 'steuer_status'), 'X Miete fest sperrt Ist-Miete, Wohnungen, Leerstand, nicht den Steuerstand');
+  ok(B.feldGesperrtRein({ steuer: 'x' }, 'steuer_status') && !B.feldGesperrtRein({ steuer: 'x' }, 'rs_ist'), 'X Steuer fest sperrt den Steuerstand');
+  const alle4 = { miete: 'x', wert: 'x', haus: 'x', steuer: 'x' };
+  ok(B.feldGesperrtRein(alle4, 'rs_ist') && B.feldGesperrtRein(alle4, 'notiz') && !B.feldGesperrtRein({ miete: 'x' }, 'notiz'), 'X Restschuld und Notiz sperren mit dem ganzen Jahr');
+  const alt = [{ id: 'a', datum: '2024-05-01', art: '558', von: 500, auf: 540 }, { id: 'b', datum: '2025-03-01', art: '558', von: 540, auf: 560 }];
+  const fm = (y) => y === 2024;
+  const r1 = B.erhoehungenSchuetzenRein(alt, alt.concat([{ id: 'c', datum: '2024-09-01', art: '558', von: 540, auf: 555 }]), fm);
+  ok(r1.abgewiesen && r1.liste.length === 2, 'X neue Erhöhung in festgeschriebenem Mietjahr fällt weg');
+  const r2 = B.erhoehungenSchuetzenRein(alt, [alt[1]], fm);
+  ok(r2.abgewiesen && r2.liste.some((x) => x.id === 'a'), 'X gelöschte Erhöhung im festgeschriebenen Jahr kommt zurück');
+  const r3 = B.erhoehungenSchuetzenRein(alt, [alt[0], { id: 'd', datum: '2025-08-01', art: '558', von: 560, auf: 580 }], fm);
+  ok(!r3.abgewiesen && r3.liste.length === 2 && r3.liste[1].id === 'd', 'X offenes Jahr bleibt frei änderbar');
+  /* echte Schreibstelle: _jahre wird nicht geschrieben, wenn Miete fest */
+  const jb = lies('frontend/js/jahresbuch.js');
+  ok(/if \(feldGesperrt\(jahr, feld\)\) \{ sperrHinweis/.test(jb), 'X schreiben() prüft jede Schreibstelle eines Jahres');
+  ok(/function steuerSperreEinhaengen\(\)/.test(jb) && /istFest\(y, 'steuer'\)\) \{ sperrHinweis\(y, 'steuer'\); return false; \}/.test(jb), 'X dpSteuerSetzen (Belege, Unterlagen, Sonderumlage, ViVi) schreibt nicht in eine festgeschriebene Steuer');
+  /* Wrapper real: tax-Funktion wird nicht gerufen */
+  let gerufen = 0; c6.dpSteuerSetzen = () => { gerufen++; return true; };
+  c6.DpJahresbuch.fest = () => ({});
+  B.steuerSperreEinhaengen();
+  c6._currentObjData = { _jahre: { '2024': { fest: { steuer: '2026-11-23' } } } };
+  const rS = c6.dpSteuerSetzen(2024, 'erhaltungsaufwand', 100), rS2 = c6.dpSteuerSetzen(2025, 'erhaltungsaufwand', 100);
+  ok(rS === false && rS2 === true && gerufen === 1, 'X Steuer 2024 fest: dpSteuerSetzen lehnt ab, 2025 schreibt (' + gerufen + ')');
+  ok(/erhoehungenSchuetzen\(h\.liste\(\), l\)/.test(lies('frontend/js/mieterhoehungen.js')), 'X Liste der Mieterhöhungen (Reiter Miete, Wohnung) geschützt');
+  ok(/erhoehungenSchuetzenRein\(alt, m,/.test(lies('frontend/js/vivi-felder.js')), 'X ViVi-Abgleich übernimmt nichts in ein festgeschriebenes Mietjahr');
+  ok(/JBf\.istFest\(yE, 'miete'\)/.test(lies('frontend/js/object-actions.js')), 'X Belege/Unterlagen: Mieterhöhung in festgeschriebenem Jahr nicht übernommen');
+  const ja = lies('frontend/js/jahresabgleich.js');
+  ok(/a === 'freigeben'\) \{ _frage = /.test(ja) && /a === 'freigeben-ja'\)/.test(ja) && /fest_protokoll/.test(jb) && /aktion: an \? 'festgeschrieben' : 'freigegeben'/.test(jb), 'X Freigeben nur nach Rückfrage, Vorgang im Protokoll');
 }
 
 console.log(`jahresabgleich-pruefen (v3430): ${gruen} von ${gruen + rot} ok`);

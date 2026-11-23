@@ -39,7 +39,7 @@
 (function (global) {
   'use strict';
   if (global.DpJahresbuch) return;
-  var VERSION = 'v4037';
+  var VERSION = 'v4090';
   var STATUS = [['geplant', 'geplant'], ['erklaert', 'erklärt'], ['bescheid', 'Bescheid']];
 
   function doc() { return global.document || null; }
@@ -178,10 +178,49 @@
     return los;
   })();
   function speichern() { return global.DpSpeichernFolge(); }
+  /* v4090 · Marcel 23.11.2026: „wichtig ist auch, dass man an festgeschriebenen Jahren nicht einfach wieder was ändern
+     kann." Jede Schreibstelle eines Jahres geht hier durch. Ein Feld gehört zu einem Schritt; ist der Schritt
+     festgeschrieben, wird nicht geschrieben. Restschuld und Notiz gehören keinem Schritt, sie sperren mit dem ganzen Jahr.
+     Lösen nur über „wieder freigeben" mit Rückfrage im Jahresabgleich, der Vorgang steht in _jahre[J].fest_protokoll. */
+  var FELD_SCHRITT = { nkm_j: 'miete', nkm_j_vivi: 'miete', einheiten: 'miete', leer_monate: 'miete', steuer_status: 'steuer', rs_ist: '*', notiz: '*' };
+  /** Rein: ist das Feld des Jahres gesperrt? f = festAus(eintrag) */
+  function feldGesperrtRein(f, feld) {
+    var k = FELD_SCHRITT[feld];
+    if (!k) return false;
+    if (k === '*') return FEST_SCHRITTE.every(function (x) { return !!f[x[0]]; });
+    return !!f[k];
+  }
+  function feldGesperrt(jahr, feld) { return feldGesperrtRein(fest(jahr), feld); }
+  /** Ist der Schritt (oder bei '*' das ganze Jahr) festgeschrieben? Ohne Hinweis. */
+  function istFest(jahr, schritt) { var f = fest(jahr); return schritt === '*' ? FEST_SCHRITTE.every(function (x) { return !!f[x[0]]; }) : !!f[schritt || 'steuer']; }
+  function sperrHinweis(jahr, schritt) {
+    var w = schritt === '*' ? 'Das Jahr' : (FEST_SCHRITTE.filter(function (x) { return x[0] === schritt; })[0] || [schritt, schritt])[1];
+    if (typeof global.toast === 'function') global.toast(w + ' ' + jahr + ' ist festgeschrieben. Ändern geht erst nach „wieder freigeben“ im Jahresabgleich.');
+  }
+  /** Rein: Liste der Mieterhöhungen gegen festgeschriebene Mietjahre schützen. Einträge eines gesperrten Jahres bleiben,
+      wie sie waren (neu dazu fällt weg, gelöscht kommt zurück, geändert bleibt alt). festMiete(jahr) → true = gesperrt.
+      Rückgabe { liste, abgewiesen } */
+  function erhoehungenSchuetzenRein(alt, neu, festMiete) {
+    alt = Array.isArray(alt) ? alt : []; neu = Array.isArray(neu) ? neu : [];
+    var gesp = function (x) { var y = parseInt(String((x && x.datum) || '').slice(0, 4), 10); return y >= 1990 && !!festMiete(y); };
+    var sig = function (x) { return JSON.stringify([x.id, x.datum, x.art, x.von, x.auf]); };
+    var altG = alt.filter(gesp), neuG = neu.filter(gesp);
+    var gleich = altG.length === neuG.length && altG.map(sig).sort().join('|') === neuG.map(sig).sort().join('|');
+    if (gleich) return { liste: neu, abgewiesen: 0 };
+    var erg = neu.filter(function (x) { return !gesp(x); }).concat(altG).sort(function (a, b) { return a.datum < b.datum ? -1 : (a.datum > b.datum ? 1 : 0); });
+    return { liste: erg, abgewiesen: Math.max(1, Math.abs(neuG.length - altG.length)) };
+  }
+  function erhoehungenSchuetzen(alt, neu) {
+    var r = erhoehungenSchuetzenRein(alt, neu, function (y) { return istFest(y, 'miete'); });
+    if (r.abgewiesen) { var y0 = null; (neu || []).concat(alt || []).some(function (x) { var y = parseInt(String((x && x.datum) || '').slice(0, 4), 10); if (istFest(y, 'miete')) { y0 = y; return true; } return false; }); sperrHinweis(y0 || '', 'miete'); }
+    return r;
+  }
   function schreiben(jahr, feld, wert, ohneSpeichern) {
-    var d = D(); if (!d) return;
+    var d = D(); if (!d) return false;
+    if (feldGesperrt(jahr, feld)) { sperrHinweis(jahr, FELD_SCHRITT[feld]); return false; }   /* v4090 */
     d._jahre = setzen(d._jahre, jahr, feld, wert);
     if (!ohneSpeichern) speichern();
+    return true;
   }
   function statusSetzen(jahr, s) {
     if (!STATUS.some(function (x) { return x[0] === s; })) return false;
@@ -209,7 +248,14 @@
   function festSetzen(jahr, schritte, an) {
     var y = parseInt(jahr, 10);
     if (!verfuegbar() || !(y >= 1990) || (an && y >= heuteJahr())) return false;
-    var n = festNeu(fest(y), schritte, !!an, heuteIso());
+    var alt = fest(y), n = festNeu(alt, schritte, !!an, heuteIso());
+    var geaendert = FEST_SCHRITTE.map(function (x) { return x[0]; }).filter(function (k) { return !!alt[k] !== !!n[k]; });
+    if (!geaendert.length) return true;
+    /* v4090 · Protokoll: wer wann was festgeschrieben oder freigegeben hat (Freigeben nur nach Rückfrage, jahresabgleich.js) */
+    var prot = ((jahreDaten()[String(y)] || {}).fest_protokoll || []).slice(-29);
+    var wer = ''; try { var u = global.Auth && global.Auth.getUser ? global.Auth.getUser() : null; wer = (u && (u.email || u.name)) || ''; } catch (e) {}
+    prot.push({ am: new Date().toISOString(), aktion: an ? 'festgeschrieben' : 'freigegeben', schritte: geaendert, wer: wer });
+    var d = D(); if (d) d._jahre = setzen(d._jahre, y, 'fest_protokoll', prot);
     schreiben(y, 'fest', Object.keys(n).length ? n : '');
     mountAll();
     return true;
@@ -331,6 +377,7 @@
       '.dp-jb-f input,.dp-jb-f select{font:inherit;padding:5px 7px;border:1px solid rgba(128,128,128,.4);border-radius:6px;background:transparent;color:inherit;min-width:0}',
       '.dp-jb-h{margin:4px 0;padding:6px 9px;border-left:3px solid var(--wl-c9a84c, #C9A84C);background:rgba(127,127,127,.06);font-size:12px}',
       '.dp-jb-h.dp-jb-ok{border-left-color:#3FA56C}',
+      '.dp-jb-inline{margin:10px 0 4px;padding:12px 14px;border:1px solid var(--wl-c9a84c, #C9A84C);border-radius:10px;background:var(--surface, #FDFCFA)}',
       '.dp-jb-ov{position:fixed;inset:0;background:rgba(42,39,39,.6);z-index:99990;display:flex;align-items:flex-start;justify-content:center;padding:14px;overflow:auto}',
       '.dp-jb-karte{background:var(--surface, #FDFCFA);color:var(--text, #2A2727);border-radius:12px;max-width:1100px;width:100%;padding:16px 18px;box-shadow:0 10px 40px rgba(0,0,0,.35)}',
       '.dp-jb-kopf{display:flex;align-items:center;gap:10px;margin-bottom:8px}.dp-jb-kopf b{font:600 16px "Space Grotesk",Inter,sans-serif}',
@@ -381,7 +428,7 @@
     }).join(' · ') : 'keine eingetragen';
     /* v3840 · GEMESSEN 19.11.2026 (Westerfeldstr.-Kopie): die Eingabe je Wohnung (ein) wurde seit v3366 gebaut, aber nie
        ausgegeben. Beim MFH gab es damit keinen Weg, die Miete eines vergangenen Jahres einzutragen. */
-    return '<tr class="dp-jb-edit" data-jb-edit="' + z.jahr + '"><td colspan="8">' + zus + (z.jahr < heuteJahr() ? ein : '')
+    return sperrHtml(z.jahr, '<tr class="dp-jb-edit" data-jb-edit="' + z.jahr + '"><td colspan="8">' + zus + (z.jahr < heuteJahr() ? ein : '')
       + '<div class="dp-jb-f">'
       + ((mfh && mfh.length) ? '' : (z.jahr < heuteJahr() ? f('nkm_j', 'Kaltmiete ' + z.jahr + ', wirklich eingenommen (€ im Jahr)', istZahl(z.miete_proj) ? String(z.miete_proj) : '') : ''))
       + f('leer_monate', 'Leerstand (Monate)', '0', 'numeric')
@@ -391,7 +438,43 @@
       + '</div>'
       + '<div class="dp-jb-h">Mieterhöhungen ' + z.jahr + ': ' + erh + '. Eine Erhöhung trägst du ' + ((mfh && mfh.length) ? 'bei der Wohnung in den Einheiten' : 'im Reiter Miete in der Karte Mietvertrag') + ' ein.</div>'
       + '<button type="button" class="dp-jb-knopf" data-jb-aktion="zu">Fertig</button>'
-      + '</td></tr>';
+      + '</td></tr>');
+  }
+  /** v4090 · gesperrte Felder des Jahres deaktiviert zeigen, mit Satz dazu */
+  function sperrHtml(jahr, h) {
+    var gesperrt = [];
+    h = h.replace(/<(input|select)([^>]*?)data-jb-(feld|einheit)="([^"]+)"/g, function (m, tag, vor, art, name) {
+      var feld = art === 'einheit' ? 'einheiten' : name;
+      if (!feldGesperrt(jahr, feld)) return m;
+      gesperrt.push(feld);
+      return '<' + tag + ' disabled title="festgeschrieben"' + vor + 'data-jb-' + art + '="' + name + '"';
+    });
+    if (!gesperrt.length) return h;
+    return h.replace(/(<td colspan="8">)/, '$1<div class="dp-jb-h">' + (istFest(jahr, '*') ? 'Das Jahr ' + jahr + ' ist festgeschrieben.' : 'Festgeschriebene Schritte von ' + jahr + ' sind gesperrt.') + ' Ändern geht erst nach „wieder freigeben“ im Jahresabgleich.</div>');
+  }
+  /** v4090 · Marcel 23.11.2026: „warum öffnet sich noch dieses Modal?" Der Jahresabgleich zeigt die Eingabe eines Jahres
+      direkt im Reiter (Ist-Miete, Leerstand, Restschuld, Steuerstand, Notiz). Dieselben Felder wie im Fenster „Jahre",
+      dieselbe Speicherstelle (_jahre[J]). '' ohne Bestand oder bei unbekanntem Jahr. */
+  function eingabeHtml(jahr) {
+    if (!verfuegbar()) return '';
+    stil();
+    var y = +jahr, z = zeilen().filter(function (x) { return x.jahr === y; })[0]; if (!z) return '';
+    _offen = y;
+    var M = global._dpMfh, mfh = global.DpMfhEinheiten && global.DpMfhEinheiten.artMitEinheiten && global.DpMfhEinheiten.artMitEinheiten() && M && Array.isArray(M.einheiten) ? M.einheiten : null;
+    var innen = editHtml(z, mfh).replace(/^<tr[^>]*><td colspan="8">/, '').replace(/<\/td><\/tr>$/, '');
+    return '<div class="dp-jb dp-jb-inline" data-jb-inline="' + y + '">' + innen + '</div>';
+  }
+  /** v4090 · Eingaben und Knöpfe eines eingabeHtml-Blocks binden. fertig() nach „Fertig" (gespeichert). */
+  function eingabeBinden(el, fertig) {
+    if (!el || el._dpJbIn) return; el._dpJbIn = true;
+    el.addEventListener('change', aendern);
+    el.addEventListener('click', function (ev) {
+      var b = ev.target && ev.target.closest ? ev.target.closest('[data-jb-aktion]') : null; if (!b) return;
+      ev.preventDefault(); ev.stopPropagation();
+      var a = b.getAttribute('data-jb-aktion');
+      if (a === 'zu') { _offen = null; Promise.resolve(speichern()).then(function () { if (typeof fertig === 'function') fertig(); }); return; }
+      aktion(a, parseInt(b.getAttribute('data-jb-jahr'), 10) || _offen, b.getAttribute('data-jb-fassung'));
+    });
   }
   function tafelHtml(Z, mfh) {
     var kopf = '<tr><th>Jahr</th><th>Kaltmiete Plan</th><th>Kaltmiete Ist</th><th>Cashflow v. St. Plan</th><th>Restschuld Plan · Ist</th><th>Steuer V+V</th><th>Ziel · Wert</th><th></th></tr>';
@@ -578,6 +661,28 @@
     });
     return g;
   }
+  /* v4090 · Alle Schreibstellen der Anlage V eines Jahres laufen über window.dpSteuerSetzen (tax.js): Belege einlesen
+     (object-actions.js), Unterlagen-Eingang, Sonderumlage, ViVi-Steuerabgleich. Ist die Steuer des Jahres festgeschrieben,
+     schreibt sie nicht (Rückgabe false wie „Jahr nicht in der Zeitleiste"). Die Eingabe im Reiter Steuer prüft selbst
+     (updateTaxOverride → aenderungErlaubt). */
+  function steuerSperreEinhaengen() {
+    var f = global.dpSteuerSetzen;
+    if (typeof f !== 'function' || f._dpFest) return;
+    var g = function (year, field) {
+      var y = parseInt(year, 10);
+      if (y >= 1990 && istFest(y, 'steuer')) { sperrHinweis(y, 'steuer'); return false; }
+      return f.apply(this, arguments);
+    };
+    g._dpFest = true;
+    Object.keys(f).forEach(function (k) { if (!(k in g)) g[k] = f[k]; });
+    global.dpSteuerSetzen = g;
+  }
+  steuerSperreEinhaengen();
+  if (global.addEventListener) {
+    global.addEventListener('DOMContentLoaded', steuerSperreEinhaengen);
+    global.addEventListener('load', steuerSperreEinhaengen);
+    global.addEventListener('dp:object-ready', steuerSperreEinhaengen);
+  }
   if (global.addEventListener) {
     global.addEventListener('dp:object-ready', function () { _offen = null; mountAll._mbFertig = null; setTimeout(mountAll, 900); });
     global.addEventListener('dp:erhoehungen', function () { setTimeout(mountAll, 100); });
@@ -590,6 +695,7 @@
     verfuegbar: verfuegbar, zeilen: zeilen, status: status, statusSetzen: statusSetzen, statusWort: statusWort, aenderungErlaubt: aenderungErlaubt,
     istMieteSetzen: istMieteSetzen, istMiete: istMiete,   /* v3710 */ istHerkunft: istHerkunft, viviIstSetzen: viviIstSetzen,   /* v4037 */
     FEST_SCHRITTE: FEST_SCHRITTE, festAus: festAus, festNeu: festNeu, fest: fest, festSetzen: festSetzen, festGesperrt: festGesperrt,   /* v4016 */
-    html: html, mountAll: mountAll, oeffnen: oeffnen, schliessen: schliessen, vorbelegen: vorbelegen, mbLaden: mbLaden, aktion: aktion   /* v3430 */
+    FELD_SCHRITT: FELD_SCHRITT, feldGesperrtRein: feldGesperrtRein, feldGesperrt: feldGesperrt, istFest: istFest, erhoehungenSchuetzenRein: erhoehungenSchuetzenRein, erhoehungenSchuetzen: erhoehungenSchuetzen, steuerSperreEinhaengen: steuerSperreEinhaengen,   /* v4090 */
+    html: html, eingabeHtml: eingabeHtml, eingabeBinden: eingabeBinden,   /* v4090 */ mountAll: mountAll, oeffnen: oeffnen, schliessen: schliessen, vorbelegen: vorbelegen, mbLaden: mbLaden, aktion: aktion   /* v3430 */
   };
 })(typeof window !== 'undefined' ? window : globalThis);

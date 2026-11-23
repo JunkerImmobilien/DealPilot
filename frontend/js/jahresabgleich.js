@@ -48,11 +48,12 @@
 (function (global) {
   'use strict';
   if (global.DpJahresabgleich) return;
-  var VERSION = 'v4042b';
+  var VERSION = 'v4090';
   var GOLD = 'var(--wl-c9a84c, #C9A84C)';
-  var SCHRITTE = [['miete', 'Miete'], ['steuer', 'Steuer'], ['wert', 'Wert'], ['haus', 'Haus']];
+  /* v4090 · Marcel 23.11.2026: „ich würde die Reihenfolge ändern in Miete, Wert, Haus und dann Steuern" (die Steuer braucht die Zahlen der drei davor) */
+  var SCHRITTE = [['miete', 'Miete'], ['wert', 'Wert'], ['haus', 'Haus'], ['steuer', 'Steuer']];
   var WORT = { ok: 'erledigt', teil: 'teilweise', offen: 'offen', laufend: 'läuft' };
-  var _gewaehlt = null, _gewaehltKey = null;
+  var _gewaehlt = null, _gewaehltKey = null, _fuehrung = {}, _eingabe = null, _frage = null;   /* v4090 · geführter Schritt je Jahr, offene Eingabe (Jahr) */
 
   function doc() { return global.document || null; }
   function istZahl(v) { return typeof v === 'number' && isFinite(v); }
@@ -382,6 +383,26 @@
       '.dp-ja-notiz{border-left:2px solid ' + GOLD + ';padding:8px 12px;background:color-mix(in srgb, ' + GOLD + ' 8%, #fff);font-size:12.5px;margin:10px 0 0;border-radius:0 8px 8px 0}',
       '.dp-ja-notiz.ok{border-left-color:#3FA56C}',
       '.dp-ja-fuss{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:10px;font-size:12px;color:' + LE + '}',
+      /* v4090 · geführter Ablauf, aktiver Schritt, Eingabe im Reiter, Sprungziel */
+      '.dp-ja-fuehrung{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px 18px;align-items:center;border:1px solid ' + GOLD + ';border-radius:10px;padding:10px 14px;margin:0 0 10px;background:color-mix(in srgb, ' + GOLD + ' 6%, #fff)}',
+      '.dp-ja-fuehrung.fertig{border-color:rgba(63,165,108,.45);background:color-mix(in srgb, #3FA56C 6%, #fff);grid-template-columns:auto minmax(0,1fr)}',
+      '.dp-ja-f-p{display:flex;gap:4px;margin:0;padding:0;list-style:none}',
+      '.dp-pa-wrap .dp-ja-f-p button{display:inline-flex !important;align-items:center;gap:6px;padding:4px 9px 4px 5px !important;min-height:0 !important;height:auto !important;border-radius:14px !important;border:1px solid ' + LI + ' !important;background:#fff !important;font:500 12px Inter,sans-serif !important;color:' + M + ' !important;cursor:pointer;box-shadow:none !important}',
+      '.dp-pa-wrap .dp-ja-f-p button.an{border-color:' + GOLD + ' !important;color:' + T + ' !important;font-weight:600 !important;box-shadow:0 0 0 2px color-mix(in srgb, ' + GOLD + ' 25%, transparent) !important}',
+      '.dp-ja-f-p i{font-style:normal;width:18px;height:18px;border-radius:50%;display:inline-grid;place-items:center;font:600 10.5px Inter,sans-serif;background:rgba(42,39,39,.07);color:' + T + '}',
+      '.dp-ja-f-p .dp-ja-f-ok i{background:#3FA56C;color:#fff}.dp-ja-f-p .dp-ja-f-teil i{background:#C99A2E;color:#fff}.dp-ja-f-p .dp-ja-f-offen i{background:rgba(184,98,92,.14);color:#B8625C}',
+      '.dp-ja-f-t{display:flex;flex-direction:column;gap:2px;font:400 13px/1.45 Inter,sans-serif;color:' + T + ';min-width:0}',
+      '.dp-ja-f-k{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}',
+      '.dp-pa-wrap .dp-ja-f-k button.dp-ja-f-nav{color:' + M + ' !important}',
+      '.dp-ja-schritt{cursor:pointer;transition:background .15s}.dp-ja-schritt.dp-ja-akt{background:color-mix(in srgb, ' + GOLD + ' 7%, #fff);box-shadow:inset 0 3px 0 ' + GOLD + '}',
+      '.dp-ja-eingabe{margin-top:10px}.dp-ja-eingabe-k{display:flex;align-items:baseline;gap:10px;margin:0 0 -4px;flex-wrap:wrap}.dp-ja-eingabe-k b{font:600 14px "Space Grotesk",Inter,sans-serif;color:' + T + '}.dp-ja-eingabe-k span{font-size:12px;color:' + M + '}',
+      '.dp-pa-wrap .dp-ja button.dp-ja-ein-x{margin-left:auto;background:none !important;border:none !important;box-shadow:none !important;font-size:16px !important;min-height:30px !important;padding:0 6px !important;color:' + M + ' !important;cursor:pointer}',
+      '.dp-ja-fh{display:inline-flex;align-items:center;gap:4px}',
+      '.dp-ja-frage{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 14px;border:1px solid #B8625C;border-radius:10px;padding:10px 14px;margin:0 0 10px;background:color-mix(in srgb, #B8625C 6%, #fff);font:400 13px/1.45 Inter,sans-serif;color:' + T + '}',
+      '.dp-ja-prot{font:400 11.5px Inter,sans-serif;color:' + LE + ';margin:-4px 0 10px}',
+      '@keyframes dpJaBlink{0%,100%{box-shadow:0 0 0 0 transparent}20%,60%{box-shadow:0 0 0 4px color-mix(in srgb, ' + GOLD + ' 45%, transparent)}}',
+      '.dp-ja-blink{animation:dpJaBlink 1.3s ease-in-out 2;border-radius:8px}',
+      '@media (max-width:760px){.dp-ja-fuehrung{grid-template-columns:1fr;padding:10px}.dp-ja-f-p{flex-wrap:wrap}.dp-ja-f-k{justify-content:flex-start}}',
       '@media (max-width:760px){.dp-ja-schritte{grid-template-columns:repeat(2,minmax(0,1fr))}.dp-ja-schritt:nth-child(2n){border-right:none}.dp-ja-schritt:nth-child(-n+2){border-bottom:1px solid ' + LI + '}'
         + '.dp-ja-pot{grid-template-columns:1fr}.dp-ja-satz{font-size:15px}.dp-ja-schritt{padding:11px 10px;gap:5px}.dp-ja-w{font-size:17px}'
         + '.dp-pa-wrap .dp-ja-schritt p{font-size:11.5px}.dp-ja-kk{flex-wrap:wrap;gap:5px}.dp-ja-kk .st{margin-left:0}'
@@ -406,7 +427,7 @@
     var festKn = lauf ? '' : (fest
       ? '<button type="button" class="btn-clean dp-ja-fest an" data-ja-aktion="freigeben" data-ja-schritt-k="' + k + '" title="Festgeschrieben am ' + esc(datumText(fest)) + '. Wieder freigeben, um ' + titel + ' ' + jahr + ' zu ändern.">' + SCHLOSS + ' wieder freigeben</button>'
       : '<button type="button" class="btn-clean dp-ja-fest" data-ja-aktion="festschreiben" data-ja-schritt-k="' + k + '" title="' + titel + ' ' + jahr + ' abschließen. Danach lässt sich der Schritt nicht mehr ändern, bis er freigegeben ist.">' + SCHLOSS + ' festschreiben</button>');
-    return '<div class="dp-ja-schritt' + (fest ? ' fest' : '') + '" data-ja-schritt="' + k + '"><div class="dp-ja-kk"><span class="dp-ja-nr">' + nr + '</span><b>' + titel + '</b><span class="st dp-ja-st-' + (fest ? 'fest' : s[k]) + '">' + stW + '</span></div>'
+    return '<div class="dp-ja-schritt' + (fest ? ' fest' : '') + '" data-ja-schritt="' + k + '" data-ja-k="' + k + '"><div class="dp-ja-kk"><span class="dp-ja-nr">' + nr + '</span><b>' + titel + '</b><span class="st dp-ja-st-' + (fest ? 'fest' : s[k]) + '">' + stW + '</span></div>'
       + '<div class="dp-ja-w">' + wert + '</div><div class="dp-ja-vgl">' + vgl + '</div><p>' + text + '</p>' + (fest ? '' : kn) + festKn + '</div>';
   }
   function abschnitt(t, eti) { return '<div class="dp-ja-abs"><h4>' + t + '</h4>' + (eti ? '<span class="dp-ja-eti">' + eti + '</span>' : '') + '</div>'; }
@@ -507,22 +528,23 @@
           + (xl ? '<small>läuft</small>' : sx.nFest === 4 ? '<small class="dp-ja-schl">' + SCHLOSS + '</small>'
             : '<span class="dp-ja-mini">' + SCHRITTE.map(function (y) { return '<i class="dp-ja-' + (sx[y[0]] === 'ok' ? 'ok' : sx[y[0]]) + '"></i>'; }).join('') + '</span>') + '</button>';
       }).join('') + '</div>' + jahrKn + '<div class="dp-ja-satz">' + satz + '</div></div>';
+    out += frageHtml(z.jahr) + protokollHtml(z.jahr);
 
     /* die vier Schritte als eine Leiste */
     var erh = (z.erhoehungen || []).map(function (e) { return datumText(e.datum) + (e.nr ? ' (Whg. ' + e.nr + ')' : '') + (istZahl(zahl(e.auf)) ? ' auf ' + eur(zahl(e.auf)) : ''); });
     var listeLeer = false; try { var E = global.DpErhoehungen; listeLeer = !!(E && E.alle && !E.alle().length); } catch (e) {}
     var mPlan = z.miete_plan != null ? z.miete_plan : z.miete_proj;
-    var sch = '';
-    sch += schritt('miete', 'Miete', s, eur(z.miete_ist), (z.miete_plan != null ? 'Plan ' : 'Projektion ') + eur(mPlan) + (abw(mPlan, z.miete_ist, true) ? ' · ' + abw(mPlan, z.miete_ist, true) : ''),
+    var sch = '', teile = {};
+    teile.miete = schritt('miete', 'Miete', s, eur(z.miete_ist), (z.miete_plan != null ? 'Plan ' : 'Projektion ') + eur(mPlan) + (abw(mPlan, z.miete_ist, true) ? ' · ' + abw(mPlan, z.miete_ist, true) : ''),
       (erh.length ? 'Erhöhung ' + esc(erh.join(', ')) + '.' : 'Keine Erhöhung in diesem Jahr eingetragen.') + (listeLeer && !lauf ? ' Ohne Liste rechnet DealPilot vergangene Jahre mit der heutigen Miete.' : '')
         + (!lauf ? (z.miete_eigen ? ' Ist-Miete von dir eingetragen.' : (z.miete_vivi ? ' Ist-Miete aus ViVi übernommen.' : ' Die Ist-Miete ' + z.jahr + ' fehlt noch. Trag ein, was wirklich eingegangen ist.')) : ''),
       (!lauf && !z.miete_eigen && !z.miete_vivi ? knopf('eintragen', 'Ist-Miete ' + z.jahr + ' eintragen', true, z.jahr) + ' ' : '') + knopf('miete', 'Mieterhöhung eintragen', listeLeer && !lauf), z.jahr);
     var stW = { geplant: 'nicht erklärt', erklaert: 'erklärt, Bescheid fehlt', bescheid: 'Bescheid liegt vor' }[z.status] || 'nicht erklärt';
     var stI = z.steuer ? z.steuer.ergebnis : null, stP = pl && istZahl(pl.zve_y) ? pl.zve_y : null;
-    sch += schritt('steuer', 'Steuer', s, istZahl(stI) ? vz(stI) : '–', (stP != null ? 'Plan ' + vz(stP) : 'kein Plan') + (abw(stP, stI, true) ? ' · ' + abw(stP, stI, true) : ''),
+    teile.steuer = schritt('steuer', 'Steuer', s, istZahl(stI) ? vz(stI) : '–', (stP != null ? 'Plan ' + vz(stP) : 'kein Plan') + (abw(stP, stI, true) ? ' · ' + abw(stP, stI, true) : ''),
       'Ergebnis Anlage V · ' + stW + '.', knopf('steuer', z.status === 'geplant' ? 'Anlage V ' + z.jahr + ' ausfüllen' : 'Anlage V ansehen', s.steuer === 'offen') + ' ' + knopf('eintragen', 'Stand setzen', false, z.jahr), z.jahr);
     var wP = pl && istZahl(pl.wert_y) ? pl.wert_y : null, wI = z.mb ? z.mb.wert : null;
-    sch += schritt('wert', 'Wert', s, wI != null ? eur(wI) : '–', (wP != null ? 'Plan ' + eur(wP) : 'kein Plan') + (abw(wP, wI, true) ? ' · ' + abw(wP, wI, true) : ''),
+    teile.wert = schritt('wert', 'Wert', s, wI != null ? eur(wI) : '–', (wP != null ? 'Plan ' + eur(wP) : 'kein Plan') + (abw(wP, wI, true) ? ' · ' + abw(wP, wI, true) : ''),
       z.mb ? 'Marktbericht vom ' + datumText(z.mb.am) + '.' : 'Kein Marktbericht in ' + z.jahr + '.', knopf(z.mb ? 'wert-sehen' : 'wert', z.mb ? 'Alle Berichte' : 'Marktbericht abrufen', s.wert === 'offen'), z.jahr);
     if (weg) {
       var hgW = istZahl(h.hg_ist_j) ? eur(h.hg_ist_j) : (istZahl(h.hg_plan_m) ? eur(h.hg_plan_m * 12) : '–');
@@ -539,14 +561,18 @@
       var suP = pl && istZahl(pl.su_y) ? pl.su_y : 0;
       var suT = h.suDa && h.su > 0 ? ' Sonderumlage ' + eur(h.su) + (suP ? ' (Plan ' + eur(suP) + ')' : ' (nicht geplant)') + '.' : '';
       var bT = h.beschluesse.length ? ' ' + esc(h.beschluesse.slice(0, 2).join(' · ')) + '.' : '';
-      sch += schritt('haus', 'Haus', s, hgW, hgV, hausT.join(' · ') + '.' + suT + bT,
+      teile.haus = schritt('haus', 'Haus', s, hgW, hgV, hausT.join(' · ') + '.' + suT + bT,
         knopf('haus', 'Unterlagen hochladen', s.haus !== 'ok' && !lauf) + ' ' + knopf('haus-sehen', 'Haus ansehen', false), z.jahr);
     } else {
       var ev = h.ereignisse.slice(0, 2).map(function (e) { return esc(e.titel || e.text); }).filter(Boolean);
-      sch += schritt('haus', 'Haus', s, h.suDa && h.su > 0 ? eur(h.su) : 'keine', 'Sonderumlage · Plan ' + eur(pl && istZahl(pl.su_y) ? pl.su_y : 0),
+      teile.haus = schritt('haus', 'Haus', s, h.suDa && h.su > 0 ? eur(h.su) : 'keine', 'Sonderumlage · Plan ' + eur(pl && istZahl(pl.su_y) ? pl.su_y : 0),
         'Kein Wohnungseigentum, die Hauskosten stehen in der Anlage V.' + (ev.length ? ' ' + ev.join(' · ') + '.' : ''), knopf('steuer', 'Anlage V ansehen', false), z.jahr);
     }
+    var akt = aktiverSchritt(z, s, lauf);
+    sch = SCHRITTE.map(function (x) { var t = teile[x[0]] || ''; return x[0] === akt ? t.replace('class="dp-ja-schritt', 'class="dp-ja-schritt dp-ja-akt') : t; }).join('');
+    out += fuehrungHtml(z, s, lauf, akt, weg);
     out += '<div class="dp-ja-schritte">' + sch + '</div>';
+    if (_eingabe === z.jahr && JB() && JB().eingabeHtml) out += '<div class="dp-ja-eingabe" data-ja-eingabe="' + z.jahr + '"><div class="dp-ja-eingabe-k"><b>' + z.jahr + ' eintragen</b><span>Ist-Miete, Leerstand, Restschuld laut Kontoauszug, Stand der Steuer und Notiz</span><button type="button" class="btn-clean dp-ja-ein-x" data-ja-aktion="ein-zu" aria-label="Eingabe schließen">✕</button></div>' + JB().eingabeHtml(z.jahr) + '</div>';
 
     /* v4017 · ViVi des Jahres mit Differenz zu DealPilot */
     var vd = null; try { vd = viviDaten(); } catch (e) { vd = null; }
@@ -564,9 +590,10 @@
     if (z.notiz) hin += '<div class="dp-ja-notiz">Notiz ' + z.jahr + ': ' + esc(z.notiz) + '</div>';
     out += hin;
     var nSt = 0; try { nSt = global.DpJahresstaende && global.DpJahresstaende.liste ? global.DpJahresstaende.liste().length : 0; } catch (e) {}
-    out += '<div class="dp-ja-fuss"><span>Plan ist die Rechnung vom Kauf, eingefroren. DSCR und Score aus dem Jahresstand (' + nSt + ' festgehalten). '
+    out += '<div class="dp-ja-fuss"><span>Plan ist die Rechnung vom Kauf, eingefroren. DSCR und Score je Jahr merkt sich DealPilot beim Speichern (' + nSt + (nSt === 1 ? ' Jahr' : ' Jahre') + '). '
       + (z.ohne_plan ? 'Ohne eingefrorenen Plan steht grau die heutige Projektion. ' : '') + '</span>'
-      + '<button type="button" class="btn-clean dp-pa4-btn" data-ja-aktion="festhalten">Stand ' + heuteJahr() + ' festhalten</button></div>';
+      + '<span class="dp-ja-fh"><button type="button" class="btn-clean dp-pa4-btn" data-ja-aktion="festhalten">Kennzahlen ' + heuteJahr() + ' jetzt sichern</button>'
+      + '<button type="button" class="dp-tip" data-tip-id="pa.ja_kennzahlen_sichern" tabindex="-1" aria-label="Was heißt Kennzahlen sichern?"></button></span></div>';   /* v4090 · hieß „Stand JJJJ festhalten" */
 
     /* Verlauf */
     out += abschnitt('Verlauf', 'Kaltmiete und Cashflow · Plan gegen Ist') + '<div data-dp-jb-grafik="1" data-ja-grafik="1"></div>';
@@ -602,11 +629,11 @@
       m.title = info.title;
     });
   }
-  function grafikOpt() { return { gewaehlt: _gewaehlt, onJahr: function (j) { if (j && j <= heuteJahr()) { _gewaehlt = j; mountAll(); } } }; }
+  function grafikOpt() { return { karten: true, gewaehlt: _gewaehlt, onJahr: function (j) { if (j && j <= heuteJahr()) { _gewaehlt = j; mountAll(); } } }; }
   function mountAll() {
     var d = doc(); if (!d || !d.querySelectorAll) return;
     var hs = d.querySelectorAll('[data-dp-ja-host]');
-    for (var i = 0; i < hs.length; i++) { try { hs[i].innerHTML = html(); binden(hs[i]); } catch (e) { hs[i].innerHTML = ''; try { console.warn('[jahresabgleich]', e); } catch (x) {} } }
+    for (var i = 0; i < hs.length; i++) { try { hs[i].innerHTML = html(); binden(hs[i]); eingabeBinden(hs[i]); } catch (e) { hs[i].innerHTML = ''; try { console.warn('[jahresabgleich]', e); } catch (x) {} } }
     try { if (hs.length && global.DpJahresbuchGrafik) global.DpJahresbuchGrafik.mountAll(grafikOpt()); } catch (e) {}
     reiterMarke();
     if (hs.length && JB() && JB().mbLaden && mountAll._mb !== global._currentObjKey) {
@@ -628,37 +655,168 @@
     if (t) t.click();
     try { var m = d.querySelector('.main-col'); if (m) m.scrollTop = 0; global.scrollTo(0, 0); } catch (e) {}
   }
-  /** In den Reiter, in dem das Feld steht (Abschnitt .sec), und dorthin rollen. ziel 'mh': Soll-Miete / Mietleiter */
+  /** v4090 · Marcel 23.11.2026: „Mieterhöhung eintragen springt nur in den Tab Miete, aber nicht an die Stelle."
+      Ursache gemessen (Demostraße, ETW): der Sprung rollte 300 ms nach dem Reiterwechsel. Da war die Karte noch nicht
+      sichtbar (offsetParent null), es wurde nichts gerollt und die Seite blieb oben. Jetzt: warten, bis das Ziel
+      sichtbar ist, dann zur Eingabe „Erhöhung eintragen" rollen, sie aufklappen und kurz hervorheben.
+      MFH: die Wohnung mit Luft nach § 558 (sonst die erste) in den Einheiten öffnen, dort die Liste der Erhöhungen.
+      ziel 'erh': Mieterhöhung eintragen · 'mh': Mieterhöhung vorbereiten (Soll-Miete, Zielbild) */
+  function wohnungMitLuft() {
+    try {
+      var mp = mpJahr(_gewaehlt), M = global._dpMfh, E = M && Array.isArray(M.einheiten) ? M.einheiten : [];
+      var w = mp && mp.wohnungen ? mp.wohnungen.filter(function (x) { return x.plus > 0.5; })[0] : null;
+      if (!w) return 0;
+      for (var i = 0; i < E.length; i++) if (String((E[i] && E[i].nr) || i + 1) === String(w.nr)) return i;
+    } catch (e) {}
+    return 0;
+  }
+  function hervorheben(e) {
+    if (!e) return;
+    try { e.scrollIntoView({ block: 'center', behavior: 'smooth' }); } catch (x) { try { e.scrollIntoView(); } catch (y) {} }
+    try {
+      e.classList.remove('dp-ja-blink'); void e.offsetWidth; e.classList.add('dp-ja-blink');
+      setTimeout(function () { try { e.classList.remove('dp-ja-blink'); } catch (x) {} }, 2600);
+    } catch (x) {}
+  }
+  function warteSichtbar(finde, fertig, n) {
+    var e = finde();
+    if (e && e.offsetParent && e.getBoundingClientRect().height > 0) { setTimeout(function () { fertig(finde() || e); }, 150); return; }
+    if ((n || 0) > 30) { fertig(e); return; }
+    setTimeout(function () { warteSichtbar(finde, fertig, (n || 0) + 1); }, 100);
+  }
   function zuMiete(ziel) {
-    var d = doc(), kand = ziel === 'mh' ? ['zb_soll_qm', 'mfh-einheiten', 'mv-erh-host', 'mv_letzte_erhoehung'] : ['mv-erh-host', 'mv_letzte_erhoehung'];
-    var e = null; kand.some(function (id) { var x = d.getElementById(id); if (x) { e = x; return true; } return false; });
-    var sec = e && e.closest ? e.closest('.sec') : null;
+    var d = doc(); stil();
+    var Mf = global.DpMfhEinheiten, mfh = !!(Mf && Mf.artMitEinheiten && Mf.artMitEinheiten() && global._dpMfh && Array.isArray(global._dpMfh.einheiten) && global._dpMfh.einheiten.length);
+    if (ziel === 'erh' && mfh && Mf.einheitOeffnen) {
+      try { Mf.einheitOeffnen(wohnungMitLuft()); } catch (x) {}
+      warteSichtbar(function () { return d.getElementById('mfh-we-erh-liste'); }, function (e) {
+        var det = e && e.querySelector('details'); if (det) det.open = true;
+        hervorheben(det || e);
+      });
+      return;
+    }
+    var kand = ziel === 'mh' ? ['zb_soll_qm', 'mv-erh-host', 'mv_letzte_erhoehung'] : ['mv-erh-host', 'mv_letzte_erhoehung'];
+    var finde = function () { var e = null; kand.some(function (id) { var x = d.getElementById(id); if (x) { e = x; return true; } return false; }); return e; };
+    var e0 = finde(), sec = e0 && e0.closest ? e0.closest('.sec') : null;
     zuReiter(sec && sec.id ? sec.id : 's2');
-    setTimeout(function () {
-      var k = e && e.closest ? e.closest('.card,.sec-card,fieldset') : null;
-      try { (k || e) && (k || e).scrollIntoView({ block: 'center' }); } catch (x) {}
-      try { if (ziel === 'mh' && e && e.tagName === 'INPUT' && e.offsetParent) e.focus({ preventScroll: true }); } catch (x) {}
-    }, 300);
+    warteSichtbar(finde, function (e) {
+      if (!e) return;
+      var ziel2 = e;
+      if (e.id === 'mv-erh-host') {
+        var det = e.querySelector('details');
+        if (det) { det.open = true; ziel2 = det; var f = det.querySelector('input[data-erh-feld="datum"]'); setTimeout(function () { try { if (f) f.focus({ preventScroll: true }); } catch (x) {} }, 600); }
+      } else if (ziel === 'mh' && e.closest) ziel2 = e.closest('.f,.card') || e;
+      hervorheben(ziel2);
+    });
+  }
+  /* ── v4090 · Geführter Ablauf ───────────────────────────────────────
+     Marcel 23.11.2026: „es wäre besser, wenn man einen Ablauf hat, der einen da durchführt. Ich find es nicht
+     selbsterklärend." Eine Leiste über den vier Schritten: die vier Punkte mit Stand, Schritt n von 4, was zu tun
+     ist, der Knopf dafür, zurück und weiter. Aktiv ist der erste offene Schritt, bis der Nutzer selbst wählt
+     (_fuehrung je Jahr). Nur für vergangene Jahre, das laufende Jahr läuft noch. */
+  function aktiverSchritt(z, s, lauf) {
+    if (lauf) return null;
+    var w = _fuehrung[z.jahr];
+    if (w && SCHRITTE.some(function (x) { return x[0] === w; })) return w;
+    var o = SCHRITTE.filter(function (x) { return s[x[0]] !== 'ok'; })[0];
+    return o ? o[0] : null;
+  }
+  function aufgabe(k, z, s, weg) {
+    var J = z.jahr, ok = s[k] === 'ok', fest = s.fest && s.fest[k];
+    if (fest) return { t: 'Festgeschrieben. Zum Ändern erst wieder freigeben.', kn: '' };
+    if (k === 'miete') return ok
+      ? { t: 'Die Ist-Miete ' + J + ' steht fest. Gab es im Jahr eine Erhöhung, trag sie im Reiter Miete ein.', kn: knopf('miete', 'Mieterhöhung eintragen', false) }
+      : { t: 'Trag ein, was ' + J + ' wirklich an Kaltmiete eingegangen ist. Erhöhungen im Jahr gehören in den Reiter Miete.', kn: knopf('eintragen', 'Ist-Miete ' + J + ' eintragen', true, J) + ' ' + knopf('miete', 'Mieterhöhung eintragen', false) };
+    if (k === 'wert') return ok
+      ? { t: 'Für ' + J + ' liegt ein Marktbericht vor. Der Wert steht gegen den Plan vom Kauf.', kn: knopf('wert-sehen', 'Alle Berichte', false) }
+      : { t: 'Für ' + J + ' fehlt ein Marktbericht. Ein neuer Bericht zählt für das laufende Jahr. Gibt es keinen für ' + J + ', schreib den Schritt fest.', kn: knopf('wert', 'Marktbericht abrufen', true) };
+    if (k === 'haus') return weg
+      ? (ok ? { t: 'Protokoll und Abrechnung ' + J + ' sind da. Hausgeld, Rücklage und Beschlüsse stehen im Schritt Haus.', kn: knopf('haus-sehen', 'Haus ansehen', false) }
+        : { t: 'Lade Protokoll, Wirtschaftsplan und Abrechnung ' + J + ' hoch. DealPilot liest Hausgeld, Rücklage und Beschlüsse daraus.', kn: knopf('haus', 'Unterlagen hochladen', true) })
+      : { t: 'Kein Wohnungseigentum. Die Hauskosten stehen in der Anlage V, der Schritt folgt der Steuer.', kn: '' };
+    return ok
+      ? { t: 'Der Bescheid ' + J + ' liegt vor. Damit ist die Steuer abgeglichen.', kn: knopf('steuer', 'Anlage V ansehen', false) }
+      : { t: z.status === 'erklaert' ? 'Die Anlage V ' + J + ' ist erklärt. Sobald der Bescheid da ist, setz den Stand auf Bescheid.' : 'Füll die Anlage V ' + J + ' aus und setz danach den Stand auf erklärt oder Bescheid.',
+          kn: knopf('steuer', 'Anlage V ' + J + ' ' + (z.status === 'geplant' ? 'ausfüllen' : 'ansehen'), true) + ' ' + knopf('eintragen', 'Stand setzen', false, J) };
+  }
+  function fuehrungHtml(z, s, lauf, akt, weg) {
+    if (lauf) return '';
+    var ks = SCHRITTE.map(function (x) { return x[0]; });
+    var punkte = '<ol class="dp-ja-f-p" aria-label="Ablauf ' + z.jahr + '">' + SCHRITTE.map(function (x, i) {
+      var st = s.fest && s.fest[x[0]] ? 'ok' : s[x[0]];
+      return '<li><button type="button" class="btn-clean dp-ja-f-' + (st === 'ok' ? 'ok' : st) + (x[0] === akt ? ' an' : '') + '" data-ja-aktion="f-wahl" data-ja-k="' + x[0] + '" aria-current="' + (x[0] === akt ? 'step' : 'false') + '" title="' + x[1] + ': ' + (st === 'ok' ? 'erledigt' : WORT[st]) + '">'
+        + '<i>' + (st === 'ok' ? '✓' : (i + 1)) + '</i>' + x[1] + '</button></li>';
+    }).join('') + '</ol>';
+    if (!akt) return '<div class="dp-ja-fuehrung fertig">' + punkte + '<div class="dp-ja-f-t"><b>' + z.jahr + ' ist abgeglichen.</b> ' + (s.nFest === 4 ? 'Alle Schritte sind festgeschrieben.' : 'Schreib das Jahr fest, dann bleibt es so stehen.') + '</div></div>';
+    var i = ks.indexOf(akt), a = aufgabe(akt, z, s, weg), st = s.fest && s.fest[akt] ? 'ok' : s[akt];
+    return '<div class="dp-ja-fuehrung">' + punkte
+      + '<div class="dp-ja-f-t"><span class="dp-ja-eti">Schritt ' + (i + 1) + ' von 4 · ' + SCHRITTE[i][1] + ' · ' + (st === 'ok' ? 'erledigt' : WORT[st]) + '</span><span>' + esc(a.t) + '</span></div>'
+      + '<div class="dp-ja-f-k">' + a.kn
+      + (i > 0 ? '<button type="button" class="btn-clean dp-pa4-btn dp-ja-f-nav" data-ja-aktion="f-zurueck" data-ja-k="' + akt + '">Zurück</button>' : '')
+      + (i < 3 ? '<button type="button" class="btn-clean dp-pa4-btn dp-ja-f-nav" data-ja-aktion="f-weiter" data-ja-k="' + akt + '">Weiter</button>' : '')
+      + '</div></div>';
+  }
+  /* v4090 · Rückfrage vor dem Freigeben und Protokoll des Jahres */
+  function frageHtml(jahr) {
+    if (!_frage || _frage.jahr !== jahr) return '';
+    var w = _frage.k ? (SCHRITTE.filter(function (x) { return x[0] === _frage.k; })[0] || ['', _frage.k])[1] + ' ' + jahr : 'Das ganze Jahr ' + jahr;
+    return '<div class="dp-ja-frage" role="alertdialog" aria-label="Festschreibung aufheben"><span><b>' + esc(w) + ' wieder freigeben?</b> Danach lassen sich die Werte wieder ändern. Das Freigeben wird mit Datum protokolliert.</span>'
+      + '<span>' + knopf('freigeben-ja', 'Ja, freigeben', true) + ' ' + knopf('freigeben-nein', 'Abbrechen', false) + '</span></div>';
+  }
+  function protokollHtml(jahr) {
+    var l = []; try { var e = (global._currentObjData && global._currentObjData._jahre && global._currentObjData._jahre[String(jahr)]) || {}; l = Array.isArray(e.fest_protokoll) ? e.fest_protokoll : []; } catch (x) { l = []; }
+    if (!l.length) return '';
+    var wort = function (k) { return (SCHRITTE.filter(function (x) { return x[0] === k; })[0] || ['', k])[1]; };
+    var z = l.slice(-3).reverse().map(function (p) { return esc(datumText(String(p.am || '').slice(0, 10)) + ' ' + (p.schritte || []).map(wort).join(', ') + ' ' + p.aktion); });
+    return '<div class="dp-ja-prot" title="Protokoll der Festschreibung ' + jahr + '">Protokoll ' + jahr + ': ' + z.join(' · ') + (l.length > 3 ? ' · ' + (l.length - 3) + ' ältere' : '') + '</div>';
+  }
+  /* v4090 · Eingabe eines Jahres im Reiter (vorher Fenster „Jahre") */
+  function eingabeAuf(y) {
+    _eingabe = _eingabe === y ? null : y;
+    if (_eingabe && y !== _gewaehlt) _gewaehlt = y;
+    mountAll();
+    if (!_eingabe) return;
+    setTimeout(function () { var d = doc(), e = d && d.querySelector('[data-ja-eingabe="' + y + '"]'); if (e) hervorheben(e); }, 60);
+  }
+  function eingabeBinden(host) {
+    var e = host.querySelector('[data-ja-eingabe] .dp-jb-inline'); if (!e || !JB() || !JB().eingabeBinden) return;
+    JB().eingabeBinden(e, function () { _eingabe = null; mountAll(); try { if (typeof global.toast === 'function') global.toast('✓ Gespeichert'); } catch (x) {} });
   }
   function binden(host) {
     if (host._dpJa) return; host._dpJa = true;
     host.addEventListener('click', function (ev) {
-      var b = ev.target && ev.target.closest ? ev.target.closest('[data-ja-aktion],[data-ja-jahr]') : null; if (!b) return;
+      if (ev.target && ev.target.closest && ev.target.closest('.dp-jb-inline,.dp-tip')) return;   /* v4090 · die Eingabe bindet selbst (DpJahresbuch.eingabeBinden) */
+      var b = ev.target && ev.target.closest ? ev.target.closest('[data-ja-aktion],[data-ja-jahr]') : null;
+      if (!b) { var kc = ev.target && ev.target.closest ? ev.target.closest('.dp-ja-schritt[data-ja-k]') : null; if (kc && _gewaehlt < heuteJahr() && !(ev.target.closest('a,input,select'))) { _fuehrung[_gewaehlt] = kc.getAttribute('data-ja-k'); mountAll(); } return; }
       ev.preventDefault();
       var a = b.getAttribute('data-ja-aktion');
       if (!a) { var j = +b.getAttribute('data-ja-jahr'); if (j) { _gewaehlt = j; mountAll(); } return; }
       var y = +b.getAttribute('data-ja-j') || _gewaehlt;
-      if (a === 'festschreiben' || a === 'freigeben') {   /* v4016 · ein Schritt (data-ja-schritt-k) oder das ganze Jahr */
+      if (a === 'festschreiben') {   /* v4016 · ein Schritt (data-ja-schritt-k) oder das ganze Jahr */
         var k = b.getAttribute('data-ja-schritt-k');
-        if (JB() && JB().festSetzen) JB().festSetzen(_gewaehlt, k ? [k] : null, a === 'festschreiben');
-        mountAll(); return;
+        if (JB() && JB().festSetzen) JB().festSetzen(_gewaehlt, k ? [k] : null, true);
+        _frage = null; mountAll(); return;
       }
-      if (a === 'miete') { zuMiete(); return; }
+      /* v4090 · Marcel 23.11.2026: an festgeschriebenen Jahren nicht einfach wieder etwas ändern. Freigeben fragt erst
+         nach (Leiste über den Schritten), dann wird es mit Datum ins Protokoll des Jahres geschrieben (jahresbuch.js). */
+      if (a === 'freigeben') { _frage = { jahr: _gewaehlt, k: b.getAttribute('data-ja-schritt-k') || null }; mountAll();
+        setTimeout(function () { var q = host.querySelector('.dp-ja-frage'); if (q) hervorheben(q); }, 30); return; }
+      if (a === 'freigeben-nein') { _frage = null; mountAll(); return; }
+      if (a === 'freigeben-ja') {
+        var fq = _frage; _frage = null;
+        if (fq && JB() && JB().festSetzen) JB().festSetzen(fq.jahr, fq.k ? [fq.k] : null, false);
+        mountAll(); try { if (typeof global.toast === 'function') global.toast('Freigegeben und protokolliert'); } catch (x) {} return;
+      }
+      if (a === 'miete') { zuMiete('erh'); return; }
       if (a === 'mieterhoehung') { zuMiete('mh'); return; }
       if (a === 'vivi-reiter') { try { global.DpViviReiter.oeffnen(Number(b.getAttribute('data-ja-j')) || null); } catch (x) {} return; }   /* v4042 */
       if (a === 'vivi-mh') { try { global.DpViviMieterhoehung.oeffnen({ quelle: 'pilot-analyse' }); } catch (x) {} return; }   /* v4037 */
       if (a === 'steuer') { zuReiter('s3-tax'); return; }
-      if (a === 'eintragen') { if (JB() && JB().oeffnen) JB().oeffnen(y); return; }
+      if (a === 'eintragen') { eingabeAuf(y); return; }   /* v4090 · im Reiter statt im Fenster „Jahre" (JB().oeffnen(y) bleibt für Steuer und Mietentwicklung) */
+      if (a === 'ein-zu') { _eingabe = null; mountAll(); return; }
+      if (a === 'f-weiter' || a === 'f-zurueck') { var ks = SCHRITTE.map(function (x) { return x[0]; }), ik = ks.indexOf(b.getAttribute('data-ja-k')), nk = ks[Math.max(0, Math.min(3, ik + (a === 'f-weiter' ? 1 : -1)))];
+        _fuehrung[_gewaehlt] = nk; mountAll(); return; }
+      if (a === 'f-wahl') { _fuehrung[_gewaehlt] = b.getAttribute('data-ja-k'); mountAll(); return; }
       if (a === 'av' || a === 'erreicht') { if (JB() && JB().aktion) JB().aktion(a, y, b.getAttribute('data-ja-fassung')); return; }
       if (a === 'festhalten') { if (global.DpJahresstaende && global.DpJahresstaende.festhalten) global.DpJahresstaende.festhalten(); return; }
       if (a === 'wert') { mbAbrufen(); return; }
@@ -674,5 +832,6 @@
 
   global.DpJahresabgleich = { VERSION: VERSION, stand: stand, hausStand: hausStand, hausJahr: hausJahr, erinnerung: erinnerung, mbAbrufen: mbAbrufen,
     mpRein: mpRein, mpQuellen: mpQuellen, mpJahr: mpJahr, html: html, mountAll: mountAll, verfuegbar: verfuegbar, grafikOpt: grafikOpt,
-    standText: standText, viviMieteRein: viviMieteRein, viviJahr: viviJahr };   /* v4016, v4017 */
+    standText: standText, viviMieteRein: viviMieteRein, viviJahr: viviJahr,   /* v4016, v4017 */
+    SCHRITTE: SCHRITTE, aktiverSchritt: aktiverSchritt, aufgabe: aufgabe, fuehrungHtml: fuehrungHtml };   /* v4090 · für den Prüfer */
 })(typeof window !== 'undefined' ? window : globalThis);
