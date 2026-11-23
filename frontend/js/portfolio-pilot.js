@@ -217,7 +217,7 @@
     d.className = 'dp-pp-msg dp-pp-' + (role === 'assistant' ? 'a' : 'u');
     /* v2304 · die Antwort kommt mit **fett** - gemessen im Video (Modul 21) standen die Sternchen roh da.
        Erst escapen, dann nur dieses eine Muster wandeln. */
-    d.innerHTML = esc(text).replace(/\*\*([^*\n]+)\*\*/g, '<b>$1</b>').replace(/\n/g, '<br>');
+    d.innerHTML = window.DpKiText ? window.DpKiText.html(text) : esc(text).replace(/\*\*([^*\n]+)\*\*/g, '<b>$1</b>').replace(/\n/g, '<br>');   /* v4230 */
     log.appendChild(d);
     log.scrollTop = log.scrollHeight;
     return d;

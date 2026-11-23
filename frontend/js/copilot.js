@@ -76,7 +76,8 @@
     if (hint) hint.parentNode.removeChild(hint);
     var d = document.createElement('div');
     d.className = 'dp-cp-msg dp-cp-' + (role === 'assistant' ? 'a' : 'u');
-    d.innerHTML = esc(text).replace(/\n/g, '<br>');
+    /* v4230 · Antwort ohne Markdown (**), Listen als echte Listen (js/ki-text.js) */
+    d.innerHTML = (role === 'assistant' && window.DpKiText) ? window.DpKiText.html(text) : esc(text).replace(/\n/g, '<br>');
     log.appendChild(d);
     log.scrollTop = log.scrollHeight;
     return d;

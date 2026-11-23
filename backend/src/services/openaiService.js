@@ -22,6 +22,7 @@ const dokumentSchemas = require('./dokumentSchemas');   /* v1678 */
 const ocr = require('./ocr');   /* v3089 · Dokumentbilder nur als geschwaerzter Text hinaus */
 
 const OPENAI_URL = 'https://api.openai.com/v1/responses';
+const ohneMd = require('../utils/ohneMarkdown');   /* v4230 · kein ** in KI-Texten */
 const kiVerbrauch = require('./kiVerbrauch');   /* v3318 · Erfassen + Monatsdeckel */
 
 /* v3318 · LUECKE 5 DES KOSTENBERICHTS: callOpenAI las opts.maxTokens nicht - die Ausgabegrenze war
@@ -2105,7 +2106,9 @@ async function callOpenAI(prompt, opts) {
  * versucht, die fehlenden schließenden Klammern zu ergänzen, damit
  * der User wenigstens die teilweise Analyse sieht.
  */
-function extractJson(text) {
+/* v4230 · Marcel 23.11.2026: keine ** in Antworten. Jedes KI-JSON wird hier einmal von Markdown gesaeubert. */
+function extractJson(text) { return ohneMd.tief(_extractJsonRoh(text)); }
+function _extractJsonRoh(text) {
   if (!text) return null;
 
   // 1) Markdown ```json ... ``` Block?
@@ -3944,7 +3947,7 @@ async function copilotChat(payload, opts) {
     istPortfolio
       ? 'Du bist der DealPilot Portfolio-Pilot, ein sachlicher KI-Assistent fuer Immobilien-Investmentanalyse. Du siehst das GESAMTE Portfolio des Nutzers: seine Vermoegensbilanz und jedes einzelne Objekt darin.'
       : 'Du bist der DealPilot Co-Pilot, ein sachlicher KI-Assistent fuer Immobilien-Investmentanalyse.',
-    'Antworte praezise, auf Deutsch, in du-Form, ohne Floskeln und ohne Markdown-Ueberschriften.',
+    'Antworte praezise, auf Deutsch, in du-Form, ohne Floskeln. Kein Markdown: keine Sternchen (**), keine Ueberschriften mit #, keine Codebloecke. Aufzaehlungen als eigene Zeilen mit "- " oder "1. ".',
     'Nutze die bereitgestellten Objekt- und Kennzahlendaten als PRIMAERE Quelle. Rechne wo sinnvoll mit den',
     'gegebenen Zahlen (DSCR, LTV, Cashflow, Renditen, Kaufpreis). Erfinde keine Werte; fehlt etwas, sag es klar.',
     allowWeb
@@ -4219,7 +4222,7 @@ async function copilotChat(payload, opts) {
     maxTokens: 2500,
     kiFunktion: opts.kiFunktion || 'copilot'
   });
-  return { reply: _urlsSaeubern(res.text), model: res.model, allowWeb: allowWeb };
+  return { reply: ohneMd.antwort(_urlsSaeubern(res.text)), model: res.model, allowWeb: allowWeb };   /* v4230 */
 }
 /* v585-copilot END */
 
