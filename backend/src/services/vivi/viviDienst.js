@@ -16,7 +16,7 @@
  */
 const mapping = require('./viviMapping');
 const viviClient = require('./viviClient');
-const steuer = require('./viviSteuer');   /* v3951 · Paket V4 als Entwurf, steuer.AKTIV = false */
+const steuer = require('./viviSteuer');   /* v4020 · Paket V4: Steuerjahre, nach Einstellung des Nutzers (aus, Vorschlag, automatisch) */
 
 const ANBIETER = 'vivi';
 const TAKT_STUNDEN = 20;          /* ein Objekt wird hoechstens alle 20 h vom Takt gelesen, der Takt laeuft alle 6 h */
@@ -341,17 +341,14 @@ async function abrufen(userId, objectId, opt) {
     const erg = mapping.ausVivi({ projekt: projekt, einheiten: einheiten, mietverhaeltnisse: miet, darlehen: darl, tilgungsplan: plan, mietverlauf: mietverlauf },
       { vivi_ids: v.vivi_ids || {}, mitEinheiten: mitEinheiten(v, o.data), objart: o.data && o.data.objart, jetzt: deps().jetzt(),
         musterAnschrift: !!(v.vivi_ids && v.vivi_ids.muster_anschrift) });
-    /* v3951 · Paket V4 (Steuer): Entwurf hinter dem Schalter steuer.AKTIV (aus). Erst mit echten Antworten umlegen. */
-    if (steuer.AKTIV) {
-      const jahr = new Date(deps().jetzt()).getFullYear();
-      const roh = {};
-      for (const x of steuer.lesePfade(v.vivi_objekt_id, jahr)) roh[x.pfad.split('/').pop()] = await cl.get(x.pfad, Object.assign({}, q, x.abfrage));
-      const st = steuer.ausViviSteuer({ steueruebersicht: roh['tax-overview'] && roh['tax-overview'].data, kosten: liste(roh.costs), laufend: liste(roh['monthly-costs']), einnahmen: liste(roh.revenues) }, jahr);
-      Object.assign(erg.felder, st.felder);
-    }
     await sp.werteSchreiben(objectId, erg.felder, erg.info);
-    await sp.protokoll({ user_id: userId, object_id: objectId, art: opt.takt ? 'takt' : 'abruf', anfragen: cl.zaehler.anfragen - vorher, ok: true, dauer_ms: deps().jetzt() - t0 });
-    return { ok: true, felder: erg.felder, info: erg.info, anzahl: Object.keys(erg.felder).length };
+    /* v4020 · Paket V4: Steuerjahre vom Kaufjahr bis heute (nur GET). Einstellung „aus“ fragt ViVi nicht. Ein Fehler hier
+       kostet nur die Steuerjahre dieses Abrufs: die Objektwerte sind schon geschrieben, die alten Steuerwerte bleiben. */
+    const st = await steuerLesen(userId, objectId, o.data, projekt, cl, q, v.vivi_objekt_id);
+    await sp.protokoll({ user_id: userId, object_id: objectId, art: opt.takt ? 'takt' : 'abruf', anfragen: cl.zaehler.anfragen - vorher, bremse_429: !!st.bremse, ok: true, fehler: st.fehler || null, dauer_ms: deps().jetzt() - t0 });
+    /* im Takt beendet die Bremse die Runde wie immer (taktLauf bricht bei bremse_429 ab) */
+    if (st.bremse && opt.takt) throw fehler(429, 'bremse_429', 'ViVi bremst gerade. Die Steuerjahre folgen beim nächsten Abgleich.');
+    return { ok: true, felder: erg.felder, info: erg.info, anzahl: Object.keys(erg.felder).length, steuer: st };
   } catch (e) {
     if (e && e.geloest) throw e;
     const a = alsAntwort(e);
@@ -361,14 +358,61 @@ async function abrufen(userId, objectId, opt) {
   }
 }
 
+/* ── v4020 · Paket V4: Steuerjahre ────────────────────────────────────── */
+async function steuerEinstellung(userId) {
+  let roh = null;
+  try { roh = await deps().speicher.einstellungLesen(userId); } catch (e) { roh = null; }
+  return steuer.einstellungNormal(roh);
+}
+async function steuerEinstellungSpeichern(userId, roh) {
+  if (!roh || typeof roh !== 'object') throw fehler(400, 'einstellung_ungueltig', 'Einstellung fehlt.');
+  if (roh.modus != null && steuer.MODI.indexOf(roh.modus) < 0) throw fehler(400, 'einstellung_ungueltig', 'Unbekannte Einstellung.');
+  const n = steuer.einstellungNormal(roh);
+  await deps().speicher.einstellungSchreiben(userId, n);
+  return n;
+}
+/** Liest die Steuerjahre eines verknuepften Objekts (nur GET) und schreibt sie nach vivi_werte (jahr > 0). */
+async function steuerLesen(userId, objectId, daten, projekt, cl, q, projektId) {
+  const e = await steuerEinstellung(userId);
+  if (e.modus === 'aus') return { modus: 'aus', jahre: [] };
+  const J = steuer.jahre(steuer.kaufdatumAus(daten, projekt), deps().jetzt());
+  const felder = {}, gelesen = [];
+  try {
+    for (const j of J) {
+      const basis = (((await cl.get('/tax-overview', Object.assign({}, q, steuer.lesePfade(projektId, j)[0].abfrage))) || {}).data) || null;
+      const details = {};
+      for (const x of steuer.lesePfade(projektId, j, steuer.zeilenMitPosten(basis)).slice(1)) {
+        const d = (((await cl.get(x.pfad, Object.assign({}, q, x.abfrage))) || {}).data) || {};
+        if (d.line_details && !d.line_details.error) details[x.abfrage.line] = d.line_details;
+      }
+      const w = steuer.ausJahr(basis, details);
+      Object.keys(w).forEach(function (sp) { felder[steuer.feldId(j, sp)] = w[sp]; });
+      gelesen.push(j);
+    }
+  } catch (x) {
+    if (gelesen.length) await deps().speicher.steuerSchreiben(objectId, gelesen, felder);
+    const bremse = !!(x && (x.code === 'bremse_429' || x.code === 'bremse_lokal'));
+    return { modus: e.modus, jahre: gelesen, fehler: 'Steuerjahre: ' + ((x && x.message) || 'Fehler'), bremse: bremse };
+  }
+  await deps().speicher.steuerSchreiben(objectId, gelesen, felder);
+  return { modus: e.modus, jahre: gelesen, anzahl: Object.keys(felder).length };
+}
+
 /** Was der Browser braucht: Status und die zuletzt gelesenen Werte. Schickt nichts an ViVi. */
 async function werte(userId, objectId) {
   const v = await deps().speicher.verknuepfung(userId, objectId);
   if (!v) return { verknuepft: false, status: null };
   const zeilen = v.anlage_status === 'fertig' ? await deps().speicher.werteLesen(objectId) : [];
-  const felder = {}, info = {};
+  const felder = {}, info = {}, steuerJahre = {};
+  let steuerStand = null;
   zeilen.forEach(function (z) {
-    if (z.jahr) return;   /* Steuerjahre: Paket V4 */
+    /* v4020 · Steuerjahre (Paket V4): steuer[jahr][spalte] = { summe, zeile, label, kat, art, posten, gelesen_am } */
+    if (z.jahr) {
+      const sp = String(z.feld).split('.').pop();
+      (steuerJahre[z.jahr] = steuerJahre[z.jahr] || {})[sp] = Object.assign({}, z.wert, { gelesen_am: z.gelesen_am });
+      if (!steuerStand || new Date(z.gelesen_am) > new Date(steuerStand)) steuerStand = z.gelesen_am;
+      return;
+    }
     if (z.feld.indexOf('_info.') === 0) info[z.feld.slice(6)] = z.wert;
     else felder[z.feld] = { wert: z.wert, quelle: z.vivi_quelle, gelesen_am: z.gelesen_am };
   });
@@ -376,7 +420,8 @@ async function werte(userId, objectId) {
     verknuepft: v.anlage_status === 'fertig', status: v.anlage_status, herkunft: v.herkunft,
     muster_anschrift: !!(v.vivi_ids && v.vivi_ids.muster_anschrift),
     vivi_objekt_id: v.vivi_objekt_id, letzter_abruf: v.letzter_abruf, letzter_fehler: v.letzter_fehler,
-    felder: felder, info: info
+    felder: felder, info: info,
+    steuer: steuerJahre, steuer_stand: steuerStand, steuer_einstellung: v.anlage_status === 'fertig' ? await steuerEinstellung(userId) : null
   };
 }
 
@@ -422,5 +467,6 @@ function starteTakt() {
 
 module.exports = {
   ANBIETER, verbindungMeta, verbindungSpeichern, verbindungLoeschen, probe, vorschau, anlegen, zuordnen, projekte,
-  abrufen, werte, loesen, taktLauf, starteTakt, _setzeDeps, alsAntwort, planOptionen
+  abrufen, werte, loesen, taktLauf, starteTakt, _setzeDeps, alsAntwort, planOptionen,
+  steuerEinstellung, steuerEinstellungSpeichern, steuerLesen
 };

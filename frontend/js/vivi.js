@@ -108,7 +108,9 @@
         '<div style="display:flex;gap:9px;flex-wrap:wrap;margin-top:11px">' +
           '<button type="button" class="btn btn-sm btn-ghost" id="pk-vivi-probe">Verbindung testen</button>' +
           '<button type="button" class="btn btn-sm" id="pk-vivi-loeschen" style="color:#B8625C;border:1px solid #e3c9c4;background:#fff">Token löschen</button></div>' +
-        '<div id="pk-vivi-ergebnis" class="hint" style="margin-top:8px"></div><div id="pk-vivi-objekte" class="hint" style="margin-top:8px"></div>';
+        '<div id="pk-vivi-ergebnis" class="hint" style="margin-top:8px"></div><div id="pk-vivi-objekte" class="hint" style="margin-top:8px"></div>' +
+        '<div id="pk-vivi-steuer"></div>';   /* v4020 · Steuerjahre aus ViVi: aus, Vorschlag, automatisch, je Kategorie (js/vivi-steuer-abgleich.js, nicht bei Einsteiger) */
+      try { if (window.DpViviSteuer) window.DpViviSteuer.einstellungKarte($('pk-vivi-steuer')); } catch (e) {}
       $('pk-vivi-probe').onclick = function () { probe(false); };
       $('pk-vivi-loeschen').onclick = function () {
         if (!confirm('ViVi-Token in DealPilot löschen? Verknüpfte Objekte bleiben verknüpft, werden aber nicht mehr gelesen.')) return;
@@ -185,11 +187,14 @@
   }
   function leisteWeg() { var l = $('vivi-leiste'); if (l) l.style.display = 'none'; }
 
+  /* v4020 · jeder neue Stand geht an js/vivi-steuer-abgleich.js (Steuerjahre, Jahresabgleich, automatisch) */
+  function standMelden() { try { window.dispatchEvent(new CustomEvent('dp:vivi-stand', { detail: { key: _key, stand: _stand } })); } catch (e) {} }
   function werteAnwenden(r) {
     _stand = r || null;
     var geaendert = false;
     try { if (window.DpViviFelder) geaendert = window.DpViviFelder.setzen(_stand); } catch (e) { console.warn('[vivi] Felder:', e && e.message); }
     leiste();
+    standMelden();
     if (geaendert && typeof window.saveObj === 'function') setTimeout(function () { try { if (window._currentObjKey === _key) window.saveObj(); } catch (e) {} }, 300);
   }
   function objektGeladen(key) {

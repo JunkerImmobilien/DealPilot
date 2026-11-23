@@ -1,48 +1,65 @@
 'use strict';
-/* services/vivi/viviSteuer.js — v3951 · Paket V4 (Steuer) als ENTWURF, NICHT AKTIV
+/* services/vivi/viviSteuer.js — v4020 · Paket V4 (Steuer): Steuerjahre aus ViVi lesen, je Objekt und Jahr
  *
- * Bauplan Dateien/Architektur/ViVi-Anbindung-2026-11-22.md, Abschnitt 2.3. Die Spezifikation (vivi-openapi-v1.json,
- * v1.5.0) nennt die Pfade, aber nicht die Felder der Antworten:
- *   GET /tax-overview?year=&project_id=&line=   200: { data: string }       Anlage V als TEXT, Form unbekannt
- *   GET /projects/{p}/costs                     200: { data: array<{}> }    Summen geplanter und angefallener Kosten
- *   GET /projects/{p}/monthly-costs             200: { data: array<{}> }    laufende Kosten (Hausgeld, Grundsteuer …)
- *   GET /projects/{p}/revenues                  200: { data: array<{}> }    Erloese ausserhalb der Miete
+ * Bauplan Dateien/Architektur/ViVi-Anbindung-2026-11-22.md, Abschnitt 2.3. Marcel 23.11.2026: „auswählen, ob die
+ * Belege automatisch in die Steuerjahre geschrieben werden … bei Einsteigern gar nicht anbieten … eine Übersicht in der
+ * Pilot-Analyse … Einstellungen, weil es Sachen gibt, die wir nicht wollen.“
  *
- * v3953 · GEMESSEN am Testkonto (22.11.2026, Antworten in tools/vivi-antworten/): die Spezifikation stimmt hier nicht.
- *   /tax-overview?year=&project_id=  data ist ein OBJEKT: { year, project_id, income: [{ zeile: '13-15', label, amount }],
- *                                    expenses: [{ zeile: '46-48', ... }], summary, fifteen_percent_rule }. Ohne project_id
- *                                    nur Summen je Objekt (projects[].total_income/total_expenses), keine Zeilen.
- *   /projects/{p}/costs              data ist ein OBJEKT mit Summen (planned_costs, realized_costs, financing_costs_...),
- *                                    keine Positionen und keine Steuerkategorie. ausKosten() findet darin nichts (richtig so).
- *   /monthly-costs, /revenues        Listen, im Testkonto leer: Feldnamen weiter offen.
- * ausSteueruebersicht() liest deshalb das Objekt (Zeilenbereich -> Spalte) und als Rueckfall den Text.
- * Die Schluessel unten (amount, tax_category, interval …) sind deshalb ANNAHMEN nach dem Hilfe-Center
- * (kb/objekt-kosten.html: Steuerkategorien „Erhaltungsaufwand“, „Hausgeld (WEG)“, „Hausgeld (Vorauszahlung)“,
- * „Hausgeld (Rücklage)“, „Sonstige Werbungskosten“, „Nicht absetzbar“ …). Jede Funktion nimmt mehrere Schreibweisen
- * an und laesst weg, was sie nicht sicher erkennt (kein Treffer heisst kein Wert, nie geraten).
+ * GEMESSEN am Testkonto (23.11.2026, nur GET, Antworten in tools/vivi-antworten/steuer-belege-2026-11-23.json):
+ *   GET /tax-overview?year=&project_id=            data ist ein OBJEKT (Spezifikation sagt string): income[] und
+ *                                                  expenses[] je Zeilenbereich der Anlage V ({ zeile: '55-72', label,
+ *                                                  amount }), Betrag 0 = nichts gebucht. Jahre ohne Buchung: alle 0.
+ *   GET /tax-overview?year=&project_id=&line=55-72 dazu line_details: { zeile, label, amount, items: [{ label,
+ *                                                  date: 'TT.MM.JJJJ', amount }], items_truncated }. Die Belege einer
+ *                                                  Zeile MIT Datum und Betrag, also genau die Steuerkategorie des Belegs.
+ *                                                  Nur der ganze Bereich ('55-72'), eine Einzelzeile ('55') ergibt
+ *                                                  line_details.error. Zinsen (46-48) kommen monatlich aus dem Tilgungsplan
+ *                                                  (group, info 'Tilgungsplan'), ohne Datum.
+ *   GET /receipts?project_id=                      Belege mit Betrag, Datum, Zahlstatus, OHNE Steuerkategorie. Deshalb
+ *                                                  liest dieses Modul die Zeilen der Anlage V, nicht die Belegliste.
+ *   /costs, /monthly-costs, /revenues, /planned-costs, /depreciation: Summen bzw. im Testkonto leer, ohne Jahr und
+ *                                                  ohne Kategorie. Nicht gelesen.
  *
- * SCHALTER: AKTIV = false. viviDienst.abrufen() ruft dieses Modul nur, wenn AKTIV true ist. Umlegen erst, wenn mit dem
- * Key eine echte Antwort je Pfad abgelegt ist (Prueffaelle in tools/vivi-pruefen.mjs, Teil V4) und Marcel die
- * Steuerjahr-Regel bestaetigt hat (Jahre mit Steuerstand nie automatisch, nur als Abweichung).
+ * ZWEI ARTEN VON ZEILEN:
+ *   summe   Mieteinnahmen, NK-Vorauszahlungen, Schuldzinsen. ViVi rechnet sie aus Mieten und Tilgungsplan. DealPilot
+ *           vergleicht die Jahressumme und setzt sie auf Wunsch (ein Jahr, das noch laeuft, nie: dort kennt ViVi erst
+ *           die Monate bis heute, DealPilot rechnet das ganze Jahr).
+ *   belege  Erhaltung, Betriebskosten, nicht umgelegte Kosten, sonstige Kosten, bewegliche Wirtschaftsgueter. Jeder
+ *           Posten traegt Datum und Betrag. DealPilot uebernimmt nur Posten, die nicht schon als Beleg erfasst sind
+ *           (gleicher Betrag, gleiches Datum) und ADDIERT sie wie der Beleg-Import (dpWkUebernehmen).
+ *   vergleich  AfA (33-35): DealPilot rechnet die AfA selbst, ViVi steht nur daneben.
  *
- * Feld-IDs: Steuerwerte als 'steuer.<jahr>.<spalte>' (tax_records, Migration 005/006), Objektfelder ohne Jahr
- * (hg_ul, hg_nul in €/Jahr wie das Formular). vivi_werte fuehrt sie spaeter mit jahr > 0, werte() liefert sie heute
- * bewusst nicht aus (z.jahr wird uebersprungen).
+ * Die Entscheidung, was wann geschrieben wird, faellt im Browser (js/vivi-steuer-abgleich.js), weil Steuerjahr,
+ * Steuerstand (_jahre, erklaert/Bescheid) und erfasste Belege (_dok_eingang) im Objekt liegen. Das Backend schreibt
+ * objects.data nie (viviDienst Regel 3). Hier: Lesepfade, Auslese, Einstellung.
  */
-const AKTIV = false;
 
-/* Anlage V 2025, Zeile -> tax_records-Spalte (nur die Zeilen, die ViVi laut Hilfe-Center fuehrt und die als Spalte
-   in tax_records stehen). Die av_*-Zeilen (21, 26, 27, 79) liegen im anlage_v-JSON und folgen mit der echten Antwort. */
-const ZEILE_ZU_SPALTE = Object.freeze({ 15: 'einnahmen_km', 20: 'einnahmen_nk', 48: 'schuldzinsen', 55: 'erhaltungsaufwand', 75: 'nk_umlf', 78: 'nk_n_umlf' });
-/* Steuerkategorie der Kostenposition -> Spalte. Sonstige Werbungskosten sind EINE Summe bei ViVi, DealPilot trennt sie,
-   deshalb nur Vorschlag (nicht verknuepft). Ruecklage und nicht absetzbar: kein Abzug. */
-const KATEGORIE_ZU_SPALTE = Object.freeze({
-  'erhaltungsaufwand': 'erhaltungsaufwand',
-  'hausgeld (vorauszahlung)': 'nk_umlf',
-  'hausgeld (weg)': 'nk_n_umlf'
-});
-const NUR_VORSCHLAG = Object.freeze({ 'sonstige werbungskosten': 'sonst_kosten', 'abschreibbare anschaffung': 'sonst_bewegl_wg', 'herstellungskosten am gebäude': 'anschaffungsnah' });
-const OHNE_ABZUG = Object.freeze({ 'hausgeld (rücklage)': 1, 'nicht absetzbar': 1 });
+/* Zeilenbereiche der Anlage V (wie ViVi sie liefert) -> tax_records-Spalte, Kategorie der Einstellung, Art */
+const ZEILEN = Object.freeze([
+  { zeile: '13-15', spalte: 'einnahmen_km', kat: 'mieten', art: 'summe', seite: 'einnahme' },
+  { zeile: '20', spalte: 'einnahmen_nk', kat: 'nk_vz', art: 'summe', seite: 'einnahme' },
+  { zeile: '33-35', spalte: 'afa', kat: null, art: 'vergleich', seite: 'ausgabe' },
+  { zeile: '42-45', spalte: 'sonst_bewegl_wg', kat: 'bewegliche', art: 'belege', seite: 'ausgabe' },
+  { zeile: '46-48', spalte: 'schuldzinsen', kat: 'zinsen', art: 'summe', seite: 'ausgabe' },
+  { zeile: '55-72', spalte: 'erhaltungsaufwand', kat: 'erhaltung', art: 'belege', seite: 'ausgabe' },
+  { zeile: '73-75', spalte: 'nk_umlf', kat: 'betriebskosten', art: 'belege', seite: 'ausgabe' },
+  { zeile: '76-78', spalte: 'nk_n_umlf', kat: 'nicht_umgelegt', art: 'belege', seite: 'ausgabe' },
+  { zeile: '80-82', spalte: 'sonst_kosten', kat: 'sonstige', art: 'belege', seite: 'ausgabe' }
+]);
+/* Abwaehlbar in Einstellungen › Konto › Externe Anbieter › ViVi. Kundentext ohne Gedankenstrich und Semikolon. */
+const KATEGORIEN = Object.freeze([
+  { id: 'erhaltung', label: 'Erhaltungsaufwand', hinweis: 'Reparaturen und Instandhaltung, Anlage V Zeile 55 bis 72' },
+  { id: 'betriebskosten', label: 'Umgelegte Betriebskosten', hinweis: 'Hausgeld umlagefähig, Grundsteuer, Versicherung, Wartung, Zeile 73 bis 75' },
+  { id: 'nicht_umgelegt', label: 'Nicht umgelegte Kosten', hinweis: 'Hausgeld nicht umlagefähig, Zeile 76 bis 78' },
+  { id: 'sonstige', label: 'Sonstige Werbungskosten', hinweis: 'Verwaltung, Beratung, Kontoführung, Zeile 80 bis 82' },
+  { id: 'bewegliche', label: 'Bewegliche Wirtschaftsgüter', hinweis: 'Abschreibung auf Einrichtung, Zeile 42 bis 45' },
+  { id: 'zinsen', label: 'Schuldzinsen', hinweis: 'aus dem Tilgungsplan in ViVi, Zeile 46 bis 48' },
+  { id: 'mieten', label: 'Mieteinnahmen', hinweis: 'Kaltmiete, Zeile 15' },
+  { id: 'nk_vz', label: 'Umgelegte Nebenkosten', hinweis: 'Vorauszahlungen der Mieter, Zeile 20' }
+]);
+const MODI = Object.freeze(['aus', 'vorschlag', 'automatisch']);
+const STANDARD_MODUS = 'vorschlag';
+const MAX_JAHRE = 8;   /* Anfragebremse: hoechstens acht Jahre je Abruf (je Jahr eine Anfrage plus eine je gebuchter Belegzeile) */
 
 function zahl(v) {
   if (v == null || v === '') return null;
@@ -55,36 +72,98 @@ function zahl(v) {
   return isFinite(n) ? n : null;
 }
 function rund(n) { return Math.round(n * 100) / 100; }
-function erstes(o, schluessel) { for (const k of schluessel) if (o && o[k] != null && o[k] !== '') return o[k]; return null; }
-function jahrVon(o) {
-  const d = String(erstes(o, ['date', 'booking_date', 'paid_at', 'invoice_date', 'due_date', 'year']) || '');
-  const m = /^(\d{4})/.exec(d) || /(\d{4})$/.exec(d);
-  return m ? +m[1] : null;
+/* 'TT.MM.JJJJ' oder 'JJJJ-MM-TT' -> 'JJJJ-MM-TT', sonst null */
+function isoDatum(d) {
+  const s = String(d == null ? '' : d).trim();
+  let m = /^(\d{1,2})\.(\d{1,2})\.(\d{4})$/.exec(s);
+  if (m) return m[3] + '-' + ('0' + m[2]).slice(-2) + '-' + ('0' + m[1]).slice(-2);
+  m = /^(\d{4})-(\d{2})-(\d{2})/.exec(s);
+  return m ? m[1] + '-' + m[2] + '-' + m[3] : null;
 }
-function kategorie(o) { return String(erstes(o, ['tax_category', 'tax_category_label', 'category', 'category_label']) || '').trim().toLowerCase(); }
-function betrag(o) { return zahl(erstes(o, ['amount', 'gross_amount', 'total', 'total_amount', 'value'])); }
+
+/** Einstellung des Nutzers auf bekannte Werte bringen. Unbekannte Kategorien fallen weg, fehlende sind an. */
+function einstellungNormal(roh) {
+  const r = roh && typeof roh === 'object' ? roh : {};
+  const modus = MODI.indexOf(r.modus) >= 0 ? r.modus : STANDARD_MODUS;
+  const kategorien = {};
+  KATEGORIEN.forEach(function (k) { kategorien[k.id] = !(r.kategorien && r.kategorien[k.id] === false); });
+  return { modus: modus, kategorien: kategorien };
+}
+
+/** Jahre vom Kaufjahr bis zum laufenden Jahr, hoechstens MAX_JAHRE (die juengsten). */
+function jahre(kaufdatum, jetzt) {
+  const heute = new Date(jetzt == null ? Date.now() : jetzt).getFullYear();
+  const m = /^(\d{4})/.exec(String(kaufdatum || ''));
+  let von = m ? +m[1] : heute;
+  if (!(von >= 2000) || von > heute) von = heute;
+  von = Math.max(von, heute - MAX_JAHRE + 1);
+  const out = [];
+  for (let j = von; j <= heute; j++) out.push(j);
+  return out;
+}
+function kaufdatumAus(daten, projekt) {
+  const d = daten || {};
+  return d.wirtschaftlicher_uebergang || d.kaufdat || (projekt && projekt.purchase_date) || null;
+}
+
+/* Zeilenbereich '55-72' -> Eintrag aus ZEILEN */
+function zeileZu(z) { const s = String(z == null ? '' : z).replace(/\s/g, ''); return ZEILEN.find(function (x) { return x.zeile === s; }) || null; }
 
 /**
- * /tax-overview liefert data als TEXT. Erkannt werden nur Zeilen der Form „Zeile 48 … 1.234,56“ (auch „Z. 48“).
- * Alles andere bleibt liegen. Rueckgabe { spalte: betrag }.
+ * Eine Antwort von /tax-overview (data-Objekt) und die line_details je Zeile zu Werten eines Jahres.
+ * Rueckgabe { spalte: { summe, zeile, label, kat, art, posten: [{datum, betrag, text}] | null, posten_gekuerzt } }.
+ * Betrag 0 heisst bei ViVi „nichts gebucht“: kein Wert (nie eine Null, die einen DealPilot-Wert ueberschreibt).
  */
-function ausSteueruebersicht(text) {
+function ausJahr(uebersicht, details) {
   const aus = {};
-  /* v3953 · echte Form: Objekt mit income[] und expenses[], zeile als Bereich '13-15'. Betrag 0 heisst bei ViVi
-     „nichts gebucht“, nicht „null Euro Aufwand“: kein Wert. */
+  if (!uebersicht || typeof uebersicht !== 'object' || Array.isArray(uebersicht)) return aus;
+  [].concat(Array.isArray(uebersicht.income) ? uebersicht.income : [], Array.isArray(uebersicht.expenses) ? uebersicht.expenses : []).forEach(function (z) {
+    if (!z || typeof z !== 'object') return;
+    const def = zeileZu(z.zeile); if (!def) return;
+    const n = zahl(z.amount); if (n == null || n === 0) return;
+    const w = { summe: rund(Math.abs(n)), zeile: def.zeile, label: String(z.label || ''), kat: def.kat, art: def.art, posten: null, posten_gekuerzt: 0 };
+    const d = details && details[def.zeile];
+    if (def.art === 'belege' && d && typeof d === 'object' && Array.isArray(d.items)) {
+      w.posten = d.items.map(function (it) {
+        const b = zahl(it && it.amount);
+        return b == null ? null : { datum: isoDatum(it.date), betrag: rund(Math.abs(b)), text: String((it && (it.label || it.group)) || '').slice(0, 160) };
+      }).filter(Boolean);
+      w.posten_gekuerzt = +d.items_truncated || 0;
+    }
+    aus[def.spalte] = w;
+  });
+  return aus;
+}
+
+/** Welche Zeilen brauchen die Einzelposten? Nur Belegzeilen mit Betrag (spart Anfragen). */
+function zeilenMitPosten(uebersicht) {
+  if (!uebersicht || typeof uebersicht !== 'object') return [];
+  return (Array.isArray(uebersicht.expenses) ? uebersicht.expenses : []).filter(function (z) {
+    const def = z && zeileZu(z.zeile); const n = z && zahl(z.amount);
+    return def && def.art === 'belege' && n != null && n !== 0;
+  }).map(function (z) { return zeileZu(z.zeile).zeile; });
+}
+
+/** Lesepfade eines Jahres (nur GET). Die Zeilen mit Posten folgen erst nach der ersten Antwort (zeilenMitPosten). */
+function lesePfade(projektId, jahr, zeilen) {
+  const pid = String(projektId);
+  const out = [{ pfad: '/tax-overview', abfrage: { year: jahr, project_id: pid } }];
+  (zeilen || []).forEach(function (z) { out.push({ pfad: '/tax-overview', abfrage: { year: jahr, project_id: pid, line: z } }); });
+  return out;
+}
+
+/** Feld-ID in vivi_werte (jahr > 0): steuer.<jahr>.<spalte> */
+function feldId(jahr, spalte) { return 'steuer.' + jahr + '.' + spalte; }
+
+/* Alt (v3951, Entwurf): Textform der Steueruebersicht, Zeile -> Spalte. Bleibt als Rueckfall, falls ViVi doch Text liefert. */
+const ZEILE_ZU_SPALTE = Object.freeze({ 15: 'einnahmen_km', 20: 'einnahmen_nk', 48: 'schuldzinsen', 55: 'erhaltungsaufwand', 75: 'nk_umlf', 78: 'nk_n_umlf' });
+function ausSteueruebersicht(text) {
   if (text && typeof text === 'object') {
-    [].concat(Array.isArray(text.income) ? text.income : [], Array.isArray(text.expenses) ? text.expenses : []).forEach(function (z) {
-      if (!z || typeof z !== 'object') return;
-      const m = /^(\d{1,3})(?:\s*-\s*(\d{1,3}))?$/.exec(String(z.zeile == null ? '' : z.zeile).trim());
-      if (!m) return;
-      const von = +m[1], bis = m[2] ? +m[2] : von;
-      const n = zahl(z.amount); if (n == null || n === 0) return;
-      Object.keys(ZEILE_ZU_SPALTE).forEach(function (k) {
-        if (+k >= von && +k <= bis) { const sp = ZEILE_ZU_SPALTE[k]; aus[sp] = rund((aus[sp] || 0) + Math.abs(n)); }
-      });
-    });
+    const j = ausJahr(text, null), aus = {};
+    Object.keys(j).forEach(function (sp) { if (j[sp].art !== 'vergleich' && Object.values(ZEILE_ZU_SPALTE).indexOf(sp) >= 0) aus[sp] = j[sp].summe; });
     return aus;
   }
+  const aus = {};
   String(text == null ? '' : text).split(/\r?\n/).forEach(function (z) {
     const m = /(?:Zeile|Z\.)\s*(\d{1,3})\b[^\n]*?(-?\d{1,3}(?:\.\d{3})*,\d{2}|-?\d+,\d{2}|-?\d+\.\d{2})\s*(?:€|EUR)?\s*$/i.exec(z);
     if (!m) return;
@@ -95,69 +174,5 @@ function ausSteueruebersicht(text) {
   return aus;
 }
 
-/** /costs: Kostenpositionen eines Jahres nach Steuerkategorie summiert. { verknuepft: {spalte: betrag}, vorschlag: {...} } */
-function ausKosten(liste, jahr) {
-  const verknuepft = {}, vorschlag = {};
-  (Array.isArray(liste) ? liste : []).forEach(function (o) {
-    if (!o || typeof o !== 'object') return;
-    if (jahr && jahrVon(o) !== jahr) return;
-    const k = kategorie(o), b = betrag(o);
-    if (b == null || !k || OHNE_ABZUG[k]) return;
-    if (KATEGORIE_ZU_SPALTE[k]) verknuepft[KATEGORIE_ZU_SPALTE[k]] = rund((verknuepft[KATEGORIE_ZU_SPALTE[k]] || 0) + Math.abs(b));
-    else if (NUR_VORSCHLAG[k]) vorschlag[NUR_VORSCHLAG[k]] = rund((vorschlag[NUR_VORSCHLAG[k]] || 0) + Math.abs(b));
-  });
-  return { verknuepft: verknuepft, vorschlag: vorschlag };
-}
-
-/* Intervall -> Faktor auf ein Jahr */
-const JE_JAHR = { monthly: 12, monatlich: 12, quarterly: 4, vierteljaehrlich: 4, 'vierteljährlich': 4, half_yearly: 2, halbjaehrlich: 2, yearly: 1, annually: 1, jaehrlich: 1, 'jährlich': 1 };
-/**
- * /monthly-costs: Hausgeld je Jahr fuer die Objektfelder hg_ul (umlagefaehig) und hg_nul (nicht umlagefaehig, inkl.
- * Ruecklage wie tab6 im Formular). Fuer den Unterlagen-Abgleich (Paket V5: Wirtschaftsplan gegen ViVi).
- */
-function hausgeldJahr(liste) {
-  let ul = null, nul = null;
-  (Array.isArray(liste) ? liste : []).forEach(function (o) {
-    if (!o || typeof o !== 'object') return;
-    const k = kategorie(o), name = String(erstes(o, ['name', 'description', 'label']) || '').toLowerCase();
-    if (!/hausgeld/.test(k + ' ' + name)) return;
-    const f = JE_JAHR[String(erstes(o, ['interval', 'frequency', 'rhythm']) || 'monthly').toLowerCase()];
-    const b = betrag(o); if (b == null || !f) return;
-    const j = rund(Math.abs(b) * f);
-    if (/vorauszahlung|umlagef/.test(k + ' ' + name) && !/nicht umlagef/.test(k + ' ' + name)) ul = rund((ul || 0) + j);
-    else nul = rund((nul || 0) + j);   /* „Hausgeld (WEG)“ und „Hausgeld (Rücklage)“ */
-  });
-  return { hg_ul: ul, hg_nul: nul };
-}
-
-/**
- * Alles zusammen fuer ein Jahr. paket = { steueruebersicht: string, kosten: [], laufend: [], einnahmen: [] }.
- * Vorrang: die Anlage-V-Zeile aus /tax-overview, sonst die Summe aus /costs. Ergebnis wie ausVivi().felder.
- */
-function ausViviSteuer(paket, jahr) {
-  paket = paket || {};
-  const felder = {}, vorschlaege = {};
-  const pre = 'steuer.' + jahr + '.';
-  const tv = ausSteueruebersicht(paket.steueruebersicht);
-  const ko = ausKosten(paket.kosten, jahr);
-  Object.keys(ko.verknuepft).forEach(function (sp) { felder[pre + sp] = { wert: ko.verknuepft[sp], quelle: 'costs' }; });
-  Object.keys(tv).forEach(function (sp) { felder[pre + sp] = { wert: tv[sp], quelle: 'tax-overview' }; });
-  Object.keys(ko.vorschlag).forEach(function (sp) { vorschlaege[pre + sp] = { wert: ko.vorschlag[sp], quelle: 'costs' }; });
-  const hg = hausgeldJahr(paket.laufend);
-  if (hg.hg_ul != null) felder.hg_ul = { wert: hg.hg_ul, quelle: 'monthly-costs' };
-  if (hg.hg_nul != null) felder.hg_nul = { wert: hg.hg_nul, quelle: 'monthly-costs' };
-  return { felder: felder, vorschlaege: vorschlaege };
-}
-
-/* Pfade, die der Abruf mit AKTIV lesen wuerde (nur GET, Pruefer C kennt sie als Lesepfade) */
-function lesePfade(projektId, jahr) {
-  const P = '/projects/' + encodeURIComponent(String(projektId));
-  return [
-    { pfad: '/tax-overview', abfrage: { year: jahr, project_id: String(projektId) } },
-    { pfad: P + '/costs', abfrage: {} },
-    { pfad: P + '/monthly-costs', abfrage: {} },
-    { pfad: P + '/revenues', abfrage: {} }
-  ];
-}
-
-module.exports = { AKTIV, ZEILE_ZU_SPALTE, KATEGORIE_ZU_SPALTE, NUR_VORSCHLAG, ausSteueruebersicht, ausKosten, hausgeldJahr, ausViviSteuer, lesePfade };
+module.exports = { ZEILEN, KATEGORIEN, MODI, STANDARD_MODUS, MAX_JAHRE, ZEILE_ZU_SPALTE, einstellungNormal, jahre, kaufdatumAus, ausJahr, zeilenMitPosten,
+  lesePfade, feldId, isoDatum, ausSteueruebersicht };

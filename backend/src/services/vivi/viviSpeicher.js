@@ -79,6 +79,30 @@ async function werteSchreiben(objectId, felder, info) {
   await q('UPDATE vivi_verknuepfung SET letzter_abruf = now(), letzter_fehler = NULL WHERE object_id = $1', [objectId]);
 }
 
+/* v4020 · Paket V4: Steuerjahre (jahr > 0). Ersetzt nur die gelesenen Jahre, aeltere Jahre bleiben stehen. */
+async function steuerSchreiben(objectId, jahre, felder) {
+  const J = (jahre || []).map(Number).filter(function (j) { return j > 0; });
+  if (!J.length) return;
+  await q("DELETE FROM vivi_werte WHERE object_id = $1 AND jahr = ANY($2::int[]) AND feld LIKE 'steuer.%'", [objectId, J]);
+  for (const feld of Object.keys(felder || {})) {
+    const m = /^steuer\.(\d{4})\./.exec(feld); if (!m || J.indexOf(+m[1]) < 0) continue;
+    await q(`INSERT INTO vivi_werte (object_id, feld, jahr, wert, vivi_quelle, gelesen_am) VALUES ($1, $2, $3, $4::jsonb, 'tax-overview', now())
+             ON CONFLICT (object_id, feld, jahr) DO UPDATE SET wert = EXCLUDED.wert, vivi_quelle = EXCLUDED.vivi_quelle, gelesen_am = now()`,
+      [objectId, feld, +m[1], JSON.stringify(felder[feld])]);
+  }
+}
+
+/* v4020 · Einstellung „Steuerjahre aus ViVi“ je Nutzer im allgemeinen Einstellungsspeicher (user_settings, Migration 074) */
+const EINSTELLUNG = 'vivi_steuer';
+async function einstellungLesen(userId) {
+  const r = await q('SELECT wert, updated_at FROM user_settings WHERE user_id = $1 AND schluessel = $2', [userId, EINSTELLUNG]);
+  return r.rows[0] ? r.rows[0].wert : null;
+}
+async function einstellungSchreiben(userId, wert) {
+  await q(`INSERT INTO user_settings (user_id, schluessel, wert, updated_at) VALUES ($1, $2, $3::jsonb, NOW())
+           ON CONFLICT (user_id, schluessel) DO UPDATE SET wert = $3::jsonb, updated_at = NOW()`, [userId, EINSTELLUNG, JSON.stringify(wert || {})]);
+}
+
 async function abrufFehler(objectId, text) {
   await q('UPDATE vivi_verknuepfung SET letzter_fehler = $2 WHERE object_id = $1', [objectId, String(text || '').slice(0, 500)]);
 }
@@ -116,5 +140,5 @@ async function protokoll(eintrag) {
 
 module.exports = {
   objektHolen, verknuepfung, beanspruchen, idsSpeichern, statusSetzen, zuordnen, loesen,
-  werteSchreiben, abrufFehler, werteLesen, verknuepfteObjekte, faelligeAbrufe, protokoll, ABGEBROCHEN_NACH_MIN
+  werteSchreiben, steuerSchreiben, einstellungLesen, einstellungSchreiben, abrufFehler, werteLesen, verknuepfteObjekte, faelligeAbrufe, protokoll, ABGEBROCHEN_NACH_MIN
 };

@@ -26,8 +26,11 @@
  *      vorgehakt, Hinweis Zeichen fuer Zeichen, Entscheidung gemerkt, lokal festlegen ohne Netz, Gegenproben
  *   R  v3953 Echte Antworten aus dem Testkonto (tools/vivi-antworten/): Rundweg, gelesene Felder, was ViVi selbst setzt,
  *      Steueruebersicht als Objekt
- *   V4 v3951 Steuer als Entwurf: Schalter aus, Lesepfade in der Spezifikation, Zielspalten in tax_records, Auslese an
- *      nachgebauten Antworten (Feldnamen sind Annahmen, erst mit Key pruefbar)
+ *   V4 v4020 Steuer: Lesepfade nur GET in der Spezifikation, Zielspalten in tax_records, Zeilenbereiche, Einstellung,
+ *      Abruf je Jahr vom Kaufjahr bis heute an einer Attrappe mit den echten Antworten, Einstellung aus fragt ViVi nicht
+ *   T  v4020 Steuerjahre im Browser (js/vivi-steuer-abgleich.js, Kern jahrAbgleich) an den echten Antworten 23.11.2026:
+ *      Kategorien abwaehlbar, erklaerte/beschiedene/festgeschriebene Jahre nie automatisch, keine Doppelung (Betrag und
+ *      Datum), laufendes Jahr nur ansehen, Schaetzung nie automatisch ersetzt, Einsteiger ohne Angebot, Gegenproben
  *
  * Aufruf: node tools/vivi-pruefen.mjs [--zeigen]   (--zeigen druckt die Nutzlast je Demo-Fall)
  * RC=0 sauber, RC=1 rot.
@@ -705,7 +708,8 @@ kopf('J  Kundentext ohne Gedankenstrich und Semikolon');
   texte.push(...mapping.nachVivi({ objart: 'XYZ' }, {}).fehlt.map((x) => x.text), ...mapping.nachVivi({ objart: 'XYZ' }, {}).hinweise);
   const schlecht = texte.filter((x) => /[–—;]/.test(x));
   ok(texte.length > 50 && !schlecht.length, texte.length + ' Texte der Vorschau ohne – — ;' + (schlecht.length ? ': ' + schlecht.slice(0, 3).join(' | ') : ''));
-  const datei = ['frontend/js/vivi.js', 'frontend/js/vivi-felder.js', 'frontend/js/nk-vorauszahlung.js', 'backend/src/services/vivi/viviDienst.js', 'backend/src/services/vivi/viviClient.js'];
+  const datei = ['frontend/js/vivi.js', 'frontend/js/vivi-felder.js', 'frontend/js/nk-vorauszahlung.js', 'backend/src/services/vivi/viviDienst.js', 'backend/src/services/vivi/viviClient.js',
+    'frontend/js/vivi-steuer-abgleich.js', 'backend/src/services/vivi/viviSteuer.js', 'backend/src/routes/vivi.js'];   /* v4020 · Steuerjahre */
   const funde = [];
   datei.forEach((rel) => {
     const t = lies(rel).replace(/\/\*[\s\S]*?\*\//g, '').split('\n').filter((z) => !/^\s*\/\//.test(z)).join('\n');
@@ -860,34 +864,80 @@ kopf('V5 Unterlagen gegen ViVi: Zustand vivi_abweichung, nie vorgehakt, lokal fe
   ok(netz.test(lokNetz), 'Gegenprobe rot: ein Aufruf nach ViVi in lokalFestlegen würde gefunden');
 }
 
-/* ═══ V4 · Steuer als Entwurf (v3951) ════════════════════════════════════ */
-kopf('V4 Steuer: Entwurf hinter dem Schalter, nicht aktiv');
+/* ═══ V4 · Steuerjahre (v4020) ══════════════════════════════════════════ */
+kopf('V4 Steuerjahre: Lesepfade, Zeilen der Anlage V, Einstellung, Abruf je Jahr (v4020)');
+const STB = JSON.parse(lies('tools/vivi-antworten/steuer-belege-2026-11-23.json'));
+/* line_details wie gemessen (55-72 und 46-48 echt), 73-75 und 80-82 aus /receipts desselben Objekts nachgebaut (gleicher Betrag) */
+function zeileDetails(nr, jahr, zeile) {
+  const o = STB.objekte[nr];
+  if (nr === '2026-1157' && jahr === 2026 && zeile === '55-72') return o.zeile_55.line_details;
+  if (nr === '2026-1157' && jahr === 2026 && zeile === '46-48') return o.zeile_46.line_details;
+  const so = o.steuer[jahr]; const z = so && so.expenses.find((x) => x.zeile === zeile);
+  if (!z || !z.amount) return { error: 'Zeile nicht gefunden' };
+  const b = o.belege.filter((x) => String(x.date).startsWith(String(jahr)) && Math.abs(x.amount - z.amount) < 0.005);
+  return { zeile, label: z.label, amount: z.amount, items: b.map((x) => ({ label: x.payments[0].purpose, date: x.date.split('-').reverse().join('.'), amount: x.amount })), items_truncated: 0 };
+}
 {
-  ok(steuerEntwurf.AKTIV === false, 'Schalter viviSteuer.AKTIV ist aus');
-  const ds = lies('backend/src/services/vivi/viviDienst.js');
-  const nutz = ds.split('steuer.').length - 1;
-  ok(/if \(steuer\.AKTIV\) \{/.test(ds) && !/steuer\.(ausViviSteuer|lesePfade)/.test(ds.replace(/if \(steuer\.AKTIV\) \{[\s\S]*?\n    \}/, '')), 'viviDienst ruft den Steuer-Entwurf nur hinter if (steuer.AKTIV) (' + nutz + ' Stellen)');
+  const st = steuerEntwurf;
+  ok(st.AKTIV === undefined && !/steuer\.AKTIV/.test(lies('backend/src/services/vivi/viviDienst.js')), 'kein Schalter mehr: die Einstellung des Nutzers entscheidet (aus, Vorschlag, automatisch)');
+  const pf = st.lesePfade('p1', 2026, ['55-72']);
   const TO = SPEC.paths['/tax-overview'] && SPEC.paths['/tax-overview'].get;
-  const toTyp = TO && TO.responses['200'].content['application/json'].schema.properties.data.type;
-  ok(toTyp === 'string', 'Spezifikation: /tax-overview liefert data als string (gemessen: Objekt, siehe Teil R, die Textauslese bleibt Rückfall)');
-  const pf = steuerEntwurf.lesePfade('p1', 2026).map((x) => x.pfad.replace('/projects/p1', '/projects/{project}'));
-  ok(pf.every((x) => SPEC.paths[x] && SPEC.paths[x].get), 'alle Lesepfade stehen in der Spezifikation mit GET: ' + pf.join(', '));
+  ok(pf.every((x) => x.pfad === '/tax-overview') && TO && ['year', 'project_id', 'line'].every((n) => TO.parameters.some((p) => p.name === n)) && pf[1].abfrage.line === '55-72',
+    'Lesepfad nur GET /tax-overview mit year, project_id und line (stehen in der Spezifikation)');
   const mig = lies('backend/migrations/005_tax_records.sql') + lies('backend/migrations/006_tax_extended.sql');
-  const spalten = [...new Set([...Object.values(steuerEntwurf.ZEILE_ZU_SPALTE), ...Object.values(steuerEntwurf.KATEGORIE_ZU_SPALTE)])];
+  const spalten = st.ZEILEN.map((z) => z.spalte);
   ok(spalten.every((c) => new RegExp('\\b' + c + '\\b').test(mig)), 'jede Zielspalte steht in tax_records (Migration 005/006): ' + spalten.join(', '));
-  ok(/id="hg_ul"/.test(HTML) && /id="hg_nul"/.test(HTML), 'Hausgeld-Ziele hg_ul und hg_nul gibt es im Formular');
-  const r = steuerEntwurf.ausViviSteuer({
-    steueruebersicht: 'Anlage V 2026\nZeile 15 Mieteinnahmen 11.400,00 €\nZeile 48 Schuldzinsen 11.880,00\nZeile 99 Unbekannt 5,00\nFreitext ohne Zeile 1.000,00',
-    kosten: [{ tax_category: 'Erhaltungsaufwand', amount: 1850, date: '2026-05-12' }, { tax_category: 'Erhaltungsaufwand', amount: '640,50', date: '2026-09-02' }, { tax_category: 'Erhaltungsaufwand', amount: 999, date: '2025-12-30' },
-      { tax_category: 'Hausgeld (Rücklage)', amount: 85, date: '2026-01-01' }, { tax_category: 'Sonstige Werbungskosten', amount: 120, date: '2026-03-01' }],
-    laufend: [{ name: 'Hausgeld', tax_category: 'Hausgeld (Vorauszahlung)', amount: 200, interval: 'monthly' }, { name: 'Hausgeld', tax_category: 'Hausgeld (WEG)', amount: 107, interval: 'monthly' }, { name: 'Grundsteuer', amount: 90, interval: 'quarterly' }]
-  }, 2026);
-  const f = r.felder;
-  ok(f['steuer.2026.einnahmen_km'].wert === 11400 && f['steuer.2026.schuldzinsen'].wert === 11880 && !Object.keys(f).some((k) => /99|unbekannt/i.test(k)), 'Steuerübersicht als Text: Zeile 15 und 48 erkannt, unbekannte Zeile und Freitext bleiben liegen');
-  ok(f['steuer.2026.erhaltungsaufwand'].wert === 2490.5, 'Erhaltungsaufwand 2026 = 1.850 + 640,50 (der Beleg aus 2025 zählt nicht)');
-  ok(!Object.keys(f).some((k) => /ruecklage/.test(k)) && r.vorschlaege['steuer.2026.sonst_kosten'].wert === 120 && !f['steuer.2026.sonst_kosten'], 'Rücklage ohne Abzug, sonstige Werbungskosten nur als Vorschlag (nicht verknüpft)');
-  ok(f.hg_ul.wert === 2400 && f.hg_nul.wert === 1284, 'laufendes Hausgeld je Jahr: umlagefähig 200 × 12 = 2.400, nicht umlagefähig 107 × 12 = 1.284, Grundsteuer kein Hausgeld');
-  ok(Object.keys(steuerEntwurf.ausViviSteuer({}, 2026).felder).length === 0, 'leere oder unbekannte Antworten: kein Wert (nie geraten)');
+  const verf = STB.objekte['2026-1157'].zeile_55b.line_details.error;
+  ok(st.ZEILEN.every((z) => verf.indexOf(z.zeile + ' ') >= 0) && /Zeile nicht gefunden/.test(verf), 'gemessen: jeder Zeilenbereich steht in der Liste, die ViVi bei einer Einzelzeile nennt (line=55 ist ein Fehler, line=55-72 nicht)');
+  const kats = st.ZEILEN.map((z) => z.kat).filter(Boolean);
+  ok(kats.every((k) => st.KATEGORIEN.some((x) => x.id === k)) && st.KATEGORIEN.every((x) => kats.indexOf(x.id) >= 0), 'jede Kategorie der Einstellung gehört zu einer Zeile und umgekehrt (' + st.KATEGORIEN.length + ')');
+  const n0 = st.einstellungNormal(null), n1 = st.einstellungNormal({ modus: 'quatsch', kategorien: { erhaltung: false, fremd: true } });
+  ok(n0.modus === 'vorschlag' && Object.values(n0.kategorien).every(Boolean) && n1.modus === 'vorschlag' && n1.kategorien.erhaltung === false && !('fremd' in n1.kategorien),
+    'Einstellung: Vorgabe „als Vorschlag“ mit allen Kategorien, unbekannte Werte fallen weg, abgewählt bleibt abgewählt');
+  const jt = Date.parse('2026-11-23T10:00:00Z');
+  ok(JSON.stringify(st.jahre('2024-07-01', jt)) === '[2024,2025,2026]' && st.jahre('2009-01-01', jt).length === 8 && st.jahre('2009-01-01', jt)[0] === 2019
+    && JSON.stringify(st.jahre(null, jt)) === '[2026]' && JSON.stringify(st.jahre('2030-01-01', jt)) === '[2026]', 'Jahre vom Kaufjahr bis heute, höchstens acht (Anfragebremse), ohne Kaufdatum nur das laufende Jahr');
+  const so = STB.objekte['2026-1157'].steuer[2026];
+  const det = {}; st.zeilenMitPosten(so).forEach((z) => { det[z] = zeileDetails('2026-1157', 2026, z); });
+  const w = st.ausJahr(so, det);
+  ok(JSON.stringify(st.zeilenMitPosten(so)) === '["55-72","73-75","80-82"]' && st.zeilenMitPosten(STB.objekte['2026-1053'].steuer[2025]).length === 0, 'Einzelposten nur für gebuchte Belegzeilen (1157 2026: drei Zeilen, 1053 2025: keine)');
+  ok(w.erhaltungsaufwand.summe === 1850 && w.erhaltungsaufwand.posten.length === 1 && w.erhaltungsaufwand.posten[0].datum === '2026-11-06' && w.erhaltungsaufwand.art === 'belege'
+    && w.nk_umlf.summe === 57.12 && w.sonst_kosten.summe === 297.5 && w.schuldzinsen.summe === 10865.18 && w.schuldzinsen.art === 'summe' && w.schuldzinsen.posten === null && !w.afa && !w.nk_n_umlf,
+    '1157 2026 an echten Antworten: Erhaltung 1.850 € (ein Beleg vom 06.11.2026), Betriebskosten 57,12 €, Sonstige 297,50 €, Zinsen 10.865,18 € als Summe, Zeilen mit 0 € kein Wert');
+  ok(Object.keys(st.ausJahr(STB.objekte['2026-1157'].steuer[2024], {})).length === 0 && Object.keys(st.ausJahr('Text', {})).length === 0, 'Jahr ohne Buchung (1157 2024, alles 0) und Textantwort: kein Wert');
+  /* Abruf an einer Attrappe mit den echten Antworten */
+  const lauf = async (modus, bremseAb) => {
+    const log = [], geschrieben = [];
+    let n = 0;
+    const cl = { zaehler: { anfragen: 0, bremse429: 0 }, get: async (pfad, q) => {
+      n++; cl.zaehler.anfragen++; log.push(pfad + '?' + new URLSearchParams(q).toString());
+      if (bremseAb && n >= bremseAb) { const e = new Error('429'); e.code = 'bremse_429'; throw e; }
+      const o = STB.objekte['2026-1157'], ue = o.steuer[q.year];
+      return { data: q.line ? Object.assign({}, ue, { line_details: zeileDetails('2026-1157', +q.year, q.line) }) : ue };
+    } };
+    dienst._setzeDeps({ speicher: { einstellungLesen: async () => ({ modus }), steuerSchreiben: async (o, j, f) => { geschrieben.push([j, f]); } }, jetzt: () => jt, testbetrieb: async () => false });
+    const r = await dienst.steuerLesen(USER, 'o1', { wirtschaftlicher_uebergang: '2025-03-01' }, {}, cl, {}, 'prj_0XQ3hs2htSc7');
+    return { r, log, geschrieben, cl };
+  };
+  let L = await lauf('vorschlag');
+  const f = L.geschrieben[0] && L.geschrieben[0][1];
+  ok(L.log.length === 5 && L.log.every((x) => x.startsWith('/tax-overview?')) && JSON.stringify(L.geschrieben[0][0]) === '[2025,2026]' && f['steuer.2026.erhaltungsaufwand'].posten[0].betrag === 1850 && f['steuer.2025.einnahmen_km'].summe === 8550,
+    'Abruf 1157 (Kauf 2025): 2 Jahresübersichten plus 3 Belegzeilen, nur GET, steuer.2026.erhaltungsaufwand und steuer.2025.einnahmen_km in vivi_werte');
+  L = await lauf('aus');
+  ok(L.log.length === 0 && L.geschrieben.length === 0 && L.r.modus === 'aus', 'Einstellung „aus“: keine Anfrage an ViVi, nichts geschrieben');
+  L = await lauf('automatisch', 2);
+  ok(L.r.bremse === true && L.geschrieben.length === 1 && JSON.stringify(L.geschrieben[0][0]) === '[2025]' && /Steuerjahre/.test(L.r.fehler), 'Bremse mitten im Abruf: gelesene Jahre bleiben (2025), das Jahr danach behält den alten Stand, kein Abbruch');
+  /* werte() liefert die Steuerjahre aus */
+  dienst._setzeDeps({ speicher: { verknuepfung: async () => ({ anlage_status: 'fertig', vivi_ids: {} }), einstellungLesen: async () => ({ modus: 'automatisch', kategorien: { zinsen: false } }),
+    werteLesen: async () => [{ feld: 'kp', jahr: 0, wert: 1, vivi_quelle: 'projects', gelesen_am: '2026-11-23T09:00:00Z' }, { feld: 'steuer.2026.erhaltungsaufwand', jahr: 2026, wert: w.erhaltungsaufwand, vivi_quelle: 'tax-overview', gelesen_am: '2026-11-23T10:00:00Z' }] }, testbetrieb: async () => false });
+  const wt = await dienst.werte(USER, 'o1');
+  ok(wt.steuer[2026].erhaltungsaufwand.summe === 1850 && !wt.felder['steuer.2026.erhaltungsaufwand'] && wt.felder.kp && wt.steuer_einstellung.modus === 'automatisch' && wt.steuer_einstellung.kategorien.zinsen === false && /2026-11-23T10/.test(wt.steuer_stand),
+    'werte(): Steuerjahre unter steuer[jahr][spalte], nicht unter felder (nichts wird ausgegraut), mit Einstellung und Stand');
+  let fe = null; try { await dienst.steuerEinstellungSpeichern(USER, { modus: 'immer' }); } catch (e) { fe = e; }
+  ok(fe && fe.status === 400, 'unbekannte Einstellung wird abgewiesen (400)');
+  const RV = lies('backend/src/routes/vivi.js');
+  ok(/router\.get\('\/steuer-einstellung'/.test(RV) && /router\.put\('\/steuer-einstellung'/.test(RV) && RV.indexOf("router.use(vorschau.sperre('vivi'))") < RV.indexOf("'/steuer-einstellung'"), 'Routen GET/PUT /vivi/steuer-einstellung hinter der Vorschau-Sperre vivi');
+  dienst._setzeDeps(null);
 }
 
 /* ═══ R · Echte Antworten aus dem Testkonto (v3953) ═══════════════════════ */
@@ -945,7 +995,7 @@ kopf('R  Echte ViVi-Antworten (Testkonto, 22.11.2026, tools/vivi-antworten/)');
   const tv = steuerEntwurf.ausSteueruebersicht(so);
   ok(tv.einnahmen_km === 32850 && tv.einnahmen_nk === 9760 && tv.schuldzinsen === 15524.77 && tv.erhaltungsaufwand === undefined, 'Steuerübersicht als Objekt: Zeile 13-15, 20, 46-48 erkannt, Betrag 0 (nichts gebucht) ist kein Wert');
   const ko = ECHT.objekte['2026-1041'].antworten.costs;
-  ok(ko && !Array.isArray(ko) && 'realized_costs' in ko && !Object.keys(steuerEntwurf.ausKosten(ko, 2026).verknuepft).length, 'gemessen: /costs ist ein Summen-Objekt ohne Steuerkategorie, daraus wird nichts gelesen');
+  ok(ko && !Array.isArray(ko) && 'realized_costs' in ko && !Object.keys(steuerEntwurf.ausJahr(ko, null)).length, 'gemessen: /costs ist ein Summen-Objekt ohne Steuerkategorie und ohne Jahr, daraus wird nichts gelesen');
 }
 
 /* ═══ R2 · nach den Bewegungsdaten (v3966) ═══════════════════════════════ */
@@ -1035,6 +1085,66 @@ console.log('\nTeil S · in ViVi gelöscht: Verknüpfung lösen nur bei eindeuti
   ok(/function erhoehungenMischen/.test(VF) && /\^vivi-/.test(VF) && /erhoehungenUebernehmen\(info\)/.test(VF), 'S13 Browser mischt: ViVi-Einträge ersetzt, eigene bleiben, gleicher Tag eigener gewinnt');
   ok(/v3998a/.test(VF) && /behalten\[id\] = true/.test(VF) && /if \(behalten\[id\]\) return;/.test(VF), 'S14 Betrag der Erhöhung leer aus ViVi, Datum unverändert: Betrag aus DealPilot bleibt (gemessen 1177, 50 € gingen verloren)');
   ok(/function alleSelbst/.test(VF) && /data-vivi="alle-selbst"/.test(VJ) && /data-vivi="alle-vivi"/.test(VJ), 'S8 alle Schlösser auf einmal: selbst festlegen und aus ViVi übernehmen');
+}
+
+/* ═══ T · Steuerjahre im Browser (v4020) ═════════════════════════════════ */
+kopf('T  Steuerjahre aus ViVi: Kategorien, Sperre, keine Doppelung, automatisch nur offene Jahre');
+{
+  const QT = 'frontend/js/vivi-steuer-abgleich.js';
+  const K = require(P(QT));
+  const o57 = STB.objekte['2026-1157'];
+  const det = {}; steuerEntwurf.zeilenMitPosten(o57.steuer[2026]).forEach((z) => { det[z] = zeileDetails('2026-1157', 2026, z); });
+  const V26 = steuerEntwurf.ausJahr(o57.steuer[2026], det), V25 = steuerEntwurf.ausJahr(o57.steuer[2025], {});
+  const dpSt = { 2026: { nk_umlf: { wert: 1200, eigen: false }, einnahmen_km: { wert: 11880, eigen: false } }, 2025: { einnahmen_km: { wert: 8000, eigen: true } } };
+  const ctx = (jahr, x) => Object.assign({ jahr, heuteJahr: 2026, einstellung: { modus: 'vorschlag', kategorien: {} }, einsteiger: false,
+    dp: (sp) => (dpSt[jahr] && dpSt[jahr][sp]) || { wert: 0, eigen: false }, buchungen: [], status: 'geplant', fest: false }, x || {});
+  const zl = (a, sp) => a.zeilen.find((z) => z.spalte === sp);
+  let a = K.jahrAbgleich(V26, ctx(2026));
+  ok(zl(a, 'erhaltungsaufwand').aktion === 'uebernehmen' && zl(a, 'erhaltungsaufwand').modus === 'addieren' && zl(a, 'erhaltungsaufwand').wert === 1850 && zl(a, 'erhaltungsaufwand').neu[0].datum === '2026-11-06'
+    && zl(a, 'einnahmen_km').aktion === 'laufend' && zl(a, 'schuldzinsen').aktion === 'laufend' && !a.auto.length,
+    'T1 Vorschlag 1157 2026: Erhaltung 1.850 € neu (Beleg 06.11.2026), Miete und Zinsen im laufenden Jahr nur ansehen, nichts automatisch');
+  a = K.jahrAbgleich(V26, ctx(2026, { einstellung: { modus: 'automatisch', kategorien: {} } }));
+  ok(a.auto.map((z) => z.spalte).sort().join() === 'erhaltungsaufwand,sonst_kosten' && zl(a, 'nk_umlf').ersetztSchaetzung === true,
+    'T2 automatisch 2026: Erhaltung und Sonstige gehen hinein, Betriebskosten 57,12 € nicht (ersetzte die Schätzung 1.200 €), laufende Summen nicht');
+  a = K.jahrAbgleich(V25, ctx(2025, { einstellung: { modus: 'automatisch', kategorien: {} } }));
+  ok(zl(a, 'einnahmen_km').aktion === 'uebernehmen' && zl(a, 'einnahmen_km').modus === 'setzen' && zl(a, 'einnahmen_km').wert === 8550 && zl(a, 'einnahmen_km').abw === 550 && a.auto.some((z) => z.spalte === 'einnahmen_km'),
+    'T3 abgeschlossenes Jahr 2025 offen: Mieteinnahmen 8.550 € laut ViVi gegen 8.000 € (Abweichung +550 €) gehen automatisch hinein');
+  const sp = ['erklaert', 'bescheid'].map((s) => K.jahrAbgleich(V25, ctx(2025, { status: s, einstellung: { modus: 'automatisch', kategorien: {} } })));
+  const fe = K.jahrAbgleich(V25, ctx(2025, { fest: true, einstellung: { modus: 'automatisch', kategorien: {} } }));
+  ok(sp.every((x) => x.gesperrt && !x.auto.length && x.offen > 0 && zl(x, 'einnahmen_km').aktion === 'uebernehmen') && fe.gesperrt && !fe.auto.length,
+    'T4 erklärt, Bescheid und festgeschrieben: nie automatisch, die Abweichung steht als Vorschlag da');
+  a = K.jahrAbgleich(V26, ctx(2026, { buchungen: [{ feld: 'sonst_kosten', betrag: 1850, datum: '2026-11-06' }] }));
+  const b2 = K.jahrAbgleich(V26, ctx(2026, { buchungen: [{ feld: 'erhaltungsaufwand', betrag: 1850, datum: '2026-11-07' }] }));
+  const zwei = K.jahrAbgleich({ erhaltungsaufwand: { summe: 200, kat: 'erhaltung', art: 'belege', zeile: '55-72', posten: [{ datum: '2026-03-01', betrag: 100 }, { datum: '2026-03-01', betrag: 100 }] } }, ctx(2026, { buchungen: [{ feld: 'erhaltungsaufwand', betrag: 100, datum: '2026-03-01' }] }));
+  ok(zl(a, 'erhaltungsaufwand').aktion === 'gleich' && zl(a, 'erhaltungsaufwand').erfasst.length === 1 && zl(b2, 'erhaltungsaufwand').aktion === 'uebernehmen' && zl(zwei, 'erhaltungsaufwand').wert === 100,
+    'T5 keine Doppelung: gleicher Betrag und gleiches Datum gilt als erfasst (auch unter anderem Posten), anderes Datum ist neu, zwei gleiche Belege gegen einen erfassten: einer neu');
+  a = K.jahrAbgleich(V26, ctx(2026, { einstellung: { modus: 'automatisch', kategorien: { erhaltung: false, sonstige: false } } }));
+  ok(!zl(a, 'erhaltungsaufwand') && !zl(a, 'sonst_kosten') && a.abgewaehlt === 2 && !a.auto.length, 'T6 abgewählte Kategorien erscheinen nicht und werden nie geschrieben');
+  a = K.jahrAbgleich(V26, ctx(2026, { einsteiger: true, einstellung: { modus: 'automatisch', kategorien: {} } }));
+  const QS = lies(QT);
+  ok(!a.auto.length && /if \(einsteiger\(\)\) \{ host\.innerHTML = ''; return; \}/.test(QS) && /&& !einsteiger\(\)\); \}/.test(QS), 'T7 Einsteiger: keine Einstellung, keine Karte, nichts automatisch');
+  ok(K.jahrAbgleich(V26, ctx(2026, { einstellung: { modus: 'aus', kategorien: {} } })).zeilen.length === 0, 'T8 Einstellung aus: keine Zeilen');
+  a = K.jahrAbgleich(V25, ctx(2025, { dp: () => null, einstellung: { modus: 'automatisch', kategorien: {} } }));
+  ok(a.zeilen.every((z) => z.aktion === 'ausserhalb') && !a.auto.length, 'T9 Jahr nicht in der Zeitleiste des Reiters Steuer: nur Hinweis');
+  a = K.jahrAbgleich({ afa: { summe: 4100, kat: null, art: 'vergleich', zeile: '33-35' } }, ctx(2025, { einstellung: { modus: 'automatisch', kategorien: {} } }));
+  ok(zl(a, 'afa').aktion === 'vergleich' && !a.offen, 'T10 AfA aus ViVi nur zum Vergleich, nie übernehmen');
+  /* nach dem Uebernehmen: eigener Wert = ViVi, die Posten als Buchung gemerkt */
+  const a25 = K.jahrAbgleich(V25, ctx(2025, { dp: (s) => ({ wert: s === 'einnahmen_km' ? 8550 : s === 'einnahmen_nk' ? 2385 : s === 'schuldzinsen' ? 10290.69 : 0, eigen: true }) }));
+  const a26 = K.jahrAbgleich(V26, ctx(2026, { buchungen: V26.erhaltungsaufwand.posten.concat(V26.sonst_kosten.posten, V26.nk_umlf.posten).map((p) => ({ betrag: p.betrag, datum: p.datum })) }));
+  ok(a25.offen === 0 && a26.offen === 0, 'T11 zweiter Lauf nach der Übernahme: nichts mehr offen (automatisch schreibt nicht doppelt)');
+  /* Gegenproben am echten Quelltext */
+  const lade = (t) => { const m = { exports: {} }; vm.runInNewContext(t, { module: m, globalThis: {}, window: undefined }); return m.exports; };
+  const g1 = lade(QS.replace('!ctx.einsteiger && !sperre && ', '!ctx.einsteiger && '));
+  const g2 = lade(QS.replace('return !!(p && b && p.datum', 'return false && !!(p && b && p.datum'));
+  ok(g1.jahrAbgleich(V25, ctx(2025, { status: 'erklaert', einstellung: { modus: 'automatisch', kategorien: {} } })).auto.length > 0
+    && zl(g2.jahrAbgleich(V26, ctx(2026, { buchungen: [{ betrag: 1850, datum: '2026-11-06' }] })), 'erhaltungsaufwand').aktion === 'uebernehmen' && QS.indexOf('!ctx.einsteiger && !sperre && ') > 0,
+    'Gegenproben rot: ohne Sperre schriebe „automatisch“ ins erklärte Jahr, ohne Belegvergleich käme der erfasste Beleg doppelt');
+  const VJ = lies('frontend/js/vivi.js'), IX = lies('frontend/index.html');
+  ok(/dp:vivi-stand/.test(VJ) && /standMelden\(\);/.test(VJ) && /pk-vivi-steuer/.test(VJ) && /DpViviSteuer\.einstellungKarte/.test(VJ), 'vivi.js meldet jeden Stand (dp:vivi-stand) und trägt die Einstellung in die Verbindungskarte');
+  ok(IX.indexOf('js/vivi-steuer-abgleich.js?v=') > IX.indexOf('js/vivi.js?v='), 'index.html lädt vivi-steuer-abgleich.js nach vivi.js');
+  ok(/DpVorschau\.frei\('vivi'\)/.test(QS) && /aenderungErlaubt\(jahr, 'steuer'\)/.test(QS) && /a\.auto\.length\) n \+= uebernehmen\(j, a\.auto, true\)/.test(QS),
+    'Browser: nur hinter der Vorschau-Funktion vivi, Übernehmen von Hand fragt bei erklärt/Bescheid nach, automatisch nur aus der auto-Liste des Kerns');
+  ok(/quelle: 'ViVi'/.test(QS) && /vivi-st-marke/.test(QS) && /'yearly-tax-form-box'/.test(QS), 'Herkunft „ViVi“ je übernommenem Wert, Marke am Feld im Reiter Steuer');
 }
 
 dienst._setzeDeps(null);

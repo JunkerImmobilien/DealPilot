@@ -1,0 +1,1682 @@
+{
+ "_zweck": "ViVi Steuer und Belege je Jahr, gemessen 23.11.2026 am Testkonto (nur GET, Musteranschriften, Belege aus den Testunterlagen). Pfade: /tax-overview?year&project_id (Anlage V je Objekt und Jahr), dazu &line=<Zeilenbereich> (line_details.items: label, date TT.MM.JJJJ, amount), /receipts?project_id (Belege ohne Steuerkategorie), /projects/{p}/depreciation|costs|planned-costs|monthly-costs|revenues|service-contracts. Dateinamen der Belege ersetzt.",
+ "gemessen_am": "2026-11-23T07:14:48.190Z",
+ "objekte": {
+  "2026-1157": {
+   "project_id": "prj_0XQ3hs2htSc7",
+   "steuer": {
+    "2024": {
+     "year": 2024,
+     "project_id": "prj_0XQ3hs2htSc7",
+     "project_name": "Musterstadt - Musterstraße 1157 - Wohnung",
+     "income": [
+      {
+       "zeile": "13-15",
+       "label": "Mieteinnahmen für Wohnungen",
+       "amount": 0
+      },
+      {
+       "zeile": "20",
+       "label": "Umgelegte Nebenkosten (Vorauszahlungen)",
+       "amount": 0
+      },
+      {
+       "zeile": "26",
+       "label": "Sonstige Einnahmen",
+       "amount": 0
+      },
+      {
+       "zeile": "27",
+       "label": "Vereinnahmte Umsatzsteuer",
+       "amount": 0
+      }
+     ],
+     "expenses": [
+      {
+       "zeile": "33-35",
+       "label": "AfA auf Gebäude",
+       "amount": 0
+      },
+      {
+       "zeile": "42-45",
+       "label": "AfA auf bewegliche Wirtschaftsgüter",
+       "amount": 0
+      },
+      {
+       "zeile": "46-48",
+       "label": "Schuldzinsen, Geldbeschaffungskosten",
+       "amount": 0
+      },
+      {
+       "zeile": "55-72",
+       "label": "Erhaltungsaufwendungen",
+       "amount": 0
+      },
+      {
+       "zeile": "73-75",
+       "label": "Umgelegte Betriebskosten",
+       "amount": 0
+      },
+      {
+       "zeile": "76-78",
+       "label": "Nicht umgelegte Kosten",
+       "amount": 0
+      },
+      {
+       "zeile": "79",
+       "label": "Gezahlte Umsatzsteuer",
+       "amount": 0
+      },
+      {
+       "zeile": "80-82",
+       "label": "Sonstige Kosten",
+       "amount": 0
+      }
+     ],
+     "summary": {
+      "total_income": 0,
+      "total_expenses": 0,
+      "surplus": 0
+     },
+     "fifteen_percent_rule": null,
+     "self_occupancy_warning": null
+    },
+    "2025": {
+     "year": 2025,
+     "project_id": "prj_0XQ3hs2htSc7",
+     "project_name": "Musterstadt - Musterstraße 1157 - Wohnung",
+     "income": [
+      {
+       "zeile": "13-15",
+       "label": "Mieteinnahmen für Wohnungen",
+       "amount": 8550
+      },
+      {
+       "zeile": "20",
+       "label": "Umgelegte Nebenkosten (Vorauszahlungen)",
+       "amount": 2385
+      },
+      {
+       "zeile": "26",
+       "label": "Sonstige Einnahmen",
+       "amount": 0
+      },
+      {
+       "zeile": "27",
+       "label": "Vereinnahmte Umsatzsteuer",
+       "amount": 0
+      }
+     ],
+     "expenses": [
+      {
+       "zeile": "33-35",
+       "label": "AfA auf Gebäude",
+       "amount": 0
+      },
+      {
+       "zeile": "42-45",
+       "label": "AfA auf bewegliche Wirtschaftsgüter",
+       "amount": 0
+      },
+      {
+       "zeile": "46-48",
+       "label": "Schuldzinsen, Geldbeschaffungskosten",
+       "amount": 10290.69
+      },
+      {
+       "zeile": "55-72",
+       "label": "Erhaltungsaufwendungen",
+       "amount": 0
+      },
+      {
+       "zeile": "73-75",
+       "label": "Umgelegte Betriebskosten",
+       "amount": 0
+      },
+      {
+       "zeile": "76-78",
+       "label": "Nicht umgelegte Kosten",
+       "amount": 0
+      },
+      {
+       "zeile": "79",
+       "label": "Gezahlte Umsatzsteuer",
+       "amount": 0
+      },
+      {
+       "zeile": "80-82",
+       "label": "Sonstige Kosten",
+       "amount": 0
+      }
+     ],
+     "summary": {
+      "total_income": 10935,
+      "total_expenses": 10290.69,
+      "surplus": 644.31
+     },
+     "fifteen_percent_rule": {
+      "limit": 61698.06,
+      "used_net": 1554.62,
+      "remaining": 60143.44,
+      "percentage_used": 2.5,
+      "exceeded": false,
+      "borderline": false,
+      "window_end": "01.04.2028"
+     },
+     "self_occupancy_warning": null
+    },
+    "2026": {
+     "year": 2026,
+     "project_id": "prj_0XQ3hs2htSc7",
+     "project_name": "Musterstadt - Musterstraße 1157 - Wohnung",
+     "income": [
+      {
+       "zeile": "13-15",
+       "label": "Mieteinnahmen für Wohnungen",
+       "amount": 10490
+      },
+      {
+       "zeile": "20",
+       "label": "Umgelegte Nebenkosten (Vorauszahlungen)",
+       "amount": 2930
+      },
+      {
+       "zeile": "26",
+       "label": "Sonstige Einnahmen",
+       "amount": 0
+      },
+      {
+       "zeile": "27",
+       "label": "Vereinnahmte Umsatzsteuer",
+       "amount": 0
+      }
+     ],
+     "expenses": [
+      {
+       "zeile": "33-35",
+       "label": "AfA auf Gebäude",
+       "amount": 0
+      },
+      {
+       "zeile": "42-45",
+       "label": "AfA auf bewegliche Wirtschaftsgüter",
+       "amount": 0
+      },
+      {
+       "zeile": "46-48",
+       "label": "Schuldzinsen, Geldbeschaffungskosten",
+       "amount": 10865.18
+      },
+      {
+       "zeile": "55-72",
+       "label": "Erhaltungsaufwendungen",
+       "amount": 1850
+      },
+      {
+       "zeile": "73-75",
+       "label": "Umgelegte Betriebskosten",
+       "amount": 57.12
+      },
+      {
+       "zeile": "76-78",
+       "label": "Nicht umgelegte Kosten",
+       "amount": 0
+      },
+      {
+       "zeile": "79",
+       "label": "Gezahlte Umsatzsteuer",
+       "amount": 0
+      },
+      {
+       "zeile": "80-82",
+       "label": "Sonstige Kosten",
+       "amount": 297.5
+      }
+     ],
+     "summary": {
+      "total_income": 13420,
+      "total_expenses": 13069.8,
+      "surplus": 350.2
+     },
+     "fifteen_percent_rule": {
+      "limit": 61698.06,
+      "used_net": 1554.62,
+      "remaining": 60143.44,
+      "percentage_used": 2.5,
+      "exceeded": false,
+      "borderline": false,
+      "window_end": "01.04.2028"
+     },
+     "self_occupancy_warning": null
+    }
+   },
+   "belege": [
+    {
+     "id": "rcp_1AJVXu24Sho6",
+     "status": "booked",
+     "amount": 297.5,
+     "open_amount": 0,
+     "discount_amount": null,
+     "date": "2026-11-12",
+     "due_date": null,
+     "sender": null,
+     "invoice_number": null,
+     "description": null,
+     "direction": "expense",
+     "project": {
+      "id": "prj_0XQ3hs2htSc7",
+      "name": "Musterstadt - Musterstraße 1157 - Wohnung"
+     },
+     "file_name": "beleg.pdf",
+     "created_at": "2026-11-22T14:22:00+00:00",
+     "payments": [
+      {
+       "id": "txn_0o5ceN1xOo3b",
+       "booking_date": "2026-11-12",
+       "value_date": "2026-11-12",
+       "amount": -297.5,
+       "counterparty_name": null,
+       "purpose": "Beratung Mieterhöhungsverlangen",
+       "is_manual": true,
+       "bank_account": null
+      }
+     ]
+    },
+    {
+     "id": "rcp_1eUm573CXZU4",
+     "status": "booked",
+     "amount": 57.12,
+     "open_amount": 0,
+     "discount_amount": null,
+     "date": "2026-11-10",
+     "due_date": null,
+     "sender": null,
+     "invoice_number": null,
+     "description": null,
+     "direction": "expense",
+     "project": {
+      "id": "prj_0XQ3hs2htSc7",
+      "name": "Musterstadt - Musterstraße 1157 - Wohnung"
+     },
+     "file_name": "beleg.pdf",
+     "created_at": "2026-11-22T14:21:56+00:00",
+     "payments": [
+      {
+       "id": "txn_0EBlpC4RyEYI",
+       "booking_date": "2026-11-10",
+       "value_date": "2026-11-10",
+       "amount": -57.12,
+       "counterparty_name": null,
+       "purpose": "Rauchwarnmelder Jahreswartung",
+       "is_manual": true,
+       "bank_account": null
+      }
+     ]
+    },
+    {
+     "id": "rcp_1OrpST4ery7q",
+     "status": "booked",
+     "amount": 1850,
+     "open_amount": 0,
+     "discount_amount": null,
+     "date": "2026-11-06",
+     "due_date": null,
+     "sender": null,
+     "invoice_number": null,
+     "description": null,
+     "direction": "expense",
+     "project": {
+      "id": "prj_0XQ3hs2htSc7",
+      "name": "Musterstadt - Musterstraße 1157 - Wohnung"
+     },
+     "file_name": "beleg.pdf",
+     "created_at": "2026-11-22T14:20:46+00:00",
+     "payments": [
+      {
+       "id": "txn_3WYUTY3oWdUG",
+       "booking_date": "2026-11-06",
+       "value_date": "2026-11-06",
+       "amount": -1850,
+       "counterparty_name": null,
+       "purpose": "Malerarbeiten Wohnzimmer und Flur",
+       "is_manual": true,
+       "bank_account": null
+      }
+     ]
+    }
+   ],
+   "zeile_55": {
+    "year": 2026,
+    "project_id": "prj_0XQ3hs2htSc7",
+    "project_name": "Musterstadt - Musterstraße 1157 - Wohnung",
+    "income": [
+     {
+      "zeile": "13-15",
+      "label": "Mieteinnahmen für Wohnungen",
+      "amount": 10490
+     },
+     {
+      "zeile": "20",
+      "label": "Umgelegte Nebenkosten (Vorauszahlungen)",
+      "amount": 2930
+     },
+     {
+      "zeile": "26",
+      "label": "Sonstige Einnahmen",
+      "amount": 0
+     },
+     {
+      "zeile": "27",
+      "label": "Vereinnahmte Umsatzsteuer",
+      "amount": 0
+     }
+    ],
+    "expenses": [
+     {
+      "zeile": "33-35",
+      "label": "AfA auf Gebäude",
+      "amount": 0
+     },
+     {
+      "zeile": "42-45",
+      "label": "AfA auf bewegliche Wirtschaftsgüter",
+      "amount": 0
+     },
+     {
+      "zeile": "46-48",
+      "label": "Schuldzinsen, Geldbeschaffungskosten",
+      "amount": 10865.18
+     },
+     {
+      "zeile": "55-72",
+      "label": "Erhaltungsaufwendungen",
+      "amount": 1850
+     },
+     {
+      "zeile": "73-75",
+      "label": "Umgelegte Betriebskosten",
+      "amount": 57.12
+     },
+     {
+      "zeile": "76-78",
+      "label": "Nicht umgelegte Kosten",
+      "amount": 0
+     },
+     {
+      "zeile": "79",
+      "label": "Gezahlte Umsatzsteuer",
+      "amount": 0
+     },
+     {
+      "zeile": "80-82",
+      "label": "Sonstige Kosten",
+      "amount": 297.5
+     }
+    ],
+    "summary": {
+     "total_income": 13420,
+     "total_expenses": 13069.8,
+     "surplus": 350.2
+    },
+    "fifteen_percent_rule": {
+     "limit": 61698.06,
+     "used_net": 1554.62,
+     "remaining": 60143.44,
+     "percentage_used": 2.5,
+     "exceeded": false,
+     "borderline": false,
+     "window_end": "01.04.2028"
+    },
+    "self_occupancy_warning": null,
+    "line_details": {
+     "zeile": "55-72",
+     "label": "Erhaltungsaufwendungen",
+     "amount": 1850,
+     "items": [
+      {
+       "label": "Malerarbeiten Wohnzimmer und Flur",
+       "date": "06.11.2026",
+       "amount": 1850
+      }
+     ],
+     "items_truncated": 0
+    }
+   },
+   "zeile_55b": {
+    "year": 2026,
+    "project_id": "prj_0XQ3hs2htSc7",
+    "project_name": "Musterstadt - Musterstraße 1157 - Wohnung",
+    "income": [
+     {
+      "zeile": "13-15",
+      "label": "Mieteinnahmen für Wohnungen",
+      "amount": 10490
+     },
+     {
+      "zeile": "20",
+      "label": "Umgelegte Nebenkosten (Vorauszahlungen)",
+      "amount": 2930
+     },
+     {
+      "zeile": "26",
+      "label": "Sonstige Einnahmen",
+      "amount": 0
+     },
+     {
+      "zeile": "27",
+      "label": "Vereinnahmte Umsatzsteuer",
+      "amount": 0
+     }
+    ],
+    "expenses": [
+     {
+      "zeile": "33-35",
+      "label": "AfA auf Gebäude",
+      "amount": 0
+     },
+     {
+      "zeile": "42-45",
+      "label": "AfA auf bewegliche Wirtschaftsgüter",
+      "amount": 0
+     },
+     {
+      "zeile": "46-48",
+      "label": "Schuldzinsen, Geldbeschaffungskosten",
+      "amount": 10865.18
+     },
+     {
+      "zeile": "55-72",
+      "label": "Erhaltungsaufwendungen",
+      "amount": 1850
+     },
+     {
+      "zeile": "73-75",
+      "label": "Umgelegte Betriebskosten",
+      "amount": 57.12
+     },
+     {
+      "zeile": "76-78",
+      "label": "Nicht umgelegte Kosten",
+      "amount": 0
+     },
+     {
+      "zeile": "79",
+      "label": "Gezahlte Umsatzsteuer",
+      "amount": 0
+     },
+     {
+      "zeile": "80-82",
+      "label": "Sonstige Kosten",
+      "amount": 297.5
+     }
+    ],
+    "summary": {
+     "total_income": 13420,
+     "total_expenses": 13069.8,
+     "surplus": 350.2
+    },
+    "fifteen_percent_rule": {
+     "limit": 61698.06,
+     "used_net": 1554.62,
+     "remaining": 60143.44,
+     "percentage_used": 2.5,
+     "exceeded": false,
+     "borderline": false,
+     "window_end": "01.04.2028"
+    },
+    "self_occupancy_warning": null,
+    "line_details": {
+     "error": "Zeile nicht gefunden. Verfügbar: 13-15 Mieteinnahmen für Wohnungen, 20 Umgelegte Nebenkosten (Vorauszahlungen), 26 Sonstige Einnahmen, 27 Vereinnahmte Umsatzsteuer, 33-35 AfA auf Gebäude, 42-45 AfA auf bewegliche Wirtschaftsgüter, 46-48 Schuldzinsen, Geldbeschaffungskosten, 55-72 Erhaltungsaufwendungen, 73-75 Umgelegte Betriebskosten, 76-78 Nicht umgelegte Kosten, 79 Gezahlte Umsatzsteuer, 80-82 Sonstige Kosten"
+    }
+   },
+   "zeile_46": {
+    "year": 2026,
+    "project_id": "prj_0XQ3hs2htSc7",
+    "project_name": "Musterstadt - Musterstraße 1157 - Wohnung",
+    "income": [
+     {
+      "zeile": "13-15",
+      "label": "Mieteinnahmen für Wohnungen",
+      "amount": 10490
+     },
+     {
+      "zeile": "20",
+      "label": "Umgelegte Nebenkosten (Vorauszahlungen)",
+      "amount": 2930
+     },
+     {
+      "zeile": "26",
+      "label": "Sonstige Einnahmen",
+      "amount": 0
+     },
+     {
+      "zeile": "27",
+      "label": "Vereinnahmte Umsatzsteuer",
+      "amount": 0
+     }
+    ],
+    "expenses": [
+     {
+      "zeile": "33-35",
+      "label": "AfA auf Gebäude",
+      "amount": 0
+     },
+     {
+      "zeile": "42-45",
+      "label": "AfA auf bewegliche Wirtschaftsgüter",
+      "amount": 0
+     },
+     {
+      "zeile": "46-48",
+      "label": "Schuldzinsen, Geldbeschaffungskosten",
+      "amount": 10865.18
+     },
+     {
+      "zeile": "55-72",
+      "label": "Erhaltungsaufwendungen",
+      "amount": 1850
+     },
+     {
+      "zeile": "73-75",
+      "label": "Umgelegte Betriebskosten",
+      "amount": 57.12
+     },
+     {
+      "zeile": "76-78",
+      "label": "Nicht umgelegte Kosten",
+      "amount": 0
+     },
+     {
+      "zeile": "79",
+      "label": "Gezahlte Umsatzsteuer",
+      "amount": 0
+     },
+     {
+      "zeile": "80-82",
+      "label": "Sonstige Kosten",
+      "amount": 297.5
+     }
+    ],
+    "summary": {
+     "total_income": 13420,
+     "total_expenses": 13069.8,
+     "surplus": 350.2
+    },
+    "fifteen_percent_rule": {
+     "limit": 61698.06,
+     "used_net": 1554.62,
+     "remaining": 60143.44,
+     "percentage_used": 2.5,
+     "exceeded": false,
+     "borderline": false,
+     "window_end": "01.04.2028"
+    },
+    "self_occupancy_warning": null,
+    "line_details": {
+     "zeile": "46-48",
+     "label": "Schuldzinsen, Geldbeschaffungskosten",
+     "amount": 10865.18,
+     "items": [
+      {
+       "group": "Darlehenszinsen (Darlehen I Beispielbank eG)",
+       "label": "Januar 2026",
+       "amount": 990,
+       "info": "Tilgungsplan"
+      },
+      {
+       "group": "Darlehenszinsen (Darlehen I Beispielbank eG)",
+       "label": "Februar 2026",
+       "amount": 990,
+       "info": "Tilgungsplan"
+      },
+      {
+       "group": "Darlehenszinsen (Darlehen I Beispielbank eG)",
+       "label": "März 2026",
+       "amount": 990,
+       "info": "Tilgungsplan"
+      },
+      {
+       "group": "Darlehenszinsen (Darlehen I Beispielbank eG)",
+       "label": "April 2026",
+       "amount": 990,
+       "info": "Tilgungsplan"
+      },
+      {
+       "group": "Darlehenszinsen (Darlehen I Beispielbank eG)",
+       "label": "Mai 2026",
+       "amount": 990,
+       "info": "Tilgungsplan"
+      },
+      {
+       "group": "Darlehenszinsen (Darlehen I Beispielbank eG)",
+       "label": "Juni 2026",
+       "amount": 990,
+       "info": "Tilgungsplan"
+      },
+      {
+       "group": "Darlehenszinsen (Darlehen I Beispielbank eG)",
+       "label": "Juli 2026",
+       "amount": 990,
+       "info": "Tilgungsplan"
+      },
+      {
+       "group": "Darlehenszinsen (Darlehen I Beispielbank eG)",
+       "label": "August 2026",
+       "amount": 990,
+       "info": "Tilgungsplan"
+      },
+      {
+       "group": "Darlehenszinsen (Darlehen I Beispielbank eG)",
+       "label": "September 2026",
+       "amount": 990,
+       "info": "Tilgungsplan"
+      },
+      {
+       "group": "Darlehenszinsen (Darlehen I Beispielbank eG)",
+       "label": "Oktober 2026",
+       "amount": 990,
+       "info": "Tilgungsplan"
+      },
+      {
+       "group": "Darlehenszinsen (Darlehen II KfW über Beispielbank eG)",
+       "label": "Januar 2026",
+       "amount": 97.26,
+       "info": "Tilgungsplan"
+      },
+      {
+       "group": "Darlehenszinsen (Darlehen II KfW über Beispielbank eG)",
+       "label": "Februar 2026",
+       "amount": 97.1,
+       "info": "Tilgungsplan"
+      },
+      {
+       "group": "Darlehenszinsen (Darlehen II KfW über Beispielbank eG)",
+       "label": "März 2026",
+       "amount": 96.93,
+       "info": "Tilgungsplan"
+      },
+      {
+       "group": "Darlehenszinsen (Darlehen II KfW über Beispielbank eG)",
+       "label": "April 2026",
+       "amount": 96.77,
+       "info": "Tilgungsplan"
+      },
+      {
+       "group": "Darlehenszinsen (Darlehen II KfW über Beispielbank eG)",
+       "label": "Mai 2026",
+       "amount": 96.6,
+       "info": "Tilgungsplan"
+      },
+      {
+       "group": "Darlehenszinsen (Darlehen II KfW über Beispielbank eG)",
+       "label": "Juni 2026",
+       "amount": 96.44,
+       "info": "Tilgungsplan"
+      },
+      {
+       "group": "Darlehenszinsen (Darlehen II KfW über Beispielbank eG)",
+       "label": "Juli 2026",
+       "amount": 96.27,
+       "info": "Tilgungsplan"
+      },
+      {
+       "group": "Darlehenszinsen (Darlehen II KfW über Beispielbank eG)",
+       "label": "August 2026",
+       "amount": 96.1,
+       "info": "Tilgungsplan"
+      },
+      {
+       "group": "Darlehenszinsen (Darlehen II KfW über Beispielbank eG)",
+       "label": "September 2026",
+       "amount": 95.94,
+       "info": "Tilgungsplan"
+      },
+      {
+       "group": "Darlehenszinsen (Darlehen II KfW über Beispielbank eG)",
+       "label": "Oktober 2026",
+       "amount": 95.77,
+       "info": "Tilgungsplan"
+      }
+     ],
+     "items_truncated": 0
+    }
+   },
+   "afa": {
+    "state": {
+     "acquisition_costs": 514150.5,
+     "current": null,
+     "periods": []
+    }
+   },
+   "kosten": {
+    "planned_costs": 0,
+    "realized_costs": 0,
+    "monthly_costs_planned": 0,
+    "monthly_costs_realized": 0,
+    "financing_costs_planned": 0,
+    "financing_costs_realized": 19800.000000000004,
+    "total_planned_costs": 0,
+    "total_realized_costs": 19800.000000000004
+   },
+   "geplant": [],
+   "laufend": [],
+   "einnahmen": [],
+   "vertraege": []
+  },
+  "2026-001": {
+   "project_id": "prj_0w8jrk4bVgJ3",
+   "steuer": {
+    "2024": {
+     "year": 2024,
+     "project_id": "prj_0w8jrk4bVgJ3",
+     "project_name": "Musterstadt - Musterstraße 1 - Wohnung",
+     "income": [
+      {
+       "zeile": "13-15",
+       "label": "Mieteinnahmen für Wohnungen",
+       "amount": 0
+      },
+      {
+       "zeile": "20",
+       "label": "Umgelegte Nebenkosten (Vorauszahlungen)",
+       "amount": 0
+      },
+      {
+       "zeile": "26",
+       "label": "Sonstige Einnahmen",
+       "amount": 0
+      },
+      {
+       "zeile": "27",
+       "label": "Vereinnahmte Umsatzsteuer",
+       "amount": 0
+      }
+     ],
+     "expenses": [
+      {
+       "zeile": "33-35",
+       "label": "AfA auf Gebäude",
+       "amount": 0
+      },
+      {
+       "zeile": "42-45",
+       "label": "AfA auf bewegliche Wirtschaftsgüter",
+       "amount": 0
+      },
+      {
+       "zeile": "46-48",
+       "label": "Schuldzinsen, Geldbeschaffungskosten",
+       "amount": 0
+      },
+      {
+       "zeile": "55-72",
+       "label": "Erhaltungsaufwendungen",
+       "amount": 0
+      },
+      {
+       "zeile": "73-75",
+       "label": "Umgelegte Betriebskosten",
+       "amount": 0
+      },
+      {
+       "zeile": "76-78",
+       "label": "Nicht umgelegte Kosten",
+       "amount": 0
+      },
+      {
+       "zeile": "79",
+       "label": "Gezahlte Umsatzsteuer",
+       "amount": 0
+      },
+      {
+       "zeile": "80-82",
+       "label": "Sonstige Kosten",
+       "amount": 0
+      }
+     ],
+     "summary": {
+      "total_income": 0,
+      "total_expenses": 0,
+      "surplus": 0
+     },
+     "fifteen_percent_rule": null,
+     "self_occupancy_warning": null
+    },
+    "2025": {
+     "year": 2025,
+     "project_id": "prj_0w8jrk4bVgJ3",
+     "project_name": "Musterstadt - Musterstraße 1 - Wohnung",
+     "income": [
+      {
+       "zeile": "13-15",
+       "label": "Mieteinnahmen für Wohnungen",
+       "amount": 0
+      },
+      {
+       "zeile": "20",
+       "label": "Umgelegte Nebenkosten (Vorauszahlungen)",
+       "amount": 0
+      },
+      {
+       "zeile": "26",
+       "label": "Sonstige Einnahmen",
+       "amount": 0
+      },
+      {
+       "zeile": "27",
+       "label": "Vereinnahmte Umsatzsteuer",
+       "amount": 0
+      }
+     ],
+     "expenses": [
+      {
+       "zeile": "33-35",
+       "label": "AfA auf Gebäude",
+       "amount": 0
+      },
+      {
+       "zeile": "42-45",
+       "label": "AfA auf bewegliche Wirtschaftsgüter",
+       "amount": 0
+      },
+      {
+       "zeile": "46-48",
+       "label": "Schuldzinsen, Geldbeschaffungskosten",
+       "amount": 0
+      },
+      {
+       "zeile": "55-72",
+       "label": "Erhaltungsaufwendungen",
+       "amount": 0
+      },
+      {
+       "zeile": "73-75",
+       "label": "Umgelegte Betriebskosten",
+       "amount": 0
+      },
+      {
+       "zeile": "76-78",
+       "label": "Nicht umgelegte Kosten",
+       "amount": 0
+      },
+      {
+       "zeile": "79",
+       "label": "Gezahlte Umsatzsteuer",
+       "amount": 0
+      },
+      {
+       "zeile": "80-82",
+       "label": "Sonstige Kosten",
+       "amount": 0
+      }
+     ],
+     "summary": {
+      "total_income": 0,
+      "total_expenses": 0,
+      "surplus": 0
+     },
+     "fifteen_percent_rule": null,
+     "self_occupancy_warning": null
+    },
+    "2026": {
+     "year": 2026,
+     "project_id": "prj_0w8jrk4bVgJ3",
+     "project_name": "Musterstadt - Musterstraße 1 - Wohnung",
+     "income": [
+      {
+       "zeile": "13-15",
+       "label": "Mieteinnahmen für Wohnungen",
+       "amount": 5500
+      },
+      {
+       "zeile": "20",
+       "label": "Umgelegte Nebenkosten (Vorauszahlungen)",
+       "amount": 65
+      },
+      {
+       "zeile": "26",
+       "label": "Sonstige Einnahmen",
+       "amount": 0
+      },
+      {
+       "zeile": "27",
+       "label": "Vereinnahmte Umsatzsteuer",
+       "amount": 0
+      }
+     ],
+     "expenses": [
+      {
+       "zeile": "33-35",
+       "label": "AfA auf Gebäude",
+       "amount": 0
+      },
+      {
+       "zeile": "42-45",
+       "label": "AfA auf bewegliche Wirtschaftsgüter",
+       "amount": 0
+      },
+      {
+       "zeile": "46-48",
+       "label": "Schuldzinsen, Geldbeschaffungskosten",
+       "amount": 1797.75
+      },
+      {
+       "zeile": "55-72",
+       "label": "Erhaltungsaufwendungen",
+       "amount": 980
+      },
+      {
+       "zeile": "73-75",
+       "label": "Umgelegte Betriebskosten",
+       "amount": 0
+      },
+      {
+       "zeile": "76-78",
+       "label": "Nicht umgelegte Kosten",
+       "amount": 0
+      },
+      {
+       "zeile": "79",
+       "label": "Gezahlte Umsatzsteuer",
+       "amount": 0
+      },
+      {
+       "zeile": "80-82",
+       "label": "Sonstige Kosten",
+       "amount": 0
+      }
+     ],
+     "summary": {
+      "total_income": 5565,
+      "total_expenses": 2777.75,
+      "surplus": 2787.25
+     },
+     "fifteen_percent_rule": {
+      "limit": 27304.8,
+      "used_net": 823.53,
+      "remaining": 26481.27,
+      "percentage_used": 3,
+      "exceeded": false,
+      "borderline": false,
+      "window_end": "09.06.2029"
+     },
+     "self_occupancy_warning": null
+    }
+   },
+   "belege": [
+    {
+     "id": "rcp_2LsYMR3yrDr6",
+     "status": "booked",
+     "amount": 980,
+     "open_amount": 0,
+     "discount_amount": null,
+     "date": "2026-11-13",
+     "due_date": null,
+     "sender": null,
+     "invoice_number": null,
+     "description": null,
+     "direction": "expense",
+     "project": {
+      "id": "prj_0w8jrk4bVgJ3",
+      "name": "Musterstadt - Musterstraße 1 - Wohnung"
+     },
+     "file_name": "beleg.pdf",
+     "created_at": "2026-11-22T14:21:35+00:00",
+     "payments": [
+      {
+       "id": "txn_37oc0Z4d05qb",
+       "booking_date": "2026-11-13",
+       "value_date": "2026-11-13",
+       "amount": -980,
+       "counterparty_name": null,
+       "purpose": "Elektroarbeiten Unterverteilung",
+       "is_manual": true,
+       "bank_account": null
+      }
+     ]
+    }
+   ]
+  },
+  "2026-1041": {
+   "project_id": "prj_34f3ix17DflJ",
+   "steuer": {
+    "2024": {
+     "year": 2024,
+     "project_id": "prj_34f3ix17DflJ",
+     "project_name": "Musterstadt - Musterstraße 1041 - Mehrfamilienhaus",
+     "income": [
+      {
+       "zeile": "13-15",
+       "label": "Mieteinnahmen für Wohnungen",
+       "amount": 0
+      },
+      {
+       "zeile": "20",
+       "label": "Umgelegte Nebenkosten (Vorauszahlungen)",
+       "amount": 0
+      },
+      {
+       "zeile": "26",
+       "label": "Sonstige Einnahmen",
+       "amount": 0
+      },
+      {
+       "zeile": "27",
+       "label": "Vereinnahmte Umsatzsteuer",
+       "amount": 0
+      }
+     ],
+     "expenses": [
+      {
+       "zeile": "33-35",
+       "label": "AfA auf Gebäude",
+       "amount": 0
+      },
+      {
+       "zeile": "42-45",
+       "label": "AfA auf bewegliche Wirtschaftsgüter",
+       "amount": 0
+      },
+      {
+       "zeile": "46-48",
+       "label": "Schuldzinsen, Geldbeschaffungskosten",
+       "amount": 0
+      },
+      {
+       "zeile": "55-72",
+       "label": "Erhaltungsaufwendungen",
+       "amount": 0
+      },
+      {
+       "zeile": "73-75",
+       "label": "Umgelegte Betriebskosten",
+       "amount": 0
+      },
+      {
+       "zeile": "76-78",
+       "label": "Nicht umgelegte Kosten",
+       "amount": 0
+      },
+      {
+       "zeile": "79",
+       "label": "Gezahlte Umsatzsteuer",
+       "amount": 0
+      },
+      {
+       "zeile": "80-82",
+       "label": "Sonstige Kosten",
+       "amount": 0
+      }
+     ],
+     "summary": {
+      "total_income": 0,
+      "total_expenses": 0,
+      "surplus": 0
+     },
+     "fifteen_percent_rule": null,
+     "self_occupancy_warning": null
+    },
+    "2025": {
+     "year": 2025,
+     "project_id": "prj_34f3ix17DflJ",
+     "project_name": "Musterstadt - Musterstraße 1041 - Mehrfamilienhaus",
+     "income": [
+      {
+       "zeile": "13-15",
+       "label": "Mieteinnahmen für Wohnungen",
+       "amount": 39420
+      },
+      {
+       "zeile": "20",
+       "label": "Umgelegte Nebenkosten (Vorauszahlungen)",
+       "amount": 11712
+      },
+      {
+       "zeile": "26",
+       "label": "Sonstige Einnahmen",
+       "amount": 0
+      },
+      {
+       "zeile": "27",
+       "label": "Vereinnahmte Umsatzsteuer",
+       "amount": 0
+      }
+     ],
+     "expenses": [
+      {
+       "zeile": "33-35",
+       "label": "AfA auf Gebäude",
+       "amount": 0
+      },
+      {
+       "zeile": "42-45",
+       "label": "AfA auf bewegliche Wirtschaftsgüter",
+       "amount": 0
+      },
+      {
+       "zeile": "46-48",
+       "label": "Schuldzinsen, Geldbeschaffungskosten",
+       "amount": 18809.02
+      },
+      {
+       "zeile": "55-72",
+       "label": "Erhaltungsaufwendungen",
+       "amount": 0
+      },
+      {
+       "zeile": "73-75",
+       "label": "Umgelegte Betriebskosten",
+       "amount": 0
+      },
+      {
+       "zeile": "76-78",
+       "label": "Nicht umgelegte Kosten",
+       "amount": 0
+      },
+      {
+       "zeile": "79",
+       "label": "Gezahlte Umsatzsteuer",
+       "amount": 0
+      },
+      {
+       "zeile": "80-82",
+       "label": "Sonstige Kosten",
+       "amount": 0
+      }
+     ],
+     "summary": {
+      "total_income": 51132,
+      "total_expenses": 18809.02,
+      "surplus": 32322.98
+     },
+     "fifteen_percent_rule": {
+      "limit": 74405.58,
+      "used_net": 4000,
+      "remaining": 70405.58,
+      "percentage_used": 5.4,
+      "exceeded": false,
+      "borderline": false,
+      "window_end": "01.01.2028"
+     },
+     "self_occupancy_warning": null
+    },
+    "2026": {
+     "year": 2026,
+     "project_id": "prj_34f3ix17DflJ",
+     "project_name": "Musterstadt - Musterstraße 1041 - Mehrfamilienhaus",
+     "income": [
+      {
+       "zeile": "13-15",
+       "label": "Mieteinnahmen für Wohnungen",
+       "amount": 32850
+      },
+      {
+       "zeile": "20",
+       "label": "Umgelegte Nebenkosten (Vorauszahlungen)",
+       "amount": 9760
+      },
+      {
+       "zeile": "26",
+       "label": "Sonstige Einnahmen",
+       "amount": 0
+      },
+      {
+       "zeile": "27",
+       "label": "Vereinnahmte Umsatzsteuer",
+       "amount": 0
+      }
+     ],
+     "expenses": [
+      {
+       "zeile": "33-35",
+       "label": "AfA auf Gebäude",
+       "amount": 0
+      },
+      {
+       "zeile": "42-45",
+       "label": "AfA auf bewegliche Wirtschaftsgüter",
+       "amount": 0
+      },
+      {
+       "zeile": "46-48",
+       "label": "Schuldzinsen, Geldbeschaffungskosten",
+       "amount": 15524.77
+      },
+      {
+       "zeile": "55-72",
+       "label": "Erhaltungsaufwendungen",
+       "amount": 4760
+      },
+      {
+       "zeile": "73-75",
+       "label": "Umgelegte Betriebskosten",
+       "amount": 690.2
+      },
+      {
+       "zeile": "76-78",
+       "label": "Nicht umgelegte Kosten",
+       "amount": 0
+      },
+      {
+       "zeile": "79",
+       "label": "Gezahlte Umsatzsteuer",
+       "amount": 0
+      },
+      {
+       "zeile": "80-82",
+       "label": "Sonstige Kosten",
+       "amount": 535.5
+      }
+     ],
+     "summary": {
+      "total_income": 42610,
+      "total_expenses": 21510.47,
+      "surplus": 21099.53
+     },
+     "fifteen_percent_rule": {
+      "limit": 74405.58,
+      "used_net": 4000,
+      "remaining": 70405.58,
+      "percentage_used": 5.4,
+      "exceeded": false,
+      "borderline": false,
+      "window_end": "01.01.2028"
+     },
+     "self_occupancy_warning": null
+    }
+   },
+   "belege": [
+    {
+     "id": "rcp_4XQaxL4XQLML",
+     "status": "booked",
+     "amount": 690.2,
+     "open_amount": 0,
+     "discount_amount": null,
+     "date": "2026-11-11",
+     "due_date": null,
+     "sender": null,
+     "invoice_number": null,
+     "description": null,
+     "direction": "expense",
+     "project": {
+      "id": "prj_34f3ix17DflJ",
+      "name": "Musterstadt - Musterstraße 1041 - Mehrfamilienhaus"
+     },
+     "file_name": "beleg.pdf",
+     "created_at": "2026-11-22T14:22:05+00:00",
+     "payments": [
+      {
+       "id": "txn_0TCxyZ3kIrqM",
+       "booking_date": "2026-11-11",
+       "value_date": "2026-11-11",
+       "amount": -690.2,
+       "counterparty_name": null,
+       "purpose": "Gartenpflege Herbstschnitt",
+       "is_manual": true,
+       "bank_account": null
+      }
+     ]
+    },
+    {
+     "id": "rcp_0GMLvZ0d9RvH",
+     "status": "booked",
+     "amount": 4760,
+     "open_amount": 0,
+     "discount_amount": null,
+     "date": "2026-11-04",
+     "due_date": null,
+     "sender": null,
+     "invoice_number": null,
+     "description": null,
+     "direction": "expense",
+     "project": {
+      "id": "prj_34f3ix17DflJ",
+      "name": "Musterstadt - Musterstraße 1041 - Mehrfamilienhaus"
+     },
+     "file_name": "beleg.pdf",
+     "created_at": "2026-11-22T14:22:10+00:00",
+     "payments": [
+      {
+       "id": "txn_0lBxiH2NLRcw",
+       "booking_date": "2026-11-04",
+       "value_date": "2026-11-04",
+       "amount": -4760,
+       "counterparty_name": null,
+       "purpose": "Dachreparatur Sturmschaden",
+       "is_manual": true,
+       "bank_account": null
+      }
+     ]
+    },
+    {
+     "id": "rcp_0JHZ4z3yYkgZ",
+     "status": "booked",
+     "amount": 535.5,
+     "open_amount": 0,
+     "discount_amount": null,
+     "date": "2026-11-02",
+     "due_date": null,
+     "sender": null,
+     "invoice_number": null,
+     "description": null,
+     "direction": "expense",
+     "project": {
+      "id": "prj_34f3ix17DflJ",
+      "name": "Musterstadt - Musterstraße 1041 - Mehrfamilienhaus"
+     },
+     "file_name": "beleg.pdf",
+     "created_at": "2026-11-22T14:22:36+00:00",
+     "payments": [
+      {
+       "id": "txn_2aMvCs34K6Kg",
+       "booking_date": "2026-11-02",
+       "value_date": "2026-11-02",
+       "amount": -535.5,
+       "counterparty_name": null,
+       "purpose": "Verwaltervergütung Quartal",
+       "is_manual": true,
+       "bank_account": null
+      }
+     ]
+    }
+   ]
+  },
+  "2026-1053": {
+   "project_id": "prj_2VorIh2u3uhX",
+   "steuer": {
+    "2024": {
+     "year": 2024,
+     "project_id": "prj_2VorIh2u3uhX",
+     "project_name": "Musterstadt - Musterstraße 1053 - Mehrfamilienhaus",
+     "income": [
+      {
+       "zeile": "13-15",
+       "label": "Mieteinnahmen für Wohnungen",
+       "amount": 63132
+      },
+      {
+       "zeile": "20",
+       "label": "Umgelegte Nebenkosten (Vorauszahlungen)",
+       "amount": 17424
+      },
+      {
+       "zeile": "26",
+       "label": "Sonstige Einnahmen",
+       "amount": 0
+      },
+      {
+       "zeile": "27",
+       "label": "Vereinnahmte Umsatzsteuer",
+       "amount": 0
+      }
+     ],
+     "expenses": [
+      {
+       "zeile": "33-35",
+       "label": "AfA auf Gebäude",
+       "amount": 0
+      },
+      {
+       "zeile": "42-45",
+       "label": "AfA auf bewegliche Wirtschaftsgüter",
+       "amount": 0
+      },
+      {
+       "zeile": "46-48",
+       "label": "Schuldzinsen, Geldbeschaffungskosten",
+       "amount": 37405.84
+      },
+      {
+       "zeile": "55-72",
+       "label": "Erhaltungsaufwendungen",
+       "amount": 0
+      },
+      {
+       "zeile": "73-75",
+       "label": "Umgelegte Betriebskosten",
+       "amount": 0
+      },
+      {
+       "zeile": "76-78",
+       "label": "Nicht umgelegte Kosten",
+       "amount": 0
+      },
+      {
+       "zeile": "79",
+       "label": "Gezahlte Umsatzsteuer",
+       "amount": 0
+      },
+      {
+       "zeile": "80-82",
+       "label": "Sonstige Kosten",
+       "amount": 0
+      }
+     ],
+     "summary": {
+      "total_income": 80556,
+      "total_expenses": 37405.84,
+      "surplus": 43150.16
+     },
+     "fifteen_percent_rule": null,
+     "self_occupancy_warning": null
+    },
+    "2025": {
+     "year": 2025,
+     "project_id": "prj_2VorIh2u3uhX",
+     "project_name": "Musterstadt - Musterstraße 1053 - Mehrfamilienhaus",
+     "income": [
+      {
+       "zeile": "13-15",
+       "label": "Mieteinnahmen für Wohnungen",
+       "amount": 66000
+      },
+      {
+       "zeile": "20",
+       "label": "Umgelegte Nebenkosten (Vorauszahlungen)",
+       "amount": 18216
+      },
+      {
+       "zeile": "26",
+       "label": "Sonstige Einnahmen",
+       "amount": 0
+      },
+      {
+       "zeile": "27",
+       "label": "Vereinnahmte Umsatzsteuer",
+       "amount": 0
+      }
+     ],
+     "expenses": [
+      {
+       "zeile": "33-35",
+       "label": "AfA auf Gebäude",
+       "amount": 0
+      },
+      {
+       "zeile": "42-45",
+       "label": "AfA auf bewegliche Wirtschaftsgüter",
+       "amount": 0
+      },
+      {
+       "zeile": "46-48",
+       "label": "Schuldzinsen, Geldbeschaffungskosten",
+       "amount": 36933.47
+      },
+      {
+       "zeile": "55-72",
+       "label": "Erhaltungsaufwendungen",
+       "amount": 0
+      },
+      {
+       "zeile": "73-75",
+       "label": "Umgelegte Betriebskosten",
+       "amount": 0
+      },
+      {
+       "zeile": "76-78",
+       "label": "Nicht umgelegte Kosten",
+       "amount": 0
+      },
+      {
+       "zeile": "79",
+       "label": "Gezahlte Umsatzsteuer",
+       "amount": 0
+      },
+      {
+       "zeile": "80-82",
+       "label": "Sonstige Kosten",
+       "amount": 0
+      }
+     ],
+     "summary": {
+      "total_income": 84216,
+      "total_expenses": 36933.47,
+      "surplus": 47282.53
+     },
+     "fifteen_percent_rule": null,
+     "self_occupancy_warning": null
+    },
+    "2026": {
+     "year": 2026,
+     "project_id": "prj_2VorIh2u3uhX",
+     "project_name": "Musterstadt - Musterstraße 1053 - Mehrfamilienhaus",
+     "income": [
+      {
+       "zeile": "13-15",
+       "label": "Mieteinnahmen für Wohnungen",
+       "amount": 55043
+      },
+      {
+       "zeile": "20",
+       "label": "Umgelegte Nebenkosten (Vorauszahlungen)",
+       "amount": 15180
+      },
+      {
+       "zeile": "26",
+       "label": "Sonstige Einnahmen",
+       "amount": 0
+      },
+      {
+       "zeile": "27",
+       "label": "Vereinnahmte Umsatzsteuer",
+       "amount": 0
+      }
+     ],
+     "expenses": [
+      {
+       "zeile": "33-35",
+       "label": "AfA auf Gebäude",
+       "amount": 0
+      },
+      {
+       "zeile": "42-45",
+       "label": "AfA auf bewegliche Wirtschaftsgüter",
+       "amount": 0
+      },
+      {
+       "zeile": "46-48",
+       "label": "Schuldzinsen, Geldbeschaffungskosten",
+       "amount": 30403.2
+      },
+      {
+       "zeile": "55-72",
+       "label": "Erhaltungsaufwendungen",
+       "amount": 2380
+      },
+      {
+       "zeile": "73-75",
+       "label": "Umgelegte Betriebskosten",
+       "amount": 311.99
+      },
+      {
+       "zeile": "76-78",
+       "label": "Nicht umgelegte Kosten",
+       "amount": 0
+      },
+      {
+       "zeile": "79",
+       "label": "Gezahlte Umsatzsteuer",
+       "amount": 0
+      },
+      {
+       "zeile": "80-82",
+       "label": "Sonstige Kosten",
+       "amount": 0
+      }
+     ],
+     "summary": {
+      "total_income": 70223,
+      "total_expenses": 33095.19,
+      "surplus": 37127.81
+     },
+     "fifteen_percent_rule": null,
+     "self_occupancy_warning": null
+    }
+   },
+   "belege": [
+    {
+     "id": "rcp_1aw6mV2Y2Ou2",
+     "status": "booked",
+     "amount": 2380,
+     "open_amount": 0,
+     "discount_amount": null,
+     "date": "2026-11-09",
+     "due_date": null,
+     "sender": null,
+     "invoice_number": null,
+     "description": null,
+     "direction": "expense",
+     "project": {
+      "id": "prj_2VorIh2u3uhX",
+      "name": "Musterstadt - Musterstraße 1053 - Mehrfamilienhaus"
+     },
+     "file_name": "beleg.pdf",
+     "created_at": "2026-11-22T14:21:11+00:00",
+     "payments": [
+      {
+       "id": "txn_1WOApX2yFwCA",
+       "booking_date": "2026-11-09",
+       "value_date": "2026-11-09",
+       "amount": -2380,
+       "counterparty_name": null,
+       "purpose": "Austausch Mischbatterie und Eckventile",
+       "is_manual": true,
+       "bank_account": null
+      }
+     ]
+    },
+    {
+     "id": "rcp_4dZcgr2u1qow",
+     "status": "booked",
+     "amount": 311.99,
+     "open_amount": 0,
+     "discount_amount": null,
+     "date": "2026-11-05",
+     "due_date": null,
+     "sender": null,
+     "invoice_number": null,
+     "description": null,
+     "direction": "expense",
+     "project": {
+      "id": "prj_2VorIh2u3uhX",
+      "name": "Musterstadt - Musterstraße 1053 - Mehrfamilienhaus"
+     },
+     "file_name": "beleg.pdf",
+     "created_at": "2026-11-22T14:21:02+00:00",
+     "payments": [
+      {
+       "id": "txn_27hyza04Dzcz",
+       "booking_date": "2026-11-05",
+       "value_date": "2026-11-05",
+       "amount": -311.99,
+       "counterparty_name": null,
+       "purpose": "Feuerstättenschau Abgasmessung",
+       "is_manual": true,
+       "bank_account": null
+      }
+     ]
+    }
+   ]
+  }
+ }
+}

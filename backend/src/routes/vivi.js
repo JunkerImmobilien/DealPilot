@@ -15,6 +15,8 @@
  *   GET    /objekt/:id/werte            zuletzt gelesene ViVi-Werte (schickt nichts an ViVi)
  *   POST   /objekt/:id/abrufen          „Jetzt abgleichen": nur GET bei ViVi
  *   DELETE /objekt/:id/verknuepfung     Verknuepfung in DealPilot loesen, ViVi bleibt unberuehrt
+ *   GET    /steuer-einstellung          v4020 · Steuerjahre aus ViVi: { einstellung: {modus, kategorien}, kategorien: [...] }
+ *   PUT    /steuer-einstellung          v4020 · { modus: aus|vorschlag|automatisch, kategorien: {id: bool} } (user_settings 'vivi_steuer')
  *
  * Die Methoden hier sind die von DealPilot. An ViVi geht nur, was services/vivi/viviClient.js erlaubt:
  * GET und POST an die Anlege-Pfade. tools/vivi-pruefen.mjs prueft das.
@@ -88,6 +90,14 @@ router.get('/objekt/:id/werte', function (req, res, next) {
 router.post('/objekt/:id/abrufen', bremse, function (req, res, next) {
   const id = oid(req, res); if (!id) return;
   dienst.abrufen(uid(req), id).then(function () { return dienst.werte(uid(req), id); }).then(function (r) { res.json(r); }).catch(antwort(res, next));
+});
+/* v4020 · Paket V4: Einstellung „Steuerjahre aus ViVi“ (Einstellungen › Konto › Externe Anbieter › ViVi) */
+router.get('/steuer-einstellung', function (req, res, next) {
+  const st = require('../services/vivi/viviSteuer');
+  dienst.steuerEinstellung(uid(req)).then(function (e) { res.set('Cache-Control', 'no-store'); res.json({ einstellung: e, kategorien: st.KATEGORIEN }); }).catch(antwort(res, next));
+});
+router.put('/steuer-einstellung', function (req, res, next) {
+  dienst.steuerEinstellungSpeichern(uid(req), req.body || null).then(function (e) { res.json({ einstellung: e }); }).catch(antwort(res, next));
 });
 router.delete('/objekt/:id/verknuepfung', function (req, res, next) {
   const id = oid(req, res); if (!id) return;
