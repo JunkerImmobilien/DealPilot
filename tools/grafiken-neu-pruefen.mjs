@@ -15,7 +15,10 @@
      F  Hebel: Basis = IRR des Basisfalls, jede Spanne enthält die Basis, im Bestand kein Kaufpreis-Hebel
      G  Heatmap: Basiszelle = Szenario mit dem App-Zins, höherer Zins nie besser, Miete +x nie schlechter
      H  Monte-Carlo: P10 ≤ Mitte ≤ P90 je Jahr, fester Startwert (zweimal gleich)
-     X  Gegenprobe: eine um 5 € verfälschte Rechnung muss A rot machen
+     I  v4250 Theme: Farben sind var(--gx-*), Heatmap mischt per color-mix (kein NaN), Mieteuro je 100 € Miete geht auf
+     J  v4250 Reiter Bewertung (grafiken-bewertung.js): Vermögenszuwachs = Summe der vier Quellen wie calc.js (_vz),
+        Vermögensaufbau: Wert Ende Jahr = Startwert × (1 + Wertsteigerung)^Jahre, Eigenkapital = Wert − Restschuld
+     X  Gegenprobe: eine um 5 € verfälschte Rechnung muss A rot machen, ein verfälschter Zuwachs muss J rot machen
 
    RC 0 = alles grün.
    ═══════════════════════════════════════════════════════════════════════════ */
@@ -141,12 +144,45 @@ const mc1 = M.monteCarlo(P, 300), mc2 = M.monteCarlo(P, 300);
 pruefe('H P10 ≤ Mitte ≤ P90 je Jahr', mc1.p10.every((v, i) => v <= mc1.p50[i] && mc1.p50[i] <= mc1.p90[i]));
 pruefe('H fester Startwert: zweimal gleich', JSON.stringify(mc1.p50) === JSON.stringify(mc2.p50));
 
+/* I · v4250 Theme und Mieteuro */
+const Fb = C.DpGrafiken.farben;
+pruefe('I Farben hängen an Theme-Variablen', /^var\(--gx-/.test(Fb.tinte) && /^var\(--gx-/.test(Fb.karte) && Fb.gruen === '#3FA56C', Fb.tinte);
+const hHost = { clientWidth: 600, innerHTML: '', classList: { contains: () => false, add() {} }, closest: () => null, appendChild() {}, addEventListener() {}, querySelector: () => null };
+C.DpGrafiken.heatmap(hHost, { spalten: [3, 4, 5], zeilen: [-10, 0, 10], werte: [[-50, -80, -120], [20, -10, -40], [90, 60, 30]], basis: { z: 1, s: 1 } }, { breite: 600 });
+pruefe('I Heatmap: color-mix, kein NaN', /color-mix\(in srgb,#3FA56C \d+%,var\(--gx-flaeche\)\)/.test(hHost.innerHTML) && !/NaN|undefined/.test(hHost.innerHTML));
+const je100 = D.aus.filter(a => a.v > 0.5).reduce((s, a) => s + a.v / r26.nkm * 100, 0), ein100 = D.ein.filter(a => a.v > 0.5).reduce((s, a) => s + a.v / r26.nkm * 100, 0);
+pruefe('I Mieteuro je 100 € Miete: Wohin = Woher', Math.abs(je100 - ein100) < 0.1, je100.toFixed(1) + ' = ' + ein100.toFixed(1));
+
+/* J · v4250 Reiter Bewertung: Vermögensaufbau und Vermögenszuwachs */
+const BEW = fs.readFileSync(path.join(WURZEL, 'frontend/js/grafiken-bewertung.js'), 'utf8');
+function bewertung(vz, opt) {
+  opt = opt || {};
+  const doc = { readyState: 'complete', addEventListener() {}, getElementById: () => null, querySelectorAll: () => [], documentElement: { getAttribute: () => null }, head: { appendChild() {} }, createElement: () => ({}), body: { classList: { add() {} } } };
+  const R = cfRows.map((r, i) => Object.assign({}, r, { wert_y: i === 0 ? 145000 : r.wert_y, cal: 2024 + i }));
+  const win = { State: { cfRows: R, wstg: opt.wstg != null ? opt.wstg : 0.015, bindj: 10, kpis: { ek: 35000, d1: 125000 }, _vz: vz }, matchMedia: () => ({ matches: true }), addEventListener() {}, document: doc };
+  win.window = win;
+  const ctx = vm.createContext(Object.assign(win, { document: doc, Intl, Math, Date: FesteZeit, console, setTimeout, clearTimeout }));
+  vm.runInContext(BEW, ctx, { filename: 'grafiken-bewertung.js' });
+  return ctx;
+}
+const vzB = { tilg_durch_einnahmen: 38000, bspar_durch_einnahmen: 2381.12, tilg_eigenanteil: 1500, cf_ueberschuss_konto: 6540.4, tax_kum: 4409.77, steuervorteil: 0, wertsteig_kum: 36283.65 };
+vzB.verm_zuwachs = vzB.tilg_durch_einnahmen + vzB.bspar_durch_einnahmen + vzB.cf_ueberschuss_konto + (-vzB.tax_kum) + vzB.wertsteig_kum;   /* wie calc.js verm_zuwachs_v88 */
+const GB = bewertung(vzB).DpGrafikenBewertung, ZT = GB._zuwachsTeile();
+pruefe('J Zuwachs: Summe der vier Quellen = Vermögenszuwachs der App', ZT && Math.abs(ZT.summe - vzB.verm_zuwachs) < 0.01, ZT ? Math.round(ZT.summe) + ' = ' + Math.round(vzB.verm_zuwachs) : 'null');
+pruefe('J Zuwachs: gezahlte Steuer mindert', ZT && ZT.T[2].v < 0 && ZT.T[2].u === 'gezahlt');
+pruefe('J Zuwachs-Karte meldet „Prüfung: die Summe entspricht“', /Summe entspricht dem Vermögenszuwachs der App/.test(GB._zuwachsHtml()));
+const VD = GB._vermDaten(), zl = VD.Z[VD.n - 1];
+pruefe('J Aufbau: Wert am Ende = Startwert × 1,015^Jahre', Math.abs(zl.wert - 145000 * Math.pow(1.015, VD.n)) < 0.01, Math.round(zl.wert) + ' €, ' + VD.n + ' Jahre');
+pruefe('J Aufbau: Eigenkapital = Wert − Restschuld je Jahr', VD.Z.every(z => Math.abs(z.ek - (z.wert - z.rs)) < 1e-6) && Math.abs(zl.rs - cfRows[cfRows.length - 1].rs) < 0.01);
+
 /* X Gegenprobe */
 const orig = M.rechne;
 M.rechne = function () { const z = orig.apply(this, arguments); z.rows.forEach(r => { if (r.j === 2030) r.cfns += 5; }); return z; };
 const devX = basisGleich(M, P);
 M.rechne = orig;
 pruefe('X Gegenprobe: 5 € Fehler macht A rot', devX >= 4.9, 'Abweichung ' + devX.toFixed(1) + ' €');
+const vzX = Object.assign({}, vzB, { verm_zuwachs: vzB.verm_zuwachs + 50 });
+pruefe('X Gegenprobe: verfälschter Zuwachs meldet Abweichung', /Abweichung zur App/.test(bewertung(vzX).DpGrafikenBewertung._zuwachsHtml()));
 
 gruen.forEach(t => console.log('  ok   ' + t));
 fehler.forEach(t => console.log('  ROT  ' + t));

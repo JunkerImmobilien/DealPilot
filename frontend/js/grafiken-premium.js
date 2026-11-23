@@ -80,7 +80,7 @@
     var s = document.createElement('style'); s.id = 'dp-gx-stil';
     s.textContent = [
       /* v4250 · Theme: hell Standard, dunkel per html[data-gx-stil=dunkel] (Einstellungen › Anzeige-Optionen › Grafiken) */
-      '.dp-gx,.dp-pa-wrap .dp-gn.dp-gn-karte{--gx-bg:var(--surface,#FFFFFF);--gx-karte:var(--surface,#FFFFFF);--gx-tinte:#1B1815;--gx-tinte2:#5F5850;--gx-tinte3:#8A8276;--gx-linie:#EFE8DA;--gx-linie2:#E2D8C4;--gx-flaeche:#F6F1E6;--gx-neutral:#A39A8C;--gx-kontrast:#2A2727;--gx-rand:color-mix(in srgb,#2A2727 12%,transparent);--gx-schatten:0 1px 2px rgba(5,5,5,.04);--gx-tip-bg:#050505;--gx-tip-fg:#FDFCFA}',
+      '.dp-gx,.dp-pa-wrap .dp-gn.dp-gn-karte{--gx-bg:var(--surface,#FFFFFF);--gx-karte:var(--surface,#FFFFFF);--gx-tinte:#1B1815;--gx-tinte2:#5F5850;--gx-tinte3:#8A8276;--gx-linie:#EFE8DA;--gx-linie2:#E2D8C4;--gx-flaeche:#F6F1E6;--gx-neutral:#6F685C;--gx-kontrast:#2A2727;--gx-rand:color-mix(in srgb,#2A2727 12%,transparent);--gx-schatten:0 1px 2px rgba(5,5,5,.04);--gx-tip-bg:#050505;--gx-tip-fg:#FDFCFA}',
       'html[data-gx-stil="dunkel"] .dp-gx,html[data-gx-stil="dunkel"] .dp-pa-wrap .dp-gn.dp-gn-karte{--gx-bg:linear-gradient(180deg,#16140F,#0E0D0B);--gx-karte:#0E0D0B;--gx-tinte:#E9E3D6;--gx-tinte2:#B9B2A3;--gx-tinte3:#8A8374;--gx-linie:#26231E;--gx-linie2:#3A352D;--gx-flaeche:#1B1915;--gx-neutral:#6F685C;--gx-kontrast:#E9E3D6;--gx-rand:#26231E;--gx-schatten:0 1px 0 rgba(255,255,255,.03) inset,0 10px 30px rgba(5,5,5,.18);--gx-tip-bg:#F3EEE4;--gx-tip-fg:#0B0A09}',
       /* Premium-Karte: Obsidian, Creme-Schrift, Gold als Akzent. Gilt auch für die Karten aus v4140 in der Pilot-Analyse. */
       '.dp-pa-wrap .dp-gn.dp-gn-karte,.dp-pa-wrap .dp-gn.dp-gx,.dp-gx-frei.dp-gx,.dp-pa-wrap[data-dp-pa-v4] .dp-pa-content .dp-gn.dp-gn-karte,.dp-pa-wrap[data-dp-pa-v4] .dp-pa-content .dp-gn.dp-gx{background:var(--gx-bg)!important;color:' + F.tinte + '!important;border:1px solid var(--gx-rand)!important;border-radius:14px!important;padding:18px 20px 16px!important;box-shadow:var(--gx-schatten)!important;--gn-card:' + F.karte + ';--gn-grau:color-mix(in srgb,' + F.tinte + ' 28%,transparent);--gn-netz:color-mix(in srgb,' + F.tinte + ' 9%,transparent);--gn-tinte:' + F.tinte + ';--gn-leise:' + F.tinte2 + ';--gn-rot:' + F.rot + '}',
@@ -654,7 +654,7 @@
     var bahn = function (L) {
       return '<div class="gx-mb-bahn">' + L.map(function (a, q) {
         var pr = a.v / sum * 100, je100 = nkm > 0 ? Math.round(a.v / nkm * 100) : null;
-        return '<div class="gx-mb-seg gx-wx" style="width:' + pr.toFixed(2) + '%;background:' + a.f + ';animation-delay:' + (q * 80) + 'ms"' + tipA('<div class="t">' + esc(a.n) + '</div><b>' + eur(a.v) + '</b> im Jahr' + (je100 != null ? '<br>' + je100 + ' € je 100 € Miete' : '')) + '>'
+        return '<div class="gx-mb-seg gx-wx" style="width:' + pr.toFixed(2) + '%;background:' + a.f + ';color:' + (a.f === F.gold2 ? '#1B1815' : '#FDFCFA') + ';animation-delay:' + (q * 80) + 'ms"' + tipA('<div class="t">' + esc(a.n) + '</div><b>' + eur(a.v) + '</b> im Jahr' + (je100 != null ? '<br>' + je100 + ' € je 100 € Miete' : '')) + '>'
           + (pr >= 14 ? '<span>' + esc(a.n) + '</span><b>' + eur(a.v) + '</b>' : '') + '</div>';
       }).join('') + '</div>';
     };
