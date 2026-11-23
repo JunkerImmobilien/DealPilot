@@ -112,6 +112,8 @@
       '.dp-gn-filter label{display:flex;align-items:center;gap:6px;color:var(--gn-leise)}',
       '.dp-gn-filter select,.dp-gn-filter input[type=range]{font:500 12px Inter,sans-serif;color:inherit;background:transparent;border:1px solid var(--gn-netz);border-radius:8px;padding:5px 8px;max-width:190px}',
       '.dp-gn-filter select option{color:#050505}',
+      '.dp-gn-cp .dp-gn-filter select{font-size:12.5px!important;height:auto!important;min-height:0!important;padding:5px 8px!important;width:auto!important;line-height:1.3!important}',
+      '@media (max-width:640px){.dp-gn-filter{width:100%}.dp-gn-filter label{flex:1 1 140px}.dp-gn-cp .dp-gn-filter select{max-width:none;flex:1}}',
       '.dp-gn-filter input[type=range]{padding:0;accent-color:var(--gn-gold);width:120px}',
       '.dp-gn-seg{display:inline-flex;border:1px solid var(--gn-netz);border-radius:8px;overflow:hidden}',
       '.dp-gn-seg button{font:600 11.5px Inter,sans-serif;color:inherit;background:transparent;border:0;padding:6px 10px;cursor:pointer}',
@@ -252,7 +254,7 @@
 
   /* Wasserfall (senkrecht): schritte [{name, wert, art:'start'|'delta'|'summe'}] */
   function wasserfall(o) {
-    var W = o.breite, H = o.hoehe || 240, L = 54, R = 8, T = 18, B = 34;
+    var W = o.breite, H = o.hoehe || 240, L = 54, R = W < 460 ? 22 : 8, T = 18, B = 34;
     var S = o.schritte, n = S.length, stand = 0, zeilen = [];
     S.forEach(function (s) {
       if (s.art === 'start') { zeilen.push({ a: 0, b: s.wert, s: s }); stand = s.wert; }
