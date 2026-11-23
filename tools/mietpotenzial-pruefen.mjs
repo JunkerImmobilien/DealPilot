@@ -913,5 +913,62 @@ async function bremseLauf(feld, mfh) {
   wahr('O21 Mietrecht je Wohnung: begrenzt mit Eintrag 9,50', mr && mr.gekappt && mr.ein === 9.5);
 }
 
-console.log('mietpotenzial-pruefen (v3075, v3244, v3246, v3250, v3255, v3266, v3286, v3312): ' + (n - fehler) + ' von ' + n + ' ok');
+{
+  /* v4060 · KETTENPROBE „maximale Miete“: EINE Stelle (js/miete-max.js, DpMieteMax), alle Anzeigen lesen daraus.
+     Marcel 23.11.2026: „Heute steht in jedem Reiter etwas anderes.“ Gemessen an der Demostraße 5 (ETW 68 m², 620 €,
+     Vergleichsmiete bis 7,40 €/m², keine Mietpreisbremse): der Reiter Miete zeigte 9,12 / 8,88 / 620 € und „mehr bei
+     Neuvermietung“ zugleich. Hier laufen die ECHTEN Dateien (Kern, potenzial.js, miete-max.js, miete-demo.js,
+     vivi-mieterhoehung.js) in einem Fenster und müssen dieselbe Zahl liefern. */
+  async function maxLauf(feld, mfh, ags) {
+    const c = fenster();
+    const E = {};
+    for (const [k, v] of Object.entries(feld)) E[k] = { id: k, value: v, addEventListener() {}, dispatchEvent() {}, closest() { return null; } };
+    c.document.getElementById = (id) => E[id] || null;
+    c.document.activeElement = null;
+    c._dpPotenzial = { ags: ags || '05758012', plz: feld.plz || '32052' };
+    if (mfh) { c._dpMfh = { einheiten: mfh, gebaeude: {} }; c.DpMfhEinheiten = { artMitEinheiten: () => true, maxPunkte: () => 2 }; }
+    lade(c, JS('mietpotenzial-kern.js')); lade(c, JS('miete-regel.js')); lade(c, JS('potenzial.js'));
+    await c.DpPotenzial.kappungLaden();
+    lade(c, JS('miete-max.js')); lade(c, JS('miete-demo.js')); lade(c, JS('vivi-mieterhoehung.js'));
+    return c;
+  }
+  const eurZ = (x) => Math.round(x * 100) / 100;
+
+  /* K1 · Demostraße: über der Vergleichsmiete, Neuvermietung (120 %) unter heute */
+  const c1 = await maxLauf({ plz: '32052', wfl: '68', nkm: '620', zb_vgl_qm: '7,40' }, null, '05758012');
+  const M1 = c1.DpMieteMax.einheit(null);
+  gleich('K1 Demostraße: heute, Vergleichsmiete, Bestand, Neuvermietung, Maximum',
+    [M1.heute, M1.vgl.qm, M1.bestand.mehr, M1.neu && M1.neu.qm, M1.neu && M1.neu.mehr, M1.max],
+    [620, 7.4, false, 8.88, false, 620]);
+  wahr('K1 ein Satz: über der Vergleichsmiete, keine Erhöhung, auch Neuvermietung nicht mehr',
+    /bereits über der ortsüblichen Vergleichsmiete \(bis 7,40 €\/m²\)/.test(M1.satz) && /nicht möglich/.test(M1.satz) && /Auch bei Neuvermietung nicht mehr/.test(M1.satz) && !/–|;/.test(M1.satz));
+  const D1 = c1.DpMieteDemo.daten();
+  gleich('K2 Reiter Miete liest dieselben Zahlen (soll, Neuvermietung, Spielraum-Wort)',
+    [D1.W[0].soll, D1.W[0].neuM, D1.W[0].neuMehr, D1.W[0].st, D1.W[0].satz], [M1.bestand.monat, M1.neu.monat, false, 'ueb', M1.satz]);
+  gleich('K3 ViVi-Knopf: kein Spielraum, wie die zentrale Stelle', c1.DpViviMieterhoehung.spielraum(null), M1.bestand.mehr);
+
+  /* K4 · Haus mit drei Wohnungen: unter der Vergleichsmiete (Potenzial), darüber, leer */
+  const EIN = [
+    { nr: '1', wfl: '60', ist: '420', status: 'vermietet', lage: 'EG' },
+    { nr: '2', wfl: '50', ist: '450', status: 'vermietet', lage: 'OG' },
+    { nr: '3', wfl: '70', ist: '', status: 'leer', lage: 'DG' }
+  ];
+  const c2 = await maxLauf({ plz: '32052', zb_vgl_qm: '8,00' }, EIN, '05758012');
+  const A2 = c2.DpMieteMax.alle();
+  const D2 = c2.DpMieteDemo.daten();
+  gleich('K4 Haus: je Wohnung Bestand mehr / Neuvermietung mehr / leer', A2.W.map((x) => [x.bestand.mehr, !!(x.neu && x.neu.mehr), x.leer]),
+    [[true, true, false], [false, true, false], [false, true, true]]);
+  gleich('K5 Haus: Reiter Miete = zentrale Stelle, Wohnung für Wohnung (soll, Neuvermietung, Satz)',
+    D2.W.map((x) => [eurZ(x.soll), eurZ(x.neuM), x.satz]), A2.W.map((x) => [eurZ(x.bestand.monat), eurZ(x.neu ? x.neu.monat : 0), x.satz]));
+  gleich('K6 Haus: ViVi-Knopf je Wohnung = Bestand mit Spielraum', A2.W.map((x) => c2.DpViviMieterhoehung.spielraum(x.i)), A2.W.map((x) => !x.leer && x.bestand.mehr));
+  wahr('K7 Wohnung 1: Kappung 20 % (420 → 504), Satz nennt die Erhöhung', eurZ(A2.W[0].bestand.monat) === 480 || eurZ(A2.W[0].bestand.monat) === 504 ? /Mieterhöhung auf/.test(A2.W[0].satz) : false);
+  wahr('K8 Leer: Satz nennt die Neuvermietung mit Regel', /^Leer\. Bei Neuvermietung bis/.test(A2.W[2].satz));
+
+  /* K9 · alle Anzeigen lesen nur aus DpMieteMax (Quelltext) */
+  const md = fs.readFileSync(JS('miete-demo.js'), 'utf8'), vmh = fs.readFileSync(JS('vivi-mieterhoehung.js'), 'utf8'), kim = fs.readFileSync(JS('ki-miete.js'), 'utf8'), ix = fs.readFileSync(path.join(path.dirname(JS('x')), '..', 'index.html'), 'utf8');
+  wahr('K9 Reiter Miete, ViVi-Knopf und Mietpreis-Analyse lesen DpMieteMax; keine eigene 120-%-Rechnung mehr im Reiter Miete',
+    /DpMieteMax\.alle\(\)/.test(md) && !/vgl \* fo/.test(md) && /M\.einheit\(/.test(vmh) && /DpMieteMax\.alle\(\)/.test(kim) && /DpMieteMax\.wieHtml\(\)/.test(kim) && /js\/miete-max\.js\?v=/.test(ix) && ix.indexOf('js/miete-max.js') < ix.indexOf('js/miete-demo.js'));
+}
+
+console.log('mietpotenzial-pruefen (v3075, v3244, v3246, v3250, v3255, v3266, v3286, v3312, v4060): ' + (n - fehler) + ' von ' + n + ' ok');
 process.exit(fehler ? 1 : 0);

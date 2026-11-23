@@ -81,6 +81,12 @@
      zulässige Miete (§ 558), die nächste Indexanpassung oder die nächste Staffel ÜBER der heutigen Miete sieht. vergleich =
      Miete laut ViVi, wenn bekannt: dann muss das Mögliche auch darüber liegen. einheit = Index der Wohnung, null = Objekt. */
   function spielraum(einheit, vergleich) {
+    /* v4060 · EINE Stelle für die maximale Miete (js/miete-max.js): Spielraum im laufenden Vertrag = Bestand (§ 558, Staffel, Index) über heute */
+    var M = global.DpMieteMax;
+    if (M && M.einheit) {
+      var e = null; try { e = M.einheit(einheit == null || einheit === 'objekt' ? null : einheit); } catch (x0) { e = null; }
+      if (e) return !e.leer && e.bestand.mehr && e.bestand.monat > Math.max(e.heute || 0, zahl(vergleich) || 0) + 0.5;
+    }
     var W = wohnungen(), x = null;
     W.liste.forEach(function (w) { if (einheit == null || einheit === 'objekt' ? !x : String(w.i) === String(einheit)) x = x || w; });
     if (!x) return false;

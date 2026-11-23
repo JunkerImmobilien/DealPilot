@@ -17558,6 +17558,18 @@ html body.hdr-collapsed .tabs-workflow-bar {
 #ki-miete-box .kmu-start-satz { flex: 1 1 100%; min-width: 0; font-size: 12px; line-height: 1.45; color: var(--muted, #7A7370); }
 #ki-miete-box .kmu-start-satz[hidden] { display: none; }
 #ki-miete-box .kmu-start > .dp-rnd-info { margin-left: 0; width: 18px; height: 18px; font-size: 11px; }
+/* v4060 · Marcel 23.11.2026: eine schlanke Zeile. Titel links, rechts „Mietpreis recherchieren“, das i (nur mit
+   eingeschalteten Tooltips) und „einklappen“ (erst wenn eine Analyse im Kasten steht). Ohne Analyse kein Text darunter. */
+#ki-miete-box .ki-lage-header > .kmu-start { grid-column: 2; grid-row: 1; flex-wrap: nowrap; justify-content: flex-end; gap: 8px; }
+#ki-miete-box .kmu-start > .kmu-klapp { margin-left: 0 !important; }
+#ki-miete-box:not(.kmu-hat) .kmu-klapp { display: none !important; }
+#ki-miete-box:not(.kmu-hat) #ki-miete-body { display: none !important; }
+#ki-miete-box:not(.kmu-hat) .ki-lage-header { margin-bottom: 0; }
+body.dp-tt-off #ki-miete-box .kmu-info { display: none !important; }
+@media (max-width: 640px) {
+  #ki-miete-box .ki-lage-header > .kmu-start { grid-column: 1 / -1; grid-row: 2; justify-content: flex-start; }
+  #ki-miete-box .ki-lage-title > .ki-lage-tag { display: none; }
+}
 @media (max-width: 640px) {
   #ki-miete-box .kmu-start > #ki-miete-btn { flex: 1 1 auto; justify-content: center; }
 }

@@ -40,7 +40,7 @@
      Seite unsichtbar; layout-varianten.js nimmt die Marke nach setze() ab, spätestens nach 3 s fällt sie von selbst. -->
 <style>html[data-dpl-vorab] body{visibility:hidden}</style>
 <script>(function(){try{if(/[?&]layout=aus(&|$)/.test(location.search))return;var h=document.documentElement;h.setAttribute('data-dpl-vorab','1');setTimeout(function(){h.removeAttribute('data-dpl-vorab');},3000);}catch(e){}})();</script>
-<link rel="stylesheet" href="css/style.css?v=v4043">
+<link rel="stylesheet" href="css/style.css?v=v4060">
 <link rel="stylesheet" href="css/avsec-streifen.css?v=v2780b"><!-- v1148-spalt-1025px -->
 <link rel="stylesheet" href="css/avsec-karte-neu.css?v=v2780a"><!-- v2760/v2780a · Kartenfassung unter 940 px Kartenbreite -->
 <script src="js/einbettung.js?v=v2998a"></script><!-- v2998 · Anmeldekarte eingebettet in die Landingpage (nur im iframe mit ?einbettung=1) -->
@@ -2051,7 +2051,7 @@ label.dp-required.qc-required::after {
       <div class="card" id="mv-objekt-karte" style="margin-bottom:14px">
         <div class="ct ct-pro"><span class="ct-ico"><svg width="22" height="22"><use href="#i-doc"/></svg></span>Mietvertrag
           <span class="oe-ct-hint" id="mv-objekt-hinweis">für dieses Objekt</span></div>
-        <div class="f"><label title="Die Vertragsform bestimmt, ob und wann erhöht werden darf. Staffel- und Indexmiete tragen ihren nächsten Termin schon im Vertrag. Sie sind kein Potenzial, sondern ein Datum.">Vertragsart</label>
+        <div class="f"><label>Vertragsart <button type="button" class="dp-tip" data-tip-id="tab3.mv_art" tabindex="-1" aria-label="Hilfe zur Vertragsart"></button></label>
           <div class="iw"><select id="mv_art"><option value="">– keine Angabe –</option></select></div></div>
         <div class="f"><label title="Seit wann das Mietverhältnis besteht. Bei Staffelmiete die Grundlage für die Stufen, bei Indexmiete für die Zwölfmonatsfrist.">Mietverhältnis seit</label>
           <div class="iw"><input id="mv_beginn" type="date"></div></div>
@@ -2060,13 +2060,14 @@ label.dp-required.qc-required::after {
         <!-- v2545 · Hoehe der letzten Erhoehung: die Kappungsgrenze gilt auf die Miete drei Jahre vorher (§ 558 Abs. 3 BGB) -->
         <div class="f"><label title="Um wie viel Euro im Monat die Miete bei der letzten Erhöhung gestiegen ist (bei mehreren in den letzten drei Jahren: die Summe, ohne Modernisierungsumlage und Betriebskosten). Die Kappungsgrenze gilt auf die Miete vor drei Jahren. Ohne diese Angabe rechnet DealPilot den Spielraum zu groß.">Letzte Erhöhung um</label>
           <div class="iw"><span class="pfx">€</span><input id="mv_letzte_erhoehung_betrag" type="text" inputmode="decimal" placeholder="€/Monat" class="trl"></div></div>
-        <!-- v2660 · E2 · Restlaufzeit einer Mietabweichung am Einzelobjekt (ETW, EFH ohne Wohnungsliste) - dieselben Namen wie je Wohnung im MFH -->
-        <div class="f"><label title="Ist der Mietvertrag befristet, endet eine Abweichung der Miete vom Markt spätestens dann. Liegt die Ist-Miete mehr als 20 % über der marktüblichen Miete, rechnet der Ertragswert den Mehrertrag nur bis zu diesem Datum als besonderes Merkmal. Ohne Datum nur als Szenario.">Befristet bis</label>
+        <details class="mv-weitere"><summary>Weitere Angaben: Befristung, Kündigungsverzicht, Miete unter Markt</summary><!-- v4060 · Marcel 23.11.2026: selten gebraucht, deshalb eingeklappt; rechnen nur im Ertragswert des Marktberichts (besonderes objektspezifisches Merkmal) --><!-- v2660 · E2 · Restlaufzeit einer Mietabweichung am Einzelobjekt (ETW, EFH ohne Wohnungsliste) - dieselben Namen wie je Wohnung im MFH -->
+        <div class="f"><label>Befristet bis <button type="button" class="dp-tip" data-tip-id="tab3.mv_befristet" tabindex="-1" aria-label="Hilfe zu Befristet bis"></button></label>
           <div class="iw"><input id="mv_befristet_bis" type="date"></div></div>
-        <div class="f"><label title="Bis wann der Mieter auf seine Kündigung verzichtet hat. Wie bei der Befristung: so lange ist eine Miete über dem Markt gesichert und wird als besonderes Merkmal über diese Restlaufzeit angesetzt.">Kündigungsverzicht bis</label>
+        <div class="f"><label>Kündigungsverzicht bis <button type="button" class="dp-tip" data-tip-id="tab3.mv_kuendverzicht" tabindex="-1" aria-label="Hilfe zu Kündigungsverzicht"></button></label>
           <div class="iw"><input id="mv_kuendigungsverzicht_bis" type="date"></div></div>
-        <div class="f"><label title="Nur bei einer Miete mehr als 20 % UNTER dem Markt: wie viele Jahre die Abweichung voraussichtlich noch besteht, bis die Miete rechtlich angepasst werden kann (Kappungsgrenze, Mieterhöhungsverlangen). Ohne Angabe zeigt der Bericht Szenarien über 3, 5 und 10 Jahre und setzt nichts an.">Abweichung erwartet noch (Jahre)</label>
+        <div class="f"><label>Miete unter Markt, noch (Jahre) <button type="button" class="dp-tip" data-tip-id="tab3.mv_abw" tabindex="-1" aria-label="Hilfe zu Miete unter Markt"></button></label>
           <div class="iw"><input id="mv_abw_jahre" type="text" inputmode="decimal" placeholder="nur bei Miete unter Markt" class="tr"></div></div>
+        </details>
         <!-- v3950 · Nebenkosten-Vorauszahlung (Marcel 22.11.2026): der monatliche Abschlag des Mieters (§ 556 Abs. 2 BGB), ein Stammdatum
              fuer ViVi (monthly_utility_costs) und die Nebenkostenabrechnung. Kein Rechenkern liest es: Cashflow und KPI rechnen weiter mit
              den umlagefaehigen Kosten. Leer gilt der Vorschlag aus den umlagefaehigen Kosten (js/nk-vorauszahlung.js). Beim MFH je Wohnung
@@ -4077,7 +4078,7 @@ label.dp-required.qc-required::after {
 <script src="js/qc-heuristik.js?v=v3085"></script>
 <link rel="stylesheet" href="css/datenraum.css?v=W34">
 <script src="js/datenraum.js?v=1375"></script>
-<script src="js/tooltip-content.js?v=v4043"></script>
+<script src="js/tooltip-content.js?v=v4060"></script>
   <script src="js/tooltip-engine.js?v=2351"></script>
   <script src="js/immometrica-import.js?v=v3370"></script>
   <script src="js/immometrica-qc.js?v=v2199"></script>
@@ -4148,7 +4149,7 @@ label.dp-required.qc-required::after {
 <script src="js/dealscore2-ui.js?v=v3660d"></script>
 <script src="js/ds2-ai.js?v=v3003a"></script>
 <script src="js/ki-lage.js?v=v3247"></script>
-<script src="js/ki-miete.js?v=v3845"></script>
+<script src="js/ki-miete.js?v=v4060"></script>
 <script src="js/star-rating.js?v=v1851"></script>
 <script src="js/pdf-import.js?v=v3660c"></script>
 <script src="js/dokument-import.js?v=v3993"></script>
@@ -4178,19 +4179,19 @@ label.dp-required.qc-required::after {
 <script src="js/objekt-bloecke.js?v=v3034"></script><!-- v3034 -->
 <script src="js/feld-hilfe.js?v=v3073"></script>
 <script src="js/bgf-herleitung.js?v=v1446"></script>
-<script src="js/mfh-einheiten.js?v=v4016"></script>
+<script src="js/mfh-einheiten.js?v=v4060"></script>
 <script src="js/mfh-felder.js?v=v3840b"></script><!-- v3003 · Objekt mit Einheiten: Erklaerkasten, Felder aus den Einheiten, Zustand des Gebaeudes -->
 <script src="js/nk-vorauszahlung.js?v=v3950"></script><!-- v3950 · Nebenkosten-Vorauszahlung: Vorschlag aus den umlagefaehigen Kosten je Einheit nach Wohnflaeche -->
 <script src="js/vivi-felder.js?v=v4050d"></script><!-- v3950/v3951 · ViVi: verknuepfte Felder ausgegraut, Hinweis, lokal ueberschreiben -->
 <script src="js/buchhaltung-verbinden.js?v=v4040"></script><!-- v3967 · Buchhaltung verbinden: Angebot unter Gewonnen in der Deal-Aktion, Anbieterliste (heute ViVi), nur mit hinterlegtem Schluessel -->
-<script src="js/vivi.js?v=v4050"></script><script src="js/vivi-import.js?v=v4050a"></script><!-- v4050 · Objekte aus ViVi uebernehmen, Ankauf rueckwirkend --><script src="js/vivi-mieterhoehung.js?v=v4042a"></script><script src="js/vivi-nk-anpassung.js?v=v4042a"></script><!-- v4042 · Nebenkosten-Vorauszahlung nach ViVi --><script src="js/vivi-reiter.js?v=v4050d"></script><!-- v4040 · Reiter ViVi in der Pilot-Analyse --><!-- v4037 · Mieterhöhung aus DealPilot in ViVi anlegen (ein Fenster für Reiter Miete und Pilot-Analyse) --><!-- v3950/v3951/v3967 · ViVi: Verbindung, einmal anlegen mit Vorschau und Wartehinweis, Jetzt abgleichen (Vorschau-Funktion vivi) -->
+<script src="js/vivi.js?v=v4050"></script><script src="js/vivi-import.js?v=v4050a"></script><!-- v4050 · Objekte aus ViVi uebernehmen, Ankauf rueckwirkend --><script src="js/vivi-mieterhoehung.js?v=v4060"></script><script src="js/vivi-nk-anpassung.js?v=v4042a"></script><!-- v4042 · Nebenkosten-Vorauszahlung nach ViVi --><script src="js/vivi-reiter.js?v=v4050d"></script><!-- v4040 · Reiter ViVi in der Pilot-Analyse --><!-- v4037 · Mieterhöhung aus DealPilot in ViVi anlegen (ein Fenster für Reiter Miete und Pilot-Analyse) --><!-- v3950/v3951/v3967 · ViVi: Verbindung, einmal anlegen mit Vorschau und Wartehinweis, Jetzt abgleichen (Vorschau-Funktion vivi) -->
 <script src="js/vivi-steuer-abgleich.js?v=v4042a"></script><!-- v4020 · ViVi Steuerjahre: Einstellung, Abgleich je Jahr im Jahresabgleich, automatisch nur offene Jahre, Marke im Reiter Steuer -->
 <script src="js/wertangabe.js?v=v3003b"></script><!-- v3003a · eine Wertangabe: Marktwert/Verkehrswert + Herkunft statt Bankbewertung -->
 <script src="js/indexreihen.js?v=v3026"></script><!-- v3026 · VPI/Nettokaltmieten aus dem Server-Cache -->
 <script src="js/indexmiete.js?v=v3026"></script><!-- v3026 · Indexmiete § 557b BGB -->
 <script src="js/mietpotenzial-kern.js?v=v3840b"></script><!-- v3075 · Kappung, Bremse, Termine, Soll-Miete: der reine Kern, vor potenzial.js -->
 <script src="js/miete-regel.js?v=v3845"></script><!-- v3845 · Neuvermietung ohne Mietpreisbremse 110/115/120 % (Einstellung, Vorgabe 120 %) -->
-<script src="js/potenzial.js?v=v3900a"></script><script src="js/miete-demo.js?v=v4042a"></script><!-- v3870 · Demo Reiter Miete neu, nur Staging -->
+<script src="js/potenzial.js?v=v3900a"></script><script src="js/miete-max.js?v=v4060"></script><script src="js/miete-demo.js?v=v4060"></script><!-- v4060 · miete-max.js: die maximale Miete an EINER Stelle (DpMieteMax), alle Anzeigen lesen nur daraus --><!-- v3870 · Demo Reiter Miete neu, nur Staging -->
 <script src="js/mietvertrag-objekt.js?v=v3840b"></script>
 <script src="js/mieterhoehungen.js?v=v4042a"></script><!-- v3362 · Mieterhöhungen als Liste (_erhoehungen, je Wohnung e.erhoehungen) -->
 <script src="js/hell-varianten.js?v=v1653e"></script>

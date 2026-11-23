@@ -42,7 +42,15 @@
       /* v3942 · der Block steht in voller Breite unter .col2 (siehe zeichnen). Heute und Haus/Wohnung über die ganze
          Breite, „Was hier gilt“ und „Zielbild“ nebeneinander (gemessen 260 / 200 px hoch), unter 861 px untereinander. */
       '#dp-md{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:14px;align-items:start;margin-top:14px}',
-      '#dp-md>.dp-md-k:nth-child(-n+2){grid-column:1/-1}',
+      '#dp-md>.dp-md-k{grid-column:1/-1}',
+      '#mv-objekt-karte .mv-weitere{margin:6px 0 10px}#mv-objekt-karte .mv-weitere>summary{cursor:pointer;font-size:12px;color:#7A7370;padding:4px 0}#mv-objekt-karte .mv-weitere[open]>summary{margin-bottom:6px}',
+      /* v4060 · der eine Satz, Kurzfassung „Was hier gilt“, Aufklapper „Wie wir die maximale Miete ermitteln“ */
+      '#dp-md .stand{font-size:12.5px;color:#2A2727;line-height:1.5;border-left:3px solid var(--wl-c9a84c,#C9A84C);background:#FDFCFA;padding:7px 10px;margin:10px 0 4px;border-radius:2px}',
+      '#dp-md .stand.s-pot{border-left-color:#3FA56C}#dp-md .stand.s-ueb{border-left-color:#B8625C}#dp-md .stand.s-leer{border-left-color:#C9C2B4}',
+      '#dp-md .s-leer{border-color:#C9C2B4}#dp-md .s-leer .st{background:#C9C2B4;color:#2A2727}',
+      '#dp-md .gilt-kurz{font:400 11.5px Inter,sans-serif;color:#7A7370;margin-left:10px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1 1 auto}',
+      '@media (max-width:640px){#dp-md .gilt-kurz{display:none}}',
+      '#dp-md details.dp-mmax-wie,.dp-mmax-wie{margin:8px 0 0;font-size:11.5px;color:#625C59}#dp-md details.dp-mmax-wie>summary,.dp-mmax-wie>summary{cursor:pointer;color:#7A7370;font-size:11.5px}.dp-mmax-wie p{margin:4px 0 0;line-height:1.5}',
       '@media (max-width:860px){#dp-md{grid-template-columns:minmax(0,1fr)}}',
       '#dp-md .dp-md-k{min-width:0;overflow:hidden;margin:0 0 14px}',
       '#dp-md h3{margin:0 0 4px;font:600 15px "Space Grotesk",sans-serif;color:#2A2727;display:flex;gap:8px;align-items:center;flex-wrap:wrap}',
@@ -82,36 +90,33 @@
   }
 
   /* ── Zahlen aus dem Kern ─────────────────────────────────────────── */
+  /* v4060 · Marcel 23.11.2026: „Mieterhöhung 9,12, Neuvermietung 8,88, aber Neuvermietung 620 €, und darunter kein
+     Spielraum. Das macht doch keinen Sinn.“ Alle Zahlen kommen jetzt aus EINER Stelle (js/miete-max.js, DpMieteMax),
+     die auch Häuschen, ViVi-Knopf, Mietpreis-Analyse und Zielbild lesen. Hier wird nichts mehr gerechnet. */
   function daten() {
-    var P = window.DpPotenzial; if (!P || !P.modell) return null;
-    var m = null; try { m = P.modell(); } catch (e) { return null; }
-    if (!m || !m.wohnungen || !m.wohnungen.length) return null;
-    var fo = window.DpMieteRegel ? DpMieteRegel.faktorOhne() : 1.2;
-    var W = m.wohnungen.map(function (w, j) {
-      var d = {}; try { d = P.mietrechtDaten(m, j) || {}; } catch (e) {}
-      var ist = Number(w.ist) || 0, wfl = Number(w.wfl) || 0, vgl = Number(d.vgl_qm || w.vgl_qm) || 0;
-      var br = d.bremse && d.bremse.gilt === true;
-      var neuQ = br && d.obergrenze ? Number(d.obergrenze) : (vgl > 0 ? vgl * fo : 0);
-      var soll = w.soll && w.soll.miete != null && w.soll.miete >= ist + 1 ? Number(w.soll.miete) : ist;
-      var istQ = wfl > 0 ? ist / wfl : 0;
-      var st = (vgl > 0 && istQ > vgl + 0.005) ? 'ueb' : (soll - ist < 10 ? 'aus' : 'pot');
-      var z = (d.zeilen || []).filter(function (r) { return r.k === 'Nächste Erhöhung'; })[0];
-      return { i: w.i, nr: w.nr, lage: w.lage, wfl: wfl, ist: ist, istQ: istQ, vgl: vgl, soll: soll, neuQ: neuQ, neuM: Math.max(ist, neuQ * wfl), bremse: br, st: st,
-        grund: z ? (z.v + '. ' + (z.u || '')) : '', ziel: Number(w.ziel) || 0, kosten: Number(w.kosten) || 0, status: w.status, ab: w.soll && w.soll.ab_text };
+    var A = window.DpMieteMax && DpMieteMax.alle(); if (!A) return null;
+    var W = A.W.map(function (x) {
+      var w = A.m.wohnungen[x.j] || {};
+      var st = x.leer ? 'leer' : (x.bestand.mehr ? 'pot' : (x.vgl.qm && x.heute_qm > x.vgl.qm + 0.005 ? 'ueb' : 'aus'));
+      return Object.assign({}, x, { ist: x.heute, istQ: x.heute_qm, vgl: x.vgl.qm || 0, soll: x.bestand.monat, neuQ: x.neu ? x.neu.qm : 0, neuM: x.neu ? x.neu.monat : 0,
+        neuMehr: !!(x.neu && x.neu.mehr), st: st, ziel: Number(w.ziel) || 0, kosten: Number(w.kosten) || 0, status: w.status });
     });
-    return { m: m, mfh: m.art === 'mfh', W: W };
+    return { m: A.m, mfh: A.mfh, W: W };
   }
 
   function leiter(w) {
-    var a = Math.min(w.istQ || w.vgl, w.vgl || w.istQ) - 0.4, b = Math.max(w.neuQ, w.istQ) + 0.4;
+    if (!(w.bestand.mehr || w.neuMehr) || !(w.istQ > 0)) return '';   /* v4060 · ohne Spielraum keine Leiter mit drei gleichen Zahlen */
+    var sQ = w.wfl > 0 ? w.soll / w.wfl : w.istQ;
+    var pts = [w.istQ, sQ, w.vgl || w.istQ, w.neuMehr ? w.neuQ : w.istQ];
+    var a = Math.min.apply(null, pts) - 0.4, b = Math.max.apply(null, pts) + 0.4;
     if (!(b > a)) return '';
     var p = function (x) { return ((x - a) / (b - a) * 100).toFixed(1) + '%'; };
-    var sQ = w.wfl > 0 ? w.soll / w.wfl : w.istQ;
     return '<div class="leiter"><div class="bahn">'
-      + (w.vgl > 0 ? '<i style="left:' + p(w.vgl) + ';background:#9ED0B3;width:2px" title="Vergleichsmiete bis"></i>' : '')
-      + '<i style="left:' + p(w.istQ) + ';background:#2A2727" title="heute"></i><i style="left:' + p(sQ) + ';background:#3FA56C" title="Mieterhöhung"></i>'
-      + (w.neuQ > 0 ? '<i style="left:' + p(w.neuQ) + ';background:var(--wl-c9a84c,#C9A84C)" title="Neuvermietung"></i>' : '') + '</div>'
-      + '<div class="marken"><span>heute ' + qm(w.istQ) + '</span><span>Mieterhöhung ' + qm(sQ) + '</span>' + (w.neuQ > 0 ? '<span>Neuvermietung ' + qm(w.neuQ) + '</span>' : '') + '</div></div>';
+      + (w.vgl > 0 ? '<i style="left:' + p(w.vgl) + ';background:#9ED0B3;width:2px" title="Vergleichsmiete bis ' + qm(w.vgl) + '"></i>' : '')
+      + '<i style="left:' + p(w.istQ) + ';background:#2A2727" title="heute"></i>'
+      + (w.bestand.mehr ? '<i style="left:' + p(sQ) + ';background:#3FA56C" title="Mieterhöhung"></i>' : '')
+      + (w.neuMehr ? '<i style="left:' + p(w.neuQ) + ';background:var(--wl-c9a84c,#C9A84C)" title="Neuvermietung"></i>' : '') + '</div>'
+      + '<div class="marken"><span>heute ' + qm(w.istQ) + '</span>' + (w.bestand.mehr ? '<span>Mieterhöhung ' + qm(sQ) + '</span>' : '') + (w.neuMehr ? '<span>Neuvermietung ' + qm(w.neuQ) + '</span>' : '') + '</div></div>';
   }
   /* v4037 · Absprung nach ViVi, wo DealPilot Spielraum zeigt (ein Fenster: DpViviMieterhoehung). Neuvermietung bekommt
      keinen Absprung, das ist keine Mieterhöhung im laufenden Vertrag. */
@@ -120,7 +125,7 @@
     if (!V || !V.verfuegbar() || !w || !(w.ist > 0)) return '';
     /* v4042 · nur mit Spielraum (dieselbe Regel wie Pilot-Analyse › ViVi) */
     if (V.spielraum ? !V.spielraum(mfh && w.i != null ? w.i : null) : !(w.soll >= w.ist + 1)) return '';
-    return '<button type="button" class="btn ' + (w.soll >= w.ist + 1 ? '' : 'btn-outline ') + 'btn-sm" data-md-vivi="' + (mfh && w.i != null ? w.i : 'objekt') + '">Mieterhöhung in ViVi anlegen</button>';
+    return '<button type="button" class="btn btn-sm" data-md-vivi="' + (mfh && w.i != null ? w.i : 'objekt') + '">Mieterhöhung in ViVi anlegen</button>';
   }
   /* v4042 · Nebenkosten-Vorauszahlung: weicht ViVi vom Soll in DealPilot ab (eigene Angabe, sonst umlagefähige Kosten
      nach Wohnfläche), steht die Abweichung hier mit Absprung (ein Fenster: DpViviNkAnpassung). */
@@ -131,25 +136,69 @@
     if (!a) return '';
     return '<button type="button" class="btn btn-outline btn-sm" data-md-nk="' + (mfh && w.i != null ? w.i : 'objekt') + '" title="ViVi ' + eur(a.vivi) + ', DealPilot ' + eur(a.ziel) + ' im Monat">Nebenkosten in ViVi anpassen (' + eur(a.vivi) + ' auf ' + eur(a.ziel) + ')</button>';
   }
-  function zweiZahlen(w) {
-    return '<div class="reihe" style="margin-top:8px"><div class="zahl"><small>Mieterhöhung</small><b>' + (w.soll >= w.ist + 1 ? eur(w.soll) : 'kein Spielraum') + '</b><small>' + (w.soll >= w.ist + 1 ? '+' + eur(w.soll - w.ist) + ' im Monat' + (w.ab ? ', ' + esc(w.ab) : '') : (w.st === 'ueb' ? 'über dem Oberwert ' + qm(w.vgl) : 'am Oberwert')) + '</small></div>'
-      + (w.neuQ > 0 ? '<div class="zahl"><small>Neuvermietung</small><b>' + eur(w.neuM) + '</b><small>' + qm(w.neuQ) + ', ' + (w.bremse ? '110 %, Mietpreisbremse' : (window.DpMieteRegel ? DpMieteRegel.pct() : 120) + ' %, ohne Bremse') + '</small></div>' : '') + '</div>';
+  /* v4060 · der EINE Satz aus DpMieteMax, eingefärbt wie die Kachel */
+  function stand(w) { return '<div class="stand s-' + w.st + '">' + esc(w.satz) + '</div>'; }
+  function vglTitel() { return 'Ortsübliche Vergleichsmiete, oberer Wert der Spanne für diese Wohnung (Größe, Baujahr, Merkmale). Bis dahin darf die Miete im Bestand steigen, begrenzt durch die Kappungsgrenze (§ 558 BGB).'; }
+  function zahlen(w) {
+    var z = [];
+    if (w.bestand.mehr) z.push('<div class="zahl"><small>Mieterhöhung</small><b>' + eur(w.soll) + '</b><small>plus ' + eur(w.soll - w.ist) + ' im Monat' + (w.bestand.ab ? ', ' + esc(w.bestand.ab) : '') + '</small></div>');
+    if (w.neuMehr) z.push('<div class="zahl"><small>Neuvermietung</small><b>' + eur(w.neuM) + '</b><small>' + qm(w.neuQ) + ', ' + esc(w.neu.kurz) + '</small></div>');
+    return z.length ? '<div class="reihe" style="margin-top:8px">' + z.join('') + '</div>' : '';
+  }
+  function wie() { return window.DpMieteMax ? DpMieteMax.wieHtml() : ''; }
+  function regelnHtml(D, w) {
+    var m = D.m, k = m.kappung || {}, v = m.vgl || {}; w = w || D.W[0]; var br = w && w.bremse === true;
+    var vq = (w && w.vgl) || v.qm;
+    var kurz = 'Kappung ' + (k.pct || 20) + ' % in 3 Jahren · Vergleichsmiete bis ' + (vq ? qm(vq) : 'fehlt') + ' · Neuvermietung ' + (br ? 'mit Mietpreisbremse' : 'ohne Bremse');
+    return '<details class="dp-md-auf dp-md-gilt" data-md-platz="mr"><summary>Was hier gilt<span class="gilt-kurz">' + kurz + '</span></summary>'
+      + '<div class="regel"><span class="lbl">Kappung</span><div><b>' + (k.pct || 20) + ' % in 3 Jahren</b><p>' + (k.herkunft === 'verordnung' ? 'Die Gemeinde steht in der Verordnung.' : 'Gesetzlich nach § 558 Abs. 3 BGB.') + '</p></div></div>'
+      + '<div class="regel"><span class="lbl">Vergleichsmiete</span><div><b>bis ' + (vq ? qm(vq) : '–') + '</b><p>' + esc(v.ms && v.ms.wahl_text ? (v.qualifiziert ? 'qualifizierter' : 'einfacher') + ' Mietspiegel, ' + v.ms.wahl_text : (v.art || '')) + (D.mfh ? '. Je Wohnung nach ihrer Größe.' : '.') + '</p></div></div>'
+      + '<div class="regel"><span class="lbl">Neuvermietung</span><div><b>' + (br ? 'Mietpreisbremse, höchstens 110 %' : 'ohne Bremse, DealPilot rechnet mit ' + (window.DpMieteRegel ? DpMieteRegel.pct() : 120) + ' %') + '</b></div></div>'
+      + '</details>';
   }
 
   /* ── Karten des Demo-Blocks ──────────────────────────────────────── */
-  function karteHeute(D) {
-    var s = D.W.reduce(function (a, w) { return a + w.ist; }, 0), so = D.W.reduce(function (a, w) { return a + w.soll; }, 0), ne = D.W.reduce(function (a, w) { return a + Math.max(w.soll, w.neuM); }, 0);
-    var fl = D.W.reduce(function (a, w) { return a + w.wfl; }, 0), vgl = D.W.filter(function (w) { return w.vgl > 0; })[0];
-    var max = Math.max(ne, so, s) || 1;
+  function karteHeute(D) {   /* nur beim Haus mit mehreren Wohnungen */
+    var s = D.W.reduce(function (a, w) { return a + w.ist; }, 0), so = D.W.reduce(function (a, w) { return a + w.soll; }, 0), ne = D.W.reduce(function (a, w) { return a + Math.max(w.soll, w.neuMehr ? w.neuM : 0); }, 0);
+    var fl = D.W.reduce(function (a, w) { return a + (w.ist > 0 ? w.wfl : 0); }, 0);
+    var mehrB = so > s + 1, mehrN = ne > so + 1, max = Math.max(ne, so, s) || 1;
+    var satz = mehrB || mehrN
+      ? 'Im Monat möglich: ' + (mehrB ? eur(so) + ' mit den Mieterhöhungen im Bestand (plus ' + eur(so - s) + ')' : '') + (mehrB && mehrN ? ', ' : '') + (mehrN ? eur(ne) + ' bei Neuvermietung' : '') + '.'
+      : 'Keine Wohnung hat heute Spielraum. Mehr ist nur über eine Modernisierung möglich (§ 559 BGB).';
     return '<div class="card dp-md-k">' + kopf('euro', 'Miete heute und Spielraum')
-      + '<div class="reihe"><div class="zahl"><small>Kaltmiete</small><b>' + eur(s) + '</b><small>im Monat' + (D.mfh ? ', aus ' + D.W.length + ' Wohnungen' : '') + '</small></div>'
-      + '<div class="zahl"><small>Kaltmiete</small><b>' + eur(s * 12) + '</b><small>im Jahr</small></div>'
-      + '<div class="zahl"><small>im Schnitt</small><b>' + (fl > 0 ? qm(s / fl) : '–') + '</b><small>' + (vgl ? 'Vergleichsmiete bis ' + qm(vgl.vgl) : 'ohne Vergleichsmiete') + '</small></div></div>'
-      + '<div class="satz" style="margin-top:8px">Im Monat: heute ' + eur(s) + ', mit den möglichen Mieterhöhungen ' + eur(so) + ', bei Neuvermietung bis ' + eur(ne) + '.</div>'
-      + '<div class="balken"><span style="width:' + (s / max * 100).toFixed(1) + '%;background:#2A2727"></span><span style="width:' + ((so - s) / max * 100).toFixed(1) + '%;background:#3FA56C"></span><span style="width:' + ((ne - so) / max * 100).toFixed(1) + '%;background:var(--wl-c9a84c,#C9A84C)"></span></div>'
-      + '<div class="leg"><span><i style="background:#2A2727"></i>heute</span><span><i style="background:#3FA56C"></i>Mieterhöhung im Bestand</span><span><i style="background:var(--wl-c9a84c,#C9A84C)"></i>mehr bei Neuvermietung</span></div></div>';
+      + '<div class="reihe"><div class="zahl"><small>Kaltmiete</small><b>' + eur(s) + '</b><small>im Monat, ' + eur(s * 12) + ' im Jahr</small></div>'
+      + '<div class="zahl"><small>im Schnitt</small><b>' + (fl > 0 ? qm(s / fl) : '–') + '</b><small>aus ' + D.W.length + ' Wohnungen</small></div>'
+      + (mehrB || mehrN ? '<div class="zahl"><small>maximal</small><b class="gr">' + eur(Math.max(so, ne)) + '</b><small>plus ' + eur(Math.max(so, ne) - s) + ' im Monat</small></div>' : '') + '</div>'
+      + '<div class="satz" style="margin:8px 0 0">' + satz + '</div>'
+      + (mehrB || mehrN ? '<div class="balken"><span style="width:' + (s / max * 100).toFixed(1) + '%;background:#2A2727"></span>' + (mehrB ? '<span style="width:' + ((so - s) / max * 100).toFixed(1) + '%;background:#3FA56C"></span>' : '') + (mehrN ? '<span style="width:' + ((ne - so) / max * 100).toFixed(1) + '%;background:var(--wl-c9a84c,#C9A84C)"></span>' : '') + '</div>'
+        + '<div class="leg"><span><i style="background:#2A2727"></i>heute</span>' + (mehrB ? '<span><i style="background:#3FA56C"></i>Mieterhöhung im Bestand</span>' : '') + (mehrN ? '<span><i style="background:var(--wl-c9a84c,#C9A84C)"></i>mehr bei Neuvermietung</span>' : '') + '</div>' : '')
+      + wie() + '</div>';
   }
-  var WORT = { pot: 'POTENZIAL', aus: 'AUSGEREIZT', ueb: 'ÜBER MIETSPIEGEL' };
+  var WORT = { pot: 'POTENZIAL', aus: 'AUSGEREIZT', ueb: 'ÜBER MIETSPIEGEL', leer: 'LEER' };
+  function karteWohnung(D) {   /* Eigentumswohnung, Haus ohne Wohnungsliste: Heute, Spielraum und Regeln in EINER Karte */
+    var w = D.W[0];
+    return '<div class="card dp-md-k">' + kopf('euro', 'Miete heute und Spielraum')
+      + '<div class="reihe"><div class="zahl"><small>Kaltmiete</small><b>' + (w.ist ? eur(w.ist) : 'leer') + '</b><small>' + (w.ist ? 'im Monat, ' + eur(w.ist * 12) + ' im Jahr' : '') + '</small></div>'
+      + '<div class="zahl"><small>heute</small><b>' + (w.istQ ? qm(w.istQ) : '–') + '</b><small>' + Math.round(w.wfl) + ' m²</small></div>'
+      + '<div class="zahl" title="' + esc(vglTitel()) + '"><small>Vergleichsmiete</small><b>' + (w.vgl ? 'bis ' + qm(w.vgl) : '–') + '</b><small>oberer Wert der Spanne</small></div></div>'
+      + stand(w) + leiter(w) + zahlen(w)
+      + (viviKnopf(w, false) || nkKnopf(w, false) ? '<div class="knoepfe">' + viviKnopf(w, false) + nkKnopf(w, false) + '</div>' : '')
+      + wie() + regelnHtml(D)
+      + '<details class="dp-md-auf" data-md-platz="mv"><summary>Mietvertrag und Mieterhöhungen</summary></details></div>';
+  }
+  function karteZiel(D) {
+    var s = D.W.reduce(function (a, w) { return a + w.ist; }, 0), sb = D.W.reduce(function (a, w) { return a + w.soll; }, 0);
+    var z = D.W.reduce(function (a, w) { return a + Math.max(w.ziel || 0, w.soll, w.neuMehr ? w.neuM : 0); }, 0), ko = D.W.reduce(function (a, w) { return a + w.kosten; }, 0);
+    var auf = D.mfh ? '<div class="knoepfe"><button type="button" class="btn btn-outline btn-sm" data-md-einh="1">Zielmiete je Wohnung festlegen</button></div><details class="dp-md-auf" data-md-platz="zb"><summary>Mietspiegel, eigene Werte und Merkmale</summary></details>'
+      : '<details class="dp-md-auf" data-md-platz="zb"><summary>Zielbild bearbeiten</summary></details>';
+    if (z <= s + 1 && !(ko > 0)) return '<div class="card dp-md-k">' + kopf('target', 'Zielbild') + '<div class="satz" style="margin:0 0 6px">' + eur(s) + ' im Monat, wie heute. Ohne Modernisierung gibt es keinen Spielraum.</div>' + auf + '</div>';
+    var z4 = ['<div class="zahl"><small>heute</small><b>' + eur(s) + '</b><small>im Monat</small></div>'];
+    if (sb > s + 1) z4.push('<div class="zahl"><small>im Bestand möglich</small><b class="gr">' + eur(sb) + '</b><small>plus ' + eur(sb - s) + ', Mieterhöhung</small></div>');
+    if (z > Math.max(sb, s) + 1) z4.push('<div class="zahl"><small>Zielbild</small><b class="go">' + eur(z) + '</b><small>plus ' + eur(z - Math.max(sb, s)) + (D.W.some(function (w) { return w.ziel > 0; }) ? ', mit deiner Zielmiete' : ', Neuvermietung') + '</small></div>');
+    if (ko > 0) z4.push('<div class="zahl"><small>Maßnahmen</small><b>' + eur(ko) + '</b><small>Kosten</small></div>');
+    return '<div class="card dp-md-k">' + kopf('target', 'Zielbild') + '<div class="reihe">' + z4.join('') + '</div>' + auf + '</div>';
+  }
+
   function geschoss(t) {   /* v3880c · Rang und Name eines Geschosses aus freiem Text, null wenn nicht erkennbar */
     var x = String(t || '').toLowerCase();
     if (/\b(dg|dachgeschoss|dach|spitzboden|penthouse)\b/.test(x)) return { r: 100, name: 'DG' };
@@ -182,36 +231,13 @@
           return '<button type="button" class="whg s-' + x.st + (j === _sel ? ' sel' : '') + '" data-md-sel="' + j + '"><span class="st">' + WORT[x.st] + '</span><div class="n">Wohnung ' + esc(x.nr) + '</div><div class="m">' + (x.ist ? eur(x.ist) : 'leer') + '</div><div class="q">' + (x.istQ ? qm(x.istQ) + ', ' : '') + Math.round(x.wfl) + ' m²</div></button>';
         }).join('') + '</div></div>';
       }).join('') + '<div class="boden"></div></div>'
-      + '<div class="leg" style="margin-top:8px"><span><i style="background:#3FA56C"></i>Potenzial</span><span><i style="background:var(--wl-c9a84c,#C9A84C)"></i>ausgereizt</span><span><i style="background:#B8625C"></i>über dem Mietspiegel</span></div>'
+      + '<div class="leg" style="margin-top:8px"><span><i style="background:#3FA56C"></i>Potenzial</span><span><i style="background:var(--wl-c9a84c,#C9A84C)"></i>ausgereizt</span><span><i style="background:#B8625C"></i>über dem Mietspiegel</span><span><i style="background:#C9C2B4"></i>leer</span></div>'
       + '<div style="border-top:1px solid #F1ECE1;margin-top:12px;padding-top:10px"><div class="lbl">Gewählte Wohnung</div><h3 style="margin-top:2px">Wohnung ' + esc(w.nr) + (w.lage ? ', ' + esc(w.lage) : '') + '</h3>'
-      + '<div class="satz">' + Math.round(w.wfl) + ' m², heute ' + (w.ist ? eur(w.ist) + ' im Monat' : 'leer') + '.</div>'
-      + leiter(w) + zweiZahlen(w) + (w.grund ? '<div class="grund">' + esc(w.grund) + '</div>' : '')
+      + '<div class="satz" style="margin:0 0 6px">' + Math.round(w.wfl) + ' m², heute ' + (w.ist ? eur(w.ist) + ' im Monat, ' + qm(w.istQ) : 'leer') + (w.vgl ? ', Vergleichsmiete bis ' + qm(w.vgl) : '') + '.</div>'
+      + stand(w) + leiter(w) + zahlen(w)
       + '<div class="knoepfe">' + viviKnopf(w, true) + nkKnopf(w, true) + '<button type="button" class="btn btn-outline btn-sm" data-md-whg="' + w.i + '">Wohnung öffnen, Vertrag und Erhöhung</button><button type="button" class="btn btn-outline btn-sm" data-md-jahre="1">Miete je Wohnung: heute, geplant, Ziel</button></div></div>'
-      + '<details class="dp-md-auf" data-md-platz="mv"><summary>Mietverträge der Wohnungen</summary></details></div>';   /* v4005 · Karte Mietvertrag beim MFH */
+      + regelnHtml(D, w) + '<details class="dp-md-auf" data-md-platz="mv"><summary>Mietverträge der Wohnungen</summary></details></div>';   /* v4005 · Karte Mietvertrag beim MFH */
   }
-  function karteWohnung(D) {
-    var w = D.W[0];
-    return '<div class="card dp-md-k">' + kopf('door', 'Die Wohnung') + '<div class="satz">' + Math.round(w.wfl) + ' m², heute ' + (w.ist ? eur(w.ist) + ' im Monat' : 'leer') + '. Wo die Miete steht und wie weit sie steigen darf.</div>'
-      + leiter(w) + zweiZahlen(w) + (w.grund ? '<div class="grund">' + esc(w.grund) + '</div>' : '')
-      + (viviKnopf(w, false) || nkKnopf(w, false) ? '<div class="knoepfe">' + viviKnopf(w, false) + nkKnopf(w, false) + '</div>' : '')
-      + '<details class="dp-md-auf" open data-md-platz="mv"><summary>Mietvertrag und Mieterhöhung</summary></details></div>';
-  }
-  function karteRegeln(D) {
-    var m = D.m, k = m.kappung || {}, v = m.vgl || {}, w = D.W[0], br = w && w.bremse;
-    return '<div class="card dp-md-k">' + kopf('book', 'Was hier gilt')
-      + '<div class="regel"><span class="lbl">Kappung</span><div><b>' + (k.pct || 20) + ' % in 3 Jahren</b><p>' + (k.herkunft === 'verordnung' ? 'Die Gemeinde steht in der Verordnung.' : 'Gesetzlich nach § 558 Abs. 3 BGB.') + '</p></div></div>'
-      + '<div class="regel"><span class="lbl">Vergleichsmiete</span><div><b>bis ' + (v.qm ? qm(v.qm) : '–') + '</b><p>' + esc(v.ms && v.ms.wahl_text ? (v.qualifiziert ? 'qualifizierter' : 'einfacher') + ' Mietspiegel, ' + v.ms.wahl_text : (v.art || '')) + (D.mfh ? '. Je Wohnung nach ihrer Größe.' : '.') + '</p></div></div>'
-      + '<div class="regel"><span class="lbl">Neuvermietung</span><div><b>' + (br ? 'Mietpreisbremse, höchstens 110 %' : 'ohne Bremse, DealPilot rechnet mit ' + (window.DpMieteRegel ? DpMieteRegel.pct() : 120) + ' %') + '</b></div></div>'
-      + '<details class="dp-md-auf" data-md-platz="mr"><summary>Langfassung mit Quellen</summary></details></div>';
-  }
-  function karteZiel(D) {
-    var s = D.W.reduce(function (a, w) { return a + w.ist; }, 0), sb = D.W.reduce(function (a, w) { return a + w.soll; }, 0), z = D.W.reduce(function (a, w) { return a + Math.max(w.ziel || 0, w.soll); }, 0), ko = D.W.reduce(function (a, w) { return a + w.kosten; }, 0);
-    return '<div class="card dp-md-k">' + kopf('target', 'Zielbild')
-      + '<div class="reihe"><div class="zahl"><small>heute</small><b>' + eur(s) + '</b><small>im Monat</small></div>' + '<div class="zahl"><small>im Bestand möglich</small><b class="gr">' + eur(sb) + '</b><small>' + (sb > s ? '+' + eur(sb - s) + ', Mieterhöhung' : 'keine Erhöhung') + '</small></div>' + '<div class="zahl"><small>Zielbild</small><b class="go">' + eur(z) + '</b><small>' + (z > sb ? '+' + eur(z - sb) + ', Neuvermietung' : 'im Monat') + '</small></div>' + '<div class="zahl"><small>Maßnahmen</small><b>' + eur(ko) + '</b><small>Kosten</small></div></div>'
-      + (D.mfh ? '<div class="satz" style="margin-top:8px">Zielmiete, Zeitpunkt und Maßnahmen legst du je Wohnung fest.</div><div class="knoepfe"><button type="button" class="btn btn-outline btn-sm" data-md-einh="1">In den Einheiten ändern</button></div><details class="dp-md-auf" data-md-platz="zb"><summary>Mietspiegel, eigene Werte und Merkmale</summary></details>'
-        : '<details class="dp-md-auf" data-md-platz="zb"><summary>Zielbild bearbeiten</summary></details>') + '</div>';
-  }
-
   /* ── echte Karten umhängen und zurückstellen ─────────────────────── */
   var KARTEN = { mv: 'mv-objekt-karte', mr: 'dp-mietrecht-karte', zb: 'zb-karte' };
   function merken(k) {
@@ -243,15 +269,17 @@
     var c2 = (_platz.mv && _platz.mv.parentNode && _platz.mv.parentNode.closest) ? _platz.mv.parentNode.closest('.col2') : null;
     if (c2 && c2.parentNode) { if (box.parentNode !== c2.parentNode || box.previousElementSibling !== c2) c2.parentNode.insertBefore(box, c2.nextSibling); }
     else if (box.parentNode !== mv.parentNode && _platz.mv) _platz.mv.parentNode.insertBefore(box, _platz.mv);
-    var aufMr = box.querySelector('[data-md-platz="mr"]'), aufZb = box.querySelector('[data-md-platz="zb"]'), aufMv = D.mfh ? box.querySelector('[data-md-platz="mv"]') : null;
+    var aufMr = box.querySelector('[data-md-platz="mr"]'), aufZb = box.querySelector('[data-md-platz="zb"]'), aufMv = box.querySelector('[data-md-platz="mv"]');
     var offenMr = aufMr ? aufMr.open : false, offenZb = aufZb ? aufZb.open : false, offenMv = aufMv ? aufMv.open : false;
     /* echte Karten vor dem Neuzeichnen in Sicherheit bringen, sonst löscht innerHTML sie */
     [mv, mr, zb].forEach(function (c) { if (c && box.contains(c)) document.body.appendChild(c); if (c) c.style.display = 'none'; });
-    box.innerHTML = karteHeute(D) + (D.mfh ? karteHaus(D) : karteWohnung(D)) + karteRegeln(D) + karteZiel(D);
+    box.innerHTML = (D.mfh ? karteHeute(D) + karteHaus(D) : karteWohnung(D)) + karteZiel(D);   /* v4060 · „Was hier gilt“ steckt eingeklappt in der ersten Karte */
     var setze = function (key, c, offen) { var h = box.querySelector('[data-md-platz="' + key + '"]'); if (h && c) { h.appendChild(c); c.style.display = ''; if (offen != null) h.open = h.open || offen; } };
-    setze('mv', mv, D.mfh ? offenMv : null);   /* v4005 · auch beim MFH, dort eingeklappt in „Das Haus“ */
+    setze('mv', mv, offenMv);   /* v4060 · auch bei der ETW eingeklappt, Zustand bleibt beim Neuzeichnen */   /* v4005 · auch beim MFH, dort eingeklappt in „Das Haus“ */
     setze('mr', mr, offenMr);
-    setze('zb', zb, offenZb);   /* v3880b · auch beim MFH: die Karte trägt Mietspiegel-Felder und Merkmale */
+    setze('zb', zb, offenZb);
+    /* v4060 · „Weitere Angaben“ im Mietvertrag: von selbst offen, sobald dort etwas steht */
+    try { var mw = document.querySelector('#mv-objekt-karte .mv-weitere'); if (mw && !mw.open && ['mv_befristet_bis', 'mv_kuendigungsverzicht_bis', 'mv_abw_jahre'].some(function (id) { var f = el(id); return f && String(f.value || '').trim(); })) mw.open = true; } catch (eMw) {}   /* v3880b · auch beim MFH: die Karte trägt Mietspiegel-Felder und Merkmale */
     /* beim MFH bleiben Mietvertrag-Liste und Zielbild-Karte unsichtbar: beides steht je Wohnung in den Einheiten */
     /* v4005 · bis v4004 blieb die Karte Mietvertrag beim MFH unsichtbar an ihrem Platz, jetzt hängt sie in „Das Haus“ (oben) */
     if (!box._bind) {

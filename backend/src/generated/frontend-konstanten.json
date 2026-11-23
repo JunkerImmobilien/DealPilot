@@ -1,10 +1,10 @@
 {
- "erzeugt_am": "2026-11-23T13:22:48.873Z",
+ "erzeugt_am": "2026-11-23T13:27:45.590Z",
  "quellen": {
   "voice-import": "a8a2e6dba58ea42c",
   "objektart-felder": "16af21246a92d8f6",
   "storage": "d7465228c8595ebb",
-  "index-html": "d15a03ae921ec470",
+  "index-html": "88f91625e4ae86b9",
   "grest": "81f3fb0a4de3a6cf"
  },
  "daten": {
@@ -1857,7 +1857,7 @@
    {
     "id": "mv_abw_jahre",
     "kind": "text",
-    "label": "Abweichung erwartet noch (Jahre)"
+    "label": "Miete unter Markt, noch (Jahre)"
    },
    {
     "id": "nk_vorauszahlung",

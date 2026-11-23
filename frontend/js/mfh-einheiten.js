@@ -604,7 +604,7 @@
             d('mv_befristet_bis', 'Befristet bis') +
             d('mv_kuendigungsverzicht_bis', 'Kündigungsverzicht bis') +
             /* v2600 · E2 · Restlaufzeit einer Mietabweichung (Underrent: bis zur rechtlich moeglichen Anpassung) */
-            f('mv_abw_jahre', 'Abweichung erwartet noch (Jahre)', 'nur bei Miete unter Markt', 'decimal') +
+            f('mv_abw_jahre', 'Miete unter Markt, noch (Jahre)', 'nur bei Miete unter Markt', 'decimal') +
             f('mv_mieter', 'Mieter (Name, optional)', '') +
             f('mv_notiz', 'Notiz zum Vertrag', '', 'text', true) +
           '</div>' +
@@ -613,7 +613,7 @@
           /* v2600 · E2/E3 · Hinweis zur Restlaufzeit und der waehlbare Leerstandsabzug (nur bei „leer") */
           '<p class="mfh-we-hint">Liegt die Ist-Miete außerhalb von ± 20 % um die marktübliche Miete, rechnet der Ertragswert mit der marktüblichen Miete; '
             + 'die Abweichung wird über die <b>Restlaufzeit</b> beziffert: bei Miete <i>über</i> dem Markt nur mit <b>Befristet bis</b> oder <b>Kündigungsverzicht bis</b>, '
-            + 'bei Miete darunter auch mit „Abweichung erwartet noch". Ohne Angabe zeigt der Bericht Szenarien (3/5/10 Jahre).</p>' +
+            + 'bei Miete darunter auch mit „Miete unter Markt, noch". Ohne Angabe zeigt der Bericht Szenarien (3/5/10 Jahre).</p>' +
           '<div id="mfh-we-leer-box" style="display:none"><h4>Leerstand</h4>' +
             '<p class="mfh-we-hint">Standard: voll vermietet zur marktüblichen Miete. Wahlweise ziehen Mietausfall bis zur Vermietung und Herrichtung vom Ertragswert ab.</p>' +
             '<label class="mfh-we-haken"><input type="checkbox" data-wkb="leer_abzug"' + (e.leer_abzug ? ' checked' : '') + '>' +

@@ -388,7 +388,19 @@ function kiMieteRechtUmschalten(btn) {
     var k = document.createElement('button'); k.type = 'button'; k.className = 'kmu-klapp';
     k.addEventListener('click', function () { setzen(!box().classList.contains('kmu-zu')); });
     var btn = document.getElementById('ki-miete-btn');
-    if (btn && btn.parentNode === kopf) kopf.insertBefore(k, btn.nextSibling); else kopf.appendChild(k);
+    /* v4060 · Marcel 23.11.2026: „einklappen“ steht rechts in derselben Zeile wie „Mietpreis recherchieren“ und erscheint
+       erst, wenn eine Analyse im Kasten steht. Vorher gibt es nichts einzuklappen. */
+    var start = kopf.querySelector('.kmu-start');
+    if (start) start.appendChild(k); else if (btn && btn.parentNode === kopf) kopf.insertBefore(k, btn.nextSibling); else kopf.appendChild(k);
+    var bd = document.getElementById('ki-miete-body');
+    var hat = function () {
+      var x = document.getElementById('ki-miete-body');
+      var ja = !!(x && x.children.length && !x.querySelector('.ki-lage-empty'));
+      b.classList.toggle('kmu-hat', ja);
+      return ja;
+    };
+    hat();
+    if (bd && window.MutationObserver) new MutationObserver(hat).observe(bd, { childList: true, subtree: false });
     var zu = false; try { zu = localStorage.getItem(LS) === '1'; } catch (e) {}
     setzen(zu);
     if (btn) btn.addEventListener('click', function () { setzen(false); });
@@ -454,6 +466,7 @@ function _kmUStil() {
   s.textContent = [
     '.kmu{display:flex;flex-direction:column;gap:10px}',
     '.kmu-urteil{border:1px solid #EFE7D6;border-left:4px solid #3FA56C;border-radius:10px;padding:10px 14px;background:#fff;display:flex;flex-direction:column;gap:2px}',
+    '.kmu-max{border:1px solid #EFE7D6;border-left:4px solid var(--wl-c9a84c,#C9A84C);border-radius:10px;padding:10px 14px;background:#fff;display:flex;flex-direction:column;gap:2px;margin-top:8px}',
     '.kmu-urteil.kmu-hoch{border-left-color:#B8625C}.kmu-urteil.kmu-luft{border-left-color:#3d6fa8}.kmu-urteil.kmu-offen{border-left-color:#8A8272}',
     '.kmu-t{font:600 10.5px/1.3 "JetBrains Mono",monospace;letter-spacing:.08em;text-transform:uppercase;color:#7A7370}',
     '.kmu-v{font:600 20px/1.25 "Space Grotesk",sans-serif;color:#2A2727}',
@@ -545,6 +558,15 @@ function _kmUebersicht(o) {
   h += '<div class="kmu-urteil kmu-' + art + '"><span class="kmu-t">' + (ist == null && ansatz != null ? 'Ansatz für die Planung' : 'Ansetzbare Miete') + '</span>'
     + (ansatz != null ? '<b class="kmu-v">' + _kmQmK(ansatz) + (wfl > 0 ? '<small>' + _kmEur(ansatz * wfl) + ' / Monat</small>' : '') + '</b>' : '')
     + '<span class="kmu-u">' + _kmEsc(satz) + '</span></div>';
+  /* v4060 · die maximale Miete aus EINER Stelle (js/miete-max.js), dieselbe Zahl wie im Reiter Miete und im Häuschen */
+  try {
+    var MX = window.DpMieteMax && DpMieteMax.alle();
+    if (MX && MX.W.length) {
+      var mxH = MX.W.reduce(function (s0, w0) { return s0 + w0.heute; }, 0), mxM = MX.W.reduce(function (s0, w0) { return s0 + w0.max; }, 0);
+      var mxS = MX.mfh ? (mxM > mxH + 1 ? 'Rechtlich maximal im Haus: ' + _kmEur(mxM) + ' im Monat (plus ' + _kmEur(mxM - mxH) + '). Je Wohnung im Reiter Miete.' : 'Keine Wohnung hat heute rechtlichen Spielraum.') : MX.W[0].satz;
+      h += '<div class="kmu-max"><span class="kmu-t">Maximal zulässige Miete</span>' + (MX.mfh ? '' : '<b class="kmu-v">' + _kmEur(MX.W[0].max) + '<small>' + (MX.W[0].max_qm ? _kmQmK(MX.W[0].max_qm) : '') + '</small></b>') + '<span class="kmu-u">' + _kmEsc(mxS) + '</span>' + DpMieteMax.wieHtml() + '</div>';
+    }
+  } catch (eMx) {}
 
   /* ── Werte als Zeilen (Stil Mietleiter), mit Skala ── */
   var zeilen = [];

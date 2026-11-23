@@ -248,6 +248,29 @@
       body: 'Mieteinnahmen neben der Wohnungsmiete: Stellplatz, Garage, ein gesondert vereinbarter Küchen- oder Möblierungszuschlag, Keller oder andere Nebenflächen. Sie zählen zur Kaltmiete und in die Steuerberechnung. Getrennt von der Nettokaltmiete eintragen, damit die Miete pro m² nur die Wohnung misst. Unter „aufteilen“ lässt sich die Summe in Stellplatz, Küche und Sonstiges trennen. Das braucht der Marktbericht, weil ein Küchenzuschlag kürzer läuft als das Gebäude.',   /* v3670 */
       severity: 'beginner'
     },
+    /* v4060 · Mietvertrag: Hilfetexte zum Überfahren (Marcel 23.11.2026: „da steht keine Hilfe“) */
+    'tab3.mv_art': {
+      title: 'Vertragsart',
+      body: 'Die Vertragsform bestimmt, ob und wann die Miete steigen darf. Bei der Standardmiete gilt die Erhöhung auf die ortsübliche Vergleichsmiete (§ 558 BGB). Staffel- und Indexmiete tragen ihren nächsten Termin schon im Vertrag, dort ist § 558 ausgeschlossen. Bei verknüpften Objekten kommt die Angabe aus ViVi.',
+      paragraph: '§§ 557a, 557b, 558 BGB',
+      severity: 'beginner'
+    },
+    'tab3.mv_befristet': {
+      title: 'Befristet bis',
+      body: 'Ende eines befristeten Mietvertrags (Zeitmietvertrag nach § 575 BGB). Liegt die Miete deutlich über dem Markt, ist der Mehrertrag nur bis zu diesem Datum gesichert. Der Marktbericht rechnet ihn im Ertragswert genau bis dahin. Ohne Datum zeigt er Szenarien. Bei verknüpften Objekten kommt das Datum aus ViVi.',
+      paragraph: '§ 575 BGB',
+      severity: 'beginner'
+    },
+    'tab3.mv_kuendverzicht': {
+      title: 'Kündigungsverzicht bis',
+      body: 'Bis wann der Mieter vertraglich auf seine ordentliche Kündigung verzichtet hat (zulässig bis vier Jahre). So lange ist eine Miete über dem Markt gesichert, wie bei der Befristung. Der Marktbericht rechnet den Mehrertrag bis zu diesem Datum.',
+      severity: 'beginner'
+    },
+    'tab3.mv_abw': {
+      title: 'Miete unter Markt, noch (Jahre)',
+      body: 'Nur nötig, wenn die Miete mehr als 20 % unter dem Markt liegt: wie viele Jahre das voraussichtlich so bleibt, bis die Miete über Mieterhöhungen (Kappungsgrenze) aufgeholt hat. Der Marktbericht zieht den Mindertrag über diese Zeit im Ertragswert ab. Ohne Angabe zeigt er Szenarien über 3, 5 und 10 Jahre.',
+      severity: 'beginner'
+    },
     'tab3.umlagefaehig': {
       title: 'Umlagefähige Kosten',
       body: 'Betriebskosten die der Mieter zahlt: Heizung, Wasser, Müllabfuhr, Grundsteuer, Versicherungen (Gebäudehaftpflicht), Hausmeister, Aufzugswartung. Sind in der Bewirtschaftung als "durchlaufender Posten" — Mieter zahlt, Verwaltung leitet weiter.',
