@@ -995,6 +995,15 @@ function loadData(d) {
       aiContentEmpty.innerHTML = '<div style="color:var(--muted);padding:30px 20px;text-align:center">' +
         'Noch keine KI-Analyse für dieses Objekt. Klicke auf <strong>"KI-Analyse starten"</strong> um eine Investmentanalyse zu generieren.' +
         '</div>';
+      /* v4220 · Befund Musterhof 8: im Bestand gab es den Jahresabgleich (und damit den Jahresabschluss-Assistenten) erst
+         nach einem KI-Lauf. Er braucht keine KI: ohne Analyse steht er hier allein, sobald ein Ankauf-Stand da ist. */
+      try {
+        var _JA0 = window.DpJahresabgleich;
+        if (_JA0 && _JA0.verfuegbar && _JA0.verfuegbar() && _JA0.mountAll) {
+          aiContentEmpty.innerHTML += '<div class="dp-pa-wrap" style="margin-top:8px"><div class="dp-pa-card"><h3 style="margin:0 0 10px;font:600 16px \'Space Grotesk\',sans-serif">Jahresabgleich</h3><div data-dp-ja-host="1"></div></div></div>';
+          setTimeout(function () { try { _JA0.mountAll(); } catch (e) {} }, 0);
+        }
+      } catch (_eJa) {}
     }
     // Auch Mini-AI-Block leeren falls vorhanden
     var miniAi = document.getElementById('ai-mini-content');
