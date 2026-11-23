@@ -45225,3 +45225,9 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Commit:** main c3823f8 (staging 5c97cef).
 - **Nachweis:** deploy-staging gruen; vorschau 13/13, buster, jahresabgleich 142, jahresbuch 61, vivi 312, vivi-copilot 47, mietpotenzial 302, steuerjahr 36, grafiken-neu 23, ohne-markdown 25, unterlagen-steuer 19, sonderumlage 26, ki-deckel, prompt-lecks, score-ketten 216; Staging-Konsole ohne Fehler in allen 8 Reitern; Testobjekt 2026-1188 Musterhof 8 (Staging, ViVi prj neu angelegt). Prod: Backend healthy, Buster v4160k/v4220/v4230 ausgeliefert.
 - **Rest:** Beleg-Leser bucht Reparatur auf betr_sonst (Entscheidung Marcel) · Zielbild-Deckel schreibt das Feld um (Rueckfrage) · leere Wohnung zaehlt Vorjahre mit 0 · Anschlusszins in grafiken-premium aus der App abgeleitet (State.az 5 %, gerechnet 3,763 %, pruefen) · Telegram/Flow-Antworten noch mit Markdown.
+
+### Rollout 1.0.153 · 23.11.2026 · v4240–v4260
+- **Was:** v4240 Portfolio-Cockpit neu geordnet (Einfach/Genau, Gesamtbewertung wieder da, Rechenpruefung nur Genau) · v4250 Grafiken hell als Standard, Einstellung Grafiken hell/dunkel/wie App, Uebersicht ohne Zins-Heatmap, Mieteuro als Woher/Wohin, Fahrplan nach Ankauf/Bestand/Zielbild, Bewertung Vermoegensaufbau/-zuwachs neu, schwarzer WEG-Streifen in unterlagen.js weg · v4260 restliche Cockpit-Grafiken im Stil, Grundsetup (Kern/optional), "Ansicht anpassen" gespeichert in user_settings cockpit_ansicht. Alles Grafische hinter Vorschau grafiken_neu.
+- **Commit:** main 09ed0f9 (staging 86d8ba4).
+- **Nachweis:** deploy-staging gruen, vorschau 13/13, grafiken-neu 32, score-ketten, Gold-Audit RC 0, Rechenpruefung Cockpit 6/6. Prod: Backend healthy, Buster ausgeliefert.
+- **Rest:** zwei Projektionsmodelle im Cockpit ("Netto bis" je Objekt bzw. 1,5 %, Projektion & Verlauf ASSUMP Wert +2 % auf Kaufpreis) vereinheitlichen.
