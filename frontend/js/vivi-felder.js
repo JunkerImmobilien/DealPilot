@@ -259,7 +259,18 @@
   function istJahreUebernehmen(info) {
     var ij = info && info.ist_jahre; if (!ij || !ij.summe) return false;
     var JB = window.DpJahresbuch; if (!JB || !JB.viviIstSetzen) return false;
-    try { return JB.viviIstSetzen(ij.summe); } catch (e) { return false; }
+    /* Kaltmiete aus ViVi (ohne Stellplaetze) plus die Zusatzeinnahmen aus DealPilot je vermietetem Monat: ViVi kennt
+       nicht alle Zusatzeinnahmen (gemessen 2026-1052: 90 € im Monat nur in DealPilot). Ohne kalt (aelterer Abruf) die
+       Summe aus ViVi. */
+    var zeF = $('ze'), ze = zeF ? zahl(zeF.value) : 0;
+    if (ze == null || !isFinite(ze) || ze < 0) ze = 0;
+    var werte = {};
+    Object.keys(ij.summe).forEach(function (j) {
+      var x = ij.summe[j] || {};
+      var w = (typeof x.kalt === 'number') ? x.kalt + ze * (typeof x.monate_vermietet === 'number' ? x.monate_vermietet : (x.monate || 12)) : x.miete;
+      if (typeof w === 'number' && isFinite(w)) werte[j] = { miete: Math.round(w * 100) / 100 };
+    });
+    try { return JB.viviIstSetzen(werte); } catch (e) { return false; }
   }
   function erhoehungenUebernehmen(info) {
     var E = info && info.erhoehungen; if (!E || typeof E !== 'object') return false;

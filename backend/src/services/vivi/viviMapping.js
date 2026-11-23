@@ -412,7 +412,7 @@ function geplanteAus(verlauf, heute) {
    Mietverlauf (start_state, wirksame Aenderungen), Monate ohne Mietverhaeltnis zaehlen 0 (Leerstand). Stellplaetze des
    Mietverhaeltnisses zaehlen mit (DealPilot fuehrt die Jahresmiete samt Zusatzeinnahmen). Der Monat des Uebergangs zaehlt
    voll, wie anteilig.js getWuMonths. Ergebnis { 'JJJJ': { miete, monate_vermietet } } fuer Jahre vor dem laufenden. */
-function mieteImMonat(r, verlauf, iso) {
+function mieteImMonat(r, verlauf, iso, ohneStellplatz) {
   if (!r || (r.occupancy_type && r.occupancy_type !== 'rented')) return null;
   const b = isoDatum(r.rental_start), e = isoDatum(r.rental_end);
   const mEnde = iso.slice(0, 7) + '-31';
@@ -427,6 +427,7 @@ function mieteImMonat(r, verlauf, iso) {
       .forEach(function (c) { m = zahl(c.new_rent); });
   } else m = zahl(r.rent);
   if (m == null) return null;
+  if (ohneStellplatz) return m;
   const stp = stellplatzMiete(r);
   return m + (stp || 0);
 }
@@ -435,22 +436,24 @@ function istJahreAus(rentals, mietverlauf, ab, heute) {
   const a = isoDatum(ab); if (!a) return out;
   const j0 = +a.slice(0, 4), m0 = +a.slice(5, 7), jh = +heute.slice(0, 4);
   for (let j = j0; j < jh; j++) {
-    let sum = 0, vermietet = 0;
+    let sum = 0, kalt = 0, vermietet = 0;
     for (let mo = (j === j0 ? m0 : 1); mo <= 12; mo++) {
       const iso = j + '-' + String(mo).padStart(2, '0') + '-01';
-      let monat = 0, da = false;
-      (rentals || []).forEach(function (r) { const v = mieteImMonat(r, mietverlauf && mietverlauf[r.id], iso); if (v != null) { monat += v; da = true; } });
-      sum += monat; if (da) vermietet++;
+      let monat = 0, mk = 0, da = false;
+      (rentals || []).forEach(function (r) { const h = mietverlauf && mietverlauf[r.id]; const v = mieteImMonat(r, h, iso); if (v != null) { monat += v; mk += mieteImMonat(r, h, iso, true); da = true; } });
+      sum += monat; kalt += mk; if (da) vermietet++;
     }
-    out[String(j)] = { miete: rund(sum), monate_vermietet: vermietet, monate: 12 - (j === j0 ? m0 - 1 : 0) };
+    /* kalt = Nettokaltmiete ohne Stellplaetze. Das Frontend rechnet die Zusatzeinnahmen aus DealPilot dazu, weil ViVi
+       nicht alle kennt (gemessen 2026-1052: 90 € im Monat nur in DealPilot, 2025 sonst 1.080 € zu wenig). */
+    out[String(j)] = { miete: rund(sum), kalt: rund(kalt), monate_vermietet: vermietet, monate: 12 - (j === j0 ? m0 - 1 : 0) };
   }
   return out;
 }
 function istJahreSumme(teile) {
   const out = {};
   teile.forEach(function (t) { Object.keys(t || {}).forEach(function (j) {
-    const x = out[j] || (out[j] = { miete: 0, monate_vermietet: 0, monate: t[j].monate });
-    x.miete = rund(x.miete + t[j].miete); x.monate_vermietet = Math.max(x.monate_vermietet, t[j].monate_vermietet);
+    const x = out[j] || (out[j] = { miete: 0, kalt: 0, monate_vermietet: 0, monate: t[j].monate });
+    x.miete = rund(x.miete + t[j].miete); x.kalt = rund(x.kalt + (t[j].kalt || 0)); x.monate_vermietet = Math.max(x.monate_vermietet, t[j].monate_vermietet);
   }); });
   return out;
 }

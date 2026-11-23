@@ -1191,7 +1191,7 @@ kopf('U  v4037 Ist je Jahr aus dem Mietverlauf, geplante Erhöhungen');
     { id: 'b', effective_date: '2026-11-01', status: 'active', previous_rent: 570, new_rent: 620 },
     { id: 'c', effective_date: '2027-03-01', status: 'scheduled', previous_rent: 620, new_rent: 650 }] };
   const ij = mapping.istJahreAus([r1], { r1: h1 }, '2024-03-01', '2026-11-23');
-  ok(ij['2024'] && ij['2024'].miete === 5600 && ij['2024'].monate === 10, 'U1 Kaufjahr 2024 ab Übergang 01.03.: 10 × (520 + 40) = 5.600 € (' + (ij['2024'] && ij['2024'].miete) + ')');
+  ok(ij['2024'] && ij['2024'].miete === 5600 && ij['2024'].kalt === 5200 && ij['2024'].monate === 10, 'U1 Kaufjahr 2024 ab Übergang 01.03.: 10 × (520 + 40) = 5.600 €, kalt ohne Stellplatz 5.200 € (' + (ij['2024'] && ij['2024'].miete) + ')');
   ok(ij['2025'] && ij['2025'].miete === 6770, 'U2 2025: 11 × 560 + 1 × 610 = 6.770 € (' + (ij['2025'] && ij['2025'].miete) + ')');
   ok(!ij['2026'], 'U3 das laufende Jahr steht nicht in den Ist-Jahren');
   const alt = { id: 'r0', unit_id: 'u1', occupancy_type: 'rented', rental_start: '2019-01-01', rental_end: '2025-06-30', rent: 500 };
