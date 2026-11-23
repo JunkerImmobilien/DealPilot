@@ -29,7 +29,7 @@
  * ═════════════════════════════════════════════════════════════════════════════════════════════════════════ */
 (function (global) {
   'use strict';
-  var VERSION = 'v4042a';
+  var VERSION = 'v4100';
 
   /* ══ KERN (ohne DOM, auch fuer Node) ══════════════════════════════════════════════════════════════════ */
   var REIHE = ['einnahmen_km', 'einnahmen_nk', 'schuldzinsen', 'erhaltungsaufwand', 'nk_umlf', 'nk_n_umlf', 'sonst_kosten', 'sonst_bewegl_wg', 'afa'];
@@ -267,6 +267,7 @@
   var _letzte = {};   /* jahr -> letzter Abgleich (fuer die Knoepfe) */
   function html(jahr) {
     if (!aktiv()) return '';
+    stil();   /* v4100 · auch ausserhalb des Jahresabgleichs (Belege je Jahr, Assistent Jahresabschluss) */
     var J = jahreViVi();
     if (!J.length) return '';
     if (J.indexOf(jahr) < 0) jahr = J.indexOf(heuteJahr() - 1) >= 0 ? heuteJahr() - 1 : J[J.length - 1];

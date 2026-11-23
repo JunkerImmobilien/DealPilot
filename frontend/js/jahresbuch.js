@@ -420,6 +420,7 @@
     } else {
       zus = '<div class="dp-jb-h"><b>Kaltmiete ' + z.jahr + ': ' + eur(z.miete_ist) + '</b>. '
         + (z.miete_eigen ? 'Du hast diese Summe eingetragen. Gerechnet wären es ' + eur(z.miete_proj) + '.'
+          : z.miete_vivi ? 'Sie kommt aus dem ViVi-Mietverlauf. Weicht die echte Miete ab, zum Beispiel wegen Leerstand, trag sie hier ein.'   /* v4100 */
           : 'DealPilot rechnet sie aus der Miete im Reiter Miete und den Mieterhöhungen von ' + z.jahr + '. Weicht die echte Miete ab, zum Beispiel wegen Leerstand, trag sie hier ein.') + '</div>';
     }
     var st = STATUS.map(function (s) { return '<option value="' + s[0] + '"' + (z.status === s[0] ? ' selected' : '') + '>' + s[1] + '</option>'; }).join('');

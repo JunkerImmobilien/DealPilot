@@ -572,7 +572,7 @@
       /* v4100 · Gruppen „Laut ViVi“ und „In DealPilot gebucht“ */
       + '.ue-bj-gruppe{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:4px 0 8px;font:700 11px/1.3 Inter,system-ui,sans-serif;letter-spacing:.06em;text-transform:uppercase;color:var(--muted,#7A7370)}'
       + '.ue-bj-gruppe .oabi-btn{text-transform:none;letter-spacing:0;padding:6px 12px}'
-      + '.ue-bj-vivi{margin:0 0 14px}.ue-bj-vivi .vst{margin:0}'
+      + '.ue-bj-vivi{margin:0 0 14px}.ue-bj-vivi .vst{margin:0}.ue-bj-vivi.fest .vst-jahre{display:none}'
       + '@media (max-width:640px){.ue-bj-summe{grid-template-columns:1fr 1fr}.ue-bj-summe span:last-child{grid-column:1/-1}'
       + '.ue-bj summary{grid-template-columns:minmax(0,1fr) auto}.ue-bj summary .bj-z:not(.bj-zb){grid-column:2;grid-row:1}.ue-bj summary .bj-zb{grid-column:1/-1;grid-row:2;text-align:left}.ue-bj summary .bj-zb:empty{display:none}.ue-bj summary .bj-zb small{display:inline;margin-left:4px}'
       + '.ue-bj .bj-b{grid-template-columns:minmax(0,1fr) auto}.ue-bj .bj-b .bj-d{grid-column:1/-1;order:3}}';
@@ -601,7 +601,7 @@
       inhalt = VS.html(jahr);
       if (!inhalt) inhalt = '<p class="oabi-sub" style="padding:0">Der Abgleich der Steuer mit ViVi ist in den Einstellungen ausgeschaltet.</p>';
     } else inhalt = '<p class="oabi-sub" style="padding:0">ViVi führt für ' + jahr + ' noch keine Buchungen der Anlage V. Gleich ab, um sie zu holen.</p>';
-    return '<div class="ue-bj-vivi"><div class="ue-bj-gruppe"><span>Laut ViVi</span><button type="button" class="oabi-btn" data-bj-vivi>Mit ViVi abgleichen</button></div>' + inhalt + '</div>';
+    return '<div class="ue-bj-vivi' + (opt && opt.festesJahr ? ' fest' : '') + '"><div class="ue-bj-gruppe"><span>Laut ViVi</span><button type="button" class="oabi-btn" data-bj-vivi>Mit ViVi abgleichen</button></div>' + inhalt + '</div>';
   }
   function _jahre() {
     var jahre = ((typeof window.dpWkJahre === 'function' ? window.dpWkJahre() : []) || []).slice();
