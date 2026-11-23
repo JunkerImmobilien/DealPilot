@@ -138,6 +138,18 @@ function gleicheAnschrift(p, projekt) {
     && String(p.purchase_date || '').slice(0, 10) === String(projekt.purchase_date || '').slice(0, 10);
 }
 
+/* v4210 · Mieterhoehungen eines Vertrags nacheinander als Mietaenderung (POST …/rent-changes ueber die freigegebene Methode
+   mietaenderungAnlegen). z.aend zaehlt die schon gesendeten, ein Fortsetzen schickt keine doppelt. */
+async function aenderungenSenden(cl, P, z, liste, q, gezaehlt, merke) {
+  const L = Array.isArray(liste) ? liste : [];
+  for (let i = z.aend || 0; i < L.length; i++) {
+    await cl.mietaenderungAnlegen(P + '/rental-units/' + encodeURIComponent(String(z.rental_id)) + '/rent-changes', L[i], q);
+    z.aend = i + 1;
+    gezaehlt.mietaenderungen = (gezaehlt.mietaenderungen || 0) + 1;
+    await merke();
+  }
+}
+
 async function anlegen(userId, objectId, opt) {
   opt = opt || {};
   const o = await objekt(userId, objectId);
@@ -182,21 +194,48 @@ async function anlegen(userId, objectId, opt) {
     /* 2 · Einheiten und Mietverhaeltnisse. ViVi legt mit dem Objekt eine Einheit an (units: 1). Sie gehoert der
        ersten vermieteten Einheit (das Mietverhaeltnis setzt dabei Name, Flaeche, Etage), sonst der ersten. */
     ids.einheiten = ids.einheiten || {};
-    if (!ids.auto_fuer) ids.auto_fuer = ((plan.einheiten.find(function (e) { return e.miete; }) || plan.einheiten[0]) || {}).schluessel || null;
+    if (!ids.auto_fuer) ids.auto_fuer = ((plan.einheiten.find(function (e) { return e.miete || (e.fruehere && e.fruehere.length); }) || plan.einheiten[0]) || {}).schluessel || null;
     let vorhUnits = null, vorhRentals = null;
     if (anspruch.fortsetzen) { vorhUnits = liste(await cl.get(P + '/units', q)); vorhRentals = liste(await cl.get(P + '/rental-units', q)); }
     for (const e of plan.einheiten) {
       const g = ids.einheiten[e.schluessel] || { index: e.index, nr: e.nr, name: e.name };
       if (g.fertig) continue;
       if (e.schluessel === ids.auto_fuer && ids.auto_einheit && !g.unit_id) g.unit_id = ids.auto_einheit;
+      /* v4210 · fruehere Vertraege zuerst (aeltester zuerst), damit der heutige Vertrag als letzter laufend bleibt.
+         Je Vertrag danach seine Mieterhoehungen als Mietaenderung mit Stichtag. Fortschritt in g.frueher[k] / g.aend. */
+      if (e.fruehere && e.fruehere.length) {
+        g.frueher = g.frueher || [];
+        for (let k = 0; k < e.fruehere.length; k++) {
+          const fz = g.frueher[k] || {};
+          if (fz.fertig) continue;
+          const v = e.fruehere[k];
+          if (!fz.rental_id) {
+            const da = vorhRentals && vorhRentals.find(function (r) { return String(r.rental_start || '').slice(0, 10) === v.rental_start && (!g.unit_id || String(r.unit_id) === String(g.unit_id)); });
+            if (da) { fz.rental_id = da.id; g.unit_id = da.unit_id || g.unit_id; gezaehlt.uebernommen++; }
+            else {
+              const rumpf = Object.assign({}, v); delete rumpf.aenderungen;
+              if (g.unit_id) rumpf.unit_id = String(g.unit_id);
+              const r = await cl.post(P + '/rental-units', rumpf, q);
+              fz.rental_id = r && r.data && r.data.id;
+              g.unit_id = (r && r.data && r.data.unit_id) || g.unit_id;
+              if (!fz.rental_id) throw fehler(502, 'antwort_ohne_id', 'ViVi hat das frühere Mietverhältnis ohne ID bestätigt.');
+              gezaehlt.mietverhaeltnisse++;
+            }
+            g.frueher[k] = fz; ids.einheiten[e.schluessel] = g; await merken();
+          }
+          fz.aend = fz.aend || 0;
+          await aenderungenSenden(cl, P, fz, v.aenderungen, q, gezaehlt, function () { g.frueher[k] = fz; ids.einheiten[e.schluessel] = g; return merken(); });
+          fz.fertig = true; g.frueher[k] = fz; ids.einheiten[e.schluessel] = g; await merken();
+        }
+      }
       if (e.miete) {
         if (!g.rental_id) {
           /* Fortsetzen: kam das Mietverhaeltnis doch an? Ueber die Einheit (gemerkt, sonst gleicher Name) */
           const uid = g.unit_id || (vorhUnits && (vorhUnits.find(function (u) { return u.identifier === e.name; }) || {}).id) || null;
-          const da = vorhRentals && vorhRentals.find(function (r) { return uid ? String(r.unit_id) === String(uid) : (r.unit && r.unit.identifier === e.name); });
+          const da = vorhRentals && vorhRentals.find(function (r) { return (uid ? String(r.unit_id) === String(uid) : (r.unit && r.unit.identifier === e.name)) && (!r.rental_start || String(r.rental_start).slice(0, 10) === e.miete.rental_start); });   /* v4210 · mit frueheren Vertraegen auf derselben Einheit: nach Mietbeginn */
           if (da) { g.rental_id = da.id; g.unit_id = da.unit_id || g.unit_id; gezaehlt.uebernommen++; }
           else {
-            const rumpf = Object.assign({}, e.miete);
+            const rumpf = Object.assign({}, e.miete); delete rumpf.aenderungen;   /* v4210 · die Erhoehungen gehen danach als Mietaenderung */
             if (g.unit_id) rumpf.unit_id = String(g.unit_id);
             const r = await cl.post(P + '/rental-units', rumpf, q);
             g.rental_id = r && r.data && r.data.id;
@@ -204,7 +243,14 @@ async function anlegen(userId, objectId, opt) {
             if (!g.rental_id) throw fehler(502, 'antwort_ohne_id', 'ViVi hat das Mietverhältnis ohne ID bestätigt.');
             gezaehlt.mietverhaeltnisse++;
           }
+          ids.einheiten[e.schluessel] = g; await merken();
         }
+        /* v4210 · Mieterhoehungen des heutigen Vertrags als Mietaenderung mit Stichtag */
+        const gz = { rental_id: g.rental_id, aend: g.aend || 0 };
+        await aenderungenSenden(cl, P, gz, e.miete.aenderungen, q, gezaehlt, function () { g.aend = gz.aend; ids.einheiten[e.schluessel] = g; return merken(); });
+        g.aend = gz.aend;
+      } else if (e.fruehere && e.fruehere.length) {
+        /* v4210 · heute leer, aber mit frueheren Vertraegen: die Einheit kam mit dem ersten frueheren Vertrag */
       } else if (g.unit_id && String(g.unit_id) === String(ids.auto_einheit) && !ids.auto_angepasst) {
         /* v3965 · die automatische Einheit ist leer: einmal benennen (Name, Art, Flaeche, Etage), sonst bliebe sie
            „Einheit 1“ ohne Flaeche. Gemerkt in ids.auto_angepasst, ein Fortsetzen schickt es nicht noch einmal. */
@@ -398,7 +444,8 @@ async function abrufen(userId, objectId, opt) {
     }
     const erg = mapping.ausVivi({ projekt: projekt, einheiten: einheiten, mietverhaeltnisse: miet, darlehen: darl, tilgungsplan: plan, mietverlauf: mietverlauf },
       { vivi_ids: v.vivi_ids || {}, mitEinheiten: mitEinheiten(v, o.data), objart: o.data && o.data.objart, jetzt: deps().jetzt(),
-        musterAnschrift: !!(v.vivi_ids && v.vivi_ids.muster_anschrift), uebergang: uebergang });
+        musterAnschrift: !!(v.vivi_ids && v.vivi_ids.muster_anschrift), uebergang: uebergang,
+        dpMietzeiten: (function () { try { return mapping.dpMietzeiten(o.data || {}); } catch (e) { return null; } })() });   /* v4210 · Abdeckung */
     /* v4037 · gezahlte Mieten je Jahr (warm, Hinweis im Jahresabgleich). Ein Fehler kostet nur den Hinweis. */
     if (erg.info && erg.info.ist_jahre && Object.keys(erg.info.ist_jahre.summe || {}).length) {
       let gz = null;

@@ -247,9 +247,15 @@ function nurLesenBefunde(dateien) {
     }
     if (rel.endsWith('viviDienst.js')) {
       /* v4037 · Mietänderung anlegen nur in mieterhoehung(), dort nur mit bestaetigt === true */
+      /* v4210 · und genau einmal in aenderungenSenden(), das nur anlegen() ruft (Mietverlauf beim einmaligen Anlegen) */
       const ma = (ohneKommentar.match(/mietaenderungAnlegen\(/g) || []).length;
       const mf = /async function mieterhoehung\([\s\S]*?\r?\n\}\r?\n/.exec(ohneKommentar);
-      if (ma !== 1 || !mf || !/mietaenderungAnlegen\(/.test(mf[0])) f.push(rel + ': mietaenderungAnlegen ' + ma + ' mal, erlaubt genau einmal in mieterhoehung()');
+      const af = /async function aenderungenSenden\([\s\S]*?\r?\n\}\r?\n/.exec(ohneKommentar);
+      const anlA = /async function anlegen\([\s\S]*?\r?\n\}\r?\n/.exec(ohneKommentar);
+      const asAufrufe = (ohneKommentar.match(/aenderungenSenden\(/g) || []).length;
+      const asInAnlegen = anlA ? (anlA[0].match(/aenderungenSenden\(/g) || []).length : 0;
+      if (ma !== 2 || !mf || !/mietaenderungAnlegen\(/.test(mf[0]) || !af || !/mietaenderungAnlegen\(/.test(af[0])) f.push(rel + ': mietaenderungAnlegen ' + ma + ' mal, erlaubt genau einmal in mieterhoehung() und einmal in aenderungenSenden()');
+      if (asAufrufe - 1 !== asInAnlegen || asInAnlegen < 1) f.push(rel + ': aenderungenSenden ausserhalb von anlegen() gerufen');
       if (mf && !/opt\.bestaetigt !== true/.test(mf[0])) f.push(rel + ': mieterhoehung ohne Bestätigung');
     }
     if (/method\s*:\s*['"`](?!GET['"`]|POST['"`])/i.test(ohneKommentar.replace(/method\s*:\s*methode/g, ''))) f.push(rel + ': method mit anderem Wert als GET/POST');
@@ -381,12 +387,21 @@ function attrappe() {
       let uid = b.unit_id;
       if (uid) { const u = st.einheiten[uid]; if (!u || u._p !== x[1]) return antwort(422, { message: 'unit_id' }); if (b.unit_identifier) u.identifier = b.unit_identifier; if (b.unit_square_meters != null) u.square_meters = b.unit_square_meters; if (b.unit_floor) u.floor = b.unit_floor; }
       else { if (!b.unit_identifier || b.unit_square_meters == null) return antwort(422, { message: 'neue Einheit braucht unit_identifier und unit_square_meters' }); uid = id('unt'); st.einheiten[uid] = { id: uid, _p: x[1], identifier: b.unit_identifier, square_meters: b.unit_square_meters, floor: b.unit_floor || null, unit_type: b.unit_type || 'residential' }; }
-      if (Object.values(st.miete).some((r) => r.unit_id === uid)) return antwort(422, { message: 'Überschneidung' });
+      /* v4210 · vergangene Vertraege (rental_type past, mit Ende) auf derselben Einheit: nur ueberlappend ist ein Fehler */
+      if (b.rental_type === 'past' && !b.rental_end) return antwort(422, { message: 'past ohne rental_end' });
+      if (Object.values(st.miete).some((r) => r.unit_id === uid && (!r.rental_end || r.rental_end >= b.rental_start) && (!b.rental_end || b.rental_end >= r.rental_start))) return antwort(422, { message: 'Überschneidung' });
       const rid = id('ren');
       const r = { id: rid, _p: x[1], project_id: x[1], unit_id: uid };
-      ['tenant_first_name', 'tenant_last_name', 'rent', 'monthly_utility_costs', 'rental_start', 'rent_due_day', 'rental_end', 'deposit_amount', 'last_rent_increase', 'contract_type', 'amenities'].forEach((k) => { if (k in b) r[k] = b[k]; });
+      ['rental_type', 'tenant_first_name', 'tenant_last_name', 'rent', 'monthly_utility_costs', 'rental_start', 'rent_due_day', 'rental_end', 'deposit_amount', 'last_rent_increase', 'contract_type', 'amenities'].forEach((k) => { if (k in b) r[k] = b[k]; });
       st.miete[rid] = r;
       return antwort(201, { data: mieteRes(r) });
+    }
+    /* v4210 · Mietaenderung mit Stichtag (auch rueckwirkend), gemerkt am Mietverhaeltnis */
+    if (m === 'POST' && (x = /^\/projects\/([^/]+)\/rental-units\/([^/]+)\/rent-changes$/.exec(pfad))) {
+      const r = st.miete[x[2]]; if (!r || r._p !== x[1]) return antwort(404, {});
+      if (r.rental_end && b.effective_date > r.rental_end) return antwort(422, { message: 'Stichtag nach Mietende' });
+      (r._aend = r._aend || []).push({ effective_date: b.effective_date, new_rent: b.new_rent, adjustment_type: b.adjustment_type });
+      return antwort(201, { data: { id: id('rch'), status: 'active' } });
     }
     if ((x = /^\/projects\/([^/]+)\/financings$/.exec(pfad))) {
       if (!st.projekte[x[1]]) return antwort(404, {});
@@ -459,7 +474,7 @@ ok(alleAngelegt && !A.st.fehler.length, OIDS.length + ' Objekte angelegt, die At
 ok(Object.keys(A.st.projekte).length === OIDS.length, 'je Objekt genau ein ViVi-Objekt (' + Object.keys(A.st.projekte).length + ')');
 {
   let erwartetE = 0, erwartetM = 0, erwartetD = 0;
-  OIDS.forEach((o) => { const p = mapping.nachVivi(objekte[o].data, {}); erwartetE += p.einheiten.length; erwartetM += p.einheiten.filter((e) => e.miete).length; erwartetD += p.darlehen.length; });
+  OIDS.forEach((o) => { const p = mapping.nachVivi(objekte[o].data, {}); erwartetE += p.einheiten.length; erwartetM += p.einheiten.reduce((s, e) => s + (e.miete ? 1 : 0) + (e.fruehere ? e.fruehere.length : 0), 0); erwartetD += p.darlehen.length; });   /* v4210 · fruehere Vertraege zaehlen mit */
   ok(Object.keys(A.st.einheiten).length === erwartetE, 'Einheiten in ViVi = Einheiten in DealPilot (' + Object.keys(A.st.einheiten).length + ' von ' + erwartetE + ', die von ViVi selbst angelegte mitgezählt)');
   ok(Object.keys(A.st.miete).length === erwartetM && Object.keys(A.st.darlehen).length === erwartetD, 'Mietverhältnisse ' + Object.keys(A.st.miete).length + '/' + erwartetM + ', Darlehen ' + Object.keys(A.st.darlehen).length + '/' + erwartetD);
   const ohneFlaeche = Object.values(A.st.einheiten).filter((u) => !(u.square_meters > 0) && objekte[Object.keys(SP.v).find((k) => SP.v[k].vivi_objekt_id === u._p)].data._mfh);
@@ -1491,6 +1506,75 @@ kopf('V  v4040 Reiter ViVi, Bewirtschaftung Ist heute aus dem Steuerjahr');
     'G5 Anlegen so voll wie möglich: Anzeigename Ort, Straße, Art, Zielmiete 10,50 × 60 = 630 €, Disagio aus Kurs 98 % (6.000 €), 6 tilgungsfreie Monate, Sondertilgung 5 %, passt zum Schema');
   const leer = mapping.nachVivi({ objart: 'ETW', str: 'Probeweg', hnr: '5', plz: '12345', ort: 'Teststadt', kp: '100000', wirtschaftlicher_uebergang: '2023-05-01', nkm: '500', wfl: '50', d1: '80000', d1z: '4', d1t: '2' }, { musterAnschrift: true });
   ok(!leer.projekt.name && !('target_rent' in leer.einheiten[0].miete) && !('disagio_amount' in leer.darlehen[0].body), 'G6 Gegenprobe: Musteranschrift ohne Anzeigename, ohne Zielbild keine Zielmiete, ohne Kurs kein Disagio');
+}
+/* ═══ V · v4210 Mietverlauf beim Anlegen (Befund B2/B3, Testobjekt 2026-1188, Muster) ═══════════════ */
+kopf('MV Mietverlauf beim Anlegen: frühere Verträge und Mieterhöhungen, Abdeckung');
+{
+  const dV = { objart: 'MFH', str: 'Probeweg', hnr: '8', plz: '12345', ort: 'Teststadt', kp: '465000', wirtschaftlicher_uebergang: '2021-02-01', d1: '372000', d1z: '1.15', d1t: '2',
+    _mfh: { einheiten: [
+      { nr: '1', wfl: '62', ist: '560', status: 'vermietet', mv_beginn: '2014-05-01', erhoehungen: [{ datum: '2022-04-01', art: '558', von: 470, auf: 520 }, { datum: '2024-04-01', art: '558', von: 520, auf: 560 }] },
+      { nr: '3', wfl: '70', ist: '650', status: 'vermietet', mv_beginn: '2024-04-01', erhoehungen: [{ datum: '2022-04-01', art: '558', von: 480, auf: 530 }, { datum: '2024-04-01', art: 'neuvermietung', auf: 650 }],
+        mv_historie: [{ mv_beginn: '2012-03-01', kaltmiete: '530', abgelegt_am: '2023-12-31', nk_vorauszahlung: '200' }] },
+      { nr: '5', wfl: '55', status: 'leer', erhoehungen: [{ datum: '2022-09-01', art: '558', von: 400, auf: 440 }],
+        mv_historie: [{ mv_beginn: '2019-06-01', kaltmiete: '440', abgelegt_am: '2025-08-31', nk_vorauszahlung: '160' }] },
+      { nr: '6', wfl: '40', ist: '300', status: 'vermietet', mv_beginn: '2015-01-01', mv_historie: [{ mv_beginn: '2010-01-01', kaltmiete: '250', abgelegt_am: '2026-05-01' }] }
+    ] } };
+  const pv = mapping.nachVivi(dV, { platzhalterNamen: true });
+  const [e1, e3, e5, e6] = pv.einheiten;
+  ok(e1.miete.rent === 470 && e1.miete.aenderungen.length === 2 && e1.miete.aenderungen[0].effective_date === '2022-04-01' && e1.miete.aenderungen[1].new_rent === 560
+    && e1.miete.aenderungen[0].adjustment_type === 'increase' && e1.miete.aenderungen[0].legal_basis === '§ 558 BGB',
+    'MV1 heutiger Vertrag: Anfangsmiete 470 € ab 2014, dann Erhöhungen 01.04.2022 auf 520 € und 01.04.2024 auf 560 € (§ 558) statt 560 € seit 2014');
+  ok(e3.fruehere && e3.fruehere.length === 1 && e3.fruehere[0].rental_type === 'past' && e3.fruehere[0].rental_end === '2023-12-31' && e3.fruehere[0].rent === 480
+    && e3.fruehere[0].aenderungen.length === 1 && e3.fruehere[0].aenderungen[0].new_rent === 530 && e3.miete.rent === 650 && !e3.miete.aenderungen,
+    'MV2 Mieterwechsel: früherer Vertrag 2012 bis 31.12.2023 (480 €, ab 04/2022 530 €) als past, Neuvermietung 650 € ist der Beginn des neuen Vertrags, keine Mietänderung');
+  ok(!e5.miete && e5.fruehere && e5.fruehere[0].rental_end === '2025-08-31' && e5.fruehere[0].rent === 400 && e5.fruehere[0].aenderungen[0].new_rent === 440,
+    'MV3 heute leere Einheit: der frühere Vertrag bis 31.08.2025 geht mit (B3), samt Erhöhung 09/2022');
+  ok(!e6.fruehere,
+    'MV4 Vertrag, der vor dem Übergang endete (Ende = Tag vor dem heutigen Vertrag, 31.12.2014), geht nicht mit');
+  const fS = [];
+  pv.einheiten.forEach((e) => { [e.miete].concat(e.fruehere || []).filter(Boolean).forEach((m) => {
+    const r = Object.assign({}, m); delete r.aenderungen;
+    fS.push(...pruefeSchema(r, rumpfSchema('POST', '/projects/{project}/rental-units'), 'rental'));
+    (m.aenderungen || []).forEach((a) => { fS.push(...pruefeSchema(a, rumpfSchema('POST', '/projects/{project}/rental-units/{rentalUnit}/rent-changes'), 'rent-change'));
+      Object.keys(a).forEach((k) => { if (viviClient.MIETAENDERUNG_FELDER.indexOf(k) < 0) fS.push('Feld ' + k + ' nicht freigegeben'); }); });
+  }); });
+  ok(!fS.length, 'MV5 frühere Verträge und Mietänderungen passen zum Schema und nur freigegebene Felder' + (fS.length ? ': ' + fS.slice(0, 3).join(' | ') : ''));
+  const kaputt = JSON.parse(JSON.stringify(dV)); kaputt._mfh.einheiten[0].ist = '600';
+  const pk = mapping.nachVivi(kaputt, { platzhalterNamen: true });
+  ok(pk.einheiten[0].miete.rent === 600 && !pk.einheiten[0].miete.aenderungen && pk.hinweise.some((h) => /passen die Mieterhöhungen nicht/.test(h)),
+    'MV6 Gegenprobe: Kette geht nicht auf (letzte Erhöhung 560 €, Miete 600 €), dann heutige Miete ab Mietbeginn mit Hinweis, kein erfundener Verlauf');
+  /* Ende zu Ende gegen die Attrappe, dann der Mietverlauf in ViVi je Jahr gegen DealPilot */
+  const AV = attrappe(); const oidV = '00000000-0000-4000-8000-00000000v210'.replace('v210', '0210');
+  const SV = speicherImArbeitsspeicher({ [oidV]: { user: USER, data: dV, nr: 'V' } });
+  setzeDeps({ speicher: SV, creds: { getSecret: async () => TOKEN }, client: (t, o) => viviClient.erzeugen(t, Object.assign({}, o, { fetch: AV.holen, maxWarten: 0 })), jetzt: () => SV.zeit.jetzt, schlafen: async () => {} });
+  let rV = null; try { rV = await dienst.anlegen(USER, oidV, { platzhalter_namen: true }); } catch (e) { rV = e; }
+  const R = Object.values(AV.st.miete);
+  ok(rV && rV.ok && !AV.st.fehler.length && R.length === 5 && R.filter((r) => r.rental_type === 'past').length === 2 && rV.angelegt.mietaenderungen === 4,
+    'MV7 Anlegen: 5 Mietverhältnisse (2 frühere), 4 Mietänderungen, keine Abweichung von der Spezifikation' + (rV && rV.message ? ': ' + rV.message : '') + (AV.st.fehler.length ? ': ' + AV.st.fehler.join(' | ') : ''));
+  const reihe = AV.st.anfragen.filter((a) => /^POST .*rental-units/.test(a));
+  ok(reihe.length && /rental-units$/.test(reihe[0]) && reihe.findIndex((a) => /rent-changes$/.test(a)) > 0, 'MV8 Reihenfolge: erst das Mietverhältnis, dann seine Mietänderungen');
+  const verlauf = {}; R.forEach((r) => { verlauf[r.id] = { start_state: { rent: r.rent }, rent_changes: (r._aend || []).map((c) => Object.assign({ status: 'active' }, c)) }; });
+  const ij = mapping.istJahreAus(R, verlauf, '2021-02-01', '2026-11-23');
+  /* DealPilot: WE1 470/520(04.22)/560(04.24), WE3 480/530(04.22) bis 12.23, ab 04.24 650, WE5 400/440(09.22) bis 08.25, WE6 300 */
+  const soll = { 2021: 11 * (470 + 480 + 400 + 300), 2025: 12 * 560 + 12 * 650 + 8 * 440 + 12 * 300 };
+  ok(Math.abs(ij['2021'].kalt - soll[2021]) < 0.01 && Math.abs(ij['2025'].kalt - soll[2025]) < 0.01,
+    'MV9 Mietverlauf in ViVi = DealPilot: 2021 ' + ij['2021'].kalt + ' € (Soll ' + soll[2021] + '), 2025 ' + ij['2025'].kalt + ' € (Soll ' + soll[2025] + ')');
+  let rV2 = null; try { rV2 = await dienst.anlegen(USER, oidV, {}); } catch (e) { rV2 = e; }
+  ok(Object.values(AV.st.miete).length === 5 && rV2 && rV2.status === 409, 'MV10 kein zweites Anlegen, keine doppelten Mietänderungen');
+  const dpz = mapping.dpMietzeiten(dV);
+  const lu = mapping.mietLuecken(dpz['1'], [{ id: 'r1', rental_start: '2024-04-01', rent: 650 }], {}, '2021-02-01', '2026-11-23');
+  ok(lu['2021'] === 11 && lu['2022'] === 12 && lu['2023'] === 12 && !lu['2024'] && !lu['2025'],
+    'MV11 Abdeckung: kennt ViVi nur den heutigen Vertrag (ab 04/2024), fehlen 2021 bis 2023 die Monate mit Vertrag in DealPilot');
+  const lu2 = mapping.mietLuecken(dpz['1'], [{ id: 'a', rental_start: '2012-03-01', rental_end: '2023-12-31', rent: 480 }, { id: 'b', rental_start: '2024-04-01', rent: 650 }], {}, '2021-02-01', '2026-11-23');
+  const lu5 = mapping.mietLuecken(dpz['2'], [], {}, '2021-02-01', '2026-11-23');
+  ok(!Object.keys(lu2).length && lu5['2025'] === 8 && lu5['2021'] === 11, 'MV12 mit früherem Vertrag lückenlos, leere Einheit ohne Verlauf in ViVi: 2025 fehlen 8 Monate');
+  const aus = mapping.ausVivi({ projekt: { id: 'p', units: [] }, einheiten: [{ id: 'u1', identifier: 'WE 3', square_meters: 70 }], mietverhaeltnisse: [{ id: 'r1', unit_id: 'u1', rental_start: '2024-04-01', rent: 650 }], mietverlauf: {} },
+    { vivi_ids: { einheiten: { e1: { index: 1, nr: '3', unit_id: 'u1' } } }, mitEinheiten: true, objart: 'MFH', jetzt: Date.parse('2026-11-23T10:00:00Z'), uebergang: '2021-02-01', dpMietzeiten: dpz });
+  const sj = aus.info.ist_jahre && aus.info.ist_jahre.summe;
+  ok(sj && sj['2022'].abgedeckt === false && sj['2025'].abgedeckt === true && aus.info.ist_jahre.luecken['2022'][0].monate === 12,
+    'MV13 Abruf meldet je Jahr abgedeckt ja/nein mit Lücken, das Frontend übernimmt nicht abgedeckte Jahre nicht');
+  const ve2 = lies('frontend/js/vivi-felder.js');
+  ok(ve2.indexOf('ij.summe[j].abgedeckt === false) { werte[j] = null; return; }') >= 0, 'MV14 vivi-felder.js istJahreUebernehmen: nicht abgedeckte Jahre ohne Ist aus ViVi');
 }
 dienst._setzeDeps(null);
 console.log('\n' + (rot ? 'ROT · ' + rot + ' Befund(e), ' + gruen + ' grün' : 'SAUBER · ' + gruen + ' Prüfpunkte grün'));

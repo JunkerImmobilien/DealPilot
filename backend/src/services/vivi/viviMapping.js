@@ -150,6 +150,40 @@ function etageZahl(v) {
  * Anschrift verlaesst DealPilot dann nie. ausVivi() liest die Anschrift einer so angelegten Verknuepfung nicht
  * zurueck (kontext.musterAnschrift), sonst stuende die Musteranschrift danach im DealPilot-Objekt.
  */
+/* ── v4210 · Mietverlauf beim Anlegen (Befund B2/B3, Fork M 23.11.2026 an 2026-1188) ─────────────
+   Bis v4209 ging je Einheit nur der heutige Vertrag mit der heutigen Miete ab Mietbeginn nach ViVi: Einheit 1 stand dort
+   mit 560 € seit 2014, eine heute leere Einheit ohne ihr frueheres Mietverhaeltnis. ViVis Mietverlauf war damit fuer jedes
+   vergangene Jahr falsch, und der Jahresabgleich nahm ihn als Ist. Jetzt geht mit, was DealPilot weiss:
+     · fruehere Vertraege (e.mv_historie, mfh-einheiten.js v3160) als rental_type past mit rental_end, sofern sie nach dem
+       Uebergang endeten (Ende = abgelegt_am, hoechstens der Tag vor dem naechsten Vertrag)
+     · je Vertrag die Anfangsmiete und die Mieterhoehungen der Liste (e.erhoehungen bzw. _erhoehungen, mieterhoehungen.js)
+       als Mietaenderungen mit Stichtag (POST …/rent-changes, dieselbe freigegebene Methode wie v4037)
+   Geht die Kette nicht auf (letzte Erhoehung endet nicht bei der Miete des Vertrags), bleibt es beim Stand bis v4209:
+   heutige Miete ab Mietbeginn, mit Hinweis. Lieber ein bekannter Fehler als ein erfundener Verlauf. */
+const ANPASSUNG_ART = { '558': ['increase', '§ 558 BGB'], '559': ['modernization', '§ 559 BGB'], staffel: ['stepped_rent', '§ 557a BGB'], index: ['index_adjustment', '§ 557b BGB'] };
+function tagDavor(iso) { const d = new Date(iso + 'T00:00:00Z'); d.setUTCDate(d.getUTCDate() - 1); return d.toISOString().slice(0, 10); }
+function erhoehungenSortiert(liste) {
+  return (Array.isArray(liste) ? liste : []).filter(function (x) { return x && isoDatum(x.datum) && zahl(x.auf) != null && zahl(x.auf) > 0; })
+    .map(function (x) { return { datum: isoDatum(x.datum), von: zahl(x.von), auf: zahl(x.auf), art: text(x.art) }; })
+    .sort(function (a, b) { return a.datum < b.datum ? -1 : a.datum > b.datum ? 1 : 0; });
+}
+/** Ein Vertrag: Anfangsmiete und Aenderungen zwischen start und ende (ohne Neuvermietung, die ist der Vertragsbeginn).
+    endMiete = Miete am Vertragsende (heute bzw. beim Ablegen). null, wenn die Kette nicht aufgeht. */
+function vertragsKette(erh, start, ende, endMiete) {
+  const L = erh.filter(function (x) { return x.art !== 'neuvermietung' && x.datum > start && (!ende || x.datum <= ende); });
+  if (!L.length) return { anfang: endMiete, aenderungen: [] };
+  const anfang = L[0].von != null && L[0].von > 0 ? L[0].von : null;
+  if (anfang == null) return null;
+  const letzte = L[L.length - 1].auf;
+  if (endMiete != null && Math.abs(letzte - endMiete) > 0.5) return null;
+  return { anfang: anfang, aenderungen: L.map(function (x) {
+    const a = ANPASSUNG_ART[x.art] || [x.von != null && x.auf < x.von ? 'decrease' : 'increase', null];
+    const r = { effective_date: x.datum, adjustment_type: a[0], new_rent: rund(x.auf), adjustment_reason: 'Aus DealPilot übernommen (Mieterhöhung vom ' + deDatum(x.datum) + ')' };
+    if (a[1]) r.legal_basis = a[1];
+    return r;
+  }) };
+}
+
 function nachVivi(daten, opt) {
   daten = daten || {};
   opt = opt || {};
@@ -208,7 +242,7 @@ function nachVivi(daten, opt) {
   const faellig = Math.min(31, Math.max(1, Math.round(zahl(opt.faelligTag) || FAELLIG_TAG)));
   const leerMeldung = [];
   const nkNiedrig = [];
-  function miete(e, name, qm, etage, ist, nkEigen, nkIndex, stp, zielQm) {
+  function miete(e, name, qm, etage, ist, nkEigen, nkIndex, stp, zielQm, erhListe) {
     const n = mieterName(e.mv_mieter, name, !!opt.platzhalterNamen);
     const nkWert = zahl(nkEigen);
     const nkV = nkWert != null ? nkWert : nkVorschlag(daten, nkIndex);
@@ -225,6 +259,10 @@ function nachVivi(daten, opt) {
     const kaution = zahl(e.mv_kaution); if (kaution != null && kaution > 0) m.deposit_amount = rund(kaution);
     const erh = isoDatum(e.mv_letzte_erhoehung); if (erh) m.last_rent_increase = erh;
     const ct = VERTRAG_NACH_VIVI[text(e.mv_art)]; if (ct) m.contract_type = ct;
+    /* v4210 · Anfangsmiete und Erhoehungen dieses Vertrags (siehe vertragsKette) */
+    const kette = beginn ? vertragsKette(erhoehungenSortiert(erhListe), beginn, null, ist) : { aenderungen: [] };
+    if (kette && kette.aenderungen.length) { m.rent = rund(kette.anfang); m.aenderungen = kette.aenderungen; }
+    else if (!kette) hinweise.push('Bei ' + name + ' passen die Mieterhöhungen nicht zur heutigen Miete. In ViVi steht die heutige Miete ab Mietbeginn.');
     /* v4050 · Zielmiete (Zielbild €/m² × Fläche) als target_rent, in ViVi rein informativ */
     const zq = zahl(zielQm); if (zq != null && zq > 0 && qm > 0 && zq * qm > ist) m.target_rent = rund(zq * qm);
     if (stp != null && stp > 0) m.amenities = [{ type: 'parking_space', description: 'Stellplatz', monthly_rent: rund(stp) }];
@@ -238,8 +276,40 @@ function nachVivi(daten, opt) {
     if (!(qm > 0)) fehlt.push({ feld: 'wfl', text: 'Wohnfläche fehlt bei ' + name });
     /* v4034 · Demo-Durchlauf 23.11.2026: der Stellplatz ging als amenity mit, die Vorschau nannte ihn nicht */
     const stpText = (stp != null && stp > 0) ? ', Stellplatz ' + eur(rund(stp)) : '';
+    if (m.aenderungen) notizen.push('Anfangsmiete ' + eur(m.rent) + ', dann ' + m.aenderungen.length + (m.aenderungen.length === 1 ? ' Mieterhöhung' : ' Mieterhöhungen'));
     zeige('Mietverhältnis', name, eur(ist) + ' kalt' + stpText + ', ' + eur(m.monthly_utility_costs) + ' Nebenkosten, ab ' + deDatum(beginn), notizen.join('. '));
     return m;
+  }
+
+  /* v4210 · fruehere Vertraege einer Einheit (e.mv_historie, neuester zuerst) als vergangene Mietverhaeltnisse nach ViVi,
+     soweit sie nach dem Uebergang endeten. naechsterBeginn = Beginn des heutigen Vertrags (null bei Leerstand). */
+  function fruehere(e, name, qm, etage, erhListe, naechsterBeginn) {
+    const H = (Array.isArray(e.mv_historie) ? e.mv_historie : []).filter(function (h) { return h && isoDatum(h.mv_beginn); })
+      .slice().sort(function (a, b) { return isoDatum(a.mv_beginn) < isoDatum(b.mv_beginn) ? -1 : 1; });
+    const erh = erhoehungenSortiert(erhListe), aus = [];
+    H.forEach(function (h, i) {
+      const start = isoDatum(h.mv_beginn);
+      const nb = i + 1 < H.length ? isoDatum(H[i + 1].mv_beginn) : naechsterBeginn;
+      let ende = isoDatum(h.abgelegt_am);
+      if (nb && (!ende || ende >= nb)) ende = tagDavor(nb);
+      if (!ende || ende < start) { hinweise.push('Ein früherer Vertrag bei ' + name + ' hat kein Ende und geht nicht nach ViVi.'); return; }
+      if (kauf && ende < kauf) return;   /* endete vor dem Uebergang: gehoert nicht zu diesem Eigentum */
+      const endMiete = zahl(h.kaltmiete);
+      if (!(endMiete > 0)) { hinweise.push('Ein früherer Vertrag bei ' + name + ' hat keine Miete und geht nicht nach ViVi.'); return; }
+      const kette = vertragsKette(erh, start, ende, endMiete);
+      const n = mieterName(h.mv_mieter, name, !!opt.platzhalterNamen);
+      const nkW = zahl(h.nk_vorauszahlung);
+      const m = { tenant_first_name: n.vorname, tenant_last_name: (n.nachname + (n.platzhalter ? ' früher' : '')).slice(0, 255),
+        rent: rund(kette ? kette.anfang : endMiete), monthly_utility_costs: nkW != null ? rund(nkW) : 0,
+        rental_start: start, rental_end: ende, rental_type: 'past', rent_due_day: faellig, unit_identifier: name.slice(0, 255) };
+      if (qm != null && qm > 0) m.unit_square_meters = rund(qm);
+      if (etage) m.unit_floor = etage;
+      if (kette && kette.aenderungen.length) m.aenderungen = kette.aenderungen;
+      if (!kette) hinweise.push('Beim früheren Vertrag von ' + name + ' passen die Mieterhöhungen nicht zur Miete. In ViVi steht ' + eur(endMiete) + ' für die ganze Laufzeit.');
+      zeige('Früheres Mietverhältnis', name, eur(endMiete) + ' kalt zuletzt, ' + deDatum(start) + ' bis ' + deDatum(ende), m.aenderungen ? 'Anfangsmiete ' + eur(m.rent) + ', dann ' + m.aenderungen.length + (m.aenderungen.length === 1 ? ' Mieterhöhung' : ' Mieterhöhungen') : '');
+      aus.push(m);
+    });
+    return aus;
   }
 
   if (mitListe.length) {
@@ -256,8 +326,10 @@ function nachVivi(daten, opt) {
         einheit: { identifier: name.slice(0, 255), unit_type: 'residential' } };
       if (qm != null && qm > 0) eintrag.einheit.square_meters = rund(qm);
       if (etage) eintrag.einheit.floor = etage;
-      if (vermietet) eintrag.miete = miete(e, name, qm, etage, ist, e.nk_vorauszahlung, x.index, zahl(e.stellplatz_miete), e.ziel_qm);
+      if (vermietet) eintrag.miete = miete(e, name, qm, etage, ist, e.nk_vorauszahlung, x.index, zahl(e.stellplatz_miete), e.ziel_qm, e.erhoehungen);
       else { leerMeldung.push(name); zeige('Einheit', name, (qm ? String(qm).replace('.', ',') + ' m²' : 'ohne Fläche') + ', leer'); }
+      const fr = fruehere(e, name, qm, etage, e.erhoehungen, vermietet ? (isoDatum(e.mv_beginn) || kauf || null) : null);   /* v4210 */
+      if (fr.length) eintrag.fruehere = fr;
       einheiten.push(eintrag);
     });
   } else {
@@ -274,7 +346,9 @@ function nachVivi(daten, opt) {
        (stellplatz_miete_monat), ze_stp_monat war leer. ViVi bekam deshalb keinen Stellplatz, die Mieteinnahmen 2025 wichen
        um 9 × 60 € ab. Jetzt: Aufteilung im Reiter Miete zuerst, sonst das Feld des Reiters Objekt. */
     const stpEinzel = zahl(daten.ze_stp_monat) > 0 ? zahl(daten.ze_stp_monat) : (zahl(daten.stellplatz_miete_monat) > 0 ? zahl(daten.stellplatz_miete_monat) : null);
-    if (vermietet) eintrag.miete = miete(daten, name, qm, etage, ist, daten.nk_vorauszahlung, null, stpEinzel, daten.zb_ziel_qm);
+    if (vermietet) eintrag.miete = miete(daten, name, qm, etage, ist, daten.nk_vorauszahlung, null, stpEinzel, daten.zb_ziel_qm, daten._erhoehungen);
+    const frE = fruehere(daten, name, qm, etage, daten._erhoehungen, vermietet ? (isoDatum(daten.mv_beginn) || kauf || null) : null);   /* v4210 */
+    if (frE.length) eintrag.fruehere = frE;
     else zeige('Einheit', name, (qm ? String(qm).replace('.', ',') + ' m²' : 'ohne Fläche') + (text(daten.nutzungsart) === 'eigennutzung' ? ', selbst genutzt' : ', leer'));
     if (a === 'ZFH' || a === 'MFH') hinweise.push('Keine Einheiten erfasst. Übertragen wird eine Einheit für das ganze Haus. Genauer wird es mit den Einheiten im Reiter Objekt.');
     einheiten.push(eintrag);
@@ -461,6 +535,36 @@ function istJahreAus(rentals, mietverlauf, ab, heute) {
   }
   return out;
 }
+/* v4210 · Mietzeiten laut DealPilot je Einheit (heutiger Vertrag offen, fruehere mit Ende), aus demselben Plan wie das
+   Anlegen. Schluessel: Index in _mfh.einheiten, beim Einzelobjekt 'e0'. Fuer die Abdeckungspruefung in ausVivi. */
+function dpMietzeiten(daten) {
+  const out = {};
+  let plan = null; try { plan = nachVivi(daten || {}, { platzhalterNamen: true, musterAnschrift: true }); } catch (e) { return out; }
+  (plan.einheiten || []).forEach(function (e) {
+    const k = e.index == null ? 'e0' : String(e.index), P = [];
+    (e.fruehere || []).forEach(function (f) { P.push({ start: f.rental_start, ende: f.rental_end }); });
+    if (e.miete && e.miete.rental_start) P.push({ start: e.miete.rental_start, ende: e.miete.rental_end || null });
+    if (P.length) out[k] = P;
+  });
+  return out;
+}
+/* v4210 · Deckt der ViVi-Mietverlauf einer Einheit ein vergangenes Jahr ab? Ein Monat fehlt, wenn DealPilot dort einen
+   Vertrag fuehrt (dpMietzeiten), ViVi aber keine Miete. Ergebnis { 'JJJJ': Zahl fehlender Monate } nur mit Luecken. */
+function mietLuecken(perioden, rentals, mietverlauf, ab, heute) {
+  const out = {};
+  const a = isoDatum(ab); if (!a || !Array.isArray(perioden) || !perioden.length) return out;
+  const j0 = +a.slice(0, 4), m0 = +a.slice(5, 7), jh = +heute.slice(0, 4);
+  for (let j = j0; j < jh; j++) {
+    for (let mo = (j === j0 ? m0 : 1); mo <= 12; mo++) {
+      const iso = j + '-' + String(mo).padStart(2, '0') + '-01', mEnde = j + '-' + String(mo).padStart(2, '0') + '-28';
+      const dp = perioden.some(function (p) { return p.start && p.start <= mEnde && (!p.ende || p.ende >= iso); });
+      if (!dp) continue;
+      const vi = (rentals || []).some(function (r) { return mieteImMonat(r, mietverlauf && mietverlauf[r.id], iso) != null; });
+      if (!vi) out[String(j)] = (out[String(j)] || 0) + 1;
+    }
+  }
+  return out;
+}
 function istJahreSumme(teile) {
   const out = {};
   teile.forEach(function (t) { Object.keys(t || {}).forEach(function (j) {
@@ -556,7 +660,7 @@ function ausVivi(paket, kontext) {
   const einheitenInfo = {};
   const erhoehungenInfo = {};
   const geplantInfo = {};   /* v4037 */
-  const istTeile = [], istEinheiten = {};   /* v4037 */
+  const istTeile = [], istEinheiten = {}, istLuecken = {};   /* v4037, v4210 */
   zuordnung.forEach(function (z) {
     const u = z.unit, q = 'units/' + u.id, P = z.praefix;
     if (P) einheitenInfo[z.index] = { nr: z.nr, name: text(u.identifier) };
@@ -566,6 +670,10 @@ function ausVivi(paket, kontext) {
       const alleR = rentals.filter(function (x) { return String(x.unit_id) === String(u.id); });
       const ij = istJahreAus(alleR, paket.mietverlauf, kontext.uebergang, heute);
       if (Object.keys(ij).length) { istTeile.push(ij); if (P) istEinheiten[z.index] = ij; }
+      /* v4210 · Abdeckung: fehlen ViVi Monate, in denen DealPilot einen Vertrag fuehrt, ist das Jahr nicht abgedeckt */
+      const dpz = kontext.dpMietzeiten && kontext.dpMietzeiten[z.index == null ? 'e0' : String(z.index)];
+      if (dpz) { const lu = mietLuecken(dpz, alleR, paket.mietverlauf, kontext.uebergang, heute);
+        Object.keys(lu).forEach(function (j) { (istLuecken[j] = istLuecken[j] || []).push({ einheit: z.nr || (z.index == null ? null : String(z.index + 1)), monate: lu[j] }); }); }
     }
     const rq = r ? 'rental-units/' + r.id : q;
     const qm = zahl(u.square_meters);
@@ -641,6 +749,12 @@ function ausVivi(paket, kontext) {
   if (Object.keys(erhoehungenInfo).length) info.erhoehungen = erhoehungenInfo;
   if (Object.keys(geplantInfo).length) info.erhoehungen_geplant = geplantInfo;   /* v4037 */
   if (istTeile.length) info.ist_jahre = { summe: istJahreSumme(istTeile), einheiten: istEinheiten };   /* v4037 */
+  /* v4210 · Jahre, die ViVis Mietverlauf nicht ganz abdeckt: summe[j].abgedeckt = false und luecken[j] = [{ einheit, monate }].
+     Das Frontend uebernimmt solche Jahre nicht als Ist (vivi-felder.js istJahreUebernehmen) und zeigt einen Hinweis. */
+  if (info.ist_jahre && kontext.dpMietzeiten) {
+    Object.keys(info.ist_jahre.summe).forEach(function (j) { info.ist_jahre.summe[j].abgedeckt = !istLuecken[j]; });
+    if (Object.keys(istLuecken).length) info.ist_jahre.luecken = istLuecken;
+  }
   const plan = paket.tilgungsplan && Array.isArray(paket.tilgungsplan.data) ? paket.tilgungsplan.data : [];
   const bisHeute = plan.filter(function (z) { return isoDatum(z.date) && isoDatum(z.date) <= heute; });
   if (bisHeute.length) {
@@ -839,7 +953,7 @@ function importFehlt(d, objart) {
   }).map(function (x) { return { feld: x.feld, text: x.text }; });
 }
 
-module.exports = { istStamm, stammAenderungen, STAMM_FELD, importDaten, importIds, importArt, importFehlt, BEWERTUNG_FELDER, erhoehungenAus, geplanteAus, istJahreAus, istJahreSumme, mieteImMonat,
+module.exports = { dpMietzeiten, mietLuecken, istStamm, stammAenderungen, STAMM_FELD, importDaten, importIds, importArt, importFehlt, BEWERTUNG_FELDER, erhoehungenAus, geplanteAus, istJahreAus, istJahreSumme, mieteImMonat,
   nachVivi, ausVivi, letzteErhoehung, erhoehungBetrag, nkVorschlag, ulJahr, einheitenListe, zahl, isoDatum, monatDatum, etageText, etageZahl, mieterName,
   NK_MIN_QM, OBJEKTTYP, VERTRAG_NACH_VIVI, VERTRAG_AUS_VIVI, UL_FELDER, ARTEN_MIT_EINHEITEN, MUSTER_ANSCHRIFT
 };

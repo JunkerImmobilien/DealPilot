@@ -286,6 +286,8 @@
     if (window._dpMfh && Array.isArray(window._dpMfh.einheiten)) window._dpMfh.einheiten.forEach(function (e) { nimm(e && e.erhoehungen); });
     Object.keys(ij.summe).forEach(function (j) {
       if (+j <= eigenBis) { werte[j] = null; return; }
+      /* v4210 · deckt ViVis Mietverlauf das Jahr nicht ab (Monate mit Vertrag in DealPilot, ohne Miete in ViVi), kein Ist aus ViVi */
+      if (ij.summe[j] && ij.summe[j].abgedeckt === false) { werte[j] = null; return; }
       var x = ij.summe[j] || {};
       var w = (typeof x.kalt === 'number') ? x.kalt + ze * (typeof x.monate_vermietet === 'number' ? x.monate_vermietet : (x.monate || 12)) : x.miete;
       if (typeof w === 'number' && isFinite(w)) werte[j] = { miete: Math.round(w * 100) / 100 };
