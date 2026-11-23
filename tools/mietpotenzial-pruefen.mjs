@@ -972,6 +972,31 @@ async function bremseLauf(feld, mfh) {
   wahr('K7 Wohnung 1: Kappung 20 % (420 → 504), Satz nennt die Erhöhung', eurZ(A2.W[0].bestand.monat) === 480 || eurZ(A2.W[0].bestand.monat) === 504 ? /Mieterhöhung auf/.test(A2.W[0].satz) : false);
   wahr('K8 Leer: Satz nennt die Neuvermietung mit Regel', /^Leer\. Bei Neuvermietung bis/.test(A2.W[2].satz));
 
+  /* v4290 · Marcel 23.11.2026: Ist-Miete nie setzen, nur Hinweis. Geplante Miete über dem Maximum: Feld = Rechnung,
+     mit Meldung, bis weggeklickt. */
+  gleich('AA1 Demostraße: Ist 9,12 über der Höchstmiete 8,88, heute bleibt 620 €, Markierung am Ergebnis',
+    [M1.heute, M1.ueber_hoechst && M1.ueber_hoechst.ist_qm, M1.ueber_hoechst && M1.ueber_hoechst.max_qm], [620, 9.12, 8.88]);
+  wahr('AA2 Satz nennt die Höchstmiete und das Risiko, ohne Gedankenstrich und Semikolon',
+    /über der zulässigen Höchstmiete von 8,88 €\/m²/.test(M1.satz) && /ändert sie nicht/.test(M1.satz) && /Herabsetzung oder Rückzahlung/.test(M1.satz) && !/–|—|;/.test(M1.satz), M1.satz);
+  const mr1 = c1.DpPotenzial.mietrechtDaten(c1.DpPotenzial.modell(), 0).zeilen.filter((x) => x.ist_ueber)[0];
+  wahr('AA3 Rechtsbox: Zeile „Heutige Miete“ über der Höchstmiete 8,88, Feld nkm unverändert', mr1 && mr1.bad && mr1.hoechst_qm === 8.88 && c1.document.getElementById('nkm').value === '620', mr1 && mr1.u);
+  const mrU = c2.DpPotenzial.mietrechtDaten(c2.DpPotenzial.modell(), 0).zeilen.filter((x) => x.ist_ueber)[0];
+  wahr('AA4 Gegenprobe: Wohnung unter der Vergleichsmiete hat keinen Hinweis', !mrU);
+  const c3 = await maxLauf({ plz: '32052', wfl: '68', nkm: '500', zb_vgl_qm: '7,40', zb_ziel_qm: '9,00', zb_ziel_bremse: '', zb_bremse_ausnahme: '' }, null, '05758012');
+  const P3 = c3.DpPotenzial, E3 = (id) => c3.document.getElementById(id);
+  P3.zielBremseUmtragen(P3.modell(), { jetzt: true });
+  const w3 = P3.modell().wohnungen[0];
+  gleich('AA5 Zielmiete 9,00 ohne Bremse: Feld und Rechnung beide 8,88, Merker 9|8.88', [E3('zb_ziel_qm').value, w3.ziel_qm, E3('zb_ziel_bremse').value], ['8,88', 8.88, '9|8.88']);
+  const t3 = P3.zielDeckelText(w3.ziel_bremse, E3('zb_ziel_bremse').value);
+  gleich('AA6 Meldung an der Wohnung', t3, 'Eingegeben 9,00 €/m², gesetzt auf die zulässige Höchstmiete 8,88 €/m² (120 % der Vergleichsmiete).');
+  E3('zb_ziel_bremse').value = '9|8.88|q';
+  gleich('AA7 weggeklickt: keine Meldung mehr, Wert bleibt gesetzt', [P3.zielDeckelText(P3.modell().wohnungen[0].ziel_bremse, E3('zb_ziel_bremse').value), P3.modell().wohnungen[0].ziel_qm], ['', 8.88]);
+  P3.zielBremseUmtragen(P3.modell(), { jetzt: true });
+  gleich('AA8 zweites Zeichnen hält die Quittung (idempotent)', E3('zb_ziel_bremse').value, '9|8.88|q');
+  E3('zb_ziel_qm').value = '8,50';
+  P3.zielBremseUmtragen(P3.modell(), { jetzt: true });
+  gleich('AA9 Wert selbst unter das Maximum geändert: Merker und Meldung weg, Feld = Rechnung', [E3('zb_ziel_qm').value, E3('zb_ziel_bremse').value, P3.modell().wohnungen[0].ziel_qm], ['8,50', '', 8.5]);
+
   /* K9 · alle Anzeigen lesen nur aus DpMieteMax (Quelltext) */
   const md = fs.readFileSync(JS('miete-demo.js'), 'utf8'), vmh = fs.readFileSync(JS('vivi-mieterhoehung.js'), 'utf8'), kim = fs.readFileSync(JS('ki-miete.js'), 'utf8'), ix = fs.readFileSync(path.join(path.dirname(JS('x')), '..', 'index.html'), 'utf8');
   wahr('K9 Reiter Miete, ViVi-Knopf und Mietpreis-Analyse lesen DpMieteMax; keine eigene 120-%-Rechnung mehr im Reiter Miete',

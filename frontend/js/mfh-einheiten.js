@@ -669,7 +669,7 @@
             f('ziel_wann', 'Wann', 'z. B. bei Mieterwechsel') +
             /* v3312 · über der Mietpreisbremse wird die Zielmiete auf Vergleichsmiete + 10 % begrenzt - außer mit Ausnahme */
             s('bremse_ausnahme', 'Ausnahme Mietpreisbremse', (P && P.BREMSE_AUSNAHME_FELD) || [['', 'keine']]) +
-          '</div><div class="mfh-we-ergebnis" id="mfh-we-ziel"></div>') +
+          '</div><div id="mfh-we-zielhin"></div><div class="mfh-we-ergebnis" id="mfh-we-ziel"></div>') +   /* v4290 · Meldung „gesetzt auf die Höchstmiete“ */
         /* v3265 · Marcel 09.11.2026: aufgeteilt → je Wohnung das Vergleichswertverfahren, der Ertragswert
            nur noch stützend. Oben (#mfh-we-vw) das führende Verfahren, darunter unverändert der Ertragswert
            (#mfh-we-ew - Drehbuch Modul 26 liest dort Kacheln und Zins). Ohne Aufteilung bleibt nur der
@@ -900,6 +900,16 @@
       b.onclick = function () { if (b.disabled) return; _ewArt = b.getAttribute('data-ewart'); ewZeichnen(P.modell(opts())); };
     });
     if (P) P.massnahmenBinden(el('mfh-we-mass'), e.massnahmen, { e: e, geb: _geb, fuerEinheit: true, geaendert: function () { aktualisieren(); } });
+    /* v4290 · Marcel 23.11.2026: Zielmiete über der Höchstmiete wird im Feld und in der Rechnung gesetzt, mit einer
+       Meldung, die bleibt, bis sie weggeklickt (e.ziel_bremse.q) oder der Wert geändert wird. Nie Feld ungleich Rechnung. */
+    function zielHinZeigen() {
+      var h = el('mfh-we-zielhin'); if (!h || !P || !P.zielDeckelText) return;
+      var t = ''; try { var mm = P.modell(opts()), ww = mm && mm.wohnungen ? mm.wohnungen.filter(function (x) { return x.i === i; })[0] : null; t = P.zielDeckelText(ww && ww.ziel_bremse, e.ziel_bremse); } catch (x) { t = ''; }
+      h.innerHTML = t ? P.zielDeckelHtml(t, 'data-zd-weg="1"') : '';
+      var b = h.querySelector('[data-zd-weg]');
+      if (b) b.onclick = function () { if (e.ziel_bremse && typeof e.ziel_bremse === 'object') e.ziel_bremse.q = true; h.innerHTML = ''; };
+    }
+    try { zielHinZeigen(); } catch (x) {}
     /* Jede Eingabe landet sofort im Einheiten-Objekt - es wird als
        Ganzes gespeichert, also braucht es keine Feldliste. */
     ov.querySelectorAll("[data-wk]").forEach(function (inp) {
@@ -910,6 +920,7 @@
         /* v3312 · nach der Eingabe die Zielmiete auf die Mietpreisbremse umtragen (Hinweis in der Leiter) */
         if ((k === 'ziel_qm' || k === 'bremse_ausnahme' || k === 'vgl_qm') && P && P.zielBremseKappen) {
           try { var neu = P.zielBremseKappen(e, P.modell(opts()), i), zf = ov.querySelector('[data-wk="ziel_qm"]'); if (neu != null && zf) zf.value = neu; } catch (x) {}
+          try { zielHinZeigen(); } catch (x) {}   /* v4290 */
         }
         aktualisieren();
       });

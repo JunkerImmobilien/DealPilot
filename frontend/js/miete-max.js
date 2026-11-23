@@ -74,7 +74,7 @@
     var markt = zahl(g.document && (g.document.getElementById('ds2_marktmiete') || {}).value);
 
     /* 4 · EIN Satz */
-    var s;
+    var s, ueber = null;
     if (leer) {
       s = n ? 'Leer. Bei Neuvermietung bis ' + eur(n.monat) + ' (' + qm(n.qm) + ', ' + n.regel + ').' : 'Leer. Für die Neuvermietung fehlt die Vergleichsmiete.';
     } else {
@@ -95,6 +95,12 @@
       if (n && n.mehr) s += ' Bei Neuvermietung bis ' + eur(n.monat) + ' (' + qm(n.qm) + ', ' + n.regel + ').';
       else if (n && !b.mehr) s += ' Auch bei Neuvermietung nicht mehr: DealPilot rechnet dort mit höchstens ' + qm(n.qm) + ' (' + n.kurz + ').';
       if (!b.mehr && !(n && n.mehr)) s += ' Mehr ist nur über eine Modernisierung möglich (§ 559 BGB).';
+      /* v4290 · Marcel 23.11.2026: die heutige Miete wird nie gesetzt oder gedeckelt gerechnet. Liegt sie über der
+         zulässigen Höchstmiete, sagt es der Satz klar, mit dem Risiko. */
+      if (n && istQ > n.qm + 0.005) {
+        ueber = { ist_qm: r2(istQ), max_qm: n.qm, kurz: n.kurz };
+        s += ' Die heutige Miete liegt mit ' + qm(istQ) + ' über der zulässigen Höchstmiete von ' + qm(n.qm) + '. DealPilot rechnet mit der vereinbarten Miete weiter und ändert sie nicht. Der Mieter kann unter Umständen eine Herabsetzung oder Rückzahlung verlangen. Bitte rechtlich prüfen lassen.';
+      }
     }
     return {
       i: w.i == null ? null : w.i, j: j, nr: w.nr || '', lage: w.lage || '', wfl: wfl, leer: leer,
@@ -105,7 +111,8 @@
       spielraum_bestand: r2(Math.max(0, b.monat - ist)),
       spielraum: r2(Math.max(0, max - ist)),
       markt_qm: markt > 0 ? markt : null,
-      satz: s
+      satz: s,
+      ueber_hoechst: ueber   /* v4290 */
     };
   }
 
@@ -126,6 +133,6 @@
   function wieHtml() {
     return '<details class="dp-mmax-wie"><summary>Wie wir die maximale Miete ermitteln</summary><p>' + WIE + '</p></details>';
   }
-  g.DpMieteMax = { VERSION: 'v4060', alle: alle, einheit: einheit, rechne: rechne, wieHtml: wieHtml, WIE: WIE };
+  g.DpMieteMax = { VERSION: 'v4290', alle: alle, einheit: einheit, rechne: rechne, wieHtml: wieHtml, WIE: WIE };
   if (typeof module !== 'undefined' && module.exports) module.exports = g.DpMieteMax;
 })(typeof window !== 'undefined' ? window : globalThis);
