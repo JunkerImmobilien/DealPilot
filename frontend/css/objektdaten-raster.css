@@ -126,3 +126,13 @@ body.dp-dg-2 #s0 .od-gruppen > .od-raster:not(:has(> .f:not([data-dp-dg="3"]))) 
 .od-raster > .f .iw,
 .od-raster > .f > input,
 .od-raster > .f > select { width: 100%; max-width: none; box-sizing: border-box; }
+
+/* v3990 · Marcel 23.11.2026 — Restnutzungsdauer-Hinweis am Zustand als Info-Symbol mit Tooltip
+   (modernisierung-ui.js anzeigen()), statt als Absatz unter dem Feld */
+.dp-rnd-info { display: inline-grid; place-items: center; width: 15px; height: 15px; margin-left: 5px; vertical-align: 1px;
+  border-radius: 50%; border: 1px solid var(--wl-c9a84c, #C9A84C); color: var(--wl-b8932f, #b8932f);
+  font: italic 600 10px/1 Georgia, 'Times New Roman', serif; cursor: help; user-select: none; text-transform: none; letter-spacing: 0; }
+.dp-rnd-info:hover, .dp-rnd-info:focus { background: color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 16%, transparent); outline: none; }
+
+/* v3990 · Investitionsthese und Bekannte Risiken wachsen mit (js/textfeld-wachsen.js), Griff zum Aufziehen */
+.od-strategie textarea { min-height: 64px; resize: vertical; }

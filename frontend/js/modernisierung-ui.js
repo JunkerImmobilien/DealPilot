@@ -105,7 +105,28 @@
         _t2 = 'Restnutzungsdauer: ' + (_b1.herkunft === 'abgeleitet' ? _b1.kurz : (_b1.grad + ' angenommen, keine Angabe' + (_b1.herkunft === 'rueckfall_energie' ? ' (nach Energieklasse)' : '')))
           + ' (' + _b1.punkte + ' Punkte). Mit dem Zustand hier oder je Gewerk genauer.';
       }
-      zh.textContent = [_t1, _t2].filter(Boolean).join(' ');
+      /* v3990 · Marcel 23.11.2026: der Satz zur Restnutzungsdauer steht nicht mehr unter dem Feld,
+         sondern im Tooltip eines kleinen Info-Symbols am Label (gemessen: der Hinweis nahm 100 von
+         194 px der Gruppe Zustand ein). Antippen klappt ihn unter dem Feld auf (Handy hat kein Hover). */
+      var _lab = zh.parentElement && zh.parentElement.querySelector('label');
+      var ic = $('ds2_zustand_rnd_info');
+      if (!ic && _lab) {
+        ic = document.createElement('span');
+        ic.id = 'ds2_zustand_rnd_info'; ic.className = 'dp-rnd-info'; ic.textContent = 'i';
+        ic.setAttribute('role', 'button'); ic.setAttribute('tabindex', '0');
+        var _schalten = function (ev) { ev.preventDefault(); ev.stopPropagation(); ic._offen = !ic._offen; anzeigen(); };
+        ic.addEventListener('click', _schalten);
+        ic.addEventListener('keydown', function (ev) { if (ev.key === 'Enter' || ev.key === ' ') _schalten(ev); });
+        var _tipBtn = _lab.querySelector('.dp-tip');
+        if (_tipBtn && _tipBtn.nextSibling) _lab.insertBefore(ic, _tipBtn.nextSibling); else _lab.appendChild(ic);
+      }
+      if (ic) {
+        ic.style.display = _t2 ? '' : 'none';
+        ic.title = _t2; ic.setAttribute('aria-label', _t2 || 'Restnutzungsdauer');
+        if (!_t2) ic._offen = false;
+      }
+      zh.textContent = [_t1, ic && ic._offen ? _t2 : (ic ? '' : _t2)].filter(Boolean).join(' ');
+      zh.style.display = zh.textContent ? 'block' : 'none';
       /* v3660d · Begruendung dezent im Tooltip (Bildbeschreibung bzw. belegte Gewerke), keine laute Flaeche */
       var _tip = '';
       if (_abg && r && r.gewerke) _tip = GEW.map(function (k) { var g = r.gewerke[k]; return g && g.quelle !== 'angenommen' ? LAB[k] + ': ' + (g.beleg || g.wie || '') : null; }).filter(Boolean).join(' · ');
