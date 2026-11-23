@@ -1033,6 +1033,7 @@ console.log('\nTeil S · in ViVi gelöscht: Verknüpfung lösen nur bei eindeuti
   ok(fA.info.erhoehungen && fA.info.erhoehungen.objekt && fA.info.erhoehungen.objekt[0].auf === 520 && fA.felder.nkm.wert === 520,
     'S12 ETW: Liste unter info.erhoehungen.objekt, Nettokaltmiete heute 520 (Ankauf-Stand bleibt unberührt, ViVi schreibt nur Ist heute)');
   ok(/function erhoehungenMischen/.test(VF) && /\^vivi-/.test(VF) && /erhoehungenUebernehmen\(info\)/.test(VF), 'S13 Browser mischt: ViVi-Einträge ersetzt, eigene bleiben, gleicher Tag eigener gewinnt');
+  ok(/v3998a/.test(VF) && /behalten\[id\] = true/.test(VF) && /if \(behalten\[id\]\) return;/.test(VF), 'S14 Betrag der Erhöhung leer aus ViVi, Datum unverändert: Betrag aus DealPilot bleibt (gemessen 1177, 50 € gingen verloren)');
   ok(/function alleSelbst/.test(VF) && /data-vivi="alle-selbst"/.test(VJ) && /data-vivi="alle-vivi"/.test(VJ), 'S8 alle Schlösser auf einmal: selbst festlegen und aus ViVi übernehmen');
 }
 

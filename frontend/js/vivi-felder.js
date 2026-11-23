@@ -180,7 +180,23 @@
     var st = standText(stand.letzter_abruf);
     var geaendert = false, einheitGeaendert = false;
     v.verknuepft = true; v.stand = stand.letzter_abruf || null; v.felder = {};
+    /* v3998a · ViVi kennt den Betrag einer Erhoehung nur aus dem Mietverlauf. Fehlt er (leer) und ist das Datum dasselbe
+       wie schon im Objekt (z. B. von DealPilot beim Anlegen geschickt), bleibt der Betrag aus DealPilot stehen. Nur ein
+       NEUES Datum ohne Betrag leert ihn (F8: nie der alte Betrag zum neuen Datum). */
+    var vorDatum = function (id) {
+      var m0 = /^einheit\.(\d+)\.mv_letzte_erhoehung_betrag$/.exec(id);
+      if (m0) { var i0 = einheitIndex(+m0[1], info), L0 = window._dpMfh && window._dpMfh.einheiten; return i0 != null && L0 && L0[i0] ? L0[i0].mv_letzte_erhoehung : null; }
+      if (id === 'mv_letzte_erhoehung_betrag') { var e0 = $('mv_letzte_erhoehung'); return e0 ? e0.value : null; }
+      return null;
+    };
+    var behalten = {};
     Object.keys(felder).forEach(function (id) {
+      if (!/mv_letzte_erhoehung_betrag$/.test(id) || !(felder[id] && felder[id].wert === '')) return;
+      var dId = id.replace(/_betrag$/, ''), dNeu = felder[dId] && felder[dId].wert, dAlt = vorDatum(id);
+      if (dNeu && dAlt && isoTag(dAlt) === isoTag(dNeu)) behalten[id] = true;
+    });
+    Object.keys(felder).forEach(function (id) {
+      if (behalten[id]) return;
       var w = felder[id] && felder[id].wert;
       v.felder[id] = w;
       var eigen = Object.prototype.hasOwnProperty.call(v.eigen, id);
