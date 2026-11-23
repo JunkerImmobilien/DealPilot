@@ -78,12 +78,12 @@
       "schluessel": "grafiken_neu",
       "bezeichnung": "Neue Grafiken in Pilot-Analyse und Portfolio-Cockpit",
       "seit": "v4140",
-      "beschreibung": "js/grafiken-neu.js: Pilot-Analyse › Übersicht (Vermögensaufbau, Cashflow-Brücke), Jahresabgleich (Plan vom Kauf gegen Ist, Weg zum positiven Cashflow), Potenzial (Mietspielraum je Wohnung), Steuer (Ergebnis aus Vermietung) und Portfolio-Cockpit (Portfolio auf einen Blick mit Filtern und Rechenprüfung). Mit Freigabe werden die alten Grafiken an diesen Stellen ausgeblendet. Vorlage: Dateien/Demos/pilot-analyse-charts-2026-11-23.html und portfolio-cockpit-2026-11-23.html (Marcel 23.11.2026).",
+      "beschreibung": "js/grafiken-neu.js: Pilot-Analyse › Übersicht (Vermögensaufbau, Cashflow-Brücke), Jahresabgleich (Plan vom Kauf gegen Ist, Weg zum positiven Cashflow), Potenzial (Mietspielraum je Wohnung), Steuer (Ergebnis aus Vermietung) und Portfolio-Cockpit (Portfolio auf einen Blick mit Filtern und Rechenprüfung). v4170 js/grafiken-bewertung.js: Reiter Bewertung (Einordnung, DSCR- und Beleihungsverlauf, Zinsrisiko als Heatmap Anschlusszins × Miete) statt #bc-cockpit und #bc-stress. Mit Freigabe werden die alten Grafiken an diesen Stellen ausgeblendet. Vorlage: Dateien/Demos/pilot-analyse-charts-2026-11-23.html und portfolio-cockpit-2026-11-23.html (Marcel 23.11.2026).",
       "frei_fuer": [
         "admin",
         "vorschau"
       ],
-      "frontend_erkennung": "DpGrafikenNeu|data-dp-gn=",
+      "frontend_erkennung": "DpGrafikenNeu|data-dp-gn=|DpGrafikenBewertung",
       "frontend_ausgenommen": {},
       "routen": [],
       "backend_stellen": [],
