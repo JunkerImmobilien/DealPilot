@@ -18,7 +18,7 @@
  * ════════════════════════════════════════════════════════════════════════════════════════════════════════════════ */
 (function (global) {
   'use strict';
-  var VERSION = 'v4100';
+  var VERSION = 'v4100b';
   var SCHRITTE = [['miete', 'Miete'], ['wert', 'Wert'], ['haus', 'Haus & Belege'], ['steuer', 'Steuer'], ['fest', 'Festschreiben']];
   var _z = null;                 /* { jahr, k, frage, vivi: 'laeuft' | null } */
   var _merk = {}, _gelesen = {}; /* Schritt je Objekt|Jahr · ViVi schon gelesen je Objekt|Jahr */
@@ -144,7 +144,7 @@
     var J = _z.jahr, B = JB(), t = null;
     try { var sj = typeof global._v269_getStartYear === 'function' ? global._v269_getStartYear() : null; if (sj != null && typeof global._computeYearTotal === 'function') t = global._computeYearTotal(J, J - sj); } catch (e) { t = null; }
     var st = B ? B.status(J) : 'geplant', fest = r.s.fest && r.s.fest.steuer;
-    var h = '<h4>Steuer ' + J + '</h4><p class="dp-jab-satz">Die Anlage V ' + J + ' aus dem Reiter Steuer, zusammengefasst.<small>Belege und ViVi-Werte aus Schritt 3 sind schon eingerechnet.</small></p>';
+    var h = '<h4>Steuer ' + J + '</h4><p class="dp-jab-satz">Die Anlage V ' + J + ' aus dem Reiter Steuer, zusammengefasst.<small>Übernommene Belege und ViVi-Werte aus Schritt 3 sind eingerechnet.</small></p>';
     h += '<div class="dp-jab-zahl"><span>Einnahmen<b>' + eur(t && t.einnahmen) + '</b></span><span>Werbungskosten<b>' + eur(t && t.werbungskosten) + '</b></span><span>Ergebnis V+V<b>' + (t ? vz(t.ergebnis) : '–') + '</b></span></div>';
     var opts = (B && B.STATUS ? B.STATUS : [['geplant', 'nicht erklärt'], ['erklaert', 'erklärt'], ['bescheid', 'Bescheid liegt vor']]).map(function (x) { return '<option value="' + x[0] + '"' + (x[0] === st ? ' selected' : '') + '>' + esc(x[1]) + '</option>'; }).join('');
     h += '<div class="dp-jab-reihe"><label style="display:flex;align-items:center;gap:8px">Stand der Steuer <select data-jab-status' + (fest ? ' disabled' : '') + '>' + opts + '</select></label>' + knopf('anlage-v', 'Volle Anlage V öffnen', false) + '</div>';
