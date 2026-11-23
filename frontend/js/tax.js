@@ -2502,7 +2502,7 @@ function _ytfStil() {
   s.textContent = [
     C + ' > p.hint.ytf-erkl:not(.auf){display:none !important}',
     C + ' > p.hint.ytf-erkl{margin:8px 0 10px !important;font-size:12px;line-height:1.5}',
-    C + ' .ytf-i{display:inline-grid;place-items:center;width:18px;height:18px;min-width:18px !important;min-height:18px !important;padding:0 !important;margin:0 0 0 6px;border-radius:50%;border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 55%, transparent) !important;background:transparent !important;color:var(--wl-b8932f, #b8932f) !important;font:600 11px/1 Inter,sans-serif !important;cursor:pointer;vertical-align:2px;box-shadow:none !important}',
+    C + ' .ytf-i{display:inline-grid;place-items:center;width:18px;height:18px;min-width:18px !important;min-height:18px !important;padding:0 !important;margin:0 0 0 6px;border-radius:50%;border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 55%, transparent) !important;background:transparent !important;color:var(--wl-b8932f, #b8932f) !important;font:600 11px/1 Inter,sans-serif !important;letter-spacing:0 !important;text-transform:none !important;cursor:pointer;vertical-align:2px;box-shadow:none !important}',
     C + ' .ytf-i[aria-expanded="true"],' + C + ' .ytf-i:hover{background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 16%, transparent) !important}',
     C + ' .ytf-belege{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:0 0 12px}',
     C + ' .ytf-belege > .hint:not(.auf){display:none !important}',
