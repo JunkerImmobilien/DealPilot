@@ -3288,8 +3288,44 @@ function _grenzErklaeren() {
     }
   } catch (e) {}
   box.textContent = t;
+  try { _zveFeldErklaeren(feldZve, zve, zq, jahr); } catch (_eF) {}
 }
 window._grenzErklaeren = _grenzErklaeren;
+
+/* ═══ v4041 · DAS zvE-FELD SAGT, WELCHER WERT DIESES JAHR GILT ═════════════
+   Marcel 23.11.2026 (Demostraße): Feld zvE 68.000 €, Grenzsteuersatz 47 %.
+   Gemessen: 2026 rechnet die App mit 90.000 € aus dem Steuerzeitraum 2026
+   (_dpZveFuerJahr → quelle 'steuerzeitraum'), 68.000 € ergäben 41,35 %. Die
+   Erklärung stand nur unter dem Grenzsteuersatz, am Feld selbst nichts.
+   Der Feldwert bleibt bewusst stehen: er ist das aktuelle zvE des Profils
+   (zve-manager.js) und gilt für jedes Jahr OHNE eigenen Zeitraum. Ihn mit
+   90.000 zu überschreiben, änderte still die Folgejahre. Deshalb eine
+   sichtbare Zeile direkt unter dem Feld mit dem geltenden Wert und dem Weg
+   zu den Steuerzeiträumen. */
+function _zveFeldErklaeren(feldZve, zve, zq, jahr) {
+  var inp = document.getElementById('zve'); if (!inp) return;
+  var f = inp.closest('.f'); if (!f) return;
+  var box = document.getElementById('zve_erkl');
+  var abw = zq && zq.quelle === 'steuerzeitraum' && zve > 0 && Math.abs((feldZve || 0) - zve) >= 1;
+  if (!abw) { if (box) box.hidden = true; return; }
+  if (!box) {
+    box = document.createElement('div');
+    box.id = 'zve_erkl'; box.className = 'hint';
+    box.style.cssText = 'margin-top:4px';
+    f.appendChild(box);
+  }
+  box.hidden = false;
+  box.textContent = '';
+  var b = document.createElement('strong');
+  b.textContent = jahr + ' gilt ' + Math.round(zve).toLocaleString('de-DE') + ' € aus deinem Steuerzeitraum.';
+  box.appendChild(b);
+  box.appendChild(document.createTextNode(' Dieses Feld gilt nur für Jahre ohne eigenen Zeitraum. '));
+  var a = document.createElement('a');
+  a.href = '#'; a.textContent = 'Steuerzeiträume ansehen';
+  a.style.cssText = 'color:var(--wl-7a5d18, #7a5d18);font-weight:600;text-decoration:underline';
+  a.onclick = function (e) { e.preventDefault(); try { window._v842OpenTaxPeriods && window._v842OpenTaxPeriods(); } catch (_e) {} };
+  box.appendChild(a);
+}
 
 function onGrenzAutoToggle() {
   _grenzAutoNachziehen(true);
