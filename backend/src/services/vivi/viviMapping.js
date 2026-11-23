@@ -391,6 +391,69 @@ function erhoehungenAus(verlauf, heute) {
   });
   return aus.sort(function (a, b) { return a.datum < b.datum ? -1 : (a.datum > b.datum ? 1 : 0); });
 }
+/* v4037 · Geplante Mieterhoehungen (ViVi status scheduled oder Datum nach heute) als eigene Liste. Sie zaehlen nicht als
+   „letzte Erhoehung“ und nicht fuer die Sperrfrist, nur fuer die Plan-Jahre ab ihrem Datum (mietentwicklung.js). */
+function geplanteAus(verlauf, heute) {
+  const L = verlauf && Array.isArray(verlauf.rent_changes) ? verlauf.rent_changes : [];
+  const aus = [];
+  L.forEach(function (c) {
+    if (!c || (c.status && !/^(scheduled|planned|pending|active)$/.test(c.status))) return;
+    const d = isoDatum(c.effective_date); if (!d || d <= heute) return;
+    const alt = zahl(c.previous_rent), neu = zahl(c.new_rent);
+    if (alt == null || neu == null || !(neu > alt)) return;
+    const t = text(c.adjustment_type).toLowerCase();
+    const art = /index/.test(t) ? 'index' : (/stag|graduat|step/.test(t) ? 'staffel' : (/moderni/.test(t) ? '559' : '558'));
+    aus.push({ id: 'vivi-' + (c.id != null ? c.id : d), datum: d, art: art, von: rund(alt), auf: rund(neu), beleg: 'aus ViVi, geplant', geplant: true });
+  });
+  return aus.sort(function (a, b) { return a.datum < b.datum ? -1 : (a.datum > b.datum ? 1 : 0); });
+}
+/* v4037 · Marcel 23.11.2026: „fuer jedes Jahr tatsaechlich die Werte, auch rueckwirkend“. Kaltmiete je vergangenem
+   Kalenderjahr ab dem Uebergang aus ALLEN Mietverhaeltnissen einer Einheit (auch beendeten): je Monat die Miete laut
+   Mietverlauf (start_state, wirksame Aenderungen), Monate ohne Mietverhaeltnis zaehlen 0 (Leerstand). Stellplaetze des
+   Mietverhaeltnisses zaehlen mit (DealPilot fuehrt die Jahresmiete samt Zusatzeinnahmen). Der Monat des Uebergangs zaehlt
+   voll, wie anteilig.js getWuMonths. Ergebnis { 'JJJJ': { miete, monate_vermietet } } fuer Jahre vor dem laufenden. */
+function mieteImMonat(r, verlauf, iso) {
+  if (!r || (r.occupancy_type && r.occupancy_type !== 'rented')) return null;
+  const b = isoDatum(r.rental_start), e = isoDatum(r.rental_end);
+  const mEnde = iso.slice(0, 7) + '-31';
+  if (b && b > mEnde) return null;
+  if (e && e < iso) return null;
+  let m = null;
+  if (verlauf && verlauf.start_state && zahl(verlauf.start_state.rent) != null) {
+    m = zahl(verlauf.start_state.rent);
+    const L = Array.isArray(verlauf.rent_changes) ? verlauf.rent_changes.slice() : [];
+    L.filter(function (c) { return c && (!c.status || c.status === 'active') && isoDatum(c.effective_date) && isoDatum(c.effective_date) <= iso && zahl(c.new_rent) != null; })
+      .sort(function (x, y) { return isoDatum(x.effective_date) < isoDatum(y.effective_date) ? -1 : 1; })
+      .forEach(function (c) { m = zahl(c.new_rent); });
+  } else m = zahl(r.rent);
+  if (m == null) return null;
+  const stp = stellplatzMiete(r);
+  return m + (stp || 0);
+}
+function istJahreAus(rentals, mietverlauf, ab, heute) {
+  const out = {};
+  const a = isoDatum(ab); if (!a) return out;
+  const j0 = +a.slice(0, 4), m0 = +a.slice(5, 7), jh = +heute.slice(0, 4);
+  for (let j = j0; j < jh; j++) {
+    let sum = 0, vermietet = 0;
+    for (let mo = (j === j0 ? m0 : 1); mo <= 12; mo++) {
+      const iso = j + '-' + String(mo).padStart(2, '0') + '-01';
+      let monat = 0, da = false;
+      (rentals || []).forEach(function (r) { const v = mieteImMonat(r, mietverlauf && mietverlauf[r.id], iso); if (v != null) { monat += v; da = true; } });
+      sum += monat; if (da) vermietet++;
+    }
+    out[String(j)] = { miete: rund(sum), monate_vermietet: vermietet, monate: 12 - (j === j0 ? m0 - 1 : 0) };
+  }
+  return out;
+}
+function istJahreSumme(teile) {
+  const out = {};
+  teile.forEach(function (t) { Object.keys(t || {}).forEach(function (j) {
+    const x = out[j] || (out[j] = { miete: 0, monate_vermietet: 0, monate: t[j].monate });
+    x.miete = rund(x.miete + t[j].miete); x.monate_vermietet = Math.max(x.monate_vermietet, t[j].monate_vermietet);
+  }); });
+  return out;
+}
 function monatJahr(iso) { const m = /^(\d{4})-(\d{2})/.exec(text(iso)); return m ? m[2] + '.' + m[1] : null; }
 
 /**
@@ -445,10 +508,18 @@ function ausVivi(paket, kontext) {
   }
   const einheitenInfo = {};
   const erhoehungenInfo = {};
+  const geplantInfo = {};   /* v4037 */
+  const istTeile = [], istEinheiten = {};   /* v4037 */
   zuordnung.forEach(function (z) {
     const u = z.unit, q = 'units/' + u.id, P = z.praefix;
     if (P) einheitenInfo[z.index] = { nr: z.nr, name: text(u.identifier) };
     const r = rentals.filter(function (x) { return String(x.unit_id) === String(u.id) && laufend(x, heute); })[0] || null;
+    /* v4037 · Ist je vergangenem Jahr aus allen Mietverhaeltnissen dieser Einheit */
+    if (kontext.uebergang) {
+      const alleR = rentals.filter(function (x) { return String(x.unit_id) === String(u.id); });
+      const ij = istJahreAus(alleR, paket.mietverlauf, kontext.uebergang, heute);
+      if (Object.keys(ij).length) { istTeile.push(ij); if (P) istEinheiten[z.index] = ij; }
+    }
     const rq = r ? 'rental-units/' + r.id : q;
     const qm = zahl(u.square_meters);
     if (P) {
@@ -483,6 +554,8 @@ function ausVivi(paket, kontext) {
        mehreren Erhoehungen. Der ganze Mietverlauf geht in die Liste der Mieterhoehungen (js/mieterhoehungen.js). */
     const erhListe = erhoehungenAus(paket.mietverlauf && paket.mietverlauf[r.id], heute);
     if (erhListe.length) erhoehungenInfo[P ? String(z.index) : 'objekt'] = erhListe;
+    const gepl = geplanteAus(paket.mietverlauf && paket.mietverlauf[r.id], heute);   /* v4037 */
+    if (gepl.length) geplantInfo[P ? String(z.index) : 'objekt'] = gepl;
     const va = VERTRAG_AUS_VIVI[text(r.contract_type)]; if (va) setze(P + 'mv_art', va, rq);
     const stp = stellplatzMiete(r); if (stp != null) setze(P ? P + 'stellplatz_miete' : 'ze_stp_monat', stp, rq);
   });
@@ -519,6 +592,8 @@ function ausVivi(paket, kontext) {
   /* Gegenprobe: Restschuld heute aus dem Tilgungsplan (kein Eingabefeld, nur Vergleich zu calc.js) */
   const info = { restschuld_heute: null, darlehen_weitere: [], einheiten: einheitenInfo };
   if (Object.keys(erhoehungenInfo).length) info.erhoehungen = erhoehungenInfo;
+  if (Object.keys(geplantInfo).length) info.erhoehungen_geplant = geplantInfo;   /* v4037 */
+  if (istTeile.length) info.ist_jahre = { summe: istJahreSumme(istTeile), einheiten: istEinheiten };   /* v4037 */
   const plan = paket.tilgungsplan && Array.isArray(paket.tilgungsplan.data) ? paket.tilgungsplan.data : [];
   const bisHeute = plan.filter(function (z) { return isoDatum(z.date) && isoDatum(z.date) <= heute; });
   if (bisHeute.length) {
@@ -540,7 +615,7 @@ function ausVivi(paket, kontext) {
   return { felder: felder, info: info };
 }
 
-module.exports = { erhoehungenAus,
+module.exports = { erhoehungenAus, geplanteAus, istJahreAus, istJahreSumme, mieteImMonat,
   nachVivi, ausVivi, letzteErhoehung, erhoehungBetrag, nkVorschlag, ulJahr, einheitenListe, zahl, isoDatum, monatDatum, etageText, etageZahl, mieterName,
   NK_MIN_QM, OBJEKTTYP, VERTRAG_NACH_VIVI, VERTRAG_AUS_VIVI, UL_FELDER, ARTEN_MIT_EINHEITEN, MUSTER_ANSCHRIFT
 };

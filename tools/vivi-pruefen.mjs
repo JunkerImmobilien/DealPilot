@@ -245,6 +245,13 @@ function nurLesenBefunde(dateien) {
       if (aufrufe !== 1 || !anl || !/einheitBeimAnlegen\(/.test(anl[0])) f.push(rel + ': einheitBeimAnlegen ' + aufrufe + ' mal, erlaubt genau einmal in anlegen()');
       if (anl && !/!ids\.auto_angepasst/.test(anl[0])) f.push(rel + ': einheitBeimAnlegen ohne Merker auto_angepasst');
     }
+    if (rel.endsWith('viviDienst.js')) {
+      /* v4037 · Mietänderung anlegen nur in mieterhoehung(), dort nur mit bestaetigt === true */
+      const ma = (ohneKommentar.match(/mietaenderungAnlegen\(/g) || []).length;
+      const mf = /async function mieterhoehung\([\s\S]*?\r?\n\}\r?\n/.exec(ohneKommentar);
+      if (ma !== 1 || !mf || !/mietaenderungAnlegen\(/.test(mf[0])) f.push(rel + ': mietaenderungAnlegen ' + ma + ' mal, erlaubt genau einmal in mieterhoehung()');
+      if (mf && !/opt\.bestaetigt !== true/.test(mf[0])) f.push(rel + ': mieterhoehung ohne Bestätigung');
+    }
     if (/method\s*:\s*['"`](?!GET['"`]|POST['"`])/i.test(ohneKommentar.replace(/method\s*:\s*methode/g, ''))) f.push(rel + ': method mit anderem Wert als GET/POST');
     if (/\bfetch\s*\(/.test(ohneKommentar) && !rel.endsWith('viviClient.js')) f.push(rel + ': eigenes fetch ausserhalb von viviClient.js');
     if (/require\(['"](node:)?(https?|axios|node-fetch|undici)['"]\)/.test(ohneKommentar)) f.push(rel + ': eigener HTTP-Weg');
@@ -263,7 +270,20 @@ const befunde = nurLesenBefunde(echtDateien);
 ok(!befunde.length, VIVI_DATEIEN.length + ' Dateien: kein PUT, DELETE an ViVi, PATCH nur einmal in einheitBeimAnlegen() aus anlegen(), fetch nur im Client' + (befunde.length ? ': ' + befunde.join(' | ') : ''));
 {
   const cl = viviClient.erzeugen('test-token-12345', { fetch: async () => ({ status: 200, json: async () => ({ data: [] }) }) });
-  ok(JSON.stringify(Object.keys(cl).sort()) === JSON.stringify(['einheitBeimAnlegen', 'get', 'post', 'zaehler']), 'der Client bietet nur get, post, einheitBeimAnlegen (und den Zähler)');
+  ok(JSON.stringify(Object.keys(cl).sort()) === JSON.stringify(['einheitBeimAnlegen', 'get', 'mietaenderungAnlegen', 'mietaenderungVorschau', 'post', 'zaehler']), 'der Client bietet nur get, post, einheitBeimAnlegen, mietaenderungVorschau/-Anlegen (v4037) und den Zähler');
+  /* v4037 · Marcel 23.11.2026: Mietänderung nach ViVi, nur diese zwei Pfade, nur erlaubte Felder */
+  let maGesperrt = 0;
+  for (const [fn, p] of [['mietaenderungAnlegen', '/projects/prj_1/rental-units/r1/rent-changes/preview'], ['mietaenderungVorschau', '/projects/prj_1/rental-units/r1/rent-changes'], ['mietaenderungAnlegen', '/projects/prj_1/rental-units/r1/end'], ['mietaenderungAnlegen', '/projects/prj_1/rental-units/r1/rent-changes/rch_1'], ['mietaenderungAnlegen', '/projects/prj_1']]) {
+    try { await cl[fn](p, { effective_date: '2027-01-01', adjustment_type: 'increase' }); } catch (e) { if (e.code === 'pfad_gesperrt') maGesperrt++; }
+  }
+  ok(maGesperrt === 5 && operation('POST', '/projects/{project}/rental-units/{rentalUnit}/rent-changes') && operation('POST', '/projects/{project}/rental-units/{rentalUnit}/rent-changes/preview'), 'Mietänderung nur an …/rent-changes und …/rent-changes/preview (5 andere Pfade abgewiesen), beide in der Spezifikation');
+  {
+    let gesendet = null;
+    const cl2 = viviClient.erzeugen('test-token-12345', { fetch: async (u, o) => { gesendet = { u, o }; return { status: 201, json: async () => ({ data: {} }) }; } });
+    await cl2.mietaenderungAnlegen('/projects/prj_1/rental-units/r1/rent-changes', { effective_date: '2027-03-01', adjustment_type: 'increase', new_rent: 650, rental_end: '2027-01-01', delete: true });
+    const k = gesendet ? Object.keys(JSON.parse(gesendet.o.body)).sort().join(',') : '';
+    ok(gesendet && gesendet.o.method === 'POST' && k === 'adjustment_type,effective_date,new_rent', 'Mietänderung sendet POST nur mit erlaubten Feldern (' + k + ')');
+  }
   let patchGesperrt = 0;
   for (const p of ['/projects/prj_1', '/projects/prj_1/rental-units/r1', '/projects/prj_1/financings/f1', '/projects/prj_1/units', '/projects/prj_1/units/u1/condition']) {
     try { await cl.einheitBeimAnlegen(p, { identifier: 'x' }); } catch (e) { if (e.code === 'pfad_gesperrt') patchGesperrt++; }
@@ -285,6 +305,8 @@ ok(!befunde.length, VIVI_DATEIEN.length + ' Dateien: kein PUT, DELETE an ViVi, P
     ['viviDienst.js mit eigenem fetch', 'backend/src/services/vivi/viviDienst.js', (t) => t + "\nfetch('https://app.vivi-immo.de/api/v1/projects/1', { method: 'DELETE' });\n"],
     ['viviMapping.js mit method: PUT', 'backend/src/services/vivi/viviMapping.js', (t) => t + "\nconst x = { method: 'PUT' };\n"],
     ['viviDienst.js ruft einheitBeimAnlegen auch im Abruf', 'backend/src/services/vivi/viviDienst.js', (t) => t.replace('try { projekt = (await cl.get(P, q) || {}).data || {}; }', "try { await cl.einheitBeimAnlegen(P + '/units/x', {}); projekt = (await cl.get(P, q) || {}).data || {}; }")],
+    ['viviDienst.js legt eine Mietänderung im Abruf an', 'backend/src/services/vivi/viviDienst.js', (t) => t.replace('try { projekt = (await cl.get(P, q) || {}).data || {}; }', "try { await cl.mietaenderungAnlegen(P + '/rental-units/x/rent-changes', {}); projekt = (await cl.get(P, q) || {}).data || {}; }")],
+    ['viviDienst.js mieterhoehung ohne Bestätigung', 'backend/src/services/vivi/viviDienst.js', (t) => t.replace("if (!opt.vorschau && opt.bestaetigt !== true) throw", "if (false) throw")],
     ['viviClient.js mit zweitem PATCH', 'backend/src/services/vivi/viviClient.js', (t) => t.replace("function get(pfad, abfrage) { return senden('GET', pfad, abfrage, null); }", "function get(pfad, abfrage) { return senden('GET', pfad, abfrage, null); }\n  function aendern(p, r) { return senden('PATCH', p, null, r); }")]
   ];
   for (const [name, rel, aendern] of proben) {
@@ -1159,6 +1181,26 @@ kopf('T  Steuerjahre aus ViVi: Kategorien, Sperre, keine Doppelung, automatisch 
   const zM = rS.zeilen.find((z) => z.spalte === 'einnahmen_km'), zN = rS.zeilen.find((z) => z.spalte === 'nk_umlf');
   ok(zM.aktion === 'laufend' && zM.erwartetBisHeute === 10767 && zM.abwBisHeute === -267 && !rS.auto.includes(zM), 'S16 v4033 laufendes Jahr: ViVi bis heute gegen anteilig erwartet (12.000 × 10,74/12 = 10.767), nichts übernommen');
   ok(zN.unvollstaendig && !rS.auto.includes(zN), 'S17 v4033 einzelner Beleg 57 € gegen Schätzung 2.815 €: Hinweis unvollständig, nie automatisch');
+}
+/* ═══ U · v4037 Ist je Jahr aus ViVi, geplante Erhöhungen ═══════════════ */
+kopf('U  v4037 Ist je Jahr aus dem Mietverlauf, geplante Erhöhungen');
+{
+  const r1 = { id: 'r1', unit_id: 'u1', occupancy_type: 'rented', rental_start: '2021-05-01', rent: 620, amenities: [{ type: 'parking_space', monthly_rent: 40 }] };
+  const h1 = { start_state: { rent: 520, utility: 180 }, rent_changes: [
+    { id: 'a', effective_date: '2025-12-01', status: 'active', previous_rent: 520, new_rent: 570 },
+    { id: 'b', effective_date: '2026-11-01', status: 'active', previous_rent: 570, new_rent: 620 },
+    { id: 'c', effective_date: '2027-03-01', status: 'scheduled', previous_rent: 620, new_rent: 650 }] };
+  const ij = mapping.istJahreAus([r1], { r1: h1 }, '2024-03-01', '2026-11-23');
+  ok(ij['2024'] && ij['2024'].miete === 5600 && ij['2024'].monate === 10, 'U1 Kaufjahr 2024 ab Übergang 01.03.: 10 × (520 + 40) = 5.600 € (' + (ij['2024'] && ij['2024'].miete) + ')');
+  ok(ij['2025'] && ij['2025'].miete === 6770, 'U2 2025: 11 × 560 + 1 × 610 = 6.770 € (' + (ij['2025'] && ij['2025'].miete) + ')');
+  ok(!ij['2026'], 'U3 das laufende Jahr steht nicht in den Ist-Jahren');
+  const alt = { id: 'r0', unit_id: 'u1', occupancy_type: 'rented', rental_start: '2019-01-01', rental_end: '2025-06-30', rent: 500 };
+  const neu = { id: 'r2', unit_id: 'u1', occupancy_type: 'rented', rental_start: '2025-09-01', rent: 600 };
+  const ij2 = mapping.istJahreAus([alt, neu], {}, '2024-01-01', '2026-11-23');
+  ok(ij2['2025'].miete === 6 * 500 + 4 * 600 && ij2['2025'].monate_vermietet === 10, 'U4 Mieterwechsel mit Leerstand Juli und August 2025: 6 × 500 + 4 × 600 = 5.400 € (' + ij2['2025'].miete + ')');
+  const g = mapping.geplanteAus(h1, '2026-11-23');
+  ok(g.length === 1 && g[0].datum === '2027-03-01' && g[0].auf === 650 && g[0].geplant === true, 'U5 geplante Erhöhung 01.03.2027 auf 650 € als eigene Liste');
+  ok(mapping.erhoehungenAus(h1, '2026-11-23').length === 2, 'U6 die geplante zählt nicht als wirksame Erhöhung');
 }
 dienst._setzeDeps(null);
 console.log('\n' + (rot ? 'ROT · ' + rot + ' Befund(e), ' + gruen + ' grün' : 'SAUBER · ' + gruen + ' Prüfpunkte grün'));

@@ -15,6 +15,11 @@
  * zum Anlegen: viviDienst.anlegen() ruft es hoechstens einmal je Objekt (vivi_ids.auto_angepasst), sonst niemand.
  * tools/vivi-pruefen.mjs wird rot, sobald in services/vivi/ oder routes/vivi.js eine andere Methode auftaucht.
  *
+ * v4037 · ZWEITE Ausnahme, Marcel 23.11.2026: „Mieterhoehung in ViVi anlegen“ aus DealPilot. mietaenderungVorschau() und
+ * mietaenderungAnlegen() schicken je ein POST an genau /projects/{p}/rental-units/{r}/rent-changes(/preview), nur mit den
+ * Feldern aus MIETAENDERUNG_FELDER. Jede Mietaenderung bestaetigt der Nutzer einzeln (viviDienst.mieterhoehung). Der
+ * allgemeine post() bleibt fuer diese Pfade gesperrt. Andern oder loeschen kann DealPilot eine Mietaenderung nicht.
+ *
  * ── ANFRAGEBREMSE ─────────────────────────────────────────────────────────
  * ViVi erlaubt 60 Anfragen je Minute. Wir bleiben bei hoechstens 50 je Token (gleitendes Fenster von 60 s,
  * im Arbeitsspeicher, Schluessel ist ein Hash des Tokens, nie der Token selbst). Ist das Fenster voll, wartet
@@ -41,6 +46,10 @@ const ANLEGEN_PFADE = Object.freeze([
 
 /* v3965 · der einzige PATCH-Pfad: die automatisch angelegte Einheit, nur beim Anlegen */
 const EINHEIT_PFAD = /^\/projects\/[A-Za-z0-9_-]+\/units\/[A-Za-z0-9_-]+$/;
+
+/* v4037 · Mietaenderung: Vorschau und Anlegen, sonst nichts */
+const MIETAENDERUNG_PFAD = /^\/projects\/[A-Za-z0-9_-]+\/rental-units\/[A-Za-z0-9_-]+\/rent-changes(\/preview)?$/;
+const MIETAENDERUNG_FELDER = Object.freeze(['effective_date', 'adjustment_type', 'new_rent', 'new_utility_costs', 'adjustment_reason', 'legal_basis', 'amenity_changes']);
 
 const _fenster = new Map();   // tokenHash -> [Zeitpunkte]
 
@@ -144,10 +153,22 @@ function erzeugen(token, opt) {
     return senden('PATCH', pfad, null, r);
   }
 
-  return { get: get, post: post, einheitBeimAnlegen: einheitBeimAnlegen, zaehler: zaehler };
+  /** v4037 · eine Mietaenderung: vorschau=true an …/rent-changes/preview, sonst an …/rent-changes. Nur erlaubte Felder. */
+  function mietaenderung(pfad, rumpf, abfrage, vorschau) {
+    const m = MIETAENDERUNG_PFAD.exec(pfad);
+    if (!m || (!!m[1]) !== !!vorschau) return Promise.reject(fehler('pfad_gesperrt', 'Dieser ViVi-Pfad ist für Mietänderungen nicht freigegeben: ' + pfad));
+    const r = {};
+    MIETAENDERUNG_FELDER.forEach(function (k) { if (rumpf && rumpf[k] !== undefined && rumpf[k] !== null) r[k] = rumpf[k]; });
+    if (!r.effective_date || !r.adjustment_type) return Promise.reject(fehler('ungueltig', 'Datum und Art der Mietänderung fehlen.'));
+    return senden('POST', pfad, abfrage, r);
+  }
+  function mietaenderungVorschau(pfad, rumpf, abfrage) { return mietaenderung(pfad, rumpf, abfrage, true); }
+  function mietaenderungAnlegen(pfad, rumpf, abfrage) { return mietaenderung(pfad, rumpf, abfrage, false); }
+
+  return { get: get, post: post, einheitBeimAnlegen: einheitBeimAnlegen, mietaenderungVorschau: mietaenderungVorschau, mietaenderungAnlegen: mietaenderungAnlegen, zaehler: zaehler };
 }
 
 /** nur fuer tools/vivi-pruefen.mjs */
 function _fensterLeeren() { _fenster.clear(); }
 
-module.exports = { erzeugen, fehler, ANLEGEN_PFADE, EINHEIT_PFAD, BASIS, MAX_JE_MINUTE, FENSTER_MS, _fensterLeeren };
+module.exports = { erzeugen, fehler, ANLEGEN_PFADE, EINHEIT_PFAD, MIETAENDERUNG_PFAD, MIETAENDERUNG_FELDER, BASIS, MAX_JE_MINUTE, FENSTER_MS, _fensterLeeren };

@@ -91,6 +91,17 @@ router.post('/objekt/:id/abrufen', bremse, function (req, res, next) {
   const id = oid(req, res); if (!id) return;
   dienst.abrufen(uid(req), id).then(function () { return dienst.werte(uid(req), id); }).then(function (r) { res.json(r); }).catch(antwort(res, next));
 });
+/* v4037 · Mieterhoehung aus DealPilot in ViVi (Marcel 23.11.2026). vorschau=true rechnet nur, sonst bestaetigt === true Pflicht. */
+router.post('/objekt/:id/mieterhoehung', bremse, function (req, res, next) {
+  const id = oid(req, res); if (!id) return;
+  const b = req.body || {};
+  const vorschau = b.vorschau === true;
+  if (!vorschau && b.bestaetigt !== true) return res.status(400).json({ error: 'Bitte die Mieterhöhung bestätigen.' });
+  dienst.mieterhoehung(uid(req), id, { einheit: b.einheit == null || b.einheit === '' ? null : String(b.einheit), datum: b.datum, neue_miete: b.neue_miete,
+    art: b.art, grund: b.grund, vorschau: vorschau, bestaetigt: b.bestaetigt === true })
+    .then(function (r) { return vorschau ? r : dienst.werte(uid(req), id).then(function (w) { r.stand = w; return r; }); })
+    .then(function (r) { res.json(r); }).catch(antwort(res, next));
+});
 /* v4020 · Paket V4: Einstellung „Steuerjahre aus ViVi“ (Einstellungen › Konto › Externe Anbieter › ViVi) */
 router.get('/steuer-einstellung', function (req, res, next) {
   const st = require('../services/vivi/viviSteuer');

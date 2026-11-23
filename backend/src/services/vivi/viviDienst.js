@@ -300,6 +300,55 @@ async function inViviGeloescht(cl, v, q) {
   } catch (e) { return false; }
 }
 
+/* v4037 · Uebergang des Objekts: wirtschaftlicher Uebergang, sonst Kaufdatum, sonst Stichtag des Ankauf-Stands */
+function uebergangVon(d) {
+  d = d || {};
+  const k = [d.wirtschaftlicher_uebergang, d.kaufdat, d._ankauf && d._ankauf.stichtag].map(function (x) { return mapping.isoDatum(x); }).filter(Boolean);
+  return k[0] || null;
+}
+/* v4037 · bezahlte Mietzahlungen je Kalenderjahr ab dem Uebergang bis Ende Vorjahr (GET /rental-payments, nur Miete,
+   Status bezahlt, hoechstens 5 Seiten). Betraege sind warm (Miete plus Vorauszahlung), so wie ViVi sie fuehrt. */
+async function gezahltJeJahr(cl, q, projektId, ab, heute) {
+  if (!ab) return null;
+  const bis = (+heute.slice(0, 4) - 1) + '-12-31';
+  if (ab > bis) return null;
+  const out = {};
+  for (let seite = 1; seite <= 5; seite++) {
+    const roh = await cl.get('/rental-payments', Object.assign({}, q, { project_id: projektId, date_from: ab, date_to: bis, status: 'paid', type: 'rent', per_page: 100, page: seite }));
+    const L = liste(roh);
+    L.forEach(function (x) {
+      const d = mapping.isoDatum(x && (x.due_date || x.value_date || x.booking_date || x.date)); const b = mapping.zahl(x && (x.amount_paid != null ? x.amount_paid : x.amount));
+      if (!d || b == null) return; const j = d.slice(0, 4); out[j] = Math.round(((out[j] || 0) + b) * 100) / 100;
+    });
+    const m = (roh && roh.meta) || {};
+    if (!(m.last_page > seite) || !L.length) break;
+  }
+  return out;
+}
+/* v4037 · Soll warm je Jahr (Kaltmiete plus Stellplatz plus Vorauszahlung laut Mietverlauf) zum Vergleich mit gezahlt */
+function sollWarmJeJahr(miet, verlauf, ab, heute) {
+  if (!ab) return null;
+  const nk = function (r, h, iso) {
+    if (h && h.start_state && mapping.zahl(h.start_state.utility) != null) {
+      let u = mapping.zahl(h.start_state.utility);
+      (Array.isArray(h.rent_changes) ? h.rent_changes : []).filter(function (c) { return c && (!c.status || c.status === 'active') && mapping.isoDatum(c.effective_date) && mapping.isoDatum(c.effective_date) <= iso && mapping.zahl(c.new_utility_costs) != null; })
+        .sort(function (x, y) { return mapping.isoDatum(x.effective_date) < mapping.isoDatum(y.effective_date) ? -1 : 1; }).forEach(function (c) { u = mapping.zahl(c.new_utility_costs); });
+      return u;
+    }
+    return mapping.zahl(r.monthly_utility_costs) || 0;
+  };
+  const out = {}, j0 = +ab.slice(0, 4), m0 = +ab.slice(5, 7), jh = +heute.slice(0, 4);
+  for (let j = j0; j < jh; j++) {
+    let s = 0;
+    for (let mo = (j === j0 ? m0 : 1); mo <= 12; mo++) {
+      const iso = j + '-' + String(mo).padStart(2, '0') + '-01';
+      (miet || []).forEach(function (r) { const k = mapping.mieteImMonat(r, verlauf[r.id], iso); if (k != null) s += k + nk(r, verlauf[r.id], iso); });
+    }
+    out[String(j)] = Math.round(s * 100) / 100;
+  }
+  return out;
+}
+
 async function abrufen(userId, objectId, opt) {
   opt = opt || {};
   const sp = deps().speicher;
@@ -335,14 +384,22 @@ async function abrufen(userId, objectId, opt) {
        Ein Fehler hier kostet nur die Unterscheidung, die Anfragebremse beendet die Runde wie immer. */
     const mietverlauf = {};
     const heuteIso = new Date(deps().jetzt()).toISOString().slice(0, 10);
+    const uebergang = uebergangVon(o.data);   /* v4037 */
     for (const r of miet) {
-      if (!r || r.id == null || (r.rental_end && String(r.rental_end).slice(0, 10) < heuteIso)) continue;
+      /* v4037 · auch beendete Mietverhaeltnisse seit dem Uebergang: ihr Verlauf zaehlt fuer die Ist-Miete vergangener Jahre */
+      if (!r || r.id == null || (r.rental_end && String(r.rental_end).slice(0, 10) < (uebergang || heuteIso))) continue;
       try { mietverlauf[r.id] = ((await cl.get(P + '/rental-units/' + encodeURIComponent(String(r.id)) + '/rent-history', q)) || {}).data || null; }
       catch (e) { if (e && (e.code === 'bremse_429' || e.code === 'bremse_lokal' || e.code === 'nicht_berechtigt')) throw e; }
     }
     const erg = mapping.ausVivi({ projekt: projekt, einheiten: einheiten, mietverhaeltnisse: miet, darlehen: darl, tilgungsplan: plan, mietverlauf: mietverlauf },
       { vivi_ids: v.vivi_ids || {}, mitEinheiten: mitEinheiten(v, o.data), objart: o.data && o.data.objart, jetzt: deps().jetzt(),
-        musterAnschrift: !!(v.vivi_ids && v.vivi_ids.muster_anschrift) });
+        musterAnschrift: !!(v.vivi_ids && v.vivi_ids.muster_anschrift), uebergang: uebergang });
+    /* v4037 · gezahlte Mieten je Jahr (warm, Hinweis im Jahresabgleich). Ein Fehler kostet nur den Hinweis. */
+    if (erg.info && erg.info.ist_jahre && Object.keys(erg.info.ist_jahre.summe || {}).length) {
+      try { erg.info.ist_jahre.gezahlt = await gezahltJeJahr(cl, q, v.vivi_objekt_id, uebergang, heuteIso); }
+      catch (e) { if (e && (e.code === 'bremse_429' || e.code === 'bremse_lokal')) throw e; }
+      erg.info.ist_jahre.soll_warm = sollWarmJeJahr(miet, mietverlauf, uebergang, heuteIso);
+    }
     await sp.werteSchreiben(objectId, erg.felder, erg.info);
     /* v4020 · Paket V4: Steuerjahre vom Kaufjahr bis heute (nur GET). Einstellung „aus“ fragt ViVi nicht. Ein Fehler hier
        kostet nur die Steuerjahre dieses Abrufs: die Objektwerte sind schon geschrieben, die alten Steuerwerte bleiben. */
@@ -467,8 +524,75 @@ function starteTakt() {
   setInterval(_viviAbruf, 6 * 60 * 60 * 1000);
 }
 
+/* ── v4037 · Mieterhoehung aus DealPilot in ViVi (Marcel 23.11.2026) ─────────────────────────────────────
+   „Wenn DealPilot Potenzial sieht … einen Absprung, dass wir das hier anpassen und es in ViVi hinterlegt wird.“
+   opt = { einheit (Index der Wohnung oder null fuers Objekt), datum (JJJJ-MM-TT), neue_miete (kalt je Monat),
+           art ('558' | 'index' | '559' | 'staffel'), grund (Freitext), vorschau (true = nur ViVi rechnen lassen),
+           bestaetigt (true = anlegen) }.
+   Vorschau schreibt nichts. Anlegen nur mit bestaetigt === true, danach Abruf, damit die Liste in DealPilot stimmt. */
+const MIET_ART = Object.freeze({ '558': ['increase', '§ 558 BGB'], index: ['index_adjustment', '§ 557b BGB'], '559': ['modernization', '§ 559 BGB'], staffel: ['stepped_rent', '§ 557a BGB'] });
+async function mietverhaeltnisFuer(cl, P, q, v, einheit, heute) {
+  const ids = v.vivi_ids || {};
+  const gem = ids.einheiten && typeof ids.einheiten === 'object' ? ids.einheiten : {};
+  let unitId = null;
+  if (einheit != null && einheit !== '') {
+    const k = Object.keys(gem).find(function (x) { return gem[x] && String(gem[x].index) === String(einheit); });
+    unitId = k ? gem[k].unit_id : null;
+    if (!unitId) {
+      const units = liste(await cl.get(P + '/units', q)).filter(function (u) { return u && u.unit_type !== 'ancillary'; });
+      unitId = units[+einheit] ? units[+einheit].id : null;
+    }
+  } else if (gem.e0 && gem.e0.unit_id) unitId = gem.e0.unit_id;
+  const miet = liste(await cl.get(P + '/rental-units', q)).filter(function (r) {
+    if (!r || r.id == null || (r.occupancy_type && r.occupancy_type !== 'rented')) return false;
+    const b = mapping.isoDatum(r.rental_start), e = mapping.isoDatum(r.rental_end);
+    return !(e && e < heute) && !(b && b > heute);
+  });
+  const r = unitId ? miet.find(function (x) { return String(x.unit_id) === String(unitId); }) : (miet.length === 1 ? miet[0] : null);
+  if (!r) throw fehler(404, 'kein_mietverhaeltnis', einheit != null && einheit !== '' ? 'Für diese Wohnung gibt es in ViVi kein laufendes Mietverhältnis.' : 'In ViVi gibt es für dieses Objekt kein eindeutiges laufendes Mietverhältnis.');
+  return r;
+}
+async function mieterhoehung(userId, objectId, opt) {
+  opt = opt || {};
+  const sp = deps().speicher;
+  const v = await sp.verknuepfung(userId, objectId);
+  if (!v || v.anlage_status !== 'fertig' || !v.vivi_objekt_id) throw fehler(409, 'nicht_verknuepft', 'Dieses Objekt ist nicht mit ViVi verknüpft.');
+  const datum = mapping.isoDatum(opt.datum);
+  const neu = mapping.zahl(opt.neue_miete);
+  const art = MIET_ART[String(opt.art || '558')];
+  if (!datum) throw fehler(400, 'datum_fehlt', 'Bitte das Datum eintragen, ab dem die neue Miete gilt.');
+  if (!(neu > 0)) throw fehler(400, 'miete_fehlt', 'Bitte die neue Kaltmiete je Monat eintragen.');
+  if (!art) throw fehler(400, 'art_ungueltig', 'Diese Art der Mietänderung gibt es nicht.');
+  if (!opt.vorschau && opt.bestaetigt !== true) throw fehler(400, 'nicht_bestaetigt', 'Bitte die Mieterhöhung bestätigen.');
+  const cl = opt.client || deps().client(await token(userId));
+  const vorher = cl.zaehler.anfragen, t0 = deps().jetzt();
+  const q = abfrage(v.vivi_account_id);
+  const P = '/projects/' + encodeURIComponent(String(v.vivi_objekt_id));
+  const heute = new Date(deps().jetzt()).toISOString().slice(0, 10);
+  const protokollArt = opt.vorschau ? 'mietaenderung_vorschau' : 'mietaenderung';
+  try {
+    const r = await mietverhaeltnisFuer(cl, P, q, v, opt.einheit, heute);
+    const alt = mapping.zahl(r.rent);
+    if (alt != null && !(neu > alt)) throw fehler(400, 'keine_erhoehung', 'Die neue Miete liegt nicht über der heutigen (' + alt + ' €).');
+    const rumpf = { effective_date: datum, adjustment_type: art[0], new_rent: Math.round(neu * 100) / 100, legal_basis: art[1],
+      adjustment_reason: String(opt.grund || 'Mieterhöhung aus DealPilot').slice(0, 500) };
+    const pfad = P + '/rental-units/' + encodeURIComponent(String(r.id)) + '/rent-changes';
+    const antwort = opt.vorschau ? await cl.mietaenderungVorschau(pfad + '/preview', rumpf, q) : await cl.mietaenderungAnlegen(pfad, rumpf, q);
+    await sp.protokoll({ user_id: userId, object_id: objectId, art: protokollArt, anfragen: cl.zaehler.anfragen - vorher, ok: true, dauer_ms: deps().jetzt() - t0 });
+    const out = { ok: true, vorschau: !!opt.vorschau, mietverhaeltnis: r.id, miete_bisher: alt, rumpf: rumpf, vivi: (antwort && antwort.data) || antwort || null };
+    if (!opt.vorschau) {
+      try { await abrufen(userId, objectId, { client: cl }); out.abgerufen = true; } catch (e) { out.abgerufen = false; out.abruf_fehler = e && e.message; }
+    }
+    return out;
+  } catch (e) {
+    const a = e && e.status ? e : alsAntwort(e);
+    await sp.protokoll({ user_id: userId, object_id: objectId, art: protokollArt, anfragen: cl.zaehler.anfragen - vorher, bremse_429: cl.zaehler.bremse429, ok: false, fehler: a.message, dauer_ms: deps().jetzt() - t0 });
+    throw a;
+  }
+}
+
 module.exports = {
   ANBIETER, verbindungMeta, verbindungSpeichern, verbindungLoeschen, probe, vorschau, anlegen, zuordnen, projekte,
   abrufen, werte, loesen, taktLauf, starteTakt, _setzeDeps, alsAntwort, planOptionen,
-  steuerEinstellung, steuerEinstellungSpeichern, steuerLesen
+  steuerEinstellung, steuerEinstellungSpeichern, steuerLesen, mieterhoehung, MIET_ART
 };
