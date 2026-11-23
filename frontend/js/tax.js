@@ -2904,7 +2904,7 @@ function _renderDetailForm(years) {
           var t = null; b.rows.forEach(function (x) { if (x.f === f) t = x; });
           if (t && t.st > _dgS) { verborgen++; abSt = Math.min(abSt, t.st); if (Math.abs(_val(f)) > 0.005) { mitBetrag++; abBetrag = Math.min(abBetrag, t.st); } }
         });
-        label = '<b>' + r.l + '</b>' + _pille(r);
+        label = r.l + _pille(r);   /* v4043 · Marcel 23.11.: Summenzeilen nicht mehr fett, wie die übrigen Zeilen */
         if (verborgen) label += ' <span class="ytf-sum-hint">' + (mitBetrag ? '+' + mitBetrag + (mitBetrag === 1 ? ' Angabe' : ' Angaben') + ' mit Betrag, einzeln ab Detailgrad ' + _dgNamen[abBetrag] : 'einzeln ab Detailgrad ' + _dgNamen[abSt]) + '</span>';
         zelle = '<div class="ytf-readonly ytf-summe" title="Summe der Einzelposten">' + Math.round(summe).toLocaleString('de-DE') + ' €</div>';
       } else if (r.anzeige) {
@@ -3287,8 +3287,20 @@ function _grenzErklaeren() {
         + ' € aus früher gekauften Objekten.';
     }
   } catch (e) {}
-  box.textContent = t;
+  /* v4043 · Marcel 23.11.2026: „das ist relativ viel … in den Tooltip nehmen, wenn man mit der Maus drüberfährt“.
+     Die Herleitung steht jetzt im Hover-Text des Feldes (feld-hilfe.js liest tooltip-content.js beim Überfahren, EIN
+     Popup), unter dem Feld steht nichts mehr. */
+  box.textContent = ''; box.hidden = true;
+  _tipZusatz('tab4.grenzsteuersatz', t);
   try { _zveFeldErklaeren(feldZve, zve, zq, jahr); } catch (_eF) {}
+}
+/* Stellt einem gepflegten Tooltip einen errechneten Satz voran. Der Grundtext wird beim ersten Mal gemerkt. */
+function _tipZusatz(id, zusatz) {
+  try {
+    var C = window.DpTooltips && window.DpTooltips.content; if (!C || !C[id]) return;
+    if (C[id]._grund == null) C[id]._grund = C[id].body || '';
+    C[id].body = zusatz ? zusatz + ' ' + C[id]._grund : C[id]._grund;
+  } catch (e) {}
 }
 window._grenzErklaeren = _grenzErklaeren;
 
@@ -3307,6 +3319,8 @@ function _zveFeldErklaeren(feldZve, zve, zq, jahr) {
   var f = inp.closest('.f'); if (!f) return;
   var box = document.getElementById('zve_erkl');
   var abw = zq && zq.quelle === 'steuerzeitraum' && zve > 0 && Math.abs((feldZve || 0) - zve) >= 1;
+  /* v4043 · der ganze Satz steht im Hover-Text, unter dem Feld nur noch der kurze Hinweis */
+  _tipZusatz('tab4.zve', abw ? jahr + ' gilt ' + Math.round(zve).toLocaleString('de-DE') + ' € aus deinem Steuerzeitraum. Dieses Feld gilt nur für Jahre ohne eigenen Zeitraum.' : '');
   if (!abw) { if (box) box.hidden = true; return; }
   if (!box) {
     box = document.createElement('div');
@@ -3316,12 +3330,9 @@ function _zveFeldErklaeren(feldZve, zve, zq, jahr) {
   }
   box.hidden = false;
   box.textContent = '';
-  var b = document.createElement('strong');
-  b.textContent = jahr + ' gilt ' + Math.round(zve).toLocaleString('de-DE') + ' € aus deinem Steuerzeitraum.';
-  box.appendChild(b);
-  box.appendChild(document.createTextNode(' Dieses Feld gilt nur für Jahre ohne eigenen Zeitraum. '));
   var a = document.createElement('a');
-  a.href = '#'; a.textContent = 'Steuerzeiträume ansehen';
+  a.href = '#'; a.textContent = jahr + ': ' + Math.round(zve).toLocaleString('de-DE') + ' € laut Steuerzeitraum';
+  a.title = 'Steuerzeiträume ansehen';
   a.style.cssText = 'color:var(--wl-7a5d18, #7a5d18);font-weight:600;text-decoration:underline';
   a.onclick = function (e) { e.preventDefault(); try { window._v842OpenTaxPeriods && window._v842OpenTaxPeriods(); } catch (_e) {} };
   box.appendChild(a);
@@ -3983,3 +3994,17 @@ function _miete66Css() {
     else setTimeout(_hook, 300);
   }
 })();
+
+/* v4043 · Sammelblock Sonder-AfA (§ 7b, § 7h, § 7i): die Überschrift sagt, ob etwas davon aktiv ist, damit der
+   zugeklappte Block nichts verschweigt. Liest nur die vorhandenen Felder, rechnet nichts. */
+function _sonderAfaStatus() {
+  var el = document.getElementById('sonder_afa_status'); if (!el) return;
+  var t = [];
+  var b = document.getElementById('afa_sonder7b_aktiv'); if (b && b.checked) t.push('§ 7b aktiv');
+  var h = document.getElementById('av7h_art'); if (h && h.value) t.push('§ ' + h.value + ' aktiv');
+  el.textContent = t.length ? '· ' + t.join(', ') : '';
+}
+window._sonderAfaStatus = _sonderAfaStatus;
+document.addEventListener('change', function (e) { var id = e.target && e.target.id; if (id === 'afa_sonder7b_aktiv' || id === 'av7h_art') _sonderAfaStatus(); }, true);
+window.addEventListener('dp:object-ready', function () { setTimeout(_sonderAfaStatus, 300); });
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', _sonderAfaStatus); else setTimeout(_sonderAfaStatus, 0);

@@ -25,7 +25,7 @@
 (function () {
   if (window.DpViviFelder) return;
   var HINWEIS = 'Verknüpft mit ViVi, der Wert kommt aus ViVi, Änderungen bitte in ViVi.';
-  var HINWEIS_LOESEN = 'Über das Schloss kannst du den Wert in DealPilot selbst festlegen. Er wird nicht nach ViVi übertragen.';
+  var HINWEIS_LOESEN = 'Ein Klick ins Feld gibt den Wert frei. Er wird dann nicht nach ViVi übertragen.';
   var FRAGE_LOESEN = 'Diesen Wert in DealPilot selbst festlegen? Er wird nicht nach ViVi übertragen.';
   var FRAGE_ZURUECK = 'Den Wert aus ViVi wieder übernehmen?';
   /* Felder einer Einheit, die ViVi fuehrt (Schluessel wie in _mfh.einheiten[]) */
@@ -90,7 +90,7 @@
       el.setAttribute('aria-readonly', 'true');
     }
     el.title = istEigen
-      ? 'Eigene Angabe in DealPilot. ViVi führt ' + (alsText(feld, viviWert) || 'keinen Wert') + '. Dieser Wert wird nicht nach ViVi übertragen.'
+      ? 'Eigene Angabe in DealPilot. ViVi führt ' + (alsText(feld, viviWert) || 'keinen Wert') + '. Dieser Wert wird nicht nach ViVi übertragen. Klick ins Feld, um den ViVi-Wert wieder zu übernehmen.'
       : HINWEIS + '\n' + HINWEIS_LOESEN + (stand ? '\n' + stand : '');
     schloss(el, feld, istEigen, viviWert);
   }
@@ -106,17 +106,12 @@
     el.classList.remove('vivi-eigen');
     if (/^(Verknüpft mit ViVi|Eigene Angabe in DealPilot)/.test(el.title || '')) el.title = '';
   }
-  function schloss(el, feld, istEigen, viviWert) {
-    var platz = el.parentNode; if (!platz) return;
-    var b = platz.querySelector('.vivi-schloss[data-vivi-feld="' + feld + '"]');
-    if (!b) {
-      b = document.createElement('button');
-      b.type = 'button'; b.className = 'vivi-schloss'; b.setAttribute('data-vivi-feld', feld);
-      el.insertAdjacentElement('afterend', b);
-    }
-    b.innerHTML = istEigen ? SCHLOSS_OFFEN : SCHLOSS_ZU;
-    b.setAttribute('aria-label', istEigen ? 'ViVi-Wert wieder übernehmen' : 'Wert in DealPilot selbst festlegen');
-    b.title = istEigen ? 'ViVi-Wert wieder übernehmen (' + (alsText(feld, viviWert) || 'leer') + ')' : FRAGE_LOESEN;
+  /* v4043 · Marcel 23.11.2026: „ich will eigentlich nicht, dass überall so ein Schloss ist … aufs Feld klickt und das
+     dann freigeben kann … nicht extra Schlösser daneben mit Buttons. Das verschiebt alles.“ Kein Knopf mehr im Fluss:
+     das Feld merkt sich nur seinen Schluessel (data-vivi-feld), der Klick aufs Feld oeffnet eine schwebende Rueckfrage. */
+  function schloss(el, feld) {
+    schlossWeg(el);
+    el.setAttribute('data-vivi-feld', feld);
   }
   function schlossWeg(el) {
     var p = el && el.parentNode; if (!p) return;
@@ -355,31 +350,80 @@
       .observe(document.body || document.documentElement, { childList: true });
   } catch (e) {}
 
-  /* ── Schloss ─────────────────────────────────────────────────────── */
+  /* ── Freigeben per Klick aufs Feld (v4043, ersetzt das Schloss) ──────
+     Gesperrtes Feld: Klick → schwebende Rueckfrage „Wert aus ViVi. Hier ändern?“ Ja/Nein, position:fixed am Feld,
+     also nichts im Fluss. Eigene Angabe: Klick → kleine Zeile „ViVi: 620 €, übernehmen“, verschwindet beim Tippen,
+     beim Verlassen und beim naechsten Klick daneben. Kein nativer confirm. */
+  var _pop = null;
+  function popWeg() { if (_pop) { try { _pop.remove(); } catch (e) {} _pop = null; } }
+  function feldId(el) { return el.getAttribute('data-vivi-zelle') || el.getAttribute('data-vivi-feld') || el.id; }
+  function popZeigen(el, text, knoepfe) {
+    popWeg();
+    var r = el.getBoundingClientRect();
+    var p = document.createElement('div');
+    p.className = 'vivi-pop'; p.setAttribute('role', 'dialog');
+    var t = document.createElement('span'); t.textContent = text; p.appendChild(t);
+    knoepfe.forEach(function (k) {
+      var b = document.createElement('button'); b.type = 'button'; b.className = 'btn-clean vivi-pop-b' + (k.haupt ? ' vivi-pop-h' : '');
+      b.textContent = k.text;
+      b.addEventListener('mousedown', function (e) { e.preventDefault(); });
+      b.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); popWeg(); k.tun(); });
+      p.appendChild(b);
+    });
+    document.body.appendChild(p);
+    var w = p.offsetWidth, h = p.offsetHeight, vw = window.innerWidth, vh = window.innerHeight;
+    var x = Math.max(8, Math.min(r.left, vw - w - 8));
+    var y = r.bottom + 4; if (y + h > vh - 8) y = Math.max(8, r.top - h - 4);
+    p.style.left = Math.round(x) + 'px'; p.style.top = Math.round(y) + 'px';
+    _pop = p;
+  }
+  function freigeben(el) {
+    var id = feldId(el), v = lesen();
+    var viviWert = _stand && _stand.felder && _stand.felder[id] ? _stand.felder[id].wert : v.felder[id];
+    v.eigen[id] = el.value;
+    schreiben(v);
+    sperreAn(el, id, viviWert, v.eigen, '');
+    try { el.focus(); if (el.select && el.tagName === 'INPUT') el.select(); } catch (e) {}
+    try { var h = $('_vivi'); if (h) h.dispatchEvent(new Event('input', { bubbles: true })); } catch (e) {}
+  }
+  function zurueck(el) {
+    var id = feldId(el), v = lesen();
+    var viviWert = _stand && _stand.felder && _stand.felder[id] ? _stand.felder[id].wert : v.felder[id];
+    delete v.eigen[id];
+    schreiben(v);
+    if (!/^einheit\./.test(id)) feldSetzen(id, viviWert);
+    else { el.value = alsText(id, viviWert); try { el.dispatchEvent(new Event(el.tagName === 'SELECT' ? 'change' : 'input', { bubbles: true })); } catch (e) {} }
+    sperreAn(el, id, viviWert, v.eigen, standText(_stand && _stand.letzter_abruf));
+    try { var h = $('_vivi'); if (h) h.dispatchEvent(new Event('input', { bubbles: true })); } catch (e) {}
+  }
+  /* Ein gesperrtes Select darf sich nicht oeffnen, soll den Klick aber bekommen (darum kein pointer-events:none mehr). */
+  document.addEventListener('mousedown', function (ev) {
+    var el = ev.target && ev.target.closest ? ev.target.closest('select.vivi-verknuepft') : null;
+    if (el) ev.preventDefault();
+  }, true);
   document.addEventListener('click', function (ev) {
-    var b = ev.target && ev.target.closest ? ev.target.closest('.vivi-schloss') : null;
-    if (!b) return;
-    ev.preventDefault(); ev.stopPropagation();
-    var id = b.getAttribute('data-vivi-feld');
-    var el = b.previousElementSibling;
+    var t = ev.target;
+    if (_pop && t && t.closest && t.closest('.vivi-pop')) return;
+    var el = t && t.closest ? t.closest('.vivi-verknuepft, .vivi-eigen') : null;
+    if (!el || !/^(INPUT|SELECT|TEXTAREA)$/.test(el.tagName)) { popWeg(); return; }
+    var id = feldId(el); if (!id) return;
+    if (el.classList.contains('vivi-verknuepft')) {
+      ev.preventDefault();
+      popZeigen(el, 'Wert aus ViVi. Hier ändern?', [
+        { text: 'Ja', haupt: true, tun: function () { freigeben(el); } },
+        { text: 'Nein', tun: function () {} }
+      ]);
+      return;
+    }
     var v = lesen();
     var viviWert = _stand && _stand.felder && _stand.felder[id] ? _stand.felder[id].wert : v.felder[id];
-    if (Object.prototype.hasOwnProperty.call(v.eigen, id)) {
-      if (!window.confirm(FRAGE_ZURUECK)) return;
-      delete v.eigen[id];
-      schreiben(v);
-      if (!/^einheit\./.test(id)) feldSetzen(id, viviWert);
-      else if (el) { el.value = alsText(id, viviWert); try { el.dispatchEvent(new Event(el.tagName === 'SELECT' ? 'change' : 'input', { bubbles: true })); } catch (e) {} }
-      sperreAn(el, id, viviWert, v.eigen, standText(_stand && _stand.letzter_abruf));
-    } else {
-      if (!window.confirm(FRAGE_LOESEN)) return;
-      v.eigen[id] = el ? el.value : null;
-      schreiben(v);
-      sperreAn(el, id, viviWert, v.eigen, '');
-      try { if (el) el.focus(); } catch (e) {}
-    }
-    try { var h = $('_vivi'); if (h) h.dispatchEvent(new Event('input', { bubbles: true })); } catch (e) {}
+    if (_pop && _pop.getAttribute('data-fuer') === id) return;
+    popZeigen(el, 'ViVi: ' + (alsText(id, viviWert) || 'leer'), [{ text: 'übernehmen', tun: function () { zurueck(el); } }]);
+    if (_pop) _pop.setAttribute('data-fuer', id);
   }, true);
+  document.addEventListener('keydown', function (ev) { if (_pop && (ev.key === 'Escape' || (ev.target && ev.target.classList && ev.target.classList.contains('vivi-eigen')))) popWeg(); }, true);
+  window.addEventListener('scroll', popWeg, true);
+  window.addEventListener('resize', popWeg);
 
   /* v3996 · Marcel 23.11.2026: „für jedes Feld, wo wir von ViVi was übernehmen, ein Schloss dran. Haben wir die
      Möglichkeit, das für alle Felder zu übernehmen?“ an = true: alle ViVi-Felder werden eigene Angaben mit dem Wert,
@@ -420,10 +464,11 @@
     if ($('vivi-felder-stil')) return;
     var s = document.createElement('style'); s.id = 'vivi-felder-stil';
     s.textContent = [
-      'input.vivi-verknuepft,select.vivi-verknuepft,textarea.vivi-verknuepft{opacity:.62;cursor:not-allowed;background-image:none}',
-      'select.vivi-verknuepft{pointer-events:none}',
-      '.vivi-schloss{flex:0 0 auto;margin-left:4px;border:0;background:transparent;cursor:pointer;font-size:12px;line-height:1;padding:2px 3px;opacity:.75;vertical-align:middle}',
-      '.vivi-schloss:hover,.vivi-schloss:focus{opacity:1}',
+      'input.vivi-verknuepft,select.vivi-verknuepft,textarea.vivi-verknuepft{opacity:.62;cursor:pointer;background-image:none}',
+      '.vivi-pop{position:fixed;z-index:100000;display:flex;align-items:center;gap:6px;max-width:min(320px,calc(100vw - 16px));padding:6px 8px;border-radius:8px;background:#fff;color:#2A2727;border:1px solid var(--wl-c9a84c, rgba(201,168,76,.45));box-shadow:0 6px 18px rgba(0,0,0,.14);font:500 12px/1.3 Inter,system-ui,sans-serif}',
+      '.vivi-pop span{flex:1 1 auto}',
+      '.vivi-pop .vivi-pop-b{flex:0 0 auto;border:1px solid rgba(42,39,39,.18);background:#fff;color:#2A2727;border-radius:6px;padding:4px 10px;font:600 12px/1.2 Inter,system-ui,sans-serif;cursor:pointer;min-height:28px}',
+      '.vivi-pop .vivi-pop-h{background:var(--gold,#C9A84C);border-color:var(--gold,#C9A84C);color:#050505}',
       'input.vivi-eigen,select.vivi-eigen{box-shadow:inset 3px 0 0 var(--wl-c9a84c, #C9A84C)}'
     ].join('');
     document.head.appendChild(s);

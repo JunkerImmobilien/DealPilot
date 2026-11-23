@@ -306,7 +306,7 @@
     },
     'tab4.grenzsteuersatz': {
       title: 'Grenzsteuersatz',
-      body: 'Steuer auf den nächsten verdienten Euro – Einkommensteuer plus Solidaritätszuschlag (und Kirchensteuer, falls angegeben). Entscheidend für die Wirkung der V+V-Verluste. Er kann über 42 % liegen: knapp über der Soli-Freigrenze wächst der Soli mit 11,9 % jeder Mehrsteuer (Milderungszone), 42 % × 1,119 = 47 %. Woraus er sich zusammensetzt, steht unter dem Feld. Reichensteuer (45 %) ab 277.826 € zvE.',
+      body: 'Steuer auf den nächsten verdienten Euro – Einkommensteuer plus Solidaritätszuschlag (und Kirchensteuer, falls angegeben). Entscheidend für die Wirkung der V+V-Verluste. Er kann über 42 % liegen: knapp über der Soli-Freigrenze wächst der Soli mit 11,9 % jeder Mehrsteuer (Milderungszone), 42 % × 1,119 = 47 %. Reichensteuer (45 %) ab 277.826 € zvE.',
       paragraph: '§ 32a EStG',
       severity: 'beginner'
     },

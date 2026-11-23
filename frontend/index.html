@@ -40,7 +40,7 @@
      Seite unsichtbar; layout-varianten.js nimmt die Marke nach setze() ab, spätestens nach 3 s fällt sie von selbst. -->
 <style>html[data-dpl-vorab] body{visibility:hidden}</style>
 <script>(function(){try{if(/[?&]layout=aus(&|$)/.test(location.search))return;var h=document.documentElement;h.setAttribute('data-dpl-vorab','1');setTimeout(function(){h.removeAttribute('data-dpl-vorab');},3000);}catch(e){}})();</script>
-<link rel="stylesheet" href="css/style.css?v=v4030">
+<link rel="stylesheet" href="css/style.css?v=v4043">
 <link rel="stylesheet" href="css/avsec-streifen.css?v=v2780b"><!-- v1148-spalt-1025px -->
 <link rel="stylesheet" href="css/avsec-karte-neu.css?v=v2780a"><!-- v2760/v2780a · Kartenfassung unter 940 px Kartenbreite -->
 <script src="js/einbettung.js?v=v2998a"></script><!-- v2998 · Anmeldekarte eingebettet in die Landingpage (nur im iframe mit ?einbettung=1) -->
@@ -2465,12 +2465,13 @@ label.dp-required.qc-required::after {
       </div>
     </details>
 
-    <!-- V227: § 7b Sonder-AfA Block (collapsible) -->
-    <details id="afa_sonder7b_wrap" style="margin-top:14px;border:1px solid color-mix(in srgb, var(--gold) 25%, transparent);border-radius:8px;padding:10px 14px;background:color-mix(in srgb, var(--gold) 4%, transparent)">
-      <summary style="cursor:pointer;font-weight:600;font-size:13px;color:var(--ch);list-style:none;display:flex;justify-content:space-between;align-items:center">
-        <span class="card-h-with-icon"><svg class="h-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"/></svg> Sonder-AfA § 7b EStG (zusätzlich +5% in den ersten 4 Jahren)</span>
-        <span class="cf-hint" style="font-weight:400;font-size:11px">klick zum Aufklappen</span>
-      </summary>
+    <!-- v4043 · Marcel 23.11.2026: „Sonder-AfA 7b, 7h und 7i … zusammenfassen“. EIN aufklappbarer Block statt zwei,
+         innen zwei Abschnitte. Felder, IDs und Rechnung unverändert. -->
+    <details id="sonder_afa_gruppe" style="margin-top:14px;border:1px solid color-mix(in srgb, var(--gold) 25%, transparent);border-radius:8px;padding:10px 14px;background:color-mix(in srgb, var(--gold) 4%, transparent)">
+      <summary style="cursor:pointer;font-weight:600;font-size:13px;color:var(--ch)">Sonder-AfA und erhöhte Absetzungen (§ 7b, § 7h, § 7i) <span id="sonder_afa_status" class="cf-hint" style="font-weight:400;font-size:11px"></span></summary>
+    <!-- V227: § 7b Sonder-AfA Block -->
+    <div id="afa_sonder7b_wrap" style="margin-top:10px">
+      <div style="font-weight:600;font-size:12.5px;color:var(--ch)">§ 7b Sonder-AfA für neue Mietwohnungen</div>
       <div style="margin-top:12px">
         <p class="hint" style="margin-top:0">
           Die Sonder-AfA nach <b>§ 7b EStG</b> erlaubt zusätzliche 5% AfA jährlich in den ersten 4 Jahren — <b>obendrauf</b> zur regulären linearen oder degressiven AfA. Bedingungen sind streng (siehe unten).
@@ -2533,16 +2534,17 @@ label.dp-required.qc-required::after {
           ⚠ Nicht alle Bedingungen bestätigt — § 7b wird in der Berechnung NICHT angesetzt.
         </div>
       </div>
-    </details>
+    </div>
     <!-- v3800b · Erhöhte Absetzungen §§ 7h, 7i EStG (Anlage V Zeilen 39 bis 41), Marcel 19.11.2026 -->
-    <details id="av7h_wrap" style="margin-top:10px;border:1px solid color-mix(in srgb, var(--gold) 25%, transparent);border-radius:8px;padding:10px 14px">
-      <summary style="cursor:pointer;font-weight:600">Erhöhte Absetzungen §§ 7h, 7i EStG (Sanierungsgebiet, Baudenkmal)</summary>
+    <div id="av7h_wrap" style="margin-top:14px;padding-top:12px;border-top:1px solid color-mix(in srgb, var(--gold) 20%, transparent)">
+      <div style="font-weight:600;font-size:12.5px;color:var(--ch)">§ 7h und § 7i erhöhte Absetzungen (Sanierungsgebiet, Baudenkmal)</div>
       <div class="g3" style="margin-top:10px">
         <div class="f"><label for="av7h_art">Art</label><select id="av7h_art" onchange="calc()"><option value="">— keine —</option><option value="7h">§ 7h Sanierungsgebiet / Entwicklungsbereich</option><option value="7i">§ 7i Baudenkmal</option></select></div>
         <div class="f"><label for="av7h_basis">Begünstigte Herstellungskosten laut Bescheinigung</label><div class="iw"><span class="pfx">€</span><input id="av7h_basis" type="text" inputmode="decimal" placeholder="0" class="trl" oninput="calc()"></div></div>
         <div class="f"><label for="av7h_jahr">Jahr der Herstellung (Abschluss der Maßnahme)</label><input id="av7h_jahr" type="text" inputmode="numeric" maxlength="4" placeholder="JJJJ" style="text-align:right" oninput="calc()"><!-- Jahreszahl: ohne Tausenderformat (keine Klasse tr) --></div>
       </div>
       <span class="hint">Im Jahr der Herstellung und den folgenden sieben Jahren bis zu 9 %, in den folgenden vier Jahren bis zu 7 % (§ 7h bzw. § 7i Abs. 1 EStG). Voraussetzung ist die Bescheinigung der Gemeinde bzw. der Denkmalbehörde. Die begünstigten Kosten gehören nicht zusätzlich in die Gebäude-AfA. Je Jahr änderbar im Steuer-Detail unter 8.2.</span>
+    </div>
     </details>
   </div>
 
@@ -4055,7 +4057,7 @@ label.dp-required.qc-required::after {
 <script src="js/obj-numbering.js?v=166"></script>
 <script src="js/mietentwicklung.js?v=v4037"></script>
 <script src="/vendor/cdn/xlsx/0.18.5/xlsx.full.min.js"></script>
-<script src="js/tax.js?v=v4041"></script>
+<script src="js/tax.js?v=v4043"></script>
 <script src="js/steuer-verlauf.js?v=v3273a"></script>
 <script src="js/pa-potenzial.js?v=v3710"></script><!-- v3323 · Pilot-Analyse: Reiter Potenzialanalyse -->
 <script src="js/hausverlauf.js?v=v4007"></script><!-- v3323 · Pilot-Analyse: Reiter Hausverlauf (WEG-Unterlagen chronologisch) · v3430 Haus je Jahr -->
@@ -4076,7 +4078,7 @@ label.dp-required.qc-required::after {
 <script src="js/qc-heuristik.js?v=v3085"></script>
 <link rel="stylesheet" href="css/datenraum.css?v=W34">
 <script src="js/datenraum.js?v=1375"></script>
-<script src="js/tooltip-content.js?v=v3670"></script>
+<script src="js/tooltip-content.js?v=v4043"></script>
   <script src="js/tooltip-engine.js?v=2351"></script>
   <script src="js/immometrica-import.js?v=v3370"></script>
   <script src="js/immometrica-qc.js?v=v2199"></script>
@@ -4180,7 +4182,7 @@ label.dp-required.qc-required::after {
 <script src="js/mfh-einheiten.js?v=v4016"></script>
 <script src="js/mfh-felder.js?v=v3840b"></script><!-- v3003 · Objekt mit Einheiten: Erklaerkasten, Felder aus den Einheiten, Zustand des Gebaeudes -->
 <script src="js/nk-vorauszahlung.js?v=v3950"></script><!-- v3950 · Nebenkosten-Vorauszahlung: Vorschlag aus den umlagefaehigen Kosten je Einheit nach Wohnflaeche -->
-<script src="js/vivi-felder.js?v=v4040"></script><!-- v3950/v3951 · ViVi: verknuepfte Felder ausgegraut, Hinweis, lokal ueberschreiben -->
+<script src="js/vivi-felder.js?v=v4043"></script><!-- v3950/v3951 · ViVi: verknuepfte Felder ausgegraut, Hinweis, lokal ueberschreiben -->
 <script src="js/buchhaltung-verbinden.js?v=v4040"></script><!-- v3967 · Buchhaltung verbinden: Angebot unter Gewonnen in der Deal-Aktion, Anbieterliste (heute ViVi), nur mit hinterlegtem Schluessel -->
 <script src="js/vivi.js?v=v4040"></script><script src="js/vivi-mieterhoehung.js?v=v4042a"></script><script src="js/vivi-nk-anpassung.js?v=v4042a"></script><!-- v4042 · Nebenkosten-Vorauszahlung nach ViVi --><script src="js/vivi-reiter.js?v=v4042a"></script><!-- v4040 · Reiter ViVi in der Pilot-Analyse --><!-- v4037 · Mieterhöhung aus DealPilot in ViVi anlegen (ein Fenster für Reiter Miete und Pilot-Analyse) --><!-- v3950/v3951/v3967 · ViVi: Verbindung, einmal anlegen mit Vorschau und Wartehinweis, Jetzt abgleichen (Vorschau-Funktion vivi) -->
 <script src="js/vivi-steuer-abgleich.js?v=v4042a"></script><!-- v4020 · ViVi Steuerjahre: Einstellung, Abgleich je Jahr im Jahresabgleich, automatisch nur offene Jahre, Marke im Reiter Steuer -->

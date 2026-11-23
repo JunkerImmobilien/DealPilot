@@ -2159,7 +2159,7 @@ select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%
 .ytf-zeile { display: inline-block; font-family: 'JetBrains Mono', monospace; font-size: 9.5px; line-height: 1.5; padding: 0 5px; margin-left: 4px; border: 1px solid var(--border); border-radius: 4px; color: var(--muted); white-space: nowrap; vertical-align: 1px; }
 .ytf-davon .ytf-section-label { padding-left: 14px; }
 .ytf-zwischensumme td { border-top: 1px dashed var(--border); }
-.ytf-summe { font-weight: 700; }
+.ytf-summe { font-weight: 400; }   /* v4043 · Summenzeilen wie die übrigen Zeilen (Marcel 23.11.) */
 .ytf-sum-hint, .ytf-dg-note { display: block; font-size: 10.5px; color: var(--muted); font-weight: 400; margin-top: 1px; }
 .ytf-summary {
   grid-column: 1 / -1;
