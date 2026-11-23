@@ -82,6 +82,9 @@
       '.dp-pa-wrap .dp-gn.dp-gn-karte .dp-gn-k-s,.dp-gx .gx-s{font:400 12.5px/1.45 Inter,sans-serif!important;color:' + F.tinte2 + '!important;margin:0 0 12px!important}',
       '.dp-pa-wrap .dp-gn.dp-gn-karte .gn-tip,.dp-gx .gx-tip{background:#F3EEE4!important;color:#0B0A09!important}',
       '.dp-pa-wrap .dp-gn.dp-gn-karte .gn-tip .gn-tip-j{color:' + F.goldD + '!important}',
+      '.dp-pa-wrap .dp-gn .dp-gn-seg{border:1px solid ' + F.linie2 + '!important;border-radius:9px!important;background:' + F.flaeche + '!important}',
+      '.dp-pa-wrap .dp-gn .dp-gn-seg button{background:transparent!important;color:' + F.tinte2 + '!important;border:0!important;box-shadow:none!important;padding:7px 13px!important;border-radius:0!important;font:600 11.5px Inter,sans-serif!important;min-height:0!important;height:auto!important}',
+      '.dp-pa-wrap .dp-gn .dp-gn-seg button[aria-pressed=true]{background:color-mix(in srgb,' + F.gold + ' 26%,transparent)!important;color:' + F.tinte + '!important}',
       '.dp-gx .gx-kopf{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}',
       '.dp-gx .gx-eye{font:500 10.5px/1 "JetBrains Mono",ui-monospace,monospace;letter-spacing:.16em;text-transform:uppercase;color:' + F.tinte3 + '}',
       '.dp-gx .gx-chips{display:flex;gap:6px;flex-wrap:wrap}',
@@ -424,7 +427,7 @@
           rs: zahl(r.rs) || 0, wert: zahl(r.wert_y), steuer: zahl(r.tax_y) || 0, afa: zahl(r.afa_y) || 0, vuv: zahl(r.zve_y) || 0 };
       }).filter(function (r) { return r.j > 1900 && r.cfop != null && r.cfns != null && r.wert != null; });
       if (J.length < 3) return null;
-      var S = window.State || {}, kd = String(S._afa_year1_relDate || (document.getElementById('purchase_date') || {}).value || ''), mm = /^(\d{4})-(\d{2})/.exec(kd);
+      var S = window.State || {}, kd = String((document.getElementById('kaufdat') || {}).value || (document.getElementById('purchase_date') || {}).value || S._afa_year1_relDate || ''),   /* Kaufdatum aus dem Feld: _afa_year1_relDate ist der AfA-Beginn und kann heute sein (gemessen Westerfeldstr.) */ mm = /^(\d{4})-(\d{2})/.exec(kd);
       var kaufJ = mm ? +mm[1] : J[0].j, kaufM = mm ? +mm[2] : 1;
       var g = function (k) { var a = J[J.length - 2][k], b = J[J.length - 1][k]; return a > 0 && b > 0 ? Math.max(-0.05, Math.min(0.08, b / a - 1)) : 0; };
       var halter = (document.getElementById('halter') || {}).value || 'privat';
@@ -471,7 +474,7 @@
         var rsNeu = Math.max(0, rs - tilg), r;
         if (a) {
           var dN = n - a.nkm, dB = b - a.bwk, dZ = zins - a.zins, dT = tilg - a.tilg, vuv = a.vuv + dN - dB - dZ - dAfa, steuer = a.steuer + (vuv - a.vuv) * P.grenz, cfop = a.cfop + dN - dB - dZ - dT;
-          r = { j: j, nkm: n, bwk: b, zins: zins, tilg: tilg, cfop: cfop, cfns: cfop - steuer, rs: (o.zA == null && !o.pfad) ? a.rs : rsNeu, wert: w, steuer: steuer, afa: a.afa + dAfa, vuv: vuv, quelle: (n === a.nkm && b === a.bwk && dZ === 0) ? 'app' : 'modell' };
+          r = { j: j, nkm: n, bwk: b, zins: zins, tilg: tilg, cfop: cfop, cfns: a.cfns + (cfop - a.cfop) - (steuer - a.steuer), rs: (o.zA == null && !o.pfad) ? a.rs : rsNeu, wert: w, steuer: steuer, afa: a.afa + dAfa, vuv: vuv, quelle: (n === a.nkm && b === a.bwk && dZ === 0) ? 'app' : 'modell' };
           if (o.zA == null && !o.pfad) rsNeu = a.rs;
         } else {
           var afa = afaL + dAfa, vuv2 = n - b - zins - afa, st2 = vuv2 * P.grenz, cf2 = n - b - zins - tilg;
@@ -517,10 +520,10 @@
         ['Miete ab ' + (P.heute + 1) + ' ± 10 %', { mFak: 0.9 }, { mFak: 1.1 }],
         ['Anschlusszins ± 1 Punkt', { zA: P.az + 0.01 }, { zA: Math.max(0.005, P.az - 0.01) }],
         ['Wertsteigerung ± 1 Punkt im Jahr', { wDelta: -0.01 }, { wDelta: 0.01 }],
-        ['Kaufpreis ± 10 %', { kpFak: 1.1 }, { kpFak: 0.9 }],
+        P.kaufJ >= P.heute ? ['Kaufpreis ± 10 %', { kpFak: 1.1 }, { kpFak: 0.9 }] : null,   /* im Bestand ist der Kaufpreis kein Hebel mehr */
         ['Nicht umlegbare Kosten ± 25 %', { kFak: 1.25 }, { kFak: 0.75 }],
         ['Leerstand 1 Monat im Jahr', { leer: 1 / 12 }, { leer: 0 }]
-      ].map(function (t) { var a = irr(P, rechne(P, t[1]), exitJ), b = irr(P, rechne(P, t[2]), exitJ); return a && b ? { n: t[0], lo: a.irr, hi: b.irr, span: Math.abs(b.irr - a.irr) } : null; })
+      ].filter(Boolean).map(function (t) { var a = irr(P, rechne(P, t[1]), exitJ), b = irr(P, rechne(P, t[2]), exitJ); return a && b ? { n: t[0], lo: a.irr, hi: b.irr, span: Math.abs(b.irr - a.irr) } : null; })
         .filter(Boolean).sort(function (x, y) { return y.span - x.span; });
       return { basis: B.irr, T: T, exitJ: exitJ };
     }
@@ -616,13 +619,18 @@
       spaltenText: function (z, cw) { return nf1.format(z) + (cw < 46 ? '' : ' %'); }, zeilenText: function (m) { return (m > 0 ? '+' : m < 0 ? '−' : '±') + Math.abs(m) + ' %'; },
       zelleText: function (m, z, v) { return '<div class="t">Zins ' + pct(z) + ' · Miete ' + (m > 0 ? '+' : m < 0 ? '−' : '±') + Math.abs(m) + ' %</div>Cashflow nach Steuer ' + Hm.jahr + ' <b>' + eurV(v) + '</b> im Monat'; } }, { breite: w - 2, kompakt: kompakt });
   }
-  function karteSankey(k, w, P) {
+  /* Mieteuro des laufenden Jahres: Zufluss = Abfluss (Rest als Sonstiges, Prüfer) */
+  function mieteuro(P) {
     var r = P.J.filter(function (x) { return x.j === P.heute; })[0] || P.J[0];
     var erst = r.steuer < 0 ? -r.steuer : 0, zahlt = r.steuer > 0 ? r.steuer : 0, tasche = r.cfns < 0 ? -r.cfns : 0, frei = r.cfns > 0 ? r.cfns : 0;
     var ein = [{ n: 'Kaltmiete', v: r.nkm, f: F.goldD }, { n: 'Steuererstattung', v: erst, f: F.gold2 }, { n: 'Aus eigener Tasche', v: tasche, f: F.rot }];
     var aus = [{ n: 'Zins an die Bank', v: r.zins, f: F.neutral }, { n: 'Tilgung = Vermögen', v: r.tilg, f: F.gruen }, { n: 'Nicht umlegbare Kosten', v: r.bwk, f: F.violett }, { n: 'Steuer', v: zahlt, f: F.gold2 }, { n: 'Bleibt dir', v: frei, f: F.gold }];
     var sE = ein.reduce(function (s, a) { return s + a.v; }, 0), sA = aus.reduce(function (s, a) { return s + a.v; }, 0), rest = sE - sA;
     if (rest >= 1) aus.push({ n: 'Sonstiges', v: rest, f: F.tinte3 }); else if (rest <= -1) ein.push({ n: 'Sonstiges', v: -rest, f: F.tinte3 });
+    return { r: r, ein: ein, aus: aus, tasche: tasche, frei: frei };
+  }
+  function karteSankey(k, w, P) {
+    var D = mieteuro(P), r = D.r, ein = D.ein, aus = D.aus, tasche = D.tasche, frei = D.frei;
     var titel = tasche > 0.5 ? r.j + ': ' + eur(tasche) + ' legst du selbst dazu, ' + eur(r.tilg) + ' davon werden Vermögen' : r.j + ': ' + eur(frei) + ' bleiben dir nach Steuer, ' + eur(r.tilg) + ' werden Vermögen';
     var i = karte(k, { eyebrow: 'Fluss des Mieteuros ' + r.j, titel: titel, unter: 'Woher das Geld kommt und wohin es fließt, € im Jahr aus der Rechnung der App.', chips: ['gemessen'] });
     return sankey(i, { ein: ein, aus: aus }, { breite: w - 2 });
@@ -838,6 +846,6 @@
     }
   }
 
-  window.DpGrafikenPremium = { lauf: function (h) { stil(); try { pilotAnalyse(h); } catch (e) { try { console.warn('[grafiken-premium]', e); } catch (x) {} } }, MODELL: MODELL, _einordnung: einordnungDaten, _portfolio: portfolioSchnitt };
+  window.DpGrafikenPremium = { lauf: function (h) { stil(); try { pilotAnalyse(h); } catch (e) { try { console.warn('[grafiken-premium]', e); } catch (x) {} } }, MODELL: MODELL, _mieteuro: mieteuro, _einordnung: einordnungDaten, _portfolio: portfolioSchnitt };
   window.DpGrafiken = { heatmap: heatmap, bullets: bullets, verlauf: verlauf, punktreihen: punktreihen, fahrplan: fahrplan, fingerabdruck: fingerabdruck, sankey: sankey, tornado: tornado, ausstieg: ausstieg, karte: karte, farben: F, modell: MODELL };
 })();
