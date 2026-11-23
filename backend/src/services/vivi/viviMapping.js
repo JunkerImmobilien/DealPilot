@@ -261,7 +261,11 @@ function nachVivi(daten, opt) {
       einheit: { identifier: name, unit_type: 'residential' } };
     if (qm != null && qm > 0) eintrag.einheit.square_meters = rund(qm);
     if (etage) eintrag.einheit.floor = etage;
-    if (vermietet) eintrag.miete = miete(daten, name, qm, etage, ist, daten.nk_vorauszahlung, null, zahl(daten.ze_stp_monat));
+    /* v4032 · Marcel 23.11.2026, gemessen 2026-1157: die Stellplatzmiete (60 €) stand nur im Feld des Reiters Objekt
+       (stellplatz_miete_monat), ze_stp_monat war leer. ViVi bekam deshalb keinen Stellplatz, die Mieteinnahmen 2025 wichen
+       um 9 × 60 € ab. Jetzt: Aufteilung im Reiter Miete zuerst, sonst das Feld des Reiters Objekt. */
+    const stpEinzel = zahl(daten.ze_stp_monat) > 0 ? zahl(daten.ze_stp_monat) : (zahl(daten.stellplatz_miete_monat) > 0 ? zahl(daten.stellplatz_miete_monat) : null);
+    if (vermietet) eintrag.miete = miete(daten, name, qm, etage, ist, daten.nk_vorauszahlung, null, stpEinzel);
     else zeige('Einheit', name, (qm ? String(qm).replace('.', ',') + ' m²' : 'ohne Fläche') + (text(daten.nutzungsart) === 'eigennutzung' ? ', selbst genutzt' : ', leer'));
     if (a === 'ZFH' || a === 'MFH') hinweise.push('Keine Einheiten erfasst. Übertragen wird eine Einheit für das ganze Haus. Genauer wird es mit den Einheiten im Reiter Objekt.');
     einheiten.push(eintrag);
@@ -269,7 +273,7 @@ function nachVivi(daten, opt) {
   /* v3997 · F19 Gesamt-Flow, Marcel 23.11.2026: Stellplaetze nie als eigene Nebeneinheit, sondern beim Mieter
      (amenities am Mietverhaeltnis). Eine Stellplatzmiete nur am Objekt (ze_stp_monat) gehoert keinem Mieter und geht
      deshalb nicht mit, das sagt der Hinweis. */
-  const stpObjekt = zahl(daten.ze_stp_monat);
+  const stpObjekt = zahl(daten.ze_stp_monat) > 0 ? zahl(daten.ze_stp_monat) : zahl(daten.stellplatz_miete_monat);   /* v4032 */
   if (mitListe.length && stpObjekt != null && stpObjekt > 0 && !mitListe.some(function (x) { return zahl(x.e.stellplatz_miete) > 0; })) {
     hinweise.push('Die Stellplatzmiete von ' + eur(stpObjekt) + ' im Monat ist keinem Mieter zugeordnet und geht nicht mit. Trag sie in der Einheitentabelle bei der Wohnung ein, zu der der Stellplatz gehört.');
   }

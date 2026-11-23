@@ -72,7 +72,16 @@
       } else if (v.art === 'summe') {
         z.abw = Math.round(v.summe) - Math.round(d.wert || 0);
         if (Math.abs(z.abw) < 1) z.aktion = 'gleich';
-        else if (laufend) { z.aktion = 'laufend'; z.grund = 'Das Jahr läuft noch. ViVi kennt erst die Buchungen bis heute, DealPilot rechnet das ganze Jahr.'; }
+        else if (laufend) {
+          /* v4033 · Marcel 23.11.2026: im laufenden Jahr monatlich sehen, wie es anwaechst, Uebernahme erst am Jahresende.
+             Vergleich: ViVi bis heute gegen den Jahreswert der App anteilig bis heute. */
+          var jetzt = ctx.heute ? new Date(ctx.heute) : new Date();
+          var anteil = (jetzt.getMonth() + jetzt.getDate() / new Date(jetzt.getFullYear(), jetzt.getMonth() + 1, 0).getDate()) / 12;
+          z.erwartetBisHeute = Math.round((d.wert || 0) * anteil);
+          z.abwBisHeute = Math.round(v.summe) - z.erwartetBisHeute;
+          z.aktion = 'laufend';
+          z.grund = 'Bis heute laut ViVi ' + eurK(v.summe) + ', anteilig erwartet ' + eurK(z.erwartetBisHeute) + '. Übernommen wird nach dem Jahresende.';
+        }
         else { z.aktion = 'uebernehmen'; z.modus = 'setzen'; z.wert = v.summe; }
       } else {
         if (!Array.isArray(v.posten)) {
@@ -88,6 +97,8 @@
             z.aktion = 'uebernehmen'; z.modus = 'addieren'; z.wert = z.abw;
             /* ohne eigenen Wert ersetzt dpWkUebernehmen die Schaetzung der App: das entscheidet der Nutzer, nie der Automat */
             z.ersetztSchaetzung = !z.dpEigen && (d.wert || 0) > 0.5;
+            /* v4033 · Marcel 23.11.2026: „57 Euro klingt nach einem einzelnen Beleg, 2.815 Euro ist die Schätzung“ */
+            if (z.ersetztSchaetzung && z.abw < 0.5 * (d.wert || 0)) z.unvollstaendig = 'Wirkt unvollständig: in ViVi sind bisher Belege über ' + eurK(z.abw) + ' gebucht, die Schätzung liegt bei ' + eurK(d.wert) + '. Am besten erst übernehmen, wenn das Jahr in ViVi vollständig gebucht ist.';
           }
         }
       }
@@ -99,6 +110,8 @@
     });
     return out;
   }
+
+  function eurK(x) { return (Math.round((+x || 0) * 100) / 100).toLocaleString('de-DE', { minimumFractionDigits: 0, maximumFractionDigits: 2 }) + ' €'; }
 
   var KERN = { VERSION: VERSION, NAMEN: NAMEN, REIHE: REIHE, jahrAbgleich: jahrAbgleich, gleicherPosten: gleicherPosten, gesperrt: gesperrt };
   if (typeof module !== 'undefined' && module.exports) module.exports = KERN;
@@ -240,11 +253,13 @@
     var abwT = '', kn = '';
     if (z.aktion === 'gleich') abwT = '<span class="vst-ok">gleich</span>';
     else if (z.art === 'belege' && z.aktion === 'uebernehmen') abwT = '<span class="vst-ab">' + vz(z.abw) + '</span><small>' + z.neu.length + ' neu' + (z.erfasst.length ? ', ' + z.erfasst.length + ' schon erfasst' : '') + '</small>';
+    else if (z.aktion === 'laufend' && istZahl(z.abwBisHeute)) abwT = '<span class="vst-ab">' + vz(z.abwBisHeute) + '</span><small>bis heute</small>';   /* v4033 */
     else if (istZahl(z.abw)) abwT = '<span class="vst-ab">' + vz(z.abw) + '</span>';
     if (z.aktion === 'uebernehmen') kn = '<button type="button" class="vst-k" data-vst="eins" data-vst-jahr="' + jahr + '" data-vst-i="' + i + '" title="' + esc(z.modus === 'addieren' ? 'Die neuen Belege aus ViVi zum Wert ' + jahr + ' addieren' + (z.ersetztSchaetzung ? '. Die Schätzung der App wird dabei ersetzt' : '') : 'Den Wert aus ViVi für ' + jahr + ' eintragen') + '">übernehmen</button>';
     var unter = '';
     if (z.grund) unter += '<small>' + esc(z.grund) + '</small>';
     if (z.ersetztSchaetzung) unter += '<small>Ersetzt die Schätzung der App, deshalb nicht automatisch.</small>';
+    if (z.unvollstaendig) unter += '<small>' + esc(z.unvollstaendig) + '</small>';
     if (z.neu.length) unter += '<ul class="vst-posten">' + z.neu.map(function (p) { return '<li>' + esc(datumText(p.datum)) + ' · ' + esc(p.text || 'Beleg') + ' · ' + eur(p.betrag) + '</li>'; }).join('') + '</ul>';
     if (z.gekuerzt) unter += '<small>' + z.gekuerzt + ' weitere Posten hat ViVi nicht mitgeschickt.</small>';
     return '<tr><td><b>' + esc(z.label) + '</b><small>Anlage V Zeile ' + esc(String(z.zeile || '').replace('-', ' bis ')) + '</small>' + unter + '</td><td>' + dpT + '</td><td>' + eur(z.vivi) + '</td><td>' + abwT + '</td><td>' + kn + '</td></tr>';

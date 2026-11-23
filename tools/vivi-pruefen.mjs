@@ -1147,6 +1147,17 @@ kopf('T  Steuerjahre aus ViVi: Kategorien, Sperre, keine Doppelung, automatisch 
   ok(/quelle: 'ViVi'/.test(QS) && /vivi-st-marke/.test(QS) && /'yearly-tax-form-box'/.test(QS), 'Herkunft „ViVi“ je übernommenem Wert, Marke am Feld im Reiter Steuer');
 }
 
+{
+  const dE = { objart: 'ETW', str: 'A', hnr: '1', plz: '33607', ort: 'B', kp: 300000, wirtschaftlicher_uebergang: '2025-04-01', nkm: 950, wfl: 70, stellplatz_miete_monat: '60', ze: '60' };
+  const am = mapping.nachVivi(dE, {}).einheiten[0].miete.amenities;
+  ok(am && am[0] && am[0].monthly_rent === 60, 'S15 v4032 Stellplatz nur im Reiter Objekt (stellplatz_miete_monat, gemessen 1157) geht als amenity mit');
+  const K = (await import('node:module')).createRequire(import.meta.url)('../frontend/js/vivi-steuer-abgleich.js');
+  const vS = { einnahmen_km: { art: 'summe', summe: 10500, kat: 'mieten' }, nk_umlf: { art: 'belege', summe: 57.12, kat: 'bk', posten: [{ datum: '2026-11-06', betrag: 57.12, text: 'x' }] } };
+  const rS = K.jahrAbgleich(vS, { jahr: 2026, heuteJahr: 2026, heute: '2026-11-23', dp: (sp) => ({ wert: sp === 'einnahmen_km' ? 12000 : 2815, eigen: false }), einstellung: { modus: 'automatisch' }, buchungen: [] });
+  const zM = rS.zeilen.find((z) => z.spalte === 'einnahmen_km'), zN = rS.zeilen.find((z) => z.spalte === 'nk_umlf');
+  ok(zM.aktion === 'laufend' && zM.erwartetBisHeute === 10767 && zM.abwBisHeute === -267 && !rS.auto.includes(zM), 'S16 v4033 laufendes Jahr: ViVi bis heute gegen anteilig erwartet (12.000 × 10,74/12 = 10.767), nichts übernommen');
+  ok(zN.unvollstaendig && !rS.auto.includes(zN), 'S17 v4033 einzelner Beleg 57 € gegen Schätzung 2.815 €: Hinweis unvollständig, nie automatisch');
+}
 dienst._setzeDeps(null);
 console.log('\n' + (rot ? 'ROT · ' + rot + ' Befund(e), ' + gruen + ' grün' : 'SAUBER · ' + gruen + ' Prüfpunkte grün'));
 process.exit(rot ? 1 : 0);
