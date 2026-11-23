@@ -13,7 +13,7 @@
  */
 (function (global) {
   'use strict';
-  var VERSION = 'v4130';
+  var VERSION = 'v4130a';
   var doc = global.document;
   var _stand = {};   /* objektKey -> { verlauf: [{rolle, text}], einheit, laeuft, fehler, entwurf } */
   var PLANE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4z"/></svg>';
@@ -122,6 +122,7 @@
       '.vc-box{margin:0 0 14px;border:1px solid #E7E4DC;border-radius:14px;background:#fff;box-shadow:0 1px 2px rgba(40,35,20,.04);overflow:hidden;font-family:Inter,sans-serif}',
       '.vc-box .dp-cp-tt{display:flex;flex-direction:column;min-width:0;flex:1}',
       '.vc-box .dp-cp-log{max-height:300px}',
+      '.vc-box .dp-cp-in{height:40px;min-height:40px}',
       '.vc-neu{margin-left:auto;border:1px solid #E7E4DC!important;background:#fff!important;border-radius:99px;padding:4px 10px;font:600 11px Inter,sans-serif;color:#5E5856;cursor:pointer;white-space:nowrap}',
       '.vc-bsp{display:flex;flex-wrap:wrap;gap:6px}',
       '.vc-b{border:1px solid var(--wl-ece0be,#ECE0BE)!important;background:#FBFAF6!important;border-radius:99px;padding:5px 10px;font:500 11.5px Inter,sans-serif;color:#2A2826;cursor:pointer}',

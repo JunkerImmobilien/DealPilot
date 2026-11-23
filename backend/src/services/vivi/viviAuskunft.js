@@ -393,7 +393,9 @@ async function frage(userId, objectId, b, opt) {
     schreibenVormerken: async function () { return { ok: false, gesperrt: true, hinweis: 'Im Reiter ViVi wird nur gelesen. Sag, dass Änderungen in DealPilot oder in ViVi selbst gemacht werden.' }; }
   });
   const schritte = (r.protokoll || ctx.protokoll || []).map(function (x) { return x.werkzeug; });
-  return { antwort: String(r.text || '').trim(), werkzeuge: schritte, abgebrochen: !!r.abgebrochen, tageslimit: { benutzt: lim.benutzt, limit: lim.limit } };
+  /* Kundentext: keine Gedankenstriche und Semikolons (Marcel), auch wenn das Modell sie trotz Vorspann setzt */
+  const antwort = String(r.text || '').trim().replace(/\s+[–—]\s+/g, ', ').replace(/\s*;\s*/g, '. ').replace(/\*\*/g, '');
+  return { antwort: antwort, werkzeuge: schritte, abgebrochen: !!r.abgebrochen, tageslimit: { benutzt: lim.benutzt, limit: lim.limit } };
 }
 
 module.exports = { einheiten, belege, vorgaenge, handwerker, darlehen, frage, mieterKurz, namenAus, schwaerzer, _setzeTest, CACHE_MS };
