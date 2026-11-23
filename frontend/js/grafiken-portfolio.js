@@ -130,6 +130,8 @@
       B + ' .gp-bar{position:relative;height:18px}',
       B + ' .gp-bar i{position:absolute;top:3px;height:12px;border-radius:2px}',
       B + ' .gp-bar span{position:absolute;top:0;font:500 10.5px/18px "JetBrains Mono",monospace;white-space:nowrap}',
+      B + ' .gp-c{display:grid;grid-template-columns:minmax(0,1fr) 62px;gap:5px;align-items:center}',
+      B + ' .gp-w{font:500 10.5px/18px "JetBrains Mono",monospace;white-space:nowrap;text-align:right}',
       B + ' .gp-bar .gp-null{position:absolute;top:0;bottom:0;width:1px;background:var(--c-line,#e0dbd3)}',
       B + ' .gp-ob .gp-sum{font-weight:600;border-top:1px solid var(--c-line,#e0dbd3);padding-top:4px}',
       B + ' .gp-ob .gp-tr{display:contents}',
@@ -165,12 +167,11 @@
   function ton(v) { return v == null ? '' : v >= 0 ? 'gp-pos' : 'gp-neg'; }
   /* Balken in einer Zelle, gemeinsame Skala je Spalte: [lo, hi] */
   function zelle(v, lo, hi, farbe, text) {
-    if (v == null) return '<div class="gp-bar"><span style="left:0;color:var(--c-pmut,#6b6660)">keine Angabe</span></div>';
+    if (v == null) return '<div class="gp-c"><div class="gp-bar"></div><span class="gp-w" style="color:var(--c-pmut,#6b6660)">keine Angabe</span></div>';
     var sp = hi - lo || 1, x0 = (0 - lo) / sp * 100, x1 = (v - lo) / sp * 100, a = Math.min(x0, x1), b = Math.max(x0, x1);
-    var rechts = v >= 0, txtPos = rechts ? 'left:calc(' + Math.min(b, 70).toFixed(1) + '% + 4px)' : 'right:calc(' + Math.min(100 - a, 70).toFixed(1) + '% + 4px)';
-    return '<div class="gp-bar">' + (lo < 0 ? '<b class="gp-null" style="left:' + x0.toFixed(1) + '%"></b>' : '') + '<i style="left:' + a.toFixed(1) + '%;width:' + Math.max(0.6, b - a).toFixed(1) + '%;background:' + farbe + '"></i><span style="' + txtPos + '">' + text + '</span></div>';
+    return '<div class="gp-c"><div class="gp-bar">' + (lo < 0 ? '<b class="gp-null" style="left:' + x0.toFixed(1) + '%"></b>' : '') + '<i style="left:' + a.toFixed(1) + '%;width:' + Math.max(0.6, b - a).toFixed(1) + '%;background:' + farbe + '"></i></div><span class="gp-w">' + text + '</span></div>';
   }
-  function bereich(L, f) { var lo = 0, hi = 0; L.forEach(function (r) { var v = f(r); if (v != null) { lo = Math.min(lo, v); hi = Math.max(hi, v); } }); var p = (hi - lo) * 0.42; return [lo < 0 ? lo - p * (hi > 0 ? 0.6 : 1) : 0, hi > 0 ? hi + p : 0]; }
+  function bereich(L, f) { var lo = 0, hi = 0; L.forEach(function (r) { var v = f(r); if (v != null) { lo = Math.min(lo, v); hi = Math.max(hi, v); } }); var p = (hi - lo) * 0.03; return [lo < 0 ? lo - p : 0, hi > 0 ? hi + p : 0]; }
 
   function linie(proj, w, J0, jahr) {
     var h = 210, l = 46, r = 10, t = 10, b = 24, W = w - l - r, H = h - t - b;
