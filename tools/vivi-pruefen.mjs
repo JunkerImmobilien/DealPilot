@@ -1288,9 +1288,39 @@ kopf('V  v4040 Reiter ViVi, Bewirtschaftung Ist heute aus dem Steuerjahr');
   const nkRoute = RV.slice(RV.indexOf("'/objekt/:id/nk-anpassung'"));
   ok(/router\.post\('\/objekt\/:id\/nk-anpassung', bremse/.test(RV) && /art: 'nk'/.test(nkRoute) && /b\.bestaetigt !== true\) return res\.status\(400\)/.test(nkRoute) && RV.indexOf("router.use(vorschau.sperre('vivi'))") >= 0 && RV.indexOf("router.use(vorschau.sperre('vivi'))") < RV.indexOf('nk-anpassung'),
     'N11 Route POST /vivi/objekt/:id/nk-anpassung: hinter der Vorschau-Sperre vivi, Bremse, Bestätigung Pflicht, Art nk');
-  ok(/\/nk-anpassung'/.test(nkj) && /data-vnk="vorschau"/.test(nkj) && /_z\.vorschauOk \? '' : ' disabled'/.test(nkj) && /DpNkVorauszahlung/.test(nkj), 'N12 Fenster: erst „ViVi rechnen lassen“, „In ViVi anlegen“ erst nach der Vorschau, Soll aus DpNkVorauszahlung');
-  ok(/data-md-nk=/.test(md) && /DpViviNkAnpassung\.oeffnen/.test(md) && /data-vr="w-nk"/.test(vr2) && /DpViviNkAnpassung\.oeffnen/.test(vr2) && /js\/vivi-nk-anpassung\.js\?v=v4042/.test(ix),
+  ok(/\/nk-anpassung'/.test(nkj) && /fk\('vorschau'/.test(nkj) && /fk\('anlegen', 'In ViVi anlegen', 'haupt', !!\(darf && _z\.vorschauOk\)/.test(nkj) && /DpNkVorauszahlung/.test(nkj), 'N12 Fenster: erst „ViVi rechnen lassen“, „In ViVi anlegen“ erst nach der Vorschau, Soll aus DpNkVorauszahlung');
+  ok(/data-md-nk=/.test(md) && /DpViviNkAnpassung\.oeffnen/.test(md) && /data-vr="w-nk"/.test(vr2) && /DpViviNkAnpassung\.oeffnen/.test(vr2) && /js\/vivi-nk-anpassung\.js\?v=v4\d{3}/.test(ix),
     'N13 Absprung im Reiter Miete und im Häuschen der Pilot-Analyse › ViVi, Datei in index.html geladen');
+  /* v4120 · Marcel 23.11.2026: ViVi-Fenster im Rahmen der Einlese-Fenster, Wahl „ViVi-Wert übernehmen“, Knopf nur bei Abweichung */
+  {
+    const vmh = lies('frontend/js/vivi-mieterhoehung.js');
+    ok(/ov\.className = 'oabi-ov dp-vmh-ov'/.test(vmh) && /class="oabi-modal dp-vmh-modal"/.test(vmh) && /class="oabi-foot" id="dp-vmh-foot"/.test(vmh)
+      && /var ov = rahmen\('Mieterhöhung in ViVi anlegen'/.test(vmh) && /MV\.rahmen\('Nebenkosten-Vorauszahlung abgleichen'/.test(nkj) && !/class="btn btn-outline btn-sm" data-vnk=/.test(nkj) && !/class="btn btn-outline btn-sm" data-vmh=/.test(vmh),
+      'NK1 beide ViVi-Fenster im Rahmen der Einlese-Fenster (.oabi-ov, Fuß mit .oabi-btn), keine alten Knöpfe');
+    /* liste()/abweichung() echt im vm: Vorschlag 188, ViVi 180 */
+    const lauf = (v, extra) => {
+      const g = { document: { getElementById: () => null, addEventListener() {} }, addEventListener() {}, dispatchEvent() {},
+        DpViviFelder: { lesen: () => JSON.parse(JSON.stringify(v)), einheitFeld: null }, DpNkVorauszahlung: { ausFormular: () => ({}), vorschlag: () => 188 }, _dpMfh: null };
+      Object.assign(g, extra || {}); g.window = g;
+      vm.runInNewContext(nkj, g);
+      return g.DpViviNkAnpassung;
+    };
+    const basis = { verknuepft: true, felder: { nk_vorauszahlung: '180' }, eigen: {} };
+    const a0 = lauf(basis).abweichung(null);
+    ok(a0 && a0.vivi === 180 && a0.ziel === 188 && a0.quelle === 'vorschlag', 'NK2 ohne Wahl: ViVi 180 gegen Vorschlag 188 ist eine Abweichung');
+    const a1 = lauf(Object.assign({}, basis, { vivi_gilt: { nk_vorauszahlung: true } }));
+    ok(a1.abweichung(null) === null && a1.liste()[0].quelle === 'vivi' && a1.liste()[0].vorschlag === 188, 'NK3 ViVi-Wert gilt: keine Abweichung mehr, Vorschlag bleibt sichtbar');
+    const a2 = lauf(Object.assign({}, basis, { eigen: { nk_vorauszahlung: '200' }, vivi_gilt: { nk_vorauszahlung: true } })).abweichung(null);
+    ok(a2 && a2.ziel === 200 && a2.quelle === 'eigen', 'NK4 eigene Angabe schlägt „ViVi gilt“');
+    const a3 = lauf(Object.assign({}, basis, { nk_angelegt: { nk_vorauszahlung: { wert: 188, ab: '2999-01-01' } } }));
+    const a4 = lauf(Object.assign({}, basis, { nk_angelegt: { nk_vorauszahlung: { wert: 188, ab: '2000-01-01' } } }));
+    ok(a3.abweichung(null) === null && a3.liste()[0].angelegt && a3.liste()[0].angelegt.wert === 188 && a4.abweichung(null) && a4.abweichung(null).abw === 8,
+      'NK5 in ViVi angelegt und noch nicht wirksam: keine Abweichung, nach dem Datum wieder (ViVi führt dann den neuen Wert)');
+    ok(/data-vr="nk-vergleich"/.test(vr2) && /NA\.viviGilt\(x\.id, false\)/.test(vr2) && /w\.nk \? '<div class="vr-wz vr-wn"/.test(vr2) && /mh && w\.nk \?/.test(vr2) && /if \(!a\) return '';/.test(md),
+      'NK6 Knopf und NK-Zeilen nur bei Abweichung, „wieder mit DealPilot vergleichen“ nimmt die Wahl zurück');
+    ok(/function neuZeichnen\(\)/.test(nkj) && /neuZeichnen\(\);\s*try \{ if \(global\.DpVivi && global\.DpVivi\.objektGeladen\)/.test(nkj) && /if \(ok\) \{ speichern\(\); neuZeichnen\(\); \}/.test(nkj),
+      'NK7 nach „In ViVi angelegt“ und „ViVi-Wert übernehmen“ zeichnen Haus und Reiter Miete sofort neu (dp:vivi-stand)');
+  }
   const ohneKomm = nkj.replace(/\/\*[\s\S]*?\*\//g, '');
   const kunde = (ohneKomm.match(/'[^'\n]*'/g) || []).map((t) => t.replace(/&[a-z#0-9]+;/gi, '')).filter((t) => /\s[–—]\s|;/.test(t) && /[a-zäöü]{3}/i.test(t));
   ok(!kunde.length, 'N14 Kundentext ohne Gedankenstrich und Semikolon' + (kunde.length ? ': ' + kunde.join(' | ') : ''));

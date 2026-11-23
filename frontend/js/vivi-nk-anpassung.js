@@ -19,7 +19,7 @@
  * ══════════════════════════════════════════════════════════════════════ */
 (function (global) {
   'use strict';
-  var VERSION = 'v4042a';
+  var VERSION = 'v4120';
   if (!global.document || global.DpViviNkAnpassung) return;
   var doc = global.document;
   function $(id) { return doc.getElementById(id); }
@@ -48,12 +48,22 @@
     if (!v || !v.felder || !N) return [];
     var eigen = v.eigen || {}, d = N.ausFormular ? N.ausFormular() : {}, out = [];
     var E = (global._dpMfh && Array.isArray(global._dpMfh.einheiten)) ? global._dpMfh.einheiten : [];
+    /* v4120 · Marcel 23.11.2026: „wie kann ich einstellen, dass der Wert aus ViVi genommen wird?“ _vivi.vivi_gilt[id]: die
+       Vorauszahlung laut ViVi gilt, DealPilot vergleicht nicht mehr mit dem Vorschlag aus den umlagefähigen Kosten. Eine
+       eigene Angabe im Feld schlägt das weiter. _vivi.nk_angelegt[id] = { wert, ab }: in ViVi angelegt, wirksam erst ab
+       Datum. Bis dahin führt ViVi noch den alten Betrag, das ist keine Abweichung mehr. Kein Rechenkern liest das Feld. */
+    var gilt = v.vivi_gilt || {}, angelegt = v.nk_angelegt || {}, heute = new Date().toISOString().slice(0, 10);
     var eintrag = function (i, id, name) {
       var vivi = zahl(v.felder[id]); if (vivi == null) return;
       var hatEigen = Object.prototype.hasOwnProperty.call(eigen, id) && zahl(eigen[id]) != null;
-      var ziel = hatEigen ? zahl(eigen[id]) : N.vorschlag(d, i);
+      var viviGilt = !hatEigen && !!gilt[id];
+      var ziel = hatEigen ? zahl(eigen[id]) : (viviGilt ? vivi : N.vorschlag(d, i));
       if (ziel == null) return;
-      out.push({ i: i, name: name, vivi: vivi, ziel: ziel, quelle: hatEigen ? 'eigen' : 'vorschlag', abw: Math.round((ziel - vivi) * 100) / 100 });
+      var an = angelegt[id] && zahl(angelegt[id].wert) != null ? angelegt[id] : null;
+      var wartet = !!(an && Math.abs(zahl(an.wert) - ziel) < 0.5 && Math.abs(zahl(an.wert) - vivi) >= 0.5 && String(an.ab || '') > heute);
+      out.push({ i: i, id: id, name: name, vivi: vivi, ziel: ziel, quelle: hatEigen ? 'eigen' : (viviGilt ? 'vivi' : 'vorschlag'),
+        vorschlag: N.vorschlag(d, i), angelegt: wartet ? { wert: zahl(an.wert), ab: an.ab } : null,
+        abw: wartet ? 0 : Math.round((ziel - vivi) * 100) / 100 });
     };
     var mitE = false;
     if (F.einheitFeld) E.forEach(function (e, i) {
@@ -73,29 +83,66 @@
   var _z = null;
   function schliessen() { var o = $('dp-vmh-ov'); if (o && o.parentNode) o.parentNode.removeChild(o); _z = null; }
   function gewaehlt() { return _z && _z.L[_z.sel] || null; }
+  function V() { return global.DpViviMieterhoehung || {}; }
+  function fuss(html) { if (V().fuss) V().fuss(html); }
+  function fk(w, t, art, an, ti) { return V().fk ? V().fk('vnk', w, t, art, an, ti) : ''; }
   function zeichnen() {
     var host = $('dp-vmh'); if (!host || !_z) return;
     var w = gewaehlt(), neu = _z.neu;
-    var h = '<h3>Nebenkosten-Vorauszahlung in ViVi anpassen</h3><p class="vmh-sub">DealPilot legt die neue Vorauszahlung als Anpassung in ViVi an. Die Erklärung an den Mieter schickst du in Textform wie gewohnt.</p>';
+    var h = '';
     if (!_z.L.length) {
-      h += '<div class="vmh-box vmh-warn">In ViVi gibt es für dieses Objekt kein laufendes Mietverhältnis mit Vorauszahlung.</div><div class="vmh-kn"><button type="button" class="btn btn-outline btn-sm" data-vnk="zu">Schließen</button></div>';
-      host.innerHTML = h; return;
+      host.innerHTML = '<div class="vmh-box vmh-warn">In ViVi gibt es für dieses Objekt kein laufendes Mietverhältnis mit Vorauszahlung.</div>';
+      fuss(fk('zu', 'Schließen', 'zu')); return;
     }
-    var opts = _z.L.map(function (x, k) { return '<option value="' + k + '"' + (k === _z.sel ? ' selected' : '') + '>' + esc(x.name) + ', heute ' + esc(eur2(x.vivi)) + '</option>'; }).join('');
+    /* v4120 · zwei Wege: DealPilot-Wert nach ViVi schreiben oder den ViVi-Wert in DealPilot gelten lassen */
+    var opts0 = _z.L.map(function (x, k) { return '<option value="' + k + '"' + (k === _z.sel ? ' selected' : '') + '>' + esc(x.name) + ', heute ' + esc(eur2(x.vivi)) + '</option>'; }).join('');
+    if (_z.L.length > 1 || _z.L[0].i != null) h += '<div class="vmh-g"><label class="vmh-voll">Wohnung<select data-vnk-f="sel">' + opts0 + '</select></label></div>';
+    var dpText = w.quelle === 'eigen' ? 'bei dir eingetragen' : (w.quelle === 'vivi' ? 'es gilt der Wert aus ViVi' : 'aus den umlagefähigen Kosten' + (w.i != null ? ', nach Wohnfläche' : ''));
+    var dpWert = w.quelle === 'vivi' ? w.vorschlag : w.ziel;
+    h += '<div class="vmh-vgl"><div><span>Laut ViVi</span><b>' + esc(eur2(w.vivi)) + '</b><small class="vmh-hin"> im Monat</small></div>'
+      + '<div><span>Laut DealPilot</span><b>' + esc(dpWert != null ? eur2(dpWert) : '–') + '</b><small class="vmh-hin"> ' + esc(dpText) + '</small></div></div>';
+    if (w.angelegt) h += '<div class="vmh-box vmh-ok">In ViVi angelegt: ' + esc(eur2(w.angelegt.wert)) + ' ab ' + esc(datumDe(w.angelegt.ab)) + '. Bis dahin führt ViVi noch ' + esc(eur2(w.vivi)) + '.</div>';
+    var weg = _z.weg || 'vivi-anpassen';
+    h += '<div class="vmh-wahl" role="radiogroup" aria-label="Welcher Wert gilt?">'
+      + '<label class="' + (weg === 'vivi-anpassen' ? 'an' : '') + '"><input type="radio" name="vnk-weg" data-vnk-f="weg" value="vivi-anpassen"' + (weg === 'vivi-anpassen' ? ' checked' : '') + '><span><b>In ViVi anpassen</b><small>DealPilot legt die neue Vorauszahlung als Anpassung in ViVi an.</small></span></label>'
+      + '<label class="' + (weg === 'vivi-gilt' ? 'an' : '') + '"><input type="radio" name="vnk-weg" data-vnk-f="weg" value="vivi-gilt"' + (weg === 'vivi-gilt' ? ' checked' : '') + '><span><b>ViVi-Wert übernehmen</b><small>In DealPilot gilt ' + esc(eur2(w.vivi)) + ' laut ViVi. Der Vergleich entfällt.</small></span></label></div>';
+    if (weg === 'vivi-gilt') {
+      h += '<p class="vmh-hin">Die Vorauszahlung steht nur im Mietvertrag. Cashflow und Steuer rechnen weiter mit den umlagefähigen Kosten. Zurücknehmen geht im Reiter Pilot-Analyse unter ViVi.</p>';
+      if (_z.fehler) h += '<div class="vmh-fehler">' + esc(_z.fehler) + '</div>';
+      host.innerHTML = h;
+      fuss(fk('zu', 'Abbrechen', 'zu') + fk('gilt', 'ViVi-Wert übernehmen', 'haupt', true));
+      return;
+    }
     h += '<div class="vmh-g">'
-      + (_z.L.length > 1 || _z.L[0].i != null ? '<label class="vmh-voll">Wohnung<select data-vnk-f="sel">' + opts + '</select></label>' : '<div class="vmh-voll vmh-hin">' + esc(w.name) + ', Vorauszahlung heute <b>' + esc(eur2(w.vivi)) + '</b> im Monat</div>')
       + '<label>Neue Vorauszahlung (€ im Monat)<input inputmode="decimal" data-vnk-f="neu" value="' + (neu != null ? esc(String(neu).replace('.', ',')) : '') + '"></label>'
       + '<label>Wirksam ab<input type="date" data-vnk-f="datum" value="' + esc(_z.datum || '') + '"></label></div>';
-    h += '<div class="vmh-box">' + (w.quelle === 'eigen' ? 'Bei dir eingetragen: <b>' + esc(eur2(w.ziel)) + '</b> im Monat.' : 'Aus den umlagefähigen Kosten ergeben sich <b>' + esc(eur2(w.ziel)) + '</b> im Monat' + (w.i != null ? ', nach Wohnfläche verteilt.' : '.'))
-      + ' ViVi führt heute ' + esc(eur2(w.vivi)) + '.</div>';
     h += '<p class="vmh-hin">Nach § 560 Abs. 4 BGB darf jede Seite die Vorauszahlung nach einer Betriebskostenabrechnung auf eine angemessene Höhe anpassen. Sie gilt ab der nächsten Fälligkeit nach Zugang der Erklärung.</p>';
     if (_z.vorschau) h += '<div class="vmh-box vmh-ok">' + _z.vorschau + '</div>';
     if (_z.fehler) h += '<div class="vmh-fehler">' + esc(_z.fehler) + '</div>';
     var darf = w && neu != null && neu >= 0 && Math.abs(neu - w.vivi) >= 0.5 && _z.datum && !_z.laeuft;
-    h += '<div class="vmh-kn"><button type="button" class="btn btn-outline btn-sm" data-vnk="zu">Abbrechen</button>'
-      + '<button type="button" class="btn btn-outline btn-sm" data-vnk="vorschau"' + (darf ? '' : ' disabled') + '>ViVi rechnen lassen</button>'
-      + '<button type="button" class="btn btn-sm" data-vnk="anlegen"' + (darf && _z.vorschauOk ? '' : ' disabled') + ' title="Erst ViVi rechnen lassen">In ViVi anlegen</button></div>';
     host.innerHTML = h;
+    fuss(fk('zu', 'Abbrechen', 'zu') + fk('vorschau', _z.laeuft ? 'ViVi rechnet …' : 'ViVi rechnen lassen', 'neben', !!darf)
+      + fk('anlegen', 'In ViVi anlegen', 'haupt', !!(darf && _z.vorschauOk), 'Erst ViVi rechnen lassen'));
+  }
+  /* v4120 · nach jeder Aktion: Haus im ViVi-Reiter und Reiter Miete neu zeichnen (beide hören auf dp:vivi-stand) */
+  function neuZeichnen() {
+    try { global.dispatchEvent(new CustomEvent('dp:vivi-stand', { detail: { key: global._currentObjKey, nk: true } })); } catch (e) {}
+    try { if (global.DpViviReiter && global.DpViviReiter.mountAll) setTimeout(global.DpViviReiter.mountAll, 60); } catch (e) {}
+  }
+  function speichern() { try { if (global.DpSpeichernFolge) global.DpSpeichernFolge(); else if (typeof global.saveObj === 'function') global.saveObj({ silent: true }); } catch (e) {} }
+  /** v4120 · ViVi-Wert gilt (an = true) oder DealPilot vergleicht wieder (an = false). Eine eigene Angabe wird dabei verworfen. */
+  function viviGilt(id, an) {
+    var F = global.DpViviFelder; if (!F || !F.merken || !id) return false;
+    try { var v = F.lesen(); if (an && v.eigen && Object.prototype.hasOwnProperty.call(v.eigen, id) && F.viviUebernehmen) F.viviUebernehmen(id); } catch (e) {}
+    var ok = F.merken('vivi_gilt', id, an ? true : null);
+    if (ok) { speichern(); neuZeichnen(); }
+    return ok;
+  }
+  function gelten() {
+    var w = gewaehlt(); if (!w) return;
+    if (!viviGilt(w.id, true)) { _z.fehler = 'Das ging nicht. Ist das Objekt noch mit ViVi verknüpft?'; zeichnen(); return; }
+    schliessen();
+    try { if (typeof global.toast === 'function') global.toast('✓ ' + (w.i != null ? w.name + ': ' : '') + 'Es gilt die Vorauszahlung laut ViVi, ' + eur2(w.vivi) + '.'); } catch (e) {}
   }
   function rumpf(vorschau) {
     var w = gewaehlt();
@@ -120,8 +167,10 @@
         if (!_z) return;
         _z.laeuft = false;
         if (vorschau) { _z.vorschau = vorschauText(r); _z.vorschauOk = true; zeichnen(); return; }
-        var w = gewaehlt(), ab = _z.datum;
+        var w = gewaehlt(), ab = _z.datum, neuWert = r && r.rumpf && r.rumpf.new_utility_costs != null ? r.rumpf.new_utility_costs : _z.neu;
         schliessen();
+        try { if (w && global.DpViviFelder && global.DpViviFelder.merken) { global.DpViviFelder.merken('nk_angelegt', w.id, { wert: neuWert, ab: ab, am: new Date().toISOString().slice(0, 10) }); speichern(); } } catch (e) {}
+        neuZeichnen();
         try { if (global.DpVivi && global.DpVivi.objektGeladen) global.DpVivi.objektGeladen(key); } catch (e) {}
         try { if (typeof global.toast === 'function') global.toast('✓ Vorauszahlung in ViVi angepasst: ' + (w ? w.name + ', ' : '') + eur2(r.rumpf && r.rumpf.new_utility_costs) + ' ab ' + datumDe(ab) + '.'); } catch (e) {}
       })
@@ -135,24 +184,24 @@
   function oeffnen(o) {
     o = o || {};
     if (!verfuegbar()) { try { if (typeof global.toast === 'function') global.toast('ℹ Anpassungen nach ViVi gehen nur bei einem mit ViVi verknüpften Objekt.'); } catch (e) {} return false; }
-    var V = global.DpViviMieterhoehung; if (V && V.stil) V.stil();
-    schliessen(); try { if (V && V.schliessen) V.schliessen(); } catch (e) {}
+    var MV = global.DpViviMieterhoehung;
+    schliessen(); try { if (MV && MV.schliessen) MV.schliessen(); } catch (e) {}
     var L = liste(), sel = 0;
     L.forEach(function (x, k) { if (String(x.i) === String(o.einheit == null ? null : o.einheit)) sel = k; });
-    _z = { L: L, sel: sel, neu: L[sel] ? L[sel].ziel : null, datum: ersterNaechster(), vorschau: '', vorschauOk: false, fehler: '', laeuft: false, quelle: o.quelle || '' };
-    var ov = doc.createElement('div'); ov.id = 'dp-vmh-ov';
-    ov.innerHTML = '<div id="dp-vmh" role="dialog" aria-modal="true" aria-label="Nebenkosten-Vorauszahlung in ViVi anpassen"></div>';
-    doc.body.appendChild(ov);
+    _z = { L: L, sel: sel, neu: L[sel] ? L[sel].ziel : null, datum: ersterNaechster(), vorschau: '', vorschauOk: false, fehler: '', laeuft: false, quelle: o.quelle || '', weg: o.weg || 'vivi-anpassen' };
+    var ov = MV && MV.rahmen ? MV.rahmen('Nebenkosten-Vorauszahlung abgleichen', 'ViVi und DealPilot führen eine andere Vorauszahlung. Entscheide, welcher Wert gilt. Die Erklärung an den Mieter schickst du in Textform wie gewohnt.') : null;
+    if (!ov) return false;
     ov.addEventListener('click', function (ev) {
       if (ev.target === ov) { schliessen(); return; }
-      var b = ev.target.closest && ev.target.closest('[data-vnk]'); if (!b) return;
+      var b = ev.target.closest && ev.target.closest('[data-vnk]'); if (!b || b.disabled) return;
       ev.preventDefault();
       var a = b.getAttribute('data-vnk');
-      if (a === 'zu') schliessen(); else if (a === 'vorschau') senden(true); else if (a === 'anlegen') senden(false);
+      if (a === 'zu') schliessen(); else if (a === 'vorschau') senden(true); else if (a === 'anlegen') senden(false); else if (a === 'gilt') gelten();
     });
     ov.addEventListener('change', function (ev) {
       var f = ev.target && ev.target.getAttribute && ev.target.getAttribute('data-vnk-f'); if (!f || !_z) return;
       var v = ev.target.value;
+      if (f === 'weg') { _z.weg = v; _z.fehler = ''; zeichnen(); return; }
       if (f === 'sel') { _z.sel = +v; _z.neu = gewaehlt() ? gewaehlt().ziel : null; }
       else if (f === 'neu') _z.neu = zahl(v);
       else if (f === 'datum') _z.datum = v || null;
@@ -163,5 +212,5 @@
     return true;
   }
 
-  global.DpViviNkAnpassung = { VERSION: VERSION, verfuegbar: verfuegbar, liste: liste, abweichung: abweichung, oeffnen: oeffnen, schliessen: schliessen };
+  global.DpViviNkAnpassung = { VERSION: VERSION, verfuegbar: verfuegbar, liste: liste, abweichung: abweichung, oeffnen: oeffnen, schliessen: schliessen, viviGilt: viviGilt /* v4120 */ };
 })(typeof window !== 'undefined' ? window : globalThis);

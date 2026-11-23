@@ -134,7 +134,7 @@
     if (!N || !N.verfuegbar() || !w) return '';
     var a = null; try { a = N.abweichung(mfh && w.i != null ? w.i : null); } catch (e) { a = null; }
     if (!a) return '';
-    return '<button type="button" class="btn btn-outline btn-sm" data-md-nk="' + (mfh && w.i != null ? w.i : 'objekt') + '" title="ViVi ' + eur(a.vivi) + ', DealPilot ' + eur(a.ziel) + ' im Monat">Nebenkosten in ViVi anpassen (' + eur(a.vivi) + ' auf ' + eur(a.ziel) + ')</button>';
+    return '<button type="button" class="btn btn-outline btn-sm" data-md-nk="' + (mfh && w.i != null ? w.i : 'objekt') + '" title="ViVi ' + eur(a.vivi) + ', DealPilot ' + eur(a.ziel) + ' im Monat">Nebenkosten abgleichen (ViVi ' + eur(a.vivi) + ', DealPilot ' + eur(a.ziel) + ')</button>';   /* v4120 · Fenster bietet beide Wege */
   }
   /* v4060 · der EINE Satz aus DpMieteMax, eingefärbt wie die Kachel */
   function stand(w) { return '<div class="stand s-' + w.st + '">' + esc(w.satz) + '</div>'; }

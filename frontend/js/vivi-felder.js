@@ -585,11 +585,23 @@
     return true;
   }
   function stand() { return _stand; }
+  /* v4120 · Merker je Feld im Objekt (_vivi[bereich][id]), z. B. vivi_gilt (Marcel 23.11.2026: „einstellen, dass der Wert
+     aus ViVi genommen wird“) oder nk_angelegt (Anpassung in ViVi angelegt, wirksam erst ab Datum). wert null loescht. */
+  function merken(bereich, id, wert) {
+    var v = lesen(); if (!v.verknuepft || !bereich || !id) return false;
+    if (!v[bereich] || typeof v[bereich] !== 'object') v[bereich] = {};
+    if (wert == null) delete v[bereich][id]; else v[bereich][id] = wert;
+    if (!Object.keys(v[bereich]).length) delete v[bereich];
+    schreiben(v);
+    try { var h = $('_vivi'); if (h) h.dispatchEvent(new Event('input', { bubbles: true })); } catch (e) {}
+    return true;
+  }
   window.DpViviFelder = { setzen: setzen, allesLoesen: allesLoesen, alleSelbst: alleSelbst, anzahlEigen: anzahlEigen, erhoehungenMischen: erhoehungenMischen, einheitenSperren: einheitenSperren, lesen: lesen, HINWEIS: HINWEIS, EINHEIT_FELDER: EINHEIT_FELDER,
     /* fuer den Unterlagen-Abgleich (Paket V5): ist ein Feld verknuepft, und welchen Wert fuehrt ViVi? */
     istVerknuepft: istVerknuepft, viviWert: viviWert,
     HINWEIS_ABWEICHUNG: HINWEIS_ABWEICHUNG, vergleich: vergleich, einheitFeld: einheitFeld, einheitVergleich: einheitVergleich,
     lokalFestlegen: lokalFestlegen, entscheiden: entscheiden, entscheidung: entscheidung, gleichDok: gleichDok,
-    viviUebernehmen: viviUebernehmen, stand: stand   /* v4040 */
+    viviUebernehmen: viviUebernehmen, stand: stand,   /* v4040 */
+    merken: merken   /* v4120 */
   };
 })();

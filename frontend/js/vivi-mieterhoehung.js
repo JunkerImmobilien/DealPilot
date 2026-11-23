@@ -24,7 +24,7 @@
  * ══════════════════════════════════════════════════════════════════════ */
 (function (global) {
   'use strict';
-  var VERSION = 'v4042a';
+  var VERSION = 'v4120';
   function doc() { return global.document || null; }
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
   /* Zahl aus Modell oder Eingabe: Zahlen bleiben Zahlen (806.17 ist kein Tausender), Text deutsch oder englisch */
@@ -97,10 +97,20 @@
     var d = doc(); if (!d || d.getElementById('dp-vmh-stil')) return;
     var s = d.createElement('style'); s.id = 'dp-vmh-stil';
     s.textContent = [
-      '#dp-vmh-ov{position:fixed;inset:0;z-index:100500;background:rgba(5,5,5,.45);display:flex;align-items:flex-start;justify-content:center;overflow:auto;padding:40px 16px}',
-      '#dp-vmh{background:#FDFCFA;color:#2A2727;border-radius:12px;max-width:560px;width:100%;padding:20px 22px;font:400 13px/1.55 Inter,system-ui,sans-serif;box-shadow:0 18px 50px rgba(0,0,0,.25)}',
-      '#dp-vmh h3{margin:0 0 4px;font:600 18px/1.3 "Space Grotesk",Inter,sans-serif}',
-      '#dp-vmh .vmh-sub{color:#6B645A;margin:0 0 12px}',
+      /* v4120 · Rahmen wie „Belege einlesen“ (.oabi-ov, Marke und Gold-Kopf aus modal-boarding-skin.js), hier nur der Inhalt */
+      '#dp-vmh-ov{z-index:100500}',
+      '#dp-vmh-ov .oabi-modal.dp-vmh-modal{width:min(600px,100%);max-height:92vh}',
+      '#dp-vmh{color:#2A2727;font:400 13px/1.55 Inter,system-ui,sans-serif;padding:14px 22px 6px}',
+      '#dp-vmh-foot{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}',
+      '#dp-vmh .vmh-wahl{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:2px 0 10px}',
+      '#dp-vmh .vmh-wahl label{flex-direction:row;align-items:flex-start;gap:8px;border:1px solid #E6DCC2;border-radius:10px;padding:9px 11px;background:#fff;cursor:pointer;color:#2A2727;font-size:12.5px}',
+      '#dp-vmh .vmh-wahl label.an{border-color:var(--wl-c9a84c, #C9A84C);box-shadow:0 0 0 1px var(--wl-c9a84c, #C9A84C) inset;background:var(--gold-bg, rgba(201,168,76,.08))}',
+      '#dp-vmh .vmh-wahl input{margin-top:2px;accent-color:var(--wl-c9a84c, #C9A84C)}',
+      '#dp-vmh .vmh-wahl small{display:block;color:#6B645A;font-size:11.5px;margin-top:1px}',
+      '#dp-vmh .vmh-vgl{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0 0 10px}',
+      '#dp-vmh .vmh-vgl>div{border:1px solid #EFE8D6;border-radius:9px;padding:8px 11px;background:#fff}',
+      '#dp-vmh .vmh-vgl span{display:block;font:600 10px/1.3 "JetBrains Mono",monospace;letter-spacing:1.2px;text-transform:uppercase;color:#7A7370}',
+      '#dp-vmh .vmh-vgl b{font:600 17px/1.3 "Space Grotesk",Inter,sans-serif}',
       '#dp-vmh label{display:flex;flex-direction:column;gap:3px;font-size:12px;color:#6B645A}',
       '#dp-vmh input,#dp-vmh select{font:inherit;color:#2A2727;padding:7px 8px;border:1px solid #E6DCC2;border-radius:7px;background:#fff;min-width:0}',
       '#dp-vmh .vmh-g{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0}',
@@ -110,12 +120,33 @@
       '#dp-vmh .vmh-warn label{flex-direction:row;align-items:flex-start;gap:7px;color:#2A2727;margin-top:6px}',
       '#dp-vmh .vmh-ok{border-color:#3FA56C;background:rgba(63,165,108,.07)}',
       '#dp-vmh .vmh-hin{color:#6B645A;font-size:12px}',
-      '#dp-vmh .vmh-kn{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;margin-top:14px}',
       '#dp-vmh .vmh-fehler{color:#B8625C;margin-top:6px}',
-      '@media (max-width:560px){#dp-vmh .vmh-g{grid-template-columns:1fr}#dp-vmh-ov{padding:12px}}'
+      '@media (max-width:560px){#dp-vmh .vmh-g,#dp-vmh .vmh-wahl,#dp-vmh .vmh-vgl{grid-template-columns:1fr}#dp-vmh{padding:12px 14px 4px}#dp-vmh-ov .oabi-modal.dp-vmh-modal{max-height:100vh;height:100%;border-radius:0}#dp-vmh-ov{padding:0}}'
     ].join('\n');
     d.head.appendChild(s);
   }
+
+  /* v4120 · Marcel 23.11.2026: „nicht im passenden Design“. Beide ViVi-Fenster (Mieterhöhung, Nebenkosten) im Rahmen der
+     Einlese-Fenster: .oabi-ov > .oabi-modal mit Kopf, Unterzeile, Inhalt und Fuß. modal-boarding-skin.js legt Marke, Gold-Kopf
+     und Kreuz darüber (das Kreuz klickt den ersten Fußknopf ohne primary, also Abbrechen). Gezeichnet wird nur Inhalt und Fuß. */
+  function rahmen(titel, sub) {
+    var d = doc(); if (!d) return null;
+    stil();
+    var alt = d.getElementById('dp-vmh-ov'); if (alt && alt.parentNode) alt.parentNode.removeChild(alt);
+    var ov = d.createElement('div'); ov.className = 'oabi-ov dp-vmh-ov'; ov.id = 'dp-vmh-ov';
+    ov.innerHTML = '<div class="oabi-modal dp-vmh-modal" role="dialog" aria-modal="true" aria-label="' + esc(titel) + '">'
+      + '<div class="oabi-head"><h3>' + esc(titel) + '</h3></div><div class="oabi-sub">' + esc(sub) + '</div>'
+      + '<div class="oabi-body" id="dp-vmh"></div><div class="oabi-foot" id="dp-vmh-foot"></div></div>';
+    d.body.appendChild(ov);
+    return ov;
+  }
+  function fuss(html) { var d = doc(), f = d && d.getElementById('dp-vmh-foot'); if (f) f.innerHTML = html; }
+  /** Fußknopf im Stil der Einlese-Fenster. art: 'zu' | 'neben' | 'haupt' */
+  function fk(attr, wert, text, art, an, titel) {
+    return '<button type="button" class="oabi-btn' + (art === 'haupt' ? ' primary' : '') + '" data-' + attr + '="' + wert + '"' + (an === false ? ' disabled' : '') + (titel ? ' title="' + esc(titel) + '"' : '') + '>' + text + '</button>';
+  }
+  /* Esc schließt das offene ViVi-Fenster wie das Kreuz */
+  try { doc().addEventListener('keydown', function (ev) { if (ev.key !== 'Escape') return; var o = doc().getElementById('dp-vmh-ov'); if (!o) return; var c = o.querySelector('.oabi-foot .oabi-btn:not(.primary)'); if (c) { ev.preventDefault(); c.click(); } }); } catch (e) {}
 
   var _z = null;   /* Zustand des offenen Fensters */
   function schliessen() { var o = doc() && doc().getElementById('dp-vmh-ov'); if (o && o.parentNode) o.parentNode.removeChild(o); _z = null; }
@@ -139,10 +170,10 @@
     var opts = W.liste.map(function (x, k) { return '<option value="' + k + '"' + (k === _z.sel ? ' selected' : '') + '>' + esc(x.name) + ', heute ' + esc(eur2(x.ist)) + '</option>'; }).join('');
     var artOpt = [['558', 'Vergleichsmiete (§ 558 BGB)'], ['index', 'Indexmiete (§ 557b BGB)'], ['staffel', 'Staffelmiete (§ 557a BGB)'], ['559', 'Modernisierung (§ 559 BGB)']]
       .map(function (a) { return '<option value="' + a[0] + '"' + (a[0] === art ? ' selected' : '') + '>' + a[1] + '</option>'; }).join('');
-    var h = '<h3>Mieterhöhung in ViVi anlegen</h3><p class="vmh-sub">DealPilot legt die neue Miete als Mietänderung in ViVi an. Den Brief an den Mieter schickst du wie gewohnt, zustimmen muss er bei § 558 selbst.</p>';
+    var h = '';
     if (!W.liste.length) {
-      h += '<div class="vmh-box vmh-warn">Für dieses Objekt gibt es keine vermietete Wohnung mit Miete. Eine Mieterhöhung braucht ein laufendes Mietverhältnis.</div><div class="vmh-kn"><button type="button" class="btn btn-outline btn-sm" data-vmh="zu">Schließen</button></div>';
-      host.innerHTML = h; return;
+      host.innerHTML = '<div class="vmh-box vmh-warn">Für dieses Objekt gibt es keine vermietete Wohnung mit Miete. Eine Mieterhöhung braucht ein laufendes Mietverhältnis.</div>';
+      fuss(fk('vmh', 'zu', 'Schließen', 'zu')); return;
     }
     h += '<div class="vmh-g">'
       + (W.mfh ? '<label class="vmh-voll">Wohnung<select data-vmh-f="sel">' + opts + '</select></label>' : '<div class="vmh-voll vmh-hin">' + esc(w.name) + ', Miete heute <b>' + esc(eur2(w.ist)) + '</b> kalt im Monat</div>')
@@ -162,10 +193,9 @@
     if (_z.vorschau) h += '<div class="vmh-box vmh-ok">' + _z.vorschau + '</div>';
     if (_z.fehler) h += '<div class="vmh-fehler">' + esc(_z.fehler) + '</div>';
     var darf = w && neu != null && neu > w.ist && _z.datum && (!ueber || _z.trotzdem) && !_z.laeuft;
-    h += '<div class="vmh-kn"><button type="button" class="btn btn-outline btn-sm" data-vmh="zu">Abbrechen</button>'
-      + '<button type="button" class="btn btn-outline btn-sm" data-vmh="vorschau"' + (darf ? '' : ' disabled') + '>ViVi rechnen lassen</button>'
-      + '<button type="button" class="btn btn-sm" data-vmh="anlegen"' + (darf && _z.vorschauOk ? '' : ' disabled') + ' title="Erst ViVi rechnen lassen">In ViVi anlegen</button></div>';
     host.innerHTML = h;
+    fuss(fk('vmh', 'zu', 'Abbrechen', 'zu') + fk('vmh', 'vorschau', _z.laeuft ? 'ViVi rechnet …' : 'ViVi rechnen lassen', 'neben', !!darf)
+      + fk('vmh', 'anlegen', 'In ViVi anlegen', 'haupt', !!(darf && _z.vorschauOk), 'Erst ViVi rechnen lassen'));
   }
 
   function rumpf(vorschau) {
@@ -209,16 +239,14 @@
     o = o || {};
     if (!verfuegbar()) { try { if (typeof global.toast === 'function') global.toast('ℹ Mieterhöhungen nach ViVi gehen nur bei einem mit ViVi verknüpften Objekt.'); } catch (e) {} return false; }
     var d = doc(); if (!d) return false;
-    stil(); schliessen();
+    schliessen();
     var W = wohnungen(), sel = 0;
     if (o.einheit != null) W.liste.forEach(function (x, k) { if (String(x.i) === String(o.einheit)) sel = k; });
     _z = { W: W, sel: sel, art: artFuer(W.liste[sel], o.art), neu: null, datum: null, trotzdem: false, vorschau: '', vorschauOk: false, fehler: '', laeuft: false, quelle: o.quelle || '' };
-    var ov = d.createElement('div'); ov.id = 'dp-vmh-ov';
-    ov.innerHTML = '<div id="dp-vmh" role="dialog" aria-modal="true" aria-label="Mieterhöhung in ViVi anlegen"></div>';
-    d.body.appendChild(ov);
+    var ov = rahmen('Mieterhöhung in ViVi anlegen', 'DealPilot legt die neue Miete als Mietänderung in ViVi an. Den Brief an den Mieter schickst du wie gewohnt, zustimmen muss er bei § 558 selbst.');
     ov.addEventListener('click', function (ev) {
       if (ev.target === ov) { schliessen(); return; }
-      var b = ev.target.closest && ev.target.closest('[data-vmh]'); if (!b) return;
+      var b = ev.target.closest && ev.target.closest('[data-vmh]'); if (!b || b.disabled) return;
       ev.preventDefault();
       var a = b.getAttribute('data-vmh');
       if (a === 'zu') schliessen(); else if (a === 'vorschau') senden(true); else if (a === 'anlegen') senden(false);
@@ -239,5 +267,5 @@
     return true;
   }
 
-  global.DpViviMieterhoehung = { VERSION: VERSION, verfuegbar: verfuegbar, oeffnen: oeffnen, schliessen: schliessen, stil: stil /* v4042 · auch fuer DpViviNkAnpassung */, spielraum: spielraum, wohnungen: wohnungen, _ersterNaechster: ersterNaechster };
+  global.DpViviMieterhoehung = { VERSION: VERSION, verfuegbar: verfuegbar, oeffnen: oeffnen, schliessen: schliessen, stil: stil /* v4042 · auch fuer DpViviNkAnpassung */, rahmen: rahmen, fuss: fuss, fk: fk /* v4120 */, spielraum: spielraum, wohnungen: wohnungen, _ersterNaechster: ersterNaechster };
 })(typeof window !== 'undefined' ? window : globalThis);

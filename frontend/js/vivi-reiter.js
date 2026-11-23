@@ -209,6 +209,8 @@
       w.pot = w.soll >= basis + 1 ? Math.round(w.soll - basis) : 0;
       /* v4042 · Nebenkosten-Vorauszahlung: ViVi gegen das Soll in DealPilot (DpViviNkAnpassung) */
       try { w.nk = global.DpViviNkAnpassung ? global.DpViviNkAnpassung.abweichung(D.mfh ? w.i : null) : null; } catch (e) { w.nk = null; }
+      /* v4120 · Stand der Vorauszahlung ohne Abweichung: ViVi-Wert gilt, oder Anpassung in ViVi angelegt (wirksam ab Datum) */
+      try { (global.DpViviNkAnpassung && global.DpViviNkAnpassung.liste ? global.DpViviNkAnpassung.liste() : []).forEach(function (x) { if (String(x.i) === String(D.mfh ? w.i : null)) w.nkStand = x; }); } catch (e) { w.nkStand = null; }
     });
     return D;
   }
@@ -230,18 +232,21 @@
         + '<div class="vr-wz"><span>DealPilot</span><span>' + (w.ist ? eur(w.ist) : 'leer') + '</span></div>'
         + '<div class="vr-wz"><span>ViVi</span><span>' + (istZahl(w.vivi) ? eur(w.vivi) : '–') + '</span></div>'
         + (w.pot ? '<div class="vr-wz vr-wp"><span>möglich</span><span>' + eur(w.soll) + ' (+' + eur(w.pot) + ')</span></div>' : '')
+        + (!w.nk && w.nkStand && w.nkStand.angelegt ? '<div class="vr-wz vr-wn" title="In ViVi angelegt, wirksam ab ' + esc(datumText(w.nkStand.angelegt.ab)) + '. Bis dahin führt ViVi noch ' + eur(w.nkStand.vivi) + '."><span>NK ab ' + esc(datumText(w.nkStand.angelegt.ab)) + '</span><span>' + eur(w.nkStand.angelegt.wert) + '</span></div>' : '')
         + (w.nk ? '<div class="vr-wz vr-wn" title="Monatliche Nebenkosten-Vorauszahlung des Mieters. In ViVi steht ' + eur(w.nk.vivi) + '. Aus den umlagefähigen Kosten in DealPilot ergeben sich ' + eur(w.nk.ziel) + '. Mit dem Knopf passt du sie in ViVi an."><span>NK-Vorauszahlung ViVi</span><span>' + eur(w.nk.vivi) + '</span></div>'
           + '<div class="vr-wz vr-wn"><span>NK laut DealPilot</span><span>' + eur(w.nk.ziel) + '</span></div>' : '')
         + '<div class="vr-wk">' + (abw && w.eigen ? '<button type="button" class="btn-clean vr-k" data-vr="w-vivi" data-vr-id="' + esc(w.viviId) + '">ViVi übernehmen</button>' : '')
         + (mh && w.ist > 0 && (V.spielraum ? V.spielraum(D.mfh ? w.i : null, w.vivi) : w.pot) ? '<button type="button" class="btn-clean vr-k' + (w.pot ? ' gold' : '') + '" data-vr="w-mh" data-vr-e="' + (D.mfh ? w.i : 'objekt') + '">Mieterhöhung in ViVi</button>' : '')
-        + (mh && w.nk ? '<button type="button" class="btn-clean vr-k" data-vr="w-nk" data-vr-e="' + (D.mfh ? w.i : 'objekt') + '">Nebenkosten in ViVi</button>' : '') + '</div></div>';
+        + (mh && w.nk ? '<button type="button" class="btn-clean vr-k" data-vr="w-nk" data-vr-e="' + (D.mfh ? w.i : 'objekt') + '">Nebenkosten abgleichen</button>' : '') + '</div></div>';
     };
     var pot = D.W.reduce(function (s, w) { return s + w.pot; }, 0), nAb = D.W.filter(function (w) { return istZahl(w.abw) && Math.abs(w.abw) >= 1; }).length;
     var nNk = D.W.filter(function (w) { return w.nk; }).length;
+    var nGilt = D.W.filter(function (w) { return !w.nk && w.nkStand && w.nkStand.quelle === 'vivi'; });
     return '<h4 class="vr-h">' + (D.mfh ? 'Wohnungen' : 'Die Wohnung') + '</h4><p class="vr-satz">'
       + (nAb ? nAb + (nAb === 1 ? ' Wohnung weicht' : ' Wohnungen weichen') + ' von ViVi ab. ' : 'Mieten wie in ViVi. ')
       + (pot ? 'Mögliche Mieterhöhung zusammen ' + eur(pot) + ' im Monat.' : 'Kein Spielraum für eine Mieterhöhung.')
       + (nNk ? ' Bei ' + (nNk === 1 ? 'einer Wohnung passt' : nNk + ' Wohnungen passt') + ' die Nebenkosten-Vorauszahlung in ViVi nicht zu den umlagefähigen Kosten in DealPilot.' : '') + '</p>'
+      + (nGilt.length ? '<p class="vr-klein">' + (nGilt.length === 1 && !D.mfh ? 'Bei der Vorauszahlung gilt der Wert aus ViVi.' : 'Bei ' + nGilt.length + (nGilt.length === 1 ? ' Wohnung' : ' Wohnungen') + ' gilt die Vorauszahlung laut ViVi.') + ' <button type="button" class="btn-clean vr-k" data-vr="nk-vergleich">wieder mit DealPilot vergleichen</button></p>' : '')
       + '<div class="vr-haus"><div class="vr-dach"></div>' + reihen.map(function (r) { return '<div class="vr-etage" style="grid-template-columns:repeat(' + r.length + ',minmax(0,1fr))">' + r.map(kachel).join('') + '</div>'; }).join('') + '<div class="vr-boden"></div></div>';
   }
 
@@ -408,6 +413,12 @@
       var F = global.DpViviFelder, id = b.getAttribute('data-vr-id');
       if (F && F.viviUebernehmen && F.viviUebernehmen(id)) { meldung('Wert aus ViVi übernommen'); speichern(); }
       setTimeout(mountAll, 150);
+      return;
+    }
+    if (was === 'nk-vergleich') {   /* v4120 · ViVi-Wert gilt zurücknehmen, für alle Wohnungen */
+      try { var NA = global.DpViviNkAnpassung, LL = NA && NA.liste ? NA.liste() : []; LL.forEach(function (x) { if (x.quelle === 'vivi') NA.viviGilt(x.id, false); }); } catch (x) {}
+      meldung('DealPilot vergleicht die Vorauszahlung wieder');
+      setTimeout(mountAll, 120);
       return;
     }
     if (was === 'w-nk') {   /* v4042 */
