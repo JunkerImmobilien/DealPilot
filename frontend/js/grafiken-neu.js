@@ -210,7 +210,7 @@
         out.push('<rect class="gn-bar' + (v < 0 ? ' neg' : '') + '" x="' + f1(x) + '" y="' + f1(yt) + '" width="' + f1(bw - (o.gestapelt ? 0 : 2)) + '" height="' + f1(Math.max(0.5, yb - yt)) + '" rx="2" style="fill:' + farbe + ';animation-delay:' + (i * 25) + 'ms"/>');
         if (proj) out.push('<rect x="' + f1(x) + '" y="' + f1(yt) + '" width="' + f1(bw - (o.gestapelt ? 0 : 2)) + '" height="' + f1(Math.max(0.5, yb - yt)) + '" rx="2" style="fill:url(#gn-schraffur-' + o.id + ');pointer-events:none" class="gn-bar' + (v < 0 ? ' neg' : '') + '"/>');
       });
-      if (i % jede === 0 || i === n - 1) out.push('<text class="gn-ax" x="' + f1(cx) + '" y="' + (H - 8) + '" text-anchor="middle"' + (o.x[i] === o.heute ? ' style="fill:var(--gn-gold-d);font-weight:600"' : '') + '>' + esc(o.xText ? o.xText(o.x[i]) : o.x[i]) + '</text>');
+      if (i % jede === 0) out.push('<text class="gn-ax" x="' + f1(cx) + '" y="' + (H - 8) + '" text-anchor="middle"' + (o.x[i] === o.heute ? ' style="fill:var(--gn-gold-d);font-weight:600"' : '') + '>' + esc(o.xText ? o.xText(o.x[i]) : o.x[i]) + '</text>');
       out.push('<rect class="gn-treff" data-gn-i="' + i + '" x="' + f1(L + dx * i) + '" y="' + T + '" width="' + f1(dx) + '" height="' + ph + '"/><rect class="gn-hl" x="' + f1(L + dx * i) + '" y="' + T + '" width="' + f1(dx) + '" height="' + ph + '"/>');
     }
     out.push('</svg>');
@@ -243,7 +243,7 @@
     });
     var jede = Math.ceil(n / Math.max(1, Math.floor(pw / 44)));
     for (var i = 0; i < n; i++) {
-      if (i % jede === 0 || i === n - 1) out.push('<text class="gn-ax" x="' + f1(xv(i)) + '" y="' + (H - 8) + '" text-anchor="middle"' + (o.x[i] === o.heute ? ' style="fill:var(--gn-gold-d);font-weight:600"' : '') + '>' + esc(o.x[i]) + '</text>');
+      if (i % jede === 0 || (i === n - 1 && (n - 1) % jede >= jede / 2)) out.push('<text class="gn-ax" x="' + f1(xv(i)) + '" y="' + (H - 8) + '" text-anchor="middle"' + (o.x[i] === o.heute ? ' style="fill:var(--gn-gold-d);font-weight:600"' : '') + '>' + esc(o.x[i]) + '</text>');
       out.push('<rect class="gn-treff" data-gn-i="' + i + '" x="' + f1(xv(i) - dx / 2) + '" y="' + T + '" width="' + f1(dx) + '" height="' + ph + '"/><rect class="gn-hl" x="' + f1(xv(i) - dx / 2) + '" y="' + T + '" width="' + f1(dx) + '" height="' + ph + '"/>');
     }
     out.push('</svg>');
@@ -252,7 +252,7 @@
 
   /* Wasserfall (senkrecht): schritte [{name, wert, art:'start'|'delta'|'summe'}] */
   function wasserfall(o) {
-    var W = o.breite, H = o.hoehe || 240, L = 54, R = 8, T = 18, B = 30;
+    var W = o.breite, H = o.hoehe || 240, L = 54, R = 8, T = 18, B = 34;
     var S = o.schritte, n = S.length, stand = 0, zeilen = [];
     S.forEach(function (s) {
       if (s.art === 'start') { zeilen.push({ a: 0, b: s.wert, s: s }); stand = s.wert; }
@@ -275,7 +275,7 @@
       if (i < n - 1) { var yn = yv(z.b); out.push('<line x1="' + f1(x + bw) + '" x2="' + f1(L + dx * (i + 1) + (dx - bw) / 2) + '" y1="' + f1(yn) + '" y2="' + f1(yn) + '" style="stroke:var(--gn-grau);stroke-width:1;stroke-dasharray:2 2"/>'); }
       var w = z.summe || z.s.art === 'start' ? z.b : z.b - z.a;
       if (!schmal || z.summe) out.push('<text class="gn-wert" x="' + f1(x + bw / 2) + '" y="' + f1(Math.max(T - 4, yt - 5)) + '" text-anchor="middle">' + kurzEur(w) + '</text>');
-      out.push('<text class="gn-ax" x="' + f1(x + bw / 2) + '" y="' + (H - 12) + '" text-anchor="middle">' + esc(z.s.name) + '</text>');
+      out.push('<text class="gn-ax" x="' + f1(x + bw / 2) + '" y="' + (H - (schmal && i % 2 ? 2 : 14)) + '" text-anchor="middle">' + esc(schmal && z.s.kurz ? z.s.kurz : z.s.name) + '</text>');
       out.push('<rect class="gn-treff" data-gn-i="' + i + '" x="' + f1(L + dx * i) + '" y="' + T + '" width="' + f1(dx) + '" height="' + ph + '"/><rect class="gn-hl" x="' + f1(L + dx * i) + '" y="' + T + '" width="' + f1(dx) + '" height="' + ph + '"/>');
     });
     out.push('</svg>');
@@ -409,11 +409,11 @@
   function bruecke(k, w, J) {
     var H = heuteJahr(), r = J.filter(function (x) { return x.j === H; })[0] || J[0]; if (!r || r.nkm == null || r.cfop == null) { k.innerHTML = ''; return; }
     var rest = r.cfop - (r.nkm - (r.bwk || 0) - (r.zins || 0) - (r.tilg || 0));
-    var S = [{ name: 'Miete', wert: r.nkm, art: 'start' }, { name: 'Kosten', wert: -(r.bwk || 0) }, { name: 'Zins', wert: -(r.zins || 0) }, { name: 'Tilgung', wert: -(r.tilg || 0) }];
-    if (Math.abs(rest) >= 1) S.push({ name: 'Sonstiges', wert: rest });
-    S.push({ name: 'vor Steuer', art: 'summe' });
+    var S = [{ name: 'Miete', wert: r.nkm, art: 'start' }, { name: 'Kosten', wert: -(r.bwk || 0) }, { name: 'Zins', wert: -(r.zins || 0) }, { name: 'Tilgung', kurz: 'Tilg.', wert: -(r.tilg || 0) }];
+    if (Math.abs(rest) >= 1) S.push({ name: 'Sonstiges', kurz: 'Sonst.', wert: rest });
+    S.push({ name: 'vor Steuer', kurz: 'vor St.', art: 'summe' });
     var st = r.cfns != null ? r.cfns - r.cfop : null;
-    if (st != null && Math.abs(st) >= 1) { S.push({ name: 'Steuer', wert: st }); S.push({ name: 'nach Steuer', art: 'summe' }); }
+    if (st != null && Math.abs(st) >= 1) { S.push({ name: 'Steuer', wert: st }); S.push({ name: 'nach Steuer', kurz: 'nach St.', art: 'summe' }); }
     var wf = wasserfall({ breite: w, hoehe: 250, schritte: S, aria: 'Cashflow-Brücke ' + r.j });
     /* Prüfung: die Brücke endet beim Cashflow der App */
     var ende = wf.zeilen[wf.zeilen.length - 1].b, soll = st != null && Math.abs(st) >= 1 ? r.cfns : r.cfop;
