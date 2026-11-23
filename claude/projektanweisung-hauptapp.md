@@ -45213,3 +45213,9 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Commit:** main fd4728e (staging bb1bad1).
 - **Nachweis:** jahresabgleich 137/137, vivi 298, vivi-copilot 39/39, jahresbuch 54/54, steuerjahr 36, ki-deckel gruen, Buster sauber, Gold-Audit RC 0, deploy-staging gruen. Prod: Backend healthy, vivi-copilot v4130a, jahresabschluss v4110a, vivi-nk-anpassung v4120 ausgeliefert, keine neuen Fehler.
 - **Rest:** Co-Pilot-Fragefeld bei 390 px nicht im Browser gemessen · Zaehler-Werkzeug fehlt (Antwort /meters nicht beschrieben) · Kappungsgrenzen HE laufen am 25.11.2026 aus (Jahreswerte-Hinweis).
+
+### Rollout 1.0.151 · 23.11.2026 · v4042d, v4140, Kappung HE
+- **Was:** v4042d Kennzahlen-Tabelle Ankauf/Bestand/Zielbild bei ETW wieder da (v4042c brach bei d.auf = null ab, TypeError in siTabelle, seit Prod 1.0.146) · Kappungsgrenzen HE nach MiSchuV vom 17.11.2026 (GVBl. 2026 Nr. 78, in Kraft 20.11.2026, 71 Gemeinden), BW-Nachfolge ab 01.01.2027 vorgemerkt (Umstellung bis 31.12.2026 faellig) · v4140 neue Grafiken Pilot-Analyse und Portfolio-Cockpit hinter Vorschau grafiken_neu (Kunden sehen nichts), dashboard.js: zins_prozent "3,8" wurde 38, zinsbindung_bis war null.
+- **Commit:** main 62f60fa (staging 31cd60a).
+- **Nachweis:** deploy-staging gruen, vorschau 13/13 Gegenprobe, kappungsgrenzen HE 71/71, mietpotenzial 298, jahresabgleich 137, Gold-Audit RC 0. Prod: Backend healthy, pilot-analyse-v4 v4042d und grafiken-neu v4140d ausgeliefert, keine neuen Fehler.
+- **Rest:** BW-Umstellung Kehl/Konstanz/Mannheim bis 31.12.2026 · messe-app-zahlen und mietspiegel-naeherung nicht neu erzeugt.
