@@ -1,10 +1,10 @@
 {
- "erzeugt_am": "2026-11-22T16:20:48.463Z",
+ "erzeugt_am": "2026-11-23T06:44:50.410Z",
  "quellen": {
   "voice-import": "a8a2e6dba58ea42c",
   "objektart-felder": "16af21246a92d8f6",
-  "storage": "69c6758ad30f5ae8",
-  "index-html": "ccee03f9920d433d",
+  "storage": "4e70a1ebdc70ae36",
+  "index-html": "a6f95532f278d583",
   "grest": "81f3fb0a4de3a6cf"
  },
  "daten": {
@@ -699,6 +699,14 @@
    "d1_verwendung",
    "d2_verwendung",
    "d1_tf_mon",
+   "d1_kurs",
+   "d1_bz_frei",
+   "d1_bz_satz",
+   "d1_st_pct",
+   "d2_kurs",
+   "d2_bz_frei",
+   "d2_bz_satz",
+   "d2_st_pct",
    "halter",
    "halter_seit",
    "obj_herkunft",
@@ -2558,6 +2566,46 @@
     "id": "d1_tf_mon",
     "kind": "text",
     "label": "Tilgungsfrei"
+   },
+   {
+    "id": "d1_kurs",
+    "kind": "text",
+    "label": "Auszahlungskurs"
+   },
+   {
+    "id": "d1_bz_frei",
+    "kind": "text",
+    "label": "Bereitstellungsfrei"
+   },
+   {
+    "id": "d1_bz_satz",
+    "kind": "text",
+    "label": "Bereitstellungszins"
+   },
+   {
+    "id": "d1_st_pct",
+    "kind": "text",
+    "label": "Sondertilgungsrecht"
+   },
+   {
+    "id": "d2_kurs",
+    "kind": "text",
+    "label": "Auszahlungskurs"
+   },
+   {
+    "id": "d2_bz_frei",
+    "kind": "text",
+    "label": "Bereitstellungsfrei"
+   },
+   {
+    "id": "d2_bz_satz",
+    "kind": "text",
+    "label": "Bereitstellungszins"
+   },
+   {
+    "id": "d2_st_pct",
+    "kind": "text",
+    "label": "Sondertilgungsrecht"
    },
    {
     "id": "halter",
