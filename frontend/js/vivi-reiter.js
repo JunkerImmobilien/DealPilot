@@ -17,7 +17,7 @@
  * ═══════════════════════════════════════════════════════════════════════════════════════════════════════════════ */
 (function (global) {
   'use strict';
-  var VERSION = 'v4040a';
+  var VERSION = 'v4040b';
   if (!global.document || global.DpViviReiter) return;
   var doc = global.document;
   var _jahr = null, _offen = {};
@@ -100,6 +100,8 @@
     if (z.aktion === 'laufend') return '<span class="vr-grau">' + (istZahl(z.abwBisHeute) ? vz(z.abwBisHeute) + ' bis heute' : 'läuft') + '</span>';
     if (z.aktion === 'vergleich') return '<span class="vr-grau">' + vz(z.abw) + '</span>';
     if (z.aktion === 'ausserhalb' || z.aktion === 'ohne_posten') return '<span class="vr-grau">' + (istZahl(z.abw) ? vz(z.abw) : 'offen') + '</span>';
+    /* Belegzeilen: ViVi-Belege kommen DAZU (Kern: addieren), die Zahl ist die Summe der neuen Belege, nicht die Differenz */
+    if (z.modus === 'addieren') return '<span class="vr-ab">' + z.neu.length + ' neu</span><small>' + vz(z.abw) + (z.ersetztSchaetzung ? ', ersetzt die Schätzung' : '') + '</small>';
     return '<span class="vr-ab">' + vz(z.abw) + '</span>';
   }
   function mieteZeile(jahr) {
@@ -111,7 +113,7 @@
     if (!z || !vj || !istZahl(vj.miete)) return '';
     var d = istZahl(z.miete_ist) ? z.miete_ist - vj.miete : null;
     var st = d == null ? '<span class="vr-grau">kein Ist</span>' : Math.abs(d) < 1 ? '<span class="vr-ok">✓ gleich</span>' : '<span class="vr-ab">' + vz(-d) + '</span>';
-    var her = JB.istHerkunft ? JB.istHerkunft(jahr) : '';
+    var her = JB.istHerkunft ? ({ eigen: 'eingetragen', vivi: 'aus ViVi' })[JB.istHerkunft(jahr)] || 'gerechnet' : '';
     return '<tr><td><b>Miete im Jahr</b><small>Reiter Miete' + (her ? ', ' + esc(her) : '') + '</small></td><td>' + eur(z.miete_ist) + '</td><td>' + eur(vj.miete) + '</td><td>' + st + '</td><td></td></tr>';
   }
   function viviDaten() {
