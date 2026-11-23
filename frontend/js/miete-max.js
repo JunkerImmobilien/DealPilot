@@ -54,7 +54,8 @@
         var vm = zahl(so.vertrag_monat);
         if (vm > ist + 0.5) b = { monat: r2(vm), mehr: true, art: 'vertrag', ab: so.ab_text || '', grenze: so.vertrag_text || 'laut Vertrag' };
       } else if (so.miete != null && zahl(so.miete) > ist + 0.5) {
-        b = { monat: r2(zahl(so.miete)), mehr: true, art: '558', ab: so.ab_text || '', grenze: so.grenze || '' };
+        b = { monat: r2(zahl(so.miete)), mehr: true, art: '558', ab: so.ab_text || '', grenze: so.grenze || '',
+          umlage559: so.umlage559 && zahl(so.umlage559.monat) > 0.5 ? r2(zahl(so.umlage559.monat)) : 0 };
       }
       var ix = w.index && w.index.ok && w.index.naechste ? w.index.naechste : null;
       if (ix && zahl(ix.miete_neu) > b.monat + 0.5) b = { monat: r2(zahl(ix.miete_neu)), mehr: true, art: 'index', ab: ix.wirksam || '', grenze: 'Indexanpassung' };
@@ -63,8 +64,8 @@
     /* 2 · Neuvermietung: Bremse = Vergleichsmiete + 10 %, sonst die gewählte Grenze (Vorgabe 120 %) */
     var n = null;
     if (wfl > 0) {
-      if (brGilt === true && zahl(d.obergrenze) > 0) n = { qm: r2(zahl(d.obergrenze)), regel: 'Mietpreisbremse, Vergleichsmiete plus 10 % (§ 556d BGB)', kurz: '110 %, Mietpreisbremse' };
-      else if (vgl > 0) n = { qm: r2(vgl * fo), regel: (brGilt === false ? 'keine Mietpreisbremse, ' : 'Mietpreisbremse nicht geprüft, ') + pct + ' % der Vergleichsmiete (§ 5 WiStG)', kurz: pct + ' %, ohne Bremse' };
+      if (brGilt === true && zahl(d.obergrenze) > 0) n = { qm: r2(zahl(d.obergrenze)), regel: 'Mietpreisbremse, Vergleichsmiete plus 10 % nach § 556d BGB', kurz: '110 %, Mietpreisbremse' };
+      else if (vgl > 0) n = { qm: r2(vgl * fo), regel: (brGilt === false ? 'keine Mietpreisbremse, ' : 'Mietpreisbremse nicht geprüft, ') + pct + ' % der Vergleichsmiete nach § 5 WiStG', kurz: pct + ' %, ohne Bremse' };
       if (n) { n.monat = r2(n.qm * wfl); n.mehr = n.monat > Math.max(ist, b.monat) + 0.5; }
     }
 
@@ -79,7 +80,7 @@
     } else {
       if (b.mehr) {
         s = (b.art === '558' ? 'Mieterhöhung auf ' : b.art === 'index' ? 'Indexanpassung auf ' : 'Nächste Stufe laut Vertrag auf ')
-          + eur(b.monat) + ' möglich (plus ' + eur(b.monat - ist) + ' im Monat' + (b.ab ? ', ' + b.ab : '') + ').';
+          + eur(b.monat) + ' möglich (plus ' + eur(b.monat - ist) + ' im Monat' + (b.umlage559 ? ', davon ' + eur(b.umlage559) + ' Modernisierungsumlage nach § 559 BGB' : '') + (b.ab ? ', ' + b.ab : '') + ').';
       } else if (vgl > 0 && istQ > vgl + 0.005) {
         s = 'Die Miete liegt bereits über der ortsüblichen Vergleichsmiete (bis ' + qm(vgl) + '). Eine Erhöhung nach § 558 BGB ist nicht möglich.';
       } else if (so.vertrag) {
