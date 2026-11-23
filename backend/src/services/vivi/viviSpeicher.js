@@ -59,6 +59,26 @@ async function zuordnen(userId, objectId, viviObjektId, accountId) {
   return r.rows[0] || null;
 }
 
+/* v4050 · Import: das DealPilot-Objekt entsteht aus einem ViVi-Objekt. Die Verknuepfung ist sofort fertig (nichts wird
+   in ViVi angelegt). null, wenn dieses ViVi-Objekt beim Nutzer schon verknuepft ist (UNIQUE user_id, vivi_objekt_id). */
+async function importVerknuepfen(userId, objectId, viviObjektId, accountId, viviIds) {
+  const r = await q(
+    `INSERT INTO vivi_verknuepfung (object_id, user_id, vivi_objekt_id, vivi_account_id, vivi_ids, herkunft, anlage_status)
+     VALUES ($1, $2, $3, $4, $5::jsonb, 'importiert', 'fertig')
+     ON CONFLICT DO NOTHING RETURNING *`, [objectId, userId, String(viviObjektId), accountId || null, JSON.stringify(viviIds || {})]);
+  return r.rows[0] || null;
+}
+/* v4050 · alle ViVi-Objekt-IDs, die der Nutzer schon verknuepft hat (auch Kundenstaende, damit nichts doppelt kommt) */
+async function verknuepfteViviIds(userId) {
+  const r = await q('SELECT vivi_objekt_id FROM vivi_verknuepfung WHERE user_id = $1 AND vivi_objekt_id IS NOT NULL', [userId]);
+  return r.rows.map(function (x) { return String(x.vivi_objekt_id); });
+}
+/* v4050 · Felder am Objekt ergaenzen (oberste Ebene, jsonb ||). Nur fuer den Import: Bewirtschaftung zum Kaufdatum. */
+async function objektDatenErgaenzen(userId, objectId, patch) {
+  if (!patch || !Object.keys(patch).length) return;
+  await q('UPDATE objects SET data = data || $3::jsonb, version = version + 1, updated_at = now() WHERE id = $1 AND user_id = $2', [objectId, userId, JSON.stringify(patch)]);
+}
+
 /* Loest NUR die DealPilot-Seite. In ViVi bleibt alles, wie es ist. */
 async function loesen(userId, objectId) {
   const r = await q('DELETE FROM vivi_verknuepfung WHERE object_id = $1 AND user_id = $2 RETURNING object_id', [objectId, userId]);
@@ -149,6 +169,7 @@ async function protokoll(eintrag) {
 }
 
 module.exports = {
+  importVerknuepfen, verknuepfteViviIds, objektDatenErgaenzen,
   objektHolen, verknuepfung, beanspruchen, idsSpeichern, statusSetzen, zuordnen, loesen,
   werteSchreiben, werteErgaenzen, steuerSchreiben, einstellungLesen, einstellungSchreiben, abrufFehler, werteLesen, verknuepfteObjekte, faelligeAbrufe, protokoll, ABGEBROCHEN_NACH_MIN
 };

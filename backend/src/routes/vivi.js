@@ -9,6 +9,8 @@
  *   POST   /verbindung/probe            Probeabruf GET /accounts bei ViVi
  *   GET    /projekte?account_id=        ViVi-Objekte zum Zuordnen (nur lesen)
  *   GET    /objekte                     verknuepfte DealPilot-Objekte des Nutzers
+ *   GET    /importierbar?account_id=    v4050 · ViVi-Objekte ohne Verknuepfung, mit Kurzvorschau (nur lesen)
+ *   POST   /importieren     {vivi_id}   v4050 · EIN ViVi-Objekt als gewonnenes DealPilot-Objekt anlegen (ViVi nur lesen)
  *   POST   /objekt/:id/vorschau         welche Felder an ViVi gehen wuerden (schickt nichts)
  *   POST   /objekt/:id/anlegen          EINMAL anlegen (409, wenn schon verknuepft)
  *   POST   /objekt/:id/zuordnen         vorhandenes ViVi-Objekt verknuepfen (schickt nichts an ViVi)
@@ -61,6 +63,17 @@ router.post('/verbindung/probe', bremse, function (req, res, next) {
 });
 router.get('/projekte', bremse, function (req, res, next) {
   dienst.projekte(uid(req), req.query.account_id ? String(req.query.account_id) : null).then(function (r) { res.json(r); }).catch(antwort(res, next));
+});
+/* v4050 · Objekte aus ViVi uebernehmen: Liste der noch nicht verknuepften ViVi-Objekte (nur GET bei ViVi) und Import EINES
+   Objekts je Aufruf (der Browser zaehlt den Fortschritt). Kein Schreibzugriff auf ViVi. */
+router.get('/importierbar', bremse, function (req, res, next) {
+  dienst.importierbar(uid(req), req.query.account_id ? String(req.query.account_id) : null).then(function (r) { res.set('Cache-Control', 'no-store'); res.json(r); }).catch(antwort(res, next));
+});
+router.post('/importieren', bremse, function (req, res, next) {
+  const b = req.body || {};
+  const vid = b.vivi_id != null ? b.vivi_id : (Array.isArray(b.ids) && b.ids.length === 1 ? b.ids[0] : null);
+  if (vid == null || !/^[A-Za-z0-9_-]{1,64}$/.test(String(vid))) return res.status(400).json({ error: 'Bitte genau ein ViVi-Objekt angeben.', code: 'vivi_id_ungueltig' });
+  dienst.importieren(uid(req), String(vid), b.account_id ? String(b.account_id) : null).then(function (r) { res.json(r); }).catch(antwort(res, next));
 });
 router.get('/objekte', function (req, res, next) {
   require('../services/vivi/viviSpeicher').verknuepfteObjekte(uid(req)).then(function (r) { res.json({ objekte: r }); }).catch(antwort(res, next));

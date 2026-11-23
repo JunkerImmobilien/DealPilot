@@ -109,8 +109,9 @@
           '<button type="button" class="btn btn-sm btn-ghost" id="pk-vivi-probe">Verbindung testen</button>' +
           '<button type="button" class="btn btn-sm" id="pk-vivi-loeschen" style="color:#B8625C;border:1px solid #e3c9c4;background:#fff">Token löschen</button></div>' +
         '<div id="pk-vivi-ergebnis" class="hint" style="margin-top:8px"></div><div id="pk-vivi-objekte" class="hint" style="margin-top:8px"></div>' +
-        '<div id="pk-vivi-steuer"></div>';   /* v4020 · Steuerjahre aus ViVi: aus, Vorschlag, automatisch, je Kategorie (js/vivi-steuer-abgleich.js, nicht bei Einsteiger) */
+        '<div id="pk-vivi-steuer"></div><div id="pk-vivi-import-host"></div>';   /* v4050 · Objekte aus ViVi uebernehmen (js/vivi-import.js) */   /* v4020 · Steuerjahre aus ViVi: aus, Vorschlag, automatisch, je Kategorie (js/vivi-steuer-abgleich.js, nicht bei Einsteiger) */
       try { if (window.DpViviSteuer) window.DpViviSteuer.einstellungKarte($('pk-vivi-steuer')); } catch (e) {}
+      try { if (window.DpViviImport) window.DpViviImport.karte($('pk-vivi-import-host')); } catch (e) {}
       $('pk-vivi-probe').onclick = function () { probe(false); };
       $('pk-vivi-loeschen').onclick = function () {
         if (!confirm('ViVi-Token in DealPilot löschen? Verknüpfte Objekte bleiben verknüpft, werden aber nicht mehr gelesen.')) return;
@@ -207,10 +208,16 @@
       return api('/vivi/objekt/' + encodeURIComponent(key) + '/werte').then(function (r) {
         if (window._currentObjKey !== key) return;
         if (r && r.verknuepft) {
-          werteAnwenden(r);
-          var alt = !r.letzter_abruf || (Date.now() - new Date(r.letzter_abruf).getTime() > ABGLEICH_NACH_MS);
-          if (alt) abgleichen(true);
-          return;
+          /* v4050 · importiertes Objekt: erst den Ankauf zum Kaufdatum festschreiben (Formular = Stand zum Kauf),
+             dann die Werte von heute darueber (js/vivi-import.js) */
+          var vor = (window.DpViviImport && r.herkunft === 'importiert') ? window.DpViviImport.vorAnwenden(key, r) : Promise.resolve(false);
+          return vor.then(function (neuFest) {
+            if (window._currentObjKey !== key) return;
+            werteAnwenden(r);
+            if (neuFest && typeof window.saveObj === 'function') setTimeout(function () { try { if (window._currentObjKey === key) window.saveObj(true); } catch (e) {} }, 500);
+            var alt = !r.letzter_abruf || (Date.now() - new Date(r.letzter_abruf).getTime() > ABGLEICH_NACH_MS);
+            if (alt) abgleichen(true);
+          });
         }
         _stand = r;
         if (window.DpViviFelder) window.DpViviFelder.setzen(r);

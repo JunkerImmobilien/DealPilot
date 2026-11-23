@@ -26,6 +26,7 @@ const PAUSE_MS = 1500;            /* zwischen zwei Objekten im Takt */
 const STANDARD = {
   get speicher() { return require('./viviSpeicher'); },
   get creds() { return require('../providerCredentialsService'); },
+  get objekte() { return require('../objectService'); },   /* v4050 · nur der Import legt ein Objekt an */
   client: function (token, opt) { return viviClient.erzeugen(token, opt); },
   jetzt: function () { return Date.now(); },
   /* v3951 · Testbetrieb: solange 'vivi' als Vorschau-Funktion gefuehrt und nicht fuer alle freigegeben ist */
@@ -491,7 +492,7 @@ async function werte(userId, objectId) {
   });
   return {
     verknuepft: v.anlage_status === 'fertig', status: v.anlage_status, herkunft: v.herkunft,
-    muster_anschrift: !!(v.vivi_ids && v.vivi_ids.muster_anschrift),
+    muster_anschrift: !!(v.vivi_ids && v.vivi_ids.muster_anschrift), import: (v.vivi_ids && v.vivi_ids.import) || null,   /* v4050 · Kaufdatum des Imports, js/vivi-import.js */
     vivi_objekt_id: v.vivi_objekt_id, letzter_abruf: v.letzter_abruf, letzter_fehler: v.letzter_fehler,
     felder: felder, info: info,
     steuer: steuerJahre, steuer_stand: steuerStand, steuer_einstellung: v.anlage_status === 'fertig' ? await steuerEinstellung(userId) : null
@@ -611,8 +612,113 @@ async function mieterhoehung(userId, objectId, opt) {
   }
 }
 
+/* ══ v4050 · OBJEKTE AUS ViVi ÜBERNEHMEN (Import) ═════════════════════════════════════════════════════════════
+   Marcel 23.11.2026: Objekte, die schon (auch seit Jahren) in ViVi verwaltet werden, als gewonnene Bestandsobjekte in
+   DealPilot anlegen, rückwirkend mit eingefrorenem Ankauf, Auswahl alle oder einzeln, aus den Einstellungen.
+   ViVi wird dabei NUR GELESEN (GET). Ausnahme von Regel 3 oben: der Import legt das DealPilot-Objekt an (objectService,
+   derselbe Weg wie jedes neue Objekt) und ergänzt einmal die Bewirtschaftung zum Kaufdatum. Danach gilt wieder: die
+   ViVi-Werte liegen in vivi_werte, der Browser setzt sie (js/vivi.js, js/vivi-import.js friert vorher den Ankauf ein). */
+const IMPORT_VORSCHAU_MAX = 15;   /* je Liste hoechstens so viele ViVi-Objekte im Detail (3 Abrufe je Objekt, Bremse 50/min) */
+
+async function importierbar(userId, accountId) {
+  const cl = deps().client(await token(userId), { maxWarten: 65000 });
+  const q = abfrage(accountId || null);
+  const L = liste(await cl.get('/projects', q));
+  const verkn = new Set(await deps().speicher.verknuepfteViviIds(userId));
+  const offen = L.filter(function (p) { return p && p.id != null && !verkn.has(String(p.id)); });
+  const heute = new Date(deps().jetzt()).toISOString().slice(0, 10);
+  const aus = [];
+  for (const p0 of offen.slice(0, IMPORT_VORSCHAU_MAX)) {
+    const P = '/projects/' + encodeURIComponent(String(p0.id));
+    const projekt = ((await cl.get(P, q)) || {}).data || p0;
+    const units = Array.isArray(projekt.units) ? projekt.units : liste(await cl.get(P + '/units', q));
+    const miet = liste(await cl.get(P + '/rental-units', q));
+    const plan = mapping.importDaten({ projekt: projekt, einheiten: units, mietverhaeltnisse: miet, darlehen: [] }, { jetzt: deps().jetzt() });
+    let miete = 0, vermietet = 0;
+    miet.forEach(function (r) { const m = mapping.mieteImMonat(r, null, heute, true); if (m != null) { miete += m; vermietet++; } });
+    aus.push({
+      vivi_id: String(p0.id), name: plan.kurz.name || p0.name || '', objart: plan.objart, einheiten: plan.kurz.einheiten,
+      vermietet_heute: vermietet, kaufdatum: plan.kurz.kaufdatum, kaufpreis: plan.kurz.kaufpreis,
+      miete_heute: Math.round(miete * 100) / 100,
+      importierbar: !!plan.objart, grund: plan.objart ? null : 'Objektart in ViVi unbekannt',
+      fehlt: plan.fehlt_bewertung.map(function (x) { return x.text; })
+    });
+  }
+  return { objekte: aus, weitere: Math.max(0, offen.length - aus.length), verknuepft: verkn.size };
+}
+
+/* Bewirtschaftung ZUM KAUF aus den gelesenen Steuerjahren: das erste volle Jahr nach dem Kaufjahr, sonst das Kaufjahr
+   selbst, nicht hochgerechnet (ViVi bucht das Hausgeld oft einmal im Jahr, gemessen 1183 am 15.12.2025). */
+function bewirtschaftungZumKauf(zeilen, kauf, jetzt) {
+  const m = /^(\d{4})-(\d{2})/.exec(String(kauf || '')); if (!m) return null;
+  const felder = {}, J = {};
+  (zeilen || []).forEach(function (z) { if (z && z.jahr) { felder[z.feld] = z.wert; J[+z.jahr] = true; } });
+  const heute = new Date(jetzt == null ? Date.now() : jetzt).getFullYear();
+  const kj = +m[1];
+  const jahr = (J[kj + 1] && kj + 1 < heute) ? kj + 1 : (J[kj] ? kj : null);
+  if (jahr == null) return null;
+  const bw = steuer.bewirtschaftungAus(felder, jahr, 12);
+  const out = {};
+  Object.keys(bw).forEach(function (k) { out[k] = String(bw[k].wert); });
+  return Object.keys(out).length ? { jahr: jahr, felder: out } : null;
+}
+
+async function importieren(userId, viviId, accountId) {
+  if (viviId == null || String(viviId).trim() === '') throw fehler(400, 'vivi_id_fehlt', 'Welches ViVi-Objekt soll übernommen werden?');
+  viviId = String(viviId);
+  const sp = deps().speicher;
+  if ((await sp.verknuepfteViviIds(userId)).indexOf(viviId) >= 0) throw fehler(409, 'bereits_verknuepft', 'Dieses ViVi-Objekt ist schon mit einem DealPilot-Objekt verknüpft.');
+  const cl = deps().client(await token(userId), { maxWarten: 65000 });
+  const vorher = cl.zaehler.anfragen, t0 = deps().jetzt();
+  const q = abfrage(accountId || null);
+  const P = '/projects/' + encodeURIComponent(viviId);
+  try {
+    const projekt = ((await cl.get(P, q)) || {}).data || {};
+    const einheiten = Array.isArray(projekt.units) ? projekt.units : liste(await cl.get(P + '/units', q));
+    const miet = liste(await cl.get(P + '/rental-units', q));
+    const darl = liste(await cl.get(P + '/financings', q));
+    const kauf = mapping.isoDatum(projekt.purchase_date);
+    const mietverlauf = {};
+    for (const r of miet) {
+      if (!r || r.id == null || (kauf && r.rental_end && String(r.rental_end).slice(0, 10) < kauf)) continue;
+      try { mietverlauf[r.id] = ((await cl.get(P + '/rental-units/' + encodeURIComponent(String(r.id)) + '/rent-history', q)) || {}).data || null; }
+      catch (e) { if (e && (e.code === 'bremse_429' || e.code === 'bremse_lokal' || e.code === 'nicht_berechtigt')) throw e; }
+    }
+    const plan = mapping.importDaten({ projekt: projekt, einheiten: einheiten, mietverhaeltnisse: miet, darlehen: darl, mietverlauf: mietverlauf }, { jetzt: deps().jetzt() });
+    if (!plan.ok) throw fehler(422, 'objektart_unbekannt', 'Die Objektart dieses ViVi-Objekts kennt DealPilot nicht. Bitte in ViVi die Art setzen.');
+    plan.vivi_ids.import.am = new Date(deps().jetzt()).toISOString();
+    const neu = await deps().objekte.create(userId, { data: plan.daten, photos: [] });
+    const v = await sp.importVerknuepfen(userId, neu.id, viviId, accountId || null, plan.vivi_ids);
+    if (!v) {
+      /* gleichzeitig schon verknuepft: das neue Objekt nicht loeschen (nie endgueltig), sondern als verloren markieren */
+      await sp.objektDatenErgaenzen(userId, neu.id, { _deal_won: false, _deal_lost: true });
+      throw fehler(409, 'bereits_verknuepft', 'Dieses ViVi-Objekt wurde gerade schon übernommen.');
+    }
+    await sp.protokoll({ user_id: userId, object_id: neu.id, art: 'import', anfragen: cl.zaehler.anfragen - vorher, ok: true, dauer_ms: deps().jetzt() - t0 });
+    /* die Werte von heute und die Steuerjahre: derselbe Abgleich wie bei jedem verknuepften Objekt */
+    let abgleich = { ok: true, fehler: null };
+    try { await abrufen(userId, neu.id, { client: cl }); }
+    catch (e) { abgleich = { ok: false, fehler: (e && e.message) || 'Abgleich fehlgeschlagen' }; }
+    let bw = null;
+    try {
+      bw = bewirtschaftungZumKauf(await sp.werteLesen(neu.id), plan.stichtag, deps().jetzt());
+      if (bw) await sp.objektDatenErgaenzen(userId, neu.id, bw.felder);
+    } catch (e) { bw = null; }
+    const fehlt = mapping.importFehlt(Object.assign({}, plan.daten, bw ? bw.felder : {}), plan.objart);
+    return {
+      ok: true, objekt_id: neu.id, seq: neu.seq_no, name: plan.kurz.name, objart: plan.objart, stichtag: plan.stichtag,
+      einheiten: plan.kurz.einheiten, bewirtschaftung_jahr: bw ? bw.jahr : null, abgleich: abgleich, fehlt_bewertung: fehlt
+    };
+  } catch (e) {
+    if (e && (e.code === 'bereits_verknuepft' || e.code === 'objektart_unbekannt')) throw e;
+    const a = alsAntwort(e);
+    await sp.protokoll({ user_id: userId, object_id: null, art: 'import', anfragen: cl.zaehler.anfragen - vorher, bremse_429: cl.zaehler.bremse429, ok: false, fehler: a.message, dauer_ms: deps().jetzt() - t0 });
+    throw a;
+  }
+}
+
 module.exports = {
   ANBIETER, verbindungMeta, verbindungSpeichern, verbindungLoeschen, probe, vorschau, anlegen, zuordnen, projekte,
   abrufen, werte, loesen, taktLauf, starteTakt, _setzeDeps, alsAntwort, planOptionen,
-  steuerEinstellung, steuerEinstellungSpeichern, steuerLesen, mieterhoehung, MIET_ART
+  steuerEinstellung, steuerEinstellungSpeichern, steuerLesen, mieterhoehung, MIET_ART, importierbar, importieren, bewirtschaftungZumKauf, IMPORT_VORSCHAU_MAX
 };

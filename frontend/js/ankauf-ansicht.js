@@ -240,6 +240,7 @@
       + felderZahl + ' Felder'
       + (a.daten && a.daten._ai ? ', inklusive Pilot-Analyse' : '')
       + (korr ? ' · ' + korr + (korr === 1 ? ' Korrektur' : ' Korrekturen') : '')
+      + (a.vermerk ? '. ' + a.vermerk : '')   /* v4050 · Import aus ViVi: Ankauf rueckwirkend zum Kaufdatum */
       + '.\nIst = der laufende Stand von heute, frei zu pflegen.';
     var wahl = '<div class="ank-wahl" role="group" aria-label="Stand">'
       + '<button type="button" class="ank-seg' + (_aktiv ? '' : ' aktiv') + '" data-ank-stand="ist">Ist · heute</button>'

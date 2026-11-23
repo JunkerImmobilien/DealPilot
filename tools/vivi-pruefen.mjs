@@ -1321,6 +1321,103 @@ kopf('V  v4040 Reiter ViVi, Bewirtschaftung Ist heute aus dem Steuerjahr');
     && /if \(!ziel \|\| !global\.DPVST_IM_JAHRESABGLEICH\) return;/.test(vst3) && /abweichungen: abweichungen/.test(vr3),
     'N18 Jahresabgleich: eine Zeile je Jahr „ViVi: n Abweichungen“ mit Absprung in den Reiter, keine Spalte und keine Steuerkarte laut ViVi mehr');
 }
+/* ═══ I1–I14 · v4050 · Objekte aus ViVi übernehmen (Import, Ankauf rückwirkend) ═══════════════════════════════════
+   Erfundene Daten. Kauf 01.05.2023, Mieterhöhung danach (520 → 600 am 01.03.2024), eine Wohnung erst nach dem Kauf
+   vermietet. Der Datensatz muss den Stand ZUM KAUFDATUM tragen, die Werte von heute kommen über den Abgleich. */
+{
+  kopf('I · Objekte aus ViVi übernehmen (v4050)');
+  const PRJ = { id: 'prj_T1', name: 'Teststadt - Probeweg 5', type: 'multi_family_house', street: 'Probeweg', house_number: '5', postal_code: '12345', city: 'Teststadt',
+    construction_year: 1965, purchase_date: '2023-05-01', purchase_price: 400000, broker: 14280, real_estate_transfer_tax: 26000, notary: 6000, land_register: 2000, other_costs: 0,
+    units: [{ id: 'u1', identifier: 'WE 1 EG', unit_type: 'residential', square_meters: 60, rooms: 2, floor: 'EG' },
+      { id: 'u2', identifier: 'WE 2 OG', unit_type: 'residential', square_meters: 70, rooms: 3, floor: '1. OG' },
+      { id: 'u3', identifier: 'WE 3 DG', unit_type: 'residential', square_meters: 50, rooms: 2, floor: 'DG' },
+      { id: 'k1', identifier: 'Keller', unit_type: 'ancillary', square_meters: 10 }] };
+  const MIET = [
+    { id: 'r1', unit_id: 'u1', tenant_first_name: 'Erika', tenant_last_name: 'Probefrau', tenant_email: 'probe@example.test', tenant_phone: '0000', tenant_date_of_birth: '1970-01-01',
+      rent: 600, monthly_utility_costs: 150, rental_start: '2015-01-01', occupancy_type: 'rented', deposit_amount: 1560 },
+    { id: 'r2', unit_id: 'u2', tenant_last_name: 'Testmann', rent: 700, monthly_utility_costs: 170, rental_start: '2020-06-01', occupancy_type: 'rented' },
+    { id: 'r3', unit_id: 'u3', tenant_last_name: 'Neumieter', rent: 450, monthly_utility_costs: 120, rental_start: '2024-01-01', occupancy_type: 'rented' }];
+  const VERLAUF = { r1: { start_state: { rent: 520 }, rent_changes: [{ id: 9, effective_date: '2024-03-01', previous_rent: 520, new_rent: 600, status: 'active', adjustment_type: 'comparable_rent' }] }, r2: null, r3: { start_state: { rent: 450 }, rent_changes: [] } };
+  const FIN = [{ id: 'f1', name: 'Darlehen', bank_name: 'Probebank', financing_type: 'primary', financing_amount: 300000, interest_rate: 4.1, initial_repayment: 2, fixed_interest_period: 10, financing_start_date: '2023-05-01' },
+    { id: 'f2', name: 'Anschluss', financing_type: 'follow_up', financing_amount: 250000, interest_rate: 3.5, financing_start_date: '2033-05-01' }];
+  const JETZT = Date.parse('2026-11-23T10:00:00Z');
+  const plan = mapping.importDaten({ projekt: PRJ, einheiten: PRJ.units, mietverhaeltnisse: MIET, darlehen: FIN, mietverlauf: VERLAUF }, { jetzt: JETZT });
+  const d = plan.daten, E = (d._mfh && d._mfh.einheiten) || [];
+  ok(plan.ok && plan.objart === 'MFH' && d._deal_won === true && d.kaufdat === '2023-05-01' && d.wirtschaftlicher_uebergang === '2023-05-01' && plan.stichtag === '2023-05-01',
+    'I1 MFH aus multi_family_house, gewonnen, Kaufdatum = Übergang = Stichtag 01.05.2023');
+  ok(d.kp === '400000' && d.makler_p === '3.57' && d.gest_p === '6.5' && d.notar_p === '1.5' && d.gba_p === '0.5' && d.baujahr === '1965' && d.str === 'Probeweg' && d.plz === '12345',
+    'I2 Kaufpreis und Kaufnebenkosten in Prozent (3,57 / 6,5 / 1,5 / 0,5), Baujahr, Anschrift');
+  ok(E.length === 3 && d.einheiten === '3' && E[0].wfl === '60' && E[0].zimmer === '2' && E[0].etage === 'EG' && E[2].lage === 'WE 3 DG',
+    'I3 drei Wohnungen ohne Nebeneinheit (Keller), Fläche, Zimmer, Etage, Lage aus der ViVi-Bezeichnung');
+  ok(E[0].ist === '520' && E[0].status === 'vermietet' && E[1].ist === '700' && E[2].status === 'leer' && E[2].ist == null && d.nkm === '1220' && d.wfl === '180' && d.vermstand === 'Teilweise leer',
+    'I4 Stand ZUM KAUF: WE 1 mit 520 € laut Mietverlauf (heute 600), WE 3 leer (erst 2024 vermietet), Summe 1.220 €, 180 m²');
+  ok(!E[0].mv_letzte_erhoehung && !(E[0].erhoehungen && E[0].erhoehungen.length), 'I5 die Erhöhung vom 01.03.2024 liegt nach dem Kauf und steht nicht im Ankauf-Stand');
+  ok(d.d1 === '300000' && d.d1z === '4.1' && d.d1t === '2' && d.d1_bindj === '10' && d.bank_inst === 'Probebank' && d.d1_auszahl === '05.2023' && !d.d2,
+    'I6 Darlehen I mit Ursprungsbetrag, Zins, Tilgung, Bindung, Bank, Auszahlung, Anschlussfinanzierung nicht als Darlehen II');
+  const txt = JSON.stringify(plan);
+  ok(!/Probefrau|Testmann|Neumieter|Erika|probe@example|1970-01-01/.test(txt), 'I7 keine Mieter-Personendaten (Name, E-Mail, Telefon, Geburtstag) im Datensatz');
+  ok(plan.vivi_ids.projekt === 'prj_T1' && plan.vivi_ids.einheiten.e0.unit_id === 'u1' && plan.vivi_ids.einheiten.e2.index === 2 && plan.vivi_ids.darlehen.d1 === 'f1' && !plan.vivi_ids.darlehen.d2 && plan.vivi_ids.import.kaufdatum === '2023-05-01',
+    'I8 vivi_ids: Projekt, Einheiten mit Index (wie beim Anlegen gemerkt), Darlehen d1, Kaufdatum des Imports');
+  const fT = plan.fehlt_bewertung.map((x) => x.text).join(' | ');
+  ok(/Zustand/.test(fT) && /Modernisierungen/.test(fT) && /Grundstücksgröße/.test(fT) && !/Miteigentumsanteil/.test(fT) && !/Wohnfläche/.test(fT) && !/Kaufpreis/.test(fT) && d.dp_stufe === '2',
+    'I9 Für die Bewertung fehlt: Zustand, Modernisierungen, Grundstück (kein MEA beim Haus), Wohnfläche und Kaufpreis sind da, Detailgrad Fortgeschritten');
+  /* ETW mit Erhöhung VOR dem Kauf */
+  const pE = mapping.importDaten({ projekt: { id: 'prj_E', type: 'apartment', street: 'Probeweg', house_number: '7', postal_code: '12345', city: 'Teststadt', purchase_date: '2024-03-01', purchase_price: 150000,
+      units: [{ id: 'w1', identifier: 'Wohnung', unit_type: 'residential', square_meters: 68, rooms: 3, floor: '2. OG' }] },
+    einheiten: null, mietverhaeltnisse: [{ id: 'q1', unit_id: 'w1', rent: 620, rental_start: '2019-01-01', occupancy_type: 'rented', monthly_utility_costs: 180 }],
+    darlehen: [], mietverlauf: { q1: { start_state: { rent: 520 }, rent_changes: [{ id: 1, effective_date: '2022-07-01', previous_rent: 520, new_rent: 560, status: 'active' }, { id: 2, effective_date: '2025-12-01', previous_rent: 560, new_rent: 620, status: 'active' }] } } }, { jetzt: JETZT });
+  const dE = pE.daten;
+  ok(pE.objart === 'ETW' && dE.nkm === '560' && dE.wfl === '68' && dE.etage === '2' && dE.zimmer === '3' && dE.mv_letzte_erhoehung === '2022-07-01' && !dE._mfh && dE.vermstand === 'Vollvermietet'
+    && Array.isArray(dE._erhoehungen) && dE._erhoehungen.length === 1 && /Miteigentumsanteil/.test(pE.fehlt_bewertung.map((x) => x.text).join()),
+    'I10 ETW: Miete zum Kauf 560 € (vor der Erhöhung 2025 auf 620), letzte Erhöhung 01.07.2022, Etage, Zimmer, MEA fehlt');
+  ok(!mapping.importDaten({ projekt: { id: 'x', type: 'other', units: [] } }, { jetzt: JETZT }).ok, 'I11 Gegenprobe: unbekannte Objektart wird nicht angelegt');
+  /* Bewirtschaftung zum Kauf: erstes volles Jahr nach dem Kaufjahr, nicht hochgerechnet */
+  const zeilen = [
+    { feld: 'steuer.2023.nk_umlf', jahr: 2023, wert: { summe: 900, posten: [{ text: 'Hausgeld (WEG)', betrag: 900 }] } },
+    { feld: 'steuer.2024.nk_umlf', jahr: 2024, wert: { summe: 2252, posten: [{ text: 'Hausgeld (WEG)', betrag: 2040 }, { text: 'Grundsteuer', betrag: 212 }] } },
+    { feld: 'steuer.2024.nk_n_umlf', jahr: 2024, wert: { summe: 1200, posten: [{ text: 'Hausgeld (WEG) nicht umlagefähig', betrag: 1200 }] } }];
+  const bw = dienst.bewirtschaftungZumKauf(zeilen, '2023-05-01', JETZT);
+  const bw2 = dienst.bewirtschaftungZumKauf(zeilen.slice(0, 1), '2023-05-01', JETZT);
+  ok(bw && bw.jahr === 2024 && bw.felder.hg_ul === '2040' && bw.felder.hg_nul === '1200' && bw.felder.grundsteuer === '212' && bw2 && bw2.jahr === 2023 && bw2.felder.hg_ul === '900',
+    'I12 Bewirtschaftung zum Kauf aus dem ersten vollen Jahr (2024: 2.040 / 1.200 / 212), sonst Kaufjahr ohne Hochrechnung (900)');
+  /* importieren(): nur GET bei ViVi, Objekt angelegt, Verknuepfung 'importiert', doppelt = 409 */
+  const anfragen = [], angelegt = [], verkn = {}, werte = {};
+  const cl = { zaehler: { anfragen: 0, bremse429: false }, get: async (pfad) => {
+    cl.zaehler.anfragen++; anfragen.push('GET ' + pfad);
+    if (pfad === '/projects/prj_T1') return { data: PRJ };
+    if (pfad === '/projects/prj_T1/rental-units') return { data: MIET };
+    if (pfad === '/projects/prj_T1/financings') return { data: FIN };
+    if (pfad === '/projects/prj_T1/financing-schedule') return { data: [] };
+    const m = /^\/projects\/prj_T1\/rental-units\/(\w+)\/rent-history$/.exec(pfad); if (m) return { data: VERLAUF[m[1]] };
+    if (pfad === '/projects') return { data: [{ id: 'prj_T1', name: PRJ.name, type: PRJ.type }, { id: 'prj_X', name: 'schon da' }] };
+    return { data: [] };
+  }, post: async () => { throw new Error('POST verboten'); } };
+  const sp = {
+    verknuepfteViviIds: async () => Object.values(verkn).map((v) => v.vivi_objekt_id).concat(['prj_X']),
+    importVerknuepfen: async (u, o, vid, acc, ids) => { if (Object.values(verkn).some((v) => v.vivi_objekt_id === vid)) return null; verkn[o] = { object_id: o, user_id: u, vivi_objekt_id: vid, vivi_ids: ids, herkunft: 'importiert', anlage_status: 'fertig' }; return verkn[o]; },
+    verknuepfung: async (u, o) => verkn[o] || null,
+    objektHolen: async (u, o) => { const x = angelegt.find((a) => a.id === o); return x ? { id: o, data: x.data } : null; },
+    objektDatenErgaenzen: async (u, o, patch) => { const x = angelegt.find((a) => a.id === o); Object.assign(x.data, patch); },
+    werteSchreiben: async (o, f) => { werte[o] = f; }, werteErgaenzen: async () => {}, werteLesen: async () => [], steuerSchreiben: async () => {},
+    einstellungLesen: async () => ({ modus: 'aus' }), abrufFehler: async () => {}, protokoll: async () => {}, loesen: async () => true
+  };
+  dienst._setzeDeps({ speicher: sp, creds: { getSecret: async () => 'tok' }, client: () => cl, jetzt: () => JETZT, schlafen: async () => {}, testbetrieb: async () => false,
+    objekte: { create: async (u, { data }) => { const id = '00000000-0000-4000-8000-00000000000' + (angelegt.length + 1); angelegt.push({ id, data }); return { id, seq_no: '2026-0' + (90 + angelegt.length) }; } } });
+  const liste = await dienst.importierbar('u-1', null);
+  ok(liste.objekte.length === 1 && liste.objekte[0].vivi_id === 'prj_T1' && liste.objekte[0].einheiten === 3 && liste.objekte[0].vermietet_heute === 3 && liste.objekte[0].miete_heute === 1750 && liste.objekte[0].importierbar,
+    'I13 Liste: nur das noch nicht verknüpfte ViVi-Objekt, 3 Einheiten, heute 3 vermietet, Miete heute 1.750 €');
+  const r = await dienst.importieren('u-1', 'prj_T1', null);
+  const w = werte[r.objekt_id] || {};
+  let doppelt = null; try { await dienst.importieren('u-1', 'prj_T1', null); } catch (e) { doppelt = e; }
+  ok(r.ok && angelegt.length === 1 && angelegt[0].data.nkm === '1220' && verkn[r.objekt_id].herkunft === 'importiert' && w['einheit.0.ist'] && w['einheit.0.ist'].wert === 600 && w['einheit.2.status'].wert === 'vermietet'
+    && anfragen.every((x) => /^GET /.test(x)) && doppelt && doppelt.status === 409 && angelegt.length === 1,
+    'I14 importieren(): Objekt mit dem Stand zum Kauf angelegt, Verknüpfung „importiert“, Abgleich liefert heute (WE 1 600 €, WE 3 vermietet), nur GET, zweiter Import 409 ohne zweites Objekt');
+  const vi = lies('frontend/js/vivi-import.js'), vj = lies('frontend/js/vivi.js'), rt = lies('backend/src/routes/vivi.js');
+  ok(/DpViviImport\.vorAnwenden\(key, r\)/.test(vj) && /herkunft === 'importiert'/.test(vj) && /A\.festschreiben\(kauf\)/.test(vi) && /Rückwirkend aus ViVi zum/.test(vi) && /DpSteuerGrundlagen/.test(vi)
+    && /router\.get\('\/importierbar', bremse/.test(rt) && /router\.post\('\/importieren', bremse/.test(rt) && !/[–;](?=[^']*'\s*\+?)/.test((vi.match(/'[^'\n]*(?:übernehm|Bewertung|Ankauf)[^'\n]*'/g) || []).join('')),
+    'I15 Browser: erst Ankauf zum Kaufdatum festschreiben (nach den Steuergrundlagen), dann die Werte von heute, Routen hinter Bremse, Kundentext ohne Gedankenstrich und Semikolon');
+  dienst._setzeDeps(null);
+}
 dienst._setzeDeps(null);
 console.log('\n' + (rot ? 'ROT · ' + rot + ' Befund(e), ' + gruen + ' grün' : 'SAUBER · ' + gruen + ' Prüfpunkte grün'));
 process.exit(rot ? 1 : 0);

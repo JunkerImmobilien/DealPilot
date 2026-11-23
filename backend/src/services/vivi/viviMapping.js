@@ -618,7 +618,161 @@ function ausVivi(paket, kontext) {
   return { felder: felder, info: info };
 }
 
-module.exports = { erhoehungenAus, geplanteAus, istJahreAus, istJahreSumme, mieteImMonat,
+/* ══ v4050 · ViVi -> NEUES DealPilot-Objekt (Import) ═══════════════════════
+   Marcel 23.11.2026: „wenn wir ein Objekt aus ViVi übernehmen … kann man das auch rückwirkend machen? Sodass wir dann
+   auch einen Ankauf einfrieren können? Weil es kann ja sein, dass das Objekt schon drei Jahre bei ViVi verwaltet wird.“
+   Der Datensatz, den diese Funktion baut, ist der STAND ZUM KAUFDATUM (purchase_date): Mietverhältnisse, die an diesem
+   Tag liefen, mit der Kaltmiete laut Mietverlauf an diesem Tag, Mieterhöhungen bis dahin, die Darlehen mit ihrem
+   Ursprungsbetrag. Der Browser schreibt daraus den Ankauf-Stand fest (js/vivi-import.js, Stichtag = Kaufdatum) und
+   legt danach die Werte von heute aus ViVi darüber (der normale Abgleich, js/vivi.js). So rechnen beide Stände die
+   echten Kerne, keiner wird hier gerechnet.
+   Keine Personendaten der Mieter: Name, Geburtstag, Telefon und E-Mail bleiben in ViVi (ausVivi liest sie ohnehin nicht). */
+const OBJART_AUS_TYP = Object.freeze({ apartment: 'ETW', single_family_house: 'EFH', commercial: 'GESCH', land: 'GRST' });
+function importArt(projekt, units) {
+  const t = text(projekt && projekt.type);
+  if (t === 'multi_family_house') return (units || []).length === 2 ? 'ZFH' : 'MFH';
+  return OBJART_AUS_TYP[t] || null;
+}
+function importEinheiten(paket) {
+  return (Array.isArray(paket.einheiten) ? paket.einheiten : []).filter(function (u) { return u && u.unit_type !== 'ancillary'; });
+}
+/* Darlehen in derselben Reihenfolge wie ausVivi ohne gemerkte IDs: nach Beginn, ohne Anschluss und Bausparer */
+function importDarlehen(paket) {
+  return (Array.isArray(paket.darlehen) ? paket.darlehen : []).filter(function (f) { return f && !f.is_savings_plan && f.financing_type !== 'follow_up'; })
+    .sort(function (x, y) { return String(x.financing_start_date || '').localeCompare(String(y.financing_start_date || '')); });
+}
+/** vivi_ids fuer ein importiertes Objekt: Einheiten e0..eN mit Index (MFH) bzw. e0 ohne Index, Darlehen d1/d2. */
+function importIds(paket, objart) {
+  const p = paket.projekt || {};
+  const units = importEinheiten(paket);
+  const mehr = !!ARTEN_MIT_EINHEITEN[objart];
+  const ids = { projekt: p.id, einheiten: {}, darlehen: {}, muster_anschrift: false, import: { am: null, kaufdatum: isoDatum(p.purchase_date) || null } };
+  if (mehr) units.forEach(function (u, i) { ids.einheiten['e' + i] = { index: i, nr: String(i + 1), name: text(u.identifier), unit_id: u.id, fertig: true }; });
+  else if (units[0]) ids.einheiten.e0 = { index: null, nr: '1', name: text(units[0].identifier), unit_id: units[0].id, fertig: true };
+  const D = importDarlehen(paket);
+  if (D[0]) ids.darlehen.d1 = D[0].id;
+  if (D[1]) ids.darlehen.d2 = D[1].id;
+  return ids;
+}
+function zs(n) { return n == null ? '' : String(n); }   /* Formularwerte stehen als Text im Datensatz, Dezimalpunkt */
+
+/**
+ * @param paket    wie ausVivi: { projekt, einheiten, mietverhaeltnisse, darlehen, mietverlauf }
+ * @param kontext  { jetzt }
+ * @returns { ok, daten, vivi_ids, objart, stichtag, fehlt_bewertung: [{feld, text}], kurz }
+ */
+function importDaten(paket, kontext) {
+  paket = Object.assign({}, paket || {}); kontext = kontext || {};
+  const p = paket.projekt || {};
+  if (!Array.isArray(paket.einheiten) && Array.isArray(p.units)) paket.einheiten = p.units;   /* ViVi liefert die Einheiten oft im Objekt */
+  const units = importEinheiten(paket);
+  const objart = importArt(p, units);
+  const heute = heuteIso(kontext.jetzt);
+  const kauf = isoDatum(p.purchase_date);
+  const stichtag = kauf && kauf <= heute ? kauf : heute;
+  const mehr = !!ARTEN_MIT_EINHEITEN[objart];
+  const ids = importIds(paket, objart);
+  const tag = Date.parse(stichtag + 'T12:00:00Z');
+  /* der ganze Abbildungsweg von ausVivi, nur mit „heute“ = Kaufdatum: laufende Mietverhaeltnisse, letzte Erhoehung
+     und die Liste der Erhoehungen gelten zu diesem Tag */
+  const erg = ausVivi(paket, { vivi_ids: ids, mitEinheiten: mehr, objart: objart, jetzt: tag, musterAnschrift: false, uebergang: null });
+  const f = erg.felder, info = erg.info || {};
+  const rentals = Array.isArray(paket.mietverhaeltnisse) ? paket.mietverhaeltnisse : [];
+  const verlauf = paket.mietverlauf || {};
+  const mieteAmTag = function (u) {
+    const r = rentals.filter(function (x) { return String(x.unit_id) === String(u.id) && laufend(x, stichtag); })[0] || null;
+    if (!r) return null;
+    const m = mieteImMonat(r, verlauf[r.id], stichtag, true);
+    return m != null ? rund(m) : null;
+  };
+
+  const d = {
+    objart: objart || '',
+    nutzungsart: 'kapitalanlage',
+    obj_herkunft: 'neukauf',
+    _deal_won: true,
+    _deal_won_at: new Date(kontext.jetzt == null ? Date.now() : kontext.jetzt).toISOString(),
+    kaufdat: kauf || '',
+    wirtschaftlicher_uebergang: kauf || '',
+    dp_stufe: '2'
+  };
+  Object.keys(f).forEach(function (id) {
+    if (/^einheit\./.test(id)) return;
+    const w = f[id] && f[id].wert;
+    if (w === '' || w == null) return;
+    d[id] = typeof w === 'number' ? zs(w) : w;
+  });
+  if (!d.kaufdat && d.wirtschaftlicher_uebergang) d.kaufdat = d.wirtschaftlicher_uebergang;
+
+  let leer = 0;
+  if (mehr) {
+    const L = units.map(function (u, i) {
+      const P = 'einheit.' + i + '.';
+      const g = function (k) { const x = f[P + k]; return x && x.wert !== '' && x.wert != null ? x.wert : null; };
+      const gew = /commercial|business|office|retail/.test(text(u.unit_type));
+      const e = { nr: String(i + 1), art: gew ? 'gewerbe' : 'wohnen', status: g('status') || 'leer' };
+      if (text(u.identifier)) e.lage = text(u.identifier).slice(0, 80);
+      const et = etageText(u.floor); if (et) e.etage = et;
+      const zi = zahl(u.rooms); if (zi != null && zi > 0) e.zimmer = zs(zi);
+      ['wfl', 'nk_vorauszahlung', 'mv_beginn', 'mv_befristet_bis', 'mv_kaution', 'mv_letzte_erhoehung', 'mv_letzte_erhoehung_betrag', 'mv_art', 'stellplatz_miete'].forEach(function (k) {
+        const w = g(k); if (w != null) e[k] = typeof w === 'number' ? zs(w) : w;
+      });
+      if (e.status === 'vermietet') { const m = mieteAmTag(u); const ist = m != null ? m : zahl(g('ist')); if (ist != null) e.ist = zs(ist); }
+      else leer++;
+      const erh = info.erhoehungen && info.erhoehungen[String(i)];
+      if (Array.isArray(erh) && erh.length) e.erhoehungen = erh;
+      return e;
+    });
+    d._mfh = { einheiten: L, stand: stichtag };
+    d.einheiten = zs(L.length);
+    let fl = 0, ohne = 0, ist = 0;
+    L.forEach(function (e) { const w = zahl(e.wfl); if (w > 0) fl += w; else ohne++; if (e.status !== 'leer') ist += zahl(e.ist) || 0; });
+    if (fl > 0 && !ohne) d.wfl = zs(rund(fl));
+    if (ist > 0) d.nkm = zs(rund(ist));
+  } else if (units[0]) {
+    const m = mieteAmTag(units[0]);
+    if (m != null) d.nkm = zs(m);
+    else if (d.nkm == null) leer = 1;
+    const zi = zahl(units[0].rooms); if (zi != null && zi > 0) d.zimmer = zs(zi);
+    if (info.erhoehungen && Array.isArray(info.erhoehungen.objekt) && info.erhoehungen.objekt.length) d._erhoehungen = info.erhoehungen.objekt;
+  }
+  d.vermstand = leer === 0 ? 'Vollvermietet' : (mehr && leer < units.length ? 'Teilweise leer' : 'Leer');
+
+  const fehlt = importFehlt(d, objart);
+  const kurz = {
+    name: [text(p.street), text(p.house_number)].filter(Boolean).join(' ') + (text(p.city) ? ', ' + text(p.city) : ''),
+    objart: objart, einheiten: units.length, vermietet: units.length - leer,
+    kaufdatum: kauf || null, kaufpreis: zahl(p.purchase_price), nkm_heute: null, darlehen: importDarlehen(paket).length
+  };
+  return { ok: !!objart, daten: d, vivi_ids: ids, objart: objart, stichtag: stichtag, fehlt_bewertung: fehlt, kurz: kurz };
+}
+
+/* Was ViVi nicht kennt, die Bewertung aber braucht. Feld-ids aus storage.js FIELDS, Texte kurz, ohne Gedankenstrich. */
+const BEWERTUNG_FELDER = [
+  { feld: 'ds2_zustand', text: 'Zustand des Objekts' },
+  { feld: 'mod_punkte', text: 'Modernisierungen (für die Restnutzungsdauer)', alle: ['mod_dach', 'mod_fenster', 'mod_leitungen', 'mod_heizung', 'mod_aussenwand', 'mod_baeder', 'mod_innenausbau', 'mod_grundriss'] },
+  { feld: 'ausst', text: 'Ausstattung' },
+  { feld: 'ds2_energie', text: 'Energieeffizienz' },
+  { feld: 'gsfl', text: 'Grundstücksgröße', nicht: ['ETW'] },
+  { feld: 'mea', text: 'Miteigentumsanteil', nur: ['ETW'] },
+  { feld: 'etage', text: 'Etage der Wohnung', nur: ['ETW'] },
+  { feld: 'zimmer', text: 'Zimmerzahl', nur: ['ETW', 'EFH'] },
+  { feld: 'baujahr', text: 'Baujahr' },
+  { feld: 'wfl', text: 'Wohnfläche' },
+  { feld: 'kp', text: 'Kaufpreis' },
+  { feld: 'wirtschaftlicher_uebergang', text: 'Kaufdatum (Übergang von Nutzen und Lasten)' },
+  { feld: 'hg_ul', text: 'Hausgeld bzw. umlagefähige Kosten', bewirtschaftung: true }
+];
+function importFehlt(d, objart) {
+  return BEWERTUNG_FELDER.filter(function (x) {
+    if (x.nur && x.nur.indexOf(objart) < 0) return false;
+    if (x.nicht && x.nicht.indexOf(objart) >= 0) return false;
+    if (x.alle) return !x.alle.some(function (k) { return text(d[k]) !== ''; });
+    return text(d[x.feld]) === '';
+  }).map(function (x) { return { feld: x.feld, text: x.text }; });
+}
+
+module.exports = { importDaten, importIds, importArt, importFehlt, BEWERTUNG_FELDER, erhoehungenAus, geplanteAus, istJahreAus, istJahreSumme, mieteImMonat,
   nachVivi, ausVivi, letzteErhoehung, erhoehungBetrag, nkVorschlag, ulJahr, einheitenListe, zahl, isoDatum, monatDatum, etageText, etageZahl, mieterName,
   NK_MIN_QM, OBJEKTTYP, VERTRAG_NACH_VIVI, VERTRAG_AUS_VIVI, UL_FELDER, ARTEN_MIT_EINHEITEN, MUSTER_ANSCHRIFT
 };
