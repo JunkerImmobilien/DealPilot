@@ -17,7 +17,7 @@
  * ═══════════════════════════════════════════════════════════════════════════════════════════════════════════════ */
 (function (global) {
   'use strict';
-  var VERSION = 'v4040c';
+  var VERSION = 'v4040d';
   if (!global.document || global.DpViviReiter) return;
   var doc = global.document;
   var _jahr = null, _offen = {};
@@ -84,7 +84,7 @@
     var nurDp = L.filter(function (x) { return x.art === 'dp'; }).length;
     return '<ul class="vr-belege">' + L.map(function (x) {
       return '<li><span class="vr-tag ' + ART[x.art][1] + '">' + ART[x.art][0] + '</span><span class="vr-bt">' + esc(datumText(x.datum)) + ' · ' + esc(x.text) + (x.aussteller ? ' · ' + esc(x.aussteller) : '') + '</span><b>' + eur(x.betrag) + '</b>'
-        + (x.art === 'dp' ? '<button type="button" class="vr-link" data-vr="beleg" data-vr-jahr="' + jahr + '">öffnen</button>' : '') + '</li>';
+        + (x.art === 'dp' ? '<button type="button" class="btn-clean vr-link" data-vr="beleg" data-vr-jahr="' + jahr + '">öffnen</button>' : '') + '</li>';
     }).join('') + '</ul>' + (nurDp ? '<p class="vr-klein">Belege nur in DealPilot stehen schon im Steuerjahr. In ViVi bitte nachbuchen, die Schnittstelle kann keine Belege anlegen.</p>' : '');
   }
 
@@ -144,7 +144,7 @@
     a.zeilen.forEach(function (z, i) {
       if (z.spalte === 'afa') return;   /* AfA rechnet DealPilot selbst, steht im Jahresabgleich zum Vergleich */
       var L = belege(jahr, z), key = jahr + '|' + z.spalte, auf = !!_offen[key];
-      var kn = z.aktion === 'uebernehmen' && !a.gesperrt ? '<button type="button" class="vr-k" data-vr="eins" data-vr-jahr="' + jahr + '" data-vr-i="' + i + '">übernehmen</button>' : '';
+      var kn = z.aktion === 'uebernehmen' && !a.gesperrt ? '<button type="button" class="btn-clean vr-k" data-vr="eins" data-vr-jahr="' + jahr + '" data-vr-i="' + i + '">übernehmen</button>' : '';
       var unter = (z.aktion === 'laufend' || z.aktion === 'ausserhalb' || z.aktion === 'ohne_posten') && z.grund ? '<small>' + esc(z.grund) + '</small>' : '';
       if (z.unvollstaendig) unter += '<small>' + esc(z.unvollstaendig) + '</small>';
       rows += '<tr class="vr-z' + (L.length ? ' vr-auf' : '') + '"' + (L.length ? ' data-vr="belege" data-vr-key="' + esc(key) + '"' : '') + '><td><b>' + esc(z.label) + '</b>'
@@ -155,8 +155,8 @@
     rows += restschuldZeile(jahr);
     var JB = global.DpJahresbuch, fest = JB && JB.fest ? JB.fest(jahr) : {}, istFest = !!(fest.miete && fest.steuer);
     var fuss = '<div class="vr-fuss">';
-    if (a.offen > 0 && !a.gesperrt) fuss += '<button type="button" class="vr-k gold" data-vr="alle" data-vr-jahr="' + jahr + '">Alles übernehmen (' + a.offen + ')</button>';
-    if (jahr < heuteJahr()) fuss += istFest ? '<span class="vr-fest">' + jahr + ' festgeschrieben</span>' : '<button type="button" class="vr-k" data-vr="fest" data-vr-jahr="' + jahr + '">Jahr ' + jahr + ' festschreiben</button>';
+    if (a.offen > 0 && !a.gesperrt) fuss += '<button type="button" class="btn-clean vr-k gold" data-vr="alle" data-vr-jahr="' + jahr + '">Alles übernehmen (' + a.offen + ')</button>';
+    if (jahr < heuteJahr()) fuss += istFest ? '<span class="vr-fest">' + jahr + ' festgeschrieben</span>' : '<button type="button" class="btn-clean vr-k" data-vr="fest" data-vr-jahr="' + jahr + '">Jahr ' + jahr + ' festschreiben</button>';
     fuss += '</div>';
     var satz = a.gesperrt ? 'Das Steuerjahr ' + jahr + ' ist festgeschrieben oder erklärt. Abweichungen werden nur gezeigt.'
       : jahr >= heuteJahr() ? 'Das Jahr läuft. ViVi zeigt die Buchungen bis heute, übernommen wird nach dem Jahresende.'
@@ -195,8 +195,8 @@
         + '<div class="vr-wz"><span>DealPilot</span><span>' + (w.ist ? eur(w.ist) : 'leer') + '</span></div>'
         + '<div class="vr-wz"><span>ViVi</span><span>' + (istZahl(w.vivi) ? eur(w.vivi) : '–') + '</span></div>'
         + (w.pot ? '<div class="vr-wz vr-wp"><span>möglich</span><span>' + eur(w.soll) + ' (+' + eur(w.pot) + ')</span></div>' : '')
-        + '<div class="vr-wk">' + (abw && w.eigen ? '<button type="button" class="vr-k" data-vr="w-vivi" data-vr-id="' + esc(w.viviId) + '">ViVi übernehmen</button>' : '')
-        + (mh && w.ist > 0 ? '<button type="button" class="vr-k' + (w.pot ? ' gold' : '') + '" data-vr="w-mh" data-vr-e="' + (D.mfh ? w.i : 'objekt') + '">Mieterhöhung in ViVi</button>' : '') + '</div></div>';
+        + '<div class="vr-wk">' + (abw && w.eigen ? '<button type="button" class="btn-clean vr-k" data-vr="w-vivi" data-vr-id="' + esc(w.viviId) + '">ViVi übernehmen</button>' : '')
+        + (mh && w.ist > 0 ? '<button type="button" class="btn-clean vr-k' + (w.pot ? ' gold' : '') + '" data-vr="w-mh" data-vr-e="' + (D.mfh ? w.i : 'objekt') + '">Mieterhöhung in ViVi</button>' : '') + '</div></div>';
     };
     var pot = D.W.reduce(function (s, w) { return s + w.pot; }, 0), nAb = D.W.filter(function (w) { return istZahl(w.abw) && Math.abs(w.abw) >= 1; }).length;
     return '<h4 class="vr-h">' + (D.mfh ? 'Wohnungen' : 'Die Wohnung') + '</h4><p class="vr-satz">'
@@ -228,7 +228,7 @@
       return '<div><span>' + esc(feldName(id)) + '</span><b>' + eur(zahl(v.felder[id])) + '</b><small>' + esc(q(id) || 'aus ViVi') + (Object.prototype.hasOwnProperty.call(eigen, id) ? ', eigene Angabe ' + eur(zahl(eigen[id])) : '') + '</small></div>';
     }).join('') + '</div>';
     if (ab.length) out += '<div class="vr-tab-w"><table class="vr-tab"><thead><tr><th>Feld</th><th>DealPilot</th><th>ViVi</th><th></th></tr></thead><tbody>' + ab.map(function (id) {
-      return '<tr><td><b>' + esc(feldName(id)) + '</b></td><td>' + esc(String(eigen[id])) + '</td><td>' + esc(String(v.felder[id])) + '</td><td><button type="button" class="vr-k" data-vr="f-vivi" data-vr-id="' + esc(id) + '">ViVi übernehmen</button></td></tr>';
+      return '<tr><td><b>' + esc(feldName(id)) + '</b></td><td>' + esc(String(eigen[id])) + '</td><td>' + esc(String(v.felder[id])) + '</td><td><button type="button" class="btn-clean vr-k" data-vr="f-vivi" data-vr-id="' + esc(id) + '">ViVi übernehmen</button></td></tr>';
     }).join('') + '</tbody></table></div>';
     return out;
   }
@@ -242,10 +242,10 @@
     var S = global.DpViviSteuer;
     var pills = J.map(function (j) {
       var n = 0; try { n = S && S.abgleich ? S.abgleich(j).offen : 0; } catch (e) { n = 0; }
-      return '<button type="button" data-vr="jahr" data-vr-jahr="' + j + '" aria-pressed="' + (j === _jahr) + '">' + j + (n ? '<i>' + n + '</i>' : '') + '</button>';
+      return '<button type="button" class="btn-clean" data-vr="jahr" data-vr-jahr="' + j + '" aria-pressed="' + (j === _jahr) + '">' + j + (n ? '<i>' + n + '</i>' : '') + '</button>';
     }).join('');
     var kopf = '<div class="vr-kopf"><span class="vr-marke">ViVi</span><b>Abgleich mit ViVi</b><span class="vr-stand">' + (st && st.letzter_abruf ? 'Stand ' + esc(datumText(String(st.letzter_abruf).slice(0, 10))) : (st ? '' : 'lädt…')) + '</span>'
-      + '<button type="button" class="vr-k" data-vr="abgleichen">Jetzt abgleichen</button></div>';
+      + '<button type="button" class="btn-clean vr-k" data-vr="abgleichen">Jetzt abgleichen</button></div>';
     if (!st) return '<div class="vr">' + kopf + '<p class="vr-klein">Der Stand aus ViVi wird geladen.</p></div>';
     return '<div class="vr">' + kopf
       + '<div class="vr-jahre" role="group" aria-label="Jahr">' + pills + '</div>'
@@ -272,7 +272,7 @@
     stil();
     var alt = $('vr-fenster'); if (alt) alt.remove();
     var ov = doc.createElement('div'); ov.id = 'vr-fenster';
-    ov.innerHTML = '<div class="vr-ov-box"><button type="button" class="vr-ov-zu" data-vr="zu" aria-label="Schließen">×</button><div data-dp-vivi-host="1"></div></div>';
+    ov.innerHTML = '<div class="vr-ov-box"><button type="button" class="btn-clean vr-ov-zu" data-vr="zu" aria-label="Schließen">×</button><div data-dp-vivi-host="1"></div></div>';
     doc.body.appendChild(ov);
     mountAll();
     return true;
