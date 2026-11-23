@@ -234,7 +234,7 @@
       var pts = X.map(function (j, i) { return d.band.hi[i] == null ? null : f1(xs(j)) + ',' + f1(ys(d.band.hi[i])); }).filter(Boolean)
         .concat(X.slice().reverse().map(function (j, k) { var i = n - 1 - k; return d.band.lo[i] == null ? null : f1(xs(j)) + ',' + f1(ys(d.band.lo[i])); }).filter(Boolean));
       out.push('<polygon class="gx-fade" points="' + pts.join(' ') + '" style="fill:color-mix(in srgb,' + F.gold + ' 15%,transparent)"/>');
-      [d.band.lo, d.band.hi].forEach(function (a) { out.push('<polyline points="' + X.map(function (j, i) { return a[i] == null ? '' : f1(xs(j)) + ',' + f1(ys(a[i])); }).filter(Boolean).join(' ') + '" style="fill:none;stroke:' + F.gold + ';stroke-width:1;stroke-dasharray:3 4;opacity:.7"/>'); });
+      if (!d.band.ohneRand) [d.band.lo, d.band.hi].forEach(function (a) { out.push('<polyline points="' + X.map(function (j, i) { return a[i] == null ? '' : f1(xs(j)) + ',' + f1(ys(a[i])); }).filter(Boolean).join(' ') + '" style="fill:none;stroke:' + F.gold + ';stroke-width:1;stroke-dasharray:3 4;opacity:.7"/>'); });
     }
     if (d.heute != null && d.heute >= X[0] && d.heute <= X[n - 1]) out.push('<line x1="' + f1(xs(d.heute)) + '" x2="' + f1(xs(d.heute)) + '" y1="' + m.t + '" y2="' + (H - m.b) + '" style="stroke:' + F.linie2 + ';stroke-dasharray:2 3"/><text class="gx-ax" x="' + f1(xs(d.heute) + 6) + '" y="' + (m.t + 10) + '" style="fill:' + F.tinte2 + '">HEUTE</text>');
     d.reihen.forEach(function (r) {
@@ -643,7 +643,7 @@
     var idx = function (jj) { return jj - P.heute; };
     var L = MC.jahre.length - 1, ersteJ = null; MC.jahre.forEach(function (jj, i) { if (ersteJ == null && jj > P.heute && MC.pPos[i] >= 50) ersteJ = jj; });
     var i = karte(k, { eyebrow: 'Vermögen in ' + MC.N + ' Zukünften', titel: 'Im mittleren Verlauf ' + tsd(MC.p50[L]) + ' Vermögen aus dem Objekt bis ' + P.bis + ', in 80 % der Fälle zwischen ' + tsd(MC.p10[L]) + ' und ' + tsd(MC.p90[L]),
-      unter: 'Vermögen = Wert minus Restschuld plus aufsummierter Cashflow nach Steuer. Band: 80 % der Pfade, Linie: Mitte, weiß: bisher.', chips: ['Modell'],
+      unter: 'Vermögen = Wert minus Restschuld plus aufsummierter Cashflow nach Steuer. Band: 80 % der Pfade, Linie: Mitte, Punkte: bisher.', chips: ['Modell'],
       fuss: ['Je Jahr: Miete ' + pct(P.mstg * 100) + ' ± 1,0, Kosten ' + pct(P.kstg * 100) + ' ± 0,6, Wert ' + pct(P.wstg * 100) + ' mit Marktzyklen, in 4 % der Jahre zwei Monate Leerstand.', 'Anschlusszins im Mittel ' + pct(P.az * 100, 2) + ', 80 % zwischen ' + pct(MC.zP10 * 100, 2) + ' und ' + pct(MC.zP90 * 100, 2) + '.', MC.N + ' Pfade, fester Startwert. Modell, keine Prognose und keine Zusage.'] });
     var ziel = document.createElement('div'); i.appendChild(ziel);
     verlauf(ziel, { x: X, heute: P.heute,
@@ -682,7 +682,7 @@
     var i = karte(k, { eyebrow: 'Verlauf mit Steuern', titel: titel, unter: 'Cashflow im Jahr vor und nach Steuer, die Lücke dazwischen ist deine Steuerwirkung. Rechts von ' + P.heute + ' Projektion der App.', chips: ['gemessen'] });
     var ziel = document.createElement('div'); i.appendChild(ziel);
     verlauf(ziel, { x: X, heute: P.heute,
-      band: { lo: J.map(function (r) { return Math.min(r.cfop, r.cfns); }), hi: J.map(function (r) { return Math.max(r.cfop, r.cfns); }) },
+      band: { ohneRand: true, lo: J.map(function (r) { return Math.min(r.cfop, r.cfns); }), hi: J.map(function (r) { return Math.max(r.cfop, r.cfns); }) },
       reihen: [{ name: 'vor Steuer', werte: J.map(function (r) { return r.cfop; }), farbe: F.tinte3, dick: 2 }, { name: 'nach Steuer', werte: J.map(function (r) { return r.cfns; }), farbe: F.gold, dick: 2.6, punkte: true }],
       marken: nach ? [{ j: nach.j, text: 'nach Steuer im Plus', farbe: F.gruen }] : [],
       tip: function (q, j) { var r = J[q]; return '<div class="t">' + j + (j > P.heute ? ' · Projektion' : '') + '</div>vor Steuer <b>' + eurV(r.cfop) + '</b><br>Steuer <b>' + eurV(r.cfns - r.cfop) + '</b><br>nach Steuer <b>' + eurV(r.cfns) + '</b>'; },
@@ -736,7 +736,7 @@
     var i = karte(k, { eyebrow: 'Wertverlauf', titel: titel, unter: 'Plan-Wert (Kaufpreis mit deiner Wertsteigerung) über der Restschuld, die goldene Fläche ist dein Eigenkapital im Objekt. Punkte: Marktberichte, Raute: Kaufpreis.',
       chips: [lw != null ? 'gemessen' : 'Plan'], fuss: lw == null ? ['Noch kein Marktbericht. Mit einem Bericht im Jahr steht hier der Marktpreis gegen deinen Plan.'] : [] });
     var ziel = document.createElement('div'); i.appendChild(ziel);
-    verlauf(ziel, { x: X, heute: P.heute, band: { lo: J.map(function (r) { return r.rs; }), hi: J.map(function (r) { return r.wert; }) },
+    verlauf(ziel, { x: X, heute: P.heute, band: { ohneRand: true, lo: J.map(function (r) { return r.rs; }), hi: J.map(function (r) { return r.wert; }) },
       reihen: [{ name: 'Plan-Wert', werte: J.map(function (r) { return r.wert; }), farbe: F.gold, dick: 2.4 }, { name: 'Restschuld', werte: J.map(function (r) { return r.rs; }), farbe: F.tinte3, dick: 2 }],
       streu: streu,
       tip: function (q, j) { var r = J[q]; return '<div class="t">' + j + (j > P.heute ? ' · Projektion' : '') + '</div>Plan-Wert <b>' + eur(r.wert) + '</b><br>Restschuld <b>' + eur(r.rs) + '</b><br>dein Eigenkapital <b>' + eur(r.wert - r.rs) + '</b>'; },
