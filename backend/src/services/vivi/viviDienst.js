@@ -109,7 +109,9 @@ async function planOptionen(opt, daten) {
   const test = await deps().testbetrieb();
   const vorgabe = function (v) { return v === undefined || v === null ? test : !!v; };
   const nr = String((daten && daten._obj_seq) || '').split('-').pop().replace(/\D/g, '').replace(/^0+/, '') || '1';
-  return { platzhalterNamen: vorgabe(opt.platzhalter_namen), musterAnschrift: vorgabe(opt.muster_anschrift), musterNr: nr, faelligTag: opt.faellig_tag, testbetrieb: test };
+  /* v4035 · Marcel 23.11.2026 („können wir die nicht richtig benennen?“): die echte Anschrift ist die Vorgabe, auch im
+     Testbetrieb. Die Musteranschrift gibt es nur noch, wenn der Haken im Anlegen-Fenster ausdrücklich gesetzt wird. */
+  return { platzhalterNamen: vorgabe(opt.platzhalter_namen), musterAnschrift: opt.muster_anschrift === undefined || opt.muster_anschrift === null ? false : !!opt.muster_anschrift, musterNr: nr, faelligTag: opt.faellig_tag, testbetrieb: test };
 }
 function optionenAntwort(po) { return { platzhalter_namen: po.platzhalterNamen, muster_anschrift: po.musterAnschrift, testbetrieb: po.testbetrieb }; }
 

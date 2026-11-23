@@ -751,10 +751,12 @@ kopf('K  Testbetrieb: Musteranschrift und Platzhalter, solange vivi Vorschau-Fun
   const deps4 = (test) => dienst._setzeDeps({ speicher: S4, testbetrieb: async () => test, creds: { getSecret: async () => TOKEN }, client: (t, o) => viviClient.erzeugen(t, Object.assign({}, o, { fetch: B.holen, maxWarten: 0 })), jetzt: () => S4.zeit.jetzt, schlafen: async () => {} });
   deps4(true);
   const vs = await dienst.vorschau(USER, oid, {});
-  ok(vs.optionen && vs.optionen.muster_anschrift === true && vs.optionen.platzhalter_namen === true && vs.optionen.testbetrieb === true, 'Vorschau im Testbetrieb: Musteranschrift und Platzhalter vorgegeben (an)');
+  ok(vs.optionen && vs.optionen.muster_anschrift === false && vs.optionen.platzhalter_namen === true && vs.optionen.testbetrieb === true && vs.nutzlast.projekt.street === 'Echtweg', 'Vorschau im Testbetrieb: echte Anschrift vorgegeben (v4035, Marcel 23.11.), Platzhalter-Mieter an');
+  const vsMu = await dienst.vorschau(USER, oid, { muster_anschrift: true });
+  ok(vsMu.optionen.muster_anschrift === true && vsMu.nutzlast.projekt.street === 'Musterstraße', 'Haken gesetzt: Musteranschrift');
   const vsAus = await dienst.vorschau(USER, oid, { muster_anschrift: false, platzhalter_namen: false });
   ok(vsAus.optionen.muster_anschrift === false && vsAus.nutzlast.projekt.street === 'Echtweg', 'ausdrücklich abgewählt: echte Anschrift (Wahl des Kunden)');
-  await dienst.anlegen(USER, oid, {});
+  await dienst.anlegen(USER, oid, { muster_anschrift: true });   /* v4035: Musterpfad nur noch mit Haken */
   const proj = Object.values(B.st.projekte)[0] || {};
   const rentals = Object.values(B.st.miete);
   ok(proj.street === 'Musterstraße' && proj.house_number === '1041' && !JSON.stringify(B.st).includes('Echtweg'), 'angelegt mit Musterstraße 1041, die echte Straße kam nie bei ViVi an');
