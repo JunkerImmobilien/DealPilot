@@ -315,7 +315,7 @@ function funk(src, name) {
   const j25 = E ? Math.round(E.jahresFaktor(q, 2025) * 520 * 12) : null, j26 = E ? Math.round(E.jahresFaktor(q, 2026) * 520 * 12) : null;
   ok(j25 === 5940, 'F18 2025 = 12 × 495 = 5.940 € (Ist ' + j25 + ')');
   ok(j26 === 5990, 'F18 2026 = 10 × 495 + 2 × 520 = 5.990 € (Ist ' + j26 + ')');
-  ok(/if \(y <= off\) \{/.test(lies('frontend/js/mietentwicklung.js')), 'F18 mietentwicklung.js: auch das laufende Jahr aus dem Mietverlauf (istFaktor), nicht 12 × heutige Miete');
+  ok(/if \(y <= off\) return _planFaktor\(by \+ y\);/.test(lies('frontend/js/mietentwicklung.js')), 'F18 mietentwicklung.js: auch das laufende Jahr aus dem Mietverlauf (planFaktor, v4037 mit geplanten Erhöhungen), nicht 12 × heutige Miete');
   const jb = lies('frontend/js/jahresbuch.js');
   ok(/function vertragsErhoehungen\(E\)/.test(jb) && /erh = erh\.concat\(vertragsErhoehungen\(E\)\)/.test(jb), 'F18 Jahresabgleich zeigt die Erhöhung aus „Letzte Erhöhung" (ohne Liste), nicht „Keine Erhöhung"');
 }

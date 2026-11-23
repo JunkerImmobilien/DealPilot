@@ -39,7 +39,7 @@
 (function (global) {
   'use strict';
   if (global.DpErhoehungen) return;
-  var VERSION = 'v3840';
+  var VERSION = 'v4037';
   var ARTEN = [['558', 'Erhöhung auf die Vergleichsmiete (§ 558 BGB)'], ['559', 'Modernisierungsumlage (§ 559 BGB)'], ['staffel', 'Staffelmiete'],
     ['index', 'Indexmiete'], ['neuvermietung', 'Neuvermietung'], ['sonstig', 'sonstige Änderung']];
   var SPERRE_ARTEN = { '558': 1, staffel: 1, index: 1 };
@@ -144,6 +144,36 @@
     return [{ liste: objektListe(), heute: zahl((el('nkm') || {}).value), letzte: (el('mv_letzte_erhoehung') || {}).value, betrag: (el('mv_letzte_erhoehung_betrag') || {}).value }];
   }
   function istFaktor(jahr) { try { return jahresFaktor(quellenObjekt(), jahr); } catch (e) { return 1; } }
+  /* ── v4037 · Geplante Erhöhungen (aus ViVi, status geplant) ─────────────────────────────────
+     Marcel 23.11.2026: eine in ViVi geplante Erhöhung soll in den Plan-Jahren stehen. Sie liegt getrennt
+     (_erhoehungen_geplant am Objekt, erhoehungen_geplant je Wohnung), damit „Letzte Erhöhung“ und Sperrfrist
+     nur aus wirksamen Erhöhungen kommen. planFaktor = Jahresfaktor mit wirksamen UND geplanten Einträgen. */
+  function geplantObjekt() { var d = D(); return d && Array.isArray(d._erhoehungen_geplant) ? d._erhoehungen_geplant : []; }
+  function quellenPlan() {
+    var M = global._dpMfh, w = [];
+    if (M && Array.isArray(M.einheiten)) M.einheiten.forEach(function (e) {
+      if (!e || e.status === 'leer' || !(zahl(e.ist) > 0)) return;
+      w.push({ liste: (e.erhoehungen || []).concat(e.erhoehungen_geplant || []), heute: zahl(e.ist), letzte: e.mv_letzte_erhoehung, betrag: e.mv_letzte_erhoehung_betrag });
+    });
+    if (w.length) return w;
+    return [{ liste: objektListe().concat(geplantObjekt()), heute: zahl((el('nkm') || {}).value), letzte: (el('mv_letzte_erhoehung') || {}).value, betrag: (el('mv_letzte_erhoehung_betrag') || {}).value }];
+  }
+  function planFaktor(jahr) { try { return jahresFaktor(quellenPlan(), jahr); } catch (e) { return 1; } }
+  function geplant() {
+    var out = geplantObjekt().map(function (x) { return Object.assign({ einheit: null }, x); });
+    var M = global._dpMfh;
+    if (M && Array.isArray(M.einheiten)) M.einheiten.forEach(function (e, i) {
+      (e && Array.isArray(e.erhoehungen_geplant) ? e.erhoehungen_geplant : []).forEach(function (x) { out.push(Object.assign({ einheit: i, nr: e.nr || String(i + 1) }, x)); });
+    });
+    return sortiert(out);
+  }
+  function geplantLetztesJahr() { var g = geplant(); return g.length ? +String(g[g.length - 1].datum).slice(0, 4) : null; }
+  /** Miete nach der letzten geplanten Erhöhung geteilt durch die heutige (Faktor auf heute) */
+  function geplantNiveau() {
+    var q = quellenPlan(), heute = 0, spaeter = 0;
+    q.forEach(function (x) { var h = zahl(x.heute); if (!(h > 0)) return; heute += h; var m = mieteMonat(x, '9999-12-01'); spaeter += istZahl(m) ? m : h; });
+    return heute > 0 ? spaeter / heute : 1;
+  }
 
   /* ── Anzeige (eine Maske für Objekt und Wohnung) ──────────────── */
   function stil() {
@@ -160,7 +190,8 @@
       '.dp-erh-x{background:none;border:none;color:#B8625C;cursor:pointer;font:inherit;padding:6px}',
       '.dp-erh-fehler{color:#B8625C;margin-top:4px}',
       '.dp-erh-ok{margin:4px 0 6px;padding:6px 9px;border-left:3px solid #3FA56C;background:rgba(63,165,108,.07);font-size:12px;line-height:1.5}',
-      '.dp-erh-ok button{margin-left:6px}'
+      '.dp-erh-ok button{margin-left:6px}',
+      '.dp-erh-gepl{background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 7%, transparent)}.dp-erh-gepl em{font-style:normal;font-weight:600;color:var(--wl-b8932f,#b8932f)}'
     ].join('\n');
     d.head.appendChild(s);
   }
@@ -174,6 +205,14 @@
         + '<button type="button" class="dp-erh-x" data-erh-weg="' + esc(x.id) + '" title="Eintrag entfernen" aria-label="Eintrag entfernen">✕</button>'
         + (x.beleg ? '<small>' + esc(x.beleg) + '</small>' : '') + '</div>';
     }).join('');
+    /* v4037 · geplante Erhöhungen aus ViVi: nur ansehen, sie gelten ab ihrem Datum in den Plan-Jahren */
+    var gz = sortiert(o.geplant || []).reverse().map(function (x) {
+      var p = plus(x);
+      return '<div class="dp-erh-z dp-erh-gepl"><b>' + datumDe(x.datum) + '</b><span><em>geplant</em>, ' + esc(artWort(x.art)) + ': ' + (istZahl(zahl(x.von)) ? 'von ' + eur(zahl(x.von)) + ' ' : '') + 'auf <b>' + eur(zahl(x.auf)) + '</b>'
+        + (istZahl(p) ? ' (' + (p >= 0 ? '+' : '') + eur(p) + ')' : '') + '</span><span></span>'
+        + '<small>' + esc(x.beleg || 'geplant') + '. Zählt ab ' + datumDe(x.datum) + ' in den Plan-Jahren der Mietentwicklung.</small></div>';
+    }).join('');
+    zeilen = gz + zeilen;
     var hin = '';
     if (a.n558_3j > 1) hin = '<div class="cf-hint" style="margin-top:4px">In den letzten drei Jahren gab es ' + a.n558_3j + ' Erhöhungen auf die Vergleichsmiete, zusammen ' + eur(a.summe558_3j) + ' je Monat. Für die Kappungsgrenze zählt die Summe. Gerechnet wird heute mit der letzten (' + eur(a.betrag) + '), trag die Summe bei Bedarf unter „Letzte Erhöhung um“ ein.</div>';
     var vorb = (!l.length && o.vorbelegbar) ? '<button type="button" class="btn btn-outline btn-sm" data-erh-vorbelegen="1" style="margin-top:6px">Aus den Vertragsangaben übernehmen</button>' : '';
@@ -182,6 +221,7 @@
        jetzt, was mit dem Eintrag passiert, und nach dem Eintragen steht eine Rückmeldung mit dem Weg (o.meldung). */
     return '<div class="dp-erh-t">Mieterhöhungen <span>Trag jede Erhöhung mit Datum ein. Die jüngste setzt „Letzte Erhöhung“' + (o.wo ? ' ' + esc(o.wo) : '') + '. Daraus rechnet DealPilot die Miete vergangener Jahre in der Mietentwicklung und die Sperrfrist für die nächste Erhöhung.</span></div>'
       + (o.meldung ? '<div class="dp-erh-ok">' + o.meldung + '</div>' : '')
+      + (o.vivi != null && global.DpViviMieterhoehung && global.DpViviMieterhoehung.verfuegbar() ? '<button type="button" class="btn btn-outline btn-sm" data-erh-vivi="' + esc(String(o.vivi)) + '" style="margin:2px 0 6px">Mieterhöhung in ViVi anlegen</button>' : '')   /* v4037 */
       + (zeilen || '<div style="color:#6B645A">Noch keine Erhöhung eingetragen.</div>') + hin + vorb
       + '<details' + (l.length ? '' : '') + '><summary style="cursor:pointer;margin-top:6px;min-height:28px;display:flex;align-items:center">Erhöhung eintragen</summary><div class="dp-erh-f">'
       + '<label>Wirksam ab<input type="date" data-erh-feld="datum"></label>'
@@ -210,7 +250,7 @@
     stil();
     host.classList.add('dp-erh');
     var meldung = '';
-    function zeichne() { host.innerHTML = html(h.liste(), { vorbelegbar: !!(h.vorbelegen && h.vorbelegen(true)), wo: h.wo, meldung: meldung }); meldung = ''; }
+    function zeichne() { host.innerHTML = html(h.liste(), { vorbelegbar: !!(h.vorbelegen && h.vorbelegen(true)), wo: h.wo, meldung: meldung, geplant: h.geplant ? h.geplant() : [], vivi: h.vivi ? h.vivi() : null }); meldung = ''; }
     function fertig(l, neu) {
       h.setzen(l); var a = ableiten(l); if (h.geaendert) h.geaendert(a);
       if (neu) meldung = rueckmeldung(neu, a, h.heute ? h.heute() : null, h.wohin || null);
@@ -218,6 +258,8 @@
     }
     host.onclick = function (ev) {
       var t = ev.target; if (!t || !t.closest) return;
+      var vv = t.closest('[data-erh-vivi]');   /* v4037 · Absprung nach ViVi, ein Fenster für alle Stellen */
+      if (vv) { ev.preventDefault(); var ve = vv.getAttribute('data-erh-vivi'); try { global.DpViviMieterhoehung.oeffnen({ einheit: ve === 'objekt' ? null : ve, quelle: 'Reiter Miete' }); } catch (x) {} return; }
       var weg = t.closest('[data-erh-weg]'), neu = t.closest('[data-erh-neu]'), vb = t.closest('[data-erh-vorbelegen]');
       if (weg) { ev.preventDefault(); var id = weg.getAttribute('data-erh-weg'); fertig(h.liste().filter(function (x) { return x && x.id !== id; })); return; }
       if (vb) { ev.preventDefault(); var e0 = h.vorbelegen(); if (e0) fertig(h.liste().concat([e0])); return; }
@@ -299,6 +341,8 @@
       heute: function () { return zahl((el('nkm') || {}).value); },
       heuteSetzen: function (v) { if (v > 0) setzeFeld('nkm', String(v).replace('.', ',')); try { if (typeof global.calc === 'function') global.calc(); } catch (e) {} try { global.DpSpeichernFolge(); } catch (e) {} },
       liste: objektListe,
+      geplant: geplantObjekt,   /* v4037 */
+      vivi: function () { return 'objekt'; },   /* v4037 */
       setzen: function (l) { var d = D(); if (d) d._erhoehungen = l; },
       vorbelegen: function (nurPruefen) {
         var e = ausVertrag((el('mv_letzte_erhoehung') || {}).value, (el('mv_letzte_erhoehung_betrag') || {}).value, (el('nkm') || {}).value);
@@ -320,6 +364,8 @@
       wo: 'in dieser Wohnung',
       wohin: 'für diese Wohnung, in der Mietentwicklung und für die Sperrfrist. Die heutige Miete der Wohnung änderst du oben im Feld Ist-Miete',
       liste: function () { return Array.isArray(e.erhoehungen) ? e.erhoehungen : []; },
+      geplant: function () { return Array.isArray(e.erhoehungen_geplant) ? e.erhoehungen_geplant : []; },   /* v4037 */
+      vivi: function () { var L = global._dpMfh && global._dpMfh.einheiten; var k = Array.isArray(L) ? L.indexOf(e) : -1; return k >= 0 ? k : null; },   /* v4037 */
       setzen: function (l) { e.erhoehungen = l; },
       vorbelegen: function (nurPruefen) { var x = ausVertrag(e.mv_letzte_erhoehung, e.mv_letzte_erhoehung_betrag, e.ist); return nurPruefen ? !!x : x; },
       geaendert: function (a) {
@@ -339,7 +385,8 @@
     return sortiert(out);
   }
 
-  if (global.addEventListener) global.addEventListener('dp:object-ready', function () { setTimeout(objektMount, 600); setTimeout(objektMount, 1800); });   /* v3840 · Wohnungen (_dpMfh) kommen nach */
+  if (global.addEventListener) global.addEventListener('dp:object-ready', function () { setTimeout(objektMount, 600); setTimeout(objektMount, 1800); });
+  if (global.addEventListener) global.addEventListener('dp:vivi-stand', function () { setTimeout(objektMount, 300); });   /* v4037 · Knopf nach ViVi und geplante Erhoehungen */   /* v3840 · Wohnungen (_dpMfh) kommen nach */
   if (doc() && doc().addEventListener) doc().addEventListener('DOMContentLoaded', function () { setTimeout(objektMount, 800); });
 
   global.DpErhoehungen = {
@@ -347,6 +394,7 @@
     ableiten: ableiten, mieteAm: mieteAm, imJahr: imJahr, eintragAus: eintragAus, ausVertrag: ausVertrag, sortiert: sortiert,
     html: html, binden: binden, rueckmeldung: rueckmeldung,   /* v3840 */
  objektMount: objektMount, einheitBinden: einheitBinden, objektListe: objektListe, alle: alle,
-    mieteMonat: mieteMonat, jahresFaktor: jahresFaktor, quellenObjekt: quellenObjekt, istFaktor: istFaktor   /* v3366 */
+    mieteMonat: mieteMonat, jahresFaktor: jahresFaktor, quellenObjekt: quellenObjekt, istFaktor: istFaktor,   /* v3366 */
+    planFaktor: planFaktor, geplant: geplant, geplantObjekt: geplantObjekt, geplantLetztesJahr: geplantLetztesJahr, geplantNiveau: geplantNiveau   /* v4037 */
   };
 })(typeof window !== 'undefined' ? window : globalThis);

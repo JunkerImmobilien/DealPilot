@@ -199,7 +199,9 @@ const K = c.DpMietpotenzial, E = c.DpErhoehungen, JA = c.DpJahresabgleich, HV = 
   ok(Object.keys(B.festNeu(alle, null, false, 'x')).length === 0, 'F Jahr freigeben = leer');
   /* stand(): festgeschrieben zählt als erledigt, Text mit Namen der Schritte */
   c4.DpJahresbuch.fest = (j) => (j === 2024 ? { steuer: '2026-11-23', wert: '2026-11-23' } : {});
-  const s24 = J4.stand({ jahr: 2024, status: 'geplant', mb: null }, false);
+  /* v4037 · Miete eines vergangenen Jahres ist erst mit Ist-Miete erledigt (eingetragen oder aus ViVi) */
+  ok(J4.stand({ jahr: 2024, status: 'geplant', mb: null }, false).miete === 'offen' && J4.stand({ jahr: 2024, status: 'geplant', mb: null, miete_vivi: true }, false).miete === 'ok', 'F v4037 Miete 2024 ohne Ist offen, mit Ist aus ViVi erledigt');
+  const s24 = J4.stand({ jahr: 2024, status: 'geplant', mb: null, miete_eigen: true }, false);
   ok(s24.steuer === 'ok' && s24.wert === 'ok' && s24.nFest === 2 && s24.n === 3, 'F fest: Steuer und Wert erledigt, mit Miete 3 von 4 (' + s24.n + ')');
   ok(s24.offen.join(',') === 'Haus' && s24.erledigt.join(',') === 'Miete,Steuer,Wert', 'F erledigt/offen mit Namen');
   const lauf = J4.stand({ jahr: new Date().getFullYear(), status: 'geplant' }, false);

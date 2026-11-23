@@ -106,7 +106,10 @@
   function stand(z, weg, L) {
     if (!z) return null;
     var lauf = z.jahr >= heuteJahr(), h = hausJahr(z.jahr, L), s = {};
-    s.miete = lauf ? 'laufend' : 'ok';
+    /* v4037 · Marcel 23.11.2026: „für jedes Jahr tatsächlich die Werte reinschreiben … sicherstellen“. Ein vergangenes
+       Jahr ist bei der Miete erst erledigt, wenn die Ist-Miete da ist (eingetragen oder aus ViVi) oder der Schritt
+       festgeschrieben ist. Bis v4036 galt jedes vergangene Jahr als erledigt, auch nur mit gerechneter Miete. */
+    s.miete = lauf ? 'laufend' : ((z.miete_eigen || z.miete_vivi) ? 'ok' : 'offen');
     s.steuer = lauf ? 'laufend' : steuerStand(z.status);
     s.wert = z.mb ? 'ok' : (lauf ? 'laufend' : 'offen');
     s.haus = weg ? hausStand(h, lauf) : (lauf ? 'laufend' : steuerStand(z.status));
@@ -252,6 +255,11 @@
     try { var A = global.DealPilotAnkauf, a = A && A.vorhanden && A.vorhanden() ? A.stand() : null, m = a && /^(\d{4})-(\d{2})/.exec(String(a.stichtag || '')); if (m && +m[1] === jahr) ab = +m[2]; } catch (e) {}
     var out = { miete: viviMieteRein(vd.quellen, jahr, ab, global.DpErhoehungen), st: [], rs: null };
     var info = vd.info || {};
+    /* v4037 · Kaltmiete laut ViVi aus dem Mietverlauf ALLER Mietverhältnisse (mit Leerstand), sonst wie bisher */
+    var ij = info.ist_jahre || null;
+    if (ij && ij.summe && ij.summe[String(jahr)] && istZahl(zahl(ij.summe[String(jahr)].miete))) out.miete = zahl(ij.summe[String(jahr)].miete);
+    out.gezahlt = ij && ij.gezahlt && istZahl(zahl(ij.gezahlt[String(jahr)])) ? zahl(ij.gezahlt[String(jahr)]) : null;
+    out.soll_warm = ij && ij.soll_warm && istZahl(zahl(ij.soll_warm[String(jahr)])) ? zahl(ij.soll_warm[String(jahr)]) : null;
     (info.sondertilgungen || []).forEach(function (x) { if (x && String(x.datum || '').slice(0, 4) === String(jahr)) out.st.push(x); });
     if (jahr === heuteJahr() && info.restschuld_heute && istZahl(info.restschuld_heute.wert)) out.rs = info.restschuld_heute;
     return out;
@@ -263,6 +271,12 @@
       var dI = istZahl(z.miete_ist) ? z.miete_ist - vj.miete : null;
       zeilen.push('<div class="dp-ja-vz"><span>Kaltmiete ' + z.jahr + '</span><b>' + eur(vj.miete) + '</b><span>' + (dI == null ? 'kein Ist in DealPilot'
         : Math.abs(dI) < 1 ? '<span class="dp-ja-gut">stimmt mit DealPilot überein</span>' : 'DealPilot ' + eur(z.miete_ist) + ', <span class="dp-ja-schlecht">Differenz ' + vz(dI) + '</span>') + '</span></div>');
+    }
+    /* v4037 · gezahlt laut ViVi (warm) gegen das Soll warm: deutlich darunter = Hinweis */
+    if (vj.gezahlt != null && vj.soll_warm != null && vj.soll_warm > 0) {
+      var q = vj.gezahlt / vj.soll_warm;
+      zeilen.push('<div class="dp-ja-vz"><span>Gezahlt ' + z.jahr + ' (warm)</span><b>' + eur(vj.gezahlt) + '</b><span>' + (q >= 0.97 ? '<span class="dp-ja-gut">wie vereinbart</span>'
+        : 'vereinbart ' + eur(vj.soll_warm) + ', <span class="dp-ja-schlecht">' + Math.round((1 - q) * 100) + ' % weniger eingegangen</span>. Mietrückstand oder Leerstand prüfen.') + '</span></div>');
     }
     if (vj.rs) {
       var rsD = istZahl(z.rs_proj) ? z.rs_proj - vj.rs.wert : null;
@@ -399,7 +413,8 @@
     return '<div class="dp-ja-pot" data-ja-pot="' + z.jahr + '"><div><div class="dp-ja-eti">Mieterhöhung ' + z.jahr + '</div><div class="dp-ja-w' + (ungenutzt > 0 ? '' : ' dp-ja-gut') + '">' + wort + '</div>'
       + (genutzt ? '<div class="dp-ja-vgl">' + vz(Math.round(mp.zul - mp.ist)) + ' / Monat ab ' + mmjj(gen[0].datum) + '</div>' : '') + '</div>'
       + '<div><div class="dp-ja-balken" role="img" aria-label="eingetragen ' + quote + ' % der zulässigen Miete"><i style="width:' + quote + '%"></i></div><p>' + t + '</p></div>'
-      + (ungenutzt > 0 ? knopf('mieterhoehung', 'Mieterhöhung vorbereiten', true) : '<span></span>') + '</div>'
+      + (ungenutzt > 0 ? '<span>' + knopf('mieterhoehung', 'Mieterhöhung vorbereiten', true)
+        + (global.DpViviMieterhoehung && global.DpViviMieterhoehung.verfuegbar() ? ' ' + knopf('vivi-mh', 'In ViVi anlegen', false) : '') + '</span>' : '<span></span>') + '</div>'
       + '<p class="dp-ja-hin">Gerechnet wie die Potenzialanalyse (Kappung, Sperrfrist, Vergleichsmiete). Frühere Jahre mit der heutigen Vergleichsmiete, den damaligen Mietspiegel kennt DealPilot nicht.</p>';
   }
 
@@ -479,8 +494,9 @@
     var mPlan = z.miete_plan != null ? z.miete_plan : z.miete_proj;
     var sch = '';
     sch += schritt('miete', 'Miete', s, eur(z.miete_ist), (z.miete_plan != null ? 'Plan ' : 'Projektion ') + eur(mPlan) + (abw(mPlan, z.miete_ist, true) ? ' · ' + abw(mPlan, z.miete_ist, true) : ''),
-      (erh.length ? 'Erhöhung ' + esc(erh.join(', ')) + '.' : 'Keine Erhöhung in diesem Jahr eingetragen.') + (listeLeer && !lauf ? ' Ohne Liste rechnet DealPilot vergangene Jahre mit der heutigen Miete.' : ''),
-      knopf('miete', 'Mieterhöhung eintragen', listeLeer && !lauf), z.jahr);
+      (erh.length ? 'Erhöhung ' + esc(erh.join(', ')) + '.' : 'Keine Erhöhung in diesem Jahr eingetragen.') + (listeLeer && !lauf ? ' Ohne Liste rechnet DealPilot vergangene Jahre mit der heutigen Miete.' : '')
+        + (!lauf ? (z.miete_eigen ? ' Ist-Miete von dir eingetragen.' : (z.miete_vivi ? ' Ist-Miete aus ViVi übernommen.' : ' Die Ist-Miete ' + z.jahr + ' fehlt noch. Trag ein, was wirklich eingegangen ist.')) : ''),
+      (!lauf && !z.miete_eigen && !z.miete_vivi ? knopf('eintragen', 'Ist-Miete ' + z.jahr + ' eintragen', true, z.jahr) + ' ' : '') + knopf('miete', 'Mieterhöhung eintragen', listeLeer && !lauf), z.jahr);
     var stW = { geplant: 'nicht erklärt', erklaert: 'erklärt, Bescheid fehlt', bescheid: 'Bescheid liegt vor' }[z.status] || 'nicht erklärt';
     var stI = z.steuer ? z.steuer.ergebnis : null, stP = pl && istZahl(pl.zve_y) ? pl.zve_y : null;
     sch += schritt('steuer', 'Steuer', s, istZahl(stI) ? vz(stI) : '–', (stP != null ? 'Plan ' + vz(stP) : 'kein Plan') + (abw(stP, stI, true) ? ' · ' + abw(stP, stI, true) : ''),
@@ -619,6 +635,7 @@
       }
       if (a === 'miete') { zuMiete(); return; }
       if (a === 'mieterhoehung') { zuMiete('mh'); return; }
+      if (a === 'vivi-mh') { try { global.DpViviMieterhoehung.oeffnen({ quelle: 'pilot-analyse' }); } catch (x) {} return; }   /* v4037 */
       if (a === 'steuer') { zuReiter('s3-tax'); return; }
       if (a === 'eintragen') { if (JB() && JB().oeffnen) JB().oeffnen(y); return; }
       if (a === 'av' || a === 'erreicht') { if (JB() && JB().aktion) JB().aktion(a, y, b.getAttribute('data-ja-fassung')); return; }

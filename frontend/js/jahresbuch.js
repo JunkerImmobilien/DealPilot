@@ -39,7 +39,7 @@
 (function (global) {
   'use strict';
   if (global.DpJahresbuch) return;
-  var VERSION = 'v4016';
+  var VERSION = 'v4037';
   var STATUS = [['geplant', 'geplant'], ['erklaert', 'erklärt'], ['bescheid', 'Bescheid']];
 
   function doc() { return global.document || null; }
@@ -105,7 +105,9 @@
        Jahre jetzt mit den eingetragenen Mieterhöhungen. Eine frühere eigene Jahressumme (bis v3365)
        bleibt sichtbar und geht vor. */
     z.miete_eigen = istZahl(zahl(ist.nkm_j));
-    z.miete_ist = z.miete_eigen ? zahl(ist.nkm_j) : (q.jahr <= heuteJahr() ? z.miete_proj : null);
+    /* v4037 · Ist-Miete laut ViVi (nkm_j_vivi, aus dem Mietverlauf aller Mietverhaeltnisse) zaehlt, wenn keine eigene da ist */
+    z.miete_vivi = !z.miete_eigen && istZahl(zahl(ist.nkm_j_vivi));
+    z.miete_ist = z.miete_eigen ? zahl(ist.nkm_j) : (z.miete_vivi ? zahl(ist.nkm_j_vivi) : (q.jahr <= heuteJahr() ? z.miete_proj : null));
     z.miete_einheiten = summeEinheiten(ist.einheiten);
     /* Ohne eingefrorenen Plan (Ankauf-Stand vor v2989) steht die heutige Projektion da - gekennzeichnet, nie als Plan */
     z.ohne_plan = !q.plan;
@@ -546,7 +548,33 @@
     try { if (global.DpJahresabgleich) global.DpJahresabgleich.mountAll(); } catch (x) {}
     return true;
   }
-  function istMiete(jahr) { var e = jahreDaten()[String(jahr)]; var v = e ? zahl(e.nkm_j) : null; return istZahl(v) ? v : null; }
+  /** v4037 · eigene Angabe vor ViVi. Ohne beides null (dann rechnet die Mietentwicklung aus den Mieterhoehungen). */
+  function istMiete(jahr) {
+    var e = jahreDaten()[String(jahr)]; if (!e) return null;
+    var v = zahl(e.nkm_j); if (istZahl(v)) return v;
+    var w = zahl(e.nkm_j_vivi); return istZahl(w) ? w : null;
+  }
+  function istHerkunft(jahr) {
+    var e = jahreDaten()[String(jahr)]; if (!e) return null;
+    if (istZahl(zahl(e.nkm_j))) return 'eigen';
+    return istZahl(zahl(e.nkm_j_vivi)) ? 'vivi' : null;
+  }
+  /** v4037 · Ist-Kaltmiete je vergangenem Jahr aus ViVi uebernehmen (ohne Speichern, der Aufrufer speichert).
+      werte = { 'JJJJ': { miete, ... } }. Ein festgeschriebener Mietschritt bleibt unberuehrt, die eigene Angabe bleibt
+      stehen (sie gewinnt in istMiete). Rueckgabe: true, wenn sich etwas geaendert hat. */
+  function viviIstSetzen(werte) {
+    var d = D(); if (!d || !werte || typeof werte !== 'object' || !verfuegbar()) return false;
+    var hj = heuteJahr(), g = false;
+    Object.keys(werte).forEach(function (k) {
+      var y = parseInt(k, 10), w = werte[k] && zahl(werte[k].miete);
+      if (!(y >= 1990) || y >= hj || !istZahl(w)) return;
+      if (fest(y).miete) return;
+      var alt = zahl((jahreDaten()[String(y)] || {}).nkm_j_vivi);
+      if (alt === Math.round(w * 100) / 100) return;
+      d._jahre = setzen(d._jahre, y, 'nkm_j_vivi', Math.round(w * 100) / 100); g = true;
+    });
+    return g;
+  }
   if (global.addEventListener) {
     global.addEventListener('dp:object-ready', function () { _offen = null; mountAll._mbFertig = null; setTimeout(mountAll, 900); });
     global.addEventListener('dp:erhoehungen', function () { setTimeout(mountAll, 100); });
@@ -557,7 +585,7 @@
     VERSION: VERSION, STATUS: STATUS,
     jahreVon: jahreVon, summeEinheiten: summeEinheiten, summeWohnungen: summeWohnungen,   /* v3840 */ zeile: zeile, setzen: setzen, nachfragen: nachfragen,
     verfuegbar: verfuegbar, zeilen: zeilen, status: status, statusSetzen: statusSetzen, statusWort: statusWort, aenderungErlaubt: aenderungErlaubt,
-    istMieteSetzen: istMieteSetzen, istMiete: istMiete,   /* v3710 */
+    istMieteSetzen: istMieteSetzen, istMiete: istMiete,   /* v3710 */ istHerkunft: istHerkunft, viviIstSetzen: viviIstSetzen,   /* v4037 */
     FEST_SCHRITTE: FEST_SCHRITTE, festAus: festAus, festNeu: festNeu, fest: fest, festSetzen: festSetzen, festGesperrt: festGesperrt,   /* v4016 */
     html: html, mountAll: mountAll, oeffnen: oeffnen, schliessen: schliessen, vorbelegen: vorbelegen, mbLaden: mbLaden, aktion: aktion   /* v3430 */
   };

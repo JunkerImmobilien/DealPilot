@@ -113,6 +113,13 @@
       + (w.neuQ > 0 ? '<i style="left:' + p(w.neuQ) + ';background:var(--wl-c9a84c,#C9A84C)" title="Neuvermietung"></i>' : '') + '</div>'
       + '<div class="marken"><span>heute ' + qm(w.istQ) + '</span><span>Mieterhöhung ' + qm(sQ) + '</span>' + (w.neuQ > 0 ? '<span>Neuvermietung ' + qm(w.neuQ) + '</span>' : '') + '</div></div>';
   }
+  /* v4037 · Absprung nach ViVi, wo DealPilot Spielraum zeigt (ein Fenster: DpViviMieterhoehung). Neuvermietung bekommt
+     keinen Absprung, das ist keine Mieterhöhung im laufenden Vertrag. */
+  function viviKnopf(w, mfh) {
+    var V = window.DpViviMieterhoehung;
+    if (!V || !V.verfuegbar() || !w || !(w.ist > 0)) return '';
+    return '<button type="button" class="btn ' + (w.soll >= w.ist + 1 ? '' : 'btn-outline ') + 'btn-sm" data-md-vivi="' + (mfh && w.i != null ? w.i : 'objekt') + '">Mieterhöhung in ViVi anlegen</button>';
+  }
   function zweiZahlen(w) {
     return '<div class="reihe" style="margin-top:8px"><div class="zahl"><small>Mieterhöhung</small><b>' + (w.soll >= w.ist + 1 ? eur(w.soll) : 'kein Spielraum') + '</b><small>' + (w.soll >= w.ist + 1 ? '+' + eur(w.soll - w.ist) + ' im Monat' + (w.ab ? ', ' + esc(w.ab) : '') : (w.st === 'ueb' ? 'über dem Oberwert ' + qm(w.vgl) : 'am Oberwert')) + '</small></div>'
       + (w.neuQ > 0 ? '<div class="zahl"><small>Neuvermietung</small><b>' + eur(w.neuM) + '</b><small>' + qm(w.neuQ) + ', ' + (w.bremse ? '110 %, Mietpreisbremse' : (window.DpMieteRegel ? DpMieteRegel.pct() : 120) + ' %, ohne Bremse') + '</small></div>' : '') + '</div>';
@@ -168,13 +175,14 @@
       + '<div style="border-top:1px solid #F1ECE1;margin-top:12px;padding-top:10px"><div class="lbl">Gewählte Wohnung</div><h3 style="margin-top:2px">Wohnung ' + esc(w.nr) + (w.lage ? ', ' + esc(w.lage) : '') + '</h3>'
       + '<div class="satz">' + Math.round(w.wfl) + ' m², heute ' + (w.ist ? eur(w.ist) + ' im Monat' : 'leer') + '.</div>'
       + leiter(w) + zweiZahlen(w) + (w.grund ? '<div class="grund">' + esc(w.grund) + '</div>' : '')
-      + '<div class="knoepfe"><button type="button" class="btn btn-outline btn-sm" data-md-whg="' + w.i + '">Wohnung öffnen, Vertrag und Erhöhung</button><button type="button" class="btn btn-outline btn-sm" data-md-jahre="1">Miete je Wohnung: heute, geplant, Ziel</button></div></div>'
+      + '<div class="knoepfe">' + viviKnopf(w, true) + '<button type="button" class="btn btn-outline btn-sm" data-md-whg="' + w.i + '">Wohnung öffnen, Vertrag und Erhöhung</button><button type="button" class="btn btn-outline btn-sm" data-md-jahre="1">Miete je Wohnung: heute, geplant, Ziel</button></div></div>'
       + '<details class="dp-md-auf" data-md-platz="mv"><summary>Mietverträge der Wohnungen</summary></details></div>';   /* v4005 · Karte Mietvertrag beim MFH */
   }
   function karteWohnung(D) {
     var w = D.W[0];
     return '<div class="card dp-md-k">' + kopf('door', 'Die Wohnung') + '<div class="satz">' + Math.round(w.wfl) + ' m², heute ' + (w.ist ? eur(w.ist) + ' im Monat' : 'leer') + '. Wo die Miete steht und wie weit sie steigen darf.</div>'
       + leiter(w) + zweiZahlen(w) + (w.grund ? '<div class="grund">' + esc(w.grund) + '</div>' : '')
+      + (viviKnopf(w, false) ? '<div class="knoepfe">' + viviKnopf(w, false) + '</div>' : '')
       + '<details class="dp-md-auf" open data-md-platz="mv"><summary>Mietvertrag und Mieterhöhung</summary></details></div>';
   }
   function karteRegeln(D) {
@@ -238,6 +246,8 @@
     if (!box._bind) {
       box._bind = true;
       box.addEventListener('click', function (ev) {
+        var vv = ev.target.closest('[data-md-vivi]');   /* v4037 */
+        if (vv) { ev.preventDefault(); var ve = vv.getAttribute('data-md-vivi'); try { window.DpViviMieterhoehung.oeffnen({ einheit: ve === 'objekt' ? null : ve, quelle: 'Reiter Miete' }); } catch (e) {} return; }
         var t = ev.target.closest('[data-md-sel],[data-md-whg],[data-md-jahre],[data-md-einh]'); if (!t) return;
         var M = window.DpMfhEinheiten;
         if (t.hasAttribute('data-md-sel')) { _sel = +t.getAttribute('data-md-sel'); zeichnen(); return; }

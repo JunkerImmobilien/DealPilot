@@ -287,15 +287,44 @@ window.MietEntwicklung = (function() {
   /* v3981 · F18 Gesamt-Flow 22.11.2026: auch das LAUFENDE Jahr aus dem Mietverlauf. Bis hier bekam es die heutige
      Miete für alle zwölf Monate - eine Erhöhung ab 11/2026 (495 → 520 €) stand als 12 × 520 = 6.240 statt
      10 × 495 + 2 × 520 = 5.990 € im Jahr. Ohne Erhöhung im Jahr ergibt istFaktor 1, wie bisher. */
+  /* v4037 · Marcel 23.11.2026: „für jedes Jahr tatsächlich die Werte, auch rückwirkend … es muss passen“.
+     Vergangene Jahre im Bestand: liegt eine Ist-Miete vor (eigene Angabe oder aus ViVi, DpJahresbuch.istMiete), rechnet
+     der Faktor genau auf diese Jahressumme zurück, damit Projektion, Cashflow und Steuer dasselbe Jahr zeigen wie die
+     Tabelle. Das Kaufjahr zählt nur ab dem Übergang (calc.js kürzt Jahr 1 mit getWuMonths, hier wird darauf hochgerechnet).
+     Ohne Ist-Miete wie bisher aus den Mieterhöhungen. Ab heute Plan: heutige Miete, geplante Erhöhungen (ViVi „geplant“)
+     und die Steigerung p. a. */
+  function _wuMonate(jahr) {
+    try { var A = window.DealPilotAnteilig; if (A && typeof A.getWuMonths === 'function') { var m = A.getWuMonths(jahr); if (typeof m === 'number') return m; } } catch (e) {}
+    return 12;
+  }
+  function _istJahrFaktor(y) {
+    var JB = window.DpJahresbuch; if (!(JB && JB.istMiete && JB.verfuegbar && JB.verfuegbar())) return null;
+    var by = _basisJahr(), eig = JB.istMiete(by + y); if (eig == null) return null;
+    var wu = y === 0 ? _wuMonate(by) : 12; if (!(wu > 0)) return null;
+    var nkm = _v('nkm', 0), ze = _v('ze', 0), inc = appliesToZE(), voll = eig * 12 / wu;
+    var f = inc ? voll / ((nkm + ze) * 12) : (nkm > 0 ? (voll - ze * 12) / (nkm * 12) : 0);
+    return isFinite(f) && f > 0 ? f : null;
+  }
+  function _planFaktor(cal) {
+    var E = window.DpErhoehungen;
+    if (E && typeof E.planFaktor === 'function') return E.planFaktor(cal);
+    return (E && typeof E.istFaktor === 'function') ? E.istFaktor(cal) : 1.0;
+  }
   function factor(y) {
     var off = bestandVersatz();
     if (!off) return factorRoh(y);
-    if (y <= off) {
-      var E = window.DpErhoehungen;
-      return (E && typeof E.istFaktor === 'function') ? E.istFaktor(_basisJahr() + y) : 1.0;
-    }
+    var by = _basisJahr();
+    if (y < off) { var fi = _istJahrFaktor(y); if (fi != null) return fi; }
+    if (y <= off) return _planFaktor(by + y);
     var f0 = factorRoh(off);
-    return f0 > 0 ? factorRoh(y) / f0 : factorRoh(y - off);
+    var basis = f0 > 0 ? factorRoh(y) / f0 : factorRoh(y - off);
+    /* v4037 · geplante Erhöhungen: mindestens die vereinbarte Miete, danach läuft die Steigerung ab ihrem Jahr weiter */
+    var E = window.DpErhoehungen, g = E && E.geplantLetztesJahr ? E.geplantLetztesJahr() : null;
+    if (!g || g < by + off) return basis;
+    var yG = g - by;
+    if (y <= yG) return Math.max(basis, _planFaktor(by + y));
+    var fG = factorRoh(yG) > 0 ? factorRoh(y) / factorRoh(yG) : 1;
+    return Math.max(basis, (E.geplantNiveau ? E.geplantNiveau() : 1) * fG);
   }
   function factorRoh(y) {
     if (y <= 0) return 1.0;
@@ -488,9 +517,13 @@ window.MietEntwicklung = (function() {
     var fW = function (n) { return Math.round(n).toLocaleString('de-DE'); };
     for (var i = 0; i < bis; i++) {
       var f = factor(i), cal = by + i, ist = cal < cy;
-      var jahr = nkm_m * 12 * f + ze_m * 12 * (inc ? f : 1);   /* wie calc.js _nkmJYear */
+      /* v4037 · Kaufjahr nur ab dem Übergang, wie calc.js Jahr 1 (getWuMonths) */
+      var monate = i === 0 ? _wuMonate(cal) : 12;
+      var jahr = (nkm_m * 12 * f + ze_m * 12 * (inc ? f : 1)) * monate / 12;   /* wie calc.js _nkmJYear, Jahr 1 anteilig */
       var erh = alle.filter(function (x) { return String(x.datum).slice(0, 4) === String(cal); });
+      var gepl = (E && E.geplant ? E.geplant() : []).filter(function (x) { return String(x.datum).slice(0, 4) === String(cal); });
       var eig = (ist && eintragbar && JB.istMiete) ? JB.istMiete(cal) : null;
+      var hk = (ist && eintragbar && JB.istHerkunft) ? JB.istHerkunft(cal) : null;
       /* v3840 · Marcel 19.11.2026: „bei 2025 steht in Kaltmiete im Jahr plötzlich ein Eingabefeld, unverständlich".
          Jetzt steht dort der Wert (grau = gerechnet, schwarz = eingetragen) und ein Knopf „eintragen". Er öffnet das
          Jahr im Fenster Jahre, dort steht, wie sich der Wert zusammensetzt. Beim MFH kommt die Summe aus den Wohnungen
@@ -498,17 +531,23 @@ window.MietEntwicklung = (function() {
       /* v3860 · Marcel 19.11.2026: „Warum steht neben 2025 eintragen? Der macht dasselbe wie alle Jahre im Überblick."
          Kein Knopf je Jahr mehr. Grau gerechnet, schwarz eingetragen. Eingetragen wird an EINER Stelle: beim MFH je Wohnung
          im Fenster Einheiten (Miete je Wohnung und Jahr), sonst im Fenster Jahre (Knopf unter der Tabelle). */
-      var zelle = ist && eintragbar ? '<span class="me-ist-wert' + (eig != null ? ' me-ist-eigen' : '') + '">' + fE(eig != null ? eig : jahr) + '</span>' : fE(jahr);
-      zeilen += '<tr class="' + (ist ? 'me-row-ist' : (cal === cy ? 'me-row-heute' : 'me-row-plan')) + (erh.length ? ' me-row-hike' : '') + '">'
-        + '<td>' + cal + (erh.length ? ' ⬆' : '') + '</td>'
-        + '<td>' + (ist ? (eig != null ? 'Ist · eingetragen' : 'Ist') : (cal === cy ? 'heute' : 'Plan')) + '</td>'
+      var wertJ = eig != null ? eig : jahr;
+      var zelle = ist && eintragbar ? '<span class="me-ist-wert' + (eig != null ? ' me-ist-eigen' : '') + '">' + fE(wertJ) + '</span>' : fE(jahr);
+      var stand = ist ? (hk === 'eigen' ? 'Ist · eingetragen' : (hk === 'vivi' ? 'Ist · aus ViVi' : 'Ist')) : (cal === cy ? 'heute' : (gepl.length ? 'Plan · geplant' : 'Plan'));
+      zeilen += '<tr class="' + (ist ? 'me-row-ist' : (cal === cy ? 'me-row-heute' : 'me-row-plan')) + (erh.length || gepl.length ? ' me-row-hike' : '') + '">'
+        + '<td>' + cal + (erh.length || gepl.length ? ' ⬆' : '') + (monate < 12 ? ' <small>ab ' + String(13 - monate).padStart(2, '0') + '.</small>' : '') + '</td>'
+        + '<td>' + stand + '</td>'
         + '<td' + (ist && eintragbar ? ' class="me-ist-td"' : '') + '>' + zelle + '</td>'
-        + '<td>' + fE(eig != null ? eig / 12 : nkm_m * f) + '</td></tr>';
+        + '<td>' + fE(monate > 0 ? wertJ / monate : 0) + '</td></tr>';
     }
     var nE = alle.length;
-    /* v3840 · kurze Sätze, nur Punkt und Komma (Marcel 19.11.2026) */
-    wrap.innerHTML = '<div class="me-herkunft">Vergangene Jahre zeigen die gezahlte Miete' + (nE ? ', gerechnet aus ' + nE + ' eingetragenen Mieterhöhungen' : '') + '. Ab ' + cy + ' schreibt DealPilot die heutige Miete fort.'
-      + (eintragbar ? ' Grau ist gerechnet, schwarz ist eingetragen.' : '') + '</div>'
+    /* v3840 · kurze Sätze, nur Punkt und Komma (Marcel 19.11.2026)
+       v4037 · klar trennen: vergangene Jahre tatsächlich, ab heute Plan. Die Steigerung p. a. gilt nur für den Plan. */
+    var stg = String(_v('mietstg', 0)).replace('.', ',');
+    var mUe = _wuMonate(by) < 12 ? ' Das Kaufjahr ' + by + ' zählt ab dem Übergang.' : '';
+    wrap.innerHTML = '<div class="me-herkunft">Vergangene Jahre zeigen die tatsächliche Miete, aus ViVi, von dir eingetragen oder aus ' + (nE ? nE + ' Mieterhöhungen' : 'der heutigen Miete') + ' gerechnet.' + mUe
+      + ' Ab ' + cy + ' ist es Plan: heutige Miete' + ((E && E.geplant && E.geplant().length) ? ', geplante Erhöhungen' : '') + (getMode() === 'prog' ? ' und ' + stg + ' % Steigerung im Jahr.' : ' und deine Annahme zur Entwicklung.')
+      + (eintragbar ? ' Grau ist gerechnet, schwarz ist eingetragen oder aus ViVi.' : '') + '</div>'
       + '<table><thead><tr><th>Jahr</th><th>Stand</th><th>Kaltmiete im Jahr</th><th>je Monat</th></tr></thead><tbody>' + zeilen + '</tbody></table>'
       + (eintragbar ? '<div class="me-ist-link">' + (mfh ? '<button type="button" class="me-ist-alle" data-me-einh-jahre="1">Miete je Wohnung: heute, geplant, Ziel</button>' : '<button type="button" class="me-ist-alle" data-me-ist-alle="1">Alle Jahre im Überblick</button>') + '</div>' : '');
     if (eintragbar && !wrap._dpMeIst) {

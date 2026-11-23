@@ -215,6 +215,8 @@
     });
     if (einheitGeaendert) { geaendert = true; einheitenSummen(); }
     if (erhoehungenUebernehmen(info)) geaendert = true;   /* v3998 */
+    if (geplantUebernehmen(info)) geaendert = true;   /* v4037 */
+    if (istJahreUebernehmen(info)) geaendert = true;   /* v4037 */
     /* Felder, die ViVi nicht mehr fuehrt, werden frei */
     Array.prototype.forEach.call(document.querySelectorAll('.vivi-verknuepft, .vivi-eigen'), function (el) {
       if (el.id && !Object.prototype.hasOwnProperty.call(felder, el.id) && !el.hasAttribute('data-vivi-zelle')) { sperreAus(el); schlossWeg(el); }
@@ -237,6 +239,27 @@
     var erg = eigene.concat(dazu).sort(function (a, b) { return a.datum < b.datum ? -1 : (a.datum > b.datum ? 1 : 0); });
     var kern = function (l) { return JSON.stringify(l.map(function (x) { return [x.id, x.datum, x.art, x.von, x.auf]; })); };
     return kern(erg) === kern(alt) ? null : erg;
+  }
+  /* v4037 · geplante Erhöhungen aus ViVi: die Liste ersetzt sich ganz (sie gehört ViVi, keine eigenen Einträge darin) */
+  function geplantUebernehmen(info) {
+    var E = (info && info.erhoehungen_geplant) || {}, g = false;
+    var d = window._currentObjData; if (!d) return false;
+    var neuO = E.objekt || [];
+    if (JSON.stringify(d._erhoehungen_geplant || []) !== JSON.stringify(neuO)) { if (neuO.length) d._erhoehungen_geplant = neuO; else delete d._erhoehungen_geplant; g = true; }
+    var L = window._dpMfh && window._dpMfh.einheiten;
+    if (Array.isArray(L)) L.forEach(function (e, idx) {
+      var k = Object.keys(E).filter(function (x) { return x !== 'objekt' && einheitIndex(+x, info) === idx; })[0];
+      var neu = k != null ? E[k] : [];
+      if (JSON.stringify(e.erhoehungen_geplant || []) !== JSON.stringify(neu)) { if (neu.length) e.erhoehungen_geplant = neu; else delete e.erhoehungen_geplant; g = true; }
+    });
+    return g;
+  }
+  /* v4037 · Ist-Kaltmiete je vergangenem Jahr laut ViVi-Mietverlauf ins Jahresbuch (nkm_j_vivi). Eigene Angaben
+     bleiben und gewinnen, festgeschriebene Jahre bleiben unberührt (DpJahresbuch.viviIstSetzen). */
+  function istJahreUebernehmen(info) {
+    var ij = info && info.ist_jahre; if (!ij || !ij.summe) return false;
+    var JB = window.DpJahresbuch; if (!JB || !JB.viviIstSetzen) return false;
+    try { return JB.viviIstSetzen(ij.summe); } catch (e) { return false; }
   }
   function erhoehungenUebernehmen(info) {
     var E = info && info.erhoehungen; if (!E || typeof E !== 'object') return false;
