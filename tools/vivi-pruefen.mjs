@@ -1018,6 +1018,21 @@ console.log('\nTeil S · in ViVi gelöscht: Verknüpfung lösen nur bei eindeuti
   ok(hS(dS) === 1 && !pS.einheiten.some((e) => e.einheit.unit_type === 'ancillary'), 'S9 F19: Stellplatzmiete nur am Objekt: Hinweis, keine Nebeneinheit (Marcel 23.11.)');
   dS._mfh.einheiten[0].stellplatz_miete = 35;
   ok(hS(dS) === 0 && mapping.nachVivi(dS, {}).einheiten[0].miete.amenities[0].monthly_rent === 35, 'S10 Stellplatz an der Wohnung geht als amenity des Mieters mit, kein Hinweis');
+  const eA = mapping.erhoehungenAus({ rent_changes: [
+    { id: 'a', effective_date: '2025-03-01', status: 'active', adjustment_type: 'rent_increase', previous_rent: 470, new_rent: 495 },
+    { id: 'b', effective_date: '2026-11-01', status: 'active', adjustment_type: 'utility_adjustment', previous_rent: 495, new_rent: 495 },
+    { id: 'c', effective_date: '2026-11-01', status: 'active', adjustment_type: 'index_rent', previous_rent: 495, new_rent: 520 },
+    { id: 'd', effective_date: '2027-01-01', status: 'active', previous_rent: 520, new_rent: 540 },
+    { id: 'e', effective_date: '2025-06-01', status: 'cancelled', previous_rent: 495, new_rent: 999 }] }, '2026-11-23');
+  ok(eA.length === 2 && eA[0].datum === '2025-03-01' && eA[0].von === 470 && eA[0].auf === 495 && eA[0].art === '558' && eA[1].art === 'index' && eA[1].id === 'vivi-c',
+    'S11 Mietverlauf → Mieterhöhungen: zwei Erhöhungen, NK-Anpassung, Zukunft und Storno nicht (Kauf 2024, heute 2026)');
+  const rA = { id: 'r1', unit_id: 'u1', occupancy_type: 'rented', rent: 520, rental_start: '2016-09-01' };
+  const fA = mapping.ausVivi({ projekt: { id: 'p' }, einheiten: [{ id: 'u1', unit_type: 'residential', square_meters: 58.5 }], mietverhaeltnisse: [rA],
+    mietverlauf: { r1: { rent_changes: [{ id: 'c', effective_date: '2026-11-01', status: 'active', previous_rent: 495, new_rent: 520 }] } } },
+    { vivi_ids: {}, mitEinheiten: false, objart: 'ETW', jetzt: Date.parse('2026-11-23T10:00:00Z') });
+  ok(fA.info.erhoehungen && fA.info.erhoehungen.objekt && fA.info.erhoehungen.objekt[0].auf === 520 && fA.felder.nkm.wert === 520,
+    'S12 ETW: Liste unter info.erhoehungen.objekt, Nettokaltmiete heute 520 (Ankauf-Stand bleibt unberührt, ViVi schreibt nur Ist heute)');
+  ok(/function erhoehungenMischen/.test(VF) && /\^vivi-/.test(VF) && /erhoehungenUebernehmen\(info\)/.test(VF), 'S13 Browser mischt: ViVi-Einträge ersetzt, eigene bleiben, gleicher Tag eigener gewinnt');
   ok(/function alleSelbst/.test(VF) && /data-vivi="alle-selbst"/.test(VJ) && /data-vivi="alle-vivi"/.test(VJ), 'S8 alle Schlösser auf einmal: selbst festlegen und aus ViVi übernehmen');
 }
 

@@ -368,6 +368,23 @@ function erhoehungBetrag(verlauf, datum) {
   });
   return b;
 }
+/* v3998 · Mieterhoehungen aus dem Mietverlauf: jede wirksame Aenderung bis heute mit hoeherer Kaltmiete, als Eintrag der
+   Liste in js/mieterhoehungen.js { id, datum, art, von, auf, beleg }. Reine NK-Anpassungen und Senkungen zaehlen nicht.
+   Die Art folgt adjustment_type (Index, Staffel, Modernisierung), sonst Vergleichsmiete (§ 558). */
+function erhoehungenAus(verlauf, heute) {
+  const L = verlauf && Array.isArray(verlauf.rent_changes) ? verlauf.rent_changes : [];
+  const aus = [];
+  L.forEach(function (c) {
+    if (!c || (c.status && c.status !== 'active')) return;
+    const d = isoDatum(c.effective_date); if (!d || d > heute) return;
+    const alt = zahl(c.previous_rent), neu = zahl(c.new_rent);
+    if (alt == null || neu == null || !(neu > alt)) return;
+    const t = text(c.adjustment_type).toLowerCase();
+    const art = /index/.test(t) ? 'index' : (/stag|graduat|step/.test(t) ? 'staffel' : (/moderni/.test(t) ? '559' : '558'));
+    aus.push({ id: 'vivi-' + (c.id != null ? c.id : d), datum: d, art: art, von: rund(alt), auf: rund(neu), beleg: 'aus ViVi' });
+  });
+  return aus.sort(function (a, b) { return a.datum < b.datum ? -1 : (a.datum > b.datum ? 1 : 0); });
+}
 function monatJahr(iso) { const m = /^(\d{4})-(\d{2})/.exec(text(iso)); return m ? m[2] + '.' + m[1] : null; }
 
 /**
@@ -421,6 +438,7 @@ function ausVivi(paket, kontext) {
     if (u) zuordnung.push({ unit: u, praefix: '' });
   }
   const einheitenInfo = {};
+  const erhoehungenInfo = {};
   zuordnung.forEach(function (z) {
     const u = z.unit, q = 'units/' + u.id, P = z.praefix;
     if (P) einheitenInfo[z.index] = { nr: z.nr, name: text(u.identifier) };
@@ -455,6 +473,10 @@ function ausVivi(paket, kontext) {
       if (eb != null) setze(P + 'mv_letzte_erhoehung_betrag', rund(eb), rq);
       else felder[P + 'mv_letzte_erhoehung_betrag'] = { wert: '', quelle: rq };   /* unbekannt: leer, nie der alte Betrag */
     }
+    /* v3998 · Marcel 23.11.2026: Kauf 2024, heute 2026: die Miete jedes vergangenen Jahres muss stimmen, auch bei
+       mehreren Erhoehungen. Der ganze Mietverlauf geht in die Liste der Mieterhoehungen (js/mieterhoehungen.js). */
+    const erhListe = erhoehungenAus(paket.mietverlauf && paket.mietverlauf[r.id], heute);
+    if (erhListe.length) erhoehungenInfo[P ? String(z.index) : 'objekt'] = erhListe;
     const va = VERTRAG_AUS_VIVI[text(r.contract_type)]; if (va) setze(P + 'mv_art', va, rq);
     const stp = stellplatzMiete(r); if (stp != null) setze(P ? P + 'stellplatz_miete' : 'ze_stp_monat', stp, rq);
   });
@@ -490,6 +512,7 @@ function ausVivi(paket, kontext) {
 
   /* Gegenprobe: Restschuld heute aus dem Tilgungsplan (kein Eingabefeld, nur Vergleich zu calc.js) */
   const info = { restschuld_heute: null, darlehen_weitere: [], einheiten: einheitenInfo };
+  if (Object.keys(erhoehungenInfo).length) info.erhoehungen = erhoehungenInfo;
   const plan = paket.tilgungsplan && Array.isArray(paket.tilgungsplan.data) ? paket.tilgungsplan.data : [];
   const bisHeute = plan.filter(function (z) { return isoDatum(z.date) && isoDatum(z.date) <= heute; });
   if (bisHeute.length) {
@@ -511,7 +534,7 @@ function ausVivi(paket, kontext) {
   return { felder: felder, info: info };
 }
 
-module.exports = {
+module.exports = { erhoehungenAus,
   nachVivi, ausVivi, letzteErhoehung, erhoehungBetrag, nkVorschlag, ulJahr, einheitenListe, zahl, isoDatum, monatDatum, etageText, etageZahl, mieterName,
   NK_MIN_QM, OBJEKTTYP, VERTRAG_NACH_VIVI, VERTRAG_AUS_VIVI, UL_FELDER, ARTEN_MIT_EINHEITEN, MUSTER_ANSCHRIFT
 };

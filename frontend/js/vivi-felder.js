@@ -198,6 +198,7 @@
       sperreAn($(id), id, w, v.eigen, st);
     });
     if (einheitGeaendert) { geaendert = true; einheitenSummen(); }
+    if (erhoehungenUebernehmen(info)) geaendert = true;   /* v3998 */
     /* Felder, die ViVi nicht mehr fuehrt, werden frei */
     Array.prototype.forEach.call(document.querySelectorAll('.vivi-verknuepft, .vivi-eigen'), function (el) {
       if (el.id && !Object.prototype.hasOwnProperty.call(felder, el.id) && !el.hasAttribute('data-vivi-zelle')) { sperreAus(el); schlossWeg(el); }
@@ -206,6 +207,38 @@
     if (geaendert) { try { if (typeof window.calc === 'function') window.calc(); } catch (e) {} try { if (window.DpMfhFelder) window.DpMfhFelder.anwenden(); } catch (e) {} }
     einheitenSperren();
     return geaendert;
+  }
+
+  /* v3998 · Mietverlauf aus ViVi in die Liste der Mieterhoehungen (js/mieterhoehungen.js): Objekt _erhoehungen, Wohnung
+     e.erhoehungen. Eintraege aus ViVi (id vivi-…) werden ersetzt, eigene bleiben. Steht am selben Tag schon ein eigener
+     Eintrag, gilt der eigene (keine Doppelung). Gibt true zurueck, wenn sich etwas geaendert hat. */
+  function erhoehungenMischen(alt, neu) {
+    alt = Array.isArray(alt) ? alt : [];
+    var eigene = alt.filter(function (x) { return x && !/^vivi-/.test(String(x.id || '')); });
+    var tage = {}; eigene.forEach(function (x) { if (x.datum) tage[x.datum] = true; });
+    var dazu = (neu || []).filter(function (x) { return x && x.datum && !tage[x.datum]; })
+      .map(function (x) { return { id: x.id, datum: x.datum, art: x.art, von: x.von, auf: x.auf, beleg: x.beleg || 'aus ViVi', am: x.am || null }; });
+    var erg = eigene.concat(dazu).sort(function (a, b) { return a.datum < b.datum ? -1 : (a.datum > b.datum ? 1 : 0); });
+    var kern = function (l) { return JSON.stringify(l.map(function (x) { return [x.id, x.datum, x.art, x.von, x.auf]; })); };
+    return kern(erg) === kern(alt) ? null : erg;
+  }
+  function erhoehungenUebernehmen(info) {
+    var E = info && info.erhoehungen; if (!E || typeof E !== 'object') return false;
+    var v = lesen(), g = false;
+    Object.keys(E).forEach(function (k) {
+      if (k === 'objekt') {
+        if (Object.prototype.hasOwnProperty.call(v.eigen, '_erhoehungen')) return;
+        var d = window._currentObjData; if (!d) return;
+        var m = erhoehungenMischen(d._erhoehungen, E[k]); if (m) { d._erhoehungen = m; g = true; }
+      } else {
+        if (Object.prototype.hasOwnProperty.call(v.eigen, 'einheit.' + k + '.erhoehungen')) return;
+        var idx = einheitIndex(+k, info), L = window._dpMfh && window._dpMfh.einheiten;
+        if (idx == null || !L || !L[idx]) return;
+        var m2 = erhoehungenMischen(L[idx].erhoehungen, E[k]); if (m2) { L[idx].erhoehungen = m2; g = true; }
+      }
+    });
+    if (g) { try { if (window.DpErhoehungen && window.DpErhoehungen.objektMount) window.DpErhoehungen.objektMount(); } catch (e) {} }
+    return g;
   }
 
   /* datenLeeren: nur wenn das Backend sagt, das Objekt ist nicht (mehr) verknuepft. Beim Objektwechsel fallen nur
@@ -420,7 +453,7 @@
     return true;
   }
 
-  window.DpViviFelder = { setzen: setzen, allesLoesen: allesLoesen, alleSelbst: alleSelbst, anzahlEigen: anzahlEigen, einheitenSperren: einheitenSperren, lesen: lesen, HINWEIS: HINWEIS, EINHEIT_FELDER: EINHEIT_FELDER,
+  window.DpViviFelder = { setzen: setzen, allesLoesen: allesLoesen, alleSelbst: alleSelbst, anzahlEigen: anzahlEigen, erhoehungenMischen: erhoehungenMischen, einheitenSperren: einheitenSperren, lesen: lesen, HINWEIS: HINWEIS, EINHEIT_FELDER: EINHEIT_FELDER,
     /* fuer den Unterlagen-Abgleich (Paket V5): ist ein Feld verknuepft, und welchen Wert fuehrt ViVi? */
     istVerknuepft: istVerknuepft, viviWert: viviWert,
     HINWEIS_ABWEICHUNG: HINWEIS_ABWEICHUNG, vergleich: vergleich, einheitFeld: einheitFeld, einheitVergleich: einheitVergleich,
