@@ -610,8 +610,14 @@
 
     html += _row('Gebäude %', variants.map(function(n){ return _fmtPct(p5[n].gebaeude_pct); }), J.ok && _fmtPct(J.geb), { grund: true });
     html += _row('Boden %', variants.map(function(n){ return _fmtPct(p5[n].boden_pct); }), J.ok && _fmtPct(100 - J.geb));
-    html += _row('Gebäude im Vertrag', variants.map(function(n){ return _fmtEur(p5[n].gebaeude_eur_vertrag); }), J.ok && _fmtEur(J.gebVertrag));
-    html += _row('Boden im Vertrag', variants.map(function(n){ return _fmtEur(p5[n].boden_eur_vertrag); }), J.ok && _fmtEur(J.bodenVertrag));
+    /* v3991 · F13 Gesamt-Flow 22.11.2026: Gebäude-AK 216.128 € hier gegen 216.138 € in Schritt 5. Die Gebäude-AK der
+       Pipeline (phase8) ist Anschaffungskosten × Anteil auf ZWEI Stellen, der Vertragsbetrag (phase5) kam aus dem
+       ungerundeten Anteil. Jetzt beide aus dem gerundeten Anteil, wie bei Jacoby und im Reiter Steuer. */
+    var _kpI = (r.phase2_inventar && r.phase2_inventar.immobilien_kp) || 0;
+    var _gebV = function (n) { return _kpI > 0 && isFinite(Number(p5[n].gebaeude_pct)) ? _kpI * Number(p5[n].gebaeude_pct) / 100 : p5[n].gebaeude_eur_vertrag; };
+    var _bodV = function (n) { return _kpI > 0 && isFinite(Number(p5[n].gebaeude_pct)) ? _kpI - _gebV(n) : p5[n].boden_eur_vertrag; };
+    html += _row('Gebäude im Vertrag', variants.map(function(n){ return _fmtEur(_gebV(n)); }), J.ok && _fmtEur(J.gebVertrag));
+    html += _row('Boden im Vertrag', variants.map(function(n){ return _fmtEur(_bodV(n)); }), J.ok && _fmtEur(J.bodenVertrag));
     html += _row('Gebäude-AK (mit NK)', variants.map(function(n){ return _fmtEur(p8[n].gebaeude_ak); }), J.ok && _fmtEur(J.gebAk), { bold: true });
     html += _row('15-%-Grenze (max. Sanierung)', variants.map(function(n){ return _fmtEur(p9[n].max); }), J.ok && _fmtEur(J.gebAk * 0.15));
     if (SAN && SAN.san > 0 && sanAn(0) !== null) {   /* v3705 */
@@ -969,9 +975,12 @@
       _origOpenBMFModal();
     }
     // Nach Lazy-Load: V292-Init + erster Pipeline-Call
-    setTimeout(function(){
+    /* v3991 · F12: beim ersten Öffnen lädt das Fenster erst aus dem Netz. War es nach 100 ms noch nicht offen,
+       fiel die Sofortsumme ganz aus und Schritt 1 zeigte den Stand des stillen Vorlaufs. Jetzt bis 3 s nachfassen. */
+    var _v3991Versuch = 0;
+    setTimeout(function _v3991Init(){
       var ov = document.getElementById('bmfOverlay');
-      if (!ov || !ov.classList.contains('open')) return;
+      if (!ov || !ov.classList.contains('open')) { if (++_v3991Versuch < 30) setTimeout(_v3991Init, 100); return; }
 
       /* V292.6.2-flicker-fix: SOFORT V289-Banner ausblenden + V292-Skeleton
        * Vorher: User sah 3-4s das alte V289-Layout während Pipeline läuft.
@@ -988,6 +997,9 @@
          Wechsel dorthin (switchPane in bmf-modal.js). Vorher standen beim
          Oeffnen zwei Backend-Rufe von je rund drei Sekunden an, fuer einen
          Reiter, der sie gar nicht braucht. */
+      /* v3991 · F12: erst die Felder aus den Reitern holen, dann summieren. Der Abgleich (syncFromTabInvest) laeuft in
+         openBMFModal 50 ms nach dem Laden des Fensters - beim ersten Laden kann das NACH diesen 100 ms sein. */
+      try { if (typeof window.syncFromTabInvest === 'function') window.syncFromTabInvest(); } catch (e3991) {}
       try { _v292SofortSumme(); } catch (e) { console.warn('[v1499] Sofortsumme:', e.message); }
 
       // Event-Listener für Live-Berechnung bei Pane 2 GAA-Änderungen
@@ -1011,6 +1023,11 @@
   function _v292SofortSumme(){
     var paneAk = document.getElementById('p-ak');
     if (!paneAk) return;
+    /* v3991 · F12 Gesamt-Flow 22.11.2026: Schritt 1 zeigte beim ersten Öffnen nach einer Feldänderung 230.805 statt
+       245.433 €. Gemessen: die Endzeile schreibt _dpInjectTreeHk (bmf-modal.js) aus ak_total.dataset.raw, und das
+       setzt nur calcAk() - die lief 50 ms NACH dieser Summe (syncFromTabInvest plant sie per setTimeout). Die Endzeile
+       rechnete also neuen Kaufpreis gegen die alte Summe des vorigen Öffnens. Erst die Summe des Fensters auffrischen. */
+    try { if (typeof window.calcAk === 'function') window.calcAk(); } catch (e3991) {}
     function z(id){
       var el = document.getElementById(id);
       if (!el) return 0;

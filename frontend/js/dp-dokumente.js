@@ -775,7 +775,8 @@
         return B.seite(c, 'Anschaffungskosten und AfA', B.abschnitt('Anlage zur Steuererklärung', 'Anschaffungskosten, Verprobung und AfA', 'Nachvollziehbarkeit gegenüber dem Finanzamt; keine Steuerberatung.') + akTab + verp + afaT);
       })());
       if (abw) {
-        var d = function (a, b) { var x = b - a; return Math.abs(x) < 0.5 ? '' : (x > 0 ? '+ ' : '− ') + B.eur(Math.abs(x)); };
+        /* v3991 · F13 Gesamt-Flow 22.11.2026: „+146 €“ neben 4.176 und 4.323 €. Unterschied aus den gezeigten, auf Euro gerundeten Werten */
+        var d = function (a, b) { var x = Math.round(b) - Math.round(a); return Math.abs(x) < 0.5 ? '' : (x > 0 ? '+ ' : '− ') + B.eur(Math.abs(x)); };
         var basisAlt = T.gebAmtlich + (T.basis - T.geb) * (T.gebPctAmtlich / (T.gebPct || 1));
         S.push(B.seite(c, 'Gewählte Aufteilung', B.abschnitt('Abschnitt 2', 'Gewählte Aufteilung', T.name + ' – neben dem Ergebnis der Arbeitshilfe, die unverändert bleibt.')
           + '<table><thead><tr><th>Position</th><th class="r">Arbeitshilfe</th><th class="r">Gewählt</th><th class="r">Unterschied</th></tr></thead><tbody>'

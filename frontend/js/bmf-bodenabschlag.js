@@ -99,6 +99,7 @@
     var boden = zahl(wert(r.bodenwert));
     var gebPct = zahl(wert(r.gebaeudeanteil_prozent));
     if (kp == null || gebPct == null) return null;
+    gebPct = Math.round(gebPct * 100) / 100;   /* v3991 · zwei Stellen wie Pipeline phase5 und Reiter Steuer */
     /* Inventar gehoert nicht in die Aufteilung (Phase 6 der Pipeline). */
     var inv = ['inv_kueche', 'inv_moebel', 'inv_geraete', 'inv_pv', 'inv_stellplatz', 'inv_sonst']
       .reduce(function (a, i) { return a + (zahl(el(i) && el(i).value) || 0); }, 0);
@@ -235,9 +236,14 @@
     var ab = ABSCHLAG_JE_VARIANTE[wahl];
     if (ab == null) ab = Math.min(90, Math.max(0, zahl(el('bmf-boden-pct') && el('bmf-boden-pct').value) || 0));
     var f = el('bmf-boden-pct'); if (f && String(f.value) !== String(ab)) { window._dpBodenStillsetzen = true; try { f.value = String(ab); } finally { window._dpBodenStillsetzen = false; } }
-    var bodenNeu = B.bodenAmtlich * (1 - ab / 100), gebNeu = B.immoKp - bodenNeu;
+    /* v3991 · F13 Gesamt-Flow 22.11.2026: Gebäude-AK 216.128 € in Schritt 3 gegen 216.138 € hier. Schritt 3, die
+       Pipeline (phase8 = Anschaffungskosten × Anteil) und der Reiter Steuer rechnen mit dem Gebäudeanteil auf ZWEI
+       Stellen (88,06 %), hier stand der ungerundete (88,0639 %). Jetzt einmal runden und alles daraus ableiten, wie
+       bei Jacoby: Gebäude = Kaufpreis × Anteil, Boden = Rest. */
+    var gebPctAb = B.immoKp > 0 ? Math.round((B.immoKp - B.bodenAmtlich * (1 - ab / 100)) / B.immoKp * 10000) / 100 : 0;
+    var gebNeu = B.immoKp * gebPctAb / 100, bodenNeu = B.immoKp - gebNeu;
     return { id: wahl, name: NAME_WAHL[wahl] || ('Abschlag ' + ab + ' % auf den Bodenwert'), ab: ab, gebNeu: gebNeu, bodenNeu: bodenNeu,
-      gebPctNeu: B.immoKp > 0 ? gebNeu / B.immoKp * 100 : 0, spalte: ab ? 'Mit ' + pct(ab, 0) + ' Abschlag' : 'Gewählt: amtlich' };
+      gebPctNeu: gebPctAb, spalte: ab ? 'Mit ' + pct(ab, 0) + ' Abschlag' : 'Gewählt: amtlich' };
   }
 
   function rechnen() {
@@ -259,7 +265,9 @@
 
     function zeile(label, alt, neu, o) {
       o = o || {};
-      var d = (typeof alt === 'number' && typeof neu === 'number') ? (neu - alt) : null;
+      /* v3991 · Unterschied aus den GEZEIGTEN Werten (Euro ganz, Prozent zwei Stellen), sonst 4.323 − 4.176 = „+146 €“ */
+      var _r = o.fmt ? function (v) { return Math.round(v * 100) / 100; } : Math.round;
+      var d = (typeof alt === 'number' && typeof neu === 'number') ? (_r(neu) - _r(alt)) : null;
       return '<tr' + (o.summe ? ' style="font-weight:600"' : '') + '>' +
         '<td style="padding:6px 8px 6px 0;border-bottom:1px solid #F0ECE3">' + label + '</td>' +
         '<td style="padding:6px 8px;text-align:right;border-bottom:1px solid #F0ECE3">' + (o.fmt ? o.fmt(alt) : eur(alt)) + '</td>' +

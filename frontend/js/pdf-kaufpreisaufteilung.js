@@ -55,8 +55,10 @@
     var a = rechne(gebPct);
     var kpImmo = a.kpOhneInv;
     var bodenAlt = kpImmo - a.gebKp, gebAlt = a.gebKp;
-    var bodenNeu = bodenAlt * (1 - abschlag / 100), gebNeu = kpImmo - bodenNeu;
-    var gebPctNeu = kpImmo ? gebNeu / kpImmo * 100 : 0;
+    /* v3991 · F13: der Anteil mit Abschlag auf zwei Stellen wie Schritt 3, Schritt 5 und der Reiter Steuer,
+       Gebäude und Boden daraus (vorher 88,0639 % ungerundet: AfA-Basis 216.138 statt 216.128 €) */
+    var gebPctNeu = kpImmo ? Math.round((kpImmo - bodenAlt * (1 - abschlag / 100)) / kpImmo * 10000) / 100 : 0;
+    var gebNeu = kpImmo * gebPctNeu / 100, bodenNeu = kpImmo - gebNeu;
     var n = rechne(gebPctNeu);
     return { kp: kp, inventar: kp - kpImmo, kpImmo: kpImmo, grundschuld: gs,
       bodenAlt: bodenAlt, gebAlt: gebAlt, bodenNeu: bodenNeu, gebNeu: gebNeu, gebPctNeu: gebPctNeu,
@@ -411,7 +413,9 @@
     abschnitt('Angepasste Kaufpreisaufteilung - amtlich gegen ' + pct(abschlag, 0) + ' Abschlag');
     einleitung('Die Arbeitshilfe bindet das Finanzgericht nicht (BFH, Urteil vom 21.07.2020, IX R 26/19). Eine niedrigere Bodenkomponente ist ansetzbar, wenn sie begründet ist' + (grundBegr ? ' - hier: ' + grundBegr : '') + '.');
     function zv(label, a, n, fmt, fett) {
-      var d = (a != null && n != null) ? n - a : null;
+      /* v3991 · Unterschied aus den gezeigten Werten (Euro ganz, Prozent zwei Stellen) */
+      var _r = fmt ? function (v) { return Math.round(v * 100) / 100; } : Math.round;
+      var d = (a != null && n != null) ? _r(n) - _r(a) : null;
       return { fett: !!fett, werte: [label, fmt ? fmt(a) : eur(a), fmt ? fmt(n) : eur(n),
         d == null ? '' : ((d > 0 ? '+' : '') + (fmt ? fmt(d) : eur(d)))] };
     }
