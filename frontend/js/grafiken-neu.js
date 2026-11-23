@@ -267,8 +267,9 @@
     var schmal = dx < 62;
     zeilen.forEach(function (z, i) {
       var x = L + dx * i + (dx - bw) / 2, yt = yv(Math.max(z.a, z.b)), yb = yv(Math.min(z.a, z.b));
-      var farbe = z.summe || z.s.art === 'start' ? (z.b < 0 ? 'var(--gn-rot)' : 'var(--gn-gold)') : (z.b >= z.a ? 'var(--gn-gruen)' : 'var(--gn-rot)');
-      if (z.summe || z.s.art === 'start') farbe = z.b < 0 ? 'var(--gn-rot)' : (z.s.art === 'start' ? 'var(--gn-grau)' : 'var(--gn-gold)');
+      /* v4280 · Farbschema Reiter Bewertung: Bausteine blass (30 %) mit Rand, Start grau, Summe kräftig grün bzw. rot */
+      var farbe = z.b >= z.a ? 'color-mix(in srgb,var(--gn-gruen) 30%,transparent);stroke:var(--gn-gruen);stroke-width:1' : 'color-mix(in srgb,var(--gn-rot) 30%,transparent);stroke:var(--gn-rot);stroke-width:1';
+      if (z.summe || z.s.art === 'start') farbe = z.b < 0 ? 'var(--gn-rot)' : (z.s.art === 'start' ? 'var(--gn-grau)' : 'var(--gn-gruen)');
       out.push('<rect class="gn-bar' + (z.b < z.a ? ' neg' : '') + '" x="' + f1(x) + '" y="' + f1(yt) + '" width="' + f1(bw) + '" height="' + f1(Math.max(1, yb - yt)) + '" rx="2" style="fill:' + farbe + ';animation-delay:' + (i * 70) + 'ms"/>');
       if (i < n - 1) { var yn = yv(z.b); out.push('<line x1="' + f1(x + bw) + '" x2="' + f1(L + dx * (i + 1) + (dx - bw) / 2) + '" y1="' + f1(yn) + '" y2="' + f1(yn) + '" style="stroke:var(--gn-grau);stroke-width:1;stroke-dasharray:2 2"/>'); }
       var w = z.summe || z.s.art === 'start' ? z.b : z.b - z.a;
@@ -399,8 +400,8 @@
     var titel = e0 != null && eN != null ? 'Dein Anteil am Objekt wächst von ' + eur(e0) + ' auf ' + eur(eN) + ' bis ' + x[x.length - 1] : 'Vermögensaufbau';
     k.innerHTML = karteHtml('verm', titel, 'Wert des Objekts = Restschuld der Bank + dein Eigenkapital · schraffiert ab ' + (H + 1) + ' Projektion',
       saeulen({ id: 'verm', breite: w, hoehe: 250, x: x, heute: H, projAb: H + 1, gestapelt: true, aria: 'Restschuld und Eigenkapital je Jahr',
-        reihen: [{ name: 'Restschuld', werte: rs, farbe: 'var(--gn-grau)' }, { name: 'Eigenkapital', werte: ek, farbe: function (v) { return v < 0 ? 'var(--gn-rot)' : 'var(--gn-gold)'; } }] }),
-      legende([{ name: 'Restschuld der Bank', farbe: 'color-mix(in srgb,currentColor 30%,transparent)' }, { name: 'Dein Eigenkapital', farbe: 'var(--gn-gold)' }, { name: 'Projektion', farbe: 'var(--gn-gold)', muster: true }]));
+        reihen: [{ name: 'Restschuld', werte: rs, farbe: 'var(--gn-grau)' }, { name: 'Eigenkapital', werte: ek, farbe: function (v) { return v < 0 ? 'var(--gn-rot)' : 'var(--gn-gruen)'; } }] }),
+      legende([{ name: 'Restschuld der Bank', farbe: 'color-mix(in srgb,currentColor 30%,transparent)' }, { name: 'Dein Eigenkapital', farbe: 'var(--gn-gruen)' }, { name: 'Projektion', farbe: 'var(--gn-gold)', muster: true }]));
     tipBinden(k, function (i) { var r = J[i]; if (!r) return ''; return '<div class="gn-tip-j">' + r.j + (r.j > H ? ' · Projektion' : '') + '</div>Wert <b>' + eur(r.wert) + '</b><br>Restschuld <b>' + eur(r.rs) + '</b><br>Eigenkapital <b>' + eur(ek[i]) + '</b>'; });
   }
   /* 2 · Cashflow-Brücke des laufenden Jahres */
@@ -459,7 +460,7 @@
     var zeilen = W.map(function (e) {
       var h = zahl(e.heute) || 0, b = Math.max(h, zahl(e.bestand && e.bestand.monat) || 0), m = Math.max(b, zahl(e.max) || 0, zahl(e.neu && e.neu.monat) || 0);
       return { e: e, h: h, b: b, m: m, name: (A.mfh ? 'Whg. ' + (e.nr || (e.i + 1)) : 'Wohnung') + (e.leer || !(h > 0) ? ' (leer)' : ''),
-        segs: [{ von: 0, bis: h, farbe: 'color-mix(in srgb,currentColor 30%,transparent)' }, { von: h, bis: b, farbe: 'var(--gn-gold)' }, { von: b, bis: m, farbe: 'var(--gn-gold-h)', muster: true }].filter(function (s) { return s.bis - s.von > 0.4; }),
+        segs: [{ von: 0, bis: h, farbe: 'color-mix(in srgb,currentColor 30%,transparent)' }, { von: h, bis: b, farbe: 'var(--gn-gruen)' }, { von: b, bis: m, farbe: 'color-mix(in srgb,var(--gn-gruen) 40%,transparent)', muster: true }].filter(function (s) { return s.bis - s.von > 0.4; }),
         wertText: m - h >= 1 ? eurV(m - h) : 'kein Spielraum', wertFarbe: m - h >= 1 ? 'var(--gn-gruen)' : null };
     });
     var ges = summe(zeilen, function (z) { return z.m - z.h; }), sof = summe(zeilen, function (z) { return z.b - z.h; });
@@ -467,7 +468,7 @@
     var titel = ges >= 1 ? 'Zusammen ' + eurV(ges) + ' Miete im Monat möglich, davon ' + eur(sof) + ' sofort im Bestand' : 'Kein Spielraum für eine höhere Miete';
     k.innerHTML = karteHtml('sp', titel, '€ Kaltmiete im Monat je Wohnung · heute, im Bestand erhöhbar, nur bei Neuvermietung',
       balkenH({ id: 'sp', breite: w, zeilen: zeilen, namenBreite: 110, aria: 'Mietspielraum je Wohnung' }),
-      legende([{ name: 'Miete heute', farbe: 'color-mix(in srgb,currentColor 30%,transparent)' }, { name: 'sofort im Bestand', farbe: 'var(--gn-gold)' }, { name: 'nur bei Neuvermietung', farbe: 'var(--gn-gold-h)', muster: true }]));
+      legende([{ name: 'Miete heute', farbe: 'color-mix(in srgb,currentColor 30%,transparent)' }, { name: 'sofort im Bestand', farbe: 'var(--gn-gruen)' }, { name: 'nur bei Neuvermietung', farbe: 'color-mix(in srgb,var(--gn-gruen) 40%,transparent)', muster: true }]));
     tipBinden(k, function (i) { var z = zeilen[i]; if (!z) return ''; return '<div class="gn-tip-j">' + esc(z.name) + '</div>heute <b>' + eur(z.h) + '</b><br>im Bestand bis <b>' + eur(z.b) + '</b><br>bei Neuvermietung bis <b>' + eur(z.m) + '</b>'; });
     return zeilen.map(function (z) { return [z.h, z.b, z.m].map(Math.round).join('/'); }).join(',');
   }
