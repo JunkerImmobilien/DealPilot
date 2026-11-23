@@ -601,7 +601,7 @@
       var liste = z.belege.map(function (b) {
         var vivi = b.quelle === 'ViVi' || b.datei === 'ViVi';
         return '<div class="bj-b"><span>' + esc(b.position || '—') + '<small>' + (vivi ? 'aus ViVi' : esc(b.datei)) + (b.aussteller ? ' · ' + esc(b.aussteller) : '') + '</small></span>'
-          + '<span class="bj-d">' + esc(b.datum || '') + '<small>übernommen ' + esc(String(b.am || '').split('-').reverse().join('.')) + (b.hand ? ' · Betrag von Hand geändert' : '') + '</small></span>'
+          + '<span class="bj-d">' + esc(/^\d{4}-\d{2}-\d{2}$/.test(String(b.datum || '')) ? String(b.datum).split('-').reverse().join('.') : (b.datum || '')) + '<small>übernommen ' + esc(String(b.am || '').split('-').reverse().join('.')) + (b.hand ? ' · Betrag von Hand geändert' : '') + '</small></span>'
           + '<span class="bj-z">' + eur2(b.betrag) + '</span></div>';
       }).join('');
       var art = z.art;
@@ -619,7 +619,7 @@
     box.innerHTML = '<div class="ue-bj">'
       + '<div class="oabi-sub" style="padding:0 0 8px">Jedes Steuerjahr mit seinen Werbungskosten, und für jeden Posten, woher der Wert kommt: eingelesener Beleg, Unterlage, ViVi, von Hand oder von der App berechnet.</div>'
       + '<div class="ue-bj-jahre" role="tablist">' + jahre.map(function (j) { return '<button type="button" data-bj-jahr="' + j + '"' + (j === jahr ? ' class="an"' : '') + '>' + j + (mitBelegen[j] ? '<i title="' + mitBelegen[j] + ' Positionen aus Belegen">●</i>' : '') + '</button>'; }).join('') + '</div>'
-      + '<div class="ue-bj-summe"><span>Werbungskosten ohne AfA<b>' + eur2(sumWert) + '</b></span><span>davon einzeln aus Belegen<b>' + eur2(sumBel) + '</b></span><span>Belege ' + jahr + '<b>' + nDat + ' <small style="font-size:11px;font-weight:400;color:var(--muted,#7A7370)">(' + d.buchungen.length + ' Positionen)</small></b></span></div>'
+      + '<div class="ue-bj-summe"><span>Werbungskosten ohne AfA<b>' + eur2(sumWert) + '</b></span><span>davon einzeln aus Belegen<b>' + eur2(sumBel) + '</b></span><span>Belege ' + jahr + '<b>' + nDat + ' <small style="font-size:11px;font-weight:400;color:var(--muted,#7A7370)">(' + d.buchungen.length + (d.buchungen.length === 1 ? ' Position' : ' Positionen') + ')</small></b></span></div>'
       + posten
       + '<div class="ue-bj-fuss"><span>Einzeln aufgeführt sind Belege, die seit dem 04.11.2026 eingelesen oder aus ViVi übernommen wurden. Wird ein Import im Verlauf zurückgenommen, verschwinden seine Belege hier mit.</span>'
       + (d.buchungen.length ? '<button type="button" class="oabi-btn" data-bj-csv>Liste als CSV</button>' : '') + '</div></div>';
