@@ -59,7 +59,7 @@ window.DpFinanzierungskosten = (function () {
 
   function einDarlehen(e, opt) {
     var betrag = zahl(e.betrag) || 0;
-    var r = { name: e.name || '', betrag: betrag, kurs: null, disagio: 0, disagio_pct: 0, auszahlung_eur: betrag,
+    var r = { name: e.name || '', dw: e.dw != null ? e.dw : null, betrag: betrag, kurs: null, disagio: 0, disagio_pct: 0, auszahlung_eur: betrag,
       sofort: null, disagio_jahre: null, bz_monate: 0, bz_eur: 0, bz_monat_eur: 0, jahre: {}, fehlt: [] };
     if (!(betrag > 0)) return r;
     var aus = monat(e.aus);

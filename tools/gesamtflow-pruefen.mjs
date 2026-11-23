@@ -224,6 +224,9 @@ function funk(src, name) {
   ok(ohneZ && ohneZ.bz === 0 && ohneZ.liste[0].fehlt.indexOf('zusage') >= 0 && /Vertragsdatum/.test(K.text(ohneZ.liste[0])), 'F6b ohne Vertragsdatum keine Bereitstellungszinsen, Hinweis nennt das Vertragsdatum');
   const vor = K && K.berechnen([Object.assign({}, D, { kurs: 99 })], { abJahr: 2024 });
   ok(vor && vor.jahre[2024] && !vor.jahre[2023], 'F6b Auszahlung vor Beginn der Projektion: auf das erste Jahr gelegt');
+  /* v3994 · gemessen auf Staging 23.11.2026: der Hinweis am weiteren Darlehen blieb leer, weil das Ergebnis den Index dw nicht trug */
+  const w = K && K.berechnen([{ name: 'KfW', dw: 0, betrag: 20000, bindj: 10, aus: '12.2023', kurs: 99, zusage: '01.2023', bz_frei: 2, bz_satz: 0.25 }], { abJahr: 2024 });
+  ok(w && w.liste[0].dw === 0 && Math.abs(w.disagio - 200) < 0.01 && w.liste[0].bz_monate === 9 && Math.abs(w.bz - 450) < 0.01, 'F6b weiteres Darlehen: Index dw im Ergebnis, Disagio 200 €, 9 Monate Bereitstellungszins = 450 € (Staging 2026-1177 gemessen)');
   const tx = K ? K.text(a.liste[0]) + ' ' + K.text(b.liste[0]) + ' ' + K.text(z.liste[0]) : '';
   ok(tx && !/[–—;]/.test(tx), 'F6b Kundentext ohne Gedankenstrich und Semikolon');
   /* Verdrahtung */
@@ -443,5 +446,5 @@ function funk(src, name) {
   ok(!gegner || /'html:not\(#gp-nie\) #gp-overlay \.rnd-wiz-field\[hidden\]\{display:none !important\}'/.test(gp), 'F24 [hidden] schlägt „html:not(#rnd-nie) … .rnd-wiz-field{display:flex !important}“ (Spezifität 2 IDs + 2 gegen 1 ID + 3)');
 }
 
-console.log(`gesamtflow-pruefen (v3993): ${gruen} von ${gruen + rot} ok`);
+console.log(`gesamtflow-pruefen (v3994): ${gruen} von ${gruen + rot} ok`);
 process.exit(rot ? 1 : 0);
