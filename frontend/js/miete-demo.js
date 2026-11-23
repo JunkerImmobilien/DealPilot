@@ -251,6 +251,9 @@
   function spaeter(ms) { clearTimeout(_t); _t = setTimeout(function () { try { zeichnen(); } catch (e) { try { console.warn('[miete-demo]', e); } catch (x) {} } }, ms || 400); }
   window.addEventListener('dp:object-ready', function () { _sel = 0; spaeter(1500); });
   window.addEventListener('dp:jahre-geaendert', function () { spaeter(300); });
+  /* v4036 · Demo-Durchlauf 23.11.2026: nach „Jetzt abgleichen“ setzte ViVi die Miete auf 620 €, das Zielbild zeigte weiter
+     „heute 570 €“. vivi-felder setzt per input, hier hörte nur change. dp:vivi-stand kommt nach jeder ViVi-Übernahme. */
+  window.addEventListener('dp:vivi-stand', function () { spaeter(600); });
   document.addEventListener('change', function (e) { if (aktiv() && e.target && e.target.closest && e.target.closest('#s2')) spaeter(600); });
   document.addEventListener('click', function (e) { if (e.target && e.target.closest && e.target.closest('#mfh-ok, #mfh-zu, [onclick*="switchTab(2)"], [data-tab="s2"]')) spaeter(900); });
   window.DpMieteDemo = { zeichnen: zeichnen, aktiv: aktiv, daten: daten };
