@@ -309,6 +309,12 @@
     einhaengen(); marken();
   }
 
+  /* v4040 · welche ViVi-Felder die grauen Werte im Reiter Steuer tragen (Feld der Anlage V -> Eingabefelder der Reiter) */
+  var GRUNDLAGE = { einnahmen_km: ['nkm', 'ze_stp_monat', 'ist'], einnahmen_nk: ['nk_vorauszahlung'], schuldzinsen: ['d1', 'd1z', 'd1t', 'd2', 'd2z', 'd2t'],
+    nk_umlf: ['hg_ul', 'grundsteuer'], nk_n_umlf: ['hg_nul'], afa: ['kp', 'makler_p', 'gest_p', 'notar_p', 'gba_p', 'baujahr'] };
+  var GRUNDLAGE_NAME = { nkm: 'Kaltmiete', ze_stp_monat: 'Stellplatz', ist: 'Miete der Wohnungen', nk_vorauszahlung: 'Nebenkosten', d1: 'Darlehen', d1z: 'Zins', d1t: 'Tilgung',
+    d2: 'Darlehen 2', d2z: 'Zins', d2t: 'Tilgung', hg_ul: 'Hausgeld umlagefähig', grundsteuer: 'Grundsteuer', hg_nul: 'Hausgeld nicht umlagefähig',
+    kp: 'Kaufpreis', makler_p: 'Makler', gest_p: 'Grunderwerbsteuer', notar_p: 'Notar', gba_p: 'Grundbuch', baujahr: 'Baujahr' };
   /* ── Marke „ViVi“ im Reiter Steuer ──────────────────────────────── */
   function marken() {
     var box = $('yearly-tax-form-box'); if (!box) return;
@@ -322,6 +328,25 @@
       if (!gilt) { if (m) m.remove(); return; }
       if (!m) { m = doc.createElement('span'); m.className = 'vivi-st-marke'; m.textContent = 'ViVi'; inp.insertAdjacentElement('afterend', m); stil(); }
       m.title = 'Aus ViVi übernommen am ' + datumText(h.am) + (h.stand ? ', Stand ViVi ' + datumText(h.stand) : '') + '. Eine Änderung von Hand nimmt die Marke weg.';
+    });
+    /* v4040 · Marcel 23.11.2026: „bei den ausgegrauten Werten, wenn die übernommen werden, steht ‚wird automatisch übernommen‘.
+       Wenn das ViVi-Werte sind, dann bitte auch die Information, dass das aus ViVi übernommen wurde.“ Die grauen Werte rechnet
+       DealPilot aus den Reitern. Stammt ihre Grundlage aus ViVi (gesperrtes Feld ohne eigene Angabe), sagt der Hinweis das. */
+    var Fv = global.DpViviFelder, vv = null; try { vv = Fv && Fv.lesen ? Fv.lesen() : null; } catch (e) { vv = null; }
+    Array.prototype.forEach.call(box.querySelectorAll('tr[data-ytf-feld] .ytf-readonly'), function (d) {
+      var f = d.closest('tr').getAttribute('data-ytf-feld'), q = GRUNDLAGE[f] || [], namen = [];
+      if (vv && vv.verknuepft && vv.felder) {
+        Object.keys(vv.felder).forEach(function (id) {
+          var k = id.replace(/^einheit\.\d+\./, '');
+          if (q.indexOf(k) < 0 || Object.prototype.hasOwnProperty.call(vv.eigen || {}, id)) return;
+          var n = GRUNDLAGE_NAME[k] || k; if (namen.indexOf(n) < 0) namen.push(n);
+        });
+      }
+      var m = d.querySelector('.vivi-st-marke');
+      if (!namen.length) { if (m) { m.remove(); d.title = 'Wird automatisch übernommen'; } return; }
+      if (!m) { m = doc.createElement('span'); m.className = 'vivi-st-marke'; m.textContent = 'ViVi'; d.appendChild(m); stil(); }
+      d.title = 'Aus ViVi übernommen' + (vv.stand ? ' am ' + datumText(String(vv.stand).slice(0, 10)) : '') + '. DealPilot rechnet den Wert aus ' + namen.join(', ') + '. Ändern bitte in ViVi.';
+      m.title = d.title;
     });
   }
 

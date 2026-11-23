@@ -77,7 +77,9 @@
       stil();
       h.innerHTML = L.map(function (x) {
         var st = x.st, a = x.a;
-        if (st.verknuepft) return '<div class="buha-zeile"><span class="buha-txt"><span class="buha-marke">' + esc(a.name) + '</span>' + esc(st.text || 'In deiner Objektverwaltung. Die Werte kommen von dort, siehe Reiter Objekt.') + '</span></div>';
+        /* v4040 · verknüpft: Knopf zum Abgleich (Pilot-Analyse › ViVi), wenn der Anbieter ihn anbietet */
+        if (st.verknuepft) return '<div class="buha-zeile"><span class="buha-txt"><span class="buha-marke">' + esc(a.name) + '</span>' + esc(st.text || 'In deiner Objektverwaltung. Die Werte kommen von dort, siehe Reiter Objekt.') + '</span>'
+          + (typeof a.abgleich === 'function' ? '<button type="button" class="btn btn-sm btn-gold" data-buha-abgleich="' + esc(a.id) + '">Abgleich mit ' + esc(a.name) + '</button>' : '') + '</div>';
         if (st.laeuft) return '<div class="buha-zeile"><span class="buha-txt"><span class="buha-marke">' + esc(a.name) + '</span>' + esc(st.text || 'Die Übernahme läuft.') + '</span></div>';
         return '<div class="buha-zeile"><span class="buha-txt"><b>In deine Objektverwaltung übernehmen</b><br>Das Objekt wird einmal angelegt, mit Einheiten, Mietverhältnissen und Darlehen. Danach liest DealPilot nur noch.</span>' +
           '<button type="button" class="btn btn-sm btn-gold" data-buha="' + esc(a.id) + '">In deine Objektverwaltung übernehmen · ' + esc(a.name) + '</button></div>';
@@ -92,6 +94,8 @@
   }
 
   document.addEventListener('click', function (ev) {
+    var g = ev.target && ev.target.closest ? ev.target.closest('#da-buchhaltung [data-buha-abgleich]') : null;   /* v4040 */
+    if (g) { ev.preventDefault(); var ga = _anbieter.filter(function (x) { return x.id === g.getAttribute('data-buha-abgleich'); })[0]; if (ga && ga.abgleich) ga.abgleich(); return; }
     var b = ev.target && ev.target.closest ? ev.target.closest('#da-buchhaltung [data-buha]') : null;
     if (!b) return;
     ev.preventDefault();

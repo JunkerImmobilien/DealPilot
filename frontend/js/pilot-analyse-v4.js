@@ -500,6 +500,22 @@
   function wertDaten() {
     try { var d = window.DpWertZielbild && window.DpWertZielbild.daten ? window.DpWertZielbild.daten() : null; return d && d.wert ? d.wert : null; } catch (e) { return null; }
   }
+  /* v4040 · Marcel 23.11.2026: „Wie kann mein Grenzsteuersatz bei 47 Prozent liegen? Es gibt ja nur 42.“ Über 42 % (45 %)
+     liegt der Satz, weil der Soli in seiner Übergangszone 11,9 % je weiterem Euro Einkommensteuer nimmt. Abgeleitet aus
+     tax.js (Tax.soli, Tax.calcGrenzsteuersatz), keine feste Zahl. Nur ein Satz unter der Kachel. */
+  function grenzErklaerung(gs) {
+    var T = window.Tax; if (!T || !T.soli || !T.calcGrenzsteuersatz || !T.optionen || !T.steuerLast) return null;
+    var zve = feldZahl('zve'); if (!(zve > 0)) return null;
+    var jahr = new Date().getFullYear(), o = T.optionen(null, jahr);
+    var g = T.calcGrenzsteuersatz(o.splitting ? zve / 2 : zve, jahr);
+    if (!(gs > g * 100 + 0.5)) return null;
+    var L = T.steuerLast(zve, jahr, o);
+    var ds = (T.soli(L.est + 100, jahr, o.splitting) - T.soli(L.est, jahr, o.splitting)) / 100;
+    var gP = Math.round(g * 1000) / 10, ki = o.kist > 0 ? ' Dazu kommt die Kirchensteuer.' : '';
+    if (ds > 0.1) return gP.toLocaleString('de-DE') + ' % Einkommensteuer. Der Soli steht in seiner Übergangszone und nimmt 11,9 % auf jeden weiteren Euro Steuer. Danach sind es ' + (Math.round(g * 1.055 * 1000) / 10).toLocaleString('de-DE') + ' %.' + ki;
+    if (ds > 0.04) return gP.toLocaleString('de-DE') + ' % Einkommensteuer plus 5,5 % Soli darauf.' + ki;
+    return ki ? gP.toLocaleString('de-DE') + ' % Einkommensteuer.' + ki : null;
+  }
   function zahlKachel(lbl, wert, unter, farbe) {
     return '<div class="dp-pa4-z" style="--c:' + (farbe || '#E6DCC2') + '"><span>' + esc(lbl) + '</span><b>' + wert + '</b>' + (unter ? '<em>' + unter + '</em>' : '') + '</div>';
   }
@@ -822,7 +838,7 @@
       }
     }
     var gs = feldZahl('grenz');
-    if (gs != null && gs > 0) z.push(zahlKachel('Grenzsteuersatz', de(gs, 2) + ' %', 'aus deinen Steuerangaben'));
+    if (gs != null && gs > 0) { var gsU = 'aus deinen Steuerangaben'; try { gsU = grenzErklaerung(gs) || gsU; } catch (eG) {} z.push(zahlKachel('Grenzsteuersatz', de(gs, 2) + ' %', gsU)); }
     return ergebnis(satz, kn) + (z.length ? '<div class="dp-pa4-zahlen' + (z.length === 4 ? ' l4' : '') + '">' + z.join('') + '</div>' : '');
   }
   /** Unterreiter Steuer: Verlauf wie im Reiter Steuer, Text, im Detail die Tabelle */
@@ -1518,6 +1534,11 @@
     if (bestand && o.jahre) {
       add('jahr', 'Jahresabgleich', '<div data-dp-ja-host="1"></div><div style="margin-top:18px"></div>' + o.jahre);
       try { setTimeout(function () { if (window.DpJahresabgleich) window.DpJahresabgleich.mountAll(); if (window.DpJahresbuch) window.DpJahresbuch.mountAll(); }, 0); } catch (eJ) {}
+    }
+    /* v4040 · Marcel 23.11.2026: eigener Reiter „ViVi“ im Bestand, nur bei verknüpftem Objekt und nicht für Einsteiger (vivi-reiter.js) */
+    if (bestand && window.DpViviReiter && window.DpViviReiter.sichtbar()) {
+      add('vivi', 'ViVi', '<div data-dp-vivi-host="1"></div>', { tabExtra: ' id="dp-pa-tab-vivi"' });
+      try { setTimeout(function () { window.DpViviReiter.mountAll(); }, 0); } catch (eV) {}
     }
     add('uebersicht', 'Übersicht', o.uebersicht);
     /* v3440 · o.si ist ein Objekt mit den Teilen (ui.js); als Text (ältere Aufrufer) wie bis v3439 */

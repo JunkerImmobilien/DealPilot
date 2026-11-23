@@ -170,7 +170,8 @@
         ? '<button type="button" class="btn btn-sm btn-ghost" data-vivi="alle-selbst" title="Alle Werte aus ViVi in DealPilot selbst festlegen. Sie werden nicht nach ViVi übertragen.">Alle selbst festlegen</button>'
         : '')
         + (ze.eigen ? '<button type="button" class="btn btn-sm btn-ghost" data-vivi="alle-vivi" title="Alle eigenen Angaben verwerfen und die Werte aus ViVi übernehmen.">Alle aus ViVi übernehmen</button>' : '');
-      knoepfe = '<button type="button" class="btn btn-sm btn-ghost" data-vivi="abgleichen">Jetzt abgleichen</button>' + alleKnopf + '<button type="button" class="btn btn-sm btn-ghost" data-vivi="loesen">Verknüpfung lösen</button>';
+      /* v4040 · Absprung in den Reiter ViVi der Pilot-Analyse */
+      knoepfe = (window.DpViviReiter && window.DpViviReiter.sichtbar() ? '<button type="button" class="btn btn-sm btn-gold" data-vivi="reiter">Abgleich mit ViVi</button>' : '') + '<button type="button" class="btn btn-sm btn-ghost" data-vivi="abgleichen">Jetzt abgleichen</button>' + alleKnopf + '<button type="button" class="btn btn-sm btn-ghost" data-vivi="loesen">Verknüpfung lösen</button>';
     } else if (st.status === 'abgebrochen' || st.status === 'laeuft') {
       text = st.status === 'laeuft' ? 'Die Übertragung nach ViVi läuft.' : 'Die Übertragung nach ViVi ist unterbrochen. Ein neuer Versuch setzt an der letzten Stelle fort, es entsteht nichts doppelt.';
       knoepfe = '<button type="button" class="btn btn-sm btn-gold" data-vivi="anlegen">Übertragung fortsetzen</button>';
@@ -386,6 +387,7 @@
     if (was === 'anlegen') { if (b.disabled) return; anlegen(); }
     else if (was === 'zuordnen') zuordnen();
     else if (was === 'abgleichen') abgleichen(false);
+    else if (was === 'reiter') { try { window.DpViviReiter.oeffnen(); } catch (e) {} }
     else if (was === 'loesen') loesen();
     else if (was === 'alle-selbst' || was === 'alle-vivi') alleSchloesser(was === 'alle-selbst');
   });
@@ -443,7 +445,9 @@
           return { verknuepft: false };
         });
       },
-      uebernehmen: anlegen
+      uebernehmen: anlegen,
+      /* v4040 · Deal-Aktion nach „gewonnen“: Absprung in den Abgleich */
+      abgleich: function () { if (window.DpViviReiter && window.DpViviReiter.sichtbar()) return window.DpViviReiter.oeffnen(); return false; }
     });
   }
   if (window.DpBuchhaltung) anmelden(); else document.addEventListener('DOMContentLoaded', anmelden);

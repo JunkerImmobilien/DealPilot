@@ -512,10 +512,23 @@
     return true;
   }
 
+  /* v4040 · ViVi-Reiter der Pilot-Analyse: eine eigene Angabe verwerfen und den Wert aus ViVi wieder gelten lassen (ohne
+     Rückfrage, der Reiter fragt selbst). Wendet den letzten Stand erneut an, auch für Einheiten. Rückgabe true = geändert. */
+  function viviUebernehmen(id) {
+    var v = lesen();
+    if (!_stand || !v.verknuepft || !Object.prototype.hasOwnProperty.call(v.eigen || {}, id)) return false;
+    delete v.eigen[id];
+    schreiben(v);
+    setzen(_stand);
+    try { var h = $('_vivi'); if (h) h.dispatchEvent(new Event('input', { bubbles: true })); } catch (e) {}
+    return true;
+  }
+  function stand() { return _stand; }
   window.DpViviFelder = { setzen: setzen, allesLoesen: allesLoesen, alleSelbst: alleSelbst, anzahlEigen: anzahlEigen, erhoehungenMischen: erhoehungenMischen, einheitenSperren: einheitenSperren, lesen: lesen, HINWEIS: HINWEIS, EINHEIT_FELDER: EINHEIT_FELDER,
     /* fuer den Unterlagen-Abgleich (Paket V5): ist ein Feld verknuepft, und welchen Wert fuehrt ViVi? */
     istVerknuepft: istVerknuepft, viviWert: viviWert,
     HINWEIS_ABWEICHUNG: HINWEIS_ABWEICHUNG, vergleich: vergleich, einheitFeld: einheitFeld, einheitVergleich: einheitVergleich,
-    lokalFestlegen: lokalFestlegen, entscheiden: entscheiden, entscheidung: entscheidung, gleichDok: gleichDok
+    lokalFestlegen: lokalFestlegen, entscheiden: entscheiden, entscheidung: entscheidung, gleichDok: gleichDok,
+    viviUebernehmen: viviUebernehmen, stand: stand   /* v4040 */
   };
 })();
