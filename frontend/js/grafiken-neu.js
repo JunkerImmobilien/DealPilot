@@ -135,11 +135,7 @@
       '.dp-gn-tab td{padding:7px 8px;border-bottom:1px solid var(--gn-netz);text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}',
       '.dp-gn-tab td:first-child{white-space:normal;max-width:240px}',
       '.dp-gn-pill{display:inline-block;font:600 10px Inter,sans-serif;padding:1px 7px;border-radius:999px;margin:2px 4px 0 0;background:color-mix(in srgb,var(--gn-gold) 20%,transparent);color:inherit;white-space:nowrap}',
-      '@media (max-width:640px){.dp-gn-tab thead{display:none}.dp-gn-tab,.dp-gn-tab tbody,.dp-gn-tab tr,.dp-gn-tab td{display:block;width:100%}',
-      '.dp-gn-tab tr{border:1px solid var(--gn-netz);border-radius:10px;padding:6px 10px;margin:0 0 8px}',
-      '.dp-gn-tab td{display:flex;justify-content:space-between;gap:10px;border:0;padding:3px 0;white-space:normal}',
-      '.dp-gn-tab td::before{content:attr(data-l);font:600 10px "JetBrains Mono",monospace;text-transform:uppercase;color:var(--gn-leise)}',
-      '.dp-gn-tab td:first-child{display:block;font-weight:600;max-width:none}.dp-gn-tab td:first-child::before{content:none}}',
+      /* am Handy übernimmt js/tabellen-karten.js die Tabelle (Kartenmodus mit Schalter „alle Spalten“), wie überall in der App */
       '.dp-gn-pruef{list-style:none;margin:0;padding:0;font:400 12px/1.5 Inter,sans-serif}',
       '.dp-gn-pruef li{padding:3px 0 3px 22px;position:relative}',
       '.dp-gn-pruef li::before{content:"✓";position:absolute;left:2px;font-weight:700;color:#3FA56C}',
@@ -648,7 +644,7 @@
       + rows.map(function (r) {
         var h = H[r.id] || [];
         return '<tr><td>' + esc(r.name) + (h.length ? '<br>' + h.map(function (t) { return '<span class="dp-gn-pill" title="Bitte prüfen">Bitte prüfen: ' + esc(t) + '</span>'; }).join('') : '') + '</td>'
-          + '<td data-l="Art">' + esc(r.art) + '</td><td data-l="Wert">' + mio(r.marktwert) + (r.belegt ? '' : ' <small title="ohne Bewertung gilt der Kaufpreis">KP</small>') + '</td>'
+          + '<td data-l="Art"><span>' + esc(r.art) + '</span></td><td data-l="Wert"><span>' + mio(r.marktwert) + (r.belegt ? '' : ' <small title="ohne Bewertung gilt der Kaufpreis">KP</small>') + '</span></td>'
           + '<td data-l="Restschuld">' + mio(r.rest) + '</td><td data-l="LTV">' + (r.marktwert ? nf1.format(r.rest / r.marktwert * 100) + ' %' : '') + '</td>'
           + '<td data-l="Rendite">' + (r.bmy != null ? nf2.format(r.bmy) + ' %' : '') + '</td><td data-l="Cashflow" style="color:' + ((r[cfK] || 0) < 0 ? ROT : GRUEN) + '">' + eurV(r[cfK]) + '</td>'
           + '<td data-l="DSCR"' + (r.dscr != null && r.dscr < 1 ? ' style="color:' + ROT + '"' : '') + '>' + (r.dscr != null ? nf2.format(r.dscr) : '') + '</td>'
