@@ -553,7 +553,12 @@
   })();
 
   /* ── Daten der App für Einordnung und Fingerabdruck ────────────────── */
+  var _ptMemo = null;
   function portfolioSchnitt() {
+    if (_ptMemo && Date.now() - _ptMemo.t < 5000) return _ptMemo.v;   /* portfolioPayload ist teuer, zwei Karten lesen ihn */
+    var v = portfolioSchnittRoh(); _ptMemo = { t: Date.now(), v: v }; return v;
+  }
+  function portfolioSchnittRoh() {
     var O = []; try { var P = window.DealPilotDashboard && window.DealPilotDashboard.portfolioPayload ? window.DealPilotDashboard.portfolioPayload() : null; O = P && Array.isArray(P.objekte) ? P.objekte : []; } catch (e) { O = []; }
     var mw = function (f) { var a = O.map(f).filter(function (v) { return v != null && isFinite(v); }); return a.length ? a.reduce(function (s, v) { return s + v; }, 0) / a.length : null; };
     return { n: O.length, bmy: mw(function (o) { return zahl(o.bruttomietrendite_prozent); }), dscr: mw(function (o) { return zahl(o.dscr); }), ltv: mw(function (o) { return zahl(o.ltv_prozent); }),
