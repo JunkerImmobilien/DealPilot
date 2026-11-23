@@ -499,8 +499,10 @@
     var host = vc.querySelector(':scope > [data-dp-gp="vb"]');
     if (!host) { host = document.createElement('div'); host.setAttribute('data-dp-gp', 'vb'); host.className = 'dp-gp gp-vb'; vc.insertBefore(host, vc.firstChild); }
     var PR = V.PR, H = V.H, last = PR[PR.length - 1], X = PR.map(function (r) { return r.yr; }), A = V.annahmen || {};
+    document.body.classList.add('dp-gp-vb');
     var sig = JSON.stringify([Math.round(H.wert), Math.round(H.rest), PR.length, Math.round(last.eq), Math.round(last.cumCf || 0), Math.round((vc.clientWidth || 0) / 40), document.documentElement.getAttribute('data-gx-stil') || '']);
     if (host.getAttribute('data-gp-sig') === sig && host.querySelector('svg')) return;
+    document.body.classList.add('dp-gp-vb');   /* vorher: .vb-charts ist sonst ein Raster und die Karten messen nur eine Spalte */
     var F = G.farben || {}, pz = function (v) { return nf1.format(v * 100) + ' %'; };
     var annahme = 'Modell: Wertansatz Kaufpreis, Wert ' + pz(A.wert || 0.02) + ' und Miete ' + pz(A.miete || 0.015) + ' im Jahr, Zins rund ' + pz(A.zins || 0.035) + '. Kein Verkehrswert.';
     host.innerHTML = '<div class="gp-vb-raster"><div class="gp-vbk gp-breit" data-gp-k="vb-eq"></div><div class="gp-vbk" data-gp-k="vb-bilanz"></div><div class="gp-vbk" data-gp-k="vb-objekte"></div><div class="gp-vbk gp-breit" data-gp-k="vb-quellen"></div></div><p class="gp-vb-fuss">' + esc(annahme) + '</p>';
