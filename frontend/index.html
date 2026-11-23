@@ -1196,7 +1196,7 @@ label.dp-required.qc-required::after {
       <!-- v363-erwerb: abgesetzte Untergruppe -->
       <div class="f s2" data-v363-erwerb data-v369-head style="margin-top:16px"><div class="ct ct-pro"><span class="ct-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>Erwerb &amp; Besitzübergang</div></div>
       <div class="f"><label>Kaufdatum</label><input id="kaufdat" type="date"></div>
-      <div class="f"><label class="dp-required" data-v236-required-set="1" data-v371-wu-req="1">Wirtsch. Übergang <span style="color:var(--muted,#7A7370);font-size:11px;font-weight:400">· Nutzen-/Lastenwechsel</span></label><input id="wirtschaftlicher_uebergang" type="date"></div><!-- v3243: Halter + Ueberfuehrung umgezogen in den Reiter Steuer, Karte #tax-halter-card -->
+      <div class="f"><label class="dp-required" data-v236-required-set="1" data-v371-wu-req="1" title="Nutzen- und Lastenwechsel: der Tag, ab dem Miete, Kosten und Risiko beim Käufer liegen.">Wirtschaftlicher Übergang</label><!-- v4006 · Zusatz nicht mehr als kleinere graue Zeile im Label (wirkte hochgestellt), sondern im Tooltip --><input id="wirtschaftlicher_uebergang" type="date"></div><!-- v3243: Halter + Ueberfuehrung umgezogen in den Reiter Steuer, Karte #tax-halter-card -->
       <!-- v3202 · Paket aus mehreren Objekten (js/paket-import.js) - unsichtbar, wird mitgespeichert -->
       <input type="hidden" id="paket_id"><input type="hidden" id="paket_name"><input type="hidden" id="paket_nr"><input type="hidden" id="paket_anzahl"><input type="hidden" id="paket_kp_gesamt"><input type="hidden" id="paket_share_deal"><input type="hidden" id="paket_beteiligung">
     </div></div>
@@ -4743,7 +4743,7 @@ document.addEventListener('DOMContentLoaded', function(){
          weil es _dpDispSkin fuer den hellen Grund benutzt. -->
     <link rel="stylesheet" href="css/datenaufnahme.css?v=v3952"><!-- v1639 · aus der Bordkarte wird eine Zeile -->
     <link rel="stylesheet" href="css/layout-varianten.css?v=v3630f">
-    <link rel="stylesheet" href="css/einheitlich.css?v=v3630k"><!-- v3239 · Marcel 09.11.2026: Felder, Karten, Schrift in allen Reitern und Fenstern wie im Reiter Objekt; Handy-Felder nie unter 16 px (iOS-Zoom). Letztes Stylesheet. -->
+    <link rel="stylesheet" href="css/einheitlich.css?v=v4006"><!-- v3239 · Marcel 09.11.2026: Felder, Karten, Schrift in allen Reitern und Fenstern wie im Reiter Objekt; Handy-Felder nie unter 16 px (iOS-Zoom). Letztes Stylesheet. -->
     <script src="js/marktbericht-profi.js?v=v3338a"></script><!-- v3176 · Marktbericht Profi (HTML/A4) -->
     <script src="js/dp-dokument.js?v=v3223"></script><!-- v3179 · einheitliches Dokument-Design -->
     <script src="js/dp-dokumente.js?v=v3991"></script><!-- v3179 · Dokumente im einheitlichen Design (Demo) -->

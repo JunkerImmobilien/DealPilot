@@ -372,3 +372,40 @@ html:not(#dp-nie):not(#dp-nie-2):not(#dp-nie-3) body
       input[type=url], input:not([type]), select, textarea):not(.body .sec *):not(aside *):not(header *):not(.pm-menge-n):not(.sb-search-box *) {
   border-radius: 2px !important;
 }
+
+/* ═══ 6 · v4006 · Feldabstände eine Linie (Objekt, Investition, Miete, Finanzierung, Bewirtschaftung) ═══
+   Marcel 23.11.2026: „Schriftart, Schriftgröße, Farbe, Label-Abstand und Abstände zwischen Feldern einheitlich,
+   eine Linie, auf Handy, Tablet, Desktop.“ Gemessen mit getComputedStyle an 2026-1177 (Messkabine):
+   Schrift, Größe und Farbe der Felder waren schon gleich (Handy 16 px / 44 px, sonst 13 px / 38 px), die
+   Beschriftung auch (11 px / 500, Handy 10,5 px). Abweichend waren die ABSTÄNDE:
+   - Beschriftung zum Feld: 834 px Adresse 8 px (gap 4 + Rand 4), Finanzierung 4 px, sonst 5 px.
+   - Feld zu Feld (untereinander, 834/1280 px): Miete 4 px (Karte ohne Raster, nur margin 4), Objekt-Raster
+     8 px, Finanzierung 8 px, Bewirtschaftung 10 px, Ausstattung 14 px (.g3 10 + 4), Investition und
+     Bodenwert 16 px (.g2 12 + 4).
+   - Mieterhöhung (Karte Mietvertrag, .dp-erh-f): Beschriftung 11,5 px / 400 statt 11 px / 500.
+   Jetzt: Beschriftung zum Feld 5 px, Feld zu Feld 12 px (Handy 10 px), überall. Im Raster trägt row-gap den
+   Abstand und das Feld keinen Rand, in einer Karte ohne Raster der Rand unten (das letzte Feld ohne). */
+html[data-dp-layout] body .body :is(#s0,#s1,#s2,#s3,#s4) .f {
+  gap: 5px !important;
+  margin-bottom: 12px !important;
+}
+html[data-dp-layout] body .body :is(#s0,#s1,#s2,#s3,#s4) .f > label { margin: 0 !important; }
+html[data-dp-layout] body .body :is(#s0,#s1,#s2,#s3,#s4) .f:last-child { margin-bottom: 0 !important; }
+html[data-dp-layout] body .body :is(#s0,#s1,#s2,#s3,#s4) :is(.g2,.g3,.g4,.od-raster,.fz-raster,.wa-raster,.wa-raster2,.ze-auft-grid) {
+  row-gap: 12px !important;
+}
+html[data-dp-layout] body .body :is(#s0,#s1,#s2,#s3,#s4) :is(.g2,.g3,.g4,.od-raster,.fz-raster,.wa-raster,.wa-raster2,.ze-auft-grid) > .f {
+  margin-bottom: 0 !important;
+}
+html[data-dp-layout] body .body #s2 .dp-erh-f label {
+  font-family: var(--dpl-body, 'Inter', system-ui, sans-serif) !important;
+  font-size: 11px !important; font-weight: 500 !important; gap: 5px !important;
+  color: rgba(42, 39, 39, .85) !important;
+}
+@media (max-width: 720px) {
+  html[data-dp-layout] body .body :is(#s0,#s1,#s2,#s3,#s4) .f { margin-bottom: 10px !important; }
+  html[data-dp-layout] body .body :is(#s0,#s1,#s2,#s3,#s4) .f:last-child { margin-bottom: 0 !important; }
+  html[data-dp-layout] body .body :is(#s0,#s1,#s2,#s3,#s4) :is(.g2,.g3,.g4,.od-raster,.fz-raster,.wa-raster,.wa-raster2,.ze-auft-grid) { row-gap: 10px !important; }
+  html[data-dp-layout] body .body :is(#s0,#s1,#s2,#s3,#s4) :is(.g2,.g3,.g4,.od-raster,.fz-raster,.wa-raster,.wa-raster2,.ze-auft-grid) > .f { margin-bottom: 0 !important; }
+  html[data-dp-layout] body .body #s2 .dp-erh-f label { font-size: 10.5px !important; }
+}
