@@ -238,7 +238,7 @@
       s.title = s.textContent;
     }
     var inp = el('dp-cp-in');
-    if (inp && fenster.contains(inp)) inp.placeholder = mit ? 'Frage oder Änderung – z. B. „Miete auf 9 €/m² erhöhen“' : 'Frage an den Piloten …';
+    if (inp && fenster.contains(inp)) inp.placeholder = mit ? 'Frage oder Änderung' : 'Deine Frage';
     var hint = fenster.querySelector('.dp-cp-hint');
     if (hint) hint.textContent = mit
       ? 'Frag mich zu Lage, Verhandlung, Finanzierung oder Bank – ich arbeite mit den Daten dieses Objekts. Änderungen wie „Miete auf 9 €/m² erhöhen“ schlage ich vor, du bestätigst. Mit der Klammer gibst du eine Unterlage in den Eingang.'
