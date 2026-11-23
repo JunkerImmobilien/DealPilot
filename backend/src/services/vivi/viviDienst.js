@@ -726,5 +726,6 @@ async function importieren(userId, viviId, accountId) {
 module.exports = {
   ANBIETER, verbindungMeta, verbindungSpeichern, verbindungLoeschen, probe, vorschau, anlegen, zuordnen, projekte,
   abrufen, werte, loesen, taktLauf, starteTakt, _setzeDeps, alsAntwort, planOptionen,
-  steuerEinstellung, steuerEinstellungSpeichern, steuerLesen, mieterhoehung, MIET_ART, importierbar, importieren, bewirtschaftungZumKauf, IMPORT_VORSCHAU_MAX
+  steuerEinstellung, steuerEinstellungSpeichern, steuerLesen, mieterhoehung, MIET_ART, importierbar, importieren, bewirtschaftungZumKauf, IMPORT_VORSCHAU_MAX,
+  _deps: deps, _token: token   /* v4130 · viviAuskunft.js (Co-Pilot, nur lesen) nutzt dieselben Abhaengigkeiten */
 };

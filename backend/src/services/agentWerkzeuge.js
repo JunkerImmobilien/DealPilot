@@ -4198,6 +4198,45 @@ const WERKZEUGE = [
       + 'Baulasten und Grundbuch aus den Unterlagen nimm objekt_unterlagen.',
     parameter: { type: 'object', properties: OBJEKT_ARGS, additionalProperties: false } },
 
+  /* v4130 · ViVi, nur lesen (services/vivi/viviAuskunft.js). Mieter sind abgekuerzt. */
+  { name: 'vivi_einheiten', stufe: 'lesen', fn: vivi_einheiten,
+    beschreibung: 'Aus der Hausverwaltungssoftware ViVi (nur wenn das Objekt mit ViVi verknüpft ist): je Einheit Fläche, '
+      + 'Zimmer, Etage, das laufende Mietverhältnis mit Mieter (abgekürzt, z. B. Hr. M.), Vertragsart, Beginn, Ende, '
+      + 'Kaltmiete, Nebenkosten-Vorauszahlung, Zielmiete, letzte Mieterhöhung, Index, Kaution und dem Mietverlauf '
+      + '(jede Änderung mit Datum, vorher, nachher, Grund). Nutze es bei "wann war die letzte Mieterhöhung in Wohnung 2?", '
+      + '"seit wann wohnt der Mieter dort?", "wie hoch ist die Kaution?", "welche Wohnung steht leer?". Kombiniere es mit '
+      + 'potenzial_lesen, wenn nach dem Spielraum für eine Erhöhung gefragt wird. Kostet nichts.',
+    parameter: { type: 'object', properties: Object.assign({}, OBJEKT_ARGS, {
+      einheit: { type: 'string', description: 'Optional: nur diese Einheit, z. B. "2" oder "Wohnung 2" oder die Bezeichnung aus ViVi' }
+    }), additionalProperties: false } },
+  { name: 'vivi_belege', stufe: 'lesen', fn: vivi_belege,
+    beschreibung: 'Aus ViVi (nur bei Verknüpfung): die Buchungen EINES Jahres. Summen je Zeile der Anlage V, je Kostenart '
+      + 'die Posten mit Datum und Betrag (Erhaltung, Betriebskosten, sonstige Kosten …) und die Belegliste mit Fälligkeit '
+      + 'und Zahlstatus (offen, bezahlt). Nutze es bei "was haben wir 2025 für die Heizung ausgegeben?", "welche Belege '
+      + 'gab es 2025?", "ist noch eine Rechnung offen?", "warum ist der Cashflow 2025 schlechter?". Kostet nichts.',
+    parameter: { type: 'object', properties: Object.assign({}, OBJEKT_ARGS, {
+      jahr: { type: 'integer', description: 'Das Jahr, z. B. 2025. Ohne Angabe das Vorjahr.' }
+    }), additionalProperties: false } },
+  { name: 'vivi_vorgaenge', stufe: 'lesen', fn: vivi_vorgaenge,
+    beschreibung: 'Aus ViVi (nur bei Verknüpfung): Vorgänge aus dem Mieterportal (Schadensmeldungen, Anfragen) mit Titel, '
+      + 'Kategorie, Status, Priorität, nächstem Schritt und Fälligkeit, Mieter abgekürzt. Nutze es bei "gibt es offene '
+      + 'Schäden?", "was hat der Mieter gemeldet?". Kostet nichts.',
+    parameter: { type: 'object', properties: Object.assign({}, OBJEKT_ARGS, {
+      nur_offen: { type: 'boolean', description: 'true: nur Vorgänge, die nicht erledigt sind' }
+    }), additionalProperties: false } },
+  { name: 'vivi_handwerker', stufe: 'lesen', fn: vivi_handwerker,
+    beschreibung: 'Aus ViVi (nur bei Verknüpfung): Handwerkeraufträge mit Art, Status, Firma, Auftrag, Kostengrenze, '
+      + 'Angebot, Vergabe, Fertigstellung und ob eine Rechnung vorliegt. Nutze es bei "welche Handwerker waren da?", '
+      + '"was hat die Reparatur gekostet?". Kostet nichts.',
+    parameter: { type: 'object', properties: OBJEKT_ARGS, additionalProperties: false } },
+  { name: 'vivi_darlehen', stufe: 'lesen', fn: vivi_darlehen,
+    beschreibung: 'Aus ViVi (nur bei Verknüpfung): die Darlehen mit Bank, Zins, Tilgung, Rate, Zinsbindung und '
+      + 'Sondertilgungsrecht, dazu aus dem Tilgungsplan die Restschuld heute und Zinsen, Tilgung und Restschuld eines '
+      + 'Jahres. Nutze es bei "wie hoch ist die Restschuld laut ViVi?", "wie viel Zinsen 2025?". Kostet nichts.',
+    parameter: { type: 'object', properties: Object.assign({}, OBJEKT_ARGS, {
+      jahr: { type: 'integer', description: 'Jahr für die Summen aus dem Tilgungsplan, ohne Angabe das laufende Jahr' }
+    }), additionalProperties: false } },
+
   /* v3025 */
   { name: 'objekt_unterlagen', stufe: 'lesen', fn: objekt_unterlagen,
     beschreibung: 'Die AUSGEWERTETEN UNTERLAGEN eines Objekts (Exposé, WEG-Protokolle, '
@@ -4599,6 +4638,28 @@ async function marktpreis_ohne_objekt_abrufen(ctx) {
       hinweis: 'Der Abruf ist fehlgeschlagen. Sag das dem Nutzer mit dem Grund.' };
   }
 }
+
+/* ── v4130 · ViVi-Werkzeuge (nur lesen) ─────────────────────────────────
+   Marcel 23.11.2026: „kann im Reiter ViVi man auch KI-Anfragen machen zu seinem Objekt? … mit dem Co-Pilot
+   kombinieren?“ Gelesen wird ueber services/vivi/viviAuskunft.js, das Mieter abkuerzt („Hr. M.“) und Freitext
+   schwaerzt, BEVOR etwas das Modell erreicht. Nur das eigene, verknuepfte Objekt, nur mit Vorschau-Freigabe 'vivi'.
+   Dieselben Werkzeuge sieht der Telegram-Bot und die Flow-Schnittstelle: dort gilt dieselbe Sperre. */
+async function _viviWerkzeug(art, ctx, args) {
+  const a = Object.assign({}, args || {});
+  const id = await _findeObjekt(ctx, { nummer: a.nummer, id: a.id, adresse: a.adresse });
+  if (!id) return { gefunden: false, hinweis: 'Kein Objekt zu dieser Angabe gefunden.' };
+  let frei = false;
+  try { frei = await require('./vorschau').darf({ id: ctx.userId }, 'vivi'); } catch (e) { frei = false; }
+  if (!frei) return { ok: false, gesperrt: true, hinweis: 'Die ViVi-Anbindung ist für dieses Konto noch nicht freigegeben. Sag das so, ohne Details.' };
+  if (typeof ctx.merkeObjekt === 'function') ctx.merkeObjekt(id);
+  const r = await require('./vivi/viviAuskunft')[art](ctx.userId, id, a);
+  return Object.assign({ objekt_id: id }, r);
+}
+function vivi_einheiten(ctx, args) { return _viviWerkzeug('einheiten', ctx, args); }
+function vivi_belege(ctx, args) { return _viviWerkzeug('belege', ctx, args); }
+function vivi_vorgaenge(ctx, args) { return _viviWerkzeug('vorgaenge', ctx, args); }
+function vivi_handwerker(ctx, args) { return _viviWerkzeug('handwerker', ctx, args); }
+function vivi_darlehen(ctx, args) { return _viviWerkzeug('darlehen', ctx, args); }
 
 function fuerModell() {
   return WERKZEUGE.map((w) => ({
