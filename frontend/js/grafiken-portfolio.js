@@ -415,7 +415,7 @@
       'body.dp-gp-vb #dashboard-main .vb-charts{display:block !important}',
       'body.dp-gp-an #dashboard-main #dp-steuerkette .sk-box.sk-box-h.gp-ersetzt{display:none !important}',
       B + '.gp-vb{margin:4px 0 0}',
-      B + ' .gp-vb-raster{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}',
+      B + ' .gp-vb-raster{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;align-items:start}',
       B + ' .gp-vb-raster > .gp-vbk{min-width:0}',
       B + ' .gp-vb-raster > .gp-vbk.gp-breit{grid-column:1/-1}',
       B + ' .gp-vb-fuss{font-size:11px;color:var(--c-pmut,#6b6660);margin:8px 2px 0}',
