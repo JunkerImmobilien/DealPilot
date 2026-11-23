@@ -83,6 +83,7 @@
      /invoice\s*(no|number|date|nr)|\bvat\b|gross\s*(eur|amount)|net\s*(eur|amount)|amount\s*due|total\s*(eur|amount|due)/i,
      /(rechnungs|gesamt|end|zahl)betrag|betrag:?\s*(eur|€)|summe\s*brutto|bruttobetrag/i].forEach(function (r) { if (r.test(t)) treffer++; });
     if (/rechnung|quittung|beleg|invoice/i.test(n)) treffer++;
+    if (/grundsteuer(bescheid|messbetrag)|abgabenbescheid|bescheid über (die )?grundsteuer/i.test(t) || /grundsteuer/i.test(n)) treffer += 2;   /* v4200 · B5: ein Grundsteuerbescheid ist ein Beleg (Grundsteuer), kein Marktbericht */
     if (/quittung|betrag dankend erhalten/i.test(t)) treffer++;   /* v3120c · eine Quittung ist eindeutig - gemessen: Schornsteinfeger-Quittung kam nur auf 2 */
     return treffer >= 3;
   }

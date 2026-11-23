@@ -2636,7 +2636,7 @@
     aus.forEach(function (id) { var L = DG.importEbene(id); stufen[L && L > s ? L : 3] = 1; });
     var ziel = stufen[2] ? DG.NAMEN[2] + (stufen[3] ? ' bzw. ' + DG.NAMEN[3] : '') : DG.NAMEN[3];
     var html = '<div class="oabi-dg" style="margin-top:10px;padding:9px 11px;border-radius:8px;border:1px dashed rgba(42,39,39,.25);font-size:12.5px">'
-      + '<b>' + aus.length + (aus.length === 1 ? ' weiterer Wert erkannt' : ' weitere Werte erkannt') + ' — nicht übernommen (Detailgrad ' + escH(DG.NAMEN[s]) + ').</b> '
+      + '<b>' + aus.length + (aus.length === 1 ? ' weiterer Wert erkannt' : ' weitere Werte erkannt') + ', nicht übernommen (Detailgrad ' + escH(DG.NAMEN[s]) + ').</b> '
       + (aus.length === 1 ? 'Er gehört' : 'Sie gehören') + ' zu Feldern, die erst ab ' + escH(ziel) + ' zu sehen sind. '
       + 'Stellst du den Detailgrad in den Einstellungen höher und liest dieselben Unterlagen erneut ein, werden diese Felder gefüllt, soweit sie noch leer sind.'
       + '<div style="margin-top:4px;color:#7A7370">' + aus.map(function (id) { var it = _merged[id]; return escH(it ? it.label : id); }).join(' · ') + '</div></div>';
@@ -2661,7 +2661,7 @@
         if (ch.plz) _merged['plz'] = { label: 'PLZ', value: ch.plz, raw: ch.plz, source: ch.source, kind: 'input' };
         if (ch.ort) _merged['ort'] = { label: 'Ort', value: ch.ort, raw: ch.ort, source: ch.source, kind: 'input' };
       }
-      addrHtml = '<div class="oabi-addr"><div class="oabi-addr-h">\u26A0 Unterschiedliche Adressen erkannt — welche gilt?</div>' +
+      addrHtml = '<div class="oabi-addr"><div class="oabi-addr-h">\u26A0 Unterschiedliche Adressen erkannt. Welche gilt?</div>' +
         addrOpts.map(function (o) {
           return '<label class="oabi-addr-opt"><input type="radio" name="oabi-addr" value="' + escH(o.key) + '"' + (o.key === _addrChoice ? ' checked' : '') + '> ' + escH(o.label) + ' <span class="src">(' + escH(o.source) + ')</span></label>';
         }).join('') + '<div class="oabi-addr-hinweis" style="font-size:12px;margin-top:4px;opacity:.8">Übernommen werden nur Werte aus dem Dokument der gewählten Adresse.</div></div>';
@@ -2731,7 +2731,7 @@
         + '<button type="button" class="oabi-btn primary" id="oabi-adr-ja">Ja, trotzdem übernehmen</button></div></div>'
       : ((_adrAbw.length || _dokAdr.length) ? '<div class="oabi-abw-kopf" style="margin:8px 0;padding:8px 10px;border-radius:8px;border:1px solid rgba(42,39,39,.2);font-size:12.5px">Du hast bestätigt, dass das Dokument zu diesem Objekt gehört. Die Adresszeilen übernimmst du nur, wenn du sie anhakst.</div>' : '');
     var abwKopf = nAbw ? '<div class="oabi-abw-kopf" style="margin:8px 0;padding:8px 10px;border-radius:8px;border:1px solid #d9a441;background:rgba(217,164,65,.12);font-size:12.5px">'
-      + '<b>' + nAbw + (nAbw === 1 ? ' Wert weicht' : ' Werte weichen') + ' vom Objekt ab.</b> Diese Zeilen sind nicht vorgehakt — hak sie an, wenn das Dokument recht hat.</div>' : '';
+      + '<b>' + nAbw + (nAbw === 1 ? ' Wert weicht' : ' Werte weichen') + ' vom Objekt ab.</b> Diese Zeilen sind nicht vorgehakt. Hak sie an, wenn das Dokument recht hat.</div>' : '';
     /* v3088a · Hinweis, wenn Zeilen aus Wirtschaftsplan/Abrechnung bewusst nicht vorgehakt sind */
     var nAktiv = keys.filter(function (id) { return _merged[id] && _merged[id].nurAktiv && !_merged[id].viviAbw && abw[id] === undefined; }).length;
     if (_viviOffen) abwKopf += '<div class="oabi-abw-kopf oabi-vivi-kopf" style="margin:8px 0;padding:8px 10px;border-radius:8px;border:1px solid #d9a441;background:rgba(217,164,65,.12);font-size:12.5px">'
@@ -2741,7 +2741,7 @@
     /* v3120 · erkannte Rechnungen: an den Beleg-Leser (Werbungskosten je Jahr, jede Zeile bestätigen) */
     var _rech = _files.filter(function (f) { return f.type === 'rechnung' && f.file; });
     if (_rech.length) abwKopf += '<div class="oabi-abw-kopf" style="margin:8px 0;padding:8px 10px;border-radius:8px;border:1px solid var(--wl-c9a84c,#C9A84C);background:var(--gold-bg, rgba(201,168,76,.08));font-size:12.5px">'
-      + '<b>' + _rech.length + (_rech.length === 1 ? ' Rechnung/Beleg' : ' Rechnungen/Belege') + ' erkannt</b> (' + _rech.map(function (f) { return escH(f.name); }).join(', ') + '). Sie öffnen sich im Prüffenster der Belege – dort siehst du Bild, Positionen und wohin sie übernommen werden. '
+      + '<b>' + _rech.length + (_rech.length === 1 ? ' Rechnung/Beleg' : ' Rechnungen/Belege') + ' erkannt</b> (' + _rech.map(function (f) { return escH(f.name); }).join(', ') + '). Sie öffnen sich im Prüffenster der Belege. Dort siehst du Bild, Positionen und wohin sie übernommen werden. '
       + '<button type="button" class="oabi-btn" id="oabi-belege" style="margin-left:6px">Prüffenster öffnen</button></div>';
     /* v3202 · Exposé mit mehreren einzeln bepreisten Objekten (Portfolio/Paket) - paket-import.js */
     var _pkF = window.DpPaket ? _files.filter(function (f) { return f.type === 'expose' && f.text && window.DpPaket.erkennen(f.text) > 1; })[0] : null;
@@ -2768,7 +2768,7 @@
     }).join('') + '</tbody></table>'
       + _dg.html   /* v3236 · was der Detailgrad zurückhält */
       + (_vergleich.length ? '<div class="oabi-vgl" style="margin-top:10px;padding:9px 11px;border-radius:8px;border:1px dashed rgba(42,39,39,.25);font-size:12.5px">'
-          + '<b>Ergebnis eines fremden Gutachtens — wird nicht übernommen.</b> DealPilot rechnet selbst; die Zahl dient dem Abgleich.'
+          + '<b>Ergebnis eines fremden Gutachtens, wird nicht übernommen.</b> DealPilot rechnet selbst. Die Zahl dient dem Abgleich.'
           + _vergleich.map(function (v) { return '<div style="margin-top:4px">' + escH(v.wort) + ': <b>' + escH(v.wert) + '</b>' + (v.eigen ? ' · DealPilot: ' + escH(v.eigen) : '') + ' <span class="src">(' + escH(v.quelle) + ')</span></div>'; }).join('')
           + '</div>' : '')
       /* v3029-import · was bewusst NICHT übernommen wurde, und warum */
@@ -2830,13 +2830,13 @@
       } else if (d && f.type !== 'dokument') h = U.dokHtml(d) + (f.cache.mietliste && f.cache.mietliste.success ? '<div class="dpu-h">Mieterliste im Exposé</div>' + U.dokHtml(f.cache.mietliste.extracted || {}) : '');
       else h = '<p class="dpu-hinweis">' + escH(f.status === 'reading' ? 'wird gelesen …' : ((d && d.error) || 'Aus dieser Datei kam nichts Verwertbares.')) + '</p>';
       if (f._scan) h = '<p class="dpu-hinweis">Scan: ' + f._scan.gelesen + ' von ' + f._scan.seiten + ' Seiten gelesen' + (f._scan.gekuerzt ? ' (gekürzt)' : '') + '.</p>' + h;
-      var lab = f.status === 'gesperrt' ? 'Persönlich' : (f.type === 'dokument' ? (f.dokLabel || 'Dokument') : f.type === 'market' ? 'Marktbericht' : 'Exposé');
+      var lab = f.status === 'gesperrt' ? 'Persönlich' : (f.type === 'dokument' ? (f.dokLabel || 'Dokument') : f.type === 'market' ? 'Marktbericht' : f.type === 'rechnung' ? 'Rechnung' : 'Exposé');   /* v4200 · B6: Rechnung hiess hier Exposé */
       reiter.push({ id: id, label: lab + ' · ' + f.name.replace(/\.pdf$/i, ''), n: n });
       panels[id] = h;
     });
     if (_auswertungLaeuft || _auswertung || _auswertungFehler) {
       reiter.push({ id: 'ausw', label: 'Auswertung', n: _auswertung ? (_auswertung.risiken || []).length : 0 });
-      panels.ausw = _auswertungLaeuft ? '<p class="dpu-hinweis">Alle Unterlagen werden gemeinsam ausgewertet — Risiken, WEG, Investitionsthese …</p>'
+      panels.ausw = _auswertungLaeuft ? '<p class="dpu-hinweis">Alle Unterlagen werden gemeinsam ausgewertet: Risiken, WEG, Investitionsthese …</p>'
         : _auswertungFehler ? '<p class="dpu-hinweis">Auswertung nicht möglich: ' + escH(_auswertungFehler) + '</p>' : U.auswertungHtml(_auswertung);
     }
     if (!reiter.some(function (r) { return r.id === _reiter; })) _reiter = 'ueb';
@@ -2936,10 +2936,10 @@
     var ov = document.createElement('div'); ov.className = 'oabi-ov'; ov.id = 'oabi-ov';
     ov.innerHTML =
       '<div class="oabi-modal">' +
-        '<div class="oabi-head"><span style="color:var(--gold,#C9A84C)">' + svg('upload', 22) + '</span><h3>' + (_eingang ? 'Belege, Unterlagen & Rechnungen einlesen' : _ergaenzen ? 'Unterlagen nachreichen' : 'Unterlagen einlesen — PDF oder Foto: Exposé, Marktbericht, Dokumente') + '</h3></div>' +
+        '<div class="oabi-head"><span style="color:var(--gold,#C9A84C)">' + svg('upload', 22) + '</span><h3>' + (_eingang ? 'Belege, Unterlagen & Rechnungen einlesen' : _ergaenzen ? 'Unterlagen nachreichen' : 'Unterlagen einlesen: PDF oder Foto, Exposé, Marktbericht, Dokumente') + '</h3></div>' +
         (_jr ? '<div class="oabi-reiter" role="tablist"><button type="button" role="tab" data-oabi-r="ein">Einlesen</button><button type="button" role="tab" data-oabi-r="jahre">Belege je Jahr</button></div><div id="oabi-r-ein">' : '') +
-        (_ergaenzen ? '<div class="oabi-sub" style="border-left:3px solid var(--gold,#C9A84C);padding-left:9px">Die bisherige Auswertung bleibt die Grundlage – gelesen werden nur die neuen PDFs, dann wird zusammengeführt. Vor der Übernahme siehst du, was sich in Risiken, These, Hausgeld und Steuer ändert.</div>' : '') +
-        '<div class="oabi-sub">Mehrere PDFs oder Fotos (JPG, PNG) gleichzeitig anhängen — Typ wird automatisch erkannt (inkl. OCR bei Scan-/Grafik-PDFs) und ist pro Datei umstellbar. Alle Werte werden zusammengeführt (Marktbericht führt bei Konflikt).</div>' +
+        (_ergaenzen ? '<div class="oabi-sub" style="border-left:3px solid var(--gold,#C9A84C);padding-left:9px">Die bisherige Auswertung bleibt die Grundlage. Gelesen werden nur die neuen PDFs, dann wird zusammengeführt. Vor der Übernahme siehst du, was sich in Risiken, These, Hausgeld und Steuer ändert.</div>' : '') +
+        '<div class="oabi-sub">Mehrere PDFs oder Fotos (JPG, PNG) gleichzeitig anhängen. Der Typ wird automatisch erkannt (inkl. OCR bei Scan-/Grafik-PDFs) und ist pro Datei umstellbar. Alle Werte werden zusammengeführt (Marktbericht führt bei Konflikt).</div>' +
         '<div class="oabi-body">' +
           '<div class="oabi-drop" id="oabi-drop">📁 PDFs oder Fotos auswählen oder hierher ziehen<br><span style="font-size:11px;color:var(--muted,#7A7370)">mehrere Dateien möglich · max 100 MB je Datei</span>' +
             '<input type="file" id="oabi-input" accept="application/pdf,.pdf,image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp" multiple style="display:none"></div>' +
@@ -3057,6 +3057,10 @@
     var marketHits = ['marktwert', 'mikrolage', 'makrolage', 'mikro ', 'makro ', 'wertentwicklung', 'bodenrichtwert', 'konfidenz', 'marktmiete', '€/m²', 'spanne', 'wertsteigerung'].reduce(function (n, kw) { return n + (t.indexOf(kw) >= 0 ? 1 : 0); }, 0);
     var exposeHits = ['kaufpreis', 'courtage', 'provision', 'maklerprovision', 'objektbeschreibung', 'besichtigung', 'immobilienscout', 'provisionsfrei'].reduce(function (n, kw) { return n + (t.indexOf(kw) >= 0 ? 1 : 0); }, 0);
     if (exposeHits >= 2 && marketHits === 0) return 'expose';
+    /* v4200 · B5 (Musterhof 8, 23.11.2026): ein Grundsteuerbescheid ohne ein einziges Markt- oder Exposé-Merkmal lief als
+       „Marktbericht“ durch, die KI füllte Makrolage, Nachfrage und Entwicklung, die im Bescheid nicht stehen. Ohne jedes
+       Merkmal keine Vermutung mehr, sondern „Art wählen“. Nie Werte, die nicht im Dokument stehen. */
+    if (marketHits === 0 && exposeHits === 0) return 'unklar';
     return 'unknown';
   }
   // Marktbericht-typische Felder im Extraktionsergebnis? (valuation-spezifisch, in Exposés nicht vorhanden)
@@ -3093,8 +3097,8 @@
        (Dateiname/Kopf), die Art kennt der Import aber nicht („Art unklar“). Sie liefen als Marktbericht durch, und die KI
        füllte Makro-/Mikrolage, Marktmiete 7,92 €/m² (die Miete aus dem Mieterhöhungsschreiben) und Baujahr 1970 (die
        Baualtersklasse des Mietspiegels), teils vorgehakt. Dann keine Marktbericht-Suche, sondern „Art wählen“. */
-    if (_warDok) {
-      f.type = 'dokument'; f.status = 'err'; f.fehler = 'Art unklar, bitte die Art wählen'; renderFileRow(f); return;
+    if (_warDok || cls === 'unklar') {
+      f.type = _warDok ? 'dokument' : 'unklar'; f.status = 'err'; f.fehler = 'Art unklar, bitte die Art wählen'; renderFileRow(f); return;
     }
     setStatus(f, 'Typ prüfen…');
     f.type = 'market'; await ensureExtract(f);
@@ -3128,6 +3132,9 @@
   async function onTypeChange(f, v) {
     f.userType = (v === 'auto') ? null : v;
     await resolveType(f); recompute(); renderMergedTable();
+    /* v4200 · B5: von Hand auf Rechnung / Beleg gestellt, dann liest der Beleg-Leser sie gleich aus. Vorher stand sie nur
+       in der Liste, und der Betrag (Grundsteuer 640 €) kam nirgends an. */
+    if (v === 'rechnung' && f.file && window.DpEingang && window.DpEingang.belegeAuslesen) { try { window.DpEingang.belegeAuslesen([f.file]); } catch (e) {} }
   }
   /* v3093a · N106 · mehrere Fotos = Seiten EINES Dokuments. Jede Seite einzeln lesen (wie bisher je
      Foto ein Abruf von /ai/seiten-lesen), Text merken, zusammen einordnen. Ist eine Seite persönlich,
@@ -3277,6 +3284,20 @@
    * null heisst: nichts geschrieben, also auch nicht zaehlen. */
   /* v3977 · Hausgeld je Dokument: nur Einzelplan/-abrechnung der Wohnung (Gesamtwerte der Gemeinschaft passen nicht zu weg.jahre). Ist = umlagefähig + nicht
      umlagefähig + Rücklage, wenn alle drei genannt sind (so rechnet die Abrechnung das Hausgeld), sonst kosten_jahr. */
+  /* v4200 · B14 · Vorschläge je Dokument für den Jahresabschluss (Jahr, Feld, Betrag; Sonderumlagen als Anteil des Objekts).
+     Ein Wirtschaftsplan, zu dessen Jahr die Abrechnung vorliegt, schlägt keine Steuer vor (v3993, _hgWahl.ohneSteuer). */
+  function _vorschlaegeFuerDok(x) {
+    var D = window.DokumentImport, aus = { steuer: [], su: [] }; if (!D || !x) return aus;
+    var ex = x.extracted || {}, ktx = _kontext();
+    var ohne = !!(_hgWahl && (_hgWahl.ohneSteuer || []).some(function (t) { return t && t.extracted === x.extracted; }));
+    if (!ohne && typeof D.steuerVorschlaege === 'function') (D.steuerVorschlaege(ex, x.typ, ktx) || []).forEach(function (s) {
+      if (s && s.jahr && s.feld && s.betrag > 0) aus.steuer.push({ jahr: s.jahr, feld: s.feld, wort: s.wort, betrag: Math.round(s.betrag) });
+    });
+    if (typeof D.sonderumlagenAus === 'function') (D.sonderumlagenAus(ex, x.typ, ktx) || []).forEach(function (s) {
+      if (s && !s.hinweis && s.jahr && s.betrag > 0) aus.su.push({ jahr: s.jahr, betrag: Math.round(s.betrag), zweck: s.zweck || 'Sonderumlage', faellig: s.faellig || '', wie: s.wie || '', gesamt: s.gesamt || null });
+    });
+    return aus;
+  }
   function _hgWerte(ex) {
     var t = (ex && ex.einzel) || null, n = function (v) { return typeof v === 'number' && isFinite(v) ? v : null; };
     var w = {};
@@ -3345,6 +3366,11 @@
         if (ex.art && typeof ex.art === 'string') o.art = ex.art; if (typeof ex.jahr === 'number' && ex.jahr > 1950 && ex.jahr < 2100) o.jahr = ex.jahr;
         /* v3977 · F1: die Zahlen des Dokuments reisen mit - der Jahresabgleich ordnet sie dem Jahr DIESES Dokuments zu (hausverlauf.js wegJahre) */
         if (x.typ === 'hausgeld') { var _w = _hgWerte(ex); if (_w) o.werte = _w; }
+        /* v4200 · B14 (Musterhof 8, 23.11.2026): die Steuer- und Sonderumlage-Vorschläge einer Abrechnung oder eines Protokolls
+           stehen in der Übernahme bewusst nicht vorgehakt (v3088a, Marcel: „aktiv anstoßen“). Wer sie nicht anhakte, verlor sie:
+           Erhaltung 14.000 €, Sonderumlage 15.000 €, Verwaltung je Jahr kamen nie in der Anlage V an. Jetzt reisen sie mit dem
+           Dokument, und der Jahresabschluss (Schritt Steuer) bietet an, was in der Anlage V noch fehlt. */
+        try { var _sv = _vorschlaegeFuerDok(x); if (_sv.steuer.length) o.steuer = _sv.steuer; if (_sv.su.length) o.su = _sv.su; } catch (_e) {}
         return o; });
       /* v3017 · Nachreichen: die Liste der Unterlagen wächst, die Auswertung ist schon zusammengeführt */
       var alt = _ergaenzen ? (window.DpUnterlagen.laden() || {}) : {};

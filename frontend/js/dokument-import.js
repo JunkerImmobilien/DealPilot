@@ -738,11 +738,30 @@
      in object-actions.js ruft dieselbe Auslese und denselben Abgleich - ohne
      dieses Fenster. Eine Auslese, ein Abgleich, zwei Eingänge. */
   async function lesenText(text, dateiname, typ) {
-    return await Auth.apiCall('/ai/extract-dokument', {
+    var r = await Auth.apiCall('/ai/extract-dokument', {
       method: 'POST',
       /* v3016 · 45.000 statt 15.000 Zeichen: ein WEG-Protokoll mit 10 Seiten hat ~28.000, die
          Beschlüsse zur Sanierung standen hinter Zeichen 15.000 */
       body: { text: String(text || '').slice(0, 45000), dateiname: dateiname || '', typ: typ || undefined }
+    });
+    try { ergebnisNachtragen(r, text); } catch (e) {}
+    return r;
+  }
+  /* v4200 · B7 (Musterhof 8, 23.11.2026): „Nachzahlung 681,00 €“ stand wörtlich in der Hausgeldabrechnung 2022, die KI gab
+     abrechnungsergebnis_eur null zurück (2021, 2023, 2024 richtig). Fehlt das Ergebnis einer Jahresabrechnung, wird es aus
+     dem Text gelesen, aber nur, wenn genau EIN Betrag hinter „Nachzahlung“ bzw. „Guthaben“ steht. Sonst bleibt es leer. */
+  function ergebnisAusText(text) {
+    var t = String(text || ''), treffer = {};
+    var re = /(nachzahlung|guthaben)[^0-9\n]{0,40}?(\d{1,3}(?:\.\d{3})*,\d{2})\s*(?:€|eur)/gi, m;
+    while ((m = re.exec(t))) { var n = Number(m[2].replace(/\./g, '').replace(',', '.')); if (n > 0) treffer[(/guthaben/i.test(m[1]) ? -1 : 1) * n] = 1; }
+    var k = Object.keys(treffer); return k.length === 1 ? Number(k[0]) : null;
+  }
+  function ergebnisNachtragen(r, text) {
+    if (!r || !r.success) return;
+    [r].concat(Array.isArray(r.weitere) ? r.weitere : []).forEach(function (t) {
+      var ex = t && t.extracted; if (!ex || t.typ !== 'hausgeld' || !/abrechnung/i.test(String(ex.art || ''))) return;
+      if (ex.abrechnungsergebnis_eur != null && ex.abrechnungsergebnis_eur !== '') return;
+      var e = ergebnisAusText(text); if (e != null) { ex.abrechnungsergebnis_eur = e; ex._ergebnis_aus_text = true; }
     });
   }
   function vergleich(ext) {
@@ -767,7 +786,8 @@
     lesenText: lesenText,
     abgleich: _abgleich,
     steuerVorschlaege: steuerVorschlaege,   /* v3017 */
-    sonderumlagenAus: sonderumlagenAus,     /* v3092 · N100 */
+    sonderumlagenAus: sonderumlagenAus,
+    ergebnisAusText: ergebnisAusText,   /* v4200 · B7 */     /* v3092 · N100 */
     hausgeldWahl: hausgeldWahl,             /* v3993 · F22 */
     vergleich: vergleich,
     adresseAbweichung: adresseAbweichung   /* v3279 */

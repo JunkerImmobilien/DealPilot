@@ -18,7 +18,7 @@
  * ════════════════════════════════════════════════════════════════════════════════════════════════════════════════ */
 (function (global) {
   'use strict';
-  var VERSION = 'v4110a';
+  var VERSION = 'v4200';
   var SCHRITTE = [['miete', 'Miete'], ['wert', 'Wert'], ['haus', 'Haus & Belege'], ['steuer', 'Steuer'], ['fest', 'Festschreiben']];
   var _z = null;                 /* { jahr, k, frage, vivi: 'laeuft' | null } */
   var _merk = {}, _gelesen = {}; /* Schritt je Objekt|Jahr · ViVi schon gelesen je Objekt|Jahr */
@@ -139,6 +139,49 @@
     h += '<div data-jab-belege></div>';
     return h;
   }
+  /* v4200 · B14 (Musterhof 8, 23.11.2026): Steuer- und Sonderumlage-Vorschläge der eingelesenen Unterlagen (object-actions.js
+     merkt sie seit v4200 am Dokument) gegen das, was heute in der Anlage V bzw. der Liste der Sonderumlagen steht. Was dort
+     fehlt oder niedriger steht, bietet Schritt 4 zum Übernehmen an. Nur ein Hinweis, festschreiben bleibt möglich. */
+  function unterlagenOffen(J) {
+    var aus = { steuer: [], su: [] }, U = global.DpUnterlagen, docs = [];
+    try { docs = (U && U.laden ? (U.laden() || {}).dokumente : []) || []; } catch (e) { docs = []; }
+    var je = {};
+    docs.forEach(function (d) { (d && Array.isArray(d.steuer) ? d.steuer : []).forEach(function (s) {
+      if (!s || Number(s.jahr) !== J || !(s.betrag > 0)) return;
+      var k = s.feld; if (!je[k] || s.betrag > je[k].betrag) je[k] = { feld: s.feld, wort: s.wort || s.feld, betrag: s.betrag, quelle: d.label || d.datei || 'Unterlage' };
+    }); });
+    Object.keys(je).forEach(function (k) {
+      var x = je[k], w = null; try { w = typeof global.dpSteuerWert === 'function' ? global.dpSteuerWert(J, x.feld) : null; } catch (e) { w = null; }
+      if (!w) return;   /* Jahr nicht in der Zeitleiste */
+      if ((Number(w.wert) || 0) + 1 < x.betrag) aus.steuer.push({ feld: x.feld, wort: x.wort, betrag: x.betrag, ist: Number(w.wert) || 0, eigen: !!w.eigen, quelle: x.quelle });
+    });
+    var L = []; try { L = global.DpSonderumlage && global.DpSonderumlage.liste ? global.DpSonderumlage.liste() : []; } catch (e) { L = []; }
+    var gesehen = {};
+    docs.forEach(function (d) { (d && Array.isArray(d.su) ? d.su : []).forEach(function (s) {
+      if (!s || Number(s.jahr) !== J || !(s.betrag > 0)) return;
+      var key = s.jahr + ':' + Math.round(s.betrag) + ':' + (s.faellig || ''); if (gesehen[key]) return; gesehen[key] = 1;
+      var da = L.some(function (x) { return Number(x.jahr) === J && Math.abs((Number(x.betrag) || 0) - s.betrag) <= 1; });
+      if (!da) aus.su.push(s);
+    }); });
+    return aus;
+  }
+  function unterlagenBox(J, fest) {
+    var o = unterlagenOffen(J); if (!o.steuer.length && !o.su.length) return '';
+    var z = o.steuer.map(function (x) { return '<li><span>' + esc(x.wort) + '</span><b>' + eur(x.betrag) + '</b><small>Anlage V heute ' + eur(x.ist) + (x.eigen ? ', deine Angabe' : '') + '</small></li>'; })
+      .concat(o.su.map(function (s) { return '<li><span>Sonderumlage ' + esc(s.zweck || '') + '</span><b>' + eur(s.betrag) + '</b><small>fällig ' + esc(s.faellig || String(s.jahr)) + ', fehlt in der Liste der Sonderumlagen</small></li>'; }));
+    return '<div class="dp-jab-box" data-jab-unterlagen="' + J + '"><b>Aus den eingelesenen Unterlagen ' + J + ' fehlt noch etwas.</b> Die Anlage V rechnet ohne diese Beträge.'
+      + '<ul class="dp-jab-liste">' + z.join('') + '</ul>'
+      + (fest ? '<small>Die Steuer ' + J + ' ist festgeschrieben. Zum Übernehmen erst im Jahresabgleich freigeben.</small>'
+        : '<div class="dp-jab-reihe" style="margin:8px 0 0">' + knopf('unterlagen-uebernehmen', 'Aus den Unterlagen übernehmen', true) + '</div><small>Ersetzt den bisherigen Wert des Feldes. Sonderumlagen kommen in die Liste im Reiter Bewirtschaftung, steuerlich zählen sie im Jahr der Verwendung.</small>')
+      + '</div>';
+  }
+  function unterlagenUebernehmen(J) {
+    var o = unterlagenOffen(J), n = 0;
+    o.steuer.forEach(function (x) { try { if (global.dpSteuerSetzen && global.dpSteuerSetzen(J, x.feld, x.betrag, { quelle: x.quelle })) n++; } catch (e) {} });
+    o.su.forEach(function (s) { try { if (global.DpSonderumlage && global.DpSonderumlage.uebernehmen(s)) n++; } catch (e) {} });
+    if (n) { try { if (global.DpSpeichernFolge) global.DpSpeichernFolge(); else if (typeof global.saveObj === 'function') global.saveObj({ silent: true }); } catch (e) {} }
+    return n;
+  }
   function schrittSteuer(r) {
     var J = _z.jahr, B = JB(), t = null;
     try { var sj = typeof global._v269_getStartYear === 'function' ? global._v269_getStartYear() : null; if (sj != null && typeof global._computeYearTotal === 'function') t = global._computeYearTotal(J, J - sj); } catch (e) { t = null; }
@@ -148,6 +191,7 @@
     /* v4110 · eigene Wörter statt der Kurzform des Jahresbuchs (dort „geplant“) */
     var opts = [['geplant', 'nicht erklärt'], ['erklaert', 'erklärt'], ['bescheid', 'Bescheid liegt vor']].map(function (x) { return '<option value="' + x[0] + '"' + (x[0] === st ? ' selected' : '') + '>' + esc(x[1]) + '</option>'; }).join('');
     h += '<div class="dp-jab-reihe"><label style="display:flex;align-items:center;gap:8px;white-space:nowrap">Stand der Steuer <select data-jab-status' + (fest ? ' disabled' : '') + '>' + opts + '</select></label>' + (anlageVErlaubt() ? knopf('anlage-v', 'Volle Anlage V öffnen', false) : '') + '</div>';
+    h += unterlagenBox(J, fest);   /* v4200 · B14 */
     if (fest) h += '<div class="dp-jab-box">Die Steuer ' + J + ' ist festgeschrieben.</div>';
     else if (st !== 'bescheid') h += '<div class="dp-jab-box">Erledigt ist der Schritt mit dem Bescheid. Ist die Erklärung abgegeben, setz den Stand auf erklärt.</div>';
     return h;
@@ -168,6 +212,8 @@
       return h + '<div class="dp-jab-box gold">' + J + ' ist abgeschlossen und festgeschrieben' + (p && p.am ? ' am ' + esc(datumText(String(p.am).slice(0, 10))) : '') + '. Ändern geht nur nach Freigabe im Jahresabgleich.</div>';
     }
     if (L.length) h += '<div class="dp-jab-box">Noch offen: ' + esc(L.join(', ')) + '. Du kannst trotzdem festschreiben, offene Schritte gelten dann als abgeschlossen.</div>';
+    var _uo = unterlagenOffen(J), _un = _uo.steuer.length + _uo.su.length;   /* v4200 · B14: Musterhof 2023 ließ sich ohne Hinweis festschreiben */
+    if (_un && !(s.fest && s.fest.steuer)) h += '<div class="dp-jab-box">' + _un + (_un === 1 ? ' Betrag' : ' Beträge') + ' aus den eingelesenen Unterlagen ' + J + ' fehlen in der Anlage V. ' + knopf('zu-schritt', 'Zum Schritt Steuer', false, ' data-jab-k="steuer"') + '</div>';
     else h += '<div class="dp-jab-box gold">Alle vier Schritte von ' + J + ' sind erledigt.</div>';
     if (_z.frage) h += '<div class="dp-jab-box rot"><b>' + J + ' festschreiben?</b> Danach lassen sich die Werte nur nach Freigabe ändern. Das Festschreiben wird mit Datum protokolliert.'
       + '<div class="dp-jab-reihe" style="margin:8px 0 0">' + knopf('fest-ja', 'Ja, festschreiben', true) + knopf('fest-nein', 'Noch nicht', false) + '</div></div>';
@@ -251,6 +297,7 @@
       if (a === 'wert-nein') { if (JB()) JB().festSetzen(J, ['wert'], true); zeichnen(); return; }
       if (a === 'wert-abrufen') { schliessen(); try { JA().mbAbrufen(); } catch (e) {} return; }
       if (a === 'hochladen') { try { global.DpEingang.oeffnen({ fertig: function () { setTimeout(zeichnen, 300); } }); } catch (e) {} return; }
+      if (a === 'unterlagen-uebernehmen') { var _n = unterlagenUebernehmen(J); toast(_n ? _n + (_n === 1 ? ' Betrag' : ' Beträge') + ' übernommen' : 'Nichts übernommen'); zeichnen(); return; }   /* v4200 · B14 */
       if (a === 'anlage-v') { schliessen(); try { JA().zuAnlageV(J); } catch (e) {} return; }   /* v4110 · Reiter Steuer UND zur Anlage V rollen */
       if (a === 'fest-frage') { _z.frage = true; zeichnen(); return; }
       if (a === 'fest-nein') { _z.frage = false; zeichnen(); return; }
@@ -263,5 +310,5 @@
     global.addEventListener('dp:object-ready', function () { if (_z) schliessen(); _merk = {}; });
   }
 
-  global.DpJahresabschluss = { VERSION: VERSION, SCHRITTE: SCHRITTE, oeffnen: oeffnen, schliessen: schliessen, startSchritt: startSchritt, anlageVErlaubt: anlageVErlaubt, offen: function () { return _z ? { jahr: _z.jahr, k: _z.k } : null; } };
+  global.DpJahresabschluss = { VERSION: VERSION, SCHRITTE: SCHRITTE, oeffnen: oeffnen, schliessen: schliessen, startSchritt: startSchritt, anlageVErlaubt: anlageVErlaubt, unterlagenOffen: unterlagenOffen, offen: function () { return _z ? { jahr: _z.jahr, k: _z.k } : null; } };
 })(typeof window !== 'undefined' ? window : globalThis);
