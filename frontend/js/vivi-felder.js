@@ -289,6 +289,33 @@
     try { var h = $('_vivi'); if (h) h.dispatchEvent(new Event('input', { bubbles: true })); } catch (e) {}
   }, true);
 
+  /* v3996 · Marcel 23.11.2026: „für jedes Feld, wo wir von ViVi was übernehmen, ein Schloss dran. Haben wir die
+     Möglichkeit, das für alle Felder zu übernehmen?“ an = true: alle ViVi-Felder werden eigene Angaben mit dem Wert,
+     der gerade im Feld steht (nichts wird überschrieben). an = false: alle eigenen Angaben fallen, ViVi gilt wieder. */
+  function alleSelbst(an) {
+    if (!_stand || !_stand.verknuepft) return false;
+    var v = lesen(), felder = _stand.felder || {}, info = _stand.info || {};
+    if (an) {
+      Object.keys(felder).forEach(function (id) {
+        if (Object.prototype.hasOwnProperty.call(v.eigen, id)) return;
+        var m = /^einheit\.(\d+)\.(\w+)$/.exec(id);
+        if (m) {
+          var idx = einheitIndex(+m[1], info), L = window._dpMfh && window._dpMfh.einheiten;
+          v.eigen[id] = (idx != null && L && L[idx]) ? L[idx][m[2]] : felder[id].wert;
+        } else { var el = $(id); v.eigen[id] = el ? el.value : felder[id].wert; }
+      });
+    } else v.eigen = {};
+    schreiben(v);
+    var g = setzen(_stand);
+    try { var h = $('_vivi'); if (h) h.dispatchEvent(new Event('input', { bubbles: true })); } catch (e) {}
+    return g || true;
+  }
+  function anzahlEigen() {
+    if (!_stand || !_stand.felder) return { alle: 0, eigen: 0 };
+    var v = lesen(), ids = Object.keys(_stand.felder);
+    return { alle: ids.length, eigen: ids.filter(function (id) { return Object.prototype.hasOwnProperty.call(v.eigen, id); }).length };
+  }
+
   /* Eine eigene Angabe folgt der Eingabe (sonst stuende im Spiegel der Wert beim Loesen) */
   document.addEventListener('input', function (ev) {
     var el = ev.target; if (!el || !el.classList || !el.classList.contains('vivi-eigen')) return;
@@ -393,7 +420,7 @@
     return true;
   }
 
-  window.DpViviFelder = { setzen: setzen, allesLoesen: allesLoesen, einheitenSperren: einheitenSperren, lesen: lesen, HINWEIS: HINWEIS, EINHEIT_FELDER: EINHEIT_FELDER,
+  window.DpViviFelder = { setzen: setzen, allesLoesen: allesLoesen, alleSelbst: alleSelbst, anzahlEigen: anzahlEigen, einheitenSperren: einheitenSperren, lesen: lesen, HINWEIS: HINWEIS, EINHEIT_FELDER: EINHEIT_FELDER,
     /* fuer den Unterlagen-Abgleich (Paket V5): ist ein Feld verknuepft, und welchen Wert fuehrt ViVi? */
     istVerknuepft: istVerknuepft, viviWert: viviWert,
     HINWEIS_ABWEICHUNG: HINWEIS_ABWEICHUNG, vergleich: vergleich, einheitFeld: einheitFeld, einheitVergleich: einheitVergleich,

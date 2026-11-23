@@ -286,6 +286,18 @@ function mitEinheiten(v, daten) {
   return mapping.einheitenListe(daten || {}).length > 0;
 }
 
+/* v3996 · fuehrt die Objektliste des Kontos das Objekt nicht mehr? Nur ein eindeutiges Ja zaehlt: Liste gelesen,
+   keine weitere Seite angekuendigt, Objekt nicht darin. Jeder Fehler beim Lesen der Liste heisst „unklar“ = false. */
+async function inViviGeloescht(cl, v, q) {
+  try {
+    const roh = await cl.get('/projects', q);
+    if (!roh || !Array.isArray(roh.data)) return false;
+    const m = roh.meta || {}, l = roh.links || {};
+    if (l.next || (m.last_page != null && +m.last_page > 1) || (m.next_cursor != null && m.next_cursor !== '')) return false;
+    return !roh.data.some(function (p) { return p && String(p.id) === String(v.vivi_objekt_id); });
+  } catch (e) { return false; }
+}
+
 async function abrufen(userId, objectId, opt) {
   opt = opt || {};
   const sp = deps().speicher;
@@ -298,7 +310,21 @@ async function abrufen(userId, objectId, opt) {
   const q = abfrage(v.vivi_account_id);
   const P = '/projects/' + encodeURIComponent(String(v.vivi_objekt_id));
   try {
-    const projekt = (await cl.get(P, q) || {}).data || {};
+    let projekt;
+    try { projekt = (await cl.get(P, q) || {}).data || {}; }
+    catch (e) {
+      /* v3996 · Marcel 23.11.2026: „wenn dort ein Objekt gelöscht ist und wir das nicht mehr abrufen können, dass wir das
+         rausnehmen“. Nur wenn ViVi das Objekt mit 404 ablehnt UND die vollstaendige Objektliste desselben Kontos es nicht
+         mehr fuehrt (anderes Konto, Rechte oder eine weitere Seite der Liste loesen nie). Die Werte bleiben im Objekt. */
+      if (e && e.code === 'nicht_gefunden' && await inViviGeloescht(cl, v, q)) {
+        await sp.loesen(userId, objectId);
+        await sp.protokoll({ user_id: userId, object_id: objectId, art: opt.takt ? 'takt' : 'abruf', anfragen: cl.zaehler.anfragen - vorher, ok: false, fehler: 'in ViVi geloescht, Verknuepfung geloest', dauer_ms: deps().jetzt() - t0 });
+        const g = fehler(410, 'in_vivi_geloescht', 'Dieses Objekt gibt es in ViVi nicht mehr. Die Verknüpfung ist gelöst, die Werte bleiben in DealPilot als deine Angaben.');
+        g.geloest = true;
+        throw g;
+      }
+      throw e;
+    }
     const einheiten = Array.isArray(projekt.units) ? projekt.units : liste(await cl.get(P + '/units', q));
     const miet = liste(await cl.get(P + '/rental-units', q));
     const darl = liste(await cl.get(P + '/financings', q));
@@ -327,6 +353,7 @@ async function abrufen(userId, objectId, opt) {
     await sp.protokoll({ user_id: userId, object_id: objectId, art: opt.takt ? 'takt' : 'abruf', anfragen: cl.zaehler.anfragen - vorher, ok: true, dauer_ms: deps().jetzt() - t0 });
     return { ok: true, felder: erg.felder, info: erg.info, anzahl: Object.keys(erg.felder).length };
   } catch (e) {
+    if (e && e.geloest) throw e;
     const a = alsAntwort(e);
     await sp.abrufFehler(objectId, a.message);
     await sp.protokoll({ user_id: userId, object_id: objectId, art: opt.takt ? 'takt' : 'abruf', anfragen: cl.zaehler.anfragen - vorher, bremse_429: cl.zaehler.bremse429, ok: false, fehler: a.message, dauer_ms: deps().jetzt() - t0 });

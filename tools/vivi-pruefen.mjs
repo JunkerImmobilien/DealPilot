@@ -281,7 +281,7 @@ ok(!befunde.length, VIVI_DATEIEN.length + ' Dateien: kein PUT, DELETE an ViVi, P
     ['viviClient.js mit method: PATCH', 'backend/src/services/vivi/viviClient.js', (t) => t.replace("function get(pfad, abfrage) { return senden('GET', pfad, abfrage, null); }", "function get(pfad, abfrage) { return senden('PATCH', pfad, abfrage, null); }")],
     ['viviDienst.js mit eigenem fetch', 'backend/src/services/vivi/viviDienst.js', (t) => t + "\nfetch('https://app.vivi-immo.de/api/v1/projects/1', { method: 'DELETE' });\n"],
     ['viviMapping.js mit method: PUT', 'backend/src/services/vivi/viviMapping.js', (t) => t + "\nconst x = { method: 'PUT' };\n"],
-    ['viviDienst.js ruft einheitBeimAnlegen auch im Abruf', 'backend/src/services/vivi/viviDienst.js', (t) => t.replace('const projekt = (await cl.get(P, q) || {}).data || {};', "await cl.einheitBeimAnlegen(P + '/units/x', {}); const projekt = (await cl.get(P, q) || {}).data || {};")],
+    ['viviDienst.js ruft einheitBeimAnlegen auch im Abruf', 'backend/src/services/vivi/viviDienst.js', (t) => t.replace('try { projekt = (await cl.get(P, q) || {}).data || {}; }', "try { await cl.einheitBeimAnlegen(P + '/units/x', {}); projekt = (await cl.get(P, q) || {}).data || {}; }")],
     ['viviClient.js mit zweitem PATCH', 'backend/src/services/vivi/viviClient.js', (t) => t.replace("function get(pfad, abfrage) { return senden('GET', pfad, abfrage, null); }", "function get(pfad, abfrage) { return senden('GET', pfad, abfrage, null); }\n  function aendern(p, r) { return senden('PATCH', p, null, r); }")]
   ];
   for (const [name, rel, aendern] of proben) {
@@ -976,6 +976,43 @@ kopf('R2 Echte Antworten nach Mietanpassung, Mietende, Sondertilgung, Belegen');
   ok(st.every(([k, v]) => v === soll[k]), 'V4 mit echten Belegen: Erhaltungsaufwand 2026 ' + st.map(([k, v]) => k + ' ' + v).join(', ') + ' (Testplan 7.4)');
   const b = ECHT.beleg_beispiel;
   ok(b && b.status === 'booked' && b.payments && b.payments[0] && b.payments[0].is_manual === true, 'gemessen: hochgeladene Belege als manuelle Transaktion gebucht (/receipts status booked)');
+}
+
+/* ── Teil S · v3996 in ViVi geloeschtes Objekt (Marcel 23.11.2026) ─────────────────────── */
+console.log('\nTeil S · in ViVi gelöscht: Verknüpfung lösen nur bei eindeutigem Befund');
+{
+  const fall = async (liste, projektFehler) => {
+    const st = { geloest: 0, fehler: null };
+    const sp = {
+      verknuepfung: async () => ({ anlage_status: 'fertig', vivi_objekt_id: 'prj_weg', vivi_account_id: null, vivi_ids: {} }),
+      objektHolen: async () => ({ data: { objart: 'ETW' } }),
+      loesen: async () => { st.geloest++; return true; },
+      protokoll: async () => {}, abrufFehler: async (o, t) => { st.fehler = t; }, werteSchreiben: async () => {}
+    };
+    const cl = { zaehler: { anfragen: 0, bremse429: 0 }, get: async (p) => {
+      cl.zaehler.anfragen++;
+      if (p === '/projects') { if (liste instanceof Error) throw liste; return liste; }
+      if (/^\/projects\/prj_weg$/.test(p)) { const e = new Error('404'); e.code = projektFehler; throw e; }
+      return { data: [] };
+    } };
+    dienst._setzeDeps({ speicher: sp, creds: { getSecret: async () => 'x' }, client: () => cl, jetzt: () => Date.parse('2026-11-23T10:00:00Z'), schlafen: async () => {}, testbetrieb: async () => false });
+    let e = null; try { await dienst.abrufen(USER, 'o1', { client: cl }); } catch (x) { e = x; }
+    return { st, e };
+  };
+  let r = await fall({ data: [{ id: 'prj_anders' }] }, 'nicht_gefunden');
+  ok(r.st.geloest === 1 && r.e && r.e.status === 410 && r.e.code === 'in_vivi_geloescht', 'S1 404 und nicht in der Liste: Verknüpfung gelöst, Antwort 410 in_vivi_geloescht');
+  r = await fall({ data: [{ id: 'prj_weg' }] }, 'nicht_gefunden');
+  ok(r.st.geloest === 0 && r.e && r.e.code === 'nicht_gefunden', 'S2 404, aber in der Liste: nichts gelöst (Rechte, Konto), Fehler bleibt sichtbar');
+  r = await fall({ data: [{ id: 'prj_anders' }], links: { next: '?page=2' } }, 'nicht_gefunden');
+  ok(r.st.geloest === 0, 'S3 Liste hat eine weitere Seite: unklar, nichts gelöst');
+  r = await fall(Object.assign(new Error('429'), { code: 'bremse_429' }), 'nicht_gefunden');
+  ok(r.st.geloest === 0 && r.e && r.e.code === 'nicht_gefunden', 'S4 Liste nicht lesbar (Bremse): nichts gelöst');
+  r = await fall({ data: [] }, 'nicht_berechtigt');
+  ok(r.st.geloest === 0, 'S5 kein 404 (Rechte): nichts gelöst, auch bei leerer Liste');
+  const VJ = lies('frontend/js/vivi.js'), VF = lies('frontend/js/vivi-felder.js');
+  ok(/in_vivi_geloescht/.test(VJ) && /DpViviFelder\.setzen\(_stand\)/.test(VJ), 'S6 Browser: bei in_vivi_geloescht fallen die Sperren, Werte bleiben, Objekt wird gespeichert');
+  ok(!/im Reiter Objekt ausgegraut/.test(VJ) && /function reiterText/.test(VJ), 'S7 Deal-Aktion nennt die gemessenen Reiter statt immer „Reiter Objekt“');
+  ok(/function alleSelbst/.test(VF) && /data-vivi="alle-selbst"/.test(VJ) && /data-vivi="alle-vivi"/.test(VJ), 'S8 alle Schlösser auf einmal: selbst festlegen und aus ViVi übernehmen');
 }
 
 dienst._setzeDeps(null);

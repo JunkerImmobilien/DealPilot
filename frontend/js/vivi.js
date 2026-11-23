@@ -161,7 +161,14 @@
       text = 'Mit ViVi verknüpft. ' + standText(st.letzter_abruf) + '. ' + (n ? n + ' Felder kommen aus ViVi und sind ausgegraut.' : 'Noch keine Werte gelesen.') + (st.letzter_fehler ? ' Letzter Abruf: ' + st.letzter_fehler : '');
       if (st.info && st.info.restschuld_heute && st.info.restschuld_heute.wert != null) text += ' Restschuld laut ViVi ' + Math.round(st.info.restschuld_heute.wert).toLocaleString('de-DE') + ' €' +
         (st.info.restschuld_heute.sondertilgung ? ' nach ' + Math.round(st.info.restschuld_heute.sondertilgung).toLocaleString('de-DE') + ' € Sondertilgung' : '') + '.';
-      knoepfe = '<button type="button" class="btn btn-sm btn-ghost" data-vivi="abgleichen">Jetzt abgleichen</button><button type="button" class="btn btn-sm btn-ghost" data-vivi="loesen">Verknüpfung lösen</button>';
+      /* v3996 · alle Schlösser auf einmal */
+      var ze = window.DpViviFelder && window.DpViviFelder.anzahlEigen ? window.DpViviFelder.anzahlEigen() : { alle: 0, eigen: 0 };
+      if (ze.eigen) text += ' ' + ze.eigen + ' davon legst du selbst fest.';
+      var alleKnopf = !ze.alle ? '' : (ze.eigen < ze.alle
+        ? '<button type="button" class="btn btn-sm btn-ghost" data-vivi="alle-selbst" title="Alle Werte aus ViVi in DealPilot selbst festlegen. Sie werden nicht nach ViVi übertragen.">Alle selbst festlegen</button>'
+        : '')
+        + (ze.eigen ? '<button type="button" class="btn btn-sm btn-ghost" data-vivi="alle-vivi" title="Alle eigenen Angaben verwerfen und die Werte aus ViVi übernehmen.">Alle aus ViVi übernehmen</button>' : '');
+      knoepfe = '<button type="button" class="btn btn-sm btn-ghost" data-vivi="abgleichen">Jetzt abgleichen</button>' + alleKnopf + '<button type="button" class="btn btn-sm btn-ghost" data-vivi="loesen">Verknüpfung lösen</button>';
     } else if (st.status === 'abgebrochen' || st.status === 'laeuft') {
       text = st.status === 'laeuft' ? 'Die Übertragung nach ViVi läuft.' : 'Die Übertragung nach ViVi ist unterbrochen. Ein neuer Versuch setzt an der letzten Stelle fort, es entsteht nichts doppelt.';
       knoepfe = '<button type="button" class="btn btn-sm btn-gold" data-vivi="anlegen">Übertragung fortsetzen</button>';
@@ -216,6 +223,16 @@
         werteAnwenden(r);
         if (!still) meldung('Werte aus ViVi gelesen');
       }).catch(function (e) {
+        /* v3996 · in ViVi geloescht: das Backend hat die Verknuepfung schon geloest. Sperren weg, Werte bleiben. */
+        if (e && e.code === 'in_vivi_geloescht') {
+          if (window._currentObjKey !== key) return;
+          _stand = { verknuepft: false, status: null };
+          try { if (window.DpViviFelder) window.DpViviFelder.setzen(_stand); } catch (x) {}
+          leiste();
+          meldung(e.message || 'Dieses Objekt gibt es in ViVi nicht mehr. Die Verknüpfung ist gelöst.');
+          if (typeof window.saveObj === 'function') setTimeout(function () { try { if (window._currentObjKey === key) window.saveObj(); } catch (x) {} }, 300);
+          return;
+        }
         if (!still) alert((e && e.message) || 'Abgleich fehlgeschlagen.');
         api('/vivi/objekt/' + encodeURIComponent(key) + '/werte').then(function (r) { if (window._currentObjKey === key) { _stand = r; leiste(); } }).catch(function () {});
       });
@@ -365,7 +382,18 @@
     else if (was === 'zuordnen') zuordnen();
     else if (was === 'abgleichen') abgleichen(false);
     else if (was === 'loesen') loesen();
+    else if (was === 'alle-selbst' || was === 'alle-vivi') alleSchloesser(was === 'alle-selbst');
   });
+  function alleSchloesser(an) {
+    if (!window.DpViviFelder || !window.DpViviFelder.alleSelbst) return;
+    if (!confirm(an ? 'Alle Werte aus ViVi in DealPilot selbst festlegen? Sie bleiben, wie sie sind, werden aber nicht mehr aus ViVi aktualisiert und nicht nach ViVi übertragen.'
+                    : 'Alle eigenen Angaben verwerfen und die Werte aus ViVi übernehmen?')) return;
+    var key = _key;
+    var g = window.DpViviFelder.alleSelbst(an);
+    leiste();
+    meldung(an ? 'Alle Werte selbst festgelegt' : 'Werte aus ViVi übernommen');
+    if (g && typeof window.saveObj === 'function') setTimeout(function () { try { if (window._currentObjKey === key) window.saveObj(); } catch (e) {} }, 300);
+  }
   window.addEventListener('dp:object-ready', function (ev) {
     var key = (ev && ev.detail && (ev.detail.key || ev.detail.id)) || window._currentObjKey || null;
     setTimeout(function () { objektGeladen(window._currentObjKey || key); }, 500);
@@ -373,6 +401,27 @@
 
   /* v3967 · Statuswechsel (gewonnen, offen, verloren) aus js/buchhaltung-verbinden.js: Leiste neu zeichnen */
   window.addEventListener('dp:buchhaltung-status', function () { frei().then(function (ok) { if (ok && _key) leiste(); }); });
+
+  /* v3996 · Marcel 23.11.2026: „Warum nur im Reiter Objekt?“ Die Felder liegen in Objekt, Investition, Miete und
+     Finanzierung. Die Reiter werden aus den gelieferten Feldern gemessen (Feld im DOM → Abschnitt → Reiter der Leiste). */
+  function reiterVon(felder) {
+    var reihe = [], gesehen = {};
+    Array.prototype.forEach.call(document.querySelectorAll('nav.tabs .tab[data-target-sec]'), function (b) { reihe.push(b.getAttribute('data-target-sec')); });
+    Object.keys(felder || {}).forEach(function (id) {
+      var sec = /^einheit\./.test(id) ? 's2' : null;
+      if (!sec) { var el = $(id); var s = el && el.closest ? el.closest('.sec[id]') : null; sec = s ? s.id : null; }
+      if (sec) gesehen[sec] = true;
+    });
+    return reihe.filter(function (s) { return gesehen[s]; }).map(function (s) {
+      var b = document.querySelector('nav.tabs .tab[data-target-sec="' + s + '"] .tab-lbl'); return b ? b.textContent.trim() : null;
+    }).filter(Boolean);
+  }
+  function reiterText(felder) {
+    var r = reiterVon(felder);
+    if (!r.length) return 'Die Werte kommen aus ViVi und sind ausgegraut.';
+    var liste = r.length === 1 ? r[0] : r.slice(0, -1).join(', ') + ' und ' + r[r.length - 1];
+    return 'Die Werte kommen aus ViVi und sind ' + (r.length === 1 ? 'im Reiter ' : 'in den Reitern ') + liste + ' ausgegraut.';
+  }
 
   /* v3967 · Anbieter in der Schicht „Buchhaltung verbinden“ (js/buchhaltung-verbinden.js) */
   function anmelden() {
@@ -383,7 +432,7 @@
       status: function (key) {
         if (_anlegenLaeuft && key === _key) return { laeuft: true, text: 'Die Übernahme nach ViVi läuft. Bei einem Mehrfamilienhaus kann das bis zu zwei Minuten dauern.' };
         return api('/vivi/objekt/' + encodeURIComponent(key) + '/werte').then(function (r) {
-          if (r && r.verknuepft) return { verknuepft: true, text: 'In ViVi verwaltet. ' + standText(r.letzter_abruf) + '. Die Werte kommen aus ViVi und sind im Reiter Objekt ausgegraut.' };
+          if (r && r.verknuepft) return { verknuepft: true, text: 'In ViVi verwaltet. ' + standText(r.letzter_abruf) + '. ' + reiterText(r.felder) };
           if (r && r.status === 'laeuft') return { laeuft: true };
           if (r && r.status === 'abgebrochen') return { verknuepft: false, text: '' };
           return { verknuepft: false };
