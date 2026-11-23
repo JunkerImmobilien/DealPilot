@@ -567,8 +567,11 @@
     var hj = heuteJahr(), g = false;
     Object.keys(werte).forEach(function (k) {
       var y = parseInt(k, 10), w = werte[k] && zahl(werte[k].miete);
-      if (!(y >= 1990) || y >= hj || !istZahl(w)) return;
+      if (!(y >= 1990) || y >= hj) return;
       if (fest(y).miete) return;
+      /* null = ViVi gilt fuer dieses Jahr nicht (mehr): einen frueheren ViVi-Wert entfernen */
+      if (werte[k] === null) { if ((jahreDaten()[String(y)] || {}).nkm_j_vivi != null) { d._jahre = setzen(d._jahre, y, 'nkm_j_vivi', ''); g = true; } return; }
+      if (!istZahl(w)) return;
       var alt = zahl((jahreDaten()[String(y)] || {}).nkm_j_vivi);
       if (alt === Math.round(w * 100) / 100) return;
       d._jahre = setzen(d._jahre, y, 'nkm_j_vivi', Math.round(w * 100) / 100); g = true;

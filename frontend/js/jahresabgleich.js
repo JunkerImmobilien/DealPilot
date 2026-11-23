@@ -257,7 +257,11 @@
     var info = vd.info || {};
     /* v4037 · Kaltmiete laut ViVi aus dem Mietverlauf ALLER Mietverhältnisse (mit Leerstand), sonst wie bisher */
     var ij = info.ist_jahre || null;
-    if (ij && ij.summe && ij.summe[String(jahr)] && istZahl(zahl(ij.summe[String(jahr)].miete))) out.miete = zahl(ij.summe[String(jahr)].miete);
+    if (ij && ij.summe && ij.summe[String(jahr)] && istZahl(zahl(ij.summe[String(jahr)].miete))) {
+      /* wie vivi-felder: Kaltmiete aus ViVi plus Zusatzeinnahmen aus DealPilot je vermietetem Monat */
+      var xj = ij.summe[String(jahr)], zeD = zahl((doc() && doc().getElementById('ze') || {}).value) || 0;
+      out.miete = istZahl(zahl(xj.kalt)) ? Math.round((zahl(xj.kalt) + zeD * (istZahl(zahl(xj.monate_vermietet)) ? zahl(xj.monate_vermietet) : 12)) * 100) / 100 : zahl(xj.miete);
+    }
     out.gezahlt = ij && ij.gezahlt && istZahl(zahl(ij.gezahlt[String(jahr)])) ? zahl(ij.gezahlt[String(jahr)]) : null;
     out.soll_warm = ij && ij.soll_warm && istZahl(zahl(ij.soll_warm[String(jahr)])) ? zahl(ij.soll_warm[String(jahr)]) : null;
     (info.sondertilgungen || []).forEach(function (x) { if (x && String(x.datum || '').slice(0, 4) === String(jahr)) out.st.push(x); });

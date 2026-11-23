@@ -265,7 +265,16 @@
     var zeF = $('ze'), ze = zeF ? zahl(zeF.value) : 0;
     if (ze == null || !isFinite(ze) || ze < 0) ze = 0;
     var werte = {};
+    /* Eigene Mieterhoehungen (nicht aus ViVi) zeigen, dass ViVi die Zeit davor nicht kennt: ein von DealPilot angelegtes
+       Objekt startet in ViVi mit der Miete vom Anlegen. Gemessen 2026-1052: eigene Erhoehungen zum 01.03.2025, ViVi
+       rechnete 2025 zwoelf Monate mit der heutigen Miete. Bis einschliesslich des Jahres der juengsten eigenen Erhoehung
+       gilt deshalb DealPilot (Mieterhoehungen), danach ViVi. */
+    var eigenBis = 0, d0 = window._currentObjData || {};
+    var nimm = function (l) { (Array.isArray(l) ? l : []).forEach(function (x) { if (x && x.datum && !/^vivi-/.test(String(x.id || ''))) eigenBis = Math.max(eigenBis, +String(x.datum).slice(0, 4) || 0); }); };
+    nimm(d0._erhoehungen);
+    if (window._dpMfh && Array.isArray(window._dpMfh.einheiten)) window._dpMfh.einheiten.forEach(function (e) { nimm(e && e.erhoehungen); });
     Object.keys(ij.summe).forEach(function (j) {
+      if (+j <= eigenBis) { werte[j] = null; return; }
       var x = ij.summe[j] || {};
       var w = (typeof x.kalt === 'number') ? x.kalt + ze * (typeof x.monate_vermietet === 'number' ? x.monate_vermietet : (x.monate || 12)) : x.miete;
       if (typeof w === 'number' && isFinite(w)) werte[j] = { miete: Math.round(w * 100) / 100 };
