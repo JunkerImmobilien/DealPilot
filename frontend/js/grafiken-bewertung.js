@@ -49,6 +49,12 @@
       'body.dp-gb-an .dp-gb-weg{display:none!important}',
       '.dp-gb{--gb-gold:var(--wl-c9a84c,#C9A84C);--gb-gold-h:var(--wl-e8cc7a,#E8CC7A);--gb-gruen:#3FA56C;--gb-rot:#B8625C;',
       '--gb-netz:color-mix(in srgb,currentColor 10%,transparent);--gb-leise:color-mix(in srgb,currentColor 62%,transparent);--gb-neutral:color-mix(in srgb,currentColor 7%,transparent);margin:0 0 18px}',
+      /* v4250 · Einstellung Grafiken dunkel (html[data-gx-stil], grafiken-premium.js): dieselben Karten auf Obsidian, alle Linien hängen an currentColor */
+      'html[data-gx-stil="dunkel"] .dp-gb-karte{background:linear-gradient(180deg,#16140F,#0E0D0B)!important;color:#E9E3D6;border-color:#26231E!important}',
+      'html[data-gx-stil="dunkel"] .dp-gb-bul .mark{box-shadow:0 0 0 2px #0E0D0B}',
+      '.dp-gb-wf .gb-saeule{transform-box:fill-box;transform-origin:50% 100%}',
+      '.dp-gb.gb-anim .dp-gb-wf .gb-saeule{animation:gbWy .6s cubic-bezier(.2,.7,.2,1) both}',
+      '@keyframes gbWy{from{transform:scaleY(0)}to{transform:scaleY(1)}}',
       '.dp-gb-karte{position:relative;background:var(--surface,#fff);border:1px solid var(--gb-netz);border-radius:14px;padding:18px 20px 16px;margin:0 0 16px;min-width:0}',
       '.dp-gb-eti{font:600 10.5px/1 "JetBrains Mono",ui-monospace,monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--gb-gold);margin:0 0 8px}',
       '.dp-gb-t{font:600 18px/1.25 "Space Grotesk",Inter,sans-serif;letter-spacing:-.01em;margin:0 0 4px}',
@@ -239,6 +245,103 @@
       + '<div class="gb-leg"><span><i style="background:var(--gb-gold)"></i>' + (art === 'dscr' ? 'DSCR je Jahr' : 'Beleihung je Jahr') + '</span><span><i class="d" style="color:var(--gb-gold)"></i>Ende Zinsbindung</span></div></div>';
   }
 
+  /* ── v4250 · Vermögensaufbau und Vermögenszuwachs im Stil dieses Reiters ─────────────
+     Marcel 23.11.2026: „den Vermögenszuwachs in 15 Jahren nach Kauf und den Vermögensaufbau in 15 Jahren bitte im
+     gleichen Stil wie Zinsrisiko, Schuldendienstdeckung, Beleihungsauslauf und Einordnung“. Ersetzt #bc-equity und
+     #bc-waterfall (bank-charts.js) nur bei Vorschau. RECHNET NICHTS NEU: dieselben Größen wie bank-charts.js
+     _renderEquityBuild (Wert Ende Jahr = cfRows[0].wert_y × (1 + wstg)^(i+1), Restschuld eff_rs, sonst rs) und der
+     Wasserfall aus State._vz (calc.js: Tilgung aus Einnahmen inkl. Bausparen, Cashflow vor Steuer, Steuer, Wertsteigerung). */
+  function vermDaten() {
+    var S = window.State, R = S && Array.isArray(S.cfRows) ? S.cfRows : [];
+    if (R.length < 2) return null;
+    var w0 = zahl(R[0].wert_y); if (w0 == null) return null;
+    var g = S.wstg != null ? Number(S.wstg) : 0.015, hj = new Date().getFullYear();
+    var Z = R.map(function (r, i) { var rs = zahl(r.eff_rs != null ? r.eff_rs : r.rs) || 0, wv = w0 * Math.pow(1 + g, i + 1); return { j: (zahl(r.cal) || hj + i) + 1, wert: wv, rs: rs, ek: wv - rs }; });
+    var ek0 = zahl(S.kpis && S.kpis.ek), rs0 = zahl(S.kpis && S.kpis.d1) || (zahl(R[0].rs) || 0) + (zahl(R[0].ty) || 0);
+    return { Z: Z, n: Z.length, w0: w0, rs0: rs0, ek0: ek0, vz: S._vz || null, bindj: zahl(S.bindj) || 10 };
+  }
+  function tsd(v) { return (v < 0 ? '−' : '') + nf0.format(Math.abs(Math.round(v / 1000))) + ' T€'; }
+  function aufbauHtml() {
+    var V = vermDaten(); if (!V) return '';
+    var Z = V.Z, n = V.n, ende = Z[n - 1], vz = V.vz;
+    var gesamt = vz && zahl(vz.verm_zuwachs) != null ? Number(vz.verm_zuwachs) : (ende.ek - (V.w0 - V.rs0));
+    var mult = V.ek0 > 100 ? ende.ek / V.ek0 : null;
+    var w = 1000, h = 300, L = 64, R = 18, T = 16, B = 30, iw = w - L - R, ih = h - T - B;
+    var alle = []; Z.forEach(function (z) { alle.push(z.wert, z.rs); });
+    var max = Math.max.apply(null, alle) * 1.05, min = Math.min(0, Math.min.apply(null, alle));
+    var x = function (i) { return L + i / (n - 1) * iw; }, y = function (v) { return T + (1 - (v - min) / (max - min)) * ih; };
+    var stp = Math.pow(10, Math.floor(Math.log10(max / 4))), st = Math.ceil(max / 4 / stp) * stp, tk = []; for (var t = 0; t <= max; t += st) tk.push(t);
+    var netz = tk.map(function (v) { return '<line class="gb-netz" x1="' + L + '" x2="' + (w - R) + '" y1="' + y(v).toFixed(1) + '" y2="' + y(v).toFixed(1) + '"/><text class="gb-ax" x="' + (L - 8) + '" y="' + (y(v) + 4).toFixed(1) + '" text-anchor="end">' + tsd(v) + '</text>'; }).join('');
+    var schritt = n > 16 ? 3 : n > 10 ? 2 : 1;
+    var jx = Z.map(function (z, i) { return (i % schritt === 0 || i === n - 1) ? '<text class="gb-ax" x="' + x(i).toFixed(1) + '" y="' + (h - 8) + '" text-anchor="middle">' + z.j + '</text>' : ''; }).join('');
+    var pfad = function (k) { return Z.map(function (z, i) { return (i ? 'L' : 'M') + x(i).toFixed(1) + ' ' + y(z[k]).toFixed(1); }).join(' '); };
+    var band = Z.map(function (z, i) { return (i ? 'L' : 'M') + x(i).toFixed(1) + ' ' + y(z.wert).toFixed(1); }).join(' ') + ' ' + Z.slice().reverse().map(function (z, q) { return 'L' + x(n - 1 - q).toFixed(1) + ' ' + y(z.rs).toFixed(1); }).join(' ') + ' Z';
+    var len = function (k) { var l = 0; for (var i = 1; i < n; i++) l += Math.hypot(x(i) - x(i - 1), y(Z[i][k]) - y(Z[i - 1][k])); return Math.ceil(l); };
+    var ei = V.bindj - 1, ezb = ei > 0 && ei < n ? '<line class="gb-ezb" x1="' + x(ei).toFixed(1) + '" x2="' + x(ei).toFixed(1) + '" y1="' + T + '" y2="' + (T + ih) + '"/><text class="gb-lab" x="' + (x(ei) + 4).toFixed(1) + '" y="' + (T + 10) + '" style="fill:var(--gb-gold)">Ende Zinsbindung</text>' : '';
+    var em = '<circle cx="' + x(n - 1).toFixed(1) + '" cy="' + y(ende.wert).toFixed(1) + '" r="4.5" style="fill:var(--gb-gold)"/><circle cx="' + x(n - 1).toFixed(1) + '" cy="' + y(ende.rs).toFixed(1) + '" r="4.5" style="fill:currentColor"/>'
+      + '<text class="gb-wert" x="' + (x(n - 1) - 8).toFixed(1) + '" y="' + ((y(ende.wert) + y(ende.rs)) / 2 + 4).toFixed(1) + '" text-anchor="end">Eigenkapital ' + tsd(ende.ek) + '</text>';
+    var treff = Z.map(function (z, i) {
+      var bw = iw / (n - 1), bx = x(i) - bw / 2;
+      var tt = '<div class=j>Ende ' + z.j + (i === ei ? ' · Ende Zinsbindung' : '') + '</div>Wert <b>' + eurV(z.wert).replace('+', '') + '</b><br>Restschuld <b>' + eurV(z.rs).replace('+', '') + '</b><br>Eigenkapital <b>' + eurV(z.ek).replace('+', '') + '</b>';
+      return '<rect class="gb-treff" x="' + bx.toFixed(1) + '" y="' + T + '" width="' + bw.toFixed(1) + '" height="' + ih + '" data-tip="' + esc(tt) + '"/>';
+    }).join('');
+    var svg = '<svg viewBox="0 0 ' + w + ' ' + h + '" role="img" aria-label="Vermögensaufbau je Jahr">' + netz
+      + '<path d="' + band + '" style="fill:var(--gb-gold);fill-opacity:.13"/>' + ezb
+      + '<path class="gb-linie" d="' + pfad('wert') + '" style="stroke:var(--gb-gold);--gb-len:' + len('wert') + '"/>'
+      + '<path class="gb-linie" d="' + pfad('rs') + '" style="stroke:currentColor;opacity:.75;--gb-len:' + len('rs') + '"/>'
+      + em + jx + treff + '</svg>';
+    var kopf = '<b style="color:' + (gesamt >= 0 ? GRUEN : ROT) + '">' + eurV(gesamt) + '</b><span>Vermögenszuwachs in ' + n + ' Jahren</span>'
+      + (mult != null ? '<span>Eigenkapital ' + tsd(V.w0 - V.rs0) + ' heute, ' + tsd(ende.ek) + ' am Ende · ' + nf1.format(mult) + ' × dein Einsatz von ' + tsd(V.ek0) + '</span>' : '<span>kein Eigenkapital eingesetzt</span>');
+    return '<div class="dp-gb-karte" data-gb="aufbau"><div class="gb-tip"></div><div class="dp-gb-eti">Vermögensaufbau · ' + n + ' Jahre</div>'
+      + '<div class="dp-gb-t">' + (gesamt >= 0 ? 'Die Schere zwischen Wert und Restschuld ist dein Vermögen' : 'Das Vermögen schrumpft im Zeitraum') + '</div>'
+      + '<div class="gb-kopfzahl">' + kopf + '</div><p class="dp-gb-s">Der Wert steigt mit deiner Annahme zur Wertsteigerung, die Restschuld sinkt mit der Tilgung. Die goldene Fläche dazwischen ist dein Eigenkapital, Jahr für Jahr.</p>' + svg
+      + '<div class="gb-leg"><span><i style="background:var(--gb-gold)"></i>Wert</span><span><i style="background:currentColor;opacity:.75"></i>Restschuld</span><span><i style="background:var(--gb-gold);opacity:.3;height:10px;vertical-align:-1px"></i>Eigenkapital</span><span><i class="d" style="color:var(--gb-gold)"></i>Ende Zinsbindung</span></div></div>';
+  }
+  function zuwachsTeile() {
+    var V = vermDaten(), vz = V && V.vz; if (!vz) return null;
+    var T = [
+      { n: 'Tilgung', u: 'Schuld abgebaut aus Einnahmen', v: (zahl(vz.tilg_durch_einnahmen) || 0) + (zahl(vz.bspar_durch_einnahmen) || 0) },
+      { n: 'Cashflow', u: 'vor Steuer, aufs Konto', v: zahl(vz.cf_ueberschuss_konto) || 0 },
+      { n: 'Steuer', u: zahl(vz.tax_kum) != null && vz.tax_kum > 0 ? 'gezahlt' : 'erstattet', v: zahl(vz.tax_kum) != null ? -Number(vz.tax_kum) : (zahl(vz.steuervorteil) || 0) },
+      { n: 'Wertsteigerung', u: 'mit deiner Annahme', v: zahl(vz.wertsteig_kum) || 0 }
+    ];
+    var summe = T.reduce(function (s2, t) { return s2 + t.v; }, 0);
+    return { V: V, T: T, summe: summe, gesamt: zahl(vz.verm_zuwachs), eigen: zahl(vz.tilg_eigenanteil) || 0 };
+  }
+  function zuwachsHtml() {
+    var D = zuwachsTeile(); if (!D) return '';
+    var T = D.T, n = D.V.n, summe = D.summe, ok = D.gesamt != null && Math.abs(D.gesamt - summe) < 1;
+    var w = 1000, h = 300, L = 64, R = 18, Tp = 26, B = 46, iw = w - L - R, ih = h - Tp - B;
+    var lauf = 0, stufen = T.map(function (t) { var a = lauf; lauf += t.v; return { t: t, a: a, b: lauf }; });
+    var alle = [0, summe]; stufen.forEach(function (q) { alle.push(q.a, q.b); });
+    var max = Math.max.apply(null, alle) * 1.08, min = Math.min(0, Math.min.apply(null, alle) * 1.08);
+    var y = function (v) { return Tp + (1 - (v - min) / (max - min)) * ih; };
+    var spalten = stufen.length + 1, sw2 = iw / spalten, bw = Math.min(120, sw2 * 0.56), cx = function (i) { return L + sw2 * i + sw2 / 2; };
+    var stp = Math.pow(10, Math.floor(Math.log10(Math.max(1, max - min) / 4))), st = Math.ceil((max - min) / 4 / stp) * stp, tk = []; for (var t = Math.ceil(min / st) * st; t <= max; t += st) tk.push(t);
+    var netz = tk.map(function (v) { return '<line class="gb-netz" x1="' + L + '" x2="' + (w - R) + '" y1="' + y(v).toFixed(1) + '" y2="' + y(v).toFixed(1) + '"/><text class="gb-ax" x="' + (L - 8) + '" y="' + (y(v) + 4).toFixed(1) + '" text-anchor="end">' + tsd(v) + '</text>'; }).join('');
+    var saeulen = stufen.map(function (q, i) {
+      var top = y(Math.max(q.a, q.b)), hh = Math.max(2, Math.abs(y(q.a) - y(q.b))), f = q.t.v >= 0 ? 'var(--gb-gold)' : ROT;
+      var tt = '<div class=j>' + esc(q.t.n) + '</div><b>' + eurV(q.t.v) + '</b> ' + esc(q.t.u);
+      var verb = i < stufen.length ? '<line x1="' + (cx(i) + bw / 2).toFixed(1) + '" x2="' + (cx(i + 1) - bw / 2).toFixed(1) + '" y1="' + y(q.b).toFixed(1) + '" y2="' + y(q.b).toFixed(1) + '" style="stroke:currentColor;opacity:.35;stroke-dasharray:3 3"/>' : '';
+      return '<rect class="gb-saeule" x="' + (cx(i) - bw / 2).toFixed(1) + '" y="' + top.toFixed(1) + '" width="' + bw.toFixed(1) + '" height="' + hh.toFixed(1) + '" rx="4" style="fill:' + f + ';animation-delay:' + (i * 120) + 'ms" data-tip="' + esc(tt) + '"/>'
+        + '<text class="gb-wert" x="' + cx(i).toFixed(1) + '" y="' + (top - 7).toFixed(1) + '" text-anchor="middle">' + eurV(q.t.v) + '</text>' + verb
+        + '<text class="gb-lab" x="' + cx(i).toFixed(1) + '" y="' + (h - 26) + '" text-anchor="middle" style="fill:currentColor">' + esc(q.t.n) + '</text><text class="gb-ax" x="' + cx(i).toFixed(1) + '" y="' + (h - 12) + '" text-anchor="middle">' + esc(q.t.u) + '</text>';
+    }).join('');
+    var k = stufen.length, sTop = y(Math.max(0, summe)), sH = Math.max(2, Math.abs(y(0) - y(summe)));
+    saeulen += '<rect class="gb-saeule" x="' + (cx(k) - bw / 2).toFixed(1) + '" y="' + sTop.toFixed(1) + '" width="' + bw.toFixed(1) + '" height="' + sH.toFixed(1) + '" rx="4" style="fill:' + (summe >= 0 ? GRUEN : ROT) + ';animation-delay:' + (k * 120) + 'ms" data-tip="' + esc('<div class=j>Vermögenszuwachs</div><b>' + eurV(summe) + '</b> in ' + n + ' Jahren') + '"/>'
+      + '<text class="gb-wert" x="' + cx(k).toFixed(1) + '" y="' + (sTop - 7).toFixed(1) + '" text-anchor="middle" style="font-size:13px">' + eurV(summe) + '</text>'
+      + '<text class="gb-lab" x="' + cx(k).toFixed(1) + '" y="' + (h - 26) + '" text-anchor="middle" style="fill:currentColor">Zuwachs</text><text class="gb-ax" x="' + cx(k).toFixed(1) + '" y="' + (h - 12) + '" text-anchor="middle">in ' + n + ' Jahren</text>';
+    var nulllinie = '<line x1="' + L + '" x2="' + (w - R) + '" y1="' + y(0).toFixed(1) + '" y2="' + y(0).toFixed(1) + '" style="stroke:currentColor;opacity:.4"/>';
+    var groesste = T.slice().sort(function (a, b) { return Math.abs(b.v) - Math.abs(a.v); })[0];
+    var svg = '<svg viewBox="0 0 ' + w + ' ' + h + '" role="img" aria-label="Vermögenszuwachs nach Quellen">' + netz + nulllinie + saeulen + '</svg>';
+    return '<div class="dp-gb-karte dp-gb-wf" data-gb="zuwachs"><div class="gb-tip"></div><div class="dp-gb-eti">Vermögenszuwachs · ' + n + ' Jahre nach Kauf</div>'
+      + '<div class="dp-gb-t">Woraus dein Vermögen in ' + n + ' Jahren wächst</div>'
+      + '<div class="gb-kopfzahl"><b style="color:' + (summe >= 0 ? GRUEN : ROT) + '">' + eurV(summe) + '</b><span>größter Treiber: ' + esc(groesste.n) + ' ' + eurV(groesste.v) + '</span></div>'
+      + '<p class="dp-gb-s">Vier Quellen, von links nach rechts aufaddiert: die Tilgung baut Schulden ab, der Cashflow landet auf dem Konto, die Steuer kommt dazu oder geht ab, die Wertsteigerung erhöht den Wert.</p>' + svg
+      + '<p class="dp-gb-fuss">' + (D.eigen > 0.5 ? '<b>Aus eigener Tasche:</b> ' + eurV(D.eigen).replace('+', '') + ' der Tilgung hast du selbst zugeschossen, sie sind oben schon abgezogen. ' : '')
+      + (ok ? 'Prüfung: die Summe entspricht dem Vermögenszuwachs der App.' : 'Prüfung: Abweichung zur App, bitte neu rechnen.') + '</p></div>';
+  }
+
   /* ── 3 · Zinsrisiko: Anschlusszins × Miete ───────────────────────── */
   function zinsrisikoHtml(D) {
     var K = D.K, S = D.S, s = D.sw;
@@ -291,13 +394,20 @@
     var sec = document.getElementById('s6'), cock = document.getElementById('bc-cockpit'), stress = document.getElementById('bc-stress');
     if (!sec || !cock) return;
     var D = daten(); if (!D) return;
-    var sig = [window._currentObjKey, D.K.dscr, D.K.ltv, D.K.cf_op, D.K.cf_op_an, D.S.az, D.C.dscrArr.join(','), JSON.stringify(D.sw)].join('|');
+    var sig = [window._currentObjKey, D.K.dscr, D.K.ltv, D.K.cf_op, D.K.cf_op_an, D.S.az, D.C.dscrArr.join(','), JSON.stringify(D.sw), D.S._vz ? D.S._vz.verm_zuwachs : '', D.S.wstg, document.documentElement.getAttribute('data-gx-stil')].join('|');
     var host = document.getElementById('dp-gb-bank');
     if (host && host._sig === sig && host.isConnected) return;
     stil();
     document.body.classList.add('dp-gb-an');
     if (!host) { host = document.createElement('div'); host.id = 'dp-gb-bank'; host.className = 'dp-gb'; cock.parentNode.insertBefore(host, cock); }
     cock.classList.add('dp-gb-weg'); if (stress) stress.classList.add('dp-gb-weg');
+    /* v4250 · Vermögensaufbau und Vermögenszuwachs */
+    var eq = document.getElementById('bc-equity'), wf = document.getElementById('bc-waterfall'), hv = document.getElementById('dp-gb-verm');
+    if (eq) {
+      if (!hv) { hv = document.createElement('div'); hv.id = 'dp-gb-verm'; hv.className = 'dp-gb'; eq.parentNode.insertBefore(hv, eq); }
+      var vh = ''; try { vh = aufbauHtml() + zuwachsHtml(); } catch (e) { try { console.warn('[grafiken-bewertung] Vermögen', e); } catch (x) {} }
+      if (vh) { hv.innerHTML = vh; eq.classList.add('dp-gb-weg'); if (wf) wf.classList.add('dp-gb-weg'); Array.prototype.forEach.call(hv.querySelectorAll('.dp-gb-karte'), tipBinden); if (!reduziert()) { hv.classList.remove('gb-anim'); void hv.offsetWidth; hv.classList.add('gb-anim'); } }
+    }
     var html = '';
     try { html += einordnungHtml(D); } catch (e) { try { console.warn('[grafiken-bewertung] Einordnung', e); } catch (x) {} }
     try { html += '<div class="dp-gb-reihe">' + verlaufHtml(D, 'dscr') + verlaufHtml(D, 'ltv') + '</div>'; } catch (e) { try { console.warn('[grafiken-bewertung] Verlauf', e); } catch (x) {} }
@@ -324,5 +434,5 @@
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', los); else los();
 
-  window.DpGrafikenBewertung = { an: function () { return AN; }, zeichnen: function () { var h = document.getElementById('dp-gb-bank'); if (h) h._sig = ''; zeichnen(); }, _zinsrisikoHtml: zinsrisikoHtml, _einordnungHtml: einordnungHtml, _verlaufHtml: verlaufHtml };
+  window.DpGrafikenBewertung = { an: function () { return AN; }, zeichnen: function () { var h = document.getElementById('dp-gb-bank'); if (h) h._sig = ''; zeichnen(); }, _zinsrisikoHtml: zinsrisikoHtml, _einordnungHtml: einordnungHtml, _aufbauHtml: aufbauHtml, _zuwachsHtml: zuwachsHtml, _zuwachsTeile: zuwachsTeile, _vermDaten: vermDaten, _verlaufHtml: verlaufHtml };
 })();

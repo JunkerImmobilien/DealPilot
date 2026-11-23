@@ -252,7 +252,8 @@
       '.dpu-gesperrt{padding:9px 11px;border-radius:8px;border:1px dashed rgba(42,39,39,.3);font-size:12.5px;background:#fff}',
       /* v3016x · WEG-Blöcke */
       '.dpu-weg{margin:14px 0 6px;border:1px solid rgba(42,39,39,.12);border-radius:12px;overflow:hidden;background:#fff}',
-      '.dpu-weg-kopf{background:#2A2727;color:#fff;font:600 12px Inter,sans-serif;letter-spacing:.08em;text-transform:uppercase;padding:9px 14px}',
+      /* v4250 · Marcel 23.11.2026: „im Reiter Haus und Unterlagen so ein schwarzer Streifen, das verstehe ich nicht“. Der Kopf war eine #2A2727-Leiste in der weißen Karte, jetzt ein ruhiges Etikett wie die Abschnittsköpfe der App */
+      '.dpu-weg-kopf{background:#FBF6E9;color:#050505;font:600 10.5px "JetBrains Mono",ui-monospace,monospace;letter-spacing:.14em;text-transform:uppercase;padding:9px 14px;border-bottom:1px solid #EAD9B0}',
       '.dpu-weg-blk{padding:12px 14px;border-top:1px solid rgba(42,39,39,.08)}.dpu-weg-blk:first-of-type{border-top:0}',
       '.dpu-weg-t{font:600 11.5px Inter,sans-serif;letter-spacing:.06em;text-transform:uppercase;color:#7A7370;margin:0 0 8px}',
       '.dpu-zeit{list-style:none;margin:0;padding:0 0 0 14px;border-left:2px solid ' + GOLD + '}',

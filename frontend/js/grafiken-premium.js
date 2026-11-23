@@ -65,10 +65,13 @@
   /* v4160 · Marcel: „farblich besser an DealPilot angleichen … kein Fremdblau“. Gemessen an der App (getComputedStyle 23.11.2026):
      Kopfleiste Obsidian #0E0D0B mit Creme #E9E3D6, Trennlinie #26231E, Kennzahl-Karte #FBF6E9 mit Rand #EAD9B0, Gold #C9A84C,
      Goldgrund #FAF5E8. Abstufungen nur aus Gold und Creme (color-mix), Grün und Rot nur für gut und schlecht. */
-  var F = { tinte: '#E9E3D6', tinte2: '#B9B2A3', tinte3: '#8A8374', linie: '#26231E', linie2: '#3A352D', flaeche: '#1B1915', karte: '#0E0D0B',
+  /* v4250 · Marcel 23.11.2026: „die Grafiken einmal in hell darstellen, jetzt sind die alle dunkel“. Die Farben sind jetzt
+     Theme-Variablen (--gx-*), gesetzt in stil(): hell als Standard (wie die Karten im Reiter Bewertung: weiß, Gold-Etikett,
+     Obsidian-Text), dunkel per html[data-gx-stil="dunkel"]. Gold weiter nur über Whitelabel-Token, Grün und Rot fest. */
+  var F = { tinte: 'var(--gx-tinte)', tinte2: 'var(--gx-tinte2)', tinte3: 'var(--gx-tinte3)', linie: 'var(--gx-linie)', linie2: 'var(--gx-linie2)', flaeche: 'var(--gx-flaeche)', karte: 'var(--gx-karte)',
     gold: 'var(--wl-c9a84c,#C9A84C)', goldH: 'var(--wl-e8cc7a,#E8CC7A)', goldD: 'var(--wl-b8932f,#b8932f)',
-    gruen: '#3FA56C', rot: '#D8564C', neutral: '#6F685C',
-    creme: '#E9E3D6', gold2: 'color-mix(in srgb,var(--wl-c9a84c,#C9A84C) 55%,#E9E3D6)', gold3: 'color-mix(in srgb,var(--wl-b8932f,#b8932f) 60%,#0E0D0B)' };
+    gruen: '#3FA56C', rot: '#D8564C', neutral: 'var(--gx-neutral)',
+    creme: 'var(--gx-kontrast)', gold2: 'color-mix(in srgb,var(--wl-c9a84c,#C9A84C) 55%,var(--gx-karte))', gold3: 'color-mix(in srgb,var(--wl-b8932f,#b8932f) 60%,#0E0D0B)' };
   F.blau = F.creme; F.violett = F.gold3;
 
   /* ── Stil ──────────────────────────────────────────────────────────── */
@@ -76,23 +79,31 @@
     if (document.getElementById('dp-gx-stil')) return;
     var s = document.createElement('style'); s.id = 'dp-gx-stil';
     s.textContent = [
+      /* v4250 · Theme: hell Standard, dunkel per html[data-gx-stil=dunkel] (Einstellungen › Anzeige-Optionen › Grafiken) */
+      '.dp-gx,.dp-pa-wrap .dp-gn.dp-gn-karte{--gx-bg:var(--surface,#FFFFFF);--gx-karte:var(--surface,#FFFFFF);--gx-tinte:#1B1815;--gx-tinte2:#5F5850;--gx-tinte3:#8A8276;--gx-linie:#EFE8DA;--gx-linie2:#E2D8C4;--gx-flaeche:#F6F1E6;--gx-neutral:#A39A8C;--gx-kontrast:#2A2727;--gx-rand:color-mix(in srgb,#2A2727 12%,transparent);--gx-schatten:0 1px 2px rgba(5,5,5,.04);--gx-tip-bg:#050505;--gx-tip-fg:#FDFCFA}',
+      'html[data-gx-stil="dunkel"] .dp-gx,html[data-gx-stil="dunkel"] .dp-pa-wrap .dp-gn.dp-gn-karte{--gx-bg:linear-gradient(180deg,#16140F,#0E0D0B);--gx-karte:#0E0D0B;--gx-tinte:#E9E3D6;--gx-tinte2:#B9B2A3;--gx-tinte3:#8A8374;--gx-linie:#26231E;--gx-linie2:#3A352D;--gx-flaeche:#1B1915;--gx-neutral:#6F685C;--gx-kontrast:#E9E3D6;--gx-rand:#26231E;--gx-schatten:0 1px 0 rgba(255,255,255,.03) inset,0 10px 30px rgba(5,5,5,.18);--gx-tip-bg:#F3EEE4;--gx-tip-fg:#0B0A09}',
       /* Premium-Karte: Obsidian, Creme-Schrift, Gold als Akzent. Gilt auch für die Karten aus v4140 in der Pilot-Analyse. */
-      '.dp-pa-wrap .dp-gn.dp-gn-karte,.dp-pa-wrap .dp-gn.dp-gx,.dp-gx-frei.dp-gx,.dp-pa-wrap[data-dp-pa-v4] .dp-pa-content .dp-gn.dp-gn-karte,.dp-pa-wrap[data-dp-pa-v4] .dp-pa-content .dp-gn.dp-gx{background:linear-gradient(180deg,#16140F,#0E0D0B)!important;color:' + F.tinte + '!important;border:1px solid ' + F.linie + '!important;border-radius:14px!important;padding:18px 18px 14px!important;box-shadow:0 1px 0 rgba(255,255,255,.03) inset,0 10px 30px rgba(5,5,5,.18)!important;--gn-card:' + F.karte + ';--gn-grau:rgba(243,238,228,.28);--gn-netz:rgba(243,238,228,.08);--gn-leise:' + F.tinte2 + ';--gn-rot:' + F.rot + '}',
-      '.dp-pa-wrap .dp-gn.dp-gn-karte .dp-gn-k-t,.dp-gx .gx-t{font:600 17px/1.25 "Space Grotesk",Inter,sans-serif!important;letter-spacing:-.01em;color:' + F.tinte + '!important;margin:4px 0 3px!important;text-wrap:balance}',
+      '.dp-pa-wrap .dp-gn.dp-gn-karte,.dp-pa-wrap .dp-gn.dp-gx,.dp-gx-frei.dp-gx,.dp-pa-wrap[data-dp-pa-v4] .dp-pa-content .dp-gn.dp-gn-karte,.dp-pa-wrap[data-dp-pa-v4] .dp-pa-content .dp-gn.dp-gx{background:var(--gx-bg)!important;color:' + F.tinte + '!important;border:1px solid var(--gx-rand)!important;border-radius:14px!important;padding:18px 20px 16px!important;box-shadow:var(--gx-schatten)!important;--gn-card:' + F.karte + ';--gn-grau:color-mix(in srgb,' + F.tinte + ' 28%,transparent);--gn-netz:color-mix(in srgb,' + F.tinte + ' 9%,transparent);--gn-tinte:' + F.tinte + ';--gn-leise:' + F.tinte2 + ';--gn-rot:' + F.rot + '}',
+      '.dp-pa-wrap .dp-gn.dp-gn-karte .dp-gn-k-t,.dp-gx .gx-t{font:600 18px/1.25 "Space Grotesk",Inter,sans-serif!important;letter-spacing:-.01em;color:' + F.tinte + '!important;margin:4px 0 3px!important;text-wrap:balance}',
       '.dp-pa-wrap .dp-gn.dp-gn-karte .dp-gn-k-s,.dp-gx .gx-s{font:400 12.5px/1.45 Inter,sans-serif!important;color:' + F.tinte2 + '!important;margin:0 0 12px!important}',
-      '.dp-pa-wrap .dp-gn.dp-gn-karte .gn-tip,.dp-gx .gx-tip{background:#F3EEE4!important;color:#0B0A09!important}',
+      '.dp-pa-wrap .dp-gn.dp-gn-karte .gn-tip,.dp-gx .gx-tip{background:var(--gx-tip-bg)!important;color:var(--gx-tip-fg)!important}',
       '.dp-pa-wrap .dp-gn.dp-gn-karte .gn-tip .gn-tip-j{color:' + F.goldD + '!important}',
       '.dp-pa-wrap .dp-gn .dp-gn-seg{border:1px solid ' + F.linie2 + '!important;border-radius:9px!important;background:' + F.flaeche + '!important}',
       '.dp-pa-wrap .dp-gn .dp-gn-seg button{background:transparent!important;color:' + F.tinte2 + '!important;border:0!important;box-shadow:none!important;padding:7px 13px!important;border-radius:0!important;font:600 11.5px Inter,sans-serif!important;min-height:0!important;height:auto!important}',
       '.dp-pa-wrap .dp-gn .dp-gn-seg button[aria-pressed=true]{background:color-mix(in srgb,' + F.gold + ' 26%,transparent)!important;color:' + F.tinte + '!important}',
       '.dp-gx .gx-kopf{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}',
-      '.dp-gx .gx-eye{font:500 10.5px/1 "JetBrains Mono",ui-monospace,monospace;letter-spacing:.16em;text-transform:uppercase;color:' + F.tinte3 + '}',
+      '.dp-gx .gx-eye{font:600 10.5px/1 "JetBrains Mono",ui-monospace,monospace;letter-spacing:.12em;text-transform:uppercase;color:' + F.gold + '}',
       '.dp-gx .gx-chips{display:flex;gap:6px;flex-wrap:wrap}',
       '.dp-gx .gx-chip{font:500 10px/1 "JetBrains Mono",monospace;letter-spacing:.08em;text-transform:uppercase;border:1px solid ' + F.linie2 + ';color:' + F.tinte2 + ';padding:5px 8px;border-radius:999px;white-space:nowrap}',
       '.dp-gx .gx-chip.modell{border-color:' + F.gold + ';color:' + F.gold + '}',
       '.dp-gx .gx-chip.bsp{border-color:' + F.violett + ';color:' + F.violett + '}',
       '.dp-gx .gx-fuss{font:400 11.5px/1.5 Inter,sans-serif;color:' + F.tinte3 + ';border-top:1px dashed ' + F.linie + ';padding-top:8px;margin-top:10px;display:flex;gap:4px 16px;flex-wrap:wrap}',
       '.dp-gx .gx-leg{display:flex;flex-wrap:wrap;gap:4px 14px;margin:8px 0 0;font:400 11.5px Inter,sans-serif;color:' + F.tinte2 + '}',
+      '.dp-gx .gx-mb{display:flex;flex-direction:column;gap:8px;margin:4px 0 0}.dp-gx .gx-mb-z{display:grid;grid-template-columns:62px minmax(0,1fr);gap:10px;align-items:center}',
+      '.dp-gx .gx-mb-l{color:' + F.tinte3 + '!important}.dp-gx .gx-mb-bahn{display:flex;gap:2px;height:46px;border-radius:8px;overflow:hidden}',
+      '.dp-gx .gx-mb-seg{min-width:3px;display:flex;flex-direction:column;justify-content:center;padding:0 9px;overflow:hidden;color:#FDFCFA;transform-origin:0 50%}',
+      '.dp-gx .gx-mb-seg span{font:500 10.5px/1.2 Inter,sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:.92}.dp-gx .gx-mb-seg b{font:600 12px/1.2 "JetBrains Mono",monospace;white-space:nowrap}',
+      '@media (max-width:640px){.dp-gx .gx-mb-z{grid-template-columns:minmax(0,1fr)}.dp-gx .gx-mb-bahn{height:38px}.dp-gx .gx-mb-seg span{display:none}}',
       '.dp-gx .gx-leg i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}',
       '.dp-gx svg{display:block;width:100%;height:auto;overflow:visible}',
       '.dp-gx .gx-ax{font:400 10.5px "JetBrains Mono",ui-monospace,monospace;fill:' + F.tinte3 + '}',
@@ -172,7 +183,7 @@
     var lw = W < 420 ? 44 : 56, top = 24, cw = (W - lw - 4) / Z.length, ch = kompakt ? Math.max(22, Math.min(28, cw * 0.7)) : Math.max(26, Math.min(36, cw * 0.85)), H = top + M.length * ch + 30;
     var alle = []; G.forEach(function (r) { r.forEach(function (v) { if (v != null && isFinite(v)) alle.push(Math.abs(v)); }); });
     var maxAbs = Math.max.apply(null, alle.concat([1]));
-    var farbe = function (v) { return v >= 0 ? mix(F.flaeche, F.gruen, Math.min(1, v / maxAbs) * 0.95) : mix(F.flaeche, F.rot, Math.min(1, -v / maxAbs) * 0.95); };
+    var farbe = function (v) { var t = Math.round(Math.min(1, Math.abs(v) / maxAbs) * 92); return 'color-mix(in srgb,' + (v >= 0 ? F.gruen : F.rot) + ' ' + t + '%,' + F.flaeche + ')'; };   /* v4250 · color-mix statt mix(): F sind jetzt var() */
     var out = ['<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="' + esc(o.aria || 'Heatmap') + '">'];
     out.push('<text class="gx-ax" x="' + lw + '" y="12">' + esc(d.spaltenTitel || '') + ' →</text>');
     var jede = cw < 34 ? 2 : 1;
@@ -276,7 +287,7 @@
     if (d.heute != null) out.push('<line x1="' + f1(x(d.von)) + '" x2="' + f1(x(d.heute + 0.9)) + '" y1="' + yA + '" y2="' + yA + '" style="stroke:' + F.tinte + ';stroke-width:2"/>');
     var tj = []; for (var j = d.von; j <= d.bis; j++) if ((j - d.von) % (schmal ? 10 : 5) === 0 || j === d.bis) tj.push(j);
     tj.forEach(function (j) { out.push('<line x1="' + f1(x(j)) + '" x2="' + f1(x(j)) + '" y1="' + (yA - 4) + '" y2="' + (yA + 4) + '" style="stroke:' + F.tinte3 + '"/><text class="gx-ax" x="' + f1(x(j)) + '" y="' + (yA - 8) + '" text-anchor="middle">' + j + '</text>'); });
-    if (d.heute != null) out.push('<circle cx="' + f1(x(d.heute + 0.9)) + '" cy="' + yA + '" r="5" style="fill:#0B0A09;stroke:' + F.gold + ';stroke-width:2"/>');
+    if (d.heute != null) out.push('<circle cx="' + f1(x(d.heute + 0.9)) + '" cy="' + yA + '" r="5" style="fill:' + F.karte + ';stroke:' + F.gold + ';stroke-width:2"/>');
     var farbe = { gem: F.tinte, info: F.tinte3, gut: F.gruen, risiko: F.rot };
     var M = (d.marken || []).filter(function (mk) { return mk.j != null; }).sort(function (a, b) { return a.j - b.j; });
     var jt = function (mk) { return mk.j > d.bis + 0.5 ? 'nach ' + d.bis : String(Math.floor(mk.j)); };
@@ -632,6 +643,29 @@
     if (rest >= 1) aus.push({ n: 'Sonstiges', v: rest, f: F.tinte3 }); else if (rest <= -1) ein.push({ n: 'Sonstiges', v: -rest, f: F.tinte3 });
     return { r: r, ein: ein, aus: aus, tasche: tasche, frei: frei };
   }
+  /* v4250 · Marcel 23.11.2026: „den Fluss des Mieteuros vielleicht anders angeben“. Statt Sankey zwei gleich lange Balken
+     (woher, wohin) auf derselben Skala, darunter „Von 100 € Miete gehen …“. Dieselben Zahlen wie mieteuro() (Rechnung der App). */
+  function karteMieteuro(k, w, P) {
+    var D = mieteuro(P), r = D.r, nkm = r.nkm || 0;
+    var ein = D.ein.filter(function (a) { return a.v > 0.5; }), aus = D.aus.filter(function (a) { return a.v > 0.5; });
+    var sE = ein.reduce(function (s2, a) { return s2 + a.v; }, 0), sA = aus.reduce(function (s2, a) { return s2 + a.v; }, 0), sum = Math.max(sE, sA) || 1;
+    var titel = D.tasche > 0.5 ? r.j + ': ' + eur(D.tasche) + ' legst du selbst dazu, ' + eur(r.tilg) + ' davon werden Vermögen' : r.j + ': ' + eur(D.frei) + ' bleiben dir nach Steuer, ' + eur(r.tilg) + ' werden Vermögen';
+    var i = karte(k, { eyebrow: 'Wohin die Miete ' + r.j + ' geht', titel: titel, unter: 'Oben woher das Geld kommt, unten wohin es fließt. Beide Balken sind gleich lang, € im Jahr aus der Rechnung der App.', chips: ['gemessen'] });
+    var bahn = function (L) {
+      return '<div class="gx-mb-bahn">' + L.map(function (a, q) {
+        var pr = a.v / sum * 100, je100 = nkm > 0 ? Math.round(a.v / nkm * 100) : null;
+        return '<div class="gx-mb-seg gx-wx" style="width:' + pr.toFixed(2) + '%;background:' + a.f + ';animation-delay:' + (q * 80) + 'ms"' + tipA('<div class="t">' + esc(a.n) + '</div><b>' + eur(a.v) + '</b> im Jahr' + (je100 != null ? '<br>' + je100 + ' € je 100 € Miete' : '')) + '>'
+          + (pr >= 14 ? '<span>' + esc(a.n) + '</span><b>' + eur(a.v) + '</b>' : '') + '</div>';
+      }).join('') + '</div>';
+    };
+    var wort = function (n) { return { 'Zins an die Bank': 'Zinsen', 'Tilgung = Vermögen': 'die Tilgung', 'Nicht umlegbare Kosten': 'nicht umlegbare Kosten', 'Steuer': 'die Steuer' }[n] || n; };
+    var satz = nkm > 0 ? 'Von 100 € Miete gehen ' + D.aus.filter(function (a) { return a.v > 0.5 && a.n !== 'Bleibt dir'; }).map(function (a) { return Math.round(a.v / nkm * 100) + ' € an ' + wort(a.n); }).join(', ') + '.'
+      + (D.frei > 0.5 ? ' Dir bleiben ' + Math.round(D.frei / nkm * 100) + ' €.' : '') + (D.tasche > 0.5 ? ' Dazu legst du ' + Math.round(D.tasche / nkm * 100) + ' € je 100 € Miete selbst drauf.' : '') : '';
+    i.innerHTML = '<div class="gx-mb"><div class="gx-mb-z"><div class="gx-eye gx-mb-l">Woher</div>' + bahn(ein) + '</div><div class="gx-mb-z"><div class="gx-eye gx-mb-l">Wohin</div>' + bahn(aus) + '</div></div>'
+      + legende(ein.concat(aus).map(function (a) { return { n: a.n + ' ' + eur(a.v), f: a.f }; }))
+      + (satz ? '<div class="gx-s" style="margin:10px 0 0!important">' + esc(satz) + '</div>' : '');
+    return i;
+  }
   function karteSankey(k, w, P) {
     var D = mieteuro(P), r = D.r, ein = D.ein, aus = D.aus, tasche = D.tasche, frei = D.frei;
     var titel = tasche > 0.5 ? r.j + ': ' + eur(tasche) + ' legst du selbst dazu, ' + eur(r.tilg) + ' davon werden Vermögen' : r.j + ': ' + eur(frei) + ' bleiben dir nach Steuer, ' + eur(r.tilg) + ' werden Vermögen';
@@ -810,13 +844,14 @@
       zeichneMit(h, kind(r1, 'gx-finger'), sig + kpSig, function (k, w) { karteFingerabdruck(k, w); });
       var nach = ue.querySelector('[data-dp-gn="ue-reihe"]');
       var anker = nach ? nach.nextSibling : null;
-      var kh = h.platz(ue, 'gx-heat-ue', anker, 'dp-gx'); zeichneMit(h, kh, sig, function (k, w) { karteHeat(k, w, P, C, true); });
-      var ks = h.platz(ue, 'gx-sankey', kh.nextSibling, 'dp-gx'); zeichneMit(h, ks, sig, function (k, w) { karteSankey(k, w, P); });
-      var kf = h.platz(ue, 'gx-fahrplan', ks.nextSibling, 'dp-gx'); zeichneMit(h, kf, sig, function (k, w) { karteFahrplan(k, w, P, C); });
+      /* v4250 · Marcel: „in der Übersicht kann der Anschlusszins raus“, Mieteuro als Balken, Fahrplan gehört nach Ankauf · Bestand · Zielbild */
+      ['gx-heat-ue', 'gx-sankey', 'gx-fahrplan'].forEach(function (q) { var alt = ue.querySelector('[data-dp-gn="' + q + '"]'); if (alt && alt.parentNode) alt.parentNode.removeChild(alt); });
+      var km = h.platz(ue, 'gx-mieteuro', anker, 'dp-gx'); zeichneMit(h, km, sig, function (k, w) { karteMieteuro(k, w, P); });
     }
     /* Ankauf · Bestand · Zielbild: Einordnung mit Ankauf-Marke */
     var si = document.getElementById('dp-pa-si');
-    if (si) { var ksi = h.platz(si, 'gx-einordnung-si', si.firstChild, 'dp-gx'); zeichneMit(h, ksi, sig + kpSig + 'a', function (k, w) { karteEinordnung(k, w, true); }); }
+    if (si) { var ksi = h.platz(si, 'gx-einordnung-si', si.firstChild, 'dp-gx'); zeichneMit(h, ksi, sig + kpSig + 'a', function (k, w) { karteEinordnung(k, w, true); });
+      var kfs = h.platz(si, 'gx-fahrplan-si', ksi.nextSibling, 'dp-gx'); zeichneMit(h, kfs, sig, function (k, w) { karteFahrplan(k, w, P, C); }); }   /* v4250 · Fahrplan hierher */
     /* Wert & Lage: Wertverlauf (statt „Wert gegen Plan“), Wo dein Objekt steht und Lage, Monte-Carlo-Fächer */
     var we = document.getElementById('dp-pa-wert');
     if (we) {
@@ -852,7 +887,26 @@
   /* Vorschau-Sperre: nur mit DpVorschau.frei('grafiken_neu') (zusätzlich zur Sperre in grafiken-neu.js, tools/vorschau-pruefen.mjs) */
   var FREI = false;
   function freigabe() { try { if (window.DpVorschau) window.DpVorschau.frei('grafiken_neu').then(function (an) { FREI = !!an; }); } catch (e) {} }
+  /* v4250 · Grafiken hell oder dunkel. Merker dp_grafik_stil: 'hell' (Standard), 'dunkel', 'app' (dunkel nur, wenn die
+     Fläche hinter der Pilot-Analyse dunkel ist). Gesetzt wird html[data-gx-stil], die Farben hängen an --gx-* (stil()). */
+  function appDunkel() {
+    try {
+      var e = document.querySelector('.dp-pa-wrap') || document.querySelector('.sec.active') || document.body, c = null;
+      while (e && e.nodeType === 1) { c = getComputedStyle(e).backgroundColor; var m = c && c.match(/[0-9.]+/g); if (m && !(m.length === 4 && Number(m[3]) === 0)) { var l = (0.2126 * m[0] + 0.7152 * m[1] + 0.0722 * m[2]) / 255; return l < 0.35; } e = e.parentElement; }
+    } catch (x) {}
+    return false;
+  }
+  function stilWahl() { var v = 'hell'; try { v = localStorage.getItem('dp_grafik_stil') || 'hell'; } catch (e) {} return v === 'dunkel' || v === 'app' ? v : 'hell'; }
+  function stilAnwenden() { var w = stilWahl(), r = w === 'dunkel' ? 'dunkel' : (w === 'app' && appDunkel() ? 'dunkel' : 'hell'); try { document.documentElement.setAttribute('data-gx-stil', r); } catch (e) {} return r; }
+  function stilSetzen(v) {
+    try { localStorage.setItem('dp_grafik_stil', v === 'dunkel' || v === 'app' ? v : 'hell'); } catch (e) {}
+    var r = stilAnwenden();
+    try { if (window.DpGrafikenNeu && window.DpGrafikenNeu.neu) window.DpGrafikenNeu.neu(); } catch (e) {}
+    try { if (window.DpGrafikenBewertung && window.DpGrafikenBewertung.zeichnen) window.DpGrafikenBewertung.zeichnen(); } catch (e) {}
+    return r;
+  }
+  stilAnwenden();
   freigabe(); window.addEventListener('dp:vorschau', freigabe); window.addEventListener('dp:plan-ready', function () { setTimeout(freigabe, 300); });
-  window.DpGrafikenPremium = { lauf: function (h) { if (!FREI) { freigabe(); return; } stil(); try { pilotAnalyse(h); } catch (e) { try { console.warn('[grafiken-premium]', e); } catch (x) {} } }, MODELL: MODELL, _mieteuro: mieteuro, _einordnung: einordnungDaten, _portfolio: portfolioSchnitt };
+  window.DpGrafikenPremium = { lauf: function (h) { if (!FREI) { freigabe(); return; } stil(); try { pilotAnalyse(h); } catch (e) { try { console.warn('[grafiken-premium]', e); } catch (x) {} } }, MODELL: MODELL, _mieteuro: mieteuro, stil: stilSetzen, stilWahl: stilWahl, stilAnwenden: stilAnwenden, _einordnung: einordnungDaten, _portfolio: portfolioSchnitt };
   window.DpGrafiken = { heatmap: heatmap, bullets: bullets, verlauf: verlauf, punktreihen: punktreihen, fahrplan: fahrplan, fingerabdruck: fingerabdruck, sankey: sankey, tornado: tornado, ausstieg: ausstieg, karte: karte, farben: F, modell: MODELL };
 })();

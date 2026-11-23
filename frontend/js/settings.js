@@ -798,6 +798,23 @@ function showSettings(initialTab) {
         '<h2 class="set-section-h2">Anzeige-Optionen</h2>' +
 
         '<p class="hint">Steuere, welche UI-Elemente in der App angezeigt werden.</p>' +
+        /* v4250 · Marcel 23.11.2026: „die Grafiken einmal in hell darstellen … vielleicht später einstellbar in den Einstellungen“.
+           Nur ein Anzeige-Merker (dp_grafik_stil), wirkt sofort, kein Speichern nötig. Gilt für die neuen Grafiken. */
+        (function () {
+          var a = 'hell'; try { a = (window.DpGrafikenPremium && window.DpGrafikenPremium.stilWahl) ? window.DpGrafikenPremium.stilWahl() : (localStorage.getItem('dp_grafik_stil') || 'hell'); } catch (e) {}
+          function opt(w, t, s2) {
+            return '<label style="display:flex;gap:10px;align-items:flex-start;padding:5px 0;cursor:pointer;font-size:13px;line-height:1.4">' +
+              '<input type="radio" name="set-grafik-stil" value="' + w + '"' + (a === w ? ' checked' : '') +
+              ' onchange="try{window.DpGrafikenPremium&&window.DpGrafikenPremium.stil(this.value)}catch(e){}" style="margin-top:3px;accent-color:var(--wl-c9a84c, #C9A84C)">' +
+              '<span><b>' + t + '</b>' + (s2 ? '<br><span style="opacity:.72;font-size:12px">' + s2 + '</span>' : '') + '</span></label>';
+          }
+          return '<div class="set-grafik-stil" role="radiogroup" aria-label="Grafiken" style="margin:4px 0 16px;padding:12px 14px;border:1px solid var(--border, #e6dfcf);border-radius:12px">' +
+            '<div style="font-weight:600;font-size:13px;margin-bottom:6px">Grafiken</div>' +
+            opt('hell', 'Hell', 'Weiße Karten wie im Reiter Bewertung.') +
+            opt('dunkel', 'Dunkel', 'Obsidian-Karten mit heller Schrift.') +
+            opt('app', 'Wie die App', 'Dunkel nur, wenn die App dunkel ist.') +
+          '</div>';
+        })() +
         /* ── v1162-PROFIL · Hell und Dunkel als zwei Profile ────────────────
            Marcels Vorgabe (Backlog Punkt 5): „DealPilot wird im dunklen Modus
            ausgeliefert. Daneben ein heller Modus, umschaltbar mit einem Griff."
