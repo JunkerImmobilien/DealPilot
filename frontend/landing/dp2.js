@@ -344,3 +344,12 @@
     })
     .catch(function () {});
 })();
+
+/* landing-zaehlen-1 · anonymes Besucherzaehlen (besucher-zaehlen.js) auf jeder Seite, die dp2.js laedt */
+(function () {
+  try {
+    if (window.__dpZaehlen) return; window.__dpZaehlen = true;
+    var s = document.createElement('script'); s.src = 'besucher-zaehlen.js?v=landing-zaehlen-1'; s.defer = true;
+    (document.body || document.documentElement).appendChild(s);
+  } catch (e) {}
+})();
