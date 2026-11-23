@@ -45231,3 +45231,9 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Commit:** main 09ed0f9 (staging 86d8ba4).
 - **Nachweis:** deploy-staging gruen, vorschau 13/13, grafiken-neu 32, score-ketten, Gold-Audit RC 0, Rechenpruefung Cockpit 6/6. Prod: Backend healthy, Buster ausgeliefert.
 - **Rest:** zwei Projektionsmodelle im Cockpit ("Netto bis" je Objekt bzw. 1,5 %, Projektion & Verlauf ASSUMP Wert +2 % auf Kaufpreis) vereinheitlichen.
+
+### Rollout 1.0.154 und 1.0.155 · 23.11.2026 · v4270–v4290
+- **Was:** v4270 Beleg-Leser: "Erhaltungsaufwand / Reparatur" auf erhaltungsaufwand statt betr_sonst (Marcel: ja) · v4280 ein Farbschema fuer alle Grafiken (--gx-*, gemessen an der Bewertung), Break-even Steuer (Demostrasse 2028), Fahrplan mit Zielbild ganz oben in der Uebersicht, Marken Zinsbindungsende und Horizont, Monte-Carlo als "Spanne moeglicher Verlaeufe" · v4280a Bewertung nennt das Zinsbindungsende 03/2034 wie die Pilot-Analyse · v4290 Hoechstmiete: Ist-Miete nie ueberschrieben, Hinweis wenn darueber (Demostrasse 9,12 > 8,88); geplante Miete auf Hoechstmiete gesetzt mit bleibender Meldung, Feld = Rechnung.
+- **Commit:** main ea58ff9 (staging ed5d239), davor 1384406.
+- **Nachweis:** grafiken-neu 39, mietpotenzial 311, miete-reiter 33, jahresbuch 61, gesamtflow 97, vorschau 13/13, Buster, Gold-Audit RC 0; Staging-Browser: Bewertung "Zinsbindung endet 03/2034". Prod: Backend healthy.
+- **Rest:** Mieteuro-Balken bleiben gold/neutral (Lesbarkeit) · Grafiken weiter hinter Vorschau grafiken_neu bis Marcels Freigabe · Projektionsmodelle im Cockpit vereinheitlichen (Rueckfrage).
