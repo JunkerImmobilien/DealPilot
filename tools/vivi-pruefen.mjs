@@ -1212,6 +1212,7 @@ kopf('V  v4040 Reiter ViVi, Bewirtschaftung Ist heute aus dem Steuerjahr');
       { label: 'Grundsteuer (Testbeleg Grundsteuer 2025)', date: '15.07.2025', amount: 212 }] },
     '76-78': { items: [{ group: 'WEG Abrechnung (nicht umlagefähig)', label: 'Zahlung vom 15.12.2025', amount: 1200 }] } };
   const w = S.ausJahr(roh, det);
+  ok(w.nk_umlf && w.nk_umlf.posten[0].datum === '2025-12-15', 'V1b Posten ohne date: Datum aus „Zahlung vom 15.12.2025“');
   ok(w.nk_umlf && w.nk_umlf.posten[0].text.indexOf('Hausgeld') >= 0, 'V1 aufgeteilter Kontoumsatz: der Posten trägt die Beschreibung (group), nicht nur „Zahlung vom …“');
   const fe = {}; Object.keys(w).forEach((sp) => { fe[S.feldId(2025, sp)] = w[sp]; });
   const bw = S.bewirtschaftungAus(fe, 2025, 12);

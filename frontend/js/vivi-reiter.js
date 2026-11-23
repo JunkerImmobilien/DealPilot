@@ -17,7 +17,7 @@
  * ═══════════════════════════════════════════════════════════════════════════════════════════════════════════════ */
 (function (global) {
   'use strict';
-  var VERSION = 'v4040d';
+  var VERSION = 'v4040e';
   if (!global.document || global.DpViviReiter) return;
   var doc = global.document;
   var _jahr = null, _offen = {};
@@ -83,7 +83,7 @@
     if (!L.length) return '';
     var nurDp = L.filter(function (x) { return x.art === 'dp'; }).length;
     return '<ul class="vr-belege">' + L.map(function (x) {
-      return '<li><span class="vr-tag ' + ART[x.art][1] + '">' + ART[x.art][0] + '</span><span class="vr-bt">' + esc(datumText(x.datum)) + ' · ' + esc(x.text) + (x.aussteller ? ' · ' + esc(x.aussteller) : '') + '</span><b>' + eur(x.betrag) + '</b>'
+      return '<li><span class="vr-tag ' + ART[x.art][1] + '">' + ART[x.art][0] + '</span><span class="vr-bt">' + (datumText(x.datum) ? esc(datumText(x.datum)) + ' · ' : '') + esc(x.text) + (x.aussteller ? ' · ' + esc(x.aussteller) : '') + '</span><b>' + eur(x.betrag) + '</b>'
         + (x.art === 'dp' ? '<button type="button" class="btn-clean vr-link" data-vr="beleg" data-vr-jahr="' + jahr + '">öffnen</button>' : '') + '</li>';
     }).join('') + '</ul>' + (nurDp ? '<p class="vr-klein">Belege nur in DealPilot stehen schon im Steuerjahr. In ViVi bitte nachbuchen, die Schnittstelle kann keine Belege anlegen.</p>' : '');
   }

@@ -127,7 +127,9 @@ function ausJahr(uebersicht, details) {
       w.posten = d.items.map(function (it) {
         const b = zahl(it && it.amount);
         /* v4040 · aufgeteilte Kontoumsaetze tragen die Beschreibung in group (label ist nur „Zahlung vom …“) */
-        return b == null ? null : { datum: isoDatum(it.date), betrag: rund(Math.abs(b)), text: String((it && (it.group || it.label)) || '').slice(0, 160) };
+        /* ohne date steht das Datum im label („Zahlung vom 15.12.2025“) */
+        const dl = /(\d{1,2}\.\d{1,2}\.\d{4})/.exec(String((it && it.label) || ''));
+        return b == null ? null : { datum: isoDatum(it.date) || (dl ? isoDatum(dl[1]) : null), betrag: rund(Math.abs(b)), text: String((it && (it.group || it.label)) || '').slice(0, 160) };
       }).filter(Boolean);
       w.posten_gekuerzt = +d.items_truncated || 0;
     }
