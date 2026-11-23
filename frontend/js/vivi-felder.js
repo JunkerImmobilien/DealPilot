@@ -53,6 +53,15 @@
     if (typeof wert === 'number') return Number.isInteger(wert) ? String(wert) : String(wert).replace('.', ',');
     return String(wert);
   }
+  /* v4043a · Einheit (€, %, m²) aus dem Vor-/Nachsatz des Feldes, damit „ViVi: 620“ nicht nackt dasteht */
+  function einheitAm(el) {
+    try {
+      var iw = el && el.closest ? el.closest('.iw') : null;
+      var e = iw && iw.querySelector('.pfx, .sfx, .unit');
+      var t = e ? String(e.textContent || '').trim() : '';
+      return t && t.length <= 6 ? ' ' + t : '';
+    } catch (x) { return ''; }
+  }
   function gleich(feld, a, b) {
     var k = feld.split('.').pop();
     if (ZAHL_FELDER.test(k)) { var x = zahl(a), y = zahl(b); return x === y || (x != null && y != null && Math.abs(x - y) < 0.005); }
@@ -418,7 +427,7 @@
     var v = lesen();
     var viviWert = _stand && _stand.felder && _stand.felder[id] ? _stand.felder[id].wert : v.felder[id];
     if (_pop && _pop.getAttribute('data-fuer') === id) return;
-    popZeigen(el, 'ViVi: ' + (alsText(id, viviWert) || 'leer'), [{ text: 'übernehmen', tun: function () { zurueck(el); } }]);
+    popZeigen(el, 'ViVi: ' + (alsText(id, viviWert) ? alsText(id, viviWert) + einheitAm(el) : 'leer'), [{ text: 'übernehmen', tun: function () { zurueck(el); } }]);
     if (_pop) _pop.setAttribute('data-fuer', id);
   }, true);
   document.addEventListener('keydown', function (ev) { if (_pop && (ev.key === 'Escape' || (ev.target && ev.target.classList && ev.target.classList.contains('vivi-eigen')))) popWeg(); }, true);
