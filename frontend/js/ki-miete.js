@@ -244,13 +244,13 @@ function _kmVergleichHtml(b, kiWert, istQm, sug) {
     o += _kmZeile('Aktueller Marktdurchschnitt', _kmQm(m.wert_qm) + _kmAbw(m.wert_qm, ist),
       'Angebotsmieten, Median' + (m.q25_qm != null && m.q75_qm != null ? ', mittlere Hälfte ' + _kmQm(m.q25_qm) + ' bis ' + _kmQm(m.q75_qm) : '')
         + (m.anzahl != null ? ' · ' + m.anzahl + ' Angebote' : '') + (m.umkreis_km != null ? ' im Umkreis von ' + String(m.umkreis_km).replace('.', ',') + ' km' : '')
-        + (m.stand ? ' · Marktbericht vom ' + _kmDat(m.stand) : '') + ' · Angebote, keine Abschlüsse; ein Abschlag für Mieten ist nicht gemessen',
+        + (m.stand ? ' · Marktbericht vom ' + _kmDat(m.stand) : '') + ' · Angebote, keine Abschlüsse. Ein Abschlag für Mieten ist nicht gemessen',
       'Markt', g.indexOf('marktdurchschnitt') >= 0);
   } else {
     o += _kmZeile('Aktueller Marktdurchschnitt', 'liegt nicht vor', m.weg || '', 'Markt', false, true);
   }
   if (b.band) {
-    o += _kmZeile('Marktüblichkeitsband', _kmQm(b.band.unten_qm) + ' – ' + _kmQm(b.band.oben_qm),
+    o += _kmZeile('Marktüblichkeitsband', _kmQm(b.band.unten_qm) + ' bis ' + _kmQm(b.band.oben_qm),
       'Wertermittlung im Marktbericht: ' + (b.band.regel || 'Anker der Marktüblichkeit ± 20 %')   /* v3002: stand „× 0,7 bis × 1,3“, seit v2600 Anker ± 20 % */, 'Wertermittlung', g.indexOf('marktueblichkeitsband') >= 0);
   }
   if (b.ertrag && b.ertrag.wert_qm != null) {
@@ -279,7 +279,7 @@ function _kmRisikoHtml(b, kiWert, sug) {
     if (lz.anhalt) {
       var abw = kiWert && kiWert !== lz.anhalt.wert;
       o += _kmZeile('Anhalt aus dem Zensus-Leerstand', lz.anhalt.wort,
-        'Stufen: ' + (lz.schwellen || '') + (kiWert ? (abw ? ' · Die Pilot-Einstufung „' + (WORT[kiWert] || kiWert) + '“ weicht ab — begründbar z. B. durch Mieterstruktur, Objektzustand oder Entwicklung seit 2022.' : ' · Passt zur Pilot-Einstufung.') : ''),
+        'Stufen: ' + (lz.schwellen || '') + (kiWert ? (abw ? ' · Die Pilot-Einstufung „' + (WORT[kiWert] || kiWert) + '“ weicht ab, begründbar z. B. durch Mieterstruktur, Objektzustand oder Entwicklung seit 2022.' : ' · Passt zur Pilot-Einstufung.') : ''),
         'Vorschlag', false);
       o += '<div class="ki-miete-actions"><button type="button" class="btn btn-outline btn-sm" onclick="kiMieteApplyAusfall(\'' + _kmEsc(lz.anhalt.wert) + '\')">Zensus-Anhalt „' + _kmEsc(lz.anhalt.wort) + '“ übernehmen</button></div>';
     }
@@ -529,29 +529,29 @@ function _kmUebersicht(o) {
 
   /* ── der Ansatz ── */
   var ansatz = null, art = 'offen', satz = '';
-  var bandTxt = band ? 'marktüblichen Band (' + _kmQmK(band.lo).replace(' €/m²', '') + ' – ' + _kmQmK(band.hi) + ')' : '';
+  var bandTxt = band ? 'marktüblichen Band (' + _kmQmK(band.lo).replace(' €/m²', '') + ' bis ' + _kmQmK(band.hi) + ')' : '';
   if (b.ertrag && b.ertrag.wert_qm != null) ansatz = b.ertrag.wert_qm;
   if (ist != null && band) {
     if (ist > band.hi + 0.005) { art = 'hoch'; if (ansatz == null) ansatz = band.hi;
-      satz = 'Deine Ist-Miete liegt über dem ' + bandTxt + '. Dauerhaft ansetzbar ist höchstens die obere Kante — bei einer Neuvermietung trägt der Markt die heutige Miete voraussichtlich nicht.'; }
+      satz = 'Deine Ist-Miete liegt über dem ' + bandTxt + '. Dauerhaft ansetzbar ist höchstens die obere Kante. Bei einer Neuvermietung trägt der Markt die heutige Miete voraussichtlich nicht.'; }
     else if (ist < band.lo - 0.005) { art = 'luft'; if (ansatz == null) ansatz = ist;
-      satz = 'Deine Ist-Miete liegt unter dem ' + bandTxt + ' — angesetzt wird, was vereinbart ist. Was du wann erhöhen darfst, zeigt die Mietleiter unter Einheiten bzw. Zielmiete.'; }
+      satz = 'Deine Ist-Miete liegt unter dem ' + bandTxt + '. Angesetzt wird, was vereinbart ist. Was du wann erhöhen darfst, zeigt die Mietleiter unter Einheiten oder Zielmiete.'; }
     else { art = 'ok'; if (ansatz == null) ansatz = ist;
       satz = 'Deine Ist-Miete liegt im ' + bandTxt + ' und ist damit plausibel. So setzt sie auch der Ertragswert an.'; }
   } else if (ist != null && m && m.q25_qm != null && m.q75_qm != null) {
     ansatz = ansatz != null ? ansatz : ist;
-    if (ist > m.q75_qm) { art = 'hoch'; satz = 'Deine Ist-Miete liegt über drei Vierteln der aktuellen Angebote in der Umgebung (mittlere Hälfte ' + _kmQmK(m.q25_qm).replace(' €/m²', '') + ' – ' + _kmQmK(m.q75_qm) + '). Prüfe, ob Ausstattung und Zustand das tragen.'; }
-    else if (ist < m.q25_qm) { art = 'luft'; satz = 'Deine Ist-Miete liegt unter den meisten Angeboten der Umgebung — Luft nach oben. Was zulässig ist, zeigt die Mietleiter.'; }
+    if (ist > m.q75_qm) { art = 'hoch'; satz = 'Deine Ist-Miete liegt über drei Vierteln der aktuellen Angebote in der Umgebung (mittlere Hälfte ' + _kmQmK(m.q25_qm).replace(' €/m²', '') + ' bis ' + _kmQmK(m.q75_qm) + '). Prüfe, ob Ausstattung und Zustand das tragen.'; }
+    else if (ist < m.q25_qm) { art = 'luft'; satz = 'Deine Ist-Miete liegt unter den meisten Angeboten der Umgebung. Es ist Luft nach oben. Was zulässig ist, zeigt die Mietleiter.'; }
     else { art = 'ok'; satz = 'Deine Ist-Miete liegt in der mittleren Hälfte der Angebote der Umgebung und ist damit plausibel.'; }
     satz += ' Ein marktübliches Band gibt es erst mit dem Marktbericht.';
   } else if (ist == null && band) {
     art = 'offen'; ansatz = (band.lo + band.hi) / 2;
-    satz = 'Noch keine Ist-Miete eingetragen. Für die Planung ist der Anker der Marktüblichkeit (Mitte des Bands ' + _kmQmK(band.lo).replace(' €/m²', '') + ' – ' + _kmQmK(band.hi) + ') ein belastbarer Ansatz.';
+    satz = 'Noch keine Ist-Miete eingetragen. Für die Planung ist der Anker der Marktüblichkeit (Mitte des Bands ' + _kmQmK(band.lo).replace(' €/m²', '') + ' bis ' + _kmQmK(band.hi) + ') ein belastbarer Ansatz.';
   } else if (ist != null) {
     art = 'offen'; ansatz = ist;
-    satz = 'Für eine belastbare Einordnung fehlen Vergleichswerte — mit dem Marktbericht kommen Marktdurchschnitt und marktübliches Band dazu.';
+    satz = 'Für eine belastbare Einordnung fehlen Vergleichswerte. Mit dem Marktbericht kommen Marktdurchschnitt und marktübliches Band dazu.';
   } else {
-    satz = 'Trag im Reiter Miete die Nettokaltmiete ein oder ruf den Marktbericht ab — dann ordnet die Analyse ein.';
+    satz = 'Trag im Reiter Miete die Nettokaltmiete ein oder ruf den Marktbericht ab. Dann ordnet die Analyse ein.';
   }
 
   var h = '<div class="kmu">';
@@ -592,7 +592,7 @@ function _kmUebersicht(o) {
     h += '<div class="dp-ml">' + zeilen.map(function (z) {
       var abw = (ist != null && z.c !== 'ist') ? ' <small>' + ((z.v / ist - 1) * 100 >= 0 ? '+' : '') + Math.round((z.v / ist - 1) * 100) + ' % zur Ist-Miete</small>' : '';
       var knopf = z.c === 'ist' ? '<span></span>'
-        : '<button type="button" class="dp-ml-k' + (z.c === vorschlag ? ' kmu-k-voll' : '') + '" onclick="kiMieteApplyMarktmiete(' + Number(z.v).toFixed(2) + ')" title="In das Feld Marktmiete (€/m²) übernehmen — es fließt in den Investor Deal Score">als Marktmiete</button>';
+        : '<button type="button" class="dp-ml-k' + (z.c === vorschlag ? ' kmu-k-voll' : '') + '" onclick="kiMieteApplyMarktmiete(' + Number(z.v).toFixed(2) + ')" title="In das Feld Marktmiete (€/m²) übernehmen. Es fließt in den Investor Deal Score">als Marktmiete</button>';
       return '<div class="dp-ml-z"><span class="dp-ml-p kmu-p-' + z.c + '"></span><span class="dp-ml-txt"><span class="dp-ml-t">' + _kmEsc(z.t) + ' <i>' + _kmEsc(z.h) + '</i></span>'
         + '<span class="dp-ml-v">' + _kmQmK(z.v) + abw + '</span></span><span></span>' + knopf + '</div>';
     }).join('') + '</div>';
@@ -637,8 +637,8 @@ function _kmUebersicht(o) {
       var kpText = 'Im laufenden Mietverhältnis darf die Miete in drei Jahren um höchstens ' + (kp.pct || '–') + ' % steigen, und nie über die ortsübliche Vergleichsmiete (§ 558 BGB)'
         + (ist && kp.pct ? (vgQ && vgQ < ist * (1 + kp.pct / 100)
             /* v3770 · die Grenze ist das Kleinere aus Kappung und Vergleichsmiete (dieselbe wie oben) */
-            ? (vgQ > ist + 0.005 ? ' — bei deiner Miete also auf höchstens ' + _kmQmK(vgQ) + ' (' + vgT + ')' : ' — deine Miete liegt schon an der ' + vgT)
-            : ' — bei deiner Miete also auf höchstens ' + _kmQmK(ist * (1 + kp.pct / 100))) : '') + '.';
+            ? (vgQ > ist + 0.005 ? ', bei deiner Miete also auf höchstens ' + _kmQmK(vgQ) + ' (' + vgT + ')' : ', deine Miete liegt schon an der ' + vgT)
+            : ', bei deiner Miete also auf höchstens ' + _kmQmK(ist * (1 + kp.pct / 100))) : '') + '.';
       var quelleKp = kp.herkunft === 'verordnung' ? ' · ' + lnk(kp.verordnung || 'Landesverordnung', kp.url) : ' · gesetzliche Grenze (§ 558 Abs. 3 Satz 1 BGB)';
       /* v3086 · Marcel 02.11.2026: „die Mietrecht-Kachel zum Minimieren - nur das Wichtigste, die beiden
          Zeilen dann stehen lassen“. Zugeklappt (Vorgabe): zwei Zeilen; aufgeklappt: Erklaerung und Quelle. */
@@ -670,14 +670,14 @@ function _kmUebersicht(o) {
      (_kmVergleichHtml/_kmRisikoHtml) mit allen Fußnoten. */
   var stand = function (x) { return x ? ' (Stand ' + String(x).slice(8, 10) + '.' + String(x).slice(5, 7) + '.' + String(x).slice(0, 4) + ')' : ''; };
   var li = [];
-  if (ist != null) li.push('<b>Deine Ist-Miete</b> — die Nettokaltmiete, die du eingetragen hast, geteilt durch die Wohnfläche.');
-  if (band) li.push('<b>Marktübliches Band</b> — der Bereich, den die Wertermittlung im Marktbericht als marktüblich anerkennt. Liegt eine Miete darüber, rechnet der Ertragswert nur mit der Obergrenze, weil ein neuer Mieter sie voraussichtlich nicht zahlt.');
-  if (a) li.push('<b>Amtliche Vergleichsmiete</b> — aus der Mietpreisübersicht des Gutachterausschusses' + (a.quelle ? ' (' + _kmEsc(a.quelle) + ')' : '') + '. Sie bildet vor allem bestehende Mietverträge ab und ist deshalb meist niedriger als Angebote.');
-  if (m) li.push('<b>Marktdurchschnitt</b> — was Vermieter in der Umgebung gerade verlangen: der mittlere Wert aus ' + (m.anzahl != null ? m.anzahl + ' ' : '') + 'aktuellen Angeboten' + stand(m.stand) + '. Angebote sind keine abgeschlossenen Mieten und liegen oft etwas darüber.');
-  if (pilot != null) li.push('<b>Pilot-Recherche</b> — eine Schätzung der KI aus Mietspiegeln und Webquellen; sie ist eine Plausibilitätsprobe, kein Beleg.' + (o.sugMarkt ? ' ' + _renderQuellen(o.sugMarkt).replace(/<\/?div[^>]*>/g, '') : ''));
-  if (lz) li.push('<b>Mietausfall-Risiko</b> — aus dem amtlichen Leerstand der Gemeinde (Zensus 2022) und der Bevölkerungsentwicklung des Kreises. Es beschreibt den Ort, nicht dein Objekt.');
+  if (ist != null) li.push('<b>Deine Ist-Miete:</b> die Nettokaltmiete, die du eingetragen hast, geteilt durch die Wohnfläche.');
+  if (band) li.push('<b>Marktübliches Band:</b> der Bereich, den die Wertermittlung im Marktbericht als marktüblich anerkennt. Liegt eine Miete darüber, rechnet der Ertragswert nur mit der Obergrenze, weil ein neuer Mieter sie voraussichtlich nicht zahlt.');
+  if (a) li.push('<b>Amtliche Vergleichsmiete:</b> aus der Mietpreisübersicht des Gutachterausschusses' + (a.quelle ? ' (' + _kmEsc(a.quelle) + ')' : '') + '. Sie bildet vor allem bestehende Mietverträge ab und ist deshalb meist niedriger als Angebote.');
+  if (m) li.push('<b>Marktdurchschnitt:</b> was Vermieter in der Umgebung gerade verlangen: der mittlere Wert aus ' + (m.anzahl != null ? m.anzahl + ' ' : '') + 'aktuellen Angeboten' + stand(m.stand) + '. Angebote sind keine abgeschlossenen Mieten und liegen oft etwas darüber.');
+  if (pilot != null) li.push('<b>Pilot-Recherche:</b> eine Schätzung der KI aus Mietspiegeln und Webquellen. Sie ist eine Plausibilitätsprobe, kein Beleg.' + (o.sugMarkt ? ' ' + _renderQuellen(o.sugMarkt).replace(/<\/?div[^>]*>/g, '') : ''));
+  if (lz) li.push('<b>Mietausfall-Risiko:</b> aus dem amtlichen Leerstand der Gemeinde (Zensus 2022) und der Bevölkerungsentwicklung des Kreises. Es beschreibt den Ort, nicht dein Objekt.');
   if (li.length) h += '<details class="kmu-mehr"><summary>Woher die Zahlen kommen</summary><ul class="kmu-li">' + li.map(function (x) { return '<li>' + x + '</li>'; }).join('') + '</ul></details>';
 
-  h += '<p class="kmu-fuss">Die Pilot-Recherche ist eine Schätzung; Marktdurchschnitt und Band stammen aus dem Marktbericht und tragen dort ihren Stand.</p>';
+  h += '<p class="kmu-fuss">Die Pilot-Recherche ist eine Schätzung. Marktdurchschnitt und Band stammen aus dem Marktbericht und tragen dort ihren Stand.</p>';
   return h + '</div>';
 }
