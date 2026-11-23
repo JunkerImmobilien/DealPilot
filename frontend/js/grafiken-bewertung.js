@@ -26,6 +26,8 @@
    ═══════════════════════════════════════════════════════════════════ */
 (function () {
   'use strict';
+  /* v4280a · Ende der Zinsbindung wie in der Pilot-Analyse: Monat des Kaufs im Jahr nach dem letzten vollen Bindungsjahr (03/2034 statt 2033) */
+  function zbEnde(letztesJahr) { if (letztesJahr == null) return null; var kd = String((document.getElementById('kaufdat') || {}).value || ''); var m = /^(\d{4})-(\d{2})/.exec(kd) || /^(\d{1,2})\.(\d{1,2})\.(\d{4})/.exec(kd); var mon = m ? m[2] : null; return (mon ? String(mon).padStart(2, '0') + '/' : '') + (Number(letztesJahr) + 1); }
   if (window.DpGrafikenBewertung) return;
 
   var AN = false, GRUEN = '#3FA56C', ROT = '#B8625C', _sig = '';
@@ -178,7 +180,7 @@
         tip: 'Cashflow vor Steuer <b>' + eurV(cfm) + '</b> im Monat' }));
     }
     if (!z.length) return '';
-    var ezbJ = C.years[C.ezbIdx] != null ? C.years[C.ezbIdx] : null;
+    var ezbJ = zbEnde(C.years[C.ezbIdx]);
     return '<div class="dp-gb-karte" data-gb="einordnung"><div class="gb-tip"></div><div class="dp-gb-eti">Einordnung</div>'
       + '<div class="dp-gb-t">Wo das Objekt gegenüber den Bankschwellen steht</div>'
       + '<p class="dp-gb-s">Goldener Strich: Zielmarke. Schwellen aus deinen Einstellungen (DSCR ' + nf2.format(s.dy) + ' und ' + nf2.format(s.dg) + ', Beleihung ' + nf0.format(s.lg) + ' %)' + (ezbJ ? '. Zinsbindung endet ' + ezbJ : '') + '.</p>'
@@ -380,7 +382,7 @@
       + (kipp != null ? (kipp > azP ? '. Ins Minus rutscht der Cashflow erst ab rund ' + nf1.format(kipp) + ' % Zins' : '. Schon bei dieser Annahme fehlt Geld, positiv wird es erst unter rund ' + nf1.format(kipp) + ' % Zins') : ', auch bei 15 % Zins bleibt er positiv')
       + (dscrKipp != null ? ', die Bankschwelle DSCR ' + nf2.format(s.dy) + ' reißt ab rund ' + nf1.format(dscrKipp) + ' %.' : '.');
     var pruef = Math.abs(basis.cf * 12 - cfA) < 1;
-    var ezbJ = D.C.years[D.C.ezbIdx];
+    var ezbJ = zbEnde(D.C.years[D.C.ezbIdx]);
     return '<div class="dp-gb-karte" data-gb="zinsrisiko"><div class="gb-tip"></div><div class="dp-gb-eti">Zinsrisiko · Modell</div>'
       + '<div class="dp-gb-t">Cashflow nach der Zinsbindung je Anschlusszins und Miete</div>'
       + '<p class="dp-gb-s">' + esc(satz) + ' Jede Zelle: Cashflow vor Steuer im Monat im ersten Jahr nach der Zinsbindung' + (ezbJ ? ' (' + ezbJ + ')' : '') + '. Gold umrandet ist die Annahme aus dem Reiter Finanzierung, „!“ heißt DSCR unter der Bankschwelle.</p>'
