@@ -364,6 +364,11 @@
       '.dp-pa-wrap .dp-ja button.dp-ja-fest{display:inline-flex;align-items:center;gap:5px;font:500 11.5px Inter,sans-serif !important;padding:3px 9px !important;min-height:0 !important;height:auto !important;border:1px dashed ' + RA + ' !important;background:#fff !important;box-shadow:none !important;color:' + M + ' !important;border-radius:8px !important;cursor:pointer;white-space:nowrap !important}',
       '.dp-pa-wrap .dp-ja button.dp-ja-fest.an{border-style:solid !important;border-color:rgba(63,165,108,.45) !important;color:#2f7d52 !important}',
       '.dp-pa-wrap .dp-ja-erg button.dp-ja-fest{margin-left:auto}',
+      /* v4150 · ein Jahr-Knopf an der Jahresauswahl, Karten ohne Knöpfe und ganz anklickbar */
+      '.dp-ja-jk{margin-left:auto;display:inline-flex;align-items:center;gap:10px;flex-wrap:wrap}.dp-ja-erg>.dp-ja-jk-t{margin-left:auto}',
+      '.dp-ja-jk-t{display:inline-flex;align-items:center;gap:5px;font:500 12px Inter,sans-serif;color:' + M + '}',
+      '.dp-pa-wrap .dp-ja-jk button.dp-ja-fest{margin-left:0}',
+      '.dp-ja-schritt:hover{background:color-mix(in srgb, ' + GOLD + ' 4%, #fff)}.dp-ja-schritt:focus-visible{outline:2px solid ' + GOLD + ';outline-offset:-2px}',
       '.dp-pa-wrap .dp-ja-schritt button.dp-ja-fest{margin-top:2px}',
       '.dp-ja-vivi{border:1px solid ' + LI + ';border-radius:10px;padding:10px 16px;margin-top:12px;background:#fff;display:flex;flex-direction:column;gap:4px}',
       '.dp-ja-vivi.dp-ja-vivi-kurz{flex-direction:row;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:6px 12px;padding:6px 6px 6px 16px}',   /* v4042b · eine Zeile */
@@ -451,14 +456,19 @@
   function pktKlasse(sx, lauf) { return lauf ? 'laufend' : (sx.n === 4 ? 'ok' : (sx.n >= 2 ? 'teil' : 'offen')); }
   var SCHLOSS = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>';
   /* v4016 · Schritt mit Nummer, Stand als Pille, festschreiben / wieder freigeben (nur vergangene Jahre) */
+  /* v4150 · Marcel 23.11.2026: „in den Karten Miete, Wert, Haus und Steuern die Buttons rausnehmen … weil wir ja oben drüber
+     schon die Buttons angeben. Und wir können das ja auch anklicken.“ Die Karte zeigt nur noch Stand, Wert und Satz und ist
+     ganz anklickbar (Klick = Schritt wählen). Ihre Knöpfe merkt sich _kn, die Führungsleiste zeigt sie. */
+  var _kn = {};
   function schritt(k, titel, s, wert, vgl, text, kn, jahr) {
+    _kn[k] = kn || '';
     var nr = SCHRITTE.map(function (x) { return x[0]; }).indexOf(k) + 1, fest = s.fest && s.fest[k], lauf = jahr >= heuteJahr();
     var stW = fest ? 'festgeschrieben' : WORT[s[k]];
-    var festKn = lauf ? '' : (fest
+    var festKn = '', _alt = lauf ? '' : (fest
       ? '<button type="button" class="btn-clean dp-ja-fest an" data-ja-aktion="freigeben" data-ja-schritt-k="' + k + '" title="Festgeschrieben am ' + esc(datumText(fest)) + '. Wieder freigeben, um ' + titel + ' ' + jahr + ' zu ändern.">' + SCHLOSS + ' wieder freigeben</button>'
       : '<button type="button" class="btn-clean dp-ja-fest" data-ja-aktion="festschreiben" data-ja-schritt-k="' + k + '" title="' + titel + ' ' + jahr + ' abschließen. Danach lässt sich der Schritt nicht mehr ändern, bis er freigegeben ist.">' + SCHLOSS + ' festschreiben</button>');
     return '<div class="dp-ja-schritt' + (fest ? ' fest' : '') + '" data-ja-schritt="' + k + '" data-ja-k="' + k + '"><div class="dp-ja-kk"><span class="dp-ja-nr">' + nr + '</span><b>' + titel + '</b><span class="st dp-ja-st-' + (fest ? 'fest' : s[k]) + '">' + stW + '</span></div>'
-      + '<div class="dp-ja-w">' + wert + '</div><div class="dp-ja-vgl">' + vgl + '</div><p>' + text + '</p>' + (fest ? '' : kn) + festKn + '</div>';
+      + '<div class="dp-ja-w">' + wert + '</div><div class="dp-ja-vgl">' + vgl + '</div><p>' + text + '</p></div>';   /* v4150 · Knöpfe stehen nur in der Führungsleiste (_kn je Schritt) */
   }
   function abschnitt(t, eti) { return '<div class="dp-ja-abs"><h4>' + t + '</h4>' + (eti ? '<span class="dp-ja-eti">' + eti + '</span>' : '') + '</div>'; }
 
@@ -535,7 +545,7 @@
     var pl = planZeile(z.jahr), pr = projZeile(z.jahr), lauf = z.jahr >= heuteJahr();
 
     var out = '<div class="dp-ja" data-dp-ja="1">';
-    try { out += wechselHtml(Z, weg, L); } catch (e) {}   /* v4100 · Jahreswechsel */
+    /* v4150 · Hinweiszeile wechselHtml entfällt, der Knopf steht an der Jahresauswahl (jahrKn) */
     /* v4016 · Die Erinnerung „Jahresabgleich 2025: 2 von 4" stand oben über JEDEM gewählten Jahr (Marcel 23.11.2026:
        „bleibt beim Wechsel der Jahre stehen"). Jetzt sagt der Kopf nur das gewählte Jahr; offene Jahre zeigt die
        Jahresleiste mit Punkt und Zahl. */
@@ -551,9 +561,13 @@
     /* v4110 · Marcel 23.11.2026: „Der Button ‚2025 fertig machen‘ könnte auch oben mit unter ‚2025 ist vorbei. Du kannst es
        jetzt abschließen.‘, ist sonst doppelt.“ Der Knopf steht nur noch in der Hinweiszeile (wechselHtml), die dem gewählten
        Jahr folgt. */
-    var jahrKn = (lauf ? '' : (s.nFest === 4
-      ? '<button type="button" class="btn-clean dp-ja-fest an" data-ja-aktion="freigeben" title="Alle vier Schritte von ' + z.jahr + ' wieder freigeben.">' + SCHLOSS + ' Jahr ' + z.jahr + ' wieder freigeben</button>'
-      : '<button type="button" class="btn-clean dp-ja-fest" data-ja-aktion="festschreiben" title="Alle vier Schritte von ' + z.jahr + ' festschreiben und das Jahr abschließen. Wieder freigeben geht jederzeit.">' + SCHLOSS + ' Jahr ' + z.jahr + ' festschreiben</button>'));
+    /* v4150 · Marcel 23.11.2026: „nicht ganz übersichtlich mit dem 2025 oder 2024 fertig machen … irgendwo anders besser
+       positionieren“. EIN Knopf an der Jahresauswahl, er folgt dem gewählten Jahr: vorbei und offen „<Jahr> fertig machen“
+       (öffnet den Assistenten, festgeschrieben wird dort in Schritt 5), ganz festgeschrieben „wieder freigeben“, laufendes
+       Jahr kein Knopf. Die Hinweiszeile „<Jahr> ist vorbei“ (wechselHtml, v4100/v4110) entfällt. */
+    var jahrKn = lauf ? '<span class="dp-ja-jk-t">' + z.jahr + ' läuft noch</span>' : (s.nFest === 4
+      ? '<span class="dp-ja-jk"><span class="dp-ja-jk-t">' + SCHLOSS + ' ' + z.jahr + ' festgeschrieben</span><button type="button" class="btn-clean dp-ja-fest an" data-ja-aktion="freigeben" title="Alle vier Schritte von ' + z.jahr + ' wieder freigeben.">wieder freigeben</button></span>'
+      : '<span class="dp-ja-jk"><span class="dp-ja-jk-t">' + (s.n === 4 ? 'Alles erledigt, nur noch festschreiben' : z.jahr + ' ist vorbei') + '</span>' + knopf('fertig', z.jahr + ' fertig machen', true, z.jahr) + '</span>');
     out += '<div class="dp-ja-erg"><div class="dp-ja-jahre" role="group" aria-label="Jahr wählen">' + Z.slice().reverse().map(function (x) {
         var sx = stand(x, weg, L), xl = x.jahr >= heuteJahr();
         var tt = standText(sx, x.jahr) + (!xl && sx.offen.length ? '. Offen: ' + sx.offen.join(', ') : '');
@@ -782,8 +796,8 @@
      ist, der Knopf dafür, zurück und weiter. Aktiv ist der erste offene Schritt, bis der Nutzer selbst wählt
      (_fuehrung je Jahr). Nur für vergangene Jahre, das laufende Jahr läuft noch. */
   function aktiverSchritt(z, s, lauf) {
-    if (lauf) return null;
     var w = _fuehrung[z.jahr];
+    if (lauf) return w && SCHRITTE.some(function (x) { return x[0] === w; }) ? w : 'miete';   /* v4150 · auch das laufende Jahr zeigt die Knöpfe des gewählten Schritts */
     if (w && SCHRITTE.some(function (x) { return x[0] === w; })) return w;
     var o = SCHRITTE.filter(function (x) { return s[x[0]] !== 'ok'; })[0];
     return o ? o[0] : null;
@@ -809,7 +823,6 @@
           kn: knopf('steuer', 'Anlage V ' + J + ' ' + (z.status === 'geplant' ? 'ausfüllen' : 'ansehen'), true) + ' ' + knopf('eintragen', 'Stand setzen', false, J) };
   }
   function fuehrungHtml(z, s, lauf, akt, weg) {
-    if (lauf) return '';
     var ks = SCHRITTE.map(function (x) { return x[0]; });
     var punkte = '<ol class="dp-ja-f-p" aria-label="Ablauf ' + z.jahr + '">' + SCHRITTE.map(function (x, i) {
       var st = s.fest && s.fest[x[0]] ? 'ok' : s[x[0]];
@@ -817,13 +830,17 @@
         + '<i>' + (st === 'ok' ? '✓' : (i + 1)) + '</i><span class="w">' + x[1] + '</span></button></li>';
     }).join('') + '</ol>';
     if (!akt) return '<div class="dp-ja-fuehrung fertig">' + punkte + '<div class="dp-ja-f-t"><b>' + z.jahr + ' ist abgeglichen.</b> ' + (s.nFest === 4 ? 'Alle Schritte sind festgeschrieben.' : 'Schreib das Jahr fest, dann bleibt es so stehen.') + '</div></div>';
-    var i = ks.indexOf(akt), a = aufgabe(akt, z, s, weg), st = s.fest && s.fest[akt] ? 'ok' : s[akt];
-    return '<div class="dp-ja-fuehrung">' + punkte
-      + '<div class="dp-ja-f-t"><span class="dp-ja-eti">Schritt ' + (i + 1) + ' von 4 · ' + SCHRITTE[i][1] + ' · ' + (st === 'ok' ? 'erledigt' : WORT[st]) + '</span><span>' + esc(a.t) + '</span></div>'
-      + '<div class="dp-ja-f-k">' + a.kn
-      + (i > 0 ? '<button type="button" class="btn-clean dp-pa4-btn dp-ja-f-nav" data-ja-aktion="f-zurueck" data-ja-k="' + akt + '">Zurück</button>' : '')
-      + (i < 3 ? '<button type="button" class="btn-clean dp-pa4-btn dp-ja-f-nav" data-ja-aktion="f-weiter" data-ja-k="' + akt + '">Weiter</button>' : '')
-      + '</div></div>';
+    var i = ks.indexOf(akt), st = s.fest && s.fest[akt] ? 'ok' : s[akt], fest = s.fest && s.fest[akt];
+    /* v4150 · Marcel 23.11.2026: „in der Strecke ja auch kein Weiter und Zurück, sondern geben dann nur die Buttons an“.
+       Die Punkte und die Karten wählen den Schritt, hier stehen nur seine Knöpfe (dieselben wie bisher in der Karte) und
+       klein „Schritt festschreiben“ bzw. „wieder freigeben“. Laufendes Jahr: Knöpfe der Karte, kein Festschreiben. */
+    var a = lauf ? { t: 'Das Jahr ' + z.jahr + ' läuft noch. Abgleich ab Februar ' + (z.jahr + 1) + '.', kn: _kn[akt] || '' } : aufgabe(akt, z, s, weg);
+    var festK = lauf ? '' : (fest
+      ? '<button type="button" class="btn-clean dp-ja-fest an" data-ja-aktion="freigeben" data-ja-schritt-k="' + akt + '" title="Festgeschrieben am ' + esc(datumText(fest)) + '. Wieder freigeben, um ' + SCHRITTE[i][1] + ' ' + z.jahr + ' zu ändern.">' + SCHLOSS + ' wieder freigeben</button>'
+      : '<button type="button" class="btn-clean dp-ja-fest" data-ja-aktion="festschreiben" data-ja-schritt-k="' + akt + '" title="' + SCHRITTE[i][1] + ' ' + z.jahr + ' abschließen. Danach lässt sich der Schritt nicht mehr ändern, bis er freigegeben ist.">' + SCHLOSS + ' Schritt festschreiben</button>');
+    return '<div class="dp-ja-fuehrung' + (lauf ? ' lauf' : '') + '">' + punkte
+      + '<div class="dp-ja-f-t"><span class="dp-ja-eti">' + (lauf ? z.jahr + ' · ' + SCHRITTE[i][1] + ' · läuft' : 'Schritt ' + (i + 1) + ' von 4 · ' + SCHRITTE[i][1] + ' · ' + (st === 'ok' ? 'erledigt' : WORT[st])) + '</span><span>' + esc(a.t) + '</span></div>'
+      + '<div class="dp-ja-f-k">' + a.kn + festK + '</div></div>';
   }
   /* v4090 · Rückfrage vor dem Freigeben und Protokoll des Jahres */
   /* ── v4100 · Jahr fertig machen ─────────────────────────────────────
@@ -874,11 +891,7 @@
     var s = stand(z, weg, L); if (s.nFest === 4) return null;
     return { jahr: j, alleOk: s.n === 4 };
   }
-  function wechselHtml(Z, weg, L) {
-    var w = wechselJahr(Z, weg, L, _gewaehlt); if (!w) return '';
-    return '<div class="dp-ja-wechsel"><span><b>' + w.jahr + ' ist vorbei.</b> ' + (w.alleOk ? 'Alle Schritte sind erledigt, du kannst es festschreiben.' : 'Du kannst es jetzt abschließen.') + '</span>'
-      + knopf('fertig', w.jahr + ' fertig machen', true, w.jahr) + '</div>';
-  }
+  /* v4150 · wechselHtml (Hinweiszeile „<Jahr> ist vorbei“ mit Knopf) entfällt, der Knopf steht an der Jahresauswahl (jahrKn) */
   function frageHtml(jahr) {
     if (!_frage || _frage.jahr !== jahr) return '';
     var w = _frage.k ? (SCHRITTE.filter(function (x) { return x[0] === _frage.k; })[0] || ['', _frage.k])[1] + ' ' + jahr : 'Das ganze Jahr ' + jahr;
@@ -909,7 +922,7 @@
     host.addEventListener('click', function (ev) {
       if (ev.target && ev.target.closest && ev.target.closest('.dp-jb-inline,.dp-tip')) return;   /* v4090 · die Eingabe bindet selbst (DpJahresbuch.eingabeBinden) */
       var b = ev.target && ev.target.closest ? ev.target.closest('[data-ja-aktion],[data-ja-jahr]') : null;
-      if (!b) { var kc = ev.target && ev.target.closest ? ev.target.closest('.dp-ja-schritt[data-ja-k]') : null; if (kc && _gewaehlt < heuteJahr() && !(ev.target.closest('a,input,select'))) { _fuehrung[_gewaehlt] = kc.getAttribute('data-ja-k'); mountAll(); } return; }
+      if (!b) { var kc = ev.target && ev.target.closest ? ev.target.closest('.dp-ja-schritt[data-ja-k]') : null; if (kc && !(ev.target.closest('a,input,select'))) { _fuehrung[_gewaehlt] = kc.getAttribute('data-ja-k'); mountAll(); } return; }
       ev.preventDefault();
       var a = b.getAttribute('data-ja-aktion');
       if (!a) { var j = +b.getAttribute('data-ja-jahr'); if (j) { _gewaehlt = j; mountAll(); } return; }
@@ -968,5 +981,6 @@
     hgViviRein: hgViviRein, hausMitViviRein: hausMitViviRein, offenListe: offenListe, fertigErgebnis: fertigErgebnis,   /* v4100 */
     standFuer: function (j) { var z = zeileJahr(j), w = mitWeg(); return z ? { z: z, s: stand(z, w, hausLesen()), weg: w } : null; },
     viviVerknuepft: viviVerknuepft, viviAbgleichen: viviAbgleichen, viviHgJahr: viviHgJahr, zuMiete: zuMiete, zuReiter: zuReiter, hervorheben: hervorheben,
-    anlageVErlaubt: anlageVErlaubt, zuAnlageV: zuAnlageV, wechselJahr: wechselJahr };   /* v4110 */
+    anlageVErlaubt: anlageVErlaubt, zuAnlageV: zuAnlageV, wechselJahr: wechselJahr,   /* v4110 */
+    schritt: schritt };   /* v4150 · für den Prüfer */
 })(typeof window !== 'undefined' ? window : globalThis);

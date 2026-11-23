@@ -194,7 +194,7 @@
     var inh = ov.querySelector('.oabi-body'); inh.innerHTML = inhalt; inh.scrollTop = 0;
     /* v4110 · erster Knopf im Fuß ist Schließen: das × der Obsidian-Leiste klickt den ersten .oabi-btn ohne primary */
     ov.querySelector('.oabi-foot').innerHTML = knopf('zu', 'Schließen', false) + '<span>' + esc(_z.jahr + ' · ' + SCHRITTE.filter(function (x) { return r.st[x[0]] === 'ok' || r.st[x[0]] === 'fest'; }).length + ' von 5 erledigt') + '</span>'
-      + (i > 0 ? knopf('zurueck', 'Zurück', false) : '') + (i < 4 ? knopf('weiter', 'Weiter', true) : '');
+      + (i < 4 ? knopf('weiter', 'Weiter: ' + SCHRITTE[i + 1][1], true) : '');   /* v4150 · Marcel: kein Zurück, die Reiter oben wählen jeden Schritt; Weiter nennt den nächsten */
     /* eingebettete Bausteine */
     var e = inh.querySelector('[data-jab-eingabe]'), B = JB();
     if (e && B && B.eingabeHtml) {

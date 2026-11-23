@@ -229,10 +229,17 @@ const K = c.DpMietpotenzial, E = c.DpErhoehungen, JA = c.DpJahresabgleich, HV = 
   ok(J5.SCHRITTE.map((x) => x[1]).join(',') === 'Miete,Wert,Haus,Steuer', 'A Reihenfolge Miete, Wert, Haus, Steuer');
   const s1 = { miete: 'ok', wert: 'offen', haus: 'teil', steuer: 'offen', fest: {}, nFest: 0 };
   ok(J5.aktiverSchritt({ jahr: 2025 }, s1, false) === 'wert', 'A Ablauf startet beim ersten offenen Schritt (Wert)');
-  ok(J5.aktiverSchritt({ jahr: 2026 }, s1, true) === null, 'A laufendes Jahr ohne Ablauf');
+  ok(J5.aktiverSchritt({ jahr: 2026 }, s1, true) === 'miete', 'A laufendes Jahr: Leiste beim Schritt Miete (v4150, Knöpfe nur noch dort)');
   ok(J5.aktiverSchritt({ jahr: 2025 }, { miete: 'ok', wert: 'ok', haus: 'ok', steuer: 'ok', fest: {}, nFest: 0 }, false) === null, 'A alles erledigt: kein aktiver Schritt');
   const fh = J5.fuehrungHtml({ jahr: 2025, status: 'geplant' }, s1, false, 'wert', true);
-  ok(/Schritt 2 von 4 · Wert · offen/.test(fh) && /data-ja-aktion="f-zurueck"/.test(fh) && /data-ja-aktion="f-weiter"/.test(fh), 'A Leiste: Schritt 2 von 4, zurück und weiter');
+  ok(/Schritt 2 von 4 · Wert · offen/.test(fh) && !/f-zurueck|f-weiter/.test(fh) && /data-ja-aktion="festschreiben" data-ja-schritt-k="wert"/.test(fh) && /data-ja-aktion="wert"/.test(fh), 'A Leiste (v4150): Schritt 2 von 4, Knöpfe des Schritts und Schritt festschreiben, kein Zurück/Weiter');
+  { const sk = J5.schritt('miete', 'Miete', { miete: 'offen', fest: {} }, '1 €', 'Plan 1 €', 'Satz.', '<button type="button" data-ja-aktion="miete">X</button>', 2025);
+    ok(!/<button/.test(sk) && /data-ja-k="miete"/.test(sk), 'L Karte ohne Knöpfe und ohne festschreiben, anklickbar über data-ja-k (v4150)');
+    const fl = J5.fuehrungHtml({ jahr: 2026, status: 'geplant' }, s1, true, 'miete', true);
+    ok(/data-ja-aktion="miete"/.test(fl) && !/festschreiben/.test(fl) && /läuft noch/.test(fl), 'L laufendes Jahr: Leiste mit den Knöpfen der Karte, ohne Festschreiben'); }
+  { const sf = { miete: 'ok', wert: 'ok', haus: 'teil', steuer: 'offen', fest: { wert: '2026-11-23' }, nFest: 1 };
+    const ff = J5.fuehrungHtml({ jahr: 2025, status: 'geplant' }, sf, false, 'wert', true);
+    ok(/data-ja-aktion="freigeben" data-ja-schritt-k="wert"/.test(ff) && !/data-ja-aktion="festschreiben"/.test(ff), 'L festgeschriebener Schritt: nur wieder freigeben'); }
   ok(!/f-weiter/.test(J5.fuehrungHtml({ jahr: 2025, status: 'geplant' }, s1, false, 'steuer', true)), 'A letzter Schritt ohne weiter');
   let texte = '';
   for (const k of ['miete', 'wert', 'haus', 'steuer']) for (const st of ['ok', 'offen']) for (const weg of [true, false]) texte += J5.aufgabe(k, { jahr: 2025, status: 'geplant' }, Object.assign({}, s1, { [k]: st }), weg).t + '\n';
@@ -346,7 +353,9 @@ const K = c.DpMietpotenzial, E = c.DpErhoehungen, JA = c.DpJahresabgleich, HV = 
   ok(as.includes("ov.querySelector('.oabi-foot').innerHTML = knopf('zu', 'Schließen', false)"), 'E erster Fuß-Knopf ist Schließen (das × der Leiste klickt ihn)');
   ok(as.includes("(anlageVErlaubt() ? knopf('anlage-v'") && as.includes('JA().zuAnlageV(J)'), 'E Absprung zur Anlage V nur mit Stufe und bis zur Anlage V');
   ok(/function zuAnlageV\(\) \{[\s\S]{0,420}yearly-tax-form-box[\s\S]{0,700}nav\.tabs[\s\S]{0,400}scrollBy\(\{ top: dy/.test(ja) && ja.includes("if (a === 'steuer') { zuAnlageV(); return; }"), 'E Absprung wartet auf die Anlage V und rollt hin');
-  ok(!ja.includes('dp-ja-fertig-k') && /function wechselHtml[\s\S]{0,400}knopf\('fertig', w\.jahr \+ ' fertig machen'/.test(ja), 'E „fertig machen“ nur noch in der Hinweiszeile');
+  ok(!ja.includes('dp-ja-fertig-k') && !/function wechselHtml/.test(ja) && !/out \+= wechselHtml/.test(ja) && (ja.match(/knopf\('fertig'/g) || []).length === 1 && /var jahrKn = lauf[\s\S]{0,900}knopf\('fertig', z\.jahr \+ ' fertig machen', true, z\.jahr\)/.test(ja), 'L „fertig machen“ genau einmal, an der Jahresauswahl des gewählten Jahres (v4150)');
+  ok(/var jahrKn = lauf \? '<span class="dp-ja-jk-t">' \+ z\.jahr \+ ' läuft noch/.test(ja) && /s\.nFest === 4[\s\S]{0,300}data-ja-aktion="freigeben"/.test(ja), 'L laufendes Jahr ohne Knopf, festgeschrieben: wieder freigeben an derselben Stelle');
+  ok(!/knopf\('zurueck'/.test(as) && /knopf\('weiter', 'Weiter: ' \+ SCHRITTE\[i \+ 1\]\[1\]/.test(as), 'L Assistent ohne Zurück, Weiter nennt den nächsten Schritt');
 }
 
 console.log(`jahresabgleich-pruefen (v3430): ${gruen} von ${gruen + rot} ok`);
