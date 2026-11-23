@@ -3552,7 +3552,7 @@ button[onclick="QcApp.openQc6Settings()"] { display:none !important; }
 </head>
 <body class="dp-neue-karte"><!-- qb-rename-v699 · v1645: die Marke fest - dieses Dokument ist IMMER hell -->
 
-<canvas id="particle-canvas"></canvas>
+<!-- v4000 · bewegliche Partikel im Hintergrund raus (Marcel 23.11.2026): Leinwand entfernt, die Zeichenschleife unten kehrt ohne sie sofort zurueck -->
 
 <div class="container">
 
@@ -4446,7 +4446,7 @@ const QcEngine = (function() {
     });
     requestAnimationFrame(draw);
   }
-  if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) draw();
+  /* v4000: keine Partikel mehr, draw() wird nie gestartet */
 })();
 
 /* ═══════════════════════════════════════════════════════════════════
@@ -8280,6 +8280,8 @@ html.qc-embedded, html.qc-embedded body{ min-height:0 !important; height:auto !i
   var CATS=['rendite','cashflow','ltv','risiko','potenzial'];
   var CATL={rendite:'Rendite',cashflow:'Cashflow',ltv:'LTV',risiko:'Risiko',potenzial:'Potenzial'};
   /* qc-v2420: nur die fuenf Groessen, die in den Score eingehen (DealScore.computeFromKpis) */
+  /* v4000 · Marcel 23.11.2026: am Handy stehen die Kennzahlen klein unter dem passenden Balken, die eigene Zeile #qb-kt faellt dort weg */
+  var CATK={rendite:['kpi-nmr','Nettomietrendite'],cashflow:['kpi-cf','Cashflow/Mo'],ltv:['kpi-ltv','LTV'],risiko:['kpi-dscr','DSCR'],potenzial:['kpi-wp','Wertpuffer']};
   var KPI=[['kpi-cf','Cashflow/Mo','\u22650\u20ac'],['kpi-nmr','Nettomietr.','\u22653%'],['kpi-ltv','LTV','<90%'],
            ['kpi-dscr','DSCR','\u22651,2'],['kpi-wp','Wertpuffer','Marktwert \u2212 KP']];
   function tc(s){return s>=70?'#3FA56C':s>=50?window._qcGold('--gold', '#C9A84C'):'#B8625C';}
@@ -8352,7 +8354,8 @@ html.qc-embedded, html.qc-embedded body{ min-height:0 !important; height:auto !i
       var v=num(document.getElementById('sub-'+name+'-v'));
       var w=(v==null?0:Math.max(0,Math.min(100,v)));
       var col=(v==null?'rgba('+window._qcGoldRGB()+',.3)':tc(v));
-      return '<div class="cb"><span class="cl">'+CATL[name]+'</span><div class="bar"><i style="width:'+w+'%;background:'+col+'"></i></div><span class="cv" style="color:'+(v==null?'#9a9080':th(v))+'">'+(v==null?'\u2013':v)+'</span></div>';
+      var kk=CATK[name], ks=document.getElementById(kk[0]), kv=ks?ks.querySelector('.v'):null, kt=kv?(kv.textContent||'').trim():''; if(!kt) kt='\u2014';
+      return '<div class="cb"><span class="cl">'+CATL[name]+'</span><div class="bar"><i style="width:'+w+'%;background:'+col+'"></i></div><span class="cv" style="color:'+(v==null?'#9a9080':th(v))+'">'+(v==null?'\u2013':v)+'</span><span class="ck">'+kk[1]+' <b>'+kt+'</b></span></div>';
     }).join(''); }
     var kt=document.getElementById('qb-kt');
     if(kt){ kt.innerHTML=KPI.map(function(k){
@@ -9011,6 +9014,60 @@ html[data-dp-heute] body.dp-neue-karte #qc7-sources .dp-pf-sep{ display:block !i
 })();
 </script>
 
+<style id="qc-v4000-optik">
+/* v4000 · Quick-Check-Optik (Marcel 23.11.2026), gemessen per getComputedStyle im Reiter Objekt der Haupt-App
+   (Desktop und 390 px) gegen dieses Dokument:
+     Seite     Haupt-App .body rgb(244,242,237) ohne Muster; hier #F8F6F1 plus zwei Goldschimmer (body::before)
+               und die bewegten Partikel -> Grund wie die Haupt-App, Schimmer und Partikel weg
+     Eingabe   Rand im Ruhezustand rgb(230,225,214) = #E6E1D6; hier #E0DBD3 (Fokus, Herkunft und Pflichtmarke
+               behalten ihre eigenen, spezifischeren Regeln)
+     Label     Zeilenhoehe 20 px (hier 16,5 bzw. 15,75)
+     Handy     Karte unten 12 px (hier 16), Kartenkopf unten 10 px (hier 12)
+     Adresse   Haupt-App am Handy "str str str hnr" / "plz plz ort ort", hier 3fr 1fr -> PLZ 160, Ort 53 px */
+html.qc-app body { background: #F4F2ED !important; background-image: none !important; }
+html.qc-app body::before { display: none !important; background: none !important; }
+#particle-canvas { display: none !important; }
+
+body.dp-neue-karte .card .field > input[type="text"],
+body.dp-neue-karte .card .field > input[type="number"],
+body.dp-neue-karte .card .field > select { border-color: #E6E1D6; }
+body.dp-neue-karte .card .field > label { line-height: 20px; }
+
+@media (max-width: 699px) {
+  body.dp-neue-karte .card .row.row-adr { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px 12px; }
+  body.dp-neue-karte .card .row.row-adr > .field:nth-child(1) { grid-column: span 3; }
+  body.dp-neue-karte .card .row.row-adr > .field:nth-child(3),
+  body.dp-neue-karte .card .row.row-adr > .field:nth-child(4) { grid-column: span 2; }
+}
+
+/* Abrufen: keine weisse Pille mit Rand mehr hinter dem Knopf (alle Kartenstile) */
+html.qc-app body #qc7-sources.dp-pfbar .dp-pf-rz {
+  background: transparent !important; background-image: none !important;
+  border: 0 !important; box-shadow: none !important;
+}
+html.qc-app body #qc7-sources.dp-pfbar .dp-pf-rz::before,
+html.qc-app body #qc7-sources.dp-pfbar .dp-pf-rz::after { display: none !important; }
+
+/* Kennzahlen klein unter dem passenden Balken; nur schmal sichtbar */
+#qb-bp .cb .ck { display: none; }
+@media (max-width: 640px) {
+  /* Doppelte Kopfzeile: "Datenaufnahme · Quellen waehlen" steht schon darueber, der dunkle Pass-Kopf faellt weg */
+  html.qc-app body #qc7-sources.dp-pfbar .dp-pf-lead,
+  html.qc-app body #qc7-sources.dp-pfbar .dp-pf-perf { display: none !important; }
+
+  body.dp-neue-karte .card { margin-bottom: 12px; }
+  body.dp-neue-karte .card > .card-title { margin-bottom: 10px; }
+
+  #qb-bp .kt { display: none !important; }
+  #qb-bp .cbars { gap: 7px; }
+  #qb-bp .cb { flex-wrap: wrap; row-gap: 1px; }
+  #qb-bp .cb .ck {
+    display: block; flex: 0 0 100%; padding-left: 84px;
+    font: 500 10px/1.3 'Inter', system-ui, sans-serif; color: #7A7370;
+  }
+  #qb-bp .cb .ck b { font-weight: 700; color: #2A2727; margin-left: 3px; }
+}
+</style>
 <script src="js/pilot-tower.js?v=v3223"></script><!-- v2188: Bruecke F1/? zum Piloten im Elternfenster -->
 </body>
 </html>
