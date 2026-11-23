@@ -659,7 +659,8 @@
         /* v4100 · ViVi: abgleichen (nur lesen), Jahr der Karte, nach „übernehmen“ neu zeichnen */
         if (t.closest && t.closest('[data-bj-vivi]')) {
           var kb = t.closest('[data-bj-vivi]'); kb.disabled = true; kb.textContent = 'ViVi wird gelesen …';
-          Promise.resolve(window.DpVivi.abgleichen(false)).then(function () { return new Promise(function (r) { setTimeout(r, 1500); }); })
+          (window.DpVorschau && window.DpVorschau.frei ? window.DpVorschau.frei('vivi').catch(function () { return false; }) : Promise.resolve(false))   /* Vorschau-Funktion vivi */
+            .then(function (ok) { return ok ? window.DpVivi.abgleichen(false) : null; }).then(function () { return new Promise(function (r) { setTimeout(r, 1500); }); })
             .then(function () { jahresInRahmen(box, _jbJahr); }, function () { jahresInRahmen(box, _jbJahr); });
           return;
         }
