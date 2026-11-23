@@ -17,7 +17,7 @@
  * ═══════════════════════════════════════════════════════════════════════════════════════════════════════════════ */
 (function (global) {
   'use strict';
-  var VERSION = 'v4040g';
+  var VERSION = 'v4040h';
   if (!global.document || global.DpViviReiter) return;
   var doc = global.document;
   var _jahr = null, _offen = {};
@@ -98,6 +98,7 @@
   function statusHtml(z) {
     if (z.aktion === 'gleich') return '<span class="vr-ok">✓ gleich</span>';
     if (z.aktion === 'laufend') return '<span class="vr-grau">' + (istZahl(z.abwBisHeute) ? vz(z.abwBisHeute) + ' bis heute' : 'läuft') + '</span>';
+    if (z.aktion === 'zusatz') return '<span class="vr-grau">' + vz(z.abw) + '</span>';
     if (z.aktion === 'vergleich') return '<span class="vr-grau">' + vz(z.abw) + '</span>';
     if (z.aktion === 'ausserhalb' || z.aktion === 'ohne_posten') return '<span class="vr-grau">' + (istZahl(z.abw) ? vz(z.abw) : 'offen') + '</span>';
     /* Belegzeilen: ViVi-Belege kommen DAZU (Kern: addieren), die Zahl ist die Summe der neuen Belege, nicht die Differenz */
@@ -137,15 +138,26 @@
       + (d == null ? '' : Math.abs(d) < 50 ? '<span class="vr-ok">✓ gleich</span>' : '<span class="vr-ab">' + vz(-d) + '</span>') + '</td><td></td></tr>';
   }
   var _letzte = {};
-  function jahrHtml(jahr) {
+  function abgleichJahr(jahr) {
     var S = global.DpViviSteuer, a = S && S.abgleich ? S.abgleich(jahr) : { zeilen: [], offen: 0 };
+    /* Mieteinnahmen: ViVi kennt nicht alle Zusatzeinnahmen (Stellplatz, Garage, Sonstiges aus dem Reiter Miete). Ist die
+       Abweichung genau ein Vielfaches davon, wäre „übernehmen“ falsch (gemessen 2026-1052: 12 × 90 €). Dann kein Knopf. */
+    var ze = zahl(($('ze') || {}).value) || 0;
+    a.zeilen.forEach(function (z) {
+      if (z.spalte !== 'einnahmen_km' || z.aktion !== 'uebernehmen' || !(ze > 0) || !istZahl(z.abw)) return;
+      for (var m = 1; m <= 12; m++) if (Math.abs(z.abw + ze * m) < 1) { z.aktion = 'zusatz'; z.grund = 'Der Unterschied sind ' + m + ' × ' + eur(ze) + ' Zusatzeinnahmen aus dem Reiter Miete, die ViVi nicht führt. DealPilot bleibt.'; a.offen = Math.max(0, a.offen - 1); break; }
+    });
+    return a;
+  }
+  function jahrHtml(jahr) {
+    var a = abgleichJahr(jahr);
     _letzte[jahr] = a;
     var rows = mieteZeile(jahr);
     a.zeilen.forEach(function (z, i) {
       if (z.spalte === 'afa') return;   /* AfA rechnet DealPilot selbst, steht im Jahresabgleich zum Vergleich */
       var L = belege(jahr, z), key = jahr + '|' + z.spalte, auf = !!_offen[key];
       var kn = z.aktion === 'uebernehmen' && !a.gesperrt ? '<button type="button" class="btn-clean vr-k" data-vr="eins" data-vr-jahr="' + jahr + '" data-vr-i="' + i + '">übernehmen</button>' : '';
-      var unter = (z.aktion === 'laufend' || z.aktion === 'ausserhalb' || z.aktion === 'ohne_posten') && z.grund ? '<small>' + esc(z.grund) + '</small>' : '';
+      var unter = (z.aktion === 'laufend' || z.aktion === 'ausserhalb' || z.aktion === 'ohne_posten' || z.aktion === 'zusatz') && z.grund ? '<small>' + esc(z.grund) + '</small>' : '';
       if (z.unvollstaendig) unter += '<small>' + esc(z.unvollstaendig) + '</small>';
       rows += '<tr class="vr-z' + (L.length ? ' vr-auf' : '') + '"' + (L.length ? ' data-vr="belege" data-vr-key="' + esc(key) + '"' : '') + '><td><b>' + esc(z.label) + '</b>'
         + (z.spalte === 'schuldzinsen' ? zinsAmpel(z) : '') + (L.length ? '<span class="vr-n">' + L.length + ' Beleg' + (L.length === 1 ? '' : 'e') + (auf ? ' ▴' : ' ▾') + '</span>' : '') + unter + '</td>'
@@ -245,7 +257,7 @@
     if (_jahr == null || J.indexOf(_jahr) < 0) _jahr = J.indexOf(h - 1) >= 0 ? h - 1 : J[J.length - 1];
     var S = global.DpViviSteuer;
     var pills = J.map(function (j) {
-      var n = 0; try { n = S && S.abgleich ? S.abgleich(j).offen : 0; } catch (e) { n = 0; }
+      var n = 0; try { n = abgleichJahr(j).offen; } catch (e) { n = 0; }
       return '<button type="button" class="btn-clean" data-vr="jahr" data-vr-jahr="' + j + '" aria-pressed="' + (j === _jahr) + '">' + j + (n ? '<i>' + n + '</i>' : '') + '</button>';
     }).join('');
     var kopf = '<div class="vr-kopf"><span class="vr-marke">ViVi</span><b>Abgleich mit ViVi</b><span class="vr-stand">' + (st && st.letzter_abruf ? 'Stand ' + esc(datumText(String(st.letzter_abruf).slice(0, 10))) : (st ? '' : 'lädt…')) + '</span>'
@@ -296,7 +308,7 @@
     if (was === 'beleg') { try { global.DpEingang.jahresAnsicht(j); } catch (e) {} return; }
     var S = global.DpViviSteuer;
     if (was === 'eins' || was === 'alle') {
-      var a = _letzte[j] || (S && S.abgleich(j)); if (!a || !S) return;
+      var a = _letzte[j] || abgleichJahr(j); if (!a || !S) return;
       var zeilen = was === 'alle' ? a.zeilen.filter(function (z) { return z.spalte !== 'afa'; }) : [a.zeilen[Number(b.getAttribute('data-vr-i'))]];
       var n = S.uebernehmen(j, zeilen, false);
       if (n) meldung(n + ' Wert' + (n === 1 ? '' : 'e') + ' aus ViVi in das Steuerjahr ' + j + ' übernommen');

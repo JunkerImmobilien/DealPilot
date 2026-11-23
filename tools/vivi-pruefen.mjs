@@ -1231,6 +1231,7 @@ kopf('V  v4040 Reiter ViVi, Bewirtschaftung Ist heute aus dem Steuerjahr');
   ok(/function sichtbar\(\) \{[^}]*verknuepft[^}]*!einsteiger\(\)/.test(vr), 'V7 sichtbar(): nur verknüpft und nicht Einsteiger');
   ok(/S\.uebernehmen\(j, zeilen, false\)/.test(vr) && /JB\.festSetzen\(j, \['miete', 'steuer'\], true\)/.test(vr) && !/dpSteuerSetzen|dpWkUebernehmen/.test(vr),
     'V8 Reiter schreibt nur über die vorhandenen Kerne (DpViviSteuer.uebernehmen, DpJahresbuch.festSetzen), keine eigene Steuerschreibung');
+  ok(/z\.aktion = 'zusatz'/.test(vr) && /Math\.abs\(z\.abw \+ ze \* m\) < 1/.test(vr), 'V10 Mieteinnahmen: Abweichung = Zusatzeinnahmen, die ViVi nicht führt, wird nicht übernommen (2026-1052: 12 × 90 €)');
   const dn = quelle('backend/src/services/vivi/viviDienst.js');
   ok(/steuer\.bewirtschaftungAus\(st\._felder/.test(dn) && /delete st\._felder/.test(dn), 'V9 abrufen: Bewirtschaftung aus dem gelesenen Steuerjahr, _felder geht nicht an den Browser');
 }
