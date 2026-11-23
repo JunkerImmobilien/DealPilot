@@ -1436,8 +1436,8 @@
     if (T && zahl(T.potenzial) && T.potenzial > 0) satz.push((satz.length ? 'die Aufteilung ' : 'Die Aufteilung bringt ') + '<b>+' + eur(T.potenzial) + '</b>' + (satz.length ? '' : ' Wert'));
     var s = satz.length ? satz.join(', ').replace(/^(.)/, function (c) { return c.toUpperCase(); }) + '.' : (hatAnkauf ? 'Der Ankauf-Stand vom ' + datumDe(d.ab.stichtag) + ' gegen heute, Kennzahl für Kennzahl.' : 'Was in dem Objekt steckt: heute, nach Mieterhöhung und im Zielbild.');
     var hin = [];
-    if (!mitAuf && d.mfh) hin.push('Aufteilung: der Aufteilerwert erscheint, sobald die Ertragswerte gerechnet sind und das Haus aufgeteilt werden kann.');   /* v4042c · Marcel 23.11.2026: bei ETW gar kein Hinweis zur Aufteilung */
-    else if (!T && d.auf.gesperrt) hin.push('Aufteilung: ' + esc(d.auf.gesperrt));
+    if (!mitAuf && d.mfh) hin.push('Aufteilung: der Aufteilerwert erscheint, sobald die Ertragswerte gerechnet sind und das Haus aufgeteilt werden kann.');   /* v4042c · Marcel 23.11.2026: bei ETW gar kein Hinweis zur Aufteilung. v4042d · ohne Aufteilung ist d.auf null: der else-Zweig brach bei jeder ETW ab und die ganze Kennzahlen-Tabelle fehlte */
+    else if (mitAuf && !T && d.auf && d.auf.gesperrt) hin.push('Aufteilung: ' + esc(d.auf.gesperrt));
     if (S.mieterhoehung) hin.push('Mieterhöhung nach § 558 BGB' + (J.mieterhoehung ? ' ab ' + J.mieterhoehung : '') + ', Mieter bleibt.');
     if (Z && Z.kurz_ausblick) hin.push(esc(Z.kurz_ausblick));
     return { satz: s, html: tabelle(kopf, zeilen.filter(Boolean)), hinweis: hin.join(' '), Z: Z, hatAnkauf: hatAnkauf };
