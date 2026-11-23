@@ -538,7 +538,7 @@
     if (!Z.length) return '';
     var weg = mitWeg(), key = global._currentObjKey, L = null;
     try { L = global.DpHausverlauf && global.DpHausverlauf.lesen ? global.DpHausverlauf.lesen() : null; } catch (e) { L = null; }
-    if (_gewaehltKey !== key) { _gewaehlt = null; _gewaehltKey = key; }
+    if (_gewaehltKey !== key) { _gewaehlt = null; _gewaehltKey = key; _fuehrung = {}; _eingabe = null; _frage = null; }   /* v4150a · gewählter Schritt galt sonst im nächsten Objekt weiter */
     var jahre = Z.map(function (z) { return z.jahr; });
     if (_gewaehlt == null || jahre.indexOf(_gewaehlt) < 0) _gewaehlt = jahre.indexOf(heuteJahr() - 1) >= 0 ? heuteJahr() - 1 : jahre[0];
     var z = Z.filter(function (x) { return x.jahr === _gewaehlt; })[0], s = stand(z, weg, L), h = s._haus;
