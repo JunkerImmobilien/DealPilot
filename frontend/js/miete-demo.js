@@ -11,11 +11,16 @@
  * beim Zurückschalten an ihren Platz zurückgestellt. Rechnet nichts selbst: Zahlen aus DpPotenzial.modell() und
  * mietrechtDaten() (dieselbe Leiter wie im Wohnungsfenster). Kundentext nur mit Punkt und Komma.
  */
+/* v4005 · Marcel 23.11.2026: „komplett auf neu umstellen“. Der Umschalter „neu | bisher“ ist weg, die neue Ansicht
+ * gilt immer (ein alter Merker dp_miete_demo=0 wird nicht mehr gelesen). Nur ohne Daten (kein Modell, keine Wohnung)
+ * bleiben die Karten an ihrem Platz, weil der Block dann nichts zu zeigen hat. Gegenprobe, dass nichts fehlt: Mietvertrag,
+ * Mietrecht und Zielbild hängen als echte Karten im Block. Beim MFH stand die Karte Mietvertrag bisher unsichtbar
+ * (Vertragsarten der Wohnungen, Erhöhungen der Wohnungen, „Einheiten erfassen“): jetzt aufklappbar in der Karte „Das Haus“. */
 (function () {
   'use strict';
   if (window.DpMieteDemo) return;
-  var KEY = 'dp_miete_demo';
-  function aktiv() { try { return localStorage.getItem(KEY) !== '0'; } catch (e) { return true; } }   /* v3880b · Marcel: „so umsetzen“, neue Ansicht ist Standard */
+  var KEY = 'dp_miete_demo';   /* v4005 · nur noch Altlast, wird nicht mehr gelesen */
+  function aktiv() { return true; }   /* v4005 · immer neu, kein Umschalter mehr */
   function erlaubt() { return true; }   /* v3880b · nicht mehr nur Staging */
   function el(id) { return document.getElementById(id); }
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
@@ -163,7 +168,8 @@
       + '<div style="border-top:1px solid #F1ECE1;margin-top:12px;padding-top:10px"><div class="lbl">Gewählte Wohnung</div><h3 style="margin-top:2px">Wohnung ' + esc(w.nr) + (w.lage ? ', ' + esc(w.lage) : '') + '</h3>'
       + '<div class="satz">' + Math.round(w.wfl) + ' m², heute ' + (w.ist ? eur(w.ist) + ' im Monat' : 'leer') + '.</div>'
       + leiter(w) + zweiZahlen(w) + (w.grund ? '<div class="grund">' + esc(w.grund) + '</div>' : '')
-      + '<div class="knoepfe"><button type="button" class="btn btn-outline btn-sm" data-md-whg="' + w.i + '">Wohnung öffnen, Vertrag und Erhöhung</button><button type="button" class="btn btn-outline btn-sm" data-md-jahre="1">Miete je Wohnung: heute, geplant, Ziel</button></div></div></div>';
+      + '<div class="knoepfe"><button type="button" class="btn btn-outline btn-sm" data-md-whg="' + w.i + '">Wohnung öffnen, Vertrag und Erhöhung</button><button type="button" class="btn btn-outline btn-sm" data-md-jahre="1">Miete je Wohnung: heute, geplant, Ziel</button></div></div>'
+      + '<details class="dp-md-auf" data-md-platz="mv"><summary>Mietverträge der Wohnungen</summary></details></div>';   /* v4005 · Karte Mietvertrag beim MFH */
   }
   function karteWohnung(D) {
     var w = D.W[0];
@@ -199,21 +205,9 @@
   }
 
   function schalter() {
-    var sec = el('s2'); if (!sec || !erlaubt()) return;
-    var b = el('dp-md-schalter');
-    if (!b) {
-      b = document.createElement('div'); b.id = 'dp-md-schalter'; b.className = 'dp-md-schalter';
-      b.innerHTML = '<span>Ansicht</span><button type="button" data-md-an="1">neu</button><button type="button" data-md-an="0">bisher</button>';
-      var d = sec.querySelector('.sec-desc'); if (d && d.nextSibling) sec.insertBefore(b, d.nextSibling); else sec.insertBefore(b, sec.firstChild);
-      b.addEventListener('click', function (ev) {
-        var t = ev.target.closest('[data-md-an]'); if (!t) return;
-        try { localStorage.setItem(KEY, t.getAttribute('data-md-an')); } catch (e) {}
-        zeichnen();
-      });
-    }
-    b.querySelectorAll('[data-md-an]').forEach(function (x) { x.classList.toggle('an', x.getAttribute('data-md-an') === (aktiv() ? '1' : '0')); });
+    /* v4005 · der Umschalter „neu | bisher“ ist weg; ein schon gezeichneter (alter Stand im Tab) wird entfernt */
+    var alt = el('dp-md-schalter'); if (alt && alt.parentNode) alt.parentNode.removeChild(alt);
   }
-
   function zeichnen() {
     if (!erlaubt()) return;
     stil(); schalter();
@@ -230,17 +224,17 @@
     var c2 = (_platz.mv && _platz.mv.parentNode && _platz.mv.parentNode.closest) ? _platz.mv.parentNode.closest('.col2') : null;
     if (c2 && c2.parentNode) { if (box.parentNode !== c2.parentNode || box.previousElementSibling !== c2) c2.parentNode.insertBefore(box, c2.nextSibling); }
     else if (box.parentNode !== mv.parentNode && _platz.mv) _platz.mv.parentNode.insertBefore(box, _platz.mv);
-    var aufMr = box.querySelector('[data-md-platz="mr"]'), aufZb = box.querySelector('[data-md-platz="zb"]');
-    var offenMr = aufMr ? aufMr.open : false, offenZb = aufZb ? aufZb.open : false;
+    var aufMr = box.querySelector('[data-md-platz="mr"]'), aufZb = box.querySelector('[data-md-platz="zb"]'), aufMv = D.mfh ? box.querySelector('[data-md-platz="mv"]') : null;
+    var offenMr = aufMr ? aufMr.open : false, offenZb = aufZb ? aufZb.open : false, offenMv = aufMv ? aufMv.open : false;
     /* echte Karten vor dem Neuzeichnen in Sicherheit bringen, sonst löscht innerHTML sie */
     [mv, mr, zb].forEach(function (c) { if (c && box.contains(c)) document.body.appendChild(c); if (c) c.style.display = 'none'; });
     box.innerHTML = karteHeute(D) + (D.mfh ? karteHaus(D) : karteWohnung(D)) + karteRegeln(D) + karteZiel(D);
     var setze = function (key, c, offen) { var h = box.querySelector('[data-md-platz="' + key + '"]'); if (h && c) { h.appendChild(c); c.style.display = ''; if (offen != null) h.open = h.open || offen; } };
-    if (!D.mfh) setze('mv', mv, null);
+    setze('mv', mv, D.mfh ? offenMv : null);   /* v4005 · auch beim MFH, dort eingeklappt in „Das Haus“ */
     setze('mr', mr, offenMr);
     setze('zb', zb, offenZb);   /* v3880b · auch beim MFH: die Karte trägt Mietspiegel-Felder und Merkmale */
     /* beim MFH bleiben Mietvertrag-Liste und Zielbild-Karte unsichtbar: beides steht je Wohnung in den Einheiten */
-    if (D.mfh) { [mv].forEach(function (c) { if (c && c.parentNode === document.body && _platz[c === mv ? 'mv' : 'zb']) { var mk = _platz[c === mv ? 'mv' : 'zb']; mk.parentNode.insertBefore(c, mk); c.style.display = 'none'; } }); }
+    /* v4005 · bis v4004 blieb die Karte Mietvertrag beim MFH unsichtbar an ihrem Platz, jetzt hängt sie in „Das Haus“ (oben) */
     if (!box._bind) {
       box._bind = true;
       box.addEventListener('click', function (ev) {

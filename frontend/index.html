@@ -40,7 +40,7 @@
      Seite unsichtbar; layout-varianten.js nimmt die Marke nach setze() ab, spätestens nach 3 s fällt sie von selbst. -->
 <style>html[data-dpl-vorab] body{visibility:hidden}</style>
 <script>(function(){try{if(/[?&]layout=aus(&|$)/.test(location.search))return;var h=document.documentElement;h.setAttribute('data-dpl-vorab','1');setTimeout(function(){h.removeAttribute('data-dpl-vorab');},3000);}catch(e){}})();</script>
-<link rel="stylesheet" href="css/style.css?v=v3962a">
+<link rel="stylesheet" href="css/style.css?v=v4005">
 <link rel="stylesheet" href="css/avsec-streifen.css?v=v2780b"><!-- v1148-spalt-1025px -->
 <link rel="stylesheet" href="css/avsec-karte-neu.css?v=v2780a"><!-- v2760/v2780a · Kartenfassung unter 940 px Kartenbreite -->
 <script src="js/einbettung.js?v=v2998a"></script><!-- v2998 · Anmeldekarte eingebettet in die Landingpage (nur im iframe mit ?einbettung=1) -->
@@ -1964,7 +1964,8 @@ label.dp-required.qc-required::after {
           <button class="btn btn-gold btn-sm" id="ki-miete-btn" onclick="runKiMiete()" type="button">
             <span data-ico="sparkles" data-ico-size="14"></span> Mietpreis recherchieren
           </button>
-          <span class="kmu-start-satz">Ordnet deine Miete ein: gegen den Marktdurchschnitt, das marktübliche Band, die amtliche Vergleichsmiete und eine eigene Recherche. Ergebnis: welche Miete du ansetzen kannst.</span>
+          <span class="dp-rnd-info kmu-info" role="button" tabindex="0" title="Ordnet deine Miete ein: gegen den Marktdurchschnitt, das marktübliche Band, die amtliche Vergleichsmiete und eine eigene Recherche. Ergebnis: welche Miete du ansetzen kannst." aria-label="Was die Recherche tut" onclick="var s=this.nextElementSibling;if(s)s.hidden=!s.hidden" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}">i</span><!-- v4005 · Satz im Tooltip -->
+          <span class="kmu-start-satz" hidden>Ordnet deine Miete ein: gegen den Marktdurchschnitt, das marktübliche Band, die amtliche Vergleichsmiete und eine eigene Recherche. Ergebnis: welche Miete du ansetzen kannst.</span>
         </div>
       </div>
       <div class="ki-lage-body" id="ki-miete-body">
@@ -4186,7 +4187,7 @@ label.dp-required.qc-required::after {
 <script src="js/indexmiete.js?v=v3026"></script><!-- v3026 · Indexmiete § 557b BGB -->
 <script src="js/mietpotenzial-kern.js?v=v3840b"></script><!-- v3075 · Kappung, Bremse, Termine, Soll-Miete: der reine Kern, vor potenzial.js -->
 <script src="js/miete-regel.js?v=v3845"></script><!-- v3845 · Neuvermietung ohne Mietpreisbremse 110/115/120 % (Einstellung, Vorgabe 120 %) -->
-<script src="js/potenzial.js?v=v3900a"></script><script src="js/miete-demo.js?v=v3942"></script><!-- v3870 · Demo Reiter Miete neu, nur Staging -->
+<script src="js/potenzial.js?v=v3900a"></script><script src="js/miete-demo.js?v=v4005"></script><!-- v3870 · Demo Reiter Miete neu, nur Staging -->
 <script src="js/mietvertrag-objekt.js?v=v3840b"></script>
 <script src="js/mieterhoehungen.js?v=v3860"></script><!-- v3362 · Mieterhöhungen als Liste (_erhoehungen, je Wohnung e.erhoehungen) -->
 <script src="js/hell-varianten.js?v=v1653e"></script>
@@ -4250,7 +4251,7 @@ label.dp-required.qc-required::after {
 <script src="js/jahresabgleich.js?v=v3993"></script><!-- v3420 · Jahresabgleich im Bestand: erster Unterreiter der Pilot-Analyse (Miete, Steuer, Wert, Haus) · v3430 Demo Fassung 2 -->
 <script src="js/wert-zielbild.js?v=v3720"></script><!-- v2840 · Tab Bewertung: Segment „Wert &amp; Zielbild"; Pilot-Analyse: Einfach | Genau -->
 <script src="js/dealpilot-mb.js?v=v3945"></script>
-<script src="js/mb-abgleich.js?v=v3840b"></script><!-- v3002 · Abgleich mit dem Marktbericht in den Reitern Objekt und Miete -->
+<script src="js/mb-abgleich.js?v=v4005"></script><!-- v3002 · Abgleich mit dem Marktbericht in den Reitern Objekt und Miete -->
 <script src="js/mb-auftrag.js?v=v3253"></script>
   <script src="js/marktbericht-view.js?v=v3641"></script>
 <!-- V63.75: Selbstauskunft-PDF-Generator -->

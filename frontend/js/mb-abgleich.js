@@ -33,7 +33,7 @@
    ═══════════════════════════════════════════════════════════════════════ */
 (function () {
   if (window.DpMbAbgleich) return;
-  var VERSION = 'v3247';   /* v3247 · Abweichungen zum Marktbericht, leise */
+  var VERSION = 'v4005';   /* v4005 · Miete ohne Knopf Marktbericht erstellen */   /* v3247 · Abweichungen zum Marktbericht, leise */
   var $ = function (id) { return document.getElementById(id); };
   var esc = function (s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
   function fmt(n, d) {
@@ -556,6 +556,9 @@
   function inhalt(art) {
     if (!key()) return '';
     if (!S.fertig) return '<div class="mba-zeile mba-leise">Abgleich mit dem Marktbericht wird gelesen …</div>';
+    /* v4005 · Marcel 23.11.2026: im Reiter Miete KEIN Knopf „Marktbericht erstellen“ („totaler Quatsch“). Ohne Bericht
+       Stufe 3 bleibt der Block in Miete leer, der Weg zum Bericht steht im Reiter Objekt. */
+    if ((!S.bericht || S.nurIndikation) && art === 'miete') return '';
     if (!S.bericht || S.nurIndikation) {
       return '<div class="mba-zeile"><span>' + (S.bericht ? 'Bisher nur eine Marktpreisindikation — für den Abgleich mit amtlichen Werten fehlt ein Marktbericht Stufe 3.' : 'Noch kein Marktbericht zu diesem Objekt. Mit ihm prüft DealPilot deine Angaben gegen amtliche Werte.')
         + '</span>' + knopfStufe3(S.bericht ? 'Marktbericht Stufe 3 erstellen' : 'Marktbericht erstellen') + '</div>';
@@ -579,7 +582,7 @@
         + '<span class="mba-a-w"><i>Reiter</i> ' + esc(h.reiter || '—') + '</span>'
         + '<span class="mba-a-w"><i>Bericht</i> ' + esc(h.bericht || '—') + '</span></div>' : '';
       return '<li>' + vgl + '<div class="mba-satz">' + esc(h.satz) + (h.ueb ? ' <button type="button" class="btn btn-outline btn-sm mba-btn" data-mba-ueb="' + esc(h.ueb.id) + '" data-mba-wert="' + esc(h.ueb.wert) + '">' + esc(h.ueb.text) + '</button>' : '') + '</div></li>';
-    }).join('') + '</ul>' + (neu ? '<div class="mba-fuss">' + knopfStufe3('Neuen Marktbericht erstellen') + '</div>' : '');
+    }).join('') + '</ul>' + (neu && art !== 'miete' ? '<div class="mba-fuss">' + knopfStufe3('Neuen Marktbericht erstellen') + '</div>' : '');
   }
   function host(art) {
     var id = art === 'objekt' ? 'mba-objekt' : 'mba-miete';

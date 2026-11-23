@@ -17554,9 +17554,12 @@ html body.hdr-collapsed .tabs-workflow-bar {
 #ki-miete-box .ki-lage-header > .kmu-klapp { grid-column: 2; grid-row: 1; align-self: center; }
 #ki-miete-box .ki-lage-header > .kmu-start { grid-column: 1 / -1; grid-row: 2; display: flex; align-items: center; gap: 8px 14px; flex-wrap: wrap; min-width: 0; }
 #ki-miete-box .kmu-start > #ki-miete-btn { flex: 0 0 auto; margin: 0; }
-#ki-miete-box .kmu-start-satz { flex: 1 1 260px; min-width: 0; font-size: 12px; line-height: 1.45; color: var(--muted, #7A7370); }
+/* v4005 · Marcel 23.11.2026: der Satz unter „Mietpreis recherchieren“ steht im Tooltip des i-Symbols (title), Antippen klappt ihn darunter auf */
+#ki-miete-box .kmu-start-satz { flex: 1 1 100%; min-width: 0; font-size: 12px; line-height: 1.45; color: var(--muted, #7A7370); }
+#ki-miete-box .kmu-start-satz[hidden] { display: none; }
+#ki-miete-box .kmu-start > .dp-rnd-info { margin-left: 0; width: 18px; height: 18px; font-size: 11px; }
 @media (max-width: 640px) {
-  #ki-miete-box .kmu-start > #ki-miete-btn { flex: 1 1 100%; justify-content: center; }
+  #ki-miete-box .kmu-start > #ki-miete-btn { flex: 1 1 auto; justify-content: center; }
 }
 #ki-miete-box .ki-lage-title {
   color: var(--ch, #2A2727);
