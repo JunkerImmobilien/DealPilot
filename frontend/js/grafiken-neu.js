@@ -287,7 +287,9 @@
     var W = o.breite, zeileH = 34, T = 8, L = 52, R = 70, n = o.x.length, H = T + n * zeileH + 22;
     var alle = []; o.plan.concat(o.ist).forEach(function (v) { if (v != null) alle.push(v); });
     if (!alle.length) return '';
-    var tk = ticks(Math.min(0, Math.min.apply(null, alle)), Math.max(0, Math.max.apply(null, alle)), 4), x0 = tk[0], x1 = tk[tk.length - 1];
+    /* Achse um die Werte, nicht ab 0: sonst kleben die Hanteln am Rand */
+    var mn = Math.min.apply(null, alle), mx = Math.max.apply(null, alle), pad = Math.max(1, (mx - mn) * 0.15);
+    var tk = ticks(mn - pad, mx + pad, Math.max(2, Math.min(4, Math.floor((W - 122) / 70)))), x0 = tk[0], x1 = tk[tk.length - 1];
     var pw = W - L - R, xv = function (v) { return L + (v - x0) / (x1 - x0) * pw; };
     var out = ['<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="' + esc(o.aria || '') + '">'];
     tk.forEach(function (t) { out.push('<line class="gn-netz" x1="' + f1(xv(t)) + '" x2="' + f1(xv(t)) + '" y1="' + T + '" y2="' + (H - 20) + '"/><text class="gn-ax" x="' + f1(xv(t)) + '" y="' + (H - 6) + '" text-anchor="middle">' + kurzEur(t) + '</text>'); });
@@ -463,6 +465,7 @@
         wertText: m - h >= 1 ? eurV(m - h) : 'kein Spielraum', wertFarbe: m - h >= 1 ? 'var(--gn-gruen)' : null };
     });
     var ges = summe(zeilen, function (z) { return z.m - z.h; }), sof = summe(zeilen, function (z) { return z.b - z.h; });
+    if (!A.mfh && ges < 1) { k.innerHTML = ''; return 'leer'; }   /* eine Wohnung ohne Spielraum: der Satz darunter sagt es schon */
     var titel = ges >= 1 ? 'Zusammen ' + eurV(ges) + ' Miete im Monat möglich, davon ' + eur(sof) + ' sofort im Bestand' : 'Kein Spielraum für eine höhere Miete';
     k.innerHTML = karteHtml('sp', titel, '€ Kaltmiete im Monat je Wohnung · heute, im Bestand erhöhbar, nur bei Neuvermietung',
       balkenH({ id: 'sp', breite: w, zeilen: zeilen, namenBreite: 110, aria: 'Mietspielraum je Wohnung' }),
