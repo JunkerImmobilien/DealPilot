@@ -73,6 +73,22 @@
       ],
       "backend_stellen": [],
       "backend_erkennung": "services/vivi/|vivi_verknuepfung"
+    },
+    {
+      "schluessel": "grafiken_neu",
+      "bezeichnung": "Neue Grafiken in Pilot-Analyse und Portfolio-Cockpit",
+      "seit": "v4140",
+      "beschreibung": "js/grafiken-neu.js: Pilot-Analyse › Übersicht (Vermögensaufbau, Cashflow-Brücke), Jahresabgleich (Plan vom Kauf gegen Ist, Weg zum positiven Cashflow), Potenzial (Mietspielraum je Wohnung), Steuer (Ergebnis aus Vermietung) und Portfolio-Cockpit (Portfolio auf einen Blick mit Filtern und Rechenprüfung). Mit Freigabe werden die alten Grafiken an diesen Stellen ausgeblendet. Vorlage: Dateien/Demos/pilot-analyse-charts-2026-11-23.html und portfolio-cockpit-2026-11-23.html (Marcel 23.11.2026).",
+      "frei_fuer": [
+        "admin",
+        "vorschau"
+      ],
+      "frontend_erkennung": "DpGrafikenNeu|data-dp-gn=",
+      "frontend_ausgenommen": {},
+      "routen": [],
+      "backend_stellen": [],
+      "nur_frontend": "reine Darstellung von Werten, die der Nutzer in der App ohnehin sieht (State.cfRows, Jahresbuch, DpMieteMax, Portfolio-Payload). Es gibt keine Route und keinen Datenweg, den eine Backend-Sperre schützen könnte.",
+      "backend_erkennung": ""
     }
   ]
 }

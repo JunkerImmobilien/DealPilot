@@ -163,7 +163,8 @@ for (const e of liste) {
   if (!Array.isArray(e.frei_fuer) || !e.frei_fuer.length) rotMelden(z + ': frei_fuer leer');
   (e.frei_fuer || []).forEach((g) => { if (!/^(admin|vorschau|zusatz:[a-z_]+)$/.test(g)) rotMelden(z + ': unbekannte Gruppe ' + g); });
   try { new RegExp(e.frontend_erkennung); if (!e.frontend_erkennung) throw new Error('leer'); } catch (x) { rotMelden(z + ': frontend_erkennung ' + x.message); }
-  if (!(e.routen || []).length && !(e.backend_stellen || []).length) rotMelden(z + ': keine Backend-Sperre (routen oder backend_stellen) - Ausblenden allein reicht nicht');
+  /* v4140 · reine Darstellungs-Funktion ohne Route: nur mit ausdruecklicher Begruendung in nur_frontend (mind. 40 Zeichen) */
+  if (!(e.routen || []).length && !(e.backend_stellen || []).length && !(typeof e.nur_frontend === 'string' && e.nur_frontend.trim().length >= 40)) rotMelden(z + ': keine Backend-Sperre (routen oder backend_stellen) - Ausblenden allein reicht nicht (nur_frontend nur mit Begruendung)');
 }
 if (!rot) console.log('  ok  ' + liste.map((e) => e.schluessel).join(', '));
 
@@ -203,6 +204,7 @@ const proben = [
   ['Route wuensche ohne Sperre', 'backend/src/routes/wuensche.js', (t) => t.replace(/router\.use\(vorschau\.sperre\('umsetzungswuensche'\)\);/, '')],
   ['Route vivi ohne Sperre (v3950)', 'backend/src/routes/vivi.js', (t) => t.replace(/router\.use\(vorschau\.sperre\('vivi'\)\);/, '')],
   ['vivi.js (App) ohne DpVorschau.frei (v3950)', 'frontend/js/vivi.js', (t) => t.split("DpVorschau.frei('vivi')").join('DpVorschau.x()')],
+  ['grafiken-neu.js ohne DpVorschau.frei (v4140)', 'frontend/js/grafiken-neu.js', (t) => t.split("DpVorschau.frei('grafiken_neu')").join('DpVorschau.x()')],
   ['Sperre der Route nach der ersten Route', 'backend/src/routes/gutachterpartner.js', (t) => t.replace(/router\.use\(vorschau\.sperre\('gutachten_org'\)\);/, '') + "\nrouter.use(vorschau.sperre('gutachten_org'));\n"],
   ['PDF dok_vermoegen ohne vorschau.darf', 'backend/src/services/telegramPdfService.js', (t) => t.replace(/\.darf\(\{ id: s\.userId, role: s\.role \}, 'vermoegen'\)/, '.nix()')],
   ['gutachterpartner.js (App) ohne DpVorschau.frei', 'frontend/js/gutachterpartner.js', (t) => t.split("DpVorschau.frei('gutachten_org')").join('DpVorschau.x()')],

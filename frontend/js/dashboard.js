@@ -4117,8 +4117,8 @@
         eigenkapital_eur: _ppZahl(o.ek),
         darlehen_eur: (num(o.d1) + num(o.d2) + _dwO(o).betrag) || null,   /* v3215 */
         restschuld_eur: Math.round(_restschuldOf(o)) || null,
-        zins_prozent: _ppZahl(o.d1z),
-        tilgung_prozent: _ppZahl(o.d1t),
+        zins_prozent: _pct(o.d1z) || null,   /* v4140 · _pct statt _ppZahl: "3,8" wurde 38 (gemessen 23.11.2026, 5 von 17 Objekten) */
+        tilgung_prozent: _pct(o.d1t) || null,
         /* v1802 · DIE TILGUNG IN EURO, NICHT NUR IN PROZENT.
            Marcel fragte den Bot nach der "Gesamttilgung aller Objekte".
            Er bekam eine Liste von Prozentsaetzen und die Rueckfrage, ob
@@ -4140,7 +4140,7 @@
           var z = num(o.d1) * _pct(o.d1z) / 100 + num(o.d2) * _pct(o.d2z) / 100 + _dwO(o).zins_j;   /* v3215 */
           return z > 0 ? Math.round(z) : null;
         })(),
-        zinsbindung_bis: o.d1_zbind || o.d1_zinsbindung || null,
+        zinsbindung_bis: o.d1_zbind || o.d1_zinsbindung || o._kpis_bindung_ende || null,   /* v4140 · stand bei allen 17 Objekten auf null */
         dscr: _ppZahl(window.Dscr && Dscr.ausGespeichert ? Dscr.ausGespeichert(o) : o._kpis_dscr),   /* v3031 */
         ltv_prozent: _ppZahl(o.ltv) != null ? _ppZahl(o.ltv) : _ppZahl(o._kpis_ltv),
         bruttomietrendite_prozent: _ppZahl(o._kpis_bmy),
@@ -4212,6 +4212,8 @@
   window.DealPilotDashboard = {
     /* v1704: der Portfolio-Pilot liest hier - er rechnet nichts nach. */
     portfolioPayload: portfolioPayload,
+    /* v4140 · gleiche Reihenfolge wie portfolioPayload().objekte, nur lesen (grafiken-neu.js) */
+    grafikDaten: function () { return detailArr(true).slice(0, PP_MAX_OBJEKTE); },
     /* v2170: die Detailkopien werden sonst nur beim LOESCHEN erneuert - eine
        Pilot-Analyse aus derselben Sitzung kam beim Portfolio-Piloten nie an
        (gemessen: Stand 09.10. statt 13.10.). Vor jeder Pilot-Anfrage frisch. */
