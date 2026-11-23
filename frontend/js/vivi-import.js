@@ -55,8 +55,14 @@
 
   /* ── Einstellungen ─────────────────────────────────────────────── */
   var _liste = [], _laeuft = false;
+  function frei() {
+    return (window.DpVorschau && typeof window.DpVorschau.frei === 'function') ? window.DpVorschau.frei('vivi').catch(function () { return false; }) : Promise.resolve(false);
+  }
   function karte(host) {
     if (!host) return;
+    frei().then(function (ok) { if (ok) karteZeichnen(host); else host.innerHTML = ''; });
+  }
+  function karteZeichnen(host) {
     stil();
     host.innerHTML = '<div id="pk-vivi-import"><div class="vi-kopf"><span class="vi-titel">Objekte aus ViVi übernehmen</span>'
       + '<button type="button" class="btn btn-sm btn-ghost" data-vi="laden">ViVi-Objekte anzeigen</button></div>'
