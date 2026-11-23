@@ -323,7 +323,7 @@
     if (d.heute != null) out.push('<circle cx="' + f1(x(d.heute + 0.9)) + '" cy="' + yA + '" r="5" style="fill:' + F.karte + ';stroke:' + F.gold + ';stroke-width:2"/>');
     var farbe = { gem: F.tinte, info: F.tinte3, gut: F.gruen, risiko: F.rot };
     var M = (d.marken || []).filter(function (mk) { return mk.j != null; }).sort(function (a, b) { return a.j - b.j; });
-    var jt = function (mk) { return mk.j > d.bis + 0.5 ? 'nach ' + d.bis : String(Math.floor(mk.j)); };
+    var jt = function (mk) { return mk.jahrText || (mk.j > d.bis + 0.5 ? 'nach ' + d.bis : String(Math.floor(mk.j))); };
     var H;
     if (schmal) {
       M.forEach(function (mk, i) {
@@ -594,7 +594,7 @@
       /* v4280 · Marcel: „im Fahrplan fehlt das Zielbild“. Jahr und Miete aus DpWertZielbild.daten().zielbild (Reiter Miete › Zielbild). */
       try { var WZ = window.DpWertZielbild && window.DpWertZielbild.daten ? window.DpWertZielbild.daten() : null, ZB = WZ && WZ.zielbild, zs = ZB && ZB.stufen && ZB.stufen.zielbild;
         if (zs) { var zj = ZB.jahre && zahl(ZB.jahre.zielbild), mm = zahl(zs.miete_monat) != null ? zs.miete_monat : (zahl(zs.miete_jahr) != null ? zs.miete_jahr / 12 : null);
-          M.push({ j: zj != null ? zj + 0.5 : P.heute + 1, n: zj != null ? 'Zielbild' : 'Zielbild, Jahr offen', d: (mm != null ? 'Miete ' + eur(mm) + ' im Monat' : 'Zielbild eingetragen') + (zahl(zs.kosten) ? ', Maßnahmen ' + eur(zs.kosten) : '') + (zj != null ? '' : '. Das Jahr trägst du im Reiter Miete beim Zielbild ein.'), art: 'gut' }); } } catch (e) {}
+          M.push({ j: zj != null ? zj + 0.5 : P.heute + 1, jahrText: zj != null ? null : 'Jahr offen', n: 'Zielbild', d: (mm != null ? 'Miete ' + eur(mm) + ' im Monat' : 'Zielbild eingetragen') + (zahl(zs.kosten) ? ', Maßnahmen ' + eur(zs.kosten) : '') + (zj != null ? '' : '. Das Jahr trägst du im Reiter Miete beim Zielbild ein.'), art: 'gut' }); } } catch (e) {}
       if (cfop) M.push({ j: cfop, n: 'Cashflow vor Steuer positiv', d: String(cfop), art: 'gut' });
       if (P.bindEnde > P.heute && P.bindEnde <= P.bis) M.push({ j: P.bindEnde + (P.bindMon - 1) / 12, n: 'Zinsbindung endet', d: String(P.bindMon).padStart(2, '0') + '/' + P.bindEnde + (rsBind != null ? ' · Restschuld etwa ' + eur(rsBind) : ''), art: 'risiko' });
       if (P.privat && P.kaufJ + 10 > P.heute) M.push({ j: P.kaufJ + 10 + (P.kaufM - 1) / 12, n: 'Verkauf steuerfrei', d: 'ab ' + String(P.kaufM).padStart(2, '0') + '/' + (P.kaufJ + 10) + ' · zehn Jahre gehalten (§ 23 EStG)', art: 'gut' });

@@ -188,7 +188,7 @@ const mitZb = M.meilensteine(P, M.rechne(P, {})), zbM = mitZb.find(m => m.n === 
 pruefe('K Zielbild im Fahrplan: Jahr 2030, Miete 720 €, Maßnahmen 8.000 €', zbM && Math.floor(zbM.j) === 2030 && /720 €/.test(zbM.d) && /8\.000 €/.test(zbM.d), zbM ? zbM.j + ' · ' + zbM.d : 'fehlt');
 C.DpWertZielbild = { daten: () => ({ zielbild: { jahre: { zielbild: null }, stufen: { zielbild: { miete_jahr: 7440, kosten: 0 } } } }) };
 const offZb = M.meilensteine(P, M.rechne(P, {})).find(m => /^Zielbild/.test(m.n));
-pruefe('K Zielbild ohne Jahr: „Jahr offen“ nach heute, Miete 620 €', offZb && offZb.n === 'Zielbild, Jahr offen' && offZb.j > P.heute && /620 €/.test(offZb.d), offZb ? offZb.n + ' · ' + offZb.d : 'fehlt');
+pruefe('K Zielbild ohne Jahr: „Jahr offen“ nach heute, Miete 620 €', offZb && offZb.n === 'Zielbild' && offZb.jahrText === 'Jahr offen' && offZb.j > P.heute && /620 €/.test(offZb.d), offZb ? offZb.n + ' · ' + offZb.d : 'fehlt');
 delete C.DpWertZielbild;
 const MCk = M.monteCarlo(P, 200), iBk = P.bindEnde - 1 - P.heute;
 pruefe('K Spanne an Ende Zinsbindung liest das Jahr vor dem Wechsel', P.bindEnde === 2034 && MCk.jahre[iBk] === 2033 && MCk.p10[iBk] <= MCk.p50[iBk] && MCk.p50[iBk] <= MCk.p90[iBk], 'Jahr ' + MCk.jahre[iBk]);
