@@ -48,7 +48,7 @@
 (function (global) {
   'use strict';
   if (global.DpJahresabgleich) return;
-  var VERSION = 'v4090';
+  var VERSION = 'v4090a';
   var GOLD = 'var(--wl-c9a84c, #C9A84C)';
   /* v4090 · Marcel 23.11.2026: „ich würde die Reihenfolge ändern in Miete, Wert, Haus und dann Steuern" (die Steuer braucht die Zahlen der drei davor) */
   var SCHRITTE = [['miete', 'Miete'], ['wert', 'Wert'], ['haus', 'Haus'], ['steuer', 'Steuer']];
@@ -670,8 +670,13 @@
     } catch (e) {}
     return 0;
   }
+  /* v4090 · GEMESSEN 23.11.2026 (Demostraße): die Karte Mietvertrag liegt seit v4060 im zugeklappten „Mietvertrag und
+     Mieterhöhungen" (details.dp-md-auf in einer Karte mit overflow:hidden). scrollIntoView tat dort nichts. Erst alle
+     umgebenden details aufklappen, dann rollen. */
+  function aufklappen(e) { for (var p = e; p && p.tagName; p = p.parentElement) if (p.tagName === 'DETAILS' && !p.open) p.open = true; }
   function hervorheben(e) {
     if (!e) return;
+    aufklappen(e);
     try { e.scrollIntoView({ block: 'center', behavior: 'smooth' }); } catch (x) { try { e.scrollIntoView(); } catch (y) {} }
     try {
       e.classList.remove('dp-ja-blink'); void e.offsetWidth; e.classList.add('dp-ja-blink');

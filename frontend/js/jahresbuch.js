@@ -39,7 +39,7 @@
 (function (global) {
   'use strict';
   if (global.DpJahresbuch) return;
-  var VERSION = 'v4090';
+  var VERSION = 'v4090a';
   var STATUS = [['geplant', 'geplant'], ['erklaert', 'erklärt'], ['bescheid', 'Bescheid']];
 
   function doc() { return global.document || null; }
@@ -253,7 +253,7 @@
     if (!geaendert.length) return true;
     /* v4090 · Protokoll: wer wann was festgeschrieben oder freigegeben hat (Freigeben nur nach Rückfrage, jahresabgleich.js) */
     var prot = ((jahreDaten()[String(y)] || {}).fest_protokoll || []).slice(-29);
-    var wer = ''; try { var u = global.Auth && global.Auth.getUser ? global.Auth.getUser() : null; wer = (u && (u.email || u.name)) || ''; } catch (e) {}
+    var wer = ''; try { var u = global.Auth && global.Auth.getSession ? global.Auth.getSession() : null; wer = (u && (u.name || u.email)) || ''; } catch (e) {}
     prot.push({ am: new Date().toISOString(), aktion: an ? 'festgeschrieben' : 'freigegeben', schritte: geaendert, wer: wer });
     var d = D(); if (d) d._jahre = setzen(d._jahre, y, 'fest_protokoll', prot);
     schreiben(y, 'fest', Object.keys(n).length ? n : '');
