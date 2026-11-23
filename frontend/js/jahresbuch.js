@@ -73,25 +73,67 @@
   /** v3840 · Summe der Wohnungen MIT Aufschlüsselung: je Wohnung die eingetragene Monatsmiete, sonst die heutige
       Miete der Wohnung (liste[i].ist, leer = 0) × (12 − Leerstandsmonate). Nur wenn mindestens eine Wohnung
       eingetragen ist, sonst null. Rein, Prüfer tools/miete-reiter-pruefen.mjs. */
-  function summeWohnungen(einheiten, liste) {
+  function summeWohnungen(einheiten, liste, jahr) {
     var e = einheiten || {}, L = Array.isArray(liste) ? liste : [];
     if (!Object.keys(e).some(function (k) { return istZahl(zahl((e[k] || {}).miete_m)); })) return null;
-    var teile = [], s = 0;
+    var teile = [], s = 0, mon = monateImJahr(jahr);
     L.forEach(function (w, i) {
       if (!w || w.art === 'gewerbe' && !istZahl(zahl((e[String(i)] || {}).miete_m))) return;
       var x = e[String(i)] || {}, m = zahl(x.miete_m), eig = istZahl(m), l = zahl(x.leer_monate) || 0;
-      if (!eig) m = w.status === 'leer' ? 0 : (zahl(w.ist) || 0);
-      var j = Math.round(m * Math.max(0, 12 - Math.min(12, l)));
-      s += j; teile.push({ i: i, nr: w.nr || String(i + 1), miete_m: m, leer: l, jahr: j, eingetragen: eig });
+      if (!eig) m = w.status === 'leer' ? 0 : (jahr ? mieteWohnungImJahr(w, jahr) : (zahl(w.ist) || 0));
+      var erh = eig ? erhoehungImJahr(x, w, jahr) : null;
+      var j = jahresMiete(m, erh, mon, l);
+      s += j; teile.push({ i: i, nr: w.nr || String(i + 1), miete_m: m, leer: l, monate: mon, erh: erh, jahr: j, eingetragen: eig });
     });
     return { summe: Math.round(s), teile: teile };
   }
+  /* ── v4220 · B8 / B11 (Durchlauf Musterhof 8, 23.11.2026) ───────────────────────────────────────
+     B8: im Kaufjahr zählte die Miete je Wohnung 12 Monate, Plan und AfA aber ab dem Übergang (11 bei 01.02.).
+     Jetzt dieselben Monate wie dort (DealPilotAnteilig.getWuMonths: wirtschaftlicher Übergang, sonst Kaufdatum).
+     B11: eine Erhöhung im Jahr ließ sich nur als Durchschnitt eintragen. Jetzt je Wohnung „ab Monat“ und „neue
+     Miete“ (erh_ab, erh_auf). Ohne eigene Angabe gilt die Erhöhung aus der Liste der Wohnung (Reiter Miete), die
+     im Jahr liegt. Der Platzhalter zeigt die Miete des Jahres (Liste), nicht die heutige. */
+  function monateImJahr(jahr) {
+    if (!jahr) return 12;
+    try { var A = global.DealPilotAnteilig; if (A && typeof A.getWuMonths === 'function') { var n = Number(A.getWuMonths(+jahr)); if (isFinite(n)) return Math.max(0, Math.min(12, n)); } } catch (e) {}
+    return 12;
+  }
+  function ersterMonat(mon) { return 13 - Math.max(1, mon || 12); }
+  function quelleWohnung(w) { return { liste: w.erhoehungen, heute: zahl(w.ist), letzte: w.mv_letzte_erhoehung, betrag: w.mv_letzte_erhoehung_betrag }; }
+  /** Monatsmiete der Wohnung im ersten Monat des Jahres (ab Übergang) laut Liste der Erhöhungen, sonst heute. */
+  function mieteWohnungImJahr(w, jahr) {
+    var E = global.DpErhoehungen, h = zahl(w && w.ist) || 0;
+    if (!E || !E.mieteMonat || !jahr) return h;
+    try { var m = E.mieteMonat(quelleWohnung(w), jahr + '-' + String(ersterMonat(monateImJahr(jahr))).padStart(2, '0') + '-01'); return istZahl(m) ? m : h; } catch (e) { return h; }
+  }
+  /** Erhöhung im Jahr: eigene Angabe (erh_ab 1 bis 12, erh_auf) oder die letzte Erhöhung der Liste in diesem Jahr. */
+  function erhoehungImJahr(x, w, jahr) {
+    var ab = zahl(x && x.erh_ab), auf = zahl(x && x.erh_auf);
+    if (istZahl(ab) && ab >= 1 && ab <= 12 && istZahl(auf) && auf > 0) return { ab: Math.round(ab), auf: auf, quelle: 'eigen' };
+    var E = global.DpErhoehungen;
+    if (!jahr || !E || !E.imJahr || !w || !Array.isArray(w.erhoehungen)) return null;
+    try {
+      var l = E.imJahr(w.erhoehungen, jahr).filter(function (y) { return istZahl(zahl(y.auf)); });
+      if (!l.length) return null;
+      var d = String(l[l.length - 1].datum), mo = +d.slice(5, 7) + (+d.slice(8, 10) > 1 ? 1 : 0);
+      return mo >= 1 && mo <= 12 ? { ab: mo, auf: zahl(l[l.length - 1].auf), quelle: 'liste' } : null;
+    } catch (e) { return null; }
+  }
+  /** Rein: Jahresmiete aus Monatsmiete, Erhöhung im Jahr, verfügbaren Monaten (ab Übergang) und Monaten ohne Miete. */
+  function jahresMiete(m, erh, mon, leer) {
+    mon = mon == null ? 12 : Math.max(0, Math.min(12, mon));
+    if (!mon) return 0;
+    var von = ersterMonat(mon), sum = 0;
+    for (var k = von; k <= 12; k++) sum += (erh && k >= erh.ab ? erh.auf : (m || 0));
+    var l = Math.max(0, Math.min(mon, leer || 0));
+    return Math.round(sum * (mon - l) / mon);
+  }
   /** Summe der Wohnungen: Monatsmiete am 31.12. × (12 − Leerstandsmonate). Nur ein Vorschlag. */
-  function summeEinheiten(einheiten) {
-    var keys = Object.keys(einheiten || {}), s = 0, n = 0;
+  function summeEinheiten(einheiten, jahr) {
+    var keys = Object.keys(einheiten || {}), s = 0, n = 0, mon = monateImJahr(jahr);
     keys.forEach(function (k) {
       var e = einheiten[k] || {}, m = zahl(e.miete_m), l = zahl(e.leer_monate) || 0;
-      if (istZahl(m)) { s += m * Math.max(0, 12 - Math.min(12, l)); n++; }
+      if (istZahl(m)) { s += jahresMiete(m, erhoehungImJahr(e, null, null), mon, l); n++; }   /* v4220 · B8/B11 */
     });
     return n ? Math.round(s) : null;
   }
@@ -108,7 +150,7 @@
     /* v4037 · Ist-Miete laut ViVi (nkm_j_vivi, aus dem Mietverlauf aller Mietverhaeltnisse) zaehlt, wenn keine eigene da ist */
     z.miete_vivi = !z.miete_eigen && istZahl(zahl(ist.nkm_j_vivi));
     z.miete_ist = z.miete_eigen ? zahl(ist.nkm_j) : (z.miete_vivi ? zahl(ist.nkm_j_vivi) : (q.jahr <= heuteJahr() ? z.miete_proj : null));
-    z.miete_einheiten = summeEinheiten(ist.einheiten);
+    z.miete_einheiten = summeEinheiten(ist.einheiten, q.jahr);
     /* Ohne eingefrorenen Plan (Ankauf-Stand vor v2989) steht die heutige Projektion da - gekennzeichnet, nie als Plan */
     z.ohne_plan = !q.plan;
     z.miete_basis = istZahl(z.miete_plan) ? z.miete_plan : z.miete_proj;
@@ -402,19 +444,22 @@
        das Feld gesperrt sein mit Absprung". Beim MFH ist die Jahressumme die Summe der Wohnungen (wird beim Eintragen
        je Wohnung gesetzt), sonst ein eigenes Feld. */
     if (mfh && mfh.length) {
-      var sw = summeWohnungen(e.einheiten, mfh);
+      var sw = summeWohnungen(e.einheiten, mfh, z.jahr);
       zus = '<div class="dp-jb-h"><b>Kaltmiete ' + z.jahr + ': ' + eur(z.miete_ist) + '</b>. '
-        + (sw ? 'Das ist die Summe der Wohnungen: ' + sw.teile.map(function (t) { return 'Wohnung ' + esc(t.nr) + ' ' + eur(t.miete_m) + ' × ' + (12 - Math.min(12, t.leer)) + ' Monate' + (t.eingetragen ? '' : ' (heutige Miete)'); }).join(', ') + '.'
+        + (sw ? 'Das ist die Summe der Wohnungen: ' + sw.teile.map(function (t) { return 'Wohnung ' + esc(t.nr) + ' ' + eur(t.miete_m) + (t.erh ? ', ab Monat ' + t.erh.ab + ' ' + eur(t.erh.auf) : '') + ' × ' + Math.max(0, t.monate - Math.min(t.monate, t.leer)) + ' Monate' + (t.eingetragen ? '' : ' (laut Liste)'); }).join(', ') + '.' + (sw.teile.length && sw.teile[0].monate < 12 ? ' Im Kaufjahr zählen die Monate ab dem Übergang.' : '')
           : (z.miete_eigen ? 'Eingetragen als Jahressumme.' : 'Gerechnet aus der heutigen Miete der Wohnungen und den Mieterhöhungen.'))
         + ' Die Summe kommt aus den Wohnungen und lässt sich hier nicht frei ändern. Weicht ein Jahr ab, trag die Miete unten je Wohnung ein. Die heutige Miete änderst du in den Einheiten.'
         + ' <button type="button" class="dp-jb-knopf" data-jb-aktion="einheiten">In den Einheiten ändern</button></div>';
-      ein = '<div style="margin:6px 0 2px;font-weight:600">Je Wohnung: Monatsmiete in ' + z.jahr + ' und Monate ohne Miete</div><div class="dp-jb-f">'
+      ein = '<div style="margin:6px 0 2px;font-weight:600">Je Wohnung: Monatsmiete in ' + z.jahr + ', Monate ohne Miete und eine Erhöhung im Jahr (ab Monat, neue Miete)</div><div class="dp-jb-f">'
         + mfh.map(function (w, i) {
           if (!w) return '';
           var x = (e.einheiten || {})[String(i)] || {};
           return '<label>' + esc('Wohnung ' + (w.nr || (i + 1)) + (w.lage ? ' · ' + w.lage : '')) + '<span style="display:flex;gap:4px">'
-            + '<input data-jb-einheit="' + i + '" data-jb-k="miete_m" inputmode="decimal" style="flex:2" value="' + esc(x.miete_m == null ? '' : String(x.miete_m).replace('.', ',')) + '" placeholder="' + esc(String(w.ist || '')) + '">'
-            + '<input data-jb-einheit="' + i + '" data-jb-k="leer_monate" inputmode="numeric" style="flex:1" value="' + esc(x.leer_monate == null ? '' : x.leer_monate) + '" placeholder="0"></span></label>';
+            + '<input data-jb-einheit="' + i + '" data-jb-k="miete_m" inputmode="decimal" style="flex:2" title="Monatsmiete zu Jahresbeginn" value="' + esc(x.miete_m == null ? '' : String(x.miete_m).replace('.', ',')) + '" placeholder="' + esc(String(Math.round(mieteWohnungImJahr(w, z.jahr) * 100) / 100).replace('.', ',')) + '">'
+            + '<input data-jb-einheit="' + i + '" data-jb-k="leer_monate" inputmode="numeric" style="flex:1" title="Monate ohne Miete" value="' + esc(x.leer_monate == null ? '' : x.leer_monate) + '" placeholder="0">'
+            + (function () { var lp = erhoehungImJahr({}, w, z.jahr); return '<input data-jb-einheit="' + i + '" data-jb-k="erh_ab" inputmode="numeric" style="flex:1" title="Erhöhung ab Monat (1 bis 12)" value="' + esc(x.erh_ab == null ? '' : x.erh_ab) + '" placeholder="' + (lp ? lp.ab : 'ab Mon.') + '">'
+              + '<input data-jb-einheit="' + i + '" data-jb-k="erh_auf" inputmode="decimal" style="flex:2" title="Neue Monatsmiete ab diesem Monat" value="' + esc(x.erh_auf == null ? '' : String(x.erh_auf).replace('.', ',')) + '" placeholder="' + (lp ? esc(String(lp.auf).replace('.', ',')) : 'neu €') + '">'; })()
+            + '</span></label>';
         }).join('') + '</div>'
         ;
     } else {
@@ -586,7 +631,7 @@
         if (Object.keys(x).length) e[ei] = x; else delete e[ei];
         schreiben(y, 'einheiten', Object.keys(e).length ? e : '', true);
         /* v3840 · die Jahressumme des MFH folgt den Wohnungen (gesperrt, kein freies Feld mehr) */
-        var Mx = global._dpMfh, sw2 = summeWohnungen(Object.keys(e).length ? e : null, Mx && Array.isArray(Mx.einheiten) ? Mx.einheiten : []);
+        var Mx = global._dpMfh, sw2 = summeWohnungen(Object.keys(e).length ? e : null, Mx && Array.isArray(Mx.einheiten) ? Mx.einheiten : [], y);
         if (y < heuteJahr() && aenderungErlaubt(y)) schreiben(y, 'nkm_j', sw2 ? sw2.summe : '', true);
         mountAll();
       }
@@ -692,7 +737,7 @@
 
   global.DpJahresbuch = {
     VERSION: VERSION, STATUS: STATUS,
-    jahreVon: jahreVon, summeEinheiten: summeEinheiten, summeWohnungen: summeWohnungen,   /* v3840 */ zeile: zeile, setzen: setzen, nachfragen: nachfragen,
+    jahreVon: jahreVon, summeEinheiten: summeEinheiten, summeWohnungen: summeWohnungen, jahresMiete: jahresMiete, monateImJahr: monateImJahr,   /* v4220 */   /* v3840 */ zeile: zeile, setzen: setzen, nachfragen: nachfragen,
     verfuegbar: verfuegbar, zeilen: zeilen, status: status, statusSetzen: statusSetzen, statusWort: statusWort, aenderungErlaubt: aenderungErlaubt,
     istMieteSetzen: istMieteSetzen, istMiete: istMiete,   /* v3710 */ istHerkunft: istHerkunft, viviIstSetzen: viviIstSetzen,   /* v4037 */
     FEST_SCHRITTE: FEST_SCHRITTE, festAus: festAus, festNeu: festNeu, fest: fest, festSetzen: festSetzen, festGesperrt: festGesperrt,   /* v4016 */

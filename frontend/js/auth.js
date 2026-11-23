@@ -24,7 +24,32 @@ var Auth = (function() {
 
   function isApiMode() { return getApiBase() !== null; }
 
-  async function apiCall(path, options) {
+  /* v4220 · B1 (Durchlauf Musterhof 8, 23.11.2026): ein Tab geriet ohne fremdes Fenster in die Konfliktsperre.
+     Zwei Schreibwege DESSELBEN Tabs auf dasselbe Objekt liefen gleichzeitig (saveObj, Ankauf-Stand sollSpeichern
+     ohne expectedVersion, Steuer-Snapshot): der zweite PUT trug noch die alte expectedVersion, der Server
+     antwortete 409, storage.js sperrte das Objekt, jedes weitere Speichern endete still. Jetzt laufen alle
+     schreibenden Aufrufe eines Tabs auf ein Objekt nacheinander, und eine expectedVersion wird beim Absenden auf
+     die zuletzt von DIESEM Tab geschriebene Version gehoben. Ein 409 heisst danach wirklich: ein anderes Fenster. */
+  var _schreibKette = {};
+  function apiCall(path, options) {
+    var m = /^\/objects\/([0-9a-f-]{36})(\/[a-z-]+)?(\?|$)/.exec(String(path || ''));
+    var meth = String((options && options.method) || 'GET').toUpperCase();
+    if (!m || meth === 'GET') return _apiCallRoh(path, options);
+    var id = m[1];
+    var vorher = _schreibKette[id] || Promise.resolve();
+    var lauf = vorher.then(function () {
+      try {
+        var b = options && options.body, ver = window._dpObjVer && window._dpObjVer[id];
+        if (b && typeof b.expectedVersion === 'number' && typeof ver === 'number' && ver > b.expectedVersion) b.expectedVersion = ver;
+      } catch (e) {}
+      return _apiCallRoh(path, options);
+    });
+    _schreibKette[id] = lauf.then(function () {}, function () {});
+    return lauf;
+  }
+  apiCall._kette = _schreibKette;   /* fuer den Pruefer */
+
+  async function _apiCallRoh(path, options) {
     options = options || {};
     var base = getApiBase();
     if (!base) throw new Error('Kein API-Base konfiguriert');

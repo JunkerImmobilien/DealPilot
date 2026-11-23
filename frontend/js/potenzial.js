@@ -284,7 +284,9 @@
   }
   function zielBremseFuer(feld, stash, ausnahme, vgl, art) {
     var br = art === 'gewerbe' ? null : mietpreisbremse(agsJetzt());   /* die Bremse gilt nur für Wohnraum */
-    return K.zielmieteBremse({ ziel_qm: zielEingetragen(feld, stash), vgl_qm: vgl, bremse: br, ausnahme: ausnahme });
+    /* v4220 · B13: ohne Bremse die Höchstmiete bei Neuvermietung (Einstellung, Vorgabe 120 %), nur Wohnraum */
+    var fo = null; try { fo = art !== 'gewerbe' && window.DpMieteRegel ? window.DpMieteRegel.faktorOhne() : (art !== 'gewerbe' ? 1.2 : null); } catch (e) { fo = null; }
+    return K.zielmieteBremse({ ziel_qm: zielEingetragen(feld, stash), vgl_qm: vgl, bremse: br, ausnahme: ausnahme, faktor_ohne: fo });
   }
   function qmFeld(x) { return (Math.round(x * 100) / 100).toFixed(2).replace('.', ','); }
   /** was am Feld zu tun ist: null (nichts) · { feld: 'x,xx' | null (Feld bleibt), stash: {ein, auf} | null (Merker weg) } */
@@ -418,7 +420,7 @@
     /* v3312 · Zielmiete aus dem Modell: über der Bremse ist sie dort schon auf die Obergrenze begrenzt (w.ziel_bremse) */
     var zb = w.ziel_bremse || {}, zq = zahl(w.ziel_qm), bad = !!(og && br && br.gilt === true && zq > og + 0.004 && !zb.ausnahme);
     z.push({ c: 'ziel', t: 'Zielbild', v: zq > 0 ? eur2(zq) + '/m²' + (wfl ? ' · ' + eur(zq * wfl) + '/Monat' : '') : 'noch keine Zielmiete', bad: bad,
-      tag: zb.gekappt ? 'auf die Mietpreisbremse begrenzt' : zb.ueber ? 'Ausnahme § ' + zb.ausnahme + ' BGB' : '', warn: !!zb.gekappt,
+      tag: zb.gekappt ? (zb.grenze === 'wistg' ? 'auf die Höchstmiete bei Neuvermietung begrenzt' : 'auf die Mietpreisbremse begrenzt') : zb.ueber ? 'Ausnahme § ' + zb.ausnahme + ' BGB' : '', warn: !!zb.gekappt,
       u: bad ? 'über der Mietpreisbremse — nur mit höherer Vormiete (§ 556e) oder nach umfassender Modernisierung (§ 556f)'
         : zb.text ? zb.text + (f.ziel_wann ? ' · ' + String(f.ziel_wann) : '')
         : (f.ziel_wann ? String(f.ziel_wann) : 'Zielmiete und Maßnahmen darunter eintragen') });
@@ -690,6 +692,9 @@
 
   /* Eine Wohnung des Modells (m.wohnungen[i]) als höchstens vier Zeilen. */
   function mietrechtDaten(m, i) {
+    /* v4220 · B12: ohne Modell (pa-potenzial.js ruft mietrechtDaten() ohne Argumente) fehlte die Vergleichsmiete,
+       obwohl DpMieteMax sie aus dem Mietspiegel rechnet. Jetzt dasselbe Modell wie dort. */
+    if (!m) { try { m = modell(); } catch (e) { m = null; } }
     var w = (m && m.wohnungen && m.wohnungen[i || 0]) || null;
     var kapp = (m && m.kappung) || kappung(agsJetzt());
     var br = mietpreisbremse(agsJetzt());
@@ -732,7 +737,7 @@
       u: vglHer + (vBegr ? ' · ' + vBegr : '') + (vHwU.length ? ' · ' + vHwU.join(' · ') : ''),
       warn: vSchaetz || !!(vMs && (vMs.veraltet || vMs.art !== 'qualifiziert' || vMs.genutzt === 'oben')), lang: vHw.join(' · '),
       ms: vMs, quelle_art: vEig ? 'eigen' : (s.vgl_quelle_art || vgO.quelle_art || null) });
-    else z.push({ k: 'Vergleichsmiete', v: 'fehlt', u: 'Trag den Mietspiegel der Stadt ein. Das geht unten in der Karte Mieterhöhung und Zielbild. Eine belegte Vergleichsmiete geht auch', warn: true });
+    else z.push({ k: 'Vergleichsmiete', v: 'fehlt', u: 'Trag den Mietspiegel der Stadt ein. Das geht unten in der Karte Mieterhöhung und Zielbild. Eine belegte Vergleichsmiete geht auch.', warn: true });
     /* 2 · Nächste Erhöhung (§ 558) — aus sollFuer, nichts nachgerechnet */
     if (w) {
       var ist = zahl(w.ist), wfl = zahl(w.wfl);
@@ -795,7 +800,7 @@
     }
     /* 4 · Zielmiete gegen die Bremse */
     var zq = zahl(w && w.ziel_qm), zbM = (w && w.ziel_bremse) || {};
-    if (zbM.gekappt) z.push({ k: 'Zielmiete', v: 'auf ' + eur2(zq) + '/m² begrenzt', warn: true, gekappt: true, ein: zbM.eingetragen_qm, u: zbM.text });   /* v3312 */
+    if (zbM.gekappt) z.push({ k: 'Zielmiete', v: 'auf ' + eur2(zq) + '/m² begrenzt' + (zbM.grenze === 'wistg' ? ', über der zulässigen Höchstmiete bei Neuvermietung' : ''), warn: true, gekappt: true, wistg: zbM.grenze === 'wistg', ein: zbM.eingetragen_qm, u: zbM.text });   /* v3312, v4220 */
     else if (zbM.ueber) z.push({ k: 'Zielmiete', v: eur2(zq) + '/m² über der Bremse (Ausnahme)', warn: true, ueber: true, u: zbM.text });
     else if (obergrenze && zq > obergrenze + 0.004) z.push({ k: 'Zielmiete', v: eur2(zq) + '/m² liegt über der Bremse', bad: true,
       u: 'Zulässig nur mit höherer Vormiete (§ 556e) oder nach umfassender Modernisierung (§ 556f). Sonst höchstens ' + eur2(obergrenze) + '/m²' });
@@ -904,7 +909,7 @@
           + '<span class="dp-mr-w-v">' + esc(naechst ? naechst.v : 'keine Angabe') + '</span></div>'
           + '<div class="dp-mr-w2">' + esc(naechst && naechst.u ? kurzSaetze(naechst.u) : '')
           + (w.ziel_qm ? '<br>Zielmiete ' + eur2(w.ziel_qm) + '/m².' + (ziel && ziel.bad ? ' <b>Sie liegt über der Mietpreisbremse.</b> Höchstens ' + eur2(d.obergrenze) + '/m², außer nach § 556e oder § 556f BGB.'
-              : ziel && ziel.gekappt ? ' <b>Begrenzt auf die Mietpreisbremse.</b> Eingetragen waren ' + eur2(ziel.ein) + '/m². Mehr geht nur mit einer Ausnahme nach § 556e oder § 556f BGB.'   /* v3312 */
+              : ziel && ziel.gekappt ? (ziel.wistg ? ' <b>Begrenzt auf die zulässige Höchstmiete bei Neuvermietung.</b> Eingetragen waren ' + eur2(ziel.ein) + '/m².' : ' <b>Begrenzt auf die Mietpreisbremse.</b> Eingetragen waren ' + eur2(ziel.ein) + '/m². Mehr geht nur mit einer Ausnahme nach § 556e oder § 556f BGB.')   /* v3312 */
               : ziel && ziel.ueber ? ' Sie liegt über der Bremse, eine Ausnahme ist eingetragen.' : '') : '') + '</div></div>';
       }).join('');
       /* v3840 · Marcel 19.11.2026: „darunter steht eine Auflistung der Einheiten, ohne zu sagen wozu" und
@@ -2276,7 +2281,8 @@
       html += '<tr class="dp-pot-sum"><td>' + zz('Wertzuwachs nach Kosten', 'Ertragswert der Stufe − Bestand − Maßnahmen') + '</td>' + cols.map(function (c) {
         if (c.k === 'ankauf' || c.k === 'bestand') return '<td></td>';
         var h = WS[c.k], kk = (m.stufen[c.k] && m.stufen[c.k].kosten) || 0;
-        return '<td class="' + c.c + '">' + (h && h.ew != null ? (h.ew - HB.ew - kk >= 0 ? '+' : '') + eur(h.ew - HB.ew - kk) : '—') + '</td>';
+        /* v4220 · B16: Zielbild ohne eingetragene Maßnahmenkosten: „nach Kosten“ wäre irreführend, Hinweis statt stiller 0 */
+        return '<td class="' + c.c + '">' + (h && h.ew != null ? (h.ew - HB.ew - kk >= 0 ? '+' : '') + eur(h.ew - HB.ew - kk) + (c.k === 'zielbild' && !(kk > 0) ? '<small>ohne Maßnahmenkosten, bitte eintragen</small>' : '') : '—') + '</td>';
       }).join('') + '</tr>';
     }
     html += '</tbody></table></div>';

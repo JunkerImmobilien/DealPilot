@@ -1088,7 +1088,7 @@
     var x = Object.assign({}, E[String(i)] || {}); if (v == null) delete x.miete_m; else x.miete_m = v;
     if (Object.keys(x).length) E[String(i)] = x; else delete E[String(i)];
     if (!Object.keys(E).length) delete J.einheiten;
-    var sw = window.DpJahresbuch && window.DpJahresbuch.summeWohnungen ? window.DpJahresbuch.summeWohnungen(J.einheiten || null, _arbeit) : null;
+    var sw = window.DpJahresbuch && window.DpJahresbuch.summeWohnungen ? window.DpJahresbuch.summeWohnungen(J.einheiten || null, _arbeit, +y) : null;
     if (sw) J.nkm_j = sw.summe; else delete J.nkm_j;
     J.geaendert_am = new Date().toISOString();
     if (!Object.keys(J).filter(function (q) { return q !== 'geaendert_am'; }).length) delete _jArbeit[k];

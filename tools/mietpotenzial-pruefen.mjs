@@ -827,6 +827,14 @@ const EINH = [{ nr: '1', wfl: '60', ist: '480', status: 'vermietet' }, { nr: '2'
   gleich('O4 Bremse gilt nicht: unverändert, keine Obergrenze', [r.qm, r.gekappt, r.obergrenze_qm], [9.5, false, null]);
   r = K.zielmieteBremse({ ziel_qm: 9.5, vgl_qm: 8.43, bremse: { gilt: null } });
   gleich('O5 Bremse „bitte prüfen“: unverändert', [r.qm, r.gekappt, r.obergrenze_qm], [9.5, false, null]);
+  /* v4220 · B13 (Musterhof 8 Whg. 5): ohne Bremse mit faktor_ohne auf 120 % der Vergleichsmiete begrenzt */
+  r = K.zielmieteBremse({ ziel_qm: 9, vgl_qm: 7.4, bremse: { gilt: false }, faktor_ohne: 1.2 });
+  gleich('O4b ohne Bremse, faktor_ohne 1,2: 9,00 auf 8,88 begrenzt', [r.qm, r.gekappt, r.obergrenze_qm, r.grenze], [8.88, true, 8.88, 'wistg']);
+  wahr('O4b Hinweis nennt § 5 WiStG und 120 %', /Höchstmiete bei Neuvermietung/.test(r.text) && /120 %/.test(r.text) && /§ 5 WiStG/.test(r.text) && !/[—;]/.test(r.text));
+  r = K.zielmieteBremse({ ziel_qm: 8.8, vgl_qm: 7.4, bremse: { gilt: false }, faktor_ohne: 1.2 });
+  gleich('O4c ohne Bremse unter 120 %: unverändert', [r.qm, r.gekappt], [8.8, false]);
+  r = K.zielmieteBremse({ ziel_qm: 9.5, vgl_qm: 8.43, bremse: { gilt: true }, faktor_ohne: 1.2 });
+  gleich('O4d Bremse gilt: weiter 110 % (faktor_ohne ohne Wirkung)', [r.qm, r.obergrenze_qm], [9.27, 9.27]);
   r = K.zielmieteBremse({ ziel_qm: 9.5, vgl_qm: 0, bremse: BR });
   gleich('O6 ohne Vergleichsmiete: unverändert', [r.qm, r.gekappt, r.obergrenze_qm], [9.5, false, null]);
   r = K.zielmieteBremse({ ziel_qm: 9.5, vgl_qm: 8.43, bremse: BR, ausnahme: '556f' });

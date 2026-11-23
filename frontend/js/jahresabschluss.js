@@ -106,11 +106,15 @@
   }
   function schrittMiete(r) {
     var J = _z.jahr, z = r.z, e = jahrDaten(J), vivi = e.nkm_j_vivi != null && e.nkm_j_vivi !== '' && istZahl(Number(e.nkm_j_vivi)) ? Number(e.nkm_j_vivi) : null;
+    /* v4220 · B9: kennt ViVi das Jahr nicht vollständig (vor dem Anlegen in ViVi, fehlende Vormieter), kein Übernehmen */
+    var lueV = null; try { lueV = global.DpJahresabgleich && global.DpJahresabgleich.viviLuecke ? global.DpJahresabgleich.viviLuecke(J) : null; } catch (x) { lueV = null; }
+    if (lueV) vivi = null;
     var plan = z.miete_plan != null ? z.miete_plan : z.miete_proj, herkunft = z.miete_eigen ? 'von dir eingetragen' : (z.miete_vivi ? 'aus dem ViVi-Mietverlauf' : 'gerechnet aus der Miete heute und den Mieterhöhungen');
     var h = '<h4>Miete ' + J + '</h4><p class="dp-jab-satz">Trag ein, was ' + J + ' wirklich an Kaltmiete eingegangen ist. Leerstand und Restschuld gehören dazu.<small>Heute steht dort ' + eur(z.miete_ist) + ', ' + herkunft + '.</small></p>';
     h += '<div class="dp-jab-zahl"><span>Kaltmiete ' + J + '<b>' + eur(z.miete_ist) + '</b></span><span>' + (z.miete_plan != null ? 'Plan vom Kauf' : 'Projektion') + '<b>' + eur(plan) + '</b></span><span>Abstand<b>' + (istZahl(plan) && istZahl(z.miete_ist) ? vz(z.miete_ist - plan) : '–') + '</b></span></div>';
     if (vivi != null && z.miete_eigen && Math.abs(vivi - z.miete_ist) >= 1) h += '<div class="dp-jab-box gold">Laut ViVi-Mietverlauf ' + eur(vivi) + ' im Jahr. Deine Angabe ' + eur(z.miete_ist) + ' gilt.<div class="dp-jab-reihe" style="margin:8px 0 0">' + knopf('vivi-miete', 'ViVi übernehmen', false) + '</div></div>';
     else if (vivi != null && z.miete_vivi) h += '<div class="dp-jab-box">Die Ist-Miete kommt aus dem ViVi-Mietverlauf. Weicht sie ab, trag die echte Summe unten ein.</div>';
+    if (lueV) h += '<div class="dp-jab-box">' + esc(lueV.text) + (z.miete_vivi ? ' Die Ist-Miete stammt aus einem älteren ViVi-Abgleich. Trag die echte Summe unten ein.' : '') + '</div>';
     h += '<div data-jab-eingabe></div>';
     h += '<div class="dp-jab-reihe">' + knopf('erh', 'Mieterhöhung im Jahr eintragen', false) + '</div>';
     return h;

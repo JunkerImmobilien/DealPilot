@@ -112,6 +112,7 @@
     var z = null; try { z = JB.zeilen().filter(function (x) { return +x.jahr === +jahr; })[0] || null; } catch (e) { z = null; }
     var vd = null; try { vd = viviDaten(); } catch (e) { vd = null; }
     var vj = vd ? JA.viviJahr(jahr, vd) : null;
+    if (z && vj && vj.unvollstaendig) return { z: z, vj: vj, d: null, unvoll: true };   /* v4220 · B9 */
     if (!z || !vj || !istZahl(vj.miete)) return null;
     return { z: z, vj: vj, d: istZahl(z.miete_ist) ? z.miete_ist - vj.miete : null };
   }
@@ -124,10 +125,12 @@
     var m = mieteVergleich(jahr); if (m && m.d != null && Math.abs(m.d) >= 1) n++;
     return n;
   }
+  function JA0() { return global.DpJahresabgleich || null; }
   function mieteZeile(jahr) {
     var JB = global.DpJahresbuch, mv = mieteVergleich(jahr);
     if (!mv) return '';
     var z = mv.z, vj = mv.vj, d = mv.d;
+    if (mv.unvoll) { var lt = JA0() && JA0().lueckenText ? JA0().lueckenText(vj.luecken) : ''; return '<tr><td><b>Miete im Jahr</b><small>Reiter Miete</small></td><td>' + eur(z.miete_ist) + '</td><td colspan="3"><span class="vr-grau">ViVi kennt ' + jahr + ' nicht vollständig' + (lt ? ', es fehlen ' + esc(lt) : '') + '</span></td></tr>'; }   /* v4220 · B9 */
     var st = d == null ? '<span class="vr-grau">kein Ist</span>' : Math.abs(d) < 1 ? '<span class="vr-ok">✓ gleich</span>' : '<span class="vr-ab">' + vz(-d) + '</span>';
     var her = JB.istHerkunft ? ({ eigen: 'eingetragen', vivi: 'aus ViVi' })[JB.istHerkunft(jahr)] || 'gerechnet' : '';
     return '<tr><td><b>Miete im Jahr</b><small>Reiter Miete' + (her ? ', ' + esc(her) : '') + '</small></td><td>' + eur(z.miete_ist) + '</td><td>' + eur(vj.miete) + '</td><td>' + st + '</td><td></td></tr>';

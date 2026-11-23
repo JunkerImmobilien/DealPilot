@@ -524,6 +524,20 @@
     var og = (br && br.gilt === true && vgl > 0) ? Math.round(vgl * 1.1 * 100) / 100 : null;
     var r = { qm: ein > 0 ? ein : null, eingetragen_qm: ein > 0 ? ein : null, obergrenze_qm: og, gekappt: false, ueber: false,
       ausnahme: aus, bremse_gilt: br ? br.gilt : null, text: '' };
+    /* v4220 · B13 (Durchlauf Musterhof 8): ohne Mietpreisbremse war die Zielmiete gar nicht begrenzt. Whg. 5 trug
+       9,00 €/m² bei einer Höchstmiete von 8,88 €/m² (120 % der Vergleichsmiete). Reicht der Aufrufer den Faktor
+       herein (faktor_ohne, Einstellung DpMieteRegel, ein Kern liest keine Einstellungen), wird auf diese Grenze
+       begrenzt wie bei der Bremse. Ohne faktor_ohne bleibt alles wie bisher (Einzel-Check, Backend). */
+    var fo = zahl(p.faktor_ohne);
+    if (!og && fo > 1 && vgl > 0 && !(br && br.gilt === true)) {
+      var ogW = Math.round(vgl * fo * 100) / 100;
+      if (ein > 0 && ein > ogW + 0.004) {
+        r.qm = ogW; r.obergrenze_qm = ogW; r.gekappt = true; r.grenze = 'wistg';
+        r.text = 'Zielmiete auf die zulässige Höchstmiete bei Neuvermietung begrenzt: eingetragen ' + eur2(ein).replace(/\s*€$/, '') + ' → ' + eur2(ogW) + '/m²'
+          + ' (' + Math.round(fo * 100) + ' % der Vergleichsmiete ' + eur2(vgl) + '/m², § 5 WiStG)';
+      }
+      return r;
+    }
     if (!(ein > 0) || !og || ein <= og + 0.004) return r;
     if (aus) {
       r.ueber = true;

@@ -289,7 +289,11 @@
     /* v4037 · auch der Rechenweg ohne Ist-Jahre (laufendes Jahr): Zusatzeinnahmen aus DealPilot je Monat dazu, ViVi kennt
        nicht alle. Sonst stand bei 2026-1041 eine Differenz von genau 12 × 90 € in der Spalte „laut ViVi“. */
     if (istZahl(out.miete)) { var zeL = zahl((doc() && doc().getElementById('ze') || {}).value) || 0; if (zeL > 0) out.miete = Math.round((out.miete + zeL * (13 - ab)) * 100) / 100; }
-    if (ij && ij.summe && ij.summe[String(jahr)] && istZahl(zahl(ij.summe[String(jahr)].miete))) {
+    /* v4220 · Fork S (v4210): ViVi meldet je Jahr, ob der Mietverlauf das Jahr ganz abdeckt (abgedeckt, luecken).
+       Ein Jahr, das ViVi nicht vollständig kennt (vor dem Anlegen in ViVi, fehlende Vormieter), liefert keine Summe. */
+    if (ij && ij.summe && ij.summe[String(jahr)] && ij.summe[String(jahr)].abgedeckt === false) {
+      out.miete = null; out.luecken = (ij.luecken || {})[String(jahr)] || []; out.unvollstaendig = true;
+    } else if (ij && ij.summe && ij.summe[String(jahr)] && ij.summe[String(jahr)].abgedeckt !== false && istZahl(zahl(ij.summe[String(jahr)].miete))) {
       /* wie vivi-felder: Kaltmiete aus ViVi plus Zusatzeinnahmen aus DealPilot je vermietetem Monat */
       var xj = ij.summe[String(jahr)], zeD = zahl((doc() && doc().getElementById('ze') || {}).value) || 0;
       out.miete = istZahl(zahl(xj.kalt)) ? Math.round((zahl(xj.kalt) + zeD * (istZahl(zahl(xj.monate_vermietet)) ? zahl(xj.monate_vermietet) : 12)) * 100) / 100 : zahl(xj.miete);
@@ -299,6 +303,22 @@
     (info.sondertilgungen || []).forEach(function (x) { if (x && String(x.datum || '').slice(0, 4) === String(jahr)) out.st.push(x); });
     if (jahr === heuteJahr() && info.restschuld_heute && istZahl(info.restschuld_heute.wert)) out.rs = info.restschuld_heute;
     return out;
+  }
+  /* v4220 · B9: Lücken des ViVi-Mietverlaufs als Satz. luecken = [{ einheit, monate }], monate = Liste oder Zahl */
+  function lueckenText(l) {
+    var t = (Array.isArray(l) ? l : []).map(function (x) {
+      var n = Array.isArray(x && x.monate) ? x.monate.length : zahl(x && x.monate);
+      return (x && x.einheit ? 'Wohnung ' + x.einheit : 'Objekt') + (istZahl(n) && n > 0 ? ' ' + n + (n === 1 ? ' Monat' : ' Monate') : '');
+    }).filter(Boolean);
+    return t.length ? t.join(', ') : '';
+  }
+  /** v4220 · B9: kennt ViVi das Jahr nicht vollständig? { text } oder null. Für Assistent und Reiter ViVi. */
+  function viviLuecke(jahr) {
+    var vd = null; try { vd = viviDaten(); } catch (e) { vd = null; }
+    var vj = vd ? viviJahr(+jahr, vd) : null;
+    if (!vj || !vj.unvollstaendig) return null;
+    var lt = lueckenText(vj.luecken);
+    return { luecken: vj.luecken || [], text: 'ViVi kennt ' + jahr + ' nicht vollständig' + (lt ? ' (es fehlen ' + lt + ')' : '') + '. Die Summe laut ViVi wird deshalb nicht angeboten.' };
   }
   /* v4042 · Marcel 23.11.2026: keine Doppelung mit dem Reiter ViVi. Im Jahresabgleich nur noch eine Zeile je Jahr mit der
      Zahl der Abweichungen (gezählt wie im Reiter, DpViviReiter.abweichungen) und dem Absprung dorthin. Was dort nicht
@@ -490,11 +510,11 @@
     /* im Jahr genutzt: die Erhöhung ist eingetragen und es blieb (fast) nichts liegen */
     var genutzt = !lauf && ungenutzt > 0 && gen.length && mp.ungenutzt_jahr <= Math.max(5, ungenutzt * 1.2);
     var wort = genutzt ? 'genutzt' : (ungenutzt > 0 ? vz(ungenutzt) + ' / Monat' : 'ausgeschöpft');
-    if (genutzt) ungenutzt = 0;
+    if (genutzt) ungenutzt = 0;   /* v4220 · B15: festgeschriebene Miete des Jahres bietet keine Mieterhöhung mehr an (Knöpfe unten) */
     return '<div class="dp-ja-pot" data-ja-pot="' + z.jahr + '"><div><div class="dp-ja-eti">Mieterhöhung ' + z.jahr + '</div><div class="dp-ja-w' + (ungenutzt > 0 ? '' : ' dp-ja-gut') + '">' + wort + '</div>'
       + (genutzt ? '<div class="dp-ja-vgl">' + vz(Math.round(mp.zul - mp.ist)) + ' / Monat ab ' + mmjj(gen[0].datum) + '</div>' : '') + '</div>'
       + '<div><div class="dp-ja-balken" role="img" aria-label="eingetragen ' + quote + ' % der zulässigen Miete"><i style="width:' + quote + '%"></i></div><p>' + t + '</p></div>'
-      + (ungenutzt > 0 ? '<span>' + knopf('mieterhoehung', 'Mieterhöhung vorbereiten', true)
+      + (ungenutzt > 0 && !(festJahr(z.jahr) || {}).miete ? '<span>' + knopf('mieterhoehung', 'Mieterhöhung vorbereiten', true)
         + (global.DpViviMieterhoehung && global.DpViviMieterhoehung.verfuegbar() ? ' ' + knopf('vivi-mh', 'In ViVi anlegen', false) : '') + '</span>' : '<span></span>') + '</div>'
       + '<p class="dp-ja-hin">Gerechnet wie die Potenzialanalyse (Kappung, Sperrfrist, Vergleichsmiete). Frühere Jahre mit der heutigen Vergleichsmiete, den damaligen Mietspiegel kennt DealPilot nicht.</p>';
   }
@@ -976,7 +996,7 @@
 
   global.DpJahresabgleich = { VERSION: VERSION, stand: stand, hausStand: hausStand, hausJahr: hausJahr, erinnerung: erinnerung, mbAbrufen: mbAbrufen,
     mpRein: mpRein, mpQuellen: mpQuellen, mpJahr: mpJahr, html: html, mountAll: mountAll, verfuegbar: verfuegbar, grafikOpt: grafikOpt,
-    standText: standText, viviMieteRein: viviMieteRein, viviJahr: viviJahr,   /* v4016, v4017 */
+    standText: standText, viviMieteRein: viviMieteRein, viviJahr: viviJahr, viviLuecke: viviLuecke, lueckenText: lueckenText,   /* v4220 */   /* v4016, v4017 */
     SCHRITTE: SCHRITTE, aktiverSchritt: aktiverSchritt, aufgabe: aufgabe, fuehrungHtml: fuehrungHtml,   /* v4090 · für den Prüfer */
     hgViviRein: hgViviRein, hausMitViviRein: hausMitViviRein, offenListe: offenListe, fertigErgebnis: fertigErgebnis,   /* v4100 */
     standFuer: function (j) { var z = zeileJahr(j), w = mitWeg(); return z ? { z: z, s: stand(z, w, hausLesen()), weg: w } : null; },

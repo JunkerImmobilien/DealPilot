@@ -82,6 +82,14 @@ const E = ctx.DpErhoehungen;
   ok(B.jahreVon(null, 2026).length === 0 && B.jahreVon(2027, 2026).length === 0, 'J ohne Kaufjahr oder Kauf in der Zukunft: keine Jahre');
   ok(B.summeEinheiten({ '0': { miete_m: 500 }, '1': { miete_m: 600, leer_monate: 3 } }) === 500 * 12 + 600 * 9, 'J Summe der Wohnungen mit Leerstand');
   ok(B.summeEinheiten({}) === null, 'J ohne Wohnungsangaben kein Vorschlag');
+  /* v4220 · B8 Kaufjahr ab Übergang, B11 Erhöhung im Jahr (Musterhof 8: 5 Wohnungen, Übergang 01.02.2021) */
+  ok(B.jahresMiete(444, null, 11, 0) === 444 * 11, 'J B8 Kaufjahr mit Übergang 01.02.: 11 Monate statt 12');
+  ok(B.jahresMiete(470, { ab: 4, auf: 520 }, 12, 0) === 3 * 470 + 9 * 520, 'J B11 Erhöhung ab April: 3 × 470 + 9 × 520');
+  ok(B.jahresMiete(470, { ab: 4, auf: 520 }, 11, 0) === 2 * 470 + 9 * 520, 'J B8+B11 Kaufjahr ab Februar mit Erhöhung ab April');
+  ok(B.jahresMiete(500, null, 12, 3) === 500 * 9, 'J Leerstand wie bisher (12 Monate, 3 leer)');
+  ok(B.jahresMiete(500, null, 0, 0) === 0, 'J vor dem Kauf: keine Miete');
+  ok(B.summeEinheiten({ '0': { miete_m: 470, erh_ab: 4, erh_auf: 520 } }) === 3 * 470 + 9 * 520, 'J eigene Erhöhung im Jahr zählt in der Summe');
+  ok(B.summeEinheiten({ '0': { miete_m: 470, erh_ab: 13, erh_auf: 520 } }) === 470 * 12, 'J Erhöhung mit Monat 13 wird nicht gezählt');
   const z1 = B.zeile({ jahr: 2025, plan: { nkm_y: 12000, cfop_y: 1500, rs: 180000 }, ist: { nkm_j: '11.400', rs_ist: 178000 }, av: { wert: 12000, eigen: false } });
   ok(z1.miete_ist === 11400 && z1.miete_abw === -600 && z1.rs_abw === -2000, 'J Abweichung Miete und Restschuld gegen den Plan');
   ok(z1.abgleich && z1.abgleich.art === 'vorschlag', 'J Anlage V nur Vorschlag: Ist-Miete wird angeboten, nicht übernommen (E7)');

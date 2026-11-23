@@ -89,7 +89,7 @@
   }
 
   /* ── Kerne nachladen (Buster wie frontend/index.html, tools/buster-ebenen-pruefen.mjs) ── */
-  var KERNE = { DpDokument: 'js/dp-dokument.js?v=v3223', DpMietpotenzial: 'js/mietpotenzial-kern.js?v=v3840b', DealScore2: 'js/dealscore2.js?v=v3254',
+  var KERNE = { DpDokument: 'js/dp-dokument.js?v=v3223', DpMietpotenzial: 'js/mietpotenzial-kern.js?v=v4220', DealScore2: 'js/dealscore2.js?v=v3254',
     DpDarlehenWeitere: 'js/darlehen-weitere.js?v=v3256' };   /* v3946 · Monatsplan der Darlehen (Restschuld, Anschluss) */
   var _geladen = {};
   function lade(name) {
