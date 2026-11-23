@@ -1536,6 +1536,8 @@
         return '<div id="dp-pa-' + x[0] + '" data-dp-pa5-teil="' + x[0] + '"' + (i ? ' class="dp-pa5-zu"' : '') + '>' + x[1] + '</div>'; }).join('');
     };
     var teil = function (id, inner, erst) { return inner ? '<div id="dp-pa-' + id + '"' + (erst ? '' : ' class="dp-pa4-mt" style="margin-top:18px"') + '>' + inner + '</div>' : ''; };
+    /* v4042 · Marcel 23.11.2026: Reihenfolge Übersicht, Jahresabgleich, ViVi (vorher Jahresabgleich vorn, v3420) */
+    add('uebersicht', 'Übersicht', o.uebersicht);
     if (bestand && o.jahre) {
       add('jahr', 'Jahresabgleich', '<div data-dp-ja-host="1"></div><div style="margin-top:18px"></div>' + o.jahre);
       try { setTimeout(function () { if (window.DpJahresabgleich) window.DpJahresabgleich.mountAll(); if (window.DpJahresbuch) window.DpJahresbuch.mountAll(); }, 0); } catch (eJ) {}
@@ -1545,7 +1547,6 @@
       add('vivi', 'ViVi', '<div data-dp-vivi-host="1"></div>', { tabExtra: ' id="dp-pa-tab-vivi"' });
       try { setTimeout(function () { window.DpViviReiter.mountAll(); }, 0); } catch (eV) {}
     }
-    add('uebersicht', 'Übersicht', o.uebersicht);
     /* v3440 · o.si ist ein Objekt mit den Teilen (ui.js); als Text (ältere Aufrufer) wie bis v3439 */
     if (o.si && typeof o.si === 'object') { if (o.si.pot || o.si.sollIst || o.si.leer) add('si', bestand ? 'Ankauf · Bestand · Zielbild' : 'Ankauf · Soll · Zielbild', siReiter(bestand, o.si, o.analyse)); }
     else add('si', bestand ? 'Ankauf · Bestand · Zielbild' : 'Ankauf · Soll · Zielbild', o.si ? '<div class="dp-pa-e dp-pa4-mini" data-dp-pa4-mini="abz"></div>' + o.si : o.si);

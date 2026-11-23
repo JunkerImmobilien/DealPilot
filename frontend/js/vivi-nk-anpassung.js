@@ -19,7 +19,7 @@
  * ══════════════════════════════════════════════════════════════════════ */
 (function (global) {
   'use strict';
-  var VERSION = 'v4042';
+  var VERSION = 'v4042a';
   if (!global.document || global.DpViviNkAnpassung) return;
   var doc = global.document;
   function $(id) { return doc.getElementById(id); }
@@ -86,7 +86,7 @@
       + (_z.L.length > 1 || _z.L[0].i != null ? '<label class="vmh-voll">Wohnung<select data-vnk-f="sel">' + opts + '</select></label>' : '<div class="vmh-voll vmh-hin">' + esc(w.name) + ', Vorauszahlung heute <b>' + esc(eur2(w.vivi)) + '</b> im Monat</div>')
       + '<label>Neue Vorauszahlung (€ im Monat)<input inputmode="decimal" data-vnk-f="neu" value="' + (neu != null ? esc(String(neu).replace('.', ',')) : '') + '"></label>'
       + '<label>Wirksam ab<input type="date" data-vnk-f="datum" value="' + esc(_z.datum || '') + '"></label></div>';
-    h += '<div class="vmh-box">' + (w.quelle === 'eigen' ? 'Bei dir eingetragen: <b>' + esc(eur2(w.ziel)) + '</b> im Monat.' : 'Aus den umlagefähigen Kosten ergeben sich <b>' + esc(eur2(w.ziel)) + '</b> im Monat, nach Wohnfläche verteilt.')
+    h += '<div class="vmh-box">' + (w.quelle === 'eigen' ? 'Bei dir eingetragen: <b>' + esc(eur2(w.ziel)) + '</b> im Monat.' : 'Aus den umlagefähigen Kosten ergeben sich <b>' + esc(eur2(w.ziel)) + '</b> im Monat' + (w.i != null ? ', nach Wohnfläche verteilt.' : '.'))
       + ' ViVi führt heute ' + esc(eur2(w.vivi)) + '.</div>';
     h += '<p class="vmh-hin">Nach § 560 Abs. 4 BGB darf jede Seite die Vorauszahlung nach einer Betriebskostenabrechnung auf eine angemessene Höhe anpassen. Sie gilt ab der nächsten Fälligkeit nach Zugang der Erklärung.</p>';
     if (_z.vorschau) h += '<div class="vmh-box vmh-ok">' + _z.vorschau + '</div>';

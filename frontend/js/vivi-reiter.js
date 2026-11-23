@@ -17,7 +17,7 @@
  * ═══════════════════════════════════════════════════════════════════════════════════════════════════════════════ */
 (function (global) {
   'use strict';
-  var VERSION = 'v4042';
+  var VERSION = 'v4042a';
   if (!global.document || global.DpViviReiter) return;
   var doc = global.document;
   var _jahr = null, _offen = {};
@@ -105,14 +105,29 @@
     if (z.modus === 'addieren') return '<span class="vr-ab">' + z.neu.length + ' neu</span><small>' + vz(z.abw) + (z.ersetztSchaetzung ? ', ersetzt die Schätzung' : '') + '</small>';
     return '<span class="vr-ab">' + vz(z.abw) + '</span>';
   }
-  function mieteZeile(jahr) {
+  /* v4042 · Miete im Jahr: DealPilot (Ist) gegen ViVi, für die Zeile und für die Zählung im Jahresabgleich */
+  function mieteVergleich(jahr) {
     var JB = global.DpJahresbuch, JA = global.DpJahresabgleich;
-    if (!JB || !JB.zeilen || !JA || !JA.viviJahr) return '';
+    if (!JB || !JB.zeilen || !JA || !JA.viviJahr) return null;
     var z = null; try { z = JB.zeilen().filter(function (x) { return +x.jahr === +jahr; })[0] || null; } catch (e) { z = null; }
     var vd = null; try { vd = viviDaten(); } catch (e) { vd = null; }
     var vj = vd ? JA.viviJahr(jahr, vd) : null;
-    if (!z || !vj || !istZahl(vj.miete)) return '';
-    var d = istZahl(z.miete_ist) ? z.miete_ist - vj.miete : null;
+    if (!z || !vj || !istZahl(vj.miete)) return null;
+    return { z: z, vj: vj, d: istZahl(z.miete_ist) ? z.miete_ist - vj.miete : null };
+  }
+  /** v4042 · Zahl der Abweichungen eines Jahres, wie der Reiter sie zeigt (Miete im Jahr + offene Zeilen). null = kein Stand. */
+  function abweichungen(jahr) {
+    if (!sichtbar() || !vstand()) return null;
+    var n = 0, a = null;
+    try { a = abgleichJahr(jahr); } catch (e) { a = null; }
+    if (a) n += a.offen || 0;
+    var m = mieteVergleich(jahr); if (m && m.d != null && Math.abs(m.d) >= 1) n++;
+    return n;
+  }
+  function mieteZeile(jahr) {
+    var JB = global.DpJahresbuch, mv = mieteVergleich(jahr);
+    if (!mv) return '';
+    var z = mv.z, vj = mv.vj, d = mv.d;
     var st = d == null ? '<span class="vr-grau">kein Ist</span>' : Math.abs(d) < 1 ? '<span class="vr-ok">✓ gleich</span>' : '<span class="vr-ab">' + vz(-d) + '</span>';
     var her = JB.istHerkunft ? ({ eigen: 'eingetragen', vivi: 'aus ViVi' })[JB.istHerkunft(jahr)] || 'gerechnet' : '';
     return '<tr><td><b>Miete im Jahr</b><small>Reiter Miete' + (her ? ', ' + esc(her) : '') + '</small></td><td>' + eur(z.miete_ist) + '</td><td>' + eur(vj.miete) + '</td><td>' + st + '</td><td></td></tr>';
@@ -189,7 +204,9 @@
       w.vivi = id && v.felder ? zahl(v.felder[id]) : null;
       w.eigen = !!(id && Object.prototype.hasOwnProperty.call(eigen, id));
       w.abw = istZahl(w.vivi) ? Math.round((w.ist - w.vivi) * 100) / 100 : null;
-      w.pot = w.soll >= w.ist + 1 ? Math.round(w.soll - w.ist) : 0;
+      /* v4042 · Potenzial gegen die höhere der beiden Mieten (DealPilot, ViVi): liegt ViVi schon darüber, gibt es keins */
+      var basis = Math.max(w.ist || 0, istZahl(w.vivi) ? w.vivi : 0);
+      w.pot = w.soll >= basis + 1 ? Math.round(w.soll - basis) : 0;
       /* v4042 · Nebenkosten-Vorauszahlung: ViVi gegen das Soll in DealPilot (DpViviNkAnpassung) */
       try { w.nk = global.DpViviNkAnpassung ? global.DpViviNkAnpassung.abweichung(D.mfh ? w.i : null) : null; } catch (e) { w.nk = null; }
     });
@@ -215,7 +232,7 @@
         + (w.pot ? '<div class="vr-wz vr-wp"><span>möglich</span><span>' + eur(w.soll) + ' (+' + eur(w.pot) + ')</span></div>' : '')
         + (w.nk ? '<div class="vr-wz vr-wn"><span>Nebenkosten</span><span>' + eur(w.nk.vivi) + ' → ' + eur(w.nk.ziel) + '</span></div>' : '')
         + '<div class="vr-wk">' + (abw && w.eigen ? '<button type="button" class="btn-clean vr-k" data-vr="w-vivi" data-vr-id="' + esc(w.viviId) + '">ViVi übernehmen</button>' : '')
-        + (mh && w.ist > 0 ? '<button type="button" class="btn-clean vr-k' + (w.pot ? ' gold' : '') + '" data-vr="w-mh" data-vr-e="' + (D.mfh ? w.i : 'objekt') + '">Mieterhöhung in ViVi</button>' : '')
+        + (mh && w.ist > 0 && (V.spielraum ? V.spielraum(D.mfh ? w.i : null, w.vivi) : w.pot) ? '<button type="button" class="btn-clean vr-k' + (w.pot ? ' gold' : '') + '" data-vr="w-mh" data-vr-e="' + (D.mfh ? w.i : 'objekt') + '">Mieterhöhung in ViVi</button>' : '')
         + (mh && w.nk ? '<button type="button" class="btn-clean vr-k" data-vr="w-nk" data-vr-e="' + (D.mfh ? w.i : 'objekt') + '">Nebenkosten in ViVi</button>' : '') + '</div></div>';
     };
     var pot = D.W.reduce(function (s, w) { return s + w.pot; }, 0), nAb = D.W.filter(function (w) { return istZahl(w.abw) && Math.abs(w.abw) >= 1; }).length;
@@ -289,7 +306,8 @@
     var L = Array.prototype.slice.call(doc.querySelectorAll(sel));
     return L.filter(function (e) { return e.closest && e.closest('#ai-content'); })[0] || L.filter(function (e) { return e.getClientRects().length > 0; })[0] || L[0] || null;
   }
-  function oeffnen() {
+  function oeffnen(jahr) {
+    if (istZahl(+jahr) && +jahr > 1900) { _jahr = +jahr; try { mountAll(); } catch (e) {} }   /* v4042 · Absprung aus dem Jahresabgleich mit Jahr */
     var b = imSichtbaren('#dp-pa-tab-vivi') || imSichtbaren(".dp-pa-tab[onclick*=\"'vivi'\"]");
     var p = imSichtbaren('#dp-pa-vivi');
     if (b && p) {
@@ -410,5 +428,5 @@
     doc.head.appendChild(s);
   }
 
-  global.DpViviReiter = { VERSION: VERSION, sichtbar: sichtbar, html: html, mountAll: mountAll, oeffnen: oeffnen, jahre: jahre };
+  global.DpViviReiter = { VERSION: VERSION, sichtbar: sichtbar, html: html, mountAll: mountAll, oeffnen: oeffnen, jahre: jahre, abweichungen: abweichungen };
 })(typeof window !== 'undefined' ? window : globalThis);

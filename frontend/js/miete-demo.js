@@ -118,6 +118,8 @@
   function viviKnopf(w, mfh) {
     var V = window.DpViviMieterhoehung;
     if (!V || !V.verfuegbar() || !w || !(w.ist > 0)) return '';
+    /* v4042 · nur mit Spielraum (dieselbe Regel wie Pilot-Analyse › ViVi) */
+    if (V.spielraum ? !V.spielraum(mfh && w.i != null ? w.i : null) : !(w.soll >= w.ist + 1)) return '';
     return '<button type="button" class="btn ' + (w.soll >= w.ist + 1 ? '' : 'btn-outline ') + 'btn-sm" data-md-vivi="' + (mfh && w.i != null ? w.i : 'objekt') + '">Mieterhöhung in ViVi anlegen</button>';
   }
   /* v4042 · Nebenkosten-Vorauszahlung: weicht ViVi vom Soll in DealPilot ab (eigene Angabe, sonst umlagefähige Kosten

@@ -1296,6 +1296,31 @@ kopf('V  v4040 Reiter ViVi, Bewirtschaftung Ist heute aus dem Steuerjahr');
   ok(!/_mb\.innerHTML = (html|_renderAIServerAnalysis)/.test(ui + sto) && /\['ai-content'\]\.forEach/.test(ui) && /function imSichtbaren\(sel\)/.test(vr2) && !/var p = \$\('dp-pa-vivi'\)/.test(vr2),
     'N15 Pilot-Analyse nur einmal im DOM (nicht mehr in #ai-mini-body), oeffnen() nimmt den sichtbaren Reiter');
 }
+/* ═══ N16–N18 · Zusatz Marcel 23.11.2026 (v4042a): Mieterhöhungs-Knopf nur mit Spielraum, Reihenfolge der Reiter,
+   Jahresabgleich ohne Doppelung mit dem Reiter ViVi ═══════════════════════════════════════════════════════════ */
+{
+  const vm = await import('node:vm');
+  const quelleMh = lies('frontend/js/vivi-mieterhoehung.js');
+  const mitModell = (wohnungen) => {
+    const g = { DpPotenzial: { modell: () => ({ art: 'mfh', wohnungen }) } };
+    g.globalThis = g; g.window = g;
+    vm.runInNewContext(quelleMh, g);
+    return g.DpViviMieterhoehung;
+  };
+  const M = mitModell([{ i: 0, nr: 1, ist: 600, soll: { miete: 640 } }, { i: 1, nr: 2, ist: 620, soll: { miete: 620 } }, { i: 2, nr: 3, ist: 500, soll: { miete: 560, vertrag: 'index' }, index: { ok: true, naechste: { miete_neu: 515, wirksam: '2027-01' } } }]);
+  ok(M.spielraum(0) === true && M.spielraum(0, 620) === true && M.spielraum(0, 640) === false && M.spielraum(1) === false && M.spielraum(2) === true && M.spielraum(2, 520) === false,
+    'N16 spielraum(): 600 → 640 ja, gegen ViVi 640 nein, an der Grenze nein, Indexvertrag nur bis zur nächsten Anpassung (515)');
+  const vr3 = lies('frontend/js/vivi-reiter.js'), md3 = lies('frontend/js/miete-demo.js'), mh3 = lies('frontend/js/mieterhoehungen.js');
+  ok(/V\.spielraum\(D\.mfh \? w\.i : null, w\.vivi\)/.test(vr3) && /V\.spielraum\(mfh && w\.i != null \? w\.i : null\)/.test(md3) && /DpViviMieterhoehung\.spielraum\(o\.vivi\)/.test(mh3) && /Math\.max\(w\.ist \|\| 0, istZahl\(w\.vivi\)/.test(vr3),
+    'N16b Knopf „Mieterhöhung in ViVi“ an allen drei Stellen nur mit Spielraum (Häuschen gegen die ViVi-Miete), Potenzial im Häuschen gegen die höhere Miete');
+  const pa3 = lies('frontend/js/pilot-analyse-v4.js');
+  const iU = pa3.indexOf("add('uebersicht'"), iJ = pa3.indexOf("add('jahr'"), iV = pa3.indexOf("add('vivi'");
+  ok(iU > 0 && iU < iJ && iJ < iV, 'N17 Pilot-Analyse im Bestand: Übersicht, Jahresabgleich, ViVi');
+  const ja3 = lies('frontend/js/jahresabgleich.js'), vst3 = lies('frontend/js/vivi-steuer-abgleich.js');
+  ok(/R\.abweichungen\(z\.jahr\)/.test(ja3) && /stimmt mit ViVi überein/.test(ja3) && /knopf\('vivi-reiter'/.test(ja3) && /DpViviReiter\.oeffnen\(/.test(ja3) && /tabelleHtml\(Z, weg, L, null\)/.test(ja3)
+    && /if \(!ziel \|\| !global\.DPVST_IM_JAHRESABGLEICH\) return;/.test(vst3) && /abweichungen: abweichungen/.test(vr3),
+    'N18 Jahresabgleich: eine Zeile je Jahr „ViVi: n Abweichungen“ mit Absprung in den Reiter, keine Spalte und keine Steuerkarte laut ViVi mehr');
+}
 dienst._setzeDeps(null);
 console.log('\n' + (rot ? 'ROT · ' + rot + ' Befund(e), ' + gruen + ' grün' : 'SAUBER · ' + gruen + ' Prüfpunkte grün'));
 process.exit(rot ? 1 : 0);

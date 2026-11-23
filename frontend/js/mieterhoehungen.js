@@ -39,7 +39,7 @@
 (function (global) {
   'use strict';
   if (global.DpErhoehungen) return;
-  var VERSION = 'v4037';
+  var VERSION = 'v4042a';
   var ARTEN = [['558', 'Erhöhung auf die Vergleichsmiete (§ 558 BGB)'], ['559', 'Modernisierungsumlage (§ 559 BGB)'], ['staffel', 'Staffelmiete'],
     ['index', 'Indexmiete'], ['neuvermietung', 'Neuvermietung'], ['sonstig', 'sonstige Änderung']];
   var SPERRE_ARTEN = { '558': 1, staffel: 1, index: 1 };
@@ -221,7 +221,7 @@
        jetzt, was mit dem Eintrag passiert, und nach dem Eintragen steht eine Rückmeldung mit dem Weg (o.meldung). */
     return '<div class="dp-erh-t">Mieterhöhungen <span>Trag jede Erhöhung mit Datum ein. Die jüngste setzt „Letzte Erhöhung“' + (o.wo ? ' ' + esc(o.wo) : '') + '. Daraus rechnet DealPilot die Miete vergangener Jahre in der Mietentwicklung und die Sperrfrist für die nächste Erhöhung.</span></div>'
       + (o.meldung ? '<div class="dp-erh-ok">' + o.meldung + '</div>' : '')
-      + (o.vivi != null && global.DpViviMieterhoehung && global.DpViviMieterhoehung.verfuegbar() ? '<button type="button" class="btn btn-outline btn-sm" data-erh-vivi="' + esc(String(o.vivi)) + '" style="margin:2px 0 6px">Mieterhöhung in ViVi anlegen</button>' : '')   /* v4037 */
+      + (o.vivi != null && global.DpViviMieterhoehung && global.DpViviMieterhoehung.verfuegbar() && (!global.DpViviMieterhoehung.spielraum || global.DpViviMieterhoehung.spielraum(o.vivi)) ? '<button type="button" class="btn btn-outline btn-sm" data-erh-vivi="' + esc(String(o.vivi)) + '" style="margin:2px 0 6px">Mieterhöhung in ViVi anlegen</button>' : '')   /* v4037 */
       + (zeilen || '<div style="color:#6B645A">Noch keine Erhöhung eingetragen.</div>') + hin + vorb
       + '<details' + (l.length ? '' : '') + '><summary style="cursor:pointer;margin-top:6px;min-height:28px;display:flex;align-items:center">Erhöhung eintragen</summary><div class="dp-erh-f">'
       + '<label>Wirksam ab<input type="date" data-erh-feld="datum"></label>'

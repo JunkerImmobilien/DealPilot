@@ -29,7 +29,7 @@
  * ═════════════════════════════════════════════════════════════════════════════════════════════════════════ */
 (function (global) {
   'use strict';
-  var VERSION = 'v4021';
+  var VERSION = 'v4042a';
 
   /* ══ KERN (ohne DOM, auch fuer Node) ══════════════════════════════════════════════════════════════════ */
   var REIHE = ['einnahmen_km', 'einnahmen_nk', 'schuldzinsen', 'erhaltungsaufwand', 'nk_umlf', 'nk_n_umlf', 'sonst_kosten', 'sonst_bewegl_wg', 'afa'];
@@ -291,7 +291,10 @@
     Array.prototype.forEach.call(hs, function (h) {
       var ziel = h.querySelector('.dp-ja-schritte');
       var alt = h.querySelector('[data-vivi-steuer]');
-      if (!ziel) { if (alt) alt.remove(); return; }
+      /* v4042 · Marcel 23.11.2026: keine Doppelung mit dem Reiter ViVi. Die Karte „Steuer JJJJ laut ViVi“ steht nur noch dort
+         (Pilot-Analyse › ViVi, dieselben Kerne abgleich/uebernehmen), im Jahresabgleich eine Zeile mit Absprung (jahresabgleich.js). */
+      if (alt) alt.remove();
+      if (!ziel || !global.DPVST_IM_JAHRESABGLEICH) return;
       var j = _vorgabeJahr || gewaehltIn(h);
       if (alt && Number(alt.getAttribute('data-vivi-steuer')) === j && alt._vstStand === standMerk()) return;
       var t = html(j);

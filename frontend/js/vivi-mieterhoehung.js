@@ -24,7 +24,7 @@
  * ══════════════════════════════════════════════════════════════════════ */
 (function (global) {
   'use strict';
-  var VERSION = 'v4037';
+  var VERSION = 'v4042a';
   function doc() { return global.document || null; }
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
   /* Zahl aus Modell oder Eingabe: Zahlen bleiben Zahlen (806.17 ist kein Tausender), Text deutsch oder englisch */
@@ -76,6 +76,17 @@
     return { mfh: !!(m && m.art === 'mfh'), liste: out };
   }
 
+  /* v4042 · Marcel 23.11.2026: „Mieterhöhung in ViVi“ stand im Häuschen, obwohl darüber „kein Spielraum“ stand. EINE Regel
+     für alle Knöpfe (Reiter Miete, Liste der Mieterhöhungen, Pilot-Analyse › ViVi): Spielraum nur, wenn DealPilot eine
+     zulässige Miete (§ 558), die nächste Indexanpassung oder die nächste Staffel ÜBER der heutigen Miete sieht. vergleich =
+     Miete laut ViVi, wenn bekannt: dann muss das Mögliche auch darüber liegen. einheit = Index der Wohnung, null = Objekt. */
+  function spielraum(einheit, vergleich) {
+    var W = wohnungen(), x = null;
+    W.liste.forEach(function (w) { if (einheit == null || einheit === 'objekt' ? !x : String(w.i) === String(einheit)) x = x || w; });
+    if (!x) return false;
+    var basis = Math.max(x.ist || 0, zahl(vergleich) || 0) + 0.5;
+    return [x.soll, x.index_miete, x.vertrag_miete].some(function (m) { return m != null && m > basis; });
+  }
   function stil() {
     var d = doc(); if (!d || d.getElementById('dp-vmh-stil')) return;
     var s = d.createElement('style'); s.id = 'dp-vmh-stil';
@@ -222,5 +233,5 @@
     return true;
   }
 
-  global.DpViviMieterhoehung = { VERSION: VERSION, verfuegbar: verfuegbar, oeffnen: oeffnen, schliessen: schliessen, stil: stil /* v4042 · auch fuer DpViviNkAnpassung */, wohnungen: wohnungen, _ersterNaechster: ersterNaechster };
+  global.DpViviMieterhoehung = { VERSION: VERSION, verfuegbar: verfuegbar, oeffnen: oeffnen, schliessen: schliessen, stil: stil /* v4042 · auch fuer DpViviNkAnpassung */, spielraum: spielraum, wohnungen: wohnungen, _ersterNaechster: ersterNaechster };
 })(typeof window !== 'undefined' ? window : globalThis);

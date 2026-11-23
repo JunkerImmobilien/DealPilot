@@ -48,7 +48,7 @@
 (function (global) {
   'use strict';
   if (global.DpJahresabgleich) return;
-  var VERSION = 'v4017a';
+  var VERSION = 'v4042a';
   var GOLD = 'var(--wl-c9a84c, #C9A84C)';
   var SCHRITTE = [['miete', 'Miete'], ['steuer', 'Steuer'], ['wert', 'Wert'], ['haus', 'Haus']];
   var WORT = { ok: 'erledigt', teil: 'teilweise', offen: 'offen', laufend: 'läuft' };
@@ -271,7 +271,19 @@
     if (jahr === heuteJahr() && info.restschuld_heute && istZahl(info.restschuld_heute.wert)) out.rs = info.restschuld_heute;
     return out;
   }
+  /* v4042 · Marcel 23.11.2026: keine Doppelung mit dem Reiter ViVi. Im Jahresabgleich nur noch eine Zeile je Jahr mit der
+     Zahl der Abweichungen (gezählt wie im Reiter, DpViviReiter.abweichungen) und dem Absprung dorthin. Was dort nicht
+     steht, bleibt als kurzer Zusatz: weniger Miete eingegangen als vereinbart. viviBlockAlt ist die Fassung bis v4041. */
   function viviHtml(z, vd) {
+    var R = global.DpViviReiter; if (!vd || !R || !R.abweichungen || !R.sichtbar || !R.sichtbar()) return '';
+    var n = R.abweichungen(z.jahr); if (n == null) return '';
+    var vj = null; try { vj = viviJahr(z.jahr, vd); } catch (e) { vj = null; }
+    var zu = '';
+    if (vj && vj.gezahlt != null && vj.soll_warm != null && vj.soll_warm > 0 && vj.gezahlt / vj.soll_warm < 0.97) zu = ' <span class="dp-ja-schlecht">' + Math.round((1 - vj.gezahlt / vj.soll_warm) * 100) + ' % weniger Miete eingegangen als vereinbart.</span>';
+    return '<div class="dp-ja-vivi dp-ja-vivi-kurz" data-ja-vivi="' + z.jahr + '"><span><b>ViVi:</b> ' + (n ? '<span class="dp-ja-schlecht">' + n + (n === 1 ? ' Abweichung' : ' Abweichungen') + '</span>' : '<span class="dp-ja-gut">stimmt mit ViVi überein</span>') + zu + '</span>'
+      + knopf('vivi-reiter', n ? 'zum Abgleich' : 'ansehen', false, z.jahr) + '</div>';
+  }
+  function viviBlockAlt(z, vd) {
     var vj = viviJahr(z.jahr, vd); if (!vj) return '';
     var zeilen = [];
     if (istZahl(vj.miete)) {
@@ -544,7 +556,7 @@
 
     /* Jahr für Jahr: eine Tabelle statt drei */
     out += abschnitt('Jahr für Jahr', 'Plan vom Kauf gegen Ist · Zeile wählt das Jahr');
-    out += tabelleHtml(Z, weg, L, vd);
+    out += tabelleHtml(Z, weg, L, null);   /* v4042 · Spalte „laut ViVi“ entfällt, der Vergleich steht im Reiter ViVi */
     var hin = '';
     if (z.abgleich && z.abgleich.art !== 'gleich') hin += '<div class="dp-ja-notiz">' + esc(z.abgleich.text) + (z.abgleich.art === 'vorschlag' ? ' ' + knopf('av', 'übernehmen', false, z.jahr) : '') + '</div>';
     if (z.ziel_erreicht && z.ziel_fassung && z.ziel_fassung.status !== 'erreicht') hin += '<div class="dp-ja-notiz ok">Die Ist-Miete ' + z.jahr + ' erreicht das Ziel von ' + esc(z.ziel_titel || 'Zielbild') + '. <button type="button" class="btn-clean dp-pa4-btn" data-ja-aktion="erreicht" data-ja-fassung="' + esc(z.ziel_fassung.id) + '">als erreicht kennzeichnen</button></div>';
@@ -642,6 +654,7 @@
       }
       if (a === 'miete') { zuMiete(); return; }
       if (a === 'mieterhoehung') { zuMiete('mh'); return; }
+      if (a === 'vivi-reiter') { try { global.DpViviReiter.oeffnen(Number(b.getAttribute('data-ja-j')) || null); } catch (x) {} return; }   /* v4042 */
       if (a === 'vivi-mh') { try { global.DpViviMieterhoehung.oeffnen({ quelle: 'pilot-analyse' }); } catch (x) {} return; }   /* v4037 */
       if (a === 'steuer') { zuReiter('s3-tax'); return; }
       if (a === 'eintragen') { if (JB() && JB().oeffnen) JB().oeffnen(y); return; }
