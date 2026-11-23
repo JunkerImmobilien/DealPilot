@@ -306,19 +306,23 @@ function uebergangVon(d) {
   const k = [d.wirtschaftlicher_uebergang, d.kaufdat, d._ankauf && d._ankauf.stichtag].map(function (x) { return mapping.isoDatum(x); }).filter(Boolean);
   return k[0] || null;
 }
-/* v4037 · bezahlte Mietzahlungen je Kalenderjahr ab dem Uebergang bis Ende Vorjahr (GET /rental-payments, nur Miete,
-   Status bezahlt, hoechstens 5 Seiten). Betraege sind warm (Miete plus Vorauszahlung), so wie ViVi sie fuehrt. */
+/* v4037 · Mietzahlungen je Kalenderjahr ab dem Uebergang bis Ende Vorjahr (GET /rental-payments, nur Miete, hoechstens
+   5 Seiten): gezahlt und erwartet, warm wie ViVi sie fuehrt. */
 async function gezahltJeJahr(cl, q, projektId, ab, heute) {
   if (!ab) return null;
   const bis = (+heute.slice(0, 4) - 1) + '-12-31';
   if (ab > bis) return null;
-  const out = {};
+  /* v4037 · ViVi fuehrt je Sollstellung expected_total und actual_total (warm, mit Stellplatz). Gemessen 23.11.2026 an
+     2026-1183: period JJJJ-MM, status paid/pending. Gezaehlt wird die Periode, nicht das Zahlungsdatum. */
+  const out = { gezahlt: {}, soll: {} };
   for (let seite = 1; seite <= 5; seite++) {
-    const roh = await cl.get('/rental-payments', Object.assign({}, q, { project_id: projektId, date_from: ab, date_to: bis, status: 'paid', type: 'rent', per_page: 100, page: seite }));
+    const roh = await cl.get('/rental-payments', Object.assign({}, q, { project_id: projektId, date_from: ab, date_to: bis, type: 'rent', per_page: 100, page: seite }));
     const L = liste(roh);
     L.forEach(function (x) {
-      const d = mapping.isoDatum(x && (x.due_date || x.value_date || x.booking_date || x.date)); const b = mapping.zahl(x && (x.amount_paid != null ? x.amount_paid : x.amount));
-      if (!d || b == null) return; const j = d.slice(0, 4); out[j] = Math.round(((out[j] || 0) + b) * 100) / 100;
+      const per = /^(\d{4})-\d{2}/.exec(String((x && (x.period || x.due_date)) || '')); if (!per) return;
+      const j = per[1], ist = mapping.zahl(x.actual_total), soll = mapping.zahl(x.expected_total);
+      if (ist != null) out.gezahlt[j] = Math.round(((out.gezahlt[j] || 0) + ist) * 100) / 100;
+      if (soll != null) out.soll[j] = Math.round(((out.soll[j] || 0) + soll) * 100) / 100;
     });
     const m = (roh && roh.meta) || {};
     if (!(m.last_page > seite) || !L.length) break;
@@ -396,9 +400,11 @@ async function abrufen(userId, objectId, opt) {
         musterAnschrift: !!(v.vivi_ids && v.vivi_ids.muster_anschrift), uebergang: uebergang });
     /* v4037 · gezahlte Mieten je Jahr (warm, Hinweis im Jahresabgleich). Ein Fehler kostet nur den Hinweis. */
     if (erg.info && erg.info.ist_jahre && Object.keys(erg.info.ist_jahre.summe || {}).length) {
-      try { erg.info.ist_jahre.gezahlt = await gezahltJeJahr(cl, q, v.vivi_objekt_id, uebergang, heuteIso); }
+      let gz = null;
+      try { gz = await gezahltJeJahr(cl, q, v.vivi_objekt_id, uebergang, heuteIso); }
       catch (e) { if (e && (e.code === 'bremse_429' || e.code === 'bremse_lokal')) throw e; }
-      erg.info.ist_jahre.soll_warm = sollWarmJeJahr(miet, mietverlauf, uebergang, heuteIso);
+      if (gz && Object.keys(gz.gezahlt).length) { erg.info.ist_jahre.gezahlt = gz.gezahlt; erg.info.ist_jahre.soll_warm = gz.soll; }
+      else erg.info.ist_jahre.soll_warm = sollWarmJeJahr(miet, mietverlauf, uebergang, heuteIso);
     }
     await sp.werteSchreiben(objectId, erg.felder, erg.info);
     /* v4020 · Paket V4: Steuerjahre vom Kaufjahr bis heute (nur GET). Einstellung „aus“ fragt ViVi nicht. Ein Fehler hier
