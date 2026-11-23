@@ -1741,7 +1741,7 @@ async function _runAIServer(btn) {
       window._aiText = JSON.stringify(window._aiAnalysis, null, 2);
       html = _renderAIServerAnalysis(window._aiAnalysis);
       // V25: Mini-Block in Tab Kennzahlen mit aktualisieren
-      var _mb = document.getElementById('ai-mini-body'); if (_mb) _mb.innerHTML = html; /* v596: Voll-Analyse in Bewertung */
+      /* v4042 · keine zweite Pilot-Analyse in #ai-mini-body (Karte seit v743 versteckt, doppelte dp-pa-IDs) */
       // V63.69: KI-Analyse direkt persistieren — User-Wunsch
       // Damit sie beim nächsten Öffnen des Objekts da ist
       if (typeof saveObj === 'function') {
@@ -1989,7 +1989,7 @@ window._dpPaNeuZeichnen = function () {
     /* v3154g · gemessen: nach „Zurücknehmen"/„Löschen" im Verlauf sprang die Ansicht auf „Übersicht" -
        das Neuzeichnen setzt den ersten Unterreiter aktiv. Aktiver Reiter und Scrollstand bleiben jetzt. */
     var _y = window.scrollY;
-    ['ai-content', 'ai-mini-body'].forEach(function (id) {
+    ['ai-content'].forEach(function (id) {   /* v4042 · ai-mini-body traegt keine Pilot-Analyse mehr */
       var h = document.getElementById(id);
       if (!h || !h.querySelector('.dp-pa-wrap')) return;
       var akt = h.querySelector('.dp-pa-tab.active'), m = akt && String(akt.getAttribute('onclick') || '').match(/_dpPaTab\('([^']+)'/);

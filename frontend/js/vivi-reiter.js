@@ -17,7 +17,7 @@
  * ═══════════════════════════════════════════════════════════════════════════════════════════════════════════════ */
 (function (global) {
   'use strict';
-  var VERSION = 'v4040i';
+  var VERSION = 'v4042';
   if (!global.document || global.DpViviReiter) return;
   var doc = global.document;
   var _jahr = null, _offen = {};
@@ -190,6 +190,8 @@
       w.eigen = !!(id && Object.prototype.hasOwnProperty.call(eigen, id));
       w.abw = istZahl(w.vivi) ? Math.round((w.ist - w.vivi) * 100) / 100 : null;
       w.pot = w.soll >= w.ist + 1 ? Math.round(w.soll - w.ist) : 0;
+      /* v4042 · Nebenkosten-Vorauszahlung: ViVi gegen das Soll in DealPilot (DpViviNkAnpassung) */
+      try { w.nk = global.DpViviNkAnpassung ? global.DpViviNkAnpassung.abweichung(D.mfh ? w.i : null) : null; } catch (e) { w.nk = null; }
     });
     return D;
   }
@@ -211,13 +213,17 @@
         + '<div class="vr-wz"><span>DealPilot</span><span>' + (w.ist ? eur(w.ist) : 'leer') + '</span></div>'
         + '<div class="vr-wz"><span>ViVi</span><span>' + (istZahl(w.vivi) ? eur(w.vivi) : '–') + '</span></div>'
         + (w.pot ? '<div class="vr-wz vr-wp"><span>möglich</span><span>' + eur(w.soll) + ' (+' + eur(w.pot) + ')</span></div>' : '')
+        + (w.nk ? '<div class="vr-wz vr-wn"><span>Nebenkosten</span><span>' + eur(w.nk.vivi) + ' → ' + eur(w.nk.ziel) + '</span></div>' : '')
         + '<div class="vr-wk">' + (abw && w.eigen ? '<button type="button" class="btn-clean vr-k" data-vr="w-vivi" data-vr-id="' + esc(w.viviId) + '">ViVi übernehmen</button>' : '')
-        + (mh && w.ist > 0 ? '<button type="button" class="btn-clean vr-k' + (w.pot ? ' gold' : '') + '" data-vr="w-mh" data-vr-e="' + (D.mfh ? w.i : 'objekt') + '">Mieterhöhung in ViVi</button>' : '') + '</div></div>';
+        + (mh && w.ist > 0 ? '<button type="button" class="btn-clean vr-k' + (w.pot ? ' gold' : '') + '" data-vr="w-mh" data-vr-e="' + (D.mfh ? w.i : 'objekt') + '">Mieterhöhung in ViVi</button>' : '')
+        + (mh && w.nk ? '<button type="button" class="btn-clean vr-k" data-vr="w-nk" data-vr-e="' + (D.mfh ? w.i : 'objekt') + '">Nebenkosten in ViVi</button>' : '') + '</div></div>';
     };
     var pot = D.W.reduce(function (s, w) { return s + w.pot; }, 0), nAb = D.W.filter(function (w) { return istZahl(w.abw) && Math.abs(w.abw) >= 1; }).length;
+    var nNk = D.W.filter(function (w) { return w.nk; }).length;
     return '<h4 class="vr-h">' + (D.mfh ? 'Wohnungen' : 'Die Wohnung') + '</h4><p class="vr-satz">'
       + (nAb ? nAb + (nAb === 1 ? ' Wohnung weicht' : ' Wohnungen weichen') + ' von ViVi ab. ' : 'Mieten wie in ViVi. ')
-      + (pot ? 'Mögliche Mieterhöhung zusammen ' + eur(pot) + ' im Monat.' : 'Kein Spielraum für eine Mieterhöhung.') + '</p>'
+      + (pot ? 'Mögliche Mieterhöhung zusammen ' + eur(pot) + ' im Monat.' : 'Kein Spielraum für eine Mieterhöhung.')
+      + (nNk ? ' Bei ' + (nNk === 1 ? 'einer Wohnung passt' : nNk + ' Wohnungen passt') + ' die Nebenkosten-Vorauszahlung in ViVi nicht zu DealPilot.' : '') + '</p>'
       + '<div class="vr-haus"><div class="vr-dach"></div>' + reihen.map(function (r) { return '<div class="vr-etage" style="grid-template-columns:repeat(' + r.length + ',minmax(0,1fr))">' + r.map(kachel).join('') + '</div>'; }).join('') + '<div class="vr-boden"></div></div>';
   }
 
@@ -276,9 +282,16 @@
   }
 
   /** Von der Deal-Aktion und der ViVi-Leiste: Pilot-Analyse › ViVi, sonst als Fenster. */
+  /* v4042 · Pilot-Analyse lag bis v4041 zweimal im DOM (#ai-content und das versteckte #ai-mini-body), alle dp-pa-IDs
+     doppelt. Die Kopie ist entfernt (ui.js, storage.js). oeffnen() nimmt trotzdem den Reiter in #ai-content bzw. den
+     ersten sichtbaren, nie blind den ersten per getElementById. */
+  function imSichtbaren(sel) {
+    var L = Array.prototype.slice.call(doc.querySelectorAll(sel));
+    return L.filter(function (e) { return e.closest && e.closest('#ai-content'); })[0] || L.filter(function (e) { return e.getClientRects().length > 0; })[0] || L[0] || null;
+  }
   function oeffnen() {
-    var b = $('dp-pa-tab-vivi') || doc.querySelector('.dp-pa-tab[onclick*="\'vivi\'"]');
-    var p = $('dp-pa-vivi');
+    var b = imSichtbaren('#dp-pa-tab-vivi') || imSichtbaren(".dp-pa-tab[onclick*=\"'vivi'\"]");
+    var p = imSichtbaren('#dp-pa-vivi');
     if (b && p) {
       var t = Array.prototype.filter.call(doc.querySelectorAll('nav.tabs .tab'), function (x) { return /Pilot/.test(x.textContent || ''); })[0];
       if (t) t.click();
@@ -328,6 +341,11 @@
       setTimeout(mountAll, 150);
       return;
     }
+    if (was === 'w-nk') {   /* v4042 */
+      var en = b.getAttribute('data-vr-e');
+      try { global.DpViviNkAnpassung.oeffnen({ einheit: en === 'objekt' ? null : en, quelle: 'Pilot-Analyse ViVi' }); } catch (x) {}
+      return;
+    }
     if (was === 'w-mh') {
       var e = b.getAttribute('data-vr-e');
       try { global.DpViviMieterhoehung.oeffnen({ einheit: e === 'objekt' ? null : e, quelle: 'Pilot-Analyse ViVi' }); } catch (x) {}
@@ -375,7 +393,7 @@
       '.vr-w b{display:block;font:600 12.5px "Space Grotesk",sans-serif;margin:2px 0 4px}',
       '.vr-wm{display:inline-block;font:700 8.5px "JetBrains Mono",monospace;letter-spacing:.08em;padding:2px 6px;border-radius:2px}',
       '.vr-wz{display:flex;justify-content:space-between;gap:6px;font-size:11.5px;color:#5E5856}.vr-wz span:last-child{font-variant-numeric:tabular-nums;color:#2A2727;font-weight:600}',
-      '.vr-wp span:last-child{color:#3FA56C}',
+      '.vr-wp span:last-child{color:#3FA56C}.vr-wn span:last-child{color:#B8625C}',
       '.vr-wk{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}.vr-wk .vr-k{padding:5px 8px;font-size:11px}',
       '.vr-w-ok{box-shadow:inset 3px 0 0 #3FA56C}.vr-w-ok .vr-wm{background:rgba(63,165,108,.14);color:#2f7d52}',
       '.vr-w-pot{border-color:#3FA56C;box-shadow:inset 3px 0 0 #3FA56C}.vr-w-pot .vr-wm{background:#3FA56C;color:#fff}',

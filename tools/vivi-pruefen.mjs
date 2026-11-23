@@ -1235,6 +1235,67 @@ kopf('V  v4040 Reiter ViVi, Bewirtschaftung Ist heute aus dem Steuerjahr');
   const dn = quelle('backend/src/services/vivi/viviDienst.js');
   ok(/steuer\.bewirtschaftungAus\(st\._felder/.test(dn) && /delete st\._felder/.test(dn), 'V9 abrufen: Bewirtschaftung aus dem gelesenen Steuerjahr, _felder geht nicht an den Browser');
 }
+/* ═══ N · Nebenkosten-Vorauszahlung nach ViVi (v4042, Marcel 23.11.2026 „setz alles um“) ═══════════════
+   Dieselbe Mietänderung wie die Mieterhöhung (utility_adjustment + new_utility_costs), Vorschau zuerst, Anlegen nur
+   mit bestaetigt === true. Gemessen an der Spezifikation, am echten Client (Felder) und am echten Dienst mit Attrappe. */
+{
+  ok(/utility_adjustment/.test(JSON.stringify(SPEC)) && /new_utility_costs/.test(JSON.stringify(SPEC)) && viviClient.MIETAENDERUNG_FELDER.includes('new_utility_costs'),
+    'N1 Spezifikation kennt utility_adjustment und new_utility_costs, der Client lässt new_utility_costs durch (kein neuer Schreibpfad)');
+  ok(dienst.MIET_ART.nk && dienst.MIET_ART.nk[0] === 'utility_adjustment' && dienst.MIET_ART.nk[1] === '§ 560 BGB', 'N2 Art nk = utility_adjustment, § 560 BGB');
+  const lauf = async (opt, rental) => {
+    const log = [], prot = [];
+    const r0 = Object.assign({ id: 'r1', unit_id: 'u1', rent: 570, monthly_utility_costs: 180, occupancy_type: 'rented', rental_start: '2024-03-01' }, rental || {});
+    const cl = { zaehler: { anfragen: 0, bremse429: 0 },
+      get: async (pf) => { log.push(['GET', pf]); return { data: /rental-units$/.test(pf) ? [r0] : [{ id: 'u1' }] }; },
+      mietaenderungVorschau: async (pf, b) => { log.push(['VORSCHAU', pf, b]); return { data: { effective_date: b.effective_date } }; },
+      mietaenderungAnlegen: async (pf, b) => { log.push(['ANLEGEN', pf, b]); return { data: { id: 'rch_1' } }; } };
+    dienst._setzeDeps({ speicher: { verknuepfung: async () => ({ anlage_status: 'fertig', vivi_objekt_id: 'prj_1', vivi_ids: { einheiten: { e0: { index: 0, unit_id: 'u1' } } } }), protokoll: async (x) => { prot.push(x); },
+      idsSpeichern: async () => {}, werteLesen: async () => [] }, jetzt: () => Date.parse('2026-11-23T10:00:00Z'), testbetrieb: async () => false, client: () => cl, creds: { getSecret: async () => 'x' } });
+    let r = null, e = null;
+    try { r = await dienst.mieterhoehung(USER, 'o1', Object.assign({ client: cl }, opt)); } catch (x) { e = x; }
+    return { r, e, log, prot };
+  };
+  let L = await lauf({ art: 'nk', neue_nk: 205, datum: '2027-01-01', vorschau: true });
+  const vb = L.log.find((x) => x[0] === 'VORSCHAU');
+  ok(L.r && vb && /\/rental-units\/r1\/rent-changes\/preview$/.test(vb[1]) && vb[2].adjustment_type === 'utility_adjustment' && vb[2].new_utility_costs === 205 && !('new_rent' in vb[2]) && vb[2].legal_basis === '§ 560 BGB'
+    && !L.log.some((x) => x[0] === 'ANLEGEN') && L.r.nk_bisher === 180 && L.prot[0] && L.prot[0].art === 'mietaenderung_vorschau',
+    'N3 Vorschau: an …/rent-changes/preview, utility_adjustment, new_utility_costs 205, keine Kaltmiete, nichts angelegt, Protokoll mietaenderung_vorschau' + (L.e ? ' (' + L.e.message + ')' : ''));
+  L = await lauf({ art: 'nk', neue_nk: 205, datum: '2027-01-01' });
+  ok(L.e && L.e.code === 'nicht_bestaetigt' && !L.log.length, 'N4 Anlegen ohne Bestätigung: abgewiesen, keine Anfrage an ViVi');
+  L = await lauf({ art: 'nk', neue_nk: 180.2, datum: '2027-01-01', vorschau: true });
+  ok(L.e && L.e.code === 'keine_aenderung' && !L.log.some((x) => x[0] === 'VORSCHAU'), 'N5 gleiche Vorauszahlung wie heute (180): abgewiesen');
+  L = await lauf({ art: 'nk', neue_nk: 150, datum: '2027-01-01', vorschau: true });
+  ok(L.r && L.log.some((x) => x[0] === 'VORSCHAU' && x[2].new_utility_costs === 150), 'N6 Senkung der Vorauszahlung ist erlaubt (180 → 150)');
+  L = await lauf({ art: 'nk', datum: '2027-01-01', vorschau: true });
+  ok(L.e && L.e.code === 'nk_fehlt', 'N7 ohne neue Vorauszahlung: abgewiesen');
+  L = await lauf({ art: 'nk', neue_nk: 205, datum: '2027-01-01', bestaetigt: true });
+  const an = L.log.find((x) => x[0] === 'ANLEGEN');
+  ok(an && /\/rental-units\/r1\/rent-changes$/.test(an[1]) && an[2].new_utility_costs === 205 && L.prot.some((x) => x.art === 'mietaenderung'), 'N8 mit Bestätigung: genau eine Anlage an …/rent-changes, Protokoll mietaenderung');
+  L = await lauf({ art: '558', neue_miete: 600, datum: '2027-01-01', vorschau: true });
+  const mv = L.log.find((x) => x[0] === 'VORSCHAU');
+  ok(mv && mv[2].new_rent === 600 && !('new_utility_costs' in mv[2]) && mv[2].adjustment_type === 'increase', 'N9 Gegenprobe Mieterhöhung unverändert: new_rent ohne Nebenkosten');
+  {
+    let gesendet = null;
+    const cl3 = viviClient.erzeugen('test-token-12345', { fetch: async (u, o) => { gesendet = { u, o }; return { status: 200, json: async () => ({ data: {} }) }; } });
+    await cl3.mietaenderungVorschau('/projects/prj_1/rental-units/r1/rent-changes/preview', { effective_date: '2027-01-01', adjustment_type: 'utility_adjustment', new_utility_costs: 205, monthly_utility_costs: 1, tenant_id: 'x' });
+    const k = gesendet ? Object.keys(JSON.parse(gesendet.o.body)).sort().join(',') : '';
+    ok(k === 'adjustment_type,effective_date,new_utility_costs', 'N10 echter Client: NK-Vorschau sendet nur erlaubte Felder (' + k + ')');
+  }
+  const RV = lies('backend/src/routes/vivi.js'), nkj = lies('frontend/js/vivi-nk-anpassung.js'), md = lies('frontend/js/miete-demo.js'), vr2 = lies('frontend/js/vivi-reiter.js'), ix = lies('frontend/index.html');
+  const nkRoute = RV.slice(RV.indexOf("'/objekt/:id/nk-anpassung'"));
+  ok(/router\.post\('\/objekt\/:id\/nk-anpassung', bremse/.test(RV) && /art: 'nk'/.test(nkRoute) && /b\.bestaetigt !== true\) return res\.status\(400\)/.test(nkRoute) && RV.indexOf("router.use(vorschau.sperre('vivi'))") >= 0 && RV.indexOf("router.use(vorschau.sperre('vivi'))") < RV.indexOf('nk-anpassung'),
+    'N11 Route POST /vivi/objekt/:id/nk-anpassung: hinter der Vorschau-Sperre vivi, Bremse, Bestätigung Pflicht, Art nk');
+  ok(/\/nk-anpassung'/.test(nkj) && /data-vnk="vorschau"/.test(nkj) && /_z\.vorschauOk \? '' : ' disabled'/.test(nkj) && /DpNkVorauszahlung/.test(nkj), 'N12 Fenster: erst „ViVi rechnen lassen“, „In ViVi anlegen“ erst nach der Vorschau, Soll aus DpNkVorauszahlung');
+  ok(/data-md-nk=/.test(md) && /DpViviNkAnpassung\.oeffnen/.test(md) && /data-vr="w-nk"/.test(vr2) && /DpViviNkAnpassung\.oeffnen/.test(vr2) && /js\/vivi-nk-anpassung\.js\?v=v4042/.test(ix),
+    'N13 Absprung im Reiter Miete und im Häuschen der Pilot-Analyse › ViVi, Datei in index.html geladen');
+  const ohneKomm = nkj.replace(/\/\*[\s\S]*?\*\//g, '');
+  const kunde = (ohneKomm.match(/'[^'\n]*'/g) || []).map((t) => t.replace(/&[a-z#0-9]+;/gi, '')).filter((t) => /\s[–—]\s|;/.test(t) && /[a-zäöü]{3}/i.test(t));
+  ok(!kunde.length, 'N14 Kundentext ohne Gedankenstrich und Semikolon' + (kunde.length ? ': ' + kunde.join(' | ') : ''));
+  /* Doppelte Pilot-Analyse (v4042): keine zweite Hülle in #ai-mini-body, oeffnen() nimmt den sichtbaren Reiter */
+  const ui = lies('frontend/js/ui.js'), sto = lies('frontend/js/storage.js');
+  ok(!/_mb\.innerHTML = (html|_renderAIServerAnalysis)/.test(ui + sto) && /\['ai-content'\]\.forEach/.test(ui) && /function imSichtbaren\(sel\)/.test(vr2) && !/var p = \$\('dp-pa-vivi'\)/.test(vr2),
+    'N15 Pilot-Analyse nur einmal im DOM (nicht mehr in #ai-mini-body), oeffnen() nimmt den sichtbaren Reiter');
+}
 dienst._setzeDeps(null);
 console.log('\n' + (rot ? 'ROT · ' + rot + ' Befund(e), ' + gruen + ' grün' : 'SAUBER · ' + gruen + ' Prüfpunkte grün'));
 process.exit(rot ? 1 : 0);

@@ -222,5 +222,5 @@
     return true;
   }
 
-  global.DpViviMieterhoehung = { VERSION: VERSION, verfuegbar: verfuegbar, oeffnen: oeffnen, schliessen: schliessen, wohnungen: wohnungen, _ersterNaechster: ersterNaechster };
+  global.DpViviMieterhoehung = { VERSION: VERSION, verfuegbar: verfuegbar, oeffnen: oeffnen, schliessen: schliessen, stil: stil /* v4042 · auch fuer DpViviNkAnpassung */, wohnungen: wohnungen, _ersterNaechster: ersterNaechster };
 })(typeof window !== 'undefined' ? window : globalThis);

@@ -102,6 +102,18 @@ router.post('/objekt/:id/mieterhoehung', bremse, function (req, res, next) {
     .then(function (r) { return vorschau ? r : dienst.werte(uid(req), id).then(function (w) { r.stand = w; return r; }); })
     .then(function (r) { res.json(r); }).catch(antwort(res, next));
 });
+/* v4042 · Nebenkosten-Vorauszahlung in ViVi anpassen (§ 560 Abs. 4 BGB). Derselbe Dienst wie die Mieterhoehung (Art 'nk'),
+   vorschau=true rechnet nur, sonst bestaetigt === true Pflicht. */
+router.post('/objekt/:id/nk-anpassung', bremse, function (req, res, next) {
+  const id = oid(req, res); if (!id) return;
+  const b = req.body || {};
+  const vorschau = b.vorschau === true;
+  if (!vorschau && b.bestaetigt !== true) return res.status(400).json({ error: 'Bitte die Anpassung der Vorauszahlung bestätigen.' });
+  dienst.mieterhoehung(uid(req), id, { einheit: b.einheit == null || b.einheit === '' ? null : String(b.einheit), datum: b.datum, neue_nk: b.neue_nk,
+    art: 'nk', grund: b.grund, vorschau: vorschau, bestaetigt: b.bestaetigt === true })
+    .then(function (r) { return vorschau ? r : dienst.werte(uid(req), id).then(function (w) { r.stand = w; return r; }); })
+    .then(function (r) { res.json(r); }).catch(antwort(res, next));
+});
 /* v4020 · Paket V4: Einstellung „Steuerjahre aus ViVi“ (Einstellungen › Konto › Externe Anbieter › ViVi) */
 router.get('/steuer-einstellung', function (req, res, next) {
   const st = require('../services/vivi/viviSteuer');

@@ -544,7 +544,10 @@ function starteTakt() {
            art ('558' | 'index' | '559' | 'staffel'), grund (Freitext), vorschau (true = nur ViVi rechnen lassen),
            bestaetigt (true = anlegen) }.
    Vorschau schreibt nichts. Anlegen nur mit bestaetigt === true, danach Abruf, damit die Liste in DealPilot stimmt. */
-const MIET_ART = Object.freeze({ '558': ['increase', '§ 558 BGB'], index: ['index_adjustment', '§ 557b BGB'], '559': ['modernization', '§ 559 BGB'], staffel: ['stepped_rent', '§ 557a BGB'] });
+const MIET_ART = Object.freeze({ '558': ['increase', '§ 558 BGB'], index: ['index_adjustment', '§ 557b BGB'], '559': ['modernization', '§ 559 BGB'], staffel: ['stepped_rent', '§ 557a BGB'],
+  /* v4042 · Nebenkosten-Vorauszahlung anpassen (§ 560 Abs. 4 BGB): dieselbe ViVi-Mietaenderung, nur new_utility_costs.
+     Gleicher Weg wie die Mieterhoehung (Vorschau, Bestaetigung, Protokoll 'mietaenderung'), keine neue Schreibstelle. */
+  nk: ['utility_adjustment', '§ 560 BGB'] });
 async function mietverhaeltnisFuer(cl, P, q, v, einheit, heute) {
   const ids = v.vivi_ids || {};
   const gem = ids.einheiten && typeof ids.einheiten === 'object' ? ids.einheiten : {};
@@ -572,12 +575,13 @@ async function mieterhoehung(userId, objectId, opt) {
   const v = await sp.verknuepfung(userId, objectId);
   if (!v || v.anlage_status !== 'fertig' || !v.vivi_objekt_id) throw fehler(409, 'nicht_verknuepft', 'Dieses Objekt ist nicht mit ViVi verknüpft.');
   const datum = mapping.isoDatum(opt.datum);
-  const neu = mapping.zahl(opt.neue_miete);
+  const nk = String(opt.art || '') === 'nk';
+  const neu = mapping.zahl(nk ? opt.neue_nk : opt.neue_miete);
   const art = MIET_ART[String(opt.art || '558')];
-  if (!datum) throw fehler(400, 'datum_fehlt', 'Bitte das Datum eintragen, ab dem die neue Miete gilt.');
-  if (!(neu > 0)) throw fehler(400, 'miete_fehlt', 'Bitte die neue Kaltmiete je Monat eintragen.');
+  if (!datum) throw fehler(400, 'datum_fehlt', nk ? 'Bitte das Datum eintragen, ab dem die neue Vorauszahlung gilt.' : 'Bitte das Datum eintragen, ab dem die neue Miete gilt.');
+  if (nk ? !(neu != null && neu >= 0) : !(neu > 0)) throw fehler(400, nk ? 'nk_fehlt' : 'miete_fehlt', nk ? 'Bitte die neue Nebenkosten-Vorauszahlung je Monat eintragen.' : 'Bitte die neue Kaltmiete je Monat eintragen.');
   if (!art) throw fehler(400, 'art_ungueltig', 'Diese Art der Mietänderung gibt es nicht.');
-  if (!opt.vorschau && opt.bestaetigt !== true) throw fehler(400, 'nicht_bestaetigt', 'Bitte die Mieterhöhung bestätigen.');
+  if (!opt.vorschau && opt.bestaetigt !== true) throw fehler(400, 'nicht_bestaetigt', nk ? 'Bitte die Anpassung der Vorauszahlung bestätigen.' : 'Bitte die Mieterhöhung bestätigen.');
   const cl = opt.client || deps().client(await token(userId));
   const vorher = cl.zaehler.anfragen, t0 = deps().jetzt();
   const q = abfrage(v.vivi_account_id);
@@ -586,14 +590,16 @@ async function mieterhoehung(userId, objectId, opt) {
   const protokollArt = opt.vorschau ? 'mietaenderung_vorschau' : 'mietaenderung';
   try {
     const r = await mietverhaeltnisFuer(cl, P, q, v, opt.einheit, heute);
-    const alt = mapping.zahl(r.rent);
-    if (alt != null && !(neu > alt)) throw fehler(400, 'keine_erhoehung', 'Die neue Miete liegt nicht über der heutigen (' + alt + ' €).');
-    const rumpf = { effective_date: datum, adjustment_type: art[0], new_rent: Math.round(neu * 100) / 100, legal_basis: art[1],
-      adjustment_reason: String(opt.grund || 'Mieterhöhung aus DealPilot').slice(0, 500) };
+    const alt = mapping.zahl(nk ? r.monthly_utility_costs : r.rent);
+    if (nk && alt != null && Math.abs(neu - alt) < 0.5) throw fehler(400, 'keine_aenderung', 'Die neue Vorauszahlung ist gleich der heutigen (' + alt + ' €).');
+    if (!nk && alt != null && !(neu > alt)) throw fehler(400, 'keine_erhoehung', 'Die neue Miete liegt nicht über der heutigen (' + alt + ' €).');
+    const rumpf = { effective_date: datum, adjustment_type: art[0], legal_basis: art[1],
+      adjustment_reason: String(opt.grund || (nk ? 'Anpassung der Nebenkosten-Vorauszahlung aus DealPilot' : 'Mieterhöhung aus DealPilot')).slice(0, 500) };
+    if (nk) rumpf.new_utility_costs = Math.round(neu * 100) / 100; else rumpf.new_rent = Math.round(neu * 100) / 100;
     const pfad = P + '/rental-units/' + encodeURIComponent(String(r.id)) + '/rent-changes';
     const antwort = opt.vorschau ? await cl.mietaenderungVorschau(pfad + '/preview', rumpf, q) : await cl.mietaenderungAnlegen(pfad, rumpf, q);
     await sp.protokoll({ user_id: userId, object_id: objectId, art: protokollArt, anfragen: cl.zaehler.anfragen - vorher, ok: true, dauer_ms: deps().jetzt() - t0 });
-    const out = { ok: true, vorschau: !!opt.vorschau, mietverhaeltnis: r.id, miete_bisher: alt, rumpf: rumpf, vivi: (antwort && antwort.data) || antwort || null };
+    const out = { ok: true, vorschau: !!opt.vorschau, mietverhaeltnis: r.id, miete_bisher: nk ? mapping.zahl(r.rent) : alt, nk_bisher: nk ? alt : mapping.zahl(r.monthly_utility_costs), rumpf: rumpf, vivi: (antwort && antwort.data) || antwort || null };
     if (!opt.vorschau) {
       try { await abrufen(userId, objectId, { client: cl }); out.abgerufen = true; } catch (e) { out.abgerufen = false; out.abruf_fehler = e && e.message; }
     }

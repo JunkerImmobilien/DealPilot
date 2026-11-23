@@ -979,7 +979,8 @@ function loadData(d) {
         var aiContent = document.getElementById('ai-content');
         if (aiContent) aiContent.innerHTML = _renderAIServerAnalysis(parsedAI);
       }
-      var _mb = document.getElementById('ai-mini-body'); if (_mb && typeof _renderAIServerAnalysis === 'function') _mb.innerHTML = _renderAIServerAnalysis(parsedAI); /* v596-restore-both */
+      /* v4042 · keine zweite Pilot-Analyse mehr in #ai-mini-body: die Karte ist seit v743 versteckt, die Kopie trug alle
+         dp-pa-IDs doppelt (gemessen 23.11.2026: 21 von 23), getElementById traf je nach Reihenfolge die unsichtbare. */
     } else if (typeof renderAIResponse === 'function') {
       var aiContent2 = document.getElementById('ai-content');
       if (aiContent2) aiContent2.innerHTML = renderAIResponse(window._aiText);
