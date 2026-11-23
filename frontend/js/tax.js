@@ -2498,7 +2498,8 @@ if (typeof window !== 'undefined') window._ytfJahresHinweise = _ytfJahresHinweis
 function _ytfStil() {
   if (document.getElementById('ytf-stil-v4014')) return;
   var s = document.createElement('style'); s.id = 'ytf-stil-v4014';
-  var C = 'html body .tax-module-card';
+  /* #s3-tax-Anker (1,x,x): .sec button:not(...)x n setzt background:#fff !important mit vielen Klassen (gemessen v4014) */
+  var C = 'html body #s3-tax .tax-module-card';
   s.textContent = [
     C + ' > p.hint.ytf-erkl:not(.auf){display:none !important}',
     C + ' > p.hint.ytf-erkl{margin:8px 0 10px !important;font-size:12px;line-height:1.5}',

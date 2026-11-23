@@ -1721,7 +1721,7 @@
        gedrungen: 289 x 557 px bei 390 px, davon 49 px Abriss rechts und 28 px doppelter Seitenrand.
        Nur bis 760 px, der Browser bleibt wie er ist. */
     '@media(max-width:760px){'
-      + 'html body #s8 .dab-panel{padding-left:0 !important;padding-right:0 !important}'
+      + 'html body #s8.sec.active > .dab-band + .dab-panel,html body #s8.sec.active > .dab-band + #dab-rails-host{padding-left:10px !important;padding-right:10px !important}'
       + 'html body #s8 .dab-dr-link{display:grid !important;grid-template-columns:38px minmax(0,1fr) auto;grid-template-areas:"ic t btn" "s s s" "c c c";align-items:center;column-gap:12px;row-gap:8px;padding:14px !important}'
       + 'html body #s8 .dab-dr-x{display:contents}'
       + 'html body #s8 .dab-dr-ic{grid-area:ic}'
@@ -1730,7 +1730,7 @@
       + 'html body #s8 .dab-dr-chips{grid-area:c;margin:0 !important}'
       + 'html body #s8 .dab-dr-btn{grid-area:btn;width:auto !important;height:36px !important;min-height:36px !important;padding:0 14px !important;border-radius:9px !important;background:#141210 !important;color:var(--wl-e8cc7a, #E8CC7A) !important;border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 60%, transparent) !important;font:600 12.5px Inter,sans-serif !important;box-shadow:none !important}'
       + 'html body #s8 #dab-rails-host .dab-rail{gap:10px !important;padding:4px 0 8px !important}'
-      + 'html body #s8 #dab-rails-host .dab-bp{flex:0 0 calc(100% - 26px) !important;border-radius:14px !important}'
+      + 'html body #s8 #dab-rails-host .dab-bp{flex:0 0 calc(100% - 16px) !important;border-radius:14px !important}'
       + 'html body #s8 #dab-rails-host .dab-bp-stub,html body #s8 #dab-rails-host .dab-edge{display:none !important}'
       + 'html body #s8 #dab-rails-host .dab-bp-l{padding:14px !important}'
       + 'html body #s8 #dab-rails-host .dab-bp-logo{width:44px !important;height:44px !important;flex:0 0 44px !important}'
