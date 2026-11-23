@@ -2975,6 +2975,10 @@ label.dp-required.qc-required::after {
             <div class="f" id="d1t_field"><label class="dp-required" data-v236-required-set="1" title="Tilgung (% p.a.)">Tilgung <span class="cf-hint" id="d1t_hint" style="display:none"></span> <button type="button" class="dp-tip" data-tip-id="tab5.tilgung" tabindex="-1" aria-label="Hilfe zu Tilgung"></button></label><div class="iw"><input id="d1t" type="text" inputmode="decimal" value="2.00" step="0.01" class="tr" oninput="calc()"><span class="sfx">%</span></div></div>
             <div class="f"><label>Zinsbindung</label><div class="iw"><input id="d1_bindj" type="text" inputmode="decimal" value="10" class="tr" oninput="calc(); calcD1Volltilgung()"><span class="sfx">J.</span></div></div>
             <div class="f" id="d1_tf_field"><label title="Tilgungsfreie Anlaufzeit laut Darlehensvertrag: in diesen Monaten ab Auszahlung zahlst du nur die Zinsen, danach die volle Rate">Tilgungsfrei</label><div class="iw"><input id="d1_tf_mon" type="text" inputmode="numeric" placeholder="0" class="tr" oninput="calc()"><span class="sfx">Mon.</span></div></div><!-- v3980 · F6 tilgungsfreie Anlaufzeit -->
+            <div class="f" data-dg-stufe="3"><label title="Auszahlungskurs laut Darlehensvertrag. Unter 100 % behält die Bank ein Disagio ein: ausgezahlt wird weniger, Zins und Rate laufen auf die volle Darlehenssumme. Steuerlich Werbungskosten, bis 5 % bei mindestens 5 Jahren Zinsbindung sofort abziehbar.">Auszahlungskurs</label><div class="iw"><input id="d1_kurs" type="text" inputmode="decimal" placeholder="100" class="tr" oninput="calc()"><span class="sfx">%</span></div></div><!-- v3992 · F6 Disagio, ab Experte -->
+            <div class="f" data-dg-stufe="3"><label title="Bereitstellungsfreie Zeit ab Vertragsdatum (Bankdaten). Danach berechnet die Bank bis zur Auszahlung Bereitstellungszinsen.">Bereitstellungsfrei</label><div class="iw"><input id="d1_bz_frei" type="text" inputmode="numeric" placeholder="0" class="tr" oninput="calc()"><span class="sfx">Mon.</span></div></div>
+            <div class="f" data-dg-stufe="3"><label title="Bereitstellungszins je Monat auf den noch nicht ausgezahlten Betrag, üblich 0,25 %. Gerechnet vom Ende der freien Zeit bis zum Auszahlungsdatum, steuerlich Werbungskosten im Jahr der Zahlung.">Bereitstellungszins</label><div class="iw"><input id="d1_bz_satz" type="text" inputmode="decimal" placeholder="0" class="tr" oninput="calc()"><span class="sfx">% p. M.</span></div></div>
+            <div class="f fz-voll" data-dg-stufe="3"><div class="cf-hint" id="d1_fk_hint" style="display:block"></div></div>
             <div class="f"><label title="Monatliche Rate (berechnet)">Rate / Monat</label><div class="cf" id="d1_rate">—</div></div>
             <div class="f"><label>davon Zinsen</label><div class="cf" id="d1_zm">—</div></div>
             <div class="f"><label id="d1_tm_lbl">davon Tilgung</label><div class="cf" id="d1_tm">—</div></div><!-- v3256: bei Tilgungsaussetzung „Sparrate Bausparvertrag" (financing.js _wortwahl) -->
@@ -3025,7 +3029,8 @@ label.dp-required.qc-required::after {
           <div class="fz-raster fz-bank">
             <div class="f fz-s2"><label>Institution</label><input id="bank_inst" type="text" placeholder="Bank / Kreditinstitut"></div>
             <div class="f"><label>Vertragsnummer</label><input id="d1_vertrag" type="text" placeholder="z.B. KD-2025-001"></div>
-            <div class="f"><label>Vertragsdatum</label><input id="d1_vertragsdatum" type="text" placeholder="z.B. 14.03.2025"></div>
+            <div class="f"><label>Vertragsdatum</label><input id="d1_vertragsdatum" type="text" oninput="calc()" placeholder="z.B. 14.03.2025"></div>
+            <div class="f"><label title="Nur zur Information: das vertragliche Recht, jährlich bis zu diesem Anteil der Darlehenssumme zusätzlich zu tilgen. DealPilot rechnet keine Sondertilgung ein. Rate, Restschuld und Cashflow folgen dem Tilgungsplan ohne Sondertilgungen.">Sondertilgungsrecht</label><div class="iw"><input id="d1_st_pct" type="text" inputmode="decimal" placeholder="0" class="tr"><span class="sfx">% p. a.</span></div></div><!-- v3992 · F6 nur Angabe, nicht eingerechnet -->
           </div>
           </div>
         </details>
@@ -3142,6 +3147,10 @@ label.dp-required.qc-required::after {
                 <span class="hint" id="d2t_hint">Bei Tilgungsaussetzung: 0</span>
               </div>
               <div class="f"><label>Zinsbindung</label><div class="iw"><input id="d2_bindj" type="text" inputmode="decimal" value="10" class="tr" oninput="calc()"><span class="sfx">J.</span></div></div>
+              <div class="f" data-dg-stufe="3"><label title="Auszahlungskurs laut Darlehensvertrag. Unter 100 % behält die Bank ein Disagio ein: ausgezahlt wird weniger, Zins und Rate laufen auf die volle Darlehenssumme. Steuerlich Werbungskosten, bis 5 % bei mindestens 5 Jahren Zinsbindung sofort abziehbar.">Auszahlungskurs</label><div class="iw"><input id="d2_kurs" type="text" inputmode="decimal" placeholder="100" class="tr" oninput="calc()"><span class="sfx">%</span></div></div><!-- v3992 · F6 Disagio, ab Experte -->
+              <div class="f" data-dg-stufe="3"><label title="Bereitstellungsfreie Zeit ab Vertragsdatum (Bankdaten). Danach berechnet die Bank bis zur Auszahlung Bereitstellungszinsen.">Bereitstellungsfrei</label><div class="iw"><input id="d2_bz_frei" type="text" inputmode="numeric" placeholder="0" class="tr" oninput="calc()"><span class="sfx">Mon.</span></div></div>
+              <div class="f" data-dg-stufe="3"><label title="Bereitstellungszins je Monat auf den noch nicht ausgezahlten Betrag, üblich 0,25 %. Gerechnet vom Ende der freien Zeit bis zum Auszahlungsdatum, steuerlich Werbungskosten im Jahr der Zahlung.">Bereitstellungszins</label><div class="iw"><input id="d2_bz_satz" type="text" inputmode="decimal" placeholder="0" class="tr" oninput="calc()"><span class="sfx">% p. M.</span></div></div>
+              <div class="f fz-voll" data-dg-stufe="3"><div class="cf-hint" id="d2_fk_hint" style="display:block"></div></div>
               <div class="f"><label title="Monatliche Rate">Rate / Monat</label><div class="cf" id="d2_rate">—</div></div>
             </div>
             </div>
@@ -3172,7 +3181,8 @@ label.dp-required.qc-required::after {
             <div class="fz-raster fz-bank">
               <div class="f"><label>Institution</label><input id="d2_inst" type="text" placeholder="Bank / KfW" oninput="calc()"></div>
               <div class="f"><label>Vertragsnummer</label><input id="d2_vertrag" type="text" placeholder="z.B. KfW-1234567"></div>
-              <div class="f"><label>Vertragsdatum</label><input id="d2_vertragsdatum" type="text" placeholder="z.B. 02.06.2026"></div>
+              <div class="f"><label>Vertragsdatum</label><input id="d2_vertragsdatum" type="text" oninput="calc()" placeholder="z.B. 02.06.2026"></div>
+              <div class="f"><label title="Nur zur Information: das vertragliche Recht, jährlich bis zu diesem Anteil der Darlehenssumme zusätzlich zu tilgen. DealPilot rechnet keine Sondertilgung ein. Rate, Restschuld und Cashflow folgen dem Tilgungsplan ohne Sondertilgungen.">Sondertilgungsrecht</label><div class="iw"><input id="d2_st_pct" type="text" inputmode="decimal" placeholder="0" class="tr"><span class="sfx">% p. a.</span></div></div><!-- v3992 · F6 nur Angabe, nicht eingerechnet -->
               <div class="f"><label title="Bausparvertrag (optional)">Bausparvertrag</label><input id="d2_bspar" type="text" placeholder="Bausparvertragsnr."></div>
             </div>
             </div>
@@ -4035,14 +4045,15 @@ label.dp-required.qc-required::after {
   <script src="js/anteilig-recalc.js?v=353"></script>
   <script src="js/finanzierung-validation.js?v=1"></script>
 <script src="js/data/foerderregister.js?v=v3072"></script>
-  <script src="js/calc.js?v=v3980"></script>
+  <script src="js/finanzierungskosten.js?v=v3992"></script><!-- v3992 · F6 Disagio, Bereitstellungszinsen (Rechenkern) -->
+  <script src="js/calc.js?v=v3992"></script>
   <script src="js/zahlenfelder.js?v=v3800e"></script>
 <script src="js/d1-type-handler.js?v=161"></script>
 <script src="js/icons.js?v=166"></script>
 <script src="js/obj-numbering.js?v=166"></script>
 <script src="js/mietentwicklung.js?v=v3981"></script>
 <script src="/vendor/cdn/xlsx/0.18.5/xlsx.full.min.js"></script>
-<script src="js/tax.js?v=v3920"></script>
+<script src="js/tax.js?v=v3992"></script>
 <script src="js/steuer-verlauf.js?v=v3273a"></script>
 <script src="js/pa-potenzial.js?v=v3710"></script><!-- v3323 · Pilot-Analyse: Reiter Potenzialanalyse -->
 <script src="js/hausverlauf.js?v=v3977"></script><!-- v3323 · Pilot-Analyse: Reiter Hausverlauf (WEG-Unterlagen chronologisch) · v3430 Haus je Jahr -->
@@ -4103,7 +4114,7 @@ label.dp-required.qc-required::after {
 <script src="js/marktdaten-modal.js?v=v2247c"></script>
 <script src="js/ui.js?v=v3983"></script>
 <script src="js/sidebar-collapse.js?v=20260611174630"></script>
-<script src="js/storage.js?v=v3987"></script>
+<script src="js/storage.js?v=v3992"></script>
 <script src="js/nachrechnen.js?v=v3031"></script><!-- v3031: Kennzahlen/Scores gespeicherter Objekte neu rechnen (nur auf Aufruf) -->
 <!-- v845-newsearch-removed: sb-search.js entfernt (Kollision mit sidebar-search.js) -->
 <script src="js/inventar-sync.js?v=v3006c"></script><!-- V291-inv-sync-applied -->
@@ -4137,15 +4148,15 @@ label.dp-required.qc-required::after {
 <script src="js/ki-miete.js?v=v3845"></script>
 <script src="js/star-rating.js?v=v1851"></script>
 <script src="js/pdf-import.js?v=v3660c"></script>
-<script src="js/dokument-import.js?v=v3982"></script>
+<script src="js/dokument-import.js?v=v3993"></script>
 <script src="js/unterlagen.js?v=v3984"></script>
 <script src="js/sonderumlage.js?v=v3221"></script><script src="js/hausgeld-positionen.js?v=v3860"></script><!-- v3860 · Zusammensetzung des Hausgelds -->
 <script src="js/sanierung-plan.js?v=v3800"></script><!-- v3214 · N137 · W-15: weitere Sanierungen in spaeteren Jahren -->
-<script src="js/darlehen-weitere-ui.js?v=v3261"></script><!-- v3215 · W-17: Liste Weitere Darlehen (Reiter Finanzierung) -->
+<script src="js/darlehen-weitere-ui.js?v=v3992"></script><!-- v3215 · W-17: Liste Weitere Darlehen (Reiter Finanzierung) -->
 
 <script src="js/beleg-import.js?v=v3166"></script>
 <script src="js/financing.js?v=v3261"></script>
-<script src="js/financing-pdf.js?v=v3980"></script>
+<script src="js/financing-pdf.js?v=v3992"></script>
 <script src="js/finanzierung-kopf.js?v=v3264"></script><!-- v3261 · Reiter Finanzierung: Eckdaten je Darlehen und eingeklappte Gruppen (rechnet nichts) -->
 <script src="js/immokalk-import.js?v=v1260"></script>
 <script src="js/import-export-modal.js?v=v1678"></script>
@@ -4236,7 +4247,7 @@ label.dp-required.qc-required::after {
 <script src="js/jahresstaende.js?v=v3430"></script><!-- v2989 · Jahresstaende, Rechenstand, Zielerreichung im Bestand -->
 <script src="js/jahresbuch.js?v=v3981"></script><!-- v3363 · Jahr für Jahr: Plan gegen Ist im Bestand (_jahre) -->
 <script src="js/jahresbuch-grafik.js?v=v3433"></script><!-- v3364 · Verlaufsgrafik Plan gegen Ist · v3430 Engine für Jahresabgleich und Haus -->
-<script src="js/jahresabgleich.js?v=v3434"></script><!-- v3420 · Jahresabgleich im Bestand: erster Unterreiter der Pilot-Analyse (Miete, Steuer, Wert, Haus) · v3430 Demo Fassung 2 -->
+<script src="js/jahresabgleich.js?v=v3993"></script><!-- v3420 · Jahresabgleich im Bestand: erster Unterreiter der Pilot-Analyse (Miete, Steuer, Wert, Haus) · v3430 Demo Fassung 2 -->
 <script src="js/wert-zielbild.js?v=v3720"></script><!-- v2840 · Tab Bewertung: Segment „Wert &amp; Zielbild"; Pilot-Analyse: Einfach | Genau -->
 <script src="js/dealpilot-mb.js?v=v3945"></script>
 <script src="js/mb-abgleich.js?v=v3840b"></script><!-- v3002 · Abgleich mit dem Marktbericht in den Reitern Objekt und Miete -->
@@ -4266,7 +4277,7 @@ label.dp-required.qc-required::after {
 <script src="js/main.js?v=v3280"></script>
   <!-- v372-autocomplete-removed: <script src="js/autocomplete.js?v=160" defer></script> -->
   <script src="js/session-expired-banner.js?v=500"></script><!-- v500-session-banner -->
-  <script src="js/object-actions.js?v=v3988"></script>
+  <script src="js/object-actions.js?v=v3993"></script>
   <script src="js/unterlagen-eingang.js?v=v3670"></script><!-- v3120 · ein Eingang fuer Belege, Unterlagen, Rechnungen -->
   <script src="js/ze-aufteilung.js?v=v3961"></script><!-- v3670 · Zusatzeinnahmen aufteilen (Reiter Miete) -->
   <script src="js/dpsh-score-hero.js?v=v3370"></script><!-- dpsh-score-hero -->

@@ -2074,7 +2074,16 @@
        Gemeinschaft (z. B. 38.000 € umlagefähig) ging vorgehakt in EINE Wohnung. */
     var _dokFiles = _files.filter(function (f) { return f.type === 'dokument' && f.cache.dokument && f.cache.dokument.success; });
     _dokFiles.forEach(function (f) { mergeDokument(f.cache.dokument, false); });
+    /* v3993 · F22 Marcel 23.11.2026: mehrere Hausgeld-Unterlagen. Maßgeblich ist die jüngste Abrechnung, der
+       Wirtschaftsplan nur zur Plausibilität (DokumentImport.hausgeldWahl). Bis hier gewann die zuletzt gelesene Datei. */
+    _hgWahl = null;
+    try {
+      var _hgL = [];
+      _dokFiles.forEach(function (f) { var a = f.cache.dokument; [a].concat(a.weitere || []).forEach(function (t) { if (t && t.typ === 'hausgeld') _hgL.push({ ext: t.extracted || {}, ref: t }); }); });
+      if (_hgL.length > 1 && window.DokumentImport && typeof window.DokumentImport.hausgeldWahl === 'function') _hgWahl = window.DokumentImport.hausgeldWahl(_hgL, _kontext());
+    } catch (_hgE) { _hgWahl = null; }
     _dokFiles.forEach(function (f) { mergeDokument(f.cache.dokument, true); });
+    if (_hgWahl) _hgWahl.hinweise.forEach(function (h) { _importHinweise.push(h); });
     /* v3016g · gemessen am Demo-Set Lindenallee (MFH, alle Einheiten): das Wohnungsgrundbuch EINER
        Einheit setzte „Miteigentumsanteil 20,4 %“ - das Haus hätte dann als Anteil gerechnet.
        Beim Haus (MFH/WGH/ZFH/EFH) gilt kein MEA aus einem einzelnen Blatt. */
@@ -2095,6 +2104,7 @@
     if (_qcMode) { try { _dgEinheitenSummen({ importErlaubt: function () { return false; } }); } catch (e) {} }
   }
   var _vergleich = [], _importHinweise = [];
+  var _hgWahl = null;   /* v3993 · F22 */
   /* v3979 · F3 Gesamt-Flow 22.11.2026: „Exposé-Werte gewinnen still gegen Mieterliste, Teilungserklärung und
      Wirtschaftsplan". Die Unterlagen gingen zwar vor (amtliche Dokumente zuletzt), aber still - und beim Hausgeld
      ersetzte die nie vorgehakte Wirtschaftsplan-Zeile (v3088a) die vorgehakte Exposé-Zeile: das Feld blieb leer und
@@ -2226,8 +2236,10 @@
       var ktx = _kontext();
       if (t.typ === 'mieterhoehung') { _mieterhoehungZeile(t); return; }   /* v3982 · F11 */
       if (t.typ === 'betriebskosten') { _betriebskostenHinweis(t); return; }
+      var _hgNicht = t.typ === 'hausgeld' && _hgWahl && _hgWahl.gewaehlt && _hgWahl.gewaehlt !== t;   /* v3993 · F22: nicht die maßgebliche Unterlage */
       (D.abgleich(t.extracted || {}, t.typ, ktx) || []).forEach(function (z) {
-        if (z.hinweis) { _importHinweise.push(z.hinweis); return; }
+        if (z.hinweis) { if (!_hgNicht) _importHinweise.push(z.hinweis); return; }
+        if (_hgNicht) return;
         /* v3088a · Marcel 02.11.2026: Wirtschaftsplan/Abrechnung „immer erst mal auflisten und zum Übernehmen aktiv anstoßen“ - nie vorgehakt */
         /* v3349 · Marcel 13.11.2026 (Lindenallee 14 im QuickBoarding): im Quick-Check läuft ein Mietvertrag
            hier durch und überschrieb Fläche und Miete des Exposés (518 m² → 72 m², 3.660 → 545 €); die MFH-Regel
@@ -2250,7 +2262,7 @@
       });
       /* v3017 · Wirtschaftsplan/Abrechnung → Steuer-Reiter. Weicht der Vorschlag vom heutigen Wert ab,
          ist die Zeile nicht vorgehakt und zeigt den bisherigen Wert („erstmal drauf hinweisen") */
-      if (typeof D.steuerVorschlaege === 'function' && typeof window.dpSteuerWert === 'function') {
+      if (typeof D.steuerVorschlaege === 'function' && typeof window.dpSteuerWert === 'function' && !(_hgWahl && _hgWahl.ohneSteuer.indexOf(t) >= 0)) {   /* v3993 · F22: zum Jahr liegt die Abrechnung vor */
         D.steuerVorschlaege(t.extracted || {}, t.typ, ktx).forEach(function (s) {
           var w = window.dpSteuerWert(s.jahr, s.feld); if (w === null) return;
           _merged['steuer:' + s.jahr + ':' + s.feld] = { nurAktiv: true, label: 'Steuer ' + s.jahr + ' · ' + s.wort, value: fmt0(s.betrag) + ' € im Jahr ' + s.jahr, raw: String(s.betrag),

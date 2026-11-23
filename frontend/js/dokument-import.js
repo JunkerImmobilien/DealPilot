@@ -144,6 +144,10 @@
     darlehensbetrag_eur: ['d1', 'Darlehenssumme', 'eur'], sollzins_pct: ['d1z', 'Zinssatz nominal', 'pct'], tilgung_pct: ['d1t', 'Tilgung', 'pct'],
     zinsbindung_jahre: ['d1_bindj', 'Zinsbindung (Jahre)', 'zahl'], tilgungsfrei_monate: ['d1_tf_mon', 'Tilgungsfrei (Monate)', 'zahl'],
     auszahlung: ['d1_auszahl', 'Auszahlung', 'monat'], bank: ['bank_inst', 'Bank', 'text'], vertragsnummer: ['d1_vertrag', 'Vertragsnummer', 'text'],
+    /* v3992 · F6/F7 Marcel 23.11.2026: Auszahlungskurs (Disagio) und Bereitstellungszins rechnen ab Experte mit
+       (js/finanzierungskosten.js), das Sondertilgungsrecht ist nur Angabe und wird nicht eingerechnet */
+    auszahlungskurs_pct: ['d1_kurs', 'Auszahlungskurs', 'pct'], bereitstellungsfrei_monate: ['d1_bz_frei', 'Bereitstellungsfrei (Monate)', 'zahl'],
+    bereitstellungszins_pct_monat: ['d1_bz_satz', 'Bereitstellungszins je Monat', 'pct'], sondertilgung_pct: ['d1_st_pct', 'Sondertilgungsrecht (nur Angabe)', 'pct'],
     brutto_eur: ['san', 'Sanierungskosten (Angebot brutto)', 'eur'],
     stellplatz_miete_eur: ['ze_stp_monat', 'Zusätzliche Einnahmen: Stellplatz / Monat', 'eur'],
     kueche_miete_eur: ['ze_kueche_monat', 'Zusätzliche Einnahmen: Küche / Möblierung / Monat', 'eur']
@@ -154,7 +158,8 @@
      unter diese Sperre und kam nie an. Beim Haus mit mehreren Einheiten entfernt object-actions.js
      Miete/Fläche/Zimmer/Stellplatz eines Mietvertrags wieder (eine Einheit ist nicht das Haus). */
   var NUR_AUS = { darlehensbetrag_eur: { darlehensvertrag: 1 }, sollzins_pct: { darlehensvertrag: 1 }, tilgung_pct: { darlehensvertrag: 1 }, zinsbindung_jahre: { darlehensvertrag: 1 },
-    tilgungsfrei_monate: { darlehensvertrag: 1 }, auszahlung: { darlehensvertrag: 1 }, bank: { darlehensvertrag: 1 }, vertragsnummer: { darlehensvertrag: 1 }, brutto_eur: { sanierungsangebot: 1 },   /* v3982 */
+    tilgungsfrei_monate: { darlehensvertrag: 1 }, auszahlung: { darlehensvertrag: 1 }, auszahlungskurs_pct: { darlehensvertrag: 1 }, bereitstellungsfrei_monate: { darlehensvertrag: 1 },
+    bereitstellungszins_pct_monat: { darlehensvertrag: 1 }, sondertilgung_pct: { darlehensvertrag: 1 },   /* v3992 */ bank: { darlehensvertrag: 1 }, vertragsnummer: { darlehensvertrag: 1 }, brutto_eur: { sanierungsangebot: 1 },   /* v3982 */
     kaltmiete_eur: { mietvertrag: 1 }, wohnflaeche_m2: { mietvertrag: 1, vwg_vorgutachten: 1 }, zimmer: { mietvertrag: 1 }, stellplatz_miete_eur: { mietvertrag: 1 }, kueche_miete_eur: { mietvertrag: 1 } };
   /* Klartext statt Schluessel fuer die uebrigen Angaben */
   var NAMEN = {
@@ -276,6 +281,53 @@
       zeilen.push({ feld: 'hg_pos', wort: 'Aufstellung des Hausgelds', neu: pj, anzeige: pos.length + ' Positionen' + (ext.jahr ? ' (' + (ext.art || 'Wirtschaftsplan') + ' ' + ext.jahr + ')' : ''), ist: istP ? 'andere Aufstellung' : '', einheit: '', ort: 'Bewirtschaftung', status: istP === '' ? 'neu' : (istP === pj ? 'gleich' : 'abweichung'), herleitung: (ext.art || 'Wirtschaftsplan') + (ext.jahr ? ' ' + ext.jahr : '') + ' · ' + b.wie });
     }
     return zeilen.map(_viviPruefen);   /* v3951 */
+  }
+  /* v3993 · F22 Marcel 23.11.2026: „Bewirtschaftungskosten im Jahresabgleich: maßgeblich ist immer die Abrechnung.
+     Der Wirtschaftsplan wird nur zur Plausibilität herangezogen." Bis hier gewann beim Einlesen mehrerer Hausgeld-
+     Unterlagen die zuletzt gelesene (Dateireihenfolge), auch ein älteres Jahr oder ein Plan.
+     Jetzt: die Felder (hg_ul, hg_nul, weg_r, hg_pos) kommen aus der JÜNGSTEN Abrechnung, nur ohne jede Abrechnung
+     aus dem jüngsten Wirtschaftsplan. Liegen Abrechnung und Wirtschaftsplan DESSELBEN Jahres mehr als 10 % auseinander
+     (Summe umlagefähig + nicht umlagefähig + Rücklage, anteilig wie _hausgeldBasis), kommt ein Hinweis, nichts wird
+     überschrieben. Steuer-Vorschläge eines Wirtschaftsplans entfallen für ein Jahr, zu dem die Abrechnung vorliegt.
+     liste: [{ ext, ref }] → { gewaehlt: ref, ohneSteuer: [ref …], hinweise: [Text …], abweichungen: [{ jahr, abr, plan, pct }] } */
+  var HG_PLAUSI_GRENZE = 0.10;
+  function _hgIstAbr(ext) { return /abrechnung/i.test(String((ext && ext.art) || '')); }
+  function _hgSumme(ext, ktx) {
+    var b = _hausgeldBasis(ext, ktx); if (!b) return null;
+    var w = b.w, n = function (x) { var v = _zahl(x); return v == null ? null : v; };
+    var u = n(w.umlagefaehig_jahr_eur), nu = n(w.nicht_umlagefaehig_jahr_eur), r = n(w.ruecklage_zufuehrung_jahr_eur);
+    var t = (u != null || nu != null) ? (u || 0) + (nu || 0) + (r || 0) : n(w.kosten_jahr_eur);
+    return t != null && t > 0 ? t * b.faktor : null;
+  }
+  function hausgeldWahl(liste, ktx) {
+    var L = (Array.isArray(liste) ? liste : []).filter(function (x) { return x && x.ext; });
+    var aus = { gewaehlt: null, ohneSteuer: [], hinweise: [], abweichungen: [] };
+    if (!L.length) return aus;
+    var jahr = function (x) { return _zahl(x.ext.jahr) || 0; };
+    var abr = L.filter(function (x) { return _hgIstAbr(x.ext); }), plan = L.filter(function (x) { return !_hgIstAbr(x.ext); });
+    var pool = abr.length ? abr : plan, best = null;
+    pool.forEach(function (x) { if (!best || jahr(x) >= jahr(best)) best = x; });
+    aus.gewaehlt = best ? best.ref : null;
+    if (L.length > 1 && best) {
+      var rest = L.filter(function (x) { return x !== best; }).map(function (x) { return (_hgIstAbr(x.ext) ? 'Abrechnung' : 'Wirtschaftsplan') + (jahr(x) ? ' ' + jahr(x) : ''); });
+      aus.hinweise.push('Für das Hausgeld zählt ' + (_hgIstAbr(best.ext) ? 'die Abrechnung' : 'der Wirtschaftsplan') + (jahr(best) ? ' ' + jahr(best) : '') + '. '
+        + (abr.length ? 'Maßgeblich ist die Abrechnung (Ist), ' : 'Eine Abrechnung liegt nicht vor, ')
+        + 'die übrigen Unterlagen (' + rest.join(', ') + ') ändern das Hausgeld nicht.');
+    }
+    plan.forEach(function (pl) {
+      var a = abr.filter(function (x) { return jahr(x) && jahr(x) === jahr(pl); })[0]; if (!a) return;
+      aus.ohneSteuer.push(pl.ref);
+      var sa = _hgSumme(a.ext, ktx), sp = _hgSumme(pl.ext, ktx);
+      if (!(sa > 0 && sp > 0)) return;
+      var d = (sa - sp) / sp;
+      if (Math.abs(d) > HG_PLAUSI_GRENZE) {
+        var pct = Math.round(Math.abs(d) * 1000) / 10;
+        aus.abweichungen.push({ jahr: jahr(pl), abr: Math.round(sa), plan: Math.round(sp), pct: Math.round(d * 1000) / 10 });
+        aus.hinweise.push('Plausibilität Hausgeld ' + jahr(pl) + ': die Abrechnung nennt ' + _fmt(Math.round(sa)) + ' € im Jahr, der Wirtschaftsplan ' + _fmt(Math.round(sp)) + ' €. Das sind '
+          + String(pct).replace('.', ',') + ' % ' + (d > 0 ? 'mehr' : 'weniger') + ' als geplant. Maßgeblich bleibt die Abrechnung. Bitte die Abweichung prüfen.');
+      }
+    });
+    return aus;
   }
   /* Vorschläge für den Steuer-Reiter: Verwaltung, übrige nicht umlagefähige Kosten (OHNE Rücklage -
      die Zuführung ist erst absetzbar, wenn die Gemeinschaft sie ausgibt), Erhaltungsaufwand aus
@@ -716,6 +768,7 @@
     abgleich: _abgleich,
     steuerVorschlaege: steuerVorschlaege,   /* v3017 */
     sonderumlagenAus: sonderumlagenAus,     /* v3092 · N100 */
+    hausgeldWahl: hausgeldWahl,             /* v3993 · F22 */
     vergleich: vergleich,
     adresseAbweichung: adresseAbweichung   /* v3279 */
   };

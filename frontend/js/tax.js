@@ -1668,6 +1668,10 @@ function _computeAutoForYear(yearIdx, year, teiljahr) {
 
   // Schuldzinsen aus cfRows
   var schuldzinsen = row ? (row.zy || 0) : 0;
+  /* v3992 · F6 Disagio (Damnum, gehoert zu den Schuldzinsen, Zeile 48) und Bereitstellungszinsen dieses Jahres
+     aus calc.js (js/finanzierungskosten.js). Ohne Eingabe 0. */
+  var _fkDisagio = row && row.fk_disagio_y > 0 ? row.fk_disagio_y : 0, _fkBz = row && row.fk_bz_y > 0 ? row.fk_bz_y : 0;
+  schuldzinsen += _fkDisagio;
   /* ═══ v1898 · DIE BEWIRTSCHAFTUNG KOMMT AUS DEM RECHENKERN ═════════════
    *
    * Hier stand bis zum 06.10.2026 eine SCHAETZUNG:
@@ -1733,7 +1737,7 @@ function _computeAutoForYear(yearIdx, year, teiljahr) {
        ueberschreibbar, es schlaegt nur nichts mehr vor. (v646 hat
        `steuerber` und `telefon` aus demselben Grund auf 0 gesetzt.) */
     kontofuehrung: 0,
-    bereitstellung: 0,
+    bereitstellung: _fkBz,   /* v3992 · F6 */
     notar_grundschuld: 0,
     vermittlung: 0,
     finanz_sonst: 0,

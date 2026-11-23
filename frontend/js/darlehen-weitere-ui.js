@@ -121,8 +121,16 @@
             : '<div class="f"><label>Tilgung</label><div class="iw"><input id="' + id + 'tilg" data-dw="tilg" type="text" inputmode="decimal" class="tr" value="' + esc(zahlText(e.tilg)) + '"><span class="sfx">%</span></div></div>')
           + '<div class="f"><label>Zinsbindung</label><div class="iw"><input id="' + id + 'bindj" data-dw="bindj" type="text" inputmode="numeric" class="tr" value="' + esc(e.bindj != null ? e.bindj : '') + '"><span class="sfx">J.</span></div></div>'
           + '<div class="f"><label>Start-Jahr <span style="color:var(--muted);font-weight:400">· optional</span></label><input id="' + id + 'start_jahr" data-dw="start_jahr" data-zf-aus="1" type="text" inputmode="numeric" placeholder="mit dem Kauf" value="' + esc(e.start_jahr || '') + '"></div>'
+          /* v3992 · F6 Marcel 23.11.2026: Disagio und Bereitstellungszinsen für alle Darlehen, ab Experte (data-dg-stufe, detailgrad.js).
+             Gerechnet in js/finanzierungskosten.js über calc.js. Das Sondertilgungsrecht ist nur Angabe. */
+          + '<div class="f" data-dg-stufe="3"><label title="Auszahlungskurs laut Vertrag. Unter 100 % behält die Bank ein Disagio ein, das aus Eigenkapital kommt.">Auszahlungskurs</label><div class="iw"><input id="' + id + 'kurs" data-dw="kurs" type="text" inputmode="decimal" class="tr" placeholder="100" value="' + esc(zahlText(e.kurs)) + '"><span class="sfx">%</span></div></div>'
+          + '<div class="f" data-dg-stufe="3"><label title="Vertragsdatum: ab hier läuft die bereitstellungsfreie Zeit">Vertragsdatum</label><input id="' + id + 'zusage" data-dw="zusage" data-zf-aus="1" type="text" placeholder="z.B. 03.2025" value="' + esc(e.zusage || '') + '"></div>'
+          + '<div class="f" data-dg-stufe="3"><label>Bereitstellungsfrei</label><div class="iw"><input id="' + id + 'bz_frei" data-dw="bz_frei" type="text" inputmode="numeric" class="tr" placeholder="0" value="' + esc(e.bz_frei != null ? e.bz_frei : '') + '"><span class="sfx">Mon.</span></div></div>'
+          + '<div class="f" data-dg-stufe="3"><label title="Bereitstellungszins je Monat bis zur Auszahlung (Start-Jahr bzw. Auszahlung von Darlehen I)">Bereitstellungszins</label><div class="iw"><input id="' + id + 'bz_satz" data-dw="bz_satz" type="text" inputmode="decimal" class="tr" placeholder="0" value="' + esc(zahlText(e.bz_satz)) + '"><span class="sfx">% p. M.</span></div></div>'
+          + '<div class="f"><label title="Nur zur Information. DealPilot rechnet keine Sondertilgung ein.">Sondertilgungsrecht</label><div class="iw"><input id="' + id + 'st_pct" data-dw="st_pct" type="text" inputmode="decimal" class="tr" placeholder="0" value="' + esc(zahlText(e.st_pct)) + '"><span class="sfx">% p. a.</span></div></div>'
           + '</div>'
-          + '<div class="hint dw-rate" style="display:block;margin-top:6px"></div>';
+          + '<div class="hint dw-rate" style="display:block;margin-top:6px"></div>'
+          + '<div class="hint dw-fk" data-dg-stufe="3" style="display:block;margin-top:4px"></div>';
         /* v3256 · Marcel 09.11.2026: dieselben Werkzeuge wie Darlehen I - Plan ansehen
            (financing.js openTilgungsplanModal(i), gerechnet im Kern) und Bank-PDF
            (financing.js triggerPdfImportTo('dw:i'), Leser financing-pdf.js) */
@@ -150,6 +158,8 @@
     [].forEach.call(host.querySelectorAll('.dw-eintrag'), function (box) {
       var i = +box.getAttribute('data-i'), e = l[i]; if (!e) return;
       var r = box.querySelector('.dw-rate'); if (r) r.textContent = rateZeile(e, i);
+      var fk = box.querySelector('.dw-fk');   /* v3992 · F6: Disagio/Bereitstellungszinsen aus calc.js (State.fk) */
+      if (fk) { var fr = (typeof State !== 'undefined' && State.fk && window.DpFinanzierungskosten) ? State.fk.liste.filter(function (x) { return x && x.dw === i; })[0] : null; fk.textContent = fr ? DpFinanzierungskosten.text(fr) : ''; }
       try { kopfFuellen(box, e, i); } catch (x) {}
     });
   }
@@ -161,6 +171,7 @@
     var k = t.getAttribute('data-dw'), v = String(t.value || '').trim();
     var zahl = K() ? K().zahl : function (x) { var n = parseFloat(String(x).replace(',', '.')); return isFinite(n) ? n : null; };
     if (k === 'bez') e.bez = v;
+    else if (k === 'zusage') e.zusage = v;   /* v3992 · Datum, keine Zahl */
     else if (k === 'art') { e.art = v === 'tilgungsaussetzung' ? 'tilgungsaussetzung' : 'annuitaet'; if (e.art === 'tilgungsaussetzung') e.tilg = 0; }
     else e[k] = zahl(v);
     speichern(l, k === 'art');   /* die Art schaltet das Tilgungsfeld → neu zeichnen */
@@ -203,7 +214,7 @@
   function uebernehmen(i, w) {
     var l = roh(), e = l[i]; if (!e || !w) return false;
     var zahl = K() ? K().zahl : function (x) { var n = parseFloat(String(x).replace(',', '.')); return isFinite(n) ? n : null; };
-    ['betrag', 'zins', 'tilg', 'bindj'].forEach(function (k) {
+    ['betrag', 'zins', 'tilg', 'bindj', 'kurs', 'bz_frei', 'bz_satz', 'st_pct' /* v3992 */].forEach(function (k) {
       if (w[k] == null || String(w[k]).trim() === '') return;
       var n = zahl(w[k]); if (n != null && n >= 0) e[k] = n;
     });

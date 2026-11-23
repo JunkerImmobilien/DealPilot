@@ -136,6 +136,7 @@
       if (f2.d2_bindj != null) fw.dw_bindj = f2.d2_bindj;
       if (f2.d2_type) fw.dw_art = f2.d2_type;
       if (f2.d2_inst) fw.dw_bez = f2.d2_inst;
+      ['kurs', 'bz_frei', 'bz_satz', 'st_pct'].forEach(function (k) { if (f2['d2_' + k] != null) fw['dw_' + k] = f2['d2_' + k]; });   /* v3992 */
       return { _target: 'dw', _dwIndex: +dwM[1], _detectedType: 'dw', fields: fw, _meta: r2._meta };
     }
     var lower = text.toLowerCase();
@@ -271,6 +272,26 @@
         else if (/tilgungsfreie\s+Anlaufzeit\W{0,4}keine/i.test(text)) result.fields.d1_tf_mon = 0;
       }
 
+      /* v3992 · F6/F7 Marcel 23.11.2026: Auszahlungskurs (Disagio), Bereitstellungszins und Sondertilgungsrecht.
+         „Auszahlungskurs 100 % (kein Disagio)", „Disagio 2 %", „Bereitstellungszins 3 Monate frei, danach 0,25 % im
+         Monat" (oder „3 % p. a."), „Sondertilgung jährlich bis 5 % …". Das Sondertilgungsrecht ist nur Angabe. */
+      var _pz = function (x) { var n = parseFloat(String(x).replace(/\./g, '').replace(',', '.')); return isFinite(n) ? n : null; };
+      var kuMatch = text.match(/Auszahlungskurs\s*[:\s]\s*(\d{2,3}(?:,\d{1,3})?)\s*%/i);
+      var diMatch = text.match(/(?:Disagio|Damnum)\s*[:\s]\s*(\d{1,2}(?:,\d{1,3})?)\s*%/i);
+      if (kuMatch && _pz(kuMatch[1]) > 50 && _pz(kuMatch[1]) <= 100) result.fields[target + '_kurs'] = _pz(kuMatch[1]);
+      else if (diMatch && _pz(diMatch[1]) >= 0 && _pz(diMatch[1]) < 50) result.fields[target + '_kurs'] = Math.round((100 - _pz(diMatch[1])) * 1000) / 1000;
+      var bzZeile = (text.match(/Bereitstellungs(?:zins|provision)\w*[^\n]{0,140}/i) || [''])[0];
+      if (bzZeile) {
+        var bzFrei = bzZeile.match(/(\d{1,2})\s*Monate?\s*(?:bereitstellungs)?(?:zins)?frei/i) || bzZeile.match(/frei\w*(?:\s+Zeit)?\s*[:\s]\s*(\d{1,2})\s*Monat/i);
+        if (bzFrei) result.fields[target + '_bz_frei'] = parseInt(bzFrei[1], 10);
+        var bzM = bzZeile.match(/(\d{1,2}(?:,\d{1,3})?)\s*%\s*(?:im|pro|je)\s*Monat|(\d{1,2}(?:,\d{1,3})?)\s*%\s*p\.\s?M\./i);
+        var bzA = bzZeile.match(/(\d{1,2}(?:,\d{1,3})?)\s*%\s*(?:p\.\s?a\.|pro\s+Jahr|im\s+Jahr|jährlich)/i);
+        if (bzM) result.fields[target + '_bz_satz'] = _pz(bzM[1] || bzM[2]);
+        else if (bzA) result.fields[target + '_bz_satz'] = Math.round(_pz(bzA[1]) / 12 * 10000) / 10000;
+      }
+      var stMatch = text.match(/Sondertilgung\w*[^\n%]{0,60}?(\d{1,2}(?:,\d{1,2})?)\s*%/i);
+      if (stMatch && _pz(stMatch[1]) > 0 && _pz(stMatch[1]) <= 100) result.fields[target + '_st_pct'] = _pz(stMatch[1]);
+
       // Ableitung Bindungs-Jahre wenn nur Enddatum + Auszahlung
       if (!result.fields[target + '_bindj'] && result._meta.bind_end_date && result.fields[target + '_auszahl']) {
         try {
@@ -347,6 +368,9 @@
       d1: 'Darlehenssumme (€)', d1z: 'Zinssatz nominal (%)', d1t: 'Tilgung (%)',
       d1_bindj: 'Zinsbindung (Jahre)', d1_auszahl: 'Auszahlung (MM.YYYY)',
       d1_type: 'Darlehenstyp', bank_inst: 'Bank', d1_vertrag: 'Vertragsnummer', d1_tf_mon: 'Tilgungsfrei (Monate)',   /* v3980 */
+      d1_kurs: 'Auszahlungskurs (%)', d1_bz_frei: 'Bereitstellungsfrei (Monate)', d1_bz_satz: 'Bereitstellungszins (% je Monat)', d1_st_pct: 'Sondertilgungsrecht (% p. a., nur Angabe)',
+      d2_kurs: 'Auszahlungskurs (%)', d2_bz_frei: 'Bereitstellungsfrei (Monate)', d2_bz_satz: 'Bereitstellungszins (% je Monat)', d2_st_pct: 'Sondertilgungsrecht (% p. a., nur Angabe)',
+      dw_kurs: 'Auszahlungskurs (%)', dw_bz_frei: 'Bereitstellungsfrei (Monate)', dw_bz_satz: 'Bereitstellungszins (% je Monat)', dw_st_pct: 'Sondertilgungsrecht (% p. a., nur Angabe)',   /* v3992 */
       d2: 'Darlehenssumme (€)', d2z: 'Zinssatz nominal (%)', d2t: 'Tilgung (%)',
       d2_bindj: 'Zinsbindung (Jahre)', d2_inst: 'Bank', d2_type: 'Darlehenstyp',
       d2_vertrag: 'Vertragsnummer', d2_auszahl: 'Auszahlung (MM.YYYY)',   /* v3261 */

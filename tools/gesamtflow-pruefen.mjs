@@ -108,7 +108,7 @@ function funk(src, name) {
   ok(!fehlt.length, 'F3 Funktionen in object-actions.js gefunden (fehlt: ' + (fehlt.join(', ') || '-') + ')');
   const code = teile.filter((t) => t[1]).map((t) => t[1]).join('\n');
   function sandbox(objart, zeilen, exposeRows) {
-    const ctx = { console, Math, JSON, Number, String, isFinite, parseFloat, parseInt, Object, Array, Intl, _qcMode: true, _mvImport: [], _importHinweise: [], _vergleich: [], _merged: {} };
+    const ctx = { console, Math, JSON, Number, String, isFinite, parseFloat, parseInt, Object, Array, Intl, _qcMode: true, _mvImport: [], _importHinweise: [], _vergleich: [], _merged: {}, _hgWahl: null /* v3993 */ };
     ctx.window = { DokumentImport: { abgleich: (ext, typ) => JSON.parse(JSON.stringify(zeilen[typ] || [])), vergleich: () => [] } };
     ctx._kontext = () => ({ objart, mea: null });
     vm.createContext(ctx);
@@ -197,6 +197,92 @@ function funk(src, name) {
   ok(f.bank_inst === 'Musterbank eG', 'F7 Bank „Musterbank eG" statt „eG · Darlehensvertrag …" (Ist ' + f.bank_inst + ')');
   ok(f.d1_auszahl === '12.2023', 'F7 Auszahlung „voll am 29.12.2023" → 12.2023 (Ist ' + f.d1_auszahl + ')');
   ok(f.d1_tf_mon === 3, 'F7 tilgungsfreie Anlaufzeit 3 Monate gelesen (Ist ' + f.d1_tf_mon + ')');
+}
+
+/* ── F6b · v3992 Disagio und Bereitstellungszinsen (Kern js/finanzierungskosten.js), Sondertilgung nur Angabe ── */
+{
+  const ctx = { Math, JSON, Number, String, isFinite, parseFloat, parseInt, Array, Object };
+  ctx.window = ctx; vm.createContext(ctx);
+  try { vm.runInContext(lies('frontend/js/finanzierungskosten.js'), ctx); } catch (e) { ok(false, 'F6b finanzierungskosten.js lädt: ' + e.message); }
+  const K = ctx.DpFinanzierungskosten;
+  const D = { name: 'Darlehen I', betrag: 175200, bindj: 10, aus: '12.2023' };   /* Musterweg 7 */
+  const leer = K ? K.berechnen([D, Object.assign({}, D, { kurs: 100 }), Object.assign({}, D, { kurs: '', bz_satz: '' })], { abJahr: 2023 }) : null;
+  ok(leer && leer.disagio === 0 && leer.bz === 0 && Object.keys(leer.jahre).length === 0, 'F6b ohne Eingabe (Kurs leer oder 100, kein Bereitstellungszins) keine Jahreswerte, nichts ändert sich');
+  const a = K && K.berechnen([Object.assign({}, D, { kurs: 98 })], { abJahr: 2023 });
+  const a23 = a && a.jahre[2023];
+  ok(a && Math.abs(a.disagio - 3504) < 0.01 && a.liste[0].sofort === true && Math.abs(a.liste[0].auszahlung_eur - 171696) < 0.01, 'F6b Kurs 98 %: Disagio 3.504 €, Auszahlung 171.696 €, marktüblich (Ist ' + (a ? a.disagio + ' / ' + a.liste[0].auszahlung_eur : '-') + ')');
+  ok(a23 && Math.abs(a23.disagio_wk - 3504) < 0.01 && Math.abs(a23.cf - 3504) < 0.01 && Object.keys(a.jahre).length === 1, 'F6b Disagio bis 5 % bei 10 Jahren Zinsbindung: 3.504 € Werbungskosten 2023 sofort, 3.504 € aus Eigenkapital 2023');
+  const b = K && K.berechnen([Object.assign({}, D, { kurs: 94 })], { abJahr: 2023 });
+  ok(b && b.liste[0].sofort === false && Math.abs(b.jahre[2023].disagio_wk - 10512 / 120) < 0.01 && Math.abs(b.jahre[2024].disagio_wk - 10512 / 10) < 0.01 && Math.abs(b.jahre[2023].cf - 10512) < 0.01,
+    'F6b Disagio 6 %: verteilt über 120 Monate Zinsbindung (2023: 87,60 €, 2024: 1.051,20 €), Zahlung 10.512 € im Jahr der Auszahlung');
+  const c = K && K.berechnen([Object.assign({}, D, { kurs: 98, bindj: 4 })], { abJahr: 2023 });
+  ok(c && c.liste[0].sofort === false && c.liste[0].disagio_jahre === 4, 'F6b Disagio 2 % bei 4 Jahren Zinsbindung: verteilt (nicht marktüblich nach BMF 20.10.2003)');
+  const z = K && K.berechnen([Object.assign({}, D, { zusage: '15.03.2023', bz_frei: 3, bz_satz: '0,25' })], { abJahr: 2023 });
+  ok(z && z.liste[0].bz_monate === 6 && Math.abs(z.bz - 2628) < 0.01 && Math.abs(z.jahre[2023].bz_wk - 2628) < 0.01 && Math.abs(z.jahre[2023].cf - 2628) < 0.01,
+    'F6b Bereitstellungszinsen: Vertrag 03/2023, 3 Monate frei, Auszahlung 12/2023 → 6 Monate × 438 € = 2.628 € Werbungskosten und Cashflow 2023 (Ist ' + (z ? z.liste[0].bz_monate + ' / ' + z.bz : '-') + ')');
+  const ohneZ = K && K.berechnen([Object.assign({}, D, { bz_frei: 3, bz_satz: 0.25 })], { abJahr: 2023 });
+  ok(ohneZ && ohneZ.bz === 0 && ohneZ.liste[0].fehlt.indexOf('zusage') >= 0 && /Vertragsdatum/.test(K.text(ohneZ.liste[0])), 'F6b ohne Vertragsdatum keine Bereitstellungszinsen, Hinweis nennt das Vertragsdatum');
+  const vor = K && K.berechnen([Object.assign({}, D, { kurs: 99 })], { abJahr: 2024 });
+  ok(vor && vor.jahre[2024] && !vor.jahre[2023], 'F6b Auszahlung vor Beginn der Projektion: auf das erste Jahr gelegt');
+  const tx = K ? K.text(a.liste[0]) + ' ' + K.text(b.liste[0]) + ' ' + K.text(z.liste[0]) : '';
+  ok(tx && !/[–—;]/.test(tx), 'F6b Kundentext ohne Gedankenstrich und Semikolon');
+  /* Verdrahtung */
+  const cj = lies('frontend/js/calc.js'), tj = lies('frontend/js/tax.js'), ih = lies('frontend/index.html'), sj = lies('frontend/js/storage.js'), du = lies('frontend/js/darlehen-weitere-ui.js');
+  ok(cj.includes('DpFinanzierungskosten.berechnen(_fkL') && cj.includes('var _fk_y = _fkJahr[cal]') && /zve_op_y\s+-= _fk_y\.wk/.test(cj) && cj.includes('cfop_y -= _fk_y.cf; cfns_y -= _fk_y.cf'), 'F6b calc.js: Projektion mindert Steuer um die Werbungskosten und Cashflow um die Zahlung');
+  ok(cj.includes('var _fk_loop = _fkJahr[_calYearBase + y - 1]'), 'F6b calc.js: Zahlungsreihe (IRR) mit denselben Werten');
+  ok(cj.includes('fk_disagio_y:(_fk_y?_fk_y.disagio_wk:0),fk_bz_y:(_fk_y?_fk_y.bz_wk:0)') && tj.includes('schuldzinsen += _fkDisagio') && tj.includes('bereitstellung: _fkBz'), 'F6b Steuer-Reiter: Disagio in den Schuldzinsen (Zeile 48), Bereitstellungszinsen in ihrer Zeile');
+  ok(['d1', 'd2'].every((k) => ih.includes('data-dg-stufe="3"><label') && ih.includes('id="' + k + '_kurs"') && ih.includes('id="' + k + '_bz_frei"') && ih.includes('id="' + k + '_bz_satz"'))
+    && du.includes('data-dw="kurs"') && du.includes('data-dw="bz_satz"') && (du.match(/data-dg-stufe="3"/g) || []).length >= 5,
+    'F6b Felder für Darlehen I, II und die weiteren, erst ab Experte (data-dg-stufe="3")');
+  ok(sj.includes("'d1_kurs','d1_bz_frei','d1_bz_satz','d1_st_pct','d2_kurs'") && sj.includes("'d1_tf_mon', 'd1_kurs', 'd1_bz_frei'"), 'F6b Felder in FIELDS und in der Leerliste (kein Erben von Objekt A, auch d1_tf_mon)');
+  const iK = ih.indexOf('js/finanzierungskosten.js?v='), iC = ih.indexOf('js/calc.js?v=');
+  ok(iK > 0 && iC > iK, 'F6b Kern wird vor calc.js geladen');
+  /* Sondertilgung: nur Angabe */
+  ok(!/[gv]\('d[12]_st_pct'\)/.test(cj) && !/st_pct/.test(lies('frontend/js/darlehen-weitere.js')) && ih.includes('id="d1_st_pct"') && ih.includes('id="d2_st_pct"'), 'F6c Sondertilgungsrecht nur Angabe: calc.js und der Kern der weiteren Darlehen lesen es nicht');
+}
+
+/* ── F7b · v3992 Darlehensvertrag: Auszahlungskurs, Bereitstellungszins, Sondertilgungsrecht (financing-pdf.js) ── */
+{
+  const ctx = { console, Math, JSON, Number, String, isFinite, parseFloat, parseInt, Object, Array, Date, RegExp, setTimeout: () => 0,
+    document: { getElementById: () => null, addEventListener() {}, createElement: () => ({ style: {} }), body: { appendChild() {} }, head: { appendChild() {} } }, addEventListener() {} };
+  ctx.window = ctx; vm.createContext(ctx);
+  try { vm.runInContext(lies('frontend/js/financing-pdf.js'), ctx); } catch (e) { ok(false, 'F7b financing-pdf.js lädt: ' + e.message); }
+  const P = ctx.dpFinPdfLesen;
+  const text = 'Musterbank eG · Darlehensvertrag MB-2023-4711\nDarlehensart Annuitätendarlehen\nNettodarlehensbetrag 175.200,00 €\nAuszahlungskurs 100 % (kein Disagio)\nAuszahlung voll am 29.12.2023\n'
+    + 'Sollzins gebunden 3,85 % p. a., fest für 10 Jahre\nSondertilgung jährlich bis 5 % des Nettodarlehensbetrags (8.760,00 €) ohne Vorfälligkeitsentschädigung\nBereitstellungszins 3 Monate frei, danach 0,25 % im Monat\n';
+  const f = (P ? P(text, 'd1') : { fields: {} }).fields || {};
+  ok(f.d1_kurs === 100 && f.d1_bz_frei === 3 && f.d1_bz_satz === 0.25 && f.d1_st_pct === 5, 'F7b Testvertrag Musterweg 7: Kurs 100 %, 3 Monate frei, 0,25 % im Monat, Sondertilgungsrecht 5 % (Ist ' + [f.d1_kurs, f.d1_bz_frei, f.d1_bz_satz, f.d1_st_pct].join(' / ') + ')');
+  const g = (P ? P('Auszahlungskurs: 98,5 %\nBereitstellungsprovision 6 Monate bereitstellungsfrei, danach 3 % p. a.\n', 'd2') : { fields: {} }).fields || {};
+  ok(g.d2_kurs === 98.5 && g.d2_bz_frei === 6 && g.d2_bz_satz === 0.25, 'F7b Darlehen II: Kurs 98,5 %, 6 Monate frei, 3 % p. a. = 0,25 % je Monat (Ist ' + [g.d2_kurs, g.d2_bz_frei, g.d2_bz_satz].join(' / ') + ')');
+  const h = (P ? P('Disagio 2 %\n', 'dw:0') : { fields: {} }).fields || {};
+  ok(h.dw_kurs === 98, 'F7b weiteres Darlehen: „Disagio 2 %" → Kurs 98 % (Ist ' + h.dw_kurs + ')');
+  const di = lies('frontend/js/dokument-import.js');
+  ok(di.includes("auszahlungskurs_pct: ['d1_kurs'") && di.includes("bereitstellungszins_pct_monat: ['d1_bz_satz'") && di.includes("bereitstellungsfrei_monate: ['d1_bz_frei'") && di.includes("sondertilgung_pct: ['d1_st_pct'"), 'F7b Dokument-Import (KI-Auslese) setzt Kurs, Bereitstellungszins und Sondertilgungsrecht');
+}
+
+/* ── F22 · v3993 Hausgeld: maßgeblich die Abrechnung, Wirtschaftsplan nur Plausibilität ── */
+{
+  const d = dom();
+  const ctx = { console, Math, JSON, Number, String, isFinite, parseFloat, parseInt, Object, Array, Date, RegExp, Intl, Promise, setTimeout: () => 0, clearTimeout() {},
+    document: d, localStorage: { getItem: () => null, setItem() {} }, fetch: () => new Promise(() => {}), addEventListener() {}, dispatchEvent() {} };
+  ctx.window = ctx; vm.createContext(ctx);
+  try { vm.runInContext(lies('frontend/js/dokument-import.js'), ctx); } catch (e) { ok(false, 'F22 dokument-import.js lädt: ' + e.message); }
+  const W = ctx.DokumentImport && ctx.DokumentImport.hausgeldWahl;
+  const doc = (art, jahr, u, n, r) => ({ ext: { art, jahr, umfang: 'einzel', einzel: { umlagefaehig_jahr_eur: u, nicht_umlagefaehig_jahr_eur: n, ruecklage_zufuehrung_jahr_eur: r } }, ref: { name: art + ' ' + jahr } });
+  const abr24 = doc('Jahresabrechnung', 2024, 2300, 850, 800), abr25 = doc('Jahresabrechnung', 2025, 2400, 900, 840);
+  const wp24 = doc('Wirtschaftsplan', 2024, 2280, 860, 790), wp25 = doc('Wirtschaftsplan', 2025, 2200, 800, 720), wp26 = doc('Wirtschaftsplan', 2026, 2500, 950, 880);
+  const ktx = { objart: 'ETW', mea: 8.5 };
+  const r = W ? W([wp26, abr25, wp25, abr24, wp24], ktx) : null;
+  ok(r && r.gewaehlt === abr25.ref, 'F22 maßgeblich ist die jüngste Abrechnung (2025), nicht der neuere Wirtschaftsplan 2026 (Ist ' + (r && r.gewaehlt && r.gewaehlt.name) + ')');
+  ok(r && r.ohneSteuer.indexOf(wp25.ref) >= 0 && r.ohneSteuer.indexOf(wp24.ref) >= 0 && r.ohneSteuer.indexOf(wp26.ref) < 0, 'F22 Steuer-Vorschläge der Wirtschaftspläne 2024 und 2025 entfallen (Abrechnung liegt vor), 2026 bleibt');
+  ok(r && r.abweichungen.length === 1 && r.abweichungen[0].jahr === 2025 && r.abweichungen[0].abr === 4140 && r.abweichungen[0].plan === 3720,
+    'F22 Plausibilität: 2025 Abrechnung 4.140 € gegen Wirtschaftsplan 3.720 € (+11,3 %) als Hinweis, 2024 (0,3 %) nicht (Ist ' + JSON.stringify(r && r.abweichungen) + ')');
+  ok(r && r.hinweise.some((h) => /Plausibilität Hausgeld 2025/.test(h) && /11,3 % mehr/.test(h)) && r.hinweise.every((h) => !/[–—;]/.test(h)), 'F22 Hinweistext ohne Gedankenstrich und Semikolon');
+  const r2 = W ? W([wp24, wp26, wp25], ktx) : null;
+  ok(r2 && r2.gewaehlt === wp26.ref && r2.abweichungen.length === 0, 'F22 ohne Abrechnung zählt der jüngste Wirtschaftsplan (2026)');
+  const oa = lies('frontend/js/object-actions.js');
+  ok(oa.includes('_hgWahl = window.DokumentImport.hausgeldWahl(_hgL, _kontext())') && oa.includes('if (_hgNicht) return;') && oa.includes('_hgWahl.ohneSteuer.indexOf(t) >= 0'), 'F22 Prüftabelle: nur die maßgebliche Unterlage setzt das Hausgeld, Plan-Steuer entfällt bei vorliegender Abrechnung');
+  ok(lies('frontend/js/jahresabgleich.js').includes("dem Wirtschaftsplan, maßgeblich ist die Abrechnung'"), 'F22 Jahresabgleich zeigt mehr als 10 % Abstand Abrechnung gegen Wirtschaftsplan');
 }
 
 /* ── F8/F18 · ViVi: Betrag der letzten Erhöhung, Miete der Jahre aus dem Mietverlauf ── */
@@ -357,5 +443,5 @@ function funk(src, name) {
   ok(!gegner || /'html:not\(#gp-nie\) #gp-overlay \.rnd-wiz-field\[hidden\]\{display:none !important\}'/.test(gp), 'F24 [hidden] schlägt „html:not(#rnd-nie) … .rnd-wiz-field{display:flex !important}“ (Spezifität 2 IDs + 2 gegen 1 ID + 3)');
 }
 
-console.log(`gesamtflow-pruefen (v3989): ${gruen} von ${gruen + rot} ok`);
+console.log(`gesamtflow-pruefen (v3993): ${gruen} von ${gruen + rot} ok`);
 process.exit(rot ? 1 : 0);

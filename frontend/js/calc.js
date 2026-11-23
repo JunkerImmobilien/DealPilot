@@ -2692,6 +2692,42 @@ function _calcImmediate(){
      08.11.2026). Die Steuer dazu rechnet tax.js _computeAutoForYear (Erhaltung / Herstellung). */
   var _spJahr = {};
   try { if (window.DpSanierungPlan && typeof DpSanierungPlan.jeJahr === 'function') _spJahr = DpSanierungPlan.jeJahr() || {}; } catch (_spE) { _spJahr = {}; }
+  /* v3992 · F6 Marcel 23.11.2026: Disagio und Bereitstellungszinsen je Darlehen (Kern js/finanzierungskosten.js,
+     Felder ab Detailgrad Experte). Je Kalenderjahr: wk = Werbungskosten (mindern die Steuer), cf = Einmalzahlung
+     (Disagio aus Eigenkapital im Jahr der Auszahlung, Bereitstellungszinsen im Jahr der Zahlung). Zins, Rate und
+     Restschuld bleiben auf dem Nennbetrag. Ohne Eingabe ist _fkJahr leer und nichts aendert sich.
+     Die Sondertilgung ist nur ein vertragliches Recht (d1_st_pct/d2_st_pct) und wird NICHT eingerechnet. */
+  var _fkJahr = {};
+  State.fk = null;
+  try {
+    if (window.DpFinanzierungskosten) {
+      var _fkL = [{ name: 'Darlehen I', betrag: d1, kurs: g('d1_kurs'), bindj: bindj, aus: g('d1_auszahl'), zusage: g('d1_vertragsdatum'), bz_frei: g('d1_bz_frei'), bz_satz: g('d1_bz_satz') }];
+      if (d2_enabled && d2 > 0) _fkL.push({ name: 'Darlehen II', betrag: d2, kurs: g('d2_kurs'), bindj: d2_bindj, aus: g('d2_auszahl') || g('d1_auszahl'), zusage: g('d2_vertragsdatum'), bz_frei: g('d2_bz_frei'), bz_satz: g('d2_bz_satz') });
+      (function () {
+        var _raw = []; try { _raw = JSON.parse(g('darlehen_weitere') || '[]'); } catch (_x) { _raw = []; }
+        if (!Array.isArray(_raw)) return;
+        _raw.forEach(function (e, i) {
+          if (!e || !(DpFinanzierungskosten.zahl(e.betrag) > 0)) return;
+          var _sj = DpFinanzierungskosten.zahl(e.start_jahr);
+          var _ab = !(_sj > _calYearBase);
+          _fkL.push({ name: e.bez || ('Darlehen ' + (i + 3)), betrag: e.betrag, kurs: e.kurs, bindj: e.bindj, aus: _ab ? g('d1_auszahl') : ('01.' + _sj), zusage: e.zusage, bz_frei: e.bz_frei, bz_satz: e.bz_satz, dw: i });
+        });
+      })();
+      var _fkR = DpFinanzierungskosten.berechnen(_fkL, { abJahr: _calYearBase, ausErsatz: _calYearBase * 12 });
+      if (_fkR.disagio > 0 || _fkR.bz > 0 || _fkR.liste.some(function (r) { return r.fehlt.length; })) { State.fk = _fkR; _fkJahr = _fkR.jahre; }
+    }
+  } catch (_fkE) { _fkJahr = {}; State.fk = null; }
+  (function () {   /* Hinweis je Darlehen unter den Feldern (nur Text) */
+    var _fkT = function (n) { var r = State.fk && State.fk.liste.filter(function (x) { return x.name === n; })[0]; return r ? DpFinanzierungskosten.text(r) : ''; };
+    try { st('d1_fk_hint', _fkT('Darlehen I')); st('d2_fk_hint', _fkT('Darlehen II')); } catch (_fkH) {}
+    try {   /* weitere Darlehen: die Liste zeichnet vor dieser Rechnung (_dwUiSync), deshalb hier nachtragen */
+      [].forEach.call(document.querySelectorAll('.dw-eintrag'), function (b) {
+        var i = +b.getAttribute('data-i'), h = b.querySelector('.dw-fk'); if (!h) return;
+        var r = State.fk && State.fk.liste.filter(function (x) { return x.dw === i; })[0];
+        h.textContent = r ? DpFinanzierungskosten.text(r) : '';
+      });
+    } catch (_fkW) {}
+  })();
   var rs_loop = d1, cfkum = 0;
   var _d2PlanV = _d2PlanJahre(btj);   /* v3760 · Darlehen II in der IRR-Schleife */
   var _tilgWKum = 0;                  /* v3760 · Tilgung von Darlehen II und weiteren Darlehen */
@@ -2796,6 +2832,11 @@ function _calcImmediate(){
     var _su_loop = (_suJahr[_calYearBase + y - 1] > 0) ? _suJahr[_calYearBase + y - 1] : 0;   /* v3092 · N100: Einmalzahlung, wie cfRows */
     var _sp_loop = (_spJahr[_calYearBase + y - 1] > 0) ? _spJahr[_calYearBase + y - 1] : 0;   /* v3214 · N137 */
     cf_y_ns -= _su_loop + _sp_loop;
+    var _fk_loop = _fkJahr[_calYearBase + y - 1];   /* v3992 · F6 Disagio/Bereitstellungszinsen: Steuer mit den Werbungskosten, Einmalzahlung */
+    if (_fk_loop) {
+      var _tax_fk = _mtxYear((nkm_y-bwk_st_y-_zy_eff-_fk_loop.wk)-_afa_eff, _calYearBase + y - 1, _zy_eff + _fk_loop.wk);
+      cf_y_ns += tax_y_loop - _tax_fk; tax_y_loop = _tax_fk; cf_y_ns -= _fk_loop.cf;
+    }
     cfkum+=cf_y_ns;
     /* ═══ v1260c · Die Tilgung MUSS hier abgezogen werden ═══════════════════
        ZURÜCKGENOMMEN: v1260 hat `cf_y_ns` roh in die Reihe gelegt. Das war
@@ -4000,6 +4041,15 @@ function _calcImmediate(){
       taxEffect_y     = _mtxYear(zve_op_y - _afaPush, _v268_baseYear + y - 1, zy2);
       cfns_y          = cfop_y - taxEffect_y;
     }
+    /* v3992 · F6 Disagio und Bereitstellungszinsen: Werbungskosten mindern die Steuer des Jahres (wie Schuldzinsen,
+       auch in der Hinzurechnung § 8 Nr. 1 GewStG), die Zahlung mindert den Cashflow des Jahres. Ohne Eingabe leer. */
+    var _fk_y = _fkJahr[cal] || null;
+    if (_fk_y) {
+      zve_op_y   -= _fk_y.wk;
+      taxEffect_y = _mtxYear(zve_op_y - _afaPush, _v268_baseYear + y - 1, zy2 + _fk_y.wk);
+      cfns_y      = cfop_y - taxEffect_y;
+      cfop_y -= _fk_y.cf; cfns_y -= _fk_y.cf;
+    }
     var su_y = (_suJahr[cal] > 0) ? _suJahr[cal] : 0;   /* v3092 · N100: nach allen Neuberechnungen oben abziehen */
     if (su_y) { cfop_y -= su_y; cfns_y -= su_y; }
     var san_y = (_spJahr[cal] > 0) ? _spJahr[cal] : 0;   /* v3214 · N137: geplante Sanierung, Einmalzahlung */
@@ -4010,7 +4060,7 @@ function _calcImmediate(){
        bis v3759 zog eff_rs es ein zweites Mal ab (gemessen: 135.729 statt 183.729 € im Zuteilungsjahr, Bank-PDF
        „Effektive Restschuld am Bindungsende", Restschuld-Grafik und LTV der Bank-Charts). */
     var eff_rs = Math.max(0, _rs_push - ((typeof bsv_zuteil_jahr === 'number' && y >= bsv_zuteil_jahr) ? 0 : bspar_kum_proj));
-    State.cfRows.push({y:y,cal:cal,nkm_m:nkm_y2/12,wm_m:(wm_j>0?wm_y2*warm_j/wm_j:0)/12 /* v2484: Anzeige Warmmiete ohne Zusatzeinnahmen */,nkm_y:nkm_y2,bwk_y:bwk_y2,bwk_cf_y:bwk_cf_y2,bwk_st_y:bwk_st_y2,su_y:su_y,zy:zy2,ty:ty2,bspar_y:bspar_y2,bspar_kum:bspar_kum_proj,eff_rs:eff_rs,cfop_y:cfop_y,cfns_y:cfns_y,wm_y:wm_y2,rs:_rs_push,wert_y:wert_y,eq_y:eq_y,ltv_y:ltv_y,tax_y:taxEffect_y,afa_y:_afaPush,zve_y:zve_op_y-_afaPush,rs_d1:rs3,rs_d2:(typeof rs3_d2==='number'?rs3_d2:null),rs_dw:(_dwAktiv?rs3_dw:null),zy_dw:(_dw_y?_dw_y.zins:null),ty_dw:(_dw_y?_dw_y.tilg:null),san_y:san_y});  /* v2989: Restschuld je Darlehen fuer die Jahresstaende (jahresstaende.js) - nur mitgefuehrt, nichts neu gerechnet */  /* v2166: AfA und steuerliches Ergebnis je Jahr - fuer die Pilot-Analyse (Werbungskosten, Jahr der Wende) */
+    State.cfRows.push({y:y,cal:cal,nkm_m:nkm_y2/12,wm_m:(wm_j>0?wm_y2*warm_j/wm_j:0)/12 /* v2484: Anzeige Warmmiete ohne Zusatzeinnahmen */,nkm_y:nkm_y2,bwk_y:bwk_y2,bwk_cf_y:bwk_cf_y2,bwk_st_y:bwk_st_y2,su_y:su_y,zy:zy2,ty:ty2,bspar_y:bspar_y2,bspar_kum:bspar_kum_proj,eff_rs:eff_rs,cfop_y:cfop_y,cfns_y:cfns_y,wm_y:wm_y2,rs:_rs_push,wert_y:wert_y,eq_y:eq_y,ltv_y:ltv_y,tax_y:taxEffect_y,afa_y:_afaPush,zve_y:zve_op_y-_afaPush,rs_d1:rs3,rs_d2:(typeof rs3_d2==='number'?rs3_d2:null),rs_dw:(_dwAktiv?rs3_dw:null),zy_dw:(_dw_y?_dw_y.zins:null),ty_dw:(_dw_y?_dw_y.tilg:null),san_y:san_y,fk_disagio_y:(_fk_y?_fk_y.disagio_wk:0),fk_bz_y:(_fk_y?_fk_y.bz_wk:0),fk_cf_y:(_fk_y?_fk_y.cf:0)});   /* v3992 · F6 */  /* v2989: Restschuld je Darlehen fuer die Jahresstaende (jahresstaende.js) - nur mitgefuehrt, nichts neu gerechnet */  /* v2166: AfA und steuerliches Ergebnis je Jahr - fuer die Pilot-Analyse (Werbungskosten, Jahr der Wende) */
   }
   /* v1898 · WOHER DAS zvE JE JAHR KAM — die Herkunft ist ausweisbar, statt
      dass eine Zahl ohne Vermerk dasteht. 'steuerzeitraum' = aus Marcels
@@ -4058,7 +4108,7 @@ function _calcImmediate(){
         // V119: Komponenten konsistent zu cfns_y akkumulieren
         _mieteKumNew += (r.nkm_y || 0);
         _bwkKumNew   += (r.bwk_cf_y || r.bwk_y || 0);
-        _zinsKumNew  += (r.zy || 0);
+        _zinsKumNew  += (r.zy || 0) + (r.fk_cf_y || 0);   /* v3992 · F6 Finanzierungskosten einmalig */
         _tilgKumNew  += (r.ty || 0);
         _bsparKumNew += (r.bspar_y || 0);
       });
@@ -4477,7 +4527,8 @@ function renderProjTable(){
       /* v3092 · N100: die Sonderumlage steht in der Kostenspalte, damit die Zeile aufgeht (CF = Miete - Kosten - Zins - Tilgung) */
       /* v3214 · N137: dasselbe fuer geplante Sanierungen (san_y) */
       ((r.su_y > 0 || r.san_y > 0) ? '<td class="neg" title="'+[(r.su_y > 0 ? 'inkl. Sonderumlage '+fE(r.su_y,0)+' (einmalig, Fälligkeitsjahr)' : ''), (r.san_y > 0 ? 'inkl. geplante Sanierung '+fE(r.san_y,0)+' (einmalig)' : '')].filter(Boolean).join(' · ')+'">–'+fE((r.bwk_cf_y || r.bwk_y) + (r.su_y || 0) + (r.san_y || 0))+' <span class="proj-su-mark" style="font-size:10px;color:var(--muted)">inkl. '+[(r.su_y > 0 ? 'SU' : ''), (r.san_y > 0 ? 'Sanierung' : '')].filter(Boolean).join(' + ')+'</span></td>' : '<td class="neg">–'+fE(r.bwk_cf_y || r.bwk_y)+'</td>')+
-      '<td class="neg">–'+fE(r.zy)+'</td>'+
+      /* v3992 · F6: Disagio und Bereitstellungszinsen (einmalig) in der Zinsspalte, damit die Zeile aufgeht */
+      (r.fk_cf_y > 0 ? '<td class="neg" title="inkl. Finanzierungskosten '+fE(r.fk_cf_y,0)+' einmalig (Disagio, Bereitstellungszinsen)">–'+fE(r.zy + r.fk_cf_y)+' <span class="proj-su-mark" style="font-size:10px;color:var(--muted)">inkl. einmalig</span></td>' : '<td class="neg">–'+fE(r.zy)+'</td>')+
       '<td class="neg">–'+fE(tilgOrBspar)+'</td>'+
       '<td class="'+(cf_vst_j>=0?'pos':'neg')+'">'+fE(cf_vst_j,0,true)+'</td>'+
       '<td class="'+(cf_vst_m>=0?'pos':'neg')+'">'+fE(cf_vst_m,0,true)+'</td>'+

@@ -377,6 +377,11 @@
       hausT.push(h.protokoll ? 'Versammlung ' + esc(h.protokoll) : 'Protokoll fehlt');
       hausT.push(h.wirtschaftsplan ? 'Wirtschaftsplan da' : 'Wirtschaftsplan fehlt');
       hausT.push(h.abrechnung ? 'Abrechnung da' + (istZahl(h.ergebnis) ? ' (' + (h.ergebnis > 0 ? 'Nachzahlung ' : 'Guthaben ') + eur(Math.abs(h.ergebnis)) + ')' : '') : 'Abrechnung fehlt');
+      /* v3993 · F22 Marcel 23.11.2026: maßgeblich ist die Abrechnung, der Wirtschaftsplan nur zur Plausibilität (mehr als 10 % Abstand = Hinweis) */
+      if (istZahl(h.hg_plan_m) && istZahl(h.hg_ist_j) && h.hg_plan_m > 0) {
+        var _hgQ = (h.hg_ist_j - h.hg_plan_m * 12) / (h.hg_plan_m * 12);
+        if (Math.abs(_hgQ) > 0.10) hausT.push('Abrechnung ' + String(Math.round(Math.abs(_hgQ) * 1000) / 10).replace('.', ',') + ' % ' + (_hgQ > 0 ? 'über' : 'unter') + ' dem Wirtschaftsplan, maßgeblich ist die Abrechnung');
+      }
       var suP = pl && istZahl(pl.su_y) ? pl.su_y : 0;
       var suT = h.suDa && h.su > 0 ? ' Sonderumlage ' + eur(h.su) + (suP ? ' (Plan ' + eur(suP) + ')' : ' (nicht geplant)') + '.' : '';
       var bT = h.beschluesse.length ? ' ' + esc(h.beschluesse.slice(0, 2).join(' · ')) + '.' : '';
