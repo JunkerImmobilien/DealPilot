@@ -335,6 +335,8 @@
       '#s5 .ai-box:has(#ai-content .dp-pa-wrap[data-dp-pa-v4]):not(.dp-pa4-pdf-offen) > .ai-pdf-toggle{display:none !important}',
       /* eigene Schalter anderer Module folgen dem Kopf */
       '.dp-pa-wrap[data-dp-pa-v4] .dpu-umschalter{display:none !important}',
+      /* v4007 · im Reiter Haus & Unterlagen: Nachreichen-Knopf und Ampel stehen oben im Hausverlauf */
+      '#dp-pa-haus:has(#dp-pa-hausv [data-dp-hv]) .dpu-nach,#dp-pa-haus:has(.dp-hv-ampel) .dpu-wrap .dpu-ampel{display:none !important}',
       /* v3440 · „Wert je Verfahren" (#dp-pa-wert-body) steht jetzt in beiden Ansichten */
       '.dp-pa-wrap[data-dp-pa-modus="einfach"] .dp-stv-fuss{display:none !important}',
       /* Mini-Grafiken (Einfach) und Beleg-Stand */
@@ -1302,13 +1304,19 @@
   /* v3099e · Unterlagen & WEG steht immer da (Fassung 4): ohne Auswertung mit dem Einstieg zum Hochladen */
   /* v3099e/v3120 · Unterlagen & WEG steht immer da. v3120: EIN Eingang (unterlagen-eingang.js) für Wirtschaftspläne,
      Protokolle, Mietverträge, Abrechnungen, Rechnungen - und der Verlauf, was wann eingelesen und übernommen wurde. */
-  function unterlagenPanel(html) {
+  function unterlagenPanel(html, opt) {
+    opt = opt || {};   /* v4007 · ohneEingang: Knopf steht oben im Hausverlauf; ohneVerlauf: Verlauf setzt der Aufrufer ans Ende */
     var knoepfe = '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">' + '<button type="button" class="btn-clean dp-pa4-btn" onclick="if(window.DpEingang)DpEingang.oeffnen();else if(window.DealPilotBelegImport)DealPilotBelegImport.open(\'wk\')">Belege, Unterlagen &amp; Rechnungen einlesen</button>' + '</div>';
     var verlauf = '';
-    try { var vh = window.DpEingang ? window.DpEingang.verlaufHtml() : ''; if (vh) verlauf = karte(kopfzeile('Verlauf · eingelesen und übernommen') + vh, 'dp-pa4-mt'); } catch (e) { verlauf = ''; }
+    try { verlauf = opt.ohneVerlauf ? '' : eingangVerlauf(); } catch (e) { verlauf = ''; }
     var erklaerung = '<p class="dp-pa-p">Wirtschaftsplan und Jahresabrechnung → Werbungskosten mit Jahr · Protokolle → Beschlüsse und Sonderumlagen · Mietverträge → passende Einheit und Mieter · Rechnungen → Werbungskosten. Nichts wird ohne deine Bestätigung übernommen.</p>';
-    if (html) return kuerzen(html) + verlauf + karte(kopfzeile('Neue Unterlagen') + erklaerung + knoepfe, 'dp-pa4-mt');
+    if (html) return kuerzen(html) + verlauf + (opt.ohneEingang ? '' : karte(kopfzeile('Neue Unterlagen') + erklaerung + knoepfe, 'dp-pa4-mt'));
+    if (opt.ohneEingang) return verlauf;   /* v4007 · ohne Auswertung und mit Hausverlauf: dessen Knopf trägt das Hochladen */
     return karte(kopfzeile('Unterlagen & WEG') + '<p class="dp-pa-p">Noch keine Unterlagen ausgewertet.</p>' + erklaerung + knoepfe) + verlauf;
+  }
+  function eingangVerlauf() {
+    var vh = window.DpEingang ? window.DpEingang.verlaufHtml() : '';
+    return vh ? karte(kopfzeile('Eingelesen und übernommen') + vh, 'dp-pa4-mt') : '';
   }
 
   /* ══ v3440 · ANKAUF · BESTAND · ZIELBILD ALS EINE KENNZAHLEN-TABELLE ═════════════════════════════════
@@ -1527,8 +1535,15 @@
       + '<div id="dp-pa-verlauf-wrap" style="display:none;margin-top:16px"><div class="dp-pa-card" id="dp-pa-verlauf-body"></div></div></div>', false));
     /* v3323 · Potenzialanalyse (pa-potenzial.js) und Hausverlauf (hausverlauf.js) */
     var potH = ''; try { potH = window.DpPaPotenzial ? window.DpPaPotenzial.html(o.analyse || {}, bestand) : ''; } catch (eP) { potH = ''; }
-    var hausH = ''; try { hausH = window.DpHausverlauf ? window.DpHausverlauf.html() : ''; } catch (eH) { hausH = ''; }
-    var hausUl = teil('hausv', hausH, true) + teil('unterlagen', unterlagenPanel(o.unterlagen), !hausH);
+    var hausH = '', zeitH = '', egH = ''; try { hausH = window.DpHausverlauf ? window.DpHausverlauf.html({ ohneVerlauf: true }) : ''; } catch (eH) { hausH = ''; }
+    /* v4007 · Marcel 23.11.2026: oben EIN Knopf zum Hochladen (Hausverlauf), darunter Grafik mit Risiken je Jahr, Jahr für
+       Jahr, Karten hoch/mittel/niedrig, dann die Auswertung der Unterlagen (Einfach/Detail schaltet sie), am Ende der Verlauf:
+       „Was passiert ist“ und „Eingelesen und übernommen“. Doppelt waren „Weitere WEG-Unterlagen“, „+ Unterlagen nachreichen“
+       und „Belege, Unterlagen & Rechnungen einlesen“ (alle drei öffnen den Import), sie fallen, wo der Hausverlauf steht. */
+    try { zeitH = hausH && window.DpHausverlauf.zeitleisteHtml ? window.DpHausverlauf.zeitleisteHtml() : ''; } catch (eZ) { zeitH = ''; }
+    try { egH = eingangVerlauf(); } catch (eE) { egH = ''; }
+    var hausUl = teil('hausv', hausH, true) + teil('unterlagen', unterlagenPanel(o.unterlagen, { ohneEingang: !!hausH, ohneVerlauf: true }), !hausH)
+      + (zeitH ? '<div id="dp-pa-hausv-zeit">' + zeitH + '</div>' : '') + (egH ? '<div id="dp-pa-eingang-verlauf">' + egH + '</div>' : '');
     if (bestand) {
       add('steuer', 'Steuer', o.steuer);
       add('haus', 'Haus &amp; Unterlagen', hausUl);

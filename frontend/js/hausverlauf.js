@@ -362,14 +362,63 @@
       '.dp-hv-st.beschlossen{background:rgba(184,98,92,.13);color:#B8625C}.dp-hv-st.erledigt{background:rgba(63,165,108,.14);color:#2f7d52}',
       '.dp-hv-st.geplant,.dp-hv-st.angekuendigt{background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 18%, transparent);color:#8a6d1f}',
       '.dp-pa-wrap[data-dp-pa-modus="einfach"] .dp-hv-e.leise{display:none}',
+      /* v4007 */
+      '.dp-hv-hoch{display:grid;gap:5px;justify-items:start;max-width:320px}.dp-hv-hoch span{font:400 11.5px/1.45 Inter,sans-serif;color:#7A7370}',
+      '.dp-hv-eing{margin:-6px 0 12px !important}',
+      '.dp-hv-risj{display:grid;grid-template-columns:repeat(auto-fit,minmax(104px,1fr));gap:6px;margin:8px 0 4px}',
+      '.dp-hv-risj>div{border:1px solid #EFE8D6;border-radius:8px;background:#fff;padding:7px 9px;display:grid;gap:2px;min-width:0}',
+      '.dp-hv-risj small{font:600 10.5px "JetBrains Mono",monospace;color:#6B645A}',
+      '.dp-hv-risj b{font:600 12px Inter,sans-serif}.dp-hv-risj b.k{color:#B8625C}.dp-hv-risj b.h{color:var(--wl-9a7f33,#9a7f33)}',
+      '.dp-hv-risj span{font:400 11.5px Inter,sans-serif;color:#9A9285}',
+      '.dp-hv-risj>.krit{border-color:rgba(184,98,92,.45);box-shadow:inset 3px 0 0 #B8625C}.dp-hv-risj>.hand{border-color:color-mix(in srgb,var(--wl-c9a84c,#C9A84C) 45%,transparent);box-shadow:inset 3px 0 0 var(--wl-c9a84c,#C9A84C)}',
+      '.dp-hv-ampel{margin:4px 0 0 !important}',
       '@media (max-width:720px){.dp-hv-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.dp-hv-kpi:nth-child(2n){border-right:none}.dp-hv-kpi:nth-child(-n+2){border-bottom:1px solid #EFE8D6}.dp-hv-erg .satz{font-size:15.5px}}'
     ].join('\n');
     document.head.appendChild(s);
   }
+  /* v4007 · EIN Weg zum Hochladen im Reiter Haus & Unterlagen: der Eingang (unterlagen-eingang.js) liest
+     WEG-Unterlagen, Belege und Rechnungen und ergaenzt eine vorhandene Auswertung (wie „nachreichen“). */
+  var HOCH = "try{if(window.DpEingang&&DpEingang.oeffnen)DpEingang.oeffnen();else if(window.DpUnterlagen&&DpUnterlagen.nachreichen)DpUnterlagen.nachreichen();}catch(e){}";
   function knoepfe() {
     return '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">'
-      + '<button type="button" class="btn-clean dp-pa4-btn" onclick="try{if(window.DpUnterlagen&&DpUnterlagen.nachreichen)DpUnterlagen.nachreichen();else if(window.DpEingang)DpEingang.oeffnen();}catch(e){}">WEG-Unterlagen hochladen</button>'
-      + '<button type="button" class="btn-clean dp-pa4-btn leise" data-dp-pa4-geh="unterlagen">Zu Unterlagen &amp; WEG</button></div>';
+      + '<button type="button" class="btn-clean dp-pa4-btn" onclick="' + HOCH + '">Unterlagen hochladen</button></div>';
+  }
+  /* v4007 · Risiken der Auswertung je Jahr: hoch = kritisch, mittel = Handlungsbedarf (niedrig zaehlt nicht) */
+  function risikenJe(ausw) {
+    var r = ausw && Array.isArray(ausw.risiken) ? ausw.risiken : [], n = { hoch: 0, mittel: 0, niedrig: 0 }, j = {};
+    r.forEach(function (x) {
+      if (!x) return;
+      var s = String(x.schwere || 'mittel').toLowerCase(); if (n[s] == null) s = 'mittel'; n[s]++;
+      if (s === 'niedrig') return;
+      var y = jahrAus(x.jahr) || 0;
+      j[y] = j[y] || { hoch: 0, mittel: 0, titel: [] }; j[y][s]++; if (x.titel) j[y].titel.push(String(x.titel));
+    });
+    return { n: n, jahre: j, gesamt: r.length };
+  }
+  function risText(z) {
+    var t = [];
+    if (z.hoch) t.push(z.hoch + ' kritisch');
+    if (z.mittel) t.push(z.mittel + ' Handlungsbedarf');
+    return t.join(', ');
+  }
+  /** Leiste unter der Grafik: je Jahr, was kritisch ist und wo Handlungsbedarf besteht, mit Anzahl */
+  function risLeiste(R, J) {
+    var js = Object.keys(R.jahre).map(Number);
+    if (!js.length) return '';
+    var alle = (J || []).map(function (z) { return z.jahr; });
+    js.forEach(function (y) { if (y && alle.indexOf(y) < 0) alle.push(y); });
+    alle.sort(function (a, b) { return a - b; });
+    if (R.jahre[0]) alle.push(0);
+    return '<div class="dp-hv-risj" role="list" aria-label="Risiken je Jahr">' + alle.map(function (y) {
+      var z = R.jahre[y];
+      return '<div role="listitem" class="' + (z ? (z.hoch ? 'krit' : 'hand') : 'ruhig') + '"' + (z && z.titel.length ? ' title="' + esc(z.titel.join(' · ')) + '"' : '') + '><small>' + (y ? y : 'ohne Jahr') + '</small>'
+        + (z ? (z.hoch ? '<b class="k">' + z.hoch + ' kritisch</b>' : '') + (z.mittel ? '<b class="h">' + z.mittel + ' Handlungsbedarf</b>' : '') : '<span>nichts offen</span>') + '</div>';
+    }).join('') + '</div>';
+  }
+  function risAmpel(R) {
+    if (!R.gesamt) return '';
+    try { if (g.DpUnterlagen && g.DpUnterlagen.stil) g.DpUnterlagen.stil(); } catch (e) {}
+    return '<div class="dpu-ampel dp-hv-ampel"><div class="hoch"><b>' + R.n.hoch + '</b><span>hoch</span></div><div class="mittel"><b>' + R.n.mittel + '</b><span>mittel</span></div><div class="niedrig"><b>' + R.n.niedrig + '</b><span>niedrig</span></div></div>';
   }
   function eurO(v) { return v != null ? eur(v) : '–'; }
   function kennzahlen(L, w) {
@@ -408,7 +457,7 @@
       }).join('') + '</tbody></table></div>';
   }
   /** Spec der Grafik Hausgeld + Rücklage (jahresbuch-grafik.js), null ohne zwei Jahre mit Zahl */
-  function grafikSpec(J) {
+  function grafikSpec(J, opt) {
     var mit = J.filter(function (z) { return z.hausgeld_plan_monat != null || z.hausgeld_ist_jahr != null || z.ruecklage_stand != null; });
     if (mit.length < 2) return null;
     var G = g.DpJahresbuchGrafik || {}, a = mit[0].jahr, b = mit[mit.length - 1].jahr, jahre = [];
@@ -421,6 +470,12 @@
       var su = z.su_anteil != null ? z.su_anteil : z.su_gesamt;
       if (su > 0) marken.push({ jahr: z.jahr, text: 'Sonderumlage ' + z.jahr + ': ' + eur(su) + (z.su_anteil != null ? (istEtw() ? ' (dein Anteil)' : '') : ' (Gemeinschaft)'), farbe: G.ROT || '#B8625C', art: 'Sonderumlage', legende: 'Sonderumlage' });
     });
+    /* v4007 · Risiken je Jahr als Marke an der Grundlinie (rot kritisch, Gold Handlungsbedarf), Text mit Anzahl */
+    try {
+      var R = risikenJe(opt && opt.ausw);
+      Object.keys(R.jahre).forEach(function (y) { var z = R.jahre[y]; y = +y; if (!y) return;
+        marken.push({ jahr: y, text: y + ': ' + risText(z), farbe: z.hoch ? (G.ROT || '#B8625C') : (G.GOLD || 'var(--wl-c9a84c,#C9A84C)'), art: z.hoch ? 'kritisch' : 'hand', legende: z.hoch ? 'Risiko kritisch' : 'Handlungsbedarf' }); });
+    } catch (eR) {}
     var panels = [];
     if (Object.keys(wp).length || Object.keys(ab).length) panels.push({ titel: 'Hausgeld je Jahr' + (istEtw() ? ', deine Wohnung' : ''), kurz: 'Hausgeld', art: 'balken', hoehe: 130, marken: marken, serien: [
       { name: 'Wirtschaftsplan (Plan)', typ: 'balken', farbe: G.GRAU || '#8A8278', deckkraft: 0.45, werte: wp },
@@ -430,7 +485,7 @@
     return panels.length ? { jahre: jahre, heute: new Date().getFullYear(), panels: panels, titel: 'Hausgeld und Rücklage je Jahr' } : null;
   }
   function abschnitt(t, eti) { return '<div class="dp-hv-abs"><h4>' + t + '</h4>' + (eti ? '<span>' + esc(eti) + '</span>' : '') + '</div>'; }
-  function html() {
+  function html(opt) {
     if (typeof document === 'undefined') return '';
     stil();
     var L = lesen();
@@ -445,26 +500,43 @@
     var h = '<div class="dp-pa-card" data-dp-hv="1">';
     h += '<div class="dp-hv-erg"><div class="satz">' + (u ? '<b>' + esc(u.wort) + '</b> ' + esc(u.satz) : '<b>Das Haus in den Unterlagen.</b>')
       + (w.fazit ? '<span class="q">' + esc(w.fazit) + '</span>' : '') + '</div>'
-      + '<button type="button" class="btn-clean dp-pa4-btn" onclick="try{if(window.DpUnterlagen&&DpUnterlagen.nachreichen)DpUnterlagen.nachreichen();else if(window.DpEingang)DpEingang.oeffnen();}catch(e){}">Unterlagen hochladen</button></div>';
+      + '<div class="dp-hv-hoch"><button type="button" class="btn-clean dp-pa4-btn" onclick="' + HOCH + '">Unterlagen hochladen</button>'
+      + '<span>Protokoll, Wirtschaftsplan, Abrechnung, Belege oder Rechnungen. Art und Jahr erkennt DealPilot selbst, übernommen wird erst nach deiner Bestätigung.</span></div></div>';
+    var eing = L.doks.filter(function (x) { return x && WEG_TYPEN.test(String(x.typ || '')); }).map(function (x) { return esc(x.label + (x.datum ? ' ' + x.datum : (x.jahr ? ' ' + x.jahr : ''))); });
+    if (eing.length) h += '<p class="dp-pa-fuss dp-hv-eing">Eingelesen: ' + eing.join(' · ') + '</p>';
     h += kennzahlen(L, w);
-    var sp = grafikSpec(J);
+    var ausw = L.d && L.d.auswertung, sp = grafikSpec(J, { ausw: ausw }), R = risikenJe(ausw);
     if (sp) h += abschnitt('Hausgeld und Rücklage', 'je Jahr · aus Wirtschaftsplänen und Abrechnungen') + '<div data-dp-hv-grafik="1"></div>';
+    if (Object.keys(R.jahre).length) h += (sp ? '' : abschnitt('Risiken je Jahr', 'aus der Auswertung der Unterlagen')) + risLeiste(R, J);
     if (J.length) h += abschnitt('Jahr für Jahr', 'aus Protokollen, Wirtschaftsplänen, Abrechnungen') + tabelle(J)
       + '<p class="dp-pa-fuss" style="margin-top:6px">P Protokoll · W Wirtschaftsplan · A Jahresabrechnung. Ein Jahr ist im Jahresabgleich erledigt, wenn das Protokoll und der Wirtschaftsplan oder die Abrechnung des Jahres vorliegen.'
       + (!(w.jahre && w.jahre.length) ? ' Diese Auswertung ist älter als die Jahreswerte (v3430): Hausgeld und Rücklage je Jahr stehen hier, sobald du Unterlagen nachreichst.' : '') + '</p>';
+    /* v4007 · die Karten hoch/mittel/niedrig stehen unter „Jahr für Jahr“ (vorher im Teil Unterlagen, nur in Einfach) */
+    if (R.gesamt) h += abschnitt('Risiken aus den Unterlagen', R.gesamt + (R.gesamt === 1 ? ' Risiko' : ' Risiken') + ', Einzelheiten unter Detail') + risAmpel(R);
     h += '</div>';
+    if (sp) setTimeout(mountGrafik, 0);
+    if (opt && opt.ohneVerlauf) return h;
+    return h + zeitleisteHtml(L);
+  }
+  /** v4007 · „Was passiert ist“: eigene Karte, im Reiter Haus & Unterlagen ganz unten. Einfach zeigt die letzten 5 Ereignisse. */
+  function zeitleisteHtml(L) {
+    if (typeof document === 'undefined') return '';
+    stil();
+    L = L || lesen();
+    if (!L.hatWeg || !L.liste.length) return '';
+    var h = '';
     /* die Zeitleiste, nach Jahren */
     var arten = []; L.liste.forEach(function (e) { if (arten.indexOf(e.art) < 0) arten.push(e.art); });
     var filter = arten.length > 1 ? '<div class="dp-hv-filter" role="group" aria-label="Nach Art filtern">' + arten.map(function (a) {
       return '<button type="button" class="btn-clean" aria-pressed="true" data-dp-hv-art="' + a + '"><i style="background:' + ARTEN[a][1] + '"></i>' + ARTEN[a][0] + '</button>';
     }).join('') + '</div>' : '';
-    var zeit = '', jahr = null;
-    L.liste.forEach(function (e) {
-      var j = e.jahr || 'ohne Jahr';
-      if (j !== jahr) { zeit += '<div class="dp-hv-jahr">' + esc(j) + '</div>'; jahr = j; }
+    var zeit = '', jahr = null, ab = Math.max(0, L.liste.length - 5);
+    L.liste.forEach(function (e, ix) {
+      var j = e.jahr || 'ohne Jahr', alt = ix < ab ? ' dp-pa-d' : '';
+      if (j !== jahr) { zeit += '<div class="dp-hv-jahr' + alt + '">' + esc(j) + '</div>'; jahr = j; }
       var A = ARTEN[e.art] || ARTEN.sonstiges, st = String(e.status || '').toLowerCase();
-      /* Einfach: reine Versammlungsmarken ohne Inhalt treten zurück */
-      zeit += '<div class="dp-hv-e' + (e.art === 'versammlung' ? ' leise' : '') + '" data-dp-hv-e="' + e.art + '" style="--c:' + A[1] + '"><div class="dp-hv-kopf">'
+      /* Einfach: reine Versammlungsmarken ohne Inhalt treten zurück, ältere als die letzten 5 auch (v4007) */
+      zeit += '<div class="dp-hv-e' + (e.art === 'versammlung' ? ' leise' : '') + alt + '" data-dp-hv-e="' + e.art + '" style="--c:' + A[1] + '"><div class="dp-hv-kopf">'
         + (e.datum && e.datum !== String(e.jahr) ? '<span class="d">' + esc(e.datum) + '</span>' : '')
         + '<span class="a">' + A[0] + '</span>' + (e.titel ? '<b>' + esc(e.titel) + '</b>' : '')
         + (st ? '<span class="dp-hv-st ' + esc(st.replace(/[^a-zäöü]/g, '')) + '">' + esc(e.status) + '</span>' : '')
@@ -472,21 +544,18 @@
         + (e.text ? '<p>' + esc(e.text) + '</p>' : '') + (e.quelle ? '<span class="q dp-pa-d">Quelle: ' + esc(e.quelle) + '</span>' : '') + '</div>';
     });
     if (L.liste.length) h += '<div class="dp-pa-card dp-pa4-mt"><div class="dp-pa-sec"><span class="dp-pa-bar"></span><span class="dp-pa-lbl">Was passiert ist</span><span class="dp-pa-rule"></span></div>'
+      + (ab ? '<p class="dp-pa-fuss dp-pa-e" style="margin:0 0 8px">Die letzten 5 von ' + L.liste.length + ' Ereignissen. Alle unter Detail.</p>' : '')
       + filter + '<div class="dp-hv-zeit">' + zeit + '</div>'
       + (L.liste.some(function (e) { return e.herkunft === 'kernpunkt'; }) ? '<p class="dp-pa-fuss">Diese Auswertung nennt die Ereignisse nur mit Jahr. Beim nächsten Einlesen von Unterlagen steht jedes mit seinem Datum und seiner Quelle hier.</p>' : '')
       + '</div>';
-    h += '<div class="dp-pa-card dp-pa4-mt"><div class="dp-pa-sec"><span class="dp-pa-bar"></span><span class="dp-pa-lbl">Weitere WEG-Unterlagen</span><span class="dp-pa-rule"></span></div>'
-      + '<p class="dp-pa-p">Jedes Jahr ein neues Protokoll, den Wirtschaftsplan und die Jahresabrechnung hochladen: die Auswertung wird mit den bisherigen Unterlagen zusammengeführt, die Jahreswerte ergänzt. Nichts wird ohne deine Bestätigung ins Objekt übernommen.</p>'
-      + '<p class="dp-pa-p" style="font-size:12px;color:#7A7370">Eingelesen: ' + (L.doks.filter(function (x) { return x && WEG_TYPEN.test(String(x.typ || '')); }).map(function (x) { return esc(x.label + (x.datum ? ' ' + x.datum : (x.jahr ? ' ' + x.jahr : ''))); }).join(' · ') || '–') + '</p>'
-      + knoepfe() + '</div>';
-    /* die Grafik zeichnet nach dem Einhängen (der Host ist erst dann im Dokument) */
-    if (sp) setTimeout(mountGrafik, 0);
+    /* v4007 · die Karte „Weitere WEG-Unterlagen“ ist weg: derselbe Knopf steht oben (Unterlagen hochladen),
+       die Liste „Eingelesen“ steht jetzt unter dem Ergebnissatz */
     return h;
   }
   function mountGrafik() {
     var G = g.DpJahresbuchGrafik; if (!G || !G.malen || typeof document === 'undefined') return;
     var hs = document.querySelectorAll('[data-dp-hv-grafik]'); if (!hs.length) return;
-    var sp = null; try { sp = grafikSpec(lesen().jahre || []); } catch (e) { sp = null; }
+    var sp = null; try { var L0 = lesen(); sp = grafikSpec(L0.jahre || [], { ausw: L0.d && L0.d.auswertung }); } catch (e) { sp = null; }
     for (var i = 0; i < hs.length; i++) { try { if (sp) G.malen(hs[i], sp); else hs[i].innerHTML = ''; } catch (e) { hs[i].innerHTML = ''; } }
   }
   if (typeof document !== 'undefined') document.addEventListener('click', function (ev) {
@@ -496,6 +565,6 @@
     if (card) Array.prototype.forEach.call(card.querySelectorAll('[data-dp-hv-e="' + art + '"]'), function (e) { e.style.display = an ? '' : 'none'; });
   });
 
-  g.DpHausverlauf = { VERSION: 'v3977', ereignisse: ereignisse, wegJahre: wegJahre, urteil: urteil, artDok: artDok, html: html, kurz: kurz, lesen: lesen, jahrDaten: jahrDaten, grafikSpec: grafikSpec, mountGrafik: mountGrafik, ARTEN: ARTEN };
+  g.DpHausverlauf = { VERSION: 'v4007', ereignisse: ereignisse, wegJahre: wegJahre, urteil: urteil, artDok: artDok, html: html, zeitleisteHtml: zeitleisteHtml, risikenJe: risikenJe, kurz: kurz, lesen: lesen, jahrDaten: jahrDaten, grafikSpec: grafikSpec, mountGrafik: mountGrafik, ARTEN: ARTEN };
   if (typeof module !== 'undefined' && module.exports) module.exports = g.DpHausverlauf;
 })(typeof window !== 'undefined' ? window : globalThis);

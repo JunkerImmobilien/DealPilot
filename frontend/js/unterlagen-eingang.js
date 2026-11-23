@@ -421,22 +421,32 @@
     var v = o.verlauf.slice().reverse(), ae = (o.einheiten_aenderungen || []).slice().reverse();
     if (!v.length && !ae.length) return '';
     var datum = function (s) { try { return new Date(s).toLocaleDateString('de-DE'); } catch (x) { return ''; } };
-    var kb = 'font:600 11.5px/1 inherit;padding:5px 9px;border-radius:6px;cursor:pointer;margin:2px 0;white-space:nowrap;';
-    var h = '<div style="overflow-x:auto"><table class="abw-tafel" style="min-width:620px"><thead><tr><th>Eingelesen</th><th>Unterlagen</th><th>Übernommen</th><th></th></tr></thead><tbody>'
+    /* v4007 · Marcel 23.11.2026: „Verlauf einlesen/übernommen einfacher und verständlicher“. Bis v4006 eine Tabelle mit
+       vier Spalten (min. 620 px, am Handy quer zu schieben). Jetzt je Einlesen eine Zeile: Datum und ein Satz
+       („3 Unterlagen gelesen, 5 Werte übernommen“), die Knöpfe rechts, Warnungen sichtbar, die Einzelheiten aufklappbar. */
+    var kb = 'font:600 11.5px/1 inherit;padding:6px 10px;border-radius:6px;cursor:pointer;white-space:nowrap;min-height:32px;';
+    var h = '<p class="dp-pa-p" style="margin:0 0 8px;font-size:12px;color:#7A7370">Jedes Einlesen mit dem, was daraus ins Objekt übernommen wurde. Zurücknehmen setzt die Werte auf den Stand davor, Löschen entfernt nur den Eintrag.</p>'
+      + '<div class="dp-eg-liste" style="display:grid;gap:8px">'
       + v.map(function (x) {
+        var nd = (x.dokumente || []).length, nu = (x.uebernommen || []).length;
+        var satz = nd + (nd === 1 ? ' Unterlage' : ' Unterlagen') + ' gelesen, ' + (nu ? nu + (nu === 1 ? ' Wert' : ' Werte') + ' übernommen' : 'nichts übernommen');
         var ng = (x.nicht_gelesen || []).length
-          ? '<div style="margin-top:6px;color:#B8625C;font-weight:600">⚠ Nichts gelesen aus: ' + x.nicht_gelesen.map(esc).join(', ') + ' – bitte von Hand prüfen</div>' : '';
+          ? '<div style="margin-top:6px;color:#B8625C;font-weight:600">Nichts gelesen aus: ' + x.nicht_gelesen.map(esc).join(', ') + '. Bitte von Hand prüfen.</div>' : '';
         var zr = x.zurueck
           ? '<div style="margin-top:6px;color:#8a7a55"><b>Zurückgenommen am ' + esc(datum(x.zurueck.am)) + '</b> (' + x.zurueck.anzahl + ' Wert(e))'
-            + (x.zurueck.konflikt && x.zurueck.konflikt.length ? ' · belassen, weil seitdem geändert: ' + x.zurueck.konflikt.map(esc).join(', ') : '')
-            + (x.zurueck.nicht && x.zurueck.nicht.length ? ' · nicht automatisch: ' + x.zurueck.nicht.map(esc).join(', ') : '') + '</div>' : '';
+            + (x.zurueck.konflikt && x.zurueck.konflikt.length ? ', belassen, weil seitdem geändert: ' + x.zurueck.konflikt.map(esc).join(', ') : '')
+            + (x.zurueck.nicht && x.zurueck.nicht.length ? ', nicht automatisch: ' + x.zurueck.nicht.map(esc).join(', ') : '') + '</div>' : '';
         var kannZurueck = !x.zurueck && (x.aenderungen || []).some(function (a) { return a.t !== 'nicht'; });
-        var aktion = (kannZurueck ? '<button type="button" data-eg-knopf="zurueck:' + esc(x.id) + '" style="' + kb + 'border:1px solid var(--wl-c9a84c,#C9A84C);background:transparent;color:inherit" onclick="DpEingang.knopf(\'zurueck\',\'' + esc(x.id) + '\',this)">' + knopfText('zurueck', x.id) + '</button><br>' : '')
-          + '<button type="button" data-eg-knopf="loeschen:' + esc(x.id) + '" style="' + kb + 'border:1px solid rgba(184,98,92,.55);background:transparent;color:#B8625C" onclick="DpEingang.knopf(\'loeschen\',\'' + esc(x.id) + '\',this)" title="Nur den Eintrag aus dem Verlauf entfernen - übernommene Werte bleiben">' + knopfText('loeschen', x.id) + '</button>';
-        return '<tr' + (x.zurueck ? ' style="opacity:.6"' : '') + '><td class="abw-wort" style="white-space:nowrap">' + esc(datum(x.am)) + '</td><td>' + x.dokumente.map(function (d) { return esc((d.typ ? d.typ + ': ' : '') + d.name); }).join('<br>') + ng + '</td>'
-          + '<td>' + (x.uebernommen.length ? x.uebernommen.map(esc).join('<br>') : '<i>nichts übernommen</i>') + zr + '</td><td style="text-align:right">' + aktion + '</td></tr>';
-      }).join('') + '</tbody></table></div>'
-      + '<p class="dp-pa-p" style="margin-top:6px;font-size:12px;opacity:.75">Zurücknehmen setzt die übernommenen Werte auf den Stand davor – nur dort, wo seitdem niemand etwas geändert hat. Löschen entfernt nur den Eintrag; die Werte bleiben.</p>';
+        var aktion = (kannZurueck ? '<button type="button" data-eg-knopf="zurueck:' + esc(x.id) + '" style="' + kb + 'border:1px solid var(--wl-c9a84c,#C9A84C);background:transparent;color:inherit" onclick="DpEingang.knopf(\'zurueck\',\'' + esc(x.id) + '\',this)">' + knopfText('zurueck', x.id) + '</button>' : '')
+          + '<button type="button" data-eg-knopf="loeschen:' + esc(x.id) + '" style="' + kb + 'border:1px solid rgba(184,98,92,.55);background:transparent;color:#B8625C" onclick="DpEingang.knopf(\'loeschen\',\'' + esc(x.id) + '\',this)" title="Nur den Eintrag entfernen, übernommene Werte bleiben">' + knopfText('loeschen', x.id) + '</button>';
+        return '<div class="dp-eg-z" style="border:1px solid #EFE8D6;border-radius:8px;background:#fff;padding:9px 12px' + (x.zurueck ? ';opacity:.6' : '') + '">'
+          + '<div style="display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px"><b style="font:600 12px \'JetBrains Mono\',monospace;color:#6B645A">' + esc(datum(x.am)) + '</b>'
+          + '<span style="flex:1 1 200px;min-width:0;font-size:13px">' + esc(satz) + '</span><span style="display:flex;gap:6px;flex-wrap:wrap">' + aktion + '</span></div>'
+          + ng + zr
+          + '<details style="margin-top:4px"><summary style="cursor:pointer;font-size:12px;color:#7A7370;min-height:28px;display:flex;align-items:center">Einzelheiten</summary>'
+          + '<div style="font-size:12.5px;line-height:1.55;margin-top:4px"><b>Gelesen:</b> ' + (x.dokumente || []).map(function (d) { return esc((d.typ ? d.typ + ': ' : '') + d.name); }).join(', ')
+          + '<br><b>Übernommen:</b> ' + (nu ? x.uebernommen.map(esc).join(', ') : 'nichts') + '</div></details></div>';
+      }).join('') + '</div>';
     if (ae.length) h += '<p class="dp-pa-p" style="margin-top:10px"><b>Mietverträge den Einheiten zugeordnet:</b> ' + ae.map(function (a) { return esc(a.einheit) + ' (' + esc(datum(a.am)) + ', vorher ' + (a.vorher.ist ? esc(a.vorher.ist) + ' €' : '–') + ')'; }).join(' · ') + '</p>';
     return h;
   }
