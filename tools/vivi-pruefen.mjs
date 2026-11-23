@@ -1371,6 +1371,11 @@ kopf('V  v4040 Reiter ViVi, Bewirtschaftung Ist heute aus dem Steuerjahr');
     && Array.isArray(dE._erhoehungen) && dE._erhoehungen.length === 1 && /Miteigentumsanteil/.test(pE.fehlt_bewertung.map((x) => x.text).join()),
     'I10 ETW: Miete zum Kauf 560 € (vor der Erhöhung 2025 auf 620), letzte Erhöhung 01.07.2022, Etage, Zimmer, MEA fehlt');
   ok(!mapping.importDaten({ projekt: { id: 'x', type: 'other', units: [] } }, { jetzt: JETZT }).ok, 'I11 Gegenprobe: unbekannte Objektart wird nicht angelegt');
+  { const r16 = mapping.importDaten({ projekt: { id: 'p', type: 'multi_family_house', purchase_date: '2024-12-23', units: [{ id: 'u', identifier: 'WE 3 · EG rechts', unit_type: 'residential', square_meters: 61, floor: 'EG rechts' }, { id: 'v', identifier: 'Laden', unit_type: 'commercial', square_meters: 40 }, { id: 'w', identifier: 'WE 5', unit_type: 'residential', square_meters: 50 }] },
+      mietverhaeltnisse: [{ id: 'r', unit_id: 'u', rent: 561, rental_start: '2023-01-01', last_rent_increase: '2026-01-01', occupancy_type: 'rented' }, { id: 's', unit_id: 'w', rent: 500, rental_start: '2020-01-01', last_rent_increase: '2023-06-01', occupancy_type: 'rented' }] }, { jetzt: JETZT });
+    const e16 = r16.daten._mfh.einheiten;
+    ok(e16[0].nr === '3' && e16[0].lage === 'EG rechts' && !e16[0].mv_letzte_erhoehung && e16[1].art === 'gewerbe' && e16[2].mv_letzte_erhoehung === '2023-06-01',
+      'I16 „WE 3 · EG rechts“ wieder in Nummer und Lage getrennt, Erhöhung nach dem Kauf (ohne Mietverlauf) nicht im Ankauf, davor schon, Gewerbe erkannt'); }
   /* Bewirtschaftung zum Kauf: erstes volles Jahr nach dem Kaufjahr, nicht hochgerechnet */
   const zeilen = [
     { feld: 'steuer.2023.nk_umlf', jahr: 2023, wert: { summe: 900, posten: [{ text: 'Hausgeld (WEG)', betrag: 900 }] } },

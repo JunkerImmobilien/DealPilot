@@ -711,12 +711,16 @@ function importDaten(paket, kontext) {
       const g = function (k) { const x = f[P + k]; return x && x.wert !== '' && x.wert != null ? x.wert : null; };
       const gew = /commercial|business|office|retail/.test(text(u.unit_type));
       const e = { nr: String(i + 1), art: gew ? 'gewerbe' : 'wohnen', status: g('status') || 'leer' };
-      if (text(u.identifier)) e.lage = text(u.identifier).slice(0, 80);
+      /* DealPilot legt Einheiten in ViVi als „WE 3 · EG rechts“ an: Nummer und Lage wieder trennen */
+      const idm = /^(?:WE|GE)\s*(\d+)\s*·\s*(.+)$/.exec(text(u.identifier));
+      if (idm) { e.nr = idm[1]; e.lage = idm[2].slice(0, 80); } else if (text(u.identifier)) e.lage = text(u.identifier).slice(0, 80);
       const et = etageText(u.floor); if (et) e.etage = et;
       const zi = zahl(u.rooms); if (zi != null && zi > 0) e.zimmer = zs(zi);
       ['wfl', 'nk_vorauszahlung', 'mv_beginn', 'mv_befristet_bis', 'mv_kaution', 'mv_letzte_erhoehung', 'mv_letzte_erhoehung_betrag', 'mv_art', 'stellplatz_miete'].forEach(function (k) {
         const w = g(k); if (w != null) e[k] = typeof w === 'number' ? zs(w) : w;
       });
+      /* ohne Mietverlauf in ViVi kennt ausVivi nur last_rent_increase, auch wenn es NACH dem Kauf liegt: nicht in den Ankauf */
+      if (e.mv_letzte_erhoehung && e.mv_letzte_erhoehung > stichtag) { delete e.mv_letzte_erhoehung; delete e.mv_letzte_erhoehung_betrag; }
       if (e.status === 'vermietet') { const m = mieteAmTag(u); const ist = m != null ? m : zahl(g('ist')); if (ist != null) e.ist = zs(ist); }
       else leer++;
       const erh = info.erhoehungen && info.erhoehungen[String(i)];
@@ -735,6 +739,8 @@ function importDaten(paket, kontext) {
     else if (d.nkm == null) leer = 1;
     const zi = zahl(units[0].rooms); if (zi != null && zi > 0) d.zimmer = zs(zi);
     if (info.erhoehungen && Array.isArray(info.erhoehungen.objekt) && info.erhoehungen.objekt.length) d._erhoehungen = info.erhoehungen.objekt;
+    if (d.mv_letzte_erhoehung && d.mv_letzte_erhoehung > stichtag) { delete d.mv_letzte_erhoehung; delete d.mv_letzte_erhoehung_betrag; }
+    d.einheiten = '1';
   }
   d.vermstand = leer === 0 ? 'Vollvermietet' : (mehr && leer < units.length ? 'Teilweise leer' : 'Leer');
 
