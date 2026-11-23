@@ -83,7 +83,7 @@
         "admin",
         "vorschau"
       ],
-      "frontend_erkennung": "DpGrafikenNeu|data-dp-gn=|DpGrafikenBewertung",
+      "frontend_erkennung": "DpGrafikenNeu|data-dp-gn=|DpGrafikenBewertung|DpGrafikenPortfolio",
       "frontend_ausgenommen": {},
       "routen": [],
       "backend_stellen": [],

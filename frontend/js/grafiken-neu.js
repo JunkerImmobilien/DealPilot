@@ -603,164 +603,13 @@
     }
   }
 
-  /* ── Portfolio-Cockpit ─────────────────────────────────────────────── */
-  var _cp = { art: 'all', obj: 'all', cf: 'ns', jahr: null };
-  function cpDaten() {
-    var D = window.DealPilotDashboard; if (!D || !D.portfolioPayload) return [];
-    var p = null, det = []; try { p = D.portfolioPayload(); det = D.grafikDaten ? D.grafikDaten() : []; } catch (e) { return []; }
-    var O = (p && p.objekte) || [];
-    return O.map(function (o, i) {
-      var d = det[i] || {}, kp = zahl(o.kaufpreis_eur) || 0, sv = zahl(String(d.svwert || '').replace(/\./g, '').replace(',', '.'));
-      var dar = zahl(o.darlehen_eur) || 0, zinsJ = zahl(o.zins_eur_jahr) || 0, tilgJ = zahl(o.tilgung_eur_jahr) || 0;
-      var afaB = zahl(d._kpis_afa_geb_basis), afaS = zahl(d._kpis_afa_satz);
-      return { id: o.id, name: o.name || ('Objekt ' + (i + 1)), art: o.objektart || 'Objekt', kp: kp, marktwert: sv > 0 ? sv : kp, belegt: sv > 0,
-        darlehen: dar, rest: zahl(o.restschuld_eur) || 0, zinsPct: dar ? zinsJ / dar * 100 : null, rateJ: zinsJ + tilgJ,
-        mieteJ: zahl(o.miete_kalt_eur_jahr), cfvs: zahl(o.cashflow_vor_steuer_eur_jahr), cfns: zahl(o.cashflow_nach_steuer_eur_jahr),
-        dscr: zahl(o.dscr), bmy: zahl(o.bruttomietrendite_prozent), wfl: zahl(o.wohnflaeche_qm), we: zahl(o.wohneinheiten),
-        score: zahl(o.investor_deal_score) != null ? zahl(o.investor_deal_score) : zahl(o.dealpilot_score),
-        bindEnde: d._kpis_bindung_ende || null, rsBind: zahl(d._kpis_rs_bindung), afa: afaB != null && afaS != null ? afaB * afaS / 100 : null,
-        wertstg: zahl(String(d.wertstg == null ? '' : d.wertstg).replace(',', '.')) };
-    });
-  }
-  function hinweise(rows) {
-    var H = {}; rows.forEach(function (r) { H[r.id] = []; });
-    var dup = {}; rows.forEach(function (r) { if (!r.kp) return; var s = Math.round(r.kp) + '|' + Math.round(r.darlehen) + '|' + Math.round(r.rest); (dup[s] = dup[s] || []).push(r); });
-    Object.keys(dup).forEach(function (s) { if (dup[s].length > 1) dup[s].forEach(function (r) { H[r.id].push('gleiche Finanzierung wie ' + dup[s].filter(function (x) { return x !== r; }).map(function (x) { return x.name; }).join(', ') + ', doppelt angelegt?'); }); });
-    rows.forEach(function (r) {
-      if (r.wfl != null && r.wfl / Math.max(1, r.we || 1) > 400) H[r.id].push('Wohnfläche ' + nf0.format(r.wfl) + ' m² prüfen');
-      if (r.kp && r.darlehen / r.kp > 1.05) H[r.id].push('Darlehen ' + nf1.format(r.darlehen / r.kp * 100) + ' % des Kaufpreises');
-    });
-    return H;
-  }
-  function projektion(rows, bis) {
-    var J0 = heuteJahr(), out = [];
-    var P = rows.map(function (r) {
-      var g = (r.wertstg != null ? r.wertstg : 1.5) / 100, z = (r.zinsPct || 0) / 100, rest = r.rest, a = [];
-      for (var j = J0; j <= bis; j++) { var wert = r.marktwert * Math.pow(1 + g, j - J0); a.push({ wert: wert, rest: rest }); rest = Math.max(0, rest * (1 + z) - r.rateJ); }
-      return a;
-    });
-    for (var j = J0, i = 0; j <= bis; j++, i++) out.push({ jahr: j, wert: summe(P, function (p) { return p[i].wert; }), rest: summe(P, function (p) { return p[i].rest; }) });
-    out.forEach(function (p) { p.netto = p.wert - p.rest; });
-    return out;
-  }
-  function cockpit() {
-    var m = document.getElementById('dashboard-main'); if (!m || m.style.display === 'none' || m.getAttribute('data-dp-built') !== '1') return;
-    var hero = document.getElementById('dp-pscore-hero'); if (!hero) return;
-    var alle = cpDaten(); if (!alle.length) return;
-    var host = m.querySelector('[data-dp-gn="cp"]');
-    if (!host) {
-      host = document.createElement('div'); host.setAttribute('data-dp-gn', 'cp'); host.className = 'dp-gn dp-gn-cp';
-      hero.parentNode.insertBefore(host, hero.nextSibling);
-      host.addEventListener('change', function (ev) {
-        var t = ev.target; if (!t || !t.getAttribute) return; var f = t.getAttribute('data-gn-f'); if (!f) return;
-        _cp[f] = f === 'jahr' ? +t.value : t.value; if (f === 'art') _cp.obj = 'all'; host.removeAttribute('data-gn-sig'); cockpit();
-      });
-      host.addEventListener('input', function (ev) { var t = ev.target; if (t && t.getAttribute && t.getAttribute('data-gn-f') === 'jahr') { _cp.jahr = +t.value; host.removeAttribute('data-gn-sig'); cockpit(); } });
-      host.addEventListener('click', function (ev) { var b = ev.target && ev.target.closest ? ev.target.closest('[data-gn-cf]') : null; if (!b) return; _cp.cf = b.getAttribute('data-gn-cf'); host.removeAttribute('data-gn-sig'); cockpit(); });
-    }
-    var sig = JSON.stringify(alle.map(function (r) { return [r.id, Math.round(r.rest), Math.round(r.cfns || 0), Math.round(r.marktwert)]; })) + JSON.stringify(_cp);
-    zeichnen(host, sig, function (k, w) { cockpitZeichnen(k, w, alle); });
-  }
-  function cockpitZeichnen(k, w, alle) {
-    var J0 = heuteJahr(), JE = J0 + 29; if (!_cp.jahr) _cp.jahr = J0 + 10;
-    var arten = []; alle.forEach(function (r) { if (arten.indexOf(r.art) < 0) arten.push(r.art); });
-    var rows = _cp.obj !== 'all' ? alle.filter(function (r) { return r.id === _cp.obj; }) : alle.filter(function (r) { return _cp.art === 'all' || r.art === _cp.art; });
-    if (!rows.length) { rows = alle; _cp.obj = 'all'; _cp.art = 'all'; }
-    var cfK = _cp.cf === 'ns' ? 'cfns' : 'cfvs', cfW = _cp.cf === 'ns' ? 'nach Steuer' : 'vor Steuer';
-    var scope = _cp.obj !== 'all' ? rows[0].name : (_cp.art === 'all' ? rows.length + ' Objekte' : rows.length + ' × ' + _cp.art);
-    var W = summe(rows, function (r) { return r.marktwert; }), RS = summe(rows, function (r) { return r.rest; }), KP = summe(rows, function (r) { return r.kp; });
-    var MJ = summe(rows, function (r) { return r.mieteJ; }), CF = summe(rows, function (r) { return r[cfK]; });
-    var KD = summe(rows, function (r) { return r.rateJ; });
-    var proj = projektion(rows, JE), pj = proj[_cp.jahr - J0] || proj[proj.length - 1];
-    var unter1 = rows.filter(function (r) { return r.dscr != null && r.dscr < 1; }).length;
-    var ds = rows.map(function (r) { return r.dscr; }).filter(function (v) { return v != null; }).sort(function (a, b) { return a - b; });
-    var med = ds.length ? (ds.length % 2 ? ds[(ds.length - 1) / 2] : (ds[ds.length / 2 - 1] + ds[ds.length / 2]) / 2) : null;
-    var H = hinweise(alle);
-    var halbe = w > 900 ? Math.floor((w - 16) / 2) - 34 : w - 34;
-    var opt = function (v, t, an) { return '<option value="' + esc(v) + '"' + (an ? ' selected' : '') + '>' + esc(t) + '</option>'; };
-    var kopf = '<div class="dp-gn-cp-kopf"><div><h3>Portfolio auf einen Blick</h3><small>Neue Grafiken (Vorschau) · ' + esc(scope) + ' · Werte heute aus DealPilot, Projektion mit der Wertsteigerung je Objekt, Zins und Rate wie heute</small></div>'
-      + '<div class="dp-gn-filter">'
-      + '<label>Art <select data-gn-f="art">' + opt('all', 'alle', _cp.art === 'all') + arten.map(function (a) { return opt(a, a, _cp.art === a); }).join('') + '</select></label>'
-      + '<label>Objekt <select data-gn-f="obj">' + opt('all', 'alle', _cp.obj === 'all') + alle.filter(function (r) { return _cp.art === 'all' || r.art === _cp.art; }).map(function (r) { return opt(r.id, r.name, _cp.obj === r.id); }).join('') + '</select></label>'
-      + '<span class="dp-gn-seg" role="group" aria-label="Cashflow"><button type="button" data-gn-cf="vs" aria-pressed="' + (_cp.cf === 'vs') + '">vor Steuer</button><button type="button" data-gn-cf="ns" aria-pressed="' + (_cp.cf === 'ns') + '">nach Steuer</button></span>'
-      + '<label>Jahr <input type="range" data-gn-f="jahr" min="' + (J0 + 1) + '" max="' + JE + '" value="' + _cp.jahr + '"><b style="font-family:JetBrains Mono,monospace">' + _cp.jahr + '</b></label>'
-      + '</div></div>';
-    var kz = '<div class="dp-gn-kz">'
-      + '<div><span>Vermögen netto</span><b>' + mio(W - RS) + '</b><small>Wert minus Restschuld</small></div>'
-      + '<div><span>Cashflow ' + cfW + '</span><b style="color:' + (CF < 0 ? ROT : GRUEN) + '">' + eur(CF / 12) + '</b><small>im Monat, ' + eur(CF) + ' im Jahr</small></div>'
-      + '<div><span>Bruttorendite</span><b>' + (KP ? nf2.format(MJ / KP * 100) + ' %' : 'keine Angabe') + '</b><small>Kaltmiete zu Kaufpreis</small></div>'
-      + '<div><span>DSCR Median</span><b style="color:' + (med == null ? 'inherit' : med >= 1 ? GRUEN : ROT) + '">' + (med == null ? 'keine Angabe' : nf2.format(med)) + '</b><small>' + (unter1 ? unter1 + ' von ' + rows.length + ' unter 1,0' : 'alle ab 1,0') + '</small></div>'
-      + '<div><span>LTV</span><b>' + (W ? nf1.format(RS / W * 100) + ' %' : 'keine Angabe') + '</b><small>Restschuld zu Wert</small></div>'
-      + '<div><span>Restschuld</span><b>' + mio(RS) + '</b><small>Rate ' + eur(KD / 12) + ' im Monat</small></div>'
-      + '<div><span>Netto ' + _cp.jahr + '</span><b>' + mio(pj.netto) + '</b><small>Projektion</small></div>'
-      + '</div>';
-    /* Grafiken */
-    var x = proj.map(function (p) { return p.jahr; });
-    var verdopplung = proj[0].netto > 0 ? proj.filter(function (p) { return p.jahr > J0 && p.netto >= 2 * proj[0].netto; })[0] : null;
-    var gV = linien({ breite: w > 900 ? w - 34 : w - 34, hoehe: 250, x: x, heute: J0, marken: [{ x: _cp.jahr, text: String(_cp.jahr) }], aria: 'Vermögensaufbau Projektion',
-      reihen: [{ name: 'Wert', werte: proj.map(function (p) { return p.wert; }), farbe: 'var(--gn-grau)', gestrichelt: true }, { name: 'Restschuld', werte: proj.map(function (p) { return p.rest; }), farbe: 'var(--gn-rot)', gestrichelt: true }, { name: 'Netto', werte: proj.map(function (p) { return p.netto; }), farbe: 'var(--gn-gold)', dick: 3 }] });
-    /* Zinsbindung */
-    var bj = {}; rows.forEach(function (r) { var j = String(r.bindEnde || '').slice(0, 4); if (/^\d{4}$/.test(j) && r.rsBind != null) bj[j] = (bj[j] || 0) + r.rsBind; });
-    var bJ = Object.keys(bj).sort(), bMax = bJ.reduce(function (a, j) { return bj[j] > (bj[a] || 0) ? j : a; }, bJ[0]);
-    var gB = bJ.length ? saeulen({ id: 'bind', breite: halbe, hoehe: 220, x: bJ.map(Number), aria: 'Restschuld zum Ende der Zinsbindung', reihen: [{ name: 'Restschuld', werte: bJ.map(function (j) { return bj[j]; }), farbe: function (v, i) { return bJ[i] === bMax ? 'var(--gn-gold)' : 'var(--gn-grau)'; } }] }) : '<p class="dp-gn-k-s">Keine Zinsbindung eingetragen.</p>';
-    /* Cashflow je Objekt */
-    var cfR = rows.filter(function (r) { return r[cfK] != null; }).sort(function (a, b) { return b[cfK] - a[cfK]; });
-    var gC = balkenH({ id: 'cf', breite: halbe, zeilen: cfR.map(function (r) { return { name: r.name, segs: [{ von: 0, bis: r[cfK], farbe: r[cfK] >= 0 ? 'var(--gn-gruen)' : 'var(--gn-rot)' }], wertText: eurV(r[cfK]) }; }), zeileH: 26, namenBreite: 170, aria: 'Cashflow je Objekt' });
-    var traeger = cfR.filter(function (r) { return r[cfK] > 0; }).length;
-    /* Rendite gegen DSCR */
-    var gS = streuung({ breite: halbe, hoehe: 260, aria: 'Bruttomietrendite gegen DSCR', punkte: rows.map(function (r) { return { x: r.bmy, y: r.dscr, z: r.kp, r: r }; }) });
-    /* Steuer je Objekt */
-    var stR = rows.filter(function (r) { return r.cfns != null && r.cfvs != null; }).map(function (r) { return { r: r, eff: r.cfns - r.cfvs }; }).sort(function (a, b) { return b.eff - a.eff; });
-    var entl = summe(stR, function (s) { return s.eff; }), afaS = summe(rows, function (r) { return r.afa; });
-    var gT = balkenH({ id: 'st', breite: halbe, zeilen: stR.map(function (s) { return { name: s.r.name, segs: [{ von: 0, bis: s.eff, farbe: s.eff >= 0 ? 'var(--gn-gruen)' : 'var(--gn-rot)' }], wertText: eurV(s.eff) }; }), zeileH: 26, namenBreite: 170, aria: 'Steuereffekt je Objekt' });
-    /* Tabelle */
-    var tab = '<table class="dp-gn-tab"><thead><tr><th>Objekt</th><th>Art</th><th>Wert</th><th>Restschuld</th><th>LTV</th><th>Rendite</th><th>Cashflow</th><th>DSCR</th><th>Bindung bis</th><th>Score</th></tr></thead><tbody>'
-      + rows.map(function (r) {
-        var h = H[r.id] || [];
-        return '<tr><td>' + esc(r.name) + (h.length ? '<br>' + h.map(function (t) { return '<span class="dp-gn-pill" title="Bitte prüfen">Bitte prüfen: ' + esc(t) + '</span>'; }).join('') : '') + '</td>'
-          + '<td data-l="Art"><span>' + esc(r.art) + '</span></td><td data-l="Wert"><span>' + mio(r.marktwert) + (r.belegt ? '' : ' <small title="ohne Bewertung gilt der Kaufpreis">KP</small>') + '</span></td>'
-          + '<td data-l="Restschuld">' + mio(r.rest) + '</td><td data-l="LTV">' + (r.marktwert ? nf1.format(r.rest / r.marktwert * 100) + ' %' : '') + '</td>'
-          + '<td data-l="Rendite">' + (r.bmy != null ? nf2.format(r.bmy) + ' %' : '') + '</td><td data-l="Cashflow" style="color:' + ((r[cfK] || 0) < 0 ? ROT : GRUEN) + '">' + eurV(r[cfK]) + '</td>'
-          + '<td data-l="DSCR"' + (r.dscr != null && r.dscr < 1 ? ' style="color:' + ROT + '"' : '') + '>' + (r.dscr != null ? nf2.format(r.dscr) : '') + '</td>'
-          + '<td data-l="Bindung bis">' + (r.bindEnde ? esc(String(r.bindEnde).split('-').reverse().join('/')) : '') + '</td><td data-l="Score">' + (r.score != null ? Math.round(r.score) : '') + '</td></tr>';
-      }).join('') + '</tbody></table>';
-    /* Prüfung: jede Summe ein zweites Mal auf anderem Weg */
-    var L = [], ok = function (b, t, art) { L.push('<li class="' + (b ? '' : (art || 'fehler')) + '">' + esc(t) + '</li>'); };
-    var cfB = summe(cfR, function (r) { return r[cfK]; });
-    ok(Math.abs(cfB - CF) < 1, 'Die Balken Cashflow je Objekt ergeben die Summe ' + eur(CF) + ' im Jahr');
-    ok(Math.abs(proj[0].netto - (W - RS)) < 1, 'Projektion ' + J0 + ' gleich Vermögen netto heute (' + mio(W - RS) + ')');
-    var effA = summe(rows, function (r) { return r.cfns; }) - summe(rows, function (r) { return r.cfvs; });
-    ok(Math.abs(effA - entl) < 1 || stR.length < rows.length, 'Steuereffekte je Objekt summiert gleich Cashflow nach minus vor Steuer (' + eurV(effA) + ')');
-    var bindS = summe(bJ, function (j) { return bj[j]; }), bindR = summe(rows, function (r) { return String(r.bindEnde || '').length >= 4 ? r.rsBind : null; });
-    ok(Math.abs(bindS - bindR) < 1, 'Zinsbindungs-Kalender gleich Summe der Restschuld zum Bindungsende (' + mio(bindS) + ')');
-    var ohneB = rows.filter(function (r) { return !r.bindEnde; }).length; if (ohneB) ok(false, ohneB + ' Objekt' + (ohneB === 1 ? '' : 'e') + ' ohne Zinsbindung, im Kalender nicht enthalten', 'warn');
-    var nH = 0; Object.keys(H).forEach(function (id) { if (rows.some(function (r) { return r.id === id; })) nH += H[id].length; }); if (nH) ok(false, nH + ' Angabe' + (nH === 1 ? '' : 'n') + ' bitte prüfen, siehe Tabelle', 'warn');
-    var ohneS = rows.filter(function (r) { return r.score == null; }).length; if (ohneS) ok(false, ohneS + ' Objekt' + (ohneS === 1 ? '' : 'e') + ' ohne Score, als Lücke gezeigt', 'warn');
-    var karte = function (id, titel, unter, inhalt, breit) { return '<div class="dp-gn-karte' + (breit ? ' dp-gn-breit' : '') + '" data-gn-k="' + id + '"><div class="dp-gn-k-t">' + esc(titel) + '</div><div class="dp-gn-k-s">' + esc(unter) + '</div>' + inhalt + '</div>'; };
-    k.innerHTML = kopf + kz + '<div class="dp-gn-raster">'
-      + karte('verm', verdopplung ? 'Das Nettovermögen verdoppelt sich bis ' + verdopplung.jahr : 'Das Nettovermögen wächst bis ' + JE + ' auf ' + mio(proj[proj.length - 1].netto), 'Projektion · Wert, Restschuld und Netto · ' + esc(scope), gV + legende([{ name: 'Wert', farbe: 'color-mix(in srgb,currentColor 30%,transparent)', linie: true }, { name: 'Restschuld', farbe: ROT, linie: true }, { name: 'Netto', farbe: 'var(--gn-gold)', linie: true }]), true)
-      + karte('cf', rows.length > 1 ? traeger + ' von ' + cfR.length + ' Objekten bringen Geld, zusammen ' + eurV(CF) + ' im Jahr' : 'Cashflow ' + cfW + ' ' + eurV(CF) + ' im Jahr', 'Cashflow ' + cfW + ' je Objekt in € im Jahr', gC)
-      + karte('bind', bJ.length ? 'Größte Anschlussfinanzierung ' + bMax + ' mit ' + mio(bj[bMax]) : 'Zinsbindung', 'Restschuld am Ende der Zinsbindung je Jahr', gB)
-      + karte('sc', unter1 ? (unter1 === 1 ? '1 Objekt deckt' : unter1 + ' Objekte decken') + ' die Rate nicht aus der Miete' : 'Die Miete deckt überall die Rate', 'Bruttomietrendite gegen DSCR · Kreisgröße = Kaufpreis', gS)
-      + karte('st', (entl >= 0 ? 'Die Steuer entlastet um ' : 'Die Steuer kostet ') + eur(Math.abs(entl)) + ' im Jahr', 'Steuereffekt je Objekt in € im Jahr · AfA zusammen ' + eur(afaS) + ' im Jahr', gT)
-      + karte('tab', 'Objekte im Einzelnen', 'Werte heute · Wert ohne Bewertung = Kaufpreis (KP)', tab, true)
-      + karte('pr', 'Rechenprüfung', 'Jede Summe auf einem zweiten Weg nachgerechnet', '<ul class="dp-gn-pruef">' + L.join('') + '</ul>', true)
-      + '</div>';
-    /* Tooltips je Karte */
-    var tk = function (id, f) { var c = k.querySelector('[data-gn-k="' + id + '"]'); if (c) { c.style.position = 'relative'; tipBinden(c, f); } };
-    tk('verm', function (i) { var p = proj[i]; return p ? '<div class="gn-tip-j">' + p.jahr + '</div>Wert <b>' + mio(p.wert) + '</b><br>Restschuld <b>' + mio(p.rest) + '</b><br>Netto <b>' + mio(p.netto) + '</b>' : ''; });
-    tk('cf', function (i) { var r = cfR[i]; return r ? '<div class="gn-tip-j">' + esc(r.name) + '</div>Cashflow ' + cfW + ' <b>' + eurV(r[cfK]) + '</b> im Jahr<br>DSCR <b>' + (r.dscr != null ? nf2.format(r.dscr) : 'keine Angabe') + '</b>' : ''; });
-    tk('bind', function (i) { var j = bJ[i]; if (!j) return ''; var obs = rows.filter(function (r) { return String(r.bindEnde || '').slice(0, 4) === j; }); return '<div class="gn-tip-j">' + j + '</div>Restschuld <b>' + mio(bj[j]) + '</b><br>' + obs.map(function (r) { return esc(r.name); }).join('<br>'); });
-    tk('sc', function (i) { var r = rows[i]; return r ? '<div class="gn-tip-j">' + esc(r.name) + '</div>Rendite <b>' + (r.bmy != null ? nf2.format(r.bmy) + ' %' : '') + '</b><br>DSCR <b>' + (r.dscr != null ? nf2.format(r.dscr) : '') + '</b><br>Kaufpreis <b>' + eur(r.kp) + '</b>' : ''; });
-    tk('st', function (i) { var s = stR[i]; return s ? '<div class="gn-tip-j">' + esc(s.r.name) + '</div>Steuereffekt <b>' + eurV(s.eff) + '</b> im Jahr<br>AfA <b>' + eur(s.r.afa) + '</b>' : ''; });
-  }
+  /* v4240 · Der Portfolio-Teil (v4140 cockpit/cockpitZeichnen) ist entfernt: Portfolio auf einen Blick zeichnet js/grafiken-portfolio.js (v4180/v4240). */
 
   /* ── Lauf ──────────────────────────────────────────────────────────── */
   function lauf() {
     if (!AN) return;
     try { pilotAnalyse(); } catch (e) { try { console.warn('[grafiken-neu] Pilot-Analyse', e); } catch (x) {} }
     try { if (window.DpGrafikenPremium) window.DpGrafikenPremium.lauf(HILFEN); } catch (e) { try { console.warn('[grafiken-neu] Premium', e); } catch (x) {} }   /* v4160 */
-    try { cockpit(); } catch (e) { try { console.warn('[grafiken-neu] Cockpit', e); } catch (x) {} }
   }
   function spaeter() { if (_timer) clearTimeout(_timer); _timer = setTimeout(lauf, 220); }
   function start() {
@@ -779,7 +628,7 @@
   /* v4160 · Hilfen für grafiken-premium.js (Platz, Zeichnen nur bei Änderung und nur sichtbar, alte Grafik ausblenden) */
   var HILFEN = { platz: platz, zeichnen: zeichnen, weg: weg, jahre: jahre, sigJ: sigJ, karteHtml: karteHtml, legende: legende, tipBinden: tipBinden };
   window.DpGrafikenNeu = { an: function () { return AN; }, _h: HILFEN, neu: function () { document.querySelectorAll('[data-dp-gn]').forEach(function (k) { k.removeAttribute('data-gn-sig'); }); lauf(); },
-    _test: { ticks: ticks, saeulen: saeulen, wasserfall: wasserfall, linien: linien, hantel: hantel, balkenH: balkenH, streuung: streuung, projektion: projektion, hinweise: hinweise } };
+    _test: { ticks: ticks, saeulen: saeulen, wasserfall: wasserfall, linien: linien, hantel: hantel, balkenH: balkenH, streuung: streuung } };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', pruefeFreigabe); else pruefeFreigabe();
   window.addEventListener('dp:vorschau', pruefeFreigabe);
   window.addEventListener('dp:plan-ready', function () { setTimeout(pruefeFreigabe, 300); });

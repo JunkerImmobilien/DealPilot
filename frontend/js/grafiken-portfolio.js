@@ -91,10 +91,23 @@
   function stil() {
     if (document.getElementById('dp-gp-stil')) return;
     var s = document.createElement('style'); s.id = 'dp-gp-stil';
-    var B = '#dashboard-main .dp-gp';
+    var B = '#dashboard-main .dp-gp', A = 'body.dp-gp-an #dp-stage .app', E = 'body.dp-gp-an #dp-stage.cp-einfach .app';
     s.textContent = [
       /* v4180 · der v4140-Cockpit-Host und der Abschnitt Kennzahlen (p. a. + Gesamtbewertung) stehen jetzt oben in der Leiste */
       'body.dp-gp-an #dashboard-main [data-dp-gn="cp"],body.dp-gp-an #dashboard-main .cp-sek[data-sek="kennzahlen"]{display:none !important}',
+      /* v4240 · Marcel 23.11.2026: „von der Sortierung nicht optimal … wo muss was hin?" Reihenfolge vom Ganzen ins Detail:
+         Kopf, Vermögen (Gesamtbewertung + Projektion & Verlauf), Cashflow und Steuer, Finanzierung, Potenzial, Pilot,
+         Gesamt-Projektion, Details. Umgestellt wird nur per order (die Abschnitte bleiben, wo dashboard.js sie baut). */
+      A + '{display:flex;flex-direction:column}',
+      A + ' > *{order:50}',
+      A + ' > .sl-head{order:0}' + A + ' > #dp-pscore-hero{order:1}' + A + ' > .cp-ansicht{order:2}' + A + ' > [data-dp-gp="kopf"]{order:3}' + A + ' > #dp-einfach{order:4}',
+      A + ' > [data-dp-gp="gb"]{order:5}' + A + ' > .cp-sek[data-sek="projektion"]{order:6}' + A + ' > [data-dp-gp="ob"]{order:7}' + A + ' > .cp-sek[data-sek="steuer"]{order:8}',
+      A + ' > [data-dp-gp="bk"]{order:9}' + A + ' > .cp-sek[data-sek="zielbild"]{order:10}' + A + ' > #dp-pp-slot{order:11}' + A + ' > .cp-sek[data-sek="gesamtproj"]{order:12}' + A + ' > [data-dp-gp="det"]{order:13}',
+      A + ' .sl > .e{display:none}',   /* die alten Nummern 02 bis 06 passen nach dem Umstellen nicht mehr */
+      /* Einfach: Leiste, die Karten (ohne „Heute", das steht in der Leiste), je Objekt und Finanzierung. Genau: alles. */
+      E + ' > [data-dp-gp="gb"],' + E + ' > [data-dp-gp="det"]{display:none !important}',
+      E + ' .gp-klein{display:none}' + E + ' #dp-einfach .ke2-k:first-child{display:none}',
+      B + ' .gp-sl{margin:6px 0 10px}',
       B + '{margin:14px 0 18px;color:var(--c-ptext,#1b1815);font-family:Inter,system-ui,sans-serif}',
       B + ' .gp-kopf{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:8px 16px;margin:0 2px 10px}',
       B + ' .gp-kopf h3{margin:0;font:700 20px/1.2 "Space Grotesk",sans-serif}',
@@ -192,7 +205,7 @@
       + '</svg>';
   }
 
-  function zeichnen(host) {
+  function zeichnen(host, hosts) {
     var D = daten(); if (!D) return false;
     var alle = D.rows, B = D.B, S = B.S, J0 = heuteJahr(), JE = J0 + 29;
     if (!_f.jahr) _f.jahr = J0 + 10;
@@ -237,7 +250,7 @@
       + kachel('Marktpreis', nMpi ? (kpMpi ? (mpiS / kpMpi >= 1 ? '+' : '−') + nf1.format(Math.abs(mpiS / kpMpi * 100 - 100)) + ' %' : '') : 'keine Angabe', nMpi ? nMpi + ' von ' + rows.length + ' Obj.' : '', nMpi && kpMpi ? (mpiS >= kpMpi ? 'gp-pos' : 'gp-neg') : '', 'Gesamtbewertung: Marktpreisindikation ' + mio(mpiS) + ' gegen die Kaufpreise derselben Objekte ' + mio(kpMpi) + '.')
       + '</div>';
     var ohneEw = rows.filter(function (r) { return r.ew == null; });
-    var gb = gesamt ? '<div class="gp-gb"><span>Investiert <b>' + mio(S.gi) + '</b></span><span>Darlehen <b>' + mio(S.darl) + '</b></span><span>Eigenkapital eingesetzt <b>' + mio(S.ek) + '</b></span>'
+    var gb = false ? '<div class="gp-gb"><span>Investiert <b>' + mio(S.gi) + '</b></span><span>Darlehen <b>' + mio(S.darl) + '</b></span><span>Eigenkapital eingesetzt <b>' + mio(S.ek) + '</b></span>'
       + (ohneEw.length ? '<span title="' + esc(ohneEw.map(function (r) { return r.name; }).join(', ')) + '">ohne Ertragswert: ' + ohneEw.length + '</span>' : '') + '</div>' : '';
 
     /* je Objekt: Miete, Cashflow nach Steuer, Steuereffekt */
@@ -269,12 +282,10 @@
           + '<div class="gp-z' + (istMax ? ' gp-max' : '') + '">+' + nf0.format(Math.round(x.p1)) + ' €</div><div class="gp-z gp-p2' + (istMax ? ' gp-max' : '') + '">+' + nf0.format(Math.round(x.p2)) + ' €</div>';
       }).join('') + '</div>' : '<p class="gp-u">Keine Zinsbindung eingetragen.</p>';
     var bkT = K.max ? 'Größte Anschlussfinanzierung <em>' + K.max.jahr + '</em> mit ' + mio(K.max.rest) : 'Zinsbindung';
-    var bkU = K.max ? 'Mehrbelastung im Monat, wenn der Anschlusszins 1 oder 2 Prozentpunkte über heute liegt · ' + K.max.jahr + ': +' + nf0.format(Math.round(K.max.p1)) + ' € bzw. +' + nf0.format(Math.round(K.max.p2)) + ' €'
+    var bkU = K.max ? 'Mehrbelastung im Monat bei 1 oder 2 Prozentpunkten mehr Zins · ' + K.max.jahr + ': +' + nf0.format(Math.round(K.max.p1)) + ' € bzw. +' + nf0.format(Math.round(K.max.p2)) + ' €'
       + (bald.length ? ' · in den nächsten 3 Jahren ' + mio(baldS) : '') : '';
     var bkOhne = K.ohne.length ? '<p class="gp-u" style="margin:8px 0 0">Ohne Zinsbindung: ' + esc(K.ohne.map(function (r) { return r.name; }).join(', ')) + '</p>' : '';
 
-    /* Vermögen */
-    var vermT = (function () { var d = proj[0].netto > 0 ? proj.filter(function (p) { return p.jahr > J0 && p.netto >= 2 * proj[0].netto; })[0] : null; return d ? 'Das Nettovermögen verdoppelt sich bis <em>' + d.jahr + '</em>' : 'Nettovermögen bis ' + JE + ': ' + mio(proj[proj.length - 1].netto); })();
 
     /* Objekte im Einzelnen (eingeklappt) und Rechenprüfung */
     var H = hinweise(alle), nH = 0; rows.forEach(function (r) { nH += (H[r.id] || []).length; });
@@ -296,33 +307,49 @@
     var nOk = P.filter(function (x) { return x.ok; }).length;
     var pruef = '<details class="gp-det"><summary>Rechenprüfung: ' + nOk + ' von ' + P.length + ' stimmen' + (B.mbLaedt ? ' · Marktberichte laden noch' : '') + '</summary><ul class="gp-pruef">' + P.map(function (x) { return '<li class="' + (x.ok ? '' : x.art) + '">' + (x.ok ? '✓ ' : '✗ ') + esc(x.t) + '</li>'; }).join('') + '</ul></details>';
 
-    var w = Math.max(280, Math.round((host.getBoundingClientRect().width || 900) * (window.innerWidth > 1100 ? 0.55 : 1) - 34));
-    host.innerHTML = kopf + gross + klein + gb + '<div class="gp-raster">'
-      + '<div class="gp-karte" data-gp-k="ob"><div class="gp-t">' + obT + '</div><div class="gp-u">' + obU + '</div>' + ob + '</div>'
-      + '<div class="gp-karte" data-gp-k="bk"><div class="gp-t">' + bkT + '</div><div class="gp-u">' + bkU + '</div>' + bk + bkOhne + '</div>'
-      + '<div class="gp-karte gp-breit" data-gp-k="verm"><div class="gp-t">' + vermT + '</div><div class="gp-u">Projektion · Wert und Restschuld gestrichelt, Netto in Gold · Modell, keine Garantie</div>' + linie(proj, Math.max(280, Math.round(host.getBoundingClientRect().width - 34)), J0, _f.jahr) + '</div>'
-      + '<div class="gp-karte gp-breit">' + tab + pruef + '</div>'
-      + '</div>';
-    host.setAttribute('data-gp-pruef', nOk + '/' + P.length);
+    /* v4240 · Teile statt eines Blocks: jeder Teil steht an seinem Platz (lauf). Der Vermögensaufbau entfällt hier,
+       er steht in „Projektion & Verlauf" (Eigenkapital-Entwicklung). */
+    var T = {
+      kopf: kopf + gross + klein,
+      ob: sl('Cashflow und Steuer', 'je Objekt im Jahr') + '<div class="gp-karte" data-gp-k="ob"><div class="gp-t">' + obT + '</div><div class="gp-u">' + obU + '</div>' + ob + '</div>',
+      bk: sl('Finanzierung', 'Zinsbindung und Anschluss') + '<div class="gp-karte" data-gp-k="bk"><div class="gp-t">' + bkT + '</div><div class="gp-u">' + bkU + '</div>' + bk + bkOhne + '</div>',
+      det: sl('Details', 'je Objekt und Rechenprüfung') + '<div class="gp-karte">' + tab + pruef + '</div>'
+    };
+    if (hosts) Object.keys(T).forEach(function (k) { if (hosts[k]) hosts[k].innerHTML = T[k]; });
+    else host.innerHTML = T.kopf + T.ob + T.bk + T.det;
+    (hosts ? hosts.kopf : host).setAttribute('data-gp-pruef', nOk + '/' + P.length);
     return true;
   }
+  function sl(t, tag) { return '<div class="sl gp-sl"><h2>' + esc(t) + '</h2><span class="tag">' + esc(tag) + '</span><span class="rule"></span></div>'; }
 
   /* ── Lauf ──────────────────────────────────────────────────────── */
   function lauf() {
     if (!AN) return;
     var m = document.getElementById('dashboard-main'); if (!m || m.style.display === 'none' || m.getAttribute('data-dp-built') !== '1') return;
     var hero = document.getElementById('dp-pscore-hero'); if (!hero) return;
-    var host = m.querySelector('[data-dp-gp]');
-    if (!host) {
-      host = document.createElement('div'); host.setAttribute('data-dp-gp', '1'); host.className = 'dp-gp';
-      hero.parentNode.insertBefore(host, hero.nextSibling);
+    var app = hero.parentNode;
+    var alt = app.querySelector(':scope > [data-dp-gp="1"]'); if (alt) alt.parentNode.removeChild(alt);   /* v4180-Host */
+    var hosts = {};
+    ['kopf', 'gb', 'ob', 'bk', 'det'].forEach(function (k) {
+      var h = app.querySelector(':scope > [data-dp-gp="' + k + '"]');
+      if (!h) { h = document.createElement('div'); h.setAttribute('data-dp-gp', k); h.className = 'dp-gp dp-gp-' + k; app.appendChild(h); }
+      hosts[k] = h;
+    });
+    var host = hosts.kopf;
+    if (!host._gpOn) {
+      host._gpOn = true;
       host.addEventListener('change', function (ev) { var t = ev.target, f = t && t.getAttribute && t.getAttribute('data-gp-f'); if (!f) return; _f[f] = f === 'jahr' ? +t.value : t.value; if (f === 'art') _f.obj = 'all'; host.removeAttribute('data-gp-sig'); lauf(); });
       host.addEventListener('input', function (ev) { var t = ev.target; if (t && t.getAttribute && t.getAttribute('data-gp-f') === 'jahr') { _f.jahr = +t.value; host.removeAttribute('data-gp-sig'); lauf(); } });
-    } else if (host.previousElementSibling !== hero) hero.parentNode.insertBefore(host, hero.nextSibling);
+    }
+    /* Vermögen: Überschrift und die Gesamtbewertung aus dashboard.js (Investiert, Bilanz heute, nach Bewertung) hierher */
+    if (!hosts.gb.querySelector('.gp-sl')) hosts.gb.insertAdjacentHTML('afterbegin', sl('Vermögen', 'investiert, dir gehört heute, Wert'));
+    var gbe = document.getElementById('dp-gesamtbew'); if (gbe && gbe.parentNode !== hosts.gb) hosts.gb.appendChild(gbe);
+    /* Steuer über alle Objekte steht jetzt unter „Cashflow und Steuer" als Detail: einmalig zugeklappt */
+    try { if (!localStorage.getItem('dp_gp_steuer_zu')) { var stk = app.querySelector(':scope > .cp-sek[data-sek="steuer"]'); if (stk) { stk.classList.add('cp-zu'); var z = {}; try { z = JSON.parse(localStorage.getItem('dp_cockpit_zu') || '{}') || {}; } catch (e) {} z.steuer = 1; localStorage.setItem('dp_cockpit_zu', JSON.stringify(z)); localStorage.setItem('dp_gp_steuer_zu', '1'); } } } catch (e) {}
     var D = null; try { D = window.DealPilotDashboard.blickDaten(); } catch (e) { D = null; }
     var sig = D ? JSON.stringify([D.n, Math.round(D.S.cfNsJ), Math.round(D.S.rest), (D.W || []).map(function (x) { return Math.round(x.wert); }), _f, Math.round(host.getBoundingClientRect().width / 40)]) : '';
     if (sig && host.getAttribute('data-gp-sig') === sig) return;
-    if (zeichnen(host)) { host.setAttribute('data-gp-sig', sig); document.body.classList.add('dp-gp-an'); }
+    if (zeichnen(host, hosts)) { host.setAttribute('data-gp-sig', sig); document.body.classList.add('dp-gp-an'); }
   }
   function spaeter() { if (_timer) clearTimeout(_timer); _timer = setTimeout(function () { try { lauf(); } catch (e) { try { console.warn('[grafiken-portfolio]', e); } catch (x) {} } }, 260); }
   function start() {
@@ -334,7 +361,7 @@
     spaeter();
   }
   function pruefeFreigabe() { try { if (window.DpVorschau) window.DpVorschau.frei('grafiken_neu').then(function (an) { if (an) start(); }); } catch (e) {} }
-  window.DpGrafikenPortfolio = { zeichnen: function (host) { stil(); return zeichnen(host); }, an: function () { return AN; }, neu: function () { var h = document.querySelector('[data-dp-gp]'); if (h) h.removeAttribute('data-gp-sig'); lauf(); },
+  window.DpGrafikenPortfolio = { zeichnen: function (host) { stil(); return zeichnen(host); }, an: function () { return AN; }, neu: function () { var h = document.querySelector('[data-dp-gp="kopf"]'); if (h) h.removeAttribute('data-gp-sig'); lauf(); },
     _test: { projektion: projektion, bindKalender: bindKalender, hinweise: hinweise, bereich: bereich } };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', pruefeFreigabe); else pruefeFreigabe();
   window.addEventListener('dp:vorschau', pruefeFreigabe);
