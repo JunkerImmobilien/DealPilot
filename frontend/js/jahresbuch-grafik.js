@@ -29,7 +29,7 @@
 (function (global) {
   'use strict';
   if (global.DpJahresbuchGrafik) return;
-  var VERSION = 'v4090';
+  var VERSION = 'v4090b';
   var GOLD = 'var(--wl-c9a84c, #C9A84C)', GRAU = '#8A8278', TINTE = '#5B544C', ROT = '#B8625C';
   var FLAECHE = 'var(--jbg-flaeche, #FDFCFA)';
   var W0 = 720, WMAX = 1400, L = 60, R = 54, OBEN = 26, LUECKE = 56;   /* v4090 · WMAX: das Bild wird nicht mehr über 720 hochskaliert (am Desktop war die Schrift 1,6-fach groß) */   /* v3432 · W je Bild: so breit wie der Platz (340-720), sonst wird die Schrift am Handy 4 px klein */
@@ -283,7 +283,7 @@
       var bw = ziel.clientWidth || 0;
       var sub = { jahre: spec.jahre, heute: spec.heute, gewaehlt: spec.gewaehlt, onJahr: spec.onJahr, titel: p.titel, ohneTitel: true,
         ereignisse: k === 0 ? spec.ereignisse : [], panels: [Object.assign({}, p, { hoehe: p.hoeheKarte || p.hoehe })],
-        W: bw > 0 ? Math.max(280, Math.min(WMAX, Math.round(bw))) : W0 };
+        W: bw > 0 ? Math.max(240, Math.min(WMAX, Math.round(bw))) : W0 };   /* v4090b · am Handy 245 px: nicht verkleinern */
       var sv = bild(sub);
       if (!sv) { ziel.innerHTML = ''; return; }
       ziel.innerHTML = '<div class="jbg">' + legendeHtml(sub) + sv + '<div class="jbg-tip" role="status"></div></div>';
