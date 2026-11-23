@@ -5949,7 +5949,7 @@ const QcApp = (function() {
       '.qcb{display:flex;flex-direction:column;gap:10px;font:400 13.5px/1.5 Inter,system-ui,sans-serif;color:#2A2727}',
       '.qcb-l{font:600 10.5px/1.3 "JetBrains Mono",monospace;letter-spacing:.08em;text-transform:uppercase;color:#7A7370}',
       '.qcb-box{background:#fff;border:1px solid #EFE7D6;border-radius:12px;padding:12px 14px}',
-      '.qcb-urteil{display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:center;border-left:5px solid #3FA56C}',
+      '.qcb-urteil{display:grid;grid-template-columns:auto 1fr auto;grid-template-areas:"ring kopf lage" "ring rat lage";gap:2px 14px;align-items:center;border-left:5px solid #3FA56C}','.qcb-urteil .qcb-ring{grid-area:ring}.qcb-urteil .qcb-kopf{grid-area:kopf;align-self:end}.qcb-urteil .qcb-rat{grid-area:rat;align-self:start}.qcb-urteil .qcb-lage{grid-area:lage}',
       '.qcb-urteil.warn{border-left-color:var(--wl-c9a84c,#C9A84C)}.qcb-urteil.bad{border-left-color:#B8625C}',
       '.qcb-ring{width:62px;height:62px;border-radius:50%;display:grid;place-items:center;border:5px solid #EFE7D6;font:700 21px "Space Grotesk",sans-serif}',
       '.qcb-urteil h4{margin:2px 0 3px;font:600 18px/1.25 "Space Grotesk",sans-serif;color:#2A2727;text-transform:none;letter-spacing:0}',
@@ -5959,11 +5959,11 @@ const QcApp = (function() {
       '.qcb-seg button{border:0;background:transparent;font:600 12px "Space Grotesk",sans-serif;padding:5px 11px;border-radius:7px;cursor:pointer;color:#2A2727}',
       '.qcb-seg button.on{background:linear-gradient(110deg,var(--wl-e8cc7a,#E8CC7A),var(--wl-c9a84c,#C9A84C) 55%,var(--wl-b8932f,#b8932f));color:#050505}',
       '.qcb-lage small{font-size:11px;color:#7A7370}',
-      '.qcb-pz{display:grid;grid-template-columns:12px 1fr auto;gap:12px;align-items:center;padding:9px 0;border-top:1px solid #F1ECE1}',
+      '.qcb-pz{display:grid;grid-template-columns:12px 1fr auto;grid-template-areas:"dot t w" "dot u w";gap:0 12px;align-items:center;padding:9px 0;border-top:1px solid #F1ECE1}','.qcb-pz>.qcb-dot{grid-area:dot}.qcb-pz>.t{grid-area:t;align-self:end}.qcb-pz>.u{grid-area:u;align-self:start}.qcb-pz>.w{grid-area:w}',
       '.qcb-pz:first-child{border-top:0;padding-top:0}.qcb-pz:last-child{padding-bottom:0}',
       '.qcb-dot{width:11px;height:11px;border-radius:50%;background:#8A8272}.qcb-dot.ok{background:#3FA56C}.qcb-dot.mid{background:var(--wl-c9a84c,#C9A84C)}.qcb-dot.bad{background:#B8625C}',
       '.qcb-pz b{display:block;font:600 14px/1.3 "Space Grotesk",sans-serif}',
-      '.qcb-pz .u{font-size:12px;color:#7A7370}',
+      '.qcb-pz .u{font-size:12px;color:#7A7370}','.qcb-sp{display:block;position:relative;height:8px;margin:8px 6px 3px;border-radius:4px;background:#F1ECE1}','.qcb-sp-b{position:absolute;top:0;bottom:0;border-radius:4px;background:color-mix(in srgb,#3FA56C 35%,#fff)}','.qcb-sp-m{position:absolute;top:-3px;bottom:-3px;width:2px;margin-left:-1px;background:#7A7370}','.qcb-sp-k{position:absolute;top:50%;width:13px;height:13px;margin:-6.5px 0 0 -6.5px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px rgba(0,0,0,.18);background:#3FA56C}.qcb-sp-k.bad{background:#B8625C}','.qcb-sp-z{display:flex;justify-content:space-between;gap:6px;font:500 10.5px Inter,sans-serif;color:#7A7370;font-variant-numeric:tabular-nums}','details.qcb-mehr{margin-top:3px}details.qcb-mehr>summary{cursor:pointer;color:var(--wl-b8932f,#b8932f);font-weight:500;list-style:none}details.qcb-mehr>summary::-webkit-details-marker{display:none}details.qcb-mehr>summary::after{content:" ›"}details.qcb-mehr[open]>summary::after{content:" ⌄"}',
       '.qcb-pz .w{font:600 14px "Space Grotesk",sans-serif;text-align:right;white-space:nowrap}',
       '.qcb-pz .w small{display:block;font:500 11px Inter,sans-serif;color:#7A7370}',
       '.qcb-ziel{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:8px;margin-top:8px}',
@@ -5996,7 +5996,7 @@ const QcApp = (function() {
       'details.qcb-ki>summary::after{content:" ›";color:#7A7370}details.qcb-ki[open]>summary::after{content:" ⌄"}',
       'details.qcb-ki .ai-opinion{margin-top:8px;font:400 13px/1.55 Inter,sans-serif}',
       'details.qcb-ki .ai-opinion-l{display:none}',
-      '@media (max-width:640px){.qcb-urteil{grid-template-columns:auto 1fr}.qcb-lage{grid-column:1/-1;align-items:flex-start}.qcb-pc{grid-template-columns:1fr}}'
+      '@media (max-width:640px){.qcb-urteil{grid-template-columns:auto 1fr;grid-template-areas:"ring kopf" "rat rat" "lage lage";gap:8px 12px;padding:12px}'+'.qcb-ring{width:52px;height:52px;border-width:4px;font-size:19px}.qcb-urteil h4{font-size:17px;margin:2px 0 0}.qcb-urteil .qcb-kopf{align-self:center}.qcb-urteil p{font-size:12.5px;line-height:1.5}'+'.qcb-lage{flex-direction:row;align-items:center;flex-wrap:wrap;gap:4px 10px;padding-top:8px;border-top:1px solid #F1ECE1}.qcb-lage small{margin-left:auto}'+'.qcb-pz{grid-template-columns:10px 1fr auto;grid-template-areas:"dot t w" ". u u";gap:2px 10px;align-items:baseline;padding:8px 0}.qcb-pz>.qcb-dot{width:10px;height:10px;align-self:center}.qcb-pz b{font-size:13.5px}.qcb-pz .w{font-size:13.5px}.qcb-pz .u{font-size:11.5px;line-height:1.45}'+'.qcb-ziel{grid-template-columns:repeat(auto-fit,minmax(128px,1fr));gap:6px}.qcb-zk{padding:7px 9px}.qcb-zk .v{font-size:16px}.qcb-zk .qcb-l{font-size:9.5px;letter-spacing:.05em}'+'.qcb-box{padding:11px 12px}.qcb-pc{grid-template-columns:1fr}}'
     ].join('');
     document.head.appendChild(s);
   }
@@ -6042,7 +6042,10 @@ const QcApp = (function() {
     const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
     const e0 = x => Math.round(x).toLocaleString('de-DE') + ' €';
     const p1 = x => (Math.round(x * 10) / 10).toFixed(1).replace('.', ',') + ' %';
-    const pz = (ton, titel, text, wert, unter) => `<div class="qcb-pz"><span class="qcb-dot ${ton}"></span><span><b>${titel}</b><span class="u">${text}</span></span><span class="w">${wert}${unter ? `<small>${unter}</small>` : ''}</span></div>`;
+    /* v4015 · Marcel 23.11.2026 (Bewertung am Handy zu lang, Prüfsteine schlecht dargestellt): Titel, Wert und Text als
+       eigene Zellen (Raster-Bereiche), damit der Text am Handy unter Titel und Wert die volle Breite nimmt. extra = Zusatz
+       (Spannenbalken, aufklappbare Annahme) unter dem Text. */
+    const pz = (ton, titel, text, wert, unter, extra) => `<div class="qcb-pz"><span class="qcb-dot ${ton}"></span><b class="t">${titel}</b><span class="w">${wert}${unter ? `<small>${unter}</small>` : ''}</span><span class="u">${text}${extra || ''}</span></div>`;
 
     /* Lageklasse und ihr Ziel */
     const lk = inputs.lageklasse || '';
@@ -6053,7 +6056,8 @@ const QcApp = (function() {
     const ton = urteil && urteil.ton === 'bad' ? 'bad' : urteil && urteil.ton === 'warn' ? 'warn' : '';
     let h = `<div class="qcb"><div class="qcb-box qcb-urteil ${ton}">`
       + `<div class="qcb-ring">${score.score != null ? Math.round(score.score) : '–'}</div>`
-      + `<div><span class="qcb-l">Ersteinschätzung · ${esc(score.label || '')}</span><h4>${esc(urteil ? urteil.ueberschrift : '')}</h4><p>${urteil ? urteil.rat : ''}</p></div>`
+      + `<div class="qcb-kopf"><span class="qcb-l">Ersteinschätzung · ${esc(score.label || '')}</span><h4>${esc(urteil ? String(urteil.ueberschrift || '').replace(/, /g, ', ') : '')}</h4></div>`
+      + `<p class="qcb-rat">${urteil ? String(urteil.rat || '').replace(/, /g, ', ') : ''}</p>`
       + `<div class="qcb-lage"><span class="qcb-l">Lageklasse</span><div class="qcb-seg" role="group" aria-label="Lageklasse">`
       + ['A', 'B', 'C'].map(x => `<button type="button" data-qcb-lage="${x}" class="${x === lk ? 'on' : ''}">${x}</button>`).join('')
       + `</div><small>${esc(zielT || 'keine Lageklasse')}</small></div></div>`;
@@ -6065,10 +6069,16 @@ const QcApp = (function() {
     if (span && span.low > 0 && span.high > 0 && kp > 0) {
       const ab = Math.round((kp / span.med - 1) * 100);
       const unter = kp < span.low, ueber = kp > span.high;
-      p += pz(ueber ? 'bad' : 'ok', ueber ? 'Preis über der Marktspanne' : unter ? 'Preis unter der Marktspanne' : 'Preis im Rahmen des Marktes',
-        (wfl > 0 ? e0(kp / wfl) + '/m² · ' : '') + 'DealPilot-Marktbewertung ' + e0(span.low) + ' – ' + e0(span.high) + ' (Mitte ' + e0(span.med) + ')'
-        + (!unter && !ueber ? '. Innerhalb der Spanne gibt es keinen belastbaren Vor- oder Nachteil.' : ''),
-        e0(kp), (ab >= 0 ? '+' : '') + ab + ' % zur Mitte');
+      /* v4015 · die Spanne als Balken: Spanne der Marktbewertung, Strich = Mitte, Punkt = Kaufpreis */
+      const lo = Math.min(span.low, kp), hi = Math.max(span.high, kp), br = hi - lo || 1, pos = x => Math.max(0, Math.min(100, Math.round((x - lo) / br * 1000) / 10));
+      const balken = `<span class="qcb-sp" role="img" aria-label="Kaufpreis ${e0(kp)}, Marktspanne ${e0(span.low)} bis ${e0(span.high)}">`
+        + `<span class="qcb-sp-b" style="left:${pos(span.low)}%;right:${100 - pos(span.high)}%"></span><span class="qcb-sp-m" style="left:${pos(span.med)}%"></span>`
+        + `<span class="qcb-sp-k ${ueber ? 'bad' : 'ok'}" style="left:${pos(kp)}%"></span></span>`
+        + `<span class="qcb-sp-z"><span>${e0(span.low)}</span><span>Mitte ${e0(span.med)}</span><span>${e0(span.high)}</span></span>`;
+      p += pz(ueber ? 'bad' : 'ok', ueber ? 'Preis über der Marktspanne' : unter ? 'Preis unter der Marktspanne' : 'Preis in der Marktspanne',
+        (wfl > 0 ? e0(kp / wfl) + '/m² · ' : '') + 'Spanne der DealPilot-Marktbewertung'
+        + (!unter && !ueber ? '. Innerhalb der Spanne kein belastbarer Vor- oder Nachteil.' : '.'),
+        e0(kp), (ab >= 0 ? '+' : '') + ab + ' % zur Mitte', balken);
     } else if (urteil && urteil.marktwert > 0 && kp > 0) {
       const ab = Math.round((kp / urteil.marktwert - 1) * 100);
       p += pz(ab > 5 ? 'bad' : 'ok', ab > 5 ? 'Preis über dem Marktwert' : 'Preis im Rahmen des Marktwerts', 'Marktwert ' + e0(urteil.marktwert), e0(kp), (ab >= 0 ? '+' : '') + ab + ' %');
@@ -6093,17 +6103,19 @@ const QcApp = (function() {
           : mb.herkunft === 'jung' ? 'Gebäude jünger als 30 Jahre: ' + mb.grad
           : 'Angenommen, da kein Zustand angegeben: ' + mb.grad + (mb.herkunft === 'rueckfall_energie' ? ' (nach Energieklasse)' : '');
         /* Marcel 17.11.2026: die Annahme steht immer sichtbar, mit dem Weg zum Genauer-Machen */
-        const ann = mb.annahme_satz ? ' ' + mb.annahme_satz.replace(/ ?Den Zustand kannst du je Gewerk einstellen\.$/, '') : '';
+        const ann = mb.annahme_satz ? mb.annahme_satz.replace(/ ?Den Zustand kannst du je Gewerk einstellen\.$/, '') : '';
+        /* v4015 · kurz: woher der Grad kommt und der Weg zum Genauer-Machen; die Annahme je Gewerk klappt auf */
         p += pz('', rnd && rnd.jahre != null ? 'Restnutzungsdauer ' + String(rnd.jahre).replace('.', ',') + ' Jahre' : 'Zustand und Modernisierung',
-          esc(bez + ' (Anlage 2 ImmoWertV, ' + mb.punkte + ' Punkte).' + ann + ' Genauer mit dem Feld Zustand oben oder je Gewerk im Objekt.'),
-          mb.punkte + ' Pkt.', 'Modernisierung');
+          esc(bez + ', ' + mb.punkte + ' Punkte nach Anlage 2 ImmoWertV. Genauer mit dem Feld Zustand oben oder je Gewerk im Objekt.'),
+          mb.punkte + ' Pkt.', 'Modernisierung',
+          ann ? '<details class="qcb-mehr"><summary>Annahme je Gewerk</summary>' + esc(ann) + '</details>' : '');
       }
     } catch (_) {}
     const bmr = QcEngine.num(k.bmr) || 0, kpf = nkm > 0 ? kp / (nkm * 12) : null;
     const lageE = e.lage || null;
     if (lageE) p += pz(lageE.passt ? 'ok' : 'bad', lageE.passt ? 'Rendite erfüllt das Ziel der ' + lageE.klasse + '-Lage' : 'Rendite unter dem Ziel der ' + lageE.klasse + '-Lage',
       'Bruttorendite · Ziel ' + String(lageE.ziel).replace('.', ',') + ' %' + (kpf ? ' · Kaufpreisfaktor ' + kpf.toFixed(1).replace('.', ',') : '')
-      + (lageE.passt ? '' : '. Die Lageklasse ist deine Grenze — der Deal kann trotzdem gut sein, siehe Urteil.'),
+      + (lageE.passt ? '' : '. Die Lageklasse ist deine Grenze, der Deal kann trotzdem gut sein (siehe Urteil).'),
       p1(bmr), 'Ziel ' + String(lageE.ziel).replace('.', ',') + ' %');
     else p += pz(bmr >= 5 ? 'ok' : bmr >= 4 ? 'mid' : 'bad', 'Bruttorendite', 'ohne Lageklasse an der festen Skala (ab 5 % gut)' + (kpf ? ' · Kaufpreisfaktor ' + kpf.toFixed(1).replace('.', ',') : ''), p1(bmr), '');
     const cf = QcEngine.num(k.cfMon) || 0, dscr = QcEngine.num(k.dscr) || 0, Sw = window._qcSw();
@@ -6118,13 +6130,13 @@ const QcApp = (function() {
     try {
       const T = (window.QcHeuristik && QcHeuristik.zielKaufpreisTeile) ? QcHeuristik.zielKaufpreisTeile(D) : null;
       if (T && kp > 0) {
-        const zk = (lbl, v, art, satz) => { if (v == null) return ''; const vr = v >= kp ? kp : Math.floor(v / 1000) * 1000; return `<div class="qcb-zk${T.greift === art ? ' greift' : ''}"><span class="qcb-l">${lbl}</span><div class="v">${e0(v >= kp ? v : vr)}</div><span class="u">${v >= kp ? 'kein Nachlass nötig' : 'Nachlass ' + e0(kp - vr) + ' (' + Math.round((1 - vr / kp) * 100) + ' %)'}${T.greift === art ? ' — diese Grenze greift' : ''}${satz ? ' · ' + satz : ''}</span></div>`; };
+        const zk = (lbl, v, art, satz) => { if (v == null) return ''; const vr = v >= kp ? kp : Math.floor(v / 1000) * 1000; return `<div class="qcb-zk${T.greift === art ? ' greift' : ''}"><span class="qcb-l">${lbl}</span><div class="v">${e0(v >= kp ? v : vr)}</div><span class="u">${v >= kp ? 'kein Nachlass nötig' : 'Nachlass ' + e0(kp - vr) + ' (' + Math.round((1 - vr / kp) * 100) + ' %)'}${T.greift === art ? ', diese Grenze greift' : ''}${satz ? ' · ' + satz : ''}</span></div>`; };
         const zr = D.zielBmr != null ? String(D.zielBmr).replace('.', ',') + ' %' : '6 %';
         h += `<div class="qcb-box"><span class="qcb-l">Zielkaufpreis · was der Preis sein müsste</span><div class="qcb-ziel">`
           + zk('Rendite-Ziel ' + (lk ? lk + '-Lage' : '(ohne Lageklasse)'), T.rendite, 'rendite', zr + ' brutto')
           + zk('Cashflow null · deine Finanzierung', T.cashflow, 'cashflow', '')
           + (T.markt != null ? zk('Marktwert', T.markt, 'markt', '') : '')
-          + `</div>${_qcbZweiteStufe(score, inputs, D, kp, e0, T.greift)}<p class="qcb-fuss">Verhandlungsrahmen, kein Wert.${T.greift === 'cashflow' ? ' Den Preis bremst die Finanzierung, nicht die Lage — mehr Eigenkapital oder ein günstigerer Zins verschieben ihn.' : ''}</p></div>`;
+          + `</div>${_qcbZweiteStufe(score, inputs, D, kp, e0, T.greift)}<p class="qcb-fuss">Verhandlungsrahmen, kein Wert.${T.greift === 'cashflow' ? ' Den Preis bremst die Finanzierung, nicht die Lage, mehr Eigenkapital oder ein günstigerer Zins verschieben ihn.' : ''}</p></div>`;
       }
     } catch (_) {}
 
@@ -6138,7 +6150,7 @@ const QcApp = (function() {
       const wohn = (mp && mp.grund > 0) ? mp.grund : nkm, zus = (mp && mp.zusatz > 0) ? mp.zusatz : 0;
       const q = [];
       if (mp && mp.bremse) q.push(mp.bremse.gilt === true
-        ? 'Mietpreisbremse gilt — ' + link(mp.bremse.verordnung || 'Landesverordnung', mp.bremse.url) + ': bei Neuvermietung höchstens ortsübliche Vergleichsmiete + 10 % (§ 556d BGB); im Quick-Check ist die Vergleichsmiete aus der Marktmiete geschätzt, vor Vertragsschluss mit dem Mietspiegel prüfen'
+        ? 'Mietpreisbremse gilt, ' + link(mp.bremse.verordnung || 'Landesverordnung', mp.bremse.url) + ': bei Neuvermietung höchstens ortsübliche Vergleichsmiete + 10 % (§ 556d BGB); im Quick-Check ist die Vergleichsmiete aus der Marktmiete geschätzt, vor Vertragsschluss mit dem Mietspiegel prüfen'
         : mp.bremse.gilt === false ? (mp.bremse.neubau ? esc(mp.bremse.text) : 'keine Mietpreisbremse, die Gemeinde steht nicht in der ' + link(mp.bremse.verordnung || 'Landesverordnung', mp.bremse.url))
         : esc(mp.bremse.text || ''));
       if (mp && mp.kapp) q.push('Kappungsgrenze ' + mp.kapp.pct + ' % in drei Jahren (' + (mp.kapp.herkunft === 'verordnung' ? link(mp.kapp.verordnung || 'Landesverordnung', mp.kapp.url) : 'gesetzlich, § 558 Abs. 3 Satz 1 BGB') + ')'
@@ -6147,7 +6159,7 @@ const QcApp = (function() {
       let kopfT, pot = '';
       if (leer) {
         /* v3081e · Marcel: „wir sehen ja nicht, ob sie leer ist“ - also keine Aussage zum Leerstand */
-        kopfT = 'Keine Miete angegeben — angesetzt ist die Marktmiete der DealPilot-Bewertung.';
+        kopfT = 'Keine Miete angegeben, angesetzt ist die Marktmiete der DealPilot-Bewertung.';
       } else {
         kopfT = (mp && mp.markt_monat > 0)
           ? 'Deine Ist-Miete, abgeglichen mit der Marktmiete der DealPilot-Bewertung (' + e0(mp.markt_monat) + ', ' + qm(mp.markt_monat) + ')' + (mp.vgl_abschlag && mp.vgl_qm > 0 ? '. Die ortsübliche Vergleichsmiete ist daraus geschätzt, abzüglich ' + mp.vgl_abschlag.pct + ' % (' + String(mp.vgl_qm.toFixed(2)).replace('.', ',') + ' €/m², nicht amtlich).' : ' als Annahme für die ortsübliche Miete.')
@@ -6158,7 +6170,7 @@ const QcApp = (function() {
         /* v3081f · Marcel: „wie gehst du damit um, wenn wir keine Daten haben?“ - ohne Marktmiete kein Abgleich und keine
            Potenzial-Karte; der Satz sagt, ob die Bewertung noch fehlt oder ob sie keine Mieten fand. */
         if (!(mp && mp.markt_monat > 0)) pot = span
-          ? 'Die DealPilot-Marktbewertung fand für diese Adresse keine Vergleichsmieten — ein Abgleich und ein Mietpotenzial sind deshalb nicht möglich. Mietspiegel der Gemeinde oder aktuelle Angebote selbst prüfen.'
+          ? 'Die DealPilot-Marktbewertung fand für diese Adresse keine Vergleichsmieten, ein Abgleich und ein Mietpotenzial sind deshalb nicht möglich. Mietspiegel der Gemeinde oder aktuelle Angebote selbst prüfen.'
           : 'Für den Abgleich oben die DealPilot-Marktbewertung abrufen.';
         else if (wohn > mp.markt_monat * 1.03) {   /* v3356 · C3: erst ab 3 % darüber · v3670: Wohnung */
           /* v3354 · Marcel 13.11.2026: „ist das wirklich das Maximum? Außerdem habe ich kein Risiko beim Mieterwechsel,
@@ -6199,17 +6211,17 @@ const QcApp = (function() {
             + `<span class="qcb-bar" style="height:${Math.max(10, Math.round(b.v / max * 90))}px"></span><i>${b.t}</i></div>`).join('')
           + `</div><p class="qcb-fuss" style="color:#2A2727;font-size:12.5px">`
           + (z3 != null && z3 > wohn + 0.5
-              ? 'Im laufenden Mietverhältnis: bis <b>' + e0(z3) + '</b> in drei Jahren (+' + jahr(z3 - wohn) + ' im Jahr) — begrenzt durch ' + (mp.zul.grund === 'kappung' ? 'die Kappungsgrenze von ' + mp.kapp.pct + ' %' : 'die Marktmiete') + '. '
+              ? 'Im laufenden Mietverhältnis: bis <b>' + e0(z3) + '</b> in drei Jahren (+' + jahr(z3 - wohn) + ' im Jahr), begrenzt durch ' + (mp.zul.grund === 'kappung' ? 'die Kappungsgrenze von ' + mp.kapp.pct + ' %' : 'die Marktmiete') + '. '
               : '')
           + 'Bei einem Mieterwechsel: <b>' + e0(mp.markt_monat) + '</b> (+' + jahr(mp.markt_monat - wohn) + ' im Jahr).'
           + (zus > 0 ? ' Alle Beträge für die Wohnung, ohne Stellplatz, Küche und Sonstiges (' + e0(zus) + ' im Monat).' : '')   /* v3670 */
-          + '</p><p class="qcb-fuss">Vergleichsgröße ist die Marktmiete der DealPilot-Bewertung als Annahme für die ortsübliche Miete. Wann die letzte Erhöhung war, sehen wir nicht — vor einer Erhöhung prüfen (§ 558 Abs. 1 BGB: frühestens 15 Monate nach der letzten).</p></div>';
+          + '</p><p class="qcb-fuss">Vergleichsgröße ist die Marktmiete der DealPilot-Bewertung als Annahme für die ortsübliche Miete. Wann die letzte Erhöhung war, sehen wir nicht, vor einer Erhöhung prüfen (§ 558 Abs. 1 BGB: frühestens 15 Monate nach der letzten).</p></div>';
       }
     }
 
     /* 5 · Dafür / Dagegen, je drei */
-    const kurz = a => a.slice(0, 3).map(x => '<li>' + x + '</li>').join('');
-    h += `<div class="qcb-box qcb-pc"><div class="qcb-pro"><span class="qcb-l" style="color:#2f7d55">Dafür</span><ul>${kurz(pros) || '<li>—</li>'}</ul></div>`
+    const kurz = a => a.slice(0, 3).map(x => '<li>' + String(x).replace(/ — /g, ', ') + '</li>').join('');
+    h += `<div class="qcb-box qcb-pc"><div class="qcb-pro"><span class="qcb-l" style="color:#2f7d55">Dafür</span><ul>${kurz(pros) || '<li>keine</li>'}</ul></div>`
       + `<div class="qcb-con"><span class="qcb-l" style="color:#B8625C">Dagegen</span><ul>${kurz(cons) || '<li>Keine kritischen Punkte</li>'}</ul></div></div>`;
     host.innerHTML = h + '</div>';
 
