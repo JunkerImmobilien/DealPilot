@@ -263,8 +263,8 @@ export const ABLAEUFE = [
     titel: 'Steuer: Einkommen, Steuerzeiträume und BMF-Kaufpreisaufteilung',
     kurz: 'Die Steuerwirkung des Objekts richtig rechnen lassen: dein Einkommen über die Jahre, der Gebäudeanteil und die Werbungskosten bis zum Finanzamt-PDF.',
     schritte: [
-      { t: 'Reiter **Steuer**, Karte **Persönliche Steuer**: dein zu versteuerndes Einkommen (zvE) vor der Immobilie eintragen. Mit dem Haken **Grenzsteuersatz automatisch aus zvE berechnen** rechnet DealPilot den Satz selbst.',
-        belege: [[IX, 'Persönliche Steuer'], [IX, 'Zu versteuerndes Einkommen (zvE) vor Immobilie / Jahr'], [IX, 'Grenzsteuersatz automatisch aus zvE berechnen']] },
+      { t: 'Reiter **Steuer**, Karte **Persönliche Steuer**: dein zu versteuerndes Einkommen (zvE) vor der Immobilie eintragen. Daraus rechnet DealPilot den Grenzsteuersatz selbst.',
+        belege: [[IX, 'Persönliche Steuer'], [IX, 'Zu versteuerndes Einkommen (zvE) vor Immobilie / Jahr'], [IX, 'Persönl. Grenzsteuersatz']] },
       { t: 'Ändert sich dein Einkommen über die Jahre: **Steuerzeiträume verwalten →**. Unter **Neuen Zeitraum hinzufügen** **Gültig von**, **Gültig bis (leer = laufend)**, **zvE / Jahr (€)** und einen **Grund** eintragen, dann **Hinzufügen**. Überschneidet sich ein Zeitraum, zeigt DealPilot den Konflikt — du kannst abbrechen oder **Trotzdem als neuen Zeitraum anlegen**.',
         belege: [[IX, 'Steuerzeiträume verwalten →</a>'], [J('tax-periods.js'), 'Neuen Zeitraum hinzufügen'], [J('tax-periods.js'), 'Gültig bis (leer = laufend)'], [J('tax-periods.js'), 'zvE / Jahr (€)'], [J('tax-periods.js'), 'Trotzdem als neuen Zeitraum anlegen']] },
       { t: 'Karte **AfA-Konfiguration**: **AfA-Satz** und **Gebäudeanteil am KP (%)** prüfen. Für einen genaueren Gebäudeanteil rechts in der Karte den Knopf **BMF-Rechner** öffnen (nicht den Link unter „Hilfreiche Links“).',

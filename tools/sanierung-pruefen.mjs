@@ -58,6 +58,7 @@ function umgebung(mitPlan) {
       body: { appendChild() {} }, readyState: 'complete'
     },
     localStorage: { getItem: () => null, setItem() {}, removeItem() {} },
+    addEventListener() {}, removeEventListener() {},   /* v4070: tax.js meldet sich seit v4009 am window an */
     Event: function () {}, setTimeout: () => 0, clearTimeout() {}, fetch: async () => ({ ok: false, json: async () => ({}) }),
     State: { _ahk: { sanLimit: 29700, nkQuote: 0 }, cfRows: null, _afaSeriesNormal: Array(60).fill(3000), _afaSeriesSonder: [], kpis: { afa: 3000 }, _afaBreakdown: { gebaeude: 3000, kueche: 0 } }
   };
@@ -127,6 +128,13 @@ for (const [san, txt] of [['', 'ohne Sanierung'], ['20000', 'Sanierung 20.000 un
   melde(nahe(U.jahr(1).anschaffungsnah, 800) && nahe(U.jahr(1).erhaltungsaufwand, 0), 'D 2027: #san 400 + Bad 400 anschaffungsnah, kein Erhaltungsaufwand', [U.jahr(1).anschaffungsnah, U.jahr(1).erhaltungsaufwand]);
   const r = U.sb.DpSanierungPlan.kern.steuerAus(JSON.parse(U.felder.san_plan.value), { A: 2026, grenze: 29700, sanNetto: 20000 / 1.19, ust: 'brutto', afaSatz: 2 });
   melde(r.ueber === true && nahe(r.summeNetto, 40000 / 1.19, 0.5), 'D Kern: ueber = true, Summe 33.613 netto', r);
+  /* v4070 · #san ueber der Grenze mit fester Wahl 3 Jahre: anschaffungsnah wie die Ampel, nicht verteilt */
+  { const V = umgebung(true); V.felder.san.value = '40000'; V.felder.san_tax_years.value = '3';
+    melde(nahe(V.jahr(0).erhaltungsaufwand, 0) && nahe(V.jahr(0).anschaffungsnah, 800), 'D v4070 #san 40.000 ueber der Grenze, Wahl 3 Jahre: AfA 800 statt 13.333 Erhaltung', [V.jahr(0).erhaltungsaufwand, V.jahr(0).anschaffungsnah]);
+    V.felder.san.value = '20000';
+    melde(nahe(V.jahr(0).erhaltungsaufwand, 20000 / 3) && nahe(V.jahr(2).erhaltungsaufwand, 20000 / 3) && nahe(V.jahr(3).erhaltungsaufwand, 0), 'D v4070 #san 20.000 unter der Grenze, Wahl 3 Jahre: 3 x 6.666,67 (§ 82b)', [V.jahr(0).erhaltungsaufwand, V.jahr(2).erhaltungsaufwand, V.jahr(3).erhaltungsaufwand]);
+    const e0 = V.jahr(0)._erhV, e2 = V.jahr(2)._erhV;
+    melde(e0 && nahe(e0[2026], 20000 / 3) && e2 && nahe(e2[2026], 20000 / 3) && nahe(V.jahr(0)._erhG, 20000), 'D v4070 Anlage V: je Jahr Anteil aus 2026, Gesamtaufwand 20.000 im Jahr 2026', { e0, e2, g: V.jahr(0)._erhG }); }
   /* feste Verteilung bleibt die Wahl des Nutzers - mit Warnung */
   U.felder.san_plan.value = JSON.stringify([{ bez: 'Bad', jahr: 2027, betrag: 20000, art: 'erhaltung', vert: '1' }]);
   const r1 = U.sb.DpSanierungPlan.kern.steuerAus(JSON.parse(U.felder.san_plan.value), { A: 2026, grenze: 29700, sanNetto: 20000 / 1.19, ust: 'brutto', afaSatz: 2 });

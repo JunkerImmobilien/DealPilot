@@ -548,6 +548,7 @@
       hsel.addEventListener('change', function () {
         try { if (typeof calc === 'function') calc(); } catch (e) {}
         try { if (typeof renderTaxModule === 'function') renderTaxModule(); } catch (e) {}
+        try { _syncUeberf(); } catch (e) {}   /* v4070: Hinweis zum Halter nachziehen */
       });
     }
     _syncUeberf();
@@ -617,6 +618,22 @@
               : 'Fest, weil dieses Objekt zum <b>' + esc(_fmtDe((_endeEl2 && _endeEl2.value) || '')) + '</b> &uuml;berf&uuml;hrt und eingefroren wurde.';
           }
         } else if (_hHint) { _hHint.remove(); }
+        /* v4070 · Marcel 23.11.2026: „Ich kann auch unter Halter & Eigentum die Wohnung der Gesellschaft zuordnen.
+           Ist das richtig?“ Ja, für ein Objekt, das die Gesellschaft SELBST kauft: dann rechnet es mit Körperschaft-
+           und Gewerbesteuer (bzw. Feststellung bei der GbR). Gehört es heute dir privat, ist der Wechsel eine
+           Überführung (Grunderwerbsteuer, neue AfA-Basis, privates Veräußerungsgeschäft) und gehört in den Assistenten. */
+        var _dHint = document.getElementById('mand-halter-direkt-hint');
+        var _direkt = !_frozen && _hsel.value && _hsel.value !== 'privat';
+        if (_direkt) {
+          if (!_dHint && _hHost) {
+            _dHint = document.createElement('span');
+            _dHint.id = 'mand-halter-direkt-hint';
+            _dHint.className = 'hint';
+            _dHint.style.cssText = 'display:block;margin-top:4px;font-size:11.5px;line-height:1.45';
+            _hHost.appendChild(_dHint);
+          }
+          if (_dHint) _dHint.textContent = 'Passt, wenn die Gesellschaft das Objekt selbst kauft. Gehört es heute dir privat, nutze die Überführung (Einstellungen › Mandanten › Privat › „In Gesellschaft überführen“). Dort rechnen Grunderwerbsteuer und die neue AfA-Basis mit.';
+        } else if (_dHint) { _dHint.remove(); }
       }
     } catch (_he) {}
     try { _renderUeberfBadge(); } catch (_e) {}

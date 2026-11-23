@@ -1,10 +1,10 @@
 {
- "erzeugt_am": "2026-11-23T13:32:48.583Z",
+ "erzeugt_am": "2026-11-23T14:55:13.870Z",
  "quellen": {
   "voice-import": "a8a2e6dba58ea42c",
   "objektart-felder": "16af21246a92d8f6",
   "storage": "d7465228c8595ebb",
-  "index-html": "6b7ff8e6bd868fb9",
+  "index-html": "abac507ffa8e38f3",
   "grest": "81f3fb0a4de3a6cf"
  },
  "daten": {
@@ -4140,7 +4140,7 @@
     "abschnitte": [
      {
       "h": "Grenzsteuersatz und Steuerwirkung",
-      "text": "Im Reiter Steuer, Karte „Persönliche Steuer“, trägst du dein Zu versteuerndes Einkommen (zvE) vor Immobilie ein. Ist „Grenzsteuersatz automatisch aus zvE berechnen“ angehakt, rechnet DealPilot den Satz nach § 32a EStG (Tarif 2026). Nimmst du den Haken heraus, kannst du ihn selbst eintragen. Das zvE wird zentral in deinem Profil gespeichert.\n\nWie die Wirkung entsteht: Das steuerliche Ergebnis des Objekts — Miete minus Kosten und AfA — wird auf dein zvE gerechnet. Die Steuerwirkung ist die Differenz zweier Tarifberechnungen, mit und ohne das Objekt. Daraus entsteht der Cashflow nach Steuer.\n\nGespeicherte Bestandsobjekte rechnen mit, in der Reihenfolge ihres Kaufzeitpunkts: ein Verlust aus einem älteren Objekt senkt die Basis, auf der dieses spart. Verlustverrechnungsgrenzen (§ 15a, § 15b, § 10d EStG) bleiben außen vor."
+      "text": "Im Reiter Steuer, Karte „Persönliche Steuer“, trägst du dein Zu versteuerndes Einkommen (zvE) vor Immobilie ein. Daraus rechnet DealPilot den Grenzsteuersatz nach § 32a EStG selbst. Nur ohne zvE trägst du ihn von Hand ein. Das zvE wird zentral in deinem Profil gespeichert.\n\nWie die Wirkung entsteht: Das steuerliche Ergebnis des Objekts — Miete minus Kosten und AfA — wird auf dein zvE gerechnet. Die Steuerwirkung ist die Differenz zweier Tarifberechnungen, mit und ohne das Objekt. Daraus entsteht der Cashflow nach Steuer.\n\nGespeicherte Bestandsobjekte rechnen mit, in der Reihenfolge ihres Kaufzeitpunkts: ein Verlust aus einem älteren Objekt senkt die Basis, auf der dieses spart. Verlustverrechnungsgrenzen (§ 15a, § 15b, § 10d EStG) bleiben außen vor."
      },
      {
       "h": "Steuerzeiträume: zvE im Zeitverlauf",
@@ -5746,7 +5746,7 @@
   }
  },
  "inhalt": {
-  "hilfe": "3a4f541a8727888d",
+  "hilfe": "2a5bec521f3fb8c8",
   "bewertung": "4119201154a9f321"
  }
 }

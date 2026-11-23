@@ -1595,6 +1595,15 @@ function _computeAutoForYear(yearIdx, year, teiljahr) {
     sanAnschaffungsnah = true;
     sanLaufzeit = afa_nutzungsdauer;
     sanAfaJaehrlich = san_inp * afa_satz_eff / 100;   /* v3006b */
+  } else if ((san_netto + (_sp.fensterNetto || 0)) > sanGrenze15) {
+    /* v4070 · Marcel 23.11.2026 „werden die Erhaltungsaufwendungen tatsächlich richtig aufgeteilt?“ Nein,
+       nicht in diesem Fall: über der 15-%-Grenze sind die Kosten anschaffungsnahe Herstellungskosten
+       (§ 6 Abs. 1 Nr. 1a EStG), das ist kein Wahlrecht. Bis v4069 verteilte eine feste Wahl (1 bis 5 Jahre)
+       sie trotzdem als Erhaltung, während die Ampel im Reiter Investition „anschaffungsnahe HK“ sagte.
+       Jetzt rechnet die Steuer wie die Ampel. */
+    sanAnschaffungsnah = true;
+    sanLaufzeit = afa_nutzungsdauer;
+    sanAfaJaehrlich = san_inp * afa_satz_eff / 100;
   } else {
     // Manuell: feste Jahresanzahl als Erhaltungsaufwand
     sanAnschaffungsnah = false;
@@ -2149,6 +2158,7 @@ function _dpAnschaffungsnah() {
   if (!aktiv || !(san > 0)) { an = false; grund = 'keine Sanierung übernommen'; }
   else if (wahl === '50') { an = true; grund = 'als anschaffungsnah gewählt'; }
   else if (wahl === 'auto') { an = (netto + fenster) > grenze; grund = an ? '15-%-Grenze überschritten' : 'unter der 15-%-Grenze'; }
+  else if ((netto + fenster) > grenze) { an = true; grund = '15-%-Grenze überschritten, eine Verteilung ist dann nicht möglich'; }   /* v4070 wie _computeAutoForYear */
   else { an = false; grund = 'als Erhaltungsaufwand gewählt'; }
   var gebPct = null; try { gebPct = pd((g('geb_ant') || {}).value) || null; } catch (e) {}
   return { an: an, betrag: an ? san : 0, san: san, netto: netto, fenster: fenster, grenze: grenze, wahl: wahl, grund: grund, gebPct: gebPct };
@@ -3168,8 +3178,12 @@ renderTaxTimeline = function() {
 function _grenzAutoNachziehen(mitToast) {
   var auto = document.getElementById('grenz_auto');
   var grenzInput = document.getElementById('grenz');
-  if (!auto || !grenzInput) return false;
-  if (auto.checked) {
+  if (!grenzInput) return false;
+  /* v4070 · Marcel 23.11.2026: „kann die raus? sollten wir das nicht immer daraus ermitteln?“ Der Haken
+     #grenz_auto ist aus der Ansicht genommen, der Satz kommt IMMER aus dem zvE. Alte Objekte mit Haken aus
+     werden beim Laden still auf an gestellt (kein Speichern), von Hand eintragen geht nur ohne zvE. */
+  if (auto) auto.checked = true;
+  {
     /* v3188: dasselbe zvE wie die Jahresrechnung des laufenden Jahres (_dpZveFuerJahr), nicht blind das Feld */
     var zve = parseDe((document.getElementById('zve') || {}).value) || 0;
     try { var _zj = window._dpZveFuerJahr && window._dpZveFuerJahr(new Date().getFullYear()); if (_zj && _zj.zve > 0 && _zj.quelle !== 'ersatz') zve = _zj.zve; } catch (_eZ) {}
@@ -3270,7 +3284,7 @@ function _grenzErklaeren() {
     teile.push('Solidaritätszuschlag' + (mild ? ' in der Milderungszone (er wächst dort mit 11,9 % jeder Mehrsteuer, bis er 5,5 % erreicht)' : ' 5,5 %'));
   }
   if (o.kist > 0) teile.push('Kirchensteuer ' + Math.round(o.kist * 100) + ' %');
-  var t = (document.getElementById('grenz_auto') || {}).checked
+  var t = true   /* v4070: immer aus dem zvE */
     ? 'Aus dem zvE ' + Math.round(zve).toLocaleString('de-DE') + ' € (' + jahr + (zq && zq.quelle === 'steuerzeitraum' ? ', Steuerzeitraum' : '') + (o.splitting ? ', Splitting' : '') + '): ' + teile.join(' + ') + ' = ' + pz(gGes, 1) + ' auf jeden weiteren Euro.'
     : 'Von Hand eingetragen. Aus dem zvE ergäben sich ' + pz(gGes, 1) + ' (' + teile.join(' + ') + ').';
   /* v3188 · Steuerzeitraum des laufenden Jahres und Feld widersprechen sich: sagen, was gilt */
