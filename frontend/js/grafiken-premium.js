@@ -111,6 +111,7 @@
       '.dp-gx-reihe>.dp-gx{margin:0!important}',
       '@media (max-width:900px){.dp-gx-reihe{grid-template-columns:minmax(0,1fr)}}',
       '.dp-gx{position:relative;margin:0 0 16px;min-width:0}',
+      '.dp-pa-wrap .dp-gn.dp-gx:empty{padding:0!important;border:0!important;box-shadow:none!important;margin:0!important;min-height:0!important;background:none!important}',   /* leere Karte (keine Daten) nimmt keinen Platz, behält aber ihre Breite für das Neuzeichnen */
       '.dp-gx .gx-fade{animation:gxFade .6s ease-out both}',
       '.dp-gx .gx-zieh{stroke-dasharray:var(--gx-len);stroke-dashoffset:var(--gx-len);animation:gxZieh 1.2s ease-out .1s forwards}',
       '.dp-gx .gx-wx{transform-box:fill-box;animation:gxWx .7s cubic-bezier(.2,.7,.2,1) both}',
@@ -788,7 +789,7 @@
     /* Übersicht: Einordnung + Fingerabdruck oben, dann (v4140) Vermögen + Brücke, dann Heatmap kompakt, Mieteuro, Fahrplan */
     var ue = document.getElementById('dp-pa-uebersicht');
     if (ue) {
-      var r1 = reihe(ue, 'ue-oben', ue.firstChild);
+      var r1 = reihe(ue, 'ue-oben', ue.querySelector(':scope > .dp-pa5-zwei') || ue.firstChild);   /* nach Satz und Kennzahlen, vor der Einordnung in Worten */
       zeichneMit(h, kind(r1, 'gx-einordnung'), sig + kpSig, function (k, w) { karteEinordnung(k, w, false); });
       zeichneMit(h, kind(r1, 'gx-finger'), sig + kpSig, function (k, w) { karteFingerabdruck(k, w); });
       var nach = ue.querySelector('[data-dp-gn="ue-reihe"]');
