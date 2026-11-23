@@ -4224,6 +4224,15 @@
       var zw = 0, zws = 0; arr.forEach(function (o) { var z = _pct(o.d1z), r = _restschuldOf(o) || 1; if (z > 0) { zw += r; zws += z * r; } });
       return { S: S, W: W, BW: BW, BS: BS, n: arr.length, avgZins: zw > 0 ? zws / zw : null, mbLaedt: W.some(function (x) { return x.quelle === 'laedt'; }) };
     },
+    /* v4260 · Restliche Cockpit-Grafiken im neuen Stil (grafiken-portfolio.js): dieselben Quellen wie buildCharts()
+       (_bilanzHeute, projectAll) und die Steuerkette - nur gelesen, nichts neu gerechnet. */
+    vermoegenBlick: function () {
+      if (!_detailsLoaded) return null;
+      var arr = detailArr(); if (!arr.length) return null;
+      var PR = []; try { PR = projectAll(_projYears); } catch (e) { PR = []; }
+      return { H: _bilanzHeute(arr), PR: PR, jahre: _projYears, annahmen: { wert: ASSUMP.wertWg, miete: ASSUMP.mietWg, zins: ASSUMP.zinsApprox } };
+    },
+    steuerKetteDaten: function (jahr) { try { return steuerKette(jahr); } catch (e) { return null; } },
     /* v2170: die Detailkopien werden sonst nur beim LOESCHEN erneuert - eine
        Pilot-Analyse aus derselben Sitzung kam beim Portfolio-Piloten nie an
        (gemessen: Stand 09.10. statt 13.10.). Vor jeder Pilot-Anfrage frisch. */
