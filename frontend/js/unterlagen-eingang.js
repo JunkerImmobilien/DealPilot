@@ -53,12 +53,12 @@
   }
 
   /* ── Eingang ──────────────────────────────────────────────────────────── */
-  function oeffnen() {
+  function oeffnen(wie) {   /* v4080 · wie = { reiter: 'jahre', jahr } öffnet auf „Belege je Jahr“ */
     var OA = window.ObjectActions;
     if (!OA || typeof OA.openImport !== 'function') { try { if (window.toast) window.toast('Import nicht geladen – Seite neu laden.'); } catch (e) {} return; }
     var ergaenzen = false;
     try { ergaenzen = !!(window.DpUnterlagen && window.DpUnterlagen.laden()); } catch (e) {}
-    OA.openImport(null, { ergaenzen: ergaenzen, eingang: true });
+    OA.openImport(null, { ergaenzen: ergaenzen, eingang: true, reiter: wie && wie.reiter, jahr: wie && wie.jahr });
   }
 
   /* ── Rechnungen erkennen ──────────────────────────────────────────────────
@@ -530,89 +530,112 @@
     });
     return { zeilen: zeilen, buchungen: B };
   }
+  /* v4080 · Marcel 23.11.2026: „Belege je Jahr“ mit „Belege einlesen“ verknüpfen, im selben Fenster unter
+     einem eigenen Reiter, mit Herkunft und im Design des Einlesens. Das eigene Fenster #dp-jb (v3164) ist
+     damit weg, jahresAnsicht() öffnet den Eingang auf dem Reiter „Belege je Jahr“. Gezeichnet wird in den
+     Rahmen, den object-actions.js (openCombinedImport, Reiter oabi-r-jahre) bereitstellt. */
   function _belegCss() {
-    if (el('dp-jb-css')) return;
-    var s = document.createElement('style'); s.id = 'dp-jb-css';
-    s.textContent = '#dp-jb{position:fixed;inset:0;z-index:100060;background:rgba(5,5,5,.72);display:flex;align-items:center;justify-content:center;padding:16px}'
-      + '#dp-jb .jb-k{background:var(--surface,#FDFCFA);color:var(--text,#2A2727);border-radius:14px;width:min(1100px,100%);max-height:92vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.4)}'
-      + '#dp-jb .jb-kopf{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid var(--wl-c9a84c,#C9A84C)}'
-      + '#dp-jb .jb-kopf b{flex:1;min-width:0;font-size:16px}'
-      + '#dp-jb .jb-zu{border:0;background:transparent;font-size:24px;line-height:1;cursor:pointer;color:inherit;padding:4px 8px}'
-      + '#dp-jb .jb-jahre{display:flex;gap:6px;padding:10px 16px;overflow-x:auto;flex:0 0 auto;border-bottom:1px solid rgba(0,0,0,.08)}'
-      + '#dp-jb .jb-jahre button{flex:0 0 auto;border:1px solid rgba(0,0,0,.18);background:transparent;color:inherit;border-radius:16px;padding:5px 12px;font:inherit;font-size:13px;cursor:pointer}'
-      + '#dp-jb .jb-jahre button.an{background:var(--wl-c9a84c,#C9A84C);border-color:var(--wl-c9a84c,#C9A84C);color:#050505;font-weight:700}'
-      + '#dp-jb .jb-jahre button i{font-style:normal;opacity:.7;margin-left:4px}'
-      + '#dp-jb .jb-inhalt{overflow:auto;padding:12px 16px 16px;flex:1 1 auto}'
-      + '#dp-jb .jb-summe{display:flex;flex-wrap:wrap;gap:8px 20px;margin-bottom:12px;font-size:13px}'
-      + '#dp-jb .jb-summe b{font-size:15px}'
-      + '#dp-jb details{border:1px solid rgba(0,0,0,.1);border-radius:10px;margin-bottom:8px;background:rgba(0,0,0,.015)}'
-      + '#dp-jb summary{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:4px 16px;align-items:center;padding:10px 12px;cursor:pointer;list-style:none}'
-      + '#dp-jb summary::-webkit-details-marker{display:none}'
-      + '#dp-jb summary .jb-p{font-weight:600;min-width:0}'
-      + '#dp-jb summary .jb-p small{display:block;font-weight:400;opacity:.65;font-size:12px}'
-      + '#dp-jb .jb-z{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}'
-      + '#dp-jb .jb-z small{display:block;opacity:.6;font-size:11px}'
-      + '#dp-jb .jb-liste{padding:0 12px 10px}'
-      + '#dp-jb .jb-b{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr) auto;gap:2px 12px;padding:7px 0;border-top:1px solid rgba(0,0,0,.07);font-size:13px}'
-      + '#dp-jb .jb-b span{min-width:0;overflow-wrap:anywhere}'
-      + '#dp-jb .jb-b small{display:block;opacity:.6;font-size:11.5px}'
-      + '#dp-jb .jb-hin{font-size:12.5px;opacity:.8;padding:7px 0;border-top:1px dashed rgba(0,0,0,.15)}'
-      + '#dp-jb .jb-warn{color:#B8625C;font-weight:600}'
-      + '#dp-jb .jb-fuss{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:10px 16px;border-top:1px solid rgba(0,0,0,.08);font-size:12px}'
-      + '#dp-jb .jb-fuss span{flex:1 1 260px;opacity:.7}'
-      + '@media (max-width:640px){#dp-jb{padding:0;align-items:stretch}#dp-jb .jb-k{border-radius:0;max-height:none;height:100%}'
-      + '#dp-jb summary{grid-template-columns:minmax(0,1fr) auto}#dp-jb summary .jb-z:not(.jb-zb){grid-column:2;grid-row:1}#dp-jb summary .jb-zb{grid-column:1/-1;grid-row:2;text-align:left}#dp-jb summary .jb-zb:empty{display:none}#dp-jb summary .jb-zb small{display:inline;margin-left:4px}'
-      + '#dp-jb .jb-b{grid-template-columns:minmax(0,1fr) auto}#dp-jb .jb-b .jb-d{grid-column:1/-1;order:3}}';
+    if (el('ue-bj-css')) return;
+    var s = document.createElement('style'); s.id = 'ue-bj-css';
+    s.textContent = '.ue-bj{font-family:Inter,system-ui,sans-serif;color:var(--ch,#2A2727)}'
+      + '.ue-bj-jahre{display:flex;gap:6px;overflow-x:auto;padding:2px 0 10px;-webkit-overflow-scrolling:touch}'
+      + '.ue-bj-jahre button{flex:0 0 auto;border:1px solid var(--border,#E7E2DC);background:#fff;color:var(--ch,#2A2727);border-radius:8px;padding:5px 11px;font:600 12.5px/1.3 Inter,system-ui,sans-serif;cursor:pointer}'
+      + '.ue-bj-jahre button.an{background:var(--gold,#C9A84C);border-color:var(--gold,#C9A84C);color:#fff}'
+      + '.ue-bj-jahre button i{font-style:normal;opacity:.75;margin-left:4px;font-size:10px}'
+      + '.ue-bj-summe{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:0 0 12px}'
+      + '.ue-bj-summe span{background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 6%, #fff);border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 25%, transparent);border-radius:10px;padding:8px 10px;font-size:11.5px;color:var(--muted,#7A7370);line-height:1.35}'
+      + '.ue-bj-summe b{display:block;font-size:15px;color:var(--ch,#2A2727);font-variant-numeric:tabular-nums;margin-top:2px}'
+      + '.ue-bj details{background:#fff;border:1px solid var(--border,#E7E2DC);border-radius:8px;margin-bottom:6px}'
+      + '.ue-bj summary{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:4px 14px;align-items:center;padding:8px 10px;cursor:pointer;list-style:none;font-size:12.5px}'
+      + '.ue-bj summary::-webkit-details-marker{display:none}'
+      + '.ue-bj .bj-p{font-weight:600;min-width:0}'
+      + '.ue-bj .bj-p small{display:block;font-weight:400;color:var(--muted,#7A7370);font-size:11px}'
+      + '.ue-bj .bj-q{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.02em;padding:1px 6px;border-radius:5px;margin:0 4px 0 0;vertical-align:1px;border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 45%, transparent);color:var(--wl-9a7f33, #9a7f33);background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 7%, transparent)}'
+      + '.ue-bj .bj-q.hand{border-color:var(--border,#E7E2DC);color:var(--muted,#7A7370);background:transparent}'
+      + '.ue-bj .bj-z{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}'
+      + '.ue-bj .bj-z small{display:block;color:var(--muted,#7A7370);font-size:10.5px}'
+      + '.ue-bj .bj-liste{padding:0 10px 8px}'
+      + '.ue-bj .bj-b{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr) auto;gap:2px 12px;padding:6px 0;border-top:1px solid rgba(42,39,39,0.07);font-size:12px}'
+      + '.ue-bj .bj-b span{min-width:0;overflow-wrap:anywhere}'
+      + '.ue-bj .bj-b small{display:block;color:var(--muted,#7A7370);font-size:10.5px}'
+      + '.ue-bj .bj-hin{font-size:11.5px;color:var(--muted,#7A7370);padding:6px 0;border-top:1px dashed rgba(42,39,39,0.15)}'
+      + '.ue-bj .bj-warn{color:#B8625C;font-weight:600}'
+      + '.ue-bj-fuss{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px;font-size:11px;color:var(--muted,#7A7370)}'
+      + '.ue-bj-fuss span{flex:1 1 260px}'
+      + '@media (max-width:640px){.ue-bj-summe{grid-template-columns:1fr 1fr}.ue-bj-summe span:last-child{grid-column:1/-1}'
+      + '.ue-bj summary{grid-template-columns:minmax(0,1fr) auto}.ue-bj summary .bj-z:not(.bj-zb){grid-column:2;grid-row:1}.ue-bj summary .bj-zb{grid-column:1/-1;grid-row:2;text-align:left}.ue-bj summary .bj-zb:empty{display:none}.ue-bj summary .bj-zb small{display:inline;margin-left:4px}'
+      + '.ue-bj .bj-b{grid-template-columns:minmax(0,1fr) auto}.ue-bj .bj-b .bj-d{grid-column:1/-1;order:3}}';
     document.head.appendChild(s);
   }
+  /* Herkunft eines Postens als kurze Marken: woher der Wert kommt */
+  function _quellen(z, h) {
+    var q = [], hat = function (t) { return q.indexOf(t) >= 0; };
+    z.belege.forEach(function (b) { var t = b.quelle === 'ViVi' || b.datei === 'ViVi' ? 'ViVi' : 'Beleg eingelesen'; if (!hat(t)) q.push(t); });
+    if (h && h.quelle === 'ViVi' && !hat('ViVi')) q.push('ViVi');
+    if (h && h.quelle === 'Unterlage') q.push('Unterlage');
+    if (z.schaetzung) q.push('App berechnet');
+    else if (!q.length || (z.rest != null && Math.abs(z.rest) >= 0.5 && !(h && (h.quelle === 'Unterlage' || h.quelle === 'ViVi')))) q.push('von Hand');
+    return q;
+  }
   var _jbJahr = null;
-  function jahresAnsicht(jahr) {
-    _belegCss();
-    var jahre = (typeof window.dpWkJahre === 'function' ? window.dpWkJahre() : []) || [];
+  function _jahre() {
+    var jahre = ((typeof window.dpWkJahre === 'function' ? window.dpWkJahre() : []) || []).slice();
     var o = lesen(), mitBelegen = {};
     (o.buchungen || []).forEach(function (b) { mitBelegen[b.jahr] = (mitBelegen[b.jahr] || 0) + 1; });
     Object.keys(mitBelegen).forEach(function (j) { if (jahre.indexOf(Number(j)) < 0) jahre.push(Number(j)); });
     jahre.sort(function (a, b) { return a - b; });
-    if (!jahre.length) { try { if (window.toast) window.toast('Noch keine Steuerjahre – bitte erst Kaufdatum und Werte eingeben.'); } catch (e) {} return; }
+    return { jahre: jahre, mitBelegen: mitBelegen };
+  }
+  function jahresInRahmen(box, jahr) {
+    if (!box) return;
+    _belegCss();
+    var J = _jahre(), jahre = J.jahre, mitBelegen = J.mitBelegen;
+    if (!jahre.length) { box.innerHTML = '<div class="ue-bj"><p class="oabi-sub" style="padding:0">Noch keine Steuerjahre. Bitte erst Kaufdatum und Werte eingeben.</p></div>'; return; }
     var heute = new Date().getFullYear();
     jahr = Number(jahr || _jbJahr) || (jahre.indexOf(heute) >= 0 ? heute : jahre[0]);
+    if (jahre.indexOf(jahr) < 0) jahr = jahre.indexOf(heute) >= 0 ? heute : jahre[jahre.length - 1];
     _jbJahr = jahr;
-    var d = _jahrDaten(jahr), sumWert = 0, sumBel = 0;
+    var d = _jahrDaten(jahr), H = lesen().herkunft['y' + jahr] || {}, sumWert = 0, sumBel = 0;
     d.zeilen.forEach(function (z) { if (z.feld !== 'afa') sumWert += z.wert; sumBel += z.summe; });
-    var alt = el('dp-jb'); if (alt) alt.remove();
-    var ov = document.createElement('div'); ov.id = 'dp-jb';
     var posten = d.zeilen.map(function (z) {
       var liste = z.belege.map(function (b) {
-        return '<div class="jb-b"><span>' + esc(b.position || '—') + '<small>' + esc(b.datei) + (b.aussteller ? ' · ' + esc(b.aussteller) : '') + '</small></span>'
-          + '<span class="jb-d">' + esc(b.datum || '') + '<small>übernommen ' + esc(String(b.am || '').split('-').reverse().join('.')) + (b.hand ? ' · Betrag von Hand geändert' : '') + '</small></span>'
-          + '<span class="jb-z">' + eur2(b.betrag) + '</span></div>';
+        var vivi = b.quelle === 'ViVi' || b.datei === 'ViVi';
+        return '<div class="bj-b"><span>' + esc(b.position || '—') + '<small>' + (vivi ? 'aus ViVi' : esc(b.datei)) + (b.aussteller ? ' · ' + esc(b.aussteller) : '') + '</small></span>'
+          + '<span class="bj-d">' + esc(b.datum || '') + '<small>übernommen ' + esc(String(b.am || '').split('-').reverse().join('.')) + (b.hand ? ' · Betrag von Hand geändert' : '') + '</small></span>'
+          + '<span class="bj-z">' + eur2(b.betrag) + '</span></div>';
       }).join('');
-      var hin = z.art ? '<div class="jb-hin' + (z.rest != null && z.rest < -0.5 ? ' jb-warn' : '') + '">' + (z.rest != null && Math.abs(z.rest) >= 0.5 && z.belege.length ? (z.rest > 0 ? 'Übriger Betrag ' + eur2(z.rest) + ': ' : '') : '') + esc(z.art) + '</div>' : '';
-      return '<details' + (z.belege.length ? ' open' : '') + '><summary><span class="jb-p">' + esc(z.label)
-        + '<small>' + (z.belege.length ? (function (n, m) { return n + (n === 1 ? ' Position' : ' Positionen') + ' aus ' + m + (m === 1 ? ' Beleg' : ' Belegen'); })(z.belege.length, Object.keys(z.belege.reduce(function (a, b) { a[b.datei] = 1; return a; }, {})).length) : (z.schaetzung ? 'von der App berechnet' : 'ohne Beleg')) + '</small></span>'
-        + '<span class="jb-z jb-zb">' + (z.belege.length ? eur2(z.summe) + '<small>aus Belegen</small>' : '') + '</span>'
-        + '<span class="jb-z"><b>' + eur2(z.wert) + '</b><small>im Jahr ' + jahr + '</small></span></summary>'
-        + (liste || hin ? '<div class="jb-liste">' + liste + hin + '</div>' : '') + '</details>';
-    }).join('') || '<p style="opacity:.7">Für ' + jahr + ' steht kein Posten.</p>';
-    ov.innerHTML = '<div class="jb-k" role="dialog" aria-label="Belege je Steuerjahr">'
-      + '<div class="jb-kopf"><b>Werbungskosten ' + jahr + ' – woher jeder Posten kommt</b><button type="button" class="jb-zu" data-zu aria-label="Schließen">×</button></div>'
-      + '<div class="jb-jahre">' + jahre.map(function (j) { return '<button type="button" data-jahr="' + j + '"' + (j === jahr ? ' class="an"' : '') + '>' + j + (mitBelegen[j] ? '<i title="' + mitBelegen[j] + ' Positionen aus Belegen">●</i>' : '') + '</button>'; }).join('') + '</div>'
-      + '<div class="jb-inhalt"><div class="jb-summe"><span>Werbungskosten ohne AfA<br><b>' + eur2(sumWert) + '</b></span><span>davon einzeln aus Belegen<br><b>' + eur2(sumBel) + '</b></span><span>Belege in ' + jahr + '<br><b>' + Object.keys(d.buchungen.reduce(function (a, b) { a[b.datei] = 1; return a; }, {})).length + '</b> (' + d.buchungen.length + ' Positionen)</span></div>'
-      + posten + '</div>'
-      + '<div class="jb-fuss"><span>Einzeln aufgeführt sind Belege, die seit dem 04.11.2026 über den Beleg-Leser übernommen wurden. Wird ein Import im Verlauf zurückgenommen, verschwinden seine Belege hier mit.</span>'
-      + (d.buchungen.length ? '<button type="button" class="btn btn-outline btn-sm" data-csv>Liste als CSV</button>' : '') + '</div></div>';
-    document.body.appendChild(ov);
-    var zu = function () { try { ov.remove(); } catch (e) {} document.removeEventListener('keydown', k1); };
-    var k1 = function (e) { if (e.key === 'Escape') zu(); };
-    document.addEventListener('keydown', k1);
-    ov.addEventListener('click', function (e) {
-      var t = e.target;
-      if (t === ov || (t.closest && t.closest('[data-zu]'))) { zu(); return; }
-      var jb = t.closest && t.closest('[data-jahr]');
-      if (jb) { document.removeEventListener('keydown', k1); jahresAnsicht(Number(jb.getAttribute('data-jahr'))); return; }
-      if (t.closest && t.closest('[data-csv]')) _jbCsv(jahr, d);
-    });
-    var an = ov.querySelector('.jb-jahre .an'); if (an && an.scrollIntoView) try { an.scrollIntoView({ block: 'nearest', inline: 'center' }); } catch (e) {}
+      var art = z.art;
+      if (H[z.feld] && H[z.feld].quelle === 'ViVi' && !z.belege.length && z.rest != null && Math.abs(z.rest) >= 0.5) art = 'aus ViVi übernommen' + (H[z.feld].am ? ' am ' + String(H[z.feld].am).split('-').reverse().join('.') : '');
+      var hin = art ? '<div class="bj-hin' + (z.rest != null && z.rest < -0.5 ? ' bj-warn' : '') + '">' + (z.rest != null && Math.abs(z.rest) >= 0.5 && z.belege.length ? (z.rest > 0 ? 'Übriger Betrag ' + eur2(z.rest) + ': ' : '') : '') + esc(art) + '</div>' : '';
+      var marken = _quellen(z, H[z.feld]).map(function (t) { return '<span class="bj-q' + (t === 'von Hand' || t === 'App berechnet' ? ' hand' : '') + '">' + esc(t) + '</span>'; }).join('');
+      var nBel = Object.keys(z.belege.reduce(function (a, b) { a[b.datei] = 1; return a; }, {})).length;
+      return '<details' + (z.belege.length ? ' open' : '') + '><summary><span class="bj-p">' + esc(z.label)
+        + '<small>' + marken + (z.belege.length ? z.belege.length + (z.belege.length === 1 ? ' Position' : ' Positionen') + ' aus ' + nBel + (nBel === 1 ? ' Beleg' : ' Belegen') : '') + '</small></span>'
+        + '<span class="bj-z bj-zb">' + (z.belege.length ? eur2(z.summe) + '<small>aus Belegen</small>' : '') + '</span>'
+        + '<span class="bj-z"><b>' + eur2(z.wert) + '</b><small>im Jahr ' + jahr + '</small></span></summary>'
+        + (liste || hin ? '<div class="bj-liste">' + liste + hin + '</div>' : '') + '</details>';
+    }).join('') || '<p class="oabi-sub" style="padding:0">Für ' + jahr + ' steht kein Posten.</p>';
+    var nDat = Object.keys(d.buchungen.reduce(function (a, b) { a[b.datei] = 1; return a; }, {})).length;
+    box.innerHTML = '<div class="ue-bj">'
+      + '<div class="oabi-sub" style="padding:0 0 8px">Jedes Steuerjahr mit seinen Werbungskosten, und für jeden Posten, woher der Wert kommt: eingelesener Beleg, Unterlage, ViVi, von Hand oder von der App berechnet.</div>'
+      + '<div class="ue-bj-jahre" role="tablist">' + jahre.map(function (j) { return '<button type="button" data-bj-jahr="' + j + '"' + (j === jahr ? ' class="an"' : '') + '>' + j + (mitBelegen[j] ? '<i title="' + mitBelegen[j] + ' Positionen aus Belegen">●</i>' : '') + '</button>'; }).join('') + '</div>'
+      + '<div class="ue-bj-summe"><span>Werbungskosten ohne AfA<b>' + eur2(sumWert) + '</b></span><span>davon einzeln aus Belegen<b>' + eur2(sumBel) + '</b></span><span>Belege ' + jahr + '<b>' + nDat + ' <small style="font-size:11px;font-weight:400;color:var(--muted,#7A7370)">(' + d.buchungen.length + ' Positionen)</small></b></span></div>'
+      + posten
+      + '<div class="ue-bj-fuss"><span>Einzeln aufgeführt sind Belege, die seit dem 04.11.2026 eingelesen oder aus ViVi übernommen wurden. Wird ein Import im Verlauf zurückgenommen, verschwinden seine Belege hier mit.</span>'
+      + (d.buchungen.length ? '<button type="button" class="oabi-btn" data-bj-csv>Liste als CSV</button>' : '') + '</div></div>';
+    if (!box._bjKlick) {
+      box._bjKlick = true;
+      box.addEventListener('click', function (e) {
+        var t = e.target, jb = t.closest && t.closest('[data-bj-jahr]');
+        if (jb) { jahresInRahmen(box, Number(jb.getAttribute('data-bj-jahr'))); return; }
+        if (t.closest && t.closest('[data-bj-csv]')) _jbCsv(_jbJahr, _jahrDaten(_jbJahr));
+      });
+    }
+    var an = box.querySelector('.ue-bj-jahre .an'); if (an && an.scrollIntoView) try { an.scrollIntoView({ block: 'nearest', inline: 'center' }); } catch (e) {}
+  }
+  function jahresAnsicht(jahr) {
+    if (!_jahre().jahre.length) { try { if (window.toast) window.toast('Noch keine Steuerjahre. Bitte erst Kaufdatum und Werte eingeben.'); } catch (e) {} return; }
+    oeffnen({ reiter: 'jahre', jahr: jahr });
   }
   function _jbCsv(jahr, d) {
     var c = function (s) { s = String(s == null ? '' : s); return /[";\r\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; };
@@ -624,7 +647,7 @@
     setTimeout(function () { a.remove(); URL.revokeObjectURL(url); }, 0);
   }
 
-  window.DpEingang = { VERSION: 'v3164', jahresAnsicht: jahresAnsicht, oeffnen: oeffnen, istRechnung: istRechnung, belegeAuslesen: belegeAuslesen,
+  window.DpEingang = { VERSION: 'v4080', jahresAnsicht: jahresAnsicht, jahresInRahmen: jahresInRahmen, oeffnen: oeffnen, istRechnung: istRechnung, belegeAuslesen: belegeAuslesen,
     einheiten: einheiten, mvVorschlag: mvVorschlag, mvOptionen: mvOptionen, mvText: mvText, mvUebernehmen: mvUebernehmen, mvFelder: mvFelder,
     jahrStand: jahrStand, protokoll: protokoll, verlaufHtml: verlaufHtml, lesen: lesen,
     /* v3154 */ txStart: txStart, txEnde: txEnde, feldStand: feldStand, feldGeaendert: feldGeaendert,

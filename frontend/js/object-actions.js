@@ -258,6 +258,11 @@
       '.oabi-head{display:flex;align-items:center;gap:12px;padding:18px 20px 8px}',
       '.oabi-head h3{margin:0;font-size:17px;color:var(--ch,#2A2727)}',
       '.oabi-sub{font-size:12px;color:var(--muted,#7A7370);padding:0 20px 6px}',
+      /* v4080 · Reiter im Eingang: Einlesen | Belege je Jahr (unterlagen-eingang.js jahresInRahmen) */
+      '.oabi-reiter{display:flex;gap:4px;padding:2px 20px 0;border-bottom:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 25%, transparent);margin-bottom:8px}',
+      ".oabi-reiter button{border:0;background:transparent;padding:8px 12px 9px;font:600 13px/1.2 'Inter',system-ui,sans-serif;color:var(--muted,#7A7370);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px}",
+      '.oabi-reiter button.on{color:var(--ch,#2A2727);border-bottom-color:var(--gold,#C9A84C)}',
+      '.oabi-reiter button i{font-style:normal;font-weight:500;opacity:.7;margin-left:4px}',
       '.oabi-body{padding:8px 20px 20px}',
       '.oabi-drop{border:2px dashed color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 45%, transparent);border-radius:12px;padding:26px;text-align:center;background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 4%, transparent);cursor:pointer;color:var(--ch,#2A2727)}',
       '.oabi-drop.drag{background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 12%, transparent);border-color:var(--gold,#C9A84C)}',
@@ -2926,10 +2931,13 @@
     _auswertung = null;
     _qcPendingMerged = {};
     _merged = {}; _files = []; _importPhotos = [];
+    /* v4080 · Marcel 23.11.2026: „Belege je Jahr“ im selben Fenster wie „Belege einlesen“, als eigener Reiter */
+    var _jr = _eingang && window.DpEingang && typeof window.DpEingang.jahresInRahmen === 'function';
     var ov = document.createElement('div'); ov.className = 'oabi-ov'; ov.id = 'oabi-ov';
     ov.innerHTML =
       '<div class="oabi-modal">' +
         '<div class="oabi-head"><span style="color:var(--gold,#C9A84C)">' + svg('upload', 22) + '</span><h3>' + (_eingang ? 'Belege, Unterlagen & Rechnungen einlesen' : _ergaenzen ? 'Unterlagen nachreichen' : 'Unterlagen einlesen — PDF oder Foto: Exposé, Marktbericht, Dokumente') + '</h3></div>' +
+        (_jr ? '<div class="oabi-reiter" role="tablist"><button type="button" role="tab" data-oabi-r="ein">Einlesen</button><button type="button" role="tab" data-oabi-r="jahre">Belege je Jahr</button></div><div id="oabi-r-ein">' : '') +
         (_ergaenzen ? '<div class="oabi-sub" style="border-left:3px solid var(--gold,#C9A84C);padding-left:9px">Die bisherige Auswertung bleibt die Grundlage – gelesen werden nur die neuen PDFs, dann wird zusammengeführt. Vor der Übernahme siehst du, was sich in Risiken, These, Hausgeld und Steuer ändert.</div>' : '') +
         '<div class="oabi-sub">Mehrere PDFs oder Fotos (JPG, PNG) gleichzeitig anhängen — Typ wird automatisch erkannt (inkl. OCR bei Scan-/Grafik-PDFs) und ist pro Datei umstellbar. Alle Werte werden zusammengeführt (Marktbericht führt bei Konflikt).</div>' +
         '<div class="oabi-body">' +
@@ -2937,6 +2945,7 @@
             '<input type="file" id="oabi-input" accept="application/pdf,.pdf,image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp" multiple style="display:none"></div>' +
           '<div class="oabi-files" id="oabi-files"></div><div id="oabi-result"></div>' +
         '</div>' +
+        (_jr ? '</div><div class="oabi-body" id="oabi-r-jahre" hidden></div>' : '') +
         '<div class="oabi-foot"><button type="button" class="oabi-btn" id="oabi-cancel">Schließen</button>' +
           '<button type="button" class="oabi-btn primary" id="oabi-apply" disabled><span style="display:inline-flex">' + svg('download', 14, '#fff') + '</span> Ausgewählte übernehmen</button></div>' +
       '</div>';
@@ -2955,6 +2964,16 @@
     drop.addEventListener('drop', function (e) { e.preventDefault(); drop.classList.remove('drag'); if (e.dataTransfer.files) handleFiles(e.dataTransfer.files); });
     input.addEventListener('change', function (e) { if (e.target.files) handleFiles(e.target.files); });
     $('oabi-apply').addEventListener('click', applyMerged);
+    if (_jr) {
+      var reiter = function (r) {
+        var j = r === 'jahre';
+        ov.querySelectorAll('[data-oabi-r]').forEach(function (b) { var an = b.getAttribute('data-oabi-r') === r; b.classList.toggle('on', an); b.setAttribute('aria-selected', an ? 'true' : 'false'); });
+        $('oabi-r-ein').hidden = j; $('oabi-r-jahre').hidden = !j; $('oabi-apply').style.display = j ? 'none' : '';
+        if (j) window.DpEingang.jahresInRahmen($('oabi-r-jahre'), opts && opts.jahr);
+      };
+      ov.querySelectorAll('[data-oabi-r]').forEach(function (b) { b.addEventListener('click', function () { reiter(b.getAttribute('data-oabi-r')); }); });
+      reiter(opts && opts.reiter === 'jahre' ? 'jahre' : 'ein');
+    }
   }
   function setStatus(f, txt) { var st = f.row.querySelector('.oabi-st'); if (st) st.textContent = txt; }
   function renderFileRow(f) {
