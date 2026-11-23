@@ -106,7 +106,7 @@
       A + ' .sl > .e{display:none}',   /* die alten Nummern 02 bis 06 passen nach dem Umstellen nicht mehr */
       /* Einfach: Leiste, die Karten (ohne „Heute", das steht in der Leiste), je Objekt und Finanzierung. Genau: alles. */
       E + ' > [data-dp-gp="gb"],' + E + ' > [data-dp-gp="det"]{display:none !important}',
-      E + ' .gp-klein{display:none}' + E + ' #dp-einfach .ke2-k:first-child{display:none}',
+      E + ' .gp-klein{display:none}' + E + ' #dp-einfach .ke2 > .ke2-k:first-child{display:none}',
       B + ' .gp-sl{margin:6px 0 10px}',
       B + '{margin:14px 0 18px;color:var(--c-ptext,#1b1815);font-family:Inter,system-ui,sans-serif}',
       B + ' .gp-kopf{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:8px 16px;margin:0 2px 10px}',
