@@ -504,17 +504,22 @@
      liegt der Satz, weil der Soli in seiner Übergangszone 11,9 % je weiterem Euro Einkommensteuer nimmt. Abgeleitet aus
      tax.js (Tax.soli, Tax.calcGrenzsteuersatz), keine feste Zahl. Nur ein Satz unter der Kachel. */
   function grenzErklaerung(gs) {
-    var T = window.Tax; if (!T || !T.soli || !T.calcGrenzsteuersatz || !T.optionen || !T.steuerLast) return null;
-    var zve = feldZahl('zve'); if (!(zve > 0)) return null;
-    var jahr = new Date().getFullYear(), o = T.optionen(null, jahr);
-    var g = T.calcGrenzsteuersatz(o.splitting ? zve / 2 : zve, jahr);
-    if (!(gs > g * 100 + 0.5)) return null;
-    var L = T.steuerLast(zve, jahr, o);
-    var ds = (T.soli(L.est + 100, jahr, o.splitting) - T.soli(L.est, jahr, o.splitting)) / 100;
-    var gP = Math.round(g * 1000) / 10, ki = o.kist > 0 ? ' Dazu kommt die Kirchensteuer.' : '';
-    if (ds > 0.1) return gP.toLocaleString('de-DE') + ' % Einkommensteuer. Der Soli steht in seiner Übergangszone und nimmt 11,9 % auf jeden weiteren Euro Steuer. Danach sind es ' + (Math.round(g * 1.055 * 1000) / 10).toLocaleString('de-DE') + ' %.' + ki;
-    if (ds > 0.04) return gP.toLocaleString('de-DE') + ' % Einkommensteuer plus 5,5 % Soli darauf.' + ki;
-    return ki ? gP.toLocaleString('de-DE') + ' % Einkommensteuer.' + ki : null;
+    /* gemessen 2026-1183: das Feld „grenz“ steht auf 47,00, das zvE-Feld auf „68.000“. Der Satz wird deshalb aus dem
+       Satz selbst zerlegt, nicht aus dem zvE: Einkommensteuer g (42 oder 45 %) mal (1 + Soli-Grenzsatz). Den Soli-Grenzsatz
+       liefert tax.js (Tax.soli) an einer Einkommensteuer knapp über der Freigrenze bzw. weit darüber. */
+    var T = window.Tax; if (!T || !T.soli || !(gs > 42.5)) return null;
+    var jahr = new Date().getFullYear(), fg = 0;
+    for (var e = 10000; e < 60000; e += 50) { if (T.soli(e, jahr, false) > 0) { fg = e; break; } }
+    if (!fg) return null;
+    var sZone = (T.soli(fg + 1000, jahr, false) - T.soli(fg, jahr, false)) / 1000, sVoll = (T.soli(200000, jahr, false) - T.soli(199000, jahr, false)) / 1000;
+    var pr = function (x) { return (Math.round(x * 10) / 10).toLocaleString('de-DE'); };
+    var zerlegt = null;
+    [42, 45].forEach(function (g) {
+      if (zerlegt) return;
+      if (Math.abs(gs - g * (1 + sZone)) < 0.15) zerlegt = g + ' % Einkommensteuer. Der Soli steht in seiner Übergangszone und nimmt ' + pr(sZone * 100) + ' % auf jeden weiteren Euro Steuer, zusammen ' + pr(g * (1 + sZone)) + ' %. Danach sind es ' + pr(g * (1 + sVoll)) + ' %.';
+      else if (Math.abs(gs - g * (1 + sVoll)) < 0.15) zerlegt = g + ' % Einkommensteuer plus ' + pr(sVoll * 100) + ' % Soli darauf, zusammen ' + pr(g * (1 + sVoll)) + ' %.';
+    });
+    return zerlegt;
   }
   function zahlKachel(lbl, wert, unter, farbe) {
     return '<div class="dp-pa4-z" style="--c:' + (farbe || '#E6DCC2') + '"><span>' + esc(lbl) + '</span><b>' + wert + '</b>' + (unter ? '<em>' + unter + '</em>' : '') + '</div>';

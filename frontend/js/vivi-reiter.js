@@ -17,7 +17,7 @@
  * ═══════════════════════════════════════════════════════════════════════════════════════════════════════════════ */
 (function (global) {
   'use strict';
-  var VERSION = 'v4040h';
+  var VERSION = 'v4040i';
   if (!global.document || global.DpViviReiter) return;
   var doc = global.document;
   var _jahr = null, _offen = {};
@@ -385,7 +385,7 @@
       '.vr-bw>div{background:#FBF6E9;border:1px solid color-mix(in srgb,var(--wl-c9a84c,#C9A84C) 18%,transparent);border-radius:2px;padding:8px 10px}',
       '.vr-bw span{display:block;font:700 9.5px "JetBrains Mono",monospace;letter-spacing:.06em;text-transform:uppercase;color:#6B645A}.vr-bw b{display:block;font:600 17px "Space Grotesk",sans-serif}.vr-bw small{color:#7A7370;font-size:11px}',
       '#vr-fenster{position:fixed;inset:0;z-index:100050;background:rgba(5,5,5,.6);display:flex;align-items:flex-start;justify-content:center;padding:24px 12px;overflow:auto}',
-      '#vr-fenster .vr-ov-box{background:#FDFCFA;border-radius:12px;max-width:980px;width:100%;padding:18px 16px;position:relative}',
+      '#vr-fenster .vr-ov-box{background:#FDFCFA;border-radius:12px;max-width:980px;width:100%;padding:44px 16px 18px;position:relative}',
       '#vr-fenster .vr-ov-zu{position:absolute;top:8px;right:10px;border:0;background:none;font-size:24px;cursor:pointer;color:#5E5856;min-width:36px;min-height:36px}',
       '@media (max-width:640px){.vr-tab td,.vr-tab th{padding:6px 3px}.vr-tab{font-size:11.5px}.vr-etage{grid-template-columns:minmax(0,1fr)!important}.vr-kopf .vr-k{margin-left:0}}'
     ].join('');
