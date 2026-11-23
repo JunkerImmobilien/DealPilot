@@ -29,7 +29,7 @@
  * ═════════════════════════════════════════════════════════════════════════════════════════════════════════ */
 (function (global) {
   'use strict';
-  var VERSION = 'v4020';
+  var VERSION = 'v4021';
 
   /* ══ KERN (ohne DOM, auch fuer Node) ══════════════════════════════════════════════════════════════════ */
   var REIHE = ['einnahmen_km', 'einnahmen_nk', 'schuldzinsen', 'erhaltungsaufwand', 'nk_umlf', 'nk_n_umlf', 'sonst_kosten', 'sonst_bewegl_wg', 'afa'];
@@ -111,8 +111,9 @@
 
   function $(id) { return doc.getElementById(id); }
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
-  function eur(v) { return istZahl(v) ? v.toLocaleString('de-DE', { minimumFractionDigits: 0, maximumFractionDigits: 2 }) + ' €' : 'kein Wert'; }
-  function vz(v) { return istZahl(v) ? (v > 0 ? '+' : v < 0 ? '−' : '±') + Math.abs(v).toLocaleString('de-DE', { maximumFractionDigits: 2 }) + ' €' : ''; }
+  /* v4021 · gemessen 1179: „1.878,6 €“. Cent immer zweistellig, ganze Euro ohne Nachkommastellen */
+  function eur(v) { if (!istZahl(v)) return 'kein Wert'; var c = Math.abs(v - Math.round(v)) >= 0.005; return v.toLocaleString('de-DE', { minimumFractionDigits: c ? 2 : 0, maximumFractionDigits: 2 }) + ' €'; }
+  function vz(v) { return istZahl(v) ? (v > 0 ? '+' : v < 0 ? '−' : '±') + eur(Math.abs(v)) : ''; }
   function datumText(iso) { var m = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(iso || '')); return m ? m[3] + '.' + m[2] + '.' + m[1] : ''; }
   function heuteJahr() { return new Date().getFullYear(); }
   function api(pfad, opt) { return global.Auth && global.Auth.apiCall ? global.Auth.apiCall(pfad, opt || { method: 'GET' }) : Promise.reject(new Error('Nicht angemeldet')); }
@@ -216,7 +217,7 @@
       '.vst th{font:600 9.5px/1.2 "JetBrains Mono",ui-monospace,monospace;letter-spacing:.08em;text-transform:uppercase;color:#7A7370;text-align:right;padding:5px 6px;border-bottom:1px solid rgba(42,39,39,.12)}',
       '.vst th:first-child,.vst td:first-child{text-align:left}',
       '.vst td{padding:6px;border-bottom:1px solid rgba(42,39,39,.07);text-align:right;vertical-align:top;font-variant-numeric:tabular-nums}',
-      '.vst td small{display:block;color:#7A7370;font-size:11px;text-align:left}',
+      '.vst td small{display:block;color:#7A7370;font-size:11px;text-align:inherit}',
       '.vst .vst-ab{color:#B8625C;font-weight:600}.vst .vst-ok{color:#3FA56C}',
       '.vst .vst-posten{margin:3px 0 0;padding:0;list-style:none;font-size:11.5px;color:#5E5856;text-align:left}',
       '.vst button.vst-k{font:600 11.5px/1.2 Inter,sans-serif;padding:4px 9px;border-radius:7px;border:1px solid var(--wl-c9a84c, #C9A84C);background:transparent;color:inherit;cursor:pointer;white-space:nowrap}',
@@ -297,7 +298,8 @@
   function marken() {
     var box = $('yearly-tax-form-box'); if (!box) return;
     var E = eingang(); var H = (E && E.herkunft) || {};
-    Array.prototype.forEach.call(box.querySelectorAll('input[data-year][data-field]'), function (inp) {
+    /* v4021 · gemessen 1179: die Bemerkungsfelder tragen dieselben data-year/data-field, die Marke stand doppelt */
+    Array.prototype.forEach.call(box.querySelectorAll('input[data-year][data-field]:not(.ytf-bemerkung-input)'), function (inp) {
       var y = inp.getAttribute('data-year'), f = inp.getAttribute('data-field'), h = H['y' + y] && H['y' + y][f];
       var wrap = inp.parentNode, m = wrap && wrap.querySelector('.vivi-st-marke');
       var ov = (global._taxYearlyOverrides || {})['y' + y]; ov = ov && ov[f];
