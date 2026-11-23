@@ -54,7 +54,9 @@
   function einsteiger() { try { return !!(global.DpDetailgrad && global.DpDetailgrad.stufe && global.DpDetailgrad.stufe() === 1); } catch (e) { return false; } }
   /* DpVorschau.frei ist asynchron (Promise, immer truthy). istFrei ist synchron: false = gesperrt, null = noch nicht
      geladen (dann trägt der ViVi-Stand, den das Backend nur bei freier Funktion liefert). Gemessen im Quertest v4037f. */
-  function vorschauFrei() { try { var V = global.DpVorschau; if (!V || typeof V.istFrei !== 'function') return true; return V.istFrei('vivi') !== false; } catch (e) { return false; } }
+  var _frei = null;   /* Ergebnis von DpVorschau.frei('vivi'), einmal geladen */
+  try { if (global.DpVorschau && typeof global.DpVorschau.frei === 'function') global.DpVorschau.frei('vivi').then(function (v) { _frei = !!v; }).catch(function () { _frei = false; }); } catch (e) {}
+  function vorschauFrei() { try { if (_frei === false) return false; var V = global.DpVorschau; return !(V && typeof V.istFrei === 'function' && V.istFrei('vivi') === false); } catch (e) { return false; } }
   function verfuegbar() { var s = stand(); return !!(s && s.verknuepft && s.status === 'fertig') && !einsteiger() && vorschauFrei(); }
 
   /** Die vermieteten Wohnungen mit dem, was DealPilot für möglich hält (Modell der Potenzialanalyse). */
