@@ -815,6 +815,12 @@ function showSettings(initialTab) {
             opt('app', 'Wie die App', 'Dunkel nur, wenn die App dunkel ist.') +
           '</div>';
         })() +
+        /* v4260 · Marcel 23.11.2026: „in den Einstellungen gewisse Charts ausblenden … erstmal mit einem Grundsetup“. Öffnet das
+           Cockpit mit dem Panel „Ansicht anpassen“ (grafiken-portfolio.js, gespeichert in user_settings cockpit_ansicht). */
+        '<div class="set-cockpit-ansicht" data-vorschau="grafiken_neu" style="margin:-6px 0 16px;padding:12px 14px;border:1px solid var(--border, #e6dfcf);border-radius:12px;display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;justify-content:space-between">' +
+          '<span style="font-size:13px;line-height:1.4"><b>Portfolio-Cockpit: Grafiken auswählen</b><br><span style="opacity:.72;font-size:12px">Welche Grafiken das Cockpit zeigt. Das Grundsetup lässt sich jederzeit wiederherstellen.</span></span>' +
+          '<button type="button" class="btn btn-outline btn-sm" onclick="try{window._dpCockpitAnsicht&&window._dpCockpitAnsicht()}catch(e){}">Grafiken auswählen</button>' +
+        '</div>' +
         /* ── v1162-PROFIL · Hell und Dunkel als zwei Profile ────────────────
            Marcels Vorgabe (Backlog Punkt 5): „DealPilot wird im dunklen Modus
            ausgeliefert. Daneben ein heller Modus, umschaltbar mit einem Griff."
@@ -1419,6 +1425,8 @@ function _swSet(btn) {
        Knoepfe, obwohl einer galt. Die Funktion steht weiter unten in
        derselben Datei und ist beim Oeffnen laengst definiert. */
     try { if (typeof window._dpProfilMarkieren === 'function') window._dpProfilMarkieren(); } catch (e) {}
+    /* v4260 · Vorschau-Eintraege (data-vorschau) im frisch gebauten Fenster sichtbar machen */
+    try { if (window.DpVorschau && window.DpVorschau.markieren) window.DpVorschau.markieren(); } catch (e) {}
     /* v452: Theme-Switch aktiv markieren */
     try {
       var _dpTh = localStorage.getItem('dp_theme') || 'light';

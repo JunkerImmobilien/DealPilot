@@ -436,7 +436,15 @@
       B + ' .gp-an-f{display:flex;justify-content:space-between;gap:8px;margin-top:10px;padding-top:10px;border-top:1px solid var(--c-line,#e0dbd3)}',
       B + ' .gp-an-b{font:600 12px Inter,sans-serif;border:1px solid var(--c-line,#e0dbd3);background:#fff;border-radius:8px;padding:6px 10px;cursor:pointer}',
       B + ' .gp-an-ok{background:#050505;color:#FDFCFA;border-color:#050505}',
-      '@media (max-width:900px){' + B + ' .gp-vb-raster{grid-template-columns:minmax(0,1fr)}}'
+      '@media (max-width:900px){' + B + ' .gp-vb-raster{grid-template-columns:minmax(0,1fr)}}',
+      /* v4260c · Einstellung „Grafiken: hell / dunkel / wie App“ (grafiken-premium.js setzt html[data-gx-stil]) gilt auch hier.
+         Die Karten aus DpGrafiken.karte folgen ihr über --gx-*; die eigenen Teile (Leiste, je Objekt, Finanzierung, Panel) hier. */
+      'html[data-gx-stil="dunkel"] ' + B + '{--c-ptext:#E9E3D6;--c-pmut:#B9B2A3;--c-line:#2B2720;--dp-gold-txt:var(--wl-e8cc7a,#E8CC7A);color:#E9E3D6}',
+      'html[data-gx-stil="dunkel"] ' + B + ' .gp-karte,html[data-gx-stil="dunkel"] ' + B + ' .gp-k,html[data-gx-stil="dunkel"] ' + B + ' .gp-an{background:linear-gradient(180deg,#16140F,#0E0D0B);border-color:#2B2720}',
+      'html[data-gx-stil="dunkel"] ' + B + ' .gp-k.gp-haupt{background:color-mix(in srgb,' + GOLD + ' 12%,#0E0D0B);border-color:color-mix(in srgb,' + GOLD + ' 45%,transparent)}',
+      'html[data-gx-stil="dunkel"] ' + B + ' .gp-zahn,html[data-gx-stil="dunkel"] ' + B + ' .gp-an-b,html[data-gx-stil="dunkel"] ' + B + ' .gp-filter select{background:#16140F;color:#E9E3D6;border-color:#2B2720}',
+      'html[data-gx-stil="dunkel"] ' + B + ' .gp-an-ok{background:var(--wl-c9a84c,#C9A84C);color:#050505;border-color:var(--wl-c9a84c,#C9A84C)}',
+      'html[data-gx-stil="dunkel"] ' + B + ' svg text{fill:#B9B2A3}'
     ].join('\n');
     document.head.appendChild(s);
   }
@@ -655,6 +663,14 @@
   function pruefeFreigabe() { try { if (window.DpVorschau) window.DpVorschau.frei('grafiken_neu').then(function (an) { if (an) start(); }); } catch (e) {} }
   window.DpGrafikenPortfolio = { zeichnen: function (host) { stil(); return zeichnen(host); }, an: function () { return AN; }, ansichtOeffnen: ansichtOeffnen, ANSICHT: ANSICHT, sichtbar: sichtbar, neu: function () { var h = document.querySelector('[data-dp-gp="kopf"]'); if (h) h.removeAttribute('data-gp-sig'); lauf(); },
     _test: { projektion: projektion, bindKalender: bindKalender, hinweise: hinweise, bereich: bereich } };
+  /* v4260 · Einstellungen › Anzeige-Optionen › „Portfolio-Cockpit: Grafiken auswählen“: Einstellungen zu, Cockpit auf, Panel auf */
+  window._dpCockpitAnsicht = function () {
+    try { if (typeof window.closeSettings === 'function') window.closeSettings(); } catch (e) {}
+    setTimeout(function () {
+      try { if (window.DealPilotDashboard && window.DealPilotDashboard.open) window.DealPilotDashboard.open(); } catch (e) {}
+      var n = 0, t = setInterval(function () { n++; if (document.querySelector('[data-dp-gp="kopf"] .gp-kopf')) { clearInterval(t); ansichtOeffnen(); } else if (n > 40) clearInterval(t); }, 250);
+    }, 160);
+  };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', pruefeFreigabe); else pruefeFreigabe();
   window.addEventListener('dp:vorschau', pruefeFreigabe);
   window.addEventListener('dp:plan-ready', function () { setTimeout(pruefeFreigabe, 300); });
