@@ -5996,7 +5996,7 @@ const QcApp = (function() {
       'details.qcb-ki>summary::after{content:" ›";color:#7A7370}details.qcb-ki[open]>summary::after{content:" ⌄"}',
       'details.qcb-ki .ai-opinion{margin-top:8px;font:400 13px/1.55 Inter,sans-serif}',
       'details.qcb-ki .ai-opinion-l{display:none}',
-      '@media (max-width:640px){.qcb-urteil{grid-template-columns:auto 1fr;grid-template-areas:"ring kopf" "rat rat" "lage lage";gap:8px 12px;padding:12px}'+'.qcb-ring{width:52px;height:52px;border-width:4px;font-size:19px}.qcb-urteil h4{font-size:17px;margin:2px 0 0}.qcb-urteil .qcb-kopf{align-self:center}.qcb-urteil p{font-size:12.5px;line-height:1.5}'+'.qcb-lage{flex-direction:row;align-items:center;flex-wrap:wrap;gap:4px 10px;padding-top:8px;border-top:1px solid #F1ECE1}.qcb-lage small{margin-left:auto}'+'.qcb-pz{grid-template-columns:10px 1fr auto;grid-template-areas:"dot t w" ". u u";gap:2px 10px;align-items:baseline;padding:8px 0}.qcb-pz>.qcb-dot{width:10px;height:10px;align-self:center}.qcb-pz b{font-size:13.5px}.qcb-pz .w{font-size:13.5px}.qcb-pz .u{font-size:11.5px;line-height:1.45}'+'.qcb-ziel{grid-template-columns:repeat(auto-fit,minmax(128px,1fr));gap:6px}.qcb-zk{padding:7px 9px}.qcb-zk .v{font-size:16px}.qcb-zk .qcb-l{font-size:9.5px;letter-spacing:.05em}'+'.qcb-box{padding:11px 12px}.qcb-pc{grid-template-columns:1fr}}'
+      '@media (max-width:640px){.qcb-urteil{grid-template-columns:auto 1fr;grid-template-areas:"ring kopf" "rat rat" "lage lage";gap:8px 12px;padding:12px}'+'.qcb-ring{width:52px;height:52px;border-width:4px;font-size:19px}.qcb-urteil h4{font-size:17px;margin:2px 0 0}.qcb-urteil .qcb-kopf{align-self:center}.qcb-urteil p{font-size:12.5px;line-height:1.5}'+'.qcb-lage{flex-direction:row;align-items:center;flex-wrap:nowrap;gap:8px;padding-top:8px;border-top:1px solid #F1ECE1}.qcb-lage small{margin-left:auto;white-space:nowrap}'+'.qcb-pz{grid-template-columns:10px 1fr auto;grid-template-areas:"dot t w" ". u u";gap:2px 10px;align-items:baseline;padding:8px 0}.qcb-pz>.qcb-dot{width:10px;height:10px;align-self:center}.qcb-pz b{font-size:13.5px}.qcb-pz .w{font-size:13.5px}.qcb-pz .u{font-size:11.5px;line-height:1.45}'+'.qcb-ziel{grid-template-columns:repeat(auto-fit,minmax(128px,1fr));gap:6px}.qcb-zk{padding:7px 9px}.qcb-zk .v{font-size:16px}.qcb-zk .qcb-l{font-size:9.5px;letter-spacing:.05em}'+'.qcb-box{padding:11px 12px}.qcb-pc{grid-template-columns:1fr}}'
     ].join('');
     document.head.appendChild(s);
   }
@@ -6056,8 +6056,8 @@ const QcApp = (function() {
     const ton = urteil && urteil.ton === 'bad' ? 'bad' : urteil && urteil.ton === 'warn' ? 'warn' : '';
     let h = `<div class="qcb"><div class="qcb-box qcb-urteil ${ton}">`
       + `<div class="qcb-ring">${score.score != null ? Math.round(score.score) : '–'}</div>`
-      + `<div class="qcb-kopf"><span class="qcb-l">Ersteinschätzung · ${esc(score.label || '')}</span><h4>${esc(urteil ? String(urteil.ueberschrift || '').replace(/, /g, ', ') : '')}</h4></div>`
-      + `<p class="qcb-rat">${urteil ? String(urteil.rat || '').replace(/, /g, ', ') : ''}</p>`
+      + `<div class="qcb-kopf"><span class="qcb-l">Ersteinschätzung · ${esc(score.label || '')}</span><h4>${esc(urteil ? String(urteil.ueberschrift || '').replace(/ — /g, ', ') : '')}</h4></div>`
+      + `<p class="qcb-rat">${urteil ? String(urteil.rat || '').replace(/ — /g, ', ') : ''}</p>`
       + `<div class="qcb-lage"><span class="qcb-l">Lageklasse</span><div class="qcb-seg" role="group" aria-label="Lageklasse">`
       + ['A', 'B', 'C'].map(x => `<button type="button" data-qcb-lage="${x}" class="${x === lk ? 'on' : ''}">${x}</button>`).join('')
       + `</div><small>${esc(zielT || 'keine Lageklasse')}</small></div></div>`;

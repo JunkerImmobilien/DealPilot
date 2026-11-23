@@ -48,7 +48,7 @@
 (function (global) {
   'use strict';
   if (global.DpJahresabgleich) return;
-  var VERSION = 'v4017';
+  var VERSION = 'v4017a';
   var GOLD = 'var(--wl-c9a84c, #C9A84C)';
   var SCHRITTE = [['miete', 'Miete'], ['steuer', 'Steuer'], ['wert', 'Wert'], ['haus', 'Haus']];
   var WORT = { ok: 'erledigt', teil: 'teilweise', offen: 'offen', laufend: 'läuft' };
@@ -334,7 +334,7 @@
       '.dp-ja-abs .dp-ja-eti{margin-left:auto;color:' + LE + '}',
       '.dp-ja-tab{overflow-x:auto;-webkit-overflow-scrolling:touch;border:1px solid ' + LI + ';border-radius:10px;background:#fff}',
       '.dp-ja-tab table{width:100%;border-collapse:collapse;font:400 12.5px Inter,sans-serif;color:' + T + ';min-width:780px}',
-      '.dp-ja-tab th,.dp-ja-tab td{text-align:right;padding:8px 10px;border-bottom:1px solid #F1EBDD;font-variant-numeric:tabular-nums;white-space:nowrap;vertical-align:top}',
+      '.dp-ja-tab th,.dp-ja-tab td{text-align:right;padding:8px 7px;border-bottom:1px solid #F1EBDD;font-variant-numeric:tabular-nums;white-space:nowrap;vertical-align:top}',
       '.dp-ja-tab tbody tr:last-child td{border-bottom:none}',
       '.dp-ja-tab th:first-child,.dp-ja-tab td:first-child{text-align:left}',
       '.dp-ja-tab th{font:500 10px/1.35 "JetBrains Mono",monospace;letter-spacing:.06em;text-transform:uppercase;color:' + M + ';border-bottom:1px solid ' + RA + ';vertical-align:bottom}',
@@ -352,6 +352,7 @@
         + '.dp-ja-pot{grid-template-columns:1fr}.dp-ja-satz{font-size:15px}.dp-ja-schritt{padding:11px 10px;gap:5px}.dp-ja-w{font-size:17px}'
         + '.dp-pa-wrap .dp-ja-schritt p{font-size:11.5px}.dp-ja-kk{flex-wrap:wrap;gap:5px}.dp-ja-kk .st{margin-left:0}'
         + '.dp-pa-wrap .dp-ja-schritt button{font-size:12px !important;padding:5px 8px !important}'
+        + '.dp-pa-wrap .dp-ja-jahre button{padding:4px 8px !important;gap:5px}.dp-pa-wrap .dp-ja-schritt p{display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}'
         + '.dp-pa-wrap .dp-ja-erg button.dp-ja-fest{margin-left:0}.dp-ja-vivi{padding:10px 12px}.dp-ja-vz{grid-template-columns:auto auto;gap:0 10px}.dp-ja-vz>span:last-child{grid-column:1/-1;margin-bottom:4px}}'
     ].join('\n');
     d.head.appendChild(s);
