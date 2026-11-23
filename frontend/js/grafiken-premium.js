@@ -427,9 +427,15 @@
       var kaufJ = mm ? +mm[1] : J[0].j, kaufM = mm ? +mm[2] : 1;
       var g = function (k) { var a = J[J.length - 2][k], b = J[J.length - 1][k]; return a > 0 && b > 0 ? Math.max(-0.05, Math.min(0.08, b / a - 1)) : 0; };
       var halter = (document.getElementById('halter') || {}).value || 'privat';
-      var gi = zahl(S.gi) || wert('kp') || 0, ek = wert('ek');
-      return { J: J, kaufJ: kaufJ, kaufM: kaufM, bindEnde: kaufJ + (zahl(S.bindj) || 10), bindMon: kaufM,
-        az: zahl(S.az) != null && S.az > 0 ? S.az : 0.04, at: zahl(S.at) != null && S.at > 0 ? S.at : 0.02,
+      var gi = zahl(S.gi) || wert('kp') || 0, ek = wert('ek'), bindEnde = kaufJ + (zahl(S.bindj) || 10);
+      /* Anschlusszins und -tilgung, mit denen die App WIRKLICH rechnet: aus dem ersten vollen Jahr nach der Zinsbindung
+         (Zins / Restschuld am Jahresanfang). State.az ist die Eingabe, die App kann einen anderen Satz ansetzen
+         (gemessen Demostraße: State.az 5 %, gerechnet 3,763 %). */
+      var az = zahl(S.az) != null && S.az > 0 ? S.az : 0.04, at = zahl(S.at) != null && S.at > 0 ? S.at : 0.02, azQ = 'Eingabe';
+      var rB = J.filter(function (r) { return r.j === bindEnde; })[0], rN = J.filter(function (r) { return r.j === bindEnde + 1; })[0];
+      if (rB && rN && rB.rs > 0 && rN.zins > 0) { az = rN.zins / rB.rs; at = Math.max(0, rN.tilg / rB.rs); azQ = 'App'; }
+      return { J: J, kaufJ: kaufJ, kaufM: kaufM, bindEnde: bindEnde, bindMon: kaufM, azQuelle: azQ,
+        az: az, at: at,
         gi: gi, ek: ek != null ? ek : Math.max(0, gi - (J[0].rs + J[0].tilg)), kp: wert('kp') || gi, grenz: (wert('grenz') || 42) / 100,
         mstg: g('nkm'), kstg: g('bwk'), wstg: g('wert'), privat: !/gmbh|ug|gesellschaft|kg|ag/i.test(halter) && halter !== 'gesellschaft',
         heute: heuteJahr(), bis: heuteJahr() + 30 };
@@ -452,9 +458,13 @@
         var n = bN * fN * o.mFak * (1 - o.leer - (p ? p.leer : 0)), b = bK * fK * o.kFak, w = bW * fW, zins, tilg;
         if (a && (o.zA == null || j < P.bindEnde)) { zins = a.zins; tilg = a.tilg; }
         else if (j < P.bindEnde) { zins = L.zins; tilg = L.tilg; }
+        else if (a && j === P.bindEnde) {
+          /* Wechseljahr: die App wechselt unterjährig. Nur der Zinsunterschied für die Monate nach dem Wechsel, Tilgung wie die App. */
+          var anteil = (12 - (P.bindMon - 1)) / 12; zins = a.zins + (o.zA - P.az) * rs * anteil; tilg = a.tilg;
+        }
         else {
           var zA = o.zA != null ? o.zA : P.az;
-          if (ann == null) { var prev = rows[rows.length - 1]; ann = (o.zA == null && prev && prev.j >= P.bindEnde) ? prev.zins + prev.tilg : rs * (zA + P.at); }
+          if (ann == null) { var prev = rows[rows.length - 1]; ann = (o.zA == null && prev && prev.j > P.bindEnde) ? prev.zins + prev.tilg : rs * (zA + P.at); }
           zins = rs * zA; tilg = Math.max(0, Math.min(rs, ann - zins));
         }
         var rsNeu = Math.max(0, rs - tilg), r;
@@ -516,7 +526,7 @@
     /* Heatmap: Cashflow nach Steuer im Monat im Jahr nach der Zinsbindung, Anschlusszins × Miete */
     function heat(P) {
       var jahr = Math.max(P.bindEnde + 1, P.heute + 1); if (jahr > P.bis) return null;
-      var start = Math.max(1, Math.round((P.az * 100 - 3) * 2) / 2), Z = []; for (var z = start; z <= P.az * 100 + 3 + 1e-9; z += 0.5) Z.push(Math.round(z * 10) / 10);
+      var mitte = Math.round(P.az * 100 * 2) / 2, Z = []; for (var z = Math.max(0.5, mitte - 3); z <= mitte + 3 + 1e-9; z += 0.5) Z.push(Math.round(z * 10) / 10);
       var M = [15, 10, 5, 0, -5, -10];
       var G = M.map(function (mm) { return Z.map(function (zz) { var r = rechne(P, { zA: zz / 100, mFak: 1 + mm / 100 }).rows.filter(function (x) { return x.j === jahr; })[0]; return r ? r.cfns / 12 : null; }); });
       var ci = -1, best = 9; Z.forEach(function (zz, i) { var d = Math.abs(zz - P.az * 100); if (d < best) { best = d; ci = i; } });
@@ -595,7 +605,7 @@
     var basisV = Hm.G[Hm.ri][Hm.ci], kipp = null; Hm.Z.forEach(function (z, c) { if (kipp == null && Hm.G[Hm.ri][c] != null && Hm.G[Hm.ri][c] < 0) kipp = z; });
     var titel = basisV < 0 ? 'Nach der Zinsbindung fehlen im Basisfall ' + eur(-basisV) + ' im Monat' : (kipp != null ? 'Ab ' + pct(kipp) + ' Anschlusszins wird der Cashflow ' + Hm.jahr + ' negativ' : 'Der Cashflow ' + Hm.jahr + ' bleibt in allen Zinsfällen positiv');
     var i = karte(k, { eyebrow: 'Anschlussfinanzierung · Zins × Miete', titel: titel, unter: 'Cashflow nach Steuer im Monat ' + Hm.jahr + ', dem ersten vollen Jahr nach der Zinsbindung. Spalten Anschlusszins, Zeilen Miete gegen die Projektion.', chips: ['Modell'],
-      fuss: ['Rahmen: Basisfall mit ' + pct(P.az * 100, 2) + ' Anschlusszins und ' + pct(P.at * 100) + ' Tilgung wie in der App.', 'Steuer mit deinem Grenzsteuersatz ' + pct(P.grenz * 100) + '.', 'Modell, keine Zusage einer Bank.'] });
+      fuss: ['Rahmen: Basisfall mit ' + pct(P.az * 100, 2) + ' Anschlusszins und ' + pct(P.at * 100, 2) + ' Tilgung' + (P.azQuelle === 'App' ? ', so wie die App nach der Zinsbindung rechnet.' : ' aus deiner Eingabe.'), 'Steuer mit deinem Grenzsteuersatz ' + pct(P.grenz * 100) + '.', 'Modell, keine Zusage einer Bank.'] });
     heatmap(i, { spalten: Hm.Z, zeilen: Hm.M, werte: Hm.G, basis: { z: Hm.ri, s: Hm.ci }, spaltenTitel: 'Anschlusszins', einheit: ' im Monat',
       spaltenText: function (z, cw) { return nf1.format(z) + (cw < 46 ? '' : ' %'); }, zeilenText: function (m) { return (m > 0 ? '+' : m < 0 ? '−' : '±') + Math.abs(m) + ' %'; },
       zelleText: function (m, z, v) { return '<div class="t">Zins ' + pct(z) + ' · Miete ' + (m > 0 ? '+' : m < 0 ? '−' : '±') + Math.abs(m) + ' %</div>Cashflow nach Steuer ' + Hm.jahr + ' <b>' + eurV(v) + '</b> im Monat'; } }, { breite: w - 2, kompakt: kompakt });
