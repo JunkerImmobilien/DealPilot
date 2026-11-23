@@ -166,6 +166,16 @@ if ($LASTEXITCODE -ne 0) {
 }
 Gut (($vp | Select-Object -Last 1) -as [string])
 
+# ---- 3c. Besucherzaehlen auf der Landing (landing-zaehlen-1, Marcel 23.11.2026) ----
+Schritt "Besucherzaehlen auf allen Seiten der Landing (tools/landing-zaehlen-pruefen.mjs)"
+$lz = node tools/landing-zaehlen-pruefen.mjs --still 2>&1
+if ($LASTEXITCODE -ne 0) {
+  $lz | Select-String "ROT" | ForEach-Object { Write-Host "     $_" }
+  Schlecht "Eine Seite der Landing zaehlt keine Besucher - Rollout abgebrochen."
+  exit 1
+}
+Gut (($lz | Select-Object -Last 1) -as [string])
+
 # ---- 4. Nachfrage -----------------------------------------------------
 Schritt "Freigabe"
 Write-Host ""

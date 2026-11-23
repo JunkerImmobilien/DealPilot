@@ -196,6 +196,19 @@ if (Test-Path "tools\vorschau-pruefen.mjs") {
     Write-Host "   [ok] Vorschau-Funktionen gesperrt (tools/vorschau-pruefen.mjs)"
 }
 
+# landing-zaehlen-1 (Marcel 23.11.2026): jede Seite der Landing zaehlt Besucher. Vom 24.09. bis 23.11.2026 zaehlte nichts.
+if (Test-Path "tools\landing-zaehlen-pruefen.mjs") {
+    $null = node tools/landing-zaehlen-pruefen.mjs --still 2>&1
+    if ($LASTEXITCODE -ne 0) {
+        node tools/landing-zaehlen-pruefen.mjs --still
+        Write-Host ""
+        Write-Host "ABBRUCH: eine Seite der Landing zaehlt keine Besucher." -ForegroundColor Red
+        Write-Host ""
+        exit 1
+    }
+    Write-Host "   [ok] Besucherzaehlen auf allen Seiten der Landing (tools/landing-zaehlen-pruefen.mjs)"
+}
+
 # --- 3b) v2176 - Register-Pflichtfelder gegen die Basislinie ----------
 # Marcel am 13.10.2026: "sicherstellen, dass wir immer die notwendigen
 # Felder ausfuellen und auch mit Quellen". Jeder Registersatz (Zins,

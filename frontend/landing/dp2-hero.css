@@ -192,3 +192,14 @@
   .ids-left{flex-direction:row;flex-wrap:wrap;justify-content:flex-start}
   .ids-stats{width:100%}
 }
+
+/* landing-hero-handy-1 · Marcel 23.11.2026: „das Video im Header auf der Handy-Version mit dem Fliegerbild wird nicht
+   angezeigt“. Gemessen bei 390 px: Bild 55 % Deckkraft, Hero 1.352 px hoch (cover schnitt den Flieger weg), Schleier
+   links 93 % schwarz genau über dem Flieger, Video gar nicht geladen. Am Handy jetzt ein eigenes Bild bzw. Video
+   (dp-hero-flug-handy.mp4, 640 px, 0,34 MB), oben im Kopf, nach unten ausgeblendet, Schleier von oben nach unten. */
+@media(max-width:760px){
+  .hero-bg{inset:0 0 auto 0;height:560px;opacity:.9;object-position:50% 30%;transform:none;animation:none;
+    -webkit-mask-image:linear-gradient(180deg,#000 55%,transparent 100%);mask-image:linear-gradient(180deg,#000 55%,transparent 100%)}
+  .hero-veil{background:linear-gradient(180deg,rgba(7,7,7,.30) 0,rgba(7,7,7,.55) 260px,rgba(7,7,7,.92) 520px,rgba(7,7,7,.97) 100%)!important}
+  .hero h1,.hero .eye{text-shadow:0 2px 14px rgba(0,0,0,.75)}
+}
