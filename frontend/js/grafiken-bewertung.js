@@ -148,8 +148,9 @@
     var gruen = 'color-mix(in srgb,' + GRUEN + ' 30%,transparent)', rot = 'color-mix(in srgb,' + ROT + ' 30%,transparent)', mitte = 'var(--gb-neutral)';
     var dscrH = zahl(K.dscr), dscrA = dscrKern(K.nkm_an, K.zins_an, K.tilg_an, K.bspar_an, K.bwk_cf_an, (D.S.ze || 0) * 12);
     var ltvH = zahl(K.ltv), cfm = zahl(K.cf_op) != null ? K.cf_op / 12 : null;
-    var dWort = function (v) { return v >= s.dg ? '✓ solide' : v >= s.dy ? '◐ knapp' : '✕ kritisch'; };
-    var dFarbe = function (v) { return v >= s.dg ? GRUEN : v >= s.dy ? 'currentColor' : ROT; };
+    var r2 = function (v) { return Math.round(v * 100) / 100; };   /* v4170b · wie angezeigt: 0,997 steht als 1,00 und gilt als 1,00 */
+    var dWort = function (v) { v = r2(v); return v >= s.dg ? '✓ solide' : v >= s.dy ? '◐ knapp' : '✕ kritisch'; };
+    var dFarbe = function (v) { v = r2(v); return v >= s.dg ? GRUEN : v >= s.dy ? 'currentColor' : ROT; };
     var z = [];
     if (dscrH != null) z.push(bullet({ name: 'DSCR heute', sub: 'Schuldendienstdeckung', wert: dscrH, text: nf2.format(dscrH), min: 0, max: 2,
       baender: [{ bis: s.dy, farbe: rot }, { bis: s.dg, farbe: mitte }, { bis: 2, farbe: gruen }], ziel: s.dg, farbe: dFarbe(dscrH), wort: dWort(dscrH),
@@ -217,9 +218,9 @@
       sub = 'Restschuld zum Immobilienwert je Jahr. Banken rechnen bis 60 % mit dem günstigsten Zins, bis 80 % ist üblich.' + (i60 >= 0 ? ' Ab ' + J[i60] + ' liegt die Beleihung unter 60 %, gut für die Anschlussfinanzierung.' : ' Im Zeitraum fällt die Beleihung nicht unter 60 %.');
     } else {
       var dh = zahl(D.K.dscr) != null ? D.K.dscr : W[0], i1 = -1;
-      W.some(function (v, i) { if (v != null && v >= s.dy) { i1 = i; return true; } return false; });
+      W.some(function (v, i) { if (v != null && Math.round(v * 100) / 100 >= s.dy) { i1 = i; return true; } return false; });
       if (i1 > 0) meil = '<circle cx="' + x(i1) + '" cy="' + y(Math.min(W[i1], max)) + '" r="5" style="fill:' + GRUEN + ';stroke:var(--surface,#fff);stroke-width:2"/><text class="gb-lab" x="' + (x(i1) - 6) + '" y="' + (y(Math.min(W[i1], max)) - 9) + '" text-anchor="end" style="fill:' + GRUEN + '">✓ ab ' + J[i1] + ' über ' + nf2.format(s.dy) + '</text>';
-      kopf = '<b style="color:' + (dh >= s.dg ? GRUEN : dh >= s.dy ? 'inherit' : ROT) + '">' + nf2.format(dh) + '</b><span>heute</span><span>' + (W[n - 1] != null ? nf2.format(W[n - 1]) + ' im Jahr ' + J[n - 1] : '') + '</span>';
+      kopf = '<b style="color:' + (Math.round(dh * 100) / 100 >= s.dg ? GRUEN : Math.round(dh * 100) / 100 >= s.dy ? 'inherit' : ROT) + '">' + nf2.format(dh) + '</b><span>heute</span><span>' + (W[n - 1] != null ? nf2.format(W[n - 1]) + ' im Jahr ' + J[n - 1] : '') + '</span>';
       sub = 'Miete nach nicht umlagefähigen Kosten geteilt durch Zins und Tilgung, je Jahr. Unter ' + nf2.format(s.dy) + ' muss Geld zugeschossen werden, ab ' + nf2.format(s.dg) + ' gilt die Finanzierung als solide.' + (i1 > 0 ? ' Ab ' + J[i1] + ' deckt die Miete den Schuldendienst.' : (i1 === 0 ? ' Die Miete deckt den Schuldendienst in jedem Jahr.' : ' Im Zeitraum deckt die Miete den Schuldendienst nie ganz.'));
     }
     var treff = J.map(function (j, i) {
@@ -260,7 +261,7 @@
       return '<div class="k z">' + (m > 0 ? '+' : m < 0 ? '−' : '±') + Math.abs(m) + ' %</div>' + zinsen.map(function (z) {
         var c = zelle(z, m), t = Math.min(1, Math.abs(c.cf) / maxA), f = c.cf >= 0 ? GRUEN : ROT;
         var bg = 'color-mix(in srgb,' + f + ' ' + Math.round(12 + t * 78) + '%,var(--gb-neutral))';
-        var hell = t > 0.55, warn = c.dscr != null && c.dscr < s.dy;
+        var hell = t > 0.55, warn = c.dscr != null && Math.round(c.dscr * 100) / 100 < s.dy;
         var tip = '<div class=j>Anschlusszins ' + nf1.format(z) + ' %, Miete ' + (m > 0 ? '+' : m < 0 ? '−' : '±') + Math.abs(m) + ' %</div>Cashflow vor Steuer <b>' + eurV(c.cf) + '</b> im Monat<br>DSCR <b>' + (c.dscr != null ? nf2.format(c.dscr) : 'keine Angabe') + '</b>' + (warn ? ' · unter der Bankschwelle' : '') + (z === azP && m === 0 ? '<br>Annahme heute' : '');
         return '<div class="c' + (z === azP && m === 0 ? ' basis' : '') + '" style="background:' + bg + ';color:' + (hell ? '#FDFCFA' : 'inherit') + '" data-tip="' + esc(tip) + '">'
           + (warn ? '<span class="warn" aria-label="unter der Bankschwelle">!</span>' : '')
@@ -269,7 +270,7 @@
     }).join('');
     /* ab welchem Zins kippt der Cashflow bei heutiger Miete? */
     var kipp = null; for (var zz = 0.5; zz <= 15; zz += 0.1) { if (zelle(zz, 0).cf < 0) { kipp = Math.round(zz * 10) / 10; break; } }
-    var dscrKipp = null; for (var zd = 0.5; zd <= 15; zd += 0.1) { var dv = zelle(zd, 0).dscr; if (dv != null && dv < s.dy) { dscrKipp = Math.round(zd * 10) / 10; break; } }
+    var dscrKipp = null; for (var zd = 0.5; zd <= 15; zd += 0.1) { var dv = zelle(zd, 0).dscr; if (dv != null && Math.round(dv * 100) / 100 < s.dy) { dscrKipp = Math.round(zd * 10) / 10; break; } }
     var satz = 'Bei ' + nf1.format(azP) + ' % Anschlusszins und heutiger Miete bleiben ' + eurV(basis.cf) + ' im Monat'
       + (kipp != null ? (kipp > azP ? '. Ins Minus rutscht der Cashflow erst ab rund ' + nf1.format(kipp) + ' % Zins' : '. Schon bei dieser Annahme fehlt Geld, positiv wird es erst unter rund ' + nf1.format(kipp) + ' % Zins') : ', auch bei 15 % Zins bleibt er positiv')
       + (dscrKipp != null ? ', die Bankschwelle DSCR ' + nf2.format(s.dy) + ' reißt ab rund ' + nf1.format(dscrKipp) + ' %.' : '.');
