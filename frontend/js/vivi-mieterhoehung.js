@@ -52,7 +52,9 @@
 
   function stand() { try { return global.DpVivi && global.DpVivi.stand ? global.DpVivi.stand() : null; } catch (e) { return null; } }
   function einsteiger() { try { return !!(global.DpDetailgrad && global.DpDetailgrad.stufe && global.DpDetailgrad.stufe() === 1); } catch (e) { return false; } }
-  function vorschauFrei() { try { return !global.DpVorschau || !global.DpVorschau.frei || global.DpVorschau.frei('vivi'); } catch (e) { return false; } }
+  /* DpVorschau.frei ist asynchron (Promise, immer truthy). istFrei ist synchron: false = gesperrt, null = noch nicht
+     geladen (dann trägt der ViVi-Stand, den das Backend nur bei freier Funktion liefert). Gemessen im Quertest v4037f. */
+  function vorschauFrei() { try { var V = global.DpVorschau; if (!V || typeof V.istFrei !== 'function') return true; return V.istFrei('vivi') !== false; } catch (e) { return false; } }
   function verfuegbar() { var s = stand(); return !!(s && s.verknuepft && s.status === 'fertig') && !einsteiger() && vorschauFrei(); }
 
   /** Die vermieteten Wohnungen mit dem, was DealPilot für möglich hält (Modell der Potenzialanalyse). */
@@ -132,7 +134,8 @@
       : (art === '559' ? 'Die Umlage einer Modernisierung rechnet DealPilot hier nicht vor. Trag die neue Miete aus deiner Modernisierungsankündigung ein.'
         : (art === 'index' ? 'Für eine Indexanpassung fehlt im Mietvertrag die Indexvereinbarung oder der Index.'
           : (art === 'staffel' ? 'Für diese Wohnung ist keine nächste Staffel eingetragen. Trag sie aus dem Mietvertrag ein.'
-            : (w && w.vertrag ? 'Bei einem ' + (w.vertrag === 'index' ? 'Index' : 'Staffel') + 'mietvertrag gibt es keine Erhöhung nach § 558. Wähl die Art des Vertrags.' : 'Nach § 558 sieht DealPilot heute keinen Spielraum (Kappungsgrenze, Vergleichsmiete oder Sperrfrist).')))))
+            : (w && w.vertrag === 'gewerbe' ? 'Bei Gewerbe gilt § 558 nicht. Die Erhöhung richtet sich nach dem Mietvertrag (Index, Staffel oder Vereinbarung). Trag die vereinbarte Miete ein.'
+              : (w && w.vertrag ? 'Bei einem ' + (w.vertrag === 'index' ? 'Index' : 'Staffel') + 'mietvertrag gibt es keine Erhöhung nach § 558. Wähl die Art des Vertrags.' : 'Nach § 558 sieht DealPilot heute keinen Spielraum (Kappungsgrenze, Vergleichsmiete oder Sperrfrist).'))))))
       + (w && neu != null && w.wfl > 0 ? ' <span class="vmh-hin">Neu ' + esc((neu / w.wfl).toLocaleString('de-DE', { maximumFractionDigits: 2 })) + ' €/m².</span>' : '') + '</div>';
     if (ueber) h += '<div class="vmh-box vmh-warn"><b>Mehr als DealPilot für zulässig hält.</b> Eine Mieterhöhung über der Kappungsgrenze oder der Vergleichsmiete ist im laufenden Vertrag nicht durchsetzbar.'
       + '<label><input type="checkbox" data-vmh-f="trotzdem"' + (_z.trotzdem ? ' checked' : '') + '> Ich habe es geprüft, die Miete ist so vereinbart oder zulässig.</label></div>';
