@@ -17,7 +17,7 @@
  * ═══════════════════════════════════════════════════════════════════════════════════════════════════════════════ */
 (function (global) {
   'use strict';
-  var VERSION = 'v4040';
+  var VERSION = 'v4040a';
   if (!global.document || global.DpViviReiter) return;
   var doc = global.document;
   var _jahr = null, _offen = {};
@@ -36,8 +36,12 @@
   function vstand() { try { return global.DpVivi && global.DpVivi.stand ? global.DpVivi.stand() : null; } catch (e) { return null; } }
   function speichern() { try { if (global.DpSpeichernFolge) global.DpSpeichernFolge(); else if (typeof global.saveObj === 'function') global.saveObj({ silent: true }); } catch (e) {} }
 
-  /** Reiter zeigen? Verknüpft (gespeicherter Stand im Objekt) und nicht Einsteiger. */
-  function sichtbar() { var v = felder(); return !!(v && v.verknuepft) && !einsteiger(); }
+  /* Vorschau-Funktion 'vivi' (claude/vorschau-funktionen.md): wie vivi-mieterhoehung.js einmal geladen, synchron gelesen */
+  var _frei = null;
+  try { if (global.DpVorschau && typeof global.DpVorschau.frei === 'function') global.DpVorschau.frei('vivi').then(function (v) { _frei = !!v; }).catch(function () { _frei = false; }); } catch (e) {}
+  function vorschauFrei() { try { if (_frei === false) return false; var V = global.DpVorschau; return !(V && typeof V.istFrei === 'function' && V.istFrei('vivi') === false); } catch (e) { return false; } }
+  /** Reiter zeigen? Verknüpft (gespeicherter Stand im Objekt), Vorschau frei und nicht Einsteiger. */
+  function sichtbar() { var v = felder(); return !!(v && v.verknuepft) && vorschauFrei() && !einsteiger(); }
 
   /* ── Jahre ──────────────────────────────────────────────────────── */
   function startJahr() {
