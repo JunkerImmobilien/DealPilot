@@ -27,8 +27,18 @@
   var VERSION = 'v4037';
   function doc() { return global.document || null; }
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
-  function zahl(v) { if (v == null || v === '') return null; var n = parseFloat(String(v).replace(/\./g, '').replace(',', '.')); return isFinite(n) ? n : null; }
-  function zahlEin(v) { if (v == null || v === '') return null; var t = String(v).trim(); if (/,/.test(t)) t = t.replace(/\./g, '').replace(',', '.'); var n = parseFloat(t); return isFinite(n) ? n : null; }
+  /* Zahl aus Modell oder Eingabe: Zahlen bleiben Zahlen (806.17 ist kein Tausender), Text deutsch oder englisch */
+  function zahl(v) {
+    if (v == null || v === '') return null;
+    if (typeof v === 'number') return isFinite(v) ? v : null;
+    var t = String(v).trim().replace(/\s|€/g, '');
+    if (t.indexOf(',') >= 0) t = t.replace(/\./g, '').replace(',', '.');
+    else if (/^\d{1,3}(\.\d{3})+$/.test(t)) t = t.replace(/\./g, '');
+    var n = parseFloat(t); return isFinite(n) ? n : null;
+  }
+  /* Termine im Modell sind JJJJ-MM, ViVi braucht einen Tag: der Erste des Monats */
+  function tag(x) { var t = String(x || ''); if (/^\d{4}-\d{2}$/.test(t)) return t + '-01'; return /^\d{4}-\d{2}-\d{2}/.test(t) ? t.slice(0, 10) : null; }
+  function zahlEin(v) { return zahl(v); }
   function eur(n) { return n == null ? '–' : Math.round(n).toLocaleString('de-DE') + ' €'; }
   function eur2(n) { return n == null ? '–' : n.toLocaleString('de-DE', { minimumFractionDigits: 0, maximumFractionDigits: 2 }) + ' €'; }
   function datumDe(iso) { var m = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(iso || '')); return m ? m[3] + '.' + m[2] + '.' + m[1] : ''; }
@@ -54,9 +64,10 @@
       var ist = zahl(w.ist); if (!(ist > 0) || w.status === 'leer') return;
       var so = w.soll || {}, t = so.termine || {}, ix = w.index && w.index.ok && w.index.naechste ? w.index.naechste : null;
       out.push({ j: j, i: w.i == null ? null : w.i, nr: w.nr, name: m.art === 'mfh' ? 'Wohnung ' + (w.nr || (j + 1)) + (w.lage ? ', ' + w.lage : '') : 'Wohnung', wfl: zahl(w.wfl), ist: ist,
-        soll: so.miete != null && so.miete > ist + 0.5 ? Math.round(so.miete * 100) / 100 : null, soll_ab: t.wirksam_ab || so.ab || null, verlangbar_ab: t.verlangbar_ab || null,
-        ab_text: so.ab_text || '', vertrag: !!so.vertrag,
-        index_miete: ix ? zahl(ix.miete_neu) : null, index_ab: ix ? ix.wirksam || null : null });
+        /* Spielraum nach § 558 nur ohne Index- oder Staffelvertrag (dort gilt der Vertrag, § 557a/b) */
+        soll: !so.vertrag && so.miete != null && so.miete > ist + 0.5 ? Math.round(so.miete * 100) / 100 : null, soll_ab: tag(t.wirksam_ab || so.ab), verlangbar_ab: tag(t.verlangbar_ab),
+        ab_text: so.ab_text || '', vertrag: so.vertrag || null,
+        index_miete: ix ? zahl(ix.miete_neu) : null, index_ab: ix ? tag(ix.wirksam) : null });
     });
     return { mfh: !!(m && m.art === 'mfh'), liste: out };
   }
@@ -96,6 +107,7 @@
     return w.soll != null ? { miete: w.soll, ab: w.soll_ab, text: w.ab_text || 'Vergleichsmiete und Kappungsgrenze' } : null;
   }
 
+  function artFuer(w, gewuenscht) { if (gewuenscht) return gewuenscht; return w && w.vertrag === 'index' ? 'index' : '558'; }
   function zeichnen() {
     var d = doc(), host = d && d.getElementById('dp-vmh'); if (!host || !_z) return;
     var W = _z.W, w = gewaehlt(), art = _z.art, mg = moeglich(w, art);
@@ -175,7 +187,7 @@
     stil(); schliessen();
     var W = wohnungen(), sel = 0;
     if (o.einheit != null) W.liste.forEach(function (x, k) { if (String(x.i) === String(o.einheit)) sel = k; });
-    _z = { W: W, sel: sel, art: o.art || '558', neu: null, datum: null, trotzdem: false, vorschau: '', vorschauOk: false, fehler: '', laeuft: false, quelle: o.quelle || '' };
+    _z = { W: W, sel: sel, art: artFuer(W.liste[sel], o.art), neu: null, datum: null, trotzdem: false, vorschau: '', vorschauOk: false, fehler: '', laeuft: false, quelle: o.quelle || '' };
     var ov = d.createElement('div'); ov.id = 'dp-vmh-ov';
     ov.innerHTML = '<div id="dp-vmh" role="dialog" aria-modal="true" aria-label="Mieterhöhung in ViVi anlegen"></div>';
     d.body.appendChild(ov);
@@ -189,7 +201,7 @@
     ov.addEventListener('change', function (ev) {
       var f = ev.target && ev.target.getAttribute && ev.target.getAttribute('data-vmh-f'); if (!f || !_z) return;
       var v = ev.target.value;
-      if (f === 'sel') { _z.sel = +v; _z.neu = null; _z.datum = null; }
+      if (f === 'sel') { _z.sel = +v; _z.neu = null; _z.datum = null; _z.art = artFuer(gewaehlt(), null); }
       else if (f === 'art') { _z.art = v; _z.neu = null; _z.datum = null; }
       else if (f === 'neu') _z.neu = zahlEin(v);
       else if (f === 'datum') _z.datum = v || null;
