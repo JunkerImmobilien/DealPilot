@@ -21,7 +21,7 @@
   var AN = false, _timer = null, _f = { art: 'all', obj: 'all', jahr: 0 };
   var nf0 = new Intl.NumberFormat('de-DE', { maximumFractionDigits: 0 }), nf1 = new Intl.NumberFormat('de-DE', { minimumFractionDigits: 1, maximumFractionDigits: 1 }),
     nf2 = new Intl.NumberFormat('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-  var GOLD = 'var(--wl-c9a84c, #C9A84C)', GRUEN = 'var(--c-greenl, #387652)', ROT = 'var(--c-redl, #965c53)';
+  var GOLD = 'var(--wl-c9a84c, #C9A84C)', GRUEN = '#3FA56C', ROT = '#B8625C';   /* v4280 · dieselben Statusfarben wie Reiter Bewertung und Pilot-Analyse (vorher --c-greenl/--c-redl, dunkler) */
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
   function zahl(v) { if (v == null || v === '') return null; var n = typeof v === 'number' ? v : Number(String(v).replace(/\s/g, '')); return isFinite(n) ? n : null; }
   function summe(L, f) { return L.reduce(function (t, x) { var v = f(x); return t + (v == null || !isFinite(v) ? 0 : v); }, 0); }
@@ -108,7 +108,7 @@
       E + ' > [data-dp-gp="gb"],' + E + ' > [data-dp-gp="det"]{display:none !important}',
       E + ' .gp-klein{display:none}' + E + ' #dp-einfach .ke2 > .ke2-k:first-child{display:none}',
       B + ' .gp-sl{margin:6px 0 10px}',
-      B + '{margin:14px 0 18px;color:var(--c-ptext,#1b1815);font-family:Inter,system-ui,sans-serif}',
+      B + '{margin:14px 0 18px;color:var(--c-ptext,#2A2727);font-family:Inter,system-ui,sans-serif;--c-ptext:#2A2727;--c-pmut:color-mix(in srgb,#2A2727 62%,transparent);--c-line:color-mix(in srgb,#2A2727 10%,transparent)}',   /* v4280 · Farbschema Reiter Bewertung */
       B + ' .gp-kopf{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:8px 16px;margin:0 2px 10px}',
       B + ' .gp-kopf h3{margin:0;font:700 20px/1.2 "Space Grotesk",sans-serif}',
       B + ' .gp-kopf small{display:block;color:var(--c-pmut,#6b6660);font-size:11px;margin-top:2px}',
@@ -118,7 +118,7 @@
       B + ' .gp-filter b{font:600 12px "JetBrains Mono",monospace;color:var(--c-ptext,#1b1815)}',
       /* Leiste: vier große Werte, darunter eine ruhige Reihe kleiner */
       B + ' .gp-gross{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}',
-      B + ' .gp-k{background:color-mix(in srgb,#fff 70%,#FBF6E9);border:1px solid var(--c-line,#e0dbd3);border-radius:10px;padding:10px 12px;min-width:0}',
+      B + ' .gp-k{background:var(--surface,#F8F6F1);border:1px solid var(--c-line,#e0dbd3);border-radius:10px;padding:10px 12px;min-width:0}',
       B + ' .gp-k.gp-haupt{border-color:color-mix(in srgb,' + GOLD + ' 55%,transparent);background:color-mix(in srgb,' + GOLD + ' 8%,#fff)}',
       B + ' .gp-l{display:block;font:600 10px/1.3 Inter,sans-serif;letter-spacing:.06em;text-transform:uppercase;color:var(--c-pmut,#6b6660)}',
       B + ' .gp-v{display:block;font:700 22px/1.2 "Space Grotesk",sans-serif;margin-top:3px;white-space:nowrap}',
@@ -131,7 +131,7 @@
       B + ' .gp-gb b{color:var(--c-ptext,#1b1815);font-family:"JetBrains Mono",monospace;font-weight:600}',
       /* Karten */
       B + ' .gp-raster{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:12px;margin-top:12px}',
-      B + ' .gp-karte{background:#fff;border:1px solid var(--c-line,#e0dbd3);border-radius:14px;padding:14px 16px;min-width:0;position:relative}',
+      B + ' .gp-karte{background:var(--surface,#F8F6F1);border:1px solid var(--c-line,#e0dbd3);border-radius:14px;padding:18px 20px 16px;min-width:0;position:relative}',
       B + ' .gp-breit{grid-column:1/-1}',
       B + ' .gp-t{font:600 15px/1.3 "Space Grotesk",Inter,sans-serif}',
       B + ' .gp-t em{font-style:normal;color:var(--dp-gold-txt,#7d682f);background:color-mix(in srgb,' + GOLD + ' 22%,transparent);border-radius:5px;padding:0 5px}',

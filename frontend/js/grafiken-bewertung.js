@@ -246,6 +246,8 @@
   }
 
   /* ── v4250 · Vermögensaufbau und Vermögenszuwachs im Stil dieses Reiters ─────────────
+     v4280 · Marcel: „gleiche Farbtöne wie Einordnung, Schuldendienstdeckung und Beleihung“: Eigenkapital-Fläche und Bausteine in Grün
+     bzw. Rot (blasse Fläche 30 % mit Rand), Summe kräftig, Gold nur noch für die Wertlinie und Marken.
      Marcel 23.11.2026: „den Vermögenszuwachs in 15 Jahren nach Kauf und den Vermögensaufbau in 15 Jahren bitte im
      gleichen Stil wie Zinsrisiko, Schuldendienstdeckung, Beleihungsauslauf und Einordnung“. Ersetzt #bc-equity und
      #bc-waterfall (bank-charts.js) nur bei Vorschau. RECHNET NICHTS NEU: dieselben Größen wie bank-charts.js
@@ -286,7 +288,7 @@
       return '<rect class="gb-treff" x="' + bx.toFixed(1) + '" y="' + T + '" width="' + bw.toFixed(1) + '" height="' + ih + '" data-tip="' + esc(tt) + '"/>';
     }).join('');
     var svg = '<svg viewBox="0 0 ' + w + ' ' + h + '" role="img" aria-label="Vermögensaufbau je Jahr">' + netz
-      + '<path d="' + band + '" style="fill:var(--gb-gold);fill-opacity:.13"/>' + ezb
+      + '<path d="' + band + '" style="fill:' + GRUEN + ';fill-opacity:.12"/>' + ezb
       + '<path class="gb-linie" d="' + pfad('wert') + '" style="stroke:var(--gb-gold);--gb-len:' + len('wert') + '"/>'
       + '<path class="gb-linie" d="' + pfad('rs') + '" style="stroke:currentColor;opacity:.75;--gb-len:' + len('rs') + '"/>'
       + em + jx + treff + '</svg>';
@@ -294,8 +296,8 @@
       + (mult != null ? '<span>Eigenkapital ' + tsd(V.w0 - V.rs0) + ' heute, ' + tsd(ende.ek) + ' am Ende · ' + nf1.format(mult) + ' × dein Einsatz von ' + tsd(V.ek0) + '</span>' : '<span>kein Eigenkapital eingesetzt</span>');
     return '<div class="dp-gb-karte" data-gb="aufbau"><div class="gb-tip"></div><div class="dp-gb-eti">Vermögensaufbau · ' + n + ' Jahre</div>'
       + '<div class="dp-gb-t">' + (gesamt >= 0 ? 'Die Schere zwischen Wert und Restschuld ist dein Vermögen' : 'Das Vermögen schrumpft im Zeitraum') + '</div>'
-      + '<div class="gb-kopfzahl">' + kopf + '</div><p class="dp-gb-s">Der Wert steigt mit deiner Annahme zur Wertsteigerung, die Restschuld sinkt mit der Tilgung. Die goldene Fläche dazwischen ist dein Eigenkapital, Jahr für Jahr.</p>' + svg
-      + '<div class="gb-leg"><span><i style="background:var(--gb-gold)"></i>Wert</span><span><i style="background:currentColor;opacity:.75"></i>Restschuld</span><span><i style="background:var(--gb-gold);opacity:.3;height:10px;vertical-align:-1px"></i>Eigenkapital</span><span><i class="d" style="color:var(--gb-gold)"></i>Ende Zinsbindung</span></div></div>';
+      + '<div class="gb-kopfzahl">' + kopf + '</div><p class="dp-gb-s">Der Wert steigt mit deiner Annahme zur Wertsteigerung, die Restschuld sinkt mit der Tilgung. Die grüne Fläche dazwischen ist dein Eigenkapital, Jahr für Jahr.</p>' + svg
+      + '<div class="gb-leg"><span><i style="background:var(--gb-gold)"></i>Wert</span><span><i style="background:currentColor;opacity:.75"></i>Restschuld</span><span><i style="background:' + GRUEN + ';opacity:.3;height:10px;vertical-align:-1px"></i>Eigenkapital</span><span><i class="d" style="color:var(--gb-gold)"></i>Ende Zinsbindung</span></div></div>';
   }
   function zuwachsTeile() {
     var V = vermDaten(), vz = V && V.vz; if (!vz) return null;
@@ -320,7 +322,7 @@
     var stp = Math.pow(10, Math.floor(Math.log10(Math.max(1, max - min) / 4))), st = Math.ceil((max - min) / 4 / stp) * stp, tk = []; for (var t = Math.ceil(min / st) * st; t <= max; t += st) tk.push(t);
     var netz = tk.map(function (v) { return '<line class="gb-netz" x1="' + L + '" x2="' + (w - R) + '" y1="' + y(v).toFixed(1) + '" y2="' + y(v).toFixed(1) + '"/><text class="gb-ax" x="' + (L - 8) + '" y="' + (y(v) + 4).toFixed(1) + '" text-anchor="end">' + tsd(v) + '</text>'; }).join('');
     var saeulen = stufen.map(function (q, i) {
-      var top = y(Math.max(q.a, q.b)), hh = Math.max(2, Math.abs(y(q.a) - y(q.b))), f = q.t.v >= 0 ? 'var(--gb-gold)' : ROT;
+      var top = y(Math.max(q.a, q.b)), hh = Math.max(2, Math.abs(y(q.a) - y(q.b))), f = 'color-mix(in srgb,' + (q.t.v >= 0 ? GRUEN : ROT) + ' 30%,transparent);stroke:' + (q.t.v >= 0 ? GRUEN : ROT) + ';stroke-width:1';   /* v4280 · blasse Bänder wie Einordnung und Zinsrisiko */
       var tt = '<div class=j>' + esc(q.t.n) + '</div><b>' + eurV(q.t.v) + '</b> ' + esc(q.t.u);
       var verb = i < stufen.length ? '<line x1="' + (cx(i) + bw / 2).toFixed(1) + '" x2="' + (cx(i + 1) - bw / 2).toFixed(1) + '" y1="' + y(q.b).toFixed(1) + '" y2="' + y(q.b).toFixed(1) + '" style="stroke:currentColor;opacity:.35;stroke-dasharray:3 3"/>' : '';
       return '<rect class="gb-saeule" x="' + (cx(i) - bw / 2).toFixed(1) + '" y="' + top.toFixed(1) + '" width="' + bw.toFixed(1) + '" height="' + hh.toFixed(1) + '" rx="4" style="fill:' + f + ';animation-delay:' + (i * 120) + 'ms" data-tip="' + esc(tt) + '"/>'

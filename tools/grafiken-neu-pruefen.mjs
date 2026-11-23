@@ -15,9 +15,11 @@
      F  Hebel: Basis = IRR des Basisfalls, jede Spanne enthält die Basis, im Bestand kein Kaufpreis-Hebel
      G  Heatmap: Basiszelle = Szenario mit dem App-Zins, höherer Zins nie besser, Miete +x nie schlechter
      H  Monte-Carlo: P10 ≤ Mitte ≤ P90 je Jahr, fester Startwert (zweimal gleich)
-     I  v4250 Theme: Farben sind var(--gx-*), Heatmap mischt per color-mix (kein NaN), Mieteuro je 100 € Miete geht auf
+     I  v4250 Theme: Farben sind var(--gx-*), Heatmap mischt per color-mix wie Reiter Bewertung (v4280, kein NaN), Mieteuro je 100 € Miete geht auf
      J  v4250 Reiter Bewertung (grafiken-bewertung.js): Vermögenszuwachs = Summe der vier Quellen wie calc.js (_vz),
         Vermögensaufbau: Wert Ende Jahr = Startwert × (1 + Wertsteigerung)^Jahre, Eigenkapital = Wert − Restschuld
+     K  v4280: Steuer-Break-even (erstes Jahr mit Steuer > 0, Demostraße 2028), Zielbild-Meilenstein im Fahrplan (mit und ohne Jahr,
+        Gegenprobe ohne Zielbild), Spanne und Restschuld an Ende der Zinsbindung
      X  Gegenprobe: eine um 5 € verfälschte Rechnung muss A rot machen, ein verfälschter Zuwachs muss J rot machen
 
    RC 0 = alles grün.
@@ -149,7 +151,7 @@ const Fb = C.DpGrafiken.farben;
 pruefe('I Farben hängen an Theme-Variablen', /^var\(--gx-/.test(Fb.tinte) && /^var\(--gx-/.test(Fb.karte) && Fb.gruen === '#3FA56C', Fb.tinte);
 const hHost = { clientWidth: 600, innerHTML: '', classList: { contains: () => false, add() {} }, closest: () => null, appendChild() {}, addEventListener() {}, querySelector: () => null };
 C.DpGrafiken.heatmap(hHost, { spalten: [3, 4, 5], zeilen: [-10, 0, 10], werte: [[-50, -80, -120], [20, -10, -40], [90, 60, 30]], basis: { z: 1, s: 1 } }, { breite: 600 });
-pruefe('I Heatmap: color-mix, kein NaN', /color-mix\(in srgb,#3FA56C \d+%,var\(--gx-flaeche\)\)/.test(hHost.innerHTML) && !/NaN|undefined/.test(hHost.innerHTML));
+pruefe('I Heatmap: color-mix wie Reiter Bewertung (v4280), kein NaN', /color-mix\(in srgb,#3FA56C \d+%,transparent\)/.test(hHost.innerHTML) && /#B8625C/.test(hHost.innerHTML) && !/NaN|undefined/.test(hHost.innerHTML));
 const je100 = D.aus.filter(a => a.v > 0.5).reduce((s, a) => s + a.v / r26.nkm * 100, 0), ein100 = D.ein.filter(a => a.v > 0.5).reduce((s, a) => s + a.v / r26.nkm * 100, 0);
 pruefe('I Mieteuro je 100 € Miete: Wohin = Woher', Math.abs(je100 - ein100) < 0.1, je100.toFixed(1) + ' = ' + ein100.toFixed(1));
 
@@ -174,6 +176,24 @@ pruefe('J Zuwachs-Karte meldet „Prüfung: die Summe entspricht“', /Summe ent
 const VD = GB._vermDaten(), zl = VD.Z[VD.n - 1];
 pruefe('J Aufbau: Wert am Ende = Startwert × 1,015^Jahre', Math.abs(zl.wert - 145000 * Math.pow(1.015, VD.n)) < 0.01, Math.round(zl.wert) + ' €, ' + VD.n + ' Jahre');
 pruefe('J Aufbau: Eigenkapital = Wert − Restschuld je Jahr', VD.Z.every(z => Math.abs(z.ek - (z.wert - z.rs)) < 1e-6) && Math.abs(zl.rs - cfRows[cfRows.length - 1].rs) < 0.01);
+
+/* K · v4280 Break-even Steuer, Zielbild im Fahrplan, Werte an Ende Zinsbindung */
+const BE = C.DpGrafikenPremium._steuerBreakEven(P);
+pruefe('K Steuer ab 2028: erstes Jahr ab heute mit Steuer > 0 und positivem Ergebnis aus Vermietung', BE && BE.j === 2028 && Math.round(BE.vuv) === 74 && Math.round(BE.steuer) === 35, BE ? BE.j + ', V+V ' + Math.round(BE.vuv) + ' €, Steuer ' + Math.round(BE.steuer) + ' €' : 'keins');
+pruefe('K vor dem Break-even keine Steuerzahlung', P.J.filter(r => r.j >= P.heute && r.j < 2028).every(r => r.steuer <= 0.5 && r.vuv <= 0));
+const ohneZb = M.meilensteine(P, M.rechne(P, {}));
+pruefe('K ohne Zielbild kein Zielbild-Meilenstein (Gegenprobe)', !ohneZb.some(m => /^Zielbild/.test(m.n)));
+C.DpWertZielbild = { daten: () => ({ zielbild: { jahre: { zielbild: 2030 }, stufen: { zielbild: { miete_monat: 720, kosten: 8000 } } } }) };
+const mitZb = M.meilensteine(P, M.rechne(P, {})), zbM = mitZb.find(m => m.n === 'Zielbild');
+pruefe('K Zielbild im Fahrplan: Jahr 2030, Miete 720 €, Maßnahmen 8.000 €', zbM && Math.floor(zbM.j) === 2030 && /720 €/.test(zbM.d) && /8\.000 €/.test(zbM.d), zbM ? zbM.j + ' · ' + zbM.d : 'fehlt');
+C.DpWertZielbild = { daten: () => ({ zielbild: { jahre: { zielbild: null }, stufen: { zielbild: { miete_jahr: 7440, kosten: 0 } } } }) };
+const offZb = M.meilensteine(P, M.rechne(P, {})).find(m => /^Zielbild/.test(m.n));
+pruefe('K Zielbild ohne Jahr: „Jahr offen“ nach heute, Miete 620 €', offZb && offZb.n === 'Zielbild, Jahr offen' && offZb.j > P.heute && /620 €/.test(offZb.d), offZb ? offZb.n + ' · ' + offZb.d : 'fehlt');
+delete C.DpWertZielbild;
+const MCk = M.monteCarlo(P, 200), iBk = P.bindEnde - 1 - P.heute;
+pruefe('K Spanne an Ende Zinsbindung liest das Jahr vor dem Wechsel', P.bindEnde === 2034 && MCk.jahre[iBk] === 2033 && MCk.p10[iBk] <= MCk.p50[iBk] && MCk.p50[iBk] <= MCk.p90[iBk], 'Jahr ' + MCk.jahre[iBk]);
+const zeileB = M.rechne(P, {}).rows.find(r => r.j === 2033), appB = P.J.find(r => r.j === 2033);
+pruefe('K Fahrplan-Wert an Ende Zinsbindung = Restschuld der App 2033', zeileB && appB && Math.abs(zeileB.rs - appB.rs) < 0.5, zeileB ? Math.round(zeileB.rs) + ' €' : 'fehlt');
 
 /* X Gegenprobe */
 const orig = M.rechne;

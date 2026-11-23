@@ -70,7 +70,7 @@
      Obsidian-Text), dunkel per html[data-gx-stil="dunkel"]. Gold weiter nur über Whitelabel-Token, Grün und Rot fest. */
   var F = { tinte: 'var(--gx-tinte)', tinte2: 'var(--gx-tinte2)', tinte3: 'var(--gx-tinte3)', linie: 'var(--gx-linie)', linie2: 'var(--gx-linie2)', flaeche: 'var(--gx-flaeche)', karte: 'var(--gx-karte)',
     gold: 'var(--wl-c9a84c,#C9A84C)', goldH: 'var(--wl-e8cc7a,#E8CC7A)', goldD: 'var(--wl-b8932f,#b8932f)',
-    gruen: '#3FA56C', rot: '#D8564C', neutral: 'var(--gx-neutral)',
+    gruen: '#3FA56C', rot: '#B8625C', neutral: 'var(--gx-neutral)', gruenW: 'var(--gx-gruen-w)', rotW: 'var(--gx-rot-w)',
     creme: 'var(--gx-kontrast)', gold2: 'color-mix(in srgb,var(--wl-c9a84c,#C9A84C) 55%,var(--gx-karte))', gold3: 'color-mix(in srgb,var(--wl-b8932f,#b8932f) 60%,#0E0D0B)' };
   F.blau = F.creme; F.violett = F.gold3;
 
@@ -80,8 +80,13 @@
     var s = document.createElement('style'); s.id = 'dp-gx-stil';
     s.textContent = [
       /* v4250 · Theme: hell Standard, dunkel per html[data-gx-stil=dunkel] (Einstellungen › Anzeige-Optionen › Grafiken) */
-      '.dp-gx,.dp-pa-wrap .dp-gn.dp-gn-karte{--gx-bg:var(--surface,#FFFFFF);--gx-karte:var(--surface,#FFFFFF);--gx-tinte:#1B1815;--gx-tinte2:#5F5850;--gx-tinte3:#8A8276;--gx-linie:#EFE8DA;--gx-linie2:#E2D8C4;--gx-flaeche:#F6F1E6;--gx-neutral:#6F685C;--gx-kontrast:#2A2727;--gx-rand:color-mix(in srgb,#2A2727 12%,transparent);--gx-schatten:0 1px 2px rgba(5,5,5,.04);--gx-tip-bg:#050505;--gx-tip-fg:#FDFCFA}',
-      'html[data-gx-stil="dunkel"] .dp-gx,html[data-gx-stil="dunkel"] .dp-pa-wrap .dp-gn.dp-gn-karte{--gx-bg:linear-gradient(180deg,#16140F,#0E0D0B);--gx-karte:#0E0D0B;--gx-tinte:#E9E3D6;--gx-tinte2:#B9B2A3;--gx-tinte3:#8A8374;--gx-linie:#26231E;--gx-linie2:#3A352D;--gx-flaeche:#1B1915;--gx-neutral:#6F685C;--gx-kontrast:#E9E3D6;--gx-rand:#26231E;--gx-schatten:0 1px 0 rgba(255,255,255,.03) inset,0 10px 30px rgba(5,5,5,.18);--gx-tip-bg:#F3EEE4;--gx-tip-fg:#0B0A09}',
+      /* v4280 · Marcel 23.11.2026: alle Grafiken im Farbschema der Karten im Reiter Bewertung (Einordnung, Schuldendienstdeckung,
+         Beleihung). Gemessen dort (getComputedStyle): Karte --surface #F8F6F1, Text #2A2727, Netz und Rand #2A2727 10 %, Achsen und
+         Untertitel #2A2727 62 %, kein Schatten, Radius 14, Innenabstand 18/20/16, Titel Space Grotesk 600 18 px, Kopfzahl Space
+         Grotesk 600 28 px, Achsen JetBrains Mono 11 px. Grün #3FA56C und Rot #B8625C, Flächen davon 30 % (Bänder) bzw. 7 % (Zonen).
+         EINE Quelle für alle: diese Variablen (DpGrafiken.farben), grafiken-bewertung.js und grafiken-portfolio.js lesen dieselben. */
+      '.dp-gx,.dp-pa-wrap .dp-gn.dp-gn-karte,.dp-gb,.dp-gp{--gx-bg:var(--surface,#F8F6F1);--gx-karte:var(--surface,#F8F6F1);--gx-tinte:#2A2727;--gx-tinte2:color-mix(in srgb,#2A2727 62%,transparent);--gx-tinte3:color-mix(in srgb,#2A2727 50%,transparent);--gx-linie:color-mix(in srgb,#2A2727 10%,transparent);--gx-linie2:color-mix(in srgb,#2A2727 16%,transparent);--gx-flaeche:color-mix(in srgb,#2A2727 5%,transparent);--gx-neutral:color-mix(in srgb,#2A2727 7%,transparent);--gx-kontrast:#2A2727;--gx-rand:color-mix(in srgb,#2A2727 10%,transparent);--gx-schatten:none;--gx-tip-bg:#050505;--gx-tip-fg:#FDFCFA;--gx-gruen-w:color-mix(in srgb,#3FA56C 30%,transparent);--gx-rot-w:color-mix(in srgb,#B8625C 30%,transparent)}',
+      'html[data-gx-stil="dunkel"] .dp-gx,html[data-gx-stil="dunkel"] .dp-pa-wrap .dp-gn.dp-gn-karte,html[data-gx-stil="dunkel"] .dp-gb,html[data-gx-stil="dunkel"] .dp-gp{--gx-bg:linear-gradient(180deg,#16140F,#0E0D0B);--gx-karte:#0E0D0B;--gx-tinte:#E9E3D6;--gx-tinte2:#B9B2A3;--gx-tinte3:#8A8374;--gx-linie:#26231E;--gx-linie2:#3A352D;--gx-flaeche:#1B1915;--gx-neutral:#6F685C;--gx-kontrast:#E9E3D6;--gx-rand:#26231E;--gx-schatten:0 1px 0 rgba(255,255,255,.03) inset,0 10px 30px rgba(5,5,5,.18);--gx-tip-bg:#F3EEE4;--gx-tip-fg:#0B0A09}',
       /* Premium-Karte: Obsidian, Creme-Schrift, Gold als Akzent. Gilt auch für die Karten aus v4140 in der Pilot-Analyse. */
       '.dp-pa-wrap .dp-gn.dp-gn-karte,.dp-pa-wrap .dp-gn.dp-gx,.dp-gx-frei.dp-gx,.dp-pa-wrap[data-dp-pa-v4] .dp-pa-content .dp-gn.dp-gn-karte,.dp-pa-wrap[data-dp-pa-v4] .dp-pa-content .dp-gn.dp-gx{background:var(--gx-bg)!important;color:' + F.tinte + '!important;border:1px solid var(--gx-rand)!important;border-radius:14px!important;padding:18px 20px 16px!important;box-shadow:var(--gx-schatten)!important;--gn-card:' + F.karte + ';--gn-grau:color-mix(in srgb,' + F.tinte + ' 28%,transparent);--gn-netz:color-mix(in srgb,' + F.tinte + ' 9%,transparent);--gn-tinte:' + F.tinte + ';--gn-leise:' + F.tinte2 + ';--gn-rot:' + F.rot + '}',
       '.dp-pa-wrap .dp-gn.dp-gn-karte .dp-gn-k-t,.dp-gx .gx-t{font:600 18px/1.25 "Space Grotesk",Inter,sans-serif!important;letter-spacing:-.01em;color:' + F.tinte + '!important;margin:4px 0 3px!important;text-wrap:balance}',
@@ -105,11 +110,34 @@
       '.dp-gx .gx-mb-seg span{font:500 10.5px/1.2 Inter,sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:.92}.dp-gx .gx-mb-seg b{font:600 12px/1.2 "JetBrains Mono",monospace;white-space:nowrap}',
       '@media (max-width:640px){.dp-gx .gx-mb-z{grid-template-columns:minmax(0,1fr)}.dp-gx .gx-mb-bahn{height:38px}.dp-gx .gx-mb-seg span{display:none}}',
       '.dp-gx .gx-leg i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}',
+      /* v4280 · Marcel: „Gesamtbewertung, Einordnung, Investmentbewertung, DealPilot Insight und was jetzt zu tun ist, passend formatiert
+         wie der Rest“. Nur mit Vorschau (body.dp-gn-an): dieselbe Karte wie die Grafiken (Fläche, Rand 10 %, Radius 14, Abstände), Überschrift
+         wie der Kartentitel, Unterpunkte als Etikett. Der Text selbst bleibt unverändert. */
+      'body.dp-gn-an #dp-pa-uebersicht .dp-pa5-zwei{gap:16px!important;margin:0 0 16px!important}',
+      'body.dp-gn-an #dp-pa-uebersicht .dp-pa5-zwei>div{background:var(--surface,#F8F6F1);border:1px solid color-mix(in srgb,#2A2727 10%,transparent);border-radius:14px;padding:18px 20px 16px;color:#2A2727}',
+      'body.dp-gn-an #dp-pa-uebersicht .dp-pa5-zwei .dp-pa5-ab{margin:0 0 8px!important}',
+      'body.dp-gn-an #dp-pa-uebersicht .dp-pa5-zwei .dp-pa5-ab h3{font:600 18px/1.25 "Space Grotesk",Inter,sans-serif!important;letter-spacing:-.01em;color:#2A2727!important}',
+      'body.dp-gn-an #dp-pa-uebersicht .dp-pa5-zwei .dp-pa4-a{border-left:0!important;padding:10px 0 0!important;border-top:1px solid color-mix(in srgb,#2A2727 10%,transparent)}',
+      'body.dp-gn-an #dp-pa-uebersicht .dp-pa5-zwei .dp-pa4-a h4{font:600 10.5px/1 "JetBrains Mono",ui-monospace,monospace!important;letter-spacing:.12em!important;text-transform:uppercase;color:var(--wl-b8932f,#b8932f)!important;margin:0 0 4px!important}',
+      'body.dp-gn-an #dp-pa-uebersicht .dp-pa5-zwei p,body.dp-gn-an #dp-pa-uebersicht .dp-pa5-zwei li{font:400 13px/1.55 Inter,sans-serif;color:#2A2727}',
+      'html[data-gx-stil="dunkel"] body.dp-gn-an #dp-pa-uebersicht .dp-pa5-zwei p,html[data-gx-stil="dunkel"] body.dp-gn-an #dp-pa-uebersicht .dp-pa5-zwei li,html[data-gx-stil="dunkel"] body.dp-gn-an #dp-pa-uebersicht .dp-pa5-zwei .dp-pa5-ab h3{color:#E9E3D6!important}',
+      'html[data-gx-stil="dunkel"] body.dp-gn-an #dp-pa-uebersicht .dp-pa5-zwei>div{background:linear-gradient(180deg,#16140F,#0E0D0B);border-color:#26231E;color:#E9E3D6}',
+      /* v4280 · Einordnung wie im Reiter Bewertung */
+      '.dp-gx .gx-bul{display:flex;flex-direction:column;gap:10px;margin:2px 0 0}.dp-gx .gx-bz{display:grid;grid-template-columns:minmax(120px,210px) minmax(0,1fr) 96px;gap:6px 14px;align-items:center}',
+      '.dp-gx .gx-bz .n{font:600 13px/1.3 Inter,sans-serif;color:' + F.tinte + '}.dp-gx .gx-bz .n small{display:block;font:400 11px/1.3 Inter,sans-serif;color:' + F.tinte2 + '}',
+      '.dp-gx .gx-bz .w{font:600 13px "JetBrains Mono",monospace;text-align:right}.dp-gx .gx-bz .w small{display:block;font:600 10.5px Inter,sans-serif;letter-spacing:.02em}',
+      '.dp-gx .gx-bz .bahn{position:relative;height:18px;border-radius:4px;display:flex;gap:2px}.dp-gx .gx-bz .bahn i{display:block;height:100%;border-radius:3px}',
+      '.dp-gx .gx-bz .mark{position:absolute;top:-3px;bottom:-3px;width:4px;margin-left:-2px;border-radius:2px;box-shadow:0 0 0 2px var(--gx-karte)}',
+      '.dp-gx .gx-bz .ziel{position:absolute;top:2px;bottom:2px;width:2px;margin-left:-1px;background:' + F.gold + '}',
+      '.dp-gx .gx-bz .ank{position:absolute;top:50%;width:10px;height:10px;margin:-5px 0 0 -5px;border-radius:50%;border:2px solid ' + F.tinte + ';background:var(--gx-karte)}',
+      '.dp-gx .gx-bz .zb{position:absolute;top:50%;width:10px;height:10px;margin:-5px 0 0 -5px;transform:rotate(45deg);background:' + F.goldD + ';box-shadow:0 0 0 2px var(--gx-karte)}',
+      '.dp-gx .gx-bz .port{position:absolute;bottom:-6px;width:0;height:0;margin-left:-5px;border-left:5px solid transparent;border-right:5px solid transparent;border-bottom:6px solid ' + F.tinte3 + '}',
+      '@media (max-width:640px){.dp-gx .gx-bz{grid-template-columns:minmax(0,1fr) auto}.dp-gx .gx-bz .bahn{grid-column:1/-1;order:3}}',
       '.dp-gx svg{display:block;width:100%;height:auto;overflow:visible}',
-      '.dp-gx .gx-ax{font:400 10.5px "JetBrains Mono",ui-monospace,monospace;fill:' + F.tinte3 + '}',
+      '.dp-gx .gx-ax{font:400 11px "JetBrains Mono",ui-monospace,monospace;fill:' + F.tinte3 + '}',
       '.dp-gx .gx-ax2{font:400 11.5px Inter,sans-serif;fill:' + F.tinte2 + '}',
       '.dp-gx .gx-w{font:600 11px "JetBrains Mono",monospace;fill:' + F.tinte + '}',
-      '.dp-gx .gx-zahl{font:600 26px "Cormorant Garamond",Georgia,serif;fill:' + F.tinte + '}',
+      '.dp-gx .gx-zahl{font:600 26px "Space Grotesk",Inter,sans-serif;letter-spacing:-.02em;fill:' + F.tinte + '}',
       '.dp-gx .gx-netz{stroke:' + F.linie + ';stroke-width:1}',
       '.dp-gx [data-gx-tip]{cursor:default}',
       '.dp-gx .gx-tip{position:absolute;pointer-events:none;z-index:6;font:500 12px/1.45 Inter,sans-serif;padding:8px 11px;border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.35);max-width:280px;display:none}',
@@ -119,7 +147,7 @@
       '@media (max-width:700px){.dp-gx .gx-seite{grid-template-columns:repeat(2,minmax(0,1fr))}}',
       '.dp-gx .gx-seite>div{border:1px solid ' + F.linie + ';border-radius:10px;padding:10px 12px;min-width:0}',
       '.dp-gx .gx-seite span{display:block;font:500 9.5px "JetBrains Mono",monospace;letter-spacing:.12em;text-transform:uppercase;color:' + F.tinte3 + '}',
-      '.dp-gx .gx-seite b{display:block;font:600 24px/1.15 "Cormorant Garamond",Georgia,serif;color:' + F.tinte + ';margin:4px 0 2px}',
+      '.dp-gx .gx-seite b{display:block;font:600 24px/1.15 "Space Grotesk",Inter,sans-serif;letter-spacing:-.02em;color:' + F.tinte + ';margin:4px 0 2px}',
       '.dp-gx .gx-seite small{display:block;font:400 11px/1.35 Inter,sans-serif;color:' + F.tinte2 + '}',
       '.dp-gx-reihe{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:16px;margin:0 0 16px}',
       '.dp-gx-reihe>.dp-gx{margin:0!important}',
@@ -183,7 +211,7 @@
     var lw = W < 420 ? 44 : 56, top = 24, cw = (W - lw - 4) / Z.length, ch = kompakt ? Math.max(22, Math.min(28, cw * 0.7)) : Math.max(26, Math.min(36, cw * 0.85)), H = top + M.length * ch + 30;
     var alle = []; G.forEach(function (r) { r.forEach(function (v) { if (v != null && isFinite(v)) alle.push(Math.abs(v)); }); });
     var maxAbs = Math.max.apply(null, alle.concat([1]));
-    var farbe = function (v) { var t = Math.round(Math.min(1, Math.abs(v) / maxAbs) * 92); return 'color-mix(in srgb,' + (v >= 0 ? F.gruen : F.rot) + ' ' + t + '%,' + F.flaeche + ')'; };   /* v4250 · color-mix statt mix(): F sind jetzt var() */
+    var farbe = function (v) { var t = Math.round(12 + Math.min(1, Math.abs(v) / maxAbs) * 78); return 'color-mix(in srgb,' + (v >= 0 ? F.gruen : F.rot) + ' ' + t + '%,transparent)'; };   /* v4280 · wie die Zinsrisiko-Heatmap im Reiter Bewertung */   /* v4250 · color-mix statt mix(): F sind jetzt var() */
     var out = ['<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="' + esc(o.aria || 'Heatmap') + '">'];
     out.push('<text class="gx-ax" x="' + lw + '" y="12">' + esc(d.spaltenTitel || '') + ' →</text>');
     var jede = cw < 34 ? 2 : 1;
@@ -203,30 +231,35 @@
   }
 
   /* Bullets: je Kennzahl Balken, Strich = Ziel/Schwelle, Raute = Portfolio, Kreis = Ankauf */
+  /* v4280 · Einordnung im Stil der Karte „Einordnung“ im Reiter Bewertung (grafiken-bewertung.js bullet): je Kennzahl eine Bahn mit
+     blassen Bändern (rot unter, grün über der Schwelle), dunkle Marke = Wert heute, goldener Strich = Schwelle, Kreis = Ankauf,
+     Raute gold = Zielbild, Dreieck = Portfolio-Schnitt. Rechts Wert und Wort. Marcel: „gleiches Farbschema wie Einordnung“. */
   function bullets(host, B, o) {
-    o = o || {}; var W = o.breite || breiteVon(host), rowH = 60, H = B.length * rowH + 4, l = 0, r = W - 6;
-    var out = ['<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="' + esc(o.aria || 'Einordnung') + '">'];
-    B.forEach(function (b, i) {
-      var y0 = i * rowH + 18, x = function (v) { return l + (Math.max(b.lo, Math.min(b.hi, v)) - b.lo) / (b.hi - b.lo) * (r - l); };
-      var gut = b.ziel == null ? null : (b.hoch ? b.wert >= b.ziel : b.wert <= b.ziel), fc = gut == null ? F.gold : (gut ? F.gruen : F.rot);
-      out.push('<text class="gx-ax" x="' + l + '" y="' + (y0 - 6) + '" style="letter-spacing:.08em">' + esc(String(b.name).toUpperCase()) + '</text>');
-      out.push('<text x="' + r + '" y="' + (y0 - 5) + '" text-anchor="end" style="font:600 13px JetBrains Mono,monospace;fill:' + fc + '">' + esc(b.fmt(b.wert)) + '</text>');
-      out.push('<rect x="' + l + '" y="' + y0 + '" width="' + (r - l) + '" height="16" rx="3" style="fill:' + F.flaeche + '"/>');
-      var x0 = x(Math.max(b.lo, Math.min(0, b.hi))), xv = x(b.wert);
-      out.push('<rect class="gx-wx" x="' + f1(Math.min(x0, xv)) + '" y="' + (y0 + 4) + '" width="' + f1(Math.max(2, Math.abs(xv - x0))) + '" height="8" rx="2" style="fill:' + fc + ';transform-origin:' + (xv >= x0 ? 'left' : 'right') + ';animation-delay:' + (i * 90) + 'ms"/>');
-      if (b.ziel != null) out.push('<line x1="' + f1(x(b.ziel)) + '" x2="' + f1(x(b.ziel)) + '" y1="' + (y0 - 3) + '" y2="' + (y0 + 19) + '" style="stroke:' + F.tinte + ';stroke-width:2"/>');
-      if (b.ankauf != null) out.push('<circle cx="' + f1(x(b.ankauf)) + '" cy="' + (y0 + 8) + '" r="5" style="fill:none;stroke:' + F.goldH + ';stroke-width:2"/>');
-      if (b.port != null) { var dx = x(b.port); out.push('<path d="M' + f1(dx) + ',' + (y0 + 2) + ' L' + f1(dx + 6) + ',' + (y0 + 8) + ' L' + f1(dx) + ',' + (y0 + 14) + ' L' + f1(dx - 6) + ',' + (y0 + 8) + ' Z" style="fill:' + F.blau + ';stroke:' + F.karte + ';stroke-width:1.5"/>'); }
-      var tip = '<div class="t">' + esc(b.name) + '</div>' + (o.objektWort || 'Objekt') + ' <b>' + esc(b.fmt(b.wert)) + '</b>' + (b.ankauf != null ? '<br>beim Ankauf <b>' + esc(b.fmt(b.ankauf)) + '</b>' : '') + (b.ziel != null ? '<br>' + esc(b.zielText || 'Ziel') + ' <b>' + esc(b.fmt(b.ziel)) + '</b>' : '') + (b.port != null ? '<br>Portfolio-Schnitt <b>' + esc(b.fmt(b.port)) + '</b>' : '');
-      out.push('<rect x="' + l + '" y="' + (y0 - 4) + '" width="' + (r - l) + '" height="26" style="fill:transparent"' + tipA(tip) + '/>');
-      var unter = [b.ziel != null ? (b.zielText || 'Ziel') + ' ' + b.fmt(b.ziel) : '', b.port != null ? 'Portfolio ' + b.fmt(b.port) : '', b.ankauf != null ? 'Ankauf ' + b.fmt(b.ankauf) : ''].filter(Boolean).join(' · ');
-      if (unter) out.push('<text class="gx-ax" x="' + l + '" y="' + (y0 + 32) + '">' + esc(unter) + '</text>');
+    o = o || {};
+    var zeilen = B.map(function (b, i) {
+      var span = b.hi - b.lo, pos = function (v) { return Math.max(0, Math.min(100, (v - b.lo) / span * 100)); };
+      var gut = b.ziel == null ? null : (b.hoch ? b.wert >= b.ziel : b.wert <= b.ziel);
+      var fc = gut == null ? F.tinte : (gut ? F.gruen : F.rot), wort = gut == null ? '' : (gut ? '✓ erfüllt' : '✕ unter Schwelle');
+      if (gut === false && !b.hoch) wort = '✕ über Schwelle';
+      var baender = b.ziel == null ? '<i style="width:100%;background:' + F.neutral + '"></i>'
+        : (b.hoch ? '<i style="width:' + pos(b.ziel).toFixed(2) + '%;background:' + F.rotW + '"></i><i style="width:' + (100 - pos(b.ziel)).toFixed(2) + '%;background:' + F.gruenW + '"></i>'
+          : '<i style="width:' + pos(b.ziel).toFixed(2) + '%;background:' + F.gruenW + '"></i><i style="width:' + (100 - pos(b.ziel)).toFixed(2) + '%;background:' + F.rotW + '"></i>');
+      var tip = '<div class="t">' + esc(b.name) + '</div>' + (o.objektWort || 'heute') + ' <b>' + esc(b.fmt(b.wert)) + '</b>' + (b.ankauf != null ? '<br>beim Ankauf <b>' + esc(b.fmt(b.ankauf)) + '</b>' : '') + (b.zielbild != null ? '<br>im Zielbild <b>' + esc(b.fmt(b.zielbild)) + '</b>' : '') + (b.ziel != null ? '<br>' + esc(b.zielText || 'Schwelle') + ' <b>' + esc(b.fmt(b.ziel)) + '</b>' : '') + (b.port != null ? '<br>Portfolio-Schnitt <b>' + esc(b.fmt(b.port)) + '</b>' : '');
+      var unter = [b.ankauf != null ? 'Ankauf ' + b.fmt(b.ankauf) : '', b.zielbild != null ? 'Zielbild ' + b.fmt(b.zielbild) : '', b.ziel != null ? (b.zielText || 'Schwelle') + ' ' + b.fmt(b.ziel) : '', b.port != null ? 'Portfolio ' + b.fmt(b.port) : ''].filter(Boolean).join(' · ');
+      return '<div class="gx-bz"><div class="n">' + esc(b.name) + (unter ? '<small>' + esc(unter) + '</small>' : '') + '</div>'
+        + '<div class="bahn"' + tipA(tip) + '>' + baender
+        + (b.ziel != null ? '<span class="ziel" style="left:' + pos(b.ziel).toFixed(2) + '%"></span>' : '')
+        + (b.port != null ? '<span class="port" style="left:' + pos(b.port).toFixed(2) + '%"></span>' : '')
+        + (b.ankauf != null ? '<span class="ank" style="left:' + pos(b.ankauf).toFixed(2) + '%"></span>' : '')
+        + (b.zielbild != null ? '<span class="zb" style="left:' + pos(b.zielbild).toFixed(2) + '%"></span>' : '')
+        + '<span class="mark gx-fade" style="left:' + pos(b.wert).toFixed(2) + '%;background:' + fc + ';animation-delay:' + (i * 90) + 'ms"></span></div>'
+        + '<div class="w" style="color:' + fc + '">' + esc(b.fmt(b.wert)) + (wort ? '<small>' + wort + '</small>' : '') + '</div></div>';
     });
-    out.push('</svg>');
-    var leg = [{ n: o.objektWort || 'dieses Objekt', f: F.gold }, { n: 'Schwelle / Ziel', f: F.tinte }];
-    if (B.some(function (b) { return b.port != null; })) leg.push({ n: 'Portfolio-Schnitt', f: F.blau });
+    var leg = [{ n: 'heute', f: F.tinte }, { n: 'deine Schwelle', f: F.gold }];
     if (B.some(function (b) { return b.ankauf != null; })) leg.push({ n: 'beim Ankauf', f: 'transparent', rand: true });
-    host.innerHTML = out.join('') + legende(leg);
+    if (B.some(function (b) { return b.zielbild != null; })) leg.push({ n: 'im Zielbild', f: F.goldD });
+    if (B.some(function (b) { return b.port != null; })) leg.push({ n: 'Portfolio-Schnitt', f: F.tinte3 });
+    host.innerHTML = '<div class="gx-bul">' + zeilen.join('') + '</div>' + legende(leg);
     return host;
   }
 
@@ -258,7 +291,7 @@
     });
     (d.streu || []).forEach(function (q) { if (q.v == null || q.j < X[0] || q.j > X[n - 1]) return; var form = q.raute ? '<path d="M' + f1(xs(q.j)) + ',' + f1(ys(q.v) - 7) + ' L' + f1(xs(q.j) + 7) + ',' + f1(ys(q.v)) + ' L' + f1(xs(q.j)) + ',' + f1(ys(q.v) + 7) + ' L' + f1(xs(q.j) - 7) + ',' + f1(ys(q.v)) + ' Z"' : '<circle cx="' + f1(xs(q.j)) + '" cy="' + f1(ys(q.v)) + '" r="' + (q.r || 6) + '"';
       out.push(form + ' class="gx-fade" style="' + (q.hohl ? 'fill:' + F.karte + ';stroke:' + (q.farbe || F.gold) + ';stroke-width:2' : 'fill:' + (q.farbe || F.gold) + ';stroke:' + F.karte + ';stroke-width:2') + '"/>'); });
-    (d.marken || []).forEach(function (mk) { if (mk.j < X[0] || mk.j > X[n - 1]) return; var x = xs(mk.j); out.push('<line x1="' + f1(x) + '" x2="' + f1(x) + '" y1="' + m.t + '" y2="' + (H - m.b) + '" style="stroke:' + (mk.farbe || F.gold) + ';stroke-dasharray:3 3;opacity:.8"/><text class="gx-ax" x="' + f1(Math.min(x + 5, W - m.r - 4)) + '" y="' + (m.t + 22) + '" text-anchor="' + (x > W - 140 ? 'end' : 'start') + '" style="fill:' + (mk.farbe || F.goldH) + '">' + esc(mk.text) + '</text>'); });
+    (d.marken || []).forEach(function (mk) { if (mk.j < X[0] || mk.j > X[n - 1]) return; var x = xs(mk.j); out.push('<line x1="' + f1(x) + '" x2="' + f1(x) + '" y1="' + m.t + '" y2="' + (H - m.b) + '" style="stroke:' + (mk.farbe || F.gold) + ';stroke-dasharray:3 3;opacity:.8"/><text class="gx-ax" x="' + f1(Math.min(x + 5, W - m.r - 4)) + '" y="' + (m.t + 22 + (mk.zeile || 0) * 14) + '" text-anchor="' + (x > W - 140 ? 'end' : 'start') + '" style="fill:' + (mk.farbe || F.goldH) + '">' + esc(mk.text) + '</text>'); });
     /* Treffer je Jahr */
     var dx = (W - m.l - m.r) / Math.max(1, n - 1);
     X.forEach(function (j, i) { if (!d.tip) return; out.push('<rect x="' + f1(xs(j) - dx / 2) + '" y="' + m.t + '" width="' + f1(dx) + '" height="' + (H - m.t - m.b) + '" style="fill:transparent"' + tipA(d.tip(i, j)) + '/>'); });
@@ -558,6 +591,10 @@
       var M = [{ j: P.kaufJ + (P.kaufM - 1) / 12, n: 'Kauf', d: String(P.kaufM).padStart(2, '0') + '/' + P.kaufJ + ' · ' + eur(P.kp), art: 'gem' }];
       var mh = null; try { var A = window.DpMieteMax && window.DpMieteMax.alle ? window.DpMieteMax.alle() : null; (A && A.W || []).forEach(function (w) { var ab = w.bestand && w.bestand.ab; var m2 = /(\d{4})-(\d{2})/.exec(String(ab || '')) || /(\d{2})\.(\d{4})/.exec(String(ab || '')); if (m2) { var jj = m2[1].length === 4 ? +m2[1] + (+m2[2] - 1) / 12 : +m2[2] + (+m2[1] - 1) / 12; if (mh == null || jj < mh.j) mh = { j: jj, d: String(ab) }; } }); } catch (e) {}
       if (mh) M.push({ j: mh.j, n: 'Mieterhöhung möglich', d: 'ab ' + mh.d + ' nach § 558 BGB', art: 'gut' });
+      /* v4280 · Marcel: „im Fahrplan fehlt das Zielbild“. Jahr und Miete aus DpWertZielbild.daten().zielbild (Reiter Miete › Zielbild). */
+      try { var WZ = window.DpWertZielbild && window.DpWertZielbild.daten ? window.DpWertZielbild.daten() : null, ZB = WZ && WZ.zielbild, zs = ZB && ZB.stufen && ZB.stufen.zielbild;
+        if (zs) { var zj = ZB.jahre && zahl(ZB.jahre.zielbild), mm = zahl(zs.miete_monat) != null ? zs.miete_monat : (zahl(zs.miete_jahr) != null ? zs.miete_jahr / 12 : null);
+          M.push({ j: zj != null ? zj + 0.5 : P.heute + 1, n: zj != null ? 'Zielbild' : 'Zielbild, Jahr offen', d: (mm != null ? 'Miete ' + eur(mm) + ' im Monat' : 'Zielbild eingetragen') + (zahl(zs.kosten) ? ', Maßnahmen ' + eur(zs.kosten) : '') + (zj != null ? '' : '. Das Jahr trägst du im Reiter Miete beim Zielbild ein.'), art: 'gut' }); } } catch (e) {}
       if (cfop) M.push({ j: cfop, n: 'Cashflow vor Steuer positiv', d: String(cfop), art: 'gut' });
       if (P.bindEnde > P.heute && P.bindEnde <= P.bis) M.push({ j: P.bindEnde + (P.bindMon - 1) / 12, n: 'Zinsbindung endet', d: String(P.bindMon).padStart(2, '0') + '/' + P.bindEnde + (rsBind != null ? ' · Restschuld etwa ' + eur(rsBind) : ''), art: 'risiko' });
       if (P.privat && P.kaufJ + 10 > P.heute) M.push({ j: P.kaufJ + 10 + (P.kaufM - 1) / 12, n: 'Verkauf steuerfrei', d: 'ab ' + String(P.kaufM).padStart(2, '0') + '/' + (P.kaufJ + 10) + ' · zehn Jahre gehalten (§ 23 EStG)', art: 'gut' });
@@ -586,11 +623,14 @@
     var K = (window.State && window.State.kpis) || {}, Pt = portfolioSchnitt(), ak = {};
     if (mitAnkauf) { try { var AK = window.DealPilotAnkauf; var ab = AK && AK.vorhanden && AK.vorhanden() ? AK.abweichung() : null; (ab && ab.zeilen || []).forEach(function (z) { ak[z.schluessel] = zahl(z.ankauf); }); } catch (e) {} }
     var cfAk = ak._kpis_cf_vs != null ? ak._kpis_cf_vs / 12 : null;
+    /* v4280 · Marcel: „Ankauf, Bestand, Zielbild, dass wir da auch wirklich alles drin haben“. Zielbild aus DpPotenzial.kennzahlen
+       (dieselbe Quelle wie die Tafel Ankauf · Bestand · Zielbild), nur lesen. Beleihung im Zielbild führt die App nicht. */
+    var zb = {}; if (mitAnkauf) { try { var PZ = window.DpPotenzial, mo = PZ && PZ.modell ? PZ.modell() : null; if (mo && mo.aktiv && mo.stufen && mo.stufen.zielbild) zb = (PZ.kennzahlen(mo) || {}).zielbild || {}; } catch (e) { zb = {}; } }
     var B = [
-      { name: 'Bruttomietrendite', wert: zahl(K.bmy), ziel: null, port: Pt.bmy, ankauf: ak._kpis_bmy, lo: 0, hi: 9, fmt: function (v) { return pct(v, 2); }, hoch: true },
-      { name: 'DSCR', wert: zahl(K.dscr), ziel: profil('min_dscr'), zielText: 'dein Mindest-DSCR', port: Pt.dscr, ankauf: ak._kpis_dscr, lo: 0, hi: 1.8, fmt: function (v) { return nf2.format(v); }, hoch: true },
-      { name: 'Beleihung (LTV)', wert: zahl(K.ltv), ziel: profil('max_ltv'), zielText: 'dein maximaler LTV', port: Pt.ltv, ankauf: ak._kpis_ltv, lo: 0, hi: 120, fmt: function (v) { return pct(v); }, hoch: false },
-      { name: 'Cashflow vor Steuer im Monat', wert: zahl(K.cf_m), ziel: profil('min_cashflow_vor_st'), zielText: 'dein Mindest-Cashflow', port: Pt.cfm, ankauf: cfAk, lo: -400, hi: 400, fmt: function (v) { return eurV(v); }, hoch: true }
+      { name: 'Bruttomietrendite', wert: zahl(K.bmy), ziel: null, port: mitAnkauf ? null : Pt.bmy, ankauf: ak._kpis_bmy, zielbild: zahl(zb.bmy), lo: 0, hi: 9, fmt: function (v) { return pct(v, 2); }, hoch: true },
+      { name: 'DSCR', wert: zahl(K.dscr), ziel: profil('min_dscr'), zielText: 'dein Mindest-DSCR', port: mitAnkauf ? null : Pt.dscr, ankauf: ak._kpis_dscr, zielbild: zahl(zb.dscr), lo: 0, hi: 1.8, fmt: function (v) { return nf2.format(v); }, hoch: true },
+      { name: 'Beleihung (LTV)', wert: zahl(K.ltv), ziel: profil('max_ltv'), zielText: 'dein maximaler LTV', port: mitAnkauf ? null : Pt.ltv, ankauf: ak._kpis_ltv, lo: 0, hi: 120, fmt: function (v) { return pct(v); }, hoch: false },
+      { name: 'Cashflow vor Steuer im Monat', wert: zahl(K.cf_m), ziel: profil('min_cashflow_vor_st'), zielText: 'dein Mindest-Cashflow', port: mitAnkauf ? null : Pt.cfm, ankauf: cfAk, zielbild: zahl(zb.cf_m), lo: -400, hi: 400, fmt: function (v) { return eurV(v); }, hoch: true }
     ].filter(function (b) { return b.wert != null; });
     return { B: B, Pt: Pt };
   }
@@ -604,7 +644,8 @@
     var D = einordnungDaten(mitAnkauf); if (!D.B.length) { k.innerHTML = ''; return; }
     var schlecht = D.B.filter(function (b) { return b.ziel != null && !(b.hoch ? b.wert >= b.ziel : b.wert <= b.ziel); }).map(function (b) { return b.name.replace(' im Monat', ''); });
     var titel = schlecht.length ? (schlecht.length === 1 ? schlecht[0] + ' unter deiner Schwelle' : schlecht.length + ' Kennzahlen unter deinen Schwellen: ' + schlecht.join(', ')) : 'Alle Kennzahlen innerhalb deiner Schwellen';
-    var i = karte(k, { eyebrow: mitAnkauf ? 'Einordnung · Ankauf gegen heute' : 'Einordnung', titel: titel, unter: 'Balken heute, Strich deine Schwelle aus dem Investmentprofil' + (D.Pt.n ? ', Raute der Schnitt deiner ' + D.Pt.n + ' Objekte' : '') + (mitAnkauf ? ', Kreis der Stand beim Ankauf' : ''), chips: ['gemessen'] });
+    var mitZb = D.B.some(function (b) { return b.zielbild != null; });
+    var i = karte(k, { eyebrow: mitAnkauf ? 'Einordnung · Ankauf, heute' + (mitZb ? ', Zielbild' : '') : 'Einordnung', titel: titel, unter: 'Marke heute, goldener Strich deine Schwelle aus dem Investmentprofil' + (mitAnkauf ? ', Kreis beim Ankauf' + (mitZb ? ', Raute im Zielbild' : '') : (D.Pt.n ? ', Dreieck der Schnitt deiner ' + D.Pt.n + ' Objekte' : '')) + '.', chips: ['gemessen'] });
     bullets(i, D.B, { breite: w - 2 });
   }
   function karteFingerabdruck(k, w) {
@@ -675,10 +716,17 @@
   function karteFahrplan(k, w, P, C) {
     C.basis = C.basis || MODELL.rechne(P, {}); var sz = C.basis;
     var M = MODELL.meilensteine(P, sz);
-    var i = karte(k, { eyebrow: 'Fahrplan ' + P.J[0].j + ' bis ' + P.bis, titel: 'Was bis ' + P.bis + ' auf dich zukommt', unter: 'Oben die Beleihung (Restschuld durch Wert), unten die Meilensteine. Fahr über einen Punkt für Einzelheiten.', chips: ['Modell'], fuss: [zeitSatz(P)] });
-    fahrplan(i, { von: P.J[0].j, bis: P.bis, heute: P.heute, linieText: 'LTV',
+    var i = karte(k, { eyebrow: 'Fahrplan ' + P.J[0].j + ' bis ' + P.bis, titel: 'Was bis ' + P.bis + ' auf dich zukommt', unter: 'Oben die Beleihung (Restschuld durch Wert), unten die Meilensteine bis zum Ende der Zinsbindung und darüber hinaus. Fahr über einen Punkt für Einzelheiten.', chips: ['Modell'], fuss: [zeitSatz(P)] });
+    var ziel = document.createElement('div'); i.appendChild(ziel);
+    fahrplan(ziel, { von: P.J[0].j, bis: P.bis, heute: P.heute, linieText: 'LTV',
       linie: sz.rows.filter(function (r) { return r.wert > 0; }).map(function (r) { return { j: r.j, v: r.rs / r.wert * 100, tip: '<div class="t">' + r.j + (r.quelle === 'modell' ? ' · Modell' : '') + '</div>Beleihung <b>' + pct(r.rs / r.wert * 100) + '</b><br>Restschuld <b>' + eur(r.rs) + '</b> · Wert <b>' + eur(r.wert) + '</b>' }; }),
       marken: M }, { breite: w - 2 });
+    /* v4280 · Werte von … bis …: heute, Ende Zinsbindung, Ende Horizont */
+    var an = function (j) { return sz.rows.filter(function (r) { return r.j === j; })[0]; };
+    var zelle = function (r, t) { return r && r.wert > 0 ? '<div><span>' + esc(t) + '</span><b>' + pct(r.rs / r.wert * 100) + '</b><small>Restschuld ' + tsd(r.rs) + ', Wert ' + tsd(r.wert) + '</small></div>' : ''; };
+    var sx = document.createElement('div'); sx.className = 'gx-seite';
+    sx.innerHTML = zelle(an(P.heute), 'Heute ' + P.heute) + (P.bindEnde > P.heute ? zelle(an(P.bindEnde - 1), 'Ende Zinsbindung ' + P.bindEnde) : '') + zelle(an(P.bis), 'Ende ' + P.bis);
+    i.appendChild(sx);
   }
   function karteFaecher(k, w, P, C) {
     C.mc = C.mc || MODELL.monteCarlo(P, 500); var MC = C.mc;
@@ -687,21 +735,24 @@
     var X = []; for (var j = P.J[0].j; j <= P.bis; j++) X.push(j);
     var idx = function (jj) { return jj - P.heute; };
     var L = MC.jahre.length - 1, ersteJ = null; MC.jahre.forEach(function (jj, i) { if (ersteJ == null && jj > P.heute && MC.pPos[i] >= 50) ersteJ = jj; });
-    var i = karte(k, { eyebrow: 'Vermögen in ' + MC.N + ' Zukünften', titel: 'Im mittleren Verlauf ' + tsd(MC.p50[L]) + ' Vermögen aus dem Objekt bis ' + P.bis + ', in 80 % der Fälle zwischen ' + tsd(MC.p10[L]) + ' und ' + tsd(MC.p90[L]),
-      unter: 'Vermögen = Wert minus Restschuld plus aufsummierter Cashflow nach Steuer. Band: 80 % der Pfade, Linie: Mitte, Punkte: bisher.', chips: ['Modell'],
+    /* v4280 · Marcel: „Vermögen in 500 Zukünften verstehe ich nicht“. Klartext und zwei Zeitpunkte: Ende der Zinsbindung und Ende des Horizonts. */
+    var iB = P.bindEnde - 1 - P.heute, hatB = iB > 0 && iB < L;
+    var i = karte(k, { eyebrow: 'Spanne möglicher Verläufe', titel: (hatB ? 'Bei Ende der Zinsbindung ' + P.bindEnde + ' zwischen ' + tsd(MC.p10[iB]) + ' und ' + tsd(MC.p90[iB]) + ', ' : '') + P.bis + ' zwischen ' + tsd(MC.p10[L]) + ' und ' + tsd(MC.p90[L]) + ', mittlerer Verlauf ' + tsd(MC.p50[L]),
+      unter: 'DealPilot spielt ' + MC.N + ' mögliche Entwicklungen von Miete, Kosten, Wert und Anschlusszins durch. Das Band zeigt, wo 8 von 10 davon landen, die Linie den mittleren Verlauf, die Punkte die Jahre bis heute. Vermögen heißt Wert minus Restschuld plus aufsummierter Cashflow nach Steuer.', chips: ['Modell'],
       fuss: ['Je Jahr: Miete ' + pct(P.mstg * 100) + ' ± 1,0, Kosten ' + pct(P.kstg * 100) + ' ± 0,6, Wert ' + pct(P.wstg * 100) + ' mit Marktzyklen, in 4 % der Jahre zwei Monate Leerstand.', 'Anschlusszins im Mittel ' + pct(P.az * 100, 2) + ', 80 % zwischen ' + pct(MC.zP10 * 100, 2) + ' und ' + pct(MC.zP90 * 100, 2) + '.', MC.N + ' Pfade, fester Startwert. Modell, keine Prognose und keine Zusage.'] });
     var ziel = document.createElement('div'); i.appendChild(ziel);
     verlauf(ziel, { x: X, heute: P.heute,
       band: { lo: X.map(function (jj) { var q = idx(jj); return q >= 0 ? MC.p10[q] : null; }), hi: X.map(function (jj) { var q = idx(jj); return q >= 0 ? MC.p90[q] : null; }) },
+      marken: hatB ? [{ j: P.bindEnde, text: 'Ende Zinsbindung', farbe: F.goldD }] : [],
       reihen: [{ name: 'Mitte', werte: X.map(function (jj) { var q = idx(jj); return q >= 0 ? MC.p50[q] : null; }), farbe: F.gold, dick: 2.4 }, { name: 'bisher', werte: X.map(function (jj) { var p = ist.filter(function (x) { return x.j === jj; })[0]; return p ? p.v : null; }), farbe: F.tinte, dick: 2, punkte: true }],
       tip: function (q, jj) { var m = idx(jj); var p = ist.filter(function (x) { return x.j === jj; })[0]; return p && jj <= P.heute && m < 1 ? '<div class="t">' + jj + ' · App</div>Vermögen aus dem Objekt <b>' + eur(p.v) + '</b>' : (m >= 0 ? '<div class="t">' + jj + ' · Modell</div>Mitte <b>' + eur(MC.p50[m]) + '</b><br>80 % zwischen <b>' + eur(MC.p10[m]) + '</b> und <b>' + eur(MC.p90[m]) + '</b><br>Cashflow positiv in <b>' + nf0.format(MC.pPos[m]) + ' %</b> der Fälle' : '<div class="t">' + jj + '</div>' + (p ? 'Vermögen <b>' + eur(p.v) + '</b>' : '')); },
-      legende: [{ n: 'Mitte', f: F.gold }, { n: '80 % der Pfade', f: 'color-mix(in srgb,' + F.gold + ' 25%,transparent)' }, { n: 'bisher', f: F.tinte }] }, { breite: w - 2, aria: 'Vermögen in Zukünften' });
+      legende: [{ n: 'mittlerer Verlauf', f: F.gold }, { n: '8 von 10 Verläufen', f: 'color-mix(in srgb,' + F.gold + ' 25%,transparent)' }, { n: 'bis heute', f: F.tinte }] }, { breite: w - 2, aria: 'Spanne möglicher Verläufe des Vermögens' });
     var s = document.createElement('div'); s.className = 'gx-seite';
     var i10 = Math.min(L, 10);
-    s.innerHTML = '<div><span>Mitte ' + P.bis + '</span><b>' + tsd(MC.p50[L]) + '</b><small>aus ' + tsd(P.ek) + ' Eigenkapital</small></div>'
-      + '<div><span>Cashflow im Plus</span><b>' + (ersteJ || 'nach ' + P.bis) + '</b><small>ab hier in mehr als der Hälfte der Zukünfte</small></div>'
-      + '<div><span>Positiv ' + MC.jahre[i10] + '</span><b>' + nf0.format(MC.pPos[i10]) + ' %</b><small>der Zukünfte mit Cashflow nach Steuer über null</small></div>'
-      + '<div><span>Schlechteste 10 %</span><b>' + tsd(MC.p10[L]) + '</b><small>bleiben ' + P.bis + ' trotzdem im Objekt</small></div>';
+    s.innerHTML = (hatB ? '<div><span>Ende Zinsbindung ' + P.bindEnde + '</span><b>' + tsd(MC.p50[iB]) + '</b><small>mittlerer Verlauf, Spanne ' + tsd(MC.p10[iB]) + ' bis ' + tsd(MC.p90[iB]) + '</small></div>' : '')
+      + '<div><span>Ende ' + P.bis + '</span><b>' + tsd(MC.p50[L]) + '</b><small>mittlerer Verlauf, Spanne ' + tsd(MC.p10[L]) + ' bis ' + tsd(MC.p90[L]) + '</small></div>'
+      + '<div><span>Cashflow im Plus</span><b>' + (ersteJ || 'nach ' + P.bis) + '</b><small>ab hier in mehr als der Hälfte der Verläufe, nach Steuer</small></div>'
+      + '<div><span>Eingesetzt</span><b>' + tsd(P.ek) + '</b><small>Eigenkapital beim Kauf</small></div>';
     i.appendChild(s);
   }
   function karteHebel(k, w, P, C) {
@@ -721,17 +772,40 @@
     var i = karte(k, { eyebrow: 'Rendite je Verkaufsjahr', titel: titel, unter: 'Eigenkapitalrendite (IRR) im Jahr bei Verkauf am Jahresende' + (fa ? ', bis ' + String(P.kaufM).padStart(2, '0') + '/' + fa + ' ist der Gewinn steuerpflichtig' : '') + '.', chips: ['Modell'], fuss: ['Verkaufspreis = Wert der Projektion, Verkaufskosten 3 % (Beispiel).', P.privat ? 'Steuer auf den Gewinn vor Ablauf von zehn Jahren mit deinem Grenzsteuersatz.' : 'Gesellschaft: kein steuerfreier Verkauf nach zehn Jahren.', 'Modell, keine Zusage.'] });
     ausstieg(i, { punkte: D2, freiAb: fa, freiText: fa ? 'STEUERFREI AB ' + String(P.kaufM).padStart(2, '0') + '/' + fa : '' }, { breite: w - 2 });
   }
+  /* v4280 · Marcel: „Break-even einzeichnen, wann wir tatsächlich Steuern bezahlen müssen“. Gelesen aus der App: das erste Jahr ab
+     heute, in dem die Steuer der Zeile (tax_y) über null liegt, weil das Ergebnis aus Vermietung (zve_y) positiv wird. Die App
+     verrechnet einen Verlust im selben Jahr mit dem übrigen Einkommen (kein Verlustvortrag), deshalb genau dieses Jahr.
+     Dazu Marken Ende der Zinsbindung und Ende der Projektion mit den Werten an beiden. */
+  function steuerBreakEven(P) {
+    var J = P.J, r = J.filter(function (x) { return x.j >= P.heute && x.steuer > 0.5 && x.vuv > 0; })[0];
+    return r ? { j: r.j, vuv: r.vuv, steuer: r.steuer } : null;
+  }
   function karteVerlaufSteuer(k, w, P) {
     var J = P.J, X = J.map(function (r) { return r.j; }), nach = J.filter(function (r) { return r.j > P.heute && r.cfns > 0; })[0], vor = J.filter(function (r) { return r.j > P.heute && r.cfop > 0; })[0];
-    var titel = nach ? 'Nach Steuer im Plus ab ' + nach.j + (vor && vor.j !== nach.j ? ', vor Steuer ab ' + vor.j : '') : 'In den nächsten Jahren hilft die Steuer, den Cashflow zu tragen';
-    var i = karte(k, { eyebrow: 'Verlauf mit Steuern', titel: titel, unter: 'Cashflow im Jahr vor und nach Steuer, die Lücke dazwischen ist deine Steuerwirkung. Rechts von ' + P.heute + ' Projektion der App.', chips: ['gemessen'] });
+    var be = steuerBreakEven(P), ende = J[J.length - 1], zb = J.filter(function (r) { return r.j === P.bindEnde; })[0];
+    var titel = be ? 'Ab ' + be.j + ' zahlst du Steuer auf das Objekt' + (nach ? ', nach Steuer im Plus ab ' + nach.j : '') : (nach ? 'Nach Steuer im Plus ab ' + nach.j + (vor && vor.j !== nach.j ? ', vor Steuer ab ' + vor.j : '') : 'In den nächsten Jahren hilft die Steuer, den Cashflow zu tragen');
+    var unter = (be ? 'Bis ' + (be.j - 1) + ' ist das Ergebnis aus Vermietung negativ und senkt deine Steuer auf das übrige Einkommen. ' + be.j + ' wird es positiv (' + eurV(be.vuv) + '), darauf fallen ' + eur(be.steuer) + ' Steuer an. ' : '')
+      + 'Cashflow im Jahr vor und nach Steuer, die Lücke dazwischen ist deine Steuerwirkung. Rechts von ' + P.heute + ' Projektion der App.';
+    var i = karte(k, { eyebrow: 'Verlauf mit Steuern', titel: titel, unter: unter, chips: ['gemessen'] });
     var ziel = document.createElement('div'); i.appendChild(ziel);
+    var marken = [];
+    if (be) marken.push({ j: be.j, text: 'ab hier Steuer', farbe: F.rot, zeile: 0 });
+    if (nach && (!be || nach.j !== be.j)) marken.push({ j: nach.j, text: 'nach Steuer im Plus', farbe: F.gruen, zeile: 1 });
+    if (zb && P.bindEnde > P.heute) marken.push({ j: P.bindEnde, text: 'Ende Zinsbindung', farbe: F.goldD, zeile: 2 });
     verlauf(ziel, { x: X, heute: P.heute,
       band: { ohneRand: true, lo: J.map(function (r) { return Math.min(r.cfop, r.cfns); }), hi: J.map(function (r) { return Math.max(r.cfop, r.cfns); }) },
       reihen: [{ name: 'vor Steuer', werte: J.map(function (r) { return r.cfop; }), farbe: F.tinte3, dick: 2 }, { name: 'nach Steuer', werte: J.map(function (r) { return r.cfns; }), farbe: F.gold, dick: 2.6, punkte: true }],
-      marken: nach ? [{ j: nach.j, text: 'nach Steuer im Plus', farbe: F.gruen }] : [],
-      tip: function (q, j) { var r = J[q]; return '<div class="t">' + j + (j > P.heute ? ' · Projektion' : '') + '</div>vor Steuer <b>' + eurV(r.cfop) + '</b><br>Steuer <b>' + eurV(r.cfns - r.cfop) + '</b><br>nach Steuer <b>' + eurV(r.cfns) + '</b>'; },
-      legende: [{ n: 'vor Steuer', f: F.tinte3 }, { n: 'nach Steuer', f: F.gold }, { n: 'Steuerwirkung', f: 'color-mix(in srgb,' + F.gold + ' 25%,transparent)' }] }, { breite: w - 2, aria: 'Cashflow vor und nach Steuer' });
+      marken: marken,
+      tip: function (q, j) { var r = J[q]; return '<div class="t">' + j + (j > P.heute ? ' · Projektion' : '') + '</div>Ergebnis aus Vermietung <b>' + eurV(r.vuv) + '</b><br>vor Steuer <b>' + eurV(r.cfop) + '</b><br>Steuer <b>' + eurV(r.cfns - r.cfop) + '</b><br>nach Steuer <b>' + eurV(r.cfns) + '</b>'; },
+      legende: [{ n: 'vor Steuer', f: F.tinte3 }, { n: 'nach Steuer', f: F.gold }, { n: 'Steuerwirkung', f: 'color-mix(in srgb,' + F.gold + ' 25%,transparent)' }].concat(be ? [{ n: 'ab hier Steuer', f: F.rot }] : []) }, { breite: w - 2, aria: 'Cashflow vor und nach Steuer' });
+    /* Werte an Ende Zinsbindung und Ende der Projektion */
+    var zelle = function (r, t) { return r ? '<div><span>' + esc(t) + '</span><b>' + eurV(r.cfns) + '</b><small>nach Steuer, vor Steuer ' + eurV(r.cfop) + '</small></div>' : ''; };
+    var sx = document.createElement('div'); sx.className = 'gx-seite';
+    sx.innerHTML = (be ? '<div><span>Steuer ab</span><b>' + be.j + '</b><small>Ergebnis aus Vermietung ' + eurV(be.vuv) + '</small></div>' : '')
+      + zelle(J.filter(function (r) { return r.j === P.heute; })[0], 'Heute ' + P.heute)
+      + (zb && P.bindEnde > P.heute ? zelle(zb, 'Ende Zinsbindung ' + P.bindEnde) : '')
+      + zelle(ende, 'Ende ' + ende.j);
+    i.appendChild(sx);
   }
   function karteHausgeld(k, w, P) {
     var Hv = window.DpHausverlauf; if (!Hv || !Hv.lesen || !Hv.jahrDaten) { k.innerHTML = ''; return; }
@@ -839,19 +913,23 @@
     /* Übersicht: Einordnung + Fingerabdruck oben, dann (v4140) Vermögen + Brücke, dann Heatmap kompakt, Mieteuro, Fahrplan */
     var ue = document.getElementById('dp-pa-uebersicht');
     if (ue) {
-      var r1 = reihe(ue, 'ue-oben', ue.querySelector(':scope > .dp-pa5-zwei') || ue.firstChild);   /* nach Satz und Kennzahlen, vor der Einordnung in Worten */
+      /* v4280 · Marcel: „Fahrplan in der Übersicht ganz oben, danach die Einordnung, danach Gesamtbewertung … und was jetzt zu tun ist“ */
+      var vorText = ue.querySelector(':scope > .dp-pa5-zwei');
+      var kfp = h.platz(ue, 'gx-fahrplan', vorText || ue.firstChild, 'dp-gx'); zeichneMit(h, kfp, sig + 'fp', function (k, w) { karteFahrplan(k, w, P, C); });
+      var r1 = reihe(ue, 'ue-oben', vorText || ue.firstChild);   /* nach dem Fahrplan, vor der Einordnung in Worten */
+      if (kfp.nextSibling !== r1 && r1.parentNode) r1.parentNode.insertBefore(r1, kfp.nextSibling);
       zeichneMit(h, kind(r1, 'gx-einordnung'), sig + kpSig, function (k, w) { karteEinordnung(k, w, false); });
       zeichneMit(h, kind(r1, 'gx-finger'), sig + kpSig, function (k, w) { karteFingerabdruck(k, w); });
       var nach = ue.querySelector('[data-dp-gn="ue-reihe"]');
       var anker = nach ? nach.nextSibling : null;
       /* v4250 · Marcel: „in der Übersicht kann der Anschlusszins raus“, Mieteuro als Balken, Fahrplan gehört nach Ankauf · Bestand · Zielbild */
-      ['gx-heat-ue', 'gx-sankey', 'gx-fahrplan'].forEach(function (q) { var alt = ue.querySelector('[data-dp-gn="' + q + '"]'); if (alt && alt.parentNode) alt.parentNode.removeChild(alt); });
+      ['gx-heat-ue', 'gx-sankey'].forEach(function (q) { var alt = ue.querySelector('[data-dp-gn="' + q + '"]'); if (alt && alt.parentNode) alt.parentNode.removeChild(alt); });
       var km = h.platz(ue, 'gx-mieteuro', anker, 'dp-gx'); zeichneMit(h, km, sig, function (k, w) { karteMieteuro(k, w, P); });
     }
     /* Ankauf · Bestand · Zielbild: Einordnung mit Ankauf-Marke */
     var si = document.getElementById('dp-pa-si');
-    if (si) { var ksi = h.platz(si, 'gx-einordnung-si', si.firstChild, 'dp-gx'); zeichneMit(h, ksi, sig + kpSig + 'a', function (k, w) { karteEinordnung(k, w, true); });
-      var kfs = h.platz(si, 'gx-fahrplan-si', ksi.nextSibling, 'dp-gx'); zeichneMit(h, kfs, sig, function (k, w) { karteFahrplan(k, w, P, C); }); }   /* v4250 · Fahrplan hierher */
+    if (si) { var ksi = h.platz(si, 'gx-einordnung-si', si.firstChild, 'dp-gx'); var zbSig = ''; try { zbSig = JSON.stringify((window.DpPotenzial.kennzahlen(window.DpPotenzial.modell()) || {}).zielbild || ''); } catch (e) {} zeichneMit(h, ksi, sig + kpSig + 'a' + zbSig, function (k, w) { karteEinordnung(k, w, true); });
+      var altFs = si.querySelector('[data-dp-gn="gx-fahrplan-si"]'); if (altFs && altFs.parentNode) altFs.parentNode.removeChild(altFs); }   /* v4280 · Fahrplan wieder in die Übersicht, ganz oben */
     /* Wert & Lage: Wertverlauf (statt „Wert gegen Plan“), Wo dein Objekt steht und Lage, Monte-Carlo-Fächer */
     var we = document.getElementById('dp-pa-wert');
     if (we) {
@@ -907,6 +985,6 @@
   }
   stilAnwenden();
   freigabe(); window.addEventListener('dp:vorschau', freigabe); window.addEventListener('dp:plan-ready', function () { setTimeout(freigabe, 300); });
-  window.DpGrafikenPremium = { lauf: function (h) { if (!FREI) { freigabe(); return; } stil(); try { pilotAnalyse(h); } catch (e) { try { console.warn('[grafiken-premium]', e); } catch (x) {} } }, MODELL: MODELL, _mieteuro: mieteuro, stil: stilSetzen, stilWahl: stilWahl, stilAnwenden: stilAnwenden, _einordnung: einordnungDaten, _portfolio: portfolioSchnitt };
+  window.DpGrafikenPremium = { lauf: function (h) { if (!FREI) { freigabe(); return; } stil(); try { pilotAnalyse(h); } catch (e) { try { console.warn('[grafiken-premium]', e); } catch (x) {} } }, MODELL: MODELL, _mieteuro: mieteuro, _steuerBreakEven: steuerBreakEven, _einordnungDaten: einordnungDaten, stil: stilSetzen, stilWahl: stilWahl, stilAnwenden: stilAnwenden, _einordnung: einordnungDaten, _portfolio: portfolioSchnitt };
   window.DpGrafiken = { heatmap: heatmap, bullets: bullets, verlauf: verlauf, punktreihen: punktreihen, fahrplan: fahrplan, fingerabdruck: fingerabdruck, sankey: sankey, tornado: tornado, ausstieg: ausstieg, karte: karte, farben: F, modell: MODELL };
 })();
