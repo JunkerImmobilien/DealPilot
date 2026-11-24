@@ -1453,13 +1453,22 @@
     if (mitAuf) sp.push({ k: 'aufteilung', t: 'Aufteilung', u: d.auf.je_wohnung && d.auf.je_wohnung.length ? d.auf.je_wohnung.filter(function (w) { return w.art !== 'gewerbe'; }).length + ' Wohnungen einzeln' : 'in Eigentumswohnungen', kl: 'hebel' });
     var A = function (s) { var z = zA[s]; return z && zahl(z.ankauf) ? Number(z.ankauf) : null; };
     var H = function (s) { var z = zA[s]; return z && zahl(z.bestand) ? Number(z.bestand) : null; };
+    /* v4440 · Rohstand des Ankaufs und heutige Eingaben: DSCR netto, Zuschlaege, geaenderte Annahmen */
+    var AKD = null; try { var _st = hatAnkauf && window.DealPilotAnkauf && window.DealPilotAnkauf.stand ? window.DealPilotAnkauf.stand() : null; AKD = _st && _st.daten ? _st.daten : null; } catch (e) { AKD = null; }
+    var ein = function (s) { if (s == null || s === '') return null; var x = String(s).trim(); if (x.indexOf(',') >= 0) x = x.replace(/\./g, '').replace(',', '.'); x = parseFloat(x); return isFinite(x) ? x : null; };
+    var feldHeute = function (id) { var el = document.getElementById(id); return el ? ein(el.value) : null; };
+    var zeJahr = function (k) { var z = k === 'ankauf' ? (AKD ? ein(AKD.ze) : null) : feldHeute('ze'); return z > 0 ? z * 12 : 0; };
     /* Wert einer Kennzahl je Spalte; die Spalte Heute nimmt die Stufe Bestand, ohne Zielbild-Modell den Abgleich */
     var w = function (feld, k) {
       if (k === 'aufteilung') return null;
-      if (k === 'ankauf') return { miete_jahr: A('_kpis_miete_j') != null ? A('_kpis_miete_j') : (A('nkm') != null ? A('nkm') * 12 : null), miete_qm: A('_nkm_qm'), bmy: A('_kpis_bmy'), cf_monat: A('_kpis_cf_vs') != null ? A('_kpis_cf_vs') / 12 : null, dscr: A('_kpis_dscr') }[feld];
+      if (k === 'ankauf') return { miete_jahr: A('_kpis_miete_j') != null ? A('_kpis_miete_j') : (A('nkm') != null ? A('nkm') * 12 + zeJahr('ankauf') : null), miete_qm: A('_nkm_qm'), bmy: A('_kpis_bmy'), cf_monat: A('_kpis_cf_vs') != null ? A('_kpis_cf_vs') / 12 : null,
+        /* v4440 · alte Ankauf-Staende trugen den Brutto-DSCR, die anderen Spalten sind netto */
+        dscr: AKD && window.Dscr && window.Dscr.ausGespeichert ? window.Dscr.ausGespeichert(AKD) : A('_kpis_dscr') }[feld];
       var st = S[k];
+      /* v4440 · die Stufen fuehren die Kaltmiete der Wohnungen, Cashflow und DSCR rechnen mit Zuschlaegen und Stellplaetzen: Zeile auf dieselbe Basis */
+      if (feld === 'miete_jahr' && st && st.miete_jahr != null) return st.miete_jahr + zeJahr(k);
       if (st && st[feld] != null) return st[feld];
-      if (k === 'bestand' && hatAnkauf) return { miete_jahr: H('_kpis_miete_j') != null ? H('_kpis_miete_j') : (H('nkm') != null ? H('nkm') * 12 : null), miete_qm: H('_nkm_qm'), bmy: H('_kpis_bmy'), cf_monat: H('_kpis_cf_vs') != null ? H('_kpis_cf_vs') / 12 : null, dscr: H('_kpis_dscr') }[feld];
+      if (k === 'bestand' && hatAnkauf) return { miete_jahr: H('_kpis_miete_j') != null ? H('_kpis_miete_j') : (H('nkm') != null ? H('nkm') * 12 + zeJahr('bestand') : null), miete_qm: H('_nkm_qm'), bmy: H('_kpis_bmy'), cf_monat: H('_kpis_cf_vs') != null ? H('_kpis_cf_vs') / 12 : null, dscr: H('_kpis_dscr') }[feld];
       return null;
     };
     var kopf = [{ t: 'Kennzahl' }].concat(sp.map(function (c) { return { t: c.t, u: c.u, kl: c.kl }; }));
@@ -1473,7 +1482,7 @@
     var sub = function (h, s) { return s ? h + '<small>' + s + '</small>' : h; };
     var ewGesperrt = !!(Z && Z.ertragswert_gesperrt);
     var zeilen = [{ gr: 'Miete und Rendite' },
-      zeile('Kaltmiete im Jahr', function (k) { var v = w('miete_jahr', k); return v == null ? null : sub(eur(v), w('miete_qm', k) != null ? de(w('miete_qm', k), 2) + ' €/m² im Monat' : ''); }),
+      zeile('Kaltmiete im Jahr', function (k) { var v = w('miete_jahr', k); if (v == null) return null; var zj = k === 'aufteilung' ? 0 : zeJahr(k); var u = [w('miete_qm', k) != null ? de(w('miete_qm', k), 2) + ' €/m² im Monat' : '', zj > 0 ? 'davon Stellplätze und Zuschläge ' + eur(zj) : ''].filter(Boolean).join('<br>'); return sub(eur(v), u); }),
       zeile('Bruttomietrendite', function (k) { var v = w('bmy', k); return v == null ? null : pct(v); }, { u: 'auf Kaufpreis und Maßnahmen' }),
       zeile('Cashflow vor Steuer im Monat', function (k) { var v = w('cf_monat', k); return v == null ? null : { h: sEur(v), kl: v < 0 ? 'schlecht' : '' }; }),
       zeile('DSCR', function (k) { var v = w('dscr', k); return v == null ? null : { h: de(v, 2), kl: v < 1 ? 'schlecht' : '' }; }, { d: true }),
@@ -1514,6 +1523,17 @@
     var hin = [];
     if (!mitAuf && d.mfh) hin.push('Aufteilung: der Aufteilerwert erscheint, sobald die Ertragswerte gerechnet sind und das Haus aufgeteilt werden kann.');   /* v4042c · Marcel 23.11.2026: bei ETW gar kein Hinweis zur Aufteilung. v4042d · ohne Aufteilung ist d.auf null: der else-Zweig brach bei jeder ETW ab und die ganze Kennzahlen-Tabelle fehlte */
     else if (mitAuf && !T && d.auf && d.auf.gesperrt) hin.push('Aufteilung: ' + esc(d.auf.gesperrt));
+    /* v4440 · Marcel 24.11.2026 (Westerfeldstr.): die Spalte Ankauf bleibt eingefroren, sagt aber, welche Annahmen sich seither geaendert haben */
+    if (hatAnkauf && AKD) {
+      var anders = [];
+      [['mietausfall', 'Mietausfall', 'eurj'], ['hg_nul', 'nicht umlagefähiges Hausgeld', 'eurj'], ['d1', 'Darlehen', 'eur'], ['d1z', 'Zins', 'pct'], ['d1t', 'Tilgung', 'pct'], ['d2', 'zweites Darlehen', 'eur'], ['d2z', 'Zins des zweiten Darlehens', 'pct']].forEach(function (f) {
+        var a = ein(AKD[f[0]]), h = feldHeute(f[0]); a = a == null ? 0 : a; h = h == null ? 0 : h;
+        if (Math.abs(a - h) < (f[2] === 'pct' ? 0.005 : 1)) return;
+        var fm = function (x) { return f[2] === 'pct' ? de(x, 2) + ' %' : eur(x) + (f[2] === 'eurj' ? ' im Jahr' : ''); };
+        anders.push(f[1] + ' im Ankauf ' + fm(a) + ', heute ' + fm(h));
+      });
+      if (anders.length) hin.push('Seit dem Ankauf geändert: ' + esc(anders.join(', ')) + '. Die Spalte Ankauf zeigt die Rechnung von damals.');
+    }
     if (S.mieterhoehung) hin.push('Mieterhöhung nach § 558 BGB' + (J.mieterhoehung ? ' ab ' + J.mieterhoehung : '') + ', Mieter bleibt.');
     if (Z && Z.kurz_ausblick) hin.push(esc(Z.kurz_ausblick));
     return { satz: s, html: tabelle(kopf, zeilen.filter(Boolean)), hinweis: hin.join(' '), Z: Z, hatAnkauf: hatAnkauf };

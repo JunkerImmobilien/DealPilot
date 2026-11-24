@@ -141,12 +141,27 @@ window.Dscr = (function () {
      netto = (Miete - Kosten) / Kapitaldienst. Fehlen sie, bleibt der alte Wert (null-Fall
      sichtbar statt geraten waere schlechter: der Wert stimmt dann bis zum naechsten Oeffnen).
      Kein DOM, keine Einstellung - reine Rechnung. */
+  /* v4440 · Eingabefeld als Zahl: "3195", "1.234,50", "3,5" (Komma = Dezimal, Punkt nur mit Komma Tausender) */
+  function _zahlEin(s) {
+    if (s == null || s === '') return NaN;
+    if (typeof s === 'number') return s;
+    var t = String(s).trim();
+    if (t.indexOf(',') >= 0) t = t.replace(/\./g, '').replace(',', '.');
+    return parseFloat(t);
+  }
   function ausGespeichert(d) {
     if (!d) return null;
     var x = parseFloat(d._kpis_dscr);
     if (!isFinite(x)) return null;
     if (d._kpis_dscr_art === 'netto') return x;
     var m = parseFloat(d._kpis_miete_j), b = parseFloat(d._kpis_bwk_nul_y);
+    /* v4440 · alte Ankauf-Staende (vor v3031 festgeschrieben) fuehren kein _kpis_miete_j.
+       Dann die Jahresmiete aus den Eingaben: (NKM + Zuschlaege/Stellplaetze) je Monat x 12,
+       genau der Zaehler, mit dem der Brutto-DSCR damals gerechnet wurde. */
+    if (!(m > 0)) {
+      var nk = _zahlEin(d.nkm), ze = _zahlEin(d.ze);
+      if (nk > 0) m = (nk + (ze > 0 ? ze : 0)) * 12;
+    }
     if (x > 0 && m > 0 && isFinite(b) && b >= 0) return (m - b) / (m / x);
     return x;
   }
