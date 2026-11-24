@@ -45262,3 +45262,9 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Commit:** main fac529ee (per Index auf origin/main, nur dp-dokument.js, dp-dokumente.js, Buster index.html/einzelcheck.js), staging eb7af915, 4fd0f79f, Rücknahme 5d64beac, 181f2aad.
 - **Nachweis:** Staging Demostraße 5 und Musterhof 8, Kurz und Vollständig erzeugt, Seitenzahlen unverändert (9/18, 8/19), Diagramme neu, buster-ebenen sauber. Prod: Dateien mit v4380 ausgeliefert (curl), Inhalt main == staging; PDF auf Prod nicht erzeugt (keine Anmeldung im Prod-Tab).
 - **Rest:** App-Kachel Wertpuffer nutzt weiter das alte Feld; Bericht mit Stichtag Kaufdatum gilt in der App als Wert 2026; Muster unter Dateien/Investment-PDF/v4380/.
+
+### Rollout 1.0.159 · 24.11.2026 · einzelcheck-2/2a (Landing)
+- **Was:** Deal-Check-Wege anklickbar · Fenster schließen nicht per Klick daneben (Einzel-Check, Black Friday) · Bericht-PDF mit Lagekarte/Exposé-Foto, Marktpreisindikation getrennt vom Vergleichswert, DSCR erklärt, ganze Seiten (11 statt 13) · Bericht per Mail (PDF-Dienst, Anrechnungs-Code, Migration 130) · Prod-Sperre nur noch im Server (EINZELCHECK_AKTIV + Live-Preis).
+- **Commit:** main c582e3aa (cherry-picks 4efd5ef3, 46cc56c6, fc49adde aus staging d82abaa9, 2b22329e, 29957d8a), davor fac529ee.
+- **Nachweis:** einzelcheck-pruefen GRÜN (17 neue Punkte), buster-ebenen sauber, landing-zaehlen 27, Gold-Audit RC 0; vorschau-pruefen ROT D (grafiken_neu in dp-dokumente.js, schon vor diesem Paket auf main). Sicherungen *-20261124-0820-kk. Prod: Backend healthy, Migration 130, /preis 404 wie gewollt, Landing lädt einzelcheck.js?v=einzelcheck-2a ohne sichtbaren zweiten Weg.
+- **Rest:** Freischaltung Prod (Live-Preis, Coupon, .env) wartet auf Marcel · DEALCHECK10 live ja/nein · Merge main → staging · Foto-Wahl nur mit echtem Exposé-Kauf abnehmbar.
