@@ -45244,3 +45244,9 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Commit:** main d039ad8 (staging 273ce5b), davor ea58ff9.
 - **Nachweis:** vorschau 11/11, Buster sauber, Gold-Audit RC 0, vivi 322, jahresabgleich 151, unterlagen-steuer 53, grafiken-neu 49; Prod: Migration 128 gelaufen, Backend healthy, plans.vivi investor/pro/partner true.
 - **Rest:** Plan business (1 aktives Abo) hat features.vivi nicht gesetzt = kein ViVi, Rueckfrage · ViVi-Abgleich bei Herabstufung anhalten? · DSCR/EK-Rendite "wie eingegeben" vs "2026" beschriften (Rueckfrage) · PDF-Fassungen kurz/kompakt/voll + Kombi offen · Werbung BF/ViVi wartet auf Freigabe, ViVi-Logo fehlt.
+
+### Rollout 1.0.157 · 24.11.2026 · v4360
+- **Was:** DSCR/EK-Rendite beschriftet (Kacheln „volles Jahr, heutige Eingaben“, Karte „DSCR 2026“/„Cashflow nach Steuern 2026“, Zeilen und Spalte „Heute (2026)“), keine Rechnungsänderung · ViVi-Takt hält ohne Plan-Merkmal an (Herabstufung), Verknüpfung bleibt · Migration 129: `grafiken_neu` für alle Kunden (vorschau_freigaben.fuer_alle, im Admin zurücknehmbar) · Business ohne ViVi (Marcel).
+- **Commit:** main 015d68b (staging 015d68b, fast-forward), davor d039ad8. Von Hand ausgerollt (gleiche Schritte wie rollout-prod.ps1: Gold-Audit RC 0, vorschau-pruefen, beide Sicherungen 0843 mit Kopf, Version, Merge im Worktree, Pull, Build backend + mb-backend), weil das Skript an fremden, nicht committeten Dateien eines parallelen Forks abbricht.
+- **Nachweis:** vivi-pruefen 327, Buster sauber; Staging Demostraße gemessen (0,91 / 0,83 „DSCR 2026“), zwei Nicht-Admin-Konten grafiken_neu frei (vorschau.fuerKonto); Prod: Migration 129, grafiken_neu t, Backend healthy, HTTP 200, Version 1.0.157, Buster v4360.
+- **Rest:** Sperren `grafiken_neu` im Code in späterer Version entfernen · Browser-Messung als echter Nicht-Admin und bei 390 px nicht nachgeholt.
