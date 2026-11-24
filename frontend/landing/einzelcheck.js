@@ -322,6 +322,8 @@
     var basis = grundBasis(), g = basis.g || {}, z = (S.frei && S.frei.zahlen) || {}, her = S.herkunft || {};
     var werte = {}, quelle = {}, konflikt = {};
     Object.keys(g).forEach(function (k) { if (g[k] != null && g[k] !== '') { werte[k] = g[k]; quelle[k] = basis.q; } });
+    /* Vorgaben, die das Formular schon immer zeigte (Tilgung 1,5 %, 10 Jahre, Nebenkosten 10 %): als Vorschlag markiert */
+    [['tilg_pct', 1.5], ['bindung_j', 10], ['nk_pct', 10]].forEach(function (x) { if (werte[x[0]] == null && !(z[x[0]] > 0)) { werte[x[0]] = x[1]; quelle[x[0]] = 'vorgabe'; } });
     Object.keys(VORBELEGBAR).forEach(function (k) {
       var u = z[k]; if (u == null || u === '') return;
       if (werte[k] == null || werte[k] === '') { werte[k] = u; quelle[k] = her[k] || 'Unterlagen'; return; }
@@ -329,7 +331,7 @@
     });
     return { werte: werte, quelle: quelle, konflikt: konflikt };
   }
-  function quelleText(q) { return q === 'eingabe' ? 'deine Angabe' : q === 'dealcheck' ? 'aus deinem Deal-Check' : ausText(q); }
+  function quelleText(q) { return q === 'eingabe' ? 'deine Angabe' : q === 'dealcheck' ? 'aus deinem Deal-Check' : q === 'vorgabe' ? 'Vorschlag, bitte prüfen' : ausText(q); }
   function zeigeGrund(hinweis) {
     stufe(2); ++schritt;
     var vb = vorbelegung(), g = vb.werte, offen = {};
@@ -346,7 +348,7 @@
           + '<button type="button" class="ec-wahl-a" data-v="' + esc(kf.a) + '">' + esc(wertText(art, kf.a)) + ' <em>' + esc(quelleText(kf.aq)) + '</em></button>'
           + '<button type="button" class="ec-wahl-b" data-v="' + esc(kf.b) + '">' + esc(wertText(art, kf.b)) + ' <em>' + esc(quelleText(kf.bq)) + '</em></button></div>';
       }
-      if (g[k] != null && g[k] !== '' && vb.quelle[k] && vb.quelle[k] !== 'eingabe') return '<small class="ec-her' + (vb.quelle[k] === 'dealcheck' ? '' : ' doc') + '">' + esc(quelleText(vb.quelle[k])) + '</small>';
+      if (g[k] != null && g[k] !== '' && vb.quelle[k] && vb.quelle[k] !== 'eingabe') return '<small class="ec-her' + (vb.quelle[k] === 'dealcheck' || vb.quelle[k] === 'vorgabe' ? '' : ' doc') + '">' + esc(quelleText(vb.quelle[k])) + '</small>';
       if ((g[k] == null || g[k] === '') && pflicht(k) && !(k === 'plz' && g.ort)) return '<small class="ec-her fehlt">fehlt, bitte ergänzen</small>';
       return '';
     };
@@ -364,7 +366,7 @@
       return '<option value="' + j + '"' + ((g.bindung_j || 10) === j ? ' selected' : '') + '>' + j + ' Jahre</option>'; }).join('') + '</select></label>';
     var strasse = S.adresse ? String(S.adresse).split(',')[0] : '';
     /* Kopf: was die Unterlagen gefüllt haben, was fehlt, wo zu wählen ist */
-    var ausDok = Object.keys(vb.quelle).filter(function (k) { return vb.quelle[k] !== 'eingabe' && vb.quelle[k] !== 'dealcheck' && !vb.konflikt[k]; }).length;
+    var ausDok = Object.keys(vb.quelle).filter(function (k) { return vb.quelle[k] !== 'eingabe' && vb.quelle[k] !== 'dealcheck' && vb.quelle[k] !== 'vorgabe' && !vb.konflikt[k]; }).length;
     var fehltJetzt = grundFehlt(g), NAMEN = { kp: 'Kaufpreis', nkm: 'Kaltmiete', wfl: 'Wohnfläche', art: 'Objektart', plz: 'Postleitzahl oder Ort', ek_eur: 'Eigenkapital', zins_pct: 'Sollzins', tilg_pct: 'Tilgung', bindung_j: 'Zinsbindung' };
     var nWahl = Object.keys(vb.konflikt).length;
     var lead = S.frei ? (ausDok ? ausDok + (ausDok === 1 ? ' Angabe stammt' : ' Angaben stammen') + ' aus deinen Unterlagen.' : 'Aus deinen Unterlagen ließ sich keine Grundangabe ablesen.') : 'Ohne Unterlagen rechnet der Bericht mit diesen Angaben.';
