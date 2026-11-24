@@ -9693,6 +9693,7 @@ html[data-dp-layout][data-wl-logo-gross] .dpl-schiene .dpl-logo{
    html[data-dk-drei] steht nur, solange der Dreier-Schalter gebaut ist, und
    blendet nur dann den Regler aus. Gold über Whitelabel-Token, Statusfarben nicht. */
 html[data-dk-drei] .dpl-portfolio-regler{ display:none !important; }
+html[data-dp-layout][data-dp-layout][data-dk-drei] body aside.sidebar#sidebar .dpl-portfolio-handy{ display:none !important; }
 html[data-dk-drei] .dk-schalter.dk-drei{
   display:flex !important; align-items:stretch !important; gap:3px !important;
   padding:3px !important; box-sizing:border-box !important;
