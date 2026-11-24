@@ -1874,11 +1874,15 @@
       add('haus', 'Haus &amp; Unterlagen', hausUl);
       add('potx', 'Potenzial &amp; Exit', unterReiter([['pot', potH], ['risk', o.risiko], ['anschluss', o.anschluss != null ? kuerzen(o.anschluss) : kuerzen(o.anschlussExit)], ['exit', o.exit != null ? kuerzen(o.exit) : '']], true));
     } else {
-      add('verh', 'Kaufpreis &amp; Offerte', kuerzen(o.verhandlung));
-      add('bank', 'Finanzierung &amp; Bank', kuerzen(o.bank));
+      /* v4540 · Marcel 24.11.2026 („Übersicht, Ankauf Soll Zielbild, Wert und Lage sollten wir gleichhalten, genauso Haus- und
+         Unterlagen und Potenzial und Risiken“): die gemeinsamen Reiter stehen im Ankauf in derselben Reihenfolge wie im
+         Objekt-Cockpit (Übersicht, Ankauf/Bestand/Zielbild, Wert & Lage, Steuer, Haus & Unterlagen, Potenzial), die zwei
+         reinen Kaufreiter danach. Vorher lagen Kaufpreis & Offerte und Finanzierung & Bank zwischen Wert & Lage und Steuer. */
       add('steuer', 'Steuer', o.steuer);
       add('haus', 'Haus &amp; Unterlagen', hausUl);
       add('potx', 'Potenzial &amp; Risiken', unterReiter([['pot', potH], ['risk', o.risiko]], false));
+      add('verh', 'Kaufpreis &amp; Offerte', kuerzen(o.verhandlung));
+      add('bank', 'Finanzierung &amp; Bank', kuerzen(o.bank));
     }
     var phase = bestand ? 'Bestand' : 'Ankauf', info = '', seit = '';
     try {

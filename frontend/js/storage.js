@@ -975,6 +975,15 @@ function loadData(d) {
     // Leiser renderSaved(): aktive Karte rechnet live neu (storage.js Z.1011+)
     if (typeof renderSaved === 'function') renderSaved();
   } catch(_e351) { console.warn('[V351] load-cache-refresh:', _e351.message); }
+  /* v4540 · Gewonnen/Verloren VOR dem Zeichnen der Analyse aus dem geladenen Objekt setzen. Bis hier trugen die
+     versteckten Felder noch den Stand des VORIGEN Objekts (gesetzt wird unten, V104). _dpPaIstBestand() fragt
+     DpObjektCockpit.aktiv(), und das las #_deal_won_state: gemessen 24.11.2026 auf Staging bekam Hauptstr. 51
+     (Ankauf) nach Westerfeldstr. 140 (gewonnen) die Bestand-Reiter mit Jahresabgleich. Unten wird derselbe Wert
+     noch einmal gesetzt, das bleibt unverändert. */
+  try {
+    var _wonV = document.getElementById('_deal_won_state'); if (_wonV) _wonV.value = (d && d._deal_won) ? 'true' : 'false';
+    var _lostV = document.getElementById('_deal_lost_state'); if (_lostV) _lostV.value = (d && (d._deal_lost === true || d._deal_lost === 'true')) ? 'true' : 'false';
+  } catch (_eWonV) {}
   if (window._aiText) {
     // V25: Wenn _aiText valides JSON ist (Server-KI), beide Blöcke rehydrieren
     var parsedAI = null;
@@ -2592,7 +2601,7 @@ async function loadSaved(k) {
       if (typeof setMainView === 'function') setMainView('single');
       // V63.77 FIX: Falls User im Quick-Check-Standalone war → diesen sauber verlassen, dann zu Tab Objekt
       if (typeof exitQuickCheckMode === 'function') exitQuickCheckMode();
-      if (typeof switchTab === 'function') switchTab(0);
+      /* v4540 · Bestand: Objekt-Cockpit, Ankauf: Objekt */ if (window.DpObjektCockpit && typeof window.DpObjektCockpit.startReiter === 'function') window.DpObjektCockpit.startReiter(); else if (typeof switchTab === 'function') switchTab(0);
       // V63.48: Workflow-Bar nach Daten-Load aktualisieren (Felder sind jetzt befüllt)
       if (window.DealPilotWorkflow && typeof DealPilotWorkflow.renderProgressBar === 'function') {
         setTimeout(DealPilotWorkflow.renderProgressBar, 100);
@@ -2624,7 +2633,7 @@ async function loadSaved(k) {
       if (typeof setMainView === 'function') setMainView('single');
       // V63.77 FIX: Falls User im Quick-Check-Standalone war → diesen sauber verlassen, dann zu Tab Objekt
       if (typeof exitQuickCheckMode === 'function') exitQuickCheckMode();
-      if (typeof switchTab === 'function') switchTab(0);
+      /* v4540 · Bestand: Objekt-Cockpit, Ankauf: Objekt */ if (window.DpObjektCockpit && typeof window.DpObjektCockpit.startReiter === 'function') window.DpObjektCockpit.startReiter(); else if (typeof switchTab === 'function') switchTab(0);
       if (window.DealPilotWorkflow && typeof DealPilotWorkflow.renderProgressBar === 'function') {
         setTimeout(DealPilotWorkflow.renderProgressBar, 100);
       }
