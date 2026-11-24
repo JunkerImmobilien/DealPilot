@@ -2279,8 +2279,8 @@ function _renderAIServerAnalysis(a) {
     pV += '<div class="dp-pa-card"><em class="dp-pa-empty">\u2014 keine Verhandlungsdaten</em></div>';
 
   // Panel 6 — Bank
-  var pK = sec('', I.bank, 'BANK') + '<div class="dp-pa-card">' + sec('', I.bank, 'BANKARGUMENTE') +
-    ((Array.isArray(a.bankargumente) && a.bankargumente.length) ? num(a.bankargumente) : '<em class="dp-pa-empty">\u2014 keine Bankargumente</em>') + '</div>';
+  var pK = sec('', I.bank, 'BANK') + '<div class="dp-pa-card">' + sec('', I.bank, 'WAS FÜR DIE FINANZIERUNG SPRICHT') +   /* v4550 · wie im Investment-PDF (v4390b, Marcel: „wir gehen ja damit zur Bank“) */
+    ((Array.isArray(a.bankargumente) && a.bankargumente.length) ? num(a.bankargumente) : '<em class="dp-pa-empty">Noch keine Punkte. Mit „Neu abrufen“ stehen sie hier.</em>') + '</div>';
 
   /* v2985 · BESTAND: Anschlussfinanzierung und Exit-Strategien. Der rechnerische Teil
      kommt aus bestand-analyse.js (ohne KI, gefuellt beim Oeffnen des Reiters), die
