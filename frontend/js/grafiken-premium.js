@@ -281,7 +281,7 @@
     BAENDER.forEach(function (bd) { bd.lo.concat(bd.hi).forEach(function (v) { if (v != null && isFinite(v)) alle.push(v); }); });
     (d.streu || []).forEach(function (q) { if (q.v != null && isFinite(q.v)) alle.push(q.v); });
     /* v4570 · o.yFrei: Achse um die Werte statt ab null (Index um 100), d.xText: eigene Beschriftung je Punkt (Berichtsdatum) */
-    var aMin = Math.min.apply(null, alle), aMax = Math.max.apply(null, alle), aPad = Math.max(2, (aMax - aMin) * 0.18);
+    var aMin = Math.min.apply(null, alle), aMax = Math.max.apply(null, alle), aPad = Math.max(4, (aMax - aMin) * 0.18);
     var tk = o.yFrei ? ticks(aMin - aPad, aMax + aPad, 4) : ticks(Math.min(0, aMin), Math.max(0, aMax), 4), y0 = tk[0], y1 = tk[tk.length - 1];
     var xs = function (j) { return m.l + (j - X[0]) / (X[n - 1] - X[0]) * (W - m.l - m.r); }, ys = function (v) { return m.t + (1 - (v - y0) / (y1 - y0)) * (H - m.t - m.b); };
     var out = ['<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="' + esc(o.aria || 'Verlauf') + '">'];
@@ -473,7 +473,7 @@
        Beschriftung mittig darüber und ragte links aus der Karte, oben lag sie auf „STEUERPFLICHTIG“.
        Jetzt bündig zur Seite, auf der Platz ist, und unter dem Punkt, wenn er oben an den Feldbeschriftungen liegt. */
     var bx = x(best.j), by = y(best.irr), bAnk = bx < m.l + 110 ? 'start' : (bx > W - m.r - 110 ? 'end' : 'middle');
-    var bTx = bAnk === 'start' ? bx + 9 : (bAnk === 'end' ? bx - 9 : bx), bTy = by - 10 < m.t + 24 ? by + 18 : by - 10;
+    var bTx = bAnk === 'start' ? bx + 9 : (bAnk === 'end' ? bx - 9 : bx), bTy = bAnk === 'middle' ? (by - 10 < m.t + 24 ? by + 18 : by - 10) : (by + 4 < m.t + 22 ? by + 18 : by + 4);   /* seitlich: auf Höhe des Punkts, die Linie fällt oder steigt davon weg */
     out.push('<circle cx="' + f1(bx) + '" cy="' + f1(by) + '" r="5" style="fill:' + F.gold + ';stroke:' + F.karte + ';stroke-width:2"/><text x="' + f1(bTx) + '" y="' + f1(bTy) + '" text-anchor="' + bAnk + '" style="font:600 11px JetBrains Mono,monospace;fill:' + F.tinte + ';paint-order:stroke;stroke:' + F.karte + ';stroke-width:3px">bestes Jahr ' + best.j + ' · ' + esc(pct(best.irr)) + '</text>');
     var dx = (W - m.l - m.r) / Math.max(1, j1 - j0);
     D.forEach(function (p) { out.push('<rect x="' + f1(x(p.j) - dx / 2) + '" y="' + m.t + '" width="' + f1(dx) + '" height="' + (H - m.t - m.b) + '" style="fill:transparent"' + tipA('<div class="t">Verkauf Ende ' + p.j + '</div>Eigenkapitalrendite <b>' + pct(p.irr) + '</b> im Jahr<br>Rückfluss das <b>' + nf1.format(p.mult) + '-fache</b> des Eigenkapitals<br>' + (p.frei ? 'Verkauf steuerfrei' : 'Gewinn steuerpflichtig')) + '/>'); });
@@ -1072,7 +1072,7 @@
   }
   function indexKarte(host, hist, mets, o) {
     o = o || {}; stil();
-    var FARBE = [F.gold, F.goldD, F.tinte3, F.gold2, F.tinte, F.tinte2], STRICH = [false, true, false, false, true, false];
+    var FARBE = [F.gold, F.goldD, F.tinte3, F.tinte, F.tinte2, F.gold3, F.gruen, F.tinte3], STRICH = [false, true, false, false, true, false, false, true];
     var an = mets.map(function (m, i) { return i < 2; });
     var datum = function (h) { try { return new Date(h.created_at).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' }); } catch (e) { return ''; } };
     var basis = mets.map(function (m) { var b = hist.filter(function (h) { return zahl(h[m.key]) != null && Number(h[m.key]) !== 0; })[0]; return b ? Number(b[m.key]) : null; });
@@ -1090,10 +1090,10 @@
     var wahl = document.createElement('div'); wahl.className = 'gx-wahl'; i.appendChild(wahl);
     var ziel = document.createElement('div'); i.appendChild(ziel);
     wahl.innerHTML = mets.map(function (m, k) {
-      return '<button type="button" data-k="' + k + '" class="' + (an[k] ? 'an' : '') + '" aria-pressed="' + an[k] + '"><i style="background:' + (STRICH[k] ? 'repeating-linear-gradient(90deg,' + FARBE[k] + ' 0 5px,transparent 5px 8px)' : FARBE[k]) + '"></i>' + esc(m.label) + '</button>';
+      return '<button type="button" data-k="' + k + '" class="' + (an[k] ? 'an' : '') + '" aria-pressed="' + an[k] + '"><i style="background:' + (STRICH[k % STRICH.length] ? 'repeating-linear-gradient(90deg,' + FARBE[k % FARBE.length] + ' 0 5px,transparent 5px 8px)' : FARBE[k % FARBE.length]) + '"></i>' + esc(m.label) + '</button>';
     }).join('');
     var zeichnen = function (w) {
-      var R = []; mets.forEach(function (m, k) { if (an[k]) R.push({ name: m.label, farbe: FARBE[k % FARBE.length], gestrichelt: STRICH[k], dick: k === 0 ? 2.6 : 2, punkte: true, werte: hist.map(function (h) { return idx(k, h); }) }); });
+      var R = []; mets.forEach(function (m, k) { if (an[k]) R.push({ name: m.label, farbe: FARBE[k % FARBE.length], gestrichelt: STRICH[k % STRICH.length], dick: k === 0 ? 2.6 : 2, punkte: true, werte: hist.map(function (h) { return idx(k, h); }) }); });
       if (!R.length) { ziel.innerHTML = '<div class="gx-s" style="margin:8px 0">Mindestens eine Kennzahl einblenden.</div>'; return; }
       verlauf(ziel, { x: hist.map(function (h, q) { return q; }), xText: hist.map(function (h, q) { return (q + 1) + '. · ' + datum(h); }), reihen: R,
         tip: function (q) {
