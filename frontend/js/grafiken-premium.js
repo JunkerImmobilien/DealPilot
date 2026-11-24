@@ -287,7 +287,7 @@
     var out = ['<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="' + esc(o.aria || 'Verlauf') + '">'];
     tk.forEach(function (v) { out.push('<line class="gx-netz" x1="' + m.l + '" x2="' + (W - m.r) + '" y1="' + f1(ys(v)) + '" y2="' + f1(ys(v)) + '"/><text class="gx-ax" x="' + (m.l - 8) + '" y="' + f1(ys(v) + 4) + '" text-anchor="end">' + kurz(v) + '</text>'); });
     if (y0 < 0) out.push('<line x1="' + m.l + '" x2="' + (W - m.r) + '" y1="' + f1(ys(0)) + '" y2="' + f1(ys(0)) + '" style="stroke:' + F.linie2 + ';stroke-width:1.2"/>');
-    var schritt = Math.max(1, Math.ceil(n / Math.max(2, Math.floor((W - m.l - m.r) / (d.xText ? 86 : 52)))));
+    var schritt = Math.max(1, Math.ceil(n / Math.max(2, Math.floor((W - m.l - m.r) / (d.xText ? (W < 560 ? 70 : 96) : 52)))));
     X.forEach(function (j, i) { if (i % schritt === 0 || (i === n - 1 && (n - 1) % schritt >= schritt / 2)) out.push('<text class="gx-ax" x="' + f1(xs(j)) + '" y="' + (H - 6) + '" text-anchor="' + (d.xText ? (i === 0 ? 'start' : i === n - 1 ? 'end' : 'middle') : 'middle') + '"' + (j === d.heute ? ' style="fill:' + F.goldH + '"' : '') + '>' + esc(d.xText ? d.xText[i] : j) + '</text>'); });
     BAENDER.forEach(function (bd) {
       var pts = X.map(function (j, i) { return bd.hi[i] == null ? null : f1(xs(j)) + ',' + f1(ys(bd.hi[i])); }).filter(Boolean)
@@ -1095,7 +1095,7 @@
     var zeichnen = function (w) {
       var R = []; mets.forEach(function (m, k) { if (an[k]) R.push({ name: m.label, farbe: FARBE[k % FARBE.length], gestrichelt: STRICH[k % STRICH.length], dick: k === 0 ? 2.6 : 2, punkte: true, werte: hist.map(function (h) { return idx(k, h); }) }); });
       if (!R.length) { ziel.innerHTML = '<div class="gx-s" style="margin:8px 0">Mindestens eine Kennzahl einblenden.</div>'; return; }
-      verlauf(ziel, { x: hist.map(function (h, q) { return q; }), xText: hist.map(function (h, q) { return (q + 1) + '. · ' + datum(h); }), reihen: R,
+      verlauf(ziel, { x: hist.map(function (h, q) { return q; }), xText: hist.map(function (h, q) { var d0 = datum(h); return w < 560 ? d0.slice(0, 6) + d0.slice(8) : (q + 1) + '. · ' + d0; }),   /* schmal: 12.11.26 */ reihen: R,
         tip: function (q) {
           var h = hist[q];
           return '<div class="t">' + (q + 1) + '. Bericht · ' + esc(datum(h)) + '</div>' + mets.map(function (m, k) {
