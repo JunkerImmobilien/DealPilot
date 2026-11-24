@@ -2403,7 +2403,8 @@
         herl += Math.abs(diff) < 1 ? ' · Summe stimmt mit der Liste überein (' + fmt0(sl) + ' €/Monat)'
           : ' · ACHTUNG: Einheiten + Stellplätze ergeben ' + (miete + stp).toLocaleString('de-DE', { maximumFractionDigits: 2 }) + ' €/Monat, die Liste nennt ' + sl.toLocaleString('de-DE', { maximumFractionDigits: 2 }) + ' € - bitte im Fenster prüfen';
       }
-      _merged.mfh_einheiten_liste = { label: 'Einheiten erfassen', value: we.length + ' Einheiten' + (miete ? ' · ' + miete.toLocaleString('de-DE', { maximumFractionDigits: 2 }) + ' €/Monat Ist-Miete' : ''), raw: we, source: 'Unterlagen', kind: 'einheiten', herleitung: herl };
+      _merged.mfh_einheiten_liste = { label: 'Einheiten erfassen', value: we.length + ' Einheiten' + (miete ? ' · ' + miete.toLocaleString('de-DE', { maximumFractionDigits: 2 }) + ' €/Monat Ist-Miete' : ''), raw: we, source: 'Unterlagen', kind: 'einheiten', herleitung: herl,
+        teilung: _unterlagenListe().some(function (t) { return t.typ === 'teilungserklaerung'; }) };   /* v4590 · Teilungserklärung gelesen = schon in Wohnungseigentum aufgeteilt */
       /* v3029-import · Stellplätze und Garagen der Mieterliste: bis v3028 fielen sie still heraus
          (z. B. 2 × 40 € fehlten in der Objektmiete). Sie gehören in die Zusatzeinnahmen. */
       /* v3349 · gemessen an Lindenallee 14: das Exposé nennt „3.660 € (Wohnungen) + 210 € (Stellplätze)“, die
@@ -3444,6 +3445,13 @@
     }
     if (it.kind === 'einheiten') {
       var liste = it.raw;
+      /* v4590 · Marcel 24.11.2026 (Lindenallee 14): „wenn wir das als Objekt speichern, möchte ich nicht, dass die
+         Informationen verloren gehen“. Beim Speichern aus dem Quick-Check öffnete sich das Fenster „Einheiten erfassen“
+         erst NACH dem Speichern, vorbefüllt mit den 8 Wohnungen samt Mietverträgen. Ohne Klick auf „Übernehmen“ gingen
+         sie verloren. In der Übergabe werden sie jetzt direkt übernommen (dieselbe Funktion wie der Knopf). */
+      if (_qcUebergabe && window.DpMfhEinheiten && typeof window.DpMfhEinheiten.automatisch === 'function') {
+        try { if (window.DpMfhEinheiten.automatisch(liste, { aufgeteilt: !!it.teilung })) return 'text'; } catch (e) { try { console.warn('[obj-actions] Einheiten automatisch:', e); } catch (_) {} }
+      }
       setTimeout(function () { try { window.DpMfhEinheiten.vorbelegen(liste); } catch (e) {} }, 350);
       return 'text';
     }
@@ -3805,8 +3813,30 @@
   // v418: beim qc-save aufgerufen — Bucket B+C aus dem Stash ins frisch angelegte
   // Objekt schreiben (gleiche Schreiblogik wie applyMerged), gefiltert nach den im
   // Transfer-Modal angehakten Targets. Danach Stash leeren.
+  var _qcUebergabe = false;   /* v4590 · true nur während applyQcPending (Speichern aus dem Quick-Check) */
+  /* v4590 · nach der Übergabe aus dem Quick-Check die Pilot-Analyse einmal anstoßen, sobald das neue Objekt
+     gespeichert ist (qc-bridge löst _qcTakeover nach dem finalen Speichern). Nur mit Unterlagen-Auswertung, damit
+     ein Quick-Check ohne Unterlagen nicht ungefragt eine Analyse zieht. Nie doppelt (runAI hat einen Riegel). */
+  function _pilotNachUebergabe() {
+    var t0 = Date.now();
+    (function warte() {
+      if (Date.now() - t0 > 90000) return;
+      if (window._qcTakeover || !window._currentObjKey) { setTimeout(warte, 700); return; }
+      var key = window._currentObjKey;
+      setTimeout(function () {
+        if (window._currentObjKey !== key || window._aiAnalysis || window._aiRunning) return;
+        var lauf = (typeof window.runAI === 'function') ? window.runAI : null;
+        if (!lauf) return;
+        try { if (typeof window.toast === 'function') window.toast('Pilot-Analyse wird mit den Unterlagen erstellt …'); } catch (e) {}
+        try { lauf(); } catch (e) { try { console.warn('[obj-actions] Pilot-Analyse nach Übergabe:', e); } catch (_) {} }
+      }, 1500);
+    })();
+  }
   function applyQcPending(targets) {
     var n = 0, applied = [];
+    var _mitUnterlagen = !!(_qcPendingMerged._dok_auswertung && (!targets || targets._dok_auswertung));
+    _qcUebergabe = true;
+    try {
     Object.keys(_qcPendingMerged).forEach(function (id) {
       if (targets && !targets[id]) return;
       var it = _qcPendingMerged[id]; if (!it) return;
@@ -3817,7 +3847,9 @@
         n++; applied.push(id);
       }
     });
+    } finally { _qcUebergabe = false; }
     _qcPendingMerged = {};
+    if (_mitUnterlagen && applied.indexOf('_dok_auswertung') >= 0) _pilotNachUebergabe();
     try { if (typeof window._v236MarkQcLoaded === 'function' && applied.length) window._v236MarkQcLoaded(applied); } catch (e) {}
     try { if (typeof window.calc === 'function') window.calc(); } catch (e) {}
     try { if (typeof window.renderDealScore2 === 'function') window.renderDealScore2(); } catch (e) {}
