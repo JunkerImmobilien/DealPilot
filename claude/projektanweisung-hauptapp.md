@@ -45274,3 +45274,9 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Commit:** main f81fec2d (aus staging f9b862ba, 5704c964, 2c00c79d), Merge main → staging eded6934.
 - **Nachweis:** mietpotenzial 311, steuerjahr 36, prompt-lecks, grafiken-neu 49, vorschau sauber, Buster sauber, Gold-Audit Staging RC 0; Sicherungen 20261124-0830 mit Kopf; Prod backend healthy, Buster v4390/v4390b ausgeliefert.
 - **Rest:** Score-Eingang wp_kpi nutzt weiter das Formularfeld (Rückfrage) · echte PDF-Dateien nicht erzeugt, nur HTML der Fassungen geprüft.
+
+### Rollout 1.0.161 · 24.11.2026 · v4420
+- **Was:** Deal Score und Investor Deal Score rechnen den Wertpuffer mit dem maßgebenden Objektwert (State.wert_anker, Stichtag v4390), wenn die Wertangabe im Reiter Objekt aus einem Marktbericht stammt und abweicht (calc.js wp_kpi, Kachel r-wpuff liest denselben Wert). Die App speichert `_wert_anker`, objektRechnung.js (Flow/Telegram/Agent) spiegelt die Regel. Kern unverändert. Marcel 24.11.: „ja ändern, so dass es passt“.
+- **Commit:** main 6c601153 + 4b8b45c9 (cherry-pick aus staging abe68733), Merge main → staging 5dece908.
+- **Nachweis:** score-ketten 216, flow-berechnen RC 0, objekt-mapper sauber, steuerjahr 36, prompt-lecks, vorschau, buster-ebenen grün. Staging-Browser (Schreiben abgefangen): Demostraße wp_kpi −34.000 → −15.000, Scores 29/65 unverändert; Bismarckstr. 27 und Musterweg 7 unverändert. Container: objektRechnung ohne/mit Anker −34.000/−15.000. Prod: Sicherungen *-20261124-0843-oo (Kopf gelesen), Backend healthy, Buster v4420, Version 1.0.161 (danach 1.0.162 von Fork MM).
+- **Rest:** Prod hat 0 von 68 Objekten mit Wertangabe aus Marktbericht/Indikation, betroffen ist dort heute keins. Gespeicherte Kartenscores ändern sich erst beim nächsten Speichern. rechenkerne-spiegeln meldet eine fremde Abweichung bei modernisierung-herkunft.js.
