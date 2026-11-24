@@ -254,6 +254,17 @@
       P + '.avmx-apply{margin:12px 0 2px}',
       /* combined import modal */
       '.oabi-ov{position:fixed;inset:0;background:rgba(20,18,16,0.55);z-index:10001;display:flex;align-items:center;justify-content:center;padding:18px}',
+      /* v4470 · kombiniertes Fenster Einlesen + Belege je Jahr, Breite wie die Hilfe (1180 px) */
+      '.oabi-ov.oabi-kombi .oabi-modal{width:min(1180px,100%);max-height:92vh}',
+      '.oabi-kombi-grid{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:0;min-height:0}',
+      '.oabi-kombi .oabi-spalte{min-width:0;padding:4px 0 8px}',
+      '.oabi-kombi .oabi-spalte-jahre{border-left:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 25%, transparent);background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 3%, #fff)}',
+      ".oabi-kombi .oabi-spalte-t{font:700 11px/1.3 'JetBrains Mono',monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--wl-b8932f, #b8932f);padding:10px 20px 6px}",
+      '.oabi-kombi #oabi-r-jahre{padding-top:0}',
+      '.oabi-kombi .oabi-head{position:relative;padding-right:52px}',
+      '.oabi-x{position:absolute;right:14px;top:12px;width:32px;height:32px;border-radius:8px;border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 35%, transparent);background:transparent;font-size:20px;line-height:1;cursor:pointer;color:inherit}',
+      '.oabi-btn.warn{border-color:#B8625C;color:#B8625C}',
+      '@media (max-width:899px){.oabi-kombi-grid{grid-template-columns:1fr}.oabi-kombi .oabi-spalte-jahre{border-left:0;border-top:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 25%, transparent)}}',
       ".oabi-modal{background:var(--surface,#F8F6F1);border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 35%, transparent);border-radius:16px;width:min(740px,100%);max-height:90vh;overflow:auto;box-shadow:0 24px 60px rgba(0,0,0,0.28);font-family:'Inter',system-ui,sans-serif}",
       '.oabi-head{display:flex;align-items:center;gap:12px;padding:18px 20px 8px}',
       '.oabi-head h3{margin:0;font-size:17px;color:var(--ch,#2A2727)}',
@@ -2906,7 +2917,9 @@
     if (!kand.length) return;
     kand.forEach(function (f) { f._anBeleg = true; });
     var nurBelege = _files.every(function (f) { return f._anBeleg; });
-    if (nurBelege) { var ov = $('oabi-ov'); try { if (ov) ov.remove(); } catch (e) {} _fireOabiDone(); }
+    /* v4470 · im kombinierten Fenster bleibt der Eingang offen: das Prüffenster der Belege liegt darüber, danach zeigt
+       die rechte Spalte die neuen Belege (Ereignis dp:belege-geaendert aus beleg-import.js) */
+    if (nurBelege && !$('oabi-r-jahre')) { var ov = $('oabi-ov'); try { if (ov) ov.remove(); } catch (e) {} _fireOabiDone(); }
     window.DpEingang.belegeAuslesen(kand.map(function (f) { return f.file; }));
   }
   function _fireOabiDone(payload) {
@@ -2933,11 +2946,14 @@
     _merged = {}; _files = []; _importPhotos = [];
     /* v4080 · Marcel 23.11.2026: „Belege je Jahr“ im selben Fenster wie „Belege einlesen“, als eigener Reiter */
     var _jr = _eingang && window.DpEingang && typeof window.DpEingang.jahresInRahmen === 'function';
-    var ov = document.createElement('div'); ov.className = 'oabi-ov'; ov.id = 'oabi-ov';
+    /* v4470 · Marcel 24.11.2026: „das Einlesen und das Belege je Jahr alles kombinieren … ein breites Modal, ungefähr so
+       breit wie die Hilfe“. Statt zweier Reiter EIN Fenster (1180 px wie #help-modal, gemessen): links Einlesen, rechts die
+       Jahre mit Aufstellung nach Anlage V und der Liste der Belege. Am Handy untereinander. */
+    var ov = document.createElement('div'); ov.className = 'oabi-ov' + (_jr ? ' oabi-kombi' : ''); ov.id = 'oabi-ov';
     ov.innerHTML =
       '<div class="oabi-modal">' +
         '<div class="oabi-head"><span style="color:var(--gold,#C9A84C)">' + svg('upload', 22) + '</span><h3>' + (_eingang ? 'Belege, Unterlagen & Rechnungen einlesen' : _ergaenzen ? 'Unterlagen nachreichen' : 'Unterlagen einlesen: PDF oder Foto, Exposé, Marktbericht, Dokumente') + '</h3></div>' +
-        (_jr ? '<div class="oabi-reiter" role="tablist"><button type="button" role="tab" data-oabi-r="ein">Einlesen</button><button type="button" role="tab" data-oabi-r="jahre">Belege je Jahr</button></div><div id="oabi-r-ein">' : '') +
+        (_jr ? '<div class="oabi-kombi-grid"><div id="oabi-r-ein" class="oabi-spalte"><div class="oabi-spalte-t">Belege und Unterlagen einlesen</div>' : '') +
         (_ergaenzen ? '<div class="oabi-sub" style="border-left:3px solid var(--gold,#C9A84C);padding-left:9px">Die bisherige Auswertung bleibt die Grundlage. Gelesen werden nur die neuen PDFs, dann wird zusammengeführt. Vor der Übernahme siehst du, was sich in Risiken, These, Hausgeld und Steuer ändert.</div>' : '') +
         '<div class="oabi-sub">Mehrere PDFs oder Fotos (JPG, PNG) gleichzeitig anhängen. Der Typ wird automatisch erkannt (inkl. OCR bei Scan-/Grafik-PDFs) und ist pro Datei umstellbar. Alle Werte werden zusammengeführt (Marktbericht führt bei Konflikt).</div>' +
         '<div class="oabi-body">' +
@@ -2945,18 +2961,40 @@
             '<input type="file" id="oabi-input" accept="application/pdf,.pdf,image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp" multiple style="display:none"></div>' +
           '<div class="oabi-files" id="oabi-files"></div><div id="oabi-result"></div>' +
         '</div>' +
-        (_jr ? '</div><div class="oabi-body" id="oabi-r-jahre" hidden></div>' : '') +
+        (_jr ? '</div><div class="oabi-spalte oabi-spalte-jahre"><div class="oabi-spalte-t">Belege je Jahr</div><div class="oabi-body" id="oabi-r-jahre"></div></div></div>' : '') +
         '<div class="oabi-foot"><button type="button" class="oabi-btn" id="oabi-cancel">Schließen</button>' +
           '<button type="button" class="oabi-btn primary" id="oabi-apply" disabled><span style="display:inline-flex">' + svg('download', 14, '#fff') + '</span> Ausgewählte übernehmen</button></div>' +
       '</div>';
     document.body.appendChild(ov);
     /* v1330: auch hier darf nichts dazwischenkommen - das Fenster ist
        schon weg, wenn der Rueckruf faellt. */
+    /* v4470 · kein Schließen per Klick daneben, × oben und Esc schließen; läuft noch ein Lesevorgang, fragt der erste
+       Druck nach (Marcel 24.11.2026: nur über Schließen oder ×). */
+    var _zuFrage = null;
     function close() {
+      var laeuft = _files.some(function (f) { return f.status === 'reading'; });
+      if (laeuft && !_zuFrage) {
+        var kb = $('oabi-cancel');
+        if (kb) { kb.textContent = 'Wirklich schließen? Es wird noch gelesen'; kb.classList.add('warn'); }
+        _zuFrage = setTimeout(function () { _zuFrage = null; var k2 = $('oabi-cancel'); if (k2) { k2.textContent = 'Schließen'; k2.classList.remove('warn'); } }, 4000);
+        return;
+      }
+      if (_zuFrage) { clearTimeout(_zuFrage); _zuFrage = null; }
       try { var x = $('oabi-ov'); if (x) x.remove(); } catch (e) {}
+      document.removeEventListener('keydown', _escZu);
+      window.removeEventListener('dp:belege-geaendert', _jahreNeu);
       _fireOabiDone();
     }
+    function _escZu(e) { if (e.key === 'Escape' && !document.getElementById('beleg-import-ov') && !document.getElementById('dp-eg-vorschau') && !document.getElementById('dp-beleg-lupe')) close(); }
+    function _jahreNeu() { var b = $('oabi-r-jahre'); if (b && _jr) try { window.DpEingang.jahresInRahmen(b); } catch (e) {} }
+    document.addEventListener('keydown', _escZu);
+    window.addEventListener('dp:belege-geaendert', _jahreNeu);
     $('oabi-cancel').addEventListener('click', close);
+    if (_jr) {
+      var _x = document.createElement('button'); _x.type = 'button'; _x.className = 'oabi-x'; _x.setAttribute('aria-label', 'Schließen'); _x.textContent = '×';
+      _x.addEventListener('click', close);
+      var _hd = ov.querySelector('.oabi-head'); if (_hd) _hd.appendChild(_x);
+    }
     var drop = $('oabi-drop'), input = $('oabi-input');
     drop.addEventListener('click', function () { input.click(); });
     drop.addEventListener('dragover', function (e) { e.preventDefault(); drop.classList.add('drag'); });
@@ -2965,14 +3003,9 @@
     input.addEventListener('change', function (e) { if (e.target.files) handleFiles(e.target.files); });
     $('oabi-apply').addEventListener('click', applyMerged);
     if (_jr) {
-      var reiter = function (r) {
-        var j = r === 'jahre';
-        ov.querySelectorAll('[data-oabi-r]').forEach(function (b) { var an = b.getAttribute('data-oabi-r') === r; b.classList.toggle('on', an); b.setAttribute('aria-selected', an ? 'true' : 'false'); });
-        $('oabi-r-ein').hidden = j; $('oabi-r-jahre').hidden = !j; $('oabi-apply').style.display = j ? 'none' : '';
-        if (j) window.DpEingang.jahresInRahmen($('oabi-r-jahre'), opts && opts.jahr);
-      };
-      ov.querySelectorAll('[data-oabi-r]').forEach(function (b) { b.addEventListener('click', function () { reiter(b.getAttribute('data-oabi-r')); }); });
-      reiter(opts && opts.reiter === 'jahre' ? 'jahre' : 'ein');
+      window.DpEingang.jahresInRahmen($('oabi-r-jahre'), opts && opts.jahr);
+      /* am Handy stehen die Jahre unter dem Einlesen: kam der Aufruf für „Belege je Jahr“, dorthin rollen */
+      if (opts && opts.reiter === 'jahre' && window.innerWidth < 900) setTimeout(function () { try { var s = ov.querySelector('.oabi-spalte-jahre'); if (s) s.scrollIntoView({ block: 'start' }); } catch (e) {} }, 60);
     }
   }
   function setStatus(f, txt) { var st = f.row.querySelector('.oabi-st'); if (st) st.textContent = txt; }

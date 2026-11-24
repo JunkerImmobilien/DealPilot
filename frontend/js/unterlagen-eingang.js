@@ -58,7 +58,10 @@
     if (!OA || typeof OA.openImport !== 'function') { try { if (window.toast) window.toast('Import nicht geladen – Seite neu laden.'); } catch (e) {} return; }
     var ergaenzen = false;
     try { ergaenzen = !!(window.DpUnterlagen && window.DpUnterlagen.laden()); } catch (e) {}
-    OA.openImport(wie && typeof wie.fertig === 'function' ? wie.fertig : null, { ergaenzen: ergaenzen, eingang: true, reiter: wie && wie.reiter, jahr: wie && wie.jahr });   /* v4100 · fertig: Rückruf nach dem Schließen (Assistent Jahresabschluss) */
+    /* v4470 · Einlesen und Belege je Jahr stehen jetzt nebeneinander: ohne Jahr zeigt die rechte Spalte das jüngste Jahr mit Belegen */
+    var _j = wie && wie.jahr;
+    if (!_j) { try { var _J = _jahre(), _m = Object.keys(_J.mitBelegen).map(Number).sort(function (x, y) { return y - x; }); if (_m.length) _j = _m[0]; } catch (e) {} }
+    OA.openImport(wie && typeof wie.fertig === 'function' ? wie.fertig : null, { ergaenzen: ergaenzen, eingang: true, reiter: wie && wie.reiter, jahr: _j });   /* v4100 · fertig: Rückruf nach dem Schließen (Assistent Jahresabschluss) */
   }
   /* v4100 · Marcel 23.11.2026: im Reiter Steuer nur noch EIN Knopf „Belege & Unterlagen“. Liegen schon Belege vor, öffnet
      das Fenster auf „Belege je Jahr“ (jüngstes Jahr mit Belegen), sonst auf „Einlesen“. */
@@ -495,9 +498,9 @@
       + '</div></div></div>';
     document.body.appendChild(ov);
     var zu = function () { try { ov.remove(); } catch (e) {} document.removeEventListener('keydown', esc1); };
-    var esc1 = function (e) { if (e.key === 'Escape') zu(); };
+    var esc1 = function (e) { if (e.key === 'Escape' && !document.getElementById('dp-beleg-lupe')) zu(); };
     document.addEventListener('keydown', esc1);
-    ov.addEventListener('click', function (e) { if (e.target === ov || (e.target.hasAttribute && e.target.hasAttribute('data-zu'))) zu(); });
+    ov.addEventListener('click', function (e) { if (e.target.hasAttribute && e.target.hasAttribute('data-zu')) zu(); });   /* v4470 · nicht per Klick daneben */
     var box = ov.querySelector('[data-bilder]');
     var zeige = function (b) {
       if (!b || !b.length) { box.innerHTML = '<span style="opacity:.6;padding:30px">Keine Bildansicht für diese Datei.</span>'; return; }
@@ -698,7 +701,7 @@
     setTimeout(function () { a.remove(); URL.revokeObjectURL(url); }, 0);
   }
 
-  window.DpEingang = { VERSION: 'v4100', start: start, jahresAnsicht: jahresAnsicht, jahresInRahmen: jahresInRahmen, oeffnen: oeffnen, istRechnung: istRechnung, belegeAuslesen: belegeAuslesen,
+  window.DpEingang = { VERSION: 'v4470', start: start, jahresAnsicht: jahresAnsicht, jahresInRahmen: jahresInRahmen, oeffnen: oeffnen, istRechnung: istRechnung, belegeAuslesen: belegeAuslesen,
     einheiten: einheiten, mvVorschlag: mvVorschlag, mvOptionen: mvOptionen, mvText: mvText, mvUebernehmen: mvUebernehmen, mvFelder: mvFelder,
     jahrStand: jahrStand, protokoll: protokoll, verlaufHtml: verlaufHtml, lesen: lesen,
     /* v3154 */ txStart: txStart, txEnde: txEnde, feldStand: feldStand, feldGeaendert: feldGeaendert,
