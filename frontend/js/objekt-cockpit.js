@@ -71,16 +71,17 @@
     var kinder = k.querySelectorAll('.tab-lbl,.tab-ico');
     if (!an) {
       ['background', 'box-shadow', 'color', 'border-radius', 'margin-right'].forEach(function (p) { setz(k, p, null); });
+      k.style.setProperty('order', '0');   /* gemessen v4460a: ohne Klasse blieb order -1 stehen, daher ausdruecklich */
       Array.prototype.forEach.call(kinder, function (c) { setz(c, 'color', null); });
       return;
     }
-    setz(k, 'border-radius', '8px'); setz(k, 'margin-right', '6px');
+    setz(k, 'order', '-1'); setz(k, 'border-radius', '8px'); setz(k, 'margin-right', '6px');
     if (akt) {
       setz(k, 'background', 'linear-gradient(110deg,var(--gold-hi,var(--wl-e8cc7a,#E8CC7A)),' + G + ' 55%,var(--gold-lo,var(--wl-b8932f,#b8932f)))');
       setz(k, 'box-shadow', 'none'); setz(k, 'color', '#1a1712');
       Array.prototype.forEach.call(kinder, function (c) { setz(c, 'color', '#1a1712'); });
     } else {
-      setz(k, 'background', 'color-mix(in srgb,' + G + ' 20%,transparent)');
+      setz(k, 'background', 'color-mix(in srgb,' + G + ' 28%,transparent)');
       setz(k, 'box-shadow', 'inset 0 0 0 1px color-mix(in srgb,' + G + ' 75%,transparent)');
       setz(k, 'color', null);
       Array.prototype.forEach.call(kinder, function (c) { setz(c, 'color', c.classList.contains('tab-ico') ? G : null); });
