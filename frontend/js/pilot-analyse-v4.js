@@ -444,6 +444,10 @@
       '.dp-pa4-strat small{font:600 10px "JetBrains Mono",monospace;letter-spacing:.08em;text-transform:uppercase;color:#6B645A;margin-bottom:2px}',
       '.dp-pa4-strat b{font:700 14px "Space Grotesk",Inter,sans-serif;color:#2A2727}',
       '.dp-pa4-strat em{font-style:normal;font:400 11px Inter,sans-serif;color:#7A7370;margin-bottom:4px}',
+      /* v4310 · Strategie-Kasten unter „Was jetzt zu tun ist“: Abstand zum Text, Angaben nebeneinander mit Luft */
+      '.dp-pa4-strat-z{display:flex;flex-wrap:wrap;gap:10px 32px;margin:4px 0 6px}.dp-pa4-strat-z>div{display:grid;gap:3px;min-width:0}.dp-pa4-strat-z em{margin:0}',
+      '.dp-pa5-ab ~ .dp-pa4-strat,.dp-pa-e + .dp-pa4-strat,.dp-pa-d + .dp-pa4-strat{margin-top:16px;padding:12px 16px}',
+      '.dp-pa-wrap[data-dp-pa-v4] .dp-pa-e > p:last-child,.dp-pa-wrap[data-dp-pa-v4] .dp-pa-d > p:last-child{margin-bottom:0}',
       '.dp-pa-wrap[data-dp-pa-v4] .dp-pa4-link{justify-self:start;border:0 !important;background:transparent !important;padding:2px 0 !important;font:600 12px Inter,sans-serif !important;color:var(--wl-b8932f,#8a6d1f) !important;text-decoration:underline;cursor:pointer;box-shadow:none !important;min-height:0 !important}',
       /* Investor-Fit kompakt */
       '.dp-pa4-fit{display:grid;gap:8px}',
@@ -577,9 +581,11 @@
   function strategieKasten() {
     var s = strategie();
     if (!s.exit && !s.profil) return '';
-    return '<div class="dp-pa4-strat"><small>Deine Strategie</small>'
-      + (s.exit ? '<b>' + esc(s.exit) + '</b><em>Exitstrategie im Reiter Objekt</em>' : '')
-      + (s.profil ? '<b>' + esc(s.profil) + '</b><em>Strategie im Investmentprofil</em>' : '')
+    /* v4310 · Marcel 24.11.2026: „das Kästchen hat überhaupt keinen Absatz nach dem Text“ - je Angabe eine eigene Zeile (Wert, darunter
+       woher), Abstand zum Text darüber (CSS .dp-pa4-strat-z und die Abstandsregel unten) */
+    return '<div class="dp-pa4-strat"><small>Deine Strategie</small><div class="dp-pa4-strat-z">'
+      + (s.exit ? '<div><b>' + esc(s.exit) + '</b><em>Exitstrategie im Reiter Objekt</em></div>' : '')
+      + (s.profil ? '<div><b>' + esc(s.profil) + '</b><em>Strategie im Investmentprofil</em></div>' : '') + '</div>'
       + '<button type="button" class="btn-clean dp-pa4-link" onclick="try{switchTab(0);setTimeout(function(){var e=document.getElementById(\'exitstr\');if(e){e.scrollIntoView({block:\'center\'});e.focus();}},300)}catch(e){}">ändern</button></div>';
   }
   function fitBlock(a) {

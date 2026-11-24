@@ -4950,7 +4950,7 @@ async function exportPdf(out) {
       /* v2600 · E1 · neues Band (Anker ± 20 %, ausserhalb der Anker); alte Berichte unten wie bisher */
       const _bandT = (_mbd && _mbd.anker_qm != null) ? (' Band der Marktüblichkeit ' + _z2(_mbd.unten_qm) + '–' + _z2(_mbd.oben_qm) + ' €/m² ('
         + (_mbd.anker_etikett || 'Vergleichsmiete') + ' ' + _qm(_mbd.anker_qm) + ' ± ' + (_mbd.band_pct || 20) + ' %, Analyseparameter von DealPilot, keine gesetzliche Grenze)'
-        + (_mbd.je_wohnung ? ': geprüft je Wohnung (ImmoWertA 31.2). '
+        + ((_mbd.je_wohnung && typeof _mbd.je_wohnung === 'object') ? ': geprüft je Wohnung (ImmoWertA 31.2). '
             + (_mbd.je_wohnung.angepasst.length
               ? _mbd.je_wohnung.angepasst.map((w) => w.nr + ' mit ' + _qm(w.ist_qm) + (w.herkunft === 'ueber_band' ? ' darüber' : ' darunter')).join('; ')
                 + ' — dort angesetzt die marktüblich erzielbare Miete ' + _qm(_mbd.anker_qm) + ' (ImmoWertA zu § 31); die übrigen liegen im Band.'
@@ -4964,7 +4964,7 @@ async function exportPdf(out) {
         + '; untere Kante × 0,7, obere × ' + (_mbd.faktor_oben ? String(_mbd.faktor_oben).replace('.', ',') : '1,3') + ')'   /* v2541: Faktor aus dem Bericht, alte Berichte 1,3 */
         /* v2540 · je Wohnung geprueft (CrossCheckService miete_band.je_wohnung): die Wohnungen nennen,
            die an eine Kante gehen - nicht den Hausdurchschnitt „liegt im Band" */
-        + (_mbd.je_wohnung ? ': geprüft je Wohnung (ImmoWertA 31.2). '
+        + ((_mbd.je_wohnung && typeof _mbd.je_wohnung === 'object') ? ': geprüft je Wohnung (ImmoWertA 31.2). '
             + (_mbd.je_wohnung.angepasst.length
               ? _mbd.je_wohnung.angepasst.map((w) => w.nr + ' mit ' + _qm(w.ist_qm) + (w.herkunft === 'obere_kante' ? ' darüber, gerechnet die obere' : ' darunter, gerechnet die untere') + ' Kante ' + _qm(w.qm)).join('; ')
                 + '; die übrigen liegen im Band. Mehr- oder Minderertrag nur für die gesicherte Vertragslaufzeit als besonderes objektspezifisches Merkmal (§ 8 Abs. 3).'

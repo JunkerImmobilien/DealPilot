@@ -11,9 +11,9 @@
    Platz-/Zeichen-Logik (DpGrafikenNeu._h). Ohne Freigabe passiert hier nichts.
 
    Wo was steht (nur mit Freigabe):
-     Übersicht              Einordnung (Bullets), Score-Fingerabdruck, Heatmap kompakt,
-                            Fluss des Mieteuros, Fahrplan mit Meilensteinen
-     Ankauf·Bestand·Zielbild Einordnung mit Ankauf-Marke
+     Übersicht              Fahrplan mit Meilensteinen (v4310: sonst nur Texte)
+     Ankauf·Bestand·Zielbild Einordnung mit Ankauf-Marke, Score-Fingerabdruck, Zielerreichung (v4310)
+     Steuer (v4310)          dazu Wohin die Miete geht
      Wert & Lage            Vermögen in 500 Zukünften (Monte-Carlo-Fächer)
      Steuer                 Verlauf mit Steuern (Cashflow vor und nach Steuer)
      Haus & Unterlagen      Hausgeld je Jahr (nur mit Hausverlauf)
@@ -105,10 +105,11 @@
       '.dp-gx .gx-fuss{font:400 11.5px/1.5 Inter,sans-serif;color:' + F.tinte3 + ';border-top:1px dashed ' + F.linie + ';padding-top:8px;margin-top:10px;display:flex;gap:4px 16px;flex-wrap:wrap}',
       '.dp-gx .gx-leg{display:flex;flex-wrap:wrap;gap:4px 14px;margin:8px 0 0;font:400 11.5px Inter,sans-serif;color:' + F.tinte2 + '}',
       '.dp-gx .gx-mb{display:flex;flex-direction:column;gap:8px;margin:4px 0 0}.dp-gx .gx-mb-z{display:grid;grid-template-columns:62px minmax(0,1fr);gap:10px;align-items:center}',
-      '.dp-gx .gx-mb-l{color:' + F.tinte3 + '!important}.dp-gx .gx-mb-bahn{display:flex;gap:2px;height:46px;border-radius:8px;overflow:hidden}',
+      '.dp-gx .gx-mb-l{display:flex;flex-direction:column;gap:2px}.dp-gx .gx-mb-l b{font:600 13px/1.1 "Space Grotesk",Inter,sans-serif;color:' + F.tinte + '}.dp-gx .gx-mb-l small{font:500 10.5px/1.1 "JetBrains Mono",monospace;color:' + F.tinte2 + '}'
+      + '.dp-gx .gx-mb-seg{box-shadow:inset 0 0 0 1px color-mix(in srgb,' + F.tinte + ' 8%,transparent)}.dp-gx .gx-mb-bahn{display:flex;gap:2px;height:46px;border-radius:8px;overflow:hidden}',
       '.dp-gx .gx-mb-seg{min-width:3px;display:flex;flex-direction:column;justify-content:center;padding:0 9px;overflow:hidden;color:#FDFCFA;transform-origin:0 50%}',
       '.dp-gx .gx-mb-seg span{font:500 10.5px/1.2 Inter,sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:.92}.dp-gx .gx-mb-seg b{font:600 12px/1.2 "JetBrains Mono",monospace;white-space:nowrap}',
-      '@media (max-width:640px){.dp-gx .gx-mb-z{grid-template-columns:minmax(0,1fr)}.dp-gx .gx-mb-bahn{height:38px}.dp-gx .gx-mb-seg span{display:none}}',
+      '@media (max-width:640px){.dp-gx .gx-mb-z{grid-template-columns:minmax(0,1fr)}.dp-gx .gx-mb-l{flex-direction:row;gap:8px;align-items:baseline}.dp-gx .gx-mb-bahn{height:38px}.dp-gx .gx-mb-seg span{display:none}}',
       '.dp-gx .gx-leg i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}',
       /* v4280 · Marcel: „Gesamtbewertung, Einordnung, Investmentbewertung, DealPilot Insight und was jetzt zu tun ist, passend formatiert
          wie der Rest“. Nur mit Vorschau (body.dp-gn-an): dieselbe Karte wie die Grafiken (Fläche, Rand 10 %, Radius 14, Abstände), Überschrift
@@ -241,11 +242,12 @@
       var gut = b.ziel == null ? null : (b.hoch ? b.wert >= b.ziel : b.wert <= b.ziel);
       var fc = gut == null ? F.tinte : (gut ? F.gruen : F.rot), wort = gut == null ? '' : (gut ? '✓ erfüllt' : '✕ unter Schwelle');
       if (gut === false && !b.hoch) wort = '✕ über Schwelle';
+      if (b.farbe) fc = b.farbe; if (b.wort != null) wort = b.wort;   /* v4310 · Zielerreichung: eigene Farbe und eigenes Wort je Zeile */
       var baender = b.ziel == null ? '<i style="width:100%;background:' + F.neutral + '"></i>'
         : (b.hoch ? '<i style="width:' + pos(b.ziel).toFixed(2) + '%;background:' + F.rotW + '"></i><i style="width:' + (100 - pos(b.ziel)).toFixed(2) + '%;background:' + F.gruenW + '"></i>'
           : '<i style="width:' + pos(b.ziel).toFixed(2) + '%;background:' + F.gruenW + '"></i><i style="width:' + (100 - pos(b.ziel)).toFixed(2) + '%;background:' + F.rotW + '"></i>');
       var tip = '<div class="t">' + esc(b.name) + '</div>' + (o.objektWort || 'heute') + ' <b>' + esc(b.fmt(b.wert)) + '</b>' + (b.ankauf != null ? '<br>beim Ankauf <b>' + esc(b.fmt(b.ankauf)) + '</b>' : '') + (b.zielbild != null ? '<br>im Zielbild <b>' + esc(b.fmt(b.zielbild)) + '</b>' : '') + (b.ziel != null ? '<br>' + esc(b.zielText || 'Schwelle') + ' <b>' + esc(b.fmt(b.ziel)) + '</b>' : '') + (b.port != null ? '<br>Portfolio-Schnitt <b>' + esc(b.fmt(b.port)) + '</b>' : '');
-      var unter = [b.ankauf != null ? 'Ankauf ' + b.fmt(b.ankauf) : '', b.zielbild != null ? 'Zielbild ' + b.fmt(b.zielbild) : '', b.ziel != null ? (b.zielText || 'Schwelle') + ' ' + b.fmt(b.ziel) : '', b.port != null ? 'Portfolio ' + b.fmt(b.port) : ''].filter(Boolean).join(' · ');
+      var unter = [b.ankauf != null ? 'Ankauf ' + b.fmt(b.ankauf) : '', b.zielbild != null ? 'Zielbild ' + b.fmt(b.zielbild) : '', b.ziel != null ? (b.zielText || 'Schwelle') + ' ' + b.fmt(b.ziel) : '', b.port != null ? 'Portfolio ' + b.fmt(b.port) : '', b.notiz || ''].filter(Boolean).join(' · ');
       return '<div class="gx-bz"><div class="n">' + esc(b.name) + (unter ? '<small>' + esc(unter) + '</small>' : '') + '</div>'
         + '<div class="bahn"' + tipA(tip) + '>' + baender
         + (b.ziel != null ? '<span class="ziel" style="left:' + pos(b.ziel).toFixed(2) + '%"></span>' : '')
@@ -255,7 +257,7 @@
         + '<span class="mark gx-fade" style="left:' + pos(b.wert).toFixed(2) + '%;background:' + fc + ';animation-delay:' + (i * 90) + 'ms"></span></div>'
         + '<div class="w" style="color:' + fc + '">' + esc(b.fmt(b.wert)) + (wort ? '<small>' + wort + '</small>' : '') + '</div></div>';
     });
-    var leg = [{ n: 'heute', f: F.tinte }, { n: 'deine Schwelle', f: F.gold }];
+    var leg = [{ n: o.objektWort || 'heute', f: F.tinte }, { n: o.zielName || 'deine Schwelle', f: F.gold }];
     if (B.some(function (b) { return b.ankauf != null; })) leg.push({ n: 'beim Ankauf', f: 'transparent', rand: true });
     if (B.some(function (b) { return b.zielbild != null; })) leg.push({ n: 'im Zielbild', f: F.goldD });
     if (B.some(function (b) { return b.port != null; })) leg.push({ n: 'Portfolio-Schnitt', f: F.tinte3 });
@@ -268,7 +270,8 @@
     o = o || {}; var W = o.breite || breiteVon(host), H = o.hoehe || Math.round(Math.min(330, Math.max(210, W * 0.4))), m = { l: 56, r: 14, t: 16, b: 26 };
     var X = d.x, n = X.length; if (n < 2) { host.innerHTML = ''; return host; }
     var alle = []; d.reihen.forEach(function (r) { r.werte.forEach(function (v) { if (v != null && isFinite(v)) alle.push(v); }); });
-    if (d.band) { d.band.lo.concat(d.band.hi).forEach(function (v) { if (v != null && isFinite(v)) alle.push(v); }); }
+    var BAENDER = d.baender || (d.band ? [d.band] : []);   /* v4310 · mehrere Bänder, je mit eigener Farbe (band.farbe) */
+    BAENDER.forEach(function (bd) { bd.lo.concat(bd.hi).forEach(function (v) { if (v != null && isFinite(v)) alle.push(v); }); });
     (d.streu || []).forEach(function (q) { if (q.v != null && isFinite(q.v)) alle.push(q.v); });
     var tk = ticks(Math.min(0, Math.min.apply(null, alle)), Math.max(0, Math.max.apply(null, alle)), 4), y0 = tk[0], y1 = tk[tk.length - 1];
     var xs = function (j) { return m.l + (j - X[0]) / (X[n - 1] - X[0]) * (W - m.l - m.r); }, ys = function (v) { return m.t + (1 - (v - y0) / (y1 - y0)) * (H - m.t - m.b); };
@@ -277,12 +280,13 @@
     if (y0 < 0) out.push('<line x1="' + m.l + '" x2="' + (W - m.r) + '" y1="' + f1(ys(0)) + '" y2="' + f1(ys(0)) + '" style="stroke:' + F.linie2 + ';stroke-width:1.2"/>');
     var schritt = Math.max(1, Math.ceil(n / Math.max(2, Math.floor((W - m.l - m.r) / 52))));
     X.forEach(function (j, i) { if (i % schritt === 0 || (i === n - 1 && (n - 1) % schritt >= schritt / 2)) out.push('<text class="gx-ax" x="' + f1(xs(j)) + '" y="' + (H - 6) + '" text-anchor="middle"' + (j === d.heute ? ' style="fill:' + F.goldH + '"' : '') + '>' + j + '</text>'); });
-    if (d.band) {
-      var pts = X.map(function (j, i) { return d.band.hi[i] == null ? null : f1(xs(j)) + ',' + f1(ys(d.band.hi[i])); }).filter(Boolean)
-        .concat(X.slice().reverse().map(function (j, k) { var i = n - 1 - k; return d.band.lo[i] == null ? null : f1(xs(j)) + ',' + f1(ys(d.band.lo[i])); }).filter(Boolean));
-      out.push('<polygon class="gx-fade" points="' + pts.join(' ') + '" style="fill:color-mix(in srgb,' + F.gold + ' 15%,transparent)"/>');
-      if (!d.band.ohneRand) [d.band.lo, d.band.hi].forEach(function (a) { out.push('<polyline points="' + X.map(function (j, i) { return a[i] == null ? '' : f1(xs(j)) + ',' + f1(ys(a[i])); }).filter(Boolean).join(' ') + '" style="fill:none;stroke:' + F.gold + ';stroke-width:1;stroke-dasharray:3 4;opacity:.7"/>'); });
-    }
+    BAENDER.forEach(function (bd) {
+      var pts = X.map(function (j, i) { return bd.hi[i] == null ? null : f1(xs(j)) + ',' + f1(ys(bd.hi[i])); }).filter(Boolean)
+        .concat(X.slice().reverse().map(function (j, k) { var i = n - 1 - k; return bd.lo[i] == null ? null : f1(xs(j)) + ',' + f1(ys(bd.lo[i])); }).filter(Boolean));
+      if (pts.length < 4) return;
+      out.push('<polygon class="gx-fade" points="' + pts.join(' ') + '" style="fill:' + (bd.farbe || 'color-mix(in srgb,' + F.gold + ' 15%,transparent)') + '"/>');
+      if (!bd.ohneRand) [bd.lo, bd.hi].forEach(function (a) { out.push('<polyline points="' + X.map(function (j, i) { return a[i] == null ? '' : f1(xs(j)) + ',' + f1(ys(a[i])); }).filter(Boolean).join(' ') + '" style="fill:none;stroke:' + F.gold + ';stroke-width:1;stroke-dasharray:3 4;opacity:.7"/>'); });
+    });
     if (d.heute != null && d.heute >= X[0] && d.heute <= X[n - 1]) out.push('<line x1="' + f1(xs(d.heute)) + '" x2="' + f1(xs(d.heute)) + '" y1="' + m.t + '" y2="' + (H - m.b) + '" style="stroke:' + F.linie2 + ';stroke-dasharray:2 3"/><text class="gx-ax" x="' + f1(xs(d.heute) + 6) + '" y="' + (m.t + 10) + '" style="fill:' + F.tinte2 + '">HEUTE</text>');
     d.reihen.forEach(function (r) {
       var p = ''; r.werte.forEach(function (v, i) { if (v == null || !isFinite(v)) return; p += (p ? ' L' : 'M') + f1(xs(X[i])) + ',' + f1(ys(v)); });
@@ -648,6 +652,30 @@
     var i = karte(k, { eyebrow: mitAnkauf ? 'Einordnung · Ankauf, heute' + (mitZb ? ', Zielbild' : '') : 'Einordnung', titel: titel, unter: 'Marke heute, goldener Strich deine Schwelle aus dem Investmentprofil' + (mitAnkauf ? ', Kreis beim Ankauf' + (mitZb ? ', Raute im Zielbild' : '') : (D.Pt.n ? ', Dreieck der Schnitt deiner ' + D.Pt.n + ' Objekte' : '')) + '.', chips: ['gemessen'] });
     bullets(i, D.B, { breite: w - 2 });
   }
+  /* v4310 · Marcel 24.11.2026: „die Zielerreichung genauso anlegen wie oben die Einordnung Ankauf, heute, Zielbild,
+     auch das Farbschema“. Daten aus DpJahresstaende.zielerreichung() (jahresstaende.js rechnet, hier nur Darstellung):
+     je Hebel Ankauf (Kreis), heute (Marke), Ziel (goldener Strich), Band rot bis zum Ziel, grün dahinter.
+     Marke grün = Ziel erreicht, Tinte = mindestens halb, rot = unter der Hälfte. Ersetzt die blauen Balken (.dp-pa5-ziel). */
+  function zielDaten() {
+    var z = null; try { z = window.DpJahresstaende && window.DpJahresstaende.zielerreichung ? window.DpJahresstaende.zielerreichung() : null; } catch (e) { z = null; }
+    if (!z || !Array.isArray(z.hebel)) return null;
+    var B = z.hebel.filter(function (h) { return zahl(h.pct) != null && zahl(h.heute) != null && zahl(h.ziel) != null; }).map(function (h) {
+      var a = zahl(h.ankauf), hh = Number(h.heute), zi = Number(h.ziel), hoch = a == null ? true : zi >= a;
+      var vals = [hh, zi].concat(a != null ? [a] : []), lo = Math.min.apply(null, vals), hi = Math.max.apply(null, vals);
+      var pad = (hi - lo) * 0.14 || Math.abs(hi) * 0.1 || 1, p = Math.round(Number(h.pct)), erreicht = hoch ? hh >= zi : hh <= zi;
+      var fmt = h.einheit === 'eur_m' ? function (v) { return eur(v) + ' im Monat'; } : h.einheit === 'pct' ? function (v) { return pct(v, 2); } : function (v) { return eur(v); };
+      return { name: String(h.wort || '').replace(/ \(Cashflow v\. St\. (\d{4})?\)/, ' (Cashflow vor Steuer)'), wert: hh, ankauf: a, ziel: zi, zielText: 'Ziel', hoch: hoch, lo: lo - pad, hi: hi + pad, fmt: fmt,
+        farbe: erreicht ? F.gruen : (p >= 50 ? F.tinte : F.rot), wort: erreicht ? '✓ erreicht' : Math.max(0, p) + ' % erreicht', notiz: h.zaehlt === false ? 'nicht in der Gesamtzahl' : '' };
+    });
+    return B.length ? { B: B, gesamt: zahl(z.gesamt), ampel: z.ampel && z.ampel.wort ? z.ampel.wort : '', woraus: z.woraus || [] } : null;
+  }
+  function karteZiel(k, w) {
+    var D = zielDaten(); if (!D) { k.innerHTML = ''; return; }
+    var offen = D.B.filter(function (b) { return !/erreicht$/.test(b.wort) || /%/.test(b.wort); });
+    var titel = D.gesamt != null ? 'Gesamt ' + Math.round(D.gesamt) + ' % deiner Ziele erreicht' + (D.woraus.length ? ', aus ' + D.woraus.length + (D.woraus.length === 1 ? ' Hebel' : ' Hebeln') : '') : (offen.length ? offen.length + ' von ' + D.B.length + ' Zielen noch offen' : 'Alle Ziele erreicht');
+    var i = karte(k, { eyebrow: 'Zielerreichung · Ankauf, heute, Ziel', titel: titel, unter: 'Marke heute, Kreis beim Ankauf, goldener Strich dein Ziel. Rot bis zum Ziel, grün dahinter. Die Prozentzahl sagt, wie viel vom Weg zwischen Ankauf und Ziel geschafft ist.', chips: ['gemessen'] });
+    bullets(i, D.B, { breite: w - 2, zielName: 'Ziel' });
+  }
   function karteFingerabdruck(k, w) {
     var sc = null; try { sc = window.DealScore && window.DealScore.compute ? window.DealScore.compute() : null; } catch (e) { sc = null; }
     var K = (window.State && window.State.kpis) || {}, Pt = portfolioSchnitt();
@@ -678,10 +706,11 @@
   function mieteuro(P) {
     var r = P.J.filter(function (x) { return x.j === P.heute; })[0] || P.J[0];
     var erst = r.steuer < 0 ? -r.steuer : 0, zahlt = r.steuer > 0 ? r.steuer : 0, tasche = r.cfns < 0 ? -r.cfns : 0, frei = r.cfns > 0 ? r.cfns : 0;
-    var ein = [{ n: 'Kaltmiete', v: r.nkm, f: F.goldD }, { n: 'Steuererstattung', v: erst, f: F.gold2 }, { n: 'Aus eigener Tasche', v: tasche, f: F.rot }];
-    var aus = [{ n: 'Zins an die Bank', v: r.zins, f: F.neutral }, { n: 'Tilgung = Vermögen', v: r.tilg, f: F.gruen }, { n: 'Nicht umlegbare Kosten', v: r.bwk, f: F.violett }, { n: 'Steuer', v: zahlt, f: F.gold2 }, { n: 'Bleibt dir', v: frei, f: F.gold }];
+    /* v4310 · Marcel 24.11.2026: Farbschema wie Bewertung. Kräftig = Tinte, Grün, Rot (weiße Schrift); blass = 30 % davon (dunkle Schrift) */
+    var ein = [{ n: 'Kaltmiete', v: r.nkm, f: F.tinte }, { n: 'Steuererstattung', v: erst, f: F.gruenW, hell: true }, { n: 'Aus eigener Tasche', v: tasche, f: F.rot }];
+    var aus = [{ n: 'Zins an die Bank', v: r.zins, f: 'color-mix(in srgb,' + F.tinte + ' 16%,transparent)', hell: true }, { n: 'Tilgung = Vermögen', v: r.tilg, f: F.gruen }, { n: 'Nicht umlegbare Kosten', v: r.bwk, f: F.rotW, hell: true }, { n: 'Steuer', v: zahlt, f: F.rot }, { n: 'Bleibt dir', v: frei, f: F.gruenW, hell: true }];
     var sE = ein.reduce(function (s, a) { return s + a.v; }, 0), sA = aus.reduce(function (s, a) { return s + a.v; }, 0), rest = sE - sA;
-    if (rest >= 1) aus.push({ n: 'Sonstiges', v: rest, f: F.tinte3 }); else if (rest <= -1) ein.push({ n: 'Sonstiges', v: -rest, f: F.tinte3 });
+    if (rest >= 1) aus.push({ n: 'Sonstiges', v: rest, f: F.neutral, hell: true }); else if (rest <= -1) ein.push({ n: 'Sonstiges', v: -rest, f: F.neutral, hell: true });
     return { r: r, ein: ein, aus: aus, tasche: tasche, frei: frei };
   }
   /* v4250 · Marcel 23.11.2026: „den Fluss des Mieteuros vielleicht anders angeben“. Statt Sankey zwei gleich lange Balken
@@ -695,14 +724,14 @@
     var bahn = function (L) {
       return '<div class="gx-mb-bahn">' + L.map(function (a, q) {
         var pr = a.v / sum * 100, je100 = nkm > 0 ? Math.round(a.v / nkm * 100) : null;
-        return '<div class="gx-mb-seg gx-wx" style="width:' + pr.toFixed(2) + '%;background:' + a.f + ';color:' + (a.f === F.gold2 ? '#1B1815' : '#FDFCFA') + ';animation-delay:' + (q * 80) + 'ms"' + tipA('<div class="t">' + esc(a.n) + '</div><b>' + eur(a.v) + '</b> im Jahr' + (je100 != null ? '<br>' + je100 + ' € je 100 € Miete' : '')) + '>'
-          + (pr >= 14 ? '<span>' + esc(a.n) + '</span><b>' + eur(a.v) + '</b>' : '') + '</div>';
+        return '<div class="gx-mb-seg gx-wx" style="width:' + pr.toFixed(2) + '%;background:' + a.f + ';color:' + (a.hell ? F.tinte : '#FDFCFA') + ';animation-delay:' + (q * 80) + 'ms"' + tipA('<div class="t">' + esc(a.n) + '</div><b>' + eur(a.v) + '</b> im Jahr' + (je100 != null ? '<br>' + je100 + ' € je 100 € Miete' : '')) + '>'
+          + (pr >= 9 ? '<span>' + esc(a.n) + '</span><b>' + eur(a.v) + '</b>' : (pr >= 4 ? '<b>' + eur(a.v) + '</b>' : '')) + '</div>';
       }).join('') + '</div>';
     };
     var wort = function (n) { return { 'Zins an die Bank': 'Zinsen', 'Tilgung = Vermögen': 'die Tilgung', 'Nicht umlegbare Kosten': 'nicht umlegbare Kosten', 'Steuer': 'die Steuer' }[n] || n; };
     var satz = nkm > 0 ? 'Von 100 € Miete gehen ' + D.aus.filter(function (a) { return a.v > 0.5 && a.n !== 'Bleibt dir'; }).map(function (a) { return Math.round(a.v / nkm * 100) + ' € an ' + wort(a.n); }).join(', ') + '.'
       + (D.frei > 0.5 ? ' Dir bleiben ' + Math.round(D.frei / nkm * 100) + ' €.' : '') + (D.tasche > 0.5 ? ' Dazu legst du ' + Math.round(D.tasche / nkm * 100) + ' € je 100 € Miete selbst drauf.' : '') : '';
-    i.innerHTML = '<div class="gx-mb"><div class="gx-mb-z"><div class="gx-eye gx-mb-l">Woher</div>' + bahn(ein) + '</div><div class="gx-mb-z"><div class="gx-eye gx-mb-l">Wohin</div>' + bahn(aus) + '</div></div>'
+    i.innerHTML = '<div class="gx-mb"><div class="gx-mb-z"><div class="gx-mb-l"><b>Woher</b><small>' + eur(sE) + '</small></div>' + bahn(ein) + '</div><div class="gx-mb-z"><div class="gx-mb-l"><b>Wohin</b><small>' + eur(sA) + '</small></div>' + bahn(aus) + '</div></div>'
       + legende(ein.concat(aus).map(function (a) { return { n: a.n + ' ' + eur(a.v), f: a.f }; }))
       + (satz ? '<div class="gx-s" style="margin:10px 0 0!important">' + esc(satz) + '</div>' : '');
     return i;
@@ -742,11 +771,11 @@
       fuss: ['Je Jahr: Miete ' + pct(P.mstg * 100) + ' ± 1,0, Kosten ' + pct(P.kstg * 100) + ' ± 0,6, Wert ' + pct(P.wstg * 100) + ' mit Marktzyklen, in 4 % der Jahre zwei Monate Leerstand.', 'Anschlusszins im Mittel ' + pct(P.az * 100, 2) + ', 80 % zwischen ' + pct(MC.zP10 * 100, 2) + ' und ' + pct(MC.zP90 * 100, 2) + '.', MC.N + ' Pfade, fester Startwert. Modell, keine Prognose und keine Zusage.'] });
     var ziel = document.createElement('div'); i.appendChild(ziel);
     verlauf(ziel, { x: X, heute: P.heute,
-      band: { lo: X.map(function (jj) { var q = idx(jj); return q >= 0 ? MC.p10[q] : null; }), hi: X.map(function (jj) { var q = idx(jj); return q >= 0 ? MC.p90[q] : null; }) },
+      band: { farbe: 'color-mix(in srgb,' + F.gruen + ' 16%,transparent)', lo: X.map(function (jj) { var q = idx(jj); return q >= 0 ? MC.p10[q] : null; }), hi: X.map(function (jj) { var q = idx(jj); return q >= 0 ? MC.p90[q] : null; }) },   /* v4310 · Band grün wie die Eigenkapital-Fläche im Reiter Bewertung */
       marken: hatB ? [{ j: P.bindEnde, text: 'Ende Zinsbindung', farbe: F.goldD }] : [],
       reihen: [{ name: 'Mitte', werte: X.map(function (jj) { var q = idx(jj); return q >= 0 ? MC.p50[q] : null; }), farbe: F.gold, dick: 2.4 }, { name: 'bisher', werte: X.map(function (jj) { var p = ist.filter(function (x) { return x.j === jj; })[0]; return p ? p.v : null; }), farbe: F.tinte, dick: 2, punkte: true }],
       tip: function (q, jj) { var m = idx(jj); var p = ist.filter(function (x) { return x.j === jj; })[0]; return p && jj <= P.heute && m < 1 ? '<div class="t">' + jj + ' · App</div>Vermögen aus dem Objekt <b>' + eur(p.v) + '</b>' : (m >= 0 ? '<div class="t">' + jj + ' · Modell</div>Mitte <b>' + eur(MC.p50[m]) + '</b><br>80 % zwischen <b>' + eur(MC.p10[m]) + '</b> und <b>' + eur(MC.p90[m]) + '</b><br>Cashflow positiv in <b>' + nf0.format(MC.pPos[m]) + ' %</b> der Fälle' : '<div class="t">' + jj + '</div>' + (p ? 'Vermögen <b>' + eur(p.v) + '</b>' : '')); },
-      legende: [{ n: 'mittlerer Verlauf', f: F.gold }, { n: '8 von 10 Verläufen', f: 'color-mix(in srgb,' + F.gold + ' 25%,transparent)' }, { n: 'bis heute', f: F.tinte }] }, { breite: w - 2, aria: 'Spanne möglicher Verläufe des Vermögens' });
+      legende: [{ n: 'mittlerer Verlauf', f: F.gold }, { n: '8 von 10 Verläufen', f: 'color-mix(in srgb,' + F.gruen + ' 16%,transparent)' }, { n: 'bis heute', f: F.tinte }] }, { breite: w - 2, aria: 'Spanne möglicher Verläufe des Vermögens' });
     var s = document.createElement('div'); s.className = 'gx-seite';
     var i10 = Math.min(L, 10);
     s.innerHTML = (hatB ? '<div><span>Ende Zinsbindung ' + P.bindEnde + '</span><b>' + tsd(MC.p50[iB]) + '</b><small>mittlerer Verlauf, Spanne ' + tsd(MC.p10[iB]) + ' bis ' + tsd(MC.p90[iB]) + '</small></div>' : '')
@@ -793,11 +822,13 @@
     if (nach && (!be || nach.j !== be.j)) marken.push({ j: nach.j, text: 'nach Steuer im Plus', farbe: F.gruen, zeile: 1 });
     if (zb && P.bindEnde > P.heute) marken.push({ j: P.bindEnde, text: 'Ende Zinsbindung', farbe: F.goldD, zeile: 2 });
     verlauf(ziel, { x: X, heute: P.heute,
-      band: { ohneRand: true, lo: J.map(function (r) { return Math.min(r.cfop, r.cfns); }), hi: J.map(function (r) { return Math.max(r.cfop, r.cfns); }) },
-      reihen: [{ name: 'vor Steuer', werte: J.map(function (r) { return r.cfop; }), farbe: F.tinte3, dick: 2 }, { name: 'nach Steuer', werte: J.map(function (r) { return r.cfns; }), farbe: F.gold, dick: 2.6, punkte: true }],
+      /* v4310 · Marcel 24.11.2026: Farbschema wie Bewertung. Steuerwirkung grün, wo die Steuer Geld bringt, rot, wo sie Geld kostet */
+      baender: [{ ohneRand: true, farbe: 'color-mix(in srgb,' + F.gruen + ' 16%,transparent)', lo: J.map(function (r) { return r.cfns >= r.cfop ? r.cfop : null; }), hi: J.map(function (r) { return r.cfns >= r.cfop ? r.cfns : null; }) },
+        { ohneRand: true, farbe: 'color-mix(in srgb,' + F.rot + ' 18%,transparent)', lo: J.map(function (r) { return r.cfns < r.cfop ? r.cfns : null; }), hi: J.map(function (r) { return r.cfns < r.cfop ? r.cfop : null; }) }],
+      reihen: [{ name: 'vor Steuer', werte: J.map(function (r) { return r.cfop; }), farbe: F.tinte3, dick: 2, gestrichelt: true }, { name: 'nach Steuer', werte: J.map(function (r) { return r.cfns; }), farbe: F.tinte, dick: 2.6, punkte: true }],
       marken: marken,
       tip: function (q, j) { var r = J[q]; return '<div class="t">' + j + (j > P.heute ? ' · Projektion' : '') + '</div>Ergebnis aus Vermietung <b>' + eurV(r.vuv) + '</b><br>vor Steuer <b>' + eurV(r.cfop) + '</b><br>Steuer <b>' + eurV(r.cfns - r.cfop) + '</b><br>nach Steuer <b>' + eurV(r.cfns) + '</b>'; },
-      legende: [{ n: 'vor Steuer', f: F.tinte3 }, { n: 'nach Steuer', f: F.gold }, { n: 'Steuerwirkung', f: 'color-mix(in srgb,' + F.gold + ' 25%,transparent)' }].concat(be ? [{ n: 'ab hier Steuer', f: F.rot }] : []) }, { breite: w - 2, aria: 'Cashflow vor und nach Steuer' });
+      legende: [{ n: 'vor Steuer', f: F.tinte3 }, { n: 'nach Steuer', f: F.tinte }, { n: 'Steuer bringt Geld', f: 'color-mix(in srgb,' + F.gruen + ' 16%,transparent)' }, { n: 'Steuer kostet Geld', f: 'color-mix(in srgb,' + F.rot + ' 18%,transparent)' }].concat(be ? [{ n: 'ab hier Steuer', f: F.rot }] : []) }, { breite: w - 2, aria: 'Cashflow vor und nach Steuer' });
     /* Werte an Ende Zinsbindung und Ende der Projektion */
     var zelle = function (r, t) { return r ? '<div><span>' + esc(t) + '</span><b>' + eurV(r.cfns) + '</b><small>nach Steuer, vor Steuer ' + eurV(r.cfop) + '</small></div>' : ''; };
     var sx = document.createElement('div'); sx.className = 'gx-seite';
@@ -815,9 +846,9 @@
     if (X.length < 2) { k.innerHTML = ''; return 'leer'; }
     var i = karte(k, { eyebrow: 'Hausgeld je Jahr', titel: 'Hausgeld ' + X[0] + ' bis ' + X[X.length - 1] + ': Abrechnung gegen Wirtschaftsplan', unter: 'Aus deinen Hausunterlagen. Maßgeblich ist die Abrechnung, der Wirtschaftsplan dient zur Plausibilität.', chips: ['gemessen'] });
     var ziel = document.createElement('div'); i.appendChild(ziel);
-    verlauf(ziel, { x: X, reihen: [{ name: 'Abrechnung', werte: ist, farbe: F.gold, dick: 2.4, punkte: true }, { name: 'Wirtschaftsplan', werte: plan, farbe: F.tinte3, gestrichelt: true }].concat(rl.some(function (v) { return v != null; }) ? [{ name: 'Rücklage', werte: rl, farbe: F.blau, dick: 1.8 }] : []),
+    verlauf(ziel, { x: X, reihen: [{ name: 'Abrechnung', werte: ist, farbe: F.tinte, dick: 2.4, punkte: true }, { name: 'Wirtschaftsplan', werte: plan, farbe: F.tinte3, gestrichelt: true }].concat(rl.some(function (v) { return v != null; }) ? [{ name: 'Rücklage', werte: rl, farbe: F.gruen, dick: 1.8 }] : []),   /* v4310 · Tinte und Grün wie Bewertung */
       tip: function (q, j) { return '<div class="t">' + j + '</div>Abrechnung <b>' + eur(ist[q]) + '</b><br>Wirtschaftsplan <b>' + eur(plan[q]) + '</b>' + (rl[q] != null ? '<br>Rücklage <b>' + eur(rl[q]) + '</b>' : ''); },
-      legende: [{ n: 'Abrechnung', f: F.gold }, { n: 'Wirtschaftsplan', f: F.tinte3 }].concat(rl.some(function (v) { return v != null; }) ? [{ n: 'Rücklage', f: F.blau }] : []) }, { breite: w - 2, hoehe: 220 });
+      legende: [{ n: 'Abrechnung', f: F.tinte }, { n: 'Wirtschaftsplan', f: F.tinte3 }].concat(rl.some(function (v) { return v != null; }) ? [{ n: 'Rücklage', f: F.gruen }] : []) }, { breite: w - 2, hoehe: 220 });
   }
 
   /* ── Wert & Lage: Berichte aus dem Wertverlauf der Pilot-Analyse (DpPilotV4.wertverlauf(hist)) ── */
@@ -852,14 +883,14 @@
     var letzt = H0.length ? H0[H0.length - 1] : null, lw = letzt ? nachAbschlag(letzt) : null, lj = letzt ? berichtJahr(letzt) : null, pl = lj ? (R.filter(function (r) { return r.j === lj; })[0] || {}).wert : null;
     var titel = lw != null && pl ? 'Marktbericht ' + datumDe(letzt.created_at) + ': ' + eur(lw) + ', ' + eur(Math.abs(lw - pl)) + (lw >= pl ? ' über' : ' unter') + ' deinem Plan-Wert'
       : 'Plan-Wert ' + P.heute + ' ' + eur(heuteR.wert) + ', davon gehören dir ' + eur(heuteR.wert - heuteR.rs);
-    var i = karte(k, { eyebrow: 'Wertverlauf', titel: titel, unter: 'Plan-Wert (Kaufpreis mit deiner Wertsteigerung) über der Restschuld, die goldene Fläche ist dein Eigenkapital im Objekt. Punkte: Marktberichte, Raute: Kaufpreis.',
+    var i = karte(k, { eyebrow: 'Wertverlauf', titel: titel, unter: 'Plan-Wert (Kaufpreis mit deiner Wertsteigerung) über der Restschuld, die grüne Fläche ist dein Eigenkapital im Objekt. Punkte: Marktberichte, Raute: Kaufpreis.',
       chips: [lw != null ? 'gemessen' : 'Plan'], fuss: lw == null ? ['Noch kein Marktbericht. Mit einem Bericht im Jahr steht hier der Marktpreis gegen deinen Plan.'] : [] });
     var ziel = document.createElement('div'); i.appendChild(ziel);
-    verlauf(ziel, { x: X, heute: P.heute, band: { ohneRand: true, lo: J.map(function (r) { return r.rs; }), hi: J.map(function (r) { return r.wert; }) },
-      reihen: [{ name: 'Plan-Wert', werte: J.map(function (r) { return r.wert; }), farbe: F.gold, dick: 2.4 }, { name: 'Restschuld', werte: J.map(function (r) { return r.rs; }), farbe: F.tinte3, dick: 2 }],
+    verlauf(ziel, { x: X, heute: P.heute, band: { ohneRand: true, farbe: 'color-mix(in srgb,' + F.gruen + ' 16%,transparent)', lo: J.map(function (r) { return r.rs; }), hi: J.map(function (r) { return r.wert; }) },   /* v4310 · Eigenkapital grün wie Vermögensaufbau im Reiter Bewertung */
+      reihen: [{ name: 'Plan-Wert', werte: J.map(function (r) { return r.wert; }), farbe: F.gold, dick: 2.4 }, { name: 'Restschuld', werte: J.map(function (r) { return r.rs; }), farbe: F.tinte2, dick: 2 }],
       streu: streu,
       tip: function (q, j) { var r = J[q]; return '<div class="t">' + j + (j > P.heute ? ' · Projektion' : '') + '</div>Plan-Wert <b>' + eur(r.wert) + '</b><br>Restschuld <b>' + eur(r.rs) + '</b><br>dein Eigenkapital <b>' + eur(r.wert - r.rs) + '</b>'; },
-      legende: [{ n: 'Plan-Wert', f: F.gold }, { n: 'Restschuld', f: F.tinte3 }, { n: 'Eigenkapital', f: 'color-mix(in srgb,' + F.gold + ' 25%,transparent)' }, { n: 'Kaufpreis', f: F.creme }].concat(lw != null ? [{ n: 'Marktbericht', f: F.goldH }] : []) }, { breite: w - 2, aria: 'Wertverlauf' });
+      legende: [{ n: 'Plan-Wert', f: F.gold }, { n: 'Restschuld', f: F.tinte2 }, { n: 'Eigenkapital', f: 'color-mix(in srgb,' + F.gruen + ' 16%,transparent)' }, { n: 'Kaufpreis', f: F.creme }].concat(lw != null ? [{ n: 'Marktbericht', f: F.goldH }] : []) }, { breite: w - 2, aria: 'Wertverlauf' });
   }
   function karteMarkt(k, w, P) {
     var H0 = _hist || [], h = H0.length ? H0[H0.length - 1] : null, R = P.J, r = R.filter(function (x) { return x.j === P.heute; })[0] || R[0];
@@ -916,19 +947,31 @@
       /* v4280 · Marcel: „Fahrplan in der Übersicht ganz oben, danach die Einordnung, danach Gesamtbewertung … und was jetzt zu tun ist“ */
       var vorText = ue.querySelector(':scope > .dp-pa5-zwei');
       var kfp = h.platz(ue, 'gx-fahrplan', vorText || ue.firstChild, 'dp-gx'); zeichneMit(h, kfp, sig + 'fp', function (k, w) { karteFahrplan(k, w, P, C); });
-      var r1 = reihe(ue, 'ue-oben', vorText || ue.firstChild);   /* nach dem Fahrplan, vor der Einordnung in Worten */
-      if (kfp.nextSibling !== r1 && r1.parentNode) r1.parentNode.insertBefore(r1, kfp.nextSibling);
-      zeichneMit(h, kind(r1, 'gx-einordnung'), sig + kpSig, function (k, w) { karteEinordnung(k, w, false); });
-      zeichneMit(h, kind(r1, 'gx-finger'), sig + kpSig, function (k, w) { karteFingerabdruck(k, w); });
-      var nach = ue.querySelector('[data-dp-gn="ue-reihe"]');
-      var anker = nach ? nach.nextSibling : null;
-      /* v4250 · Marcel: „in der Übersicht kann der Anschlusszins raus“, Mieteuro als Balken, Fahrplan gehört nach Ankauf · Bestand · Zielbild */
-      ['gx-heat-ue', 'gx-sankey'].forEach(function (q) { var alt = ue.querySelector('[data-dp-gn="' + q + '"]'); if (alt && alt.parentNode) alt.parentNode.removeChild(alt); });
-      var km = h.platz(ue, 'gx-mieteuro', anker, 'dp-gx'); zeichneMit(h, km, sig, function (k, w) { karteMieteuro(k, w, P); });
+      /* v4310 · Marcel 24.11.2026: „die Einordnung mit den zwei Kennzahlen unter deiner Schwelle haben wir schon in Ankauf, Bestand
+         und Zielbild … gehört das alles in die Übersicht?“ Die Übersicht trägt jetzt nur Fahrplan, Einordnung in Worten, Gesamtbewertung
+         und was jetzt zu tun ist. Einordnung (Bullets) steht nur noch in Ankauf · Bestand · Zielbild, der Score-Fingerabdruck daneben
+         (beides vergleicht das Objekt mit Maßstäben). „Wohin die Miete geht“ steht im Reiter Steuer neben dem Verlauf mit Steuern
+         (es ist der Cashflow dieses Jahres samt Steuer). „Dein Anteil am Objekt wächst“ und „nach Zins und Tilgung“ (grafiken-neu.js)
+         sind raus: dasselbe zeigen der Wertverlauf (Wert & Lage) und „Wohin die Miete geht“. */
+      ['gx-heat-ue', 'gx-sankey', 'gx-ue-oben', 'gx-mieteuro', 'gx-einordnung', 'gx-finger'].forEach(function (q) { var alt = ue.querySelector('[data-dp-gn="' + q + '"]'); if (alt && alt.parentNode) alt.parentNode.removeChild(alt); });
     }
     /* Ankauf · Bestand · Zielbild: Einordnung mit Ankauf-Marke */
     var si = document.getElementById('dp-pa-si');
-    if (si) { var ksi = h.platz(si, 'gx-einordnung-si', si.firstChild, 'dp-gx'); var zbSig = ''; try { zbSig = JSON.stringify((window.DpPotenzial.kennzahlen(window.DpPotenzial.modell()) || {}).zielbild || ''); } catch (e) {} zeichneMit(h, ksi, sig + kpSig + 'a' + zbSig, function (k, w) { karteEinordnung(k, w, true); });
+    if (si) {
+      var rsi = reihe(si, 'si-oben', si.firstChild);   /* v4310 · Einordnung und Score-Fingerabdruck nebeneinander */
+      var altSi = si.querySelector(':scope > [data-dp-gn="gx-einordnung-si"]'); if (altSi && altSi.parentNode) altSi.parentNode.removeChild(altSi);
+      var ksi = kind(rsi, 'gx-einordnung-si'); var zbSig = ''; try { zbSig = JSON.stringify((window.DpPotenzial.kennzahlen(window.DpPotenzial.modell()) || {}).zielbild || ''); } catch (e) {} zeichneMit(h, ksi, sig + kpSig + 'a' + zbSig, function (k, w) { karteEinordnung(k, w, true); });
+      zeichneMit(h, kind(rsi, 'gx-finger'), sig + kpSig, function (k, w) { karteFingerabdruck(k, w); });
+      /* v4310 · Zielerreichung als Karte statt der blauen Balken */
+      var zAlt = si.querySelector('.dp-pa5-ziel:not(.dp-gn-weg)') || si.querySelector('.dp-pa5-ziel');
+      var kzAlt = si.querySelector('[data-dp-gn="gx-ziel"]');
+      if (zAlt) {
+        var zKopf = zAlt.previousElementSibling && zAlt.previousElementSibling.classList.contains('dp-pa5-ab') ? zAlt.previousElementSibling : null;
+        var kz = kzAlt || h.platz(si, 'gx-ziel', zKopf || zAlt, 'dp-gx');
+        var zSig = ''; try { zSig = JSON.stringify((zielDaten() || {}).B || '').length + '|' + JSON.stringify(zielDaten()); } catch (e) {}
+        zeichneMit(h, kz, sig + zSig, function (k, w) { karteZiel(k, w); });
+        h.weg(zAlt); if (zKopf) h.weg(zKopf);
+      } else if (kzAlt && kzAlt.parentNode) kzAlt.parentNode.removeChild(kzAlt);
       var altFs = si.querySelector('[data-dp-gn="gx-fahrplan-si"]'); if (altFs && altFs.parentNode) altFs.parentNode.removeChild(altFs); }   /* v4280 · Fahrplan wieder in die Übersicht, ganz oben */
     /* Wert & Lage: Wertverlauf (statt „Wert gegen Plan“), Wo dein Objekt steht und Lage, Monte-Carlo-Fächer */
     var we = document.getElementById('dp-pa-wert');
@@ -947,7 +990,9 @@
     }
     /* Steuer: Verlauf mit Steuern nach dem Ergebnis aus Vermietung (v4140) */
     var st = document.getElementById('dp-pa-steuer');
-    if (st) { var vuv = st.querySelector('[data-dp-gn="vuv"]'); var kst = h.platz(st, 'gx-steuerverlauf', vuv ? vuv.nextSibling : st.firstChild, 'dp-gx'); zeichneMit(h, kst, sig, function (k, w) { karteVerlaufSteuer(k, w, P); }); }
+    if (st) { var vuv = st.querySelector('[data-dp-gn="vuv"]'); var kst = h.platz(st, 'gx-steuerverlauf', vuv ? vuv.nextSibling : st.firstChild, 'dp-gx'); zeichneMit(h, kst, sig, function (k, w) { karteVerlaufSteuer(k, w, P); });
+      /* v4310 · „Wohin die Miete geht“ aus der Übersicht hierher: der Cashflow dieses Jahres mit der Steuer */
+      var kme = h.platz(st, 'gx-mieteuro', kst.nextSibling, 'dp-gx'); zeichneMit(h, kme, sig, function (k, w) { karteMieteuro(k, w, P); }); }
     /* Haus & Unterlagen: Hausgeld je Jahr */
     var ha = document.getElementById('dp-pa-haus');
     if (ha) { var khs = h.platz(ha, 'gx-hausgeld', ha.firstChild, 'dp-gx'); var hvSig = ''; try { hvSig = JSON.stringify(window.DpHausverlauf.lesen().jahre || '').length; } catch (e) {} zeichneMit(h, khs, sig + hvSig, function (k, w) { karteHausgeld(k, w, P); }); }
@@ -985,6 +1030,6 @@
   }
   stilAnwenden();
   freigabe(); window.addEventListener('dp:vorschau', freigabe); window.addEventListener('dp:plan-ready', function () { setTimeout(freigabe, 300); });
-  window.DpGrafikenPremium = { lauf: function (h) { if (!FREI) { freigabe(); return; } stil(); try { pilotAnalyse(h); } catch (e) { try { console.warn('[grafiken-premium]', e); } catch (x) {} } }, MODELL: MODELL, _mieteuro: mieteuro, _steuerBreakEven: steuerBreakEven, _einordnungDaten: einordnungDaten, stil: stilSetzen, stilWahl: stilWahl, stilAnwenden: stilAnwenden, _einordnung: einordnungDaten, _portfolio: portfolioSchnitt };
+  window.DpGrafikenPremium = { lauf: function (h) { if (!FREI) { freigabe(); return; } stil(); try { pilotAnalyse(h); } catch (e) { try { console.warn('[grafiken-premium]', e); } catch (x) {} } }, MODELL: MODELL, _mieteuro: mieteuro, _zielDaten: zielDaten, _steuerBreakEven: steuerBreakEven, _einordnungDaten: einordnungDaten, stil: stilSetzen, stilWahl: stilWahl, stilAnwenden: stilAnwenden, _einordnung: einordnungDaten, _portfolio: portfolioSchnitt };
   window.DpGrafiken = { heatmap: heatmap, bullets: bullets, verlauf: verlauf, punktreihen: punktreihen, fahrplan: fahrplan, fingerabdruck: fingerabdruck, sankey: sankey, tornado: tornado, ausstieg: ausstieg, karte: karte, farben: F, modell: MODELL };
 })();

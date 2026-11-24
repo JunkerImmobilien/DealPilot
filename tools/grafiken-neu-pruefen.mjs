@@ -195,6 +195,29 @@ pruefe('K Spanne an Ende Zinsbindung liest das Jahr vor dem Wechsel', P.bindEnde
 const zeileB = M.rechne(P, {}).rows.find(r => r.j === 2033), appB = P.J.find(r => r.j === 2033);
 pruefe('K Fahrplan-Wert an Ende Zinsbindung = Restschuld der App 2033', zeileB && appB && Math.abs(zeileB.rs - appB.rs) < 0.5, zeileB ? Math.round(zeileB.rs) + ' €' : 'fehlt');
 
+/* Z · v4310 Zielerreichung im Stil der Einordnung, Übersicht schlank, Mieteuro lesbar */
+C.DpJahresstaende = { zielerreichung: () => ({ gesamt: 37, woraus: ['Miete', 'Entschuldung'], ampel: { wort: 'gelb' }, hebel: [
+  { id: 'miete', wort: 'Miete', einheit: 'eur_m', ankauf: 640, heute: 640, ziel: 720, pct: 0, zaehlt: true },
+  { id: 'entschuldung', wort: 'Entschuldung', einheit: 'eur', ankauf: 110000, heute: 100000, ziel: 70000, pct: 25, zaehlt: true },
+  { id: 'plan', wort: 'Plan gegen Ist (Cashflow v. St. 2025)', einheit: 'eur', ankauf: null, heute: 900, ziel: 800, pct: 112, zaehlt: true },
+  { id: 'rendite', wort: 'Rendite seit Ankauf', einheit: 'pct', zaehlt: false, pct: null } ] }) };
+const ZD = C.DpGrafikenPremium._zielDaten(), zM = ZD && ZD.B.find(b => b.name === 'Miete'), zE = ZD && ZD.B.find(b => b.name === 'Entschuldung'), zP = ZD && ZD.B.find(b => /^Plan gegen Ist/.test(b.name));
+pruefe('Z Zielerreichung: drei Hebel mit Ziel, ohne Ziel nicht gezeichnet', ZD && ZD.B.length === 3, ZD ? ZD.B.map(b => b.name).join(', ') : 'keine');
+pruefe('Z Entschuldung: weniger ist besser, Ankauf als Kreis, 25 % erreicht, Marke rot', zE && zE.hoch === false && zE.ankauf === 110000 && zE.wort === '25 % erreicht' && zE.farbe === Fb.rot && zE.lo < 70000 && zE.hi > 110000, zE ? zE.wort + ' · ' + zE.lo + '–' + zE.hi : 'fehlt');
+pruefe('Z Miete: mehr ist besser, Einheit im Monat', zM && zM.hoch === true && /im Monat$/.test(zM.fmt(720)), zM ? zM.fmt(720) : 'fehlt');
+pruefe('Z Plan gegen Ist über dem Ziel: „✓ erreicht“, grün, Klartext statt Abkürzung', zP && zP.wort === '✓ erreicht' && zP.farbe === Fb.gruen && zP.name === 'Plan gegen Ist (Cashflow vor Steuer)', zP ? zP.name + ' · ' + zP.wort : 'fehlt');
+delete C.DpJahresstaende;
+pruefe('Z ohne Zielerreichung keine Karte', C.DpGrafikenPremium._zielDaten() === null);
+const pa = PREM.slice(PREM.indexOf('function pilotAnalyse(h)'), PREM.indexOf('Vorschau-Sperre: nur mit'));
+const ueTeil = pa.slice(pa.indexOf("getElementById('dp-pa-uebersicht')"), pa.indexOf("getElementById('dp-pa-si')"));
+pruefe('Z Übersicht zeichnet keine Einordnung, keinen Fingerabdruck, kein Mieteuro mehr (räumt sie ab)', !/karteEinordnung|karteFingerabdruck|karteMieteuro/.test(ueTeil) && /'gx-einordnung', 'gx-finger'/.test(ueTeil));
+pruefe('Z Fingerabdruck und Zielerreichung in Ankauf · Bestand · Zielbild, Mieteuro im Reiter Steuer', pa.includes("kind(rsi, 'gx-finger')") && pa.includes("'gx-ziel'") && pa.includes("'gx-mieteuro', kst.nextSibling"));
+const NEUue = NEU.slice(NEU.indexOf("var ue = document.getElementById('dp-pa-uebersicht')"), NEU.indexOf('/* Jahresabgleich: statt der Karten'));
+pruefe('Z grafiken-neu: Übersicht ohne „Dein Anteil wächst“ und „nach Zins und Tilgung“', !NEUue.includes('vermoegen(k') && !NEUue.includes('bruecke(k') && NEUue.includes('removeChild(reihe)'));
+const hellOk = D.ein.concat(D.aus).every(a => !/gx-neutral|gruen-w|rot-w|16%/.test(a.f) || a.hell === true);
+pruefe('Z Mieteuro: jede blasse Fläche trägt dunkle Schrift (vorher weiß auf Hellgrau)', hellOk && !D.ein.concat(D.aus).some(a => /gold/.test(String(a.f))), D.ein.concat(D.aus).map(a => a.n + (a.hell ? '(dunkel)' : '')).join(', '));
+pruefe('Z Flächen grün statt gold in Wertverlauf, Spanne und Steuerverlauf', !PREM.includes("{ n: 'Eigenkapital', f: 'color-mix(in srgb,' + F.gold") && !PREM.includes("{ n: '8 von 10 Verläufen', f: 'color-mix(in srgb,' + F.gold") && PREM.includes("'Steuer kostet Geld'"));
+
 /* X Gegenprobe */
 const orig = M.rechne;
 M.rechne = function () { const z = orig.apply(this, arguments); z.rows.forEach(r => { if (r.j === 2030) r.cfns += 5; }); return z; };

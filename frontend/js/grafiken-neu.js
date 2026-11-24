@@ -563,13 +563,12 @@
     /* Übersicht */
     var ue = document.getElementById('dp-pa-uebersicht');
     if (ue && J.length >= 2) {
+      /* v4310 · Marcel 24.11.2026: „gehört das alles in die Übersicht?“ - „Dein Anteil am Objekt wächst“ (vermoegen) und
+         „nach Zins und Tilgung“ (bruecke) sind aus der Übersicht raus: dasselbe zeigen der Wertverlauf in Wert & Lage und
+         „Wohin die Miete geht“ im Reiter Steuer (grafiken-premium.js). Die alte Mini-Grafik bleibt versteckt. */
       var alt = ue.querySelector('[data-dp-pa4-mini="vermoegen"]');
       var reihe = ue.querySelector('[data-dp-gn="ue-reihe"]');
-      if (!reihe) { reihe = document.createElement('div'); reihe.setAttribute('data-dp-gn', 'ue-reihe'); reihe.className = 'dp-gn-reihe'; if (alt) alt.parentNode.insertBefore(reihe, alt); else ue.appendChild(reihe); }
-      var k1 = platz(reihe, 'verm', null, 'dp-pa-card dp-gn-karte'), k2 = reihe.querySelector('[data-dp-gn="br"]');
-      if (!k2) { k2 = document.createElement('div'); k2.setAttribute('data-dp-gn', 'br'); k2.className = 'dp-gn dp-pa-card dp-gn-karte'; reihe.appendChild(k2); }
-      zeichnen(k1, sj, function (k, w) { vermoegen(k, w, J); });
-      zeichnen(k2, sj, function (k, w) { bruecke(k, w, J); });
+      if (reihe && reihe.parentNode) reihe.parentNode.removeChild(reihe);
       weg(alt);
     }
     /* Jahresabgleich: statt der Karten Kaltmiete/Cashflow */
