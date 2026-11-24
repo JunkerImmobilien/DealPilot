@@ -962,7 +962,8 @@
   var VW_LANG = { ertragswert: 'Ertragswert, führend', sachwert: 'Sachwert, führend', vergleichswert: 'Vergleichswert, führend' };   /* einzelcheck-2 */
   /* einzelcheck-2 · DSCR erklärt, mit den Beträgen aus dem Kern (Reinertrag = DSCR × Kapitaldienst, nichts neu gerechnet) */
   function dscrSatz(r, f) {
-    var kd = r.k.d_total, re = r.k.dscr * kd;
+    var kd = r.k.kd_dscr, re = r.k.dscr * kd;   /* Kapitaldienst aus dem Kern (Zins + Tilgung im Jahr), Reinertrag = DSCR x Kapitaldienst */
+    if (!(kd > 0)) return 'DSCR ' + dez(r.k.dscr, 2) + ', volles Jahr mit den heutigen Eingaben.';
     var s = 'DSCR ' + dez(r.k.dscr, 2) + ', volles Jahr mit den heutigen Eingaben: Reinertrag ' + eur(re) + ' im Jahr (Kaltmiete und Zusatzeinnahmen minus nicht umlagefähige Kosten) geteilt durch Zins und Tilgung ' + eur(kd) + '.';
     if (f && f.bindung) s += ' In den ' + f.bindung.jahre + ' Jahren Zinsbindung bleibt er so, weil Miete und Rate gleich bleiben.';
     if (f && f.anschluss && f.anschluss.dscr > 0) s += ' Im Anschluss ' + dez(f.anschluss.dscr, 2) + ' bei ' + dez(f.anschluss.zins, 1) + ' % Zins.';
@@ -1033,7 +1034,7 @@
         ['Getilgt', dez(b.getilgt_pct, 1) + ' %'], ['Restschuld am Ende der Zinsbindung', D.eur(b.rs), { art: 'ende' }]]) + '</div></div>';
     var kopfA = a ? 'Anschluss ab Jahr ' + (b.jahre + 1) : 'Anschluss';
     var zeile = function (l, x, y, o) { return [l, x, a ? y : 'entfällt', o || {}]; };
-    out += '<h3>Rate und Cashflow je Phase</h3>' + D.liste([
+    out += '<!--PHASE--><h3>Rate und Cashflow je Phase</h3>' + D.liste([
       zeile('Sollzins', dez(h.zins, 2) + ' %', a && dez(a.zins, 2) + ' %'),
       zeile('Tilgung im Jahr', dez(h.tilg, 2) + ' %', a && dez(a.tilg, 2) + ' %', { det: 'Anschluss mit derselben Tilgung' }),
       zeile('Darlehen zu Beginn der Phase', D.eur(f.d1), a && D.eur(a.darlehen)),
@@ -1043,7 +1044,7 @@
       zeile('Cashflow vor Finanzierung im Monat', D.eurS(h.cf_vor_m), a && D.eurS(h.cf_vor_m), { det: 'Kaltmiete und Zusatzeinnahmen minus nicht umlagefähige Kosten', farbe: 1 }),
       zeile('Cashflow nach Finanzierung im Monat', D.eurS(h.cf_nach_m), a && D.eurS(a.cf_nach_m), { art: 'ende', farbe: 1, det: 'vor Steuern, nach Zins und Tilgung' }),
       zeile('DSCR', dez(h.dscr, 2), a && dez(a.dscr, 2), { det: 'Kapitaldienstdeckung, ab 1,2 gilt sie als solide' })
-    ], ['', 'Heute', kopfA]);
+    ], ['', 'Heute', kopfA]) + '<!--/PHASE-->';
     out = out.replace(/<table>/g, '<table class="dicht">');
     if (a) {
       out += '<div class="zwei block"><div><h3>Anschlussfinanzierung</h3>' + D.liste([
@@ -1136,7 +1137,7 @@
       kz: [{ l: 'Bodenrichtwert', v: bo.verfuegbar ? dez(bo.brw_qm, 0) + ' €/m²' : 'kein Wert', s: bo.verfuegbar ? 'amtlich, Stichtag ' + stichtagText(bo.stichtag) : (w.grund === 'ohne_anschrift' ? 'ohne Anschrift keine Zone' : 'nicht ermittelt') },
         g ? { l: 'Investor Deal Score', v: g.score + ' / 100', s: g.empfehlung ? g.empfehlung.text : '' } : (r && r.k ? { l: 'Deal Score', v: r.ds.score + ' / 100', s: r.st.wort } : null),
         r && r.k ? { l: 'Cashflow', v: eurS(r.k.cf_m), s: 'im Monat nach Finanzierung', art: r.k.cf_m < 0 ? 'schlecht' : 'gut' } : null,
-        r && r.k ? { l: 'DSCR', v: r.k.d_total > 0 ? dez(r.k.dscr, 2) : 'entfällt', s: 'Kapitaldienstdeckung' } : null].filter(Boolean),
+        r && r.k ? { l: 'DSCR', v: r.k.d_total > 0 ? dez(r.k.dscr, 2) : 'entfällt', s: 'volles Jahr, heutige Eingaben' } : null].filter(Boolean),
       meta: [['Stand', d.stand], ['Unterlagen', (d.unterlagen.filter(function (u) { return u.gelesen; }).length || (z.unterlagen || 0)) + ' gelesen'], ['Bewertungsstichtag', stichtagText(m.stichtag) || d.stand]],
       hinweisRechts: 'Erstellt am ' + D.esc(d.stand) + '<br>Indikativ, kein Gutachten' }));
 
@@ -1161,7 +1162,13 @@
       + ((z.ek_klasse || z.endenergie > 0) ? '<h3>Energie</h3>' + D.energieSkala(z.ek_klasse, z.endenergie) : '')));
 
     /* Finanzierung */
-    if (r && r.k) seiten.push(D.seite(c, 'Finanzierung', D.abschnitt('Die Finanzierung', 'Finanzierung und Anschluss', annahmeText(r)) + finanzSeite(D, d.fin, r)));
+    /* einzelcheck-2 · Finanzierung auf zwei ganzen Seiten statt einer übergelaufenen: Überblick und Anschluss,
+       danach Rate und Cashflow je Phase mit eigenem Kopf (gemessen 24.11.2026: 327 mm auf einer A4-Seite) */
+    if (r && r.k) {
+      var fh = finanzSeite(D, d.fin, r), ph = /<!--PHASE-->([\s\S]*)<!--\/PHASE-->/.exec(fh);
+      seiten.push(D.seite(c, 'Finanzierung', D.abschnitt('Die Finanzierung', 'Finanzierung und Anschluss', annahmeText(r)) + (ph ? fh.replace(ph[0], '') : fh)));
+      if (ph) seiten.push(D.seite(c, 'Rate und Cashflow', D.abschnitt('Die Finanzierung', 'Rate und Cashflow je Phase', 'Heute und im Anschluss nach der Zinsbindung, Monat für Monat wie der Tilgungsplan einer Bank.') + ph[1].replace('<h3>Rate und Cashflow je Phase</h3>', '')));
+    }
 
     /* Wertermittlung */
     seiten.push(D.seite(c, 'Wertermittlung', D.abschnitt('Wertermittlung nach ImmoWertV', 'Bodenrichtwert und Verfahren',
