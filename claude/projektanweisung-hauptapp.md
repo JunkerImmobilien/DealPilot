@@ -45256,3 +45256,9 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Commit:** main e5f109ab (cherry-pick ea6745a8, 56e9c8cc), staging 002ca3d6 (Merge main zurück). PDF v4370 bewusst NICHT mit ausgerollt.
 - **Nachweis:** Staging-Browser Desktop und 390 px (iframe), Umschalter Jahr, Ablauf per Testuhr; Prod: dealpilot.immo und /preise.html laden blackfriday.js?v=landing-blackfriday-1a (200), version 1.0.158. Gold-Audit RC 0, vorschau sauber, landing-zaehlen 27.
 - **Rest:** JSON-LD-Preise bleiben regulär · nach dem 01.12. Datei und Script-Zeilen entfernen (Aufräumen, nicht eilig).
+
+### Prod-Hotfix v4380 · 24.11.2026 · PDF-Diagramme wie im Reiter Bewertung
+- **Was:** v4370 (drei Fassungen, Kombi mit Marktbericht) auf Marcels Wunsch zurückgenommen, nie auf Prod. v4380: alte PDF-Struktur, nur Vermögensaufbau, Vermögenszuwachs, DSCR- und LTV-Verlauf aus grafiken-bewertung.js mit festen Farben; veraltete Wertangabe aus dem Marktbericht (≠ State.wert_anker) nicht im PDF.
+- **Commit:** main fac529ee (per Index auf origin/main, nur dp-dokument.js, dp-dokumente.js, Buster index.html/einzelcheck.js), staging eb7af915, 4fd0f79f, Rücknahme 5d64beac, 181f2aad.
+- **Nachweis:** Staging Demostraße 5 und Musterhof 8, Kurz und Vollständig erzeugt, Seitenzahlen unverändert (9/18, 8/19), Diagramme neu, buster-ebenen sauber. Prod: Dateien mit v4380 ausgeliefert (curl), Inhalt main == staging; PDF auf Prod nicht erzeugt (keine Anmeldung im Prod-Tab).
+- **Rest:** App-Kachel Wertpuffer nutzt weiter das alte Feld; Bericht mit Stichtag Kaufdatum gilt in der App als Wert 2026; Muster unter Dateien/Investment-PDF/v4380/.
