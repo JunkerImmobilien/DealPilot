@@ -566,7 +566,7 @@
             var fu = z.mb && z.mb.fu && !z.mb.fu.stufe_m ? z.mb.fu : null;
             return '<td' + (z.mb ? ' title="' + esc((fu ? fu.name + ' (führend) ' + eur(fu.wert) + ', ' : '') + 'Marktpreisindikation ' + eur(z.mb.wert) + ' aus Angebotspreisen, Bericht vom ' + datumText(z.mb.am)) + '"' : '') + '>'
               + (z.mb ? eur(fu ? fu.wert : z.mb.wert) : '<span style="color:#9A9285">–</span>')
-              + '<small>' + (fu ? esc(fu.name.replace(' (vorläufig)', '')) + ' · ' : '') + (pl && istZahl(pl.wert_y) ? 'Plan ' + eur(pl.wert_y) : '') + '</small></td>'; })()
+              + '<small>' + [fu ? esc(fu.name.replace(' (vorläufig)', '')) : '', pl && istZahl(pl.wert_y) ? 'Plan ' + eur(pl.wert_y) : ''].filter(Boolean).join(' · ') + '</small></td>'; })()
         + '<td>' + eur(rs) + '<small>' + (istZahl(z.rs_ist) ? 'Kontoauszug' : 'Projektion') + '</small></td>'
         + '<td>' + (dscr != null ? z2(dscr) : '–') + '</td>'
         + '<td>' + (score != null ? String(Math.round(score)) : '–') + '</td>'

@@ -578,7 +578,7 @@
     var ERK = { ertragswert: 'Aus der nachhaltig erzielbaren Miete nach ImmoWertV abgeleitet, abzüglich der Bewirtschaftungskosten und mit dem Liegenschaftszins kapitalisiert.',
       sachwert: 'Aus Bodenwert und Herstellungskosten des Gebäudes nach ImmoWertV abgeleitet und an den Markt angepasst.',
       vergleichswert: 'Aus amtlichen Kaufpreisen vergleichbarer Objekte nach ImmoWertV abgeleitet.' };
-    if (S.wert_basis_quelle === 'verkehrswert' && zahl(S.wert_basis) > 0) {
+    if (S.wert_basis_quelle === 'verkehrswert' && /^(gutachten|bank)$/.test(String(S.svw_herkunft || '')) && zahl(S.wert_basis) > 0) {   /* nur ein belastbares Gutachten geht dem Bericht vor (calc.js _svwBelastbar) */
       gutachten = true;
       out.push(zahlKachel((S.svw_label || 'Verkehrswert') + ' · führend', eur(S.wert_basis), 'deine Angabe im Reiter Objekt', C.c1,
         { t: (S.svw_label || 'Verkehrswert') + ', führend', a: 'Deine Wertangabe aus Gutachten oder Bankbewertung geht jedem Marktbericht vor. An ihr misst sich der Preis.' }));
