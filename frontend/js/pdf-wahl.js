@@ -61,8 +61,12 @@
   var WAHLEN = [
     { id: 'bank', titel: 'Bankfassung', unter: 'Weisses Papier, Kennzahlen als Tabelle',
       fuer: 'Bank · Finanzierung · Steuerberater', hell: true, art: 'bank' },
-    { id: 'kurz', titel: 'Kurzfassung', unter: 'Fünf bis sechs Seiten, weisses Papier',
+    { id: 'kurz', titel: 'Kurzfassung', unter: 'Rund acht Seiten mit den wichtigsten Grafiken',
       fuer: 'Erstkontakt · Bank · Investor', hell: true, art: 'kurz' },
+    /* v4370 · Marcel 24.11.2026: drei Fassungen, Kurz (~8), Kompakt (~15), Vollständig. Klassisch (jsPDF) kennt keine
+       Kompaktfassung, dort erzeugt sie die Bankfassung (fuehreAus). */
+    { id: 'kompakt', titel: 'Kompaktfassung', unter: 'Rund 15 Seiten, alle Kernkapitel mit Grafiken',
+      fuer: 'Bank · Partner · Miteigentümer', hell: true, art: 'kompakt' },
     { id: 'hell', titel: 'Investment-PDF · hell', unter: 'Volles Dokument, helles Deckblatt',
       fuer: 'Miteigentümer · Partner · Ausdruck', hell: true, art: 'voll' },
     { id: 'obsidian', titel: 'Investment-PDF · Obsidian', unter: 'Volles Dokument, dunkles Deckblatt',
@@ -161,11 +165,11 @@
   /* v3184 · Marcel 05.11.2026: „Eigentlich brauchen wir ja nur … eine vollumfängliche Version und das Investment PDF
      als Kurzfassung." Im einheitlichen Design also zwei Wahlen; „hell" führt dort auf dieselbe vollständige Fassung. */
   function sichtbar() {
-    if (vorgabe.design === 'klassisch') return WAHLEN.slice();
-    return [Object.assign({}, wahl('bank'), { titel: 'Investment-PDF · vollständig', unter: 'Alle Kapitel, 18 bis 24 Seiten', fuer: 'Bank · Partner · Steuerberater' }), wahl('kurz')];
+    if (vorgabe.design === 'klassisch') return WAHLEN.filter(function (w) { return w.id !== 'kompakt'; });   /* v4370 · Kompakt nur im einheitlichen Design */
+    return [Object.assign({}, wahl('bank'), { titel: 'Investment-PDF · vollständig', unter: 'Alle Kapitel, rund 20 Seiten', fuer: 'Bank · Partner · Steuerberater' }), wahl('kompakt'), wahl('kurz')];   /* v4370 · Kompakt */
   }
-  function fuehreAus(w) {
-    if (w.art !== 'profi' && window.DpDokWeiche && window.DpDokWeiche.aktiv()) return window.DpDokWeiche.investment(w.art);
+  function fuehreAus(w, zusatz) {
+    if (w.art !== 'profi' && window.DpDokWeiche && window.DpDokWeiche.aktiv()) return window.DpDokWeiche.investment(w.art, zusatz || {});   /* v4370 · zusatz.mitMarktbericht */
     /* Der Schalter gilt nur für DIESEN Export - danach zurück auf den
        Stand, den der Mandant gesetzt hat. Ein Schalter, der stehen
        bleibt, färbt den nächsten Export mit, den niemand gewählt hat. */
@@ -176,6 +180,7 @@
       if (w.art === 'profi') { if (window.DpProfi) return window.DpProfi.oeffnen(window._currentObjKey); return; }
       if (w.art === 'bank') { if (origBank) return origBank.call(window, { ohneRueckfrage: true }); }
       else if (w.art === 'kurz') { if (origBank) return origBank.call(window, { ohneRueckfrage: true, kurz: true }); }
+      else if (w.art === 'kompakt') { if (origBank) return origBank.call(window, { ohneRueckfrage: true }); }   /* v4370 · klassisch ohne Kompaktfassung */
       else { if (origVoll) return origVoll.call(window, { ohneRueckfrage: true }); }
     } finally {
       /* Erst nach einem Wimpernschlag zurücksetzen: der Export ist
@@ -225,9 +230,12 @@
       + '<button type="button" class="dpw-zu" aria-label="Schliessen">×</button></div>'
       /* v3235: das einheitliche Design zeigt ZWEI Fassungen - hier stand „=== 3 ? Drei : Vier“,
          und bei zwei Karten hiess es „Vier Fassungen“. */
-      + '<p class="dpw-vor">' + (['Keine', 'Eine', 'Zwei', 'Drei', 'Vier'][sichtbar().length] || sichtbar().length) + ' Fassungen stehen bereit. Sie unterscheiden sich im Umfang '
-      + 'und im Deckblatt - die Zahlen sind dieselben.</p>'
+      + '<p class="dpw-vor">' + (['Keine', 'Eine', 'Zwei', 'Drei', 'Vier'][sichtbar().length] || sichtbar().length) + ' Fassungen stehen bereit. Sie unterscheiden sich im Umfang, die Zahlen sind dieselben.</p>'
       + '<div class="dpw-liste">' + karten + '</div>'
+      /* v4370 · Kombi: der letzte Marktbericht als Anhang (nur im einheitlichen Design, DpDokWeiche fügt zusammen) */
+      + (window.DpDokWeiche && DpDokWeiche.aktiv() && DpDokWeiche.letzterBericht ? '<label class="dpw-mb" style="display:flex;gap:10px;align-items:flex-start;margin:12px 2px 0;font-size:13px;line-height:1.45;color:var(--ch,#2A2727);cursor:pointer">'
+        + '<input type="checkbox" id="dpw-mb" disabled style="margin-top:3px;flex-shrink:0"><span><b style="font-weight:600">Mit Marktbericht als Anhang</b>'
+        + '<span id="dpw-mb-t" style="display:block;color:var(--muted,#5F5E5A);font-size:12px">Wird geprüft …</span></span></label>' : '')
       /* v1733 · hier stand „(änderbar in den Einstellungen)". Das war eine
          Zusage ohne Code: `vergessen()` hatte ausserhalb dieser Datei null
          Aufrufer, und in den Einstellungen gab es nichts. Jetzt steht dort,
@@ -253,11 +261,19 @@
         var w = wahl(k.dataset.id);
         if (!w) return;
         /* v3235: der Haken #dpw-merken ist raus - hier stand setze({ fassung, immer: true }) */
+        var mb = ov.querySelector('#dpw-mb');
         zu();
-        fuehreAus(w);
+        fuehreAus(w, { mitMarktbericht: !!(mb && mb.checked && !mb.disabled) });
       });
     });
 
+    /* v4370 · gibt es zum Objekt einen Marktbericht? Ohne Bericht bleibt der Haken aus, mit Hinweis */
+    var mbCb = ov.querySelector('#dpw-mb'), mbT = ov.querySelector('#dpw-mb-t');
+    if (mbCb) DpDokWeiche.letzterBericht(window._currentObjKey).then(function (h) {
+      if (!document.body.contains(mbCb)) return;
+      if (h) { mbCb.disabled = false; mbT.textContent = 'Bericht vom ' + new Date(h.created_at).toLocaleDateString('de-DE') + ' wird hinten angefügt, ein PDF.'; }
+      else { mbCb.disabled = true; mbCb.parentNode.style.opacity = '.55'; mbT.textContent = 'Zu diesem Objekt gibt es noch keinen Marktbericht. Er lässt sich im Reiter Bewertung abrufen.'; }
+    });
     var erste = ov.querySelector('.dpw-an') || ov.querySelector('.dpw-k');
     if (erste) erste.focus();
   }

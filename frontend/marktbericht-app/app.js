@@ -2783,12 +2783,12 @@ async function _mbOpenReport(rid, asPdf){
     var res=await fetch(API + '/reports/one?id=' + encodeURIComponent(rid), { headers:_mbAuth() }); /* v942 */
     if(!res.ok) throw new Error('HTTP '+res.status);
     var out=await res.json(); render(out);
-    if(asPdf){ try{ await exportPdf(out); }catch(e){ alert('PDF-Fehler: '+e.message); } }
+    if(asPdf){ try{ await exportPdf(out); }catch(e){ var _offP = false; try { _offP = /^(1|bytes)$/.test(new URLSearchParams(location.search).get('autopdf') || ''); } catch (x) {} if (_offP) throw e; alert('PDF-Fehler: '+e.message); } }   /* v4370 · offscreen kein alert */
     else { _mbScrollTop(); } /* v945-scroll */
   }catch(e){
     /* v949-autopdf: im Offscreen-Betrieb gibt es niemanden, der ein alert() sieht.
      * Fehler nach oben durchreichen, statt ihn in einem unsichtbaren iframe zu begraben. */
-    var _off = false; try { _off = new URLSearchParams(location.search).get('autopdf') === '1'; } catch (x) {}
+    var _off = false; try { _off = /^(1|bytes)$/.test(new URLSearchParams(location.search).get('autopdf') || ''); } catch (x) {}
     if (_off) throw e;
     alert('Bericht konnte nicht geladen werden: '+e.message);
   }
@@ -6086,6 +6086,9 @@ async function exportPdf(out) {
     .replace(/ß/g, 'ss');
   const fname = 'Marktbericht_' + (a.postcode || '') + '_'
     + _umlaut(a.city || ref.address || 'Objekt').replace(/[^a-z0-9]/gi, '_').slice(0, 30) + '.pdf';
+  /* v4370 · Kombi-PDF: im Offscreen-Betrieb ?autopdf=bytes geht das PDF als Bytes an die App (DpDokWeiche haengt es an) */
+  var _alsBytes = false; try { _alsBytes = new URLSearchParams(location.search).get('autopdf') === 'bytes'; } catch (x) {}
+  if (_alsBytes && window.parent && window.parent !== window) { parent.postMessage({ type: 'mbv-pdf-bytes', bytes: doc.output('arraybuffer'), name: fname }, location.origin); return; }
   doc.save(fname);
 }
 
@@ -6556,7 +6559,7 @@ function _mbLayoutRuns(doc, runs, maxW, size) {
 try { (function () {
   var q; try { q = new URLSearchParams(location.search); } catch (e) { return; }
   var rid = q.get('report');
-  if (!rid || q.get('autopdf') !== '1') return;
+  if (!rid || !/^(1|bytes)$/.test(q.get('autopdf') || '')) return;   /* v4370 · bytes: Kombi-PDF */
   function tell(type, msg) {
     try { if (window.parent && window.parent !== window) parent.postMessage({ type: type, error: msg || null }, '*'); } catch (e) {}
   }
