@@ -853,10 +853,12 @@
       if (da(K.bmy) !== null) pk.push('Bruttomietrendite ' + B.pct(K.bmy, 2) + ' auf den Kaufpreis, Kaufpreisfaktor ' + B.zahl(K.fak, 1) + '.');
       if ((K.cf_m || 0) >= 0) pk.push('Die Miete trägt Zins, Tilgung und Bewirtschaftung: Cashflow vor Steuern ' + B.eurS(K.cf_m) + ' im Monat.');
       if (da(K.dscr) !== null && K.dscr >= dg) pk.push('DSCR ' + B.zahl(K.dscr, 2) + ', über der üblichen Schwelle von ' + B.zahl(dg, 2) + '.');
+      if (mw && K.kp > mw.wert) rk.push('Der Kaufpreis liegt ' + B.pct((K.kp - mw.wert) / mw.wert * 100, 1) + ' über dem ' + mw.name + '.');
+      if (!mw && mpiV && K.kp > mpiV.mitte) rk.push('Der Kaufpreis liegt ' + B.pct((K.kp - mpiV.mitte) / mpiV.mitte * 100, 1) + ' über der Marktpreisindikation (' + B.eur(mpiV.mitte) + ').');
       if (da(K.dscr) !== null && K.dscr < dg) rk.push('DSCR ' + B.zahl(K.dscr, 2) + ', unter der üblichen Schwelle von ' + B.zahl(dg, 2) + '.');
       if (da(K.ltv) !== null && K.ltv > 80) rk.push('Beleihungsauslauf ' + B.pct(K.ltv, 1) + (S0.ltv_basis_label ? ' auf ' + S0.ltv_basis_label : '') + (mw && mw.wert > 0 && zahlAus('d1') ? ', auf den ' + mw.name + ' ' + B.pct(zahlAus('d1') / mw.wert * 100, 1) : '') + '.');
       if (da(K.rate_an_m) !== null && da(K.cf_op_an) !== null) rk.push('Nach der Zinsbindung (Annahme ' + B.pct(zahlAus('anschl_z'), 2) + ') Rate ' + B.eur(K.rate_an_m) + ' im Monat, Cashflow vor Steuern ' + B.eurS(K.cf_op_an / 12) + ' im Monat.');
-      var kernH = (WZ && WZ.kern && WZ.kern.length) ? B.kacheln(WZ.kern.slice(0, 6).map(function (k) { return { l: k.titel, v: k.wert_text || '' }; }), true) : '';
+      var kernH = (WZ && WZ.kern && WZ.kern.length) ? B.kacheln(WZ.kern.filter(function (k) { return /\d/.test(k.wert_text || ''); }).slice(0, 6).map(function (k) { return { l: k.titel, v: k.wert_text || '' }; }), true) : '';
       var punkte = function (titel, arr) { return arr.length ? '<h3>' + titel + '</h3><ul>' + arr.map(function (x) { return '<li>' + B.esc(ersterSatz(x)) + '</li>'; }).join('') + '</ul>' : ''; };
       Sx.push(B.seite(c, 'Kernaussagen', B.abschnitt('Kurzfassung', 'Kernaussagen') + kernH + punkte('Was dafür spricht', pk) + punkte('Worauf zu achten ist', rk)
         + '<h3>Vermögensaufbau</h3>' + (gbKarte('_aufbauHtml') || '') + '<p class="det">Objektwert fortgeschrieben mit der angenommenen Wertsteigerung, keine Bewertung nach § 194 BauGB.</p>'));
