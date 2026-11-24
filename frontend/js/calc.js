@@ -1357,12 +1357,12 @@ function _calcImmediate(){
     var _mpiO = _wzW && _wzW.ohne_abschlag ? _wzW.ohne_abschlag.mitte : null;
     if (_wzW && _ankWahl === 'massgebend' && _wzW.fuehrend) {
       var _fv = _wzW[_wzW.fuehrend];
-      if (_fv && _fv.wert > 0 && !_fv.vorlaeufig) _mbAnker = { wert: Math.max(0, _fv.wert - _erbAbzug), art: _wzW.fuehrend, datum: _wzW.bericht_datum };
+      if (_fv && _fv.wert > 0 && !_fv.vorlaeufig) _mbAnker = { wert: Math.max(0, _fv.wert - _erbAbzug), art: _wzW.fuehrend, datum: _wzW.wert_stichtag || _wzW.bericht_datum, erstellt: _wzW.bericht_datum, stichtag_eigen: !!_wzW.wert_stichtag };
       /* Stufe M: führt der Vergleichswert ohne amtliche Basis, IST er die Marktpreisindikation nach Abschlag */
-      else if (_wzW.fuehrend === 'vergleichswert' && !_wzW.vergleichswert && _mpiM > 0) _mbAnker = { wert: Math.max(0, _mpiM - _erbAbzug), art: 'vergleichswert_m', datum: _wzW.bericht_datum };
+      else if (_wzW.fuehrend === 'vergleichswert' && !_wzW.vergleichswert && _mpiM > 0) _mbAnker = { wert: Math.max(0, _mpiM - _erbAbzug), art: 'vergleichswert_m', datum: _wzW.wert_stichtag || _wzW.bericht_datum, erstellt: _wzW.bericht_datum, stichtag_eigen: !!_wzW.wert_stichtag };
     }
-    if (_wzW && !_mbAnker && _ankWahl !== 'mpi_ohne' && _mpiM > 0 && (_ankWahl === 'mpi_mit' || _wzW.ohne_abschlag)) _mbAnker = { wert: Math.max(0, _mpiM - _erbAbzug), art: 'mpi_mit', datum: _wzW.bericht_datum };
-    if (_wzW && !_mbAnker && _ankWahl === 'mpi_ohne' && (_mpiO > 0 || _mpiM > 0)) _mbAnker = { wert: Math.max(0, (_mpiO > 0 ? _mpiO : _mpiM) - _erbAbzug), art: _mpiO > 0 ? 'mpi_ohne' : 'mpi_mit', datum: _wzW.bericht_datum };
+    if (_wzW && !_mbAnker && _ankWahl !== 'mpi_ohne' && _mpiM > 0 && (_ankWahl === 'mpi_mit' || _wzW.ohne_abschlag)) _mbAnker = { wert: Math.max(0, _mpiM - _erbAbzug), art: 'mpi_mit', datum: _wzW.wert_stichtag || _wzW.bericht_datum, erstellt: _wzW.bericht_datum, stichtag_eigen: !!_wzW.wert_stichtag };
+    if (_wzW && !_mbAnker && _ankWahl === 'mpi_ohne' && (_mpiO > 0 || _mpiM > 0)) _mbAnker = { wert: Math.max(0, (_mpiO > 0 ? _mpiO : _mpiM) - _erbAbzug), art: _mpiO > 0 ? 'mpi_ohne' : 'mpi_mit', datum: _wzW.wert_stichtag || _wzW.bericht_datum, erstellt: _wzW.bericht_datum, stichtag_eigen: !!_wzW.wert_stichtag };
   } catch (_e) { _mbAnker = null; }
   State.wert_anker_wahl = _ankWahl || 'massgebend';
   var wert_basis, _wbQuelle;
@@ -1383,7 +1383,9 @@ function _calcImmediate(){
   /* v4300 · Anker mit Jahr: der Bericht bewertet zu SEINEM Stichtag. Weiter unten (nach wstg) wird auf den Beginn der
      Projektion zurueckgerechnet, damit wert_y im Berichtsjahr den Berichtswert trifft. */
   State.wert_anker = (_wbQuelle === 'marktbericht' && _mbAnker) ? { wert: _mbAnker.wert, art: _mbAnker.art, datum: _mbAnker.datum || null,
-    jahr: (function () { var d = _mbAnker.datum ? new Date(_mbAnker.datum) : null; return d && !isNaN(d) ? d.getFullYear() : null; })() } : null;
+    erstellt: _mbAnker.erstellt || null, stichtag_eigen: !!_mbAnker.stichtag_eigen,   /* v4390 · datum = Wertermittlungsstichtag, erstellt = Berichtsdatum */
+    jahr: (function () { var d = _mbAnker.datum ? new Date(_mbAnker.datum) : null; return d && !isNaN(d) ? d.getFullYear() : null; })(),
+    monat: (function () { var d = _mbAnker.datum ? new Date(_mbAnker.datum) : null; return d && !isNaN(d) ? d.getMonth() + 1 : null; })() } : null;
   State.wert_basis_text = _wbQuelle === 'verkehrswert' ? (State.svw_label || 'Wertangabe') + ' (Reiter Objekt)'
     : _wbQuelle === 'marktbericht' ? ({ ertragswert: 'Ertragswert', sachwert: 'Sachwert', vergleichswert: 'Vergleichswert', vergleichswert_m: 'Vergleichswert', mpi_mit: 'Marktpreisindikation nach Abschlag', mpi_ohne: 'Marktpreisindikation ohne Abschlag' }[_mbAnker.art] || 'Wert') + ' aus dem Marktbericht'
     : _wbQuelle === 'bankbewertung' ? 'Bankbewertung' : 'Kaufpreis';
@@ -2678,10 +2680,11 @@ function _calcImmediate(){
      alle Stellen mit wert_basis x (1 + wstg)^(y - 1) treffen damit im Berichtsjahr genau den Bericht. */
   try {
     var _wa = State.wert_anker, _wa0 = (window.DealPilotAnteilig && DealPilotAnteilig.getBaseYear) ? DealPilotAnteilig.getBaseYear() : null;
-    if (_wa && _wa.jahr && _wa0 && _wa.jahr > _wa0 && _wa.jahr - _wa0 <= 40 && wstg > -0.5) {
+    /* v4390 · Stichtag kann auch VOR dem Kaufjahr liegen: dann vorwärts auf das Basisjahr fortschreiben */
+    if (_wa && _wa.jahr && _wa0 && _wa.jahr !== _wa0 && Math.abs(_wa.jahr - _wa0) <= 40 && wstg > -0.5) {
       wert_basis = _wa.wert / Math.pow(1 + wstg, _wa.jahr - _wa0);
       State.wert_basis = wert_basis; _wa.basis_jahr = _wa0;
-      State.wert_basis_text = (State.wert_basis_text || 'Marktbericht') + ' ' + _wa.jahr + ', auf ' + _wa0 + ' zurückgerechnet';
+      State.wert_basis_text = (State.wert_basis_text || 'Marktbericht') + ' (Stichtag ' + _wa.jahr + '), auf ' + _wa0 + (_wa.jahr > _wa0 ? ' zurückgerechnet' : ' fortgeschrieben');
     }
   } catch (_eWa) {}
   State.mstg = mstg;
@@ -3271,7 +3274,7 @@ function _calcImmediate(){
   st('r-dscr2',fN(dscr,2));
   st('r-dscr-netto',fN(dscr_netto,2));
   st('r-ltv2',fP(ltv,1));
-  st('r-wpuff',wp_kpi!==0?fE(wp_kpi,0,true):'Kein Verkehrswert');st('r-zaer-kpi',fE(zaer_m,0)+'/Mon.');
+  /* v4390 · wie das PDF (dp-dokumente.js svwVeraltet, v4380): stammt die Wertangabe im Reiter Objekt aus einem Marktbericht und weicht vom maßgebenden Objektwert (State.wert_anker) ab, zeigt die Kachel den maßgebenden Wert gegen den Kaufpreis (Demostraße 5: 130.000 − 145.000 statt 111.000 − 145.000). Der Score (wp_kpi) bleibt unverändert. */ var _wpAnz = wp_kpi; try { var _waP = State.wert_anker; if (_waP && _waP.wert > 0 && svw > 0 && /^(marktbericht|indikation)$/.test(_svwHerk || '') && Math.abs(_waP.wert - svw) > 1) _wpAnz = _waP.wert - kp; } catch (_eWp) {} st('r-wpuff',_wpAnz!==0?fE(_wpAnz,0,true):'Kein Verkehrswert');st('r-zaer-kpi',fE(zaer_m,0)+'/Mon.');
   // V63.36: Vermögenszuwachs-Aufschlüsselung
   // Mieter-Anteil: Anteil der Tilgung der durch Mieteinnahmen finanziert wurde
   var tilg_durch_einnahmen = Math.min(tilgung_kum, Math.max(0, cfkum + tilgung_kum));
