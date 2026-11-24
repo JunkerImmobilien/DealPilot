@@ -1539,7 +1539,8 @@
       z.push(zahlKachel('Marktpreis Ø', eur(mpi), 'Kaufpreis ' + (ab >= 0 ? '+' : '−') + de(Math.abs(ab), 1) + ' % ' + (ab >= 0 ? 'darüber' : 'darunter'), ab > 10 ? C.rot : ab < 0 ? C.gut : 'var(--wl-c9a84c,#C9A84C)',
         { t: 'Marktpreisindikation', a: 'Aus aktuellen Angebotspreisen vergleichbarer Objekte abgeleitet, abzüglich des üblichen Verhandlungsabschlags. Kein Verkehrswert.',
           r: [['Spanne', zahl(w.marktpreisindikation.unten) && zahl(w.marktpreisindikation.oben) ? eur(w.marktpreisindikation.unten) + ' bis ' + eur(w.marktpreisindikation.oben) : ''], ['Abstand Kaufpreis', eur(kp - mpi)]] })); }
-    if (off && mpi) z.push(zahlKachel('Offerte zum Marktpreis', (off >= mpi ? '+' : '−') + de(Math.abs((off - mpi) / mpi * 100), 1) + ' %', off >= mpi ? 'über dem Marktpreis' : 'unter dem Marktpreis', '#2A2727',
+    var dOm = off && mpi ? (off - mpi) / mpi * 100 : null, gleich = dOm != null && Math.abs(dOm) < 0.5;
+    if (off && mpi) z.push(zahlKachel('Offerte zum Marktpreis', gleich ? '± 0 %' : (dOm > 0 ? '+' : '−') + de(Math.abs(dOm), 1) + ' %', gleich ? 'entspricht dem Marktpreis' : dOm > 0 ? 'über dem Marktpreis' : 'unter dem Marktpreis', '#2A2727',
       { t: 'Offerte gegen Marktpreis', a: 'Wie weit die Offerte vom Marktpreis aus Angebotspreisen entfernt liegt. Ein Wert nahe null heißt: du bietest, was der Markt hergibt.' }));
     return leiste(z, 'v');
   }
