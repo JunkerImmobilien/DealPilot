@@ -573,7 +573,7 @@
     var st = w && (w.wert_stichtag || w.bericht_datum) ? mmjjIso(w.wert_stichtag || w.bericht_datum) : '';
     var bericht = w && w.bericht_datum ? new Date(w.bericht_datum).toLocaleDateString('de-DE') : '';
     var mpi = w && w.marktpreisindikation && zahl(w.marktpreisindikation.mitte) ? w.marktpreisindikation : null;
-    var ab = w && zahl(w.abschlag_pct) ? de(w.abschlag_pct, 1) + ' %' : null;
+    var ab = w && zahl(w.abschlag_pct) ? Number(w.abschlag_pct).toLocaleString('de-DE', { maximumFractionDigits: 1 }) + ' %' : null;
     var fu = null, gutachten = false, N = { ertragswert: 'Ertragswert', sachwert: 'Sachwert', vergleichswert: 'Vergleichswert' };
     var ERK = { ertragswert: 'Aus der nachhaltig erzielbaren Miete nach ImmoWertV abgeleitet, abzüglich der Bewirtschaftungskosten und mit dem Liegenschaftszins kapitalisiert.',
       sachwert: 'Aus Bodenwert und Herstellungskosten des Gebäudes nach ImmoWertV abgeleitet und an den Markt angepasst.',
