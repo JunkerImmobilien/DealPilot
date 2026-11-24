@@ -48,6 +48,7 @@
     '.dp-gx .gx-tip,.dp-gx .dp-gn-seg,.dp-gx button{display:none!important}',
     '.dp-gx .gx-t{font-size:12pt!important}.dp-gx .gx-s{font-size:8.2pt!important;margin-bottom:2.5mm!important;text-align:left;hyphens:manual}',
     '.dp-gx .gx-fuss{font-size:7.4pt!important}.dp-gx .gx-leg{font-size:7.6pt!important}',
+    '.gx-pdf-klein .dp-gx svg{max-height:60mm}',
     '.dp-gx-paar{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:4mm;break-inside:avoid}.dp-gx-paar>.dp-gx{margin:0!important}'
   ].join('\n');
 

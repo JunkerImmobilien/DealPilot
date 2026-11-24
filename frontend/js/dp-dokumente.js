@@ -661,8 +661,8 @@
       S.push(B.seite(c, 'Objekt und Finanzierung', B.abschnitt(ab(), 'Objekt und Finanzierung')
         + '<div class="kv">' + [['Objektart', o.art], ['Baujahr', B.jahr(o.bj)], ['Wohnfläche', o.wfl ? B.zahl(o.wfl, 0) + ' m²' : '–'], ['Grundstück', o.gs ? B.zahl(o.gs, 0) + ' m²' : '–'],
           ['Kaufdatum', B.datum(feld('kaufdat')) || '–'], ['Energieklasse', feld('ds2_energie') || '–']].map(function (k) { return '<div><span>' + k[0] + '</span><span>' + B.esc(k[1]) + '</span></div>'; }).join('') + '</div>'
-        + finanzierungVoll(K, B, false) + (voll ? gesellschaft(B) : '')));
-      if (voll && (galerie || feld('ds2_energie'))) S.push(B.seite(c, 'Ansichten', B.abschnitt(ab(), 'Ansichten und Energie') + galerie + (feld('ds2_energie') ? '<h3>Energieeffizienz</h3>' + B.energieSkala(feld('ds2_energie')) : '')));
+        + finanzierungVoll(K, B, false) + (voll ? gesellschaft(B) : '') + (voll && !galerie && feld('ds2_energie') ? '<h3>Energieeffizienz</h3>' + B.energieSkala(feld('ds2_energie')) : '')));
+      if (voll && galerie) S.push(B.seite(c, 'Ansichten', B.abschnitt(ab(), 'Ansichten und Energie') + galerie + (feld('ds2_energie') ? '<h3>Energieeffizienz</h3>' + B.energieSkala(feld('ds2_energie')) : '')));
     };
     var wertSeite = function (karteDazu) {
       var wz = wertZielbild(K, B, WZ, PD, kurz || kompakt, bank);
@@ -678,7 +678,7 @@
       + '<h3>Kennzahlen</h3>' + kennzahlen12(K, B, SC) + (interp && voll ? '<div class="hinweis">Einordnung: ' + B.esc(String(interp).replace(/\s+/g, ' ')) + '</div>' : '')
       + (kurz ? g('fahrplan') : '') + (voll ? ansprechpartner(c, B) : '')));
     /* Einordnung: Ankauf, heute, Zielbild und Score-Fingerabdruck */
-    if (g('einordnung') || g('finger')) S.push(B.seite(c, 'Einordnung', B.abschnitt(ab(), 'Ankauf, heute und Zielbild', 'Die Kennzahlen gegen deine Schwellen aus dem Investmentprofil') + g('einordnung') + paar('finger')));
+    if (g('einordnung') || g('finger')) S.push(B.seite(c, 'Einordnung', B.abschnitt(ab(), 'Ankauf, heute und Zielbild', 'Die Kennzahlen gegen deine Schwellen aus dem Investmentprofil') + g('einordnung') + (kurz ? paar('finger') : paar('finger', 'markt'))));
     if (!kurz && (g('fahrplan') || g('ziel'))) S.push(B.seite(c, 'Fahrplan', B.abschnitt(ab(), 'Fahrplan und Ziele', 'Was bis zum Ende der Betrachtung auf dich zukommt und wie weit deine Ziele erreicht sind') + g('fahrplan') + g('ziel')));
     if (!kurz) objektSeite();
     /* Ertrag und Cashflow (v4370: Kennzahlen „wie eingegeben“ = volles Jahr mit den heutigen Eingaben, nicht das laufende Kalenderjahr) */
@@ -686,19 +686,18 @@
       + (kurz ? g('mieteuro') : '<div class="zwei"><div>' + bewirtschaftungDetail(K, B) + '</div><div>' + steuerWirkung(K, B) + '</div></div>')));
     if (kurz) {
       S.push(B.seite(c, 'Steuer und Anschlusszins', B.abschnitt(ab(), 'Verlauf mit Steuern und Anschlusszins', 'Cashflow nach Steuern je Jahr und der Cashflow nach der Zinsbindung je Anschlusszins')
-        + (g('steuer') || steuerWirkung(K, B) + zuwachsKurz(B)) + (g('heatKompakt') || bankCockpit(B, true))));
+        + '<div class="gx-pdf-klein">' + (g('steuer') || steuerWirkung(K, B) + zuwachsKurz(B)) + (g('heatKompakt') || bankCockpit(B, true)) + '</div>'));
       wertSeite('');
     } else {
       if (g('mieteuro') || g('steuer')) S.push(B.seite(c, 'Wohin die Miete geht', B.abschnitt(ab(), 'Wohin die Miete geht', 'Der Weg der Miete in diesem Jahr und der Cashflow nach Steuern im Verlauf') + g('mieteuro') + g('steuer')));
       if (kompakt) {
         S.push(B.seite(c, 'Drei Phasen', B.abschnitt(ab(), 'Finanzierung in drei Phasen und Vermögen', 'Jahr 1, Ende der Zinsbindung und Anschlussfinanzierung, darunter Wert, Restschuld und Eigenkapital') + dreiPhasen(K, B) + (g('wertverlauf') || zuwachsKurz(B))));
-        if (g('faecher') || g('markt')) S.push(B.seite(c, 'Vermögen und Markt', B.abschnitt(ab(), 'Spanne und Markt', 'Mögliche Verläufe des Vermögens und wo das Objekt heute am Markt steht') + g('faecher') + paar('markt', 'lage')));
+        if (g('faecher')) S.push(B.seite(c, 'Spanne', B.abschnitt(ab(), 'Spanne möglicher Verläufe', 'Wie sich dein Vermögen im Objekt entwickeln kann') + g('faecher')));
         wertSeite('');
       } else {
-        S.push(B.seite(c, 'Drei Phasen', B.abschnitt(ab(), 'Finanzierung in drei Phasen', 'Jahr 1, Ende der Zinsbindung und Anschlussfinanzierung') + phasenVoll(K, B)));
-        S.push(B.seite(c, 'Cashflow je Jahr', B.abschnitt(ab(), 'Cashflow je Jahr', (St().cfRows || []).length + ' Jahre') + cfJahre(B)));
+        S.push(B.seite(c, 'Drei Phasen', B.abschnitt(ab(), 'Finanzierung in drei Phasen', 'Jahr 1, Ende der Zinsbindung und Anschlussfinanzierung, darunter der Cashflow je Jahr') + phasenVoll(K, B) + '<h3>Cashflow je Jahr · ' + (St().cfRows || []).length + ' Jahre</h3>' + cfJahre(B)));
         S.push(B.seite(c, 'Vermögensaufbau', B.abschnitt(ab(), 'Vermögensaufbau', 'Wert, Restschuld und Eigenkapital') + vermoegenVoll(K, B, g('wertverlauf'))));
-        if (g('faecher') || g('markt')) S.push(B.seite(c, 'Vermögen und Markt', B.abschnitt(ab(), 'Spanne und Markt', 'Mögliche Verläufe des Vermögens und wo das Objekt heute am Markt steht') + g('faecher') + paar('markt', 'lage')));
+        if (g('faecher') || g('lage')) S.push(B.seite(c, 'Spanne und Lage', B.abschnitt(ab(), 'Spanne und Lage', 'Wie sich dein Vermögen im Objekt entwickeln kann und wie sich die Lage laut Marktbericht entwickelt') + g('faecher') + paar('lage')));
         var ml = mieterliste(K, B); if (ml) S.push(B.seite(c, 'Einheiten und Zustand', B.abschnitt(ab(), 'Einheiten und Zustand') + ml));
         wertSeite('');
         if (g('hausgeld')) S.push(B.seite(c, 'Haus und Hausgeld', B.abschnitt(ab(), 'Haus und Hausgeld', 'Hausgeld je Jahr aus den Abrechnungen') + g('hausgeld')));
