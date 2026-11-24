@@ -261,10 +261,9 @@
       '.oabi-kombi .oabi-spalte-jahre{border-left:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 25%, transparent);background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 3%, #fff)}',
       ".oabi-kombi .oabi-spalte-t{font:700 11px/1.3 'JetBrains Mono',monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--wl-b8932f, #b8932f);padding:10px 20px 6px}",
       '.oabi-kombi #oabi-r-jahre{padding-top:0}',
-      '.oabi-kombi .oabi-head{position:relative;padding-right:52px}',
-      '.oabi-x{position:absolute;right:14px;top:12px;width:32px;height:32px;border-radius:8px;border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 35%, transparent);background:transparent;font-size:20px;line-height:1;cursor:pointer;color:inherit}',
+      '.oabi-kombi #oabi-r-ein{position:sticky;top:0;align-self:start}',
       '.oabi-btn.warn{border-color:#B8625C;color:#B8625C}',
-      '@media (max-width:899px){.oabi-kombi-grid{grid-template-columns:1fr}.oabi-kombi .oabi-spalte-jahre{border-left:0;border-top:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 25%, transparent)}}',
+      '@media (max-width:899px){.oabi-kombi-grid{grid-template-columns:1fr}.oabi-kombi #oabi-r-ein{position:static}.oabi-kombi .oabi-spalte-jahre{border-left:0;border-top:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 25%, transparent)}}',
       ".oabi-modal{background:var(--surface,#F8F6F1);border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 35%, transparent);border-radius:16px;width:min(740px,100%);max-height:90vh;overflow:auto;box-shadow:0 24px 60px rgba(0,0,0,0.28);font-family:'Inter',system-ui,sans-serif}",
       '.oabi-head{display:flex;align-items:center;gap:12px;padding:18px 20px 8px}',
       '.oabi-head h3{margin:0;font-size:17px;color:var(--ch,#2A2727)}',
@@ -2990,11 +2989,7 @@
     document.addEventListener('keydown', _escZu);
     window.addEventListener('dp:belege-geaendert', _jahreNeu);
     $('oabi-cancel').addEventListener('click', close);
-    if (_jr) {
-      var _x = document.createElement('button'); _x.type = 'button'; _x.className = 'oabi-x'; _x.setAttribute('aria-label', 'Schließen'); _x.textContent = '×';
-      _x.addEventListener('click', close);
-      var _hd = ov.querySelector('.oabi-head'); if (_hd) _hd.appendChild(_x);
-    }
+    /* × oben setzt modal-boarding-skin.js (klickt „Schließen“, also dieselbe Rückfrage) */
     var drop = $('oabi-drop'), input = $('oabi-input');
     drop.addEventListener('click', function () { input.click(); });
     drop.addEventListener('dragover', function (e) { e.preventDefault(); drop.classList.add('drag'); });
