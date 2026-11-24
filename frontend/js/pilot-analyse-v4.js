@@ -381,6 +381,13 @@
       '.dp-pa4-zwei{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}',
       '@media (max-width:620px){.dp-pa4-zwei{grid-template-columns:1fr}}',
       '.dp-pa4-liste{margin:6px 0 0;padding-left:18px;display:grid;gap:4px;font:400 13px/1.5 Inter,sans-serif;color:#2A2727}',
+      /* v4450 · Stichpunkte der Einfach-Ansicht: Punkt grün/rot/neutral wie die Bewertung, Schritte nummeriert */
+      '.dp-pa4-kp{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:7px;font:400 13.5px/1.45 Inter,system-ui,sans-serif;color:#2A2727}',
+      '.dp-pa4-kp > li{position:relative;padding-left:18px}',
+      '.dp-pa4-kp:not(.n) > li::before{content:"";position:absolute;left:2px;top:.5em;width:8px;height:8px;border-radius:50%;background:#A39E95}',
+      '.dp-pa4-kp > li.gut::before{background:#3FA56C}.dp-pa4-kp > li.schlecht::before{background:#B8625C}',
+      '.dp-pa4-kp.n{counter-reset:kp}.dp-pa4-kp.n > li{counter-increment:kp;padding-left:26px}',
+      '.dp-pa4-kp.n > li::before{content:counter(kp);position:absolute;left:0;top:0;width:19px;height:19px;border-radius:50%;background:#F8F6F1;border:1px solid #E4DED2;font:600 11px/19px "JetBrains Mono",monospace;text-align:center;color:#2A2727}',
       '.dp-pa4-mehr{margin-top:10px;border:1px solid #E6DCC2;background:#fff;border-radius:9px;padding:7px 12px;font:600 12.5px "Space Grotesk",Inter,sans-serif;cursor:pointer;color:#2A2727}',
       /* Szenarien */
       '.dp-pa4-sz{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}',
@@ -717,6 +724,27 @@
   /** kurz(t): der erste GANZE Satz (v3323: nie mitten im Satz abschneiden – Marcel: „bis zum Ende ausgeschrieben") */
   function kurz(t) { return saetze(t, 1); }
 
+  /* v4450 · Marcel 24.11.2026: „mehr mit Bullet Points, dass es in einfacher Ansicht wirklich nur die wichtigen Punkte hat".
+     Die KI liefert je Abschnitt eigene Stichpunkte (kernpunkte). Ältere Analysen haben keine: dort bleibt der gekürzte Text
+     und ein Hinweis, dass der nächste Abruf Stichpunkte bringt (nie aus dem Fließtext zusammengeschnitten). */
+  function kpListe(a, feld) {
+    var k = a && a.kernpunkte && typeof a.kernpunkte === 'object' ? a.kernpunkte[feld] : null;
+    if (!Array.isArray(k)) return null;
+    var r = k.map(function (x) {
+      var t = typeof x === 'string' ? x : (x && (x.t || x.text)) || '';
+      t = String(t).replace(/\s+[–—]\s+/g, ', ').replace(/\s*;\s*/g, ', ').replace(/\*\*/g, '').replace(/\s+/g, ' ').trim();
+      var ton = x && typeof x === 'object' ? String(x.ton || '').toLowerCase() : '';
+      return { t: t, ton: ton === 'gut' ? 'gut' : ton === 'schlecht' ? 'schlecht' : 'neutral' };
+    }).filter(function (x) { return x.t && !/^\.\.\./.test(x.t); });
+    return r.length ? r.slice(0, 5) : null;
+  }
+  function kpHtml(liste, nummeriert) {
+    if (!liste) return '';
+    if (nummeriert) return '<ol class="dp-pa4-kp n">' + liste.map(function (x) { return '<li>' + txt(x.t) + '</li>'; }).join('') + '</ol>';
+    return '<ul class="dp-pa4-kp">' + liste.map(function (x) { return '<li class="' + x.ton + '">' + txt(x.t) + '</li>'; }).join('') + '</ul>';
+  }
+  function kpFehlen(a) { return !(a && a.kernpunkte && typeof a.kernpunkte === 'object'); }
+
   function uebersicht(a, bestand, extra) {
     extra = extra || {};
     window._dpPaLetzte = a;
@@ -729,10 +757,10 @@
     var stufe = sc && window.ScoreTier && window.ScoreTier.stufe ? window.ScoreTier.stufe(sc.wert).wort : '';
     var rechts = (!bestand || sc) ? '<div class="dp-pa4-urteil">' + (bestand ? '' : '<span class="dp-pa-empf" style="background:' + st.farbe + '">' + esc(st.label) + '</span>')
       + (sc ? '<span class="z">' + sc.wert + '</span><span class="u">' + (stufe ? '<b>' + esc(stufe) + '</b>' : '') + esc(sc.name) + '</span>' : '') + '</div>' : '';
-    var h = (extra.hinweis || '') + ergebnis(satz ? txt(satz) : (bestand ? 'Stand heute' : 'Urteil zum Ankauf'), rechts) + kennzahlen(bestand, true);
+    var h = (extra.hinweis || '') + (kpFehlen(a) ? '<p class="dp-pa5-hin dp-pa-e" style="margin:0 0 10px">Diese Analyse ist älter. Mit „Neu abrufen“ steht hier das Wichtigste in Stichpunkten.</p>' : '') + ergebnis(satz ? txt(satz) : (bestand ? 'Stand heute' : 'Urteil zum Ankauf'), rechts) + kennzahlen(bestand, true);
     /* Einordnung | Was jetzt zu tun ist (Bestand) bzw. Zu welchem Anleger der Kauf passt (Ankauf) */
     var links = abKopf(bestand ? 'Einordnung' : 'Begründung')
-      + '<div class="dp-pa-e">' + absatz(saetze(a.empfehlung_begruendung || gb, 2)) + '</div>'
+      + '<div class="dp-pa-e">' + (kpListe(a, 'einordnung') ? kpHtml(kpListe(a, 'einordnung')) : absatz(saetze(a.empfehlung_begruendung || gb, 2))) + '</div>'
       + '<div class="dp-pa-d"><div class="dp-pa4-ta">'
       + (function () { var od = ohneDoppel([gb, a.empfehlung_begruendung, a.investmentbewertung, a.dealpilot_insight]);   /* v3987 · F15 */
         return abschnitt('Gesamtbewertung', absatz(od[0])) + abschnitt(bestand ? 'Einordnung' : 'Begründung des Urteils', absatz(od[1]))
@@ -740,11 +768,14 @@
     var re = '';
     if (bestand) {
       var tun = a.bestand_modus && has(a.verhandlungsempfehlung) ? a.verhandlungsempfehlung : '';
-      re = abKopf('Was jetzt zu tun ist') + (tun ? '<div class="dp-pa-e">' + absatz(saetze(tun, 2)) + '</div><div class="dp-pa-d">' + absatz(tun) + '</div>' : '') + strategieKasten();
-      if (!tun && !strategieKasten()) re = '';
+      var _sch = kpListe(a, 'schritte');   /* v4450 */
+      re = abKopf('Was jetzt zu tun ist') + (tun || _sch ? '<div class="dp-pa-e">' + (_sch ? kpHtml(_sch, true) : absatz(saetze(tun, 2))) + '</div><div class="dp-pa-d">' + absatz(tun) + '</div>' : '') + strategieKasten();
+      if (!tun && !_sch && !strategieKasten()) re = '';
     } else {
       re = fitBlock(a);
       if (re) re = abKopf('Zu welchem Anleger der Kauf passt') + re.replace(/^<div class="dp-pa4-a"><h4>[^<]*<\/h4>/, '<div class="dp-pa4-a" style="border-left:0;padding-left:0">');
+      var _schA = kpListe(a, 'schritte');   /* v4450 · Ankauf: was vor der Unterschrift zu tun ist */
+      if (_schA) re += '<div class="dp-pa-e dp-pa4-mt">' + abKopf('Was jetzt zu tun ist') + kpHtml(_schA, true) + '</div>';
     }
     h += '<div class="dp-pa5-zwei"><div>' + links + '</div>' + (re ? '<div>' + re + '</div>' : '') + '</div>';
     /* Einfach: die Tendenz als kleine Grafik (Vermögen im Objekt über die Jahre) */
@@ -765,13 +796,16 @@
     extra = extra || {};
     var ra = a.risikoanalyse && typeof a.risikoanalyse === 'object' ? a.risikoanalyse : null, sz = a.szenarien && typeof a.szenarien === 'object' ? a.szenarien : {};
     /* v3099e · Einfach: drei Punkte mit je einem Satz; Detail: alle, ganz */
+    var _kpS = kpListe(a, 'staerken'), _kpR = kpListe(a, 'risiken');   /* v4450 */
+    var lstD = function (arr) { return Array.isArray(arr) && arr.length ? '<ul class="dp-pa4-liste">' + arr.map(function (x) { return '<li>' + txt(x) + '</li>'; }).join('') + '</ul>' : '<em class="dp-pa-empty">—</em>'; };
+    var lstKp = function (arr, kp, ton) { if (!kp) return lst(arr); return '<div class="dp-pa-e">' + kpHtml(kp.map(function (x) { return { t: x.t, ton: ton }; })) + '</div><div class="dp-pa-d">' + lstD(arr) + '</div>'; };
     var lst = function (arr) { return Array.isArray(arr) && arr.length ? '<ul class="dp-pa4-liste">' + arr.map(function (x, i) { return (i < 3 ? '<li class="dp-pa-e">' + txt(kurz(x, 140)) + '</li>' : '') + '<li class="dp-pa-d">' + txt(x) + '</li>'; }).join('') + '</ul>' : '<em class="dp-pa-empty">—</em>'; };
     /* v3441 · Ergebnissatz des Abschnitts (Demo Fassung 2): Zahl der Stärken und Risiken, das erste Risiko in einem Satz */
     var nR = Array.isArray(a.risiken) ? a.risiken.length : 0, nS = Array.isArray(a.staerken) ? a.staerken.length : 0;
     var h = (nR || nS) ? ergebnis('<b>' + nS + (nS === 1 ? ' Stärke' : ' Stärken') + ', ' + nR + (nR === 1 ? ' Risiko' : ' Risiken') + '.</b>' + (nR ? ' Zuerst: ' + txt(saetze(a.risiken[0], 1)) : '')) : '';
     h += '<div class="dp-pa-cols">'
-      + karte('<div class="dp-pa-sec good"><span class="dp-pa-bar"></span><span class="dp-pa-lbl">STÄRKEN</span><span class="dp-pa-rule"></span></div>' + lst(a.staerken))
-      + karte('<div class="dp-pa-sec bad"><span class="dp-pa-bar"></span><span class="dp-pa-lbl">RISIKEN</span><span class="dp-pa-rule"></span></div>' + lst(a.risiken))
+      + karte('<div class="dp-pa-sec good"><span class="dp-pa-bar"></span><span class="dp-pa-lbl">STÄRKEN</span><span class="dp-pa-rule"></span></div>' + lstKp(a.staerken, _kpS, 'gut'))
+      + karte('<div class="dp-pa-sec bad"><span class="dp-pa-bar"></span><span class="dp-pa-lbl">RISIKEN</span><span class="dp-pa-rule"></span></div>' + lstKp(a.risiken, _kpR, 'schlecht'))
       + '</div>';
     /* Risikobewertung: Einfach die ersten Sätze, Detail ganz */
     if (ra && (has(ra.finanzierungsrisiko) || has(ra.cashflow_stabilitaet) || has(ra.annahmen_abhaengigkeit))) {
@@ -936,7 +970,7 @@
         + 'Die Linie ist der Cashflow nach Steuern. Markiert sind der Wendepunkt, das Ende der Zinsbindung und das Datum, ab dem ein Verkauf nach § 23 EStG steuerfrei ist. Es ist dieselbe Rechnung wie im Reiter Steuer.'));
     h += karte(kopfzeile('Steuerliche Zusammenfassung')
       + (has(a.steuer_zusammenfassung)
-        ? '<p class="dp-pa-p dp-pa-e">' + txt(kurz(a.steuer_zusammenfassung, 220)) + '</p><p class="dp-pa-p dp-pa-d">' + txt(a.steuer_zusammenfassung) + '</p>'
+        ? (kpListe(a, 'steuer') ? '<div class="dp-pa-e">' + kpHtml(kpListe(a, 'steuer')) + '</div>' : '<p class="dp-pa-p dp-pa-e">' + txt(kurz(a.steuer_zusammenfassung, 220)) + '</p>') + '<p class="dp-pa-p dp-pa-d">' + txt(a.steuer_zusammenfassung) + '</p>'
         : '<div class="dp-pa-fuss" style="margin-top:0">Diese Analyse wurde vor der steuerlichen Zusammenfassung erstellt. Beim nächsten Abruf steht sie hier.</div>')
       + '<div class="dp-pa-fuss dp-pa-d">Eine Einordnung aus deinen Eingaben im Reiter Steuer – keine Steuerberatung. Lass sie von deinem Steuerberater bestätigen.</div>', 'dp-pa4-mt');
     /* v3323 · Marcel 12.11.2026: „steuerlich Ankauf gegen heute … die Steuersachen zu Steuern“ - stand bis hier unter Ankauf · Bestand · Zielbild */
