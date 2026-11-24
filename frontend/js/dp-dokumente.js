@@ -501,6 +501,26 @@
   }
   /* v4580 · Marcel 24.11.2026: „Ertragswert Bestand. Ist das jetzt überhaupt führend? Da steige ich gar nicht durch.“ Die Rolle des
      Ertragswerts steht jetzt an der Überschrift: führend nur, wenn er der maßgebende Wert ist (calc.js wert_anker). */
+  /* v4580 · MUSTER (Marcel 24.11.2026: „unten extrem viel Text zur Aufteilung … kurz und knapp, auch woher es kommt“). Nur in den
+     Musterfassungen investment_muster / kurz_muster gesetzt, die regulären Fassungen bleiben, bis Marcel die Muster freigibt. */
+  var _knapp = false;
+  function fussKnapp(B, PD) {
+    var f = klar(PD.fuss || ''), A = St().wert_anker, pk = [];
+    var lzs = f.match(/Liegenschaftszins (\d+,\d+ %(?: \([^)]*\))?(?: bzw\. \d+,\d+ %(?: \([^)]*\))?)?)/), jahre = f.match(/Jahre: ([^]*?)\.?\s*$/), ks = f.match(/Kappungsgrenze (\d+ %)/), vm = f.match(/Vergleichsmiete (\d+,\d+ €\/m²)/);
+    if (A && A.art) pk.push('Führend: ' + (ANKER_NAME[A.art] || 'Wert aus dem Marktbericht') + '. Der Ertragswert' + ewRolle().replace(/[()]/g, '').replace(/^ /, ', ') + '.');
+    pk.push('Mieterhöhung: Wert zum heutigen Stichtag, Erhöhungen erst ab Wirksamkeit und abgezinst.');
+    pk.push('Zielbild: Ausblick mit umgesetzten Maßnahmen, kein heutiger Verkehrswert.');
+    pk.push('Marktpreisindikation: aus Angebotspreisen am Ort, sie hängt nicht an der Miete.');
+    if (lzs) pk.push('Liegenschaftszins ' + lzs[1] + '.');
+    if (ks || vm) pk.push([ks ? 'Kappungsgrenze ' + ks[1] + ' in 3 Jahren' : '', vm ? 'Vergleichsmiete ' + vm[1] + ' (Mietspiegel)' : ''].filter(Boolean).join(', ') + '.');
+    if (jahre) pk.push('Jahre: ' + jahre[1].replace(/\s*\([^)]*\)/g, '') + '.');
+    return '<ul class="det" style="margin:2mm 0 0 4mm;padding:0">' + pk.map(function (x) { return '<li>' + B.esc(x) + '</li>'; }).join('') + '</ul>';
+  }
+  function herkunftJeWohnung(B, PD) {
+    var h = {}; (PD.wert_je_wohnung || []).forEach(function (w) { var t = String(w.verfahren || ''), i = t.indexOf(' · '); if (i > 0) h[t.slice(i + 3)] = 1; });
+    var l = Object.keys(h); if (!l.length) return '';
+    return '<p class="det">Herkunft: ' + B.esc(l.join(' · ')) + '</p>';
+  }
   function ewRolle() {
     var A = St().wert_anker, auf = A && A.art === 'aufteiler';
     if (!A) return '';
@@ -537,11 +557,11 @@
           + PD.wert_je_wohnung.map(function (w) {
             var v = _vz(w.verfahren);
             return '<tr><td>' + B.esc(w.we) + '</td><td class="r num">' + B.esc(B.zahl(w.wfl, 0)) + '</td><td class="r num">' + B.esc(w.wert) + '</td>'
-              + '<td style="white-space:normal">' + B.esc(v[0]) + (v[1] ? '<div class="det">' + B.esc(v[1]) + '</div>' : '') + '</td><td class="r num">' + B.esc(w.stuetzend) + '</td></tr>';
+              + '<td style="white-space:normal">' + B.esc(v[0]) + (v[1] && !_knapp ? '<div class="det">' + B.esc(v[1]) + '</div>' : '') + '</td><td class="r num">' + B.esc(w.stuetzend) + '</td></tr>';
           }).join('')
           + (WS ? '<tr class="summe"><td>Summe nach Aufteilung</td><td></td><td class="r num">' + B.esc(WS.summe + (WS.vollstaendig ? '' : '*')) + '</td><td style="white-space:normal">'
             + B.esc(WS.bezeichnung) + ' · führend</td><td></td></tr>' : '')
-          + '</tbody></table>';
+          + '</tbody></table>' + (_knapp ? herkunftJeWohnung(B, PD) : '');
       }
       if (PD.bruecke && PZ && typeof PZ.ueberleitungZeilen === 'function') {
         var UZ = PZ.ueberleitungZeilen(PD.bruecke) || [], um = Math.max.apply(null, UZ.filter(function (z) { return z.schritt; }).map(function (z) { return Math.abs(z.w); }).concat([1]));
@@ -561,7 +581,7 @@
         h += '<div class="block"><h3>Kennzahlen je Stufe</h3>' + tab(B, ['Kennzahl'].concat(PD.spalten.map(function (k) { return PD.titel[k]; })),
           PD.kennzahlen.map(function (z) { return { w: z.map(String), art: /^Ertragswert|^nach Aufteilung/.test(z[0]) ? 'summe' : '' }; }).concat([{ w: ['Kaufpreis'].concat(PD.spalten.map(function (k, i) { return i ? '' : B.eur(K.kp); })) }]))
           /* v3332 · PD.fuss traegt den Aufteilungshinweis schon (potenzial.js pdfDaten) - er stand zweimal da */
-          + '<p class="det">' + B.esc(klar(PD.fuss || '')) + '</p></div>';
+          + (_knapp ? fussKnapp(B, PD) : '<p class="det">' + B.esc(klar(PD.fuss || '')) + '</p>') + '</div>';
       }
     } else if (WZ && WZ.stufen && WZ.stufen.length) {
       h += '<h3>Ertragswert je Stufe</h3>' + tab(B, ['Stufe', 'Ertragswert', 'Maßnahmen', 'Marktpreisindikation'], WZ.stufen.map(function (s) { return [s.titel, B.eur(s.wert), s.kosten ? B.eur(s.kosten) : '–', s.mpi != null ? B.eur(s.mpi) : '–']; }));
@@ -573,7 +593,7 @@
       /* v3180c · Bankfassung ohne die Erklaertexte des Marktberichts (Methodik) - die Zahlen stehen in den Tabellen darueber */
       if (!kurz && !bank) (WZ.texte || []).forEach(function (t) { h += '<div class="block"><h3>' + B.esc(t.h) + '</h3>' + t.p.map(function (x) { return '<p>' + B.esc(klar(x)) + '</p>'; }).join('') + '</div>'; });
       /* v3180c · die Kennzeichnung steht schon im Fuss der Stufen-Tabelle (PD.fuss) - nicht zweimal */
-      if (WZ.hinweis && !(PD && PD.fuss && !kurz)) h += '<p class="det">' + B.esc(klar(WZ.hinweis)) + '</p>';
+      if (WZ.hinweis && !(PD && PD.fuss && !kurz) && !_knapp) h += '<p class="det">' + B.esc(klar(WZ.hinweis)) + '</p>';
     }
     return h;
   }
@@ -760,6 +780,114 @@
     if (pa) S.push(B.seite(c, 'Gesamtbewertung', B.abschnitt(ab(), 'Gesamtbewertung') + pa));   /* v4390b */
     S.push(B.seite(c, 'Annahmen', B.abschnitt('Anhang', 'Annahmen und Hinweise') + annahmenVoll(K, B, kurz)));
     return B.dokument(name + ' · ' + o.adresse, S);
+  }
+
+  /* ── v4580 · MUSTER: Investment-PDF neu geordnet und Kurzfassung für die Bank ─────────────────────────────────────────
+     Marcel 24.11.2026: „das Deckblatt können wir lassen … vernünftiges Inhaltsverzeichnis, sauber strukturieren, einen Überblick auch
+     mit Bildern, mit der Energieeffizienz … Finanzierung in den Phasen … Kennzahlen, Cashflow je Jahr, die Projektion, die Graphen …
+     mit den Tabellen … Einheiten und Zustand, Wert und Zielbild.“ Und zur Kurzfassung: eine Bank liest sie und sagt „könnten wir
+     drüber nachdenken“, mit dem vollen PDF geht man ins Gespräch. Am 24.11. hat er eine ausgedünnte Fassung als „zu dünn“
+     abgelehnt: die volle Fassung streicht NICHTS, sie ordnet nur. Erreichbar nur über DpDokumente.dokument('investment_muster' |
+     'kurz_muster'), kein Knopf. Erst nach Marcels Freigabe der Muster ersetzt sie die bisherigen Fassungen. */
+  function inhaltSeite(c, B, teile) {
+    return B.seite(c, 'Inhalt', B.abschnitt('Investment Case', 'Inhalt')
+      + '<table class="inhalt"><tbody>' + teile.map(function (t, i) {
+        return '<tr><td class="num" style="width:12mm;color:var(--gold-d);font-weight:700">' + (t[2] || (i + 1)) + '</td><td><b>' + B.esc(t[0]) + '</b><div class="det">' + B.esc(t[1]) + '</div></td></tr>';
+      }).join('') + '</tbody></table>');
+  }
+  function cfDiagramm(B) {
+    var rows = St().cfRows || []; if (rows.length < 2) return '';
+    return B.linien([
+      { name: 'Cashflow vor Steuern', klasse: 'l1', werte: rows.map(function (r) { return { x: Number(r.cal || r.y), y: r.cfop_y }; }) },
+      { name: 'Cashflow nach Steuern', klasse: 'l3', werte: rows.map(function (r) { return { x: Number(r.cal || r.y), y: r.cfns_y }; }) }
+    ], { null: true, h: 150, fmt: function (v) { return B.zahl(v / 1000, 1) + ' T€'; }, titel: 'Cashflow je Jahr' });
+  }
+  function aufteilungZeile() {
+    var A = St().wert_anker; if (!A || A.art !== 'aufteiler') return '';
+    return '<p class="det">In Wohnungseigentum aufgeteilt: Wert als Summe der Wohnungen (Vergleichswert je Wohnung nach Aufteilungskosten), das Haus als Ganzes (Ertragswert) stützt.</p>';
+  }
+  function ersterSatz(t) { t = klar(t); var e = t.indexOf('. '); return e > 40 ? t.slice(0, e + 1) : t; }
+  async function investmentMuster(art) {
+    var kurz = art === 'kurz';
+    var PZ0 = window.DpPotenzial;
+    try { if (PZ0 && PZ0.modell && PZ0.modell().aktiv) { await Promise.race([PZ0.rechnen(), new Promise(function (f) { setTimeout(f, 40000); })]); if (typeof window.calcNow === 'function') window.calcNow(); } } catch (e0) {}
+    var B = D(), K = (window.State && State.kpis) || {}, o = objektKopf(), key = window._currentObjKey, S0 = St();
+    var name = kurz ? 'Investment Case · Kurzfassung' : 'Investment Case';
+    var SC = scoreDaten(K);
+    var z = await Promise.all([basis(name), objektInfo(key, o.adresse)]);
+    var c = z[0], info = z[1], fotos = info.fotos; c.zeile = o.adresse; o.seq = info.seq || o.seq;
+    var PD = null, WZ = null, PZ = window.DpPotenzial;
+    try { if (PZ && PZ.modell && PZ.modell().aktiv) PD = PZ.pdfDaten(); } catch (e) { PD = null; }
+    try { if (window.DpPdfWertZielbild) WZ = await DpPdfWertZielbild.daten({ potenzial: PD }); } catch (e) { WZ = null; }
+    var mw = massgebend(B);
+    var deck = B.deckblatt(c, { bild: fotos[0] || info.karte || null, eyebrow: name, titel: o.adresse, unter: [o.art, o.wfl ? B.zahl(o.wfl, 0) + ' m² Wohnfläche' : '', o.bj ? 'Baujahr ' + B.jahr(o.bj) : ''].filter(Boolean).join(' · '),
+      kz: [{ l: 'Kaufpreis', v: B.eur(K.kp) }, mw ? { l: mw.name, v: B.eur(mw.wert), s: 'führendes Verfahren' } : { l: 'Gesamtinvestition', v: B.eur(K.gi) }, { l: 'Eigenkapital', v: B.eur(K.ek) }, { l: 'Bruttomietrendite', v: B.pct(K.bmy, 2), art: 'hi' }],
+      meta: [['Objekt-Nr.', o.seq || '–'], ['Stand', c.stand], ['Deal Score', SC.score != null ? B.zahl(SC.score, 0) + ' · ' + (SC.label || '') : '–']],
+      zitat: feld('thesis') || '', hinweisRechts: 'Finanzierungsunterlage' });
+    var steck = '<div class="kv">' + [['Objektart', o.art], ['Baujahr', B.jahr(o.bj)], ['Wohnfläche', o.wfl ? B.zahl(o.wfl, 0) + ' m²' : '–'], ['Grundstück', o.gs ? B.zahl(o.gs, 0) + ' m²' : '–'],
+      ['Kaufdatum', B.datum(feld('kaufdat')) || '–'], ['Energieklasse', feld('ds2_energie') || '–']].map(function (k) { return '<div><span>' + k[0] + '</span><span>' + B.esc(k[1]) + '</span></div>'; }).join('') + '</div>';
+    var bild = fotos[0] || info.karte || null;
+    var kern9 = B.kacheln([
+      mw ? { l: mw.name + ' · führend', v: B.eur(mw.wert), s: mw.det } : null,
+      { l: 'Kaufpreis', v: B.eur(K.kp), s: K.gi ? 'Gesamtinvestition ' + B.eur(K.gi) : '' },
+      { l: 'Kaltmiete p. a.', v: B.eur(K.nkm_j), s: 'Bruttomietrendite ' + B.pct(K.bmy, 2) },
+      { l: 'DSCR', v: B.zahl(K.dscr, 2), s: 'Schuldendienstdeckung', art: K.dscr >= 1.2 ? 'gut' : 'schlecht' },
+      { l: 'LTV', v: B.pct(K.ltv, 1), s: S0.ltv_basis_label ? 'auf ' + S0.ltv_basis_label : '' },
+      { l: 'Eigenkapital', v: B.eur(K.ek), s: B.zahl(K.gi ? K.ek / K.gi * 100 : 0, 1) + ' % der Gesamtinvestition' },
+      { l: 'Cashflow vor Steuern', v: B.eurS(K.cf_m), s: 'je Monat', art: (K.cf_m || 0) >= 0 ? 'gut' : 'schlecht' },
+      { l: 'Cashflow nach Steuern', v: B.eurS(K.cf_ns), s: 'im Jahr', art: (K.cf_ns || 0) >= 0 ? 'gut' : 'schlecht' },
+      { l: 'Deal Score', v: SC.score ? B.zahl(SC.score, 0) + ' / 100' : '–', s: SC.label || '', art: 'hi' }
+    ].filter(Boolean), true);
+    var Sx = [deck];
+    if (kurz) {
+      /* Kurzfassung: Auf einen Blick, Kernaussagen mit Vermögensaufbau, Finanzierung mit DSCR und LTV, Annahmen */
+      Sx.push(B.seite(c, 'Auf einen Blick', B.abschnitt('Kurzfassung', 'Auf einen Blick', o.adresse + ' · ' + o.art)
+        + '<div class="zwei"><div>' + steck + (feld('ds2_energie') ? B.energieSkala(feld('ds2_energie')) : '') + '</div><div>'
+        + (bild ? '<img class="karte" src="' + bild + '" alt="" style="height:58mm;width:100%;object-fit:cover">' : '') + '</div></div>'
+        + '<h3>Die wichtigsten Zahlen</h3>' + kern9 + aufteilungZeile()));
+      var ai = window._aiAnalysis || null, pk = [], rk = [];
+      try { pk = ((ai && (ai.staerken || ai.strengths)) || []).slice(0, 3); } catch (e) {}
+      try { rk = ((ai && (ai.risiken || ai.schwaechen || ai.risks)) || []).slice(0, 2); } catch (e) {}
+      var kernH = (WZ && WZ.kern && WZ.kern.length) ? B.kacheln(WZ.kern.slice(0, 6).map(function (k) { return { l: k.titel, v: k.wert_text || '' }; }), true) : '';
+      var punkte = function (titel, arr) { return arr.length ? '<h3>' + titel + '</h3><ul>' + arr.map(function (x) { return '<li>' + B.esc(ersterSatz(x)) + '</li>'; }).join('') + '</ul>' : ''; };
+      Sx.push(B.seite(c, 'Kernaussagen', B.abschnitt('Kurzfassung', 'Kernaussagen') + kernH + punkte('Was dafür spricht', pk) + punkte('Worauf zu achten ist', rk)
+        + '<h3>Vermögensaufbau</h3>' + (gbKarte('_aufbauHtml') || '') + '<p class="det">Objektwert fortgeschrieben mit der angenommenen Wertsteigerung, keine Bewertung nach § 194 BauGB.</p>'));
+      var dl = darlehen();
+      var dlT = '<table class="dicht"><thead><tr><th>Darlehen</th><th class="r">Betrag</th><th class="r">Zins</th><th class="r">Tilgung</th><th class="r">Bindung</th><th class="r">Rate / Monat</th></tr></thead><tbody>'
+        + dl.map(function (d) { return '<tr><td>' + B.esc(d.name) + '</td><td class="r num">' + B.eur(d.betrag) + '</td><td class="r num">' + B.pct(d.zins, 2) + '</td><td class="r num">' + B.pct(d.tilg, 2) + '</td><td class="r num">' + (d.bind ? B.zahl(d.bind, 0) + ' J.' : '–') + '</td><td class="r num">' + B.eur(d.rate, 0) + '</td></tr>'; }).join('')
+        + '</tbody></table>';
+      Sx.push(B.seite(c, 'Finanzierung', B.abschnitt('Kurzfassung', 'Finanzierung und Tragfähigkeit') + dlT + dreiPhasen(K, B) + bankCockpit(B, true)
+        + '<p class="det">Mit dem vollständigen Investment Case gehen wir gern ins Gespräch: Einheiten, Wertermittlung, Cashflow je Jahr, Belastungsprobe und Annahmen im Einzelnen.</p>'));
+      Sx.push(B.seite(c, 'Annahmen', B.abschnitt('Anhang', 'Annahmen') + annahmenVoll(K, B, true)));
+      return B.dokument(name + ' · ' + o.adresse, Sx);
+    }
+    /* volle Fassung: dieselben Bausteine wie investment('voll'), neu geordnet, mit Inhaltsverzeichnis */
+    _knapp = true;
+    try {
+      var T = [], P = [];
+      var add = function (titel, unter, html) { if (!html) return; T.push([titel, unter]); P.push([titel, html]); };
+      add('Überblick', 'Deal Score, Kennzahlen, Ansprechpartner', '<div class="zwei"><div>' + B.scoreRing(SC.score, SC.label) + '</div><div>'
+        + B.kacheln([{ l: 'CF n. St. Jahr 1', v: B.eurS(K.cf_ns), art: (K.cf_ns || 0) >= 0 ? 'gut' : 'schlecht' }, { l: 'CF n. St. Ende Zinsbindung', v: B.eurS(K.cf_ns_ezb) }]).replace('class="kz"', 'class="kz" style="grid-template-columns:1fr 1fr"') + '</div></div>'
+        + '<h3>Kennzahlen</h3>' + kennzahlen12(K, B, SC) + aufteilungZeile() + ansprechpartner(c, B));
+      var gal = fotos.length > 1 ? '<h3>Objektfotos</h3><div class="galerie">' + fotos.slice(1, 5).map(function (f) { return '<img src="' + f + '" alt="">'; }).join('') + '</div>' : '';
+      add('Objekt', 'Steckbrief, Ansichten, Energieeffizienz', steck + (bild ? '<img class="karte" src="' + bild + '" alt="" style="height:70mm;width:100%;object-fit:cover;margin-top:3mm">' : '') + gal
+        + (feld('ds2_energie') ? '<h3>Energieeffizienz</h3>' + B.energieSkala(feld('ds2_energie')) : '') + gesellschaft(B));
+      add('Einheiten und Zustand', 'Mieterliste, Ist gegen Soll, Modernisierung', mieterliste(K, B));
+      add('Wert und Zielbild', 'Werte je Verfahren, Wert je Wohnung, Wertüberleitung, Kennzahlen je Stufe', wertZielbild(K, B, WZ, PD, false, false));
+      add('Investition und Finanzierung', 'Investition, Darlehen, drei Phasen', finanzierungVoll(K, B, false)
+        + '<h3 style="break-before:page;page-break-before:always">Finanzierung in drei Phasen</h3>' + dreiPhasen(K, B) + phasenVoll(K, B));
+      add('Ertrag und Kennzahlen', 'Von der Warmmiete zum Cashflow, Bewirtschaftung, Steuer', ertragKette(K, B)
+        + '<div class="zwei"><div>' + bewirtschaftungDetail(K, B) + '</div><div>' + steuerWirkung(K, B) + '</div></div>');
+      add('Cashflow je Jahr', (St().cfRows || []).length + ' Jahre als Grafik und Tabelle', '<div class="block"><h3>Cashflow vor und nach Steuern</h3>' + cfDiagramm(B) + '</div>' + cfJahre(B));
+      add('Projektion und Vermögen', 'Wert, Restschuld, Eigenkapital, Zuwachs, Exit', vermoegenVoll(K, B));
+      var bc = bankCockpit(B, false), sm = stressMatrix(B);
+      add('Bank-Cockpit und Belastungsprobe', 'DSCR und LTV im Verlauf, Zins- und Mietstress', (bc || '') + (sm || ''));
+      add('Gesamtbewertung', 'Gesamtbewertung, Stärken, Schwächen, Lage und Markt', pilotAnalyse(B, false, false));
+      Sx.push(inhaltSeite(c, B, T.concat([['Annahmen und Hinweise', 'Annahmen, Grundlagen', 'A']])));
+      P.forEach(function (p, i) { Sx.push(B.seite(c, p[0], B.abschnitt('Abschnitt ' + (i + 1), p[0]) + p[1])); });
+      Sx.push(B.seite(c, 'Annahmen', B.abschnitt('Anhang', 'Annahmen und Hinweise') + annahmenVoll(K, B, false)));
+    } finally { _knapp = false; }
+    return B.dokument(name + ' · ' + o.adresse, Sx);
   }
 
   /* ── 4 · Kaufpreisaufteilung ─────────────────────────────────────── */
@@ -1602,7 +1730,8 @@
 
   /* ── Einstieg ────────────────────────────────────────────────────── */
   var TYPEN = {
-    investment: function () { return investment('voll'); }, bank: function () { return investment('bank'); }, kurz: function () { return investment('kurz'); },
+    investment: function () { return investment('voll'); }, investment_muster: function () { return investmentMuster('voll'); }, kurz_muster: function () { return investmentMuster('kurz'); },   /* v4580 · Muster, kein Knopf */
+    bank: function () { return investment('bank'); }, kurz: function () { return investment('kurz'); },
     kaufpreisaufteilung: kaufpreisaufteilung, finanzamt: function (o) { return finanzamt(3, false, o); }, finanzamt_anlagev: function (o) { return finanzamt(3, true, o); }, trackrecord: trackRecord, bankexport: bankexport, selbstauskunft: selbstauskunft,
     steuermappe: steuermappe,   /* v3471 · Steuer-Mappe im einheitlichen Design */
     jahresabschluss: jahresabschluss,   /* v3480 · Jahresabschluss der Gesellschaft */
