@@ -45304,3 +45304,9 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Commit:** main 2d0b28f9 (cherry-pick 4e834b96 von staging 89e85860), Merge zurueck 5c5902f7.
 - **Nachweis:** Staging-Browser Westerfeldstr. 146: Kaltmiete 39.420 € je Spalte, DSCR 1,34/1,18/1,23/1,39, Hinweis Mietausfall 0 → 3.942 €; Demostrasse 5: Hinweis Mietausfall 125 → 158 €, Hausgeld 1.080 → 1.200 €; PUTs abgefangen, DB-md5 vorher = nachher. score-ketten 216, flow-berechnen RC 0, objekt-mapper, mietpotenzial 311, grafiken-neu 49, vorschau, buster sauber. Prod: Sicherungen *-20261124-0916-qq, backend + mb-backend healthy, Buster v4440 per curl.
 - **Rest:** Cashflow-Zeile Ankauf bleibt die Rechnung von damals (gewollt).
+
+### Rollout 1.0.166 · 24.11.2026 · v4450
+- **Was:** Pilot-Analyse Einfach als Stichpunkte: KI-Feld `kernpunkte` (openaiService.js Prompt), Darstellung in pilot-analyse-v4.js (Übersicht Einordnung + Was jetzt zu tun ist nummeriert, Risiken Stärken/Risiken, Steuer), alte Analysen mit Hinweis "Neu abrufen".
+- **Commit:** staging 5e922961, main a9da5da1 + eaf89878 (Version), Merge zurück e2591f2f.
+- **Nachweis:** prompt-lecks, ki-deckel, grafiken-neu 49, vorschau, buster-ebenen sauber; Staging-Browser Demostraße 5 und Westerfeldstr. 146 neu abgerufen; Prod: Sicherung haupt-20261124-0935-ss, Backend healthy, Buster v4450, Prompt im Container.
+- **Rest:** 390 px nicht per Fenster gemessen · KI-Prozentangabe "unter/über" kann kippen (Prompt fordert nur Zahlen aus dem Langtext).
