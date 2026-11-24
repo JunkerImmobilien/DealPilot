@@ -2,7 +2,7 @@
 /* ═══ js/vivi.js — v3950 · ViVi-ANBINDUNG IM BROWSER (Pakete V1 bis V3) ═══════════════════════════════
  *
  * Bauplan Dateien/Architektur/ViVi-Anbindung-2026-11-22.md. Marcels Regeln vom 22.11.2026:
- *   · einmal anlegen: Knopf „In ViVi anlegen“ am Objekt, vorher eine Vorschau aller Werte, die rausgehen
+ *   · einmal anlegen: „In ViVi anlegen“ in Deal-Aktion und in den Einstellungen (v4400, vorher am Objekt), mit Vorschau
  *   · danach nur lesen: „Jetzt abgleichen“ holt die Werte aus ViVi, nichts geht zurueck
  *   · verknuepfte Felder sind ausgegraut (js/vivi-felder.js)
  *
@@ -11,7 +11,7 @@
  *
  * Teile:
  *   verbindungKarte(host)   Einstellungen › Konto › Externe Anbieter: Token eintragen, Test-Abruf, Liste
- *   Leiste am Objekt        #vivi-leiste im Reiter Objekt unter dem Kopf: Status, anlegen, abgleichen, loesen
+ *   Leiste am Objekt        #vivi-leiste im Reiter Objekt, nur verknuepft: Status, abgleichen, loesen (v4400)
  *   Vorschau-Fenster        #vivi-ov: Werte, Hinweise, fehlende Angaben, Account, Bestaetigung
  * Kundentexte ohne Gedankenstrich und Semikolon, keine Datenquellennamen.
  * ═════════════════════════════════════════════════════════════════════════════════════════════════ */
@@ -55,9 +55,24 @@
       '.vivi-leiste .vivi-marke{font:600 11px/1 "JetBrains Mono",ui-monospace,monospace;letter-spacing:.08em;text-transform:uppercase}',
       '.vivi-leiste .vivi-text{flex:1 1 220px;min-width:0}',
       '.vivi-leiste .vivi-knoepfe{display:flex;flex-wrap:wrap;gap:6px}',
-      '#vivi-ov{position:fixed;inset:0;z-index:99998;background:rgba(5,5,5,.55);display:flex;align-items:center;justify-content:center;padding:16px}',
-      '#vivi-ov .vivi-karte{background:#FDFCFA;color:#2A2727;border-radius:12px;max-width:760px;width:100%;max-height:calc(100vh - 32px);overflow:auto;padding:18px 20px;box-shadow:0 18px 50px rgba(0,0,0,.35);font:400 13px/1.45 Inter,system-ui,sans-serif}',
-      '#vivi-ov h3{margin:0 0 6px;font:600 17px/1.3 "Space Grotesk",Inter,sans-serif}',
+      /* v4400 · Marcel 24.11.2026: Fenster im DealPilot-Design wie „Belege einlesen“ (.oabi-ov, modal-boarding-skin.js
+         legt Obsidian-Leiste und Gold-Kopf darüber, Farben aus den Whitelabel-Token). Kein Schließen per Klick daneben. */
+      '#vivi-ov.oabi-ov{z-index:99998}',
+      '#vivi-ov .oabi-modal{width:min(760px,100%);max-height:92vh}',
+      '#vivi-ov .oabi-body{padding:14px 22px 16px;font:400 13px/1.5 Inter,system-ui,sans-serif;color:var(--ch, #2A2727)}',
+      '#vivi-ov .oabi-body p{margin:0 0 10px}',
+      '#vivi-ov .oabi-foot{flex:none;align-items:center}',
+      '#vivi-ov .vivi-wahlliste{display:flex;flex-direction:column;gap:6px;margin:6px 0}',
+      '#vivi-ov .vivi-wahlliste label.vivi-wahl{margin:0;padding:9px 11px;border:1px solid var(--border, #E7E2DC);border-radius:10px;cursor:pointer}',
+      '#vivi-ov .vivi-wahlliste label.vivi-wahl:has(input:checked){border-color:var(--wl-c9a84c, #C9A84C);background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 7%, #fff)}',
+      '@media (max-width:640px){#vivi-ov.oabi-ov{padding:0;align-items:stretch}#vivi-ov .oabi-modal{max-height:none;height:100%;width:100%;border-radius:0;border:0}#vivi-ov .oabi-body{padding:12px 14px}}',
+      '.vivi-obj-liste{margin-top:10px;border:1px solid var(--border, #E7E2DC);border-radius:10px;overflow:hidden}',
+      '.vivi-obj-liste .vivi-obj{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;padding:9px 12px;border-top:1px solid var(--border, #E7E2DC);font:400 12.5px/1.4 Inter,system-ui,sans-serif}',
+      '.vivi-obj-liste .vivi-obj:first-child{border-top:0}',
+      '.vivi-obj-liste .vivi-obj-adr{flex:1 1 220px;min-width:0}',
+      '.vivi-obj-liste .vivi-obj-st{display:block;color:var(--muted, #7A7370);font-size:11.5px}',
+      '.vivi-obj-liste .vivi-obj-k{display:flex;gap:6px;flex-wrap:wrap}',
+      '.vivi-obj-liste .vivi-obj-k .btn-ghost{border:1px solid var(--border, #E7E2DC) !important;background:#fff !important;color:var(--ch, #2A2727) !important}',
       '#vivi-ov table{width:100%;border-collapse:collapse;margin:8px 0;font-size:12.5px}',
       '#vivi-ov td,#vivi-ov th{padding:5px 6px;border-bottom:1px solid rgba(42,39,39,.1);text-align:left;vertical-align:top}',
       '#vivi-ov th{font:600 10px/1.2 "JetBrains Mono",ui-monospace,monospace;letter-spacing:.08em;text-transform:uppercase;color:#7A7370}',
@@ -66,9 +81,6 @@
       '#vivi-ov .vivi-hinw{border-left:3px solid var(--wl-c9a84c, #C9A84C);padding:6px 10px;margin:8px 0;background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 7%, transparent)}',
       '#vivi-ov .vivi-fuss{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end;margin-top:12px}',
       '#vivi-ov label.vivi-wahl{display:flex;gap:8px;align-items:center;margin:6px 0}',
-      '#vivi-ov details summary{cursor:pointer;color:#7A7370;margin-top:8px}',
-      '#vivi-ov pre{white-space:pre-wrap;font-size:11px;background:rgba(42,39,39,.05);padding:8px;border-radius:6px;max-height:240px;overflow:auto}',
-      '@media (max-width:640px){#vivi-ov{padding:8px}#vivi-ov .vivi-karte{padding:14px}#vivi-ov td,#vivi-ov th{padding:4px}}'
     ].join('');
     document.head.appendChild(s);
   }
@@ -117,14 +129,44 @@
         if (!confirm('ViVi-Token in DealPilot löschen? Verknüpfte Objekte bleiben verknüpft, werden aber nicht mehr gelesen.')) return;
         api('/vivi/verbindung', { method: 'DELETE' }).then(karteLaden).catch(function () { alert('Löschen fehlgeschlagen.'); });
       };
-      api('/vivi/objekte').then(function (r) {
-        var L = (r && r.objekte) || []; var ziel = $('pk-vivi-objekte'); if (!ziel) return;
-        ziel.innerHTML = L.length ? '<b>Verknüpfte Objekte</b><br>' + L.map(function (o) {
-          return esc([o.str, o.hnr].filter(Boolean).join(' ') + (o.ort ? ', ' + o.ort : '')) + ' · ' + esc(o.anlage_status === 'fertig' ? standText(o.letzter_abruf) : (o.anlage_status === 'abgebrochen' ? 'Übertragung unterbrochen' : 'Übertragung läuft')) + (o.letzter_fehler ? ' · ' + esc(o.letzter_fehler) : '');
-        }).join('<br>') : 'Noch kein Objekt mit ViVi verknüpft.';
-      }).catch(function () {});
+      objektListe();
     }).catch(function () { body.innerHTML = '<p class="hint">ViVi ist gerade nicht verfügbar.</p>'; });
   }
+
+  /* v4400 · Marcel 24.11.2026: Anlegen und Verknüpfen auch hier, je Objekt. Gelistet werden deine gewonnenen bzw.
+     Bestandsobjekte (wie Deal-Aktion: _deal_won oder Ankauf festgeschrieben) und alles, was schon verknüpft ist.
+     Kundenstände eines Partners (kunde_ziel 'kunde') nie. */
+  function objektListe() {
+    var ziel = $('pk-vivi-objekte'); if (!ziel) return;
+    Promise.all([
+      api('/vivi/objekte').then(function (r) { return (r && r.objekte) || []; }).catch(function () { return []; }),
+      api('/objects').then(function (r) { return (r && (r.items || r.objects)) || []; }).catch(function () { return []; })
+    ]).then(function (x) {
+      var ziel2 = $('pk-vivi-objekte'); if (!ziel2) return;
+      var V = {}; x[0].forEach(function (v) { V[String(v.object_id)] = v; });
+      var L = x[1].filter(function (o) {
+        if (o.kunde_ziel === 'kunde') return false;
+        return V[String(o.id)] || o.deal_won === true || !!o.ankauf_stichtag || !!o.ankauf_kurz;
+      });
+      if (!L.length) { ziel2.innerHTML = '<p class="hint" style="margin:0">Noch kein Objekt im Bestand. Anlegen und Verknüpfen geht, sobald ein Objekt gewonnen ist.</p>'; return; }
+      ziel2.innerHTML = '<b>Deine Objekte im Bestand</b><div class="vivi-obj-liste">' + L.map(function (o) {
+        var v = V[String(o.id)], st, k = '';
+        var adr = [o.str, o.hnr].filter(Boolean).join(' ') + (o.ort ? ', ' + o.ort : '');
+        if (v && v.anlage_status === 'fertig') st = 'Mit ViVi verknüpft · ' + standText(v.letzter_abruf) + (v.letzter_fehler ? ' · ' + v.letzter_fehler : '');
+        else if (v && v.anlage_status === 'abgebrochen') { st = 'Übertragung unterbrochen. Ein neuer Versuch setzt an der letzten Stelle fort.'; k = '<button type="button" class="btn btn-sm btn-gold" data-vivi-obj="anlegen" data-id="' + esc(o.id) + '">Fortsetzen</button>'; }
+        else if (v) st = 'Übertragung läuft';
+        else { st = 'Nicht mit ViVi verknüpft'; k = '<button type="button" class="btn btn-sm btn-gold" data-vivi-obj="anlegen" data-id="' + esc(o.id) + '">In ViVi anlegen</button><button type="button" class="btn btn-sm btn-ghost" data-vivi-obj="zuordnen" data-id="' + esc(o.id) + '">Verknüpfen</button>'; }
+        return '<div class="vivi-obj"><span class="vivi-obj-adr"><b>' + esc(o.kuerzel || o.seq_no || '') + '</b> ' + esc(adr || o.name || '') + '<span class="vivi-obj-st">' + esc(st) + '</span></span><span class="vivi-obj-k">' + k + '</span></div>';
+      }).join('') + '</div>';
+    });
+  }
+  document.addEventListener('click', function (ev) {
+    var b = ev.target && ev.target.closest ? ev.target.closest('#pk-vivi-objekte [data-vivi-obj]') : null;
+    if (!b) return;
+    ev.preventDefault();
+    var id = b.getAttribute('data-id');
+    if (b.getAttribute('data-vivi-obj') === 'anlegen') anlegen(id); else zuordnen(id);
+  });
   function probe(nachSpeichern) {
     var ziel = $('pk-vivi-ergebnis');
     if (ziel) ziel.textContent = 'Frage ViVi…';
@@ -173,17 +215,12 @@
         + (ze.eigen ? '<button type="button" class="btn btn-sm btn-ghost" data-vivi="alle-vivi" title="Alle eigenen Angaben verwerfen und die Werte aus ViVi übernehmen.">Alle aus ViVi übernehmen</button>' : '');
       /* v4040 · Absprung in den Reiter ViVi der Pilot-Analyse */
       knoepfe = (window.DpViviReiter && window.DpViviReiter.sichtbar() ? '<button type="button" class="btn btn-sm btn-gold" data-vivi="reiter">Abgleich mit ViVi</button>' : '') + '<button type="button" class="btn btn-sm btn-ghost" data-vivi="abgleichen">Jetzt abgleichen</button>' + alleKnopf + '<button type="button" class="btn btn-sm btn-ghost" data-vivi="loesen">Verknüpfung lösen</button>';
-    } else if (st.status === 'abgebrochen' || st.status === 'laeuft') {
-      text = st.status === 'laeuft' ? 'Die Übertragung nach ViVi läuft.' : 'Die Übertragung nach ViVi ist unterbrochen. Ein neuer Versuch setzt an der letzten Stelle fort, es entsteht nichts doppelt.';
-      knoepfe = '<button type="button" class="btn btn-sm btn-gold" data-vivi="anlegen">Übertragung fortsetzen</button>';
-    } else if (_anlegenLaeuft) {
-      text = 'Die Übernahme nach ViVi läuft. Bei einem Mehrfamilienhaus kann das bis zu zwei Minuten dauern.';
-      knoepfe = '';
     } else {
-      /* v3967 · Marcel 22.11.2026: anlegen erst nach Gewonnen bzw. im Bestand, sonst nichts zeigen */
-      if (!(window.DpBuchhaltung && window.DpBuchhaltung.istGewonnen())) { l.style.display = 'none'; l.innerHTML = ''; return; }
-      text = 'Dieses Objekt ist noch nicht in ViVi. Es wird einmal angelegt, danach liest DealPilot nur noch.';
-      knoepfe = '<button type="button" class="btn btn-sm btn-gold" data-vivi="anlegen">In ViVi anlegen</button><button type="button" class="btn btn-sm btn-ghost" data-vivi="zuordnen">Mit ViVi-Objekt verknüpfen</button>';
+      /* v4400 · Marcel 24.11.2026: „In ViVi anlegen“ und „Mit ViVi-Objekt verknüpfen“ gehören nicht in den Reiter Objekt.
+         Anlegen, Verknüpfen und Fortsetzen stehen jetzt in Deal-Aktion (js/buchhaltung-verbinden.js) und in den
+         Einstellungen › Externe Anbieter › ViVi (Objektliste). Im Reiter Objekt bleibt die Leiste nur für verknüpfte
+         Objekte, weil sie die ausgegrauten Felder erklärt. */
+      l.style.display = 'none'; l.innerHTML = ''; return;
     }
     l.innerHTML = '<span class="vivi-marke">ViVi</span><span class="vivi-text">' + esc(text) + '</span><span class="vivi-knoepfe">' + knoepfe + '</span>';
   }
@@ -253,31 +290,54 @@
   }
 
   /* ── Fenster ─────────────────────────────────────────────────────── */
-  function fenster(html) {
+  /* v4400 · Rahmen wie „Belege einlesen“: .oabi-ov mit Kopf (h3), Unterzeile, Inhalt und Fuß. modal-boarding-skin.js
+     legt Obsidian-Leiste mit × und Gold-Kopf darüber (Whitelabel-Token). Das × klickt den ersten Nicht-Haupt-Knopf im Fuß
+     (Abbrechen bzw. Schließen), solange eine Übertragung läuft, ist der gesperrt. Kein Schließen per Klick daneben. */
+  function fenster(titel, sub, body) {
     schliessen();
-    var ov = document.createElement('div'); ov.id = 'vivi-ov';
-    ov.innerHTML = '<div class="vivi-karte" role="dialog" aria-modal="true">' + html + '</div>';
-    ov.addEventListener('click', function (ev) { if (ev.target === ov && !_anlegenLaeuft) schliessen(); });
+    var ov = document.createElement('div'); ov.id = 'vivi-ov'; ov.className = 'oabi-ov';
+    ov.innerHTML = '<div class="oabi-modal" role="dialog" aria-modal="true" aria-label="' + esc(titel) + '">' +
+      '<div class="oabi-head"><h3>' + esc(titel) + '</h3></div><div class="oabi-sub">' + esc(sub || '') + '</div>' +
+      '<div class="oabi-body vivi-karte">' + (body || '') + '</div><div class="oabi-foot" id="vivi-fuss"></div></div>';
     document.body.appendChild(ov);
     return ov;
   }
+  function inhalt(ov, body, fuss) {
+    var b = ov.querySelector('.vivi-karte'); if (b) b.innerHTML = body;
+    var f = ov.querySelector('#vivi-fuss'); if (f) f.innerHTML = fuss || '';
+  }
+  function fk(id, text, haupt, aus) { return '<button type="button" class="oabi-btn' + (haupt ? ' primary' : '') + '" id="' + id + '"' + (aus ? ' disabled' : '') + '>' + text + '</button>'; }
+  function schliessenKnopf(ov) { inhalt(ov, ov.querySelector('.vivi-karte').innerHTML, fk('vivi-abbrechen', 'Schließen')); $('vivi-abbrechen').onclick = schliessen; }
   function schliessen() { var o = $('vivi-ov'); if (o) o.remove(); }
+  document.addEventListener('keydown', function (ev) { if (ev.key === 'Escape' && $('vivi-ov') && !_anlegenLaeuft) schliessen(); });
 
-  function anlegen() {
-    if (!_key) { alert('Bitte das Objekt zuerst speichern.'); return; }
+  /* v4400 · nach Anlegen oder Verknüpfen: Objekt offen → Werte lesen, sonst nur die Listen neu (Einstellungen, Deal-Aktion) */
+  function nachher(key) {
+    try { if (window.DpBuchhaltung) window.DpBuchhaltung.zeigen(); } catch (x) {}
+    objektListe();
+    if (key === _key) return abgleichen(true);
+    return null;
+  }
+
+  /** In ViVi anlegen. k = Objekt-ID (aus den Einstellungen), ohne = das offene Objekt. */
+  function anlegen(k) {
+    var key = (typeof k === 'string' && k) ? k : _key;
+    if (!key) { alert('Bitte das Objekt zuerst speichern.'); return; }
     if (_anlegenLaeuft) { meldung('Die Übernahme nach ViVi läuft schon.'); return; }
-    var key = _key;
     frei().then(function (ok) {
       if (!ok) return;
       stil();
-      var ov = fenster('<h3>In ViVi anlegen</h3><p>Lade Vorschau…</p>');
+      var TITEL = 'In ViVi anlegen', SUB = 'Diese Werte gehen einmal an ViVi. Danach liest DealPilot nur noch aus ViVi und schreibt nichts zurück.';
+      var ov = fenster(TITEL, SUB, '<p>Lade Vorschau…</p>');
+      inhalt(ov, '<p>Lade Vorschau…</p>', fk('vivi-abbrechen', 'Abbrechen'));
+      $('vivi-abbrechen').onclick = schliessen;
       var opt = function () {
         var pz = $('vivi-platzhalter'), ma = $('vivi-muster'), ft = $('vivi-faellig'), ac = $('vivi-account');
         return { platzhalter_namen: !!(pz && pz.checked), muster_anschrift: !!(ma && ma.checked), faellig_tag: ft ? Number(ft.value) || 3 : 3, account_id: ac && ac.value ? ac.value : null };
       };
       var zeichnen = function (v, accounts, o) {
         o = o || {};
-        /* v3951 · die Vorgaben des Servers (Testbetrieb: Musteranschrift und Platzhalter an) gelten, bis der Kunde umschaltet */
+        /* v3951 · die Vorgaben des Servers gelten, bis der Kunde umschaltet */
         if (v.optionen) { if (o.platzhalter_namen === undefined) o.platzhalter_namen = v.optionen.platzhalter_namen; if (o.muster_anschrift === undefined) o.muster_anschrift = v.optionen.muster_anschrift; }
         var zeilen = (v.vorschau || []).map(function (z) {
           return '<tr><td>' + esc(z.bereich) + '</td><td>' + esc(z.feld) + '</td><td>' + esc(z.wert) + (z.notiz ? '<div class="vivi-notiz">' + esc(z.notiz) + '</div>' : '') + '</td></tr>';
@@ -287,25 +347,25 @@
         var acc = (accounts && accounts.length > 1) ? '<label class="vivi-wahl">Bereich in ViVi <select id="vivi-account">' + accounts.map(function (a) {
           return '<option value="' + esc(a.id) + '"' + ((o.account_id ? String(o.account_id) === String(a.id) : a.is_default) ? ' selected' : '') + '>' + esc(a.name) + (a.label ? ' (' + esc(a.label) + ')' : '') + '</option>';
         }).join('') + '</select></label>' : '';
-        ov.querySelector('.vivi-karte').innerHTML =
-          '<h3>In ViVi anlegen</h3>' +
-          '<p>Diese Werte gehen <b>einmal</b> an ViVi. Danach liest DealPilot nur noch aus ViVi und schreibt nichts zurück. Verknüpfte Felder sind dann ausgegraut.</p>' +
+        /* v4400 · Marcel 24.11.2026: der Block „Was genau an ViVi geht“ zeigte die Rohdaten als Code. Raus, die Tabelle
+           darüber nennt jeden Wert lesbar (Objekt, Einheiten, Mietverhältnisse, Darlehen). */
+        inhalt(ov,
+          '<p>Verknüpfte Felder sind danach in DealPilot ausgegraut.</p>' +
           fehlt + hinw +
           '<table><thead><tr><th>Bereich</th><th>Feld</th><th>Wert</th></tr></thead><tbody>' + zeilen + '</tbody></table>' +
           acc +
           '<label class="vivi-wahl"><input type="checkbox" id="vivi-platzhalter"' + (o.platzhalter_namen ? ' checked' : '') + '> Mieternamen durch Platzhalter ersetzen</label>' +
           '<label class="vivi-wahl"><input type="checkbox" id="vivi-muster"' + (o.muster_anschrift ? ' checked' : '') + '> Anschrift durch Musteranschrift ersetzen' + (v.optionen && v.optionen.testbetrieb ? ' (Testbetrieb)' : '') + '</label>' +
-          '<label class="vivi-wahl">Miete fällig am <input type="number" id="vivi-faellig" min="1" max="31" value="' + esc(o.faellig_tag || 3) + '" style="width:64px"> des Monats</label>' +
-          '<details><summary>Was genau an ViVi geht</summary><pre>' + esc(JSON.stringify(v.nutzlast, null, 2)) + '</pre></details>' +
-          '<div class="vivi-fuss"><button type="button" class="btn btn-sm btn-ghost" id="vivi-abbrechen">Abbrechen</button>' +
-          (v.gesperrt ? '<span class="hint">Schon mit ViVi verknüpft.</span>' : '<button type="button" class="btn btn-sm btn-gold" id="vivi-los"' + (v.ok ? '' : ' disabled') + '>Jetzt in ViVi anlegen</button>') + '</div>';
+          '<label class="vivi-wahl">Miete fällig am <input type="number" id="vivi-faellig" min="1" max="31" value="' + esc(o.faellig_tag || 3) + '" style="width:64px"> des Monats</label>',
+          fk('vivi-abbrechen', 'Abbrechen') +
+          (v.gesperrt ? '<span class="hint">Schon mit ViVi verknüpft.</span>' : fk('vivi-los', 'Jetzt in ViVi anlegen', true, !v.ok)));
         $('vivi-abbrechen').onclick = schliessen;
         ['vivi-platzhalter', 'vivi-muster', 'vivi-faellig'].forEach(function (id) { var e = $(id); if (e) e.onchange = function () { neu(); }; });
         var los = $('vivi-los');
         if (los) los.onclick = function () {
           if (_anlegenLaeuft) return;
-          /* v3967 · Wartehinweis: ViVi legt je Mietverhaeltnis alle Sollstellungen ab Mietbeginn an. Gemessen bis 113 s
-             (2026-1053, acht Mietverhaeltnisse ab 2009). Knopf und Fenster bleiben gesperrt, bis die Antwort da ist. */
+          /* v3967 · Wartehinweis: ViVi legt je Mietverhaeltnis alle Sollstellungen ab Mietbeginn an. Gemessen bis 113 s.
+             Knopf und Fenster bleiben gesperrt, bis die Antwort da ist (auch × und Esc). */
           _anlegenLaeuft = true; leiste();
           los.disabled = true; los.textContent = 'Wird angelegt…';
           Array.prototype.forEach.call(ov.querySelectorAll('input, select, #vivi-abbrechen'), function (x) { x.disabled = true; });
@@ -317,18 +377,19 @@
             warte.textContent = 'Übertragung läuft, ' + s + ' s. ' + (n > 2 ? 'Bei einem Mehrfamilienhaus kann das bis zu zwei Minuten dauern, weil ViVi alle Mieten ab Mietbeginn anlegt. ' : 'Das dauert meist nur Sekunden. ') + 'Bitte das Fenster offen lassen.';
           };
           zeichneWarte();
-          var fuss = ov.querySelector('.vivi-fuss'); if (fuss) fuss.parentNode.insertBefore(warte, fuss);
+          var body = ov.querySelector('.vivi-karte'); if (body) body.insertBefore(warte, body.firstChild);
           var uhr = setInterval(zeichneWarte, 1000);
           var fertig = function () { clearInterval(uhr); _anlegenLaeuft = false; };
           var b = opt(); b.bestaetigt = true;
           api('/vivi/objekt/' + encodeURIComponent(key) + '/anlegen', { method: 'POST', body: b, timeout: 240000 }).then(function () {
             fertig(); schliessen(); meldung('In ViVi angelegt');
-            return abgleichen(true);
+            return nachher(key);
           }).catch(function (e) {
             fertig();
             alert((e && e.message) || 'Anlegen fehlgeschlagen.');
             schliessen();
-            api('/vivi/objekt/' + encodeURIComponent(key) + '/werte').then(function (r) { if (window._currentObjKey === key) { _stand = r; leiste(); } }).catch(function () {});
+            if (key === _key) api('/vivi/objekt/' + encodeURIComponent(key) + '/werte').then(function (r) { if (window._currentObjKey === key) { _stand = r; leiste(); } }).catch(function () {});
+            objektListe();
           }).then(function () { try { if (window.DpBuchhaltung) window.DpBuchhaltung.zeigen(); } catch (x) {} });
         };
       };
@@ -336,37 +397,46 @@
       var neu = function () {
         var o = $('vivi-platzhalter') ? opt() : {};
         api('/vivi/objekt/' + encodeURIComponent(key) + '/vorschau', { method: 'POST', body: o }).then(function (v) { zeichnen(v, accounts, o); })
-          .catch(function (e) { ov.querySelector('.vivi-karte').innerHTML = '<h3>In ViVi anlegen</h3><p>' + esc((e && e.message) || 'Vorschau nicht möglich.') + '</p><div class="vivi-fuss"><button type="button" class="btn btn-sm btn-ghost" onclick="document.getElementById(\'vivi-ov\').remove()">Schließen</button></div>'; });
+          .catch(function (e) { inhalt(ov, '<p>' + esc((e && e.message) || 'Vorschau nicht möglich.') + '</p>'); schliessenKnopf(ov); });
       };
       api('/vivi/verbindung/probe', { method: 'POST', body: {} }).then(function (r) { accounts = (r && r.accounts) || null; }).catch(function () { accounts = null; }).then(neu);
     });
   }
 
-  function zuordnen() {
-    if (!_key) return;
-    var key = _key;
+  /** Mit einem Objekt verknüpfen, das es in ViVi schon gibt. k = Objekt-ID, ohne = das offene Objekt. */
+  function zuordnen(k) {
+    var key = (typeof k === 'string' && k) ? k : _key;
+    if (!key) return;
     frei().then(function (ok) {
       if (!ok) return;
       stil();
-      var ov = fenster('<h3>Mit ViVi-Objekt verknüpfen</h3><p>Lade deine Objekte aus ViVi…</p>');
-      api('/vivi/projekte').then(function (r) {
-        var L = (r && r.projekte) || [];
-        ov.querySelector('.vivi-karte').innerHTML = '<h3>Mit ViVi-Objekt verknüpfen</h3>' +
-          '<p>Das Objekt gibt es schon in ViVi? Dann wähle es aus. Es wird nichts an ViVi geschickt, DealPilot liest danach die Werte.</p>' +
-          (L.length ? L.map(function (p, i) {
-            return '<label class="vivi-wahl"><input type="radio" name="vivi-proj" value="' + esc(p.id) + '"' + (i === 0 ? ' checked' : '') + '> ' + esc([p.street, p.house_number].filter(Boolean).join(' ') + ', ' + [p.postal_code, p.city].filter(Boolean).join(' ')) + ' <span class="vivi-notiz">' + esc(p.name || '') + '</span></label>';
-          }).join('') : '<p class="hint">In ViVi ist noch kein Objekt angelegt.</p>') +
-          '<div class="vivi-fuss"><button type="button" class="btn btn-sm btn-ghost" id="vivi-abbrechen">Abbrechen</button>' + (L.length ? '<button type="button" class="btn btn-sm btn-gold" id="vivi-los">Verknüpfen</button>' : '') + '</div>';
+      var TITEL = 'Mit ViVi-Objekt verknüpfen', SUB = 'Das Objekt gibt es schon in ViVi? Dann wähle es aus. Es wird nichts an ViVi geschickt, DealPilot liest danach die Werte.';
+      var ov = fenster(TITEL, SUB, '<p>Lade deine Objekte aus ViVi…</p>');
+      inhalt(ov, '<p>Lade deine Objekte aus ViVi…</p>', fk('vivi-abbrechen', 'Abbrechen'));
+      $('vivi-abbrechen').onclick = schliessen;
+      Promise.all([api('/vivi/projekte'), api('/vivi/objekte').catch(function () { return {}; })]).then(function (x) {
+        var r = x[0];
+        /* v4400 · ViVi-Objekte, die schon mit einem DealPilot-Objekt verknüpft sind, stehen unten und sind nicht wählbar */
+        var belegt = {}; ((x[1] && x[1].objekte) || []).forEach(function (v) { if (v.vivi_objekt_id) belegt[String(v.vivi_objekt_id)] = [v.str, v.hnr].filter(Boolean).join(' '); });
+        var L = ((r && r.projekte) || []).slice().sort(function (a, b) { return (belegt[String(a.id)] ? 1 : 0) - (belegt[String(b.id)] ? 1 : 0); });
+        var frei0 = L.filter(function (p) { return !belegt[String(p.id)]; }).length;
+        inhalt(ov,
+          (L.length ? '<div class="vivi-wahlliste">' + L.map(function (p, i) {
+            var b = belegt[String(p.id)];
+            return '<label class="vivi-wahl"' + (b ? ' style="opacity:.55;cursor:default"' : '') + '><input type="radio" name="vivi-proj" value="' + esc(p.id) + '"' + (b ? ' disabled' : (i === 0 ? ' checked' : '')) + '> <span>' + esc([p.street, p.house_number].filter(Boolean).join(' ') + ', ' + [p.postal_code, p.city].filter(Boolean).join(' ')) + (b ? ' <span class="vivi-notiz">schon verknüpft mit ' + esc(b) + '</span>' : (p.name ? ' <span class="vivi-notiz">' + esc(p.name) + '</span>' : '')) + '</span></label>';
+          }).join('') + '</div>' : '<p class="hint">In ViVi ist noch kein Objekt angelegt.</p>') +
+          (L.length && !frei0 ? '<p class="hint">Alle Objekte in ViVi sind schon mit DealPilot verknüpft. Lege das Objekt neu in ViVi an.</p>' : ''),
+          fk('vivi-abbrechen', 'Abbrechen') + (frei0 ? fk('vivi-los', 'Verknüpfen', true) : ''));
         $('vivi-abbrechen').onclick = schliessen;
         var los = $('vivi-los');
         if (los) los.onclick = function () {
           var w = ov.querySelector('input[name="vivi-proj"]:checked'); if (!w) return;
           los.disabled = true;
           api('/vivi/objekt/' + encodeURIComponent(key) + '/zuordnen', { method: 'POST', body: { vivi_objekt_id: w.value } })
-            .then(function () { schliessen(); meldung('Mit ViVi verknüpft'); return abgleichen(true); })
+            .then(function () { schliessen(); meldung('Mit ViVi verknüpft'); return nachher(key); })
             .catch(function (e) { alert((e && e.message) || 'Verknüpfen fehlgeschlagen.'); los.disabled = false; });
         };
-      }).catch(function (e) { ov.querySelector('.vivi-karte').innerHTML = '<h3>Mit ViVi-Objekt verknüpfen</h3><p>' + esc((e && e.message) || 'ViVi nicht erreichbar.') + '</p><div class="vivi-fuss"><button type="button" class="btn btn-sm btn-ghost" onclick="document.getElementById(\'vivi-ov\').remove()">Schließen</button></div>'; });
+      }).catch(function (e) { inhalt(ov, '<p>' + esc((e && e.message) || 'ViVi nicht erreichbar.') + '</p>'); schliessenKnopf(ov); });
     });
   }
 
@@ -380,6 +450,8 @@
         _stand = { verknuepft: false, status: null };
         var geaendert = window.DpViviFelder ? window.DpViviFelder.setzen(_stand) : false;
         leiste(); meldung('Verknüpfung gelöst');
+        try { if (window.DpBuchhaltung) window.DpBuchhaltung.zeigen(); } catch (x) {}   /* v4400 · Deal-Aktion bietet wieder Anlegen und Verknüpfen */
+        objektListe();
         if (typeof window.saveObj === 'function') setTimeout(function () { try { if (window._currentObjKey === key) window.saveObj(); } catch (e) {} }, 300);
         return geaendert;
       }).catch(function (e) { alert((e && e.message) || 'Lösen fehlgeschlagen.'); });
@@ -448,11 +520,13 @@
         return api('/vivi/objekt/' + encodeURIComponent(key) + '/werte').then(function (r) {
           if (r && r.verknuepft) return { verknuepft: true, text: 'In ViVi verwaltet. ' + standText(r.letzter_abruf) + '. ' + reiterText(r.felder) };
           if (r && r.status === 'laeuft') return { laeuft: true };
-          if (r && r.status === 'abgebrochen') return { verknuepft: false, text: '' };
+          if (r && r.status === 'abgebrochen') return { verknuepft: false, unterbrochen: true, text: '' };   /* v4400 */
           return { verknuepft: false };
         });
       },
       uebernehmen: anlegen,
+      verknuepfen: zuordnen,   /* v4400 · zweiter Knopf in Deal-Aktion */
+      loesen: loesen,
       /* v4040 · Deal-Aktion nach „gewonnen“: Absprung in den Abgleich */
       abgleich: function () { if (window.DpViviReiter && window.DpViviReiter.sichtbar()) return window.DpViviReiter.oeffnen(); return false; }
     });

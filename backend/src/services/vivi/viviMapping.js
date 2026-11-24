@@ -29,6 +29,7 @@ const OBJEKTTYP = Object.freeze({
   BUERO: 'commercial', GESCH: 'commercial', HOTEL: 'commercial', GEW: 'commercial',
   GRST: 'land', GAR: 'other'
 });
+const TYP_WORT = Object.freeze({ apartment: 'Eigentumswohnung', single_family_house: 'Einfamilienhaus', multi_family_house: 'Mehrfamilienhaus', commercial: 'Gewerbe', land: 'Grundstück', other: 'Sonstiges' });   /* v4400 · Anzeige im Fenster */
 const ARTEN_MIT_EINHEITEN = { MFH: 1, ZFH: 1, GESCH: 1, BUERO: 1, HOTEL: 1, GEW: 1 };
 const ART_WORT = { ETW: 'Wohnung', EFH: 'Einfamilienhaus', DHH: 'Einfamilienhaus', RH: 'Einfamilienhaus', ZFH: 'Mehrfamilienhaus', MFH: 'Mehrfamilienhaus',
   BUERO: 'Gewerbe', GESCH: 'Gewerbe', HOTEL: 'Gewerbe', GEW: 'Gewerbe', GRST: 'Grundstück', GAR: 'Objekt' };   /* v4050 · Anzeigename in ViVi */   /* wie mfh-einheiten.js */
@@ -225,7 +226,8 @@ function nachVivi(daten, opt) {
   if (!muster && text(daten.ort) && text(daten.str)) projekt.name = (text(daten.ort) + ' - ' + text(daten.str) + ' ' + text(daten.hnr) + ' - ' + (ART_WORT[a] || 'Objekt')).replace(/\s+/g, ' ').trim().slice(0, 255);
   const nk = [['broker', 'makler_p', 'Makler'], ['real_estate_transfer_tax', 'gest_p', 'Grunderwerbsteuer'],
     ['notary', 'notar_p', 'Notar'], ['land_register', 'gba_p', 'Grundbuch'], ['other_costs', 'ji_p', 'Sonstige Kaufnebenkosten']];
-  zeige('Objekt', 'Objektart', typ);
+  /* v4400 · Marcel 24.11.2026: „Multi Family House“ stand im Fenster. Angezeigt wird die Art auf Deutsch, an ViVi geht weiter der Typ. */
+  zeige('Objekt', 'Objektart', TYP_WORT[typ] || 'Sonstiges');
   zeige('Objekt', 'Anschrift', [projekt.street, projekt.house_number].join(' ') + ', ' + projekt.postal_code + ' ' + projekt.city, muster ? 'Musteranschrift für den Testbetrieb. Die Anschrift des Objekts bleibt in DealPilot' : '');
   if (muster) hinweise.push('Testbetrieb: In ViVi steht eine Musteranschrift. DealPilot liest die Anschrift deshalb nicht aus ViVi zurück.');
   zeige('Objekt', 'Kaufpreis', eur(kp));

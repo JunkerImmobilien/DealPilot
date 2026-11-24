@@ -192,7 +192,7 @@
     var ov = MV && MV.rahmen ? MV.rahmen('Nebenkosten-Vorauszahlung abgleichen', 'ViVi und DealPilot führen eine andere Vorauszahlung. Entscheide, welcher Wert gilt. Die Erklärung an den Mieter schickst du in Textform wie gewohnt.') : null;
     if (!ov) return false;
     ov.addEventListener('click', function (ev) {
-      if (ev.target === ov) { schliessen(); return; }
+      /* v4400 · Marcel 24.11.2026: kein Schließen per Klick daneben, nur Schließen und × */
       var b = ev.target.closest && ev.target.closest('[data-vnk]'); if (!b || b.disabled) return;
       ev.preventDefault();
       var a = b.getAttribute('data-vnk');

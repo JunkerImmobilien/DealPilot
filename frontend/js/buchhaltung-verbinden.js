@@ -40,6 +40,8 @@
       '#da-buchhaltung:empty{display:none}',
       '#da-buchhaltung .buha-zeile{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin:10px 0 0;padding:10px 12px;border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 35%, transparent);border-radius:10px;font:400 12.5px/1.45 Inter,system-ui,sans-serif}',
       '#da-buchhaltung .buha-txt{flex:1 1 240px;min-width:0}',
+      /* v4400 · gemessen: die Deal-Aktion färbt jeden Knopf weiß (wie „Stand neu nehmen“). Der Hauptknopf bleibt Gold (Whitelabel-Token). */
+      '#da-buchhaltung .buha-zeile .btn-gold{background:linear-gradient(110deg,var(--wl-e8cc7a, #E8CC7A),var(--wl-c9a84c, #C9A84C) 55%,var(--wl-b8932f, #b8932f)) !important;color:#1a1407 !important;border-color:transparent !important}',
       '#da-buchhaltung .buha-marke{font:600 10.5px/1 "JetBrains Mono",ui-monospace,monospace;letter-spacing:.08em;text-transform:uppercase;opacity:.75;margin-right:6px}'
     ].join('');
     document.head.appendChild(s);
@@ -79,10 +81,16 @@
         var st = x.st, a = x.a;
         /* v4040 · verknüpft: Knopf zum Abgleich (Pilot-Analyse › ViVi), wenn der Anbieter ihn anbietet */
         if (st.verknuepft) return '<div class="buha-zeile"><span class="buha-txt"><span class="buha-marke">' + esc(a.name) + '</span>' + esc(st.text || 'In deiner Objektverwaltung. Die Werte kommen von dort, siehe Reiter Objekt.') + '</span>'
-          + (typeof a.abgleich === 'function' ? '<button type="button" class="btn btn-sm btn-gold" data-buha-abgleich="' + esc(a.id) + '">Abgleich mit ' + esc(a.name) + '</button>' : '') + '</div>';
+          + (typeof a.abgleich === 'function' ? '<button type="button" class="btn btn-sm btn-gold" data-buha-abgleich="' + esc(a.id) + '">Abgleich mit ' + esc(a.name) + '</button>' : '')
+          + (typeof a.loesen === 'function' ? '<button type="button" class="btn btn-sm btn-ghost" data-buha-loesen="' + esc(a.id) + '">Verknüpfung lösen</button>' : '') + '</div>';   /* v4400 */
         if (st.laeuft) return '<div class="buha-zeile"><span class="buha-txt"><span class="buha-marke">' + esc(a.name) + '</span>' + esc(st.text || 'Die Übernahme läuft.') + '</span></div>';
-        return '<div class="buha-zeile"><span class="buha-txt"><b>In deine Objektverwaltung übernehmen</b><br>Das Objekt wird einmal angelegt, mit Einheiten, Mietverhältnissen und Darlehen. Danach liest DealPilot nur noch.</span>' +
-          '<button type="button" class="btn btn-sm btn-gold" data-buha="' + esc(a.id) + '">In deine Objektverwaltung übernehmen · ' + esc(a.name) + '</button></div>';
+        /* v4400 · Marcel 24.11.2026: Anlegen UND Verknüpfen stehen hier (vorher als Leiste im Reiter Objekt). Unterbrochene
+           Übertragung: derselbe Knopf setzt fort, es entsteht nichts doppelt. */
+        var fort = st.unterbrochen === true;
+        return '<div class="buha-zeile"><span class="buha-txt"><b>' + (fort ? 'Übertragung unterbrochen' : 'In deine Objektverwaltung übernehmen') + '</b><br>' +
+          (fort ? 'Ein neuer Versuch setzt an der letzten Stelle fort, es entsteht nichts doppelt.' : 'Das Objekt wird einmal angelegt, mit Einheiten, Mietverhältnissen und Darlehen. Danach liest DealPilot nur noch. Gibt es das Objekt schon in ' + esc(a.name) + ', verknüpfst du es.') + '</span>' +
+          '<button type="button" class="btn btn-sm btn-gold" data-buha="' + esc(a.id) + '">' + (fort ? 'Übertragung fortsetzen' : 'In ' + esc(a.name) + ' anlegen') + '</button>' +
+          (!fort && typeof a.verknuepfen === 'function' ? '<button type="button" class="btn btn-sm btn-ghost" data-buha-verkn="' + esc(a.id) + '">Mit ' + esc(a.name) + '-Objekt verknüpfen</button>' : '') + '</div>';
       }).join('');
     });
   }
@@ -96,6 +104,14 @@
   document.addEventListener('click', function (ev) {
     var g = ev.target && ev.target.closest ? ev.target.closest('#da-buchhaltung [data-buha-abgleich]') : null;   /* v4040 */
     if (g) { ev.preventDefault(); var ga = _anbieter.filter(function (x) { return x.id === g.getAttribute('data-buha-abgleich'); })[0]; if (ga && ga.abgleich) ga.abgleich(); return; }
+    var vk = ev.target && ev.target.closest ? ev.target.closest('#da-buchhaltung [data-buha-verkn], #da-buchhaltung [data-buha-loesen]') : null;   /* v4400 */
+    if (vk) {
+      ev.preventDefault();
+      var vid = vk.getAttribute('data-buha-verkn') || vk.getAttribute('data-buha-loesen');
+      var va = _anbieter.filter(function (x) { return x.id === vid; })[0]; if (!va) return;
+      if (vk.hasAttribute('data-buha-verkn')) { if (va.verknuepfen) va.verknuepfen(); } else if (va.loesen) va.loesen();
+      return;
+    }
     var b = ev.target && ev.target.closest ? ev.target.closest('#da-buchhaltung [data-buha]') : null;
     if (!b) return;
     ev.preventDefault();

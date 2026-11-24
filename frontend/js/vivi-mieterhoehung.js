@@ -245,7 +245,7 @@
     _z = { W: W, sel: sel, art: artFuer(W.liste[sel], o.art), neu: null, datum: null, trotzdem: false, vorschau: '', vorschauOk: false, fehler: '', laeuft: false, quelle: o.quelle || '' };
     var ov = rahmen('Mieterhöhung in ViVi anlegen', 'DealPilot legt die neue Miete als Mietänderung in ViVi an. Den Brief an den Mieter schickst du wie gewohnt, zustimmen muss er bei § 558 selbst.');
     ov.addEventListener('click', function (ev) {
-      if (ev.target === ov) { schliessen(); return; }
+      /* v4400 · Marcel 24.11.2026: kein Schließen per Klick daneben, nur Schließen und × */
       var b = ev.target.closest && ev.target.closest('[data-vmh]'); if (!b || b.disabled) return;
       ev.preventDefault();
       var a = b.getAttribute('data-vmh');
