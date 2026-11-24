@@ -256,14 +256,16 @@
       '.oabi-ov{position:fixed;inset:0;background:rgba(20,18,16,0.55);z-index:10001;display:flex;align-items:center;justify-content:center;padding:18px}',
       /* v4470 · kombiniertes Fenster Einlesen + Belege je Jahr, Breite wie die Hilfe (1180 px) */
       '.oabi-ov.oabi-kombi .oabi-modal{width:min(1180px,100%);max-height:92vh}',
-      '.oabi-kombi-grid{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:0;min-height:0}',
-      '.oabi-kombi .oabi-spalte{min-width:0;padding:4px 0 8px}',
+      /* GEMESSEN: der Boarding-Rahmen macht .oabi-modal zur Flex-Spalte mit overflow:hidden, gescrollt wird in .oabi-body.
+         Das Raster braucht deshalb flex + min-height:0, jede Spalte scrollt für sich (sonst war alles unter 92vh abgeschnitten). */
+      '.oabi-kombi-grid{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);grid-template-rows:minmax(0,1fr);gap:0;flex:1 1 auto;min-height:0}',
+      '.oabi-kombi .oabi-spalte{min-width:0;min-height:0;overflow:auto;padding:4px 0 8px;display:flex;flex-direction:column}',
+      '.oabi-kombi .oabi-spalte>.oabi-body{flex:0 0 auto;overflow:visible;min-height:auto}',
       '.oabi-kombi .oabi-spalte-jahre{border-left:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 25%, transparent);background:color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 3%, #fff)}',
       ".oabi-kombi .oabi-spalte-t{font:700 11px/1.3 'JetBrains Mono',monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--wl-b8932f, #b8932f);padding:10px 20px 6px}",
       '.oabi-kombi #oabi-r-jahre{padding-top:0}',
-      '.oabi-kombi #oabi-r-ein{position:sticky;top:0;align-self:start}',
       '.oabi-btn.warn{border-color:#B8625C;color:#B8625C}',
-      '@media (max-width:899px){.oabi-kombi-grid{grid-template-columns:1fr}.oabi-kombi #oabi-r-ein{position:static}.oabi-kombi .oabi-spalte-jahre{border-left:0;border-top:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 25%, transparent)}}',
+      '@media (max-width:899px){.oabi-kombi-grid{grid-template-columns:1fr;grid-template-rows:auto;overflow:auto}.oabi-kombi .oabi-spalte{overflow:visible}.oabi-kombi .oabi-spalte-jahre{border-left:0;border-top:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 25%, transparent)}}',
       ".oabi-modal{background:var(--surface,#F8F6F1);border:1px solid color-mix(in srgb, var(--wl-c9a84c, #C9A84C) 35%, transparent);border-radius:16px;width:min(740px,100%);max-height:90vh;overflow:auto;box-shadow:0 24px 60px rgba(0,0,0,0.28);font-family:'Inter',system-ui,sans-serif}",
       '.oabi-head{display:flex;align-items:center;gap:12px;padding:18px 20px 8px}',
       '.oabi-head h3{margin:0;font-size:17px;color:var(--ch,#2A2727)}',
