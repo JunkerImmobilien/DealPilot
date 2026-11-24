@@ -118,7 +118,12 @@
       staffelZeile(K, TP);
     }
     var sz = document.getElementById('segZeit');
-    if (sz) sz.addEventListener('click', function () { setTimeout(function () { zeitLesen(true); }, 0); });
+    /* landing-partner-preise-1 · partner.html hat keinen eigenen Umschalter-Code: .on hier setzen (idempotent, auf preise.html schadet es nicht) */
+    if (sz) sz.addEventListener('click', function (e) {
+      var b = e.target && e.target.closest ? e.target.closest('button[data-zeit]') : null;
+      if (b) [].forEach.call(sz.querySelectorAll('button[data-zeit]'), function (x) { x.classList.toggle('on', x === b); });
+      setTimeout(function () { zeitLesen(true); }, 0);
+    });
     zeitLesen(false);
   }
 
