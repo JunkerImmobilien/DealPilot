@@ -1065,9 +1065,5 @@
   stilAnwenden();
   freigabe(); window.addEventListener('dp:vorschau', freigabe); window.addEventListener('dp:plan-ready', function () { setTimeout(freigabe, 300); });
   window.DpGrafikenPremium = { lauf: function (h) { if (!FREI) { freigabe(); return; } stil(); try { pilotAnalyse(h); } catch (e) { try { console.warn('[grafiken-premium]', e); } catch (x) {} } }, MODELL: MODELL, _mieteuro: mieteuro, _zielDaten: zielDaten, _steuerBreakEven: steuerBreakEven, _einordnungDaten: einordnungDaten, stil: stilSetzen, stilWahl: stilWahl, stilAnwenden: stilAnwenden, _einordnung: einordnungDaten, _portfolio: portfolioSchnitt };
-  /* v4370 · für die PDFs (grafiken-pdf.js): dieselben Karten, offscreen gezeichnet, ohne Vorschau-Bedingung */
-  window.DpGrafikenPremium._pdf = { karten: { fahrplan: karteFahrplan, einordnung: karteEinordnung, ziel: karteZiel, finger: karteFingerabdruck, heat: karteHeat, mieteuro: karteMieteuro,
-    faecher: karteFaecher, hebel: karteHebel, ausstieg: karteAusstieg, steuer: karteVerlaufSteuer, hausgeld: karteHausgeld, wertverlauf: karteWertverlauf, markt: karteMarkt, lage: karteLage },
-    cache: cache, stil: stil, hist: function (h) { if (Array.isArray(h)) _hist = h; return _hist; } };
   window.DpGrafiken = { heatmap: heatmap, bullets: bullets, verlauf: verlauf, punktreihen: punktreihen, fahrplan: fahrplan, fingerabdruck: fingerabdruck, sankey: sankey, tornado: tornado, ausstieg: ausstieg, karte: karte, farben: F, modell: MODELL };
 })();

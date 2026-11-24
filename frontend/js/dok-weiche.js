@@ -31,7 +31,7 @@
   'use strict';
   if (window.DpDokWeiche) return;
 
-  var NAMEN = { investment: 'Investment Case', bank: 'Investment Case', selbstauskunft: 'Selbstauskunft', kurz: 'Kurzfassung', kompakt: 'Kompaktfassung', kaufpreisaufteilung: 'Kaufpreisaufteilung',
+  var NAMEN = { investment: 'Investment Case', bank: 'Investment Case', selbstauskunft: 'Selbstauskunft', kurz: 'Kurzfassung', kaufpreisaufteilung: 'Kaufpreisaufteilung',
     finanzamt: 'Werbungskosten', finanzamt_anlagev: 'Werbungskosten mit Anlage V', trackrecord: 'Track Record', bankexport: 'Bankexport',
     vermoegen: 'Vermögen & Haushalt', steuermappe: 'Steuer-Mappe', jahresabschluss: 'Jahresabschluss' };   /* v3480 */   /* v3471 */   /* v3226 */
 
@@ -66,62 +66,6 @@
 
   /* v3183 · der schnelle Weg: die App baut das Dokument selbst (rund 0,5 s, Objekt ist schon gerechnet) und der
      PDF-Dienst druckt es nur (ohne Skript, ohne Netz). Vorher startete er fuer jedes PDF die ganze App neu (12-30 s). */
-  /* ── v4370 · Kombi: Investment-PDF plus der letzte Marktbericht des Objekts ──────────────
-     Der Marktbericht entsteht in seiner eigenen Engine (marktbericht-app/app.js exportPdf), offscreen im iframe wie
-     deal-action-boarding.js _mbEnginePdf, aber mit ?autopdf=bytes: die Engine schickt das PDF als Bytes zurück, statt
-     es zu speichern. Zusammengefügt wird im Browser mit pdf-lib 1.17.1 (vendor/cdn, nur bei Bedarf geladen). */
-  function letzterBericht(key) {
-    if (window.DpGrafikenPdf && DpGrafikenPdf.letzterBericht) return DpGrafikenPdf.letzterBericht(key);   /* v4370e · eine Stelle */
-    if (!key || !window.Auth || !Auth.apiCall) return Promise.resolve(null);
-    return Auth.apiCall('/marktbericht/objects/history?key=' + encodeURIComponent('dp:' + key), { method: 'GET' }).then(function (d) {
-      var h = ((d && d.history) || []).filter(function (x) { return x && x.report_id; });
-      h.sort(function (a, b) { return new Date(a.created_at) - new Date(b.created_at); });
-      return h.length ? h[h.length - 1] : null;
-    }).catch(function () { return null; });
-  }
-  function berichtBytes(rid) {
-    return new Promise(function (ok, nein) {
-      var fr = document.createElement('iframe'), fertig = false, to = null;
-      fr.setAttribute('aria-hidden', 'true');
-      fr.style.cssText = 'position:fixed;left:-10000px;top:0;width:1280px;height:2000px;border:0;visibility:hidden';
-      function ende() { if (fertig) return; fertig = true; window.removeEventListener('message', an); if (to) clearTimeout(to); setTimeout(function () { try { fr.remove(); } catch (e) {} }, 1500); }
-      function an(ev) {
-        if (ev.origin !== location.origin || ev.source !== fr.contentWindow || !ev.data) return;
-        if (ev.data.type === 'mbv-pdf-bytes' && ev.data.bytes) { ende(); ok(ev.data.bytes); }
-        else if (ev.data.type === 'mbv-pdf-fail') { ende(); nein(new Error(ev.data.error || 'Marktbericht-PDF fehlgeschlagen')); }
-      }
-      window.addEventListener('message', an);
-      to = setTimeout(function () { ende(); nein(new Error('Zeitüberschreitung beim Marktbericht')); }, 90000);
-      fr.src = '/marktbericht-app/index.html?v=4370&theme=light&autopdf=bytes&report=' + encodeURIComponent(rid);
-      document.body.appendChild(fr);
-    });
-  }
-  function pdfLib() {
-    if (window.PDFLib) return Promise.resolve(window.PDFLib);
-    return new Promise(function (ok, nein) {
-      var s = document.createElement('script'); s.src = '/vendor/cdn/pdf-lib/1.17.1/pdf-lib.min.js';
-      s.onload = function () { window.PDFLib ? ok(window.PDFLib) : nein(new Error('pdf-lib fehlt')); }; s.onerror = function () { nein(new Error('pdf-lib nicht ladbar')); };
-      document.head.appendChild(s);
-    });
-  }
-  async function anhaengen(blob, mbBytes) {
-    var L = await pdfLib();
-    var a = await L.PDFDocument.load(await blob.arrayBuffer()), b = await L.PDFDocument.load(mbBytes);
-    var seiten = await a.copyPages(b, b.getPageIndices());
-    seiten.forEach(function (p) { a.addPage(p); });
-    return new Blob([await a.save()], { type: 'application/pdf' });
-  }
-  /* opt.mitMarktbericht: den Bericht parallel zum Dokument erzeugen; scheitert er, kommt das Dokument allein mit Hinweis */
-  function berichtVorbereiten(opt) {
-    if (!opt || !opt.mitMarktbericht) return null;
-    /* v4370e · nur der letzte Bericht und nur, wenn er zum Objektstand passt (DpGrafikenPdf.berichtPruefen) */
-    return letzterBericht(window._currentObjKey).then(function (h) {
-      var p = window.DpGrafikenPdf && DpGrafikenPdf.berichtPruefen ? DpGrafikenPdf.berichtPruefen(h) : { ok: !!h, grund: 'Kein Marktbericht zum Objekt' };
-      if (!p.ok) throw new Error(p.grund);
-      return berichtBytes(h.report_id);
-    });
-  }
-
   async function schnell(art, opt) {
     var html = await window.DpDokumente.dokument(art, opt || {});
     var d = new DOMParser().parseFromString(html, 'text/html'), f = d.querySelector('.fuss');
@@ -132,12 +76,7 @@
       body: JSON.stringify({ html: html.replace('</style>', '.fuss{display:none}</style>'), titel: d.title || NAMEN[art], fuss: fuss }) });
     if (r.status === 401) { hinweis('Sitzung abgelaufen – bitte neu anmelden.'); return true; }
     if (!r.ok || !/pdf/.test(r.headers.get('content-type') || '')) return false;
-    var blob = await r.blob(), name = dateiname(r, art);
-    if (opt && opt._mb) {   /* v4370 · Kombi */
-      try { blob = await anhaengen(blob, await opt._mb); name = name.replace(/\.pdf$/i, '') + '-mit-Marktbericht.pdf'; }
-      catch (e) { hinweis('Marktbericht nicht angehängt: ' + (e && e.message || 'Fehler') + ' Das Dokument kommt ohne ihn.'); }
-    }
-    herunterladen(blob, name);
+    herunterladen(await r.blob(), dateiname(r, art));
     return true;
   }
 
@@ -146,7 +85,6 @@
     var key = window._currentObjKey;
     if (objekt && !key) { hinweis('Bitte zuerst ein Objekt öffnen.'); return; }
     hinweis((NAMEN[art] || 'Dokument') + ' wird erstellt …');
-    var _mbp = berichtVorbereiten(opt); if (_mbp) { _mbp.catch(function () {}); opt = Object.assign({}, opt, { _mb: _mbp }); delete opt.mitMarktbericht; }   /* v4370 */
     try { if (await schnell(art, opt)) { hinweis('✓ ' + (NAMEN[art] || 'Dokument') + ' erstellt'); return; } }
     catch (e) { if (e && e.dpNutzer) { hinweis(e.message); return; } }   /* v3480 · „kein Objekt“, „kein Steuersatz“: PDF-Dienst und Vorschau wuerden nur dasselbe sagen */
     if (objekt) { try { if (typeof window.saveObj === 'function') await window.saveObj({ silent: true }); } catch (e) {} }
@@ -242,19 +180,19 @@
   (function warten() { if (umhuellen() < 7 && versuche++ < 40) setTimeout(warten, 250); })();   /* v3480: 7 Funktionen */
 
   window.DpDokWeiche = {
-    aktiv: aktiv, design: design, erzeugen: erzeugen, letzterBericht: letzterBericht,   /* v4370 */
+    aktiv: aktiv, design: design, erzeugen: erzeugen,
     selbstauskunft: function () { return erzeugen('selbstauskunft', {}, false); },   /* v3184 · Demo */
     /** für pdf-wahl.js: Investment-Familie (art 'voll'|'bank'|'kurz') */
-    investment: function (art, zusatz) {
+    investment: function (art) {
       if (art === 'voll') {
         if (typeof Paywall !== 'undefined' && !Paywall.gate('exports')) return;
         if (!tor('investment', 'Investment-PDF')) return;
         /* v3184 · Marcel 05.11.2026: nur noch zwei Fassungen - vollständig und kurz. Die vollständige ist die
            frühere Bankfassung (18-24 Seiten, ohne Urteil); 'investment' bleibt für Bot und Altaufrufer stehen. */
-        return erzeugen('bank', zusatz || {}, true);
+        return erzeugen('bank', {}, true);
       }
-      if (!tor('investment', art === 'kurz' ? 'Kurzfassung' : art === 'kompakt' ? 'Kompaktfassung' : 'Bankfassung')) return;
-      return erzeugen(art === 'kurz' ? 'kurz' : art === 'kompakt' ? 'kompakt' : 'bank', zusatz || {}, true);   /* v4370 · kompakt, Kombi */
+      if (!tor('investment', art === 'kurz' ? 'Kurzfassung' : 'Bankfassung')) return;
+      return erzeugen(art === 'kurz' ? 'kurz' : 'bank', {}, true);
     }
   };
 })();

@@ -19,7 +19,7 @@
    ═══════════════════════════════════════════════════════════════════════ */
 (function () {
   'use strict';
-  var VERSION = 'v4370';   /* v4370 · opt.css (Grafiken der Pilot-Analyse), Grün #3FA56C wie in der App */
+  var VERSION = 'v3217';
 
   /* ── Helfer ───────────────────────────────────────────────────────── */
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
@@ -58,7 +58,7 @@
   var CSS = [
     '@page{size:A4;margin:13mm 0 17mm}@page:first{margin:0}',
     '@page quer{size:A4 landscape;margin:12mm 0 14mm}',
-    ':root{--ink:#16161A;--muted:#5F5E66;--line:#E3E1DA;--soft:#F6F4EF;--gold:var(--wl-b8932f, #b8932f);--gold-l:color-mix(in srgb,var(--gold) 13%,#fff);--gold-d:color-mix(in srgb,var(--gold) 70%,#000);--obs:#0B0B0D;--gruen:#3FA56C;--rot:#B8625C}',
+    ':root{--ink:#16161A;--muted:#5F5E66;--line:#E3E1DA;--soft:#F6F4EF;--gold:var(--wl-b8932f, #b8932f);--gold-l:color-mix(in srgb,var(--gold) 13%,#fff);--gold-d:color-mix(in srgb,var(--gold) 70%,#000);--obs:#0B0B0D;--gruen:#2E8B57;--rot:#B8625C}',
     '*{box-sizing:border-box}html,body{margin:0;background:#fff;color:var(--ink)}',
     'body{font:9.4pt/1.5 Inter,system-ui,"Segoe UI",sans-serif;-webkit-print-color-adjust:exact;print-color-adjust:exact}',
     '.seite{width:210mm;padding:3mm 17mm 0;page-break-before:always;break-before:page}',
@@ -269,7 +269,7 @@
     var fonts = (location && location.origin ? location.origin : '') + '/fonts/dp-fonts.css';
     /* Querformat fuer das ganze Dokument (Bankexport): die Seitenregel kommt NACH der hochkant-Regel */
     var quer = opt && opt.quer ? '@page{size:A4 landscape;margin:12mm 0 14mm}@page:first{size:A4 landscape;margin:12mm 0 14mm}' : '';
-    return '<!doctype html><html lang="de"><head><meta charset="utf-8"><title>' + esc(titel) + '</title><link rel="stylesheet" href="' + fonts + '"><style>' + CSS + quer + markenGold() + (opt && opt.css ? opt.css : '') + '</style></head><body>' + seiten.join('') + '</body></html>';
+    return '<!doctype html><html lang="de"><head><meta charset="utf-8"><title>' + esc(titel) + '</title><link rel="stylesheet" href="' + fonts + '"><style>' + CSS + quer + markenGold() + '</style></head><body>' + seiten.join('') + '</body></html>';
   }
   function vorschau(doc, titel) {
     var alt = document.getElementById('dp-dok-vorschau'); if (alt) alt.remove();
