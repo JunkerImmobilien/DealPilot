@@ -1764,6 +1764,9 @@
   var _siT = null;
   function siBald() { clearTimeout(_siT); _siT = setTimeout(siZeichnen, 60); }
   ['dp:potenzial', 'dp:potenzial-markt', 'dp:mb-ready'].forEach(function (ev) { window.addEventListener(ev, siBald); });
+  /* v4490b · gemessen Westerfeldstr. 146: die Kennzahlleiste zeichnete vor dem Aufteilerwert (DpPotenzial) und blieb bei „Ertragswert · führend“ stehen */
+  var _kzT = null;
+  ['dp:potenzial', 'dp:potenzial-markt', 'dp:mb-ready'].forEach(function (ev) { window.addEventListener(ev, function () { clearTimeout(_kzT); _kzT = setTimeout(function () { try { kzNeu(); } catch (e) {} }, 80); }); });
 
   /* ══ v3440 · UNTERUMSCHALTER in Potenzial & Exit / Potenzial & Risiken ═══════════════════════════════
      Gemessen v3420: der Reiter war 2.693 px (Einfach) bzw. 5.470 px (Detail) lang, alles in einem Stück. Jetzt ist
