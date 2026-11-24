@@ -3619,6 +3619,18 @@ try { window._buildAIPayload = _buildAIPayload; } catch (e) {}
     var ktxt = root.querySelector('#dpv-txt');
     if (ktxt) _dpVerlaufKiText(hist, mets, ktxt);
 
+    /* v4570 · Marcel 24.11.2026: „das alte Diagramm Entwicklung im Zeitverlauf … so, dass es aussieht wie die obigen Graphen
+       und Charts“. Mit freigegebenen Grafiken ersetzt die Karte im Stil der Pilot-Analyse (grafiken-premium.js indexKarte)
+       die alte Karte samt Knöpfen; Tabelle und KI-Einordnung darunter bleiben. Sonst wie bisher. */
+    var _altK = cv && cv.closest ? cv.closest('.dpv-card') : null;
+    if (_altK && window.DpGrafikenPremium && DpGrafikenPremium.indexKarte && DpGrafikenPremium.frei && DpGrafikenPremium.frei()) {
+      var _gx = document.createElement('div'); _gx.className = 'dp-gn dp-gx'; _gx.setAttribute('data-dp-gn', 'gx-index-verlauf');
+      _altK.parentNode.replaceChild(_gx, _altK);
+      DpGrafikenPremium.indexKarte(_gx, hist, mets, { umschalten: function (key, an) { var row = root.querySelector('[data-mrow="' + key + '"]'); if (row) row.style.opacity = an ? '1' : '.45'; } });
+      mets.forEach(function (m, i) { if (i >= 2) { var row = root.querySelector('[data-mrow="' + m.key + '"]'); if (row) row.style.opacity = '.45'; } });
+      return;
+    }
+
     /* v3099 · Marcel 03.11.2026: „Grafiken und Verläufe einheitlich, so ähnlich wie im Tab Steuern" -
        statt des Chart.js-Bildes dieselbe SVG-Bauart wie der Steuerverlauf (pilot-analyse-v4.js) */
     if (cv && window.DpPilotV4 && window.DpPilotV4.indexVerlauf) {

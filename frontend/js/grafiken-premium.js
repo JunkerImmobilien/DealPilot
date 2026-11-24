@@ -111,6 +111,12 @@
       '.dp-gx .gx-mb-seg span{font:500 10.5px/1.2 Inter,sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:.92}.dp-gx .gx-mb-seg b{font:600 12px/1.2 "JetBrains Mono",monospace;white-space:nowrap}',
       '@media (max-width:640px){.dp-gx .gx-mb-z{grid-template-columns:minmax(0,1fr)}.dp-gx .gx-mb-l{flex-direction:row;gap:8px;align-items:baseline}.dp-gx .gx-mb-bahn{height:38px}.dp-gx .gx-mb-seg span{display:none}}',
       '.dp-gx .gx-leg i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}',
+      /* v4570 · Kennzahlen-Wahl der Karte „Entwicklung im Zeitverlauf“ (Wert & Lage) */
+      '.dp-gx .gx-wahl{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 12px}',
+      '.dp-gx .gx-wahl button{font:500 11.5px/1.2 Inter,sans-serif;padding:6px 11px;border-radius:999px;border:1px solid ' + F.linie2 + ';background:transparent;color:' + F.tinte3 + ';cursor:pointer;display:inline-flex;align-items:center;gap:7px;max-width:100%;text-align:left}',
+      '.dp-gx .gx-wahl button.an{background:' + F.flaeche + ';color:' + F.tinte + ';border-color:' + F.tinte3 + '}',
+      '.dp-gx .gx-wahl button i{flex:0 0 16px;height:3px;border-radius:2px;opacity:.35}',
+      '.dp-gx .gx-wahl button.an i{opacity:1}',
       /* v4280 · Marcel: „Gesamtbewertung, Einordnung, Investmentbewertung, DealPilot Insight und was jetzt zu tun ist, passend formatiert
          wie der Rest“. Nur mit Vorschau (body.dp-gn-an): dieselbe Karte wie die Grafiken (Fläche, Rand 10 %, Radius 14, Abstände), Überschrift
          wie der Kartentitel, Unterpunkte als Etikett. Der Text selbst bleibt unverändert. */
@@ -186,8 +192,9 @@
     return Math.max(260, Math.round(w));
   }
   function tipBinden(k) {
-    if (k._gxTip) return; k._gxTip = true;
-    var tip = document.createElement('div'); tip.className = 'gx-tip'; k.appendChild(tip);
+    /* v4570 · beim Neuzeichnen derselben Karte (karte() setzt innerHTML) den Tooltip wieder einhängen */
+    if (k._gxTip) { if (k._gxTipEl && !k.contains(k._gxTipEl)) k.appendChild(k._gxTipEl); return; } k._gxTip = true;
+    var tip = document.createElement('div'); tip.className = 'gx-tip'; k.appendChild(tip); k._gxTipEl = tip;
     k.addEventListener('mousemove', function (ev) {
       var t = ev.target && ev.target.closest ? ev.target.closest('[data-gx-tip]') : null;
       if (!t || !k.contains(t)) { tip.style.display = 'none'; return; }
@@ -273,13 +280,15 @@
     var BAENDER = d.baender || (d.band ? [d.band] : []);   /* v4310 · mehrere Bänder, je mit eigener Farbe (band.farbe) */
     BAENDER.forEach(function (bd) { bd.lo.concat(bd.hi).forEach(function (v) { if (v != null && isFinite(v)) alle.push(v); }); });
     (d.streu || []).forEach(function (q) { if (q.v != null && isFinite(q.v)) alle.push(q.v); });
-    var tk = ticks(Math.min(0, Math.min.apply(null, alle)), Math.max(0, Math.max.apply(null, alle)), 4), y0 = tk[0], y1 = tk[tk.length - 1];
+    /* v4570 · o.yFrei: Achse um die Werte statt ab null (Index um 100), d.xText: eigene Beschriftung je Punkt (Berichtsdatum) */
+    var aMin = Math.min.apply(null, alle), aMax = Math.max.apply(null, alle), aPad = Math.max(2, (aMax - aMin) * 0.18);
+    var tk = o.yFrei ? ticks(aMin - aPad, aMax + aPad, 4) : ticks(Math.min(0, aMin), Math.max(0, aMax), 4), y0 = tk[0], y1 = tk[tk.length - 1];
     var xs = function (j) { return m.l + (j - X[0]) / (X[n - 1] - X[0]) * (W - m.l - m.r); }, ys = function (v) { return m.t + (1 - (v - y0) / (y1 - y0)) * (H - m.t - m.b); };
     var out = ['<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="' + esc(o.aria || 'Verlauf') + '">'];
     tk.forEach(function (v) { out.push('<line class="gx-netz" x1="' + m.l + '" x2="' + (W - m.r) + '" y1="' + f1(ys(v)) + '" y2="' + f1(ys(v)) + '"/><text class="gx-ax" x="' + (m.l - 8) + '" y="' + f1(ys(v) + 4) + '" text-anchor="end">' + kurz(v) + '</text>'); });
     if (y0 < 0) out.push('<line x1="' + m.l + '" x2="' + (W - m.r) + '" y1="' + f1(ys(0)) + '" y2="' + f1(ys(0)) + '" style="stroke:' + F.linie2 + ';stroke-width:1.2"/>');
-    var schritt = Math.max(1, Math.ceil(n / Math.max(2, Math.floor((W - m.l - m.r) / 52))));
-    X.forEach(function (j, i) { if (i % schritt === 0 || (i === n - 1 && (n - 1) % schritt >= schritt / 2)) out.push('<text class="gx-ax" x="' + f1(xs(j)) + '" y="' + (H - 6) + '" text-anchor="middle"' + (j === d.heute ? ' style="fill:' + F.goldH + '"' : '') + '>' + j + '</text>'); });
+    var schritt = Math.max(1, Math.ceil(n / Math.max(2, Math.floor((W - m.l - m.r) / (d.xText ? 86 : 52)))));
+    X.forEach(function (j, i) { if (i % schritt === 0 || (i === n - 1 && (n - 1) % schritt >= schritt / 2)) out.push('<text class="gx-ax" x="' + f1(xs(j)) + '" y="' + (H - 6) + '" text-anchor="' + (d.xText ? (i === 0 ? 'start' : i === n - 1 ? 'end' : 'middle') : 'middle') + '"' + (j === d.heute ? ' style="fill:' + F.goldH + '"' : '') + '>' + esc(d.xText ? d.xText[i] : j) + '</text>'); });
     BAENDER.forEach(function (bd) {
       var pts = X.map(function (j, i) { return bd.hi[i] == null ? null : f1(xs(j)) + ',' + f1(ys(bd.hi[i])); }).filter(Boolean)
         .concat(X.slice().reverse().map(function (j, k) { var i = n - 1 - k; return bd.lo[i] == null ? null : f1(xs(j)) + ',' + f1(ys(bd.lo[i])); }).filter(Boolean));
@@ -460,7 +469,12 @@
     D.forEach(function (p, i) { if (i % st === 0 || (i === D.length - 1 && (D.length - 1) % st >= st / 2)) out.push('<text class="gx-ax" x="' + f1(x(p.j)) + '" y="' + (H - 6) + '" text-anchor="middle">' + p.j + '</text>'); });
     out.push('<path class="gx-zieh" d="M' + D.map(function (p) { return f1(x(p.j)) + ',' + f1(y(p.irr)); }).join(' L') + '" style="fill:none;stroke:' + F.gold + ';stroke-width:2.2;stroke-linejoin:round"/>');
     var best = D.reduce(function (a, b) { return b.irr > a.irr ? b : a; });
-    out.push('<circle cx="' + f1(x(best.j)) + '" cy="' + f1(y(best.irr)) + '" r="5" style="fill:' + F.gold + ';stroke:' + F.karte + ';stroke-width:2"/><text x="' + f1(x(best.j)) + '" y="' + f1(y(best.irr) - 10) + '" text-anchor="' + (x(best.j) > W - 120 ? 'end' : 'middle') + '" style="font:600 11px JetBrains Mono,monospace;fill:' + F.tinte + '">bestes Jahr ' + best.j + ' · ' + esc(pct(best.irr)) + '</text>');
+    /* v4570 · Marcel 24.11.2026: „bestes Jahr 2027 steht über den Graphen hinaus“. Lag der beste Punkt am linken Rand, stand die
+       Beschriftung mittig darüber und ragte links aus der Karte, oben lag sie auf „STEUERPFLICHTIG“.
+       Jetzt bündig zur Seite, auf der Platz ist, und unter dem Punkt, wenn er oben an den Feldbeschriftungen liegt. */
+    var bx = x(best.j), by = y(best.irr), bAnk = bx < m.l + 110 ? 'start' : (bx > W - m.r - 110 ? 'end' : 'middle');
+    var bTx = bAnk === 'start' ? bx + 9 : (bAnk === 'end' ? bx - 9 : bx), bTy = by - 10 < m.t + 24 ? by + 18 : by - 10;
+    out.push('<circle cx="' + f1(bx) + '" cy="' + f1(by) + '" r="5" style="fill:' + F.gold + ';stroke:' + F.karte + ';stroke-width:2"/><text x="' + f1(bTx) + '" y="' + f1(bTy) + '" text-anchor="' + bAnk + '" style="font:600 11px JetBrains Mono,monospace;fill:' + F.tinte + ';paint-order:stroke;stroke:' + F.karte + ';stroke-width:3px">bestes Jahr ' + best.j + ' · ' + esc(pct(best.irr)) + '</text>');
     var dx = (W - m.l - m.r) / Math.max(1, j1 - j0);
     D.forEach(function (p) { out.push('<rect x="' + f1(x(p.j) - dx / 2) + '" y="' + m.t + '" width="' + f1(dx) + '" height="' + (H - m.t - m.b) + '" style="fill:transparent"' + tipA('<div class="t">Verkauf Ende ' + p.j + '</div>Eigenkapitalrendite <b>' + pct(p.irr) + '</b> im Jahr<br>Rückfluss das <b>' + nf1.format(p.mult) + '-fache</b> des Eigenkapitals<br>' + (p.frei ? 'Verkauf steuerfrei' : 'Gewinn steuerpflichtig')) + '/>'); });
     out.push('</svg>');
@@ -1045,6 +1059,73 @@
     }
   }
 
+  /* ══ v4570 · Karten außerhalb der Pilot-Analyse-Reihen ══════════════
+     Marcel 24.11.2026: „das alte Diagramm Entwicklung im Zeitverlauf … mit unseren neuen Skills so, dass es aussieht wie die
+     obigen Graphen“ und „Verlauf mit Steuern … auch im Tab Steuern reinpacken … einheitlich“. Beide zeichnen mit denselben
+     Zeichnern wie die Pilot-Analyse (karte, verlauf), Breite aus dem Platz, neu bei Größenänderung. Keine eigene Rechnung:
+     indexKarte liest die Marktberichte, steuerVerlauf State.cfRows über MODELL.basis() wie der Reiter Steuer. */
+  function breitWache(host, fn) {
+    var w0 = 0, lauf = function () { var w = host.clientWidth || 0; if (w > 0 && Math.abs(w - w0) < 12) return; w0 = w; fn(w > 0 ? w : breiteVon(host)); if (reduziert()) host.classList.add('gx-still'); };
+    lauf();
+    if (host._gxRO || typeof ResizeObserver === 'undefined') return;
+    host._gxRO = new ResizeObserver(function () { if (host.isConnected) lauf(); }); host._gxRO.observe(host);
+  }
+  function indexKarte(host, hist, mets, o) {
+    o = o || {}; stil();
+    var FARBE = [F.gold, F.goldD, F.tinte3, F.gold2, F.tinte, F.tinte2], STRICH = [false, true, false, false, true, false];
+    var an = mets.map(function (m, i) { return i < 2; });
+    var datum = function (h) { try { return new Date(h.created_at).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' }); } catch (e) { return ''; } };
+    var basis = mets.map(function (m) { var b = hist.filter(function (h) { return zahl(h[m.key]) != null && Number(h[m.key]) !== 0; })[0]; return b ? Number(b[m.key]) : null; });
+    var idx = function (k, h) { var v = zahl(h[mets[k].key]); return v != null && basis[k] ? Math.round(v / basis[k] * 1000) / 10 : null; };
+    /* Titel aus der ersten Kennzahl (Marktpreisindikation): erster gegen letzten vorhandenen Wert */
+    var m0 = mets[0], h0 = hist.filter(function (h) { return zahl(h[m0.key]) != null; }), titel = 'Wie sich die Marktberichte entwickeln';
+    if (h0.length >= 2) {
+      var a = Number(h0[0][m0.key]), b = Number(h0[h0.length - 1][m0.key]), p = a ? (b - a) / Math.abs(a) * 100 : 0;
+      titel = Math.abs(p) < 0.5 ? m0.label + ' seit ' + datum(h0[0]) + ' stabil bei ' + m0.fmt(b)
+        : m0.label + ' seit ' + datum(h0[0]) + ' ' + (p > 0 ? '+' : '−') + nf1.format(Math.abs(p)) + ' % auf ' + m0.fmt(b);
+    }
+    var i = karte(host, { eyebrow: 'Entwicklung im Zeitverlauf', titel: titel, chips: [hist.length + ' Berichte'],
+      unter: 'Jeder Marktbericht als Punkt, der erste Bericht ist 100. Kennzahlen hier ein- und ausblenden, die Beträge stehen im Tooltip und in der Tabelle.',
+      fuss: ['Index 100 = Wert im ersten Bericht · 112 = 12 % höher als damals'] });
+    var wahl = document.createElement('div'); wahl.className = 'gx-wahl'; i.appendChild(wahl);
+    var ziel = document.createElement('div'); i.appendChild(ziel);
+    wahl.innerHTML = mets.map(function (m, k) {
+      return '<button type="button" data-k="' + k + '" class="' + (an[k] ? 'an' : '') + '" aria-pressed="' + an[k] + '"><i style="background:' + (STRICH[k] ? 'repeating-linear-gradient(90deg,' + FARBE[k] + ' 0 5px,transparent 5px 8px)' : FARBE[k]) + '"></i>' + esc(m.label) + '</button>';
+    }).join('');
+    var zeichnen = function (w) {
+      var R = []; mets.forEach(function (m, k) { if (an[k]) R.push({ name: m.label, farbe: FARBE[k % FARBE.length], gestrichelt: STRICH[k], dick: k === 0 ? 2.6 : 2, punkte: true, werte: hist.map(function (h) { return idx(k, h); }) }); });
+      if (!R.length) { ziel.innerHTML = '<div class="gx-s" style="margin:8px 0">Mindestens eine Kennzahl einblenden.</div>'; return; }
+      verlauf(ziel, { x: hist.map(function (h, q) { return q; }), xText: hist.map(function (h, q) { return (q + 1) + '. · ' + datum(h); }), reihen: R,
+        tip: function (q) {
+          var h = hist[q];
+          return '<div class="t">' + (q + 1) + '. Bericht · ' + esc(datum(h)) + '</div>' + mets.map(function (m, k) {
+            if (!an[k] || zahl(h[m.key]) == null) return '';
+            var x = idx(k, h); return esc(m.label) + ' <b>' + esc(m.fmt(Number(h[m.key]))) + '</b>' + (x != null ? ' · Index ' + nf1.format(x) : '') + '<br>';
+          }).join('');
+        } }, { breite: w - 2, yFrei: true, aria: 'Entwicklung der Marktberichte, erster Bericht = 100' });
+      ziehen(ziel);
+    };
+    var wBreite = 0;
+    wahl.addEventListener('click', function (ev) {
+      var bt = ev.target.closest ? ev.target.closest('button[data-k]') : null; if (!bt) return;
+      var k = +bt.getAttribute('data-k'); an[k] = !an[k]; bt.classList.toggle('an', an[k]); bt.setAttribute('aria-pressed', String(an[k]));
+      if (o.umschalten) try { o.umschalten(mets[k].key, an[k]); } catch (e) {}
+      zeichnen(wBreite || breiteVon(i)); host.classList.add('gx-still');
+    });
+    breitWache(host, function (w) { wBreite = w; zeichnen(w); });
+    return host;
+  }
+  function steuerVerlauf(host) {
+    if (!host || !FREI) return false; stil();
+    var P = MODELL.basis(); if (!P) { host.innerHTML = ''; host.style.display = 'none'; return false; }
+    host.style.display = ''; if (!host.classList.contains('dp-gx')) host.className = 'dp-gn dp-gx';
+    host._gxP = P;
+    if (host._gxGezeichnet) { karteVerlaufSteuer(host, host.clientWidth || breiteVon(host), P); return true; }
+    host._gxGezeichnet = true;
+    breitWache(host, function (w) { karteVerlaufSteuer(host, w, host._gxP || P); });
+    return true;
+  }
+
   /* Vorschau-Sperre: nur mit DpVorschau.frei('grafiken_neu') (zusätzlich zur Sperre in grafiken-neu.js, tools/vorschau-pruefen.mjs) */
   var FREI = false;
   function freigabe() { try { if (window.DpVorschau) window.DpVorschau.frei('grafiken_neu').then(function (an) { FREI = !!an; }); } catch (e) {} }
@@ -1068,6 +1149,6 @@
   }
   stilAnwenden();
   freigabe(); window.addEventListener('dp:vorschau', freigabe); window.addEventListener('dp:plan-ready', function () { setTimeout(freigabe, 300); });
-  window.DpGrafikenPremium = { lauf: function (h) { if (!FREI) { freigabe(); return; } stil(); try { pilotAnalyse(h); } catch (e) { try { console.warn('[grafiken-premium]', e); } catch (x) {} } }, MODELL: MODELL, _mieteuro: mieteuro, _zielDaten: zielDaten, _steuerBreakEven: steuerBreakEven, _einordnungDaten: einordnungDaten, stil: stilSetzen, stilWahl: stilWahl, stilAnwenden: stilAnwenden, _einordnung: einordnungDaten, _portfolio: portfolioSchnitt };
+  window.DpGrafikenPremium = { frei: function () { return FREI; }, indexKarte: indexKarte, steuerVerlauf: steuerVerlauf, lauf: function (h) { if (!FREI) { freigabe(); return; } stil(); try { pilotAnalyse(h); } catch (e) { try { console.warn('[grafiken-premium]', e); } catch (x) {} } }, MODELL: MODELL, _mieteuro: mieteuro, _zielDaten: zielDaten, _steuerBreakEven: steuerBreakEven, _einordnungDaten: einordnungDaten, stil: stilSetzen, stilWahl: stilWahl, stilAnwenden: stilAnwenden, _einordnung: einordnungDaten, _portfolio: portfolioSchnitt };
   window.DpGrafiken = { heatmap: heatmap, bullets: bullets, verlauf: verlauf, punktreihen: punktreihen, fahrplan: fahrplan, fingerabdruck: fingerabdruck, sankey: sankey, tornado: tornado, ausstieg: ausstieg, karte: karte, farben: F, modell: MODELL };
 })();
