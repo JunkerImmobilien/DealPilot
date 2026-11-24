@@ -685,6 +685,32 @@ const SCHEMATA = {
       bodenrichtwert_eur_m2: [0, 100000],
       durchschnittsmiete_eur_m2: [0, 1000]
     }
+  },
+  /* einzelcheck-3 (24.11.2026) · Bewertungsbericht ZU EINEM OBJEKT (eigener Marktbericht, Verkehrswertgutachten), nur
+     fuer den Einzel-Check der Landing (services/einzelcheck.js istWertbericht). Bewusst KEIN Eintrag in DOKUMENT_TYPEN:
+     klassifiziere() waehlt diese Art nie, der Dokument-Import der App bleibt unberuehrt. Ein solcher Bericht fuehrt
+     mehrere Eurobetraege (Kaufpreis, Angebotsmittel, Marktpreisindikation, Verfahrenswerte), das Exposé-Schema nahm
+     davon irgendeinen als Kaufpreis. */
+  wertbericht: {
+    einleitung: 'Aus dem folgenden Bewertungsbericht zu EINEM Objekt (Marktbericht, Wertermittlung oder Verkehrswertgutachten) extrahiere die Angaben als JSON. Trenne streng zwischen dem Kaufpreis und den Werten der Verfahren.',
+    schema: [
+      '{',
+      '  "kaufpreis_im_bericht_eur": number|null (NUR der im Bericht ausdruecklich als Kaufpreis oder Angebotspreis DIESES Objekts genannte Betrag; NIE ein Verfahrenswert, NIE eine Marktpreisindikation, NIE ein Mittelwert oder Median von Vergleichsangeboten, NIE ein Betrag vor oder nach einem Angebotsabschlag),',
+      '  "fuehrender_wert_eur": number|null (Wert des als fuehrend oder massgebend bezeichneten Verfahrens bzw. der Verkehrswert; gibt es keine Angabe, welches fuehrt: null),',
+      '  "fuehrendes_verfahren": "vergleichswert"|"ertragswert"|"sachwert"|"marktpreisindikation"|"verkehrswert"|null,',
+      '  "marktpreisindikation_eur": number|null (Marktpreisindikation bzw. Marktwert-Indikation aus Angeboten, nach Abschlag),',
+      '  "vergleichswert_eur": number|null, "ertragswert_eur": number|null, "sachwert_eur": number|null,',
+      '  "stichtag": string DD.MM.JJJJ|null,',
+      '  "objektart": string|null, "wohnflaeche_m2": number|null, "grundstuecksflaeche_m2": number|null, "baujahr": number|null,',
+      '  "nettokaltmiete_monat_eur": number|null (tatsaechliche Kaltmiete des Objekts im Monat in Euro, NICHT eine Marktmiete je m2),',
+      '  "plz": string|null, "ort": string|null',
+      '}'
+    ],
+    zahlen: {
+      kaufpreis_im_bericht_eur: [1000, 1e9], fuehrender_wert_eur: [1000, 1e9], marktpreisindikation_eur: [1000, 1e9],
+      vergleichswert_eur: [1000, 1e9], ertragswert_eur: [1000, 1e9], sachwert_eur: [1000, 1e9],
+      wohnflaeche_m2: [5, 1e6], grundstuecksflaeche_m2: [1, 1e7], baujahr: [1500, 2100], nettokaltmiete_monat_eur: [0, 1e7]
+    }
   }
 };
 

@@ -85,7 +85,24 @@ const MB_STUFE = 3;                  /* v3946 · Wertermittlung (Stufe 3) wie in
    (auch nicht erkannt) laeuft ueber das Exposé-Schema - wie dokument-import.js in der App. */
 const DOKUMENT_ARTEN = ['mietaufstellung', 'weg_protokoll', 'hausgeld', 'energieausweis', 'teilungserklaerung', 'mietvertrag'];
 const ART_NAME = { expose: 'Exposé', mietaufstellung: 'Mietaufstellung', weg_protokoll: 'WEG-Protokoll', hausgeld: 'Wirtschaftsplan',
-  energieausweis: 'Energieausweis', teilungserklaerung: 'Teilungserklärung', mietvertrag: 'Mietvertrag' };
+  energieausweis: 'Energieausweis', teilungserklaerung: 'Teilungserklärung', mietvertrag: 'Mietvertrag', wertbericht: 'Marktbericht' };
+/* einzelcheck-3 (Marcel 24.11.2026: „Marktbericht reingeladen mit 180.000 … die Unterlagen sagen was ganz anderes“).
+   GEMESSEN am Muster „Marktbericht Profi Baeckerstr 7“: klassifiziere() erkennt ihn richtig als „marktbericht“, aber
+   DOKUMENT_ARTEN kannte die Art nicht, und istExpose() sagte ja (Kaufpreis, Wohnfläche und „Vergleichsangebote“).
+   Er lief also über das Exposé-Schema, das aus FÜNF Eurobeträgen (Kaufpreis 165.000, Angebotsmittel vor Abschlag
+   180.000, Marktpreisindikation 171.000, Vergleichswert führend 143.550, Ertragswert 83.000) genau EINEN als
+   „Kaufpreis“ nimmt, und der Kunde sah nur „Unterlagen 165.000 €“ ohne Herkunft. Jetzt hat ein Bewertungsbericht
+   (eigener Marktbericht, Verkehrswertgutachten) ein eigenes Schema: der im Bericht angesetzte Kaufpreis heißt
+   „Kaufpreis im Marktbericht“, und die Werte der Verfahren stehen getrennt daneben, nie als Kaufpreis. */
+function istWertbericht(text, name, erk) {
+  const n = String(name || '').toLowerCase(), t = String(text || '').toLowerCase().slice(0, 8000);
+  if (/expos[eé]/.test(n)) return false;
+  if (erk && (erk.typ === 'marktbericht' || erk.typ === 'vwg_vorgutachten')) return true;
+  if (/(marktbericht|gutachten|wertermittlung|bewertung)/.test(n)) return true;
+  const indikation = /(marktwert-indikation|marktpreisindikation|verkehrswert)/.test(t);
+  const verfahren = /(spanne der verfahren|f(ü|ue)hrende[sn]? (bewertungs)?verfahren|vergleichswertverfahren|ertragswertverfahren|sachwertverfahren)/.test(t);
+  return indikation && verfahren;
+}
 /* v3940a · Exposé-Merkmal: „Exposé“ im Dateinamen oder am Anfang des Textes, oder ein Verkaufsangebot
    (Kaufpreis + Wohnfläche + Makler-/Provisions- bzw. Angebotsbegriff). Ein reiner Energieausweis, eine
    Mietaufstellung oder ein Protokoll führt keinen Kaufpreis mit Provision. */
@@ -219,7 +236,9 @@ const ZAHL_GRENZEN = {
   endenergie: [0, 1000], bj_heizung: [1900, 2100], leer_einheiten: [0, 10000], nkm_liste: [0, 1e7], wfl_liste: [1, 1e6],
   risiken_hoch: [0, 100], risiken_mittel: [0, 100], unterlagen: [0, VOLL_MAX_UNTERLAGEN],
   /* v3946 · Grundangaben: Miteigentumsanteil (Prozent) und die Finanzierung */
-  mea_pct: [0.01, 100], ek_eur: [0, 1e9], zins_pct: [0, 20], tilg_pct: [0, 10], bindung_j: [1, 40]
+  mea_pct: [0.01, 100], ek_eur: [0, 1e9], zins_pct: [0, 20], tilg_pct: [0, 10], bindung_j: [1, 40],
+  /* einzelcheck-3 · aus einem Bewertungsbericht: Wert des führenden Verfahrens und Marktpreisindikation (nur Anzeige) */
+  wert_bericht: [1000, 1e9], mpi_bericht: [1000, 1e9]
 };
 /* v3946 · GRUNDANGABEN des Kaeufers (Formular „Objekt“ und „Finanzierung“). Nur diese Felder, ueber dieselbe
    Weissliste wie die gelesenen Zahlen. Pflicht: GRUND_PFLICHT und PLZ oder Ort. */
@@ -243,7 +262,8 @@ const TEXT_REGELN = {
   ort: /^[A-Za-zÄÖÜäöüß][A-Za-zÄÖÜäöüß .\-()/]{1,59}$/,
   art: /^(ETW|EFH|ZFH|DHH|RH|MFH|GEW)$/,
   ek_klasse: /^(A\+|A|B|C|D|E|F|G|H)$/,
-  zustand: /^(neubau|erstbezug|saniert|renoviert|modernisiert|renovierungsbeduerftig)$/
+  zustand: /^(neubau|erstbezug|saniert|renoviert|modernisiert|renovierungsbeduerftig)$/,
+  wert_verfahren: /^(vergleichswert|ertragswert|sachwert|marktpreisindikation|verkehrswert)$/
 };
 function _zahl(v) {
   if (v === null || v === undefined || v === '' || typeof v === 'boolean') return null;
@@ -286,12 +306,17 @@ function _summe(liste, feld) {
 
 /** Aus den Antworten der Auslese die Zahlen ziehen. Reihenfolge der Quellen: Mietaufstellung vor Exposé
  *  fuer die Miete (Ist statt Angabe im Inserat), Wirtschaftsplan fuer nicht umlagefaehige Kosten. */
-function zahlenAus(ergebnisse) {
-  const z = {}; let risHoch = 0, risMittel = 0;
-  const setze = function (k, v) { const n = _zahl(v); if (n != null && z[k] == null) z[k] = n; };
+function zahlenAus(ergebnisse) { return zahlenUndHerkunft(ergebnisse).zahlen; }
+/* einzelcheck-3 · dazu je Feld, aus welcher Unterlage der Wert stammt (Art, nie der Dateiname): die Grundangaben
+   zeigen „aus dem Exposé“ / „aus dem Marktbericht“ am Feld, und bei Widerspruch wählt der Käufer. */
+function zahlenUndHerkunft(ergebnisse) {
+  const z = {}, her = {}; let risHoch = 0, risMittel = 0; let quelle = null;
+  const setze = function (k, v) { const n = _zahl(v); if (n != null && z[k] == null) { z[k] = n; if (quelle) her[k] = quelle; } };
+  const setzeT = function (k, v) { if (v != null && v !== '' && !z[k]) { z[k] = v; if (quelle) her[k] = quelle; } };
   const liste = (Array.isArray(ergebnisse) ? ergebnisse : []).filter(function (e) { return e && e.ok && e.extracted; });
   const nach = function (typ) { return liste.filter(function (e) { return e.typ === typ; }); };
   nach('mietaufstellung').forEach(function (e) {
+    quelle = ART_NAME.mietaufstellung;
     const x = e.extracted, eh = Array.isArray(x.einheiten) ? x.einheiten : [];
     setze('nkm_liste', x.summe_kaltmiete_monat_eur != null ? x.summe_kaltmiete_monat_eur : _summe(eh, 'kaltmiete_eur'));
     setze('wfl_liste', x.summe_wfl_m2 != null ? x.summe_wfl_m2 : _summe(eh, 'wfl_m2'));
@@ -301,32 +326,50 @@ function zahlenAus(ergebnisse) {
     }
   });
   nach('expose').forEach(function (e) {
+    quelle = ART_NAME.expose;
     const x = e.extracted;
     setze('kp', x.kaufpreis); setze('wfl', x.wohnflaeche); setze('nkm', x.nettokaltmiete); setze('gsfl', x.grundstuecksflaeche);
     setze('bj', x.baujahr); setze('zimmer', x.zimmer); setze('einheiten', x.wohneinheiten); setze('nk_pct', x.kaufnebenkosten);
     setze('makler_pct', x.kaeuferprovision_pct); setze('hausgeld_monat', x.hausgeld); setze('endenergie', x.energieverbrauch);
     const ze = (_zahl(x.stellplatz_miete_monat) || 0) + (_zahl(x.kueche_miete_monat) || 0) + (_zahl(x.zusatz_miete_monat) || 0);
     if (ze > 0) setze('ze', ze);
-    if (!z.plz && typeof x.plz === 'string') z.plz = x.plz.trim();
-    if (!z.ort && typeof x.ort === 'string') z.ort = x.ort.trim();
-    if (!z.art) z.art = _artAus(x.objektart);
-    if (!z.ek_klasse && x.energieklasse) z.ek_klasse = String(x.energieklasse).toUpperCase();
-    if (!z.zustand) z.zustand = _zustandAus(x.zustand);
+    if (typeof x.plz === 'string') setzeT('plz', x.plz.trim());
+    if (typeof x.ort === 'string') setzeT('ort', x.ort.trim());
+    setzeT('art', _artAus(x.objektart));
+    if (x.energieklasse) setzeT('ek_klasse', String(x.energieklasse).toUpperCase());
+    setzeT('zustand', _zustandAus(x.zustand));
+  });
+  /* einzelcheck-3 · Bewertungsbericht NACH dem Exposé: dessen Kaufpreis ist die Angabe des Verkäufers, der Bericht
+     ergänzt nur, was noch fehlt. Die Werte der Verfahren gehen nie in den Kaufpreis. */
+  nach('wertbericht').forEach(function (e) {
+    quelle = ART_NAME.wertbericht;
+    const x = e.extracted;
+    setze('kp', x.kaufpreis_im_bericht_eur); setze('wfl', x.wohnflaeche_m2); setze('nkm', x.nettokaltmiete_monat_eur);
+    setze('gsfl', x.grundstuecksflaeche_m2); setze('bj', x.baujahr);
+    setze('wert_bericht', x.fuehrender_wert_eur); setze('mpi_bericht', x.marktpreisindikation_eur);
+    const vf = String(x.fuehrendes_verfahren || '').toLowerCase();
+    if (/^(vergleichswert|ertragswert|sachwert|marktpreisindikation|verkehrswert)$/.test(vf)) setzeT('wert_verfahren', vf);
+    if (typeof x.plz === 'string') setzeT('plz', x.plz.trim());
+    if (typeof x.ort === 'string') setzeT('ort', x.ort.trim());
+    setzeT('art', _artAus(x.objektart));
   });
   nach('hausgeld').forEach(function (e) {
+    quelle = ART_NAME.hausgeld;
     const ein = e.extracted.einzel || {};
     setze('hausgeld_monat', ein.hausgeld_monat_eur); setze('bwk_nul_jahr', ein.nicht_umlagefaehig_jahr_eur);
     setze('ruecklage_zuf_jahr', ein.ruecklage_zufuehrung_jahr_eur); setze('ruecklage_stand', e.extracted.ruecklage_stand_eur);
   });
   nach('weg_protokoll').forEach(function (e) {
+    quelle = ART_NAME.weg_protokoll;
     const x = e.extracted;
     setze('ruecklage_stand', x.ruecklage_stand_eur != null ? x.ruecklage_stand_eur : x.instandhaltungsruecklage_eur);
     const su = (Array.isArray(x.sonderumlagen_geplant) ? x.sonderumlagen_geplant : []).filter(function (s) { return s && s.status === 'beschlossen'; });
     if (su.length) { setze('sonderumlagen_anzahl', su.length); setze('sonderumlage_eur', _summe(su, 'betrag_einheit_eur') || null); }
   });
   nach('energieausweis').forEach(function (e) {
+    quelle = ART_NAME.energieausweis;
     const x = e.extracted;
-    if (!z.ek_klasse && x.energieeffizienzklasse) z.ek_klasse = String(x.energieeffizienzklasse).toUpperCase().replace(/\s/g, '');
+    if (x.energieeffizienzklasse) setzeT('ek_klasse', String(x.energieeffizienzklasse).toUpperCase().replace(/\s/g, ''));
     setze('endenergie', x.endenergie_kwh_m2a); setze('bj', x.baujahr_gebaeude); setze('bj_heizung', x.baujahr_waermeerzeuger);
     setze('einheiten', x.anzahl_wohnungen);
   });
@@ -336,12 +379,14 @@ function zahlenAus(ergebnisse) {
     });
   });
   /* Die Ist-Miete der Mietaufstellung schlaegt die Angabe im Exposé */
-  if (z.nkm_liste > 0) z.nkm = z.nkm_liste;
-  if (!(z.wfl > 0) && z.wfl_liste > 0) z.wfl = z.wfl_liste;
+  if (z.nkm_liste > 0) { z.nkm = z.nkm_liste; her.nkm = ART_NAME.mietaufstellung; }
+  if (!(z.wfl > 0) && z.wfl_liste > 0) { z.wfl = z.wfl_liste; her.wfl = ART_NAME.mietaufstellung; }
   if (risHoch) z.risiken_hoch = risHoch;
   if (risMittel) z.risiken_mittel = risMittel;
   z.unterlagen = liste.length;
-  return zahlenSauber(z);
+  const zahlen = zahlenSauber(z), herkunft = {};
+  Object.keys(her).forEach(function (k) { if (zahlen[k] != null) herkunft[k] = her[k]; });
+  return { zahlen: zahlen, herkunft: herkunft };
 }
 
 /* Was der Bericht aus einer Unterlage zeigen darf: Art, ob gelesen, Risiken als kurze Saetze.
@@ -390,7 +435,8 @@ async function leseEine(datei, modell) {
      zurück (Kaufpreis, Wohnfläche, Miete fehlten). DOKUMENT_TYPEN kennt kein Exposé, und ein Exposé
      führt fast immer einen Abschnitt zum Energieausweis. In der App wählt der Nutzer das Exposé
      ausdrücklich, hier entscheidet nur die Erkennung - deshalb gewinnt ein Exposé-Merkmal. */
-  const typ = istExpose(text, name) ? 'expose' : (DOKUMENT_ARTEN.indexOf(erk.typ) >= 0 ? erk.typ : 'expose');
+  const typ = istWertbericht(text, name, erk) ? 'wertbericht'
+    : istExpose(text, name) ? 'expose' : (DOKUMENT_ARTEN.indexOf(erk.typ) >= 0 ? erk.typ : 'expose');
   let r;
   try {
     r = typ === 'expose'
@@ -414,10 +460,11 @@ async function auslesen(dateien, modus) {
   const zuLesen = alle.slice(0, max);
   const ergebnisse = [];
   for (const f of zuLesen) ergebnisse.push(await leseEine(f, modell));
-  const zahlen = zahlenAus(ergebnisse);
+  const zh = zahlenUndHerkunft(ergebnisse), zahlen = zh.zahlen;
   const out = {
     modus: voll ? 'voll' : 'frei', modell: modell,
     zahlen: zahlen,
+    herkunft: zh.herkunft,   /* einzelcheck-3 · Feld -> Art der Unterlage, nur zur Anzeige (nicht im Siegel, nicht gespeichert) */
     unterlagen: ergebnisse.map(anzeigeAus),
     nicht_gelesen: alle.slice(max).map(function (f) { return { name: dateiname(f), grund: 'im_bericht' }; })
   };
@@ -977,6 +1024,6 @@ module.exports = {
   freiMoeglich, tagesverbrauchEur, preis, landingBasis, kaufAnlegen, kaufLesen, statusAus, berichtGezaehlt,
   handleEinzelcheckPaid, marktAus, vglAus, mbEingabe, markt, textAus, kostenErfassen, adresseAus, aufraeumen, starteTakt, MB_STUFE, OCR_SEITEN, OCR_ZEIT_MS,
   /* v3946 */ grundSauber, grundFehlt, GRUND_FELDER, GRUND_PFLICHT, wertAus, ueberschrift, KAPITEL,
-  istExpose, _setzeDeps, _pdfText,
+  istExpose, istWertbericht, zahlenUndHerkunft, _setzeDeps, _pdfText,
   /* einzelcheck-2 */ karteHolen, berichtMailen, mailErlaubt, mailInhalt, emailForm, MAX_MAILS
 };

@@ -1,5 +1,14 @@
 /* ═══════════════════════════════════════════════════════════════════════
-   einzelcheck.js · v3940 (20.11.2026) / v3941 (21.11.2026) / v3944 / v3946 (22.11.2026) · Einzel-Check der Landing, echter Ablauf
+   einzelcheck.js · v3940 (20.11.2026) / v3941 (21.11.2026) / v3944 / v3946 (22.11.2026) / einzelcheck-3 (24.11.2026) · Einzel-Check der Landing, echter Ablauf
+
+   einzelcheck-3 · Marcel 24.11.2026: „erst die Unterlagen auslesen und dann auch schauen, welche Werte wir ergänzen
+   müssen … erst auslesen, dann die Grundangaben gucken, was noch fehlt, und dann wird der Bericht daraus erstellt“.
+   Ablauf jetzt: 1 Unterlagen (oder ohne weiter) → 2 Auslesen → 3 GRUNDANGABEN, vorbelegt aus den Unterlagen, je Feld
+   mit Herkunft („aus dem Exposé“, „aus dem Marktbericht“, „aus deinem Deal-Check“), Pflichtfelder ohne Wert als
+   „fehlt“ markiert → 4 Ergebnis und Kauf → 5 Bericht. Widerspricht eine Unterlage einer Angabe (Deal-Check oder
+   eigene Eingabe), stehen BEIDE Werte am Feld und der Käufer wählt, weiter geht es erst danach (nie still
+   überschrieben). Ein Marktbericht oder Gutachten liest der Server mit eigenem Schema (services/einzelcheck.js
+   istWertbericht): sein Kaufpreis heißt „aus dem Marktbericht“, seine Verfahrenswerte stehen als Hinweis daneben.
 
    v3946 · Marcel nach dem Testkauf 22.11.2026 („danach musste ich das Exposé wieder hochladen … Stufe drei …
    Finanzierung … Anschlussfinanzierung auf fünf Prozent … im Stil unserer sonstigen Unterlagen … nichts davor mit
@@ -54,7 +63,7 @@
 (function () {
   'use strict';
   if (window.DpEinzelCheck) return;
-  var VERSION = 'v3946';
+  var VERSION = 'einzelcheck-3';
   var ANSCHLUSS_ZINS = 5.0;     /* v3946 · Marcel 22.11.2026: „Anschlussfinanzierung, die wir einfach auf fünf Prozent rechnen mit derselben Tilgung“ */
   var ABLAGE_STUNDEN = 2;       /* v3946 · Unterlagen im Browser höchstens so lange (die Stripe-Kasse läuft nach 60 Minuten ab) */
   var SPEICHER = 'dp_ec_kauf';
@@ -115,7 +124,8 @@
   }
 
   /* ── Zustand: Dateien NUR im Arbeitsspeicher dieses Tabs ─────────────── */
-  var S = { dateien: [], frei: null, token: null, status: null, bericht: null, abfrage: null, grund: null, adresse: '', abweichungen: [] };
+  var S = { dateien: [], frei: null, token: null, status: null, bericht: null, abfrage: null, grund: null, adresse: '', abweichungen: [],
+    herkunft: {}, ohneUnterlagen: false };   /* einzelcheck-3 · Herkunft je Feld aus dem Auslesen, Weg ohne Unterlagen */
   function tokenMerken(t) { S.token = t; try { sessionStorage.setItem(SPEICHER, t); } catch (e) {} }
   function tokenLesen() { if (S.token) return S.token; try { S.token = sessionStorage.getItem(SPEICHER) || null; } catch (e) {} return S.token; }
 
@@ -186,7 +196,7 @@
     fenster.hidden = true;
     fenster.innerHTML = '<div class="ec-dunkel"></div><div class="ec-box" role="dialog" aria-modal="true" aria-labelledby="ecTitel">'
       + '<div class="ec-leiste"><span class="ec-marke">Einzel-Check</span>' + (/(^|\.)staging\./.test(location.hostname) ? '<span class="ec-demo">Staging · Abnahme läuft</span>' : '') + '<button type="button" class="ec-x" data-zu aria-label="Schließen">×</button></div>'
-      + '<ol class="ec-schritte" aria-hidden="true"><li>Grundangaben</li><li>Unterlagen</li><li>Auslesen</li><li>Ergebnis</li><li>Bericht</li></ol>'
+      + '<ol class="ec-schritte" aria-hidden="true"><li>Unterlagen</li><li>Auslesen</li><li>Grundangaben</li><li>Ergebnis</li><li>Bericht</li></ol>'
       + '<div class="ec-inhalt" aria-live="polite"></div></div>';
     document.body.appendChild(fenster);
     inhalt = $('.ec-inhalt', fenster);
@@ -212,9 +222,9 @@
   function auf() {
     oeffnen();
     if (S.bericht) zeigeBericht(S.bericht);
-    else if (S.frei && !grundFehlt(S.grund).length) zeigeErgebnis();
-    else if (grundFehlt(S.grund).length) zeigeGrund();   /* v3946 · erst die Grundangaben */
-    else zeigeUnterlagen();
+    else if ((S.frei || S.ohneUnterlagen) && S.grund && !grundFehlt(S.grund).length) zeigeErgebnis();
+    else if (S.frei || S.ohneUnterlagen) zeigeGrund();   /* einzelcheck-3 · nach dem Auslesen die Grundangaben */
+    else zeigeUnterlagen();                                /* einzelcheck-3 · zuerst die Unterlagen */
   }
   function frageWeg() { var q = fenster && $('.ec-frage', fenster); if (q) q.remove(); }
   function zu(sicher) {
@@ -275,6 +285,8 @@
     return isFinite(n) ? n : null;
   }
   function feldText(n, st) { return istZahl(n) ? (st ? dez(n, st) : Math.round(n).toLocaleString('de-DE')) : ''; }
+  /* einzelcheck-3 · Basis der Grundangaben: die eigene Eingabe (schon einmal bestätigt) oder der Deal-Check */
+  function grundBasis() { return S.grund ? { g: S.grund, q: 'eingabe' } : { g: grundVorbelegt(), q: 'dealcheck' }; }
   function grundVorbelegt() {
     if (S.grund) return S.grund;
     var g = {}, dc = window.DpDealCheck && DpDealCheck.letztes ? DpDealCheck.letztes() : null;
@@ -289,35 +301,109 @@
     var b = dom('dcBj'); if (b >= 1500 && b <= 2100) g.bj = Math.round(b);
     return g;
   }
+  /* einzelcheck-3 · Felder, die eine Unterlage vorbelegen kann, mit Art des Vergleichs */
+  var VORBELEGBAR = { kp: 'eur', nkm: 'eur', wfl: 'qm', ze: 'eur', bj: 'jahr', gsfl: 'qm', mea_pct: 'pct', nk_pct: 'pct', plz: 'text', ort: 'text', art: 'art' };
+  var AUS_ART = { 'Exposé': 'dem Exposé', 'Mietaufstellung': 'der Mietaufstellung', 'Marktbericht': 'dem Marktbericht', 'Energieausweis': 'dem Energieausweis',
+    'Wirtschaftsplan': 'dem Wirtschaftsplan', 'WEG-Protokoll': 'dem WEG-Protokoll', 'Mietvertrag': 'dem Mietvertrag', 'Teilungserklärung': 'der Teilungserklärung' };
+  function ausText(art) { return 'aus ' + (AUS_ART[art] || 'den Unterlagen'); }
+  function gleich(art, a, b) {
+    if (art === 'text' || art === 'art') return String(a).trim().toLowerCase() === String(b).trim().toLowerCase();
+    return Math.abs(Number(a) - Number(b)) <= Math.max(0.5, Math.abs(Number(a)) * 0.005);
+  }
+  function wertText(art, w) {
+    if (art === 'eur') return eur(w); if (art === 'qm') return dez(w, w % 1 ? 1 : 0) + ' m²'; if (art === 'pct') return dez(w, 2) + ' %';
+    if (art === 'jahr') return String(Math.round(w));
+    if (art === 'art') { var a = ART_LISTE.filter(function (y) { return y[0] === w; })[0]; return a ? a[1] : String(w); }
+    return String(w);
+  }
+  function feldWertForm(art, w) { return art === 'jahr' ? String(Math.round(w)) : art === 'pct' ? feldText(w, 2) : art === 'qm' ? feldText(w, w % 1 ? 1 : 0) : art === 'eur' ? feldText(w) : String(w); }
+  /* Je Feld: Wert, Herkunft und ob Unterlage und Angabe sich widersprechen */
+  function vorbelegung() {
+    var basis = grundBasis(), g = basis.g || {}, z = (S.frei && S.frei.zahlen) || {}, her = S.herkunft || {};
+    var werte = {}, quelle = {}, konflikt = {};
+    Object.keys(g).forEach(function (k) { if (g[k] != null && g[k] !== '') { werte[k] = g[k]; quelle[k] = basis.q; } });
+    Object.keys(VORBELEGBAR).forEach(function (k) {
+      var u = z[k]; if (u == null || u === '') return;
+      if (werte[k] == null || werte[k] === '') { werte[k] = u; quelle[k] = her[k] || 'Unterlagen'; return; }
+      if (!gleich(VORBELEGBAR[k], werte[k], u)) konflikt[k] = { a: werte[k], aq: basis.q, b: u, bq: her[k] || 'Unterlagen' };
+    });
+    return { werte: werte, quelle: quelle, konflikt: konflikt };
+  }
+  function quelleText(q) { return q === 'eingabe' ? 'deine Angabe' : q === 'dealcheck' ? 'aus deinem Deal-Check' : ausText(q); }
   function zeigeGrund(hinweis) {
-    stufe(0); ++schritt;
-    var g = grundVorbelegt();
-    var f = function (id, label, wert, opt) {
-      opt = opt || {};
-      return '<label class="ec-f' + (opt.breit ? ' breit' : '') + '"><span>' + esc(label) + (opt.frei ? ' <em>optional</em>' : '') + '</span>'
-        + '<input id="' + id + '" inputmode="' + (opt.text ? 'text' : 'decimal') + '" value="' + esc(wert) + '"' + (opt.ph ? ' placeholder="' + esc(opt.ph) + '"' : '')
-        + (opt.max ? ' maxlength="' + opt.max + '"' : '') + ' autocomplete="off">' + (opt.einheit ? '<i>' + esc(opt.einheit) + '</i>' : '') + '</label>';
+    stufe(2); ++schritt;
+    var vb = vorbelegung(), g = vb.werte, offen = {};
+    Object.keys(vb.konflikt).forEach(function (k) { offen[k] = true; });
+    var IDS = { kp: 'ecgKp', nkm: 'ecgNkm', wfl: 'ecgWfl', art: 'ecgArt', plz: 'ecgPlz', ort: 'ecgOrt', ze: 'ecgZe', bj: 'ecgBj', gsfl: 'ecgGsfl', mea_pct: 'ecgMea',
+      ek_eur: 'ecgEk', nk_pct: 'ecgNk', zins_pct: 'ecgZins', tilg_pct: 'ecgTilg', bindung_j: 'ecgBind' };
+    var pflicht = function (k) { return GRUND_PFLICHT.indexOf(k) >= 0 || k === 'plz'; };
+    /* Zeile unter dem Feld: Herkunft, „fehlt“ oder die Wahl bei Widerspruch */
+    var unter = function (k) {
+      var kf = vb.konflikt[k];
+      if (kf) {
+        var art = VORBELEGBAR[k];
+        return '<div class="ec-wahl" data-k="' + k + '"><small>Deine Unterlagen sagen etwas anderes. Welcher Wert gilt?</small>'
+          + '<button type="button" class="ec-wahl-a" data-v="' + esc(kf.a) + '">' + esc(wertText(art, kf.a)) + ' <em>' + esc(quelleText(kf.aq)) + '</em></button>'
+          + '<button type="button" class="ec-wahl-b" data-v="' + esc(kf.b) + '">' + esc(wertText(art, kf.b)) + ' <em>' + esc(quelleText(kf.bq)) + '</em></button></div>';
+      }
+      if (g[k] != null && g[k] !== '' && vb.quelle[k] && vb.quelle[k] !== 'eingabe') return '<small class="ec-her' + (vb.quelle[k] === 'dealcheck' ? '' : ' doc') + '">' + esc(quelleText(vb.quelle[k])) + '</small>';
+      if ((g[k] == null || g[k] === '') && pflicht(k) && !(k === 'plz' && g.ort)) return '<small class="ec-her fehlt">fehlt, bitte ergänzen</small>';
+      return '';
     };
-    var art = '<label class="ec-f"><span>Objektart</span><select id="ecgArt"><option value="">Bitte wählen</option>'
-      + ART_LISTE.map(function (a) { return '<option value="' + a[0] + '"' + (g.art === a[0] ? ' selected' : '') + '>' + a[1] + '</option>'; }).join('') + '</select></label>';
+    var f = function (id, k, label, wert, opt) {
+      opt = opt || {};
+      var leer = (g[k] == null || g[k] === '') && pflicht(k) && !(k === 'plz' && g.ort);
+      return '<label class="ec-f' + (opt.breit ? ' breit' : '') + (leer ? ' fehlt' : '') + (vb.konflikt[k] ? ' wahl' : '') + '"><span>' + esc(label) + (opt.frei ? ' <em>optional</em>' : '') + '</span>'
+        + '<div class="ec-ein"><input id="' + id + '" inputmode="' + (opt.text ? 'text' : 'decimal') + '" value="' + esc(wert) + '"' + (opt.ph ? ' placeholder="' + esc(opt.ph) + '"' : '')
+        + (opt.max ? ' maxlength="' + opt.max + '"' : '') + ' autocomplete="off">' + (opt.einheit ? '<i>' + esc(opt.einheit) + '</i>' : '') + '</div>' + unter(k) + '</label>';
+    };
+    var artLeer = !g.art;
+    var art = '<label class="ec-f' + (artLeer ? ' fehlt' : '') + (vb.konflikt.art ? ' wahl' : '') + '"><span>Objektart</span><select id="ecgArt"><option value="">Bitte wählen</option>'
+      + ART_LISTE.map(function (a) { return '<option value="' + a[0] + '"' + (g.art === a[0] ? ' selected' : '') + '>' + a[1] + '</option>'; }).join('') + '</select>' + unter('art') + '</label>';
     var bind = '<label class="ec-f"><span>Zinsbindung</span><select id="ecgBind">' + [5, 10, 15, 20, 25, 30].map(function (j) {
       return '<option value="' + j + '"' + ((g.bindung_j || 10) === j ? ' selected' : '') + '>' + j + ' Jahre</option>'; }).join('') + '</select></label>';
     var strasse = S.adresse ? String(S.adresse).split(',')[0] : '';
-    setze('<h3 id="ecTitel">Erst die Grundangaben, dann die Unterlagen.</h3>'
-      + '<p class="ec-lead">Damit rechnet der Bericht. Was die Unterlagen genauer wissen, ergänzt DealPilot danach. Eine Anschrift brauchst du nicht.</p>'
-      + (hinweis ? meldung(hinweis, 'warn') : '')
+    /* Kopf: was die Unterlagen gefüllt haben, was fehlt, wo zu wählen ist */
+    var ausDok = Object.keys(vb.quelle).filter(function (k) { return vb.quelle[k] !== 'eingabe' && vb.quelle[k] !== 'dealcheck' && !vb.konflikt[k]; }).length;
+    var fehltJetzt = grundFehlt(g), NAMEN = { kp: 'Kaufpreis', nkm: 'Kaltmiete', wfl: 'Wohnfläche', art: 'Objektart', plz: 'Postleitzahl oder Ort', ek_eur: 'Eigenkapital', zins_pct: 'Sollzins', tilg_pct: 'Tilgung', bindung_j: 'Zinsbindung' };
+    var nWahl = Object.keys(vb.konflikt).length;
+    var lead = S.frei ? (ausDok ? ausDok + (ausDok === 1 ? ' Angabe stammt' : ' Angaben stammen') + ' aus deinen Unterlagen.' : 'Aus deinen Unterlagen ließ sich keine Grundangabe ablesen.') : 'Ohne Unterlagen rechnet der Bericht mit diesen Angaben.';
+    var stand = '<ul class="ec-stand">'
+      + (fehltJetzt.length ? '<li class="fehlt"><b>Es fehlt noch:</b> ' + esc(fehltJetzt.map(function (k) { return NAMEN[k]; }).join(', ')) + '</li>' : '<li class="ok"><b>Alle Pflichtangaben sind da.</b></li>')
+      + (nWahl ? '<li class="wahl"><b>' + nWahl + (nWahl === 1 ? ' Angabe weicht' : ' Angaben weichen') + ' ab.</b> Bitte am Feld wählen, welcher Wert gilt.</li>' : '') + '</ul>';
+    var z = (S.frei && S.frei.zahlen) || {};
+    var VF = { vergleichswert: 'Vergleichswert', ertragswert: 'Ertragswert', sachwert: 'Sachwert', marktpreisindikation: 'Marktpreisindikation', verkehrswert: 'Verkehrswert' };
+    var wertInfo = (z.wert_bericht > 0 || z.mpi_bericht > 0) ? '<p class="ec-wertinfo"><b>Laut deinem Marktbericht</b>'
+      + (z.wert_bericht > 0 ? (VF[z.wert_verfahren] || 'Wert') + (z.wert_verfahren && z.wert_verfahren !== 'verkehrswert' ? ', führend' : '') + ' ' + eur(z.wert_bericht) : '')
+      + (z.wert_bericht > 0 && z.mpi_bericht > 0 ? ' · ' : '') + (z.mpi_bericht > 0 ? 'Marktpreisindikation ' + eur(z.mpi_bericht) : '')
+      + '. Das sind Werte, kein Kaufpreis. Der Bericht ermittelt den Wert neu.</p>' : '';
+    setze('<h3 id="ecTitel">Prüf und ergänz die Grundangaben.</h3>'
+      + '<p class="ec-lead">' + esc(lead) + ' Damit rechnet der Bericht. Eine Anschrift brauchst du nicht.</p>'
+      + (hinweis ? meldung(hinweis, 'warn') : '') + stand
       + '<form class="ec-grund" novalidate><fieldset><legend>Objekt</legend><div class="ec-raster">'
-      + art + f('ecgKp', 'Kaufpreis', feldText(g.kp), { einheit: '€' }) + f('ecgNkm', 'Kaltmiete im Monat', feldText(g.nkm), { einheit: '€' })
-      + f('ecgWfl', 'Wohnfläche', feldText(g.wfl, g.wfl % 1 ? 1 : 0), { einheit: 'm²' }) + f('ecgPlz', 'Postleitzahl', g.plz || '', { text: 1, max: 5, ph: '12345' })
-      + f('ecgOrt', 'Ort', g.ort || '', { text: 1, frei: 1, ph: 'wenn ohne PLZ' })
-      + f('ecgZe', 'Zusatzeinnahmen im Monat', feldText(g.ze), { einheit: '€', frei: 1, ph: 'Stellplatz, Küche' }) + f('ecgBj', 'Baujahr', g.bj ? String(Math.round(g.bj)) : '', { frei: 1, max: 4 })
-      + f('ecgGsfl', 'Grundstücksfläche', feldText(g.gsfl), { einheit: 'm²', frei: 1, ph: 'bei Häusern' }) + f('ecgMea', 'Miteigentumsanteil', feldText(g.mea_pct, 2), { einheit: '%', frei: 1, ph: 'bei Wohnungen' })
-      + f('ecgStr', 'Straße und Hausnummer', strasse, { text: 1, frei: 1, breit: 1, ph: 'nur für den Bodenrichtwert, wird nicht gespeichert' })
-      + '</div></fieldset><fieldset><legend>Finanzierung</legend><div class="ec-raster">'
-      + f('ecgEk', 'Eigenkapital', feldText(g.ek_eur), { einheit: '€' }) + f('ecgNk', 'Kaufnebenkosten', feldText(g.nk_pct != null ? g.nk_pct : 10, 1), { einheit: '%' })
-      + f('ecgZins', 'Sollzins', feldText(g.zins_pct, 2), { einheit: '%' }) + f('ecgTilg', 'Tilgung im Jahr', feldText(g.tilg_pct != null ? g.tilg_pct : 1.5, 2), { einheit: '%' }) + bind
+      + art + f('ecgKp', 'kp', 'Kaufpreis', feldText(g.kp), { einheit: '€' }) + f('ecgNkm', 'nkm', 'Kaltmiete im Monat', feldText(g.nkm), { einheit: '€' })
+      + f('ecgWfl', 'wfl', 'Wohnfläche', feldText(g.wfl, g.wfl % 1 ? 1 : 0), { einheit: 'm²' }) + f('ecgPlz', 'plz', 'Postleitzahl', g.plz || '', { text: 1, max: 5, ph: '12345' })
+      + f('ecgOrt', 'ort', 'Ort', g.ort || '', { text: 1, frei: 1, ph: 'wenn ohne PLZ' })
+      + f('ecgZe', 'ze', 'Zusatzeinnahmen im Monat', feldText(g.ze), { einheit: '€', frei: 1, ph: 'Stellplatz, Küche' }) + f('ecgBj', 'bj', 'Baujahr', g.bj ? String(Math.round(g.bj)) : '', { frei: 1, max: 4 })
+      + f('ecgGsfl', 'gsfl', 'Grundstücksfläche', feldText(g.gsfl), { einheit: 'm²', frei: 1, ph: 'bei Häusern' }) + f('ecgMea', 'mea_pct', 'Miteigentumsanteil', feldText(g.mea_pct, 2), { einheit: '%', frei: 1, ph: 'bei Wohnungen' })
+      + f('ecgStr', 'strasse', 'Straße und Hausnummer', strasse, { text: 1, frei: 1, breit: 1, ph: 'nur für den Bodenrichtwert, wird nicht gespeichert' })
+      + '</div>' + wertInfo + '</fieldset><fieldset><legend>Finanzierung</legend><div class="ec-raster">'
+      + f('ecgEk', 'ek_eur', 'Eigenkapital', feldText(g.ek_eur), { einheit: '€' }) + f('ecgNk', 'nk_pct', 'Kaufnebenkosten', feldText(g.nk_pct != null ? g.nk_pct : 10, 1), { einheit: '%' })
+      + f('ecgZins', 'zins_pct', 'Sollzins', feldText(g.zins_pct, 2), { einheit: '%' }) + f('ecgTilg', 'tilg_pct', 'Tilgung im Jahr', feldText(g.tilg_pct != null ? g.tilg_pct : 1.5, 2), { einheit: '%' }) + bind
       + '</div><p class="ec-fein">Das Darlehen ist Kaufpreis plus Nebenkosten minus Eigenkapital. Nach der Zinsbindung rechnet der Bericht die Anschlussfinanzierung mit ' + dez(ANSCHLUSS_ZINS, 1) + ' % Zins und derselben Tilgung.</p></fieldset>'
-      + '<div class="ec-knoepfe"><button type="submit" class="btn-p ec-weiter">Weiter zu den Unterlagen</button></div></form>', 'h3');
+      + '<div class="ec-knoepfe"><button type="button" class="btn-l ec-zurueck">Unterlagen ändern</button><button type="submit" class="btn-p ec-weiter">Weiter zum Ergebnis</button></div></form>', 'h3');
+    /* Wahl bei Widerspruch: ein Klick setzt den Wert ins Feld, eigenes Tippen gilt ebenfalls als Wahl */
+    $$('.ec-wahl', inhalt).forEach(function (w) {
+      var k = w.dataset.k, el = document.getElementById(IDS[k]);
+      $$('button', w).forEach(function (b) { b.addEventListener('click', function () {
+        var v = b.dataset.v;
+        if (el) el.value = (k === 'art' || VORBELEGBAR[k] === 'text') ? v : feldWertForm(VORBELEGBAR[k], Number(v));
+        $$('button', w).forEach(function (x) { x.classList.toggle('an', x === b); x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
+        delete offen[k]; if (w.parentNode) w.parentNode.classList.remove('wahl');
+      }); });
+      if (el) el.addEventListener(k === 'art' ? 'change' : 'input', function () { delete offen[k]; if (w.parentNode) w.parentNode.classList.remove('wahl'); });
+    });
+    $('.ec-zurueck', inhalt).addEventListener('click', function () { S.ohneUnterlagen = false; zeigeUnterlagen(); });
     $('.ec-grund', inhalt).addEventListener('submit', function (e) {
       e.preventDefault();
       var v = function (id) { var x = document.getElementById(id); return x ? x.value : ''; };
@@ -325,22 +411,27 @@
         ort: String(v('ecgOrt')).trim().slice(0, 60), ze: zahlAus(v('ecgZe')), bj: zahlAus(v('ecgBj')), gsfl: zahlAus(v('ecgGsfl')), mea_pct: zahlAus(v('ecgMea')),
         ek_eur: zahlAus(v('ecgEk')), nk_pct: zahlAus(v('ecgNk')), zins_pct: zahlAus(v('ecgZins')), tilg_pct: zahlAus(v('ecgTilg')), bindung_j: zahlAus(v('ecgBind')) };
       Object.keys(n).forEach(function (k) { if (n[k] === null || n[k] === '') delete n[k]; });
-      var fehlt = grundFehlt(n);
-      var NAMEN = { kp: 'Kaufpreis', nkm: 'Kaltmiete', wfl: 'Wohnfläche', art: 'Objektart', plz: 'Postleitzahl oder Ort', ek_eur: 'Eigenkapital', zins_pct: 'Sollzins', tilg_pct: 'Tilgung', bindung_j: 'Zinsbindung' };
-      $$('.ec-f', inhalt).forEach(function (l) { l.classList.remove('fehlt'); });
-      if (fehlt.length) {
-        var ids = { kp: 'ecgKp', nkm: 'ecgNkm', wfl: 'ecgWfl', art: 'ecgArt', plz: 'ecgPlz', ek_eur: 'ecgEk', zins_pct: 'ecgZins', tilg_pct: 'ecgTilg', bindung_j: 'ecgBind' };
-        fehlt.forEach(function (k) { var x = document.getElementById(ids[k]); if (x && x.parentNode) x.parentNode.classList.add('fehlt'); });
-        var m = $('.ec-grund-m', inhalt); if (!m) { m = document.createElement('p'); m.className = 'ec-meldung warn ec-grund-m'; m.setAttribute('role', 'alert'); $('.ec-knoepfe', inhalt).before(m); }
-        m.textContent = 'Bitte noch eintragen: ' + fehlt.map(function (k) { return NAMEN[k]; }).join(', ') + '.';
-        var erst = document.getElementById(ids[fehlt[0]]); if (erst) try { erst.focus(); } catch (x) {}
+      var m = $('.ec-grund-m', inhalt); if (!m) { m = document.createElement('p'); m.className = 'ec-meldung warn ec-grund-m'; m.setAttribute('role', 'alert'); $('.ec-knoepfe', inhalt).before(m); }
+      /* nie still überschreiben: erst weiter, wenn bei jedem Widerspruch gewählt ist */
+      var nochOffen = Object.keys(offen);
+      if (nochOffen.length) {
+        var LANG = { kp: 'Kaufpreis', nkm: 'Kaltmiete', wfl: 'Wohnfläche', art: 'Objektart', plz: 'Postleitzahl', ort: 'Ort', ze: 'Zusatzeinnahmen', bj: 'Baujahr', gsfl: 'Grundstücksfläche', mea_pct: 'Miteigentumsanteil', nk_pct: 'Kaufnebenkosten' };
+        m.textContent = 'Bitte wähle noch, welcher Wert gilt: ' + nochOffen.map(function (k) { return LANG[k] || k; }).join(', ') + '.';
+        var w0 = $('.ec-wahl[data-k="' + nochOffen[0] + '"] button', inhalt); if (w0) try { w0.focus(); } catch (x) {}
         return;
       }
-      S.grund = n;
+      var fehlt = grundFehlt(n);
+      $$('.ec-f', inhalt).forEach(function (l) { l.classList.remove('fehlt'); });
+      if (fehlt.length) {
+        fehlt.forEach(function (k) { var x = document.getElementById(IDS[k]); if (x && x.parentNode) x.parentNode.classList.add('fehlt'); });
+        m.textContent = 'Bitte noch eintragen: ' + fehlt.map(function (k) { return NAMEN[k]; }).join(', ') + '.';
+        var erst = document.getElementById(IDS[fehlt[0]]); if (erst) try { erst.focus(); } catch (x) {}
+        return;
+      }
+      S.grund = n; S.abweichungen = [];
       var str = String(v('ecgStr')).trim().slice(0, 100);
       S.adresse = str.length >= 3 ? str + ', ' + [n.plz, n.ort].filter(Boolean).join(' ') : '';
-      S.frei = null;
-      zeigeUnterlagen();
+      zeigeErgebnis();
     });
   }
   function grundKurz(g) {
@@ -351,23 +442,21 @@
 
   /* 1 · Unterlagen wählen ─────────────────────────────────────────── */
   function zeigeUnterlagen(hinweis) {
-    if (grundFehlt(S.grund).length) { zeigeGrund(hinweis); return; }   /* v3946 · Pflicht vor dem Hochladen */
-    stufe(1); ++schritt;
+    stufe(0); ++schritt;   /* einzelcheck-3 · zuerst die Unterlagen, die Grundangaben kommen nach dem Auslesen */
     var liste = S.dateien.map(function (f, i) {
       return '<li class="ec-dok' + (i < INFO.frei_max ? ' frei' : '') + '"><span class="ec-dok-i" aria-hidden="true"></span><span class="ec-dok-t"><b>' + esc(artRaten(f.name)) + '</b><small>' + esc(f.name) + ' · ' + mb(f.size) + '</small></span>'
         + '<span class="ec-dok-m">' + (i < INFO.frei_max ? 'kostenlos' : 'im Bericht') + '</span>'
         + (i > 0 ? '<button type="button" class="ec-hoch" data-i="' + i + '" aria-label="' + esc(f.name) + ' nach oben">↑</button>' : '')
         + '<button type="button" class="ec-entf" data-i="' + i + '" aria-label="' + esc(f.name) + ' entfernen">×</button></li>';
     }).join('');
-    setze('<h3 id="ecTitel">Bis zu vier Unterlagen, und DealPilot rechnet genauer.</h3>'
-      + '<p class="ec-lead">Zum Beispiel Exposé, Mietaufstellung, WEG-Protokoll und Energieausweis. Die ersten zwei liest DealPilot kostenlos. Alle vier liest erst der Bericht.</p>'
+    setze('<h3 id="ecTitel">Erst die Unterlagen. DealPilot liest sie aus und füllt die Grundangaben vor.</h3>'
+      + '<p class="ec-lead">Zum Beispiel Exposé, Mietaufstellung, Marktbericht, WEG-Protokoll und Energieausweis. Die ersten zwei liest DealPilot kostenlos, alle vier liest der Bericht. Danach siehst du, was noch fehlt.</p>'
       + (hinweis ? meldung(hinweis, 'warn') : '')
-      + '<div class="ec-grund-kurz"><span class="ec-l">Deine Grundangaben</span><p>' + esc(grundKurz(S.grund)) + '</p><button type="button" class="btn-l ec-grund-aendern">Ändern</button></div>'
       + '<label class="ec-ablage-zone"><input type="file" class="ec-datei" accept="application/pdf,.pdf" multiple' + (S.dateien.length >= INFO.voll_max ? ' disabled' : '') + '>'
       + '<span><b>PDF auswählen</b> oder hierher ziehen<br><small>Höchstens ' + INFO.voll_max + ' Dateien, je bis ' + INFO.max_mb + ' MB</small></span></label>'
       + (liste ? '<ol class="ec-ablage">' + liste + '</ol>' : '')
       + SCHUTZ
-      + '<div class="ec-knoepfe"><button type="button" class="btn-p ec-los"' + (S.dateien.length ? '' : ' disabled') + '>Kostenlos auslesen</button></div>', S.dateien.length ? '.ec-los' : 'h3');
+      + '<div class="ec-knoepfe"><button type="button" class="btn-l ec-ohne">Ohne Unterlagen weiter</button><button type="button" class="btn-p ec-los"' + (S.dateien.length ? '' : ' disabled') + '>Kostenlos auslesen</button></div>', S.dateien.length ? '.ec-los' : 'h3');
     var inp = $('.ec-datei', inhalt), zone = $('.ec-ablage-zone', inhalt);
     inp.addEventListener('change', function () { dazu(inp.files); });
     ['dragover', 'dragenter'].forEach(function (t) { zone.addEventListener(t, function (e) { e.preventDefault(); zone.classList.add('ueber'); }); });
@@ -376,7 +465,7 @@
     $$('.ec-entf', inhalt).forEach(function (b) { b.addEventListener('click', function () { S.dateien.splice(+b.dataset.i, 1); S.frei = null; zeigeUnterlagen(); }); });
     $$('.ec-hoch', inhalt).forEach(function (b) { b.addEventListener('click', function () { var i = +b.dataset.i, x = S.dateien[i]; S.dateien[i] = S.dateien[i - 1]; S.dateien[i - 1] = x; S.frei = null; zeigeUnterlagen(); }); });
     $('.ec-los', inhalt).addEventListener('click', zeigeAuslesen);
-    $('.ec-grund-aendern', inhalt).addEventListener('click', function () { zeigeGrund(); });
+    $('.ec-ohne', inhalt).addEventListener('click', function () { S.ohneUnterlagen = true; S.frei = null; S.herkunft = {}; zeigeGrund(); });
   }
   function dazu(files) {
     var fehler = [];
@@ -387,7 +476,7 @@
       if (S.dateien.some(function (x) { return x.name === f.name && x.size === f.size; })) return;
       S.dateien.push(f);
     });
-    S.frei = null;
+    S.frei = null; S.herkunft = {};
     zeigeUnterlagen(fehler.length ? fehler.filter(function (x, i, a) { return a.indexOf(x) === i; }).join(' ') : null);
   }
   function formular(dateien, token) {
@@ -402,16 +491,15 @@
 
   /* 2 · Kostenlos auslesen (nur die ersten zwei werden gesendet) ─────── */
   function zeigeAuslesen() {
-    stufe(2); var nr = ++schritt;
+    stufe(1); var nr = ++schritt;
     var teil = S.dateien.slice(0, INFO.frei_max);
     setze('<h3 id="ecTitel">DealPilot liest deine Unterlagen.</h3><p class="ec-lead">Die ersten zwei werden geschwärzt und ausgelesen. Das dauert etwa eine halbe Minute.</p>'
       + '<div class="ec-lesen">' + teil.map(function (f) { return '<div class="ec-zeile an liest"><div class="ec-z-kopf"><b>' + esc(artRaten(f.name)) + '</b><span class="ec-z-st">liest aus</span></div><span class="ec-balken"><i style="width:100%"></i></span><small>' + esc(f.name) + '</small></div>'; }).join('') + '</div>', 'h3');
     holeJson(api('/auslesen'), { method: 'POST', body: formular(teil) }).then(function (j) {
       if (nr !== schritt) return;
       if (!j._ok) { zeigeUnterlagen(j.error || 'Das Auslesen hat nicht geklappt.'); return; }
-      S.frei = j;
-      ergaenzen(j.zahlen || {});
-      zeigeErgebnis();
+      S.frei = j; S.herkunft = j.herkunft || {}; S.ohneUnterlagen = false;
+      zeigeGrund();   /* einzelcheck-3 · erst auslesen, dann die Grundangaben mit dem, was die Unterlagen wissen */
     }).catch(function () { if (nr === schritt) zeigeUnterlagen('Keine Verbindung. Bitte noch einmal versuchen.'); });
   }
 
@@ -500,9 +588,9 @@
         + '<p class="ec-annahme">' + esc(annahmeText(r)) + '</p>';
     } else {
       var fehlt = r && r.fehlt === 'kp' ? 'den Kaufpreis' : (r && r.fehlt === 'nkm' ? 'die Kaltmiete' : 'den Zins');
-      kern = '<p class="ec-lead">' + (r ? 'In den gelesenen Unterlagen fehlt ' + fehlt + '. Trag ' + fehlt + ' im Deal-Check ein, dann rechnet die Einschätzung mit.' : 'Die Rechenkerne sind gerade nicht geladen. Lade die Seite neu.') + '</p>';
+      kern = '<p class="ec-lead">' + (r ? 'Es fehlt ' + fehlt + '. Trag ' + fehlt + ' in den Grundangaben ein, dann rechnet die Einschätzung mit.' : 'Die Rechenkerne sind gerade nicht geladen. Lade die Seite neu.') + '</p>';
     }
-    var gelesen = FELD.map(function (f) { var w = feldWert(z, f); return w ? '<li><span>' + esc(f[1]) + '</span><b>' + esc(w) + '</b></li>' : ''; }).join('');
+    var gelesen = FELD.map(function (f) { var w = feldWert(z, f); return w ? '<li><span>' + esc(f[1]) + (S.herkunft && S.herkunft[f[0]] ? ' <small>' + esc(ausText(S.herkunft[f[0]])) + '</small>' : '') + '</span><b>' + esc(w) + '</b></li>' : ''; }).join('');
     var dok = (j.unterlagen || []).map(function (u) {
       return '<li><b>' + esc(u.art) + '</b> ' + (u.gelesen ? 'gelesen' + (u.texterkennung ? ' per Texterkennung' : '') + (u.geschwaerzt ? ', ' + u.geschwaerzt + ' Stellen geschwärzt' : '') : esc(GRUND[u.grund] || 'nicht gelesen')) + '</li>';
     }).concat(S.dateien.slice(INFO.frei_max).map(function (f) { return '<li><b>' + esc(artRaten(f.name)) + '</b> liest der Bericht</li>'; })).join('');
@@ -512,13 +600,15 @@
       + S.abweichungen.map(function (x, i) { return '<li><span>' + esc(x.name) + ': du ' + esc(abweichungText(x, x.deins)) + ', Unterlagen ' + esc(abweichungText(x, x.unterlagen))
         + '</span><button type="button" class="btn-l ec-uebern" data-i="' + i + '">Wert aus den Unterlagen übernehmen</button></li>'; }).join('')
       + '</ul><p class="ec-fein">Gerechnet wird mit deiner Angabe, bis du übernimmst.</p></div>' : '';
-    setze('<h3 id="ecTitel">Deine Daten stehen bereit.</h3>' + (hinweis ? meldung(hinweis, 'warn') : '') + abw + kern
+    var kurz = S.grund ? '<div class="ec-grund-kurz"><span class="ec-l">Deine Grundangaben</span><p>' + esc(grundKurz(S.grund)) + '</p><button type="button" class="btn-l ec-grund-aendern">Ändern</button></div>' : '';
+    setze('<h3 id="ecTitel">Deine Daten stehen bereit.</h3>' + (hinweis ? meldung(hinweis, 'warn') : '') + abw + kurz + kern
       + '<div class="ec-zwei"><div><span class="ec-l">Ausgelesen</span><ul class="ec-felder an">' + (gelesen || '<li><span>Keine Kennzahl gefunden</span><b></b></li>') + '</ul></div>'
       + '<div><span class="ec-l">Unterlagen</span><ul class="ec-dokliste">' + dok + '</ul>' + (risiken ? '<p class="ec-fein">' + risiken + (risiken === 1 ? ' Hinweis' : ' Hinweise') + ' auf Risiken stehen im Bericht.</p>' : '') + '</div></div>'
       + kaufBox()
       + '<div class="ec-pakete"><span class="ec-l">Oder gleich weitermachen</span><p class="ec-fein">Mit einem Paket legst du das Objekt mit diesen Zahlen in DealPilot an.</p><div class="ec-pk"></div></div>', 'h3');
     paketeEinsetzen($('.ec-pk', inhalt), z, r, null);
     kaufVerdrahten();
+    var ga = $('.ec-grund-aendern', inhalt); if (ga) ga.addEventListener('click', function () { zeigeGrund(); });
     $$('.ec-uebern', inhalt).forEach(function (b) { b.addEventListener('click', function () {
       var x = S.abweichungen[+b.dataset.i]; if (!x || !S.grund) return;
       S.grund[x.feld] = x.unterlagen; S.abweichungen.splice(+b.dataset.i, 1); zeigeErgebnis();
@@ -1366,7 +1456,7 @@
 
   /* v3946 · _bericht/_pdf/_fin/_grundFehlt: für das Muster unter Dateien/Einzelcheck und den Prüfer, rechnen nichts Eigenes */
   window.DpEinzelCheck = { VERSION: VERSION, auf: auf, zu: zu, rechne: rechne, preis: 0, _S: S,
-    _bericht: berichtDaten, _pdf: pdf, _fin: finanzierungAus, _grundFehlt: grundFehlt };
+    _bericht: berichtDaten, _pdf: pdf, _fin: finanzierungAus, _grundFehlt: grundFehlt, _vorbelegung: vorbelegung };
   preisLaden();
   rueckkehrPruefen();
 })();

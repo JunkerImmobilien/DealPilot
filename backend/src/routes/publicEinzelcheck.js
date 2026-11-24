@@ -2,7 +2,7 @@
 /* ═══════════════════════════════════════════════════════════════════════════
  * routes/publicEinzelcheck.js · v3940 / v3946 · /api/v1/public/einzelcheck/…  (OHNE Anmeldung)
  *
- * v3946 · Grundangaben (Feld „grund“, JSON) sind Pflicht für /auslesen und /kaufen (ec.grundFehlt), der Bericht
+ * v3946 · Grundangaben (Feld „grund“, JSON) sind Pflicht für /kaufen (ec.grundFehlt, seit einzelcheck-3 nicht mehr für /auslesen), der Bericht
  * nimmt sie und eine freiwillige Anschrift (Feld „adresse“, nur für den Marktbericht-Dienst, nie gespeichert).
  *
  *   GET  /preis       Preis aus Stripe (lookup_key dp_einzelcheck_399), Frist, Grenzen
@@ -89,9 +89,8 @@ router.post('/auslesen', bremseAuslesen, mitDateien, async function (req, res) {
   try {
     const dateien = req.files || [];
     if (!dateien.length) return res.status(400).json({ error: 'Bitte mindestens ein PDF hochladen.', code: 'keine_datei' });
-    /* v3946 · erst die Grundangaben (Objekt und Finanzierung), dann die Unterlagen */
-    const fehltG = ec.grundFehlt(req.body && req.body.grund);
-    if (fehltG.length) return res.status(400).json({ error: 'Bitte zuerst die Grundangaben zu Objekt und Finanzierung eintragen.', code: 'grundangaben', fehlt: fehltG });
+    /* einzelcheck-3 (Marcel 24.11.2026: „erst auslesen, dann die Grundangaben gucken, was noch fehlt“): die Unterlagen
+       kommen VOR den Grundangaben. Pflicht sind die Grundangaben erst beim Kauf (kaufAnlegen, grundFehlt). */
     const deckel = await ec.freiMoeglich();
     if (!deckel.ok) return res.status(503).json({ error: 'Der kostenlose Teil ist für heute ausgelastet. Morgen geht es wieder, der Bericht ist weiter kaufbar.', code: 'tagesdeckel' });
     const r = await kiKontext('public/einzelcheck/auslesen', function () { return ec.auslesen(dateien, 'frei'); });
