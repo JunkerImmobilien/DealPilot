@@ -640,10 +640,13 @@
        und State.wert_basis_text setzt calc.js (v4300, Einstellung dp_wert_anker: maßgebendes Verfahren oder Marktpreisindikation
        mit bzw. ohne Abschlag). Nur wenn der Wert nicht der Kaufpreis selbst ist. */
     if (mitAnkauf) { try {
-      var S0 = window.State || {}, kp0 = wert('kp'), ow = zahl(S0.wert_basis);
+      /* v4310e · gemessen Demostraße 5: State.wert_basis ist der auf den Projektionsbeginn zurückgerechnete Wert (126.186 € für 2024),
+         der Bericht sagt 130.000 € (2026). Mit Bericht gilt dessen Wert zu seinem Jahr (State.wert_anker), sonst wert_basis. */
+      var S0 = window.State || {}, kp0 = wert('kp'), A0 = S0.wert_anker && zahl(S0.wert_anker.wert) > 0 ? S0.wert_anker : null, ow = A0 ? Number(A0.wert) : zahl(S0.wert_basis);
+      var artText = A0 ? ({ ertragswert: 'Ertragswert', sachwert: 'Sachwert', vergleichswert: 'Vergleichswert', vergleichswert_m: 'Vergleichswert aus Angeboten', mpi_mit: 'Marktpreisindikation nach Abschlag', mpi_ohne: 'Marktpreisindikation ohne Abschlag' }[A0.art] || 'Objektwert') + ' laut Marktbericht' : null;
       if (kp0 > 0 && ow > 0 && S0.wert_basis_quelle && S0.wert_basis_quelle !== 'kaufpreis') {
-        var an = S0.wert_anker && S0.wert_anker.jahr ? ' ' + S0.wert_anker.jahr : '', d0 = ow - kp0;
-        B.unshift({ name: 'Objektwert', notiz: (S0.wert_basis_text || 'Objektwert') + an, wert: ow, ziel: kp0, zielText: 'Kaufpreis', hoch: true, ohneSchwelle: true,
+        var d0 = ow - kp0;
+        B.unshift({ name: 'Objektwert' + (A0 && A0.jahr ? ' ' + A0.jahr : ''), notiz: artText || S0.wert_basis_text || 'Objektwert', wert: ow, ziel: kp0, zielText: 'Kaufpreis', hoch: true, ohneSchwelle: true,
           lo: Math.min(ow, kp0) * 0.85, hi: Math.max(ow, kp0) * 1.15, fmt: function (v) { return eur(v); },
           wort: (d0 >= 0 ? '✓ ' : '✕ ') + eur(Math.abs(d0)) + (d0 >= 0 ? ' über' : ' unter') + ' Kaufpreis' });
       }
