@@ -537,9 +537,19 @@
     var tx = box.querySelector('.dk-text');
     if (tx && !tx.querySelector('.dk-ablauf')) {
       var ol = document.createElement('ol'); ol.className = 'dk-ablauf';
-      ol.innerHTML = '<li><b>Kostenlos prüfen.</b> Zahlen eintragen, Deal prüfen, das Ergebnis steht sofort da.</li>'
-        + '<li><b>Oder genauer mit Unterlagen.</b> Exposé und Co. hochladen und den kompletten Bericht für ' + dez(ec.preis, 2) + ' € holen, mit Bewertung und Marktbericht als PDF.</li>';
+      /* einzelcheck-2 (Marcel 24.11.2026): die beiden Wege sind direkt anklickbar und waehlen die Stufe */
+      ol.innerHTML = '<li class="dk-wahl" data-weg="frei" role="button" tabindex="0"><b>Kostenlos prüfen.</b> Zahlen eintragen, Deal prüfen, das Ergebnis steht sofort da.</li>'
+        + '<li class="dk-wahl" data-weg="bericht" role="button" tabindex="0"><b>Oder genauer mit Unterlagen.</b> Exposé und Co. hochladen und den kompletten Bericht für ' + dez(ec.preis, 2) + ' € holen, mit Bewertung und Marktbericht als PDF.</li>';
       tx.appendChild(ol);
+      var wahl = function (li) {
+        if (!li) return;
+        [].forEach.call(ol.querySelectorAll('.dk-wahl'), function (x) { x.classList.toggle('an', x === li); });
+        if (li.getAttribute('data-weg') === 'bericht') { if ($('dkBericht')) $('dkBericht').click(); return; }
+        try { box.scrollIntoView({ behavior: ruhig ? 'auto' : 'smooth', block: 'center' }); } catch (e) {}
+        setTimeout(function () { try { F.kp.focus({ preventScroll: true }); } catch (e) {} }, ruhig ? 0 : 450);
+      };
+      ol.addEventListener('click', function (e) { wahl(e.target.closest('.dk-wahl')); });
+      ol.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { var li = e.target.closest('.dk-wahl'); if (li) { e.preventDefault(); wahl(li); } } });
     }
     hoehe();
   }

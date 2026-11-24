@@ -1025,5 +1025,58 @@ for (const [teil, was, ueber] of GEGEN) {
   for (const [w, ist, soll] of faelle) { if (ist === soll) ok('Exposé-Erkennung: ' + w); else fehl('Exposé-Erkennung: ' + w + ' ergibt ' + ist); }
 }
 
+/* einzelcheck-2 (24.11.2026) · Lagekarte, Bericht per Mail, Fenster schließt nicht per Klick daneben */
+{
+  const s2 = require(P.dienst);
+  const front = fs.readFileSync(P.front, 'utf8');
+  const kaufer = (o) => Object.assign({ id: 'k1', status: 'bezahlt', gueltig_bis: new Date(Date.now() + 864e5).toISOString(), mails: 0, amount_cents: 399, anrechnung_code: 'EC1A2B3C4D5E' }, o || {});
+  const tab = { mails: 0 }, log = [];
+  const deps = (o) => Object.assign({
+    query: async (t, pa) => { log.push(t); if (/SET mails = mails \+ 1/.test(t)) { if (tab.mails >= pa[1]) return { rowCount: 0, rows: [] }; tab.mails++; return { rowCount: 1, rows: [{ mails: tab.mails }] }; }
+      if (/GREATEST\(mails - 1/.test(t)) { tab.mails = Math.max(0, tab.mails - 1); return { rowCount: 1, rows: [] }; } return { rowCount: 0, rows: [] }; },
+    pdfFetch: async () => ({ ok: true, arrayBuffer: async () => Buffer.concat([Buffer.from('%PDF-1.7\n'), Buffer.alloc(2000)]) }),
+    sendMail: async (m) => { log.push('MAIL ' + m.to + ' ' + (m.attachments || []).length); return { messageId: 'x' }; },
+    mbFetch: async (u) => ({ ok: true, headers: { get: () => 'image/png' }, arrayBuffer: async () => Buffer.from('PNGDATA') })
+  }, o || {});
+  const HTML = '<!doctype html><html><head></head><body>' + 'x'.repeat(400) + '</body></html>';
+  const altG = process.env.PDF_DIENST_SECRET; process.env.PDF_DIENST_SECRET = 'geheim-test';
+  try {
+    s2._setzeDeps(deps());
+    const r1 = await s2.berichtMailen(kaufer(), 'kaeufer@beispiel.de', HTML, 'ETW in 32609 Hüllhorst');
+    if (r1.ok && tab.mails === 1 && log.some((x) => /^MAIL kaeufer@beispiel\.de 1$/.test(x))) ok('Mail: PDF als Anhang, Zähler 1'); else fehl('Mail: kein Versand oder Zähler falsch ' + JSON.stringify(r1));
+    let e2 = null; try { await s2.berichtMailen(kaufer(), 'keine-adresse', HTML, 't'); } catch (e) { e2 = e; }
+    if (e2 && e2.code === 'email') ok('Mail: ungültige Adresse abgewiesen'); else fehl('Mail: ungültige Adresse geht durch');
+    tab.mails = 3; let e3 = null; try { await s2.berichtMailen(kaufer({ mails: 3 }), 'a@beispiel.de', HTML, 't'); } catch (e) { e3 = e; }
+    if (e3 && e3.code === 'mails_aufgebraucht') ok('Mail: Deckel ' + s2.MAX_MAILS + ' je Kauf'); else fehl('Mail: Deckel greift nicht');
+    tab.mails = 0; s2._setzeDeps(deps({ sendMail: async () => { throw new Error('smtp'); } }));
+    let e4 = null; try { await s2.berichtMailen(kaufer(), 'a@beispiel.de', HTML, 't'); } catch (e) { e4 = e; }
+    if (e4 && e4.code === 'mail' && tab.mails === 0) ok('Mail: SMTP-Fehler gibt den Zähler zurück'); else fehl('Mail: Zähler bleibt nach SMTP-Fehler stehen (' + tab.mails + ')');
+    s2._setzeDeps(deps({ pdfFetch: async () => ({ ok: true, arrayBuffer: async () => Buffer.from('<html>kein pdf</html>') }) }));
+    let e5 = null; try { await s2.berichtMailen(kaufer(), 'a@beispiel.de', HTML, 't'); } catch (e) { e5 = e; }
+    if (e5 && e5.code === 'pdf' && tab.mails === 0) ok('Mail: ohne echtes PDF keine Mail'); else fehl('Mail: Antwort ohne %PDF wird verschickt');
+    const mi = s2.mailInhalt({ titel: 'ETW', code: 'EC1A2B3C4D5E', code_text: 'Er rechnet die 3,99 € an', code_bis: '08.12.2026' });
+    const kunde = mi.text + ' ' + mi.html.replace(/<[^>]+>/g, ' ');
+    if (!/[–—;]/.test(kunde.replace(/&[a-z]+;/g, ''))) ok('Mail: Kundentext ohne Gedankenstrich und Semikolon'); else fehl('Mail: Gedankenstrich oder Semikolon im Text');
+    if (/abbestellen/.test(mi.text) && /app\.dealpilot\.immo\/\?code=EC1A2B3C4D5E/.test(mi.text) && !/staging/.test(mi.text)) ok('Mail: Widerspruchshinweis, Prod-Link mit Code'); else fehl('Mail: Widerspruch oder Link fehlt');
+    if (/geomap|scout|immowelt|pricehubble|sprengnetter/i.test(kunde)) fehl('Mail: Quellenname im Text'); else ok('Mail: keine Quellennamen');
+    delete process.env.PDF_DIENST_SECRET; s2._setzeDeps(deps());
+    let e6 = null; try { await s2.berichtMailen(kaufer(), 'a@beispiel.de', HTML, 't'); } catch (e) { e6 = e; }
+    if (e6 && e6.code === 'kein_dienst') ok('Mail: ohne PDF-Dienst 503 statt stiller Mail'); else fehl('Mail: ohne PDF-Dienst kein sauberer Fehler');
+    if (s2.mailErlaubt(kaufer({ status: 'offen' })).code === 'nicht_bezahlt' && s2.mailErlaubt(kaufer({ gueltig_bis: '2020-01-01' })).code === 'kauf_abgelaufen') ok('Mail: nur bezahlt und gültig'); else fehl('Mail: offener oder abgelaufener Kauf darf mailen');
+    s2._setzeDeps(deps());
+    const k1 = await s2.karteHolen({ lat: 52.27, lon: 8.62, street: 'Musterweg' });
+    const k0 = await s2.karteHolen({ city: 'Hüllhorst' });
+    if (k1 && /^data:image\/png;base64,/.test(k1.bild) && k1.genau && k0 === null) ok('Lagekarte: mit Koordinaten data:-Bild, ohne keine'); else fehl('Lagekarte: falsch ' + JSON.stringify([k1 && k1.genau, k0]));
+    s2._setzeDeps(deps({ mbFetch: async () => ({ ok: true, headers: { get: () => 'text/html' }, arrayBuffer: async () => Buffer.from('x') }) }));
+    if ((await s2.karteHolen({ lat: 52, lon: 8 })) === null) ok('Lagekarte: kein Bild, keine Karte'); else fehl('Lagekarte: HTML-Antwort wird als Bild genommen');
+  } finally { s2._setzeDeps(null); if (altG == null) delete process.env.PDF_DIENST_SECRET; else process.env.PDF_DIENST_SECRET = altG; }
+  /* Fenster: Klick daneben schließt nicht (Marcel 24.11.2026), × und Esc schon */
+  if (/class="ec-dunkel"><\/div>/.test(front) && !/class="ec-dunkel" data-zu/.test(front)) ok('Fenster: Klick auf den Hintergrund schließt nicht'); else fehl('Fenster: Hintergrund trägt data-zu und schließt');
+  if (/_laeuft > 0/.test(front) && /Trotzdem schließen/.test(front)) ok('Fenster: Rückfrage, solange Hochladen oder Auslesen läuft'); else fehl('Fenster: keine Rückfrage bei laufender Anfrage');
+  if (!/'Unterlagen', D\.abschnitt\('Deine Unterlagen'/.test(front) || /var ud = \[\];/.test(front)) ok('Bericht: Seite Unterlagen und Hinweise entfällt'); else fehl('Bericht: Seite Unterlagen noch drin');
+  if (/Marktpreisindikation aus Angebotspreisen<\/h3>/.test(front) && /kein Verkehrswert/.test(front)) ok('Bericht: Marktpreisindikation getrennt vom Vergleichswertverfahren'); else fehl('Bericht: Marktpreisindikation nicht getrennt');
+  if (/bild: deckFoto \|\| m\.karte \|\| deckBild\(\)/.test(front)) ok('Bericht: Deckblatt Foto, sonst Lagekarte'); else fehl('Bericht: Deckblatt ohne Karte');
+}
+
 console.log('\n' + (rot ? 'ROT: ' + rot + ' Befund(e)' : 'GRÜN: alles sauber') + ' · RC=' + (rot ? 1 : 0));
 process.exit(rot ? 1 : 0);

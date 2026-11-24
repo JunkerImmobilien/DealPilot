@@ -944,7 +944,14 @@
      Adressen“). Staging: staging.dealpilot.immo (dealcheck-laden.js,
      assets/umgebung.js, tools/landing-zahlen-pruefen.mjs). Auf einer
      Produktionsadresse wird die Datei nicht einmal geladen. */
+  /* einzelcheck-2 (Marcel 24.11.2026: „auf Prod fehlt das mit dem kompletten Bericht für 3,99"): die Sperre liegt
+     jetzt allein im Server (EINZELCHECK_AKTIV in routes/publicEinzelcheck.js, dazu der Stripe-Preis
+     dp_einzelcheck_399). Die Datei laedt ueberall, ohne Freigabe antwortet /preis mit 404 und der zweite Weg
+     bleibt unsichtbar (einzelcheck.js preisLaden). So schaltet ein Eintrag in der .env Produktion frei, ohne Rollout. */
   function einzelcheckErlaubt() {
+    return true;
+  }
+  function einzelcheckErlaubtAlt() {
     var h = String(location.hostname || '').toLowerCase();
     var staging = /(^|\.)staging\.dealpilot\.immo$/.test(h);
     var prod = !staging && /(^|\.)dealpilot\.immo$|(^|\.)junker-immobilien\.io$/.test(h);
@@ -956,8 +963,8 @@
     if (!einzelcheckErlaubt() || !document.getElementById('dealcheck')) return;
     /* v3940 · echter Ablauf statt Demo (einzelcheck.js/.css, Backend routes/publicEinzelcheck.js) */
     /* v3946 · Grundangaben, Bezahlen im selben Tab, Stufe 3, Finanzierung: beide Buster neu */
-    var l = document.createElement('link'); l.rel = 'stylesheet'; l.href = 'einzelcheck.css?v=v3946'; document.head.appendChild(l);
-    var s = document.createElement('script'); s.src = 'einzelcheck.js?v=v4220'; s.async = true;
+    var l = document.createElement('link'); l.rel = 'stylesheet'; l.href = 'einzelcheck.css?v=einzelcheck-2'; document.head.appendChild(l);
+    var s = document.createElement('script'); s.src = 'einzelcheck.js?v=einzelcheck-2'; s.async = true;
     /* landing-faecher-2 · der Deal-Check zeigt den zweiten Weg „Bericht holen“ erst, wenn der Einzel-Check da ist */
     s.onload = function () { try { document.dispatchEvent(new CustomEvent('dp:einzelcheck-bereit')); } catch (e) {} };
     document.body.appendChild(s);

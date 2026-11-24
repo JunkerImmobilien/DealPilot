@@ -72,7 +72,9 @@ const FREI_MAX_UNTERLAGEN = 2;
 const VOLL_MAX_UNTERLAGEN = 4;
 const MAX_DATEI_BYTES = 10 * 1024 * 1024;
 const MAX_TEXT_ZEICHEN = 120000;
-const MAX_BERICHTE = 3;              /* je Kauf so oft neu erzeugbar (Kosten je Lauf, siehe Bericht) */
+const MAX_MAILS = 3;                 /* einzelcheck-2 · je Kauf so oft per Mail (PDF-Dienst und SMTP je Lauf) */
+const MAX_MAIL_HTML = 12 * 1024 * 1024;
+const MAX_BERICHTE = 3;             /* je Kauf so oft neu erzeugbar (Kosten je Lauf, siehe Bericht) */
 const ERLAUBTE_MIME = ['application/pdf'];
 /* v3941 · Texterkennung fuer gescannte PDFs: hoechstens 6 Seiten, 60 s je Unterlage (ocr.js grenzt selbst auch) */
 const OCR_SEITEN = 6;
@@ -129,6 +131,8 @@ const STANDARD = {
   query: function (t, p) { return require('../db/pool').query(t, p); },
   stripe: function () { return require('./stripeService').getStripe(); },
   mbFetch: function (url, init) { return fetch(url, init); },
+  pdfFetch: function (url, init) { return fetch(url, init); },   /* einzelcheck-2 */
+  sendMail: function (o) { return require('./mailerService').sendMail(o); },   /* einzelcheck-2 */
   jetzt: function () { return Date.now(); }
 };
 let _deps = null;
@@ -516,6 +520,7 @@ function statusAus(z, jetzt) {
   return {
     status: g ? z.status : 'abgelaufen', bezahlt: z.status === 'bezahlt' && g, gueltig_bis: z.gueltig_bis,
     berichte_rest: Math.max(0, MAX_BERICHTE - (Number(z.berichte) || 0)),
+    mails_rest: Math.max(0, MAX_MAILS - (Number(z.mails) || 0)),   /* einzelcheck-2 */
     anrechnung: (z.status === 'bezahlt' && g && z.anrechnung_code) ? { code: z.anrechnung_code, cents: z.amount_cents, bis: z.gueltig_bis } : null,
     zahlen: g ? zahlenSauber(z.zahlen || {}) : null
   };
@@ -833,8 +838,113 @@ async function markt(zahlen, adresse) {
       + (k.marktdaten_eur == null ? 'unbekannt' : k.marktdaten_eur.toFixed(2) + ' EUR'));
     const m = Object.assign({ verfuegbar: true }, marktAus(j));
     Object.defineProperty(m, '_kosten', { value: k, enumerable: false });
+    /* einzelcheck-2 · Lagekarte fuers Deckblatt (dieselbe Karte wie oben im Marktbericht, ueber den mb-Dienst,
+       der Schluessel bleibt dort). Ohne Strasse nur der Ort ohne Marker. */
+    const kt = await karteHolen(j && j.data && j.data.address);
+    if (kt) { m.karte = kt.bild; m.karte_genau = kt.genau; }
     return m;
   } catch (e) { return { verfuegbar: false, grund: 'dienst' }; }
+}
+
+/* einzelcheck-2 · Lagekarte als data:-Bild (Deckblatt des Berichts). Nur Koordinaten gehen an den mb-Dienst. */
+async function karteHolen(adr) {
+  const lat = _n(adr && adr.lat), lon = _n(adr && adr.lon);
+  if (lat == null || lon == null || Math.abs(lat) > 90 || Math.abs(lon) > 180) return null;
+  const genau = !!(adr && typeof adr.street === 'string' && adr.street.trim());
+  try {
+    const u = MB_BASE + '/static-map?lat=' + lat.toFixed(6) + '&lon=' + lon.toFixed(6) + '&zoom=' + (genau ? 16 : 13)
+      + '&style=dark-matter-yellow-roads&width=1200&height=560&marker=' + (genau ? '1' : '0');
+    const r = await deps().mbFetch(u, { method: 'GET' });
+    if (!r || !r.ok || typeof r.arrayBuffer !== 'function') return null;
+    const typ = String((r.headers && r.headers.get && r.headers.get('content-type')) || 'image/png').split(';')[0];
+    if (!/^image\/(png|jpeg|webp)$/.test(typ)) return null;
+    const buf = Buffer.from(await r.arrayBuffer());
+    if (!buf.length || buf.length > 3 * 1024 * 1024) return null;
+    return { bild: 'data:' + typ + ';base64,' + buf.toString('base64'), genau: genau };
+  } catch (e) { return null; }
+}
+
+/* ── einzelcheck-2 · Bericht per Mail ─────────────────────────────────────────────────────────────────
+   Marcel 24.11.2026: „in der Strecke … die E-Mail-Adresse angeben, dass der Bericht auch per E-Mail einmal
+   zugesendet wird … mit dem Link zu DealPilot … gleich mit dem Code". Das PDF druckt der PDF-Dienst aus dem
+   fertigen HTML des Browsers (Art html: ohne Skript, ohne Netz, CSP), wie in der App. Die Adresse wird nicht
+   gespeichert, nur der Zaehler. Testadressen (.test …) gehen nie ueber SMTP (mailerService). */
+function mailErlaubt(zeile, jetzt) {
+  if (!zeile) return { ok: false, code: 'kauf_unbekannt' };
+  if (!istGueltig(zeile, jetzt)) return { ok: false, code: 'kauf_abgelaufen' };
+  if (zeile.status !== 'bezahlt') return { ok: false, code: 'nicht_bezahlt' };
+  if ((Number(zeile.mails) || 0) >= MAX_MAILS) return { ok: false, code: 'mails_aufgebraucht' };
+  return { ok: true };
+}
+function emailForm(e) {
+  const a = String(e || '').trim();
+  return a.length <= 254 && /^[^\s@<>,;"]+@[^\s@<>,;"]+\.[a-z]{2,}$/i.test(a) ? a : null;
+}
+function _escM(t) { return String(t == null ? '' : t).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+/* Mailtext: nur Punkt und Komma, keine Datenquellen. Werbung fuer eigene, aehnliche Leistung an Kaeufer
+   (§ 7 Abs. 3 UWG) mit Hinweis auf Widerspruch bei jeder Verwendung. */
+function mailInhalt(o) {
+  const app = String(o.app || 'https://app.dealpilot.immo/').replace(/\/?$/, '/');
+  const reg = app + (o.code ? '?code=' + encodeURIComponent(o.code) : '');
+  const codeText = o.code_text || '';
+  const widerspruch = 'Du bekommst diese Mail, weil du den Einzel-Check gekauft hast. Hinweise auf DealPilot kannst du jederzeit mit einer kurzen Antwort an info@dealpilot.immo abbestellen. Dafür entstehen nur die Übermittlungskosten nach den Basistarifen.';
+  const zeilen = ['Hallo,', '', 'anbei dein Einzel-Check als PDF: ' + o.titel + '.', '',
+    'Alle Zahlen, die Finanzierung und die Wertermittlung rechnest du in DealPilot weiter, mit Steuer, Restnutzungsdauer und Mietpotenzial.'];
+  if (o.code) zeilen.push('', 'Dein Code: ' + o.code + '. ' + codeText + (o.code_bis ? ', gültig bis ' + o.code_bis : '') + '. Im Checkout eingeben.');
+  zeilen.push('', 'Kostenlos starten: ' + reg, '', 'Viele Grüße', 'DealPilot', '', widerspruch);
+  const html = '<div style="font-family:Inter,Arial,sans-serif;font-size:15px;line-height:1.5;color:#1a1a1a;max-width:560px">'
+    + '<p>Hallo,</p><p>anbei dein Einzel-Check als PDF: <b>' + _escM(o.titel) + '</b>.</p>'
+    + '<p>Alle Zahlen, die Finanzierung und die Wertermittlung rechnest du in DealPilot weiter, mit Steuer, Restnutzungsdauer und Mietpotenzial.</p>'
+    + (o.code ? '<p style="border:1px dashed #C9A84C;border-radius:8px;padding:12px 14px;background:#FBF6E9">Dein Code: <b style="font-family:monospace;font-size:17px;letter-spacing:.08em">' + _escM(o.code) + '</b><br>'
+      + _escM(codeText) + (o.code_bis ? ', gültig bis ' + _escM(o.code_bis) : '') + '. Im Checkout eingeben.</p>' : '')
+    + '<p><a href="' + _escM(reg) + '" style="display:inline-block;background:#C9A84C;color:#0a0a0a;text-decoration:none;font-weight:600;padding:11px 20px;border-radius:999px">Kostenlos starten</a></p>'
+    + '<p>Viele Grüße<br>DealPilot</p><p style="font-size:12px;color:#6b6b6b">' + _escM(widerspruch) + '</p></div>';
+  return { text: zeilen.join('\n'), html: html };
+}
+function _fehlerMit(text, status, code) { const e = new Error(text); e.status = status; e.code = code; return e; }
+async function berichtMailen(zeile, email, html, titel) {
+  const an = emailForm(email);
+  if (!an) throw _fehlerMit('Bitte eine gültige E-Mail-Adresse eintragen.', 400, 'email');
+  if (typeof html !== 'string' || html.length < 200 || html.length > MAX_MAIL_HTML || !/^<!doctype html>/i.test(html.trim())) throw _fehlerMit('Der Bericht fehlt.', 400, 'html');
+  const geheim = process.env.PDF_DIENST_SECRET;
+  if (!geheim) throw _fehlerMit('Der Versand ist hier gerade nicht eingerichtet.', 503, 'kein_dienst');
+  const t = String(titel || 'Einzel-Check').replace(/[\u0000-\u001f]/g, ' ').trim().slice(0, 120) || 'Einzel-Check';
+  /* Zaehler zuerst, mit Bedingung: zwei gleichzeitige Anfragen ueberholen den Deckel nicht */
+  const up = await deps().query('UPDATE einzelcheck_kaeufe SET mails = mails + 1 WHERE id = $1 AND mails < $2 RETURNING mails', [zeile.id, MAX_MAILS]);
+  if (!up.rowCount) throw _fehlerMit('Der Bericht ging schon ' + MAX_MAILS + ' Mal per Mail raus.', 403, 'mails_aufgebraucht');
+  const zurueck = function () { return deps().query('UPDATE einzelcheck_kaeufe SET mails = GREATEST(mails - 1, 0) WHERE id = $1', [zeile.id]).catch(function () {}); };
+  const ctrl = new AbortController(); const uhr = setTimeout(function () { ctrl.abort(); }, 120000);
+  let pdf;
+  try {
+    const url = String(process.env.PDF_DIENST_URL || 'http://dealpilot-pdf:4100').replace(/\/+$/, '') + '/pdf';
+    /* Art html druckt ohne Anmeldung (kein Skript, kein Netz). token/sitzung verlangt der Dienst nur formal. */
+    const r = await deps().pdfFetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Pdf-Geheimnis': geheim },
+      body: JSON.stringify({ art: 'html', html: html, titel: 'DealPilot Einzel-Check ' + t,
+        fuss: ['DealPilot · Einzel-Check', 'Stand ' + new Date().toLocaleDateString('de-DE', { timeZone: 'Europe/Berlin' })],
+        token: 'einzelcheck', sitzung: { mode: 'einzelcheck' } }), signal: ctrl.signal });
+    if (!r.ok) throw new Error('PDF-Dienst ' + r.status);
+    pdf = Buffer.from(await r.arrayBuffer());
+    if (pdf.length < 1000 || pdf.slice(0, 4).toString() !== '%PDF') throw new Error('kein PDF');
+  } catch (e) {
+    console.warn('[einzelcheck] PDF fuer Mail fehlgeschlagen:', e.message);
+    await zurueck();
+    throw _fehlerMit('Das PDF ließ sich gerade nicht erzeugen. Bitte gleich noch einmal.', 502, 'pdf');
+  } finally { clearTimeout(uhr); }
+  const bis = zeile.gueltig_bis ? new Date(zeile.gueltig_bis) : null;
+  const cents = Number(zeile.amount_cents) || 0;
+  const inhalt = mailInhalt({ titel: t, app: 'https://app.dealpilot.immo/',
+    code: zeile.anrechnung_code || null,
+    code_text: cents > 0 ? 'Er rechnet die ' + (cents / 100).toFixed(2).replace('.', ',') + ' € des Berichts auf dein erstes Paket an' : 'Er rechnet den Bericht auf dein erstes Paket an',
+    code_bis: bis ? bis.toLocaleDateString('de-DE', { timeZone: 'Europe/Berlin' }) : '' });
+  try {
+    const erg = await deps().sendMail({ to: an, subject: 'Dein DealPilot Einzel-Check: ' + t, text: inhalt.text, html: inhalt.html, replyTo: 'info@dealpilot.immo',
+      attachments: [{ filename: ('DealPilot Einzel-Check ' + t).replace(/[^\wäöüÄÖÜß .,-]+/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 100) + '.pdf', content: pdf, contentType: 'application/pdf' }] });
+    return { ok: true, mails: up.rows[0].mails, rest: Math.max(0, MAX_MAILS - up.rows[0].mails), bytes: pdf.length, testadresse: !!(erg && erg.testadresse) };
+  } catch (e) {
+    console.warn('[einzelcheck] Mail fehlgeschlagen:', e.message);
+    await zurueck();
+    throw _fehlerMit('Die Mail ließ sich gerade nicht senden. Bitte gleich noch einmal.', 502, 'mail');
+  }
 }
 
 /* Adresse aus dem Exposé: nur fuer den Marktbericht-Dienst, nie gespeichert, nie in zahlen. */
@@ -867,5 +977,6 @@ module.exports = {
   freiMoeglich, tagesverbrauchEur, preis, landingBasis, kaufAnlegen, kaufLesen, statusAus, berichtGezaehlt,
   handleEinzelcheckPaid, marktAus, vglAus, mbEingabe, markt, textAus, kostenErfassen, adresseAus, aufraeumen, starteTakt, MB_STUFE, OCR_SEITEN, OCR_ZEIT_MS,
   /* v3946 */ grundSauber, grundFehlt, GRUND_FELDER, GRUND_PFLICHT, wertAus, ueberschrift, KAPITEL,
-  istExpose, _setzeDeps, _pdfText
+  istExpose, _setzeDeps, _pdfText,
+  /* einzelcheck-2 */ karteHolen, berichtMailen, mailErlaubt, mailInhalt, emailForm, MAX_MAILS
 };
