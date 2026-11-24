@@ -45292,3 +45292,9 @@ Prod 1.0.35 → 1.0.41 an einem Abend: GNotKG-Notarkosten, Gesamtscore über zwe
 - **Commit:** main db7a335e (aus staging 282ffc7f, b48c7f34, 3e7e692e; Dateien von staging, Buster auf main einzeln), Rückmerge d59a3e05.
 - **Nachweis:** jahresabgleich-pruefen 156 (5 neu, Gegenprobe), mietpotenzial 311, grafiken-neu 49, vorschau, Buster sauber; Staging-Browser Westerfeldstr. 146: Leiste l5, Erklärkarte Marktpreis/Ertragswert, Tabelle 2026 „40.468 €“ mit Titel, Karte „Stellplätze und Zuschläge (90 € im Monat) kommen unverändert dazu“; Prod: Backend healthy, Buster v4410b/v4410a/v4410, Version 1.0.163, Sicherungen *-20261124-0851-nn.
 - **Rest:** Ein Bericht mit Erstellungsdatum 2026 und Stichtag 2025 zählt im Jahresabgleich weiter für das Erstellungsjahr (mbImJahr nach created_at) · zusatzMonat liest das heutige Feld ze, frühere Jahre mit anderer Stellplatzmiete rechnen mit dem heutigen Betrag.
+
+### Rollout 1.0.164 · 24.11.2026 · v4430
+- **Was:** Jahresabgleich ordnet Marktberichte dem Jahr ihres Wertermittlungsstichtags zu (Rueckfall Erstellungsdatum), Demostrasse Bericht 616 zaehlt fuer 2024 · ViVi-Zuordnen: ViVi-Objekt schon an anderem DealPilot-Objekt -> 409 vivi_objekt_vergeben (vorher Unique-Fehler 500), auch gleichzeitig (23505) · Fenster "Abgleich mit ViVi" ausserhalb der Pilot-Analyse im Boarding-Rahmen (.oabi-ov), Whitelabel-Farben, kein Schliessen per Klick daneben.
+- **Commit:** main 6b840de6 (nur v4430-Dateien aus staging f380e134, Buster einzeln), staging-Merge 2588c04c.
+- **Nachweis:** jahresabgleich 160 (Abschnitt S mit Gegenprobe), vivi 338, buster-ebenen und vorschau sauber; Staging-Browser: mbImJahr(2024)=130.000, mbImJahr(2026)=null; Fenster Kick "ABGLEICH MIT VIVI", Partnerblau greift, Klick daneben laesst offen, × und Esc schliessen. Prod: Sicherung haupt-20261124-0903-pp (Kopf gelesen), Backend healthy, Buster v4430, Version 1.0.164.
+- **Rest:** keiner.
