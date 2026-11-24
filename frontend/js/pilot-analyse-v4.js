@@ -673,6 +673,9 @@
     Array.prototype.forEach.call(document.querySelectorAll('[data-dp-pa4-kz]'), function (h) {
       try { var a = h.getAttribute('data-dp-pa4-kz') || '', t = document.createElement('div'); t.innerHTML = kennzahlen(a.charAt(0) === 'b', a.indexOf('4') > 0); if (t.firstChild) h.parentNode.replaceChild(t.firstChild, h); } catch (e) {}
     });
+    Array.prototype.forEach.call(document.querySelectorAll('[data-dp-pa4-kauf]'), function (h) {   /* v4550a */
+      try { var t = document.createElement('div'); t.innerHTML = h.getAttribute('data-dp-pa4-kauf') === 'v' ? verhKacheln(_verhA) : bankKacheln(); if (t.firstChild) h.parentNode.replaceChild(t.firstChild, h); } catch (e) {}
+    });
   }
 
   /* ══ v3323 · ÜBERSICHT SCHLANK ═══════════════════════════════════════════════════════════════
@@ -1517,7 +1520,8 @@
     var kp = Number(kpis().kp);
     return isFinite(w) && w > 0 && !(kp > 0 && w > kp) ? w : null;
   }
-  function leiste(z) { return z.length ? '<div class="dp-pa4-zahlen' + (z.length === 4 ? ' l4' : '') + '" data-dp-pa4-kauf="1">' + z.join('') + '</div>' : ''; }
+  var _verhA = null;   /* v4550a · der Marktbericht lädt oft erst nach dem Zeichnen: kzNeu() zeichnet die Leiste mit derselben Analyse neu */
+  function leiste(z, art) { return z.length ? '<div class="dp-pa4-zahlen' + (z.length === 4 ? ' l4' : '') + '" data-dp-pa4-kauf="' + art + '">' + z.join('') + '</div>' : ''; }
   function nachKopf(html, vorn) {   /* die Leiste unter die erste Abschnittszeile (VERHANDLUNG & OFFERTE, BANK) */
     if (!vorn) return html; html = html || '';
     var e = '<span class="dp-pa-rule"></span></div>', i = html.indexOf(e);
@@ -1537,7 +1541,7 @@
           r: [['Spanne', zahl(w.marktpreisindikation.unten) && zahl(w.marktpreisindikation.oben) ? eur(w.marktpreisindikation.unten) + ' bis ' + eur(w.marktpreisindikation.oben) : ''], ['Abstand Kaufpreis', eur(kp - mpi)]] })); }
     if (off && mpi) z.push(zahlKachel('Offerte zum Marktpreis', (off >= mpi ? '+' : '−') + de(Math.abs((off - mpi) / mpi * 100), 1) + ' %', off >= mpi ? 'über dem Marktpreis' : 'unter dem Marktpreis', '#2A2727',
       { t: 'Offerte gegen Marktpreis', a: 'Wie weit die Offerte vom Marktpreis aus Angebotspreisen entfernt liegt. Ein Wert nahe null heißt: du bietest, was der Markt hergibt.' }));
-    return leiste(z);
+    return leiste(z, 'v');
   }
   function bankKacheln() {
     var k = kpis(), z = [];
@@ -1549,10 +1553,10 @@
       { t: 'Eigenkapital', a: 'Was du selbst einbringst, mit den Nebenkosten des Kaufs. Mehr Eigenkapital senkt LTV und Zins.' }));
     if (zahl(k.cf_m)) z.push(zahlKachel('Cashflow vor Steuer', sEur(k.cf_m) + ' / Monat', 'volles Jahr', k.cf_m >= 0 ? C.gut : C.rot,
       { t: 'Cashflow vor Steuer', a: 'Was im Monat nach Bewirtschaftungskosten, Zins und Tilgung übrig bleibt. Banken sehen gern einen positiven Wert.' }));
-    return leiste(z);
+    return leiste(z, 'b');
   }
   function verhPanel(a, html) {
-    var vorn = verhKacheln(a);
+    _verhA = a; var vorn = verhKacheln(a);
     /* die Offerte steht jetzt als Kachel: die Karte mit Preis, Begründung und Argumenten nur noch unter Detail. Eine ungültige
        Offerte (über dem Kaufpreis) bleibt in Einfach stehen, weil ihre Karte den Hinweis trägt. */
     if (vorn && offerteWert(a)) html = String(html || '').replace('class="dp-pa-card dp-pa-offerte"', 'class="dp-pa-card dp-pa-offerte dp-pa-d"');
