@@ -151,12 +151,13 @@
     /* Kennzahlleiste mit Trennlinien (ersetzt die Kacheln mit farbiger Oberkante) */
     '.dp-pa-wrap[data-dp-pa-v4] .dp-pa4-zahlen{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:0;border:1px solid #EFEAE0;border-radius:10px;overflow:hidden;margin:0 0 20px}',
     '.dp-pa-wrap[data-dp-pa-v4] .dp-pa4-zahlen.l4{grid-template-columns:repeat(4,minmax(0,1fr))}',
+    '.dp-pa-wrap[data-dp-pa-v4] .dp-pa4-zahlen.l5{grid-template-columns:repeat(5,minmax(0,1fr))}',   /* v4410 · führend + Marktpreis */
     '.dp-pa-wrap[data-dp-pa-v4] .dp-pa4-z{border:0;border-right:1px solid #EFEAE0;padding:12px 14px;gap:2px;min-width:0}',
     '.dp-pa-wrap[data-dp-pa-v4] .dp-pa4-z:last-child{border-right:0}',
     '.dp-pa-wrap[data-dp-pa-v4] .dp-pa4-z span{font:500 10.5px/1.3 "JetBrains Mono",monospace;letter-spacing:.07em;color:#6B645A}',
     '.dp-pa-wrap[data-dp-pa-v4] .dp-pa4-z b{font:600 20px/1.25 "Space Grotesk",Inter,sans-serif;margin-top:2px}',
     '.dp-pa-wrap[data-dp-pa-v4] .dp-pa4-z em{font-size:12px;color:#6B645A}',
-    '@media (max-width:640px){.dp-pa-wrap[data-dp-pa-v4] .dp-pa4-zahlen,.dp-pa-wrap[data-dp-pa-v4] .dp-pa4-zahlen.l4{grid-template-columns:repeat(2,minmax(0,1fr))}'
+    '@media (max-width:640px){.dp-pa-wrap[data-dp-pa-v4] .dp-pa4-zahlen,.dp-pa-wrap[data-dp-pa-v4] .dp-pa4-zahlen.l4,.dp-pa-wrap[data-dp-pa-v4] .dp-pa4-zahlen.l5{grid-template-columns:repeat(2,minmax(0,1fr))}'
       + '.dp-pa-wrap[data-dp-pa-v4] .dp-pa4-z:nth-child(2n){border-right:0}.dp-pa-wrap[data-dp-pa-v4] .dp-pa4-z:nth-child(n+3){border-top:1px solid #EFEAE0}'
       + '.dp-pa-wrap[data-dp-pa-v4] .dp-pa4-z b{font-size:17px}}',
     /* Steuerverlauf (steuer-verlauf.js) in der Pilot-Analyse: dieselbe Leiste, Raster als Haarlinie */
@@ -525,8 +526,79 @@
     });
     return zerlegt;
   }
-  function zahlKachel(lbl, wert, unter, farbe) {
-    return '<div class="dp-pa4-z" style="--c:' + (farbe || '#E6DCC2') + '"><span>' + esc(lbl) + '</span><b>' + wert + '</b>' + (unter ? '<em>' + unter + '</em>' : '') + '</div>';
+  function zahlKachel(lbl, wert, unter, farbe, tip) {
+    /* v4410 · tip { t, a, r: [[Bezeichnung, Wert]] } - Erklärkarte beim Darüberfahren (tipStart) */
+    var ta = tip ? ' data-dp-pa4-tip="' + esc(JSON.stringify(tip)) + '" tabindex="0"' : '';
+    return '<div class="dp-pa4-z' + (tip ? ' dp-pa4-ztip' : '') + '" style="--c:' + (farbe || '#E6DCC2') + '"' + ta + '><span>' + esc(lbl) + '</span><b>' + wert + '</b>' + (unter ? '<em>' + unter + '</em>' : '') + '</div>';
+  }
+  /* v4410 · Erklärkarte wie im Reiter Bewertung (bewertung-ansicht.js .bwa-pop), eine für die ganze Seite */
+  var _tipPop = null, _tipAn = null;
+  function tipZeige(el) {
+    var d = null; try { d = JSON.parse(el.getAttribute('data-dp-pa4-tip') || 'null'); } catch (e) { d = null; }
+    if (!d) return;
+    if (!_tipPop) {
+      _tipPop = document.createElement('div'); _tipPop.className = 'dp-pa4-pop'; _tipPop.setAttribute('role', 'tooltip'); document.body.appendChild(_tipPop);
+      var s = document.createElement('style');
+      s.textContent = '.dp-pa4-pop{position:fixed;z-index:9000;max-width:340px;background:#FFFFFF;color:#2A2727;border:1px solid #E6E0D3;border-radius:12px;box-shadow:0 12px 32px rgba(20,16,8,.16);padding:12px 14px;font:400 12.5px/1.45 Inter,sans-serif;pointer-events:none;opacity:0;transition:opacity .12s}'
+        + '.dp-pa4-pop.an{opacity:1}.dp-pa4-pop b.t{display:block;font:600 13px/1.3 "Space Grotesk",Inter,sans-serif;margin-bottom:4px}.dp-pa4-pop p{margin:0 0 6px}'
+        + '.dp-pa4-pop table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}.dp-pa4-pop td{padding:2px 0;border-bottom:1px solid #F0EBDF}.dp-pa4-pop td:last-child{text-align:right;padding-left:10px}'
+        + '.dp-pa4-ztip{cursor:help}.dp-pa4-ztip:hover,.dp-pa4-ztip:focus{background:#FBF8F1;outline:none}';
+      document.head.appendChild(s);
+    }
+    _tipPop.innerHTML = '<b class="t">' + esc(d.t || '') + '</b>' + (d.a ? '<p>' + esc(d.a) + '</p>' : '')
+      + (d.r && d.r.length ? '<table>' + d.r.filter(function (z) { return z && z[1]; }).map(function (z) { return '<tr><td>' + esc(z[0]) + '</td><td>' + esc(z[1]) + '</td></tr>'; }).join('') + '</table>' : '');
+    var r = el.getBoundingClientRect(); _tipPop.style.maxWidth = Math.min(340, window.innerWidth - 24) + 'px';
+    _tipPop.style.left = '0px'; _tipPop.style.top = '0px'; _tipPop.classList.add('an');
+    var ph = _tipPop.offsetHeight, pw = _tipPop.offsetWidth, top = r.bottom + 8;
+    if (top + ph > window.innerHeight - 8) top = Math.max(8, r.top - ph - 8);
+    _tipPop.style.left = Math.max(12, Math.min(r.left, window.innerWidth - pw - 12)) + 'px'; _tipPop.style.top = top + 'px'; _tipAn = el;
+  }
+  function tipWeg() { if (_tipPop) _tipPop.classList.remove('an'); _tipAn = null; }
+  (function tipStart() {
+    if (typeof document === 'undefined' || !document.addEventListener || document.__dpPa4Tip) return; document.__dpPa4Tip = true;
+    var ziel = function (e) { return e.target && e.target.closest ? e.target.closest('[data-dp-pa4-tip]') : null; };
+    document.addEventListener('mouseover', function (e) { var el = ziel(e); if (el && el !== _tipAn) tipZeige(el); });
+    document.addEventListener('mouseout', function (e) { var el = ziel(e); if (el && !(e.relatedTarget && el.contains(e.relatedTarget))) tipWeg(); });
+    document.addEventListener('focusin', function (e) { var el = ziel(e); if (el) tipZeige(el); });
+    document.addEventListener('focusout', function (e) { if (ziel(e)) tipWeg(); });
+    window.addEventListener('scroll', tipWeg, true);
+  })();
+  /* v4410 · Marcel 24.11.2026: „in der Pilotanalyse in der Übersicht zusätzlich zum Marktpreis … Tooltip … mit der
+     Beschreibung. Und natürlich auch das führende Verfahren. Wir haben dort bei der Westerfeldstraße zum Beispiel auch
+     Ertragswerte.“ Führend ist, was der LETZTE Bericht führt (DpWertZielbild, dieselbe Lesung wie calc.js State.wert_anker);
+     ein belastbares Gutachten im Reiter Objekt geht vor (State.wert_basis_quelle 'verkehrswert'). */
+  function mmjjIso(iso) { var m = /^(\d{4})-(\d{2})/.exec(String(iso || '')); return m ? m[2] + '/' + m[1] : ''; }
+  function wertKacheln(w) {
+    var S = window.State || {}, out = [];
+    var st = w && (w.wert_stichtag || w.bericht_datum) ? mmjjIso(w.wert_stichtag || w.bericht_datum) : '';
+    var bericht = w && w.bericht_datum ? new Date(w.bericht_datum).toLocaleDateString('de-DE') : '';
+    var mpi = w && w.marktpreisindikation && zahl(w.marktpreisindikation.mitte) ? w.marktpreisindikation : null;
+    var ab = w && zahl(w.abschlag_pct) ? Number(w.abschlag_pct).toLocaleString('de-DE', { maximumFractionDigits: 1 }) + ' %' : null;
+    var fu = null, gutachten = false, N = { ertragswert: 'Ertragswert', sachwert: 'Sachwert', vergleichswert: 'Vergleichswert' };
+    var ERK = { ertragswert: 'Aus der nachhaltig erzielbaren Miete nach ImmoWertV abgeleitet, abzüglich der Bewirtschaftungskosten und mit dem Liegenschaftszins kapitalisiert.',
+      sachwert: 'Aus Bodenwert und Herstellungskosten des Gebäudes nach ImmoWertV abgeleitet und an den Markt angepasst.',
+      vergleichswert: 'Aus amtlichen Kaufpreisen vergleichbarer Objekte nach ImmoWertV abgeleitet.' };
+    if (S.wert_basis_quelle === 'verkehrswert' && /^(gutachten|bank)$/.test(String(S.svw_herkunft || '')) && zahl(S.wert_basis) > 0) {   /* nur ein belastbares Gutachten geht dem Bericht vor (calc.js _svwBelastbar) */
+      gutachten = true;
+      out.push(zahlKachel((S.svw_label || 'Verkehrswert') + ' · führend', eur(S.wert_basis), 'deine Angabe im Reiter Objekt', C.c1,
+        { t: (S.svw_label || 'Verkehrswert') + ', führend', a: 'Deine Wertangabe aus Gutachten oder Bankbewertung geht jedem Marktbericht vor. An ihr misst sich der Preis.' }));
+    } else if (w && w.fuehrend && w[w.fuehrend] && zahl(w[w.fuehrend].wert) > 0) {
+      fu = w.fuehrend; var f = w[fu], nm = N[fu] + (f.vorlaeufig ? ' (vorläufig)' : '');
+      out.push(zahlKachel(N[fu] + ' · führend', eur(f.wert), (st ? 'Stichtag ' + st : '') + (f.vorlaeufig ? (st ? ', ' : '') + 'vorläufig' : ''), C.c1,
+        { t: nm + ', führendes Verfahren', a: ERK[fu] + ' An ihm misst sich der Preis, die übrigen Werte sind die Gegenprobe.',
+          r: [['Wertermittlungsstichtag', st], ['Liegenschaftszins', fu === 'ertragswert' && zahl(f.lzs_pct) ? de(f.lzs_pct, 2) + ' %' + (f.lzs_stufe ? ', Stufe ' + f.lzs_stufe : '') : ''],
+            ['Spanne', fu === 'ertragswert' && zahl(f.von) && zahl(f.bis) ? eur(f.von) + ' bis ' + eur(f.bis) : ''], ['Marktbericht vom', bericht]] }));
+    }
+    if (mpi) {
+      var stufeM = !fu && !gutachten && w.fuehrend === 'vergleichswert';
+      var oh = w.ohne_abschlag && zahl(w.ohne_abschlag.mitte) ? eur(w.ohne_abschlag.mitte) : '';
+      out.push(zahlKachel('Marktpreis Ø' + (stufeM ? ' · führend' : ''), eur(mpi.mitte), oh ? 'ohne Abschlag ' + oh : (st ? 'Stichtag ' + st : ''), 'var(--wl-c9a84c,#C9A84C)',
+        { t: 'Marktpreisindikation' + (stufeM ? ', führend' : ''),
+          a: 'Aus aktuellen Angebotspreisen vergleichbarer Objekte abgeleitet' + (ab ? ', abzüglich des üblichen Verhandlungsabschlags von ' + ab : '')
+            + '. Kein Verkehrswert und kein Verfahren der ImmoWertV.' + (stufeM ? ' Für diese Lage gibt es keine amtliche Kaufpreisbasis, deshalb führt sie hier (indikativ).' : ''),
+          r: [['Spanne', zahl(mpi.unten) && zahl(mpi.oben) ? eur(mpi.unten) + ' bis ' + eur(mpi.oben) : ''], ['ohne Abschlag', oh], ['Wertermittlungsstichtag', st], ['Marktbericht vom', bericht]] }));
+    }
+    return { kacheln: out, fu: fu };
   }
   function abschnitt(titel, inhalt) { return inhalt ? '<div class="dp-pa4-a"><h4>' + esc(titel) + '</h4>' + inhalt + '</div>' : ''; }
   function absatz(t) { return has(t) ? '<p>' + txt(t) + '</p>' : ''; }
@@ -542,15 +614,13 @@
     if (zahl(k.kp) && k.kp > 0) z.push(zahlKachel(bestand ? 'Kaufpreis (Ankauf)' : 'Kaufpreis', eur(k.kp), zahl(k.bmy) ? 'Bruttorendite ' + de(k.bmy, 2) + ' %' : '', '#E6DCC2'));
     if (zahl(k.cf_m)) z.push(zahlKachel('Cashflow vor Steuer · volles Jahr', sEur(k.cf_m) + ' / Monat', zahl(k.cf_ns) ? 'nach Steuer ' + sEur(k.cf_ns / 12) + ' / Monat (volles Jahr)' : '', k.cf_m >= 0 ? C.gut : C.rot));
     if (zahl(k.dscr) && k.dscr > 0) z.push(zahlKachel('DSCR', de(k.dscr, 2), k.dscr >= 1.2 ? 'Bank: trägt sich' : k.dscr >= 1 ? 'knapp über 1' : 'unter 1: Zuschuss nötig', k.dscr >= 1 ? C.gut : C.rot));
-    if (w && w.marktpreisindikation && zahl(w.marktpreisindikation.mitte)) {
-      var oh = w.ohne_abschlag && zahl(w.ohne_abschlag.mitte) ? 'ohne Abschlag ' + eur(w.ohne_abschlag.mitte) : '';
-      z.push(zahlKachel('Marktpreis Ø', eur(w.marktpreisindikation.mitte), oh, 'var(--wl-c9a84c,#C9A84C)'));
-    }
-    if (w && w.ertragswert && zahl(w.ertragswert.wert)) z.push(zahlKachel('Ertragswert', eur(w.ertragswert.wert), w.ertragswert.vorlaeufig ? 'vorläufig' : (zahl(w.ertragswert.lzs_pct) ? 'LZS ' + de(w.ertragswert.lzs_pct, 2) + ' %' : ''), C.c1));
+    var WK = wertKacheln(w); z = z.concat(WK.kacheln);   /* v4410 · führend + Marktpreis mit Erklärung */
+    if (WK.fu !== 'ertragswert' && w && w.ertragswert && zahl(w.ertragswert.wert)) z.push(zahlKachel('Ertragswert', eur(w.ertragswert.wert), w.ertragswert.vorlaeufig ? 'vorläufig' : (zahl(w.ertragswert.lzs_pct) ? 'LZS ' + de(w.ertragswert.lzs_pct, 2) + ' %' : ''), C.c1));
+    var nVier = WK.kacheln.length > 1 ? 5 : 4;
     var sc = vier ? null : sichtbarerScore();
     if (sc) z.push(zahlKachel(sc.name, String(sc.wert), (window.ScoreTier && window.ScoreTier.stufe ? window.ScoreTier.stufe(sc.wert).wort : ''), '#2A2727'));
-    if (vier) z = z.slice(0, 4);
-    return '<div class="dp-pa4-zahlen' + (vier && z.length === 4 ? ' l4' : '') + '" data-dp-pa4-kz="' + (bestand ? 'b' : 'a') + (vier ? '4' : '') + '"' + (z.length ? '' : ' style="display:none"') + '>' + z.join('') + '</div>';
+    if (vier) z = z.slice(0, nVier);
+    return '<div class="dp-pa4-zahlen' + (vier && z.length === 4 ? ' l4' : '') + (vier && z.length === 5 ? ' l5' : '') + '" data-dp-pa4-kz="' + (bestand ? 'b' : 'a') + (vier ? '4' : '') + '"' + (z.length ? '' : ' style="display:none"') + '>' + z.join('') + '</div>';
   }
   /* Der Marktbericht (DpWertZielbild) lädt oft erst nach dem Zeichnen - dann die Kacheln neu */
   function kzNeu() {
