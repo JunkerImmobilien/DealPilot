@@ -232,7 +232,11 @@
     '.dp-pa-wrap[data-dp-pa-v4] .dp-pa4-leg{font:500 10.5px "JetBrains Mono",monospace;gap:8px 16px}',
     /* Wert je Verfahren (wertvergleich.js): Erklärtexte nur im Detail, Zwischenköpfe in Textfarbe */
     '.dp-pa-wrap[data-dp-pa-v4] .dp-wv .dp-wv-h{color:#2A2727}',
-    '.dp-pa-wrap[data-dp-pa-modus="einfach"] .dp-wv > .dp-wv-h,.dp-pa-wrap[data-dp-pa-modus="einfach"] .dp-wv > p.dp-pa-p{display:none !important}'
+    '.dp-pa-wrap[data-dp-pa-modus="einfach"] .dp-wv > .dp-wv-h,.dp-pa-wrap[data-dp-pa-modus="einfach"] .dp-wv > p.dp-pa-p{display:none !important}',
+    /* v4520 · Einfach in Wert & Lage, Steuer, Potenzial & Exit: Unterzeilen der Grafiken auf zwei Zeilen, Fußnoten der Grafiken
+       nur im Detail (Marcel 24.11.2026: „Immer diese Bullet Points, kleine Kacheln, wenig Text“) */
+    '.dp-pa-wrap[data-dp-pa-modus="einfach"] :is(#dp-pa-wert,#dp-pa-steuer,#dp-pa-potx) :is(.gx-s,.dp-gn-k-s){display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}',
+    '.dp-pa-wrap[data-dp-pa-modus="einfach"] :is(#dp-pa-wert,#dp-pa-steuer,#dp-pa-potx) .gx-fuss{display:none !important}'
   ];
 
   /* ── Bausteine der Fassung 5 (v3440) ─────────────────────────────────── */
@@ -993,21 +997,28 @@
       if (S && Array.isArray(S.cfRows)) S.cfRows.forEach(function (r, i) { if (bestand && r.cal === heute) idx = i; });
       var t = S && S.cfRows && S.cfRows[idx] && typeof window._computeYearTotal === 'function' ? window._computeYearTotal(S.cfRows[idx].cal, idx) : null;
       var afa = t && t.values && zahl(t.values.afa) ? Math.abs(Number(t.values.afa)) : null, satzA = feldZahl('afa_satz');
-      if (afa != null && afa > 0) z.push(zahlKachel('AfA im Jahr', eur(afa), (satzA != null ? de(satzA, 2) + ' % · ' : '') + S.cfRows[idx].cal));
+      /* v4520 · Marcel 24.11.2026: „beim Grenzsteuersatz … kompakter … kleine Kacheln, wenig Text, Tooltips an den wichtigen Stellen“ */
+      if (afa != null && afa > 0) z.push(zahlKachel('AfA im Jahr', eur(afa), (satzA != null ? de(satzA, 2) + ' % · ' : '') + S.cfRows[idx].cal, null,
+        { t: 'Abschreibung (AfA)', a: 'Jedes Jahr ziehst du einen Teil des Gebäudewerts als Werbungskosten ab, ohne dass Geld fließt. Grundlage ist der Gebäudeanteil am Kaufpreis.', r: [['Satz', satzA != null ? de(satzA, 2) + ' %' : ''], ['Jahr', String(S.cfRows[idx].cal)]] }));
     } catch (e) {}
     var ga = feldZahl('geb_ant');
-    if (ga != null && ga > 0) z.push(zahlKachel('Gebäudeanteil', de(ga, 1) + ' %', 'Basis der AfA'));
-    if (corp) z.push(zahlKachel('Zehnjahresfrist', 'keine', 'in der GmbH/UG ist ein Verkauf steuerpflichtig'));
+    if (ga != null && ga > 0) z.push(zahlKachel('Gebäudeanteil', de(ga, 1) + ' %', 'Basis der AfA', null,
+      { t: 'Gebäudeanteil', a: 'Nur das Gebäude wird abgeschrieben, der Boden nicht. Ein höherer Gebäudeanteil heißt mehr AfA und weniger Steuer. Belegen lässt er sich mit der Kaufpreisaufteilung.' }));
+    if (corp) z.push(zahlKachel('Zehnjahresfrist', 'keine', 'Verkauf steuerpflichtig', null, { t: 'Zehnjahresfrist', a: 'In der GmbH oder UG ist ein Gewinn aus dem Verkauf immer steuerpflichtig.' }));
     else {
       var kd = feldWert('kaufdat').slice(0, 10);
       if (/^\d{4}-\d{2}-\d{2}$/.test(kd)) {
         var fr = new Date(Date.UTC(+kd.slice(0, 4) + 10, +kd.slice(5, 7) - 1, +kd.slice(8, 10) + 1));
         var mon = Math.round((fr - Date.now()) / (30.44 * 864e5));
-        z.push(zahlKachel('Zehnjahresfrist', ('0' + (fr.getUTCMonth() + 1)).slice(-2) + '/' + fr.getUTCFullYear(), mon <= 0 ? 'abgelaufen, Verkauf steuerfrei' : 'steuerfrei ab ' + ('0' + fr.getUTCDate()).slice(-2) + '.' + ('0' + (fr.getUTCMonth() + 1)).slice(-2) + '.' + fr.getUTCFullYear() + (mon >= 12 ? ', noch ' + Math.floor(mon / 12) + ' J.' : ', noch ' + mon + ' Mon.')));
+        var frT = ('0' + fr.getUTCDate()).slice(-2) + '.' + ('0' + (fr.getUTCMonth() + 1)).slice(-2) + '.' + fr.getUTCFullYear();
+        z.push(zahlKachel('Zehnjahresfrist', ('0' + (fr.getUTCMonth() + 1)).slice(-2) + '/' + fr.getUTCFullYear(), mon <= 0 ? 'abgelaufen, Verkauf steuerfrei' : (mon >= 12 ? 'noch ' + Math.floor(mon / 12) + ' Jahre' : 'noch ' + mon + ' Monate'), null,
+          { t: 'Zehnjahresfrist (§ 23 EStG)', a: mon <= 0 ? 'Zehn Jahre seit dem Kauf sind um. Ein Gewinn aus dem Verkauf ist für dich als Privatperson steuerfrei.' : 'Verkaufst du vor Ablauf von zehn Jahren seit dem Kauf, ist der Gewinn steuerpflichtig. Ab dem ' + frT + ' ist er steuerfrei.', r: [['Kauf', kd.split('-').reverse().join('.')], ['steuerfrei ab', frT]] }));
       }
     }
     var gs = feldZahl('grenz');
-    if (gs != null && gs > 0) { var gsU = 'aus deinen Steuerangaben'; try { gsU = grenzErklaerung(gs) || gsU; } catch (eG) {} z.push(zahlKachel('Grenzsteuersatz', de(gs, 2) + ' %', gsU)); }
+    if (gs != null && gs > 0) { var gsE = null; try { gsE = grenzErklaerung(gs); } catch (eG) {}
+      z.push(zahlKachel('Grenzsteuersatz', de(gs, 2) + ' %', gsE ? 'Einkommensteuer mit Soli' : 'aus deinen Steuerangaben', null,
+        { t: 'Grenzsteuersatz', a: 'So viel Steuer zahlst du auf jeden weiteren Euro Einkommen. Mit diesem Satz wirkt ein Verlust aus dem Objekt auf deine Steuer.' + (gsE ? ' ' + gsE : '') })); }
     return ergebnis(satz, kn) + (z.length ? '<div class="dp-pa4-zahlen' + (z.length === 4 ? ' l4' : '') + '">' + z.join('') + '</div>' : '');
   }
   /** Unterreiter Steuer: Verlauf wie im Reiter Steuer, Text, im Detail die Tabelle */

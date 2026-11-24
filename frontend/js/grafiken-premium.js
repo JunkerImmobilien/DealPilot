@@ -476,7 +476,7 @@
       var R = (window.State && Array.isArray(window.State.cfRows)) ? window.State.cfRows : [];
       var J = R.map(function (r) {
         return { j: +r.cal, nkm: zahl(r.nkm_y) || 0, bwk: zahl(r.bwk_cf_y) || 0, zins: zahl(r.zy) || 0, tilg: zahl(r.ty) || 0, cfop: zahl(r.cfop_y), cfns: zahl(r.cfns_y),
-          rs: zahl(r.rs) || 0, wert: zahl(r.wert_y), steuer: zahl(r.tax_y) || 0, afa: zahl(r.afa_y) || 0, vuv: zahl(r.zve_y) || 0 };
+          rs: zahl(r.rs) || 0, wert: zahl(r.wert_y), steuer: zahl(r.tax_y) || 0, afa: zahl(r.afa_y) || 0, vuv: (typeof r.zve_steuer === 'number' && isFinite(r.zve_steuer) ? r.zve_steuer : zahl(r.zve_y)) || 0 };   /* v4520 · wie grafiken-neu.js */
       }).filter(function (r) { return r.j > 1900 && r.cfop != null && r.cfns != null && r.wert != null; });
       if (J.length < 3) return null;
       var S = window.State || {}, kd = String((document.getElementById('kaufdat') || {}).value || (document.getElementById('purchase_date') || {}).value || S._afa_year1_relDate || ''),   /* Kaufdatum aus dem Feld: _afa_year1_relDate ist der AfA-Beginn und kann heute sein (gemessen Westerfeldstr.) */ mm = /^(\d{4})-(\d{2})/.exec(kd);
