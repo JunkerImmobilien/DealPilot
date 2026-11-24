@@ -304,9 +304,11 @@
       '<div class="dpsh-body">' +
         '<div class="dpsh-headrow"><div class="dpsh-logo"><span class="t">' + d.logo + '</span></div></div>' +
         '<div class="dpsh-empty"><div class="dpsh-empty-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01"/><path d="M11 12h1v4h1"/></svg></div>' +
-          '<div class="dpsh-empty-t">Noch nicht genug Daten</div>' +
-          '<div class="dpsh-empty-s">Gib Kaufpreis und Miete ein \u2014 dann berechne ich den ' + esc(d.emptyName) + '.</div>' +
-          '<button class="dpsh-empty-btn" type="button" onclick="DealPilotScoreHero.jump(\'kp\',\'s1\')">Daten eingeben</button>' +
+          '<div class="dpsh-empty-t">' + (d.unterSchwelle ? 'Noch nicht belastbar' : 'Noch nicht genug Daten') + '</div>' +
+          '<div class="dpsh-empty-s">' + (d.unterSchwelle
+            ? ('Datentiefe ' + d.ist + '\u00a0% von ' + d.soll + '\u00a0%. Es fehlen noch ' + d.fehlt + ' Angaben' + (d.wo ? ', vor allem bei ' + esc(d.wo) : '') + '. Ab ' + d.soll + '\u00a0% zeige ich den ' + esc(d.emptyName) + '.')
+            : ('Gib Kaufpreis und Miete ein \u2014 dann berechne ich den ' + esc(d.emptyName) + '.')) + '</div>' +
+          '<button class="dpsh-empty-btn" type="button" onclick="DealPilotScoreHero.jump(\'kp\',\'s1\')">' + (d.unterSchwelle ? 'Angaben erg\u00e4nzen' : 'Daten eingeben') + '</button>' +
         '</div>' +
       '</div></div>' + stubHtml(d) +
     '</div>';
@@ -596,6 +598,22 @@
       nurInvestor = vollerPlan && !!(i && !i.empty) && !!comp && comp.percent >= schwelle * 100;
     } catch (e) {}
     document.body.classList.toggle('dpsh-nur-investor', nurInvestor);
+    /* v4320 · Marcel 24.11.2026: der Investor Deal Score erst, wenn die Schwelle erreicht ist.
+       Vorher stand er auch bei 50 % Datentiefe als Zahl da (gemessen Demostraße 5: 65/100). */
+    try {
+      var schw2 = (typeof window._dpDs2Schwelle === 'function') ? window._dpDs2Schwelle() : 0.70;
+      if (i && !i.empty && comp && comp.percent < schw2 * 100) {
+        var lab = { rendite: 'Rendite', finanzierung: 'Finanzierung', risiko: 'Risiko', lage: 'Lage', upside: 'Potenzial' };
+        var bc = comp.byCategory || {};
+        var wo = Object.keys(bc).filter(function (k) { return bc[k].filled < bc[k].total; })
+          .sort(function (a, b) { return (bc[b].total - bc[b].filled) - (bc[a].total - bc[a].filled); })
+          .slice(0, 2).map(function (k) { return lab[k] || k; });
+        var ue = emptyData('investor');
+        ue.unterSchwelle = true; ue.ist = comp.percent; ue.soll = Math.round(schw2 * 100);
+        ue.fehlt = Math.max(1, Math.ceil(schw2 * comp.total) - comp.filled); ue.wo = wo.join(' und ');
+        i = ue;
+      }
+    } catch (e3) {}
     if (!nurInvestor) { var c = classicData(depthPct); if (c) html += heroHtml(c); }
     /* v3076 · Einstellung „Bewertung als: zwei Scores" - nur die Anzeige wechselt, gerechnet ist beides. */
     if (i) html += (!i.empty && i.r2 && i.r2.investment && scoreAnsicht() === 'zwei') ? zweiHtml(i) : heroHtml(i);

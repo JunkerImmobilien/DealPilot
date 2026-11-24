@@ -72,7 +72,7 @@ const { query } = require('../db/pool');
    jeder Anmeldung neu eingeben - es lag nur im Browser. */
 /* v3217 - `vermoegen`: Vermögensaufstellung, Haushaltsrechnung und gespeicherte Stände (js/vermoegen.js,
    Umsetzungswunsch W-11). Client-Daten, keine Berechnungsgrundlage - nur Summen fuer Ansicht und Track Record. */
-const ERLAUBT = ['datenraum', 'lage_profil', 'portfolio_analyse', 'eigenes_wissen', 'bwk_profil', 'hinweise', 'mandanten', 'pdf_vorgabe', 'browser_vorgaben', 'stammdaten', 'vermoegen', 'cockpit_ansicht'];   /* v4260: Grundsetup des Portfolio-Cockpits (grafiken-portfolio.js) */   /* v2204: abgeschaltete Hinweise (js/hinweise.js) */
+const ERLAUBT = ['datenraum', 'lage_profil', 'portfolio_analyse', 'eigenes_wissen', 'bwk_profil', 'hinweise', 'mandanten', 'pdf_vorgabe', 'browser_vorgaben', 'stammdaten', 'vermoegen', 'cockpit_ansicht', 'bewertung_ansicht'];   /* v4320: Bloecke des Reiters Bewertung (bewertung-ansicht.js) */   /* v4260: Grundsetup des Portfolio-Cockpits (grafiken-portfolio.js) */   /* v2204: abgeschaltete Hinweise (js/hinweise.js) */
 
 router.get('/:schluessel', authenticate, async (req, res, next) => {
   try {

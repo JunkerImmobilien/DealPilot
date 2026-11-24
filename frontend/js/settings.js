@@ -821,6 +821,12 @@ function showSettings(initialTab) {
           '<span style="font-size:13px;line-height:1.4"><b>Portfolio-Cockpit: Grafiken auswählen</b><br><span style="opacity:.72;font-size:12px">Welche Grafiken das Cockpit zeigt. Das Grundsetup lässt sich jederzeit wiederherstellen.</span></span>' +
           '<button type="button" class="btn btn-outline btn-sm" onclick="try{window._dpCockpitAnsicht&&window._dpCockpitAnsicht()}catch(e){}">Grafiken auswählen</button>' +
         '</div>' +
+        /* v4320 · Marcel 24.11.2026: im Reiter Bewertung „gewisse Sachen ausschalten“. Öffnet dort „Ansicht anpassen“
+           (bewertung-ansicht.js, gespeichert in user_settings bewertung_ansicht). */
+        '<div class="set-bewertung-ansicht" data-vorschau="grafiken_neu" style="margin:-6px 0 16px;padding:12px 14px;border:1px solid var(--border, #e6dfcf);border-radius:12px;display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;justify-content:space-between">' +
+          '<span style="font-size:13px;line-height:1.4"><b>Reiter Bewertung: Blöcke auswählen</b><br><span style="opacity:.72;font-size:12px">Welche Karten der Reiter Bewertung zeigt. Score und Kennzahlen bleiben immer.</span></span>' +
+          '<button type="button" class="btn btn-outline btn-sm" onclick="try{window._dpBewertungAnsicht&&window._dpBewertungAnsicht()}catch(e){}">Blöcke auswählen</button>' +
+        '</div>' +
         /* ── v1162-PROFIL · Hell und Dunkel als zwei Profile ────────────────
            Marcels Vorgabe (Backlog Punkt 5): „DealPilot wird im dunklen Modus
            ausgeliefert. Daneben ein heller Modus, umschaltbar mit einem Griff."
