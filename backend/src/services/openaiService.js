@@ -1918,6 +1918,16 @@ function buildPrompt(payload, opts) {
     '  "empfehlung": "Kaufen | Prüfen | Nicht kaufen",',
     '  "empfehlung_begruendung": "Ausführliche Begründung: die drei Gründe, die das Urteil tragen, je mit Zahl, und was es ändern würde, 8-10 Sätze",',
     '  "dealpilot_insight": "Tool-Voice, 6-8 Sätze, fundiert — die eine Erkenntnis, die in den Zahlen steckt und die man auf den ersten Blick nicht sieht",',
+    /* v4450 · Marcel 24.11.2026: „die Pilot-Analyse mehr mit Bullet Points, dass es in einfacher Ansicht wirklich nur die
+       wichtigen Punkte hat". Die Einfach-Ansicht kürzte bisher die Langtexte auf ihre ersten Sätze. Jetzt liefert die KI
+       eigene Stichpunkte - gezogen aus den Langtexten DIESER Antwort, ohne neue Zahl. */
+    '  "kernpunkte": {',
+    '    "einordnung": [{ "t": "Stichpunkt, höchstens 12 Wörter, mit der tragenden Zahl", "ton": "gut | schlecht | neutral" }, "... 3 bis 5 Einträge, der wichtigste zuerst, aus gesamtbewertung und empfehlung_begruendung"],',
+    '    "schritte": ["Schritt, höchstens 12 Wörter, mit Verb, z.B. \\"Miete Whg. 3 um 45 € anheben\\"", "... 3 bis 5 Schritte in der Reihenfolge, in der man sie angeht, aus verhandlungsempfehlung"],',
+    '    "staerken": ["höchstens 12 Wörter mit Zahl", "... genau 3, die stärksten aus staerken"],',
+    '    "risiken": ["höchstens 12 Wörter mit Zahl", "... genau 3, die schwersten aus risiken"],',
+    '    "steuer": [{ "t": "höchstens 12 Wörter mit Zahl", "ton": "gut | schlecht | neutral" }, "... 2 bis 4 aus steuer_zusammenfassung, null ohne Steuerdaten"]',
+    '  },',
     '  "investmentbewertung": "Holistische Bewertung — 12-16 Sätze, mit Zahlen, Lage, Marktumfeld, Risiko, langfristige Perspektive",',
     '  "verhandlungsempfehlung": "Konkrete Verhandlungsstrategie — 12-16 Sätze: Argumente, Hebel, Zielpreis, Kompromisse",',
     '  "kaufpreis_offerte": {',
@@ -1975,7 +1985,11 @@ function buildPrompt(payload, opts) {
        eine Zeile, die zum Raten einlaedt. */
     _nFotos ? '  "optischer_eindruck": "Was die Fotos ZEIGEN: Bauweise, Fassade, Fenster, Dach, Umfeld, Pflegezustand. Als visueller Eindruck formuliert, nicht als Feststellung. KEIN Baujahr, keine Flaeche, kein Sanierungsjahr, kein Wert daraus ableiten. Widerspricht der Eindruck dem erfassten Zustandsfeld, nenne BEIDES und sage, dass sie auseinandergehen. 4-6 Saetze.",' : '',
     '  "quellen":             ["URL 1", "URL 2", "..."]',
-    '}'
+    '}',
+    /* v4450 · Regeln für kernpunkte (Einfach-Ansicht) */
+    'Zu "kernpunkte": jeder Punkt fasst zusammen, was in den Langtexten DERSELBEN Antwort steht. Keine Zahl, die dort nicht steht.',
+    'Kurze Hauptsätze ohne Gedankenstrich und ohne Semikolon, keine Füllwörter, kein Markdown. "ton" ist "gut", wenn der Punkt für den Investor spricht, "schlecht", wenn er dagegen spricht, sonst "neutral".'
+    + (_ak ? ' Im Bestand sind "schritte" die Hebel der Bestandsstrategie.' : ' Im Ankauf sind "schritte" das, was vor der Unterschrift zu tun ist (prüfen, verhandeln, finanzieren).')
   ].filter(Boolean).join('\n');
 }
 
