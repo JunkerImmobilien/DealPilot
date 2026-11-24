@@ -208,7 +208,7 @@
     '.dp-pa-wrap[data-dp-pa-modus="detail"] .dp-pa5-zwei{grid-template-columns:1fr}',
     '.dp-pa5-zwei > div{min-width:0}',
     /* Zielerreichung */
-    '.dp-pa5-ziel{display:grid;grid-template-columns:minmax(96px,170px) minmax(0,1fr) 52px;gap:4px 12px;align-items:center}',
+    '.dp-pa5-ziel{display:grid;grid-template-columns:minmax(96px,170px) minmax(0,1fr) 52px;gap:4px 12px;align-items:center;margin:0 0 26px}',   /* v4310c · Fork DD 24.11.2026: Überschrift „Kauf gegen heute“ lag ohne Abstand auf der letzten Zeile (dp-pa5-ab:first-child hat margin-top 0) */
     '.dp-pa5-ziel > span{font:400 13px Inter,sans-serif;color:#4A4542}',
     '.dp-pa5-ziel .bahn{height:8px;border-radius:4px;background:#F1ECE1;position:relative;overflow:hidden}',
     '.dp-pa5-ziel .bahn i{position:absolute;left:0;top:0;bottom:0;border-radius:4px;background:#2f6db5}',
