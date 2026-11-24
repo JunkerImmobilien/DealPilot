@@ -794,7 +794,10 @@
   function inhaltSeite(c, B, teile) {
     return B.seite(c, 'Inhalt', B.abschnitt('Investment Case', 'Inhalt')
       + '<table class="inhalt"><tbody>' + teile.map(function (t, i) {
-        return '<tr><td class="num" style="width:12mm;color:var(--gold-d);font-weight:700">' + (t[2] || (i + 1)) + '</td><td><b>' + B.esc(t[0]) + '</b><div class="det">' + B.esc(t[1]) + '</div></td></tr>';
+        /* v4580g · Marcel: „die PDFs brauchen auch Seitenzahlen im Inhaltsverzeichnis.“ Der PDF-Dienst (pdf-dienst/server.js) zählt je
+           Abschnitt (data-dp-abschnitt) die gedruckten Seiten und setzt die Startseite in data-dp-toc. Ohne Dienst bleibt die Spalte leer. */
+        return '<tr><td class="num" style="width:12mm;color:var(--gold-d);font-weight:700">' + (t[2] || (i + 1)) + '</td><td><b>' + B.esc(t[0]) + '</b><div class="det">' + B.esc(t[1]) + '</div></td>'
+          + '<td class="r num" style="width:16mm;vertical-align:top"><span data-dp-toc="' + B.esc(t[3] || '') + '"></span></td></tr>';
       }).join('') + '</tbody></table>');
   }
   function cfDiagramm(B) {
@@ -879,7 +882,7 @@
     _knapp = true;
     try {
       var T = [], P = [];
-      var add = function (titel, unter, html) { if (!html) return; T.push([titel, unter]); P.push([titel, html]); };
+      var add = function (titel, unter, html) { if (!html) return; T.push([titel, unter, null, 'a' + (T.length + 1)]); P.push([titel, html]); };
       add('Überblick', 'Deal Score, Kennzahlen, Ansprechpartner', '<div class="zwei"><div>' + B.scoreRing(SC.score, SC.label) + '</div><div>'
         + B.kacheln([{ l: 'CF n. St. Jahr 1', v: B.eurS(K.cf_ns), art: (K.cf_ns || 0) >= 0 ? 'gut' : 'schlecht' }, { l: 'CF n. St. Ende Zinsbindung', v: B.eurS(K.cf_ns_ezb) }]).replace('class="kz"', 'class="kz" style="grid-template-columns:1fr 1fr"') + '</div></div>'
         + '<h3>Kennzahlen</h3>' + kennzahlen12(K, B, SC) + aufteilungZeile(B, WZ) + ansprechpartner(c, B));
@@ -897,9 +900,10 @@
       var bc = bankCockpit(B, false), sm = stressMatrix(B);
       add('Bank-Cockpit und Belastungsprobe', 'DSCR und LTV im Verlauf, Zins- und Mietstress', (bc || '') + (sm || ''));
       add('Gesamtbewertung', 'Gesamtbewertung, Stärken, Schwächen, Lage und Markt', pilotAnalyse(B, false, false));
-      Sx.push(inhaltSeite(c, B, T.concat([['Annahmen und Hinweise', 'Annahmen, Grundlagen', 'A']])));
-      P.forEach(function (p, i) { Sx.push(B.seite(c, p[0], B.abschnitt('Abschnitt ' + (i + 1), p[0]) + p[1])); });
-      Sx.push(B.seite(c, 'Annahmen', B.abschnitt('Anhang', 'Annahmen und Hinweise') + annahmenVoll(K, B, false)));
+      var mark = function (html, k) { return html.replace('<section class="seite', '<section data-dp-abschnitt="' + k + '" class="seite'); };
+      Sx.push(inhaltSeite(c, B, T.concat([['Annahmen und Hinweise', 'Annahmen, Grundlagen', 'A', 'anh']])));
+      P.forEach(function (p, i) { Sx.push(mark(B.seite(c, p[0], B.abschnitt('Abschnitt ' + (i + 1), p[0]) + p[1]), 'a' + (i + 1))); });
+      Sx.push(mark(B.seite(c, 'Annahmen', B.abschnitt('Anhang', 'Annahmen und Hinweise') + annahmenVoll(K, B, false)), 'anh'));
     } finally { _knapp = false; }
     return B.dokument(name + ' · ' + o.adresse, Sx);
   }

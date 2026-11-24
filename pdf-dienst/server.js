@@ -174,6 +174,27 @@ async function erzeugen(auftrag) {
       schritt('html gesetzt (' + String(schriften).slice(0, 160) + ')');
       const esc = (t) => String(t || '').replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
       const f = Array.isArray(auftrag.fuss) ? auftrag.fuss : [];
+      /* v4580g · Seitenzahlen im Inhaltsverzeichnis (Marcel 24.11.2026). Jeder Abschnitt ist eine eigene section.seite mit Seitenumbruch
+         davor, also zählt hier jeder Abschnitt für sich: Deckblatt plus Abschnitt drucken, Seiten zählen, Deckblatt abziehen. Die erste
+         Seite (Deckblatt, @page:first ohne Rand) bleibt dabei immer stehen, sonst bekäme der Abschnitt deren Rand. Danach die Startseiten
+         in [data-dp-toc] eintragen und das Dokument einmal richtig drucken. Nur wenn das Dokument ein Verzeichnis trägt. */
+      if (/data-dp-toc=/.test(html)) {
+        const zaehle = (b) => (Buffer.from(b).toString('latin1').match(/\/Type\s*\/Page[^s]/g) || []).length;
+        const n = await page.evaluate(() => document.querySelectorAll('body > section.seite').length);
+        const zeige = (i) => page.evaluate((k) => { Array.from(document.querySelectorAll('body > section.seite')).forEach((s, j) => { s.style.display = (j === 0 || j === k || k < 0) ? '' : 'none'; }); }, i);
+        const probe = { format: 'A4', printBackground: true, preferCSSPageSize: true };
+        await zeige(0); const deck = zaehle(await page.pdf(probe));
+        const start = {}; let seite = 1 + deck;
+        for (let i = 1; i < n; i++) {
+          await zeige(i); const k = zaehle(await page.pdf(probe)) - deck;
+          const key = await page.evaluate((j) => document.querySelectorAll('body > section.seite')[j].getAttribute('data-dp-abschnitt'), i);
+          if (key) start[key] = seite;
+          seite += Math.max(1, k);
+        }
+        await zeige(-1);
+        await page.evaluate((st) => { document.querySelectorAll('[data-dp-toc]').forEach((e) => { const s = st[e.getAttribute('data-dp-toc')]; e.textContent = s ? 'S. ' + s : ''; }); }, start);
+        schritt('verzeichnis ' + JSON.stringify(start));
+      }
       const pdf = Buffer.from(await page.pdf({
         format: 'A4', printBackground: true, preferCSSPageSize: true, displayHeaderFooter: true,
         headerTemplate: '<span></span>',
