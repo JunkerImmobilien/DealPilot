@@ -255,6 +255,23 @@
       body: 'DealPilot merkt sich je Jahr DSCR, Deal Score, Cashflow, Miete und Restschuld. Das passiert bei jedem Speichern von selbst, der Knopf tut es sofort. Im nächsten Jahr steht dieser Stand dann in der Tabelle Jahr für Jahr neben dem Plan vom Kauf. Ein früheres Jahr wird dabei nicht verändert.',
       severity: 'beginner'
     },
+    /* v4500 · Jahresabgleich, Tabelle Jahr für Jahr (Marcel 24.11.2026: „Kaltmiete Plan und Kaltmiete Ist … kann ich nicht nachvollziehen“) */
+    'pa.ja_miete_plan': {
+      title: 'Kaltmiete geplant',
+      body: 'So viel Kaltmiete hat die Rechnung beim Kauf für dieses Jahr erwartet. Sie ist mit dem Ankauf-Stand eingefroren und ändert sich später nicht mehr. Stellplätze und Zuschläge sind enthalten. Steht die Zahl grau da, gibt es keinen Plan vom Kauf und du siehst die heutige Projektion.',
+      severity: 'beginner'
+    },
+    'pa.ja_miete_ist': {
+      title: 'Kaltmiete tatsächlich',
+      body: 'So viel Kaltmiete ist im Jahr wirklich eingegangen, mit Stellplätzen und Zuschlägen. Darunter steht, woher die Zahl kommt: eingetragen (von dir), laut ViVi oder gerechnet. Gerechnet heißt: es ist noch nichts eingetragen, DealPilot nimmt die Miete und die Mieterhöhungen aus dem Reiter Miete. Im laufenden Jahr ist es eine Hochrechnung. Daneben der Unterschied zum Plan.',
+      severity: 'beginner'
+    },
+    'pa.ja_zulaessig': {
+      title: 'Zulässig nach § 558 BGB',
+      body: 'Die höchste Kaltmiete, die das Jahr nach den Regeln der Mieterhöhung bis zur Vergleichsmiete tragen durfte. Monat für Monat gerechnet: bis zum frühesten Termin die Miete am 1. Januar, danach die zulässige Grenze (Vergleichsmiete, Kappungsgrenze, Sperrfrist). Jede eingetragene Erhöhung wird an ihrem eigenen Tag geprüft. Stellplätze und Zuschläge kommen unverändert dazu. „Erhöhung zu hoch“ heißt: eine eingetragene Erhöhung liegt über dem, was an diesem Tag zulässig war.',
+      paragraph: '§ 558 BGB',
+      severity: 'beginner'
+    },
     'tab3.mv_art': {
       title: 'Vertragsart',
       body: 'Die Vertragsform bestimmt, ob und wann die Miete steigen darf. Bei der Standardmiete gilt die Erhöhung auf die ortsübliche Vergleichsmiete (§ 558 BGB). Staffel- und Indexmiete tragen ihren nächsten Termin schon im Vertrag, dort ist § 558 ausgeschlossen. Bei verknüpften Objekten kommt die Angabe aus ViVi.',
