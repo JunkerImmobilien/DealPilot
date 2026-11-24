@@ -218,7 +218,7 @@
       if (pp.ertragswert_basis) rw.push(['Ertragswert je Stufe', pp.ertragswert_basis]);
       if (pp.sanierung_regel) rw.push(['Sanierung aus dem Ankauf', pp.sanierung_regel]);
       if (pp.kennzeichnung) rw.push(['Einordnung', pp.kennzeichnung]);
-      if (rw.length) h += '<div class="dp-pa-d">' + karte(kopf('So ist gerechnet') + rw.map(function (x) { return '<div class="dp-pa-kv"><strong>' + esc(x[0]) + ':</strong> ' + esc(x[1]) + '</div>'; }).join(''), 'dp-pa4-mt') + '</div>';
+      if (rw.length) h += '<div class="dp-pa-d">' + karte(kopf('So ist gerechnet') + rw.map(function (x) { return '<div class="dp-pa-kv"><strong>' + esc(x[0]) + ':</strong> ' + esc(ohneStrich(x[1])) + '</div>'; }).join(''), 'dp-pa4-mt') + '</div>';
       var W = Array.isArray(pp.wohnungen) ? pp.wohnungen : [];
       if (W.length > 1) h += '<div class="dp-pa-d">' + karte(kopf('Je Wohnung') + '<div class="dp-pap-tab"><table><thead><tr><th>Wohnung</th><th>Fläche</th><th>Ist</th><th>nach § 558</th><th>Zielbild</th><th>Maßnahmen</th><th>Wann</th></tr></thead><tbody>'
         + W.map(function (w) {
