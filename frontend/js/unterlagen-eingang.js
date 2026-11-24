@@ -495,7 +495,7 @@
     if (el('dp-eg-css')) return;
     var s = document.createElement('style'); s.id = 'dp-eg-css';
     var g = 'var(--wl-c9a84c, #C9A84C)';
-    s.textContent = '.dp-pa-wrap .dp-gn.dp-gx:empty{display:none!important}'
+    s.textContent = '.dp-pa-wrap .dp-gn.dp-gx:empty{padding:0!important;border:0!important;box-shadow:none!important;margin:0!important;min-height:0!important;background:none!important}'   /* v4520 · nicht display:none: eine leere Karte braucht ihre Breite, sonst zeichnet grafiken-neu zeichnen() nie (w < 120) und alle Premium-Grafiken blieben leer */
       + '.dp-eg-tab{border:1px solid color-mix(in srgb,' + g + ' 22%,transparent);border-radius:10px;overflow:hidden;background:#fff;font-family:Inter,system-ui,sans-serif;color:var(--ch,#2A2727)}'
       + '.dp-eg-kopf,.dp-eg-z{display:grid;grid-template-columns:92px minmax(0,1fr) 110px 228px;gap:10px;align-items:start;padding:9px 12px}'
       + '.dp-eg-kopf{background:color-mix(in srgb,' + g + ' 7%,#fff);font:600 10px/1.2 "JetBrains Mono",ui-monospace,monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--muted,#7A7370);padding-top:7px;padding-bottom:7px}'

@@ -281,28 +281,40 @@
        pdf-wert-zielbild.js liest weiter h4.dp-wv-h und p.dp-pa-p, die Kacheln tragen keine dieser Klassen. */
     var ohneTags = function (x) { return String(x || '').replace(/<[^>]+>/g, '').replace(/&amp;/g, '&').replace(/\s+[–—]\s+/g, ', ').replace(/\s+/g, ' ').trim(); };
     var kach = [];
-    var kachel = function (lbl, wert, unter, farbe, tipT, tipA) {
-      kach.push('<div class="dp-pa4-z dp-pa4-ztip" tabindex="0" style="--c:' + (farbe || '#E6DCC2') + '" data-dp-pa4-tip="' + esc(JSON.stringify({ t: tipT, a: ohneTags(tipA) })).replace(/"/g, '&quot;') + '">'
+    /* Erklärkarte knapp: ein, zwei Sätze und die Zahlen als Zeilen (r), der volle Text steht unter Detail */
+    var zweiSaetze = function (x) { var t = ohneTags(x).split(/(?<=[.!?])\s+(?=[A-ZÄÖÜ])/); return t.slice(0, 2).join(' '); };
+    var kachel = function (lbl, wert, unter, farbe, tipT, tipA, rows) {
+      var tip = { t: tipT, a: tipA, r: (rows || []).filter(function (z) { return z && z[1] && z[1] !== '–'; }) };
+      kach.push('<div class="dp-pa4-z dp-pa4-ztip" tabindex="0" style="--c:' + (farbe || '#E6DCC2') + '" data-dp-pa4-tip="' + esc(JSON.stringify(tip)).replace(/"/g, '&quot;') + '">'
         + '<span>' + esc(lbl) + '</span><b>' + esc(wert) + '</b>' + (unter ? '<em>' + esc(unter) + '</em>' : '') + '</div>');
     };
     var GOLD = 'var(--wl-c9a84c, #C9A84C)', GRUEN = '#3FA56C', ROT = '#B8625C', HELL = '#E6DCC2';
-    if (AUF) kachel('Führend', 'Je Einheit', AUF.n + ' Wohnungen einzeln bewertet', GOLD, 'Vergleichswert je Einheit, führend', w[0] || '');
-    else if (fu && VERF[fu]) kachel('Führend', VERF[fu], 'an ihm misst sich der Preis', GOLD, VERF[fu] + ', führendes Verfahren', w[0] || '');
+    if (AUF) kachel('Führend', 'Je Einheit', AUF.n + ' Wohnungen einzeln bewertet', GOLD, 'Vergleichswert je Einheit, führend',
+      'Das Haus ist in Wohnungseigentum aufgeteilt. Jede Wohnung ist einzeln bewertet, der Ertragswert des ganzen Hauses stützt.',
+      [['Summe der Wohnungen', eur(AUF.wert)], ['Aufteilungskosten', AUF.kosten > 0 ? eur(AUF.kosten) : ''], ['Ertragswert Haus', ew != null ? eur(ew) : '']]);
+    else if (fu && VERF[fu]) kachel('Führend', VERF[fu], 'an ihm misst sich der Preis', GOLD, VERF[fu] + ', führendes Verfahren',
+      zweiSaetze(w[0] || ''), [[VERF[fu], eur(fu === 'ertragswert' ? ew : fu === 'sachwert' ? sw : vw)], ['Marktpreisindikation', eur(mw)]]);
     if (ew != null) {
       var dE = abw(ew, mw), wortE = Math.abs(dE) <= 5 ? 'Miete und Marktpreis passen' : (dE < 0 ? 'Miete trägt den Marktpreis nicht ganz' : 'Miete trägt mehr als der Markt');
       kachel('Ertragswert', abwText(dE), wortE, Math.abs(dE) <= 5 ? HELL : (dE < 0 ? ROT : GRUEN), 'Ertragswert gegen Marktpreisindikation',
-        ewt + ' ' + (w.filter(function (x) { return /Ertragswert (liegt|und Marktpreis)/.test(x); })[0] || ''));
+        'Der Ertragswert fragt, was die Miete trägt. ' + (Math.abs(dE) <= 5 ? 'Miete und Marktpreis passen zueinander.' : dE < 0 ? 'Käufer zahlen hier mehr, als sich aus der Miete rechnet.' : 'Die Miete trägt mehr, als vergleichbare Objekte kosten.'),
+        [['Jahresrohertrag', ro != null ? eur(ro) : ''], ['Liegenschaftszins', zahl(h.lzs_pct) != null ? pct(h.lzs_pct, 2) + ' %' : ''], ['Ertragswert', eur(ew)], ['Marktpreisindikation', eur(mw)],
+          ['Vielfaches der Jahresmiete', ro ? pct(ew / ro) + ' statt ' + pct(mw / ro) : '']]);
     }
     if (sw != null) {
       var dS = abw(sw, mw);
       kachel('Sachwert', swVorl ? 'Gegenprobe' : abwText(dS), swVorl ? 'Baukosten, keine Marktaussage' : (Math.abs(dS) <= 10 ? 'Substanz passt zum Markt' : (dS < 0 ? 'Markt zahlt mehr als die Substanz' : 'Substanz über dem Markt')),
-        HELL, 'Sachwert', swt);
+        HELL, 'Sachwert', swVorl ? 'Der Sachwert fragt, was die Substanz kostet. Ohne Sachwertfaktor ist er nicht an den Markt angepasst und dient nur der Plausibilität.' : 'Der Sachwert fragt, was die Substanz wert ist, angepasst an den Markt.',
+        [['Bodenwert', zahl(h.sw_bodenwert_eur) != null ? eur(h.sw_bodenwert_eur) : ''], ['Restnutzungsdauer', zahl(h.sw_rnd_jahre) != null ? pct(h.sw_rnd_jahre, 0) + ' Jahre' : ''], ['Sachwertfaktor', !swVorl && zahl(h.sw_faktor) != null ? pct(h.sw_faktor, 2) : ''], ['Sachwert', eur(sw)]]);
     }
-    if (mitAb) kachel('Abschlag Angebote', pct(ab) + ' %', 'ohne Abschlag ' + eur(roh), HELL, 'Abschlag auf Angebotspreise', mpi);
+    if (mitAb) kachel('Abschlag Angebote', pct(ab) + ' %', 'ohne Abschlag ' + eur(roh), HELL, 'Abschlag auf Angebotspreise',
+      'Angebotspreise liegen über dem, was am Ende bezahlt wird. Deshalb ist dieser Abschlag abgezogen.',
+      [['Herkunft', ohneTags(esc(herkunftAbschlag(h))).split(/[:(]/)[0].trim()], ['ohne Abschlag', eur(roh)], ['nach Abschlag', eur(mw)]]);
     if (kp != null) {
       var dK = abw(kp, mw), inSpK = lo != null && hi != null && kp >= lo && kp <= hi;
       kachel('Dein Kaufpreis', abwText(dK), inSpK ? 'innerhalb der Spanne' : (dK < 0 ? 'unter der Spanne' : 'über der Spanne'), dK <= 0 ? GRUEN : ROT, 'Kaufpreis gegen Marktpreisindikation',
-        w.filter(function (x) { return /^Dein Kaufpreis/.test(x); })[0] || '');
+        dK <= 0 ? 'Dein Kaufpreis liegt unter dem, was vergleichbare Objekte kosten.' : 'Dein Kaufpreis liegt über dem, was vergleichbare Objekte kosten.',
+        [['Kaufpreis', eur(kp)], ['Marktpreisindikation', eur(mw)], ['Spanne', lo != null && hi != null ? eur(lo) + ' bis ' + eur(hi) : ''], ['zum Ertragswert', ew != null ? abwText(abw(kp, ew)) : '']]);
     }
     var kachelHtml = kach.length ? '<div class="dp-pa-e dp-wv-kurz" data-dp-kp-nie="1"><div class="dp-pa4-zahlen">' + kach.join('') + '</div>'
       + '<div class="dp-wv-hinweis">Fahr über eine Kachel für die Erklärung. Die Rechenwege stehen unter Detail.</div></div>' : '';
