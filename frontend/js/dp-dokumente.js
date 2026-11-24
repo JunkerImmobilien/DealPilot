@@ -89,7 +89,7 @@
   }
 
   /* ── gemeinsame Seitenstuecke der Investment-Familie ─────────────── */
-  function dreiPhasen(K, B) {
+  function dreiPhasen(K, B, titel1) {   /* v4370 · titel1: im Bestand das Jahr der Heute-Zeile */
     var sp = function (k, t, cls, w) {
       return '<div class="phase ' + cls + '"><h4>' + t + '</h4><table><tbody>'
         + [['Kaltmiete / Jahr', B.eur(w.nkm)], ['− Bewirtschaftung', B.eur(w.bwk)], ['− Zinsen', B.eur(w.zins)], ['− Tilgung', B.eur(w.tilg)],
@@ -98,7 +98,7 @@
         + '</tbody></table></div>';
     };
     return '<div class="drei3">'
-      + sp(1, 'Jahr 1', 'p1', { nkm: K.nkm_j, bwk: K.bwk_cf, zins: K.zins_j, tilg: K.tilg_j, cfop: K.cf_op, st: (K.cf_ns || 0) - (K.cf_op || 0), cfns: K.cf_ns })
+      + sp(1, titel1 || 'Jahr 1', 'p1', { nkm: K.nkm_j, bwk: K.bwk_cf, zins: K.zins_j, tilg: K.tilg_j, cfop: K.cf_op, st: (K.cf_ns || 0) - (K.cf_op || 0), cfns: K.cf_ns })
       + sp(2, 'Ende Zinsbindung', 'p2', { nkm: K.nkm_ezb, bwk: K.bwk_cf_ezb, zins: K.zins_ezb, tilg: K.tilg_ezb, cfop: K.cf_op_ezb, st: (K.cf_ns_ezb || 0) - (K.cf_op_ezb || 0), cfns: K.cf_ns_ezb })
       + sp(3, 'Anschluss', 'p3', { nkm: K.nkm_an, bwk: K.bwk_cf_an, zins: K.zins_an, tilg: K.tilg_an, cfop: K.cf_op_an, st: (K.cf_ns_an || 0) - (K.cf_op_an || 0), cfns: K.cf_ns_an })
       + '</div>';
@@ -137,7 +137,7 @@
       { l: 'Bruttomietrendite', v: B.pct(K.bmy, 2), s: 'auf Kaufpreis' },
       { l: 'Nettomietrendite', v: B.pct(K.nmy, 2), s: 'auf Gesamtinvestition' },
       { l: 'Kaufpreisfaktor', v: B.zahl(K.fak, 1) + '-fach' },
-      { l: 'Cashflow v. St.', v: B.eurS(K.cf_m), s: 'je Monat', art: (K.cf_m || 0) >= 0 ? 'gut' : 'schlecht' },
+      { l: 'Cashflow v. St.', v: B.eurS(K.cf_m), s: K.heute && K.heute.jahr ? 'je Monat, Jahr ' + K.heute.jahr : 'je Monat, volles Jahr', art: (K.cf_m || 0) >= 0 ? 'gut' : 'schlecht' },
       { l: 'DSCR', v: B.zahl(K.dscr, 2), s: 'volles Jahr, heutige Eingaben', art: K.dscr >= 1.2 ? 'gut' : 'schlecht' },
       { l: 'LTV', v: B.pct(K.ltv, 1), s: S.ltv_basis_label ? 'auf ' + S.ltv_basis_label : '' },
       { l: 'EK-Rendite', v: B.pct(K.ekr, 2), s: 'vor Steuern, volles Jahr' },
@@ -647,6 +647,10 @@
       : ['fahrplan', 'einordnung', 'finger', 'ziel', 'mieteuro', 'steuer', 'heat', 'wertverlauf', 'faecher', 'markt', 'lage', 'hebel', 'ausstieg'].concat(voll ? ['hausgeld'] : []);
     var GX = null; try { if (window.DpGrafikenPdf) GX = await Promise.race([DpGrafikenPdf.karten(GXL, { halb: ['finger', 'markt', 'lage', 'hebel', 'ausstieg'] }), new Promise(function (f) { setTimeout(function () { f(null); }, 20000); })]); } catch (e) { GX = null; }
     var g = function (n) { return (GX && GX.html && GX.html[n]) || ''; };
+    /* v4370 · Im Bestand sind Cashflow v. St. und n. St. die Zeile des Steuerjahres (calc.js v3314a), Miete, Zins und Tilgung
+       aber die Eingaben. Gemessen Demostraße 5: Betriebsergebnis 6.562 − 7.250 = −688, die Kette zeigte −1.216. Der Cashflow-Weg
+       und die erste Phase rechnen deshalb mit derselben Zeile (_dpKpisHeute), beschriftet mit dem Jahr. */
+    var KH = typeof window._dpKpisHeute === 'function' ? window._dpKpisHeute(K) : K, hj = K.heute && K.heute.jahr ? K.heute.jahr : null;
     var paar = function (a, b) { var x = g(a), y = g(b); return (x || y) ? '<div class="dp-gx-paar">' + x + y + '</div>' : ''; };
     var S = [], nr = 0, ab = function (t) { nr++; return 'Abschnitt ' + nr; };
     S.push(B.deckblatt(c, { bild: fotos[0] || info.karte || null, eyebrow: name, titel: o.adresse, unter: [o.art, o.wfl ? B.zahl(o.wfl, 0) + ' m² Wohnfläche' : '', o.bj ? 'Baujahr ' + B.jahr(o.bj) : ''].filter(Boolean).join(' · '),
@@ -674,7 +678,7 @@
     };
     /* Überblick (Kurzfassung mit Fahrplan, ohne Score-Ring: der Score steht auf dem Deckblatt und in den Kennzahlen) */
     S.push(B.seite(c, 'Überblick', B.abschnitt('Executive Summary', 'Investitionsüberblick', o.adresse + ' · ' + o.art)
-      + (kurz ? '' : '<div class="zwei"><div>' + B.scoreRing(SC.score, SC.label) + '</div><div>' + B.kacheln([{ l: 'CF n. St. Jahr 1', v: B.eurS(K.cf_ns), art: (K.cf_ns || 0) >= 0 ? 'gut' : 'schlecht' }, { l: 'CF n. St. Ende Zinsbindung', v: B.eurS(K.cf_ns_ezb) }]).replace('class="kz"', 'class="kz" style="grid-template-columns:1fr 1fr"') + '</div></div>')
+      + (kurz ? '' : '<div class="zwei"><div>' + B.scoreRing(SC.score, SC.label) + '</div><div>' + B.kacheln([{ l: hj ? 'CF n. St. ' + hj : 'CF n. St. Jahr 1', v: B.eurS(K.cf_ns), art: (K.cf_ns || 0) >= 0 ? 'gut' : 'schlecht' }, { l: 'CF n. St. Ende Zinsbindung', v: B.eurS(K.cf_ns_ezb) }]).replace('class="kz"', 'class="kz" style="grid-template-columns:1fr 1fr"') + '</div></div>')
       + '<h3>Kennzahlen</h3>' + kennzahlen12(K, B, SC) + (interp && voll ? '<div class="hinweis">Einordnung: ' + B.esc(String(interp).replace(/\s+/g, ' ')) + '</div>' : '')
       + (kurz ? g('fahrplan') : '') + (voll ? ansprechpartner(c, B) : '')));
     /* Einordnung: Ankauf, heute, Zielbild und Score-Fingerabdruck */
@@ -682,7 +686,7 @@
     if (!kurz && (g('fahrplan') || g('ziel'))) S.push(B.seite(c, 'Fahrplan', B.abschnitt(ab(), 'Fahrplan und Ziele', 'Was bis zum Ende der Betrachtung auf dich zukommt und wie weit deine Ziele erreicht sind') + g('fahrplan') + g('ziel')));
     if (!kurz) objektSeite();
     /* Ertrag und Cashflow (v4370: Kennzahlen „wie eingegeben“ = volles Jahr mit den heutigen Eingaben, nicht das laufende Kalenderjahr) */
-    S.push(B.seite(c, 'Ertrag und Cashflow', B.abschnitt(ab(), 'Von der Warmmiete zum Cashflow', 'Volles Jahr mit den heutigen Eingaben') + ertragKette(K, B)
+    S.push(B.seite(c, 'Ertrag und Cashflow', B.abschnitt(ab(), 'Von der Warmmiete zum Cashflow', hj ? 'Jahr ' + hj + ' laut Projektion, wie das Objekt in diesem Jahr läuft' : 'Volles Jahr mit den heutigen Eingaben') + ertragKette(KH, B)
       + (kurz ? (g('heatKompakt') || bankCockpit(B, true)) : '<div class="zwei"><div>' + bewirtschaftungDetail(K, B) + '</div><div>' + steuerWirkung(K, B) + '</div></div>')));
     if (kurz) {
       S.push(B.seite(c, 'Wohin die Miete geht', B.abschnitt(ab(), 'Wohin die Miete geht', 'Der Weg der Miete in diesem Jahr und der Cashflow nach Steuern im Verlauf')
@@ -691,7 +695,7 @@
     } else {
       if (g('mieteuro') || g('steuer')) S.push(B.seite(c, 'Wohin die Miete geht', B.abschnitt(ab(), 'Wohin die Miete geht', 'Der Weg der Miete in diesem Jahr und der Cashflow nach Steuern im Verlauf') + g('mieteuro') + g('steuer')));
       if (kompakt) {
-        S.push(B.seite(c, 'Drei Phasen', B.abschnitt(ab(), 'Finanzierung in drei Phasen und Vermögen', 'Jahr 1, Ende der Zinsbindung und Anschlussfinanzierung, darunter Wert, Restschuld und Eigenkapital') + dreiPhasen(K, B) + (g('wertverlauf') || zuwachsKurz(B))));
+        S.push(B.seite(c, 'Drei Phasen', B.abschnitt(ab(), 'Finanzierung in drei Phasen und Vermögen', 'Jahr 1, Ende der Zinsbindung und Anschlussfinanzierung, darunter Wert, Restschuld und Eigenkapital') + dreiPhasen(KH, B, hj ? 'Jahr ' + hj : '') + (g('wertverlauf') || zuwachsKurz(B))));
         if (g('faecher')) S.push(B.seite(c, 'Spanne', B.abschnitt(ab(), 'Spanne möglicher Verläufe', 'Wie sich dein Vermögen im Objekt entwickeln kann') + g('faecher')));
         wertSeite('');
       } else {
