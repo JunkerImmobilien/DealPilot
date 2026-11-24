@@ -1528,14 +1528,16 @@
      Nach dem Abruf rechnet calc() mit dem neuen Wert (wert-zielbild.js laden), die Analyse lässt sich danach neu abrufen. */
   function mbHinweis() {
     try {
-      var h = document.querySelector('[data-dp-pa-mbfehlt]'); if (!h) return;
       var W = window.DpWertZielbild, b = W && W.bericht ? W.bericht() : null;
+      /* zwei Orte: Kopf der Analyse und die leere Seite vor dem ersten Lauf (storage.js) */
+      Array.prototype.forEach.call(document.querySelectorAll('[data-dp-pa-mbfehlt]'), function (h) {
       if (b || !window._currentObjKey) { h.innerHTML = ''; h.style.display = 'none'; return; }
       h.style.display = '';
       h.innerHTML = '<div class="dp-pa-mbfehlt" style="display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;justify-content:space-between;'
         + 'margin:0 0 12px;padding:10px 14px;border:1px solid var(--gx-linie,#E6DFCF);border-left:3px solid var(--wl-c9a84c,#C9A84C);border-radius:10px;background:var(--gx-flaeche,#F8F6F1);color:var(--gx-text,#2A2727);font-size:13px;line-height:1.45">'
         + '<span><b>Noch kein Marktbericht zu diesem Objekt.</b><br><span style="opacity:.75">Mit Bericht rechnet die Analyse mit dem ermittelten Objektwert statt mit dem Kaufpreis und ordnet Wert und Lage genauer ein. Der Abruf verbraucht eine Bewertung aus deinem Kontingent.</span></span>'
         + knopf('Marktbericht abrufen', 'try{if(window.DpJahresabgleich)DpJahresabgleich.mbAbrufen()}catch(e){}', false) + '</div>';
+      });
       try { if (window.DpVorschau && DpVorschau.markieren) DpVorschau.markieren(); } catch (e) {}
     } catch (e) {}
   }
@@ -1710,6 +1712,6 @@
     }
   });
 
-  window.DpPilotV4 = { VERSION: 'v3444', unterZeigen: unterZeigen, siZeichnen: siZeichnen, siTabelle: siTabelle, wegNeu: wegNeu, scoreSicht: scoreSicht, sichtbarerScore: sichtbarerScore, leisteMessen: leisteMessen, huelle: huelle, uebersicht: uebersicht, risiko: risiko, steuer: steuer, gesamtstatement: gesamtstatement,
+  window.DpPilotV4 = { VERSION: 'v3444', mbHinweis: mbHinweis /* v4300 */, unterZeigen: unterZeigen, siZeichnen: siZeichnen, siTabelle: siTabelle, wegNeu: wegNeu, scoreSicht: scoreSicht, sichtbarerScore: sichtbarerScore, leisteMessen: leisteMessen, huelle: huelle, uebersicht: uebersicht, risiko: risiko, steuer: steuer, gesamtstatement: gesamtstatement,
     wertverlauf: wertverlauf, indexVerlauf: indexVerlauf, linien: linien, modus: modus, setzeModus: setzeModus, neuZeichnen: neuZeichnen, saetze: saetze, steuerTabelle: steuerTabelle };
 })();

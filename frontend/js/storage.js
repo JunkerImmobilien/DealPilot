@@ -994,7 +994,10 @@ function loadData(d) {
     if (aiContentEmpty) {
       aiContentEmpty.innerHTML = '<div style="color:var(--muted);padding:30px 20px;text-align:center">' +
         'Noch keine KI-Analyse für dieses Objekt. Klicke auf <strong>"KI-Analyse starten"</strong> um eine Investmentanalyse zu generieren.' +
-        '</div>';
+        '</div>' +
+        /* v4300 · ohne Marktbericht vor dem ersten Lauf anbieten (pilot-analyse-v4.js mbHinweis, Vorschau grafiken_neu) */
+        '<div data-dp-pa-mbfehlt="1" data-vorschau="grafiken_neu" style="display:none;max-width:760px;margin:0 auto 14px;text-align:left"></div>';
+      setTimeout(function () { try { if (window.DpWertZielbild && DpWertZielbild.laden) DpWertZielbild.laden().then(function () { try { window.DpPilotV4 && DpPilotV4.mbHinweis && DpPilotV4.mbHinweis(); } catch (e) {} }, function () {}); } catch (e) {} }, 400);   /* erst wenn _currentObjKey auf dem neuen Objekt steht */
       /* v4220 · Befund Musterhof 8: im Bestand gab es den Jahresabgleich (und damit den Jahresabschluss-Assistenten) erst
          nach einem KI-Lauf. Er braucht keine KI: ohne Analyse steht er hier allein, sobald ein Ankauf-Stand da ist. */
       try {
