@@ -1267,7 +1267,7 @@ function renderTaxTimeline() {
   var _tlHdr = document.getElementById('tax-timeline-header');
   if (_tlCorp && _tlRate != null) {
     if (_tlHdr) _tlHdr.innerHTML = '<span class="ct-ico"><svg width="22" height="22"><use href="#i-calendar"/></svg></span>K&ouml;rperschaftsteuer-Verlauf der Gesellschaft';
-    try { var _stvK = document.getElementById('tax-verlauf-chart'); if (_stvK) _stvK.innerHTML = ''; } catch (_e2) {}   /* v2544: die ESt-Grafik gilt nicht für die Gesellschaft */
+    try { var _stvK = document.getElementById('tax-verlauf-chart'); if (_stvK) _stvK.innerHTML = ''; var _gxK = document.getElementById('tax-gx-verlauf'); if (_gxK) _gxK.style.display = 'none'; } catch (_e2) {}   /* v2544: die ESt-Grafik gilt nicht für die Gesellschaft */
     var _activeY = State._taxDisplayYear || new Date().getFullYear();
     var chtml = '<div class="tax-tl-grid">';
     var sumKst = 0;
@@ -1322,6 +1322,15 @@ function renderTaxTimeline() {
     /* v3257 · im Reiter Steuer ist das Diagramm einklappbar, standardmäßig zu (steuer-verlauf.js) */
     if (_stvH) _stvH.setAttribute('data-dp-stv-klappbar', '1');
     if (_stvH && window.DpSteuerVerlauf) window.DpSteuerVerlauf.mount(_stvH);
+    /* v4570 · Marcel 24.11.2026: „im Objektcockpit unter Steuer haben wir ein Diagramm Verlauf mit Steuern. Vielleicht können
+       wir dieses nehmen und auch im Tab Steuern reinpacken … einheitlich“. Dieselbe Karte (grafiken-premium.js, State.cfRows)
+       über dem Steuerverlauf. Gemessen Westerfeldstr. 146: alle 20 Jahre Ergebnis V+V und Erstattung/Steuer gleich wie hier
+       (_computeYearTotal gegen zve_steuer und cfns_y − cfop_y, Abweichung 0 €). */
+    if (_stvH && _stvH.parentNode && window.DpGrafikenPremium && DpGrafikenPremium.steuerVerlauf && DpGrafikenPremium.frei && DpGrafikenPremium.frei()) {
+      var _gxS = document.getElementById('tax-gx-verlauf');
+      if (!_gxS) { _gxS = document.createElement('div'); _gxS.id = 'tax-gx-verlauf'; _gxS.style.margin = '0 0 16px'; _stvH.parentNode.insertBefore(_gxS, _stvH); }
+      DpGrafikenPremium.steuerVerlauf(_gxS);
+    }
   } catch (_stvE) {}
   // Render as visual timeline
   var html = '<div class="tax-tl-grid">';
