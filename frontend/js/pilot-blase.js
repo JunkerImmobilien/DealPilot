@@ -269,7 +269,7 @@
     var s5 = el('s5');
     if (!s5 || el('dp-cp-verweis')) return;
     var d = document.createElement('div'); d.id = 'dp-cp-verweis';
-    d.innerHTML = '<span style="flex:1 1 260px">Der <b>Co-Pilot</b> sitzt jetzt in der Pilot-Blase unten rechts – in jeder Ansicht, mit denselben Fragen, Änderungen und Unterlagen.</span>'
+    d.innerHTML = '<span style="flex:1 1 260px">Der <b>Co-Pilot</b> sitzt jetzt in der Pilot-Blase unten rechts. Er ist in jeder Ansicht da, mit denselben Fragen, Änderungen und Unterlagen.</span>'
       + '<button type="button">Co-Pilot öffnen</button>';
     d.querySelector('button').addEventListener('click', auf);
     s5.appendChild(d);
